@@ -1,0 +1,46 @@
+{
+  "created": "2026-10-22",
+  "tool": "image_gen",
+  "calls": 3,
+  "pixellab_calls": 0,
+  "description": "One new coherent office design, clean-background edit, transparent-workstation extraction. No existing character image used as generation reference. Extraction changed framing; runtime uses uniform .55 scale and (90,107.5) offset to align furniture floor contact.",
+  "world": {
+    "width": 1280,
+    "height": 720,
+    "lane": [
+      430,
+      690
+    ],
+    "start": [
+      820,
+      620
+    ],
+    "door": [
+      1084,
+      446
+    ],
+    "desk": {
+      "x": 420,
+      "y": 520,
+      "width": 260,
+      "back_depth": 60
+    }
+  },
+  "files": [
+    {
+      "path": "game-src/art/start-room/design.png",
+      "sha256": "762647faa818d5ad6aa3fadea99c09e6e069aedd706ecc86e400d3ba737fd85a",
+      "bytes": 2027520
+    },
+    {
+      "path": "game-pack/start-room/room.png",
+      "sha256": "723dfe7f25098d6663296aeeef1cdff7eab11a1c27e603da03a64f4d474933e2",
+      "bytes": 1907720
+    },
+    {
+      "path": "game-pack/start-room/workstation.png",
+      "sha256": "a3e628ee6a24461fe017c22d20d53d384f5eec8d5bfcfee2bf38f4377df25a32",
+      "bytes": 371392
+    }
+  ]
+}

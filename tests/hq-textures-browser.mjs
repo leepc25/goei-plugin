@@ -21,14 +21,14 @@ for(const mobile of [false,true]) {
  await page.getByText('새로 시작',{exact:true}).click();
  await page.waitForFunction(()=>window.__goeiEngine?.world?.floor.id==='hq:office');
  await page.waitForTimeout(1700);await page.evaluate(()=>window.__goeiStory.skip());
- await page.waitForFunction(()=>window.artDraws.has(window.__GOEI_BG_ART__.hq_office.hq_office_wall_1));
+ await page.waitForFunction(()=>window.__GOEI_START_ROOM__ && window.artDraws.has(window.__GOEI_START_ROOM__.room) && window.artDraws.has(window.__GOEI_START_ROOM__.workstation));
  const office=await page.evaluate(()=>{
-  const bg=window.__GOEI_BG_ART__;return {wall:artDraws.has(bg.hq_office.hq_office_wall_1),desk:artDraws.has(bg.hq_office['objects/hq_office_objects_1'])};
- });assert.ok(office.wall&&office.desk);
+  const art=window.__GOEI_START_ROOM__,bg=window.__GOEI_BG_ART__;return {room:artDraws.has(art.room),workstation:artDraws.has(art.workstation),legacyWall:artDraws.has(bg.hq_office.hq_office_wall_1),legacyDesk:artDraws.has(bg.hq_office['objects/hq_office_objects_1'])};
+ });assert.ok(office.room&&office.workstation&&!office.legacyWall&&!office.legacyDesk,'새 방 배경과 분리 작업대가 그려지고 이전 사무실 배경/책상은 사용하지 않음');
  await page.screenshot({path:`${out}/${mobile?'mobile':'pc'}-office.png`});
  const door=await page.evaluate(()=>__goeiEngine.world.stage.current().doors.find(d=>d.to));
  async function walk(key,axis,value,sign){await page.keyboard.down(key);await page.waitForFunction(({axis,value,sign})=>sign*(__goeiEngine.world.player[axis]-value)>=0,{axis,value,sign},{timeout:20000});await page.keyboard.up(key)}
- await walk('ArrowUp','y',486,-1);await walk('ArrowRight','x',door.x+78,1);await walk('ArrowDown','y',676,1);await walk('ArrowLeft','x',door.x+20,-1);await page.keyboard.press('KeyE');
+ await walk('ArrowDown','y',620,1);await walk('ArrowRight','x',door.x,1);await walk('ArrowUp','y',446,-1);await page.keyboard.press('KeyE');
  await page.waitForFunction(()=>__goeiEngine.world.floor.id==='hq:f2');await page.waitForTimeout(500);
  const corridor=await page.evaluate(()=>({wall:artDraws.has(__GOEI_BG_ART__.hq_corridor.hq_corridor_wall_2),door:artDraws.has(__GOEI_HQ_DOOR_ROUND2__.frame)}));
  assert.ok(corridor.wall&&corridor.door);assert.deepEqual(errors,[]);

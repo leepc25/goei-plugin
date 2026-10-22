@@ -157,7 +157,7 @@ export interface FloorPlan {
   /** 몸들 위에 그림 (어둠·안개 등, 선택). 없으면 엔진이 world.light < 1일 때 어둡게 덮는다 */
   drawForeground?(ctx: CanvasRenderingContext2D, camX: number, world: WorldView): void;
   /** 몸과 깊이(y) 순서로 섞어 그릴 바닥 위 물건 줄 (월드 좌표). y = 바닥에 닿는 선, x0~x1 = 그림 폭 */
-  depthLayers?: { y: number; x0: number; x1: number; draw(ctx: CanvasRenderingContext2D): void }[];
+  depthLayers?: { y: number; x0: number; x1: number; occludedSilhouette?: boolean; draw(ctx: CanvasRenderingContext2D): void }[];
   /** 바닥 물건을 두면 안 되는 x 구간 (벽 그림 속 문·가구 앞 등) */
   keepOut?: [number, number][];
 }

@@ -66,6 +66,8 @@ export interface HqScene {
   name: string;
   floor: 'out' | '1F' | '2F' | 'B1' | 'B2';
   length: number;
+  /** 장면 전용 보행 깊이. 없으면 공용 본부 보행 띠를 쓴다. */
+  lane?: [number, number];
   /** 마감: office(지상 사무) · life(생활) · lab(지하 SF) · hall(복도) · 옛 그림(street, pasta) */
   look: string;
   /** 옛 벽 칸 그림으로 그리는 장면 (거리·파스타집은 사용자 지시로 그대로 둔다) */
@@ -149,7 +151,20 @@ export const HQ_SCENES: HqScene[] = [
     { id: 'lounge', x: M(23), kind: 'glass', to: 'lounge', toDoor: 'out' },
   ]),
   room({ id: 'wc', name: '화장실', floor: '2F', look: 'life', doors: [exitS('f2', 'wc', 'wc', true)] }, 'wc', true),
-  room({ id: 'office', name: '종합대응팀', floor: '2F', look: 'office', doors: [exitS('f2', 'office', 'office', true)] }, 'office', true),
+  {
+    id: 'office', name: '종합대응팀', floor: '2F', look: 'office', length: 1280, lane: [430, 690],
+    doors: [{ id: 'out', side: 'N', x: 1084, kind: 'door', to: 'f2', toDoor: 'office' }],
+    boxes: [
+      { kind: 'desk', x: 420, y: 520, w: 260, d: 60, h: 140, solid: true },
+      { kind: 'chair', x: 245, y: 512, w: 105, d: 45, h: 190, solid: true },
+    ],
+    fixtures: [], things: [],
+    spots: [
+      { id: 'jaemtri', x: 680, y: 470, place: 'jaemtri', verb: '임무 게시판', face: 1 },
+      { id: 'agents', x: 110, y: 450, place: 'office', verb: '요원' },
+      { id: 'chief', x: 800, y: 470, place: 'chief', verb: '결재' },
+    ],
+  },
   room({ id: 'interview', name: '면담실', floor: '2F', look: 'life', doors: [exitS('f2', 'interview', 'interview')] }, 'interview'),
   room({ id: 'lounge', name: '휴게실', floor: '2F', look: 'life', doors: [exitS('f2', 'lounge', 'lounge')] }, 'lounge'),
   // ── 지하 1층: 의무실(서) · 훈련장·목욕탕(동) ──
@@ -190,14 +205,13 @@ export function whereIs(place: PlaceId): { scene: SceneId; x: number; y?: number
   if (place === 'street') return { scene: 'street', x: 640 };
   return START;
 }
-const chief = SCENE_BY_ID.office.spots.find((s) => s.id === 'chief')!;
-/** 출근·귀환: 종합대응팀 부장 책상 옆 */
-const START = { scene: 'office' as SceneId, x: chief.x - 60, y: chief.y };
+/** 출근·귀환: 단일 화면 사무실의 빈 보행 공간 */
+const START = { scene: 'office' as SceneId, x: 820, y: 620 };
 
 export interface HqMapView {
   scenes: (HqScene & { doors: (HqDoor & { open: boolean })[]; spots: (HqSpot & { open: boolean })[] })[];
   elevator: (typeof ELEVATOR[number] & { open: boolean })[];
-  /** 지금 시작할 장면: 출근·귀환은 사무실 부장 책상 옆, 후송 직후는 의무실 침대 앞 */
+  /** 지금 시작할 장면: 출근·귀환은 사무실, 후송 직후는 의무실 침대 앞 */
   start: { scene: SceneId; x: number; y?: number };
 }
 export function hqMap(s: HqSave, justEvacuated = false): HqMapView {

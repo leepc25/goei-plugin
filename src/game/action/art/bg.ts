@@ -968,38 +968,28 @@ export function drawLedge(ctx: CanvasRenderingContext2D, place: string, x0: numb
 
 /** New belt HQ: decorate walls without introducing painted, non-interactive doors.
  * Authored furniture/windows on these tiles replace procedural wall fixtures. */
-export function drawHqTextureWall(ctx: CanvasRenderingContext2D, place: string, length: number, camX: number): boolean {
+export function drawHqTextureWall(ctx: CanvasRenderingContext2D, place: string, length: number, camX: number, openings: { x: number; width: number }[] = []): boolean {
   const names = walls(place).filter(n => !DOOR_WALLS[n] && !HQ_SKIP.has(n));
   if (!names.length) return false;
   const imgs = names.map(n => image(place, n));
-  if (imgs.some(im => !im)) return false;
+  const strip = plainStrip(names.map(n => [place, n]));
+  const plain = strip ? image(strip[0], strip[1]) : null;
+  if (imgs.some(im => !im) || (openings.length && !plain)) return false;
   ctx.save();
   ctx.imageSmoothingEnabled = false;
   ctx.beginPath(); ctx.rect(0, 0, length, 440); ctx.clip();
   for (let bay = Math.max(0, Math.floor(camX / 640)); bay * 640 < Math.min(length, camX + 1280); bay++) {
-    ctx.drawImage(imgs[bay % imgs.length]!, bay * 640, 0, 640, 440);
+    const name = names[bay % imgs.length], x = bay * 640;
+    ctx.drawImage(imgs[bay % imgs.length]!, x, 0, 640, 440);
+    // Remove the ENTIRE decoration if a real doorway intersects it. A window,
+    // radiator or notice board must never remain behind a door or be cut in half.
+    for (const [a, b] of HQ_WALL_DECO[name] ?? []) {
+      const left = x + a * 2, right = x + b * 2;
+      if (!plain || !strip || !openings.some(d => left < d.x + d.width / 2 + 24 && right > d.x - d.width / 2 - 24)) continue;
+      const [u0, u1] = strip[2];
+      ctx.drawImage(plain, u0, 0, u1 - u0, 220, left - 4, 0, right - left + 8, 440);
+    }
   }
   ctx.restore();
   return true;
-}
-
-/** First integration: independent office furniture, feet at the existing depth key.
- * Fit within the collision width; do not stretch or silently change walkable space. */
-export function drawHqFurniture(ctx: CanvasRenderingContext2D, kind: string, x: number, y: number, width: number): boolean {
-  const refs: Record<string, [string, number]> = {
-    desk: ['hq_office', 1], opdesk: ['hq_jaemtri', 1], chiefdesk: ['hq_chief', 1],
-    cabinet: ['hq_office', 3], sofa: ['hq_office', 4],
-  };
-  const ref = refs[kind];
-  if (!ref) return false;
-  const im = objImage(ref[0], ref[1]);
-  if (!im) return false;
-  const scale = Math.min(2, width / im.naturalWidth);
-  // Narrow side-facing furniture needs its own art, not a miniaturized front view.
-  if (scale < 1.75) return false;
-  const w = Math.round(im.naturalWidth * scale), h = Math.round(im.naturalHeight * scale);
-  if (outsideCanvas(ctx, x - w / 2, y - h, w, h)) return true;
-  ctx.save(); ctx.imageSmoothingEnabled = false;
-  ctx.drawImage(im, Math.round(x - w / 2), Math.round(y - h), w, h);
-  ctx.restore(); return true;
 }

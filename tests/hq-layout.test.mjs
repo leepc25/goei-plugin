@@ -25,12 +25,12 @@ test('본부: 문은 서로 이어진다 (A→B 문이면 B에 A로 돌아오는
   }
 });
 
-test('본부: 복도의 방 문은 전부 북쪽, 방은 화면 아래로 나온다 (1층 정문만 남쪽)', () => {
+test('본부: 사무실은 북쪽 출구, 나머지 방은 아래 출구로 복도에 연결', () => {
   for (const sc of fresh) {
     const isHall = ['lobby', 'f2', 'b1', 'b2'].includes(sc.id);
     for (const d of sc.doors) {
       if (isHall) assert.ok(d.side !== 'S' || (sc.id === 'lobby' && d.id === 'main'), `${sc.id}.${d.id} 복도 남쪽 문`);
-      else if (d.to) assert.equal(d.side, 'S', `${sc.id}.${d.id} 방 출구가 아래가 아님`);
+      else if (d.to) assert.equal(d.side, sc.id === 'office' ? 'N' : 'S', `${sc.id}.${d.id} 방 출구 방향`);
     }
   }
 });
@@ -48,10 +48,11 @@ test('본부: 층마다 가운데 코어(계단·엘리베이터)와 이정표',
 test('본부: 집기는 걷는 띠 안, 들어오는 자리·쓰는 자리는 집기 밖', () => {
   for (const sc of fresh) {
     const S = solid(sc);
-    for (const b of sc.boxes) assert.ok(b.y - b.d >= M.LANE_TOP - 2 && b.y - b.d <= M.LANE_BOT, `${sc.id} ${b.kind} 띠 밖`);
+    const lane = sc.lane ?? [M.LANE_TOP, M.LANE_BOT];
+    for (const b of sc.boxes) assert.ok(b.y - b.d >= lane[0] - 2 && b.y - b.d <= lane[1], `${sc.id} ${b.kind} 띠 밖`);
     for (const s of sc.spots) if (s.y !== undefined) assert.ok(!S.some((p) => M.insideProp(p, s.x, s.y)), `${sc.id} 자리 ${s.id}가 집기 안`);
     for (const d of sc.doors) {
-      const y = d.side === 'S' ? M.LANE_BOT - 14 : M.LANE_TOP + 16;
+      const y = d.side === 'S' ? lane[1] - 14 : lane[0] + 16;
       assert.ok(!S.some((p) => M.insideProp(p, d.x, y)), `${sc.id} 문 ${d.id} 앞이 막힘`);
       assert.ok(d.x > 0 && d.x < sc.length, `${sc.id} 문 ${d.id} 장면 밖`);
     }

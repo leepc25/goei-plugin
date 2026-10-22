@@ -25,16 +25,15 @@ try{
  await page.getByText('새로 시작',{exact:true}).click();await page.waitForTimeout(1500);await page.evaluate(()=>window.__goeiStory.skip());
  await page.waitForFunction(()=>window.__goeiEngine.world?.floor.id==='hq:office'&&!window.__goeiEngine.mods.blocking());
  const door=await page.evaluate(()=>window.__goeiEngine.world.stage.current().doors.find(d=>d.to));
- // 위치 주입 없이 가구 뒤 통로 → 문 오른쪽 빈자리 → 남쪽 출입구로 걷는다.
+ // 위치 주입 없이 책상 아래 안전 통로 → 오른쪽 문 x → 북쪽 출입구로 걷는다.
  const walk=async(key,axis,value,sign)=>{
   await page.keyboard.down(key);
   await page.waitForFunction(({axis,value,sign})=>sign*(window.__goeiEngine.world.player[axis]-value)>=0,{axis,value,sign},{timeout:20000});
   await page.keyboard.up(key);
  };
- await walk('ArrowUp','y',486,-1);
- await walk('ArrowRight','x',door.x+78,1);
- await walk('ArrowDown','y',676,1);
- await walk('ArrowLeft','x',door.x+20,-1);
+ await walk('ArrowDown','y',620,1);
+ await walk('ArrowRight','x',door.x,1);
+ await walk('ArrowUp','y',446,-1);
  await page.keyboard.press('KeyE');
  await page.waitForFunction(()=>window.__goeiEngine.world.floor.id==='hq:f2',{timeout:3000});
  await page.waitForTimeout(400);

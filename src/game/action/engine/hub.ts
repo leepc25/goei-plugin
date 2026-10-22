@@ -7,7 +7,8 @@
 // 화면에 방 이름·층·잠김 이유 같은 글씨를 쓰지 않는다.
 import type { FloorPlan, StageApi, StageModule, WorldView } from './contract';
 import { SCREEN_H, SCREEN_W } from './contract';
-import { HQ_PLACE, drawFloor, drawHqWall, drawPropArt, drawHqTextureWall, drawHqFurniture } from '../art/bg';
+import { HQ_PLACE, drawFloor, drawHqWall, drawPropArt, drawHqTextureWall } from '../art/bg';
+import { drawStartRoom, drawStartRoomFurniture } from '../art/startRoom';
 import { drawHqDoorRound2 } from '../art/hqDoorRound2';
 import { blockByProps, clearSpot, type BlockProp } from './propBlock';
 import { LANE_BOT, LANE_TOP, type HqBox, type HqDoor, type HqMapView, type HqScene, type HqSpot } from '../hq/map';
@@ -40,7 +41,7 @@ const DOOR_W: Record<Door['kind'], number> = { main: 190, door: 120, glass: 160,
 export type Hub = StageModule & { goto(place: string): void; jump(sceneId: string, x?: number, y?: number): void; sceneIds(): string[]; current(): HqScene | null };
 
 const isS = (d: HqDoor) => d.side === 'S';
-const doorY = (d: HqDoor) => (isS(d) ? LANE_BOT - 14 : LANE_TOP + 16);
+const doorY = (d: HqDoor, lane: [number, number] = LANE) => (isS(d) ? lane[1] - 14 : lane[0] + 16);
 
 export function makeHub(host: HubHost, whereIs: (place: string) => { scene: string; x: number; y?: number }): Hub {
   let view: HqMapView | null = null;
@@ -76,16 +77,17 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
       title: sc.name,
       type: 'hq',
       length: len,
-      lane: LANE,
+      lane: sc.lane ?? LANE,
       startX: sx,
       exitX: Infinity,
       props: [],
       encounters: [],
-      depthLayers: sc.boxes.map((b) => ({ y: b.y, x0: b.x - b.w / 2, x1: b.x + b.w / 2, draw: (c: CanvasRenderingContext2D) => {
-        if (sc.id === 'office' && drawHqFurniture(c, b.kind, b.x, b.y, b.w)) return;
+      depthLayers: sc.boxes.filter(b => sc.id !== 'office' || b.kind === 'desk').map((b) => ({ y: b.y, occludedSilhouette: sc.id !== 'office', x0: sc.id === 'office' ? 180 : b.x - b.w / 2, x1: sc.id === 'office' ? 560 : b.x + b.w / 2, draw: (c: CanvasRenderingContext2D) => {
+        if (sc.id === 'office') { drawStartRoomFurniture(c, b.kind); return; }
         drawBox(c, b, sc.look);
       } })),
       drawBackground(c: CanvasRenderingContext2D, camX: number) {
+        if (sc.id === 'office' && drawStartRoom(c, openOf('out'))) return;
         if (sc.legacy) {
           const cov = drawHqWall(c, place, sc.id, len, TOP, sc.doors);
           artDoors = cov ?? new Set();
@@ -101,11 +103,11 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
           return;
         }
         drawRoomShell(c, sc, camX);
-        const textured = (sc.id === 'office' || sc.id === 'f2') && drawHqTextureWall(c, place, len, camX);
+        const textured = (sc.id === 'office' || sc.id === 'f2') && drawHqTextureWall(c, place, len, camX, sc.doors.filter(d => !isS(d)).map(d => ({ x: d.x, width: d.kind === 'glass' ? 192 : DOOR_W[d.kind] + 24 })));
         if (sc.id === 'office' || sc.id === 'f2') drawFloor(c, place, camX - 40, camX + SCREEN_W + 40, TOP, SCREEN_H);
         for (const f of sc.fixtures) {
           // Windows/boards are already painted in the wall tiles; keep functional signage.
-          if (!textured || f.kind === 'directory' || f.kind === 'screen') drawFixture(c, f, sc.look, camX);
+          if (!textured || f.kind === 'directory') drawFixture(c, f, sc.look, camX);
         }
         for (const d of sc.doors) if (!isS(d)) {
           if (sc.id === 'f2' && d.id === 'office' && d.kind === 'glass' && drawHqDoorRound2(c, d.x, openOf(d.id), d.open)) continue;
@@ -135,7 +137,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
   };
   const arriveAt = (sceneId: string, doorId?: string) => {
     const d = sceneOf(sceneId).doors.find((q) => q.id === doorId);
-    return d ? { x: d.x, y: sceneOf(sceneId).legacy ? undefined : doorY(d) } : { x: 200, y: undefined };
+    return d ? { x: d.x, y: sceneOf(sceneId).legacy ? undefined : doorY(d, sceneOf(sceneId).lane ?? LANE) } : { x: 200, y: undefined };
   };
   const goDoor = (sceneId: string, doorId?: string) => {
     const t = arriveAt(sceneId, doorId);
@@ -158,7 +160,8 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
     }
     for (const d of scene.doors) {
       const reach = Math.abs(d.x - px) < (scene.legacy ? 60 : 75);
-      const depth = scene.legacy || (isS(d) ? py > LANE_BOT - 60 : py < LANE_TOP + 75);
+      const lane = scene.lane ?? LANE;
+      const depth = scene.legacy || (isS(d) ? py > lane[1] - 60 : py < lane[0] + 75);
       consider(`door:${d.id}`, 'hubdoor', d.x, reach && depth);
     }
     return best;
@@ -192,7 +195,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
       // 들어온 자리: 문 앞 깊이에, 집기와 겹치면 비켜서
       if (arrive) {
         const y = arrive.y ?? p.y;
-        const at = clearSpot(arrive.x, y, solids, LANE);
+        const at = clearSpot(arrive.x, y, solids, scene?.lane ?? LANE);
         a.movePlayer(at.x, at.y);
         arrive = null;
       }
@@ -201,7 +204,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
         opening.t = OPEN_T;
         then();
       }
-      if (solids.length) blockByProps([p as never], solids, LANE);
+      if (solids.length) blockByProps([p as never], solids, scene?.lane ?? LANE);
       // E가 닿는 것 하나만 엔진 소품으로 (엔진은 x 거리만 보므로 깊이는 여기서 고른다)
       const t = target(p.x, p.y);
       const id = t?.id ?? null;

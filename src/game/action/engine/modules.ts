@@ -600,7 +600,8 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
         if (!cutOnce('first_entry', () => setTimeout(rope, 1200))) setTimeout(rope, 4600);
       }
       // 새 저장의 첫 본부: first_day (첫 출동 영상과 사이에 본부를 한 번 걷게 된다)
-      if (run.stageId === 'hq') setTimeout(() => world === w && cutOnce('first_day'), 600);
+      // The rebuilt starting room is shown immediately. The old full-frame first_day
+      // film is retired until its replacement uses the new room and layered staging.
       w.hitFx = false; // 맞을 때 효과는 껍데기 fx가 그린다
       if (run.stageId === 'hq') return void npc.attach(w, { hub: (hq.hub?.() ?? null) as never, hq: true }); // 본부 걷기: 아이템·대사 안내·전투 기록 없음
       w.notes.runId = (run as Launch).launch?.runId;

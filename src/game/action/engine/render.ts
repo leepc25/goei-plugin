@@ -483,7 +483,7 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
       // 요원이 앞쪽 물건에 가려지면 윤곽을 비쳐 보인다 (완전히 사라지지 않게, 검수 8)
       {
         const pl = w.player;
-        if (pl.alive && (w.props.some((p) => p.y > pl.y + 2 && Math.abs(p.x - pl.x) < p.w / 2 + 50 && !['hubdoor', 'hubspot', 'door', 'elevator', 'hatch'].includes(p.kind)) || layers.some((l) => l.y > pl.y + 2 && pl.x > l.x0 - 50 && pl.x < l.x1 + 50))) {
+        if (pl.alive && (w.props.some((p) => p.y > pl.y + 2 && Math.abs(p.x - pl.x) < p.w / 2 + 50 && !['hubdoor', 'hubspot', 'door', 'elevator', 'hatch'].includes(p.kind)) || layers.some((l) => l.occludedSilhouette !== false && l.y > pl.y + 2 && pl.x > l.x0 - 50 && pl.x < l.x1 + 50))) {
           const q = pos(pl);
           ctx.save();
           ctx.globalAlpha = 0.4;
