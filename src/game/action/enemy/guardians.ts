@@ -9,6 +9,7 @@ import { charge, grab, S, shoot, strike } from './moves';
 import type { Attack, EnemyDef } from './roster';
 import type { FloorType, Hit, LocalBox, WorldView } from './types';
 import { spawnInto } from './registry';
+import { PROJ, Proj } from './proj';
 
 export interface GuardianDef extends EnemyDef {
   floor: FloorType;
@@ -85,7 +86,7 @@ const guardAtk = {
     [S(20, 'down', 6, { strength: 3 })],
     { danger: [{ fx0: -260, fx1: 260, dy: 24 }] },
   ),
-  whistle: shoot('whistle', '호루라기', 76, GH, { tele: 24, shots: 1, gap: 10, recover: 30, fire: 'whistle', armor: 2, body: guardBody }),
+  whistle: bake('whistle', '호루라기', guardBody, [{ n: 24, tele: true }, { n: 10, ev: 'whistle', armor: 2 }, { n: 30 }], [S(0, 'none')]),
   punch: grab('punch', '표 검사 (붙잡기)', 76, GH, { tele: 14, active: 5, recover: 22, reach: 120, lunge: 6, ticks: 40, dmgPerTick: 1.6, armor: 2, body: guardBody }),
 };
 const guardAttacks: Attack[] = [
@@ -157,12 +158,14 @@ const guardBrain: Brain = {
       if (e.mem.watch >= 300 && (e.state === 'idle' || e.state === 'walk')) {
         e.mem.watch = 0;
         e.start(guardAtk.whistle, w, 0);
-        e.mem.peek = 90;
+        e.mem.peek = 60;
       }
-      if (e.mem.peek > 0 && --e.mem.peek < 60 && e.state !== 'attack') {
-        if (e.mem.peek === 59) e.say('(초시계를 본다)', 50);
-        e.weakOpen = Math.max(e.weakOpen, 2);
-        if (e.state === 'idle' || e.state === 'walk') return true;
+      // 예고·발사·회복 중에는 초시계의 2초를 소비하지 않는다.
+      if (e.mem.peek > 0 && (e.state === 'idle' || e.state === 'walk')) {
+        if (e.mem.peek === 60) e.say('(초시계를 본다)', 60);
+        e.mem.peek--;
+        e.weakOpen = Math.max(e.weakOpen, 1);
+        return true;
       }
     }
     if (e.mem.mode === 'patrol' && e.lastHurt > 0 && e.age - e.lastHurt < 2 && !e.mem.stealth) e.mem.mode = 'fight';
@@ -203,6 +206,13 @@ const guardBrain: Brain = {
       e.mem.stealth = true;
       return { weak: true, text: '기습' };
     }
+  },
+  ev(e, name, w) {
+    if (name !== 'whistle') return;
+    if (e.kind !== 'proctor') return e.fire('whistle', w);
+    // 시험 규칙의 점프 회피: 경비원의 전신 파동 대신 바닥 높이로 판정한다.
+    const wave = { ...PROJ.whistle, h: PROJ.ring.h, low: true };
+    w.add(new Proj(wave, 'whistle', e.x, e.y, e.dir, e.id, newAttackId(), e.power));
   },
   drawUnder(e, ctx) {
     const r = e.mem.route as [number, number] | undefined;
@@ -816,7 +826,8 @@ export const elderM: GuardianDef = g({
 });
 
 function pairOf(e: Enemy, w: WorldView): Enemy | null {
-  for (const b of w.bodies) if (b instanceof Enemy && b !== e && b.alive && (b.kind === 'elder_f' || b.kind === 'elder_m') && b.state !== 'dead') return b;
+  const kind = e.kind === 'elder_f' ? 'elder_m' : 'elder_f';
+  for (const b of w.bodies) if (b instanceof Enemy && b.alive && b.kind === kind && b.state !== 'dead') return b;
   return null;
 }
 function startFight(e: Enemy, w: WorldView, why: string) {
@@ -833,12 +844,12 @@ function startFight(e: Enemy, w: WorldView, why: string) {
 
 const elderBrain: Brain = {
   tick(e, w) {
-    if (e.age === 1 && e.mem.solo && e.kind === 'elder_f') spawnInto(w, 'elder_m', e.x + 120, e.y + 10);
     if (e.age === 1) {
-      e.mem.mode = 'table';
-      e.hostile = false;
+      e.mem.mode ??= 'table';
+      e.hostile = e.mem.mode === 'fight';
       e.groggyMax = (e.def as GuardianDef).groggyMax;
       e.mem.tableX = e.x;
+      if (e.mem.solo && e.kind === 'elder_f' && !pairOf(e, w)) spawnInto(w, 'elder_m', e.x + 120, e.y + 10);
     }
     if (e.age === 4 && e.kind === 'elder_f') e.say('앉아요, 밥 먹고 가요.', 120);
     const pair = pairOf(e, w);
@@ -854,7 +865,7 @@ const elderBrain: Brain = {
       e.alpha = Math.max(0, e.alpha - 0.02);
       if (e.alpha <= 0) {
         e.alive = false;
-        if (e.kind === 'elder_f') w.emit({ type: 'custom', name: 'guardianCleared', data: { kind: 'elder', how: 'rule' } });
+        if (e.mem.peaceLead) w.emit({ type: 'custom', name: 'guardianCleared', data: { kind: 'elder', how: 'rule' } });
       }
       return true;
     }
@@ -883,18 +894,28 @@ const elderBrain: Brain = {
     }
     engage(e, w, 0.1);
   },
-  hit(e, h) {
-    if (e.mem.mode === 'table') return;
+  hit(e, h, _part, w) {
+    if (e.mem.mode === 'peace') return { immune: true };
+    // 치명타여도 죽기 전에 짝을 전투로 전환한다. 다음 tick은 죽은 몸을 건너뛴다.
+    if (e.mem.mode === 'table') {
+      startFight(e, w, 'hit');
+      return;
+    }
     if (h.low) return { weak: true, text: '입' };
   },
   signal(e, s, w) {
-    if (e.mem.mode !== 'table') return;
+    if (!e.alive || e.state === 'dead' || e.mem.mode !== 'table') return;
     if (s.kind === 'mealThanks') {
-      for (const x of [e, pairOf(e, w)]) if (x) ((x.mem.mode = 'peace'), x.say('잘 가요, 또 와요.', 80));
-      if (e.kind === 'elder_f') {
-        w.emit({ type: 'custom', name: 'ruleKept', data: { rule: 'r_meal', id: e.id } });
-        w.emit({ type: 'custom', name: 'enemyDrop', data: { id: e.id, kind: 'elder', x: e.x, y: e.y, drops: [{ item: 'relic', n: 1 }, { item: 'shard', n: 5 }] } });
+      const all = [e, pairOf(e, w)].filter(Boolean) as Enemy[];
+      const lead = all.find(x => x.kind === 'elder_f') ?? e;
+      for (const x of all) {
+        x.mem.mode = 'peace';
+        x.hostile = false;
+        x.mem.peaceLead = x === lead;
+        x.say('잘 가요, 또 와요.', 80);
       }
+      w.emit({ type: 'custom', name: 'ruleKept', data: { rule: 'r_meal', id: lead.id } });
+      w.emit({ type: 'custom', name: 'enemyDrop', data: { id: lead.id, kind: 'elder', x: lead.x, y: lead.y, drops: [{ item: 'relic', n: 1 }, { item: 'shard', n: 5 }] } });
     } else if (s.kind === 'mealEat') {
       w.emit({ type: 'custom', name: 'hurtPlayer', data: { dmg: 30, debuff: { kind: 'taint', ticks: 900 } } });
       startFight(e, w, 'eat');
@@ -980,10 +1001,16 @@ const touchBrain: Brain = {
     e.mem.touching = touching;
     if (touching >= 3 && !e.mem.evac) {
       e.mem.evac = true;
+      // 후송은 생존 성공과 별개인 종료다. 죽임/드랍 경로로 보내지 않는다.
+      e.mem.hands = [];
+      e.set('dead');
       w.emit({ type: 'custom', name: 'evac', data: { reason: 'touchers' } });
+      w.emit({ type: 'custom', name: 'screen', data: { effect: 'dark', ticks: 0 } });
+      return true;
     }
     e.mem.left = 1800 - e.age;
     if (e.age >= 1800 && e.state !== 'dead') {
+      e.mem.hands = [];
       e.set('dead');
       w.emit({ type: 'custom', name: 'guardianCleared', data: { kind: 'touchers', how: 'endure' } });
       w.emit({ type: 'custom', name: 'screen', data: { effect: 'dark', ticks: 0 } });
@@ -1068,10 +1095,12 @@ export const familyM: GuardianDef = g({
 });
 const FAMILY_ASK = ['우리 애 못 봤어요?', '키가 이만해요. 머리핀을 했어요.', '…정말 못 봤어요?'];
 function familyOther(e: Enemy, w: WorldView): Enemy | null {
-  for (const b of w.bodies) if (b instanceof Enemy && b !== e && b.alive && (b.kind === 'family_f' || b.kind === 'family_m') && b.state !== 'dead') return b;
+  const kind = e.kind === 'family_f' ? 'family_m' : 'family_f';
+  for (const b of w.bodies) if (b instanceof Enemy && b.alive && b.kind === kind && b.state !== 'dead') return b;
   return null;
 }
 function familyFight(e: Enemy, w: WorldView) {
+  if (e.mem.mode === 'fight') return;
   for (const x of [e, familyOther(e, w)]) if (x && x.mem.mode !== 'fight') ((x.mem.mode = 'fight'), (x.hostile = true));
   e.say('(턱이 찢어진다)', 60);
   w.emit({ type: 'bossRoar', x: e.x, kind: 'family208' });
@@ -1081,9 +1110,9 @@ const familyBrain: Brain = {
   tick(e, w) {
     if (e.age === 1) {
       e.groggyMax = (e.def as GuardianDef).groggyMax;
-      e.mem.mode = 'ask';
-      e.hostile = false;
-      if (e.mem.solo && e.kind === 'family_f') spawnInto(w, 'family_m', e.x + 140, e.y + 10);
+      e.mem.mode ??= 'ask';
+      e.hostile = e.mem.mode === 'fight';
+      if (e.mem.solo && e.kind === 'family_f' && !familyOther(e, w)) spawnInto(w, 'family_m', e.x + 140, e.y + 10);
     }
     if (e.mem.mode === 'ask') {
       e.face(w.player.x);
@@ -1096,20 +1125,28 @@ const familyBrain: Brain = {
       }
       return true;
     }
-    if (e.mem.froze > 0) {
-      e.mem.froze--;
-      e.weakOpen = 2;
-      return true;
-    }
     if (!familyOther(e, w) && !e.mem.alone) ((e.mem.alone = true), (e.rally = 99999));
   },
   think: (e, w) => engage(e, w, e.kind === 'family_f' ? 0.14 : 0.08),
-  hit(e, h) {
-    if (e.kind === 'family_m' && ranged(h)) return { mult: 0, noReact: true, text: '비틀거릴 뿐' };
+  hit(e, h, _part, w) {
+    if (e.mem.mode === 'ask') familyFight(e, w);
+    // 공통 피해 계산의 최솟값은 1이다. 배율 0 대신 면역으로 총격을 막는다.
+    if (e.kind === 'family_m' && ranged(h)) {
+      e.flash = 6;
+      return { immune: true, text: '비틀거릴 뿐' };
+    }
   },
   signal(e, s, w) {
-    if ((s.kind === 'childDoor' || s.kind === 'door') && e.mem.mode === 'fight' && !e.mem.doorDone) {
-      for (const x of [e, familyOther(e, w)]) if (x) ((x.mem.doorDone = true), (x.mem.froze = 150), (x.move = null), x.set('stunned'), (x.stunT = 150), x.say('…거기 있니?', 80));
+    // 보통 E도 door 신호를 보낸다. 잠금 조건을 확인한 아이 방만 childDoor를 보내야 한다.
+    if (s.kind === 'childDoor' && e.alive && e.state !== 'dead' && e.mem.mode === 'fight' && !e.mem.doorDone) {
+      for (const x of [e, familyOther(e, w)]) if (x) {
+        x.releaseGrab(w);
+        x.mem.doorDone = true;
+        x.move = null;
+        x.set('stunned');
+        x.stunT = x.weakOpen = 150;
+        x.say('…거기 있니?', 80);
+      }
       w.emit({ type: 'custom', name: 'ruleKept', data: { rule: 'r_child', id: e.id } });
     }
   },
