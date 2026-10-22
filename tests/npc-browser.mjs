@@ -69,7 +69,19 @@ async function run(view, tag) {
   assert.match(sys, /젖은 복도/, '상황판 사건이 들어간다');
   assert.doesNotMatch(sys, /오늘은 좀 쉬자/, '최근 채팅은 기본으로 안 보낸다');
   await S('2-hq-reply');
+  if (view.isMobile) {
+    // 폰 소프트 키보드: 입력칸을 누르면 창이 위로 올라가고 입력칸이 이름 바로 아래로 온다. 키보드(아래 55%)는 회색 판으로 흉내
+    await page.tap('.gnp-in');
+    await page.waitForSelector('.gnp.typing');
+    const [r, ih] = await page.evaluate(() => [document.querySelector('.gnp-in').getBoundingClientRect().bottom, innerHeight]);
+    assert.ok(r < ih * 0.45, `키보드 위에 입력칸 (${Math.round(r)}/${ih})`);
+    await page.evaluate(() => { const k = document.createElement('div'); k.id = 'fakekb'; k.textContent = '(소프트 키보드 자리)'; k.style.cssText = 'position:fixed;left:0;right:0;bottom:0;height:55%;background:#3b3f44;color:#aaa;font:16px sans-serif;display:grid;place-items:center;z-index:99999'; document.body.append(k); });
+    await S('2b-keyboard');
+    await page.evaluate(() => document.getElementById('fakekb').remove());
+    await page.evaluate(() => document.activeElement.blur());
+  }
   // 입력칸에서 Esc로 빠져나와 E = 원래 하던 일(임무 창구). 일시정지 메뉴는 열리지 않는다
+  await page.focus('.gnp-in');
   await page.keyboard.press('Escape');
   assert.ok(await page.isVisible('.gnp'), 'Esc는 입력칸에서만 빠진다');
   await page.keyboard.press('KeyE');
