@@ -163,11 +163,10 @@ C(c,'deadpan','deadpan: arms folded, head tilted, flat unimpressed stare, waitin
 KQ=P((X+2,78),14,SIDE,0,(X+16,G),(X-12,G),(22,32),(18,32),lk=KNEE_UP,rk=KNEE_FWD)
 KU=stand(0,55,0,(6,0),(-4,0),(4,-30),(-2,24),-6,le=('e',6,-6))
 C(c,'lift','squats, grabs low with both hands, then stands and effortlessly raises one arm straight overhead',[KI(0),KQ,lerp(KQ,stand(0,56,4,(6,0),(-4,0),(14,8),(12,10)),.5),stand(0,56,4,(6,0),(-4,0),(14,8),(12,10)),lerp(stand(0,56,4,(6,0),(-4,0),(14,8),(12,10)),KU,.5),KU,KU,KU])
-C(c,'carry','bouncy walk with the near arm raised straight overhead as if carrying something huge, far arm swinging',cyc(8,lambda t: skip_h(t)))
 def skip_h(t):
     c_=math.cos(2*math.pi*t); sn=math.sin(2*math.pi*t)
     return P((X+2,55+3*abs(sn)),3,0.1*c_,0.2*c_,(X+2+11*c_,G-7*max(0,-sn)),(X+2-11*c_,G-7*max(0,sn)),(4,-30),(-1+10*c_,24),le=('e',6,-6),tilt=-4)
-c['carry']=(c['carry'][0],cyc(8,skip_h))
+C(c,'carry','bouncy walk with the near arm raised straight overhead as if carrying something huge, far arm swinging',cyc(8,skip_h))
 KO=stand(3,55,18,(10,0),(-4,0),(14,2),(12,4),-8,le=ELB_DOWN,re=ELB_DOWN)
 C(c,'wonder','wide-eyed wonder: leans far forward toward something, hands raised near the chest',[KI(0),lerp(KI(0),KO,.6),KO,KO])
 KG=lambda a: stand(0,56,6,(6,0),(-4,0),(3,27),(1,27),24+a,head=(5,-7+a*0.3))
