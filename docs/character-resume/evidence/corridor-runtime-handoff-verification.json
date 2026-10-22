@@ -1,0 +1,21 @@
+{
+  "verified_at": "2026-10-22T20:46:22.413718+09:00",
+  "delivery_commit": "a4bcf495c5340ce8079bca70c27a36cdc95ed3c5",
+  "previous_art_delivery_commit": "eda9a6e4c414fa4f4c316cb3d0f0d0265e288f3f",
+  "runtime_zip_path": "game-src/art/cutscene-production-round2/integration/environment-runtime.zip",
+  "runtime_zip_sha256": "5844ee972997cb5d9b04fb24e787a62a277a889a13655114772b3e16c6cdd57a",
+  "frame_mapping_verified": "0000..0016 → 0001..0017",
+  "frame_bytes_unchanged": true,
+  "zip_contents_match_runtime_frames": true,
+  "duration_ms": 2400,
+  "independent_html_unchanged": true,
+  "reported_runtime_test": {
+    "path": "game-src/art/cutscene-production-round2/integration/runtime-validation.json",
+    "duration_ms": 2446.2000000476837,
+    "displayed_frames": 17,
+    "errors": []
+  },
+  "verification_scope": "실제 Git 파일/ZIP/해시·시간표 대조와 담당 실행 기록 확인; 이 세션에서 VideoPlayer 재실행 안 함",
+  "additional_generation_calls": 0,
+  "additional_charge_generations": 0
+}

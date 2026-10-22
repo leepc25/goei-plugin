@@ -211,7 +211,7 @@
       "state": "delivered_cost_reconciled",
       "job_id": "21ec4c32-1bf3-4dba-a2c4-a8368d8af51f",
       "actual_charge": 1,
-      "delivery_sha": "eda9a6e4c414fa4f4c316cb3d0f0d0265e288f3f",
+      "delivery_sha": "a4bcf495c5340ce8079bca70c27a36cdc95ed3c5",
       "do_not_generate_in_character_queue": true,
       "character_generation_calls": 0,
       "separate_door_generation_calls": 0,
@@ -236,7 +236,7 @@
       "submitted_generation_calls": 1,
       "remaining_reserved_generation_calls": 0,
       "additional_ai_animation_calls": 0,
-      "updated_at": "2026-10-22T19:52:31.752698+09:00",
+      "updated_at": "2026-10-22T20:46:22.413718+09:00",
       "cost_evidence": {
         "source": "committed_completed_job_receipt_verified",
         "independently_fetched_here": false,
@@ -278,7 +278,20 @@
         "shared_door_additional_charge": 0,
         "verification_evidence": "docs/character-resume/evidence/corridor-delivery-verification.json",
         "replacement_target": "first_day/c3 총6초 중 앞2.4초 문 열림",
-        "remaining_main_scope": "뒤3.6초 인사/캐릭터·자막·오디오·로딩·게임 통합"
+        "remaining_main_scope": "뒤3.6초 인사/캐릭터·자막·오디오·로딩·게임 통합",
+        "runtime_handoff_commit": "a4bcf495c5340ce8079bca70c27a36cdc95ed3c5",
+        "runtime_zip": "game-src/art/cutscene-production-round2/integration/environment-runtime.zip",
+        "runtime_zip_sha256": "5844ee972997cb5d9b04fb24e787a62a277a889a13655114772b3e16c6cdd57a",
+        "runtime_contract": "game-src/art/cutscene-production-round2/integration/contract.json",
+        "runtime_verification_evidence": "docs/character-resume/evidence/corridor-runtime-handoff-verification.json",
+        "source_index_base": 0,
+        "runtime_index_base": 1,
+        "environment_runtime_frames": "0001..0017",
+        "next_character_frame": "0018",
+        "required_character_duration_ms": 3600,
+        "full_c3_duration_ms": 6000,
+        "subtitle_caveat": "전체 t=8초 기존 인사가 빈 복도에 먼저 표시됨. 캐릭터 시작10.4초·다음대사10.5초와 정합 조정 필요.",
+        "main_integration_status": "미적용; 환경 구간만으로 c3 전체를 대체하지 않음"
       },
       "reported_validation": {
         "normal_and_quarter_speed": true,
@@ -290,10 +303,13 @@
       "pending_completion_scopes": [
         "사용자 시각 승인",
         "실제 모바일 기기 검사",
-        "캐릭터 인사 장면 및 최종 통합"
+        "신규 캐릭터 3.6초 연결(0018부터)",
+        "총6000ms 유지·자막/오디오 정합",
+        "메인 담당 최종 통합"
       ],
       "user_visual_approval": false,
-      "main_integrated": false
+      "main_integrated": false,
+      "original_art_delivery_sha": "eda9a6e4c414fa4f4c316cb3d0f0d0265e288f3f"
     },
     {
       "reservation_id": "spangdal-first-hit-hand-01a1632e82b9",
