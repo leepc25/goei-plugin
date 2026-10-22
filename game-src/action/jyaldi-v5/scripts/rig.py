@@ -957,6 +957,14 @@ SAb=P((X,60),6,0,0,(X+13,G),(X-12,G-1),(24,6),(8,6)); SRb=P((X-3,60),0,0,0,(X+13
 SPb=P((X,60),6,0,0,(X+13,G),(X-12,G-1),(16,8),(8,6))
 clip('shotgun2','side view in profile: firing a pump shotgun from the shoulder with both hands, strong recoil, then racks the pump',[SAb,SRb,lerp(SRb,SAb,.5),SPb,SAb,SAb],
      'holding a long black pump shotgun with a wooden stock and wooden pump in both hands, stock against the shoulder, as long as her arm')
+# 잡기 무릎 3차(2026-10-22): s만 고친 2차도 3/4 정면 → 원인 후보: 뒷손 'chin'(몸 앞을 가로지름) + 높이 든 무릎이 몸 앞을 가림.
+# 뒷손은 엉덩이 옆 아래로 내려 몸 뒤에 두고(앞을 가로지르지 않음), 앞손만 앞으로 뻗어 잡음, 무릎은 허리 높이까지만, 몸통은 살짝 뒤로.
+# 4차(검수 9차: 앞다리 디딤·무릎 안 보임) → 계단 오르기처럼 앞발(lf)을 KNEE_UP으로 높이 든다. 두 손은 앞으로 뻗어 잡아 당김
+GRd=P((X+2,57),4,SIDE,0,(X+14,G),(X-8,G),('a',X+30,33),('a',X+26,36),le=('e',8,10),re=('e',6,12))
+KNd=P((X+1,55),-2,SIDE,0,(X+16,G-26),(X-4,G),('a',X+22,44),('a',X+18,48),lk=KNEE_UP,le=('e',10,14),re=('e',8,15))
+KNe=P((X+1,55),-2,SIDE,0,(X+18,G-29),(X-4,G),('a',X+20,47),('a',X+16,52),lk=KNEE_UP,le=('e',10,16),re=('e',8,17))
+clip('grabknee','side view in profile facing right: grabs forward with both hands, pulls down and drives the near knee up high to chest height, standing on the rear leg',
+     [GRd,lerp(GRd,KNd,.5),KNd,KNe,lerp(KNd,GRd,.6)])
 REDO8=['blast','grabknee','drink','down','getup','collapse','pipe2','walk_shotgun']
 
 A_KP=skel.A
