@@ -1,6 +1,6 @@
 import { VENDORS } from './data';
 import type { ItemRun } from './inventory';
-import { buy, sell, sellPrice, type BuyResult, type Shop } from './shop';
+import { buy, sell, sellPrice, type BuyContext, type BuyResult, type Shop } from './shop';
 import { drawItemIcon } from './icons';
 /**
  * 중림 상인 거래 창. 통합 게임 화면(1280×720 무대) 위에 겹친다. 열려 있는 동안 엔진은 전투를 멈춘다(isOpen).
@@ -30,7 +30,7 @@ const CSS = `
 const WHY: Record<string, string> = { cash: '현금이 모자라', stock: '품절', full: '1~4칸이 가득', ammoFull: '탄이 가득', loan: '빚부터 갚아' };
 
 export interface ShopPanel {
-  open(shop: Shop, run: ItemRun, onBuy: (r: Extract<BuyResult, { ok: true }>) => void, onClose?: () => void): void;
+  open(shop: Shop, run: ItemRun, onBuy: (r: Extract<BuyResult, { ok: true }>) => void, onClose?: () => void, context?: () => BuyContext): void;
   close(): void;
   isOpen(): boolean;
   dispose(): void;
@@ -46,7 +46,7 @@ export function createShopPanel(root: HTMLElement): ShopPanel {
   box.className = 'gi-shop';
   box.hidden = true;
   root.appendChild(box);
-  let cur: { shop: Shop; run: ItemRun; onBuy: (r: Extract<BuyResult, { ok: true }>) => void; onClose?: () => void } | null = null;
+  let cur: { shop: Shop; run: ItemRun; onBuy: (r: Extract<BuyResult, { ok: true }>) => void; onClose?: () => void; context?: () => BuyContext } | null = null;
   let sel = 0;
   let msg = '';
 
@@ -86,11 +86,11 @@ export function createShopPanel(root: HTMLElement): ShopPanel {
     }
     const k = b.dataset.k;
     if (!k) return;
-    const r = buy(cur.shop, cur.run, k);
+    const r = buy(cur.shop, cur.run, k, cur.context?.());
     if (r.ok) {
       cur.onBuy(r);
       msg = `받음: ${r.got}`;
-    } else msg = WHY[r.why];
+    } else msg = r.message ?? (r.currency === 'hp' ? '체력이 모자라거나 체력 거래를 사용할 수 없다' : WHY[r.why]);
     render();
   };
   box.addEventListener('click', e => {
@@ -122,8 +122,8 @@ export function createShopPanel(root: HTMLElement): ShopPanel {
     c?.();
   }
   return {
-    open(shop, run, onBuy, onClose) {
-      cur = { shop, run, onBuy, onClose };
+    open(shop, run, onBuy, onClose, context) {
+      cur = { shop, run, onBuy, onClose, context };
       sel = 0;
       msg = '';
       box.hidden = false;
