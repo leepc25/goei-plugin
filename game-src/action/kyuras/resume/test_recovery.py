@@ -41,6 +41,15 @@ class RecoveryTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 c.call(name, {})
 
+    def test_forbids_other_jobs_and_invalid_indices_before_network(self):
+        c = M.Client("fake-token")
+        job_id = M.JOBS["idle_shotgun"][0]
+        for args in [{"job_id": "another-job"}, {"job_id": job_id, "index": -1},
+                     {"job_id": job_id, "index": 4}, {"job_id": job_id, "index": True},
+                     {"job_id": job_id, "unrecognized": True}]:
+            with self.assertRaises(ValueError):
+                c.call("get_image", args)
+
     def test_resume_fetches_only_missing_indices_and_preserves_usage(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

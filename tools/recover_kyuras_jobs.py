@@ -74,6 +74,14 @@ class Client:
     def call(self, name, arguments):
         if name not in READ_TOOLS:
             raise ValueError("회수 도구는 생성·취소 호출을 허용하지 않습니다")
+        counts = {job_id: count for job_id, count in JOBS.values()}
+        if arguments.get("job_id") not in counts:
+            raise ValueError("등록된 큐라스 회수 작업 ID가 아닙니다")
+        if set(arguments) - {"job_id", "index"}:
+            raise ValueError("지원하지 않는 회수 인자")
+        index = arguments.get("index")
+        if "index" in arguments and (type(index) is not int or not 0 <= index < counts[arguments["job_id"]]):
+            raise ValueError("등록된 프레임 범위가 아닙니다")
         body = json.dumps({"jsonrpc": "2.0", "id": 1, "method": "tools/call",
                            "params": {"name": name, "arguments": arguments}}).encode()
         return parse_rpc(self.request("https://api.pixellab.ai/mcp", body))
