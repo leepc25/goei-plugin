@@ -1,0 +1,9 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "id: c2c9cbc3-8a1e-40fa-b776-6112e7e5a82a\njob_id: c2c9cbc3-8a1e-40fa-b776-6112e7e5a82a\nmodel: pixen\nedit: Correct only the face to the right-facing side profile of this same adult woman. Preserve her white chin-length bob, pale blue eye, facial identity, head position, body pose, white shirt, black trousers, hands, feet, pixel palette, transparent background and canvas. Do not add objects or another person.\nsource: 192x144px\nsize: 192x144px\ntransparent: True\nseed: 221003\nasset_id: 1f0ef13f-5f69-515c-b4da-7cca7675419a\nasset_status: pending (saved when generation completes)\ncost: 1 generation\nstatus: processing (~10-40s)\n\nhint: get_image(job_id=\"c2c9cbc3-8a1e-40fa-b776-6112e7e5a82a\")"
+    }
+  ],
+  "isError": false
+}

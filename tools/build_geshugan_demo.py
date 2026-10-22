@@ -8,7 +8,7 @@ game-src/action/geshugan/clips/<클립>/NN.png (animate_with_skeleton_v3 원본,
 검수에서 정한 장 빼기·순서는 game-src/action/geshugan/fixes.json({클립: {"drop": [장], "order": [장]}}).
 게임용 최종 스트립·manifest.json·hands.json은 game-src/action/geshugan/final/에도 쓴다.
 """
-import base64, io, json, os, sys
+import base64, hashlib, io, json, os, sys
 from PIL import Image
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -37,11 +37,33 @@ SPLIT = [('snap', 'chain3', (0, 5), '1타 스냅다운', 16, [3]), ('mark', 'cha
          ('slam', 'chain3', (9, 15), '3타 내려찍기', 14, [3])]
 
 
+def pixel_edits():
+    path = os.path.join(SRC, 'resume', 'accepted-edits.json')
+    if not os.path.exists(path):
+        return {}
+    with open(path, encoding='utf-8') as f:
+        return json.load(f)['frames']
+
+
 def frames_of(src):
     d = os.path.join(SRC, 'clips', src)
     if not os.path.isdir(d):
         return []
-    return [Image.open(os.path.join(d, f)).convert('RGBA') for f in sorted(os.listdir(d)) if f.endswith('.png')]
+    edits = pixel_edits()
+    frames = []
+    for f in sorted(os.listdir(d)):
+        if not f.endswith('.png'):
+            continue
+        path = os.path.join(d, f)
+        edit = edits.get(f'{src}/{int(f[:-4]):02d}')
+        if edit:
+            with open(path, 'rb') as source:
+                assert hashlib.sha256(source.read()).hexdigest() == edit['original_sha256'], path
+            path = os.path.join(SRC, edit['replacement'])
+            with open(path, 'rb') as replacement:
+                assert hashlib.sha256(replacement.read()).hexdigest() == edit['replacement_sha256'], path
+        frames.append(Image.open(path).convert('RGBA'))
+    return frames
 
 
 ONESHOT = {'step', 'jump', 'crouch', 'chain3', 'tackle', 'airstomp', 'grabreap', 'grabcrush', 'super', 'chain2', 'support', 'down', 'getup',
@@ -145,7 +167,11 @@ def frame_sources(src, idx, fx, raw_frames):
             bbox = raw_frames[raw].getbbox()
             if bbox:
                 dy = fx['align'][str(raw)] - (bbox[3] - 1)
-        out.append({'clip': clip, 'frame': raw, 'offset': [0, dy]})
+        source = {'clip': clip, 'frame': raw, 'offset': [0, dy]}
+        edit = pixel_edits().get(f'{clip}/{raw:02d}')
+        if edit:
+            source['pixelEdit'] = edit
+        out.append(source)
     return out
 
 
@@ -200,8 +226,16 @@ def main():
         if fx.get('outline'):
             frames = [outline(f) for f in frames]
         data = strip(frames)
+        output_path = os.path.join(final, d['key'] + '.png')
+        if os.path.exists(output_path):
+            with open(output_path, 'rb') as existing:
+                previous = existing.read()
+            old_image = Image.open(io.BytesIO(previous)).convert('RGBA')
+            new_image = Image.open(io.BytesIO(data)).convert('RGBA')
+            if old_image.size == new_image.size and old_image.tobytes() == new_image.tobytes():
+                data = previous  # Avoid PNG encoder-only churn across Pillow versions.
         strips[d['key']] = base64.b64encode(data).decode()
-        open(os.path.join(final, d['key'] + '.png'), 'wb').write(data)
+        open(output_path, 'wb').write(data)
         c = {k: d[k] for k in ('label', 'fps', 'loop', 'hits', 'group')} | {'frames': len(frames), 'src': d['src'], 'idx': idx}
         sources = frame_sources(d['src'], idx, fx, raw_frames)
         c['frameSources'] = sources

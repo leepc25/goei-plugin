@@ -1,0 +1,389 @@
+[
+  {
+    "index": 0,
+    "clip": "crouch",
+    "frame": 1,
+    "source": "clips/crouch/01.png",
+    "source_sha256": "ee577cd360103257532c26f7fcd54610eed118a0e4d3494670fb0fc1df46acff",
+    "crop_box": [
+      39,
+      44,
+      103,
+      108
+    ],
+    "crop_file": "input-00-crouch-01.png",
+    "crop_sha256": "3c01c54edc352b381bcf540b2149c29bc1f95b4f9d39fe70a30162b7ffb61b20",
+    "repair_crop_box": [
+      28,
+      24,
+      37,
+      33
+    ]
+  },
+  {
+    "index": 1,
+    "clip": "crouch",
+    "frame": 2,
+    "source": "clips/crouch/02.png",
+    "source_sha256": "8bb6ebb228c1614059a3322966e307ede2f1b15c71e81481a46f68a673395ed6",
+    "crop_box": [
+      40,
+      51,
+      104,
+      115
+    ],
+    "crop_file": "input-01-crouch-02.png",
+    "crop_sha256": "651bbe11631bc2eab8e85d4fad5234b7987aeea752cf22de9c0b09280706f29c",
+    "repair_crop_box": [
+      28,
+      24,
+      37,
+      33
+    ]
+  },
+  {
+    "index": 2,
+    "clip": "crouch",
+    "frame": 3,
+    "source": "clips/crouch/03.png",
+    "source_sha256": "6290b43a26ecf831eaadcd4e92849905465a16d1c8b3cc720b95071a07c6c9c0",
+    "crop_box": [
+      40,
+      55,
+      104,
+      119
+    ],
+    "crop_file": "input-02-crouch-03.png",
+    "crop_sha256": "92a90fdce8ccd4accb6b0ccd9c526e2ab8c42e902418f908b122cacd46bf33d1",
+    "repair_crop_box": [
+      29,
+      24,
+      39,
+      33
+    ]
+  },
+  {
+    "index": 3,
+    "clip": "chain3",
+    "frame": 12,
+    "source": "clips/chain3/12.png",
+    "source_sha256": "f94f3dd6d657829cea335f8ab8cacfd3e8546b0dcefb858c7182eb5d1641535f",
+    "crop_box": [
+      46,
+      55,
+      110,
+      119
+    ],
+    "crop_file": "input-03-chain3-12.png",
+    "crop_sha256": "3fb9db6fce0457c0ab087151c5ff3e0f0d2aa349c2c6021c21ce4c648c036def",
+    "repair_crop_box": [
+      29,
+      23,
+      38,
+      32
+    ]
+  },
+  {
+    "index": 4,
+    "clip": "chain3",
+    "frame": 13,
+    "source": "clips/chain3/13.png",
+    "source_sha256": "ac9d6faa282df0c78412136004cc84471310f136604a0284412a2c6235b9b413",
+    "crop_box": [
+      46,
+      55,
+      110,
+      119
+    ],
+    "crop_file": "input-04-chain3-13.png",
+    "crop_sha256": "0d273e712166ae0836d19471ccba68194890b2a1273523e840c3303e38d7c7f2",
+    "repair_crop_box": [
+      29,
+      22,
+      38,
+      31
+    ]
+  },
+  {
+    "index": 5,
+    "clip": "airstomp",
+    "frame": 3,
+    "source": "clips/airstomp/03.png",
+    "source_sha256": "e26bfe31e4145fff5a2da818e1efda3cabe87a9c2e243e742ee51a2733d332d0",
+    "crop_box": [
+      43,
+      57,
+      107,
+      121
+    ],
+    "crop_file": "input-05-airstomp-03.png",
+    "crop_sha256": "dc8aa21915f46be5c7a85e2cb1dbb6bc29ac725c33426b61b7e38fb7b73d31db",
+    "repair_crop_box": [
+      29,
+      23,
+      38,
+      32
+    ]
+  },
+  {
+    "index": 6,
+    "clip": "airstomp",
+    "frame": 4,
+    "source": "clips/airstomp/04.png",
+    "source_sha256": "267765c1ffc18c88ccae5a06030631f44ac17ad7d169014be694cd31a23b0611",
+    "crop_box": [
+      43,
+      57,
+      107,
+      121
+    ],
+    "crop_file": "input-06-airstomp-04.png",
+    "crop_sha256": "867e04d477617a5dddf77db2913d9b5d30c98af76b35b7572b92ab0be432f642",
+    "repair_crop_box": [
+      29,
+      22,
+      38,
+      31
+    ]
+  },
+  {
+    "index": 7,
+    "clip": "tackle",
+    "frame": 1,
+    "source": "clips/tackle/01.png",
+    "source_sha256": "2e34e748d5f4105d6d38804b74323636366f8fc30c6c3ca5a27c5666a490c906",
+    "crop_box": [
+      50,
+      53,
+      114,
+      117
+    ],
+    "crop_file": "input-07-tackle-01.png",
+    "crop_sha256": "d26cb7269393322eee214f7baf24546810a4ddb0a6cf608c833e572072c6d98e",
+    "repair_crop_box": [
+      27,
+      18,
+      38,
+      27
+    ]
+  },
+  {
+    "index": 8,
+    "clip": "tackle",
+    "frame": 3,
+    "source": "clips/tackle/03.png",
+    "source_sha256": "008ca7c7a98a9567e1c0efc706769271b8b4687369ae11425bdf8f767e7b67d1",
+    "crop_box": [
+      68,
+      53,
+      132,
+      117
+    ],
+    "crop_file": "input-08-tackle-03.png",
+    "crop_sha256": "340a3140caa4d4fcde7389dcb5e2385016abadebb26566b8e0261d3d2a0b6b88",
+    "repair_crop_box": [
+      27,
+      29,
+      37,
+      38
+    ]
+  },
+  {
+    "index": 9,
+    "clip": "grabreap",
+    "frame": 4,
+    "source": "clips/grabreap/04.png",
+    "source_sha256": "7bed14cd720b1674d6b96f936dfffab86d1860116ea4c161e820d5ff5d9f7b0c",
+    "crop_box": [
+      62,
+      54,
+      126,
+      118
+    ],
+    "crop_file": "input-09-grabreap-04.png",
+    "crop_sha256": "bb63868693044db56598510f439aace42dad2df3844fbfdec68cbd9f09160af8",
+    "repair_crop_box": [
+      27,
+      24,
+      39,
+      33
+    ]
+  },
+  {
+    "index": 10,
+    "clip": "grabreap",
+    "frame": 5,
+    "source": "clips/grabreap/05.png",
+    "source_sha256": "b3845fcc81e1430ca1020fd42ef3d9405d1480ef8fc2f7fda8564478161a17b2",
+    "crop_box": [
+      62,
+      54,
+      126,
+      118
+    ],
+    "crop_file": "input-10-grabreap-05.png",
+    "crop_sha256": "0472e36e159dc2c09d94d6fb7613c54b979818006090485ed21981e7a2714bd8",
+    "repair_crop_box": [
+      27,
+      24,
+      39,
+      33
+    ]
+  },
+  {
+    "index": 11,
+    "clip": "chain2",
+    "frame": 2,
+    "source": "clips/chain2/02.png",
+    "source_sha256": "64c9c3bd43e05f51592830ce11fff413fdcab07f1f524df96ff0960c15d09a96",
+    "crop_box": [
+      35,
+      33,
+      99,
+      97
+    ],
+    "crop_file": "input-11-chain2-02.png",
+    "crop_sha256": "4c622571f41afc3235a2a84d75c5f5c8aa3756f439af3b0bb660053234cfc73c",
+    "repair_crop_box": [
+      30,
+      24,
+      39,
+      33
+    ]
+  },
+  {
+    "index": 12,
+    "clip": "chain2",
+    "frame": 4,
+    "source": "clips/chain2/04.png",
+    "source_sha256": "db0b68740eeebd48c26e0f1d5b57259103c0fe6e6217790831f7c0aaa9ac24e6",
+    "crop_box": [
+      35,
+      29,
+      99,
+      93
+    ],
+    "crop_file": "input-12-chain2-04.png",
+    "crop_sha256": "d16197ef878b76731c6c5616a8425963441d041071257fe937585256529f70ea",
+    "repair_crop_box": [
+      29,
+      26,
+      37,
+      35
+    ]
+  },
+  {
+    "index": 13,
+    "clip": "chain2",
+    "frame": 0,
+    "source": "clips/chain2/00.png",
+    "source_sha256": "3db1df6c87228fdcf4ae9b81a93ccce1cd3d2e18e9cee27553cfa00302e6c47d",
+    "crop_box": [
+      37,
+      37,
+      101,
+      101
+    ],
+    "repair_crop_box": [
+      29,
+      24,
+      38,
+      33
+    ]
+  },
+  {
+    "index": 14,
+    "clip": "chain2",
+    "frame": 1,
+    "source": "clips/chain2/01.png",
+    "source_sha256": "fced7be6d5605291c2cd567d985ad65480336b701436f32497aa729e87b2ff0c",
+    "crop_box": [
+      35,
+      33,
+      99,
+      97
+    ],
+    "repair_crop_box": [
+      30,
+      27,
+      40,
+      36
+    ]
+  },
+  {
+    "index": 15,
+    "clip": "chain2",
+    "frame": 3,
+    "source": "clips/chain2/03.png",
+    "source_sha256": "d4892fd6efcddfc0f7d670183d33fd57a6bebc99e37f0d8630f23410c2d067b4",
+    "crop_box": [
+      34,
+      29,
+      98,
+      93
+    ],
+    "repair_crop_box": [
+      30,
+      26,
+      38,
+      35
+    ]
+  },
+  {
+    "index": 16,
+    "clip": "chain2",
+    "frame": 5,
+    "source": "clips/chain2/05.png",
+    "source_sha256": "4838a5fd7f6059313406bfdb2027cf47c56f071418fdd810e74f6ad81c98acb7",
+    "crop_box": [
+      35,
+      29,
+      99,
+      93
+    ],
+    "repair_crop_box": [
+      29,
+      26,
+      37,
+      35
+    ]
+  },
+  {
+    "index": 17,
+    "clip": "chain2",
+    "frame": 6,
+    "source": "clips/chain2/06.png",
+    "source_sha256": "f7a4658b4e21774cb7b559a84ee3fe2e4bdac7cf8f747ddec1cb3796ef94abe7",
+    "crop_box": [
+      35,
+      34,
+      99,
+      98
+    ],
+    "repair_crop_box": [
+      31,
+      27,
+      40,
+      36
+    ]
+  },
+  {
+    "index": 18,
+    "clip": "chain2",
+    "frame": 7,
+    "source": "clips/chain2/07.png",
+    "source_sha256": "70431f11935344c4a9689d1057babfddd22c8e883136281c48e1589f76df3cf1",
+    "crop_box": [
+      37,
+      37,
+      101,
+      101
+    ],
+    "repair_crop_box": [
+      28,
+      24,
+      38,
+      33
+    ]
+  }
+]

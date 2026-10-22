@@ -43,7 +43,7 @@
   }
 </style>
 <div class="wrap">
-  <h1>게슈간 2차 검수판 · 기존 그림 · 새 PixelLab 수정 대기</h1>
+  <h1>게슈간 2차 수정판 · 얼굴·턱 경계 수정 반영 · 사용자 시각 승인 전</h1>
   <div class="bar">
     <label><input type="checkbox" id="rim" checked> 외곽광</label>
     <label><input type="checkbox" id="fx" checked> 히트스톱·흔들림</label>
@@ -54,6 +54,7 @@
     <label><input type="checkbox" id="inspect"> 장별 검수</label>
     <button id="prev" type="button">이전 장</button><button id="next" type="button">다음 장</button>
     <button id="resume" type="button">전투 시연</button>
+    <label>수정 장 <select id="repairs"><option value="">선택해서 검수</option></select></label>
     <span id="state"></span>
   </div>
   <div class="screen" id="screen"><canvas id="c" width="1280" height="720"></canvas></div>
@@ -337,6 +338,21 @@ function stepFrame(delta) {
 $('prev').onclick = () => stepFrame(-1);
 $('next').onclick = () => stepFrame(1);
 $('resume').onclick = () => { $('inspect').checked = false; clearInputs(); G.lock = false; play(idleClip()); };
+for (const [key, clip] of Object.entries(M.clips)) {
+  if (['snap', 'mark', 'slam'].includes(key)) continue;
+  clip.frameSources?.forEach((source, i) => {
+    if (!source.pixelEdit) return;
+    const option = document.createElement('option');
+    option.value = `${key}:${i}`; option.textContent = `${clip.label} ${i + 1}장`;
+    $('repairs').appendChild(option);
+  });
+}
+$('repairs').onchange = () => {
+  if (!$('repairs').value) return;
+  const [key, frame] = $('repairs').value.split(':');
+  clearInputs(); $('inspect').checked = true; G.lock = false; G.y = 0;
+  play(key); G.f = Number(frame); G.t = 0;
+};
 $('padt').onchange = () => $('pad').classList.toggle('show', $('padt').checked);
 if (matchMedia('(pointer:coarse)').matches) { $('padt').checked = true; $('pad').classList.add('show'); }
 for (const b of document.querySelectorAll('#pad button')) {
@@ -610,7 +626,7 @@ function hud() {
   ctx.fillText(`${G.carry ? { pipe: '쇠파이프 띄움', gun: '권총 띄움', box: '상자 띄움' }[G.carry] : '맨손'}${G.grab ? ' · 잡는 중' : ''}${G.tired ? ' · 피로' : ''}${G.hq ? ' · 본부' : ''}`, 24, 86);
   const c = C();
   const source = c?.frameSources?.[G.f];
-  $('state').textContent = c ? `${c.label} ${G.f + 1}/${c.frames} · ${source ? `원본 ${source.clip}/${String(source.frame).padStart(2, '0')}${source.offset[1] ? ` · 세로 ${source.offset[1]}px` : ''}` : ''} · ${$('inspect').checked ? '정지 검수' : '시연 중'}` : '';
+  $('state').textContent = c ? `${c.label} ${G.f + 1}/${c.frames} · ${source ? `원본 ${source.clip}/${String(source.frame).padStart(2, '0')}${source.offset[1] ? ` · 세로 ${source.offset[1]}px` : ''}${source.pixelEdit ? ' · PixelLab 수정 반영' : ''}` : ''} · ${$('inspect').checked ? '정지 검수' : '시연 중'}` : '';
 }
 requestAnimationFrame(update);
 

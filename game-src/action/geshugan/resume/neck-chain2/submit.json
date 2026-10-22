@@ -1,0 +1,21 @@
+{
+  "submitted_at": "2026-10-22T10:48:42.010Z",
+  "queue_before": {
+    "content": [
+      {
+        "type": "text",
+        "text": "1 jobs:\n27a5c819-12b3-4f7b-82ae-fe0a56f55a04 processing 16%, eta ~125s (animation, 24s old)\nhint: cancel_job(job_id=\"...\") to release a stuck job's concurrency slot"
+      }
+    ],
+    "isError": false
+  },
+  "response": {
+    "content": [
+      {
+        "type": "text",
+        "text": "id: cd0766c8-87f7-4b50-8a9c-a7d79c5c3896\njob_id: cd0766c8-87f7-4b50-8a9c-a7d79c5c3896\nsize: 256x128px\nmask: custom mask\nfill: This is a grid of separate pixel-art poses of the SAME adult woman. In EACH masked chin region only, remove the beard-like grey or white strands dangling below her chin. Reveal a clean feminine jawline and small natural skin-colored neck above the existing white shirt collar. Preserve the existing side bob outside the mask. Follow each face angle and the original limited palette, crisp 1px outline and transparent background. Do not connect cells or add any new objects.\ntransparent: True\nseed: 221014\nasset_id: cb42ad61-f146-5104-91fd-5700cb9f5579\nasset_status: pending (saved when generation completes)\ncost: ~10 generations\nstatus: processing (~30-90s)\n\nhint: get_image(job_id=\"cd0766c8-87f7-4b50-8a9c-a7d79c5c3896\")"
+      }
+    ],
+    "isError": false
+  }
+}

@@ -1,0 +1,67 @@
+[
+  {
+    "frame": "crouch/01",
+    "changed_pixels": 56,
+    "outside_patch_changed": 0
+  },
+  {
+    "frame": "crouch/02",
+    "changed_pixels": 61,
+    "outside_patch_changed": 0
+  },
+  {
+    "frame": "crouch/03",
+    "changed_pixels": 54,
+    "outside_patch_changed": 0
+  },
+  {
+    "frame": "chain3/12",
+    "changed_pixels": 69,
+    "outside_patch_changed": 0
+  },
+  {
+    "frame": "chain3/13",
+    "changed_pixels": 65,
+    "outside_patch_changed": 0
+  },
+  {
+    "frame": "airstomp/03",
+    "changed_pixels": 51,
+    "outside_patch_changed": 0
+  },
+  {
+    "frame": "airstomp/04",
+    "changed_pixels": 61,
+    "outside_patch_changed": 0
+  },
+  {
+    "frame": "tackle/01",
+    "changed_pixels": 68,
+    "outside_patch_changed": 0
+  },
+  {
+    "frame": "tackle/03",
+    "changed_pixels": 51,
+    "outside_patch_changed": 0
+  },
+  {
+    "frame": "grabreap/04",
+    "changed_pixels": 80,
+    "outside_patch_changed": 0
+  },
+  {
+    "frame": "grabreap/05",
+    "changed_pixels": 83,
+    "outside_patch_changed": 0
+  },
+  {
+    "frame": "chain2/02",
+    "changed_pixels": 42,
+    "outside_patch_changed": 0
+  },
+  {
+    "frame": "chain2/04",
+    "changed_pixels": 43,
+    "outside_patch_changed": 0
+  }
+]

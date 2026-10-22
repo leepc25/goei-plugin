@@ -1,7 +1,10 @@
 # grig.py 클립을 animate_with_skeleton_v3로 생성. 기준 그림 base/G0.png(192×144, 발 y=136), 첫 장 관절 = 쟈알디 STAND(0)(기준 그림이 그 장을 고친 것).
 # 사용: python3 gen.py [이름...] [--fresh] [--seed=N] [--par=N]. 결과 ../clips/<이름>/NN.png, 기록 ../spend.log
 import sys,time,base64,re,json,os,hashlib,uuid
-import fcntl
+if os.name == 'nt':
+    import msvcrt
+else:
+    import fcntl
 from pathlib import Path
 HERE=os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0,HERE)
 import mcp,grig as R
@@ -64,9 +67,16 @@ if __name__=='__main__':
     if len(names)!=1 or names[0] not in R.CLIPS:
         raise SystemExit('현재 승인·계정 큐 확인을 마친 클립 이름 하나를 명시하세요. 일괄 생성은 금지합니다.')
     lock_path=Path(ROOT)/'resume'/'generation.lock'; lock_path.parent.mkdir(exist_ok=True)
-    lock_file=lock_path.open('a')
-    try: fcntl.flock(lock_file,fcntl.LOCK_EX|fcntl.LOCK_NB)
-    except BlockingIOError: raise SystemExit('이 작업 공간에서 게슈간 생성이 실행 중입니다.')
+    lock_file=lock_path.open('a+b')
+    try:
+        if os.name == 'nt':
+            if lock_file.tell() == 0:
+                lock_file.write(b'0'); lock_file.flush()
+            lock_file.seek(0)
+            msvcrt.locking(lock_file.fileno(), msvcrt.LK_NBLCK, 1)
+        else:
+            fcntl.flock(lock_file,fcntl.LOCK_EX|fcntl.LOCK_NB)
+    except OSError: raise SystemExit('이 작업 공간에서 게슈간 생성이 실행 중입니다.')
     unknown=list((Path(ROOT)/'resume'/'requests').glob('*/status.json'))
     for path in unknown:
         if json.loads(path.read_text()).get('state') in ('submitting','submission_unknown_do_not_retry','response_requires_review'):

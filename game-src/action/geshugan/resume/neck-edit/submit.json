@@ -1,0 +1,21 @@
+{
+  "submitted_at": "2026-10-22T10:42:10.237Z",
+  "queue_before": {
+    "content": [
+      {
+        "type": "text",
+        "text": "2 jobs:\nd9e65b7a-aca2-48db-b2d9-1ae5d15823e4 processing 0%, eta ~148s (animation, 1s old)\n7282832d-aa8a-4969-b050-096a6a4832ed processing 100%, eta ~60s (animation, 2m9s old)\nhint: cancel_job(job_id=\"...\") to release a stuck job's concurrency slot"
+      }
+    ],
+    "isError": false
+  },
+  "response": {
+    "content": [
+      {
+        "type": "text",
+        "text": "id: c679844b-e541-48e4-9006-4b615ddb9dcc\njob_id: c679844b-e541-48e4-9006-4b615ddb9dcc\nmode: text\nframes: 13\nsize: 64x64px\ntransparent: True\nedit: Remove the beard-like grey-white strands hanging directly below this adult woman's chin, revealing a clean feminine jawline and small natural neck above her white shirt collar. Keep the white chin-length bob on the sides of the head. Preserve each distinct pose, face direction, eye, head silhouette, shirt collar, black tie, hands, original limited pixel palette, black pixel outlines and transparent background. Make only this tiny chin cleanup; do not redesign or move anything.\nseed: 221013\nasset_id: 6bacd634-be9e-5334-8ce8-974f60f1dd66\nasset_status: pending (saved when generation completes)\ncost: ~10 generations\nstatus: processing (~30-90s)\n\nhint: get_image(job_id=\"c679844b-e541-48e4-9006-4b615ddb9dcc\")"
+      }
+    ],
+    "isError": false
+  }
+}

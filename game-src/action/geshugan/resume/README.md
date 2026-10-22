@@ -1,3 +1,51 @@
+# 게슈간 Local 제작 재개 결과 · 2026-10-22
+
+**7개 클립 20장에 새 PixelLab 얼굴·턱 수정 반영 완료. 사용자 시각 승인 전.**
+독립 worktree / `codex/art-geshugan-resume`, 새 납품은 `release/demo/geshugan-full.html`.
+HTML 위의 「수정 장」에서 20장을 바로 골라 정지 검수하거나 「전투 시연」으로 플레이한다.
+
+- 기상 `getup/03`: 옆얼굴의 눈·얼굴 영역을 수정. 생성기가 바꾼 몸 색은 채택하지 않았다.
+- 턱 아래 수염처럼 보이는 회색 경계 19장: `crouch/01..03`, `chain3/12,13`, `airstomp/03,04`, `tackle/01,03`, `grabreap/04,05`, `chain2/00..07`.
+- 전투·이동 기존 49클립 288장을 다시 열람해 얼굴·체형·복식·손·접지·끝/첫 장을 대조했다. 이전 드롭/합성·접지 보정을 유지했다. 원본 전투·이동의 모든 타이밍 또는 손 고정점 실측 합격을 뜻하지 않는다.
+- 씻기 원본 20장은 별도 납품 `7b2cb8ae`와 현재 Git blob을 재대조해 전부 동일. 재발주 0건.
+- 원본 `clips/`는 변경하지 않았다. `accepted-edits.json` → `repaired/`를 빌더가 읽고 원본/교체 SHA-256을 검증한다. 최종 manifest의 `frameSources.pixelEdit`에 유료 job ID 또는 무료 image ID·원본/결과 해시·마스크·원좌표를 남겼다.
+- **실제 비용 31회, 제출 4건**. 아래 `local-production.json`과 `spend.log`는 완료 응답의 `charged`를 사용한다. 유료 결과 중 30회분은 최종 불채택/교체됐고, 무료 직접 픽셀 편집 1건(19장·394픽셀)을 추가했다. 동시 제출은 항상 1건. 계정 잔액 차이를 비용으로 배분하지 않았다.
+
+| 작업 ID | 실제 회수 | 결과 |
+| --- | ---: | --- |
+| c2c9cbc3-8a1e-40fa-b776-6112e7e5a82a | 1 | 기상 얼굴 영역만 채택 |
+| c679844b-e541-48e4-9006-4b615ddb9dcc | 10 | 13장 전체편집 결과는 머리/몸 크기·위치 변형으로 불채택. 원본 결과 보존 |
+| ee5ef44a-a16d-4ed1-a494-6578590bb498 | 10 | 마지막 확대 검수에서 큰 턱으로 보여 채택 철회 |
+| cd0766c8-87f7-4b50-8a9c-a7d79c5c3896 | 10 | 6칸 후보 보존, 연계 전체 얼굴 비율 유지를 위해 직접 픽셀 편집으로 교체 |
+| 79a13fde-b17e-47b7-8e9b-11c47ba8f0f9 (image ID) | 0 | 원본19장의 회색 꼬리394픽셀만 정확히 정리한 최종 채택본 |
+
+전체편집 실패 뒤 마스크 방식으로 바꿨지만 일부 턱이 커져 마지막 확대 검수에서 철회했다. 다시 유료 생성하지 않고 PixelLab 무료 `pixelart_workbench`로 원본 얼굴 피부·눈을 모두 유지하면서 턱 아래 회색 꼬리만 지웠다. 마스크 후보의 경계 밖 17/2픽셀 변화와 과한 턱은 납품에 포함하지 않는다. `neck-exact/`의 입력·expected RGBA/교체 RGBA 394개·서버 출력·검증 파일이 최종 근거다. 최종 20장 모두 수정 영역 밖 RGBA 차이는 0이다. 이것은 같은 게슈간 원본의 제한된 보정이며 다른 캐릭터 그림을 사용하지 않는다.
+
+`local-account-status.json`은 Local 인증 성공과 2026-10-22 19:50 KST 무렵 실제 무료 조회를 보존한다: 잔액 14,046.30회 / 크레딧 $0 / Tier3 / 다른 담당 활성 2건 / 게슈간 활성 0건. 이 값은 조회 시점 스냅샷이며 실시간 잔액을 대체하지 않는다. 무료 도움말의 계정 비동기 한도20·동기10·제출간격2초초과를 확인했다. 과거 클라우드401 기록은 아래에 보존한다.
+
+총괄 `01a1632e-358b-7931-b8ab-c3487b5b6095`와 소유권·견적·ID·실제 비용을 조율했다. 준비 도구는 `tool-handoff.json`의 고정087dec12 링크/해시로 수령했고 필요한 게슈간 도구만 사용했다. 큐라스 2건의 회수는 총괄이 지정한 큐라스 담당에게 맡겼다. 총괄 원장, 타 캐릭터, 엔진·본부·스테이지·공용 atlas·통합 HTML은 수정하지 않았다.
+
+검증: 기존 6개 + 수정 전용 3개 단위검사 통과. Chromium PC1366×900 / 폰844×390 / 폰390×844에서 수정 장20개 선택·정지·앞뒤 장·원본 출처·포커스 해제·터치 취소·가로 넘침을 확인했다. 폰 가로 조작부 하단371px으로 화면 안. 해당 스크린샷은 `pc.png`, `phone-landscape.png`, `phone-portrait.png`.
+
+남은 범위: 사용자 시각 승인, 손 소품 고정점의 실측, 기존 bandage 감기 미충족, 후순위 생활·사교·지형73클립. 걷기/달리기 새 발주 없음. 생성 완료와 사용자 시각 승인을 구분한다.
+
+재현(이미 회수한 파일만 사용, 유료 호출 없음):
+
+```text
+python game-src/action/geshugan/resume/apply_getup.py
+python game-src/action/geshugan/resume/apply_necks.py
+python tools/build_geshugan_demo.py
+python game-src/action/geshugan/resume/test_resume.py
+python game-src/action/geshugan/resume/test_pixel_repairs.py
+python game-src/action/geshugan/resume/browser_check.py
+```
+
+필요 패키지 Pillow/numpy/scipy/playwright. Windows에서는 `GESHUGAN_BROWSER`를 설치된 Chrome 경로로 설정한다. 기본 Python이 WindowsApps 연결이면 실제 Python 런타임을 사용한다. `collect.py`는 옛 인증중단 시점의 수집 스크립트이므로 최신 Local 원장 재작성 용도로 실행하지 않는다.
+
+---
+
+아래는 클라우드 인증중단 단계의 **과거 기록**이다. 현재 상태는 위 Local 결과가 우선한다.
+
 # 게슈간 제작 재개 · 총괄 대조 / 2차 검수
 
 2026-10-22 한국 시간. 브랜치 `codex/art-geshugan-resume`.

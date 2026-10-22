@@ -6,6 +6,7 @@
     "source_label": true,
     "blur_reset": true,
     "touch_cancel": false,
+    "repairs_checked": 20,
     "pad_bottom": null
   },
   {
@@ -15,7 +16,8 @@
     "source_label": true,
     "blur_reset": true,
     "touch_cancel": true,
-    "pad_bottom": 373
+    "repairs_checked": 20,
+    "pad_bottom": 371
   },
   {
     "viewport": "phone-portrait",
@@ -24,6 +26,7 @@
     "source_label": true,
     "blur_reset": true,
     "touch_cancel": true,
-    "pad_bottom": 596.875
+    "repairs_checked": 20,
+    "pad_bottom": 622.875
   }
 ]

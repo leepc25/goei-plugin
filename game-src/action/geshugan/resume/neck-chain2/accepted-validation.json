@@ -1,0 +1,32 @@
+[
+  {
+    "frame": "chain2/00",
+    "changed_pixels": 27,
+    "outside_patch_changed": 0
+  },
+  {
+    "frame": "chain2/01",
+    "changed_pixels": 33,
+    "outside_patch_changed": 0
+  },
+  {
+    "frame": "chain2/03",
+    "changed_pixels": 43,
+    "outside_patch_changed": 0
+  },
+  {
+    "frame": "chain2/05",
+    "changed_pixels": 36,
+    "outside_patch_changed": 0
+  },
+  {
+    "frame": "chain2/06",
+    "changed_pixels": 37,
+    "outside_patch_changed": 0
+  },
+  {
+    "frame": "chain2/07",
+    "changed_pixels": 45,
+    "outside_patch_changed": 0
+  }
+]

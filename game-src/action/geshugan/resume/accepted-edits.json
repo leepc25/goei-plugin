@@ -1,0 +1,420 @@
+{
+  "user_visual_approval": false,
+  "frames": {
+    "getup/03": {
+      "original": "clips/getup/03.png",
+      "original_sha256": "195cae51f0bf8c4af5f89721a8b3214bd92920485398807f77447d310c018b9e",
+      "replacement": "resume/repaired/getup/03.png",
+      "replacement_sha256": "5ea78a0008c056ce346a91d9b20372406a7b0f33598f07b258ea66600ce4f011",
+      "job_id": "c2c9cbc3-8a1e-40fa-b776-6112e7e5a82a",
+      "tool": "edit_image_pixen",
+      "patch_box": [
+        56,
+        70,
+        66,
+        85
+      ],
+      "transform": "copy generated face rectangle at original coordinates; preserve all pixels outside",
+      "review": "single visible eye reads as right-facing profile; body/feet/hands pixel-identical; user approval pending"
+    },
+    "crouch/01": {
+      "original": "clips/crouch/01.png",
+      "original_sha256": "ee577cd360103257532c26f7fcd54610eed118a0e4d3494670fb0fc1df46acff",
+      "replacement": "resume/repaired/crouch/01.png",
+      "replacement_sha256": "b2b8274cdfa4da4c703d2a20d8a990676d6be5205b44ffc91f54f914f9b29787",
+      "job_id": null,
+      "image_id": "79a13fde-b17e-47b7-8e9b-11c47ba8f0f9",
+      "tool": "pixelart_workbench",
+      "patch_box": [
+        67,
+        68,
+        76,
+        77
+      ],
+      "atlas_index": 0,
+      "atlas_source_sha256": "fab62176a42d56eee852f95a5112e05018f1f2d8244860b8cf0f7384cab4f473",
+      "atlas_result_sha256": "1313053eaf8c382f3c192db5d1bd6c6159f6cf36470d6997591323d75a1de807",
+      "mask_sha256": "a1c560901fb313d64235c85f72a5e6df17f8d0afa39758812559f0179730e5dc",
+      "transform": "copy reviewed chin region from guarded exact edit; original RGBA outside patch preserved exactly",
+      "review": "original face skin, eye and head size retained; beard tail removed with explicit pixels; user visual approval pending"
+    },
+    "crouch/02": {
+      "original": "clips/crouch/02.png",
+      "original_sha256": "8bb6ebb228c1614059a3322966e307ede2f1b15c71e81481a46f68a673395ed6",
+      "replacement": "resume/repaired/crouch/02.png",
+      "replacement_sha256": "5b3716d2ce341e26a4553ccf1697ac1eb9377e382329f6312d93cccd353d42e9",
+      "job_id": null,
+      "image_id": "79a13fde-b17e-47b7-8e9b-11c47ba8f0f9",
+      "tool": "pixelart_workbench",
+      "patch_box": [
+        68,
+        75,
+        77,
+        84
+      ],
+      "atlas_index": 1,
+      "atlas_source_sha256": "fab62176a42d56eee852f95a5112e05018f1f2d8244860b8cf0f7384cab4f473",
+      "atlas_result_sha256": "1313053eaf8c382f3c192db5d1bd6c6159f6cf36470d6997591323d75a1de807",
+      "mask_sha256": "a1c560901fb313d64235c85f72a5e6df17f8d0afa39758812559f0179730e5dc",
+      "transform": "copy reviewed chin region from guarded exact edit; original RGBA outside patch preserved exactly",
+      "review": "original face skin, eye and head size retained; beard tail removed with explicit pixels; user visual approval pending"
+    },
+    "crouch/03": {
+      "original": "clips/crouch/03.png",
+      "original_sha256": "6290b43a26ecf831eaadcd4e92849905465a16d1c8b3cc720b95071a07c6c9c0",
+      "replacement": "resume/repaired/crouch/03.png",
+      "replacement_sha256": "90903b3eff471b0c253989090ceb5fdbf87f7e6b430086a6f950d61cce239f05",
+      "job_id": null,
+      "image_id": "79a13fde-b17e-47b7-8e9b-11c47ba8f0f9",
+      "tool": "pixelart_workbench",
+      "patch_box": [
+        69,
+        79,
+        79,
+        88
+      ],
+      "atlas_index": 2,
+      "atlas_source_sha256": "fab62176a42d56eee852f95a5112e05018f1f2d8244860b8cf0f7384cab4f473",
+      "atlas_result_sha256": "1313053eaf8c382f3c192db5d1bd6c6159f6cf36470d6997591323d75a1de807",
+      "mask_sha256": "a1c560901fb313d64235c85f72a5e6df17f8d0afa39758812559f0179730e5dc",
+      "transform": "copy reviewed chin region from guarded exact edit; original RGBA outside patch preserved exactly",
+      "review": "original face skin, eye and head size retained; beard tail removed with explicit pixels; user visual approval pending"
+    },
+    "chain3/12": {
+      "original": "clips/chain3/12.png",
+      "original_sha256": "f94f3dd6d657829cea335f8ab8cacfd3e8546b0dcefb858c7182eb5d1641535f",
+      "replacement": "resume/repaired/chain3/12.png",
+      "replacement_sha256": "ab76682c4b08640801887fb3448e270a2135309105f6dbad7396cf37893a7a9d",
+      "job_id": null,
+      "image_id": "79a13fde-b17e-47b7-8e9b-11c47ba8f0f9",
+      "tool": "pixelart_workbench",
+      "patch_box": [
+        75,
+        78,
+        84,
+        87
+      ],
+      "atlas_index": 3,
+      "atlas_source_sha256": "fab62176a42d56eee852f95a5112e05018f1f2d8244860b8cf0f7384cab4f473",
+      "atlas_result_sha256": "1313053eaf8c382f3c192db5d1bd6c6159f6cf36470d6997591323d75a1de807",
+      "mask_sha256": "a1c560901fb313d64235c85f72a5e6df17f8d0afa39758812559f0179730e5dc",
+      "transform": "copy reviewed chin region from guarded exact edit; original RGBA outside patch preserved exactly",
+      "review": "original face skin, eye and head size retained; beard tail removed with explicit pixels; user visual approval pending"
+    },
+    "chain3/13": {
+      "original": "clips/chain3/13.png",
+      "original_sha256": "ac9d6faa282df0c78412136004cc84471310f136604a0284412a2c6235b9b413",
+      "replacement": "resume/repaired/chain3/13.png",
+      "replacement_sha256": "0c1541ada6ec9d65fcc4bb1b585a98806722b63c1b5821c7a5e036bcf1e4c792",
+      "job_id": null,
+      "image_id": "79a13fde-b17e-47b7-8e9b-11c47ba8f0f9",
+      "tool": "pixelart_workbench",
+      "patch_box": [
+        75,
+        77,
+        84,
+        86
+      ],
+      "atlas_index": 4,
+      "atlas_source_sha256": "fab62176a42d56eee852f95a5112e05018f1f2d8244860b8cf0f7384cab4f473",
+      "atlas_result_sha256": "1313053eaf8c382f3c192db5d1bd6c6159f6cf36470d6997591323d75a1de807",
+      "mask_sha256": "a1c560901fb313d64235c85f72a5e6df17f8d0afa39758812559f0179730e5dc",
+      "transform": "copy reviewed chin region from guarded exact edit; original RGBA outside patch preserved exactly",
+      "review": "original face skin, eye and head size retained; beard tail removed with explicit pixels; user visual approval pending"
+    },
+    "airstomp/03": {
+      "original": "clips/airstomp/03.png",
+      "original_sha256": "e26bfe31e4145fff5a2da818e1efda3cabe87a9c2e243e742ee51a2733d332d0",
+      "replacement": "resume/repaired/airstomp/03.png",
+      "replacement_sha256": "4eafbe1ba86e7a9815a9e1fb3cc383d2604a5968cfe5abe87362118a93e79f5c",
+      "job_id": null,
+      "image_id": "79a13fde-b17e-47b7-8e9b-11c47ba8f0f9",
+      "tool": "pixelart_workbench",
+      "patch_box": [
+        72,
+        80,
+        81,
+        89
+      ],
+      "atlas_index": 5,
+      "atlas_source_sha256": "fab62176a42d56eee852f95a5112e05018f1f2d8244860b8cf0f7384cab4f473",
+      "atlas_result_sha256": "1313053eaf8c382f3c192db5d1bd6c6159f6cf36470d6997591323d75a1de807",
+      "mask_sha256": "a1c560901fb313d64235c85f72a5e6df17f8d0afa39758812559f0179730e5dc",
+      "transform": "copy reviewed chin region from guarded exact edit; original RGBA outside patch preserved exactly",
+      "review": "original face skin, eye and head size retained; beard tail removed with explicit pixels; user visual approval pending"
+    },
+    "airstomp/04": {
+      "original": "clips/airstomp/04.png",
+      "original_sha256": "267765c1ffc18c88ccae5a06030631f44ac17ad7d169014be694cd31a23b0611",
+      "replacement": "resume/repaired/airstomp/04.png",
+      "replacement_sha256": "ee43e6c50374340b4ec799fb1421ac46d75abe64f9bcff0ba93e7f633c3efb85",
+      "job_id": null,
+      "image_id": "79a13fde-b17e-47b7-8e9b-11c47ba8f0f9",
+      "tool": "pixelart_workbench",
+      "patch_box": [
+        72,
+        79,
+        81,
+        88
+      ],
+      "atlas_index": 6,
+      "atlas_source_sha256": "fab62176a42d56eee852f95a5112e05018f1f2d8244860b8cf0f7384cab4f473",
+      "atlas_result_sha256": "1313053eaf8c382f3c192db5d1bd6c6159f6cf36470d6997591323d75a1de807",
+      "mask_sha256": "a1c560901fb313d64235c85f72a5e6df17f8d0afa39758812559f0179730e5dc",
+      "transform": "copy reviewed chin region from guarded exact edit; original RGBA outside patch preserved exactly",
+      "review": "original face skin, eye and head size retained; beard tail removed with explicit pixels; user visual approval pending"
+    },
+    "tackle/01": {
+      "original": "clips/tackle/01.png",
+      "original_sha256": "2e34e748d5f4105d6d38804b74323636366f8fc30c6c3ca5a27c5666a490c906",
+      "replacement": "resume/repaired/tackle/01.png",
+      "replacement_sha256": "c0b1ece809c80f718b61aed2b004d72d5ecca374ccda3dcae21ee4e4061d50e9",
+      "job_id": null,
+      "image_id": "79a13fde-b17e-47b7-8e9b-11c47ba8f0f9",
+      "tool": "pixelart_workbench",
+      "patch_box": [
+        77,
+        71,
+        88,
+        80
+      ],
+      "atlas_index": 7,
+      "atlas_source_sha256": "fab62176a42d56eee852f95a5112e05018f1f2d8244860b8cf0f7384cab4f473",
+      "atlas_result_sha256": "1313053eaf8c382f3c192db5d1bd6c6159f6cf36470d6997591323d75a1de807",
+      "mask_sha256": "a1c560901fb313d64235c85f72a5e6df17f8d0afa39758812559f0179730e5dc",
+      "transform": "copy reviewed chin region from guarded exact edit; original RGBA outside patch preserved exactly",
+      "review": "original face skin, eye and head size retained; beard tail removed with explicit pixels; user visual approval pending"
+    },
+    "tackle/03": {
+      "original": "clips/tackle/03.png",
+      "original_sha256": "008ca7c7a98a9567e1c0efc706769271b8b4687369ae11425bdf8f767e7b67d1",
+      "replacement": "resume/repaired/tackle/03.png",
+      "replacement_sha256": "2bb956adedd88fd440a64fcaf6c19a43118bcac6e2b93a72cab67ef0192c3c97",
+      "job_id": null,
+      "image_id": "79a13fde-b17e-47b7-8e9b-11c47ba8f0f9",
+      "tool": "pixelart_workbench",
+      "patch_box": [
+        95,
+        82,
+        105,
+        91
+      ],
+      "atlas_index": 8,
+      "atlas_source_sha256": "fab62176a42d56eee852f95a5112e05018f1f2d8244860b8cf0f7384cab4f473",
+      "atlas_result_sha256": "1313053eaf8c382f3c192db5d1bd6c6159f6cf36470d6997591323d75a1de807",
+      "mask_sha256": "a1c560901fb313d64235c85f72a5e6df17f8d0afa39758812559f0179730e5dc",
+      "transform": "copy reviewed chin region from guarded exact edit; original RGBA outside patch preserved exactly",
+      "review": "original face skin, eye and head size retained; beard tail removed with explicit pixels; user visual approval pending"
+    },
+    "grabreap/04": {
+      "original": "clips/grabreap/04.png",
+      "original_sha256": "7bed14cd720b1674d6b96f936dfffab86d1860116ea4c161e820d5ff5d9f7b0c",
+      "replacement": "resume/repaired/grabreap/04.png",
+      "replacement_sha256": "06db2faba003105edb36df6298509ea1d53a709827f1266ab16c71c24cdf95a0",
+      "job_id": null,
+      "image_id": "79a13fde-b17e-47b7-8e9b-11c47ba8f0f9",
+      "tool": "pixelart_workbench",
+      "patch_box": [
+        89,
+        78,
+        101,
+        87
+      ],
+      "atlas_index": 9,
+      "atlas_source_sha256": "fab62176a42d56eee852f95a5112e05018f1f2d8244860b8cf0f7384cab4f473",
+      "atlas_result_sha256": "1313053eaf8c382f3c192db5d1bd6c6159f6cf36470d6997591323d75a1de807",
+      "mask_sha256": "a1c560901fb313d64235c85f72a5e6df17f8d0afa39758812559f0179730e5dc",
+      "transform": "copy reviewed chin region from guarded exact edit; original RGBA outside patch preserved exactly",
+      "review": "original face skin, eye and head size retained; beard tail removed with explicit pixels; user visual approval pending"
+    },
+    "grabreap/05": {
+      "original": "clips/grabreap/05.png",
+      "original_sha256": "b3845fcc81e1430ca1020fd42ef3d9405d1480ef8fc2f7fda8564478161a17b2",
+      "replacement": "resume/repaired/grabreap/05.png",
+      "replacement_sha256": "e69b4692a7a4eedbd2644f3708640a4caf7594a379768935ea0d2e7d9637891f",
+      "job_id": null,
+      "image_id": "79a13fde-b17e-47b7-8e9b-11c47ba8f0f9",
+      "tool": "pixelart_workbench",
+      "patch_box": [
+        89,
+        78,
+        101,
+        87
+      ],
+      "atlas_index": 10,
+      "atlas_source_sha256": "fab62176a42d56eee852f95a5112e05018f1f2d8244860b8cf0f7384cab4f473",
+      "atlas_result_sha256": "1313053eaf8c382f3c192db5d1bd6c6159f6cf36470d6997591323d75a1de807",
+      "mask_sha256": "a1c560901fb313d64235c85f72a5e6df17f8d0afa39758812559f0179730e5dc",
+      "transform": "copy reviewed chin region from guarded exact edit; original RGBA outside patch preserved exactly",
+      "review": "original face skin, eye and head size retained; beard tail removed with explicit pixels; user visual approval pending"
+    },
+    "chain2/02": {
+      "original": "clips/chain2/02.png",
+      "original_sha256": "64c9c3bd43e05f51592830ce11fff413fdcab07f1f524df96ff0960c15d09a96",
+      "replacement": "resume/repaired/chain2/02.png",
+      "replacement_sha256": "d5b2712907deabfec2f67cde5f86171fc2e37867d29fa3284f987c4077be7635",
+      "job_id": null,
+      "image_id": "79a13fde-b17e-47b7-8e9b-11c47ba8f0f9",
+      "tool": "pixelart_workbench",
+      "patch_box": [
+        65,
+        57,
+        74,
+        66
+      ],
+      "atlas_index": 11,
+      "atlas_source_sha256": "fab62176a42d56eee852f95a5112e05018f1f2d8244860b8cf0f7384cab4f473",
+      "atlas_result_sha256": "1313053eaf8c382f3c192db5d1bd6c6159f6cf36470d6997591323d75a1de807",
+      "mask_sha256": "a1c560901fb313d64235c85f72a5e6df17f8d0afa39758812559f0179730e5dc",
+      "transform": "copy reviewed chin region from guarded exact edit; original RGBA outside patch preserved exactly",
+      "review": "original face skin, eye and head size retained; beard tail removed with explicit pixels; user visual approval pending"
+    },
+    "chain2/04": {
+      "original": "clips/chain2/04.png",
+      "original_sha256": "db0b68740eeebd48c26e0f1d5b57259103c0fe6e6217790831f7c0aaa9ac24e6",
+      "replacement": "resume/repaired/chain2/04.png",
+      "replacement_sha256": "324faee913fd9eef64a80090643bddb35af114a9e0f6a3ac837ed4f563b7e192",
+      "job_id": null,
+      "image_id": "79a13fde-b17e-47b7-8e9b-11c47ba8f0f9",
+      "tool": "pixelart_workbench",
+      "patch_box": [
+        64,
+        55,
+        72,
+        64
+      ],
+      "atlas_index": 12,
+      "atlas_source_sha256": "fab62176a42d56eee852f95a5112e05018f1f2d8244860b8cf0f7384cab4f473",
+      "atlas_result_sha256": "1313053eaf8c382f3c192db5d1bd6c6159f6cf36470d6997591323d75a1de807",
+      "mask_sha256": "a1c560901fb313d64235c85f72a5e6df17f8d0afa39758812559f0179730e5dc",
+      "transform": "copy reviewed chin region from guarded exact edit; original RGBA outside patch preserved exactly",
+      "review": "original face skin, eye and head size retained; beard tail removed with explicit pixels; user visual approval pending"
+    },
+    "chain2/00": {
+      "original": "clips/chain2/00.png",
+      "original_sha256": "3db1df6c87228fdcf4ae9b81a93ccce1cd3d2e18e9cee27553cfa00302e6c47d",
+      "replacement": "resume/repaired/chain2/00.png",
+      "replacement_sha256": "4b52e277650589ee6247aff77647a41bd6d1d93a32513ef2ca752285f10458e4",
+      "job_id": null,
+      "image_id": "79a13fde-b17e-47b7-8e9b-11c47ba8f0f9",
+      "tool": "pixelart_workbench",
+      "patch_box": [
+        66,
+        61,
+        75,
+        70
+      ],
+      "atlas_index": 13,
+      "atlas_source_sha256": "fab62176a42d56eee852f95a5112e05018f1f2d8244860b8cf0f7384cab4f473",
+      "atlas_result_sha256": "1313053eaf8c382f3c192db5d1bd6c6159f6cf36470d6997591323d75a1de807",
+      "mask_sha256": "a1c560901fb313d64235c85f72a5e6df17f8d0afa39758812559f0179730e5dc",
+      "transform": "copy reviewed chin region from guarded exact edit; original RGBA outside patch preserved exactly",
+      "review": "original face skin, eye and head size retained; beard tail removed with explicit pixels; user visual approval pending"
+    },
+    "chain2/01": {
+      "original": "clips/chain2/01.png",
+      "original_sha256": "fced7be6d5605291c2cd567d985ad65480336b701436f32497aa729e87b2ff0c",
+      "replacement": "resume/repaired/chain2/01.png",
+      "replacement_sha256": "0dcb54cceb92ffd3ba528668185a01607a2cefde5000001d135c8380b44e8de4",
+      "job_id": null,
+      "image_id": "79a13fde-b17e-47b7-8e9b-11c47ba8f0f9",
+      "tool": "pixelart_workbench",
+      "patch_box": [
+        65,
+        60,
+        75,
+        69
+      ],
+      "atlas_index": 14,
+      "atlas_source_sha256": "fab62176a42d56eee852f95a5112e05018f1f2d8244860b8cf0f7384cab4f473",
+      "atlas_result_sha256": "1313053eaf8c382f3c192db5d1bd6c6159f6cf36470d6997591323d75a1de807",
+      "mask_sha256": "a1c560901fb313d64235c85f72a5e6df17f8d0afa39758812559f0179730e5dc",
+      "transform": "copy reviewed chin region from guarded exact edit; original RGBA outside patch preserved exactly",
+      "review": "original face skin, eye and head size retained; beard tail removed with explicit pixels; user visual approval pending"
+    },
+    "chain2/03": {
+      "original": "clips/chain2/03.png",
+      "original_sha256": "d4892fd6efcddfc0f7d670183d33fd57a6bebc99e37f0d8630f23410c2d067b4",
+      "replacement": "resume/repaired/chain2/03.png",
+      "replacement_sha256": "a36d8aa845345ab979225dc90f07931c00a4877265f0b34158aa2fe9d149f2e3",
+      "job_id": null,
+      "image_id": "79a13fde-b17e-47b7-8e9b-11c47ba8f0f9",
+      "tool": "pixelart_workbench",
+      "patch_box": [
+        64,
+        55,
+        72,
+        64
+      ],
+      "atlas_index": 15,
+      "atlas_source_sha256": "fab62176a42d56eee852f95a5112e05018f1f2d8244860b8cf0f7384cab4f473",
+      "atlas_result_sha256": "1313053eaf8c382f3c192db5d1bd6c6159f6cf36470d6997591323d75a1de807",
+      "mask_sha256": "a1c560901fb313d64235c85f72a5e6df17f8d0afa39758812559f0179730e5dc",
+      "transform": "copy reviewed chin region from guarded exact edit; original RGBA outside patch preserved exactly",
+      "review": "original face skin, eye and head size retained; beard tail removed with explicit pixels; user visual approval pending"
+    },
+    "chain2/05": {
+      "original": "clips/chain2/05.png",
+      "original_sha256": "4838a5fd7f6059313406bfdb2027cf47c56f071418fdd810e74f6ad81c98acb7",
+      "replacement": "resume/repaired/chain2/05.png",
+      "replacement_sha256": "e0106eeee2baaa3bdb1f0a154a3b28a103869c2c400162da32ad8797ac5be681",
+      "job_id": null,
+      "image_id": "79a13fde-b17e-47b7-8e9b-11c47ba8f0f9",
+      "tool": "pixelart_workbench",
+      "patch_box": [
+        64,
+        55,
+        72,
+        64
+      ],
+      "atlas_index": 16,
+      "atlas_source_sha256": "fab62176a42d56eee852f95a5112e05018f1f2d8244860b8cf0f7384cab4f473",
+      "atlas_result_sha256": "1313053eaf8c382f3c192db5d1bd6c6159f6cf36470d6997591323d75a1de807",
+      "mask_sha256": "a1c560901fb313d64235c85f72a5e6df17f8d0afa39758812559f0179730e5dc",
+      "transform": "copy reviewed chin region from guarded exact edit; original RGBA outside patch preserved exactly",
+      "review": "original face skin, eye and head size retained; beard tail removed with explicit pixels; user visual approval pending"
+    },
+    "chain2/06": {
+      "original": "clips/chain2/06.png",
+      "original_sha256": "f7a4658b4e21774cb7b559a84ee3fe2e4bdac7cf8f747ddec1cb3796ef94abe7",
+      "replacement": "resume/repaired/chain2/06.png",
+      "replacement_sha256": "03c66392d25a40dfe2b473149094924a1a82cab6aedf2c074e337c9557ea0a3d",
+      "job_id": null,
+      "image_id": "79a13fde-b17e-47b7-8e9b-11c47ba8f0f9",
+      "tool": "pixelart_workbench",
+      "patch_box": [
+        66,
+        61,
+        75,
+        70
+      ],
+      "atlas_index": 17,
+      "atlas_source_sha256": "fab62176a42d56eee852f95a5112e05018f1f2d8244860b8cf0f7384cab4f473",
+      "atlas_result_sha256": "1313053eaf8c382f3c192db5d1bd6c6159f6cf36470d6997591323d75a1de807",
+      "mask_sha256": "a1c560901fb313d64235c85f72a5e6df17f8d0afa39758812559f0179730e5dc",
+      "transform": "copy reviewed chin region from guarded exact edit; original RGBA outside patch preserved exactly",
+      "review": "original face skin, eye and head size retained; beard tail removed with explicit pixels; user visual approval pending"
+    },
+    "chain2/07": {
+      "original": "clips/chain2/07.png",
+      "original_sha256": "70431f11935344c4a9689d1057babfddd22c8e883136281c48e1589f76df3cf1",
+      "replacement": "resume/repaired/chain2/07.png",
+      "replacement_sha256": "925e99d08be9d2e6cebc7b048a4159baedae3edd742d30e6ce4997a24332df68",
+      "job_id": null,
+      "image_id": "79a13fde-b17e-47b7-8e9b-11c47ba8f0f9",
+      "tool": "pixelart_workbench",
+      "patch_box": [
+        65,
+        61,
+        75,
+        70
+      ],
+      "atlas_index": 18,
+      "atlas_source_sha256": "fab62176a42d56eee852f95a5112e05018f1f2d8244860b8cf0f7384cab4f473",
+      "atlas_result_sha256": "1313053eaf8c382f3c192db5d1bd6c6159f6cf36470d6997591323d75a1de807",
+      "mask_sha256": "a1c560901fb313d64235c85f72a5e6df17f8d0afa39758812559f0179730e5dc",
+      "transform": "copy reviewed chin region from guarded exact edit; original RGBA outside patch preserved exactly",
+      "review": "original face skin, eye and head size retained; beard tail removed with explicit pixels; user visual approval pending"
+    }
+  }
+}

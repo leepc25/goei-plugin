@@ -1,0 +1,99 @@
+{
+  "recorded_at_kst": "2026-10-22T19:52:12.861180+09:00",
+  "branch": "codex/art-geshugan-resume",
+  "started_from": "5e197e1365fb88a4441d19166b14626d5dd87c45",
+  "refs_observed_at_close": {
+    "origin/codex/metroidvania-run-system": "59a2a883c6aca00f8c0e1e5fc2c421a6da770528",
+    "origin/codex/character-production-resume": "6b8000ea3f51a9ac9cc437995c5a2edc0e77b2eb"
+  },
+  "new_paid_submissions": 4,
+  "total_actual_generations": 31,
+  "failed_generations_included": 20,
+  "own_inflight_jobs": 0,
+  "character_submission_limit": 1,
+  "corrected_frames": 20,
+  "corrected_source_clips": 7,
+  "user_visual_approval": false,
+  "shared_balance_is_not_per_job_cost": true,
+  "jobs": [
+    {
+      "job_id": "c2c9cbc3-8a1e-40fa-b776-6112e7e5a82a",
+      "tool": "edit_image_pixen",
+      "purpose": "getup/03 right-facing eye/face",
+      "actual_cost": 1,
+      "unit": "generations",
+      "evidence": "local-getup-result.json",
+      "outcome": "accepted_face_region_only",
+      "input_sha256": "195cae51f0bf8c4af5f89721a8b3214bd92920485398807f77447d310c018b9e"
+    },
+    {
+      "job_id": "c679844b-e541-48e4-9006-4b615ddb9dcc",
+      "tool": "edit_image",
+      "purpose": "13 chin crops whole-image edit",
+      "actual_cost": 10,
+      "unit": "generations",
+      "evidence": "neck-edit/result.json",
+      "outcome": "rejected",
+      "failure": "Head/body scale and position changed inside crops. Do not paste these crops or repeat whole-image editing. Changed to masked inpainting.",
+      "input_manifest": "neck-edit/inputs.json"
+    },
+    {
+      "job_id": "ee5ef44a-a16d-4ed1-a494-6578590bb498",
+      "tool": "inpaint_image",
+      "purpose": "13 chin patches on 256x256 atlas",
+      "actual_cost": 10,
+      "unit": "generations",
+      "evidence": "neck-edit/masked-result.json",
+      "outcome": "rejected_after_final_visual_review",
+      "input_sha256": "f3cd9402276059e13b262f54b4c4d6736a599d719551a62a4c23427cadbee738",
+      "mask_sha256": "ec14a5f2c9915dce4b093ffe3cf387e9c9cbc8215213f536b8e6fea5c0299abf",
+      "outside_mask_server_changes": 17,
+      "outside_patch_delivered_changes": 0,
+      "failure": "Masked generator replaced grey chin strands with an oversized skin chin; changed to free guarded exact pixels on original inputs."
+    },
+    {
+      "job_id": "cd0766c8-87f7-4b50-8a9c-a7d79c5c3896",
+      "tool": "inpaint_image",
+      "purpose": "6 remaining chain2 chin patches on 256x128 atlas",
+      "actual_cost": 10,
+      "unit": "generations",
+      "evidence": "neck-chain2/result.json",
+      "outcome": "superseded_by_consistent_exact_pixel_cleanup",
+      "input_sha256": "79e8b6cb3ca7c424b2105504227fe799972b1a0a00570a2da3ba719d648a6348",
+      "mask_sha256": "bc014bf990e5bb77a5984bba9932eac4b34fb1adb3387910113b1151f5e5333e",
+      "outside_mask_server_changes": 2,
+      "outside_patch_delivered_changes": 0,
+      "failure": "Not shipped; keep all eight chain2 faces at their original proportions using the same exact cleanup."
+    }
+  ],
+  "validation": {
+    "unit_tests": 9,
+    "pc": "1366x900 pass",
+    "phone_landscape": "844x390 pass",
+    "phone_portrait": "390x844 pass",
+    "repaired_frames_selected_in_each_viewport": 20,
+    "raw_clips_immutable": true,
+    "outside_patch_pixels_unchanged": true,
+    "bathing20_blobs_identical": true
+  },
+  "handoff": {
+    "coordinator_thread": "01a1632e-358b-7931-b8ab-c3487b5b6095",
+    "prepared_tools_received": true,
+    "kyuras_recovery_owner": "kyuras_owner (coordinator delegated)",
+    "other_character_generation": false
+  },
+  "not_used_in_final_generations": 30,
+  "free_exact_edit_calls": 1,
+  "free_edit": {
+    "image_id": "79a13fde-b17e-47b7-8e9b-11c47ba8f0f9",
+    "tool": "pixelart_workbench",
+    "actual_cost": 0,
+    "unit": "generations",
+    "changed_pixels": 394,
+    "frames": 19,
+    "evidence": "neck-exact/result.json",
+    "request": "neck-exact/exact-input.json",
+    "guarded_decisions": "neck-exact/exact-changes.json",
+    "outcome": "accepted_user_visual_approval_pending"
+  }
+}

@@ -286,3 +286,10 @@ description: athletic adult woman agent, snow-white chin-length bob haircu
 2026-10-22 03:48:32 gen bandage done
 2026-10-22 03:48:32 gen after generations_remaining: 15152.30
 2026-10-22T10:27:41.276193+00:00 resume audit: paid_submissions=0 actual_new_generations=0; balance/jobs auth 401 including user-requested retry; historical job costs unknown; kyuras recovery reserved for kyuras owner; no art generation
+2026-10-22T19:52:12.861180+09:00 local_resume job_id=c2c9cbc3-8a1e-40fa-b776-6112e7e5a82a tool=edit_image_pixen charged=1 generations outcome=accepted_face_region_only evidence=resume/local-getup-result.json
+2026-10-22T19:52:12.861180+09:00 local_resume job_id=c679844b-e541-48e4-9006-4b615ddb9dcc tool=edit_image charged=10 generations outcome=rejected evidence=resume/neck-edit/result.json
+2026-10-22T19:52:12.861180+09:00 local_resume job_id=ee5ef44a-a16d-4ed1-a494-6578590bb498 tool=inpaint_image charged=10 generations outcome=accepted_mask_only evidence=resume/neck-edit/masked-result.json
+2026-10-22T19:52:12.861180+09:00 local_resume job_id=cd0766c8-87f7-4b50-8a9c-a7d79c5c3896 tool=inpaint_image charged=10 generations outcome=accepted_mask_only evidence=resume/neck-chain2/result.json
+2026-10-22T19:52:12.861180+09:00 local_resume total_actual=31 generations (rejected=10 included); new_submissions=4; own_inflight=0; shared_balance_not_attributed; user_visual_approval=false
+2026-10-22T20:44:05.147229+09:00 local_resume FINAL disposition: ee5ef44a-a16d-4ed1-a494-6578590bb498 rejected oversized chin; cd0766c8-87f7-4b50-8a9c-a7d79c5c3896 superseded by exact cleanup; previous provisional acceptance revoked. Total charged31 unchanged, not used in final30.
+2026-10-22T20:44:05.147229+09:00 local_resume free pixelart_workbench image_id=79a13fde-b17e-47b7-8e9b-11c47ba8f0f9 cost=0 generations original19frames exact394pixels evidence=resume/neck-exact/result.json user_visual_approval=false

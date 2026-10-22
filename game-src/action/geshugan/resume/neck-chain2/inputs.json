@@ -1,0 +1,116 @@
+[
+  {
+    "index": 0,
+    "clip": "chain2",
+    "frame": 0,
+    "source": "clips/chain2/00.png",
+    "source_sha256": "3db1df6c87228fdcf4ae9b81a93ccce1cd3d2e18e9cee27553cfa00302e6c47d",
+    "crop_box": [
+      37,
+      37,
+      101,
+      101
+    ],
+    "repair_crop_box": [
+      29,
+      24,
+      38,
+      33
+    ]
+  },
+  {
+    "index": 1,
+    "clip": "chain2",
+    "frame": 1,
+    "source": "clips/chain2/01.png",
+    "source_sha256": "fced7be6d5605291c2cd567d985ad65480336b701436f32497aa729e87b2ff0c",
+    "crop_box": [
+      35,
+      33,
+      99,
+      97
+    ],
+    "repair_crop_box": [
+      30,
+      27,
+      40,
+      36
+    ]
+  },
+  {
+    "index": 2,
+    "clip": "chain2",
+    "frame": 3,
+    "source": "clips/chain2/03.png",
+    "source_sha256": "d4892fd6efcddfc0f7d670183d33fd57a6bebc99e37f0d8630f23410c2d067b4",
+    "crop_box": [
+      34,
+      29,
+      98,
+      93
+    ],
+    "repair_crop_box": [
+      30,
+      26,
+      38,
+      35
+    ]
+  },
+  {
+    "index": 3,
+    "clip": "chain2",
+    "frame": 5,
+    "source": "clips/chain2/05.png",
+    "source_sha256": "4838a5fd7f6059313406bfdb2027cf47c56f071418fdd810e74f6ad81c98acb7",
+    "crop_box": [
+      35,
+      29,
+      99,
+      93
+    ],
+    "repair_crop_box": [
+      29,
+      26,
+      37,
+      35
+    ]
+  },
+  {
+    "index": 4,
+    "clip": "chain2",
+    "frame": 6,
+    "source": "clips/chain2/06.png",
+    "source_sha256": "f7a4658b4e21774cb7b559a84ee3fe2e4bdac7cf8f747ddec1cb3796ef94abe7",
+    "crop_box": [
+      35,
+      34,
+      99,
+      98
+    ],
+    "repair_crop_box": [
+      31,
+      27,
+      40,
+      36
+    ]
+  },
+  {
+    "index": 5,
+    "clip": "chain2",
+    "frame": 7,
+    "source": "clips/chain2/07.png",
+    "source_sha256": "70431f11935344c4a9689d1057babfddd22c8e883136281c48e1589f76df3cf1",
+    "crop_box": [
+      37,
+      37,
+      101,
+      101
+    ],
+    "repair_crop_box": [
+      28,
+      24,
+      38,
+      33
+    ]
+  }
+]
