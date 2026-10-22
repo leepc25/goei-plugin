@@ -1,3 +1,25 @@
+variant-numeric: tabular-nums; }
+.gx-support { display: flex; align-items: center; gap: 10px; font-size: 14px; }
+.gx-support span { margin-right: auto; color: var(--dim); }
+.gx-support b { min-width: 20px; text-align: center; font-variant-numeric: tabular-nums; }
+.gx-step { width: 36px; height: 36px; border: 1px solid var(--line); border-radius: 10px; background: var(--void); font-size: 17px; }
+.gx-step:disabled { opacity: .4; }
+.gx-mbox { max-height: calc(min(100vh - 28px, 950px) - 222px); overflow-y: auto; }
+/* 커스텀 탭: PC 오른쪽 편성은 임무 탭과 같은 칸 너비·구조 (v0.16.21, 사용자 요청) */
+.gx-mlist { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; align-content: start; }
+.gx-mlist li.gx-mgrp { grid-column: 1 / -1; border: 0; background: none; box-shadow: none; padding: 6px 2px 0; font-size: 12px; font-weight: 700; color: var(--muted); display: flex; gap: 6px; align-items: baseline; }
+.gx-mlist li.gx-mgrp:first-child { padding-top: 0; }
+.gx-mlist li.gx-mgrp small { font-weight: 400; }
+.gx-mapcol .gx-segs { align-self: flex-start; }
+/* 커스텀 탭 (v0.16.21): 종류 고르기와 검색을 한 줄에. 종류는 임무 탭 상황 필터와 같은 칩, 남는 폭은 검색 */
+.gx-mfilter { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.gx-mfilter .gx-chip { flex: none; min-height: 36px; padding: 0 14px; }
+.gx-mfilter .gx-search { flex: 1; width: auto; min-width: 0; min-height: 36px; margin-left: 4px; border-radius: 999px; padding: 0 14px; font-size: 13px; }
+.gx-mapcol .gx-hint, .gx-mapcol > .gx-muted { margin: 0; }
+
+@media (max-width: 760px) {
+  .gx-field { grid-template-columns: 1fr; }
+  .gx-field > .gx-mapcol { position: static; }
   .gx-mapcol .gx-canvas:not(.ph) { width: auto; }
   .gx-mapimg { width: 100%; max-height: none; }
   .gx-mbox { max-height: none; }
@@ -1490,6 +1512,7 @@ details.gx-gl-card:not([open]) { gap: 0; }
 /* 설정 → 창 바깥 불투명도 막대 */
 .st-range { display: flex; align-items: center; gap: 12px; min-width: min(260px, 100%); }
 .st-range input { flex: 1; accent-color: var(--signal); }
+.st-recent { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 10px 14px; }
 .st-range output { min-width: 3.2em; text-align: right; font-variant-numeric: tabular-nums; color: var(--sub); }
 
 /* 메인 설정 맨 위 「기능별 설정」: 세 기능 설정을 바로 여는 단추 */
@@ -1510,6 +1533,8 @@ details.gx-gl-card:not([open]) { gap: 0; }
 @media (max-width: 640px) {
   .gx .ps-ctl:has(> .st-range) { width: 100%; }
   .gx .st-range { width: 100%; }
+  .gx .ps-ctl:has(> .st-recent) { width: 100%; }
+  .gx .st-recent { justify-content: flex-start; }
 }
 
 /* 즐겨찾기 (2026-10-20): PC 메뉴 맨 아래 ‹ ★ ›, 모바일 상황판 서랍 다섯 칸, 둘 다 같은 ★ 창 */
@@ -2215,25 +2240,4 @@ button.mk-go:hover { color: var(--signal); }
     const full = list4.length >= MARK_MAX;
     const mine = list4.length ? `<ul class="mk-rows">${list4.map((m, i) => `<li class="mk-row"><button class="mk-go" data-action="mk-go" data-value="${i}">${icon(m)}<span>${esc10(m.name)}</span></button>
         <button class="ph-tool sm" data-action="mk-del" data-value="${i}" aria-label="${esc10(m.name)} 빼기" title="빼기">${ICONS.close}</button></li>`).join("")}</ul>` : '<p class="mk-empty">아래 지금 화면이나 최근 본 화면의 ＋를 누르면 여기에 담겨요. 빼려면 오른쪽 ×를 누르세요.</p>';
-    const here = current3 && !isMarked(current3) ? `<button class="mk-here" data-action="mk-here" ${full ? "disabled" : ""}>${ICONS.plus}<span>지금 화면 · ${esc10(current3.name)}</span></button>` : "";
-    const cand = markCandidates(recent, current3);
-    const more = cand.length ? `<h4>최근 본 화면</h4><ul class="mk-rows">${cand.map((m, i) => `<li class="mk-row"><span class="mk-go">${icon(m)}<span>${esc10(m.name)}</span></span>
-        <button class="ph-tool sm" data-action="mk-add" data-value="${i}" aria-label="${esc10(m.name)} 추가" title="추가" ${full ? "disabled" : ""}>${ICONS.plus}</button></li>`).join("")}</ul>` : "";
-    return `<button class="mk-scrim" data-action="mk-pop" aria-label="즐겨찾기 닫기"></button>
-    <div class="mk-pop" role="dialog" aria-label="즐겨찾기">
-      <div class="mk-head"><b>즐겨찾기</b><small>${list4.length}/${MARK_MAX}</small><button class="ph-tool sm" data-action="mk-pop" aria-label="닫기">${ICONS.close}</button></div>
-      ${mine}${here}${full ? '<p class="mk-empty">5개까지 넣을 수 있어요. 하나를 빼면 더 넣을 수 있어요.</p>' : ""}${more}
-    </div>`;
-  }
-  function navHistBar(current3) {
-    return `<div class="gx-navhist">
-    <button class="gx-nh" data-action="nav-back" aria-label="뒤로" title="뒤로">${ICONS.back}</button>
-    <button class="gx-nh mk-star${markUi.pop ? " on" : ""}${current3 && isMarked(current3) ? " marked" : ""}" data-action="mk-pop" aria-label="즐겨찾기" title="즐겨찾기" aria-expanded="${markUi.pop}">${ICONS.star}</button>
-    <button class="gx-nh fwd" data-action="nav-fwd" aria-label="앞으로" title="앞으로">${ICONS.back}</button></div>`;
-  }
-  function markSlots() {
-    const list4 = marks();
-    if (!list4.length) return `<button class="mk-hint" data-action="mk-pop">${ICONS.star}<span>좌우로 밀어 즐겨찾기를 추가하세요</span></button>`;
-    return Array.from({ length: MARK_MAX }, (_, i) => {
-      const m = list4[i];
-      return m ? `
+    const here = current3 && !isMarked(current3) ? `<button class="m

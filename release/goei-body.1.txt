@@ -1,4 +1,4 @@
-// goei-body 0.16.39
+// goei-body 0.16.40
 "use strict";
 (() => {
   // src/core/dispatch.ts
@@ -3218,20 +3218,51 @@ ${body4.slice(at).replace(/^\s+/, "")}
 
   // src/core/imgtag.ts
   var TAG = /\s*<img=["']?([^_>"']+)_([^>"']+)["']?>\s*/g;
+  var ANY_TAG = /<img=.*?>/g;
+  var IMG_RECENT = { min: 1, max: 30, step: 1, def: 6 };
+  var imgRecent = (v) => {
+    const n = typeof v === "string" && v.trim() ? Number(v) : v;
+    return typeof n === "number" && Number.isInteger(n) && (n === 0 || n >= IMG_RECENT.min && n <= IMG_RECENT.max) ? n : null;
+  };
+  var BASE_STYLE = "display:block;margin:auto;width:100%;max-width:32em;aspect-ratio:1/1;overflow:hidden;border-radius:20px;background-repeat:no-repeat;background-size:100% auto;background-position:center top";
   function hasImgTag(text) {
     return text.includes("<img=");
   }
-  function renderImgTags(text, pick3) {
+  var tagName = (who, expr, pick3) => {
+    const want = `${who.trim()}_${expr.trim()}`;
+    return pick3 ? pick3(want) ?? pick3(`${who.trim()}_default`) : want;
+  };
+  function imgTagsKnown(text, pick3) {
+    if (!pick3) return false;
+    const all = [...text.matchAll(TAG)];
+    return all.length > 0 && all.every((m) => !!tagName(m[1], m[2], pick3));
+  }
+  function renderImgTags(text, pick3, recent = IMG_RECENT.def) {
     return text.replace(TAG, (_m, who, expr) => {
-      const want = `${who.trim()}_${expr.trim()}`;
-      const name = pick3 ? pick3(want) ?? pick3(`${who.trim()}_default`) : want;
+      const name = tagName(who, expr, pick3);
       if (!name || /[{}'"<>\\]/.test(name)) return "\n\n";
+      const box = `<div class="gim" style="${BASE_STYLE};background-image:url('{{raw::${name}}}')" tabindex="0"></div>`;
       return `
 
-<div class="gim" style="background-image:url('{{raw::${name}}}')" tabindex="0"></div>
+${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-${recent - 1}}}}}}}${box}{{/when}}` : box}
 
 `;
     });
+  }
+  function stripOldImgTags(messages, recent = IMG_RECENT.def) {
+    if (recent <= 0) return messages;
+    let seen2 = 0;
+    let changed = false;
+    const out = [...messages];
+    for (let i = out.length - 1; i >= 0; i--) {
+      const m = out[i];
+      if (!m || m.role === "system") continue;
+      seen2++;
+      if (seen2 <= recent || typeof m.content !== "string" || !m.content.includes("<img=")) continue;
+      out[i] = { ...m, content: m.content.replace(ANY_TAG, "") };
+      changed = true;
+    }
+    return changed ? out : messages;
   }
   var IMG_SIZE = { min: 30, max: 200, step: 5, def: 100 };
   var IMG_FOLD = { min: 20, max: 100, step: 1, def: 68 };
@@ -3249,7 +3280,7 @@ ${body4.slice(at).replace(/^\s+/, "")}
     if (hidden) return `${g}{display:none!important}`;
     const open3 = fold >= 100;
     const folded = open3 ? `${W}/${H}` : `${W}/${Math.round(H * fold) / 100}`;
-    return `${g}{display:block;box-sizing:border-box;margin:auto;width:100%;max-width:${Math.round(BASE_EM * size) / 100}em;aspect-ratio:${folded};overflow:hidden;border-radius:20px;background-color:transparent;background-repeat:no-repeat;background-size:100% auto;background-position:center top;cursor:${open3 ? "default" : "pointer"};outline:none;transition:aspect-ratio .45s ease;-webkit-mask-image:-webkit-radial-gradient(white,black)}` + (open3 ? "" : `${g}:hover,${g}:focus{aspect-ratio:${W}/${H}}`);
+    return `${g}{display:block!important;box-sizing:border-box;margin:auto;width:100%;max-width:${Math.round(BASE_EM * size) / 100}em!important;aspect-ratio:${folded}!important;overflow:hidden;border-radius:20px;background-color:transparent;background-repeat:no-repeat;background-size:100% auto;background-position:center top;cursor:${open3 ? "default" : "pointer"};outline:none;transition:aspect-ratio .45s ease;-webkit-mask-image:-webkit-radial-gradient(white,black)}` + (open3 ? "" : `${g}:hover,${g}:focus{aspect-ratio:${W}/${H}!important}`);
   }
   var hiddenNow = false;
   var imgHidden = () => hiddenNow;
@@ -3334,8 +3365,10 @@ ${body4.slice(at).replace(/^\s+/, "")}
     const status = o.status === "off" || o.status === "light" || o.status === "dark" || o.status === "paper" ? o.status : void 0;
     const size = imgSize(o.imgSize);
     const fold = imgFold(o.imgFold);
+    const show = imgRecent(o.imgShow);
+    const send2 = imgRecent(o.imgSend);
     const marks2 = (Array.isArray(o.marks) ? o.marks : []).filter((m) => !!m && typeof m === "object" && typeof m.name === "string" && !!m.s && typeof m.s.tab === "string").slice(0, MARK_MAX).map((m) => ({ s: m.s, name: m.name.slice(0, 80) }));
-    prefs = { basic, world, ...theme ? { theme } : {}, ...Object.keys(vars).length ? { vars } : {}, ...nav ? { nav } : {}, ...agents ? { agents } : {}, ...dim !== null ? { dim } : {}, ...status ? { status } : {}, ...size !== null ? { imgSize: size } : {}, ...fold !== null ? { imgFold: fold } : {}, ...marks2.length ? { marks: marks2 } : {} };
+    prefs = { basic, world, ...theme ? { theme } : {}, ...Object.keys(vars).length ? { vars } : {}, ...nav ? { nav } : {}, ...agents ? { agents } : {}, ...dim !== null ? { dim } : {}, ...status ? { status } : {}, ...size !== null ? { imgSize: size } : {}, ...fold !== null ? { imgFold: fold } : {}, ...show !== null ? { imgShow: show } : {}, ...send2 !== null ? { imgSend: send2 } : {}, ...marks2.length ? { marks: marks2 } : {} };
     return prefs;
   }
   function readSettingsBook(lore) {
@@ -4254,46 +4287,4 @@ ${themeVars("[x-goei-fab]")}
   }
   var postUnread = (p) => p.comments.some((c) => c.unread);
   var boardUnread = (st) => st.posts.some(postUnread);
-  var dmUnread = (st, nick) => st.dms.some((d) => d.unread && (nick === void 0 || d.nick === nick));
-  function writeGnet(chat, st, opts = {}) {
-    if (opts.reconcile !== false) reconcileUnread(st, readGnet(chat));
-    if (opts.ack) acknowledge(st, opts.ack.post ?? void 0, opts.ack.nick ?? void 0);
-    const keep = gnetRetention(chat.scriptstate);
-    if (keep.auto) trimDms(st, keep.limit);
-    const raw = encode(st);
-    const unread = boardUnread(st) || dmUnread(st);
-    return { ...chat, scriptstate: { ...chat.scriptstate ?? {}, [GN_RAW]: raw, "$st_unread_gnet": unread ? "1" : "0" } };
-  }
-  function addUserPost(st, nick, title2, body4, date) {
-    st.seq += 1;
-    const p = {
-      id: st.seq,
-      date: validDate(date),
-      nick: cut(nick, 80),
-      title: trimTokens(title2, LIMITS.title_tokens),
-      body: trimTokens(body4, LIMITS.post_tokens),
-      views: 0,
-      votes: 0,
-      mine: true,
-      comments: []
-    };
-    st.posts.unshift(p);
-    return p;
-  }
-  function addUserComment(st, postIdValue, parent, nick, body4, now = "") {
-    const p = findPost(st, postIdValue);
-    if (!p) throw new GnetError("대상 글이 없어졌어요.");
-    if (parent > 0 && !p.comments[parent - 1]) throw new GnetError("답글을 달 댓글이 없어졌어요.");
-    p.comments.push({ parent, nick, body: trimTokens(body4, LIMITS.comment_tokens), mine: true, unread: false });
-    stampComments(p, p.comments.length - 1, [now ? hhmm(now) : ""], now);
-    return p.comments.length;
-  }
-  function deletePost(st, id) {
-    const i = st.posts.findIndex((p) => p.id === id && p.mine);
-    if (i < 0) return false;
-    st.posts.splice(i, 1);
-    return true;
-  }
-  function deleteComment(st, id, k) {
-    const p = findPost(st, id);
-    const target = p?.comm
+  var dmUnread = (st, nick) => st.dms.some((

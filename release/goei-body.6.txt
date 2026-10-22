@@ -1,4 +1,64 @@
- key: ev.key, kind: ev.kind, name: ev.name, loc: ev.loc };
+nd = null;
+        env2.render();
+        return true;
+      case "map-jump":
+      case "map-place": {
+        let v2 = value ?? "";
+        if (action === "map-jump") {
+          const [code, key2] = v2.split("|");
+          if (!MAP_CODES.includes(code) || !key2) return true;
+          field2.region = code;
+          field2.mapq = "";
+          v2 = key2;
+        }
+        field2.confirmEnd = null;
+        if (action === "map-place" && isPC() && field2.place === v2 && sameTarget(field2.target, v2)) {
+          field2.place = null;
+          field2.target = null;
+          env2.render();
+          return true;
+        }
+        field2.place = v2;
+        const x = readCtx(ctx2);
+        const here = typeof x === "string" || !x.on ? [] : activeEvents(x.world).filter((e) => placeKey(e, x.catalog) === v2);
+        if (!here.length) field2.target = placeTarget(v2);
+        env2.render();
+        return true;
+      }
+      case "map-unplace":
+        field2.place = null;
+        field2.target = null;
+        field2.confirmEnd = null;
+        toStep("goal", env2);
+        return true;
+      case "map-filter":
+        field2.filter = ["all", "an", "in", "ms"].includes(v) ? v : "all";
+        env2.render();
+        return true;
+      case "pick-place":
+        if (isPC() && sameTarget(field2.target, v)) {
+          field2.target = null;
+          env2.render();
+          return true;
+        }
+        field2.target = placeTarget(v);
+        toStep("team", env2);
+        return true;
+      case "field-step":
+        toStep(v === "team" ? "team" : "goal", env2);
+        return true;
+      case "pick-event": {
+        const x = readCtx(ctx2);
+        if (typeof x === "string") return true;
+        const ev = activeEvents(x.world).find((e) => e.key === v);
+        if (!ev) return true;
+        if (sameTarget(field2.target, ev.key)) {
+          field2.target = null;
+          field2.confirmEnd = null;
+          env2.render();
+          return true;
+        }
+        field2.target = { type: "event", key: ev.key, kind: ev.kind, name: ev.name, loc: ev.loc };
         field2.region = sidoOf(ev.loc);
         field2.confirmEnd = null;
         toStep("team", env2);
@@ -119,6 +179,11 @@
   }
   var dimSlider = (n, busy5) => `<label class="st-range"><input type="range" min="0" max="100" step="5" value="${n}" data-input="dim" data-change="set-dim" aria-label="창 바깥 불투명도"${busy5 ? " disabled" : ""}><output>${n}%</output></label>`;
   var pctSlider = (action, n, r, label, busy5) => `<label class="st-range"><input type="range" min="${r.min}" max="${r.max}" step="${r.step}" value="${n}" data-input="pct" data-change="${action}" aria-label="${label}"${busy5 ? " disabled" : ""}><output>${n}%</output></label>`;
+  function recentControl(key2, v, label, busy5) {
+    const n = v ?? IMG_RECENT.def;
+    const all = n === 0;
+    return `<div class="st-recent">${seg4(`set-${key2}-mode`, all ? "all" : "recent", [["recent", "최근만"], ["all", "전부"]], busy5)}` + (all ? "" : `<label class="st-range"><input type="range" min="${IMG_RECENT.min}" max="${IMG_RECENT.max}" step="1" value="${n}" data-input="count" data-change="set-${key2}" aria-label="${label}"${busy5 ? " disabled" : ""}><output>${n}개</output></label>`) + "</div>";
+  }
   var group3 = (title2, body4, note = "") => `<section class="ps-group"><h3>${title2}</h3>${note ? `<p class="ps-note">${note}</p>` : ""}<div class="ps-rows">${body4}</div></section>`;
   function worldOffVars() {
     return { $st_anomaly_on: "0", [WORLD_KEY]: "", $an_report: "", $in_report: "", $ms_report: "", $ag_report: "" };
@@ -204,6 +269,8 @@
       field3("에셋 출력", seg4("set-asset", s4.assetOn ? "1" : "0", [["1", "ON"], ["0", "OFF"]], busy5), "본문에 등장하는 캐릭터의 등록 이미지를 표시하도록 이미지 태그를 적어요. 이미지와 태그 목록은 에셋 모듈에 있어요."),
       s4.assetOn ? field3("이미지 크기", pctSlider("set-img-size", getPrefs().imgSize ?? IMG_SIZE.def, IMG_SIZE, "이미지 크기", busy5), "채팅 속 캐릭터 이미지 칸의 크기예요. 100%가 원래 크기이고, 채팅 폭보다 커지지는 않아요. 이 기기의 모든 채팅에 같이 적용돼요.") : "",
       s4.assetOn ? field3("접힌 높이", pctSlider("set-img-fold", getPrefs().imgFold ?? IMG_FOLD.def, IMG_FOLD, "접힌 높이", busy5), "이미지는 위쪽만 보이게 접혀 있다가 누르거나 마우스를 올리면 펼쳐져요. 접혔을 때 그림 높이의 몇 %를 보여 줄지예요. 원래는 68%(정사각형)이고 100%면 접지 않아요.") : "",
+      s4.assetOn ? field3("이미지 표시 범위", recentControl("img-show", getPrefs().imgShow, "이미지 표시 메시지 수", busy5), "이미지를 띄울 메시지예요. 「최근만」이면 마지막 메시지부터 정한 개수까지만 띄워요(원래 6개). 바꾼 값은 메시지를 다시 그릴 때 반영돼요.") : "",
+      s4.assetOn ? field3("요청 속 이미지 태그", recentControl("img-send", getPrefs().imgSend, "태그를 남길 메시지 수", busy5), "모델에 보내는 대화 기록에서 이미지 태그를 남길 메시지예요. 오래된 태그를 빼면 토큰이 줄어요. 최근 태그는 모델이 태그 쓰는 법을 따라 하도록 남겨요(원래 6개).") : "",
       s4.assetOn ? field3("출력 모델", seg4("set-asset-model", s4.assetModel, [["main", "메인모델"], ["aux", "보조모델"]], busy5), "메인모델은 본문과 함께 적고, 보조모델은 응답이 끝난 뒤 한 번 더 불러 태그를 보충해요.") : "",
       s4.assetOn && s4.assetModel === "aux" ? field3("캐릭터당 이미지 수", seg4("set-asset-limit", String(s4.assetLimit), [["1", "1"], ["2", "2"], ["3", "3"], ["4", "4"]], busy5), "보조모델이 한 응답에서 캐릭터 한 명에게 붙일 이미지 태그의 최대 개수") : ""
     ].join(""))}
@@ -320,6 +387,13 @@
       if (action === "set-img-size" && size !== null) await saveDefaults(env2, (p) => ({ ...p, imgSize: size === IMG_SIZE.def ? void 0 : size }));
       else if (action === "set-img-fold" && fold !== null) await saveDefaults(env2, (p) => ({ ...p, imgFold: fold === IMG_FOLD.def ? void 0 : fold }));
       repaintTheme();
+      return true;
+    }
+    if (/^set-img-(show|send)(-mode)?$/.test(action)) {
+      const key2 = action.includes("show") ? "imgShow" : "imgSend";
+      const cur = getPrefs()[key2];
+      const n = action.endsWith("-mode") ? v === "all" ? 0 : cur === 0 || cur === void 0 ? IMG_RECENT.def : cur : imgRecent(v);
+      if (n !== null) await saveDefaults(env2, (p) => ({ ...p, [key2]: n === IMG_RECENT.def ? void 0 : n }));
       return true;
     }
     if (action === "set-agents") {
@@ -677,9 +751,9 @@
         if (out) out.textContent = `${el.value}%`;
         return;
       }
-      if (el?.dataset?.input === "pct") {
+      if (el?.dataset?.input === "pct" || el?.dataset?.input === "count") {
         const out = el.parentElement?.querySelector("output");
-        if (out) out.textContent = `${el.value}%`;
+        if (out) out.textContent = `${el.value}${el.dataset.input === "pct" ? "%" : "개"}`;
         return;
       }
       if (el?.dataset?.input === "wiki-query" && view2.kind === "started") {
@@ -1585,6 +1659,7 @@
     if (messages.some((m) => marked(m?.content))) {
       messages = messages.map((m) => marked(m?.content) ? { ...m, content: stripStartCard(stripUnsentMark(m.content)) } : m);
     }
+    if (liteNow || messages.some((m) => typeof m?.content === "string" && imgTagsKnown(m.content, modulePicker()))) messages = stripOldImgTags(messages, getPrefs().imgSend ?? IMG_RECENT.def);
     if (liteNow) {
       messages = stripHistoryTags(messages);
       messages = await fixLore(messages).catch(() => messages);
@@ -1824,7 +1899,10 @@
       if (hasCall(out)) out = renderCalls(out, callCardHtml);
       if (out.includes(START_MARK)) out = renderStartCards(out, startCardHtml);
       if (hasStatusTag(out)) out = renderStatus(out);
-      if (liteNow && hasImgTag(out)) out = renderImgTags(out, modulePicker());
+      if (hasImgTag(out)) {
+        const pick3 = modulePicker();
+        if (liteNow || imgTagsKnown(out, pick3)) out = renderImgTags(out, pick3, getPrefs().imgShow ?? IMG_RECENT.def);
+      }
       if (out.includes(UNSENT_MARK)) out = renderUnsentMark(out, unsentMarkHtml());
       if (wantsOpeningHint(text)) out += openingHintHtml();
     }
@@ -1933,5 +2011,5 @@
   }
 
   // src/body-entry.ts
-  globalThis.__goeiBody = { version: "0.16.39", start: start2 };
+  globalThis.__goeiBody = { version: "0.16.40", start: start2 };
 })();

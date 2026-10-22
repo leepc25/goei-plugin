@@ -1,4 +1,43 @@
- = setTimeout(() => {
+lass="gx-mini${save2 ? " ps-save" : " danger"}" data-action="${pane}-def-yes">${save2 ? "덮어쓰기" : "불러오기"}</button><button class="gx-mini" data-action="${pane}-def-no">취소</button></div></div>`;
+  }
+  async function defaultsAction(pane, action, value, ctx2, refresh2) {
+    const sub = action.slice(pane.length + 1);
+    if (sub === "def-ask") {
+      defaultsAsk.pane = pane;
+      defaultsAsk.what = value === "save" || value === "load" ? value : "";
+      return "";
+    }
+    if (sub === "def-no") {
+      defaultsAsk.pane = "";
+      defaultsAsk.what = "";
+      return "";
+    }
+    if (sub !== "def-yes") return null;
+    const what = defaultsAsk.pane === pane ? defaultsAsk.what : "";
+    defaultsAsk.pane = "";
+    defaultsAsk.what = "";
+    if (what === "save") {
+      await saveVarDefaults(PREFIXES[pane], ctx2.chat.scriptstate);
+      return `지금 ${NAME[pane]} 설정을 새 채팅 기본값으로 저장했어요.`;
+    }
+    if (what === "load") {
+      await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => ({ ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...loadVarDefaults(PREFIXES[pane], chat.scriptstate) } }));
+      await refresh2();
+      return `새 채팅 기본값을 지금 ${NAME[pane]}에 불러왔어요.`;
+    }
+    return "";
+  }
+
+  // src/ui/toast.ts
+  var esc4 = (s4) => s4.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  var timers = /* @__PURE__ */ new Map();
+  function toast(key2, text, clear) {
+    if (!text) return "";
+    const cur = timers.get(key2);
+    if (!cur || cur.text !== text) {
+      if (cur) clearTimeout(cur.id);
+      const ms = Math.min(8e3, 2500 + [...text].length * 50);
+      const id = setTimeout(() => {
         timers.delete(key2);
         clear(text);
         const el = document.querySelector(`.gx-toast[data-toast="${key2}"]`);
@@ -3517,25 +3556,4 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .gx-goal span { color: var(--dim); font-size: 13px; }
 .gx-goal b { flex: 1; min-width: 0; color: var(--signal); }
 .gx-goal b.none { color: var(--dim); font-weight: 600; }
-.gx-goal em { font-style: normal; font-size: 13px; color: var(--dim); font-variant-numeric: tabular-nums; }
-.gx-support { display: flex; align-items: center; gap: 10px; font-size: 14px; }
-.gx-support span { margin-right: auto; color: var(--dim); }
-.gx-support b { min-width: 20px; text-align: center; font-variant-numeric: tabular-nums; }
-.gx-step { width: 36px; height: 36px; border: 1px solid var(--line); border-radius: 10px; background: var(--void); font-size: 17px; }
-.gx-step:disabled { opacity: .4; }
-.gx-mbox { max-height: calc(min(100vh - 28px, 950px) - 222px); overflow-y: auto; }
-/* 커스텀 탭: PC 오른쪽 편성은 임무 탭과 같은 칸 너비·구조 (v0.16.21, 사용자 요청) */
-.gx-mlist { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; align-content: start; }
-.gx-mlist li.gx-mgrp { grid-column: 1 / -1; border: 0; background: none; box-shadow: none; padding: 6px 2px 0; font-size: 12px; font-weight: 700; color: var(--muted); display: flex; gap: 6px; align-items: baseline; }
-.gx-mlist li.gx-mgrp:first-child { padding-top: 0; }
-.gx-mlist li.gx-mgrp small { font-weight: 400; }
-.gx-mapcol .gx-segs { align-self: flex-start; }
-/* 커스텀 탭 (v0.16.21): 종류 고르기와 검색을 한 줄에. 종류는 임무 탭 상황 필터와 같은 칩, 남는 폭은 검색 */
-.gx-mfilter { display: flex; align-items: center; gap: 6px; min-width: 0; }
-.gx-mfilter .gx-chip { flex: none; min-height: 36px; padding: 0 14px; }
-.gx-mfilter .gx-search { flex: 1; width: auto; min-width: 0; min-height: 36px; margin-left: 4px; border-radius: 999px; padding: 0 14px; font-size: 13px; }
-.gx-mapcol .gx-hint, .gx-mapcol > .gx-muted { margin: 0; }
-
-@media (max-width: 760px) {
-  .gx-field { grid-template-columns: 1fr; }
-  .gx-field > .gx-mapcol { position: static; }
+.gx-goal em { font-style: normal; font-size: 13px; color: var(--dim); font-

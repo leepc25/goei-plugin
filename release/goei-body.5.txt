@@ -1,4 +1,25 @@
-<button class="ph-tool mk-slot" data-action="mk-go" data-value="${i}" aria-label="${esc10(m.name)}" title="${esc10(m.name)}">${icon(m)}<span class="ph-tool-l">${esc10(m.name)}</span></button>` : `<button class="ph-tool mk-slot empty" data-action="mk-pop" aria-label="즐겨찾기 추가">${ICONS.plus}</button>`;
+k-here" data-action="mk-here" ${full ? "disabled" : ""}>${ICONS.plus}<span>지금 화면 · ${esc10(current3.name)}</span></button>` : "";
+    const cand = markCandidates(recent, current3);
+    const more = cand.length ? `<h4>최근 본 화면</h4><ul class="mk-rows">${cand.map((m, i) => `<li class="mk-row"><span class="mk-go">${icon(m)}<span>${esc10(m.name)}</span></span>
+        <button class="ph-tool sm" data-action="mk-add" data-value="${i}" aria-label="${esc10(m.name)} 추가" title="추가" ${full ? "disabled" : ""}>${ICONS.plus}</button></li>`).join("")}</ul>` : "";
+    return `<button class="mk-scrim" data-action="mk-pop" aria-label="즐겨찾기 닫기"></button>
+    <div class="mk-pop" role="dialog" aria-label="즐겨찾기">
+      <div class="mk-head"><b>즐겨찾기</b><small>${list4.length}/${MARK_MAX}</small><button class="ph-tool sm" data-action="mk-pop" aria-label="닫기">${ICONS.close}</button></div>
+      ${mine}${here}${full ? '<p class="mk-empty">5개까지 넣을 수 있어요. 하나를 빼면 더 넣을 수 있어요.</p>' : ""}${more}
+    </div>`;
+  }
+  function navHistBar(current3) {
+    return `<div class="gx-navhist">
+    <button class="gx-nh" data-action="nav-back" aria-label="뒤로" title="뒤로">${ICONS.back}</button>
+    <button class="gx-nh mk-star${markUi.pop ? " on" : ""}${current3 && isMarked(current3) ? " marked" : ""}" data-action="mk-pop" aria-label="즐겨찾기" title="즐겨찾기" aria-expanded="${markUi.pop}">${ICONS.star}</button>
+    <button class="gx-nh fwd" data-action="nav-fwd" aria-label="앞으로" title="앞으로">${ICONS.back}</button></div>`;
+  }
+  function markSlots() {
+    const list4 = marks();
+    if (!list4.length) return `<button class="mk-hint" data-action="mk-pop">${ICONS.star}<span>좌우로 밀어 즐겨찾기를 추가하세요</span></button>`;
+    return Array.from({ length: MARK_MAX }, (_, i) => {
+      const m = list4[i];
+      return m ? `<button class="ph-tool mk-slot" data-action="mk-go" data-value="${i}" aria-label="${esc10(m.name)}" title="${esc10(m.name)}">${icon(m)}<span class="ph-tool-l">${esc10(m.name)}</span></button>` : `<button class="ph-tool mk-slot empty" data-action="mk-pop" aria-label="즐겨찾기 추가">${ICONS.plus}</button>`;
     }).join("");
   }
 
@@ -355,7 +376,7 @@
     });
     return { list: list4, count: count2 };
   }
-  var RETIRED_SCRIPTS = ["📊상태창"];
+  var RETIRED_SCRIPTS = ["📊상태창", "🖼️에셋줄바꿈", "🖼️에셋출력", "🖼️에셋리퀘제거"];
   var loreName = (e) => `${e.comment ?? ""}${e.folder ?? ""}`;
   function renamed(current3, incoming) {
     const target = incoming.find((e) => e.comment === DIRECTORY_COMMENT);
@@ -411,7 +432,7 @@
     }
     return { next, lore: lore.count, scripts: scripts.count, fields: fields3 };
   }
-  var PLUGIN_VERSION = true ? "0.16.39" : "0";
+  var PLUGIN_VERSION = true ? "0.16.40" : "0";
 
   // src/host/game/fetch.ts
   var GAME_BASE = UPDATE_BASE ? `${UPDATE_BASE}/game` : "";
@@ -476,7 +497,7 @@
 
   // src/host/game/code.ts
   var CODE_KEY = "goei:game:code";
-  var VERSION = true ? "0.16.39" : "";
+  var VERSION = true ? "0.16.40" : "";
   var codeVersion = (code) => /^\/\/ goei-game (\S+)/.exec(code)?.[1] ?? null;
   var mod = null;
   var codeStats = { readMs: 0, runMs: 0, bytes: 0, fromNet: false };
@@ -3824,64 +3845,4 @@ ${note.trim()}` : card2;
       case "map-region":
         field2.region = v === "01" || MAP_CODES.includes(v) ? v : "01";
         field2.place = null;
-        field2.confirmEnd = null;
-        env2.render();
-        return true;
-      case "map-jump":
-      case "map-place": {
-        let v2 = value ?? "";
-        if (action === "map-jump") {
-          const [code, key2] = v2.split("|");
-          if (!MAP_CODES.includes(code) || !key2) return true;
-          field2.region = code;
-          field2.mapq = "";
-          v2 = key2;
-        }
-        field2.confirmEnd = null;
-        if (action === "map-place" && isPC() && field2.place === v2 && sameTarget(field2.target, v2)) {
-          field2.place = null;
-          field2.target = null;
-          env2.render();
-          return true;
-        }
-        field2.place = v2;
-        const x = readCtx(ctx2);
-        const here = typeof x === "string" || !x.on ? [] : activeEvents(x.world).filter((e) => placeKey(e, x.catalog) === v2);
-        if (!here.length) field2.target = placeTarget(v2);
-        env2.render();
-        return true;
-      }
-      case "map-unplace":
-        field2.place = null;
-        field2.target = null;
-        field2.confirmEnd = null;
-        toStep("goal", env2);
-        return true;
-      case "map-filter":
-        field2.filter = ["all", "an", "in", "ms"].includes(v) ? v : "all";
-        env2.render();
-        return true;
-      case "pick-place":
-        if (isPC() && sameTarget(field2.target, v)) {
-          field2.target = null;
-          env2.render();
-          return true;
-        }
-        field2.target = placeTarget(v);
-        toStep("team", env2);
-        return true;
-      case "field-step":
-        toStep(v === "team" ? "team" : "goal", env2);
-        return true;
-      case "pick-event": {
-        const x = readCtx(ctx2);
-        if (typeof x === "string") return true;
-        const ev = activeEvents(x.world).find((e) => e.key === v);
-        if (!ev) return true;
-        if (sameTarget(field2.target, ev.key)) {
-          field2.target = null;
-          field2.confirmEnd = null;
-          env2.render();
-          return true;
-        }
-        field2.target = { type: "event",
+        field2.confirmE

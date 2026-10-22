@@ -1,4 +1,46 @@
-ents[k - 1];
+d) => d.unread && (nick === void 0 || d.nick === nick));
+  function writeGnet(chat, st, opts = {}) {
+    if (opts.reconcile !== false) reconcileUnread(st, readGnet(chat));
+    if (opts.ack) acknowledge(st, opts.ack.post ?? void 0, opts.ack.nick ?? void 0);
+    const keep = gnetRetention(chat.scriptstate);
+    if (keep.auto) trimDms(st, keep.limit);
+    const raw = encode(st);
+    const unread = boardUnread(st) || dmUnread(st);
+    return { ...chat, scriptstate: { ...chat.scriptstate ?? {}, [GN_RAW]: raw, "$st_unread_gnet": unread ? "1" : "0" } };
+  }
+  function addUserPost(st, nick, title2, body4, date) {
+    st.seq += 1;
+    const p = {
+      id: st.seq,
+      date: validDate(date),
+      nick: cut(nick, 80),
+      title: trimTokens(title2, LIMITS.title_tokens),
+      body: trimTokens(body4, LIMITS.post_tokens),
+      views: 0,
+      votes: 0,
+      mine: true,
+      comments: []
+    };
+    st.posts.unshift(p);
+    return p;
+  }
+  function addUserComment(st, postIdValue, parent, nick, body4, now = "") {
+    const p = findPost(st, postIdValue);
+    if (!p) throw new GnetError("대상 글이 없어졌어요.");
+    if (parent > 0 && !p.comments[parent - 1]) throw new GnetError("답글을 달 댓글이 없어졌어요.");
+    p.comments.push({ parent, nick, body: trimTokens(body4, LIMITS.comment_tokens), mine: true, unread: false });
+    stampComments(p, p.comments.length - 1, [now ? hhmm(now) : ""], now);
+    return p.comments.length;
+  }
+  function deletePost(st, id) {
+    const i = st.posts.findIndex((p) => p.id === id && p.mine);
+    if (i < 0) return false;
+    st.posts.splice(i, 1);
+    return true;
+  }
+  function deleteComment(st, id, k) {
+    const p = findPost(st, id);
+    const target = p?.comments[k - 1];
     if (!p || !target?.mine) return false;
     const up = target.parent;
     p.comments.splice(k - 1, 1);
@@ -2422,7 +2464,7 @@ ${line2}`;
           const tc = /^#[0-9a-fA-F]{3,8}$/.test(c2 ?? "") ? c2 : color;
           const head = fields3.find(([k]) => k === "Head")?.[1];
           const rows2 = fields3.filter(([k]) => k === "Row" || k === "RowHead");
-          const cells = (v, tagName) => v.split(";;").map((x) => `<${tagName}>${inline(x.trim())}</${tagName}>`).join("");
+          const cells = (v, tagName2) => v.split(";;").map((x) => `<${tagName2}>${inline(x.trim())}</${tagName2}>`).join("");
           out.push(`<table class="nw-table${b.tag === "CategoryTable" ? " cat" : ""}" style="--nw:${tc}">${cap ? `<caption>${inline(cap)}</caption>` : ""}${head ? `<tr>${cells(head, "th")}</tr>` : ""}${rows2.map(([k, v]) => `<tr>${cells(v, k === "RowHead" ? "th" : "td")}</tr>`).join("")}</table>`);
           break;
         }
@@ -4444,43 +4486,4 @@ The previous response was rejected and nothing was saved. Recreate the complete 
     if (defaultsAsk.pane !== pane || !defaultsAsk.what) return "";
     const save2 = defaultsAsk.what === "save";
     const text = save2 ? `지금 ${NAME[pane]} 설정으로 새 채팅 기본값을 덮어쓸까요?` : `저장해 둔 ${NAME[pane]} 기본값을 지금 채팅에 불러올까요?`;
-    return `<div class="st-confirm st-barconfirm ps-defconfirm"><p>${text}</p><div class="gx-row-btns"><button class="gx-mini${save2 ? " ps-save" : " danger"}" data-action="${pane}-def-yes">${save2 ? "덮어쓰기" : "불러오기"}</button><button class="gx-mini" data-action="${pane}-def-no">취소</button></div></div>`;
-  }
-  async function defaultsAction(pane, action, value, ctx2, refresh2) {
-    const sub = action.slice(pane.length + 1);
-    if (sub === "def-ask") {
-      defaultsAsk.pane = pane;
-      defaultsAsk.what = value === "save" || value === "load" ? value : "";
-      return "";
-    }
-    if (sub === "def-no") {
-      defaultsAsk.pane = "";
-      defaultsAsk.what = "";
-      return "";
-    }
-    if (sub !== "def-yes") return null;
-    const what = defaultsAsk.pane === pane ? defaultsAsk.what : "";
-    defaultsAsk.pane = "";
-    defaultsAsk.what = "";
-    if (what === "save") {
-      await saveVarDefaults(PREFIXES[pane], ctx2.chat.scriptstate);
-      return `지금 ${NAME[pane]} 설정을 새 채팅 기본값으로 저장했어요.`;
-    }
-    if (what === "load") {
-      await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => ({ ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...loadVarDefaults(PREFIXES[pane], chat.scriptstate) } }));
-      await refresh2();
-      return `새 채팅 기본값을 지금 ${NAME[pane]}에 불러왔어요.`;
-    }
-    return "";
-  }
-
-  // src/ui/toast.ts
-  var esc4 = (s4) => s4.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
-  var timers = /* @__PURE__ */ new Map();
-  function toast(key2, text, clear) {
-    if (!text) return "";
-    const cur = timers.get(key2);
-    if (!cur || cur.text !== text) {
-      if (cur) clearTimeout(cur.id);
-      const ms = Math.min(8e3, 2500 + [...text].length * 50);
-      const id
+    return `<div class="st-confirm st-barconfirm ps-defconfirm"><p>${text}</p><div class="gx-row-btns"><button c
