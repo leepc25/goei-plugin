@@ -430,3 +430,25 @@ BODY_ONLY={
 }
 for _n,_a in BODY_ONLY.items():
     _o=CLIPS[_n]; CLIPS[_n]=('side view: '+_a,_o[1],_o[2])
+
+# ── 2차 수정(2026-10-22 독립 검수 f622d66 「망가짐」): 동작이 읽히게 손 위치를 크게, 먼 팔은 몸에 붙임 ──
+TUCK=(8,14)   # 먼 손을 가슴 아래에 붙임(앞으로 나오면 팔이 셋처럼 보임)
+clip('lowmark','crouching low, near open hand sweeps down toward the floor ahead, then rises to head height and clenches into a fist',
+     [LOW(rh=TUCK),LOW(lh=(24,26),rh=TUCK,tilt=24),LOW(lh=(25,24),rh=TUCK,tilt=24),LOW(lh=(20,6),rh=TUCK,tilt=10),LOW(lh=(16,-8),rh=TUCK,tilt=0,le=ELB_DOWN),LOW(lh=(16,-8),rh=TUCK,tilt=0,le=ELB_DOWN),LOW(rh=TUCK)],False)
+clip('parry','low stance, far hand tucked at the chest, near hand snaps outward with the back of the hand in a quick slap-away',
+     [ST(rh=TUCK),ST(lh=(8,6),rh=TUCK,tilt=-2),ST(lh=(27,-4),rh=TUCK,tilt=-2,head=(7,-6)),ST(lh=(26,-2),rh=TUCK,tilt=-2,head=(7,-6)),ST(rh=TUCK)],False)
+SQ2=lambda lh,b=14,tilt=16: P((X+2,55+b),10,0,0,(X+12,G),(X-8,G),lh,'down',tilt=tilt)
+clip('pickup','bends the knees into a half squat, reaches the near open hand down to the floor ahead, rises bringing the hand up to the chest palm up',
+     [STAND(0),SQ2((20,30)),SQ2((22,34),18),SQ2(('r',16,18),8,8),PK(('r',10,12),4),STAND(0)],False)
+DR=lambda lh,tilt,le: P((X,55),2,0,0,(X+6,G),(X-4,G),lh,'down',tilt=tilt,le=le)
+clip('drink','lifts the closed near hand up to her lips, tips the head back to drink, then lowers the hand',
+     [STAND(0),DR(('r',12,8),2,('e',8,14)),DR(('r',8,-3),-6,('e',8,10)),DR(('r',7,-5),-14,('e',7,8)),DR(('r',7,-5),-14,('e',7,8)),DR(('r',12,8),0,('e',8,14)),STAND(0)],False)
+EA2=lambda m: P((X,55),4,0,0,(X+6,G),(X-4,G),('r',8,-3) if m else ('r',14,10),'down',head=(5,-7),tilt=6,le=('e',8,10) if m else ('e',8,15))
+clip('eat','quick bites: near hand goes up to the mouth and back down to chest height, three times',[EA2(0),EA2(1),EA2(0),EA2(1),EA2(0),EA2(1)])
+BA2=lambda a: P((X,55),6,0,0,(X+6,G),(X-4,G),('r',20,10),('r',19+3*math.cos(a),9+4*math.sin(a)),tilt=16,le=('e',10,12),re=('e',10,14))
+clip('bandage','near forearm held out across the front of the chest, the other hand wraps around that forearm in circles, eyes down on it',
+     [BA2(0),BA2(1.6),BA2(3.1),BA2(4.7),BA2(6.2),BA2(7.8)])
+# 치료 3차: 앞에 든 팔뚝을 감는 손이 몸 뒤에 가려 안 보임 → 가까운 손이 먼 어깨를 누르고 팔꿈치까지 문질러 내림(몸 앞을 가로지름)
+BA3=lambda y,tilt=16: P((X,55),4,0,0,(X+6,G),(X-4,G),('r',1,y),'down',tilt=tilt,le=('e',12,10))
+clip('bandage','head down, near hand presses on the far shoulder, then rubs firmly down the far arm to the elbow and back up',
+     [BA3(4),BA3(4,20),BA3(10),BA3(16),BA3(20,20),BA3(12)])
