@@ -24,7 +24,7 @@ import { SEED_OPEN } from './core/seed';
 import { readManifest } from './core/start';
 import type { Chat, LoreEntry } from './core/types';
 import { cleanOutput, hasWorldTags, parseCatalog, processOutput } from './core/world';
-import { missingBasicVars, worldSettings } from './core/settings';
+import { basicSettings, missingBasicVars, worldSettings } from './core/settings';
 import { staleFactionVars } from './core/factions';
 import { supplementAssets } from './host/asset';
 import { updateCharacterLore, updateChat } from './host/risu';
@@ -43,7 +43,7 @@ import { setWaiting } from './host/waiting';
 import { syncDecorators, computeLore, loreOptions, patchSlots, sameVars, trimRoster, type LoreMode } from './core/lore';
 import { advValue } from './core/advanced';
 import { userInfo } from './host/user';
-import { applyPlayer, playerAgent, playerBlock } from './core/player';
+import { applyPlayer, hidePlayerTag, playerAgent, playerBlock } from './core/player';
 
 const PLUGIN_ID = 'goei-plugin';
 const WATCH_MS = 1000;
@@ -151,7 +151,8 @@ async function withPlayer<M extends PromptMessage>(messages: M[]): Promise<M[]> 
   const agent = char && chat ? playerAgent(char.globalLore, chat.scriptstate) : undefined;
   if (!char || !chat || !agent) return messages;
   const env = { vars: chat.scriptstate ?? {}, char: char.name, user: agent.name };
-  return applyPlayer(messages, playerBlock(char.globalLore, agent, env), await readPersona(), userInfo().name, agent.name);
+  const out = applyPlayer(messages, playerBlock(char.globalLore, agent, env), await readPersona(), userInfo().name, agent.name);
+  return basicSettings(char.globalLore, chat.scriptstate).assetPlayer ? out : hidePlayerTag(out, [agent.english]);
 }
 
 let rulesCache: { charIndex: number; gnet: string | null; phone: string | null; wiki: string | null; registry: Registry } | null = null;
@@ -373,7 +374,8 @@ function onDisplay(text: string): string {
     // 캐릭터 이미지 태그는 플러그인이 그림 칸으로. Lite 판정 전(다른 채팅에서 돌아온 직후)에는 태그가 모두 에셋 모듈에 있는 이름일 때만
     if (hasImgTag(out)) {
       const pick = modulePicker();
-      if (liteNow || imgTagsKnown(out, pick)) out = renderImgTags(out, pick, getPrefs().imgShow ?? IMG_RECENT.def);
+      const self = userInfo().name;
+      if (liteNow || imgTagsKnown(out, pick, self)) out = renderImgTags(out, pick, getPrefs().imgShow ?? IMG_RECENT.def, self);
     }
     if (out.includes(UNSENT_MARK)) out = renderUnsentMark(out, unsentMarkHtml());
     if (wantsOpeningHint(text)) out += openingHintHtml();

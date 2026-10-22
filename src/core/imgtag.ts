@@ -25,29 +25,35 @@ export function hasImgTag(text: string): boolean {
   return text.includes('<img=');
 }
 
-const tagName = (who: string, expr: string, pick?: (name: string) => string | null) => {
+/** 페르소나 태그(<img=페르소나이름_표정>)에 맞는 에셋이 없을 때 쓰는 그림: Risu의 유저 사진 (표정과 상관없이 한 장).
+ *  나중에 「페르소나이름_표정」 에셋을 넣으면 그것이 먼저다 */
+const SELF = '{{source::user}}';
+
+const tagName = (who: string, expr: string, pick?: (name: string) => string | null, self?: string) => {
   const want = `${who.trim()}_${expr.trim()}`;
-  return pick ? pick(want) ?? pick(`${who.trim()}_default`) : want;
+  const found = pick ? pick(want) ?? pick(`${who.trim()}_default`) : want;
+  return found ?? (self && who.trim() === self.trim() ? SELF : null);
 };
 
 /** 태그가 모두 에셋에 있는 이름인지 (괴이봇 판정 전에도 그려도 되는지. 다른 봇의 같은 꼴 태그는 건드리지 않게) */
-export function imgTagsKnown(text: string, pick?: (name: string) => string | null): boolean {
+export function imgTagsKnown(text: string, pick?: (name: string) => string | null, self?: string): boolean {
   if (!pick) return false;
   const all = [...text.matchAll(TAG)];
-  return all.length > 0 && all.every((m) => !!tagName(m[1], m[2], pick));
+  return all.length > 0 && all.every((m) => !!tagName(m[1], m[2], pick, self));
 }
 
 /**
  * 태그를 그림 칸으로. pick(이름)은 에셋에 있으면 실제 이름(대소문자 맞춤), 없으면 null.
  * pick이 없으면(에셋 목록을 못 읽었으면) 태그 이름을 그대로 쓴다.
- * 그 표정이 없으면 이름_default, 그것도 없으면 칸을 그리지 않는다 (원본과 같음).
+ * 그 표정이 없으면 이름_default, 그것도 없으면 칸을 그리지 않는다 (원본과 같음). self(페르소나 이름) 태그는 유저 사진.
  * 최근 메시지에만 띄우는 조건은 메시지 번호를 아는 Risu CBS에 맡긴다 (화면 처리기는 번호를 모른다). recent 0이면 전부
  */
-export function renderImgTags(text: string, pick?: (name: string) => string | null, recent = IMG_RECENT.def): string {
+export function renderImgTags(text: string, pick?: (name: string) => string | null, recent = IMG_RECENT.def, self?: string): string {
   return text.replace(TAG, (_m, who: string, expr: string) => {
-    const name = tagName(who, expr, pick);
-    if (!name || /[{}'"<>\\]/.test(name)) return '\n\n';
-    const box = `<div class="gim" style="${BASE_STYLE};background-image:url('{{raw::${name}}}')" tabindex="0"></div>`;
+    const name = tagName(who, expr, pick, self);
+    if (!name || (name !== SELF && /[{}'"<>\\]/.test(name))) return '\n\n';
+    const url = name === SELF ? SELF : `{{raw::${name}}}`;
+    const box = `<div class="gim" style="${BASE_STYLE};background-image:url('${url}')" tabindex="0"></div>`;
     return `\n\n${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-${recent - 1}}}}}}}${box}{{/when}}` : box}\n\n`;
   });
 }

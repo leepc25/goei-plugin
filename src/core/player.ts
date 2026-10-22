@@ -79,3 +79,18 @@ export function applyPlayer<M extends { role?: unknown; content?: unknown }>(mes
   }
   return out;
 }
+
+/**
+ * 「주인공 이미지」를 끈 채 캐릭터로 플레이할 때: Asset 로어북의 「- Characters {name}:」 명단에서 주인공 이름을 뺀다.
+ * 명단은 카드에 고정된 글이고 누가 주인공인지는 플러그인만 알아서 요청 직전에 지운다
+ */
+export function hidePlayerTag<M extends { content?: unknown }>(messages: M[], tagNames: string[]): M[] {
+  const drop = new Set(tagNames.filter(Boolean));
+  if (!drop.size) return messages;
+  const re = /^(- Characters \{name\}: )(.*)$/gm;
+  return messages.map((m) => {
+    if (typeof m?.content !== 'string' || !m.content.includes('- Characters {name}: ')) return m;
+    const content = m.content.replace(re, (_, head: string, list: string) => head + list.split(',').map((s) => s.trim()).filter((s) => s && !drop.has(s)).join(', '));
+    return content === m.content ? m : { ...m, content };
+  });
+}
