@@ -1,0 +1,9 @@
+{
+  "observedRevision": "6",
+  "observationsCurrent": true,
+  "secrets": [],
+  "runtimeVariables": [],
+  "outboundIdentities": [],
+  "pixellabTokenPresent": false,
+  "status": "401-missing-authorization-header"
+}
