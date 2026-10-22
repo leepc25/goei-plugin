@@ -100,7 +100,7 @@ function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui
     },
     onReturn(r, run) {
       const l = (run as Launch).launch;
-      if (l) hq.onReturn({ ...(r as unknown as RunResult), runId: (l as { runId?: string }).runId } as RunResult, l);
+      if (l) hq.onReturn({ ...(r as unknown as RunResult), runId: (r as unknown as RunResult).runId ?? l.runId } as RunResult, l);
     },
     unmount: () => hq.unmount(),
   };
@@ -111,6 +111,7 @@ function toHqResult(r: RunResultCore, w: World): RunResult {
   const n = r.notes as Partial<RunResult> & Record<string, unknown>;
   return {
     how: r.how,
+    runId: (w.run as Launch).launch?.runId,
     missionDone: (n.missionDone as boolean | undefined) ?? r.how === 'return',
     depth: (n.depth as number | undefined) ?? Math.max(1, w.floor?.depth ?? r.floors),
     floors: r.floors,
@@ -569,7 +570,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       if (run.stageId === 'hq') setTimeout(() => world === w && cutOnce('first_day'), 600);
       w.hitFx = false; // 맞을 때 효과는 껍데기 fx가 그린다
       if (run.stageId === 'hq') return void npc.attach(w, { hub: (hq.hub?.() ?? null) as never, hq: true }); // 본부 걷기: 아이템·대사 안내·전투 기록 없음
-      w.notes.runId = `${run.seed}`;
+      w.notes.runId = (run as Launch).launch?.runId;
       // 승강기 안내 방송은 층 모듈 hooks를 대사 모듈이 채우면 거기서 나온다 (여기서 따로 부르지 않음: 중복)
       w.on((e) => {
         if (e.type === 'hp:low') w.notes.bigHit = true;
@@ -578,7 +579,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       const bossesDown = new Set<number>();
       w.hooks.push(() => {
         for (const bd of w.bodies) {
-          if (!(bd as { boss?: boolean }).boss || bossesDown.has(bd.id) || (bd.alive && bd.hp > 0)) continue;
+          if (!(bd as { boss?: boolean }).boss || bossesDown.has(bd.id) || bd.hp > 0) continue;
           bossesDown.add(bd.id);
           ((w.notes.bosses ??= []) as string[]).push(bd.kind);
         }

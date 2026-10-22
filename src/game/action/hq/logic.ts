@@ -317,7 +317,7 @@ export function judgeMission(g: MissionGoal, r: RunResult): boolean {
     case '구조':
       return g.rescue ? r.rescued.includes(survivorId(g.rescue)) : r.rescued.length > 0;
     case '진압':
-      if (g.id === 'm6') return bosses.includes('elder') || (bosses.includes('elder_f') && bosses.includes('elder_m'));
+      if (g.id === 'm6') return n['stage.elderDefeated'] === true || bosses.includes('elder') || (bosses.includes('elder_f') && bosses.includes('elder_m'));
       return bosses.includes(g.id === 'm2' ? 'guard' : g.id);
     case '회수':
       return !!g.recover && r.bag.some((b) => b?.id === g.recover);

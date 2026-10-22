@@ -5,6 +5,7 @@ import type { Encounter, FloorPlan, GameEvent, PropSpec, RunConfigCore, StageApi
 import { B12, FLOOR_TYPES, depthLabel } from './data/floortypes';
 import { RULE, ruleText } from './data/rules';
 import { CLOSE_SPAM_LINE, LONELY_LINE, MUTTER, STUCK_LINE, announce, defaultCallout, dealTruth, elevatorButtons, greetLine, type ElevatorButton, type ElevatorLines } from './elevator';
+import { enemyKind } from '../enemy/kinds';
 import { makeFloor, pickSub, pickType } from './gen/floor';
 import { DIRS, KEY_MARK, OPP, across, edgeId, makeWorld, roomAt, roomFloor } from './gen/world';
 import { cellAt, makeService } from './gen/service';
@@ -118,6 +119,7 @@ interface Runtime {
   guardianSpawned: boolean;
   guardianSkip: boolean;
   guardianDefeated: boolean;
+  guardianKills?: string[];
   traversed: boolean;
   penaltyKind: string | null;
   predator: boolean;
@@ -340,7 +342,7 @@ export function createElevatorStage(store: StageStore, hooks: StageHooks = {}): 
     plan.startX = x;
     rt!.prevX = rt!.safeX = x;
     // 추격: 그것은 들어온 쪽에서 쫓아온다. 오른쪽 문으로 들어온 방은 (거꾸로 쫓을 수 없어) 잠잠하다
-    if (plan.type === 'chase') rt!.chaseX = t.from === 'r' ? -1e9 : x - 600;
+    if (plan.type === 'chase') rt!.chaseX = t.from === 'r' || x >= f.width / 2 ? -1e9 : x - 600;
     syncRoom(plan, w);
     o.floorTypes[t.depth] = { type: f.type, sub: f.sub };
     o.depth = t.depth;
@@ -555,6 +557,8 @@ export function createElevatorStage(store: StageStore, hooks: StageHooks = {}): 
       }
     }
     // 추격: 자동으로 다가오는 벽. 문을 닫으면 느려지고, 뒤돌아보면 빨라진다.
+    // 방 통과 목표를 달성한 뒤에는 열쇠·이전 출입구로 되돌아갈 수 있다.
+    if (f.type === 'chase' && f.room && r.traversed) r.chaseX = plan.stage.fx.chaseX = -1e9;
     if (f.type === 'chase' && r.chaseX > -1e8) {
       const end = f.segments[f.segments.length - 1].x;
       if (p.x < end - 200 && r.t > 1.2) {
@@ -919,8 +923,24 @@ export function createElevatorStage(store: StageStore, hooks: StageHooks = {}): 
         case 'enemyDie':
           rt.kills++;
           if (e.kind === rt.plan.stage.floor?.spawns.find(s => s.role === 'guardian')?.kind) rt.guardianDefeated = true;
-          if (rt.trial?.failed && e.kind === rt.penaltyKind) rt.trial.done = true;
+          if (f?.spawns.some(s => s.role === 'guardian' && s.kind === 'elder') && ['elder_f', 'elder_m'].includes(e.kind)) {
+            rt.guardianKills = [...new Set([...(rt.guardianKills ?? []), e.kind])];
+            if (rt.guardianKills.includes('elder_f') && rt.guardianKills.includes('elder_m')) {
+              rt.guardianDefeated = true;
+              api.world.emit({ type: 'custom', name: 'guardianCleared', data: { kind: 'elder', how: 'kill' } });
+            }
+          }
+          if (rt.trial?.failed && rt.penaltyKind && enemyKind(e.kind) === enemyKind(rt.penaltyKind)) rt.trial.done = true;
           break;
+        case 'custom': {
+          const d = e.data as { kind?: string; how?: string } | undefined;
+          if (e.name === 'guardianCleared' && d?.kind === 'elder' && f?.spawns.some(s => s.role === 'guardian' && s.kind === 'elder')) {
+            if (d.how === 'rule') rt.guardianSkip = true;
+            // 진압과 규칙 준수는 서로 다른 결과다.
+            if (d.how === 'kill') api.note('stage.elderDefeated', true);
+          }
+          break;
+        }
         case 'item':
           if (e.id === 'light') rt.light = 1;
           break;
@@ -974,7 +994,11 @@ export function createElevatorStage(store: StageStore, hooks: StageHooks = {}): 
         }
         case 'checklist':
           foundRule(api, 'entry', p.x);
-          if (!o.items.includes('checklist')) o.items.push('checklist'), api.world.say('서명란이 빈 점검표를 챙겼다. (회수물)', 2.5);
+          if (api.world.recovery?.has('checklist')) break;
+          if (api.world.recovery?.add('checklist')) {
+            api.setProp(prop.id, null);
+            api.world.say('서명란이 빈 점검표를 회수품 가방에 넣었다.', 2.5);
+          } else api.world.say('회수품 가방이 가득 찼다. 빈칸이 필요하다.', 2.5);
           break;
         case 'sign':
           if (pl?.data.rule) {
@@ -1383,9 +1407,11 @@ export function createElevatorStage(store: StageStore, hooks: StageHooks = {}): 
   const applyDeal = (api: StageApi, deal: 'reveal' | 'skip' | 'supply') => {
     const o = out!;
     if (deal === 'skip' && !o.clearedFloors.includes(o.serviceDepth)) return void api.world.say('이 층의 방을 먼저 정리해야 아래로 갈 수 있다.', 3);
-    const cost = o.items.find((i) => i === 'gear' || i === 'checklist') ?? o.items[0];
+    const cost = o.items.find(i => i === 'gear') ?? (api.world.recovery?.has('checklist') ? 'checklist' : o.items.find(i => i !== 'checklist'));
     if (!cost) return api.world.say('인터폰: 「줄 게 없으면 거래도 없어요.」', 2.5);
-    o.items.splice(o.items.indexOf(cost), 1);
+    if (cost === 'checklist') {
+      if (!api.world.recovery?.take(cost)) return;
+    } else o.items.splice(o.items.indexOf(cost), 1);
     o.deals++;
     const truth = dealTruth(meta.favor, rng(mix(o.seed, o.deals, meta.favor, 11))());
     log(`승강기와 거래: ${deal} (${itemName(cost)} 줌) · ${truth ? '참' : '거짓'}`);
@@ -1460,9 +1486,10 @@ export function createElevatorStage(store: StageStore, hooks: StageHooks = {}): 
 
   const offerDeal = (api: StageApi, prop: PropSpec) => {
     const r = rt!;
+    const items = [...out!.items.filter(id => id !== 'checklist'), ...(api.world.recovery?.has('checklist') ? ['checklist'] : [])];
     const hookStub: SpawnHook = { id: 0, role: 'passenger', kind: 'deal', x: 0, lane: 0, wave: 0, elite: false, data: {} };
-    if (hooks.deal?.({ favor: meta.favor, items: [...out!.items] }, defer<{ deal: 'reveal' | 'skip' | 'supply' | null }>((api, res) => res.deal && applyDeal(api, res.deal)))) return;
-    api.world.say(`인터폰: 「거래할래요? 회수물 하나면 돼요.」 (가진 것: ${out!.items.map(itemName).join(', ') || '없음'})`, 4);
+    if (hooks.deal?.({ favor: meta.favor, items }, defer<{ deal: 'reveal' | 'skip' | 'supply' | null }>((api, res) => res.deal && applyDeal(api, res.deal)))) return;
+    api.world.say(`인터폰: 「거래할래요? 회수물 하나면 돼요.」 (가진 것: ${items.map(itemName).join(', ') || '없음'})`, 4);
     (
       [
         ['reveal', '다음 층 유형'],
@@ -1858,6 +1885,7 @@ export function createElevatorStage(store: StageStore, hooks: StageHooks = {}): 
           role: rm.role,
           key: rm.key && (isSeen || scout) && !o.wkeys.includes(`${d}:${rm.key}`) ? rm.key : null,
           panel: rm.panel && isSeen,
+          service: isSeen && !!nodes.get(`room:${d}:${id}`)?.plan.props?.some(p => p.kind === 'hatch' || p.kind === 'servicedoor'),
           guardian: rm.guardian && isSeen,
           clear: isSeen && roomClear(d, rm),
           reward: (rm.role === 'reward' || rm.role === 'secret') && (isSeen || scout) ? (o.rewards.includes(`${d}:${id}`) ? 'done' : 'full') : null,
@@ -1902,7 +1930,7 @@ export function createElevatorStage(store: StageStore, hooks: StageHooks = {}): 
     }
     const keys = o.wkeys.filter((k) => k.startsWith(`${o.depth}:`)).map((k) => KEY_MARK[Number(k.split(':')[1])]);
     const f = rt?.plan.stage.floor;
-    return { where: o.where, depth: o.where === 'service' ? o.serviceDepth : o.depth, room: o.where === 'floor' && f?.room ? [f.room.col, f.room.row] : null, roomW: f?.width ?? 1280, cell: o.where === 'service' ? o.cell : null, worlds: worldsV, services, keys, upgrades: o.upgrades.filter((id) => UPGRADE_BY_ID[id]), goal, seed: o.seed };
+    return { where: o.where, depth: o.where === 'service' ? o.serviceDepth : o.depth, room: o.where === 'floor' && f?.room ? [f.room.col, f.room.row] : null, roomW: f?.width ?? 1280, panelReady: o.clearedFloors.includes(o.where === 'service' ? o.serviceDepth : o.depth), cell: o.where === 'service' ? o.cell : null, worlds: worldsV, services, keys, upgrades: o.upgrades.filter((id) => UPGRADE_BY_ID[id]), goal, seed: o.seed };
   };
 
   return mod;

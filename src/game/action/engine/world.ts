@@ -84,6 +84,7 @@ export class World implements WorldView {
   notes: Record<string, unknown> = {};
   ended: 'next' | 'withdraw' | 'return' | 'evac' | null = null;
   itemState?: { snapshot(): unknown; restore(v: unknown): void };
+  recovery?: WorldView['recovery'];
   /** 전투·공중·투사체가 없는 안정된 시점만 저장한다. */
   canCheckpoint() {
     return !this.ended && this.player.hp > 0 && this.player.phase === 'free' && !this.player.move && !this.player.airborne && !this.player.grabbed

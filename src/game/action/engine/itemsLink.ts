@@ -10,6 +10,7 @@ import {
   createField,
   createItemRun,
   addItem,
+  addRelic,
   drawItemIcon,
   dropFromKill,
   spawnEnemyDrops,
@@ -135,6 +136,23 @@ export function linkItems(w: World, run: RunConfigCore & { launch?: { items?: ({
   p.reserve = ir.reserve;
   let lastReserve = ir.reserve;
   (w as unknown as { itemRun: ItemRun }).itemRun = ir;
+  w.recovery = {
+    has: id => ir.bag.some(b => b?.id === id),
+    add: id => addRelic(ir, id),
+    take: id => {
+      const i = ir.bag.findIndex(b => b?.id === id);
+      if (i < 0) return false;
+      ir.bag[i] = null;
+      return true;
+    },
+  };
+  const recordInventory = () => {
+    w.notes.cash = ir.cash;
+    w.notes.shards = ir.shards;
+    w.notes.debt = ir.debt;
+    w.notes.bag = ir.bag.map(b => b ? { ...b } : null);
+    w.notes.itemsLeft = ir.loadout.map(s => s ? { ...s } : null);
+  };
   (w as unknown as { itemField: () => Field }).itemField = () => field;
 
   const syncSlots = () => {
@@ -242,6 +260,7 @@ export function linkItems(w: World, run: RunConfigCore & { launch?: { items?: ({
   };
 
   w.on((e) => {
+    if (e.type === 'run:end') recordInventory();
     if (e.type === 'enter:floor') {
       const remembered = fields.get(e.floor.id);
       if (remembered) { field = remembered; syncCarry(); return; }
@@ -377,12 +396,8 @@ export function linkItems(w: World, run: RunConfigCore & { launch?: { items?: ({
         });
       }
       syncCarry();
-      w.notes.cash = ir.cash;
+      recordInventory();
       w.notes.held = ir.held ? { name: WEAPONS[ir.held.id].name, uses: ir.held.uses, max: WEAPONS[ir.held.id].uses } : null;
-      w.notes.shards = ir.shards;
-      w.notes.debt = ir.debt;
-      w.notes.bag = ir.bag.map((b) => (b ? { id: b.id, name: b.name } : null));
-      w.notes.itemsLeft = ir.loadout.map((s) => (s ? { id: s.id, n: s.n } : null));
     },
     draw(c: CanvasRenderingContext2D, camX: number) {
       for (const e of field.ents) {

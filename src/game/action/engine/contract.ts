@@ -86,6 +86,8 @@ export type GameEvent =
 
 /** 적·층·아이템이 보는 세계 */
 export interface WorldView {
+  /** 회수품은 아이템 가방 하나에서만 보관·소비하고 출동 저장에 포함한다. */
+  recovery?: { has(id: string): boolean; add(id: string): boolean; take(id: string): boolean };
   readonly tick: number;
   rand(): number;
   readonly player: Body & PlayerState;

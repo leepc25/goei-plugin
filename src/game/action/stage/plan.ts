@@ -270,9 +270,9 @@ function spreadProps(f: Floor, props: PropSpec[], startX: number): [number, numb
   const meaning = new Set(f.placed.filter((q) => q.data.fork !== undefined || q.data.group !== undefined).map((q) => `p${q.id}`));
   // 규칙 표지는 지우지 않지만(읽어야 한다) 겹치면 옮긴다
   const ruled = new Set(f.placed.filter((q) => q.data.rule).map((q) => `p${q.id}`));
-  // 잠긴 셔터 앞 해치는 열쇠 길이라 옮기지 않는다 (밀려서 셔터 뒤로 넘어가면 열쇠를 가지러 갈 수 없다)
+  // 잠긴 셔터 앞 해치는 열쇠 길이다. 같은 쪽에서 벽 그림을 피하도록 옮긴다.
   const gateX = f.placed.find((q) => q.kind === 'locked')?.x ?? -1;
-  const fixed = (p: PropSpec) => FIXED_PROPS.has(p.kind) || meaning.has(p.id) || (p.x < startX + 60 && (!f.room || ruled.has(p.id))) || (p.kind === 'hatch' && p.x < gateX);
+  const fixed = (p: PropSpec) => FIXED_PROPS.has(p.kind) || meaning.has(p.id) || (p.kind !== 'hatch' && p.x < startX + 60 && (!f.room || ruled.has(p.id)));
   // 입간판(로비 6번 판 그림으로 그려지는 것 전부)은 한 화면에 하나 (검수 13-2, 14-1: 화면마다 2~3개, 같은 「비상구」 둘이 나란히).
   // 규칙·갈림길 표지는 남기고, 뜻 없는 꾸밈 판은 다른 판과 1400px 안이거나 앞 판과 같은 것이면 뺀다.
   const boardLike = (p: PropSpec) => isStandBoard(p.kind, p.label, f.type) && !isHighSign(p.kind, p.label);
@@ -338,6 +338,7 @@ function spreadProps(f: Floor, props: PropSpec[], startX: number): [number, numb
   for (const g of f.placed.filter((q) => q.kind === 'locked')) for (const y of [Y_TOP, (Y_TOP + Y_BOTTOM) / 2, Y_BOTTOM]) taken.push({ a: g.x - 150, b: g.x + 150, y });
   const free = (p: PropSpec, x: number) => {
     const h = artW(p, f.type) / 2;
+    if (p.kind === 'hatch' && p.x < gateX && x + h + 120 >= gateX) return false;
     // E 선택은 깊이(y)를 보지 않는다. 다른 줄의 물건도 필수 장치의
     // x를 차지하면 열쇠·스위치 입력을 가로챌 수 있다.
     if (f.room && f.placed.some(q => (q.data.dir || ['key', 'switch', 'goalwall', 'panel'].includes(q.kind)) && `p${q.id}` !== p.id && Math.abs(q.x - x) < 120)) return false;
@@ -354,7 +355,7 @@ function spreadProps(f: Floor, props: PropSpec[], startX: number): [number, numb
   let spaced = true;
   // 한 화면 간격 자리가 없으면(짧은 층에 규칙 표지 셋) 다른 판과 가장 먼 빈자리
   const farthest = (p: PropSpec, reach: number): number | null => {
-    spaced = false;
+    spaced = p.kind === 'hatch';
     let best: number | null = null, bd = -1;
     for (let d = -reach; d <= reach; d += 24) {
       const x = p.x + d;
@@ -366,7 +367,7 @@ function spreadProps(f: Floor, props: PropSpec[], startX: number): [number, numb
     return best;
   };
   const placed: PropSpec[] = props.filter(fixed);
-  const order = (p: PropSpec) => (boardLike(p) ? (decor.has(p) ? 1 : 0) : 2);
+  const order = (p: PropSpec) => p.kind === 'hatch' ? -1 : (boardLike(p) ? (decor.has(p) ? 1 : 0) : 2);
   for (const p of [...props].filter((q) => !fixed(q)).sort((a, b) => order(a) - order(b) || a.x - b.x)) {
     let x: number | null = null;
     // 판은 다른 판과 한 화면 떨어진 자리를 더 멀리까지 찾는다
@@ -382,6 +383,11 @@ function spreadProps(f: Floor, props: PropSpec[], startX: number): [number, numb
       }
     }
     if (x === null && ((boardLike(p) && !decor.has(p)) || p.kind === 'hatch' || p.kind === 'npc' || p.kind === 'passenger')) x = farthest(p, f.width);
+    // 같은 셔터 쪽의 정비구역 입구가 이미 있으면 겹치는 추가 사다리는 생략한다.
+    if (x === null && p.kind === 'hatch' && placed.some(q => q.kind === 'hatch' && (q.x < gateX) === (p.x < gateX))) {
+      props.splice(props.indexOf(p), 1);
+      continue;
+    }
     // 짧은 방의 주민·승객이 같은 줄에 몰려도 셔터 앞에 남겨 두지 않는다.
     // 다른 깊이 줄의 빈자리까지 찾되 E 접근 간격은 그대로 지킨다.
     if (x === null && (p.kind === 'npc' || p.kind === 'passenger')) {
