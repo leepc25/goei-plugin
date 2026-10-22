@@ -1,13 +1,14 @@
 # 작업별 서버 비용 취합
 
-관측: 2026-10-22T11:47:22.119720+00:00
+관측: 2026-10-22T11:51:46.791174+00:00
 
 확정 차감과 제출 영수증을 중복 합산하지 않는다. 과거 회수 비용은 이번 신규 비용에서 제외한다. 사용자 시각 승인과 서버 완료는 별개다.
 
 | 담당 | 작업 ID | 서버 상태 | 확정 차감 | 제출 영수증 | 추정 | 구분 |
 |---|---|---|---:|---:|---:|---|
 | blaret-saladin | 429ad77b-ed3b-4337-9524-075adf0a262c | completed | 3.0 | 3.0 | 미확인 | current_resume |
-| blaret-saladin | 5d78c846-5658-40d0-b3a2-31c119818707 | processing | 미확인 | 3.0 | 미확인 | current_resume |
+| blaret-saladin | 4bf8106e-b076-4288-8a2d-913f41543755 | processing | 미확인 | 3.0 | 미확인 | current_resume |
+| blaret-saladin | 5d78c846-5658-40d0-b3a2-31c119818707 | completed | 3.0 | 3.0 | 미확인 | current_resume |
 | blaret-saladin | 6bce13df-7d64-47e5-ba79-650cdea00aa4 | completed | 10.0 | 미확인 | 10.0 | current_resume |
 | blaret-saladin | 76884626-42e9-4626-980a-37663c8aac8f | completed | 3.0 | 3.0 | 미확인 | current_resume |
 | blaret-saladin | f06a14de-204f-47b2-badd-dfd49796f148 | completed | 3.0 | 3.0 | 미확인 | current_resume |
@@ -17,6 +18,7 @@
 | deadpole | d9e65b7a-aca2-48db-b2d9-1ae5d15823e4 | completed | 3.0 | 3.0 | 미확인 | current_resume |
 | eileen | 296587c6-95c3-4b93-92a7-d164ddb10506 | completed | 10.0 | 미확인 | 10.0 | current_resume |
 | eileen | 5ce7b76d-7f1a-43e5-a28a-76f10b039fbd | completed | 3.0 | 3.0 | 미확인 | current_resume |
+| eileen | ad4c134d-a12b-493f-996f-aa9fa2340811 | completed | 10.0 | 미확인 | 10.0 | current_resume |
 | eileen | ddafed99-d4d6-4b51-bbb4-c01ce660ef68 | completed | 1.0 | 1.0 | 미확인 | current_resume |
 | eileen | e92bce68-f025-4757-94b0-b16566cebe5d | completed | 4.0 | 4.0 | 미확인 | current_resume |
 | geshugan | c2c9cbc3-8a1e-40fa-b776-6112e7e5a82a | completed | 1.0 | 1.0 | 미확인 | current_resume |
@@ -24,6 +26,7 @@
 | geshugan | cd0766c8-87f7-4b50-8a9c-a7d79c5c3896 | completed | 10.0 | 미확인 | 10.0 | current_resume |
 | geshugan | ee5ef44a-a16d-4ed1-a494-6578590bb498 | completed | 10.0 | 미확인 | 10.0 | current_resume |
 | gorgodio | 7282832d-aa8a-4969-b050-096a6a4832ed | completed | 3.0 | 3.0 | 미확인 | current_resume |
+| jyaldi | 134e1800-0f54-4dba-969e-d9b1b1d9f15e | pending | 미확인 | 2.0 | 미확인 | current_resume |
 | jyaldi | 4a4e18c2-d2f4-4604-9620-2127d4b8d3ca | completed | 2.0 | 2.0 | 미확인 | current_resume |
 | jyaldi | df3b56fb-5426-4491-888f-f94a4192e5cf | completed | 3.0 | 3.0 | 미확인 | current_resume |
 | kyuras | 11526db3-3927-47df-a600-5f55e1473bcc | completed | 3.0 | 3.0 | 미확인 | current_resume |
@@ -46,7 +49,7 @@
 | spangdal | aa4b5980-880c-4ee9-8171-3f47dd2d994f | completed | 10.0 | 미확인 | 10.0 | current_resume |
 | spangdal | c40aab31-b7a6-4d05-aeaf-907041ed603c | completed | 3.0 | 3.0 | 미확인 | current_resume |
 
-이번 재개 중 완료 영수증 확인분 합계: 171.0회.
+이번 재개 중 완료 영수증 확인분 합계: 184.0회.
 기존 회수 2건의 과거 비용: 6.0회(회수 추가 비용0).
 
 정확한 서버 응답·원본 경로·SHA256은 verified-local-receipts.json, 담당 배정은 local-owners.json, 직접 검수는 coordinator-visual-review.json 참조.
