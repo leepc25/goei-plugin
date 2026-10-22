@@ -12,6 +12,7 @@ KNEE_UP,KNEE_FWD,ELB_UP,ELB_OUT,ELB_DOWN=J.KNEE_UP,J.KNEE_FWD,J.ELB_UP,J.ELB_OUT
 X,G=J.X,J.G
 cos=lambda t: math.cos(2*math.pi*t); sin=lambda t: math.sin(2*math.pi*t)
 CLIPS={}
+LOOP={}   # 클립 → 반복 여부(None = 인자 없음: 8장 이상 순환 동작)
 def tail(ps,loop):
     """생성기가 끝 장을 기준 그림 쪽으로 되돌리는 버릇(쟈알디 실측) → 버릴 장 1개를 덧붙임. 빌더가 뺌."""
     return ps+[ps[0] if loop else ps[-1]]
@@ -26,8 +27,9 @@ def bones(p):
         q[f'{s} ELBOW']=m; q[f'{s} ARM']=wr
     return q
 def clip(name,action,poses,loop=None):
+    LOOP[name]=loop
     if loop is not None and len(poses)<8: poses=tail(poses,loop)
-    assert 3<=len(poses)<=15,(name,len(poses)); CLIPS[name]=('side view in profile facing right: '+action,'',[anatomic(bones(p)) for p in poses])
+    assert 3<=len(poses)<=15,(name,len(poses)); CLIPS[name]=('side view: '+action,'',[anatomic(bones(p)) for p in poses])
 
 # ── 기본 자세 ──
 BASE=J.STAND(0)                       # 기준 그림 자세(첫 장 관절)
@@ -35,7 +37,7 @@ HC=dict(lh=('r',-3,20),le=('e',9,17)) # 반팔짱(기본 이미지): 가까운 �
 def IDLE(b=0,tilt=6,dx=0,**k):        # 기본 대기: 무게 뒷다리, 고개 살짝 숙이고 눈은 앞
     a=dict(HC,tilt=tilt); a.update(k); return P((X-1+dx,55+b),3,0,0,(X+6,G),(X-5,G),**a)
 def ST(b=0,d=0,**k):                  # 전투 대기: 레슬링·유도 자세, 낮게, 두 손 펴서 가슴 앞, 턱 당김
-    a=dict(lh=(20,8),rh=(15,11),tilt=6); a.update(k); return P((X+d,64+b),12,-0.2,-0.1,(X+16+d,G),(X-14+d,G),**a)
+    a=dict(lh=(25,14),rh=(20,17),tilt=6); a.update(k); return P((X+d,64+b),12,-0.2,-0.1,(X+16+d,G),(X-14+d,G),**a)
 S0=ST()
 LOW=lambda b=0,d=0,**k: P((X+d,80+b),18,-0.2,-0.1,(X+18+d,G),(X-18+d,G),**({**dict(lh=(18,12),rh=(14,14),tilt=4),**k}))
 STAND=lambda b=0,**k: P((X,55+b),2,0,0,(X+6,G),(X-4,G),**k)
@@ -45,7 +47,7 @@ clip('idle','calm watchful idle, one arm across the waist holding the other elbo
 CS=lambda u: IDLE(0,tilt=14,lh=('r',14,10-4*u),le=('e',8,16))
 clip('cubespin','raises the near hand palm up in front of the chest and watches it, then closes the hand',[IDLE(0),CS(0),CS(1),CS(1),CS(0),IDLE(0)],False)
 clip('scan','body still, head snaps to look sharply at something, holds, then slowly turns back',[IDLE(0),IDLE(0,tilt=-4,head=(3,-8)),IDLE(0,tilt=-4,head=(3,-8)),IDLE(0,tilt=0,head=(4,-8)),IDLE(0)],False)
-clip('stance','low wrestling stance, knees bent, both open hands forward at chest height, chin tucked',[ST(0),ST(1),ST(1.5),ST(1)])
+clip('stance','low wrestling stance, open hands with spread fingers reaching forward, knees bent',[ST(0),ST(1),ST(1.5),ST(1)])
 clip('engage','unfolds her arms and drops into a low wrestling stance, lead foot forward, open hands forward',[IDLE(0),lerp(IDLE(0),S0,.35),lerp(IDLE(0),S0,.7),S0],False)
 def gwalk(t,lh=None,rh=None,stride=14,lift=3,bob=1.6,lean=2):
     c,s=cos(t),sin(t)
@@ -53,7 +55,7 @@ def gwalk(t,lh=None,rh=None,stride=14,lift=3,bob=1.6,lean=2):
     return P((X+2,55+bob*abs(c)),lean,0.05*c,0.15*c,(X+2+stride*c,G-lift*max(0,-s)),(X+2-stride*c,G-lift*max(0,s)),lh,rh,tilt=4,head=(5,-7) if c>-0.5 else (4,-7))
 clip('walk','long flat-footed strides, whole foot plants, arms barely swing, head turning to scan',[gwalk(i/8) for i in range(8)])
 def shuf(ld,rd,ll=0):
-    return P((X+(ld+rd)/2,64),12,-0.2,-0.1,(X+16+ld,G-ll),(X-14+rd,G),(20,8),(15,11),tilt=6)
+    return P((X+(ld+rd)/2,64),12,-0.2,-0.1,(X+16+ld,G-ll),(X-14+rd,G),(25,14),(20,17),tilt=6)
 clip('step','wrestling shuffle: lead foot slides forward flat, rear foot slides after, feet never cross, stays low',[shuf(5,0,1),shuf(11,0,1),shuf(16,0),shuf(16,6),shuf(16,12),shuf(16,16)])
 def grun(t,lh=None,rh=None):
     c,s=cos(t),sin(t)
@@ -381,3 +383,50 @@ if __name__=='__main__':
             for k,v in p.items():
                 x,y=(v[0]+J.DX)/J.W,(v[1]+J.DY)/J.H
                 if not(0.02<x<0.98 and 0.02<y<0.98): print('OUT',n,k,round(x,2),round(y,2))
+
+# ── 동작 설명은 몸만 (2026-10-22 시험: "enemy neck"이라 쓰자 생성기가 상대 남자를 그려 넣음 → 사람·물건·장소 이름 금지) ──
+BODY_ONLY={
+ 'scan':'body still, head snaps sharply to look ahead, holds, then slowly turns back',
+ 'lowmark':'from a low crouch she looks down ahead, lifts the near hand palm up and clenches it into a fist',
+ 'chain3':'alone, near hand pulls down from head height as she sinks, stands, clenches a fist, slams it down',
+ 'tackle':'alone, runs, drops to one knee with arms forward, rises lifting both arms, drives them down',
+ 'hold':'slowly lifts the near hand palm up from waist to shoulder height, arm straining',
+ 'grab':'alone: reaches forward with both hands open at chest height and closes them, elbows down, low stance',
+ 'grabreap':'alone: both hands pull in to the chest, lead foot steps forward, far leg swings high forward then sweeps back hard as the torso drives down',
+ 'focus':'standing still, near hand at the chest with the thumb moving, slow deep breaths, eyes half closed',
+ 'stepup':'one big stride up: near knee lifts high, foot plants high, she pushes up and the rear foot joins, no hands',
+ 'stepover':'hurdle step: lead leg kicks high and straight forward, then the trail leg swings forward with the knee out',
+ 'carry2_idle':'standing, near hand raised forward at chest height with the palm up, far arm down',
+ 'carry2_walk':'walking, near hand held forward at chest height with the palm up, far arm down',
+ 'carry2_run':'running, near hand held forward at chest height with the palm up',
+ 'ladder':'climbing motion in empty space, hands reaching up and feet stepping up alternately',
+ 'mantle':'muscle-up motion in empty space: both hands press down at waist height, she springs up on straight arms, steps one foot up high and stands tall',
+ 'hide':'drops low onto one knee, one hand touching the ground, ready to spring, eyes fixed ahead',
+ 'door':'stops, looks ahead, small flick of the near fingers forward, then walks on',
+ 'push':'leaning forward hard with the near shoulder leading, arms tucked, legs driving step by step',
+ 'inspect':'squats down looking at the ground ahead, small flick of the near fingers, keeps squatting',
+ 'leadhand':'walking forward, near arm held low and back behind her, palm open facing back',
+ 'elevwait':'standing still leaning back slightly, arm across the waist, watching ahead',
+ 'floorsit':'sits down on the ground leaning back, near knee up, far leg straight out, arm resting on the knee',
+ 'floorrest':'sitting on the ground leaning back, near knee up with the arm draped over it, far leg out, calm breathing',
+ 'chairsit':'lowers into a seated pose in empty space, perched forward, forearms on the thighs',
+ 'typing':'seated pose in empty space, hunched forward, two index fingers pecking down one at a time, peering down',
+ 'gearcheck':'near hand checks at her belt, then she squats and both hands work at her near shoe',
+ 'sleeves':'near hand folds the cuff of the far forearm upward, looking down at it',
+ 'seatrest':'seated pose in empty space leaning back, near ankle crossed on the far knee, near hand palm up at the chest',
+ 'seatthink':'seated pose in empty space, upright, arm across the waist, eyes half closed',
+ 'doze':'seated pose in empty space, arms folded at the waist, head slowly drops, then the eyes snap open, body still',
+ 'handshake':'alone: steps in, near hand forward at waist height gripping and pumping once, eyes level, steps back',
+ 'pat':'alone: near hand rises forward to shoulder height, one stiff downward pat, quickly withdrawn',
+ 'hug':'alone: steps in, both arms wrap forward at chest height and squeeze, head bowed forward, shoulders shaking',
+ 'glad':'near hand at the chest, thumb flicks upward once',
+ 'wallcry':'leaning back, head tipped back, back of the near hand pressed over the eyes',
+ 'kneelcry':'down on one knee, head bowed low, both fists pressed to the ground, shoulders shaking',
+ 'sad':'shoulders sink, eyes down, arms hanging limp',
+ 'deskslam':'near fist held low in front slowly tightens, body tense',
+ 'plopdown':'tired, slides down into a sitting slump on the ground, near knee up, far leg out, head hanging',
+ 'think':'near hand at the chest with the fingers fidgeting, eyes narrowed',
+ 'bored':'shifts weight from foot to foot, near hand fidgeting at the waist',
+}
+for _n,_a in BODY_ONLY.items():
+    _o=CLIPS[_n]; CLIPS[_n]=('side view: '+_a,_o[1],_o[2])
