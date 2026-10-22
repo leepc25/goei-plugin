@@ -1,0 +1,761 @@
+[
+  {
+    "key": "undress/00",
+    "source": "exec-18ffd3bf-c5e5-4abd-b180-57723e2fe9f2.png",
+    "canvas": [
+      192,
+      144
+    ],
+    "bounds": [
+      49,
+      36,
+      82,
+      136
+    ],
+    "translation": [
+      -3,
+      -5
+    ],
+    "palette": "G0 only",
+    "sampling": [
+      202,
+      151
+    ]
+  },
+  {
+    "key": "undress/01",
+    "source": "exec-d57a3084-b9a8-4bc0-b8ce-f711c5c846f1.png",
+    "canvas": [
+      192,
+      144
+    ],
+    "bounds": [
+      49,
+      38,
+      81,
+      136
+    ],
+    "translation": [
+      -3,
+      -4
+    ],
+    "palette": "G0 only",
+    "sampling": [
+      202,
+      151
+    ]
+  },
+  {
+    "key": "undress/02",
+    "source": "exec-6c89497d-a1f1-4462-8a6b-93ef534520b1.png",
+    "canvas": [
+      192,
+      144
+    ],
+    "bounds": [
+      49,
+      37,
+      81,
+      136
+    ],
+    "translation": [
+      -3,
+      -5
+    ],
+    "palette": "G0 only",
+    "sampling": [
+      202,
+      151
+    ]
+  },
+  {
+    "key": "undress/03",
+    "source": "exec-96c1e487-1791-410c-91e6-48e132a39dfa.png",
+    "canvas": [
+      192,
+      144
+    ],
+    "bounds": [
+      49,
+      37,
+      81,
+      136
+    ],
+    "translation": [
+      -3,
+      -5
+    ],
+    "palette": "G0 only",
+    "sampling": [
+      202,
+      151
+    ]
+  },
+  {
+    "key": "undress/04",
+    "source": "exec-321504ca-b80f-47c9-a996-06213097cf52.png",
+    "canvas": [
+      192,
+      144
+    ],
+    "bounds": [
+      49,
+      36,
+      81,
+      136
+    ],
+    "translation": [
+      -3,
+      -5
+    ],
+    "palette": "G0 only",
+    "sampling": [
+      202,
+      151
+    ]
+  },
+  {
+    "key": "undress/05",
+    "source": "exec-47aefedb-525f-4f55-bb5d-1e2fabf12236.png",
+    "canvas": [
+      192,
+      144
+    ],
+    "bounds": [
+      54,
+      44,
+      96,
+      136
+    ],
+    "translation": [
+      -3,
+      -4
+    ],
+    "palette": "G0 only",
+    "sampling": [
+      202,
+      151
+    ]
+  },
+  {
+    "key": "undress/06",
+    "source": "exec-920dd442-3bdd-41d4-aa41-53e7da04c46e.png",
+    "canvas": [
+      192,
+      144
+    ],
+    "bounds": [
+      49,
+      37,
+      77,
+      136
+    ],
+    "translation": [
+      -3,
+      -4
+    ],
+    "palette": "G0 only",
+    "sampling": [
+      202,
+      151
+    ]
+  },
+  {
+    "key": "showerturn/01",
+    "source": "exec-14bf9858-9076-4d2a-baae-f505023b8b2f.png",
+    "canvas": [
+      192,
+      144
+    ],
+    "bounds": [
+      51,
+      38,
+      80,
+      136
+    ],
+    "translation": [
+      -3,
+      -4
+    ],
+    "palette": "G0 only",
+    "sampling": [
+      202,
+      151
+    ]
+  },
+  {
+    "key": "showerturn/02",
+    "source": "exec-e3fa8f93-9d60-47f2-bbfb-135c3481aa9f.png",
+    "canvas": [
+      192,
+      144
+    ],
+    "bounds": [
+      49,
+      38,
+      80,
+      136
+    ],
+    "translation": [
+      -3,
+      -4
+    ],
+    "palette": "G0 only",
+    "sampling": [
+      202,
+      151
+    ]
+  },
+  {
+    "key": "shower/00",
+    "source": "exec-01a22c97-27ec-49d9-8992-650611caa9d9.png",
+    "canvas": [
+      192,
+      144
+    ],
+    "bounds": [
+      43,
+      38,
+      86,
+      136
+    ],
+    "translation": [
+      -3,
+      -4
+    ],
+    "palette": "G0 only",
+    "sampling": [
+      202,
+      151
+    ]
+  },
+  {
+    "key": "shower/01",
+    "source": "exec-03a5e945-275a-46a8-b439-edaffd8088e0.png",
+    "canvas": [
+      192,
+      144
+    ],
+    "bounds": [
+      46,
+      38,
+      87,
+      136
+    ],
+    "translation": [
+      -3,
+      -4
+    ],
+    "palette": "G0 only",
+    "sampling": [
+      202,
+      151
+    ]
+  },
+  {
+    "key": "shower/02",
+    "source": "exec-1f81ab7d-5ac9-48c5-98bb-928e056ebfef.png",
+    "canvas": [
+      192,
+      144
+    ],
+    "bounds": [
+      46,
+      38,
+      82,
+      136
+    ],
+    "translation": [
+      -3,
+      -4
+    ],
+    "palette": "G0 only",
+    "sampling": [
+      202,
+      151
+    ]
+  },
+  {
+    "key": "shower/03",
+    "source": "exec-c042e832-4828-4d1c-82f6-72c0d1d1ef3b.png",
+    "canvas": [
+      192,
+      144
+    ],
+    "bounds": [
+      47,
+      38,
+      87,
+      136
+    ],
+    "translation": [
+      -3,
+      -4
+    ],
+    "palette": "G0 only",
+    "sampling": [
+      202,
+      151
+    ]
+  },
+  {
+    "key": "shower/04",
+    "source": "exec-5210df58-c1d6-4bcd-a330-b66181abd04c.png",
+    "canvas": [
+      192,
+      144
+    ],
+    "bounds": [
+      42,
+      38,
+      87,
+      136
+    ],
+    "translation": [
+      -3,
+      -4
+    ],
+    "palette": "G0 only",
+    "sampling": [
+      202,
+      151
+    ]
+  },
+  {
+    "key": "shower/05",
+    "source": "exec-3b9a0ef2-4758-4fe4-8c6f-be6a58070d57.png",
+    "canvas": [
+      192,
+      144
+    ],
+    "bounds": [
+      43,
+      38,
+      86,
+      136
+    ],
+    "translation": [
+      -3,
+      -4
+    ],
+    "palette": "G0 only",
+    "sampling": [
+      202,
+      151
+    ]
+  },
+  {
+    "key": "bath/00",
+    "source": "exec-267c4ffd-8c91-4687-a265-800410eb1e50.png",
+    "canvas": [
+      192,
+      144
+    ],
+    "bounds": [
+      42,
+      68,
+      113,
+      136
+    ],
+    "translation": [
+      0,
+      31
+    ],
+    "palette": "G0 only",
+    "sampling": [
+      156,
+      117
+    ]
+  },
+  {
+    "key": "bath/01",
+    "source": "exec-70af02e3-daf1-4d9d-9216-4f60f392333a.png",
+    "canvas": [
+      192,
+      144
+    ],
+    "bounds": [
+      42,
+      68,
+      113,
+      136
+    ],
+    "translation": [
+      0,
+      31
+    ],
+    "palette": "G0 only",
+    "sampling": [
+      156,
+      117
+    ]
+  },
+  {
+    "key": "undress/01",
+    "source": "exec-4cab8541-d005-4453-adda-389ee729c303.png",
+    "canvas": [
+      192,
+      144
+    ],
+    "bounds": [
+      49,
+      36,
+      81,
+      136
+    ],
+    "translation": [
+      -3,
+      -5
+    ],
+    "palette": "G0 plus specified beige towel ramp",
+    "sampling": [
+      202,
+      151
+    ]
+  },
+  {
+    "key": "undress/03",
+    "source": "exec-f71859d8-2123-4c2c-9db2-dca422579a5f.png",
+    "canvas": [
+      192,
+      144
+    ],
+    "bounds": [
+      50,
+      37,
+      82,
+      136
+    ],
+    "translation": [
+      -3,
+      -5
+    ],
+    "palette": "G0 plus specified beige towel ramp",
+    "sampling": [
+      202,
+      151
+    ]
+  },
+  {
+    "key": "undress/04",
+    "source": "exec-17eb195b-823d-4519-912d-61d9d438560d.png",
+    "canvas": [
+      192,
+      144
+    ],
+    "bounds": [
+      52,
+      34,
+      84,
+      136
+    ],
+    "translation": [
+      -3,
+      -5
+    ],
+    "palette": "G0 plus specified beige towel ramp",
+    "sampling": [
+      202,
+      151
+    ]
+  },
+  {
+    "key": "undress/05",
+    "source": "exec-f29338ec-f510-45ac-a605-c042024e5299.png",
+    "canvas": [
+      192,
+      144
+    ],
+    "bounds": [
+      48,
+      38,
+      77,
+      136
+    ],
+    "translation": [
+      -3,
+      -4
+    ],
+    "palette": "G0 plus specified beige towel ramp",
+    "sampling": [
+      202,
+      151
+    ]
+  },
+  {
+    "key": "undress/06",
+    "source": "exec-c7a0accd-daea-4cf7-9efd-f56b4d4266e1.png",
+    "canvas": [
+      192,
+      144
+    ],
+    "bounds": [
+      49,
+      38,
+      77,
+      136
+    ],
+    "translation": [
+      -3,
+      -4
+    ],
+    "palette": "G0 plus specified beige towel ramp",
+    "sampling": [
+      202,
+      151
+    ]
+  },
+  {
+    "key": "showerturn/01",
+    "source": "exec-c3c00ac4-8c8a-4f1e-9e7d-0b6921a8a39a.png",
+    "canvas": [
+      192,
+      144
+    ],
+    "bounds": [
+      51,
+      38,
+      80,
+      136
+    ],
+    "translation": [
+      -3,
+      -4
+    ],
+    "palette": "G0 plus specified beige towel ramp",
+    "sampling": [
+      202,
+      151
+    ]
+  },
+  {
+    "key": "showerturn/02",
+    "source": "exec-cfa4b6de-2070-4664-8c2b-33954de6fa55.png",
+    "canvas": [
+      192,
+      144
+    ],
+    "bounds": [
+      48,
+      38,
+      81,
+      136
+    ],
+    "translation": [
+      -3,
+      -4
+    ],
+    "palette": "G0 plus specified beige towel ramp",
+    "sampling": [
+      202,
+      151
+    ]
+  },
+  {
+    "key": "shower/00",
+    "source": "exec-79d54559-ebc8-41da-980b-9deb356afc6d.png",
+    "canvas": [
+      192,
+      144
+    ],
+    "bounds": [
+      42,
+      37,
+      87,
+      136
+    ],
+    "translation": [
+      -3,
+      -4
+    ],
+    "palette": "G0 plus specified beige towel ramp",
+    "sampling": [
+      202,
+      151
+    ]
+  },
+  {
+    "key": "shower/01",
+    "source": "exec-45c6635c-e868-4a58-ae71-0fd626f2a3ba.png",
+    "canvas": [
+      192,
+      144
+    ],
+    "bounds": [
+      44,
+      36,
+      87,
+      136
+    ],
+    "translation": [
+      -3,
+      -4
+    ],
+    "palette": "G0 plus specified beige towel ramp",
+    "sampling": [
+      202,
+      151
+    ]
+  },
+  {
+    "key": "shower/02",
+    "source": "exec-0d1bd7c7-eeea-42a6-b90d-777a0e0088f1.png",
+    "canvas": [
+      192,
+      144
+    ],
+    "bounds": [
+      43,
+      36,
+      85,
+      136
+    ],
+    "translation": [
+      -3,
+      -4
+    ],
+    "palette": "G0 plus specified beige towel ramp",
+    "sampling": [
+      202,
+      151
+    ]
+  },
+  {
+    "key": "shower/03",
+    "source": "exec-28a589d0-4cb3-4edb-b198-308dfb12846c.png",
+    "canvas": [
+      192,
+      144
+    ],
+    "bounds": [
+      41,
+      37,
+      88,
+      136
+    ],
+    "translation": [
+      -3,
+      -4
+    ],
+    "palette": "G0 plus specified beige towel ramp",
+    "sampling": [
+      202,
+      151
+    ]
+  },
+  {
+    "key": "shower/04",
+    "source": "exec-ee961595-9d96-4a02-a252-3401b40f832b.png",
+    "canvas": [
+      192,
+      144
+    ],
+    "bounds": [
+      43,
+      36,
+      89,
+      136
+    ],
+    "translation": [
+      -3,
+      -4
+    ],
+    "palette": "G0 plus specified beige towel ramp",
+    "sampling": [
+      202,
+      151
+    ]
+  },
+  {
+    "key": "shower/05",
+    "source": "exec-2a34a4ff-3564-49fd-b3da-de10b3d7ad8e.png",
+    "canvas": [
+      192,
+      144
+    ],
+    "bounds": [
+      40,
+      37,
+      89,
+      136
+    ],
+    "translation": [
+      -3,
+      -4
+    ],
+    "palette": "G0 plus specified beige towel ramp",
+    "sampling": [
+      202,
+      151
+    ]
+  },
+  {
+    "key": "bath/00",
+    "source": "exec-4ff16c05-f2f1-4de2-b4e5-07a7b7003773.png",
+    "canvas": [
+      192,
+      144
+    ],
+    "bounds": [
+      42,
+      68,
+      122,
+      136
+    ],
+    "translation": [
+      0,
+      31
+    ],
+    "palette": "G0 plus specified beige towel ramp",
+    "sampling": [
+      156,
+      117
+    ]
+  },
+  {
+    "key": "bath/01",
+    "source": "exec-c66bf05f-072c-4330-9faf-70035b7c8a45.png",
+    "canvas": [
+      192,
+      144
+    ],
+    "bounds": [
+      42,
+      68,
+      122,
+      136
+    ],
+    "translation": [
+      0,
+      31
+    ],
+    "palette": "G0 plus specified beige towel ramp",
+    "sampling": [
+      156,
+      117
+    ]
+  },
+  {
+    "key": "bath/03",
+    "source": "exec-95e3425f-2e01-433e-beae-de970d334e95.png",
+    "canvas": [
+      192,
+      144
+    ],
+    "bounds": [
+      42,
+      68,
+      122,
+      136
+    ],
+    "translation": [
+      0,
+      31
+    ],
+    "palette": "G0 plus specified beige towel ramp",
+    "sampling": [
+      156,
+      117
+    ]
+  }
+]

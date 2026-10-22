@@ -1,0 +1,1010 @@
+{
+  "date": "2026-10-22",
+  "character": "Geshugan",
+  "tool": "built-in image_gen",
+  "pixellabCalls": 0,
+  "request": "docs/캐릭터제작서/의뢰서_게슈간_샤워·목욕_GPT.md",
+  "requestBlob": "87de3a2f81f2749c1047732f62d0bc209e00187d",
+  "reference": "game-src/action/geshugan/base/G0.png",
+  "frames": {
+    "undress": 7,
+    "showerturn": 3,
+    "shower": 6,
+    "bath": 4
+  },
+  "initialExistingFrames": 0,
+  "sharedFrames": {
+    "undress/00": "base/G0.png (latest brief requires exact original)",
+    "showerturn/00": "undress/06",
+    "bath/02": "bath/00"
+  },
+  "prompts": [
+    {
+      "key": "undress/00",
+      "prompt": "Create ONE low-resolution pixel-art animation frame for a game: Geshugan undress/00. Use the reference image G0.png as exact character, pixel style, scale, palette and placement reference. Adult woman age 25, short snow-white chin-length bob with bangs, small pale cyan-blue eye, expressionless athletic build. Strict RIGHT-FACING 90-degree SIDE PROFILE as reference. Loose opaque white collared shirt sleeves rolled up, loose black necktie, high-waisted black slacks, black flat shoes, no jacket and no gloves. Neutral standing pose, arms relaxed down; hands empty. Preserve head size, physique, limb lengths, thin dark outline and shaded pixel clusters from G0. Her gaze faces forward to the right. Transparent background, character only: no floor, cast shadow, props, water, text or guides. Composition: same 4:3 landscape canvas representing exactly 192x144 logical pixels; body axis x57, top of hair y37, soles y136, character height 100 logical pixels. Large blank area on right, do not enlarge to fill canvas. Crisp pixel art on identical pixel grid; if output must be large use exact nearest-neighbor pixel blocks. A single sprite frame, not a sheet.",
+      "source": "exec-18ffd3bf-c5e5-4abd-b180-57723e2fe9f2.png"
+    },
+    {
+      "key": "undress/01",
+      "prompt": "Edit the reference sprite into ONE next animation frame Geshugan undress/01: same adult woman age25 in strict RIGHT-FACING profile, lifts her near hand to the black necktie knot at neck, other hand lightly steadies the lower tie, elbows bent naturally forward to the right. She loosens the tie, which remains worn. White collared shirt with rolled sleeves remains opaque and closed, black high-waisted slacks and black flats. No jacket, no gloves. Preserve exactly reference white chin-length bob, cyan eye, impassive face, athletic body proportions, head size, all leg/shoe pixels, thin outlines and softly modeled fine pixel clusters. Keep head, body and feet at identical locations on the SAME transparent 4:3 canvas, same scale and margins. Character only, no ground, shadows, detached clothing, props, text or environment. ONE frame only, not sheet."
+    },
+    {
+      "key": "undress/02",
+      "prompt": "Edit reference to ONE next game animation frame Geshugan undress/02: remove black necktie completely (not held, no loose clothing). Same adult25 woman standing in strict RIGHT-FACING side profile, both hands now at the upper FRONT SHIRT BUTTON below collar, beginning to undo it. Shirt stays fully opaque and covers torso, only collar slightly loosened. Sleeves rolled, high-waisted black slacks and black flat shoes unchanged. The near elbow points down and slightly right, forearm rises toward chest, far fingertips steady fabric at upper sternum. Preserve exact white chin-length bob with bangs, pale blue eye, neutral alert gaze right, same head size and athletic physique. Keep all lower body, foot positions, canvas, scale and margins identical. Match fine dark pixel outlines and softly shaded limited palette. True transparent background, one character only. No jacket, gloves, detached clothing, scenery, shadow, props or text."
+    },
+    {
+      "key": "undress/03",
+      "prompt": "Edit reference into ONE next animation frame Geshugan undress/03. Same adult woman25, strict right-facing side profile. BOTH HANDS move DOWN from collar to the middle shirt buttons at upper abdomen, deftly undoing the lower button. Near elbow lowered at waist, forearm forward, fingertips meet at front lower shirt. Shirt remains opaque with front edges overlapping, torso covered, collar loosened. No necktie. Preserve white collared shirt rolled sleeves, black slacks and flats, white chin-length bob, pale cyan eye and impassive forward gaze. Keep exact same head size, body proportions, feet and fixed transparent 4:3 canvas placement. Fine pixel art shaded clusters identical to reference. No detached clothing, no objects, no scenery, shadows, text. Single sprite, not sheet."
+    },
+    {
+      "key": "undress/04",
+      "prompt": "Edit this character reference into ONE game animation frame Geshugan undress/04. Same adult woman25 standing upright strict RIGHT-FACING side profile. Replace shirt and tie with an opaque OFF-WHITE BATH TOWEL wrapped securely from upper chest to knees. She STILL wears BLACK SLACKS AND BLACK FLAT SHOES underneath: black trouser legs visible below knee-length towel. Both bare arms hang relaxed at sides, empty hands. No shirt, no tie, no jacket, no gloves, no loose garments. Use towel off-whites and gray shadows from reference shirt palette, not beige (palette must remain reference colors). Towel completely covers chest, waist and pelvis. Ordinary bathing preparation, neutral posture. Preserve exactly same short white chin-length bob, bangs, cyan eye, impassive face, athletic body dimensions and head size. Keep feet, scalp, body anchor, transparent landscape canvas and margins identical to reference. Fine low-resolution pixel art, same thin outlines and shade clusters. Only character, no furniture, water, effects, ground, shadow or text."
+    },
+    {
+      "key": "undress/05",
+      "prompt": "ONE nonsexual everyday movement sprite of the same clearly adult woman age25 from reference. She is FULLY COVERED in an opaque white bath wrap from upper chest through knees, worn over black trousers and black flats. She bends forward about30 degrees to reach both empty hands toward her knees, a simple neutral bending/reaching pose. All clothing stays fully worn and secure; nothing is being pulled down or removed. Chest, abdomen, pelvis and thighs all fully covered. Strict right-facing profile, feet stay planted at their exact original positions; preserve head size and limb lengths, the bending pose naturally appears shorter. Same white bob haircut, neutral face and forward gaze. Match reference pixel-art style, proportions and palette. Same transparent landscape canvas and scale, no scenery, water, shadows, text or objects. Only one character/frame.",
+      "adjustment": "Original fully covered trouser-removal preparation prompt rejected by image safety filter; generated fully clothed neutral bending/reaching posture."
+    },
+    {
+      "key": "undress/06",
+      "prompt": "ONE ordinary bath-preparation sprite frame of the same clearly adult25 woman from reference. Standing upright in strict RIGHT-FACING profile, arms down, empty hands. Wearing ONLY an opaque WHITE BATH WRAP securely from upper chest all the way through knees, bare calves and bare feet. Chest/torso/pelvis/thighs fully covered. No black trousers or shoes in this frame. Preserve exact reference white chin-length bob, pale cyan eye, impassive expression, head size and athletic body dimensions. Same slender pixel outline and shaded pixel clusters. Exact same transparent 4:3 canvas composition, body and scalp location, physical scale, sole baseline and blank margins. Neutral everyday standing, not a revealing pose. Character only, no discarded clothing, no objects, floor, shadows, water, environment or text. Single frame, not sheet."
+    },
+    {
+      "key": "showerturn/00",
+      "sharedEndpoint": "undress/06",
+      "reason": "Identical transition endpoint, matching specified Jyaldi workflow."
+    },
+    {
+      "key": "showerturn/01",
+      "prompt": "Turn the reference adult25 woman in white opaque chest-through-knees bath wrap into THREE-QUARTER BACK VIEW, halfway between right profile and full rear, for one animation frame showerturn/01. A restrained in-place pivot away from viewer. Back of white chin-length bob and back of towel visible; only tiny right facial silhouette at far right, no front chest view. Both arms relaxed DOWN at sides, empty hands. Bare feet pivot in place toward upper-right while retaining exact baseline. Same athletic adult body, head size, short snowy-white bob with bangs, palette and fine shaded pixel art, thin dark outlines. Towel stays fully worn, opaque and secure covering chest waist pelvis thighs through knees. Do not walk or lean. Keep torso center in same position, same head height, same physical scale and identical transparent landscape canvas/margins. Character only, no floor, shadows, furniture, water, loose clothing, effects or text. One frame only."
+    },
+    {
+      "key": "showerturn/02",
+      "prompt": "Rotate the same adult25 woman into EXACT FULL BACK VIEW for ONE sprite frame showerturn/02. She faces directly away; no face, no eye visible. White CHIN-LENGTH BOB, clean blunt horizontal hem at nape. Both arms hang naturally down at sides, hands empty, shoulders level and symmetric. Bare feet now face directly away, heels visible, feet stay at same baseline. She wears same opaque white bath wrap from chest through knees, fully secure, covering torso pelvis thighs. Preserve athletic adult anatomy, exact head size, same body scale and same canvas anchor. Do not walk, lean or raise arms. Exact reference fine pixel art, outline thickness and soft shade clusters, palette whites/grays/warm skin. Same transparent landscape canvas, blank margins unchanged. Only character, no floor, shadow, water, furniture, foam, text or effects."
+    },
+    {
+      "key": "shower/00",
+      "prompt": "Edit approved full rear-view sprite into ONE animation frame shower/00. Same adult25 woman in opaque WHITE BATH WRAP chest-through-knees, bare feet, short white chin-length bob. Remain exact FULL BACK VIEW, no face. Raise BOTH bare arms to wash short hair: elbows out and bent naturally, forearms angle upward/inward, fingertips on left/right crown. Small brisk economical motion, no exaggerated gestures. Keep head/scalp, shoulders, torso, towel hem, legs and feet at exactly same positions and size. No foam, water, spray, droplets or steam; game draws effects separately. White wrap stays securely worn fully covering torso pelvis thighs. Fine low-resolution pixel art matching reference outline/palette/shading exactly. Same transparent 4:3 canvas, same scale and blank margins. Only one character/frame, no environment, furniture, ground, shadow, text or props."
+    },
+    {
+      "key": "shower/01",
+      "prompt": "ONE next sprite animation frame, edit reference with very small arm/hand motion only. Same clearly adult25 woman, EXACT FULL BACK VIEW, short white chin-length bob, opaque white bath wrap securely from chest through knees, bare feet. Preserve head/neck/body size, outline, palette, softly shaded pixel-art clusters and transparent 4:3 canvas/margins exactly. Lower body/towel/legs/feet remain fixed; no scaling, walking, leaning or whole-image translation. Both hands remain on hair, natural shoulders/elbows. No water, foam, steam, droplets, scenery, objects, ground, shadow or text. shower/01: brisk short hair washing phase1, left fingertips scrub inward toward crown center by2 logical pixels, left elbow tucks inward1 pixel and lifts1; right hand stays on right crown, right elbow relaxes1 pixel outward. Scalp stays absolutely level. Tiny localized hand action, body does not change."
+    },
+    {
+      "key": "shower/02",
+      "prompt": "ONE next sprite animation frame, edit reference with very small arm/hand motion only. Same clearly adult25 woman, EXACT FULL BACK VIEW, short white chin-length bob, opaque white bath wrap securely from chest through knees, bare feet. Preserve head/neck/body size, outline, palette, softly shaded pixel-art clusters and transparent 4:3 canvas/margins exactly. Lower body/towel/legs/feet remain fixed; no scaling, walking, leaning or whole-image translation. Both hands remain on hair, natural shoulders/elbows. No water, foam, steam, droplets, scenery, objects, ground, shadow or text. shower/02: hair washing phase2, both hands slide inward to the CENTER OF CROWN, fingertips nearly meeting without merging. Elbows each move inward2 logical pixels and rise1 pixel. Keep head level, short white bob same silhouette. Compact symmetrical inward scrub, only arms/hands change."
+    },
+    {
+      "key": "shower/03",
+      "prompt": "ONE next sprite animation frame, edit reference with very small arm/hand motion only. Same clearly adult25 woman, EXACT FULL BACK VIEW, short white chin-length bob, opaque white bath wrap securely from chest through knees, bare feet. Preserve head/neck/body size, outline, palette, softly shaded pixel-art clusters and transparent 4:3 canvas/margins exactly. Lower body/towel/legs/feet remain fixed; no scaling, walking, leaning or whole-image translation. Both hands remain on hair, natural shoulders/elbows. No water, foam, steam, droplets, scenery, objects, ground, shadow or text. shower/03: hair washing phase3, right hand presses inward toward crown center2 logical pixels while left hand slides outward1 pixel; RIGHT elbow tucks inward2 pixels and lifts1, LEFT elbow spreads1 pixel and drops1. Head remains level, chin-length white bob intact. Small alternating quick scrub, only arms and fingers change."
+    },
+    {
+      "key": "shower/04",
+      "prompt": "ONE next sprite animation frame, edit reference with very small arm/hand motion only. Same clearly adult25 woman, EXACT FULL BACK VIEW, short white chin-length bob, opaque white bath wrap securely from chest through knees, bare feet. Preserve head/neck/body size, outline, palette, softly shaded pixel-art clusters and transparent 4:3 canvas/margins exactly. Lower body/towel/legs/feet remain fixed; no scaling, walking, leaning or whole-image translation. Both hands remain on hair, natural shoulders/elbows. No water, foam, steam, droplets, scenery, objects, ground, shadow or text. shower/04: hair washing phase4, BOTH palms slide slightly OUTWARD and DOWN along upper sides of short bob, fingertips remain near crown edges. Elbows spread2 logical pixels from reference and drop1. Small natural outward scrub. Hair scalp position unchanged, body motionless. No excessive movement."
+    },
+    {
+      "key": "shower/05",
+      "prompt": "ONE next sprite animation frame, edit reference with very small arm/hand motion only. Same clearly adult25 woman, EXACT FULL BACK VIEW, short white chin-length bob, opaque white bath wrap securely from chest through knees, bare feet. Preserve head/neck/body size, outline, palette, softly shaded pixel-art clusters and transparent 4:3 canvas/margins exactly. Lower body/towel/legs/feet remain fixed; no scaling, walking, leaning or whole-image translation. Both hands remain on hair, natural shoulders/elbows. No water, foam, steam, droplets, scenery, objects, ground, shadow or text. shower/05 final loop phase: Return arms almost exactly to reference neutral hair-washing posture, hands on left/right crown. Left fingertips curl in1 logical pixel, right fingertips relax1 pixel, right wrist just1 pixel lower than reference; elbows near symmetric reference positions. This is a small return movement to connect smoothly to reference frame00. Head and entire lower body unchanged."
+    },
+    {
+      "key": "bath/00",
+      "prompt": "Create ONE new pixel-art game frame bath/00 using reference for exact adult character identity, head size, anatomy, palette and art style. Geshugan, adult woman25, short white chin-length bob with bangs, small pale cyan eye, impassive alert face, gaze forward RIGHT. STRICT RIGHT-FACING SIDE PROFILE. Change standing pose into sitting low in a bathtub-shaped posture BUT DO NOT DRAW THE TUB. Hip rests near logical (60,128), feet at y135 to the right around x100, knees comfortably bent ahead, not pulled to chest. Head top approximately y68, same head size as standing reference; keep anatomical limb lengths. Torso upright with very slight relaxed lean backward. BOTH ARMS rest OUT TO THE SIDES at invisible bathtub-rim height around logical y100: elbows naturally bent, forearms supported horizontally along invisible side rims, wrists relaxed. Near arm fully visible and held away from lap; far arm partially visible by perspective. HANDS DO NOT touch knees or embrace legs. She wears the same opaque WHITE bath wrap securely covering chest, waist, pelvis and upper thighs through knees; no exposure. Bare lower legs and feet. Use same fine dark outline and soft pixel shade clusters. Transparent 4:3 landscape canvas representing192x144 grid with same physical character scale and empty margins. Character only, no tub, chair, floor, cast shadow, water, steam, foam, text, props or guides. ONE frame, not sheet."
+    },
+    {
+      "key": "bath/01",
+      "prompt": "Edit reference into ONE next pixel-art animation frame of subtle breathing. Same adult25 woman Geshugan, short white bob, pale cyan eye open gazing RIGHT, impassive face, side view, white opaque towel securely covering chest and lap through knees, bare feet. BOTH arms remain resting outward on invisible bathtub side rims, hands do not touch knees. Preserve exact character size, head size, limb lengths, lower body/feet/hips, thin outline, shade clusters, palette, transparent4:3 canvas and composition. No tub, floor, shadow, water, steam, foam, objects, text or effects. bath/01 inhale: raise only head and upper shoulders by ONE logical sprite pixel (about9 pixels in this large image), preserve neck and facial direction. Arms/hips/legs/feet remain fixed. Tiny breathing lift only, do not nod, rescale or move whole body. Keep all other parts identical."
+    },
+    {
+      "key": "undress/03",
+      "prompt": "ONE corrected low-resolution pixel-art animation frame of adult25 Geshugan, exact right-facing profile except rear-view frames. Preserve exact white chin-length bob, bangs, pale cyan eye, head size, athletic body, body scale, thin1px black outline and shaded pixel clusters. Same transparent4:3 canvas, same fixed character placement and baseline, no rescaling or whole-character shifts. No floor, shadow, water, tub, foam, objects, loose clothing, text or guides. Opaque BEIGE bath towel securely from upper chest THROUGH KNEES, covering chest waist pelvis thighs. Colors #F2DDBF highlight, #DAC19D middle, #BA9D78 shadow. Towel is beige, NOT white; hair remains WHITE. Correct undress/03: white shirt has been replaced by beige towel, BLACK TROUSERS AND BLACK FLATS still worn below towel. NEAR HAND tucks towel's upper edge securely under near armpit at upper chest. Near elbow bends forward/down; far arm hangs down. Exact right-facing side profile (no front chest), gaze right. Same head/torso/feet scale and positions. Empty hands touching only the worn towel.",
+      "revision": "Updated brief"
+    },
+    {
+      "key": "undress/01",
+      "prompt": "ONE corrected low-resolution pixel-art animation frame of adult25 Geshugan, exact right-facing profile except rear-view frames. Preserve exact white chin-length bob, bangs, pale cyan eye, head size, athletic body, body scale, thin1px black outline and shaded pixel clusters. Same transparent4:3 canvas, same fixed character placement and baseline, no rescaling or whole-character shifts. No floor, shadow, water, tub, foam, objects, loose clothing, text or guides. Correct undress/01 to updated specification. Her NEAR hand is at her neck under chin pulling the black necktie knot downward once. Her FAR ARM must hang DOWN relaxed at her side, not touch the tie or chest. Only ONE hand works at neck. Opaque white collared shirt rolled sleeves, black slacks and black flats unchanged. Strict profile one shoulder and one eye only, no front-view shirt placket. Impassive gaze forward right. Keep head/hair/legs/shoes unchanged.",
+      "revision": "Updated brief"
+    },
+    {
+      "key": "undress/04",
+      "prompt": "ONE corrected low-resolution pixel-art animation frame of adult25 Geshugan, exact right-facing profile except rear-view frames. Preserve exact white chin-length bob, bangs, pale cyan eye, head size, athletic body, body scale, thin1px black outline and shaded pixel clusters. Same transparent4:3 canvas, same fixed character placement and baseline, no rescaling or whole-character shifts. No floor, shadow, water, tub, foam, objects, loose clothing, text or guides. Opaque BEIGE bath towel securely from upper chest THROUGH KNEES, covering chest waist pelvis thighs. Colors #F2DDBF highlight, #DAC19D middle, #BA9D78 shadow. Towel is beige, NOT white; hair remains WHITE. ONE undress/04 preparation frame: same adult stands facing exactly right, torso leans forward only15degrees. BOTH hands at WAISTBAND HEIGHT just below navel, thumbs touching the waist seam of still-worn black slacks beneath secure towel, hands making a small downward preparatory push. Keep towel fully wrapped from chest through knees, nothing exposed, black trousers and black flat shoes remain fully worn. Hands stay at waist, not knees. No detached clothes. Head faces right ahead, not down. Feet planted as reference, fixed physical scale.",
+      "revision": "Updated brief"
+    },
+    {
+      "key": "undress/05",
+      "prompt": "ONE corrected low-resolution pixel-art animation frame of adult25 Geshugan, exact right-facing profile except rear-view frames. Preserve exact white chin-length bob, bangs, pale cyan eye, head size, athletic body, body scale, thin1px black outline and shaded pixel clusters. Same transparent4:3 canvas, same fixed character placement and baseline, no rescaling or whole-character shifts. No floor, shadow, water, tub, foam, objects, loose clothing, text or guides. Opaque BEIGE bath towel securely from upper chest THROUGH KNEES, covering chest waist pelvis thighs. Colors #F2DDBF highlight, #DAC19D middle, #BA9D78 shadow. Towel is beige, NOT white; hair remains WHITE. Create undress/05: same adult standing RIGHT profile in beige towel and BARE FEET, no trousers/shoes. Both arms relaxed down at sides. Shift weight onto front/near foot remaining flat at original baseline, lift the other bare foot about5 logical pixels and draw it slightly BACK to left, knee bends gently. Simple stepping-out preparation posture, body mostly upright, gaze right ahead. Towel remains securely fully covering torso pelvis thighs through knees, no exposed body areas beneath towel. Keep head position and physical body scale of reference, no enlarging. No removed clothes or objects.",
+      "revision": "Updated brief"
+    },
+    {
+      "key": "undress/06",
+      "prompt": "ONE corrected low-resolution pixel-art animation frame of adult25 Geshugan, exact right-facing profile except rear-view frames. Preserve exact white chin-length bob, bangs, pale cyan eye, head size, athletic body, body scale, thin1px black outline and shaded pixel clusters. Same transparent4:3 canvas, same fixed character placement and baseline, no rescaling or whole-character shifts. No floor, shadow, water, tub, foam, objects, loose clothing, text or guides. Opaque BEIGE bath towel securely from upper chest THROUGH KNEES, covering chest waist pelvis thighs. Colors #F2DDBF highlight, #DAC19D middle, #BA9D78 shadow. Towel is beige, NOT white; hair remains WHITE. Correct only the towel COLOR in reference into specified beige three-tone ramp. undress/06: keep identical standing upright right profile, both arms down, bare feet flat, no other clothing. No change to hair color (white), skin, pose, anatomy, scale, location or margins. Towel remains chest-through-knees, same narrow shape. Crisp dark1px exterior outline.",
+      "revision": "Updated brief"
+    },
+    {
+      "key": "showerturn/01",
+      "prompt": "ONE corrected low-resolution pixel-art animation frame of adult25 Geshugan, exact right-facing profile except rear-view frames. Preserve exact white chin-length bob, bangs, pale cyan eye, head size, athletic body, body scale, thin1px black outline and shaded pixel clusters. Same transparent4:3 canvas, same fixed character placement and baseline, no rescaling or whole-character shifts. No floor, shadow, water, tub, foam, objects, loose clothing, text or guides. Opaque BEIGE bath towel securely from upper chest THROUGH KNEES, covering chest waist pelvis thighs. Colors #F2DDBF highlight, #DAC19D middle, #BA9D78 shadow. Towel is beige, NOT white; hair remains WHITE. showerturn/01: keep identical THREE-QUARTER BACK view, both arms down, bare feet pivoting right/away. Change only white towel color to specified BEIGE. Keep white bob, skin, pose, body proportions and canvas absolutely unchanged. No front-facing turn.",
+      "revision": "Updated brief"
+    },
+    {
+      "key": "showerturn/02",
+      "prompt": "ONE corrected low-resolution pixel-art animation frame of adult25 Geshugan, exact right-facing profile except rear-view frames. Preserve exact white chin-length bob, bangs, pale cyan eye, head size, athletic body, body scale, thin1px black outline and shaded pixel clusters. Same transparent4:3 canvas, same fixed character placement and baseline, no rescaling or whole-character shifts. No floor, shadow, water, tub, foam, objects, loose clothing, text or guides. Opaque BEIGE bath towel securely from upper chest THROUGH KNEES, covering chest waist pelvis thighs. Colors #F2DDBF highlight, #DAC19D middle, #BA9D78 shadow. Towel is beige, NOT white; hair remains WHITE. showerturn/02 exact FULL BACK VIEW, both arms relaxed straight down. Modify towel color to beige and place bare FEET SHOULDER-WIDTH APART: heels centered under shoulders, around logical x51 and x73 with small natural gap between legs. Keep standing upright and symmetric, body center and same foot baseline, scalp height/white bob unchanged. No walking pose, no front face. Body dimensions unchanged; only feet stance and towel color.",
+      "revision": "Updated brief"
+    },
+    {
+      "key": "shower/00",
+      "prompt": "ONE corrected low-resolution pixel-art animation frame of adult25 Geshugan, exact right-facing profile except rear-view frames. Preserve exact white chin-length bob, bangs, pale cyan eye, head size, athletic body, body scale, thin1px black outline and shaded pixel clusters. Same transparent4:3 canvas, same fixed character placement and baseline, no rescaling or whole-character shifts. No floor, shadow, water, tub, foam, objects, loose clothing, text or guides. Opaque BEIGE bath towel securely from upper chest THROUGH KNEES, covering chest waist pelvis thighs. Colors #F2DDBF highlight, #DAC19D middle, #BA9D78 shadow. Towel is beige, NOT white; hair remains WHITE. shower/00 FULL BACK VIEW, keep EXACT lower body/towel/shoulder-width feet from reference. ONLY raise both hands to crown of white bob, elbows naturally spread to sides, palms on top of head. No face shown. Small economical pose. Hair remains white and scalp at same height. Same anatomy, feet positions and canvas. At most tiny soap on crown, no other effects.",
+      "revision": "Updated brief"
+    },
+    {
+      "key": "shower/01",
+      "prompt": "ONE corrected low-resolution pixel-art animation frame of adult25 Geshugan, exact right-facing profile except rear-view frames. Preserve exact white chin-length bob, bangs, pale cyan eye, head size, athletic body, body scale, thin1px black outline and shaded pixel clusters. Same transparent4:3 canvas, same fixed character placement and baseline, no rescaling or whole-character shifts. No floor, shadow, water, tub, foam, objects, loose clothing, text or guides. Opaque BEIGE bath towel securely from upper chest THROUGH KNEES, covering chest waist pelvis thighs. Colors #F2DDBF highlight, #DAC19D middle, #BA9D78 shadow. Towel is beige, NOT white; hair remains WHITE. Exact FULL BACK VIEW, adult25 woman, white chin-length bob, both feet shoulder-width apart. Keep lower body, towel, legs and feet at EXACTLY same positions as reference, scalp level, same overall size. Change only arms/hands as specified. shower/01: both hands scrub crown briskly. LEFT fingertips reach slightly FORWARD over top toward forehead (partly hidden beyond crown), RIGHT fingertips remain toward BACK of crown, visible on back upper hair. Hands alternate front/back, elbow positions natural, small movement only. Tiny crown suds allowed but not required. No face.",
+      "revision": "Updated brief"
+    },
+    {
+      "key": "shower/02",
+      "prompt": "ONE corrected low-resolution pixel-art animation frame of adult25 Geshugan, exact right-facing profile except rear-view frames. Preserve exact white chin-length bob, bangs, pale cyan eye, head size, athletic body, body scale, thin1px black outline and shaded pixel clusters. Same transparent4:3 canvas, same fixed character placement and baseline, no rescaling or whole-character shifts. No floor, shadow, water, tub, foam, objects, loose clothing, text or guides. Opaque BEIGE bath towel securely from upper chest THROUGH KNEES, covering chest waist pelvis thighs. Colors #F2DDBF highlight, #DAC19D middle, #BA9D78 shadow. Towel is beige, NOT white; hair remains WHITE. Exact FULL BACK VIEW, adult25 woman, white chin-length bob, both feet shoulder-width apart. Keep lower body, towel, legs and feet at EXACTLY same positions as reference, scalp level, same overall size. Change only arms/hands as specified. shower/02 reverse alternate scrub: RIGHT fingertips reach forward over top toward forehead partly hidden beyond crown, LEFT fingertips press BACK of crown visibly on upper back hair. Both elbows lower ONE logical pixel versus reference. Keep face invisible, same white bob and exact stable feet/torso. Tiny crown suds only.",
+      "revision": "Updated brief"
+    },
+    {
+      "key": "shower/03",
+      "prompt": "ONE corrected low-resolution pixel-art animation frame of adult25 Geshugan, exact right-facing profile except rear-view frames. Preserve exact white chin-length bob, bangs, pale cyan eye, head size, athletic body, body scale, thin1px black outline and shaded pixel clusters. Same transparent4:3 canvas, same fixed character placement and baseline, no rescaling or whole-character shifts. No floor, shadow, water, tub, foam, objects, loose clothing, text or guides. Opaque BEIGE bath towel securely from upper chest THROUGH KNEES, covering chest waist pelvis thighs. Colors #F2DDBF highlight, #DAC19D middle, #BA9D78 shadow. Towel is beige, NOT white; hair remains WHITE. Exact FULL BACK VIEW, adult25 woman, white chin-length bob, both feet shoulder-width apart. Keep lower body, towel, legs and feet at EXACTLY same positions as reference, scalp level, same overall size. Change only arms/hands as specified. shower/03: lower BOTH hands to the NAPE OF NECK, at bottom hem of white bob, fingers brushing water from nape. Hands are BELOW the head, NOT on crown. Elbows point outward around SHOULDER HEIGHT; forearms bend up/in toward nape at logical y59. Crown completely unobstructed, no hands above scalp. Keep face invisible and head upright. Same body/towel/feet unchanged, no water or foam drawn.",
+      "revision": "Updated brief"
+    },
+    {
+      "key": "shower/04",
+      "prompt": "ONE corrected low-resolution pixel-art animation frame of adult25 Geshugan, exact right-facing profile except rear-view frames. Preserve exact white chin-length bob, bangs, pale cyan eye, head size, athletic body, body scale, thin1px black outline and shaded pixel clusters. Same transparent4:3 canvas, same fixed character placement and baseline, no rescaling or whole-character shifts. No floor, shadow, water, tub, foam, objects, loose clothing, text or guides. Opaque BEIGE bath towel securely from upper chest THROUGH KNEES, covering chest waist pelvis thighs. Colors #F2DDBF highlight, #DAC19D middle, #BA9D78 shadow. Towel is beige, NOT white; hair remains WHITE. Exact FULL BACK VIEW, adult25 woman, white chin-length bob, both feet shoulder-width apart. Keep lower body, towel, legs and feet at EXACTLY same positions as reference, scalp level, same overall size. Change only arms/hands as specified. shower/04: both hands back on CROWN of head, elbows out. A brief tiny head shake: white bob tips displaced ONE logical pixel to the right while neck/body remain fixed. Do not turn face into view; still exact rear. Tiny crown suds. Hands follow small head movement, no other movement.",
+      "revision": "Updated brief"
+    },
+    {
+      "key": "shower/05",
+      "prompt": "ONE corrected low-resolution pixel-art animation frame of adult25 Geshugan, exact right-facing profile except rear-view frames. Preserve exact white chin-length bob, bangs, pale cyan eye, head size, athletic body, body scale, thin1px black outline and shaded pixel clusters. Same transparent4:3 canvas, same fixed character placement and baseline, no rescaling or whole-character shifts. No floor, shadow, water, tub, foam, objects, loose clothing, text or guides. Opaque BEIGE bath towel securely from upper chest THROUGH KNEES, covering chest waist pelvis thighs. Colors #F2DDBF highlight, #DAC19D middle, #BA9D78 shadow. Towel is beige, NOT white; hair remains WHITE. Exact FULL BACK VIEW, adult25 woman, white chin-length bob, both feet shoulder-width apart. Keep lower body, towel, legs and feet at EXACTLY same positions as reference, scalp level, same overall size. Change only arms/hands as specified. shower/05: BOTH hands sweep DOWN along LEFT AND RIGHT SIDES of short bob, palms beside ears/side hair at logical y52, fingers pointing down toward hair ends. Elbows settle at SHOULDER HEIGHT, around logical y61, spread out. Hands are at SIDES of head, not crown and not nape. Scalp unobstructed. Natural bent elbows and symmetric small movement. No face, no water drawn.",
+      "revision": "Updated brief"
+    },
+    {
+      "key": "bath/00",
+      "prompt": "ONE corrected low-resolution pixel-art animation frame of adult25 Geshugan, exact right-facing profile except rear-view frames. Preserve exact white chin-length bob, bangs, pale cyan eye, head size, athletic body, body scale, thin1px black outline and shaded pixel clusters. Same transparent4:3 canvas, same fixed character placement and baseline, no rescaling or whole-character shifts. No floor, shadow, water, tub, foam, objects, loose clothing, text or guides. Opaque BEIGE bath towel securely from upper chest THROUGH KNEES, covering chest waist pelvis thighs. Colors #F2DDBF highlight, #DAC19D middle, #BA9D78 shadow. Towel is beige, NOT white; hair remains WHITE. Correct bath/00 reference: change ONLY towel white to BEIGE and extend both lower legs slightly farther FORWARD, with knees only gently bent rather than raised high. Seated hip remains close to ground near sole baseline, back nearly upright, gaze right toward door. BOTH arms remain spread to sides resting on invisible side rims around hip height+20 logical pixels; near forearm prominent, far one only partly visible behind. Do not hug knees. Exact right-facing profile, same head size and same seated physical scale/canvas as reference, no enlargement or shifting hip. Preserve head position. Bath tub is NOT drawn. Same white chin-length bob, adult25. Towel covers chest through upper thighs/knees securely.",
+      "revision": "Updated brief"
+    },
+    {
+      "key": "bath/01",
+      "prompt": "ONE corrected low-resolution pixel-art animation frame of adult25 Geshugan, exact right-facing profile except rear-view frames. Preserve exact white chin-length bob, bangs, pale cyan eye, head size, athletic body, body scale, thin1px black outline and shaded pixel clusters. Same transparent4:3 canvas, same fixed character placement and baseline, no rescaling or whole-character shifts. No floor, shadow, water, tub, foam, objects, loose clothing, text or guides. Opaque BEIGE bath towel securely from upper chest THROUGH KNEES, covering chest waist pelvis thighs. Colors #F2DDBF highlight, #DAC19D middle, #BA9D78 shadow. Towel is beige, NOT white; hair remains WHITE. Same seated right-facing profile, arms on invisible SIDE RIMS, legs forward with slight knee bend, adult25 Geshugan. Keep hip, feet, hands, elbows and all lower body fixed at exact same positions. Same canvas and character size. bath/01 INHALE: translate ONLY HEAD and upper shoulders UP exactly10 image pixels at this1448x1086 resolution (equivalent ONE final logical pixel). Hair top currently around341 must become331, same head shape and orientation. Neck connects naturally. No nodding, no rescaling, no whole-body movement. Keep the rest identical. Tiny breathing motion only.",
+      "revision": "Updated brief"
+    },
+    {
+      "key": "bath/01",
+      "prompt": "Make a NEAR-IDENTICAL version of the reference sprite. Preserve head position, head size, neck length, torso proportions, hands, elbows, towel, hip, knees, feet and full transparent canvas almost exactly. Tiny inhale breathing only: head and shoulders barely rise, less than one percent of the character height. NOT a stretch and do not lengthen neck. Adult woman25, same white bob and beige opaque towel, same seated side pose and pixel art. Keep all outlines and pixel clusters except minimal breathing unchanged. No added elements. This should look practically identical when still, with only a very small breathing change visible in animation.",
+      "revision": "Correct excessive generated breathing displacement"
+    },
+    {
+      "key": "bath/02",
+      "sharedEndpoint": "bath/00",
+      "revision": "Updated brief explicitly requests identical neutral pose"
+    },
+    {
+      "key": "bath/03",
+      "prompt": "ONE corrected low-resolution pixel-art animation frame of adult25 Geshugan, exact right-facing profile except rear-view frames. Preserve exact white chin-length bob, bangs, pale cyan eye, head size, athletic body, body scale, thin1px black outline and shaded pixel clusters. Same transparent4:3 canvas, same fixed character placement and baseline, no rescaling or whole-character shifts. No floor, shadow, water, tub, foam, objects, loose clothing, text or guides. Opaque BEIGE bath towel securely from upper chest THROUGH KNEES, covering chest waist pelvis thighs. Colors #F2DDBF highlight, #DAC19D middle, #BA9D78 shadow. Towel is beige, NOT white; hair remains WHITE. Same seated right-facing profile, arms on invisible SIDE RIMS, legs forward with slight knee bend, adult25 Geshugan. Keep hip, feet, hands, elbows and all lower body fixed at exact same positions. Same canvas and character size. bath/03 EXHALE: a very tiny relaxed breath out. Head and shoulders settle very slightly lower than reference, about one percent of character height, while hip/legs/feet/forearms stay fixed. Keep head level facing right, no forward nod and no neck stretching. Preserve same overall silhouette and proportions almost exactly. Only this tiny downward breathing motion, no other changes.",
+      "revision": "Updated brief"
+    }
+  ],
+  "export": {
+    "canvas": [
+      192,
+      144
+    ],
+    "alpha": [
+      0,
+      255
+    ],
+    "palette": "G0 sampled palette plus #F2DDBF/#DAC19D/#BA9D78 towel ramp",
+    "sampling": "Nearest-neighbor; fixed 202x151 standing-source projection and 156x117 seated-source projection, followed by baseline translation. No per-frame anatomical stretching.",
+    "footY": 135
+  },
+  "finalMeasurements": [
+    {
+      "key": "G0",
+      "size": [
+        192,
+        144
+      ],
+      "bounds": [
+        47,
+        37,
+        78,
+        136
+      ],
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "7fbfb4003a0e2200328e0e5c54742b3df099597ef25d72c64d0c6439f2967cb5"
+    },
+    {
+      "key": "undress/00",
+      "size": [
+        192,
+        144
+      ],
+      "bounds": [
+        47,
+        37,
+        78,
+        136
+      ],
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "7fbfb4003a0e2200328e0e5c54742b3df099597ef25d72c64d0c6439f2967cb5"
+    },
+    {
+      "key": "undress/01",
+      "size": [
+        192,
+        144
+      ],
+      "bounds": [
+        49,
+        36,
+        81,
+        136
+      ],
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "f24b3c40bac9ccdda557996973b434fa1cb78fc6380c00ed4e6f95809614bf6b"
+    },
+    {
+      "key": "undress/02",
+      "size": [
+        192,
+        144
+      ],
+      "bounds": [
+        49,
+        37,
+        81,
+        136
+      ],
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "90b67c59a351b99c7018966cf7fd63c809308fe26116644ff7276febd7aa8729"
+    },
+    {
+      "key": "undress/03",
+      "size": [
+        192,
+        144
+      ],
+      "bounds": [
+        50,
+        37,
+        82,
+        136
+      ],
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "4e64c0c6e2a1d0e1cc27193648f4180d916cb6ce07d3b521a32ab7f180337c71"
+    },
+    {
+      "key": "undress/04",
+      "size": [
+        192,
+        144
+      ],
+      "bounds": [
+        52,
+        34,
+        84,
+        136
+      ],
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "25dfc65de50095f24e9a54a84eb85b0c560412c0d21d5377f1894f20830af863"
+    },
+    {
+      "key": "undress/05",
+      "size": [
+        192,
+        144
+      ],
+      "bounds": [
+        48,
+        38,
+        77,
+        136
+      ],
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "32e670ee193be0879be26435e5a8c1cfddf162bbbc6ebe4b79ff858aeb1d5d18"
+    },
+    {
+      "key": "undress/06",
+      "size": [
+        192,
+        144
+      ],
+      "bounds": [
+        49,
+        38,
+        77,
+        136
+      ],
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "1cd61e96d9542ac67943ad0d15370f6ddfb00a03d3f2ec64d786db5cb9fd4150"
+    },
+    {
+      "key": "showerturn/00",
+      "size": [
+        192,
+        144
+      ],
+      "bounds": [
+        49,
+        38,
+        77,
+        136
+      ],
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "1cd61e96d9542ac67943ad0d15370f6ddfb00a03d3f2ec64d786db5cb9fd4150"
+    },
+    {
+      "key": "showerturn/01",
+      "size": [
+        192,
+        144
+      ],
+      "bounds": [
+        51,
+        38,
+        80,
+        136
+      ],
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "1615d47dbdbcc3b8026f93ca0dfe027c22d63492934a9b1e728d0faaa22e9f20"
+    },
+    {
+      "key": "showerturn/02",
+      "size": [
+        192,
+        144
+      ],
+      "bounds": [
+        48,
+        38,
+        81,
+        136
+      ],
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "c35983250a87be5aa3b1d28e8c3ba10c26f22f07a211c6d2d04c3ce5c04ec24b"
+    },
+    {
+      "key": "shower/00",
+      "size": [
+        192,
+        144
+      ],
+      "bounds": [
+        42,
+        37,
+        87,
+        136
+      ],
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "ae67539944bc5bb66b9f321d25e288a08b9c1aa28a20ab160f45b15e5377ea87"
+    },
+    {
+      "key": "shower/01",
+      "size": [
+        192,
+        144
+      ],
+      "bounds": [
+        44,
+        36,
+        87,
+        136
+      ],
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "aac78b46e64f515486749a222167864ad9aa4981123b1014376480cfa7daaad5"
+    },
+    {
+      "key": "shower/02",
+      "size": [
+        192,
+        144
+      ],
+      "bounds": [
+        43,
+        36,
+        85,
+        136
+      ],
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "b43b5c402e2431274d9d83d549e64747be7763e4686a10bf0e55189244043fea"
+    },
+    {
+      "key": "shower/03",
+      "size": [
+        192,
+        144
+      ],
+      "bounds": [
+        41,
+        37,
+        88,
+        136
+      ],
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "960ac218a32b386815f991a0947f966ffcadd9e2e980dd260f54c3044d91ed89"
+    },
+    {
+      "key": "shower/04",
+      "size": [
+        192,
+        144
+      ],
+      "bounds": [
+        43,
+        36,
+        89,
+        136
+      ],
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "3cf84da3faf029d31c7ef9b32e9e7cd819d917fc30ba6b9e6b723364bd651596"
+    },
+    {
+      "key": "shower/05",
+      "size": [
+        192,
+        144
+      ],
+      "bounds": [
+        40,
+        37,
+        89,
+        136
+      ],
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "8ff81b1cf50fa7604f6dd4d2f85b24b88e7e465d0daca5b0f15693793f9ac93b"
+    },
+    {
+      "key": "bath/00",
+      "size": [
+        192,
+        144
+      ],
+      "bounds": [
+        42,
+        68,
+        122,
+        136
+      ],
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "868fda018e06369e8d80e767b81d753b23a9623396b4fecc5afb04390ab10a2e"
+    },
+    {
+      "key": "bath/01",
+      "size": [
+        192,
+        144
+      ],
+      "bounds": [
+        42,
+        68,
+        122,
+        136
+      ],
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "35e8bec30ac3c998e7f44af777090da1592f9def55be2e122304e5b7060a20f4"
+    },
+    {
+      "key": "bath/02",
+      "size": [
+        192,
+        144
+      ],
+      "bounds": [
+        42,
+        68,
+        122,
+        136
+      ],
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "868fda018e06369e8d80e767b81d753b23a9623396b4fecc5afb04390ab10a2e"
+    },
+    {
+      "key": "bath/03",
+      "size": [
+        192,
+        144
+      ],
+      "bounds": [
+        42,
+        68,
+        122,
+        136
+      ],
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "e4846469377a46151e72d29e29ac335731cfd623d89147b52d78c41c19b50ec3"
+    }
+  ],
+  "sourceMapping": {
+    "undress/00": {
+      "key": "undress/00",
+      "source": "exec-18ffd3bf-c5e5-4abd-b180-57723e2fe9f2.png",
+      "canvas": [
+        192,
+        144
+      ],
+      "bounds": [
+        49,
+        36,
+        82,
+        136
+      ],
+      "translation": [
+        -3,
+        -5
+      ],
+      "palette": "G0 only",
+      "sampling": [
+        202,
+        151
+      ]
+    },
+    "undress/01": {
+      "key": "undress/01",
+      "source": "exec-4cab8541-d005-4453-adda-389ee729c303.png",
+      "canvas": [
+        192,
+        144
+      ],
+      "bounds": [
+        49,
+        36,
+        81,
+        136
+      ],
+      "translation": [
+        -3,
+        -5
+      ],
+      "palette": "G0 plus specified beige towel ramp",
+      "sampling": [
+        202,
+        151
+      ]
+    },
+    "undress/02": {
+      "key": "undress/02",
+      "source": "exec-6c89497d-a1f1-4462-8a6b-93ef534520b1.png",
+      "canvas": [
+        192,
+        144
+      ],
+      "bounds": [
+        49,
+        37,
+        81,
+        136
+      ],
+      "translation": [
+        -3,
+        -5
+      ],
+      "palette": "G0 only",
+      "sampling": [
+        202,
+        151
+      ]
+    },
+    "undress/03": {
+      "key": "undress/03",
+      "source": "exec-f71859d8-2123-4c2c-9db2-dca422579a5f.png",
+      "canvas": [
+        192,
+        144
+      ],
+      "bounds": [
+        50,
+        37,
+        82,
+        136
+      ],
+      "translation": [
+        -3,
+        -5
+      ],
+      "palette": "G0 plus specified beige towel ramp",
+      "sampling": [
+        202,
+        151
+      ]
+    },
+    "undress/04": {
+      "key": "undress/04",
+      "source": "exec-17eb195b-823d-4519-912d-61d9d438560d.png",
+      "canvas": [
+        192,
+        144
+      ],
+      "bounds": [
+        52,
+        34,
+        84,
+        136
+      ],
+      "translation": [
+        -3,
+        -5
+      ],
+      "palette": "G0 plus specified beige towel ramp",
+      "sampling": [
+        202,
+        151
+      ]
+    },
+    "undress/05": {
+      "key": "undress/05",
+      "source": "exec-f29338ec-f510-45ac-a605-c042024e5299.png",
+      "canvas": [
+        192,
+        144
+      ],
+      "bounds": [
+        48,
+        38,
+        77,
+        136
+      ],
+      "translation": [
+        -3,
+        -4
+      ],
+      "palette": "G0 plus specified beige towel ramp",
+      "sampling": [
+        202,
+        151
+      ]
+    },
+    "undress/06": {
+      "key": "undress/06",
+      "source": "exec-c7a0accd-daea-4cf7-9efd-f56b4d4266e1.png",
+      "canvas": [
+        192,
+        144
+      ],
+      "bounds": [
+        49,
+        38,
+        77,
+        136
+      ],
+      "translation": [
+        -3,
+        -4
+      ],
+      "palette": "G0 plus specified beige towel ramp",
+      "sampling": [
+        202,
+        151
+      ]
+    },
+    "showerturn/01": {
+      "key": "showerturn/01",
+      "source": "exec-c3c00ac4-8c8a-4f1e-9e7d-0b6921a8a39a.png",
+      "canvas": [
+        192,
+        144
+      ],
+      "bounds": [
+        51,
+        38,
+        80,
+        136
+      ],
+      "translation": [
+        -3,
+        -4
+      ],
+      "palette": "G0 plus specified beige towel ramp",
+      "sampling": [
+        202,
+        151
+      ]
+    },
+    "showerturn/02": {
+      "key": "showerturn/02",
+      "source": "exec-cfa4b6de-2070-4664-8c2b-33954de6fa55.png",
+      "canvas": [
+        192,
+        144
+      ],
+      "bounds": [
+        48,
+        38,
+        81,
+        136
+      ],
+      "translation": [
+        -3,
+        -4
+      ],
+      "palette": "G0 plus specified beige towel ramp",
+      "sampling": [
+        202,
+        151
+      ]
+    },
+    "shower/00": {
+      "key": "shower/00",
+      "source": "exec-79d54559-ebc8-41da-980b-9deb356afc6d.png",
+      "canvas": [
+        192,
+        144
+      ],
+      "bounds": [
+        42,
+        37,
+        87,
+        136
+      ],
+      "translation": [
+        -3,
+        -4
+      ],
+      "palette": "G0 plus specified beige towel ramp",
+      "sampling": [
+        202,
+        151
+      ]
+    },
+    "shower/01": {
+      "key": "shower/01",
+      "source": "exec-45c6635c-e868-4a58-ae71-0fd626f2a3ba.png",
+      "canvas": [
+        192,
+        144
+      ],
+      "bounds": [
+        44,
+        36,
+        87,
+        136
+      ],
+      "translation": [
+        -3,
+        -4
+      ],
+      "palette": "G0 plus specified beige towel ramp",
+      "sampling": [
+        202,
+        151
+      ]
+    },
+    "shower/02": {
+      "key": "shower/02",
+      "source": "exec-0d1bd7c7-eeea-42a6-b90d-777a0e0088f1.png",
+      "canvas": [
+        192,
+        144
+      ],
+      "bounds": [
+        43,
+        36,
+        85,
+        136
+      ],
+      "translation": [
+        -3,
+        -4
+      ],
+      "palette": "G0 plus specified beige towel ramp",
+      "sampling": [
+        202,
+        151
+      ]
+    },
+    "shower/03": {
+      "key": "shower/03",
+      "source": "exec-28a589d0-4cb3-4edb-b198-308dfb12846c.png",
+      "canvas": [
+        192,
+        144
+      ],
+      "bounds": [
+        41,
+        37,
+        88,
+        136
+      ],
+      "translation": [
+        -3,
+        -4
+      ],
+      "palette": "G0 plus specified beige towel ramp",
+      "sampling": [
+        202,
+        151
+      ]
+    },
+    "shower/04": {
+      "key": "shower/04",
+      "source": "exec-ee961595-9d96-4a02-a252-3401b40f832b.png",
+      "canvas": [
+        192,
+        144
+      ],
+      "bounds": [
+        43,
+        36,
+        89,
+        136
+      ],
+      "translation": [
+        -3,
+        -4
+      ],
+      "palette": "G0 plus specified beige towel ramp",
+      "sampling": [
+        202,
+        151
+      ]
+    },
+    "shower/05": {
+      "key": "shower/05",
+      "source": "exec-2a34a4ff-3564-49fd-b3da-de10b3d7ad8e.png",
+      "canvas": [
+        192,
+        144
+      ],
+      "bounds": [
+        40,
+        37,
+        89,
+        136
+      ],
+      "translation": [
+        -3,
+        -4
+      ],
+      "palette": "G0 plus specified beige towel ramp",
+      "sampling": [
+        202,
+        151
+      ]
+    },
+    "bath/00": {
+      "key": "bath/00",
+      "source": "exec-4ff16c05-f2f1-4de2-b4e5-07a7b7003773.png",
+      "canvas": [
+        192,
+        144
+      ],
+      "bounds": [
+        42,
+        68,
+        122,
+        136
+      ],
+      "translation": [
+        0,
+        31
+      ],
+      "palette": "G0 plus specified beige towel ramp",
+      "sampling": [
+        156,
+        117
+      ]
+    },
+    "bath/01": {
+      "key": "bath/01",
+      "source": "exec-c66bf05f-072c-4330-9faf-70035b7c8a45.png",
+      "canvas": [
+        192,
+        144
+      ],
+      "bounds": [
+        42,
+        68,
+        122,
+        136
+      ],
+      "translation": [
+        0,
+        31
+      ],
+      "palette": "G0 plus specified beige towel ramp",
+      "sampling": [
+        156,
+        117
+      ]
+    },
+    "bath/03": {
+      "key": "bath/03",
+      "source": "exec-95e3425f-2e01-433e-beae-de970d334e95.png",
+      "canvas": [
+        192,
+        144
+      ],
+      "bounds": [
+        42,
+        68,
+        122,
+        136
+      ],
+      "translation": [
+        0,
+        31
+      ],
+      "palette": "G0 plus specified beige towel ramp",
+      "sampling": [
+        156,
+        117
+      ]
+    }
+  },
+  "review": {
+    "imageCountSizeAlphaBaseline": "passed",
+    "userVisualApproval": false,
+    "demoIntegration": "Not changed. Assigned to Claude by request section 4.",
+    "remainingMinorCorrections": [
+      "bath/01 and bath/03: after export the scalp top remains y68, so exact requested y67/y69 head-and-shoulder breathing offsets need the Claude 1px correction pass specified in section 3. No claim of exact 1px breathing conformance.",
+      "undress/04: scalp top y34 versus reference y37; small head/shoulder registration correction required. Other standing scalp bounds are approximately y36-38 (raised hands/soap may be uppermost).",
+      "Check strict side-profile handedness, 1px black exterior outline and stable horizontal center during Claude technical review. Image generation does not guarantee pixel-exact registration."
+    ]
+  },
+  "briefChangedDuringProduction": "Initial brief was less specific and used reference-only palette. User repeated request after detailed frame table and beige towel ramp were added; affected frames were redrawn. Superseded local candidates are not delivered.",
+  "generationFailure": "One original bending/trouser-removal wording was filtered. A fully covered preparation pose was produced, then superseded by updated brief lifted-foot frame.",
+  "cost": "Built-in tool cost not exposed."
+}
