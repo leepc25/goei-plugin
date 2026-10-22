@@ -65,7 +65,7 @@ const CHIPS: Record<NpcDef['group'], string[]> = {
   resident: ['안녕하세요', '여기 사세요?', '실례했습니다'],
 };
 
-const FACE_PX = 44;
+const FACE_PX = 36;
 const FACE_BG = [35, 45, 50];
 /** 얼굴 그림을 도트로: 44칸으로 줄이고 가장자리에 이어진 흰 바탕은 패널 색으로 메운다. 읽지 못하는 그림(다른 출처)은 그대로 */
 function pixelFace(src: string): Promise<HTMLElement> {
@@ -90,10 +90,15 @@ function pixelFace(src: string): Promise<HTMLElement> {
         g.drawImage(img, sx, sy, side, side, 0, 0, FACE_PX, FACE_PX);
         const d = g.getImageData(0, 0, FACE_PX, FACE_PX);
         const a = d.data;
-        const light = (i: number) => a[i * 4 + 3] < 40 || (a[i * 4] > 215 && a[i * 4 + 1] > 215 && a[i * 4 + 2] > 215);
+        // 바탕색 = 네 귀퉁이 평균. 그 색에 가까운 가장자리 이어진 칸을 메운다 (흰 바탕·밝은 회색 바탕 모두)
+        const corner = [0, FACE_PX - 1, FACE_PX * (FACE_PX - 1), FACE_PX * FACE_PX - 1];
+        const ref = [0, 1, 2].map((k) => corner.reduce((t, i) => t + a[i * 4 + k], 0) / 4);
+        const light = (i: number) => a[i * 4 + 3] < 40 || Math.hypot(a[i * 4] - ref[0], a[i * 4 + 1] - ref[1], a[i * 4 + 2] - ref[2]) < 52;
         const seen = new Uint8Array(FACE_PX * FACE_PX);
         const stack: number[] = [];
         for (let k = 0; k < FACE_PX; k++) stack.push(k, (FACE_PX - 1) * FACE_PX + k, k * FACE_PX, k * FACE_PX + FACE_PX - 1);
+        // 밝은 바탕일 때만 (어두운 귀퉁이는 머리카락일 수 있다)
+        if (ref[0] * 0.3 + ref[1] * 0.59 + ref[2] * 0.11 < 150) stack.length = 0;
         while (stack.length) {
           const i = stack.pop()!;
           if (seen[i] || !light(i)) continue;
@@ -105,6 +110,8 @@ function pixelFace(src: string): Promise<HTMLElement> {
           if (i >= FACE_PX) stack.push(i - FACE_PX);
           if (i < FACE_PX * (FACE_PX - 1)) stack.push(i + FACE_PX);
         }
+        // 색을 계단으로 (매끈한 그라데이션 대신 도트 색면)
+        for (let i = 0; i < a.length; i += 4) for (let k = 0; k < 3; k++) a[i + k] = Math.min(255, Math.round(a[i + k] / 24) * 24);
         g.putImageData(d, 0, 0);
         resolve(c);
       } catch {
@@ -157,13 +164,17 @@ export function createNpcTalk(layer: HTMLElement, host: NpcHost, store?: Relatio
     fitLog();
     return p;
   };
-  /** 대화 줄은 아래부터 채우고, 넘치는 윗줄은 통째로 감춘다 (반쯤 잘린 줄이 남지 않게) */
+  /** 대화 줄은 위에서부터, 넘치면 오래된 윗줄을 통째로 감춘다 (반쯤 잘린 줄이 남지 않게).
+   *  폰에서 입력하는 동안(입력칸이 이름 바로 아래)은 상대의 마지막 말과 그 뒤 결과 줄만 보인다 */
   const fitLog = () => {
     const ps = [...log.children] as HTMLElement[];
     for (const q of ps) q.hidden = false;
-    // 아래 정렬이라 넘친 줄은 위로 삐져나간다(scrollHeight에 안 잡힘). 칸 위로 나간 줄을 감춘다
-    const top = log.getBoundingClientRect().top - 1;
-    for (let i = 0; i < ps.length - 1 && ps[i].getBoundingClientRect().top < top; i++) ps[i].hidden = true;
+    if (el.classList.contains('typing')) {
+      let last = -1;
+      ps.forEach((q, i) => !q.classList.contains('me') && !q.classList.contains('sys') && (last = i));
+      ps.forEach((q, i) => (q.hidden = i < last || (i > last && !q.classList.contains('sys'))));
+    }
+    for (let i = 0; i < ps.length - 1 && log.scrollHeight > log.clientHeight + 1; i++) ps[i].hidden = true;
   };
 
   const drawFavor = () => {
@@ -173,7 +184,7 @@ export function createNpcTalk(layer: HTMLElement, host: NpcHost, store?: Relatio
     for (let v = FAVOR_MIN; v <= FAVOR_MAX; v++) if (v) h += `<i class="${v > 0 && f >= v ? 'up' : v < 0 && f <= v ? 'down' : ''}"></i>`;
     favorEl.innerHTML = h;
     favorEl.title = `호감 ${FAVOR_WORD(f)}`;
-    stateEl.textContent = `호감 ${FAVOR_WORD(f)}`;
+    stateEl.textContent = `호감 ${FAVOR_WORD(f)} ${f > 0 ? '+' : ''}${f}`;
   };
 
   const drawActs = () => {

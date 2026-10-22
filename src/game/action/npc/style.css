@@ -10,12 +10,12 @@
 .gnp-head{display:flex;align-items:center;gap:14px;min-height:34px}
 .gnp-name{font-size:26px;color:#ffe27a;text-shadow:2px 2px 0 #000;white-space:nowrap}
 .gnp-favor{display:flex;gap:4px;align-items:center}
-.gnp-favor i{width:12px;height:12px;background:#5e6a72;box-shadow:inset 0 0 0 2px #1b1f22;display:block}
+.gnp-favor i{width:12px;height:12px;background:#7d8a92;box-shadow:inset 0 0 0 2px #1b1f22;display:block}
 .gnp-favor i.up{background:#e6c35a}
 .gnp-favor i.down{background:#c0453a}
 .gnp-state{font-size:18px;color:#d8cfb6;text-shadow:2px 2px 0 #000}
 .gnp-x{margin-left:auto;padding:0 6px;background:none;border:0;color:#ffe27a;font-size:33px;line-height:1;text-shadow:2px 2px 0 #000;cursor:pointer}
-.gnp-log{flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;gap:6px;user-select:text;-webkit-user-select:text}
+.gnp-log{flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-start;gap:6px;user-select:text;-webkit-user-select:text}
 .gnp-log p[hidden]{display:none}
 .gnp-log p{margin:0;flex:none;font-size:22px;line-height:1.45;word-break:keep-all;overflow-wrap:anywhere;text-shadow:2px 2px 0 #000}
 .gnp-log p.me{color:#9fc7b6}
@@ -38,16 +38,16 @@
 .gnp-send:disabled{opacity:.45;cursor:default}
 .gnp-chips{display:flex;gap:6px;flex-wrap:wrap}
 .gnp-chips[hidden],.gnp-row:has(>.gnp-chips[hidden]){display:none}
-.gnp-chips button{font-size:18px;padding:4px 12px;color:#d8cfb6;background:#1b2427;border:2px solid #6b6250;border-radius:0;box-shadow:inset -2px -2px 0 #000;cursor:pointer;text-shadow:1px 1px 0 #000}
+.gnp-chips button{font-size:19px;font-weight:700;padding:4px 14px;color:#ece6d4;background:#2c383e;border:3px solid #6b6250;border-radius:0;box-shadow:inset -3px -3px 0 #1b1f22;cursor:pointer;text-shadow:2px 2px 0 #000}
 .gnp-chips button:hover,.gnp-chips button:focus-visible{color:#ffe27a;border-color:#8a7a4a}
 .gnp-note{font-size:16px;color:#c98a6a;min-height:0}
 .gnp-note:empty{display:none}
 /* 터치 화면: 폰 가로에서 놀이판이 작게 줄어드므로 글씨를 키운다. 입력칸은 iOS가 확대하지 않게 크게 */
 .gnp.coarse{height:330px}
-.gnp.coarse.typing{top:8px;bottom:auto}
+.gnp.coarse.typing{top:0;bottom:auto;width:1280px;height:300px;padding:6px 74px}
 .gnp.coarse.typing .gnp-head{order:-2}
 .gnp.coarse.typing .gnp-say{order:-1}
-.gnp.coarse.typing .gnp-row,.gnp.coarse.typing .gnp-acts{display:none}
+.gnp.coarse.typing .gnp-row{display:none}
 .gnp.coarse .gnp-send{height:60px;font-size:24px}
 .gnp.coarse .gnp-log p{font-size:26px}
 .gnp.coarse .gnp-in{height:60px;font-size:30px}
