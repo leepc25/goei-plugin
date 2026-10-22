@@ -224,7 +224,7 @@
    "hold": 0,
    "origin": 0,
    "frames": 4,
-   "bytes": 11403,
+   "bytes": 11202,
    "hands": [
     [
      [
@@ -764,7 +764,7 @@
    "hold": 0,
    "origin": 0,
    "frames": 7,
-   "bytes": 13449,
+   "bytes": 12287,
    "hands": [
     [
      [
@@ -1216,7 +1216,7 @@
    "hold": 0.1,
    "origin": 0,
    "frames": 8,
-   "bytes": 19744,
+   "bytes": 19670,
    "hands": [
     [
      [
@@ -1890,7 +1890,7 @@
    "hold": 0,
    "origin": 0,
    "frames": 4,
-   "bytes": 11953,
+   "bytes": 9787,
    "hands": [
     [
      [
@@ -1952,7 +1952,7 @@
    "hold": 0,
    "origin": 0,
    "frames": 5,
-   "bytes": 13220,
+   "bytes": 13758,
    "hands": [
     [
      [
@@ -2526,7 +2526,7 @@
    "hold": 0.12,
    "origin": 0,
    "frames": 8,
-   "bytes": 19349,
+   "bytes": 11781,
    "hands": [
     [
      [
@@ -3030,7 +3030,7 @@
    "hold": 0,
    "origin": 0,
    "frames": 6,
-   "bytes": 8905,
+   "bytes": 8173,
    "hands": [
     [
      [
@@ -3264,7 +3264,7 @@
    "hold": 0,
    "origin": 0,
    "frames": 7,
-   "bytes": 15073,
+   "bytes": 11226,
    "hands": [
     [
      [
@@ -3660,7 +3660,7 @@
    "hold": 0.05,
    "origin": 0,
    "frames": 6,
-   "bytes": 17375,
+   "bytes": 17476,
    "hands": [
     [
      [
@@ -3748,7 +3748,7 @@
    "hold": 0,
    "origin": 0,
    "frames": 5,
-   "bytes": 8905,
+   "bytes": 8875,
    "hands": [
     [
      [
@@ -4317,7 +4317,7 @@
    "hold": 0,
    "origin": 0,
    "frames": 8,
-   "bytes": 19494,
+   "bytes": 15493,
    "hands": [
     [
      [
@@ -5520,8 +5520,44 @@
    "adv": 0,
    "hold": 0,
    "origin": 0,
-   "frames": 2,
-   "bytes": 9307
+   "frames": 7,
+   "bytes": 17568
+  },
+  "showerturn": {
+   "label": "수건 차림으로 돌아섬",
+   "group": "씻기·집안일·운동",
+   "fps": 8,
+   "loop": false,
+   "hits": [],
+   "adv": 0,
+   "hold": 0,
+   "origin": 0,
+   "frames": 3,
+   "bytes": 6625
+  },
+  "shower": {
+   "label": "뒷모습 머리 감기",
+   "group": "씻기·집안일·운동",
+   "fps": 8,
+   "loop": false,
+   "hits": [],
+   "adv": 0,
+   "hold": 0,
+   "origin": 0,
+   "frames": 6,
+   "bytes": 9354
+  },
+  "bath": {
+   "label": "욕조",
+   "group": "씻기·집안일·운동",
+   "fps": 8,
+   "loop": false,
+   "hits": [],
+   "adv": 0,
+   "hold": 0,
+   "origin": 0,
+   "frames": 4,
+   "bytes": 5058
   }
  }
 }

@@ -137,15 +137,15 @@ clip('risestab','rises straight up out of a deep squat, thrusting the near finge
 # 3연타: 1타 앞손 관수(손 먼저, 앞발 반 걸음 2px) → 2타 뒷손 아바니코 베기(허리 먼저, 4px) → 3타 양손 X 런지(8px). 1·2타는 몸 이동 최소
 STAB=P((X+2,71),9,-0.4,-0.1,(X+19+2,G),(X-16,G-1),('r',44,4),('r',12,20),le=('e',22,5),re=('e',5,13))
 clip('stab1','spear-hand thrust: near hand straight forward with fingers together, hand first, then a half step',tail([S0,handfirst(S0,STAB,.5),STAB,STAB,lerp(STAB,STANCE(2),.5),STANCE(2)],False))
-SL0=P((X+2,71),6,0.4,0.3,(X+19,G),(X-16,G-1),('r',14,16),('r',8,4),le=('e',8,11),re=('e',12,10))       # 뒷손을 앞어깨 앞으로 감음
-SL1=P((X+6,72),10,-0.2,-0.2,(X+23,G),(X-14,G-1),('r',16,12),('r',40,6),le=('e',8,10),re=('e',22,8))     # 수평으로 끝까지 쓸어냄
-clip('slash2','backhand slash: rear hand starts at the near shoulder and whips out horizontally, hips turn first',tail([STANCE(2),SL0,hipfirst(SL0,SL1,.5),SL1,SL1,lerp(SL1,STANCE(6),.5)],False))
+SL0=P((X+2,71),4,0.4,0.3,(X+19,G),(X-16,G-1),('r',14,16),('r',8,-14),le=('e',8,11),re=('e',10,-4))      # 뒷손을 귀 높이로 감아올림(검수 03:55: 1타와 같은 직선 뻗기 → 위→아래 사선으로 바꿈)
+SL1=P((X+6,73),14,-0.2,-0.2,(X+23,G),(X-14,G-1),('r',16,12),('r',34,26),le=('e',8,10),re=('e',18,14))   # 손등으로 앞아래까지 사선 베기
+clip('slash2','backhand slash: rear open hand starts high by her ear and slices diagonally down and forward',tail([STANCE(2),SL0,hipfirst(SL0,SL1,.5),SL1,SL1,lerp(SL1,STANCE(6),.5)],False))
 LU=P((X+18,76),6,-0.3,-0.2,(X+48,G),(X-8,G),('r',46,2),('r',44,4),le=('e',22,3),re=('e',21,5))      # 펜싱 런지: 두 손 끝 모아 일직선
 clip('pierce3','fencing lunge: both hands thrust forward fingertips first, front foot lunges far, rear leg straight',
      tail([STANCE(6),P((X+6,72),8,-0.2,-0.1,(X+24,G),(X-10,G-1),('r',10,12),('r',8,13),le=('e',6,10),re=('e',4,11)),handfirst(STANCE(6),LU,.45),LU,LU,LU,lerp(LU,STANCE(14),.5),STANCE(14)],False))
 EX0=P((X+4,64),4,-0.1,0,(X+14,G),(X-6,G),('r',24,-12),('r',10,14),le=('e',12,-2),re=('e',4,12))
-EX1=P((X+4,64),5,-0.1,0,(X+14,G),(X-6,G),('r',24,-12),('r',26,-4),le=('e',12,-2),re=('e',14,6))
-clip('execute','close behind someone: near hand grips high, other hand makes one tiny precise stab, then still',
+EX1=P((X+4,64),5,-0.1,0,(X+14,G),(X-6,G),('r',24,-12),('r',19,-2),le=('e',12,-2),re=('e',8,9))   # 찌르는 손은 쥔 손보다 짧고 아래(권투 가드처럼 두 손 나란히 → 금지)
+clip('execute','near open hand grips high at head height, other hand rises from the hip in one short fingertip stab',
      tail([STANCE(4),EX0,EX0,EX1,EX1,EX1,lerp(EX1,STANCE(4),.5)],False))
 PS0=P((X+8,76),30,-0.3,-0.2,(X+28,G),(X-22,G-2),('r',30,14),('r',4,18),le=('e',14,10),re=('e',0,13))
 PS1=P((X+30,76),32,-0.3,-0.2,(X+50,G),(X+2,G-3),('r',36,12),('r',2,20),le=('e',18,8),re=('e',-1,13))
@@ -158,9 +158,9 @@ SU=P((X,70),6,-0.2,-0.1,(X+16,G),(X-15,G-1),('r',18,-10),('r',10,18),le=('e',13,
 clip('spineup','raises the near forearm upright in front of her eyes, fingers pointing up, low stance',tail([S0,lerp(S0,SU,.5),SU,SU,SU],False))
 TH=P((X+1,70),9,-0.3,-0.1,(X+17,G),(X-15,G-1),('r',34,-4),('r',10,18),le=('e',20,1),re=('e',5,12))
 clip('throw','quick dart throw: snaps the near forearm and wrist forward from upright, body still',tail([SU,TH,lerp(TH,SU,.5),SU],False))
-FA0=P((X-1,71),4,0.5,0.4,(X+16,G),(X-15,G-1),('r',12,18),('r',-8,8),le=('e',6,12),re=('e',-6,12))
-FA1=P((X+2,71),10,-0.5,-0.4,(X+18,G),(X-14,G-1),('r',12,18),('r',38,2),le=('e',6,12),re=('e',20,4))
-clip('fan','twists the waist and sweeps the rear arm flat across in front of her, flinging the open hand',tail([S0,FA0,FA0,hipfirst(FA0,FA1,.5),FA1,lerp(FA1,S0,.5)],False))
+FA0=P((X-1,71),4,0.5,0.4,(X+16,G),(X-15,G-1),('r',12,18),('r',-10,22),le=('e',6,12),re=('e',-6,13))   # 뒷손을 골반 뒤 낮게
+FA1=P((X+2,71),8,-0.5,-0.4,(X+18,G),(X-14,G-1),('r',12,18),('r',34,-12),le=('e',6,12),re=('e',18,-3))   # 아래→위로 크게 뿌려 올림(2타의 위→아래와 반대)
+clip('fan','twists the waist, swings the rear arm from low behind the hip up and forward, open fingers fling',tail([S0,FA0,FA0,hipfirst(FA0,FA1,.5),FA1,lerp(FA1,S0,.5)],False))
 PL0=P((X,70),6,0,0,(X+16,G),(X-15,G-1),('r',18,8),('r',10,14),le=('e',10,10),re=('e',8,12))
 PL1=P((X,70),6,0,0,(X+16,G),(X-15,G-1),('r',18,8),('r',22,-4),le=('e',10,10),re=('e',14,4))
 clip('pluck','holds the near forearm out, the other hand slides along it and pulls something long out upward',tail([S0,PL0,lerp(PL0,PL1,.5),PL1,lerp(PL1,S0,.5)],False))

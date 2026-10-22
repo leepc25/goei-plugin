@@ -80,13 +80,24 @@ def frames_of(k):
 AIR = {'jump', 'airrain', 'fall'}   # 공중 장은 발이 떠 있는 게 맞음
 FIX_ERASE = {   # 클립: {장: [(x0, y0, x1, y1), ...]}  생성기가 그린 소품·효과를 지울 사각형(검수 결과)
     'execute': {4: [(102, 48, 112, 56)], 5: [(102, 48, 112, 56)]},   # 손끝 은색 바늘(가시는 코드가 그림)
-    'shotgun': {0: [(152, 50, 192, 76)]},                            # 총구 불꽃(효과는 코드)
-    'engage': {0: [(80, 80, 95, 90)], 1: [(84, 81, 101, 91)]},       # 손 앞 번진 잔상
+    'shotgun': {0: [(152, 50, 192, 76), (151, 66, 152, 68)]},        # 총구 불꽃(효과는 코드)
+    'engage': {0: [(80, 80, 95, 90)], 1: [(84, 81, 101, 91)],          # 손 앞 번진 잔상
+               2: [(91, 84, 104, 93)], 3: [(92, 85, 104, 93)]},
+    'pierce3': {1: [(91, 83, 104, 90)]},                             # 손 앞 번짐(지운 가시 흔적)
+    'pipe': {0: [(150, 80, 176, 92)]},                               # 파이프 끝 잔상 꼬리
     'door': {i: [(96, 0, 192, 144)] for i in range(7)},              # 생성기가 그린 문짝·손잡이(문은 배경 소품)
 }
 FIX_REPLACE = {'getup': {0: ('down', -1)},   # 머리 위 회색 먼지 → 다운 마지막 누운 장
                'land': {0: ('fall', -1)},    # 검게 뭉개진 첫 장 → 낙하 마지막 장
-               'door': {6: ('door', 5)}}     # 문짝이 몸을 덮은 장 → 손잡이 잡은 장
+               'door': {6: ('door', 5)},     # 문짝이 몸을 덮은 장 → 손잡이 잡은 장
+               # 독립 검수(03:55)에서 나온 녹은 얼굴·정면으로 돈 장·번진 장 → 같은 클립의 멀쩡한 이웃 장
+               'pin': {0: ('pin', 2), 1: ('pin', 2), 6: ('pin', 5), 7: ('pin', 5)},
+               'sink': {3: ('sink', 2)}, 'rise': {0: ('sink', 2)},
+               'down': {2: ('down', 1), 3: ('down', 4)},
+               'eat': {1: ('eat', 2), 3: ('eat', 2)},
+               'crouchwalk': {5: ('crouchwalk', 4)},
+               'support': {5: ('support', 4), 6: ('support', 4)}}
+SNAP = {'stance', 'hit', 'engage'}   # 발바닥이 y=134에 떠 있는 클립 → 바닥선에 내림
 
 
 def detach(im):
@@ -126,8 +137,29 @@ def clean(k, fr):
         f = detach(f)
         if k not in AIR:   # 발이 바닥선(불투명 맨 아래 y=135) 아래로 내려간 장은 위로 당김
             bb = f.split()[-1].getbbox()
-            if bb and bb[3] - 1 > 135:
+            if bb and (bb[3] - 1 > 135 or (k in SNAP and bb[3] - 1 < 135)):
                 g = Image.new('RGBA', f.size, (0, 0, 0, 0)); g.paste(f, (0, 135 - (bb[3] - 1))); f = g
+        out.append(f)
+    return out
+
+
+def gpt_clean(fr):
+    """GPT 납품 장 규격 맞춤(의뢰서 §2): 알파 0/255, 색이 많은 장은 같은 클립 깨끗한 장의 팔레트로, 발바닥 y=135."""
+    import numpy as np
+    arrs = [np.array(f.convert('RGBA')) for f in fr]
+    pal = np.unique(np.concatenate([a[a[..., 3] > 0][:, :3] for a in arrs if len(np.unique(a[a[..., 3] > 0][:, :3], axis=0)) <= 64] or [np.zeros((1, 3), np.uint8)]), axis=0).astype(int)
+    out = []
+    for a in arrs:
+        a = a.copy(); on = a[..., 3] >= 128
+        a[..., 3] = np.where(on, 255, 0)
+        if len(np.unique(a[on][:, :3], axis=0)) > 64:
+            px = a[on][:, :3].astype(int)
+            idx = ((px[:, None, :] - pal[None, :, :]) ** 2).sum(-1).argmin(1)
+            a[on, :3] = pal[idx]
+        f = Image.fromarray(a, 'RGBA')
+        bb = f.split()[-1].getbbox()
+        if bb and bb[3] - 1 != 135:
+            g = Image.new('RGBA', f.size, (0, 0, 0, 0)); g.paste(f, (0, 135 - (bb[3] - 1))); f = g
         out.append(f)
     return out
 
@@ -172,7 +204,7 @@ def main():
     for k, grp, label in defs:
         fr = frames_of(k)
         if k == 'talk': continue   # 말하기 = 대기 장 + 말풍선(코드)
-        if fr and k not in NUDE: fr = clean(k, fr)
+        if fr: fr = gpt_clean(fr) if k in NUDE else clean(k, fr)
         if not fr:
             missing.append(k); continue
         cv = COMBAT.get(k)

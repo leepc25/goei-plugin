@@ -31,6 +31,15 @@
   .pad.show { display: flex; }
   h2 { font-size: 15px; margin: 18px 0 4px; }
   .miss { color: #ff9a8a; }
+  @media (orientation: landscape) and (max-height: 520px) {   /* 폰 가로: 화면을 높이에 맞추고 버튼은 화면 아래에 겹쳐 놓음 */
+    .wrap { padding: 0 0 40px; }
+    .screen { width: min(100vw, calc(100svh * 16 / 9)); height: auto; margin: 0 auto; }
+    .pad.show { position: fixed; left: 0; right: 0; bottom: 0; margin: 0; padding: 4px 6px; justify-content: space-between; align-items: flex-end; pointer-events: none; z-index: 5; }
+    .pad.show button { pointer-events: auto; min-height: 30px; font-size: 10px; background: rgba(42, 51, 58, .62); }
+    .dpad { grid-template-columns: repeat(3, 40px); }
+    .acts { flex: 0 1 58%; gap: 3px; }
+    .acts button:nth-child(n+11) { display: none; }   /* 생활·시험 버튼(커피·맞기 등)은 가로 화면에서 숨김: 아래 클립 목록으로 재생 */
+  }
 </style>
 <div class="wrap">
   <h1>스팡달 전 동작 시연판 · 가시·배후·그림자 규칙</h1>
