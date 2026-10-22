@@ -1,6 +1,7 @@
 // 모바일 터치 조작: 왼쪽 떠다니는 스틱 + 오른쪽 버튼 무리. 손가락을 떼지 않고 옆 버튼으로 미끄러져도 눌린다.
 // 모든 버튼은 키보드와 같은 키 코드를 InputHub 에 누르고 뗀다.
 import { drawHudItemIcon } from './hud';
+import { TOUCH_IMG } from './kit.gen';
 import type { InputHub } from './input';
 import type { UiSettings } from './settings';
 import { portraitTop } from './stage';
@@ -80,9 +81,12 @@ export class TouchPad {
     this.knob = this.root.querySelector('.tp-knob')!;
     const mk = (b: Btn, cls: string) => {
       const el = document.createElement('div');
-      el.className = `tp-b gk-slot ${cls}`;
+      // GPT 도트 단추 판(그림이 박힘). 판이 있으면 글씨는 숨긴다 (검수 12: 웹 단추 + 시스템 글꼴)
+      const plate = TOUCH_IMG[cls === 'item' ? 'slot' : b.id];
+      el.className = `tp-b ${plate ? 'pl' : 'gk-slot'} ${cls}`;
       el.dataset.id = b.id;
       el.innerHTML = `<b>${b.label}</b><i>${b.key}</i>`;
+      if (plate) el.style.backgroundImage = `url("${plate}")`;
       this.root.append(el);
       b.el = el;
       this.btns.push(b);
@@ -296,6 +300,7 @@ export class TouchPad {
     const b = this.btns.find((x) => x.id === 'ult')!.el!;
     b.style.setProperty('--g', String(Math.max(0, Math.min(1, v))));
     b.classList.toggle('full', v >= 1);
+    if (TOUCH_IMG.ult_ready) b.style.backgroundImage = `url("${TOUCH_IMG[v >= 1 ? 'ult_ready' : 'ult']}")`;
   }
   /** 버튼 강조 (조사할 것이 있을 때 E, 탄이 적을 때 R 등) */
   hint(id: string, on: boolean) {

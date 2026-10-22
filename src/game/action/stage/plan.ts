@@ -5,7 +5,7 @@ import { depthLabel } from './data/floortypes';
 import { CHUNK_W, ROOM_W, Y_BOTTOM, Y_TOP, laneY, type Floor, type FloorSegment, type Palette, type ServiceCell, type ServiceZone, type Terrain } from './types';
 import type { ElevatorButton } from './elevator';
 import { FLOOR_TYPES } from './data/floortypes';
-import { drawFloor, drawLedge, floorHasGrid, floorPattern, drawWallCell, placeFor, seamPillar, wallSolidSpans } from '../art/bg';
+import { drawFloor, drawLedge, drawPipeBundle, floorHasGrid, isHighSign, floorPattern, drawWallCell, placeFor, seamPillar, wallSolidSpans } from '../art/bg';
 
 /** FloorPlan에 붙여 두는 스테이지 정보 (엔진은 몰라도 된다) */
 export interface StagePlan extends FloorPlan {
@@ -39,13 +39,18 @@ export function narrowBack(t: Terrain, terr: readonly Terrain[] = []): { span: [
     if (o.x1 <= t.x0 && (o.x1 + t.x0) / 2 > a) (a = (o.x1 + t.x0) / 2), (clipped = true);
     else if (o.x0 >= t.x1 && (t.x1 + o.x0) / 2 < b) (b = (t.x1 + o.x0) / 2), (clipped = true);
   }
-  if (!clipped) return { span: [a, b], xs };
+  // 벽 그림의 문·명패·게시판·액자·창 앞 사물함은 뺀다(그 칸은 낮은 차단대): 키 큰 사물함이 벽 그림을 가렸다 (검수 23)
+  const wall = lockerWall.get(t);
+  const open = (xs: number[]) => (wall ? xs.filter((x) => !wall.spans.some(([s0, s1]) => x + wall.half > s0 && x - wall.half < s1)) : xs);
+  if (!clipped) return { span: [a, b], xs: open(xs) };
   if (b - a < 2 * H) return { span: [Math.max(a, t.x0 - 20), Math.min(b, t.x1 + 20)], xs: [] };
   const fit: number[] = [];
   for (let x = a + H; x <= b - H; x += 100) fit.push(x);
   if (fit[fit.length - 1] < b - H - 1) fit.push(b - H);
-  return { span: [a, b], xs: fit };
+  return { span: [a, b], xs: open(fit) };
 }
+/** floorPlan이 채운다: 좁은 길마다 피할 벽 그림 구간과 사물함 그림 절반 폭 */
+const lockerWall = new WeakMap<Terrain, { spans: [number, number][]; half: number }>();
 export const narrowBackSpan = (t: Terrain, terr: readonly Terrain[] = []): [number, number] | null => narrowBack(t, terr)?.span ?? null;
 
 const NOLOCK_TYPES = new Set(['chase', 'deep']);
@@ -70,6 +75,8 @@ export function floorPlan(f: Floor, id: string, startX = 240): StagePlan {
     if (s.role === 'enemy' && s.data.harmless) props.push({ id: `h${s.id}`, kind: 'npc', x: s.x, y: laneY(s.lane), w: 50, h: 150, label: '평범한 직원' });
   }
   const doorSpans = spreadProps(f, props, startX);
+  const lockerHalf = (propArtSize('clutter', '사물함')?.w ?? 150) / 2;
+  for (const sg of f.segments) for (const t of sg.terrain) if (t.kind === 'narrow') lockerWall.set(t, { spans: doorSpans, half: lockerHalf });
   // 싸움 구간: 조각마다 적 자리를 묶는다. 추격·B-12는 화면을 잠그지 않으므로 층 tick이 직접 부른다.
   const encounters: Encounter[] = [];
   if (!NOLOCK_TYPES.has(f.type)) {
@@ -214,7 +221,7 @@ function spreadProps(f: Floor, props: PropSpec[], startX: number): [number, numb
   const fixed = (p: PropSpec) => FIXED_PROPS.has(p.kind) || meaning.has(p.id) || p.x < startX + 60;
   // 입간판(로비 6번 판 그림으로 그려지는 것 전부)은 한 화면에 하나 (검수 13-2, 14-1: 화면마다 2~3개, 같은 「비상구」 둘이 나란히).
   // 규칙·갈림길 표지는 남기고, 뜻 없는 꾸밈 판은 다른 판과 1400px 안이거나 앞 판과 같은 것이면 뺀다.
-  const boardLike = (p: PropSpec) => isStandBoard(p.kind, p.label, f.type);
+  const boardLike = (p: PropSpec) => isStandBoard(p.kind, p.label, f.type) && !isHighSign(p.kind, p.label);
   const must = (p: PropSpec) => meaning.has(p.id) || ruled.has(p.id);
   // 판 자리: 고정된 판(갈림길·순서) → 규칙 표지 → 꾸밈 판 순으로 잡는다. 꾸밈 판은 자리가 없거나, 넷째거나, 바로 앞 판과 같은 그림이면 뺀다.
   const kept: PropSpec[] = props.filter((p) => boardLike(p) && fixed(p));
@@ -242,6 +249,25 @@ function spreadProps(f: Floor, props: PropSpec[], startX: number): [number, numb
         break;
       }
     if (x !== null) p.x = x;
+  }
+  // 갈림길·순서 표지(자리가 뜻이라 고정)도 문·벽 문·다른 고정 소품을 가리면 가까운 빈 벽으로 조금만 민다 (뜻이 바뀌지 않는 거리 안)
+  for (const p of props.filter((q) => boardLike(q) && meaning.has(q.id))) {
+    const h = artW(p, f.type) / 2;
+    const ok = (x: number) =>
+      x - h >= 40 && x + h <= f.width - 40 &&
+      !keepOut.some(([a, b]) => x + h + 6 > a && x - h - 6 < b) &&
+      !props.some((q) => q !== p && fixed(q) && !boardLike(q) && Math.abs(q.y - p.y) < 90 && Math.abs(q.x - x) < h + artW(q, f.type) / 2 + 12);
+    if (ok(p.x)) continue;
+    for (let d = 12; d <= 360; d += 12) {
+      if (ok(p.x - d)) {
+        p.x -= d;
+        break;
+      }
+      if (ok(p.x + d)) {
+        p.x += d;
+        break;
+      }
+    }
   }
   for (const p of props) if (fixed(p)) taken.push({ a: p.x - artW(p, f.type) / 2, b: p.x + artW(p, f.type) / 2, y: p.y });
   const free = (p: PropSpec, x: number) => {
@@ -622,6 +648,8 @@ export function drawTerrain(ctx: CanvasRenderingContext2D, t: Terrain, pal: Pale
       const x0 = Math.round(t.x0 / 4) * 4,
         x1 = Math.round(t.x1 / 4) * 4;
       const by = Math.round((y0 - 236) / 4) * 4; // 보 밑면
+      // 배관 그림(어둠 층 물건 3번)을 천장부터 밑면까지 다발로 쌓는다. 그림이 없으면 아래 코드 보
+      if (drawPipeBundle(ctx, x0, x1, by + 32)) break;
       // 보 몸통: 위는 천장 그늘, 아래로 밝아지는 3단 + 밑면 모서리
       const bands: [number, string][] = [[0.45, '#2b2c2e'], [0.3, '#45474a'], [0.25, '#5b5e61']];
       let yy = 0;
@@ -679,6 +707,14 @@ export function drawTerrain(ctx: CanvasRenderingContext2D, t: Terrain, pal: Pale
         const nb = narrowBack(t, segTerrain)!;
         layers.push({ y: a, x0: nb.span[0], x1: nb.span[1], draw: (c) => {
           if (!nb.xs.length) return drawBarricade(c, nb.span[0], nb.span[1], a);
+          // 사물함을 뺀 칸(벽 그림 앞)은 차단대로 메운다: 먼저 차단대, 그 위에 사물함
+          const half = (propArtSize('clutter', '사물함')?.w ?? 150) / 2;
+          let from = nb.span[0];
+          for (const x of [...nb.xs, Infinity]) {
+            const to = x === Infinity ? nb.span[1] : x - half;
+            if (to - from > 40) drawBarricade(c, from, to, a);
+            from = Math.max(from, x + half);
+          }
           for (const x of nb.xs) if (!drawPropArt(c, 'clutter', '사물함', x, a)) break;
         } });
       } else if (a > y0 && !row('사물함', a)) {
