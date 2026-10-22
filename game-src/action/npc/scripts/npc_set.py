@@ -32,6 +32,14 @@ BASIC={  # 4.1 줍기·마시기·먹기·피로 (잼트리, 고그니쟈, 데�
 }
 SIG={'jaemtri':['poke','shush','glare'],'gognija':['bellow','pill','welcome','present','steeple','tinker'],
      'dejure':['sorry','bloom','work','scan'],'konjyuce':['lift','wink','protest','deadpan','wonder']}
+# 본부 상주 넷은 던전 이동 동작을 만들지 않음(본부 설계, 사용자 2026-10-22 03:53 「그래」)
+DUNGEON={'ladder','rope','crawl','idle_light','walk_light','run_light','sneak','hide','fall','land','mantle','vault'}
+# 본부에서 쓰는 사람별 동작(같은 결정): npc_rig에 있는 것 중 SIG 밖의 것
+EXTRA={'jaemtri':['type','stir'],'dejure':['startle','stir'],'konjyuce':['carry']}
+HQ1={'jaemtri':['type','coffee','walk_cup','poke','shush','glare'],
+     'gognija':['tinker','present','pill','drink','bellow','welcome','steeple'],
+     'dejure':['scan','coffee','stir','startle','sorry','bloom','work'],
+     'konjyuce':['idle_box','walk_box','run_box','lift','protest','wink','deadpan','wonder','run','carry','bathin_k','bathout_k']}
 def hq(id):
     j=HQ.index(id); st=npc_life.STYLE[id]; out={}
     out.update(pick(id,'idle','walk'))
@@ -39,7 +47,9 @@ def hq(id):
     for n in ('pickup','drink','eat','tired'): out[n]=(BASIC[n][j],RS(T(n),st))
     out.update(pick(id,'talk'))
     out.update(pick(id,*SIG[id]))
-    for n,(a,ps,tl) in npc_life.life_clips(id).items(): out[n]=(a,ps)
+    out.update(pick(id,*[n for n in EXTRA.get(id,[]) if n not in out]))
+    for n,(a,ps,tl) in npc_life.life_clips(id).items():
+        if n not in DUNGEON: out[n]=(a,ps)
     out['handwash']=(('washes her hands neatly, palms then backs, then dabs them dry','scrubs his hands vigorously with big motions, then shakes them hard',
                       'washes her hands very carefully, finger by finger','rubs her palms together fast and splashy, then flicks her hands dry')[j],RS(T('handwash'),st))
     if id=='konjyuce':   # 욕실 대체 2클립: 옷 입은 채(설계서 4.4)
@@ -260,8 +270,8 @@ ALL=HQ+MER+BODY+['passenger_3y','passenger_pack']
 def phase1(id):
     c=clips(id)
     if id in HQ:
-        keep=['idle','walk','run','talk','turn','nod','point','wave','surprise','smile']+SIG[id]+(['bathin_k','bathout_k'] if id=='konjyuce' else [])
-        return [n for n in c if n in keep]
+        keep=['idle','walk','talk','turn']+HQ1[id]
+        return [n for n in keep if n in c]
     return list(c)
 def cost(nf): return 3 if nf<=8 else 4   # 실측 2026-10-22: 4장도 3회
 if __name__=='__main__':
