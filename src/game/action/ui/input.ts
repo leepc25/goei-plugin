@@ -18,7 +18,7 @@ export class InputHub {
   private analog = new Map<Source, { x: number; y: number }>();
   /** 마지막으로 쓴 입력 장치 (안내 글자 고르기용) */
   last: Source = 'kb';
-  /** 켜면 터치·패드 입력을 가짜 KeyboardEvent 로 target 에 쏜다 */
+  /** 켜면 장치별 입력을 합친 KeyboardEvent만 target에 보낸다 (키보드 원본은 차단). */
   synth = false;
   target: EventTarget | null = null;
   /** 메뉴가 열려 있으면 게임 입력을 막고 메뉴가 받는다 */
@@ -42,7 +42,7 @@ export class InputHub {
       this.down.add(code);
       this.edgeDown.add(code);
       this.since.set(code, this.now());
-      if (src !== 'kb') this.emit(code, true);
+      this.emit(code, true);
       for (const f of this.listeners) f(code, true, src);
     }
   }
@@ -56,7 +56,7 @@ export class InputHub {
     for (const s of this.bySrc.values()) if (s.has(code)) return;
     this.down.delete(code);
     this.edgeUp.add(code);
-    if (src !== 'kb') this.emit(code, false);
+    this.emit(code, false);
     for (const f of this.listeners) f(code, false, src);
   }
   releaseSource(src: Source) {
@@ -108,19 +108,28 @@ export class InputHub {
   /** 키보드 받기. 글 입력칸에 초점이 있으면 무시한다 */
   attachKeyboard(el: Window | HTMLElement, opts: { prevent?: (code: string) => boolean } = {}) {
     this.detach?.();
+    const physical = new Set<string>();
     const onKey = (e: Event) => {
       const ev = e as KeyboardEvent;
       if ((ev as unknown as Record<string, boolean>)[MARK]) return;
       const t = ev.target as HTMLElement | null;
-      if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable)) return;
+      const editing = t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable);
+      if (editing && ev.type === 'keydown') return;
+      // The engine must only see the aggregate edge, including when a menu consumes it.
+      if (this.synth) ev.stopImmediatePropagation();
       if (ev.type === 'keydown') {
         if (opts.prevent?.(ev.code) ?? true) ev.preventDefault();
         if (ev.repeat) return;
+        physical.add(ev.code);
         this.press(ev.code, 'kb');
-      } else this.release(ev.code, 'kb');
+      } else {
+        physical.delete(ev.code);
+        const code = ALIAS[ev.code] ?? ev.code;
+        if (![...physical].some(c => (ALIAS[c] ?? c) === code)) this.release(code, 'kb');
+      }
     };
-    const blur = () => this.releaseAll();
-    const vis = () => document.hidden && this.releaseAll();
+    const blur = () => { physical.clear(); this.releaseAll(); };
+    const vis = () => document.hidden && blur();
     el.addEventListener('keydown', onKey);
     el.addEventListener('keyup', onKey);
     window.addEventListener('blur', blur);

@@ -44,7 +44,7 @@ export class TouchPad {
   private zone: HTMLElement;
   private base: HTMLElement;
   private knob: HTMLElement;
-  private ptr = new Map<number, { kind: 'stick' } | { kind: 'btn'; b: Btn }>();
+  private ptr = new Map<number, { kind: 'stick' } | { kind: 'btn'; b: Btn | null }>();
   private count = new Map<string, number>();
   private stickPid: number | null = null;
   private sx = 0;
@@ -104,15 +104,28 @@ export class TouchPad {
     this.root.addEventListener('pointermove', (e) => this.move(e), opt);
     this.root.addEventListener('pointerup', (e) => this.up(e), opt);
     this.root.addEventListener('pointercancel', (e) => this.up(e), opt);
+    this.root.addEventListener('lostpointercapture', (e) => this.up(e), opt);
+    // Capture may fail on an embedded/rotated surface; still receive its final release.
+    window.addEventListener('pointerup', this.onPointerEnd);
+    window.addEventListener('pointercancel', this.onPointerEnd);
+    window.addEventListener('blur', this.onBlur);
+    document.addEventListener('visibilitychange', this.onVisibility);
     this.root.addEventListener('contextmenu', (e) => e.preventDefault());
     window.addEventListener('touchstart', this.onAnyTouch, { passive: true, capture: true });
     this.layout();
   }
+  private onPointerEnd = (e: PointerEvent) => this.up(e);
+  private onBlur = () => this.releaseAll();
+  private onVisibility = () => { if (document.hidden) this.releaseAll(); };
   private onAnyTouch = () => {
-    if (!this.seenTouch) (this.seenTouch = true), this.refresh();
+    if (!this.seenTouch) {
+      this.seenTouch = true;
+      if (!this.shown) this.refresh();
+    }
   };
   /** 설정·화면 크기가 바뀌면 다시 배치 */
   layout() {
+    this.releaseAll();
     const s = this.st();
     const bw = this.layer.clientWidth || 800,
       bh = this.layer.clientHeight || 400;
@@ -333,7 +346,11 @@ export class TouchPad {
     this.count.set(b.code, Math.max(0, n));
     b.el!.classList.toggle('on', n > 0);
     if (b.code === 'Escape' || b.code === 'KeyZ') {
-      if (on && n === 1) this.onMenu(b.code);
+      if (on && n === 1) {
+        // Closing/opening a map or menu must not resume a hidden held stick.
+        this.releaseAll();
+        this.onMenu(b.code);
+      }
       return;
     }
     if (on && n === 1) {
@@ -342,6 +359,7 @@ export class TouchPad {
     } else if (!on && n <= 0) this.hub.release(b.code, 'touch');
   }
   private down(e: PointerEvent) {
+    if (!this.shown || (e.pointerType === 'mouse' && e.button !== 0)) return;
     e.preventDefault();
     const p = this.local(e);
     const b = this.hit(p.x, p.y);
@@ -372,22 +390,27 @@ export class TouchPad {
     if (!st) return;
     e.preventDefault();
     const p = this.local(e);
+    if (p.x < 0 || p.y < 0 || p.x >= this.layer.clientWidth || p.y >= this.layer.clientHeight) {
+      this.up(e);
+      return;
+    }
     if (st.kind === 'stick') {
       this.stickTo(p.x - this.zr.x, p.y - this.zr.y);
       return;
     }
     const b = this.hit(p.x, p.y);
-    if (b && b !== st.b) {
-      this.hold(st.b, false);
-      this.hold(b, true);
+    if (b !== st.b) {
+      if (st.b) this.hold(st.b, false);
       st.b = b;
+      if (b) this.hold(b, true);
     }
   }
   private up(e: PointerEvent) {
     const st = this.ptr.get(e.pointerId);
     if (!st) return;
     this.ptr.delete(e.pointerId);
-    if (st.kind === 'btn') this.hold(st.b, false);
+    if (this.root.hasPointerCapture(e.pointerId)) this.root.releasePointerCapture(e.pointerId);
+    if (st.kind === 'btn') { if (st.b) this.hold(st.b, false); }
     else {
       this.stickPid = null;
       this.setStick(0, 0);
@@ -436,22 +459,30 @@ export class TouchPad {
     if (wantRun && !this.runOn) {
       this.runOn = true;
       this.runSince = performance.now();
+      // A pending delayed release still owns one hold; reuse it on re-entry.
+      const pending = this.runTimer !== 0;
       clearTimeout(this.runTimer);
-      this.hold(shiftBtn, true);
+      this.runTimer = 0;
+      if (!pending) this.hold(shiftBtn, true);
     } else if (!wantRun && this.runOn) {
       this.runOn = false;
       const left = 250 - (performance.now() - this.runSince);
       clearTimeout(this.runTimer);
-      if (left > 0) this.runTimer = window.setTimeout(() => this.hold(shiftBtn, false), left);
+      this.runTimer = 0;
+      if (left > 0) this.runTimer = window.setTimeout(() => {
+        this.runTimer = 0;
+        this.hold(shiftBtn, false);
+      }, left);
       else this.hold(shiftBtn, false);
     }
   }
   releaseAll() {
-    for (const [id, st] of this.ptr) {
-      if (st.kind === 'btn') this.hold(st.b, false);
-      this.ptr.delete(id);
-    }
-    if (this.runOn) (this.runOn = false), clearTimeout(this.runTimer), this.hold(this.btns.find((b) => b.code === 'ShiftLeft')!, false);
+    const ids = [...this.ptr.keys()];
+    this.ptr.clear();
+    for (const id of ids) if (this.root.hasPointerCapture(id)) this.root.releasePointerCapture(id);
+    clearTimeout(this.runTimer);
+    this.runTimer = 0;
+    this.runOn = false;
     this.stickPid = null;
     this.setStick(0, 0);
     this.count.clear();
@@ -460,6 +491,10 @@ export class TouchPad {
     this.restBase();
   }
   dispose() {
+    window.removeEventListener('pointerup', this.onPointerEnd);
+    window.removeEventListener('pointercancel', this.onPointerEnd);
+    window.removeEventListener('blur', this.onBlur);
+    document.removeEventListener('visibilitychange', this.onVisibility);
     window.removeEventListener('touchstart', this.onAnyTouch, { capture: true });
     this.releaseAll();
     this.root.remove();

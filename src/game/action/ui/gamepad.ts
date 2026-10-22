@@ -8,6 +8,7 @@ export class PadReader {
   connected = '';
   private prev = new Map<string, boolean>();
   private rumbleOn = true;
+  private index: number | null = null;
   constructor(private hub: InputHub) {}
   setRumble(on: boolean) {
     this.rumbleOn = on;
@@ -20,9 +21,17 @@ export class PadReader {
   poll() {
     const p = this.pad();
     if (!p) {
-      if (this.connected) (this.connected = ''), this.hub.releaseSource('pad'), this.prev.clear();
+      this.connected = '';
+      this.index = null;
+      this.hub.releaseSource('pad');
+      this.prev.clear();
       return;
     }
+    if (this.index !== p.index || this.connected !== p.id) {
+      this.hub.releaseSource('pad');
+      this.prev.clear();
+    }
+    this.index = p.index;
     this.connected = p.id;
     const want = new Map<string, boolean>();
     const set = (code: string, on: boolean) => want.set(code, (want.get(code) ?? false) || on);
@@ -38,6 +47,8 @@ export class PadReader {
     set('ArrowRight', x > 0.45);
     set('ArrowUp', y < -0.45);
     set('ArrowDown', y > 0.45);
+    // A replacement pad (or a changed button array) may omit previously held buttons.
+    for (const code of this.prev.keys()) if (!want.has(code)) want.set(code, false);
     for (const [code, on] of want) {
       if (on && !this.prev.get(code)) this.hub.press(code, 'pad');
       else if (!on && this.prev.get(code)) this.hub.release(code, 'pad');
