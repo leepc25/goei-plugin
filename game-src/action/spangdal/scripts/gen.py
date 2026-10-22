@@ -21,10 +21,10 @@ def submit(n,seed=11):
     act,prop,ps=rig.CLIPS[n]
     args={'description':DESC+(', '+prop if prop else ''),'action':act[:100],'direction':'east','first_frame_url':REF,
           'first_frame_keypoints':REF_KP,'keypoints':[rig.kp(p) for p in ps],'seed':seed}
-    for k in range(80):
+    for k in range(3):
         try: t=mcp.text(mcp.tool('animate_with_skeleton_v3',args))
         except Exception as e: t='EXC '+str(e); time.sleep(5); continue
-        if 'rate limit' in t.lower() or 'too many' in t.lower(): time.sleep(30); continue
+        if 'rate limit' in t.lower() or 'too many' in t.lower(): return None,'RATE'   # 작업 칸이 차면 바로 돌아가 받기부터
         break
     log(f'{n} {len(ps)}f -> {t[:160]}')
     m=re.search(r'job_id["\s:]+([0-9a-f-]{36})',t); return m.group(1) if m else None,t
@@ -57,6 +57,7 @@ if __name__=='__main__':
             n=queue.pop(0)
             if n in resume: pend[n]=resume[n]; continue
             j,t=submit(n)
+            if t=='RATE': queue.insert(0,n); break
             if j: pend[n]=j; print('sub',n,flush=True)
             else: print('SUBFAIL',n,t[:300],flush=True)
         time.sleep(15)
