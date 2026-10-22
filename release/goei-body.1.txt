@@ -1,4 +1,4 @@
-// goei-body 0.16.38
+// goei-body 0.16.39
 "use strict";
 (() => {
   // src/core/dispatch.ts
@@ -3216,6 +3216,49 @@ ${body4.slice(at).replace(/^\s+/, "")}
 @media (max-width:450px){.gst{padding:11px 12px}.gst-clock{font-size:17px}.gst-top{gap:8px}}
 `;
 
+  // src/core/imgtag.ts
+  var TAG = /\s*<img=["']?([^_>"']+)_([^>"']+)["']?>\s*/g;
+  function hasImgTag(text) {
+    return text.includes("<img=");
+  }
+  function renderImgTags(text, pick3) {
+    return text.replace(TAG, (_m, who, expr) => {
+      const want = `${who.trim()}_${expr.trim()}`;
+      const name = pick3 ? pick3(want) ?? pick3(`${who.trim()}_default`) : want;
+      if (!name || /[{}'"<>\\]/.test(name)) return "\n\n";
+      return `
+
+<div class="gim" style="background-image:url('{{raw::${name}}}')" tabindex="0"></div>
+
+`;
+    });
+  }
+  var IMG_SIZE = { min: 30, max: 200, step: 5, def: 100 };
+  var IMG_FOLD = { min: 20, max: 100, step: 1, def: 68 };
+  var BASE_EM = 32;
+  var W = 832;
+  var H = 1216;
+  function pct(v, r) {
+    const n = typeof v === "string" && v.trim() ? Number(v) : v;
+    return typeof n === "number" && Number.isInteger(n) && n >= r.min && n <= r.max ? n : null;
+  }
+  var imgSize = (v) => pct(v, IMG_SIZE);
+  var imgFold = (v) => pct(v, IMG_FOLD);
+  function imgCss(size = IMG_SIZE.def, fold = IMG_FOLD.def, hidden = false) {
+    const g = ":is(.gim,.x-risu-gim,.ib-asset-hover,.x-risu-ib-asset-hover)";
+    if (hidden) return `${g}{display:none!important}`;
+    const open3 = fold >= 100;
+    const folded = open3 ? `${W}/${H}` : `${W}/${Math.round(H * fold) / 100}`;
+    return `${g}{display:block;box-sizing:border-box;margin:auto;width:100%;max-width:${Math.round(BASE_EM * size) / 100}em;aspect-ratio:${folded};overflow:hidden;border-radius:20px;background-color:transparent;background-repeat:no-repeat;background-size:100% auto;background-position:center top;cursor:${open3 ? "default" : "pointer"};outline:none;transition:aspect-ratio .45s ease;-webkit-mask-image:-webkit-radial-gradient(white,black)}` + (open3 ? "" : `${g}:hover,${g}:focus{aspect-ratio:${W}/${H}}`);
+  }
+  var hiddenNow = false;
+  var imgHidden = () => hiddenNow;
+  function setImgHidden(v) {
+    if (v === hiddenNow) return false;
+    hiddenNow = v;
+    return true;
+  }
+
   // src/core/settings.ts
   var ST = {
     assetOn: "$st_asset_on",
@@ -3289,8 +3332,10 @@ ${body4.slice(at).replace(/^\s+/, "")}
     const agents = o.agents === "list" ? "list" : void 0;
     const dim = int(o.dim, 0, 100);
     const status = o.status === "off" || o.status === "light" || o.status === "dark" || o.status === "paper" ? o.status : void 0;
+    const size = imgSize(o.imgSize);
+    const fold = imgFold(o.imgFold);
     const marks2 = (Array.isArray(o.marks) ? o.marks : []).filter((m) => !!m && typeof m === "object" && typeof m.name === "string" && !!m.s && typeof m.s.tab === "string").slice(0, MARK_MAX).map((m) => ({ s: m.s, name: m.name.slice(0, 80) }));
-    prefs = { basic, world, ...theme ? { theme } : {}, ...Object.keys(vars).length ? { vars } : {}, ...nav ? { nav } : {}, ...agents ? { agents } : {}, ...dim !== null ? { dim } : {}, ...status ? { status } : {}, ...marks2.length ? { marks: marks2 } : {} };
+    prefs = { basic, world, ...theme ? { theme } : {}, ...Object.keys(vars).length ? { vars } : {}, ...nav ? { nav } : {}, ...agents ? { agents } : {}, ...dim !== null ? { dim } : {}, ...status ? { status } : {}, ...size !== null ? { imgSize: size } : {}, ...fold !== null ? { imgFold: fold } : {}, ...marks2.length ? { marks: marks2 } : {} };
     return prefs;
   }
   function readSettingsBook(lore) {
@@ -3401,7 +3446,7 @@ ${body4.slice(at).replace(/^\s+/, "")}
 
   // src/host/overlay.ts
   var OPENING_CSS = '.default-chat-screen:has(.chat-message-container) [data-goei-card="opening"]{display:none!important}';
-  var chatCss = (t) => cardVarsCss(t) + LANDING_CSS + OPENING_CSS + statusCss(getPrefs().status ?? "auto", t);
+  var chatCss = (t) => cardVarsCss(t) + LANDING_CSS + OPENING_CSS + statusCss(getPrefs().status ?? "auto", t) + imgCss(getPrefs().imgSize, getPrefs().imgFold, imgHidden());
   function themeVars(sel) {
     return Object.keys(PALETTES).map((t) => {
       const p = PALETTES[t];
@@ -3762,9 +3807,9 @@ ${themeVars("[x-goei-fab]")}
   };
   var ATTACH_MAX = 3;
   var IMAGE_MAX = 8;
-  var TAG = String.raw`\[\[ATTACH:(\w+)\]\]([\s\S]*?)\[\[\/ATTACH\]\]`;
+  var TAG2 = String.raw`\[\[ATTACH:(\w+)\]\]([\s\S]*?)\[\[\/ATTACH\]\]`;
   var HEX = String.raw`%%ATTACHMENT:([0-9a-fA-F]+)%%`;
-  var ANY = () => new RegExp(`${TAG}|${HEX}`, "g");
+  var ANY = () => new RegExp(`${TAG2}|${HEX}`, "g");
   var isKind = (k) => ATTACH_KINDS.includes(k);
   function hasAttachment(text) {
     return ANY().test(String(text ?? ""));
@@ -4251,67 +4296,4 @@ ${themeVars("[x-goei-fab]")}
   }
   function deleteComment(st, id, k) {
     const p = findPost(st, id);
-    const target = p?.comments[k - 1];
-    if (!p || !target?.mine) return false;
-    const up = target.parent;
-    p.comments.splice(k - 1, 1);
-    for (const c of p.comments) {
-      if (c.parent === k) c.parent = up;
-      else if (c.parent > k) c.parent -= 1;
-    }
-    return true;
-  }
-  function deleteThread(st, nick) {
-    const before = st.dms.length;
-    st.dms = st.dms.filter((d) => d.nick !== nick);
-    const had = nick in st.sources;
-    delete st.sources[nick];
-    return before !== st.dms.length || had;
-  }
-  function dmThreads(st) {
-    const map = /* @__PURE__ */ new Map();
-    st.dms.forEach((d, i) => {
-      const t = map.get(d.nick) ?? { nick: d.nick, rows: [], unread: 0, last: -1, lastDate: "" };
-      t.rows.push(d);
-      if (d.unread) t.unread++;
-      t.last = i;
-      if (d.side === "npc" && d.date) t.lastDate = d.date;
-      map.set(d.nick, t);
-    });
-    return [...map.values()].sort((a, b) => b.last - a.last);
-  }
-  function findPublicSource(st, nick) {
-    let found;
-    let match = null;
-    for (const p of st.posts) {
-      if (p.nick === nick && !p.mine) {
-        if (match !== null && match !== p.id) return void 0;
-        found = { postid: p.id, title: p.title, body: trimTokens(p.body, LIMITS.origin_tokens), author: p.nick, quote: "", quoteAuthor: "" };
-        match = p.id;
-      }
-      for (const c of p.comments) {
-        if (c.nick === nick && !c.mine) {
-          if (match !== null && match !== p.id) return void 0;
-          found = { postid: p.id, title: p.title, body: trimTokens(p.body, LIMITS.origin_tokens), author: p.nick, quote: trimTokens(c.body, LIMITS.quote_tokens), quoteAuthor: c.nick };
-          match = p.id;
-        }
-      }
-    }
-    return found;
-  }
-  function sourceFor(p, ci) {
-    const c = ci > 0 ? p.comments[ci - 1] : void 0;
-    return {
-      postid: p.id,
-      title: p.title,
-      body: trimTokens(p.body, LIMITS.origin_tokens),
-      author: p.nick,
-      quote: c ? trimTokens(c.body, LIMITS.quote_tokens) : "",
-      quoteAuthor: c ? c.nick : ""
-    };
-  }
-  function addOutgoingDm(st, nick, body4, date, source4) {
-    if (!st.sources[nick]) {
-      const s4 = source4 ?? findPublicSource(st, nick);
-      if (s4) st.sources[nick] = s4;
-  
+    const target = p?.comm

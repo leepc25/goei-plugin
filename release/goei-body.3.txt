@@ -1,4 +1,58 @@
-ssive: true });
+ = setTimeout(() => {
+        timers.delete(key2);
+        clear(text);
+        const el = document.querySelector(`.gx-toast[data-toast="${key2}"]`);
+        if (!el) return;
+        el.classList.add("out");
+        setTimeout(() => el.remove(), 300);
+      }, ms);
+      timers.set(key2, { text, id });
+    }
+    return `<div class="gx-toast gn-notice" data-toast="${key2}" role="status">${esc4(text)}</div>`;
+  }
+
+  // src/ui/drawer.ts
+  var open = false;
+  function drawerHtml(tools, above = "", cls = "") {
+    return `<div class="ph-drawer${cls ? ` ${cls}` : ""}${open ? " open" : ""}">
+    <button class="ph-grip" type="button" aria-label="${open ? "도구 접기" : "도구 펼치기"}" aria-expanded="${open}"><i></i></button>
+    ${above}<div class="ph-tools">${tools}</div></div>`;
+  }
+  function drawerBox(content, cls = "", after = "") {
+    return `<div class="ph-drawer gx-mdrawer${cls ? ` ${cls}` : ""}${open ? " open" : ""}">
+    <button class="ph-grip" type="button" aria-label="${open ? "도구 접기" : "도구 펼치기"}" aria-expanded="${open}"><i></i></button>
+    <div class="ph-dbody">${content}</div>${after}</div>`;
+  }
+  function closeDrawer() {
+    open = false;
+  }
+  function set(box, on2) {
+    open = on2;
+    box.classList.toggle("open", on2);
+    const grip = box.querySelector(".ph-grip");
+    grip?.setAttribute("aria-expanded", String(on2));
+    grip?.setAttribute("aria-label", on2 ? "도구 접기" : "도구 펼치기");
+  }
+  function bindDrawer(root2, onSide) {
+    const box = root2.querySelector(".ph-drawer");
+    const grip = box?.querySelector(".ph-grip");
+    if (!box || !grip) return;
+    grip.addEventListener("click", () => set(box, !open));
+    let y0 = null;
+    let x0 = 0;
+    box.addEventListener("touchstart", (e) => {
+      y0 = e.touches[0]?.clientY ?? null;
+      x0 = e.touches[0]?.clientX ?? 0;
+    }, { passive: true });
+    box.addEventListener("touchend", (e) => {
+      if (y0 === null) return;
+      const dy = (e.changedTouches[0]?.clientY ?? y0) - y0;
+      const dx = (e.changedTouches[0]?.clientX ?? x0) - x0;
+      y0 = null;
+      if (onSide && open && box.classList.contains("gx-bdrawer") && Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy) * 1.4) return onSide();
+      if (dy < -24 && !open) set(box, true);
+      else if (dy > 24 && open) set(box, false);
+    }, { passive: true });
   }
 
   // src/host/llm.ts
@@ -962,7 +1016,7 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
   function settingsView(ctx2) {
     const v = (k) => phoneValue(ctx2.chat.scriptstate, k);
     const onoff = (k) => seg(k, v(k) === "1" ? "1" : "0", [["1", "켜기"], ["0", "끄기"]]);
-    const pct = (k) => `<span class="ph-inline"><input class="gx-search ph-pct" type="number" min="0" max="100" data-change="ph-num" data-key="${k}" value="${esc6(v(k))}" aria-label="확률"><span>%</span></span>`;
+    const pct2 = (k) => `<span class="ph-inline"><input class="gx-search ph-pct" type="number" min="0" max="100" data-change="ph-num" data-key="${k}" value="${esc6(v(k))}" aria-label="확률"><span>%</span></span>`;
     const num4 = (k, cur, lo, hi, unit) => `<span class="ph-inline"><input class="gx-search ph-pct" type="number" min="${lo}" max="${hi}" data-change="ph-num" data-key="${k}" value="${cur}" aria-label="${k}"><span>${unit}</span></span>`;
     const notices = noticeSettings(ctx2.chat.scriptstate);
     const rest = (k) => {
@@ -982,8 +1036,8 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
     ].join(""))}
       ${group("새 메시지", [
       row2("새 메시지 확인", seg("auto", ["1", "open"].includes(v("auto")) ? v("auto") : "0", [["0", "수동"], ["open", "창을 열 때"], ["1", "매 턴"]]), AUTO_HINT[v("auto")] ?? AUTO_HINT["0"]),
-      row2("선톡 받기", `<span class="ph-inline">${onoff("incoming")}${pct("incoming_chance")}</span>`, rest("cd_incoming")),
-      row2("단톡방 초대 받기", `<span class="ph-inline">${onoff("group_invites")}${pct("group_invite_chance")}</span>`, rest("cd_invite")),
+      row2("선톡 받기", `<span class="ph-inline">${onoff("incoming")}${pct2("incoming_chance")}</span>`, rest("cd_incoming")),
+      row2("단톡방 초대 받기", `<span class="ph-inline">${onoff("group_invites")}${pct2("group_invite_chance")}</span>`, rest("cd_invite")),
       row2("소속 공지 받기", onoff("announcements")),
       row2("공지 대기 턴", num4("announcement_gap", notices.gap, 1, 100, "턴")),
       row2("공지 참고 수", num4("announcement_history", notices.history, 1, 50, "개"))
@@ -3485,34 +3539,3 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 @media (max-width: 760px) {
   .gx-field { grid-template-columns: 1fr; }
   .gx-field > .gx-mapcol { position: static; }
-  .gx-mapcol .gx-canvas:not(.ph) { width: auto; }
-  .gx-mapimg { width: 100%; max-height: none; }
-  .gx-mbox { max-height: none; }
-  .gx-mlist { grid-template-columns: minmax(0, 1fr); }
-  .gx-mapcol .gx-segs { align-self: stretch; display: flex; }
-  .gx-mapcol .gx-seg { flex: 1; min-width: 0; padding: 0 8px; }
-}
-
-/* 위키 */
-.nw { display: flex; flex-direction: column; gap: 12px; padding-top: 12px; padding-bottom: 20px; }
-.nw-nav { display: flex; gap: 6px; }
-.nw-search { display: flex; gap: 8px; }
-.nw-search .gx-search { flex: 1; }
-.nw-search .gx-mini { min-height: 40px; padding: 0 16px; }
-.nw-req summary, .nw-meta summary, .nw-fail summary { cursor: pointer; color: var(--mint); font-size: 14px; }
-.nw-reqbox { margin-top: 8px; padding: 10px 12px; resize: vertical; min-height: 64px; line-height: 1.5; }
-.nw-req .gx-muted { margin: 6px 0 0; font-size: 13px; }
-.nw-settings { display: grid; grid-template-columns: max-content 1fr; gap: 8px 12px; align-items: center; padding: 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel2); }
-.nw-settings label { font-size: 13px; color: var(--dim); }
-.gx-segs-sm .gx-seg { min-width: 0; min-height: 34px; padding: 0 12px; font-size: 14px; }
-.nw-busy { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; border: 1px solid color-mix(in srgb, var(--signal) 40%, transparent); background: var(--accent-bg); color: var(--signal); font-size: 14px; }
-.nw-spin { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--line); border-top-color: var(--signal); animation: nwspin .9s linear infinite; flex: none; }
-@keyframes nwspin { to { transform: rotate(360deg); } }
-@media (prefers-reduced-motion: reduce) { .nw-spin { animation: none; } }
-.nw-compose { display: flex; flex-direction: column; gap: 10px; padding: 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel2); }
-.nw-compose p { margin: 0; }
-.nw-title { margin: 0; font-size: 24px; color: var(--text); letter-spacing: -.01em; }
-.nw-doc { display: flex; flex-direction: column; gap: 12px; }
-.nw-dochead { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; padding-bottom: 10px; border-bottom: 2px solid var(--accent-line); }
-.nw-body { font-size: 16px; line-height: 1.75; color: var(--text); }
-.nw-body::afte
