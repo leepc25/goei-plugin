@@ -1,23 +1,10 @@
 {
-  "observed_at": "2026-10-22T10:33:19.910829+00:00",
-  "balance": null,
-  "active_jobs": null,
-  "concurrency_limit": null,
-  "paid_generation_calls": 0,
-  "new_generation_charge": 0,
-  "observations": {
-    "get_balance": {
-      "ok": false,
-      "evidence": "game-src/action/character-resume/control-evidence/20261022T103319910779Z/get_balance.json"
-    },
-    "list_jobs": {
-      "ok": false,
-      "evidence": "game-src/action/character-resume/control-evidence/20261022T103319910779Z/list_jobs.json"
-    },
-    "search_help": {
-      "ok": false,
-      "evidence": "game-src/action/character-resume/control-evidence/20261022T103319910779Z/search_help.json"
-    }
-  },
-  "note": "성공 응답의 단위·필드 확인 후 잔액/한도 기입. 실패 또는 미확인은 null이며 0이 아님."
+  "observed_at": "2026-10-22 10:38:38 UTC",
+  "authentication": "native_mcp_success",
+  "balance_generations": 14158.3,
+  "active_jobs": 3,
+  "documented_tier_limit": 20,
+  "account_specific_limit": null,
+  "limit_note": "Tier 3 documentation: 20; no separate account cap returned",
+  "evidence": "control-evidence/local-auth-20261022/account-snapshot.json"
 }

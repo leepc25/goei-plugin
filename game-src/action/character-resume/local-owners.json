@@ -1,0 +1,102 @@
+{
+  "observed_at": "2026-10-22 10:38:38 UTC",
+  "owners": [
+    {"character":"blaret-saladin","thread_id":"01a1632f-1d51-7062-a1ed-f8fa53a9a904","branch":"codex/art-blaret-saladin-resume","clip":"guns_idle","quote_generations":3,"job_id":"f06a14de-204f-47b2-badd-dfd49796f148","in_flight_limit":1,"handoff":"delivered","user_visual_approval":false},
+    {
+      "character": "jyaldi",
+      "thread_id": "01a1632e-1944-7c20-8551-3a279d6c0a24",
+      "branch": "codex/art-jyaldi-resume",
+      "clip": "walk",
+      "quote_generations": 3,
+      "job_id": "df3b56fb-5426-4491-888f-f94a4192e5cf",
+      "in_flight_limit": 1,
+      "handoff": "delivered",
+      "source": "owner chat report; receipt verification follows",
+      "user_visual_approval": false
+    },
+    {
+      "character": "kyuras",
+      "thread_id": "01a1632e-358b-7931-b8ab-c3487b5b6095",
+      "branch": "codex/art-kyuras-resume",
+      "clip": "recover_then_snap_and_weapons",
+      "quote_generations": null,
+      "job_id": null,
+      "in_flight_limit": 1,
+      "handoff": "delivered",
+      "source": "owner chat report; receipt verification follows",
+      "user_visual_approval": false
+    },
+    {
+      "character": "eileen",
+      "thread_id": "01a1632e-6241-7833-a935-d22a16ddea36",
+      "branch": "codex/art-eileen-resume",
+      "clip": "precise/01",
+      "quote_generations": 1,
+      "job_id": null,
+      "in_flight_limit": 1,
+      "handoff": "delivered",
+      "source": "owner chat report; receipt verification follows",
+      "user_visual_approval": false
+    },
+    {
+      "character": "spangdal",
+      "thread_id": "01a1632e-82b9-7e41-94f9-e52607f4d591",
+      "branch": "codex/art-spangdal-resume",
+      "clip": "stab1/02",
+      "quote_generations": 10,
+      "job_id": null,
+      "in_flight_limit": 1,
+      "handoff": "delivered",
+      "source": "owner chat report; receipt verification follows",
+      "user_visual_approval": false
+    },
+    {
+      "character": "geshugan",
+      "thread_id": "01a1632e-9c8c-7260-9261-14f63884b684",
+      "branch": "codex/art-geshugan-resume",
+      "clip": "getup/03",
+      "quote_generations": 1,
+      "job_id": null,
+      "in_flight_limit": 1,
+      "handoff": "delivered",
+      "source": "owner chat report; receipt verification follows",
+      "user_visual_approval": false
+    },
+    {
+      "character": "deadpole",
+      "thread_id": "01a1632e-b889-7cb1-9d42-c4adbdccbf33",
+      "branch": "codex/art-deadpole-resume",
+      "clip": "pipe_body",
+      "quote_generations": 3,
+      "job_id": null,
+      "in_flight_limit": 1,
+      "handoff": "delivered",
+      "source": "owner chat report; receipt verification follows",
+      "user_visual_approval": false
+    },
+    {
+      "character": "gorgodio",
+      "thread_id": "01a1632e-d807-7a23-87b4-a0854ac90304",
+      "branch": "codex/art-gorgodio-resume",
+      "clip": "a_arrive",
+      "quote_generations": 3,
+      "job_id": null,
+      "in_flight_limit": 1,
+      "handoff": "delivered",
+      "source": "owner chat report; receipt verification follows",
+      "user_visual_approval": false
+    },
+    {
+      "character": "rojemon",
+      "thread_id": "01a1632e-ff98-7341-9074-17b145a21b26",
+      "branch": "codex/art-rojemon-resume",
+      "clip": "down/man_throw_review",
+      "quote_generations": 3,
+      "job_id": null,
+      "in_flight_limit": 1,
+      "handoff": "delivered",
+      "source": "owner chat report; receipt verification follows",
+      "user_visual_approval": false
+    }
+  ]
+}

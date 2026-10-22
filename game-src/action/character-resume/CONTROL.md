@@ -1,6 +1,8 @@
 # 캐릭터 제작 총괄 인계
 
-2026-10-22 19:33 KST 계정 무료 재조회 기준. 현재 **인증 차단**이며 제작 완료가 아니다.
+현재 로컬 재개 기록은 [LOCAL-20261022.md](LOCAL-20261022.md), 계정 관측은 `account-latest.json`, 작업별 서버 영수증 취합은 `verified-local-receipts.json`을 따른다. 로컬 MCP 인증이 성공하여 실제 회수·생성을 재개했다. 아래 19:33 기록은 이전 클라우드 환경의 역사적 인계로 보존한다.
+
+이전 기록: 2026-10-22 19:33 KST 클라우드 환경에서 인증 차단. 이 상태를 현재 로컬 인증 상태로 사용하지 않는다.
 
 총괄 브랜치 `codex/character-production-control`, 시스템 기준 `7f8fdfb0c5a6cef096d412d3d872aec6eae7de81`.
 준비 브랜치 `codex/character-production-resume`는 `087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4`로 고정했다.

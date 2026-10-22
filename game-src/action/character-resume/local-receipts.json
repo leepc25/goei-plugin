@@ -1,0 +1,101 @@
+{
+  "updated_at": "2026-10-22 10:40:12 UTC",
+  "receipts": [
+    {
+      "character": "jyaldi",
+      "clip": "walk",
+      "job_id": "df3b56fb-5426-4491-888f-f94a4192e5cf",
+      "reported_generations": 3,
+      "receipt_text": "cost: 3 generations",
+      "cost_verification": "owner_report_pending_receipt_fetch",
+      "billing_period": "current_resume",
+      "recovery_charge": null,
+      "estimate_generations": null,
+      "user_visual_approval": false
+    },
+    {
+      "character": "eileen",
+      "clip": "precise/01",
+      "job_id": "ddafed99-d4d6-4b51-bbb4-c01ce660ef68",
+      "reported_generations": 1,
+      "receipt_text": "cost: 1 generation",
+      "cost_verification": "owner_report_pending_receipt_fetch",
+      "billing_period": "current_resume",
+      "recovery_charge": null,
+      "estimate_generations": null,
+      "user_visual_approval": false
+    },
+    {
+      "character": "spangdal",
+      "clip": "stab1/02",
+      "job_id": "6aa5567e-0ffc-45df-a3a3-702ca373d66c",
+      "reported_generations": null,
+      "receipt_text": "~10 generations",
+      "cost_verification": "owner_report_pending_receipt_fetch",
+      "billing_period": "current_resume",
+      "recovery_charge": null,
+      "estimate_generations": 10,
+      "user_visual_approval": false
+    },
+    {
+      "character": "geshugan",
+      "clip": "getup/03",
+      "job_id": "c2c9cbc3-8a1e-40fa-b776-6112e7e5a82a",
+      "reported_generations": 1,
+      "receipt_text": "cost: 1 generation",
+      "cost_verification": "owner_report_pending_receipt_fetch",
+      "billing_period": "current_resume",
+      "recovery_charge": null,
+      "estimate_generations": null,
+      "user_visual_approval": false
+    },
+    {
+      "character": "rojemon",
+      "clip": "down",
+      "job_id": "d4017c4c-d084-4bc0-88b7-eb0df8dfe9e3",
+      "reported_generations": 3,
+      "receipt_text": "cost: 3 generations",
+      "cost_verification": "owner_report_pending_receipt_fetch",
+      "billing_period": "current_resume",
+      "recovery_charge": null,
+      "estimate_generations": null,
+      "user_visual_approval": false
+    },
+    {
+      "character": "deadpole",
+      "clip": "pipe_body",
+      "job_id": "4ee67072-3bcb-431e-b62b-a1f2446761ea",
+      "reported_generations": 3,
+      "receipt_text": "cost: 3 generations",
+      "cost_verification": "owner_report_pending_receipt_fetch",
+      "billing_period": "current_resume",
+      "recovery_charge": null,
+      "estimate_generations": null,
+      "user_visual_approval": false
+    },
+    {
+      "character": "kyuras",
+      "clip": "idle_shotgun",
+      "job_id": "11826541-47d1-40de-9664-f05f1838bb23",
+      "reported_generations": 3,
+      "receipt_text": "charged_generations=3",
+      "cost_verification": "owner_report_pending_receipt_fetch",
+      "billing_period": "historical_paid_recovery",
+      "recovery_charge": 0,
+      "estimate_generations": null,
+      "user_visual_approval": false
+    },
+    {
+      "character": "kyuras",
+      "clip": "run_shotgun",
+      "job_id": "9fe0e770-b992-4299-a4c1-90d6e591828a",
+      "reported_generations": 3,
+      "receipt_text": "charged_generations=3",
+      "cost_verification": "owner_report_pending_receipt_fetch",
+      "billing_period": "historical_paid_recovery",
+      "recovery_charge": 0,
+      "estimate_generations": null,
+      "user_visual_approval": false
+    }
+  ]
+}

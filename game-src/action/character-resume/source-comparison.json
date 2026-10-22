@@ -26,5 +26,9 @@
     "game-src/action/jyaldi-v5/spend.log",
     "game-src/action/kyuras/spend.log"
   ],
-  "finding": "차이는 준비 산출물과 이전 재개 조사 로그. 해당 캐릭터 최신 원본·manifest는 동일. 별도 담당 후속 제출은 다시 fetch 후 비교 필요."
+  "finding": "차이는 준비 산출물과 이전 재개 조사 로그. 해당 캐릭터 최신 원본·manifest는 동일. 별도 담당 후속 제출은 다시 fetch 후 비교 필요.",
+  "latest_system_ref": "59a2a883c6aca00f8c0e1e5fc2c421a6da770528",
+  "latest_preparation_ref": "6b8000ea3f51a9ac9cc437995c5a2edc0e77b2eb",
+  "current_art_diff_since_control_base": [],
+  "verification_time": "2026-10-22T10:43:34.678119+00:00"
 }

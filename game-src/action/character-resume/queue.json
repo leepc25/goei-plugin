@@ -3,27 +3,14 @@
   "system_base": "7f8fdfb0c5a6cef096d412d3d872aec6eae7de81",
   "branch": "codex/character-production-control",
   "account": {
-    "observed_at": "2026-10-22T10:33:19.910829+00:00",
-    "balance": null,
-    "active_jobs": null,
-    "concurrency_limit": null,
-    "paid_generation_calls": 0,
-    "new_generation_charge": 0,
-    "observations": {
-      "get_balance": {
-        "ok": false,
-        "evidence": "game-src/action/character-resume/control-evidence/20261022T103319910779Z/get_balance.json"
-      },
-      "list_jobs": {
-        "ok": false,
-        "evidence": "game-src/action/character-resume/control-evidence/20261022T103319910779Z/list_jobs.json"
-      },
-      "search_help": {
-        "ok": false,
-        "evidence": "game-src/action/character-resume/control-evidence/20261022T103319910779Z/search_help.json"
-      }
-    },
-    "note": "성공 응답의 단위·필드 확인 후 잔액/한도 기입. 실패 또는 미확인은 null이며 0이 아님."
+    "observed_at": "2026-10-22 10:38:38 UTC",
+    "authentication": "native_mcp_success",
+    "balance_generations": 14158.3,
+    "active_jobs": 3,
+    "documented_tier_limit": 20,
+    "account_specific_limit": null,
+    "limit_note": "Tier 3 documentation: 20; no separate account cap returned",
+    "evidence": "control-evidence/local-auth-20261022/account-snapshot.json"
   },
   "new_generation_calls": 0,
   "new_generation_charge": 0,
@@ -34,13 +21,25 @@
       "clip": "idle_shotgun",
       "frames": 4,
       "job_id": "11826541-47d1-40de-9664-f05f1838bb23",
-      "state": "recovery_only_auth_blocked",
+      "state": "recovered_pending_review",
       "regenerate": false,
       "original_job_usage": null,
       "owner_branch": "codex/art-kyuras-resume",
-      "owner_status": "delegated_to_kyuras_owner",
-      "actual_cost": null,
-      "owner_commit": "ed5a83e27523ffd6c844932c307a00627f626454"
+      "owner_status": "handoff_received",
+      "owner_commit": "ed5a83e27523ffd6c844932c307a00627f626454",
+      "owner_thread_id": "01a1632e-358b-7931-b8ab-c3487b5b6095",
+      "cost_record": {
+        "character": "kyuras",
+        "clip": "idle_shotgun",
+        "job_id": "11826541-47d1-40de-9664-f05f1838bb23",
+        "reported_generations": 3,
+        "receipt_text": "charged_generations=3",
+        "cost_verification": "owner_report_pending_receipt_fetch",
+        "billing_period": "historical_paid_recovery",
+        "recovery_charge": 0,
+        "estimate_generations": null,
+        "user_visual_approval": false
+      }
     },
     {
       "priority": 1,
@@ -48,27 +47,51 @@
       "clip": "run_shotgun",
       "frames": 8,
       "job_id": "9fe0e770-b992-4299-a4c1-90d6e591828a",
-      "state": "recovery_only_auth_blocked",
+      "state": "recovered_pending_review",
       "regenerate": false,
       "original_job_usage": null,
       "owner_branch": "codex/art-kyuras-resume",
-      "owner_status": "delegated_to_kyuras_owner",
-      "actual_cost": null,
-      "owner_commit": "ed5a83e27523ffd6c844932c307a00627f626454"
+      "owner_status": "handoff_received",
+      "owner_commit": "ed5a83e27523ffd6c844932c307a00627f626454",
+      "owner_thread_id": "01a1632e-358b-7931-b8ab-c3487b5b6095",
+      "cost_record": {
+        "character": "kyuras",
+        "clip": "run_shotgun",
+        "job_id": "9fe0e770-b992-4299-a4c1-90d6e591828a",
+        "reported_generations": 3,
+        "receipt_text": "charged_generations=3",
+        "cost_verification": "owner_report_pending_receipt_fetch",
+        "billing_period": "historical_paid_recovery",
+        "recovery_charge": 0,
+        "estimate_generations": null,
+        "user_visual_approval": false
+      }
     },
     {
       "priority": 2,
       "character": "jyaldi",
       "clip": "walk",
       "frames": 8,
-      "state": "skeleton_design_pending_auth_and_review",
+      "state": "submitted_pending_review",
       "tool": "animate_with_skeleton_v3",
-      "job_id": null,
-      "actual_charge": 0,
-      "owner_branch": null,
-      "owner_status": "awaiting_existing_character_owner",
+      "job_id": "df3b56fb-5426-4491-888f-f94a4192e5cf",
+      "owner_branch": "codex/art-jyaldi-resume",
+      "owner_status": "handoff_received",
       "historical_public_estimate_generations": 3,
-      "quote_requires_refresh": true
+      "quote_requires_refresh": true,
+      "owner_thread_id": "01a1632e-1944-7c20-8551-3a279d6c0a24",
+      "cost_record": {
+        "character": "jyaldi",
+        "clip": "walk",
+        "job_id": "df3b56fb-5426-4491-888f-f94a4192e5cf",
+        "reported_generations": 3,
+        "receipt_text": "cost: 3 generations",
+        "cost_verification": "owner_report_pending_receipt_fetch",
+        "billing_period": "current_resume",
+        "recovery_charge": null,
+        "estimate_generations": null,
+        "user_visual_approval": false
+      }
     },
     {
       "priority": 3,
@@ -79,10 +102,11 @@
       "tool": "animate_with_skeleton_v3",
       "job_id": null,
       "actual_charge": 0,
-      "owner_branch": null,
-      "owner_status": "awaiting_existing_character_owner",
+      "owner_branch": "codex/art-jyaldi-resume",
+      "owner_status": "handoff_received",
       "historical_public_estimate_generations": 3,
-      "quote_requires_refresh": true
+      "quote_requires_refresh": true,
+      "owner_thread_id": "01a1632e-1944-7c20-8551-3a279d6c0a24"
     },
     {
       "priority": 4,
@@ -98,8 +122,9 @@
       "state": "redesign_review_before_quote",
       "current_estimate": null,
       "owner_branch": "codex/art-kyuras-resume",
-      "owner_status": "delegated_to_kyuras_owner",
-      "owner_commit": "ed5a83e27523ffd6c844932c307a00627f626454"
+      "owner_status": "handoff_received",
+      "owner_commit": "ed5a83e27523ffd6c844932c307a00627f626454",
+      "owner_thread_id": "01a1632e-358b-7931-b8ab-c3487b5b6095"
     },
     {
       "priority": 5,
@@ -113,8 +138,9 @@
       ],
       "state": "combat_pose_review_before_quote",
       "current_estimate": null,
-      "owner_branch": null,
-      "owner_status": "awaiting_existing_character_owner"
+      "owner_branch": "codex/art-eileen-resume",
+      "owner_status": "handoff_received",
+      "owner_thread_id": "01a1632e-6241-7833-a935-d22a16ddea36"
     }
   ],
   "never_duplicate_from_stale_handoff": [
@@ -125,10 +151,183 @@
     "deadpole 20 bathing frames"
   ],
   "preparation_source": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
-  "observed_at": "2026-10-22T10:33:19.910829+00:00",
+  "observed_at": "2026-10-22 10:38:38 UTC",
   "per_owner_in_flight_limit": 1,
-  "dispatch_enabled": false,
-  "dispatch_blocker": "현재 계정 인증·잔액·실행 중 작업·동시 한도 미확인",
-  "coordination": "총괄만 제출 허가를 기록. 담당은 제출 직전 최신 원격 원장·계정 큐를 대조. Git 원장은 분산 잠금이 아님. 여러 환경에서 독립 제출 금지.",
-  "known_jobs_ledger": "job-inventory.json"
+  "dispatch_enabled": true,
+  "dispatch_blocker": null,
+  "coordination": "One owner per character and one in-flight job per owner. Account cap includes unrelated jobs. Git ledger is an audit record, not a distributed lock.",
+  "known_jobs_ledger": "job-inventory.json",
+  "local_owners": [
+    {
+      "character": "blaret-saladin",
+      "thread_id": "01a1632f-1d51-7062-a1ed-f8fa53a9a904",
+      "branch": "codex/art-blaret-saladin-resume",
+      "clip": "guns_idle",
+      "quote_generations": 3,
+      "job_id": "f06a14de-204f-47b2-badd-dfd49796f148",
+      "in_flight_limit": 1,
+      "handoff": "delivered",
+      "user_visual_approval": false
+    },
+    {
+      "character": "jyaldi",
+      "thread_id": "01a1632e-1944-7c20-8551-3a279d6c0a24",
+      "branch": "codex/art-jyaldi-resume",
+      "clip": "walk",
+      "quote_generations": 3,
+      "job_id": "df3b56fb-5426-4491-888f-f94a4192e5cf",
+      "in_flight_limit": 1,
+      "handoff": "delivered",
+      "source": "owner chat report; receipt verification follows",
+      "user_visual_approval": false
+    },
+    {
+      "character": "kyuras",
+      "thread_id": "01a1632e-358b-7931-b8ab-c3487b5b6095",
+      "branch": "codex/art-kyuras-resume",
+      "clip": "recover_then_snap_and_weapons",
+      "quote_generations": null,
+      "job_id": null,
+      "in_flight_limit": 1,
+      "handoff": "delivered",
+      "source": "owner chat report; receipt verification follows",
+      "user_visual_approval": false
+    },
+    {
+      "character": "eileen",
+      "thread_id": "01a1632e-6241-7833-a935-d22a16ddea36",
+      "branch": "codex/art-eileen-resume",
+      "clip": "precise/01",
+      "quote_generations": 1,
+      "job_id": null,
+      "in_flight_limit": 1,
+      "handoff": "delivered",
+      "source": "owner chat report; receipt verification follows",
+      "user_visual_approval": false
+    },
+    {
+      "character": "spangdal",
+      "thread_id": "01a1632e-82b9-7e41-94f9-e52607f4d591",
+      "branch": "codex/art-spangdal-resume",
+      "clip": "stab1/02",
+      "quote_generations": 10,
+      "job_id": null,
+      "in_flight_limit": 1,
+      "handoff": "delivered",
+      "source": "owner chat report; receipt verification follows",
+      "user_visual_approval": false
+    },
+    {
+      "character": "geshugan",
+      "thread_id": "01a1632e-9c8c-7260-9261-14f63884b684",
+      "branch": "codex/art-geshugan-resume",
+      "clip": "getup/03",
+      "quote_generations": 1,
+      "job_id": null,
+      "in_flight_limit": 1,
+      "handoff": "delivered",
+      "source": "owner chat report; receipt verification follows",
+      "user_visual_approval": false
+    },
+    {
+      "character": "deadpole",
+      "thread_id": "01a1632e-b889-7cb1-9d42-c4adbdccbf33",
+      "branch": "codex/art-deadpole-resume",
+      "clip": "pipe_body",
+      "quote_generations": 3,
+      "job_id": null,
+      "in_flight_limit": 1,
+      "handoff": "delivered",
+      "source": "owner chat report; receipt verification follows",
+      "user_visual_approval": false
+    },
+    {
+      "character": "gorgodio",
+      "thread_id": "01a1632e-d807-7a23-87b4-a0854ac90304",
+      "branch": "codex/art-gorgodio-resume",
+      "clip": "a_arrive",
+      "quote_generations": 3,
+      "job_id": null,
+      "in_flight_limit": 1,
+      "handoff": "delivered",
+      "source": "owner chat report; receipt verification follows",
+      "user_visual_approval": false
+    },
+    {
+      "character": "rojemon",
+      "thread_id": "01a1632e-ff98-7341-9074-17b145a21b26",
+      "branch": "codex/art-rojemon-resume",
+      "clip": "down/man_throw_review",
+      "quote_generations": 3,
+      "job_id": null,
+      "in_flight_limit": 1,
+      "handoff": "delivered",
+      "source": "owner chat report; receipt verification follows",
+      "user_visual_approval": false
+    }
+  ],
+  "external_reservations": [
+    {
+      "reservation_id": "hq-glass-door-round2-01a1632c",
+      "owner_thread_id": "01a1632c-ef37-7b13-b0b2-099b78b84713",
+      "owner_chat": "제작 및 검수할 본부 출입구",
+      "owner_branch": "codex/pixellab-doors-round2",
+      "asset": "본부 유리문 닫힘 원본",
+      "canvas": [
+        96,
+        144
+      ],
+      "variants": 1,
+      "tool": "create_image_pixen",
+      "reserved_generation_calls": 1,
+      "quoted_charge": null,
+      "quote_status": "담당자가 공식 비용 재확인 중",
+      "state": "reserved_by_other_session_pending_gallery_recovery_check",
+      "job_id": null,
+      "actual_charge": null,
+      "delivery_sha": null,
+      "do_not_generate_in_character_queue": true,
+      "opening_plan": "동일 문틀·문짝 로컬 분리; 추가 유료 생성 예약 없음",
+      "received_at": "2026-10-22T19:36:28.507035+09:00",
+      "reported_account_snapshot": {
+        "source": "문 담당 세션 전달; 이 캐릭터 세션에서 독립 조회하지 않음",
+        "observed_at": null,
+        "authentication": "MCP 정상이라고 전달받음",
+        "generations_remaining": "14160.30",
+        "active_jobs": 0,
+        "note": "전달 당시 조회 기록이며 현재 계정값이나 이 세션 인증 복구를 의미하지 않음"
+      },
+      "existing_results": "기존 문 담당 기록 생성 0건; gallery 회수 여부 확인 중"
+    },
+    {
+      "reservation_id": "hq-first-day-corridor-round2-01a1632e",
+      "owner_thread_id": "01a1632e-0093-7c30-9af7-39fedb2b4fac",
+      "owner_branch": "codex/pixellab-cutscene-round2",
+      "asset": "첫 출근 빈 본부 복도 문 열림 1컷의 배경 원본",
+      "background_images": 1,
+      "tool": null,
+      "reserved_generation_calls": 1,
+      "quoted_charge": null,
+      "quote_status": "담당자가 정확한 도구·비용 조사 중",
+      "state": "reserved_by_other_session_pending_quote",
+      "job_id": null,
+      "actual_charge": null,
+      "delivery_sha": null,
+      "do_not_generate_in_character_queue": true,
+      "character_generation_calls": 0,
+      "separate_door_generation_calls": 0,
+      "depends_on_reservation": "hq-glass-door-round2-01a1632c",
+      "door_plan": "본부 문 담당 최신 원본을 공유받아 합성; 별도 문 발주 없음",
+      "submission_policy": "1건씩 제출",
+      "received_at": "2026-10-22T19:37:09.130786+09:00",
+      "reported_account_snapshot": {
+        "source": "컷씬 환경 담당 세션 전달; 이 캐릭터 세션에서 독립 조회하지 않음",
+        "observed_at": null,
+        "authentication": "로컬 인증 정상이라고 전달받음",
+        "generations_remaining": "14160.30",
+        "active_jobs": 0,
+        "note": "전달 당시 조회 기록이며 현재 계정값이나 이 세션 인증 복구를 의미하지 않음"
+      }
+    }
+  ]
 }
