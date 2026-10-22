@@ -102,11 +102,11 @@
       "variants": 1,
       "tool": "create_image_pixen",
       "reserved_generation_calls": 1,
-      "quoted_charge": null,
-      "quote_status": "담당자가 공식 비용 재확인 중",
-      "state": "reserved_by_other_session_pending_gallery_recovery_check",
-      "job_id": null,
-      "actual_charge": null,
+      "quoted_charge": 1,
+      "quote_status": "담당자가 get_image completed / charged 1 generation 전달",
+      "state": "original_recovered_local_assembly_pending",
+      "job_id": "d0105c20-4b44-4ebb-b3a5-32ea1a4158c1",
+      "actual_charge": 1,
       "delivery_sha": null,
       "do_not_generate_in_character_queue": true,
       "opening_plan": "동일 문틀·문짝 로컬 분리; 추가 유료 생성 예약 없음",
@@ -119,7 +119,35 @@
         "active_jobs": 0,
         "note": "전달 당시 조회 기록이며 현재 계정값이나 이 세션 인증 복구를 의미하지 않음"
       },
-      "existing_results": "기존 문 담당 기록 생성 0건; gallery 회수 여부 확인 중"
+      "existing_results": "기존 문 담당 기록 생성 0건; gallery 회수 여부 확인 중",
+      "asset_id": "4d996bf4-cba3-559f-8c23-de805a905fe8",
+      "charge_unit": "generations",
+      "submitted_generation_calls": 1,
+      "remaining_reserved_generation_calls": 0,
+      "updated_at": "2026-10-22T19:39:30.694327+09:00",
+      "cost_evidence": {
+        "source": "owner_report_of_completed_job_receipt",
+        "independently_fetched_here": false,
+        "reported_cost": 1,
+        "unit": "generation"
+      },
+      "recovery": {
+        "reported_complete": true,
+        "canvas": [
+          96,
+          144
+        ],
+        "mode": "RGBA",
+        "delivery_sha": null,
+        "assembly_status": "분리된 문짝 형태; 로컬 개구부/문틀 고정 조립과 상태 분리 중"
+      },
+      "reported_balance_change": {
+        "before": "14160.30",
+        "after": "14159.30",
+        "source": "문 담당 세션 전달",
+        "note": "공유 계정 전체의 현재 잔액으로 간주하지 않음; 개별 과금은 작업 영수증 기준"
+      },
+      "repeat_generation": false
     },
     {
       "reservation_id": "hq-first-day-corridor-round2-01a1632e",
@@ -127,13 +155,13 @@
       "owner_branch": "codex/pixellab-cutscene-round2",
       "asset": "첫 출근 빈 본부 복도 문 열림 1컷의 배경 원본",
       "background_images": 1,
-      "tool": null,
+      "tool": "create_image_pixen",
       "reserved_generation_calls": 1,
-      "quoted_charge": null,
-      "quote_status": "담당자가 정확한 도구·비용 조사 중",
-      "state": "reserved_by_other_session_pending_quote",
-      "job_id": null,
-      "actual_charge": null,
+      "quoted_charge": 1,
+      "quote_status": "담당자가 서버 영수증 cost=1 generation 전달",
+      "state": "submitted_recovery_pending",
+      "job_id": "21ec4c32-1bf3-4dba-a2c4-a8368d8af51f",
+      "actual_charge": 1,
       "delivery_sha": null,
       "do_not_generate_in_character_queue": true,
       "character_generation_calls": 0,
@@ -149,6 +177,29 @@
         "generations_remaining": "14160.30",
         "active_jobs": 0,
         "note": "전달 당시 조회 기록이며 현재 계정값이나 이 세션 인증 복구를 의미하지 않음"
+      },
+      "canvas": [
+        320,
+        180
+      ],
+      "transparent_background": false,
+      "charge_unit": "generations",
+      "submitted_generation_calls": 1,
+      "remaining_reserved_generation_calls": 0,
+      "additional_ai_animation_calls": 0,
+      "updated_at": "2026-10-22T19:39:30.694327+09:00",
+      "cost_evidence": {
+        "source": "owner_report_of_server_receipt",
+        "independently_fetched_here": false,
+        "reported_cost": 1,
+        "unit": "generation"
+      },
+      "animation_plan": {
+        "local_composited_unique_positions": 17,
+        "shared_source": "본부 문 담당 새 레이어",
+        "previous_proposed_animation_generations": 4,
+        "proposal_status": "취소된 생성 계획; 제출/과금/서버 작업 취소를 의미하지 않음",
+        "additional_ai_calls": 0
       }
     },
     {
@@ -203,5 +254,12 @@
         "note": "담당 범위 중복 없음. 계정 동시 제출 슬롯 확보를 뜻하지 않음"
       }
     }
-  ]
+  ],
+  "external_cost_summary": {
+    "as_of_received_at": "2026-10-22T19:39:30.694327+09:00",
+    "reported_receipt_charge_generations": 2,
+    "pending_quoted_generations": 10,
+    "pending_quote_reservation": "spangdal-first-hit-hand-01a1632e82b9",
+    "note": "담당자 전달 영수증 기준 2회. 스팡달 10회는 미실행 견적. 이 세션 신규 생성 0회; 현재 잔액은 독립 조회하지 않음."
+  }
 }
