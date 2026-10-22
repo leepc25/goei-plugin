@@ -1,0 +1,22 @@
+{
+  "observed_at": "2026-10-22T10:43:42.355Z",
+  "balance": {
+    "content": [
+      {
+        "type": "text",
+        "text": "credits: $0.00\ngenerations_remaining: 14117.30\ngenerations_used: 5237.70\ngenerations_total: 19355\nnote: fractions come from small steps billed per use — prompt enhancement 0.05, skeleton estimation and colour reduction 0.1, sprite import 0.25, /chat builder model calls — most are not jobs, so list_jobs does not show them\nsubscription: active (Tier 3: Pixel Architect 2x)\ngenerations_reset: 2026-11-20\nnote: generations_total is this cycle's allowance (prorated on a mid-cycle upgrade); it refills on generations_reset"
+      }
+    ],
+    "isError": false
+  },
+  "jobs": {
+    "content": [
+      {
+        "type": "text",
+        "text": "5 jobs:\n11526db3-3927-47df-a600-5f55e1473bcc processing 10%, eta ~102s (animation, 47s old)\nf06a14de-204f-47b2-badd-dfd49796f148 processing 11%, eta ~512s (animation, 1m3s old)\n2fce7c21-c96f-492c-a404-e5cdeb9a6450 processing 15%, eta ~449s (animation, 1m19s old)\nc679844b-e541-48e4-9006-4b615ddb9dcc processing 100%, eta ~60s (edit_images, 1m19s old)\nd9e65b7a-aca2-48db-b2d9-1ae5d15823e4 processing 17%, eta ~403s (animation, 1m22s old)\nhint: cancel_job(job_id=\"...\") to release a stuck job's concurrency slot"
+      }
+    ],
+    "isError": false
+  },
+  "note": "Shared account balance changes include other owners. Only server charged_generations=3 assigned to this Jyaldi job."
+}

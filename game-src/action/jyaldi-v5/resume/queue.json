@@ -1,35 +1,37 @@
 {
-  "observed_at": "2026-10-22T10:25:46.791400+00:00",
+  "observed_at": "2026-10-22T10:44:54.183231+00:00",
   "branch": "codex/art-jyaldi-resume",
   "account": {
-    "balance": null,
-    "active_jobs": null,
-    "concurrency_limit": null,
-    "error": "get_balance and list_jobs both return 401 Missing Authorization header after user-reported connection",
-    "evidence": "evidence/recheck-20261022T102500Z/",
-    "environment_spec_revision": "4"
+    "balance_observed": 14117.3,
+    "active_jobs_observed": 5,
+    "account_specific_concurrency_limit": null,
+    "tier_documented_concurrency_limit": 20,
+    "evidence": "evidence/local-after.json",
+    "note": "Timestamped shared account snapshot. Not current forever; balance delta not attributed."
   },
   "per_owner_inflight_limit": 1,
   "global_lock_acquired": false,
-  "new_paid_calls": 0,
-  "new_actual_charge": 0,
+  "new_paid_calls": 1,
+  "new_actual_charge": 3,
   "walk": {
-    "state": "unsubmitted_auth_blocked_reference_review_pending",
+    "state": "completed_quality_hold",
     "frames": 8,
     "quote_generations": 3,
-    "job_id": null,
-    "actual_cost": null,
-    "file_sha256": "5e7376f3ab60342e9e0859371bc53fa87cd9d37e8d4752cb413e18c14fee74d3",
-    "arguments_sha256": "2fd1253190bf7e0e97dbd380c3ec88f9a7cfecdfd64557f0d5b72bdfede6318b"
+    "job_id": "df3b56fb-5426-4491-888f-f94a4192e5cf",
+    "actual_cost": 3,
+    "cost_unit": "generations",
+    "arguments_sha256": "2fd1253190bf7e0e97dbd380c3ec88f9a7cfecdfd64557f0d5b72bdfede6318b",
+    "input_sha256": "fa72194d31e4f08b1612d99b7ffcf056a6d67d8e1ff2b51139424afc631e3b0a",
+    "evidence": "evidence/walk-completed.json"
   },
   "run": {
-    "state": "wait_for_walk_review",
+    "state": "not_submitted_wait_for_walk_quality_correction",
     "job_id": null,
     "actual_cost": null
   },
   "kyuras_recovery": {
     "owner": "큐라스 담당",
-    "handoff_acknowledged": false,
+    "handoff_acknowledged": true,
     "recovery_performed_here": false,
     "jobs": [
       {
@@ -50,6 +52,12 @@
     "jyaldi showerturn",
     "jyaldi shower"
   ],
-  "generated": false,
-  "user_visual_approval": false
+  "generated": true,
+  "user_visual_approval": false,
+  "owner_inflight": 0,
+  "coordination": {
+    "controller_thread": "01a1632e-358b-7931-b8ab-c3487b5b6095",
+    "controller_branch": "codex/character-production-control",
+    "this_owner": "jyaldi only; controller ledger untouched"
+  }
 }

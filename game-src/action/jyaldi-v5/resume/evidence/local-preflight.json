@@ -1,0 +1,35 @@
+{
+  "observed_at": "2026-10-22T10:37:41.889Z",
+  "balance": {
+    "status": "fulfilled",
+    "value": {
+      "content": [
+        {
+          "type": "text",
+          "text": "credits: $0.00\ngenerations_remaining: 14160.30\ngenerations_used: 5194.70\ngenerations_total: 19355\nnote: fractions come from small steps billed per use — prompt enhancement 0.05, skeleton estimation and colour reduction 0.1, sprite import 0.25, /chat builder model calls — most are not jobs, so list_jobs does not show them\nsubscription: active (Tier 3: Pixel Architect 2x)\ngenerations_reset: 2026-11-20\nnote: generations_total is this cycle's allowance (prorated on a mid-cycle upgrade); it refills on generations_reset"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "jobs": {
+    "status": "fulfilled",
+    "value": {
+      "content": [
+        {
+          "type": "text",
+          "text": "no active jobs, and none finished in the last 30 minutes\nnote: completed/failed rows are deleted 8 hours after they finish, so older work is gone from here either way"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "limits": {
+    "tier3_documented_limit": 20,
+    "account_specific_cap": null,
+    "price": 3
+  },
+  "owner": "01a1632e-1944-7c20-8551-3a279d6c0a24",
+  "reference_review": "Overlay viewed: visible near shoulder/elbow/wrist and knees/ankles align; hidden far arm/eye/ear remain anatomical estimates. Not user visual approval.",
+  "quote_generations": 3
+}

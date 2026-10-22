@@ -1,0 +1,12 @@
+{
+  "submitted_at": "2026-10-22T10:38:10.523Z",
+  "response": {
+    "content": [
+      {
+        "type": "text",
+        "text": "id: df3b56fb-5426-4491-888f-f94a4192e5cf\njob_id: df3b56fb-5426-4491-888f-f94a4192e5cf\ndescription: adult woman agent, long straight black hair, red eyes, blue-grey shaded black suit with a hip-length jacket, white shirt, black tie, black gloves, black shoes, right hip holster, identical proportions and palette to reference, character only\naction: walking forward, alternating opposite arms and legs\nframes: 8\nsize: 192x144px\ntransparent: True\ncost: 3 generations\nstatus: processing (~4 min)\n\nhint: get_image(job_id=\"df3b56fb-5426-4491-888f-f94a4192e5cf\")\nasset_id: 16e5be89-c304-5e1b-9867-5b65768e92af\nasset_status: pending (saved to your gallery when generation completes)"
+      }
+    ],
+    "isError": false
+  }
+}

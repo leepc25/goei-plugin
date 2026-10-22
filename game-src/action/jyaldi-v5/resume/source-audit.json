@@ -1,8 +1,8 @@
 {
   "refs": {
     "origin/main": "317faad892a4c89f339f63b6960b751e22801bc1",
-    "origin/codex/metroidvania-run-system": "7f8fdfb0c5a6cef096d412d3d872aec6eae7de81",
-    "origin/codex/character-production-resume": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4"
+    "origin/codex/metroidvania-run-system": "59a2a883c6aca00f8c0e1e5fc2c421a6da770528",
+    "origin/codex/character-production-resume": "6b8000ea3f51a9ac9cc437995c5a2edc0e77b2eb"
   },
   "source_comparisons": {
     "origin/main": [],
@@ -11,7 +11,7 @@
       "game-src/action/jyaldi-v5/spend.log"
     ]
   },
-  "manifest_sha256": "78bd9a68af565a6d595bdc8adf37a5337968e003e72f9525098e5b2a50d65095",
+  "manifest_sha256": "2057836f958d8eb1d007af60c4ef29caa31bb740e89c5ec2e9c2522b55d7c8ff",
   "clips": {
     "walk": {
       "raw_count": 8,
@@ -941,15 +941,16 @@
   ],
   "requests": {
     "walk": {
-      "file_sha256": "5e7376f3ab60342e9e0859371bc53fa87cd9d37e8d4752cb413e18c14fee74d3",
+      "file_sha256": "5648ef887d8b7d9b5b80e42142e3e23e2be1000335069a778fd4b666d3551fb3",
       "arguments_sha256": "2fd1253190bf7e0e97dbd380c3ec88f9a7cfecdfd64557f0d5b72bdfede6318b"
     },
     "run": {
-      "file_sha256": "bcd9d743988c2d6fabeb6090766a8685c5e9bd48d40259ec40e967b811430d3d",
+      "file_sha256": "ce0b11530d5dcc37f661c0e85eecaf8f63a90687f59264f38552a6d06ef8065b",
       "arguments_sha256": "f0533105ef6c73c44c6548c7ddf8721aaeccc471038d9d9d68b45f7f3a3616d8"
     }
   },
-  "paid_calls": 0,
-  "new_artwork": false,
+  "scope": "preexisting source audit only; generated delivery in walk-20261022/manifest.json",
+  "paid_calls_by_audit": 0,
+  "new_artwork_by_audit": false,
   "user_visual_approval": false
 }

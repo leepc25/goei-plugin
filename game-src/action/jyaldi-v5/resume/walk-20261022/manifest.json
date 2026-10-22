@@ -1,0 +1,130 @@
+{
+  "character": "jyaldi",
+  "clip": "walk",
+  "frames": 8,
+  "frame_size": [
+    192,
+    144
+  ],
+  "raw_unmodified": true,
+  "generation_complete": true,
+  "quality_pass": false,
+  "user_visual_approval": false,
+  "job_id": "df3b56fb-5426-4491-888f-f94a4192e5cf",
+  "charged_generations": 3,
+  "arguments_sha256": "2fd1253190bf7e0e97dbd380c3ec88f9a7cfecdfd64557f0d5b72bdfede6318b",
+  "input_sha256": "fa72194d31e4f08b1612d99b7ffcf056a6d67d8e1ff2b51139424afc631e3b0a",
+  "cycle_delta_x": 48,
+  "engine_integrated": false,
+  "frames_evidence": [
+    {
+      "frame": 0,
+      "bbox": [
+        29,
+        38,
+        88,
+        136
+      ],
+      "lowest_opaque_y": 135,
+      "colors": 32,
+      "sha256": "0055fa765601859cde4210f34ffc0932e84c083589feea6fc67a64521addd317"
+    },
+    {
+      "frame": 1,
+      "bbox": [
+        35,
+        41,
+        88,
+        136
+      ],
+      "lowest_opaque_y": 135,
+      "colors": 34,
+      "sha256": "1b1fae86d31921fe03b080b91924149f9f98ec0236fbb8a8443426d0c0c58520"
+    },
+    {
+      "frame": 2,
+      "bbox": [
+        39,
+        38,
+        90,
+        136
+      ],
+      "lowest_opaque_y": 135,
+      "colors": 32,
+      "sha256": "6562ea4c92a6c706d8be630464f8f32d396131c0ec39d4d595773ae9651ea65d"
+    },
+    {
+      "frame": 3,
+      "bbox": [
+        45,
+        38,
+        95,
+        136
+      ],
+      "lowest_opaque_y": 135,
+      "colors": 34,
+      "sha256": "a410197cbd3427cdcc931e207eb50b1b7a44e7215888297893a5cafd8e73c721"
+    },
+    {
+      "frame": 4,
+      "bbox": [
+        51,
+        40,
+        111,
+        137
+      ],
+      "lowest_opaque_y": 136,
+      "colors": 35,
+      "sha256": "0634f6639a6ef2f2e77162203f0e629dbc18d6100ec35225576b2844a079615b"
+    },
+    {
+      "frame": 5,
+      "bbox": [
+        56,
+        40,
+        110,
+        136
+      ],
+      "lowest_opaque_y": 135,
+      "colors": 35,
+      "sha256": "6c1b13927cb3ff0d11c334633995beaab2af41474b490ed725a3e932e3b2a68c"
+    },
+    {
+      "frame": 6,
+      "bbox": [
+        62,
+        39,
+        112,
+        135
+      ],
+      "lowest_opaque_y": 134,
+      "colors": 32,
+      "sha256": "ae6c53987845cab1c20e8a20f5addd4e7c47cdc574ec962a6a1da0a0ffceb9c5"
+    },
+    {
+      "frame": 7,
+      "bbox": [
+        67,
+        39,
+        120,
+        135
+      ],
+      "lowest_opaque_y": 134,
+      "colors": 34,
+      "sha256": "b6f73e677c10fe821d1476081a82db07b65c7821473dddb722f3303932e0026d"
+    }
+  ],
+  "failures": [
+    {
+      "type": "quality",
+      "frame": [
+        4,
+        6,
+        7
+      ],
+      "reason": "4 front contact mismatch; 6/7 sole y134 instead of135; bent-knee posture remains",
+      "retry_performed": false
+    }
+  ],
+  "next_method": "Fix measured foot-contact contours and more upright pelvis/IK contact keyposes separately; do not rerun unchanged 8-frame request."
+}

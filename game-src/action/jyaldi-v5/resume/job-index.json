@@ -1,8 +1,8 @@
 {
-  "basis": "7f8fdfb0c5a6cef096d412d3d872aec6eae7de81",
+  "basis": "59a2a883c6aca00f8c0e1e5fc2c421a6da770528",
   "scope": "eight agent spend.log submission records only; not live account job list",
   "note": "Historical balance changes and batch estimates are not per-job actual charges. Unknown cost is null, not zero.",
-  "job_count": 1023,
+  "job_count": 1024,
   "jobs": [
     {
       "job_id": "42b12cee-9e7b-496e-a721-69deaf28c853",
@@ -6871,6 +6871,21 @@
           "text": "job_id: 037bbe08-c043-4055-a166-20e06c19e792"
         }
       ]
+    },
+    {
+      "job_id": "df3b56fb-5426-4491-888f-f94a4192e5cf",
+      "character": "jyaldi-v5",
+      "actual_cost": 3,
+      "cost_status": "server_receipt_verified",
+      "evidence": [
+        {
+          "path": "game-src/action/jyaldi-v5/spend.log",
+          "line": 1812,
+          "text": "2026-10-22T10:44:54.183231+00:00 LOCAL authenticated MCP Jyaldi walk skeleton-v3 8 frames 192x144. job_id: df3b56fb-5426-4491-888f-f94a4192e5cf"
+        }
+      ],
+      "cost_unit": "generations",
+      "cost_evidence": "game-src/action/jyaldi-v5/resume/evidence/walk-completed.json"
     },
     {
       "job_id": "a08976c6-2b55-4991-b172-fad06e0d65ae",

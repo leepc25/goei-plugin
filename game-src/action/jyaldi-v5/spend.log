@@ -1808,3 +1808,7 @@ description: tall slim adult woman agent, long straight black hair to the
 
 2026-10-22T10:20:46.077176+00:00 codex/art-jyaldi-resume: tools/list OK; get_balance/list_jobs/search_help MCP 401 Missing Authorization. New submissions=0, new charge=0; balance/active_jobs/limit unknown. walk 8-frame public quote=3 generations; not submitted. Kyuras two paid jobs handed off in resume/HANDOFF-20261022.md, not recovered here.
 2026-10-22T10:25:46.791400+00:00 auth recheck after user connection: get_balance/list_jobs both MCP 401 Missing Authorization header. Environment revision 4 reports no secret/runtime bindings. New submissions=0; new charge=0; live balance/queue/limit unknown. Evidence resume/evidence/recheck-20261022T102500Z/.
+
+2026-10-22T10:44:54.183231+00:00 LOCAL authenticated MCP Jyaldi walk skeleton-v3 8 frames 192x144. job_id: df3b56fb-5426-4491-888f-f94a4192e5cf
+quote=3 generations; server charged_generations=3; completed/raw 8 recovered; input_sha256=fa72194d31e4f08b1612d99b7ffcf056a6d67d8e1ff2b51139424afc631e3b0a; arguments_sha256=2fd1253190bf7e0e97dbd380c3ec88f9a7cfecdfd64557f0d5b72bdfede6318b
+quality HOLD: frame4 contact, frame6/7 sole height and crouched posture. No repeated paid request. Evidence resume/evidence/walk-completed.json. Shared balance delta not used. run unsubmitted.
