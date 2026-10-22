@@ -134,6 +134,29 @@ def hand(src, i):
     return [round(x + DX), round(y + DY)]
 
 
+def frame_sources(src, idx, fx, raw_frames):
+    """Keep source identity and the image's vertical translation with each frame."""
+    sources = fx.get('compose')
+    out = []
+    for i in idx:
+        clip, raw = sources[i] if sources else (src, i)
+        dy = 0
+        if not sources and str(raw) in fx.get('align', {}):
+            bbox = raw_frames[raw].getbbox()
+            if bbox:
+                dy = fx['align'][str(raw)] - (bbox[3] - 1)
+        out.append({'clip': clip, 'frame': raw, 'offset': [0, dy]})
+    return out
+
+
+def source_hands(sources):
+    out = []
+    for source in sources:
+        h = hand(source['clip'], source['frame'])
+        out.append([h[0] + source['offset'][0], h[1] + source['offset'][1]] if h else None)
+    return out
+
+
 def main():
     fixes = {}
     fp = os.path.join(SRC, 'fixes.json')
@@ -155,6 +178,7 @@ def main():
     final = os.path.join(SRC, 'final'); os.makedirs(final, exist_ok=True)
     for d in defs:
         fr = lookback_frames() if d['key'] == 'lookback' else frames_of(d['src'])
+        raw_frames = fr.copy()
         idx = list(range(len(fr)))
         if d['src'] in grig.CLIPS and d['plan'] and len(fr) > d['plan'] and not d['rng']:
             idx = idx[:d['plan']]                      # 버릴 끝 장
@@ -179,12 +203,16 @@ def main():
         strips[d['key']] = base64.b64encode(data).decode()
         open(os.path.join(final, d['key'] + '.png'), 'wb').write(data)
         c = {k: d[k] for k in ('label', 'fps', 'loop', 'hits', 'group')} | {'frames': len(frames), 'src': d['src'], 'idx': idx}
-        if fx.get('compose'):
-            hs = [hand(c, i) for c, i in fx['compose']]
+        sources = frame_sources(d['src'], idx, fx, raw_frames)
+        c['frameSources'] = sources
+        if d['key'] == 'lookback':
+            c['derivedFrom'] = 'idle: head reflection; not a new generation'
+            hs = [hand('idle', i % 4) for i in idx]
         else:
-            hs = [hand('idle' if d['key'] == 'lookback' else d['src'], i % 4 if d['key'] == 'lookback' else i) for i in idx]
+            hs = source_hands(sources)
         if all(hs):
             c['hand'] = hs
+            c['handBasis'] = 'skeleton-with-image-offset; not visually measured'
         manifest['clips'][d['key']] = c
     json.dump(manifest, open(os.path.join(final, 'manifest.json'), 'w'), ensure_ascii=False, indent=1)
     json.dump({k: v['hand'] for k, v in manifest['clips'].items() if v.get('hand')}, open(os.path.join(final, 'hands.json'), 'w'), separators=(',', ':'))

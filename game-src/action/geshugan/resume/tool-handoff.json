@@ -1,0 +1,77 @@
+{
+  "source_commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+  "scope": "참조 인계만. 전체 브랜치 병합 없음. 담당 수령 미확인.",
+  "owners": {
+    "kyuras": [
+      {
+        "path": "tools/recover_character_jobs.py",
+        "sha256": "80a8649e5257cb248c5f42dc522a1319c3ad8dd3a8f5e3061fe76b64247166f3",
+        "url": "https://github.com/leepc25/goei-plugin/blob/087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4/tools/recover_character_jobs.py"
+      },
+      {
+        "path": "tests/character-recovery.test.py",
+        "sha256": "e47840f4a09ca792314ed9918147a81a1be41dbacaa3f0e2e7497805e3839aed",
+        "url": "https://github.com/leepc25/goei-plugin/blob/087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4/tests/character-recovery.test.py"
+      },
+      {
+        "path": "docs/character-resume/kyuras-audit.md",
+        "sha256": "57f8ebbddb4776413a8b579ebd942eb0543ef0b969576628b14c515f3ed95054",
+        "url": "https://github.com/leepc25/goei-plugin/blob/087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4/docs/character-resume/kyuras-audit.md"
+      }
+    ],
+    "jyaldi": [
+      {
+        "path": "game-src/action/jyaldi-v5/resume/build_drafts.py",
+        "sha256": "55193e53e481462224219e0bb5c256ae61f797a0517f5104fa3677bfc7603640",
+        "url": "https://github.com/leepc25/goei-plugin/blob/087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4/game-src/action/jyaldi-v5/resume/build_drafts.py"
+      },
+      {
+        "path": "game-src/action/jyaldi-v5/resume/README.md",
+        "sha256": "568ab04e2bca126417c4217657ecebe7853230202605e81dfeb1ef1a668adbfd",
+        "url": "https://github.com/leepc25/goei-plugin/blob/087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4/game-src/action/jyaldi-v5/resume/README.md"
+      },
+      {
+        "path": "game-src/action/jyaldi-v5/resume/walk-request.draft.json",
+        "sha256": "5e7376f3ab60342e9e0859371bc53fa87cd9d37e8d4752cb413e18c14fee74d3",
+        "url": "https://github.com/leepc25/goei-plugin/blob/087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4/game-src/action/jyaldi-v5/resume/walk-request.draft.json"
+      },
+      {
+        "path": "game-src/action/jyaldi-v5/resume/run-request.draft.json",
+        "sha256": "bcd9d743988c2d6fabeb6090766a8685c5e9bd48d40259ec40e967b811430d3d",
+        "url": "https://github.com/leepc25/goei-plugin/blob/087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4/game-src/action/jyaldi-v5/resume/run-request.draft.json"
+      },
+      {
+        "path": "docs/character-resume/jyaldi-audit.md",
+        "sha256": "0eeb541932b7b7670d1fc40cdc450a54ffcb48e13ac0c73099dc2198a412fd5d",
+        "url": "https://github.com/leepc25/goei-plugin/blob/087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4/docs/character-resume/jyaldi-audit.md"
+      }
+    ],
+    "all": [
+      {
+        "path": "tools/build_character_delivery.py",
+        "sha256": "45e17a398a4ae0d09c837f8d7ada1459c8b7a883eae7bfe4db42bea7238bc559",
+        "url": "https://github.com/leepc25/goei-plugin/blob/087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4/tools/build_character_delivery.py"
+      },
+      {
+        "path": "tools/build_character_resume_demo.py",
+        "sha256": "d0a5b4209c099264a05fa76db16c4bcda98175f05cbc27cc72f7adf3f0815569",
+        "url": "https://github.com/leepc25/goei-plugin/blob/087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4/tools/build_character_resume_demo.py"
+      },
+      {
+        "path": "tools/character_resume_demo.html",
+        "sha256": "aa62825c94ea5b24672594c8f97bce402515a0cb4a350bd59be2042b822e8bcf",
+        "url": "https://github.com/leepc25/goei-plugin/blob/087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4/tools/character_resume_demo.html"
+      },
+      {
+        "path": "docs/character-resume/other-agents-audit.md",
+        "sha256": "b953451cd644629ccac29953752aaed433e57621604a82329e57076e73f04ac7",
+        "url": "https://github.com/leepc25/goei-plugin/blob/087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4/docs/character-resume/other-agents-audit.md"
+      },
+      {
+        "path": "game-src/action/character-resume/queue.json",
+        "sha256": "dc846467d21adfe3f505a5ea2cb1861d5107815b461106896943fe6c62ae56ab",
+        "url": "https://github.com/leepc25/goei-plugin/blob/087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4/game-src/action/character-resume/queue.json"
+      }
+    ]
+  }
+}

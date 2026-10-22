@@ -1,0 +1,26 @@
+[
+  {
+    "file": "balance-response.txt.gz",
+    "uncompressed_sha256": "943096626a3f8d27b220f6916531f8ee030db5a061de47555e8742e15318f55b"
+  },
+  {
+    "file": "search_help-response.txt.gz",
+    "uncompressed_sha256": "44795998176b8ad80eda36fd628729d1ecba38d95e8c00e643c29c48f83e05dd"
+  },
+  {
+    "file": "get_balance-reauth-response.txt.gz",
+    "uncompressed_sha256": "47bd0ebbd08e16f8678c97778827995d556f3ad8c072e790338dd05e88fd0ba3"
+  },
+  {
+    "file": "list_jobs-response.txt.gz",
+    "uncompressed_sha256": "818fe6b3b4a4c00d8f13f617fb5cb75464b67aadd2795e68310ceb1743c66896"
+  },
+  {
+    "file": "tools-response.txt.gz",
+    "uncompressed_sha256": "ec75d5e403947390fb7a67db6f84364ef5c058a494153b18b242cc8d6aceb6fb"
+  },
+  {
+    "file": "list_jobs-reauth-response.txt.gz",
+    "uncompressed_sha256": "818fe6b3b4a4c00d8f13f617fb5cb75464b67aadd2795e68310ceb1743c66896"
+  }
+]

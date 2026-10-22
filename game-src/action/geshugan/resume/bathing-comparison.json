@@ -1,0 +1,126 @@
+{
+  "branch": "origin/art/geshugan-bath-20261022-final",
+  "commit": "7b2cb8aeac261e564f8c0a7d4bb85c7af7b5bb79",
+  "files": [
+    {
+      "path": "game-src/action/geshugan/clips/bath/00.png",
+      "delivery_blob": "df20f9ff5004e5c1fbb1e082a9498cb231d51bf9",
+      "current_blob": "df20f9ff5004e5c1fbb1e082a9498cb231d51bf9",
+      "identical": true
+    },
+    {
+      "path": "game-src/action/geshugan/clips/bath/01.png",
+      "delivery_blob": "003868bd5eeb862b4c980580e7dc07de4a7d1612",
+      "current_blob": "003868bd5eeb862b4c980580e7dc07de4a7d1612",
+      "identical": true
+    },
+    {
+      "path": "game-src/action/geshugan/clips/bath/02.png",
+      "delivery_blob": "df20f9ff5004e5c1fbb1e082a9498cb231d51bf9",
+      "current_blob": "df20f9ff5004e5c1fbb1e082a9498cb231d51bf9",
+      "identical": true
+    },
+    {
+      "path": "game-src/action/geshugan/clips/bath/03.png",
+      "delivery_blob": "07a1986a0e4395d15c62f70da7f8cb06829d191d",
+      "current_blob": "07a1986a0e4395d15c62f70da7f8cb06829d191d",
+      "identical": true
+    },
+    {
+      "path": "game-src/action/geshugan/clips/shower/00.png",
+      "delivery_blob": "46e783fe03ff135a732d5e8672c09acfd2a81d40",
+      "current_blob": "46e783fe03ff135a732d5e8672c09acfd2a81d40",
+      "identical": true
+    },
+    {
+      "path": "game-src/action/geshugan/clips/shower/01.png",
+      "delivery_blob": "7e5e853cec3522ced344a5ce164bb8c289c35c4a",
+      "current_blob": "7e5e853cec3522ced344a5ce164bb8c289c35c4a",
+      "identical": true
+    },
+    {
+      "path": "game-src/action/geshugan/clips/shower/02.png",
+      "delivery_blob": "5823755c8d4a13830772e8d72b89d735af58e4be",
+      "current_blob": "5823755c8d4a13830772e8d72b89d735af58e4be",
+      "identical": true
+    },
+    {
+      "path": "game-src/action/geshugan/clips/shower/03.png",
+      "delivery_blob": "38787e4c3e55066cb9ee8ca6026f15777c7dd949",
+      "current_blob": "38787e4c3e55066cb9ee8ca6026f15777c7dd949",
+      "identical": true
+    },
+    {
+      "path": "game-src/action/geshugan/clips/shower/04.png",
+      "delivery_blob": "cacc8e8ca6980b5f07757834e7f543ce607616df",
+      "current_blob": "cacc8e8ca6980b5f07757834e7f543ce607616df",
+      "identical": true
+    },
+    {
+      "path": "game-src/action/geshugan/clips/shower/05.png",
+      "delivery_blob": "9ab629b0b87ca3815820527f168e838890ada00d",
+      "current_blob": "9ab629b0b87ca3815820527f168e838890ada00d",
+      "identical": true
+    },
+    {
+      "path": "game-src/action/geshugan/clips/showerturn/00.png",
+      "delivery_blob": "b74061a8cf83988924f4f202fcd7ded41c1d3109",
+      "current_blob": "b74061a8cf83988924f4f202fcd7ded41c1d3109",
+      "identical": true
+    },
+    {
+      "path": "game-src/action/geshugan/clips/showerturn/01.png",
+      "delivery_blob": "13c22c495f0820a34d70492bcdb5d9393215890e",
+      "current_blob": "13c22c495f0820a34d70492bcdb5d9393215890e",
+      "identical": true
+    },
+    {
+      "path": "game-src/action/geshugan/clips/showerturn/02.png",
+      "delivery_blob": "769bc58cc0a3f6b2d9ec3e933bd0cd986b2e057b",
+      "current_blob": "769bc58cc0a3f6b2d9ec3e933bd0cd986b2e057b",
+      "identical": true
+    },
+    {
+      "path": "game-src/action/geshugan/clips/undress/00.png",
+      "delivery_blob": "96058f56e121895fc68fc2835e69beb5a9a6fa73",
+      "current_blob": "96058f56e121895fc68fc2835e69beb5a9a6fa73",
+      "identical": true
+    },
+    {
+      "path": "game-src/action/geshugan/clips/undress/01.png",
+      "delivery_blob": "a620eea546498f7abcc572beeb0b1b72fca57c47",
+      "current_blob": "a620eea546498f7abcc572beeb0b1b72fca57c47",
+      "identical": true
+    },
+    {
+      "path": "game-src/action/geshugan/clips/undress/02.png",
+      "delivery_blob": "8c190305e7814942d4928f8f8c8d805b5f547ac3",
+      "current_blob": "8c190305e7814942d4928f8f8c8d805b5f547ac3",
+      "identical": true
+    },
+    {
+      "path": "game-src/action/geshugan/clips/undress/03.png",
+      "delivery_blob": "7d2788d8d69dd5bc5ecddaf8e84eedccca3eace3",
+      "current_blob": "7d2788d8d69dd5bc5ecddaf8e84eedccca3eace3",
+      "identical": true
+    },
+    {
+      "path": "game-src/action/geshugan/clips/undress/04.png",
+      "delivery_blob": "fcedafd8dce6004191612d2609b4c881f6c021e0",
+      "current_blob": "fcedafd8dce6004191612d2609b4c881f6c021e0",
+      "identical": true
+    },
+    {
+      "path": "game-src/action/geshugan/clips/undress/05.png",
+      "delivery_blob": "93bfea613bd709e0dc92c64b7cf710dcc3d61425",
+      "current_blob": "93bfea613bd709e0dc92c64b7cf710dcc3d61425",
+      "identical": true
+    },
+    {
+      "path": "game-src/action/geshugan/clips/undress/06.png",
+      "delivery_blob": "b74061a8cf83988924f4f202fcd7ded41c1d3109",
+      "current_blob": "b74061a8cf83988924f4f202fcd7ded41c1d3109",
+      "identical": true
+    }
+  ]
+}

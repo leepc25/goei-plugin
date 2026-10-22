@@ -18,6 +18,40 @@
     2,
     3
    ],
+   "frameSources": [
+    {
+     "clip": "idle",
+     "frame": 0,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "idle",
+     "frame": 1,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "idle",
+     "frame": 2,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "idle",
+     "frame": 3,
+     "offset": [
+      0,
+      0
+     ]
+    }
+   ],
    "hand": [
     [
      53,
@@ -35,7 +69,8 @@
      53,
      77
     ]
-   ]
+   ],
+   "handBasis": "skeleton-with-image-offset; not visually measured"
   },
   "cubespin": {
    "label": "대기 버릇: 큐브 띄우기",
@@ -53,6 +88,56 @@
     4,
     5
    ],
+   "frameSources": [
+    {
+     "clip": "cubespin",
+     "frame": 0,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "cubespin",
+     "frame": 1,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "cubespin",
+     "frame": 2,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "cubespin",
+     "frame": 3,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "cubespin",
+     "frame": 4,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "cubespin",
+     "frame": 5,
+     "offset": [
+      0,
+      0
+     ]
+    }
+   ],
    "hand": [
     [
      53,
@@ -78,7 +163,8 @@
      53,
      77
     ]
-   ]
+   ],
+   "handBasis": "skeleton-with-image-offset; not visually measured"
   },
   "scan": {
    "label": "관찰: 시선 꽂기",
@@ -94,6 +180,48 @@
     2,
     3,
     4
+   ],
+   "frameSources": [
+    {
+     "clip": "scan",
+     "frame": 0,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "scan",
+     "frame": 1,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "scan",
+     "frame": 2,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "scan",
+     "frame": 3,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "scan",
+     "frame": 4,
+     "offset": [
+      0,
+      0
+     ]
+    }
    ],
    "hand": [
     [
@@ -116,7 +244,8 @@
      53,
      77
     ]
-   ]
+   ],
+   "handBasis": "skeleton-with-image-offset; not visually measured"
   },
   "stance": {
    "label": "전투 대기",
@@ -131,6 +260,40 @@
     1,
     2,
     3
+   ],
+   "frameSources": [
+    {
+     "clip": "stance",
+     "frame": 0,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "stance",
+     "frame": 1,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "stance",
+     "frame": 2,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "stance",
+     "frame": 3,
+     "offset": [
+      0,
+      0
+     ]
+    }
    ],
    "hand": [
     [
@@ -149,7 +312,8 @@
      87,
      82
     ]
-   ]
+   ],
+   "handBasis": "skeleton-with-image-offset; not visually measured"
   },
   "engage": {
    "label": "대기 → 전투 대기",
@@ -164,6 +328,40 @@
     1,
     2,
     3
+   ],
+   "frameSources": [
+    {
+     "clip": "engage",
+     "frame": 0,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "engage",
+     "frame": 1,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "engage",
+     "frame": 2,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "engage",
+     "frame": 3,
+     "offset": [
+      0,
+      0
+     ]
+    }
    ],
    "hand": [
     [
@@ -182,7 +380,8 @@
      87,
      81
     ]
-   ]
+   ],
+   "handBasis": "skeleton-with-image-offset; not visually measured"
   },
   "walk": {
    "label": "걷기",
@@ -201,6 +400,72 @@
     5,
     6,
     7
+   ],
+   "frameSources": [
+    {
+     "clip": "walk",
+     "frame": 0,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "walk",
+     "frame": 1,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "walk",
+     "frame": 2,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "walk",
+     "frame": 3,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "walk",
+     "frame": 4,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "walk",
+     "frame": 5,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "walk",
+     "frame": 6,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "walk",
+     "frame": 7,
+     "offset": [
+      0,
+      0
+     ]
+    }
    ],
    "hand": [
     [
@@ -235,7 +500,8 @@
      59,
      86
     ]
-   ]
+   ],
+   "handBasis": "skeleton-with-image-offset; not visually measured"
   },
   "step": {
    "label": "전투 걸음",
@@ -252,6 +518,56 @@
     3,
     4,
     5
+   ],
+   "frameSources": [
+    {
+     "clip": "step",
+     "frame": 0,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "step",
+     "frame": 1,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "step",
+     "frame": 2,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "step",
+     "frame": 3,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "step",
+     "frame": 4,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "step",
+     "frame": 5,
+     "offset": [
+      0,
+      0
+     ]
+    }
    ],
    "hand": [
     [
@@ -278,7 +594,8 @@
      103,
      81
     ]
-   ]
+   ],
+   "handBasis": "skeleton-with-image-offset; not visually measured"
   },
   "run": {
    "label": "달리기",
@@ -297,6 +614,72 @@
     5,
     6,
     7
+   ],
+   "frameSources": [
+    {
+     "clip": "run",
+     "frame": 0,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "run",
+     "frame": 1,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "run",
+     "frame": 2,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "run",
+     "frame": 3,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "run",
+     "frame": 4,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "run",
+     "frame": 5,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "run",
+     "frame": 6,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "run",
+     "frame": 7,
+     "offset": [
+      0,
+      0
+     ]
+    }
    ],
    "hand": [
     [
@@ -331,7 +714,8 @@
      80,
      83
     ]
-   ]
+   ],
+   "handBasis": "skeleton-with-image-offset; not visually measured"
   },
   "jump": {
    "label": "점프",
@@ -349,6 +733,64 @@
     4,
     5,
     6
+   ],
+   "frameSources": [
+    {
+     "clip": "jump",
+     "frame": 0,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "fall",
+     "frame": 0,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "fall",
+     "frame": 1,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "fall",
+     "frame": 1,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "fall",
+     "frame": 0,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "jump",
+     "frame": 6,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "jump",
+     "frame": 7,
+     "offset": [
+      0,
+      0
+     ]
+    }
    ],
    "hand": [
     [
@@ -379,7 +821,8 @@
      87,
      81
     ]
-   ]
+   ],
+   "handBasis": "skeleton-with-image-offset; not visually measured"
   },
   "crouch": {
    "label": "앉기",
@@ -394,6 +837,40 @@
     1,
     2,
     3
+   ],
+   "frameSources": [
+    {
+     "clip": "crouch",
+     "frame": 0,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "crouch",
+     "frame": 1,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "crouch",
+     "frame": 2,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "crouch",
+     "frame": 3,
+     "offset": [
+      0,
+      0
+     ]
+    }
    ],
    "hand": [
     [
@@ -412,7 +889,8 @@
      83,
      95
     ]
-   ]
+   ],
+   "handBasis": "skeleton-with-image-offset; not visually measured"
   },
   "crouchwalk": {
    "label": "앉아 이동",
@@ -432,6 +910,72 @@
     6,
     7
    ],
+   "frameSources": [
+    {
+     "clip": "crouchwalk",
+     "frame": 0,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "crouchwalk",
+     "frame": 1,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "crouchwalk",
+     "frame": 2,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "crouchwalk",
+     "frame": 3,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "crouchwalk",
+     "frame": 4,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "crouchwalk",
+     "frame": 5,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "crouchwalk",
+     "frame": 6,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "crouchwalk",
+     "frame": 7,
+     "offset": [
+      0,
+      0
+     ]
+    }
+   ],
    "hand": [
     [
      85,
@@ -465,7 +1009,8 @@
      85,
      96
     ]
-   ]
+   ],
+   "handBasis": "skeleton-with-image-offset; not visually measured"
   },
   "lowmark": {
    "label": "하단 공격(앉아 A)",
@@ -485,6 +1030,64 @@
     4,
     5,
     6
+   ],
+   "frameSources": [
+    {
+     "clip": "lowmark",
+     "frame": 0,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "lowmark",
+     "frame": 1,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "lowmark",
+     "frame": 2,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "lowmark",
+     "frame": 3,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "lowmark",
+     "frame": 4,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "lowmark",
+     "frame": 5,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "lowmark",
+     "frame": 6,
+     "offset": [
+      0,
+      0
+     ]
+    }
    ],
    "hand": [
     [
@@ -515,7 +1118,8 @@
      83,
      95
     ]
-   ]
+   ],
+   "handBasis": "skeleton-with-image-offset; not visually measured"
   },
   "chain3": {
    "label": "A 연계 1·2·3 (한 번에 15장)",
@@ -541,6 +1145,128 @@
     12,
     13,
     14
+   ],
+   "frameSources": [
+    {
+     "clip": "chain3",
+     "frame": 0,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "chain3",
+     "frame": 1,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "chain3",
+     "frame": 2,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "chain3",
+     "frame": 3,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "chain3",
+     "frame": 4,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "chain3",
+     "frame": 5,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "chain3",
+     "frame": 6,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "chain3",
+     "frame": 7,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "chain3",
+     "frame": 8,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "chain3",
+     "frame": 9,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "chain3",
+     "frame": 10,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "chain3",
+     "frame": 11,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "chain3",
+     "frame": 12,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "chain3",
+     "frame": 13,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "chain3",
+     "frame": 14,
+     "offset": [
+      0,
+      0
+     ]
+    }
    ],
    "hand": [
     [
@@ -603,7 +1329,8 @@
      85,
      94
     ]
-   ]
+   ],
+   "handBasis": "skeleton-with-image-offset; not visually measured"
   },
   "tackle": {
    "label": "돌진공격(달리며 A)",
@@ -623,6 +1350,64 @@
     5,
     6,
     7
+   ],
+   "frameSources": [
+    {
+     "clip": "tackle",
+     "frame": 0,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "tackle",
+     "frame": 1,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "tackle",
+     "frame": 2,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "tackle",
+     "frame": 3,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "tackle",
+     "frame": 5,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "tackle",
+     "frame": 6,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "tackle",
+     "frame": 7,
+     "offset": [
+      0,
+      0
+     ]
+    }
    ],
    "hand": [
     [
@@ -653,7 +1438,8 @@
      111,
      81
     ]
-   ]
+   ],
+   "handBasis": "skeleton-with-image-offset; not visually measured"
   },
   "airstomp": {
    "label": "공중 공격",
@@ -672,6 +1458,56 @@
     3,
     4,
     5
+   ],
+   "frameSources": [
+    {
+     "clip": "airstomp",
+     "frame": 0,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "airstomp",
+     "frame": 1,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "airstomp",
+     "frame": 2,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "airstomp",
+     "frame": 3,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "airstomp",
+     "frame": 4,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "airstomp",
+     "frame": 5,
+     "offset": [
+      0,
+      0
+     ]
+    }
    ],
    "hand": [
     [
@@ -698,7 +1534,8 @@
      87,
      81
     ]
-   ]
+   ],
+   "handBasis": "skeleton-with-image-offset; not visually measured"
   },
   "airmark": {
    "label": "공중 지정(공중 S)",
@@ -715,6 +1552,40 @@
     1,
     2,
     3
+   ],
+   "frameSources": [
+    {
+     "clip": "airmark",
+     "frame": 0,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "airmark",
+     "frame": 1,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "airmark",
+     "frame": 2,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "airmark",
+     "frame": 3,
+     "offset": [
+      0,
+      0
+     ]
+    }
    ],
    "hand": [
     [
@@ -733,7 +1604,8 @@
      76,
      78
     ]
-   ]
+   ],
+   "handBasis": "skeleton-with-image-offset; not visually measured"
   },
   "designate": {
    "label": "원거리 준비(S 유지)",
@@ -748,6 +1620,40 @@
     1,
     2,
     3
+   ],
+   "frameSources": [
+    {
+     "clip": "designate",
+     "frame": 0,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "designate",
+     "frame": 1,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "designate",
+     "frame": 2,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "designate",
+     "frame": 3,
+     "offset": [
+      0,
+      0
+     ]
+    }
    ],
    "hand": [
     [
@@ -766,7 +1672,8 @@
      72,
      76
     ]
-   ]
+   ],
+   "handBasis": "skeleton-with-image-offset; not visually measured"
   },
   "clench": {
    "label": "원거리 발동(S 놓기)",
@@ -783,6 +1690,40 @@
     1,
     2,
     3
+   ],
+   "frameSources": [
+    {
+     "clip": "clench",
+     "frame": 0,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "clench",
+     "frame": 1,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "clench",
+     "frame": 2,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "clench",
+     "frame": 3,
+     "offset": [
+      0,
+      0
+     ]
+    }
    ],
    "hand": [
     [
@@ -801,7 +1742,8 @@
      73,
      77
     ]
-   ]
+   ],
+   "handBasis": "skeleton-with-image-offset; not visually measured"
   },
   "hold": {
    "label": "고유기 짧게: 고정",
@@ -820,6 +1762,56 @@
     3,
     4,
     5
+   ],
+   "frameSources": [
+    {
+     "clip": "hold",
+     "frame": 0,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "hold",
+     "frame": 1,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "hold",
+     "frame": 2,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "hold",
+     "frame": 3,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "hold",
+     "frame": 4,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "hold",
+     "frame": 5,
+     "offset": [
+      0,
+      0
+     ]
+    }
    ],
    "hand": [
     [
@@ -846,7 +1838,8 @@
      72,
      56
     ]
-   ]
+   ],
+   "handBasis": "skeleton-with-image-offset; not visually measured"
   },
   "holdloop": {
    "label": "고유기 길게: 고정 유지",
@@ -861,6 +1854,40 @@
     1,
     2,
     3
+   ],
+   "frameSources": [
+    {
+     "clip": "holdloop",
+     "frame": 0,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "holdloop",
+     "frame": 1,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "holdloop",
+     "frame": 2,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "holdloop",
+     "frame": 3,
+     "offset": [
+      0,
+      0
+     ]
+    }
    ],
    "hand": [
     [
@@ -879,7 +1906,8 @@
      80,
      59
     ]
-   ]
+   ],
+   "handBasis": "skeleton-with-image-offset; not visually measured"
   },
   "fling": {
    "label": "놓아 던지기(D 놓기·잡고 방향+A)",
@@ -898,6 +1926,56 @@
     3,
     4,
     5
+   ],
+   "frameSources": [
+    {
+     "clip": "fling",
+     "frame": 0,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "fling",
+     "frame": 1,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "fling",
+     "frame": 2,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "fling",
+     "frame": 3,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "fling",
+     "frame": 4,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "fling",
+     "frame": 5,
+     "offset": [
+      0,
+      0
+     ]
+    }
    ],
    "hand": [
     [
@@ -924,7 +2002,8 @@
      87,
      81
     ]
-   ]
+   ],
+   "handBasis": "skeleton-with-image-offset; not visually measured"
   },
   "parry": {
    "label": "가드: 염동 쳐내기(Q)",
@@ -942,6 +2021,48 @@
     2,
     3,
     4
+   ],
+   "frameSources": [
+    {
+     "clip": "parry",
+     "frame": 0,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "parry",
+     "frame": 1,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "parry",
+     "frame": 2,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "parry",
+     "frame": 3,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "parry",
+     "frame": 4,
+     "offset": [
+      0,
+      0
+     ]
+    }
    ],
    "hand": [
     [
@@ -964,7 +2085,8 @@
      87,
      81
     ]
-   ]
+   ],
+   "handBasis": "skeleton-with-image-offset; not visually measured"
   },
   "parryfail": {
    "label": "가드 실패",
@@ -979,6 +2101,40 @@
     1,
     2,
     3
+   ],
+   "frameSources": [
+    {
+     "clip": "parryfail",
+     "frame": 0,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "parryfail",
+     "frame": 1,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "parryfail",
+     "frame": 2,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "parryfail",
+     "frame": 3,
+     "offset": [
+      0,
+      0
+     ]
+    }
    ],
    "hand": [
     [
@@ -997,7 +2153,8 @@
      68,
      69
     ]
-   ]
+   ],
+   "handBasis": "skeleton-with-image-offset; not visually measured"
   },
   "tkleap": {
    "label": "회피: 염동 도약(Shift)",
@@ -1014,6 +2171,56 @@
     3,
     4,
     5
+   ],
+   "frameSources": [
+    {
+     "clip": "tkleap",
+     "frame": 0,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "tkleap",
+     "frame": 1,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "tkleap",
+     "frame": 2,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "tkleap",
+     "frame": 3,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "tkleap",
+     "frame": 4,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "tkleap",
+     "frame": 5,
+     "offset": [
+      0,
+      0
+     ]
+    }
    ],
    "hand": [
     [
@@ -1040,7 +2247,8 @@
      121,
      81
     ]
-   ]
+   ],
+   "handBasis": "skeleton-with-image-offset; not visually measured"
   },
   "grab": {
    "label": "잡기(E)",
@@ -1055,6 +2263,40 @@
     1,
     2,
     3
+   ],
+   "frameSources": [
+    {
+     "clip": "grab",
+     "frame": 0,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "grab",
+     "frame": 1,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "grab",
+     "frame": 2,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "grab",
+     "frame": 3,
+     "offset": [
+      0,
+      0
+     ]
+    }
    ],
    "hand": [
     [
@@ -1073,7 +2315,8 @@
      94,
      66
     ]
-   ]
+   ],
+   "handBasis": "skeleton-with-image-offset; not visually measured"
   },
   "grabreap": {
    "label": "잡고 A: 오소토가리",
@@ -1094,6 +2337,72 @@
     5,
     6,
     7
+   ],
+   "frameSources": [
+    {
+     "clip": "grabreap",
+     "frame": 0,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "grabreap",
+     "frame": 1,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "grabreap",
+     "frame": 2,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "grabreap",
+     "frame": 3,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "grabreap",
+     "frame": 4,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "grabreap",
+     "frame": 5,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "grabreap",
+     "frame": 6,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "grabreap",
+     "frame": 7,
+     "offset": [
+      0,
+      0
+     ]
+    }
    ],
    "hand": [
     [
@@ -1128,7 +2437,8 @@
      87,
      81
     ]
-   ]
+   ],
+   "handBasis": "skeleton-with-image-offset; not visually measured"
   },
   "grabcrush": {
    "label": "잡고 D·숙련 6: 공간 왜곡 압살",
@@ -1149,6 +2459,72 @@
     5,
     6,
     7
+   ],
+   "frameSources": [
+    {
+     "clip": "grabcrush",
+     "frame": 0,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "grabcrush",
+     "frame": 1,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "grabcrush",
+     "frame": 2,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "grabcrush",
+     "frame": 3,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "grabcrush",
+     "frame": 4,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "grabcrush",
+     "frame": 5,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "grabcrush",
+     "frame": 6,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "grabcrush",
+     "frame": 7,
+     "offset": [
+      0,
+      0
+     ]
+    }
    ],
    "hand": [
     [
@@ -1183,7 +2559,8 @@
      87,
      81
     ]
-   ]
+   ],
+   "handBasis": "skeleton-with-image-offset; not visually measured"
   },
   "super": {
    "label": "필살기",
@@ -1206,6 +2583,88 @@
     7,
     8,
     9
+   ],
+   "frameSources": [
+    {
+     "clip": "super",
+     "frame": 0,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "super",
+     "frame": 1,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "super",
+     "frame": 2,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "super",
+     "frame": 3,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "super",
+     "frame": 4,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "super",
+     "frame": 5,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "super",
+     "frame": 6,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "super",
+     "frame": 7,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "super",
+     "frame": 8,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "super",
+     "frame": 9,
+     "offset": [
+      0,
+      0
+     ]
+    }
    ],
    "hand": [
     [
@@ -1248,7 +2707,8 @@
      87,
      81
     ]
-   ]
+   ],
+   "handBasis": "skeleton-with-image-offset; not visually measured"
   },
   "chain2": {
    "label": "숙련 3: 연속 지정",
@@ -1270,6 +2730,72 @@
     5,
     6,
     7
+   ],
+   "frameSources": [
+    {
+     "clip": "chain2",
+     "frame": 0,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "chain2",
+     "frame": 1,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "chain2",
+     "frame": 2,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "chain2",
+     "frame": 3,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "chain2",
+     "frame": 4,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "chain2",
+     "frame": 5,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "chain2",
+     "frame": 6,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "chain2",
+     "frame": 7,
+     "offset": [
+      0,
+      0
+     ]
+    }
    ],
    "hand": [
     [
@@ -1304,7 +2830,8 @@
      87,
      81
     ]
-   ]
+   ],
+   "handBasis": "skeleton-with-image-offset; not visually measured"
   },
   "support": {
    "label": "지원 등장",
@@ -1325,6 +2852,72 @@
     7,
     8,
     9
+   ],
+   "frameSources": [
+    {
+     "clip": "support",
+     "frame": 0,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "support",
+     "frame": 1,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "support",
+     "frame": 4,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "support",
+     "frame": 5,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "support",
+     "frame": 6,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "support",
+     "frame": 7,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "support",
+     "frame": 8,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "support",
+     "frame": 9,
+     "offset": [
+      0,
+      0
+     ]
+    }
    ],
    "hand": [
     [
@@ -1359,7 +2952,8 @@
      66,
      87
     ]
-   ]
+   ],
+   "handBasis": "skeleton-with-image-offset; not visually measured"
   },
   "focus": {
    "label": "집중 회복(재장전 대신)",
@@ -1376,6 +2970,56 @@
     3,
     4,
     5
+   ],
+   "frameSources": [
+    {
+     "clip": "focus",
+     "frame": 0,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "focus",
+     "frame": 1,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "focus",
+     "frame": 2,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "focus",
+     "frame": 3,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "focus",
+     "frame": 4,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "focus",
+     "frame": 5,
+     "offset": [
+      0,
+      0
+     ]
+    }
    ],
    "hand": [
     [
@@ -1402,7 +3046,8 @@
      68,
      72
     ]
-   ]
+   ],
+   "handBasis": "skeleton-with-image-offset; not visually measured"
   },
   "tkswing": {
    "label": "임시 둔기(38행)",
@@ -1421,6 +3066,56 @@
     3,
     4,
     5
+   ],
+   "frameSources": [
+    {
+     "clip": "tkswing",
+     "frame": 0,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "tkswing",
+     "frame": 1,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "tkswing",
+     "frame": 2,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "tkswing",
+     "frame": 3,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "tkswing",
+     "frame": 4,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "tkswing",
+     "frame": 5,
+     "offset": [
+      0,
+      0
+     ]
+    }
    ],
    "hand": [
     [
@@ -1447,7 +3142,8 @@
      87,
      81
     ]
-   ]
+   ],
+   "handBasis": "skeleton-with-image-offset; not visually measured"
   },
   "gunclench": {
    "label": "임시 총(39행)",
@@ -1464,6 +3160,40 @@
     1,
     2,
     3
+   ],
+   "frameSources": [
+    {
+     "clip": "gunclench",
+     "frame": 0,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "gunclench",
+     "frame": 1,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "gunclench",
+     "frame": 2,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "gunclench",
+     "frame": 3,
+     "offset": [
+      0,
+      0
+     ]
+    }
    ],
    "hand": [
     [
@@ -1482,7 +3212,8 @@
      72,
      71
     ]
-   ]
+   ],
+   "handBasis": "skeleton-with-image-offset; not visually measured"
   },
   "pickup": {
    "label": "줍기(E)",
@@ -1501,6 +3232,56 @@
     3,
     4,
     5
+   ],
+   "frameSources": [
+    {
+     "clip": "pickup",
+     "frame": 0,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "pickup",
+     "frame": 1,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "pickup",
+     "frame": 2,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "pickup",
+     "frame": 3,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "pickup",
+     "frame": 4,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "pickup",
+     "frame": 5,
+     "offset": [
+      0,
+      0
+     ]
+    }
    ],
    "hand": [
     [
@@ -1527,7 +3308,8 @@
      61,
      90
     ]
-   ]
+   ],
+   "handBasis": "skeleton-with-image-offset; not visually measured"
   },
   "toss": {
    "label": "물건 던지기",
@@ -1545,6 +3327,48 @@
     2,
     3,
     4
+   ],
+   "frameSources": [
+    {
+     "clip": "toss",
+     "frame": 0,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "toss",
+     "frame": 1,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "toss",
+     "frame": 2,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "toss",
+     "frame": 3,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "toss",
+     "frame": 4,
+     "offset": [
+      0,
+      0
+     ]
+    }
    ],
    "hand": [
     [
@@ -1567,7 +3391,8 @@
      53,
      77
     ]
-   ]
+   ],
+   "handBasis": "skeleton-with-image-offset; not visually measured"
   },
   "drink": {
    "label": "마시기",
@@ -1585,6 +3410,64 @@
     4,
     5,
     6
+   ],
+   "frameSources": [
+    {
+     "clip": "drink",
+     "frame": 0,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "drink",
+     "frame": 1,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "drink",
+     "frame": 2,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "drink",
+     "frame": 3,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "drink",
+     "frame": 4,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "drink",
+     "frame": 5,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "drink",
+     "frame": 6,
+     "offset": [
+      0,
+      0
+     ]
+    }
    ],
    "hand": [
     [
@@ -1615,7 +3498,8 @@
      61,
      90
     ]
-   ]
+   ],
+   "handBasis": "skeleton-with-image-offset; not visually measured"
   },
   "eat": {
    "label": "먹기",
@@ -1632,6 +3516,56 @@
     3,
     4,
     5
+   ],
+   "frameSources": [
+    {
+     "clip": "eat",
+     "frame": 0,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "eat",
+     "frame": 1,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "eat",
+     "frame": 2,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "eat",
+     "frame": 3,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "eat",
+     "frame": 4,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "eat",
+     "frame": 5,
+     "offset": [
+      0,
+      0
+     ]
+    }
    ],
    "hand": [
     [
@@ -1658,7 +3592,8 @@
      67,
      55
     ]
-   ]
+   ],
+   "handBasis": "skeleton-with-image-offset; not visually measured"
   },
   "bandage": {
    "label": "자기 치료",
@@ -1673,6 +3608,40 @@
     3,
     4,
     5
+   ],
+   "frameSources": [
+    {
+     "clip": "bandage",
+     "frame": 2,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "bandage",
+     "frame": 3,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "bandage",
+     "frame": 4,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "bandage",
+     "frame": 5,
+     "offset": [
+      0,
+      0
+     ]
+    }
    ],
    "hand": [
     [
@@ -1691,7 +3660,8 @@
      59,
      69
     ]
-   ]
+   ],
+   "handBasis": "skeleton-with-image-offset; not visually measured"
   },
   "hit": {
    "label": "약 피격",
@@ -1706,6 +3676,40 @@
     1,
     2,
     3
+   ],
+   "frameSources": [
+    {
+     "clip": "hit",
+     "frame": 0,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "hit",
+     "frame": 1,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "hit",
+     "frame": 2,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "hit",
+     "frame": 3,
+     "offset": [
+      0,
+      0
+     ]
+    }
    ],
    "hand": [
     [
@@ -1724,7 +3728,8 @@
      87,
      81
     ]
-   ]
+   ],
+   "handBasis": "skeleton-with-image-offset; not visually measured"
   },
   "down": {
    "label": "강 피격·다운",
@@ -1744,6 +3749,72 @@
     6,
     7
    ],
+   "frameSources": [
+    {
+     "clip": "down",
+     "frame": 0,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "down",
+     "frame": 1,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "down",
+     "frame": 2,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "down",
+     "frame": 3,
+     "offset": [
+      0,
+      5
+     ]
+    },
+    {
+     "clip": "down",
+     "frame": 4,
+     "offset": [
+      0,
+      -4
+     ]
+    },
+    {
+     "clip": "down",
+     "frame": 5,
+     "offset": [
+      0,
+      -4
+     ]
+    },
+    {
+     "clip": "down",
+     "frame": 6,
+     "offset": [
+      0,
+      -4
+     ]
+    },
+    {
+     "clip": "down",
+     "frame": 7,
+     "offset": [
+      0,
+      -4
+     ]
+    }
+   ],
    "hand": [
     [
      52,
@@ -1759,25 +3830,26 @@
     ],
     [
      51,
-     128
+     133
     ],
     [
      53,
-     128
+     124
     ],
     [
      53,
-     128
+     124
     ],
     [
      53,
-     128
+     124
     ],
     [
      53,
-     128
+     124
     ]
-   ]
+   ],
+   "handBasis": "skeleton-with-image-offset; not visually measured"
   },
   "getup": {
    "label": "기상",
@@ -1797,14 +3869,80 @@
     6,
     7
    ],
+   "frameSources": [
+    {
+     "clip": "getup",
+     "frame": 0,
+     "offset": [
+      0,
+      -3
+     ]
+    },
+    {
+     "clip": "getup",
+     "frame": 1,
+     "offset": [
+      0,
+      5
+     ]
+    },
+    {
+     "clip": "getup",
+     "frame": 2,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "getup",
+     "frame": 3,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "getup",
+     "frame": 4,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "getup",
+     "frame": 5,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "getup",
+     "frame": 6,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "getup",
+     "frame": 7,
+     "offset": [
+      0,
+      0
+     ]
+    }
+   ],
    "hand": [
     [
      53,
-     128
+     125
     ],
     [
      49,
-     117
+     122
     ],
     [
      60,
@@ -1830,7 +3968,8 @@
      101,
      81
     ]
-   ]
+   ],
+   "handBasis": "skeleton-with-image-offset; not visually measured"
   },
   "talk": {
    "label": "말하기",
@@ -1845,6 +3984,40 @@
     1,
     2,
     3
+   ],
+   "frameSources": [
+    {
+     "clip": "talk",
+     "frame": 0,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "talk",
+     "frame": 1,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "talk",
+     "frame": 2,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "talk",
+     "frame": 3,
+     "offset": [
+      0,
+      0
+     ]
+    }
    ],
    "hand": [
     [
@@ -1863,7 +4036,8 @@
      53,
      77
     ]
-   ]
+   ],
+   "handBasis": "skeleton-with-image-offset; not visually measured"
   },
   "tired": {
    "label": "피로 대기",
@@ -1878,6 +4052,40 @@
     1,
     2,
     3
+   ],
+   "frameSources": [
+    {
+     "clip": "tired",
+     "frame": 0,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "tired",
+     "frame": 1,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "tired",
+     "frame": 2,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "tired",
+     "frame": 3,
+     "offset": [
+      0,
+      0
+     ]
+    }
    ],
    "hand": [
     [
@@ -1896,7 +4104,8 @@
      60,
      86
     ]
-   ]
+   ],
+   "handBasis": "skeleton-with-image-offset; not visually measured"
   },
   "stepup": {
    "label": "계단·발판 오르기",
@@ -1914,6 +4123,64 @@
     4,
     5,
     6
+   ],
+   "frameSources": [
+    {
+     "clip": "stepup",
+     "frame": 0,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "stepup",
+     "frame": 1,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "stepup",
+     "frame": 2,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "stepup",
+     "frame": 3,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "stepup",
+     "frame": 4,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "stepup",
+     "frame": 5,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "stepup",
+     "frame": 6,
+     "offset": [
+      0,
+      0
+     ]
+    }
    ],
    "hand": [
     [
@@ -1944,7 +4211,8 @@
      84,
      72
     ]
-   ]
+   ],
+   "handBasis": "skeleton-with-image-offset; not visually measured"
   },
   "stepover": {
    "label": "턱 넘기",
@@ -1961,6 +4229,56 @@
     3,
     4,
     5
+   ],
+   "frameSources": [
+    {
+     "clip": "stepover",
+     "frame": 0,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "stepover",
+     "frame": 1,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "stepover",
+     "frame": 2,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "stepover",
+     "frame": 3,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "stepover",
+     "frame": 4,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "stepover",
+     "frame": 5,
+     "offset": [
+      0,
+      0
+     ]
+    }
    ],
    "hand": [
     [
@@ -1987,7 +4305,8 @@
      90,
      90
     ]
-   ]
+   ],
+   "handBasis": "skeleton-with-image-offset; not visually measured"
   },
   "liesit": {
    "label": "누웠다 일어나 앉기",
@@ -2005,10 +4324,60 @@
     4,
     5
    ],
+   "frameSources": [
+    {
+     "clip": "liesit",
+     "frame": 0,
+     "offset": [
+      0,
+      -8
+     ]
+    },
+    {
+     "clip": "liesit",
+     "frame": 1,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "liesit",
+     "frame": 2,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "liesit",
+     "frame": 3,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "liesit",
+     "frame": 4,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "liesit",
+     "frame": 5,
+     "offset": [
+      0,
+      0
+     ]
+    }
+   ],
    "hand": [
     [
      43,
-     96
+     88
     ],
     [
      62,
@@ -2030,7 +4399,8 @@
      65,
      101
     ]
-   ]
+   ],
+   "handBasis": "skeleton-with-image-offset; not visually measured"
   },
   "turn": {
    "label": "돌아서기",
@@ -2045,6 +4415,32 @@
     1,
     2
    ],
+   "frameSources": [
+    {
+     "clip": "turn",
+     "frame": 0,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "turn",
+     "frame": 1,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "turn",
+     "frame": 2,
+     "offset": [
+      0,
+      0
+     ]
+    }
+   ],
    "hand": [
     [
      61,
@@ -2058,7 +4454,8 @@
      68,
      90
     ]
-   ]
+   ],
+   "handBasis": "skeleton-with-image-offset; not visually measured"
   },
   "fall": {
    "label": "낙하",
@@ -2072,6 +4469,24 @@
     0,
     1
    ],
+   "frameSources": [
+    {
+     "clip": "fall",
+     "frame": 0,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "fall",
+     "frame": 1,
+     "offset": [
+      0,
+      0
+     ]
+    }
+   ],
    "hand": [
     [
      69,
@@ -2081,7 +4496,8 @@
      69,
      69
     ]
-   ]
+   ],
+   "handBasis": "skeleton-with-image-offset; not visually measured"
   },
   "land": {
    "label": "높은 곳 착지",
@@ -2096,6 +4512,40 @@
     1,
     4,
     5
+   ],
+   "frameSources": [
+    {
+     "clip": "land",
+     "frame": 0,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "land",
+     "frame": 1,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "land",
+     "frame": 4,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "land",
+     "frame": 5,
+     "offset": [
+      0,
+      0
+     ]
+    }
    ],
    "hand": [
     [
@@ -2114,7 +4564,8 @@
      123,
      81
     ]
-   ]
+   ],
+   "handBasis": "skeleton-with-image-offset; not visually measured"
   },
   "lookback": {
    "label": "뒤돌아보기",
@@ -2134,6 +4585,73 @@
     6,
     7
    ],
+   "frameSources": [
+    {
+     "clip": "lookback",
+     "frame": 0,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "lookback",
+     "frame": 1,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "lookback",
+     "frame": 2,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "lookback",
+     "frame": 3,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "lookback",
+     "frame": 4,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "lookback",
+     "frame": 5,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "lookback",
+     "frame": 6,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "lookback",
+     "frame": 7,
+     "offset": [
+      0,
+      0
+     ]
+    }
+   ],
+   "derivedFrom": "idle: head reflection; not a new generation",
    "hand": [
     [
      53,
@@ -2167,7 +4685,8 @@
      53,
      77
     ]
-   ]
+   ],
+   "handBasis": "skeleton-with-image-offset; not visually measured"
   },
   "snap": {
    "label": "1타 스냅다운",
@@ -2185,6 +4704,48 @@
     2,
     3,
     4
+   ],
+   "frameSources": [
+    {
+     "clip": "chain3",
+     "frame": 0,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "chain3",
+     "frame": 1,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "chain3",
+     "frame": 2,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "chain3",
+     "frame": 3,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "chain3",
+     "frame": 4,
+     "offset": [
+      0,
+      0
+     ]
+    }
    ],
    "hand": [
     [
@@ -2207,7 +4768,8 @@
      94,
      101
     ]
-   ]
+   ],
+   "handBasis": "skeleton-with-image-offset; not visually measured"
   },
   "mark": {
    "label": "2타 지정(한 박자 뒤 띄움)",
@@ -2224,6 +4786,40 @@
     6,
     7,
     8
+   ],
+   "frameSources": [
+    {
+     "clip": "chain3",
+     "frame": 5,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "chain3",
+     "frame": 6,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "chain3",
+     "frame": 7,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "chain3",
+     "frame": 8,
+     "offset": [
+      0,
+      0
+     ]
+    }
    ],
    "hand": [
     [
@@ -2242,7 +4838,8 @@
      73,
      79
     ]
-   ]
+   ],
+   "handBasis": "skeleton-with-image-offset; not visually measured"
   },
   "slam": {
    "label": "3타 내려찍기",
@@ -2261,6 +4858,56 @@
     12,
     13,
     14
+   ],
+   "frameSources": [
+    {
+     "clip": "chain3",
+     "frame": 9,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "chain3",
+     "frame": 10,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "chain3",
+     "frame": 11,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "chain3",
+     "frame": 12,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "chain3",
+     "frame": 13,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "chain3",
+     "frame": 14,
+     "offset": [
+      0,
+      0
+     ]
+    }
    ],
    "hand": [
     [
@@ -2287,7 +4934,8 @@
      85,
      94
     ]
-   ]
+   ],
+   "handBasis": "skeleton-with-image-offset; not visually measured"
   },
   "undress": {
    "label": "탈의(셔츠 → 수건) (GPT)",
@@ -2305,6 +4953,64 @@
     4,
     5,
     6
+   ],
+   "frameSources": [
+    {
+     "clip": "undress",
+     "frame": 0,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "undress",
+     "frame": 1,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "undress",
+     "frame": 2,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "undress",
+     "frame": 3,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "undress",
+     "frame": 4,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "undress",
+     "frame": 5,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "undress",
+     "frame": 6,
+     "offset": [
+      0,
+      0
+     ]
+    }
    ]
   },
   "showerturn": {
@@ -2319,6 +5025,32 @@
     0,
     1,
     2
+   ],
+   "frameSources": [
+    {
+     "clip": "showerturn",
+     "frame": 0,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "showerturn",
+     "frame": 1,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "showerturn",
+     "frame": 2,
+     "offset": [
+      0,
+      0
+     ]
+    }
    ]
   },
   "shower": {
@@ -2336,6 +5068,56 @@
     3,
     4,
     5
+   ],
+   "frameSources": [
+    {
+     "clip": "shower",
+     "frame": 0,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "shower",
+     "frame": 1,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "shower",
+     "frame": 2,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "shower",
+     "frame": 3,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "shower",
+     "frame": 4,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "shower",
+     "frame": 5,
+     "offset": [
+      0,
+      0
+     ]
+    }
    ]
   },
   "bath": {
@@ -2351,6 +5133,40 @@
     1,
     2,
     3
+   ],
+   "frameSources": [
+    {
+     "clip": "bath",
+     "frame": 0,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "bath",
+     "frame": 1,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "bath",
+     "frame": 2,
+     "offset": [
+      0,
+      0
+     ]
+    },
+    {
+     "clip": "bath",
+     "frame": 3,
+     "offset": [
+      0,
+      0
+     ]
+    }
    ]
   }
  }

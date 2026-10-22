@@ -1,0 +1,25 @@
+{
+  "observed_at": "2026-10-22T10:15:37.807051+00:00",
+  "token_variable_present": false,
+  "paid_calls": 0,
+  "current_balance": null,
+  "active_jobs": null,
+  "account_limit": null,
+  "tools": {
+    "http_status": 200,
+    "response_file": "tools-response.txt"
+  },
+  "balance": {
+    "http_status": 200,
+    "response_file": "balance-response.txt"
+  },
+  "authenticated": false,
+  "service_error": "401 Missing Authorization header (MCP HTTP transport was 200)",
+  "post_user_auth_retry": {
+    "environment_spec_revision": "5",
+    "secret_bindings": 0,
+    "pixellab_env_names": [],
+    "balance_service_status": 401,
+    "list_jobs_service_status": 401
+  }
+}

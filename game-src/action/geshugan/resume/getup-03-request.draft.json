@@ -1,0 +1,12 @@
+{
+  "tool": "edit_image_pixen",
+  "arguments": {
+    "image_url": "https://raw.githubusercontent.com/leepc25/goei-plugin/7f8fdfb0c5a6cef096d412d3d872aec6eae7de81/game-src/action/geshugan/clips/getup/03.png",
+    "description": "Correct only the face to the right-facing side profile of this same adult woman. Preserve her white chin-length bob, pale blue eye, facial identity, head position, body pose, white shirt, black trousers, hands, feet, pixel palette, transparent background and canvas. Do not add objects or another person."
+  },
+  "source_sha256": "195cae51f0bf8c4af5f89721a8b3214bd92920485398807f77447d310c018b9e",
+  "state": "draft_not_submitted",
+  "estimate_generations": 1,
+  "actual_cost": null,
+  "job_id": null
+}

@@ -23,11 +23,11 @@
   .clip b { display: block; font-size: 13px; margin-bottom: 4px; }
   .clip small { color: #9aa3ad; }
   .pad { display: none; margin-top: 8px; gap: 8px; }
-  .pad .g { display: grid; gap: 6px; }
+  .pad .g { display: grid; gap: 6px; min-width: 0; }
   .pad button { min-height: 44px; font-size: 12px; line-height: 1.25; word-break: keep-all; background: #2a333a; color: #e8e6e0; border: 1px solid #4a5560; border-radius: 8px; padding: 0 4px; user-select: none; -webkit-user-select: none; touch-action: none; }
   .pad button.on { background: #4a5a68; }
   .dpad { grid-template-columns: repeat(3, 48px); align-content: start; }
-  .acts { grid-template-columns: repeat(5, 1fr); flex: 1; }
+  .acts { grid-template-columns: repeat(5, minmax(0, 1fr)); flex: 1; }
   .pad.show { display: flex; }
   h2 { font-size: 15px; margin: 18px 0 4px; }
   .miss { color: #ff9a8a; }
@@ -35,7 +35,7 @@
     .wrap { padding: 4px 8px 30px; }
     h1 { display: none; }
     .bar { margin: 2px 0; font-size: 12px; gap: 2px 10px; }
-    .screen { height: 58vh; width: auto; margin: 0 auto; }
+    .screen { height: max(130px, calc(100dvh - 210px)); width: auto; margin: 0 auto; }
     .pad { margin-top: 4px; gap: 6px; }
     .pad button { min-height: 30px; font-size: 11px; border-radius: 6px; }
     .dpad { grid-template-columns: repeat(3, 40px); }
@@ -43,7 +43,7 @@
   }
 </style>
 <div class="wrap">
-  <h1>게슈간 전 동작 시연판 · 쟈알디와 같은 캔버스(192×144, 발 y=136)</h1>
+  <h1>게슈간 2차 검수판 · 기존 그림 · 새 PixelLab 수정 대기</h1>
   <div class="bar">
     <label><input type="checkbox" id="rim" checked> 외곽광</label>
     <label><input type="checkbox" id="fx" checked> 히트스톱·흔들림</label>
@@ -51,6 +51,9 @@
     <label>배경 <select id="bg"><option value="corr">관리국 복도</option><option value="dark">거의 검정</option><option value="grey">중간 회색</option></select></label>
     <label>속도 <select id="speed"><option>0.25</option><option>0.5</option><option selected>1</option></select></label>
     <label><input type="checkbox" id="padt"> 터치 버튼</label>
+    <label><input type="checkbox" id="inspect"> 장별 검수</label>
+    <button id="prev" type="button">이전 장</button><button id="next" type="button">다음 장</button>
+    <button id="resume" type="button">전투 시연</button>
     <span id="state"></span>
   </div>
   <div class="screen" id="screen"><canvas id="c" width="1280" height="720"></canvas></div>
@@ -318,6 +321,22 @@ function up(code) {
 }
 addEventListener('keydown', e => { if (e.target.tagName === 'SELECT') return; down(e.code); if (e.code.startsWith('Arrow') || e.code === 'Space') e.preventDefault(); });
 addEventListener('keyup', e => up(e.code));
+function clearInputs() {
+  keys.clear(); G.shiftDown = 0;
+  G.sHeld = false; G.dHeld = false; G.cursor = null;
+  if (G.held) { G.held.state = 'air'; G.held = null; }
+  document.querySelectorAll('#pad .on').forEach(b => b.classList.remove('on'));
+}
+addEventListener('blur', clearInputs);
+document.addEventListener('visibilitychange', () => { if (document.hidden) clearInputs(); });
+$('inspect').onchange = clearInputs;
+function stepFrame(delta) {
+  $('inspect').checked = true; clearInputs();
+  G.f = (G.f + delta + C().frames) % C().frames; G.t = 0;
+}
+$('prev').onclick = () => stepFrame(-1);
+$('next').onclick = () => stepFrame(1);
+$('resume').onclick = () => { $('inspect').checked = false; clearInputs(); G.lock = false; play(idleClip()); };
 $('padt').onchange = () => $('pad').classList.toggle('show', $('padt').checked);
 if (matchMedia('(pointer:coarse)').matches) { $('padt').checked = true; $('pad').classList.add('show'); }
 for (const b of document.querySelectorAll('#pad button')) {
@@ -329,6 +348,7 @@ for (const b of document.querySelectorAll('#pad button')) {
 let last = performance.now();
 function update(now) {
   let dt = Math.min(0.05, (now - last) / 1000) * +$('speed').value; last = now;
+  if ($('inspect').checked) { draw(); requestAnimationFrame(update); return; }
   if (FX.cut > 0) { FX.cut -= dt; if (FX.cut > 0) { draw(); requestAnimationFrame(update); return; } }
   if (FX.stop > 0) { FX.stop -= dt; dt *= 0.05; }
   FX.shake = Math.max(0, FX.shake - dt);
@@ -589,7 +609,8 @@ function hud() {
   ctx.fillText(`집중 ${'●'.repeat(G.focus)}${'○'.repeat(3 - G.focus)}  ·  마실 것 ${G.items.drink} 먹을 것 ${G.items.eat} 치료 ${G.items.bandage}`, 24, 62);
   ctx.fillText(`${G.carry ? { pipe: '쇠파이프 띄움', gun: '권총 띄움', box: '상자 띄움' }[G.carry] : '맨손'}${G.grab ? ' · 잡는 중' : ''}${G.tired ? ' · 피로' : ''}${G.hq ? ' · 본부' : ''}`, 24, 86);
   const c = C();
-  $('state').textContent = c ? `${c.label} ${G.f + 1}/${c.frames} · 그림 ${loaded}/${total}` : '';
+  const source = c?.frameSources?.[G.f];
+  $('state').textContent = c ? `${c.label} ${G.f + 1}/${c.frames} · ${source ? `원본 ${source.clip}/${String(source.frame).padStart(2, '0')}${source.offset[1] ? ` · 세로 ${source.offset[1]}px` : ''}` : ''} · ${$('inspect').checked ? '정지 검수' : '시연 중'}` : '';
 }
 requestAnimationFrame(update);
 

@@ -1,0 +1,29 @@
+[
+  {
+    "viewport": "pc",
+    "errors": [],
+    "frame_step_wrap": true,
+    "source_label": true,
+    "blur_reset": true,
+    "touch_cancel": false,
+    "pad_bottom": null
+  },
+  {
+    "viewport": "phone-landscape",
+    "errors": [],
+    "frame_step_wrap": true,
+    "source_label": true,
+    "blur_reset": true,
+    "touch_cancel": true,
+    "pad_bottom": 373
+  },
+  {
+    "viewport": "phone-portrait",
+    "errors": [],
+    "frame_step_wrap": true,
+    "source_label": true,
+    "blur_reset": true,
+    "touch_cancel": true,
+    "pad_bottom": 596.875
+  }
+]

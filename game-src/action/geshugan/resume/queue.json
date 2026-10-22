@@ -1,0 +1,42 @@
+{
+  "as_of_commit": "7f8fdfb0c5a6cef096d412d3d872aec6eae7de81",
+  "account_queue_verified": false,
+  "character_submission_limit": 1,
+  "new_paid_calls": 0,
+  "current_balance": null,
+  "current_account_limit": null,
+  "entries": [
+    {
+      "owner": "kyuras",
+      "action": "recover_only",
+      "job_id": "11826541-47d1-40de-9664-f05f1838bb23",
+      "clip": "idle_shotgun",
+      "paid_previously_reported": true,
+      "actual_cost": null,
+      "handoff": "prepared; recipient acknowledgement unavailable"
+    },
+    {
+      "owner": "kyuras",
+      "action": "recover_only",
+      "job_id": "9fe0e770-b992-4299-a4c1-90d6e591828a",
+      "clip": "run_shotgun",
+      "paid_previously_reported": true,
+      "actual_cost": null,
+      "handoff": "prepared; recipient acknowledgement unavailable"
+    },
+    {
+      "owner": "geshugan",
+      "action": "edit_getup_frame_03",
+      "state": "blocked_auth_not_submitted",
+      "job_id": null,
+      "actual_cost": null,
+      "published_estimate_generations": 1,
+      "estimate_source": "edit_image_pixen tools/list read this session"
+    },
+    {
+      "owner": "geshugan",
+      "action": "bathing_20_frames",
+      "state": "already_delivered_hash_identical_do_not_generate"
+    }
+  ]
+}

@@ -285,3 +285,4 @@ job_id: abcfe668-028e-4a3f-b1ee-7670b855baff
 description: athletic adult woman agent, snow-white chin-length bob haircu
 2026-10-22 03:48:32 gen bandage done
 2026-10-22 03:48:32 gen after generations_remaining: 15152.30
+2026-10-22T10:27:41.276193+00:00 resume audit: paid_submissions=0 actual_new_generations=0; balance/jobs auth 401 including user-requested retry; historical job costs unknown; kyuras recovery reserved for kyuras owner; no art generation

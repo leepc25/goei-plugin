@@ -2,8 +2,11 @@ import json,sys,urllib.request,ssl,os
 URL='https://api.pixellab.ai/mcp'
 def call(method,params=None,id=1):
     body=json.dumps({"jsonrpc":"2.0","id":id,"method":method,"params":params or {}}).encode()
-    req=urllib.request.Request(URL,data=body,headers={'Content-Type':'application/json','Accept':'application/json, text/event-stream'})
-    ctx=ssl.create_default_context(cafile='/root/.ccr/ca-bundle.crt')
+    headers={'Content-Type':'application/json','Accept':'application/json, text/event-stream'}
+    token=os.environ.get('PIXELLAB_API_TOKEN')
+    if token: headers['Authorization']='Bearer '+token
+    req=urllib.request.Request(URL,data=body,headers=headers)
+    ctx=ssl.create_default_context()
     with urllib.request.urlopen(req,context=ctx,timeout=300) as r:
         txt=r.read().decode()
     out=None
