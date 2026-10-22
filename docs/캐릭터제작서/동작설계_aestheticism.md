@@ -70,7 +70,7 @@
 
 ### 1.3 원작과 다르게 정한 곳 (Claude 결정)
 
-1. **마네킹 몸은 가게 마네킹처럼 그린다.** 기본 그림은 맨몸 마네킹이다. 도트에서는 **매끈한 석고빛 마네킹**(어깨·팔꿈치·허리·무릎의 관절 이음매, 손가락 마디 선)으로, 가슴·몸의 굴곡은 **세부 없이 단순한 면**으로만 그린다. 나체 표현이 아니라 백화점 마네킹 질감. 머리카락은 기본 그림처럼 허리까지 내려 앞쪽을 덮음. (원하면 물감 튄 화가 앞치마를 두른 갈래로 바꿀 수 있음, 10장)
+1. **무성 마네킹**(사용자 결정 2026-10-22 02:48): 몸은 성별 특징이 없는 마네킹으로 그린다. 가슴·엉덩이 굴곡 없이 곧은 원통형 몸통, 매끈한 석고빛, 어깨·팔꿈치·손목·허리·무릎 관절 이음매만. 여성형은 얼굴·머리카락·하이힐 발로만 드러남. 머리카락은 기본 그림처럼 허리까지.
 2. **쓰러뜨릴 수 없음**: 원작대로. 게임 보상은 그릇을 다 부수거나 살아서 나가는 것.
 3. 사람 설치물·꿰매기 장면은 **피·상처를 그리지 않음**. sew는 손동작만, 대상은 코드로 굳은 실루엣 + 실.
 4. 「사람 껍데기를 벗어 던지는」 인간 위장 형태는 만들지 않음(옷 갈래 금지, 마네킹 하나로 통일).
@@ -98,7 +98,7 @@
 
 - A2 방식(순검정 1px 외곽선, 약 78색 이하, 채도 0.2 안팎, 왼쪽 위 빛, 음영 2~3단). pixen, side, east, 투명 배경.
 - 마네킹 몸은 따뜻한 회백색 석고(밝기 3단 + 이음매 선 1단 어둡게). 머리는 채도 높은 빨강이지만 A2 범위로 한 단 눌러 몸보다 조금만 튀게.
-- 생성 설명: "tall store mannequin woman, smooth featureless plaster body with visible ball-joint seams, simple shapes with no anatomical detail, long messy bright red hair to the waist covering the front, red glowing eyes, freckles, crooked smile, thick stitched scar across the neck, mannequin feet shaped like high heels". 장면·물건 이름 금지.
+- 생성 설명: "tall genderless store mannequin, straight flat cylindrical torso with no chest or hip curves, smooth plaster body with visible ball-joint seams, no anatomical detail, long messy bright red hair to the waist covering the front, red glowing eyes, freckles, crooked smile, thick stitched scar across the neck, mannequin feet shaped like high heels". 장면·물건 이름 금지.
 - 관절이 반대로 꺾이는 클립(fold·fold_run·getup·claw3 3타)은 뼈대로 팔꿈치·무릎을 반대로 둔다. 생성기가 정상 방향으로 되돌리면(쟈알디 결함 목록 「팔꿈치 방향」 반대 사례) 그 장만 뼈대를 과장해 다시 뽑고, 그래도 안 되면 해당 장 팔다리만 좌우 반전 합성.
 - 비교판 `game-src/action/named/aestheticism/compare.png`.
 
@@ -192,7 +192,7 @@
 
 ## 8. 검수 기준
 
-- 빨간 긴 머리·붉은 눈·주근깨·어긋난 미소·목 봉합·관절 이음매가 모든 장에 있음. 몸은 **세부 없는 마네킹**(장마다 확인, 하나라도 사람 맨몸처럼 보이면 그 장 불합격).
+- 빨간 긴 머리·붉은 눈·주근깨·어긋난 미소·목 봉합·관절 이음매가 모든 장에 있음. 몸은 **무성 마네킹**(가슴·엉덩이 굴곡 없음, 장마다 확인, 하나라도 사람 맨몸처럼 보이면 그 장 불합격).
 - 반대 꺾임 클립은 실제로 반대로 꺾여 있음(정상 방향이면 불합격), 그 밖의 클립은 정상 방향.
 - decree는 어깨·가슴이 안 오르내림.
 - 옆모습, 발바닥 선, 키 108 ±3 유지.
@@ -243,7 +243,7 @@
 
 ## 10. 임의로 정한 것
 
-1. **마네킹 몸 표현**: 세부 없는 가게 마네킹(기본). 대안 = 물감 튄 화가 앞치마를 두른 차림. 사용자가 고르면 기준 그림 단계에서 반영.
+1. 마네킹 몸 표현: **무성 마네킹으로 확정**(사용자 02:48).
 2. 흥미 세 구간·수치, 선언 세 종류, 그릇 2~5개는 시험판에서 조정.
 3. 「걸작 증서」로 표적을 지우는 길은 Claude 창작(영구 추격만 있으면 출구가 없어서).
 4. 상인 없음(원작에 거래는 「출구와 좋은 답」뿐). 대신 초상화 효과.
