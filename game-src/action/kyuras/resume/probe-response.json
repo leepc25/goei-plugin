@@ -1,0 +1,17 @@
+{
+  "raw_sha256": "44795998176b8ad80eda36fd628729d1ecba38d95e8c00e643c29c48f83e05dd",
+  "raw_base64": "ZXZlbnQ6IG1lc3NhZ2UNCmRhdGE6IHsianNvbnJwYyI6IjIuMCIsImlkIjoxLCJyZXN1bHQiOnsiY29udGVudCI6W3sidHlwZSI6InRleHQiLCJ0ZXh0IjoiZXJyb3I6IDQwMTogTWlzc2luZyBBdXRob3JpemF0aW9uIGhlYWRlci4gUGxlYXNlIGNvbmZpZ3VyZSB5b3VyIE1DUCBjbGllbnQgd2l0aCAnQXV0aG9yaXphdGlvbjogQmVhcmVyIFlPVVJfQVBJX1RPS0VOJyJ9XSwiaXNFcnJvciI6dHJ1ZX19DQoNCg==",
+  "response": {
+    "jsonrpc": "2.0",
+    "id": 1,
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "error: 401: Missing Authorization header. Please configure your MCP client with 'Authorization: Bearer YOUR_API_TOKEN'"
+        }
+      ],
+      "isError": true
+    }
+  }
+}
