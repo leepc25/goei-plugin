@@ -13,7 +13,7 @@ export function mountVisit(root: HTMLElement, api: GameVisit) {
   panel.style.cssText = 'position:absolute;inset:12% 5% 5%;background:#111c20f5;padding:20px;pointer-events:auto;display:none;overflow:auto;border:1px solid #a99c78;border-radius:8px';
   panel.innerHTML = '<header style="display:flex;justify-content:space-between"><b>본부 인물</b><button data-close>닫기</button></header><p>대화는 이 채팅에 저장되어 본편에서도 이어집니다.</p><div data-people></div><p role="status"></p><div data-log style="white-space:pre-wrap;max-height:42vh;overflow:auto"></div><div data-compose style="display:flex;gap:8px"><select aria-label="대화 모델"><option value="main">메인 모델</option><option value="aux">보조 모델</option></select><input aria-label="요원에게 할 말" maxlength="2000" style="flex:1;min-width:0" autocomplete="off"><button type="button" data-send>보내기</button></div>';
   wrap.append(button, panel); root.append(wrap);
-  let state: VisitState = { agents: [], turns: [] };
+  let state: VisitState = { visitor: { agentId: '', name: '' }, agents: [], turns: [] };
   let selected = '';
   let busy = false;
   let dead = false;
