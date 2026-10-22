@@ -64,6 +64,28 @@
       57
      ]
     ]
+   ],
+   "frameSources": [
+    {
+     "clip": "idle",
+     "frame": 0,
+     "dy": 0
+    },
+    {
+     "clip": "idle",
+     "frame": 1,
+     "dy": 0
+    },
+    {
+     "clip": "idle",
+     "frame": 2,
+     "dy": 0
+    },
+    {
+     "clip": "idle",
+     "frame": 3,
+     "dy": 0
+    }
    ]
   },
   "groom": {
@@ -150,6 +172,38 @@
       57
      ]
     ]
+   ],
+   "frameSources": [
+    {
+     "clip": "groom",
+     "frame": 0,
+     "dy": 0
+    },
+    {
+     "clip": "groom",
+     "frame": 1,
+     "dy": 0
+    },
+    {
+     "clip": "groom",
+     "frame": 2,
+     "dy": 0
+    },
+    {
+     "clip": "groom",
+     "frame": 3,
+     "dy": 0
+    },
+    {
+     "clip": "groom",
+     "frame": 4,
+     "dy": 0
+    },
+    {
+     "clip": "groom",
+     "frame": 5,
+     "dy": 0
+    }
    ]
   },
   "stance": {
@@ -167,51 +221,73 @@
     [
      [
       85.8,
-      91.4,
+      92.4,
       45
      ],
      [
       80.4,
-      93.7,
+      94.7,
       53
      ]
     ],
     [
      [
       85.8,
-      91.9,
+      92.9,
       45
      ],
      [
       80.4,
-      94.2,
+      95.2,
       53
      ]
     ],
     [
      [
       85.8,
-      92.2,
+      93.2,
       45
      ],
      [
       80.4,
-      94.5,
+      95.5,
       53
      ]
     ],
     [
      [
       85.8,
-      91.9,
+      92.9,
       45
      ],
      [
       80.4,
-      94.2,
+      95.2,
       53
      ]
     ]
+   ],
+   "frameSources": [
+    {
+     "clip": "stance",
+     "frame": 0,
+     "dy": 1
+    },
+    {
+     "clip": "stance",
+     "frame": 1,
+     "dy": 1
+    },
+    {
+     "clip": "stance",
+     "frame": 2,
+     "dy": 1
+    },
+    {
+     "clip": "stance",
+     "frame": 3,
+     "dy": 1
+    }
    ]
   },
   "engage": {
@@ -265,15 +341,37 @@
     [
      [
       85.8,
-      91.4,
+      92.4,
       45
      ],
      [
       80.4,
-      93.7,
+      94.7,
       53
      ]
     ]
+   ],
+   "frameSources": [
+    {
+     "clip": "engage",
+     "frame": 0,
+     "dy": 0
+    },
+    {
+     "clip": "engage",
+     "frame": 1,
+     "dy": 0
+    },
+    {
+     "clip": "engage",
+     "frame": 2,
+     "dy": 0
+    },
+    {
+     "clip": "engage",
+     "frame": 3,
+     "dy": 1
+    }
    ]
   },
   "walk": {
@@ -327,12 +425,12 @@
     [
      [
       77.1,
-      87.6,
+      86.6,
       60
      ],
      [
       76.1,
-      88.5,
+      87.5,
       58
      ]
     ],
@@ -384,6 +482,48 @@
       58
      ]
     ]
+   ],
+   "frameSources": [
+    {
+     "clip": "walk",
+     "frame": 0,
+     "dy": 0
+    },
+    {
+     "clip": "walk",
+     "frame": 1,
+     "dy": 0
+    },
+    {
+     "clip": "walk",
+     "frame": 2,
+     "dy": 0
+    },
+    {
+     "clip": "walk",
+     "frame": 3,
+     "dy": -1
+    },
+    {
+     "clip": "walk",
+     "frame": 4,
+     "dy": 0
+    },
+    {
+     "clip": "walk",
+     "frame": 5,
+     "dy": 0
+    },
+    {
+     "clip": "walk",
+     "frame": 6,
+     "dy": 0
+    },
+    {
+     "clip": "walk",
+     "frame": 7,
+     "dy": 0
+    }
    ]
   },
   "glide": {
@@ -437,12 +577,12 @@
     [
      [
       100.8,
-      94.4,
+      93.4,
       45
      ],
      [
       95.4,
-      96.7,
+      95.7,
       53
      ]
     ],
@@ -461,15 +601,47 @@
     [
      [
       107.8,
-      94.4,
+      93.4,
       45
      ],
      [
       102.4,
-      96.7,
+      95.7,
       53
      ]
     ]
+   ],
+   "frameSources": [
+    {
+     "clip": "glide",
+     "frame": 0,
+     "dy": 0
+    },
+    {
+     "clip": "glide",
+     "frame": 1,
+     "dy": 0
+    },
+    {
+     "clip": "glide",
+     "frame": 2,
+     "dy": 0
+    },
+    {
+     "clip": "glide",
+     "frame": 3,
+     "dy": -1
+    },
+    {
+     "clip": "glide",
+     "frame": 4,
+     "dy": 0
+    },
+    {
+     "clip": "glide",
+     "frame": 5,
+     "dy": -1
+    }
    ]
   },
   "run": {
@@ -523,24 +695,24 @@
     [
      [
       81.4,
-      98.2,
+      97.2,
       88
      ],
      [
       71.9,
-      92.5,
+      91.5,
       112
      ]
     ],
     [
      [
       82.7,
-      98.2,
+      97.2,
       85
      ],
      [
       70.6,
-      91.1,
+      90.1,
       116
      ]
     ],
@@ -571,15 +743,57 @@
     [
      [
       75.1,
-      95.1,
+      94.1,
       102
      ],
      [
       78.3,
-      95.6,
+      94.6,
       95
      ]
     ]
+   ],
+   "frameSources": [
+    {
+     "clip": "run",
+     "frame": 0,
+     "dy": 0
+    },
+    {
+     "clip": "run",
+     "frame": 1,
+     "dy": 0
+    },
+    {
+     "clip": "run",
+     "frame": 2,
+     "dy": 0
+    },
+    {
+     "clip": "run",
+     "frame": 3,
+     "dy": -1
+    },
+    {
+     "clip": "run",
+     "frame": 4,
+     "dy": -1
+    },
+    {
+     "clip": "run",
+     "frame": 5,
+     "dy": 0
+    },
+    {
+     "clip": "run",
+     "frame": 6,
+     "dy": 0
+    },
+    {
+     "clip": "run",
+     "frame": 7,
+     "dy": -1
+    }
    ]
   },
   "jump": {
@@ -690,6 +904,48 @@
       53
      ]
     ]
+   ],
+   "frameSources": [
+    {
+     "clip": "jump",
+     "frame": 0,
+     "dy": 0
+    },
+    {
+     "clip": "jump",
+     "frame": 1,
+     "dy": 0
+    },
+    {
+     "clip": "jump",
+     "frame": 2,
+     "dy": 0
+    },
+    {
+     "clip": "jump",
+     "frame": 3,
+     "dy": 0
+    },
+    {
+     "clip": "jump",
+     "frame": 4,
+     "dy": 0
+    },
+    {
+     "clip": "jump",
+     "frame": 5,
+     "dy": 0
+    },
+    {
+     "clip": "jump",
+     "frame": 6,
+     "dy": 0
+    },
+    {
+     "clip": "jump",
+     "frame": 7,
+     "dy": 0
+    }
    ]
   },
   "crouch": {
@@ -752,6 +1008,28 @@
       46
      ]
     ]
+   ],
+   "frameSources": [
+    {
+     "clip": "crouch",
+     "frame": 0,
+     "dy": 0
+    },
+    {
+     "clip": "crouch",
+     "frame": 1,
+     "dy": 0
+    },
+    {
+     "clip": "crouch",
+     "frame": 2,
+     "dy": 0
+    },
+    {
+     "clip": "crouch",
+     "frame": 3,
+     "dy": 0
+    }
    ]
   },
   "crouchwalk": {
@@ -769,24 +1047,24 @@
     [
      [
       98.0,
-      128,
+      124,
       54
      ],
      [
       88.6,
-      119.1,
+      115.1,
       41
      ]
     ],
     [
      [
       95.7,
-      126.4,
+      122.4,
       55
      ],
      [
       86.5,
-      118.7,
+      114.7,
       43
      ]
     ],
@@ -817,39 +1095,76 @@
     [
      [
       86.6,
-      128,
+      127,
       65
      ],
      [
       78.3,
-      115.2,
+      114.2,
       56
      ]
     ],
     [
      [
-      90.7,
-      128,
+      86.6,
+      127,
       65
      ],
      [
-      82.0,
-      117.0,
-      48
+      78.3,
+      114.2,
+      56
      ]
     ],
     [
      [
       95.7,
-      128,
+      126,
       57
      ],
      [
       86.5,
-      118.7,
+      116.7,
       43
      ]
     ]
+   ],
+   "frameSources": [
+    {
+     "clip": "crouchwalk",
+     "frame": 0,
+     "dy": -4
+    },
+    {
+     "clip": "crouchwalk",
+     "frame": 1,
+     "dy": -4
+    },
+    {
+     "clip": "crouchwalk",
+     "frame": 2,
+     "dy": 0
+    },
+    {
+     "clip": "crouchwalk",
+     "frame": 3,
+     "dy": 0
+    },
+    {
+     "clip": "crouchwalk",
+     "frame": 4,
+     "dy": -1
+    },
+    {
+     "clip": "crouchwalk",
+     "frame": 4,
+     "dy": -1
+    },
+    {
+     "clip": "crouchwalk",
+     "frame": 6,
+     "dy": -2
+    }
    ]
   },
   "groundspike": {
@@ -869,75 +1184,107 @@
     [
      [
       92,
-      128,
+      127,
       64
      ],
      [
       83.2,
-      116.9,
+      115.9,
       46
      ]
     ],
     [
      [
       95.2,
-      123.8,
+      122.8,
       57
      ],
      [
       85.8,
-      118.2,
+      117.2,
       50
      ]
     ],
     [
      [
       98,
-      128,
+      126,
       57
      ],
      [
       86.9,
-      121.1,
+      119.1,
       60
      ]
     ],
     [
      [
       98,
-      128,
+      126,
       57
      ],
      [
       86.9,
-      121.1,
+      119.1,
       60
      ]
     ],
     [
      [
       98,
-      128,
+      126,
       57
      ],
      [
       86.9,
-      121.1,
+      119.1,
       60
      ]
     ],
     [
      [
       92,
-      128,
+      127,
       64
      ],
      [
       83.2,
-      116.9,
+      115.9,
       46
      ]
     ]
+   ],
+   "frameSources": [
+    {
+     "clip": "groundspike",
+     "frame": 0,
+     "dy": -1
+    },
+    {
+     "clip": "groundspike",
+     "frame": 1,
+     "dy": -1
+    },
+    {
+     "clip": "groundspike",
+     "frame": 2,
+     "dy": -2
+    },
+    {
+     "clip": "groundspike",
+     "frame": 3,
+     "dy": -2
+    },
+    {
+     "clip": "groundspike",
+     "frame": 4,
+     "dy": -2
+    },
+    {
+     "clip": "groundspike",
+     "frame": 5,
+     "dy": -1
+    }
    ]
   },
   "risestab": {
@@ -969,12 +1316,12 @@
     [
      [
       85.6,
-      84.2,
+      82.2,
       -42
      ],
      [
       76.3,
-      100.7,
+      98.7,
       53
      ]
     ],
@@ -1026,6 +1373,38 @@
       55
      ]
     ]
+   ],
+   "frameSources": [
+    {
+     "clip": "risestab",
+     "frame": 0,
+     "dy": 0
+    },
+    {
+     "clip": "risestab",
+     "frame": 1,
+     "dy": -2
+    },
+    {
+     "clip": "risestab",
+     "frame": 2,
+     "dy": 0
+    },
+    {
+     "clip": "risestab",
+     "frame": 3,
+     "dy": 0
+    },
+    {
+     "clip": "risestab",
+     "frame": 4,
+     "dy": 0
+    },
+    {
+     "clip": "risestab",
+     "frame": 5,
+     "dy": 0
+    }
    ]
   },
   "stab1": {
@@ -1114,6 +1493,38 @@
       53
      ]
     ]
+   ],
+   "frameSources": [
+    {
+     "clip": "stab1",
+     "frame": 0,
+     "dy": 0
+    },
+    {
+     "clip": "stab1",
+     "frame": 1,
+     "dy": 0
+    },
+    {
+     "clip": "stab1",
+     "frame": 2,
+     "dy": 0
+    },
+    {
+     "clip": "stab1",
+     "frame": 3,
+     "dy": 0
+    },
+    {
+     "clip": "stab1",
+     "frame": 4,
+     "dy": 0
+    },
+    {
+     "clip": "stab1",
+     "frame": 5,
+     "dy": 0
+    }
    ]
   },
   "slash2": {
@@ -1202,6 +1613,38 @@
       52
      ]
     ]
+   ],
+   "frameSources": [
+    {
+     "clip": "slash2",
+     "frame": 0,
+     "dy": 0
+    },
+    {
+     "clip": "slash2",
+     "frame": 1,
+     "dy": 0
+    },
+    {
+     "clip": "slash2",
+     "frame": 2,
+     "dy": 0
+    },
+    {
+     "clip": "slash2",
+     "frame": 3,
+     "dy": 0
+    },
+    {
+     "clip": "slash2",
+     "frame": 4,
+     "dy": 0
+    },
+    {
+     "clip": "slash2",
+     "frame": 5,
+     "dy": 0
+    }
    ]
   },
   "pierce3": {
@@ -1233,87 +1676,129 @@
     [
      [
       85.6,
-      89.5,
+      88.5,
       35
      ],
      [
       83.5,
-      90.2,
+      89.2,
       35
      ]
     ],
     [
      [
       122.2,
-      88.2,
+      87.2,
       9
      ],
      [
       119.1,
-      90.1,
+      89.1,
       10
      ]
     ],
     [
      [
       134.0,
-      86.9,
+      84.9,
       4
      ],
      [
       131.8,
-      88.7,
+      86.7,
       4
      ]
     ],
     [
      [
       134.0,
-      86.9,
+      84.9,
       4
      ],
      [
       131.8,
-      88.7,
+      86.7,
       4
      ]
     ],
     [
      [
       134.0,
-      86.9,
+      84.9,
       4
      ],
      [
       131.8,
-      88.7,
+      86.7,
       4
      ]
     ],
     [
      [
       116.9,
-      89.2,
+      87.2,
       15
      ],
      [
       113.1,
-      91.2,
+      89.2,
       18
      ]
     ],
     [
      [
       99.8,
-      91.4,
+      90.4,
       45
      ],
      [
       94.4,
-      93.7,
+      92.7,
       53
      ]
     ]
+   ],
+   "frameSources": [
+    {
+     "clip": "pierce3",
+     "frame": 0,
+     "dy": 0
+    },
+    {
+     "clip": "pierce3",
+     "frame": 1,
+     "dy": -1
+    },
+    {
+     "clip": "pierce3",
+     "frame": 2,
+     "dy": -1
+    },
+    {
+     "clip": "pierce3",
+     "frame": 3,
+     "dy": -2
+    },
+    {
+     "clip": "pierce3",
+     "frame": 4,
+     "dy": -2
+    },
+    {
+     "clip": "pierce3",
+     "frame": 5,
+     "dy": -2
+    },
+    {
+     "clip": "pierce3",
+     "frame": 6,
+     "dy": -2
+    },
+    {
+     "clip": "pierce3",
+     "frame": 7,
+     "dy": -1
+    }
    ]
   },
   "execute": {
@@ -1414,6 +1899,43 @@
       -7
      ]
     ]
+   ],
+   "frameSources": [
+    {
+     "clip": "execute",
+     "frame": 0,
+     "dy": 0
+    },
+    {
+     "clip": "execute",
+     "frame": 1,
+     "dy": 0
+    },
+    {
+     "clip": "execute",
+     "frame": 2,
+     "dy": 0
+    },
+    {
+     "clip": "execute",
+     "frame": 3,
+     "dy": 0
+    },
+    {
+     "clip": "execute",
+     "frame": 4,
+     "dy": 0
+    },
+    {
+     "clip": "execute",
+     "frame": 5,
+     "dy": 0
+    },
+    {
+     "clip": "execute",
+     "frame": 6,
+     "dy": 0
+    }
    ]
   },
   "passslash": {
@@ -1502,6 +2024,38 @@
       53
      ]
     ]
+   ],
+   "frameSources": [
+    {
+     "clip": "passslash",
+     "frame": 0,
+     "dy": 0
+    },
+    {
+     "clip": "passslash",
+     "frame": 1,
+     "dy": 0
+    },
+    {
+     "clip": "passslash",
+     "frame": 2,
+     "dy": 0
+    },
+    {
+     "clip": "passslash",
+     "frame": 3,
+     "dy": 0
+    },
+    {
+     "clip": "passslash",
+     "frame": 4,
+     "dy": 0
+    },
+    {
+     "clip": "passslash",
+     "frame": 5,
+     "dy": 0
+    }
    ]
   },
   "airrain": {
@@ -1578,6 +2132,33 @@
       4
      ]
     ]
+   ],
+   "frameSources": [
+    {
+     "clip": "airrain",
+     "frame": 0,
+     "dy": 0
+    },
+    {
+     "clip": "airrain",
+     "frame": 1,
+     "dy": 0
+    },
+    {
+     "clip": "airrain",
+     "frame": 2,
+     "dy": 0
+    },
+    {
+     "clip": "airrain",
+     "frame": 3,
+     "dy": 0
+    },
+    {
+     "clip": "airrain",
+     "frame": 4,
+     "dy": 0
+    }
    ]
   },
   "spineup": {
@@ -1643,15 +2224,42 @@
     [
      [
       89.5,
-      66.1,
+      65.1,
       -68
      ],
      [
       78.6,
-      93.1,
+      92.1,
       56
      ]
     ]
+   ],
+   "frameSources": [
+    {
+     "clip": "spineup",
+     "frame": 0,
+     "dy": 0
+    },
+    {
+     "clip": "spineup",
+     "frame": 1,
+     "dy": 0
+    },
+    {
+     "clip": "spineup",
+     "frame": 3,
+     "dy": 0
+    },
+    {
+     "clip": "spineup",
+     "frame": 3,
+     "dy": 0
+    },
+    {
+     "clip": "spineup",
+     "frame": 4,
+     "dy": -1
+    }
    ]
   },
   "throw": {
@@ -1716,6 +2324,28 @@
       56
      ]
     ]
+   ],
+   "frameSources": [
+    {
+     "clip": "throw",
+     "frame": 0,
+     "dy": 0
+    },
+    {
+     "clip": "throw",
+     "frame": 1,
+     "dy": 0
+    },
+    {
+     "clip": "throw",
+     "frame": 2,
+     "dy": 0
+    },
+    {
+     "clip": "throw",
+     "frame": 3,
+     "dy": 0
+    }
    ]
   },
   "fan": {
@@ -1804,6 +2434,38 @@
       3
      ]
     ]
+   ],
+   "frameSources": [
+    {
+     "clip": "fan",
+     "frame": 0,
+     "dy": 0
+    },
+    {
+     "clip": "fan",
+     "frame": 1,
+     "dy": 0
+    },
+    {
+     "clip": "fan",
+     "frame": 2,
+     "dy": 0
+    },
+    {
+     "clip": "fan",
+     "frame": 3,
+     "dy": 0
+    },
+    {
+     "clip": "fan",
+     "frame": 4,
+     "dy": 0
+    },
+    {
+     "clip": "fan",
+     "frame": 5,
+     "dy": 0
+    }
    ]
   },
   "pluck": {
@@ -1878,6 +2540,33 @@
       3
      ]
     ]
+   ],
+   "frameSources": [
+    {
+     "clip": "pluck",
+     "frame": 0,
+     "dy": 0
+    },
+    {
+     "clip": "pluck",
+     "frame": 1,
+     "dy": 0
+    },
+    {
+     "clip": "pluck",
+     "frame": 2,
+     "dy": 0
+    },
+    {
+     "clip": "pluck",
+     "frame": 3,
+     "dy": 0
+    },
+    {
+     "clip": "pluck",
+     "frame": 4,
+     "dy": 0
+    }
    ]
   },
   "sink": {
@@ -1907,39 +2596,61 @@
     [
      [
       82.2,
-      99.1,
+      98.1,
       44
      ],
      [
       78.1,
-      100.8,
+      99.8,
       52
      ]
     ],
     [
      [
       78.5,
-      106.8,
+      105.8,
       42
      ],
      [
       75.8,
-      107.9,
+      106.9,
       50
      ]
     ],
     [
      [
-      76.7,
-      110.6,
-      41
+      78.5,
+      105.8,
+      42
      ],
      [
-      74.6,
-      111.4,
-      49
+      75.8,
+      106.9,
+      50
      ]
     ]
+   ],
+   "frameSources": [
+    {
+     "clip": "sink",
+     "frame": 0,
+     "dy": 0
+    },
+    {
+     "clip": "sink",
+     "frame": 1,
+     "dy": -1
+    },
+    {
+     "clip": "sink",
+     "frame": 2,
+     "dy": -1
+    },
+    {
+     "clip": "sink",
+     "frame": 2,
+     "dy": -1
+    }
    ]
   },
   "rise": {
@@ -1956,14 +2667,14 @@
    "hands": [
     [
      [
-      76.7,
-      110.6,
-      41
+      78.5,
+      105.8,
+      42
      ],
      [
-      74.6,
-      111.4,
-      49
+      75.8,
+      106.9,
+      50
      ]
     ],
     [
@@ -1981,12 +2692,12 @@
     [
      [
       83.3,
-      96.8,
+      95.8,
       44
      ],
      [
       78.8,
-      98.7,
+      97.7,
       52
      ]
     ],
@@ -2014,6 +2725,33 @@
       53
      ]
     ]
+   ],
+   "frameSources": [
+    {
+     "clip": "sink",
+     "frame": 2,
+     "dy": -1
+    },
+    {
+     "clip": "rise",
+     "frame": 1,
+     "dy": 0
+    },
+    {
+     "clip": "rise",
+     "frame": 2,
+     "dy": -1
+    },
+    {
+     "clip": "rise",
+     "frame": 3,
+     "dy": 0
+    },
+    {
+     "clip": "rise",
+     "frame": 4,
+     "dy": 0
+    }
    ]
   },
   "latticecharge": {
@@ -2031,51 +2769,73 @@
     [
      [
       101.6,
-      75.3,
+      74.3,
       -17
      ],
      [
       99.0,
-      80.0,
+      79.0,
       -6
      ]
     ],
     [
      [
       102.1,
-      75.6,
+      74.6,
       -16
      ],
      [
       99.5,
-      80.3,
+      79.3,
       -5
      ]
     ],
     [
      [
       101.6,
-      75.3,
+      74.3,
       -17
      ],
      [
       99.0,
-      80.0,
+      79.0,
       -6
      ]
     ],
     [
      [
       101.1,
-      75.0,
+      74.0,
       -19
      ],
      [
       98.5,
-      79.7,
+      78.7,
       -8
      ]
     ]
+   ],
+   "frameSources": [
+    {
+     "clip": "latticecharge",
+     "frame": 0,
+     "dy": -1
+    },
+    {
+     "clip": "latticecharge",
+     "frame": 1,
+     "dy": -1
+    },
+    {
+     "clip": "latticecharge",
+     "frame": 2,
+     "dy": -1
+    },
+    {
+     "clip": "latticecharge",
+     "frame": 3,
+     "dy": -1
+    }
    ]
   },
   "latticerelease": {
@@ -2152,6 +2912,33 @@
       27
      ]
     ]
+   ],
+   "frameSources": [
+    {
+     "clip": "latticerelease",
+     "frame": 0,
+     "dy": 0
+    },
+    {
+     "clip": "latticerelease",
+     "frame": 1,
+     "dy": 0
+    },
+    {
+     "clip": "latticerelease",
+     "frame": 2,
+     "dy": 0
+    },
+    {
+     "clip": "latticerelease",
+     "frame": 3,
+     "dy": 0
+    },
+    {
+     "clip": "latticerelease",
+     "frame": 4,
+     "dy": 0
+    }
    ]
   },
   "spikeguard": {
@@ -2181,39 +2968,61 @@
     [
      [
       83.4,
-      87.7,
+      86.7,
       -7
      ],
      [
       79.7,
-      89.8,
+      88.8,
       8
      ]
     ],
     [
      [
       81.1,
-      83.9,
+      82.9,
       -86
      ],
      [
       78.9,
-      85.8,
+      84.8,
       -86
      ]
     ],
     [
      [
       81.1,
-      83.9,
+      82.9,
       -86
      ],
      [
       78.9,
-      85.8,
+      84.8,
       -86
      ]
     ]
+   ],
+   "frameSources": [
+    {
+     "clip": "spikeguard",
+     "frame": 0,
+     "dy": 0
+    },
+    {
+     "clip": "spikeguard",
+     "frame": 1,
+     "dy": -1
+    },
+    {
+     "clip": "spikeguard",
+     "frame": 2,
+     "dy": -1
+    },
+    {
+     "clip": "spikeguard",
+     "frame": 3,
+     "dy": -1
+    }
    ]
   },
   "parry": {
@@ -2276,6 +3085,28 @@
       45
      ]
     ]
+   ],
+   "frameSources": [
+    {
+     "clip": "parry",
+     "frame": 0,
+     "dy": 0
+    },
+    {
+     "clip": "parry",
+     "frame": 1,
+     "dy": 0
+    },
+    {
+     "clip": "parry",
+     "frame": 2,
+     "dy": 0
+    },
+    {
+     "clip": "parry",
+     "frame": 3,
+     "dy": 0
+    }
    ]
   },
   "shadowstep": {
@@ -2305,48 +3136,48 @@
     [
      [
       80.3,
-      102.9,
+      101.9,
       43
      ],
      [
       76.9,
-      104.3,
+      103.3,
       51
      ]
     ],
     [
      [
       76.7,
-      110.6,
+      106.6,
       41
      ],
      [
       74.6,
-      111.4,
+      107.4,
       49
      ]
     ],
     [
      [
       88.1,
-      116.9,
+      111.9,
       54
      ],
      [
       84.0,
-      116.5,
+      111.5,
       71
      ]
     ],
     [
      [
       87.5,
-      102.9,
+      101.9,
       43
      ],
      [
       84.1,
-      104.3,
+      103.3,
       51
      ]
     ],
@@ -2362,6 +3193,38 @@
       53
      ]
     ]
+   ],
+   "frameSources": [
+    {
+     "clip": "shadowstep",
+     "frame": 0,
+     "dy": 0
+    },
+    {
+     "clip": "shadowstep",
+     "frame": 1,
+     "dy": -1
+    },
+    {
+     "clip": "shadowstep",
+     "frame": 2,
+     "dy": -4
+    },
+    {
+     "clip": "shadowstep",
+     "frame": 3,
+     "dy": -5
+    },
+    {
+     "clip": "shadowstep",
+     "frame": 4,
+     "dy": -1
+    },
+    {
+     "clip": "shadowstep",
+     "frame": 5,
+     "dy": 0
+    }
    ]
   },
   "reargrab": {
@@ -2448,6 +3311,38 @@
       -25
      ]
     ]
+   ],
+   "frameSources": [
+    {
+     "clip": "reargrab",
+     "frame": 0,
+     "dy": 0
+    },
+    {
+     "clip": "reargrab",
+     "frame": 1,
+     "dy": 0
+    },
+    {
+     "clip": "reargrab",
+     "frame": 2,
+     "dy": 0
+    },
+    {
+     "clip": "reargrab",
+     "frame": 3,
+     "dy": 0
+    },
+    {
+     "clip": "reargrab",
+     "frame": 4,
+     "dy": 0
+    },
+    {
+     "clip": "reargrab",
+     "frame": 5,
+     "dy": 0
+    }
    ]
   },
   "grabstab": {
@@ -2512,6 +3407,28 @@
       -1
      ]
     ]
+   ],
+   "frameSources": [
+    {
+     "clip": "grabstab",
+     "frame": 0,
+     "dy": 0
+    },
+    {
+     "clip": "grabstab",
+     "frame": 1,
+     "dy": 0
+    },
+    {
+     "clip": "grabstab",
+     "frame": 2,
+     "dy": 0
+    },
+    {
+     "clip": "grabstab",
+     "frame": 3,
+     "dy": 0
+    }
    ]
   },
   "pin": {
@@ -2530,26 +3447,26 @@
    "hands": [
     [
      [
-      104.3,
-      59.8,
-      -32
+      106.2,
+      112.0,
+      43
      ],
      [
-      103.8,
-      67.7,
-      -25
+      100.3,
+      102.2,
+      17
      ]
     ],
     [
      [
-      107.9,
-      99.9,
-      29
+      106.2,
+      112.0,
+      43
      ],
      [
-      102.3,
-      97.8,
-      20
+      100.3,
+      102.2,
+      17
      ]
     ],
     [
@@ -2567,63 +3484,105 @@
     [
      [
       104.5,
-      124.1,
+      122.1,
       57
      ],
      [
       98.4,
-      106.7,
+      104.7,
       12
      ]
     ],
     [
      [
       104.5,
-      124.1,
+      122.1,
       57
      ],
      [
       98.4,
-      106.7,
+      104.7,
       12
      ]
     ],
     [
      [
       105.7,
-      126.8,
+      123.8,
       63
      ],
      [
       108,
-      127,
+      124,
       49
      ]
     ],
     [
      [
       105.7,
-      126.8,
+      123.8,
       63
      ],
      [
       108,
-      127,
+      124,
       49
      ]
     ],
     [
      [
       105.7,
-      126.8,
+      123.8,
       63
      ],
      [
       108,
-      127,
+      124,
       49
      ]
     ]
+   ],
+   "frameSources": [
+    {
+     "clip": "pin",
+     "frame": 2,
+     "dy": 0
+    },
+    {
+     "clip": "pin",
+     "frame": 2,
+     "dy": 0
+    },
+    {
+     "clip": "pin",
+     "frame": 2,
+     "dy": 0
+    },
+    {
+     "clip": "pin",
+     "frame": 3,
+     "dy": -2
+    },
+    {
+     "clip": "pin",
+     "frame": 4,
+     "dy": -2
+    },
+    {
+     "clip": "pin",
+     "frame": 5,
+     "dy": -3
+    },
+    {
+     "clip": "pin",
+     "frame": 5,
+     "dy": -3
+    },
+    {
+     "clip": "pin",
+     "frame": 5,
+     "dy": -3
+    }
    ]
   },
   "super": {
@@ -2689,12 +3648,12 @@
     [
      [
       76.7,
-      110.6,
+      107.6,
       41
      ],
      [
       74.6,
-      111.4,
+      108.4,
       49
      ]
     ],
@@ -2746,6 +3705,53 @@
       4
      ]
     ]
+   ],
+   "frameSources": [
+    {
+     "clip": "super",
+     "frame": 0,
+     "dy": 0
+    },
+    {
+     "clip": "super",
+     "frame": 1,
+     "dy": 0
+    },
+    {
+     "clip": "super",
+     "frame": 2,
+     "dy": 0
+    },
+    {
+     "clip": "super",
+     "frame": 3,
+     "dy": 0
+    },
+    {
+     "clip": "super",
+     "frame": 4,
+     "dy": -3
+    },
+    {
+     "clip": "super",
+     "frame": 5,
+     "dy": 0
+    },
+    {
+     "clip": "super",
+     "frame": 6,
+     "dy": 0
+    },
+    {
+     "clip": "super",
+     "frame": 7,
+     "dy": 0
+    },
+    {
+     "clip": "super",
+     "frame": 8,
+     "dy": 0
+    }
    ]
   },
   "pickup": {
@@ -2832,6 +3838,38 @@
       57
      ]
     ]
+   ],
+   "frameSources": [
+    {
+     "clip": "pickup",
+     "frame": 0,
+     "dy": 0
+    },
+    {
+     "clip": "pickup",
+     "frame": 1,
+     "dy": 0
+    },
+    {
+     "clip": "pickup",
+     "frame": 2,
+     "dy": 0
+    },
+    {
+     "clip": "pickup",
+     "frame": 3,
+     "dy": 0
+    },
+    {
+     "clip": "pickup",
+     "frame": 4,
+     "dy": 0
+    },
+    {
+     "clip": "pickup",
+     "frame": 5,
+     "dy": 0
+    }
    ]
   },
   "toss": {
@@ -2875,37 +3913,37 @@
     [
      [
       102.9,
-      64.3,
+      63.3,
       -12
      ],
      [
       76.1,
-      88.5,
+      87.5,
       60
      ]
     ],
     [
      [
       102.9,
-      64.3,
+      63.3,
       -12
      ],
      [
       76.1,
-      88.5,
+      87.5,
       60
      ]
     ],
     [
      [
-      89.5,
-      75.7,
-      15
+      102.9,
+      63.3,
+      -12
      ],
      [
-      75.6,
-      88.3,
-      59
+      76.1,
+      87.5,
+      60
      ]
     ],
     [
@@ -2920,6 +3958,38 @@
       57
      ]
     ]
+   ],
+   "frameSources": [
+    {
+     "clip": "toss",
+     "frame": 0,
+     "dy": 0
+    },
+    {
+     "clip": "toss",
+     "frame": 1,
+     "dy": 0
+    },
+    {
+     "clip": "toss",
+     "frame": 3,
+     "dy": -1
+    },
+    {
+     "clip": "toss",
+     "frame": 3,
+     "dy": -1
+    },
+    {
+     "clip": "toss",
+     "frame": 3,
+     "dy": -1
+    },
+    {
+     "clip": "toss",
+     "frame": 5,
+     "dy": 0
+    }
    ]
   },
   "drink": {
@@ -3018,6 +4088,43 @@
       57
      ]
     ]
+   ],
+   "frameSources": [
+    {
+     "clip": "drink",
+     "frame": 0,
+     "dy": 0
+    },
+    {
+     "clip": "drink",
+     "frame": 1,
+     "dy": 0
+    },
+    {
+     "clip": "drink",
+     "frame": 2,
+     "dy": 0
+    },
+    {
+     "clip": "drink",
+     "frame": 3,
+     "dy": 0
+    },
+    {
+     "clip": "drink",
+     "frame": 4,
+     "dy": 0
+    },
+    {
+     "clip": "drink",
+     "frame": 5,
+     "dy": 0
+    },
+    {
+     "clip": "drink",
+     "frame": 6,
+     "dy": 0
+    }
    ]
   },
   "eat": {
@@ -3046,8 +4153,8 @@
     ],
     [
      [
-      78.2,
-      66.5,
+      78.3,
+      64.5,
       -87
      ],
      [
@@ -3070,8 +4177,8 @@
     ],
     [
      [
-      78.2,
-      66.5,
+      78.3,
+      64.5,
       -87
      ],
      [
@@ -3104,6 +4211,38 @@
       57
      ]
     ]
+   ],
+   "frameSources": [
+    {
+     "clip": "eat",
+     "frame": 0,
+     "dy": 0
+    },
+    {
+     "clip": "eat",
+     "frame": 2,
+     "dy": 0
+    },
+    {
+     "clip": "eat",
+     "frame": 2,
+     "dy": 0
+    },
+    {
+     "clip": "eat",
+     "frame": 2,
+     "dy": 0
+    },
+    {
+     "clip": "eat",
+     "frame": 4,
+     "dy": 0
+    },
+    {
+     "clip": "eat",
+     "frame": 5,
+     "dy": 0
+    }
    ]
   },
   "stitch": {
@@ -3190,6 +4329,38 @@
       5
      ]
     ]
+   ],
+   "frameSources": [
+    {
+     "clip": "stitch",
+     "frame": 0,
+     "dy": 0
+    },
+    {
+     "clip": "stitch",
+     "frame": 1,
+     "dy": 0
+    },
+    {
+     "clip": "stitch",
+     "frame": 2,
+     "dy": 0
+    },
+    {
+     "clip": "stitch",
+     "frame": 3,
+     "dy": 0
+    },
+    {
+     "clip": "stitch",
+     "frame": 4,
+     "dy": 0
+    },
+    {
+     "clip": "stitch",
+     "frame": 5,
+     "dy": 0
+    }
    ]
   },
   "hit": {
@@ -3207,51 +4378,73 @@
     [
      [
       85.8,
-      91.4,
+      92.4,
       45
      ],
      [
       80.4,
-      93.7,
+      94.7,
       53
      ]
     ],
     [
      [
       79.6,
-      89.5,
+      90.5,
       31
      ],
      [
       75.2,
-      93.3,
+      94.3,
       39
      ]
     ],
     [
      [
       82.7,
-      90.5,
+      91.5,
       38
      ],
      [
       77.8,
-      93.5,
+      94.5,
       46
      ]
     ],
     [
      [
       85.8,
-      91.4,
+      92.4,
       45
      ],
      [
       80.4,
-      93.7,
+      94.7,
       53
      ]
     ]
+   ],
+   "frameSources": [
+    {
+     "clip": "hit",
+     "frame": 0,
+     "dy": 1
+    },
+    {
+     "clip": "hit",
+     "frame": 1,
+     "dy": 1
+    },
+    {
+     "clip": "hit",
+     "frame": 2,
+     "dy": 1
+    },
+    {
+     "clip": "hit",
+     "frame": 3,
+     "dy": 1
+    }
    ]
   },
   "down": {
@@ -3292,64 +4485,101 @@
     ],
     [
      [
-      60.2,
-      102.3,
-      -21
+      28.5,
+      74.2,
+      159
      ],
      [
-      57.6,
-      103.5,
-      -9
-     ]
-    ],
-    [
-     [
-      67.2,
-      116.8,
-      -2
-     ],
-     [
-      64.9,
-      116.4,
-      12
+      32.1,
+      81.9,
+      123
      ]
     ],
     [
      [
       74.3,
-      131.4,
+      125.4,
       16
      ],
      [
       72.2,
-      129.4,
+      123.4,
       34
      ]
     ],
     [
      [
       74.3,
-      131.4,
+      125.4,
       16
      ],
      [
       72.2,
-      129.4,
+      123.4,
       34
      ]
     ],
     [
      [
       74.3,
-      131.4,
+      125.4,
       16
      ],
      [
       72.2,
-      129.4,
+      123.4,
+      34
+     ]
+    ],
+    [
+     [
+      74.3,
+      125.4,
+      16
+     ],
+     [
+      72.2,
+      123.4,
       34
      ]
     ]
+   ],
+   "frameSources": [
+    {
+     "clip": "down",
+     "frame": 0,
+     "dy": 0
+    },
+    {
+     "clip": "down",
+     "frame": 1,
+     "dy": 0
+    },
+    {
+     "clip": "down",
+     "frame": 1,
+     "dy": 0
+    },
+    {
+     "clip": "down",
+     "frame": 4,
+     "dy": -6
+    },
+    {
+     "clip": "down",
+     "frame": 4,
+     "dy": -6
+    },
+    {
+     "clip": "down",
+     "frame": 5,
+     "dy": -6
+    },
+    {
+     "clip": "down",
+     "frame": 6,
+     "dy": -6
+    }
    ]
   },
   "getup": {
@@ -3367,48 +4597,48 @@
     [
      [
       74.3,
-      131.4,
+      125.4,
       16
      ],
      [
       72.2,
-      129.4,
+      123.4,
       34
      ]
     ],
     [
      [
       72.1,
-      121.9,
+      115.9,
       21
      ],
      [
       69.4,
-      121.2,
+      115.2,
       34
      ]
     ],
     [
      [
       75.7,
-      110.3,
+      106.3,
       57
      ],
      [
       73.4,
-      110.2,
+      106.2,
       64
      ]
     ],
     [
      [
       72.7,
-      110.5,
+      107.5,
       48
      ],
      [
       70.5,
-      110.9,
+      107.9,
       56
      ]
     ],
@@ -3448,6 +4678,43 @@
       53
      ]
     ]
+   ],
+   "frameSources": [
+    {
+     "clip": "down",
+     "frame": 6,
+     "dy": -6
+    },
+    {
+     "clip": "getup",
+     "frame": 1,
+     "dy": -6
+    },
+    {
+     "clip": "getup",
+     "frame": 2,
+     "dy": -4
+    },
+    {
+     "clip": "getup",
+     "frame": 3,
+     "dy": -3
+    },
+    {
+     "clip": "getup",
+     "frame": 4,
+     "dy": 0
+    },
+    {
+     "clip": "getup",
+     "frame": 5,
+     "dy": 0
+    },
+    {
+     "clip": "getup",
+     "frame": 6,
+     "dy": 0
+    }
    ]
   },
   "beckon": {
@@ -3534,6 +4801,38 @@
       57
      ]
     ]
+   ],
+   "frameSources": [
+    {
+     "clip": "beckon",
+     "frame": 0,
+     "dy": 0
+    },
+    {
+     "clip": "beckon",
+     "frame": 1,
+     "dy": 0
+    },
+    {
+     "clip": "beckon",
+     "frame": 2,
+     "dy": 0
+    },
+    {
+     "clip": "beckon",
+     "frame": 3,
+     "dy": 0
+    },
+    {
+     "clip": "beckon",
+     "frame": 4,
+     "dy": 0
+    },
+    {
+     "clip": "beckon",
+     "frame": 5,
+     "dy": 0
+    }
    ]
   },
   "toothpull": {
@@ -3646,6 +4945,48 @@
       7
      ]
     ]
+   ],
+   "frameSources": [
+    {
+     "clip": "toothpull",
+     "frame": 0,
+     "dy": 0
+    },
+    {
+     "clip": "toothpull",
+     "frame": 1,
+     "dy": 0
+    },
+    {
+     "clip": "toothpull",
+     "frame": 2,
+     "dy": 0
+    },
+    {
+     "clip": "toothpull",
+     "frame": 3,
+     "dy": 0
+    },
+    {
+     "clip": "toothpull",
+     "frame": 4,
+     "dy": 0
+    },
+    {
+     "clip": "toothpull",
+     "frame": 5,
+     "dy": 0
+    },
+    {
+     "clip": "toothpull",
+     "frame": 6,
+     "dy": 0
+    },
+    {
+     "clip": "toothpull",
+     "frame": 7,
+     "dy": 0
+    }
    ]
   },
   "pipe": {
@@ -3689,24 +5030,24 @@
     [
      [
       131.8,
-      87.9,
+      86.9,
       6
      ],
      [
       71.5,
-      87.6,
+      86.6,
       123
      ]
     ],
     [
      [
       131.8,
-      87.9,
+      86.9,
       6
      ],
      [
       71.5,
-      87.6,
+      86.6,
       123
      ]
     ],
@@ -3734,6 +5075,38 @@
       62
      ]
     ]
+   ],
+   "frameSources": [
+    {
+     "clip": "pipe",
+     "frame": 0,
+     "dy": 0
+    },
+    {
+     "clip": "pipe",
+     "frame": 1,
+     "dy": 0
+    },
+    {
+     "clip": "pipe",
+     "frame": 2,
+     "dy": -1
+    },
+    {
+     "clip": "pipe",
+     "frame": 3,
+     "dy": -1
+    },
+    {
+     "clip": "pipe",
+     "frame": 4,
+     "dy": 0
+    },
+    {
+     "clip": "pipe",
+     "frame": 5,
+     "dy": 0
+    }
    ]
   },
   "shotgun": {
@@ -3810,6 +5183,33 @@
       0
      ]
     ]
+   ],
+   "frameSources": [
+    {
+     "clip": "shotgun",
+     "frame": 0,
+     "dy": 0
+    },
+    {
+     "clip": "shotgun",
+     "frame": 1,
+     "dy": 0
+    },
+    {
+     "clip": "shotgun",
+     "frame": 2,
+     "dy": 0
+    },
+    {
+     "clip": "shotgun",
+     "frame": 3,
+     "dy": 0
+    },
+    {
+     "clip": "shotgun",
+     "frame": 4,
+     "dy": 0
+    }
    ]
   },
   "idle_pipe": {
@@ -3872,6 +5272,28 @@
       57
      ]
     ]
+   ],
+   "frameSources": [
+    {
+     "clip": "idle_pipe",
+     "frame": 0,
+     "dy": 0
+    },
+    {
+     "clip": "idle_pipe",
+     "frame": 1,
+     "dy": 0
+    },
+    {
+     "clip": "idle_pipe",
+     "frame": 2,
+     "dy": 0
+    },
+    {
+     "clip": "idle_pipe",
+     "frame": 3,
+     "dy": 0
+    }
    ]
   },
   "walk_pipe": {
@@ -3970,6 +5392,43 @@
       58
      ]
     ]
+   ],
+   "frameSources": [
+    {
+     "clip": "walk_pipe",
+     "frame": 0,
+     "dy": 0
+    },
+    {
+     "clip": "walk_pipe",
+     "frame": 1,
+     "dy": 0
+    },
+    {
+     "clip": "walk_pipe",
+     "frame": 2,
+     "dy": 0
+    },
+    {
+     "clip": "walk_pipe",
+     "frame": 3,
+     "dy": 0
+    },
+    {
+     "clip": "walk_pipe",
+     "frame": 4,
+     "dy": 0
+    },
+    {
+     "clip": "walk_pipe",
+     "frame": 5,
+     "dy": 0
+    },
+    {
+     "clip": "walk_pipe",
+     "frame": 6,
+     "dy": 0
+    }
    ]
   },
   "idle_shotgun": {
@@ -4032,6 +5491,28 @@
       57
      ]
     ]
+   ],
+   "frameSources": [
+    {
+     "clip": "idle_shotgun",
+     "frame": 0,
+     "dy": 0
+    },
+    {
+     "clip": "idle_shotgun",
+     "frame": 1,
+     "dy": 0
+    },
+    {
+     "clip": "idle_shotgun",
+     "frame": 2,
+     "dy": 0
+    },
+    {
+     "clip": "idle_shotgun",
+     "frame": 3,
+     "dy": 0
+    }
    ]
   },
   "walk_shotgun": {
@@ -4085,12 +5566,12 @@
     [
      [
       91.1,
-      89.1,
+      88.1,
       36
      ],
      [
       76.1,
-      88.5,
+      87.5,
       58
      ]
     ],
@@ -4130,6 +5611,43 @@
       58
      ]
     ]
+   ],
+   "frameSources": [
+    {
+     "clip": "walk_shotgun",
+     "frame": 0,
+     "dy": 0
+    },
+    {
+     "clip": "walk_shotgun",
+     "frame": 1,
+     "dy": 0
+    },
+    {
+     "clip": "walk_shotgun",
+     "frame": 2,
+     "dy": 0
+    },
+    {
+     "clip": "walk_shotgun",
+     "frame": 3,
+     "dy": -1
+    },
+    {
+     "clip": "walk_shotgun",
+     "frame": 4,
+     "dy": 0
+    },
+    {
+     "clip": "walk_shotgun",
+     "frame": 5,
+     "dy": 0
+    },
+    {
+     "clip": "walk_shotgun",
+     "frame": 6,
+     "dy": 0
+    }
    ]
   },
   "run_shotgun": {
@@ -4183,24 +5701,24 @@
     [
      [
       99.3,
-      103.6,
+      102.6,
       53
      ],
      [
       71.9,
-      92.5,
+      91.5,
       112
      ]
     ],
     [
      [
       99.3,
-      102.9,
+      101.9,
       53
      ],
      [
       70.6,
-      91.1,
+      90.1,
       116
      ]
     ],
@@ -4240,6 +5758,48 @@
       95
      ]
     ]
+   ],
+   "frameSources": [
+    {
+     "clip": "run_shotgun",
+     "frame": 0,
+     "dy": 0
+    },
+    {
+     "clip": "run_shotgun",
+     "frame": 1,
+     "dy": 0
+    },
+    {
+     "clip": "run_shotgun",
+     "frame": 2,
+     "dy": 0
+    },
+    {
+     "clip": "run_shotgun",
+     "frame": 3,
+     "dy": -1
+    },
+    {
+     "clip": "run_shotgun",
+     "frame": 4,
+     "dy": -1
+    },
+    {
+     "clip": "run_shotgun",
+     "frame": 5,
+     "dy": 0
+    },
+    {
+     "clip": "run_shotgun",
+     "frame": 6,
+     "dy": 0
+    },
+    {
+     "clip": "run_shotgun",
+     "frame": 7,
+     "dy": 0
+    }
    ]
   },
   "tired": {
@@ -4302,6 +5862,28 @@
       57
      ]
     ]
+   ],
+   "frameSources": [
+    {
+     "clip": "tired",
+     "frame": 0,
+     "dy": 0
+    },
+    {
+     "clip": "tired",
+     "frame": 1,
+     "dy": 0
+    },
+    {
+     "clip": "tired",
+     "frame": 2,
+     "dy": 0
+    },
+    {
+     "clip": "tired",
+     "frame": 3,
+     "dy": 0
+    }
    ]
   },
   "support": {
@@ -4381,26 +5963,26 @@
     ],
     [
      [
-      101.2,
-      88.8,
-      18
+      116.6,
+      86.1,
+      6
      ],
      [
-      81.5,
-      95.3,
-      53
+      82.5,
+      96.9,
+      54
      ]
     ],
     [
      [
-      83.9,
-      71.0,
-      -54
+      116.6,
+      86.1,
+      6
      ],
      [
-      75.1,
-      96.5,
-      60
+      82.5,
+      96.9,
+      54
      ]
     ],
     [
@@ -4415,6 +5997,48 @@
       51
      ]
     ]
+   ],
+   "frameSources": [
+    {
+     "clip": "support",
+     "frame": 0,
+     "dy": 0
+    },
+    {
+     "clip": "support",
+     "frame": 1,
+     "dy": 0
+    },
+    {
+     "clip": "support",
+     "frame": 2,
+     "dy": 0
+    },
+    {
+     "clip": "support",
+     "frame": 3,
+     "dy": 0
+    },
+    {
+     "clip": "support",
+     "frame": 4,
+     "dy": 0
+    },
+    {
+     "clip": "support",
+     "frame": 4,
+     "dy": 0
+    },
+    {
+     "clip": "support",
+     "frame": 4,
+     "dy": 0
+    },
+    {
+     "clip": "support",
+     "frame": 7,
+     "dy": 0
+    }
    ]
   },
   "stepup": {
@@ -4468,12 +6092,12 @@
     [
      [
       79.2,
-      88.8,
+      87.8,
       62
      ],
      [
       78.1,
-      89.7,
+      88.7,
       60
      ]
     ],
@@ -4513,6 +6137,43 @@
       60
      ]
     ]
+   ],
+   "frameSources": [
+    {
+     "clip": "stepup",
+     "frame": 0,
+     "dy": 0
+    },
+    {
+     "clip": "stepup",
+     "frame": 1,
+     "dy": 0
+    },
+    {
+     "clip": "stepup",
+     "frame": 2,
+     "dy": 0
+    },
+    {
+     "clip": "stepup",
+     "frame": 3,
+     "dy": -1
+    },
+    {
+     "clip": "stepup",
+     "frame": 4,
+     "dy": 0
+    },
+    {
+     "clip": "stepup",
+     "frame": 5,
+     "dy": 0
+    },
+    {
+     "clip": "stepup",
+     "frame": 6,
+     "dy": 0
+    }
    ]
   },
   "carry2_idle": {
@@ -4575,6 +6236,28 @@
       -15
      ]
     ]
+   ],
+   "frameSources": [
+    {
+     "clip": "carry2_idle",
+     "frame": 0,
+     "dy": 0
+    },
+    {
+     "clip": "carry2_idle",
+     "frame": 1,
+     "dy": 0
+    },
+    {
+     "clip": "carry2_idle",
+     "frame": 2,
+     "dy": 0
+    },
+    {
+     "clip": "carry2_idle",
+     "frame": 3,
+     "dy": 0
+    }
    ]
   },
   "carry2_walk": {
@@ -4628,24 +6311,24 @@
     [
      [
       80.4,
-      78.7,
+      77.7,
       -14
      ],
      [
       78.4,
-      77.6,
+      76.6,
       -14
      ]
     ],
     [
      [
       80.4,
-      78.8,
+      77.8,
       -14
      ],
      [
       78.4,
-      77.7,
+      76.7,
       -14
      ]
     ],
@@ -4685,6 +6368,48 @@
       -14
      ]
     ]
+   ],
+   "frameSources": [
+    {
+     "clip": "carry2_walk",
+     "frame": 0,
+     "dy": 0
+    },
+    {
+     "clip": "carry2_walk",
+     "frame": 1,
+     "dy": 0
+    },
+    {
+     "clip": "carry2_walk",
+     "frame": 2,
+     "dy": 0
+    },
+    {
+     "clip": "carry2_walk",
+     "frame": 3,
+     "dy": -1
+    },
+    {
+     "clip": "carry2_walk",
+     "frame": 4,
+     "dy": -1
+    },
+    {
+     "clip": "carry2_walk",
+     "frame": 5,
+     "dy": 0
+    },
+    {
+     "clip": "carry2_walk",
+     "frame": 6,
+     "dy": 0
+    },
+    {
+     "clip": "carry2_walk",
+     "frame": 7,
+     "dy": 0
+    }
    ]
   },
   "carry2_run": {
@@ -4738,24 +6463,24 @@
     [
      [
       91.1,
-      90.7,
+      89.7,
       10
      ],
      [
       89.8,
-      89.0,
+      88.0,
       10
      ]
     ],
     [
      [
       91.1,
-      90.0,
+      88.0,
       10
      ],
      [
       89.8,
-      88.3,
+      86.3,
       10
      ]
     ],
@@ -4786,15 +6511,57 @@
     [
      [
       91.1,
-      90.7,
+      89.7,
       10
      ],
      [
       89.8,
-      89.0,
+      88.0,
       10
      ]
     ]
+   ],
+   "frameSources": [
+    {
+     "clip": "carry2_run",
+     "frame": 0,
+     "dy": 0
+    },
+    {
+     "clip": "carry2_run",
+     "frame": 1,
+     "dy": 0
+    },
+    {
+     "clip": "carry2_run",
+     "frame": 2,
+     "dy": 0
+    },
+    {
+     "clip": "carry2_run",
+     "frame": 3,
+     "dy": -1
+    },
+    {
+     "clip": "carry2_run",
+     "frame": 4,
+     "dy": -2
+    },
+    {
+     "clip": "carry2_run",
+     "frame": 5,
+     "dy": 0
+    },
+    {
+     "clip": "carry2_run",
+     "frame": 6,
+     "dy": 0
+    },
+    {
+     "clip": "carry2_run",
+     "frame": 7,
+     "dy": -1
+    }
    ]
   },
   "turn": {
@@ -4845,6 +6612,23 @@
       111
      ]
     ]
+   ],
+   "frameSources": [
+    {
+     "clip": "turn",
+     "frame": 0,
+     "dy": 0
+    },
+    {
+     "clip": "turn",
+     "frame": 1,
+     "dy": 0
+    },
+    {
+     "clip": "turn",
+     "frame": 2,
+     "dy": 0
+    }
    ]
   },
   "fall": {
@@ -4895,6 +6679,23 @@
       36
      ]
     ]
+   ],
+   "frameSources": [
+    {
+     "clip": "fall",
+     "frame": 0,
+     "dy": 0
+    },
+    {
+     "clip": "fall",
+     "frame": 1,
+     "dy": 0
+    },
+    {
+     "clip": "fall",
+     "frame": 2,
+     "dy": 0
+    }
    ]
   },
   "land": {
@@ -4912,12 +6713,12 @@
     [
      [
       80.3,
-      76.4,
-      36
+      80.4,
+      47
      ],
      [
       78.3,
-      77.4,
+      79.4,
       36
      ]
     ],
@@ -4945,6 +6746,23 @@
       44
      ]
     ]
+   ],
+   "frameSources": [
+    {
+     "clip": "fall",
+     "frame": 2,
+     "dy": 0
+    },
+    {
+     "clip": "land",
+     "frame": 1,
+     "dy": 0
+    },
+    {
+     "clip": "land",
+     "frame": 2,
+     "dy": 0
+    }
    ]
   },
   "ladder": {
@@ -5055,6 +6873,48 @@
       -79
      ]
     ]
+   ],
+   "frameSources": [
+    {
+     "clip": "ladder",
+     "frame": 0,
+     "dy": 0
+    },
+    {
+     "clip": "ladder",
+     "frame": 1,
+     "dy": 0
+    },
+    {
+     "clip": "ladder",
+     "frame": 2,
+     "dy": 0
+    },
+    {
+     "clip": "ladder",
+     "frame": 3,
+     "dy": 0
+    },
+    {
+     "clip": "ladder",
+     "frame": 4,
+     "dy": 0
+    },
+    {
+     "clip": "ladder",
+     "frame": 5,
+     "dy": 0
+    },
+    {
+     "clip": "ladder",
+     "frame": 6,
+     "dy": 0
+    },
+    {
+     "clip": "ladder",
+     "frame": 7,
+     "dy": 0
+    }
    ]
   },
   "mantle": {
@@ -5129,6 +6989,33 @@
       58
      ]
     ]
+   ],
+   "frameSources": [
+    {
+     "clip": "mantle",
+     "frame": 0,
+     "dy": 0
+    },
+    {
+     "clip": "mantle",
+     "frame": 1,
+     "dy": 0
+    },
+    {
+     "clip": "mantle",
+     "frame": 2,
+     "dy": 0
+    },
+    {
+     "clip": "mantle",
+     "frame": 3,
+     "dy": 0
+    },
+    {
+     "clip": "mantle",
+     "frame": 4,
+     "dy": 0
+    }
    ]
   },
   "vault": {
@@ -5203,6 +7090,33 @@
       57
      ]
     ]
+   ],
+   "frameSources": [
+    {
+     "clip": "vault",
+     "frame": 0,
+     "dy": 0
+    },
+    {
+     "clip": "vault",
+     "frame": 1,
+     "dy": 0
+    },
+    {
+     "clip": "vault",
+     "frame": 2,
+     "dy": 0
+    },
+    {
+     "clip": "vault",
+     "frame": 3,
+     "dy": 0
+    },
+    {
+     "clip": "vault",
+     "frame": 4,
+     "dy": 0
+    }
    ]
   },
   "crawl": {
@@ -5301,6 +7215,43 @@
       71
      ]
     ]
+   ],
+   "frameSources": [
+    {
+     "clip": "crawl",
+     "frame": 0,
+     "dy": 0
+    },
+    {
+     "clip": "crawl",
+     "frame": 1,
+     "dy": 0
+    },
+    {
+     "clip": "crawl",
+     "frame": 2,
+     "dy": 0
+    },
+    {
+     "clip": "crawl",
+     "frame": 3,
+     "dy": 0
+    },
+    {
+     "clip": "crawl",
+     "frame": 4,
+     "dy": 0
+    },
+    {
+     "clip": "crawl",
+     "frame": 5,
+     "dy": 0
+    },
+    {
+     "clip": "crawl",
+     "frame": 6,
+     "dy": 0
+    }
    ]
   },
   "sneak": {
@@ -5342,12 +7293,36 @@
     [
      [
       90.9,
-      99.7,
+      97.7,
       47
      ],
      [
       86.5,
-      100.6,
+      98.6,
+      54
+     ]
+    ],
+    [
+     [
+      90.9,
+      98.0,
+      47
+     ],
+     [
+      86.5,
+      98.8,
+      54
+     ]
+    ],
+    [
+     [
+      90.9,
+      98.0,
+      47
+     ],
+     [
+      86.5,
+      98.9,
       54
      ]
     ],
@@ -5366,51 +7341,69 @@
     [
      [
       90.9,
-      100.0,
+      98.7,
       47
      ],
      [
       86.5,
-      100.9,
+      99.6,
       54
      ]
     ],
     [
      [
       90.9,
-      100.0,
+      99.0,
       47
      ],
      [
       86.5,
-      100.8,
-      54
-     ]
-    ],
-    [
-     [
-      90.9,
-      99.7,
-      47
-     ],
-     [
-      86.5,
-      100.6,
-      54
-     ]
-    ],
-    [
-     [
-      90.9,
-      100.0,
-      47
-     ],
-     [
-      86.5,
-      100.8,
+      99.8,
       54
      ]
     ]
+   ],
+   "frameSources": [
+    {
+     "clip": "sneak",
+     "frame": 0,
+     "dy": 0
+    },
+    {
+     "clip": "sneak",
+     "frame": 1,
+     "dy": 0
+    },
+    {
+     "clip": "sneak",
+     "frame": 2,
+     "dy": -2
+    },
+    {
+     "clip": "sneak",
+     "frame": 3,
+     "dy": -2
+    },
+    {
+     "clip": "sneak",
+     "frame": 4,
+     "dy": -2
+    },
+    {
+     "clip": "sneak",
+     "frame": 5,
+     "dy": 0
+    },
+    {
+     "clip": "sneak",
+     "frame": 6,
+     "dy": -1
+    },
+    {
+     "clip": "sneak",
+     "frame": 7,
+     "dy": -1
+    }
    ]
   },
   "door": {
@@ -5500,15 +7493,52 @@
     [
      [
       77.1,
-      87.7,
+      87.3,
       60
      ],
      [
       76.1,
-      88.6,
+      88.2,
       58
      ]
     ]
+   ],
+   "frameSources": [
+    {
+     "clip": "door",
+     "frame": 0,
+     "dy": 0
+    },
+    {
+     "clip": "door",
+     "frame": 1,
+     "dy": 0
+    },
+    {
+     "clip": "door",
+     "frame": 2,
+     "dy": 0
+    },
+    {
+     "clip": "door",
+     "frame": 3,
+     "dy": 0
+    },
+    {
+     "clip": "door",
+     "frame": 4,
+     "dy": 0
+    },
+    {
+     "clip": "door",
+     "frame": 5,
+     "dy": 0
+    },
+    {
+     "clip": "door",
+     "frame": 5,
+     "dy": 0
+    }
    ]
   },
   "undress": {

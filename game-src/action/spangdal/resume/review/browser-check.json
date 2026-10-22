@@ -1,0 +1,38 @@
+[
+  {
+    "viewport": [
+      1440,
+      1000
+    ],
+    "mobile_touch": false,
+    "loaded_images": 70,
+    "js_errors": [],
+    "horizontal_overflow": false,
+    "pause_step_wrap": "passed",
+    "screenshot": "browser-pc.png"
+  },
+  {
+    "viewport": [
+      844,
+      390
+    ],
+    "mobile_touch": true,
+    "loaded_images": 70,
+    "js_errors": [],
+    "horizontal_overflow": false,
+    "pause_step_wrap": "passed",
+    "screenshot": "browser-phone-landscape.png"
+  },
+  {
+    "viewport": [
+      390,
+      844
+    ],
+    "mobile_touch": true,
+    "loaded_images": 70,
+    "js_errors": [],
+    "horizontal_overflow": false,
+    "pause_step_wrap": "passed",
+    "screenshot": "browser-phone-portrait.png"
+  }
+]

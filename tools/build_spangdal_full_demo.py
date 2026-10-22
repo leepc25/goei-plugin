@@ -129,10 +129,13 @@ def detach(im):
     return Image.fromarray(a)
 
 
-def clean(k, fr):
+def clean(k, fr, with_sources=False):
+    sources = [{'clip': k, 'frame': i, 'dy': 0} for i in range(len(fr))]
     for i, (src, j) in FIX_REPLACE.get(k, {}).items():
         alt = frames_of(src)
-        if alt and i < len(fr): fr = fr[:i] + [alt[j]] + fr[i + 1:]
+        if alt and i < len(fr):
+            fr = fr[:i] + [alt[j]] + fr[i + 1:]
+            sources[i] = {'clip': src, 'frame': j % len(alt), 'dy': 0}
     out = []
     for i, f in enumerate(fr):
         for r in FIX_ERASE.get(k, {}).get(i, []):
@@ -141,9 +144,10 @@ def clean(k, fr):
         if k not in AIR:   # 발이 바닥선(불투명 맨 아래 y=135) 아래로 내려간 장은 위로 당김
             bb = f.split()[-1].getbbox()
             if bb and (bb[3] - 1 > 135 or (k in SNAP and bb[3] - 1 < 135)):
-                g = Image.new('RGBA', f.size, (0, 0, 0, 0)); g.paste(f, (0, 135 - (bb[3] - 1))); f = g
+                sources[i]['dy'] = 135 - (bb[3] - 1)
+                g = Image.new('RGBA', f.size, (0, 0, 0, 0)); g.paste(f, (0, sources[i]['dy'])); f = g
         out.append(f)
-    return out
+    return (out, sources) if with_sources else out
 
 
 def gpt_clean(fr):
@@ -167,16 +171,18 @@ def gpt_clean(fr):
     return out
 
 
-def hands_of(k, n):
+def hands_of(k, n, sources=None):
     """뼈대 손목·팔꿈치 → [[앞손 x, y, 각도], [뒷손 x, y, 각도]] (각도: 팔꿈치→손목, 오른쪽 0°, 시계 방향 +)."""
     import math
     if k not in rig.CLIPS: return None
     out = []
-    for p in rig.CLIPS[k][2][:n]:
+    for i in range(n):
+        source = sources[i] if sources is not None else {'clip': k, 'frame': i, 'dy': 0}
+        p = rig.CLIPS[source['clip']][2][source['frame']]
         fr = []
         for side in ('RIGHT', 'LEFT'):
             ex, ey = p[f'{side} ELBOW']; wx, wy = p[f'{side} ARM']
-            fr.append([round(wx + rig.DX, 1), round(wy + rig.DY, 1), round(math.degrees(math.atan2(wy - ey, wx - ex)))])
+            fr.append([round(wx + rig.DX, 1), round(wy + rig.DY + source['dy'], 1), round(math.degrees(math.atan2(wy - ey, wx - ex)))])
         out.append(fr)
     return out
 
@@ -206,8 +212,11 @@ def main():
     hands_all = {}
     for k, grp, label in defs:
         fr = frames_of(k)
+        sources = None
         if k == 'talk': continue   # 말하기 = 대기 장 + 말풍선(코드)
-        if fr: fr = gpt_clean(fr) if k in NUDE else clean(k, fr)
+        if fr:
+            if k in NUDE: fr = gpt_clean(fr)
+            else: fr, sources = clean(k, fr, with_sources=True)
         if not fr:
             missing.append(k); continue
         cv = COMBAT.get(k)
@@ -218,7 +227,7 @@ def main():
             hold = cv[4] if len(cv) > 4 else 0
         else:
             fps, loop, hits, adv, hold = 8, any(w in k for w in LOOP_WORDS), [], 0, 0
-        hd = hands_of(k, len(fr))
+        hd = hands_of(k, len(fr), sources)
         if hits is None: hits = auto_hits(k, hd)
         data = strip(fr)
         strips[k] = base64.b64encode(data).decode()
@@ -226,6 +235,7 @@ def main():
         manifest['clips'][k] = {'label': label, 'group': grp, 'fps': fps, 'loop': loop, 'hits': hits, 'adv': adv, 'hold': hold,
                                 'origin': 0, 'frames': len(fr), 'bytes': len(data)}
         if hd: manifest['clips'][k]['hands'] = hd; hands_all[k] = hd
+        if sources is not None: manifest['clips'][k]['frameSources'] = sources
     json.dump(manifest, open(os.path.join(final, 'manifest.json'), 'w'), ensure_ascii=False, indent=1)
     json.dump(hands_all, open(os.path.join(final, 'hands.json'), 'w'), separators=(',', ':'))
     manifest['missing'] = missing

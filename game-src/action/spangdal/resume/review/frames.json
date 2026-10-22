@@ -1,0 +1,3632 @@
+[
+  {
+    "clip": "stab1",
+    "frame": 0,
+    "rendered_rgba_sha256": "fe56521ead1ce38cf870c0c27649211d0698df341f17e97672d28c8fe90e3793",
+    "bbox": [
+      42,
+      52,
+      94,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "stab1",
+      "frame": 0,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "stab1",
+    "frame": 1,
+    "rendered_rgba_sha256": "b5528f8e6c177fdf2646795bcf13cd1e3d7e87dfdad5c5307dec2e8ff5a6d80a",
+    "bbox": [
+      43,
+      53,
+      119,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "stab1",
+      "frame": 1,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "관수보다 검지 가리키기로 읽힘",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "stab1",
+    "frame": 2,
+    "rendered_rgba_sha256": "02b2f4041cdbe27da470b0c04ca5970537e8614ce04d3563a4a626ee1a9d364f",
+    "bbox": [
+      47,
+      54,
+      127,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "stab1",
+      "frame": 2,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "관수보다 검지 가리키기로 읽힘",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "stab1",
+    "frame": 3,
+    "rendered_rgba_sha256": "2a7baccad73e4fa2133cff7b5c124b07ef19b847b064cb84e19e20dac213f677",
+    "bbox": [
+      47,
+      54,
+      127,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "stab1",
+      "frame": 3,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "관수보다 검지 가리키기로 읽힘",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "stab1",
+    "frame": 4,
+    "rendered_rgba_sha256": "ea15b92222ba4d305baf3c1529a83a2baf27efd7e0880d917282637a882d745a",
+    "bbox": [
+      45,
+      53,
+      110,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "stab1",
+      "frame": 4,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "관수보다 검지 가리키기로 읽힘",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "stab1",
+    "frame": 5,
+    "rendered_rgba_sha256": "3ccc4d6fbc24283a44f5ada218e28810063b3c17efb2a10680b022f37e807bba",
+    "bbox": [
+      43,
+      52,
+      95,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "stab1",
+      "frame": 5,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "slash2",
+    "frame": 0,
+    "rendered_rgba_sha256": "c579bd88fcfce67d176a651818bdc85765783c816b99f6a90f5abdfc904016dc",
+    "bbox": [
+      44,
+      52,
+      96,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "slash2",
+      "frame": 0,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "손·팔 겹침: 1타와 다른 손인지 근접 확인 필요",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "slash2",
+    "frame": 1,
+    "rendered_rgba_sha256": "3bac8176e85554f12202631778be2fc25d954c224cd496af4bc0e6b59f3990c3",
+    "bbox": [
+      47,
+      52,
+      97,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "slash2",
+      "frame": 1,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "손·팔 겹침: 1타와 다른 손인지 근접 확인 필요",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "slash2",
+    "frame": 2,
+    "rendered_rgba_sha256": "6b26f4a55acf2003ce055e10ef7003007c09b688b0f443c2f03c45e8c68bb13c",
+    "bbox": [
+      49,
+      54,
+      99,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "slash2",
+      "frame": 2,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "손·팔 겹침: 1타와 다른 손인지 근접 확인 필요",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "slash2",
+    "frame": 3,
+    "rendered_rgba_sha256": "30beea4265b67a33b1bf1cafdba666813eaea22fa978cdbb6f663c80e587fa77",
+    "bbox": [
+      49,
+      58,
+      114,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "slash2",
+      "frame": 3,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "손·팔 겹침: 1타와 다른 손인지 근접 확인 필요",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "slash2",
+    "frame": 4,
+    "rendered_rgba_sha256": "690bb1c33a01d48ba00ddde9de72c110dca51cdae03a9f155db09d797d08918e",
+    "bbox": [
+      49,
+      58,
+      114,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "slash2",
+      "frame": 4,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "손·팔 겹침: 1타와 다른 손인지 근접 확인 필요",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "slash2",
+    "frame": 5,
+    "rendered_rgba_sha256": "d52f5037960761d554614d0e3b3302614262fdbf404541a3bf155da197e78138",
+    "bbox": [
+      48,
+      55,
+      104,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "slash2",
+      "frame": 5,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "손·팔 겹침: 1타와 다른 손인지 근접 확인 필요",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "pierce3",
+    "frame": 0,
+    "rendered_rgba_sha256": "b7a67120a5eb2d8169a54eab65fb27c88fd54961a742400dd12d0bf70c342fa4",
+    "bbox": [
+      47,
+      51,
+      98,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "pierce3",
+      "frame": 0,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "pierce3",
+    "frame": 1,
+    "rendered_rgba_sha256": "4ecb8a205be1f06d568003563732fb04e34a5bb44d0f573c49682bd81b55f521",
+    "bbox": [
+      51,
+      54,
+      101,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "pierce3",
+      "frame": 1,
+      "dy": -1
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "pierce3",
+    "frame": 2,
+    "rendered_rgba_sha256": "5c35355ca7b8c3a1898f327c8e147ebe31d280174f703af969eda3d13a1d30a2",
+    "bbox": [
+      49,
+      53,
+      129,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "pierce3",
+      "frame": 2,
+      "dy": -1
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "양손 X 관통 대신 나란한 주먹 지르기로 읽힘",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "pierce3",
+    "frame": 3,
+    "rendered_rgba_sha256": "19cded202b5adbdb2f83bf2b152b2eee23968f1eeab0461e2fa0b4388425d595",
+    "bbox": [
+      53,
+      57,
+      140,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "pierce3",
+      "frame": 3,
+      "dy": -2
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "양손 X 관통 대신 나란한 주먹 지르기로 읽힘",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "pierce3",
+    "frame": 4,
+    "rendered_rgba_sha256": "51c549f43dd74cfae3bfc2f8c6d1c65cca885c20e5d1f13267a19fee2d7bc40a",
+    "bbox": [
+      53,
+      57,
+      140,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "pierce3",
+      "frame": 4,
+      "dy": -2
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "양손 X 관통 대신 나란한 주먹 지르기로 읽힘",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "pierce3",
+    "frame": 5,
+    "rendered_rgba_sha256": "55ffcb507aa77c11e7cb556bc00a7ed3d440f10bc883829149b8afe1591f56cb",
+    "bbox": [
+      53,
+      57,
+      140,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "pierce3",
+      "frame": 5,
+      "dy": -2
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "양손 X 관통 대신 나란한 주먹 지르기로 읽힘",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "pierce3",
+    "frame": 6,
+    "rendered_rgba_sha256": "6eee91ce5e6571a19437762b0a1c124dcceaf5ebdedb6428a8558ac5ad4c0d66",
+    "bbox": [
+      53,
+      53,
+      126,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "pierce3",
+      "frame": 6,
+      "dy": -2
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "양손 X 관통 대신 나란한 주먹 지르기로 읽힘",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "pierce3",
+    "frame": 7,
+    "rendered_rgba_sha256": "1412d31e82b2d931415380dc152e289991000fef1fb329ae5d037aedbed7b1ba",
+    "bbox": [
+      53,
+      50,
+      106,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "pierce3",
+      "frame": 7,
+      "dy": -1
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "execute",
+    "frame": 0,
+    "rendered_rgba_sha256": "50391fd8bc39d7ced74e5bf2818665e465fb9d0375a7c842401afe1c4e6cda99",
+    "bbox": [
+      45,
+      50,
+      98,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "execute",
+      "frame": 0,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "execute",
+    "frame": 1,
+    "rendered_rgba_sha256": "f0bf206a629f96eb8efad0b3e1e1ef08524eed5c9ea9bd83579bed3eacc9a77a",
+    "bbox": [
+      58,
+      47,
+      107,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "execute",
+      "frame": 1,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "검지 가리키기. 1→2 위 손 높이 급변",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "execute",
+    "frame": 2,
+    "rendered_rgba_sha256": "a3f87dfa8a8368945e0ceeb3673c1a65f16aa91dbaafa861350b50171b0a4bc9",
+    "bbox": [
+      58,
+      47,
+      117,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "execute",
+      "frame": 2,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "검지 가리키기. 1→2 위 손 높이 급변",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "execute",
+    "frame": 3,
+    "rendered_rgba_sha256": "31e7e65f580496abeef38659ad89acef58f76f5db37fbfa2cff93cf24e015c30",
+    "bbox": [
+      58,
+      47,
+      111,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "execute",
+      "frame": 3,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "검지 가리키기. 1→2 위 손 높이 급변",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "execute",
+    "frame": 4,
+    "rendered_rgba_sha256": "c54872d63b564e44ec87bc80a90b4e23a92f86ebe785774443302ac578ec840d",
+    "bbox": [
+      58,
+      47,
+      113,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "execute",
+      "frame": 4,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "검지 가리키기. 1→2 위 손 높이 급변",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "execute",
+    "frame": 5,
+    "rendered_rgba_sha256": "fcb0e4d433daabf90ef38f1457ac2996b320442d997c55475ac13e1b47f65c79",
+    "bbox": [
+      58,
+      47,
+      112,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "execute",
+      "frame": 5,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "검지 가리키기. 1→2 위 손 높이 급변",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "execute",
+    "frame": 6,
+    "rendered_rgba_sha256": "6f60d83e7157ec159db10e9ab6d9b45816586fae67eeaf80ecc72a482035778f",
+    "bbox": [
+      51,
+      49,
+      109,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "execute",
+      "frame": 6,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "검지 가리키기. 1→2 위 손 높이 급변",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "spineup",
+    "frame": 0,
+    "rendered_rgba_sha256": "f02f92af5043c8cb4872e0b29071434ab63038ea2f1b2770d9e5364f4f17b682",
+    "bbox": [
+      41,
+      52,
+      95,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "spineup",
+      "frame": 0,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "spineup",
+    "frame": 1,
+    "rendered_rgba_sha256": "6c543f10aaf666492d6edbf1387a0efab54189a9beb1b63a7857b5b986f2ebf0",
+    "bbox": [
+      44,
+      52,
+      93,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "spineup",
+      "frame": 1,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "spineup",
+    "frame": 2,
+    "rendered_rgba_sha256": "bde13acb59244a4cd2b4d009489eabe72d666806f5a1f8492d62edc9651a57ee",
+    "bbox": [
+      48,
+      54,
+      95,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "spineup",
+      "frame": 3,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "위 손 가리키기. 2·3은 빌더 교체로 같은 그림",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "spineup",
+    "frame": 3,
+    "rendered_rgba_sha256": "bde13acb59244a4cd2b4d009489eabe72d666806f5a1f8492d62edc9651a57ee",
+    "bbox": [
+      48,
+      54,
+      95,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "spineup",
+      "frame": 3,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "위 손 가리키기. 2·3은 빌더 교체로 같은 그림",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "spineup",
+    "frame": 4,
+    "rendered_rgba_sha256": "4ec72fefbb89eba2cdba0da18e387add4daeb693d1a4bdfb64efd28f9f1353e2",
+    "bbox": [
+      48,
+      53,
+      102,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "spineup",
+      "frame": 4,
+      "dy": -1
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "위 손 가리키기. 2·3은 빌더 교체로 같은 그림",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "throw",
+    "frame": 0,
+    "rendered_rgba_sha256": "0c44ede76c4fed5110e6cf91373fe55776745ff6b3d508fdbe447b84a79da700",
+    "bbox": [
+      48,
+      54,
+      94,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "throw",
+      "frame": 0,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "위 손 검지 가리키기",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "throw",
+    "frame": 1,
+    "rendered_rgba_sha256": "b3c0a72e95752d23daf85c9ca85e0c56bf942f8027d55e6f2ca31cacac88fce6",
+    "bbox": [
+      48,
+      53,
+      113,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "throw",
+      "frame": 1,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "앞으로 뻗은 손이 주먹",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "throw",
+    "frame": 2,
+    "rendered_rgba_sha256": "877d893ca3a56a536c9e2fbc667fdf53a292575d5c63417f891c4000ac26507f",
+    "bbox": [
+      48,
+      53,
+      119,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "throw",
+      "frame": 2,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "양손 가리키기",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "throw",
+    "frame": 3,
+    "rendered_rgba_sha256": "cfc287e8e88d177787c396182acd3396376e540e4c4e74f76f0cfa5e2bc5a7d3",
+    "bbox": [
+      48,
+      53,
+      103,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "throw",
+      "frame": 3,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "위 손 검지 가리키기",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "fan",
+    "frame": 0,
+    "rendered_rgba_sha256": "50e92160f46558224c1a38b726ad5f11939e966a59c4b8b5a6322e6e070211f3",
+    "bbox": [
+      41,
+      52,
+      95,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "fan",
+      "frame": 0,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "fan",
+    "frame": 1,
+    "rendered_rgba_sha256": "db5ec62c8e73f74be4d587cf896aa6cae4bc2c05a46dbde388b17b5fd3ebb3c9",
+    "bbox": [
+      48,
+      54,
+      93,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "fan",
+      "frame": 1,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "fan",
+    "frame": 2,
+    "rendered_rgba_sha256": "aa607c5efb6a1da7cf6356db5c9af90e22ac6872b22aef515d2df227e862d6b2",
+    "bbox": [
+      49,
+      54,
+      93,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "fan",
+      "frame": 2,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "fan",
+    "frame": 3,
+    "rendered_rgba_sha256": "26aa49d96f126eaec20c2d72a35f2222bd5fa08051c54587b33731604f4517aa",
+    "bbox": [
+      49,
+      54,
+      94,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "fan",
+      "frame": 3,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "fan",
+    "frame": 4,
+    "rendered_rgba_sha256": "d4ae005496a1834b76f2b67a78cbb489dcf0b1e5ded7f38eabc7b17185ec87d4",
+    "bbox": [
+      49,
+      55,
+      116,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "fan",
+      "frame": 4,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "fan",
+    "frame": 5,
+    "rendered_rgba_sha256": "0b60eeeb744a5bd9f020fc92a4299c174ce6c12c0b0cbd36e931b7aa865d9653",
+    "bbox": [
+      45,
+      53,
+      103,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "fan",
+      "frame": 5,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "toss",
+    "frame": 0,
+    "rendered_rgba_sha256": "2410fb7f59b124a65bba60cce0a3e4b322d6be69b73d5cdd7928f05461fea134",
+    "bbox": [
+      56,
+      44,
+      83,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "toss",
+      "frame": 0,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "toss",
+    "frame": 1,
+    "rendered_rgba_sha256": "5228dce74bd32318048de5887ac6afb92b2c1485a8aa05ce82e54697b9bf5b45",
+    "bbox": [
+      56,
+      45,
+      83,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "toss",
+      "frame": 1,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "toss",
+    "frame": 2,
+    "rendered_rgba_sha256": "66c6be0c6367e081d47f644d31201c65659248997b0f9151c8c276b0b9931093",
+    "bbox": [
+      58,
+      44,
+      112,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "toss",
+      "frame": 3,
+      "dy": -1
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "2·3·4 같은 교체 그림, 손끝 가리키기. 끝 장은 자세 재진입 필요",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "toss",
+    "frame": 3,
+    "rendered_rgba_sha256": "66c6be0c6367e081d47f644d31201c65659248997b0f9151c8c276b0b9931093",
+    "bbox": [
+      58,
+      44,
+      112,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "toss",
+      "frame": 3,
+      "dy": -1
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "2·3·4 같은 교체 그림, 손끝 가리키기. 끝 장은 자세 재진입 필요",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "toss",
+    "frame": 4,
+    "rendered_rgba_sha256": "66c6be0c6367e081d47f644d31201c65659248997b0f9151c8c276b0b9931093",
+    "bbox": [
+      58,
+      44,
+      112,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "toss",
+      "frame": 3,
+      "dy": -1
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "2·3·4 같은 교체 그림, 손끝 가리키기. 끝 장은 자세 재진입 필요",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "toss",
+    "frame": 5,
+    "rendered_rgba_sha256": "ef66f00323a5af8dc6eda106771ba8ab80da13d5a89552985c46130e0b5c4ca9",
+    "bbox": [
+      56,
+      45,
+      83,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "toss",
+      "frame": 5,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "2·3·4 같은 교체 그림, 손끝 가리키기. 끝 장은 자세 재진입 필요",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "reargrab",
+    "frame": 0,
+    "rendered_rgba_sha256": "d54241c5defdd1bbec5cc02536a3c1e7fcdaee447df41b199d82821ad93e17d6",
+    "bbox": [
+      43,
+      50,
+      93,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "reargrab",
+      "frame": 0,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "얼굴·겹친 손: 잡은 상대 없는 상태에서 파지 세부 판정 보류",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "reargrab",
+    "frame": 1,
+    "rendered_rgba_sha256": "7903ead6817be1757a72580096ef8f2b84e4a4578d57d5af896f0bad9e044feb",
+    "bbox": [
+      50,
+      49,
+      100,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "reargrab",
+      "frame": 1,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "얼굴·겹친 손: 잡은 상대 없는 상태에서 파지 세부 판정 보류",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "reargrab",
+    "frame": 2,
+    "rendered_rgba_sha256": "768f4792132cd7be7ae2ffaef29987d669b5d45b8a6a5dd084fac291c1fba7dd",
+    "bbox": [
+      60,
+      48,
+      107,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "reargrab",
+      "frame": 2,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "얼굴·겹친 손: 잡은 상대 없는 상태에서 파지 세부 판정 보류",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "reargrab",
+    "frame": 3,
+    "rendered_rgba_sha256": "28ea11a8815a95271a8a1cb9e6d98e119186947b78e7c8da4852a7019605db9f",
+    "bbox": [
+      64,
+      47,
+      108,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "reargrab",
+      "frame": 3,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "얼굴·겹친 손: 잡은 상대 없는 상태에서 파지 세부 판정 보류",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "reargrab",
+    "frame": 4,
+    "rendered_rgba_sha256": "5f55632cf4db537abed42f8b0111103d0bb5fa3a848a3b19e77e418bb9cc6b0b",
+    "bbox": [
+      66,
+      47,
+      110,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "reargrab",
+      "frame": 4,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "얼굴·겹친 손: 잡은 상대 없는 상태에서 파지 세부 판정 보류",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "reargrab",
+    "frame": 5,
+    "rendered_rgba_sha256": "d6dcad33f3df61239091bcd39336f93843ec4c212fb9d432c9d6ea682be38f26",
+    "bbox": [
+      66,
+      47,
+      110,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "reargrab",
+      "frame": 5,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "얼굴·겹친 손: 잡은 상대 없는 상태에서 파지 세부 판정 보류",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "grabstab",
+    "frame": 0,
+    "rendered_rgba_sha256": "273f4c2cb5e499ef0c3e7a6a1f06b1e3f7066f381a2bbab7c78aac5071d26eff",
+    "bbox": [
+      66,
+      47,
+      116,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "grabstab",
+      "frame": 0,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "두 손 검지 가리키기, 손날 관수 불충족",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "grabstab",
+    "frame": 1,
+    "rendered_rgba_sha256": "a10e5b976a0db61e150111985aebba9ca547483aedc48fc694ed888e0e8222b1",
+    "bbox": [
+      66,
+      47,
+      116,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "grabstab",
+      "frame": 1,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "두 손 검지 가리키기, 손날 관수 불충족",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "grabstab",
+    "frame": 2,
+    "rendered_rgba_sha256": "1942eb98df0cc89536d6942be5c4e4ea4b792f9b36be6772d394224d9e8c80ab",
+    "bbox": [
+      66,
+      47,
+      122,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "grabstab",
+      "frame": 2,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "두 손 검지 가리키기, 손날 관수 불충족",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "grabstab",
+    "frame": 3,
+    "rendered_rgba_sha256": "66573ad6d9fc3ad290b77849bc987e3e0c3faa5cab90d4ddba18ce6a0aac1a5a",
+    "bbox": [
+      66,
+      47,
+      117,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "grabstab",
+      "frame": 3,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "두 손 검지 가리키기, 손날 관수 불충족",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "super",
+    "frame": 0,
+    "rendered_rgba_sha256": "f70de3ddea33b805f2d26578c101f616a3d118d51ba86c15a497fe6e3d0a0e9f",
+    "bbox": [
+      41,
+      52,
+      97,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "super",
+      "frame": 0,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "super",
+    "frame": 1,
+    "rendered_rgba_sha256": "8a2e4671ef9ff61506bdfe8d36874b6ae17e66cd3daf44b66d3f25cbc7f8c111",
+    "bbox": [
+      41,
+      52,
+      93,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "super",
+      "frame": 1,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "super",
+    "frame": 2,
+    "rendered_rgba_sha256": "cad18944f514a833081bc2e80b4a6b2d69281464fda94e518339ec764103c116",
+    "bbox": [
+      41,
+      52,
+      93,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "super",
+      "frame": 2,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "super",
+    "frame": 3,
+    "rendered_rgba_sha256": "14d14cb4638971d04ebf309e08cac85ffa110fe6a4016a00070f1b370879f2e7",
+    "bbox": [
+      44,
+      57,
+      92,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "super",
+      "frame": 3,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "super",
+    "frame": 4,
+    "rendered_rgba_sha256": "687550d22d88c7c0237f97abba944eb14361753cecdea62046c047c102db1b0e",
+    "bbox": [
+      54,
+      73,
+      90,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "super",
+      "frame": 4,
+      "dy": -3
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "super",
+    "frame": 5,
+    "rendered_rgba_sha256": "86a739b49b62bfedbaf2f22da6ac3a6915a4edecb0cf923ebad5a00653a6d3d8",
+    "bbox": [
+      46,
+      59,
+      92,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "super",
+      "frame": 5,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "super",
+    "frame": 6,
+    "rendered_rgba_sha256": "afe8a38d8294934a3d5a71e65d3bd6321a5ed6d61f78e96dedfbaaff0bc1871c",
+    "bbox": [
+      41,
+      52,
+      93,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "super",
+      "frame": 6,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "super",
+    "frame": 7,
+    "rendered_rgba_sha256": "ba28d5ed2070fa7f14eb0e66b68a7a7d0cf799250b1bf9ca95ee2c63d3d9c247",
+    "bbox": [
+      49,
+      54,
+      115,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "super",
+      "frame": 7,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "마무리 X 대신 두 손 가리키기",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "super",
+    "frame": 8,
+    "rendered_rgba_sha256": "9eabe2b4b73e53d5affdd05fb11fde120d0cab857682e48f9b3b9fe07c62878d",
+    "bbox": [
+      49,
+      54,
+      115,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "super",
+      "frame": 8,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "마무리 X 대신 두 손 가리키기",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "pipe",
+    "frame": 0,
+    "rendered_rgba_sha256": "3b52e3488a758b4b082d8255dd4a10269c8886027a91e179d8edd594783964b4",
+    "bbox": [
+      48,
+      53,
+      150,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "pipe",
+      "frame": 0,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "pipe",
+    "frame": 1,
+    "rendered_rgba_sha256": "35d93458a5b5f632cbf8b4f31a1e29560f404a2c293a9459af724501ab66670e",
+    "bbox": [
+      50,
+      54,
+      183,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "pipe",
+      "frame": 1,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "pipe",
+    "frame": 2,
+    "rendered_rgba_sha256": "e0b7f1b35bb307656284386e5a1281e6bc0e09cfcd010666517ff1fb0a6c1ac6",
+    "bbox": [
+      54,
+      57,
+      191,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "pipe",
+      "frame": 2,
+      "dy": -1
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "pipe",
+    "frame": 3,
+    "rendered_rgba_sha256": "d63aaeedab293880f4ce81eecb5da58806162945daaea8ef079de01d55650b52",
+    "bbox": [
+      54,
+      57,
+      192,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "pipe",
+      "frame": 3,
+      "dy": -1
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "pipe",
+    "frame": 4,
+    "rendered_rgba_sha256": "f1a26c70dc6dcd9373e8cfab0f36220737b516f4f2604ce4e9b77c2d2947445a",
+    "bbox": [
+      50,
+      55,
+      167,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "pipe",
+      "frame": 4,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "pipe",
+    "frame": 5,
+    "rendered_rgba_sha256": "1a98deb737df40809fb21da24c21a5da148cb02fe2a5b801d5d4a0c364d992f4",
+    "bbox": [
+      48,
+      53,
+      144,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "pipe",
+      "frame": 5,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "idle_pipe",
+    "frame": 0,
+    "rendered_rgba_sha256": "a1a5f193dfea85334dc4eb43cb08a93dc77ab0b2578a26777bda017ce7918b19",
+    "bbox": [
+      57,
+      45,
+      110,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "idle_pipe",
+      "frame": 0,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "idle_pipe",
+    "frame": 1,
+    "rendered_rgba_sha256": "7b026cb6d9f94a8d015b38fed97e12ed5d5d18f229d8a497ec1c58fd631c55a0",
+    "bbox": [
+      57,
+      45,
+      110,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "idle_pipe",
+      "frame": 1,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "idle_pipe",
+    "frame": 2,
+    "rendered_rgba_sha256": "96e25a9795964a46b5de1d62fc97d7f67c284b9a576ee523c801fba44dd00c97",
+    "bbox": [
+      57,
+      45,
+      110,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "idle_pipe",
+      "frame": 2,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "idle_pipe",
+    "frame": 3,
+    "rendered_rgba_sha256": "a6cbee6f676a72e6e1b4d00b50396473fbba2f97c195e25e98764d0d496fae43",
+    "bbox": [
+      57,
+      45,
+      110,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "idle_pipe",
+      "frame": 3,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "walk_pipe",
+    "frame": 0,
+    "rendered_rgba_sha256": "8582bcc65eec0f27eab4e51dd5912dc43ea1dc2c1cbcb64bb295a71e90e78595",
+    "bbox": [
+      55,
+      45,
+      125,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "walk_pipe",
+      "frame": 0,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "walk_pipe",
+    "frame": 1,
+    "rendered_rgba_sha256": "fda784e428c65c17130ea3a3164297e05e370a1ff4a7741771015a769356535d",
+    "bbox": [
+      58,
+      45,
+      125,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "walk_pipe",
+      "frame": 1,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "walk_pipe",
+    "frame": 2,
+    "rendered_rgba_sha256": "5b17da479c6365b9f28b7bd2c3b9cc9080658ecb4b95bcb1f43550a989ea00ce",
+    "bbox": [
+      58,
+      45,
+      125,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "walk_pipe",
+      "frame": 2,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "walk_pipe",
+    "frame": 3,
+    "rendered_rgba_sha256": "e24c224c778cd43e88d7377fc509bd6103e1c004f3d3a474a633e9e78ce25a75",
+    "bbox": [
+      58,
+      45,
+      125,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "walk_pipe",
+      "frame": 3,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "walk_pipe",
+    "frame": 4,
+    "rendered_rgba_sha256": "14eeb4cd170caed099c16fde3393b8aa7d8bc1770b899cdb95d08c024487b2bb",
+    "bbox": [
+      55,
+      45,
+      125,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "walk_pipe",
+      "frame": 4,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "walk_pipe",
+    "frame": 5,
+    "rendered_rgba_sha256": "69709476ef0c57beabe3469f14a2f31f4dd0a1e7850d594b698730929da4d2f2",
+    "bbox": [
+      58,
+      45,
+      125,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "walk_pipe",
+      "frame": 5,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "walk_pipe",
+    "frame": 6,
+    "rendered_rgba_sha256": "d565d06fe2e56cfafa33375ac4d8387dfec42e6accd1df5d620261c66c4719a6",
+    "bbox": [
+      58,
+      45,
+      125,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "walk_pipe",
+      "frame": 6,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "shotgun",
+    "frame": 0,
+    "rendered_rgba_sha256": "beefc547dca18f025cb58c3dc52ed858fb0cae391305e40e66c5180247962300",
+    "bbox": [
+      47,
+      48,
+      152,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "shotgun",
+      "frame": 0,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "shotgun",
+    "frame": 1,
+    "rendered_rgba_sha256": "c6e4d78f4939767d2c281fb851d573e706854745e050be3fc7c64fc71522f2e4",
+    "bbox": [
+      47,
+      48,
+      149,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "shotgun",
+      "frame": 1,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "shotgun",
+    "frame": 2,
+    "rendered_rgba_sha256": "0bf169399ba417bc3e355c66e3ee3ea88d4fb22ef284ebc120025bdf972c582d",
+    "bbox": [
+      47,
+      48,
+      150,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "shotgun",
+      "frame": 2,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "shotgun",
+    "frame": 3,
+    "rendered_rgba_sha256": "3d5026891f59274b1b14599da487ecdebd75cf95570a97e9ac2bf0815d8f719b",
+    "bbox": [
+      47,
+      48,
+      151,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "shotgun",
+      "frame": 3,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "shotgun",
+    "frame": 4,
+    "rendered_rgba_sha256": "eeb101e9fcd84cd603959b177597ec6a600927c9567aaf69d517492299c803d9",
+    "bbox": [
+      47,
+      48,
+      151,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "shotgun",
+      "frame": 4,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "idle_shotgun",
+    "frame": 0,
+    "rendered_rgba_sha256": "7ee6999036fffa980eaed6aaea3c33f54389b88f59a265808cc158cfceb023cc",
+    "bbox": [
+      57,
+      45,
+      130,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "idle_shotgun",
+      "frame": 0,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "idle_shotgun",
+    "frame": 1,
+    "rendered_rgba_sha256": "33f7bcfd4dd19370b23e7d2817e906742d1e851c2d2e30a423b17a73bd6a7c8f",
+    "bbox": [
+      57,
+      45,
+      130,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "idle_shotgun",
+      "frame": 1,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "idle_shotgun",
+    "frame": 2,
+    "rendered_rgba_sha256": "70188acde21e5b10de5e2c24fbce3f709656dda5455376e4c2e3de032dcc206d",
+    "bbox": [
+      57,
+      45,
+      130,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "idle_shotgun",
+      "frame": 2,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "idle_shotgun",
+    "frame": 3,
+    "rendered_rgba_sha256": "95ef97b2964a7957e37ef4f8f204d25b143e466ac4328cddb4c6283b004e5bc6",
+    "bbox": [
+      57,
+      45,
+      130,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "idle_shotgun",
+      "frame": 3,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "walk_shotgun",
+    "frame": 0,
+    "rendered_rgba_sha256": "c7ef14ad2ad336cdb71d035cd906a2b195403bc9bd40ad13a47f9083d82794df",
+    "bbox": [
+      55,
+      45,
+      136,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "walk_shotgun",
+      "frame": 0,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "walk_shotgun",
+    "frame": 1,
+    "rendered_rgba_sha256": "8a476085ffdcbd8a794dd8cfa4b6fa6ecda43757cb8e137db9acf868b13b5660",
+    "bbox": [
+      57,
+      45,
+      136,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "walk_shotgun",
+      "frame": 1,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "walk_shotgun",
+    "frame": 2,
+    "rendered_rgba_sha256": "a9169e2421eef1a140a72664f65397bbb78c8f797d9cc6b9405aed423fddaf52",
+    "bbox": [
+      57,
+      45,
+      136,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "walk_shotgun",
+      "frame": 2,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "walk_shotgun",
+    "frame": 3,
+    "rendered_rgba_sha256": "55b8949d02740d61c2b458317d3a3c64aceff04d7ade166c78c517675d31b3d4",
+    "bbox": [
+      57,
+      44,
+      136,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "walk_shotgun",
+      "frame": 3,
+      "dy": -1
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "walk_shotgun",
+    "frame": 4,
+    "rendered_rgba_sha256": "1687d8731a30c642218682e4af7ac635d55ee3b2f74631d506be56e8e24344d9",
+    "bbox": [
+      55,
+      45,
+      136,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "walk_shotgun",
+      "frame": 4,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "walk_shotgun",
+    "frame": 5,
+    "rendered_rgba_sha256": "72b049cee6ac831e81ddf71f2c06dcd1a3d24fe4a119d598fa1238597eba6d21",
+    "bbox": [
+      57,
+      45,
+      136,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "walk_shotgun",
+      "frame": 5,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "walk_shotgun",
+    "frame": 6,
+    "rendered_rgba_sha256": "02bb63f49a71dd95b163a530419e69cd7f5b6d995885781338e95dd4749e365a",
+    "bbox": [
+      57,
+      45,
+      136,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "walk_shotgun",
+      "frame": 6,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "run_shotgun",
+    "frame": 0,
+    "rendered_rgba_sha256": "90a2bfea404b749858cae92fa68fb2b8d503e3eeedf529880996f913d81fd148",
+    "bbox": [
+      48,
+      54,
+      150,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "run_shotgun",
+      "frame": 0,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "run_shotgun",
+    "frame": 1,
+    "rendered_rgba_sha256": "87928a56b4ddec9cc355b3b36bb8908a235ffd5fccebf365f0fa63647eb0da2b",
+    "bbox": [
+      53,
+      55,
+      150,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "run_shotgun",
+      "frame": 1,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "run_shotgun",
+    "frame": 2,
+    "rendered_rgba_sha256": "c7677cc96aba1abc0a99987c017597e6cc23c6469b37c2b70f0432b6c0213f3b",
+    "bbox": [
+      65,
+      55,
+      150,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "run_shotgun",
+      "frame": 2,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "run_shotgun",
+    "frame": 3,
+    "rendered_rgba_sha256": "60a48df6c07542da6cb29ae198ca4edd0b74eb3e3ac50754655f060329e10125",
+    "bbox": [
+      53,
+      54,
+      150,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "run_shotgun",
+      "frame": 3,
+      "dy": -1
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "run_shotgun",
+    "frame": 4,
+    "rendered_rgba_sha256": "f463ab41ed60adaf4fba251216b8ccf8ac008dec19ba8b0fdfbcabb003b4eb2a",
+    "bbox": [
+      49,
+      53,
+      150,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "run_shotgun",
+      "frame": 4,
+      "dy": -1
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "run_shotgun",
+    "frame": 5,
+    "rendered_rgba_sha256": "ff8b48600515027776025e721c48cdbfa091bad9f9d8cc71f9c533585dae8614",
+    "bbox": [
+      54,
+      55,
+      150,
+      135
+    ],
+    "opaque_bottom_y": 134,
+    "source": {
+      "clip": "run_shotgun",
+      "frame": 5,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "run_shotgun",
+    "frame": 6,
+    "rendered_rgba_sha256": "cc43dbf4f350307f39735dc30866d004aeb65a66627f6c0dc89f0a09a43533e0",
+    "bbox": [
+      66,
+      55,
+      150,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "run_shotgun",
+      "frame": 6,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "run_shotgun",
+    "frame": 7,
+    "rendered_rgba_sha256": "4c82c1cfd7e781f268fe886a29a358fa81050ed09d15b7c44a0a9d66004710e3",
+    "bbox": [
+      52,
+      55,
+      150,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "run_shotgun",
+      "frame": 7,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "walk",
+    "frame": 0,
+    "rendered_rgba_sha256": "10d55d66368e49f7ff13ddc95eea895eb4844bc6f970b8af169fe2f9e1677fce",
+    "bbox": [
+      55,
+      45,
+      88,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "walk",
+      "frame": 0,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류",
+    "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "walk",
+    "frame": 1,
+    "rendered_rgba_sha256": "aaa4516f5c34e57b2d5e48eec48110aef506d4a1a43086311b8e6b956a572db3",
+    "bbox": [
+      58,
+      45,
+      85,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "walk",
+      "frame": 1,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류",
+    "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "walk",
+    "frame": 2,
+    "rendered_rgba_sha256": "3e18cb7aa21544efdc20e465e079ae297a3c965df198dd83c6e4b52b6c1d40c8",
+    "bbox": [
+      58,
+      45,
+      82,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "walk",
+      "frame": 2,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류",
+    "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "walk",
+    "frame": 3,
+    "rendered_rgba_sha256": "44ea1f2b82e130f198b84399c743a417cb3f54b9151ad3fed8e16bdf77e47d83",
+    "bbox": [
+      58,
+      44,
+      83,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "walk",
+      "frame": 3,
+      "dy": -1
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류",
+    "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "walk",
+    "frame": 4,
+    "rendered_rgba_sha256": "aa266a15c80d3dc24b4ccf451f1d0494ea4b6c52766933b6a54ed5b28c018040",
+    "bbox": [
+      55,
+      45,
+      87,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "walk",
+      "frame": 4,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류",
+    "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "walk",
+    "frame": 5,
+    "rendered_rgba_sha256": "04d4a4171594bd8c1a93a78f097b7f369366f797ee548e368ffe2dc8f7ca1ace",
+    "bbox": [
+      58,
+      45,
+      82,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "walk",
+      "frame": 5,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류",
+    "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "walk",
+    "frame": 6,
+    "rendered_rgba_sha256": "59d67679d495513b7fd9fcf9423d7ddd896191b4c5b9fce9506df137ed6f656a",
+    "bbox": [
+      58,
+      45,
+      83,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "walk",
+      "frame": 6,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류",
+    "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "walk",
+    "frame": 7,
+    "rendered_rgba_sha256": "1916accd912f29ce705f7c75caafc74e141a3798ce6e891a1792ccb0988343de",
+    "bbox": [
+      58,
+      45,
+      84,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "walk",
+      "frame": 7,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류",
+    "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "run",
+    "frame": 0,
+    "rendered_rgba_sha256": "adf57a31bf60cd01d986c4694d261b5fd1febedc8d4f304a5144d5f8e2df05ea",
+    "bbox": [
+      48,
+      54,
+      104,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "run",
+      "frame": 0,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류",
+    "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "run",
+    "frame": 1,
+    "rendered_rgba_sha256": "87b740a8bcd8c04baa549f507de14f813e85de1a532d3189af7b2662068aebf3",
+    "bbox": [
+      54,
+      54,
+      103,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "run",
+      "frame": 1,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류",
+    "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "run",
+    "frame": 2,
+    "rendered_rgba_sha256": "8b8bc55f5455ab9937df1da1a445fb24c90341a51a187e7b127d34ce0aa78b6b",
+    "bbox": [
+      65,
+      55,
+      103,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "run",
+      "frame": 2,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "다리 옆 회색 이중 윤곽",
+    "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "run",
+    "frame": 3,
+    "rendered_rgba_sha256": "1ef529dba5011be9923b7e94d3ce580ebec6215a5495ee84c20703d2a31e45a6",
+    "bbox": [
+      53,
+      53,
+      103,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "run",
+      "frame": 3,
+      "dy": -1
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "다리 윤곽·팔 경계 추가 근접 확인",
+    "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "run",
+    "frame": 4,
+    "rendered_rgba_sha256": "868ab9e6c47a29234eca323cf2261e10cdca7e78477897987c083b8767a5436d",
+    "bbox": [
+      49,
+      53,
+      104,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "run",
+      "frame": 4,
+      "dy": -1
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "눈색과 허벅지 색 경계 추가 근접 확인",
+    "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "run",
+    "frame": 5,
+    "rendered_rgba_sha256": "f293877711673fbda2bd7238013b56e08adaf64d900228436c938193d6790a68",
+    "bbox": [
+      55,
+      55,
+      103,
+      134
+    ],
+    "opaque_bottom_y": 133,
+    "source": {
+      "clip": "run",
+      "frame": 5,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류",
+    "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "run",
+    "frame": 6,
+    "rendered_rgba_sha256": "4500eba990581f1f717b7584a5962c129741974c98b1e9c425143e1990d52576",
+    "bbox": [
+      67,
+      55,
+      103,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "run",
+      "frame": 6,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류",
+    "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "run",
+    "frame": 7,
+    "rendered_rgba_sha256": "b87ece26f09480093064b9a5225488f9808314487143d5b817458e8371e0a385",
+    "bbox": [
+      53,
+      54,
+      103,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "run",
+      "frame": 7,
+      "dy": -1
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류",
+    "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "jump",
+    "frame": 0,
+    "rendered_rgba_sha256": "7ffaf518f4a728558165219cffaf062fe54ea95cc1f5f127b430e174be27ca3b",
+    "bbox": [
+      41,
+      53,
+      93,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "jump",
+      "frame": 0,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "jump",
+    "frame": 1,
+    "rendered_rgba_sha256": "74d119f1459225c0fd049a49224031a831774b403802bc141b17d7ac3c37bfb4",
+    "bbox": [
+      55,
+      61,
+      93,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "jump",
+      "frame": 1,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "jump",
+    "frame": 2,
+    "rendered_rgba_sha256": "3cee968c7cd60c97312e2d2d3812ce2c8c47d158f04c183f8c68492d0da45954",
+    "bbox": [
+      47,
+      52,
+      93,
+      128
+    ],
+    "opaque_bottom_y": 127,
+    "source": {
+      "clip": "jump",
+      "frame": 2,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "공중 다리 앞뒤 벌림이 설계보다 좁음. 양 무릎 몸 쪽으로 모임",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "jump",
+    "frame": 3,
+    "rendered_rgba_sha256": "c687e5dba6c006a354134bdee406b7d8d6999dc85666b49d99534d115e4f4cf6",
+    "bbox": [
+      40,
+      42,
+      92,
+      118
+    ],
+    "opaque_bottom_y": 117,
+    "source": {
+      "clip": "jump",
+      "frame": 3,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "공중 다리 앞뒤 벌림이 설계보다 좁음. 양 무릎 몸 쪽으로 모임",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "jump",
+    "frame": 4,
+    "rendered_rgba_sha256": "2dcaa966c0dbe488eb6828510e49036cf9f32560a88742e0f83a341813f74ce6",
+    "bbox": [
+      38,
+      40,
+      93,
+      115
+    ],
+    "opaque_bottom_y": 114,
+    "source": {
+      "clip": "jump",
+      "frame": 4,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "공중 다리 앞뒤 벌림이 설계보다 좁음. 양 무릎 몸 쪽으로 모임",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "jump",
+    "frame": 5,
+    "rendered_rgba_sha256": "b1b883e557b5bb7581d36c9109317362162743321e38b51839d73873017f525e",
+    "bbox": [
+      45,
+      50,
+      93,
+      126
+    ],
+    "opaque_bottom_y": 125,
+    "source": {
+      "clip": "jump",
+      "frame": 5,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "공중 다리 앞뒤 벌림이 설계보다 좁음. 양 무릎 몸 쪽으로 모임",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "jump",
+    "frame": 6,
+    "rendered_rgba_sha256": "4ed231e6e56714fe23415bd19b5a8376bf5ef7bbb6d5c8826629c43232a25030",
+    "bbox": [
+      43,
+      55,
+      93,
+      135
+    ],
+    "opaque_bottom_y": 134,
+    "source": {
+      "clip": "jump",
+      "frame": 6,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "공중 다리 앞뒤 벌림이 설계보다 좁음. 양 무릎 몸 쪽으로 모임",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "jump",
+    "frame": 7,
+    "rendered_rgba_sha256": "6e1616bf9a6f53e9dc7911c382093be5b31c19e57b4c716f1a0be3d3982aaec1",
+    "bbox": [
+      41,
+      51,
+      93,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "jump",
+      "frame": 7,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "passslash",
+    "frame": 0,
+    "rendered_rgba_sha256": "88b10595b94d21acb7547e32e0872d790078dd5b76af399096d546f02d1bf8b5",
+    "bbox": [
+      64,
+      56,
+      103,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "passslash",
+      "frame": 0,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "다리 이중 윤곽",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "passslash",
+    "frame": 1,
+    "rendered_rgba_sha256": "5e7da14e7cd42986325d35a8fc0f6f25612ea20ade42af3e201923c7058997f6",
+    "bbox": [
+      40,
+      64,
+      113,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "passslash",
+      "frame": 1,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "passslash",
+    "frame": 2,
+    "rendered_rgba_sha256": "2837072338a427103682845d58ad80146228d96ab258d28ecaf0270ed16b6a69",
+    "bbox": [
+      52,
+      64,
+      126,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "passslash",
+      "frame": 2,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "passslash",
+    "frame": 3,
+    "rendered_rgba_sha256": "da735fde0f011b2ae3e65b8c5e15097203e79e9aeb2e8f67e5071cfa3a3e090b",
+    "bbox": [
+      64,
+      64,
+      140,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "passslash",
+      "frame": 3,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "passslash",
+    "frame": 4,
+    "rendered_rgba_sha256": "778a109bdb06885bbc7cf616f20bd4588cd739e5f5646e1b09debffa8be3f574",
+    "bbox": [
+      70,
+      58,
+      133,
+      135
+    ],
+    "opaque_bottom_y": 134,
+    "source": {
+      "clip": "passslash",
+      "frame": 4,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "passslash",
+    "frame": 5,
+    "rendered_rgba_sha256": "ecb056a7f7f7beb62ba47cf3eca7ab0465974e809de4d9fefbd0b81442f1fab2",
+    "bbox": [
+      77,
+      51,
+      128,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "passslash",
+      "frame": 5,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "다리 이중 윤곽·마무리 상체 높이 변화",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "carry2_run",
+    "frame": 0,
+    "rendered_rgba_sha256": "8de9eafb8e1e2922012664cd76d4f7dbc548d54cc525c69e4353890495541b77",
+    "bbox": [
+      48,
+      54,
+      104,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "carry2_run",
+      "frame": 0,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류",
+    "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "carry2_run",
+    "frame": 1,
+    "rendered_rgba_sha256": "f70dcc482056bcf347ba8d3933a9bc30d310b41c452168864f39542f52ff1cf6",
+    "bbox": [
+      54,
+      55,
+      102,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "carry2_run",
+      "frame": 1,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류",
+    "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "carry2_run",
+    "frame": 2,
+    "rendered_rgba_sha256": "243cc4f4cc1d1176a75c76cb0678475c2213e91823aebdbe123df9d0357a1d46",
+    "bbox": [
+      66,
+      55,
+      102,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "carry2_run",
+      "frame": 2,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "발 옆 회색 조각",
+    "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "carry2_run",
+    "frame": 3,
+    "rendered_rgba_sha256": "b3af733aeaf590b593ea5a6036979f514139eb2d58f5902f2aa3606a37492518",
+    "bbox": [
+      52,
+      54,
+      102,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "carry2_run",
+      "frame": 3,
+      "dy": -1
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류",
+    "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "carry2_run",
+    "frame": 4,
+    "rendered_rgba_sha256": "a651441cd8d7efa3f68221c5af720f2640919fc10415d773007dd48e8e6086e6",
+    "bbox": [
+      49,
+      52,
+      104,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "carry2_run",
+      "frame": 4,
+      "dy": -2
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류",
+    "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "carry2_run",
+    "frame": 5,
+    "rendered_rgba_sha256": "3225f5ec4cb0fde6f8276715f257320af45ae60c8079f908c4027f882b802ad9",
+    "bbox": [
+      55,
+      55,
+      102,
+      135
+    ],
+    "opaque_bottom_y": 134,
+    "source": {
+      "clip": "carry2_run",
+      "frame": 5,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류",
+    "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "carry2_run",
+    "frame": 6,
+    "rendered_rgba_sha256": "5a4cc87f0a7c636de120096f1ab5536b0eb1b99e104da1619ce608909650d591",
+    "bbox": [
+      67,
+      55,
+      103,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "carry2_run",
+      "frame": 6,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류",
+    "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "carry2_run",
+    "frame": 7,
+    "rendered_rgba_sha256": "7fd1608adb793d8b5f0518b03d26da16220a3fafb73329e38749c786791d9a7a",
+    "bbox": [
+      53,
+      54,
+      102,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "carry2_run",
+      "frame": 7,
+      "dy": -1
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류",
+    "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "stepup",
+    "frame": 0,
+    "rendered_rgba_sha256": "509a770ebdd3b4015287921f737fe9a93a0c5f9b84ec19f059a808be1d3d3245",
+    "bbox": [
+      60,
+      46,
+      91,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "stepup",
+      "frame": 0,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "발·다리 외곽 이중 윤곽",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "stepup",
+    "frame": 1,
+    "rendered_rgba_sha256": "c9ce7bbd39880d1e375f80e81b1f2670e57a4ac8aecb62671a1d33a66dcdca03",
+    "bbox": [
+      61,
+      46,
+      90,
+      133
+    ],
+    "opaque_bottom_y": 132,
+    "source": {
+      "clip": "stepup",
+      "frame": 1,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "stepup",
+    "frame": 2,
+    "rendered_rgba_sha256": "5bd14aaa681089d76c92d4c9d6f0dce77ed2e843b3eb4e96be126a6fc88b9eff",
+    "bbox": [
+      61,
+      46,
+      88,
+      134
+    ],
+    "opaque_bottom_y": 133,
+    "source": {
+      "clip": "stepup",
+      "frame": 2,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "stepup",
+    "frame": 3,
+    "rendered_rgba_sha256": "35c5ee882e5d9fdbf9a908f66975eda6c4ec74d9572cdbf411527787b553dd9f",
+    "bbox": [
+      59,
+      45,
+      90,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "stepup",
+      "frame": 3,
+      "dy": -1
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "stepup",
+    "frame": 4,
+    "rendered_rgba_sha256": "4f6071d431b9710a0da46c4dc0a87b66d52fb1edb9fbff9d3ece7f8832b2e9ad",
+    "bbox": [
+      60,
+      46,
+      88,
+      135
+    ],
+    "opaque_bottom_y": 134,
+    "source": {
+      "clip": "stepup",
+      "frame": 4,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "stepup",
+    "frame": 5,
+    "rendered_rgba_sha256": "56dbbc0dc31b0d985a6240d60500cadf1b9d76aa4be55665581db59d1a0e5a37",
+    "bbox": [
+      62,
+      46,
+      88,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "stepup",
+      "frame": 5,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "stepup",
+    "frame": 6,
+    "rendered_rgba_sha256": "2c90530786c94a1e84e32dce991f80d3162b0d781fbeccc6c73ffdb22215ff94",
+    "bbox": [
+      62,
+      46,
+      91,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "stepup",
+      "frame": 6,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "sneak",
+    "frame": 0,
+    "rendered_rgba_sha256": "1f39aa12633ec0025f7f78270c962b51f6d522e78247b8f46202d96123c45adb",
+    "bbox": [
+      53,
+      56,
+      94,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "sneak",
+      "frame": 0,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류",
+    "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "sneak",
+    "frame": 1,
+    "rendered_rgba_sha256": "02105e3019e076b488c87e11d15346b6fc816ede8901892cd6aa402f6002284d",
+    "bbox": [
+      58,
+      56,
+      95,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "sneak",
+      "frame": 1,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류",
+    "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "sneak",
+    "frame": 2,
+    "rendered_rgba_sha256": "950d4a9041da8a848b42c0fd91b651574b1d86f61d6fc76251f4eedefb17c1ac",
+    "bbox": [
+      62,
+      54,
+      95,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "sneak",
+      "frame": 2,
+      "dy": -2
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류",
+    "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "sneak",
+    "frame": 3,
+    "rendered_rgba_sha256": "cb3673738286fd9c4e6007a5af26d85fe957717567ef04e5f08c30c1c179044a",
+    "bbox": [
+      58,
+      54,
+      95,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "sneak",
+      "frame": 3,
+      "dy": -2
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류",
+    "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "sneak",
+    "frame": 4,
+    "rendered_rgba_sha256": "192617f5b53504d5cdb6d842c253db53d01417c6aabdd654210b92255fb43f64",
+    "bbox": [
+      56,
+      54,
+      95,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "sneak",
+      "frame": 4,
+      "dy": -2
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류",
+    "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "sneak",
+    "frame": 5,
+    "rendered_rgba_sha256": "266c2ccbfbc76db879ca68f0e5902473736fb84bd5a1666b7bdc7e675ce84303",
+    "bbox": [
+      59,
+      56,
+      95,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "sneak",
+      "frame": 5,
+      "dy": 0
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "발목 옆 회색 줄",
+    "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "sneak",
+    "frame": 6,
+    "rendered_rgba_sha256": "1f03d383b7fad3b04d9797049ed0b53cb1d915a5251f1bc13fb877185a828203",
+    "bbox": [
+      62,
+      55,
+      95,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "sneak",
+      "frame": 6,
+      "dy": -1
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류",
+    "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "sneak",
+    "frame": 7,
+    "rendered_rgba_sha256": "4b47b5b5c632fe986017a1f4cbf9761627b3224f76ae083cab9a9333ee91c845",
+    "bbox": [
+      56,
+      55,
+      95,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "sneak",
+      "frame": 7,
+      "dy": -1
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류",
+    "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "stance",
+    "frame": 0,
+    "rendered_rgba_sha256": "ae5e3bc186db3f2fd8ce8b5ee8ce9b08ba2b60356d7892f97177ea47113de78d",
+    "bbox": [
+      41,
+      52,
+      99,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "stance",
+      "frame": 0,
+      "dy": 1
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "손 외곽이 뭉쳐 손가락 모양 판정 어려움",
+    "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "stance",
+    "frame": 1,
+    "rendered_rgba_sha256": "f0af57447f5a0c6e670d75a9ca745d7b9b640313ea46e706e40ead6481654a7b",
+    "bbox": [
+      41,
+      53,
+      99,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "stance",
+      "frame": 1,
+      "dy": 1
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "손 외곽이 뭉쳐 손가락 모양 판정 어려움",
+    "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "stance",
+    "frame": 2,
+    "rendered_rgba_sha256": "c61992f41b66838e146c82eb063254fa962033f69e5ff33db20985b582723e9c",
+    "bbox": [
+      42,
+      53,
+      99,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "stance",
+      "frame": 2,
+      "dy": 1
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "손 외곽이 뭉쳐 손가락 모양 판정 어려움",
+    "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "stance",
+    "frame": 3,
+    "rendered_rgba_sha256": "7ae355fa4d96744faaf68019d08d24978d3bc625fbbb57857aca604c1627ae1c",
+    "bbox": [
+      41,
+      53,
+      99,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "stance",
+      "frame": 3,
+      "dy": 1
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "손 외곽이 뭉쳐 손가락 모양 판정 어려움",
+    "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  }
+]

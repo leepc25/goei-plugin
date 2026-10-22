@@ -1,0 +1,16 @@
+[
+  {
+    "observed_at": "2026-10-22T10:15:43.026515+00:00",
+    "tool": "get_balance",
+    "http_status": 200,
+    "token_configured": false,
+    "body": "event: message\r\ndata: {\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Error calling tool 'get_balance': 401: Missing Authorization header. Please configure your MCP client with 'Authorization: Bearer YOUR_API_TOKEN'\"}],\"isError\":true}}\r\n\r\n"
+  },
+  {
+    "observed_at": "2026-10-22T10:15:43.540140+00:00",
+    "tool": "list_jobs",
+    "http_status": 200,
+    "token_configured": false,
+    "body": "event: message\r\ndata: {\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Error calling tool 'list_jobs': 401: Missing Authorization header. Please configure your MCP client with 'Authorization: Bearer YOUR_API_TOKEN'\"}],\"isError\":true}}\r\n\r\n"
+  }
+]

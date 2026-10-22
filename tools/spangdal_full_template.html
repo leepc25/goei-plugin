@@ -13,6 +13,8 @@
   .screen canvas { display: block; width: 100%; height: 100%; image-rendering: pixelated; }
   .bar { display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: center; margin: 8px 0; }
   .bar label { white-space: nowrap; }
+  .bar button, .bar select { min-height: 32px; max-width: 100%; }
+  #reviewclip { width: min(60vw, 260px); }
   #state { color: #9fd0ff; }
   .keys { color: #b8b4a4; font-size: 13px; margin: 8px 0; }
   .keys b { color: #e8e6e0; }
@@ -33,7 +35,10 @@
   .miss { color: #ff9a8a; }
   @media (orientation: landscape) and (max-height: 520px) {   /* 폰 가로: 화면을 높이에 맞추고 버튼은 화면 아래에 겹쳐 놓음 */
     .wrap { padding: 0 0 40px; }
-    .screen { width: min(100vw, calc(100svh * 16 / 9)); height: auto; margin: 0 auto; }
+    .screen { width: min(100vw, calc(50svh * 16 / 9)); height: auto; margin: 0 auto; }
+    h1 { font-size: 14px; }
+    .wrap > p, .bar { margin: 2px 4px; font-size: 11px; gap: 2px 8px; }
+    .bar button, .bar select { min-height: 28px; }
     .pad.show { position: fixed; left: 0; right: 0; bottom: 0; margin: 0; padding: 4px 6px; justify-content: space-between; align-items: flex-end; pointer-events: none; z-index: 5; }
     .pad.show button { pointer-events: auto; min-height: 30px; font-size: 10px; background: rgba(42, 51, 58, .62); }
     .dpad { grid-template-columns: repeat(3, 40px); }
@@ -43,6 +48,14 @@
 </style>
 <div class="wrap">
   <h1>스팡달 전 동작 시연판 · 가시·배후·그림자 규칙</h1>
+  <p class="miss">기존 원본 재검수 · 새 그림 미생성 · 교체·이동된 장의 손 좌표만 보정 · 사용자 시각 승인 대기</p>
+  <div class="bar">
+    <label>검수 동작 <select id="reviewclip" aria-label="검수 동작"></select></label>
+    <label><input type="checkbox" id="paused"> 장 고정</label>
+    <button id="prevframe" type="button">이전 장</button>
+    <button id="nextframe" type="button">다음 장</button>
+    <span>끝↔처음 장을 넘겨 반복 경계 확인</span>
+  </div>
   <div class="bar">
     <label><input type="checkbox" id="rim" checked> 외곽광</label>
     <label><input type="checkbox" id="fx" checked> 히트스톱·흔들림</label>
@@ -364,6 +377,7 @@ function takeHit(e, dmg, test = false) {
 // 게임 키는 꾹 누른 반복 입력까지 스크롤을 막는다
 const GAME_KEY = c => c.startsWith('Arrow') || c === 'Space' || c.startsWith('Shift') || c.startsWith('Key') || c.startsWith('Digit');
 addEventListener('keydown', e => {
+  if (e.target.closest('select, input, button')) return;
   if (!GAME_KEY(e.code)) return;
   e.preventDefault();
   if (document.activeElement && document.activeElement !== document.body) document.activeElement.blur();
@@ -537,6 +551,7 @@ function superStep() {
 function update(now) {
   const speed = +$('speed').value;
   let dt = Math.min(0.05, (now - last) / 1000) * speed; last = now;
+  if ($('paused').checked) { draw(); requestAnimationFrame(update); return; }
   if (FX.cut > 0) { FX.cut -= dt; draw(); requestAnimationFrame(update); return; }
   if (FX.stop > 0) { FX.stop -= dt; dt = 0; }
   const c = C();
@@ -876,12 +891,24 @@ requestAnimationFrame(update);
 
 // ── 목록 ──
 const list = $('list');
+function inspectClip(k) {
+  Object.assign(G, { lock: false, down: false, lying: false, grab: null, crouch: false, lurk: false, hidden: false, after: null, air: false, y: 0, superQ: null });
+  play(k, { lock: !M.clips[k].loop });
+  $('reviewclip').value = k;
+}
+$('reviewclip').onchange = () => { inspectClip($('reviewclip').value); $('paused').checked = true; };
+for (const [id, delta] of [['prevframe', -1], ['nextframe', 1]]) $(id).onclick = () => {
+  $('paused').checked = true;
+  G.f = (G.f + delta + C().frames) % C().frames;
+  G.t = 0;
+};
 let lastGroup = '';
 for (const [k, c] of Object.entries(M.clips)) {
+  const option = document.createElement('option'); option.value = k; option.textContent = `${c.label} (${k})`; $('reviewclip').appendChild(option);
   if (c.group && c.group !== lastGroup) { lastGroup = c.group; const h = document.createElement('h3'); h.className = 'grp'; h.textContent = c.group; list.appendChild(h); }
   const d = document.createElement('div'); d.className = 'clip';
   d.innerHTML = `<b>${c.label} <small>${k}</small></b><canvas width="${FW}" height="${FH}"></canvas><small>${c.frames}장 · ${c.fps}fps · ${c.loop ? '반복' : '단발'}</small>`;
-  d.onclick = () => { Object.assign(G, { lock: false, down: false, lying: false, grab: null, crouch: false, lurk: false, hidden: false, after: null, air: false, y: 0, superQ: null }); play(k, { lock: !c.loop }); scrollTo({ top: 0, behavior: 'smooth' }); };
+  d.onclick = () => { inspectClip(k); scrollTo({ top: 0, behavior: 'smooth' }); };
   list.appendChild(d);
   const cc = d.querySelector('canvas').getContext('2d'); cc.imageSmoothingEnabled = false;
   let f = 0, acc = 0, lt = performance.now();

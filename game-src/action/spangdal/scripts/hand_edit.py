@@ -1,6 +1,7 @@
 # 재생성 뒤에도 주먹으로 남은 장(위로 든 손)을 edit_image_pixen으로 손만 편 손으로 고침. 1회/장, 동시 2개.
 # 사용: python3 hand_edit.py execute:1,2,3 spineup:2 ...   원본은 ../full/clips_fist/<클립>/NN.png로 보관 후 덮어씀
 import sys,time,re,base64,os,shutil
+raise SystemExit("손 19장 개별 pixen 편집은 이미 실패한 방식입니다. resume/README.md의 다중 프레임 교정 계획을 먼저 확인하세요. 유료 호출 0건.")
 sys.path.insert(0,'../../jyaldi-v5/scripts'); import mcp
 from sheet import poll
 D=("Change only her hands: each hand open with the fingers straight and pressed together, fingertips pointing the same way the forearm points, "

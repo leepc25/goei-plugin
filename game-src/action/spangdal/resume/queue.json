@@ -1,0 +1,30 @@
+{
+  "schema": "goei-character-owner-queue/1",
+  "observed_at": "2026-10-22T10:30:33.063442+00:00",
+  "owner_branch": "codex/art-spangdal-resume",
+  "owned_character": "spangdal",
+  "max_submitted_jobs": 1,
+  "new_paid_submissions": 0,
+  "new_actual_charge": 0,
+  "account": {
+    "balance": null,
+    "active_jobs": null,
+    "concurrency_limit": null,
+    "auth": "401 Missing Authorization header"
+  },
+  "spangdal_next": [
+    "hand_reference_and_attack",
+    "empty_weapon_grips",
+    "movement_contours_and_jump"
+  ],
+  "life_72": "deferred",
+  "delegated_recovery": {
+    "owner": "kyuras",
+    "receipt_acknowledged": false,
+    "job_ids": [
+      "11826541-47d1-40de-9664-f05f1838bb23",
+      "9fe0e770-b992-4299-a4c1-90d6e591828a"
+    ],
+    "regenerate": false
+  }
+}

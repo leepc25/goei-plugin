@@ -473,3 +473,5 @@ e
 job_id: b77305ed-9b12-4653-a6f4-90edb7f98dd3
 model: pixen
 e
+
+2026-10-22 resume audit: new_paid_submissions=0 actual_new_charge=0; get_balance/list_jobs auth 401; account balance/jobs/limit unknown. Historical job costs remain unverified; see resume/historical-job-ledger.json. Kyuras recovery IDs assigned to Kyuras owner; no recovery performed here.
