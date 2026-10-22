@@ -21,12 +21,9 @@ def submit(n):
     args={'description':DESC,'action':short(act),'direction':'east','first_frame_url':REF,'first_frame_keypoints':J.kp(J.anatomic(R.BASE)),
           'keypoints':[J.kp(p) for p in ps],'seed':SEED}
     t='?'
-    for k in range(40):   # 계정 동시 작업 20개 한도(다른 스레드와 공유) → 자리 날 때까지 기다림
-        try:
-            t=mcp.text(mcp.tool('animate_with_skeleton_v3',args))
-            if re.search(r'job_id',t): break
-        except Exception as e: t='EXC '+str(e)
-        time.sleep(20 if 'rate limit' in t else 10*(k%6+1))
+    try: t=mcp.text(mcp.tool('animate_with_skeleton_v3',args))
+    except Exception as e: t='EXC '+str(e)
+    if 'rate limit' in t or t.startswith('EXC'): return None,'BUSY '+t   # 계정 동시 작업 20개 한도(다른 스레드와 공유): 막지 않고 뒤에 다시
     log(f'{n} {len(ps)}f seed{SEED} -> {t[:160]}')
     m=re.search(r'job_id["\s:]+([0-9a-f-]{36})',t); return m.group(1) if m else None,t
 def fetch(n,j):
@@ -59,6 +56,7 @@ if __name__=='__main__':
         while queue and len(pend)<PAR:
             n=queue.pop(0); j,t=submit(n)
             if j: pend[n]=j; print('sub',n,flush=True)
+            elif t.startswith('BUSY'): queue.insert(0,n); break
             else: print('SUBFAIL',n,t[:300],flush=True)
         time.sleep(15)
         for n,j in list(pend.items()):

@@ -1,0 +1,4 @@
+{
+ "_설명": "검수 코드 보정. compose = 다른 클립 장을 빌려 엮음 [[클립, 장]], drop = 뺄 장, order = 장 순서. 근거는 qa_notes.md",
+ "jump": {"compose": [["jump", 0], ["jump", 1], ["airstomp", 0], ["airstomp", 1], ["airstomp", 0], ["jump", 6], ["jump", 7]]}
+}
