@@ -414,7 +414,7 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
     draw(w: World, alpha: number) {
       ctx.imageSmoothingEnabled = false;
       const shake = w.shakeT > 0 ? (w.tick % 2 ? 1 : -1) * w.shakeP * 2 : 0;
-      const camX = Math.round(w.camX);
+      const camX = Math.round(lerp(w.prevCamX, w.camX, alpha));
       ctx.save();
       ctx.translate(shake, w.shakeT > 0 ? (w.tick % 3) - 1 : 0);
       background(w, camX);

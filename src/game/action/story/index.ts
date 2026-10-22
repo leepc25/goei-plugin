@@ -62,6 +62,7 @@ export interface StoryApi {
   talk(npc: TalkNpcId, onDone?: () => void): void;
   update(dt: number): void;
   isBlocking(): boolean;
+  isVideoPlaying(): boolean;
   /** 대화 넘기기 (키보드 등) */
   advance(): void;
   choose(n: number): void;
@@ -406,6 +407,7 @@ export function mountStory(root: HTMLElement, host: StoryHost, opts: StoryOption
     choose,
     skip: () => (video.open ? video.finish() : scene?.skip()),
     isBlocking: () => blocking,
+    isVideoPlaying: () => video.open,
     update(dt: number) {
       now += dt;
       const p = !!host.paused?.();

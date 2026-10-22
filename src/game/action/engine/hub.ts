@@ -187,7 +187,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
         a.movePlayer(at.x, at.y);
         arrive = null;
       }
-      if (opening && ++opening.t >= OPEN_T) {
+      if (opening && opening.t < OPEN_T && ++opening.t === OPEN_T) {
         const then = opening.then;
         opening.t = OPEN_T;
         then();

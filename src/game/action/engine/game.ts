@@ -31,6 +31,8 @@ export interface EngineModules {
   onPlay?: () => void;
   /** 매 화면 프레임 (dt 초) */
   frame?: (dt: number) => void;
+  /** 불투명 컷씬이 전체 화면을 덮을 때 배경 월드를 다시 그리지 않는다. */
+  covered?: () => boolean;
   /** 세계 그리기 뒤에 덧그리기 (ui HUD·효과 등) */
   overlay?: (ctx: CanvasRenderingContext2D, world: World | null, dt: number) => void;
   /** 장면 바뀜: 'title' | 'hq' | 'battle' | 'result' */
@@ -128,8 +130,10 @@ export class Game {
         this.wasPaused = paused;
         this.mods.onPause?.(paused);
       }
-      this.scene.draw(paused ? 1 : this.acc / T);
-      this.mods.overlay?.(this.ctx, this.world, dt);
+      if (!this.mods.covered?.()) {
+        this.scene.draw(paused ? 1 : this.acc / T);
+        this.mods.overlay?.(this.ctx, this.world, dt);
+      }
     };
     this.raf = requestAnimationFrame(frame);
   }
@@ -343,7 +347,7 @@ export class Game {
         else if (w.tick % 60 === 0) this.checkpoint();
       },
       draw: (a) => {
-        this.renderer.draw(w, this.paused ? 1 : a);
+        this.renderer.draw(w, this.paused || this.mods.blocking?.() || this.mods.hq?.isOpen?.() ? 1 : a);
         if (this.paused) this.drawMenu('일시정지', ['계속', w.showBoxes ? '판정 보기 끄기' : '판정 보기 켜기', '철수 (출동 끝내기)', '처음으로']);
       },
     };

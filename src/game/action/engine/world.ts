@@ -62,6 +62,7 @@ export class World implements WorldView {
   light = 1;
   fxs: Fx[] = [];
   camX = 0;
+  prevCamX = 0;
   shakeT = 0;
   shakeP = 0;
   subtitle: { text: string; t: number } | null = null;
@@ -104,6 +105,7 @@ export class World implements WorldView {
     this.itemState?.restore(s.items);
     this.rand.restore(s.rng);
     this.camera();
+    this.prevCamX = this.camX;
   }
   deadT = 0;
   private hitMemo = new Map<string, number>();
@@ -262,6 +264,7 @@ export class World implements WorldView {
     p.enter('free'); p.stop = 0;
     p.dir = 1;
     this.camX = Math.max(0, Math.min(f.length - SCREEN_W, p.x - SCREEN_W / 2));
+    this.prevCamX = this.camX;
     this.banner = { text: f.banner ?? f.title, t: 70 };
     this.subtitle = null; // 지난 방·층 대사를 끌고 오지 않는다 (독립 검수: 탕비실 대사가 보급실까지)
     this.floors++;
@@ -271,6 +274,7 @@ export class World implements WorldView {
   /* ───────── 한 틱 ───────── */
 
   step(pad: Pad) {
+    this.prevCamX = this.camX;
     this.tick++;
     if (pad.pressed.has('hitbox')) this.showBoxes = !this.showBoxes;
     for (const f of this.fxs) f.t++;

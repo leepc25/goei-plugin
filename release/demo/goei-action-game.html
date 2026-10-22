@@ -5575,7 +5575,7 @@ function makeRenderer(ctx, art3, opt) {
     draw(w, alpha) {
       ctx.imageSmoothingEnabled = false;
       const shake = w.shakeT > 0 ? (w.tick % 2 ? 1 : -1) * w.shakeP * 2 : 0;
-      const camX = Math.round(w.camX);
+      const camX = Math.round(lerp(w.prevCamX, w.camX, alpha));
       ctx.save();
       ctx.translate(shake, w.shakeT > 0 ? w.tick % 3 - 1 : 0);
       background(w, camX);
@@ -6650,6 +6650,7 @@ var World = class {
   light = 1;
   fxs = [];
   camX = 0;
+  prevCamX = 0;
   shakeT = 0;
   shakeP = 0;
   subtitle = null;
@@ -6702,6 +6703,7 @@ var World = class {
     this.itemState?.restore(s2.items);
     this.rand.restore(s2.rng);
     this.camera();
+    this.prevCamX = this.camX;
   }
   deadT = 0;
   hitMemo = /* @__PURE__ */ new Map();
@@ -6804,6 +6806,7 @@ var World = class {
     p.stop = 0;
     p.dir = 1;
     this.camX = Math.max(0, Math.min(f.length - SCREEN_W, p.x - SCREEN_W / 2));
+    this.prevCamX = this.camX;
     this.banner = { text: f.banner ?? f.title, t: 70 };
     this.subtitle = null;
     this.floors++;
@@ -6811,6 +6814,7 @@ var World = class {
   }
   /* ───────── 한 틱 ───────── */
   step(pad) {
+    this.prevCamX = this.camX;
     this.tick++;
     if (pad.pressed.has("hitbox")) this.showBoxes = !this.showBoxes;
     for (const f of this.fxs) f.t++;
@@ -7152,8 +7156,10 @@ var Game = class {
         this.wasPaused = paused;
         this.mods.onPause?.(paused);
       }
-      this.scene.draw(paused ? 1 : this.acc / T3);
-      this.mods.overlay?.(this.ctx, this.world, dt);
+      if (!this.mods.covered?.()) {
+        this.scene.draw(paused ? 1 : this.acc / T3);
+        this.mods.overlay?.(this.ctx, this.world, dt);
+      }
     };
     this.raf = requestAnimationFrame(frame2);
   }
@@ -7352,7 +7358,7 @@ var Game = class {
         } else if (w.tick % 60 === 0) this.checkpoint();
       },
       draw: (a) => {
-        this.renderer.draw(w, this.paused ? 1 : a);
+        this.renderer.draw(w, this.paused || this.mods.blocking?.() || this.mods.hq?.isOpen?.() ? 1 : a);
         if (this.paused) this.drawMenu("일시정지", ["계속", w.showBoxes ? "판정 보기 끄기" : "판정 보기 켜기", "철수 (출동 끝내기)", "처음으로"]);
       }
     };
@@ -22634,6 +22640,9 @@ var VideoPlayer = class {
   sub;
   skipBtn;
   soundBtn;
+  loading;
+  lastImage = null;
+  lastSubtitle = "";
   subs = [];
   cuts = [];
   lens = [];
@@ -22648,6 +22657,7 @@ var VideoPlayer = class {
     el.className = "gsy-video";
     el.hidden = true;
     el.innerHTML = `<canvas width="${W4}" height="${H5}"></canvas><p class="gsy-vsub gk-panel gk-font" hidden></p>
+<p class="gsy-vloading gk-panel gk-font" style="position:absolute;top:12%;padding:12px">장면 불러오는 중…</p>
 <button class="gsy-vsound gk-btn" hidden>소리 켜기</button><button class="gsy-vskip gk-btn">건너뛰기 ▶▶</button>`;
     root.append(el);
     ensureKit();
@@ -22657,6 +22667,7 @@ var VideoPlayer = class {
     this.sub = el.querySelector(".gsy-vsub");
     this.skipBtn = el.querySelector(".gsy-vskip");
     this.soundBtn = el.querySelector(".gsy-vsound");
+    this.loading = el.querySelector(".gsy-vloading");
     this.skipBtn.addEventListener("click", (e) => (e.stopPropagation(), this.finish()));
     this.soundBtn.addEventListener("click", (e) => {
       e.stopPropagation();
@@ -22678,21 +22689,53 @@ var VideoPlayer = class {
     this.el.hidden = false;
     this.sub.hidden = true;
     this.soundBtn.hidden = true;
+    this.loading.hidden = false;
+    this.lastImage = null;
+    this.lastSubtitle = "";
     this.ctx.fillStyle = "#000";
     this.ctx.fillRect(0, 0, W4, H5);
-    const first = await ready && token === this.token ? await loadCut(base2, 1) : null;
+    const active = () => token === this.token;
+    const first = await ready && active() ? await loadCut(base2, 1, active) : null;
     if (token !== this.token) return;
     if (!first) return this.finish();
     this.cuts[0] = first;
-    cuts.slice(1).forEach((_, i) => void loadCut(base2, i + 2).then((c) => token === this.token && (this.cuts[i + 1] = c)));
+    void (async () => {
+      for (let i = 1; i < cuts.length && active(); i++) {
+        const cut = await loadCut(base2, i + 1, active);
+        if (active()) this.cuts[i] = cut;
+      }
+    })();
     if (sound) this.startAudio(`${base2}sound.ogg`, token);
     this.started = performance.now();
+    let elapsed = 0, last = this.started, buffering = false;
+    const duration = this.lens.reduce((a, b) => a + b, 0);
+    this.loading.hidden = true;
+    this.draw(0);
+    this.showSub(0);
     const tick = () => {
       if (token !== this.token) return;
-      const t = (performance.now() - this.started) / 1e3;
-      if (t >= this.lens.reduce((a, b) => a + b, 0)) return this.finish();
-      this.draw(t);
-      this.showSub(t);
+      const now = performance.now();
+      const t = elapsed + (now - last) / 1e3;
+      last = now;
+      let at2 = t, index = 0;
+      while (index < this.lens.length - 1 && at2 >= this.lens[index]) at2 -= this.lens[index++];
+      if (this.cuts[index] === void 0) {
+        this.loading.hidden = false;
+        if (!buffering) this.audio?.pause();
+        buffering = true;
+      } else {
+        this.loading.hidden = true;
+        if (buffering && this.audio) {
+          this.audio.currentTime = elapsed;
+          void this.audio.play().catch(() => {
+          });
+        }
+        buffering = false;
+        elapsed = t;
+        if (t >= duration) return this.finish();
+        this.draw(t);
+        this.showSub(t);
+      }
       this.raf = requestAnimationFrame(tick);
     };
     this.raf = requestAnimationFrame(tick);
@@ -22721,8 +22764,11 @@ var VideoPlayer = class {
       if (!cut) return;
       f = cut.frames - 1;
     }
+    const img4 = cut.imgs[f];
+    if (img4 === this.lastImage) return;
+    this.lastImage = img4;
     this.ctx.imageSmoothingEnabled = false;
-    this.ctx.drawImage(cut.imgs[f], 0, 0, W4, H5);
+    this.ctx.drawImage(img4, 0, 0, W4, H5);
   }
   showSub(t) {
     let cur = null;
@@ -22732,7 +22778,8 @@ var VideoPlayer = class {
     });
     const c = cur;
     this.sub.hidden = !c;
-    if (c) this.sub.innerHTML = `${c.who ? `<b>${esc3(c.who)}</b> ` : ""}${esc3(c.text)}`;
+    const html = c ? `${c.who ? `<b>${esc3(c.who)}</b> ` : ""}${esc3(c.text)}` : "";
+    if (html !== this.lastSubtitle) this.sub.innerHTML = this.lastSubtitle = html;
   }
   /** 화면 누르기·확인 키: 시작 1초 뒤부터 건너뜀 (실수 방지) */
   skipSoft() {
@@ -22747,6 +22794,8 @@ var VideoPlayer = class {
     this.audio?.pause();
     this.audio = null;
     this.el.hidden = true;
+    this.cuts = [];
+    this.lastImage = null;
     const cb = this.done;
     this.done = null;
     cb?.();
@@ -22761,20 +22810,24 @@ function listed(dir, id) {
     );
   return lists.get(dir).then((a) => a.includes(id));
 }
-async function loadCut(base2, n) {
+async function loadCut(base2, n, active) {
   try {
     const res = await fetch(`${base2}c${n}/timing.json`);
     if (!res.ok) return null;
     const meta = await res.json();
     if (!Array.isArray(meta.ms) || !meta.ms.length) return null;
-    const imgs2 = await Promise.all(
-      meta.ms.map(async (_, k) => {
+    const imgs2 = new Array(meta.ms.length);
+    let next = 0;
+    await Promise.all(Array.from({ length: Math.min(4, meta.ms.length) }, async () => {
+      while (next < meta.ms.length && active()) {
+        const k = next++;
         const img4 = new Image();
         img4.src = `${base2}c${n}/${String(k + 1).padStart(4, "0")}.png`;
         await img4.decode();
-        return img4;
-      })
-    );
+        imgs2[k] = img4;
+      }
+    }));
+    if (!active()) return null;
     return { imgs: imgs2, meta, frames: imgs2.length };
   } catch {
     return null;
@@ -23760,6 +23813,7 @@ ${who}: ${text2.replace(/\n/g, " ")}
     choose,
     skip: () => video.open ? video.finish() : scene?.skip(),
     isBlocking: () => blocking,
+    isVideoPlaying: () => video.open,
     update(dt) {
       now += dt;
       const p = !!host.paused?.();
@@ -23936,7 +23990,7 @@ function makeHub(host, whereIs2) {
         a.movePlayer(at2.x, at2.y);
         arrive = null;
       }
-      if (opening && ++opening.t >= OPEN_T) {
+      if (opening && opening.t < OPEN_T && ++opening.t === OPEN_T) {
         const then = opening.then;
         opening.t = OPEN_T;
         then();
@@ -27935,6 +27989,7 @@ function engineModules(box3, bridge) {
     hq: hq2,
     hud: false,
     blocking: () => story.isBlocking() || itemsBlocking() || !floorBox.hidden || npc.isOpen() || mapOpen,
+    covered: () => story.isVideoPlaying(),
     listeners,
     surface: { canvas: shell.canvas, ctx: shell.ctx },
     paused: () => shell.paused,

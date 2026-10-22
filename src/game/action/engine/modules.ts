@@ -505,6 +505,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     hq,
     hud: false,
     blocking: () => story.isBlocking() || itemsBlocking() || !floorBox.hidden || npc.isOpen() || mapOpen,
+    covered: () => story.isVideoPlaying(),
     listeners,
     surface: { canvas: shell.canvas, ctx: shell.ctx },
     paused: () => shell.paused,
