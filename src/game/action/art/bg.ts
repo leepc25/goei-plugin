@@ -3,6 +3,7 @@
 // 도트 1px = 화면 2px. 벽 칸 320×220 도트 = 화면 640×440, 바닥 무늬 128 도트.
 
 import { HQ_SCENES } from '../hq/map';
+import { HQ_WALL_DECO } from '../hq/wallDeco';
 
 export type BgPack = Record<string, Record<string, string>>; // 장소 → 이름 → data URL
 
@@ -274,8 +275,15 @@ export const HQ_PLACE: Record<string, string> = {
 const HQ_WALLS: Record<string, string[]> = {
   hq_office: ['hq_office', 'hq_jaemtri'],
   hq_supply: ['hq_supply', 'hq_workshop'],
-  hq_lab: ['hq_lab', 'hq_jaemtri:hq_jaemtri_wall_4'],
   hq_lobby: ['hq_lobby', 'lobby:lobby_wall_1'],
+  // 문 그림이 없는 방은 이웃 방의 문 칸을 빌린다: 엔진이 그린 문이 책장·창·게시판을 덮지 않게 (통합 검수 23, tests/hq-walls.test.mjs)
+  hq_chief: ['hq_chief', 'hq_office:hq_office_wall_3'],
+  hq_interview: ['hq_interview', 'hq_office:hq_office_wall_3'],
+  hq_appraisal: ['hq_appraisal', 'hq_containment:hq_containment_wall_3'],
+  hq_lab: ['hq_lab', 'hq_jaemtri:hq_jaemtri_wall_4', 'hq_containment:hq_containment_wall_1'],
+  hq_training: ['hq_training', 'hq_workshop:hq_workshop_wall_3'],
+  hq_tooth: ['hq_tooth', 'hq_containment:hq_containment_wall_4'],
+  hq_pasta: ['hq_pasta', 'hq_pantry:hq_pantry_wall_4'],
 };
 /** 바닥 그림이 없는 장소가 빌리는 바닥. */
 const FLOOR_ALT: Record<string, string> = {
@@ -309,6 +317,34 @@ function doorType(kind: string): 'door' | 'stairs' | 'elevator' {
   return kind.startsWith('stairs') ? 'stairs' : kind === 'elevator' ? 'elevator' : 'door';
 }
 
+/** 벽 칸 그림 없이 엔진이 덧그리는 문의 반폭(화면 px): 엘리베이터는 2층 복도 엘리베이터 조각, 계단은 로비 계단 물건 그림. */
+function overlayHalf(kind: string, k: number): number {
+  if (kind === 'elevator') return ((213 - 108) * k) / 2;
+  const ref = BY_KIND[`hq_${kind}`];
+  const im = ref ? objImage(ref[0], ref[1]) : null;
+  if (im) return im.width;
+  return kind.startsWith('stairs') ? 140 : 0;
+}
+/** 민벽 띠: 채움 칸 그림 중 장식이 없는 가장 넓은 도트 구간 [장소, 그림, [u0, u1]] (hq/wallDeco.ts) */
+function plainStrip(fill: [string, string][], m = 4): [string, string, [number, number]] | null {
+  let best: [string, string, [number, number]] | null = null;
+  for (const [p, n] of fill) {
+    const deco = HQ_WALL_DECO[n];
+    if (!deco) continue;
+    const hole = DOOR_WALLS[n];
+    let cur = 6;
+    // 문이 그려진 칸이면 문 구멍(+문틀)도 장식처럼 피한다
+    for (const [a, b] of [...deco, ...(hole ? [[hole[0] - 14, hole[1] + 14] as [number, number]] : []), [314, 320] as [number, number]].sort((u, v) => u[0] - v[0])) {
+      if (a - m > cur + m && (!best || a - cur - 2 * m > best[2][1] - best[2][0])) best = [p, n, [cur + m, a - m]];
+      cur = Math.max(cur, b);
+    }
+  }
+  return best && best[2][1] - best[2][0] >= 6 ? best : null;
+}
+
+/** 민벽 띠 고르기: 같은 방 칸에서 넉넉히 → 좁게(장식 사이 틈) → 문 칸을 빌린 방이면 빌린 칸의 민벽 */
+const plainOf = (fill: [string, string][], cands: [string, string][]) => plainStrip(fill) ?? plainStrip(fill, 1) ?? plainStrip(cands);
+
 /**
  * 본부 장면 벽: 엔진 문 자리에 문이 그려진 벽 칸을 문 구멍이 맞게 놓고, 사이는 문 없는 칸으로 채운다.
  * 칸끼리 겹치면 가운데서 자르고 기둥을 세운다. 돌려주는 집합 = 벽 그림이 문을 대신한 문 id (엔진은 그 문을 그리지 않는다).
@@ -324,7 +360,7 @@ export function drawHqWall(ctx: CanvasRenderingContext2D, place: string, sceneId
   const fill = plain.length ? plain : cands;
   const k = wallBottom / 220; // 화면 px / 도트
   const bayW = 320 * k;
-  type Piece = { p: string; n: string; x: number; a: number; b: number; door?: string; flip?: boolean; label?: string };
+  type Piece = { p: string; n: string; x: number; a: number; b: number; door?: string; flip?: boolean; label?: string; blank?: [number, number] };
   const pieces: Piece[] = [];
   for (const d of [...doors].sort((a, b) => a.x - b.x)) {
     const want = DOOR_FOR[`${sceneId}:${d.id}`];
@@ -332,15 +368,33 @@ export function drawHqWall(ctx: CanvasRenderingContext2D, place: string, sceneId
     const t = d.kind === 'main' && cands.some(([, n]) => DOOR_WALLS[n]?.[2] === 'main') ? 'main' : doorType(d.kind);
     const ok = cands.filter(([, n]) => DOOR_WALLS[n]?.[2] === t);
     const pick = ok.find(([, n]) => n === want) ?? ok[hash(`${sceneId}:${d.id}`) % Math.max(1, ok.length)];
-    if (!pick) continue;
+    if (!pick) {
+      // 문 칸이 없는 엘리베이터·계단: 그 뒤는 장식 없는 민벽으로 (게시판·소화전을 덮지 않게, 통합 검수 22·23)
+      const half = overlayHalf(d.kind, k);
+      const st = plainOf(fill, cands);
+      if (half && st) pieces.push({ p: st[0], n: st[1], x: d.x - half - 12, a: d.x - half - 12, b: d.x + half + 12, blank: st[2] });
+      continue;
+    }
     const [x0, x1] = DOOR_WALLS[pick[1]];
     const bx = d.x - ((x0 + x1) / 2) * k;
     pieces.push({ p: pick[0], n: pick[1], x: bx, a: bx, b: bx + bayW, door: d.id, label: d.to && SCENE_NAME.get(d.to) });
   }
-  // 겹치는 문 칸은 두 문 사이 가운데서 자른다 (문 구멍은 남는다)
+  // 벽에 붙은 가구(사물함 줄·책장·화이트보드…) 뒤도 민벽으로: 가구가 벽 그림 속 창·게시판을 반쯤 가리지 않게
+  const sc = HQ_SCENES.find((x) => x.id === sceneId);
+  const strip = plainOf(fill, cands);
+  for (const t of sc?.things ?? []) {
+    if (!t.wall || !strip) continue;
+    const sz = propArtSize(t.kind, undefined);
+    if (sz) pieces.push({ p: strip[0], n: strip[1], x: t.x - sz.w / 2 - 12, a: t.x - sz.w / 2 - 12, b: t.x + sz.w / 2 + 12, blank: strip[2] });
+  }
+  pieces.sort((u, v) => u.a - v.a);
+  // 겹치는 문 칸은 두 문 사이 가운데서 자른다 (문 구멍은 남는다). 민벽 조각과 겹치면 민벽을 남긴다
   for (let i = 1; i < pieces.length; i++) {
     const L = pieces[i - 1], R = pieces[i];
-    if (L.b > R.a) {
+    if (L.b <= R.a) continue;
+    if (R.blank && !L.blank) L.b = R.a;
+    else if (L.blank && !R.blank) R.a = L.b;
+    else {
       const m = (L.b + R.a) / 2;
       L.b = m;
       R.a = m;
@@ -363,12 +417,40 @@ export function drawHqWall(ctx: CanvasRenderingContext2D, place: string, sceneId
       fills.push({ p, n, x, a: x, b: Math.min(x + bayW, g1), flip });
     }
   }
+  // 칸 이음매·장면 끝에서 반쯤 잘리는 벽 장식(창·게시판 반쪽)은 통째로 민벽으로 덮는다 (통합 검수 23, tests/hq-walls.test.mjs)
+  const plainSt = plainOf(fill, cands);
+  if (plainSt) {
+    for (const pc of [...fills, ...pieces]) {
+      if (pc.blank) continue;
+      let a = Math.max(pc.a, pc.x, 0),
+        b = Math.min(pc.b, pc.x + bayW, length);
+      const spans = (HQ_WALL_DECO[pc.n] ?? []).map(([u0, u1]) => (pc.flip ? [pc.x + bayW - u1 * k, pc.x + bayW - u0 * k] : [pc.x + u0 * k, pc.x + u1 * k])).sort((u, v) => u[0] - v[0]);
+      for (const [d0, d1] of spans) {
+        if (d1 <= a || d0 >= b || (d0 >= a - 1 && d1 <= b + 1)) continue;
+        const blank = (x0: number, x1: number) => x1 - x0 > 1 && pieces.push({ p: plainSt[0], n: plainSt[1], x: x0, a: x0, b: x1, blank: plainSt[2] });
+        if (d0 < a) {
+          blank(a, Math.min(d1, b));
+          a = Math.min(d1, b);
+        } else {
+          blank(Math.max(d0, a), b);
+          b = Math.max(d0, a);
+        }
+      }
+      pc.a = a;
+      pc.b = b;
+    }
+  }
   ctx.save();
   ctx.imageSmoothingEnabled = false;
   const covered = new Set<string>();
   for (const pc of [...fills, ...pieces]) {
     const im = image(pc.p, pc.n);
     if (!im) continue;
+    if (pc.blank) {
+      const [u0, u1] = pc.blank;
+      ctx.drawImage(im, u0, 0, u1 - u0, im.height, pc.a, 0, pc.b - pc.a, wallBottom);
+      continue;
+    }
     const a = Math.max(pc.a, pc.x), b = Math.min(pc.b, pc.x + bayW);
     if (b <= a) continue;
     if (pc.flip) {
@@ -400,7 +482,7 @@ export function drawHqWall(ctx: CanvasRenderingContext2D, place: string, sceneId
     covered.add(d.id);
   }
   // 잘린 이음매에 기둥
-  for (const pc of [...fills, ...pieces]) for (const e of [pc.a, pc.b]) if (e > 0 && e < length && e - pc.x > 2 && pc.x + bayW - e > 2) seamPillar(ctx, e, wallBottom, 14);
+  for (const pc of [...fills, ...pieces]) for (const e of [pc.a, pc.b]) if (e > 0 && e < length && (pc.blank || (e - pc.x > 2 && pc.x + bayW - e > 2))) seamPillar(ctx, e, wallBottom, 14);
   // 이웃 칸 끝 색이 크게 다르면(나무 책장 ↔ 크림 벽, 유리 ↔ 베이지) 기둥으로 갈라 이음매가 아니라 벽 모서리로 읽히게
   const all = [...fills, ...pieces].sort((u, v) => u.a - v.a);
   for (let i = 1; i < all.length; i++) {
