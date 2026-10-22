@@ -4,10 +4,13 @@
 
 ## 실행판과 전달물
 
+[독립 검수판 실행](https://rawcdn.githack.com/leepc25/goei-plugin/dd89bf03f557cdf45a34fab38a336c855466672f/release/demo/character-production-resume.html) · [HTML 소스](https://github.com/leepc25/goei-plugin/blob/dd89bf03f557cdf45a34fab38a336c855466672f/release/demo/character-production-resume.html). 수정 그림이 없는 기존 원본 검수판이다. PC·모바일 가로/세로 실행 검수는 통과했으며 실제 기기 사용자 시각 승인은 대기다.
+
 - 단일 HTML: `release/demo/character-production-resume.html`. 최신 원본 89장 내장, 쟈알디 A/A2/가드 비교, 걷기·달리기 조작, 큐라스 기본 공격, 에일린 전투 자세, 장넘김·속도·반복 경계 검수. 네트워크 없이 열린다. 기존 그림의 결함은 남아 있다.
 - 쟈알디 8장씩 새 뼈대/요청문: `game-src/action/jyaldi-v5/resume/`. **미제출**이다. 지지발 고정, 반대 팔·다리, 같은 뼈 길이, 가상 다음 0장 반복 경계 검사 포함. 가려진 참조 관절은 추정값이므로 최종 검수 대기다.
 - 장별 시각 검사: [쟈알디](jyaldi-audit.md), [큐라스](kyuras-audit.md), [에일린·다른 요원](other-agents-audit.md). 생성 완료·내부 검수·사용자 시각 승인을 구분했다.
 - 연결 준비 패키지: [엔진 연결 계약](engine-integration.md), `game-src/action/character-resume/delivery/manifest.json`. 기존 6클립의 비교 자료이며 신규 수정 그림/승인 자산이 아니다.
+- [연결 준비 패치](engine-delivery-preparation.patch): 기준 `0a132852`에 `git apply --check` 통과. 빌더·검사·비교 패키지·뼈대/이동 계약을 추가한다. 엔진 코드에 새 그림을 연결하는 완성 패치가 아니다. 시스템 담당은 별도 브랜치에서 검토한다.
 - 큐·비용 원장: `game-src/action/character-resume/queue.json`, `spend.jsonl`. 실제 새 유료 호출/차감 **0**. 기존 과금 작업의 개별 실제 비용은 아직 미확인이다.
 
 ## PixelLab 차단의 실제 증거
