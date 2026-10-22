@@ -51,7 +51,7 @@ if __name__=='__main__':
         if resume and n in last and not os.path.exists(f'{OUT}/{n}/00.png'): pend[n]=last[n]
         elif resume and os.path.exists(f'{OUT}/{n}/00.png'): continue
         else: queue.append(n)
-    MAXP=6
+    MAXP=2   # 요원 스레드당 동시 작업 2칸(사용자 확정 2026-10-22 03:12)
     while queue or pend:
         while queue and len(pend)<MAXP:
             n=queue.pop(0); j,t=submit(n,seed)
