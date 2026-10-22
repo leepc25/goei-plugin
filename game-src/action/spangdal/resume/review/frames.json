@@ -454,10 +454,10 @@
   {
     "clip": "execute",
     "frame": 0,
-    "rendered_rgba_sha256": "50391fd8bc39d7ced74e5bf2818665e465fb9d0375a7c842401afe1c4e6cda99",
+    "rendered_rgba_sha256": "eb54df57d09a0565d843dcdbe42c072370a20c33ed04cabd07d832af7aee4555",
     "bbox": [
       45,
-      50,
+      51,
       98,
       136
     ],
@@ -465,7 +465,8 @@
     "source": {
       "clip": "execute",
       "frame": 0,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/execute/00.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
     "hands_grounding_and_motion": "시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류",
@@ -476,21 +477,22 @@
   {
     "clip": "execute",
     "frame": 1,
-    "rendered_rgba_sha256": "f0bf206a629f96eb8efad0b3e1e1ef08524eed5c9ea9bd83579bed3eacc9a77a",
+    "rendered_rgba_sha256": "cc8c45b4bd5e1ea62a893e395a571edd642ab1c38d812f583177235ae00e12fd",
     "bbox": [
       58,
       47,
-      107,
+      105,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "execute",
       "frame": 1,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/execute/01.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "검지 가리키기. 1→2 위 손 높이 급변",
+    "hands_grounding_and_motion": "무료 정확 보정: 모은 손날·손목 연결 반영. execute 고정 손, grabstab 중복 팔 제거, super X 교차. 얼굴/하체 보존 확인. 사용자 시각 승인과 별개",
     "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -498,21 +500,22 @@
   {
     "clip": "execute",
     "frame": 2,
-    "rendered_rgba_sha256": "a3f87dfa8a8368945e0ceeb3673c1a65f16aa91dbaafa861350b50171b0a4bc9",
+    "rendered_rgba_sha256": "a6467edfc39bbf8a1bc060cfe49b8da4c527d39107bb304bf908ba37694b50f7",
     "bbox": [
       58,
       47,
-      117,
+      105,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "execute",
       "frame": 2,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/execute/02.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "검지 가리키기. 1→2 위 손 높이 급변",
+    "hands_grounding_and_motion": "무료 정확 보정: 모은 손날·손목 연결 반영. execute 고정 손, grabstab 중복 팔 제거, super X 교차. 얼굴/하체 보존 확인. 사용자 시각 승인과 별개",
     "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -520,21 +523,22 @@
   {
     "clip": "execute",
     "frame": 3,
-    "rendered_rgba_sha256": "31e7e65f580496abeef38659ad89acef58f76f5db37fbfa2cff93cf24e015c30",
+    "rendered_rgba_sha256": "2bbe4a3da515b53f269271bd46dca586e7754f7b2150e7a91ec29f29527c21ab",
     "bbox": [
       58,
       47,
-      111,
+      105,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "execute",
       "frame": 3,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/execute/03.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "검지 가리키기. 1→2 위 손 높이 급변",
+    "hands_grounding_and_motion": "무료 정확 보정: 모은 손날·손목 연결 반영. execute 고정 손, grabstab 중복 팔 제거, super X 교차. 얼굴/하체 보존 확인. 사용자 시각 승인과 별개",
     "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -542,21 +546,22 @@
   {
     "clip": "execute",
     "frame": 4,
-    "rendered_rgba_sha256": "c54872d63b564e44ec87bc80a90b4e23a92f86ebe785774443302ac578ec840d",
+    "rendered_rgba_sha256": "15b3c1ab49bbd579ca0c920d775df71b8f227a993ebd2027d71179769c22b26a",
     "bbox": [
       58,
       47,
-      113,
+      105,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "execute",
       "frame": 4,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/execute/04.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "검지 가리키기. 1→2 위 손 높이 급변",
+    "hands_grounding_and_motion": "무료 정확 보정: 모은 손날·손목 연결 반영. execute 고정 손, grabstab 중복 팔 제거, super X 교차. 얼굴/하체 보존 확인. 사용자 시각 승인과 별개",
     "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -564,21 +569,22 @@
   {
     "clip": "execute",
     "frame": 5,
-    "rendered_rgba_sha256": "fcb0e4d433daabf90ef38f1457ac2996b320442d997c55475ac13e1b47f65c79",
+    "rendered_rgba_sha256": "53bee8effd1d8378deab541c173a38093214956be431cd75d0c652c3260c9345",
     "bbox": [
       58,
       47,
-      112,
+      105,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "execute",
       "frame": 5,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/execute/05.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "검지 가리키기. 1→2 위 손 높이 급변",
+    "hands_grounding_and_motion": "무료 정확 보정: 모은 손날·손목 연결 반영. execute 고정 손, grabstab 중복 팔 제거, super X 교차. 얼굴/하체 보존 확인. 사용자 시각 승인과 별개",
     "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -586,21 +592,22 @@
   {
     "clip": "execute",
     "frame": 6,
-    "rendered_rgba_sha256": "6f60d83e7157ec159db10e9ab6d9b45816586fae67eeaf80ecc72a482035778f",
+    "rendered_rgba_sha256": "004acf91599428b6539afcd5d7de6b3f9cda47d40d10673e116a4b5ba760b70b",
     "bbox": [
-      51,
+      52,
       49,
-      109,
+      103,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "execute",
       "frame": 6,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/execute/06.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "검지 가리키기. 1→2 위 손 높이 급변",
+    "hands_grounding_and_motion": "무료 정확 보정: 모은 손날·손목 연결 반영. execute 고정 손, grabstab 중복 팔 제거, super X 교차. 얼굴/하체 보존 확인. 사용자 시각 승인과 별개",
     "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -652,21 +659,22 @@
   {
     "clip": "spineup",
     "frame": 2,
-    "rendered_rgba_sha256": "bde13acb59244a4cd2b4d009489eabe72d666806f5a1f8492d62edc9651a57ee",
+    "rendered_rgba_sha256": "e0bb2ab78a9242ef83b4825e8c8262df9663fe2b90971d7e2be604cb4dffbf55",
     "bbox": [
       48,
       54,
-      95,
+      96,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "spineup",
       "frame": 3,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/spineup/02.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "위 손 가리키기. 2·3은 빌더 교체로 같은 그림",
+    "hands_grounding_and_motion": "무료 정확 보정: 모은 손날·손목 연결 반영. execute 고정 손, grabstab 중복 팔 제거, super X 교차. 얼굴/하체 보존 확인. 사용자 시각 승인과 별개",
     "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -674,21 +682,22 @@
   {
     "clip": "spineup",
     "frame": 3,
-    "rendered_rgba_sha256": "bde13acb59244a4cd2b4d009489eabe72d666806f5a1f8492d62edc9651a57ee",
+    "rendered_rgba_sha256": "e0bb2ab78a9242ef83b4825e8c8262df9663fe2b90971d7e2be604cb4dffbf55",
     "bbox": [
       48,
       54,
-      95,
+      96,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "spineup",
       "frame": 3,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/spineup/03.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "위 손 가리키기. 2·3은 빌더 교체로 같은 그림",
+    "hands_grounding_and_motion": "무료 정확 보정: 모은 손날·손목 연결 반영. execute 고정 손, grabstab 중복 팔 제거, super X 교차. 얼굴/하체 보존 확인. 사용자 시각 승인과 별개",
     "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -696,7 +705,99 @@
   {
     "clip": "spineup",
     "frame": 4,
-    "rendered_rgba_sha256": "4ec72fefbb89eba2cdba0da18e387add4daeb693d1a4bdfb64efd28f9f1353e2",
+    "rendered_rgba_sha256": "755ec3b52d9e659016006546609c99863391dfdc3832cc3c50cdd5d2cc304afd",
+    "bbox": [
+      48,
+      53,
+      101,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "spineup",
+      "frame": 4,
+      "dy": -1,
+      "correction": "resume/corrected/spineup/04.png"
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "무료 정확 보정: 모은 손날·손목 연결 반영. execute 고정 손, grabstab 중복 팔 제거, super X 교차. 얼굴/하체 보존 확인. 사용자 시각 승인과 별개",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "throw",
+    "frame": 0,
+    "rendered_rgba_sha256": "d1d82a53a1d9d939a9a69c42516af4a56e6e9d946584428e9876b18bbdbbec7f",
+    "bbox": [
+      48,
+      54,
+      93,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "throw",
+      "frame": 0,
+      "dy": 0,
+      "correction": "resume/corrected/throw/00.png"
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "무료 정확 보정: 모은 손날·손목 연결 반영. execute 고정 손, grabstab 중복 팔 제거, super X 교차. 얼굴/하체 보존 확인. 사용자 시각 승인과 별개",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "throw",
+    "frame": 1,
+    "rendered_rgba_sha256": "e41d5c8d123f142bca25d77f5ffeac5dd1cf0560cb0af61049dfd9274f69e817",
+    "bbox": [
+      48,
+      53,
+      114,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "throw",
+      "frame": 1,
+      "dy": 0,
+      "correction": "resume/corrected/throw/01.png"
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "무료 정확 보정: 모은 손날·손목 연결 반영. execute 고정 손, grabstab 중복 팔 제거, super X 교차. 얼굴/하체 보존 확인. 사용자 시각 승인과 별개",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "throw",
+    "frame": 2,
+    "rendered_rgba_sha256": "4f216633307b5723d712906c090f421a91b3914f002b0338b2b03487f78b7106",
+    "bbox": [
+      48,
+      53,
+      118,
+      136
+    ],
+    "opaque_bottom_y": 135,
+    "source": {
+      "clip": "throw",
+      "frame": 2,
+      "dy": 0,
+      "correction": "resume/corrected/throw/02.png"
+    },
+    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
+    "hands_grounding_and_motion": "무료 정확 보정: 모은 손날·손목 연결 반영. execute 고정 손, grabstab 중복 팔 제거, super X 교차. 얼굴/하체 보존 확인. 사용자 시각 승인과 별개",
+    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
+    "review_state": "needs_clip_review_or_correction",
+    "user_visual_approval": false
+  },
+  {
+    "clip": "throw",
+    "frame": 3,
+    "rendered_rgba_sha256": "104c8f33b53ebd560527c531c632221765fb84840dc17a910aa2faa67ff938c8",
     "bbox": [
       48,
       53,
@@ -705,100 +806,13 @@
     ],
     "opaque_bottom_y": 135,
     "source": {
-      "clip": "spineup",
-      "frame": 4,
-      "dy": -1
-    },
-    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "위 손 가리키기. 2·3은 빌더 교체로 같은 그림",
-    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
-    "review_state": "needs_clip_review_or_correction",
-    "user_visual_approval": false
-  },
-  {
-    "clip": "throw",
-    "frame": 0,
-    "rendered_rgba_sha256": "0c44ede76c4fed5110e6cf91373fe55776745ff6b3d508fdbe447b84a79da700",
-    "bbox": [
-      48,
-      54,
-      94,
-      136
-    ],
-    "opaque_bottom_y": 135,
-    "source": {
-      "clip": "throw",
-      "frame": 0,
-      "dy": 0
-    },
-    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "위 손 검지 가리키기",
-    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
-    "review_state": "needs_clip_review_or_correction",
-    "user_visual_approval": false
-  },
-  {
-    "clip": "throw",
-    "frame": 1,
-    "rendered_rgba_sha256": "b3c0a72e95752d23daf85c9ca85e0c56bf942f8027d55e6f2ca31cacac88fce6",
-    "bbox": [
-      48,
-      53,
-      113,
-      136
-    ],
-    "opaque_bottom_y": 135,
-    "source": {
-      "clip": "throw",
-      "frame": 1,
-      "dy": 0
-    },
-    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "앞으로 뻗은 손이 주먹",
-    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
-    "review_state": "needs_clip_review_or_correction",
-    "user_visual_approval": false
-  },
-  {
-    "clip": "throw",
-    "frame": 2,
-    "rendered_rgba_sha256": "877d893ca3a56a536c9e2fbc667fdf53a292575d5c63417f891c4000ac26507f",
-    "bbox": [
-      48,
-      53,
-      119,
-      136
-    ],
-    "opaque_bottom_y": 135,
-    "source": {
-      "clip": "throw",
-      "frame": 2,
-      "dy": 0
-    },
-    "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "양손 가리키기",
-    "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
-    "review_state": "needs_clip_review_or_correction",
-    "user_visual_approval": false
-  },
-  {
-    "clip": "throw",
-    "frame": 3,
-    "rendered_rgba_sha256": "cfc287e8e88d177787c396182acd3396376e540e4c4e74f76f0cfa5e2bc5a7d3",
-    "bbox": [
-      48,
-      53,
-      103,
-      136
-    ],
-    "opaque_bottom_y": 135,
-    "source": {
       "clip": "throw",
       "frame": 3,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/throw/03.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "위 손 검지 가리키기",
+    "hands_grounding_and_motion": "무료 정확 보정: 모은 손날·손목 연결 반영. execute 고정 손, grabstab 중복 팔 제거, super X 교차. 얼굴/하체 보존 확인. 사용자 시각 승인과 별개",
     "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -982,21 +996,22 @@
   {
     "clip": "toss",
     "frame": 2,
-    "rendered_rgba_sha256": "66c6be0c6367e081d47f644d31201c65659248997b0f9151c8c276b0b9931093",
+    "rendered_rgba_sha256": "e79a044c20355a654f14bf80bf73d228a86a32564811b977056b3f48acf5240a",
     "bbox": [
       58,
       44,
-      112,
+      114,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "toss",
       "frame": 3,
-      "dy": -1
+      "dy": -1,
+      "correction": "resume/corrected/toss/02.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "2·3·4 같은 교체 그림, 손끝 가리키기. 끝 장은 자세 재진입 필요",
+    "hands_grounding_and_motion": "무료 정확 보정: 모은 손날·손목 연결 반영. execute 고정 손, grabstab 중복 팔 제거, super X 교차. 얼굴/하체 보존 확인. 사용자 시각 승인과 별개",
     "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -1004,21 +1019,22 @@
   {
     "clip": "toss",
     "frame": 3,
-    "rendered_rgba_sha256": "66c6be0c6367e081d47f644d31201c65659248997b0f9151c8c276b0b9931093",
+    "rendered_rgba_sha256": "e79a044c20355a654f14bf80bf73d228a86a32564811b977056b3f48acf5240a",
     "bbox": [
       58,
       44,
-      112,
+      114,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "toss",
       "frame": 3,
-      "dy": -1
+      "dy": -1,
+      "correction": "resume/corrected/toss/03.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "2·3·4 같은 교체 그림, 손끝 가리키기. 끝 장은 자세 재진입 필요",
+    "hands_grounding_and_motion": "무료 정확 보정: 모은 손날·손목 연결 반영. execute 고정 손, grabstab 중복 팔 제거, super X 교차. 얼굴/하체 보존 확인. 사용자 시각 승인과 별개",
     "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -1026,21 +1042,22 @@
   {
     "clip": "toss",
     "frame": 4,
-    "rendered_rgba_sha256": "66c6be0c6367e081d47f644d31201c65659248997b0f9151c8c276b0b9931093",
+    "rendered_rgba_sha256": "e79a044c20355a654f14bf80bf73d228a86a32564811b977056b3f48acf5240a",
     "bbox": [
       58,
       44,
-      112,
+      114,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "toss",
       "frame": 3,
-      "dy": -1
+      "dy": -1,
+      "correction": "resume/corrected/toss/04.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "2·3·4 같은 교체 그림, 손끝 가리키기. 끝 장은 자세 재진입 필요",
+    "hands_grounding_and_motion": "무료 정확 보정: 모은 손날·손목 연결 반영. execute 고정 손, grabstab 중복 팔 제거, super X 교차. 얼굴/하체 보존 확인. 사용자 시각 승인과 별개",
     "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -1202,7 +1219,7 @@
   {
     "clip": "grabstab",
     "frame": 0,
-    "rendered_rgba_sha256": "273f4c2cb5e499ef0c3e7a6a1f06b1e3f7066f381a2bbab7c78aac5071d26eff",
+    "rendered_rgba_sha256": "08d6a36d989eb320371df840db150d540616b3d2f81f41a6d961bd57f0c6dc2f",
     "bbox": [
       66,
       47,
@@ -1213,10 +1230,11 @@
     "source": {
       "clip": "grabstab",
       "frame": 0,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/grabstab/00.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "두 손 검지 가리키기, 손날 관수 불충족",
+    "hands_grounding_and_motion": "무료 정확 보정: 모은 손날·손목 연결 반영. execute 고정 손, grabstab 중복 팔 제거, super X 교차. 얼굴/하체 보존 확인. 사용자 시각 승인과 별개",
     "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -1224,21 +1242,22 @@
   {
     "clip": "grabstab",
     "frame": 1,
-    "rendered_rgba_sha256": "a10e5b976a0db61e150111985aebba9ca547483aedc48fc694ed888e0e8222b1",
+    "rendered_rgba_sha256": "cdef16b2ccaa3df0f625f8847d9d55da17391fa62f47dfdc5d494eb12e9d6158",
     "bbox": [
       66,
       47,
-      116,
+      117,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "grabstab",
       "frame": 1,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/grabstab/01.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "두 손 검지 가리키기, 손날 관수 불충족",
+    "hands_grounding_and_motion": "무료 정확 보정: 모은 손날·손목 연결 반영. execute 고정 손, grabstab 중복 팔 제거, super X 교차. 얼굴/하체 보존 확인. 사용자 시각 승인과 별개",
     "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -1246,21 +1265,22 @@
   {
     "clip": "grabstab",
     "frame": 2,
-    "rendered_rgba_sha256": "1942eb98df0cc89536d6942be5c4e4ea4b792f9b36be6772d394224d9e8c80ab",
+    "rendered_rgba_sha256": "b94969802a7636676f34232586448d64d57a58245ab320e96deb64620a0969db",
     "bbox": [
       66,
       47,
-      122,
+      120,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "grabstab",
       "frame": 2,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/grabstab/02.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "두 손 검지 가리키기, 손날 관수 불충족",
+    "hands_grounding_and_motion": "무료 정확 보정: 모은 손날·손목 연결 반영. execute 고정 손, grabstab 중복 팔 제거, super X 교차. 얼굴/하체 보존 확인. 사용자 시각 승인과 별개",
     "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -1268,7 +1288,7 @@
   {
     "clip": "grabstab",
     "frame": 3,
-    "rendered_rgba_sha256": "66573ad6d9fc3ad290b77849bc987e3e0c3faa5cab90d4ddba18ce6a0aac1a5a",
+    "rendered_rgba_sha256": "a27d2528baff940d525786d1704d08865047bc62f4386155ef1490cff653d17f",
     "bbox": [
       66,
       47,
@@ -1279,10 +1299,11 @@
     "source": {
       "clip": "grabstab",
       "frame": 3,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/grabstab/03.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "두 손 검지 가리키기, 손날 관수 불충족",
+    "hands_grounding_and_motion": "무료 정확 보정: 모은 손날·손목 연결 반영. execute 고정 손, grabstab 중복 팔 제거, super X 교차. 얼굴/하체 보존 확인. 사용자 시각 승인과 별개",
     "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -1444,21 +1465,22 @@
   {
     "clip": "super",
     "frame": 7,
-    "rendered_rgba_sha256": "ba28d5ed2070fa7f14eb0e66b68a7a7d0cf799250b1bf9ca95ee2c63d3d9c247",
+    "rendered_rgba_sha256": "41d8d593e77cdce88ad3262eb075cc98c9dc0f62c44aeda79f06f4bfdbc8f190",
     "bbox": [
       49,
       54,
-      115,
+      116,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "super",
       "frame": 7,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/super/07.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "마무리 X 대신 두 손 가리키기",
+    "hands_grounding_and_motion": "무료 정확 보정: 모은 손날·손목 연결 반영. execute 고정 손, grabstab 중복 팔 제거, super X 교차. 얼굴/하체 보존 확인. 사용자 시각 승인과 별개",
     "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -1466,21 +1488,22 @@
   {
     "clip": "super",
     "frame": 8,
-    "rendered_rgba_sha256": "9eabe2b4b73e53d5affdd05fb11fde120d0cab857682e48f9b3b9fe07c62878d",
+    "rendered_rgba_sha256": "e39af5e4ec40bf7a852e78d1f7a4bb9867ea020c05c7bdeace88fedc90a82804",
     "bbox": [
       49,
       54,
-      115,
+      116,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "super",
       "frame": 8,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/super/08.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "마무리 X 대신 두 손 가리키기",
+    "hands_grounding_and_motion": "무료 정확 보정: 모은 손날·손목 연결 반영. execute 고정 손, grabstab 중복 팔 제거, super X 교차. 얼굴/하체 보존 확인. 사용자 시각 승인과 별개",
     "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false

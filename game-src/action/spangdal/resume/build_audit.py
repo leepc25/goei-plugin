@@ -28,6 +28,9 @@ FINDINGS={
  'sneak':{5:'발목 옆 회색 줄'},
  'stance':{i:'손 외곽이 뭉쳐 손가락 모양 판정 어려움' for i in range(4)},
 }
+for clip in ('execute','spineup','throw','toss','grabstab','super'):
+ for i in FINDINGS.get(clip,{}):
+  if (BASE/f'resume/corrected/{clip}/{i:02}.png').exists():FINDINGS[clip][i]='무료 정확 보정: 모은 손날·손목 연결 반영. execute 고정 손, grabstab 중복 팔 제거, super X 교차. 얼굴/하체 보존 확인. 사용자 시각 승인과 별개'
 FINDINGS['stab1']={i:'새 관수 손 후보 반영. 손목 연결·손날 폭 검수; 사용자 승인 대기' for i in [1,2,3,4]}
 FINDINGS['pierce3']={i:'새 X 교차 자세 반영. 준비2·회수6 손끝은 추가 수정 후보; 사용자 승인 대기' for i in range(8)}
 FINDINGS['jump']={i:'새 앞뒤 다리 분리 자세 반영. 준비0~1, 공중2~5, 착지6~7. 비반복 전환 검수' for i in range(8)}

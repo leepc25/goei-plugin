@@ -1,0 +1,122 @@
+{
+  "entries": [
+    {
+      "revision": "combat-exact-r1",
+      "pixel_tool_image_id": "571d2508-34ac-4407-b06d-2f68f6acc68b",
+      "job_id": null,
+      "actual_cost": 0,
+      "unit": "generations",
+      "status": "completed",
+      "request_sha256": "e35d1672fef0196ccd691fb4ad6c12d182e6c4b31d8b47e13c62e4a464d99340"
+    },
+    {
+      "revision": "combat-exact-r2",
+      "pixel_tool_image_id": "25030636-9dfa-4690-bf53-d638c1a924c5",
+      "job_id": null,
+      "actual_cost": 0,
+      "unit": "generations",
+      "status": "completed",
+      "request_sha256": "55ab39d5845258ba6d3aa1a19ec2d1500c1672a7f49a192be6cb422df459eb7a"
+    },
+    {
+      "revision": "idle_pipe-exact-r2",
+      "pixel_tool_image_id": "bb7b999e-30b7-4a1c-9715-5d5c0eb3e5e3",
+      "job_id": null,
+      "actual_cost": 0,
+      "unit": "generations",
+      "status": "completed",
+      "request_sha256": "14ce29b421f37256af3fe36d33121ba52ca8b0249bb6a0442e0251cade8184b9"
+    },
+    {
+      "revision": "idle_shotgun-exact-r2",
+      "pixel_tool_image_id": "e4b0c692-3d51-412a-a2e1-f900edd32a20",
+      "job_id": null,
+      "actual_cost": 0,
+      "unit": "generations",
+      "status": "completed",
+      "request_sha256": "67cd24375a89487acc85357dc0481ddd518d39e3085fade48939cf8e2c26cb82"
+    },
+    {
+      "revision": "motion-contours-r1",
+      "pixel_tool_image_id": "ef745afa-f479-497d-9f34-3a981eb0c8a2",
+      "job_id": null,
+      "actual_cost": 0,
+      "unit": "generations",
+      "status": "completed",
+      "request_sha256": "30149c2b6a25f650b16859f842cab1b148cb65c38594488fec7a147f017c0746"
+    },
+    {
+      "revision": "pipe-exact-r1",
+      "pixel_tool_image_id": null,
+      "job_id": null,
+      "actual_cost": 0,
+      "unit": "generations",
+      "status": "error",
+      "request_sha256": "1968c9a9a72af55daaf1fb6b1fd68bdb25c63c7c01c859541f0c6503b7ed8c97"
+    },
+    {
+      "revision": "pipe-exact-r2",
+      "pixel_tool_image_id": "685dd6a4-4344-417c-be0f-900946d3f289",
+      "job_id": null,
+      "actual_cost": 0,
+      "unit": "generations",
+      "status": "completed",
+      "request_sha256": "f91b29736435818cf22d96cb7188a0218911ef9dde22203d0e2c916c146f7f3a"
+    },
+    {
+      "revision": "run_shotgun-exact-r2",
+      "pixel_tool_image_id": "98a1ed47-525c-47ca-8704-3b5306d04bb5",
+      "job_id": null,
+      "actual_cost": 0,
+      "unit": "generations",
+      "status": "completed",
+      "request_sha256": "30e996d4b08e466f78310a27eaa1c721806db03fe448527160528dc96c88fd7f"
+    },
+    {
+      "revision": "stab1-exact-r3",
+      "pixel_tool_image_id": "691c09ba-5e3f-4b6a-a3a3-dab30a50e20b",
+      "job_id": null,
+      "actual_cost": 0,
+      "unit": "generations",
+      "status": "completed",
+      "request_sha256": "77dbccf4fb2fc6f49a27f620c18392510466d88a107e45e9e8bf7a6781c17adc"
+    },
+    {
+      "revision": "stock-colors-r2",
+      "pixel_tool_image_id": "8fcdbbef-3d3b-4deb-98dc-ac5579c2848f",
+      "job_id": null,
+      "actual_cost": 0,
+      "unit": "generations",
+      "status": "completed",
+      "request_sha256": "edb9b804ee17976e58a71ed48c72833cceeee37fc4c6aeb1e055a3af754b3506"
+    },
+    {
+      "revision": "throw-waist-r3",
+      "pixel_tool_image_id": "9e8c7aec-d97d-464b-976b-dfb6487e691c",
+      "job_id": null,
+      "actual_cost": 0,
+      "unit": "generations",
+      "status": "completed",
+      "request_sha256": "e698ffc7e06663590ee5f77b29cfecbb1df9b4547020a68f4dce14c0e82d4d4b"
+    },
+    {
+      "revision": "walk_pipe-exact-r2",
+      "pixel_tool_image_id": "20922567-1ca5-4aec-a379-b0347d557b87",
+      "job_id": null,
+      "actual_cost": 0,
+      "unit": "generations",
+      "status": "completed",
+      "request_sha256": "931200b3d20b7e6d2452c210ce4de17d3dc92cd30362367e41ce48cef1d22b77"
+    },
+    {
+      "revision": "walk_shotgun-exact-r2",
+      "pixel_tool_image_id": "ba2ebaeb-f6a1-4203-a337-9dd951f4aeba",
+      "job_id": null,
+      "actual_cost": 0,
+      "unit": "generations",
+      "status": "completed",
+      "request_sha256": "1d611e911e60887f863fdd09a868b4141944ffb6e92063a38599e463fa023a2a"
+    }
+  ],
+  "actual_total": 0
+}

@@ -47,6 +47,42 @@
       "frame": 3,
       "weapon": "shotgun",
       "toggle_changes_pixels": true
+    },
+    {
+      "clip": "execute",
+      "frame": 3,
+      "weapon": null,
+      "toggle_changes_pixels": false
+    },
+    {
+      "clip": "spineup",
+      "frame": 3,
+      "weapon": null,
+      "toggle_changes_pixels": false
+    },
+    {
+      "clip": "throw",
+      "frame": 2,
+      "weapon": null,
+      "toggle_changes_pixels": false
+    },
+    {
+      "clip": "toss",
+      "frame": 3,
+      "weapon": null,
+      "toggle_changes_pixels": false
+    },
+    {
+      "clip": "grabstab",
+      "frame": 2,
+      "weapon": null,
+      "toggle_changes_pixels": false
+    },
+    {
+      "clip": "super",
+      "frame": 7,
+      "weapon": null,
+      "toggle_changes_pixels": false
     }
   ],
   "original_frames_unchanged": true,
@@ -168,6 +204,41 @@
       "sha256": "03ec245e5f939f6f270127057f67905a14de168d3cdbd5999094d58f31453763"
     },
     {
+      "clip": "execute",
+      "frame": 0,
+      "sha256": "3bac497f04aef6c7998e45ab108da112283853e34b677577e79aea2307454c6d"
+    },
+    {
+      "clip": "execute",
+      "frame": 1,
+      "sha256": "724ac7de31761f24654b888f53472ed4e9168bd916a6cda96127b0e24b4973d3"
+    },
+    {
+      "clip": "execute",
+      "frame": 2,
+      "sha256": "5328f1c91dbb80f6f845f727f102d02bad53064ff70f058b0487915125c7aa39"
+    },
+    {
+      "clip": "execute",
+      "frame": 3,
+      "sha256": "0c8821d3e0364dfb22ea7e64e6c17baf9fa059c2749b39d59978ada1892817e5"
+    },
+    {
+      "clip": "execute",
+      "frame": 4,
+      "sha256": "12579c1e7bbab3e4c147be97eb1e632068945f265cd09581467ed86d63c58bdc"
+    },
+    {
+      "clip": "execute",
+      "frame": 5,
+      "sha256": "c772c9dd30e9bbcd114010e45c13a426573f2faccf52d932f189bfbabcc62ae7"
+    },
+    {
+      "clip": "execute",
+      "frame": 6,
+      "sha256": "3fe84419ad75871e07fac535bca8e69adbb843bf53ad1a8f30b95f4e24a481a3"
+    },
+    {
       "clip": "passslash",
       "frame": 0,
       "sha256": "e467c5b958f1c4a9847b75eebffb73e3175be753157f66f2a713b1747dec2fdf"
@@ -176,6 +247,86 @@
       "clip": "passslash",
       "frame": 5,
       "sha256": "4856ca1f9a9d7b5a50417760b87307ce0ca8216ea7e7db4b5a7809fdb8c65133"
+    },
+    {
+      "clip": "spineup",
+      "frame": 2,
+      "sha256": "e3603a885b76bfab9bb2ab5d6da9997b1b1e1f2c4e07ac6d1b232fabad07f211"
+    },
+    {
+      "clip": "spineup",
+      "frame": 3,
+      "sha256": "e3603a885b76bfab9bb2ab5d6da9997b1b1e1f2c4e07ac6d1b232fabad07f211"
+    },
+    {
+      "clip": "spineup",
+      "frame": 4,
+      "sha256": "e616115e9ab2e53a27fb9db464065111be9f22da72583966591934d0b2b6c6b1"
+    },
+    {
+      "clip": "throw",
+      "frame": 0,
+      "sha256": "38f283852db75d331c16ae3ab0b69f8521d0b3ad4627939e29626eef508c8d86"
+    },
+    {
+      "clip": "throw",
+      "frame": 1,
+      "sha256": "c27ed11021301121e95d14016ccb2bd07074aeeb3bdc16d1467e990576bc5d6f"
+    },
+    {
+      "clip": "throw",
+      "frame": 2,
+      "sha256": "460995ec5852b11e331c3557dbfafbb8ca896e54ac694cb9f756eedb9c2b224b"
+    },
+    {
+      "clip": "throw",
+      "frame": 3,
+      "sha256": "b9123e46ffd1e881954e627f6eebee7a653ecc996bd4ff6827f82931ecc6092d"
+    },
+    {
+      "clip": "grabstab",
+      "frame": 0,
+      "sha256": "e22465c26dae404486a0a1cdabca0524e67701591f2b0bbcc5500f50c4dba59c"
+    },
+    {
+      "clip": "grabstab",
+      "frame": 1,
+      "sha256": "699711f03631fb7270acb309ee071192ef11ce95e5e803996d5312d2fda6d9a6"
+    },
+    {
+      "clip": "grabstab",
+      "frame": 2,
+      "sha256": "927ab945ce22723eaa7179e1a8d1cae8115932f8bf7782c319860ac25134f1d6"
+    },
+    {
+      "clip": "grabstab",
+      "frame": 3,
+      "sha256": "eb96ba5553eff81b736ac4bc177b88c49512cd77bfa5f16ada13094348fff553"
+    },
+    {
+      "clip": "super",
+      "frame": 7,
+      "sha256": "b4a3b3f144d71f87819a4877efa86009094e5222dc55a4bc0c4cba2ebfd939b5"
+    },
+    {
+      "clip": "super",
+      "frame": 8,
+      "sha256": "e7f524a0e7b5fda1702a32d523c1c70b5163dc45ec19fbfe4fd4ab4e45e4e2ac"
+    },
+    {
+      "clip": "toss",
+      "frame": 2,
+      "sha256": "bea3d3d6fff0a624077e371515c138a4632746bd2b88d8ecf90252aa9718739e"
+    },
+    {
+      "clip": "toss",
+      "frame": 3,
+      "sha256": "bea3d3d6fff0a624077e371515c138a4632746bd2b88d8ecf90252aa9718739e"
+    },
+    {
+      "clip": "toss",
+      "frame": 4,
+      "sha256": "bea3d3d6fff0a624077e371515c138a4632746bd2b88d8ecf90252aa9718739e"
     },
     {
       "clip": "pipe",

@@ -182,7 +182,8 @@ def hands_of(k, n, sources=None):
     import math
     override = os.path.join(BASE, 'resume', 'corrected', k, 'hands.json')
     if os.path.isfile(override):
-        hands = json.load(open(override, encoding='utf-8'))[:n]
+        with open(override, encoding='utf-8') as f:
+            hands = json.load(f)[:n]
         if sources:
             hands = [[[x, y + sources[i].get('dy', 0), angle] for x, y, angle in row] for i, row in enumerate(hands)]
         return hands

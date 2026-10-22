@@ -488,3 +488,5 @@ e
 
 2026-10-22T11:47:46.659688+00:00 resume_job=c40aab31-b7a6-4d05-aeaf-907041ed603c actual_cost=3.0 unit=generations revision=execute-stable-hands-r1
 2026-10-22T11:47:46.659688+00:00 resume_job=896b959c-f221-462b-a84f-c37c117c8377 actual_cost=3.0 unit=generations revision=jump-split-r1
+
+2026-10-22T12:01:18.982740+00:00 pixel_tool_image_id=25030636-9dfa-4690-bf53-d638c1a924c5 actual_cost=0 revision=combat-exact-r2; throw-waist-r3=9e8c7aec-d97d-464b-976b-dfb6487e691c cost=0

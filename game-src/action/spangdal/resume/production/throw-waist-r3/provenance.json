@@ -1,0 +1,13 @@
+{
+  "source": "resume\\production\\combat-exact-r2\\throw-02.png",
+  "input_sha256": "bd6cf83a7c76bf29b954ac87f0915e0b317e3986f49e0c2c0cc3b6531c0aa380",
+  "region": [
+    79,
+    93,
+    85,
+    101
+  ],
+  "cost": 0,
+  "reason": "Remove the third pale hand fragment outside right waist silhouette after both real hands extend forward.",
+  "user_visual_approval": false
+}

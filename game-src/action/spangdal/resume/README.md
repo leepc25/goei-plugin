@@ -8,7 +8,7 @@
 - 큐라스 이미 과금된2건은 총괄/큐라스 담당 소유이며 호출하지 않았다. 총괄 채팅에 제출 ID·예상/실제 비용을 전달했다. 준비 도구 인계는 `codex/character-production-control`의 `game-src/action/character-resume/handoff-index.json`와 아래 경로표 사용.
 
 ## 실제 반영
-독립 `release/demo/spangdal-full.html`에 **15클립,69개 override 슬롯**을 연결했다. 이 수는 신규 AI 생성 장수와 다르다(부분 편집·무료 픽셀 정리·원본과 같은 슬롯 포함).
+독립 `release/demo/spangdal-full.html`에 **21클립,92개 override 슬롯**을 연결했다. 이 수는 신규 AI 생성 장수와 다르다(부분 편집·무료 픽셀 정리·원본과 같은 슬롯 포함).
 - stab1 1~4: 관수 손 후보. 넓은 마스크에서 회수 손목이 잘린 후보는 제외하고 전체 프레임 inpaint 후 무료 guarded patch로 교정.
 - pierce3: 새 뼈대의 X 교차 공격8장. 준비2·회수6 손끝은 후속 수정 대상.
 - jump: 새 앞뒤 다리 분리 점프8장. 공중2~5, 준비0~1, 착지6~7. 사용자 시각 승인 대기.
@@ -16,12 +16,22 @@
 - run/passslash/carry2_run/stepup/sneak: 다리 회색·보라색 이중 윤곽 정리. 알파/발 위치 보존이며 이동 속도·발 고정 문제 전체 해결을 의미하지 않는다.
 - 원본 `full/clips`는 수정하지 않았다. 수정본은 `resume/corrected`, 새 회수 원본/요청/입력 해시/영수증은 `resume/production`. 엔진·본부·스테이지·공용 atlas·통합 게임 HTML 변경 없음.
 
-## 반려 및 남은 결함
-**생성 완료는 품질 합격이나 사용자 승인과 다르다. 전체 전투·이동 품질 검수는 아직 불합격/수정 필요다.**
-- execute 새8장: 높은 손 위치는 안정됐지만 검지/낮은 손 형태 결함. 전부 반영 제외하고 원본/실패 이유 보존. 같은 기준+뼈대 방식 재시도 금지.
+## 무료 후속 수정 · 21:00 KST
+승인 대기를 이유로 중단하지 않고 execute/spineup/throw/toss/grabstab/super 6클립의 손을 후속 수정했다. 유료 추가0, 누계59 유지.
+- `combat-exact-r2`:19프레임 4,132개 정확 픽셀 수정. 네 손가락을 모은 손날·손목 연결. grabstab2의 세 번째 팔 제거, super7~8 팔을 X로 교차. 얼굴과 하체 픽셀 보존 검사 통과.
+- `execute`: 기존에 유료 회수한 안정된 자세에 무료 손 수정을 적용. 높은 손은1~5장에서 동일 좌표, 낮은 손은 위로 찌르기. 실패한 원래 생성 그림은 보존하며 직접 승격하지 않았다.
+- `throw-waist-r3`: throw2 허리 옆 세 번째 손 잔여28px 추가 제거.
+- 무료 첫 보정 r1은 손목 연결 틈으로 미반영, r2에서 소매 연결 폭을 직접 교정. 유료 반복 호출 없음.
+- `spineup2→3`, `toss2/4→3`의 기존 장 대체는 유지되므로 toss 후속 회수 동작은 여전히 중복 장을 포함한다. 이 수정이 전체 동작 타이밍 개선을 뜻하지 않는다.
+- 도구 결과 ID: r1 `571d2508-34ac-4407-b06d-2f68f6acc68b`, r2 `25030636-9dfa-4690-bf53-d638c1a924c5`, 허리 `9e8c7aec-d97d-464b-976b-dfb6487e691c`. 유료 작업 ID와 구분한다.
+- `check_combat.py`: 지정 픽셀 외 불변·처형 고정 손·중복 팔 제거·메타데이터 장수 검사 통과. `review/combat-demo.png` 실제 HTML 화면. PC/폰 검사 재통과.
+
+## 반려 및 남은 검수
+**생성/무료 보정 완료는 사용자 시각 승인과 다르다.** 전체 묶음의 사용자 승인은 false이며, pierce3 준비/회수 손끝·slash2 손 번갈이·toss 회수 중복·무기 제거 부위 소매 실루엣은 후속 검수 대상으로 남는다.
+- execute 최초 유료8장: 검지/낮은 손 형태로 그대로는 반려. 무료 후속 수정본만 반영. 원본/실패 이유 보존. 같은 기준+뼈대 유료 재시도 금지.
 - stab1-sequence-r1 frame4: crop 문맥 부족/마스크 경계에서 팔 잘림. 반영 제외. 전체 프레임 방식으로 전환.
 - free pipe-exact-r1:1024px 한도 초과. 유료 차감 없이3열576px로 변경.
-- 기존 execute/spineup/throw/toss/grabstab/super의 손, slash2 손 번갈이와 잡기 겹침은 후속 수정 필요. grabstab2의 팔 중복도 유지되는 결함이다.
+- 기존 execute/spineup/throw/toss/grabstab/super의 검지형 손과 grabstab2 팔 중복은 위 무료 보정으로 교체했다. 전체 손의 세부 표현과 실제 상대를 잡는 모습의 사용자 판정은 별도다.
 - 생활·사교72클립 양산 보류. `user_visual_approval=false` 유지.
 
 ## 비용 확정표

@@ -1,0 +1,725 @@
+{
+  "sources": [
+    {
+      "clip": "execute",
+      "frame": 1,
+      "path": "resume\\production\\execute-stable-hands-r1\\result-01.png",
+      "sha256": "85658fdb5cb527a2589d72dfb8acd451b8e40da6f2ac5067850a519d7776b210",
+      "tile": [
+        0,
+        0,
+        192,
+        144
+      ],
+      "changed_pixels": 117,
+      "hands": [
+        [
+          [
+            95,
+            50,
+            104,
+            61
+          ],
+          [
+            97,
+            58
+          ],
+          -48,
+          9
+        ],
+        [
+          [
+            80,
+            80,
+            88,
+            86
+          ],
+          [
+            82,
+            83
+          ],
+          -8,
+          9
+        ]
+      ]
+    },
+    {
+      "clip": "execute",
+      "frame": 2,
+      "path": "resume\\production\\execute-stable-hands-r1\\result-02.png",
+      "sha256": "a570bde47a4dd8140f26890c27fc15f9833cb1aed459b1fb7b8cbae3d11a4fd6",
+      "tile": [
+        192,
+        0,
+        192,
+        144
+      ],
+      "changed_pixels": 116,
+      "hands": [
+        [
+          [
+            95,
+            50,
+            104,
+            61
+          ],
+          [
+            97,
+            58
+          ],
+          -48,
+          9
+        ],
+        [
+          [
+            83,
+            77,
+            90,
+            83
+          ],
+          [
+            84,
+            80
+          ],
+          -12,
+          9
+        ]
+      ]
+    },
+    {
+      "clip": "execute",
+      "frame": 3,
+      "path": "resume\\production\\execute-stable-hands-r1\\result-03.png",
+      "sha256": "895d5ad0ea84151e30acaa6b4fc98e2c45733d278e930a6d15d4240b2b907b11",
+      "tile": [
+        384,
+        0,
+        192,
+        144
+      ],
+      "changed_pixels": 120,
+      "hands": [
+        [
+          [
+            95,
+            50,
+            104,
+            61
+          ],
+          [
+            97,
+            58
+          ],
+          -48,
+          9
+        ],
+        [
+          [
+            91,
+            61,
+            101,
+            70
+          ],
+          [
+            92,
+            67
+          ],
+          -38,
+          9
+        ]
+      ]
+    },
+    {
+      "clip": "execute",
+      "frame": 4,
+      "path": "resume\\production\\execute-stable-hands-r1\\result-04.png",
+      "sha256": "cd4dc69a0f70cafd53150e2a45e145e1570afbe99517b625108e7366f74116cc",
+      "tile": [
+        576,
+        0,
+        192,
+        144
+      ],
+      "changed_pixels": 122,
+      "hands": [
+        [
+          [
+            95,
+            50,
+            104,
+            61
+          ],
+          [
+            97,
+            58
+          ],
+          -48,
+          9
+        ],
+        [
+          [
+            91,
+            61,
+            100,
+            70
+          ],
+          [
+            92,
+            67
+          ],
+          -38,
+          9
+        ]
+      ]
+    },
+    {
+      "clip": "execute",
+      "frame": 5,
+      "path": "resume\\production\\execute-stable-hands-r1\\result-05.png",
+      "sha256": "35f8f88e991997e618351ec03e84f0424e358b77847f18a1e49a0853eaf39fdd",
+      "tile": [
+        768,
+        0,
+        192,
+        144
+      ],
+      "changed_pixels": 123,
+      "hands": [
+        [
+          [
+            95,
+            50,
+            104,
+            61
+          ],
+          [
+            97,
+            58
+          ],
+          -48,
+          9
+        ],
+        [
+          [
+            91,
+            61,
+            100,
+            70
+          ],
+          [
+            92,
+            67
+          ],
+          -38,
+          9
+        ]
+      ]
+    },
+    {
+      "clip": "execute",
+      "frame": 6,
+      "path": "resume\\production\\execute-stable-hands-r1\\result-06.png",
+      "sha256": "71f5546b0279211061831fa8ca328cb03ff526adf4ca882d2e551c0acdabc29c",
+      "tile": [
+        0,
+        144,
+        192,
+        144
+      ],
+      "changed_pixels": 116,
+      "hands": [
+        [
+          [
+            92,
+            68,
+            100,
+            76
+          ],
+          [
+            93,
+            73
+          ],
+          -12,
+          9
+        ],
+        [
+          [
+            89,
+            76,
+            96,
+            82
+          ],
+          [
+            90,
+            79
+          ],
+          -12,
+          8
+        ]
+      ]
+    },
+    {
+      "clip": "spineup",
+      "frame": 3,
+      "path": "full\\clips\\spineup\\03.png",
+      "sha256": "cf25dab0761c8cc82f37dbb5a9241085427e3fe86751b279ce821bfd157ff8c4",
+      "tile": [
+        192,
+        144,
+        192,
+        144
+      ],
+      "changed_pixels": 153,
+      "hands": [
+        [
+          [
+            86,
+            57,
+            94,
+            71
+          ],
+          [
+            89,
+            68
+          ],
+          -85,
+          10
+        ],
+        [
+          [
+            83,
+            89,
+            95,
+            97
+          ],
+          [
+            85,
+            93
+          ],
+          0,
+          10
+        ]
+      ]
+    },
+    {
+      "clip": "spineup",
+      "frame": 4,
+      "path": "full\\clips\\spineup\\04.png",
+      "sha256": "0ed440a3876f932a3164d62e35b03681bdab18c0ea482a503a4ef732ab0e595f",
+      "tile": [
+        384,
+        144,
+        192,
+        144
+      ],
+      "changed_pixels": 174,
+      "hands": [
+        [
+          [
+            92,
+            61,
+            102,
+            75
+          ],
+          [
+            94,
+            72
+          ],
+          -60,
+          11
+        ],
+        [
+          [
+            88,
+            91,
+            102,
+            98
+          ],
+          [
+            90,
+            95
+          ],
+          0,
+          10
+        ]
+      ]
+    },
+    {
+      "clip": "throw",
+      "frame": 0,
+      "path": "full\\clips\\throw\\00.png",
+      "sha256": "d579aa01296b7a57fc19db177fa7013675bc1449e2b31c272b9718813056c8a8",
+      "tile": [
+        576,
+        144,
+        192,
+        144
+      ],
+      "changed_pixels": 69,
+      "hands": [
+        [
+          [
+            86,
+            58,
+            94,
+            69
+          ],
+          [
+            89,
+            67
+          ],
+          -85,
+          10
+        ]
+      ]
+    },
+    {
+      "clip": "throw",
+      "frame": 1,
+      "path": "full\\clips\\throw\\01.png",
+      "sha256": "fde0700d875746196a43f82002cb0de8da2ec5f77632047936fe50a34fd6eeaf",
+      "tile": [
+        768,
+        144,
+        192,
+        144
+      ],
+      "changed_pixels": 80,
+      "hands": [
+        [
+          [
+            102,
+            70,
+            113,
+            79
+          ],
+          [
+            103,
+            75
+          ],
+          -8,
+          10
+        ]
+      ]
+    },
+    {
+      "clip": "throw",
+      "frame": 2,
+      "path": "full\\clips\\throw\\02.png",
+      "sha256": "c982d6046f17bac98e52cafeda3b17f825b3bf97bfa870419e8e03d8da32e4d8",
+      "tile": [
+        0,
+        288,
+        192,
+        144
+      ],
+      "changed_pixels": 200,
+      "hands": [
+        [
+          [
+            96,
+            64,
+            112,
+            72
+          ],
+          [
+            98,
+            69
+          ],
+          -14,
+          12
+        ],
+        [
+          [
+            103,
+            73,
+            119,
+            81
+          ],
+          [
+            105,
+            78
+          ],
+          -5,
+          12
+        ]
+      ]
+    },
+    {
+      "clip": "throw",
+      "frame": 3,
+      "path": "full\\clips\\throw\\03.png",
+      "sha256": "1464c030f21b8fc03ff3becd6e30fa6268a06413c6a3fdbeff7c488be3af055e",
+      "tile": [
+        192,
+        288,
+        192,
+        144
+      ],
+      "changed_pixels": 169,
+      "hands": [
+        [
+          [
+            87,
+            63,
+            103,
+            70
+          ],
+          [
+            89,
+            67
+          ],
+          -8,
+          12
+        ],
+        [
+          [
+            83,
+            90,
+            96,
+            97
+          ],
+          [
+            85,
+            94
+          ],
+          0,
+          10
+        ]
+      ]
+    },
+    {
+      "clip": "toss",
+      "frame": 3,
+      "path": "full\\clips\\toss\\03.png",
+      "sha256": "4577cc389f2c7190cfea743f61955eeee23d43bb1d6c0a42d4519010e1d37270",
+      "tile": [
+        384,
+        288,
+        192,
+        144
+      ],
+      "changed_pixels": 88,
+      "hands": [
+        [
+          [
+            100,
+            62,
+            112,
+            69
+          ],
+          [
+            102,
+            66
+          ],
+          -6,
+          11
+        ]
+      ]
+    },
+    {
+      "clip": "grabstab",
+      "frame": 0,
+      "path": "full\\clips\\grabstab\\00.png",
+      "sha256": "97f1eb1612f7767663810857ba4c2dd26ff045ec0ba732e0061dcb87c4c6d1d5",
+      "tile": [
+        576,
+        288,
+        192,
+        144
+      ],
+      "changed_pixels": 183,
+      "hands": [
+        [
+          [
+            102,
+            57,
+            116,
+            65
+          ],
+          [
+            104,
+            62
+          ],
+          -10,
+          11
+        ],
+        [
+          [
+            92,
+            72,
+            106,
+            79
+          ],
+          [
+            94,
+            76
+          ],
+          -5,
+          11
+        ]
+      ]
+    },
+    {
+      "clip": "grabstab",
+      "frame": 1,
+      "path": "full\\clips\\grabstab\\01.png",
+      "sha256": "e813faf767874f60e6944da33285ae80c73d056fde098d4f2112d014ef68f082",
+      "tile": [
+        768,
+        288,
+        192,
+        144
+      ],
+      "changed_pixels": 185,
+      "hands": [
+        [
+          [
+            103,
+            57,
+            116,
+            65
+          ],
+          [
+            105,
+            62
+          ],
+          -10,
+          10
+        ],
+        [
+          [
+            103,
+            70,
+            116,
+            78
+          ],
+          [
+            105,
+            75
+          ],
+          -5,
+          11
+        ]
+      ]
+    },
+    {
+      "clip": "grabstab",
+      "frame": 2,
+      "path": "full\\clips\\grabstab\\02.png",
+      "sha256": "0b034533f0d7a0de8f7a498a16869ca7c5523249f724963c049fef7403f847ba",
+      "tile": [
+        0,
+        432,
+        192,
+        144
+      ],
+      "changed_pixels": 489,
+      "hands": [
+        [
+          [
+            106,
+            57,
+            122,
+            66
+          ],
+          [
+            108,
+            63
+          ],
+          -12,
+          11
+        ],
+        [
+          [
+            99,
+            84,
+            114,
+            93
+          ],
+          [
+            101,
+            88
+          ],
+          28,
+          11
+        ]
+      ]
+    },
+    {
+      "clip": "grabstab",
+      "frame": 3,
+      "path": "full\\clips\\grabstab\\03.png",
+      "sha256": "901efe4a4d9473789080c3e4adb6c0f23e274801da97c7d448761521c0ad9a90",
+      "tile": [
+        192,
+        432,
+        192,
+        144
+      ],
+      "changed_pixels": 185,
+      "hands": [
+        [
+          [
+            104,
+            56,
+            117,
+            64
+          ],
+          [
+            106,
+            61
+          ],
+          -12,
+          10
+        ],
+        [
+          [
+            99,
+            76,
+            113,
+            85
+          ],
+          [
+            101,
+            80
+          ],
+          15,
+          11
+        ]
+      ]
+    },
+    {
+      "clip": "super",
+      "frame": 7,
+      "path": "full\\clips\\super\\07.png",
+      "sha256": "60f9761615c8430f6991b628e5756bf276647dedecaf1182c9aca106fba0e5f2",
+      "tile": [
+        384,
+        432,
+        192,
+        144
+      ],
+      "changed_pixels": 511,
+      "hands": []
+    },
+    {
+      "clip": "super",
+      "frame": 8,
+      "path": "full\\clips\\super\\08.png",
+      "sha256": "b9639cb80004c051e02af00904b2b9d5949af4e06eafc855d21350d7c791786b",
+      "tile": [
+        576,
+        432,
+        192,
+        144
+      ],
+      "changed_pixels": 514,
+      "hands": []
+    }
+  ],
+  "input_sha256": "10db558768d2f20c90dd7975b8ed5827176711956b55460d04c7d2e42d4bf6c7",
+  "cost": 0,
+  "method": "Artist-specified joined palm silhouettes; remove third arm; cross super forearms. No other character pixels.",
+  "user_visual_approval": false
+}

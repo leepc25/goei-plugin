@@ -1,0 +1,15 @@
+{
+  "exact_patch_pixels": 4132,
+  "unlisted_pixels_unchanged": true,
+  "execute_holding_hand_fixed_frames": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "grabstab_third_arm_region_empty": true,
+  "metadata_frames_match": true,
+  "additional_paid_cost": 0,
+  "user_visual_approval": false
+}
