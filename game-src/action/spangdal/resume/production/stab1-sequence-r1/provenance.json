@@ -1,0 +1,87 @@
+{
+  "clip": "stab1",
+  "sources": [
+    {
+      "clip": "stab1",
+      "frame": 1,
+      "path": "full\\clips\\stab1\\01.png",
+      "sha256": "9dd80f184e4974d76d07625a2ac71d8a1462140b59e79fab85016f29d6e1a6f2",
+      "box": [
+        80,
+        64,
+        144,
+        112
+      ],
+      "tile": [
+        0,
+        0,
+        64,
+        48
+      ],
+      "regions": [
+        [
+          102,
+          79,
+          126,
+          94
+        ]
+      ]
+    },
+    {
+      "clip": "stab1",
+      "frame": 3,
+      "path": "full\\clips\\stab1\\03.png",
+      "sha256": "d6675f188aa3f690430d55f3b5803d594002c983cea47b94897d7635513f8cd4",
+      "box": [
+        80,
+        64,
+        144,
+        112
+      ],
+      "tile": [
+        64,
+        0,
+        64,
+        48
+      ],
+      "regions": [
+        [
+          109,
+          78,
+          131,
+          92
+        ]
+      ]
+    },
+    {
+      "clip": "stab1",
+      "frame": 4,
+      "path": "full\\clips\\stab1\\04.png",
+      "sha256": "f8b809972f77ff4fc37a21baa8ef3b7e7a95f9a785f9bbda6c00220141246fd5",
+      "box": [
+        80,
+        64,
+        144,
+        112
+      ],
+      "tile": [
+        128,
+        0,
+        64,
+        48
+      ],
+      "regions": [
+        [
+          91,
+          79,
+          116,
+          99
+        ]
+      ]
+    }
+  ],
+  "input_sha256": "bc2999f4ff0ec52932f24ecfd625aaaeebb4982f44ab4c066854625183f00638",
+  "mask_sha256": "afe7d06458a8bc2076d1ef0ab53741ce84b64de5d86632acd810b804e2ecdffe",
+  "actual_cost": null,
+  "user_visual_approval": false
+}

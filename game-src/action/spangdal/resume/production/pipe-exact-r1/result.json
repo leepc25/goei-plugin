@@ -1,0 +1,9 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "error: 1 frame(s) of 1152x144 exceeds the pixel tools budget (max side 1024px, 8,388,608 pixels in total)"
+    }
+  ],
+  "isError": true
+}

@@ -10,11 +10,15 @@
 import argparse
 import base64
 import datetime as dt
-import fcntl
+import tempfile
 import hashlib
 import io
 import json
 import os
+if os.name == 'nt':
+    import msvcrt
+else:
+    import fcntl
 from pathlib import Path
 import re
 import sys
@@ -150,8 +154,12 @@ def main():
     if not re.fullmatch(r'[a-z0-9_-]+', a.revision):
         p.error('revision은 영문 소문자·숫자·_·-만 허용')
     folder = BASE / 'resume/candidates' / a.clip / a.revision
-    with open('/tmp/goei-pixellab-spangdal.lock', 'a') as lock:
-        fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    with open(Path(tempfile.gettempdir()) / 'goei-pixellab-spangdal.lock', 'a+b') as lock:
+        if os.name == 'nt':
+            if lock.tell() == 0: lock.write(b'0'); lock.flush()
+            lock.seek(0); msvcrt.locking(lock.fileno(), msvcrt.LK_NBLCK, 1)
+        else:
+            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
         if a.resume:
             print(json.dumps(recover(folder), ensure_ascii=False)); return
         ref = a.ref.resolve(); data = ref.read_bytes()

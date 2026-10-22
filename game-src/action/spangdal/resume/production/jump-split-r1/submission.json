@@ -1,0 +1,9 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "id: 896b959c-f221-462b-a84f-c37c117c8377\njob_id: 896b959c-f221-462b-a84f-c37c117c8377\ndescription: slim adult woman, short wavy dark purple bob, one golden eye, pale skin, black fitted suit jacket white shirt black tie knee-length pencil skirt dark stockings low heels. Empty OPEN FLAT HANDS: four straight fingers pressed together, thumbs tucked. NO pointing index fingers, NO fists, NO weapons, NO effects. Same face and outfit as reference.\naction: light high leap, legs clearly split front and back in air, upright torso, land and recover\nframes: 9\nsize: 192x144px\ntransparent: True\ncost: 3 generations\nstatus: processing (~5 min)\n\nhint: get_image(job_id=\"896b959c-f221-462b-a84f-c37c117c8377\")\nasset_id: aa93bf8d-c305-5f33-9ea6-4d8361066161\nasset_status: pending (saved to your gallery when generation completes)"
+    }
+  ],
+  "isError": false
+}

@@ -1,0 +1,25 @@
+{
+  "accepted_frames": [
+    {
+      "clip": "stab1",
+      "frame": 1,
+      "source_sha256": "9dd80f184e4974d76d07625a2ac71d8a1462140b59e79fab85016f29d6e1a6f2",
+      "output_sha256": "035f12fe263c77d63a85e135b77a98d42380fcece6192a434c8ee0f5ec9095ed",
+      "outside_allowed_region_changed": 0,
+      "candidate": "stab1-sequence-r1",
+      "user_visual_approval": false
+    },
+    {
+      "clip": "stab1",
+      "frame": 3,
+      "source_sha256": "d6675f188aa3f690430d55f3b5803d594002c983cea47b94897d7635513f8cd4",
+      "output_sha256": "8ed08d67b83d4e4adcc1b4a3e5aea26e4f8f1cafca2c85d9fe541324011ce8a6",
+      "outside_allowed_region_changed": 0,
+      "candidate": "stab1-sequence-r1",
+      "user_visual_approval": false
+    }
+  ],
+  "service_outside_mask_changed": 1,
+  "local_mask_composite": true,
+  "grid_mask_invariance_verified": true
+}

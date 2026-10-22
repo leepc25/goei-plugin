@@ -1,0 +1,103 @@
+{
+  "sources": [
+    {
+      "clip": "run",
+      "frame": 2,
+      "tile": [
+        0,
+        0,
+        192,
+        144
+      ],
+      "source_sha256": "b52d227faafc17f7d03e63da368153126acf1bc1328ab574d59335609aae0be0",
+      "changed_pixels": 11
+    },
+    {
+      "clip": "run",
+      "frame": 3,
+      "tile": [
+        192,
+        0,
+        192,
+        144
+      ],
+      "source_sha256": "54b7edb66860af9646872f129804bcbcec933f3473f3c7c4129c4e5da5ebb37a",
+      "changed_pixels": 0
+    },
+    {
+      "clip": "run",
+      "frame": 4,
+      "tile": [
+        384,
+        0,
+        192,
+        144
+      ],
+      "source_sha256": "08a31603e2f5b876265d3165f6252e448cfd0a0c0bdf76c073f82e37e79153d3",
+      "changed_pixels": 3
+    },
+    {
+      "clip": "passslash",
+      "frame": 0,
+      "tile": [
+        0,
+        144,
+        192,
+        144
+      ],
+      "source_sha256": "cfd010ea7fddc491d80153b8fdde27b06ebf42fabc06e931bbca14c635e2027f",
+      "changed_pixels": 3
+    },
+    {
+      "clip": "passslash",
+      "frame": 5,
+      "tile": [
+        192,
+        144,
+        192,
+        144
+      ],
+      "source_sha256": "8a851611c158e954d79aa519a6a70e8ec08861c60e02ee319b34af6f44af2651",
+      "changed_pixels": 0
+    },
+    {
+      "clip": "carry2_run",
+      "frame": 2,
+      "tile": [
+        384,
+        144,
+        192,
+        144
+      ],
+      "source_sha256": "668d570f56d06656046bc74806514852c6b14e16017ab8a00898956515eb3718",
+      "changed_pixels": 17
+    },
+    {
+      "clip": "stepup",
+      "frame": 0,
+      "tile": [
+        0,
+        288,
+        192,
+        144
+      ],
+      "source_sha256": "04920b4beecd7faa2a07dbee8d6eb683fd7a458fe17d48fa53fa9f977f4573ba",
+      "changed_pixels": 15
+    },
+    {
+      "clip": "sneak",
+      "frame": 5,
+      "tile": [
+        192,
+        288,
+        192,
+        144
+      ],
+      "source_sha256": "475c893e6715da2e61bf63176ba5e014be783d2350400802e104c14e465982c6",
+      "changed_pixels": 9
+    }
+  ],
+  "input_sha256": "ad2676da6d2a3bd14fa95225801af30095c65816641da8c57fb4c239f85429ea",
+  "cost": 0,
+  "user_visual_approval": false
+}

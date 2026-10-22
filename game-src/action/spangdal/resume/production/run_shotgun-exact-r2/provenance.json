@@ -1,0 +1,120 @@
+{
+  "sources": [
+    {
+      "clip": "run_shotgun",
+      "frame": 0,
+      "tile": [
+        0,
+        0,
+        192,
+        144
+      ],
+      "source_sha256": "ec8b7578a843688bfa48be9818695887757bf021dbfedefb3423c2a22073560d",
+      "hand_right_x": 103,
+      "hand_y": 103.0,
+      "erased_pixels": 285
+    },
+    {
+      "clip": "run_shotgun",
+      "frame": 1,
+      "tile": [
+        192,
+        0,
+        192,
+        144
+      ],
+      "source_sha256": "463827464fd41dd622a8071f345b7f6370d7b2842b6da47ea82bb99fd6a8161c",
+      "hand_right_x": 103,
+      "hand_y": 103.0,
+      "erased_pixels": 275
+    },
+    {
+      "clip": "run_shotgun",
+      "frame": 2,
+      "tile": [
+        384,
+        0,
+        192,
+        144
+      ],
+      "source_sha256": "e688e7bd16d7555a949505cd7951baa1a40b5899f4e7fb6f26183b6698297320",
+      "hand_right_x": 103,
+      "hand_y": 103.0,
+      "erased_pixels": 293
+    },
+    {
+      "clip": "run_shotgun",
+      "frame": 3,
+      "tile": [
+        0,
+        144,
+        192,
+        144
+      ],
+      "source_sha256": "8cb142babdc8ea018150ee7f9d914fa5c4560f4e00f36bba983fe958dbc719ce",
+      "hand_right_x": 103,
+      "hand_y": 103.0,
+      "erased_pixels": 291
+    },
+    {
+      "clip": "run_shotgun",
+      "frame": 4,
+      "tile": [
+        192,
+        144,
+        192,
+        144
+      ],
+      "source_sha256": "cc5e516279c0465f518b8c94c3709148e37aedb9fbcf7a13b8708c13edf34925",
+      "hand_right_x": 103,
+      "hand_y": 103.0,
+      "erased_pixels": 283
+    },
+    {
+      "clip": "run_shotgun",
+      "frame": 5,
+      "tile": [
+        384,
+        144,
+        192,
+        144
+      ],
+      "source_sha256": "1d36d7fc4b02a4e4c1c8eb0397f797cd6e1f05fc3437e50d699b21dee4f0b0ec",
+      "hand_right_x": 103,
+      "hand_y": 103.0,
+      "erased_pixels": 283
+    },
+    {
+      "clip": "run_shotgun",
+      "frame": 6,
+      "tile": [
+        0,
+        288,
+        192,
+        144
+      ],
+      "source_sha256": "a11d860055c1621aa7de582430e8936dc70af41dcf4b5ae66a6020f505301057",
+      "hand_right_x": 103,
+      "hand_y": 103.0,
+      "erased_pixels": 298
+    },
+    {
+      "clip": "run_shotgun",
+      "frame": 7,
+      "tile": [
+        192,
+        288,
+        192,
+        144
+      ],
+      "source_sha256": "e7e73fc31789ed619f7e3bed5224d920fa980f884f609bf6b3d4cd4b1772ca4b",
+      "hand_right_x": 103,
+      "hand_y": 103.0,
+      "erased_pixels": 292
+    }
+  ],
+  "input_sha256": "fe36e90ff294a13eb619d70399e74e374f45c7cc37ef3afbc7576167b301f9d2",
+  "cost": 0,
+  "scope": "external weapon removal only; grip/hidden stock still needs review",
+  "user_visual_approval": false
+}

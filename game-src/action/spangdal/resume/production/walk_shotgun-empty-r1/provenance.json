@@ -1,0 +1,191 @@
+{
+  "clip": "walk_shotgun",
+  "sources": [
+    {
+      "clip": "walk_shotgun",
+      "frame": 0,
+      "path": "full\\clips\\walk_shotgun\\00.png",
+      "sha256": "c257e747afb5560f7999a74248920e9ad74f26fb5212cfdfe7d1547c9d3921e2",
+      "box": [
+        64,
+        64,
+        192,
+        128
+      ],
+      "tile": [
+        0,
+        0,
+        128,
+        64
+      ],
+      "regions": [
+        [
+          84,
+          82,
+          192,
+          121
+        ]
+      ]
+    },
+    {
+      "clip": "walk_shotgun",
+      "frame": 1,
+      "path": "full\\clips\\walk_shotgun\\01.png",
+      "sha256": "a1ee452e8e7ab3e45e2be11a418d62074cbeae54af5c890eec05b3184e29f511",
+      "box": [
+        64,
+        64,
+        192,
+        128
+      ],
+      "tile": [
+        128,
+        0,
+        128,
+        64
+      ],
+      "regions": [
+        [
+          84,
+          82,
+          192,
+          121
+        ]
+      ]
+    },
+    {
+      "clip": "walk_shotgun",
+      "frame": 2,
+      "path": "full\\clips\\walk_shotgun\\02.png",
+      "sha256": "02f106bf7b43a3d8851b758231259888d5455ba1284310bdaeea24c1f1650a7a",
+      "box": [
+        64,
+        64,
+        192,
+        128
+      ],
+      "tile": [
+        0,
+        64,
+        128,
+        64
+      ],
+      "regions": [
+        [
+          84,
+          82,
+          192,
+          121
+        ]
+      ]
+    },
+    {
+      "clip": "walk_shotgun",
+      "frame": 3,
+      "path": "full\\clips\\walk_shotgun\\03.png",
+      "sha256": "1a15365f2b331ae091147075f67c2a0112079c5c4afd814fbb56e290b051c171",
+      "box": [
+        64,
+        64,
+        192,
+        128
+      ],
+      "tile": [
+        128,
+        64,
+        128,
+        64
+      ],
+      "regions": [
+        [
+          84,
+          82,
+          192,
+          121
+        ]
+      ]
+    },
+    {
+      "clip": "walk_shotgun",
+      "frame": 4,
+      "path": "full\\clips\\walk_shotgun\\04.png",
+      "sha256": "411ddf4f714787499a97bcfbba345b20d64013f868315d8b9e273efcdad85cf6",
+      "box": [
+        64,
+        64,
+        192,
+        128
+      ],
+      "tile": [
+        0,
+        128,
+        128,
+        64
+      ],
+      "regions": [
+        [
+          84,
+          82,
+          192,
+          121
+        ]
+      ]
+    },
+    {
+      "clip": "walk_shotgun",
+      "frame": 5,
+      "path": "full\\clips\\walk_shotgun\\05.png",
+      "sha256": "ae8df835c3b0d6d9f5e86acaf52122296c77bf12b4c56ddc708be51be28480d3",
+      "box": [
+        64,
+        64,
+        192,
+        128
+      ],
+      "tile": [
+        128,
+        128,
+        128,
+        64
+      ],
+      "regions": [
+        [
+          84,
+          82,
+          192,
+          121
+        ]
+      ]
+    },
+    {
+      "clip": "walk_shotgun",
+      "frame": 6,
+      "path": "full\\clips\\walk_shotgun\\06.png",
+      "sha256": "d0fbfcc559c195bd0fea30806a82e1b227ea7fb6286a587ebf61a8a87ae4dbd2",
+      "box": [
+        64,
+        64,
+        192,
+        128
+      ],
+      "tile": [
+        0,
+        192,
+        128,
+        64
+      ],
+      "regions": [
+        [
+          84,
+          82,
+          192,
+          121
+        ]
+      ]
+    }
+  ],
+  "input_sha256": "7bd71078718baf18244565623bb7469edcdba03043e33c92089c80af8d2dec67",
+  "mask_sha256": "4c8508ea354546f45f1b447b76d5cbe9be8c0e0425da32a877474f7a3c3eff33",
+  "actual_cost": null,
+  "user_visual_approval": false
+}

@@ -10,7 +10,11 @@ server=ThreadingHTTPServer(("127.0.0.1",0),partial(SimpleHTTPRequestHandler,dire
 Thread(target=server.serve_forever,daemon=True).start()
 results=[]
 with sync_playwright() as p:
- browser=p.chromium.launch(executable_path='/usr/bin/chromium',headless=True,args=['--no-sandbox'])
+ import os
+ options={'headless':True,'args':['--no-sandbox']}
+ if os.name!='nt': options['executable_path']='/usr/bin/chromium'
+ else: options['channel']='msedge'
+ browser=p.chromium.launch(**options)
  for name,w,h,mobile in [('pc',1440,1000,False),('phone-landscape',844,390,True),('phone-portrait',390,844,True)]:
   context=browser.new_context(viewport={'width':w,'height':h},is_mobile=mobile,has_touch=mobile,device_scale_factor=1)
   page=context.new_page();errors=[];page.on('pageerror',lambda e:errors.append(str(e)))

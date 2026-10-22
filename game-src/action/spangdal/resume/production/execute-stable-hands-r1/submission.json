@@ -1,0 +1,9 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "id: c40aab31-b7a6-4d05-aeaf-907041ed603c\njob_id: c40aab31-b7a6-4d05-aeaf-907041ed603c\ndescription: slim adult woman, short wavy dark purple bob, one golden eye, pale skin, black fitted suit jacket white shirt black tie knee-length pencil skirt dark stockings low heels. Empty OPEN FLAT HANDS: four straight fingers pressed together, thumbs tucked. NO pointing index fingers, NO fists, NO weapons, NO effects. Same face and outfit as reference.\naction: high near hand holds still; lower far spear-hand stabs once from waist, then both recover\nframes: 8\nsize: 192x144px\ntransparent: True\ncost: 3 generations\nstatus: processing (~4 min)\n\nhint: get_image(job_id=\"c40aab31-b7a6-4d05-aeaf-907041ed603c\")\nasset_id: 56727a9f-5496-5cf5-9225-5e73497fd07a\nasset_status: pending (saved to your gallery when generation completes)"
+    }
+  ],
+  "isError": false
+}

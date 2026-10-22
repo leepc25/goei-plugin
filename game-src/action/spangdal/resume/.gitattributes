@@ -1,0 +1,5 @@
+# Keep archived request/receipt bytes stable for SHA-256 provenance on Windows.
+*.json text eol=lf
+production/** -text whitespace=cr-at-eol
+*.png -text
+*.py text eol=lf

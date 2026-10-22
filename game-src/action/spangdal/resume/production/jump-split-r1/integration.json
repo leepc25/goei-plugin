@@ -1,0 +1,62 @@
+{
+  "accepted_frames": [
+    {
+      "clip": "jump",
+      "frame": 0,
+      "output_sha256": "9be480a532c7a2a92dab912bbd6acf143c99e42daa2196e986bdd5eece46b64d",
+      "generation_job_id": "896b959c-f221-462b-a84f-c37c117c8377",
+      "user_visual_approval": false
+    },
+    {
+      "clip": "jump",
+      "frame": 1,
+      "output_sha256": "0de58a937fcdbe374689d7ccb95e8a23cd7d1f5b880c0a78cc8512a6a7df21a4",
+      "generation_job_id": "896b959c-f221-462b-a84f-c37c117c8377",
+      "user_visual_approval": false
+    },
+    {
+      "clip": "jump",
+      "frame": 2,
+      "output_sha256": "438da2ed4a957ffbd9b6fca671de837c3dc0520659382fdd156382b0efda9f58",
+      "generation_job_id": "896b959c-f221-462b-a84f-c37c117c8377",
+      "user_visual_approval": false
+    },
+    {
+      "clip": "jump",
+      "frame": 3,
+      "output_sha256": "1ddb4349e3223f1ebeadcf4b23b9ffbc12ecd5634f4136ab396384f466b5e3e0",
+      "generation_job_id": "896b959c-f221-462b-a84f-c37c117c8377",
+      "user_visual_approval": false
+    },
+    {
+      "clip": "jump",
+      "frame": 4,
+      "output_sha256": "dc8404ef9146acfb9d2c4c5af7459380d936b847ab73dec048f0bd2010f96c45",
+      "generation_job_id": "896b959c-f221-462b-a84f-c37c117c8377",
+      "user_visual_approval": false
+    },
+    {
+      "clip": "jump",
+      "frame": 5,
+      "output_sha256": "7eec34095dfaba7beef7e33b2896dc2d38bf4baea906ae994f4fef237784fecd",
+      "generation_job_id": "896b959c-f221-462b-a84f-c37c117c8377",
+      "user_visual_approval": false
+    },
+    {
+      "clip": "jump",
+      "frame": 6,
+      "output_sha256": "3ace58b6bbc81dad697095a0291fa87c996fa0970dcbea4d215dfb96b6449510",
+      "generation_job_id": "896b959c-f221-462b-a84f-c37c117c8377",
+      "user_visual_approval": false
+    },
+    {
+      "clip": "jump",
+      "frame": 7,
+      "output_sha256": "f72789da02509864e4852ffc88793abc0614925e6fc819843dac4c672cf44d6d",
+      "generation_job_id": "896b959c-f221-462b-a84f-c37c117c8377",
+      "user_visual_approval": false
+    }
+  ],
+  "discarded_tail_frame": 8,
+  "review": "전9장 열람. 공중2~5 앞뒤 다리 분리, 얼굴/복식 유지. 준비0~1 착지6~7. 사용자 시각 승인 대기."
+}

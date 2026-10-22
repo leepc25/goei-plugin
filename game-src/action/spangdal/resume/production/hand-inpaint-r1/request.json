@@ -1,0 +1,16 @@
+{
+  "tool": "inpaint_image",
+  "estimated_generations": 10,
+  "state": "prepared",
+  "arguments": {
+    "description": "Repair only the outstretched right hand into a flat spear-hand (karate nukite): FOUR straight fingers tightly pressed together as ONE broad tapered blade, thumb folded against palm, continuous straight silhouette from wrist to fingertips pointing right. No pointing index, no fist, no spread fingers, no weapon. Pale skin and crisp dark one-pixel outline matching this sprite. Preserve wrist position, arm, face, clothing and pose.",
+    "image_url": "https://raw.githubusercontent.com/leepc25/goei-plugin/986d160287a9b6c4c98a5434d86d12507c38f50d/game-src/action/spangdal/full/clips/stab1/02.png",
+    "mask_x": 109,
+    "mask_y": 78,
+    "mask_width": 22,
+    "mask_height": 14,
+    "crop_to_mask": true,
+    "no_background": true,
+    "seed": 1022402
+  }
+}

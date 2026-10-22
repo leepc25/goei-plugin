@@ -1,0 +1,92 @@
+{
+  "sources": [
+    {
+      "clip": "pipe",
+      "frame": 0,
+      "tile": [
+        0,
+        0,
+        192,
+        144
+      ],
+      "source_sha256": "5bd28acb704385a314540117499d794f15d18b143a241f6dfb990f249d3db01b",
+      "hand_right_x": 86,
+      "hand_y": 89.0,
+      "erased_pixels": 264
+    },
+    {
+      "clip": "pipe",
+      "frame": 1,
+      "tile": [
+        192,
+        0,
+        192,
+        144
+      ],
+      "source_sha256": "187c60be702b7630eec4422df05da59c005897394db0ecac8d93cdbeb192d803",
+      "hand_right_x": 124,
+      "hand_y": 88.0,
+      "erased_pixels": 184
+    },
+    {
+      "clip": "pipe",
+      "frame": 2,
+      "tile": [
+        384,
+        0,
+        192,
+        144
+      ],
+      "source_sha256": "a45641637189d97ee755bc2256b2b2c6757e1896f289fbb909763a6f18cf2edb",
+      "hand_right_x": 133,
+      "hand_y": 87.0,
+      "erased_pixels": 187
+    },
+    {
+      "clip": "pipe",
+      "frame": 3,
+      "tile": [
+        0,
+        144,
+        192,
+        144
+      ],
+      "source_sha256": "2fb88bcccd9dd2fba1a363817e733d6dbe9f75f33b7ee6ba3194c977cf9d8271",
+      "hand_right_x": 133,
+      "hand_y": 87.5,
+      "erased_pixels": 174
+    },
+    {
+      "clip": "pipe",
+      "frame": 4,
+      "tile": [
+        192,
+        144,
+        192,
+        144
+      ],
+      "source_sha256": "7ac29b87ecdc9c5869e0c0e358573b7fb6ff2ce0bfb4bc676f9027d6002bdef2",
+      "hand_right_x": 109,
+      "hand_y": 88.0,
+      "erased_pixels": 197
+    },
+    {
+      "clip": "pipe",
+      "frame": 5,
+      "tile": [
+        384,
+        144,
+        192,
+        144
+      ],
+      "source_sha256": "1bf86351ddcd92f890b19f2ba10c3cf2ea13921eedb12a88c5f9784e2f80d532",
+      "hand_right_x": 86,
+      "hand_y": 90.0,
+      "erased_pixels": 182
+    }
+  ],
+  "input_sha256": "52d95afcca863c7da742a31f60e668dc48809bc26efe9f4d707d86379004671f",
+  "cost": 0,
+  "scope": "external weapon removal only; grip/hidden stock still needs review",
+  "user_visual_approval": false
+}

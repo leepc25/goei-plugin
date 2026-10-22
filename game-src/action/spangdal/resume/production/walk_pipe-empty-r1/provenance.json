@@ -1,0 +1,191 @@
+{
+  "clip": "walk_pipe",
+  "sources": [
+    {
+      "clip": "walk_pipe",
+      "frame": 0,
+      "path": "full\\clips\\walk_pipe\\00.png",
+      "sha256": "07a313fb0fa607efd9b6169dac44c5e0ac8cd4ecc2396fa844181eeb0382097e",
+      "box": [
+        64,
+        64,
+        192,
+        128
+      ],
+      "tile": [
+        0,
+        0,
+        128,
+        64
+      ],
+      "regions": [
+        [
+          74,
+          87,
+          192,
+          121
+        ]
+      ]
+    },
+    {
+      "clip": "walk_pipe",
+      "frame": 1,
+      "path": "full\\clips\\walk_pipe\\01.png",
+      "sha256": "beb1ef28d4b02832989e995250ed08ba9ff23be07b03f52332f983b48e568c63",
+      "box": [
+        64,
+        64,
+        192,
+        128
+      ],
+      "tile": [
+        128,
+        0,
+        128,
+        64
+      ],
+      "regions": [
+        [
+          74,
+          87,
+          192,
+          121
+        ]
+      ]
+    },
+    {
+      "clip": "walk_pipe",
+      "frame": 2,
+      "path": "full\\clips\\walk_pipe\\02.png",
+      "sha256": "3909892aade97bf01a358fe1789ee4c149d301cc6ea9ae482bcbe0884c4b1097",
+      "box": [
+        64,
+        64,
+        192,
+        128
+      ],
+      "tile": [
+        0,
+        64,
+        128,
+        64
+      ],
+      "regions": [
+        [
+          74,
+          87,
+          192,
+          121
+        ]
+      ]
+    },
+    {
+      "clip": "walk_pipe",
+      "frame": 3,
+      "path": "full\\clips\\walk_pipe\\03.png",
+      "sha256": "514f9e2e8f33654f2a448e3809f5627cad18afe70f58bea51e644b09f6760117",
+      "box": [
+        64,
+        64,
+        192,
+        128
+      ],
+      "tile": [
+        128,
+        64,
+        128,
+        64
+      ],
+      "regions": [
+        [
+          74,
+          87,
+          192,
+          121
+        ]
+      ]
+    },
+    {
+      "clip": "walk_pipe",
+      "frame": 4,
+      "path": "full\\clips\\walk_pipe\\04.png",
+      "sha256": "67dbe1bb89ca92b66a10b7fe95c78a2816c234290f40f6249fdb16d520c03a18",
+      "box": [
+        64,
+        64,
+        192,
+        128
+      ],
+      "tile": [
+        0,
+        128,
+        128,
+        64
+      ],
+      "regions": [
+        [
+          74,
+          87,
+          192,
+          121
+        ]
+      ]
+    },
+    {
+      "clip": "walk_pipe",
+      "frame": 5,
+      "path": "full\\clips\\walk_pipe\\05.png",
+      "sha256": "7d28da40463ae45e925083ea51929559b3ff3dafe7542c41ff385d546dd10c12",
+      "box": [
+        64,
+        64,
+        192,
+        128
+      ],
+      "tile": [
+        128,
+        128,
+        128,
+        64
+      ],
+      "regions": [
+        [
+          74,
+          87,
+          192,
+          121
+        ]
+      ]
+    },
+    {
+      "clip": "walk_pipe",
+      "frame": 6,
+      "path": "full\\clips\\walk_pipe\\06.png",
+      "sha256": "2cade13f42159ea7461ad4fb5a483254fe97e9638b8572c2accd32cb3dce1750",
+      "box": [
+        64,
+        64,
+        192,
+        128
+      ],
+      "tile": [
+        0,
+        192,
+        128,
+        64
+      ],
+      "regions": [
+        [
+          74,
+          87,
+          192,
+          121
+        ]
+      ]
+    }
+  ],
+  "input_sha256": "b22cffdeafb40c0f2826cffa379863623e2916366730ecbf07ca15000309f4f1",
+  "mask_sha256": "ac29974a62deda353c6b63aa35bb010c99c8373d9e54985cec534205fb6fc1e3",
+  "actual_cost": null,
+  "user_visual_approval": false
+}

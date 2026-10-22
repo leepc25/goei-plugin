@@ -1,0 +1,59 @@
+{
+  "accepted_frames": [
+    {
+      "clip": "pipe",
+      "frame": 0,
+      "source_sha256": "5bd28acb704385a314540117499d794f15d18b143a241f6dfb990f249d3db01b",
+      "output_sha256": "e56dada9c9c603fa2d76c717d49614dfd9ffc84035adee21e748dd2afab061cb",
+      "pixel_tool_id": "685dd6a4-4344-417c-be0f-900946d3f289",
+      "cost": 0,
+      "user_visual_approval": false
+    },
+    {
+      "clip": "pipe",
+      "frame": 1,
+      "source_sha256": "187c60be702b7630eec4422df05da59c005897394db0ecac8d93cdbeb192d803",
+      "output_sha256": "adc3d03c257760ada134ebe4da4f21f5a295f0893a97fd52e97b9de36f50f924",
+      "pixel_tool_id": "685dd6a4-4344-417c-be0f-900946d3f289",
+      "cost": 0,
+      "user_visual_approval": false
+    },
+    {
+      "clip": "pipe",
+      "frame": 2,
+      "source_sha256": "a45641637189d97ee755bc2256b2b2c6757e1896f289fbb909763a6f18cf2edb",
+      "output_sha256": "51aadebdcd1a8cfd3a066065a61379acb8524931fcf9f9f9b63b77af4cffe4db",
+      "pixel_tool_id": "685dd6a4-4344-417c-be0f-900946d3f289",
+      "cost": 0,
+      "user_visual_approval": false
+    },
+    {
+      "clip": "pipe",
+      "frame": 3,
+      "source_sha256": "2fb88bcccd9dd2fba1a363817e733d6dbe9f75f33b7ee6ba3194c977cf9d8271",
+      "output_sha256": "ffbcc2a4d26a23bb5b902e805a875de730b8d2d18c092e1e6df184e0fd9c32d8",
+      "pixel_tool_id": "685dd6a4-4344-417c-be0f-900946d3f289",
+      "cost": 0,
+      "user_visual_approval": false
+    },
+    {
+      "clip": "pipe",
+      "frame": 4,
+      "source_sha256": "7ac29b87ecdc9c5869e0c0e358573b7fb6ff2ce0bfb4bc676f9027d6002bdef2",
+      "output_sha256": "bc31d1c95e74364210a114265d5890d6d1dfaa70aa488b5b2828c6d249b70bd9",
+      "pixel_tool_id": "685dd6a4-4344-417c-be0f-900946d3f289",
+      "cost": 0,
+      "user_visual_approval": false
+    },
+    {
+      "clip": "pipe",
+      "frame": 5,
+      "source_sha256": "1bf86351ddcd92f890b19f2ba10c3cf2ea13921eedb12a88c5f9784e2f80d532",
+      "output_sha256": "b25b4e2caa139f9b69e2ed2d78bfc477a43d76bc819340452e7e621309c2274e",
+      "pixel_tool_id": "685dd6a4-4344-417c-be0f-900946d3f289",
+      "cost": 0,
+      "user_visual_approval": false
+    }
+  ],
+  "face_pixels_preserved": true
+}

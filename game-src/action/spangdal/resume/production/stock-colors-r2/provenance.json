@@ -1,0 +1,217 @@
+{
+  "sources": [
+    {
+      "clip": "idle_shotgun",
+      "frame": 0,
+      "source_sha256": "b46f92388de5e2e0113b05a1a23e250d50a4dbb49fee0fa602616281c5f9f71a",
+      "tile": [
+        0,
+        0,
+        192,
+        144
+      ]
+    },
+    {
+      "clip": "idle_shotgun",
+      "frame": 1,
+      "source_sha256": "129a0bcd7297b21d91a66b70cda38ea42af3840e35aa2607412c22960ea77a61",
+      "tile": [
+        192,
+        0,
+        192,
+        144
+      ]
+    },
+    {
+      "clip": "idle_shotgun",
+      "frame": 2,
+      "source_sha256": "131777ccd77dd2e898653fb63f0d2ac69821823145153d6887c95e16ecda12b2",
+      "tile": [
+        384,
+        0,
+        192,
+        144
+      ]
+    },
+    {
+      "clip": "idle_shotgun",
+      "frame": 3,
+      "source_sha256": "9e7eac0b585f1e1e2a8e2f54bf2e106a49455558c2373d14e5e332d1ffa0cd1b",
+      "tile": [
+        576,
+        0,
+        192,
+        144
+      ]
+    },
+    {
+      "clip": "walk_shotgun",
+      "frame": 0,
+      "source_sha256": "063fd0d9e0ac0f4a6680cd5aa677bc92237639a00d724893156e4f499a50ed59",
+      "tile": [
+        0,
+        144,
+        192,
+        144
+      ]
+    },
+    {
+      "clip": "walk_shotgun",
+      "frame": 1,
+      "source_sha256": "15ff8035b688d2422c87d2a119d5b5455cc3f7c5077fc8798176286a27e16686",
+      "tile": [
+        192,
+        144,
+        192,
+        144
+      ]
+    },
+    {
+      "clip": "walk_shotgun",
+      "frame": 2,
+      "source_sha256": "6ff7403322162dbb06c994c837e998c22c8f6bc71e3c665fe6701140926bd8d9",
+      "tile": [
+        384,
+        144,
+        192,
+        144
+      ]
+    },
+    {
+      "clip": "walk_shotgun",
+      "frame": 3,
+      "source_sha256": "077169f9be69abf1af2bfbda19434b97f5749539d91918ece95b04cd8ad0e417",
+      "tile": [
+        576,
+        144,
+        192,
+        144
+      ]
+    },
+    {
+      "clip": "walk_shotgun",
+      "frame": 4,
+      "source_sha256": "d5d6bf2acb14d2f01af4c0764c3c4c53e1c065889a9f30aa183f77c07677bae1",
+      "tile": [
+        0,
+        288,
+        192,
+        144
+      ]
+    },
+    {
+      "clip": "walk_shotgun",
+      "frame": 5,
+      "source_sha256": "1eeac03a2d226f6bd76fe03d5784999f1017c95f2c630cf167c3c2d44a2494c5",
+      "tile": [
+        192,
+        288,
+        192,
+        144
+      ]
+    },
+    {
+      "clip": "walk_shotgun",
+      "frame": 6,
+      "source_sha256": "fa56e768e9d43ce3b7a304b8c8b87f9ddb7ec41a62e5aac78bfd4bd8ea3973c8",
+      "tile": [
+        384,
+        288,
+        192,
+        144
+      ]
+    },
+    {
+      "clip": "run_shotgun",
+      "frame": 0,
+      "source_sha256": "31e53292a385d84eb4796723cc8573855febf65fd6fbac17c87e7f64791b0e3a",
+      "tile": [
+        576,
+        288,
+        192,
+        144
+      ]
+    },
+    {
+      "clip": "run_shotgun",
+      "frame": 1,
+      "source_sha256": "660cfbe8f54f6d228912649cc89a606b96c12ee7ed29eb15a177554c6e0625c7",
+      "tile": [
+        0,
+        432,
+        192,
+        144
+      ]
+    },
+    {
+      "clip": "run_shotgun",
+      "frame": 2,
+      "source_sha256": "1452f4ea0f6b9d3be20fdbd90a9cb315a395dd27874d5363ad233937fe7e2eb3",
+      "tile": [
+        192,
+        432,
+        192,
+        144
+      ]
+    },
+    {
+      "clip": "run_shotgun",
+      "frame": 3,
+      "source_sha256": "c11ed90e022f15d0505c64a7dc9baff2e2edd758f1fe2b14700e8cee88c39c5d",
+      "tile": [
+        384,
+        432,
+        192,
+        144
+      ]
+    },
+    {
+      "clip": "run_shotgun",
+      "frame": 4,
+      "source_sha256": "acf2f1fe974eb63cf18a282e88c971b2b2287996ffe716925cf5fd82a8d9c1c5",
+      "tile": [
+        576,
+        432,
+        192,
+        144
+      ]
+    },
+    {
+      "clip": "run_shotgun",
+      "frame": 5,
+      "source_sha256": "fe2d3d545deead5ce051a4e58d7fb19313e349e38fa6e0d5ba3a018ef65427a2",
+      "tile": [
+        0,
+        576,
+        192,
+        144
+      ]
+    },
+    {
+      "clip": "run_shotgun",
+      "frame": 6,
+      "source_sha256": "85fb80f25062bb29be7c492edbd6ef30490cf34b4e603a37eb61f73a8c28286a",
+      "tile": [
+        192,
+        576,
+        192,
+        144
+      ]
+    },
+    {
+      "clip": "run_shotgun",
+      "frame": 7,
+      "source_sha256": "5bb9cf806ba6923dbd14c36ef6d87200511dfdfa7dde8c7186aaf3448e454d0b",
+      "tile": [
+        384,
+        576,
+        192,
+        144
+      ]
+    }
+  ],
+  "input_sha256": "f31bdad6970eb101dc9b26fc964527f63434ab5c76c089a7ffa499a6b29818fb",
+  "changed_pixels": 190,
+  "cost": 0,
+  "user_visual_approval": false
+}

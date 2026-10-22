@@ -1,0 +1,86 @@
+{
+  "jobs": [
+    {
+      "revision": "execute-stable-hands-r1",
+      "job_id": "c40aab31-b7a6-4d05-aeaf-907041ed603c",
+      "actual_cost": 3.0,
+      "unit": "generations",
+      "cost_evidence": "get_image charged",
+      "request_sha256": "cbc611b385299562fe9ca881c0c620af50d0f0297acdf00a3b9487e46269fe74",
+      "completed": true,
+      "user_visual_approval": false
+    },
+    {
+      "revision": "hand-inpaint-r1",
+      "job_id": "6aa5567e-0ffc-45df-a3a3-702ca373d66c",
+      "actual_cost": 10.0,
+      "unit": "generations",
+      "cost_evidence": "get_image charged",
+      "request_sha256": "8f5cc519a5066193135e6fc10813fb728e905437cdeb1bed73f9cf2c2e647874",
+      "completed": true,
+      "user_visual_approval": false
+    },
+    {
+      "revision": "jump-split-r1",
+      "job_id": "896b959c-f221-462b-a84f-c37c117c8377",
+      "actual_cost": 3.0,
+      "unit": "generations",
+      "cost_evidence": "get_image charged",
+      "request_sha256": "0c65262a9e29c2b5520b84bbf4ffbac679369012e9d7f259b91f6957baea63c2",
+      "completed": true,
+      "user_visual_approval": false
+    },
+    {
+      "revision": "pierce3-cross-r1",
+      "job_id": "a3743d39-b041-4287-96ad-c62228b484b3",
+      "actual_cost": 3.0,
+      "unit": "generations",
+      "cost_evidence": "get_image charged",
+      "request_sha256": "bf1e54e2464e08e09275d7736236ebf8ea1b6b622d62a9fb83bd638b95e3d347",
+      "completed": true,
+      "user_visual_approval": false
+    },
+    {
+      "revision": "shotgun-empty-r1",
+      "job_id": "aa4b5980-880c-4ee9-8171-3f47dd2d994f",
+      "actual_cost": 10.0,
+      "unit": "generations",
+      "cost_evidence": "get_image charged",
+      "request_sha256": "c1150d8b4534be74a4d5cd69abb6a5f25f84ecdfcfc7eb4ac1cd1f99a9a81c97",
+      "completed": true,
+      "user_visual_approval": false
+    },
+    {
+      "revision": "shotgun-stocks-r1",
+      "job_id": "1175b029-993f-4179-90f7-b362c6358ad7",
+      "actual_cost": 10.0,
+      "unit": "generations",
+      "cost_evidence": "get_image charged",
+      "request_sha256": "e6ef1bd0b489465edb6f27690c92291b96aac19a1c879fe97da46331c470d640",
+      "completed": true,
+      "user_visual_approval": false
+    },
+    {
+      "revision": "stab1-recovery-r2",
+      "job_id": "3000e1b3-fee3-478b-a0ce-00b276a8f0c3",
+      "actual_cost": 10.0,
+      "unit": "generations",
+      "cost_evidence": "get_image charged",
+      "request_sha256": "6793ec056afe8403f1f941ea189e7f003290b643a7ccd800d58d1e96bbf62816",
+      "completed": true,
+      "user_visual_approval": false
+    },
+    {
+      "revision": "stab1-sequence-r1",
+      "job_id": "4af04357-fbfe-49e9-8ebb-b10a1765e7a2",
+      "actual_cost": 10.0,
+      "unit": "generations",
+      "cost_evidence": "get_image charged",
+      "request_sha256": "b44228b2e3f68cd9b673a363a77b6e2316b6d4cd6729d9300e59fb34adca21d6",
+      "completed": true,
+      "user_visual_approval": false
+    }
+  ],
+  "actual_total": 59.0,
+  "pending_count": 0
+}

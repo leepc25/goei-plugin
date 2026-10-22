@@ -1,0 +1,9 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "id: 3000e1b3-fee3-478b-a0ce-00b276a8f0c3\njob_id: 3000e1b3-fee3-478b-a0ce-00b276a8f0c3\nsize: 192x144px\nmask: box 16x12 at (96,83)\nfill: Repair only the tiny right hand at the end of the lowered forearm. Keep the wrist at (98,87), same lowered diagonal angle. Four fingers pressed together into a flat tapered spear-hand with thumb tucked, fingertips around (109,89). Do NOT lengthen or straighten the arm. Keep hand within existing small silhouette, black one-pixel outline and same pale skin. Empty hand, no weapon.\ntransparent: True\nseed: 1022444\nasset_id: f1e84960-6f47-5fbc-8e1a-1a24228a8ef9\nasset_status: pending (saved when generation completes)\ncost: ~10 generations\nstatus: processing (~30-90s)\n\nhint: get_image(job_id=\"3000e1b3-fee3-478b-a0ce-00b276a8f0c3\")"
+    }
+  ],
+  "isError": false
+}

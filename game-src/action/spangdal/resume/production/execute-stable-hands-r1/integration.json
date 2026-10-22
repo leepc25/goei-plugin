@@ -1,0 +1,15 @@
+{
+  "accepted_frames": [],
+  "rejected_frames": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+  ],
+  "reason": "Holding wrist stable but upper fingers still point and lower hand shape inconsistent. Do not promote or repeat same skeleton/reference method.",
+  "user_visual_approval": false
+}

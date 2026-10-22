@@ -1,0 +1,40 @@
+{
+  "sources": [
+    {
+      "clip": "idle_shotgun",
+      "frame": 0,
+      "source_sha256": "6d628177b716fb6c60b54de3308603d588842adfc274780c492c2792d031adec",
+      "hand_right_x": 93,
+      "hand_y": 88.0,
+      "erased_pixels": 258
+    },
+    {
+      "clip": "idle_shotgun",
+      "frame": 1,
+      "source_sha256": "7bd28a23e7a993da49172ecd204f92bd7f5081dd15bbb5b53e145b6c9a5776d6",
+      "hand_right_x": 94,
+      "hand_y": 88.0,
+      "erased_pixels": 250
+    },
+    {
+      "clip": "idle_shotgun",
+      "frame": 2,
+      "source_sha256": "4e72ab2a1e501b8c5b75b50e9ad61d64d3d1cb25d346cde255679c177d90bfa8",
+      "hand_right_x": 96,
+      "hand_y": 89.0,
+      "erased_pixels": 234
+    },
+    {
+      "clip": "idle_shotgun",
+      "frame": 3,
+      "source_sha256": "5dad3f20f55d236fe86e67e7f11e1280ed7397a441aee8c827f58a4cbe460596",
+      "hand_right_x": 94,
+      "hand_y": 89.0,
+      "erased_pixels": 256
+    }
+  ],
+  "input_sha256": "6fc20e53eae881641fe64f52da91d4e6786f61e7b84f69531cd78acfae4c6911",
+  "cost": 0,
+  "scope": "external weapon removal only; grip/hidden stock still needs review",
+  "user_visual_approval": false
+}

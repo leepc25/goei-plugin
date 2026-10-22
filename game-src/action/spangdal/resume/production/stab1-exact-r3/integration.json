@@ -1,0 +1,13 @@
+{
+  "accepted_frames": [
+    {
+      "clip": "stab1",
+      "frame": 4,
+      "source_sha256": "f8b809972f77ff4fc37a21baa8ef3b7e7a95f9a785f9bbda6c00220141246fd5",
+      "output_sha256": "b002a5eef7c39d5cf0880203e12ffb68f467448fb4244b3731ec2802379bfd52",
+      "candidate": "stab1-exact-r3",
+      "user_visual_approval": false
+    }
+  ],
+  "local_mask_composite": true
+}

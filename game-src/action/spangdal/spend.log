@@ -475,3 +475,16 @@ model: pixen
 e
 
 2026-10-22 resume audit: new_paid_submissions=0 actual_new_charge=0; get_balance/list_jobs auth 401; account balance/jobs/limit unknown. Historical job costs remain unverified; see resume/historical-job-ledger.json. Kyuras recovery IDs assigned to Kyuras owner; no recovery performed here.
+
+2026-10-22T10:46:03.348502+00:00 resume_job=6aa5567e-0ffc-45df-a3a3-702ca373d66c actual_cost=10.0 unit=generations revision=hand-inpaint-r1
+2026-10-22T10:46:03.348502+00:00 resume_job=3000e1b3-fee3-478b-a0ce-00b276a8f0c3 actual_cost=None unit=generations revision=stab1-recovery-r2
+2026-10-22T10:46:03.348502+00:00 resume_job=4af04357-fbfe-49e9-8ebb-b10a1765e7a2 actual_cost=10.0 unit=generations revision=stab1-sequence-r1
+
+2026-10-22T11:41:58.106093+00:00 resume_job=c40aab31-b7a6-4d05-aeaf-907041ed603c actual_cost=None unit=generations revision=execute-stable-hands-r1
+2026-10-22T11:41:58.106093+00:00 resume_job=a3743d39-b041-4287-96ad-c62228b484b3 actual_cost=3.0 unit=generations revision=pierce3-cross-r1
+2026-10-22T11:41:58.106093+00:00 resume_job=aa4b5980-880c-4ee9-8171-3f47dd2d994f actual_cost=10.0 unit=generations revision=shotgun-empty-r1
+2026-10-22T11:41:58.106093+00:00 resume_job=1175b029-993f-4179-90f7-b362c6358ad7 actual_cost=10.0 unit=generations revision=shotgun-stocks-r1
+2026-10-22T11:41:58.106093+00:00 resume_job=3000e1b3-fee3-478b-a0ce-00b276a8f0c3 actual_cost=10.0 unit=generations revision=stab1-recovery-r2
+
+2026-10-22T11:47:46.659688+00:00 resume_job=c40aab31-b7a6-4d05-aeaf-907041ed603c actual_cost=3.0 unit=generations revision=execute-stable-hands-r1
+2026-10-22T11:47:46.659688+00:00 resume_job=896b959c-f221-462b-a84f-c37c117c8377 actual_cost=3.0 unit=generations revision=jump-split-r1

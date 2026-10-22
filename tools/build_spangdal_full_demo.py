@@ -71,7 +71,11 @@ def doc_rows():
 def frames_of(k):
     d = os.path.join(SRC, 'clips', k)
     if not os.path.isdir(d): return []
-    fs = [Image.open(os.path.join(d, f)).convert('RGBA') for f in sorted(os.listdir(d)) if f.endswith('.png')]
+    fs = []
+    for f in sorted(os.listdir(d)):
+        if not f.endswith('.png'): continue
+        override = os.path.join(BASE, 'resume', 'corrected', k, f)
+        fs.append(Image.open(override if os.path.isfile(override) else os.path.join(d, f)).convert('RGBA'))
     if k in rig.CLIPS and k not in NUDE and len(fs) == len(rig.CLIPS[k][2]) and len(fs) > 3:
         fs = fs[:-1]   # 뼈대 끝 장 = 버릴 장(rig.tail)
     return fs
@@ -138,7 +142,9 @@ def clean(k, fr, with_sources=False):
             sources[i] = {'clip': src, 'frame': j % len(alt), 'dy': 0}
     out = []
     for i, f in enumerate(fr):
-        for r in FIX_ERASE.get(k, {}).get(i, []):
+        corrected = os.path.isfile(os.path.join(BASE, 'resume', 'corrected', k, f'{i:02}.png'))
+        if corrected: sources[i]['correction'] = f'resume/corrected/{k}/{i:02}.png'
+        for r in ([] if corrected else FIX_ERASE.get(k, {}).get(i, [])):
             f.paste((0, 0, 0, 0), r)
         f = detach(f)
         if k not in AIR:   # 발이 바닥선(불투명 맨 아래 y=135) 아래로 내려간 장은 위로 당김
@@ -174,6 +180,12 @@ def gpt_clean(fr):
 def hands_of(k, n, sources=None):
     """뼈대 손목·팔꿈치 → [[앞손 x, y, 각도], [뒷손 x, y, 각도]] (각도: 팔꿈치→손목, 오른쪽 0°, 시계 방향 +)."""
     import math
+    override = os.path.join(BASE, 'resume', 'corrected', k, 'hands.json')
+    if os.path.isfile(override):
+        hands = json.load(open(override, encoding='utf-8'))[:n]
+        if sources:
+            hands = [[[x, y + sources[i].get('dy', 0), angle] for x, y, angle in row] for i, row in enumerate(hands)]
+        return hands
     if k not in rig.CLIPS: return None
     out = []
     for i in range(n):
@@ -230,18 +242,28 @@ def main():
         hd = hands_of(k, len(fr), sources)
         if hits is None: hits = auto_hits(k, hd)
         data = strip(fr)
+        existing = os.path.join(final, k + '.png')
+        if os.path.isfile(existing):
+            old = open(existing, 'rb').read()
+            oldim = Image.open(io.BytesIO(old)).convert('RGBA')
+            newim = Image.open(io.BytesIO(data)).convert('RGBA')
+            if oldim.size == newim.size and oldim.tobytes() == newim.tobytes(): data = old
         strips[k] = base64.b64encode(data).decode()
         open(os.path.join(final, k + '.png'), 'wb').write(data)
         manifest['clips'][k] = {'label': label, 'group': grp, 'fps': fps, 'loop': loop, 'hits': hits, 'adv': adv, 'hold': hold,
                                 'origin': 0, 'frames': len(fr), 'bytes': len(data)}
         if hd: manifest['clips'][k]['hands'] = hd; hands_all[k] = hd
         if sources is not None: manifest['clips'][k]['frameSources'] = sources
+        if k in {'pipe','idle_pipe','walk_pipe','shotgun','idle_shotgun','walk_shotgun','run_shotgun'} and all(os.path.isfile(os.path.join(BASE,'resume','corrected',k,f'{i:02}.png')) for i in range(len(fr))):
+            manifest['clips'][k]['weaponOverlay'] = 'shotgun' if 'shotgun' in k else 'pipe'
     json.dump(manifest, open(os.path.join(final, 'manifest.json'), 'w'), ensure_ascii=False, indent=1)
     json.dump(hands_all, open(os.path.join(final, 'hands.json'), 'w'), separators=(',', ':'))
     manifest['missing'] = missing
     tpl = open(os.path.join(ROOT, 'tools', 'spangdal_full_template.html'), encoding='utf-8').read()
     html = (tpl.replace('__MANIFEST__', json.dumps(manifest, ensure_ascii=False)).replace('__STRIPS__', json.dumps(strips))
             .replace('__BG__', base64.b64encode(open(BG, 'rb').read()).decode()))
+    weapons = {k:base64.b64encode(open(os.path.join(ROOT,'game-src','art','items','dot',k+'.png'),'rb').read()).decode() for k in ('pipe','shotgun')}
+    html = html.replace('__WEAPONS__', json.dumps(weapons))
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     open(OUT, 'w', encoding='utf-8').write(html)
     print('wrote', OUT, len(html) // 1024, 'KB', 'clips', len(strips), 'missing', missing)

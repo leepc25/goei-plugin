@@ -1,0 +1,9 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "id: a3743d39-b041-4287-96ad-c62228b484b3\njob_id: a3743d39-b041-4287-96ad-c62228b484b3\ndescription: slim adult woman agent, short wavy dark purple bob, one golden eye, pale skin, black fitted suit jacket white shirt black tie knee-length pencil skirt dark stockings low heels. EMPTY OPEN SPEAR HANDS: all four fingers straight and tightly together, thumbs tucked. No pointing index, no fists, no weapons, no effects. Same face and clothes as reference.\naction: both open spear hands thrust in an X, forearms crossing, front foot lunges, then recover\nframes: 9\nsize: 192x144px\ntransparent: True\ncost: 3 generations\nstatus: processing (~5 min)\n\nhint: get_image(job_id=\"a3743d39-b041-4287-96ad-c62228b484b3\")\nasset_id: 460e484b-1e61-5953-99ad-3645cec70652\nasset_status: pending (saved to your gallery when generation completes)"
+    }
+  ],
+  "isError": false
+}

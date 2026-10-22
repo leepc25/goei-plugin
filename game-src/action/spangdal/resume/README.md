@@ -1,3 +1,52 @@
+# 스팡달 실제 제작 재개 결과 · 2026-10-22 Local
+이 절이 현재 상태다. 아래의 과거 Cloud 기록(401·신규 그림 0장)은 당시 증거로만 보존한다.
+
+- 독립 worktree `art-spangdal-resume`, 브랜치 `codex/art-spangdal-resume`. 출발 `986d160287a9b6c4c98a5434d86d12507c38f50d`.
+- fetch한 시스템 `59a2a883c6aca00f8c0e1e5fc2c421a6da770528` 및 준비 브랜치 `6b8000ea3f51a9ac9cc437995c5a2edc0e77b2eb`와 원본/로그/manifest 대조. 기존 손 수정 포함 확인. 준비 브랜치 전체 병합 없음.
+- Local PixelLab MCP 인증 성공. 마지막 무료 조회는 `production/balance-final.json`, `jobs-final.json`: 잔액 **13,984.30 generations**, $0, 활성 작업 **0건**. 관측 시각은 파일에 UTC로 보존. Tier 3 Pixel Architect 2x, 문서상 pending+processing 한도20. 동시 제출은 스팡달 1건씩 유지.
+- 유료 **8건 완료, 실제 합계59 generations**. 작업별 서버 charged 영수증은 `production/ledger.json`, 각 revision의 `submission.json/result.json`, `spend.log`. 공유 계정 잔액 차이는 비용으로 쓰지 않았다. 무료 exact 수정은0.
+- 큐라스 이미 과금된2건은 총괄/큐라스 담당 소유이며 호출하지 않았다. 총괄 채팅에 제출 ID·예상/실제 비용을 전달했다. 준비 도구 인계는 `codex/character-production-control`의 `game-src/action/character-resume/handoff-index.json`와 아래 경로표 사용.
+
+## 실제 반영
+독립 `release/demo/spangdal-full.html`에 **15클립,69개 override 슬롯**을 연결했다. 이 수는 신규 AI 생성 장수와 다르다(부분 편집·무료 픽셀 정리·원본과 같은 슬롯 포함).
+- stab1 1~4: 관수 손 후보. 넓은 마스크에서 회수 손목이 잘린 후보는 제외하고 전체 프레임 inpaint 후 무료 guarded patch로 교정.
+- pierce3: 새 뼈대의 X 교차 공격8장. 준비2·회수6 손끝은 후속 수정 대상.
+- jump: 새 앞뒤 다리 분리 점프8장. 공중2~5, 준비0~1, 착지6~7. 사용자 시각 승인 대기.
+- pipe/idle_pipe/walk_pipe/shotgun/idle_shotgun/walk_shotgun/run_shotgun: 그림의 무기를 제거한 파지 후보, 독립 데모에서 기존 무기 소품을 별도 표시. 체크박스로 빈손/무기 표시 비교 가능. 손·얼굴 보존. 제거 부위의 소매 실루엣은 추가 시각 검수 필요.
+- run/passslash/carry2_run/stepup/sneak: 다리 회색·보라색 이중 윤곽 정리. 알파/발 위치 보존이며 이동 속도·발 고정 문제 전체 해결을 의미하지 않는다.
+- 원본 `full/clips`는 수정하지 않았다. 수정본은 `resume/corrected`, 새 회수 원본/요청/입력 해시/영수증은 `resume/production`. 엔진·본부·스테이지·공용 atlas·통합 게임 HTML 변경 없음.
+
+## 반려 및 남은 결함
+**생성 완료는 품질 합격이나 사용자 승인과 다르다. 전체 전투·이동 품질 검수는 아직 불합격/수정 필요다.**
+- execute 새8장: 높은 손 위치는 안정됐지만 검지/낮은 손 형태 결함. 전부 반영 제외하고 원본/실패 이유 보존. 같은 기준+뼈대 방식 재시도 금지.
+- stab1-sequence-r1 frame4: crop 문맥 부족/마스크 경계에서 팔 잘림. 반영 제외. 전체 프레임 방식으로 전환.
+- free pipe-exact-r1:1024px 한도 초과. 유료 차감 없이3열576px로 변경.
+- 기존 execute/spineup/throw/toss/grabstab/super의 손, slash2 손 번갈이와 잡기 겹침은 후속 수정 필요. grabstab2의 팔 중복도 유지되는 결함이다.
+- 생활·사교72클립 양산 보류. `user_visual_approval=false` 유지.
+
+## 비용 확정표
+| revision | job ID | 실제 generations |
+|---|---|---:|
+| hand-inpaint-r1 | 6aa5567e-0ffc-45df-a3a3-702ca373d66c | 10 |
+| stab1-sequence-r1 | 4af04357-fbfe-49e9-8ebb-b10a1765e7a2 | 10 |
+| stab1-recovery-r2 | 3000e1b3-fee3-478b-a0ce-00b276a8f0c3 | 10 |
+| pierce3-cross-r1 | a3743d39-b041-4287-96ad-c62228b484b3 | 3 |
+| shotgun-empty-r1 | aa4b5980-880c-4ee9-8171-3f47dd2d994f | 10 |
+| shotgun-stocks-r1 | 1175b029-993f-4179-90f7-b362c6358ad7 | 10 |
+| execute-stable-hands-r1 | c40aab31-b7a6-4d05-aeaf-907041ed603c | 3 |
+| jump-split-r1 | 896b959c-f221-462b-a84f-c37c117c8377 | 3 |
+
+## 검증과 재현
+`test_resume.py`7개 통과. `check_browser.py`: PC1440×1000, 폰844×390/390×844, 이미지72개 로드, JS오류0, 수평 넘침0, 장넘김/반복 경계 통과.
+`check_candidates.py`: 신규 그림 연결, 무기 토글 픽셀 변화, 원본 불변, 비용 영수증8건 완료 확인.
+`build_audit.py`: 현재 렌더26클립165장, 해시/접지 bbox/개별 검수 메모. `review/candidate-demo.png`는 새 후보의 실제 독립 HTML 화면이다.
+
+빌드는 `python tools/build_spangdal_full_demo.py`. PixelLab 재제출 없이 `resume/corrected`에서 재현된다.
+`prepare_*.py/exact_*.py`는 보존된 제작 요청 작성 스크립트이며 자동 배치 발주기가 아니다. 각 revision에 submission이 없으면 미제출 초안이다. 이미 완료된 revision을 다시 제출하거나 회수 스크립트로 최신 override를 덮어쓰지 않는다.
+
+---
+# 과거 Cloud 인계 (현재 인증/제작 상태가 아님)
+
 # 스팡달 제작 재개 인계 · 2026-10-22
 
 브랜치 `codex/art-spangdal-resume`. 시스템 기준 `7f8fdfb0c5a6cef096d412d3d872aec6eae7de81`의 독립 worktree에서 작업했다. 준비 브랜치 `087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4` 전체를 합치지 않았다.

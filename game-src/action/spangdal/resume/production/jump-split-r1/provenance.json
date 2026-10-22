@@ -1,0 +1,8 @@
+{
+  "clip": "jump",
+  "input_sha256": "cfb9b1c7c99e724d0c36222bbab542a39b8eca6dbfc95782bfcab2ad2abc070b",
+  "source": "resume\\production\\hand-inpaint-r1\\result-00.png",
+  "estimated_generations": 3,
+  "changed_method": "explicit separated front/back leg geometry with same torso",
+  "user_visual_approval": false
+}

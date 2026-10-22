@@ -1,0 +1,11 @@
+{
+  "description": "Repair only the tiny right hand at the end of the lowered forearm. Keep the wrist at (98,87), same lowered diagonal angle. Four fingers pressed together into a flat tapered spear-hand with thumb tucked, fingertips around (109,89). Do NOT lengthen or straighten the arm. Keep hand within existing small silhouette, black one-pixel outline and same pale skin. Empty hand, no weapon.",
+  "image_url": "https://raw.githubusercontent.com/leepc25/goei-plugin/986d160287a9b6c4c98a5434d86d12507c38f50d/game-src/action/spangdal/full/clips/stab1/04.png",
+  "mask_x": 96,
+  "mask_y": 83,
+  "mask_width": 16,
+  "mask_height": 12,
+  "crop_to_mask": true,
+  "no_background": true,
+  "seed": 1022444
+}

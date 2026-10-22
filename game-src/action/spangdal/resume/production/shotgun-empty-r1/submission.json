@@ -1,0 +1,9 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "id: aa4b5980-880c-4ee9-8171-3f47dd2d994f\njob_id: aa4b5980-880c-4ee9-8171-3f47dd2d994f\nsize: 256x192px\nmask: custom mask\nfill: 5 sequential animation crop frames arranged in TWO columns, read left to right then top to bottom. Remove the entire held weapon from every masked region. Replace weapon pixels with transparent background. Keep the original HANDS, WRISTS, ARMS and pose exactly, with a clean closed empty grip as if still holding an invisible handle. Repair only hand pixels obscured by weapon so the fingers curl around an empty handle. Preserve the same fingers and wrist position between frames, black suit sleeve, all body and legs, and original pixel palette. NO sword, NO pipe, NO gun, NO muzzle flash, NO object left anywhere in the masked region. This exports character-only empty grips; weapons are a separate layer.\ntransparent: True\nseed: 1022451\nasset_id: 39404f8f-084b-5b72-8e7d-1ad29b3c5e90\nasset_status: pending (saved when generation completes)\ncost: ~10 generations\nstatus: processing (~30-90s)\n\nhint: get_image(job_id=\"aa4b5980-880c-4ee9-8171-3f47dd2d994f\")"
+    }
+  ],
+  "isError": false
+}

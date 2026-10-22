@@ -1,0 +1,8 @@
+{
+  "source": "resume\\production\\hand-inpaint-r1\\result-00.png",
+  "input_sha256": "cfb9b1c7c99e724d0c36222bbab542a39b8eca6dbfc95782bfcab2ad2abc070b",
+  "tool": "animate_with_skeleton_v3",
+  "estimated_generations": 3,
+  "changed_method": "new inpainted open hand reference plus crossed forearm skeleton, not old parallel wrists",
+  "user_visual_approval": false
+}

@@ -28,7 +28,13 @@ FINDINGS={
  'sneak':{5:'발목 옆 회색 줄'},
  'stance':{i:'손 외곽이 뭉쳐 손가락 모양 판정 어려움' for i in range(4)},
 }
-manifest=json.loads((BASE/'full/final/manifest.json').read_text())
+FINDINGS['stab1']={i:'새 관수 손 후보 반영. 손목 연결·손날 폭 검수; 사용자 승인 대기' for i in [1,2,3,4]}
+FINDINGS['pierce3']={i:'새 X 교차 자세 반영. 준비2·회수6 손끝은 추가 수정 후보; 사용자 승인 대기' for i in range(8)}
+FINDINGS['jump']={i:'새 앞뒤 다리 분리 자세 반영. 준비0~1, 공중2~5, 착지6~7. 비반복 전환 검수' for i in range(8)}
+for clip in ('run','passslash','carry2_run','stepup','sneak'):
+ for i in FINDINGS.get(clip,{}):
+  if (BASE/f'resume/corrected/{clip}/{i:02}.png').exists():FINDINGS[clip][i]='회색/보라색 이중 윤곽 정리, 알파·접지 위치 보존. 이동 속도/발 고정 문제의 해결을 뜻하지 않음'
+manifest=json.loads((BASE/'full/final/manifest.json').read_text(encoding='utf-8'))
 rows=[]
 for clip in CLIPS:
  meta=manifest['clips'][clip]; n=meta['frames']; strip=Image.open(BASE/'full/final'/f'{clip}.png').convert('RGBA')
@@ -39,7 +45,7 @@ for clip in CLIPS:
   bb=frame.getchannel('A').getbbox()
   note=FINDINGS.get(clip,{}).get(i,'시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류')
   if 'pipe' in clip or 'shotgun' in clip:
-   note='무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치'
+   note='분리 무기 후보 반영. 빈손과 별도 무기 표시 전환 가능. 손은 원래 위치 보존; 개머리판 제거 부위의 소매 실루엣 및 반복 경계 사용자 검수 대기'
   rows.append({'clip':clip,'frame':i,'rendered_rgba_sha256':hashlib.sha256(frame.tobytes()).hexdigest(),
                'bbox':bb,'opaque_bottom_y':bb[3]-1 if bb else None,
                'source':meta.get('frameSources',[None]*n)[i],
@@ -48,5 +54,5 @@ for clip in CLIPS:
                'loop_boundary':'마지막→0을 시연판 장넘김으로 확인 필요' if meta['loop'] else '비반복: 다음 자세 진입 별도 확인',
                'review_state':'needs_clip_review_or_correction','user_visual_approval':False})
  sheet.save(OUT/f'frames-{clip}.png')
-(OUT/'frames.json').write_text(json.dumps(rows,ensure_ascii=False,indent=2)+'\n')
+(OUT/'frames.json').write_text(json.dumps(rows,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
 print(len(CLIPS),'clips',len(rows),'frames')

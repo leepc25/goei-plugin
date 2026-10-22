@@ -1,0 +1,7 @@
+{
+  "input_sha256": "41b76689203876da22ea11a59003bade85ad3e5283e08638ec3367cef553da79",
+  "source": "resume\\production\\stab1-recovery-r2\\result-00.png",
+  "cost": 0,
+  "method": "PixelLab exact guarded patch",
+  "user_visual_approval": false
+}

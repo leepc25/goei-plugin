@@ -1,0 +1,12 @@
+{
+  "source": "full/clips/stab1/02.png",
+  "input_sha256": "9c6a1d31bb573854816f90de27baa06a272596e3dfcdb7f77c32231597fcb4b9",
+  "source_commit": "986d160287a9b6c4c98a5434d86d12507c38f50d",
+  "job_id": "6aa5567e-0ffc-45df-a3a3-702ca373d66c",
+  "tool": "inpaint_image",
+  "estimated_generations": 10,
+  "reported_cost": "~10 generations",
+  "actual_cost": null,
+  "actual_cost_status": "server receipt approximate; never inferred from shared balance",
+  "user_visual_approval": false
+}

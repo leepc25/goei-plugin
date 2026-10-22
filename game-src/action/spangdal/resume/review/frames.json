@@ -24,21 +24,22 @@
   {
     "clip": "stab1",
     "frame": 1,
-    "rendered_rgba_sha256": "b5528f8e6c177fdf2646795bcf13cd1e3d7e87dfdad5c5307dec2e8ff5a6d80a",
+    "rendered_rgba_sha256": "917634d2ee64fe3bd4b41202513076e068ef2c3a327ff65da644dc67524a9b17",
     "bbox": [
       43,
       53,
-      119,
+      126,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "stab1",
       "frame": 1,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/stab1/01.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "관수보다 검지 가리키기로 읽힘",
+    "hands_grounding_and_motion": "새 관수 손 후보 반영. 손목 연결·손날 폭 검수; 사용자 승인 대기",
     "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -46,7 +47,7 @@
   {
     "clip": "stab1",
     "frame": 2,
-    "rendered_rgba_sha256": "02b2f4041cdbe27da470b0c04ca5970537e8614ce04d3563a4a626ee1a9d364f",
+    "rendered_rgba_sha256": "cdcd795ca1f9e693d1af3aaa261e98643f5dca25b7c1ead37a9cbdd9fb35f2f3",
     "bbox": [
       47,
       54,
@@ -57,10 +58,11 @@
     "source": {
       "clip": "stab1",
       "frame": 2,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/stab1/02.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "관수보다 검지 가리키기로 읽힘",
+    "hands_grounding_and_motion": "새 관수 손 후보 반영. 손목 연결·손날 폭 검수; 사용자 승인 대기",
     "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -68,21 +70,22 @@
   {
     "clip": "stab1",
     "frame": 3,
-    "rendered_rgba_sha256": "2a7baccad73e4fa2133cff7b5c124b07ef19b847b064cb84e19e20dac213f677",
+    "rendered_rgba_sha256": "681630fae0c3c82976ff744710cb64da328ef869467c4154d39e7e9020affa23",
     "bbox": [
       47,
       54,
-      127,
+      131,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "stab1",
       "frame": 3,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/stab1/03.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "관수보다 검지 가리키기로 읽힘",
+    "hands_grounding_and_motion": "새 관수 손 후보 반영. 손목 연결·손날 폭 검수; 사용자 승인 대기",
     "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -90,21 +93,22 @@
   {
     "clip": "stab1",
     "frame": 4,
-    "rendered_rgba_sha256": "ea15b92222ba4d305baf3c1529a83a2baf27efd7e0880d917282637a882d745a",
+    "rendered_rgba_sha256": "a8a0729cd1d3cd596c21299bd3cba94e899a7942f205dccf3155c454b9427550",
     "bbox": [
       45,
       53,
-      110,
+      111,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "stab1",
       "frame": 4,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/stab1/04.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "관수보다 검지 가리키기로 읽힘",
+    "hands_grounding_and_motion": "새 관수 손 후보 반영. 손목 연결·손날 폭 검수; 사용자 승인 대기",
     "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -266,21 +270,22 @@
   {
     "clip": "pierce3",
     "frame": 0,
-    "rendered_rgba_sha256": "b7a67120a5eb2d8169a54eab65fb27c88fd54961a742400dd12d0bf70c342fa4",
+    "rendered_rgba_sha256": "6f29fa7443adea6aab880fe0dfb4be0b09916623bc45a34fc9f5fb4655e53156",
     "bbox": [
-      47,
+      48,
       51,
-      98,
+      101,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "pierce3",
       "frame": 0,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/pierce3/00.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류",
+    "hands_grounding_and_motion": "새 X 교차 자세 반영. 준비2·회수6 손끝은 추가 수정 후보; 사용자 승인 대기",
     "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -288,21 +293,22 @@
   {
     "clip": "pierce3",
     "frame": 1,
-    "rendered_rgba_sha256": "4ecb8a205be1f06d568003563732fb04e34a5bb44d0f573c49682bd81b55f521",
+    "rendered_rgba_sha256": "2577826d47477d01f9f15605574201686f7ea5c5a2e0d15b1ffb0ef037ea70b9",
     "bbox": [
-      51,
-      54,
-      101,
+      53,
+      55,
+      104,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "pierce3",
       "frame": 1,
-      "dy": -1
+      "dy": 0,
+      "correction": "resume/corrected/pierce3/01.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류",
+    "hands_grounding_and_motion": "새 X 교차 자세 반영. 준비2·회수6 손끝은 추가 수정 후보; 사용자 승인 대기",
     "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -310,21 +316,22 @@
   {
     "clip": "pierce3",
     "frame": 2,
-    "rendered_rgba_sha256": "5c35355ca7b8c3a1898f327c8e147ebe31d280174f703af969eda3d13a1d30a2",
+    "rendered_rgba_sha256": "8b358cd8dc04f833e5bbafd54076f860c89847788ea6e04d093e22c9329d8029",
     "bbox": [
-      49,
+      50,
       53,
-      129,
+      120,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "pierce3",
       "frame": 2,
-      "dy": -1
+      "dy": 0,
+      "correction": "resume/corrected/pierce3/02.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "양손 X 관통 대신 나란한 주먹 지르기로 읽힘",
+    "hands_grounding_and_motion": "새 X 교차 자세 반영. 준비2·회수6 손끝은 추가 수정 후보; 사용자 승인 대기",
     "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -332,21 +339,22 @@
   {
     "clip": "pierce3",
     "frame": 3,
-    "rendered_rgba_sha256": "19cded202b5adbdb2f83bf2b152b2eee23968f1eeab0461e2fa0b4388425d595",
+    "rendered_rgba_sha256": "6590d1c9bfc26b01ab1e8fbae2c430b26702c40e5515ef9adec9ded93205ab17",
     "bbox": [
       53,
       57,
-      140,
+      138,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "pierce3",
       "frame": 3,
-      "dy": -2
+      "dy": -1,
+      "correction": "resume/corrected/pierce3/03.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "양손 X 관통 대신 나란한 주먹 지르기로 읽힘",
+    "hands_grounding_and_motion": "새 X 교차 자세 반영. 준비2·회수6 손끝은 추가 수정 후보; 사용자 승인 대기",
     "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -354,21 +362,22 @@
   {
     "clip": "pierce3",
     "frame": 4,
-    "rendered_rgba_sha256": "51c549f43dd74cfae3bfc2f8c6d1c65cca885c20e5d1f13267a19fee2d7bc40a",
+    "rendered_rgba_sha256": "df335e478c5da9cc2754bf4ec757e2c276932512d256b6bbdb2c9d55580dd03c",
     "bbox": [
-      53,
-      57,
-      140,
+      55,
+      59,
+      139,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "pierce3",
       "frame": 4,
-      "dy": -2
+      "dy": -1,
+      "correction": "resume/corrected/pierce3/04.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "양손 X 관통 대신 나란한 주먹 지르기로 읽힘",
+    "hands_grounding_and_motion": "새 X 교차 자세 반영. 준비2·회수6 손끝은 추가 수정 후보; 사용자 승인 대기",
     "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -376,21 +385,22 @@
   {
     "clip": "pierce3",
     "frame": 5,
-    "rendered_rgba_sha256": "55ffcb507aa77c11e7cb556bc00a7ed3d440f10bc883829149b8afe1591f56cb",
+    "rendered_rgba_sha256": "0aab9a57d64ef3d93aca37b76dfbe11f641de0b373459c83aca34bbbe3c45080",
     "bbox": [
-      53,
-      57,
-      140,
+      55,
+      58,
+      139,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "pierce3",
       "frame": 5,
-      "dy": -2
+      "dy": -1,
+      "correction": "resume/corrected/pierce3/05.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "양손 X 관통 대신 나란한 주먹 지르기로 읽힘",
+    "hands_grounding_and_motion": "새 X 교차 자세 반영. 준비2·회수6 손끝은 추가 수정 후보; 사용자 승인 대기",
     "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -398,21 +408,22 @@
   {
     "clip": "pierce3",
     "frame": 6,
-    "rendered_rgba_sha256": "6eee91ce5e6571a19437762b0a1c124dcceaf5ebdedb6428a8558ac5ad4c0d66",
+    "rendered_rgba_sha256": "17acb209aca435f8b3f94cc16b9eb42f68ca118faaf21ec3008e2bf3448ed40b",
     "bbox": [
-      53,
-      53,
-      126,
+      55,
+      55,
+      128,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "pierce3",
       "frame": 6,
-      "dy": -2
+      "dy": -1,
+      "correction": "resume/corrected/pierce3/06.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "양손 X 관통 대신 나란한 주먹 지르기로 읽힘",
+    "hands_grounding_and_motion": "새 X 교차 자세 반영. 준비2·회수6 손끝은 추가 수정 후보; 사용자 승인 대기",
     "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -420,21 +431,22 @@
   {
     "clip": "pierce3",
     "frame": 7,
-    "rendered_rgba_sha256": "1412d31e82b2d931415380dc152e289991000fef1fb329ae5d037aedbed7b1ba",
+    "rendered_rgba_sha256": "fcdd7e8096ac316524d25a531858a3fb105e96918b23288066fbc67efb093f50",
     "bbox": [
-      53,
+      55,
       50,
-      106,
+      107,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "pierce3",
       "frame": 7,
-      "dy": -1
+      "dy": -2,
+      "correction": "resume/corrected/pierce3/07.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류",
+    "hands_grounding_and_motion": "새 X 교차 자세 반영. 준비2·회수6 손끝은 추가 수정 후보; 사용자 승인 대기",
     "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -1476,21 +1488,22 @@
   {
     "clip": "pipe",
     "frame": 0,
-    "rendered_rgba_sha256": "3b52e3488a758b4b082d8255dd4a10269c8886027a91e179d8edd594783964b4",
+    "rendered_rgba_sha256": "e5f20999f1721bed78d512eacbffcdd572c8bac15aa8e55be54acf73aee9a144",
     "bbox": [
       48,
       53,
-      150,
+      94,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "pipe",
       "frame": 0,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/pipe/00.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "hands_grounding_and_motion": "분리 무기 후보 반영. 빈손과 별도 무기 표시 전환 가능. 손은 원래 위치 보존; 개머리판 제거 부위의 소매 실루엣 및 반복 경계 사용자 검수 대기",
     "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -1498,21 +1511,22 @@
   {
     "clip": "pipe",
     "frame": 1,
-    "rendered_rgba_sha256": "35d93458a5b5f632cbf8b4f31a1e29560f404a2c293a9459af724501ab66670e",
+    "rendered_rgba_sha256": "66fb2561680c3b50c93612a2a52dfa810e18a72527cd271ce6c6e350d6936e89",
     "bbox": [
       50,
       54,
-      183,
+      125,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "pipe",
       "frame": 1,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/pipe/01.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "hands_grounding_and_motion": "분리 무기 후보 반영. 빈손과 별도 무기 표시 전환 가능. 손은 원래 위치 보존; 개머리판 제거 부위의 소매 실루엣 및 반복 경계 사용자 검수 대기",
     "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -1520,21 +1534,22 @@
   {
     "clip": "pipe",
     "frame": 2,
-    "rendered_rgba_sha256": "e0b7f1b35bb307656284386e5a1281e6bc0e09cfcd010666517ff1fb0a6c1ac6",
+    "rendered_rgba_sha256": "818f47eb6547abc7aa30c4b40cff4d0fb4c2628b9d0af8c33c8e777030150860",
     "bbox": [
       54,
       57,
-      191,
+      134,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "pipe",
       "frame": 2,
-      "dy": -1
+      "dy": -1,
+      "correction": "resume/corrected/pipe/02.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "hands_grounding_and_motion": "분리 무기 후보 반영. 빈손과 별도 무기 표시 전환 가능. 손은 원래 위치 보존; 개머리판 제거 부위의 소매 실루엣 및 반복 경계 사용자 검수 대기",
     "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -1542,21 +1557,22 @@
   {
     "clip": "pipe",
     "frame": 3,
-    "rendered_rgba_sha256": "d63aaeedab293880f4ce81eecb5da58806162945daaea8ef079de01d55650b52",
+    "rendered_rgba_sha256": "c02c01eebf68be8259dc40650896cbf3815bf7f9fabc7d7e5401909027ec358e",
     "bbox": [
       54,
       57,
-      192,
+      134,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "pipe",
       "frame": 3,
-      "dy": -1
+      "dy": -1,
+      "correction": "resume/corrected/pipe/03.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "hands_grounding_and_motion": "분리 무기 후보 반영. 빈손과 별도 무기 표시 전환 가능. 손은 원래 위치 보존; 개머리판 제거 부위의 소매 실루엣 및 반복 경계 사용자 검수 대기",
     "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -1564,21 +1580,22 @@
   {
     "clip": "pipe",
     "frame": 4,
-    "rendered_rgba_sha256": "f1a26c70dc6dcd9373e8cfab0f36220737b516f4f2604ce4e9b77c2d2947445a",
+    "rendered_rgba_sha256": "81cd1019aa9489269723e8334a285d3e4d14895d03c0f27c13a6b4a4fe863ea7",
     "bbox": [
       50,
       55,
-      167,
+      110,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "pipe",
       "frame": 4,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/pipe/04.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "hands_grounding_and_motion": "분리 무기 후보 반영. 빈손과 별도 무기 표시 전환 가능. 손은 원래 위치 보존; 개머리판 제거 부위의 소매 실루엣 및 반복 경계 사용자 검수 대기",
     "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -1586,21 +1603,22 @@
   {
     "clip": "pipe",
     "frame": 5,
-    "rendered_rgba_sha256": "1a98deb737df40809fb21da24c21a5da148cb02fe2a5b801d5d4a0c364d992f4",
+    "rendered_rgba_sha256": "4c11b0ba92d88d93d0e2f676170a0bfe99d0dafbace9c0d13669235b327191ce",
     "bbox": [
       48,
       53,
-      144,
+      94,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "pipe",
       "frame": 5,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/pipe/05.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "hands_grounding_and_motion": "분리 무기 후보 반영. 빈손과 별도 무기 표시 전환 가능. 손은 원래 위치 보존; 개머리판 제거 부위의 소매 실루엣 및 반복 경계 사용자 검수 대기",
     "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -1608,21 +1626,22 @@
   {
     "clip": "idle_pipe",
     "frame": 0,
-    "rendered_rgba_sha256": "a1a5f193dfea85334dc4eb43cb08a93dc77ab0b2578a26777bda017ce7918b19",
+    "rendered_rgba_sha256": "bf1c2c71095659db71ca6a6550b548327246c9ee28a1d0a6309c392d8ac8dbd3",
     "bbox": [
       57,
       45,
-      110,
+      81,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "idle_pipe",
       "frame": 0,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/idle_pipe/00.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "hands_grounding_and_motion": "분리 무기 후보 반영. 빈손과 별도 무기 표시 전환 가능. 손은 원래 위치 보존; 개머리판 제거 부위의 소매 실루엣 및 반복 경계 사용자 검수 대기",
     "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -1630,21 +1649,22 @@
   {
     "clip": "idle_pipe",
     "frame": 1,
-    "rendered_rgba_sha256": "7b026cb6d9f94a8d015b38fed97e12ed5d5d18f229d8a497ec1c58fd631c55a0",
+    "rendered_rgba_sha256": "089696a8975ea7fe0ed5cec571e1f585b5e1ea12caef715b61144cc5796b0702",
     "bbox": [
       57,
       45,
-      110,
+      81,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "idle_pipe",
       "frame": 1,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/idle_pipe/01.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "hands_grounding_and_motion": "분리 무기 후보 반영. 빈손과 별도 무기 표시 전환 가능. 손은 원래 위치 보존; 개머리판 제거 부위의 소매 실루엣 및 반복 경계 사용자 검수 대기",
     "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -1652,21 +1672,22 @@
   {
     "clip": "idle_pipe",
     "frame": 2,
-    "rendered_rgba_sha256": "96e25a9795964a46b5de1d62fc97d7f67c284b9a576ee523c801fba44dd00c97",
+    "rendered_rgba_sha256": "8744cb7bd6f9a87330d3fe8a42b6ab2e2bcae1c268614000462b15310669ff2e",
     "bbox": [
       57,
       45,
-      110,
+      81,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "idle_pipe",
       "frame": 2,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/idle_pipe/02.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "hands_grounding_and_motion": "분리 무기 후보 반영. 빈손과 별도 무기 표시 전환 가능. 손은 원래 위치 보존; 개머리판 제거 부위의 소매 실루엣 및 반복 경계 사용자 검수 대기",
     "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -1674,21 +1695,22 @@
   {
     "clip": "idle_pipe",
     "frame": 3,
-    "rendered_rgba_sha256": "a6cbee6f676a72e6e1b4d00b50396473fbba2f97c195e25e98764d0d496fae43",
+    "rendered_rgba_sha256": "cdfab99673dc0222b2362e04bcc228896d7f9d3aaa833103bd4676df5d9f46ff",
     "bbox": [
       57,
       45,
-      110,
+      81,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "idle_pipe",
       "frame": 3,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/idle_pipe/03.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "hands_grounding_and_motion": "분리 무기 후보 반영. 빈손과 별도 무기 표시 전환 가능. 손은 원래 위치 보존; 개머리판 제거 부위의 소매 실루엣 및 반복 경계 사용자 검수 대기",
     "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -1696,21 +1718,22 @@
   {
     "clip": "walk_pipe",
     "frame": 0,
-    "rendered_rgba_sha256": "8582bcc65eec0f27eab4e51dd5912dc43ea1dc2c1cbcb64bb295a71e90e78595",
+    "rendered_rgba_sha256": "535196218d5fc026f00de9cfc15f715cd53ce95d85ad90140fefb4200d2f5a21",
     "bbox": [
       55,
       45,
-      125,
+      87,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "walk_pipe",
       "frame": 0,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/walk_pipe/00.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "hands_grounding_and_motion": "분리 무기 후보 반영. 빈손과 별도 무기 표시 전환 가능. 손은 원래 위치 보존; 개머리판 제거 부위의 소매 실루엣 및 반복 경계 사용자 검수 대기",
     "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -1718,21 +1741,22 @@
   {
     "clip": "walk_pipe",
     "frame": 1,
-    "rendered_rgba_sha256": "fda784e428c65c17130ea3a3164297e05e370a1ff4a7741771015a769356535d",
+    "rendered_rgba_sha256": "023893838434bc59973e7fec9febc48f0dda93fa1e858a488c590c457c7bd2ec",
     "bbox": [
       58,
       45,
-      125,
+      88,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "walk_pipe",
       "frame": 1,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/walk_pipe/01.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "hands_grounding_and_motion": "분리 무기 후보 반영. 빈손과 별도 무기 표시 전환 가능. 손은 원래 위치 보존; 개머리판 제거 부위의 소매 실루엣 및 반복 경계 사용자 검수 대기",
     "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -1740,21 +1764,22 @@
   {
     "clip": "walk_pipe",
     "frame": 2,
-    "rendered_rgba_sha256": "5b17da479c6365b9f28b7bd2c3b9cc9080658ecb4b95bcb1f43550a989ea00ce",
+    "rendered_rgba_sha256": "c7b2ee209a680e4cd7c59bd6749fc484329e8424996fefbf9889b9ec3e1bc33d",
     "bbox": [
       58,
       45,
-      125,
+      81,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "walk_pipe",
       "frame": 2,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/walk_pipe/02.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "hands_grounding_and_motion": "분리 무기 후보 반영. 빈손과 별도 무기 표시 전환 가능. 손은 원래 위치 보존; 개머리판 제거 부위의 소매 실루엣 및 반복 경계 사용자 검수 대기",
     "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -1762,21 +1787,22 @@
   {
     "clip": "walk_pipe",
     "frame": 3,
-    "rendered_rgba_sha256": "e24c224c778cd43e88d7377fc509bd6103e1c004f3d3a474a633e9e78ce25a75",
+    "rendered_rgba_sha256": "d266127437604d7f69f59b0e27d765f61527ab1db54c70c2f4650ecedc79297e",
     "bbox": [
       58,
       45,
-      125,
+      83,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "walk_pipe",
       "frame": 3,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/walk_pipe/03.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "hands_grounding_and_motion": "분리 무기 후보 반영. 빈손과 별도 무기 표시 전환 가능. 손은 원래 위치 보존; 개머리판 제거 부위의 소매 실루엣 및 반복 경계 사용자 검수 대기",
     "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -1784,21 +1810,22 @@
   {
     "clip": "walk_pipe",
     "frame": 4,
-    "rendered_rgba_sha256": "14eeb4cd170caed099c16fde3393b8aa7d8bc1770b899cdb95d08c024487b2bb",
+    "rendered_rgba_sha256": "b257393508825a02148e1981c13309594bedaf93b728435f5ce7ac75ab805618",
     "bbox": [
       55,
       45,
-      125,
+      87,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "walk_pipe",
       "frame": 4,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/walk_pipe/04.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "hands_grounding_and_motion": "분리 무기 후보 반영. 빈손과 별도 무기 표시 전환 가능. 손은 원래 위치 보존; 개머리판 제거 부위의 소매 실루엣 및 반복 경계 사용자 검수 대기",
     "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -1806,21 +1833,22 @@
   {
     "clip": "walk_pipe",
     "frame": 5,
-    "rendered_rgba_sha256": "69709476ef0c57beabe3469f14a2f31f4dd0a1e7850d594b698730929da4d2f2",
+    "rendered_rgba_sha256": "b9362ccaf654d0f1c630937a95778eb5b9156229200083f96380b48d853b2d19",
     "bbox": [
       58,
       45,
-      125,
+      82,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "walk_pipe",
       "frame": 5,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/walk_pipe/05.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "hands_grounding_and_motion": "분리 무기 후보 반영. 빈손과 별도 무기 표시 전환 가능. 손은 원래 위치 보존; 개머리판 제거 부위의 소매 실루엣 및 반복 경계 사용자 검수 대기",
     "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -1828,21 +1856,22 @@
   {
     "clip": "walk_pipe",
     "frame": 6,
-    "rendered_rgba_sha256": "d565d06fe2e56cfafa33375ac4d8387dfec42e6accd1df5d620261c66c4719a6",
+    "rendered_rgba_sha256": "6ceb0727d19eca12f175c3a35426d7de4946eeac3b9164149e6d10e93a098eda",
     "bbox": [
       58,
       45,
-      125,
+      82,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "walk_pipe",
       "frame": 6,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/walk_pipe/06.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "hands_grounding_and_motion": "분리 무기 후보 반영. 빈손과 별도 무기 표시 전환 가능. 손은 원래 위치 보존; 개머리판 제거 부위의 소매 실루엣 및 반복 경계 사용자 검수 대기",
     "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -1850,21 +1879,22 @@
   {
     "clip": "shotgun",
     "frame": 0,
-    "rendered_rgba_sha256": "beefc547dca18f025cb58c3dc52ed858fb0cae391305e40e66c5180247962300",
+    "rendered_rgba_sha256": "0209a01c81893dcf7bddc1a23146dc52108ea4ba266a4c78b591f372c070481c",
     "bbox": [
       47,
       48,
-      152,
+      104,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "shotgun",
       "frame": 0,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/shotgun/00.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "hands_grounding_and_motion": "분리 무기 후보 반영. 빈손과 별도 무기 표시 전환 가능. 손은 원래 위치 보존; 개머리판 제거 부위의 소매 실루엣 및 반복 경계 사용자 검수 대기",
     "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -1872,21 +1902,22 @@
   {
     "clip": "shotgun",
     "frame": 1,
-    "rendered_rgba_sha256": "c6e4d78f4939767d2c281fb851d573e706854745e050be3fc7c64fc71522f2e4",
+    "rendered_rgba_sha256": "bc8bb1f5e67bf53d31bc599332ffed2054a76042b505b34aa863f0fae4f54764",
     "bbox": [
       47,
       48,
-      149,
+      101,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "shotgun",
       "frame": 1,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/shotgun/01.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "hands_grounding_and_motion": "분리 무기 후보 반영. 빈손과 별도 무기 표시 전환 가능. 손은 원래 위치 보존; 개머리판 제거 부위의 소매 실루엣 및 반복 경계 사용자 검수 대기",
     "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -1894,21 +1925,22 @@
   {
     "clip": "shotgun",
     "frame": 2,
-    "rendered_rgba_sha256": "0bf169399ba417bc3e355c66e3ee3ea88d4fb22ef284ebc120025bdf972c582d",
+    "rendered_rgba_sha256": "1ab0014988d9eb214cda214bcf1cbcb47b770e1869b2f27fd6c108deadf5d82a",
     "bbox": [
       47,
       48,
-      150,
+      101,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "shotgun",
       "frame": 2,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/shotgun/02.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "hands_grounding_and_motion": "분리 무기 후보 반영. 빈손과 별도 무기 표시 전환 가능. 손은 원래 위치 보존; 개머리판 제거 부위의 소매 실루엣 및 반복 경계 사용자 검수 대기",
     "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -1916,21 +1948,22 @@
   {
     "clip": "shotgun",
     "frame": 3,
-    "rendered_rgba_sha256": "3d5026891f59274b1b14599da487ecdebd75cf95570a97e9ac2bf0815d8f719b",
+    "rendered_rgba_sha256": "8b63d2a0f2ca204d24ebfcd924d16928f6447207bf0c0747f45907e57b70b53a",
     "bbox": [
       47,
       48,
-      151,
+      101,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "shotgun",
       "frame": 3,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/shotgun/03.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "hands_grounding_and_motion": "분리 무기 후보 반영. 빈손과 별도 무기 표시 전환 가능. 손은 원래 위치 보존; 개머리판 제거 부위의 소매 실루엣 및 반복 경계 사용자 검수 대기",
     "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -1938,21 +1971,22 @@
   {
     "clip": "shotgun",
     "frame": 4,
-    "rendered_rgba_sha256": "eeb101e9fcd84cd603959b177597ec6a600927c9567aaf69d517492299c803d9",
+    "rendered_rgba_sha256": "d79711e5533351822083a94ff36648f95dfb0c38ee9c8d9c4e6fe07f7e40e9be",
     "bbox": [
       47,
       48,
-      151,
+      101,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "shotgun",
       "frame": 4,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/shotgun/04.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "hands_grounding_and_motion": "분리 무기 후보 반영. 빈손과 별도 무기 표시 전환 가능. 손은 원래 위치 보존; 개머리판 제거 부위의 소매 실루엣 및 반복 경계 사용자 검수 대기",
     "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -1960,21 +1994,22 @@
   {
     "clip": "idle_shotgun",
     "frame": 0,
-    "rendered_rgba_sha256": "7ee6999036fffa980eaed6aaea3c33f54389b88f59a265808cc158cfceb023cc",
+    "rendered_rgba_sha256": "6c2d5a9113ba57b58914af90faefedd92f197ebfadcad6bffbf3853b173f2dc1",
     "bbox": [
       57,
       45,
-      130,
+      94,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "idle_shotgun",
       "frame": 0,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/idle_shotgun/00.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "hands_grounding_and_motion": "분리 무기 후보 반영. 빈손과 별도 무기 표시 전환 가능. 손은 원래 위치 보존; 개머리판 제거 부위의 소매 실루엣 및 반복 경계 사용자 검수 대기",
     "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -1982,21 +2017,22 @@
   {
     "clip": "idle_shotgun",
     "frame": 1,
-    "rendered_rgba_sha256": "33f7bcfd4dd19370b23e7d2817e906742d1e851c2d2e30a423b17a73bd6a7c8f",
+    "rendered_rgba_sha256": "9ff1c0f88e02a94696e1381953941483cc8fe9721901528d957f4a0fa3ee54c3",
     "bbox": [
       57,
       45,
-      130,
+      95,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "idle_shotgun",
       "frame": 1,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/idle_shotgun/01.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "hands_grounding_and_motion": "분리 무기 후보 반영. 빈손과 별도 무기 표시 전환 가능. 손은 원래 위치 보존; 개머리판 제거 부위의 소매 실루엣 및 반복 경계 사용자 검수 대기",
     "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -2004,21 +2040,22 @@
   {
     "clip": "idle_shotgun",
     "frame": 2,
-    "rendered_rgba_sha256": "70188acde21e5b10de5e2c24fbce3f709656dda5455376e4c2e3de032dcc206d",
+    "rendered_rgba_sha256": "b5779726c75d95515c5fb1689c2fdc299cd960499f2fba8ea5fa5dab5de4e8b8",
     "bbox": [
       57,
       45,
-      130,
+      95,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "idle_shotgun",
       "frame": 2,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/idle_shotgun/02.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "hands_grounding_and_motion": "분리 무기 후보 반영. 빈손과 별도 무기 표시 전환 가능. 손은 원래 위치 보존; 개머리판 제거 부위의 소매 실루엣 및 반복 경계 사용자 검수 대기",
     "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -2026,21 +2063,22 @@
   {
     "clip": "idle_shotgun",
     "frame": 3,
-    "rendered_rgba_sha256": "95ef97b2964a7957e37ef4f8f204d25b143e466ac4328cddb4c6283b004e5bc6",
+    "rendered_rgba_sha256": "b074291acb5517ffce505f67f4cf696cb13aec12db24e880e204d1cbf6abbcea",
     "bbox": [
       57,
       45,
-      130,
+      95,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "idle_shotgun",
       "frame": 3,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/idle_shotgun/03.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "hands_grounding_and_motion": "분리 무기 후보 반영. 빈손과 별도 무기 표시 전환 가능. 손은 원래 위치 보존; 개머리판 제거 부위의 소매 실루엣 및 반복 경계 사용자 검수 대기",
     "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -2048,21 +2086,22 @@
   {
     "clip": "walk_shotgun",
     "frame": 0,
-    "rendered_rgba_sha256": "c7ef14ad2ad336cdb71d035cd906a2b195403bc9bd40ad13a47f9083d82794df",
+    "rendered_rgba_sha256": "c6437e250495da9b1a34c30719e25c055fb1c215149a8f79039a88b966c5d107",
     "bbox": [
       55,
       45,
-      136,
+      97,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "walk_shotgun",
       "frame": 0,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/walk_shotgun/00.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "hands_grounding_and_motion": "분리 무기 후보 반영. 빈손과 별도 무기 표시 전환 가능. 손은 원래 위치 보존; 개머리판 제거 부위의 소매 실루엣 및 반복 경계 사용자 검수 대기",
     "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -2070,21 +2109,22 @@
   {
     "clip": "walk_shotgun",
     "frame": 1,
-    "rendered_rgba_sha256": "8a476085ffdcbd8a794dd8cfa4b6fa6ecda43757cb8e137db9acf868b13b5660",
+    "rendered_rgba_sha256": "5aa8071c48311055f940fd9c08c6a4134da4634efb89992cd15f28ba8fb5df91",
     "bbox": [
       57,
       45,
-      136,
+      96,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "walk_shotgun",
       "frame": 1,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/walk_shotgun/01.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "hands_grounding_and_motion": "분리 무기 후보 반영. 빈손과 별도 무기 표시 전환 가능. 손은 원래 위치 보존; 개머리판 제거 부위의 소매 실루엣 및 반복 경계 사용자 검수 대기",
     "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -2092,21 +2132,22 @@
   {
     "clip": "walk_shotgun",
     "frame": 2,
-    "rendered_rgba_sha256": "a9169e2421eef1a140a72664f65397bbb78c8f797d9cc6b9405aed423fddaf52",
+    "rendered_rgba_sha256": "11513ae71f7d26cd462c80fb028a63abfc91c617ca59fa6916c09db8cc1618a4",
     "bbox": [
       57,
       45,
-      136,
+      96,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "walk_shotgun",
       "frame": 2,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/walk_shotgun/02.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "hands_grounding_and_motion": "분리 무기 후보 반영. 빈손과 별도 무기 표시 전환 가능. 손은 원래 위치 보존; 개머리판 제거 부위의 소매 실루엣 및 반복 경계 사용자 검수 대기",
     "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -2114,21 +2155,22 @@
   {
     "clip": "walk_shotgun",
     "frame": 3,
-    "rendered_rgba_sha256": "55b8949d02740d61c2b458317d3a3c64aceff04d7ade166c78c517675d31b3d4",
+    "rendered_rgba_sha256": "9ddbeba215b41d297995b67ddbe7f665f63765811ddd656931337f3ab4240a38",
     "bbox": [
       57,
       44,
-      136,
+      96,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "walk_shotgun",
       "frame": 3,
-      "dy": -1
+      "dy": -1,
+      "correction": "resume/corrected/walk_shotgun/03.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "hands_grounding_and_motion": "분리 무기 후보 반영. 빈손과 별도 무기 표시 전환 가능. 손은 원래 위치 보존; 개머리판 제거 부위의 소매 실루엣 및 반복 경계 사용자 검수 대기",
     "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -2136,21 +2178,22 @@
   {
     "clip": "walk_shotgun",
     "frame": 4,
-    "rendered_rgba_sha256": "1687d8731a30c642218682e4af7ac635d55ee3b2f74631d506be56e8e24344d9",
+    "rendered_rgba_sha256": "3a30f55602ce64105bcd56c036ea5de2748a1014fc3b98e0f4a245c2f867f99c",
     "bbox": [
       55,
       45,
-      136,
+      96,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "walk_shotgun",
       "frame": 4,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/walk_shotgun/04.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "hands_grounding_and_motion": "분리 무기 후보 반영. 빈손과 별도 무기 표시 전환 가능. 손은 원래 위치 보존; 개머리판 제거 부위의 소매 실루엣 및 반복 경계 사용자 검수 대기",
     "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -2158,21 +2201,22 @@
   {
     "clip": "walk_shotgun",
     "frame": 5,
-    "rendered_rgba_sha256": "72b049cee6ac831e81ddf71f2c06dcd1a3d24fe4a119d598fa1238597eba6d21",
+    "rendered_rgba_sha256": "4b4f7827519136407b628a1295c0835870973d54a179b19608a7243c701aa149",
     "bbox": [
       57,
       45,
-      136,
+      96,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "walk_shotgun",
       "frame": 5,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/walk_shotgun/05.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "hands_grounding_and_motion": "분리 무기 후보 반영. 빈손과 별도 무기 표시 전환 가능. 손은 원래 위치 보존; 개머리판 제거 부위의 소매 실루엣 및 반복 경계 사용자 검수 대기",
     "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -2180,21 +2224,22 @@
   {
     "clip": "walk_shotgun",
     "frame": 6,
-    "rendered_rgba_sha256": "02bb63f49a71dd95b163a530419e69cd7f5b6d995885781338e95dd4749e365a",
+    "rendered_rgba_sha256": "7b66178ac45e6b9fde019d2ccd716031e0791188bb24eff35cf85de8d123519b",
     "bbox": [
       57,
       45,
-      136,
+      96,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "walk_shotgun",
       "frame": 6,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/walk_shotgun/06.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "hands_grounding_and_motion": "분리 무기 후보 반영. 빈손과 별도 무기 표시 전환 가능. 손은 원래 위치 보존; 개머리판 제거 부위의 소매 실루엣 및 반복 경계 사용자 검수 대기",
     "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -2202,21 +2247,22 @@
   {
     "clip": "run_shotgun",
     "frame": 0,
-    "rendered_rgba_sha256": "90a2bfea404b749858cae92fa68fb2b8d503e3eeedf529880996f913d81fd148",
+    "rendered_rgba_sha256": "6607005cec1953a022e42d38a550de472ac89c53e0b38db63d99d4b0299d177b",
     "bbox": [
       48,
       54,
-      150,
+      104,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "run_shotgun",
       "frame": 0,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/run_shotgun/00.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "hands_grounding_and_motion": "분리 무기 후보 반영. 빈손과 별도 무기 표시 전환 가능. 손은 원래 위치 보존; 개머리판 제거 부위의 소매 실루엣 및 반복 경계 사용자 검수 대기",
     "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -2224,21 +2270,22 @@
   {
     "clip": "run_shotgun",
     "frame": 1,
-    "rendered_rgba_sha256": "87928a56b4ddec9cc355b3b36bb8908a235ffd5fccebf365f0fa63647eb0da2b",
+    "rendered_rgba_sha256": "2b5b7c7f27cee3e6245f262167aab2557cbdbba09b77b8b4784acf67fc327dcd",
     "bbox": [
       53,
       55,
-      150,
+      104,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "run_shotgun",
       "frame": 1,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/run_shotgun/01.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "hands_grounding_and_motion": "분리 무기 후보 반영. 빈손과 별도 무기 표시 전환 가능. 손은 원래 위치 보존; 개머리판 제거 부위의 소매 실루엣 및 반복 경계 사용자 검수 대기",
     "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -2246,21 +2293,22 @@
   {
     "clip": "run_shotgun",
     "frame": 2,
-    "rendered_rgba_sha256": "c7677cc96aba1abc0a99987c017597e6cc23c6469b37c2b70f0432b6c0213f3b",
+    "rendered_rgba_sha256": "ef6c0050b1a78c623e85c9f5a9b6e87b4ae8c41589f9410791107c559b3441a1",
     "bbox": [
       65,
       55,
-      150,
+      104,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "run_shotgun",
       "frame": 2,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/run_shotgun/02.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "hands_grounding_and_motion": "분리 무기 후보 반영. 빈손과 별도 무기 표시 전환 가능. 손은 원래 위치 보존; 개머리판 제거 부위의 소매 실루엣 및 반복 경계 사용자 검수 대기",
     "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -2268,21 +2316,22 @@
   {
     "clip": "run_shotgun",
     "frame": 3,
-    "rendered_rgba_sha256": "60a48df6c07542da6cb29ae198ca4edd0b74eb3e3ac50754655f060329e10125",
+    "rendered_rgba_sha256": "010903d1c114f5eceed68b14b2ffaff0e777d8785828e23cbc61b9737fde2448",
     "bbox": [
       53,
       54,
-      150,
+      104,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "run_shotgun",
       "frame": 3,
-      "dy": -1
+      "dy": -1,
+      "correction": "resume/corrected/run_shotgun/03.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "hands_grounding_and_motion": "분리 무기 후보 반영. 빈손과 별도 무기 표시 전환 가능. 손은 원래 위치 보존; 개머리판 제거 부위의 소매 실루엣 및 반복 경계 사용자 검수 대기",
     "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -2290,21 +2339,22 @@
   {
     "clip": "run_shotgun",
     "frame": 4,
-    "rendered_rgba_sha256": "f463ab41ed60adaf4fba251216b8ccf8ac008dec19ba8b0fdfbcabb003b4eb2a",
+    "rendered_rgba_sha256": "3e8deca70fcdd72ef93c875442a557b534aa4ced8355e1e74e89191537a67253",
     "bbox": [
       49,
       53,
-      150,
+      104,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "run_shotgun",
       "frame": 4,
-      "dy": -1
+      "dy": -1,
+      "correction": "resume/corrected/run_shotgun/04.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "hands_grounding_and_motion": "분리 무기 후보 반영. 빈손과 별도 무기 표시 전환 가능. 손은 원래 위치 보존; 개머리판 제거 부위의 소매 실루엣 및 반복 경계 사용자 검수 대기",
     "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -2312,21 +2362,22 @@
   {
     "clip": "run_shotgun",
     "frame": 5,
-    "rendered_rgba_sha256": "ff8b48600515027776025e721c48cdbfa091bad9f9d8cc71f9c533585dae8614",
+    "rendered_rgba_sha256": "47b280d5bdba4e4eca61c4c16b1ce2f466810bee591f2ffd71a4648ffff3837b",
     "bbox": [
       54,
       55,
-      150,
+      104,
       135
     ],
     "opaque_bottom_y": 134,
     "source": {
       "clip": "run_shotgun",
       "frame": 5,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/run_shotgun/05.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "hands_grounding_and_motion": "분리 무기 후보 반영. 빈손과 별도 무기 표시 전환 가능. 손은 원래 위치 보존; 개머리판 제거 부위의 소매 실루엣 및 반복 경계 사용자 검수 대기",
     "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -2334,21 +2385,22 @@
   {
     "clip": "run_shotgun",
     "frame": 6,
-    "rendered_rgba_sha256": "cc43dbf4f350307f39735dc30866d004aeb65a66627f6c0dc89f0a09a43533e0",
+    "rendered_rgba_sha256": "19bf585bc0f9ae4fe47b68c40860d90c7fd5a391cf622fc7869c407e518c7ea4",
     "bbox": [
       66,
       55,
-      150,
+      104,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "run_shotgun",
       "frame": 6,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/run_shotgun/06.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "hands_grounding_and_motion": "분리 무기 후보 반영. 빈손과 별도 무기 표시 전환 가능. 손은 원래 위치 보존; 개머리판 제거 부위의 소매 실루엣 및 반복 경계 사용자 검수 대기",
     "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -2356,21 +2408,22 @@
   {
     "clip": "run_shotgun",
     "frame": 7,
-    "rendered_rgba_sha256": "4c82c1cfd7e781f268fe886a29a358fa81050ed09d15b7c44a0a9d66004710e3",
+    "rendered_rgba_sha256": "52ac1576a801572248d6b84b6ae431fd5f10bbc8bdcd53056c49f60483368309",
     "bbox": [
       52,
       55,
-      150,
+      104,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "run_shotgun",
       "frame": 7,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/run_shotgun/07.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "무기가 캐릭터 그림에 포함됨. 빈손 파지 원칙 불충족; 전환 클립 간 무기 길이·형태 불일치",
+    "hands_grounding_and_motion": "분리 무기 후보 반영. 빈손과 별도 무기 표시 전환 가능. 손은 원래 위치 보존; 개머리판 제거 부위의 소매 실루엣 및 반복 경계 사용자 검수 대기",
     "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -2598,7 +2651,7 @@
   {
     "clip": "run",
     "frame": 2,
-    "rendered_rgba_sha256": "8b8bc55f5455ab9937df1da1a445fb24c90341a51a187e7b127d34ce0aa78b6b",
+    "rendered_rgba_sha256": "d27c3aa1901693c7bcf9800da0e4528f5443939f762c6cb13da934eec7e77574",
     "bbox": [
       65,
       55,
@@ -2609,10 +2662,11 @@
     "source": {
       "clip": "run",
       "frame": 2,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/run/02.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "다리 옆 회색 이중 윤곽",
+    "hands_grounding_and_motion": "회색/보라색 이중 윤곽 정리, 알파·접지 위치 보존. 이동 속도/발 고정 문제의 해결을 뜻하지 않음",
     "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -2631,10 +2685,11 @@
     "source": {
       "clip": "run",
       "frame": 3,
-      "dy": -1
+      "dy": -1,
+      "correction": "resume/corrected/run/03.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "다리 윤곽·팔 경계 추가 근접 확인",
+    "hands_grounding_and_motion": "회색/보라색 이중 윤곽 정리, 알파·접지 위치 보존. 이동 속도/발 고정 문제의 해결을 뜻하지 않음",
     "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -2642,7 +2697,7 @@
   {
     "clip": "run",
     "frame": 4,
-    "rendered_rgba_sha256": "868ab9e6c47a29234eca323cf2261e10cdca7e78477897987c083b8767a5436d",
+    "rendered_rgba_sha256": "250320778620a59ee6ab613cb7f58b951c79220afe2190e82d250c827a00e29f",
     "bbox": [
       49,
       53,
@@ -2653,10 +2708,11 @@
     "source": {
       "clip": "run",
       "frame": 4,
-      "dy": -1
+      "dy": -1,
+      "correction": "resume/corrected/run/04.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "눈색과 허벅지 색 경계 추가 근접 확인",
+    "hands_grounding_and_motion": "회색/보라색 이중 윤곽 정리, 알파·접지 위치 보존. 이동 속도/발 고정 문제의 해결을 뜻하지 않음",
     "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -2730,21 +2786,22 @@
   {
     "clip": "jump",
     "frame": 0,
-    "rendered_rgba_sha256": "7ffaf518f4a728558165219cffaf062fe54ea95cc1f5f127b430e174be27ca3b",
+    "rendered_rgba_sha256": "b723bfcb92690f4ff43e5cb5602524c2c693203f418b5bde611683dae3bb3986",
     "bbox": [
       41,
       53,
-      93,
+      94,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "jump",
       "frame": 0,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/jump/00.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류",
+    "hands_grounding_and_motion": "새 앞뒤 다리 분리 자세 반영. 준비0~1, 공중2~5, 착지6~7. 비반복 전환 검수",
     "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -2752,7 +2809,7 @@
   {
     "clip": "jump",
     "frame": 1,
-    "rendered_rgba_sha256": "74d119f1459225c0fd049a49224031a831774b403802bc141b17d7ac3c37bfb4",
+    "rendered_rgba_sha256": "092260dd6b04f270d4061f8f31e8dfd7a759a8110098dc6d9cd871d143a96830",
     "bbox": [
       55,
       61,
@@ -2763,10 +2820,11 @@
     "source": {
       "clip": "jump",
       "frame": 1,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/jump/01.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류",
+    "hands_grounding_and_motion": "새 앞뒤 다리 분리 자세 반영. 준비0~1, 공중2~5, 착지6~7. 비반복 전환 검수",
     "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -2774,21 +2832,22 @@
   {
     "clip": "jump",
     "frame": 2,
-    "rendered_rgba_sha256": "3cee968c7cd60c97312e2d2d3812ce2c8c47d158f04c183f8c68492d0da45954",
+    "rendered_rgba_sha256": "8a4a25c830f6a0a2ad60a6c8aa6d22b6956a63af8852535dffa75855f19a1457",
     "bbox": [
-      47,
-      52,
-      93,
-      128
+      41,
+      51,
+      105,
+      127
     ],
-    "opaque_bottom_y": 127,
+    "opaque_bottom_y": 126,
     "source": {
       "clip": "jump",
       "frame": 2,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/jump/02.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "공중 다리 앞뒤 벌림이 설계보다 좁음. 양 무릎 몸 쪽으로 모임",
+    "hands_grounding_and_motion": "새 앞뒤 다리 분리 자세 반영. 준비0~1, 공중2~5, 착지6~7. 비반복 전환 검수",
     "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -2796,21 +2855,22 @@
   {
     "clip": "jump",
     "frame": 3,
-    "rendered_rgba_sha256": "c687e5dba6c006a354134bdee406b7d8d6999dc85666b49d99534d115e4f4cf6",
+    "rendered_rgba_sha256": "e447542eb2f535904f18d444415b866f242f50ae2d83136ae283ca98be1fec64",
     "bbox": [
-      40,
-      42,
-      92,
-      118
+      37,
+      41,
+      109,
+      115
     ],
-    "opaque_bottom_y": 117,
+    "opaque_bottom_y": 114,
     "source": {
       "clip": "jump",
       "frame": 3,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/jump/03.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "공중 다리 앞뒤 벌림이 설계보다 좁음. 양 무릎 몸 쪽으로 모임",
+    "hands_grounding_and_motion": "새 앞뒤 다리 분리 자세 반영. 준비0~1, 공중2~5, 착지6~7. 비반복 전환 검수",
     "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -2818,21 +2878,22 @@
   {
     "clip": "jump",
     "frame": 4,
-    "rendered_rgba_sha256": "2dcaa966c0dbe488eb6828510e49036cf9f32560a88742e0f83a341813f74ce6",
+    "rendered_rgba_sha256": "2fcd4b73ab75cdc1a57632823c03b2a8a4e200815c36c618f8c5f7df2190a6e5",
     "bbox": [
-      38,
+      37,
       40,
-      93,
-      115
+      109,
+      114
     ],
-    "opaque_bottom_y": 114,
+    "opaque_bottom_y": 113,
     "source": {
       "clip": "jump",
       "frame": 4,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/jump/04.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "공중 다리 앞뒤 벌림이 설계보다 좁음. 양 무릎 몸 쪽으로 모임",
+    "hands_grounding_and_motion": "새 앞뒤 다리 분리 자세 반영. 준비0~1, 공중2~5, 착지6~7. 비반복 전환 검수",
     "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -2840,21 +2901,22 @@
   {
     "clip": "jump",
     "frame": 5,
-    "rendered_rgba_sha256": "b1b883e557b5bb7581d36c9109317362162743321e38b51839d73873017f525e",
+    "rendered_rgba_sha256": "277d075771b208fe0f69858d587f7c3c4a2e29acc00a037754f6e04eb3394379",
     "bbox": [
-      45,
+      38,
       50,
-      93,
-      126
+      105,
+      128
     ],
-    "opaque_bottom_y": 125,
+    "opaque_bottom_y": 127,
     "source": {
       "clip": "jump",
       "frame": 5,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/jump/05.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "공중 다리 앞뒤 벌림이 설계보다 좁음. 양 무릎 몸 쪽으로 모임",
+    "hands_grounding_and_motion": "새 앞뒤 다리 분리 자세 반영. 준비0~1, 공중2~5, 착지6~7. 비반복 전환 검수",
     "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -2862,21 +2924,22 @@
   {
     "clip": "jump",
     "frame": 6,
-    "rendered_rgba_sha256": "4ed231e6e56714fe23415bd19b5a8376bf5ef7bbb6d5c8826629c43232a25030",
+    "rendered_rgba_sha256": "e2c743a5bb7e925f89416c840ff4e014c6036170343dd6a8f27840d3b745a48b",
     "bbox": [
-      43,
+      39,
       55,
-      93,
-      135
+      100,
+      134
     ],
-    "opaque_bottom_y": 134,
+    "opaque_bottom_y": 133,
     "source": {
       "clip": "jump",
       "frame": 6,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/jump/06.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "공중 다리 앞뒤 벌림이 설계보다 좁음. 양 무릎 몸 쪽으로 모임",
+    "hands_grounding_and_motion": "새 앞뒤 다리 분리 자세 반영. 준비0~1, 공중2~5, 착지6~7. 비반복 전환 검수",
     "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -2884,7 +2947,7 @@
   {
     "clip": "jump",
     "frame": 7,
-    "rendered_rgba_sha256": "6e1616bf9a6f53e9dc7911c382093be5b31c19e57b4c716f1a0be3d3982aaec1",
+    "rendered_rgba_sha256": "2aef579c6d16430f715be2535de24e07996636ed7c7f9ee220c940192dc5d820",
     "bbox": [
       41,
       51,
@@ -2895,10 +2958,11 @@
     "source": {
       "clip": "jump",
       "frame": 7,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/jump/07.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "시트 열람: 이 장에서 추가 결함을 단정하지 않음. 클립 시각 합격은 보류",
+    "hands_grounding_and_motion": "새 앞뒤 다리 분리 자세 반영. 준비0~1, 공중2~5, 착지6~7. 비반복 전환 검수",
     "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -2906,7 +2970,7 @@
   {
     "clip": "passslash",
     "frame": 0,
-    "rendered_rgba_sha256": "88b10595b94d21acb7547e32e0872d790078dd5b76af399096d546f02d1bf8b5",
+    "rendered_rgba_sha256": "81d55ed18889d2fe712e0447c0be12256be94aaa3114bbc9391d18f81ea25ce6",
     "bbox": [
       64,
       56,
@@ -2917,10 +2981,11 @@
     "source": {
       "clip": "passslash",
       "frame": 0,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/passslash/00.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "다리 이중 윤곽",
+    "hands_grounding_and_motion": "회색/보라색 이중 윤곽 정리, 알파·접지 위치 보존. 이동 속도/발 고정 문제의 해결을 뜻하지 않음",
     "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -3027,10 +3092,11 @@
     "source": {
       "clip": "passslash",
       "frame": 5,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/passslash/05.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "다리 이중 윤곽·마무리 상체 높이 변화",
+    "hands_grounding_and_motion": "회색/보라색 이중 윤곽 정리, 알파·접지 위치 보존. 이동 속도/발 고정 문제의 해결을 뜻하지 않음",
     "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -3082,7 +3148,7 @@
   {
     "clip": "carry2_run",
     "frame": 2,
-    "rendered_rgba_sha256": "243cc4f4cc1d1176a75c76cb0678475c2213e91823aebdbe123df9d0357a1d46",
+    "rendered_rgba_sha256": "495f1c2b8dc1cda3c57c6e1336b4409a32c2de3d5b7e1be45dbde396428aa234",
     "bbox": [
       66,
       55,
@@ -3093,10 +3159,11 @@
     "source": {
       "clip": "carry2_run",
       "frame": 2,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/carry2_run/02.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "발 옆 회색 조각",
+    "hands_grounding_and_motion": "회색/보라색 이중 윤곽 정리, 알파·접지 위치 보존. 이동 속도/발 고정 문제의 해결을 뜻하지 않음",
     "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -3214,7 +3281,7 @@
   {
     "clip": "stepup",
     "frame": 0,
-    "rendered_rgba_sha256": "509a770ebdd3b4015287921f737fe9a93a0c5f9b84ec19f059a808be1d3d3245",
+    "rendered_rgba_sha256": "4f4b3935f6084f49c4499e95399ffcff7eb32c77c39fb614e5b696162e5a1ae6",
     "bbox": [
       60,
       46,
@@ -3225,10 +3292,11 @@
     "source": {
       "clip": "stepup",
       "frame": 0,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/stepup/00.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "발·다리 외곽 이중 윤곽",
+    "hands_grounding_and_motion": "회색/보라색 이중 윤곽 정리, 알파·접지 위치 보존. 이동 속도/발 고정 문제의 해결을 뜻하지 않음",
     "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -3478,7 +3546,7 @@
   {
     "clip": "sneak",
     "frame": 5,
-    "rendered_rgba_sha256": "266c2ccbfbc76db879ca68f0e5902473736fb84bd5a1666b7bdc7e675ce84303",
+    "rendered_rgba_sha256": "80eec3534eba7f5629f8d1f57f37d0c893c45004b5160dceea2253d20a4f7b11",
     "bbox": [
       59,
       56,
@@ -3489,10 +3557,11 @@
     "source": {
       "clip": "sneak",
       "frame": 5,
-      "dy": 0
+      "dy": 0,
+      "correction": "resume/corrected/sneak/05.png"
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "발목 옆 회색 줄",
+    "hands_grounding_and_motion": "회색/보라색 이중 윤곽 정리, 알파·접지 위치 보존. 이동 속도/발 고정 문제의 해결을 뜻하지 않음",
     "loop_boundary": "마지막→0을 시연판 장넘김으로 확인 필요",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false

@@ -1,0 +1,139 @@
+{
+  "clip": "shotgun",
+  "sources": [
+    {
+      "clip": "shotgun",
+      "frame": 0,
+      "path": "full\\clips\\shotgun\\00.png",
+      "sha256": "267685b00e2d82a16b4403683f1987b932c6bdc3117bc0392a099ae9df3a523d",
+      "box": [
+        64,
+        48,
+        192,
+        112
+      ],
+      "tile": [
+        0,
+        0,
+        128,
+        64
+      ],
+      "regions": [
+        [
+          67,
+          58,
+          192,
+          81
+        ]
+      ]
+    },
+    {
+      "clip": "shotgun",
+      "frame": 1,
+      "path": "full\\clips\\shotgun\\01.png",
+      "sha256": "2bf038b3e696f0dbdb3dcc70d008e94fcd4e38ddc1e2a67060bdf95db38e3b1c",
+      "box": [
+        64,
+        48,
+        192,
+        112
+      ],
+      "tile": [
+        128,
+        0,
+        128,
+        64
+      ],
+      "regions": [
+        [
+          67,
+          58,
+          192,
+          81
+        ]
+      ]
+    },
+    {
+      "clip": "shotgun",
+      "frame": 2,
+      "path": "full\\clips\\shotgun\\02.png",
+      "sha256": "07230ab87cffdc5a10e4205764eaeb48453eabdce53c50b1c588e07e79988aeb",
+      "box": [
+        64,
+        48,
+        192,
+        112
+      ],
+      "tile": [
+        0,
+        64,
+        128,
+        64
+      ],
+      "regions": [
+        [
+          67,
+          58,
+          192,
+          81
+        ]
+      ]
+    },
+    {
+      "clip": "shotgun",
+      "frame": 3,
+      "path": "full\\clips\\shotgun\\03.png",
+      "sha256": "c759763c4a0fc454de9f9257d8ab3f99ce59d414a5e23b902f020774d1f51873",
+      "box": [
+        64,
+        48,
+        192,
+        112
+      ],
+      "tile": [
+        128,
+        64,
+        128,
+        64
+      ],
+      "regions": [
+        [
+          67,
+          58,
+          192,
+          81
+        ]
+      ]
+    },
+    {
+      "clip": "shotgun",
+      "frame": 4,
+      "path": "full\\clips\\shotgun\\04.png",
+      "sha256": "417cbff6c87d208048636ce5306815841843cb797a5ed4e2613db665599c7af8",
+      "box": [
+        64,
+        48,
+        192,
+        112
+      ],
+      "tile": [
+        0,
+        128,
+        128,
+        64
+      ],
+      "regions": [
+        [
+          67,
+          58,
+          192,
+          81
+        ]
+      ]
+    }
+  ],
+  "input_sha256": "30b112ca45be7df0e4034b0a516a0b7da7d44e4ace65f50c8ceaf04f9429df32",
+  "mask_sha256": "ba56798cbb2f699d0951fe4174f64257f2c827f580dd84bec8ff8d257f144f71",
+  "actual_cost": null,
+  "user_visual_approval": false
+}

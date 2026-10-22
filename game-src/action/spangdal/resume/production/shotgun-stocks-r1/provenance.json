@@ -1,0 +1,503 @@
+{
+  "sources": [
+    {
+      "clip": "idle_shotgun",
+      "frame": 0,
+      "path": "resume\\corrected\\idle_shotgun\\00.png",
+      "sha256": "cf5025774198b5ed9c0a3588af9b843fea8674cdaf3b60841fe81a2aa0ebe7c7",
+      "box": [
+        64,
+        68,
+        128,
+        116
+      ],
+      "tile": [
+        0,
+        0,
+        64,
+        48
+      ],
+      "regions": [
+        [
+          65,
+          81,
+          97,
+          98
+        ]
+      ]
+    },
+    {
+      "clip": "idle_shotgun",
+      "frame": 1,
+      "path": "resume\\corrected\\idle_shotgun\\01.png",
+      "sha256": "f523e8ee2ef4bbac52d7f9fa421f8fb77c04c44c334faffb2e301a9a6bc1ece4",
+      "box": [
+        64,
+        68,
+        128,
+        116
+      ],
+      "tile": [
+        64,
+        0,
+        64,
+        48
+      ],
+      "regions": [
+        [
+          65,
+          81,
+          97,
+          98
+        ]
+      ]
+    },
+    {
+      "clip": "idle_shotgun",
+      "frame": 2,
+      "path": "resume\\corrected\\idle_shotgun\\02.png",
+      "sha256": "d880ece770d9a3a8f2fd0e89f778a88d6bdb50962668b558baaf776af7a54268",
+      "box": [
+        64,
+        68,
+        128,
+        116
+      ],
+      "tile": [
+        128,
+        0,
+        64,
+        48
+      ],
+      "regions": [
+        [
+          65,
+          81,
+          97,
+          98
+        ]
+      ]
+    },
+    {
+      "clip": "idle_shotgun",
+      "frame": 3,
+      "path": "resume\\corrected\\idle_shotgun\\03.png",
+      "sha256": "6b00b18d4f1ce21d32d51e24703afd3f1bcbd5e3c78ec46f1d5b27f598b9e52c",
+      "box": [
+        64,
+        68,
+        128,
+        116
+      ],
+      "tile": [
+        192,
+        0,
+        64,
+        48
+      ],
+      "regions": [
+        [
+          65,
+          81,
+          97,
+          98
+        ]
+      ]
+    },
+    {
+      "clip": "walk_shotgun",
+      "frame": 0,
+      "path": "resume\\corrected\\walk_shotgun\\00.png",
+      "sha256": "277b28b98ae95cc402eb3057ee24a360bde1e097d2cc00f36fe98ad006a8265b",
+      "box": [
+        64,
+        68,
+        128,
+        116
+      ],
+      "tile": [
+        0,
+        48,
+        64,
+        48
+      ],
+      "regions": [
+        [
+          65,
+          81,
+          97,
+          98
+        ]
+      ]
+    },
+    {
+      "clip": "walk_shotgun",
+      "frame": 1,
+      "path": "resume\\corrected\\walk_shotgun\\01.png",
+      "sha256": "f8ed78406d2983bdacffad805b81355d60f4a9390d87925d7f2fc597ae373cc0",
+      "box": [
+        64,
+        68,
+        128,
+        116
+      ],
+      "tile": [
+        64,
+        48,
+        64,
+        48
+      ],
+      "regions": [
+        [
+          65,
+          81,
+          97,
+          98
+        ]
+      ]
+    },
+    {
+      "clip": "walk_shotgun",
+      "frame": 2,
+      "path": "resume\\corrected\\walk_shotgun\\02.png",
+      "sha256": "2bedc8be23fdfecc219cfc019dd9cacf7a579b01f65e0806dfc055d0636782a7",
+      "box": [
+        64,
+        68,
+        128,
+        116
+      ],
+      "tile": [
+        128,
+        48,
+        64,
+        48
+      ],
+      "regions": [
+        [
+          65,
+          81,
+          97,
+          98
+        ]
+      ]
+    },
+    {
+      "clip": "walk_shotgun",
+      "frame": 3,
+      "path": "resume\\corrected\\walk_shotgun\\03.png",
+      "sha256": "74598d7b01fc852690e5d77072d32a483a8112ad7e852ddf5341a8d3ce6c93a1",
+      "box": [
+        64,
+        68,
+        128,
+        116
+      ],
+      "tile": [
+        192,
+        48,
+        64,
+        48
+      ],
+      "regions": [
+        [
+          65,
+          81,
+          97,
+          98
+        ]
+      ]
+    },
+    {
+      "clip": "walk_shotgun",
+      "frame": 4,
+      "path": "resume\\corrected\\walk_shotgun\\04.png",
+      "sha256": "1eae9e405227906d7d36e990ee0d076c5566a72b0f0e9145878426db8627f410",
+      "box": [
+        64,
+        68,
+        128,
+        116
+      ],
+      "tile": [
+        0,
+        96,
+        64,
+        48
+      ],
+      "regions": [
+        [
+          65,
+          81,
+          97,
+          98
+        ]
+      ]
+    },
+    {
+      "clip": "walk_shotgun",
+      "frame": 5,
+      "path": "resume\\corrected\\walk_shotgun\\05.png",
+      "sha256": "e0f2b9ec7c61c6bc9c87bd108bc1a19f0ffc4aacdfae927b84bf94691e1567ae",
+      "box": [
+        64,
+        68,
+        128,
+        116
+      ],
+      "tile": [
+        64,
+        96,
+        64,
+        48
+      ],
+      "regions": [
+        [
+          65,
+          81,
+          97,
+          98
+        ]
+      ]
+    },
+    {
+      "clip": "walk_shotgun",
+      "frame": 6,
+      "path": "resume\\corrected\\walk_shotgun\\06.png",
+      "sha256": "d786a2bcb423e7a223e900bb9c288a7c379286facecde8f1f41c223efce457c5",
+      "box": [
+        64,
+        68,
+        128,
+        116
+      ],
+      "tile": [
+        128,
+        96,
+        64,
+        48
+      ],
+      "regions": [
+        [
+          65,
+          81,
+          97,
+          98
+        ]
+      ]
+    },
+    {
+      "clip": "run_shotgun",
+      "frame": 0,
+      "path": "resume\\corrected\\run_shotgun\\00.png",
+      "sha256": "1106fba94a471a7d482ca5edf1c16db0f9d91eda6e37058981259dd3b969d4bc",
+      "box": [
+        64,
+        80,
+        128,
+        128
+      ],
+      "tile": [
+        192,
+        96,
+        64,
+        48
+      ],
+      "regions": [
+        [
+          65,
+          95,
+          106,
+          111
+        ]
+      ]
+    },
+    {
+      "clip": "run_shotgun",
+      "frame": 1,
+      "path": "resume\\corrected\\run_shotgun\\01.png",
+      "sha256": "1c9ecd4ea09bb2be68504ac2f790fea74c2b703eaec8e1b7cf56e729bee7ceec",
+      "box": [
+        64,
+        80,
+        128,
+        128
+      ],
+      "tile": [
+        0,
+        144,
+        64,
+        48
+      ],
+      "regions": [
+        [
+          65,
+          95,
+          106,
+          111
+        ]
+      ]
+    },
+    {
+      "clip": "run_shotgun",
+      "frame": 2,
+      "path": "resume\\corrected\\run_shotgun\\02.png",
+      "sha256": "822919e56df20ee6caeb7d7cb71f837fd0e4220a8715c1a0fcd5ae4533d0f1f6",
+      "box": [
+        64,
+        80,
+        128,
+        128
+      ],
+      "tile": [
+        64,
+        144,
+        64,
+        48
+      ],
+      "regions": [
+        [
+          65,
+          95,
+          106,
+          111
+        ]
+      ]
+    },
+    {
+      "clip": "run_shotgun",
+      "frame": 3,
+      "path": "resume\\corrected\\run_shotgun\\03.png",
+      "sha256": "ab2ff4ae8aa449bc5c1ae945b4fe018af49399a8b58e00e66d20e596fe910a31",
+      "box": [
+        64,
+        80,
+        128,
+        128
+      ],
+      "tile": [
+        128,
+        144,
+        64,
+        48
+      ],
+      "regions": [
+        [
+          65,
+          95,
+          106,
+          111
+        ]
+      ]
+    },
+    {
+      "clip": "run_shotgun",
+      "frame": 4,
+      "path": "resume\\corrected\\run_shotgun\\04.png",
+      "sha256": "832a825cc50af7cdcc16c9a89c9b75dc389e2f2e00b5ec38603c28ecb3ea3767",
+      "box": [
+        64,
+        80,
+        128,
+        128
+      ],
+      "tile": [
+        192,
+        144,
+        64,
+        48
+      ],
+      "regions": [
+        [
+          65,
+          95,
+          106,
+          111
+        ]
+      ]
+    },
+    {
+      "clip": "run_shotgun",
+      "frame": 5,
+      "path": "resume\\corrected\\run_shotgun\\05.png",
+      "sha256": "d42bad06bef310821c102e1a0e389d8dd8fd34cf6212c6f60f6c19f2b0d653f4",
+      "box": [
+        64,
+        80,
+        128,
+        128
+      ],
+      "tile": [
+        0,
+        192,
+        64,
+        48
+      ],
+      "regions": [
+        [
+          65,
+          95,
+          106,
+          111
+        ]
+      ]
+    },
+    {
+      "clip": "run_shotgun",
+      "frame": 6,
+      "path": "resume\\corrected\\run_shotgun\\06.png",
+      "sha256": "c8b91b00eeac82233da10cb6c1211926b0923339da0b7c807e67e4660e56e9a2",
+      "box": [
+        64,
+        80,
+        128,
+        128
+      ],
+      "tile": [
+        64,
+        192,
+        64,
+        48
+      ],
+      "regions": [
+        [
+          65,
+          95,
+          106,
+          111
+        ]
+      ]
+    },
+    {
+      "clip": "run_shotgun",
+      "frame": 7,
+      "path": "resume\\corrected\\run_shotgun\\07.png",
+      "sha256": "9f4fc18cdf1e6b26445a67f5b01af61ed6fa831b9352d408db035698ec2f20ce",
+      "box": [
+        64,
+        80,
+        128,
+        128
+      ],
+      "tile": [
+        128,
+        192,
+        64,
+        48
+      ],
+      "regions": [
+        [
+          65,
+          95,
+          106,
+          111
+        ]
+      ]
+    }
+  ],
+  "input_sha256": "562efb8bd2455251cf0e04f73606d9b48394d5e05fd4582a2d46c492e3f90aa4",
+  "mask_sha256": "d904c2249896722abba55ad2bf947bfc61740593189e7455b2572981df22b59c",
+  "estimated_generations": 10,
+  "actual_cost": null,
+  "user_visual_approval": false
+}

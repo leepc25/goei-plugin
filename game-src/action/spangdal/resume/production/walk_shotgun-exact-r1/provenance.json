@@ -1,0 +1,64 @@
+{
+  "sources": [
+    {
+      "clip": "walk_shotgun",
+      "frame": 0,
+      "source_sha256": "c257e747afb5560f7999a74248920e9ad74f26fb5212cfdfe7d1547c9d3921e2",
+      "hand_right_x": 94,
+      "hand_y": 89.0,
+      "erased_pixels": 298
+    },
+    {
+      "clip": "walk_shotgun",
+      "frame": 1,
+      "source_sha256": "a1ee452e8e7ab3e45e2be11a418d62074cbeae54af5c890eec05b3184e29f511",
+      "hand_right_x": 94,
+      "hand_y": 89.0,
+      "erased_pixels": 303
+    },
+    {
+      "clip": "walk_shotgun",
+      "frame": 2,
+      "source_sha256": "02f106bf7b43a3d8851b758231259888d5455ba1284310bdaeea24c1f1650a7a",
+      "hand_right_x": 94,
+      "hand_y": 89.0,
+      "erased_pixels": 297
+    },
+    {
+      "clip": "walk_shotgun",
+      "frame": 3,
+      "source_sha256": "1a15365f2b331ae091147075f67c2a0112079c5c4afd814fbb56e290b051c171",
+      "hand_right_x": 94,
+      "hand_y": 89.0,
+      "erased_pixels": 298
+    },
+    {
+      "clip": "walk_shotgun",
+      "frame": 4,
+      "source_sha256": "411ddf4f714787499a97bcfbba345b20d64013f868315d8b9e273efcdad85cf6",
+      "hand_right_x": 94,
+      "hand_y": 89.0,
+      "erased_pixels": 299
+    },
+    {
+      "clip": "walk_shotgun",
+      "frame": 5,
+      "source_sha256": "ae8df835c3b0d6d9f5e86acaf52122296c77bf12b4c56ddc708be51be28480d3",
+      "hand_right_x": 94,
+      "hand_y": 89.0,
+      "erased_pixels": 295
+    },
+    {
+      "clip": "walk_shotgun",
+      "frame": 6,
+      "source_sha256": "d0fbfcc559c195bd0fea30806a82e1b227ea7fb6286a587ebf61a8a87ae4dbd2",
+      "hand_right_x": 95,
+      "hand_y": 89.0,
+      "erased_pixels": 296
+    }
+  ],
+  "input_sha256": "d78f6952a734da6123bd28adfc99db5d6bab24bdee4ec6403c3bc7eca9307ec0",
+  "cost": 0,
+  "scope": "external weapon removal only; grip/hidden stock still needs review",
+  "user_visual_approval": false
+}

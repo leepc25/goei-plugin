@@ -48,7 +48,7 @@
 </style>
 <div class="wrap">
   <h1>스팡달 전 동작 시연판 · 가시·배후·그림자 규칙</h1>
-  <p class="miss">기존 원본 재검수 · 새 그림 미생성 · 교체·이동된 장의 손 좌표만 보정 · 사용자 시각 승인 대기</p>
+  <p class="miss">스팡달 전투·이동 수정 후보 · 새 손 그림·교차 공격·빈손 파지 반영 · 사용자 시각 승인 대기</p>
   <div class="bar">
     <label>검수 동작 <select id="reviewclip" aria-label="검수 동작"></select></label>
     <label><input type="checkbox" id="paused"> 장 고정</label>
@@ -62,6 +62,7 @@
     <label><input type="checkbox" id="eatk" checked> 적 공격</label>
     <label><input type="checkbox" id="bright"> 밝은 방</label>
     <label><input type="checkbox" id="hand"> 손 좌표</label>
+    <label><input type="checkbox" id="weaponview" checked> 무기 별도 표시</label>
     <label>배경 <select id="bg"><option value="corr">관리국 복도</option><option value="dark">거의 검정</option><option value="grey">중간 회색</option></select></label>
     <label>배율 <select id="scale"><option value="2">2배</option><option value="3">3배</option></select></label>
     <label>속도 <select id="speed"><option>0.25</option><option>0.5</option><option selected>1</option></select></label>
@@ -97,12 +98,15 @@
 <script>
 const M = __MANIFEST__;
 const STRIPS = __STRIPS__;
+const WEAPONS = __WEAPONS__;
 const BG64 = "__BG__";
 const FW = M.frameW, FH = M.frameH, FOOT = M.foot, ANC = M.anchor;
 const $ = id => document.getElementById(id);
 let S = 2;
 const imgs = {};
-let loaded = 0; const total = Object.keys(STRIPS).length + 1;
+let loaded = 0; const total = Object.keys(STRIPS).length + Object.keys(WEAPONS).length + 1;
+const weaponImgs = {};
+for (const [k,b64] of Object.entries(WEAPONS)) { const im = new Image(); im.onload=()=>loaded++; im.src='data:image/png;base64,'+b64; weaponImgs[k]=im; }
 for (const [k, b64] of Object.entries(STRIPS)) { const im = new Image(); im.onload = () => loaded++; im.src = 'data:image/png;base64,' + b64; imgs[k] = im; }
 const bgImg = new Image(); bgImg.onload = () => loaded++; bgImg.src = 'data:image/png;base64,' + BG64;
 if (M.missing && M.missing.length) $('missing').textContent = '아직 그림이 없는 동작: ' + M.missing.join(', ');
@@ -741,6 +745,11 @@ function sprite(k, f, x, y, dir, alpha = 1, rim = false, sink = 0) {
   ctx.translate(Math.round(x), Math.round(y + sink * S)); ctx.scale(dir * S, S);
   if (rim) ctx.filter = `drop-shadow(${1 / S}px 0 0 rgba(170,150,210,.45)) drop-shadow(${-1 / S}px 0 0 rgba(170,150,210,.45)) drop-shadow(0 ${-1 / S}px 0 rgba(170,150,210,.45))`;
   if (SPR_FILTER) ctx.filter = SPR_FILTER;
+  const weapon = M.clips[k].weaponOverlay, grip = M.clips[k].hands?.[f]?.[0];
+  if (weapon && grip && $('weaponview').checked && weaponImgs[weapon]?.complete) {
+    ctx.save(); ctx.translate(grip[0]-ANC,grip[1]-FOOT); ctx.rotate(grip[2]*Math.PI/180);
+    ctx.drawImage(weaponImgs[weapon],weapon==='shotgun'?-12:-3,-4); ctx.restore();
+  }
   ctx.drawImage(im, f * FW, 0, FW, FH, -ANC, -FOOT, FW, FH);
   ctx.restore();
 }

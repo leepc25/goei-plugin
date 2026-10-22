@@ -1,0 +1,13 @@
+{
+  "accepted_frames": [
+    {
+      "clip": "stab1",
+      "frame": 2,
+      "source_sha256": "9c6a1d31bb573854816f90de27baa06a272596e3dfcdb7f77c32231597fcb4b9",
+      "output_sha256": "8a43187b7d6e94a7893fc5908adeb0d413d3b57e5cf64ffd644b0942d5adca20",
+      "candidate": "hand-inpaint-r1",
+      "user_visual_approval": false
+    }
+  ],
+  "local_mask_composite": true
+}

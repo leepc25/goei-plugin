@@ -1,0 +1,41 @@
+{
+  "accepted_frames": [
+    {
+      "clip": "idle_shotgun",
+      "frame": 0,
+      "source_sha256": "6d628177b716fb6c60b54de3308603d588842adfc274780c492c2792d031adec",
+      "output_sha256": "cf5025774198b5ed9c0a3588af9b843fea8674cdaf3b60841fe81a2aa0ebe7c7",
+      "pixel_tool_id": "e4b0c692-3d51-412a-a2e1-f900edd32a20",
+      "cost": 0,
+      "user_visual_approval": false
+    },
+    {
+      "clip": "idle_shotgun",
+      "frame": 1,
+      "source_sha256": "7bd28a23e7a993da49172ecd204f92bd7f5081dd15bbb5b53e145b6c9a5776d6",
+      "output_sha256": "f523e8ee2ef4bbac52d7f9fa421f8fb77c04c44c334faffb2e301a9a6bc1ece4",
+      "pixel_tool_id": "e4b0c692-3d51-412a-a2e1-f900edd32a20",
+      "cost": 0,
+      "user_visual_approval": false
+    },
+    {
+      "clip": "idle_shotgun",
+      "frame": 2,
+      "source_sha256": "4e72ab2a1e501b8c5b75b50e9ad61d64d3d1cb25d346cde255679c177d90bfa8",
+      "output_sha256": "d880ece770d9a3a8f2fd0e89f778a88d6bdb50962668b558baaf776af7a54268",
+      "pixel_tool_id": "e4b0c692-3d51-412a-a2e1-f900edd32a20",
+      "cost": 0,
+      "user_visual_approval": false
+    },
+    {
+      "clip": "idle_shotgun",
+      "frame": 3,
+      "source_sha256": "5dad3f20f55d236fe86e67e7f11e1280ed7397a441aee8c827f58a4cbe460596",
+      "output_sha256": "6b00b18d4f1ce21d32d51e24703afd3f1bcbd5e3c78ec46f1d5b27f598b9e52c",
+      "pixel_tool_id": "e4b0c692-3d51-412a-a2e1-f900edd32a20",
+      "cost": 0,
+      "user_visual_approval": false
+    }
+  ],
+  "face_pixels_preserved": true
+}

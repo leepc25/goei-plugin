@@ -1,0 +1,165 @@
+{
+  "clip": "pipe",
+  "sources": [
+    {
+      "clip": "pipe",
+      "frame": 0,
+      "path": "full\\clips\\pipe\\00.png",
+      "sha256": "5bd28acb704385a314540117499d794f15d18b143a241f6dfb990f249d3db01b",
+      "box": [
+        72,
+        64,
+        192,
+        128
+      ],
+      "tile": [
+        0,
+        0,
+        120,
+        64
+      ],
+      "regions": [
+        [
+          80,
+          78,
+          192,
+          100
+        ]
+      ]
+    },
+    {
+      "clip": "pipe",
+      "frame": 1,
+      "path": "full\\clips\\pipe\\01.png",
+      "sha256": "187c60be702b7630eec4422df05da59c005897394db0ecac8d93cdbeb192d803",
+      "box": [
+        72,
+        64,
+        192,
+        128
+      ],
+      "tile": [
+        120,
+        0,
+        120,
+        64
+      ],
+      "regions": [
+        [
+          116,
+          78,
+          192,
+          100
+        ]
+      ]
+    },
+    {
+      "clip": "pipe",
+      "frame": 2,
+      "path": "full\\clips\\pipe\\02.png",
+      "sha256": "a45641637189d97ee755bc2256b2b2c6757e1896f289fbb909763a6f18cf2edb",
+      "box": [
+        72,
+        64,
+        192,
+        128
+      ],
+      "tile": [
+        0,
+        64,
+        120,
+        64
+      ],
+      "regions": [
+        [
+          128,
+          78,
+          192,
+          100
+        ]
+      ]
+    },
+    {
+      "clip": "pipe",
+      "frame": 3,
+      "path": "full\\clips\\pipe\\03.png",
+      "sha256": "2fb88bcccd9dd2fba1a363817e733d6dbe9f75f33b7ee6ba3194c977cf9d8271",
+      "box": [
+        72,
+        64,
+        192,
+        128
+      ],
+      "tile": [
+        120,
+        64,
+        120,
+        64
+      ],
+      "regions": [
+        [
+          128,
+          78,
+          192,
+          100
+        ]
+      ]
+    },
+    {
+      "clip": "pipe",
+      "frame": 4,
+      "path": "full\\clips\\pipe\\04.png",
+      "sha256": "7ac29b87ecdc9c5869e0c0e358573b7fb6ff2ce0bfb4bc676f9027d6002bdef2",
+      "box": [
+        72,
+        64,
+        192,
+        128
+      ],
+      "tile": [
+        0,
+        128,
+        120,
+        64
+      ],
+      "regions": [
+        [
+          103,
+          78,
+          192,
+          100
+        ]
+      ]
+    },
+    {
+      "clip": "pipe",
+      "frame": 5,
+      "path": "full\\clips\\pipe\\05.png",
+      "sha256": "1bf86351ddcd92f890b19f2ba10c3cf2ea13921eedb12a88c5f9784e2f80d532",
+      "box": [
+        72,
+        64,
+        192,
+        128
+      ],
+      "tile": [
+        120,
+        128,
+        120,
+        64
+      ],
+      "regions": [
+        [
+          85,
+          78,
+          192,
+          100
+        ]
+      ]
+    }
+  ],
+  "input_sha256": "f449b2f0a650967547b2b6ea139d40aa8ce06924cf7b3123bacdd9fd03700f07",
+  "mask_sha256": "dec4f25a1b0a633bda2cee9e58acc914b4cc85efc6c303e595f285e2d278842b",
+  "actual_cost": null,
+  "user_visual_approval": false
+}

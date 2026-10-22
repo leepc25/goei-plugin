@@ -654,7 +654,7 @@
    "hold": 0,
    "origin": 0,
    "frames": 8,
-   "bytes": 17107,
+   "bytes": 16540,
    "hands": [
     [
      [
@@ -767,17 +767,20 @@
     {
      "clip": "run",
      "frame": 2,
-     "dy": 0
+     "dy": 0,
+     "correction": "resume/corrected/run/02.png"
     },
     {
      "clip": "run",
      "frame": 3,
-     "dy": -1
+     "dy": -1,
+     "correction": "resume/corrected/run/03.png"
     },
     {
      "clip": "run",
      "frame": 4,
-     "dy": -1
+     "dy": -1,
+     "correction": "resume/corrected/run/04.png"
     },
     {
      "clip": "run",
@@ -806,7 +809,7 @@
    "hold": 0,
    "origin": 0,
    "frames": 8,
-   "bytes": 22272,
+   "bytes": 21410,
    "hands": [
     [
      [
@@ -909,42 +912,50 @@
     {
      "clip": "jump",
      "frame": 0,
-     "dy": 0
+     "dy": 0,
+     "correction": "resume/corrected/jump/00.png"
     },
     {
      "clip": "jump",
      "frame": 1,
-     "dy": 0
+     "dy": 0,
+     "correction": "resume/corrected/jump/01.png"
     },
     {
      "clip": "jump",
      "frame": 2,
-     "dy": 0
+     "dy": 0,
+     "correction": "resume/corrected/jump/02.png"
     },
     {
      "clip": "jump",
      "frame": 3,
-     "dy": 0
+     "dy": 0,
+     "correction": "resume/corrected/jump/03.png"
     },
     {
      "clip": "jump",
      "frame": 4,
-     "dy": 0
+     "dy": 0,
+     "correction": "resume/corrected/jump/04.png"
     },
     {
      "clip": "jump",
      "frame": 5,
-     "dy": 0
+     "dy": 0,
+     "correction": "resume/corrected/jump/05.png"
     },
     {
      "clip": "jump",
      "frame": 6,
-     "dy": 0
+     "dy": 0,
+     "correction": "resume/corrected/jump/06.png"
     },
     {
      "clip": "jump",
      "frame": 7,
-     "dy": 0
+     "dy": 0,
+     "correction": "resume/corrected/jump/07.png"
     }
    ]
   },
@@ -1419,7 +1430,7 @@
    "hold": 0.03,
    "origin": 0,
    "frames": 6,
-   "bytes": 13535,
+   "bytes": 13242,
    "hands": [
     [
      [
@@ -1503,22 +1514,26 @@
     {
      "clip": "stab1",
      "frame": 1,
-     "dy": 0
+     "dy": 0,
+     "correction": "resume/corrected/stab1/01.png"
     },
     {
      "clip": "stab1",
      "frame": 2,
-     "dy": 0
+     "dy": 0,
+     "correction": "resume/corrected/stab1/02.png"
     },
     {
      "clip": "stab1",
      "frame": 3,
-     "dy": 0
+     "dy": 0,
+     "correction": "resume/corrected/stab1/03.png"
     },
     {
      "clip": "stab1",
      "frame": 4,
-     "dy": 0
+     "dy": 0,
+     "correction": "resume/corrected/stab1/04.png"
     },
     {
      "clip": "stab1",
@@ -1659,7 +1674,7 @@
    "hold": 0.1,
    "origin": 0,
    "frames": 8,
-   "bytes": 19670,
+   "bytes": 20832,
    "hands": [
     [
      [
@@ -1676,84 +1691,84 @@
     [
      [
       85.6,
-      88.5,
+      89.5,
       35
      ],
      [
       83.5,
-      89.2,
+      90.2,
       35
      ]
     ],
     [
      [
-      122.2,
-      87.2,
-      9
+      123.2,
+      80.7,
+      -23
      ],
      [
-      119.1,
+      121.5,
       89.1,
-      10
+      29
      ]
     ],
     [
      [
-      134.0,
-      84.9,
-      4
+      131.5,
+      81.1,
+      -36
      ],
      [
-      131.8,
-      86.7,
-      4
+      130.5,
+      93.1,
+      37
      ]
     ],
     [
      [
-      134.0,
-      84.9,
-      4
+      131.5,
+      81.1,
+      -36
      ],
      [
-      131.8,
-      86.7,
-      4
+      130.5,
+      93.1,
+      37
      ]
     ],
     [
      [
-      134.0,
-      84.9,
-      4
+      131.5,
+      81.1,
+      -36
      ],
      [
-      131.8,
-      86.7,
-      4
+      130.5,
+      93.1,
+      37
      ]
     ],
     [
      [
-      116.9,
-      87.2,
-      15
+      123.4,
+      82.7,
+      -16
      ],
      [
-      113.1,
-      89.2,
-      18
+      121.0,
+      89.7,
+      30
      ]
     ],
     [
      [
       99.8,
-      90.4,
+      89.4,
       45
      ],
      [
       94.4,
-      92.7,
+      91.7,
       53
      ]
     ]
@@ -1762,42 +1777,50 @@
     {
      "clip": "pierce3",
      "frame": 0,
-     "dy": 0
+     "dy": 0,
+     "correction": "resume/corrected/pierce3/00.png"
     },
     {
      "clip": "pierce3",
      "frame": 1,
-     "dy": -1
+     "dy": 0,
+     "correction": "resume/corrected/pierce3/01.png"
     },
     {
      "clip": "pierce3",
      "frame": 2,
-     "dy": -1
+     "dy": 0,
+     "correction": "resume/corrected/pierce3/02.png"
     },
     {
      "clip": "pierce3",
      "frame": 3,
-     "dy": -2
+     "dy": -1,
+     "correction": "resume/corrected/pierce3/03.png"
     },
     {
      "clip": "pierce3",
      "frame": 4,
-     "dy": -2
+     "dy": -1,
+     "correction": "resume/corrected/pierce3/04.png"
     },
     {
      "clip": "pierce3",
      "frame": 5,
-     "dy": -2
+     "dy": -1,
+     "correction": "resume/corrected/pierce3/05.png"
     },
     {
      "clip": "pierce3",
      "frame": 6,
-     "dy": -2
+     "dy": -1,
+     "correction": "resume/corrected/pierce3/06.png"
     },
     {
      "clip": "pierce3",
      "frame": 7,
-     "dy": -1
+     "dy": -2,
+     "correction": "resume/corrected/pierce3/07.png"
     }
    ]
   },
@@ -1950,7 +1973,7 @@
    "hold": 0.04,
    "origin": 0,
    "frames": 6,
-   "bytes": 17852,
+   "bytes": 17440,
    "hands": [
     [
      [
@@ -2029,7 +2052,8 @@
     {
      "clip": "passslash",
      "frame": 0,
-     "dy": 0
+     "dy": 0,
+     "correction": "resume/corrected/passslash/00.png"
     },
     {
      "clip": "passslash",
@@ -2054,7 +2078,8 @@
     {
      "clip": "passslash",
      "frame": 5,
-     "dy": 0
+     "dy": 0,
+     "correction": "resume/corrected/passslash/05.png"
     }
    ]
   },
@@ -5001,7 +5026,7 @@
    "hold": 0.05,
    "origin": 0,
    "frames": 6,
-   "bytes": 17476,
+   "bytes": 14883,
    "hands": [
     [
      [
@@ -5080,34 +5105,41 @@
     {
      "clip": "pipe",
      "frame": 0,
-     "dy": 0
+     "dy": 0,
+     "correction": "resume/corrected/pipe/00.png"
     },
     {
      "clip": "pipe",
      "frame": 1,
-     "dy": 0
+     "dy": 0,
+     "correction": "resume/corrected/pipe/01.png"
     },
     {
      "clip": "pipe",
      "frame": 2,
-     "dy": -1
+     "dy": -1,
+     "correction": "resume/corrected/pipe/02.png"
     },
     {
      "clip": "pipe",
      "frame": 3,
-     "dy": -1
+     "dy": -1,
+     "correction": "resume/corrected/pipe/03.png"
     },
     {
      "clip": "pipe",
      "frame": 4,
-     "dy": 0
+     "dy": 0,
+     "correction": "resume/corrected/pipe/04.png"
     },
     {
      "clip": "pipe",
      "frame": 5,
-     "dy": 0
+     "dy": 0,
+     "correction": "resume/corrected/pipe/05.png"
     }
-   ]
+   ],
+   "weaponOverlay": "pipe"
   },
   "shotgun": {
    "label": "임시 총",
@@ -5121,7 +5153,7 @@
    "hold": 0,
    "origin": 0,
    "frames": 5,
-   "bytes": 8875,
+   "bytes": 7249,
    "hands": [
     [
      [
@@ -5188,29 +5220,35 @@
     {
      "clip": "shotgun",
      "frame": 0,
-     "dy": 0
+     "dy": 0,
+     "correction": "resume/corrected/shotgun/00.png"
     },
     {
      "clip": "shotgun",
      "frame": 1,
-     "dy": 0
+     "dy": 0,
+     "correction": "resume/corrected/shotgun/01.png"
     },
     {
      "clip": "shotgun",
      "frame": 2,
-     "dy": 0
+     "dy": 0,
+     "correction": "resume/corrected/shotgun/02.png"
     },
     {
      "clip": "shotgun",
      "frame": 3,
-     "dy": 0
+     "dy": 0,
+     "correction": "resume/corrected/shotgun/03.png"
     },
     {
      "clip": "shotgun",
      "frame": 4,
-     "dy": 0
+     "dy": 0,
+     "correction": "resume/corrected/shotgun/04.png"
     }
-   ]
+   ],
+   "weaponOverlay": "shotgun"
   },
   "idle_pipe": {
    "label": "날붙이 쥐듯 끝을 아래로 늘어뜨림",
@@ -5222,7 +5260,7 @@
    "hold": 0,
    "origin": 0,
    "frames": 4,
-   "bytes": 8180,
+   "bytes": 6319,
    "hands": [
     [
      [
@@ -5277,24 +5315,29 @@
     {
      "clip": "idle_pipe",
      "frame": 0,
-     "dy": 0
+     "dy": 0,
+     "correction": "resume/corrected/idle_pipe/00.png"
     },
     {
      "clip": "idle_pipe",
      "frame": 1,
-     "dy": 0
+     "dy": 0,
+     "correction": "resume/corrected/idle_pipe/01.png"
     },
     {
      "clip": "idle_pipe",
      "frame": 2,
-     "dy": 0
+     "dy": 0,
+     "correction": "resume/corrected/idle_pipe/02.png"
     },
     {
      "clip": "idle_pipe",
      "frame": 3,
-     "dy": 0
+     "dy": 0,
+     "correction": "resume/corrected/idle_pipe/03.png"
     }
-   ]
+   ],
+   "weaponOverlay": "pipe"
   },
   "walk_pipe": {
    "label": "같은 쥐는 법으로 여우 걸음",
@@ -5306,7 +5349,7 @@
    "hold": 0,
    "origin": 0,
    "frames": 7,
-   "bytes": 11617,
+   "bytes": 9724,
    "hands": [
     [
      [
@@ -5397,39 +5440,47 @@
     {
      "clip": "walk_pipe",
      "frame": 0,
-     "dy": 0
+     "dy": 0,
+     "correction": "resume/corrected/walk_pipe/00.png"
     },
     {
      "clip": "walk_pipe",
      "frame": 1,
-     "dy": 0
+     "dy": 0,
+     "correction": "resume/corrected/walk_pipe/01.png"
     },
     {
      "clip": "walk_pipe",
      "frame": 2,
-     "dy": 0
+     "dy": 0,
+     "correction": "resume/corrected/walk_pipe/02.png"
     },
     {
      "clip": "walk_pipe",
      "frame": 3,
-     "dy": 0
+     "dy": 0,
+     "correction": "resume/corrected/walk_pipe/03.png"
     },
     {
      "clip": "walk_pipe",
      "frame": 4,
-     "dy": 0
+     "dy": 0,
+     "correction": "resume/corrected/walk_pipe/04.png"
     },
     {
      "clip": "walk_pipe",
      "frame": 5,
-     "dy": 0
+     "dy": 0,
+     "correction": "resume/corrected/walk_pipe/05.png"
     },
     {
      "clip": "walk_pipe",
      "frame": 6,
-     "dy": 0
+     "dy": 0,
+     "correction": "resume/corrected/walk_pipe/06.png"
     }
-   ]
+   ],
+   "weaponOverlay": "pipe"
   },
   "idle_shotgun": {
    "label": "한 손으로 몸에서 멀리 들기",
@@ -5441,7 +5492,7 @@
    "hold": 0,
    "origin": 0,
    "frames": 4,
-   "bytes": 9064,
+   "bytes": 7896,
    "hands": [
     [
      [
@@ -5496,24 +5547,29 @@
     {
      "clip": "idle_shotgun",
      "frame": 0,
-     "dy": 0
+     "dy": 0,
+     "correction": "resume/corrected/idle_shotgun/00.png"
     },
     {
      "clip": "idle_shotgun",
      "frame": 1,
-     "dy": 0
+     "dy": 0,
+     "correction": "resume/corrected/idle_shotgun/01.png"
     },
     {
      "clip": "idle_shotgun",
      "frame": 2,
-     "dy": 0
+     "dy": 0,
+     "correction": "resume/corrected/idle_shotgun/02.png"
     },
     {
      "clip": "idle_shotgun",
      "frame": 3,
-     "dy": 0
+     "dy": 0,
+     "correction": "resume/corrected/idle_shotgun/03.png"
     }
-   ]
+   ],
+   "weaponOverlay": "shotgun"
   },
   "walk_shotgun": {
    "label": "멀리 든 채 걷기",
@@ -5525,7 +5581,7 @@
    "hold": 0,
    "origin": 0,
    "frames": 7,
-   "bytes": 14225,
+   "bytes": 13261,
    "hands": [
     [
      [
@@ -5616,39 +5672,47 @@
     {
      "clip": "walk_shotgun",
      "frame": 0,
-     "dy": 0
+     "dy": 0,
+     "correction": "resume/corrected/walk_shotgun/00.png"
     },
     {
      "clip": "walk_shotgun",
      "frame": 1,
-     "dy": 0
+     "dy": 0,
+     "correction": "resume/corrected/walk_shotgun/01.png"
     },
     {
      "clip": "walk_shotgun",
      "frame": 2,
-     "dy": 0
+     "dy": 0,
+     "correction": "resume/corrected/walk_shotgun/02.png"
     },
     {
      "clip": "walk_shotgun",
      "frame": 3,
-     "dy": -1
+     "dy": -1,
+     "correction": "resume/corrected/walk_shotgun/03.png"
     },
     {
      "clip": "walk_shotgun",
      "frame": 4,
-     "dy": 0
+     "dy": 0,
+     "correction": "resume/corrected/walk_shotgun/04.png"
     },
     {
      "clip": "walk_shotgun",
      "frame": 5,
-     "dy": 0
+     "dy": 0,
+     "correction": "resume/corrected/walk_shotgun/05.png"
     },
     {
      "clip": "walk_shotgun",
      "frame": 6,
-     "dy": 0
+     "dy": 0,
+     "correction": "resume/corrected/walk_shotgun/06.png"
     }
-   ]
+   ],
+   "weaponOverlay": "shotgun"
   },
   "run_shotgun": {
    "label": "멀리 든 채 낮은 질주",
@@ -5660,7 +5724,7 @@
    "hold": 0,
    "origin": 0,
    "frames": 8,
-   "bytes": 19064,
+   "bytes": 19788,
    "hands": [
     [
      [
@@ -5763,44 +5827,53 @@
     {
      "clip": "run_shotgun",
      "frame": 0,
-     "dy": 0
+     "dy": 0,
+     "correction": "resume/corrected/run_shotgun/00.png"
     },
     {
      "clip": "run_shotgun",
      "frame": 1,
-     "dy": 0
+     "dy": 0,
+     "correction": "resume/corrected/run_shotgun/01.png"
     },
     {
      "clip": "run_shotgun",
      "frame": 2,
-     "dy": 0
+     "dy": 0,
+     "correction": "resume/corrected/run_shotgun/02.png"
     },
     {
      "clip": "run_shotgun",
      "frame": 3,
-     "dy": -1
+     "dy": -1,
+     "correction": "resume/corrected/run_shotgun/03.png"
     },
     {
      "clip": "run_shotgun",
      "frame": 4,
-     "dy": -1
+     "dy": -1,
+     "correction": "resume/corrected/run_shotgun/04.png"
     },
     {
      "clip": "run_shotgun",
      "frame": 5,
-     "dy": 0
+     "dy": 0,
+     "correction": "resume/corrected/run_shotgun/05.png"
     },
     {
      "clip": "run_shotgun",
      "frame": 6,
-     "dy": 0
+     "dy": 0,
+     "correction": "resume/corrected/run_shotgun/06.png"
     },
     {
      "clip": "run_shotgun",
      "frame": 7,
-     "dy": 0
+     "dy": 0,
+     "correction": "resume/corrected/run_shotgun/07.png"
     }
-   ]
+   ],
+   "weaponOverlay": "shotgun"
   },
   "tired": {
    "label": "손 포갠 채 서서 고개만 떨어졌다 올라옴",
@@ -6051,7 +6124,7 @@
    "hold": 0,
    "origin": 0,
    "frames": 7,
-   "bytes": 11563,
+   "bytes": 11223,
    "hands": [
     [
      [
@@ -6142,7 +6215,8 @@
     {
      "clip": "stepup",
      "frame": 0,
-     "dy": 0
+     "dy": 0,
+     "correction": "resume/corrected/stepup/00.png"
     },
     {
      "clip": "stepup",
@@ -6422,7 +6496,7 @@
    "hold": 0,
    "origin": 0,
    "frames": 8,
-   "bytes": 15689,
+   "bytes": 15123,
    "hands": [
     [
      [
@@ -6535,7 +6609,8 @@
     {
      "clip": "carry2_run",
      "frame": 2,
-     "dy": 0
+     "dy": 0,
+     "correction": "resume/corrected/carry2_run/02.png"
     },
     {
      "clip": "carry2_run",
@@ -7264,7 +7339,7 @@
    "hold": 0,
    "origin": 0,
    "frames": 8,
-   "bytes": 14381,
+   "bytes": 13790,
    "hands": [
     [
      [
@@ -7392,7 +7467,8 @@
     {
      "clip": "sneak",
      "frame": 5,
-     "dy": 0
+     "dy": 0,
+     "correction": "resume/corrected/sneak/05.png"
     },
     {
      "clip": "sneak",

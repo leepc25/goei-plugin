@@ -21,7 +21,7 @@ gen = load('spangdal_gen', ROOT / 'game-src/action/spangdal/scripts/gen.py')
 class ResumeTest(unittest.TestCase):
     def test_cli_loads_spangdal_rig_outside_scripts_directory(self):
         result = subprocess.run([sys.executable, str(ROOT / 'game-src/action/spangdal/scripts/gen.py'), '--help'],
-                                cwd='/tmp', text=True, capture_output=True, check=True)
+                                cwd=tempfile.gettempdir(), text=True, encoding='utf-8', capture_output=True, check=True)
         self.assertIn('stab1', result.stdout)
         self.assertIn('pierce3', result.stdout)
     def test_timeout_cannot_submit_twice(self):
