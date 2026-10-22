@@ -1,0 +1,13 @@
+{
+  "request_sha256": "b0fdb70ddeaa21a9be919fe6c7a99a1d1b04b282debf89a98344d8dfe392c29e",
+  "received_at": "2026-10-22T10:42:26.833Z",
+  "response": {
+    "content": [
+      {
+        "type": "text",
+        "text": "id: f06a14de-204f-47b2-badd-dfd49796f148\njob_id: f06a14de-204f-47b2-badd-dfd49796f148\ndescription: battle nun: black veil to the shoulders with a thin white forehead band, white collar, long fitted black habit with a high side slit, pale thigh with a black garter holster, ash-blonde straight hair with blunt bangs, green eyes, thick grey chain with a silver cross on the chest, wooden rosary on the wrist, black shoes, a silver pistol in each hand, one character only, isolated, strict right side profile, no effects, no other people\naction: low ready stance with two separate pistols, hands at waist height, subtle breathing\nframes: 4\nsize: 256x176px\ntransparent: True\ncost: 3 generations\nstatus: processing (~4 min)\n\nhint: get_image(job_id=\"f06a14de-204f-47b2-badd-dfd49796f148\")\nasset_id: ee6a94a4-791e-5460-a5f4-d97fa9e99eb6\nasset_status: pending (saved to your gallery when generation completes)"
+      }
+    ],
+    "isError": false
+  }
+}

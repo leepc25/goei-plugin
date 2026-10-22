@@ -1,0 +1,16 @@
+{
+  "blaret-guns_idle": {
+    "status": "불합격 · 추가 보정 필요",
+    "notes": "0–3: 얼굴·복식·접지 유지. 한 자루는 보이나 원측 권총/손이 분명하지 않음. 기존 가슴 앞 손 모임은 해소. 같은 skeleton 재발주 금지.",
+    "user_approved": false,
+    "generated": true,
+    "internal_pass": false
+  },
+  "blaret-stake_finish": {
+    "status": "타인 혼입 해소 · 준비 자세 보완",
+    "notes": "0–7: 본인만 존재, 얼굴·베일·체형 유지. 1–3: 들어 올린 팔이 얼굴 일부를 가림. 4–7: 얼굴 보이고 한쪽 무릎과 앞발 접지. 신규 결과는 비교판에만 포함하며 사용자 승인 전.",
+    "user_approved": false,
+    "generated": true,
+    "internal_pass": false
+  }
+}

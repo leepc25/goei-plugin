@@ -1,0 +1,29 @@
+{
+  "results": [
+    {
+      "name": "pc",
+      "width": 1280,
+      "height": 900,
+      "clips": 2,
+      "frame_step": true,
+      "horizontal_overflow": false
+    },
+    {
+      "name": "mobile-landscape",
+      "width": 844,
+      "height": 390,
+      "clips": 2,
+      "frame_step": true,
+      "horizontal_overflow": false
+    },
+    {
+      "name": "mobile-portrait",
+      "width": 390,
+      "height": 844,
+      "clips": 2,
+      "frame_step": true,
+      "horizontal_overflow": false
+    }
+  ],
+  "errors": []
+}

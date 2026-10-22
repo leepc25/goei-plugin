@@ -1,0 +1,197 @@
+{
+  "schema": 1,
+  "user_visual_approved": false,
+  "entries": [
+    {
+      "key": "blaret-guns_idle",
+      "name": "블라렛 · 쌍권총 준비",
+      "frames": 4,
+      "oldFrames": 4,
+      "img": null,
+      "old": null,
+      "fps": 6,
+      "loop": true,
+      "root": null,
+      "qa": {
+        "status": "불합격 · 추가 보정 필요",
+        "notes": "0–3: 얼굴·복식·접지 유지. 한 자루는 보이나 원측 권총/손이 분명하지 않음. 기존 가슴 앞 손 모임은 해소. 같은 skeleton 재발주 금지.",
+        "user_approved": false,
+        "generated": true,
+        "internal_pass": false
+      },
+      "hands": [
+        {
+          "RIGHT ARM": [
+            120.37,
+            112.69
+          ],
+          "LEFT ARM": [
+            105.27,
+            120.42
+          ]
+        },
+        {
+          "RIGHT ARM": [
+            120.37,
+            113.19
+          ],
+          "LEFT ARM": [
+            105.27,
+            120.93
+          ]
+        },
+        {
+          "RIGHT ARM": [
+            120.37,
+            113.7
+          ],
+          "LEFT ARM": [
+            105.27,
+            121.42
+          ]
+        },
+        {
+          "RIGHT ARM": [
+            120.37,
+            113.19
+          ],
+          "LEFT ARM": [
+            105.27,
+            120.93
+          ]
+        }
+      ]
+    },
+    {
+      "key": "blaret-stake_finish",
+      "name": "블라렛 · 말뚝 내려꽂기",
+      "frames": 8,
+      "oldFrames": 8,
+      "img": null,
+      "old": null,
+      "fps": 14,
+      "loop": false,
+      "root": null,
+      "qa": {
+        "status": "타인 혼입 해소 · 준비 자세 보완",
+        "notes": "0–7: 본인만 존재, 얼굴·베일·체형 유지. 1–3: 들어 올린 팔이 얼굴 일부를 가림. 4–7: 얼굴 보이고 한쪽 무릎과 앞발 접지. 신규 결과는 비교판에만 포함하며 사용자 승인 전.",
+        "user_approved": false,
+        "generated": true,
+        "internal_pass": false
+      },
+      "hands": [
+        {
+          "RIGHT ARM": [
+            101.56,
+            99.18
+          ],
+          "LEFT ARM": [
+            93.26,
+            121.93
+          ]
+        },
+        {
+          "RIGHT ARM": [
+            141.93,
+            95.64
+          ],
+          "LEFT ARM": [
+            139.37,
+            96.82
+          ]
+        },
+        {
+          "RIGHT ARM": [
+            141.93,
+            95.64
+          ],
+          "LEFT ARM": [
+            139.37,
+            96.82
+          ]
+        },
+        {
+          "RIGHT ARM": [
+            140.83,
+            106.15
+          ],
+          "LEFT ARM": [
+            138.37,
+            107.11
+          ]
+        },
+        {
+          "RIGHT ARM": [
+            138.57,
+            127.49
+          ],
+          "LEFT ARM": [
+            136.35,
+            128.0
+          ]
+        },
+        {
+          "RIGHT ARM": [
+            135.99,
+            151.99
+          ],
+          "LEFT ARM": [
+            133.99,
+            151.99
+          ]
+        },
+        {
+          "RIGHT ARM": [
+            135.99,
+            151.99
+          ],
+          "LEFT ARM": [
+            133.99,
+            151.99
+          ]
+        },
+        {
+          "RIGHT ARM": [
+            135.99,
+            151.01
+          ],
+          "LEFT ARM": [
+            133.99,
+            151.01
+          ]
+        }
+      ]
+    }
+  ],
+  "ledger": [
+    {
+      "key": "blaret-guns_idle",
+      "job_id": "f06a14de-204f-47b2-badd-dfd49796f148",
+      "actual_generations": 3.0,
+      "source": "submission_receipt",
+      "input_sha256": "31e0736a1803826bf2afaa72b17c2131689365429fee66f9082d623cf8379cb9",
+      "request_sha256": "b0fdb70ddeaa21a9be919fe6c7a99a1d1b04b282debf89a98344d8dfe392c29e"
+    },
+    {
+      "key": "blaret-stake_finish",
+      "job_id": "76884626-42e9-4626-980a-37663c8aac8f",
+      "actual_generations": 3.0,
+      "source": "submission_receipt",
+      "input_sha256": "31e0736a1803826bf2afaa72b17c2131689365429fee66f9082d623cf8379cb9",
+      "request_sha256": "c8708e21fe561a34321fcbdd6b19421b45c787d60e50f708d5a064b07ea4ea85"
+    },
+    {
+      "key": "blaret-super_ready",
+      "job_id": "429ad77b-ed3b-4337-9524-075adf0a262c",
+      "actual_generations": 3.0,
+      "source": "submission_receipt",
+      "input_sha256": "31e0736a1803826bf2afaa72b17c2131689365429fee66f9082d623cf8379cb9",
+      "request_sha256": "b3dffc75ddb48a28d34caf7e9c60cf39300d9f3126029e630c88a57c3ae94fe0"
+    }
+  ],
+  "actual_generations": 9.0,
+  "historical_generations": {
+    "reported": 171,
+    "per_job_verified": false
+  }
+}

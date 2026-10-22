@@ -132,3 +132,6 @@
 10-22 05:25:21 gen saladin/armed_idle done
 10-22 05:25:23 gen modernspirit/fire done
 10-22 05:25:25 gen blaret/wrath done
+
+2026-10-22 resume blaret/guns_idle job_id=f06a14de-204f-47b2-badd-dfd49796f148 charged_generations=3 source=submission_receipt input_sha256=31e0736a1803826bf2afaa72b17c2131689365429fee66f9082d623cf8379cb9 request_sha256=b0fdb70ddeaa21a9be919fe6c7a99a1d1b04b282debf89a98344d8dfe392c29e
+2026-10-22 resume blaret-stake_finish job_id=76884626-42e9-4626-980a-37663c8aac8f charged_generations=3 source=submission_and_completion input_sha256=31e0736a1803826bf2afaa72b17c2131689365429fee66f9082d623cf8379cb9 request_sha256=c8708e21fe561a34321fcbdd6b19421b45c787d60e50f708d5a064b07ea4ea85
