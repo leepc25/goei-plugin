@@ -19,7 +19,7 @@ globalThis.Image ??= class { complete = false; naturalWidth = 0; src = ''; };
 
 mkdirSync('dist-test', { recursive: true });
 await build({
-  stdin: { contents: "export { makeFloor, floorPlan } from './src/game/action/stage/index.ts'; export { propArtSize } from './src/game/action/art/bg.ts'; export { createField, furnishFloor, PROPS } from './src/game/action/items/index.ts'; export * from './src/game/action/engine/propBlock.ts';", resolveDir: '.', loader: 'ts' },
+  stdin: { contents: "export { makeFloor, floorPlan, narrowBack } from './src/game/action/stage/index.ts'; export { propArtSize } from './src/game/action/art/bg.ts'; export { createField, furnishFloor, PROPS } from './src/game/action/items/index.ts'; export * from './src/game/action/engine/propBlock.ts';", resolveDir: '.', loader: 'ts' },
   bundle: true, format: 'esm', target: 'es2022', outfile: 'dist-test/floorfit.mjs', loader: { '.css': 'text', '.png': 'empty' }, logLevel: 'error',
 });
 const M = await import('../dist-test/floorfit.mjs');
@@ -30,7 +30,7 @@ let seedR = 1;
 const rnd = () => ((seedR = (seedR * 16807) % 2147483647) / 2147483647);
 
 test('바닥 물건은 문 앞·적 생성 자리에 놓이지 않고, 적은 물건 밖에 생겨난다', () => {
-  let floors = 0, doorsChecked = 0, spawns = 0, wallProps = 0;
+  let floors = 0, doorsChecked = 0, spawns = 0, wallProps = 0, lockers = 0;
   const moved = [];
   for (let seed = 1; seed <= 40; seed++)
     for (const type of TYPES) {
@@ -58,6 +58,16 @@ test('바닥 물건은 문 앞·적 생성 자리에 놓이지 않고, 적은 �
         const hit = (plan.keepOut ?? []).find(([a, b]) => q.x + aw / 2 > a && q.x - aw / 2 < b && !(a >= q.x - aw / 2 && b <= q.x + aw / 2 && b - a >= 100));
         if (hit) moved.push(`${type} ${depth} ${seed}: 점검문@${q.x} 폭 ${aw} ↔ [${Math.round(hit[0])}, ${Math.round(hit[1])}]`);
       }
+      // 좁은 길 뒷줄 사물함(키 큰 그림)도 벽 그림의 문·명패·게시판·액자·창 앞에 서지 않는다 (검수 23)
+      const allTerr = f.segments.flatMap((sg) => sg.terrain);
+      const lh = (M.propArtSize('clutter', '사물함')?.w ?? 150) / 2;
+      for (const t of allTerr.filter((t) => t.kind === 'narrow')) {
+        for (const x of M.narrowBack(t, allTerr)?.xs ?? []) {
+          lockers++;
+          const hit = (plan.keepOut ?? []).find(([a, b]) => x + lh > a && x - lh < b);
+          assert.ok(!hit, `${type} ${depth} ${seed}: 사물함@${x} ↔ 벽 [${hit?.map(Math.round)}]`);
+        }
+      }
       // 사다리(천장 해치)는 벽선에, 문·벽 장식 앞이 아니고, 한 화면에 하나 (검수 21)
       const hatches = plan.props.filter((q) => q.kind === 'hatch').sort((a, b) => a.x - b.x);
       hatches.forEach((h, i) => {
@@ -84,5 +94,5 @@ test('바닥 물건은 문 앞·적 생성 자리에 놓이지 않고, 적은 �
     }
   // 자리가 정말 없을 때(480px 안) 원래 자리에 남는 경우만 조금 허용
   assert.ok(moved.length <= floors * 0.03, `벽 소품 ${wallProps}개 중 ${moved.length}개가 문·장식 앞:\n${moved.slice(0, 8).join('\n')}`);
-  assert.ok(floors === 320 && doorsChecked > 300 && spawns > 500, `층 ${floors}, 문 ${doorsChecked}, 적 ${spawns}`);
+  assert.ok(floors === 320 && doorsChecked > 300 && spawns > 500 && lockers > 50, `층 ${floors}, 문 ${doorsChecked}, 적 ${spawns}, 사물함 ${lockers}`);
 });

@@ -39,13 +39,18 @@ export function narrowBack(t: Terrain, terr: readonly Terrain[] = []): { span: [
     if (o.x1 <= t.x0 && (o.x1 + t.x0) / 2 > a) (a = (o.x1 + t.x0) / 2), (clipped = true);
     else if (o.x0 >= t.x1 && (t.x1 + o.x0) / 2 < b) (b = (t.x1 + o.x0) / 2), (clipped = true);
   }
-  if (!clipped) return { span: [a, b], xs };
+  // 벽 그림의 문·명패·게시판·액자·창 앞 사물함은 뺀다(그 칸은 낮은 차단대): 키 큰 사물함이 벽 그림을 가렸다 (검수 23)
+  const wall = lockerWall.get(t);
+  const open = (xs: number[]) => (wall ? xs.filter((x) => !wall.spans.some(([s0, s1]) => x + wall.half > s0 && x - wall.half < s1)) : xs);
+  if (!clipped) return { span: [a, b], xs: open(xs) };
   if (b - a < 2 * H) return { span: [Math.max(a, t.x0 - 20), Math.min(b, t.x1 + 20)], xs: [] };
   const fit: number[] = [];
   for (let x = a + H; x <= b - H; x += 100) fit.push(x);
   if (fit[fit.length - 1] < b - H - 1) fit.push(b - H);
-  return { span: [a, b], xs: fit };
+  return { span: [a, b], xs: open(fit) };
 }
+/** floorPlan이 채운다: 좁은 길마다 피할 벽 그림 구간과 사물함 그림 절반 폭 */
+const lockerWall = new WeakMap<Terrain, { spans: [number, number][]; half: number }>();
 export const narrowBackSpan = (t: Terrain, terr: readonly Terrain[] = []): [number, number] | null => narrowBack(t, terr)?.span ?? null;
 
 const NOLOCK_TYPES = new Set(['chase', 'deep']);
@@ -70,6 +75,8 @@ export function floorPlan(f: Floor, id: string, startX = 240): StagePlan {
     if (s.role === 'enemy' && s.data.harmless) props.push({ id: `h${s.id}`, kind: 'npc', x: s.x, y: laneY(s.lane), w: 50, h: 150, label: '평범한 직원' });
   }
   const doorSpans = spreadProps(f, props, startX);
+  const lockerHalf = (propArtSize('clutter', '사물함')?.w ?? 150) / 2;
+  for (const sg of f.segments) for (const t of sg.terrain) if (t.kind === 'narrow') lockerWall.set(t, { spans: doorSpans, half: lockerHalf });
   // 싸움 구간: 조각마다 적 자리를 묶는다. 추격·B-12는 화면을 잠그지 않으므로 층 tick이 직접 부른다.
   const encounters: Encounter[] = [];
   if (!NOLOCK_TYPES.has(f.type)) {
@@ -679,6 +686,14 @@ export function drawTerrain(ctx: CanvasRenderingContext2D, t: Terrain, pal: Pale
         const nb = narrowBack(t, segTerrain)!;
         layers.push({ y: a, x0: nb.span[0], x1: nb.span[1], draw: (c) => {
           if (!nb.xs.length) return drawBarricade(c, nb.span[0], nb.span[1], a);
+          // 사물함을 뺀 칸(벽 그림 앞)은 차단대로 메운다: 먼저 차단대, 그 위에 사물함
+          const half = (propArtSize('clutter', '사물함')?.w ?? 150) / 2;
+          let from = nb.span[0];
+          for (const x of [...nb.xs, Infinity]) {
+            const to = x === Infinity ? nb.span[1] : x - half;
+            if (to - from > 40) drawBarricade(c, from, to, a);
+            from = Math.max(from, x + half);
+          }
           for (const x of nb.xs) if (!drawPropArt(c, 'clutter', '사물함', x, a)) break;
         } });
       } else if (a > y0 && !row('사물함', a)) {
