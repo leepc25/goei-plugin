@@ -25,32 +25,34 @@ export function renderImgTags(text: string, pick?: (name: string) => string | nu
   });
 }
 
-export type ImgSize = 's' | 'm' | 'l' | 'xl';
-export type ImgFold = 'more' | 'square' | 'less' | 'open';
+/** 이미지 칸 크기 (%): 원본 카드 크기(최대 너비 32em)를 100으로. 채팅 폭보다 넓어지지는 않는다 */
+export const IMG_SIZE = { min: 30, max: 200, step: 5, def: 100 };
+/** 접힌 칸에 보이는 높이 (%): 그림 전체 높이를 100으로. 원본은 정사각형(832:1216 그림의 약 68%)으로 접혔다가 누르거나 올리면 펼쳐진다 */
+export const IMG_FOLD = { min: 20, max: 100, step: 1, def: 68 };
+const BASE_EM = 32;
+const W = 832;
+const H = 1216;
 
-/** 이미지 칸 최대 너비. 원본 카드 CSS는 32em */
-export const IMG_SIZES: Record<ImgSize, string> = { s: '20em', m: '26em', l: '32em', xl: '40em' };
-export const IMG_SIZE_DEFAULT: ImgSize = 'l';
-/** 접힌 칸의 가로:세로. 원본은 1:1로 접혔다가 누르거나 올리면 그림 비율(832:1216)로 펼쳐진다 */
-export const IMG_FOLDS: Record<ImgFold, string> = { more: '16/9', square: '1/1', less: '3/4', open: '832/1216' };
-export const IMG_FOLD_DEFAULT: ImgFold = 'square';
-const FULL = '832/1216';
-
-export const imgSize = (v: unknown): ImgSize | null => (typeof v === 'string' && v in IMG_SIZES ? (v as ImgSize) : null);
-export const imgFold = (v: unknown): ImgFold | null => (typeof v === 'string' && v in IMG_FOLDS ? (v as ImgFold) : null);
+function pct(v: unknown, r: { min: number; max: number }): number | null {
+  const n = typeof v === 'string' && v.trim() ? Number(v) : v;
+  return typeof n === 'number' && Number.isInteger(n) && n >= r.min && n <= r.max ? n : null;
+}
+export const imgSize = (v: unknown) => pct(v, IMG_SIZE);
+export const imgFold = (v: unknown) => pct(v, IMG_FOLD);
 
 /**
  * 본 화면 style에 넣는 그림 칸 CSS. Risu가 채팅 속 class에 붙이는 x-risu- 이름도 같이 잡는다.
  * 플러그인이 Lite 판정 전에 그려진 메시지는 카드 정규식이 그린 칸(ib-asset-hover)이라 그것도 같은 설정을 따르게 한다
  */
-export function imgCss(size: ImgSize = IMG_SIZE_DEFAULT, fold: ImgFold = IMG_FOLD_DEFAULT, hidden = false): string {
+export function imgCss(size = IMG_SIZE.def, fold = IMG_FOLD.def, hidden = false): string {
   const g = ':is(.gim,.x-risu-gim,.ib-asset-hover,.x-risu-ib-asset-hover)';
   if (hidden) return `${g}{display:none!important}`;
-  const folded = IMG_FOLDS[fold];
-  return `${g}{display:block;box-sizing:border-box;margin:auto;width:100%;max-width:${IMG_SIZES[size]};aspect-ratio:${folded};`
+  const open = fold >= 100;
+  const folded = open ? `${W}/${H}` : `${W}/${Math.round(H * fold) / 100}`;
+  return `${g}{display:block;box-sizing:border-box;margin:auto;width:100%;max-width:${Math.round(BASE_EM * size) / 100}em;aspect-ratio:${folded};`
     + 'overflow:hidden;border-radius:20px;background-color:transparent;background-repeat:no-repeat;background-size:100% auto;background-position:center top;'
-    + `cursor:${folded === FULL ? 'default' : 'pointer'};outline:none;transition:aspect-ratio .45s ease;-webkit-mask-image:-webkit-radial-gradient(white,black)}`
-    + (folded === FULL ? '' : `${g}:hover,${g}:focus{aspect-ratio:${FULL}}`);
+    + `cursor:${open ? 'default' : 'pointer'};outline:none;transition:aspect-ratio .45s ease;-webkit-mask-image:-webkit-radial-gradient(white,black)}`
+    + (open ? '' : `${g}:hover,${g}:focus{aspect-ratio:${W}/${H}}`);
 }
 
 /** 지금 채팅의 「에셋 출력」이 꺼져 있으면 그림 칸을 숨긴다 (채팅을 바꿀 때·설정을 바꿀 때 정한다) */

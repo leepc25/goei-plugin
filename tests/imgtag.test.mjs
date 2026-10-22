@@ -20,19 +20,20 @@ test('imgtag: without an asset list the tag name is trusted; unsafe names are dr
   assert.ok(!renderImgTags("<img=a_b}}{{x>").includes('{{raw'));
 });
 
-test('imgtag: css follows size, fold and hidden', () => {
-  assert.match(imgCss(), /max-width:32em;aspect-ratio:1\/1/);
-  assert.match(imgCss('s', 'more'), /max-width:20em;aspect-ratio:16\/9/);
-  assert.ok(!imgCss('l', 'open').includes(':hover'), '안 접음은 펼침 없음');
-  assert.match(imgCss('l', 'square', true), /display:none/);
+test('imgtag: css follows size %, fold % and hidden', () => {
+  assert.match(imgCss(), /max-width:32em;aspect-ratio:832\/826.88/, '기본은 원본(32em, 거의 정사각형)');
+  assert.match(imgCss(50, 40), /max-width:16em;aspect-ratio:832\/486.4/);
+  assert.match(imgCss(150, 100), /max-width:48em;aspect-ratio:832\/1216/);
+  assert.ok(!imgCss(100, 100).includes(':hover'), '100%는 접지 않음');
+  assert.match(imgCss(100, 68, true), /display:none/);
   assert.ok(imgCss().includes('.x-risu-gim') && imgCss().includes('.ib-asset-hover'));
 });
 
-test('imgtag: prefs keep valid size/fold only', () => {
-  const p = settings.setPrefs({ imgSize: 'xl', imgFold: 'less' });
-  assert.equal(p.imgSize, 'xl');
-  assert.equal(p.imgFold, 'less');
-  const q = settings.setPrefs({ imgSize: 'huge', imgFold: 3 });
+test('imgtag: prefs keep valid percentages only', () => {
+  const p = settings.setPrefs({ imgSize: 150, imgFold: '45' });
+  assert.equal(p.imgSize, 150);
+  assert.equal(p.imgFold, 45);
+  const q = settings.setPrefs({ imgSize: 500, imgFold: 'l' });
   assert.equal(q.imgSize, undefined);
   assert.equal(q.imgFold, undefined);
 });

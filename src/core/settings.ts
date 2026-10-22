@@ -2,7 +2,7 @@
 // > 옛 카드의 Settings 로어북(있으면) > 내장 기본값. 채팅 변수 키는 원본 ensureDefaults·WG.get과 같다.
 import type { LoreEntry, ScriptState } from './types';
 import { DEFAULT_SETTINGS, type WorldSettings } from './world/engine';
-import { imgFold, imgSize, type ImgFold, type ImgSize } from './imgtag';
+import { imgFold, imgSize } from './imgtag';
 
 export type AssetModel = 'main' | 'aux';
 
@@ -99,9 +99,9 @@ export interface Prefs {
   dim?: number;
   /** 채팅 속 상태창 배색 (없으면 테마 따름) */
   status?: StatusStyle;
-  /** 채팅 속 캐릭터 이미지 칸 크기·접는 정도 (이 기기 공통, 없으면 원본 카드와 같은 32em·1:1) */
-  imgSize?: ImgSize;
-  imgFold?: ImgFold;
+  /** 채팅 속 캐릭터 이미지 칸 크기·접힌 높이 (%, 이 기기 공통, 없으면 원본 카드와 같은 100%·68%) */
+  imgSize?: number;
+  imgFold?: number;
   /** 즐겨찾기 (이 기기·모든 채팅 공통, 최대 MARK_MAX): 창 안 화면 상태와 이름 */
   marks?: Mark[];
 }
@@ -160,7 +160,7 @@ export function setPrefs(raw: unknown): Prefs {
     .filter((m): m is Mark => !!m && typeof m === 'object' && typeof (m as Mark).name === 'string' && !!(m as Mark).s && typeof (m as Mark).s.tab === 'string')
     .slice(0, MARK_MAX)
     .map((m) => ({ s: m.s, name: m.name.slice(0, 80) }));
-  prefs = { basic, world, ...(theme ? { theme } : {}), ...(Object.keys(vars).length ? { vars } : {}), ...(nav ? { nav } : {}), ...(agents ? { agents } : {}), ...(dim !== null ? { dim } : {}), ...(status ? { status } : {}), ...(size ? { imgSize: size } : {}), ...(fold ? { imgFold: fold } : {}), ...(marks.length ? { marks } : {}) };
+  prefs = { basic, world, ...(theme ? { theme } : {}), ...(Object.keys(vars).length ? { vars } : {}), ...(nav ? { nav } : {}), ...(agents ? { agents } : {}), ...(dim !== null ? { dim } : {}), ...(status ? { status } : {}), ...(size !== null ? { imgSize: size } : {}), ...(fold !== null ? { imgFold: fold } : {}), ...(marks.length ? { marks } : {}) };
   return prefs;
 }
 

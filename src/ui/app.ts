@@ -325,6 +325,11 @@ function ensureRoot(): HTMLElement {
       if (out) out.textContent = `${el.value}%`;
       return;
     }
+    if (el?.dataset?.input === 'pct') {
+      const out = el.parentElement?.querySelector('output');
+      if (out) out.textContent = `${el.value}%`;
+      return;
+    }
     if (el?.dataset?.input === 'wiki-query' && view.kind === 'started') {
       wiki.query = el.value;
       const box = root?.querySelector('.nw .ph-content');

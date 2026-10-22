@@ -9,7 +9,7 @@ import { loadVarDefaults, savePrefs, saveVarDefaults } from '../host/prefs';
 import { advSections } from './advanced';
 import { loreCheckBox } from './lorecheck';
 import { ASSET_NOTE } from '../core/asset';
-import { IMG_FOLD_DEFAULT, IMG_SIZE_DEFAULT, imgFold, imgSize, setImgHidden } from '../core/imgtag';
+import { IMG_FOLD, IMG_SIZE, imgFold, imgSize, setImgHidden } from '../core/imgtag';
 import type { Chat, ScriptState } from '../core/types';
 import { parseCatalog, readWorld, startWorldVars, WORLD_KEY, worldOn, worldVars } from '../core/world';
 import { updateChat, type ChatContext } from '../host/risu';
@@ -55,6 +55,10 @@ function field(label: string, control: string, help: string): string {
 /** 0–100% 막대. 끄는 동안은 창 바깥만 바로 바꾸고(app.ts), 놓으면 저장 */
 const dimSlider = (n: number, busy: boolean) =>
   `<label class="st-range"><input type="range" min="0" max="100" step="5" value="${n}" data-input="dim" data-change="set-dim" aria-label="창 바깥 불투명도"${busy ? ' disabled' : ''}><output>${n}%</output></label>`;
+
+/** 퍼센트 막대 (이미지 크기·접힌 높이). 끄는 동안은 숫자만 바꾸고(app.ts), 놓으면 저장 */
+const pctSlider = (action: string, n: number, r: { min: number; max: number; step: number }, label: string, busy: boolean) =>
+  `<label class="st-range"><input type="range" min="${r.min}" max="${r.max}" step="${r.step}" value="${n}" data-input="pct" data-change="${action}" aria-label="${label}"${busy ? ' disabled' : ''}><output>${n}%</output></label>`;
 
 const group = (title: string, body: string, note = '') =>
   `<section class="ps-group"><h3>${title}</h3>${note ? `<p class="ps-note">${note}</p>` : ''}<div class="ps-rows">${body}</div></section>`;
@@ -174,8 +178,8 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
     ].join(''))}
     ${group('캐릭터 이미지', [
       field('에셋 출력', seg('set-asset', s.assetOn ? '1' : '0', [['1', 'ON'], ['0', 'OFF']], busy), '본문에 등장하는 캐릭터의 등록 이미지를 표시하도록 이미지 태그를 적어요. 이미지와 태그 목록은 에셋 모듈에 있어요.'),
-      s.assetOn ? field('이미지 크기', seg('set-img-size', getPrefs().imgSize ?? IMG_SIZE_DEFAULT, [['s', '작게'], ['m', '중간'], ['l', '기본'], ['xl', '크게']], busy), '채팅 속 캐릭터 이미지 칸의 최대 너비예요. 이 기기의 모든 채팅에 같이 적용돼요.') : '',
-      s.assetOn ? field('접는 정도', seg('set-img-fold', getPrefs().imgFold ?? IMG_FOLD_DEFAULT, [['more', '많이'], ['square', '기본'], ['less', '조금'], ['open', '안 접음']], busy), '이미지는 위쪽만 보이게 접혀 있다가 누르거나 마우스를 올리면 펼쳐져요. 「많이」는 가로로 납작하게, 「안 접음」은 처음부터 전체를 보여 줘요.') : '',
+      s.assetOn ? field('이미지 크기', pctSlider('set-img-size', getPrefs().imgSize ?? IMG_SIZE.def, IMG_SIZE, '이미지 크기', busy), '채팅 속 캐릭터 이미지 칸의 크기예요. 100%가 원래 크기이고, 채팅 폭보다 커지지는 않아요. 이 기기의 모든 채팅에 같이 적용돼요.') : '',
+      s.assetOn ? field('접힌 높이', pctSlider('set-img-fold', getPrefs().imgFold ?? IMG_FOLD.def, IMG_FOLD, '접힌 높이', busy), '이미지는 위쪽만 보이게 접혀 있다가 누르거나 마우스를 올리면 펼쳐져요. 접혔을 때 그림 높이의 몇 %를 보여 줄지예요. 원래는 68%(정사각형)이고 100%면 접지 않아요.') : '',
       s.assetOn ? field('출력 모델', seg('set-asset-model', s.assetModel, [['main', '메인모델'], ['aux', '보조모델']], busy), '메인모델은 본문과 함께 적고, 보조모델은 응답이 끝난 뒤 한 번 더 불러 태그를 보충해요.') : '',
       s.assetOn && s.assetModel === 'aux' ? field('캐릭터당 이미지 수', seg('set-asset-limit', String(s.assetLimit), [['1', '1'], ['2', '2'], ['3', '3'], ['4', '4']], busy), '보조모델이 한 응답에서 캐릭터 한 명에게 붙일 이미지 태그의 최대 개수') : '',
     ].join(''))}
@@ -299,8 +303,8 @@ export async function handleSettings(action: string, value: string | undefined, 
   if (action === 'set-img-size' || action === 'set-img-fold') {
     const size = imgSize(v);
     const fold = imgFold(v);
-    if (action === 'set-img-size' && size) await saveDefaults(env, (p) => ({ ...p, imgSize: size === IMG_SIZE_DEFAULT ? undefined : size }));
-    else if (action === 'set-img-fold' && fold) await saveDefaults(env, (p) => ({ ...p, imgFold: fold === IMG_FOLD_DEFAULT ? undefined : fold }));
+    if (action === 'set-img-size' && size !== null) await saveDefaults(env, (p) => ({ ...p, imgSize: size === IMG_SIZE.def ? undefined : size }));
+    else if (action === 'set-img-fold' && fold !== null) await saveDefaults(env, (p) => ({ ...p, imgFold: fold === IMG_FOLD.def ? undefined : fold }));
     repaintTheme();
     return true;
   }
