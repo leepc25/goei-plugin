@@ -40,6 +40,62 @@ export interface Out {
   room: AudioNode; // 짧은 방 울림
   noise: AudioBuffer; // 흰 잡음 2초
   brown: AudioBuffer; // 갈색 잡음 4초 (낮은 웅웅거림)
+  effects?: Partial<Record<Exclude<Bus, 'master'>, { verb: AudioNode; room: AudioNode }>>;
+  scope?: AudioScope;
+}
+
+/** A synthesis owner releases every node, including modulation and effect sends.
+ * Cleanup follows the audio clock (ended), so suspension cannot cut a fade short. */
+export class AudioScope {
+  readonly out: Out;
+  private nodes = new Set<AudioNode>();
+  private sources = new Set<AudioScheduledSourceNode>();
+  private children = new Set<AudioScope>();
+  private sealed = false;
+  private disposed = false;
+  constructor(private parent: Out) {
+    this.out = { ...parent, scope: this };
+    parent.scope?.children.add(this);
+  }
+  node<T extends AudioNode>(node: T): T { this.nodes.add(node); return node; }
+  source<T extends AudioScheduledSourceNode>(node: T): T {
+    this.node(node);
+    this.sources.add(node);
+    node.addEventListener('ended', () => {
+      node.disconnect();
+      this.sources.delete(node);
+      this.nodes.delete(node);
+      if (this.sealed && !this.sources.size) this.dispose();
+    }, { once: true });
+    return node;
+  }
+  seal() { this.sealed = true; if (!this.sources.size) this.dispose(); }
+  stopAt(at: number) {
+    // Silent source supplies an audio-clock deadline even for owners with only child voices.
+    const timer = this.source(this.out.ctx.createBufferSource());
+    timer.buffer = this.out.ctx.createBuffer(1, 1, this.out.ctx.sampleRate);
+    timer.addEventListener('ended', () => this.dispose(), { once: true });
+    timer.start(Math.max(this.out.ctx.currentTime, at));
+  }
+  dispose() {
+    if (this.disposed) return;
+    this.disposed = true;
+    for (const child of this.children) child.dispose();
+    for (const source of this.sources) try { source.stop(); } catch { /* already ended */ }
+    for (const node of this.nodes) node.disconnect();
+    this.nodes.clear(); this.sources.clear(); this.children.clear();
+    this.parent.scope?.children.delete(this);
+  }
+}
+export const ownNode = <T extends AudioNode>(o: Out, node: T): T => o.scope?.node(node) ?? node;
+const ownSource = <T extends AudioScheduledSourceNode>(o: Out, node: T): T => o.scope?.source(node) ?? node;
+export function busOut(o: Out, bus: Exclude<Bus, 'master'>): Out {
+  return { ...o, ...(o.effects?.[bus] ?? {}) };
+}
+export function oneShot<T>(o: Out, render: (out: Out) => T): T {
+  const scope = new AudioScope(o);
+  try { return render(scope.out); }
+  finally { scope.seal(); }
 }
 
 export function makeNoise(ctx: BaseAudioContext, sec: number, brown = false): AudioBuffer {
@@ -107,23 +163,23 @@ export const mtof = (m: number) => 440 * Math.pow(2, (m - 69) / 12);
 /** 이 소리 한 번 분량의 출력: 음량·좌우·잔향 보내기 */
 export function voice(o: Out, dest: AudioNode, t: number, vol = 1, pan = 0, verb = 0, room = 0): GainNode {
   const ctx = o.ctx;
-  const g = ctx.createGain();
+  const g = ownNode(o, ctx.createGain());
   g.gain.value = vol;
   let tail: AudioNode = g;
   if (pan) {
-    const p = ctx.createStereoPanner();
+    const p = ownNode(o, ctx.createStereoPanner());
     p.pan.value = Math.max(-1, Math.min(1, pan));
     g.connect(p);
     tail = p;
   }
   tail.connect(dest);
   if (verb > 0) {
-    const s = ctx.createGain();
+    const s = ownNode(o, ctx.createGain());
     s.gain.value = verb;
     tail.connect(s).connect(o.verb);
   }
   if (room > 0) {
-    const s = ctx.createGain();
+    const s = ownNode(o, ctx.createGain());
     s.gain.value = room;
     tail.connect(s).connect(o.room);
   }
@@ -151,7 +207,7 @@ export function adsr(p: AudioParam, t: number, a: number, d: number, s: number, 
 }
 
 export function osc(o: Out, type: OscillatorType, f: number, t: number, dur: number, dest: AudioNode): OscillatorNode {
-  const n = o.ctx.createOscillator();
+  const n = ownSource(o, o.ctx.createOscillator());
   n.type = type;
   n.frequency.setValueAtTime(f, t);
   n.connect(dest);
@@ -161,7 +217,7 @@ export function osc(o: Out, type: OscillatorType, f: number, t: number, dur: num
 }
 
 export function noise(o: Out, t: number, dur: number, dest: AudioNode, brown = false, rate = 1): AudioBufferSourceNode {
-  const n = o.ctx.createBufferSource();
+  const n = ownSource(o, o.ctx.createBufferSource());
   n.buffer = brown ? o.brown : o.noise;
   n.loop = true;
   n.playbackRate.value = rate;
@@ -173,7 +229,7 @@ export function noise(o: Out, t: number, dur: number, dest: AudioNode, brown = f
 }
 
 export function filt(o: Out, type: BiquadFilterType, f: number, q = 0.7, dest?: AudioNode): BiquadFilterNode {
-  const n = o.ctx.createBiquadFilter();
+  const n = ownNode(o, o.ctx.createBiquadFilter());
   n.type = type;
   n.frequency.value = f;
   n.Q.value = q;
@@ -182,14 +238,14 @@ export function filt(o: Out, type: BiquadFilterType, f: number, q = 0.7, dest?: 
 }
 
 export function gainNode(o: Out, v: number, dest?: AudioNode): GainNode {
-  const g = o.ctx.createGain();
+  const g = ownNode(o, o.ctx.createGain());
   g.gain.value = v;
   if (dest) g.connect(dest);
   return g;
 }
 
 export function shaper(o: Out, k: number, dest?: AudioNode): WaveShaperNode {
-  const n = o.ctx.createWaveShaper();
+  const n = ownNode(o, o.ctx.createWaveShaper());
   n.curve = driveCurve(k);
   n.oversample = '2x';
   if (dest) n.connect(dest);
@@ -219,24 +275,31 @@ export function buildGraph(ctx: BaseAudioContext, dest: AudioNode) {
   // 음악만 따로 낮출 수 있게(컷인) 한 단 더 둔다
   const duck = ctx.createGain();
   duck.connect(music);
-  const verb = ctx.createConvolver();
-  verb.buffer = makeImpulse(ctx, 2.6, 2.4, 0.7);
-  const verbOut = ctx.createGain();
-  verbOut.gain.value = 0.55;
-  verb.connect(verbOut).connect(master);
-  const room = ctx.createConvolver();
-  room.buffer = makeImpulse(ctx, 0.45, 3, 0.3);
-  const roomOut = ctx.createGain();
-  roomOut.gain.value = 0.5;
-  room.connect(roomOut).connect(master);
+  // Each bus owns its returns; a muted bus must not leak through the shared master.
+  const longImpulse = makeImpulse(ctx, 2.6, 2.4, 0.7);
+  const shortImpulse = makeImpulse(ctx, 0.45, 3, 0.3);
+  const effects = {} as NonNullable<Out['effects']>;
+  for (const [name, target] of Object.entries({ music: duck, sfx, amb, ui })) {
+    const verb = ctx.createConvolver();
+    verb.buffer = longImpulse;
+    const verbOut = ctx.createGain();
+    verbOut.gain.value = 0.55;
+    verb.connect(verbOut).connect(target);
+    const room = ctx.createConvolver();
+    room.buffer = shortImpulse;
+    const roomOut = ctx.createGain();
+    roomOut.gain.value = 0.5;
+    room.connect(roomOut).connect(target);
+    effects[name as Exclude<Bus, 'master'>] = { verb, room };
+  }
   const out: Out = {
     ctx,
     sfx,
     ui,
     music: duck,
     amb,
-    verb,
-    room,
+    ...effects.sfx!,
+    effects,
     noise: makeNoise(ctx, 2),
     brown: makeNoise(ctx, 4, true),
   };
