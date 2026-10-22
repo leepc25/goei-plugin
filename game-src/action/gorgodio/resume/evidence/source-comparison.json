@@ -1,0 +1,14 @@
+[
+  {
+    "ref": "HEAD",
+    "commit": "7f8fdfb0c5a6cef096d412d3d872aec6eae7de81",
+    "tree": "167b76fe90ff7ba19a8e20eef52a45c77321cc2a",
+    "files": 807
+  },
+  {
+    "ref": "origin/codex/character-production-resume",
+    "commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+    "tree": "167b76fe90ff7ba19a8e20eef52a45c77321cc2a",
+    "files": 807
+  }
+]

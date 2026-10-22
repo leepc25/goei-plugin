@@ -1,0 +1,29 @@
+<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>고르고디오 몸·갑옷 비교 검수</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#111b25;color:#ecf2f7;font:15px system-ui}main{max-width:1100px;margin:auto;padding:14px}h1{font-size:22px;margin:0 0 8px}p{margin:8px 0;color:#b9c8d6}button,select{font:inherit;min-height:42px;background:#26384b;color:inherit;border:1px solid #58718b;border-radius:6px;padding:6px 10px}button{cursor:pointer}button:focus-visible,select:focus-visible{outline:3px solid #74e7c4}.controls{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}.panels{display:grid;grid-template-columns:1fr 1fr;gap:12px}.panel{min-width:0;background:#1c2936;border:1px solid #3e5468;border-radius:8px;padding:10px}canvas{display:block;width:100%;height:auto;image-rendering:pixelated;background:#263440}.panel select{width:100%}.status{min-height:42px}#step{width:100%}#notice{padding:8px;border-left:3px solid #f5bf63}small{color:#b9c8d6}@media(max-width:600px){.panels{grid-template-columns:1fr}h1{font-size:18px}main{padding:8px}}@media(max-height:450px) and (min-width:601px){main{padding:6px}.panels{gap:6px}canvas{max-height:235px;object-fit:contain}h1{font-size:18px}.panel{padding:5px}}
+</style><main>
+<h1>고르고디오 · 몸과 갑옷 함께 검수</h1>
+<p id="notice">기존 원본 비교판 · 신규 PixelLab 그림 없음 · 사용자 시각 승인 대기</p>
+<div class="controls"><select id="pair" aria-label="대응 행동"><option value="idle,a_idle">대기</option><option value="walk,a_walk">걷기</option><option value="run,a_glide">달리기 / 활강</option><option value="jump,a_jump">점프</option><option value="land,a_land">착지</option><option value="guard,a_guard">가드</option><option value="chop1,a_swat">첫 공격</option><option value="chop2,a_hammer">두 번째 공격</option><option value="cleave,a_axe">세 번째 공격</option><option value="summon,a_arrive">소환 / 등장</option></select>
+<select id="source" aria-label="그림 출처"><option value="raw">원본 프레임</option><option value="final">기존 보정판</option></select>
+<button id="prev">이전 장</button><button id="play">재생</button><button id="next">다음 장</button><button id="seam">마지막 → 첫 장</button>
+<select id="speed" aria-label="검수 속도"><option value="2">느리게 (초당 2장)</option><option value="6">초당 6장</option><option value="12">초당 12장</option></select></div>
+<div class="panels"><section class="panel"><h2>몸</h2><select id="bare" aria-label="몸 동작"></select><canvas id="bodyCanvas" width="560" height="460"></canvas><div class="status" id="bodyStatus"></div></section><section class="panel"><h2>갑옷</h2><select id="armor" aria-label="갑옷 동작"></select><canvas id="armorCanvas" width="560" height="460"></canvas><div class="status" id="armorStatus"></div></section></div>
+<input id="step" aria-label="비교 단계" type="range" value="0" min="0" max="7">
+<p>같은 2배 확대 · 초록선: 기준 발바닥 · 세로선: 기준점. 동작 장수가 다르면 비율로 대응시킵니다. 실제 재생 속도·자세가 같다는 뜻은 아닙니다.</p>
+<small>좌우 방향키로 장 이동 · 스페이스로 재생/정지. 얼굴·체형·복식·손·접지·반복 경계를 각각 확인합니다. 그림 안 이동을 지우거나 접지로 자동 보정하지 않았습니다.</small>
+</main><script>
+const clips=__CLIPS__;
+const $=id=>document.getElementById(id), images={};let frame=0,playing=false,last=0;
+for(const [name,c] of Object.entries(clips)){const opt=new Option(c.label+' ('+name+')',name);$(c.set).add(opt);for(const src of ['raw','final']){const im=new Image();im.src='data:image/png;base64,'+c[src];images[name+src]=im;im.onload=draw}}
+function count(c){return c[$('source').value+'Count']}
+function total(){return Math.max(count(clips[$('bare').value]),count(clips[$('armor').value]))}
+function draw(){if(!$('bare').value||!$('armor').value)return;const max=total();frame=((frame%max)+max)%max;$('step').max=max-1;$('step').value=frame;
+for(const [set,canvasId,statusId] of [['bare','bodyCanvas','bodyStatus'],['armor','armorCanvas','armorStatus']]){const name=$(set).value,c=clips[name],n=count(c),i=Math.round(frame*(n-1)/Math.max(1,max-1));const ctx=$(canvasId).getContext('2d');ctx.imageSmoothingEnabled=false;ctx.clearRect(0,0,560,460);ctx.strokeStyle='#66cda4';ctx.beginPath();ctx.moveTo(0,420);ctx.lineTo(560,420);ctx.stroke();ctx.strokeStyle='#59657a';ctx.beginPath();ctx.moveTo(200,0);ctx.lineTo(200,460);ctx.stroke();const im=images[name+$('source').value];if(im.complete&&im.naturalWidth)ctx.drawImage(im,i*c.w,0,c.w,c.h,(100-c.anchor)*2,(210-c.foot)*2,c.w*2,c.h*2);$(statusId).textContent=`${i}번 / ${n}장 · 기준 x=${c.anchor}, y=${c.foot} · 기존 ${c.fps}fps`;}}
+function paired(){const [a,b]=$('pair').value.split(',');$('bare').value=a;$('armor').value=b;frame=0;draw()}
+function move(d){playing=false;$('play').textContent='재생';frame+=d;draw()}
+$('pair').onchange=paired;for(const id of ['bare','armor','source'])$(id).onchange=()=>{frame=0;draw()};$('prev').onclick=()=>move(-1);$('next').onclick=()=>move(1);$('seam').onclick=()=>{playing=false;frame=frame===total()-1?0:total()-1;$('play').textContent='재생';draw()};$('step').oninput=()=>{playing=false;$('play').textContent='재생';frame=Number($('step').value);draw()};$('play').onclick=()=>{playing=!playing;$('play').textContent=playing?'정지':'재생';last=performance.now()};
+document.addEventListener('keydown',e=>{if(['SELECT','INPUT','BUTTON'].includes(e.target.tagName))return;if(e.code==='ArrowRight'){e.preventDefault();move(1)}if(e.code==='ArrowLeft'){e.preventDefault();move(-1)}if(e.code==='Space'){e.preventDefault();$('play').click()}});
+function tick(now){if(playing&&now-last>=1000/Number($('speed').value)){frame++;last=now;draw()}requestAnimationFrame(tick)}paired();requestAnimationFrame(tick);
+</script></html>

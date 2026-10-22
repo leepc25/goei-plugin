@@ -1,0 +1,210 @@
+{
+  "observed_at": "2026-10-22T10:15:35.720737+00:00",
+  "http_status": 200,
+  "response": {
+    "jsonrpc": "2.0",
+    "id": 1,
+    "result": {
+      "tools": [
+        {
+          "name": "search_help",
+          "description": "Ask for help using PixelLab MCP tools, workflows, or features.\nA knowledge agent searches our docs and returns a concise answer.",
+          "inputSchema": {
+            "additionalProperties": false,
+            "properties": {
+              "question": {
+                "description": "What you need help with (tools, workflows, billing, features, deployment). Include the context you are working in. Max 2000 characters.",
+                "maxLength": 2000,
+                "type": "string"
+              }
+            },
+            "required": [
+              "question"
+            ],
+            "type": "object"
+          },
+          "annotations": {
+            "readOnlyHint": false,
+            "destructiveHint": false,
+            "idempotentHint": false,
+            "openWorldHint": true
+          },
+          "_meta": {
+            "fastmcp": {
+              "tags": []
+            }
+          }
+        },
+        {
+          "name": "animate_with_skeleton_v3",
+          "description": "Animate with skeleton v3 (beta): animate a sprite along a skeleton you pose, one per frame.\n\nEvery frame is drawn from the one reference image, so the character keeps its\nidentity while the pose is exactly what you send. Use this when you hold a rig\nor can derive skeletons; for a stored PixelLab character, animate_character\nwith a template animation is far less work.\nNothing returns a template clip's keypoints to an API caller, so there is no\nlibrary of walk cycles to fetch: derive them from your sprite with `POST\n/v2/estimate-skeleton`, bring your own rig (COCO-18 maps straight across, see\n`keypoints`), or use animate_character(mode=\"skeleton-v3\"), which poses a\ntemplate clip onto a stored character and needs no keypoints at all.\n\nget_image returns exactly len(keypoints) images — the reference frame is not\nechoed back. Play them in order.\n\nLimits: sprite max {MAX_DIMENSION}x{MAX_DIMENSION}; {MIN_FRAMES} to {MAX_FRAMES}\nframes, each skeleton holding all 18 humanoid joints.\n\nCost: priced by generation time, which barely moves with length, so every\nlegal frame count falls in one of three steps — 3 frames = 2 generations,\n4 to 14 = 3, 15 = 4.\nGeneration time: ~3-6 minutes (async). Poll with get_image(job_id).",
+          "inputSchema": {
+            "additionalProperties": false,
+            "properties": {
+              "description": {
+                "description": "What the character LOOKS like, as a noun phrase: 'blonde vampire with a red cape'. Colours, clothing, held items — not the motion, which the skeletons carry.",
+                "maxLength": 1000,
+                "type": "string"
+              },
+              "action": {
+                "description": "The motion's short label: 'walk', 'run', 'attack'.",
+                "maxLength": 100,
+                "type": "string"
+              },
+              "direction": {
+                "description": "Facing of the sprite (south = towards the camera).",
+                "enum": [
+                  "south",
+                  "north",
+                  "east",
+                  "west",
+                  "south-east",
+                  "south-west",
+                  "north-east",
+                  "north-west"
+                ],
+                "type": "string"
+              },
+              "keypoints": {
+                "description": "The motion: one skeleton per frame you get back, 3-15 frames. Each is a list of all 18 joints, {\"label\": \"RIGHT KNEE\", \"x\": 0.52, \"y\": 0.71, \"z_index\": 9}, with x/y as fractions 0-1 of the image. The 18 labels, exactly (every one required once per frame, order does not matter): NOSE, NECK, RIGHT SHOULDER, RIGHT ELBOW, RIGHT ARM, LEFT SHOULDER, LEFT ELBOW, LEFT ARM, RIGHT HIP, RIGHT KNEE, RIGHT LEG, LEFT HIP, LEFT KNEE, LEFT LEG, RIGHT EYE, LEFT EYE, RIGHT EAR, LEFT EAR. That set and order are OpenPose COCO-18, so `ARM` is the WRIST and `LEG` is the ANKLE (shoulder -> elbow -> ARM, hip -> knee -> LEG) and a COCO-18 pose from an external tool maps across 1:1. LEFT/RIGHT are the character's own sides, not the viewer's: facing `east` the RIGHT limbs are the near ones, mirrored for `west`, near-equal for `south`/`north`. `z_index` is a draw order — any int, default 0; no template prescribes values for it, it is yours. `depth` is optional (0-255, ~128 = the body's centre, higher = nearer the camera); left out, it is taken from the template body for this direction — which is the easier path, since that is where near/far already comes from (a mannequin at side/east runs RIGHT ARM 156 against LEFT ARM 100).",
+                "items": {},
+                "type": "array"
+              },
+              "first_frame_keypoints": {
+                "description": "The skeleton of the pose first_frame is already IN, same 18 joints and labels as `keypoints`. The model redraws that frame first and learns the background key and the colours from the redraw, so a skeleton that does not match the image quietly costs transparency and colour accuracy. This frame is not returned.",
+                "items": {},
+                "type": "array"
+              },
+              "first_frame_base64": {
+                "default": null,
+                "description": "Base64 PNG of the sprite to animate. Max 256x256. PREFER first_frame_url; MCP clients routinely truncate large inline base64.",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "first_frame_url": {
+                "default": null,
+                "description": "Alternative to first_frame_base64: an https (or data:) URL to the sprite PNG. PREFER THIS. Give one, not both.",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "template_id": {
+                "default": "mannequin",
+                "description": "The body a joint's missing `depth` is taken from. A quadruped posed with mannequin depth comes out flat.",
+                "enum": [
+                  "mannequin",
+                  "bear",
+                  "cat",
+                  "dog",
+                  "horse",
+                  "lion"
+                ],
+                "type": "string"
+              },
+              "view": {
+                "default": "low top-down",
+                "description": "Camera angle the sprite is drawn at. Must match the sprite, or the motion is posed for a different camera.",
+                "enum": [
+                  "low top-down",
+                  "high top-down",
+                  "side"
+                ],
+                "type": "string"
+              },
+              "no_background": {
+                "default": true,
+                "description": "True (default) returns the frames on transparency.",
+                "type": "boolean"
+              },
+              "seed": {
+                "default": null,
+                "description": "Seed for reproducible generation.",
+                "minimum": 0,
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "project_id": {
+                "default": null,
+                "description": "Internal Game Builder project context; the finished image is linked after generation.",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "description",
+              "action",
+              "direction",
+              "keypoints",
+              "first_frame_keypoints"
+            ],
+            "type": "object"
+          },
+          "annotations": {
+            "readOnlyHint": false,
+            "destructiveHint": false,
+            "idempotentHint": false,
+            "openWorldHint": false
+          },
+          "_meta": {
+            "fastmcp": {
+              "tags": []
+            }
+          }
+        },
+        {
+          "name": "get_balance",
+          "description": "Check your account balance: remaining credits (USD) and subscription generations.",
+          "inputSchema": {
+            "additionalProperties": false,
+            "properties": {},
+            "type": "object"
+          },
+          "annotations": {
+            "readOnlyHint": true,
+            "destructiveHint": false,
+            "idempotentHint": true,
+            "openWorldHint": false
+          },
+          "_meta": {
+            "fastmcp": {
+              "tags": []
+            }
+          }
+        },
+        {
+          "name": "list_jobs",
+          "description": "List your active background jobs (pending + processing).\n\nUse this to find stuck jobs you can cancel with cancel_job.",
+          "inputSchema": {
+            "additionalProperties": false,
+            "properties": {
+              "include_recent": {
+                "default": false,
+                "description": "Include recently completed/failed jobs (last 30 min). Default: only active jobs.",
+                "type": "boolean"
+              }
+            },
+            "type": "object"
+          },
+          "annotations": {
+            "readOnlyHint": true,
+            "destructiveHint": false,
+            "idempotentHint": true,
+            "openWorldHint": false
+          },
+          "_meta": {
+            "fastmcp": {
+              "tags": []
+            }
+          }
+        }
+      ]
+    }
+  }
+}

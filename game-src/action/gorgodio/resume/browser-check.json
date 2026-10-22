@@ -1,0 +1,32 @@
+[
+  {
+    "viewport": [
+      1280,
+      900
+    ],
+    "page_errors": [],
+    "horizontal_overflow": false,
+    "embedded_images": 206,
+    "result": "pass"
+  },
+  {
+    "viewport": [
+      844,
+      390
+    ],
+    "page_errors": [],
+    "horizontal_overflow": false,
+    "embedded_images": 206,
+    "result": "pass"
+  },
+  {
+    "viewport": [
+      390,
+      844
+    ],
+    "page_errors": [],
+    "horizontal_overflow": false,
+    "embedded_images": 206,
+    "result": "pass"
+  }
+]

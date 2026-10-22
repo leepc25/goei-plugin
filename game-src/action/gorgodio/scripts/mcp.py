@@ -3,7 +3,9 @@ URL='https://api.pixellab.ai/mcp'
 def call(method,params=None,id=1):
     body=json.dumps({"jsonrpc":"2.0","id":id,"method":method,"params":params or {}}).encode()
     req=urllib.request.Request(URL,data=body,headers={'Content-Type':'application/json','Accept':'application/json, text/event-stream'})
-    ctx=ssl.create_default_context(cafile='/root/.ccr/ca-bundle.crt')
+    token=os.environ.get('PIXELLAB_API_TOKEN')
+    if token: req.add_header('Authorization','Bearer '+token)
+    ctx=ssl.create_default_context()
     with urllib.request.urlopen(req,context=ctx,timeout=300) as r:
         txt=r.read().decode()
     out=None
@@ -13,6 +15,8 @@ def call(method,params=None,id=1):
     return out
 def tool(name,args):
     r=call('tools/call',{"name":name,"arguments":args})
+    if r.get('error') or r.get('result',{}).get('isError'):
+        raise RuntimeError('PixelLab 서비스 오류: '+name+' (생성 자동 재시도 금지)')
     return r
 if __name__=='__main__':
     m=sys.argv[1]

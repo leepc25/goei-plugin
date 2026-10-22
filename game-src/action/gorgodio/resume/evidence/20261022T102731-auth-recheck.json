@@ -1,0 +1,18 @@
+{
+  "observed_at": "2026-10-22T10:27:31.442174+00:00",
+  "variable_names": [],
+  "http_status": 200,
+  "response": {
+    "jsonrpc": "2.0",
+    "id": 1,
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "Error calling tool 'get_balance': 401: Missing Authorization header. Please configure your MCP client with 'Authorization: Bearer YOUR_API_TOKEN'"
+        }
+      ],
+      "isError": true
+    }
+  }
+}
