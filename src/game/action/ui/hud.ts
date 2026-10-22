@@ -101,6 +101,10 @@ export function label(c: CanvasRenderingContext2D, s: string, x: number, y: numb
 }
 /** HUD 글자를 도트 글꼴로 (draw 하는 동안만 켠다: 다른 모듈이 label 을 빌려 쓸 때는 원래 글꼴) */
 let pixelOn = false;
+/** HUD 밖(효과 층)에서도 도트 글꼴로 쓰게 켠다/끈다 */
+export function setPixelText(on: boolean) {
+  pixelOn = on;
+}
 
 export function plate(c: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r = 8) {
   c.beginPath();
@@ -344,13 +348,14 @@ export class Hud {
     }
   }
 
-  /** 아이템: 아이콘만 (글자 없음), 왼쪽 아래. 터치 화면에서는 터치 버튼이 대신 보여 준다 */
+  /** 아이템: 아이콘만 (글자 없음), 체력 막대 오른쪽 위 천장 띠. 바닥(물건·자막)과 겹치지 않게 (독립 검수: UI 안전영역).
+   * 터치 화면에서는 터치 버튼이 대신 보여 준다 */
   private items(c: CanvasRenderingContext2D, items: HudItem[], device?: string) {
     const n = 4,
-      s = 56,
+      s = 52,
       g = 8;
-    const x0 = 18,
-      y = H - 16 - s;
+    const x0 = 482,
+      y = 22;
     const padKeys = ['↑', '→', '↓', '←'];
     for (let i = 0; i < n; i++) {
       const it = items[i] ?? { label: '', count: 0 };
@@ -419,7 +424,8 @@ export class Hud {
     while (c.measureText(t).width > 900 && t.length > 4) t = t.slice(0, -2);
     if (t !== text) t += '…';
     const w = c.measureText(t).width + 40;
-    const y = compact ? H - 210 : H - 128;
+    // 화면 맨 아래 띠: 몸통을 가로지르지 않게 (독립 검수: 자막이 캐릭터 허리를 관통)
+    const y = H - 44;
     plate(c, W / 2 - w / 2, y, w, 36, 18);
     label(c, t, W / 2, y + 25, 17, '#fff8e6', 'center', 600);
   }

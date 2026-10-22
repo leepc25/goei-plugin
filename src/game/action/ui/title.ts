@@ -199,6 +199,19 @@ export function drawGoSign(c: CanvasRenderingContext2D, x: number, y: number, t:
   c.imageSmoothingEnabled = false;
   const im = pixelText('전진', 33, '#ffe9a8', '#ffb43a', 700, true);
   const k = 2;
+  // 어두운 도트 판을 받쳐 벽·문 위 글씨가 아니라 화면 표시로 읽히게 (독립 검수: 「전진」이 문과 겹침)
+  {
+    const pw = im.width * k + 12 + 9 * 4 + 8 + 28,
+      ph = Math.max(im.height * k, 19 * 4) + 20;
+    const px = Math.round(x - 14) & ~3,
+      py = Math.round(y + (im.height * k) / 2 - ph / 2) & ~3;
+    c.fillStyle = '#0c0f12';
+    c.fillRect(px - 4, py - 4, pw + 8, ph + 8);
+    c.fillStyle = '#b8873a';
+    c.fillRect(px, py, pw, ph);
+    c.fillStyle = 'rgba(16,20,24,0.92)';
+    c.fillRect(px + 4, py + 4, pw - 8, ph - 8);
+  }
   c.drawImage(im, Math.round(x), Math.round(y), im.width * k, im.height * k);
   // 도트 화살표: 4px 칸으로 그린 삼각형, 앞뒤로 살짝 움직인다
   const ax = Math.round(x + im.width * k + 12 + (Math.floor(t * 6) % 2) * 8),

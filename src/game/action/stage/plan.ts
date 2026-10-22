@@ -5,7 +5,7 @@ import { depthLabel } from './data/floortypes';
 import { CHUNK_W, ROOM_W, Y_BOTTOM, Y_TOP, laneY, type Floor, type FloorSegment, type Palette, type ServiceCell, type ServiceZone, type Terrain } from './types';
 import type { ElevatorButton } from './elevator';
 import { FLOOR_TYPES } from './data/floortypes';
-import { drawFloor, drawLedge, drawPipeBundle, floorHasGrid, isHighSign, floorPattern, drawWallCell, placeFor, seamPillar, wallSolidSpans } from '../art/bg';
+import { drawFloor, drawLedge, drawLowRow, setFloorTone, drawPipeBundle, floorHasGrid, isHighSign, floorPattern, drawWallCell, placeFor, seamPillar, wallSolidSpans } from '../art/bg';
 
 /** FloorPlan에 붙여 두는 스테이지 정보 (엔진은 몰라도 된다) */
 export interface StagePlan extends FloorPlan {
@@ -210,7 +210,7 @@ const artW = (p: PropSpec, floorType?: string) => {
 function spreadProps(f: Floor, props: PropSpec[], startX: number): [number, number][] {
   const wallY = Y_TOP + 40;
   const keepOut: [number, number][] = [];
-  for (const sg of f.segments) keepOut.push(...wallSolidSpans(placeFor('floor', f.type, sg.ref, f.sub), sg.x, sg.w, sg.flip));
+  for (const sg of f.segments) keepOut.push(...wallSolidSpans(placeFor('floor', f.type, sg.ref, f.sub, f.depth), sg.x, sg.w, sg.flip));
   const wallDoors = keepOut.filter(([a, b]) => b - a >= 100);
   const terr = f.segments.flatMap((sg) => sg.terrain).filter((t) => t.kind === 'block' || t.kind === 'pit' || t.kind === 'narrow' || t.kind === 'low');
   const taken: { a: number; b: number; y: number }[] = [];
@@ -227,7 +227,7 @@ function spreadProps(f: Floor, props: PropSpec[], startX: number): [number, numb
   const kept: PropSpec[] = props.filter((p) => boardLike(p) && fixed(p));
   const decor = new Set(props.filter((p) => boardLike(p) && !must(p) && !fixed(p)));
   // 벽 그림의 게시판·액자·창 앞에도 벽 쪽 소품을 세우지 않는다 (검수 14-1)
-  for (const sg of f.segments) keepOut.push(...wallDecoSpans(placeFor('floor', f.type, sg.ref, f.sub), sg.x, sg.w, sg.flip));
+  for (const sg of f.segments) keepOut.push(...wallDecoSpans(placeFor('floor', f.type, sg.ref, f.sub, f.depth), sg.x, sg.w, sg.flip));
   // 점검문(철문)은 덩이 안 자리만 정해져 있다: 벽 그림의 문·게시판 앞이면 가까운 빈 벽으로 민다 (검수 22: 철문이 게시판을 가림)
   for (const p of props.filter((q) => q.kind === 'servicedoor')) {
     const h = artW(p, f.type) / 2;
@@ -365,17 +365,18 @@ function drawBack(ctx: CanvasRenderingContext2D, camX: number, segs: FloorSegmen
   const vx0 = camX - 40,
     vx1 = camX + 1320;
   const cx = camX + 640;
+  setFloorTone(plan.stage.where === 'floor' ? (plan.depth ?? 1) : 0);
   for (const s of segs) {
     if (s.x + s.w < vx0 || s.x > vx1) continue;
     const room = s.ref.startsWith('room:');
-    const place = placeFor(plan.stage.where, plan.stage.floor?.type, s.ref, plan.stage.floor?.sub);
+    const place = placeFor(plan.stage.where, plan.stage.floor?.type, s.ref, plan.stage.floor?.sub, plan.stage.floor?.depth);
     // 바닥은 한 층 안에서 한 가지 (홀·방도 그 층 바닥), 벽 장소가 바뀌는 곳은 기둥으로 잇는다 (통합 검수 2-3)
-    const floorPlace = plan.stage.where === 'floor' ? placeFor('floor', plan.stage.floor?.type, '') : place;
+    const floorPlace = plan.stage.where === 'floor' ? placeFor('floor', plan.stage.floor?.type, '', null, plan.stage.floor?.depth) : place;
     if (drawWallCell(ctx, place, s.ref, s.x, s.w, s.flip, y0)) {
       const i = segs.indexOf(s);
-      const prev = i > 0 ? placeFor(plan.stage.where, plan.stage.floor?.type, segs[i - 1].ref, plan.stage.floor?.sub) : place;
+      const prev = i > 0 ? placeFor(plan.stage.where, plan.stage.floor?.type, segs[i - 1].ref, plan.stage.floor?.sub, plan.stage.floor?.depth) : place;
       if (prev !== place) seamPillar(ctx, s.x, y0);
-      const next = i + 1 < segs.length ? placeFor(plan.stage.where, plan.stage.floor?.type, segs[i + 1].ref, plan.stage.floor?.sub) : place;
+      const next = i + 1 < segs.length ? placeFor(plan.stage.where, plan.stage.floor?.type, segs[i + 1].ref, plan.stage.floor?.sub, plan.stage.floor?.depth) : place;
       if (next !== place) seamPillar(ctx, s.x + s.w, y0);
       if (!drawFloor(ctx, floorPlace, s.x, s.x + s.w, y0, 720) && !drawFloor(ctx, place, s.x, s.x + s.w, y0, 720)) {
         ctx.fillStyle = pal.floor;
@@ -428,7 +429,7 @@ function drawBack(ctx: CanvasRenderingContext2D, camX: number, segs: FloorSegmen
   const layers: NonNullable<StagePlan['depthLayers']> = [];
   plan.depthLayers = layers;
   const allTerr = segs.flatMap((s) => s.terrain);
-  for (const s of segs) if (!(s.x + s.w < vx0 || s.x > vx1)) for (const t of s.terrain) drawTerrain(ctx, t, pal, y0, y1, placeFor(plan.stage.where, plan.stage.floor?.type, plan.stage.where === 'floor' ? '' : s.ref, plan.stage.floor?.sub), layers, allTerr);
+  for (const s of segs) if (!(s.x + s.w < vx0 || s.x > vx1)) for (const t of s.terrain) drawTerrain(ctx, t, pal, y0, y1, placeFor(plan.stage.where, plan.stage.floor?.type, plan.stage.where === 'floor' ? '' : s.ref, plan.stage.floor?.sub, plan.stage.floor?.depth), layers, allTerr);
   void CHUNK_W;
 }
 
@@ -706,13 +707,14 @@ export function drawTerrain(ctx: CanvasRenderingContext2D, t: Terrain, pal: Pale
       if (a > y0 && layers) {
         const nb = narrowBack(t, segTerrain)!;
         layers.push({ y: a, x0: nb.span[0], x1: nb.span[1], draw: (c) => {
-          if (!nb.xs.length) return drawBarricade(c, nb.span[0], nb.span[1], a);
+          // 뒷줄도 낮은 턱 그림 줄로 (독립 검수: 차단대가 붙어 몰림). 그림이 없을 때만 차단대
+          if (!nb.xs.length) return void (drawLowRow(c, nb.span[0], nb.span[1], a, nb.span[0] + 7) || drawBarricade(c, nb.span[0], nb.span[1], a));
           // 사물함을 뺀 칸(벽 그림 앞)은 차단대로 메운다: 먼저 차단대, 그 위에 사물함
           const half = (propArtSize('clutter', '사물함')?.w ?? 150) / 2;
           let from = nb.span[0];
           for (const x of [...nb.xs, Infinity]) {
             const to = x === Infinity ? nb.span[1] : x - half;
-            if (to - from > 40) drawBarricade(c, from, to, a);
+            if (to - from > 40 && !drawLowRow(c, from, to, a, from + 7)) drawBarricade(c, from, to, a);
             from = Math.max(from, x + half);
           }
           for (const x of nb.xs) if (!drawPropArt(c, 'clutter', '사물함', x, a)) break;
@@ -728,7 +730,7 @@ export function drawTerrain(ctx: CanvasRenderingContext2D, t: Terrain, pal: Pale
       if (b < y1) {
         // 실제 공사 차단대 크기: 기둥 ≈ 쟈알디 엉덩이 높이(130px), 가로대 두 줄 (검수 7)
         const fy = Math.min(y1 + 10, b + 150);
-        drawBarricade(ctx, t.x0, t.x1, fy);
+        if (!drawLowRow(ctx, t.x0, t.x1, Math.min(y1 + 6, b + 70), t.x0)) drawBarricade(ctx, t.x0, t.x1, fy);
       }
       break;
     }
@@ -752,7 +754,6 @@ export function drawTerrain(ctx: CanvasRenderingContext2D, t: Terrain, pal: Pale
         ctx.fill();
       }
       ctx.restore();
-      label(ctx, '붉은 바닥', t.x0 + 4, laneYIn(t.lane0, y0, y1) + 14, '#ffb0b0');
       break;
     }
     case 'glass':

@@ -1,5 +1,6 @@
 // 일반 적 두뇌. 역할(10.1)별 공통 행동 + 적마다 다른 규칙 (규칙형·천장·얼룩·보이지 않음 등).
 // 벨트스크롤 관례: 한 번에 공격하는 적은 2체까지(공격권). 나머지는 둘러싸고 기다린다.
+import { pfont } from '../engine/pxfont';
 import { emitDebuff } from './debuff';
 import { Enemy, stillTicks, type Brain } from './enemy';
 import type { Attack } from './roster';
@@ -375,7 +376,7 @@ const summoner: Brain = {
   drawOver(e, ctx) {
     if (!e.mem.frozen) return;
     ctx.fillStyle = '#9fd3e6';
-    ctx.font = '600 18px sans-serif';
+    ctx.font = pfont(18).f;
     ctx.textAlign = 'center';
     ctx.fillText('멈춤', e.x, e.y - e.def.h - 40);
   },

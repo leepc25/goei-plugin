@@ -1,4 +1,4 @@
-.gsy{position:absolute;inset:0;pointer-events:none;font-family:system-ui,-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;color:#e8ece9;z-index:20;overflow:hidden}
+.gsy{position:absolute;inset:0;pointer-events:none;font-family:'GoeiPixel','Galmuri11',monospace;-webkit-font-smoothing:none;color:#e8ece9;z-index:20;overflow:hidden}
 .gsy-fade{position:absolute;inset:0;background:#000;opacity:0;pointer-events:none}
 .gsy-bubbles{position:absolute;inset:0}
 .gsy-bubble{position:absolute;left:0;top:0;max-width:min(280px,60vw);padding:6px 10px;border-radius:0;background:#f4f1e8;color:#1b1f22;font-family:'GoeiPixel','Galmuri11',monospace;-webkit-font-smoothing:none;font-size:16px;line-height:1.35;border:3px solid #1b1f22;box-shadow:inset 0 -3px 0 #c9c2ae,0 0 0 2px var(--who,#888),4px 4px 0 2px rgba(0,0,0,.45);transition:opacity .25s;word-break:keep-all;image-rendering:pixelated}
@@ -20,7 +20,7 @@
 .gsy-photo span{font-size:30px;font-weight:700;color:rgba(255,255,255,.85)}
 .gsy-body{flex:1;min-width:0}
 .gsy-name{display:block;font-size:14px;color:var(--who,#ccc);filter:brightness(1.35);margin-bottom:4px}
-.gsy-text{margin:0;font-size:16px;line-height:1.6;white-space:pre-wrap;word-break:keep-all;min-height:3.2em}
+.gsy-text{text-wrap:pretty;margin:0;font-size:16px;line-height:1.6;white-space:pre-wrap;word-break:keep-all;min-height:3.2em}
 .gsy-box.narr{border-top-color:#555}
 .gsy-box.narr .gsy-text{font-style:italic;color:#c9d0cc;text-align:center}
 .gsy-box[data-mood=serious] .gsy-photo{filter:saturate(.7) brightness(.9)}

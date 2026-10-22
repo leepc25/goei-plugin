@@ -82,6 +82,44 @@ const PLATE_NAMES: Record<string, string[]> = {
   silent: ['열람실', '서고', '별관', '고문서실'],
 };
 
+// 층마다 벽·바닥 색조를 조금씩 바꾼다: L1·L2·L3가 같은 복도로 보이지 않게 (독립 검수: 층별 타일셋 동일 반복).
+// ctx.filter는 iOS Safari에 없으므로 그림마다 한 번 픽셀 색을 곱해 캐시한다.
+let tone = 0;
+const TONES: [number, number, number, number][] = [
+  [1, 1, 1, 0],
+  [1.06, 0.98, 0.84, 6], // 누런 낡은 층
+  [0.86, 1.0, 0.94, 0], // 푸른빛 도는 녹색 층
+  [0.92, 0.9, 1.08, -4], // 차가운 보랏빛 층
+];
+const toned = new Map<string, HTMLCanvasElement>();
+/** 0이면 원래 색. 층 깊이를 넣는다 (그리기 전에 한 번) */
+export function setFloorTone(depth: number) {
+  // 벽 묶음 자체를 층마다 바꾸므로(placeFor) 색조는 4층부터 한 바퀴 돈 뒤에만
+  tone = depth > 3 ? Math.floor((depth - 1) / 3) % TONES.length : 0;
+}
+function tonedImage(key: string, im: HTMLImageElement): CanvasImageSource {
+  if (!tone || typeof document === 'undefined') return im;
+  const k = `${key}#${tone}`;
+  let c = toned.get(k);
+  if (!c) {
+    c = document.createElement('canvas');
+    c.width = im.naturalWidth;
+    c.height = im.naturalHeight;
+    const g = c.getContext('2d')!;
+    g.drawImage(im, 0, 0);
+    const d = g.getImageData(0, 0, c.width, c.height);
+    const [r, gg, b, add] = TONES[tone];
+    for (let i = 0; i < d.data.length; i += 4) {
+      d.data[i] = Math.min(255, d.data[i] * r + add);
+      d.data[i + 1] = Math.min(255, d.data[i + 1] * gg + add);
+      d.data[i + 2] = Math.min(255, d.data[i + 2] * b + add);
+    }
+    g.putImageData(d, 0, 0);
+    toned.set(k, c);
+  }
+  return c;
+}
+
 export function drawWallCell(ctx: CanvasRenderingContext2D, place: string, ref: string, x: number, w: number, flip: boolean, wallBottom: number): boolean {
   const names = walls(place);
   if (!names.length) return false;
@@ -92,11 +130,12 @@ export function drawWallCell(ctx: CanvasRenderingContext2D, place: string, ref: 
   for (let i = 0; i < bays; i++) {
     // 칸은 월드 위치 순서로 돌려 쓴다: 이웃한 칸이 같은 그림이 되지 않게 (통합 검수: 로비 문 4개 반복)
     const k = Math.round((x + i * bw) / 640);
-    const im = image(place.split(':')[0], names[(k + (hash(place) % names.length)) % names.length]);
-    if (!im) {
+    const im0 = image(place.split(':')[0], names[(k + (hash(place) % names.length)) % names.length]);
+    if (!im0) {
       ctx.restore();
       return false;
     }
+    const im = tonedImage(`${place}/${names[(k + (hash(place) % names.length)) % names.length]}`, im0);
     const bx = x + i * bw;
     if (flip) {
       ctx.save();
@@ -192,10 +231,10 @@ export function drawFloor(ctx: CanvasRenderingContext2D, place: string, x0: numb
   const name = Object.keys(pack()[place] ?? {}).find((n) => n.endsWith('_floor'));
   const im = name ? image(place, name) : null;
   if (!im) return false;
-  const key = `${place}/${name}`;
+  const key = `${place}/${name}#${tone}`;
   let pat = patterns.get(key);
   if (pat === undefined) {
-    pat = ctx.createPattern(im, 'repeat');
+    pat = ctx.createPattern(tonedImage(`${place}/${name}`, im), 'repeat');
     patterns.set(key, pat);
   }
   if (!pat) return false;
@@ -244,7 +283,7 @@ export function drawFloor(ctx: CanvasRenderingContext2D, place: string, x0: numb
 }
 
 /** 층 유형·고정 방 → 그림 장소 (docs/GPT요청_게임배경.md의 장소 이름). */
-export function placeFor(where: string, floorType: string | undefined, ref: string, sub?: string | null): string {
+export function placeFor(where: string, floorType: string | undefined, ref: string, sub?: string | null, depth?: number): string {
   // 재현의 층 하위 변형(붉은 벽·빈집)은 자기 벽 그림 (바닥은 아파트 바닥, FLOOR_ALT)
   if (where === 'floor' && floorType === 'replica' && sub && !ref.startsWith('room:') && walls(`apt_${sub}`).length) return `apt_${sub}`;
   if (where === 'car') return 'el_car';
@@ -255,6 +294,11 @@ export function placeFor(where: string, floorType: string | undefined, ref: stri
   // 침묵·어둠·퍼즐·심층은 자기 그림(GPT요청_게임배경_층별)이 들어오면 그것, 아직이면 비슷한 층을 빌린다
   const t = floorType ?? '';
   if (['silent', 'dark', 'puzzle', 'deep'].includes(t) && walls(t).length) return t;
+  // 로비 층이 이어지면 같은 복도로 보인다: 깊이마다 다른 벽 묶음 (독립 검수: L1·L2·L3 동일, 색조만으로는 불가)
+  if (where === 'floor' && t === 'lobby' && depth && depth > 1) {
+    const alt = ['lobby', 'el_hall', 'chase'][(depth - 1) % 3];
+    if (walls(alt).length) return alt;
+  }
   return ({ lobby: 'lobby', chase: 'chase', trial: 'test', replica: 'apt', puzzle: 'test', silent: 'chase', dark: 'chase', deep: 'service' } as Record<string, string>)[t] ?? 'lobby';
 }
 
@@ -756,6 +800,36 @@ export function drawPipeBundle(ctx: CanvasRenderingContext2D, x0: number, x1: nu
   return true;
 }
 
+/** 낮은 막이 줄 (GPT props_objects 1~9 중 낮은 것: 줄무늬 콘크리트 턱·모래주머니·화단·철제 통·팔레트).
+ * 좁은 길의 앞줄(화면 아래)을 키 큰 차단대 대신 무릎 높이로 막는다 (독립 검수: 차단대 몰림). fy = 받침이 닿는 바닥 y */
+export function drawLowRow(ctx: CanvasRenderingContext2D, x0: number, x1: number, fy: number, seed: number): boolean {
+  // 철제 통(5)은 빈 회색 칸처럼 보여 뺀다 (독립 검수)
+  const ORDER = [1, 6, 4, 2, 1, 4, 6, 1, 2];
+  const ims = ORDER.map((n) => objImage('props', n));
+  if (ims.some((im) => !im)) return false;
+  // 그림 폭을 차례로 이어 붙여 [x0, x1]을 채우고, 남는 폭은 가운데 맞춤
+  const pick: HTMLImageElement[] = [];
+  let tot = 0;
+  for (let i = Math.abs(Math.round(seed / 97)) % ORDER.length; ; i = (i + 1) % ORDER.length) {
+    const im = ims[i]!;
+    if (pick.length && tot + im.width * 2 > x1 - x0 + 30) break;
+    pick.push(im);
+    tot += im.width * 2;
+    if (pick.length > 30) break;
+  }
+  ctx.save();
+  ctx.imageSmoothingEnabled = false;
+  let x = Math.round(x0 + (x1 - x0 - tot) / 2);
+  for (const im of pick) {
+    ctx.fillStyle = 'rgba(0,0,0,0.3)';
+    ctx.fillRect(x + 4, fy - 6, im.width * 2 - 8, 10);
+    ctx.drawImage(im, x, fy - im.height * 2, im.width * 2, im.height * 2);
+    x += im.width * 2;
+  }
+  ctx.restore();
+  return true;
+}
+
 /** 소품 하나를 그림으로. true면 처리됨(그렸거나, 그리지 않는 게 맞는 자리). false면 그림이 아직 없어 부른 쪽 대역. */
 export function drawPropArt(ctx: CanvasRenderingContext2D, kind: string, label: string | undefined, sx: number, y: number, floorType?: string): boolean {
   if (kind === 'hatch') {
@@ -815,10 +889,10 @@ export function drawLedge(ctx: CanvasRenderingContext2D, place: string, x0: numb
   const name = Object.keys(pack()[p] ?? {}).find((n) => n.endsWith('_floor'));
   const im = name ? image(p, name) : null;
   if (!im || yBot <= yTop) return false;
-  const key = `${p}/${name}`;
+  const key = `${p}/${name}#${tone}`;
   let pat = patterns.get(key);
   if (pat === undefined) {
-    pat = ctx.createPattern(im, 'repeat');
+    pat = ctx.createPattern(tonedImage(`${p}/${name}`, im), 'repeat');
     patterns.set(key, pat);
   }
   if (!pat) return false;
