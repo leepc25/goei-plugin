@@ -1,0 +1,64 @@
+before 8447
+sub fingerwarm
+sub guard
+sub engage
+sub walk
+sub advance
+sub retreat
+done fingerwarm 5
+done guard 4
+done engage 4
+done walk 8
+done advance 6
+sub run
+sub jump
+sub crouch
+sub crouchwalk
+sub lowflame
+done retreat 6
+sub firewall
+done run 8
+done jump 8
+done crouch 4
+done lowflame 6
+sub snap1
+sub snap2
+sub snap3
+sub skid
+done crouchwalk 8
+done firewall 6
+done snap1 5
+done snap2 6
+done snap3 7
+sub airsnap
+sub aim
+sub fire
+sub cool
+sub intercept
+done skid 6
+done airsnap 6
+done aim 5
+done fire 4
+done cool 6
+sub charge
+sub barrage
+sub block
+sub evade
+sub shove
+done intercept 6
+done charge 4
+done barrage 6
+done block 4
+sub flick
+sub launch
+sub super
+before 15730
+done evade 6
+done shove 4
+done flick 4
+done launch 8
+sub mark3
+done super 9
+sub drum
+done mark3 8
+sub pickup
