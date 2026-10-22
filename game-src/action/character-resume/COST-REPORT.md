@@ -1,6 +1,6 @@
 # 작업별 서버 비용 취합
 
-관측: 2026-10-22T11:51:46.791174+00:00
+관측: 2026-10-22T11:52:51.150774+00:00
 
 확정 차감과 제출 영수증을 중복 합산하지 않는다. 과거 회수 비용은 이번 신규 비용에서 제외한다. 사용자 시각 승인과 서버 완료는 별개다.
 
@@ -26,8 +26,9 @@
 | geshugan | cd0766c8-87f7-4b50-8a9c-a7d79c5c3896 | completed | 10.0 | 미확인 | 10.0 | current_resume |
 | geshugan | ee5ef44a-a16d-4ed1-a494-6578590bb498 | completed | 10.0 | 미확인 | 10.0 | current_resume |
 | gorgodio | 7282832d-aa8a-4969-b050-096a6a4832ed | completed | 3.0 | 3.0 | 미확인 | current_resume |
-| jyaldi | 134e1800-0f54-4dba-969e-d9b1b1d9f15e | pending | 미확인 | 2.0 | 미확인 | current_resume |
+| jyaldi | 134e1800-0f54-4dba-969e-d9b1b1d9f15e | completed | 2.0 | 2.0 | 미확인 | current_resume |
 | jyaldi | 4a4e18c2-d2f4-4604-9620-2127d4b8d3ca | completed | 2.0 | 2.0 | 미확인 | current_resume |
+| jyaldi | 7977bf40-dbbd-482b-8b2d-e150d4c38b63 | pending | 미확인 | 2.0 | 미확인 | current_resume |
 | jyaldi | df3b56fb-5426-4491-888f-f94a4192e5cf | completed | 3.0 | 3.0 | 미확인 | current_resume |
 | kyuras | 11526db3-3927-47df-a600-5f55e1473bcc | completed | 3.0 | 3.0 | 미확인 | current_resume |
 | kyuras | 11826541-47d1-40de-9664-f05f1838bb23 | completed | 3.0 | 미확인 | 미확인 | historical_paid_recovery |
@@ -49,7 +50,7 @@
 | spangdal | aa4b5980-880c-4ee9-8171-3f47dd2d994f | completed | 10.0 | 미확인 | 10.0 | current_resume |
 | spangdal | c40aab31-b7a6-4d05-aeaf-907041ed603c | completed | 3.0 | 3.0 | 미확인 | current_resume |
 
-이번 재개 중 완료 영수증 확인분 합계: 184.0회.
+이번 재개 중 완료 영수증 확인분 합계: 186.0회.
 기존 회수 2건의 과거 비용: 6.0회(회수 추가 비용0).
 
 정확한 서버 응답·원본 경로·SHA256은 verified-local-receipts.json, 담당 배정은 local-owners.json, 직접 검수는 coordinator-visual-review.json 참조.

@@ -2,7 +2,7 @@
   "observed_at": "2026-10-22T10:16:19.210968+00:00",
   "source_commit": "7f8fdfb0c5a6cef096d412d3d872aec6eae7de81",
   "note": "작업 ID 명시 줄만 수집. 이미지 UUID·문자열 id는 작업 ID로 추측하지 않음. 잔액 차이를 작업 비용으로 배분하지 않음. 로그 실패 문구는 서버 최종 상태를 뜻하지 않음.",
-  "job_count": 1460,
+  "job_count": 1461,
   "jobs": [
     {
       "job_id": "429ad77b-ed3b-4337-9524-075adf0a262c",
@@ -8421,9 +8421,12 @@
       "job_id": "134e1800-0f54-4dba-969e-d9b1b1d9f15e",
       "character": "jyaldi",
       "sources": [],
-      "actual_cost": null,
+      "actual_cost": {
+        "generations": 2.0,
+        "evidence": "verified-local-receipts.json#134e1800-0f54-4dba-969e-d9b1b1d9f15e"
+      },
       "local_receipt_record": "verified-local-receipts.json#134e1800-0f54-4dba-969e-d9b1b1d9f15e",
-      "cost_status": "submission_receipt_only_completion_charge_pending"
+      "cost_status": "completed_server_receipt_verified"
     },
     {
       "job_id": "4a4e18c2-d2f4-4604-9620-2127d4b8d3ca",
@@ -8435,6 +8438,14 @@
       },
       "local_receipt_record": "verified-local-receipts.json#4a4e18c2-d2f4-4604-9620-2127d4b8d3ca",
       "cost_status": "completed_server_receipt_verified"
+    },
+    {
+      "job_id": "7977bf40-dbbd-482b-8b2d-e150d4c38b63",
+      "character": "jyaldi",
+      "sources": [],
+      "actual_cost": null,
+      "local_receipt_record": "verified-local-receipts.json#7977bf40-dbbd-482b-8b2d-e150d4c38b63",
+      "cost_status": "submission_receipt_only_completion_charge_pending"
     },
     {
       "job_id": "df3b56fb-5426-4491-888f-f94a4192e5cf",
@@ -20990,5 +21001,5 @@
       "text": "2026-10-22 03:13:08 base edge 104 -> error: rate limit exceeded (20/20 jobs)"
     }
   ],
-  "local_receipts_verified_at": "2026-10-22T11:51:46.791174+00:00"
+  "local_receipts_verified_at": "2026-10-22T11:52:51.150774+00:00"
 }
