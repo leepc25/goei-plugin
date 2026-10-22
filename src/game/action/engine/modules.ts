@@ -11,6 +11,7 @@ import type { GameEvent, HqModuleLike, RunConfigCore, RunResultCore, StageModule
 import type { EngineModules, Game } from './game';
 import { DEF_BY_KIND, arenaStage, createEnemy, isThreat, signalEnemies } from '../enemy';
 import { createElevatorStage } from '../stage';
+import { drawMiniMap, drawRunMap } from '../stage/runmap';
 import { CUTSCENES, VIDEOS, hqLines, mountStory, stageHooks, type AgentId, type StoryApi } from '../story';
 import type { SpeakerId } from '../story/types';
 import { itemsBlocking, linkItems, mountItemsOverlay } from './itemsLink';
@@ -219,7 +220,20 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     onOpen: (on) => shell.touch.setVisible(!on && shell.mode === 'play'),
   });
   (globalThis as { __goeiNpc?: unknown }).__goeiNpc = npc; // 시험용
-  const elevator = createElevatorStage(stageStore, npc.stageHooks(stageHooks()));
+  // 강화 선택(기본기획서 15.2)은 껍데기 선택 창으로: 창이 열린 동안 게임이 멈춘다
+  const elevator = createElevatorStage(stageStore, {
+    ...npc.stageHooks(stageHooks()),
+    pickUpgrade: (v, done) => {
+      void shell.choose({ title: `${v.why} · 강화 하나`, lines: ['이번 출동 동안만 남는다. 같은 계열 셋이면 완성 효과.'], options: v.options.map((o) => `[${o.set}] ${o.label} — ${o.text}`), cancel: false }).then((i) => done(Math.max(0, i)));
+      return true;
+    },
+  });
+  // 출동 지도 (Z·Tab·M, 터치 「지도」): 열린 동안 게임이 멈춘다. 구석 미니맵은 늘
+  let mapOpen = false;
+  const offMapKey = shell.input.on((code, down) => {
+    if (!down) return;
+    if ((code === 'KeyZ' || code === 'KeyM') && world && world.stage === elevator && !game?.inHub && !shell.paused && !story.isBlocking()) mapOpen = !mapOpen;
+  });
   setLineProvider(hqLines);
   // 시연용 방: 적 시험장은 적 모듈 것(?start=arena), 아이템 진열(?start=items)
   const itemStage: StageModule = {
@@ -457,7 +471,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     enemyFactory,
     hq,
     hud: false,
-    blocking: () => story.isBlocking() || itemsBlocking() || !floorBox.hidden || npc.isOpen(),
+    blocking: () => story.isBlocking() || itemsBlocking() || !floorBox.hidden || npc.isOpen() || mapOpen,
     listeners,
     surface: { canvas: shell.canvas, ctx: shell.ctx },
     paused: () => shell.paused,
@@ -485,6 +499,13 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       if (npc.isOpen()) hs.message = undefined; // 대화창이 열려 있으면 자막·안내 한 줄은 숨긴다 (같은 말이 두 번, 폰 키보드 자리)
       if (!game?.inHub) shell.hud.draw(ctx, hs, dt); // 본부에서는 전투 HUD 없음
       else if (hs.message) shell.hud.drawMessage(ctx, hs.message, hs.compact); // 본부 목소리는 아래 자막 한 줄
+      if (shell.paused) mapOpen = false;
+      if (!game?.inHub && w.stage === elevator) {
+        const m = elevator.mapView();
+        const t = performance.now() / 1000;
+        if (m && mapOpen) drawRunMap(ctx, m, w.player.x, t);
+        else if (m) drawMiniMap(ctx, m, w.player.x, t);
+      } else mapOpen = false;
       shell.touch.setItems(hs.items);
       shell.touch.setGauge(w.player.gauge / 100);
       shell.touch.hint('reload', w.player.ammo <= 2 && w.player.reserve > 0);
@@ -573,6 +594,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       world = null;
       game = null;
       window.removeEventListener('keydown', storyKeys, true);
+      offMapKey();
       window.removeEventListener('keydown', titleInput, true);
       window.removeEventListener('pointerdown', titleInput, true);
       if (openingT) clearTimeout(openingT);
