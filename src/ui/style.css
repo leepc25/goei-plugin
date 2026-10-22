@@ -1916,6 +1916,7 @@ details.gx-gl-card:not([open]) { gap: 0; }
 /* 설정 → 창 바깥 불투명도 막대 */
 .st-range { display: flex; align-items: center; gap: 12px; min-width: min(260px, 100%); }
 .st-range input { flex: 1; accent-color: var(--signal); }
+.st-recent { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 10px 14px; }
 .st-range output { min-width: 3.2em; text-align: right; font-variant-numeric: tabular-nums; color: var(--sub); }
 
 /* 메인 설정 맨 위 「기능별 설정」: 세 기능 설정을 바로 여는 단추 */
@@ -1936,6 +1937,8 @@ details.gx-gl-card:not([open]) { gap: 0; }
 @media (max-width: 640px) {
   .gx .ps-ctl:has(> .st-range) { width: 100%; }
   .gx .st-range { width: 100%; }
+  .gx .ps-ctl:has(> .st-recent) { width: 100%; }
+  .gx .st-recent { justify-content: flex-start; }
 }
 
 /* 즐겨찾기 (2026-10-20): PC 메뉴 맨 아래 ‹ ★ ›, 모바일 상황판 서랍 다섯 칸, 둘 다 같은 ★ 창 */

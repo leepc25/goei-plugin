@@ -101,7 +101,8 @@ export function mergeByName<T>(current: T[], incoming: T[], name: (x: T) => stri
 }
 
 /** 카드 업데이트 때 지우는 옛 정규식 */
-export const RETIRED_SCRIPTS = ['📊상태창'];
+/** 플러그인이 대신 하게 되어 카드에서 지우는 정규식 (이미지 태그는 v0.16.40부터 core/imgtag.ts) */
+export const RETIRED_SCRIPTS = ['📊상태창', '🖼️에셋줄바꿈', '🖼️에셋출력', '🖼️에셋리퀘제거'];
 
 const loreName = (e: LoreEntry) => `${e.comment ?? ''}\u0001${(e as { folder?: string }).folder ?? ''}`;
 

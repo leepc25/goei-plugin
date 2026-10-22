@@ -6,23 +6,67 @@
 
 /** 이름_표정. 따옴표로 감싼 꼴(<img="이름_표정">)도 받는다 */
 const TAG = /\s*<img=["']?([^_>"']+)_([^>"']+)["']?>\s*/g;
+/** 요청에서 지울 태그 (원본 「🖼️에셋리퀘제거」의 <img=(.*?)>) */
+const ANY_TAG = /<img=.*?>/g;
+
+/** 그림을 띄우는·요청에 태그를 남기는 최근 메시지 수 (마지막 메시지 포함). 기본은 원본 정규식의 chat_index >= lastmessageid-5와 같은 6개.
+ *  설정(Prefs.imgShow·imgSend)에서 0이면 전부 */
+export const IMG_RECENT = { min: 1, max: 30, step: 1, def: 6 };
+export const imgRecent = (v: unknown): number | null => {
+  const n = typeof v === 'string' && v.trim() ? Number(v) : v;
+  return typeof n === 'number' && Number.isInteger(n) && (n === 0 || (n >= IMG_RECENT.min && n <= IMG_RECENT.max)) ? n : null;
+};
+
+/** 그림 칸 기본 모양. 본 화면 style(imgCss)이 없을 때(화면 접근 권한을 거부했을 때)도 원래 크기로 보이게 */
+const BASE_STYLE = 'display:block;margin:auto;width:100%;max-width:32em;aspect-ratio:1/1;overflow:hidden;border-radius:20px;'
+  + 'background-repeat:no-repeat;background-size:100% auto;background-position:center top';
 
 export function hasImgTag(text: string): boolean {
   return text.includes('<img=');
 }
 
+const tagName = (who: string, expr: string, pick?: (name: string) => string | null) => {
+  const want = `${who.trim()}_${expr.trim()}`;
+  return pick ? pick(want) ?? pick(`${who.trim()}_default`) : want;
+};
+
+/** 태그가 모두 에셋에 있는 이름인지 (괴이봇 판정 전에도 그려도 되는지. 다른 봇의 같은 꼴 태그는 건드리지 않게) */
+export function imgTagsKnown(text: string, pick?: (name: string) => string | null): boolean {
+  if (!pick) return false;
+  const all = [...text.matchAll(TAG)];
+  return all.length > 0 && all.every((m) => !!tagName(m[1], m[2], pick));
+}
+
 /**
  * 태그를 그림 칸으로. pick(이름)은 에셋에 있으면 실제 이름(대소문자 맞춤), 없으면 null.
  * pick이 없으면(에셋 목록을 못 읽었으면) 태그 이름을 그대로 쓴다.
- * 그 표정이 없으면 이름_default, 그것도 없으면 칸을 그리지 않는다 (원본과 같음)
+ * 그 표정이 없으면 이름_default, 그것도 없으면 칸을 그리지 않는다 (원본과 같음).
+ * 최근 메시지에만 띄우는 조건은 메시지 번호를 아는 Risu CBS에 맡긴다 (화면 처리기는 번호를 모른다). recent 0이면 전부
  */
-export function renderImgTags(text: string, pick?: (name: string) => string | null): string {
+export function renderImgTags(text: string, pick?: (name: string) => string | null, recent = IMG_RECENT.def): string {
   return text.replace(TAG, (_m, who: string, expr: string) => {
-    const want = `${who.trim()}_${expr.trim()}`;
-    const name = pick ? pick(want) ?? pick(`${who.trim()}_default`) : want;
+    const name = tagName(who, expr, pick);
     if (!name || /[{}'"<>\\]/.test(name)) return '\n\n';
-    return `\n\n<div class="gim" style="background-image:url('{{raw::${name}}}')" tabindex="0"></div>\n\n`;
+    const box = `<div class="gim" style="${BASE_STYLE};background-image:url('{{raw::${name}}}')" tabindex="0"></div>`;
+    return `\n\n${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-${recent - 1}}}}}}}${box}{{/when}}` : box}\n\n`;
   });
+}
+
+/** 요청: 최근 메시지 recent개 밖의 태그를 지운다 (0이면 그대로). 시스템 글(로어북 등)은 세지 않는다 */
+export function stripOldImgTags<M extends { role?: string; content?: unknown }>(messages: M[], recent = IMG_RECENT.def): M[] {
+  if (recent <= 0) return messages;
+  let seen = 0;
+  let changed = false;
+  const out = [...messages];
+  for (let i = out.length - 1; i >= 0; i--) {
+    const m = out[i];
+    if (!m || m.role === 'system') continue;
+    seen++;
+    if (seen <= recent || typeof m.content !== 'string' || !m.content.includes('<img=')) continue;
+    out[i] = { ...m, content: m.content.replace(ANY_TAG, '') };
+    changed = true;
+  }
+  return changed ? out : messages;
 }
 
 /** 이미지 칸 크기 (%): 원본 카드 크기(최대 너비 32em)를 100으로. 채팅 폭보다 넓어지지는 않는다 */
@@ -49,10 +93,11 @@ export function imgCss(size = IMG_SIZE.def, fold = IMG_FOLD.def, hidden = false)
   if (hidden) return `${g}{display:none!important}`;
   const open = fold >= 100;
   const folded = open ? `${W}/${H}` : `${W}/${Math.round(H * fold) / 100}`;
-  return `${g}{display:block;box-sizing:border-box;margin:auto;width:100%;max-width:${Math.round(BASE_EM * size) / 100}em;aspect-ratio:${folded};`
+  // 그림 칸에 기본 모양이 style 속성으로 들어 있어 !important로 덮는다
+  return `${g}{display:block!important;box-sizing:border-box;margin:auto;width:100%;max-width:${Math.round(BASE_EM * size) / 100}em!important;aspect-ratio:${folded}!important;`
     + 'overflow:hidden;border-radius:20px;background-color:transparent;background-repeat:no-repeat;background-size:100% auto;background-position:center top;'
     + `cursor:${open ? 'default' : 'pointer'};outline:none;transition:aspect-ratio .45s ease;-webkit-mask-image:-webkit-radial-gradient(white,black)}`
-    + (open ? '' : `${g}:hover,${g}:focus{aspect-ratio:${W}/${H}}`);
+    + (open ? '' : `${g}:hover,${g}:focus{aspect-ratio:${W}/${H}!important}`);
 }
 
 /** 지금 채팅의 「에셋 출력」이 꺼져 있으면 그림 칸을 숨긴다 (채팅을 바꿀 때·설정을 바꿀 때 정한다) */

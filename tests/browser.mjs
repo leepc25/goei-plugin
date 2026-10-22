@@ -702,6 +702,15 @@ if (fixture.globalLore.some((e) => String(e.comment).startsWith('📚Lore slot')
       await page.$eval('[data-change="set-img-fold"]', (el) => { el.value = '40'; el.dispatchEvent(new Event('change', { bubbles: true })); });
       await page.waitForFunction(() => getComputedStyle(document.querySelector('#msg .x-risu-gim')).aspectRatio === '832 / 486.4');
       if (shots) { await page.$eval('[data-change="set-img-fold"]', (el) => el.scrollIntoView({ block: 'center' })); await page.screenshot({ path: `${shots}/9-img-settings.png` }); }
+      // 표시 범위·요청 속 태그: 최근만(기본 6개) ↔ 전부, 개수 막대
+      await page.click('[data-action="set-img-show-mode"][data-value="all"]');
+      await page.waitForFunction(() => JSON.parse(window.__store['p:goei:prefs'] || '{}').imgShow === 0);
+      assert.ok(!(await page.evaluate(() => window.__calls.handlers.display('<img=Jyaldi_smile>'))).includes('{{#when'), '전부면 조건 없음');
+      await page.$eval('[data-change="set-img-send"]', (el) => { el.value = '3'; el.dispatchEvent(new Event('change', { bubbles: true })); });
+      await page.waitForFunction(() => JSON.parse(window.__store['p:goei:prefs'] || '{}').imgSend === 3);
+      if (shots) { await page.$eval('[data-change="set-img-send"]', (el) => el.scrollIntoView({ block: 'center' })); await page.screenshot({ path: `${shots}/9-img-recent.png` }); }
+      await page.click('[data-action="set-img-show-mode"][data-value="recent"]');
+      await page.waitForFunction(() => JSON.parse(window.__store['p:goei:prefs'] || '{}').imgShow === undefined);
       await page.click('[data-action="set-asset"][data-value="0"]');
       await page.waitForFunction(() => getComputedStyle(document.querySelector('#msg .x-risu-gim')).display === 'none');
       await page.click('[data-action="set-asset"][data-value="1"]');

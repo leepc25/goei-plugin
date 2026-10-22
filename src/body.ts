@@ -32,7 +32,7 @@ import { WatchState, type WatchSnapshot } from './core/watch';
 import { createFab, type Fab } from './host/overlay';
 import { BRAND } from './ui/brand';
 import { cardPalette as themedCardPalette, currentTheme, onThemeChange, repaintTheme, setCurrentTheme, themeName } from './ui/theme';
-import { hasImgTag, renderImgTags, setImgHidden } from './core/imgtag';
+import { hasImgTag, IMG_RECENT, imgTagsKnown, renderImgTags, setImgHidden, stripOldImgTags } from './core/imgtag';
 import { loadModuleAssets, modulePicker } from './host/assets';
 import { getPrefs } from './core/settings';
 import { openApp, openWiki } from './ui/app';
@@ -61,6 +61,8 @@ async function onBeforeRequest<M extends PromptMessage>(messages: M[], type: str
   if (messages.some((m) => marked(m?.content))) {
     messages = messages.map((m) => (marked(m?.content) ? { ...m, content: stripStartCard(stripUnsentMark(m.content)) } : m));
   }
+  // 오래된 메시지의 이미지 태그는 요청에서 뺀다 (원본 「🖼️에셋리퀘제거」)
+  if (liteNow || messages.some((m) => typeof m?.content === 'string' && imgTagsKnown(m.content, modulePicker()))) messages = stripOldImgTags(messages, getPrefs().imgSend ?? IMG_RECENT.def);
   if (liteNow) {
     messages = stripHistoryTags(messages);
     messages = await fixLore(messages).catch(() => messages);
@@ -368,8 +370,11 @@ function onDisplay(text: string): string {
     if (out.includes(START_MARK)) out = renderStartCards(out, startCardHtml);
     // 상태창은 카드 정규식 대신 플러그인이 그린다 (칸이 어긋나도 깨지지 않게, 설정의 배색으로)
     if (hasStatusTag(out)) out = renderStatus(out);
-    // 캐릭터 이미지 태그는 카드 정규식 대신 플러그인이 그림 칸으로 (Lite 채팅에서만. 아니면 카드 정규식이 그대로 처리)
-    if (liteNow && hasImgTag(out)) out = renderImgTags(out, modulePicker());
+    // 캐릭터 이미지 태그는 플러그인이 그림 칸으로. Lite 판정 전(다른 채팅에서 돌아온 직후)에는 태그가 모두 에셋 모듈에 있는 이름일 때만
+    if (hasImgTag(out)) {
+      const pick = modulePicker();
+      if (liteNow || imgTagsKnown(out, pick)) out = renderImgTags(out, pick, getPrefs().imgShow ?? IMG_RECENT.def);
+    }
     if (out.includes(UNSENT_MARK)) out = renderUnsentMark(out, unsentMarkHtml());
     if (wantsOpeningHint(text)) out += openingHintHtml();
   }
