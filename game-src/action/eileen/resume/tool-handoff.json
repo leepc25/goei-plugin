@@ -1,0 +1,94 @@
+{
+  "whole_branch_merged": false,
+  "delivery": "repository_handoff_only; direct_thread_send_tool_unavailable",
+  "tools": [
+    {
+      "owner": "kyuras",
+      "path": "tools/recover_character_jobs.py",
+      "source_commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+      "git_objects": [
+        "100644 blob 463d4b530841c7df2dc2ec2c7c532b84e67ceabb\ttools/recover_character_jobs.py"
+      ],
+      "url": "https://github.com/leepc25/goei-plugin/tree/087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4/tools/recover_character_jobs.py"
+    },
+    {
+      "owner": "kyuras",
+      "path": "tests/character-recovery.test.py",
+      "source_commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+      "git_objects": [
+        "100644 blob 313573219212e7f68c748dcdc3aa55a954b9d390\ttests/character-recovery.test.py"
+      ],
+      "url": "https://github.com/leepc25/goei-plugin/tree/087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4/tests/character-recovery.test.py"
+    },
+    {
+      "owner": "kyuras",
+      "path": "docs/character-resume/kyuras-audit.md",
+      "source_commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+      "git_objects": [
+        "100644 blob d3bad8525ffe528d4397e8421ccbe185fa5a72e8\tdocs/character-resume/kyuras-audit.md"
+      ],
+      "url": "https://github.com/leepc25/goei-plugin/tree/087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4/docs/character-resume/kyuras-audit.md"
+    },
+    {
+      "owner": "jyaldi",
+      "path": "game-src/action/jyaldi-v5/resume",
+      "source_commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+      "git_objects": [
+        "100644 blob 5ee7d0ac755d0d068e2a6cef2ef8bdfa582664c8\tgame-src/action/jyaldi-v5/resume/README.md",
+        "100644 blob a1d6cb6b089856a97577a5ff077b3b0e9da6f0cc\tgame-src/action/jyaldi-v5/resume/build_drafts.py",
+        "100644 blob cd8ccafb9a4de35b87a76bfbc7307b65b58787b8\tgame-src/action/jyaldi-v5/resume/reference-coordinate-grid.png",
+        "100644 blob 89d76751a2e8b46a9141127320c221f6ee4c5ee3\tgame-src/action/jyaldi-v5/resume/reference-overlay.png",
+        "100644 blob 6b769b1493ee7198554ded43e403f64c5a7f9801\tgame-src/action/jyaldi-v5/resume/reference.json",
+        "100644 blob 22adc1192ff06b354fc895449f61a75b7c68a81f\tgame-src/action/jyaldi-v5/resume/run-motion.json",
+        "100644 blob 3a42ced358104ea707247d30ae01ffdd67101e6e\tgame-src/action/jyaldi-v5/resume/run-request.draft.json",
+        "100644 blob 86e864ea7cd906bd8caa9fb542043c2d848838ee\tgame-src/action/jyaldi-v5/resume/run-skeleton.png",
+        "100644 blob 11dc9485ccbf0ed65ecd8733eb26e1d024de14c7\tgame-src/action/jyaldi-v5/resume/validation.json",
+        "100644 blob 99f0acc21348a255bfbd02f4bad194c2e7d26611\tgame-src/action/jyaldi-v5/resume/walk-motion.json",
+        "100644 blob ed2a0c2b421814171b005503708a79566629799b\tgame-src/action/jyaldi-v5/resume/walk-request.draft.json",
+        "100644 blob c0802e5e287d7acfe2e89f061cffe627f891b0c1\tgame-src/action/jyaldi-v5/resume/walk-skeleton.png"
+      ],
+      "url": "https://github.com/leepc25/goei-plugin/tree/087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4/game-src/action/jyaldi-v5/resume"
+    },
+    {
+      "owner": "jyaldi",
+      "path": "docs/character-resume/jyaldi-audit.md",
+      "source_commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+      "git_objects": [
+        "100644 blob d5408ea224d2059df273144b2ef562f01cebc117\tdocs/character-resume/jyaldi-audit.md"
+      ],
+      "url": "https://github.com/leepc25/goei-plugin/tree/087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4/docs/character-resume/jyaldi-audit.md"
+    },
+    {
+      "owner": "review",
+      "path": "tools/build_character_delivery.py",
+      "source_commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+      "git_objects": [
+        "100644 blob e78b8596f0825325bca2467aee92114b42473662\ttools/build_character_delivery.py"
+      ],
+      "url": "https://github.com/leepc25/goei-plugin/tree/087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4/tools/build_character_delivery.py"
+    },
+    {
+      "owner": "review",
+      "path": "tools/build_character_resume_demo.py",
+      "source_commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+      "git_objects": [
+        "100644 blob bd0bc65fab0a293fb430235fab5892ac2502e4f3\ttools/build_character_resume_demo.py"
+      ],
+      "url": "https://github.com/leepc25/goei-plugin/tree/087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4/tools/build_character_resume_demo.py"
+    },
+    {
+      "owner": "review",
+      "path": "docs/character-resume/other-agents-audit.md",
+      "source_commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+      "git_objects": [
+        "100644 blob e55fd9d207f749bdfcfc4521df794deadd521ebe\tdocs/character-resume/other-agents-audit.md"
+      ],
+      "url": "https://github.com/leepc25/goei-plugin/tree/087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4/docs/character-resume/other-agents-audit.md"
+    }
+  ],
+  "kyuras_recovery_owner": "kyuras",
+  "kyuras_jobs": [
+    "11826541-47d1-40de-9664-f05f1838bb23",
+    "9fe0e770-b992-4299-a4c1-90d6e591828a"
+  ]
+}

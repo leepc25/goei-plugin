@@ -1,0 +1,1872 @@
+{
+  "review_method": "direct contact-sheet visual inspection plus alpha bounds; not independent second-reviewer approval",
+  "frames": [
+    {
+      "clip": "transition",
+      "frame": 0,
+      "source": "existing_final",
+      "rgba_sha256": "c04124f2f4a197dc26eda87445343c1fca037a29a0c0864f14dfafac7253dbec",
+      "bbox": [
+        44,
+        47,
+        101,
+        137
+      ],
+      "bottom_y": 136,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "정장·조끼 계열 유지",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "전투 기준 y136, bbox는 지지발 추적 대체 불가",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [
+        "0→1 소총이 손에서 등으로 순간 이동; 중간 걸기 자세 필요"
+      ],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "transition",
+      "frame": 1,
+      "source": "existing_final",
+      "rgba_sha256": "83be3b2fcd71018b344e7708ab85b2e7b0072ee075c9ba93ca9ba08f72c5ddd6",
+      "bbox": [
+        36,
+        47,
+        78,
+        137
+      ],
+      "bottom_y": 136,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "정장·조끼 계열 유지",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "전투 기준 y136, bbox는 지지발 추적 대체 불가",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [
+        "0→1 소총이 손에서 등으로 순간 이동; 중간 걸기 자세 필요"
+      ],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "transition",
+      "frame": 2,
+      "source": "existing_final",
+      "rgba_sha256": "36a69d4d54015e8518be73a580319d25111684f4b2dac718ee0f6846e6dbd9af",
+      "bbox": [
+        36,
+        47,
+        78,
+        137
+      ],
+      "bottom_y": 136,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "정장·조끼 계열 유지",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "전투 기준 y136, bbox는 지지발 추적 대체 불가",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "transition",
+      "frame": 3,
+      "source": "existing_final",
+      "rgba_sha256": "3fd63db749b6e806c6df7d09bfc469fee14953d1836681212d4dcaba9f260ede",
+      "bbox": [
+        36,
+        47,
+        88,
+        137
+      ],
+      "bottom_y": 136,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "정장·조끼 계열 유지",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "전투 기준 y136, bbox는 지지발 추적 대체 불가",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "transition",
+      "frame": 4,
+      "source": "existing_final",
+      "rgba_sha256": "90f34bc0df39cad81ee0f0777b7d91892b66e228d9d00bb0b292d2f5459c7deb",
+      "bbox": [
+        36,
+        47,
+        95,
+        137
+      ],
+      "bottom_y": 136,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "정장·조끼 계열 유지",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "전투 기준 y136, bbox는 지지발 추적 대체 불가",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "transition",
+      "frame": 5,
+      "source": "existing_final",
+      "rgba_sha256": "874017e36615abd9b6b1d17a07f0cb89a7843ed4aa81121bef87539203912fd4",
+      "bbox": [
+        37,
+        47,
+        104,
+        137
+      ],
+      "bottom_y": 136,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "정장·조끼 계열 유지",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "전투 기준 y136, bbox는 지지발 추적 대체 불가",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "buttstroke",
+      "frame": 0,
+      "source": "existing_final",
+      "rgba_sha256": "866ebcfe116b39d4d9d9d8c9e11ae7f2d828c28b8233cdc3831d196e658b2025",
+      "bbox": [
+        44,
+        47,
+        101,
+        137
+      ],
+      "bottom_y": 136,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "정장·조끼 계열 유지",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "전투 기준 y136, bbox는 지지발 추적 대체 불가",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "buttstroke",
+      "frame": 1,
+      "source": "existing_final",
+      "rgba_sha256": "497d304e04ecc4cebcffcedd192f8a51ed06de71258a50228e31a36ba809cce6",
+      "bbox": [
+        41,
+        44,
+        92,
+        137
+      ],
+      "bottom_y": 136,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "정장·조끼 계열 유지",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "전투 기준 y136, bbox는 지지발 추적 대체 불가",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [
+        "총·팔이 얼굴/눈 높이를 가림; 팔꿈치·파지 핵심 자세 변경 필요"
+      ],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "buttstroke",
+      "frame": 2,
+      "source": "existing_final",
+      "rgba_sha256": "96fa3724d8eb06cc757393c0f488836dad9e3d89d142994263db344475ade432",
+      "bbox": [
+        38,
+        44,
+        92,
+        137
+      ],
+      "bottom_y": 136,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "정장·조끼 계열 유지",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "전투 기준 y136, bbox는 지지발 추적 대체 불가",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [
+        "총·팔이 얼굴/눈 높이를 가림; 팔꿈치·파지 핵심 자세 변경 필요"
+      ],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "buttstroke",
+      "frame": 3,
+      "source": "existing_final",
+      "rgba_sha256": "d7c3715eb2c3f5ed6afd2c771d0ac41edb34d5cf65a7348bb4e8b0b69421a39c",
+      "bbox": [
+        42,
+        50,
+        108,
+        137
+      ],
+      "bottom_y": 136,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "정장·조끼 계열 유지",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "전투 기준 y136, bbox는 지지발 추적 대체 불가",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [
+        "총·팔이 얼굴/눈 높이를 가림; 팔꿈치·파지 핵심 자세 변경 필요"
+      ],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "buttstroke",
+      "frame": 4,
+      "source": "existing_final",
+      "rgba_sha256": "ff016e911ee2e8f3801120b9e39c73d7cc9f26a430f88af0eeed1a91c7308dfb",
+      "bbox": [
+        45,
+        49,
+        121,
+        137
+      ],
+      "bottom_y": 136,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "정장·조끼 계열 유지",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "전투 기준 y136, bbox는 지지발 추적 대체 불가",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "buttstroke",
+      "frame": 5,
+      "source": "existing_final",
+      "rgba_sha256": "d50358bd4a3d2eb29ac920853c7acac56797f57945a4ada7baf7d3b0fe94c59a",
+      "bbox": [
+        45,
+        49,
+        123,
+        137
+      ],
+      "bottom_y": 136,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "정장·조끼 계열 유지",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "전투 기준 y136, bbox는 지지발 추적 대체 불가",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "buttstroke",
+      "frame": 6,
+      "source": "existing_final",
+      "rgba_sha256": "3979fb21df12b79d7f69a2b1550321b86cbc337b9f989361f1cde6c4e2c81a9b",
+      "bbox": [
+        45,
+        48,
+        110,
+        137
+      ],
+      "bottom_y": 136,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "정장·조끼 계열 유지",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "전투 기준 y136, bbox는 지지발 추적 대체 불가",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "precise",
+      "frame": 0,
+      "source": "existing_final",
+      "rgba_sha256": "04eb4f35244d35b6e03124fb885276e82e06e5a8696b856e839668cef49e31e1",
+      "bbox": [
+        44,
+        48,
+        107,
+        137
+      ],
+      "bottom_y": 136,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "정장·조끼 계열 유지",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "전투 기준 y136, bbox는 지지발 추적 대체 불가",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "precise",
+      "frame": 1,
+      "source": "existing_final",
+      "rgba_sha256": "23572b2f59f96bd2032a315660e893e2642dedcafe3c8e02d7c6c2688493a6f4",
+      "bbox": [
+        26,
+        47,
+        94,
+        137
+      ],
+      "bottom_y": 136,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "정장·조끼 계열 유지",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "전투 기준 y136, bbox는 지지발 추적 대체 불가",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [
+        "개머리판과 머리카락 윤곽 겹침"
+      ],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "precise",
+      "frame": 2,
+      "source": "existing_final",
+      "rgba_sha256": "61fe6e172054136ab6ea82f3b7a1803f47ed105243dfbfe647fd2a05b7d42475",
+      "bbox": [
+        33,
+        47,
+        103,
+        137
+      ],
+      "bottom_y": 136,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "정장·조끼 계열 유지",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "전투 기준 y136, bbox는 지지발 추적 대체 불가",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [
+        "개머리판과 머리카락 윤곽 겹침"
+      ],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "precise",
+      "frame": 3,
+      "source": "existing_final",
+      "rgba_sha256": "a48c09e1f9127bcce7811b806cdc939ddd90c6e7598daba01bec5d9ccc15df1b",
+      "bbox": [
+        43,
+        48,
+        108,
+        137
+      ],
+      "bottom_y": 136,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "정장·조끼 계열 유지",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "전투 기준 y136, bbox는 지지발 추적 대체 불가",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "precise",
+      "frame": 4,
+      "source": "existing_final",
+      "rgba_sha256": "83a0e87ebcb5d70f36bf40944fe67ac57ab374e29eced9178daac4760def5bb5",
+      "bbox": [
+        44,
+        49,
+        110,
+        137
+      ],
+      "bottom_y": 136,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "정장·조끼 계열 유지",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "전투 기준 y136, bbox는 지지발 추적 대체 불가",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "pair1",
+      "frame": 0,
+      "source": "existing_final",
+      "rgba_sha256": "e4e83c1532a4b186ae801cf9f81d326c72633675b7d4c49df04dcdfae5c7ee75",
+      "bbox": [
+        44,
+        47,
+        101,
+        137
+      ],
+      "bottom_y": 136,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "정장·조끼 계열 유지",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "전투 기준 y136, bbox는 지지발 추적 대체 불가",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "pair1",
+      "frame": 1,
+      "source": "existing_final",
+      "rgba_sha256": "d64d069c366fc1cbc454127ed69dcd0d84cf1bfbbdacdaab704f908549889a89",
+      "bbox": [
+        44,
+        47,
+        102,
+        137
+      ],
+      "bottom_y": 136,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "정장·조끼 계열 유지",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "전투 기준 y136, bbox는 지지발 추적 대체 불가",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "pair1",
+      "frame": 2,
+      "source": "existing_final",
+      "rgba_sha256": "59f2fbae78dde4f56654f26b11b61e7ad8f081819bbca94fe5c08b26e5a480db",
+      "bbox": [
+        43,
+        48,
+        106,
+        137
+      ],
+      "bottom_y": 136,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "정장·조끼 계열 유지",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "전투 기준 y136, bbox는 지지발 추적 대체 불가",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [
+        "개머리판·목 뒤 머리 윤곽 겹침 후보"
+      ],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "pair1",
+      "frame": 3,
+      "source": "existing_final",
+      "rgba_sha256": "b48e9e442f2e3d50034072a42704e12901b6dacd943c6042ce6c44400bebd330",
+      "bbox": [
+        43,
+        48,
+        105,
+        137
+      ],
+      "bottom_y": 136,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "정장·조끼 계열 유지",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "전투 기준 y136, bbox는 지지발 추적 대체 불가",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [
+        "개머리판·목 뒤 머리 윤곽 겹침 후보"
+      ],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "pair1",
+      "frame": 4,
+      "source": "existing_final",
+      "rgba_sha256": "62691d6735490f90b1800491ce1fd756d959d03ea5b3ba26a01b22c69a536a73",
+      "bbox": [
+        43,
+        48,
+        106,
+        137
+      ],
+      "bottom_y": 136,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "정장·조끼 계열 유지",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "전투 기준 y136, bbox는 지지발 추적 대체 불가",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [
+        "개머리판·목 뒤 머리 윤곽 겹침 후보"
+      ],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "pair1",
+      "frame": 5,
+      "source": "existing_final",
+      "rgba_sha256": "a2deb5786647f907ea3b02e934ba655ac546adf0c85ee6bfbacc3e00062114df",
+      "bbox": [
+        43,
+        48,
+        105,
+        137
+      ],
+      "bottom_y": 136,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "정장·조끼 계열 유지",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "전투 기준 y136, bbox는 지지발 추적 대체 불가",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [
+        "개머리판·목 뒤 머리 윤곽 겹침 후보"
+      ],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "pushkick",
+      "frame": 0,
+      "source": "existing_final",
+      "rgba_sha256": "ea88e724115a9ed90e08ab1857a401bd051edb7599e76445a37ef23c0e7d1ba4",
+      "bbox": [
+        44,
+        47,
+        101,
+        137
+      ],
+      "bottom_y": 136,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "정장·조끼 계열 유지",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "전투 기준 y136, bbox는 지지발 추적 대체 불가",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "pushkick",
+      "frame": 1,
+      "source": "existing_final",
+      "rgba_sha256": "6db16ac8d53096ae772e876de4cff90e783ca7c4a1a10c831d720e457569fd2f",
+      "bbox": [
+        37,
+        47,
+        80,
+        135
+      ],
+      "bottom_y": 134,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "정장·조끼 계열 유지",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "전투 기준 y136, bbox는 지지발 추적 대체 불가",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [
+        "지지발 최하단 y134, 기준 y136보다 2px 위"
+      ],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "pushkick",
+      "frame": 2,
+      "source": "existing_final",
+      "rgba_sha256": "4b5a76c0e14d388354c479d889d32d4c8af041c4c9e7899fa217c697cac9d0c8",
+      "bbox": [
+        30,
+        47,
+        104,
+        135
+      ],
+      "bottom_y": 134,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "정장·조끼 계열 유지",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "전투 기준 y136, bbox는 지지발 추적 대체 불가",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [
+        "지지발 최하단 y134, 기준 y136보다 2px 위"
+      ],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "pushkick",
+      "frame": 3,
+      "source": "existing_final",
+      "rgba_sha256": "935335b3cd983335d1845247c0d04ed3f5810e297b006015268d324726247044",
+      "bbox": [
+        30,
+        47,
+        104,
+        135
+      ],
+      "bottom_y": 134,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "정장·조끼 계열 유지",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "전투 기준 y136, bbox는 지지발 추적 대체 불가",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [
+        "지지발 최하단 y134, 기준 y136보다 2px 위"
+      ],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "pushkick",
+      "frame": 4,
+      "source": "existing_final",
+      "rgba_sha256": "7da56c629e2f4f0ff0e38aa3c43f89b55bb4a7ead334ef71d00409e4048f25b9",
+      "bbox": [
+        33,
+        47,
+        90,
+        135
+      ],
+      "bottom_y": 134,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "정장·조끼 계열 유지",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "전투 기준 y136, bbox는 지지발 추적 대체 불가",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [
+        "지지발 최하단 y134, 기준 y136보다 2px 위"
+      ],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "pushkick",
+      "frame": 5,
+      "source": "existing_final",
+      "rgba_sha256": "1fbac4caf57cf2b87a5413faed69e5cefc848b58838dc71e1f7f2316309deda1",
+      "bbox": [
+        33,
+        47,
+        90,
+        137
+      ],
+      "bottom_y": 136,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "정장·조끼 계열 유지",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "전투 기준 y136, bbox는 지지발 추적 대체 불가",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "pushkick",
+      "frame": 6,
+      "source": "existing_final",
+      "rgba_sha256": "eab0c2ff12647a042f06d3bd1991a6e2db3980765b9b6749bc9760a1881a734e",
+      "bbox": [
+        33,
+        47,
+        90,
+        137
+      ],
+      "bottom_y": 136,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "정장·조끼 계열 유지",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "전투 기준 y136, bbox는 지지발 추적 대체 불가",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "step",
+      "frame": 0,
+      "source": "existing_final",
+      "rgba_sha256": "536c0c49d1f8a5907f804edb6cc701195361ffa57f3765b8d2891663c6ab2b3d",
+      "bbox": [
+        44,
+        48,
+        103,
+        137
+      ],
+      "bottom_y": 136,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "정장·조끼 계열 유지",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "전투 기준 y136, bbox는 지지발 추적 대체 불가",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "step",
+      "frame": 1,
+      "source": "existing_final",
+      "rgba_sha256": "ab797e652db652781bdf1d1bee60f8b8c127f9c955928918c9ce1410b5c70113",
+      "bbox": [
+        47,
+        48,
+        103,
+        137
+      ],
+      "bottom_y": 136,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "정장·조끼 계열 유지",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "전투 기준 y136, bbox는 지지발 추적 대체 불가",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "step",
+      "frame": 2,
+      "source": "existing_final",
+      "rgba_sha256": "b85526b1021edf4ccb1a2cfc7de782aaeb64d4e5f914ba71b43e0dbafb16a8f8",
+      "bbox": [
+        47,
+        48,
+        103,
+        138
+      ],
+      "bottom_y": 137,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "정장·조끼 계열 유지",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "전투 기준 y136, bbox는 지지발 추적 대체 불가",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [
+        "최하단 y137, 기준 아래 1px"
+      ],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "step",
+      "frame": 3,
+      "source": "existing_final",
+      "rgba_sha256": "1275986e02339f90275c2c4ed5aeca34e2edfe01cdc873e7554a927bb072c182",
+      "bbox": [
+        46,
+        48,
+        103,
+        138
+      ],
+      "bottom_y": 137,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "정장·조끼 계열 유지",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "전투 기준 y136, bbox는 지지발 추적 대체 불가",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [
+        "최하단 y137, 기준 아래 1px"
+      ],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "step",
+      "frame": 4,
+      "source": "existing_final",
+      "rgba_sha256": "cf236dc662fac5392db9d1dd0f097a3855bdc636f5cc0cc889876f05058934e0",
+      "bbox": [
+        43,
+        48,
+        103,
+        138
+      ],
+      "bottom_y": 137,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "정장·조끼 계열 유지",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "전투 기준 y136, bbox는 지지발 추적 대체 불가",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [
+        "최하단 y137, 기준 아래 1px"
+      ],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "step",
+      "frame": 5,
+      "source": "existing_final",
+      "rgba_sha256": "c1abd4b8c7043928114d70b123bdfa476057e9c6215930208e93727d8a5de492",
+      "bbox": [
+        45,
+        48,
+        103,
+        137
+      ],
+      "bottom_y": 136,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "정장·조끼 계열 유지",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "전투 기준 y136, bbox는 지지발 추적 대체 불가",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "step",
+      "frame": 6,
+      "source": "existing_final",
+      "rgba_sha256": "affc7f616a82a0730a78c5d117af7d67559f393a57bac8e54b08f62a1aa6b47b",
+      "bbox": [
+        47,
+        48,
+        103,
+        138
+      ],
+      "bottom_y": 137,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "정장·조끼 계열 유지",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "전투 기준 y136, bbox는 지지발 추적 대체 불가",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [
+        "최하단 y137, 기준 아래 1px"
+      ],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "step",
+      "frame": 7,
+      "source": "existing_final",
+      "rgba_sha256": "8c40ff7d67a09a1e8f4f3aa5c204349a82108f2d6378414a737a3ee13d117ec2",
+      "bbox": [
+        47,
+        48,
+        103,
+        137
+      ],
+      "bottom_y": 136,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "정장·조끼 계열 유지",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "전투 기준 y136, bbox는 지지발 추적 대체 불가",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "limp",
+      "frame": 0,
+      "source": "existing_final",
+      "rgba_sha256": "f3e469d58f97576f8f68c47e289ac586eeae97fd4ea758eac1437d91e3e08a40",
+      "bbox": [
+        47,
+        49,
+        99,
+        137
+      ],
+      "bottom_y": 136,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "정장·조끼 계열 유지",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "전투 기준 y136, bbox는 지지발 추적 대체 불가",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [
+        "절뚝임 비대칭 약함; 디딘 발 연속성 재설계 필요"
+      ],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "limp",
+      "frame": 1,
+      "source": "existing_final",
+      "rgba_sha256": "45c55da9ff5a84ae4feafc492f43d57122d090725ab2627e4204503fa8a3e31e",
+      "bbox": [
+        47,
+        49,
+        99,
+        137
+      ],
+      "bottom_y": 136,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "정장·조끼 계열 유지",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "전투 기준 y136, bbox는 지지발 추적 대체 불가",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [
+        "절뚝임 비대칭 약함; 디딘 발 연속성 재설계 필요"
+      ],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "limp",
+      "frame": 2,
+      "source": "existing_final",
+      "rgba_sha256": "651b1fd08d910d77cdce3b30c22b71ece1d3defe0f452f52ad004e49ce70bba7",
+      "bbox": [
+        47,
+        49,
+        99,
+        137
+      ],
+      "bottom_y": 136,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "정장·조끼 계열 유지",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "전투 기준 y136, bbox는 지지발 추적 대체 불가",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [
+        "절뚝임 비대칭 약함; 디딘 발 연속성 재설계 필요"
+      ],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "limp",
+      "frame": 3,
+      "source": "existing_final",
+      "rgba_sha256": "5d5205d0316c6ae0ee2da95afeb3e53fbb531f06c9dde8eb8793d76a2b19d23f",
+      "bbox": [
+        45,
+        52,
+        98,
+        139
+      ],
+      "bottom_y": 138,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "정장·조끼 계열 유지",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "전투 기준 y136, bbox는 지지발 추적 대체 불가",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [
+        "절뚝임 비대칭 약함; 디딘 발 연속성 재설계 필요",
+        "최하단 y138, 기준 아래 2px"
+      ],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "limp",
+      "frame": 4,
+      "source": "existing_final",
+      "rgba_sha256": "83761df29514d3b939d2175d4cb198c946fb41f87b8302238756fbf9b51ad751",
+      "bbox": [
+        42,
+        53,
+        97,
+        139
+      ],
+      "bottom_y": 138,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "정장·조끼 계열 유지",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "전투 기준 y136, bbox는 지지발 추적 대체 불가",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [
+        "절뚝임 비대칭 약함; 디딘 발 연속성 재설계 필요",
+        "최하단 y138, 기준 아래 2px"
+      ],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "limp",
+      "frame": 5,
+      "source": "existing_final",
+      "rgba_sha256": "e084e0d67822e36fc5b3078e98b9675fd85f380a6083b1bc6a10f69f2dc48169",
+      "bbox": [
+        44,
+        51,
+        98,
+        137
+      ],
+      "bottom_y": 136,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "정장·조끼 계열 유지",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "전투 기준 y136, bbox는 지지발 추적 대체 불가",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [
+        "절뚝임 비대칭 약함; 디딘 발 연속성 재설계 필요"
+      ],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "limp",
+      "frame": 6,
+      "source": "existing_final",
+      "rgba_sha256": "8085a8e6a9173086a45446c8c1b0664db7ce0d29d0794bdf06448966d0d8350e",
+      "bbox": [
+        47,
+        49,
+        99,
+        136
+      ],
+      "bottom_y": 135,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "정장·조끼 계열 유지",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "전투 기준 y136, bbox는 지지발 추적 대체 불가",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [
+        "절뚝임 비대칭 약함; 디딘 발 연속성 재설계 필요"
+      ],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "limp",
+      "frame": 7,
+      "source": "existing_final",
+      "rgba_sha256": "f05c4418eb9164cf8dc10948234583838ba9e91186a2cea93d2d7e6afbe4fbea",
+      "bbox": [
+        47,
+        49,
+        99,
+        136
+      ],
+      "bottom_y": 135,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "정장·조끼 계열 유지",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "전투 기준 y136, bbox는 지지발 추적 대체 불가",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [
+        "절뚝임 비대칭 약함; 디딘 발 연속성 재설계 필요"
+      ],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "walk",
+      "frame": 0,
+      "source": "existing_final",
+      "rgba_sha256": "46ac775a9da54269319f27a81197e4612bc85b0af6e15bade69a5cf039680f2e",
+      "bbox": [
+        44,
+        45,
+        81,
+        136
+      ],
+      "bottom_y": 135,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "정장·조끼 계열 유지",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "전투 기준 y136, bbox는 지지발 추적 대체 불가",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [
+        "팔 스윙·보폭 작음; 고정 발 궤적 동적 검수 보류"
+      ],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "walk",
+      "frame": 1,
+      "source": "existing_final",
+      "rgba_sha256": "f565f28b8cdc0504797960dcdd91822e724bb0cf751a5248c6390839ac28a3d9",
+      "bbox": [
+        45,
+        45,
+        77,
+        136
+      ],
+      "bottom_y": 135,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "정장·조끼 계열 유지",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "전투 기준 y136, bbox는 지지발 추적 대체 불가",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [
+        "팔 스윙·보폭 작음; 고정 발 궤적 동적 검수 보류"
+      ],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "walk",
+      "frame": 2,
+      "source": "existing_final",
+      "rgba_sha256": "dbd4644023b0e7ce37d6f74513ea5550c6c3a44479a2f665d0aefa44a3249b6e",
+      "bbox": [
+        47,
+        44,
+        74,
+        136
+      ],
+      "bottom_y": 135,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "정장·조끼 계열 유지",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "전투 기준 y136, bbox는 지지발 추적 대체 불가",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [
+        "팔 스윙·보폭 작음; 고정 발 궤적 동적 검수 보류"
+      ],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "walk",
+      "frame": 3,
+      "source": "existing_final",
+      "rgba_sha256": "5c66d0e57fcc6ba470b282cd4ed7b6997923e716e2ec9ff5a959cadd08a4557b",
+      "bbox": [
+        46,
+        45,
+        76,
+        137
+      ],
+      "bottom_y": 136,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "정장·조끼 계열 유지",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "전투 기준 y136, bbox는 지지발 추적 대체 불가",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [
+        "팔 스윙·보폭 작음; 고정 발 궤적 동적 검수 보류"
+      ],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "walk",
+      "frame": 4,
+      "source": "existing_final",
+      "rgba_sha256": "64bbca1bac374f27f245352f62de331184938776ec6718bae219897ee73afee9",
+      "bbox": [
+        44,
+        45,
+        80,
+        137
+      ],
+      "bottom_y": 136,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "정장·조끼 계열 유지",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "전투 기준 y136, bbox는 지지발 추적 대체 불가",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [
+        "팔 스윙·보폭 작음; 고정 발 궤적 동적 검수 보류"
+      ],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "walk",
+      "frame": 5,
+      "source": "existing_final",
+      "rgba_sha256": "2dc348a0ba99c2743638ddabd3bf9c298b1af6c8f4a6944e38cd60c5b49a6da7",
+      "bbox": [
+        46,
+        44,
+        77,
+        136
+      ],
+      "bottom_y": 135,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "정장·조끼 계열 유지",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "전투 기준 y136, bbox는 지지발 추적 대체 불가",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [
+        "팔 스윙·보폭 작음; 고정 발 궤적 동적 검수 보류"
+      ],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "walk",
+      "frame": 6,
+      "source": "existing_final",
+      "rgba_sha256": "bc170f23a6884dd751102c870bae7b99c68cd17cbd02b3a5ef5361b0dc99d39a",
+      "bbox": [
+        46,
+        44,
+        75,
+        136
+      ],
+      "bottom_y": 135,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "정장·조끼 계열 유지",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "전투 기준 y136, bbox는 지지발 추적 대체 불가",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [
+        "팔 스윙·보폭 작음; 고정 발 궤적 동적 검수 보류"
+      ],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "walk",
+      "frame": 7,
+      "source": "existing_final",
+      "rgba_sha256": "087fb9eb5cd0fd03d60824b6f42635b542fdf1b7352e97f46ba9e987377cea9f",
+      "bbox": [
+        46,
+        45,
+        77,
+        135
+      ],
+      "bottom_y": 134,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "정장·조끼 계열 유지",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "전투 기준 y136, bbox는 지지발 추적 대체 불가",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [
+        "팔 스윙·보폭 작음; 고정 발 궤적 동적 검수 보류"
+      ],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "run",
+      "frame": 0,
+      "source": "existing_final",
+      "rgba_sha256": "2a26dab59a717f838c5b88b1187033ff2bf6c4c76280e5514404f8db3cd91903",
+      "bbox": [
+        41,
+        47,
+        93,
+        136
+      ],
+      "bottom_y": 135,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "정장·조끼 계열 유지",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "전투 기준 y136, bbox는 지지발 추적 대체 불가",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [
+        "지지/공중 구간 구분 후 접지 판단; 전 장 일괄 바닥 스냅 금지"
+      ],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "run",
+      "frame": 1,
+      "source": "existing_final",
+      "rgba_sha256": "a808463bee987b074ec7453a0465849ace17681ab34be539f675f666bbb656fd",
+      "bbox": [
+        41,
+        45,
+        93,
+        136
+      ],
+      "bottom_y": 135,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "정장·조끼 계열 유지",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "전투 기준 y136, bbox는 지지발 추적 대체 불가",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [
+        "지지/공중 구간 구분 후 접지 판단; 전 장 일괄 바닥 스냅 금지"
+      ],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "run",
+      "frame": 2,
+      "source": "existing_final",
+      "rgba_sha256": "ee04ca172f22b8fa01f9c198ab7152907a83d98370c2c418a9e3fe141a0b669a",
+      "bbox": [
+        46,
+        44,
+        93,
+        135
+      ],
+      "bottom_y": 134,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "정장·조끼 계열 유지",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "전투 기준 y136, bbox는 지지발 추적 대체 불가",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [
+        "지지/공중 구간 구분 후 접지 판단; 전 장 일괄 바닥 스냅 금지"
+      ],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "run",
+      "frame": 3,
+      "source": "existing_final",
+      "rgba_sha256": "e44d096a5602916c47c5b229eaf3dbea6d9fc2130b9b4d304e2d94fd0ce0b4a9",
+      "bbox": [
+        44,
+        45,
+        93,
+        137
+      ],
+      "bottom_y": 136,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "정장·조끼 계열 유지",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "전투 기준 y136, bbox는 지지발 추적 대체 불가",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [
+        "지지/공중 구간 구분 후 접지 판단; 전 장 일괄 바닥 스냅 금지"
+      ],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "run",
+      "frame": 4,
+      "source": "existing_final",
+      "rgba_sha256": "001df07a003955be81174a590b6313dd6174792cab5d1da68fdc7b95a5c92a9a",
+      "bbox": [
+        41,
+        47,
+        93,
+        138
+      ],
+      "bottom_y": 137,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "정장·조끼 계열 유지",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "전투 기준 y136, bbox는 지지발 추적 대체 불가",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [
+        "지지/공중 구간 구분 후 접지 판단; 전 장 일괄 바닥 스냅 금지"
+      ],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "run",
+      "frame": 5,
+      "source": "existing_final",
+      "rgba_sha256": "e960e344c06c335853d4ce4d23e666824db6d75279a1df0bb1741bbe49887e27",
+      "bbox": [
+        41,
+        45,
+        93,
+        135
+      ],
+      "bottom_y": 134,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "정장·조끼 계열 유지",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "전투 기준 y136, bbox는 지지발 추적 대체 불가",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [
+        "지지/공중 구간 구분 후 접지 판단; 전 장 일괄 바닥 스냅 금지"
+      ],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "run",
+      "frame": 6,
+      "source": "existing_final",
+      "rgba_sha256": "1bddc43cd55004e5ec345f13c967bd10b46a1e28f3854844f21a2b9dd8fd5c9c",
+      "bbox": [
+        46,
+        44,
+        93,
+        136
+      ],
+      "bottom_y": 135,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "정장·조끼 계열 유지",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "전투 기준 y136, bbox는 지지발 추적 대체 불가",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [
+        "지지/공중 구간 구분 후 접지 판단; 전 장 일괄 바닥 스냅 금지"
+      ],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "run",
+      "frame": 7,
+      "source": "existing_final",
+      "rgba_sha256": "b048bc332494aa170b192fe64fa5f34e7410d674d141e2e19904f00cebce00e7",
+      "bbox": [
+        44,
+        45,
+        93,
+        135
+      ],
+      "bottom_y": 134,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "정장·조끼 계열 유지",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "전투 기준 y136, bbox는 지지발 추적 대체 불가",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [
+        "지지/공중 구간 구분 후 접지 판단; 전 장 일괄 바닥 스냅 금지"
+      ],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "undress",
+      "frame": 0,
+      "source": "existing_received_gpt",
+      "rgba_sha256": "10b9437119c915058ac2a5850b333ec80b88617b5ddd08291adbcdff109d0270",
+      "bbox": [
+        44,
+        45,
+        71,
+        136
+      ],
+      "bottom_y": 135,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "수건/탈의 순서 대조",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "씻기 원본 기준 y135",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [
+        "기준 H-side 대비 곧고 가는 실루엣; 초기 6장과 06의 팔레트 차이; 시각 승인 보류"
+      ],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "undress",
+      "frame": 1,
+      "source": "existing_received_gpt",
+      "rgba_sha256": "c380e2db40d698a0588ffdccfe2ce69bfcf458faa02f7b2efcbd5bf4490a65fa",
+      "bbox": [
+        42,
+        45,
+        72,
+        136
+      ],
+      "bottom_y": 135,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "수건/탈의 순서 대조",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "씻기 원본 기준 y135",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [
+        "기준 H-side 대비 곧고 가는 실루엣; 초기 6장과 06의 팔레트 차이; 시각 승인 보류"
+      ],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "undress",
+      "frame": 2,
+      "source": "existing_received_gpt",
+      "rgba_sha256": "79ad54f338d80ea13c6e741b2cdafeaf451957bb20e08424bb5262b0def88c52",
+      "bbox": [
+        43,
+        45,
+        71,
+        136
+      ],
+      "bottom_y": 135,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "수건/탈의 순서 대조",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "씻기 원본 기준 y135",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [
+        "기준 H-side 대비 곧고 가는 실루엣; 초기 6장과 06의 팔레트 차이; 시각 승인 보류"
+      ],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "undress",
+      "frame": 3,
+      "source": "existing_received_gpt",
+      "rgba_sha256": "6029218d1e501a504be040e39cbe3e8027723d20d381180bdfb511866adf4b1c",
+      "bbox": [
+        44,
+        45,
+        70,
+        136
+      ],
+      "bottom_y": 135,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "수건/탈의 순서 대조",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "씻기 원본 기준 y135",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [
+        "기준 H-side 대비 곧고 가는 실루엣; 초기 6장과 06의 팔레트 차이; 시각 승인 보류"
+      ],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "undress",
+      "frame": 4,
+      "source": "existing_received_gpt",
+      "rgba_sha256": "b73b8f29517722f79b9c8ac20814f027d37e8af254f6e0d1ea975f12599d0a41",
+      "bbox": [
+        44,
+        45,
+        70,
+        136
+      ],
+      "bottom_y": 135,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "수건/탈의 순서 대조",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "씻기 원본 기준 y135",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [
+        "기준 H-side 대비 곧고 가는 실루엣; 초기 6장과 06의 팔레트 차이; 시각 승인 보류"
+      ],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "undress",
+      "frame": 5,
+      "source": "existing_received_gpt",
+      "rgba_sha256": "22f74c63af17c1aa3634b254aa74e9375eb70e12db2c668fcab157983124e24e",
+      "bbox": [
+        40,
+        58,
+        74,
+        136
+      ],
+      "bottom_y": 135,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "수건/탈의 순서 대조",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "씻기 원본 기준 y135",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [
+        "기준 H-side 대비 곧고 가는 실루엣; 초기 6장과 06의 팔레트 차이; 시각 승인 보류"
+      ],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "undress",
+      "frame": 6,
+      "source": "existing_received_gpt",
+      "rgba_sha256": "dcecfc5c527796a5238fcaa6f9630ccec185fad3673ff5e5f51631b503f06dfb",
+      "bbox": [
+        45,
+        44,
+        70,
+        136
+      ],
+      "bottom_y": 135,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "수건/탈의 순서 대조",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "씻기 원본 기준 y135",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [
+        "기준 H-side 대비 곧고 가는 실루엣; 초기 6장과 06의 팔레트 차이; 시각 승인 보류"
+      ],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "showerturn",
+      "frame": 0,
+      "source": "existing_received_gpt",
+      "rgba_sha256": "dcecfc5c527796a5238fcaa6f9630ccec185fad3673ff5e5f51631b503f06dfb",
+      "bbox": [
+        45,
+        44,
+        70,
+        136
+      ],
+      "bottom_y": 135,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "수건/탈의 순서 대조",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "씻기 원본 기준 y135",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [
+        "undress 06에서 같은 자세로 연결"
+      ],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "showerturn",
+      "frame": 1,
+      "source": "existing_received_gpt",
+      "rgba_sha256": "20f30ec15d4d21633cd62cf3c22bcd977898c9c6d01d45dfe1cf06d60c84c3ad",
+      "bbox": [
+        43,
+        44,
+        72,
+        136
+      ],
+      "bottom_y": 135,
+      "face": "뒷모습 의도",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "수건/탈의 순서 대조",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "씻기 원본 기준 y135",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "showerturn",
+      "frame": 2,
+      "source": "existing_received_gpt",
+      "rgba_sha256": "0174cd89e5449f07849ee044365065f03ac032737f706ed878526e14e2b57826",
+      "bbox": [
+        41,
+        44,
+        73,
+        136
+      ],
+      "bottom_y": 135,
+      "face": "뒷모습 의도",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "수건/탈의 순서 대조",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "씻기 원본 기준 y135",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "shower",
+      "frame": 0,
+      "source": "existing_received_gpt",
+      "rgba_sha256": "4c0a71353bf95d4cb06249e20874bc87c31f7664b94e9673f08bd3c59a5ec25e",
+      "bbox": [
+        37,
+        44,
+        78,
+        136
+      ],
+      "bottom_y": 135,
+      "face": "뒷모습 의도",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "수건/탈의 순서 대조",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "씻기 원본 기준 y135",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [
+        "00~01 첫 회만, 02~05 반복으로 수정; 손 세부 품질 사용자 검수 대기"
+      ],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "shower",
+      "frame": 1,
+      "source": "existing_received_gpt",
+      "rgba_sha256": "c44a4ec9ac83332ab4557f0375dd50b7d888a0c957baba2e49b8c1d8736121e1",
+      "bbox": [
+        38,
+        44,
+        77,
+        136
+      ],
+      "bottom_y": 135,
+      "face": "뒷모습 의도",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "수건/탈의 순서 대조",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "씻기 원본 기준 y135",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [
+        "00~01 첫 회만, 02~05 반복으로 수정; 손 세부 품질 사용자 검수 대기"
+      ],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "shower",
+      "frame": 2,
+      "source": "existing_received_gpt",
+      "rgba_sha256": "af29e4e19c0e1f2549c47c795336dcffed04f6e9dc32a68d6bc6c352a6a0679f",
+      "bbox": [
+        39,
+        42,
+        76,
+        136
+      ],
+      "bottom_y": 135,
+      "face": "뒷모습 의도",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "수건/탈의 순서 대조",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "씻기 원본 기준 y135",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [
+        "00~01 첫 회만, 02~05 반복으로 수정; 손 세부 품질 사용자 검수 대기"
+      ],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "shower",
+      "frame": 3,
+      "source": "existing_received_gpt",
+      "rgba_sha256": "d1fa43c72401694ba7d31727e38b201990d6af95a91804f7b30a29588ff101ae",
+      "bbox": [
+        39,
+        42,
+        76,
+        136
+      ],
+      "bottom_y": 135,
+      "face": "뒷모습 의도",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "수건/탈의 순서 대조",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "씻기 원본 기준 y135",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [
+        "00~01 첫 회만, 02~05 반복으로 수정; 손 세부 품질 사용자 검수 대기"
+      ],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "shower",
+      "frame": 4,
+      "source": "existing_received_gpt",
+      "rgba_sha256": "f2da175cb9b69f01b5abe1a5a84892d8223e9c9cd5949da8314ce4001b01b889",
+      "bbox": [
+        39,
+        42,
+        75,
+        136
+      ],
+      "bottom_y": 135,
+      "face": "뒷모습 의도",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "수건/탈의 순서 대조",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "씻기 원본 기준 y135",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [
+        "00~01 첫 회만, 02~05 반복으로 수정; 손 세부 품질 사용자 검수 대기"
+      ],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "shower",
+      "frame": 5,
+      "source": "existing_received_gpt",
+      "rgba_sha256": "6f887b04d0ceb580be99471d309b9b67b65ac70b0839163e8d4367100cdd5c5c",
+      "bbox": [
+        37,
+        44,
+        77,
+        136
+      ],
+      "bottom_y": 135,
+      "face": "뒷모습 의도",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "수건/탈의 순서 대조",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "씻기 원본 기준 y135",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [
+        "00~01 첫 회만, 02~05 반복으로 수정; 손 세부 품질 사용자 검수 대기"
+      ],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "bath",
+      "frame": 0,
+      "source": "existing_received_gpt",
+      "rgba_sha256": "532a90a664fa7f9f9a9f9be15e5725e2bb16b0e892e24907cab2251f7402c586",
+      "bbox": [
+        44,
+        80,
+        96,
+        136
+      ],
+      "bottom_y": 135,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "수건/탈의 순서 대조",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "씻기 원본 기준 y135",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [
+        "앉은 자세·수건 유지; 작은 호흡 변화의 실제 표시 가독성 검수 대기"
+      ],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "bath",
+      "frame": 1,
+      "source": "existing_received_gpt",
+      "rgba_sha256": "a2d6f6fc7afb6b3a1a9e09bbd7d37910091c6cbf8fb3fd0e62de90f02ab34c96",
+      "bbox": [
+        44,
+        79,
+        96,
+        136
+      ],
+      "bottom_y": 135,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "수건/탈의 순서 대조",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "씻기 원본 기준 y135",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [
+        "앉은 자세·수건 유지; 작은 호흡 변화의 실제 표시 가독성 검수 대기"
+      ],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "bath",
+      "frame": 2,
+      "source": "existing_received_gpt",
+      "rgba_sha256": "532a90a664fa7f9f9a9f9be15e5725e2bb16b0e892e24907cab2251f7402c586",
+      "bbox": [
+        44,
+        80,
+        96,
+        136
+      ],
+      "bottom_y": 135,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "수건/탈의 순서 대조",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "씻기 원본 기준 y135",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [
+        "앉은 자세·수건 유지; 작은 호흡 변화의 실제 표시 가독성 검수 대기"
+      ],
+      "visual_approval": "pending"
+    },
+    {
+      "clip": "bath",
+      "frame": 3,
+      "source": "existing_received_gpt",
+      "rgba_sha256": "42c1628d505db7e1ba8bf2dd188a5fcdd39610bd7b9f876f4459af9a34034002",
+      "bbox": [
+        44,
+        81,
+        96,
+        136
+      ],
+      "bottom_y": 135,
+      "face": "오른쪽 지향; 엄격한 측면 일치 합격은 보류",
+      "body": "프레임 대조 완료; 사용자 체형 승인 아님",
+      "clothing": "수건/탈의 순서 대조",
+      "hands": "장별 위치·가림 대조; 파지/손가락 품질 합격 보류",
+      "grounding": "씻기 원본 기준 y135",
+      "loop_boundary": "클립 마지막→반복 시작 비교; 동작별 별도 판정",
+      "issues": [
+        "앉은 자세·수건 유지; 작은 호흡 변화의 실제 표시 가독성 검수 대기"
+      ],
+      "visual_approval": "pending"
+    }
+  ]
+}

@@ -130,6 +130,9 @@ def is_skin(a):
 def strip_fx(im, src, i):
     """효과는 게임 코드가 그린다. 몸과 떨어진 작은 조각(40px 미만), 손목보다 앞의 불꽃·빛 픽셀,
     총 클립이면 앞 손목보다 6px 앞에서 총(검고 무채색)이 아닌 픽셀(연기·탄피·불꽃 찌꺼기)을 지운다."""
+    # 받은 GPT 씻기 원본은 PixelLab 효과 제거 대상이 아니다. 알파/손가락 보존.
+    if src in ('undress', 'showerturn', 'shower', 'bath'):
+        return im.copy()
     a = drop_small(np.array(im))
     if src in erig.CLIPS:
         p = pose(src, i)
@@ -257,6 +260,11 @@ def main():
         strips[k] = base64.b64encode(data).decode()
         open(os.path.join(final, k + '.png'), 'wb').write(data)
         c = {x: d[x] for x in ('label', 'desc', 'group', 'fps', 'loop', 'hits', 'shots', 'adv', 'base')} | {'frames': len(fr), 'bytes': len(data)}
+        if k in ('undress', 'showerturn', 'shower', 'bath'):
+            c['provenance'] = 'received-gpt-existing'
+            c['visualApproval'] = 'pending'
+        if k == 'shower':
+            c['loopStart'] = 2  # 0~1 머리끈 풀기는 첫 회만, 의뢰서의 2~5장 반복
         anc = anchors(d['src'], idx, fr)
         if anc:
             c['anchors'] = anc

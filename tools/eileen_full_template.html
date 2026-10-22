@@ -52,6 +52,7 @@
 </style>
 <div class="wrap">
   <h1>에일린 전 동작 시연판 · 쟈알디와 다른 규칙(소총 페어·페어·조준, 떼어내기, 권총 전환, 판독, 순차 저격)</h1>
+  <p>검수 중 · 기존 납품된 씻기 20장 반영. 이번 신규 생성 0장. 전투 전환·얼굴 가림·접지 결함은 미수정이며 사용자 시각 승인 전입니다.</p>
   <div class="bar">
     <label><input type="checkbox" id="fx" checked> 히트스톱·흔들림</label>
     <label><input type="checkbox" id="anc"> 기준점(손·총구)</label>
@@ -379,7 +380,7 @@ function clipDone() {
   if (G.queued && G.queued !== 'A' && !G.down) { const q = G.queued; G.queued = null; play(idleClip()); const held = keys.has(q); keys.delete(q); onKey(q, true); if (!held) keys.delete(q); if (G.lock || G.clip !== idleClip()) return; }
   G.queued = null;
   if (G.aHeld && !G.pistol && !G.hq && !G.crouch && ['pair1', 'pair2', 'aimshot', 'guard', 'precise'].includes(k)) { G.aiming = true; G.steady = 0; play('aim'); return; }
-  if (c.loop && G.loops > 1) { G.loops--; G.f = 0; G.t = 0; G.frameSeen = -1; return; }
+  if (c.loop && G.loops > 1) { G.loops--; G.f = c.loopStart || 0; G.t = 0; G.frameSeen = -1; return; }
   play(idleClip());
 }
 let last = performance.now();
@@ -410,7 +411,7 @@ function tick(now) {
   const hold = holdClip(G.clip) && !G.lock;
   if (G.t >= 1 / c.fps && !(hold && (G.rev ? G.f <= 0 : G.f >= c.frames - 1))) {
     G.t = 0; G.f += G.rev ? -1 : 1;
-    if (G.rev ? G.f < 0 : G.f >= c.frames) { G.f = G.rev ? 0 : c.frames - 1; if (c.loop && !G.lock && G.loops <= 1 && !G.then) { G.f = 0; G.frameSeen = -1; } else clipDone(); }
+    if (G.rev ? G.f < 0 : G.f >= c.frames) { G.f = G.rev ? 0 : c.frames - 1; if (c.loop && !G.lock && G.loops <= 1 && !G.then) { G.f = c.loopStart || 0; G.frameSeen = -1; } else clipDone(); }
   }
   if (G.clip === 'pistolfire' && !G.lock) G.f = 0;
   if (G.f !== G.frameSeen) { G.frameSeen = G.f; if ((C().hits || []).includes(G.f)) onHitFrame(); }
@@ -537,7 +538,7 @@ let tl = performance.now();
 function thumbTick(now) {
   const dt = (now - tl) / 1000; tl = now;
   for (const th of thumbs) {
-    const c = M.clips[th.k]; th.t += dt; if (th.t < 1 / c.fps) continue; th.t = 0; th.f = (th.f + 1) % c.frames;
+    const c = M.clips[th.k]; th.t += dt; if (th.t < 1 / c.fps) continue; th.t = 0; th.f++; if (th.f >= c.frames) th.f = c.loopStart || 0;
     const x = th.cv.getContext('2d'); x.clearRect(0, 0, 192, 144); if (imgs[th.k].complete) x.drawImage(imgs[th.k], th.f * FW, 0, FW, FH, 0, 0, FW, FH);
   }
   requestAnimationFrame(thumbTick);

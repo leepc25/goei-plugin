@@ -10607,8 +10607,56 @@
    "shots": [],
    "adv": 0,
    "base": "GPT",
+   "frames": 7,
+   "bytes": 32976,
+   "provenance": "received-gpt-existing",
+   "visualApproval": "pending"
+  },
+  "showerturn": {
+   "label": "샤워 앞 돌아서기",
+   "desc": "GPT 그림(의뢰서_에일린_씻기_GPT.md)",
+   "group": "씻기 (GPT)",
+   "fps": 8,
+   "loop": false,
+   "hits": [],
+   "shots": [],
+   "adv": 0,
+   "base": "GPT",
+   "frames": 3,
+   "bytes": 11444,
+   "provenance": "received-gpt-existing",
+   "visualApproval": "pending"
+  },
+  "shower": {
+   "label": "샤워",
+   "desc": "GPT 그림(의뢰서_에일린_씻기_GPT.md)",
+   "group": "씻기 (GPT)",
+   "fps": 6,
+   "loop": true,
+   "hits": [],
+   "shots": [],
+   "adv": 0,
+   "base": "GPT",
+   "frames": 6,
+   "bytes": 20457,
+   "provenance": "received-gpt-existing",
+   "visualApproval": "pending",
+   "loopStart": 2
+  },
+  "bath": {
+   "label": "목욕",
+   "desc": "GPT 그림(의뢰서_에일린_씻기_GPT.md)",
+   "group": "씻기 (GPT)",
+   "fps": 6,
+   "loop": true,
+   "hits": [],
+   "shots": [],
+   "adv": 0,
+   "base": "GPT",
    "frames": 4,
-   "bytes": 19069
+   "bytes": 8364,
+   "provenance": "received-gpt-existing",
+   "visualApproval": "pending"
   }
  }
 }

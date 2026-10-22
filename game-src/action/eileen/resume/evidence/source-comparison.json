@@ -1,0 +1,114 @@
+[
+  {
+    "ref": "origin/codex/metroidvania-run-system",
+    "commit": "7f8fdfb0c5a6cef096d412d3d872aec6eae7de81",
+    "path": "game-src/action/eileen/clips",
+    "git_tree_listing_sha256": "59b0166dbb8d2aaa9a03c402a6e90eacbfd3ef3fa1d83c813e8456ac06cfd688",
+    "entries": 585
+  },
+  {
+    "ref": "origin/codex/metroidvania-run-system",
+    "commit": "7f8fdfb0c5a6cef096d412d3d872aec6eae7de81",
+    "path": "game-src/action/eileen/base",
+    "git_tree_listing_sha256": "5b4532c58b4a4db35c2664f4218828cb8edb82961a943021c441d081a4fba8c8",
+    "entries": 21
+  },
+  {
+    "ref": "origin/codex/metroidvania-run-system",
+    "commit": "7f8fdfb0c5a6cef096d412d3d872aec6eae7de81",
+    "path": "game-src/action/eileen/spend.log",
+    "git_tree_listing_sha256": "6291a599883a8edb637828bb6a0781da0434978c1b9d3708adac1597ab4b0a1d",
+    "entries": 1
+  },
+  {
+    "ref": "origin/codex/metroidvania-run-system",
+    "commit": "7f8fdfb0c5a6cef096d412d3d872aec6eae7de81",
+    "path": "game-src/action/eileen/final/manifest.json",
+    "git_tree_listing_sha256": "70f29a11c97d33cff135d8ab2e55f760898a4fb5d8f749df215987a584de47f7",
+    "entries": 1
+  },
+  {
+    "ref": "origin/codex/character-production-resume",
+    "commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+    "path": "game-src/action/eileen/clips",
+    "git_tree_listing_sha256": "59b0166dbb8d2aaa9a03c402a6e90eacbfd3ef3fa1d83c813e8456ac06cfd688",
+    "entries": 585
+  },
+  {
+    "ref": "origin/codex/character-production-resume",
+    "commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+    "path": "game-src/action/eileen/base",
+    "git_tree_listing_sha256": "5b4532c58b4a4db35c2664f4218828cb8edb82961a943021c441d081a4fba8c8",
+    "entries": 21
+  },
+  {
+    "ref": "origin/codex/character-production-resume",
+    "commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+    "path": "game-src/action/eileen/spend.log",
+    "git_tree_listing_sha256": "6291a599883a8edb637828bb6a0781da0434978c1b9d3708adac1597ab4b0a1d",
+    "entries": 1
+  },
+  {
+    "ref": "origin/codex/character-production-resume",
+    "commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+    "path": "game-src/action/eileen/final/manifest.json",
+    "git_tree_listing_sha256": "70f29a11c97d33cff135d8ab2e55f760898a4fb5d8f749df215987a584de47f7",
+    "entries": 1
+  },
+  {
+    "ref": "origin/main",
+    "commit": "317faad892a4c89f339f63b6960b751e22801bc1",
+    "path": "game-src/action/eileen/clips",
+    "git_tree_listing_sha256": "59b0166dbb8d2aaa9a03c402a6e90eacbfd3ef3fa1d83c813e8456ac06cfd688",
+    "entries": 585
+  },
+  {
+    "ref": "origin/main",
+    "commit": "317faad892a4c89f339f63b6960b751e22801bc1",
+    "path": "game-src/action/eileen/base",
+    "git_tree_listing_sha256": "5b4532c58b4a4db35c2664f4218828cb8edb82961a943021c441d081a4fba8c8",
+    "entries": 21
+  },
+  {
+    "ref": "origin/main",
+    "commit": "317faad892a4c89f339f63b6960b751e22801bc1",
+    "path": "game-src/action/eileen/spend.log",
+    "git_tree_listing_sha256": "6291a599883a8edb637828bb6a0781da0434978c1b9d3708adac1597ab4b0a1d",
+    "entries": 1
+  },
+  {
+    "ref": "origin/main",
+    "commit": "317faad892a4c89f339f63b6960b751e22801bc1",
+    "path": "game-src/action/eileen/final/manifest.json",
+    "git_tree_listing_sha256": "70f29a11c97d33cff135d8ab2e55f760898a4fb5d8f749df215987a584de47f7",
+    "entries": 1
+  },
+  {
+    "ref": "origin/claude/project-thread-45iwer",
+    "commit": "dd92d418ae064384b232a4e830dbf525f5ff5635",
+    "path": "game-src/action/eileen/clips",
+    "git_tree_listing_sha256": "59b0166dbb8d2aaa9a03c402a6e90eacbfd3ef3fa1d83c813e8456ac06cfd688",
+    "entries": 585
+  },
+  {
+    "ref": "origin/claude/project-thread-45iwer",
+    "commit": "dd92d418ae064384b232a4e830dbf525f5ff5635",
+    "path": "game-src/action/eileen/base",
+    "git_tree_listing_sha256": "5b4532c58b4a4db35c2664f4218828cb8edb82961a943021c441d081a4fba8c8",
+    "entries": 21
+  },
+  {
+    "ref": "origin/claude/project-thread-45iwer",
+    "commit": "dd92d418ae064384b232a4e830dbf525f5ff5635",
+    "path": "game-src/action/eileen/spend.log",
+    "git_tree_listing_sha256": "6291a599883a8edb637828bb6a0781da0434978c1b9d3708adac1597ab4b0a1d",
+    "entries": 1
+  },
+  {
+    "ref": "origin/claude/project-thread-45iwer",
+    "commit": "dd92d418ae064384b232a4e830dbf525f5ff5635",
+    "path": "game-src/action/eileen/final/manifest.json",
+    "git_tree_listing_sha256": "70f29a11c97d33cff135d8ab2e55f760898a4fb5d8f749df215987a584de47f7",
+    "entries": 1
+  }
+]

@@ -1,0 +1,9 @@
+{
+  "observed_at": "2026-10-22T10:15:38.346889+00:00",
+  "tool": "list_jobs",
+  "arguments": {
+    "include_recent": true
+  },
+  "http_status": 200,
+  "response": "event: message\r\ndata: {\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Error calling tool 'list_jobs': 401: Missing Authorization header. Please configure your MCP client with 'Authorization: Bearer YOUR_API_TOKEN'\"}],\"isError\":true}}\r\n\r\n"
+}
