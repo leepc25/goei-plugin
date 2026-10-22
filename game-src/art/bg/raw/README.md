@@ -352,3 +352,56 @@
 | [hq3_facade/hq3_facade.png](hq3_facade/hq3_facade.png) | `375e6ccf` |
 
 [29개 파일 전수 검사·전체 해시·후속 작업](hq3-production-20261022.json). 도트화·조각 분리·실제 W/D/H와 기준점 맞춤·문짝 연결·게임 통합은 후속 작업이다. 타일 경계의 픽셀 일치는 검증하지 않았으며, 일부 집기의 사선 원근·추가 의자와 치수 비례는 후속 보정이 필요하다. 원본 수령 기록이며 전체 시각 규격 합격이나 게임 반영 완료를 의미하지 않는다.
+
+
+## 절차 생성 방 타일 원본 · 2026-10-22
+
+`docs/GPT요청_방타일.md`의 35장을 순서대로 내장 image_gen으로 제작하고 **한 장마다 별도 커밋으로 main에 반영**했다. 시작 시 대상 경로가 모두 없어 신규 35장, 건너뜀 0장이다.
+
+- 벽 조각 11장: 1536×1024, 6×2 배치.
+- 바닥 타일 11장: 1024×1024, 2×2 배치.
+- 앞 가림막 11장: 1536×1024 RGBA, 3×2 배치.
+- 공통 물건 2장: 1536×1024 RGBA, 3×3 배치.
+- PNG 해독·캔버스 크기·투명 픽셀과 원격 35개 파일의 Git blob 해시를 확인했다. 정사각형 생성 출력은 지정 캔버스 치수로 정규화했다.
+- `apt_red`·`apt_vacant`는 별도 기존 바닥이 없어 `apt_floor`의 팔각 장판 재질을 기준으로 붉은 조명·먼지 색조를 적용했다.
+- 원본의 실제 셀 경계·발선·물건 여백에는 생성 오차가 남아 있다. 고정 격자로 잘라 쓰기 전 정렬 보정이 필요하며, 이음새 픽셀 정합을 보장하지 않는다. 도트화·이음새 보정·게임 통합은 후속 작업이다.
+
+| 파일 | 개별 커밋 |
+|---|---|
+| [lobby/lobby_mod.png](lobby/lobby_mod.png) | [`b4387ea5`](https://github.com/leepc25/goei-plugin/commit/b4387ea556bdee75b40d94657ab9838351ad500b) |
+| [lobby/lobby_tiles.png](lobby/lobby_tiles.png) | [`71416846`](https://github.com/leepc25/goei-plugin/commit/714168466e64719c30ac9cc53ad3dd7a72fa1139) |
+| [lobby/lobby_front.png](lobby/lobby_front.png) | [`41e6bf3d`](https://github.com/leepc25/goei-plugin/commit/41e6bf3dc0289f5e99939f8b928d7c5b4298a616) |
+| [chase/chase_mod.png](chase/chase_mod.png) | [`6998c289`](https://github.com/leepc25/goei-plugin/commit/6998c289e006b88899442eacbed1c927f834ca02) |
+| [chase/chase_tiles.png](chase/chase_tiles.png) | [`358a3ccd`](https://github.com/leepc25/goei-plugin/commit/358a3ccdadf2c67e325ef96ae964c6a1b5131158) |
+| [chase/chase_front.png](chase/chase_front.png) | [`15fbe97c`](https://github.com/leepc25/goei-plugin/commit/15fbe97c8586b9d0db949340d14b1e130e785b43) |
+| [test/test_mod.png](test/test_mod.png) | [`f41358e1`](https://github.com/leepc25/goei-plugin/commit/f41358e1a705b9395dd38386cab7e339617726b7) |
+| [test/test_tiles.png](test/test_tiles.png) | [`42b94339`](https://github.com/leepc25/goei-plugin/commit/42b94339272783f5460d172a9cafd83357b6a4e3) |
+| [test/test_front.png](test/test_front.png) | [`7952d59a`](https://github.com/leepc25/goei-plugin/commit/7952d59a04a8c343e6b556b72f0cf1f96cc6fb0f) |
+| [apt/apt_mod.png](apt/apt_mod.png) | [`20e975f2`](https://github.com/leepc25/goei-plugin/commit/20e975f28bf4fc4c1f97eabaeaf17ba2a2fd880d) |
+| [apt/apt_tiles.png](apt/apt_tiles.png) | [`b65bf74d`](https://github.com/leepc25/goei-plugin/commit/b65bf74d530a65f324f44035d96d0f1e6d8c37b9) |
+| [apt/apt_front.png](apt/apt_front.png) | [`9ffe8644`](https://github.com/leepc25/goei-plugin/commit/9ffe8644f4eb2f5d1d11ac062e0e54786b8e80af) |
+| [apt_red/apt_red_mod.png](apt_red/apt_red_mod.png) | [`00b804db`](https://github.com/leepc25/goei-plugin/commit/00b804db9100ec2e27c16c8bac09778a3f1dbf23) |
+| [apt_red/apt_red_tiles.png](apt_red/apt_red_tiles.png) | [`d3f1ec8f`](https://github.com/leepc25/goei-plugin/commit/d3f1ec8fbd6413959b0aafbae1598458c48640aa) |
+| [apt_red/apt_red_front.png](apt_red/apt_red_front.png) | [`bb83259c`](https://github.com/leepc25/goei-plugin/commit/bb83259c0a3d7fa2963f9c356995df9c1451e68a) |
+| [apt_vacant/apt_vacant_mod.png](apt_vacant/apt_vacant_mod.png) | [`0db628c3`](https://github.com/leepc25/goei-plugin/commit/0db628c3c83041df4047b2aed71d6d6be0b847f6) |
+| [apt_vacant/apt_vacant_tiles.png](apt_vacant/apt_vacant_tiles.png) | [`b3f02931`](https://github.com/leepc25/goei-plugin/commit/b3f02931ea47468387a922db6b87d8fe60ef51ee) |
+| [apt_vacant/apt_vacant_front.png](apt_vacant/apt_vacant_front.png) | [`d2f77608`](https://github.com/leepc25/goei-plugin/commit/d2f7760881cf8b07dd2dfff241984df63bc27cae) |
+| [silent/silent_mod.png](silent/silent_mod.png) | [`a5f96fa3`](https://github.com/leepc25/goei-plugin/commit/a5f96fa37f40917c9d2747c63d9bfa86ebc73fb7) |
+| [silent/silent_tiles.png](silent/silent_tiles.png) | [`1f08b358`](https://github.com/leepc25/goei-plugin/commit/1f08b358d0b87753cb7eba5ed802b4564c598535) |
+| [silent/silent_front.png](silent/silent_front.png) | [`5eaf6358`](https://github.com/leepc25/goei-plugin/commit/5eaf6358d7a707cd5e90a84bdca683917f166091) |
+| [dark/dark_mod.png](dark/dark_mod.png) | [`e6854087`](https://github.com/leepc25/goei-plugin/commit/e6854087455607cb8f5feb828a56f4af0dcbeeb1) |
+| [dark/dark_tiles.png](dark/dark_tiles.png) | [`891a5aa6`](https://github.com/leepc25/goei-plugin/commit/891a5aa6195059b9cdb845dd13c2c43d2727a509) |
+| [dark/dark_front.png](dark/dark_front.png) | [`4805cd2c`](https://github.com/leepc25/goei-plugin/commit/4805cd2c46d037e64472967aac53ead9ec5c5470) |
+| [puzzle/puzzle_mod.png](puzzle/puzzle_mod.png) | [`20b64cfe`](https://github.com/leepc25/goei-plugin/commit/20b64cfe66aa5ff21bb425daf8cbee828bafebc7) |
+| [puzzle/puzzle_tiles.png](puzzle/puzzle_tiles.png) | [`fca56638`](https://github.com/leepc25/goei-plugin/commit/fca56638e5b4f37313ba537048c0638c1c37b1b0) |
+| [puzzle/puzzle_front.png](puzzle/puzzle_front.png) | [`f39679f1`](https://github.com/leepc25/goei-plugin/commit/f39679f1bf1928f1d26ab16ca3b2a385d9d8a58d) |
+| [deep/deep_mod.png](deep/deep_mod.png) | [`db50c1af`](https://github.com/leepc25/goei-plugin/commit/db50c1af5cbaafb22337970763413cb8e80eaac9) |
+| [deep/deep_tiles.png](deep/deep_tiles.png) | [`67c70776`](https://github.com/leepc25/goei-plugin/commit/67c7077620ce711ae282f53c9828a83e18ea2954) |
+| [deep/deep_front.png](deep/deep_front.png) | [`b133edab`](https://github.com/leepc25/goei-plugin/commit/b133edab2a5c74805dc0ca781d545de26e7947a1) |
+| [service/service_mod.png](service/service_mod.png) | [`58a6b8ee`](https://github.com/leepc25/goei-plugin/commit/58a6b8eed51a24382482581699d7735ebfb4db00) |
+| [service/service_tiles.png](service/service_tiles.png) | [`0ec4efda`](https://github.com/leepc25/goei-plugin/commit/0ec4efda28fa67ea375607f23ad4596a7ef2329f) |
+| [service/service_front.png](service/service_front.png) | [`d3b3490d`](https://github.com/leepc25/goei-plugin/commit/d3b3490d547b37b35a5acc29e747da9e57fc326b) |
+| [props/room_roles_1.png](props/room_roles_1.png) | [`5209698f`](https://github.com/leepc25/goei-plugin/commit/5209698f581ff29c02ca9de1079907675b58ca6e) |
+| [props/room_roles_2.png](props/room_roles_2.png) | [`142014fb`](https://github.com/leepc25/goei-plugin/commit/142014fb2bc86b2626d0b7ce8b39decd0cccc30a) |
+
+[생성 요청문·파일 규격·해시 기록](room-tiles-20261022-production.json)
