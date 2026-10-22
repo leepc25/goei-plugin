@@ -80,6 +80,23 @@ def lookback_frames():
     return out
 
 
+def despeckle(im):
+    """몸에서 떨어진 작은 점 덩어리(80px 미만, 몸과 4px 넘게 떨어짐)를 지움 — 생성기가 흘린 회색 점(검수: stepover 1장, fall 2장)."""
+    import numpy as np
+    from scipy import ndimage
+    a = np.array(im); m = a[:, :, 3] > 0
+    lab, n = ndimage.label(m, structure=np.ones((3, 3)))
+    if n < 2:
+        return im
+    sizes = ndimage.sum(m, lab, range(1, n + 1)); main = lab == (int(np.argmax(sizes)) + 1)
+    near = ndimage.binary_dilation(main, iterations=4)
+    for k in range(1, n + 1):
+        part = lab == k
+        if sizes[k - 1] < 80 and not (part & near).any():
+            a[part] = 0
+    return Image.fromarray(a)
+
+
 def strip(frames):
     s = Image.new('RGBA', (FW * len(frames), FH), (0, 0, 0, 0))
     for i, f in enumerate(frames):
@@ -112,7 +129,7 @@ def main():
     for key, name, n in plan.GPT:
         defs.append(dict(key=key, src=key, rng=None, label=name + ' (GPT)', group='GPT 담당(샤워·목욕)', plan=n, fps=6, loop=key in ('shower', 'bath'), hits=[]))
     manifest = {'frameW': FW, 'frameH': FH, 'foot': FOOT, 'anchor': ANCHOR, 'clips': {}}
-    strips, missing = {}, []
+    strips, missing, later = {}, [], []   # later = 사용자 지시(2026-10-22 03:17)로 미룬 생활·사교·감정·지형 동작
     final = os.path.join(SRC, 'final'); os.makedirs(final, exist_ok=True)
     for d in defs:
         fr = lookback_frames() if d['key'] == 'lookback' else frames_of(d['src'])
@@ -122,30 +139,36 @@ def main():
         if d['rng']:
             idx = idx[d['rng'][0]:d['rng'][1]]
         fx = fixes.get(d['key'], {})
+        if fx.get('compose'):                      # 다른 클립 장을 빌려 엮음: [[클립, 장], ...]
+            fr = [frames_of(c)[i] for c, i in fx['compose']]
+            idx = list(range(len(fr)))
         if fx.get('order'):
             idx = [idx[i] for i in fx['order'] if i < len(idx)]
         if fx.get('drop'):
             idx = [v for i, v in enumerate(idx) if i not in set(fx['drop'])]
         if not idx:
-            missing.append(d['key']); continue
-        frames = [fr[i] for i in idx]
+            (later if d['group'] not in ('전투', '게임용 나눔(A 연계)', 'GPT 담당(샤워·목욕)') else missing).append(d['key']); continue
+        frames = [despeckle(fr[i]) for i in idx]
         data = strip(frames)
         strips[d['key']] = base64.b64encode(data).decode()
         open(os.path.join(final, d['key'] + '.png'), 'wb').write(data)
         c = {k: d[k] for k in ('label', 'fps', 'loop', 'hits', 'group')} | {'frames': len(frames), 'src': d['src'], 'idx': idx}
-        hs = [hand('idle' if d['key'] == 'lookback' else d['src'], i % 4 if d['key'] == 'lookback' else i) for i in idx]
+        if fx.get('compose'):
+            hs = [hand(c, i) for c, i in fx['compose']]
+        else:
+            hs = [hand('idle' if d['key'] == 'lookback' else d['src'], i % 4 if d['key'] == 'lookback' else i) for i in idx]
         if all(hs):
             c['hand'] = hs
         manifest['clips'][d['key']] = c
     json.dump(manifest, open(os.path.join(final, 'manifest.json'), 'w'), ensure_ascii=False, indent=1)
     json.dump({k: v['hand'] for k, v in manifest['clips'].items() if v.get('hand')}, open(os.path.join(final, 'hands.json'), 'w'), separators=(',', ':'))
-    manifest['missing'] = missing
+    manifest['missing'] = missing; manifest['later'] = later
     tpl = open(os.path.join(ROOT, 'tools', 'geshugan_demo_template.html'), encoding='utf-8').read()
     html = (tpl.replace('__MANIFEST__', json.dumps(manifest, ensure_ascii=False)).replace('__STRIPS__', json.dumps(strips))
             .replace('__BG__', base64.b64encode(open(BG, 'rb').read()).decode()))
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     open(OUT, 'w', encoding='utf-8').write(html)
-    print('wrote', OUT, len(html) // 1024, 'KB', 'clips', len(strips), 'missing', missing)
+    print('wrote', OUT, len(html) // 1024, 'KB', 'clips', len(strips), 'missing', missing, 'later', len(later))
 
 
 if __name__ == '__main__':
