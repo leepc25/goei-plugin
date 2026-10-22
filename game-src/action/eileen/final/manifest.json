@@ -2558,14 +2558,17 @@
    "label": "소총 → 권총 전환 (S)",
    "desc": "보조손이 소총을 몸 쪽으로 눌러 떨굼(멜빵) → 주손 권총 뽑아 두 손으로 앞(되돌리기 = 역재생)",
    "group": "전투",
-   "fps": 14,
+   "fps": 20,
    "loop": false,
    "hits": [],
    "shots": [],
    "adv": 0,
    "base": "R",
-   "frames": 6,
-   "bytes": 19079,
+   "frames": 11,
+   "bytes": 30627,
+   "provenance": "pixellab-rig-plus-exact-rifle-repair-20261022",
+   "visualApproval": "pending",
+   "reviewNote": "six-frame rifle sling prefix; existing five-frame pistol draw suffix preserved",
    "anchors": [
     {
      "hand": [
@@ -2576,15 +2579,85 @@
       78,
       87
      ],
-     "angle": 5,
+     "angle": 8,
      "hip": [
       57,
       90
+     ]
+    },
+    {
+     "hand": [
+      66,
+      86
      ],
-     "muzzle": [
-      100,
-      96,
-      24
+     "hand2": [
+      77,
+      94
+     ],
+     "angle": 39,
+     "hip": [
+      57,
+      90
+     ]
+    },
+    {
+     "hand": [
+      63,
+      91
+     ],
+     "hand2": [
+      70,
+      96
+     ],
+     "angle": 97,
+     "hip": [
+      57,
+      90
+     ]
+    },
+    {
+     "hand": [
+      61,
+      94
+     ],
+     "hand2": [
+      64,
+      79
+     ],
+     "angle": 114,
+     "hip": [
+      57,
+      90
+     ]
+    },
+    {
+     "hand": [
+      61,
+      94
+     ],
+     "hand2": [
+      52,
+      65
+     ],
+     "angle": 114,
+     "hip": [
+      57,
+      90
+     ]
+    },
+    {
+     "hand": [
+      61,
+      94
+     ],
+     "hand2": [
+      43,
+      74
+     ],
+     "angle": 114,
+     "hip": [
+      57,
+      90
      ]
     },
     {

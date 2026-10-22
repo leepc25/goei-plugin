@@ -1,0 +1,27 @@
+{
+  "job_id": "ad4c134d-a12b-493f-996f-aa9fa2340811",
+  "outside_mask_changed_pixels": 1,
+  "inside_mask_changed_pixels": 1364,
+  "frames": [
+    {
+      "source_frame": 2,
+      "output_sha256": "270e83a232550fd2119f009481aa2a9fc38de8ec0855398a85f120fad6fc3025",
+      "changed_pixels": 310
+    },
+    {
+      "source_frame": 3,
+      "output_sha256": "5cc25249954510c97c4fbfd3d1455331c681f3e1f2c4958865879f067f9f2c28",
+      "changed_pixels": 258
+    },
+    {
+      "source_frame": 4,
+      "output_sha256": "8ada039440f06feeb576bb50f654dcf3f8439c37bdee0bd46f537aaaa85a850f",
+      "changed_pixels": 375
+    },
+    {
+      "source_frame": 5,
+      "output_sha256": "eae63a4324499e203139119f248b4ff6d216fa24ed38149b95a5fc07723624e7",
+      "changed_pixels": 422
+    }
+  ]
+}

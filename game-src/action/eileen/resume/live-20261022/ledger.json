@@ -1,5 +1,5 @@
 {
-  "observed_at": "2026-10-22T20:43:11+09:00",
+  "observed_at": "2026-10-22T21:06:03+09:00",
   "branch": "codex/art-eileen-resume",
   "paid_jobs": [
     {
@@ -112,9 +112,9 @@
       ],
       "recovered": true,
       "output_count": 8,
-      "state": "recovered_rejected",
-      "reason": "Arm path improved but rifle becomes thin/deformed at02-04. Frame07 returns weapon to front. Face remains partly front-facing. Rejected.",
-      "visual_approval": "not_requested_for_rejected_candidate",
+      "state": "recovered_partial_used_after_exact_repair",
+      "reason": "Raw rifle02-05 rejected then repaired by free exact edits; 00/01 retained, 06/07 omitted. Profile/suffix boundary still needs review.",
+      "visual_approval": "pending",
       "outputs": [
         {
           "path": "game-src/action/eileen/resume/live-20261022/transition-rig/00.png",
@@ -148,6 +148,14 @@
           "path": "game-src/action/eileen/resume/live-20261022/transition-rig/07.png",
           "sha256": "bf8d10005e1bb026398c2894ae9e07e5cbc19e1b12dbd1cc348728931de86a4a"
         }
+      ],
+      "used_source_frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
       ]
     },
     {
@@ -225,10 +233,108 @@
           "sha256": "2e244bed0c50284ceaf17be0825a7845d873f0929207223c97bf1c9102a8710a"
         }
       ]
+    },
+    {
+      "owner": "eileen",
+      "folder": "transition-mask",
+      "job_id": "ad4c134d-a12b-493f-996f-aa9fa2340811",
+      "tool": "inpaint_image",
+      "estimated_generations": 10,
+      "actual_cost": 10.0,
+      "cost_unit": "generations",
+      "cost_source": "transition-mask/result.json charged response",
+      "request_sha256": "b4d954abc01cd13e57ce9921da5d17ace470860292febd32e7f69386e9d51607",
+      "inputs": [
+        {
+          "source_frame": 2,
+          "path": "game-src/action/eileen/resume/live-20261022/transition-rig/02.png",
+          "sha256": "9f4d843f43156a59aa26aa8a2da3de3b13a7615e23bf4a1eba1a8c120a6e71bd",
+          "sheet_slot": [
+            0,
+            0
+          ],
+          "source_crop": [
+            16,
+            16,
+            144,
+            144
+          ]
+        },
+        {
+          "source_frame": 3,
+          "path": "game-src/action/eileen/resume/live-20261022/transition-rig/03.png",
+          "sha256": "f5a3a65b10392f5008969a76d7ead603b240a92c728bea7368e03b19365c0d39",
+          "sheet_slot": [
+            128,
+            0
+          ],
+          "source_crop": [
+            16,
+            16,
+            144,
+            144
+          ]
+        },
+        {
+          "source_frame": 4,
+          "path": "game-src/action/eileen/resume/live-20261022/transition-rig/04.png",
+          "sha256": "8e528ed598cab6063f38f4c018413cf255e8285dfcfc335e96705cebca11f223",
+          "sheet_slot": [
+            0,
+            128
+          ],
+          "source_crop": [
+            16,
+            16,
+            144,
+            144
+          ]
+        },
+        {
+          "source_frame": 5,
+          "path": "game-src/action/eileen/resume/live-20261022/transition-rig/05.png",
+          "sha256": "833723c4d6a97d01a7accb946ff165fff1f2d1ecf7d7f1fbed5bc6ac98018cb9",
+          "sheet_slot": [
+            128,
+            128
+          ],
+          "source_crop": [
+            16,
+            16,
+            144,
+            144
+          ]
+        }
+      ],
+      "recovered": true,
+      "output_count": 4,
+      "state": "recovered_rejected",
+      "reason": "Full-body position retained but rifle still indistinct at02-03 and inconsistent at04-05. One unmasked opaque pixel at sheet22,192 became transparent. Rejected.",
+      "visual_approval": "not_requested_for_rejected_candidate",
+      "outputs": [
+        {
+          "path": "game-src/action/eileen/resume/live-20261022/transition-mask/02.png",
+          "sha256": "270e83a232550fd2119f009481aa2a9fc38de8ec0855398a85f120fad6fc3025"
+        },
+        {
+          "path": "game-src/action/eileen/resume/live-20261022/transition-mask/03.png",
+          "sha256": "5cc25249954510c97c4fbfd3d1455331c681f3e1f2c4958865879f067f9f2c28"
+        },
+        {
+          "path": "game-src/action/eileen/resume/live-20261022/transition-mask/04.png",
+          "sha256": "8ada039440f06feeb576bb50f654dcf3f8439c37bdee0bd46f537aaaa85a850f"
+        },
+        {
+          "path": "game-src/action/eileen/resume/live-20261022/transition-mask/05.png",
+          "sha256": "eae63a4324499e203139119f248b4ff6d216fa24ed38149b95a5fc07723624e7"
+        }
+      ],
+      "service_output_count": 1,
+      "output_count_note": "four extracted review cells; result.png preserves the original single sheet"
     }
   ],
-  "paid_submit_count": 4,
-  "actual_new_cost": 18.0,
+  "paid_submit_count": 5,
+  "actual_new_cost": 28.0,
   "cost_unit": "generations",
   "balance_delta_used_for_cost": false,
   "free_exact_edits": [
@@ -243,9 +349,28 @@
       "frame": "precise02",
       "changed_pixels": 18,
       "actual_cost": 0
+    },
+    {
+      "image_id": "7ea4bb62-8747-43f3-8356-772426b3f358",
+      "frames": "transition02-05",
+      "changed_pixels": 543,
+      "actual_cost": 0,
+      "state": "superseded_v1"
+    },
+    {
+      "image_id": "8acaabc7-e9a8-463b-8fd9-49e22aa019ea",
+      "frames": "transition02-05",
+      "changed_pixels": 541,
+      "actual_cost": 0,
+      "state": "applied_partial_correction_visual_approval_pending"
     }
   ],
   "max_owner_inflight": 1,
   "kyuras_recovery_owner": "01a1632e-358b-7931-b8ab-c3487b5b6095",
-  "historical_cost_note": "Earlier reported332 is historical, not revalidated billing; historical job IDs remain in ../job-ledger.json."
+  "historical_cost_note": "Earlier reported332 is historical, not revalidated billing; historical job IDs remain in ../job-ledger.json.",
+  "remaining_issues": [
+    "strict face profile",
+    "rifle occlusion around frame03",
+    "body and equipment silhouette change at new05 to existing suffix06"
+  ]
 }

@@ -29,12 +29,20 @@ def main():
    import numpy as np
    changed=int(np.any(np.array(a)!=np.array(b),axis=2).sum())
    records.append(dict(clip=clip,frame=i,changed_pixels=changed,before_bbox=a.getbbox(),after_bbox=b.getbbox(),rgba_sha256=hashlib.sha256(b.tobytes()).hexdigest(),face='preserved',body='preserved',clothing='preserved',hands='preserved; contact anchors shifted with placement',grounding='support-only reviewed offsets' if clip!='precise' else 'unchanged',loop_boundary='first/last unchanged',visual_approval='pending'))
+ transition_before=frames(old('transition'));transition_after=frames(Image.open(ART/'final/transition.png').convert('RGBA'))
+ sections.append(dict(key='transition',title='무장 전환 11장 · 소총 경로 직접 보정 / 시각 승인 대기',status='changed',rows=[dict(label='이전: 6장',frames=[png(f) for f in transition_before]),dict(label='현재: 11장',frames=[png(f) for f in transition_after])]))
+ sheet([('old transition',transition_before),('new transition',transition_after)],OUT/'transition-delivery-review.png',1)
+ for i,im in enumerate(transition_after):
+  records.append(dict(clip='transition',frame=i,face='rig source unchanged; strict profile still needs review' if i<6 else 'existing pistol source unchanged',body='rig source unchanged' if i<6 else 'existing suffix unchanged',clothing='unchanged except rifle overlay',hands='original skin pixels protected',grounding='support foot bbox reviewed',loop_boundary='one shot; reverse sequence supported; suffix unchanged',rgba_sha256=hashlib.sha256(im.tobytes()).hexdigest(),visual_approval='pending'))
  rejected=Image.open(OUT/'precise-edit/result.png').convert('RGBA')
  sections.append(dict(key='pixen-rejected',title='Pixen 후보 · 불합격: 머리 높이 8px 변화 · 실제 1회',status='rejected',rows=[dict(label='원본 precise 01',frames=[png(frames(old('precise'))[1])]),dict(label='전체 재그림 후보 (미적용)',frames=[png(rejected)])]))
  for folder,label in [('transition-bridge','끝장 보간 · 불합격: 소총 중복 · 실제 4회'),('transition-rig','뼈대 후보 · 불합격: 무기 변형·끝장 복귀 · 실제 3회'),('transition-pro','상체 보정 · 불합격: 몸 위치 변화·다리 연결 틈 · 실제 10회')]:
   files=sorted((OUT/folder).glob('[0-9][0-9].png'))
   if files:
    sections.append(dict(key=folder,title=label,status='rejected',rows=[dict(label='기존 전환',frames=[png(f) for f in frames(old('transition'))]),dict(label='신규 후보 (미적용)',frames=[png(Image.open(p).convert('RGBA')) for p in files])]))
+ mask_files=sorted((OUT/'transition-mask').glob('[0-9][0-9].png'))
+ if mask_files:
+  sections.append(dict(key='transition-mask',title='소총 마스크 보정 · 불합격: 형태 불명확·마스크 밖 1픽셀 변경 · 실제 10회',status='rejected',rows=[dict(label='뼈대 원본 02~05',frames=[png(Image.open(OUT/f'transition-rig/{p.name}').convert('RGBA')) for p in mask_files]),dict(label='마스크 후보 02~05 (미적용)',frames=[png(Image.open(p).convert('RGBA')) for p in mask_files])]))
  data=json.dumps(sections,ensure_ascii=False)
  template='''<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>에일린 제작 재개 · 프레임 검수</title><style>
 body{margin:0;background:#141a20;color:#e8edf1;font:15px/1.55 system-ui}main{max-width:1200px;margin:auto;padding:20px}h1{font-size:24px}p{color:#bccbd4}section{margin:24px 0;padding:16px;background:#202b34;border-radius:12px}h2{font-size:18px}button,select,input{font:inherit}button,select{padding:8px;background:#334554;color:white;border:1px solid #607c8f;border-radius:6px}.rows{display:flex;gap:16px;flex-wrap:wrap}.row{flex:1;min-width:260px}canvas{width:100%;max-width:576px;image-rendering:pixelated;background:#41444c}input[type=range]{width:100%}.rejected{border-left:4px solid #e58e75}.changed{border-left:4px solid #77c5ae}.candidate{border-left:4px solid #d3bc71}small{color:#bccbd4}.controls{display:flex;gap:12px;align-items:center;flex-wrap:wrap}</style><main><h1>에일린 · 제작 재개 검수판</h1><p>정밀 사격 2장의 경계 픽셀과 지지발 10장 위치를 수정했습니다. 생성 완료와 사용자 시각 승인은 별개입니다. 반려 후보는 게임에 적용하지 않았습니다. 씻기 20장은 기존 원본 그대로 유지합니다.</p><p><a style="color:#94d5f4" href="eileen-full.html">직접 조작하는 독립 시연판 열기</a></p><div id="sections"></div></main><script>

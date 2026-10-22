@@ -1,0 +1,9 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "id: ad4c134d-a12b-493f-996f-aa9fa2340811\njob_id: ad4c134d-a12b-493f-996f-aa9fa2340811\nsize: 256x256px\nmask: custom mask\nfill: Repair ONLY the four masked black carbine silhouettes in this 2 by 2 chronological pixel-art sprite sheet. Each cell has the same ONE short rifle, solid dark steel receiver and shoulder stock, short barrel and small magazine. Top left: rifle hangs diagonally downward beside the front thigh. Top right: rifle hangs muzzle-down close to the hip. Bottom left: the same rifle passes behind the hip, muzzle down. Bottom right: rifle is slung diagonally behind the shoulder, muzzle down. Keep each rifle aligned with the existing wrist and sling. Existing fingers overlap the grip naturally. No second rifle, no pistol, no new limbs, no effects. Use the existing black and blue-grey pixel shading. Transparent background.\ntransparent: True\nseed: 111\nasset_id: dc304d3a-2693-53e2-8feb-240434cb0493\nasset_status: pending (saved when generation completes)\ncost: ~10 generations\nstatus: processing (~30-90s)\n\nhint: get_image(job_id=\"ad4c134d-a12b-493f-996f-aa9fa2340811\")"
+    }
+  ],
+  "isError": false
+}

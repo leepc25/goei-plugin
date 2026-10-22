@@ -267,6 +267,11 @@ def main():
             exact = os.path.join(SRC, 'resume', 'live-20261022', 'precise-edit')
             fr[1] = strip_fx(Image.open(os.path.join(exact, 'exact-result.png')).convert('RGBA'), k, 1)
             fr[2] = Image.open(os.path.join(exact, 'exact-02.png')).convert('RGBA')
+        transition_anchors = None
+        if k == 'transition':
+            import resume_transition
+            transition_anchors = anchors(d['src'], idx, fr)
+            fr, transition_anchors = resume_transition.apply(fr, transition_anchors)
         anchor_frames = fr
         fr, grounding_offsets = resume_grounding.apply(k, fr)
         data = strip(fr, os.path.join(final, k + '.png'))
@@ -283,7 +288,12 @@ def main():
             c['visualApproval'] = 'pending'
         if k == 'shower':
             c['loopStart'] = 2  # 0~1 머리끈 풀기는 첫 회만, 의뢰서의 2~5장 반복
-        anc = anchors(d['src'], idx, anchor_frames)
+        if k == 'transition':
+            c['fps'] = 20
+            c['provenance'] = 'pixellab-rig-plus-exact-rifle-repair-20261022'
+            c['visualApproval'] = 'pending'
+            c['reviewNote'] = 'six-frame rifle sling prefix; existing five-frame pistol draw suffix preserved'
+        anc = transition_anchors if k == 'transition' else anchors(d['src'], idx, anchor_frames)
         anc = resume_grounding.shift_anchors(anc, grounding_offsets)
         if any(grounding_offsets):
             c['groundingOffsetsY'] = grounding_offsets

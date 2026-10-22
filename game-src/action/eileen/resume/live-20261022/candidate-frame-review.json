@@ -573,5 +573,97 @@
     ],
     "sha256": "2e244bed0c50284ceaf17be0825a7845d873f0929207223c97bf1c9102a8710a",
     "decision": "reject"
+  },
+  {
+    "candidate": "transition-mask",
+    "frame": 0,
+    "face": "profile consistency fails or not proven",
+    "body": "stance broadly retained",
+    "clothing": "black suit and olive vest retained; pixel mass not approved",
+    "hands": "rifle contact not approved",
+    "grounding": "frame bounds inspected; not enough to prove contact",
+    "loop_boundary": "one-shot; transition-rig07 returns to starting weapon state",
+    "issues": "Full-body position retained but rifle still indistinct at02-03 and inconsistent at04-05. One unmasked opaque pixel at sheet22,192 became transparent. Rejected.",
+    "bbox": [
+      44,
+      47,
+      83,
+      137
+    ],
+    "size": [
+      192,
+      144
+    ],
+    "sha256": "270e83a232550fd2119f009481aa2a9fc38de8ec0855398a85f120fad6fc3025",
+    "decision": "reject"
+  },
+  {
+    "candidate": "transition-mask",
+    "frame": 1,
+    "face": "profile consistency fails or not proven",
+    "body": "stance broadly retained",
+    "clothing": "black suit and olive vest retained; pixel mass not approved",
+    "hands": "rifle contact not approved",
+    "grounding": "frame bounds inspected; not enough to prove contact",
+    "loop_boundary": "one-shot; transition-rig07 returns to starting weapon state",
+    "issues": "Full-body position retained but rifle still indistinct at02-03 and inconsistent at04-05. One unmasked opaque pixel at sheet22,192 became transparent. Rejected.",
+    "bbox": [
+      44,
+      47,
+      78,
+      137
+    ],
+    "size": [
+      192,
+      144
+    ],
+    "sha256": "5cc25249954510c97c4fbfd3d1455331c681f3e1f2c4958865879f067f9f2c28",
+    "decision": "reject"
+  },
+  {
+    "candidate": "transition-mask",
+    "frame": 2,
+    "face": "profile consistency fails or not proven",
+    "body": "stance broadly retained",
+    "clothing": "black suit and olive vest retained; pixel mass not approved",
+    "hands": "rifle contact not approved",
+    "grounding": "frame bounds inspected; not enough to prove contact",
+    "loop_boundary": "one-shot; transition-rig07 returns to starting weapon state",
+    "issues": "Full-body position retained but rifle still indistinct at02-03 and inconsistent at04-05. One unmasked opaque pixel at sheet22,192 became transparent. Rejected.",
+    "bbox": [
+      35,
+      47,
+      78,
+      137
+    ],
+    "size": [
+      192,
+      144
+    ],
+    "sha256": "8ada039440f06feeb576bb50f654dcf3f8439c37bdee0bd46f537aaaa85a850f",
+    "decision": "reject"
+  },
+  {
+    "candidate": "transition-mask",
+    "frame": 3,
+    "face": "profile consistency fails or not proven",
+    "body": "stance broadly retained",
+    "clothing": "black suit and olive vest retained; pixel mass not approved",
+    "hands": "rifle contact not approved",
+    "grounding": "frame bounds inspected; not enough to prove contact",
+    "loop_boundary": "one-shot; transition-rig07 returns to starting weapon state",
+    "issues": "Full-body position retained but rifle still indistinct at02-03 and inconsistent at04-05. One unmasked opaque pixel at sheet22,192 became transparent. Rejected.",
+    "bbox": [
+      30,
+      47,
+      78,
+      137
+    ],
+    "size": [
+      192,
+      144
+    ],
+    "sha256": "eae63a4324499e203139119f248b4ff6d216fa24ed38149b95a5fc07723624e7",
+    "decision": "reject"
   }
 ]

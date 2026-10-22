@@ -508,3 +508,7 @@ description: short compact adult woman agent, faded cream platinum blonde
 2026-10-22T19:54:56+09:00 local-resume-20261022 verified-charge tool=animate_with_skeleton_v3 job_id=5ce7b76d-7f1a-43e5-a28a-76f10b039fbd actual_cost=3 generations state=recovered_rejected evidence=resume/live-20261022/transition-rig/result.json
 2026-10-22T19:54:56+09:00 local-resume-20261022 verified-charge tool=edit_image job_id=296587c6-95c3-4b93-92a7-d164ddb10506 actual_cost=10 generations state=recovered_rejected evidence=resume/live-20261022/transition-pro/result.json
 2026-10-22T19:54:56+09:00 local-resume-20261022 total_actual=18 generations; free_exact_edits=2; applied_precision_frames=2; support_placement_frames=10; washing_regeneration=0; user_visual_approval=pending
+
+2026-10-22T21:06:03+09:00 local-resume-20261022 verified-charge tool=inpaint_image job_id=ad4c134d-a12b-493f-996f-aa9fa2340811 actual_cost=10 generations state=recovered_rejected evidence=resume/live-20261022/transition-mask/result.json
+2026-10-22T21:06:03+09:00 local-resume-20261022 cumulative_actual=28 generations; paid_jobs=5; visual_approval=pending
+2026-10-22T21:06:03+09:00 eileen-transition-exact-v2 applied; paid_source=5ce7b76d-7f1a-43e5-a28a-76f10b039fbd; image_id=8acaabc7-e9a8-463b-8fd9-49e22aa019ea; additional_cost=0; exact_pixels=541; frames=11; remaining=profile,occlusion,suffix_boundary; user_visual_approval=pending

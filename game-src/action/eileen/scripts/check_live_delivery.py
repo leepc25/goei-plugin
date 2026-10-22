@@ -16,7 +16,25 @@ changed=[]
 for path in (ART/'final').glob('*.png'):
  rel=path.relative_to(ROOT).as_posix();a=image(old(rel));b=Image.open(path).convert('RGBA')
  if a.tobytes()!=b.tobytes():changed.append(path.stem)
-assert set(changed)=={'precise','pushkick','step','limp'},changed
+assert set(changed)=={'precise','pushkick','step','limp','transition'},changed
+trans=frames(Image.open(ART/'final/transition.png').convert('RGBA'))
+previous_trans=frames(image(old('game-src/action/eileen/final/transition.png')))
+assert len(trans)==11
+assert [im.tobytes() for im in trans[6:]]==[im.tobytes() for im in previous_trans[1:]]
+request=json.loads((OUT/'transition-exact/request.json').read_text(encoding='utf-8'))
+before=np.array(Image.open(OUT/'transition-mask/input.png').convert('RGBA'))
+after=np.array(Image.open(OUT/'transition-exact/result.png').convert('RGBA'))
+expected=before.copy()
+for change in request['changes']:
+ for x,y,old_color,new_color in change['pixels']:
+  assert '#'+''.join(f'{c:02x}' for c in expected[y,x])==old_color
+  expected[y,x]=tuple(bytes.fromhex(new_color[1:]))
+assert np.array_equal(expected,after)
+assert int(np.any(before!=after,axis=2).sum())==541
+for i in range(6):
+ source=OUT/f'{"transition-rig" if i<2 else "transition-exact"}/{i:02d}.png'
+ assert trans[i].tobytes()==Image.open(source).convert('RGBA').tobytes()
+assert len(json.loads((ART/'final/manifest.json').read_text(encoding='utf-8'))['clips']['transition']['anchors'])==11
 orig=frames(image(old('game-src/action/eileen/final/precise.png')))
 current=frames(Image.open(ART/'final/precise.png').convert('RGBA'))
 for i,(a,b) in enumerate(zip(orig,current)):
