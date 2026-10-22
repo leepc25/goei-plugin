@@ -3,7 +3,7 @@
 # 무릎: 허벅지 u(골반→무릎), 정강이 f(무릎→발목)에서 cross 가 음수면 거꾸로 꺾임.
 # 쓰는 법: python3 audit_joints.py [이름...]  (거꾸로 꺾인 장만 출력)
 import sys,math
-sys.path.insert(0,'.'); import rig
+sys.path.insert(0,"."); import krig as rig
 def cross(a,b,c):
     u=(b[0]-a[0],b[1]-a[1]); f=(c[0]-b[0],c[1]-b[1])
     n=math.hypot(*u)*math.hypot(*f) or 1
