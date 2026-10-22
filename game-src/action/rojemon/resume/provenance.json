@@ -1,0 +1,10 @@
+{
+  "refs": {
+    "HEAD": "7f8fdfb0c5a6cef096d412d3d872aec6eae7de81",
+    "origin/codex/character-production-resume": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4"
+  },
+  "original_character_diff": [],
+  "new_paid_calls": 0,
+  "new_actual_cost": 0,
+  "imported_branch": false
+}

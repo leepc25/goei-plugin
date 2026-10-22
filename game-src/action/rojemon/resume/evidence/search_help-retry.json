@@ -1,0 +1,22 @@
+{
+  "observed_at": "2026-10-22T10:25:25.097206+00:00",
+  "request": {
+    "name": "search_help",
+    "arguments": {
+      "question": "For animate_with_skeleton_v3, can I add transparent padding from 192x144 to 256x160 with translated first_frame_keypoints and all pose joints to avoid clipped hair/hands? What free endpoint reports my CURRENT account concurrency limit and actual charged generations per background job? I need to coordinate a shared account and preserve itemized actual cost."
+    }
+  },
+  "response": {
+    "jsonrpc": "2.0",
+    "id": 1,
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "error: 401: Missing Authorization header. Please configure your MCP client with 'Authorization: Bearer YOUR_API_TOKEN'"
+        }
+      ],
+      "isError": true
+    }
+  }
+}

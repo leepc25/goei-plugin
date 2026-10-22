@@ -1,0 +1,22 @@
+{
+  "observed_at": "2026-10-22T10:17:24.335669+00:00",
+  "request": {
+    "name": "search_help",
+    "arguments": {
+      "question": "For animate_with_skeleton_v3, is transparent padding from 192x144 to 256x192 with matching translated first-frame keypoints appropriate to prevent head clipping? What free tool or endpoint reports current account concurrency limit and per-job actual charged generations? Does explicit view=side matter when existing reference sprite is side view?"
+    }
+  },
+  "response": {
+    "jsonrpc": "2.0",
+    "id": 1,
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "error: 401: Missing Authorization header. Please configure your MCP client with 'Authorization: Bearer YOUR_API_TOKEN'"
+        }
+      ],
+      "isError": true
+    }
+  }
+}

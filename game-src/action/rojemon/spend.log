@@ -1307,3 +1307,4 @@ job_id: bda9bc81-4fff-4442-9a87-71df262c9448
 description: petite young woman agent, long wavy pale 
 2026-10-22 04:01:31 gen man_throw done
 2026-10-22 04:01:32 gen walllean done
+2026-10-22T10:26:32.266461+00:00 resume auth blocked: get_balance/list_jobs/search_help MCP 401; new_paid_calls=0 new_actual_cost=0; down/man_throw estimates=3+3, NOT SUBMITTED; per-job historical actual cost unknown; evidence resume/evidence/*-retry.json

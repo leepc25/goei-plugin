@@ -1,0 +1,51 @@
+{
+  "owner": "codex/art-rojemon-resume",
+  "max_submitted": 1,
+  "current_balance": null,
+  "current_account_limit": null,
+  "current_account_active_jobs": null,
+  "jobs": [
+    {
+      "clip": "down",
+      "status": "not_submitted_auth_blocked",
+      "job_id": null,
+      "estimate_generations": 3,
+      "actual_cost": null,
+      "reference_sha256": "5e8583091c777d4bc5d2677c69187391778f4001bd388e7e41d0df87dea84d76",
+      "input_sha256": "b342a19edae71f3d0aaac6165b69c21a87affc71b1e438dff4ee3c60e4abf51e",
+      "request_sha256": "cf7b54f086993626b386d1e693c2a71ca3f264413ce79de4ca9b6170b1173ca6",
+      "canvas": [
+        256,
+        160
+      ],
+      "source_offset": [
+        48,
+        8
+      ],
+      "runtime_anchor_x": 105,
+      "runtime_ground_y": 144,
+      "user_visual_approval": false
+    },
+    {
+      "clip": "man_throw",
+      "status": "not_submitted_auth_blocked",
+      "job_id": null,
+      "estimate_generations": 3,
+      "actual_cost": null,
+      "reference_sha256": "0182c79999b59e801b6a6fe33a9ee08655e1998fa94c0f60a8e05d69302eaaf6",
+      "input_sha256": "68c095225bd923a2b68312d57f55575c52c14d543c9abc059e61777cbf2fadc0",
+      "request_sha256": "04b3ae06bda2b162ff6eeb63d69171349a464321059886aea399a9200212c8a3",
+      "canvas": [
+        256,
+        160
+      ],
+      "source_offset": [
+        48,
+        8
+      ],
+      "runtime_anchor_x": 104,
+      "runtime_ground_y": 144,
+      "user_visual_approval": false
+    }
+  ]
+}
