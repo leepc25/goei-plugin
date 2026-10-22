@@ -54,6 +54,8 @@ export class DemoEngine {
   private nextId = 1;
   private rand: () => number;
   events: GameEvent[] = [];
+  /** 실제로 전달된 E 입력만 기록한다. 목표 조회는 입력이 아니다. */
+  interactions: { floor: string; id: string; tick: number }[] = [];
   onFloor?: (plan: StagePlan) => void;
   onEnd?: (how: 'return' | 'evac') => void;
   constructor(
@@ -357,7 +359,10 @@ export class DemoEngine {
     // 상호작용
     if (k.interact) {
       const pr = this.nearestProp();
-      if (pr) this.stage.onInteract?.(this.api, this.plan, pr);
+      if (pr) {
+        this.interactions.push({ floor: this.plan.id, id: pr.id, tick: this.tick });
+        this.stage.onInteract?.(this.api, this.plan, pr);
+      }
     }
     this.stage.tick?.(this.api, this.plan);
     if (this.pendingFinish) {

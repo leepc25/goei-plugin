@@ -393,10 +393,10 @@ export function roomFloor(w: World, rm: WorldRoom, g: Omit<GenContext, 'room' | 
   });
   const r = rng(mix(w.seed, w.depth, rm.col, rm.row, 777));
   const W = f.width;
-  const terr = f.segments.flatMap((s) => s.terrain);
+  const terrainNear = (x: number) => f.segments.some(s => s.terrain.some(t => x > t.x0 - 110 && x < t.x1 + 110));
   const decor = (p: Floor['placed'][number]) => p.kind === 'prop' && !Object.keys(p.data).length;
   const free = (x: number, d: number, soft = false) =>
-    x > 80 && x < W - 80 && !terr.some((t) => x > t.x0 - 110 && x < t.x1 + 110) && !f.placed.some((p) => (!soft || !decor(p)) && Math.abs(p.x - x) < d);
+    x > 80 && x < W - 80 && !terrainNear(x) && !f.placed.some((p) => (!soft || !decor(p)) && Math.abs(p.x - x) < d);
   /** 자리 찾기: 원하는 x 가까이부터. 빈 곳이 없으면 꾸밈 소품을 치우고 */
   const spot = (want: number, d: number, lo = 120, hi = W - 120): number => {
     const xs: number[] = [];
@@ -410,7 +410,18 @@ export function roomFloor(w: World, rm: WorldRoom, g: Omit<GenContext, 'room' | 
           f.placed = f.placed.filter((p) => !(decor(p) && Math.abs(p.x - x) < d));
           return x;
         }
-    return Math.max(lo, Math.min(hi, want));
+    // 짧고 빽빽한 방에서도 필수 장치를 기존 계단 위에 포개지 않는다.
+    // 장치 사이 간격을 먼저 확보하고 그 자리의 지형만 걷어 진입 발판을 만든다.
+    const fallbackXs = Array.from({ length: Math.max(0, Math.floor(hi) - Math.ceil(lo) + 1) }, (_, i) => Math.ceil(lo) + i)
+      .sort((a, b) => Math.abs(a - want) - Math.abs(b - want) || a - b);
+    for (const gap of [d, 80])
+      for (const x of fallbackXs)
+        if (!f.placed.some(p => !decor(p) && Math.abs(p.x - x) < gap)) {
+          f.placed = f.placed.filter(p => !(decor(p) && Math.abs(p.x - x) < gap));
+          for (const segment of f.segments) segment.terrain = segment.terrain.filter(t => !(x > t.x0 - 110 && x < t.x1 + 110));
+          return x;
+        }
+    throw new Error(`장치 자리 없음: seed=${w.seed} depth=${w.depth} room=${rm.col},${rm.row} x=${want}`);
   };
   const nb = (d: Dir) => across(w, rm, d);
   const label = (d: Dir) => {
@@ -424,14 +435,14 @@ export function roomFloor(w: World, rm: WorldRoom, g: Omit<GenContext, 'room' | 
     const x = d === 'l' ? 70 : W - 70;
     const hidden = rm.hidden[d];
     if (hidden) {
-      put(f, 'crack', d === 'l' ? spot(240, 120, 160, 420) : spot(W - 240, 120, W - 420, W - 160), 0, 90, '금 간 벽', { dir: d, hp: 3 });
+      put(f, 'crack', d === 'l' ? spot(240, 120, 120, W / 2) : spot(W - 240, 120, W / 2, W - 120), 0, 90, '금 간 벽', { dir: d, hp: 3 });
       continue;
     }
     // 문 바로 앞의 꾸밈 소품·표지는 비킨다
     f.placed = f.placed.filter((p) => !(decor(p) && Math.abs(p.x - x) < 140));
     put(f, 'wdoor', x, 0, 90, rm.wrap[d] ? `${label(d)} (끝이 이어진다)` : label(d), { dir: d });
     const l = rm.lock[d];
-    if (l) put(f, 'locked', d === 'l' ? 190 : W - 190, MID, 40, `잠긴 방화셔터 ${KEY_MARK[l]}`, { dir: d, lock: l });
+    if (l) put(f, 'locked', d === 'l' ? spot(190, 120, 150, 420) : spot(W - 190, 120, W - 420, W - 150), MID, 40, `잠긴 방화셔터 ${KEY_MARK[l]}`, { dir: d, lock: l });
   }
   // 위·아래: 계단 (지하 깊은 곳은 무너진 바닥 구멍·매달린 줄). 위는 앞쪽, 아래는 뒤쪽 절반에서 자리 찾기
   for (const d of ['u', 'd'] as const) {
@@ -458,7 +469,7 @@ export function roomFloor(w: World, rm: WorldRoom, g: Omit<GenContext, 'room' | 
   if (rm.panel && rm.role !== 'exit') {
     const x = spot(W - 420, 200, 300, W - 200);
     put(f, 'elevator', x, 0, 160, '열린 엘리베이터');
-    put(f, 'panel', x + 170 < W - 80 ? x + 170 : x - 170, 0, 80, '승강기 패널');
+    put(f, 'panel', spot(x + 170 < W - 80 ? x + 170 : x - 170, 120), 0, 80, '승강기 패널');
   }
   // 정비 구역 입구: 조각에 점검문·해치가 없으면 도착 방과 가끔 다른 방에 하나
   if (rm.role === 'arrival' && w.type !== 'deep' && !f.placed.some((p) => p.kind === 'hatch' || p.kind === 'servicedoor')) put(f, 'servicedoor', spot(Math.min(W - 300, ROOM_W + 400), 140), 0, 70, '점검문');

@@ -272,7 +272,7 @@ function spreadProps(f: Floor, props: PropSpec[], startX: number): [number, numb
   const ruled = new Set(f.placed.filter((q) => q.data.rule).map((q) => `p${q.id}`));
   // 잠긴 셔터 앞 해치는 열쇠 길이라 옮기지 않는다 (밀려서 셔터 뒤로 넘어가면 열쇠를 가지러 갈 수 없다)
   const gateX = f.placed.find((q) => q.kind === 'locked')?.x ?? -1;
-  const fixed = (p: PropSpec) => FIXED_PROPS.has(p.kind) || meaning.has(p.id) || p.x < startX + 60 || (p.kind === 'hatch' && p.x < gateX);
+  const fixed = (p: PropSpec) => FIXED_PROPS.has(p.kind) || meaning.has(p.id) || (p.x < startX + 60 && (!f.room || ruled.has(p.id))) || (p.kind === 'hatch' && p.x < gateX);
   // 입간판(로비 6번 판 그림으로 그려지는 것 전부)은 한 화면에 하나 (검수 13-2, 14-1: 화면마다 2~3개, 같은 「비상구」 둘이 나란히).
   // 규칙·갈림길 표지는 남기고, 뜻 없는 꾸밈 판은 다른 판과 1400px 안이거나 앞 판과 같은 것이면 뺀다.
   const boardLike = (p: PropSpec) => isStandBoard(p.kind, p.label, f.type) && !isHighSign(p.kind, p.label);
@@ -319,6 +319,7 @@ function spreadProps(f: Floor, props: PropSpec[], startX: number): [number, numb
       x - h >= 40 && x + h <= f.width - 40 &&
       (!gate || Math.sign(x - gate.x) === side && Math.abs(x - gate.x) > h + 120) &&
       !keepOut.some(([a, b]) => x + h + 6 > a && x - h - 6 < b) &&
+      !props.some(q => q !== p && q.solid && Math.abs(q.x - x) < 120) &&
       !props.some((q) => q !== p && fixed(q) && !boardLike(q) && Math.abs(q.y - p.y) < 90 && Math.abs(q.x - x) < h + artW(q, f.type) / 2 + 12);
     if (ok(p.x)) continue;
     for (let d = 12; d <= 360; d += 12) {
@@ -337,7 +338,10 @@ function spreadProps(f: Floor, props: PropSpec[], startX: number): [number, numb
   for (const g of f.placed.filter((q) => q.kind === 'locked')) for (const y of [Y_TOP, (Y_TOP + Y_BOTTOM) / 2, Y_BOTTOM]) taken.push({ a: g.x - 150, b: g.x + 150, y });
   const free = (p: PropSpec, x: number) => {
     const h = artW(p, f.type) / 2;
-    if (f.room && f.placed.some(q => q.data.dir && `p${q.id}` !== p.id && Math.abs(q.x - x) < 120)) return false;
+    // E 선택은 깊이(y)를 보지 않는다. 다른 줄의 물건도 필수 장치의
+    // x를 차지하면 열쇠·스위치 입력을 가로챌 수 있다.
+    if (f.room && f.placed.some(q => (q.data.dir || ['key', 'switch', 'goalwall', 'panel'].includes(q.kind)) && `p${q.id}` !== p.id && Math.abs(q.x - x) < 120)) return false;
+    if (props.some(q => q !== p && q.solid && Math.abs(q.x - x) < 120)) return false;
     if (x - h < 40 || x + h > f.width - 40) return false;
     if (taken.some((t) => Math.abs(t.y - p.y) < 90 && x + h + 16 > t.a && x - h - 16 < t.b)) return false;
     if (p.y <= wallY && keepOut.some(([a, b]) => x + h > a && x - h < b)) return false;
@@ -377,7 +381,18 @@ function spreadProps(f: Floor, props: PropSpec[], startX: number): [number, numb
         break;
       }
     }
-    if (x === null && ((boardLike(p) && !decor.has(p)) || p.kind === 'hatch')) x = farthest(p, f.width);
+    if (x === null && ((boardLike(p) && !decor.has(p)) || p.kind === 'hatch' || p.kind === 'npc' || p.kind === 'passenger')) x = farthest(p, f.width);
+    // 짧은 방의 주민·승객이 같은 줄에 몰려도 셔터 앞에 남겨 두지 않는다.
+    // 다른 깊이 줄의 빈자리까지 찾되 E 접근 간격은 그대로 지킨다.
+    if (x === null && (p.kind === 'npc' || p.kind === 'passenger')) {
+      const originalY = p.y;
+      for (const y of [Y_BOTTOM - 30, (Y_TOP + Y_BOTTOM) / 2, Y_TOP + 60]) {
+        p.y = y;
+        x = farthest(p, f.width);
+        if (x !== null) break;
+      }
+      if (x === null) p.y = originalY;
+    }
     // 벽에 붙는 꾸밈 소품이 문·명패·벽 장식을 피할 자리가 없으면 빼 버린다 (검수 22: 자판기가 문·게시판을 가림)
     if (x === null && p.kind === 'prop' && p.y <= wallY && !must(p) && p.label !== '거꾸로 가는 시계') {
       props.splice(props.indexOf(p), 1);
