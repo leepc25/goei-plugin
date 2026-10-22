@@ -13,6 +13,47 @@ const { DemoEngine } = await import('../dist-test/stage-engine.mjs');
 const TYPES = ['lobby', 'chase', 'replica', 'trial', 'dark', 'silent', 'puzzle', 'deep'];
 const ctxFor = (seed, depth, type, extra = {}) => ({ seed, depth, type, sub: type === 'replica' ? ['vacant', 'pretending', 'red'][seed % 3] : null, danger: seed % 3, growth: seed % 5, flags: [], epoch: 0, ...extra });
 
+function engineAt(stage, seed, target) {
+  const run = { seed, agent: 'jyaldi' };
+  let first = stage.firstFloor(run);
+  if (target) {
+    stage.outing().pending = { to: 'floor', sub: null, ...target };
+    first = stage.nextFloor(run, first, 'next');
+  }
+  const engine = new DemoEngine({ ...stage, firstFloor: () => first }, run);
+  engine.start();
+  return engine;
+}
+
+test('방 장치: 300 시드 × 8 유형, 숨은 방 없이 필수 열쇠·출입구·장치 접근', () => {
+  for (let seed = 1; seed <= 300; seed++) for (const type of TYPES) {
+    const depth = type === 'lobby' ? 2 : type === 'deep' ? 15 : 4 + seed % 12;
+    const w = S.makeWorld({ seed, depth, type, sub: type === 'replica' ? 'pretending' : null, epoch: 0 });
+    assert.deepEqual(S.validateWorld(w), []);
+    for (const rm of w.rooms) {
+      assert.ok(rm.key === null || rm.role !== 'secret');
+      const f = S.roomFloor(w, rm, { seed, danger: seed % 3, growth: 0, flags: [], epoch: 0 });
+      const plan = S.floorPlan(f, 'placement', 240);
+      const context = `${seed}:${depth}:${type}:${rm.col},${rm.row}`;
+      for (const p of f.placed.filter(p => p.data.dir || ['key', 'switch', 'shutter', 'goalwall', 'panel'].includes(p.kind))) {
+        const pr = plan.props.find(q => q.id === `p${p.id}`);
+        assert.ok(pr, `${context} 장치 ${p.kind} 누락`);
+        assert.ok(!plan.stage.terrain.some(t => pr.x > t.x0 - 25 && pr.x < t.x1 + 25 && ['pit', 'block', 'low'].includes(t.kind)), `${context} ${p.kind}@${pr.x} 지형에 막힘`);
+        // 실제 엔진 E는 y와 무관하게 가장 가까운 x 하나를 선택한다.
+        assert.ok(!plan.props.some(q => q !== pr && q.x === pr.x), `${context} ${p.kind}@${pr.x} 다른 소품이 E를 가로챔`);
+        if (p.kind === 'locked' || p.kind === 'shutter') {
+          const x = pr.x + (p.kind === 'locked' && p.data.dir === 'r' ? -1 : 1) * (pr.w / 2 + 17);
+          const nearest = plan.props.reduce((a, b) => Math.abs(b.x - x) < Math.abs(a.x - x) ? b : a);
+          assert.equal(nearest.id, pr.id, `${context} ${p.kind}@${pr.x} 몸이 닿는 자리에서 E 선택`);
+        }
+      }
+      const entries = [240, ...f.placed.filter(p => p.data.dir && ['wdoor', 'wup', 'wdown', 'crack', 'vent'].includes(p.kind))
+        .map(p => p.x + (p.data.dir === 'l' ? 120 : p.data.dir === 'r' ? -120 : 70))];
+      for (const x of entries) assert.ok(!plan.stage.terrain.some(t => x > t.x0 && x < t.x1), `${context} 진입점 ${x}`);
+    }
+  }
+});
+
 test('층 생성: 300 씨앗 × 유형 전부 검증 통과, 고정 배치는 드물다', () => {
   let fallback = 0,
     n = 0;
@@ -220,7 +261,7 @@ function bot(eng) {
       k.crouch = true;
       return k;
     }
-    k.x = Math.abs(dx) < 8 ? 0 : Math.sign(dx);
+    k.x = Math.abs(dx) < 8 && (!near || near.id === goal.id || goal.id === '__walk') ? 0 : Math.sign(dx);
   } else k.x = 1;
   // 지형
   const ahead = p.x + k.x * 70;
@@ -264,7 +305,7 @@ function inTheWay(e, f, tx) {
   const px = e.p.x;
   const lo = Math.min(px, tx) - 30,
     hi = Math.max(px, tx) + 30;
-  const tag = (p) => p.id + e.plan.id + e.run.seed;
+  const used = p => e.interactions.some(input => input.floor === e.plan.id && input.id === p.id);
   for (const sh of f.placed.filter((x) => x.kind === 'shutter').sort((a, b) => Math.abs(a.x - px) - Math.abs(b.x - px))) {
     const pr = props.find((p) => p.id === `p${sh.id}`);
     if (!pr?.solid || sh.x < lo || sh.x > hi) continue;
@@ -274,133 +315,181 @@ function inTheWay(e, f, tx) {
       return props.find((p) => p.id === `p${d.id}`);
     }
     const order = String(sh.data.order).split('-').map(Number);
-    const done = (bot.seq ??= {});
-    const key = e.run.seed + e.plan.id + sh.id;
-    const n = (done[key] ??= 0);
+    // 목표 조회는 한 프레임에 여러 번 할 수 있다. 실제 전달된 입력으로만
+    // 순서를 추적하며, 잘못 누르면 게임과 똑같이 처음부터 다시 시작한다.
+    const switches = f.placed.filter((x) => x.kind === 'switch' && x.data.group === sh.data.group);
+    let n = 0;
+    for (const input of e.interactions) {
+      if (input.floor !== e.plan.id) continue;
+      const pressed = switches.find((s) => `p${s.id}` === input.id);
+      if (pressed) n = pressed.data.n === order[n] ? n + 1 : 0;
+    }
     const sw = f.placed.find((x) => x.kind === 'switch' && x.data.group === sh.data.group && x.data.n === order[n]);
-    if (!sw) throw new Error(`스위치 ${order} n=${n}`);
+    if (!sw) throw new Error(`seed=${e.run.seed} room=${e.plan.id} x=${px} shutter=${sh.x} 스위치 ${order} n=${n} says=${e.says.map(s => s.text)}`);
     const pr2 = props.find((p) => p.id === `p${sw.id}`);
-    if (pr2 && Math.abs(pr2.x - px) < 40 && e.tick % 2 === 0 && e.nearestProp()?.id === pr2.id) done[key] = n + 1;
     return pr2;
   }
   const between = (p) => p.x > lo && p.x < hi;
-  const npc = props.find((p) => p.kind === 'npc' && f.type === 'replica' && between(p) && !(bot.greeted ??= new Set()).has(tag(p)));
-  if (npc) {
-    if (Math.abs(npc.x - px) < 40) bot.greeted.add(tag(npc));
-    return npc;
-  }
-  for (const [kind, set] of [['table', 'ate'], ['sign', 'read']]) {
-    const it = props.find((p) => p.kind === kind && between(p) && !(bot[set] ??= new Set()).has(tag(p)));
-    if (it) {
-      if (Math.abs(it.x - px) < 40) bot[set].add(tag(it));
-      return it;
-    }
+  const npc = props.find((p) => p.kind === 'npc' && f.type === 'replica' && between(p) && !used(p));
+  if (npc) return npc;
+  for (const kind of ['table', 'sign']) {
+    const it = props.find((p) => p.kind === kind && between(p) && !used(p));
+    if (it) return it;
   }
   return null;
 }
 
-test('걸어서 확인: 로비 L1부터 층마다 모든 방을 정리하고 승강기로 내려가, 정비 구역 다락방 로프로 귀환', () => {
+test('퍼즐 재현 270: 목표를 반복 조회해도 1→3→2 실제 E 입력만 진행, 오답 초기화·왕복 보존', () => {
+  const stage = S.createElevatorStage({ load: () => null, save() {} });
+  const target = { depth: 4, type: 'puzzle', room: [1, 2] };
+  const eng = engineAt(stage, 270, target);
+  const f = eng.plan.stage.floor;
+  const sh = f.placed.find(p => p.kind === 'shutter' && p.data.group !== undefined);
+  assert.equal(sh.data.order, '1-3-2');
+  const shutter = () => eng.props.find(p => p.id === `p${sh.id}`);
+  const switchProp = n => eng.props.find(p => p.id === `p${f.placed.find(s => s.kind === 'switch' && s.data.group === sh.data.group && s.data.n === n).id}`);
+  const idle = { x: 0, y: 0, run: false, jump: false, attack: false, interact: false, crouch: false };
+  const press = n => {
+    const p = switchProp(n);
+    eng.p.x = p.x;
+    assert.equal(eng.nearestProp()?.id, p.id);
+    eng.step({ ...idle, interact: true });
+  };
+  press(2); // 오답: 셔터는 닫혀 있고 처음부터 다시 입력해야 한다.
+  assert.ok(shutter().solid);
+  for (const n of [1, 3, 2]) {
+    eng.p.x = switchProp(n).x;
+    const before = eng.interactions.length;
+    for (let query = 0; query < 20; query++) assert.equal(inTheWay(eng, f, sh.x + 200)?.id, switchProp(n).id);
+    assert.equal(eng.interactions.length, before);
+    press(n);
+    assert.equal(shutter().solid, n !== 2, '마지막 올바른 입력에서만 열린다');
+  }
+  assert.equal(eng.interactions.length, 4);
+  const original = eng.plan;
+  stage.outing().pending = { to: 'floor', ...target, from: 'r' };
+  const revisited = stage.nextFloor(eng.run, eng.plan, 'next');
+  assert.equal(revisited, original);
+  assert.equal(revisited.props.find(p => p.id === `p${sh.id}`).solid, false);
+  // 아직 풀지 않은 셔터도 오른쪽 진입 시에는 뒤편 손잡이로 되돌아갈 수 있다.
+  const other = S.createElevatorStage({ load: () => null, save() {} });
+  const back = engineAt(other, 270, { ...target, from: 'r' });
+  back.p.x = sh.x + 40;
+  assert.equal(back.nearestProp()?.id, `p${sh.id}`);
+  back.step({ ...idle, interact: true });
+  assert.equal(back.props.find(p => p.id === `p${sh.id}`).solid, false);
+});
+
+test('걸어서 확인: 로비 L1부터 층마다 모든 방을 정리하고 승강기로 내려가, 정비 구역 다락방 로프로 귀환', async (t) => {
   const metaStore = { m: null, load() { return this.m; }, save(m) { this.m = JSON.parse(JSON.stringify(m)); } };
   const stage = S.createElevatorStage(metaStore);
   const tally = { unlocked: 0, keys: 0, rewards: 0, ups: 0, rooms: 0, broken: 0 };
-  for (const seed of Array.from({ length: 10 }, (_, i) => 11 + i * 37)) {
-    const eng = new DemoEngine(stage, { seed, agent: 'jyaldi' });
-    eng.start();
-    const seenTypes = new Set();
-    let mode = 'down'; // 깊이 5까지 내려간 뒤 정비 구역으로
-    let presses = 0;
-    bot.want = (e) => {
-      const st = e.plan.stage;
-      const out = stage.outing();
-      const props = e.props;
-      const f = st.floor;
-      const upPick = props.find((p) => p.id.startsWith('up:'));
-      if (upPick) return upPick;
-      if (st.where === 'car') return props.find((p) => p.id === (presses++ % 5 === 0 ? 'greet' : 'btn0')) ?? props.find((p) => p.id === 'btn0');
-      if (st.where === 'service') {
-        const z = out.service;
-        const target = z.atticCell;
-        const [c, r] = out.cell;
-        if (c === target[0] && r === target[1]) return props.find((p) => p.kind === 'rope');
-        const prev = new Map([[`${c},${r}`, null]]);
-        const q = [[c, r]];
-        while (q.length) {
-          const [x, y] = q.shift();
-          const cell = z.cells[y * z.cols + x];
-          for (const [dx, dy, o] of [[1, 0, 'r'], [-1, 0, 'l'], [0, 1, 'd'], [0, -1, 'u']])
-            if (cell.open[o] && !prev.has(`${x + dx},${y + dy}`)) prev.set(`${x + dx},${y + dy}`, `${x},${y}`), q.push([x + dx, y + dy]);
+  const cases = [
+    ...Array.from({ length: 10 }, (_, i) => ({ seed: 11 + i * 37 })),
+    ...TYPES.flatMap(type => [17, 24].map(seed => ({ seed, target: { depth: type === 'deep' ? 15 : 4, type, sub: type === 'replica' ? 'pretending' : null } }))),
+  ];
+  for (const { seed, target } of cases) {
+    await t.test(`${seed}:${target?.type ?? 'L1'}:${target?.depth ?? 1}`, () => {
+      const eng = engineAt(stage, seed, target);
+      bot.sweep = {};
+      const seenTypes = new Set();
+      let mode = 'down'; // 깊이 5까지 내려간 뒤 정비 구역으로
+      let presses = 0;
+      bot.want = (e) => {
+        const st = e.plan.stage;
+        const out = stage.outing();
+        const props = e.props;
+        const f = st.floor;
+        const upPick = props.find((p) => p.id.startsWith('up:'));
+        if (upPick) return upPick;
+        if (st.where === 'car') return props.find((p) => p.id === (presses++ % 5 === 0 ? 'greet' : 'btn0')) ?? props.find((p) => p.id === 'btn0');
+        if (st.where === 'service') {
+          const z = out.service;
+          const target = z.atticCell;
+          const [c, r] = out.cell;
+          if (c === target[0] && r === target[1]) return props.find((p) => p.kind === 'rope');
+          const prev = new Map([[`${c},${r}`, null]]);
+          const q = [[c, r]];
+          while (q.length) {
+            const [x, y] = q.shift();
+            const cell = z.cells[y * z.cols + x];
+            for (const [dx, dy, o] of [[1, 0, 'r'], [-1, 0, 'l'], [0, 1, 'd'], [0, -1, 'u']])
+              if (cell.open[o] && !prev.has(`${x + dx},${y + dy}`)) prev.set(`${x + dx},${y + dy}`, `${x},${y}`), q.push([x + dx, y + dy]);
+          }
+          let cur = `${target[0]},${target[1]}`;
+          while (prev.get(cur) !== `${c},${r}`) cur = prev.get(cur);
+          const [nx, ny] = cur.split(',').map(Number);
+          const kind = nx > c ? 'right' : nx < c ? 'left' : ny > r ? 'ladder_down' : 'ladder_up';
+          return props.find((p) => p.kind === kind);
         }
-        let cur = `${target[0]},${target[1]}`;
-        while (prev.get(cur) !== `${c},${r}`) cur = prev.get(cur);
-        const [nx, ny] = cur.split(',').map(Number);
-        const kind = nx > c ? 'right' : nx < c ? 'left' : ny > r ? 'ladder_down' : 'ladder_up';
-        return props.find((p) => p.kind === kind);
-      }
-      if (!f) return props.find((p) => p.kind === 'van');
-      seenTypes.add(f.type);
-      const w = stage.worldAt(f.depth);
-      const rm = S.roomAt(w, f.room.col, f.room.row);
-      const wv = stage.mapView().worlds.find((x) => x.depth === f.depth);
-      const clearOf = (q) => !!wv.rooms.find((v) => v.col === q.col && v.row === q.row)?.clear;
-      const go = (x) => inTheWay(e, f, x) ?? { id: '__walk', x };
-      // 방 안: 열쇠 줍기 → 싸움(방을 끝까지 쓸어 본다) → 보상 배낭
-      const key = props.find((p) => p.kind === 'key');
-      if (key) return go(key.x).id === '__walk' ? key : go(key.x);
-      if (!clearOf(rm)) {
-        const sw = (bot.sweep ??= {});
-        const k = e.plan.id + seed;
-        if (sw[k] === undefined) sw[k] = e.p.x < f.width / 2 ? 1 : -1;
-        const tx = sw[k] > 0 ? f.width - 140 : 140;
-        if (Math.abs(e.p.x - tx) < 50) sw[k] = -sw[k];
-        return go(tx);
-      }
-      const pack = props.find((p) => p.kind === 'pack' && p.label !== '빈 배낭');
-      if (pack) return go(pack.x).id === '__walk' ? pack : go(pack.x);
-      // 다음 방: 층을 다 정리하기 전에는 안 정리된 방·안 주운 열쇠로, 끝나면 패널(또는 정비 구역 입구)로
-      const done = out.clearedFloors.includes(f.depth);
-      const svc = props.find((p) => p.kind === 'servicedoor' || p.kind === 'hatch');
-      if (done && mode === 'service' && svc) return go(svc.x).id === '__walk' ? svc : go(svc.x);
-      const panel = props.find((p) => p.kind === 'panel');
-      if (done && panel && (mode === 'down' || (rm.col === w.arrival[0] && rm.row === w.arrival[1]))) return go(panel.x).id === '__walk' ? panel : go(panel.x);
-      const isGoal = !done
-        ? (q) => (q.role !== 'secret' && !clearOf(q)) || (q.key && !out.wkeys.includes(`${f.depth}:${q.key}`))
-        : mode === 'service'
-          ? (q) => q.col === w.arrival[0] && q.row === w.arrival[1]
-          : (q) => q.panel;
-      const r = route(stage, w, rm, isGoal);
-      if (!r) throw new Error(`seed ${seed}: 갈 방이 없다 (${f.label}) done=${done} keys=${out.wkeys} unlocked=${out.unlocked} rooms=${wv.rooms.map(q => `${q.col},${q.row}:${q.role}:${q.clear}`).join(";")}`);
-      const d = r.dir;
-      const gate = f.placed.find((x) => x.kind === 'locked' && x.data.dir === d && props.some((p) => p.id === `p${x.id}`));
-      const door = gate ?? f.placed.find((x) => x.data.dir === d && ['wdoor', 'wup', 'wdown', 'crack', 'vent'].includes(x.kind));
-      if (!door) throw new Error(`seed ${seed}: ${d} 문 없음 (${f.label})`);
-      const pr = props.find((p) => p.id === `p${door.id}`);
-      return go(pr.x).id === '__walk' ? pr : go(pr.x);
-    };
-    let guard = 0;
-    while (!eng.ended && guard++ < 30 * 60 * 120) {
-      const out = stage.outing();
-      if (out.depth >= 5 && mode === 'down') mode = 'service';
-      const kk = bot(eng);
-      bot.lastK = kk;
-      eng.step(kk);
-      // 사물함 뒤 깊이에 숨지 않는다 (검수 16-1·18-1)
-      if (eng.plan.stage.where === 'floor')
-        for (const t of eng.plan.stage.terrain) {
-          const bs = t.kind === 'narrow' ? S.narrowBackSpan(t, eng.plan.stage.terrain) : null;
-          const lane = ((eng.p.y - 440) / 250) * 160;
-          if (bs) assert.ok(!(eng.p.x > bs[0] + 20 && eng.p.x < bs[1] - 20 && lane < t.lane0 - 4), `seed ${seed}: 사물함 뒤 x=${Math.round(eng.p.x)} lane=${Math.round(lane)} ${JSON.stringify(t)} span=${bs.map(Math.round)}`);
+        if (!f) return props.find((p) => p.kind === 'van');
+        seenTypes.add(f.type);
+        const w = stage.worldAt(f.depth);
+        const rm = S.roomAt(w, f.room.col, f.room.row);
+        const wv = stage.mapView().worlds.find((x) => x.depth === f.depth);
+        const clearOf = (q) => !!wv.rooms.find((v) => v.col === q.col && v.row === q.row)?.clear;
+        const go = (x) => inTheWay(e, f, x) ?? { id: '__walk', x };
+        const approach = p => inTheWay(e, f, p.x) ?? p;
+        // 방 안: 열쇠 줍기 → 싸움(방을 끝까지 쓸어 본다) → 보상 배낭
+        const key = props.find((p) => p.kind === 'key');
+        if (key) return approach(key);
+        if (!clearOf(rm)) {
+          const sw = (bot.sweep ??= {});
+          const k = e.plan.id + seed;
+          if (sw[k] === undefined) sw[k] = e.p.x < f.width / 2 ? 1 : -1;
+          const tx = sw[k] > 0 ? f.width - 140 : 140;
+          if (Math.abs(e.p.x - tx) < 50) sw[k] = -sw[k];
+          return go(tx);
         }
-    }
-    const out = stage.outing();
-    tally.unlocked += out.unlocked.length;
-    tally.keys += out.wkeys.length;
-    tally.rewards += out.rewards.length;
-    tally.ups += out.upgrades.length;
-    tally.broken += out.broken.length;
-    tally.rooms += Object.values(out.seenRooms).reduce((a, b) => a + b.length, 0);
-    assert.equal(eng.ended, 'return', `seed ${seed}: 로프로 귀환 (깊이 ${out.depth}, ${eng.plan.title}) x=${Math.round(eng.p.x)} goal=${bot.want(eng)?.id} near=${eng.nearestProp()?.id} cleared=${out.clearedFloors} where=${out.where} says=${eng.says.slice(-4).map((s) => s.text).join('|')} props=${eng.props.filter((q) => Math.abs(q.x - eng.p.x) < 300).map((q) => q.kind + '@' + q.x + (q.solid ? 'S' : ''))}`);
-    assert.deepEqual(out.clearedFloors.slice(0, 4), [1, 2, 3, 4], `seed ${seed}: 층마다 다 정리하고 내려갔다 ${out.clearedFloors}`);
-    assert.ok(seenTypes.size >= 2, `유형 ${[...seenTypes]}`);
+        const pack = props.find((p) => p.kind === 'pack' && p.label !== '빈 배낭');
+        if (pack) return approach(pack);
+        // 다음 방: 층을 다 정리하기 전에는 안 정리된 방·안 주운 열쇠로, 끝나면 패널(또는 정비 구역 입구)로
+        const done = out.clearedFloors.includes(f.depth);
+        const svc = props.find((p) => p.kind === 'servicedoor' || p.kind === 'hatch');
+        if (done && mode === 'service' && svc) return approach(svc);
+        const panel = props.find((p) => p.kind === 'panel');
+        if (done && panel && (mode === 'down' || (rm.col === w.arrival[0] && rm.row === w.arrival[1]))) return approach(panel);
+        const isGoal = !done
+          ? (q) => (q.role !== 'secret' && !clearOf(q)) || (q.key && !out.wkeys.includes(`${f.depth}:${q.key}`))
+          : mode === 'service'
+            ? (q) => q.col === w.arrival[0] && q.row === w.arrival[1]
+            : (q) => q.panel;
+        const r = route(stage, w, rm, isGoal);
+        if (!r) throw new Error(`seed ${seed}: 갈 방이 없다 (${f.label}) done=${done} keys=${out.wkeys} unlocked=${out.unlocked} rooms=${wv.rooms.map(q => `${q.col},${q.row}:${q.role}:${q.clear}`).join(";")}`);
+        const d = r.dir;
+        const gate = f.placed.find((x) => x.kind === 'locked' && x.data.dir === d && props.some((p) => p.id === `p${x.id}`));
+        const door = gate ?? f.placed.find((x) => x.data.dir === d && ['wdoor', 'wup', 'wdown', 'crack', 'vent'].includes(x.kind));
+        if (!door) throw new Error(`seed ${seed}: ${d} 문 없음 (${f.label})`);
+        const pr = props.find((p) => p.id === `p${door.id}`);
+        return approach(pr);
+      };
+      let guard = 0;
+      while (!eng.ended && guard++ < 30 * 60 * 120) {
+        const out = stage.outing();
+        if (out.depth >= (target ? target.depth + 1 : 5) && mode === 'down') mode = 'service';
+        const kk = bot(eng);
+        bot.lastK = kk;
+        eng.step(kk);
+        // 사물함 뒤 깊이에 숨지 않는다 (검수 16-1·18-1)
+        if (eng.plan.stage.where === 'floor')
+          for (const t of eng.plan.stage.terrain) {
+            const bs = t.kind === 'narrow' ? S.narrowBackSpan(t, eng.plan.stage.terrain) : null;
+            const lane = ((eng.p.y - 440) / 250) * 160;
+            if (bs) assert.ok(!(eng.p.x > bs[0] + 20 && eng.p.x < bs[1] - 20 && lane < t.lane0 - 4), `seed ${seed}: 사물함 뒤 x=${Math.round(eng.p.x)} lane=${Math.round(lane)} ${JSON.stringify(t)} span=${bs.map(Math.round)}`);
+          }
+      }
+      const out = stage.outing();
+      tally.unlocked += out.unlocked.length;
+      tally.keys += out.wkeys.length;
+      tally.rewards += out.rewards.length;
+      tally.ups += out.upgrades.length;
+      tally.broken += out.broken.length;
+      tally.rooms += Object.values(out.seenRooms).reduce((a, b) => a + b.length, 0);
+      assert.equal(eng.ended, 'return', `seed ${seed}: 로프로 귀환 (깊이 ${out.depth}, ${eng.plan.title}, ${eng.plan.id}) start=${eng.plan.startX} chase=${eng.plan.stage.fx.chaseX} x=${Math.round(eng.p.x)} goal=${bot.want(eng)?.id} near=${eng.nearestProp()?.id} cleared=${out.clearedFloors} where=${out.where} says=${eng.says.slice(-4).map((s) => s.text).join('|')} props=${eng.props.filter((q) => Math.abs(q.x - eng.p.x) < 300).map((q) => q.kind + '@' + q.x + (q.solid ? 'S' : ''))}`);
+      if (target) assert.ok(out.clearedFloors.includes(target.depth) && out.depth > target.depth, `${seed}:${target.type} 정리 후 다음 층`);
+      else assert.deepEqual(out.clearedFloors.slice(0, 4), [1, 2, 3, 4], `seed ${seed}: 층마다 다 정리하고 내려갔다 ${out.clearedFloors}`);
+      assert.ok(seenTypes.size >= 2, `유형 ${[...seenTypes]}`);
+    });
   }
   assert.ok(metaStore.m.deepest >= 5);
   assert.ok(Object.keys(metaStore.m.known).length >= 4, `송신된 규칙 ${Object.keys(metaStore.m.known)}`);
