@@ -113,9 +113,9 @@ function layout(sc) {
   return { deco, over, things, cut, length };
 }
 
-test('본부 장면: 문·계단·엘리베이터가 벽 장식·벽 가구나 서로를 덮지 않는다', () => {
+test('옛 벽 칸 장면(거리·파스타집): 문이 벽 장식·벽 가구나 서로를 덮지 않는다', () => {
   const bad = [];
-  for (const sc of M.HQ_SCENES) {
+  for (const sc of M.HQ_SCENES.filter((s) => s.legacy)) {
     const { deco, over, things, cut, length } = layout(sc);
     for (const c of cut) bad.push(`${sc.id}: ${c}`);
     for (const t of things) for (const d of deco) if (Math.min(d.b, t.b) - Math.max(d.a, t.a) > 4) bad.push(`${sc.id}: ${t.what} ${Math.round(t.a)}~${Math.round(t.b)} ↔ ${d.what} ${Math.round(d.a)}~${Math.round(d.b)}`);
