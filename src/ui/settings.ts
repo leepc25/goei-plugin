@@ -192,6 +192,7 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
       s.assetOn ? field('이미지 표시 범위', recentControl('img-show', getPrefs().imgShow, '이미지 표시 메시지 수', busy), '이미지를 띄울 메시지예요. 「최근만」이면 마지막 메시지부터 정한 개수까지만 띄워요(원래 6개). 바꾼 값은 메시지를 다시 그릴 때 반영돼요.') : '',
       s.assetOn ? field('요청 속 이미지 태그', recentControl('img-send', getPrefs().imgSend, '태그를 남길 메시지 수', busy), '모델에 보내는 대화 기록에서 이미지 태그를 남길 메시지예요. 오래된 태그를 빼면 토큰이 줄어요. 최근 태그는 모델이 태그 쓰는 법을 따라 하도록 남겨요(원래 6개).') : '',
       s.assetOn ? field('출력 모델', seg('set-asset-model', s.assetModel, [['main', '메인모델'], ['aux', '보조모델']], busy), '메인모델은 본문과 함께 적고, 보조모델은 응답이 끝난 뒤 한 번 더 불러 태그를 보충해요.') : '',
+      s.assetOn ? field('주인공 이미지', seg('set-asset-player', s.assetPlayer ? '1' : '0', [['1', 'ON'], ['0', 'OFF']], busy), '「캐릭터로 플레이」로 고른 요원(내가 연기하는 주인공)에게도 이미지 태그를 붙일지예요. 끄면 페르소나처럼 주인공 이미지는 띄우지 않아요.') : '',
       s.assetOn && s.assetModel === 'aux' ? field('캐릭터당 이미지 수', seg('set-asset-limit', String(s.assetLimit), [['1', '1'], ['2', '2'], ['3', '3'], ['4', '4']], busy), '보조모델이 한 응답에서 캐릭터 한 명에게 붙일 이미지 태그의 최대 개수') : '',
     ].join(''))}
     ${scope === 'chat' && s.assetOn && s.assetModel === 'aux' && note ? `<p class="gx-hint">최근 보충: ${esc(note)}</p>` : ''}
@@ -366,6 +367,9 @@ export async function handleSettings(action: string, value: string | undefined, 
       case 'set-asset-model':
         if (v === 'main' || v === 'aux') await basicPatch(env, { assetModel: v });
         return true;
+      case 'set-asset-player':
+        await basicPatch(env, { assetPlayer: v === '1' });
+        return true;
       case 'set-asset-limit': {
         const n = Number(v);
         if (Number.isInteger(n) && n >= 1 && n <= 4) await basicPatch(env, { assetLimit: n });
@@ -440,6 +444,9 @@ export async function handleSettings(action: string, value: string | undefined, 
     case 'set-asset-model':
       if (v !== 'main' && v !== 'aux') return true;
       await save(ctx, env, (chat) => withBasic(ctx, chat, { assetModel: v }));
+      return true;
+    case 'set-asset-player':
+      await save(ctx, env, (chat) => withBasic(ctx, chat, { assetPlayer: v === '1' }));
       return true;
     case 'set-asset-limit': {
       const n = Number(v);

@@ -13,6 +13,8 @@ export interface BasicSettings {
   assetOn: boolean;
   /** main: 본문 AI가 이미지 태그를 함께 적음, aux: 보조 모델이 완성된 본문에 태그를 보충 */
   assetModel: AssetModel;
+  /** 캐릭터로 플레이할 때 주인공(유저가 고른 요원)도 이미지 태그를 받을지 */
+  assetPlayer: boolean;
   /** 캐릭터당 이미지 수 1~4 */
   assetLimit: number;
   /** 요원 표시 인원 0~20 */
@@ -24,6 +26,7 @@ export interface BasicSettings {
 export const ST = {
   assetOn: '$st_asset_on',
   assetModel: '$st_asset_model',
+  assetPlayer: '$st_asset_player',
   assetLimit: '$st_asset_limit',
   agentLimit: '$st_agent_limit',
   supportOn: '$st_support_on',
@@ -31,7 +34,7 @@ export const ST = {
 
 export const AGENT_MAX = 20;
 
-export const BASIC_DEFAULTS: BasicSettings = { anomalyOn: true, assetOn: true, assetModel: 'main', assetLimit: 2, agentLimit: 12, supportOn: true };
+export const BASIC_DEFAULTS: BasicSettings = { anomalyOn: true, assetOn: true, assetModel: 'main', assetPlayer: false, assetLimit: 2, agentLimit: 12, supportOn: true };
 
 /** 괴이 생성 수치. label은 옛 Settings 로어북 「괴이생성」의 항목 이름 (원본 WG.spec) */
 export interface WorldField {
@@ -138,6 +141,7 @@ export function setPrefs(raw: unknown): Prefs {
   if (typeof b.anomalyOn === 'boolean') basic.anomalyOn = b.anomalyOn;
   if (typeof b.assetOn === 'boolean') basic.assetOn = b.assetOn;
   if (b.assetModel === 'main' || b.assetModel === 'aux') basic.assetModel = b.assetModel;
+  if (typeof b.assetPlayer === 'boolean') basic.assetPlayer = b.assetPlayer;
   const al = int(b.assetLimit, 1, 4);
   if (al !== null) basic.assetLimit = al;
   const ag = int(b.agentLimit, 0, AGENT_MAX);
@@ -222,6 +226,7 @@ export function basicDefaults(lore: LoreEntry[] | undefined): BasicSettings {
     anomalyOn: flag(b['상황판'] ?? b['통합관제']) ?? BASIC_DEFAULTS.anomalyOn,
     assetOn: flag(b['에셋 출력']) ?? BASIC_DEFAULTS.assetOn,
     assetModel: model(b['에셋 모델']) ?? BASIC_DEFAULTS.assetModel,
+    assetPlayer: flag(b['주인공 에셋']) ?? BASIC_DEFAULTS.assetPlayer,
     assetLimit: int(b['캐릭터당 이미지 수'], 1, 4) ?? BASIC_DEFAULTS.assetLimit,
     agentLimit: int(b['요원 표시 인원'], 0, AGENT_MAX) ?? BASIC_DEFAULTS.agentLimit,
     supportOn: flag(b['지원 투입']) ?? BASIC_DEFAULTS.supportOn,
@@ -237,6 +242,7 @@ export function basicSettings(lore: LoreEntry[] | undefined, ss: ScriptState | u
     anomalyOn: v.$st_anomaly_on === undefined ? d.anomalyOn : v.$st_anomaly_on === '1',
     assetOn: flag(v[ST.assetOn]) ?? d.assetOn,
     assetModel: model(v[ST.assetModel]) ?? d.assetModel,
+    assetPlayer: flag(v[ST.assetPlayer]) ?? d.assetPlayer,
     assetLimit: int(v[ST.assetLimit], 1, 4) ?? d.assetLimit,
     agentLimit: int(v[ST.agentLimit], 0, AGENT_MAX) ?? d.agentLimit,
     supportOn: flag(v[ST.supportOn]) ?? d.supportOn,
@@ -248,6 +254,7 @@ export function basicVars(s: BasicSettings): ScriptState {
   return {
     [ST.assetOn]: s.assetOn ? '1' : '0',
     [ST.assetModel]: s.assetModel,
+    [ST.assetPlayer]: s.assetPlayer ? '1' : '0',
     [ST.assetLimit]: String(s.assetLimit),
     [ST.agentLimit]: String(s.agentLimit),
     [ST.supportOn]: s.supportOn ? '1' : '0',

@@ -1,6 +1,7 @@
 // 응답이 끝난 뒤 보조 모델로 이미지 태그를 보충한다 (원본 onOutput → imgTagFireCore).
 // 에셋 모듈의 Image tag 로어북은 모듈에 있을 수 있어서 getCurrentLorebookEntries로 읽는다.
 import { ASSET_NOTE, AssetError, finishAsset, planAsset, readImageData } from '../core/asset';
+import { playerAgent } from '../core/player';
 import { basicSettings } from '../core/settings';
 import type { Chat, LoreEntry } from '../core/types';
 import { runModel } from './llm';
@@ -35,7 +36,9 @@ export async function supplementAssets(t: AssetTarget): Promise<void> {
       entries = t.lore ?? [];
     }
     const data = readImageData(entries);
-    const job = planAsset(msg.data, data, s.assetLimit);
+    const agent = s.assetPlayer ? undefined : playerAgent(t.lore, t.chat.scriptstate);
+    const exclude = agent ? [agent.english, data.aliases.get(agent.name.toLowerCase())].filter((v): v is string => typeof v === 'string' && !!v) : [];
+    const job = planAsset(msg.data, data, s.assetLimit, exclude);
     if (!job) return;
     const raw = await runModel(job.messages, 'aux');
     const next = finishAsset(job, raw, data, s.assetLimit);

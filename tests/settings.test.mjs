@@ -8,7 +8,7 @@ const realLore = existsSync(REAL) ? (() => { const m = JSON.parse(readFileSync(R
 const book = (obj) => [{ comment: 'Settings', content: JSON.stringify(obj) }];
 
 test('Settings lorebook gives card defaults like the original', { skip: !realLore }, () => {
-  assert.deepEqual(S.basicDefaults(realLore), { anomalyOn: true, assetOn: true, assetModel: 'main', assetLimit: 2, agentLimit: 12, supportOn: true });
+  assert.deepEqual(S.basicDefaults(realLore), { anomalyOn: true, assetOn: true, assetModel: 'main', assetPlayer: false, assetLimit: 2, agentLimit: 12, supportOn: true });
   const w = S.worldSettings(realLore);
   assert.equal(w.preset_cap, 2);
   assert.equal(w.incident_p, 50);
@@ -18,7 +18,7 @@ test('Settings lorebook gives card defaults like the original', { skip: !realLor
 
 test('chat variables override, invalid values fall back', () => {
   const lore = book({ 기본설정: { '에셋 모델': '보조', '캐릭터당 이미지 수': 9, '요원 표시 인원': 5, '지원 투입': false }, 괴이생성: { '프리셋 괴이 상한': 4, '인시던트 발생 확률': 150, '랜덤 괴이 RP 유지 시간': 1.5 } });
-  assert.deepEqual(S.basicDefaults(lore), { anomalyOn: true, assetOn: true, assetModel: 'aux', assetLimit: 2, agentLimit: 5, supportOn: false });
+  assert.deepEqual(S.basicDefaults(lore), { anomalyOn: true, assetOn: true, assetModel: 'aux', assetPlayer: false, assetLimit: 2, agentLimit: 5, supportOn: false });
   const s = S.basicSettings(lore, { $st_asset_on: '0', $st_agent_limit: '30', $st_asset_limit: '3' });
   assert.equal(s.assetOn, false);
   assert.equal(s.agentLimit, 5);
@@ -29,7 +29,7 @@ test('chat variables override, invalid values fall back', () => {
   assert.equal(w.random_ttl, 1.5);
   assert.equal(w.agent_limit, 0);
   assert.deepEqual(S.missingBasicVars(lore, S.basicVars(s)), null);
-  assert.deepEqual(S.missingBasicVars(lore, { $st_asset_on: '0' }), { $st_asset_model: 'aux', $st_asset_limit: '2', $st_agent_limit: '5', $st_support_on: '0' });
+  assert.deepEqual(S.missingBasicVars(lore, { $st_asset_on: '0' }), { $st_asset_model: 'aux', $st_asset_player: '0', $st_asset_limit: '2', $st_agent_limit: '5', $st_support_on: '0' });
   assert.deepEqual(S.basicDefaults(undefined), S.BASIC_DEFAULTS);
   assert.equal(S.basicDefaults(book({ 기본설정: { 상황판: false } })).anomalyOn, false);
   assert.equal(S.basicDefaults(book({ 기본설정: { 통합관제: false } })).anomalyOn, false);
@@ -76,4 +76,29 @@ test('feature defaults keep only setting variables', () => {
   const p = S.setPrefs({ vars: { '$ph_model': 'main', '$lb_cfg_lb-gn.privacy': '3', '$nw_length': 'short', '$ph_state': '{}', '$gn_raw': 'x', '$nw_mode': 1 } });
   assert.deepEqual(p.vars, { '$ph_model': 'main', '$lb_cfg_lb-gn.privacy': '3', '$nw_length': 'short' });
   S.setPrefs({});
+});
+
+test('주인공 이미지: 기본 끔, Asset 로어북은 켜고 주인공을 고른 채팅에서만 {{user}} 금지를 뺀다', async () => {
+  const { evaluate } = await import('../dist-test/core.mjs');
+  assert.equal(S.basicSettings([], {}).assetPlayer, false);
+  assert.equal(S.basicVars(S.basicSettings([], {}))['$st_asset_player'], '0');
+  assert.equal(S.basicSettings([], { $st_asset_player: '1' }).assetPlayer, true);
+  const book = JSON.parse(readFileSync(new URL('../card/image-lore.json', import.meta.url), 'utf8')).data.find((e) => e.comment === 'Asset');
+  const run = (vars) => evaluate(book.content, { vars: { $st_asset_on: '1', $st_asset_model: 'main', ...vars }, char: 'Anomaly', user: 'Jyaldi' });
+  for (const vars of [{}, { $st_player: 'P001' }, { $st_asset_player: '1' }]) {
+    const t = run(vars);
+    assert.match(t, /Do not create tags for Jyaldi\./);
+    assert.doesNotMatch(t, /IS a defined character|\{\{/);
+  }
+  const on = run({ $st_asset_player: '1', $st_player: 'P001' });
+  assert.match(on, /The protagonist Jyaldi \(the character the user plays\) IS a defined character/);
+  assert.doesNotMatch(on, /tags for Jyaldi|solely on Jyaldi|If only Jyaldi|\{\{/);
+  assert.match(on, /If only undefined NPCs, or pure narration/);
+});
+
+test('보조모델: 주인공 이미지를 끄면 주인공은 태그 후보에서 빠진다', () => {
+  const data = A.readImageData([{ comment: 'Image tag', content: JSON.stringify({ characters: ['Jyaldi', 'Aileen'], sfw_keywords: ['default'], kor_to_eng: { 쟈알디: 'Jyaldi', 에일린: 'Aileen' } }) }]);
+  const text = '쟈알디가 문을 열었다.\n\n에일린이 웃었다.';
+  assert.deepEqual(A.planAsset(text, data, 2).messages[0].content.match(/## Allowed Character Names.*\n(.*)/)[1], 'Jyaldi | Aileen');
+  assert.deepEqual(A.planAsset(text, data, 2, ['Jyaldi']).messages[0].content.match(/## Allowed Character Names.*\n(.*)/)[1], 'Aileen');
 });

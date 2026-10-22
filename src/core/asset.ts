@@ -248,10 +248,11 @@ export interface AssetJob {
 }
 
 /** 태그를 붙일 것이 없으면 null */
-export function planAsset(content: string, d: ImageData, limit: number): AssetJob | null {
+/** exclude: 태그하지 않을 영문명 (주인공 이미지를 끈 채 캐릭터로 플레이할 때 그 요원) */
+export function planAsset(content: string, d: ImageData, limit: number, exclude: string[] = []): AssetJob | null {
   const { narrative, trailing } = splitNarrative(content);
   if (!narrative) return null;
-  const active = activeCharacters(narrative, d);
+  const active = activeCharacters(narrative, d).filter((name) => !exclude.includes(name));
   if (!active.length) return null;
   const paras = paragraphs(narrative);
   if (!paras.length) return null;
