@@ -11670,8 +11670,8 @@ ${can.ok ? "" : `<p class="hq-warn">${esc2(can.why)}</p>`}</div>
       return;
     }
     if (d3.loadslot) {
-      void host.saves?.read(Number(d3.loadslot)).then((txt) => {
-        const got = parseSave(txt);
+      void host.saves?.read(Number(d3.loadslot)).then((txt2) => {
+        const got = parseSave(txt2);
         if (!got) return say("불러오지 못했어요 (모양이 다른 저장).");
         s2 = got;
         overlay = null;
@@ -12667,12 +12667,12 @@ function drawFigure(e, ctx, outline) {
     const a = img4.data;
     for (let i = 3; i < a.length; i += 4) a[i] = a[i] > 110 ? 255 : 0;
     M2.x.putImageData(img4, OX - hw, 0);
-    const C3 = board(1);
-    transform(C3.x);
-    drawShape(C3.x, e, L, p, flash ? (part) => lighten(col[part], 0.55) : (part) => col[part]);
-    C3.x.setTransform(1, 0, 0, 1, 0, 0);
-    C3.x.globalCompositeOperation = "destination-in";
-    C3.x.drawImage(M2.c, 0, 0);
+    const C4 = board(1);
+    transform(C4.x);
+    drawShape(C4.x, e, L, p, flash ? (part) => lighten(col[part], 0.55) : (part) => col[part]);
+    C4.x.setTransform(1, 0, 0, 1, 0, 0);
+    C4.x.globalCompositeOperation = "destination-in";
+    C4.x.drawImage(M2.c, 0, 0);
     {
       const front = e.dir;
       const S3 = board(2);
@@ -12682,8 +12682,8 @@ function drawFigure(e, ctx, outline) {
       S3.x.fillRect(0, 0, CW, CH);
       S3.x.globalCompositeOperation = "destination-out";
       S3.x.drawImage(M2.c, 3 * front, -3);
-      C3.x.globalCompositeOperation = "source-atop";
-      C3.x.drawImage(S3.c, 0, 0);
+      C4.x.globalCompositeOperation = "source-atop";
+      C4.x.drawImage(S3.c, 0, 0);
       const R = board(2);
       R.x.drawImage(M2.c, 0, 0);
       R.x.globalCompositeOperation = "source-in";
@@ -12691,7 +12691,7 @@ function drawFigure(e, ctx, outline) {
       R.x.fillRect(0, 0, CW, CH);
       R.x.globalCompositeOperation = "destination-out";
       R.x.drawImage(M2.c, -front, 1);
-      C3.x.drawImage(R.c, 0, 0);
+      C4.x.drawImage(R.c, 0, 0);
     }
     const F = board(3);
     F.x.drawImage(M2.c, -1, 0);
@@ -12702,7 +12702,7 @@ function drawFigure(e, ctx, outline) {
     F.x.fillStyle = outline || "#07080a";
     F.x.fillRect(0, 0, CW, CH);
     F.x.globalCompositeOperation = "source-over";
-    F.x.drawImage(C3.c, 0, 0);
+    F.x.drawImage(C4.c, 0, 0);
     cached.x.clearRect(0, 0, CW, CH);
     cached.x.drawImage(F.c, 0, 0);
   }
@@ -16444,7 +16444,7 @@ function buildFloor(ctx, seed, fallback) {
           break;
         case "door":
           if (type === "chase") placed.push(place2("chasedoor", px, 0, 60, "방화문", { closed: false }));
-          else if (r() < 0.5) placed.push(place2("prop", px, 0, 70, "잠긴 문"));
+          else if (r() < 0.5) placed.push(place2("prop", px, 0, 70, "닫힌 사무실 문"));
           break;
         case "sign":
           if (ruleSigns.length) {
@@ -16556,7 +16556,7 @@ function buildFloor(ctx, seed, fallback) {
     squeeze: 70 + seq.length * 12,
     b12: b12mark ? 1 : 0
   };
-  return {
+  const floor = {
     depth,
     label: label3,
     type,
@@ -16575,7 +16575,70 @@ function buildFloor(ctx, seed, fallback) {
     fallback: fallback ?? "",
     tries: 0
   };
+  addMetro(floor, ctx, r);
+  return floor;
 }
+var GATE_FREE = /* @__PURE__ */ new Set(["chase", "deep"]);
+var UPPER_X = 1100;
+function addMetro(f, ctx, r) {
+  const { depth, type } = f;
+  if (type === "deep") return;
+  const hall = f.segments[0];
+  const chunks = f.segments.filter((s2) => s2.ref.startsWith("chunk:"));
+  const terr = f.segments.flatMap((s2) => s2.terrain);
+  const clearAt = (x, d3 = 90) => !f.placed.some((p) => Math.abs(p.x - x) < d3) && !terr.some((t) => x > t.x0 - 80 && x < t.x1 + 80);
+  if (depth >= 2) f.placed.push(place2("upper", hall.x + UPPER_X, 0, 70, "위층 점검문", {}));
+  if (depth >= 2 && !GATE_FREE.has(type) && chunks.length >= 4 && (depth === 2 || r() < 0.6)) {
+    let gx = -1;
+    for (let i = Math.max(2, Math.floor(chunks.length * 0.5)); i < chunks.length && gx < 0; i++) {
+      const x = chunks[i].x + 30;
+      if (clearAt(x, 110) && !f.placed.some((p) => p.kind === "shutter" && Math.abs(p.x - x) < 300)) gx = x;
+    }
+    if (gx > 0) {
+      const before = f.placed.filter((p) => (p.kind === "hatch" || p.kind === "servicedoor") && p.x < gx - 100);
+      if (!before.length) {
+        for (const c of chunks.slice(0, 3)) {
+          const x = c.x + 460;
+          if (x < gx - 200 && clearAt(x, 80)) {
+            f.placed.push(place2("servicedoor", x, 0, 70, "점검문"));
+            break;
+          }
+        }
+      }
+      if (f.placed.some((p) => (p.kind === "hatch" || p.kind === "servicedoor") && p.x < gx - 100)) {
+        f.placed.push(place2("locked", gx, MID, 40, "잠긴 방화셔터", { key: depth }));
+        f.tuning.keyGate = 1;
+      }
+    }
+  }
+  const want = depth === 1 ? 1 : 1 + (r() < 0.45 ? 1 : 0);
+  const plainChunks = chunks.slice(1).filter((c) => !CHUNK_BY_ID[c.ref.slice(6)]?.device);
+  const cand = shuffle2(r, plainChunks.map((c) => c.x + 120 + Math.floor(r() * 400)));
+  let made = 0;
+  for (const x of cand) {
+    if (made >= want) break;
+    if (!clearAt(x, 120)) continue;
+    f.placed.push(place2("sidedoor", x, 0, 80, pick3(r, SIDE_NAMES[type] ?? SIDE_NAMES.lobby), { side: made }));
+    made++;
+  }
+  if (ctx.secret) {
+    for (const x of shuffle2(r, plainChunks.map((c) => c.x + 200 + Math.floor(r() * 240)))) {
+      if (!clearAt(x, 120)) continue;
+      const crack = r() < 0.55;
+      f.placed.push(place2(crack ? "crack" : "vent", x, crack ? 0 : MID, crack ? 90 : 60, crack ? "금 간 벽" : "막힌 덕트", { hp: 3 }));
+      break;
+    }
+  }
+}
+var SIDE_NAMES = {
+  lobby: ["옆 사무실", "문서 창고", "숙직실", "탕비실"],
+  silent: ["열람실 안쪽", "서고"],
+  dark: ["불 꺼진 방", "배전실"],
+  puzzle: ["같은 방", "거꾸로 된 방"],
+  replica: ["옆집", "작은방", "다용도실"],
+  trial: ["대기실", "심판석"],
+  chase: ["비상구 옆방"]
+};
 function hook2(role, kind, x, lane, wave, elite, data) {
   return { id: nextId2++, role, kind, x: Math.round(x), lane: Math.round(lane), wave, elite, data };
 }
@@ -16638,6 +16701,11 @@ function validateFloor(f) {
     if (!g2 || !panel || g2.x > panel.x) bad.push("수호자 방 도달");
   }
   if (!f.placed.some((p) => p.kind === "panel")) bad.push("패널 없음");
+  for (const g2 of f.placed.filter((p) => p.kind === "locked")) {
+    if (!f.placed.some((p) => (p.kind === "hatch" || p.kind === "servicedoor") && p.x < g2.x - 100)) bad.push("열쇠 찾으러 갈 입구가 셔터 뒤");
+    const panel = f.placed.find((p) => p.kind === "panel");
+    if (panel && panel.x < g2.x) bad.push("패널이 셔터 앞");
+  }
   if (f.depth >= 4 && f.type !== "deep" && !f.placed.some((p) => p.kind === "sign" && p.data.rule)) bad.push("규칙 장치 없음");
   return bad;
 }
@@ -16793,7 +16861,7 @@ function makeService(ctx) {
     }
     const pits = cell.segments.flatMap((s2) => s2.terrain).filter((t) => t.kind === "pit" || t.kind === "block");
     for (const t of cell.things) for (const p of pits) if (t.x > p.x0 - 50 && t.x < p.x1 + 50) t.x = p.x1 + 60 > ROOM_W - 80 ? p.x0 - 60 : p.x1 + 60;
-    const isWay = (t) => !["item", "symbol", "pack", "gear", "checklist", "merchant"].includes(t.kind);
+    const isWay = (t) => !["item", "symbol", "pack", "gear", "checklist", "merchant", "key"].includes(t.kind);
     cell.things.sort((a, b) => Number(isWay(b)) - Number(isWay(a)));
     const kept = [];
     for (const t of cell.things) {
@@ -16809,12 +16877,81 @@ function makeService(ctx) {
     cell.label = labelOf(cell.kind);
   }
   const predatorAfter = ctx.flags.includes("attic_short") ? 60 : 90;
-  return { depth: ctx.depth, seed: ctx.seed, reroll: ctx.reroll, cols, rows, cells, atticCell, entryCell, downCell, shaftCell: shaft ? [shaft.col, shaft.row] : null, predatorAfter };
+  const dist = /* @__PURE__ */ new Map([[entryCell.join(","), 0]]);
+  const q = [entryCell];
+  while (q.length) {
+    const [c, rw] = q.shift();
+    const cell = cells[idx(c, rw)];
+    const d3 = dist.get(`${c},${rw}`);
+    for (const [k, dc, dr] of [["r", 1, 0], ["l", -1, 0], ["d", 0, 1], ["u", 0, -1]])
+      if (cell.open[k] && !dist.has(`${c + dc},${rw + dr}`)) dist.set(`${c + dc},${rw + dr}`, d3 + 1), q.push([c + dc, rw + dr]);
+  }
+  let keyCell = null;
+  if (ctx.key) {
+    const cands = cells.filter((c) => c.kind !== "attic" && c.kind !== "entry").sort((a, b) => (dist.get(`${b.col},${b.row}`) ?? 0) - (dist.get(`${a.col},${a.row}`) ?? 0) + (r() - 0.5) * 0.6);
+    const kc = cands[0];
+    if (kc) {
+      keyCell = [kc.col, kc.row];
+      const x = [300, 640, 980].find((x2) => !kc.things.some((t) => Math.abs(t.x - x2) < 80) && !kc.segments.flatMap((s2) => s2.terrain).some((t) => (t.kind === "pit" || t.kind === "block") && x2 > t.x0 - 60 && x2 < t.x1 + 60)) ?? 640;
+      kc.things.push(thing("key", x, 80, `정비 열쇠 (${ctx.depth <= 3 ? `L${ctx.depth}` : `B-${ctx.depth - 3}`} 방화셔터)`, { depth: ctx.depth }));
+    }
+  }
+  const fights = {};
+  const fr = rng(mix2(ctx.seed, ctx.depth, ctx.reroll, 9191));
+  const mobs = ctx.depth <= 3 ? ["lurker", "hollow"] : ["crawler", "charger", "shade", "lurker"];
+  for (const c of cells) {
+    if (c.kind === "attic" || c.kind === "entry") continue;
+    if (fr() < Math.min(0.75, 0.35 + ctx.depth * 0.04)) fights[`${c.col},${c.row}`] = Array.from({ length: 1 + Math.floor(fr() * (ctx.depth <= 3 ? 2 : 3)) }, () => pick3(fr, mobs));
+  }
+  return { depth: ctx.depth, seed: ctx.seed, reroll: ctx.reroll, cols, rows, cells, atticCell, entryCell, downCell, shaftCell: shaft ? [shaft.col, shaft.row] : null, predatorAfter, keyCell, fights };
 }
 function labelOf(k) {
   return { entry: "해치 밑", duct: "덕트", support: "지지대 사이", slope: "기울어진 바닥", shaft: "승강로 틈새", attic: "선배들의 다락방", down: "아래 점검문 앞", plain: "배관 통로" }[k];
 }
 var cellAt = (z, col, row) => z.cells[row * z.cols + col];
+
+// src/game/action/stage/gen/side.ts
+var hashId = (s2) => [...s2].reduce((h, c) => h * 31 + c.charCodeAt(0) | 0, 7);
+function makeSide(seed, f, door2, secret, label3) {
+  const r = rng(mix2(seed, f.depth, hashId(door2), secret ? 2 : 1, 6161));
+  const pool = FLOOR_TYPES[f.type].enemies.length ? FLOOR_TYPES[f.type].enemies : FLOOR_TYPES.lobby.enemies;
+  const n = secret ? r() < 0.35 ? 1 : 0 : f.depth <= 1 ? 1 + Math.floor(r() * 2) : 2 + Math.floor(r() * Math.min(3, 1 + f.depth / 3));
+  const fight = Array.from({ length: n }, () => pick3(r, pool).kind);
+  const loot = [{ kind: "chest", x: 1e3 }];
+  if (secret) loot.push({ kind: "gear", x: 720 }, { kind: "item", x: 560, item: pick3(r, ["heal", "guard", "light"]) });
+  else if (r() < 0.5) loot.push({ kind: "item", x: 620, item: pick3(r, ["heal", "ammo", "light"]) });
+  return { depth: f.depth, door: door2, secret, label: secret ? `숨은 방` : label3, loot, fight, elite: secret || f.depth >= 6, palette: f.palette };
+}
+
+// src/game/action/stage/upgrades.ts
+var UPGRADES = [
+  { id: "hp", set: "body", label: "단단한 몸", text: "최대 체력 +30, 바로 30 회복" },
+  { id: "blood", set: "body", label: "피의 맛", text: "적을 쓰러뜨릴 때마다 체력 +5" },
+  { id: "ward", set: "body", label: "부적 두 장", text: "다음 피격 두 번을 막는다" },
+  { id: "power", set: "fist", label: "무거운 주먹", text: "타격 피해 +20%" },
+  { id: "spirit", set: "fist", label: "기합", text: "때릴 때마다 필살 게이지가 더 찬다" },
+  { id: "rush", set: "fist", label: "몰아치기", text: "적을 쓰러뜨린 뒤 3초 동안 피해 +30%" },
+  { id: "quiet", set: "rule", label: "조용한 발", text: "내는 소리 절반 (침묵의 층)" },
+  { id: "battery", set: "rule", label: "여분 배터리", text: "빛이 사그라드는 속도 절반 (어둠의 층)" },
+  { id: "master", set: "rule", label: "만능 열쇠", text: "잠긴 방화셔터 하나를 열쇠 없이 연다" },
+  { id: "scout", set: "rule", label: "선배의 지도", text: "정비 구역 다락방·열쇠 자리가 지도에 보인다" },
+  { id: "rest", set: "rule", label: "깊은 잠", text: "다락방 매트에서 한 번 더 쉴 수 있다" }
+];
+var UPGRADE_BY_ID = Object.fromEntries(UPGRADES.map((u) => [u.id, u]));
+var SET_LABEL = { body: "몸", fist: "주먹", rule: "규칙" };
+var SET_BONUS = { body: "계열 완성 · 몸: 최대 체력 +50", fist: "계열 완성 · 주먹: 피해 +15%", rule: "계열 완성 · 규칙: 승강기 총애 +1" };
+function upgradeChoices(seed, n, taken) {
+  const pool = UPGRADES.filter((u) => !taken.includes(u.id));
+  return shuffle2(rng(mix2(seed, n, 4141)), [...pool]).slice(0, 3);
+}
+function setCounts(taken) {
+  const c = { body: 0, fist: 0, rule: 0 };
+  for (const id of taken) if (UPGRADE_BY_ID[id]) c[UPGRADE_BY_ID[id].set]++;
+  return c;
+}
+function powerOf(taken) {
+  return 1 + (taken.includes("power") ? 0.2 : 0) + (setCounts(taken).fist >= 3 ? 0.15 : 0);
+}
 
 // src/game/action/stage/passengers.ts
 var PASSENGER_LABEL = {
@@ -16867,17 +17004,18 @@ function narrowBack(t, terr = []) {
 var lockerWall = /* @__PURE__ */ new WeakMap();
 var narrowBackSpan = (t, terr = []) => narrowBack(t, terr)?.span ?? null;
 var NOLOCK_TYPES = /* @__PURE__ */ new Set(["chase", "deep"]);
+var METRO_ART = { upper: "chasedoor", sidedoor: "door", locked: "firegate" };
 function floorPlan(f, id, startX = 240) {
   const props2 = f.placed.map((p) => ({
     id: `p${p.id}`,
-    kind: p.kind,
+    kind: METRO_ART[p.kind] ?? p.kind,
     x: p.x,
     y: laneY(p.lane),
     w: p.w,
     h: propH(p.kind),
     label: p.kind === "item" && p.data.item ? `${p.label}:${p.data.item}` : p.label,
     // 보급품:ammo → 바닥 그림을 종류대로 (itemsLink drawSupply)
-    solid: p.kind === "shutter" ? !p.data.open : void 0
+    solid: p.kind === "shutter" ? !p.data.open : p.kind === "locked" ? true : void 0
   }));
   for (const p of props2) if (p.kind === "hatch") p.y = Y_TOP;
   for (const s2 of f.spawns) {
@@ -16931,6 +17069,8 @@ function floorPlan(f, id, startX = 240) {
 function cellPlan(z, cell, id, startX) {
   const props2 = cell.things.map((t) => ({ id: `s${t.id}`, kind: t.kind, x: t.x, y: laneY(t.lane), w: 60, h: t.kind === "rope" ? 260 : t.kind.startsWith("ladder") ? 220 : 110, label: t.label }));
   const pal = { wall: "#4a3a24", floor: "#33291c", trim: "#1e170e", accent: "#f0b860", fog: "rgba(0,0,0,0)" };
+  const fight = z.fights?.[`${cell.col},${cell.row}`];
+  const encounters = fight?.length ? [{ triggerX: startX < 640 ? startX + 200 : 0, lockFrom: 0, lockTo: ROOM_W, waves: [fight.map((kind, i) => ({ kind, x: startX < 640 ? 980 - i * 120 : 300 + i * 120, y: laneY(30 + i * 53 % 110) }))] }] : [];
   const plan = {
     id,
     title: `정비 구역 (${depthLabel(z.depth)} 아래) · ${cell.label}`,
@@ -16940,7 +17080,7 @@ function cellPlan(z, cell, id, startX) {
     lane: [Y_TOP, Y_BOTTOM],
     startX,
     exitX: Infinity,
-    encounters: [],
+    encounters,
     props: props2,
     palette: { wall: pal.wall, floor: pal.floor, accent: pal.accent },
     banner: cell.kind === "attic" ? "선배들의 다락방" : `정비 구역 · ${cell.label}`,
@@ -16980,6 +17120,37 @@ function carPlan(id, buttons, depth) {
   plan.drawBackground = (ctx, camX) => drawBack(ctx, camX, segs, pal, plan);
   return plan;
 }
+function sidePlan(room, parent, id) {
+  const props2 = [{ id: "xback", kind: "door", x: 170, y: Y_TOP, w: 90, h: 180, label: "나가는 문 (복도로)" }];
+  for (const l of room.loot) {
+    if (l.kind === "chest") props2.push({ id: "xchest", kind: "pack", x: l.x, y: laneY(90), w: 60, h: 60, label: "선배가 남긴 배낭 (강화)" });
+    else if (l.kind === "gear") props2.push({ id: "xgear", kind: "gear", x: l.x, y: laneY(130), w: 50, h: 50, label: "용도 모를 장비" });
+    else props2.push({ id: `xitem${l.x}`, kind: "item", x: l.x, y: laneY(120), w: 28, h: 28, label: `보급품:${l.item ?? "heal"}` });
+  }
+  const segs = [
+    { ref: `chunk:side_${room.door}_a`, x: 0, w: CHUNK_W, flip: false, terrain: [] },
+    { ref: `chunk:side_${room.door}_b`, x: CHUNK_W, w: CHUNK_W, flip: true, terrain: [] }
+  ];
+  const encounters = room.fight.length ? [{ triggerX: 330, lockFrom: 0, lockTo: ROOM_W, waves: [room.fight.map((kind, i) => ({ kind, x: 780 + i * 130, y: laneY(20 + i * 61 % 130), elite: room.elite && i === 0 || void 0 }))] }] : [];
+  const plan = {
+    id,
+    title: `${parent.label} · ${room.label}`,
+    type: parent.type,
+    depth: parent.depth,
+    length: ROOM_W,
+    lane: [Y_TOP, Y_BOTTOM],
+    startX: 260,
+    exitX: Infinity,
+    encounters,
+    props: props2,
+    palette: { wall: room.palette.wall, floor: room.palette.floor, accent: room.palette.accent },
+    banner: room.secret ? `숨은 방 · ${room.label}` : room.label,
+    stage: { where: "side", terrain: [], floor: parent, side: room, fx: { light: 1, chaseX: -9999, squeeze: 0, noise: 0, red: false } }
+  };
+  plan.drawBackground = (ctx, camX) => drawBack(ctx, camX, segs, room.palette, plan);
+  plan.drawForeground = (ctx, camX, world) => drawFront(ctx, camX, world, plan);
+  return plan;
+}
 function endingPlan(id) {
   const pal = { wall: "#c9c4b4", floor: "#9a9483", trim: "#6b675b", accent: "#ffffff", fog: "rgba(0,0,0,0)" };
   const segs = [{ ref: "room:exit_hall", x: 0, w: ROOM_W, flip: false, terrain: [] }];
@@ -17001,10 +17172,10 @@ function endingPlan(id) {
   plan.drawBackground = (ctx, camX) => drawBack(ctx, camX, segs, pal, plan);
   return plan;
 }
-var FIXED_PROPS = /* @__PURE__ */ new Set(["elevator", "mirror", "panel", "chasedoor", "b12", "goalwall", "switch", "shutter", "door", "servicedoor", "rope", "up", "down", "fall", "ladder_up", "ladder_down", "left", "right", "intercom", "button", "getoff", "close", "greet"]);
+var FIXED_PROPS = /* @__PURE__ */ new Set(["firegate", "crack", "vent", "key", "elevator", "mirror", "panel", "chasedoor", "b12", "goalwall", "switch", "shutter", "door", "servicedoor", "rope", "up", "down", "fall", "ladder_up", "ladder_down", "left", "right", "intercom", "button", "getoff", "close", "greet"]);
 var BOARD_GAP = 1400;
 var artW = (p, floorType) => {
-  const base2 = Math.max(p.w, p.kind === "item" || p.kind === "belonging" || p.kind === "mark" ? 60 : p.kind === "passenger" || p.kind === "npc" ? 80 : 130);
+  const base2 = Math.max(p.w, p.kind === "firegate" ? 170 : 0, p.kind === "item" || p.kind === "belonging" || p.kind === "mark" ? 60 : p.kind === "passenger" || p.kind === "npc" ? 80 : 130);
   if (p.kind === "item" || p.kind === "belonging" || p.kind === "mark" || p.kind === "passenger" || p.kind === "npc") return base2;
   return Math.max(base2, propArtSize(p.kind, p.label, floorType)?.w ?? 0);
 };
@@ -17023,9 +17194,9 @@ function spreadProps(f, props2, startX) {
   const kept = props2.filter((p) => boardLike(p) && fixed2(p));
   const decor = new Set(props2.filter((p) => boardLike(p) && !must(p) && !fixed2(p)));
   for (const sg of f.segments) keepOut.push(...wallDecoSpans(placeFor("floor", f.type, sg.ref, f.sub, f.depth), sg.x, sg.w, sg.flip));
-  for (const p of props2.filter((q) => q.kind === "servicedoor")) {
+  for (const p of props2.filter((q) => q.kind === "servicedoor" || q.kind === "chasedoor" && f.placed.some((z) => `p${z.id}` === q.id && z.kind === "upper") || q.kind === "door" && f.placed.some((z) => `p${z.id}` === q.id && z.kind === "sidedoor") || q.kind === "crack")) {
     const h = artW(p, f.type) / 2;
-    const ok = (x2) => x2 - h >= 40 && x2 + h <= f.width - 40 && !keepOut.some(([a, b]) => x2 + h + 8 > a && x2 - h - 8 < b) && !terr.some((t) => x2 + h > t.x0 - 20 && x2 - h < t.x1 + 20) && !props2.some((q) => q !== p && fixed2(q) && Math.abs(q.y - p.y) < 90 && Math.abs(q.x - x2) < h + artW(q, f.type) / 2 + 16);
+    const ok = (x2) => x2 - h >= 40 && x2 + h <= f.width - 40 && !keepOut.some(([a, b]) => x2 + h + 8 > a && x2 - h - 8 < b) && !terr.some((t) => x2 + h > t.x0 - 20 && x2 - h < t.x1 + 20) && !props2.some((q) => q !== p && (q.kind === "shutter" || q.kind === "firegate") && Math.abs(q.x - x2) < h + 120) && !props2.some((q) => q !== p && fixed2(q) && Math.abs(q.y - p.y) < 90 && Math.abs(q.x - x2) < h + artW(q, f.type) / 2 + 16);
     if (ok(p.x)) continue;
     let x = null;
     for (let d3 = 24; d3 <= 1600 && x === null; d3 += 24) x = ok(p.x + d3) ? p.x + d3 : ok(p.x - d3) ? p.x - d3 : null;
@@ -17055,6 +17226,7 @@ function spreadProps(f, props2, startX) {
     }
   }
   for (const p of props2) if (fixed2(p)) taken.push({ a: p.x - artW(p, f.type) / 2, b: p.x + artW(p, f.type) / 2, y: p.y });
+  for (const g2 of f.placed.filter((q) => q.kind === "locked")) for (const y of [Y_TOP, (Y_TOP + Y_BOTTOM) / 2, Y_BOTTOM]) taken.push({ a: g2.x - 150, b: g2.x + 150, y });
   const free = (p, x) => {
     const h = artW(p, f.type) / 2;
     if (x - h < 40 || x + h > f.width - 40) return false;
@@ -17134,19 +17306,20 @@ function segAt(segs, x) {
 var CEIL = 40;
 function drawBack(ctx, camX, segs, pal, plan) {
   const [y0, y1] = plan.lane ?? [Y_TOP, Y_BOTTOM];
+  const where = plan.stage.where === "side" ? "floor" : plan.stage.where;
   const vx0 = camX - 40, vx1 = camX + 1320;
   const cx = camX + 640;
-  setFloorTone(plan.stage.where === "floor" ? plan.depth ?? 1 : 0);
+  setFloorTone(where === "floor" ? plan.depth ?? 1 : 0);
   for (const s2 of segs) {
     if (s2.x + s2.w < vx0 || s2.x > vx1) continue;
     const room = s2.ref.startsWith("room:");
-    const place3 = placeFor(plan.stage.where, plan.stage.floor?.type, s2.ref, plan.stage.floor?.sub, plan.stage.floor?.depth);
-    const floorPlace = plan.stage.where === "floor" ? placeFor("floor", plan.stage.floor?.type, "", null, plan.stage.floor?.depth) : place3;
+    const place3 = placeFor(where, plan.stage.floor?.type, s2.ref, plan.stage.floor?.sub, plan.stage.floor?.depth);
+    const floorPlace = where === "floor" ? placeFor("floor", plan.stage.floor?.type, "", null, plan.stage.floor?.depth) : place3;
     if (drawWallCell(ctx, place3, s2.ref, s2.x, s2.w, s2.flip, y0)) {
       const i = segs.indexOf(s2);
-      const prev = i > 0 ? placeFor(plan.stage.where, plan.stage.floor?.type, segs[i - 1].ref, plan.stage.floor?.sub, plan.stage.floor?.depth) : place3;
+      const prev = i > 0 ? placeFor(where, plan.stage.floor?.type, segs[i - 1].ref, plan.stage.floor?.sub, plan.stage.floor?.depth) : place3;
       if (prev !== place3) seamPillar(ctx, s2.x, y0);
-      const next = i + 1 < segs.length ? placeFor(plan.stage.where, plan.stage.floor?.type, segs[i + 1].ref, plan.stage.floor?.sub, plan.stage.floor?.depth) : place3;
+      const next = i + 1 < segs.length ? placeFor(where, plan.stage.floor?.type, segs[i + 1].ref, plan.stage.floor?.sub, plan.stage.floor?.depth) : place3;
       if (next !== place3) seamPillar(ctx, s2.x + s2.w, y0);
       if (!drawFloor(ctx, floorPlace, s2.x, s2.x + s2.w, y0, 720) && !drawFloor(ctx, place3, s2.x, s2.x + s2.w, y0, 720)) {
         ctx.fillStyle = pal.floor;
@@ -17191,8 +17364,140 @@ function drawBack(ctx, camX, segs, pal, plan) {
   const layers = [];
   plan.depthLayers = layers;
   const allTerr = segs.flatMap((s2) => s2.terrain);
-  for (const s2 of segs) if (!(s2.x + s2.w < vx0 || s2.x > vx1)) for (const t of s2.terrain) drawTerrain(ctx, t, pal, y0, y1, placeFor(plan.stage.where, plan.stage.floor?.type, plan.stage.where === "floor" ? "" : s2.ref, plan.stage.floor?.sub, plan.stage.floor?.depth), layers, allTerr);
+  for (const s2 of segs) if (!(s2.x + s2.w < vx0 || s2.x > vx1)) for (const t of s2.terrain) drawTerrain(ctx, t, pal, y0, y1, placeFor(where, plan.stage.floor?.type, where === "floor" ? "" : s2.ref, plan.stage.floor?.sub, plan.stage.floor?.depth), layers, allTerr);
+  drawMetro(ctx, plan, vx0, vx1, y0);
   void CHUNK_W;
+}
+function drawMetro(ctx, plan, vx0, vx1, y0) {
+  const P = 3;
+  const f = plan.stage.floor;
+  for (const p of plan.props ?? []) {
+    if (p.x < vx0 - 100 || p.x > vx1 + 100) continue;
+    const x = Math.round(p.x);
+    const pl = f && p.id.startsWith("p") ? f.placed.find((z) => `p${z.id}` === p.id) : void 0;
+    if (p.kind === "crack") {
+      const broken = !!p.label?.includes("부서진");
+      ctx.save();
+      if (broken) {
+        ctx.fillStyle = "#0b0a09";
+        ctx.beginPath();
+        ctx.moveTo(x - 50, y0 - 6);
+        ctx.lineTo(x - 56, y0 - 120);
+        ctx.lineTo(x - 30, y0 - 168);
+        ctx.lineTo(x + 18, y0 - 176);
+        ctx.lineTo(x + 52, y0 - 130);
+        ctx.lineTo(x + 48, y0 - 6);
+        ctx.closePath();
+        ctx.fill();
+        ctx.fillStyle = "#6b6258";
+        for (let i = 0; i < 9; i++) ctx.fillRect(x - 64 + i * 37 % 128, y0 + 4 + i * 13 % 18, P * 3, P * 2);
+      } else {
+        ctx.strokeStyle = "rgba(20,16,12,0.85)";
+        ctx.lineWidth = P;
+        const lines2 = [
+          [0, -30, -20, -70, -8, -110, -34, -150],
+          [0, -30, 24, -64, 14, -100, 40, -138],
+          [-8, -110, 10, -126],
+          [14, -100, -4, -84]
+        ];
+        for (const l of lines2) {
+          ctx.beginPath();
+          ctx.moveTo(x + l[0], y0 + l[1]);
+          for (let i = 2; i < l.length; i += 2) ctx.lineTo(x + l[i], y0 + l[i + 1]);
+          ctx.stroke();
+        }
+        ctx.fillStyle = "rgba(255,255,255,0.12)";
+        ctx.fillRect(x - 22, y0 - 74, P * 2, P);
+        ctx.fillRect(x + 20, y0 - 66, P * 2, P);
+      }
+      ctx.restore();
+    } else if (p.kind === "firegate") {
+      const hw = 74, top = y0 - 236;
+      ctx.fillStyle = "#1a1c1f";
+      ctx.fillRect(x - hw - 10, top - 26, hw * 2 + 20, 30);
+      ctx.fillStyle = "#3b4046";
+      ctx.fillRect(x - hw - 6, top - 22, hw * 2 + 12, 20);
+      ctx.fillStyle = "#26292d";
+      ctx.fillRect(x - hw - 10, top, 10, y0 - top + 4);
+      ctx.fillRect(x + hw, top, 10, y0 - top + 4);
+      for (let yy = top; yy < y0; yy += 12) {
+        ctx.fillStyle = "#7d848b";
+        ctx.fillRect(x - hw, yy, hw * 2, 9);
+        ctx.fillStyle = "#5a6168";
+        ctx.fillRect(x - hw, yy + 9, hw * 2, 3);
+        ctx.fillStyle = "#9aa1a8";
+        ctx.fillRect(x - hw, yy, hw * 2, 2);
+      }
+      ctx.fillStyle = "#3c4146";
+      ctx.fillRect(x - hw, y0 - 14, hw * 2, 14);
+      ctx.fillStyle = "#c23a2c";
+      ctx.fillRect(x - 30, top + 70, 60, 34);
+      ctx.fillStyle = "#ffe9d0";
+      ctx.fillRect(x - 24, top + 78, 48, 4);
+      ctx.fillRect(x - 24, top + 90, 30, 4);
+      ctx.fillStyle = "#e8c35a";
+      ctx.fillRect(x + hw - 30, y0 - 90, 18, 26);
+      ctx.fillStyle = "#1a1408";
+      ctx.fillRect(x + hw - 23, y0 - 84, 4, 8);
+      ctx.fillRect(x + hw - 22, y0 - 76, 2, 6);
+      for (let i = 0; i < 10; i++) {
+        ctx.fillStyle = i % 2 ? "#1a1a1a" : "#d9b02a";
+        ctx.beginPath();
+        ctx.moveTo(x - hw + i * 15, y0);
+        ctx.lineTo(x - hw + i * 15 + 15, y0);
+        ctx.lineTo(x - hw + i * 15 + 5, y0 + 250);
+        ctx.lineTo(x - hw + i * 15 - 10, y0 + 250);
+        ctx.closePath();
+        ctx.fill();
+      }
+    } else if (p.kind === "vent") {
+      const open = !!p.label?.includes("열린");
+      const vy = y0 - 64;
+      ctx.fillStyle = "#2a2d30";
+      ctx.fillRect(x - 40, vy, 80, 48);
+      ctx.fillStyle = open ? "#050505" : "#575d62";
+      ctx.fillRect(x - 34, vy + 6, 68, 36);
+      if (!open) {
+        ctx.fillStyle = "#2f3336";
+        for (let i = 0; i < 6; i++) ctx.fillRect(x - 34, vy + 9 + i * 6, 68, P);
+        ctx.fillStyle = "#8a8f93";
+        for (const [dx, dy] of [[-36, 2], [32, 2], [-36, 40], [32, 40]]) ctx.fillRect(x + dx, vy + dy, P, P);
+      }
+    } else if (p.kind === "key") {
+      const t = (typeof performance !== "undefined" ? performance.now() : 0) / 300;
+      const ky = Math.round(p.y - 40 + Math.sin(t) * 4);
+      ctx.save();
+      ctx.fillStyle = "rgba(255,214,110,0.22)";
+      ctx.beginPath();
+      ctx.arc(x, ky, 30, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = "#3a2a08";
+      ctx.fillRect(x - 16, ky - 10, 14, 20);
+      ctx.fillRect(x - 4, ky - 3, 26, 6);
+      ctx.fillStyle = "#f2c14e";
+      ctx.fillRect(x - 13, ky - 7, 8, 14);
+      ctx.fillRect(x - 2, ky - 1, 22, 3);
+      ctx.fillRect(x + 12, ky + 2, 3, 6);
+      ctx.fillRect(x + 18, ky + 2, 3, 5);
+      ctx.fillStyle = "#3a2a08";
+      ctx.fillRect(x - 10, ky - 3, 3, 6);
+      ctx.restore();
+      ctx.fillStyle = "rgba(0,0,0,0.35)";
+      ctx.fillRect(x - 18, Math.round(p.y) - 4, 36, 6);
+    } else if (pl && (pl.kind === "upper" || pl.kind === "sidedoor")) {
+      const h = propArtSize(p.kind, p.label, f?.type)?.h ?? 190;
+      const ly = Math.round(Y_TOP - h - 18);
+      const col = pl.kind === "upper" ? p.label?.includes("열림") ? "#5fe08a" : "#e0503c" : p.label?.includes("비었다") ? "#3a3a3a" : "#ffb840";
+      ctx.fillStyle = "#1c1f22";
+      ctx.fillRect(x - 12, ly - 4, 24, 14);
+      ctx.fillStyle = col;
+      ctx.fillRect(x - 8, ly, 16, 6);
+      if (!p.label?.includes("비었다")) {
+        ctx.fillStyle = col + "33";
+        ctx.fillRect(x - 20, ly - 10, 40, 26);
+      }
+    }
+  }
 }
 function drawBarricade(ctx, x0, x1, fy) {
   const w = x1 - x0;
@@ -17579,7 +17884,19 @@ function newOuting(meta, o) {
     favorDelta: 0,
     log: [],
     ending: false,
-    ride: 0
+    ride: 0,
+    floorTypes: {},
+    keys: [],
+    gatesOpen: [],
+    shortcuts: [],
+    secretDepth: r() < 0.75 ? 2 + Math.floor(r() * 4) : 0,
+    services: {},
+    explored: {},
+    hatchX: {},
+    sides: {},
+    upgrades: [],
+    upgradeN: 0,
+    fightsWon: 0
   };
 }
 function addFavor(meta, out, n, why) {
@@ -17646,8 +17963,55 @@ function createElevatorStage(store2, hooks = {}) {
     sentHere: false,
     warned: /* @__PURE__ */ new Set(),
     hurtCd: 0,
-    red: false
+    red: false,
+    revisit: false,
+    crack: /* @__PURE__ */ new Map(),
+    restN: 0
   });
+  const nodes = /* @__PURE__ */ new Map();
+  let node = null;
+  const visit = (key, make, startX) => {
+    let n = nodes.get(key);
+    if (!n) {
+      const plan = make();
+      n = { plan, rt: newRt(plan), all: plan.encounters.slice(), cleared: /* @__PURE__ */ new Set() };
+      nodes.set(key, n);
+    } else {
+      const r = n.rt;
+      r.t = 0;
+      r.revisit = true;
+      r.stillT = 0;
+      r.hurtCd = 0;
+      r.predator = false;
+      r.summonCd = Math.max(r.summonCd, 3);
+      if (n.plan.type === "chase") r.chaseX = (startX ?? n.plan.startX) - 600;
+    }
+    if (startX !== void 0) n.plan.startX = startX;
+    n.rt.prevX = n.rt.safeX = n.plan.startX;
+    const cleared = n.cleared;
+    n.plan.encounters = n.all.filter((e) => !cleared.has(e.triggerX));
+    node = n;
+    rt = n.rt;
+    return n.plan;
+  };
+  const track = (api) => {
+    const t = Object.create(api);
+    t.setProp = (id, patch) => {
+      api.setProp(id, patch);
+      const props2 = rt?.plan.props;
+      if (!props2) return;
+      const i = props2.findIndex((q) => q.id === id);
+      if (patch === null) {
+        if (i >= 0) props2.splice(i, 1);
+      } else if (i >= 0) props2[i] = { ...props2[i], ...patch };
+      else props2.push({ id, kind: "decor", x: 0, y: Y_TOP, w: 40, h: 40, ...patch });
+    };
+    return t;
+  };
+  const patchAt = (key, id, patch) => {
+    const pr = nodes.get(key)?.plan.props?.find((q) => q.id === id);
+    if (pr) Object.assign(pr, patch);
+  };
   let later = [];
   const defer = (run) => (res) => {
     const plan = rt?.plan.id;
@@ -17675,18 +18039,33 @@ ${RULE[id].variant.text}` : ""}`, 4);
   };
   const buildFloorPlan = (t) => {
     const o = out;
-    const f = makeFloor({ seed: o.seed, depth: t.depth, type: t.type, sub: t.sub, danger: o.danger, growth: o.growth, flags: o.flags, epoch: meta.epoch, exitOpen: t.depth === 1 && exitOpen(meta), tired: o.tired });
+    const known = o.floorTypes[t.depth];
+    if (known) t.type = known.type, t.sub = known.sub;
+    const key = `floor:${t.depth}`;
+    const fresh = !nodes.has(key);
+    const plan = visit(
+      key,
+      () => {
+        const f2 = makeFloor({ seed: o.seed, depth: t.depth, type: t.type, sub: t.sub, danger: o.danger, growth: o.growth, flags: o.flags, epoch: meta.epoch, exitOpen: t.depth === 1 && exitOpen(meta), tired: o.tired, secret: o.secretDepth === t.depth });
+        log(`${f2.label} 도착 · 조각 ${f2.segments.length - 2 - (f2.guardian ? 1 : 0)}개 · 폭 ${f2.width}px${f2.fallback ? ` · 고정 배치 ${f2.fallback}` : ""}${f2.guardian ? ` · 수호자 ${FLOOR_TYPES[f2.type].guardians.find((g2) => g2.kind === f2.guardian)?.label ?? f2.guardian}` : ""}${f2.tuning.keyGate ? " · 잠긴 방화셔터" : ""}${f2.placed.some((p) => p.kind === "crack" || p.kind === "vent") ? " · 숨은 길" : ""}`);
+        return floorPlan(f2, `floor:${t.depth}:${++planN}`, t.startX ?? 240);
+      },
+      t.startX ?? 240
+    );
+    const f = plan.stage.floor;
+    o.floorTypes[t.depth] = { type: f.type, sub: f.sub };
     o.depth = t.depth;
     o.where = "floor";
     o.floor = f;
     o.tired = false;
-    if (!o.visited.some((v) => v.depth === t.depth)) o.visited.push({ depth: t.depth, type: t.type });
-    if (o.lastTypes[o.lastTypes.length - 1] !== t.type || o.lastTypes.length === 0) o.lastTypes.push(t.type);
+    if (fresh) {
+      if (!o.visited.some((v) => v.depth === t.depth)) o.visited.push({ depth: t.depth, type: f.type });
+      if (o.lastTypes[o.lastTypes.length - 1] !== f.type || o.lastTypes.length === 0) o.lastTypes.push(f.type);
+    }
     if (t.depth > meta.deepest) meta.deepest = t.depth;
     meta.bestFloors = Math.max(meta.bestFloors, o.visited.length);
     save2();
-    log(`${f.label} 도착 · 조각 ${f.segments.length - 2 - (f.guardian ? 1 : 0)}개 · 폭 ${f.width}px${f.fallback ? ` · 고정 배치 ${f.fallback}` : ""}${f.guardian ? ` · 수호자 ${FLOOR_TYPES[f.type].guardians.find((g2) => g2.kind === f.guardian)?.label ?? f.guardian}` : ""}`);
-    return floorPlan(f, `floor:${t.depth}:${++planN}`, t.startX ?? 240);
+    return plan;
   };
   const buildCell = (t) => {
     const o = out;
@@ -17694,22 +18073,42 @@ ${RULE[id].variant.text}` : ""}`, 4);
     o.cell = [t.col, t.row];
     o.where = "service";
     const cell = cellAt(z, t.col, t.row);
-    const startX = t.side === "l" ? 120 : t.side === "r" ? ROOM_W - 120 : t.side === "u" ? 560 : t.side === "d" ? 720 : 400;
-    return cellPlan(z, cell, `service:${z.depth}:${t.col},${t.row}:${++planN}`, startX);
+    const downX = cell.things.find((x) => x.kind === "down")?.x ?? 880;
+    const startX = t.side === "l" ? 120 : t.side === "r" ? ROOM_W - 120 : t.side === "u" ? 560 : t.side === "d" ? 720 : t.side === "down" ? Math.max(120, downX - 110) : 400;
+    const sv = o.services[z.depth];
+    const k = `${t.col},${t.row}`;
+    if (sv && !sv.seen.includes(k)) sv.seen.push(k);
+    return visit(`cell:${z.depth}:${z.reroll}:${k}`, () => cellPlan(z, cell, `service:${z.depth}:${k}:${++planN}`, startX), startX);
   };
-  const enterService = () => {
+  const buildSide = (t) => {
     const o = out;
-    const again = o.service && o.serviceDepth === o.depth;
-    if (again) o.rerolls++;
-    o.service = makeService({ seed: o.seed, depth: o.depth, reroll: again ? o.rerolls : 0, flags: o.flags, epoch: meta.epoch });
-    o.serviceDepth = o.depth;
+    const f = nodes.get(`floor:${t.depth}`).plan.stage.floor;
+    o.where = "side";
+    return visit(`side:${t.depth}:${t.door}`, () => sidePlan(makeSide(o.seed, f, t.door, t.secret, t.label), f, `side:${t.depth}:${t.door}:${++planN}`), 260);
+  };
+  const enterService = (depth, from) => {
+    const o = out;
+    const sv = o.services[depth] ??= { reroll: -1, seen: [], key: false };
+    sv.reroll++;
+    sv.seen = [];
+    if (sv.reroll > 0) log("정비 구역이 다시 짜였다 (다락방·로프 위치는 그대로)");
+    const f = nodes.get(`floor:${depth}`)?.plan.stage.floor;
+    sv.key = !!f?.tuning.keyGate && !o.keys.includes(depth) && !o.gatesOpen.includes(depth);
+    o.service = sv.zone = makeService({ seed: o.seed, depth, reroll: sv.reroll, flags: o.flags, epoch: meta.epoch, key: sv.key });
+    o.serviceDepth = depth;
     o.serviceTime = 0;
-    if (again) log("정비 구역이 다시 짜였다 (다락방·로프 위치는 그대로)");
-    return { to: "service", col: o.service.entryCell[0], row: o.service.entryCell[1], side: "u" };
+    o.rerolls = sv.reroll;
+    const c = from === "top" ? o.service.entryCell : o.service.downCell;
+    return { to: "service", col: c[0], row: c[1], side: from === "top" ? "u" : "down" };
   };
   const buttonsNow = () => {
     const o = out;
-    return elevatorButtons({ seed: o.seed + o.ride * 17, depth: o.depth, favor: meta.favor, epoch: meta.epoch, last: o.lastTypes, reveal: o.reveal, deepest: meta.deepest, exitOpen: exitOpen(meta) });
+    const bs = elevatorButtons({ seed: o.seed + o.ride * 17, depth: o.depth, favor: meta.favor, epoch: meta.epoch, last: o.lastTypes, reveal: o.reveal, deepest: meta.deepest, exitOpen: exitOpen(meta) });
+    for (const b of bs) {
+      const k = o.floorTypes[b.depth];
+      if (k && !b.exit) b.type = k.type, b.sub = k.sub;
+    }
+    return bs;
   };
   const finishWith = (api, t) => {
     out.pending = t;
@@ -17788,7 +18187,7 @@ ${RULE[id].variant.text}` : ""}`, 4);
           }
           break;
         case "glass":
-          if (inX && p.z <= 0.5 && Math.abs(p.x - r.prevX) > 0.5) r.noise += (p.running ? 0.03 : 0.012) * (rt.plan.stage.floor?.tuning.noiseMul ?? 1);
+          if (inX && p.z <= 0.5 && Math.abs(p.x - r.prevX) > 0.5) r.noise += (p.running ? 0.03 : 0.012) * (rt.plan.stage.floor?.tuning.noiseMul ?? 1) * quietK();
           break;
       }
     }
@@ -17814,7 +18213,7 @@ ${RULE[id].variant.text}` : ""}`, 4);
     r.stillT = moved || p.airborne ? 0 : r.stillT + DT;
     const tune = f.tuning;
     if (f.type === "silent" || f.type === "deep") {
-      if (p.running && moved) r.noise += 0.02 * tune.noiseMul;
+      if (p.running && moved) r.noise += 0.02 * tune.noiseMul * quietK();
       r.noise = Math.max(0, r.noise - 4e-3);
       api.world.noise = Math.min(1, r.noise);
       r.summonCd -= DT;
@@ -17827,7 +18226,7 @@ ${RULE[id].variant.text}` : ""}`, 4);
       }
     }
     if (f.type === "dark" || f.type === "deep") {
-      if (f.type === "dark") r.light = Math.max(0.12, r.light - DT / 9 * tune.lightFade);
+      if (f.type === "dark") r.light = Math.max(0.12, r.light - DT / 9 * tune.lightFade * (out.upgrades.includes("battery") ? 0.5 : 1));
       api.world.light = r.light;
       r.stalkCd -= DT;
       if (r.stillT > 1.5 && r.stalkCd <= 0) {
@@ -17874,6 +18273,14 @@ ${RULE[id].variant.text}` : ""}`, 4);
     }
     for (const sh of f.placed.filter((x) => x.kind === "shutter"))
       if (!r.opened.has(`p${sh.id}`) && p.x > sh.x - 26 && r.prevX <= sh.x - 26 + 40) api.movePlayer(Math.min(p.x, sh.x - 30), p.y);
+    for (const g2 of f.placed.filter((x) => x.kind === "locked")) {
+      if (out.gatesOpen.includes(f.depth)) break;
+      if (p.x > g2.x - 26 && r.prevX <= g2.x - 26 + 40) api.movePlayer(Math.min(p.x, g2.x - 30), p.y);
+      if (Math.abs(p.x - g2.x) < 260 && !r.warned.has("gate")) {
+        r.warned.add("gate");
+        api.world.say(out.keys.includes(f.depth) ? "방화셔터. 정비 열쇠가 있다. E로 연다." : "방화셔터가 잠겨 있다. 열쇠는 이 층 정비 구역 어딘가 (해치·점검문으로).", 3.5);
+      }
+    }
     if (f.type === "replica") {
       const nogreet = out.flags.includes("replica_nogreet");
       for (const s2 of f.spawns.filter((s3) => s3.role === "resident")) {
@@ -18008,12 +18415,14 @@ ${RULE[id].variant.text}` : ""}`, 4);
       meta = newMeta();
       save2();
     },
+    mapView: () => mapView(),
     firstFloor(run) {
       out = newOuting(meta, { seed: run.seed, agent: run.agent, danger: run.danger });
       meta.outings++;
       planN = 0;
+      nodes.clear();
+      node = null;
       const plan = buildFloorPlan({ to: "floor", depth: 1, type: "lobby", sub: null });
-      rt = newRt(plan);
       log(`출동 ${meta.outings}회째 · 씨앗 ${run.seed}${out.variants.length ? ` · 이번 출동 변형: ${out.variants.map((v) => RULE[v].variant.text.replace("이번 출동: ", "")).join(" / ")}` : ""}`);
       return plan;
     },
@@ -18025,6 +18434,8 @@ ${RULE[id].variant.text}` : ""}`, 4);
         save2();
         log(o.ending ? "출구로 나왔다." : `귀환 로프로 돌아왔다. 송신 ${sent.length}줄`);
         rt = null;
+        node = null;
+        nodes.clear();
         return null;
       }
       const t = o.pending ?? { to: "floor", depth: o.depth + 1, type: pickType(o.depth + 1, o.lastTypes, o.seed, meta.epoch), sub: null };
@@ -18038,19 +18449,24 @@ ${RULE[id].variant.text}` : ""}`, 4);
         o.rideAttack = false;
         o.stuck = meta.favor <= -2 ? 10 : 0;
         plan = carPlan(`car:${++planN}`, buttonsNow(), o.depth);
+        rt = newRt(plan);
+        node = null;
       } else if (t.to === "service") plan = buildCell(t);
+      else if (t.to === "side") plan = buildSide(t);
       else if (t.to === "ending") {
         o.where = "ending";
         plan = endingPlan(`ending:${++planN}`);
+        rt = newRt(plan);
+        node = null;
       } else {
         if (t.type === "replica" && !t.sub) t.sub = pickSub(o.seed, t.depth, meta.epoch);
         plan = buildFloorPlan(t);
       }
-      rt = newRt(plan);
       return plan;
     },
     tick(api, floor) {
       if (!rt || rt.plan.id !== floor.id || !out) return;
+      api = track(api);
       const r = rt;
       const p = api.world.player;
       if (r.t === 0) onEnter(api);
@@ -18062,6 +18478,7 @@ ${RULE[id].variant.text}` : ""}`, 4);
       r.t += DT;
       r.hurtCd -= DT;
       const where = r.plan.stage.where;
+      metroTick(api);
       if (where === "floor" || where === "service") terrain(api, r.plan.stage.terrain);
       if (where === "floor") floorRules(api);
       if (where === "service") serviceRules(api);
@@ -18078,8 +18495,10 @@ ${RULE[id].variant.text}` : ""}`, 4);
     },
     onEvent(api, floor, e) {
       if (!rt || rt.plan.id !== floor.id || !out) return;
+      api = track(api);
+      metroEvent(api, e);
       const f = rt.plan.stage.floor;
-      const mul = f?.tuning.noiseMul ?? 1;
+      const mul = (f?.tuning.noiseMul ?? 1) * quietK();
       const loud = f && (f.type === "silent" || f.type === "deep");
       switch (e.type) {
         case "land":
@@ -18116,12 +18535,15 @@ ${RULE[id].variant.text}` : ""}`, 4);
     },
     onInteract(api, floor, prop) {
       if (!rt || rt.plan.id !== floor.id || !out) return;
+      api = track(api);
       const o = out;
       const r = rt;
       const p = api.world.player;
-      const pl = placedOf(prop);
+      const pl = r.plan.stage.where === "floor" ? placedOf(prop) : void 0;
       const ch = r.choices.get(prop.id);
       if (ch) return resolveChoice(api, prop, ch);
+      const mk = pl && (pl.kind === "upper" || pl.kind === "sidedoor" || pl.kind === "locked") ? pl.kind : ["crack", "vent", "key"].includes(prop.kind) || r.plan.stage.where === "side" && prop.id.startsWith("x") ? prop.kind : null;
+      if (mk) return metroInteract(api, prop, mk, pl);
       switch (prop.kind) {
         // ── 층
         case "elevator":
@@ -18213,8 +18635,9 @@ ${RULE[id].variant.text}` : ""}`, 4);
         case "hatch":
         case "servicedoor":
           o.returnX = prop.x;
+          o.hatchX[o.depth] = prop.x;
           api.world.emit({ type: "door", x: p.x, id: "service" });
-          finishWith(api, enterService());
+          finishWith(api, enterService(o.depth, "top"));
           break;
         case "goalwall":
           if (r.trial) {
@@ -18285,13 +18708,22 @@ ${RULE[id].variant.text}` : ""}`, 4);
           talkPassenger(api, prop);
           break;
         // ── 정비 구역
-        case "up":
+        case "up": {
+          const d3 = o.serviceDepth;
+          const up = nodes.get(`floor:${d3}`)?.plan.stage.floor;
+          const hx = o.hatchX[d3] ?? up?.placed.find((q) => q.kind === "hatch" || q.kind === "servicedoor")?.x ?? 240;
           api.world.emit({ type: "door", x: p.x, id: "hatch" });
-          finishWith(api, { to: "floor", depth: o.serviceDepth, type: o.floor.type, sub: o.floor.sub, startX: o.returnX });
+          finishWith(api, { to: "floor", depth: d3, type: o.floorTypes[d3]?.type ?? "lobby", sub: o.floorTypes[d3]?.sub ?? null, startX: hx });
           break;
+        }
         case "down": {
           const d3 = o.serviceDepth + 1;
-          finishWith(api, { to: "floor", depth: d3, type: pickType(d3, o.lastTypes, o.seed, meta.epoch, 888), sub: null, startX: 240 });
+          if (!o.shortcuts.includes(d3)) {
+            o.shortcuts.push(d3);
+            log(`지름길: ${depthLabel(d3)} 위층 점검문을 열었다`);
+          }
+          patchAt(`floor:${d3}`, upperId(d3) ?? "", { label: "위층 점검문 (열림 · 정비 구역)" });
+          finishWith(api, { to: "floor", depth: d3, type: o.floorTypes[d3]?.type ?? pickType(d3, o.lastTypes, o.seed, meta.epoch, 888), sub: o.floorTypes[d3]?.sub ?? null, startX: UPPER_X + 110 });
           break;
         }
         case "fall": {
@@ -18323,8 +18755,8 @@ ${RULE[id].variant.text}` : ""}`, 4);
           api.finish("withdraw");
           break;
         case "bed":
-          if (r.rested) api.world.say("더 쉬면 위험하다.", 1.5);
-          else r.rested = true, api.heal(999), api.world.say("잠깐 눈을 붙였다. 체력 회복.", 2);
+          if (r.restN >= (o.upgrades.includes("rest") ? 2 : 1)) api.world.say("더 쉬면 위험하다.", 1.5);
+          else r.restN++, r.rested = true, api.heal(999), api.world.say("잠깐 눈을 붙였다. 체력 회복.", 2);
           break;
         case "intercom":
           if (!r.sentHere) {
@@ -18425,6 +18857,15 @@ ${RULE[id].variant.text}` : ""}`, 4);
     api.world.noise = 0;
     api.note("stage.depth", o.depth);
     api.note("stage.visited", o.visited.map((v) => `${depthLabel(v.depth)} ${FLOOR_TYPES[v.type].label}`));
+    if (r.revisit) {
+      api.world.say(plan.stage.where === "floor" ? `돌아왔다 · ${plan.stage.floor.label}` : plan.stage.where === "side" ? `${plan.banner}` : `${plan.banner}`, 2);
+      return;
+    }
+    if (plan.stage.where === "side") {
+      const sd = plan.stage.side;
+      api.world.say(sd.secret ? "벽 너머에 방이 있었다. 누군가 숨겨 둔 배낭." : plan.encounters.length ? `${sd.label}. 안에 뭔가 있다.` : `${sd.label}.`, 2.5);
+      return;
+    }
     if (plan.stage.where === "floor") {
       const f = plan.stage.floor;
       api.world.emit({ type: "ding", x: plan.startX });
@@ -18494,6 +18935,10 @@ ${RULE[id].variant.text}` : ""}`, 4);
     if (ch.choice === "deal") {
       clearChoices(api, "deal:");
       return applyDeal(api, ch.deal);
+    }
+    if (ch.choice === "upgrade") {
+      clearChoices(api, "up:");
+      return applyUpgrade(api, UPGRADE_BY_ID[ch.up]);
     }
     clearChoices(api, `h${ch.hook.id}:`);
     applyPassenger(api, prop, ch.hook, ch.choice);
@@ -18586,10 +19031,516 @@ ${RULE[id].variant.text}` : ""}`, 4);
       api.setProp(id, { id, kind: "choice", x: prop.x + 100 + i * 90, y: prop.y + 60, w: 60, h: 40, label: label3 });
     });
   };
+  const quietK = () => out?.upgrades.includes("quiet") ? 0.5 : 1;
+  const upperId = (d3) => {
+    const f = nodes.get(`floor:${d3}`)?.plan.stage.floor;
+    const u = f?.placed.find((q) => q.kind === "upper");
+    return u ? `p${u.id}` : null;
+  };
+  let rushT = 0;
+  const metroTick = (api) => {
+    const o = out;
+    const r = rt;
+    const p = api.world.player;
+    if (r.plan.stage.where === "floor") {
+      const w = r.plan.length;
+      const e = o.explored[o.depth] ??= [Math.max(0, p.x - 700), Math.min(w, p.x + 700)];
+      e[0] = Math.max(0, Math.min(e[0], p.x - 700));
+      e[1] = Math.min(w, Math.max(e[1], p.x + 700));
+    }
+    rushT = Math.max(0, rushT - DT);
+    p.dmgMul = powerOf(o.upgrades) * (rushT > 0 ? 1.3 : 1);
+  };
+  const metroEvent = (api, e) => {
+    const o = out;
+    const r = rt;
+    const p = api.world.player;
+    if (e.type === "combat:clear" && node) {
+      const enc = api.world.floor.encounters[e.index];
+      if (enc) {
+        node.cleared.add(enc.triggerX);
+        if (enc.waves.some((w) => w.some((s2) => s2.boss))) offerUpgrade(api, "수호자를 쓰러뜨렸다");
+        else if (++o.fightsWon % 3 === 0) offerUpgrade(api, `싸움 ${o.fightsWon}판째`);
+      }
+    }
+    if (e.type === "enemyDie") {
+      if (o.upgrades.includes("blood")) api.heal(5);
+      if (o.upgrades.includes("rush")) rushT = 3;
+    }
+    if (e.type === "hit" && e.kind !== "enemy" && o.upgrades.includes("spirit")) {
+      const pl = p;
+      pl.gauge = Math.min(100, pl.gauge + 2);
+    }
+    if ((e.type === "whiff" || e.type === "hit" || e.type === "ability" || e.type === "super") && r.plan.stage.where === "floor") {
+      for (const pr of api.world.floor === r.plan ? r.plan.props ?? [] : []) {
+        if (pr.kind !== "crack" || pr.label?.includes("부서진")) continue;
+        const dx = pr.x - p.x;
+        if (Math.abs(dx) > 130 || Math.abs(dx) > 30 && Math.sign(dx) !== p.dir) continue;
+        const left = (r.crack.get(pr.id) ?? 3) - (e.type === "ability" || e.type === "super" ? 3 : 1);
+        r.crack.set(pr.id, left);
+        api.world.shake(4, 3);
+        api.world.fx("dust", pr.x, Y_TOP + 30, 120);
+        if (left <= 0) {
+          api.setProp(pr.id, { label: "부서진 벽 틈 (숨은 방)" });
+          api.world.shake(10, 6);
+          api.world.fx("boom", pr.x, Y_TOP + 30, 100);
+          api.world.emit({ type: "door", x: pr.x, id: "crack" });
+          api.world.say("벽이 무너졌다. 안쪽에 방이 있다. (E)", 2.5);
+          log(`숨은 길: ${o.floor?.label} 금 간 벽을 부쉈다`);
+        } else if (left === 2) api.world.say("벽이 울린다. 금이 더 벌어진다.", 1.2);
+      }
+    }
+  };
+  const enterSide = (api, prop, secret, label3) => {
+    const o = out;
+    const key = `${o.depth}:${prop.id}`;
+    o.sides[key] ??= { done: false, secret, x: prop.x };
+    o.returnX = prop.x;
+    api.world.emit({ type: "door", x: prop.x, id: "side" });
+    finishWith(api, { to: "side", depth: o.depth, door: prop.id, secret, label: label3 });
+  };
+  const metroInteract = (api, prop, kind, pl) => {
+    const o = out;
+    const r = rt;
+    const p = api.world.player;
+    const depth = o.depth;
+    switch (kind) {
+      case "upper":
+        if (o.shortcuts.includes(depth)) {
+          api.world.emit({ type: "door", x: p.x, id: "service" });
+          finishWith(api, enterService(depth - 1, "bottom"));
+        } else api.world.say("반대편에서 잠겨 있다. 위층 정비 구역의 아래 점검문으로 내려오면 열린다.", 3);
+        break;
+      case "locked": {
+        if (o.gatesOpen.includes(depth)) break;
+        const master = o.upgrades.includes("master") && !o.upgrades.includes("master:used");
+        if (o.keys.includes(depth) || master) {
+          if (!o.keys.includes(depth)) o.upgrades.push("master:used");
+          o.gatesOpen.push(depth);
+          api.setProp(prop.id, null);
+          api.world.emit({ type: "door", x: p.x, id: "gate" });
+          api.world.shake(8, 3);
+          api.world.say(o.keys.includes(depth) ? "열쇠가 맞는다. 방화셔터가 올라간다." : "만능 열쇠로 셔터를 땄다.", 2.5);
+          log(`${o.floor?.label} 방화셔터를 열었다`);
+        } else api.world.say("잠겨 있다. 열쇠는 이 층 정비 구역 어딘가에 있다. (해치·점검문으로 내려가 찾기)", 3.5);
+        break;
+      }
+      case "sidedoor":
+        if (o.sides[`${depth}:${prop.id}`]?.done) api.world.say("이미 뒤진 방이다.", 1.5);
+        else enterSide(api, prop, false, String(pl?.label ?? prop.label ?? "옆방"));
+        break;
+      case "crack":
+        if (prop.label?.includes("부서진")) enterSide(api, prop, true, "숨은 방");
+        else api.world.say("금 간 벽. 세게 치면 무너질 것 같다.", 2);
+        break;
+      case "vent":
+        if (prop.label?.includes("열린")) enterSide(api, prop, true, "숨은 방");
+        else if (!p.crouching) api.world.say("막힌 덕트. ↓ 앉은 채로 E — 덮개를 뜯는다.", 2.5);
+        else {
+          api.setProp(prop.id, { label: "열린 덕트 (숨은 방)" });
+          log(`숨은 길: ${o.floor?.label} 막힌 덕트를 뜯었다`);
+          enterSide(api, prop, true, "숨은 방");
+        }
+        break;
+      case "key": {
+        const d3 = Number(r.plan.stage.cell?.things.find((t) => `s${t.id}` === prop.id)?.data.depth ?? o.serviceDepth);
+        api.setProp(prop.id, null);
+        if (!o.keys.includes(d3)) o.keys.push(d3);
+        const sv = o.services[o.serviceDepth];
+        if (sv) sv.key = false;
+        if (o.service) o.service.keyCell = null;
+        api.world.emit({ type: "pickup", x: p.x, id: "key" });
+        api.world.say(`정비 열쇠를 주웠다. ${depthLabel(d3)} 방화셔터를 열 수 있다. (해치로 올라가거나, 그냥 아래로 내려가도 된다)`, 4);
+        log(`정비 열쇠 (${depthLabel(d3)})`);
+        break;
+      }
+      // ── 곁가지 방 안
+      case "door": {
+        const sd = r.plan.stage.side;
+        finishWith(api, { to: "floor", depth: sd.depth, type: o.floorTypes[sd.depth].type, sub: o.floorTypes[sd.depth].sub, startX: o.sides[`${sd.depth}:${sd.door}`]?.x ?? o.returnX });
+        break;
+      }
+      case "pack": {
+        const sd = r.plan.stage.side;
+        const st = o.sides[`${sd.depth}:${sd.door}`];
+        if (node && node.cleared.size < node.all.length) return void api.world.say("먼저 이 방의 것들을 정리하자.", 1.5);
+        if (!st || st.done) return void api.world.say("빈 배낭이다.", 1.5);
+        st.done = true;
+        api.setProp(prop.id, { label: "빈 배낭" });
+        const doorLabel = nodes.get(`floor:${sd.depth}`)?.plan.props?.find((q) => q.id === sd.door)?.label ?? "";
+        patchAt(`floor:${sd.depth}`, sd.door, { label: `${doorLabel} (비었다)` });
+        offerUpgrade(api, sd.secret ? "숨겨 둔 배낭" : "선배가 남긴 배낭");
+        break;
+      }
+      case "gear":
+        api.setProp(prop.id, null);
+        o.items.push("gear");
+        api.world.say("용도 모를 장비를 챙겼다. (회수물 · 거래에 쓸 수 있다)", 2.5);
+        break;
+      case "item": {
+        const item = String(prop.label?.split(":")[1] ?? "heal");
+        api.setProp(prop.id, null);
+        o.items.push(item);
+        if (item === "heal") api.heal(25);
+        if (item === "light") r.light = 1;
+        api.world.emit({ type: "pickup", x: p.x, id: item });
+        api.world.say(`주웠다: ${itemName2(item)}`, 1.5);
+        break;
+      }
+    }
+  };
+  const offerUpgrade = (api, why) => {
+    const o = out;
+    const r = rt;
+    const opts = upgradeChoices(o.seed, o.upgradeN++, o.upgrades);
+    if (!opts.length) {
+      api.heal(40);
+      return void api.world.say(`${why}: 더 고를 강화가 없다. 체력 회복.`, 2);
+    }
+    const view = opts.map((u) => ({ id: u.id, label: u.label, text: u.text, set: SET_LABEL[u.set] }));
+    if (hooks.pickUpgrade?.({ why, options: view }, defer((api2, i) => applyUpgrade(api2, opts[Math.max(0, Math.min(opts.length - 1, i))])))) return;
+    api.world.say(`${why}: 강화 하나를 고른다 (E)`, 3);
+    const stub = { id: 0, role: "passenger", kind: "upgrade", x: 0, lane: 0, wave: 0, elite: false, data: {} };
+    const p = api.world.player;
+    opts.forEach((u, i) => {
+      const id = `up:${u.id}`;
+      r.choices.set(id, { hook: stub, choice: "upgrade", up: u.id });
+      api.setProp(id, { id, kind: "choice", x: Math.min(r.plan.length - 80, p.x + 100 + i * 110), y: p.y + 40, w: 60, h: 40, label: `${u.label}: ${u.text}` });
+    });
+  };
+  const applyUpgrade = (api, u) => {
+    const o = out;
+    if (!u || o.upgrades.includes(u.id)) return;
+    o.upgrades.push(u.id);
+    const pl = api.world.player;
+    if (u.id === "hp") pl.hpMax += 30, api.heal(30);
+    if (u.id === "ward") pl.ward = (pl.ward ?? 0) + 2;
+    let bonus = "";
+    if (setCounts(o.upgrades)[u.set] === 3) {
+      bonus = `
+${SET_BONUS[u.set]}`;
+      if (u.set === "body") pl.hpMax += 50, api.heal(50);
+      if (u.set === "rule") addFavor(meta, o, 1, "규칙 계열 완성"), save2();
+    }
+    api.world.say(`강화: ${u.label} — ${u.text}${bonus}`, 3.5);
+    api.world.emit({ type: "custom", name: "upgrade", data: { id: u.id } });
+    api.note("stage.upgrades", o.upgrades.filter((id) => UPGRADE_BY_ID[id]).map((id) => UPGRADE_BY_ID[id].label));
+    log(`강화 선택: ${u.label}${bonus ? " (계열 완성)" : ""}`);
+  };
+  const mapView = () => {
+    const o = out;
+    if (!o) return null;
+    const scout = o.upgrades.includes("scout");
+    const floors = [];
+    for (const d3 of Object.keys(o.floorTypes).map(Number).sort((a, b) => a - b)) {
+      const n = nodes.get(`floor:${d3}`);
+      const f = n?.plan.stage.floor;
+      if (!n || !f) continue;
+      const ex = o.explored[d3] ?? [0, 0];
+      const seen2 = (x) => x >= ex[0] - 150 && x <= ex[1] + 150;
+      const marks = [];
+      for (const pl of f.placed) {
+        const prop = n.plan.props?.find((q) => q.id === `p${pl.id}`);
+        const side = o.sides[`${d3}:p${pl.id}`];
+        let mk = null;
+        if (pl.kind === "hatch" || pl.kind === "servicedoor") mk = { x: pl.x, kind: "service", state: "" };
+        else if (pl.kind === "upper") mk = { x: pl.x, kind: "up", state: o.shortcuts.includes(d3) ? "open" : "locked" };
+        else if (pl.kind === "locked") mk = { x: pl.x, kind: "gate", state: o.gatesOpen.includes(d3) ? "open" : o.keys.includes(d3) ? "key" : "locked" };
+        else if (pl.kind === "sidedoor") mk = { x: pl.x, kind: "side", state: side?.done ? "done" : "" };
+        else if ((pl.kind === "crack" || pl.kind === "vent") && (side || /부서진|열린/.test(prop?.label ?? ""))) mk = { x: pl.x, kind: "secret", state: side?.done ? "done" : "" };
+        else if (pl.kind === "panel") mk = { x: pl.x, kind: "elevator", state: "" };
+        if (mk && seen2(mk.x)) marks.push(mk);
+      }
+      const g2 = f.spawns.find((s2) => s2.role === "guardian");
+      if (g2 && seen2(g2.x)) marks.push({ x: g2.x, kind: "boss", state: "" });
+      floors.push({ depth: d3, label: f.label, type: f.type, width: f.width, explored: ex, marks });
+    }
+    const services = [];
+    for (const [ds, sv] of Object.entries(o.services)) {
+      const z = sv.zone;
+      if (!z) continue;
+      const d3 = Number(ds);
+      services.push({
+        depth: d3,
+        cols: z.cols,
+        rows: z.rows,
+        hatchX: o.hatchX[d3] ?? nodes.get(`floor:${d3}`)?.plan.stage.floor?.placed.find((q) => q.kind === "hatch" || q.kind === "servicedoor")?.x ?? 600,
+        shortcut: o.shortcuts.includes(d3 + 1),
+        cells: z.cells.map((c) => {
+          const seen2 = sv.seen.includes(`${c.col},${c.row}`);
+          const keyHere = !!z.keyCell && z.keyCell[0] === c.col && z.keyCell[1] === c.row && (seen2 || scout);
+          return { col: c.col, row: c.row, open: c.open, seen: seen2 || scout && c.kind === "attic", kind: c.kind === "attic" && !(seen2 || scout) ? "plain" : c.kind, key: keyHere };
+        })
+      });
+    }
+    const cur = nodes.get(`floor:${o.depth}`)?.plan.stage.floor;
+    let goal = "아래로: 승강기 패널, 또는 정비 구역 아래 점검문. 귀환은 다락방 로프.";
+    if (o.where === "service") {
+      const sv = o.services[o.serviceDepth];
+      goal = sv?.key ? "정비 구역: 열쇠를 찾는다. 다락방(★)에서 쉬고 로프로 귀환할 수 있다." : "정비 구역: 아래 점검문으로 다음 층, 해치로 위층, 다락방(★)에 로프.";
+    } else if (o.where === "side") goal = "곁가지 방: 배낭을 열고 나간다.";
+    else if (o.where === "car") goal = "승강기: 버튼을 고른다.";
+    else if (cur?.tuning.keyGate && !o.gatesOpen.includes(o.depth)) goal = o.keys.includes(o.depth) ? "열쇠가 있다. 방화셔터를 연다." : "방화셔터가 잠겼다. 이 층 정비 구역(▼)에서 열쇠를 찾는다.";
+    return { where: o.where, depth: o.where === "service" ? o.serviceDepth : o.depth, cell: o.where === "service" ? o.cell : null, sideX: o.where === "side" ? o.returnX : null, floors, services, keys: o.keys, upgrades: o.upgrades.filter((id) => UPGRADE_BY_ID[id]), goal, seed: o.seed };
+  };
   return mod;
 }
 function itemName2(id) {
   return { heal: "회복약", light: "손전등", guard: "방어 강화", ammo: "탄약", gear: "용도 모를 장비", checklist: "점검표" }[id] ?? id;
+}
+
+// src/game/action/stage/runmap.ts
+var C3 = {
+  bg: "rgba(10,12,16,0.94)",
+  frame: "#c8a24a",
+  dim: "#2b3138",
+  floor: "#56616b",
+  seen: "#a9b7bf",
+  text: "#e9e4d4",
+  sub: "#8f9aa1",
+  here: "#ffffff",
+  svc: "#8a6a3c",
+  svcSeen: "#c79a55",
+  gateLocked: "#e0503c",
+  gateOpen: "#5fe08a",
+  key: "#f2c14e",
+  side: "#ffb840",
+  boss: "#d0406a",
+  elev: "#7fc3ff"
+};
+function txt(c, s2, x, y, size2, color, align = "left") {
+  c.font = `700 ${size2}px "Galmuri11", "DungGeunMo", system-ui, sans-serif`;
+  c.textAlign = align;
+  c.textBaseline = "alphabetic";
+  c.lineWidth = 4;
+  c.strokeStyle = "rgba(0,0,0,0.8)";
+  c.strokeText(s2, x, y);
+  c.fillStyle = color;
+  c.fillText(s2, x, y);
+}
+function glyph(c, m, x, y, s2) {
+  const R = (dx, dy, w, h, col) => {
+    c.fillStyle = col;
+    c.fillRect(Math.round(x + dx * s2), Math.round(y + dy * s2), Math.ceil(w * s2), Math.ceil(h * s2));
+  };
+  switch (m.kind) {
+    case "service":
+      R(-3, -4, 6, 2, C3.svcSeen);
+      R(-2, -2, 4, 2, C3.svcSeen);
+      R(-1, 0, 2, 2, C3.svcSeen);
+      break;
+    case "up":
+      R(-1, -4, 2, 2, m.state === "open" ? C3.gateOpen : C3.gateLocked);
+      R(-2, -2, 4, 2, m.state === "open" ? C3.gateOpen : C3.gateLocked);
+      R(-3, 0, 6, 2, m.state === "open" ? C3.gateOpen : C3.gateLocked);
+      break;
+    case "gate":
+      R(-1.5, -6, 3, 12, m.state === "open" ? C3.gateOpen : C3.gateLocked);
+      if (m.state !== "open") R(-0.5, -1, 1, 2, "#000");
+      if (m.state === "key") R(-4, -8, 8, 2, C3.key);
+      break;
+    case "side":
+      R(-2.5, -5, 5, 7, m.state === "done" ? "#555" : C3.side);
+      R(-1.5, -4, 3, 5, "#1a1a1a");
+      break;
+    case "secret":
+      R(-3, -3, 6, 6, m.state === "done" ? "#555" : "#d9a6ff");
+      R(-1, -1, 2, 2, "#1a1a1a");
+      break;
+    case "elevator":
+      R(-3, -5, 6, 8, C3.elev);
+      R(-0.5, -5, 1, 8, "#123");
+      break;
+    case "boss":
+      R(-3, -4, 6, 5, C3.boss);
+      R(-2, -3, 1, 1, "#000");
+      R(1, -3, 1, 1, "#000");
+      R(-2, 1, 4, 1, C3.boss);
+      break;
+    case "start":
+      R(-2, -4, 4, 6, "#9aa");
+      break;
+  }
+}
+function hereDot(c, x, y, t) {
+  const on = Math.floor(t * 3) % 2 === 0;
+  c.fillStyle = on ? C3.here : "#ffd76a";
+  c.fillRect(Math.round(x) - 4, Math.round(y) - 4, 8, 8);
+  c.strokeStyle = "#000";
+  c.lineWidth = 2;
+  c.strokeRect(Math.round(x) - 5, Math.round(y) - 5, 10, 10);
+}
+function drawRunMap(c, m, px, t, W5 = 1280, H6 = 720) {
+  c.save();
+  c.fillStyle = C3.bg;
+  c.fillRect(0, 0, W5, H6);
+  c.strokeStyle = C3.frame;
+  c.lineWidth = 4;
+  c.strokeRect(24, 20, W5 - 48, H6 - 40);
+  txt(c, "출동 지도", 48, 60, 26, C3.text);
+  txt(c, `열쇠 ${m.keys.length ? m.keys.map((d3) => d3 <= 3 ? `L${d3}` : `B-${d3 - 3}`).join(" ") : "없음"}  ·  강화 ${m.upgrades.length}`, W5 - 48, 60, 16, C3.sub, "right");
+  txt(c, m.goal, 48, 90, 17, "#ffd76a");
+  const x0 = 140, x1 = W5 - 60;
+  const maxW = Math.max(6e3, ...m.floors.map((f) => f.width));
+  const k = (x1 - x0) / maxW;
+  const pitch = 132;
+  const top = 128;
+  const idx = Math.max(0, m.floors.findIndex((f) => f.depth === m.depth));
+  const visible = Math.floor((H6 - top - 60) / pitch);
+  const first = Math.max(0, Math.min(idx - Math.floor(visible / 2), m.floors.length - visible));
+  const rowY = /* @__PURE__ */ new Map();
+  m.floors.slice(first, first + visible + 1).forEach((f, i) => rowY.set(f.depth, top + i * pitch));
+  for (const f of m.floors) {
+    const y = rowY.get(f.depth);
+    if (y === void 0 || y > H6 - 50) continue;
+    const label3 = f.depth <= 3 ? `L${f.depth}` : `B-${f.depth - 3}`;
+    txt(c, label3, x0 - 16, y + 18, 20, f.depth === m.depth ? "#fff" : C3.sub, "right");
+    txt(c, f.label.replace(/^[^·]*· /, ""), x0 - 16, y + 36, 11, C3.sub, "right");
+    const w = f.width * k;
+    c.fillStyle = C3.dim;
+    c.fillRect(x0, y, w, 22);
+    c.fillStyle = f.depth === m.depth && m.where === "floor" ? C3.seen : C3.floor;
+    const ea = Math.max(0, f.explored[0]) * k, eb = Math.min(f.width, f.explored[1]) * k;
+    if (eb > ea) c.fillRect(x0 + ea, y, eb - ea, 22);
+    c.strokeStyle = "#000";
+    c.lineWidth = 2;
+    c.strokeRect(x0, y, w, 22);
+    for (const mk of f.marks) {
+      const gx = x0 + mk.x * k;
+      if (mk.kind === "side" || mk.kind === "secret") {
+        c.fillStyle = mk.state === "done" ? "#3b3b3b" : "#5b4520";
+        c.fillRect(gx - 9, y - 22, 18, 16);
+        c.strokeStyle = "#000";
+        c.strokeRect(gx - 9, y - 22, 18, 16);
+        c.fillStyle = "#000";
+        c.fillRect(gx - 1, y - 6, 2, 6);
+        glyph(c, mk, gx, y - 13, 1.6);
+      } else glyph(c, mk, gx, y + 11, 2);
+    }
+    if (f.depth === m.depth && m.where === "floor") hereDot(c, x0 + px * k, y + 11, t);
+    if (f.depth === m.depth && m.where === "side" && m.sideX !== null) hereDot(c, x0 + m.sideX * k, y - 14, t);
+  }
+  for (const s2 of m.services) {
+    const y = rowY.get(s2.depth);
+    if (y === void 0) continue;
+    const cw = 30, ch = 16, gap = 6;
+    const gw = s2.cols * (cw + gap) - gap;
+    const gx = Math.max(x0, Math.min(x1 - gw, x0 + s2.hatchX * k - gw / 2));
+    const gy = y + 34;
+    c.strokeStyle = C3.svc;
+    c.lineWidth = 2;
+    c.beginPath();
+    c.moveTo(x0 + s2.hatchX * k, y + 22);
+    c.lineTo(x0 + s2.hatchX * k, gy);
+    c.stroke();
+    for (const cell of s2.cells) {
+      const cx = gx + cell.col * (cw + gap), cy = gy + cell.row * (ch + gap);
+      if (cell.row * (ch + gap) + gy > y + pitch - 8) continue;
+      if (!cell.seen && !cell.key && cell.kind !== "attic") continue;
+      c.fillStyle = cell.seen ? C3.svcSeen : "#3a2e1c";
+      c.fillRect(cx, cy, cw, ch);
+      c.strokeStyle = "#000";
+      c.strokeRect(cx, cy, cw, ch);
+      c.fillStyle = C3.svcSeen;
+      if (cell.seen) {
+        if (cell.open.r) c.fillRect(cx + cw, cy + ch / 2 - 2, gap, 4);
+        if (cell.open.d) c.fillRect(cx + cw / 2 - 2, cy + ch, 4, gap);
+      }
+      if (cell.kind === "attic") {
+        c.fillStyle = "#fff3a0";
+        c.fillRect(cx + cw / 2 - 1, cy + 3, 3, 10);
+        c.fillRect(cx + cw / 2 - 5, cy + 7, 11, 3);
+      }
+      if (cell.kind === "down") glyph(c, { x: 0, kind: "service", state: "" }, cx + cw / 2, cy + ch / 2, 1.5);
+      if (cell.key) {
+        c.fillStyle = C3.key;
+        c.fillRect(cx + 4, cy + 5, 6, 6);
+        c.fillRect(cx + 10, cy + 7, 12, 2);
+      }
+      if (m.where === "service" && m.depth === s2.depth && m.cell && m.cell[0] === cell.col && m.cell[1] === cell.row) hereDot(c, cx + 6 + px / 1280 * (cw - 12), cy + ch / 2, t);
+    }
+    if (s2.shortcut) {
+      const ny = rowY.get(s2.depth + 1);
+      if (ny !== void 0) {
+        c.strokeStyle = C3.gateOpen;
+        c.setLineDash([4, 4]);
+        c.beginPath();
+        c.moveTo(gx + gw / 2, gy + s2.rows * (ch + gap));
+        c.lineTo(x0 + 1100 * k, ny);
+        c.stroke();
+        c.setLineDash([]);
+      }
+    }
+  }
+  const ly = H6 - 34;
+  let lx = 48;
+  const legend = [
+    [{ x: 0, kind: "service", state: "" }, "정비 구역 입구"],
+    [{ x: 0, kind: "up", state: "open" }, "위층 점검문"],
+    [{ x: 0, kind: "gate", state: "locked" }, "잠긴 셔터"],
+    [{ x: 0, kind: "side", state: "" }, "곁가지 방"],
+    [{ x: 0, kind: "secret", state: "" }, "숨은 방"],
+    [{ x: 0, kind: "elevator", state: "" }, "승강기 패널"],
+    [{ x: 0, kind: "boss", state: "" }, "수호자"]
+  ];
+  for (const [mk, s2] of legend) {
+    glyph(c, mk, lx + 8, ly - 4, 2);
+    txt(c, s2, lx + 22, ly + 2, 13, C3.sub);
+    c.font = "700 13px system-ui";
+    lx += 40 + c.measureText(s2).width;
+  }
+  txt(c, "Z · Tab · M 닫기", W5 - 48, ly + 2, 13, C3.sub, "right");
+  c.restore();
+}
+function drawMiniMap(c, m, px, t, x = 740, y = 16, w = 400, h = 62) {
+  c.save();
+  c.fillStyle = "rgba(10,12,16,0.72)";
+  c.fillRect(x, y, w, h);
+  c.strokeStyle = "rgba(200,162,74,0.85)";
+  c.lineWidth = 2;
+  c.strokeRect(x, y, w, h);
+  const f = m.floors.find((q) => q.depth === m.depth);
+  if ((m.where === "floor" || m.where === "side") && f) {
+    const span = 7e3;
+    const k = (w - 16) / span;
+    const cx = m.where === "side" && m.sideX !== null ? m.sideX : px;
+    const a = Math.max(0, Math.min(f.width - span, cx - span / 2));
+    const bx = x + 8 - a * k, by = y + 30;
+    c.save();
+    c.beginPath();
+    c.rect(x + 4, y + 4, w - 8, h - 8);
+    c.clip();
+    c.fillStyle = C3.dim;
+    c.fillRect(bx, by, f.width * k, 12);
+    c.fillStyle = C3.seen;
+    c.fillRect(bx + Math.max(0, f.explored[0]) * k, by, (Math.min(f.width, f.explored[1]) - Math.max(0, f.explored[0])) * k, 12);
+    for (const mk of f.marks) {
+      if (mk.kind === "side" || mk.kind === "secret") glyph(c, mk, bx + mk.x * k, by - 9, 1.3);
+      else glyph(c, mk, bx + mk.x * k, by + 6, 1.4);
+    }
+    hereDot(c, bx + cx * k, by + 6, t);
+    c.restore();
+    txt(c, m.goal, x + 8, y + 20, 12, "#ffd76a");
+  } else if (m.where === "service") {
+    const s2 = m.services.find((q) => q.depth === m.depth);
+    if (s2) {
+      const rows = Math.max(1, s2.rows);
+      const gap = 2, ch = Math.max(3, Math.min(10, Math.floor((h - 32) / rows) - gap)), cw = Math.min(26, Math.floor((w - 20) / s2.cols) - gap);
+      const gx = x + w - 10 - s2.cols * (cw + gap), gy = y + 28;
+      for (const cell of s2.cells) {
+        if (!cell.seen && !cell.key && cell.kind !== "attic") continue;
+        const cx = gx + cell.col * (cw + gap), cy = gy + cell.row * (ch + gap);
+        if (cy + ch > y + h - 2) continue;
+        c.fillStyle = cell.seen ? C3.svcSeen : "#3a2e1c";
+        c.fillRect(cx, cy, cw, ch);
+        if (cell.kind === "attic") c.fillStyle = "#fff3a0", c.fillRect(cx + cw / 2 - 2, cy + 1, 4, Math.max(2, ch - 2));
+        if (cell.key) c.fillStyle = C3.key, c.fillRect(cx + 3, cy + 1, 8, Math.max(2, ch - 2));
+        if (m.cell && m.cell[0] === cell.col && m.cell[1] === cell.row) hereDot(c, cx + cw / 2, cy + ch / 2, t);
+      }
+      txt(c, m.goal, x + 8, y + 20, 12, "#ffd76a");
+    }
+  } else txt(c, m.where === "car" ? "승강기 안" : "", x + 8, y + 36, 14, C3.text);
+  c.restore();
 }
 
 // src/game/action/story/style.css
@@ -25233,7 +26184,18 @@ function engineModules(box3, bridge) {
     onOpen: (on) => shell.touch.setVisible(!on && shell.mode === "play")
   });
   globalThis.__goeiNpc = npc;
-  const elevator = createElevatorStage(stageStore, npc.stageHooks(stageHooks()));
+  const elevator = createElevatorStage(stageStore, {
+    ...npc.stageHooks(stageHooks()),
+    pickUpgrade: (v, done2) => {
+      void shell.choose({ title: `${v.why} · 강화 하나`, lines: ["이번 출동 동안만 남는다. 같은 계열 셋이면 완성 효과."], options: v.options.map((o) => `[${o.set}] ${o.label} — ${o.text}`), cancel: false }).then((i) => done2(Math.max(0, i)));
+      return true;
+    }
+  });
+  let mapOpen = false;
+  const offMapKey = shell.input.on((code, down2) => {
+    if (!down2) return;
+    if ((code === "KeyZ" || code === "KeyM") && world && world.stage === elevator && !game?.inHub && !shell.paused && !story.isBlocking()) mapOpen = !mapOpen;
+  });
   setLineProvider(hqLines);
   const itemStage = {
     id: "itemroom",
@@ -25458,7 +26420,7 @@ function engineModules(box3, bridge) {
     enemyFactory,
     hq: hq2,
     hud: false,
-    blocking: () => story.isBlocking() || itemsBlocking() || !floorBox.hidden || npc.isOpen(),
+    blocking: () => story.isBlocking() || itemsBlocking() || !floorBox.hidden || npc.isOpen() || mapOpen,
     listeners,
     surface: { canvas: shell.canvas, ctx: shell.ctx },
     paused: () => shell.paused,
@@ -25486,6 +26448,13 @@ function engineModules(box3, bridge) {
       if (npc.isOpen()) hs.message = void 0;
       if (!game?.inHub) shell.hud.draw(ctx, hs, dt);
       else if (hs.message) shell.hud.drawMessage(ctx, hs.message, hs.compact);
+      if (shell.paused) mapOpen = false;
+      if (!game?.inHub && w.stage === elevator) {
+        const m = elevator.mapView();
+        const t = performance.now() / 1e3;
+        if (m && mapOpen) drawRunMap(ctx, m, w.player.x, t);
+        else if (m) drawMiniMap(ctx, m, w.player.x, t);
+      } else mapOpen = false;
       shell.touch.setItems(hs.items);
       shell.touch.setGauge(w.player.gauge / 100);
       shell.touch.hint("reload", w.player.ammo <= 2 && w.player.reserve > 0);
@@ -25568,6 +26537,7 @@ function engineModules(box3, bridge) {
       world = null;
       game = null;
       window.removeEventListener("keydown", storyKeys, true);
+      offMapKey();
       window.removeEventListener("keydown", titleInput, true);
       window.removeEventListener("pointerdown", titleInput, true);
       if (openingT) clearTimeout(openingT);

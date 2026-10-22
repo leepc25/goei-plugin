@@ -31,6 +31,7 @@
   .pad.show { display: flex; }
   h2 { font-size: 15px; margin: 18px 0 4px; }
   .miss { color: #ff9a8a; }
+  @media (max-height: 520px) { h1 { display: none; } .bar { font-size: 12px; margin: 4px 0; } .screen { height: 62svh; width: auto; margin: 0 auto; } .pad button { min-height: 38px; } }
 </style>
 <div class="wrap">
   <h1>로제몬 전 동작 시연판 · 본체는 때리지 않는다(판정은 꼬마 인형·마네킹·실에서만)</h1>
@@ -54,7 +55,7 @@
       <button data-k="KeyA">A 지휘</button><button data-k="KeyS">S 최면</button><button data-k="KeyD">D 실 걸기</button><button data-k="KeyQ">Q 웅크림</button><button data-k="KeyW">W 앙상블</button>
       <button data-k="KeyR">R 장전</button><button data-k="KeyF">F 숙련3</button><button data-k="KeyG">G 숙련6</button><button data-k="KeyC">C 지원</button><button data-k="KeyT">T 말</button>
       <button data-k="Digit1">1 단 음료</button><button data-k="Digit2">2 간식</button><button data-k="Digit3">3 붕대</button><button data-k="KeyH">H 맞기</button><button data-k="KeyK">K 다운</button>
-      <button data-k="KeyV">V 피로</button><button data-k="KeyB">B 본부</button><button data-k="KeyP">P 휴대폰</button><button data-k="KeyN">N 칭찬</button><button data-k="KeyL">L 넥타이</button>
+      <button data-k="KeyV">V 피로</button><button data-k="KeyB">B 본부</button><button data-k="KeyP">P 인형극</button><button data-k="KeyN">N 칭찬</button><button data-k="KeyL">L 간식</button>
     </div>
   </div>
   <div class="keys">
@@ -62,7 +63,7 @@
     <b>A</b> 지휘 3박: 「저기!」 → 「거기 말고!」 → 「…당겨.」 1·2박은 꼬마가 앞 160px까지 날아가 대신 때리고, 3박은 실로 적을 <b>로제몬 앞으로 끌어와</b> 엎어뜨림. 손짓이 끝나면 꼬마가 싸우는 동안 걸어서 물러날 수 있음 · 달리며 A = 꼬마 굴려 던지기 · 공중 A = 꼬마 낙하<br>
     <b>S</b> 누른 채 눈 맞추기 → 놓으면 「돌아가.」 동전 던지기: 성공 = 적이 4초간 등 돌려 떠남, 실패 = 로제몬이 눈을 감싸고 그 적이 달려듦(대기 4초) · <b>D</b> 짧게 = 가장 가까운 그릇(쓰러진 마네킹·쓰러진 적)에 실을 걸어 아군 인형으로(실 2가닥), 길게 = 지휘 모았다가 놓으면 인형 일제 돌진<br>
     <b>Q</b> 유지 = 웅크림(본인은 못 막음, 꼬마가 앞에 끌려와 대신 맞음) · <b>E</b> 적 앞 = 멱살(A 노려보기 2번 → A 「돌아가.」 = 그 적이 4초간 다른 적과 싸움, Space 놓기), 물건 앞 = 줍기(쇠파이프 → A 눈 감고 내려치기, 권총 → S 고개 돌리고 쏘기, 상자 → A 던지기) · <b>W</b> 앙상블(쓰러진 것 전부 일어나 덮침 → 주저앉아 간식)<br>
-    <b>왼쪽 벽</b>에 붙어 가만히 있으면 기대기(실·필살 게이지 빨리 참) · <b>F</b> 숙련 3 눈 들여다보기 · <b>G</b> 숙련 6 인형 3체 · <b>C</b> 지원 등장 · <b>1·2·3</b> 단 음료·간식(+30%)·붕대(서툴러 -10%) · <b>T</b> 말 · <b>H</b> 맞기 · <b>K</b> 다운(실 전부 끊김) · <b>V</b> 피로 · <b>B</b> 본부(P 휴대폰, N 칭찬 두 번, L 넥타이, O 전화)
+    <b>왼쪽 벽</b>에 붙어 가만히 있으면 기대기(실·필살 게이지 빨리 참) · <b>F</b> 숙련 3 눈 들여다보기 · <b>G</b> 숙련 6 인형 3체 · <b>C</b> 지원 등장 · <b>1·2·3</b> 단 음료·간식(+30%)·붕대(서툴러 -10%) · <b>T</b> 말 · <b>H</b> 맞기 · <b>K</b> 다운(실 전부 끊김) · <b>V</b> 피로 · <b>B</b> 본부(P 인형극 영상에 넋 놓기, N 칭찬 두 번 「…죽여 버린다」, L 간식 꺼내기)
   </div>
   <h2>동작 목록 (누르면 화면에서 재생)</h2>
   <div id="missing" class="miss"></div>
@@ -89,7 +90,10 @@ function measure(src, im, fw, fh, n) {
 const SRCINFO = {}; for (const c of Object.values(M.clips)) SRCINFO[c.src] = SRCINFO[c.src] || c;
 for (const [k, b64] of Object.entries(STRIPS)) { const im = new Image(); im.onload = () => { loaded++; const c = SRCINFO[k]; if (c) measure(k, im, c.fw, c.fh, c.frames); }; im.src = 'data:image/png;base64,' + b64; imgs[k] = im; }
 const bgImg = new Image(); bgImg.onload = () => loaded++; bgImg.src = 'data:image/png;base64,' + BG64;
-if (M.missing && M.missing.length) $('missing').textContent = '아직 그림이 없는 동작(GPT 의뢰 대기 등): ' + M.missing.join(', ');
+if (M.missing && M.missing.length) {
+  const by = {}; for (const [k, g] of M.missing) (by[g] = by[g] || []).push(k);
+  $('missing').innerHTML = '아직 그림이 없는 동작 ' + M.missing.length + '개 (전투·이동을 먼저 만들고 생활·사교·감정은 나중으로 미룸, 씻기 4클립은 GPT 의뢰 중):<br>' + Object.entries(by).map(([g, ks]) => `<b>${g}</b> ${ks.length}개`).join(' · ');
+}
 
 // ── 무대 ──
 const FAR_Y = 400, NEAR_Y = 700;
@@ -110,7 +114,8 @@ const ENEMIES = [mkE(820, 0.5), mkE(1000, 0.72), mkE(1150, 0.35)];
 const MAN = { kind: 'man', x: 600, z: 0.85, y: 0, dir: -1, clip: 'man_limp', f: 0, t: 0, hooked: false, hp: 150, state: 'limp', temp: false };
 const KID = { x: 380, z: 0.57, y: 0, dir: 1, clip: 'kid_idle', f: 0, t: 0, state: 'follow', hp: 40, target: null, act: null, cb: null };
 const GHOSTS = [];                       // 숙련 6 인형 3체: 잠깐 나타나는 꼬마 둘
-const PICK = [{ kind: 'pipe', x: 470, z: 0.3, label: '쇠파이프' }, { kind: 'gun', x: 720, z: 0.9, label: '권총' }, { kind: 'box', x: 210, z: 0.85, label: '상자' }];
+const PICK = [{ kind: 'pipe', x: 470, z: 0.3, label: '쇠파이프' }, { kind: 'gun', x: 720, z: 0.9, label: '권총' }];
+if (M.clips.carry2_idle) PICK.push({ kind: 'box', x: 210, z: 0.85, label: '상자' });
 const PROJ = [];
 const ALLY = { on: false };
 const LINES = ['그러니까 내가 사무직이라고!', '저기! …아니, 거기 말고.', '하아. 왜 또 나야.', '눈 맞춰. 돌아가.', '헛소리하지 마.', '끝나면 간식 사 줘.', '…알았어, 할게. 하면 되잖아.', '깜짝 놀랐잖아, 진짜!'];
@@ -127,7 +132,7 @@ const NUDE = new Set(['undress', 'showerturn', 'shower', 'bath']);
 function idleClip() {
   if (G.crouch) return 'crouch';
   if (G.guard) return 'cower';
-  if (G.carry) return 'carry2_idle';
+  if (G.carry && has('carry2_idle')) return 'carry2_idle';
   if (G.weapon === 'pipe') return 'idle_weapon';
   if (G.weapon === 'gun') return 'idle_gun';
   if (G.tired) return 'tired';
@@ -191,10 +196,9 @@ function onKey(code, down) {
     case 'KeyT': G.talkT = 2.2; G.talkLine = LINES[lineI++ % LINES.length]; play('talk'); break;
     case 'KeyV': G.tired = !G.tired; G.fight = false; hitText(G.x, groundY(G.z) - 230, G.tired ? '피로 상태' : '피로 회복'); play(idleClip()); break;
     case 'KeyB': { const wasF = G.fight && G.clip === 'guard'; G.hq = !G.hq; G.fight = false; hitText(640, 120, G.hq ? '본부' : '현장'); if (wasF && has('engage')) play('engage', { lock: true, rev: true }); else play(idleClip()); break; }
-    case 'KeyP': play('phonelook'); G.busy = 3; break;
-    case 'KeyO': play('phone', { lock: true }); break;
+    case 'KeyP': play('puppetshow'); G.busy = 3; break;
     case 'KeyN': play('praised', { lock: true }); break;
-    case 'KeyL': play('tie', { lock: true }); break;
+    case 'KeyL': play('idle_snack', { lock: true }); break;
     case 'ArrowDown': {
       const now = performance.now();
       if (now - G.downTap < 260 && onGround()) { G.crouch = true; G.fight = true; play('crouch', { lock: true }); }
@@ -344,7 +348,9 @@ function sendKid(act, lo = 20 * S, hi = REACH, onHit) {
   if (KID.state === 'flop') { hitText(G.x, groundY(G.z) - 230, '꼬마 실이 끊김'); return; }
   const tgt = nearestE(G.x, G.z, G.dir, lo, hi + 40, 0.25);
   KID.target = tgt; KID.act = act; KID.cb = onHit; KID.dir = G.dir;
-  KID.tx = tgt ? tgt.x - G.dir * 34 : G.x + G.dir * Math.min(hi, 120 * S); KID.tz = tgt ? tgt.z + 0.005 : G.z + 0.01;
+  // 인형 그림 안에서 몸이 앞으로 나가는 거리(때리는 장의 몸 중심 - 기준 x)만큼 덜 가서 멈춤 → 때리는 장에서 딱 적에게 닿음
+  const c = M.clips[act], hb = c && boxes[c.src] && boxes[c.src][c.hits[0] || 0], off = hb ? ((hb.x0 + hb.x1) / 2 - c.anc) * S : 0;
+  KID.tx = tgt ? tgt.x - G.dir * (30 + off) : G.x + G.dir * Math.min(hi, 120 * S); KID.tz = tgt ? tgt.z + 0.005 : G.z + 0.01;
   KID.state = 'go'; anim(KID, act === 'kid_bite' ? 'kid_hop' : 'kid_leap'); KID.f = act === 'kid_bite' ? 0 : 1;
 }
 function kidGuard() { if (KID.state === 'flop') return; KID.state = 'guard'; KID.dir = G.dir; anim(KID, 'kid_block'); }
@@ -511,7 +517,8 @@ function updateMan(dt) {
   if (V.state === 'go') {
     const e = V.goal; if (!e || e.state === 'gone') { V.state = 'idle'; return; }
     V.dir = Math.sign(e.x - V.x) || V.dir; stepAnim(V, dt);
-    if (moveTo(V, e.x - V.dir * 70, e.z, 6, dt)) { V.state = 'act'; anim(V, ['man_chop', 'man_sweep', 'man_slam'][Math.min(2, (V.beat || 1) - 1)]); }
+    const mk = ['man_chop', 'man_sweep', 'man_slam'][Math.min(2, (V.beat || 1) - 1)], mc = M.clips[mk], mb = mc && boxes[mc.src] && boxes[mc.src][mc.hits[0] || 0], moff = mb ? (mb.x1 - mc.anc) * S : 70;
+    if (moveTo(V, e.x - V.dir * Math.max(40, moff), e.z, 6, dt)) { V.state = 'act'; anim(V, mk); }
     return;
   }
   if (V.state === 'act') {
@@ -533,7 +540,7 @@ function update(now) {
     const run = G.runHeld && mx;
     const base = G.carry ? 'carry2_' : '';
     let want = G.carry ? base + (run ? 'run' : 'walk') : G.weapon === 'pipe' ? (run ? 'run_weapon' : 'walk_weapon') : G.weapon === 'gun' ? (run ? 'run_gun' : 'walk_gun') : G.tired && !run ? 'limp' : (run ? 'run' : 'walk');
-    if (!has(want)) want = 'walk';
+    if (!has(want)) want = run && has('run') ? 'run' : 'walk';
     if (G.clip !== want) play(want);
     const sp = (run ? 7.1 : 2.9) * (G.tired ? 0.7 : 1);
     G.x += mx * sp * dt * 60 * S / 2; G.z = Math.max(0, Math.min(1, G.z + mz * 0.006 * dt * 60));
@@ -556,7 +563,7 @@ function update(now) {
   if (G.hypCD > 0) G.hypCD = Math.max(0, G.hypCD - dt);
   if (G.blind > 0) G.blind -= dt;
   if (G.talkT > 0) { G.talkT -= dt; if (G.talkT <= 0 && G.clip === 'talk') play(idleClip()); }
-  if (G.busy > 0) { G.busy -= dt; if (G.busy <= 0 && G.clip === 'phonelook') play(idleClip()); }
+  if (G.busy > 0) { G.busy -= dt; if (G.busy <= 0 && G.clip === 'puppetshow') play(idleClip()); }
   if (G.lying) { G.lyingT -= dt; if (G.lyingT <= 0) standUp(); }
   if (!G.fight && !G.hq && !G.tired && G.clip === 'idle' && Math.random() < dt * 0.05) play('idle_snack', { lock: true });
   if (G.vx) { G.x += G.dir * G.vx * dt * 60; G.vx *= Math.pow(0.82, dt * 60); if (Math.abs(G.vx) < 0.3) G.vx = 0; }
@@ -669,7 +676,7 @@ const PROPS = {
 // 손에 든 물건(엔진이 손 좌표에 붙임): 색, 폭, 높이
 const HELD = { idle_light: 'light', walk_light: 'light', run_light: 'light', idle_cup: 'cup', walk_cup: 'cup', run_cup: 'cup', idle_folder: 'folder', walk_folder: 'folder', run_folder: 'folder',
   idle_box: 'box', walk_box: 'box', run_box: 'box', carry2_idle: 'box', carry2_walk: 'box', carry2_run: 'box', water: 'can', phonelook: 'phone', seatphone: 'phone', toilet: 'phone', notebook: 'note', seatread: 'book', sofa: 'phone',
-  phone: 'phone', mop: 'mop', sweep: 'mop', drink: 'cup', seatdrink: 'cup', idle_weapon: 'pipe', walk_weapon: 'pipe', run_weapon: 'pipe', idle_gun: 'gun', walk_gun: 'gun', run_gun: 'gun' };
+  phone: 'phone', mop: 'mop', sweep: 'mop', seatdrink: 'cup', idle_weapon: 'pipe', walk_weapon: 'pipe', run_weapon: 'pipe', idle_gun: 'gun', walk_gun: 'gun', run_gun: 'gun' };
 function drawProps(k, x, y, dir) {
   const r = PROPS[k]; if (!r) return;
   const c = M.clips[k];

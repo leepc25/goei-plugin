@@ -2,7 +2,7 @@
 import { drawPropArt, isStandBoard, propArtSize, wallDecoSpans } from '../art/bg';
 import type { Encounter, FloorPlan, PropSpec, SpawnSpec, WorldView } from '../engine/contract';
 import { depthLabel } from './data/floortypes';
-import { CHUNK_W, ROOM_W, Y_BOTTOM, Y_TOP, laneY, type Floor, type FloorSegment, type Palette, type ServiceCell, type ServiceZone, type Terrain } from './types';
+import { CHUNK_W, ROOM_W, Y_BOTTOM, Y_TOP, laneY, type Floor, type FloorSegment, type Palette, type ServiceCell, type ServiceZone, type SideRoom, type Terrain } from './types';
 import type { ElevatorButton } from './elevator';
 import { FLOOR_TYPES } from './data/floortypes';
 import { drawFloor, drawLedge, drawLowRow, setFloorTone, drawPipeBundle, floorHasGrid, isHighSign, floorPattern, drawWallCell, placeFor, seamPillar, wallSolidSpans } from '../art/bg';
@@ -10,11 +10,12 @@ import { drawFloor, drawLedge, drawLowRow, setFloorTone, drawPipeBundle, floorHa
 /** FloorPlan에 붙여 두는 스테이지 정보 (엔진은 몰라도 된다) */
 export interface StagePlan extends FloorPlan {
   stage: {
-    where: 'floor' | 'car' | 'service' | 'ending';
+    where: 'floor' | 'car' | 'service' | 'ending' | 'side';
     terrain: Terrain[];
     floor?: Floor;
     cell?: ServiceCell;
     zone?: ServiceZone;
+    side?: SideRoom;
     buttons?: ElevatorButton[];
     /** 층 tick이 그리는 덮개 상태 (어둠·추격 벽·조임) */
     fx: { light: number; chaseX: number; squeeze: number; noise: number; red: boolean };
@@ -55,16 +56,19 @@ export const narrowBackSpan = (t: Terrain, terr: readonly Terrain[] = []): [numb
 
 const NOLOCK_TYPES = new Set(['chase', 'deep']);
 
+/** 메트로배니아 소품은 이미 있는 그림 종류로 그린다 (그림 없는 종류는 엔진이 안 그린다). 뜻은 module이 placed.kind로 가른다 */
+export const METRO_ART: Record<string, string> = { upper: 'chasedoor', sidedoor: 'door', locked: 'firegate' };
+
 export function floorPlan(f: Floor, id: string, startX = 240): StagePlan {
   const props: PropSpec[] = f.placed.map((p) => ({
     id: `p${p.id}`,
-    kind: p.kind,
+    kind: METRO_ART[p.kind] ?? p.kind,
     x: p.x,
     y: laneY(p.lane),
     w: p.w,
     h: propH(p.kind),
     label: p.kind === 'item' && p.data.item ? `${p.label}:${p.data.item}` : p.label, // 보급품:ammo → 바닥 그림을 종류대로 (itemsLink drawSupply)
-    solid: p.kind === 'shutter' ? !p.data.open : undefined,
+    solid: p.kind === 'shutter' ? !p.data.open : p.kind === 'locked' ? true : undefined,
   }));
   // 천장 해치 = 벽에 기대 세운 사다리: 복도 한가운데가 아니라 벽선에 (검수 21)
   for (const p of props) if (p.kind === 'hatch') p.y = Y_TOP;
@@ -122,6 +126,11 @@ export function floorPlan(f: Floor, id: string, startX = 240): StagePlan {
 export function cellPlan(z: ServiceZone, cell: ServiceCell, id: string, startX: number): StagePlan {
   const props: PropSpec[] = cell.things.map((t) => ({ id: `s${t.id}`, kind: t.kind, x: t.x, y: laneY(t.lane), w: 60, h: t.kind === 'rope' ? 260 : t.kind.startsWith('ladder') ? 220 : 110, label: t.label }));
   const pal: Palette = { wall: '#4a3a24', floor: '#33291c', trim: '#1e170e', accent: '#f0b860', fog: 'rgba(0,0,0,0)' };
+  // 칸 싸움: 칸 가운데에서 한 판 (들어온 쪽 반대편에서 나온다)
+  const fight = z.fights?.[`${cell.col},${cell.row}`];
+  const encounters: Encounter[] = fight?.length
+    ? [{ triggerX: startX < 640 ? startX + 200 : 0, lockFrom: 0, lockTo: ROOM_W, waves: [fight.map((kind, i) => ({ kind, x: startX < 640 ? 980 - i * 120 : 300 + i * 120, y: laneY(30 + ((i * 53) % 110)) }))] }]
+    : [];
   const plan: StagePlan = {
     id,
     title: `정비 구역 (${depthLabel(z.depth)} 아래) · ${cell.label}`,
@@ -131,7 +140,7 @@ export function cellPlan(z: ServiceZone, cell: ServiceCell, id: string, startX: 
     lane: [Y_TOP, Y_BOTTOM],
     startX,
     exitX: Infinity,
-    encounters: [],
+    encounters,
     props,
     palette: { wall: pal.wall, floor: pal.floor, accent: pal.accent },
     banner: cell.kind === 'attic' ? '선배들의 다락방' : `정비 구역 · ${cell.label}`,
@@ -173,6 +182,41 @@ export function carPlan(id: string, buttons: ElevatorButton[], depth: number): S
   return plan;
 }
 
+/** 곁가지 방 (한 화면): 들어온 층의 벽 그림·팔레트 그대로, 왼쪽에 나가는 문, 오른쪽에 보상 배낭. 싸움이 있으면 배낭은 이긴 뒤에 */
+export function sidePlan(room: SideRoom, parent: Floor, id: string): StagePlan {
+  const props: PropSpec[] = [{ id: 'xback', kind: 'door', x: 170, y: Y_TOP, w: 90, h: 180, label: '나가는 문 (복도로)' }];
+  for (const l of room.loot) {
+    if (l.kind === 'chest') props.push({ id: 'xchest', kind: 'pack', x: l.x, y: laneY(90), w: 60, h: 60, label: '선배가 남긴 배낭 (강화)' });
+    else if (l.kind === 'gear') props.push({ id: 'xgear', kind: 'gear', x: l.x, y: laneY(130), w: 50, h: 50, label: '용도 모를 장비' });
+    else props.push({ id: `xitem${l.x}`, kind: 'item', x: l.x, y: laneY(120), w: 28, h: 28, label: `보급품:${l.item ?? 'heal'}` });
+  }
+  const segs: FloorSegment[] = [
+    { ref: `chunk:side_${room.door}_a`, x: 0, w: CHUNK_W, flip: false, terrain: [] },
+    { ref: `chunk:side_${room.door}_b`, x: CHUNK_W, w: CHUNK_W, flip: true, terrain: [] },
+  ];
+  const encounters: Encounter[] = room.fight.length
+    ? [{ triggerX: 330, lockFrom: 0, lockTo: ROOM_W, waves: [room.fight.map((kind, i) => ({ kind, x: 780 + i * 130, y: laneY(20 + ((i * 61) % 130)), elite: (room.elite && i === 0) || undefined }))] }]
+    : [];
+  const plan: StagePlan = {
+    id,
+    title: `${parent.label} · ${room.label}`,
+    type: parent.type,
+    depth: parent.depth,
+    length: ROOM_W,
+    lane: [Y_TOP, Y_BOTTOM],
+    startX: 260,
+    exitX: Infinity,
+    encounters,
+    props,
+    palette: { wall: room.palette.wall, floor: room.palette.floor, accent: room.palette.accent },
+    banner: room.secret ? `숨은 방 · ${room.label}` : room.label,
+    stage: { where: 'side', terrain: [], floor: parent, side: room, fx: { light: 1, chaseX: -9999, squeeze: 0, noise: 0, red: false } },
+  };
+  plan.drawBackground = (ctx, camX) => drawBack(ctx, camX, segs, room.palette, plan);
+  plan.drawForeground = (ctx, camX, world) => drawFront(ctx, camX, world, plan);
+  return plan;
+}
+
 export function endingPlan(id: string): StagePlan {
   const pal: Palette = { wall: '#c9c4b4', floor: '#9a9483', trim: '#6b675b', accent: '#ffffff', fog: 'rgba(0,0,0,0)' };
   const segs: FloorSegment[] = [{ ref: 'room:exit_hall', x: 0, w: ROOM_W, flip: false, terrain: [] }];
@@ -198,11 +242,11 @@ export function endingPlan(id: string): StagePlan {
 /* ── 소품 겹침 금지 (검수 12-2) ──
    기능이 있는 자리(문·승강기·패널·스위치·셔터·해치…)는 그대로 두고, 꾸밈 소품(그림 소품·입간판·탁자·물건·사람)만 옮긴다.
    ① 소품끼리 같은 깊이에서 그림 폭이 겹치지 않게 ② 벽에 붙은 소품은 벽 그림 속 문·가구 앞을 피하게 ③ 지형(단·구덩이·좁은 길) 위에 놓지 않게. */
-const FIXED_PROPS = new Set(['elevator', 'mirror', 'panel', 'chasedoor', 'b12', 'goalwall', 'switch', 'shutter', 'door', 'servicedoor', 'rope', 'up', 'down', 'fall', 'ladder_up', 'ladder_down', 'left', 'right', 'intercom', 'button', 'getoff', 'close', 'greet']);
+const FIXED_PROPS = new Set(['firegate', 'crack', 'vent', 'key', 'elevator', 'mirror', 'panel', 'chasedoor', 'b12', 'goalwall', 'switch', 'shutter', 'door', 'servicedoor', 'rope', 'up', 'down', 'fall', 'ladder_up', 'ladder_down', 'left', 'right', 'intercom', 'button', 'getoff', 'close', 'greet']);
 const BOARD_GAP = 1400;
 // 소품 그림 폭: 그림이 있으면 그 실제 폭(자판기·소파처럼 넓은 것이 문·명패를 가렸다, 검수 22), 없으면 종류별 기본
 const artW = (p: PropSpec, floorType?: string) => {
-  const base = Math.max(p.w, p.kind === 'item' || p.kind === 'belonging' || p.kind === 'mark' ? 60 : p.kind === 'passenger' || p.kind === 'npc' ? 80 : 130);
+  const base = Math.max(p.w, p.kind === 'firegate' ? 170 : 0, p.kind === 'item' || p.kind === 'belonging' || p.kind === 'mark' ? 60 : p.kind === 'passenger' || p.kind === 'npc' ? 80 : 130);
   if (p.kind === 'item' || p.kind === 'belonging' || p.kind === 'mark' || p.kind === 'passenger' || p.kind === 'npc') return base;
   return Math.max(base, propArtSize(p.kind, p.label, floorType)?.w ?? 0);
 };
@@ -229,12 +273,13 @@ function spreadProps(f: Floor, props: PropSpec[], startX: number): [number, numb
   // 벽 그림의 게시판·액자·창 앞에도 벽 쪽 소품을 세우지 않는다 (검수 14-1)
   for (const sg of f.segments) keepOut.push(...wallDecoSpans(placeFor('floor', f.type, sg.ref, f.sub, f.depth), sg.x, sg.w, sg.flip));
   // 점검문(철문)은 덩이 안 자리만 정해져 있다: 벽 그림의 문·게시판 앞이면 가까운 빈 벽으로 민다 (검수 22: 철문이 게시판을 가림)
-  for (const p of props.filter((q) => q.kind === 'servicedoor')) {
+  for (const p of props.filter((q) => q.kind === 'servicedoor' || (q.kind === 'chasedoor' && f.placed.some((z) => `p${z.id}` === q.id && z.kind === 'upper')) || (q.kind === 'door' && f.placed.some((z) => `p${z.id}` === q.id && z.kind === 'sidedoor')) || q.kind === 'crack')) {
     const h = artW(p, f.type) / 2;
     const ok = (x: number) =>
       x - h >= 40 && x + h <= f.width - 40 &&
       !keepOut.some(([a, b]) => x + h + 8 > a && x - h - 8 < b) &&
       !terr.some((t) => x + h > t.x0 - 20 && x - h < t.x1 + 20) &&
+      !props.some((q) => q !== p && (q.kind === 'shutter' || q.kind === 'firegate') && Math.abs(q.x - x) < h + 120) &&
       !props.some((q) => q !== p && fixed(q) && Math.abs(q.y - p.y) < 90 && Math.abs(q.x - x) < h + artW(q, f.type) / 2 + 16);
     if (ok(p.x)) continue;
     let x: number | null = null;
@@ -270,6 +315,8 @@ function spreadProps(f: Floor, props: PropSpec[], startX: number): [number, numb
     }
   }
   for (const p of props) if (fixed(p)) taken.push({ a: p.x - artW(p, f.type) / 2, b: p.x + artW(p, f.type) / 2, y: p.y });
+  // 잠긴 방화셔터는 복도 깊이 전체를 막는다: 앞뒤 어느 줄에도 E로 잡힐 것을 붙여 두지 않는다 (가장 가까운 것 하나만 잡힌다)
+  for (const g of f.placed.filter((q) => q.kind === 'locked')) for (const y of [Y_TOP, (Y_TOP + Y_BOTTOM) / 2, Y_BOTTOM]) taken.push({ a: g.x - 150, b: g.x + 150, y });
   const free = (p: PropSpec, x: number) => {
     const h = artW(p, f.type) / 2;
     if (x - h < 40 || x + h > f.width - 40) return false;
@@ -362,21 +409,22 @@ export function segAt(segs: FloorSegment[], x: number): FloorSegment {
 const CEIL = 40;
 function drawBack(ctx: CanvasRenderingContext2D, camX: number, segs: FloorSegment[], pal: Palette, plan: StagePlan) {
   const [y0, y1] = plan.lane ?? [Y_TOP, Y_BOTTOM];
+  const where = plan.stage.where === 'side' ? 'floor' : plan.stage.where;
   const vx0 = camX - 40,
     vx1 = camX + 1320;
   const cx = camX + 640;
-  setFloorTone(plan.stage.where === 'floor' ? (plan.depth ?? 1) : 0);
+  setFloorTone(where === 'floor' ? (plan.depth ?? 1) : 0);
   for (const s of segs) {
     if (s.x + s.w < vx0 || s.x > vx1) continue;
     const room = s.ref.startsWith('room:');
-    const place = placeFor(plan.stage.where, plan.stage.floor?.type, s.ref, plan.stage.floor?.sub, plan.stage.floor?.depth);
+    const place = placeFor(where, plan.stage.floor?.type, s.ref, plan.stage.floor?.sub, plan.stage.floor?.depth);
     // 바닥은 한 층 안에서 한 가지 (홀·방도 그 층 바닥), 벽 장소가 바뀌는 곳은 기둥으로 잇는다 (통합 검수 2-3)
-    const floorPlace = plan.stage.where === 'floor' ? placeFor('floor', plan.stage.floor?.type, '', null, plan.stage.floor?.depth) : place;
+    const floorPlace = where === 'floor' ? placeFor('floor', plan.stage.floor?.type, '', null, plan.stage.floor?.depth) : place;
     if (drawWallCell(ctx, place, s.ref, s.x, s.w, s.flip, y0)) {
       const i = segs.indexOf(s);
-      const prev = i > 0 ? placeFor(plan.stage.where, plan.stage.floor?.type, segs[i - 1].ref, plan.stage.floor?.sub, plan.stage.floor?.depth) : place;
+      const prev = i > 0 ? placeFor(where, plan.stage.floor?.type, segs[i - 1].ref, plan.stage.floor?.sub, plan.stage.floor?.depth) : place;
       if (prev !== place) seamPillar(ctx, s.x, y0);
-      const next = i + 1 < segs.length ? placeFor(plan.stage.where, plan.stage.floor?.type, segs[i + 1].ref, plan.stage.floor?.sub, plan.stage.floor?.depth) : place;
+      const next = i + 1 < segs.length ? placeFor(where, plan.stage.floor?.type, segs[i + 1].ref, plan.stage.floor?.sub, plan.stage.floor?.depth) : place;
       if (next !== place) seamPillar(ctx, s.x + s.w, y0);
       if (!drawFloor(ctx, floorPlace, s.x, s.x + s.w, y0, 720) && !drawFloor(ctx, place, s.x, s.x + s.w, y0, 720)) {
         ctx.fillStyle = pal.floor;
@@ -429,8 +477,148 @@ function drawBack(ctx: CanvasRenderingContext2D, camX: number, segs: FloorSegmen
   const layers: NonNullable<StagePlan['depthLayers']> = [];
   plan.depthLayers = layers;
   const allTerr = segs.flatMap((s) => s.terrain);
-  for (const s of segs) if (!(s.x + s.w < vx0 || s.x > vx1)) for (const t of s.terrain) drawTerrain(ctx, t, pal, y0, y1, placeFor(plan.stage.where, plan.stage.floor?.type, plan.stage.where === 'floor' ? '' : s.ref, plan.stage.floor?.sub, plan.stage.floor?.depth), layers, allTerr);
+  for (const s of segs) if (!(s.x + s.w < vx0 || s.x > vx1)) for (const t of s.terrain) drawTerrain(ctx, t, pal, y0, y1, placeFor(where, plan.stage.floor?.type, where === 'floor' ? '' : s.ref, plan.stage.floor?.sub, plan.stage.floor?.depth), layers, allTerr);
+  drawMetro(ctx, plan, vx0, vx1, y0);
   void CHUNK_W;
+}
+
+/** 메트로배니아 소품 중 그림 묶음에 없는 것: 금 간 벽·막힌 덕트·정비 열쇠는 코드 도트로. 위층 점검문·곁가지 문 위에는 작은 비상등 */
+function drawMetro(ctx: CanvasRenderingContext2D, plan: StagePlan, vx0: number, vx1: number, y0: number) {
+  const P = 3;
+  const f = plan.stage.floor;
+  for (const p of plan.props ?? []) {
+    if (p.x < vx0 - 100 || p.x > vx1 + 100) continue;
+    const x = Math.round(p.x);
+    const pl = f && p.id.startsWith('p') ? f.placed.find((z) => `p${z.id}` === p.id) : undefined;
+    if (p.kind === 'crack') {
+      const broken = !!p.label?.includes('부서진');
+      ctx.save();
+      if (broken) {
+        // 뚫린 구멍 + 깨진 가장자리 + 바닥 잔해
+        ctx.fillStyle = '#0b0a09';
+        ctx.beginPath();
+        ctx.moveTo(x - 50, y0 - 6);
+        ctx.lineTo(x - 56, y0 - 120);
+        ctx.lineTo(x - 30, y0 - 168);
+        ctx.lineTo(x + 18, y0 - 176);
+        ctx.lineTo(x + 52, y0 - 130);
+        ctx.lineTo(x + 48, y0 - 6);
+        ctx.closePath();
+        ctx.fill();
+        ctx.fillStyle = '#6b6258';
+        for (let i = 0; i < 9; i++) ctx.fillRect(x - 64 + ((i * 37) % 128), y0 + 4 + ((i * 13) % 18), P * 3, P * 2);
+      } else {
+        ctx.strokeStyle = 'rgba(20,16,12,0.85)';
+        ctx.lineWidth = P;
+        const lines = [
+          [0, -30, -20, -70, -8, -110, -34, -150],
+          [0, -30, 24, -64, 14, -100, 40, -138],
+          [-8, -110, 10, -126],
+          [14, -100, -4, -84],
+        ];
+        for (const l of lines) {
+          ctx.beginPath();
+          ctx.moveTo(x + l[0], y0 + l[1]);
+          for (let i = 2; i < l.length; i += 2) ctx.lineTo(x + l[i], y0 + l[i + 1]);
+          ctx.stroke();
+        }
+        ctx.fillStyle = 'rgba(255,255,255,0.12)';
+        ctx.fillRect(x - 22, y0 - 74, P * 2, P);
+        ctx.fillRect(x + 20, y0 - 66, P * 2, P);
+      }
+      ctx.restore();
+    } else if (p.kind === 'firegate') {
+      // 잠긴 방화셔터: 벽 아래까지 내려온 철제 셔터 + 바닥 경고띠 + 열쇠 구멍 (전용 그림이 없어 코드로)
+      const hw = 74,
+        top = y0 - 236;
+      ctx.fillStyle = '#1a1c1f';
+      ctx.fillRect(x - hw - 10, top - 26, hw * 2 + 20, 30);
+      ctx.fillStyle = '#3b4046';
+      ctx.fillRect(x - hw - 6, top - 22, hw * 2 + 12, 20);
+      ctx.fillStyle = '#26292d';
+      ctx.fillRect(x - hw - 10, top, 10, y0 - top + 4);
+      ctx.fillRect(x + hw, top, 10, y0 - top + 4);
+      for (let yy = top; yy < y0; yy += 12) {
+        ctx.fillStyle = '#7d848b';
+        ctx.fillRect(x - hw, yy, hw * 2, 9);
+        ctx.fillStyle = '#5a6168';
+        ctx.fillRect(x - hw, yy + 9, hw * 2, 3);
+        ctx.fillStyle = '#9aa1a8';
+        ctx.fillRect(x - hw, yy, hw * 2, 2);
+      }
+      ctx.fillStyle = '#3c4146';
+      ctx.fillRect(x - hw, y0 - 14, hw * 2, 14);
+      // 경고 판 + 열쇠 구멍
+      ctx.fillStyle = '#c23a2c';
+      ctx.fillRect(x - 30, top + 70, 60, 34);
+      ctx.fillStyle = '#ffe9d0';
+      ctx.fillRect(x - 24, top + 78, 48, 4);
+      ctx.fillRect(x - 24, top + 90, 30, 4);
+      ctx.fillStyle = '#e8c35a';
+      ctx.fillRect(x + hw - 30, y0 - 90, 18, 26);
+      ctx.fillStyle = '#1a1408';
+      ctx.fillRect(x + hw - 23, y0 - 84, 4, 8);
+      ctx.fillRect(x + hw - 22, y0 - 76, 2, 6);
+      // 바닥 경고띠 (복도 깊이 전체)
+      for (let i = 0; i < 10; i++) {
+        ctx.fillStyle = i % 2 ? '#1a1a1a' : '#d9b02a';
+        ctx.beginPath();
+        ctx.moveTo(x - hw + i * 15, y0);
+        ctx.lineTo(x - hw + i * 15 + 15, y0);
+        ctx.lineTo(x - hw + i * 15 + 5, y0 + 250);
+        ctx.lineTo(x - hw + i * 15 - 10, y0 + 250);
+        ctx.closePath();
+        ctx.fill();
+      }
+    } else if (p.kind === 'vent') {
+      const open = !!p.label?.includes('열린');
+      const vy = y0 - 64;
+      ctx.fillStyle = '#2a2d30';
+      ctx.fillRect(x - 40, vy, 80, 48);
+      ctx.fillStyle = open ? '#050505' : '#575d62';
+      ctx.fillRect(x - 34, vy + 6, 68, 36);
+      if (!open) {
+        ctx.fillStyle = '#2f3336';
+        for (let i = 0; i < 6; i++) ctx.fillRect(x - 34, vy + 9 + i * 6, 68, P);
+        ctx.fillStyle = '#8a8f93';
+        for (const [dx, dy] of [[-36, 2], [32, 2], [-36, 40], [32, 40]]) ctx.fillRect(x + dx, vy + dy, P, P);
+      }
+    } else if (p.kind === 'key') {
+      const t = (typeof performance !== 'undefined' ? performance.now() : 0) / 300;
+      const ky = Math.round(p.y - 40 + Math.sin(t) * 4);
+      ctx.save();
+      ctx.fillStyle = 'rgba(255,214,110,0.22)';
+      ctx.beginPath();
+      ctx.arc(x, ky, 30, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#3a2a08';
+      ctx.fillRect(x - 16, ky - 10, 14, 20);
+      ctx.fillRect(x - 4, ky - 3, 26, 6);
+      ctx.fillStyle = '#f2c14e';
+      ctx.fillRect(x - 13, ky - 7, 8, 14);
+      ctx.fillRect(x - 2, ky - 1, 22, 3);
+      ctx.fillRect(x + 12, ky + 2, 3, 6);
+      ctx.fillRect(x + 18, ky + 2, 3, 5);
+      ctx.fillStyle = '#3a2a08';
+      ctx.fillRect(x - 10, ky - 3, 3, 6);
+      ctx.restore();
+      ctx.fillStyle = 'rgba(0,0,0,0.35)';
+      ctx.fillRect(x - 18, Math.round(p.y) - 4, 36, 6);
+    } else if (pl && (pl.kind === 'upper' || pl.kind === 'sidedoor')) {
+      // 문 위 작은 비상등: 위층 점검문은 열렸으면 초록·잠겼으면 빨강, 곁가지 문은 호박색 (보상을 받으면 꺼진다)
+      const h = propArtSize(p.kind, p.label, f?.type)?.h ?? 190;
+      const ly = Math.round(Y_TOP - h - 18);
+      const col = pl.kind === 'upper' ? (p.label?.includes('열림') ? '#5fe08a' : '#e0503c') : p.label?.includes('비었다') ? '#3a3a3a' : '#ffb840';
+      ctx.fillStyle = '#1c1f22';
+      ctx.fillRect(x - 12, ly - 4, 24, 14);
+      ctx.fillStyle = col;
+      ctx.fillRect(x - 8, ly, 16, 6);
+      if (!p.label?.includes('비었다')) {
+        ctx.fillStyle = col + '33';
+        ctx.fillRect(x - 20, ly - 10, 40, 26);
+      }
+    }
+  }
 }
 
 function roomName(ref: string): string {

@@ -1,0 +1,388 @@
+2026-10-22 01:41:25 base before generations_remaining: 8612
+2026-10-22 01:41:25 base p84a -> id: 3d4c26e9-04ba-407d-af81-a588f54ce67d
+job_id: 3d4c26e9-04ba-407d-af81-a588f54ce67d
+model: pixen
+description: Side-vie
+2026-10-22 01:41:25 base p84b -> id: 88b3684f-3f48-478b-9631-d12aed76b250
+job_id: 88b3684f-3f48-478b-9631-d12aed76b250
+model: pixen
+description: Side-vie
+2026-10-22 01:41:26 base p88a -> id: ddf6ae28-12a3-42ba-b480-50dc8ae36f7f
+job_id: ddf6ae28-12a3-42ba-b480-50dc8ae36f7f
+model: pixen
+description: Side-vie
+2026-10-22 01:41:26 base p88b -> id: 2b2e2981-3927-4e9e-adfb-017f9ecbbdb1
+job_id: 2b2e2981-3927-4e9e-adfb-017f9ecbbdb1
+model: pixen
+description: Side-vie
+2026-10-22 01:42:18 base after generations_remaining: 8577
+2026-10-22 01:42:50 base2 before generations_remaining: 8577
+2026-10-22 01:42:50 base2 edit 811 -> id: ac3af294-d074-4012-a372-e064f99d9033
+job_id: ac3af294-d074-4012-a372-e064f99d9033
+model: pixen
+e
+2026-10-22 01:42:51 base2 edit 812 -> id: cadf8c26-96a9-4aa3-abfa-b83ea83b5d13
+job_id: cadf8c26-96a9-4aa3-abfa-b83ea83b5d13
+model: pixen
+e
+2026-10-22 01:43:41 base2 after generations_remaining: 8563
+2026-10-22 01:43:55 base2 before generations_remaining: 8563
+2026-10-22 01:43:55 base2 edit 821 -> id: fdd80857-8caa-4ea5-a35e-71f6a7117c48
+job_id: fdd80857-8caa-4ea5-a35e-71f6a7117c48
+model: pixen
+e
+2026-10-22 01:43:56 base2 edit 822 -> id: 07a2b5f6-f483-4fc3-8363-a36cff3ed872
+job_id: 07a2b5f6-f483-4fc3-8363-a36cff3ed872
+model: pixen
+e
+2026-10-22 01:43:56 base2 edit 823 -> id: 61825c0c-c8fb-44e2-8fad-1182d8dddec7
+job_id: 61825c0c-c8fb-44e2-8fad-1182d8dddec7
+model: pixen
+e
+2026-10-22 01:44:47 base2 after generations_remaining: 8560
+2026-10-22 01:46:08 gen before generations_remaining: 8540
+2026-10-22 01:46:08 gen idle 4f -> 197f64cf-5f68-4177-b7af-a5eabf0b3699 id: 197f64cf-5f68-4177-b7af-a5eabf0b3699
+job_id: 197f64cf-5f68-4177-b7af-a5eabf0
+2026-10-22 01:46:27 실수: 첫 idle 제출이 경로 순서 탓에 쟈알디 뼈대로 나감(3회 낭비, 결과 버림)
+2026-10-22 01:46:35 gen before generations_remaining: 8540
+2026-10-22 01:46:36 gen idle 4f -> 0174bff1-2468-4cc1-86d9-a06635bc1dce id: 0174bff1-2468-4cc1-86d9-a06635bc1dce
+job_id: 0174bff1-2468-4cc1-86d9-a06635b
+2026-10-22 01:46:37 gen cq 15f -> 3c1d6119-c955-4d20-bc29-7a26857b1d7d id: 3c1d6119-c955-4d20-bc29-7a26857b1d7d
+job_id: 3c1d6119-c955-4d20-bc29-7a26857
+2026-10-22 01:46:37 gen walk 8f -> 7a9d1f63-0d84-4c0a-8c48-bf246e95b6af id: 7a9d1f63-0d84-4c0a-8c48-bf246e95b6af
+job_id: 7a9d1f63-0d84-4c0a-8c48-bf246e9
+2026-10-22 01:46:37 gen draw 4f -> b58bdce0-6266-463c-862d-47d0a5367c73 id: b58bdce0-6266-463c-862d-47d0a5367c73
+job_id: b58bdce0-6266-463c-862d-47d0a53
+2026-10-22 01:48:29 gen idle done
+2026-10-22 01:48:31 gen draw done
+2026-10-22 01:49:53 gen cq done
+2026-10-22 01:50:56 gen before generations_remaining: 8485
+2026-10-22 01:50:57 gen tidy 8f -> 70c51bf3-4f83-4dbf-adc4-d32ffbbb7574 id: 70c51bf3-4f83-4dbf-adc4-d32ffbbb7574
+job_id: 70c51bf3-4f83-4dbf-adc4-d32ffbb
+2026-10-22 01:50:57 gen holster 6f -> fcab7985-0ae9-4a7a-8b19-1f563551416f id: fcab7985-0ae9-4a7a-8b19-1f563551416f
+job_id: fcab7985-0ae9-4a7a-8b19-1f56355
+2026-10-22 01:50:57 gen ready 4f -> 313ac207-cebb-4aff-8a2c-fcf8b12efc25 id: 313ac207-cebb-4aff-8a2c-fcf8b12efc25
+job_id: 313ac207-cebb-4aff-8a2c-fcf8b12
+2026-10-22 01:50:58 gen step 8f -> 45cc29fc-bdd1-4cc7-99bf-7e5a0969bc2a id: 45cc29fc-bdd1-4cc7-99bf-7e5a0969bc2a
+job_id: 45cc29fc-bdd1-4cc7-99bf-7e5a096
+2026-10-22 01:50:58 gen run 8f -> ee6cc36f-40db-45ed-87c1-ea4a0174f5f8 id: ee6cc36f-40db-45ed-87c1-ea4a0174f5f8
+job_id: ee6cc36f-40db-45ed-87c1-ea4a017
+2026-10-22 01:50:58 gen jump 8f -> 1d96cec6-f71a-412d-805f-2085b8bff3a1 id: 1d96cec6-f71a-412d-805f-2085b8bff3a1
+job_id: 1d96cec6-f71a-412d-805f-2085b8b
+2026-10-22 01:50:59 gen kneel 4f -> 69a6721c-1eae-400a-a8bb-b85a8da74585 id: 69a6721c-1eae-400a-a8bb-b85a8da74585
+job_id: 69a6721c-1eae-400a-a8bb-b85a8da
+2026-10-22 01:50:59 gen kneelwalk 8f -> b52c6ef9-bd84-4e72-80e6-91569ed63d62 id: b52c6ef9-bd84-4e72-80e6-91569ed63d62
+job_id: b52c6ef9-bd84-4e72-80e6-91569ed
+2026-10-22 01:52:17 gen walk done
+2026-10-22 01:52:17 gen after generations_remaining: 8459
+2026-10-22 01:52:25 gen kneel done
+2026-10-22 01:52:25 gen kneelshot 6f -> 5ea3685f-e158-4353-b1a6-3d1dec3f848b id: 5ea3685f-e158-4353-b1a6-3d1dec3f848b
+job_id: 5ea3685f-e158-4353-b1a6-3d1dec3
+2026-10-22 01:52:40 gen ready done
+2026-10-22 01:53:37 base3 before generations_remaining: 8428
+2026-10-22 01:53:37 base3 edit 931 -> 1 validation error for call[edit_image_pixen]
+description
+  String should have at most 500 character
+2026-10-22 01:53:37 base3 edit 932 -> 1 validation error for call[edit_image_pixen]
+description
+  String should have at most 500 character
+2026-10-22 01:53:37 base3 edit 933 -> 1 validation error for call[edit_image_pixen]
+description
+  String should have at most 500 character
+2026-10-22 01:53:38 base3 after generations_remaining: 8428
+2026-10-22 01:53:44 base3 before generations_remaining: 8425
+2026-10-22 01:56:50 base3 edit 931 -> id: 81e34964-4b5d-492b-b365-cc60f1fac089
+job_id: 81e34964-4b5d-492b-b365-cc60f1fac089
+model: pixen
+e
+2026-10-22 01:56:50 base3 edit 932 -> id: 1e42c268-074f-4050-bb9b-a9d254c12aa3
+job_id: 1e42c268-074f-4050-bb9b-a9d254c12aa3
+model: pixen
+e
+2026-10-22 01:58:23 base3 edit 933 -> id: e0413a27-63c7-44ca-a609-110f1b50566f
+job_id: e0413a27-63c7-44ca-a609-110f1b50566f
+model: pixen
+e
+2026-10-22 01:59:14 base3 after generations_remaining: 8300.90
+2026-10-22 01:59:41 base4 before generations_remaining: 8287.90
+2026-10-22 01:59:42 base4 edit 941 -> id: a6f0be37-1181-4aed-b78d-ffebf51a99b8
+job_id: a6f0be37-1181-4aed-b78d-ffebf51a99b8
+model: pixen
+e
+2026-10-22 02:01:45 base4 edit 942 -> id: ebc25043-d1e8-42b5-b32f-f3d3ca9c22dd
+job_id: ebc25043-d1e8-42b5-b32f-f3d3ca9c22dd
+model: pixen
+e
+2026-10-22 02:03:30 gen before generations_remaining: 8200.90
+2026-10-22 02:06:04 gen idle 4f -> 586043db-3ede-4757-9d4c-0c1e65c96438 id: 586043db-3ede-4757-9d4c-0c1e65c96438
+job_id: 586043db-3ede-4757-9d4c-0c1e65c
+2026-10-22 02:10:14 gen cq 15f -> 66b7c200-995b-4c76-bfff-2647d86ad9ae id: 66b7c200-995b-4c76-bfff-2647d86ad9ae
+job_id: 66b7c200-995b-4c76-bfff-2647d86
+2026-10-22 02:11:46 gen walk 8f -> 4308f7c6-8b10-42f9-8410-b6c616ff268e id: 4308f7c6-8b10-42f9-8410-b6c616ff268e
+job_id: 4308f7c6-8b10-42f9-8410-b6c616f
+2026-10-22 02:12:00 gen idle done
+2026-10-22 02:14:03 gen cq done
+2026-10-22 02:15:09 gen before generations_remaining: 17302.60
+2026-10-22 02:15:24 gen tidy done
+2026-10-22 02:15:26 gen draw done
+2026-10-22 02:15:28 gen holster done
+2026-10-22 02:15:29 gen ready done
+2026-10-22 02:15:32 gen step done
+2026-10-22 02:15:34 gen run done
+2026-10-22 02:15:37 gen jump done
+2026-10-22 02:15:38 gen kneel done
+2026-10-22 02:15:54 gen RESET base v3 (2026-10-22 02:15) - 이전 기준 그림 작업은 이어받지 않음
+2026-10-22 02:16:02 gen before generations_remaining: 17285.50
+2026-10-22 02:16:31 gen walk done
+2026-10-22 02:16:31 gen after generations_remaining: 17253.50
+2026-10-22 02:17:06 gen tidy 8f -> 2115df89-8f84-426e-b895-2dffdbc1c2ee id: 2115df89-8f84-426e-b895-2dffdbc1c2ee
+job_id: 2115df89-8f84-426e-b895-2dffdbc
+2026-10-22 02:18:39 gen draw 4f -> 90aeb05d-e74a-4879-88ac-fca7b0a48629 id: 90aeb05d-e74a-4879-88ac-fca7b0a48629
+job_id: 90aeb05d-e74a-4879-88ac-fca7b0a
+2026-10-22 02:19:41 gen holster 6f -> 9d1ac1b7-ce4a-4085-99ab-ca8340ccb269 id: 9d1ac1b7-ce4a-4085-99ab-ca8340ccb269
+job_id: 9d1ac1b7-ce4a-4085-99ab-ca8340c
+2026-10-22 02:22:46 gen ready 4f -> e03bde79-0e7d-4880-a1df-b02eb8f09a94 id: e03bde79-0e7d-4880-a1df-b02eb8f09a94
+job_id: e03bde79-0e7d-4880-a1df-b02eb8f
+2026-10-22 02:23:17 gen step 8f -> e3b9b372-8e62-4228-b530-7201fc24fdee id: e3b9b372-8e62-4228-b530-7201fc24fdee
+job_id: e3b9b372-8e62-4228-b530-7201fc2
+2026-10-22 02:25:56 gen before generations_remaining: 17017
+2026-10-22 02:26:10 gen tidy done
+2026-10-22 02:26:11 gen draw done
+2026-10-22 02:26:14 gen holster done
+2026-10-22 02:26:15 gen ready done
+2026-10-22 02:26:17 gen step done
+2026-10-22 02:26:30 gen run 8f -> ba2ac6e4-096d-44ad-b440-405c926932d9 id: ba2ac6e4-096d-44ad-b440-405c926932d9
+job_id: ba2ac6e4-096d-44ad-b440-405c926
+2026-10-22 02:28:33 gen jump 8f -> db7b0078-45e8-43b8-b487-99c8f17cb84b id: db7b0078-45e8-43b8-b487-99c8f17cb84b
+job_id: db7b0078-45e8-43b8-b487-99c8f17
+2026-10-22 02:29:42 gen run done
+2026-10-22 02:30:22 gen kneel 4f -> 93bbf5df-ddcc-4b4f-bcbf-0bbc2abba9ee id: 93bbf5df-ddcc-4b4f-bcbf-0bbc2abba9ee
+job_id: 93bbf5df-ddcc-4b4f-bcbf-0bbc2ab
+2026-10-22 02:30:22 gen kneelwalk 8f -> 0d930b68-85b0-4ec2-872e-cae7ab6a538b id: 0d930b68-85b0-4ec2-872e-cae7ab6a538b
+job_id: 0d930b68-85b0-4ec2-872e-cae7ab6
+2026-10-22 02:30:51 gen jump done
+2026-10-22 02:30:52 gen kneelshot 6f -> 001f6050-c8b2-412e-872c-3d984fb2f4f4 id: 001f6050-c8b2-412e-872c-3d984fb2f4f4
+job_id: 001f6050-c8b2-412e-872c-3d984fb
+2026-10-22 02:32:17 gen sniffground 6f -> ed8536f1-83f0-4deb-93f5-a9518fa95103 id: ed8536f1-83f0-4deb-93f5-a9518fa95103
+job_id: ed8536f1-83f0-4deb-93f5-a9518fa
+2026-10-22 02:32:31 gen kneel done
+2026-10-22 02:33:00 gen kneelshot done
+2026-10-22 02:34:15 gen slide 8f -> 7fc4eb3b-2a12-47c7-b026-a52f3d1ea73f id: 7fc4eb3b-2a12-47c7-b026-a52f3d1ea73f
+job_id: 7fc4eb3b-2a12-47c7-b026-a52f3d1
+2026-10-22 02:34:30 gen kneelwalk done
+2026-10-22 02:35:12 gen airshot 6f -> 01376be0-8bd7-4912-8de8-e5bea125ea18 id: 01376be0-8bd7-4912-8de8-e5bea125ea18
+job_id: 01376be0-8bd7-4912-8de8-e5bea12
+2026-10-22 02:35:27 gen sniffground done
+2026-10-22 02:35:28 gen fire 4f -> 491b4e9f-56f6-464a-b76b-ffe538ad4cf9 id: 491b4e9f-56f6-464a-b76b-ffe538ad4cf9
+job_id: 491b4e9f-56f6-464a-b76b-ffe538a
+2026-10-22 02:36:11 gen slide done
+2026-10-22 02:36:39 gen fire done
+2026-10-22 02:36:39 gen reload 7f -> 10841332-833e-4399-ac85-6539c8fd4ea8 id: 10841332-833e-4399-ac85-6539c8fd4ea8
+job_id: 10841332-833e-4399-ac85-6539c8f
+2026-10-22 02:37:07 gen airshot done
+2026-10-22 02:37:34 gen rewind 8f -> d95668fe-adb8-4b40-ad14-f6daf1ac4b26 id: d95668fe-adb8-4b40-ad14-f6daf1ac4b26
+job_id: d95668fe-adb8-4b40-ad14-f6daf1a
+2026-10-22 02:38:28 gen sniff 4f -> 981f77a7-ab7e-496a-be97-b884c03a0f17 id: 981f77a7-ab7e-496a-be97-b884c03a0f17
+job_id: 981f77a7-ab7e-496a-be97-b884c03
+2026-10-22 02:38:43 gen reload done
+2026-10-22 02:38:44 gen cover 4f -> be20184f-5114-4161-89b5-4e6e139a39c8 id: be20184f-5114-4161-89b5-4e6e139a39c8
+job_id: be20184f-5114-4161-89b5-4e6e139
+2026-10-22 02:39:39 gen sniff done
+2026-10-22 02:39:54 gen rewind done
+2026-10-22 02:39:55 gen cover done
+2026-10-22 02:40:47 gen catch 7f -> 3d9c2ceb-cee7-4337-a9b7-1ce2507c4710 id: 3d9c2ceb-cee7-4337-a9b7-1ce2507c4710
+job_id: 3d9c2ceb-cee7-4337-a9b7-1ce2507
+2026-10-22 02:40:47 gen roll 8f -> 19af2cb6-ae11-4451-899b-033a77ca3f7a id: 19af2cb6-ae11-4451-899b-033a77ca3f7a
+job_id: 19af2cb6-ae11-4451-899b-033a77c
+2026-10-22 02:42:07 gen collar 4f -> f2367eae-84d7-4f38-bf60-36651cda6eee id: f2367eae-84d7-4f38-bf60-36651cda6eee
+job_id: f2367eae-84d7-4f38-bf60-36651cd
+2026-10-22 02:43:03 gen catch done
+2026-10-22 02:43:05 gen roll done
+2026-10-22 02:43:59 gen collar done
+2026-10-22 02:44:38 gen contact 6f -> 1a825f23-0a76-42b4-bab1-ed66240fcb5d id: 1a825f23-0a76-42b4-bab1-ed66240fcb5d
+job_id: 1a825f23-0a76-42b4-bab1-ed66240
+2026-10-22 02:45:31 gen tomoe 10f -> 3cec7aea-d664-4ff8-81e0-a6c403f19e82 id: 3cec7aea-d664-4ff8-81e0-a6c403f19e82
+job_id: 3cec7aea-d664-4ff8-81e0-a6c403f
+2026-10-22 02:46:11 gen super 8f -> 1980d2c0-aef0-462c-a22a-cefb9578b959 id: 1980d2c0-aef0-462c-a22a-cefb9578b959
+job_id: 1980d2c0-aef0-462c-a22a-cefb957
+2026-10-22 02:46:39 gen contact done
+2026-10-22 02:47:36 gen tomoe done
+2026-10-22 02:48:05 gen super done
+2026-10-22 02:48:05 gen superrise 8f -> c7e5f127-bd76-4fc4-8bc5-ea2b12e584d5 id: c7e5f127-bd76-4fc4-8bc5-ea2b12e584d5
+job_id: c7e5f127-bd76-4fc4-8bc5-ea2b12e
+2026-10-22 02:50:19 gen superrise done
+2026-10-22 02:55:25 gen pickup 7f -> c14bccba-c7f5-494e-8051-3d0ccb5efcc0 id: c14bccba-c7f5-494e-8051-3d0ccb5efcc0
+job_id: c14bccba-c7f5-494e-8051-3d0ccb5
+2026-10-22 02:56:05 gen toss 7f -> ffa3f715-6cfc-4f9a-8b26-d4a89e3cf32c id: ffa3f715-6cfc-4f9a-8b26-d4a89e3cf32c
+job_id: ffa3f715-6cfc-4f9a-8b26-d4a89e3
+2026-10-22 02:57:39 gen pickup done
+2026-10-22 02:57:55 gen DROP collar (다른 사람이 그려짐)
+2026-10-22 02:57:55 gen DROP super (두 팔 벌리기 대신 사격)
+2026-10-22 02:58:02 gen before generations_remaining: 16113.70
+2026-10-22 02:58:02 gen collar 4f -> 44190058-e67a-40be-a449-9dda0a1670d1 id: 44190058-e67a-40be-a449-9dda0a1670d1
+job_id: 44190058-e67a-40be-a449-9dda0a1
+2026-10-22 02:58:17 gen toss done
+2026-10-22 02:59:36 gen collar done
+2026-10-22 02:59:50 gen super 8f -> 272c0a9a-5f51-434f-a35d-b9c2aab7f5d1 id: 272c0a9a-5f51-434f-a35d-b9c2aab7f5d1
+job_id: 272c0a9a-5f51-434f-a35d-b9c2aab
+2026-10-22 03:01:49 gen super done
+2026-10-22 03:02:02 gen drink 8f -> c0711b57-6bdc-4e1f-a86b-41a52803d547 id: c0711b57-6bdc-4e1f-a86b-41a52803d547
+job_id: c0711b57-6bdc-4e1f-a86b-41a5280
+2026-10-22 03:03:50 gen drink done
+2026-10-22 03:04:53 gen eat 7f -> 728d2af1-5627-46f9-833b-9d44cf299139 id: 728d2af1-5627-46f9-833b-9d44cf299139
+job_id: 728d2af1-5627-46f9-833b-9d44cf2
+2026-10-22 03:06:12 gen bandage 7f -> 9209d187-df95-4158-a866-2d77d5586f9d id: 9209d187-df95-4158-a866-2d77d5586f9d
+job_id: 9209d187-df95-4158-a866-2d77d55
+2026-10-22 03:06:26 gen hit 4f -> c1da46ab-8e3c-4e65-8833-4adb3641b727 id: c1da46ab-8e3c-4e65-8833-4adb3641b727
+job_id: c1da46ab-8e3c-4e65-8833-4adb364
+2026-10-22 03:06:27 gen down 8f -> 489ea147-0a73-41a6-a8dc-41fb2194e253 id: 489ea147-0a73-41a6-a8dc-41fb2194e253
+job_id: 489ea147-0a73-41a6-a8dc-41fb219
+2026-10-22 03:06:42 gen eat done
+2026-10-22 03:09:13 gen die 8f -> dc2aef6d-0783-443c-a107-7a863b957de0 id: dc2aef6d-0783-443c-a107-7a863b957de0
+job_id: dc2aef6d-0783-443c-a107-7a863b9
+2026-10-22 03:09:34 gen bandage done
+2026-10-22 03:09:36 gen down done
+2026-10-22 03:09:37 gen getup 7f -> 451337cf-f3b5-4160-8300-8cd1710d293b id: 451337cf-f3b5-4160-8300-8cd1710d293b
+job_id: 451337cf-f3b5-4160-8300-8cd1710
+2026-10-22 03:09:51 gen hit done
+2026-10-22 03:10:45 gen revive 12f -> 45c4a933-d206-49a6-9e09-2a48a0cbe7c5 id: 45c4a933-d206-49a6-9e09-2a48a0cbe7c5
+job_id: 45c4a933-d206-49a6-9e09-2a48a0c
+2026-10-22 03:12:21 gen die done
+2026-10-22 03:12:23 gen getup done
+2026-10-22 03:13:21 gen before generations_remaining: 15737.70
+2026-10-22 03:13:38 gen revive done
+2026-10-22 03:13:38 gen purge 8f -> 50f607f5-2ac5-4b6a-8628-b03b69535b24 id: 50f607f5-2ac5-4b6a-8628-b03b69535b24
+job_id: 50f607f5-2ac5-4b6a-8628-b03b695
+2026-10-22 03:13:39 gen rewindother 7f -> de240a11-f422-451d-b52b-1af268285186 id: de240a11-f422-451d-b52b-1af268285186
+job_id: de240a11-f422-451d-b52b-1af2682
+2026-10-22 03:16:29 gen purge done
+2026-10-22 03:16:30 gen pipe 8f -> e8b9ab92-ec19-485b-a401-b722371d41e9 id: e8b9ab92-ec19-485b-a401-b722371d41e9
+job_id: e8b9ab92-ec19-485b-a401-b722371
+2026-10-22 03:18:12 gen before generations_remaining: 15648.30
+2026-10-22 03:18:40 gen rewindother done
+2026-10-22 03:18:41 gen shotgun 7f -> b63d3233-67aa-49b4-a0f4-837e52b7b692 id: b63d3233-67aa-49b4-a0f4-837e52b7b692
+job_id: b63d3233-67aa-49b4-a0f4-837e52b
+2026-10-22 03:19:22 gen pipe done
+2026-10-22 03:19:23 gen tired 4f -> 458cb52a-7ecf-417d-9093-f09705e75351 id: 458cb52a-7ecf-417d-9093-f09705e75351
+job_id: 458cb52a-7ecf-417d-9093-f09705e
+2026-10-22 03:20:56 gen shotgun done
+2026-10-22 03:20:57 gen support 10f -> 5a3f2afd-c81d-4763-ae5f-ccd570b44c48 id: 5a3f2afd-c81d-4763-ae5f-ccd570b44c48
+job_id: 5a3f2afd-c81d-4763-ae5f-ccd570b
+2026-10-22 03:21:49 gen tired done
+2026-10-22 03:21:51 gen idle_pipe 4f -> b68e0d4f-6016-4a3b-a1cd-eb906d053c2d id: b68e0d4f-6016-4a3b-a1cd-eb906d053c2d
+job_id: b68e0d4f-6016-4a3b-a1cd-eb906d0
+2026-10-22 03:25:21 gen support done
+2026-10-22 03:25:21 gen walk_pipe 8f -> 4cf78baa-4d36-4fce-a755-30cdc4119d96 id: 4cf78baa-4d36-4fce-a755-30cdc4119d96
+job_id: 4cf78baa-4d36-4fce-a755-30cdc41
+2026-10-22 03:25:48 gen idle_pipe done
+2026-10-22 03:25:49 gen idle_shotgun 4f -> 3bb6de43-4afe-4568-88c4-f565f4ddedc5 id: 3bb6de43-4afe-4568-88c4-f565f4ddedc5
+job_id: 3bb6de43-4afe-4568-88c4-f565f4d
+2026-10-22 03:27:22 gen idle_shotgun done
+2026-10-22 03:27:22 gen walk_shotgun 8f -> a2f9c358-463a-4d88-86d3-bf65fd89be7b id: a2f9c358-463a-4d88-86d3-bf65fd89be7b
+job_id: a2f9c358-463a-4d88-86d3-bf65fd8
+2026-10-22 03:29:08 gen walk_pipe done
+2026-10-22 03:29:08 gen run_shotgun 8f -> 209d017f-f6cd-4985-8b0e-6ba1f7c89256 id: 209d017f-f6cd-4985-8b0e-6ba1f7c89256
+job_id: 209d017f-f6cd-4985-8b0e-6ba1f7c
+2026-10-22 03:30:55 gen walk_shotgun done
+2026-10-22 03:30:57 gen carry2_idle 4f -> ab960723-17f8-49e9-b2f0-d879557eadb4 id: ab960723-17f8-49e9-b2f0-d879557eadb4
+job_id: ab960723-17f8-49e9-b2f0-d879557
+2026-10-22 03:32:53 gen run_shotgun done
+2026-10-22 03:32:54 gen carry2_walk 8f -> 0c18d29c-29b1-424c-9bba-ea34ae686915 id: 0c18d29c-29b1-424c-9bba-ea34ae686915
+job_id: 0c18d29c-29b1-424c-9bba-ea34ae6
+2026-10-22 03:34:14 gen carry2_idle done
+2026-10-22 03:34:15 gen carry2_run 8f -> c0f2d995-68d8-4ea4-b5a3-9d636aa05b77 id: c0f2d995-68d8-4ea4-b5a3-9d636aa05b77
+job_id: c0f2d995-68d8-4ea4-b5a3-9d636aa
+2026-10-22 03:35:47 gen carry2_walk done
+2026-10-22 03:35:48 gen turn 3f -> b97f63e7-bd3b-488b-b00d-c5cc73c34ab3 id: b97f63e7-bd3b-488b-b00d-c5cc73c34ab3
+job_id: b97f63e7-bd3b-488b-b00d-c5cc73c
+2026-10-22 03:37:09 gen carry2_run done
+2026-10-22 03:37:09 gen fall 3f -> 9a95fdf3-b0c8-40e9-b913-b522c84db400 id: 9a95fdf3-b0c8-40e9-b913-b522c84db400
+job_id: 9a95fdf3-b0c8-40e9-b913-b522c84
+2026-10-22 03:39:07 gen turn done
+2026-10-22 03:39:08 gen land 3f -> 6f923b63-13e5-4224-bd7b-70af63ec0ba1 id: 6f923b63-13e5-4224-bd7b-70af63ec0ba1
+job_id: 6f923b63-13e5-4224-bd7b-70af63e
+2026-10-22 03:40:01 gen fall done
+2026-10-22 03:40:02 gen ladder 8f -> 2e098bf8-a43a-4b48-8948-1f245c2be0e2 id: 2e098bf8-a43a-4b48-8948-1f245c2be0e2
+job_id: 2e098bf8-a43a-4b48-8948-1f245c2
+2026-10-22 03:42:52 gen land done
+2026-10-22 03:42:55 gen ladder done
+2026-10-22 03:42:55 gen mantle 6f -> 0ca7321f-9790-43e9-a035-75d1d253d592 id: 0ca7321f-9790-43e9-a035-75d1d253d592
+job_id: 0ca7321f-9790-43e9-a035-75d1d25
+2026-10-22 03:42:55 gen vault 5f -> 08c00af9-7490-4edc-9182-8f15a908dfaa id: 08c00af9-7490-4edc-9182-8f15a908dfaa
+job_id: 08c00af9-7490-4edc-9182-8f15a90
+2026-10-22 03:45:20 gen vault done
+2026-10-22 03:45:20 gen crawl 8f -> 54a7037f-0fe2-4d21-a36f-2bd6d752b259 id: 54a7037f-0fe2-4d21-a36f-2bd6d752b259
+job_id: 54a7037f-0fe2-4d21-a36f-2bd6d75
+2026-10-22 03:45:47 gen mantle done
+2026-10-22 03:45:48 gen sneak 8f -> 6942d237-e524-4b06-8a26-1f3ece99c3a2 id: 6942d237-e524-4b06-8a26-1f3ece99c3a2
+job_id: 6942d237-e524-4b06-8a26-1f3ece9
+2026-10-22 03:47:34 gen crawl done
+2026-10-22 03:47:35 gen idle_light 4f -> d4705fe2-14db-4797-9a4e-4f4a5f51da3e id: d4705fe2-14db-4797-9a4e-4f4a5f51da3e
+job_id: d4705fe2-14db-4797-9a4e-4f4a5f5
+2026-10-22 03:48:03 gen sneak done
+2026-10-22 03:48:03 gen walk_light 8f -> 56d18791-9926-4508-94ad-ee1197c8ac8d id: 56d18791-9926-4508-94ad-ee1197c8ac8d
+job_id: 56d18791-9926-4508-94ad-ee1197c
+2026-10-22 03:49:48 gen idle_light done
+2026-10-22 03:49:48 gen run_light 8f -> 6c79e25a-0937-497f-a804-6fcdef08a498 id: 6c79e25a-0937-497f-a804-6fcdef08a498
+job_id: 6c79e25a-0937-497f-a804-6fcdef0
+2026-10-22 03:50:55 gen walk_light done
+2026-10-22 03:50:56 gen lookback 7f -> 192d9f59-a362-42ef-96c9-e3c3126e7a27 id: 192d9f59-a362-42ef-96c9-e3c3126e7a27
+job_id: 192d9f59-a362-42ef-96c9-e3c3126
+2026-10-22 03:52:16 gen run_light done
+2026-10-22 03:52:16 gen hide 6f -> 2803e0d8-3b40-423f-b90d-0fd09d5824a8 id: 2803e0d8-3b40-423f-b90d-0fd09d5824a8
+job_id: 2803e0d8-3b40-423f-b90d-0fd09d5
+2026-10-22 03:55:07 gen lookback done
+2026-10-22 03:55:21 gen hide done
+2026-10-22 03:55:22 gen after generations_remaining: 15070.30
+2026-10-22 03:56:16 gen DROP idle_pipe (쇠파이프가 칼로 그려짐)
+2026-10-22 03:56:16 gen DROP walk_pipe (쇠파이프가 칼로 그려짐)
+2026-10-22 03:56:17 gen before generations_remaining: 15055.30
+2026-10-22 03:56:17 gen idle_pipe 4f -> 4d4155d9-0cc2-412d-964c-51f241d5317a id: 4d4155d9-0cc2-412d-964c-51f241d5317a
+job_id: 4d4155d9-0cc2-412d-964c-51f241d
+2026-10-22 03:56:18 gen walk_pipe 8f -> 057412b9-954e-4de3-a605-cec8a8665ef6 id: 057412b9-954e-4de3-a605-cec8a8665ef6
+job_id: 057412b9-954e-4de3-a605-cec8a86
+2026-10-22 03:58:15 gen idle_pipe done
+2026-10-22 03:59:59 gen walk_pipe done
+2026-10-22 04:00:01 gen after generations_remaining: 15018.30
+2026-10-22 04:12:50 gen DROP cq (independent review r1)
+2026-10-22 04:12:50 gen DROP slide (independent review r1)
+2026-10-22 04:12:50 gen DROP airshot (independent review r1)
+2026-10-22 04:12:50 gen DROP cover (independent review r1)
+2026-10-22 04:12:50 gen DROP catch (independent review r1)
+2026-10-22 04:12:50 gen DROP collar (independent review r1)
+2026-10-22 04:12:50 gen DROP contact (independent review r1)
+2026-10-22 04:12:50 gen DROP super (independent review r1)
+2026-10-22 04:12:50 gen DROP support (independent review r1)
+2026-10-22 04:12:50 gen DROP pickup (independent review r1)
+2026-10-22 04:12:51 gen before generations_remaining: 14843.30
+2026-10-22 04:12:51 gen catch 7f -> 0101ed80-9ebf-4d53-911a-5693b35a5093 id: 0101ed80-9ebf-4d53-911a-5693b35a5093
+job_id: 0101ed80-9ebf-4d53-911a-5693b35
+2026-10-22 04:12:51 gen collar 4f -> 27201bd2-1a93-4ff1-84b2-6f739e3970eb id: 27201bd2-1a93-4ff1-84b2-6f739e3970eb
+job_id: 27201bd2-1a93-4ff1-84b2-6f739e3
+2026-10-22 04:14:37 gen catch done
+2026-10-22 04:14:38 gen collar done
+2026-10-22 04:14:38 gen contact 6f -> 733f7aff-1330-43d1-894e-6129bec7e5c6 id: 733f7aff-1330-43d1-894e-6129bec7e5c6
+job_id: 733f7aff-1330-43d1-894e-6129bec
+2026-10-22 04:14:39 gen super 8f -> 5501d00c-efef-48f9-a362-15ecc222f723 id: 5501d00c-efef-48f9-a362-15ecc222f723
+job_id: 5501d00c-efef-48f9-a362-15ecc22
+2026-10-22 04:16:24 gen contact done
+2026-10-22 04:16:25 gen cover 4f -> 0bb4974b-cac9-4003-9879-c0817a2a6bb0 id: 0bb4974b-cac9-4003-9879-c0817a2a6bb0
+job_id: 0bb4974b-cac9-4003-9879-c0817a2
+2026-10-22 04:16:39 gen super done
+2026-10-22 04:16:40 gen support 10f -> ab4e773e-8fb4-44cf-9cab-18cf2e758135 id: ab4e773e-8fb4-44cf-9cab-18cf2e758135
+job_id: ab4e773e-8fb4-44cf-9cab-18cf2e7
+2026-10-22 04:17:46 gen cover done
+2026-10-22 04:17:47 gen cq 15f -> 17d97599-fbfc-49fc-9d8c-dcede24a78d7 id: 17d97599-fbfc-49fc-9d8c-dcede24a78d7
+job_id: 17d97599-fbfc-49fc-9d8c-dcede24
+2026-10-22 04:19:07 gen support done
+2026-10-22 04:19:08 gen slide 8f -> c4b22cd2-c67d-4052-a42a-2d832e5edbfb id: c4b22cd2-c67d-4052-a42a-2d832e5edbfb
+job_id: c4b22cd2-c67d-4052-a42a-2d832e5
+2026-10-22 04:20:53 gen slide done
+2026-10-22 04:20:54 gen airshot 6f -> d6b4267f-2c45-4205-ad47-bdca9c16dc2d id: d6b4267f-2c45-4205-ad47-bdca9c16dc2d
+job_id: d6b4267f-2c45-4205-ad47-bdca9c1
+2026-10-22 04:23:18 gen airshot done
+2026-10-22 04:23:19 gen pickup 7f -> 08357c9f-71b8-4941-925a-3694a15cee4e id: 08357c9f-71b8-4941-925a-3694a15cee4e
+job_id: 08357c9f-71b8-4941-925a-3694a15
+2026-10-22 04:23:35 gen cq done
+2026-10-22 04:25:07 gen pickup done
+2026-10-22 04:25:07 gen after generations_remaining: 14642.30

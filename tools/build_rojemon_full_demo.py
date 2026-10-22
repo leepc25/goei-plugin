@@ -108,6 +108,7 @@ def strip(frames, fw, fh):
 
 
 def main():
+    FIX.LOAD = frames_of
     manifest = {'clips': {}, 'missing': []}
     strips = {}
     final = os.path.join(SRC, 'final'); os.makedirs(final, exist_ok=True)
@@ -124,7 +125,7 @@ def main():
         if fr and make != 'code':
             fr, idx = FIX.apply(src, fr, idx)
         if not fr:
-            manifest['missing'].append(key); continue
+            manifest['missing'].append([key, r['group']]); continue
         pl = play_of(key, src, len(fr))
         ent = dict(label=f"{r['row']} {r['name']}", group=r['group'], body=body, fw=fw, fh=fh, foot=foot, anc=anc, frames=len(fr), src=src,
                    how=r.get('how', ''), make=make, **pl)
@@ -147,7 +148,7 @@ def main():
             .replace('__BG__', base64.b64encode(open(BG, 'rb').read()).decode()))
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     open(OUT, 'w', encoding='utf-8').write(html)
-    print('wrote', OUT, len(html) // 1024, 'KB', 'clips', len(manifest['clips']), 'strips', len(strips), 'missing', len(manifest['missing']), manifest['missing'][:30])
+    print('wrote', OUT, len(html) // 1024, 'KB', 'clips', len(manifest['clips']), 'strips', len(strips), 'missing', len(manifest['missing']), [m[0] for m in manifest['missing'] if m[1] in ('전투', '꼬마 인형', '마네킹(그릇)')])
 
 
 if __name__ == '__main__':

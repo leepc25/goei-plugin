@@ -230,7 +230,7 @@ export class DemoEngine {
       bd = 61;
     for (const pr of this.props) {
       const d = Math.abs(pr.x - this.p.x);
-      if (d < bd && pr.kind !== 'prop' && pr.kind !== 'shutter') (bd = d), (best = pr);
+      if (d < bd && pr.kind !== 'prop' && (pr.kind !== 'shutter' || pr.label === '잠긴 방화셔터')) (bd = d), (best = pr);
     }
     return best;
   }

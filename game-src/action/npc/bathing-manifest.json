@@ -1,0 +1,595 @@
+{
+  "version": 1,
+  "requested": 60,
+  "delivered": 43,
+  "missing": [
+    "game-src/action/npc/clips/jaemtri/undress/05.png",
+    "game-src/action/npc/clips/dejure/undress/04.png",
+    "game-src/action/npc/clips/dejure/undress/05.png",
+    "game-src/action/npc/clips/dejure/undress/06.png",
+    "game-src/action/npc/clips/dejure/showerturn/00.png",
+    "game-src/action/npc/clips/dejure/showerturn/01.png",
+    "game-src/action/npc/clips/dejure/showerturn/02.png",
+    "game-src/action/npc/clips/dejure/shower/00.png",
+    "game-src/action/npc/clips/dejure/shower/01.png",
+    "game-src/action/npc/clips/dejure/shower/02.png",
+    "game-src/action/npc/clips/dejure/shower/03.png",
+    "game-src/action/npc/clips/dejure/shower/04.png",
+    "game-src/action/npc/clips/dejure/shower/05.png",
+    "game-src/action/npc/clips/dejure/bath/00.png",
+    "game-src/action/npc/clips/dejure/bath/01.png",
+    "game-src/action/npc/clips/dejure/bath/02.png",
+    "game-src/action/npc/clips/dejure/bath/03.png"
+  ],
+  "frames": [
+    {
+      "path": "game-src/action/npc/clips/jaemtri/undress/00.png",
+      "bbox": [
+        47,
+        44,
+        70,
+        136
+      ],
+      "opaque_colors": 73,
+      "sole_y": 135,
+      "outline": "#0D1213",
+      "sha256": "3d8b39397b352acdbbedf9890e9688075b79e1f52495c8a44f0649ef6f5df30b"
+    },
+    {
+      "path": "game-src/action/npc/clips/jaemtri/undress/01.png",
+      "bbox": [
+        46,
+        44,
+        73,
+        136
+      ],
+      "opaque_colors": 70,
+      "sole_y": 135,
+      "outline": "#0D1213",
+      "sha256": "9a27d05fd2deda1b827aaaf0ea0b340087634318ccb0339cf69111dd77775269"
+    },
+    {
+      "path": "game-src/action/npc/clips/jaemtri/undress/02.png",
+      "bbox": [
+        47,
+        45,
+        70,
+        136
+      ],
+      "opaque_colors": 66,
+      "sole_y": 135,
+      "outline": "#0D1213",
+      "sha256": "1c474f0d74dc394850c43731c5f7e2fe3480215a6cbfee4ee16fc8f50468596c"
+    },
+    {
+      "path": "game-src/action/npc/clips/jaemtri/undress/03.png",
+      "bbox": [
+        46,
+        45,
+        72,
+        136
+      ],
+      "opaque_colors": 69,
+      "sole_y": 135,
+      "outline": "#0D1213",
+      "sha256": "f2f6912addc1f445f44fa9b0597b599a2a47a8f000f5f46233927cecbde9049b"
+    },
+    {
+      "path": "game-src/action/npc/clips/jaemtri/undress/04.png",
+      "bbox": [
+        47,
+        45,
+        70,
+        136
+      ],
+      "opaque_colors": 73,
+      "sole_y": 135,
+      "outline": "#0D1213",
+      "sha256": "57d9d2519a1e0392e642075b109fd67dfc5a8c9b9e734f8600c18354fe356530"
+    },
+    {
+      "path": "game-src/action/npc/clips/jaemtri/undress/06.png",
+      "bbox": [
+        46,
+        46,
+        71,
+        136
+      ],
+      "opaque_colors": 63,
+      "sole_y": 135,
+      "outline": "#0D1213",
+      "sha256": "1cf199fc8557533d1f39c5635d6f8e98f21c397308708358350542b54302f9c4"
+    },
+    {
+      "path": "game-src/action/npc/clips/jaemtri/showerturn/00.png",
+      "bbox": [
+        46,
+        46,
+        71,
+        136
+      ],
+      "opaque_colors": 63,
+      "sole_y": 135,
+      "outline": "#0D1213",
+      "sha256": "7f32a432ade8076e20394441cf9419fd22e221e1765d385a4befda7d66ecc5e8"
+    },
+    {
+      "path": "game-src/action/npc/clips/jaemtri/showerturn/01.png",
+      "bbox": [
+        44,
+        46,
+        72,
+        136
+      ],
+      "opaque_colors": 66,
+      "sole_y": 135,
+      "outline": "#0D1213",
+      "sha256": "04be3865b043189debb5f6477f942754bb5ba573580aea6aed49b39db9bdf004"
+    },
+    {
+      "path": "game-src/action/npc/clips/jaemtri/showerturn/02.png",
+      "bbox": [
+        44,
+        46,
+        72,
+        136
+      ],
+      "opaque_colors": 67,
+      "sole_y": 135,
+      "outline": "#0D1213",
+      "sha256": "0efc66a8bfdb2d79fc7785695a13dcfcf2d890a5e16bf1f8d1edb0c644de78b8"
+    },
+    {
+      "path": "game-src/action/npc/clips/jaemtri/shower/00.png",
+      "bbox": [
+        41,
+        45,
+        75,
+        136
+      ],
+      "opaque_colors": 67,
+      "sole_y": 135,
+      "outline": "#0D1213",
+      "sha256": "b134fe8e1af887d643376f2d893db7f8f0900d4fb0a4f6b3209d6c06ee413d20"
+    },
+    {
+      "path": "game-src/action/npc/clips/jaemtri/shower/01.png",
+      "bbox": [
+        41,
+        46,
+        74,
+        136
+      ],
+      "opaque_colors": 69,
+      "sole_y": 135,
+      "outline": "#0D1213",
+      "sha256": "ca0071ab395413bbb23f99a89282715738c8b878f6f20930176e46ddd3126b2e"
+    },
+    {
+      "path": "game-src/action/npc/clips/jaemtri/shower/02.png",
+      "bbox": [
+        43,
+        45,
+        76,
+        136
+      ],
+      "opaque_colors": 63,
+      "sole_y": 135,
+      "outline": "#0D1213",
+      "sha256": "7acf9beff22a2abcbbd3749540dc0da87d3dfab56553ba260a73782b3193376b"
+    },
+    {
+      "path": "game-src/action/npc/clips/jaemtri/shower/03.png",
+      "bbox": [
+        42,
+        46,
+        73,
+        136
+      ],
+      "opaque_colors": 71,
+      "sole_y": 135,
+      "outline": "#0D1213",
+      "sha256": "da7e5f44d409f2648019e76c65dd78ba391c466c428a30d83bcb53cbd391950b"
+    },
+    {
+      "path": "game-src/action/npc/clips/jaemtri/shower/04.png",
+      "bbox": [
+        40,
+        46,
+        73,
+        136
+      ],
+      "opaque_colors": 67,
+      "sole_y": 135,
+      "outline": "#0D1213",
+      "sha256": "331dbaaab919cc0ddeb8b430814edecbfede215b4ac7bee649130c39043c0d4e"
+    },
+    {
+      "path": "game-src/action/npc/clips/jaemtri/shower/05.png",
+      "bbox": [
+        42,
+        45,
+        73,
+        136
+      ],
+      "opaque_colors": 70,
+      "sole_y": 135,
+      "outline": "#0D1213",
+      "sha256": "0604f9a321a15e546d0e7c6423ecd613569a7a33ded967f39efece087697fcd0"
+    },
+    {
+      "path": "game-src/action/npc/clips/jaemtri/bath/00.png",
+      "bbox": [
+        39,
+        69,
+        93,
+        136
+      ],
+      "opaque_colors": 73,
+      "sole_y": 135,
+      "outline": "#0D1213",
+      "sha256": "3b544f6372887fb8c707649cca4aaa8b91206f9151b204846b687d25a2e4959a"
+    },
+    {
+      "path": "game-src/action/npc/clips/jaemtri/bath/01.png",
+      "bbox": [
+        39,
+        68,
+        93,
+        136
+      ],
+      "opaque_colors": 74,
+      "sole_y": 135,
+      "outline": "#0D1213",
+      "sha256": "c5a3ac1813ee363d358e28d3928e697bc10b4c0f8403b514e2e6fa6a7c0979f9"
+    },
+    {
+      "path": "game-src/action/npc/clips/jaemtri/bath/02.png",
+      "bbox": [
+        39,
+        70,
+        93,
+        136
+      ],
+      "opaque_colors": 70,
+      "sole_y": 135,
+      "outline": "#0D1213",
+      "sha256": "8ee161271d11ca4d6487ac20df6206a7948c9cc214160b17f879be47c6f6e35f"
+    },
+    {
+      "path": "game-src/action/npc/clips/jaemtri/bath/03.png",
+      "bbox": [
+        40,
+        68,
+        96,
+        136
+      ],
+      "opaque_colors": 70,
+      "sole_y": 135,
+      "outline": "#0D1213",
+      "sha256": "e2f7f804b16c98707a024f762bf410d118131ad312c528b66a4f3e8decd6af89"
+    },
+    {
+      "path": "game-src/action/npc/clips/gognija/undress/00.png",
+      "bbox": [
+        47,
+        39,
+        71,
+        136
+      ],
+      "opaque_colors": 69,
+      "sole_y": 135,
+      "outline": "#0D1213",
+      "sha256": "fc8c14ddad88ea42980cd141b82346bbae8b95108fad86e3a4cdd8517219ea36"
+    },
+    {
+      "path": "game-src/action/npc/clips/gognija/undress/01.png",
+      "bbox": [
+        45,
+        39,
+        71,
+        136
+      ],
+      "opaque_colors": 73,
+      "sole_y": 135,
+      "outline": "#0D1213",
+      "sha256": "03aade24c47549b34d533a192061903ac257f6eb23a442fdd9a0b032b8f9ba5c"
+    },
+    {
+      "path": "game-src/action/npc/clips/gognija/undress/02.png",
+      "bbox": [
+        47,
+        39,
+        71,
+        136
+      ],
+      "opaque_colors": 70,
+      "sole_y": 135,
+      "outline": "#0D1213",
+      "sha256": "553ab8a5540c4d9918d7ae100a1084f5459e9418cecddedac6181bf8a6326687"
+    },
+    {
+      "path": "game-src/action/npc/clips/gognija/undress/03.png",
+      "bbox": [
+        47,
+        38,
+        74,
+        136
+      ],
+      "opaque_colors": 72,
+      "sole_y": 135,
+      "outline": "#0D1213",
+      "sha256": "e2d0a8ffa41c3f915b5454299405299928e90148f1d7a82bb0160b6622e59281"
+    },
+    {
+      "path": "game-src/action/npc/clips/gognija/undress/04.png",
+      "bbox": [
+        47,
+        39,
+        71,
+        136
+      ],
+      "opaque_colors": 71,
+      "sole_y": 135,
+      "outline": "#0D1213",
+      "sha256": "f7a6e7e7b74d7d3e2cd3c2577e030e02f47f63b3d9e2ba7041de9b4ef4691064"
+    },
+    {
+      "path": "game-src/action/npc/clips/gognija/undress/05.png",
+      "bbox": [
+        44,
+        57,
+        94,
+        136
+      ],
+      "opaque_colors": 73,
+      "sole_y": 135,
+      "outline": "#0D1213",
+      "sha256": "bf2a6d60ab92a8d7dffadfd8c2053eeb557dde06f7723859021ca61489e193c1"
+    },
+    {
+      "path": "game-src/action/npc/clips/gognija/undress/06.png",
+      "bbox": [
+        47,
+        39,
+        71,
+        136
+      ],
+      "opaque_colors": 67,
+      "sole_y": 135,
+      "outline": "#0D1213",
+      "sha256": "bf95d14b6befc85351285b2bd209cf6ffa05f0a94a229e8efe8b837359748a07"
+    },
+    {
+      "path": "game-src/action/npc/clips/gognija/showerturn/00.png",
+      "bbox": [
+        47,
+        39,
+        71,
+        136
+      ],
+      "opaque_colors": 67,
+      "sole_y": 135,
+      "outline": "#0D1213",
+      "sha256": "bf95d14b6befc85351285b2bd209cf6ffa05f0a94a229e8efe8b837359748a07"
+    },
+    {
+      "path": "game-src/action/npc/clips/gognija/showerturn/01.png",
+      "bbox": [
+        44,
+        37,
+        73,
+        136
+      ],
+      "opaque_colors": 74,
+      "sole_y": 135,
+      "outline": "#0D1213",
+      "sha256": "089ee88b0578919630a4c40d0ea7b8a4c04ad25fd4a00f355b4f147085bad558"
+    },
+    {
+      "path": "game-src/action/npc/clips/gognija/showerturn/02.png",
+      "bbox": [
+        40,
+        36,
+        74,
+        136
+      ],
+      "opaque_colors": 63,
+      "sole_y": 135,
+      "outline": "#0D1213",
+      "sha256": "9f6d38a7de9388bae9001fef6c43d7f9c572cf99fc3c888e1b314c8ee3ea4055"
+    },
+    {
+      "path": "game-src/action/npc/clips/gognija/shower/00.png",
+      "bbox": [
+        36,
+        35,
+        77,
+        136
+      ],
+      "opaque_colors": 69,
+      "sole_y": 135,
+      "outline": "#0D1213",
+      "sha256": "64cb6b4f1defcf2b96bb8550c6c56d4852787f10fc0125df9ba668b65c30729e"
+    },
+    {
+      "path": "game-src/action/npc/clips/gognija/shower/01.png",
+      "bbox": [
+        37,
+        35,
+        78,
+        136
+      ],
+      "opaque_colors": 72,
+      "sole_y": 135,
+      "outline": "#0D1213",
+      "sha256": "bfba1d4f4913636f76729d80a595a880f0d18e5c89c0cacc1a141246e870f50d"
+    },
+    {
+      "path": "game-src/action/npc/clips/gognija/shower/02.png",
+      "bbox": [
+        39,
+        34,
+        79,
+        136
+      ],
+      "opaque_colors": 71,
+      "sole_y": 135,
+      "outline": "#0D1213",
+      "sha256": "a023ea77e9590de2ff3b2f8b1fc64a51eaecc8630408614a67c3d3ae4896ca22"
+    },
+    {
+      "path": "game-src/action/npc/clips/gognija/shower/03.png",
+      "bbox": [
+        39,
+        35,
+        75,
+        136
+      ],
+      "opaque_colors": 69,
+      "sole_y": 135,
+      "outline": "#0D1213",
+      "sha256": "5a1b5f925210f5607ed2beba8b7cf2500ba2de2347b9edaafd470326a82b0c37"
+    },
+    {
+      "path": "game-src/action/npc/clips/gognija/shower/04.png",
+      "bbox": [
+        36,
+        34,
+        78,
+        136
+      ],
+      "opaque_colors": 72,
+      "sole_y": 135,
+      "outline": "#0D1213",
+      "sha256": "42ace5957b8ad93091680c56357327d58d5eb172b17cd1999f18928409d95c74"
+    },
+    {
+      "path": "game-src/action/npc/clips/gognija/shower/05.png",
+      "bbox": [
+        37,
+        35,
+        77,
+        136
+      ],
+      "opaque_colors": 71,
+      "sole_y": 135,
+      "outline": "#0D1213",
+      "sha256": "341ad42dc94eba75893b7ba7feab0d91f1a4901aec307adeac2d01a41f6fdff1"
+    },
+    {
+      "path": "game-src/action/npc/clips/gognija/bath/00.png",
+      "bbox": [
+        32,
+        70,
+        90,
+        136
+      ],
+      "opaque_colors": 71,
+      "sole_y": 135,
+      "outline": "#0D1213",
+      "sha256": "9f20d2cd22171f32408400d1b40822bc602a0238dc5b173a1a74d8d119ea889d"
+    },
+    {
+      "path": "game-src/action/npc/clips/gognija/bath/01.png",
+      "bbox": [
+        32,
+        68,
+        90,
+        136
+      ],
+      "opaque_colors": 77,
+      "sole_y": 135,
+      "outline": "#0D1213",
+      "sha256": "e09620d240dda06218d064d996bf13abe981133ca0569ab3e19543c8dbc41973"
+    },
+    {
+      "path": "game-src/action/npc/clips/gognija/bath/02.png",
+      "bbox": [
+        31,
+        70,
+        90,
+        136
+      ],
+      "opaque_colors": 73,
+      "sole_y": 135,
+      "outline": "#0D1213",
+      "sha256": "9d40adee861e3181f6921987f53860bf0044baa1bbdb2cd2d5acecfb3bfcff02"
+    },
+    {
+      "path": "game-src/action/npc/clips/gognija/bath/03.png",
+      "bbox": [
+        32,
+        69,
+        90,
+        136
+      ],
+      "opaque_colors": 78,
+      "sole_y": 135,
+      "outline": "#0D1213",
+      "sha256": "169ec2e9d70ec364e0f94894e87513aedc2aaeb34bcb9976b54b9e8641e734af"
+    },
+    {
+      "path": "game-src/action/npc/clips/dejure/undress/00.png",
+      "bbox": [
+        28,
+        50,
+        71,
+        136
+      ],
+      "opaque_colors": 77,
+      "sole_y": 135,
+      "outline": "#0D1213",
+      "sha256": "c58c7cb2cc3641e71bc597c3e10a7aaf450933683c79bbbf1385d968aa8b3e63"
+    },
+    {
+      "path": "game-src/action/npc/clips/dejure/undress/01.png",
+      "bbox": [
+        28,
+        50,
+        72,
+        136
+      ],
+      "opaque_colors": 78,
+      "sole_y": 135,
+      "outline": "#0D1213",
+      "sha256": "76b242b9bab481c140746e30bb16d8f6856148647748e9acf429e55ad2bc9324"
+    },
+    {
+      "path": "game-src/action/npc/clips/dejure/undress/02.png",
+      "bbox": [
+        28,
+        50,
+        70,
+        136
+      ],
+      "opaque_colors": 74,
+      "sole_y": 135,
+      "outline": "#0D1213",
+      "sha256": "0b827fba2b20af1a8c63e21231cbb09ce066fad3815b4196c7950416fd8a2206"
+    },
+    {
+      "path": "game-src/action/npc/clips/dejure/undress/03.png",
+      "bbox": [
+        28,
+        49,
+        70,
+        136
+      ],
+      "opaque_colors": 78,
+      "sole_y": 135,
+      "outline": "#0D1213",
+      "sha256": "fa976d70c1be30a0cd451d406daaf34d5839541e8dbce2e249dbf5caec2d7a6e"
+    }
+  ],
+  "generator": "built-in ImageGen",
+  "pixel_lab_calls": 0,
+  "status": "partial; image-generation safety blocks remain",
+  "notes": [
+    "Jaemtri undress/05: output moderation blocked; oversized earlier draft excluded.",
+    "Dejure towel edit rejected at input moderation; 16 remaining towel frames not generated.",
+    "Dejure reference PNG is 87px high; request table says approximately 80px. Reference proportions retained.",
+    "Technical canvas/alpha/palette/sole/outline checks do not constitute final identity/anatomy approval.",
+    "Side-to-turn frame00 reuses the same newly generated undress/06 boundary pose."
+  ]
+}

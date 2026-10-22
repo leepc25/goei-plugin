@@ -39,6 +39,8 @@ export interface GenContext {
   exitOpen?: boolean;
   /** 거울 규칙을 어기고 탔다 → 위협 +30% */
   tired?: boolean;
+  /** 이번 출동의 숨은 길이 이 층에 있다 (출동당 0~1, 기본기획서 8.2) */
+  secret?: boolean;
 }
 
 export const MAX_PIT = 130;
@@ -238,7 +240,7 @@ function buildFloor(ctx: GenContext, seed: number, fallback: 'A' | 'B' | null): 
           break;
         case 'door':
           if (type === 'chase') placed.push(place('chasedoor', px, 0, 60, '방화문', { closed: false }));
-          else if (r() < 0.5) placed.push(place('prop', px, 0, 70, '잠긴 문'));
+          else if (r() < 0.5) placed.push(place('prop', px, 0, 70, '닫힌 사무실 문'));
           break;
         case 'sign':
           if (ruleSigns.length) {
@@ -366,7 +368,7 @@ function buildFloor(ctx: GenContext, seed: number, fallback: 'A' | 'B' | null): 
     squeeze: 70 + seq.length * 12,
     b12: b12mark ? 1 : 0,
   };
-  return {
+  const floor: Floor = {
     depth,
     label,
     type,
@@ -385,7 +387,81 @@ function buildFloor(ctx: GenContext, seed: number, fallback: 'A' | 'B' | null): 
     fallback: fallback ?? '',
     tries: 0,
   };
+  addMetro(floor, ctx, r);
+  return floor;
 }
+
+/* ── 메트로배니아 장치 (기본기획서 6.2·8.2, 스테이지 설계서 4.2) ──
+   위층 점검문: 정비 구역을 거쳐 윗층으로 되돌아가는 길. 아래에서는 잠겨 있고, 정비 구역에서 내려오면 열린 채 남는다(지름길).
+   잠긴 방화셔터: 층 길을 반쯤에서 막는다. 열쇠는 그 층 정비 구역 어딘가 → 해치로 내려가 찾고 되돌아와 연다.
+     (정비 구역을 그대로 내려가 아래층으로 가도 된다: 승강기 패널·수호자·곁가지는 셔터 뒤에 남는다)
+   곁가지 방: 층당 1~2, 끝에 보상 상자(강화 선택). 숨은 길(금 간 벽·막힌 덕트): 출동당 0~1. */
+const GATE_FREE = new Set<FloorType>(['chase', 'deep']);
+/** 위층 점검문 x (시작 홀 안). 정비 구역 아래 점검문으로 내려오면 여기로 나온다 */
+export const UPPER_X = 1100;
+function addMetro(f: Floor, ctx: GenContext, r: Rng) {
+  const { depth, type } = f;
+  if (type === 'deep') return;
+  const hall = f.segments[0];
+  const chunks = f.segments.filter((s) => s.ref.startsWith('chunk:'));
+  const terr = f.segments.flatMap((s) => s.terrain);
+  const clearAt = (x: number, d = 90) => !f.placed.some((p) => Math.abs(p.x - x) < d) && !terr.some((t) => x > t.x0 - 80 && x < t.x1 + 80);
+  if (depth >= 2) f.placed.push(place('upper', hall.x + UPPER_X, 0, 70, '위층 점검문', {}));
+  // 잠긴 셔터
+  if (depth >= 2 && !GATE_FREE.has(type) && chunks.length >= 4 && (depth === 2 || r() < 0.6)) {
+    let gx = -1;
+    for (let i = Math.max(2, Math.floor(chunks.length * 0.5)); i < chunks.length && gx < 0; i++) {
+      const x = chunks[i].x + 30;
+      if (clearAt(x, 110) && !f.placed.some((p) => p.kind === 'shutter' && Math.abs(p.x - x) < 300)) gx = x;
+    }
+    if (gx > 0) {
+      const before = f.placed.filter((p) => (p.kind === 'hatch' || p.kind === 'servicedoor') && p.x < gx - 100);
+      if (!before.length) {
+        for (const c of chunks.slice(0, 3)) {
+          const x = c.x + 460;
+          if (x < gx - 200 && clearAt(x, 80)) {
+            f.placed.push(place('servicedoor', x, 0, 70, '점검문'));
+            break;
+          }
+        }
+      }
+      if (f.placed.some((p) => (p.kind === 'hatch' || p.kind === 'servicedoor') && p.x < gx - 100)) {
+        f.placed.push(place('locked', gx, MID, 40, '잠긴 방화셔터', { key: depth }));
+        f.tuning.keyGate = 1;
+      }
+    }
+  }
+  // 곁가지 방
+  const want = depth === 1 ? 1 : 1 + (r() < 0.45 ? 1 : 0);
+  // 장치 조각(갈림길·스위치·밥상)에는 두지 않는다: 문·스위치와 E가 겹친다
+  const plainChunks = chunks.slice(1).filter((c) => !CHUNK_BY_ID[c.ref.slice(6)]?.device);
+  const cand = shuffle(r, plainChunks.map((c) => c.x + 120 + Math.floor(r() * 400)));
+  let made = 0;
+  for (const x of cand) {
+    if (made >= want) break;
+    if (!clearAt(x, 120)) continue;
+    f.placed.push(place('sidedoor', x, 0, 80, pick(r, SIDE_NAMES[type] ?? SIDE_NAMES.lobby!), { side: made }));
+    made++;
+  }
+  // 숨은 길
+  if (ctx.secret) {
+    for (const x of shuffle(r, plainChunks.map((c) => c.x + 200 + Math.floor(r() * 240)))) {
+      if (!clearAt(x, 120)) continue;
+      const crack = r() < 0.55;
+      f.placed.push(place(crack ? 'crack' : 'vent', x, crack ? 0 : MID, crack ? 90 : 60, crack ? '금 간 벽' : '막힌 덕트', { hp: 3 }));
+      break;
+    }
+  }
+}
+const SIDE_NAMES: Partial<Record<FloorType, string[]>> = {
+  lobby: ['옆 사무실', '문서 창고', '숙직실', '탕비실'],
+  silent: ['열람실 안쪽', '서고'],
+  dark: ['불 꺼진 방', '배전실'],
+  puzzle: ['같은 방', '거꾸로 된 방'],
+  replica: ['옆집', '작은방', '다용도실'],
+  trial: ['대기실', '심판석'],
+  chase: ['비상구 옆방'],
+};
 
 function hook(role: SpawnHook['role'], kind: string, x: number, lane: number, wave: number, elite: boolean, data: SpawnHook['data']): SpawnHook {
   return { id: nextId++, role, kind, x: Math.round(x), lane: Math.round(lane), wave, elite, data };
@@ -456,6 +532,11 @@ export function validateFloor(f: Floor): string[] {
     if (!g || !panel || g.x > panel.x) bad.push('수호자 방 도달');
   }
   if (!f.placed.some((p) => p.kind === 'panel')) bad.push('패널 없음');
+  for (const g of f.placed.filter((p) => p.kind === 'locked')) {
+    if (!f.placed.some((p) => (p.kind === 'hatch' || p.kind === 'servicedoor') && p.x < g.x - 100)) bad.push('열쇠 찾으러 갈 입구가 셔터 뒤');
+    const panel = f.placed.find((p) => p.kind === 'panel');
+    if (panel && panel.x < g.x) bad.push('패널이 셔터 앞');
+  }
   if (f.depth >= 4 && f.type !== 'deep' && !f.placed.some((p) => p.kind === 'sign' && p.data.rule)) bad.push('규칙 장치 없음');
   return bad;
 }
