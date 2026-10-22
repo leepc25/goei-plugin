@@ -31,6 +31,10 @@ CLIPS = {
     'super': 'super', 'hit': 'hit', 'down': 'down', 'getup': 'getup', 'collapse': 'collapse', 'tired': 'tired',
     'drink': 'drink', 'eat': 'eat', 'bandage': 'bandage', 'pickup': 'pickup', 'toss': 'toss',
     'pipe': 'pipe', 'walk_shotgun': 'walk_shotgun',
+    # 쟈알디 단독 시연판(jyaldi-full)에서 쓰던 전투 클립 (2026-10-22 사용자: 통합판에 전부 연결)
+    'holster': 'holster', 'charge': 'charge', 'chain': 'chain', 'wall': 'wall', 'shotgun': 'shotgun',
+    'idle_shotgun': 'idle_shotgun', 'run_shotgun': 'run_shotgun', 'idle_pipe': 'idle_pipe', 'walk_pipe': 'walk_pipe',
+    'carry2_idle': 'carry2_idle', 'carry2_walk': 'carry2_walk', 'carry2_run': 'carry2_run', 'support': 'support', 'glove': 'glove',
 }
 FW, FH = 192, 144
 

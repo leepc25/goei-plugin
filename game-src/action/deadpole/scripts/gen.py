@@ -18,8 +18,8 @@ def _base_pose():
         out[k]=(nx-rig.DX+2.5,ny-rig.DY)
     return out
 BASE_POSE=_base_pose()
-DESC=('petite young adult woman agent, small slim body, long straight black hair to the waist with blunt straight-cut bangs over the forehead, '
-      'pale skin with a faint blush, soft round brown eyes, gentle shy expression, black suit with a hip-length jacket and blue-grey highlights, '
+DESC=('petite young adult woman agent, small slim body, long straight black hair hanging straight down the back to the hips, blunt straight-cut bangs over the forehead, '
+      'pale skin with a faint blush, soft round brown eyes, gentle shy expression, very dark warm charcoal suit with no blue, open hip-length jacket, '
       'white shirt, black necktie, black gloves, black shoes, seen strictly from the side in profile facing right, character only, '
       'empty transparent background, no furniture, no visual effects, no muzzle flash, no sparks, no light or glow')
 def args_for(n,seed):

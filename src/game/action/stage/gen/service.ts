@@ -16,6 +16,8 @@ export interface ServiceContext {
   reroll: number;
   flags: string[];
   epoch: number;
+  /** 위층에 잠긴 셔터가 있고 열쇠를 아직 안 주웠다 → 열쇠를 입구에서 먼 칸에 둔다 */
+  key?: boolean;
 }
 
 export function makeService(ctx: ServiceContext): ServiceZone {
@@ -127,7 +129,7 @@ export function makeService(ctx: ServiceContext): ServiceZone {
     const pits = cell.segments.flatMap((s) => s.terrain).filter((t) => t.kind === 'pit' || t.kind === 'block');
     for (const t of cell.things) for (const p of pits) if (t.x > p.x0 - 50 && t.x < p.x1 + 50) t.x = p.x1 + 60 > ROOM_W - 80 ? p.x0 - 60 : p.x1 + 60;
     // E는 가장 가까운 것 하나만 잡으므로 70px 안에 둘이 겹치지 않게: 줍는 것은 빼고, 길(사다리·출입)은 옆으로 민다
-    const isWay = (t: ServiceThing) => !['item', 'symbol', 'pack', 'gear', 'checklist', 'merchant'].includes(t.kind);
+    const isWay = (t: ServiceThing) => !['item', 'symbol', 'pack', 'gear', 'checklist', 'merchant', 'key'].includes(t.kind);
     cell.things.sort((a, b) => Number(isWay(b)) - Number(isWay(a)));
     const kept: ServiceThing[] = [];
     for (const t of cell.things) {
@@ -143,7 +145,35 @@ export function makeService(ctx: ServiceContext): ServiceZone {
     cell.label = labelOf(cell.kind);
   }
   const predatorAfter = ctx.flags.includes('attic_short') ? 60 : 90;
-  return { depth: ctx.depth, seed: ctx.seed, reroll: ctx.reroll, cols, rows, cells, atticCell, entryCell, downCell, shaftCell: shaft ? [shaft.col, shaft.row] : null, predatorAfter };
+  // 입구에서 걸음 수 (열쇠는 가장 먼 칸에: 찾으러 돌아다니게)
+  const dist = new Map<string, number>([[entryCell.join(','), 0]]);
+  const q: [number, number][] = [entryCell];
+  while (q.length) {
+    const [c, rw] = q.shift()!;
+    const cell = cells[idx(c, rw)];
+    const d = dist.get(`${c},${rw}`)!;
+    for (const [k, dc, dr] of [['r', 1, 0], ['l', -1, 0], ['d', 0, 1], ['u', 0, -1]] as const)
+      if (cell.open[k] && !dist.has(`${c + dc},${rw + dr}`)) dist.set(`${c + dc},${rw + dr}`, d + 1), q.push([c + dc, rw + dr]);
+  }
+  let keyCell: [number, number] | null = null;
+  if (ctx.key) {
+    const cands = cells.filter((c) => c.kind !== 'attic' && c.kind !== 'entry').sort((a, b) => (dist.get(`${b.col},${b.row}`) ?? 0) - (dist.get(`${a.col},${a.row}`) ?? 0) + (r() - 0.5) * 0.6);
+    const kc = cands[0];
+    if (kc) {
+      keyCell = [kc.col, kc.row];
+      const x = [300, 640, 980].find((x) => !kc.things.some((t) => Math.abs(t.x - x) < 80) && !kc.segments.flatMap((s) => s.terrain).some((t) => (t.kind === 'pit' || t.kind === 'block') && x > t.x0 - 60 && x < t.x1 + 60)) ?? 640;
+      kc.things.push(thing('key', x, 80, `정비 열쇠 (${ctx.depth <= 3 ? `L${ctx.depth}` : `B-${ctx.depth - 3}`} 방화셔터)`, { depth: ctx.depth }));
+    }
+  }
+  // 칸 싸움: 다락방·입구 말고 칸마다 확률로 한 판 (깊을수록 자주·많이)
+  const fights: Record<string, string[]> = {};
+  const fr = rng(mix(ctx.seed, ctx.depth, ctx.reroll, 9191));
+  const mobs = ctx.depth <= 3 ? ['lurker', 'hollow'] : ['crawler', 'charger', 'shade', 'lurker'];
+  for (const c of cells) {
+    if (c.kind === 'attic' || c.kind === 'entry') continue;
+    if (fr() < Math.min(0.75, 0.35 + ctx.depth * 0.04)) fights[`${c.col},${c.row}`] = Array.from({ length: 1 + Math.floor(fr() * (ctx.depth <= 3 ? 2 : 3)) }, () => pick(fr, mobs));
+  }
+  return { depth: ctx.depth, seed: ctx.seed, reroll: ctx.reroll, cols, rows, cells, atticCell, entryCell, downCell, shaftCell: shaft ? [shaft.col, shaft.row] : null, predatorAfter, keyCell, fights };
 }
 
 function labelOf(k: ServiceCell['kind']): string {

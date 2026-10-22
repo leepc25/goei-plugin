@@ -1,0 +1,663 @@
+<!doctype html>
+<html lang="ko">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>고르고디오 전 동작 시연판</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #11161b; color: #e8e6e0; font: 14px/1.5 system-ui, sans-serif; }
+  .wrap { max-width: 1320px; margin: 0 auto; padding: 10px 12px 40px; }
+  h1 { font-size: 17px; margin: 6px 0; }
+  .screen { position: relative; width: 100%; max-width: 1280px; aspect-ratio: 16/9; background: #000; outline: 1px solid #2a333a; overflow: hidden; touch-action: none; }
+  .screen canvas { display: block; width: 100%; height: 100%; image-rendering: pixelated; }
+  .bar { display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: center; margin: 8px 0; }
+  .bar label { white-space: nowrap; }
+  #state { color: #9fd0ff; }
+  .keys { color: #b8b4a4; font-size: 13px; margin: 8px 0; }
+  .keys b { color: #e8e6e0; }
+  .grp { grid-column: 1 / -1; margin: 18px 0 2px; font-size: 15px; }
+  .list { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 8px; margin-top: 14px; }
+  .clip { background: #1b2228; border-radius: 8px; padding: 8px; cursor: pointer; }
+  .clip canvas { width: 100%; aspect-ratio: 4/3; background: #3a444c; image-rendering: pixelated; border-radius: 4px; }
+  .clip b { display: block; font-size: 13px; margin-bottom: 4px; }
+  .clip small { color: #9aa3ad; }
+  .pad { display: none; margin-top: 8px; gap: 8px; }
+  .pad .g { display: grid; gap: 6px; }
+  .pad button { min-height: 44px; font-size: 12px; line-height: 1.25; word-break: keep-all; background: #2a333a; color: #e8e6e0; border: 1px solid #4a5560; border-radius: 8px; padding: 0 4px; user-select: none; -webkit-user-select: none; touch-action: none; }
+  .dpad { grid-template-columns: repeat(3, 48px); align-content: start; }
+  .acts { grid-template-columns: repeat(5, 1fr); flex: 1; }
+  .pad.show { display: flex; }
+  h2 { font-size: 15px; margin: 18px 0 4px; }
+  .miss { color: #ff9a8a; }
+</style>
+<div class="wrap">
+  <h1>고르고디오 전 동작 시연판 · 맨몸 __NBARE__ · 장갑 __NARMOR__</h1>
+  <div class="bar">
+    <label><input type="checkbox" id="fx" checked> 히트스톱·흔들림</label>
+    <label><input type="checkbox" id="box"> 판정 상자</label>
+    <label>배경 <select id="bg"><option value="corr">관리국 복도</option><option value="dark">거의 검정</option><option value="grey">중간 회색</option></select></label>
+    <label>속도 <select id="speed"><option>0.25</option><option>0.5</option><option selected>1</option></select></label>
+    <label><input type="checkbox" id="padt"> 터치 버튼</label>
+    <span id="state"></span>
+  </div>
+  <div class="screen" id="screen"><canvas id="c" width="1280" height="720"></canvas></div>
+  <div class="pad" id="pad">
+    <div class="g dpad">
+      <span></span><button data-k="ArrowUp">↑</button><span></span>
+      <button data-k="ArrowLeft">←</button><button data-k="ArrowDown">↓</button><button data-k="ArrowRight">→</button>
+      <button data-k="ShiftLeft">Shift</button><button data-k="Space">점프</button><button data-k="KeyE">E 잡기·뽑기</button>
+    </div>
+    <div class="g acts">
+      <button data-k="KeyA">A 근접</button><button data-k="KeyS">S 던지기</button><button data-k="KeyD">D 소환·돌격</button><button data-k="KeyQ">Q 가드</button><button data-k="KeyW">W 필살</button>
+      <button data-k="Digit1">1 캔</button><button data-k="Digit2">2 간식</button><button data-k="Digit3">3 붕대</button><button data-k="KeyH">H 맞기</button><button data-k="KeyK">K 다운</button>
+      <button data-k="KeyT">T 말</button><button data-k="KeyV">V 피로</button><button data-k="KeyB">B 본부</button><button data-k="KeyL">L 수염</button><button data-k="KeyC">C 지원</button>
+    </div>
+  </div>
+  <div class="keys">
+    <b>이동</b> ←→ 좌우, ↑↓ 앞뒤 · <b>Shift</b> 누른 채 = 달리기(가속 있음), 짧게 = 버티기(무적 아님, 피해 70% 감소) · <b>Space</b> 점프(낮고 무거움) · <b>↓↓</b> 스모 앉기(앉아 ←→ 엉거주춤 걷기, A 시코 밟기 = 누운 적에게도 맞음, ↑ 일어서기)<br>
+    <b>A</b> 식칼 내려베기 → 올려베기 → 두 손 내려찍기(커밋형: 헛쳐도 끝까지, 슈퍼아머) · 칼이 없으면 A = 스모 손바닥 밀기 · 달리며 A = 러닝 빅 부트 · 공중 A = 바디 프레스<br>
+    <b>S</b> 식칼 던지기(한 자루뿐) → 꽂힌 칼 앞에서 <b>E</b> 뽑기 · 적 앞에서 <b>E</b> 베어 허그(A 박치기 2번, →A 고릴라 프레스, ←A 수플렉스, Space 놓기) · <b>Q</b> 팔뚝 가드, 가드 중 A = 밀쳐내기<br>
+    <b>D</b> 승인 요청 → 장갑(D 누르고 있으면 외침 유지, 놓으면 소환) · <b>W</b> 붕괴 돌파(맨몸이면 짧은 소환 뒤) · <b>C</b> 지원 등장(장갑)<br>
+    <b>장갑</b>: A 휩쓸기 → 해머 → 깍지 내려찍기 · ↓↓ 뒤 A 짓밟기 · 활강(Shift 유지) 중 A 래리어트 · 공중 A 급강하 · S 바닥 뜯어 던지기 · D 초음속 돌격(내구 10) · D 길게 해제 · Shift 짧게 옆 미끄러짐(무적) · Q 방패, 가드한 채 걷기 · E 한 손 들기(A 찍기, 방향+A 투척), 적 없으면 벽 부수기 · 맞으면 내구만 깎임, 0이면 장갑 붕괴<br>
+    <b>T</b> 말하기 · <b>H</b> 피격(맨몸은 슈퍼아머 중이면 안 밀림) · <b>K</b> 다운 → 기상 · <b>V</b> 피로 · <b>B</b> 본부(L 수염 쓸기) · <b>1·2·3</b> 캔·간식·붕대
+  </div>
+  <h2>동작 목록 (누르면 화면에서 재생)</h2>
+  <div id="missing" class="miss"></div>
+  <div class="list" id="list"></div>
+</div>
+<script>
+const M = __MANIFEST__;
+const STRIPS = __STRIPS__;
+const BG64 = "__BG__";
+const $ = id => document.getElementById(id);
+const S = 2;
+const imgs = {}, boxes = {};
+const dims = k => M.sets[M.clips[k].set];
+function measure(k, im) {
+  const D = dims(k), c = document.createElement('canvas'); c.width = im.width; c.height = im.height;
+  const x = c.getContext('2d'); x.drawImage(im, 0, 0); const d = x.getImageData(0, 0, im.width, im.height).data;
+  const out = [];
+  for (let f = 0; f < M.clips[k].frames; f++) {
+    let x0 = 1e9, x1 = -1, y0 = 1e9, y1 = -1;
+    for (let y = 0; y < D.h; y++) for (let xx = 0; xx < D.w; xx++) if (d[(y * im.width + f * D.w + xx) * 4 + 3] > 40) { if (xx < x0) x0 = xx; if (xx > x1) x1 = xx; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+    out.push(x1 < 0 ? null : { x0, x1, y0, y1 });
+  }
+  boxes[k] = out;
+}
+for (const [k, b64] of Object.entries(STRIPS)) { const im = new Image(); im.onload = () => measure(k, im); im.src = 'data:image/png;base64,' + b64; imgs[k] = im; }
+const bgImg = new Image(); bgImg.src = 'data:image/png;base64,' + BG64;
+if (M.missing.length) $('missing').textContent = '아직 그림이 없는 동작: ' + M.missing.join(', ');
+
+const FAR_Y = 400, NEAR_Y = 700, groundY = z => FAR_Y + (NEAR_Y - FAR_Y) * z;
+const has = k => !!(M.clips[k] && imgs[k]);
+const G = { x: 330, z: 0.55, y: 0, vy: 0, vx: 0, dir: 1, clip: 'idle', f: 0, t: 0, rev: false, lock: false, next: null, hold: 0, hitsDone: new Set(),
+  armor: false, dur: 100, cool: 0, knife: true, fight: false, combo: 0, comboT: 0, queued: null, guard: false, crouch: false, downTap: 0,
+  grab: null, butts: 0, down: false, lying: false, lyingT: 0, tired: false, hq: false, hp: 100, inv: 0, air: false, armorT: 0,
+  shiftDown: 0, runT: 0, brace: 0, dHeld: 0, talkT: 0, talkLine: '', super: null, items: { can: 2, snack: 2, bandage: 2 } };
+const keys = new Set();
+const FX = { stop: 0, shake: 0, sparks: [], dust: [], rings: [], text: [], flash: 0, fade: 0 };
+const ENEMIES = [mkE(820, 0.5), mkE(1020, 0.72), mkE(1120, 0.35)];
+function mkE(x, z) { return { x, z, y: 0, vx: 0, vy: 0, hp: 40, state: 'idle', t: 0, flash: 0, face: -1, home: x, knife: false }; }
+const WALL = { x: 1236, broken: 0 };
+const KNIFE = { state: 'held', x: 0, z: 0, y: 0, vx: 0, ang: 0, host: null };   // held | fly | stuck | floor | enemy
+const PROJ = [];
+const ALLY = { on: false };
+const LINES = ['잠깐만요. 그 말, 앞뒤가 안 맞는데예.', '승인 요청!', '금방 확인하고 오겠습니다.', '뒤로 빠지이소. 제가 막겠습니다.', '됐다 아이가.', '기둥이네… 아, 아입니다.', '오지 마요!'];
+let lineI = 0;
+const GOT = new Set();   // 무장 상태: 장갑 클립이면 a_ 접두사
+const A = k => G.armor ? 'a_' + k : k;
+
+function play(k, o = {}) {
+  if (!has(k)) { hitText(G.x, groundY(G.z) - 340, '그림 없음: ' + k); return false; }
+  const wasNude = NUDE.has(G.clip); if (wasNude !== NUDE.has(k)) FX.fade = 0.32;
+  G.clip = k; G.f = o.rev ? M.clips[k].frames - 1 : 0; G.t = 0; G.rev = !!o.rev; G.lock = !!o.lock; G.next = o.next || null; G.hold = 0; G.hitsDone = new Set();
+  G.seg = o.seg || null; if (G.seg) G.f = G.seg[0];
+  return true;
+}
+const C = () => M.clips[G.clip];
+const NUDE = new Set(['undress', 'showerturn', 'shower', 'bath']);
+function idleClip() {
+  if (G.armor) return G.guard ? 'a_guard' : G.crouch ? 'a_crouch' : 'a_idle';
+  if (G.carry) return 'fcarry_idle';
+  if (G.crouch) return 'crouch';
+  if (G.guard) return 'block';
+  if (G.tired) return 'tired';
+  if (G.fight && G.knife) return 'guard';
+  return 'idle';
+}
+const onGround = () => !G.air;
+function hitText(x, y, s, col) { FX.text.push({ x, y, s, t: 0.8, col }); }
+function dirX() { return (keys.has('ArrowRight') ? 1 : 0) - (keys.has('ArrowLeft') ? 1 : 0); }
+function dirZ() { return (keys.has('ArrowDown') ? 1 : 0) - (keys.has('ArrowUp') ? 1 : 0); }
+// 커밋형 슈퍼아머: 공격 클립 재생 중
+const ARMORED = new Set(['chop1', 'chop2', 'cleave', 'stomp', 'bigboot', 'summon', 'summonhold', 'bearhug', 'headbutt', 'press', 'suplex']);
+
+// ── 입력 ──
+function onKey(code, down) {
+  if (down) { if (keys.has(code)) return; keys.add(code); } else keys.delete(code);
+  if (code.startsWith('Shift')) {
+    if (down) G.shiftDown = performance.now();
+    else if (performance.now() - G.shiftDown < 200 && !G.lock && onGround() && !G.down) quickShift();
+    return;
+  }
+  if (!down) {
+    if (code === 'KeyD' && G.dHeld) { const held = performance.now() - G.dHeld; G.dHeld = 0;
+      if (!G.armor && G.clip === 'summonhold') { play('summon', { lock: true }); G.f = 5; }
+      else if (G.armor && held > 450 && G.clip === 'a_vent') { /* 끝나면 해제 */ } }
+    if (code === 'KeyQ' && G.guard) { G.guard = false; if (!G.lock) play(idleClip()); }
+    return;
+  }
+  if (G.super) return;
+  if (G.down) { if (code === 'KeyK' && G.lying) standUp(); return; }
+  if (G.lock) {
+    if (code === 'KeyA' && G.air) { airA(); return; }
+    if (code === 'KeyA' && ['chop1', 'chop2', 'a_swat', 'a_hammer'].includes(G.clip)) G.queued = 'A';
+    if (code === 'KeyA' && G.clip === 'tsuppari') G.queued = 'A';
+    if (code === 'KeyA' && (G.clip === 'headbutt' || G.clip === 'a_grabhit')) G.queued = 'A';
+    return;
+  }
+  if (G.grab) { grabInput(code); return; }
+  if (G.crouch) { crouchInput(code); return; }
+  switch (code) {
+    case 'Space': if (onGround()) jump(); break;
+    case 'KeyA': attackA(); break;
+    case 'KeyS': throwS(); break;
+    case 'KeyD': keyD(); break;
+    case 'KeyQ': if (onGround()) { G.fight = true; G.guard = true; play(G.armor ? 'a_guard' : 'block'); } break;
+    case 'KeyW': if (onGround()) superMove(); break;
+    case 'KeyC': callAlly(); break;
+    case 'KeyE': keyE(); break;
+    case 'ArrowDown': if (performance.now() - G.downTap < 260 && onGround()) { G.crouch = true; play(G.armor ? 'a_crouch' : 'crouch', { lock: false }); } G.downTap = performance.now(); break;
+    case 'Digit1': useItem('can', 'drink'); break;
+    case 'Digit2': useItem('snack', 'eat'); break;
+    case 'Digit3': useItem('bandage', 'bandage'); break;
+    case 'KeyH': takeHit(12); break;
+    case 'KeyK': if (G.armor) { G.dur = 0; armorBreak(); } else knockdown(); break;
+    case 'KeyT': G.talkT = 2.4; G.talkLine = LINES[lineI++ % LINES.length]; play(G.armor ? 'a_idle' : 'talk'); break;
+    case 'KeyV': if (!G.armor) { G.tired = !G.tired; G.fight = false; hitText(G.x, groundY(G.z) - 340, G.tired ? '피로 상태' : '피로 회복'); play(idleClip()); } break;
+    case 'KeyB': if (!G.armor) { const wasF = G.fight && G.clip === 'guard'; G.hq = !G.hq; G.fight = false; hitText(640, 120, G.hq ? '본부' : '현장'); if (wasF) play('engage', { lock: true, rev: true }); else play(idleClip()); } break;
+    case 'KeyL': if (!G.armor) play('beard', { lock: true }); break;
+  }
+}
+function quickShift() {
+  if (G.armor) { play('a_boost', { lock: true }); G.inv = 0.3; G.vz = (dirZ() || (G.z > 0.5 ? -1 : 1)) * 0.9; G.vx = dirX() * 6; dust(G.x, groundY(G.z), 6); }
+  else { play('brace', { lock: true }); G.brace = 0.4; hitText(G.x, groundY(G.z) - 330, '버티기'); }
+}
+function jump() {
+  G.crouch = false; G.air = true; G.vy = G.armor ? -15 : -9.5; G.vx = dirX() * (G.armor ? 6 : 3.4) + (G.runT > 0.3 ? G.dir * 2 : 0);
+  play(G.armor ? 'a_jump' : 'jump', { lock: true }); G.f = 1;
+}
+function airA() { if (G.airAtk) return; G.airAtk = true; if (G.armor) { play('a_dive', { lock: true }); G.vy = 9; G.vx = G.dir * 9; } else { play('splash', { lock: true }); } }
+function running() { return keys.has('ShiftLeft') || keys.has('ShiftRight'); }
+function attackA() {
+  if (G.air) { airA(); return; }
+  G.fight = true;
+  if (G.guard) { if (!G.armor) { play('shove', { lock: true }); G.guard = false; } return; }
+  if (G.armor) {
+    if (running() && G.runT > 0.25) { play('a_lariat', { lock: true }); return; }
+    const seq = ['a_swat', 'a_hammer', 'a_axe']; G.combo = G.comboT > 0 ? (G.combo + 1) % 3 : 0; play(seq[G.combo], { lock: true }); G.comboT = 0; return;
+  }
+  if (G.carry) return;
+  if (running() && G.runT > 0.35) { play('bigboot', { lock: true }); G.vx = G.dir * 5; return; }
+  if (!G.knife) { tsuppari(0); return; }
+  const seq = ['chop1', 'chop2', 'cleave']; G.combo = G.comboT > 0 ? (G.combo + 1) % 3 : 0; play(seq[G.combo], { lock: true }); G.comboT = 0;
+}
+const TSU = [[0, 2], [3, 5], [6, 7]];
+function tsuppari(i) { play('tsuppari', { lock: true, seg: TSU[i] }); G.tsu = i; G.vx = G.dir * 2.5; }
+function throwS() {
+  if (!onGround()) return;
+  G.fight = true;
+  if (G.armor) { play('a_rubble', { lock: true }); return; }
+  if (!G.knife) { hitText(G.x, groundY(G.z) - 330, '칼 없음 (E로 뽑기)'); return; }
+  play('kready', { lock: true, next: 'kthrow' });
+}
+function keyD() {
+  if (!onGround()) return;
+  G.fight = true;
+  if (G.armor) { G.dHeld = performance.now(); play('a_charge', { lock: true }); G.dur = Math.max(0, G.dur - 10); return; }
+  if (G.cool > 0) { hitText(G.x, groundY(G.z) - 330, '재소환 대기 ' + G.cool.toFixed(1) + '초'); return; }
+  if (G.dur < 30) { hitText(G.x, groundY(G.z) - 330, '장갑 내구 부족'); return; }
+  G.dHeld = performance.now(); play('summon', { lock: true });
+}
+function becomeArmor(fast) {
+  G.armor = true; G.guard = false; G.crouch = false; G.fight = true; G.combo = 0;
+  FX.flash = 0.25; FX.shake = 0.25; ring(G.x, groundY(G.z) - 150, 1.4, '#9fe8ff');
+  for (const e of ENEMIES) if (live(e) && Math.abs(e.x - G.x) < 200 && Math.abs(e.z - G.z) < 0.2) knock(e, 4, 'hit', Math.sign(e.x - G.x) || 1);
+  play('a_arrive', { lock: true });
+}
+function leaveArmor(broken) {
+  G.armor = false; G.cool = broken ? 12 : 4; G.combo = 0; play(broken ? 'down' : idleClip(), { lock: !!broken }); if (broken) { G.down = true; }
+}
+function armorBreak() { G.grab = null; play('a_break', { lock: true }); FX.shake = 0.4; for (let i = 0; i < 14; i++) FX.sparks.push({ x: G.x, y: groundY(G.z) - 140, vx: (Math.random() - .5) * 14, vy: -Math.random() * 10, t: 0.6, c: '#8fa6b4', s: 6 }); }
+function keyE() {
+  if (!onGround()) return;
+  if (G.carry) { G.carry = null; play('liftput', { lock: true }); return; }
+  const e = nearEnemy(150);
+  if (e) { G.grab = e; e.state = 'grabbed'; G.butts = 0; G.fight = true; play(G.armor ? 'a_grab' : 'bearhug', { lock: true }); return; }
+  if (G.armor) { play('a_smash', { lock: true }); return; }
+  if ((KNIFE.state === 'stuck' || KNIFE.state === 'floor') && Math.abs(KNIFE.x - G.x - G.dir * 40) < 120 && Math.abs(KNIFE.z - G.z) < 0.2) { play('kpull', { lock: true }); return; }
+  play('pickup', { lock: true });
+}
+function grabInput(code) {
+  const e = G.grab; if (!e) return;
+  if (code === 'Space') { release(); return; }
+  if (code !== 'KeyA') return;
+  const d = dirX() * G.dir;
+  if (G.armor) { if (d || dirZ()) play('a_throw', { lock: true }); else play('a_grabhit', { lock: true }); return; }
+  if (d > 0) play('press', { lock: true });
+  else if (d < 0) play('suplex', { lock: true });
+  else if (G.butts >= 2) play('press', { lock: true });
+  else play('headbutt', { lock: true });
+}
+function release() { if (G.grab) { G.grab.state = 'idle'; G.grab.y = 0; } G.grab = null; play(idleClip()); }
+function crouchInput(code) {
+  if (code === 'KeyA') play(G.armor ? 'a_stomp' : 'stomp', { lock: true });
+  else if (code === 'ArrowUp' || code === 'Space') { G.crouch = false; play(G.armor ? 'a_crouch' : 'crouch', { lock: true, rev: true }); }
+}
+function useItem(kind, clip) {
+  if (G.armor) { hitText(G.x, groundY(G.z) - 330, '장갑 중엔 못 씀'); return; }
+  if (!onGround() || G.items[kind] <= 0) { hitText(G.x, groundY(G.z) - 330, '없음'); return; }
+  G.items[kind]--; play(clip, { lock: true }); G.healOn = clip;
+}
+function superMove() {
+  G.fight = true; G.guard = false; G.crouch = false;
+  if (!G.armor) { play('summon', { lock: true }); G.fastSummon = true; return; }
+  startSuper();
+}
+function startSuper() {
+  FX.flash = 0.3; FX.stop = 0.25; hitText(640, 200, '붕괴 돌파', '#ffd23a');
+  G.super = { phase: 'go', t: 0, hit: new Set() }; G.inv = 9; play('a_super', { lock: true });
+}
+function callAlly() {
+  if (ALLY.on) return;
+  Object.assign(ALLY, { on: true, x: -120, z: Math.min(0.95, G.z + 0.2), clip: 'a_support', f: 0, t: 0, done: new Set() });
+}
+function takeHit(dmg) {
+  if (G.super || G.inv > 0) { hitText(G.x, groundY(G.z) - 330, '무적'); return; }
+  if (G.armor) {
+    G.dur = Math.max(0, G.dur - dmg); sparks(G.x + G.dir * 40, groundY(G.z) - 150, 6); FX.stop = Math.max(FX.stop, 0.05);
+    hitText(G.x, groundY(G.z) - 360, '내구 -' + dmg, '#9fe8ff'); if (G.dur <= 0) armorBreak(); return;
+  }
+  if (G.guard) { sparks(G.x + G.dir * 50, groundY(G.z) - 160, 6); G.vx = -G.dir * 2; return; }
+  if (G.brace > 0) { G.hp = Math.max(1, G.hp - Math.round(dmg * 0.3)); hitText(G.x, groundY(G.z) - 340, '버팀 -' + Math.round(dmg * 0.3)); FX.shake = 0.1; return; }
+  G.hp = Math.max(1, G.hp - dmg);
+  if (G.lock && ARMORED.has(G.clip)) { hitText(G.x, groundY(G.z) - 340, '슈퍼아머 -' + dmg, '#ffb070'); FX.stop = 0.06; G.flash = 0.12; return; }
+  if (G.grab) release();
+  play('hit', { lock: true }); G.vx = -G.dir * 3; FX.shake = 0.2; FX.stop = 0.07;
+}
+function knockdown() { G.grab && release(); G.down = true; G.crouch = false; G.guard = false; play('down', { lock: true }); G.vx = -G.dir * 4; FX.shake = 0.25; }
+function standUp() { G.lying = false; play('getup', { lock: true }); }
+const live = e => e.state !== 'dead';
+function nearEnemy(r) {
+  let best = null, bd = 1e9;
+  for (const e of ENEMIES) { if (!live(e) || e.state === 'down') continue; const dx = (e.x - G.x) * G.dir; if (dx > -20 && dx < r && Math.abs(e.z - G.z) < 0.16 && dx < bd) { bd = dx; best = e; } }
+  return best;
+}
+
+// ── 판정 ──
+// 클립별: 앞 사거리(px, 그림 1배), 깊이 폭, 피해, 반응, 여럿
+const HIT = {
+  chop1: [70, .14, 11, 'hit'], chop2: [70, .14, 12, 'hit'], cleave: [80, .16, 22, 'down'], tsuppari: [62, .14, 5, 'push'],
+  stomp: [60, .16, 10, 'down', 0, true], bigboot: [86, .16, 16, 'down'], splash: [80, .2, 20, 'down', 1, true], shove: [60, .14, 4, 'push'],
+  headbutt: [0, 0, 9, 'grab'], press: [0, 0, 24, 'throwF'], suplex: [0, 0, 28, 'throwB'], pipe: [96, .16, 14, 'hit'], shotgun: [400, .12, 18, 'hit'],
+  a_swat: [96, .2, 14, 'push', 1], a_hammer: [86, .16, 16, 'hit'], a_axe: [96, .2, 28, 'down', 1], a_stomp: [220, .14, 14, 'down', 1, true],
+  a_lariat: [90, .18, 22, 'down', 1], a_dive: [80, .2, 20, 'down', 1, true], a_charge: [90, .18, 30, 'fly', 1], a_grabhit: [0, 0, 14, 'grab'],
+  a_throw: [0, 0, 28, 'throwF'], a_smash: [80, .16, 20, 'fly', 1], a_super: [120, .3, 70, 'fly', 1], a_support: [100, .2, 20, 'down', 1],
+};
+function resolveHit(k) {
+  const h = HIT[k]; if (!h) return;
+  const [reach, zw, dmg0, react, multi, low] = h;
+  let dmg = dmg0;
+  if (k === 'cleave' && G.chargeT > 0.3) dmg = Math.round(dmg * 1.5);
+  if (h[3] === 'grab' || h[3] === 'throwF' || h[3] === 'throwB') { grabHit(k, dmg); return; }
+  let any = false;
+  const box = boxes[k] && boxes[k][G.f], D = dims(k);
+  const front = box ? (box.x1 - D.anchor) * S : reach * S;
+  for (const e of ENEMIES) {
+    if (!live(e) || e.state === 'grabbed') continue;
+    if (e.state === 'down' && !low) continue;
+    const dx = (e.x - G.x) * G.dir;
+    if (dx < -30 || dx > Math.max(front, reach * S) + 30 || Math.abs(e.z - G.z) > zw) continue;
+    let dd = dmg; if (k === 'stomp' && e.state === 'down') dd = 14;
+    damage(e, dd, react, G.dir); any = true;
+    if (!multi) break;
+  }
+  if (k === 'a_stomp' || k === 'splash' || k === 'a_axe') { ring(G.x + G.dir * 60, groundY(G.z), 1.6, '#e8d8b0'); dust(G.x + G.dir * 40, groundY(G.z), 10); FX.shake = Math.max(FX.shake, 0.18); }
+  if (any) { FX.stop = Math.max(FX.stop, react === 'down' || react === 'fly' ? 0.1 : 0.05); FX.shake = Math.max(FX.shake, 0.12); }
+  else if (k === 'bigboot') hitText(G.x, groundY(G.z) - 330, '헛침 — 휘청');
+}
+function grabHit(k, dmg) {
+  const e = G.grab; if (!e) return;
+  if (k === 'headbutt' || k === 'a_grabhit') { damage(e, dmg, 'grab', G.dir); G.butts++; FX.stop = 0.07; sparks(e.x, groundY(e.z) - 170, 5); return; }
+  const back = k === 'suplex';
+  G.grab = null; e.state = 'fly'; e.vx = (back ? -G.dir : G.dir) * (back ? 4 : 13); e.vy = back ? -6 : -8; e.hp -= dmg; e.flash = 0.15; e.thrown = true;
+  if (back) { e.x = G.x - G.dir * 70; FX.shake = 0.35; ring(e.x, groundY(e.z), 1.8, '#e8d8b0'); }
+  FX.stop = 0.12;
+}
+function damage(e, dmg, react, dir) {
+  e.hp -= dmg; e.flash = 0.12; hitText(e.x, groundY(e.z) - 240, '' + dmg);
+  sparks(e.x - dir * 20, groundY(e.z) - 140, 6);
+  if (e.hp <= 0) { knock(e, 8, 'fly', dir); return; }
+  knock(e, react === 'push' ? 9 : react === 'fly' ? 14 : react === 'down' ? 6 : 3, react === 'push' ? 'hit' : react, dir);
+}
+function knock(e, v, st, dir) {
+  if (st === 'fly' || st === 'down') { e.state = 'fly'; e.vy = st === 'fly' ? -9 : -5; }
+  else if (st === 'grab') { return; }
+  else e.state = 'hit';
+  e.vx = dir * v; e.t = 0;
+  if (e.knife && (st === 'fly' || st === 'down' || e.hp <= 0)) { e.knife = false; KNIFE.state = 'floor'; KNIFE.x = e.x; KNIFE.z = e.z; }
+}
+
+// ── 클립 진행 ──
+function onFrame(k, f) {
+  const hits = C().hits || [];
+  if (hits.includes(f) && !G.hitsDone.has(f)) { G.hitsDone.add(f); fireHit(k, f); }
+}
+function fireHit(k, f) {
+  if (k === 'kthrow') { G.knife = false; Object.assign(KNIFE, { state: 'fly', x: G.x + G.dir * 70, z: G.z, y: -230, vx: G.dir * 22, ang: 0, host: null }); return; }
+  if (k === 'a_rubble') { PROJ.push({ kind: 'slab', x: G.x + G.dir * 40, z: G.z, y: -300, vx: G.dir * 16, vy: -3, t: 0 }); return; }
+  if (k === 'kpull') { G.knife = true; KNIFE.state = 'held'; hitText(G.x, groundY(G.z) - 330, '칼 회수'); return; }
+  if (k === 'summon' && f === (C().hits || [])[0]) { if (keys.has('KeyD') && G.dHeld && !G.fastSummon) { play('summonhold', { lock: true }); return; } return; }
+  if (k === 'drink' || k === 'eat' || k === 'bandage') { G.hp = Math.min(100, G.hp + 15); hitText(G.x, groundY(G.z) - 340, '+15', '#8fe08f'); return; }
+  if (k === 'toss') return;
+  resolveHit(k);
+}
+function onEnd(k) {
+  if (G.seg) {
+    if (k === 'tsuppari' && G.queued === 'A' && G.tsu < 2) { G.queued = null; tsuppari(G.tsu + 1); return; }
+    G.seg = null;
+  }
+  G.queued = k === 'tsuppari' ? null : G.queued;
+  if (k === 'kready') { play('kthrow', { lock: true }); return; }
+  if (k === 'summon') { const fast = G.fastSummon; G.fastSummon = false; becomeArmor(fast); if (fast) startSuper(); return; }
+  if (k === 'a_vent') { leaveArmor(false); return; }
+  if (k === 'a_charge' && G.dHeld && performance.now() - G.dHeld > 450) { G.dHeld = 0; play('a_vent', { lock: true }); return; }
+  if (k === 'a_break') { leaveArmor(true); G.lying = true; G.lyingT = 1.2; G.f = M.clips.down.frames - 1; G.hold = 99; return; }
+  if (['chop1', 'chop2', 'a_swat', 'a_hammer'].includes(k)) {
+    G.comboT = 0.35;
+    if (G.queued === 'A') { G.queued = null; attackA(); return; }
+  }
+  if (k === 'cleave' || k === 'a_axe') G.combo = 2;
+  if (k === 'headbutt' || k === 'a_grabhit') { G.lock = false; play(G.armor ? 'a_grab' : 'bearhug'); G.f = M.clips[G.clip].frames - 1; G.hold = 99; if (G.queued === 'A') { G.queued = null; grabInput('KeyA'); } return; }
+  if (k === 'bearhug' || k === 'a_grab') { G.lock = false; G.f = C().frames - 1; G.hold = 99; return; }
+  if (k === 'down') { G.lying = true; G.lyingT = 1.2; G.f = C().frames - 1; G.hold = 99; return; }
+  if (k === 'getup') G.down = false;
+  if (k === 'splash' || k === 'jump' || k === 'a_jump' || k === 'a_dive') { if (G.air) { G.f = C().frames - 2; G.hold = 99; return; } }
+  if (k === 'crouch' || k === 'a_crouch') { if (G.rev) { G.crouch = false; } else { G.f = C().frames - 1; G.hold = 99; G.lock = false; return; } }
+  if (k === 'stomp' || k === 'a_stomp') { play(G.armor ? 'a_crouch' : 'crouch'); G.f = C().frames - 1; G.hold = 99; return; }
+  if (k === 'block' || k === 'a_guard') { G.f = C().frames - 1; G.hold = 99; return; }
+  if (k === 'liftput') { G.carry = null; }
+  if (k === 'a_super') { G.inv = 0.4; }
+  const nx = G.next; G.lock = false; G.next = null;
+  play(nx || idleClip(), { lock: !!nx });
+}
+
+// ── 갱신 ──
+let last = performance.now();
+function step(now) {
+  let dt = Math.min(0.05, (now - last) / 1000); last = now;
+  const sp = +$('speed').value; dt *= sp;
+  if (FX.stop > 0 && $('fx').checked) { FX.stop -= dt; draw(); requestAnimationFrame(step); return; }
+  update(dt); draw(); requestAnimationFrame(step);
+}
+function update(dt) {
+  G.inv = Math.max(0, G.inv - dt); G.brace = Math.max(0, G.brace - dt); G.comboT = Math.max(0, G.comboT - dt); G.flash = Math.max(0, (G.flash || 0) - dt);
+  if (!G.armor) { G.cool = Math.max(0, G.cool - dt); G.dur = Math.min(100, G.dur + 5 * dt); }
+  if (G.talkT > 0) { G.talkT -= dt; if (G.talkT <= 0 && G.clip === 'talk') play(idleClip()); }
+  if (G.clip === 'cleave' && G.f === 1 && keys.has('KeyA')) G.chargeT = (G.chargeT || 0) + dt; else if (G.clip !== 'cleave') G.chargeT = 0;
+  if (G.super) updateSuper(dt);
+  // 이동
+  const dx = dirX(), dz = dirZ();
+  const free = !G.lock && !G.down && !G.grab && !G.super;
+  if (free) {
+    const run = running() && (dx || dz);
+    G.runT = run ? G.runT + dt : 0;
+    if (G.crouch) {
+      if (dx) { G.dir = dx; G.x += dx * (G.armor ? 60 : 70) * dt; if (!G.armor && G.clip !== 'crouchwalk') play('crouchwalk'); }
+      else if (G.clip === 'crouchwalk') { play('crouch'); G.f = C().frames - 1; G.hold = 99; }
+    } else if (dx || dz) {
+      if (dx && !G.guard) G.dir = dx;
+      let v;
+      if (G.armor) v = G.guard ? 70 : run ? 430 : 130;
+      else v = G.carry ? 110 : run ? 180 + 170 * Math.min(1, G.runT / 0.5) : 160;   // 달리기 가속 0.5초(관성)
+      G.x += dx * v * dt; G.z = Math.max(0, Math.min(1, G.z + dz * (v / 900) * dt * 2.2));
+      let want;
+      if (G.armor) want = G.guard ? 'a_guardwalk' : run ? 'a_glide' : 'a_walk';
+      else if (G.carry) want = run ? 'fcarry_run' : 'fcarry_walk';
+      else if (G.guard) want = 'block';
+      else if (G.tired) want = 'limp';
+      else want = run ? 'run' : (G.fight && G.knife ? 'step' : 'walk');
+      if (G.clip !== want && has(want)) play(want);
+      if (!G.armor && run && G.runT > 0.3) for (const e of ENEMIES) if (live(e) && e.state === 'idle' && Math.abs(e.x - G.x) < 70 && Math.abs(e.z - G.z) < 0.12) knock(e, 7 * G.dir, 'hit', 1);
+    } else if (!['idle', 'guard', 'tired', 'talk', 'a_idle', 'a_guard', 'block', 'fcarry_idle', 'beard'].includes(G.clip) || G.clip !== idleClip() && !['talk', 'beard'].includes(G.clip)) {
+      if (!G.hold) play(idleClip());
+    }
+  }
+  if (G.clip === 'a_charge' && G.f >= 2 && G.f <= 5) { G.x += G.dir * 620 * dt; }
+  if (G.clip === 'a_lariat' || G.clip === 'bigboot') G.x += G.dir * 220 * dt;
+  if (G.vz) { G.z = Math.max(0, Math.min(1, G.z + G.vz * dt)); G.vz *= Math.pow(0.02, dt); if (Math.abs(G.vz) < 0.02) G.vz = 0; }
+  G.x += G.vx * 60 * dt; G.vx *= Math.pow(0.004, dt);
+  if (G.air) { G.y += G.vy * 60 * dt; G.vy += (G.armor ? 34 : 40) * dt; if (G.y >= 0) { G.y = 0; G.air = false; G.airAtk = false; G.vx = 0; land(); } }
+  G.x = Math.max(60, Math.min(WALL.broken > 0 ? 1400 : 1190, G.x));
+  if (G.clip === 'a_charge' && G.x >= 1190 && !WALL.broken) { WALL.broken = 3; FX.shake = 0.4; ring(1230, groundY(G.z) - 150, 2, '#ffd8a0'); }
+  // 프레임
+  const c = C();
+  if (G.hold > 0) { G.hold -= dt; if (G.hold <= 0) G.hold = 0; }
+  else {
+    G.t += dt * c.fps;
+    while (G.t >= 1) {
+      G.t -= 1;
+      const end = G.seg ? G.seg[1] : c.frames - 1, beg = G.seg ? G.seg[0] : 0;
+      if (G.rev ? G.f <= beg : G.f >= end) {
+        if (c.loop) G.f = beg; else { const k = G.clip; onEnd(k); break; }
+      } else G.f += G.rev ? -1 : 1;
+      onFrame(G.clip, G.f);
+    }
+  }
+  if (G.lying) { G.lyingT -= dt; if (G.lyingT <= 0) standUp(); }
+  if (G.grab) { const e = G.grab; e.x = G.x + G.dir * (G.armor ? 70 : 50); e.z = G.z; e.y = G.armor ? -60 : -20; }
+  updateKnife(dt); updateProj(dt); updateEnemies(dt); updateAlly(dt); updateFx(dt);
+  if (WALL.broken > 0) WALL.broken = Math.max(0.01, WALL.broken - dt * 0.2);
+  $('state').textContent = `${G.armor ? '장갑' : '맨몸'} · ${G.clip} ${G.f + 1}/${C().frames} · 체력 ${G.hp} · 장갑 내구 ${Math.round(G.dur)}${G.cool ? ' · 재소환 ' + G.cool.toFixed(1) : ''} · 식칼 ${G.knife ? '손에' : KNIFE.state === 'enemy' ? '적에 꽂힘' : '바닥'}`;
+}
+function land() {
+  dust(G.x, groundY(G.z), 8); FX.shake = Math.max(FX.shake, G.armor ? 0.2 : 0.12);
+  for (const e of ENEMIES) if (live(e) && Math.abs(e.x - G.x) < 120 && Math.abs(e.z - G.z) < 0.15 && e.state === 'idle') e.state = 'hit', e.t = 0;
+  if (G.clip === 'splash') { G.f = 3; G.hold = 0; return; }
+  if (G.clip === 'a_dive') { G.f = 4; G.hold = 0; return; }
+  if (G.clip === 'jump' || G.clip === 'a_jump') { G.f = C().frames - 2; G.hold = 0; G.lock = true; }
+}
+function updateSuper(dt) {
+  const s = G.super; s.t += dt;
+  if (s.phase === 'go') {
+    if (G.f >= 3) { G.x += G.dir * 900 * dt; for (const e of ENEMIES) if (live(e) && !s.hit.has(e) && Math.abs(e.x - G.x) < 90 && Math.abs(e.z - G.z) < 0.3) { s.hit.add(e); e.hold = true; damage(e, 70, 'fly', G.dir); } }
+    if (G.x > 1180 || G.x < 100) { s.phase = 'out'; s.t = 0; WALL.broken = 3; FX.shake = 0.6; ring(1230, groundY(G.z) - 160, 2.4, '#ffd8a0'); G.hidden = true; }
+  } else if (s.phase === 'out') {
+    if (s.t > 0.8) { s.phase = 'land'; G.hidden = false; G.x = 200; G.dir = 1; G.f = Math.max(G.f, C().frames - 3); G.hold = 0; FX.shake = 0.3; dust(G.x, groundY(G.z), 12); }
+  } else if (G.clip !== 'a_super') { G.super = null; }
+}
+function updateKnife(dt) {
+  const K = KNIFE;
+  if (K.state === 'fly') {
+    K.x += K.vx * 60 * dt; K.ang += dt * 30;
+    for (const e of ENEMIES) if (live(e) && e.state !== 'down' && Math.abs(e.x - K.x) < 40 && Math.abs(e.z - K.z) < 0.14) {
+      damage(e, 16, 'hit', Math.sign(K.vx)); e.knife = true; e.pinned = 1; K.state = 'enemy'; K.host = e; return;
+    }
+    if (K.x > 1225 || K.x < 20) { K.state = 'stuck'; K.x = Math.max(20, Math.min(1225, K.x)); K.wall = true; }
+    if (Math.abs(K.x - G.x) > 900) { K.state = 'floor'; }
+  }
+  if (K.state === 'stuck' && K.wall && K.x > 1200) K.x = 1200;   // 벽에 꽂힌 칼은 벽 앞에서 뽑음
+}
+function updateProj(dt) {
+  for (const p of PROJ) {
+    p.t += dt; p.x += p.vx * 60 * dt; p.y += p.vy * 60 * dt; p.vy += 22 * dt;
+    for (const e of ENEMIES) if (!p.dead && live(e) && e.state !== 'down' && Math.abs(e.x - p.x) < 60 && Math.abs(e.z - p.z) < 0.18) { damage(e, 24, 'fly', Math.sign(p.vx)); p.dead = true; dust(p.x, groundY(p.z), 10); }
+    if (p.y >= 0 || p.x > 1260 || p.x < 0) { p.dead = true; dust(p.x, groundY(p.z), 10); FX.shake = Math.max(FX.shake, 0.15); }
+  }
+  for (let i = PROJ.length - 1; i >= 0; i--) if (PROJ[i].dead) PROJ.splice(i, 1);
+}
+function updateEnemies(dt) {
+  for (const e of ENEMIES) {
+    e.t += dt; e.flash = Math.max(0, e.flash - dt);
+    if (e.state === 'grabbed') continue;
+    if (e.state === 'dead') { if (e.t > 2) Object.assign(e, mkE(e.home, e.z)); continue; }
+    if (e.state === 'fly') {
+      e.x += e.vx * 60 * dt; e.y += e.vy * 60 * dt; e.vy += 30 * dt;
+      if (e.thrown) for (const o of ENEMIES) if (o !== e && live(o) && o.state !== 'down' && o.state !== 'fly' && Math.abs(o.x - e.x) < 60 && Math.abs(o.z - e.z) < 0.15) { damage(o, 12, 'down', Math.sign(e.vx)); }
+      if (e.x > 1200 && !WALL.broken) { e.x = 1200; e.vx = -e.vx * 0.2; if (Math.abs(e.vx) > 1) { e.hp -= 12; hitText(e.x, groundY(e.z) - 260, '벽 +12', '#ffb070'); FX.shake = 0.2; } }
+      if (e.y >= 0) { e.y = 0; e.state = 'down'; e.t = 0; e.vx = 0; e.thrown = false; dust(e.x, groundY(e.z), 8); if (e.knife) { e.knife = false; KNIFE.state = 'floor'; KNIFE.x = e.x; KNIFE.z = e.z; } }
+      continue;
+    }
+    e.x += e.vx * 60 * dt; e.vx *= Math.pow(0.01, dt); e.x = Math.max(40, Math.min(WALL.broken ? 1400 : 1200, e.x));
+    if (e.state === 'hit' && e.t > 0.35) { e.state = 'idle'; }
+    if (e.state === 'down' && e.t > 1.6) { if (e.hp <= 0) { e.state = 'dead'; e.t = 0; } else e.state = 'idle'; }
+    if (e.state === 'idle') { e.face = G.x < e.x ? -1 : 1; if (e.x > 1260) { e.x = e.home; } }
+  }
+  if (KNIFE.state === 'enemy' && KNIFE.host) { KNIFE.x = KNIFE.host.x; KNIFE.z = KNIFE.host.z; }
+}
+function updateAlly(dt) {
+  if (!ALLY.on) return;
+  const c = M.clips[ALLY.clip]; if (!c) { ALLY.on = false; return; }
+  ALLY.t += dt * c.fps; ALLY.x += (ALLY.f < 4 ? 520 : 0) * dt;
+  while (ALLY.t >= 1) { ALLY.t -= 1; ALLY.f++;
+    if ((c.hits || []).includes(ALLY.f)) { for (const e of ENEMIES) if (live(e) && Math.abs(e.x - ALLY.x) < 180 && Math.abs(e.z - ALLY.z) < 0.25) damage(e, 20, 'down', 1); FX.shake = 0.25; dust(ALLY.x, groundY(ALLY.z), 10); }
+    if (ALLY.f >= c.frames) { ALLY.f = c.frames - 1; ALLY.leave = (ALLY.leave || 0) + 1; if (ALLY.leave > 6) { ALLY.on = false; ALLY.leave = 0; } }
+  }
+}
+function updateFx(dt) {
+  FX.shake = Math.max(0, FX.shake - dt); FX.flash = Math.max(0, FX.flash - dt); FX.fade = Math.max(0, FX.fade - dt);
+  for (const a of [FX.sparks, FX.dust, FX.rings, FX.text]) { for (const p of a) { p.t -= dt; if (p.vx != null) { p.x += p.vx; p.y += p.vy; p.vy += 0.6; } } for (let i = a.length - 1; i >= 0; i--) if (a[i].t <= 0) a.splice(i, 1); }
+}
+function sparks(x, y, n) { for (let i = 0; i < n; i++) FX.sparks.push({ x, y, vx: (Math.random() - .5) * 12, vy: -Math.random() * 8, t: 0.3, c: '#fff2b0', s: 6 }); }
+function dust(x, y, n) { for (let i = 0; i < n; i++) FX.dust.push({ x: x + (Math.random() - .5) * 80, y, vx: (Math.random() - .5) * 4, vy: -Math.random() * 3, t: 0.5, c: '#b8ad98', s: 8 }); }
+function ring(x, y, r, c) { FX.rings.push({ x, y, r, c, t: 0.35 }); }
+
+// ── 그리기 ──
+const cv = $('c'), ctx = cv.getContext('2d'); ctx.imageSmoothingEnabled = false;
+function sprite(k, f, x, y, dir, alpha = 1) {
+  const im = imgs[k]; if (!im || !im.complete || !M.clips[k]) return;
+  const D = dims(k);
+  ctx.save(); ctx.globalAlpha = alpha; ctx.translate(Math.round(x), Math.round(y)); ctx.scale(dir * S, S);
+  ctx.drawImage(im, f * D.w, 0, D.w, D.h, -D.anchor, -D.foot, D.w, D.h);
+  ctx.restore();
+}
+function drawEnemy(e) {
+  if (e.state === 'dead') return;
+  const gy = groundY(e.z) + e.y, down = e.state === 'down';
+  ctx.fillStyle = 'rgba(0,0,0,.35)'; ctx.beginPath(); ctx.ellipse(e.x, groundY(e.z) + 4, 30 * S, 5 * S, 0, 0, Math.PI * 2); ctx.fill();
+  ctx.save(); ctx.translate(e.x, gy);
+  if (down) ctx.rotate(-Math.PI / 2 * e.face);
+  if (e.state === 'fly') ctx.rotate(-e.vx * 0.03);
+  const col = e.flash > 0 ? '#f4f0e8' : '#14181c';
+  ctx.fillStyle = col;
+  ctx.beginPath(); ctx.ellipse(0, -96 * S + 12, 13 * S, 15 * S, 0, 0, Math.PI * 2); ctx.fill();   // 머리
+  ctx.fillRect(-15 * S, -82 * S, 30 * S, 44 * S); ctx.fillRect(-13 * S, -40 * S, 10 * S, 40 * S); ctx.fillRect(3 * S, -40 * S, 10 * S, 40 * S);
+  ctx.fillRect(-22 * S, -80 * S, 8 * S, 36 * S); ctx.fillRect(14 * S, -80 * S, 8 * S, 36 * S);
+  if (!down && e.flash <= 0) { ctx.fillStyle = '#d33'; ctx.fillRect(e.face * 5 * S - 3, -98 * S, 6, 6); }
+  if (e.knife) drawCleaver(0, -60 * S, -0.6, 1);
+  ctx.restore();
+  if (!down) { ctx.fillStyle = '#c33'; ctx.fillRect(e.x - 50, gy - 112 * S, 100 * Math.max(0, e.hp) / 40, 6); }
+}
+function drawCleaver(x, y, ang, sc) {   // 날아가거나 꽂힌 식칼(엔진 그림): 손잡이 갈색, 넓은 날
+  ctx.save(); ctx.translate(x, y); ctx.rotate(ang); ctx.scale(sc * S, sc * S);
+  ctx.fillStyle = '#1a1c1e'; ctx.fillRect(-14, -6, 30, 13);
+  ctx.fillStyle = '#5a3a24'; ctx.fillRect(-13, -1, 11, 4);
+  ctx.fillStyle = '#b8c2c8'; ctx.fillRect(-2, -5, 17, 11); ctx.fillStyle = '#e8eef0'; ctx.fillRect(-2, 4, 17, 2);
+  ctx.restore();
+}
+function drawKnife() {
+  const K = KNIFE;
+  if (K.state === 'fly') drawCleaver(K.x, groundY(K.z) + K.y, K.ang, 1);
+  else if (K.state === 'stuck') drawCleaver(K.x, groundY(K.z) - 200, Math.PI, 1);
+  else if (K.state === 'floor') drawCleaver(K.x, groundY(K.z) - 8, Math.PI / 2 + 0.3, 1);
+  if ((K.state === 'stuck' || K.state === 'floor') && !G.armor && Math.abs(K.x - G.x) < 160) { ctx.fillStyle = '#ffe9a0'; ctx.font = 'bold 18px system-ui'; ctx.textAlign = 'center'; ctx.fillText('E 칼 뽑기', K.x, groundY(K.z) - (K.state === 'stuck' ? 240 : 50)); }
+}
+function drawWall() {
+  if (WALL.broken > 0) { ctx.fillStyle = '#20262c'; ctx.fillRect(1236, 160, 44, 560); ctx.fillStyle = 'rgba(255,220,150,.25)'; ctx.fillRect(1236, 300, 44, 420); return; }
+  ctx.fillStyle = '#4a4f55'; ctx.fillRect(1236, 160, 44, 560); ctx.fillStyle = '#3a3f45'; for (let y = 180; y < 720; y += 40) ctx.fillRect(1236, y, 44, 4);
+}
+function draw() {
+  ctx.save();
+  if (FX.shake > 0 && $('fx').checked) ctx.translate((Math.random() - .5) * 14 * FX.shake / 0.3, (Math.random() - .5) * 10 * FX.shake / 0.3);
+  const bg = $('bg').value;
+  if (bg === 'corr' && bgImg.complete) ctx.drawImage(bgImg, 0, 0, 1280, 720); else { ctx.fillStyle = bg === 'dark' ? '#0c0f12' : '#5a636b'; ctx.fillRect(0, 0, 1280, 720); }
+  drawWall();
+  const list = [];
+  for (const e of ENEMIES) list.push({ z: e.z, d: () => drawEnemy(e) });
+  for (const p of PROJ) list.push({ z: p.z, d: () => { ctx.fillStyle = '#6a6258'; ctx.fillRect(p.x - 40, groundY(p.z) + p.y - 20, 80, 36); ctx.strokeStyle = '#2a2420'; ctx.lineWidth = 4; ctx.strokeRect(p.x - 40, groundY(p.z) + p.y - 20, 80, 36); } });
+  if (ALLY.on) list.push({ z: ALLY.z, d: () => sprite(ALLY.clip, Math.min(ALLY.f, M.clips[ALLY.clip].frames - 1), ALLY.x, groundY(ALLY.z), 1) });
+  list.push({ z: G.z + 0.001, d: drawPlayer });
+  list.push({ z: KNIFE.z + 0.002, d: drawKnife });
+  list.sort((a, b) => a.z - b.z); for (const o of list) o.d();
+  for (const r of FX.rings) { ctx.strokeStyle = r.c; ctx.lineWidth = 6; ctx.globalAlpha = r.t / 0.35; ctx.beginPath(); ctx.ellipse(r.x, r.y, 120 * r.r * (1 - r.t / 0.35 + 0.2), 30 * r.r * (1 - r.t / 0.35 + 0.2), 0, 0, Math.PI * 2); ctx.stroke(); ctx.globalAlpha = 1; }
+  for (const p of [...FX.dust, ...FX.sparks]) { ctx.fillStyle = p.c; ctx.globalAlpha = Math.min(1, p.t * 3); ctx.fillRect(Math.round(p.x / 4) * 4, Math.round(p.y / 4) * 4, p.s, p.s); }
+  ctx.globalAlpha = 1;
+  ctx.font = 'bold 22px system-ui'; ctx.textAlign = 'center';
+  for (const t of FX.text) { ctx.fillStyle = '#000'; ctx.fillText(t.s, t.x + 2, t.y + 2 - (0.8 - t.t) * 40); ctx.fillStyle = t.col || '#fff'; ctx.fillText(t.s, t.x, t.y - (0.8 - t.t) * 40); }
+  hud();
+  ctx.restore();
+  if (FX.flash > 0) { ctx.fillStyle = `rgba(255,255,255,${FX.flash * 2})`; ctx.fillRect(0, 0, 1280, 720); }
+  if (FX.fade > 0) { ctx.fillStyle = `rgba(0,0,0,${Math.min(1, FX.fade * 4)})`; ctx.fillRect(0, 0, 1280, 720); }
+}
+function drawPlayer() {
+  if (G.hidden) return;
+  const gy = groundY(G.z);
+  ctx.fillStyle = 'rgba(0,0,0,.4)'; ctx.beginPath(); ctx.ellipse(G.x, gy + 4, (G.armor ? 46 : 38) * S, 6 * S, 0, 0, Math.PI * 2); ctx.fill();
+  if (G.grab && G.grab.state === 'grabbed') drawEnemy(G.grab);
+  sprite(G.clip, G.f, G.x, gy + G.y, G.dir, G.inv > 0 && !G.super ? 0.6 : 1);
+  if ($('box').checked) { const b = boxes[G.clip] && boxes[G.clip][G.f], D = dims(G.clip); if (b) { ctx.strokeStyle = HIT[G.clip] ? '#f55' : '#5f5'; ctx.lineWidth = 2; const x0 = G.dir > 0 ? G.x + (b.x0 - D.anchor) * S : G.x - (b.x1 - D.anchor) * S; ctx.strokeRect(x0, gy + G.y + (b.y0 - D.foot) * S, (b.x1 - b.x0) * S, (b.y1 - b.y0) * S); } }
+  if (G.talkT > 0) bubble(G.x + G.dir * 30, gy + G.y - (G.armor ? 380 : 330), G.talkLine);
+  if (G.armor && $('fx').checked && (G.clip === 'a_glide' || G.clip === 'a_charge' || G.clip === 'a_boost' || G.clip === 'a_lariat')) { for (let i = 0; i < 3; i++) { ctx.fillStyle = i ? '#4fd0ff' : '#e8fbff'; ctx.fillRect(G.x - G.dir * (70 + i * 26 + Math.random() * 10), gy - 220 + Math.random() * 20, 18, 10); } }
+}
+function bubble(x, y, s) {
+  ctx.font = '20px system-ui'; const w = ctx.measureText(s).width + 28;
+  ctx.fillStyle = '#f4f0e6'; ctx.fillRect(x - w / 2, y - 26, w, 40); ctx.beginPath(); ctx.moveTo(x - 8, y + 14); ctx.lineTo(x + 8, y + 14); ctx.lineTo(x, y + 28); ctx.fill();
+  ctx.fillStyle = '#1a1c20'; ctx.textAlign = 'center'; ctx.fillText(s, x, y + 2);
+}
+function hud() {
+  ctx.textAlign = 'left'; ctx.font = 'bold 18px system-ui';
+  ctx.fillStyle = '#000a'; ctx.fillRect(16, 16, 340, 74);
+  ctx.fillStyle = '#e8e6e0'; ctx.fillText('고르고디오' + (G.armor ? ' · 장갑' : ''), 28, 40);
+  ctx.fillStyle = '#3a2226'; ctx.fillRect(28, 50, 300, 10); ctx.fillStyle = '#d84a4a'; ctx.fillRect(28, 50, 3 * G.hp, 10);
+  ctx.fillStyle = '#1e2a30'; ctx.fillRect(28, 66, 300, 10); ctx.fillStyle = G.dur >= 30 ? '#4fd0ff' : '#5a6a74'; ctx.fillRect(28, 66, 3 * G.dur, 10);
+  ctx.fillStyle = G.knife ? '#e8e6e0' : '#ff9a8a'; ctx.fillText(G.knife ? '식칼 1' : '식칼 0', 268, 40);
+}
+
+// ── 목록 ──
+const listEl = $('list'); let lastGroup = '';
+const minis = [];
+for (const [k, c] of Object.entries(M.clips)) {
+  if (c.group !== lastGroup) { const h = document.createElement('div'); h.className = 'grp'; h.textContent = c.group; listEl.appendChild(h); lastGroup = c.group; }
+  const d = document.createElement('div'); d.className = 'clip';
+  d.innerHTML = `<b>${c.label}</b><canvas width="${dims(k).w}" height="${dims(k).h}"></canvas><small>${k} · ${c.frames}장 · ${c.fps}fps</small>`;
+  d.onclick = () => { G.armor = c.set === 'armor'; G.grab = null; G.down = false; G.lying = false; G.crouch = false; G.guard = false; G.super = null; G.hidden = false; play(k, { lock: !c.loop }); $('screen').scrollIntoView({ behavior: 'smooth', block: 'center' }); };
+  listEl.appendChild(d); minis.push({ k, cv: d.querySelector('canvas'), f: 0, t: 0 });
+}
+let mLast = performance.now();
+function minisTick(now) {
+  const dt = (now - mLast) / 1000; mLast = now;
+  for (const m of minis) {
+    const c = M.clips[m.k], im = imgs[m.k], D = dims(m.k); if (!im || !im.complete) continue;
+    m.t += dt * c.fps; if (m.t >= 1) { m.t = 0; m.f = (m.f + 1) % (c.frames + (c.loop ? 0 : 3)); }
+    const x = m.cv.getContext('2d'); x.clearRect(0, 0, D.w, D.h); x.drawImage(im, Math.min(m.f, c.frames - 1) * D.w, 0, D.w, D.h, 0, 0, D.w, D.h);
+  }
+  requestAnimationFrame(minisTick);
+}
+requestAnimationFrame(minisTick);
+
+// ── 키·터치 ──
+const GAME_KEY = c => c.startsWith('Arrow') || c === 'Space' || c.startsWith('Shift') || c.startsWith('Key') || c.startsWith('Digit');
+addEventListener('keydown', e => { if (!GAME_KEY(e.code)) return; if (e.target.tagName === 'SELECT') return; e.preventDefault(); onKey(e.code, true); });
+addEventListener('keyup', e => onKey(e.code, false));
+$('padt').onchange = () => $('pad').classList.toggle('show', $('padt').checked);
+if (matchMedia('(pointer: coarse)').matches) { $('padt').checked = true; $('pad').classList.add('show'); }
+for (const b of document.querySelectorAll('.pad button')) {
+  const k = b.dataset.k;
+  b.addEventListener('pointerdown', e => { e.preventDefault(); b.setPointerCapture(e.pointerId); onKey(k, true); });
+  const up = e => { e.preventDefault(); onKey(k, false); };
+  b.addEventListener('pointerup', up); b.addEventListener('pointercancel', up);
+}
+play('idle');
+requestAnimationFrame(step);
+</script>

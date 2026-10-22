@@ -11,10 +11,13 @@ import type { GameEvent, HqModuleLike, RunConfigCore, RunResultCore, StageModule
 import type { EngineModules, Game } from './game';
 import { DEF_BY_KIND, arenaStage, createEnemy, isThreat, signalEnemies } from '../enemy';
 import { createElevatorStage } from '../stage';
+import { drawMiniMap, drawRunMap } from '../stage/runmap';
 import { CUTSCENES, VIDEOS, hqLines, mountStory, stageHooks, type AgentId, type StoryApi } from '../story';
 import type { SpeakerId } from '../story/types';
 import { itemsBlocking, linkItems, mountItemsOverlay } from './itemsLink';
 import { makeHub, type HubHost } from './hub';
+import { linkNpcTalk } from './npcLink';
+import demoPhotos from '../story/demo-photos.json';
 import { whereIs } from '../hq/map';
 import { drawTitleBg, setHudItemIcon } from '../ui';
 import { SUPPLY_CATALOG, drawItemIcon } from '../items';
@@ -45,7 +48,7 @@ const markSaved = () => local(SAVED_KEY).save('1');
 const hasSaved = () => local(SAVED_KEY).load() === '1';
 
 /** 본부 모듈을 엔진 모양으로 감싼다 */
-function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: HubHost['chooseFloor']; sfx: (n: string) => void; closed?: () => void }): HqModuleLike & { close(): void; goto(place: string): void } {
+function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: HubHost['chooseFloor']; sfx: (n: string) => void; closed?: () => void }): HqModuleLike & { close(): void; goto(place: string): void; state(): { day: number; rescued: string[] } } {
   const hq = createHq();
   const b = bridge as (Partial<GameBridge> & { slot?: number; photo?: (name: string) => string | undefined }) | undefined;
   const slot = b?.slot ?? 0;
@@ -58,11 +61,14 @@ function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui
       bark: (place) => hq.bark(place as never),
       chooseFloor: (o, pick) => ui.chooseFloor(o, pick),
       sfx: (n) => ui.sfx(n),
+      // 본부 대화창이 떠 있으면 머리 위 표시를 숨긴다 (독립 검수: 브리핑 뒤 ↓ 표시)
+      busy: () => typeof document !== 'undefined' && !!document.querySelector('.hq-talk, .hq-over:not(:empty)'),
     },
     (place) => whereIs(place as never),
   );
   return {
     hub: () => hub,
+    state: () => hq.state,
     goto: (place: string) => hub.goto(place),
     isOpen: () => hq.isOpen(),
     close: () => hq.close(),
@@ -201,7 +207,33 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       }
     },
   };
-  const elevator = createElevatorStage(stageStore, stageHooks());
+  // NPC 자유 대화 (npcLink.ts): 껍데기 놀이판 층에 대화창, 승객은 층 모듈 훅으로
+  const npc = linkNpcTalk({
+    layer: shell.stage.ui,
+    bridge,
+    settings: () => shell.settings,
+    agent: () => runAgent,
+    day: () => hq.state().day,
+    rescued: () => hq.state().rescued,
+    photo: (k) => (bridge as { photo?: (n: string) => string | undefined } | undefined)?.photo?.(k) || (demoPhotos as Record<string, string>)[k],
+    sfx: (n) => audio.play(n as never),
+    onOpen: (on) => shell.touch.setVisible(!on && shell.mode === 'play'),
+  });
+  (globalThis as { __goeiNpc?: unknown }).__goeiNpc = npc; // 시험용
+  // 강화 선택(기본기획서 15.2)은 껍데기 선택 창으로: 창이 열린 동안 게임이 멈춘다
+  const elevator = createElevatorStage(stageStore, {
+    ...npc.stageHooks(stageHooks()),
+    pickUpgrade: (v, done) => {
+      void shell.choose({ title: `${v.why} · 강화 하나`, lines: ['이번 출동 동안만 남는다. 같은 계열 셋이면 완성 효과.'], options: v.options.map((o) => `[${o.set}] ${o.label} — ${o.text}`), cancel: false }).then((i) => done(Math.max(0, i)));
+      return true;
+    },
+  });
+  // 출동 지도 (Z·Tab·M, 터치 「지도」): 열린 동안 게임이 멈춘다. 구석 미니맵은 늘
+  let mapOpen = false;
+  const offMapKey = shell.input.on((code, down) => {
+    if (!down) return;
+    if ((code === 'KeyZ' || code === 'KeyM') && world && world.stage === elevator && !game?.inHub && !shell.paused && !story.isBlocking()) mapOpen = !mapOpen;
+  });
   setLineProvider(hqLines);
   // 시연용 방: 적 시험장은 적 모듈 것(?start=arena), 아이템 진열(?start=items)
   const itemStage: StageModule = {
@@ -439,7 +471,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     enemyFactory,
     hq,
     hud: false,
-    blocking: () => story.isBlocking() || itemsBlocking() || !floorBox.hidden,
+    blocking: () => story.isBlocking() || itemsBlocking() || !floorBox.hidden || npc.isOpen() || mapOpen,
     listeners,
     surface: { canvas: shell.canvas, ctx: shell.ctx },
     paused: () => shell.paused,
@@ -464,8 +496,16 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       ctx.restore();
       shell.fx.drawScreen(ctx, w.player.hp / w.player.hpMax);
       const hs = hudState(w, shell);
+      if (npc.isOpen()) hs.message = undefined; // 대화창이 열려 있으면 자막·안내 한 줄은 숨긴다 (같은 말이 두 번, 폰 키보드 자리)
       if (!game?.inHub) shell.hud.draw(ctx, hs, dt); // 본부에서는 전투 HUD 없음
       else if (hs.message) shell.hud.drawMessage(ctx, hs.message, hs.compact); // 본부 목소리는 아래 자막 한 줄
+      if (shell.paused) mapOpen = false;
+      if (!game?.inHub && w.stage === elevator) {
+        const m = elevator.mapView();
+        const t = performance.now() / 1000;
+        if (m && mapOpen) drawRunMap(ctx, m, w.player.x, t);
+        else if (m) drawMiniMap(ctx, m, w.player.x, t);
+      } else mapOpen = false;
       shell.touch.setItems(hs.items);
       shell.touch.setGauge(w.player.gauge / 100);
       shell.touch.hint('reload', w.player.ammo <= 2 && w.player.reserve > 0);
@@ -494,7 +534,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       // 새 저장의 첫 본부: first_day (첫 출동 영상과 사이에 본부를 한 번 걷게 된다)
       if (run.stageId === 'hq') setTimeout(() => world === w && cutOnce('first_day'), 600);
       w.hitFx = false; // 맞을 때 효과는 껍데기 fx가 그린다
-      if (run.stageId === 'hq') return; // 본부 걷기: 아이템·대사 안내·전투 기록 없음
+      if (run.stageId === 'hq') return void npc.attach(w, { hub: (hq.hub?.() ?? null) as never, hq: true }); // 본부 걷기: 아이템·대사 안내·전투 기록 없음
       w.notes.runId = `${run.seed}`;
       // 승강기 안내 방송은 층 모듈 hooks를 대사 모듈이 채우면 거기서 나온다 (여기서 따로 부르지 않음: 중복)
       w.on((e) => {
@@ -527,6 +567,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
         else if (e.name === 'debuff' && d.text) w.say(d.text, 1.5);
       });
       const items = linkItems(w, run);
+      npc.attach(w, { items, hq: false });
       if (run.stageId === 'itemroom') items.showcase();
       w.hooks.push(() => items.tick());
       w.underlays.push((c, camX) => items.draw(c, camX));
@@ -544,13 +585,16 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     },
     boot: (g) => bootFromUrl(g),
     dispose: () => {
+      npc.dispose();
       unmountItems();
-      const g = globalThis as { __goeiStory?: unknown; __goeiStoryStart?: unknown };
+      const g = globalThis as { __goeiStory?: unknown; __goeiStoryStart?: unknown; __goeiNpc?: unknown };
       delete g.__goeiStory;
+      delete g.__goeiNpc;
       delete g.__goeiStoryStart;
       world = null;
       game = null;
       window.removeEventListener('keydown', storyKeys, true);
+      offMapKey();
       window.removeEventListener('keydown', titleInput, true);
       window.removeEventListener('pointerdown', titleInput, true);
       if (openingT) clearTimeout(openingT);

@@ -56,11 +56,12 @@ export function reshuffle(m: StageMeta): string[] {
   return changed;
 }
 
-export type Where = 'floor' | 'car' | 'service' | 'ending';
+export type Where = 'floor' | 'car' | 'service' | 'ending' | 'side';
 export type Target =
   | { to: 'floor'; depth: number; type: FloorType; sub: Floor['sub']; startX?: number }
   | { to: 'car' }
-  | { to: 'service'; col: number; row: number; fromX?: number; side?: 'l' | 'r' | 'u' | 'd' }
+  | { to: 'service'; col: number; row: number; fromX?: number; side?: 'l' | 'r' | 'u' | 'd' | 'down' }
+  | { to: 'side'; depth: number; door: string; secret: boolean; label: string }
   | { to: 'ending' };
 
 export interface Outing {
@@ -103,6 +104,30 @@ export interface Outing {
   ending: boolean;
   /** 같은 층을 다시 만들 때 쓰는 번호 (승강기 탑승마다 +1) */
   ride: number;
+  // ── 출동 단위 메트로배니아 (기본기획서 6.2·8.4 「메트로배니아 쪽」, 15.1)
+  /** 깊이별로 한 번 정해진 층 유형 (되돌아와도 같은 층) */
+  floorTypes: Record<number, { type: FloorType; sub: Floor['sub'] }>;
+  /** 주운 정비 열쇠: 그 열쇠가 여는 층 깊이 */
+  keys: number[];
+  /** 연 방화셔터가 있는 층 깊이 */
+  gatesOpen: number[];
+  /** 위층 점검문이 열린 층 (정비 구역에서 내려와 연 지름길) */
+  shortcuts: number[];
+  /** 숨은 길이 있는 층 (출동당 0~1, 0 = 없음) */
+  secretDepth: number;
+  /** 정비 구역: 깊이별 다시 짜인 횟수, 본 칸 */
+  services: Record<number, { reroll: number; seen: string[]; key: boolean; zone?: ServiceZone }>;
+  /** 층마다 가 본 x 범위 (지도) */
+  explored: Record<number, [number, number]>;
+  /** 층마다 처음 들어간 해치·점검문 x (정비 구역에서 올라올 자리) */
+  hatchX: Record<number, number>;
+  /** 곁가지 방: "깊이:문 id" → 보상 받음 */
+  sides: Record<string, { done: boolean; secret: boolean; x: number }>;
+  /** 강화 선택으로 고른 것 */
+  upgrades: string[];
+  upgradeN: number;
+  /** 싸움 이긴 수 (세 판마다 강화) */
+  fightsWon: number;
 }
 
 export function newOuting(meta: StageMeta, o: { seed: number; agent: string; danger?: number }): Outing {
@@ -143,6 +168,18 @@ export function newOuting(meta: StageMeta, o: { seed: number; agent: string; dan
     log: [],
     ending: false,
     ride: 0,
+    floorTypes: {},
+    keys: [],
+    gatesOpen: [],
+    shortcuts: [],
+    secretDepth: r() < 0.75 ? 2 + Math.floor(r() * 4) : 0,
+    services: {},
+    explored: {},
+    hatchX: {},
+    sides: {},
+    upgrades: [],
+    upgradeN: 0,
+    fightsWon: 0,
   };
 }
 

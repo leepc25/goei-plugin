@@ -31,6 +31,16 @@
   .pad.show { display: flex; }
   h2 { font-size: 15px; margin: 18px 0 4px; }
   .miss { color: #ff9a8a; }
+  @media (max-height: 520px) {   /* 휴대폰 가로: 화면과 터치 버튼이 한눈에 */
+    .wrap { padding: 4px 8px 30px; }
+    h1 { display: none; }
+    .bar { margin: 2px 0; font-size: 12px; gap: 2px 10px; }
+    .screen { height: 58vh; width: auto; margin: 0 auto; }
+    .pad { margin-top: 4px; gap: 6px; }
+    .pad button { min-height: 30px; font-size: 11px; border-radius: 6px; }
+    .dpad { grid-template-columns: repeat(3, 40px); }
+    .pad .g { gap: 3px; }
+  }
 </style>
 <div class="wrap">
   <h1>게슈간 전 동작 시연판 · 쟈알디와 같은 캔버스(192×144, 발 y=136)</h1>
@@ -66,6 +76,7 @@
   </div>
   <h2>동작 목록 (누르면 화면에서 재생)</h2>
   <div id="missing" class="miss"></div>
+  <div id="later" style="color:#9aa3ad;font-size:13px"></div>
   <div class="list" id="list"></div>
 </div>
 <script>
@@ -79,7 +90,8 @@ const imgs = {};
 let loaded = 0; const total = Object.keys(STRIPS).length + 1;
 for (const [k, b64] of Object.entries(STRIPS)) { const im = new Image(); im.onload = () => loaded++; im.src = 'data:image/png;base64,' + b64; imgs[k] = im; }
 const bgImg = new Image(); bgImg.onload = () => loaded++; bgImg.src = 'data:image/png;base64,' + BG64;
-if (M.missing && M.missing.length) $('missing').textContent = '아직 그림이 없는 동작: ' + M.missing.join(', ');
+if (M.missing && M.missing.length) $('missing').textContent = 'GPT에 맡긴 동작(받으면 들어감): ' + M.missing.join(', ');
+if (M.later && M.later.length) $('later').textContent = `다음 차례(전투·이동 먼저 끝내라는 지시로 미룸) ${M.later.length}개: ${M.later.join(', ')}`;
 
 const FAR_Y = 400, NEAR_Y = 700;
 const groundY = z => FAR_Y + (NEAR_Y - FAR_Y) * z;
@@ -99,7 +111,7 @@ const LINES = ['그래. 미안.', '저기!', '내 옆에 있어.', '…총 잘 �
 let lineI = 0;
 
 function play(k, o = {}) {
-  if (!has(k)) { FX.text.push({ x: G.x, y: groundY(G.z) - 320, s: '그림 없음: ' + k, t: 0.8 }); return false; }
+  if (!has(k)) { FX.text.push({ x: G.x, y: groundY(G.z) - 320, s: ((M.later || []).includes(k) ? '다음 차례 동작: ' : '그림 없음: ') + k, t: 0.8 }); return false; }
   G.clip = k; G.f = 0; G.t = 0; G.lock = !!o.lock; G.next = o.next || null; G.cb = o.cb || null; G.hitsDone = new Set(); return true;
 }
 const C = () => M.clips[G.clip];
@@ -113,8 +125,8 @@ function idleClip() {
 }
 function moveClip(running) {
   if (G.crouch) return 'crouchwalk';
-  if (G.carry === 'box') return running ? 'carry2_run' : 'carry2_walk';
-  if (G.tired) return 'limp';
+  if (G.carry === 'box' && has('carry2_walk')) return running ? 'carry2_run' : 'carry2_walk';
+  if (G.tired && has('limp')) return 'limp';
   if (running) return 'run';
   return G.fight ? 'step' : 'walk';
 }
@@ -189,11 +201,11 @@ function doChain() {
   const pend = G.combo === 2 && FX.marks.find(m => m.lift);
   if (pend) { G.combo = 0; play('slam', { lock: true, cb: () => { if (pend.e.state === 'air') slamIt(pend.e); else pend.e.slamQ = true; } }); return; }
   if (G.combo === 1) {
-    G.combo = 2; G.comboT = 0.9;
+    G.combo = 2; G.comboT = 1.3;
     const t = alive().find(e => e.bentT > 0) || nearestFront();
     play('mark', { lock: true, cb: () => { if (t && useFocus()) { G.cursor = null; { mark(t, 8, e => { dmg(e, 90, 'air', { vy: -1100, stop: .08 }); if (e.slamQ) { e.slamQ = false; setTimeout(() => slamIt(e), 150); } }); FX.marks[FX.marks.length - 1].lift = true; } } } }); return;
   }
-  G.combo = 1; G.comboT = 0.7;
+  G.combo = 1; G.comboT = 1.1;
   play('snap', { lock: true, cb: () => { for (const e of alive()) if (inFront(e, 170) && e.state !== 'down') { dmg(e, 30, 'bent'); e.bentT = 2; } } });
 }
 function slamIt(e) { if (e.hp > 0) { e.state = 'slam'; e.vy = 2200; e.t = 0; } }
@@ -438,6 +450,14 @@ function updEnemy(e, dt) {
 
 // ── 그리기 ──
 const cv = $('c'), ctx = cv.getContext('2d');
+// 시연용 가구(게임에선 무대 오브젝트): 누웠다 앉기 등 침대 높이에서 그린 동작 밑에 침대
+const PROPS = { liesit: [[14, 110, 164, 6, '#c9c4b8'], [14, 116, 164, 20, '#6b5440']], liehold: [[14, 110, 164, 6, '#c9c4b8'], [14, 116, 164, 20, '#6b5440']], bedlie: [[14, 110, 164, 6, '#c9c4b8'], [14, 116, 164, 20, '#6b5440']] };
+function drawProps(k, x, y, dir) {
+  const r = PROPS[k]; if (!r) return;
+  ctx.save(); ctx.translate(Math.round(x), Math.round(y)); ctx.scale(dir * S, S);
+  for (const [px, py, w, h, col] of r) { ctx.fillStyle = col; ctx.fillRect(px - ANC, py - FOOT, w, h); }
+  ctx.restore();
+}
 function sprite(k, f, x, y, dir, alpha = 1, rim = false, filter = '') {
   const im = imgs[k]; if (!im || !im.complete || !M.clips[k]) return;
   ctx.save(); ctx.globalAlpha = alpha; ctx.translate(Math.round(x), Math.round(y)); ctx.scale(dir * S, S);
@@ -531,6 +551,7 @@ function drawPlayer() {
   if (!['down', 'getup', 'liesit', 'liehold', 'bedlie'].includes(G.clip)) { ctx.fillStyle = 'rgba(0,0,0,.35)'; ctx.beginPath(); ctx.ellipse(G.x, gy + 4, Math.max(10, 24 * S + G.y / 8), 5 * S, 0, 0, Math.PI * 2); ctx.fill(); }
   if (G.inv > 0 && G.clip === 'tkleap') { ctx.fillStyle = 'rgba(160,215,255,.35)'; ctx.fillRect(G.x - G.dir * 120, gy - 6, 120 * G.dir, 4); }
   const filt = G.hurtT > 0.08 ? 'brightness(0) invert(1)' : G.hurtT > 0 ? 'brightness(1.8)' : '';
+  drawProps(G.clip, G.x, gy + G.y, G.dir);
   sprite(G.clip, G.f, G.x, gy + G.y, G.dir, 1, $('rim').checked && $('bg').value !== 'grey', filt);
   const hp = handPos();
   // 집은 물건: 손에 안 들고 띄움(둔기·큰 물건), 총은 손 앞에 떠 있음
@@ -587,6 +608,7 @@ for (const [k, c] of Object.entries(M.clips)) {
     acc += (now - lt) / 1000 * +$('speed').value; lt = now;
     while (acc >= 1 / c.fps) { acc -= 1 / c.fps; f = (f + 1) % c.frames; }
     cc.fillStyle = '#3a444c'; cc.fillRect(0, 0, FW, FH);
+    for (const [px, py, w, h, col] of PROPS[k] || []) { cc.fillStyle = col; cc.fillRect(px, py, w, h); }
     if (imgs[k].complete) cc.drawImage(imgs[k], f * FW, 0, FW, FH, 0, 0, FW, FH);
     requestAnimationFrame(tick);
   })(performance.now());

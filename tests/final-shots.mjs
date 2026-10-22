@@ -18,6 +18,8 @@ const VPS = [
   { name: 'phone', viewport: { width: 844, height: 390 }, isMobile: true, hasTouch: true, deviceScaleFactor: 2 },
 ];
 const only = process.env.ONLY;
+// COMPACT=1: 검수용으로 장 수를 줄인다 (장면당 한 장, 층마다 시작·싸움 한 장·싸움 뒤)
+const COMPACT = !!process.env.COMPACT;
 try {
   for (const vp of VPS) {
     if (only && only !== vp.name) continue;
@@ -53,7 +55,7 @@ try {
       await page.waitForTimeout(700);
       await S(`hq-${id}`);
       const L = await E(() => window.__goeiEngine.world.floor.length);
-      if (L > 1700) {
+      if (L > 1700 && !COMPACT) {
         await E((x) => window.__goeiEngine.world.api.movePlayer(x), L - 420);
         await page.waitForTimeout(1200);
         await S(`hq-${id}-b`);
@@ -68,6 +70,9 @@ try {
       w.api.movePlayer(w.props.find((q) => q.id === 'spot:jaemtri').x);
     });
     await page.waitForTimeout(200);
+    await page.keyboard.press('KeyE');
+    // 자리 주인과 대화창이 먼저 열린다 (NPC 자유 대화). E 한 번 더 = 원래 창구
+    await page.waitForSelector('.gnp:not([hidden])');
     await page.keyboard.press('KeyE');
     await page.waitForSelector('[data-mission]', { state: 'visible' });
     await page.waitForTimeout(300);
@@ -85,6 +90,7 @@ try {
     });
     await page.waitForTimeout(1500);
     for (let f = 0; f < FLOORS; f++) {
+      let fights = 0;
       await page.waitForFunction(() => window.__goeiEngine.world?.floor && !window.__goeiEngine.world.ended);
       // 컷신·대사가 막고 있으면 넘긴다
       for (let i = 0; i < 6; i++) await page.keyboard.press('KeyE').catch(() => {});
@@ -98,21 +104,22 @@ try {
       for (let x = 900; x < info.len - 300; x += 1100) {
         const enc = encs.length && encs[0] <= x ? encs.shift() : null;
         if (enc !== null) {
+          const shoot = !COMPACT || fights++ === 0;
           await E((x) => window.__goeiEngine.world.api.movePlayer(x), enc + 20);
           await page.waitForTimeout(900);
-          await S(`floor${f + 1}-enemy`);
+          if (!COMPACT) await S(`floor${f + 1}-enemy`);
           for (let k = 0; k < 10; k++) {
             await page.keyboard.press('KeyA');
             await page.waitForTimeout(120);
-            if (k === 3 || k === 7) await S(`floor${f + 1}-hit${k}`);
+            if (shoot && (k === 3 || (k === 7 && !COMPACT))) await S(`floor${f + 1}-hit${k}`);
           }
           // 남은 적 정리 (다음 장면으로)
           await E(() => {
             const w = window.__goeiEngine.world;
             for (const b of w.bodies) if (b.team === 'enemy') (b.hp = 0), (b.alive = false);
           });
-          await page.waitForTimeout(600);
-          await S(`floor${f + 1}-after`);
+          await page.waitForTimeout(1300); // 피해 숫자가 사라진 뒤
+          if (shoot) await S(`floor${f + 1}-after`);
           continue;
         }
         await E((x) => window.__goeiEngine.world.api.movePlayer(x), x);
@@ -120,7 +127,7 @@ try {
         await page.waitForTimeout(500);
         await page.keyboard.up('ArrowRight');
         await page.waitForTimeout(300);
-        await S(`floor${f + 1}-walk${x}`);
+        if (!COMPACT) await S(`floor${f + 1}-walk${x}`);
       }
       if (f === 0) {
         await page.keyboard.press('Escape');

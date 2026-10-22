@@ -29,9 +29,9 @@ FPS = {'idle': 5, 'stance': 6, 'walk': 10, 'step': 12, 'run': 14, 'jump': 12, 'c
        'focus': 5, 'tkswing': 14, 'gunclench': 14, 'pickup': 10, 'toss': 14, 'hit': 14, 'down': 12, 'getup': 10, 'talk': 6,
        'engage': 12, 'turn': 12, 'fall': 10, 'land': 14, 'ladder': 10, 'vault': 14, 'crawl': 10, 'sneak': 8, 'carry2_run': 14,
        'carry1_run': 14, 'carry2_walk': 10, 'carry1_walk': 10, 'limp': 8, 'collapse': 10, 'startlefall': 14, 'surprise': 14}
-HITS = {'lowmark': [3], 'tackle': [5], 'airstomp': [4], 'airmark': [3], 'clench': [1], 'hold': [4], 'fling': [2], 'parry': [1],
-        'grabreap': [4], 'grabcrush': [4], 'super': [7], 'chain2': [2, 4], 'support': [5], 'tkswing': [3], 'gunclench': [1],
-        'toss': [2], 'pickup': [3]}
+HITS = {'lowmark': [4], 'tackle': [4], 'airstomp': [4], 'airmark': [3], 'clench': [1], 'hold': [4], 'fling': [2], 'parry': [2],
+        'grabreap': [4], 'grabcrush': [4], 'super': [7], 'chain2': [2, 4], 'support': [3], 'tkswing': [3], 'gunclench': [1],
+        'toss': [2], 'pickup': [4]}
 # A 연계 15장은 게임에서 세 단으로 끊어 씀(스냅다운 0~4 → 지정 5~8 → 내려찍기 9~14)
 SPLIT = [('snap', 'chain3', (0, 5), '1타 스냅다운', 16, [3]), ('mark', 'chain3', (5, 9), '2타 지정(한 박자 뒤 띄움)', 12, [2]),
          ('slam', 'chain3', (9, 15), '3타 내려찍기', 14, [3])]
@@ -80,6 +80,45 @@ def lookback_frames():
     return out
 
 
+def despeckle(im):
+    """몸에서 떨어진 작은 점 덩어리(80px 미만, 몸과 4px 넘게 떨어짐)를 지움 — 생성기가 흘린 회색 점(검수: stepover 1장, fall 2장)."""
+    import numpy as np
+    from scipy import ndimage
+    a = np.array(im); m = a[:, :, 3] > 0
+    lab, n = ndimage.label(m, structure=np.ones((3, 3)))
+    if n < 2:
+        return im
+    sizes = ndimage.sum(m, lab, range(1, n + 1)); main = lab == (int(np.argmax(sizes)) + 1)
+    near = ndimage.binary_dilation(main, iterations=4)
+    for k in range(1, n + 1):
+        part = lab == k
+        if sizes[k - 1] < 80 and not (part & near).any():
+            a[part] = 0
+    return Image.fromarray(a)
+
+
+def shift_to(im, bottom):
+    import numpy as np
+    a = np.array(im); rows = np.nonzero(a[:, :, 3].any(1))[0]
+    dy = bottom - int(rows.max()); out = np.zeros_like(a)
+    if dy >= 0: out[dy:] = a[:FH - dy]
+    else: out[:FH + dy] = a[-dy:]
+    return Image.fromarray(out)
+
+
+def outline(im):
+    """GPT 그림 외곽선 맞춤: 바깥 테두리 중 피부·수건 색 픽셀(점선처럼 끊겨 보임)을 기준 그림 G0처럼 #000000으로. 머리·셔츠 회색 테두리는 G0도 회색이라 둠."""
+    import numpy as np
+    from scipy import ndimage
+    a = np.array(im); m = a[:, :, 3] > 0
+    edge = m & ~ndimage.binary_erosion(m)
+    rgb = a[:, :, :3].astype(int)
+    grey = (rgb.max(2) - rgb.min(2)) < 20
+    sel = edge & ~grey
+    a[sel, :3] = 0
+    return Image.fromarray(a)
+
+
 def strip(frames):
     s = Image.new('RGBA', (FW * len(frames), FH), (0, 0, 0, 0))
     for i, f in enumerate(frames):
@@ -112,7 +151,7 @@ def main():
     for key, name, n in plan.GPT:
         defs.append(dict(key=key, src=key, rng=None, label=name + ' (GPT)', group='GPT 담당(샤워·목욕)', plan=n, fps=6, loop=key in ('shower', 'bath'), hits=[]))
     manifest = {'frameW': FW, 'frameH': FH, 'foot': FOOT, 'anchor': ANCHOR, 'clips': {}}
-    strips, missing = {}, []
+    strips, missing, later = {}, [], []   # later = 사용자 지시(2026-10-22 03:17)로 미룬 생활·사교·감정·지형 동작
     final = os.path.join(SRC, 'final'); os.makedirs(final, exist_ok=True)
     for d in defs:
         fr = lookback_frames() if d['key'] == 'lookback' else frames_of(d['src'])
@@ -122,30 +161,40 @@ def main():
         if d['rng']:
             idx = idx[d['rng'][0]:d['rng'][1]]
         fx = fixes.get(d['key'], {})
+        for raw, bottom in fx.get('align', {}).items():   # 장 바닥(가장 아래 불투명 줄)을 정한 y로 옮김: {원본 장: y}
+            fr[int(raw)] = shift_to(fr[int(raw)], bottom)
+        if fx.get('compose'):                      # 다른 클립 장을 빌려 엮음: [[클립, 장], ...]
+            fr = [frames_of(c)[i] for c, i in fx['compose']]
+            idx = list(range(len(fr)))
         if fx.get('order'):
             idx = [idx[i] for i in fx['order'] if i < len(idx)]
         if fx.get('drop'):
             idx = [v for i, v in enumerate(idx) if i not in set(fx['drop'])]
         if not idx:
-            missing.append(d['key']); continue
-        frames = [fr[i] for i in idx]
+            (later if d['group'] not in ('전투', '게임용 나눔(A 연계)', 'GPT 담당(샤워·목욕)') else missing).append(d['key']); continue
+        frames = [despeckle(fr[i]) for i in idx]
+        if fx.get('outline'):
+            frames = [outline(f) for f in frames]
         data = strip(frames)
         strips[d['key']] = base64.b64encode(data).decode()
         open(os.path.join(final, d['key'] + '.png'), 'wb').write(data)
         c = {k: d[k] for k in ('label', 'fps', 'loop', 'hits', 'group')} | {'frames': len(frames), 'src': d['src'], 'idx': idx}
-        hs = [hand('idle' if d['key'] == 'lookback' else d['src'], i % 4 if d['key'] == 'lookback' else i) for i in idx]
+        if fx.get('compose'):
+            hs = [hand(c, i) for c, i in fx['compose']]
+        else:
+            hs = [hand('idle' if d['key'] == 'lookback' else d['src'], i % 4 if d['key'] == 'lookback' else i) for i in idx]
         if all(hs):
             c['hand'] = hs
         manifest['clips'][d['key']] = c
     json.dump(manifest, open(os.path.join(final, 'manifest.json'), 'w'), ensure_ascii=False, indent=1)
     json.dump({k: v['hand'] for k, v in manifest['clips'].items() if v.get('hand')}, open(os.path.join(final, 'hands.json'), 'w'), separators=(',', ':'))
-    manifest['missing'] = missing
+    manifest['missing'] = missing; manifest['later'] = later
     tpl = open(os.path.join(ROOT, 'tools', 'geshugan_demo_template.html'), encoding='utf-8').read()
     html = (tpl.replace('__MANIFEST__', json.dumps(manifest, ensure_ascii=False)).replace('__STRIPS__', json.dumps(strips))
             .replace('__BG__', base64.b64encode(open(BG, 'rb').read()).decode()))
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     open(OUT, 'w', encoding='utf-8').write(html)
-    print('wrote', OUT, len(html) // 1024, 'KB', 'clips', len(strips), 'missing', missing)
+    print('wrote', OUT, len(html) // 1024, 'KB', 'clips', len(strips), 'missing', missing, 'later', len(later))
 
 
 if __name__ == '__main__':

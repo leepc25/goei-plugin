@@ -167,6 +167,9 @@ export function mountGameShell(box: HTMLElement, o: ShellOptions = {}): Shell {
       { type: 'toggle', label: '스틱 끝까지 밀면 달리기', get: () => s.stickRun, set: (v) => (s.stickRun = v) },
       { type: 'toggle', label: '왼손 배치', get: () => s.lefty, set: (v) => (s.lefty = v) },
       { type: 'toggle', label: '진동', get: () => s.vibrate, set: (v) => (s.vibrate = v) },
+      { type: 'head', label: '대화' },
+      { type: 'choice', label: 'NPC 대화 모델', options: [['main', '주 모델'], ['aux', '보조 모델']], get: () => s.talkModel, set: (v) => (s.talkModel = v as UiSettings['talkModel']) },
+      { type: 'toggle', label: '본편 최근 채팅 같이 보내기', get: () => s.talkRecent, set: (v) => (s.talkRecent = v) },
       { type: 'html', html: `<p style="font-size:14px;color:#9aa6ab">게임패드: ${esc(pad.connected ? pad.connected.slice(0, 48) : '연결 안 됨 (버튼을 하나 누르면 잡힙니다)')}</p>` },
       { type: 'button', label: '기본값으로', act: () => ((settings = { ...DEFAULT_SETTINGS }), apply(), saveSettings(), menu.replace(settingsScreen())) },
     ];
@@ -229,17 +232,21 @@ export function mountGameShell(box: HTMLElement, o: ShellOptions = {}): Shell {
     },
     openPause() {
       if (menu.isOpen) return;
+      // 터치·패드에서는 키보드 글자 힌트를 숨긴다 (독립 검수: 폰 일시정지에 Esc/X/H)
+      const coarse = typeof matchMedia !== 'undefined' && matchMedia('(pointer: coarse)').matches;
+      const kb = !coarse && (!hud.last?.device || hud.last.device === 'kb');
+      const key = (k: string) => (kb ? k : undefined);
       menu.open({
         id: 'pause',
         title: '일시정지',
         sub: o.pauseInfo?.() ?? '',
         items: [
           ...(hud.last ? [{ type: 'html' as const, html: statusHtml(hud.last) }] : []),
-          { type: 'button', label: '계속', sub: 'Esc', act: () => menu.closeAll() },
+          { type: 'button', label: '계속', sub: key('Esc'), act: () => menu.closeAll() },
           { type: 'button', label: '설정', act: () => shell.openSettings() },
           { type: 'button', label: '조작법', act: () => shell.openControls() },
-          { type: 'button', label: '자동 전환', sub: 'X', act: () => (menu.closeAll(), tap('KeyX')) },
-          { type: 'button', label: '판정 보기', sub: 'H', act: () => (menu.closeAll(), tap('KeyH')) },
+          { type: 'button', label: '자동 전환', sub: key('X'), act: () => (menu.closeAll(), tap('KeyX')) },
+          { type: 'button', label: '판정 보기', sub: key('H'), act: () => (menu.closeAll(), tap('KeyH')) },
           ...(o.onRetreat ? [{ type: 'button' as const, label: '본부로 귀환', sub: '후송 처리', danger: true, act: () => void shell.confirm('출동을 포기하고 본부로 돌아갈까요? 송신하지 않은 정보는 절반만 남습니다.', '귀환', '계속 싸운다').then((y) => y && (menu.closeAll(), o.onRetreat!())) }] : []),
           { type: 'button', label: '타이틀로', act: () => void shell.confirm('타이틀 화면으로 나갈까요? 진행은 저장됩니다.').then((y) => y && (o.onTitle ? o.onTitle() : shell.openTitle())) },
         ],
