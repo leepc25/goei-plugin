@@ -1,0 +1,35 @@
+{
+  "status": "기하 검사 통과·그림 미생성·참조 가림 관절 검수 대기",
+  "network_calls": 0,
+  "paid_calls": 0,
+  "checks": [
+    {
+      "clip": "walk",
+      "frames": 8,
+      "all_18_unique": true,
+      "normalized_in_bounds": true,
+      "bone_lengths": true,
+      "stance_ankle_locked": true,
+      "knee_bends_forward": true,
+      "cycle_delta_x": 48,
+      "visual_review": "대기: 뼈대 검수이며 그림 합격 아님",
+      "max_joint_step_pixels": 16.492,
+      "loop_boundary_max_joint_step_pixels": 12.649,
+      "loop_boundary_no_larger_than_interior_step": true
+    },
+    {
+      "clip": "run",
+      "frames": 8,
+      "all_18_unique": true,
+      "normalized_in_bounds": true,
+      "bone_lengths": true,
+      "stance_ankle_locked": true,
+      "knee_bends_forward": true,
+      "cycle_delta_x": 80,
+      "visual_review": "대기: 뼈대 검수이며 그림 합격 아님",
+      "max_joint_step_pixels": 34.905,
+      "loop_boundary_max_joint_step_pixels": 23.854,
+      "loop_boundary_no_larger_than_interior_step": true
+    }
+  ]
+}

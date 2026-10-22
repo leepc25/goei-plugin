@@ -1,0 +1,53 @@
+{
+  "observed_at": "2026-10-22T10:20:46.077176+00:00",
+  "branch": "codex/art-jyaldi-resume",
+  "account": {
+    "balance": null,
+    "active_jobs": null,
+    "concurrency_limit": null,
+    "error": "401 Missing Authorization header"
+  },
+  "per_owner_inflight_limit": 1,
+  "global_lock_acquired": false,
+  "new_paid_calls": 0,
+  "new_actual_charge": 0,
+  "walk": {
+    "state": "unsubmitted_auth_blocked_reference_review_pending",
+    "frames": 8,
+    "quote_generations": 3,
+    "job_id": null,
+    "actual_cost": null,
+    "file_sha256": "5e7376f3ab60342e9e0859371bc53fa87cd9d37e8d4752cb413e18c14fee74d3",
+    "arguments_sha256": "2fd1253190bf7e0e97dbd380c3ec88f9a7cfecdfd64557f0d5b72bdfede6318b"
+  },
+  "run": {
+    "state": "wait_for_walk_review",
+    "job_id": null,
+    "actual_cost": null
+  },
+  "kyuras_recovery": {
+    "owner": "큐라스 담당",
+    "handoff_acknowledged": false,
+    "recovery_performed_here": false,
+    "jobs": [
+      {
+        "clip": "idle_shotgun",
+        "job_id": "11826541-47d1-40de-9664-f05f1838bb23",
+        "original_actual_cost": null
+      },
+      {
+        "clip": "run_shotgun",
+        "job_id": "9fe0e770-b992-4299-a4c1-90d6e591828a",
+        "original_actual_cost": null
+      }
+    ]
+  },
+  "excluded": [
+    "jyaldi grabknee",
+    "jyaldi undress",
+    "jyaldi showerturn",
+    "jyaldi shower"
+  ],
+  "generated": false,
+  "user_visual_approval": false
+}

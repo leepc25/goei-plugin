@@ -1,0 +1,955 @@
+{
+  "refs": {
+    "origin/main": "317faad892a4c89f339f63b6960b751e22801bc1",
+    "origin/codex/metroidvania-run-system": "7f8fdfb0c5a6cef096d412d3d872aec6eae7de81",
+    "origin/codex/character-production-resume": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4"
+  },
+  "source_comparisons": {
+    "origin/main": [],
+    "origin/codex/metroidvania-run-system": [],
+    "origin/codex/character-production-resume": [
+      "game-src/action/jyaldi-v5/spend.log"
+    ]
+  },
+  "manifest_sha256": "78bd9a68af565a6d595bdc8adf37a5337968e003e72f9525098e5b2a50d65095",
+  "clips": {
+    "walk": {
+      "raw_count": 8,
+      "manifest_frames": 8,
+      "manifest": {
+        "label": "3 걷기(탐사)",
+        "fps": 10,
+        "loop": true,
+        "hits": [],
+        "adv": 0,
+        "origin": 0,
+        "hold": 0.0,
+        "group": "전투·기본 (계획안 1~41)",
+        "frames": 8,
+        "bytes": 29406,
+        "prop": false,
+        "anchors": [
+          {
+            "hand": [
+              55,
+              87
+            ],
+            "hand2": [
+              66,
+              87
+            ],
+            "angle": 59,
+            "hip": [
+              59,
+              85
+            ]
+          },
+          {
+            "hand": [
+              57,
+              87
+            ],
+            "hand2": [
+              64,
+              87
+            ],
+            "angle": 54,
+            "hip": [
+              59,
+              85
+            ]
+          },
+          {
+            "hand": [
+              62,
+              86
+            ],
+            "hand2": [
+              59,
+              86
+            ],
+            "angle": 43,
+            "hip": [
+              59,
+              84
+            ]
+          },
+          {
+            "hand": [
+              67,
+              87
+            ],
+            "hand2": [
+              54,
+              87
+            ],
+            "angle": 35,
+            "hip": [
+              59,
+              85
+            ]
+          },
+          {
+            "hand": [
+              69,
+              87
+            ],
+            "hand2": [
+              52,
+              87
+            ],
+            "angle": 32,
+            "hip": [
+              59,
+              85
+            ]
+          },
+          {
+            "hand": [
+              67,
+              87
+            ],
+            "hand2": [
+              54,
+              87
+            ],
+            "angle": 35,
+            "hip": [
+              59,
+              85
+            ]
+          },
+          {
+            "hand": [
+              62,
+              86
+            ],
+            "hand2": [
+              59,
+              86
+            ],
+            "angle": 43,
+            "hip": [
+              59,
+              84
+            ]
+          },
+          {
+            "hand": [
+              57,
+              87
+            ],
+            "hand2": [
+              64,
+              87
+            ],
+            "angle": 54,
+            "hip": [
+              59,
+              85
+            ]
+          }
+        ]
+      },
+      "strip_sha256": "ba2de7f6070fc0a9e20f2f9f82352f29cd22461541769f98f5f661e37fb30ef4",
+      "raw": [
+        {
+          "path": "game-src/action/jyaldi-v5/full/clips/walk/00.png",
+          "sha256": "243d81abac7767afb632a3cd6570e052024d98a7b50ccf7aca29207ea8789f32",
+          "size": [
+            192,
+            144
+          ],
+          "same_as_final_frame": true
+        },
+        {
+          "path": "game-src/action/jyaldi-v5/full/clips/walk/01.png",
+          "sha256": "41345c59d0801e3e51debb727a6d4f93063615308b4030af2d7d4876fa4533fb",
+          "size": [
+            192,
+            144
+          ],
+          "same_as_final_frame": true
+        },
+        {
+          "path": "game-src/action/jyaldi-v5/full/clips/walk/02.png",
+          "sha256": "0ba274a8702649fa16a84366f53e7649d7a0295787d871e3e624b6f82d384d28",
+          "size": [
+            192,
+            144
+          ],
+          "same_as_final_frame": true
+        },
+        {
+          "path": "game-src/action/jyaldi-v5/full/clips/walk/03.png",
+          "sha256": "497bf1ba2110af1fa9b3455c78130ec4914ae34b7f7bee39c79e0f10e3e66067",
+          "size": [
+            192,
+            144
+          ],
+          "same_as_final_frame": true
+        },
+        {
+          "path": "game-src/action/jyaldi-v5/full/clips/walk/04.png",
+          "sha256": "6f7f753fe088fe012819237ba6766b25284d74d1ec6f715010c20e1ebd3297ec",
+          "size": [
+            192,
+            144
+          ],
+          "same_as_final_frame": true
+        },
+        {
+          "path": "game-src/action/jyaldi-v5/full/clips/walk/05.png",
+          "sha256": "99b4770daa8ad0fbbb84369b3c8f2a1d62b4915b28307b82b6b35aee3f54b198",
+          "size": [
+            192,
+            144
+          ],
+          "same_as_final_frame": true
+        },
+        {
+          "path": "game-src/action/jyaldi-v5/full/clips/walk/06.png",
+          "sha256": "63a3c3e94bde23c99b5f5db01a334abd67c1970cb4ddbc0dad6f0bec8ad09501",
+          "size": [
+            192,
+            144
+          ],
+          "same_as_final_frame": true
+        },
+        {
+          "path": "game-src/action/jyaldi-v5/full/clips/walk/07.png",
+          "sha256": "18b3ef7dc7d01b504a9f48040ec3131f9d4ec3d67abded093d668ae2680feb8f",
+          "size": [
+            192,
+            144
+          ],
+          "same_as_final_frame": true
+        }
+      ]
+    },
+    "run": {
+      "raw_count": 8,
+      "manifest_frames": 8,
+      "manifest": {
+        "label": "4 달리기",
+        "fps": 14,
+        "loop": true,
+        "hits": [],
+        "adv": 0,
+        "origin": 0,
+        "hold": 0.0,
+        "group": "전투·기본 (계획안 1~41)",
+        "frames": 8,
+        "bytes": 33410,
+        "prop": false,
+        "anchors": [
+          {
+            "hand": [
+              67,
+              81
+            ],
+            "hand2": [
+              101,
+              71
+            ],
+            "angle": 46,
+            "hip": [
+              67,
+              88
+            ]
+          },
+          {
+            "hand": [
+              73,
+              76
+            ],
+            "hand2": [
+              95,
+              69
+            ],
+            "angle": 18,
+            "hip": [
+              67,
+              84
+            ]
+          },
+          {
+            "hand": [
+              87,
+              71
+            ],
+            "hand2": [
+              81,
+              71
+            ],
+            "angle": -40,
+            "hip": [
+              67,
+              83
+            ]
+          },
+          {
+            "hand": [
+              101,
+              69
+            ],
+            "hand2": [
+              67,
+              76
+            ],
+            "angle": -38,
+            "hip": [
+              67,
+              84
+            ]
+          },
+          {
+            "hand": [
+              107,
+              71
+            ],
+            "hand2": [
+              61,
+              81
+            ],
+            "angle": -24,
+            "hip": [
+              67,
+              88
+            ]
+          },
+          {
+            "hand": [
+              101,
+              69
+            ],
+            "hand2": [
+              67,
+              76
+            ],
+            "angle": -38,
+            "hip": [
+              67,
+              84
+            ]
+          },
+          {
+            "hand": [
+              87,
+              71
+            ],
+            "hand2": [
+              81,
+              71
+            ],
+            "angle": -40,
+            "hip": [
+              67,
+              83
+            ]
+          },
+          {
+            "hand": [
+              73,
+              76
+            ],
+            "hand2": [
+              95,
+              69
+            ],
+            "angle": 18,
+            "hip": [
+              67,
+              84
+            ]
+          }
+        ]
+      },
+      "strip_sha256": "d4f66ac791d9832937ff67aab8f7d0364de414afdca7dc09a20d33d060e957de",
+      "raw": [
+        {
+          "path": "game-src/action/jyaldi-v5/full/clips/run/00.png",
+          "sha256": "df80724956f359b43d66d9f55baae8b162db26e26b48912612e7f7a2d77971e2",
+          "size": [
+            192,
+            144
+          ],
+          "same_as_final_frame": true
+        },
+        {
+          "path": "game-src/action/jyaldi-v5/full/clips/run/01.png",
+          "sha256": "675cf7da131fccc0ebdba5add07e85f35f16f2fb999586c33e984a6abff69ac1",
+          "size": [
+            192,
+            144
+          ],
+          "same_as_final_frame": true
+        },
+        {
+          "path": "game-src/action/jyaldi-v5/full/clips/run/02.png",
+          "sha256": "859837797b90915e33610ac7fe3be6f34158cbe9d4d679b37067d394aec17fdc",
+          "size": [
+            192,
+            144
+          ],
+          "same_as_final_frame": true
+        },
+        {
+          "path": "game-src/action/jyaldi-v5/full/clips/run/03.png",
+          "sha256": "d3ba5caeba700519c59ca455a0a38d72276c23b1e51784f4386a7ad1c4cb98cd",
+          "size": [
+            192,
+            144
+          ],
+          "same_as_final_frame": true
+        },
+        {
+          "path": "game-src/action/jyaldi-v5/full/clips/run/04.png",
+          "sha256": "d1f9b6a1093beef6c41f7a8774d08ae98ff83dbde0178249ac68e25fc0ffad86",
+          "size": [
+            192,
+            144
+          ],
+          "same_as_final_frame": true
+        },
+        {
+          "path": "game-src/action/jyaldi-v5/full/clips/run/05.png",
+          "sha256": "e7c66a21dd4d73a626f8d4441137a9dfc88f5d171fd06bc88e3cda5ecdeba561",
+          "size": [
+            192,
+            144
+          ],
+          "same_as_final_frame": true
+        },
+        {
+          "path": "game-src/action/jyaldi-v5/full/clips/run/06.png",
+          "sha256": "1c446961728e443b19b99428f30f93537b21e40d3f4898add3f0e5ac3ebb3475",
+          "size": [
+            192,
+            144
+          ],
+          "same_as_final_frame": true
+        },
+        {
+          "path": "game-src/action/jyaldi-v5/full/clips/run/07.png",
+          "sha256": "5a9e66d8aefa469418eb1d507eccd35eb6e6438fb186c67e603ee2f9a4121aa9",
+          "size": [
+            192,
+            144
+          ],
+          "same_as_final_frame": true
+        }
+      ]
+    },
+    "grabknee": {
+      "raw_count": 5,
+      "manifest_frames": 5,
+      "manifest": {
+        "label": "22 잡기 타격(무릎)",
+        "fps": 14,
+        "loop": false,
+        "hits": [
+          3
+        ],
+        "adv": 0,
+        "origin": 0,
+        "hold": 0.05,
+        "group": "전투·기본 (계획안 1~41)",
+        "frames": 5,
+        "bytes": 16804,
+        "prop": false,
+        "anchors": [
+          {
+            "hand": [
+              87,
+              61
+            ],
+            "hand2": [
+              83,
+              64
+            ],
+            "angle": -24,
+            "hip": [
+              59,
+              85
+            ]
+          },
+          {
+            "hand": [
+              83,
+              66
+            ],
+            "hand2": [
+              79,
+              70
+            ],
+            "angle": -13,
+            "hip": [
+              58,
+              84
+            ]
+          },
+          {
+            "hand": [
+              79,
+              72
+            ],
+            "hand2": [
+              75,
+              76
+            ],
+            "angle": 7,
+            "hip": [
+              58,
+              83
+            ]
+          },
+          {
+            "hand": [
+              77,
+              75
+            ],
+            "hand2": [
+              73,
+              80
+            ],
+            "angle": 14,
+            "hip": [
+              58,
+              83
+            ]
+          },
+          {
+            "hand": [
+              84,
+              65
+            ],
+            "hand2": [
+              80,
+              69
+            ],
+            "angle": -16,
+            "hip": [
+              59,
+              84
+            ]
+          }
+        ]
+      },
+      "strip_sha256": "9342a6c5b795c55198d38f75947277f1b0741a5ae5cf6bd6cdf1ef6cfff40f99",
+      "raw": [
+        {
+          "path": "game-src/action/jyaldi-v5/full/clips/grabknee/00.png",
+          "sha256": "e57b9a648b7645a4b24da1afcf5df696f8af8d1e6901c06561677c8d028909f8",
+          "size": [
+            192,
+            144
+          ],
+          "same_as_final_frame": false
+        },
+        {
+          "path": "game-src/action/jyaldi-v5/full/clips/grabknee/01.png",
+          "sha256": "276a0f24dd7c0c8823c41682942f2fa43799660f61df0a8a0dd669ef05356124",
+          "size": [
+            192,
+            144
+          ],
+          "same_as_final_frame": false
+        },
+        {
+          "path": "game-src/action/jyaldi-v5/full/clips/grabknee/02.png",
+          "sha256": "eb9c3e5978ef5df98e5ca6fa5e5d9f46af97d28ef0645f22dfdce292e676fde8",
+          "size": [
+            192,
+            144
+          ],
+          "same_as_final_frame": false
+        },
+        {
+          "path": "game-src/action/jyaldi-v5/full/clips/grabknee/03.png",
+          "sha256": "82bc2e838621bc33bf08b9d4b9286c396632acea54bf47ffdd9e17962dce6248",
+          "size": [
+            192,
+            144
+          ],
+          "same_as_final_frame": false
+        },
+        {
+          "path": "game-src/action/jyaldi-v5/full/clips/grabknee/04.png",
+          "sha256": "519b0631a0558d8d797cf253ff6bab09414d3ad82c2d6c81f98f8183d6a023c2",
+          "size": [
+            192,
+            144
+          ],
+          "same_as_final_frame": false
+        }
+      ]
+    },
+    "undress": {
+      "raw_count": 10,
+      "manifest_frames": 10,
+      "manifest": {
+        "label": "탈의: 정장 → 목욕 수건",
+        "fps": 5,
+        "loop": false,
+        "hits": [],
+        "adv": 0,
+        "origin": 0,
+        "hold": 0.0,
+        "group": "씻기·집안일·운동",
+        "frames": 10,
+        "bytes": 19374,
+        "prop": false
+      },
+      "strip_sha256": "ee11f12729203b4d87548ae885cccdddd8473216a5ed64ec93eee90d6e92f524",
+      "raw": [
+        {
+          "path": "game-src/action/jyaldi-v5/full/clips/undress/00.png",
+          "sha256": "73766e94538477b6dc62f67e46b83ad3cb745ecc3c79b10107de1efa213ab740",
+          "size": [
+            192,
+            144
+          ],
+          "same_as_final_frame": true
+        },
+        {
+          "path": "game-src/action/jyaldi-v5/full/clips/undress/01.png",
+          "sha256": "78bdca26ef9838977c5a058efc30397c9f97a0b69f39e4a8b2339ce0a546ca37",
+          "size": [
+            192,
+            144
+          ],
+          "same_as_final_frame": true
+        },
+        {
+          "path": "game-src/action/jyaldi-v5/full/clips/undress/02.png",
+          "sha256": "2a2d8d9c63a82fd6e13d31b408791f1a3bc17df47d866ac093194b0bd079cf3f",
+          "size": [
+            192,
+            144
+          ],
+          "same_as_final_frame": true
+        },
+        {
+          "path": "game-src/action/jyaldi-v5/full/clips/undress/03.png",
+          "sha256": "233ac1f5f07d4a86253511b97735304a45f88c4aca826e7b498a15b1cb6efc80",
+          "size": [
+            192,
+            144
+          ],
+          "same_as_final_frame": true
+        },
+        {
+          "path": "game-src/action/jyaldi-v5/full/clips/undress/04.png",
+          "sha256": "f2c2bd382d24629db943e33da138d8d5dfa1b722d404b039a7ab0871af3dab9a",
+          "size": [
+            192,
+            144
+          ],
+          "same_as_final_frame": true
+        },
+        {
+          "path": "game-src/action/jyaldi-v5/full/clips/undress/05.png",
+          "sha256": "6859a1253bf3b97daa9a9a73fcfd0d30badc281e3aaaa7e1a414ec86412ac53d",
+          "size": [
+            192,
+            144
+          ],
+          "same_as_final_frame": true
+        },
+        {
+          "path": "game-src/action/jyaldi-v5/full/clips/undress/06.png",
+          "sha256": "738b2eba56fec1209e21ff22323bebc402122e10adfa159e404756d690961598",
+          "size": [
+            192,
+            144
+          ],
+          "same_as_final_frame": true
+        },
+        {
+          "path": "game-src/action/jyaldi-v5/full/clips/undress/07.png",
+          "sha256": "fb683b59fb509850e1dd345c98640769d1056eaf6139e6e2bb0d2d13dc5c78cb",
+          "size": [
+            192,
+            144
+          ],
+          "same_as_final_frame": true
+        },
+        {
+          "path": "game-src/action/jyaldi-v5/full/clips/undress/08.png",
+          "sha256": "d555d81ae67e50fc5cae01720a3f35b88eff5ed516b60c3b4b33210695567e54",
+          "size": [
+            192,
+            144
+          ],
+          "same_as_final_frame": true
+        },
+        {
+          "path": "game-src/action/jyaldi-v5/full/clips/undress/09.png",
+          "sha256": "694f56409b4b6ed9d441c0d0659133104f2005ef70d51ae9ad6347e8176c6913",
+          "size": [
+            192,
+            144
+          ],
+          "same_as_final_frame": true
+        }
+      ]
+    },
+    "showerturn": {
+      "raw_count": 3,
+      "manifest_frames": 3,
+      "manifest": {
+        "label": "샤워 앞 돌아서기(옆 → 뒤)",
+        "fps": 6,
+        "loop": false,
+        "hits": [],
+        "adv": 0,
+        "origin": 0,
+        "hold": 0.0,
+        "group": "씻기·집안일·운동",
+        "frames": 3,
+        "bytes": 13639,
+        "prop": false
+      },
+      "strip_sha256": "8724cf9b0023deef8ab7d956e0005c92f1f7002e9f276c450215dc9f566f3594",
+      "raw": [
+        {
+          "path": "game-src/action/jyaldi-v5/full/clips/showerturn/00.png",
+          "sha256": "fe2f6f5a6708dff2009226f92c3cddb8dc2548b40a07946f96a617a90f255c86",
+          "size": [
+            192,
+            144
+          ],
+          "same_as_final_frame": false
+        },
+        {
+          "path": "game-src/action/jyaldi-v5/full/clips/showerturn/01.png",
+          "sha256": "7464a328398382781e3c9693ab7e21f95eec689eb303e6c9e5e7ca521669832f",
+          "size": [
+            192,
+            144
+          ],
+          "same_as_final_frame": false
+        },
+        {
+          "path": "game-src/action/jyaldi-v5/full/clips/showerturn/02.png",
+          "sha256": "d27d0949a9fd6d0678fe80d00f0e24a9a2fcb210cabd7307c20c40029c559cc3",
+          "size": [
+            192,
+            144
+          ],
+          "same_as_final_frame": false
+        }
+      ]
+    },
+    "shower": {
+      "raw_count": 6,
+      "manifest_frames": 6,
+      "manifest": {
+        "label": "샤워: 뒷모습 머리 감기",
+        "fps": 6,
+        "loop": true,
+        "hits": [],
+        "adv": 0,
+        "origin": 0,
+        "hold": 0.0,
+        "group": "씻기·집안일·운동",
+        "frames": 6,
+        "bytes": 25126,
+        "prop": false,
+        "anchors": [
+          {
+            "hand": [
+              61,
+              40
+            ],
+            "hand2": [
+              54,
+              40
+            ],
+            "angle": -137,
+            "hip": [
+              57,
+              91
+            ]
+          },
+          {
+            "hand": [
+              61,
+              41
+            ],
+            "hand2": [
+              54,
+              40
+            ],
+            "angle": -133,
+            "hip": [
+              57,
+              91
+            ]
+          },
+          {
+            "hand": [
+              61,
+              40
+            ],
+            "hand2": [
+              55,
+              40
+            ],
+            "angle": -120,
+            "hip": [
+              57,
+              91
+            ]
+          },
+          {
+            "hand": [
+              62,
+              41
+            ],
+            "hand2": [
+              54,
+              40
+            ],
+            "angle": -137,
+            "hip": [
+              57,
+              91
+            ]
+          },
+          {
+            "hand": [
+              61,
+              40
+            ],
+            "hand2": [
+              54,
+              39
+            ],
+            "angle": -132,
+            "hip": [
+              57,
+              91
+            ]
+          },
+          {
+            "hand": [
+              61,
+              41
+            ],
+            "hand2": [
+              54,
+              40
+            ],
+            "angle": -137,
+            "hip": [
+              57,
+              91
+            ]
+          }
+        ]
+      },
+      "strip_sha256": "c36b112c6a7f5c926258578f4dbc5ca42d6094c6deedb75fe2d30e92b894b134",
+      "raw": [
+        {
+          "path": "game-src/action/jyaldi-v5/full/clips/shower/00.png",
+          "sha256": "2003aeeef5ac843b98cf672795acb5200325cea3575465ba18290219f8c04561",
+          "size": [
+            192,
+            144
+          ],
+          "same_as_final_frame": false
+        },
+        {
+          "path": "game-src/action/jyaldi-v5/full/clips/shower/01.png",
+          "sha256": "c179077829e97d831ba72934c66d1e4565304b721e0f207c795601cc36f9e154",
+          "size": [
+            192,
+            144
+          ],
+          "same_as_final_frame": false
+        },
+        {
+          "path": "game-src/action/jyaldi-v5/full/clips/shower/02.png",
+          "sha256": "88986d6cadf4051ee57616f25b79a9846274b3dee4c44490d68fe7760caf5073",
+          "size": [
+            192,
+            144
+          ],
+          "same_as_final_frame": false
+        },
+        {
+          "path": "game-src/action/jyaldi-v5/full/clips/shower/03.png",
+          "sha256": "bc6b25c10dac9bf0eee99c881df0ea607be1ce4af3f38cef7af1f118e76aaee3",
+          "size": [
+            192,
+            144
+          ],
+          "same_as_final_frame": false
+        },
+        {
+          "path": "game-src/action/jyaldi-v5/full/clips/shower/04.png",
+          "sha256": "d935a47d8901718e4307a210f9cd62a2ece7f24d4b4d615ef1b944d50fc46696",
+          "size": [
+            192,
+            144
+          ],
+          "same_as_final_frame": false
+        },
+        {
+          "path": "game-src/action/jyaldi-v5/full/clips/shower/05.png",
+          "sha256": "d17db0251aab7f0a83c11fab5a48e7c9c3e693065bd8f774f44c5aa5c2d74393",
+          "size": [
+            192,
+            144
+          ],
+          "same_as_final_frame": false
+        }
+      ]
+    }
+  },
+  "geometry": [
+    {
+      "clip": "walk",
+      "frames": 8,
+      "all_18_unique": true,
+      "normalized_in_bounds": true,
+      "bone_lengths": true,
+      "stance_ankle_locked": true,
+      "knee_bends_forward": true,
+      "cycle_delta_x": 48,
+      "visual_review": "대기: 뼈대 검수이며 그림 합격 아님",
+      "max_joint_step_pixels": 16.492,
+      "loop_boundary_max_joint_step_pixels": 12.649,
+      "loop_boundary_no_larger_than_interior_step": true
+    },
+    {
+      "clip": "run",
+      "frames": 8,
+      "all_18_unique": true,
+      "normalized_in_bounds": true,
+      "bone_lengths": true,
+      "stance_ankle_locked": true,
+      "knee_bends_forward": true,
+      "cycle_delta_x": 80,
+      "visual_review": "대기: 뼈대 검수이며 그림 합격 아님",
+      "max_joint_step_pixels": 34.905,
+      "loop_boundary_max_joint_step_pixels": 23.854,
+      "loop_boundary_no_larger_than_interior_step": true
+    }
+  ],
+  "requests": {
+    "walk": {
+      "file_sha256": "5e7376f3ab60342e9e0859371bc53fa87cd9d37e8d4752cb413e18c14fee74d3",
+      "arguments_sha256": "2fd1253190bf7e0e97dbd380c3ec88f9a7cfecdfd64557f0d5b72bdfede6318b"
+    },
+    "run": {
+      "file_sha256": "bcd9d743988c2d6fabeb6090766a8685c5e9bd48d40259ec40e967b811430d3d",
+      "arguments_sha256": "f0533105ef6c73c44c6548c7ddf8721aaeccc471038d9d9d68b45f7f3a3616d8"
+    }
+  },
+  "paid_calls": 0,
+  "new_artwork": false,
+  "user_visual_approval": false
+}

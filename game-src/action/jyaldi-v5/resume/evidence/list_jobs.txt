@@ -1,0 +1,2 @@
+event: message
+data: {"jsonrpc":"2.0","id":3,"result":{"content":[{"type":"text","text":"Error calling tool 'list_jobs': 401: Missing Authorization header. Please configure your MCP client with 'Authorization: Bearer YOUR_API_TOKEN'"}],"isError":true}}
