@@ -7,7 +7,6 @@ Use: python3 tools/recover_kyuras_jobs.py inspect|recover
 import argparse
 import base64
 import datetime as dt
-import fcntl
 import hashlib
 import io
 import json
@@ -15,6 +14,8 @@ import os
 from pathlib import Path
 import sys
 import urllib.request
+import tempfile
+import contextlib
 
 from PIL import Image
 
@@ -24,6 +25,45 @@ JOBS = {
     "run_shotgun": ("9fe0e770-b992-4299-a4c1-90d6e591828a", 8),
 }
 READ_TOOLS = frozenset({"get_image"})
+
+@contextlib.contextmanager
+def recovery_lock():
+    path = Path(tempfile.gettempdir()) / "goei-pixellab-kyuras-recovery.lock"
+    with path.open("a+b") as lock:
+        if os.name == "nt":
+            import msvcrt
+            lock.seek(0); lock.write(b"0"); lock.flush(); lock.seek(0)
+            msvcrt.locking(lock.fileno(), msvcrt.LK_NBLCK, 1)
+        else:
+            import fcntl
+            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        try:
+            yield
+        finally:
+            if os.name == "nt":
+                lock.seek(0); msvcrt.locking(lock.fileno(), msvcrt.LK_UNLCK, 1)
+
+class NativeReceiptClient:
+    """Use the authenticated MCP receipt and its public download URLs; no API secret."""
+    def __init__(self, receipt):
+        self.result = json.loads(receipt.read_text(encoding="utf-8"))["result"]
+        self.meta = self.result["structuredContent"]
+        if self.meta["job_id"] not in {j[0] for j in JOBS.values()} or self.meta["status"] != "completed":
+            raise ValueError("완료된 등록 작업 응답만 회수할 수 있습니다")
+    def call(self, name, arguments):
+        if name != "get_image" or arguments["job_id"] != self.meta["job_id"]:
+            raise ValueError("회수 요청 불일치")
+        if "index" not in arguments:
+            return {"result": self.result}
+        index = arguments["index"]
+        url = self.meta["download_urls"][index]
+        expected = "https://api.pixellab.ai/mcp/images/" + self.meta["job_id"] + "/download?index=" + str(index)
+        if url != expected:
+            raise ValueError("다운로드 주소 불일치")
+        data = urllib.request.urlopen(url, timeout=45).read()
+        return {"result": {"content": [{"type": "image", "mimeType": "image/png", "data": base64.b64encode(data).decode()}]}}
+    def job(self, job_id):
+        return {"job_id": job_id, "usage": {"charged_generations": self.meta.get("charged_generations")}, "source": "native MCP get_image structuredContent"}
 
 
 def now():
@@ -37,7 +77,7 @@ def sha(data):
 def write_json(path, value):
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_suffix(path.suffix + ".tmp")
-    tmp.write_text(json.dumps(value, ensure_ascii=False, indent=2) + "\n")
+    tmp.write_text(json.dumps(value, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     tmp.replace(path)
 
 
@@ -156,7 +196,7 @@ def recover_one(client, clip, output):
         if target.exists():
             if not proof.exists():
                 raise ValueError("기존 파일의 작업 ID 증거가 없어 덮어쓰지 않습니다")
-            row = json.loads(proof.read_text())
+            row = json.loads(proof.read_text(encoding="utf-8"))
             if row.get("job_id") != job_id or row.get("index") != index or row.get("sha256") != sha(target.read_bytes()):
                 raise ValueError("기존 회수 파일/증거 해시 불일치; 덮어쓰기 금지")
         else:
@@ -181,12 +221,13 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("command", choices=["inspect", "recover"])
     parser.add_argument("--clip", choices=sorted(JOBS))
+    parser.add_argument("--native-receipt", type=Path)
     parser.add_argument("--output", type=Path, default=ROOT / "game-src/action/kyuras/recovered")
     args = parser.parse_args()
-    client = Client(credential_from_environment())
-    lock_path = Path("/tmp/goei-pixellab-kyuras-recovery.lock")
-    with lock_path.open("w") as lock:
-        fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    if args.native_receipt and not args.clip:
+        parser.error("--native-receipt requires --clip")
+    client = NativeReceiptClient(args.native_receipt) if args.native_receipt else Client(credential_from_environment())
+    with recovery_lock():
         audit = args.output / ("inspection-" + dt.datetime.now(dt.timezone.utc).strftime("%Y%m%dT%H%M%S%fZ"))
         for clip in ([args.clip] if args.clip else JOBS):
             if args.command == "recover":

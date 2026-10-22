@@ -1,0 +1,42 @@
+{
+  "clip": "idle_shotgun",
+  "job_id": "11826541-47d1-40de-9664-f05f1838bb23",
+  "frames": [
+    {
+      "job_id": "11826541-47d1-40de-9664-f05f1838bb23",
+      "index": 0,
+      "file": "00.png",
+      "sha256": "29b109e81f60a16bffeca026a3a7786f7fbe3e0b4a905a42cc790c386201c611",
+      "recovered_at": "2026-10-22T10:38:42.933381+00:00"
+    },
+    {
+      "job_id": "11826541-47d1-40de-9664-f05f1838bb23",
+      "index": 1,
+      "file": "01.png",
+      "sha256": "8bcbc87d8ae945759c7e8c5fb1050e0c3f23c28c87f06ef7363b46b47ef43ada",
+      "recovered_at": "2026-10-22T10:38:44.308524+00:00"
+    },
+    {
+      "job_id": "11826541-47d1-40de-9664-f05f1838bb23",
+      "index": 2,
+      "file": "02.png",
+      "sha256": "c3622c2b7ee4adc6df73b379508d74b84b173846cb1fba650b8e79e10662bc3e",
+      "recovered_at": "2026-10-22T10:38:45.737409+00:00"
+    },
+    {
+      "job_id": "11826541-47d1-40de-9664-f05f1838bb23",
+      "index": 3,
+      "file": "03.png",
+      "sha256": "cdc938482ca30626e3c18e1471ffb8922bb7529cdebf0291cf88d1a43a57bcb9",
+      "recovered_at": "2026-10-22T10:38:47.160537+00:00"
+    }
+  ],
+  "status": "recovered_pending_visual_review",
+  "user_visual_approval": false,
+  "new_generation_calls": 0,
+  "new_generation_charge": 0,
+  "original_job_usage": {
+    "charged_generations": 3
+  },
+  "usage_note": "원래 과금은 작업 응답 usage만 기록. 공유 계정 잔액 차이로 추정하지 않음."
+}

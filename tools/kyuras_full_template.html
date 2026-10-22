@@ -40,7 +40,9 @@
   .tone canvas { width: 288px; height: 216px; background: #3a444c; image-rendering: pixelated; border-radius: 6px; }
 </style>
 <div class="wrap">
-  <h1>큐라스 전 동작 시연판 · 손가락 스냅 → 지정 지점 폭발 · 쟈알디와 같은 장면 전부</h1>
+  <h1>큐라스 제작 재개 · 독립 검수 시연판</h1>
+  <p class="miss">사용자 시각 승인 전입니다. 회수·새 제작 그림과 손가락 수정을 반영했습니다. 기본 공격의 손 모양과 무기 파지를 검수해 주세요. 기존 다운 마지막 장의 잔상은 미해결입니다.</p>
+  <div class="bar"><label>집중 검수 <select id="reviewClip"><option value="">직접 플레이</option></select></label><label><input id="reviewPause" type="checkbox"> 장 정지</label><button id="reviewPrev">이전 장</button><button id="reviewNext">다음 장</button><span id="reviewFrame"></span></div>
   <div class="bar">
     <label><input type="checkbox" id="rim" checked> 외곽광</label>
     <label><input type="checkbox" id="crt"> CRT</label>
@@ -525,6 +527,11 @@ function frameDone() {
 function update(now) {
   const speed = +$('speed').value;
   let dt = Math.min(0.05, (now - last) / 1000) * speed; last = now;
+  if ($('reviewClip').value) {
+    if (!$('reviewPause').checked) { reviewTime += dt; G.f = Math.floor(reviewTime * C().fps) % C().frames; }
+    $('reviewFrame').textContent = `${G.clip} · ${G.f + 1}/${C().frames} · 마지막 다음은 첫 장`;
+    draw(); requestAnimationFrame(update); return;
+  }
   if (FX.cut > 0) { FX.cut -= dt; draw(); requestAnimationFrame(update); return; }
   if (FX.stop > 0) { FX.stop -= dt; dt = 0; }
   const prevBeat = Math.floor(clock / BEAT); clock += dt;
@@ -963,6 +970,18 @@ requestAnimationFrame(update);
 
 // ── 목록 ──
 const list = $('list');
+let reviewTime = 0;
+for (const k of ['snap1','snap2','snap3','idle_pipe','walk_pipe','shotgun','idle_shotgun','run_shotgun']) {
+  if (!M.clips[k]) continue;
+  const option = document.createElement('option'); option.value = k; option.textContent = M.clips[k].label; $('reviewClip').appendChild(option);
+}
+function focusReview(k) {
+  G.lock=false; G.down=false; G.lying=false; G.crouch=false; G.air=false; G.y=0; G.aim=false; G.coolT=0; G.overheat=false;
+  G.x=500; G.z=.55; G.dir=1; G.weapon=k.includes('shotgun')?'shotgun':k.includes('pipe')?'pipe':null; G.wUses=4;
+  FX.stop=0; FX.cut=0; reviewTime=0; play(k,{lock:true}); G.f=0;
+}
+$('reviewClip').onchange=()=>{const k=$('reviewClip').value; if(k)focusReview(k);else{$('reviewFrame').textContent='';G.lock=false;G.weapon=null;play('idle');}};
+for (const [id,delta] of [['reviewPrev',-1],['reviewNext',1]]) $(id).onclick=()=>{if(!$('reviewClip').value)return;$('reviewPause').checked=true;G.f=(G.f+delta+C().frames)%C().frames;reviewTime=G.f/C().fps;};
 let lastGroup = '';
 for (const [k, c] of Object.entries(M.clips)) {
   if (c.group && c.group !== lastGroup) { lastGroup = c.group; const h = document.createElement('h3'); h.className = 'grp'; h.textContent = c.group; list.appendChild(h); }

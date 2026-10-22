@@ -1,0 +1,15 @@
+{
+  "observed_at": "2026-10-22T10:39:07.375810+00:00",
+  "response": {
+    "result": {
+      "content": [
+        {
+          "type": "image",
+          "mimeType": "image/png",
+          "sha256": "6b7842969049d358a181a99b6b6e0debf3d01138d06acb84dc0df11b7c224f18",
+          "byte_count": 3818
+        }
+      ]
+    }
+  }
+}

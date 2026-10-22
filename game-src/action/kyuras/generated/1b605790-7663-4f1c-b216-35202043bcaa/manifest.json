@@ -1,0 +1,53 @@
+{
+  "clip": "snap3",
+  "source_job_id": "e5b19b7d-ca40-4632-a057-ed262452c973",
+  "pixel_edit_id": "1b605790-7663-4f1c-b216-35202043bcaa",
+  "charged_generations": 0,
+  "frames": [
+    {
+      "index": 0,
+      "file": "00.png",
+      "sha256": "dca019d4336458ca26fe804b4baf7d0c14874a2818907b86c3c333aca3a3e55d",
+      "changed_pixels": 50
+    },
+    {
+      "index": 1,
+      "file": "01.png",
+      "sha256": "614867271806a079ed88520013d79c6f955b682caae82b3762a37884f3fd8d52",
+      "changed_pixels": 42
+    },
+    {
+      "index": 2,
+      "file": "02.png",
+      "sha256": "a6e9e69011970206772a05a8a39e8a44fe6409df1d9401cb85cb638b06900ba6",
+      "changed_pixels": 45
+    },
+    {
+      "index": 3,
+      "file": "03.png",
+      "sha256": "52b5a0a2826515e596059b2d30f54e4c27a3642ccdd8c3eb7c9a9d39688363ef",
+      "changed_pixels": 87
+    },
+    {
+      "index": 4,
+      "file": "04.png",
+      "sha256": "862096f0e1442e78de077281fccb9099f95d6b22d5604d15d5fd5fd3ff61ff57",
+      "changed_pixels": 88
+    },
+    {
+      "index": 5,
+      "file": "05.png",
+      "sha256": "fd92f80b54671e61d68e277134f9825b9051b974989d4b974a6ea27039c70c08",
+      "changed_pixels": 101
+    },
+    {
+      "index": 6,
+      "file": "06.png",
+      "sha256": "4e7e0896a8d56c1c756d46fcbe2b8bed66d2a7a2ee27cce386842c68976e50ae",
+      "changed_pixels": 51
+    }
+  ],
+  "changed_pixels": 464,
+  "status": "candidate_precise_hands",
+  "user_visual_approval": false
+}

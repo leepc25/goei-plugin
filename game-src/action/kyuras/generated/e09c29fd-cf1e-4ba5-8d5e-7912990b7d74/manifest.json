@@ -1,0 +1,31 @@
+{
+  "clip": "snap1",
+  "source_job_id": "3b131a96-b98f-4c4f-b220-146ce3706ceb",
+  "pixel_edit_id": "e09c29fd-cf1e-4ba5-8d5e-7912990b7d74",
+  "charged_generations": 0,
+  "changed_pixels": 220,
+  "frames": [
+    {
+      "file": "00.png",
+      "sha256": "cf12f6b10d61a512efcf8d235c747635d008c5ac4b6fd0784dc49bd8017f968b"
+    },
+    {
+      "file": "01.png",
+      "sha256": "806203682318dd074d7f81fd0d4057789e7071bdd09fb8efdebc0c53f1a2edc8"
+    },
+    {
+      "file": "02.png",
+      "sha256": "6373f083aabb11312f23545f4cc412c8c9ab10670f704aa77c65d9d59ff96598"
+    },
+    {
+      "file": "03.png",
+      "sha256": "231b70b4c8c44de1698425170574ebcb5e3a7d3cd091205bbf80ab67fcdd9c46"
+    },
+    {
+      "file": "04.png",
+      "sha256": "1915c9204280750739a1d990210cca1821129063bf36fc7f3ef9cb55e7274d45"
+    }
+  ],
+  "user_visual_approval": false,
+  "status": "candidate_manual_hand_correction"
+}

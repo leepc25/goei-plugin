@@ -1,0 +1,8 @@
+{
+  "input_sha256": "d137c412ec4d41c87dd65841648fae386953e8ff0c7941b204e1860398595b98",
+  "request_sha256": "ebf98d5306e33e25dcb27b73c0448c8209de366ad775dc464507fe0b1e4956d2",
+  "rig_sha256": "6e70ece7a28828b5f85a664b8ea596c73d5895fe4b9db476630bea2887e881a5",
+  "estimated_generations": 3,
+  "frames": 5,
+  "historical_input": false
+}

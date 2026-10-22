@@ -160,6 +160,12 @@ def main():
             else: later.append(d['key'])   # 생활·사교·감정은 다음 차례(사용자 2026-10-22 03:17: 전투·이동 먼저)
             continue
         data = strip(fr)
+        final_path = os.path.join(final, d['key'] + '.png')
+        if os.path.exists(final_path):
+            old_data = open(final_path, 'rb').read()
+            old_im, new_im = Image.open(io.BytesIO(old_data)).convert('RGBA'), Image.open(io.BytesIO(data)).convert('RGBA')
+            if old_im.size == new_im.size and old_im.tobytes() == new_im.tobytes():
+                data = old_data  # Preserve unchanged pixel assets across PNG encoder versions.
         strips[d['key']] = base64.b64encode(data).decode()
         open(os.path.join(final, d['key'] + '.png'), 'wb').write(data)
         hits = [idx.index(h) for h in d['hits'] if h in idx]

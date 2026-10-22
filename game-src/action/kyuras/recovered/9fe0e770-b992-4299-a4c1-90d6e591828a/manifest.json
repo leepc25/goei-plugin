@@ -1,0 +1,70 @@
+{
+  "clip": "run_shotgun",
+  "job_id": "9fe0e770-b992-4299-a4c1-90d6e591828a",
+  "frames": [
+    {
+      "job_id": "9fe0e770-b992-4299-a4c1-90d6e591828a",
+      "index": 0,
+      "file": "00.png",
+      "sha256": "73cf402dc73d1c92351b894b5445cc670d29ec6f0c40e030fa798d8306ea3c57",
+      "recovered_at": "2026-10-22T10:38:59.166887+00:00"
+    },
+    {
+      "job_id": "9fe0e770-b992-4299-a4c1-90d6e591828a",
+      "index": 1,
+      "file": "01.png",
+      "sha256": "051be23f9d6123ec787160d3f634136d060853f9ac898d4af396dcf8023ba54e",
+      "recovered_at": "2026-10-22T10:39:00.542261+00:00"
+    },
+    {
+      "job_id": "9fe0e770-b992-4299-a4c1-90d6e591828a",
+      "index": 2,
+      "file": "02.png",
+      "sha256": "0a65c554d6952c0d043069db8672af53d1efaefc7bbfde6f76c841c7e51407d7",
+      "recovered_at": "2026-10-22T10:39:01.987236+00:00"
+    },
+    {
+      "job_id": "9fe0e770-b992-4299-a4c1-90d6e591828a",
+      "index": 3,
+      "file": "03.png",
+      "sha256": "5102d5c5165f7e849f7167a478d901ce95417943eac199a197f184f7cf2f6def",
+      "recovered_at": "2026-10-22T10:39:03.382526+00:00"
+    },
+    {
+      "job_id": "9fe0e770-b992-4299-a4c1-90d6e591828a",
+      "index": 4,
+      "file": "04.png",
+      "sha256": "ab44b36708a8e793f763962499b46acf7303757bcbd5bcf07f0f112882408827",
+      "recovered_at": "2026-10-22T10:39:04.796308+00:00"
+    },
+    {
+      "job_id": "9fe0e770-b992-4299-a4c1-90d6e591828a",
+      "index": 5,
+      "file": "05.png",
+      "sha256": "242bc807f4818e9f1b2b4b6b88683b0125785552162fb169e16c4a40bcadfe41",
+      "recovered_at": "2026-10-22T10:39:05.960293+00:00"
+    },
+    {
+      "job_id": "9fe0e770-b992-4299-a4c1-90d6e591828a",
+      "index": 6,
+      "file": "06.png",
+      "sha256": "6b7842969049d358a181a99b6b6e0debf3d01138d06acb84dc0df11b7c224f18",
+      "recovered_at": "2026-10-22T10:39:07.378742+00:00"
+    },
+    {
+      "job_id": "9fe0e770-b992-4299-a4c1-90d6e591828a",
+      "index": 7,
+      "file": "07.png",
+      "sha256": "925fba17f4f629d561f99d7ea3e3640c30ec0ff44ff2795d3119b0977777fd2b",
+      "recovered_at": "2026-10-22T10:39:08.557446+00:00"
+    }
+  ],
+  "status": "recovered_pending_visual_review",
+  "user_visual_approval": false,
+  "new_generation_calls": 0,
+  "new_generation_charge": 0,
+  "original_job_usage": {
+    "charged_generations": 3
+  },
+  "usage_note": "원래 과금은 작업 응답 usage만 기록. 공유 계정 잔액 차이로 추정하지 않음."
+}

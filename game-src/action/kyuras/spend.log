@@ -380,3 +380,18 @@ job_id: 9fe0e770-b992-4299-a4c1-90d6e591828a
 description: thin adult man in his early thirties, gaunt face with hollow 
 
 2026-10-22T10:15:26Z recovery_owner get_image idle_shotgun job_id=11826541-47d1-40de-9664-f05f1838bb23 http=200 mcp_error=401 authenticated=false new_generation_calls=0 new_generation_charge=0 original_job_cost=unknown; run_shotgun query deferred after shared authentication failure. Evidence: resume/authentication-probe.json
+
+2026-10-22T10:53:07.068654+00:00 resume_verified job_id=11526db3-3927-47df-a600-5f55e1473bcc clip=idle_pipe actual_generations=3 historical_charge=false new_charge=3 source=native_get_image.charged_generations
+2026-10-22T10:53:07.068654+00:00 resume_verified job_id=27a5c819-12b3-4f7b-82ae-fe0a56f55a04 clip=shotgun actual_generations=3 historical_charge=false new_charge=3 source=native_get_image.charged_generations
+2026-10-22T10:53:07.068654+00:00 resume_verified job_id=3b131a96-b98f-4c4f-b220-146ce3706ceb clip=snap1 actual_generations=3 historical_charge=false new_charge=3 source=native_get_image.charged_generations
+2026-10-22T10:53:07.068654+00:00 resume_verified job_id=9f98ad15-77c1-4eda-8023-a90762053267 clip=walk_pipe actual_generations=3 historical_charge=false new_charge=3 source=native_get_image.charged_generations
+2026-10-22T10:53:07.068654+00:00 resume_verified job_id=11826541-47d1-40de-9664-f05f1838bb23 clip=idle_shotgun actual_generations=3 historical_charge=true new_charge=0 source=native_get_image.charged_generations
+2026-10-22T10:53:07.068654+00:00 resume_verified job_id=9fe0e770-b992-4299-a4c1-90d6e591828a clip=run_shotgun actual_generations=3 historical_charge=true new_charge=0 source=native_get_image.charged_generations
+2026-10-22T10:53:07.068654+00:00 resume_free_edit clip=snap1 changed_pixels=220 charged_generations=0
+2026-10-22T10:53:07.068654+00:00 resume_free_edit clip=run_shotgun changed_pixels=130 charged_generations=0
+
+2026-10-22T11:47:05.466928+00:00 resume_verified clip=snap2 job_id=57e6577c-6ee1-4dea-8c84-532a513c7cb3 actual_generations=3 source=native_get_image.charged_generations
+
+2026-10-22T11:47:05.466928+00:00 resume_verified clip=snap3 job_id=e5b19b7d-ca40-4632-a057-ed262452c973 actual_generations=3 source=native_get_image.charged_generations
+2026-10-22T11:47:05.466928+00:00 resume_free_edit clip=snap2 changed_pixels=378 charged_generations=0
+2026-10-22T11:47:05.466928+00:00 resume_free_edit clip=snap3 changed_pixels=464 charged_generations=0

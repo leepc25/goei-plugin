@@ -11,6 +11,11 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 _spec = importlib.util.spec_from_file_location('krig', os.path.join(ROOT, 'game-src', 'action', 'kyuras', 'scripts', 'krig.py'))
 krig = importlib.util.module_from_spec(_spec); _spec.loader.exec_module(krig)
 R = krig.R
+_v4spec = importlib.util.spec_from_file_location('kyuras_snap_v4', os.path.join(ROOT, 'game-src', 'action', 'kyuras', 'scripts', 'krig_v4_snaps_unrun.py'))
+snap_v4 = importlib.util.module_from_spec(_v4spec); _v4spec.loader.exec_module(snap_v4)
+# Only promote the rig for clips whose new frames have actually been installed.
+for _clip in ('snap1', 'snap2', 'snap3'):
+    krig.CLIPS[_clip] = snap_v4.CLIPS[_clip]
 
 DROP_CLIPS = set()       # 버림: 생성기가 자세를 못 그린 클립
 DROP_FRAMES = {}         # {클립: {원본 장 번호, ...}} 깨진 장 빼기
@@ -43,6 +48,9 @@ def anchors(src, idx):
         hip = [(p['RIGHT HIP'][0] + p['LEFT HIP'][0]) / 2 + R.DX, (p['RIGHT HIP'][1] + p['LEFT HIP'][1]) / 2 + R.DY]
         out.append({'hand': [round(w[0]), round(w[1])], 'hand2': [round(w2[0]), round(w2[1])], 'angle': round(ang),
                     'hip': [round(hip[0]), round(hip[1])]})
+        if src == 'run_shotgun':
+            # Actual recovered wrist / free corrected grip, not the missed skeleton pose.
+            out[-1]['hand'] = [[88,66],[86,68],[84,81],[84,81],[84,79],[84,81],[84,81],[86,68]][raw]
     return out
 
 

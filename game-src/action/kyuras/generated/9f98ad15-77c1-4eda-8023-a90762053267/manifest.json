@@ -1,0 +1,97 @@
+{
+  "clip": "walk_pipe",
+  "job_id": "9f98ad15-77c1-4eda-8023-a90762053267",
+  "charged_generations": 3,
+  "frames": [
+    {
+      "index": 0,
+      "file": "00.png",
+      "sha256": "ebb6a94cf19cc49c1a9896aa70ba1a5f11a6c8ab2cc42c134718d9c212050985",
+      "bbox": [
+        40,
+        38,
+        87,
+        136
+      ]
+    },
+    {
+      "index": 1,
+      "file": "01.png",
+      "sha256": "7769dbbd8a2edf1f4c9620f78b1c4c2ec2b554e7bc6acfdce4b19ae69da78cda",
+      "bbox": [
+        42,
+        38,
+        85,
+        136
+      ]
+    },
+    {
+      "index": 2,
+      "file": "02.png",
+      "sha256": "8acca0e94d74762b5bafef1be6696291c8411fbd0d25d3911585c4e4bbc2c8a1",
+      "bbox": [
+        43,
+        36,
+        74,
+        136
+      ]
+    },
+    {
+      "index": 3,
+      "file": "03.png",
+      "sha256": "336a31f269094175b007f03e85a793a0162f81a37c2ed7e08d65857e8d76b552",
+      "bbox": [
+        43,
+        37,
+        79,
+        137
+      ]
+    },
+    {
+      "index": 4,
+      "file": "04.png",
+      "sha256": "fb3ac477eb66cdd0816dada4f2d963ef008e1e2ad8c4b98350e0362c79b91e45",
+      "bbox": [
+        39,
+        38,
+        87,
+        137
+      ]
+    },
+    {
+      "index": 5,
+      "file": "05.png",
+      "sha256": "215338bd411cfff35b4155384da9b23656ab98e5c250e24131271b1ba8d5fa3c",
+      "bbox": [
+        43,
+        38,
+        79,
+        136
+      ]
+    },
+    {
+      "index": 6,
+      "file": "06.png",
+      "sha256": "4b42873679a5b0de85bec3099e9d2e571b208261365fc3cd409b07deb7c4411f",
+      "bbox": [
+        43,
+        36,
+        75,
+        135
+      ]
+    },
+    {
+      "index": 7,
+      "file": "07.png",
+      "sha256": "e436ce4a3a480f787055b90e239ce9d634a6fbdf5649fb1be6e1a69299cdd3ef",
+      "bbox": [
+        43,
+        37,
+        81,
+        135
+      ]
+    }
+  ],
+  "user_visual_approval": false,
+  "status": "pending_visual_review"
+}

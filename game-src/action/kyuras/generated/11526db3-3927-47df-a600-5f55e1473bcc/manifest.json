@@ -1,0 +1,53 @@
+{
+  "clip": "idle_pipe",
+  "job_id": "11526db3-3927-47df-a600-5f55e1473bcc",
+  "charged_generations": 3,
+  "frames": [
+    {
+      "index": 0,
+      "file": "00.png",
+      "sha256": "9233bf04a578bf450a11c537f83e2145bc59bc486ce06f7ec083a2299b73e204",
+      "bbox": [
+        46,
+        36,
+        78,
+        136
+      ]
+    },
+    {
+      "index": 1,
+      "file": "01.png",
+      "sha256": "1691fb0811e7d598036fa1e7ec2927d4f20206fb0358397ee0d962beb40b75ba",
+      "bbox": [
+        44,
+        37,
+        78,
+        136
+      ]
+    },
+    {
+      "index": 2,
+      "file": "02.png",
+      "sha256": "226035e5fdf87b6330090809e68be2c90d557b3f42847d59e2e3d0bd0611e38d",
+      "bbox": [
+        44,
+        37,
+        78,
+        136
+      ]
+    },
+    {
+      "index": 3,
+      "file": "03.png",
+      "sha256": "c98af3a4f4bc3b983517576c12af5bdbddd05e6226146017c58e27f486a627d8",
+      "bbox": [
+        47,
+        37,
+        78,
+        136
+      ]
+    }
+  ],
+  "user_visual_approval": false,
+  "status": "pending_visual_review"
+}

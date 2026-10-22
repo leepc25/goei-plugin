@@ -1,0 +1,64 @@
+{
+  "clip": "snap1",
+  "job_id": "3b131a96-b98f-4c4f-b220-146ce3706ceb",
+  "charged_generations": 3,
+  "frames": [
+    {
+      "index": 0,
+      "file": "00.png",
+      "sha256": "c85c01863fc9a2c7b4e3fc7790b02075b5eb73f08670c6d380fb9a6ec280baee",
+      "bbox": [
+        39,
+        43,
+        86,
+        136
+      ]
+    },
+    {
+      "index": 1,
+      "file": "01.png",
+      "sha256": "4fa915eb822631001ab0ff6787df0076c1c3e3e6b0de7d06ae3bbebe39e7f2ac",
+      "bbox": [
+        34,
+        43,
+        86,
+        136
+      ]
+    },
+    {
+      "index": 2,
+      "file": "02.png",
+      "sha256": "489c6ff6687ab388f3fe305a46502bf86e77d20a6d2947d8c78c8e404509b0a0",
+      "bbox": [
+        32,
+        43,
+        86,
+        136
+      ]
+    },
+    {
+      "index": 3,
+      "file": "03.png",
+      "sha256": "8ae787c3e67b8762368cfed0d746090262208a011ac76daa31dcb3f43b16766a",
+      "bbox": [
+        32,
+        43,
+        83,
+        135
+      ]
+    },
+    {
+      "index": 4,
+      "file": "04.png",
+      "sha256": "752f476ad7afd7ab81c50a280f39a0ecc1c32c722c967b780ee3ec2fdf2e68be",
+      "bbox": [
+        33,
+        43,
+        80,
+        136
+      ]
+    }
+  ],
+  "user_visual_approval": false,
+  "status": "pending_visual_review"
+}

@@ -1,0 +1,64 @@
+{
+  "clip": "shotgun",
+  "job_id": "27a5c819-12b3-4f7b-82ae-fe0a56f55a04",
+  "charged_generations": 3,
+  "frames": [
+    {
+      "index": 0,
+      "file": "00.png",
+      "sha256": "2ab34d8ee6d17086982372b113437ba24ec295360f0c788255ef31800fb354ec",
+      "bbox": [
+        44,
+        36,
+        82,
+        135
+      ]
+    },
+    {
+      "index": 1,
+      "file": "01.png",
+      "sha256": "29c7afe6076f817d48b19da88dbdba707baee375b1a97603d0da96012a3ffdf0",
+      "bbox": [
+        38,
+        36,
+        82,
+        135
+      ]
+    },
+    {
+      "index": 2,
+      "file": "02.png",
+      "sha256": "369a932885f6d43a15a632aad48d3e925725945a4397e97011857b3d5e2b115b",
+      "bbox": [
+        42,
+        36,
+        82,
+        135
+      ]
+    },
+    {
+      "index": 3,
+      "file": "03.png",
+      "sha256": "0c2965e441b1e3360a00543222239cd41e4085bd72d41351d59c7eb52977c720",
+      "bbox": [
+        44,
+        37,
+        82,
+        135
+      ]
+    },
+    {
+      "index": 4,
+      "file": "04.png",
+      "sha256": "bc4671237e93607dec96ace1f2bb548f02aed604d33600cea68428e586327c56",
+      "bbox": [
+        44,
+        37,
+        82,
+        135
+      ]
+    }
+  ],
+  "user_visual_approval": false,
+  "status": "pending_visual_review"
+}

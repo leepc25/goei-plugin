@@ -1,0 +1,96 @@
+[
+  {
+    "viewport": "pc",
+    "clip": "snap1",
+    "frames": 5,
+    "lastToFirst": true
+  },
+  {
+    "viewport": "pc",
+    "clip": "snap2",
+    "frames": 6,
+    "lastToFirst": true
+  },
+  {
+    "viewport": "pc",
+    "clip": "snap3",
+    "frames": 7,
+    "lastToFirst": true
+  },
+  {
+    "viewport": "pc",
+    "clip": "idle_pipe",
+    "frames": 4,
+    "lastToFirst": true
+  },
+  {
+    "viewport": "pc",
+    "clip": "idle_shotgun",
+    "frames": 4,
+    "lastToFirst": true
+  },
+  {
+    "viewport": "pc",
+    "clip": "run_shotgun",
+    "frames": 8,
+    "lastToFirst": true
+  },
+  {
+    "viewport": "pc",
+    "errors": [],
+    "motion": {
+      "clip": "walk",
+      "x": 571.2500000000006,
+      "loaded": 55,
+      "total": 55
+    },
+    "overflow": false
+  },
+  {
+    "viewport": "mobile",
+    "clip": "snap1",
+    "frames": 5,
+    "lastToFirst": true
+  },
+  {
+    "viewport": "mobile",
+    "clip": "snap2",
+    "frames": 6,
+    "lastToFirst": true
+  },
+  {
+    "viewport": "mobile",
+    "clip": "snap3",
+    "frames": 7,
+    "lastToFirst": true
+  },
+  {
+    "viewport": "mobile",
+    "clip": "idle_pipe",
+    "frames": 4,
+    "lastToFirst": true
+  },
+  {
+    "viewport": "mobile",
+    "clip": "idle_shotgun",
+    "frames": 4,
+    "lastToFirst": true
+  },
+  {
+    "viewport": "mobile",
+    "clip": "run_shotgun",
+    "frames": 8,
+    "lastToFirst": true
+  },
+  {
+    "viewport": "mobile",
+    "errors": [],
+    "motion": {
+      "clip": "walk",
+      "x": 572.8232000000002,
+      "loaded": 55,
+      "total": 55
+    },
+    "overflow": false
+  }
+]

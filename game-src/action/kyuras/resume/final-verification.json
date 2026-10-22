@@ -1,0 +1,97 @@
+{
+  "observed_at": "2026-10-22T11:47:05.466928+00:00",
+  "clips": {
+    "snap1": {
+      "frames": 5,
+      "sha256": [
+        "cf12f6b10d61a512efcf8d235c747635d008c5ac4b6fd0784dc49bd8017f968b",
+        "806203682318dd074d7f81fd0d4057789e7071bdd09fb8efdebc0c53f1a2edc8",
+        "6373f083aabb11312f23545f4cc412c8c9ab10670f704aa77c65d9d59ff96598",
+        "231b70b4c8c44de1698425170574ebcb5e3a7d3cd091205bbf80ab67fcdd9c46",
+        "1915c9204280750739a1d990210cca1821129063bf36fc7f3ef9cb55e7274d45"
+      ]
+    },
+    "snap2": {
+      "frames": 6,
+      "sha256": [
+        "ee96983af809b42a70f71688faa3dfe853801f7177e80c9f0e395fafa8e1ece7",
+        "1fa597582a1ed965e9ec3b6ef5857b0c08b436667f322e8773e1621f239c98f6",
+        "a375c652b1498aa25eac7a0a5fb34006e63676490b3d239787d2f2d7ac6d943f",
+        "3a651cca31472752720ce1096e96c1e0052a4d38f45c7bf11d205190c284ed46",
+        "94c188efc8749f529ef9041aef41d72548cda2c42ddac3cb2f0f22824efa2cfe",
+        "dae53dc3f42d47da6fb933f9b34e557c3d439aaeb4c4894c7241014766dd90d1"
+      ]
+    },
+    "snap3": {
+      "frames": 7,
+      "sha256": [
+        "dca019d4336458ca26fe804b4baf7d0c14874a2818907b86c3c333aca3a3e55d",
+        "614867271806a079ed88520013d79c6f955b682caae82b3762a37884f3fd8d52",
+        "a6e9e69011970206772a05a8a39e8a44fe6409df1d9401cb85cb638b06900ba6",
+        "52b5a0a2826515e596059b2d30f54e4c27a3642ccdd8c3eb7c9a9d39688363ef",
+        "862096f0e1442e78de077281fccb9099f95d6b22d5604d15d5fd5fd3ff61ff57",
+        "fd92f80b54671e61d68e277134f9825b9051b974989d4b974a6ea27039c70c08",
+        "4e7e0896a8d56c1c756d46fcbe2b8bed66d2a7a2ee27cce386842c68976e50ae"
+      ]
+    },
+    "idle_pipe": {
+      "frames": 4,
+      "sha256": [
+        "9233bf04a578bf450a11c537f83e2145bc59bc486ce06f7ec083a2299b73e204",
+        "1691fb0811e7d598036fa1e7ec2927d4f20206fb0358397ee0d962beb40b75ba",
+        "226035e5fdf87b6330090809e68be2c90d557b3f42847d59e2e3d0bd0611e38d",
+        "c98af3a4f4bc3b983517576c12af5bdbddd05e6226146017c58e27f486a627d8"
+      ]
+    },
+    "walk_pipe": {
+      "frames": 8,
+      "sha256": [
+        "ebb6a94cf19cc49c1a9896aa70ba1a5f11a6c8ab2cc42c134718d9c212050985",
+        "7769dbbd8a2edf1f4c9620f78b1c4c2ec2b554e7bc6acfdce4b19ae69da78cda",
+        "8acca0e94d74762b5bafef1be6696291c8411fbd0d25d3911585c4e4bbc2c8a1",
+        "336a31f269094175b007f03e85a793a0162f81a37c2ed7e08d65857e8d76b552",
+        "fb3ac477eb66cdd0816dada4f2d963ef008e1e2ad8c4b98350e0362c79b91e45",
+        "215338bd411cfff35b4155384da9b23656ab98e5c250e24131271b1ba8d5fa3c",
+        "4b42873679a5b0de85bec3099e9d2e571b208261365fc3cd409b07deb7c4411f",
+        "e436ce4a3a480f787055b90e239ce9d634a6fbdf5649fb1be6e1a69299cdd3ef"
+      ]
+    },
+    "shotgun": {
+      "frames": 5,
+      "sha256": [
+        "2ab34d8ee6d17086982372b113437ba24ec295360f0c788255ef31800fb354ec",
+        "29c7afe6076f817d48b19da88dbdba707baee375b1a97603d0da96012a3ffdf0",
+        "369a932885f6d43a15a632aad48d3e925725945a4397e97011857b3d5e2b115b",
+        "0c2965e441b1e3360a00543222239cd41e4085bd72d41351d59c7eb52977c720",
+        "bc4671237e93607dec96ace1f2bb548f02aed604d33600cea68428e586327c56"
+      ]
+    },
+    "idle_shotgun": {
+      "frames": 4,
+      "sha256": [
+        "29b109e81f60a16bffeca026a3a7786f7fbe3e0b4a905a42cc790c386201c611",
+        "8bcbc87d8ae945759c7e8c5fb1050e0c3f23c28c87f06ef7363b46b47ef43ada",
+        "c3622c2b7ee4adc6df73b379508d74b84b173846cb1fba650b8e79e10662bc3e",
+        "cdc938482ca30626e3c18e1471ffb8922bb7529cdebf0291cf88d1a43a57bcb9"
+      ]
+    },
+    "run_shotgun": {
+      "frames": 8,
+      "sha256": [
+        "7463d4852e9c5e8a821a8b96b8b4e8ccb93f17c14eb880bb48a7d8d34da2b812",
+        "13562032c311fba2b24a059be4035133eaaa6eb3942cc1223ddb91619625e5fd",
+        "4de3e0fed6c7d43f8f1decefcc911d1f3a2365b454b0b548516a5753a9ca6d4e",
+        "5e101214115765134e9e2a7e665a1fa62f9cf5ffcc2211b8f727d7a2123a5f96",
+        "6ef89fa4672387d3af76b5105bdb57974c6d6c5dcdab56742d4df9ba2e28bb89",
+        "7e4ed2a2d830c6724830bbf9418174481e366be0aca58be95426d56c2303ec0f",
+        "5c19146feae5cc9b24ed85a3bc56fc5f73d1b8890464c9084d71840a310c799a",
+        "438d6ca91915aa584d220a5ab1f375c0ce2b4222504cdea11f16e89eaee8c48a"
+      ]
+    }
+  },
+  "new_frames": 35,
+  "recovered_frames": 12,
+  "browser": "Prior owner PC/mobile tests preserved; final snap2/snap3 update statically verified, no fresh browser run",
+  "visual_review": "snap2 raised rear hand and snap3 crossed hand releases visible; thin body and dark suit preserved. Slight head angle variation remains. Down final-frame afterimage remains outside this delivery. User approval pending.",
+  "user_visual_approval": false
+}

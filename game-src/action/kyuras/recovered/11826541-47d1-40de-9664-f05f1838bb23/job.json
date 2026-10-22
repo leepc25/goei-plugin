@@ -1,0 +1,7 @@
+{
+  "job_id": "11826541-47d1-40de-9664-f05f1838bb23",
+  "usage": {
+    "charged_generations": 3
+  },
+  "source": "native MCP get_image structuredContent"
+}
