@@ -1,0 +1,5107 @@
+diff --git a/docs/character-resume/jyaldi-audit.md b/docs/character-resume/jyaldi-audit.md
+new file mode 100644
+index 00000000..d5408ea2
+--- /dev/null
++++ b/docs/character-resume/jyaldi-audit.md
+@@ -0,0 +1,66 @@
++# 쟈알디 제작 재개 독립 검수 · 2026-10-22
++
++검수 기준 커밋: `0a13285205b77fd6cf33b966cea246efa0d3082e` (`origin/codex/metroidvania-run-system`). 생성 호출 0회. 원본과 최종 스트립을 직접 열람하고 아틀라스 역복원 픽셀을 대조했다. 이 문서는 사용자 시각 승인을 대신하지 않는다.
++
++## 최신 자산과 이력 대조
++
++- 승인 이력이 있는 A: `game-src/action/jyaldi-v5/sheet7/jyaldi-base-pixen-a.png`. A2: `full/A2.png`, 캔버스 패드 `full/A2-pad.png`. `full/A2-compare.png`에서 A → 재킷 연장 후보 → A2를 비교했다. A2는 `scripts/jacket_merge2.py`에 따라 엉덩이를 덮는 재킷과 원래 바지 음영을 결합한 후속 파일이다. A의 승인 이력을 A2·모든 동작의 승인으로 확대하지 않는다.
++- 걷기: `full/clips/walk/00.png`~`07.png`, 작업 `e9be8233-15cb-4435-958a-f1456cd5c425`, 커밋 `ed8e16ec`. `gen_all.py`는 A2-pad와 뼈대를 입력한다.
++- 달리기 최신: `full/clips/run/00.png`~`07.png`, 작업 `a8f3a4b0-961d-42ed-874f-a3d9efb294f0`, 커밋 `28e81702`. 이전 `7ce1fc1b-75ff-49d7-9b52-be3317b0f142`를 최신으로 착각하면 안 된다. `gen_fix2.py`는 A2에서 파생된 옆모습 `guard/00.png`와 G0 뼈대를 입력한다. `rig.py:794`는 A2의 3/4 각도가 중간 프레임 정면 회귀의 원인이었다고 기록한다.
++- 각 걷기/달리기 원본 8장 = `full/final/{walk,run}.png`의 8장 = `game-pack/jyaldi/atlas.png`에서 `frames.json` 좌표로 복원한 8장. **16장 모두 RGBA 픽셀 완전 일치**. 현재 그림 결함은 오래된 아틀라스가 남아서 생기는 것이 아니다.
++- 옛 결함표의 「run 0만 직립, 0장 제거」는 현재 파일에 해당하지 않는다. 최신 0장도 질주 자세이며 final에도 유지되어 있다. 해당 과거 처방을 재적용하지 않는다.
++- `grabknee`는 2026-10-22 작업 `1064e7a8-9dba-4bd5-b843-1164b233ad35` 뒤 다시 `037bbe08-c043-4055-a166-20e06c19e792`로 수정되었고 커밋 `1454dfe8`이 기준 브랜치에 포함된다. 최종 5장이다. 과거 불합격 기록만 보고 중복 발주하지 않는다.
++- 탈의·돌아서기·샤워는 `full/gpt-redraw-20261022/production.json`, `full/gpt-style-match-20261022/production.json`과 후속 반영 커밋을 보존한다. final은 undress 10, showerturn 3, shower 6장이다. 최초 납품 7장이라는 기록과 현재 10장 스트립은 구분한다. 이번 제작 큐에서 중복 발주 제외.
++- 별도 Claude 브랜치를 포함한 `git log --all`에서 걷기·달리기의 위 커밋 이후 별도 후속 원본 커밋은 발견하지 못했다.
++
++## 그림 검수: 걷기 8장
++
++연락표: `review/character-resume/jyaldi-walk-raw.png`. 빨간 선은 원본 y=136, 각 장 2배 정수 확대. 발 바닥 수치는 알파 있는 최하단 픽셀 y(테두리 포함)다.
++
++| 장 | 최하단 y | 접지·무릎·팔·연결 관찰 |
++| --- | ---: | --- |
++| 00 | 135 | 두 발 벌린 접촉 자세. 무릎이 굽고 손이 허리에 붙어 탐사 걸음 시작보다 전투 제자리 자세처럼 읽힌다. |
++| 01 | 135 | 앞 발이 몸 아래로 들어오지만 양손 실루엣 변화가 작다. 뒷무릎 굽힘은 읽힌다. |
++| 02 | 136 | 발과 다리가 겹치는 통과 자세. 굽힌 무릎 때문에 다리 길이가 짧아 보인다. 양팔의 반대 흔들림은 읽기 어렵다. |
++| 03 | 136 | 앞발 들림이 보인다. 손은 배·허리 앞에 붙은 상태여서 다리에 반대되는 큰 팔 궤적이 없다. |
++| 04 | 136 | 반대 접촉으로 설계되었지만 00과 앞뒤 다리 구분이 약하다. 양팔도 앞뒤로 충분히 갈리지 않는다. |
++| 05 | 135 | 발이 모이기 시작하며 뒤쪽 머리카락 외곽이 부풀어 보인다. 팔은 여전히 몸에 붙는다. |
++| 06 | 135 | 통과 자세에서 무릎·발목 실루엣이 포개진다. 02와 비슷하며 좌우 다리 교대가 명확하지 않다. |
++| 07 | 135 | 들린 발이 00 접촉으로 넘어가는 연결은 가능하지만 몸을 세우는 구간이 부족하여 쪼그린 걸음처럼 읽힌다. |
++
++얼굴 크기·검은 긴 머리·청회색 정장·검은 장갑·홀스터는 8장 내내 유지된다. 그림상 최우선 결함은 **작은 팔 흔들림과 굽힌 무릎이 계속 유지되는 걷기**다. 단순 재생 속도 변경으로 해결할 수 없다. 무릎이 거꾸로 꺾였다고 단정하지는 않는다. `walkf()` 자체가 보폭 ±11, 발 들기 4, 팔 흔들림 7의 작은 동작으로 설계되어 있어 글만 바꾼 재생성은 피해야 한다.
++
++## 그림 검수: 달리기 8장
++
++연락표: `review/character-resume/jyaldi-run-raw.png`.
++
++| 장 | 최하단 y | 접지·무릎·팔·연결 관찰 |
++| --- | ---: | --- |
++| 00 | 135 | 긴 보폭·앞기울기·접촉 자세가 존재한다. 앞팔은 굽혀 올리고 뒷손은 허리에 있다. 옛 직립 0장 결함은 해결됨. |
++| 01 | 132 | 앞쪽 다리가 거의 수직이지만 바닥선보다 뜬 상태. 뒷다리는 뒤로 접힘. 지지기로 쓰려면 발 접지를 다시 설계해야 한다. |
++| 02 | 133 | 뒷발이 들리고 양팔이 몸 앞쪽에 모여 읽힘. 비행기로 볼 수 있으나 발목·무릎 교차가 조밀하다. |
++| 03 | 134 | 앞무릎을 높이 든 자세. 발의 최하단은 바닥에 가깝지만 명확한 지지발 평탄 접촉이 없다. |
++| 04 | 135 | 반대 접촉 자세. **앞팔이 00과 달리 거의 수평으로 뻗어 펀치처럼 읽히는 그림 결함**이 있다. |
++| 05 | 130 | 01의 반대 지지기로 보기엔 바닥에서 5px 더 높다. 지지/비행 리듬의 좌우 비대칭이 드러난다. |
++| 06 | 130 | 두 무릎을 접은 비행 자세. 비행 장으로는 가능하나 02보다 높아 좌우 발 접지 리듬이 달라진다. |
++| 07 | 135 | 한쪽 발이 03보다 낮아 접촉하고 상체/머리도 가장 위로 올라간다. 00으로 돌아갈 때 높이 변화와 접촉 전환을 함께 점검해야 한다. |
++
++얼굴·복식·체형은 대체로 유지된다. 첫 장과 끝 장을 같게 만드는 방법은 필요하지 않으며 중복 장으로 루프 정지를 만들면 안 된다. 최신 질주는 이미 큰 동작이므로 예전 조깅을 고치겠다고 같은 작업을 다시 발주하지 않는다. 현 결함은 04 팔, 01/05 지지발과 03/07 비대칭을 포함한 뼈대·생성 그림 정합성이다. 최하단 y는 접지의 보조 지표이며, 두 발이 의도적으로 뜨는 비행 장을 자동 불합격 처리하지 않는다.
++
++## 코드와 그림을 분리한 판단
++
++최신 시스템 기준의 `src/game/action/engine/player.ts:233`은 실제 이동량을 `finishLocomotion()`에서 재어 `gaitFrame`을 진행한다. 벽에 막힘·정지·방향 전환은 `resetLocomotion()`로 처리된다. 따라서 이전 시간 기반 재생 문제를 현재 미수정이라고 보고하면 안 된다. 이 검수는 엔진을 수정하지 않았다.
++
++다만 최신 코드의 이동량 기반 동기화가 **각 프레임 지지발의 월드 좌표를 고정한다는 뜻은 아니다.** 현 원본 walk/run은 몸통 x가 대체로 고정된 제자리 사이클이며 `manifest.adv=0`이다. 요구된 「그림 안에서 전진하고 코드가 끝 장에서만 이동」 규격과도 다르다. 그림 제작에는 지지발 고정/루트 이동 메타데이터가 필요하며 엔진 담당에게 연결 패치로 전달해야 한다. 코드 속도만 고쳐 그림의 팔·무릎 결함이 해결됐다고 보고하지 않는다.
++
++## 다음 유료 실행 전 확정할 뼈대 설계
++
++1. 걷기 8장부터 수정: 접촉 → 하강/체중 싣기 → 통과 → 상승 → 반대 접촉 → 반대 하강 → 반대 통과 → 반대 상승. 접촉 0/4에서 반대 팔이 앞으로 나오도록 손목·팔꿈치 좌표를 분리한다. 지지기 무릎은 약하게 굽히고 통과 때 몸을 높여, 전 장이 웅크린 자세가 되지 않도록 한다.
++2. 근/원측 무릎·발목·손목을 장마다 명시하여 좌우 교대를 판독할 수 있게 한다. 부드러운 사인파에만 맡기지 않고 접촉 구간의 발목 x/y를 고정한다. 프레임별 몸통 전진과 한 주기 root delta를 기록한다.
++3. 달리기 8장: 접촉/압축/추진/비행의 네 단계를 양쪽에 대칭으로 지정한다. 0/4 접촉에서 팔꿈치 굽힘과 반대 팔을 보존하고 04의 수평 지르기를 제거한다. 01/05에는 지지발 고정, 03/07에는 두 발 비행을 의도적으로 배정한다. 신체 길이와 A2 복식은 유지한다.
++4. A와 A2 옆에 새 원본을 붙여 얼굴·재킷 밑단·다리 길이·손 번갈이·7→0 경계를 확인한다. 후속 strict-profile 기준 그림을 사용할 경우 A2와 정체성이 같은지 먼저 비교하며, 잘못 등록된 `c0968765-…`나 v3/v4 반려 그림은 입력하지 않는다.
++5. 과거 skeleton v3 8장당 3회(두 클립 6회) 기록과 별개로, 이번 세션 2026-10-22 공개 MCP tools/list에서도 4~14장=3회를 확인했다. **현재 공개 견적은 두 클립 6회**다. 계정 연결/남은 양/작업 큐와 첫 그림의 가려진 관절을 확인하기 전 실행 불가. 공유 계정 잔액 차이를 작업별 실제 비용으로 간주하지 않는다. `run+pipe2` 로그의 6회 역시 두 클립 묶음의 과거 기록이다.
++
++## 무료 설계 후속
++
++`game-src/action/jyaldi-v5/resume/`에 실제 COCO-18 관절 8장씩, MCP 요청 초안, 첫 그림 좌표 겹쳐보기, 뼈대 도해, 접지/루트 이동 메타데이터를 작성했다. `build_drafts.py`는 네트워크 기능이 없고 원본·엔진을 변경하지 않는다. 현 MCP inputSchema와 기하 검사를 통과했다. 지지발 고정을 위한 root-motion 설계이므로 현재 제자리 엔진과 직접 호환되지 않으며, 엔진 담당 연결 검토가 필요하다. 첫 그림 가려진 왼팔은 추정 좌표라 독립 검수 대기다. 그림 생성·사용자 승인은 아직 없다.
+diff --git a/game-src/action/jyaldi-v5/resume/README.md b/game-src/action/jyaldi-v5/resume/README.md
+new file mode 100644
+index 00000000..5ee7d0ac
+--- /dev/null
++++ b/game-src/action/jyaldi-v5/resume/README.md
+@@ -0,0 +1,23 @@
++# 쟈알디 걷기·달리기 재개 설계
++
++**현재 상태: 뼈대 설계만 완료, PixelLab 미제출·그림 미생성·사용자 시각 승인 전.**
++
++`python3 game-src/action/jyaldi-v5/resume/build_drafts.py`는 이 폴더의 초안·도해·기하 검사 결과만 다시 만든다. 네트워크 호출, 원본 변경, 엔진 적용 기능은 없다.
++
++- `reference.json` / `reference-overlay.png`: 최신 guard/00을 직접 보고 맞춘 첫 그림의 18관절. 근측 관절은 그림에 대조했으며, 가려진 원측 팔과 얼굴 뒤편은 추정 좌표다. 독립 검수 전에 바로 제출하지 않는다.
++- `walk-request.draft.json` / `run-request.draft.json`: MCP 도구명·인수·견적·미생성 상태. 실제 제출할 인수는 `arguments`이며 바깥 상태 기록은 도구 인수가 아니다. job_id와 실제 비용은 null이다.
++- `walk-motion.json` / `run-motion.json`: 192×144 픽셀 관절, 각 장의 지지발, 루트 전진량, 반복 경계, 예상 시간. 생성 결과의 실측 좌표가 아니다.
++- `walk-skeleton.png` / `run-skeleton.png`: 각 8장의 뼈대 도해. 빨강은 가까운 RIGHT, 파랑은 먼 LEFT. 실제 캐릭터 그림이 아니다.
++- `validation.json`: 18관절, 범위, 사지 길이, 무릎 굽힘 방향, 지지발 고정, 걷기 7→다음0 고정 검사를 통과한 기록. 그림 품질 합격은 아니다.
++
++## 생성 전 조건
++
++공개 MCP `tools/list`를 2026-10-22 이번 세션에서 조회한 가격은 skeleton v3 4~14장당 3회이므로 걷기 8장 3회 + 달리기 8장 3회다. 계정 연결·현재 잔액·실행 중 작업·한도 확인과 첫 그림의 가려진 관절 검수가 끝나야 한다. 걷기 결과를 먼저 A/A2와 비교하고, 그 결과를 봐야 달리기를 제출할 수 있다. 실패 시 같은 방식으로 문구만 바꿔 반복 호출하지 않는다.
++
++기준 계보는 승인 A → 재킷 후속 수정 A2 → 기존 guard/00 옆모습이다. A2와 guard/00의 존재를 새 사용자 시각 승인으로 간주하지 않는다. v3/v4 반려 그림과 잘못 등록된 캐릭터 객체는 사용하지 않는다.
++
++## 접지와 엔진 연결
++
++요청 초안은 발을 딛는 동안 그 발의 그림 좌표를 고정하고, 몸통이 전진하는 root-motion 방식이다. 걷기 한 주기48px, 달리기80px. 현재 시스템의 제자리 클립을 교체하기만 하면 몸통 이동이 이중 적용되므로 **그대로 엔진 연결 금지**다.
++
++원칙적인 연결은 주기 중 루트를 고정하고, 끝에서 주기 이동량만 적용해 다시 0장으로 돌아가는 것이다. 기존 시스템 담당이 제자리 방식을 유지해야 한다면 별도 파생 팩에서 frame별 root_x를 뺀 후 해당량과 세계 이동을 정확히 동기화해야 한다. 이 폴더는 접지 규약만 전달하며 엔진 코드를 변경하지 않는다. 같은 장을 보이는 동안 코드만 이동시키면 발 미끄럼이 생기므로 시연에서 실제 세계 좌표를 재검사해야 한다.
+diff --git a/game-src/action/jyaldi-v5/resume/build_drafts.py b/game-src/action/jyaldi-v5/resume/build_drafts.py
+new file mode 100644
+index 00000000..a1d6cb6b
+--- /dev/null
++++ b/game-src/action/jyaldi-v5/resume/build_drafts.py
+@@ -0,0 +1,121 @@
++#!/usr/bin/env python3
++"""무료 설계만: PixelLab 네트워크 호출/원본 픽셀 수정/엔진 적용 기능 없음."""
++from pathlib import Path
++import hashlib,json,math
++from PIL import Image,ImageDraw
++ROOT=Path(__file__).resolve().parents[4]
++OUT=Path(__file__).resolve().parent
++BASE=ROOT/'game-src/action/jyaldi-v5/full/clips/guard/00.png'
++W,H=192,144
++LABELS=['NOSE','NECK','RIGHT SHOULDER','RIGHT ELBOW','RIGHT ARM','LEFT SHOULDER','LEFT ELBOW','LEFT ARM','RIGHT HIP','RIGHT KNEE','RIGHT LEG','LEFT HIP','LEFT KNEE','LEFT LEG','RIGHT EYE','LEFT EYE','RIGHT EAR','LEFT EAR']
++BONES=[('NECK','NOSE'),('NECK','RIGHT SHOULDER'),('RIGHT SHOULDER','RIGHT ELBOW'),('RIGHT ELBOW','RIGHT ARM'),('NECK','LEFT SHOULDER'),('LEFT SHOULDER','LEFT ELBOW'),('LEFT ELBOW','LEFT ARM'),('NECK','RIGHT HIP'),('RIGHT HIP','RIGHT KNEE'),('RIGHT KNEE','RIGHT LEG'),('NECK','LEFT HIP'),('LEFT HIP','LEFT KNEE'),('LEFT KNEE','LEFT LEG')]
++# 직접 본 guard/00 픽셀 좌표. 가려진 왼쪽 어깨·팔꿈치·손은 추정임을 별도 기록.
++REF={'NOSE':(65,55),'NECK':(60,62),'RIGHT SHOULDER':(62,65),'RIGHT ELBOW':(77,76),'RIGHT ARM':(78,64),
++ 'LEFT SHOULDER':(58,64),'LEFT ELBOW':(65,72),'LEFT ARM':(69,61),
++ 'RIGHT HIP':(58,91),'RIGHT KNEE':(74,105),'RIGHT LEG':(68,129),'LEFT HIP':(54,92),'LEFT KNEE':(57,108),'LEFT LEG':(43,129),
++ 'RIGHT EYE':(63,52),'LEFT EYE':(65,52),'RIGHT EAR':(58,54),'LEFT EAR':(59,53)}
++
++def add(a,b):return (a[0]+b[0],a[1]+b[1])
++def polar(length,angle):
++ a=math.radians(angle);return (length*math.sin(a),length*math.cos(a))
++def knee(hip,ankle):
++ dx,dy=ankle[0]-hip[0],ankle[1]-hip[1];d=math.hypot(dx,dy)
++ if d>46:raise ValueError(f'다리 목표가 길이를 초과: {d}')
++ # 같은 23px 두 마디, 오른쪽을 보는 무릎은 굽힌 끝이 앞으로.
++ mid=((hip[0]+ankle[0])/2,(hip[1]+ankle[1])/2); h=math.sqrt(23**2-(d/2)**2)
++ return (mid[0]+dy/d*h,mid[1]-dx/d*h)
++def pose(x,y,lean,near_ankle,far_ankle,arm_angle,run):
++ neck=add((x,y),polar(-26,-lean))
++ q={'NECK':neck,'RIGHT HIP':(x+1,y),'LEFT HIP':(x-1,y)}
++ q['NOSE']=add(neck,(6,-9));q['RIGHT EYE']=add(q['NOSE'],(-2,-3));q['LEFT EYE']=add(q['NOSE'],(-1,-3));q['RIGHT EAR']=add(q['NOSE'],(-7,-2));q['LEFT EAR']=add(q['NOSE'],(-6,-2))
++ for side,sign,ankle in [('RIGHT',1,near_ankle),('LEFT',-1,far_ankle)]:
++  q[side+' SHOULDER']=add(neck,(sign*1.5,4))
++  ang=arm_angle*sign
++  q[side+' ELBOW']=add(q[side+' SHOULDER'],polar(17,ang))
++  q[side+' ARM']=add(q[side+' ELBOW'],polar(14,ang+(90 if run else 20)))
++  q[side+' LEG']=ankle;q[side+' KNEE']=knee(q[side+' HIP'],ankle)
++ return q
++
++def make(clip):
++ if clip=='walk':
++  dx=6;ys=[86,88,85,85]*2;angles=[-22,-12,0,12,22,12,0,-12]
++  # 0..4 near support x73, 4..virtual8 far support x97.
++  near=[(73,128),(73,128),(73,128),(73,128),(73,128),(82,124),(93,120),(109,124)]
++  far=[(49,128),(58,124),(69,120),(85,124),(97,128),(97,128),(97,128),(97,128)]
++  phases=['근측 접촉','근측 체중 싣기','원측 통과','원측 발 내밀기','원측 접촉','원측 체중 싣기','근측 통과','근측 발 내밀기']
++  contact=[['RIGHT','LEFT'],['RIGHT'],['RIGHT'],['RIGHT'],['LEFT','RIGHT'],['LEFT'],['LEFT'],['LEFT']]
++  lean=3
++ else:
++  dx=10;ys=[91,94,85,84]*2;angles=[-50,-15,30,55,50,15,-30,-55]
++  near=[(80,128),(80,128),(80,128),(71,109),(84,113),(92,102),(115,102),(140,115)]
++  far=[(44,113),(52,102),(75,102),(100,115),(120,128),(120,128),(120,128),(111,109)]
++  phases=['근측 접촉','근측 압축','근측 추진','비행·원측 앞으로','원측 접촉','원측 압축','원측 추진','비행·근측 앞으로']
++  contact=[['RIGHT'],['RIGHT'],['RIGHT'],[],['LEFT'],['LEFT'],['LEFT'],[]]
++  lean=22
++ poses=[pose(57+dx*i,ys[i],lean,near[i],far[i],angles[i],clip=='run') for i in range(8)]
++ return poses,dict(root_x=[dx*i for i in range(8)],cycle_delta_x=dx*8,phases=phases,contact=contact)
++
++def kp(q):return [{'label':k,'x':round(q[k][0]/W,6),'y':round(q[k][1]/H,6),'z_index':8 if k.startswith('RIGHT') else 2 if k.startswith('LEFT') else 5} for k in LABELS]
++def write(name,data): (OUT/name).write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n')
++def draw(q,base=None,scale=3):
++ im=Image.new('RGBA',(W*scale,H*scale),(35,43,52,255))
++ if base:im.alpha_composite(base.resize(im.size,Image.Resampling.NEAREST))
++ d=ImageDraw.Draw(im);d.line((0,136*scale,W*scale,136*scale),fill=(110,120,130),width=1)
++ for a,b in BONES:
++  col=(255,105,85) if 'RIGHT' in a+b else (85,175,255) if 'LEFT' in a+b else (235,235,235)
++  d.line([(q[a][0]*scale,q[a][1]*scale),(q[b][0]*scale,q[b][1]*scale)],fill=col,width=scale)
++ for k,p in q.items():
++  x,y=p[0]*scale,p[1]*scale;d.ellipse((x-2,y-2,x+2,y+2),fill=(255,230,110))
++ return im
++
++def validate(clip,poses,meta):
++ out={'clip':clip,'frames':8,'all_18_unique':True,'normalized_in_bounds':True,'bone_lengths':True,'stance_ankle_locked':True,'knee_bends_forward':True,'cycle_delta_x':meta['cycle_delta_x'],'visual_review':'대기: 뼈대 검수이며 그림 합격 아님'}
++ for q in poses:
++  assert set(q)==set(LABELS)
++  assert all(0<=x<W and 0<=y<H for x,y in q.values())
++  for side in ['RIGHT','LEFT']:
++   for a,b,n in [('HIP','KNEE',23),('KNEE','LEG',23),('SHOULDER','ELBOW',17),('ELBOW','ARM',14)]:
++    assert abs(math.dist(q[side+' '+a],q[side+' '+b])-n)<1e-6
++   h,k,a=[q[side+' '+s] for s in ['HIP','KNEE','LEG']]
++   assert (k[0]-h[0])*(a[1]-k[1])-(k[1]-h[1])*(a[0]-k[0])>=0
++ for i in range(7):
++  for s in set(meta['contact'][i])&set(meta['contact'][i+1]):assert poses[i][s+' LEG']==poses[i+1][s+' LEG']
++ # 경계 7→다음0의 지지발은 걷기만 존재. 다음0은 첫 좌표+cycle delta.
++ if clip=='walk':
++  s='LEFT';assert poses[7][s+' LEG']==(poses[0][s+' LEG'][0]+meta['cycle_delta_x'],poses[0][s+' LEG'][1])
++ last_to_next={k:math.dist(poses[-1][k],(poses[0][k][0]+meta['cycle_delta_x'],poses[0][k][1])) for k in LABELS}
++ interior=max(math.dist(poses[i][k],poses[i+1][k]) for i in range(7) for k in LABELS)
++ assert max(last_to_next.values())<=interior+1e-6
++ out['max_joint_step_pixels']=round(interior,3)
++ out['loop_boundary_max_joint_step_pixels']=round(max(last_to_next.values()),3)
++ out['loop_boundary_no_larger_than_interior_step']=True
++ return out
++
++def main():
++ OUT.mkdir(exist_ok=True)
++ base=Image.open(BASE).convert('RGBA');assert base.size==(W,H)
++ write('reference.json',{'status':'수동 맞춤 초안·가려진 관절 검수 대기','path':str(BASE.relative_to(ROOT)),'sha256':hashlib.sha256(BASE.read_bytes()).hexdigest(),'basis':'A → 재킷 수정 A2 → guard/00 후속 옆모습','approved_reference_history':'A 승인 이력. A2/guard를 독립 사용자 승인으로 간주하지 않음','coordinate_space':'192x144 pixel; RIGHT=near/east','pixel_keypoints':REF,'normalized_keypoints':kp(REF),'occluded_low_confidence':['LEFT SHOULDER','LEFT ELBOW','LEFT ARM','LEFT EYE','LEFT EAR'],'review_required':'왼팔 가림과 실제 어깨 위치를 독립 검수 후 유료 제출. 기존 G0를 무조건 복사하지 않음.'})
++ draw(REF,base).save(OUT/'reference-overlay.png')
++ checks=[]
++ for clip in ['walk','run']:
++  poses,meta=make(clip);checks.append(validate(clip,poses,meta))
++  args={'description':'adult woman agent, long straight black hair, red eyes, blue-grey shaded black suit with a hip-length jacket, white shirt, black tie, black gloves, black shoes, right hip holster, identical proportions and palette to reference, character only',
++  'action':'walking forward, alternating opposite arms and legs' if clip=='walk' else 'sprinting forward with bent elbows, opposite arms and legs, two flight phases',
++  'direction':'east','view':'side','template_id':'mannequin','no_background':True,'seed':1022 if clip=='walk' else 1023,
++  'first_frame_url':'https://raw.githubusercontent.com/leepc25/goei-plugin/0a13285205b77fd6cf33b966cea246efa0d3082e/game-src/action/jyaldi-v5/full/clips/guard/00.png',
++  'first_frame_keypoints':kp(REF),'keypoints':[kp(q) for q in poses]}
++  write(clip+'-request.draft.json',{'status':'미제출·미생성·시각 검수 대기','tool':'animate_with_skeleton_v3','quoted_generations':3,'quoted_at':'2026-10-22','quote_source':'공개 PixelLab MCP tools/list: 4~14장=3회, parent가 이번 세션 조회','job_id':None,'actual_cost':None,'arguments':args})
++  write(clip+'-motion.json',{'status':'설계 초안·엔진 미적용','frame_size':[W,H],'anchor':[57,136],'ankle_ground_y':128,'rendered_sole_target_y':135,
++   'space':'root-motion; 지지발은 그림/세계 좌표에서 고정; 캐릭터 몸통이 그림 안에서 전진','current_engine_compatible':False,
++   'integration_contract':'주기 중 월드 루트를 별도로 계속 이동시키지 않음. 주기 끝에서 cycle_delta_x * 표시배율만 이동 후 0장으로. 현 엔진에 그대로 넣으면 이중 이동. 엔진 연결 검토 필요.',
++   'in_place_conversion_contract':'엔진 담당이 제자리 방식을 유지할 경우 원본을 삭제/수정하지 않고 별도 파생 팩에서 frame별 root_x를 뺀다. 세계 이동은 해당 delta에 맞춰야 지지발이 고정된다. 현재 균일 이동량 동기화만으로 접지 합격 주장 금지.',
++   **meta,'pixel_keypoints':poses,'frame_duration_ms':[100]*8 if clip=='walk' else [70]*8,
++   'loop_boundary':'07→다음00은 root cycle_delta_x를 더해 검사. 중복 08 프레임 생성하지 않음.'})
++  sheet=Image.new('RGBA',(W*3*4,H*3*2+48),(24,30,38,255))
++  for i,q in enumerate(poses):
++   x=(i%4)*W*3;y=(i//4)*(H*3+24)
++   sheet.alpha_composite(draw(q),(x,y+24));ImageDraw.Draw(sheet).text((x+8,y+5),f'{clip} {i:02}   root +{meta["root_x"][i]}',fill='white')
++  sheet.save(OUT/(clip+'-skeleton.png'))
++ write('validation.json',{'status':'기하 검사 통과·그림 미생성·참조 가림 관절 검수 대기','network_calls':0,'paid_calls':0,'checks':checks})
++ print('설계 2클립 저장. 네트워크/유료 호출 없음. 원본 이미지·엔진 파일 변경 없음.')
++if __name__=='__main__':main()
+diff --git a/game-src/action/jyaldi-v5/resume/reference-coordinate-grid.png b/game-src/action/jyaldi-v5/resume/reference-coordinate-grid.png
+new file mode 100644
+index 0000000000000000000000000000000000000000..cd8ccafb9a4de35b87a76bfbc7307b65b58787b8
+GIT binary patch
+literal 18049
+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
+Pmm27r=#-wjcK?3?Z#*$P
+
+literal 0
+HcmV?d00001
+
+diff --git a/game-src/action/jyaldi-v5/resume/reference-overlay.png b/game-src/action/jyaldi-v5/resume/reference-overlay.png
+new file mode 100644
+index 0000000000000000000000000000000000000000..89d76751a2e8b46a9141127320c221f6ee4c5ee3
+GIT binary patch
+literal 12485
+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
+AtpET3
+
+literal 0
+HcmV?d00001
+
+diff --git a/game-src/action/jyaldi-v5/resume/reference.json b/game-src/action/jyaldi-v5/resume/reference.json
+new file mode 100644
+index 00000000..6b769b14
+--- /dev/null
++++ b/game-src/action/jyaldi-v5/resume/reference.json
+@@ -0,0 +1,200 @@
++{
++  "status": "수동 맞춤 초안·가려진 관절 검수 대기",
++  "path": "game-src/action/jyaldi-v5/full/clips/guard/00.png",
++  "sha256": "fa72194d31e4f08b1612d99b7ffcf056a6d67d8e1ff2b51139424afc631e3b0a",
++  "basis": "A → 재킷 수정 A2 → guard/00 후속 옆모습",
++  "approved_reference_history": "A 승인 이력. A2/guard를 독립 사용자 승인으로 간주하지 않음",
++  "coordinate_space": "192x144 pixel; RIGHT=near/east",
++  "pixel_keypoints": {
++    "NOSE": [
++      65,
++      55
++    ],
++    "NECK": [
++      60,
++      62
++    ],
++    "RIGHT SHOULDER": [
++      62,
++      65
++    ],
++    "RIGHT ELBOW": [
++      77,
++      76
++    ],
++    "RIGHT ARM": [
++      78,
++      64
++    ],
++    "LEFT SHOULDER": [
++      58,
++      64
++    ],
++    "LEFT ELBOW": [
++      65,
++      72
++    ],
++    "LEFT ARM": [
++      69,
++      61
++    ],
++    "RIGHT HIP": [
++      58,
++      91
++    ],
++    "RIGHT KNEE": [
++      74,
++      105
++    ],
++    "RIGHT LEG": [
++      68,
++      129
++    ],
++    "LEFT HIP": [
++      54,
++      92
++    ],
++    "LEFT KNEE": [
++      57,
++      108
++    ],
++    "LEFT LEG": [
++      43,
++      129
++    ],
++    "RIGHT EYE": [
++      63,
++      52
++    ],
++    "LEFT EYE": [
++      65,
++      52
++    ],
++    "RIGHT EAR": [
++      58,
++      54
++    ],
++    "LEFT EAR": [
++      59,
++      53
++    ]
++  },
++  "normalized_keypoints": [
++    {
++      "label": "NOSE",
++      "x": 0.338542,
++      "y": 0.381944,
++      "z_index": 5
++    },
++    {
++      "label": "NECK",
++      "x": 0.3125,
++      "y": 0.430556,
++      "z_index": 5
++    },
++    {
++      "label": "RIGHT SHOULDER",
++      "x": 0.322917,
++      "y": 0.451389,
++      "z_index": 8
++    },
++    {
++      "label": "RIGHT ELBOW",
++      "x": 0.401042,
++      "y": 0.527778,
++      "z_index": 8
++    },
++    {
++      "label": "RIGHT ARM",
++      "x": 0.40625,
++      "y": 0.444444,
++      "z_index": 8
++    },
++    {
++      "label": "LEFT SHOULDER",
++      "x": 0.302083,
++      "y": 0.444444,
++      "z_index": 2
++    },
++    {
++      "label": "LEFT ELBOW",
++      "x": 0.338542,
++      "y": 0.5,
++      "z_index": 2
++    },
++    {
++      "label": "LEFT ARM",
++      "x": 0.359375,
++      "y": 0.423611,
++      "z_index": 2
++    },
++    {
++      "label": "RIGHT HIP",
++      "x": 0.302083,
++      "y": 0.631944,
++      "z_index": 8
++    },
++    {
++      "label": "RIGHT KNEE",
++      "x": 0.385417,
++      "y": 0.729167,
++      "z_index": 8
++    },
++    {
++      "label": "RIGHT LEG",
++      "x": 0.354167,
++      "y": 0.895833,
++      "z_index": 8
++    },
++    {
++      "label": "LEFT HIP",
++      "x": 0.28125,
++      "y": 0.638889,
++      "z_index": 2
++    },
++    {
++      "label": "LEFT KNEE",
++      "x": 0.296875,
++      "y": 0.75,
++      "z_index": 2
++    },
++    {
++      "label": "LEFT LEG",
++      "x": 0.223958,
++      "y": 0.895833,
++      "z_index": 2
++    },
++    {
++      "label": "RIGHT EYE",
++      "x": 0.328125,
++      "y": 0.361111,
++      "z_index": 8
++    },
++    {
++      "label": "LEFT EYE",
++      "x": 0.338542,
++      "y": 0.361111,
++      "z_index": 2
++    },
++    {
++      "label": "RIGHT EAR",
++      "x": 0.302083,
++      "y": 0.375,
++      "z_index": 8
++    },
++    {
++      "label": "LEFT EAR",
++      "x": 0.307292,
++      "y": 0.368056,
++      "z_index": 2
++    }
++  ],
++  "occluded_low_confidence": [
++    "LEFT SHOULDER",
++    "LEFT ELBOW",
++    "LEFT ARM",
++    "LEFT EYE",
++    "LEFT EAR"
++  ],
++  "review_required": "왼팔 가림과 실제 어깨 위치를 독립 검수 후 유료 제출. 기존 G0를 무조건 복사하지 않음."
++}
+diff --git a/game-src/action/jyaldi-v5/resume/run-motion.json b/game-src/action/jyaldi-v5/resume/run-motion.json
+new file mode 100644
+index 00000000..22adc119
+--- /dev/null
++++ b/game-src/action/jyaldi-v5/resume/run-motion.json
+@@ -0,0 +1,665 @@
++{
++  "status": "설계 초안·엔진 미적용",
++  "frame_size": [
++    192,
++    144
++  ],
++  "anchor": [
++    57,
++    136
++  ],
++  "ankle_ground_y": 128,
++  "rendered_sole_target_y": 135,
++  "space": "root-motion; 지지발은 그림/세계 좌표에서 고정; 캐릭터 몸통이 그림 안에서 전진",
++  "current_engine_compatible": false,
++  "integration_contract": "주기 중 월드 루트를 별도로 계속 이동시키지 않음. 주기 끝에서 cycle_delta_x * 표시배율만 이동 후 0장으로. 현 엔진에 그대로 넣으면 이중 이동. 엔진 연결 검토 필요.",
++  "in_place_conversion_contract": "엔진 담당이 제자리 방식을 유지할 경우 원본을 삭제/수정하지 않고 별도 파생 팩에서 frame별 root_x를 뺀다. 세계 이동은 해당 delta에 맞춰야 지지발이 고정된다. 현재 균일 이동량 동기화만으로 접지 합격 주장 금지.",
++  "root_x": [
++    0,
++    10,
++    20,
++    30,
++    40,
++    50,
++    60,
++    70
++  ],
++  "cycle_delta_x": 80,
++  "phases": [
++    "근측 접촉",
++    "근측 압축",
++    "근측 추진",
++    "비행·원측 앞으로",
++    "원측 접촉",
++    "원측 압축",
++    "원측 추진",
++    "비행·근측 앞으로"
++  ],
++  "contact": [
++    [
++      "RIGHT"
++    ],
++    [
++      "RIGHT"
++    ],
++    [
++      "RIGHT"
++    ],
++    [],
++    [
++      "LEFT"
++    ],
++    [
++      "LEFT"
++    ],
++    [
++      "LEFT"
++    ],
++    []
++  ],
++  "pixel_keypoints": [
++    {
++      "NECK": [
++        66.73977142881371,
++        66.89321978126353
++      ],
++      "RIGHT HIP": [
++        58,
++        91
++      ],
++      "LEFT HIP": [
++        56,
++        91
++      ],
++      "NOSE": [
++        72.73977142881371,
++        57.893219781263525
++      ],
++      "RIGHT EYE": [
++        70.73977142881371,
++        54.893219781263525
++      ],
++      "LEFT EYE": [
++        71.73977142881371,
++        54.893219781263525
++      ],
++      "RIGHT EAR": [
++        65.73977142881371,
++        55.893219781263525
++      ],
++      "LEFT EAR": [
++        66.73977142881371,
++        55.893219781263525
++      ],
++      "RIGHT SHOULDER": [
++        68.23977142881371,
++        70.89321978126353
++      ],
++      "RIGHT ELBOW": [
++        55.217015895791086,
++        81.8206091459347
++      ],
++      "RIGHT ARM": [
++        64.21604243140263,
++        92.54523134960039
++      ],
++      "RIGHT LEG": [
++        80,
++        128
++      ],
++      "RIGHT KNEE": [
++        75.96966482255796,
++        105.35587497037093
++      ],
++      "LEFT SHOULDER": [
++        65.23977142881371,
++        70.89321978126353
++      ],
++      "LEFT ELBOW": [
++        78.26252696183634,
++        81.8206091459347
++      ],
++      "LEFT ARM": [
++        87.26155349744789,
++        71.09598694226901
++      ],
++      "LEFT LEG": [
++        44,
++        113
++      ],
++      "LEFT KNEE": [
++        66.9322366196163,
++        111.23576542888162
++      ]
++    },
++    {
++      "NECK": [
++        76.73977142881371,
++        69.89321978126353
++      ],
++      "RIGHT HIP": [
++        68,
++        94
++      ],
++      "LEFT HIP": [
++        66,
++        94
++      ],
++      "NOSE": [
++        82.73977142881371,
++        60.893219781263525
++      ],
++      "RIGHT EYE": [
++        80.73977142881371,
++        57.893219781263525
++      ],
++      "LEFT EYE": [
++        81.73977142881371,
++        57.893219781263525
++      ],
++      "RIGHT EAR": [
++        75.73977142881371,
++        58.893219781263525
++      ],
++      "LEFT EAR": [
++        76.73977142881371,
++        58.893219781263525
++      ],
++      "RIGHT SHOULDER": [
++        78.23977142881371,
++        73.89321978126353
++      ],
++      "RIGHT ELBOW": [
++        73.83984766207085,
++        90.31395882817769
++      ],
++      "RIGHT ARM": [
++        87.3628092301178,
++        93.93742545961298
++      ],
++      "RIGHT LEG": [
++        80,
++        128
++      ],
++      "RIGHT KNEE": [
++        87.46859595217991,
++        106.24637789923062
++      ],
++      "LEFT SHOULDER": [
++        75.23977142881371,
++        73.89321978126353
++      ],
++      "LEFT ELBOW": [
++        79.63969519555657,
++        90.31395882817769
++      ],
++      "LEFT ARM": [
++        93.16265676360352,
++        86.6904921967424
++      ],
++      "LEFT LEG": [
++        52,
++        102
++      ],
++      "LEFT KNEE": [
++        69.68715980115319,
++        116.70252965201809
++      ]
++    },
++    {
++      "NECK": [
++        86.73977142881371,
++        60.893219781263525
++      ],
++      "RIGHT HIP": [
++        78,
++        85
++      ],
++      "LEFT HIP": [
++        76,
++        85
++      ],
++      "NOSE": [
++        92.73977142881371,
++        51.893219781263525
++      ],
++      "RIGHT EYE": [
++        90.73977142881371,
++        48.893219781263525
++      ],
++      "LEFT EYE": [
++        91.73977142881371,
++        48.893219781263525
++      ],
++      "RIGHT EAR": [
++        85.73977142881371,
++        49.893219781263525
++      ],
++      "LEFT EAR": [
++        86.73977142881371,
++        49.893219781263525
++      ],
++      "RIGHT SHOULDER": [
++        88.23977142881371,
++        64.89321978126353
++      ],
++      "RIGHT ELBOW": [
++        96.73977142881371,
++        79.61565164559899
++      ],
++      "RIGHT ARM": [
++        108.86412708179586,
++        72.61565164559899
++      ],
++      "RIGHT LEG": [
++        80,
++        128
++      ],
++      "RIGHT KNEE": [
++        87.09988073972953,
++        106.1232613609428
++      ],
++      "LEFT SHOULDER": [
++        85.23977142881371,
++        64.89321978126353
++      ],
++      "LEFT ELBOW": [
++        76.73977142881371,
++        79.61565164559899
++      ],
++      "LEFT ARM": [
++        88.86412708179586,
++        86.61565164559899
++      ],
++      "LEFT LEG": [
++        75,
++        102
++      ],
++      "LEFT KNEE": [
++        96.82899111699767,
++        94.75464653629398
++      ]
++    },
++    {
++      "NECK": [
++        96.73977142881371,
++        59.893219781263525
++      ],
++      "RIGHT HIP": [
++        88,
++        84
++      ],
++      "LEFT HIP": [
++        86,
++        84
++      ],
++      "NOSE": [
++        102.73977142881371,
++        50.893219781263525
++      ],
++      "RIGHT EYE": [
++        100.73977142881371,
++        47.893219781263525
++      ],
++      "LEFT EYE": [
++        101.73977142881371,
++        47.893219781263525
++      ],
++      "RIGHT EAR": [
++        95.73977142881371,
++        48.893219781263525
++      ],
++      "LEFT EAR": [
++        96.73977142881371,
++        48.893219781263525
++      ],
++      "RIGHT SHOULDER": [
++        98.23977142881371,
++        63.893219781263525
++      ],
++      "RIGHT ELBOW": [
++        112.16535618172657,
++        73.64401919923131
++      ],
++      "RIGHT ARM": [
++        120.19542629064121,
++        62.17589057918542
++      ],
++      "RIGHT LEG": [
++        71,
++        109
++      ],
++      "RIGHT KNEE": [
++        93.8347178440106,
++        106.24760813392722
++      ],
++      "LEFT SHOULDER": [
++        95.23977142881371,
++        63.893219781263525
++      ],
++      "LEFT ELBOW": [
++        81.31418667590086,
++        73.64401919923131
++      ],
++      "LEFT ARM": [
++        89.3442567848155,
++        85.1121478192772
++      ],
++      "LEFT LEG": [
++        100,
++        115
++      ],
++      "LEFT KNEE": [
++        107.11153711290342,
++        93.12704775546297
++      ]
++    },
++    {
++      "NECK": [
++        106.73977142881371,
++        66.89321978126353
++      ],
++      "RIGHT HIP": [
++        98,
++        91
++      ],
++      "LEFT HIP": [
++        96,
++        91
++      ],
++      "NOSE": [
++        112.73977142881371,
++        57.893219781263525
++      ],
++      "RIGHT EYE": [
++        110.73977142881371,
++        54.893219781263525
++      ],
++      "LEFT EYE": [
++        111.73977142881371,
++        54.893219781263525
++      ],
++      "RIGHT EAR": [
++        105.73977142881371,
++        55.893219781263525
++      ],
++      "LEFT EAR": [
++        106.73977142881371,
++        55.893219781263525
++      ],
++      "RIGHT SHOULDER": [
++        108.23977142881371,
++        70.89321978126353
++      ],
++      "RIGHT ELBOW": [
++        121.26252696183634,
++        81.8206091459347
++      ],
++      "RIGHT ARM": [
++        130.2615534974479,
++        71.09598694226901
++      ],
++      "RIGHT LEG": [
++        84,
++        113
++      ],
++      "RIGHT KNEE": [
++        106.98510335943327,
++        112.17233850145753
++      ],
++      "LEFT SHOULDER": [
++        105.23977142881371,
++        70.89321978126353
++      ],
++      "LEFT ELBOW": [
++        92.21701589579108,
++        81.8206091459347
++      ],
++      "LEFT ARM": [
++        101.21604243140263,
++        92.54523134960039
++      ],
++      "LEFT LEG": [
++        120,
++        128
++      ],
++      "LEFT KNEE": [
++        113.48542120154458,
++        105.94188895034947
++      ]
++    },
++    {
++      "NECK": [
++        116.73977142881371,
++        69.89321978126353
++      ],
++      "RIGHT HIP": [
++        108,
++        94
++      ],
++      "LEFT HIP": [
++        106,
++        94
++      ],
++      "NOSE": [
++        122.73977142881371,
++        60.893219781263525
++      ],
++      "RIGHT EYE": [
++        120.73977142881371,
++        57.893219781263525
++      ],
++      "LEFT EYE": [
++        121.73977142881371,
++        57.893219781263525
++      ],
++      "RIGHT EAR": [
++        115.73977142881371,
++        58.893219781263525
++      ],
++      "LEFT EAR": [
++        116.73977142881371,
++        58.893219781263525
++      ],
++      "RIGHT SHOULDER": [
++        118.23977142881371,
++        73.89321978126353
++      ],
++      "RIGHT ELBOW": [
++        122.63969519555657,
++        90.31395882817769
++      ],
++      "RIGHT ARM": [
++        136.16265676360354,
++        86.6904921967424
++      ],
++      "RIGHT LEG": [
++        92,
++        102
++      ],
++      "RIGHT KNEE": [
++        109.47628619238571,
++        116.95257238477141
++      ],
++      "LEFT SHOULDER": [
++        115.23977142881371,
++        73.89321978126353
++      ],
++      "LEFT ELBOW": [
++        110.83984766207085,
++        90.31395882817769
++      ],
++      "LEFT ARM": [
++        124.3628092301178,
++        93.93742545961298
++      ],
++      "LEFT LEG": [
++        120,
++        128
++      ],
++      "LEFT KNEE": [
++        125.77930557141404,
++        105.73793300000598
++      ]
++    },
++    {
++      "NECK": [
++        126.73977142881371,
++        60.893219781263525
++      ],
++      "RIGHT HIP": [
++        118,
++        85
++      ],
++      "LEFT HIP": [
++        116,
++        85
++      ],
++      "NOSE": [
++        132.7397714288137,
++        51.893219781263525
++      ],
++      "RIGHT EYE": [
++        130.7397714288137,
++        48.893219781263525
++      ],
++      "LEFT EYE": [
++        131.7397714288137,
++        48.893219781263525
++      ],
++      "RIGHT EAR": [
++        125.7397714288137,
++        49.893219781263525
++      ],
++      "LEFT EAR": [
++        126.7397714288137,
++        49.893219781263525
++      ],
++      "RIGHT SHOULDER": [
++        128.2397714288137,
++        64.89321978126353
++      ],
++      "RIGHT ELBOW": [
++        119.7397714288137,
++        79.61565164559899
++      ],
++      "RIGHT ARM": [
++        131.86412708179583,
++        86.61565164559899
++      ],
++      "RIGHT LEG": [
++        115,
++        102
++      ],
++      "RIGHT KNEE": [
++        137.4946062104743,
++        97.20493050773077
++      ],
++      "LEFT SHOULDER": [
++        125.23977142881371,
++        64.89321978126353
++      ],
++      "LEFT ELBOW": [
++        133.7397714288137,
++        79.61565164559899
++      ],
++      "LEFT ARM": [
++        145.86412708179583,
++        72.61565164559899
++      ],
++      "LEFT LEG": [
++        120,
++        128
++      ],
++      "LEFT KNEE": [
++        125.88743698538323,
++        105.76628493159225
++      ]
++    },
++    {
++      "NECK": [
++        136.73977142881373,
++        59.893219781263525
++      ],
++      "RIGHT HIP": [
++        128,
++        84
++      ],
++      "LEFT HIP": [
++        126,
++        84
++      ],
++      "NOSE": [
++        142.73977142881373,
++        50.893219781263525
++      ],
++      "RIGHT EYE": [
++        140.73977142881373,
++        47.893219781263525
++      ],
++      "LEFT EYE": [
++        141.73977142881373,
++        47.893219781263525
++      ],
++      "RIGHT EAR": [
++        135.73977142881373,
++        48.893219781263525
++      ],
++      "LEFT EAR": [
++        136.73977142881373,
++        48.893219781263525
++      ],
++      "RIGHT SHOULDER": [
++        138.23977142881373,
++        63.893219781263525
++      ],
++      "RIGHT ELBOW": [
++        124.31418667590087,
++        73.64401919923131
++      ],
++      "RIGHT ARM": [
++        132.3442567848155,
++        85.1121478192772
++      ],
++      "RIGHT LEG": [
++        140,
++        115
++      ],
++      "RIGHT KNEE": [
++        148.82607309569576,
++        93.7608749306984
++      ],
++      "LEFT SHOULDER": [
++        135.23977142881373,
++        63.893219781263525
++      ],
++      "LEFT ELBOW": [
++        149.1653561817266,
++        73.64401919923131
++      ],
++      "LEFT ARM": [
++        157.19542629064125,
++        62.17589057918542
++      ],
++      "LEFT LEG": [
++        111,
++        109
++      ],
++      "LEFT KNEE": [
++        133.7551823402834,
++        105.65310940417004
++      ]
++    }
++  ],
++  "frame_duration_ms": [
++    70,
++    70,
++    70,
++    70,
++    70,
++    70,
++    70,
++    70
++  ],
++  "loop_boundary": "07→다음00은 root cycle_delta_x를 더해 검사. 중복 08 프레임 생성하지 않음."
++}
+diff --git a/game-src/action/jyaldi-v5/resume/run-request.draft.json b/game-src/action/jyaldi-v5/resume/run-request.draft.json
+new file mode 100644
+index 00000000..3a42ced3
+--- /dev/null
++++ b/game-src/action/jyaldi-v5/resume/run-request.draft.json
+@@ -0,0 +1,1011 @@
++{
++  "status": "미제출·미생성·시각 검수 대기",
++  "tool": "animate_with_skeleton_v3",
++  "quoted_generations": 3,
++  "quoted_at": "2026-10-22",
++  "quote_source": "공개 PixelLab MCP tools/list: 4~14장=3회, parent가 이번 세션 조회",
++  "job_id": null,
++  "actual_cost": null,
++  "arguments": {
++    "description": "adult woman agent, long straight black hair, red eyes, blue-grey shaded black suit with a hip-length jacket, white shirt, black tie, black gloves, black shoes, right hip holster, identical proportions and palette to reference, character only",
++    "action": "sprinting forward with bent elbows, opposite arms and legs, two flight phases",
++    "direction": "east",
++    "view": "side",
++    "template_id": "mannequin",
++    "no_background": true,
++    "seed": 1023,
++    "first_frame_url": "https://raw.githubusercontent.com/leepc25/goei-plugin/0a13285205b77fd6cf33b966cea246efa0d3082e/game-src/action/jyaldi-v5/full/clips/guard/00.png",
++    "first_frame_keypoints": [
++      {
++        "label": "NOSE",
++        "x": 0.338542,
++        "y": 0.381944,
++        "z_index": 5
++      },
++      {
++        "label": "NECK",
++        "x": 0.3125,
++        "y": 0.430556,
++        "z_index": 5
++      },
++      {
++        "label": "RIGHT SHOULDER",
++        "x": 0.322917,
++        "y": 0.451389,
++        "z_index": 8
++      },
++      {
++        "label": "RIGHT ELBOW",
++        "x": 0.401042,
++        "y": 0.527778,
++        "z_index": 8
++      },
++      {
++        "label": "RIGHT ARM",
++        "x": 0.40625,
++        "y": 0.444444,
++        "z_index": 8
++      },
++      {
++        "label": "LEFT SHOULDER",
++        "x": 0.302083,
++        "y": 0.444444,
++        "z_index": 2
++      },
++      {
++        "label": "LEFT ELBOW",
++        "x": 0.338542,
++        "y": 0.5,
++        "z_index": 2
++      },
++      {
++        "label": "LEFT ARM",
++        "x": 0.359375,
++        "y": 0.423611,
++        "z_index": 2
++      },
++      {
++        "label": "RIGHT HIP",
++        "x": 0.302083,
++        "y": 0.631944,
++        "z_index": 8
++      },
++      {
++        "label": "RIGHT KNEE",
++        "x": 0.385417,
++        "y": 0.729167,
++        "z_index": 8
++      },
++      {
++        "label": "RIGHT LEG",
++        "x": 0.354167,
++        "y": 0.895833,
++        "z_index": 8
++      },
++      {
++        "label": "LEFT HIP",
++        "x": 0.28125,
++        "y": 0.638889,
++        "z_index": 2
++      },
++      {
++        "label": "LEFT KNEE",
++        "x": 0.296875,
++        "y": 0.75,
++        "z_index": 2
++      },
++      {
++        "label": "LEFT LEG",
++        "x": 0.223958,
++        "y": 0.895833,
++        "z_index": 2
++      },
++      {
++        "label": "RIGHT EYE",
++        "x": 0.328125,
++        "y": 0.361111,
++        "z_index": 8
++      },
++      {
++        "label": "LEFT EYE",
++        "x": 0.338542,
++        "y": 0.361111,
++        "z_index": 2
++      },
++      {
++        "label": "RIGHT EAR",
++        "x": 0.302083,
++        "y": 0.375,
++        "z_index": 8
++      },
++      {
++        "label": "LEFT EAR",
++        "x": 0.307292,
++        "y": 0.368056,
++        "z_index": 2
++      }
++    ],
++    "keypoints": [
++      [
++        {
++          "label": "NOSE",
++          "x": 0.378853,
++          "y": 0.402036,
++          "z_index": 5
++        },
++        {
++          "label": "NECK",
++          "x": 0.347603,
++          "y": 0.464536,
++          "z_index": 5
++        },
++        {
++          "label": "RIGHT SHOULDER",
++          "x": 0.355415,
++          "y": 0.492314,
++          "z_index": 8
++        },
++        {
++          "label": "RIGHT ELBOW",
++          "x": 0.287589,
++          "y": 0.568199,
++          "z_index": 8
++        },
++        {
++          "label": "RIGHT ARM",
++          "x": 0.334459,
++          "y": 0.642675,
++          "z_index": 8
++        },
++        {
++          "label": "LEFT SHOULDER",
++          "x": 0.33979,
++          "y": 0.492314,
++          "z_index": 2
++        },
++        {
++          "label": "LEFT ELBOW",
++          "x": 0.407617,
++          "y": 0.568199,
++          "z_index": 2
++        },
++        {
++          "label": "LEFT ARM",
++          "x": 0.454487,
++          "y": 0.493722,
++          "z_index": 2
++        },
++        {
++          "label": "RIGHT HIP",
++          "x": 0.302083,
++          "y": 0.631944,
++          "z_index": 8
++        },
++        {
++          "label": "RIGHT KNEE",
++          "x": 0.395675,
++          "y": 0.731638,
++          "z_index": 8
++        },
++        {
++          "label": "RIGHT LEG",
++          "x": 0.416667,
++          "y": 0.888889,
++          "z_index": 8
++        },
++        {
++          "label": "LEFT HIP",
++          "x": 0.291667,
++          "y": 0.631944,
++          "z_index": 2
++        },
++        {
++          "label": "LEFT KNEE",
++          "x": 0.348605,
++          "y": 0.772471,
++          "z_index": 2
++        },
++        {
++          "label": "LEFT LEG",
++          "x": 0.229167,
++          "y": 0.784722,
++          "z_index": 2
++        },
++        {
++          "label": "RIGHT EYE",
++          "x": 0.368436,
++          "y": 0.381203,
++          "z_index": 8
++        },
++        {
++          "label": "LEFT EYE",
++          "x": 0.373645,
++          "y": 0.381203,
++          "z_index": 2
++        },
++        {
++          "label": "RIGHT EAR",
++          "x": 0.342395,
++          "y": 0.388147,
++          "z_index": 8
++        },
++        {
++          "label": "LEFT EAR",
++          "x": 0.347603,
++          "y": 0.388147,
++          "z_index": 2
++        }
++      ],
++      [
++        {
++          "label": "NOSE",
++          "x": 0.430936,
++          "y": 0.42287,
++          "z_index": 5
++        },
++        {
++          "label": "NECK",
++          "x": 0.399686,
++          "y": 0.48537,
++          "z_index": 5
++        },
++        {
++          "label": "RIGHT SHOULDER",
++          "x": 0.407499,
++          "y": 0.513147,
++          "z_index": 8
++        },
++        {
++          "label": "RIGHT ELBOW",
++          "x": 0.384583,
++          "y": 0.62718,
++          "z_index": 8
++        },
++        {
++          "label": "RIGHT ARM",
++          "x": 0.455015,
++          "y": 0.652343,
++          "z_index": 8
++        },
++        {
++          "label": "LEFT SHOULDER",
++          "x": 0.391874,
++          "y": 0.513147,
++          "z_index": 2
++        },
++        {
++          "label": "LEFT ELBOW",
++          "x": 0.41479,
++          "y": 0.62718,
++          "z_index": 2
++        },
++        {
++          "label": "LEFT ARM",
++          "x": 0.485222,
++          "y": 0.602017,
++          "z_index": 2
++        },
++        {
++          "label": "RIGHT HIP",
++          "x": 0.354167,
++          "y": 0.652778,
++          "z_index": 8
++        },
++        {
++          "label": "RIGHT KNEE",
++          "x": 0.455566,
++          "y": 0.737822,
++          "z_index": 8
++        },
++        {
++          "label": "RIGHT LEG",
++          "x": 0.416667,
++          "y": 0.888889,
++          "z_index": 8
++        },
++        {
++          "label": "LEFT HIP",
++          "x": 0.34375,
++          "y": 0.652778,
++          "z_index": 2
++        },
++        {
++          "label": "LEFT KNEE",
++          "x": 0.362954,
++          "y": 0.810434,
++          "z_index": 2
++        },
++        {
++          "label": "LEFT LEG",
++          "x": 0.270833,
++          "y": 0.708333,
++          "z_index": 2
++        },
++        {
++          "label": "RIGHT EYE",
++          "x": 0.42052,
++          "y": 0.402036,
++          "z_index": 8
++        },
++        {
++          "label": "LEFT EYE",
++          "x": 0.425728,
++          "y": 0.402036,
++          "z_index": 2
++        },
++        {
++          "label": "RIGHT EAR",
++          "x": 0.394478,
++          "y": 0.408981,
++          "z_index": 8
++        },
++        {
++          "label": "LEFT EAR",
++          "x": 0.399686,
++          "y": 0.408981,
++          "z_index": 2
++        }
++      ],
++      [
++        {
++          "label": "NOSE",
++          "x": 0.48302,
++          "y": 0.36037,
++          "z_index": 5
++        },
++        {
++          "label": "NECK",
++          "x": 0.45177,
++          "y": 0.42287,
++          "z_index": 5
++        },
++        {
++          "label": "RIGHT SHOULDER",
++          "x": 0.459582,
++          "y": 0.450647,
++          "z_index": 8
++        },
++        {
++          "label": "RIGHT ELBOW",
++          "x": 0.503853,
++          "y": 0.552886,
++          "z_index": 8
++        },
++        {
++          "label": "RIGHT ARM",
++          "x": 0.567001,
++          "y": 0.504275,
++          "z_index": 8
++        },
++        {
++          "label": "LEFT SHOULDER",
++          "x": 0.443957,
++          "y": 0.450647,
++          "z_index": 2
++        },
++        {
++          "label": "LEFT ELBOW",
++          "x": 0.399686,
++          "y": 0.552886,
++          "z_index": 2
++        },
++        {
++          "label": "LEFT ARM",
++          "x": 0.462834,
++          "y": 0.601498,
++          "z_index": 2
++        },
++        {
++          "label": "RIGHT HIP",
++          "x": 0.40625,
++          "y": 0.590278,
++          "z_index": 8
++        },
++        {
++          "label": "RIGHT KNEE",
++          "x": 0.453645,
++          "y": 0.736967,
++          "z_index": 8
++        },
++        {
++          "label": "RIGHT LEG",
++          "x": 0.416667,
++          "y": 0.888889,
++          "z_index": 8
++        },
++        {
++          "label": "LEFT HIP",
++          "x": 0.395833,
++          "y": 0.590278,
++          "z_index": 2
++        },
++        {
++          "label": "LEFT KNEE",
++          "x": 0.504318,
++          "y": 0.658018,
++          "z_index": 2
++        },
++        {
++          "label": "LEFT LEG",
++          "x": 0.390625,
++          "y": 0.708333,
++          "z_index": 2
++        },
++        {
++          "label": "RIGHT EYE",
++          "x": 0.472603,
++          "y": 0.339536,
++          "z_index": 8
++        },
++        {
++          "label": "LEFT EYE",
++          "x": 0.477811,
++          "y": 0.339536,
++          "z_index": 2
++        },
++        {
++          "label": "RIGHT EAR",
++          "x": 0.446561,
++          "y": 0.346481,
++          "z_index": 8
++        },
++        {
++          "label": "LEFT EAR",
++          "x": 0.45177,
++          "y": 0.346481,
++          "z_index": 2
++        }
++      ],
++      [
++        {
++          "label": "NOSE",
++          "x": 0.535103,
++          "y": 0.353425,
++          "z_index": 5
++        },
++        {
++          "label": "NECK",
++          "x": 0.503853,
++          "y": 0.415925,
++          "z_index": 5
++        },
++        {
++          "label": "RIGHT SHOULDER",
++          "x": 0.511665,
++          "y": 0.443703,
++          "z_index": 8
++        },
++        {
++          "label": "RIGHT ELBOW",
++          "x": 0.584195,
++          "y": 0.511417,
++          "z_index": 8
++        },
++        {
++          "label": "RIGHT ARM",
++          "x": 0.626018,
++          "y": 0.431777,
++          "z_index": 8
++        },
++        {
++          "label": "LEFT SHOULDER",
++          "x": 0.49604,
++          "y": 0.443703,
++          "z_index": 2
++        },
++        {
++          "label": "LEFT ELBOW",
++          "x": 0.423511,
++          "y": 0.511417,
++          "z_index": 2
++        },
++        {
++          "label": "LEFT ARM",
++          "x": 0.465335,
++          "y": 0.591057,
++          "z_index": 2
++        },
++        {
++          "label": "RIGHT HIP",
++          "x": 0.458333,
++          "y": 0.583333,
++          "z_index": 8
++        },
++        {
++          "label": "RIGHT KNEE",
++          "x": 0.488722,
++          "y": 0.737831,
++          "z_index": 8
++        },
++        {
++          "label": "RIGHT LEG",
++          "x": 0.369792,
++          "y": 0.756944,
++          "z_index": 8
++        },
++        {
++          "label": "LEFT HIP",
++          "x": 0.447917,
++          "y": 0.583333,
++          "z_index": 2
++        },
++        {
++          "label": "LEFT KNEE",
++          "x": 0.557873,
++          "y": 0.646716,
++          "z_index": 2
++        },
++        {
++          "label": "LEFT LEG",
++          "x": 0.520833,
++          "y": 0.798611,
++          "z_index": 2
++        },
++        {
++          "label": "RIGHT EYE",
++          "x": 0.524686,
++          "y": 0.332592,
++          "z_index": 8
++        },
++        {
++          "label": "LEFT EYE",
++          "x": 0.529895,
++          "y": 0.332592,
++          "z_index": 2
++        },
++        {
++          "label": "RIGHT EAR",
++          "x": 0.498645,
++          "y": 0.339536,
++          "z_index": 8
++        },
++        {
++          "label": "LEFT EAR",
++          "x": 0.503853,
++          "y": 0.339536,
++          "z_index": 2
++        }
++      ],
++      [
++        {
++          "label": "NOSE",
++          "x": 0.587186,
++          "y": 0.402036,
++          "z_index": 5
++        },
++        {
++          "label": "NECK",
++          "x": 0.555936,
++          "y": 0.464536,
++          "z_index": 5
++        },
++        {
++          "label": "RIGHT SHOULDER",
++          "x": 0.563749,
++          "y": 0.492314,
++          "z_index": 8
++        },
++        {
++          "label": "RIGHT ELBOW",
++          "x": 0.631576,
++          "y": 0.568199,
++          "z_index": 8
++        },
++        {
++          "label": "RIGHT ARM",
++          "x": 0.678446,
++          "y": 0.493722,
++          "z_index": 8
++        },
++        {
++          "label": "LEFT SHOULDER",
++          "x": 0.548124,
++          "y": 0.492314,
++          "z_index": 2
++        },
++        {
++          "label": "LEFT ELBOW",
++          "x": 0.480297,
++          "y": 0.568199,
++          "z_index": 2
++        },
++        {
++          "label": "LEFT ARM",
++          "x": 0.527167,
++          "y": 0.642675,
++          "z_index": 2
++        },
++        {
++          "label": "RIGHT HIP",
++          "x": 0.510417,
++          "y": 0.631944,
++          "z_index": 8
++        },
++        {
++          "label": "RIGHT KNEE",
++          "x": 0.557214,
++          "y": 0.778975,
++          "z_index": 8
++        },
++        {
++          "label": "RIGHT LEG",
++          "x": 0.4375,
++          "y": 0.784722,
++          "z_index": 8
++        },
++        {
++          "label": "LEFT HIP",
++          "x": 0.5,
++          "y": 0.631944,
++          "z_index": 2
++        },
++        {
++          "label": "LEFT KNEE",
++          "x": 0.59107,
++          "y": 0.735708,
++          "z_index": 2
++        },
++        {
++          "label": "LEFT LEG",
++          "x": 0.625,
++          "y": 0.888889,
++          "z_index": 2
++        },
++        {
++          "label": "RIGHT EYE",
++          "x": 0.57677,
++          "y": 0.381203,
++          "z_index": 8
++        },
++        {
++          "label": "LEFT EYE",
++          "x": 0.581978,
++          "y": 0.381203,
++          "z_index": 2
++        },
++        {
++          "label": "RIGHT EAR",
++          "x": 0.550728,
++          "y": 0.388147,
++          "z_index": 8
++        },
++        {
++          "label": "LEFT EAR",
++          "x": 0.555936,
++          "y": 0.388147,
++          "z_index": 2
++        }
++      ],
++      [
++        {
++          "label": "NOSE",
++          "x": 0.63927,
++          "y": 0.42287,
++          "z_index": 5
++        },
++        {
++          "label": "NECK",
++          "x": 0.60802,
++          "y": 0.48537,
++          "z_index": 5
++        },
++        {
++          "label": "RIGHT SHOULDER",
++          "x": 0.615832,
++          "y": 0.513147,
++          "z_index": 8
++        },
++        {
++          "label": "RIGHT ELBOW",
++          "x": 0.638748,
++          "y": 0.62718,
++          "z_index": 8
++        },
++        {
++          "label": "RIGHT ARM",
++          "x": 0.709181,
++          "y": 0.602017,
++          "z_index": 8
++        },
++        {
++          "label": "LEFT SHOULDER",
++          "x": 0.600207,
++          "y": 0.513147,
++          "z_index": 2
++        },
++        {
++          "label": "LEFT ELBOW",
++          "x": 0.577291,
++          "y": 0.62718,
++          "z_index": 2
++        },
++        {
++          "label": "LEFT ARM",
++          "x": 0.647723,
++          "y": 0.652343,
++          "z_index": 2
++        },
++        {
++          "label": "RIGHT HIP",
++          "x": 0.5625,
++          "y": 0.652778,
++          "z_index": 8
++        },
++        {
++          "label": "RIGHT KNEE",
++          "x": 0.570189,
++          "y": 0.812171,
++          "z_index": 8
++        },
++        {
++          "label": "RIGHT LEG",
++          "x": 0.479167,
++          "y": 0.708333,
++          "z_index": 8
++        },
++        {
++          "label": "LEFT HIP",
++          "x": 0.552083,
++          "y": 0.652778,
++          "z_index": 2
++        },
++        {
++          "label": "LEFT KNEE",
++          "x": 0.655101,
++          "y": 0.734291,
++          "z_index": 2
++        },
++        {
++          "label": "LEFT LEG",
++          "x": 0.625,
++          "y": 0.888889,
++          "z_index": 2
++        },
++        {
++          "label": "RIGHT EYE",
++          "x": 0.628853,
++          "y": 0.402036,
++          "z_index": 8
++        },
++        {
++          "label": "LEFT EYE",
++          "x": 0.634061,
++          "y": 0.402036,
++          "z_index": 2
++        },
++        {
++          "label": "RIGHT EAR",
++          "x": 0.602811,
++          "y": 0.408981,
++          "z_index": 8
++        },
++        {
++          "label": "LEFT EAR",
++          "x": 0.60802,
++          "y": 0.408981,
++          "z_index": 2
++        }
++      ],
++      [
++        {
++          "label": "NOSE",
++          "x": 0.691353,
++          "y": 0.36037,
++          "z_index": 5
++        },
++        {
++          "label": "NECK",
++          "x": 0.660103,
++          "y": 0.42287,
++          "z_index": 5
++        },
++        {
++          "label": "RIGHT SHOULDER",
++          "x": 0.667915,
++          "y": 0.450647,
++          "z_index": 8
++        },
++        {
++          "label": "RIGHT ELBOW",
++          "x": 0.623645,
++          "y": 0.552886,
++          "z_index": 8
++        },
++        {
++          "label": "RIGHT ARM",
++          "x": 0.686792,
++          "y": 0.601498,
++          "z_index": 8
++        },
++        {
++          "label": "LEFT SHOULDER",
++          "x": 0.65229,
++          "y": 0.450647,
++          "z_index": 2
++        },
++        {
++          "label": "LEFT ELBOW",
++          "x": 0.696561,
++          "y": 0.552886,
++          "z_index": 2
++        },
++        {
++          "label": "LEFT ARM",
++          "x": 0.759709,
++          "y": 0.504275,
++          "z_index": 2
++        },
++        {
++          "label": "RIGHT HIP",
++          "x": 0.614583,
++          "y": 0.590278,
++          "z_index": 8
++        },
++        {
++          "label": "RIGHT KNEE",
++          "x": 0.716118,
++          "y": 0.675034,
++          "z_index": 8
++        },
++        {
++          "label": "RIGHT LEG",
++          "x": 0.598958,
++          "y": 0.708333,
++          "z_index": 8
++        },
++        {
++          "label": "LEFT HIP",
++          "x": 0.604167,
++          "y": 0.590278,
++          "z_index": 2
++        },
++        {
++          "label": "LEFT KNEE",
++          "x": 0.655664,
++          "y": 0.734488,
++          "z_index": 2
++        },
++        {
++          "label": "LEFT LEG",
++          "x": 0.625,
++          "y": 0.888889,
++          "z_index": 2
++        },
++        {
++          "label": "RIGHT EYE",
++          "x": 0.680936,
++          "y": 0.339536,
++          "z_index": 8
++        },
++        {
++          "label": "LEFT EYE",
++          "x": 0.686145,
++          "y": 0.339536,
++          "z_index": 2
++        },
++        {
++          "label": "RIGHT EAR",
++          "x": 0.654895,
++          "y": 0.346481,
++          "z_index": 8
++        },
++        {
++          "label": "LEFT EAR",
++          "x": 0.660103,
++          "y": 0.346481,
++          "z_index": 2
++        }
++      ],
++      [
++        {
++          "label": "NOSE",
++          "x": 0.743436,
++          "y": 0.353425,
++          "z_index": 5
++        },
++        {
++          "label": "NECK",
++          "x": 0.712186,
++          "y": 0.415925,
++          "z_index": 5
++        },
++        {
++          "label": "RIGHT SHOULDER",
++          "x": 0.719999,
++          "y": 0.443703,
++          "z_index": 8
++        },
++        {
++          "label": "RIGHT ELBOW",
++          "x": 0.64747,
++          "y": 0.511417,
++          "z_index": 8
++        },
++        {
++          "label": "RIGHT ARM",
++          "x": 0.689293,
++          "y": 0.591057,
++          "z_index": 8
++        },
++        {
++          "label": "LEFT SHOULDER",
++          "x": 0.704374,
++          "y": 0.443703,
++          "z_index": 2
++        },
++        {
++          "label": "LEFT ELBOW",
++          "x": 0.776903,
++          "y": 0.511417,
++          "z_index": 2
++        },
++        {
++          "label": "LEFT ARM",
++          "x": 0.818726,
++          "y": 0.431777,
++          "z_index": 2
++        },
++        {
++          "label": "RIGHT HIP",
++          "x": 0.666667,
++          "y": 0.583333,
++          "z_index": 8
++        },
++        {
++          "label": "RIGHT KNEE",
++          "x": 0.775136,
++          "y": 0.651117,
++          "z_index": 8
++        },
++        {
++          "label": "RIGHT LEG",
++          "x": 0.729167,
++          "y": 0.798611,
++          "z_index": 8
++        },
++        {
++          "label": "LEFT HIP",
++          "x": 0.65625,
++          "y": 0.583333,
++          "z_index": 2
++        },
++        {
++          "label": "LEFT KNEE",
++          "x": 0.696642,
++          "y": 0.733702,
++          "z_index": 2
++        },
++        {
++          "label": "LEFT LEG",
++          "x": 0.578125,
++          "y": 0.756944,
++          "z_index": 2
++        },
++        {
++          "label": "RIGHT EYE",
++          "x": 0.73302,
++          "y": 0.332592,
++          "z_index": 8
++        },
++        {
++          "label": "LEFT EYE",
++          "x": 0.738228,
++          "y": 0.332592,
++          "z_index": 2
++        },
++        {
++          "label": "RIGHT EAR",
++          "x": 0.706978,
++          "y": 0.339536,
++          "z_index": 8
++        },
++        {
++          "label": "LEFT EAR",
++          "x": 0.712186,
++          "y": 0.339536,
++          "z_index": 2
++        }
++      ]
++    ]
++  }
++}
+diff --git a/game-src/action/jyaldi-v5/resume/run-skeleton.png b/game-src/action/jyaldi-v5/resume/run-skeleton.png
+new file mode 100644
+index 0000000000000000000000000000000000000000..86e864ea7cd906bd8caa9fb542043c2d848838ee
+GIT binary patch
+literal 26891
+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
+
+literal 0
+HcmV?d00001
+
+diff --git a/game-src/action/jyaldi-v5/resume/validation.json b/game-src/action/jyaldi-v5/resume/validation.json
+new file mode 100644
+index 00000000..11dc9485
+--- /dev/null
++++ b/game-src/action/jyaldi-v5/resume/validation.json
+@@ -0,0 +1,35 @@
++{
++  "status": "기하 검사 통과·그림 미생성·참조 가림 관절 검수 대기",
++  "network_calls": 0,
++  "paid_calls": 0,
++  "checks": [
++    {
++      "clip": "walk",
++      "frames": 8,
++      "all_18_unique": true,
++      "normalized_in_bounds": true,
++      "bone_lengths": true,
++      "stance_ankle_locked": true,
++      "knee_bends_forward": true,
++      "cycle_delta_x": 48,
++      "visual_review": "대기: 뼈대 검수이며 그림 합격 아님",
++      "max_joint_step_pixels": 16.492,
++      "loop_boundary_max_joint_step_pixels": 12.649,
++      "loop_boundary_no_larger_than_interior_step": true
++    },
++    {
++      "clip": "run",
++      "frames": 8,
++      "all_18_unique": true,
++      "normalized_in_bounds": true,
++      "bone_lengths": true,
++      "stance_ankle_locked": true,
++      "knee_bends_forward": true,
++      "cycle_delta_x": 80,
++      "visual_review": "대기: 뼈대 검수이며 그림 합격 아님",
++      "max_joint_step_pixels": 34.905,
++      "loop_boundary_max_joint_step_pixels": 23.854,
++      "loop_boundary_no_larger_than_interior_step": true
++    }
++  ]
++}
+diff --git a/game-src/action/jyaldi-v5/resume/walk-motion.json b/game-src/action/jyaldi-v5/resume/walk-motion.json
+new file mode 100644
+index 00000000..99f0acc2
+--- /dev/null
++++ b/game-src/action/jyaldi-v5/resume/walk-motion.json
+@@ -0,0 +1,671 @@
++{
++  "status": "설계 초안·엔진 미적용",
++  "frame_size": [
++    192,
++    144
++  ],
++  "anchor": [
++    57,
++    136
++  ],
++  "ankle_ground_y": 128,
++  "rendered_sole_target_y": 135,
++  "space": "root-motion; 지지발은 그림/세계 좌표에서 고정; 캐릭터 몸통이 그림 안에서 전진",
++  "current_engine_compatible": false,
++  "integration_contract": "주기 중 월드 루트를 별도로 계속 이동시키지 않음. 주기 끝에서 cycle_delta_x * 표시배율만 이동 후 0장으로. 현 엔진에 그대로 넣으면 이중 이동. 엔진 연결 검토 필요.",
++  "in_place_conversion_contract": "엔진 담당이 제자리 방식을 유지할 경우 원본을 삭제/수정하지 않고 별도 파생 팩에서 frame별 root_x를 뺀다. 세계 이동은 해당 delta에 맞춰야 지지발이 고정된다. 현재 균일 이동량 동기화만으로 접지 합격 주장 금지.",
++  "root_x": [
++    0,
++    6,
++    12,
++    18,
++    24,
++    30,
++    36,
++    42
++  ],
++  "cycle_delta_x": 48,
++  "phases": [
++    "근측 접촉",
++    "근측 체중 싣기",
++    "원측 통과",
++    "원측 발 내밀기",
++    "원측 접촉",
++    "원측 체중 싣기",
++    "근측 통과",
++    "근측 발 내밀기"
++  ],
++  "contact": [
++    [
++      "RIGHT",
++      "LEFT"
++    ],
++    [
++      "RIGHT"
++    ],
++    [
++      "RIGHT"
++    ],
++    [
++      "RIGHT"
++    ],
++    [
++      "LEFT",
++      "RIGHT"
++    ],
++    [
++      "LEFT"
++    ],
++    [
++      "LEFT"
++    ],
++    [
++      "LEFT"
++    ]
++  ],
++  "pixel_keypoints": [
++    {
++      "NECK": [
++        58.36073486231654,
++        60.03563209638108
++      ],
++      "RIGHT HIP": [
++        58,
++        86
++      ],
++      "LEFT HIP": [
++        56,
++        86
++      ],
++      "NOSE": [
++        64.36073486231655,
++        51.03563209638108
++      ],
++      "RIGHT EYE": [
++        62.36073486231655,
++        48.03563209638108
++      ],
++      "LEFT EYE": [
++        63.36073486231655,
++        48.03563209638108
++      ],
++      "RIGHT EAR": [
++        57.36073486231655,
++        49.03563209638108
++      ],
++      "LEFT EAR": [
++        58.36073486231655,
++        49.03563209638108
++      ],
++      "RIGHT SHOULDER": [
++        59.86073486231654,
++        64.03563209638108
++      ],
++      "RIGHT ELBOW": [
++        53.49242277424604,
++        79.79775762401647
++      ],
++      "RIGHT ARM": [
++        53.00382982041102,
++        93.7892292022838
++      ],
++      "RIGHT LEG": [
++        73,
++        128
++      ],
++      "RIGHT KNEE": [
++        70.8064461780672,
++        105.10484065069029
++      ],
++      "LEFT SHOULDER": [
++        56.86073486231654,
++        64.03563209638108
++      ],
++      "LEFT ELBOW": [
++        63.229046950387044,
++        79.79775762401647
++      ],
++      "LEFT ARM": [
++        72.59687543941106,
++        90.20178518069999
++      ],
++      "LEFT LEG": [
++        49,
++        128
++      ],
++      "LEFT KNEE": [
++        61.085027821894506,
++        108.43083797031575
++      ]
++    },
++    {
++      "NECK": [
++        64.36073486231653,
++        62.03563209638108
++      ],
++      "RIGHT HIP": [
++        64,
++        88
++      ],
++      "LEFT HIP": [
++        62,
++        88
++      ],
++      "NOSE": [
++        70.36073486231653,
++        53.03563209638108
++      ],
++      "RIGHT EYE": [
++        68.36073486231653,
++        50.03563209638108
++      ],
++      "LEFT EYE": [
++        69.36073486231653,
++        50.03563209638108
++      ],
++      "RIGHT EAR": [
++        63.360734862316534,
++        51.03563209638108
++      ],
++      "LEFT EAR": [
++        64.36073486231653,
++        51.03563209638108
++      ],
++      "RIGHT SHOULDER": [
++        65.86073486231653,
++        66.03563209638108
++      ],
++      "RIGHT ELBOW": [
++        62.32623611841463,
++        82.66414130885578
++      ],
++      "RIGHT ARM": [
++        64.27465953185555,
++        96.52789427123776
++      ],
++      "RIGHT LEG": [
++        73,
++        128
++      ],
++      "RIGHT KNEE": [
++        78.67397737298253,
++        105.71085509107893
++      ],
++      "LEFT SHOULDER": [
++        62.860734862316534,
++        66.03563209638108
++      ],
++      "LEFT ELBOW": [
++        66.39523360621844,
++        82.66414130885578
++      ],
++      "LEFT ARM": [
++        73.81410330548331,
++        94.53681465504573
++      ],
++      "LEFT LEG": [
++        58,
++        124
++      ],
++      "LEFT KNEE": [
++        74.09073385199666,
++        107.5656370946663
++      ]
++    },
++    {
++      "NECK": [
++        70.36073486231653,
++        59.03563209638108
++      ],
++      "RIGHT HIP": [
++        70,
++        85
++      ],
++      "LEFT HIP": [
++        68,
++        85
++      ],
++      "NOSE": [
++        76.36073486231653,
++        50.03563209638108
++      ],
++      "RIGHT EYE": [
++        74.36073486231653,
++        47.03563209638108
++      ],
++      "LEFT EYE": [
++        75.36073486231653,
++        47.03563209638108
++      ],
++      "RIGHT EAR": [
++        69.36073486231653,
++        48.03563209638108
++      ],
++      "LEFT EAR": [
++        70.36073486231653,
++        48.03563209638108
++      ],
++      "RIGHT SHOULDER": [
++        71.86073486231653,
++        63.03563209638108
++      ],
++      "RIGHT ELBOW": [
++        71.86073486231653,
++        80.03563209638108
++      ],
++      "RIGHT ARM": [
++        76.64901686887589,
++        93.1913287873838
++      ],
++      "RIGHT LEG": [
++        73,
++        128
++      ],
++      "RIGHT KNEE": [
++        79.51171437812417,
++        105.94104318292158
++      ],
++      "LEFT SHOULDER": [
++        68.86073486231653,
++        63.03563209638108
++      ],
++      "LEFT ELBOW": [
++        68.86073486231653,
++        80.03563209638108
++      ],
++      "LEFT ARM": [
++        73.64901686887589,
++        93.1913287873838
++      ],
++      "LEFT LEG": [
++        69,
++        120
++      ],
++      "LEFT KNEE": [
++        83.41034927483435,
++        102.07399002071902
++      ]
++    },
++    {
++      "NECK": [
++        76.36073486231653,
++        59.03563209638108
++      ],
++      "RIGHT HIP": [
++        76,
++        85
++      ],
++      "LEFT HIP": [
++        74,
++        85
++      ],
++      "NOSE": [
++        82.36073486231653,
++        50.03563209638108
++      ],
++      "RIGHT EYE": [
++        80.36073486231653,
++        47.03563209638108
++      ],
++      "LEFT EYE": [
++        81.36073486231653,
++        47.03563209638108
++      ],
++      "RIGHT EAR": [
++        75.36073486231653,
++        48.03563209638108
++      ],
++      "LEFT EAR": [
++        76.36073486231653,
++        48.03563209638108
++      ],
++      "RIGHT SHOULDER": [
++        77.86073486231653,
++        63.03563209638108
++      ],
++      "RIGHT ELBOW": [
++        81.39523360621844,
++        79.66414130885578
++      ],
++      "RIGHT ARM": [
++        88.81410330548331,
++        91.53681465504573
++      ],
++      "RIGHT LEG": [
++        73,
++        128
++      ],
++      "RIGHT KNEE": [
++        82.51171437812417,
++        107.05895681707842
++      ],
++      "LEFT SHOULDER": [
++        74.86073486231653,
++        63.03563209638108
++      ],
++      "LEFT ELBOW": [
++        71.32623611841463,
++        79.66414130885578
++      ],
++      "LEFT ARM": [
++        73.27465953185555,
++        93.52789427123776
++      ],
++      "LEFT LEG": [
++        85,
++        124
++      ],
++      "LEFT KNEE": [
++        89.97700631805434,
++        101.5449469359334
++      ]
++    },
++    {
++      "NECK": [
++        82.36073486231653,
++        60.03563209638108
++      ],
++      "RIGHT HIP": [
++        82,
++        86
++      ],
++      "LEFT HIP": [
++        80,
++        86
++      ],
++      "NOSE": [
++        88.36073486231653,
++        51.03563209638108
++      ],
++      "RIGHT EYE": [
++        86.36073486231653,
++        48.03563209638108
++      ],
++      "LEFT EYE": [
++        87.36073486231653,
++        48.03563209638108
++      ],
++      "RIGHT EAR": [
++        81.36073486231653,
++        49.03563209638108
++      ],
++      "LEFT EAR": [
++        82.36073486231653,
++        49.03563209638108
++      ],
++      "RIGHT SHOULDER": [
++        83.86073486231653,
++        64.03563209638108
++      ],
++      "RIGHT ELBOW": [
++        90.22904695038704,
++        79.79775762401647
++      ],
++      "RIGHT ARM": [
++        99.59687543941106,
++        90.20178518069999
++      ],
++      "RIGHT LEG": [
++        73,
++        128
++      ],
++      "RIGHT KNEE": [
++        85.54832962521402,
++        108.72464206254585
++      ],
++      "LEFT SHOULDER": [
++        80.86073486231653,
++        64.03563209638108
++      ],
++      "LEFT ELBOW": [
++        74.49242277424602,
++        79.79775762401647
++      ],
++      "LEFT ARM": [
++        74.00382982041101,
++        93.7892292022838
++      ],
++      "LEFT LEG": [
++        97,
++        128
++      ],
++      "LEFT KNEE": [
++        92.17870611955847,
++        105.51099990398824
++      ]
++    },
++    {
++      "NECK": [
++        88.36073486231653,
++        62.03563209638108
++      ],
++      "RIGHT HIP": [
++        88,
++        88
++      ],
++      "LEFT HIP": [
++        86,
++        88
++      ],
++      "NOSE": [
++        94.36073486231653,
++        53.03563209638108
++      ],
++      "RIGHT EYE": [
++        92.36073486231653,
++        50.03563209638108
++      ],
++      "LEFT EYE": [
++        93.36073486231653,
++        50.03563209638108
++      ],
++      "RIGHT EAR": [
++        87.36073486231653,
++        51.03563209638108
++      ],
++      "LEFT EAR": [
++        88.36073486231653,
++        51.03563209638108
++      ],
++      "RIGHT SHOULDER": [
++        89.86073486231653,
++        66.03563209638108
++      ],
++      "RIGHT ELBOW": [
++        93.39523360621844,
++        82.66414130885578
++      ],
++      "RIGHT ARM": [
++        100.81410330548331,
++        94.53681465504573
++      ],
++      "RIGHT LEG": [
++        82,
++        124
++      ],
++      "RIGHT KNEE": [
++        98.80951493365001,
++        108.301585822275
++      ],
++      "LEFT SHOULDER": [
++        86.86073486231653,
++        66.03563209638108
++      ],
++      "LEFT ELBOW": [
++        83.32623611841463,
++        82.66414130885578
++      ],
++      "LEFT ARM": [
++        85.27465953185555,
++        96.52789427123776
++      ],
++      "LEFT LEG": [
++        97,
++        128
++      ],
++      "LEFT KNEE": [
++        101.08160158333675,
++        105.3650595645824
++      ]
++    },
++    {
++      "NECK": [
++        94.36073486231653,
++        59.03563209638108
++      ],
++      "RIGHT HIP": [
++        94,
++        85
++      ],
++      "LEFT HIP": [
++        92,
++        85
++      ],
++      "NOSE": [
++        100.36073486231653,
++        50.03563209638108
++      ],
++      "RIGHT EYE": [
++        98.36073486231653,
++        47.03563209638108
++      ],
++      "LEFT EYE": [
++        99.36073486231653,
++        47.03563209638108
++      ],
++      "RIGHT EAR": [
++        93.36073486231653,
++        48.03563209638108
++      ],
++      "LEFT EAR": [
++        94.36073486231653,
++        48.03563209638108
++      ],
++      "RIGHT SHOULDER": [
++        95.86073486231653,
++        63.03563209638108
++      ],
++      "RIGHT ELBOW": [
++        95.86073486231653,
++        80.03563209638108
++      ],
++      "RIGHT ARM": [
++        100.64901686887589,
++        93.1913287873838
++      ],
++      "RIGHT LEG": [
++        93,
++        120
++      ],
++      "RIGHT KNEE": [
++        108.41034927483435,
++        102.92600997928098
++      ],
++      "LEFT SHOULDER": [
++        92.86073486231653,
++        63.03563209638108
++      ],
++      "LEFT ELBOW": [
++        92.86073486231653,
++        80.03563209638108
++      ],
++      "LEFT ARM": [
++        97.64901686887589,
++        93.1913287873838
++      ],
++      "LEFT LEG": [
++        97,
++        128
++      ],
++      "LEFT KNEE": [
++        102.22611822855028,
++        105.6016141594709
++      ]
++    },
++    {
++      "NECK": [
++        100.36073486231653,
++        59.03563209638108
++      ],
++      "RIGHT HIP": [
++        100,
++        85
++      ],
++      "LEFT HIP": [
++        98,
++        85
++      ],
++      "NOSE": [
++        106.36073486231653,
++        50.03563209638108
++      ],
++      "RIGHT EYE": [
++        104.36073486231653,
++        47.03563209638108
++      ],
++      "LEFT EYE": [
++        105.36073486231653,
++        47.03563209638108
++      ],
++      "RIGHT EAR": [
++        99.36073486231653,
++        48.03563209638108
++      ],
++      "LEFT EAR": [
++        100.36073486231653,
++        48.03563209638108
++      ],
++      "RIGHT SHOULDER": [
++        101.86073486231653,
++        63.03563209638108
++      ],
++      "RIGHT ELBOW": [
++        98.32623611841463,
++        79.66414130885578
++      ],
++      "RIGHT ARM": [
++        100.27465953185555,
++        93.52789427123776
++      ],
++      "RIGHT LEG": [
++        109,
++        124
++      ],
++      "RIGHT KNEE": [
++        115.54548817340202,
++        101.95104119075339
++      ],
++      "LEFT SHOULDER": [
++        98.86073486231653,
++        63.03563209638108
++      ],
++      "LEFT ELBOW": [
++        102.39523360621844,
++        79.66414130885578
++      ],
++      "LEFT ARM": [
++        109.81410330548331,
++        91.53681465504573
++      ],
++      "LEFT LEG": [
++        97,
++        128
++      ],
++      "LEFT KNEE": [
++        105.65254892987794,
++        106.68959416115995
++      ]
++    }
++  ],
++  "frame_duration_ms": [
++    100,
++    100,
++    100,
++    100,
++    100,
++    100,
++    100,
++    100
++  ],
++  "loop_boundary": "07→다음00은 root cycle_delta_x를 더해 검사. 중복 08 프레임 생성하지 않음."
++}
+diff --git a/game-src/action/jyaldi-v5/resume/walk-request.draft.json b/game-src/action/jyaldi-v5/resume/walk-request.draft.json
+new file mode 100644
+index 00000000..ed2a0c2b
+--- /dev/null
++++ b/game-src/action/jyaldi-v5/resume/walk-request.draft.json
+@@ -0,0 +1,1011 @@
++{
++  "status": "미제출·미생성·시각 검수 대기",
++  "tool": "animate_with_skeleton_v3",
++  "quoted_generations": 3,
++  "quoted_at": "2026-10-22",
++  "quote_source": "공개 PixelLab MCP tools/list: 4~14장=3회, parent가 이번 세션 조회",
++  "job_id": null,
++  "actual_cost": null,
++  "arguments": {
++    "description": "adult woman agent, long straight black hair, red eyes, blue-grey shaded black suit with a hip-length jacket, white shirt, black tie, black gloves, black shoes, right hip holster, identical proportions and palette to reference, character only",
++    "action": "walking forward, alternating opposite arms and legs",
++    "direction": "east",
++    "view": "side",
++    "template_id": "mannequin",
++    "no_background": true,
++    "seed": 1022,
++    "first_frame_url": "https://raw.githubusercontent.com/leepc25/goei-plugin/0a13285205b77fd6cf33b966cea246efa0d3082e/game-src/action/jyaldi-v5/full/clips/guard/00.png",
++    "first_frame_keypoints": [
++      {
++        "label": "NOSE",
++        "x": 0.338542,
++        "y": 0.381944,
++        "z_index": 5
++      },
++      {
++        "label": "NECK",
++        "x": 0.3125,
++        "y": 0.430556,
++        "z_index": 5
++      },
++      {
++        "label": "RIGHT SHOULDER",
++        "x": 0.322917,
++        "y": 0.451389,
++        "z_index": 8
++      },
++      {
++        "label": "RIGHT ELBOW",
++        "x": 0.401042,
++        "y": 0.527778,
++        "z_index": 8
++      },
++      {
++        "label": "RIGHT ARM",
++        "x": 0.40625,
++        "y": 0.444444,
++        "z_index": 8
++      },
++      {
++        "label": "LEFT SHOULDER",
++        "x": 0.302083,
++        "y": 0.444444,
++        "z_index": 2
++      },
++      {
++        "label": "LEFT ELBOW",
++        "x": 0.338542,
++        "y": 0.5,
++        "z_index": 2
++      },
++      {
++        "label": "LEFT ARM",
++        "x": 0.359375,
++        "y": 0.423611,
++        "z_index": 2
++      },
++      {
++        "label": "RIGHT HIP",
++        "x": 0.302083,
++        "y": 0.631944,
++        "z_index": 8
++      },
++      {
++        "label": "RIGHT KNEE",
++        "x": 0.385417,
++        "y": 0.729167,
++        "z_index": 8
++      },
++      {
++        "label": "RIGHT LEG",
++        "x": 0.354167,
++        "y": 0.895833,
++        "z_index": 8
++      },
++      {
++        "label": "LEFT HIP",
++        "x": 0.28125,
++        "y": 0.638889,
++        "z_index": 2
++      },
++      {
++        "label": "LEFT KNEE",
++        "x": 0.296875,
++        "y": 0.75,
++        "z_index": 2
++      },
++      {
++        "label": "LEFT LEG",
++        "x": 0.223958,
++        "y": 0.895833,
++        "z_index": 2
++      },
++      {
++        "label": "RIGHT EYE",
++        "x": 0.328125,
++        "y": 0.361111,
++        "z_index": 8
++      },
++      {
++        "label": "LEFT EYE",
++        "x": 0.338542,
++        "y": 0.361111,
++        "z_index": 2
++      },
++      {
++        "label": "RIGHT EAR",
++        "x": 0.302083,
++        "y": 0.375,
++        "z_index": 8
++      },
++      {
++        "label": "LEFT EAR",
++        "x": 0.307292,
++        "y": 0.368056,
++        "z_index": 2
++      }
++    ],
++    "keypoints": [
++      [
++        {
++          "label": "NOSE",
++          "x": 0.335212,
++          "y": 0.354414,
++          "z_index": 5
++        },
++        {
++          "label": "NECK",
++          "x": 0.303962,
++          "y": 0.416914,
++          "z_index": 5
++        },
++        {
++          "label": "RIGHT SHOULDER",
++          "x": 0.311775,
++          "y": 0.444692,
++          "z_index": 8
++        },
++        {
++          "label": "RIGHT ELBOW",
++          "x": 0.278606,
++          "y": 0.554151,
++          "z_index": 8
++        },
++        {
++          "label": "RIGHT ARM",
++          "x": 0.276062,
++          "y": 0.651314,
++          "z_index": 8
++        },
++        {
++          "label": "LEFT SHOULDER",
++          "x": 0.29615,
++          "y": 0.444692,
++          "z_index": 2
++        },
++        {
++          "label": "LEFT ELBOW",
++          "x": 0.329318,
++          "y": 0.554151,
++          "z_index": 2
++        },
++        {
++          "label": "LEFT ARM",
++          "x": 0.378109,
++          "y": 0.626401,
++          "z_index": 2
++        },
++        {
++          "label": "RIGHT HIP",
++          "x": 0.302083,
++          "y": 0.597222,
++          "z_index": 8
++        },
++        {
++          "label": "RIGHT KNEE",
++          "x": 0.368784,
++          "y": 0.729895,
++          "z_index": 8
++        },
++        {
++          "label": "RIGHT LEG",
++          "x": 0.380208,
++          "y": 0.888889,
++          "z_index": 8
++        },
++        {
++          "label": "LEFT HIP",
++          "x": 0.291667,
++          "y": 0.597222,
++          "z_index": 2
++        },
++        {
++          "label": "LEFT KNEE",
++          "x": 0.318151,
++          "y": 0.752992,
++          "z_index": 2
++        },
++        {
++          "label": "LEFT LEG",
++          "x": 0.255208,
++          "y": 0.888889,
++          "z_index": 2
++        },
++        {
++          "label": "RIGHT EYE",
++          "x": 0.324795,
++          "y": 0.333581,
++          "z_index": 8
++        },
++        {
++          "label": "LEFT EYE",
++          "x": 0.330004,
++          "y": 0.333581,
++          "z_index": 2
++        },
++        {
++          "label": "RIGHT EAR",
++          "x": 0.298754,
++          "y": 0.340525,
++          "z_index": 8
++        },
++        {
++          "label": "LEFT EAR",
++          "x": 0.303962,
++          "y": 0.340525,
++          "z_index": 2
++        }
++      ],
++      [
++        {
++          "label": "NOSE",
++          "x": 0.366462,
++          "y": 0.368303,
++          "z_index": 5
++        },
++        {
++          "label": "NECK",
++          "x": 0.335212,
++          "y": 0.430803,
++          "z_index": 5
++        },
++        {
++          "label": "RIGHT SHOULDER",
++          "x": 0.343025,
++          "y": 0.458581,
++          "z_index": 8
++        },
++        {
++          "label": "RIGHT ELBOW",
++          "x": 0.324616,
++          "y": 0.574057,
++          "z_index": 8
++        },
++        {
++          "label": "RIGHT ARM",
++          "x": 0.334764,
++          "y": 0.670333,
++          "z_index": 8
++        },
++        {
++          "label": "LEFT SHOULDER",
++          "x": 0.3274,
++          "y": 0.458581,
++          "z_index": 2
++        },
++        {
++          "label": "LEFT ELBOW",
++          "x": 0.345809,
++          "y": 0.574057,
++          "z_index": 2
++        },
++        {
++          "label": "LEFT ARM",
++          "x": 0.384448,
++          "y": 0.656506,
++          "z_index": 2
++        },
++        {
++          "label": "RIGHT HIP",
++          "x": 0.333333,
++          "y": 0.611111,
++          "z_index": 8
++        },
++        {
++          "label": "RIGHT KNEE",
++          "x": 0.40976,
++          "y": 0.734103,
++          "z_index": 8
++        },
++        {
++          "label": "RIGHT LEG",
++          "x": 0.380208,
++          "y": 0.888889,
++          "z_index": 8
++        },
++        {
++          "label": "LEFT HIP",
++          "x": 0.322917,
++          "y": 0.611111,
++          "z_index": 2
++        },
++        {
++          "label": "LEFT KNEE",
++          "x": 0.385889,
++          "y": 0.746984,
++          "z_index": 2
++        },
++        {
++          "label": "LEFT LEG",
++          "x": 0.302083,
++          "y": 0.861111,
++          "z_index": 2
++        },
++        {
++          "label": "RIGHT EYE",
++          "x": 0.356045,
++          "y": 0.34747,
++          "z_index": 8
++        },
++        {
++          "label": "LEFT EYE",
++          "x": 0.361254,
++          "y": 0.34747,
++          "z_index": 2
++        },
++        {
++          "label": "RIGHT EAR",
++          "x": 0.330004,
++          "y": 0.354414,
++          "z_index": 8
++        },
++        {
++          "label": "LEFT EAR",
++          "x": 0.335212,
++          "y": 0.354414,
++          "z_index": 2
++        }
++      ],
++      [
++        {
++          "label": "NOSE",
++          "x": 0.397712,
++          "y": 0.34747,
++          "z_index": 5
++        },
++        {
++          "label": "NECK",
++          "x": 0.366462,
++          "y": 0.40997,
++          "z_index": 5
++        },
++        {
++          "label": "RIGHT SHOULDER",
++          "x": 0.374275,
++          "y": 0.437747,
++          "z_index": 8
++        },
++        {
++          "label": "RIGHT ELBOW",
++          "x": 0.374275,
++          "y": 0.555803,
++          "z_index": 8
++        },
++        {
++          "label": "RIGHT ARM",
++          "x": 0.399214,
++          "y": 0.647162,
++          "z_index": 8
++        },
++        {
++          "label": "LEFT SHOULDER",
++          "x": 0.35865,
++          "y": 0.437747,
++          "z_index": 2
++        },
++        {
++          "label": "LEFT ELBOW",
++          "x": 0.35865,
++          "y": 0.555803,
++          "z_index": 2
++        },
++        {
++          "label": "LEFT ARM",
++          "x": 0.383589,
++          "y": 0.647162,
++          "z_index": 2
++        },
++        {
++          "label": "RIGHT HIP",
++          "x": 0.364583,
++          "y": 0.590278,
++          "z_index": 8
++        },
++        {
++          "label": "RIGHT KNEE",
++          "x": 0.414124,
++          "y": 0.735702,
++          "z_index": 8
++        },
++        {
++          "label": "RIGHT LEG",
++          "x": 0.380208,
++          "y": 0.888889,
++          "z_index": 8
++        },
++        {
++          "label": "LEFT HIP",
++          "x": 0.354167,
++          "y": 0.590278,
++          "z_index": 2
++        },
++        {
++          "label": "LEFT KNEE",
++          "x": 0.434429,
++          "y": 0.708847,
++          "z_index": 2
++        },
++        {
++          "label": "LEFT LEG",
++          "x": 0.359375,
++          "y": 0.833333,
++          "z_index": 2
++        },
++        {
++          "label": "RIGHT EYE",
++          "x": 0.387295,
++          "y": 0.326636,
++          "z_index": 8
++        },
++        {
++          "label": "LEFT EYE",
++          "x": 0.392504,
++          "y": 0.326636,
++          "z_index": 2
++        },
++        {
++          "label": "RIGHT EAR",
++          "x": 0.361254,
++          "y": 0.333581,
++          "z_index": 8
++        },
++        {
++          "label": "LEFT EAR",
++          "x": 0.366462,
++          "y": 0.333581,
++          "z_index": 2
++        }
++      ],
++      [
++        {
++          "label": "NOSE",
++          "x": 0.428962,
++          "y": 0.34747,
++          "z_index": 5
++        },
++        {
++          "label": "NECK",
++          "x": 0.397712,
++          "y": 0.40997,
++          "z_index": 5
++        },
++        {
++          "label": "RIGHT SHOULDER",
++          "x": 0.405525,
++          "y": 0.437747,
++          "z_index": 8
++        },
++        {
++          "label": "RIGHT ELBOW",
++          "x": 0.423934,
++          "y": 0.553223,
++          "z_index": 8
++        },
++        {
++          "label": "RIGHT ARM",
++          "x": 0.462573,
++          "y": 0.635672,
++          "z_index": 8
++        },
++        {
++          "label": "LEFT SHOULDER",
++          "x": 0.3899,
++          "y": 0.437747,
++          "z_index": 2
++        },
++        {
++          "label": "LEFT ELBOW",
++          "x": 0.371491,
++          "y": 0.553223,
++          "z_index": 2
++        },
++        {
++          "label": "LEFT ARM",
++          "x": 0.381639,
++          "y": 0.649499,
++          "z_index": 2
++        },
++        {
++          "label": "RIGHT HIP",
++          "x": 0.395833,
++          "y": 0.590278,
++          "z_index": 8
++        },
++        {
++          "label": "RIGHT KNEE",
++          "x": 0.429749,
++          "y": 0.743465,
++          "z_index": 8
++        },
++        {
++          "label": "RIGHT LEG",
++          "x": 0.380208,
++          "y": 0.888889,
++          "z_index": 8
++        },
++        {
++          "label": "LEFT HIP",
++          "x": 0.385417,
++          "y": 0.590278,
++          "z_index": 2
++        },
++        {
++          "label": "LEFT KNEE",
++          "x": 0.46863,
++          "y": 0.705173,
++          "z_index": 2
++        },
++        {
++          "label": "LEFT LEG",
++          "x": 0.442708,
++          "y": 0.861111,
++          "z_index": 2
++        },
++        {
++          "label": "RIGHT EYE",
++          "x": 0.418545,
++          "y": 0.326636,
++          "z_index": 8
++        },
++        {
++          "label": "LEFT EYE",
++          "x": 0.423754,
++          "y": 0.326636,
++          "z_index": 2
++        },
++        {
++          "label": "RIGHT EAR",
++          "x": 0.392504,
++          "y": 0.333581,
++          "z_index": 8
++        },
++        {
++          "label": "LEFT EAR",
++          "x": 0.397712,
++          "y": 0.333581,
++          "z_index": 2
++        }
++      ],
++      [
++        {
++          "label": "NOSE",
++          "x": 0.460212,
++          "y": 0.354414,
++          "z_index": 5
++        },
++        {
++          "label": "NECK",
++          "x": 0.428962,
++          "y": 0.416914,
++          "z_index": 5
++        },
++        {
++          "label": "RIGHT SHOULDER",
++          "x": 0.436775,
++          "y": 0.444692,
++          "z_index": 8
++        },
++        {
++          "label": "RIGHT ELBOW",
++          "x": 0.469943,
++          "y": 0.554151,
++          "z_index": 8
++        },
++        {
++          "label": "RIGHT ARM",
++          "x": 0.518734,
++          "y": 0.626401,
++          "z_index": 8
++        },
++        {
++          "label": "LEFT SHOULDER",
++          "x": 0.42115,
++          "y": 0.444692,
++          "z_index": 2
++        },
++        {
++          "label": "LEFT ELBOW",
++          "x": 0.387981,
++          "y": 0.554151,
++          "z_index": 2
++        },
++        {
++          "label": "LEFT ARM",
++          "x": 0.385437,
++          "y": 0.651314,
++          "z_index": 2
++        },
++        {
++          "label": "RIGHT HIP",
++          "x": 0.427083,
++          "y": 0.597222,
++          "z_index": 8
++        },
++        {
++          "label": "RIGHT KNEE",
++          "x": 0.445564,
++          "y": 0.755032,
++          "z_index": 8
++        },
++        {
++          "label": "RIGHT LEG",
++          "x": 0.380208,
++          "y": 0.888889,
++          "z_index": 8
++        },
++        {
++          "label": "LEFT HIP",
++          "x": 0.416667,
++          "y": 0.597222,
++          "z_index": 2
++        },
++        {
++          "label": "LEFT KNEE",
++          "x": 0.480097,
++          "y": 0.732715,
++          "z_index": 2
++        },
++        {
++          "label": "LEFT LEG",
++          "x": 0.505208,
++          "y": 0.888889,
++          "z_index": 2
++        },
++        {
++          "label": "RIGHT EYE",
++          "x": 0.449795,
++          "y": 0.333581,
++          "z_index": 8
++        },
++        {
++          "label": "LEFT EYE",
++          "x": 0.455004,
++          "y": 0.333581,
++          "z_index": 2
++        },
++        {
++          "label": "RIGHT EAR",
++          "x": 0.423754,
++          "y": 0.340525,
++          "z_index": 8
++        },
++        {
++          "label": "LEFT EAR",
++          "x": 0.428962,
++          "y": 0.340525,
++          "z_index": 2
++        }
++      ],
++      [
++        {
++          "label": "NOSE",
++          "x": 0.491462,
++          "y": 0.368303,
++          "z_index": 5
++        },
++        {
++          "label": "NECK",
++          "x": 0.460212,
++          "y": 0.430803,
++          "z_index": 5
++        },
++        {
++          "label": "RIGHT SHOULDER",
++          "x": 0.468025,
++          "y": 0.458581,
++          "z_index": 8
++        },
++        {
++          "label": "RIGHT ELBOW",
++          "x": 0.486434,
++          "y": 0.574057,
++          "z_index": 8
++        },
++        {
++          "label": "RIGHT ARM",
++          "x": 0.525073,
++          "y": 0.656506,
++          "z_index": 8
++        },
++        {
++          "label": "LEFT SHOULDER",
++          "x": 0.4524,
++          "y": 0.458581,
++          "z_index": 2
++        },
++        {
++          "label": "LEFT ELBOW",
++          "x": 0.433991,
++          "y": 0.574057,
++          "z_index": 2
++        },
++        {
++          "label": "LEFT ARM",
++          "x": 0.444139,
++          "y": 0.670333,
++          "z_index": 2
++        },
++        {
++          "label": "RIGHT HIP",
++          "x": 0.458333,
++          "y": 0.611111,
++          "z_index": 8
++        },
++        {
++          "label": "RIGHT KNEE",
++          "x": 0.514633,
++          "y": 0.752094,
++          "z_index": 8
++        },
++        {
++          "label": "RIGHT LEG",
++          "x": 0.427083,
++          "y": 0.861111,
++          "z_index": 8
++        },
++        {
++          "label": "LEFT HIP",
++          "x": 0.447917,
++          "y": 0.611111,
++          "z_index": 2
++        },
++        {
++          "label": "LEFT KNEE",
++          "x": 0.526467,
++          "y": 0.731702,
++          "z_index": 2
++        },
++        {
++          "label": "LEFT LEG",
++          "x": 0.505208,
++          "y": 0.888889,
++          "z_index": 2
++        },
++        {
++          "label": "RIGHT EYE",
++          "x": 0.481045,
++          "y": 0.34747,
++          "z_index": 8
++        },
++        {
++          "label": "LEFT EYE",
++          "x": 0.486254,
++          "y": 0.34747,
++          "z_index": 2
++        },
++        {
++          "label": "RIGHT EAR",
++          "x": 0.455004,
++          "y": 0.354414,
++          "z_index": 8
++        },
++        {
++          "label": "LEFT EAR",
++          "x": 0.460212,
++          "y": 0.354414,
++          "z_index": 2
++        }
++      ],
++      [
++        {
++          "label": "NOSE",
++          "x": 0.522712,
++          "y": 0.34747,
++          "z_index": 5
++        },
++        {
++          "label": "NECK",
++          "x": 0.491462,
++          "y": 0.40997,
++          "z_index": 5
++        },
++        {
++          "label": "RIGHT SHOULDER",
++          "x": 0.499275,
++          "y": 0.437747,
++          "z_index": 8
++        },
++        {
++          "label": "RIGHT ELBOW",
++          "x": 0.499275,
++          "y": 0.555803,
++          "z_index": 8
++        },
++        {
++          "label": "RIGHT ARM",
++          "x": 0.524214,
++          "y": 0.647162,
++          "z_index": 8
++        },
++        {
++          "label": "LEFT SHOULDER",
++          "x": 0.48365,
++          "y": 0.437747,
++          "z_index": 2
++        },
++        {
++          "label": "LEFT ELBOW",
++          "x": 0.48365,
++          "y": 0.555803,
++          "z_index": 2
++        },
++        {
++          "label": "LEFT ARM",
++          "x": 0.508589,
++          "y": 0.647162,
++          "z_index": 2
++        },
++        {
++          "label": "RIGHT HIP",
++          "x": 0.489583,
++          "y": 0.590278,
++          "z_index": 8
++        },
++        {
++          "label": "RIGHT KNEE",
++          "x": 0.564637,
++          "y": 0.714764,
++          "z_index": 8
++        },
++        {
++          "label": "RIGHT LEG",
++          "x": 0.484375,
++          "y": 0.833333,
++          "z_index": 8
++        },
++        {
++          "label": "LEFT HIP",
++          "x": 0.479167,
++          "y": 0.590278,
++          "z_index": 2
++        },
++        {
++          "label": "LEFT KNEE",
++          "x": 0.532428,
++          "y": 0.733345,
++          "z_index": 2
++        },
++        {
++          "label": "LEFT LEG",
++          "x": 0.505208,
++          "y": 0.888889,
++          "z_index": 2
++        },
++        {
++          "label": "RIGHT EYE",
++          "x": 0.512295,
++          "y": 0.326636,
++          "z_index": 8
++        },
++        {
++          "label": "LEFT EYE",
++          "x": 0.517504,
++          "y": 0.326636,
++          "z_index": 2
++        },
++        {
++          "label": "RIGHT EAR",
++          "x": 0.486254,
++          "y": 0.333581,
++          "z_index": 8
++        },
++        {
++          "label": "LEFT EAR",
++          "x": 0.491462,
++          "y": 0.333581,
++          "z_index": 2
++        }
++      ],
++      [
++        {
++          "label": "NOSE",
++          "x": 0.553962,
++          "y": 0.34747,
++          "z_index": 5
++        },
++        {
++          "label": "NECK",
++          "x": 0.522712,
++          "y": 0.40997,
++          "z_index": 5
++        },
++        {
++          "label": "RIGHT SHOULDER",
++          "x": 0.530525,
++          "y": 0.437747,
++          "z_index": 8
++        },
++        {
++          "label": "RIGHT ELBOW",
++          "x": 0.512116,
++          "y": 0.553223,
++          "z_index": 8
++        },
++        {
++          "label": "RIGHT ARM",
++          "x": 0.522264,
++          "y": 0.649499,
++          "z_index": 8
++        },
++        {
++          "label": "LEFT SHOULDER",
++          "x": 0.5149,
++          "y": 0.437747,
++          "z_index": 2
++        },
++        {
++          "label": "LEFT ELBOW",
++          "x": 0.533309,
++          "y": 0.553223,
++          "z_index": 2
++        },
++        {
++          "label": "LEFT ARM",
++          "x": 0.571948,
++          "y": 0.635672,
++          "z_index": 2
++        },
++        {
++          "label": "RIGHT HIP",
++          "x": 0.520833,
++          "y": 0.590278,
++          "z_index": 8
++        },
++        {
++          "label": "RIGHT KNEE",
++          "x": 0.601799,
++          "y": 0.707993,
++          "z_index": 8
++        },
++        {
++          "label": "RIGHT LEG",
++          "x": 0.567708,
++          "y": 0.861111,
++          "z_index": 8
++        },
++        {
++          "label": "LEFT HIP",
++          "x": 0.510417,
++          "y": 0.590278,
++          "z_index": 2
++        },
++        {
++          "label": "LEFT KNEE",
++          "x": 0.550274,
++          "y": 0.7409,
++          "z_index": 2
++        },
++        {
++          "label": "LEFT LEG",
++          "x": 0.505208,
++          "y": 0.888889,
++          "z_index": 2
++        },
++        {
++          "label": "RIGHT EYE",
++          "x": 0.543545,
++          "y": 0.326636,
++          "z_index": 8
++        },
++        {
++          "label": "LEFT EYE",
++          "x": 0.548754,
++          "y": 0.326636,
++          "z_index": 2
++        },
++        {
++          "label": "RIGHT EAR",
++          "x": 0.517504,
++          "y": 0.333581,
++          "z_index": 8
++        },
++        {
++          "label": "LEFT EAR",
++          "x": 0.522712,
++          "y": 0.333581,
++          "z_index": 2
++        }
++      ]
++    ]
++  }
++}
+diff --git a/game-src/action/jyaldi-v5/resume/walk-skeleton.png b/game-src/action/jyaldi-v5/resume/walk-skeleton.png
+new file mode 100644
+index 0000000000000000000000000000000000000000..c0802e5e287d7acfe2e89f061cffe627f891b0c1
+GIT binary patch
+literal 24547
+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
+O4yznfPTy~K<$nOF(=Jm0
+
+literal 0
+HcmV?d00001
+

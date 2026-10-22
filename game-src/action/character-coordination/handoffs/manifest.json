@@ -1,0 +1,42 @@
+[
+  {
+    "recipient_package": "kyuras-recovery",
+    "source_commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+    "base_commit": "0a13285205b77fd6cf33b966cea246efa0d3082e",
+    "paths": [
+      "tools/recover_character_jobs.py",
+      "tests/character-recovery.test.py",
+      "docs/character-resume/kyuras-audit.md"
+    ],
+    "patch": "handoffs/kyuras-recovery.patch",
+    "sha256": "269905f70a9d407c54ad41571e8c9c44ade78c7b4fadbf8e5af8f43cb15129d5",
+    "recipient_acknowledged": false
+  },
+  {
+    "recipient_package": "jyaldi-skeleton",
+    "source_commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+    "base_commit": "0a13285205b77fd6cf33b966cea246efa0d3082e",
+    "paths": [
+      "game-src/action/jyaldi-v5/resume",
+      "docs/character-resume/jyaldi-audit.md"
+    ],
+    "patch": "handoffs/jyaldi-skeleton.patch",
+    "sha256": "bd35fef82b80770d682edf43c9352f45ada34f07dc5673d92a2a7801541b36de",
+    "recipient_acknowledged": false
+  },
+  {
+    "recipient_package": "review-tools",
+    "source_commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+    "base_commit": "0a13285205b77fd6cf33b966cea246efa0d3082e",
+    "paths": [
+      "tools/build_character_resume_demo.py",
+      "tools/character_resume_demo.html",
+      "tests/character-resume-browser.py",
+      "docs/character-resume/demo-independent-review.md",
+      "docs/character-resume/other-agents-audit.md"
+    ],
+    "patch": "handoffs/review-tools.patch",
+    "sha256": "08d219012e863de1d2d379f16c4c62cae4148955aca6e868db3ca7e0e7fddfdc",
+    "recipient_acknowledged": false
+  }
+]

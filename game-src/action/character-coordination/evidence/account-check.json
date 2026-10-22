@@ -1,0 +1,29 @@
+{
+  "recorded_at": "2026-10-22T10:21:30.165479+00:00",
+  "http_status": 200,
+  "tool": "get_balance",
+  "response": {
+    "jsonrpc": "2.0",
+    "id": 1,
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "Error calling tool 'get_balance': 401: Missing Authorization header. Please configure your MCP client with 'Authorization: Bearer YOUR_API_TOKEN'"
+        }
+      ],
+      "isError": true
+    }
+  },
+  "tools_list_succeeded": true,
+  "credential_variable_presence": {
+    "PIXELLAB_API_TOKEN": false,
+    "PIXELLAB_API_KEY": false
+  },
+  "balance": null,
+  "active_jobs": null,
+  "concurrency_limit": null,
+  "other_account_reads": "not attempted after missing authorization",
+  "new_generation_calls": 0,
+  "new_charge": 0
+}

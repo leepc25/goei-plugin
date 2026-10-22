@@ -1,0 +1,161 @@
+{
+  "commit": "7f8fdfb0c5a6cef096d412d3d872aec6eae7de81",
+  "frames": [
+    {
+      "path": "game-src/action/blaret_saladin/clips/blaret/guns_idle/00.png",
+      "sha256": "178c056d594dac1a3f805d2b876ba87a9ba41f9d1c57f3cf77db1633ea77b418"
+    },
+    {
+      "path": "game-src/action/blaret_saladin/clips/blaret/guns_idle/01.png",
+      "sha256": "75eafb0c54720e799dd6753f6c47188b7ddbc5837ec328ca2e3d4890ca473eb8"
+    },
+    {
+      "path": "game-src/action/blaret_saladin/clips/blaret/guns_idle/02.png",
+      "sha256": "d2b64b59d0badd8051f043425df2ee8aa101fc6362d7f50806c2cdb119da1927"
+    },
+    {
+      "path": "game-src/action/blaret_saladin/clips/blaret/guns_idle/03.png",
+      "sha256": "0c4abfb2cbedecfee7688bd5ee53940a14ab5529693ac16ba5c6bc3032f72b9f"
+    },
+    {
+      "path": "game-src/action/blaret_saladin/clips/blaret/stake_finish/00.png",
+      "sha256": "0b0b313571673e750160d678466395d9d5bdacceac7b9d000003c864e3b7b60e"
+    },
+    {
+      "path": "game-src/action/blaret_saladin/clips/blaret/stake_finish/01.png",
+      "sha256": "a28587d4091b669408db176bac73145dfb6166d95099323c646d142bd502b703"
+    },
+    {
+      "path": "game-src/action/blaret_saladin/clips/blaret/stake_finish/02.png",
+      "sha256": "eaa691b59cfb34331dece455f6b0803dc7b1a8d4f800415639f859b9103da89b"
+    },
+    {
+      "path": "game-src/action/blaret_saladin/clips/blaret/stake_finish/03.png",
+      "sha256": "d8697168fc72e0e7971ebf14704e6042fcab67f8fe4391c24f080aa33e9ec5e1"
+    },
+    {
+      "path": "game-src/action/blaret_saladin/clips/blaret/stake_finish/04.png",
+      "sha256": "dc8ab3c5c26b609b6bbc1c8fc109edec3488054c913c170601020c8a6b48550b"
+    },
+    {
+      "path": "game-src/action/blaret_saladin/clips/blaret/stake_finish/05.png",
+      "sha256": "fd80542fd35d5b8125744f927a47e749f8a18fa4b7cd2cce37c4f90900a48660"
+    },
+    {
+      "path": "game-src/action/blaret_saladin/clips/blaret/stake_finish/06.png",
+      "sha256": "067823f1b87786d3f49bde33a92ef91794d89ca53e3553ffd96aeea13ea55756"
+    },
+    {
+      "path": "game-src/action/blaret_saladin/clips/blaret/stake_finish/07.png",
+      "sha256": "7d5307c1a4757e699927fdec19b6bb9bb6c71707bf5f9f1efe2cba33070e605f"
+    },
+    {
+      "path": "game-src/action/blaret_saladin/clips/blaret/super_ready/00.png",
+      "sha256": "33db2417cb4db41f53809d2283cdb5e7a65d534897cb25101174bb41d38a9581"
+    },
+    {
+      "path": "game-src/action/blaret_saladin/clips/blaret/super_ready/01.png",
+      "sha256": "8c34d73de66159537c5c8cbd25ab5bdb43fb5aa0dbd7d0ab47ca2193e3a430f9"
+    },
+    {
+      "path": "game-src/action/blaret_saladin/clips/blaret/super_ready/02.png",
+      "sha256": "ad5247fe6c9859b003664aab03aec4aee8fb527a49c0dacf77ccfd43bb9c4a2e"
+    },
+    {
+      "path": "game-src/action/blaret_saladin/clips/blaret/super_ready/03.png",
+      "sha256": "7a3c01fbd49385f07b0e08dd758a22120d14ac43fae8ddf685633e62c2f0d0ee"
+    },
+    {
+      "path": "game-src/action/blaret_saladin/clips/blaret/super_ready/04.png",
+      "sha256": "9bf14d54b033680ef2c0a60343c233dbabafed82880197495b7c23d9961278e4"
+    },
+    {
+      "path": "game-src/action/blaret_saladin/clips/blaret/super_ready/05.png",
+      "sha256": "6a8635adf1be819429552e461c98307126898de1eb66261eb52c918b9f0223c5"
+    },
+    {
+      "path": "game-src/action/blaret_saladin/clips/blaret/super_ready/06.png",
+      "sha256": "bf158fb7f26ff8ca13bd46a3dcd700ed1bc237feb2f414674cd79ecf84bd3bfa"
+    },
+    {
+      "path": "game-src/action/blaret_saladin/clips/blaret/super_ready/07.png",
+      "sha256": "be79985d659a943d13ff7802767b5cc0aa41ac81450f26ae2d9c7c31eec64fd9"
+    },
+    {
+      "path": "game-src/action/blaret_saladin/clips/saladin/idle/00.png",
+      "sha256": "3d97b7861280dbf64ea410bd7254245cfe08e19a73dc58b8d0567b6bc9d6541b"
+    },
+    {
+      "path": "game-src/action/blaret_saladin/clips/saladin/idle/01.png",
+      "sha256": "703f7c2b0443f34a98e2144766ccf0a71a587e47948f02b94c35b524091410d0"
+    },
+    {
+      "path": "game-src/action/blaret_saladin/clips/saladin/idle/02.png",
+      "sha256": "6d6615fbc548fdebec16561c04484a96d8b5f53586ea7f1613442a67de35753a"
+    },
+    {
+      "path": "game-src/action/blaret_saladin/clips/saladin/idle/03.png",
+      "sha256": "2470d14a0f649659a8482ca6562d9f82debcfa9de7f2649600fcb72374f406f5"
+    },
+    {
+      "path": "game-src/action/blaret_saladin/clips/saladin/idle/04.png",
+      "sha256": "43533a065326920f86192676b1316cbc1b864e78b838a8a346101700bc776a0c"
+    },
+    {
+      "path": "game-src/action/blaret_saladin/clips/saladin/idle/05.png",
+      "sha256": "8a1536b84cf40db0510548282f4f834d62e25a61707cc509fa21835b55b5379a"
+    },
+    {
+      "path": "game-src/action/blaret_saladin/clips/saladin/idle/06.png",
+      "sha256": "b430cce81e2382937406312296d120bfff21e3a507ae4fe33619ed00dd99bb25"
+    },
+    {
+      "path": "game-src/action/blaret_saladin/clips/saladin/draw/00.png",
+      "sha256": "0c622b309e5d540c58aeb3c5fa3ec74639b630a8f5b75598e035f065d0b9af81"
+    },
+    {
+      "path": "game-src/action/blaret_saladin/clips/saladin/draw/01.png",
+      "sha256": "a033122e0e9b0bc3aebac08720b04fa40aee32c797e4eda9b2c55e035bf97aa7"
+    },
+    {
+      "path": "game-src/action/blaret_saladin/clips/saladin/draw/02.png",
+      "sha256": "d7e684d5bc4c99797dc1b3487623bcc9f7f37f2ea314d72cb6943d4a65052739"
+    },
+    {
+      "path": "game-src/action/blaret_saladin/clips/saladin/draw/03.png",
+      "sha256": "694ca0f6dbef2556379fc2061381b72f0a7e8575e7b80e8a399df70b900b8e0f"
+    },
+    {
+      "path": "game-src/action/blaret_saladin/clips/saladin/draw/04.png",
+      "sha256": "fd1cfbd1a9f67606b1eaa89e93aafec9faa8144012cbfa937dddf4ff534b79ee"
+    },
+    {
+      "path": "game-src/action/blaret_saladin/clips/saladin/draw/05.png",
+      "sha256": "8c223cb4a137d7643904c12eeb68cd114edd8918b6c0eee923ad90cda9d7ffab"
+    },
+    {
+      "path": "game-src/action/blaret_saladin/clips/saladin/draw/06.png",
+      "sha256": "98a8afdb30a4cc1a0545d74b94e10facdb01d2332c442a0e9fcf1743406a0e3d"
+    },
+    {
+      "path": "game-src/action/blaret_saladin/clips/saladin/draw/07.png",
+      "sha256": "0f719692395f8eadbbc49efaa1826780cc26e32d77fdfdf785043447f26cf8ac"
+    },
+    {
+      "path": "game-src/action/blaret_saladin/clips/saladin/armed_idle/00.png",
+      "sha256": "12eb451d4fad40adcb44a6f44002c3cee5145b8046602eb4c396a800eab216b0"
+    },
+    {
+      "path": "game-src/action/blaret_saladin/clips/saladin/armed_idle/01.png",
+      "sha256": "e677079c9330a0ba6dc27c101f47f1f14cb0cfa65ea27544565c16009cb0a993"
+    },
+    {
+      "path": "game-src/action/blaret_saladin/clips/saladin/armed_idle/02.png",
+      "sha256": "46800bb824d94e8288ec95528a947a7de504f483b9ced768213f5409d1ef3e68"
+    },
+    {
+      "path": "game-src/action/blaret_saladin/clips/saladin/armed_idle/03.png",
+      "sha256": "075b00b22a20da28dc0c4aa410d2956a2d6f63601178317e691901e1cd648f11"
+    }
+  ]
+}

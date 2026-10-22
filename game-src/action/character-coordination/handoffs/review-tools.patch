@@ -1,0 +1,320 @@
+diff --git a/docs/character-resume/demo-independent-review.md b/docs/character-resume/demo-independent-review.md
+new file mode 100644
+index 00000000..67d4e00e
+--- /dev/null
++++ b/docs/character-resume/demo-independent-review.md
+@@ -0,0 +1,53 @@
++# 독립 시연판 재검수
++
++- 대상: `release/demo/character-production-resume.html`.
++- 검사일: 2026-10-22(한국 시간). 검사자는 시연판 구현 담당과 별도다.
++- 실행: Python Playwright + `/usr/bin/chromium`, 로컬 HTTP. PC 1280×720, 모바일 가로 844×390, 모바일 세로 390×844. 모바일 에뮬레이션이며 실제 단말 실측은 아니다.
++- 이 시연판은 **기존 원본 검수판**이다. 새 그림 생성·PixelLab 기과금 회수·캐릭터 그림 결함 수정 완료를 증명하지 않는다.
++
++## 1차 결과
++
++| 항목 | PC | 모바일 가로 | 모바일 세로 |
++| --- | --- | --- | --- |
++| 내장 이미지 로드 | 89/89 | 89/89 | 89/89 |
++| JavaScript 실행 오류 | 0 | 0 | 0 |
++| 페이지 가로 넘침 | 없음 | 없음 | 없음 |
++| Space 정지·장 넘김 | 통과 | 통과 | 통과 |
++| 방향키 이동·Shift 달리기 | 통과 | 통과 | 통과 |
++| 캐릭터 탭 선택 뒤 방향키 | 통과 | 통과 | 통과 |
++| 포인터 버튼 누름·해제 | 통과 | 통과 | 통과 |
++| 걷기 마지막 7장→0장 | 통과 | 통과 | 통과 |
++| 최초 화면에서 무대·하단 이동 버튼 동시 표시 | 통과 | **수정 필요** | 통과 |
++
++관찰한 화면은 `review/character-resume/independent-<viewport>-initial.png`와 `independent-<viewport>-controls.png`, 수치는 `independent-results.json`에 남겼다. 이 파일들은 아래 최종 재검수 결과로 갱신돼 있다. 수동 장 넘김의 7→0 통과는 반복 처리 코드의 정확성이다. 원본 그림 경계의 시각 합격을 뜻하지 않는다.
++
++## 발견·수정 요청
++
++1. 키보드 처리에서 BUTTON 포커스의 모든 키를 무시하는 코드를 발견해 구현 담당에게 전달했다. 담당이 이동·Shift·장 넘김은 버튼 포커스에서도 처리하도록 고쳤고, 수정본을 실행해 탭 클릭 후 방향키 이동을 확인했다.
++2. 모바일 가로 최초 화면에서 동작/속도 조작이 두 줄로 펼쳐지고 무대·상태줄 아래 터치 버튼이 화면 밖으로 내려간다. 첫 화면 스크린샷에서 무대 하단도 잘린다. 스크롤 후 버튼은 작동하지만 무대와 조작부를 한 화면에서 확인할 수 있도록 수정 요청했다.
++3. 캐릭터와 바닥 눈금이 서로 반대 방향으로 함께 움직여 상대 이동량이 커지는 코드도 전달했다. 실제 그림 접지와 시연 코드 이동을 섞어 판단하지 않도록 눈금 기준을 명확히 할 필요가 있다.
++
++## 표시의 정직성
++
++- 상단에 ‘기존 원본 검수판 · 새 그림 생성 0회 · 시각 승인 대기’가 표시된다.
++- 큐라스 설명은 `idle_shotgun`·`run_shotgun` 회수 미확인과 전시 제외를 명시한다. 전시 목록에 이 두 클립이 없다.
++- 쟈알디 A는 ‘승인 이력’, A2는 ‘후속 재킷 수정’으로 구분한다. A2에 별도 승인 이력이 있는 것처럼 표시하지 않는다.
++- 에일린은 총이 원본에 그려져 있다는 사실과 무기 합성·전투 판정 미연결을 명시한다.
++- 개인 체크 항목이 사용자 승인으로 저장되지 않는다는 설명이 있다.
++
++새 그림을 만들었다거나 고친 것으로 오인하게 하는 표시는 발견하지 않았다. 그림 자체의 결함 판정은 `jyaldi-audit.md`, `kyuras-audit.md`, `other-agents-audit.md`와 함께 읽어야 한다.
++
++## 최종 재검수
++
++**독립 검수판의 실행·배치 검사 통과. 캐릭터 그림 품질 승인은 보류.**
++
++모바일 가로 배치 수정 후 세 뷰포트 전부 다시 실행했다. 모바일 가로는 무대 y=147.94–297.94, 이동 조작 y=343.19–380.44로 화면 높이 390 안에 모두 표시된다. PC와 모바일 세로도 무대·조작부가 처음 화면 안에 들어온다. 화면의 작은 문자/픽셀은 모바일에서 1배 표시되므로 정밀 얼굴 검수는 장별 원본 확대와 병행한다.
++
++- 모든 뷰포트: 89/89 이미지 정상, JavaScript 오류 0, 깨진 표시 이미지 0, 페이지 가로 넘침 없음.
++- 정지 유지·이전/다음 장·방향키·Shift 달리기·캐릭터 탭 클릭 뒤 방향키·포인터 누름/해제·마지막 7장→0장 모두 재통과.
++- 모바일 두 뷰포트에서 CDP `Input.dispatchTouchEvent`의 실제 `touchStart`/`touchEnd`를 보내 왼쪽 이동과 손을 뗀 뒤 정지를 확인했다. 마우스 포인터 시험만으로 터치 통과 처리하지 않았다.
++- 쟈알디뿐 아니라 에일린 선택 후 이동, 큐라스 선택 후 기본 공격 표시도 실행했다. `independent-<viewport>-kyuras.png`가 추가 증거다.
++- 바닥 눈금은 고정되고 캐릭터의 시연 위치만 움직이도록 수정됐다. 그림의 발 미끄러짐을 엔진 결함 수정 완료로 오인할 여지가 줄었다.
++- HTML의 전시 89프레임 각각이 명시된 원본 PNG 바이트 및 SHA-256와 정확히 일치한다. 원본에서 생긴 그림 결함은 이 HTML에도 그대로 남아 있다.
++
++검수 대상 HTML은 592,024바이트인 최종 재빌드본이다. 이후 HTML 변경 시 그 변경 범위를 다시 검수해야 한다.
+diff --git a/docs/character-resume/other-agents-audit.md b/docs/character-resume/other-agents-audit.md
+new file mode 100644
+index 00000000..e55fd9d2
+--- /dev/null
++++ b/docs/character-resume/other-agents-audit.md
+@@ -0,0 +1,65 @@
++# 다른 요원 재개 대조·에일린 독립 검수
++
++- 확인일: 2026-10-22(한국 시간), 기준 커밋 `0a132852` (`origin/codex/metroidvania-run-system`).
++- 범위: `AGENTS.md`, 공용·캐릭터별 최신 인계, 결함 목록, `spend.log`, `final/manifest.json`, 원본 PNG와 최종 스트립을 대조했다. 에일린은 아래 19클립 최종 프레임을 직접 정지화상 검수했다.
++- 이번 조사에서 생성·편집 API 호출 없음, 신규 비용 0. 기존 장부의 잔액·상한·대기열 서술은 과거 기록이며 현재 계정 상태를 증명하지 않는다.
++- 에일린 외 요원의 남은 그림 결함은 최신 인계의 **미해결 주장**으로 기록했다. 이 문서는 그 요원의 전 프레임 재검수를 했다는 뜻이 아니다. 브라우저 재생·모바일 조작 검수와 사용자 시각 승인은 별도다.
++
++## 중복 발주 방지와 실제 납품 상태
++
++| 요원 | 현물 확인 | 인계와 다른 점 / 다음 순서 |
++| --- | --- | --- |
++| 에일린 | 원본 폴더 96개, 최종 스트립/manifest 90클립. 본부 보조 `fstand`, `holster`, `prone`는 독립 final 항목이 아님 | 인계의 미납품 `showerturn` 3장·`shower` 6장·`bath` 4장은 **이미 모두 있음**. final manifest에만 미반영. 재생성 금지. 전투 자세 결함을 먼저 처리하고 생활 49클립은 뒤로 |
++| 스팡달 | 원본 69클립, final 69클립. 씻기 7+3+6+4장과 final 4클립 모두 있음 | 공격 10클립 재생성·손 19장 보정까지 반영된 상태. 예전 ‘주먹 손 10클립 전부 미수정’으로 되돌아가면 안 됨. 최종 2차 독립검수는 미완료 |
++| 게슈간 | 원본 53폴더, final 57클립. 연계 분할/코드 합성 때문에 수가 다름. 씻기 20장 및 final 있음 | 넥타이는 사용자 유지 결정. 다시 발주하지 않음. 턱 아래 머리카락·`getup` 3장·손 고정점 실측이 미해결 |
++| 고르고디오 | final 104클립(장갑 28 포함). 맨몸 원본 80폴더, 장갑은 별도 `armor/clips` | 인계의 ‘탈의 00 한 장만 받음’은 오래됨. `undress` 7·`showerturn` 3·`shower` 6·`bath` 4장이 모두 있음. final엔 undress만 등록. 나머지는 납품 대조·패킹 대상으로, 신규 발주 금지 |
++| 데드폴 | final 73클립, 원본 69폴더(`cq`는 final 분할). 씻기 20장과 final 4클립 모두 있음 | 독립검수 1·2차 불합격 후 일부 수정된 상태. 전투 `cq`, `catch`, `reload`, `roll`, `mantle`을 생활 69클립보다 우선 |
++| 로제몬 | 원본 98폴더 = PixelLab 95 + 씻기 부분 납품 3. manifest 130행 중 PixelLab 95·코드 1·기존 기본 클립 참조 34. 독립 final PNG 96개 | manifest 130을 ‘130개 새 생성 완료’로 세면 안 됨. 씻기 13장만 있음(undress 5·showerturn 2·shower 6·bath 0), final 미반영. 이동/전투 머리 잘림 우선 |
++
++에일린 설계서 5장 표를 실제 파싱하면 138행이고, 본문 인계는 142클립이라고 쓴다. 미생성 여부는 숫자 차이로 추정하지 않고 이름·현물로 판정했다. 실제 원본이 없는 49개는 다음과 같다.
++
++`knock push inspect leadhand bow elevwait floorsit floorrest fear nausea bedlie chairsit typing gearcheck tie seatrest seatthink doze yawn stretch ponytail brushteeth gesture armscross nod headshake wave handshake pat point shrug hug sigh laugh glad cry wallcry kneelcry sad shout deskslam surprise startlefall plopdown embarrassed annoyed think bored smirk`
++
++## 별도 브랜치 확보 대조
++
++원격 refs fetch 뒤 `git log --all --not HEAD -- game-src/action/<요원>`으로 확인했다.
++
++- 에일린·스팡달·게슈간·고르고디오·로제몬 경로에는 현재 HEAD 밖의 추가 커밋이 없다. 에일린 `87347a28`(Claude `project-thread-45iwer`)과 씻기 납품 `cf4f06ec`, 고르고디오 `3e7bcdcf`, 스팡달 `a34358fe`, 로제몬 `acebc005`는 모두 HEAD의 조상이다.
++- 데드폴은 다른 refs에 씻기 후속 커밋이 남아 있다: `565ccf96`(20장 제작 원장·연락표), `bbcc45c5`, `938992ef`, `dbda98d0`, `2fe8e396`, `7580ca00`, `76b614bd`, `43681254`. 원장 브랜치 `origin/codex/deadpole-bathing-game-src-action-deadpole-full-gpt-bathing-production.json-1792637734794`를 확보한 뒤 부모가 최종 대조했다. **20장 원본·연락표·제작 원장 모두 현재 HEAD와 Git blob이 같다.** 커밋 ancestry만 다르고 현물은 이미 확보되어 있어 cherry-pick·재생성하지 않았다. 증거: `evidence/deadpole-branch-comparison.json`.
++
++## 에일린 전투·이동 프레임 검수
++
++검수 파일: `review/character-resume/eileen-contact-{0,1,2}.png` 및 `eileen-<clip>.png`. 프레임 번호는 0부터 센 최종 스트립 번호다. 확대본은 원본을 바꾸지 않고 검사 편의상 최근접 확대했다. 검은 정장/현장 조끼, 작은 성인 체형, 금발 포니테일은 대체로 유지되나 아래 자세·접지 결함이 남는다.
++
++| 클립·프레임 | 관찰·판정 |
++| --- | --- |
++| `guard` 0–3 | 몸·머리·두 손과 로우 레디 자세가 유지되고 반복 경계가 작다. 발 끝 y=136 전 장. 정지 그림 기준 합격 후보, 사용자 승인 아님 |
++| `engage` 0–1 / 2 / 3–5 | 0–1은 총을 거의 읽을 수 없는 몸통 자세, 2에서 손을 올리고 3부터 갑자기 수평 소총이 읽힌다. 전환 중 총의 이동 경로·파지 실루엣 보완 후보. 얼굴·복장 큰 붕괴 없음 |
++| `pair1` 0–1 / 2–5 | 0–1 낮춘 총, 2부터 어깨 견착. 두 번의 반동 차이는 작지만 페어 사격 의도는 읽힘. 2–5 개머리판이 포니테일/목 뒤 윤곽과 겹쳐 보인다. 발 y=136 유지 |
++| `pair2` 0–4 | 견착 자세·얼굴 유지. 반동은 작음. 손 번갈이는 적용 대상 아님(소총 두 손 파지). 앞/뒤 손의 지속 파지는 재생 상태에서 추가 확인 필요 |
++| `aimshot` 0–5 | 견착·작은 반동·회수 순서, 접지 y=136. 얼굴 방향이 조금씩 화면 쪽으로 돌아오지만 명백한 정면 뒤집힘은 없음 |
++| `aim` 0–3 | 자세·체형·발 위치와 3→0 경계가 안정적. 얼굴/볼 부분이 총과 가까워 작은 크기에서 가려지는 정도. 총을 포함한 그림이므로 별도 무기 렌더링과 중복하면 안 됨 |
++| `precise` 0 / 1–2 / 3–4 | 1–2 반동에서 머리·포니테일이 크게 움직이고 총몸/개머리판이 목 뒤 머리 윤곽과 겹친다. 발은 y=136 유지. 손목·어깨·개머리판 관계를 고칠 때 몸 전체 재생성보다 파지 기준 장부터 확인 |
++| `muzzle` 0–1 / 2–3 / 4 | 총구를 내밀었다 회수하는 순서는 읽힌다. 2–3에서 얼굴과 포니테일도 함께 전진. 가림으로 인해 타격점의 총구/앞손 구분이 작다. 발 y=136 유지 |
++| `buttstroke` 0 / 1–2 / 3 / 4–6 | **1–2 총·양손이 얼굴을 완전히 가림.** 3에서도 총이 눈앞을 가린다. 4–5 내려친 뒤 몸 중심이 앞으로 이동, 6 회수. 새 설계가 ‘총몸 내려찍기’임은 확인했으므로 옛 ‘개머리판 뒤집기 실패’로 재주문하지 않음. 가림을 피하는 팔꿈치·손 높이 설계가 먼저 |
++| `pushkick` 0 / 1 / 2–3 / 4 / 5–6 | 무릎 당김→발 뻗기→회수는 읽힌다. **1–4 지지발 포함 전체 그림 최하단 y=134**, 기준선 136보다 2px 떠 있음. 그림 접지 결함이다. final `adv=-11`이므로 전진/후퇴 의도와 시연 이동 연결도 별도 확인 필요 |
++| `transition` 0→1 / 1–2 / 3–5 | **0에서 손에 든 소총이 1에서 등에 완전히 걸린 상태로 바뀜. 중간 걸기 동작 없음.** 1–2는 권총 뽑기, 3–5 조준. 코드가 `holster` 역재생으로 대체한 기록과 일치. 소총 걸기 핵심 자세를 새로 설계해야 함 |
++| `pistolfire` 0–3 | 등에 소총·앞손 권총과 반동·회수는 읽힘. 얼굴·체형 큰 붕괴 없음. 전환 마지막 장과 연결 재생은 별도 검수 |
++| `block` 0 / 1 / 2–3 | 낮춤→올림→세워 막기, 2–3에서 얼굴과 총이 근접하지만 얼굴은 남음. 유지형 자세로 보이며 반복 회수 클립은 아님. 발 y=136 유지 |
++| `walk` 0–7 | 양발 교차는 있으나 팔은 대부분 아래로 쥔 채이고 보폭·팔 스윙이 작다. 최하단 y=`135,135,135,136,136,135,135,134`; 7→0에서 발 높이가 1px 달라짐. 접지 위치 추적과 시연 속도 대조가 필요 |
++| `step` 0–7 | 로우 레디 전술 보행. 2–4·6 최하단 y=137로 기준선 아래 1px. 정지 그림에서 확정 가능한 접지 결함. 순환 시 코드 이동량과 디딘 발 궤적은 별도 검수 |
++| `run` 0–7 | 몸 숙임·양발 교차·총 파지는 유지. 최하단 y=`135,135,134,136,137,134,135,134`; 2–3·6–7 다리 교차 실루엣은 빽빽함. 무조건 모든 장을 바닥에 붙이면 공중기가 사라지므로 지지/공중 구간부터 설계와 대조해야 함 |
++| `crouchwalk` 0–7 | 0–1 낮은 무릎 자세, 2–5 양 무릎이 모이는 과정, 6–7 다시 낮춤. 7장 발 아래 밝은 픽셀 덩어리/이중 윤곽이 보임. 1장 최하단 y=137. 무릎 걸음인지 웅크린 걷기인지 새 생성 전에 고정 |
++| `evade` 0–5 | 뒤로 물러나는 몸 중심 변화가 있으나 자세가 크게 벌어지지 않는다. 1장 y=135 외 나머지 y=136. `adv=-17`; 그림 이동과 코드 끝 위치 이동은 정지 그림만으로 판정하지 않음 |
++| `limp` 0–7 | 전술 보행과 닮고 절뚝임의 비대칭이 약함. **3–4 y=138**로 바닥선보다 2px 아래; 6–7은 y=135. 7→0 반복 경계에서 높이가 달라짐 |
++
++얼굴·체형·복식은 한 장의 좋고 나쁨으로 일괄 합격시키지 않았다. 총기 클립의 손은 번갈아 공격하는 대상이 아니라 파지 연속성을 검사해야 한다. `buttstroke` 얼굴 가림, `transition` 소총의 순간 이동, `pushkick`/`step`/`limp` 접지는 원본/최종 그림에서 확인되는 결함이며 엔진 수평 이동을 고쳐도 없어지지 않는다.
++
++## 다음 제작 큐 제안
++
++1. 큐라스 기과금 회수와 쟈알디 걷기·달리기 검수 뒤, 에일린 `transition`의 소총 걸기 핵심 자세 및 `buttstroke` 얼굴이 보이는 양팔 높이를 설계한다. 기존 열린 생성 문구만 바꿔 반복하지 않는다.
++2. 에일린 지지발 구간(`pushkick` 1–4, `step` 2–4·6, `limp` 3–4)은 접지 보정 후보를 독립 시연판에서 비교한다. 달리기 공중 구간까지 일괄 스냅하지 않는다.
++3. 데드폴 기본 사격·잡기→맞쏘기·장전, 로제몬 다운/마네킹 던지기 머리 잘림, 스팡달 손끝/이동 윤곽, 게슈간 손 기준점·턱, 고르고디오 식칼 자세/회전 순서로 결함을 재검수한다. 다른 요원 결과를 몸/손 참조로 복제하지 않는다.
++4. 생활·사교 양산보다 먼저 납품된 씻기 원본을 목록에 반영한다. 새로 생성한 것으로 세거나 사용자 시각 승인으로 바꾸지 않는다.
++
++전투무기 원본에는 소총·파이프 등이 이미 포함돼 있다. 최신 공용 인계의 ‘캐릭터만·무기는 엔진’ 규칙과 기존 빌더가 충돌한다. 예컨대 `tools/eileen_fixes.py`는 `pipe`/`walk_pipe`에 파이프를 직접 그린다. 통합 담당에게 이 사실과 손/총구 좌표를 전달하고, 무기 중복 렌더링을 피해야 한다. 이 조사에서는 엔진·본부·스테이지나 해당 빌더를 수정하지 않았다.
+diff --git a/tests/character-resume-browser.py b/tests/character-resume-browser.py
+new file mode 100644
+index 00000000..f2934578
+--- /dev/null
++++ b/tests/character-resume-browser.py
+@@ -0,0 +1,68 @@
++#!/usr/bin/env python3
++"""Exercise the independent source-frame reviewer; never asserts art approval."""
++from pathlib import Path
++import json
++import functools
++import threading
++from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
++from playwright.sync_api import sync_playwright
++ROOT=Path(__file__).resolve().parents[1]
++OUT=ROOT/'review/character-resume'
++OUT.mkdir(parents=True,exist_ok=True)
++handler=functools.partial(SimpleHTTPRequestHandler,directory=str(ROOT))
++server=ThreadingHTTPServer(('127.0.0.1',0),handler)
++threading.Thread(target=server.serve_forever,daemon=True).start()
++URL=f'http://127.0.0.1:{server.server_address[1]}/release/demo/character-production-resume.html'
++results=[]
++with sync_playwright() as p:
++    browser=p.chromium.launch(executable_path='/usr/bin/chromium',headless=True,args=['--no-sandbox'])
++    for name,width,height,touch in [('pc',1280,720,False),('mobile-landscape',844,390,True),('mobile-portrait',390,844,True)]:
++        context=browser.new_context(viewport={'width':width,'height':height},has_touch=touch)
++        page=context.new_page();errors=[];requests=[]
++        page.on('pageerror',lambda e: errors.append(str(e)))
++        page.on('console',lambda msg: errors.append(msg.text) if msg.type=='error' else None)
++        page.on('request',lambda req: requests.append(req.url) if req.url.startswith(('http:','https:')) and not req.url.startswith('http://127.0.0.1:') else None)
++        page.goto(URL)
++        page.wait_for_function('window.__characterReview && window.__characterReview.getState().loaded === window.__characterReview.getState().total')
++        state=lambda:page.evaluate('window.__characterReview.getState()')
++        assert state()['frames']==8
++        if name=='mobile-landscape':
++            touchbox=page.locator('.touch').bounding_box()
++            assert touchbox['y']+touchbox['height']<=height,'landscape touch controls below initial viewport'
++        assert page.locator('body').evaluate('(e)=>e.scrollWidth<=innerWidth'), 'horizontal overflow'
++        page.locator('#play').click();before=state()['frame'];page.wait_for_timeout(160)
++        assert state()['frame']==before, 'pause drifts'
++        page.locator('#next').click();assert state()['frame']==(before+1)%8
++        page.locator('#frames button').last.click();page.locator('#next').click();assert state()['frame']==0,'loop boundary'
++        page.locator('#speed').select_option('2')
++        page.locator('#play').click();page.wait_for_timeout(700);assert state()['loopCount']>=1,'playback loops'
++        page.locator('#play').click();page.locator('#speed').select_option('1')
++        page.locator('#reset').click();page.locator('#stage').click()
++        if touch:
++            box=page.locator('[data-hold=right]').bounding_box()
++            page.mouse.move(box['x']+box['width']/2,box['y']+box['height']/2)
++            page.mouse.down();page.wait_for_timeout(250);page.mouse.up()
++        else:
++            page.keyboard.down('ArrowRight');page.wait_for_timeout(250);page.keyboard.up('ArrowRight')
++        assert state()['worldX']>2,'movement input'
++        page.locator('#stage').click();page.keyboard.down('Shift');page.keyboard.down('ArrowLeft');page.wait_for_timeout(250)
++        page.keyboard.up('ArrowLeft');page.keyboard.up('Shift');assert state()['clip']=='run';assert state()['facing']==-1
++        page.locator('#reset').click();page.locator('#clip').select_option('walk');page.locator('#frames button').nth(2).click()
++        page.screenshot(path=str(OUT/f'demo-{name}.png'),full_page=True)
++        for agent in ['jyaldi','kyuras','eileen']:
++            page.locator(f'[data-agent={agent}]').click()
++            options=page.locator('#clip option').evaluate_all('(els)=>els.map(e=>e.value)')
++            for option in options:
++                page.locator('#clip').select_option(option)
++                page.locator('#frames button').last.click()
++                assert page.locator('#lastImage').evaluate('(e)=>e.complete&&e.naturalWidth>0')
++                assert page.locator('#firstImage').evaluate('(e)=>e.complete&&e.naturalWidth>0')
++            assert page.locator('body').evaluate('(e)=>e.scrollWidth<=innerWidth')
++        assert not errors,errors
++        assert not requests,requests
++        results.append({'viewport':name,'width':width,'height':height,'pass':True,'checks':['89 embedded source images loaded','pause/step/last-to-first/playback','keyboard/pointer movement and run','all 14 clips switchable','no external requests','no horizontal overflow','no browser errors'],'artApproval':False})
++        context.close()
++    browser.close()
++server.shutdown()
++(OUT/'demo-browser-results.json').write_text(json.dumps(results,ensure_ascii=False,indent=2)+'\n')
++print(json.dumps(results,ensure_ascii=False,indent=2))
+diff --git a/tools/build_character_resume_demo.py b/tools/build_character_resume_demo.py
+new file mode 100644
+index 00000000..bd0bc65f
+--- /dev/null
++++ b/tools/build_character_resume_demo.py
+@@ -0,0 +1,49 @@
++#!/usr/bin/env python3
++"""Embed the existing, explicitly identified source frames in a standalone review UI.
++No generation, pixel edits, runtime asset writes, or engine changes.
++"""
++from pathlib import Path
++import base64
++import hashlib
++import json
++
++ROOT = Path(__file__).resolve().parents[1]
++
++def image(path):
++    raw = (ROOT / path).read_bytes()
++    return {'source': path, 'sha256': hashlib.sha256(raw).hexdigest(),
++            'url': 'data:image/png;base64,' + base64.b64encode(raw).decode()}
++
++def clip(path, label, fps):
++    files = sorted((ROOT / path).glob('*.png'))
++    if not files:
++        raise ValueError(f'No original frames: {path}')
++    return {'label': label, 'fps': fps, 'frames': [image(str(p.relative_to(ROOT))) for p in files]}
++
++agents = []
++for key, name, root, clips, refs, note in [
++    ('jyaldi', '쟈알디', 'game-src/action/jyaldi-v5/full/clips',
++     [('walk','걷기',12),('run','달리기 · 3차 수정본',16),('idle','대기',8)],
++     [('승인 이력 · 기준표 A','game-src/action/jyaldi-v5/sheet7/jyaldi-base-pixen-a.png'),
++      ('후속 재킷 수정 · A2','game-src/action/jyaldi-v5/full/A2.png'),
++      ('후속 옆모습 참조 · 가드 0장','game-src/action/jyaldi-v5/full/clips/guard/00.png')],
++     '걷기와 달리기는 현재 원본 8장을 그대로 재생합니다. 걷기의 굽힌 무릎·작은 보폭·고정된 팔을 확인하세요. 최신 달리기는 3차 수정본이며 과거 0장 반려본과 다릅니다.'),
++    ('kyuras','큐라스','game-src/action/kyuras/clips',
++     [('snap1','기본 공격 1타',12),('snap2','기본 공격 2타',12),('snap3','기본 공격 3타',12),('walk_shotgun','산탄총 이동 자세',12),('idle','대기',8)],
++     [('기준 그림 A','game-src/action/kyuras/base/A.png')],
++     '기본 공격이 손가락 튕기기보다 주먹 지르기로 읽히는지 검수합니다. 유료 작업 idle_shotgun·run_shotgun은 회수 미확인으로 제외했습니다. 같은 이름의 과거 final 파일은 사용하지 않습니다.'),
++    ('eileen','에일린','game-src/action/eileen/clips',
++     [('idle','대기',8),('aim','조준',10),('aimshot','조준 사격',12),('walk','걷기',12),('run','달리기',16),('buttstroke','총몸 내려찍기',12)],
++     [],
++     '현재 원본 전투 자세를 재생합니다. 몸통·팔·손의 이어짐, 소총 파지와 얼굴 가림을 확인하세요. 원본에 그려진 소총을 그대로 표시하며 별도 무기 합성과 전투 판정은 연결하지 않았습니다.'),
++]:
++    agents.append({'id':key,'name':name,'note':note,
++                   'clips':{c:clip(f'{root}/{c}',label,fps) for c,label,fps in clips},
++                   'references':[dict(image(path),label=label) for label,path in refs]})
++
++payload = {'sourceBase':'0a13285205b77fd6cf33b966cea246efa0d3082e',
++           'generatedThisSession':False,'userVisualApproval':False,'agents':agents}
++template = (ROOT/'tools/character_resume_demo.html').read_text()
++output = ROOT/'release/demo/character-production-resume.html'
++output.write_text(template.replace('__REVIEW_DATA__', json.dumps(payload,ensure_ascii=False).replace('</','<\\/')))
++print(f'{output.relative_to(ROOT)}: {output.stat().st_size:,} bytes; {sum(len(c["frames"]) for a in agents for c in a["clips"].values())} original frames')
+diff --git a/tools/character_resume_demo.html b/tools/character_resume_demo.html
+new file mode 100644
+index 00000000..cc80ab4f
+--- /dev/null
++++ b/tools/character_resume_demo.html
+@@ -0,0 +1,55 @@
++<!doctype html>
++<html lang="ko">
++<meta charset="utf-8">
++<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
++<title>괴이 · 캐릭터 제작 재개 검수판</title>
++<link rel="icon" href="data:,">
++<style>
++:root{color-scheme:dark;--bg:#12171b;--panel:#1b242b;--line:#39454d;--ink:#e7e4db;--muted:#b1b8ba;--accent:#dbc084;--warn:#e5b08d}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 system-ui,sans-serif}button,select,input{font:inherit}button,select{color:var(--ink);background:#27333b;border:1px solid #59646a;border-radius:4px;min-height:42px;padding:6px 13px;cursor:pointer}button:hover,button:focus-visible,select:focus-visible{border-color:var(--accent);outline:2px solid #dbc08466}button[aria-pressed=true],button.active{background:#534935;border-color:var(--accent)}h1{font-size:23px;margin:0}h2{font-size:16px;margin:0 0 10px}.shell{max-width:1360px;margin:auto;padding:20px}.intro{display:flex;gap:20px;align-items:center;justify-content:space-between}.status{color:var(--warn);font-size:14px;border:1px solid #84624b;padding:5px 9px;flex-shrink:0}.summary{margin:10px 0;color:var(--muted)}.tabs,.controls,.touch{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.tabs{margin:17px 0 12px}.tabs button{min-width:105px}.workspace{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:14px}.panel{background:var(--panel);border:1px solid var(--line);padding:14px;min-width:0}.controls{margin-bottom:12px}.controls label{display:flex;align-items:center;gap:6px}#clip{max-width:100%}.stage{background:#151c22;border:1px solid var(--line);position:relative}#stage{display:block;width:100%;height:300px;image-rendering:pixelated}#readout{padding:7px 10px;border-top:1px solid var(--line);color:var(--accent);font-variant-numeric:tabular-nums}.touch{justify-content:center;margin-top:10px}.touch button{min-width:86px;touch-action:none;user-select:none}.help,.note{font-size:13px;color:var(--muted);margin:8px 0}.note{color:var(--warn)}.refs{display:grid;gap:12px}.ref{margin:0;text-align:center;background:#202b32;padding:8px}.ref img{display:block;max-width:100%;width:auto;height:144px;object-fit:contain;image-rendering:pixelated;margin:auto}.ref figcaption{font-size:12px;color:var(--muted)}.strip{display:flex;overflow:auto;gap:7px;padding:4px 0 10px;max-width:100%;overscroll-behavior-x:contain}.frame{padding:3px;min-width:118px;background:#202b32}.frame img{width:110px;height:83px;object-fit:contain;display:block;image-rendering:pixelated}.frame.active{border-color:var(--accent)}.frame span{font-size:12px}.section{margin-top:14px}.boundary{display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap}.boundary figure{margin:0;text-align:center}.boundary img{width:192px;height:144px;object-fit:contain;image-rendering:pixelated;background:#202b32}.boundary figcaption{font-size:12px}.arrow{color:var(--accent)}details{margin-top:12px;font-size:12px;color:var(--muted)}summary{cursor:pointer}code{overflow-wrap:anywhere}#sourceList{padding-left:22px}.badge{font-size:12px;color:var(--accent)}footer{margin-top:15px;color:var(--muted);font-size:12px}.checklist{color:var(--muted);font-size:13px}.checklist label{display:block;margin:5px 0}.checklist input{accent-color:var(--accent)}
++@media(max-width:900px){.shell{padding:12px}.workspace{grid-template-columns:minmax(0,1fr)}.refs{display:flex;flex-wrap:wrap}.ref{flex:1;min-width:160px}.intro{align-items:flex-start;flex-direction:column;gap:6px}.status{flex-shrink:1}h1{font-size:20px}#stage{height:240px}}
++@media(max-height:500px) and (min-width:600px){.shell{padding:8px 12px}.intro{flex-direction:row;align-items:center}h1{font-size:18px}.summary{display:none}.tabs{margin:7px 0}.tabs button,button,select{min-height:36px}.workspace{grid-template-columns:minmax(0,1fr) 190px;gap:9px}.panel{padding:9px}#stage{height:150px}.refs{display:grid}.ref{min-width:0}.ref img{height:110px}.help{font-size:12px}.controls{gap:5px;margin-bottom:8px}.controls button,.controls select,.controls label{font-size:13px}.controls button,.controls select{padding:5px 7px}#clip{width:145px}.touch{margin-top:6px}}
++@media(max-width:440px){.controls{align-items:stretch}.controls select{max-width:210px}.touch button{min-width:72px;padding:5px 9px}.boundary img{width:144px;height:108px}.ref{min-width:130px}.status{font-size:12px}}
++</style>
++<div class="shell">
++<header class="intro"><h1>괴이 · 캐릭터 제작 재개</h1><div class="status">기존 원본 검수판 · 새 그림 생성 0회 · 시각 승인 대기</div></header>
++<p class="summary">최신 원본의 자세와 반복 경계를 확인하는 독립 시연판입니다. 캐릭터 그림 수정본이나 통합 게임 완성판이 아닙니다.</p>
++<nav class="tabs" id="agents" aria-label="캐릭터"></nav>
++<div class="workspace">
++<main class="panel">
++<div class="controls"><label>동작 <select id="clip" aria-label="동작"></select></label><button id="play" aria-pressed="true">일시 정지</button><button id="prev" aria-label="이전 장">◀ 이전 장</button><button id="next" aria-label="다음 장">다음 장 ▶</button><label>속도 <select id="speed" aria-label="재생 속도"><option value="0.25">¼배</option><option value="0.5">½배</option><option value="1" selected>1배</option><option value="2">2배</option></select></label></div>
++<div class="stage"><canvas id="stage" aria-label="캐릭터 동작 시연"></canvas><div id="readout" aria-live="off"></div></div>
++<div class="touch" aria-label="이동 조작"><button data-hold="left" aria-label="왼쪽 이동">◀ 이동</button><button data-hold="run" aria-label="달리기 유지">달리기</button><button data-hold="right" aria-label="오른쪽 이동">이동 ▶</button><button id="reset">위치 복귀</button></div>
++<p class="help">← → 이동 · Shift+방향키 달리기 · Space 재생/정지 · [ ] 장 넘김. 이동은 자세 확인용이며 엔진 충돌·전투 판정과 연결되지 않습니다.</p>
++<p class="note" id="note"></p>
++<div class="section"><h2>장별 원본 <span class="badge">선택하면 정지</span></h2><div class="strip" id="frames" aria-label="장별 원본 선택"></div></div>
++<div class="section"><h2>반복 경계</h2><div class="boundary"><figure><img id="lastImage" alt="마지막 원본 장"><figcaption id="lastLabel"></figcaption></figure><span class="arrow">→</span><figure><img id="firstImage" alt="첫 번째 원본 장"><figcaption>0장 · 다시 시작</figcaption></figure></div></div>
++<details><summary>원본 경로와 확인 기준</summary><p>기준 시스템 커밋: <code id="base"></code><br>이미지는 PNG 원본 바이트를 내장했습니다. 픽셀 편집·색 보정·다른 캐릭터 그림 혼합은 하지 않았습니다. 재생 속도는 검수용 설정입니다.</p><ol id="sourceList"></ol></details>
++</main>
++<aside class="panel"><h2>비교 기준</h2><div class="refs" id="refs"></div><div class="checklist"><h2 class="section">확인 항목</h2><label><input type="checkbox"> 얼굴·머리색 유지</label><label><input type="checkbox"> 체형·복식 이어짐</label><label><input type="checkbox"> 접지·무릎 방향</label><label><input type="checkbox"> 팔·손의 교대</label><label><input type="checkbox"> 마지막 → 첫 장 이어짐</label><p>체크는 이 화면의 개인 메모입니다. 사용자 승인 기록으로 저장되지 않습니다.</p></div></aside>
++</div>
++<footer>원본·신규 생성·사용자 시각 승인을 구분합니다. 회수 미확인 작업은 전시하지 않으며, 기존 원본의 결함을 수정 완료로 표시하지 않습니다. 모든 재생 자료가 이 HTML에 포함돼 오프라인에서도 열립니다.</footer>
++</div>
++<script>
++const DATA=__REVIEW_DATA__;
++const $=id=>document.getElementById(id), canvas=$('stage'), ctx=canvas.getContext('2d');
++let agent=DATA.agents[0],clipKey='walk',frame=0,playing=true,accumulator=0,lastTime=0,worldX=0,facing=1,loopCount=0;
++const held=new Set(),images=new Map();
++for(const a of DATA.agents){for(const c of Object.values(a.clips))for(const f of c.frames){const im=new Image();im.src=f.url;images.set(f.source,im)}}
++function current(){return agent.clips[clipKey]}
++function setPlaying(v){playing=v;$('play').textContent=v?'일시 정지':'재생';$('play').setAttribute('aria-pressed',String(v));accumulator=0;}
++function selectClip(key){clipKey=key;frame=0;loopCount=0;accumulator=0;$('clip').value=key;renderFrames();update()}
++function selectAgent(id){agent=DATA.agents.find(a=>a.id===id);worldX=0;facing=1;held.clear();$('clip').replaceChildren();for(const [k,c] of Object.entries(agent.clips)){const o=document.createElement('option');o.value=k;o.textContent=c.label;$('clip').append(o)}$('note').textContent=agent.note;$('refs').replaceChildren();for(const ref of agent.references){const figure=document.createElement('figure');figure.className='ref';const im=document.createElement('img');im.src=ref.url;im.alt=ref.label;const cap=document.createElement('figcaption');cap.textContent=ref.label;figure.append(im,cap);$('refs').append(figure)}if(!agent.references.length){const p=document.createElement('p');p.className='help';p.textContent='선택한 전투 원본끼리 자세의 연속성을 확인합니다. 별도 기준표의 승인 여부를 추정하지 않습니다.';$('refs').append(p)}for(const b of $('agents').children)b.setAttribute('aria-pressed',String(b.dataset.agent===id));selectClip(Object.keys(agent.clips)[0]);}
++function renderFrames(){const c=current();$('frames').replaceChildren();$('sourceList').replaceChildren();c.frames.forEach((f,i)=>{const b=document.createElement('button');b.className='frame';b.dataset.frame=i;b.setAttribute('aria-label',`${i}장 선택`);const im=document.createElement('img');im.src=f.url;im.alt=`${agent.name} ${c.label} 원본 ${i}장`;const s=document.createElement('span');s.textContent=`${i}장`;b.append(im,s);b.onclick=()=>{setPlaying(false);frame=i;update()};$('frames').append(b);const li=document.createElement('li'),code=document.createElement('code');code.textContent=f.source+' · SHA-256 '+f.sha256;li.append(code);$('sourceList').append(li)});$('lastImage').src=c.frames.at(-1).url;$('firstImage').src=c.frames[0].url;$('lastLabel').textContent=`${c.frames.length-1}장 · 마지막`;}
++function update(){const c=current();$('readout').textContent=`${agent.name} · ${c.label} · ${frame} / ${c.frames.length-1}장 · 반복 ${loopCount}회${held.size?' · 조작 이동':''}`;for(const b of $('frames').children)b.classList.toggle('active',Number(b.dataset.frame)===frame);draw();}
++function draw(){const r=canvas.getBoundingClientRect();if(canvas.width!==Math.round(r.width)||canvas.height!==Math.round(r.height)){canvas.width=Math.round(r.width);canvas.height=Math.round(r.height)}ctx.imageSmoothingEnabled=false;const w=canvas.width,h=canvas.height;ctx.fillStyle='#151c22';ctx.fillRect(0,0,w,h);const scale=h>=290?2:1,ground=h-22;ctx.strokeStyle='#647574';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(0,ground+.5);ctx.lineTo(w,ground+.5);ctx.stroke();ctx.strokeStyle='#2d3d44';for(let x=(w/2)%48;x<w;x+=48){ctx.beginPath();ctx.moveTo(x,ground);ctx.lineTo(x,ground+9);ctx.stroke()};const x=Math.max(34,Math.min(w-34,w/2+worldX*scale));ctx.strokeStyle='#8e7955';ctx.setLineDash([2,4]);ctx.beginPath();ctx.moveTo(x,10);ctx.lineTo(x,ground);ctx.stroke();ctx.setLineDash([]);const im=images.get(current().frames[frame].source);if(im?.complete&&im.naturalWidth){ctx.save();ctx.translate(Math.round(x),ground);ctx.scale(facing*scale,scale);ctx.drawImage(im,-57,-136);ctx.restore()}}
++function step(delta){setPlaying(false);frame=(frame+delta+current().frames.length)%current().frames.length;update()}
++$('play').onclick=()=>setPlaying(!playing);$('prev').onclick=()=>step(-1);$('next').onclick=()=>step(1);$('clip').onchange=e=>selectClip(e.target.value);$('speed').onchange=()=>accumulator=0;$('reset').onclick=()=>{worldX=0;update()};$('base').textContent=DATA.sourceBase;
++for(const a of DATA.agents){const b=document.createElement('button');b.dataset.agent=a.id;b.textContent=a.name;b.onclick=()=>selectAgent(a.id);$('agents').append(b)}
++for(const b of document.querySelectorAll('[data-hold]')){b.onpointerdown=e=>{e.preventDefault();b.setPointerCapture(e.pointerId);held.add(b.dataset.hold);b.classList.add('active')};for(const ev of ['pointerup','pointercancel','lostpointercapture'])b.addEventListener(ev,()=>{held.delete(b.dataset.hold);b.classList.remove('active')})}
++addEventListener('keydown',e=>{if(['SELECT','INPUT'].includes(document.activeElement.tagName))return;const k={ArrowLeft:'left',ArrowRight:'right',Shift:'run'}[e.key];if(k){held.add(k);e.preventDefault()}else if(e.code==='Space'){if(document.activeElement.tagName==='BUTTON')return;e.preventDefault();if(!e.repeat)setPlaying(!playing)}else if(e.key==='[')step(-1);else if(e.key===']')step(1)});
++addEventListener('keyup',e=>{const k={ArrowLeft:'left',ArrowRight:'right',Shift:'run'}[e.key];if(k)held.delete(k)});addEventListener('blur',()=>held.clear());document.addEventListener('visibilitychange',()=>{held.clear();lastTime=0});
++function tick(now){const dt=lastTime?Math.min((now-lastTime)/1000,.1):0;lastTime=now;const direction=Number(held.has('right'))-Number(held.has('left'));if(direction){facing=direction;const target=held.has('run')?'run':'walk';if(agent.clips[target]&&clipKey!==target)selectClip(target);worldX+=direction*dt*(held.has('run')?80:38);const max=Math.max(20,canvas.width/(canvas.height>=290?4:2)-40);worldX=Math.max(-max,Math.min(max,worldX));}if(playing||direction){accumulator+=dt*Number($('speed').value)*current().fps;while(accumulator>=1){frame++;if(frame>=current().frames.length){frame=0;loopCount++}accumulator--;}}update();requestAnimationFrame(tick)}
++selectAgent('jyaldi');requestAnimationFrame(tick);
++window.__characterReview={getState:()=>({agent:agent.id,clip:clipKey,frame,playing,worldX,facing,loopCount,frames:current().frames.length,loaded:[...images.values()].filter(x=>x.complete&&x.naturalWidth).length,total:images.size}),data:DATA};
++</script>
++</html>

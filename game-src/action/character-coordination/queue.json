@@ -1,0 +1,91 @@
+{
+  "schema": "goei-character-coordination/1",
+  "account_status": "auth_blocked",
+  "balance": null,
+  "active_jobs": null,
+  "concurrency_limit": null,
+  "per_owner_inflight_limit": 1,
+  "new_submissions": 0,
+  "new_charge": 0,
+  "queue_is_not_a_distributed_lock": true,
+  "items": [
+    {
+      "character": "kyuras",
+      "clip": "idle_shotgun",
+      "job_id": "11826541-47d1-40de-9664-f05f1838bb23",
+      "frames": 4,
+      "owner": "큐라스 담당",
+      "handoff_status": "package_published_ack_pending",
+      "operation": "recover_existing_only",
+      "regenerate": false,
+      "actual_cost": null,
+      "server_state": "unknown_auth_blocked"
+    },
+    {
+      "character": "kyuras",
+      "clip": "run_shotgun",
+      "job_id": "9fe0e770-b992-4299-a4c1-90d6e591828a",
+      "frames": 8,
+      "owner": "큐라스 담당",
+      "handoff_status": "package_published_ack_pending",
+      "operation": "recover_existing_only",
+      "regenerate": false,
+      "actual_cost": null,
+      "server_state": "unknown_auth_blocked"
+    },
+    {
+      "character": "blaret",
+      "clip": "guns_idle",
+      "owner_branch": "codex/art-blaret-saladin-resume",
+      "state": "existing_frames_reviewed_needs_repair_plan",
+      "job_id": null,
+      "new_submission": false,
+      "user_visual_approval": false
+    },
+    {
+      "character": "blaret",
+      "clip": "stake_finish",
+      "owner_branch": "codex/art-blaret-saladin-resume",
+      "state": "existing_frames_reviewed_needs_repair_plan",
+      "job_id": null,
+      "new_submission": false,
+      "user_visual_approval": false
+    },
+    {
+      "character": "blaret",
+      "clip": "super_ready",
+      "owner_branch": "codex/art-blaret-saladin-resume",
+      "state": "existing_frames_reviewed_needs_repair_plan",
+      "job_id": null,
+      "new_submission": false,
+      "user_visual_approval": false
+    },
+    {
+      "character": "saladin",
+      "clip": "idle",
+      "owner_branch": "codex/art-blaret-saladin-resume",
+      "state": "existing_frames_reviewed_needs_repair_plan",
+      "job_id": null,
+      "new_submission": false,
+      "user_visual_approval": false
+    },
+    {
+      "character": "saladin",
+      "clip": "draw",
+      "owner_branch": "codex/art-blaret-saladin-resume",
+      "state": "existing_frames_reviewed_needs_repair_plan",
+      "job_id": null,
+      "new_submission": false,
+      "user_visual_approval": false
+    },
+    {
+      "character": "saladin",
+      "clip": "armed_idle",
+      "owner_branch": "codex/art-blaret-saladin-resume",
+      "state": "existing_frames_reviewed_needs_repair_plan",
+      "job_id": null,
+      "new_submission": false,
+      "user_visual_approval": false
+    }
+  ]
+}

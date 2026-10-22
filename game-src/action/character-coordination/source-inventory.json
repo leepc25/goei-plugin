@@ -1,0 +1,470 @@
+[
+  {
+    "source": "system",
+    "commit": "7f8fdfb0c5a6cef096d412d3d872aec6eae7de81",
+    "path": "game-src/action/blaret_saladin/final/blaret/manifest.json",
+    "sha256": "9aea41b039c43f7d7b2a65c3f0d96e1428f09414bbe400cd2d737e8697cf4352"
+  },
+  {
+    "source": "system",
+    "commit": "7f8fdfb0c5a6cef096d412d3d872aec6eae7de81",
+    "path": "game-src/action/blaret_saladin/final/crusader/manifest.json",
+    "sha256": "67a2485b9995589bfdbbead7a4952f15df0527083d9eb5259b32833610d53d7c"
+  },
+  {
+    "source": "system",
+    "commit": "7f8fdfb0c5a6cef096d412d3d872aec6eae7de81",
+    "path": "game-src/action/blaret_saladin/final/highmamluk/manifest.json",
+    "sha256": "805d749b38c70fe85276a3eeb1dd43d43e7e14a089d3c49831d6b7159fd8a96e"
+  },
+  {
+    "source": "system",
+    "commit": "7f8fdfb0c5a6cef096d412d3d872aec6eae7de81",
+    "path": "game-src/action/blaret_saladin/final/knight/manifest.json",
+    "sha256": "c64d6abaaf20230161b6d5f34f2fd4e1575e2993a6e878c988827f0773a4aaef"
+  },
+  {
+    "source": "system",
+    "commit": "7f8fdfb0c5a6cef096d412d3d872aec6eae7de81",
+    "path": "game-src/action/blaret_saladin/final/modernspirit/manifest.json",
+    "sha256": "cdf4d9ed32aa7f2c4acc49d20c9222e38ba89e96583eef7e57fc697b55bdd2a9"
+  },
+  {
+    "source": "system",
+    "commit": "7f8fdfb0c5a6cef096d412d3d872aec6eae7de81",
+    "path": "game-src/action/blaret_saladin/final/saladin/manifest.json",
+    "sha256": "c83a3b08032e92715e5e4ebd7f6c15ae82d3437f4ad52c2812c843bb1cf491c1"
+  },
+  {
+    "source": "system",
+    "commit": "7f8fdfb0c5a6cef096d412d3d872aec6eae7de81",
+    "path": "game-src/action/blaret_saladin/spend.log",
+    "sha256": "b9796b5147f0e4719c3af3e84c3d03f3a1fc882d74c9855abcdb1f37b17978f7"
+  },
+  {
+    "source": "system",
+    "commit": "7f8fdfb0c5a6cef096d412d3d872aec6eae7de81",
+    "path": "game-src/action/boss/spend.log",
+    "sha256": "c08389c700a600d86cea9aaa175bda8c0741b0d41429e5f5245c85cf794b762c"
+  },
+  {
+    "source": "system",
+    "commit": "7f8fdfb0c5a6cef096d412d3d872aec6eae7de81",
+    "path": "game-src/action/daydream/spend.log",
+    "sha256": "02b3117620a78009139b1336c0a1e7d1d9f26307f4532c149a00f6486417c5c8"
+  },
+  {
+    "source": "system",
+    "commit": "7f8fdfb0c5a6cef096d412d3d872aec6eae7de81",
+    "path": "game-src/action/deadpole/full/final/manifest.json",
+    "sha256": "bff80be2b20a1e9c153c4806bf76503cc5b01a64f1e77713bc75a9038306a3f4"
+  },
+  {
+    "source": "system",
+    "commit": "7f8fdfb0c5a6cef096d412d3d872aec6eae7de81",
+    "path": "game-src/action/deadpole/spend.log",
+    "sha256": "8ed55e3154ab08b0efff07b598609e4bb3a1b4adb7a82167dfb62d51ac6a6d31"
+  },
+  {
+    "source": "system",
+    "commit": "7f8fdfb0c5a6cef096d412d3d872aec6eae7de81",
+    "path": "game-src/action/eileen/final/manifest.json",
+    "sha256": "32f2c08b33878a2d9cb2502507f2877301b293562241074316c0c6a303c55ac6"
+  },
+  {
+    "source": "system",
+    "commit": "7f8fdfb0c5a6cef096d412d3d872aec6eae7de81",
+    "path": "game-src/action/eileen/spend.log",
+    "sha256": "df67c61fd364a1bce2b1479dfd58c237e9f6b0a9b1ba024f1665ec64406882ad"
+  },
+  {
+    "source": "system",
+    "commit": "7f8fdfb0c5a6cef096d412d3d872aec6eae7de81",
+    "path": "game-src/action/fake_bureau/final/burn/manifest.json",
+    "sha256": "1acb0733afefd636b4853ec4f1259f65e25de7ffd11b98511ca73a03fdd2beb9"
+  },
+  {
+    "source": "system",
+    "commit": "7f8fdfb0c5a6cef096d412d3d872aec6eae7de81",
+    "path": "game-src/action/fake_bureau/final/dohyeong/manifest.json",
+    "sha256": "c8557bb3a07234c00c033294145877be00e304e8ca273ebf118dcf8346786140"
+  },
+  {
+    "source": "system",
+    "commit": "7f8fdfb0c5a6cef096d412d3d872aec6eae7de81",
+    "path": "game-src/action/fake_bureau/final/riot/manifest.json",
+    "sha256": "c7de50f9dbdbb42e2b9c02bf42f7f2e47a4ec4f8fe23eeec7f41c1d413e87bdb"
+  },
+  {
+    "source": "system",
+    "commit": "7f8fdfb0c5a6cef096d412d3d872aec6eae7de81",
+    "path": "game-src/action/fake_bureau/final/seongju/manifest.json",
+    "sha256": "e021e075c16f6bc2af57a982f99d242316911c6c13ddfb9eab1074e2904b4a17"
+  },
+  {
+    "source": "system",
+    "commit": "7f8fdfb0c5a6cef096d412d3d872aec6eae7de81",
+    "path": "game-src/action/fake_bureau/final/sword/manifest.json",
+    "sha256": "6657c9e9338af9b60b8c980239f86ec80e7ac72b37545c6d4634aa2f3c94c103"
+  },
+  {
+    "source": "system",
+    "commit": "7f8fdfb0c5a6cef096d412d3d872aec6eae7de81",
+    "path": "game-src/action/fake_bureau/spend.log",
+    "sha256": "5e13b0a69ac3a9a1a52f2a0d4682216b518012a9f040e29472c3230a2c3cc1e0"
+  },
+  {
+    "source": "system",
+    "commit": "7f8fdfb0c5a6cef096d412d3d872aec6eae7de81",
+    "path": "game-src/action/geshugan/final/manifest.json",
+    "sha256": "faa0c8745ada4d9f27aaca070a532c3ef4e409ec716ac7ae5a05f6697e97a39f"
+  },
+  {
+    "source": "system",
+    "commit": "7f8fdfb0c5a6cef096d412d3d872aec6eae7de81",
+    "path": "game-src/action/geshugan/spend.log",
+    "sha256": "41812d6733fda4d7145014d4da4de982431c5e47982999ede91cc1f89e3713f8"
+  },
+  {
+    "source": "system",
+    "commit": "7f8fdfb0c5a6cef096d412d3d872aec6eae7de81",
+    "path": "game-src/action/gorgodio/full/final/manifest.json",
+    "sha256": "a6843f3a1513ac271164e46e367a327e29f00f879ed75c7178c5837d801b9aab"
+  },
+  {
+    "source": "system",
+    "commit": "7f8fdfb0c5a6cef096d412d3d872aec6eae7de81",
+    "path": "game-src/action/gorgodio/spend.log",
+    "sha256": "69f3ac1ca605774dd739d4f63e0187be560ae72c29c2f575fbd154954e4a39d2"
+  },
+  {
+    "source": "system",
+    "commit": "7f8fdfb0c5a6cef096d412d3d872aec6eae7de81",
+    "path": "game-src/action/jyaldi-v5/full/final/manifest.json",
+    "sha256": "78bd9a68af565a6d595bdc8adf37a5337968e003e72f9525098e5b2a50d65095"
+  },
+  {
+    "source": "system",
+    "commit": "7f8fdfb0c5a6cef096d412d3d872aec6eae7de81",
+    "path": "game-src/action/jyaldi-v5/manifest.json",
+    "sha256": "0b4fc4f3c496c3e3ade160f5633ab3878ba40c436aa349d37960121f62670929"
+  },
+  {
+    "source": "system",
+    "commit": "7f8fdfb0c5a6cef096d412d3d872aec6eae7de81",
+    "path": "game-src/action/jyaldi-v5/spend.log",
+    "sha256": "d8fb2b9b1ffdb93ba978427b1cf91899b6ecfe9118ad75aa8c1199ac8ac565a7"
+  },
+  {
+    "source": "system",
+    "commit": "7f8fdfb0c5a6cef096d412d3d872aec6eae7de81",
+    "path": "game-src/action/kyuras/final/manifest.json",
+    "sha256": "2e91296e24e7470a20f74a7a05e25414bbaeda10ca5eb699ab8c3785ced318c6"
+  },
+  {
+    "source": "system",
+    "commit": "7f8fdfb0c5a6cef096d412d3d872aec6eae7de81",
+    "path": "game-src/action/kyuras/spend.log",
+    "sha256": "b4834200c7fa05dc096245671eba7fd965c964f47cb646cc3c2aa08eb3c84532"
+  },
+  {
+    "source": "system",
+    "commit": "7f8fdfb0c5a6cef096d412d3d872aec6eae7de81",
+    "path": "game-src/action/named/spend.log",
+    "sha256": "169f36f26c39df4bb5a963783e618b09e08d0ddef9e37dce01a0bcf83f7d9df0"
+  },
+  {
+    "source": "system",
+    "commit": "7f8fdfb0c5a6cef096d412d3d872aec6eae7de81",
+    "path": "game-src/action/npc/bathing-manifest.json",
+    "sha256": "e424b7acc1462e7b35ba10ff417dc84edf9b8c17d5739fafa6917a3e7451dfb0"
+  },
+  {
+    "source": "system",
+    "commit": "7f8fdfb0c5a6cef096d412d3d872aec6eae7de81",
+    "path": "game-src/action/npc/spend.log",
+    "sha256": "61c609a1f6055d7e2ff9f45044c3bbd662b68630d7cfd32a8be64de3274d3980"
+  },
+  {
+    "source": "system",
+    "commit": "7f8fdfb0c5a6cef096d412d3d872aec6eae7de81",
+    "path": "game-src/action/rojemon/final/manifest.json",
+    "sha256": "debedd83dd40df11de8b39c96cb06a13945357b58acf9ae0336eb820d8b37368"
+  },
+  {
+    "source": "system",
+    "commit": "7f8fdfb0c5a6cef096d412d3d872aec6eae7de81",
+    "path": "game-src/action/rojemon/spend.log",
+    "sha256": "041131e52090e43b81c98b0598560ab2faeaf6cc3363b96cab53d8904985c5f4"
+  },
+  {
+    "source": "system",
+    "commit": "7f8fdfb0c5a6cef096d412d3d872aec6eae7de81",
+    "path": "game-src/action/spangdal/full/final/manifest.json",
+    "sha256": "17c4452fba2c223174942d2b79107fc142c7dcaa2e95729cebd499f76d8f146a"
+  },
+  {
+    "source": "system",
+    "commit": "7f8fdfb0c5a6cef096d412d3d872aec6eae7de81",
+    "path": "game-src/action/spangdal/spend.log",
+    "sha256": "f1562a529192612b6ec0d754cd607676eaec54ebedc208bdcc20d3ac4fccf140"
+  },
+  {
+    "source": "preparation",
+    "commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+    "path": "game-src/action/blaret_saladin/final/blaret/manifest.json",
+    "sha256": "9aea41b039c43f7d7b2a65c3f0d96e1428f09414bbe400cd2d737e8697cf4352"
+  },
+  {
+    "source": "preparation",
+    "commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+    "path": "game-src/action/blaret_saladin/final/crusader/manifest.json",
+    "sha256": "67a2485b9995589bfdbbead7a4952f15df0527083d9eb5259b32833610d53d7c"
+  },
+  {
+    "source": "preparation",
+    "commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+    "path": "game-src/action/blaret_saladin/final/highmamluk/manifest.json",
+    "sha256": "805d749b38c70fe85276a3eeb1dd43d43e7e14a089d3c49831d6b7159fd8a96e"
+  },
+  {
+    "source": "preparation",
+    "commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+    "path": "game-src/action/blaret_saladin/final/knight/manifest.json",
+    "sha256": "c64d6abaaf20230161b6d5f34f2fd4e1575e2993a6e878c988827f0773a4aaef"
+  },
+  {
+    "source": "preparation",
+    "commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+    "path": "game-src/action/blaret_saladin/final/modernspirit/manifest.json",
+    "sha256": "cdf4d9ed32aa7f2c4acc49d20c9222e38ba89e96583eef7e57fc697b55bdd2a9"
+  },
+  {
+    "source": "preparation",
+    "commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+    "path": "game-src/action/blaret_saladin/final/saladin/manifest.json",
+    "sha256": "c83a3b08032e92715e5e4ebd7f6c15ae82d3437f4ad52c2812c843bb1cf491c1"
+  },
+  {
+    "source": "preparation",
+    "commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+    "path": "game-src/action/blaret_saladin/spend.log",
+    "sha256": "b9796b5147f0e4719c3af3e84c3d03f3a1fc882d74c9855abcdb1f37b17978f7"
+  },
+  {
+    "source": "preparation",
+    "commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+    "path": "game-src/action/boss/spend.log",
+    "sha256": "c08389c700a600d86cea9aaa175bda8c0741b0d41429e5f5245c85cf794b762c"
+  },
+  {
+    "source": "preparation",
+    "commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+    "path": "game-src/action/character-resume/delivery/manifest.json",
+    "sha256": "d29916e7ee6a3f89cf01921a83854001435d492f87744cd616b80c9fc4708033"
+  },
+  {
+    "source": "preparation",
+    "commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+    "path": "game-src/action/daydream/spend.log",
+    "sha256": "02b3117620a78009139b1336c0a1e7d1d9f26307f4532c149a00f6486417c5c8"
+  },
+  {
+    "source": "preparation",
+    "commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+    "path": "game-src/action/deadpole/full/final/manifest.json",
+    "sha256": "bff80be2b20a1e9c153c4806bf76503cc5b01a64f1e77713bc75a9038306a3f4"
+  },
+  {
+    "source": "preparation",
+    "commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+    "path": "game-src/action/deadpole/spend.log",
+    "sha256": "8ed55e3154ab08b0efff07b598609e4bb3a1b4adb7a82167dfb62d51ac6a6d31"
+  },
+  {
+    "source": "preparation",
+    "commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+    "path": "game-src/action/eileen/final/manifest.json",
+    "sha256": "32f2c08b33878a2d9cb2502507f2877301b293562241074316c0c6a303c55ac6"
+  },
+  {
+    "source": "preparation",
+    "commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+    "path": "game-src/action/eileen/spend.log",
+    "sha256": "df67c61fd364a1bce2b1479dfd58c237e9f6b0a9b1ba024f1665ec64406882ad"
+  },
+  {
+    "source": "preparation",
+    "commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+    "path": "game-src/action/fake_bureau/final/burn/manifest.json",
+    "sha256": "1acb0733afefd636b4853ec4f1259f65e25de7ffd11b98511ca73a03fdd2beb9"
+  },
+  {
+    "source": "preparation",
+    "commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+    "path": "game-src/action/fake_bureau/final/dohyeong/manifest.json",
+    "sha256": "c8557bb3a07234c00c033294145877be00e304e8ca273ebf118dcf8346786140"
+  },
+  {
+    "source": "preparation",
+    "commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+    "path": "game-src/action/fake_bureau/final/riot/manifest.json",
+    "sha256": "c7de50f9dbdbb42e2b9c02bf42f7f2e47a4ec4f8fe23eeec7f41c1d413e87bdb"
+  },
+  {
+    "source": "preparation",
+    "commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+    "path": "game-src/action/fake_bureau/final/seongju/manifest.json",
+    "sha256": "e021e075c16f6bc2af57a982f99d242316911c6c13ddfb9eab1074e2904b4a17"
+  },
+  {
+    "source": "preparation",
+    "commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+    "path": "game-src/action/fake_bureau/final/sword/manifest.json",
+    "sha256": "6657c9e9338af9b60b8c980239f86ec80e7ac72b37545c6d4634aa2f3c94c103"
+  },
+  {
+    "source": "preparation",
+    "commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+    "path": "game-src/action/fake_bureau/spend.log",
+    "sha256": "5e13b0a69ac3a9a1a52f2a0d4682216b518012a9f040e29472c3230a2c3cc1e0"
+  },
+  {
+    "source": "preparation",
+    "commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+    "path": "game-src/action/geshugan/final/manifest.json",
+    "sha256": "faa0c8745ada4d9f27aaca070a532c3ef4e409ec716ac7ae5a05f6697e97a39f"
+  },
+  {
+    "source": "preparation",
+    "commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+    "path": "game-src/action/geshugan/spend.log",
+    "sha256": "41812d6733fda4d7145014d4da4de982431c5e47982999ede91cc1f89e3713f8"
+  },
+  {
+    "source": "preparation",
+    "commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+    "path": "game-src/action/gorgodio/full/final/manifest.json",
+    "sha256": "a6843f3a1513ac271164e46e367a327e29f00f879ed75c7178c5837d801b9aab"
+  },
+  {
+    "source": "preparation",
+    "commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+    "path": "game-src/action/gorgodio/spend.log",
+    "sha256": "69f3ac1ca605774dd739d4f63e0187be560ae72c29c2f575fbd154954e4a39d2"
+  },
+  {
+    "source": "preparation",
+    "commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+    "path": "game-src/action/jyaldi-v5/full/final/manifest.json",
+    "sha256": "78bd9a68af565a6d595bdc8adf37a5337968e003e72f9525098e5b2a50d65095"
+  },
+  {
+    "source": "preparation",
+    "commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+    "path": "game-src/action/jyaldi-v5/manifest.json",
+    "sha256": "0b4fc4f3c496c3e3ade160f5633ab3878ba40c436aa349d37960121f62670929"
+  },
+  {
+    "source": "preparation",
+    "commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+    "path": "game-src/action/jyaldi-v5/spend.log",
+    "sha256": "792b6ab15dd296fe3fa9245fb24f3ae9c3d0fe74e72445d3c303beba58844312"
+  },
+  {
+    "source": "preparation",
+    "commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+    "path": "game-src/action/kyuras/final/manifest.json",
+    "sha256": "2e91296e24e7470a20f74a7a05e25414bbaeda10ca5eb699ab8c3785ced318c6"
+  },
+  {
+    "source": "preparation",
+    "commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+    "path": "game-src/action/kyuras/spend.log",
+    "sha256": "49afe54ce59daffba5783556da7a1fd81e98dbe850a735ee5bb6c0ca1909246e"
+  },
+  {
+    "source": "preparation",
+    "commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+    "path": "game-src/action/named/spend.log",
+    "sha256": "169f36f26c39df4bb5a963783e618b09e08d0ddef9e37dce01a0bcf83f7d9df0"
+  },
+  {
+    "source": "preparation",
+    "commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+    "path": "game-src/action/npc/bathing-manifest.json",
+    "sha256": "e424b7acc1462e7b35ba10ff417dc84edf9b8c17d5739fafa6917a3e7451dfb0"
+  },
+  {
+    "source": "preparation",
+    "commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+    "path": "game-src/action/npc/spend.log",
+    "sha256": "61c609a1f6055d7e2ff9f45044c3bbd662b68630d7cfd32a8be64de3274d3980"
+  },
+  {
+    "source": "preparation",
+    "commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+    "path": "game-src/action/rojemon/final/manifest.json",
+    "sha256": "debedd83dd40df11de8b39c96cb06a13945357b58acf9ae0336eb820d8b37368"
+  },
+  {
+    "source": "preparation",
+    "commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+    "path": "game-src/action/rojemon/spend.log",
+    "sha256": "041131e52090e43b81c98b0598560ab2faeaf6cc3363b96cab53d8904985c5f4"
+  },
+  {
+    "source": "preparation",
+    "commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+    "path": "game-src/action/spangdal/full/final/manifest.json",
+    "sha256": "17c4452fba2c223174942d2b79107fc142c7dcaa2e95729cebd499f76d8f146a"
+  },
+  {
+    "source": "preparation",
+    "commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+    "path": "game-src/action/spangdal/spend.log",
+    "sha256": "f1562a529192612b6ec0d754cd607676eaec54ebedc208bdcc20d3ac4fccf140"
+  },
+  {
+    "source": "blaret_saladin",
+    "commit": "067f62a148788799373d304704bcf13ee8208484",
+    "path": "game-src/action/blaret_saladin/final/blaret/manifest.json",
+    "sha256": "9aea41b039c43f7d7b2a65c3f0d96e1428f09414bbe400cd2d737e8697cf4352"
+  },
+  {
+    "source": "blaret_saladin",
+    "commit": "067f62a148788799373d304704bcf13ee8208484",
+    "path": "game-src/action/blaret_saladin/final/crusader/manifest.json",
+    "sha256": "67a2485b9995589bfdbbead7a4952f15df0527083d9eb5259b32833610d53d7c"
+  },
+  {
+    "source": "blaret_saladin",
+    "commit": "067f62a148788799373d304704bcf13ee8208484",
+    "path": "game-src/action/blaret_saladin/final/highmamluk/manifest.json",
+    "sha256": "805d749b38c70fe85276a3eeb1dd43d43e7e14a089d3c49831d6b7159fd8a96e"
+  },
+  {
+    "source": "blaret_saladin",
+    "commit": "067f62a148788799373d304704bcf13ee8208484",
+    "path": "game-src/action/blaret_saladin/final/knight/manifest.json",
+    "sha256": "c64d6abaaf20230161b6d5f34f2fd4e1575e2993a6e878c988827f0773a4aaef"
+  },
+  {
+    "source": "blaret_saladin",
+    "commit": "067f62a148788799373d304704bcf13ee8208484",
+    "path": "game-src/action/blaret_saladin/final/modernspirit/manifest.json",
+    "sha256": "cdf4d9ed32aa7f2c4acc49d20c9222e38ba89e96583eef7e57fc697b55bdd2a9"
+  },
+  {
+    "source": "blaret_saladin",
+    "commit": "067f62a148788799373d304704bcf13ee8208484",
+    "path": "game-src/action/blaret_saladin/final/saladin/manifest.json",
+    "sha256": "c83a3b08032e92715e5e4ebd7f6c15ae82d3437f4ad52c2812c843bb1cf491c1"
+  },
+  {
+    "source": "blaret_saladin",
+    "commit": "067f62a148788799373d304704bcf13ee8208484",
+    "path": "game-src/action/blaret_saladin/spend.log",
+    "sha256": "b9796b5147f0e4719c3af3e84c3d03f3a1fc882d74c9855abcdb1f37b17978f7"
+  }
+]
