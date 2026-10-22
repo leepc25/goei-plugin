@@ -1,0 +1,21 @@
+{
+  "name": "hq3_doors_objects",
+  "group": "hq3_doors",
+  "prompt": "STYLE (same for every image)\n2D side-scrolling beat-'em-up game art in the spirit of 1990s arcade brawlers, set in present-day Seoul. Subject: the headquarters of a secret government agency that handles supernatural anomalies. It must look SLEEK, MODERN, CLEAN AND HIGH-TECH, refined and expensive, like a new government intelligence building. Never old, never shabby, never a factory, never a cheap small company, no stains, no rust, no peeling paint, no clutter.\nAbove-ground finish: deep navy and charcoal walls, warm walnut wood panels, satin brushed-metal trims, frosted glass with a clear band, thin cool-white LED cove lights, light grey stone or polished floor.\nUnderground finish (\"the other world\"): white composite wall panels with thin seams, glowing cyan light lines, black glass, automatic sliding doors, clean SF laboratory look.\nNight shift, moderately dark overall so the characters stand out; no pure white areas, no big saturated areas except the cyan/amber accent lights.\nClean flat cel shading with 2-3 tone steps, crisp hard edges, bold dark outlines about 6-8 px thick around every object and major shape, FEW LARGE simple shapes (it will be shrunk to a small pixel-art screen), no fine texture, no noise, no grain, no blur. NOT pixel art.\nNO people, no silhouettes of people, NO text, letters, numbers or readable logos anywhere (signs use colored bands and simple pictograms only).\n\nPIECE SHEET RULES\nA sheet of separate game pieces, 1536x1024, transparent background (or a perfectly flat #FF00FF magenta background with nothing on it). 3x3 grid, one piece per cell, each fully inside its cell with margin, filling most of the cell. No cast shadows on the ground.\nCAMERA for every piece (very important): the front of the piece is parallel to the image (never turned left or right, no 3/4 view), and the camera looks down from above at a steep angle, so the TOP surface is visible as a band ABOVE the front face. The top band's height is about 0.3 x the real depth of the piece, measured on the same scale as its width (a 1 m wide, 1 m deep, 0.75 m tall desk = front face 0.75 tall, top band 0.3 tall above it, 1 wide). Sizes are given as W (left-right) x D (depth, front-to-back) x H (height) in meters; keep those proportions.\nChairs and anything a person sits on sideways are drawn in exact SIDE PROFILE facing RIGHT (the sitter would look to the right).\n\nOVERRIDE CAMERA: all door pieces straight-on front elevation, no top band.\nhq3_doors_objects (doors are flat on the wall: draw them straight-on, NO top band). Door opening height 2.1 m.\n1 glass door frame: brushed-metal frame around an EMPTY dark opening (1.6 m wide), a small card reader with a green light on the right side of the frame.\n2 one frosted glass sliding door leaf (0.8 m wide, 2.1 m tall) with a clear horizontal band at eye height, metal edge.\n3 SF door frame: thick white frame with cyan light strip around an EMPTY dark opening (1.7 m wide), status light on the right.\n4 one SF sliding door leaf: white panel 0.85 m wide, 2.1 m tall, with a thin cyan vertical light line.\n5 elevator frame: brushed-metal frame around an EMPTY dark opening (1.6 m wide), amber floor indicator above (dots, no numbers), call button panel on the right.\n6 one elevator door leaf: brushed steel, 0.8 m wide, 2.1 m tall.\n7 stairwell opening going UP: a dark opening (1.2 m wide) with the first steps of a modern stair rising to the right inside, metal handrail, lit from above.\n8 stairwell opening going DOWN: a dark opening (1.2 m wide) with steps going down to the left inside, metal handrail.\n9 containment cell door: heavy closed dark-grey sliding door (1.5 m wide) with yellow-black hazard edge, a round status light and a small blank plate, in a white frame.",
+  "transparent": true,
+  "source": "/workspace/generated_images/exec-383170f8-5ad6-4e58-a0ec-f0ccdfbfea0d.png",
+  "source_size": [
+    1536,
+    1024
+  ],
+  "size": [
+    1536,
+    1024
+  ],
+  "mode": "RGBA",
+  "sha256": "efde866eaad734c4350d345e0ec3021033415f379342bfa8c14eebf9c6cb2736",
+  "alpha_extrema": [
+    0,
+    254
+  ]
+}
