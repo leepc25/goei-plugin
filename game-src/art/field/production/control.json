@@ -1,0 +1,22 @@
+{
+  "release_skeleton_v3_motions": true,
+  "reason": "User ordered docs first then complete Jyaldi rebuild under front-south/east-movement/southeast-stationary policy. Continue all character images/registration. Only Jyaldi motions authorized to restart; all other motion expansion remains gated.",
+  "max_in_flight": 20,
+  "max_character_pipeline_in_flight": 6,
+  "authorized_total_characters": 55,
+  "authorized_clips_per_character": 20,
+  "stop_all": false,
+  "stopped_by_user_at": 1792778185.5597813,
+  "direction_policy": {
+    "reference": "front-facing south",
+    "movement_and_combat": "east",
+    "stationary_noncombat": "south-east",
+    "southeast_templates": [
+      "breathing-idle",
+      "drinking"
+    ]
+  },
+  "motion_allowed_slugs": [
+    "jyaldi"
+  ]
+}
