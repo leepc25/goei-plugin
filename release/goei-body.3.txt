@@ -1,4 +1,26 @@
- @__PURE__ */ new Set([...Object.keys(state ?? {}), ...Object.keys(saved)])].filter(mine)) out[k] = String(saved[k] ?? "");
+h (error) {
+      console.log(`[goei] 기본 설정을 읽지 못했어요: ${error instanceof Error ? error.message : String(error)}`);
+      return getPrefs();
+    }
+  }
+  async function saveVarDefaults(prefixes, state) {
+    const mine = (k) => PREF_VAR.test(k) && prefixes.some((x) => k.startsWith(x));
+    await savePrefs((p) => {
+      const keys = [.../* @__PURE__ */ new Set([...Object.keys(state ?? {}), ...Object.keys(p.vars ?? {})])].filter(mine);
+      const vars = { ...p.vars ?? {} };
+      for (const k of keys) {
+        const v = state?.[k];
+        if (v === void 0 || v === null || v === "" || v === "null") delete vars[k];
+        else vars[k] = String(v);
+      }
+      return { ...p, vars };
+    });
+  }
+  function loadVarDefaults(prefixes, state) {
+    const mine = (k) => PREF_VAR.test(k) && prefixes.some((x) => k.startsWith(x));
+    const saved = getPrefs().vars ?? {};
+    const out = {};
+    for (const k of [.../* @__PURE__ */ new Set([...Object.keys(state ?? {}), ...Object.keys(saved)])].filter(mine)) out[k] = String(saved[k] ?? "");
     return out;
   }
   async function savePrefs(change) {
@@ -268,7 +290,7 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
   }
   var blank2 = (item2) => item2.v ? String(item2.def) : "";
   function parse2(value) {
-    const m = /^(gn|ph|nw|gen):([a-z_]+)=(.*)$/.exec(value);
+    const m = /^(gn|ph|nw|hq|gen):([a-z_]+)=(.*)$/.exec(value);
     if (!m) return null;
     const f = m[1];
     const item2 = advItem(f, m[2]);
@@ -3550,17 +3572,4 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .gx-pname b { color: #04201c; background: var(--amber); border-radius: 999px; padding: 0 5px; font-size: 12px; }
 .gx-pin.nation .gx-dot { width: 12px; height: 12px; }
 .gx-pin.nation .gx-pname { font-size: 13px; }
-.gx-pin.fac .gx-dot { border-radius: 3px; background: #9cc4ff; }
-.gx-pin.sealed .gx-dot { background: var(--danger); }
-.gx-pin.hot .gx-dot { background: var(--amber); box-shadow: 0 0 0 2px var(--void), 0 0 0 6px rgba(224, 163, 60, .35); }
-.gx-pin.hot-an .gx-dot { background: var(--danger); box-shadow: 0 0 0 2px var(--void), 0 0 0 6px rgba(255, 143, 143, .3); }
-.gx-pin.hot-ms .gx-dot { background: #c9a7ff; box-shadow: 0 0 0 2px var(--void), 0 0 0 6px rgba(201, 167, 255, .3); }
-.gx-pin.sel .gx-pname { background: var(--signal); color: var(--on-signal); }
-.gx-pin:hover .gx-pname { outline: 1px solid var(--signal); }
-.gx-mini {
-  min-height: 32px; padding: 0 10px; border: 1px solid var(--line); border-radius: 8px;
-  background: var(--void); color: var(--text); font-size: 13px; white-space: nowrap;
-}
-.gx-mini:hover { border-color: var(--mint); }
-.gx-mini.danger { border-color: var(--danger); color: var(--danger); }
-.gx-chips { display: flex; gap: 6px; fl
+.gx-pin.fac .gx-do

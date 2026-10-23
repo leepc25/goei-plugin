@@ -1,4 +1,194 @@
-"first_call");
+
+      foot.x = p.x;
+      foot.y = p.y;
+      if (p.airborne || moved > 60) return void (foot.d = 0);
+      foot.d += moved;
+      if (foot.d >= (p.running ? 75 : 55)) {
+        foot.d = 0;
+        audio.event({ type: "step", x: p.x, vol: p.running ? 0.9 : 0.6 });
+      }
+    };
+    globalThis.__goeiStoryStart = (id) => CUTSCENES[id] || VIDEOS[id] ? story.cutscene(id) : story.say(id);
+    const story = mountStory(
+      storyRoot,
+      {
+        getAgent: () => runAgent,
+        sfx: (n) => audio.event({ type: "custom", name: n }),
+        shake: (ms, amp) => shell.fx.onGameEvent({ type: "shake", ms, amp }),
+        anchor: (id) => {
+          if (id !== "agent" || !world) return null;
+          const st = shell.canvas.parentElement;
+          const m = /translate\(([-\d.]+)px, ([-\d.]+)px\)/.exec(st.style.transform);
+          const k = shell.stage.scale || 1;
+          const ox = st.offsetLeft + (m ? +m[1] : 0) - storyRoot.offsetLeft, oy = st.offsetTop + (m ? +m[2] : 0) - storyRoot.offsetTop;
+          const p = world.player;
+          const gx = Math.max(200, Math.min(1e3, p.x - world.camX));
+          let maxX;
+          const tp = storyRoot.ownerDocument.querySelector(".tp");
+          if (tp && tp.offsetParent) {
+            let tx = 0;
+            for (let n = tp; n && n !== storyRoot.offsetParent; n = n.offsetParent) tx += n.offsetLeft;
+            for (const b of tp.querySelectorAll(".tp-b:not(.item):not(.top)")) {
+              if (!b.offsetWidth || getComputedStyle(b).display === "none") continue;
+              const left = tx - storyRoot.offsetLeft + new DOMMatrix(getComputedStyle(b).transform).m41;
+              if (left > storyRoot.clientWidth / 2) maxX = Math.min(maxX ?? Infinity, left);
+            }
+          }
+          let lo = ox, hi = Math.min(maxX ?? Infinity, ox + 1280 * k);
+          const gap = bubbleGap(world, gx);
+          if (gap) {
+            lo = Math.max(lo, ox + gap[0] * k);
+            hi = Math.min(hi, ox + gap[1] * k);
+          }
+          return { x: ox + gx * k, y: oy + Math.max(120, p.y - p.z - (world.hintShown ? 362 : 290)) * k, minX: lo, maxX: hi };
+        },
+        emit: (ev, arg) => world?.emit({ type: "custom", name: ev, data: { arg } }),
+        paused: () => shell.paused && !openingOn
+      },
+      { saved: savedFlags }
+    );
+    globalThis.__goeiStory = story;
+    const saveFlags = () => {
+      try {
+        localStorage.setItem("goei-game-story", JSON.stringify(story.flags));
+      } catch {
+      }
+    };
+    const storyKeys = (e) => {
+      if (!story.isBlocking()) return;
+      if (e.code === "Escape") story.skip();
+      else if (/^Digit[1-9]$/.test(e.code)) story.choose(Number(e.code.slice(5)) - 1);
+      else if (["Space", "Enter", "KeyE", "KeyZ", "KeyA"].includes(e.code)) story.advance();
+      else return;
+      e.preventDefault();
+      e.stopImmediatePropagation();
+    };
+    window.addEventListener("keydown", storyKeys, true);
+    const saves = {
+      ...session.hqSaves,
+      restore: async (n) => {
+        const hq3 = await session.hqSaves.restore(n);
+        if (hq3) elevator.reloadMeta();
+        return hq3;
+      }
+    };
+    let floorPick = null;
+    const floorBox = document.createElement("div");
+    floorBox.className = "goei-engine-elev";
+    floorBox.hidden = true;
+    storyRoot.appendChild(floorBox);
+    const closeFloors = (i) => {
+      floorBox.hidden = true;
+      const f = floorPick;
+      floorPick = null;
+      f?.(i);
+    };
+    const chooseFloor = (opts, pick6) => {
+      floorPick = pick6;
+      floorBox.innerHTML = opts.map((o, i) => `<button type="button" data-i="${i}"${o.open && !o.here ? "" : " disabled"}${o.here ? ' class="here"' : ""}>${o.label}</button>`).join("");
+      floorBox.hidden = false;
+      audio.play("panelButton");
+    };
+    floorBox.addEventListener("click", (e) => {
+      const b = e.target.closest("button");
+      if (b && !b.disabled) closeFloors(Number(b.dataset.i));
+    });
+    const floorKeys = (e) => {
+      if (floorBox.hidden) return;
+      if (e.code === "Escape") closeFloors(null);
+      else if (/^Digit[1-9]$/.test(e.code)) {
+        const n = e.code.slice(5);
+        const want = n === "4" ? "B1" : n === "5" ? "B2" : n;
+        const b = [...floorBox.querySelectorAll("button")].find((q) => q.textContent === want);
+        if (b && !b.disabled) closeFloors(Number(b.dataset.i));
+      } else return;
+      e.preventDefault();
+      e.stopImmediatePropagation();
+    };
+    window.addEventListener("keydown", floorKeys, true);
+    const canFilm = () => location.protocol !== "file:";
+    const cutOnce = (id, done2) => {
+      if (!VIDEOS[id] || !canFilm() || story.flags[`cut_${id}`] || story.isBlocking()) return false;
+      story.flags[`cut_${id}`] = 1;
+      saveFlags();
+      story.cutscene(id, done2);
+      return true;
+    };
+    let dinnerDue = false;
+    const hq2 = hqAdapter(saves, bridge, {
+      resuming: () => !!session.checkpoint,
+      chooseFloor,
+      sfx: (n) => audio.play(n),
+      closed: () => {
+        if (dinnerDue) dinnerDue = false, cutOnce("dinner");
+      },
+      overlay: visit ? (c, people, player) => visit.draw(c, people, player) : void 0
+    });
+    const hqKeys = (e) => {
+      if (e.code !== "Escape" || !game?.inHub || !hq2.isOpen?.()) return;
+      hq2.close();
+      e.preventDefault();
+      e.stopImmediatePropagation();
+    };
+    const saveOnHide = () => {
+      game?.checkpoint();
+      void session.flush();
+    };
+    window.addEventListener("pagehide", saveOnHide);
+    document.addEventListener("visibilitychange", saveOnHide);
+    window.addEventListener("keydown", hqKeys, true);
+    let openingT = null;
+    const cancelStoryForScene = () => {
+      if (openingT) clearTimeout(openingT);
+      openingT = null;
+      story.cancel();
+      openingOn = false;
+      const menuEl = shell.stage.root.querySelector(".gs-ui");
+      if (menuEl) menuEl.style.visibility = "";
+      storyRoot.style.zIndex = "15";
+      storyRoot.style.visibility = shell.paused ? "hidden" : "";
+    };
+    const armOpening = () => {
+      if (openingT) clearTimeout(openingT);
+      openingT = null;
+      if (!VIDEOS.opening || !canFilm()) return;
+      openingT = setTimeout(() => {
+        openingT = null;
+        if (shell.mode !== "title" || story.isBlocking()) return armOpening();
+        const menuEl = shell.stage.root.querySelector(".gs-ui");
+        if (menuEl) menuEl.style.visibility = "hidden";
+        storyRoot.style.visibility = "";
+        storyRoot.style.zIndex = "60";
+        openingOn = true;
+        story.cutscene("opening", () => {
+          openingOn = false;
+          if (menuEl) menuEl.style.visibility = "";
+          storyRoot.style.zIndex = "15";
+          if (shell.paused) storyRoot.style.visibility = "hidden";
+          if (shell.mode === "title") armOpening();
+        });
+      }, 2e4);
+    };
+    const titleInput = (e) => {
+      if (openingOn) {
+        story.skip();
+        e.preventDefault();
+        e.stopImmediatePropagation();
+      } else if (openingT && shell.mode === "title") armOpening();
+    };
+    window.addEventListener("keydown", titleInput, true);
+    window.addEventListener("pointerdown", titleInput, true);
+    const listeners = [
+      (e) => {
+        audio.event(e);
+        if (game?.inHub && (e.type === "enter:floor" || e.type === "custom")) return;
+        shell.fx.onGameEvent(e);
+        story.event(e.type, e);
+        if (e.type === "run:end") saveFlags();
+        if (e.type === "enter:floor" && world) {
+          const f = world.floor;
+          if (f.id.startsWith("ending")) cutOnce("exit");
+          else if ((f.depth ?? 0) >= 2) cutOnce("first_call");
         }
       }
     ];
@@ -51,9 +241,9 @@
         if (!game?.inHub && w.stage === elevator) {
           const m = elevator.mapView();
           const t = performance.now() / 1e3;
-          const U = Math.min(2.2, Math.max(1, 1280 / Math.max(1, shell.canvas.clientWidth || 1280)));
-          if (m && mapOpen) drawRunMap(ctx, m, w.player.x, t, U);
-          else if (m) drawMiniMap(ctx, m, w.player.x, t, U);
+          const U2 = Math.min(2.2, Math.max(1, 1280 / Math.max(1, shell.canvas.clientWidth || 1280)));
+          if (m && mapOpen) drawRunMap(ctx, m, w.player.x, t, U2);
+          else if (m) drawMiniMap(ctx, m, w.player.x, t, U2);
         } else mapOpen = false;
         syncNavigationButton(shell.canvas, hs.navigation);
         shell.touch.setItems(hs.items);
@@ -206,7 +396,7 @@
   }
 
   // src/game/action/engine/touch.ts
-  var CSS2 = `
+  var CSS3 = `
 .gt-wrap{position:absolute;inset:0;pointer-events:none;user-select:none;-webkit-user-select:none;touch-action:none;z-index:5}
 .gt-stick{position:absolute;left:0;top:0;bottom:0;width:42%;pointer-events:auto;touch-action:none}
 .gt-ring{position:absolute;width:120px;height:120px;margin:-60px 0 0 -60px;border-radius:50%;border:2px solid rgba(255,255,255,.35);background:rgba(255,255,255,.06);display:none}
@@ -233,12 +423,12 @@
   ];
   function mountTouch(root, input) {
     const st = document.createElement("style");
-    st.textContent = CSS2;
-    const wrap = document.createElement("div");
-    wrap.className = "gt-wrap";
-    wrap.innerHTML = `<div class="gt-stick"><div class="gt-ring"></div><div class="gt-knob"></div></div><div class="gt-btns"></div><div class="gt-top"><div class="gt-b" data-b="pause">메뉴</div></div>`;
-    root.append(st, wrap);
-    const grid = wrap.querySelector(".gt-btns");
+    st.textContent = CSS3;
+    const wrap2 = document.createElement("div");
+    wrap2.className = "gt-wrap";
+    wrap2.innerHTML = `<div class="gt-stick"><div class="gt-ring"></div><div class="gt-knob"></div></div><div class="gt-btns"></div><div class="gt-top"><div class="gt-b" data-b="pause">메뉴</div></div>`;
+    root.append(st, wrap2);
+    const grid = wrap2.querySelector(".gt-btns");
     for (const [b, label3, cls] of BTNS) {
       const d3 = document.createElement("div");
       d3.className = "gt-b" + (cls ? " " + cls : "");
@@ -246,7 +436,7 @@
       d3.textContent = label3;
       grid.appendChild(d3);
     }
-    wrap.querySelectorAll(".gt-b").forEach((el) => {
+    wrap2.querySelectorAll(".gt-b").forEach((el) => {
       const b = el.dataset.b;
       const on = (e) => {
         e.preventDefault();
@@ -262,9 +452,9 @@
       el.addEventListener("pointerup", off2);
       el.addEventListener("pointercancel", off2);
     });
-    const stick = wrap.querySelector(".gt-stick");
-    const ring = wrap.querySelector(".gt-ring");
-    const knob = wrap.querySelector(".gt-knob");
+    const stick = wrap2.querySelector(".gt-stick");
+    const ring = wrap2.querySelector(".gt-ring");
+    const knob = wrap2.querySelector(".gt-knob");
     let id = -1;
     let ox = 0;
     let oy = 0;
@@ -313,13 +503,13 @@
     stick.addEventListener("pointerup", end);
     stick.addEventListener("pointercancel", end);
     return () => {
-      wrap.remove();
+      wrap2.remove();
       st.remove();
     };
   }
 
   // src/game/action/main.ts
-  var CSS3 = `
+  var CSS4 = `
 .goei-engine{position:relative;width:100%;height:100%;background:#000;display:flex;align-items:center;justify-content:center;overflow:hidden}
 .goei-engine-canvas{display:block;max-width:100%;max-height:100%;aspect-ratio:16/9;width:100%;height:auto;image-rendering:pixelated;touch-action:none}
 .goei-engine-stage{position:relative;width:min(100%, calc(100dvh * 16 / 9));aspect-ratio:16/9;max-height:100%}
@@ -335,7 +525,7 @@
 `;
   function mountGame(box2, bridge) {
     const st = document.createElement("style");
-    st.textContent = CSS3;
+    st.textContent = CSS4;
     const root = document.createElement("div");
     root.className = "goei-engine";
     const stage = document.createElement("div");
@@ -2924,7 +3114,7 @@
     }
   }
   var mod = {
-    version: "0.16.43",
+    version: "0.16.44",
     mount: (box2, bridge) => mountPlay(box2, bridge),
     // 이전 시험판: 저장 키와 그림 팩은 예전 그대로 (goei:game · goei:game-action:v1)
     legacy: {

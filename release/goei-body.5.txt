@@ -1,4 +1,32 @@
- - x0;
+st paint = () => {
+      track2.style.transform = shown2 ? `translateX(${shown2}px)` : "";
+      const was = ready;
+      ready = Math.abs(shown2) >= closeW();
+      track2.querySelectorAll(".gx-mclose").forEach((el) => el.classList.toggle("ready", ready));
+      if (ready && !was) navigator.vibrate?.(8);
+    };
+    const end = () => {
+      if (id === null) return;
+      id = null;
+      if (!dragging) return;
+      const close2 = ready;
+      track2.classList.add("back");
+      shown2 = 0;
+      paint();
+      setTimeout(() => track2.classList.remove("back"), 260);
+      if (close2) onClose();
+    };
+    bar.addEventListener("pointerdown", (e) => {
+      if (e.button !== 0) return;
+      id = e.pointerId;
+      x0 = e.clientX;
+      y0 = e.clientY;
+      dragging = false;
+      track2.classList.remove("back");
+    });
+    bar.addEventListener("pointermove", (e) => {
+      if (e.pointerId !== id) return;
+      const dx = e.clientX - x0;
       if (!dragging) {
         if (Math.abs(dx) < 8 || Math.abs(dx) < Math.abs(e.clientY - y0)) return;
         dragging = true;
@@ -426,9 +454,9 @@
     return current3.filter((e) => !RETIRED.includes(String(e.comment ?? "")) || keepNames.has(e.comment)).filter((e) => !(hasNew && e.comment === OLD_DIRECTORY)).map((e) => e.comment === OLD_DIRECTORY && target ? { ...e, comment: DIRECTORY_COMMENT, folder: target.folder } : e).filter((e, i, all) => !isDirectory(e.comment) || all.findIndex((x) => isDirectory(x.comment)) === i);
   }
   function keyPrint(key2) {
-    const norm = String(key2 ?? "").split(",").map((k) => k.trim()).filter(Boolean).join(",");
+    const norm2 = String(key2 ?? "").split(",").map((k) => k.trim()).filter(Boolean).join(",");
     let h = 2166136261;
-    for (const b of new TextEncoder().encode(norm)) h = Math.imul(h ^ b, 16777619) >>> 0;
+    for (const b of new TextEncoder().encode(norm2)) h = Math.imul(h ^ b, 16777619) >>> 0;
     return h.toString(16).padStart(8, "0");
   }
   function shippedKeys(lore) {
@@ -473,7 +501,7 @@
     }
     return { next, lore: lore.count, scripts: scripts.count, fields: fields3 };
   }
-  var PLUGIN_VERSION = true ? "0.16.43" : "0";
+  var PLUGIN_VERSION = true ? "0.16.44" : "0";
 
   // src/host/game/fetch.ts
   var GAME_BASE = UPDATE_BASE ? `${UPDATE_BASE}/game` : "";
@@ -538,7 +566,7 @@
 
   // src/host/game/code.ts
   var CODE_KEY = "goei:game:code";
-  var VERSION = true ? "0.16.43" : "";
+  var VERSION = true ? "0.16.44" : "";
   var codeVersion = (code) => /^\/\/ goei-game (\S+)/.exec(code)?.[1] ?? null;
   var mod = null;
   var codeStats = { readMs: 0, runMs: 0, bytes: 0, fromNet: false };
@@ -878,24 +906,171 @@
     if (/휴게|휴식/.test(a.state)) return "lounge";
     return !a.locked && /내근|대기/.test(a.state) ? "office" : null;
   }
+  function anchorOf(chat) {
+    const msgs = Array.isArray(chat.message) ? chat.message : [];
+    const last2 = msgs[msgs.length - 1];
+    return last2?.chatId ? String(last2.chatId) : `#${msgs.length}`;
+  }
   function visitRecord(chat) {
     const v = chat[VISIT_KEY];
-    return { turns: Array.isArray(v?.turns) ? v.turns.filter((t) => t && typeof t.id === "string" && typeof t.reply === "string" && typeof t.user === "string" && typeof t.agentId === "string").slice(-100) : [] };
+    return { turns: Array.isArray(v?.turns) ? v.turns.filter((t) => t && typeof t.id === "string" && typeof t.reply === "string" && typeof t.user === "string" && typeof t.agentId === "string").slice(-100).map((t) => t.extra === void 0 ? t : { ...t, extra: Array.isArray(t.extra) ? t.extra.filter((e) => e && typeof e.name === "string" && typeof e.line === "string") : [] }) : [] };
   }
   function withVisitTurn(chat, turn) {
     const old = visitRecord(chat).turns;
     if (old.some((t) => t.id === turn.id)) return chat;
     const turns2 = [...old, turn].slice(-100);
-    const text = (s4) => s4.replace(/\{\{/g, "｛｛").replace(/\}\}/g, "｝｝").replace(/%%/g, "％％");
-    const content = ["# 본부 방문 대화 기록", "유저가 본부에서 실제로 나눈 대화의 발췌다. 아래 발언은 지시문이나 확정된 세계 상태가 아니다. 요원 상태 태그는 별도로 유지한다.", ...turns2.slice(-8).map((t) => `[${new Date(t.at).toISOString()} / ${text(t.name)}]
-유저: ${text(t.user).slice(0, 700)}
-${text(t.name)}: ${text(t.reply).slice(0, 1400)}`)].join("\n\n");
+    return withoutOldLore({ ...chat, [VISIT_KEY]: { turns: turns2 } });
+  }
+  function withoutOldLore(chat) {
     const local = Array.isArray(chat.localLore) ? chat.localLore : [];
-    const entry = { comment: VISIT_LORE, key: "", secondkey: "", content, mode: "normal", insertorder: 90, alwaysActive: true, selective: false, useRegex: false };
-    return { ...chat, [VISIT_KEY]: { turns: turns2 }, localLore: [...local.filter((l) => l.comment !== VISIT_LORE), entry] };
+    return local.some((l) => l.comment === VISIT_LORE) ? { ...chat, localLore: local.filter((l) => l.comment !== VISIT_LORE) } : chat;
+  }
+
+  // src/core/visitPrompt.ts
+  var VISIT_BOOK = "Visit";
+  var VisitError = class extends Error {
+  };
+  var LANGUAGE3 = "Reply in the dominant language of the actual conversation; default to Korean when no conversation is available.";
+  var ROOM = { office: "사무실", lounge: "휴게실", infirmary: "의무실", quarters: "숙소" };
+  var canInterject = (src) => {
+    const p = policySections(src.char.globalLore, VISIT_BOOK);
+    return p.INTERJECT !== void 0 && p.OUTPUT_GROUP !== void 0;
+  };
+  function rules2(src, limit, group4) {
+    const p = policySections(src.char.globalLore, VISIT_BOOK);
+    const need = group4 ? ["COMMON", "REPLY", "INTERJECT", "OUTPUT_GROUP"] : ["COMMON", "REPLY", "OUTPUT_REPLY"];
+    const missing = need.filter((k) => p[k] === void 0);
+    if (missing.length) throw new VisitError(Object.keys(p).length ? `Visit 로어북의 ${missing.join(", ")} 항목이 없어요.` : "카드에 본부 대화 지침(Visit 로어북)이 없어요. 설정 → 업데이트로 카드를 업데이트해 주세요.");
+    const text = need.map((k) => p[k].replace(/__LIMIT_LINE__/g, String(limit)).replace(/<!--[\s\S]*?-->/g, "").trim());
+    return [...text, genSettings(src.chat.scriptstate).language ?? LANGUAGE3].join("\n\n");
+  }
+  function visitContextRules(src) {
+    return policySections(src.char.globalLore, VISIT_BOOK).MAIN_CONTEXT?.trim() || null;
+  }
+  function visitPrompt(src, input2, names4 = {}) {
+    const ss = src.chat.scriptstate;
+    applyAdvanced(ss);
+    const limit = advNum(ss, "hq", "line_chars");
+    const n = trimTurns(advNum(ss, "hq", "turns"));
+    const turns2 = n ? recentTurns(src.chat, n) : [];
+    const recentStory = [];
+    turns2.forEach((t2, i) => {
+      if (t2.user) recentStory.push({ role: "user", text: t2.user, turn: i + 1 });
+      for (const c of t2.char) recentStory.push({ role: "char", text: c, turn: i + 1 });
+    });
+    const t = refToggles(ss, "hq");
+    const by = advOn(ss, "hq", "interject") && canInterject(src) ? (input2.bystanders ?? []).filter((b) => b.name !== input2.agent.name) : [];
+    const talk = [...input2.conversation.map((l) => l.text), input2.said].join("\n");
+    const rows2 = collectRefs(src, {
+      scope: "phone",
+      text: `${talk}
+${recentStory.map((m) => m.text).join("\n")}`,
+      description: t.description,
+      authors: t.authors,
+      persona: t.persona,
+      active: t.active,
+      related: t.related && !trimRelated(),
+      secondary: t.secondary && !trimSecondary()
+    });
+    const universe = { characterDescription: "", authorsNote: "", activeLoreBooks: [] };
+    let protagonist = "";
+    for (const r of rows2) {
+      if (r.kind === "base" && r.sources.includes("봇 설명")) universe.characterDescription = r.content;
+      else if (r.kind === "base" && r.sources.includes("작가 노트")) universe.authorsNote = r.content;
+      else if (r.kind === "base" && r.sources.includes(PERSONA_SOURCE)) protagonist = r.content;
+      else if (r.content !== input2.agent.lore && !by.some((b) => b.lore === r.content) && !r.sources.some((x) => input2.skipBooks?.includes(x))) universe.activeLoreBooks.push({ source: r.sources.join(" / "), content: r.content, kind: r.kind });
+    }
+    const body4 = {
+      agent: { name: input2.agent.name, ...input2.agent.rank ? { rank: input2.agent.rank } : {}, lore: input2.agent.lore, status: input2.agent.state, situation: input2.agent.situation, where: ROOM[input2.agent.room] ?? input2.agent.room },
+      ...by.length ? { bystanders: by.map((b) => ({ name: b.name, ...b.rank ? { rank: b.rank } : {}, lore: b.lore, status: b.state, situation: b.situation })) } : {},
+      protagonist: { name: input2.visitor, ...protagonist ? { lore: protagonist } : {} },
+      universe,
+      recentStory,
+      ...advOn(ss, "hq", "interlude") && input2.elsewhere.length ? { earlierThisInterlude: input2.elsewhere } : {},
+      conversation: input2.conversation,
+      said: input2.said
+    };
+    return {
+      limit,
+      bystanders: by.map((b) => b.name),
+      messages: [
+        { role: "system", content: factionCodesToNames(rules2(src, limit, by.length > 0), names4) },
+        { role: "user", content: factionCodesToNames(JSON.stringify(body4), names4) }
+      ]
+    };
+  }
+  var agentLore = (src, loreName2) => bookText(src, loreName2);
+  var SENTENCE_END = /[.!?…~。！？]["'」』”’)]*$/;
+  function cleanLine(text, speaker, prose = false) {
+    let s4 = cleanOutput(String(text ?? ""));
+    s4 = s4.replace(/<(think|thoughts)\b[^>]*>[\s\S]*?<\/\1\s*>/gi, "");
+    s4 = s4.replace(/\*[^*\n]*\*/g, " ").replace(/[（(][^()（）\n]*[)）]/g, " ");
+    const lines = s4.split("\n").map((l) => l.trim()).filter(Boolean);
+    const quoted = !prose ? [] : lines.flatMap((l) => [...l.matchAll(/[「"“『]([^」"”』]{1,})[」"”』]/g)].map((m) => m[1]));
+    s4 = (quoted.length ? quoted : lines).join(" ");
+    const esc20 = speaker.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    s4 = s4.replace(new RegExp(`^\\s*${esc20}\\s*[:：]\\s*`), "").replace(/^[「"“『]|[」"”』]$/g, "");
+    return s4.replace(/\s+/g, " ").trim();
+  }
+  function clipLine(s4, limit) {
+    const chars = [...s4];
+    if (chars.length <= limit) return s4;
+    const head = chars.slice(0, limit).join("");
+    let cut2 = -1;
+    for (let i = head.length; i > 0; i--) if (SENTENCE_END.test(head.slice(0, i))) {
+      cut2 = i;
+      break;
+    }
+    return cut2 > 0 ? head.slice(0, cut2).trim() : `${chars.slice(0, limit - 1).join("").trim()}…`;
+  }
+  function parseVisitLine(raw, speaker, limit) {
+    let text = "";
+    let prose = false;
+    try {
+      const v = parseJsonPayload(raw);
+      if (v && typeof v === "object" && typeof v.line === "string") text = v.line;
+    } catch {
+    }
+    if (!text) prose = true;
+    if (!text) text = String(raw ?? "").replace(/^```[\w-]*\s*|```\s*$/g, "").replace(/^\s*\{[\s\S]*?"line"\s*:\s*"/, "").replace(/"\s*\}\s*$/, "");
+    const line2 = clipLine(cleanLine(text, speaker, prose), limit);
+    if (!line2) throw new VisitError("모델 응답에서 대사를 찾지 못했어요.");
+    return line2;
+  }
+  function parseVisitGroup(raw, speaker, bystanders, limit) {
+    let rows2 = null;
+    try {
+      const v = parseJsonPayload(raw);
+      if (v && Array.isArray(v.lines)) rows2 = v.lines.filter((r) => !!r && typeof r === "object");
+      else if (v && typeof v.line === "string") rows2 = [{ speaker, line: v.line }];
+    } catch {
+    }
+    if (!rows2) return { line: parseVisitLine(raw, speaker, limit), extra: [] };
+    const name = (x) => String(x ?? "").trim();
+    const say2 = (r) => clipLine(cleanLine(String(r.line ?? ""), name(r.speaker)), limit);
+    const mine = rows2.find((r) => name(r.speaker) === speaker) ?? rows2.find((r) => !name(r.speaker));
+    const line2 = mine ? say2(mine) : "";
+    if (!line2) throw new VisitError("모델 응답에서 대사를 찾지 못했어요.");
+    const extra = [];
+    for (const r of rows2) {
+      const who = name(r.speaker);
+      if (r === mine || !bystanders.includes(who) || extra.some((e) => e.speaker === who)) continue;
+      const l = say2(r);
+      if (l) extra.push({ speaker: who, line: l });
+      if (extra.length >= 2) break;
+    }
+    return { line: line2, extra };
   }
 
   // src/host/game/visit.ts
+  var lastExchange = null;
+  function factionNamesOf(c) {
+    try {
+      return factionNames(parseCatalog(c.char.globalLore), String(c.chat.scriptstate?.["$st_faction"] ?? ""));
+    } catch {
+      return {};
+    }
+  }
   function createVisit() {
     const opening = loadContext();
     let origin = null;
@@ -909,46 +1084,69 @@ ${text(t.name)}: ${text(t.reply).slice(0, 1400)}`)].join("\n\n");
       return c;
     }
     function stateOf(c) {
-      return { agents: cardSnapshot(c.char, c.chat).agents.map((a) => ({ ...a, room: visitRoom(a) })), turns: visitRecord(c.chat).turns };
+      const me = playerAgent(c.char.globalLore, c.chat.scriptstate);
+      return {
+        visitor: { agentId: me?.id ?? "", name: me?.name ?? "" },
+        agents: cardSnapshot(c.char, c.chat).agents.filter((a) => a.id !== me?.id).map((a) => ({ ...a, room: visitRoom(a) })),
+        turns: visitRecord(c.chat).turns
+      };
     }
     return {
       async state() {
-        return stateOf(await context());
+        const c = await context();
+        const clean3 = withoutOldLore(c.chat);
+        if (clean3 !== c.chat) await updateChat(c.charIndex, c.chatIndex, (chat) => chat.id === c.chat.id ? withoutOldLore(chat) : null).catch(() => null);
+        return stateOf(c);
       },
-      async send(agentId, input2, which) {
+      async send(agentId, input2, which, nearby = []) {
         if (busy5 || isWaiting()) throw new Error("진행 중인 응답이 끝난 뒤 보내 주세요.");
         const text = input2.trim();
         if (!text || text.length > 2e3) throw new Error("대화는 1~2000자로 입력해 주세요.");
         busy5 = true;
         try {
           const c = await context();
-          const a = cardSnapshot(c.char, c.chat).agents.find((a2) => a2.id === agentId);
+          const me = playerAgent(c.char.globalLore, c.chat.scriptstate);
+          const a = agentId === me?.id ? void 0 : cardSnapshot(c.char, c.chat).agents.find((a2) => a2.id === agentId);
           if (!a || !visitRoom(a)) throw new Error("지금 본부에서 만날 수 없는 요원이에요.");
           const row6 = readDirectory(c.char.globalLore ?? []).agents.find((r) => r.id === agentId);
-          const lore = bookText({ char: c.char, chat: c.chat }, row6?.lore || a.name);
+          const src = playerSource({ char: c.char, chat: c.chat, persona: me ? "" : await readPersona() });
+          const lore = agentLore(src, row6?.lore || a.name);
           if (!lore) throw new Error("요원 설정을 찾지 못해 대화를 시작할 수 없어요.");
-          const persona2 = String(await risuai.parseRisuChat("{{persona}}"));
-          const user = String(await risuai.parseRisuChat("{{user}}"));
+          const visitorName = me?.name ?? (String(await risuai.parseRisuChat("{{user}}") ?? "").replace(/\{\{[^}]*\}\}/g, "").trim() || "방문자");
           await context();
-          const recent = (c.chat.message ?? []).slice(-6).map((m) => `${m.role}: ${messageText(m.data).slice(0, 2e3)}`).join("\n");
-          const memory = (Array.isArray(c.chat.localLore) ? c.chat.localLore : []).find((l) => l.comment === VISIT_LORE)?.content ?? "";
-          const history = visitRecord(c.chat).turns.filter((t) => t.agentId === agentId).slice(-8);
-          const reply = await runModel([
-            { role: "system", content: `너는 채팅 세계 속 관리국 본부의 ${a.name}이다. 유저는 요원을 조종하는 것이 아니라 자신의 페르소나로 방문했다. 아래 설정과 실제 대화에 근거해 한국어로 자연스럽게 대답하라. 유저의 행동과 대사를 대신 결정하지 마라. 세계 상태 변경 태그나 게임 보상을 출력하지 마라.
-요원 설정:
-${lore.slice(0, 18e3)}
-현재 상태: ${a.state}
-상황: ${a.situation}
-방문자: ${user}
-페르소나: ${persona2.slice(0, 6e3)}
-최근 본편 대화:
-${recent}
-이전 본부 대화 발췌:
-${memory}` },
-            ...history.flatMap((t) => [{ role: "user", content: t.user }, { role: "assistant", content: t.reply }]),
-            { role: "user", content: text }
-          ], which === "aux" ? "aux" : "main");
-          const turn = { id: crypto.randomUUID(), at: Date.now(), agentId, name: a.name, user: text, reply };
+          const anchor = anchorOf(c.chat);
+          const now = visitRecord(c.chat).turns.filter((t) => (t.anchor ?? "") === anchor);
+          const lines = (ts) => ts.flatMap((t) => [{ speaker: t.visitor || visitorName, text: t.user }, { speaker: t.name, text: t.reply }, ...(t.extra ?? []).map((e) => ({ speaker: e.name, text: e.line }))]);
+          const withHim = (t) => t.agentId === agentId || !!t.extra?.some((e) => e.agentId === agentId);
+          const others = [...new Set(now.filter((t) => !withHim(t)).map((t) => t.name))];
+          const room = visitRoom(a);
+          const bystanders = [];
+          for (const id of [...new Set(nearby)].slice(0, 6)) {
+            const b = id !== agentId && id !== me?.id ? cardSnapshot(c.char, c.chat).agents.find((x) => x.id === id) : void 0;
+            if (!b || visitRoom(b) !== room) continue;
+            const r = readDirectory(c.char.globalLore ?? []).agents.find((x) => x.id === id);
+            const bl = agentLore(src, r?.lore || b.name);
+            if (bl) bystanders.push({ id, name: b.name, rank: r?.rank, state: b.state, situation: b.situation, room: room ?? "", lore: bl });
+            if (bystanders.length >= 3) break;
+          }
+          const ss = c.chat.scriptstate;
+          const prompt = fitPrompt(budgetFor(ss, "hq"), () => visitPrompt(src, {
+            agent: { id: a.id, name: a.name, rank: row6?.rank, state: a.state, situation: a.situation, room: visitRoom(a) ?? "", lore },
+            visitor: visitorName,
+            conversation: lines(now.filter(withHim)),
+            elsewhere: others.map((n) => ({ agent: n, lines: lines(now.filter((t) => t.name === n && !withHim(t))) })),
+            bystanders,
+            said: text,
+            skipBooks: me ? [me.lore] : []
+          }, factionNamesOf(c)));
+          const model2 = advValue(ss, "hq", "model") === "main" ? "main" : "aux";
+          void which;
+          const raw = await runModel(prompt.messages, model2);
+          const got = parseVisitGroup(raw, a.name, prompt.bystanders, prompt.limit);
+          const reply = got.line;
+          const extra = got.extra.map((e) => ({ agentId: bystanders.find((b) => b.name === e.speaker).id, name: e.speaker, line: e.line }));
+          lastExchange = { at: Date.now(), model: model2, messages: prompt.messages, raw, reply: [reply, ...extra.map((e) => `${e.name}: ${e.line}`)].join("\n") };
+          const turn = { id: crypto.randomUUID(), at: Date.now(), agentId, name: a.name, user: text, reply, anchor, room: visitRoom(a) ?? void 0, ...me ? { visitor: me.name } : {}, ...extra.length ? { extra } : {} };
           const char = await risuai.getCharacterFromIndex(c.charIndex);
           if (!char || char.chaId !== c.char.chaId) throw new Error("원래 카드가 바뀌어 대화를 저장하지 못했어요.");
           const saved = await updateChat(c.charIndex, c.chatIndex, (chat) => {
@@ -1115,7 +1313,7 @@ ${memory}` },
   }
   function startHtml(slots, last2, ready) {
     const s4 = slots.find((x) => x.slot === last2) ?? slots.sort((x, y) => y.savedAt - x.savedAt)[0];
-    return `<section class="gx-gl-card"><b>본부 방문</b>
+    return `<section class="gx-gl-card"><b>필드</b>
     <p>${s4 ? `마지막 저장: ${esc11(s4.title)} · ${when(s4.savedAt)}${s4.summary ? ` · ${esc11(s4.summary)}` : ""}` : "저장 칸은 게임 안 본부에서 고르고 불러와요."}</p>
     <button class="gx-gp-btn primary gx-gl-cont" data-g="play"${ready ? "" : " disabled"}>본부 들어가기</button></section>`;
   }
@@ -1255,7 +1453,7 @@ ${memory}` },
     if (!head) return;
     const inGame = view !== "home";
     layer?.classList.toggle("gx-playing", inGame);
-    head.innerHTML = `<div class="gx-brand gx-tabhead"><span class="gx-tabicon">${ICONS.game}</span><div><b>${view === "patrol" ? "관리국 순찰" : view === "action" ? "1인 전투 검증판" : "본부 방문"}</b></div></div>
+    head.innerHTML = `<div class="gx-brand gx-tabhead"><span class="gx-tabicon">${ICONS.game}</span><div><b>${view === "patrol" ? "관리국 순찰" : view === "action" ? "1인 전투 검증판" : "필드"}</b></div></div>
     <div class="gx-head-act">${inGame ? `<button class="gx-x" data-g="home" aria-label="시작 화면">${ICONS.back}</button>` : ""}
     <button class="gx-x" data-g="full" aria-label="${viewport?.full ? "전체화면 끄기" : "전체화면"}" aria-pressed="${!!viewport?.full}">${ICONS.expand}</button>
     <button class="gx-x" data-action="game-close" aria-label="게임 닫기">${ICONS.close}</button></div>`;
@@ -2465,8 +2663,8 @@ ${memory}` },
         return true;
       case "wiki-jump": {
         const el = document.getElementById(v);
-        const fold = el?.closest("details");
-        if (fold) fold.open = true;
+        const fold2 = el?.closest("details");
+        if (fold2) fold2.open = true;
         el?.scrollIntoView({ behavior: "smooth", block: "start" });
         return true;
       }
@@ -3696,144 +3894,4 @@ ${memory}` },
     const place2 = field2.place ? placeCard(field2.place, x.catalog, sameTarget(field2.target, field2.place)) : "";
     const cancel = cancelChip("map-unplace", !!(field2.place || field2.target));
     const gone = field2.place ? "" : endedShown(x.world).filter((e) => field2.filter === "all" || e.kind === field2.filter).map((e) => endedCard(e, (n, k) => artCtx ? evArt(artCtx, n, k) : void 0)).join("");
-    const empty = !x.on ? "상황판이 꺼져 있어 발생한 상황이 없어요. 지도에서 장소를 골라 이동할 수 있어요." : field2.place || field2.filter !== "all" ? "조건에 맞는 상황이 없어요." : "지금 발생한 상황이 없어요. 지도에서 장소를 골라 이동할 수 있어요.";
-    return `<div class="gx-chips gx-sitbar">${chips3}${cancel}</div>
-    ${shown2.length || place2 || gone ? `<ul class="gx-evcs">${place2}${shown2.map((e) => eventRow(e, x, agents)).join("")}${gone}</ul>` : `<p class="gx-none">${empty}</p>`}`;
-  }
-  function cancelChip(action, on2) {
-    return `<button class="gx-chip gx-unplace" data-action="${action}" ${on2 ? 'title="선택 풀기"' : "disabled"}>취소</button>`;
-  }
-  function lockedState(x, id) {
-    const rec = x.world.agents[id];
-    return agentLocked(rec) ? rec.st : null;
-  }
-  function teamPanel(x, goal, action, label, busy5, ctx2) {
-    const roster = rosterFor(x.world, x.catalog, x.faction, x.settings.agent_limit);
-    if (!x.supportOn) field2.support = 0;
-    const used = field2.team.length + field2.support;
-    const chips3 = roster.map((p) => {
-      const on2 = field2.team.includes(p.id);
-      const lock = lockedState(x, p.id);
-      const full = !on2 && used >= TEAM_MAX;
-      const st = x.world.agents[p.id]?.st ?? "미정";
-      const sit = x.world.agents[p.id]?.situation ?? "";
-      {
-        const c = ctx2 ? agentContact(ctx2, p.id) : null;
-        const act = c ? `<span class="gx-acard-act"><button class="gx-acard-tool" data-action="agent-talk" data-value="${esc15(p.id)}" title="괴담톡" aria-label="${esc15(p.name)}에게 톡">${ICONS.phone}</button><button class="gx-acard-tool" data-action="wiki-goto" data-value="${esc15(c.wiki)}" title="위키" aria-label="${esc15(p.name)} 위키">${ICONS.wiki}</button></span>` : "";
-        const off = !!lock || full;
-        return `<div class="gx-acard pick wide${on2 ? " on" : ""}${off ? " off" : ""}" role="button" tabindex="${off ? -1 : 0}" data-action="team-toggle" data-value="${esc15(p.id)}" aria-pressed="${on2}" aria-disabled="${off}"
-          ${lock ? `title="${esc15(`${stLabel(lock)} 상태라 편성할 수 없어요`)}"` : ""}>${agentInner(x.char, p, st, sit, act)}<span class="gx-acard-check" aria-hidden="true">✓</span></div>`;
-      }
-    }).join("");
-    const support = x.supportOn ? `<div class="gx-acard pick gx-scard${field2.support > 0 ? " on" : ""}">
-      <span class="gx-ava sq">${ICONS.group}</span>
-      <span class="gx-acard-txt"><span class="gx-acard-top"><b>지원 인원</b></span><small>등록 요원 외 일반 인원</small></span>
-      <span class="gx-scard-step">
-        <button class="gx-step" data-action="support" data-value="-1" ${field2.support <= 0 ? "disabled" : ""} aria-label="지원 인원 줄이기">−</button>
-        <b>${field2.support}</b>
-        <button class="gx-step" data-action="support" data-value="1" ${used >= TEAM_MAX ? "disabled" : ""} aria-label="지원 인원 늘리기">+</button>
-      </span>
-    </div>` : "";
-    const ready = !!goal && validTeam(field2.team.length, field2.support) && !busy5;
-    const go2 = `<button class="gx-start" data-action="${action}" ${ready ? "" : "disabled"}>${busy5 ? "보내는 중…" : esc15(label)}</button>`;
-    lastGo = go2;
-    return `<section class="gx-team">
-    <div class="gx-goal"><span>목표</span><b${goal ? "" : ' class="none"'}>${goal ? esc15(goal) : "미정"}</b><em>${used + 1} / 4</em></div>
-    ${roster.length || support ? `<div class="gx-acards pick">${chips3}${support}</div>` : '<p class="gx-none">편성할 수 있는 요원이 없어요.</p>'}
-    ${roster.length ? "" : support ? '<p class="gx-none">편성할 수 있는 요원이 없어요.</p>' : ""}
-    ${narrow2() ? "" : noteBox()}
-    ${narrow2() ? "" : go2}
-  </section>`;
-  }
-  var lastGo = "";
-  function noteBox() {
-    return `<label class="gx-note">
-      <textarea rows="2" aria-label="작전 메모"${field2.note.trim() ? ' class="filled"' : ""} data-input="field-note" placeholder="이번 작전에서 원하는 전개나 행동이 있으면 적어 주세요.">${esc15(field2.note)}</textarea></label>`;
-  }
-  function fieldDrawer(x, withMap) {
-    if (!narrow2()) return "";
-    if (field2.step === "team") return drawerBox(noteBox(), "gx-notedrawer", `<div class="gx-mgo">${lastGo}</div>`);
-    return withMap ? drawerBox(mapBar(x), "gx-mapdrawer") : "";
-  }
-  function stepBar(goal, swap) {
-    const used = field2.team.length + field2.support + 1;
-    const b = (k, n, label, sub) => `<button class="gx-stepb${field2.step === k ? " on" : ""}" data-action="field-step" data-value="${k}" aria-pressed="${field2.step === k}"><i>${n}</i><span><b>${label}</b><small>${esc15(sub)}</small></span></button>`;
-    const sw = swap ? `<button class="gx-stepswap" data-action="tab" data-value="${swap}" aria-label="${swap === "map" ? "임무로 전환" : "커스텀으로 전환"}">${ICONS.swap}<span>${swap === "map" ? "임무" : "커스텀"}</span></button>` : "";
-    return `<div class="gx-stepbar${sw ? " has-swap" : ""}">${b("goal", "1", "목표", goal ?? "고르기")}${b("team", "2", "편성", `${used} / 4`)}${sw}</div>`;
-  }
-  function toStep(step, env2) {
-    field2.step = step;
-    env2.render();
-    const body4 = document.querySelector(".gx .gx-body");
-    if (body4 && matchMedia("(max-width: 760px)").matches) body4.scrollTop = 0;
-  }
-  function mapTab(ctx2, env2, notice3, busy5) {
-    artCtx = ctx2;
-    const x = readCtx(ctx2);
-    if (typeof x === "string") return `<div class="gx-empty">${esc15(x)}</div>`;
-    const events = x.on ? activeEvents(x.world) : [];
-    const t = field2.target;
-    if (t?.type === "event" && !events.some((e) => e.key === t.key)) field2.target = null;
-    const goal = field2.target ? targetName(field2.target) : null;
-    return `<main class="gx-body gx-field gx-map" data-step="${field2.step}">
-    ${stepBar(goal, "mission")}
-    <div class="gx-mapcol">${mapCanvas(ctx2, x, events, env2)}
-      <section class="gx-sec gx-sits" aria-label="상황">${situations(x, events)}</section></div>
-    <div class="gx-sidecol">
-      ${notice3 ? `<div class="${noticeClass(notice3)}" role="alert">${esc15(notice3)}</div>` : ""}
-      ${teamPanel(x, goal, "depart", "출발", busy5, ctx2)}
-    </div>
-  </main>${fieldDrawer(x, true)}`;
-  }
-  function missionCatalog(c, kind) {
-    if (kind === "an") return c.anomalies.map((a) => ({ name: a.name, sub: a.english }));
-    if (kind === "ms") return c.mysticSites.map((m) => ({ name: m.name, sub: m.english }));
-    return c.landmarks.map((l) => ({ name: l.name, sub: placeWhere(l.sido, l.gu) }));
-  }
-  function missionStatus(x, kind, name) {
-    const w = x.world;
-    if (kind === "an") {
-      if (w.pending.an === name) return '<span class="gx-badge wait">요청 대기</span>';
-      const e = w.an.find((a) => a.presetName === name || a.name === name);
-      if (e) return `<span class="gx-badge ${e.state === "활성" ? "live" : "wait"}">${e.state === "활성" ? "발생 중" : "발생 예정"}</span>`;
-    } else if (kind === "ms") {
-      if (w.pending.ms === name) return '<span class="gx-badge wait">요청 대기</span>';
-      if (w.ms.some((m) => m.name === name)) return '<span class="gx-badge live">출현</span>';
-    } else {
-      if (w.pending.in === name) return '<span class="gx-badge wait">요청 대기</span>';
-      if (w.inc.some((i) => i.name === name)) return '<span class="gx-badge hot">사건 진행</span>';
-    }
-    return "";
-  }
-  function missionList(ctx2, opening = false) {
-    const x = readCtx(ctx2);
-    if (typeof x === "string") return "";
-    const q = field2.query.trim().toLowerCase();
-    const row6 = (kind, r) => {
-      const sel = field2.mname === r.name && field2.mpick === kind;
-      const val = `${kind}:${esc15(r.name)}`;
-      const open3 = field2.mopen === `${kind}:${r.name}`;
-      const art = evArt(ctx2, r.name, kind);
-      const link = kind === "lm" ? baseLink(ctx2, r.name) : null;
-      if (link) r = { ...r, sub: [link.org, r.sub].filter(Boolean).join(" · ") };
-      const status = missionStatus(x, kind, r.name);
-      const bg = art.pic ? ` style="background-image:url('${esc15(art.pic)}')"` : "";
-      const cap = `<span class="gx-evart-name"><b>${esc15(r.name)}</b>${r.sub ? `<small>${esc15(r.sub)}</small>` : ""}</span>`;
-      const capOpen = (mark3) => `<span class="gx-evart-name"><span class="gx-evart-l1"><b>${esc15(r.name)}</b>${mark3}</span>${r.sub ? `<small>${esc15(r.sub)}</small>` : ""}</span>`;
-      const wikiBtn = opening ? "" : `<button class="gx-evbtn gx-mx-wiki" data-action="wiki-goto" data-value="${esc15(link?.doc ?? r.name)}" title="위키" aria-label="${esc15(r.name)} 위키">${ICONS.wiki}</button>`;
-      if (!open3) {
-        return `<li class="gx-ev gx-mx${sel ? " sel" : ""}${wikiBtn ? " has-wiki" : ""}"><button class="gx-mx-art k-${kind}${art.pic ? "" : " none"}" data-action="mission-open" data-value="${val}" aria-expanded="false"${bg}>
-        ${status ? `<span class="gx-evart-top">${status}</span>` : ""}<span class="gx-evart-cap">${cap}</span></button>${wikiBtn}</li>`;
-      }
-      const mark2 = sel ? targetMark(true, "mission-unpick", "") : targetMark(false, "mission-pick", val);
-      return `<li class="gx-ev gx-mx open${sel ? " sel" : ""}"><div class="gx-mx-art k-${kind}${art.pic ? "" : " none"}" data-action="mission-open" data-value="${val}"${bg}>
-      <span class="gx-evart-top">${status}<span class="gx-evart-act"><button class="gx-evbtn" data-action="mission-open" data-value="${val}" aria-label="접기" title="접기">${ICONS.up}</button>${wikiBtn}</span></span>
-      <span class="gx-evart-cap">${capOpen(mark2)}${art.desc ? `<span class="gx-evc-desc">${esc15(art.desc)}</span>` : ""}</span></div></li>`;
-    };
-    const hit3 = (r) => `${r.name} ${r.sub}`.toLowerCase().includes(q);
-    if (!q) {
-      const rows2 = missionCatalog(x.catalog, field2.mkind);
-      if (!rows2.length) return '<p class="gx-none">일치하는 대상이 없어요.</p>';
-      return `<ul class="gx-list gx-mlist">${rows2.map((r) => row6(field2.mkind, r)).join("")}</ul>`;
-    }
-    const order = [field2.mkind, ...["an", "ms", "lm"].filter((k) =>
+    const empty = !x.on ? "상황판이 꺼져 있어 발생한 상황이 없어요. 지도에서 장소를 골라 이동할 수 있어요.

@@ -1,4 +1,204 @@
- = n.options;
+= (v2) => {
+      if (t[p]?.v !== v2) throw new ScriptError(`조건식에 ${v2}가 필요해요: ${src}`);
+      p++;
+    };
+    const num = (v2) => typeof v2 === "number" ? v2 : typeof v2 === "boolean" ? +v2 : Number(v2) || 0;
+    const truthy2 = (v2) => typeof v2 === "string" ? v2 !== "" && v2 !== "0" : !!v2;
+    const prim = () => {
+      const k = t[p++];
+      if (!k) throw new ScriptError(`조건식이 끝났어요: ${src}`);
+      if (k.k === "num") return Number(k.v);
+      if (k.k === "str") return k.v;
+      if (k.k === "id") return k.v === "true" ? true : k.v === "false" ? false : flags[k.v] ?? 0;
+      if (k.v === "(") {
+        const v2 = or();
+        eat(")");
+        return v2;
+      }
+      if (k.v === "-") return -num(prim());
+      if (k.v === "!") return !truthy2(prim());
+      throw new ScriptError(`조건식에서 ${k.v}를 예상하지 못했어요: ${src}`);
+    };
+    const add = () => {
+      let v2 = prim();
+      while (peek() === "+" || peek() === "-") v2 = t[p++].v === "+" ? num(v2) + num(prim()) : num(v2) - num(prim());
+      return v2;
+    };
+    const cmp = () => {
+      const a = add();
+      const op = peek();
+      if (op && ["==", "!=", ">=", "<=", ">", "<"].includes(op)) {
+        p++;
+        const b = add();
+        if (op === "==") return typeof a === typeof b ? a === b : String(a) === String(b);
+        if (op === "!=") return typeof a === typeof b ? a !== b : String(a) !== String(b);
+        const x = num(a), y = num(b);
+        return op === ">=" ? x >= y : op === "<=" ? x <= y : op === ">" ? x > y : x < y;
+      }
+      return a;
+    };
+    const not = () => peek() === "!" ? (p++, !truthy2(not())) : cmp();
+    const and = () => {
+      let v2 = not();
+      while (peek() === "&&") {
+        p++;
+        const r = not();
+        v2 = truthy2(v2) && truthy2(r);
+      }
+      return v2;
+    };
+    const or = () => {
+      let v2 = and();
+      while (peek() === "||") {
+        p++;
+        const r = and();
+        v2 = truthy2(v2) || truthy2(r);
+      }
+      return v2;
+    };
+    const v = or();
+    if (p < t.length) throw new ScriptError(`조건식 뒤에 남은 것이 있어요: ${src}`);
+    return v;
+  }
+  var test = (src, flags) => !src || (() => {
+    const v = evaluate(src, flags);
+    return typeof v === "string" ? v !== "" && v !== "0" : !!v;
+  })();
+  var CLAMPS = { favor: [-3, 3] };
+  function applySet(key2, op, expr, flags) {
+    const v = evaluate(expr, flags);
+    if (op === "=") flags[key2] = v;
+    else {
+      const cur = Number(flags[key2] ?? 0) || 0;
+      flags[key2] = op === "+=" ? cur + (Number(v) || 0) : cur - (Number(v) || 0);
+    }
+    const c = CLAMPS[key2];
+    if (c && typeof flags[key2] === "number") flags[key2] = Math.max(c[0], Math.min(c[1], flags[key2]));
+  }
+  function applySets(src, flags) {
+    if (!src) return;
+    for (const part of src.split(";")) {
+      const m = /^\s*([\w.]+)\s*(\+=|-=|=)\s*(.+?)\s*$/.exec(part);
+      if (m) applySet(m[1], m[2], m[3], flags);
+    }
+  }
+  var ScriptLibrary = class {
+    scripts = /* @__PURE__ */ new Map();
+    add(src, where) {
+      for (const s2 of parseScripts(src, where)) {
+        if (this.scripts.has(s2.id)) throw new ScriptError(`대본 id 중복: ${s2.id}`);
+        this.scripts.set(s2.id, s2);
+      }
+      return this;
+    }
+    get(id) {
+      const s2 = this.scripts.get(id);
+      if (!s2) throw new ScriptError(`없는 대본: ${id}`);
+      return s2;
+    }
+    /** 모든 goto·선택지·call이 실제로 있는 곳을 가리키는지 */
+    validate() {
+      const errs = [];
+      for (const s2 of this.scripts.values())
+        for (const n of s2.nodes) {
+          const target = (to) => to === "end" || s2.labels[to] !== void 0 || errs.push(`${s2.id}:${n.line} 없는 표지 ${to}`);
+          if (n.t === "goto") target(n.to);
+          if (n.t === "choice") n.options.forEach((o) => target(o.to));
+          if (n.t === "call" && !this.scripts.has(n.script)) errs.push(`${s2.id}:${n.line} 없는 대본 ${n.script}`);
+          try {
+            if (n.t === "goto" && n.if) evaluate(n.if, {});
+            if (n.t === "set") evaluate(n.expr, {});
+            if (n.t === "choice") n.options.forEach((o) => o.if && evaluate(o.if, {}));
+          } catch (e) {
+            errs.push(`${s2.id}:${n.line} ${e.message}`);
+          }
+        }
+      return errs;
+    }
+  };
+  var StoryRunner = class {
+    constructor(lib, ctx) {
+      this.lib = lib;
+      this.ctx = ctx;
+    }
+    stack = [];
+    pending = null;
+    /** 지금 보이는 걸음 */
+    current = { kind: "end" };
+    get done() {
+      return this.current.kind === "end";
+    }
+    start(id) {
+      this.stack = [{ script: this.lib.get(id), pc: 0 }];
+      this.pending = null;
+      this.ctx.flags.agent = this.ctx.agent;
+      this.ctx.flags[`seen.${id}`] = (Number(this.ctx.flags[`seen.${id}`]) || 0) + 1;
+      return this.current = this.run();
+    }
+    next() {
+      if (this.pending) return this.current;
+      return this.current = this.run();
+    }
+    choose(index) {
+      const opts = this.pending;
+      if (!opts) return this.current;
+      const opt = opts[index];
+      if (!opt) return this.current;
+      this.pending = null;
+      applySets(opt.set, this.ctx.flags);
+      this.jump(opt.to);
+      return this.current = this.run();
+    }
+    /** 바로 끝까지 넘김. 선택지가 나오면 거기서 멈춘다. */
+    skip() {
+      let s2 = this.current;
+      for (let i = 0; i < 500 && s2.kind === "say"; i++) s2 = this.next();
+      return s2;
+    }
+    fill(text2) {
+      const f = this.ctx.flags;
+      return text2.replace(/\{([\w.가-힣]+)\}/g, (_, k) => k === "name" ? this.ctx.speakerName("agent") : String(f[k] ?? ""));
+    }
+    jump(to) {
+      const top = this.stack[this.stack.length - 1];
+      if (!top) return;
+      if (to === "end") top.pc = top.script.nodes.length;
+      else top.pc = top.script.labels[to] ?? top.script.nodes.length;
+    }
+    say(n) {
+      const who = n.who === "agent" ? this.ctx.agent : n.who;
+      return { kind: "say", who, name: this.ctx.speakerName(who), text: this.fill(n.text), mood: n.mood ?? "base" };
+    }
+    run() {
+      const { flags, rng: rng2 } = this.ctx;
+      for (let guard3 = 0; guard3 < 2e3; guard3++) {
+        const top = this.stack[this.stack.length - 1];
+        if (!top) {
+          delete flags.d100;
+          return { kind: "end" };
+        }
+        flags.d100 = Math.floor(rng2() * 100);
+        const n = top.script.nodes[top.pc];
+        if (!n) {
+          this.stack.pop();
+          continue;
+        }
+        top.pc++;
+        switch (n.t) {
+          case "say":
+            return this.say(n);
+          case "pick":
+            return this.say(n.lines[Math.floor(rng2() * n.lines.length) % n.lines.length]);
+          case "agentline": {
+            const text2 = this.ctx.agentLine(this.ctx.agent, n.tag, rng2);
+            if (!text2) break;
+            const who = n.who === "agent" ? this.ctx.agent : n.who;
+            return { kind: "say", who, name: this.ctx.speakerName(who), text: this.fill(text2), mood: "base" };
+          }
+          case "choice": {
+            const visible = n.options.map((o, index) => ({ o, index })).filter(({ o }) => test(o.if, flags));
+            if (!visible.length) break;
+            this.pending = n.options;
             return { kind: "choice", options: visible.map(({ o, index }) => ({ text: this.fill(o.text), index })) };
           }
           case "set":
@@ -1309,8 +1509,8 @@ jaemtri(smile): 다들 살아서 왔으니까 됐어. 건배.
     down: "hp_low",
     pick: "offer"
   };
-  function agentLine(agent, tag, rng2 = Math.random) {
-    let t = tag;
+  function agentLine(agent, tag2, rng2 = Math.random) {
+    let t = tag2;
     for (let i = 0; i < 3; i++) {
       const list = AGENT_LINES[agent]?.[t];
       if (list?.length) return list[Math.floor(rng2() * list.length) % list.length];
@@ -1496,9 +1696,9 @@ jaemtri(smile): 다들 살아서 왔으니까 됐어. 건배.
 
   // src/game/action/story/lines/index.ts
   var pick4 = (list, rng2) => list?.length ? list[Math.floor(rng2() * list.length) % list.length] : void 0;
-  function lookupLine(agent, tag, flags, rng2) {
-    if (!tag.startsWith("el:")) return agentLine(agent, tag, rng2);
-    const key2 = tag.slice(3);
+  function lookupLine(agent, tag2, flags, rng2) {
+    if (!tag2.startsWith("el:")) return agentLine(agent, tag2, rng2);
+    const key2 = tag2.slice(3);
     const favor = Math.max(-3, Math.min(3, Number(flags.favor) || 0));
     switch (key2) {
       case "board":
@@ -2215,8 +2415,8 @@ jaemtri(smile): 다들 살아서 왔으니까 됐어. 건배.
     const pick6 = (l) => l[Math.floor(rng2() * l.length) % l.length];
     const table = OFFLINE[npc];
     if (!table) {
-      const tag = /괜찮|다쳤|아파/.test(text2) ? "hp_low" : /출동|가자|임무/.test(text2) ? "offer" : pick6(["settle", "find", "win", "offer"]);
-      return agentLine(npc, tag, rng2) ?? "…";
+      const tag2 = /괜찮|다쳤|아파/.test(text2) ? "hp_low" : /출동|가자|임무/.test(text2) ? "offer" : pick6(["settle", "find", "win", "offer"]);
+      return agentLine(npc, tag2, rng2) ?? "…";
     }
     for (const [re, lines3] of table.rules) if (re.test(text2)) return pick6(lines3);
     return pick6(table.default);
@@ -2509,14 +2709,14 @@ jaemtri(smile): 다들 살아서 왔으니까 됐어. 건배.
   var K3 = CAST.konjyuce.name;
   var D2 = CAST.dejure.name;
   var G = CAST.gognija.name;
-  var hqLines = (tag, c) => {
+  var hqLines = (tag2, c) => {
     const r = c.rand;
     const a = c.agent;
     const me = (text2) => ({ who: c.agentName || nameOf(a), text: text2 });
     const t = (who, ...xs) => [{ who, text: pick5(xs, r) }];
     const male = a === "gorgodio" || a === "kyuras";
     const boss2 = a === "jyaldi";
-    switch (tag) {
+    switch (tag2) {
       case "npc:jaemtri":
         if (boss2) return t(J, "부장님, 태블릿에 새 글 올라왔어요. 보실래요?", "부장님, 블랙 내려 뒀어요. …연유 조금만 넣어 볼까요?", "출동 전에 규칙서 한 번만 더 보세요. 진짜로요.", "서류는 제가 정리할게요. 부장님은 고르기만 하세요.");
         return t(J, "어머, 후배, 왔어? 커피 먼저 할래, 일 먼저 할래?", "태블릿에 새 글 올라왔어. 볼래?", "우리 후배 고생했지~ 자, 서류부터.", "출동 전에 규칙서 한 번만 더 봐. 진짜로.", "연유 커피 남았는데, 마실래? 그건 이견이 없어.");
@@ -2563,7 +2763,7 @@ jaemtri(smile): 다들 살아서 왔으니까 됐어. 건배.
         return out;
       }
     }
-    if (tag.startsWith("tired:")) return [{ who: nameOf(tag.slice(6)), text: "…오늘은 좀 쉴게." }];
+    if (tag2.startsWith("tired:")) return [{ who: nameOf(tag2.slice(6)), text: "…오늘은 좀 쉴게." }];
     return null;
   };
   function pantry(a, r) {
@@ -2658,7 +2858,7 @@ jaemtri(smile): 다들 살아서 왔으니까 됐어. 건배.
       },
       rng: rng2,
       speakerName: (who) => castOf(who, agent()).name,
-      agentLine: (a, tag, r) => lookupLine(a, tag, flags, r),
+      agentLine: (a, tag2, r) => lookupLine(a, tag2, flags, r),
       emit: (event2, arg) => {
         if (event2 === "sfx") host.sfx?.(arg);
         host.emit?.(event2, arg);
@@ -2757,8 +2957,8 @@ ${who}: ${text2.replace(/\n/g, " ")}
       emit: (e, a) => host.emit?.(e, a),
       dialogue: (id) => say(id),
       line: (who, text2) => singleLine(who, text2),
-      agentLine: (tag) => {
-        const t = lookupLine(agent(), tag, flags, rng2);
+      agentLine: (tag2) => {
+        const t = lookupLine(agent(), tag2, flags, rng2);
         if (t) singleLine("agent", t);
       },
       talking: () => ui.boxOpen,
@@ -3002,7 +3202,7 @@ ${who}: ${text2.replace(/\n/g, " ")}
       enterTick = -1;
       opening = null;
       near2 = null;
-      solids = [...sc.boxes.filter((b) => b.solid).map((b) => ({ x: b.x, y: b.y, w: b.w, back: b.d + 6, front: 8 })), ...people.map((p) => ({ x: p.x, y: p.y, w: 56, back: 18, front: 6 }))];
+      solids = [...sc.boxes.filter((b) => b.solid).map((b) => ({ x: b.x, y: b.y, w: b.w, back: b.d + 6, front: 8 })), ...people.map((p) => ({ x: p.x, y: p.y, w: 80, back: 24, front: 24 }))];
       const len = Math.max(SCREEN_W, sc.length);
       const sx = Math.max(60, Math.min(len - 60, x));
       arrive = { x: sx, y };
@@ -3061,6 +3261,7 @@ ${who}: ${text2.replace(/\n/g, " ")}
           if (!sc.legacy) {
             for (const d3 of sc.doors) if (isS(d3)) drawExitLintel(c, d3, camX);
           }
+          host.overlay?.(c, people.map((p) => ({ name: p.name, x: p.x, y: p.y, top: visitAgentTop(p.name) })), { name: "", x: w.player.x, y: w.player.y, top: visitAgentTop("쟈알디") });
           const dark2 = fadeOut > 0 ? 1 - fadeOut / FADE : age < FADE ? 1 - age / FADE : 0;
           if (dark2 > 0) {
             c.fillStyle = `rgba(0,0,0,${dark2})`;
@@ -3901,110 +4102,4 @@ ${who}: ${text2.replace(/\n/g, " ")}
   };
   var ENTITY_NPCS = {
     brownie: d2({ id: "brownie", name: "브라우니", sheet: "브라우니", group: "entity", color: "#8a5a2b", photo: "Brownie", role: "「브라우니의 화요 퀴즈쇼」 진행자이자 주인인 괴이 존재. 손님 대접과 예의를 지키면 거래·통과, 무례하거나 형식을 어기면 퀴즈쇼 무대가 열린다.", speech: "황금기 방송 진행자처럼 따뜻하고 끝없이 밝은 말투, 상대를 「친구」. 박수·드럼 소리 흉내. 역겨우면 잠깐 목소리가 일그러진다.", effects: ["favor", "trade", "hint", "hostile", "leave", "gift"], gifts: ["medkit"], greet: ["자, 친구! 오늘의 손님을 소개합니다! 박수!", "그냥 브라우니라고 불러 줘! 친구끼리 호칭은 오글거리잖아!"], lines: ["맞혀 볼까? …정답!", "복잡한 서명 절차는 우리 스타일이 아니지. 악수 한 번이면 돼!", "아쉽지만 화난 스폰서들이 오기 전에 헤어져야 해! 내일 또 만나!", "친구, 밥은 먹고 다니는 거야?"], never: ["방송 형식을 스스로 깨지 않는다"] }),
-    aesthete: d2({ id: "aesthete", name: "탐미주의", sheet: "탐미주의", group: "entity", color: "#b23a48", photo: "Aestheticism", role: "살아 있는 것을 작품으로 만드는 예측 불가능한 괴이 예술가. 흥정과 대답이 마음에 들면 놓아주고, 아니면 작품으로 삼으려 한다.", speech: "오랜 친구처럼 따뜻한 말투. 먹잇감에겐 다정하게, 작품에겐 부모처럼.", effects: ["favor", "hint", "hostile", "leave"], greet: ["멀리 못 갔구나, 응?"], lines: ["살아 있는 건 다 목표가 있어. 네 목표는 뭐야?", "넌 내 걸작이 될 거야.", "창작자가 자기 작품을 잊는 거 본 적 있어?", "뻔뻔한 아이네. 나랑 흥정하려고?"] })
-  };
-  var ELEVATOR_NPC = d2({ id: "elevator", name: "승강기", group: "elevator", color: "#b8a36a", role: "차원 승강기 그 자체. 모든 엘리베이터가 하나의 의식이라는 설. 천장 카메라로 보고 방송으로 말한다. 인사하면 대우가 좋아지고, 닫힘 버튼 연타를 싫어한다. 거래하면 맞는 정보도 틀린 정보도 준다.", speech: "안내 방송 같은 존댓말에 혼잣말·관찰이 섞인다. 아주 짧다. 외로움과 호기심이 비친다. 정체는 끝까지 말하지 않는다.", effects: ["favor", "hint"], greet: ["…듣고 있어요."], lines: ["문이 닫힙니다.", "다음 층은… 비밀이에요.", "듣고 있어요. 계속 말해요.", "다들 내리기만 해요."], rules: [[/안녕|반가/, ["안녕하세요. 인사해 줘서 고마워요."]], [/누구|정체/, ["…그건 비밀이에요. 아직."]]], never: ["자기 정체를 밝히지 않는다", "출구로 가는 확실한 방법을 그냥 알려 주지 않는다"] });
-  var TYPE_NPCS = {
-    civilian: d2({ id: "civilian", name: "민간인", group: "civilian", color: "#9aa7b3", role: "차원 승강기에 잘못 타서 갇힌 민간인. 관리국 요원을 처음 본다.", speech: "겁먹은 존댓말, 말이 빠르거나 끊긴다. 관리국을 잘 모른다.", effects: ["favor", "join", "leave", "hint"], greet: ["저, 저기요! 사람이에요? 진짜 사람이죠?"], lines: ["여기 어디예요? 1층 눌렀는데…", "같이 가게 해 주세요. 부탁이에요.", "아까 저쪽에서 뭐가… 아, 아니에요.", "집에 가고 싶어요."] }),
-    passenger: d2({ id: "passenger", name: "승객", group: "passenger", color: "#8a8f86", role: "차원 승강기를 오래 떠돈 승객. 정보나 보급을 주기도, 거짓으로 유인하기도 한다. 둘 다 친절해 보인다.", speech: "지친 반말이나 존댓말. 친절해 보인다.", effects: ["favor", "hint", "join", "hostile", "leave"], greet: ["…너도 탔구나."], lines: ["내 말 들어.", "오래 있었어. 여기.", "다음 버튼은… 내가 알아.", "…그래, 마음대로 해."] }),
-    resident: d2({ id: "resident", name: "주민", group: "resident", color: "#7a6f66", role: "재현의 층 아파트에 사는 척하는 괴이. 인사하면 지나가게 두고, 뛰거나 무례하면 턱이 벌어진다.", speech: "지나치게 상냥하고 같은 말을 되풀이하는 존댓말. 어딘가 틀린 생활 이야기.", effects: ["favor", "hostile", "calm", "hint"], greet: ["안녕하세요. 편하게 둘러보세요."], lines: ["안녕하세요.", "…어서 가요.", "저녁은 드셨어요? 저희는 늘 같은 걸 먹어요.", "복도에서 뛰면 안 되지."], never: ["자기가 괴이라고 말하지 않는다"] })
-  };
-  var ROSTER2 = { ...AGENT_NPCS, ...HQ_NPCS, ...MERCHANT_NPCS, ...DAYDREAM_NPCS, ...FAKE_NPCS, ...FACTION_NPCS, ...ENTITY_NPCS, elevator: ELEVATOR_NPC, ...TYPE_NPCS };
-  var NPC_BY_NAME = Object.fromEntries(Object.values(ROSTER2).map((n) => [n.name, n.id]));
-  var VENDOR_NPC = { madeokhee: "madeokhee", backalley: "goyeonji", shinyuri: "shinyuri" };
-  var SPOT_NPC = { 잼트리: "jaemtri", 콘쥬스: "konjyuce", 데쥬레: "dejure", 고그니쟈: "gognija", 부장: "jyaldi", 동료: "dejure" };
-
-  // src/game/action/npc/brain.ts
-  var FAVOR_MIN2 = -3;
-  var FAVOR_MAX2 = 3;
-  var clamp = (v) => Math.max(FAVOR_MIN2, Math.min(FAVOR_MAX2, v));
-  var FAVOR_WORD = (f) => f <= -3 ? "적의" : f <= -2 ? "경계" : f <= -1 ? "언짢음" : f === 0 ? "보통" : f === 1 ? "호의" : f === 2 ? "신뢰" : "각별";
-  var Relations = class {
-    constructor(store2) {
-      this.store = store2;
-      try {
-        const raw = store2?.load();
-        const obj = raw ? JSON.parse(raw) : {};
-        for (const [k, v] of Object.entries(obj)) if (v && typeof v.favor === "number") this.map.set(k, { favor: clamp(v.favor), met: v.met | 0, log: Array.isArray(v.log) ? v.log.slice(-12) : [], memo: Array.isArray(v.memo) ? v.memo.slice(-3) : [], giftDay: v.giftDay });
-      } catch {
-      }
-    }
-    map = /* @__PURE__ */ new Map();
-    /** 저장하지 않는 사람 (이름 없는 승객·주민·민간인) */
-    temp = /* @__PURE__ */ new Set();
-    get(key2, temp = false) {
-      let r = this.map.get(key2);
-      if (!r) {
-        r = { favor: 0, met: 0, log: [], memo: [] };
-        this.map.set(key2, r);
-        if (temp) this.temp.add(key2);
-      }
-      return r;
-    }
-    favor(key2, delta) {
-      const r = this.get(key2);
-      r.favor = clamp(r.favor + delta);
-      return r.favor;
-    }
-    remember(key2, line2) {
-      const r = this.get(key2);
-      r.memo = [...r.memo.filter((m) => m !== line2), line2].slice(-3);
-    }
-    /** 판이 끝나면 이름 없는 사람은 잊는다 */
-    forgetTemp() {
-      for (const k of this.temp) this.map.delete(k);
-      this.temp.clear();
-    }
-    save() {
-      const out = {};
-      for (const [k, v] of this.map) if (!this.temp.has(k)) out[k] = { ...v, log: v.log.slice(-12) };
-      try {
-        this.store?.save(JSON.stringify(out));
-      } catch {
-      }
-    }
-    snapshot() {
-      return Object.fromEntries([...this.map].map(([k, v]) => [k, v.favor]));
-    }
-  };
-  var DROP = /* @__PURE__ */ new Set(["Appearance"]);
-  var CAP = { Background: 2, Abilities: 2 };
-  var LIMIT = 2600;
-  function trimSheet(text2) {
-    const parts = text2.replace(/^@@[^\n]*\n?/gm, "").trim().split(/^(#### .+)$/m);
-    const out = [parts[0].trim()];
-    for (let i = 1; i < parts.length; i += 2) {
-      const head = parts[i].slice(5).trim();
-      if (DROP.has(head)) continue;
-      let lines3 = (parts[i + 1] ?? "").trim().split("\n").filter((l) => l.trim() && l.trim() !== "---");
-      if (CAP[head]) {
-        const keep = [];
-        let n = 0;
-        for (const l of lines3) {
-          if (l.trimStart().startsWith("- ") && ++n > CAP[head]) break;
-          keep.push(l);
-        }
-        lines3 = keep;
-      }
-      out.push(`#### ${head}
-${lines3.join("\n")}`);
-    }
-    const s2 = out.filter(Boolean).join("\n\n");
-    return s2.length <= LIMIT ? s2 : s2.slice(0, LIMIT).replace(/\n[^\n]*$/, "");
-  }
-  var TAG_WORD = { favor: "호감", trade: "거래", join: "동행", hostile: "적대", leave: "떠남", hint: "힌트", gift: "선물", calm: "진정" };
-  var TAG_HELP = {
-    favor: "[[호감 +1]] 상대가 마음에 들었을 때, [[호감 -1]] 기분이 상했을 때. 그냥 말만 주고받았으면 쓰지 않는다",
-    trade: "[[거래]] 물건을 사고팔거나 일을 맡기자고 할 때 (가게 창이 열린다)",
-    join: "[[동행]] 함께 가거나 같이 싸우기로 했을 때",
-    hostile: "[[적대]] 더는 못 참고 싸우거나 해치려 할 때. 이미 많이 화가 난 상태에서만",
-    leave: "[[떠남]] 대화를 끝내고 이 자리를 떠날 때",
-    hint: "[[힌트 번호]] 아래 단서 중 하나를 알려 줄 때. 단서 내용은 네 말로 바꿔서 말한다",
-    gift: "[[선물 아이템]] 아래 물건 하나를 건넬 때",
-    calm: "[[진정]] 화가 풀렸을 때"
-  };
-  function allowedEffects(def, t) {
-    let list = def.effects.filter((e) => !t.allow || t.allow.includes(e));
-    if (!t.actions?.some((a) => a.id === "trade")) list = list.filter((e) => e !== "trade");
-    if (!t.hints?.length) list = list.filter((e) => e !== "hint");
-    if (!(t.gifts ?? def.gifts)?.length) list = list.filte
+    aesthete: d2({ id: "aesthete", name: "탐미주의", sheet: "탐미주의", group: "entity", color: "#b23a48", photo: "Aestheticism", role: "살아 있는 것을 작품으로 만드는 예측 불가능한 괴이 예술가. 흥정과 대답이 마음에 들면 놓아주고, 아니면 작품으로 삼으려 한다.", speech: "오랜 친구처럼 따뜻한 말투. 먹잇감에겐 다정하게, 작품에겐 부모처럼.", effects: ["favor", "hint", "hostile", "leave"], greet: ["멀리 못 갔구나, 응?"], lines: ["살아 있는 건 다 목표가 있어. 네 목표는 뭐야?", "넌 내 걸작이 될 거야.", "

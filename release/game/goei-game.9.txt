@@ -1,4 +1,110 @@
-r((e) => e !== "gift");
+창작자가 자기 작품을 잊는 거 본 적 있어?", "뻔뻔한 아이네. 나랑 흥정하려고?"] })
+  };
+  var ELEVATOR_NPC = d2({ id: "elevator", name: "승강기", group: "elevator", color: "#b8a36a", role: "차원 승강기 그 자체. 모든 엘리베이터가 하나의 의식이라는 설. 천장 카메라로 보고 방송으로 말한다. 인사하면 대우가 좋아지고, 닫힘 버튼 연타를 싫어한다. 거래하면 맞는 정보도 틀린 정보도 준다.", speech: "안내 방송 같은 존댓말에 혼잣말·관찰이 섞인다. 아주 짧다. 외로움과 호기심이 비친다. 정체는 끝까지 말하지 않는다.", effects: ["favor", "hint"], greet: ["…듣고 있어요."], lines: ["문이 닫힙니다.", "다음 층은… 비밀이에요.", "듣고 있어요. 계속 말해요.", "다들 내리기만 해요."], rules: [[/안녕|반가/, ["안녕하세요. 인사해 줘서 고마워요."]], [/누구|정체/, ["…그건 비밀이에요. 아직."]]], never: ["자기 정체를 밝히지 않는다", "출구로 가는 확실한 방법을 그냥 알려 주지 않는다"] });
+  var TYPE_NPCS = {
+    civilian: d2({ id: "civilian", name: "민간인", group: "civilian", color: "#9aa7b3", role: "차원 승강기에 잘못 타서 갇힌 민간인. 관리국 요원을 처음 본다.", speech: "겁먹은 존댓말, 말이 빠르거나 끊긴다. 관리국을 잘 모른다.", effects: ["favor", "join", "leave", "hint"], greet: ["저, 저기요! 사람이에요? 진짜 사람이죠?"], lines: ["여기 어디예요? 1층 눌렀는데…", "같이 가게 해 주세요. 부탁이에요.", "아까 저쪽에서 뭐가… 아, 아니에요.", "집에 가고 싶어요."] }),
+    passenger: d2({ id: "passenger", name: "승객", group: "passenger", color: "#8a8f86", role: "차원 승강기를 오래 떠돈 승객. 정보나 보급을 주기도, 거짓으로 유인하기도 한다. 둘 다 친절해 보인다.", speech: "지친 반말이나 존댓말. 친절해 보인다.", effects: ["favor", "hint", "join", "hostile", "leave"], greet: ["…너도 탔구나."], lines: ["내 말 들어.", "오래 있었어. 여기.", "다음 버튼은… 내가 알아.", "…그래, 마음대로 해."] }),
+    resident: d2({ id: "resident", name: "주민", group: "resident", color: "#7a6f66", role: "재현의 층 아파트에 사는 척하는 괴이. 인사하면 지나가게 두고, 뛰거나 무례하면 턱이 벌어진다.", speech: "지나치게 상냥하고 같은 말을 되풀이하는 존댓말. 어딘가 틀린 생활 이야기.", effects: ["favor", "hostile", "calm", "hint"], greet: ["안녕하세요. 편하게 둘러보세요."], lines: ["안녕하세요.", "…어서 가요.", "저녁은 드셨어요? 저희는 늘 같은 걸 먹어요.", "복도에서 뛰면 안 되지."], never: ["자기가 괴이라고 말하지 않는다"] })
+  };
+  var ROSTER2 = { ...AGENT_NPCS, ...HQ_NPCS, ...MERCHANT_NPCS, ...DAYDREAM_NPCS, ...FAKE_NPCS, ...FACTION_NPCS, ...ENTITY_NPCS, elevator: ELEVATOR_NPC, ...TYPE_NPCS };
+  var NPC_BY_NAME = Object.fromEntries(Object.values(ROSTER2).map((n) => [n.name, n.id]));
+  var VENDOR_NPC = { madeokhee: "madeokhee", backalley: "goyeonji", shinyuri: "shinyuri" };
+  var SPOT_NPC = { 잼트리: "jaemtri", 콘쥬스: "konjyuce", 데쥬레: "dejure", 고그니쟈: "gognija", 부장: "jyaldi", 동료: "dejure" };
+
+  // src/game/action/npc/brain.ts
+  var FAVOR_MIN2 = -3;
+  var FAVOR_MAX2 = 3;
+  var clamp = (v) => Math.max(FAVOR_MIN2, Math.min(FAVOR_MAX2, v));
+  var FAVOR_WORD = (f) => f <= -3 ? "적의" : f <= -2 ? "경계" : f <= -1 ? "언짢음" : f === 0 ? "보통" : f === 1 ? "호의" : f === 2 ? "신뢰" : "각별";
+  var Relations = class {
+    constructor(store2) {
+      this.store = store2;
+      try {
+        const raw = store2?.load();
+        const obj = raw ? JSON.parse(raw) : {};
+        for (const [k, v] of Object.entries(obj)) if (v && typeof v.favor === "number") this.map.set(k, { favor: clamp(v.favor), met: v.met | 0, log: Array.isArray(v.log) ? v.log.slice(-12) : [], memo: Array.isArray(v.memo) ? v.memo.slice(-3) : [], giftDay: v.giftDay });
+      } catch {
+      }
+    }
+    map = /* @__PURE__ */ new Map();
+    /** 저장하지 않는 사람 (이름 없는 승객·주민·민간인) */
+    temp = /* @__PURE__ */ new Set();
+    get(key2, temp = false) {
+      let r = this.map.get(key2);
+      if (!r) {
+        r = { favor: 0, met: 0, log: [], memo: [] };
+        this.map.set(key2, r);
+        if (temp) this.temp.add(key2);
+      }
+      return r;
+    }
+    favor(key2, delta) {
+      const r = this.get(key2);
+      r.favor = clamp(r.favor + delta);
+      return r.favor;
+    }
+    remember(key2, line2) {
+      const r = this.get(key2);
+      r.memo = [...r.memo.filter((m) => m !== line2), line2].slice(-3);
+    }
+    /** 판이 끝나면 이름 없는 사람은 잊는다 */
+    forgetTemp() {
+      for (const k of this.temp) this.map.delete(k);
+      this.temp.clear();
+    }
+    save() {
+      const out = {};
+      for (const [k, v] of this.map) if (!this.temp.has(k)) out[k] = { ...v, log: v.log.slice(-12) };
+      try {
+        this.store?.save(JSON.stringify(out));
+      } catch {
+      }
+    }
+    snapshot() {
+      return Object.fromEntries([...this.map].map(([k, v]) => [k, v.favor]));
+    }
+  };
+  var DROP = /* @__PURE__ */ new Set(["Appearance"]);
+  var CAP = { Background: 2, Abilities: 2 };
+  var LIMIT = 2600;
+  function trimSheet(text2) {
+    const parts = text2.replace(/^@@[^\n]*\n?/gm, "").trim().split(/^(#### .+)$/m);
+    const out = [parts[0].trim()];
+    for (let i = 1; i < parts.length; i += 2) {
+      const head = parts[i].slice(5).trim();
+      if (DROP.has(head)) continue;
+      let lines3 = (parts[i + 1] ?? "").trim().split("\n").filter((l) => l.trim() && l.trim() !== "---");
+      if (CAP[head]) {
+        const keep = [];
+        let n = 0;
+        for (const l of lines3) {
+          if (l.trimStart().startsWith("- ") && ++n > CAP[head]) break;
+          keep.push(l);
+        }
+        lines3 = keep;
+      }
+      out.push(`#### ${head}
+${lines3.join("\n")}`);
+    }
+    const s2 = out.filter(Boolean).join("\n\n");
+    return s2.length <= LIMIT ? s2 : s2.slice(0, LIMIT).replace(/\n[^\n]*$/, "");
+  }
+  var TAG_WORD = { favor: "호감", trade: "거래", join: "동행", hostile: "적대", leave: "떠남", hint: "힌트", gift: "선물", calm: "진정" };
+  var TAG_HELP = {
+    favor: "[[호감 +1]] 상대가 마음에 들었을 때, [[호감 -1]] 기분이 상했을 때. 그냥 말만 주고받았으면 쓰지 않는다",
+    trade: "[[거래]] 물건을 사고팔거나 일을 맡기자고 할 때 (가게 창이 열린다)",
+    join: "[[동행]] 함께 가거나 같이 싸우기로 했을 때",
+    hostile: "[[적대]] 더는 못 참고 싸우거나 해치려 할 때. 이미 많이 화가 난 상태에서만",
+    leave: "[[떠남]] 대화를 끝내고 이 자리를 떠날 때",
+    hint: "[[힌트 번호]] 아래 단서 중 하나를 알려 줄 때. 단서 내용은 네 말로 바꿔서 말한다",
+    gift: "[[선물 아이템]] 아래 물건 하나를 건넬 때",
+    calm: "[[진정]] 화가 풀렸을 때"
+  };
+  function allowedEffects(def, t) {
+    let list = def.effects.filter((e) => !t.allow || t.allow.includes(e));
+    if (!t.actions?.some((a) => a.id === "trade")) list = list.filter((e) => e !== "trade");
+    if (!t.hints?.length) list = list.filter((e) => e !== "hint");
+    if (!(t.gifts ?? def.gifts)?.length) list = list.filter((e) => e !== "gift");
     if (!t.canJoin) list = list.filter((e) => e !== "join");
     return list;
   }
@@ -2785,6 +2891,7 @@ ${t.secret}` : "",
         chooseFloor: (o, pick6) => ui.chooseFloor(o, pick6),
         sfx: (n) => ui.sfx(n),
         visitors,
+        overlay: ui.overlay,
         // 본부 대화창이 떠 있으면 머리 위 표시를 숨긴다 (독립 검수: 브리핑 뒤 ↓ 표시)
         busy: () => typeof document !== "undefined" && !!document.querySelector(".hq-talk, .hq-over:not(:empty)")
       },
@@ -2893,7 +3000,7 @@ ${t.secret}` : "",
     let game = null;
     const shell = mountGameShell(box2, {
       synth: true,
-      title: bridge?.visit ? "본부 방문" : "차원 승강기",
+      title: bridge?.visit ? "필드" : "차원 승강기",
       sub: bridge?.visit ? "요원들을 만나고 본편 대화를 이어갑니다" : "ANOMALY SIMULATION · 관리국 액션",
       pauseInfo: () => session.error ?? (game?.inHub ? "본부 자동 저장" : "안전 지점 자동 저장 · 전투 중 중단하면 직전 안전 지점부터"),
       onNew: async () => {
@@ -2947,9 +3054,11 @@ ${t.secret}` : "",
         }
       }
     };
-    const visit = bridge?.visit ? mountVisit(shell.stage.ui, bridge.visit) : null;
+    const visit = bridge?.visit ? mountTalk(shell.stage.ui, bridge.visit) : null;
     const npc = linkNpcTalk({
-      visit: visit ? (name) => void visit.open(name) : void 0,
+      visit: visit ? (name) => {
+        if (name) visit.open(name);
+      } : void 0,
       layer: shell.stage.ui,
       bridge,
       settings: () => shell.settings,
@@ -3026,192 +3135,3 @@ ${t.secret}` : "",
       const p = w.player;
       if (foot.w !== w) foot = { x: p.x, y: p.y, d: 0, w };
       const moved = Math.hypot(p.x - foot.x, (p.y - foot.y) * 1.5);
-      foot.x = p.x;
-      foot.y = p.y;
-      if (p.airborne || moved > 60) return void (foot.d = 0);
-      foot.d += moved;
-      if (foot.d >= (p.running ? 75 : 55)) {
-        foot.d = 0;
-        audio.event({ type: "step", x: p.x, vol: p.running ? 0.9 : 0.6 });
-      }
-    };
-    globalThis.__goeiStoryStart = (id) => CUTSCENES[id] || VIDEOS[id] ? story.cutscene(id) : story.say(id);
-    const story = mountStory(
-      storyRoot,
-      {
-        getAgent: () => runAgent,
-        sfx: (n) => audio.event({ type: "custom", name: n }),
-        shake: (ms, amp) => shell.fx.onGameEvent({ type: "shake", ms, amp }),
-        anchor: (id) => {
-          if (id !== "agent" || !world) return null;
-          const st = shell.canvas.parentElement;
-          const m = /translate\(([-\d.]+)px, ([-\d.]+)px\)/.exec(st.style.transform);
-          const k = shell.stage.scale || 1;
-          const ox = st.offsetLeft + (m ? +m[1] : 0) - storyRoot.offsetLeft, oy = st.offsetTop + (m ? +m[2] : 0) - storyRoot.offsetTop;
-          const p = world.player;
-          const gx = Math.max(200, Math.min(1e3, p.x - world.camX));
-          let maxX;
-          const tp = storyRoot.ownerDocument.querySelector(".tp");
-          if (tp && tp.offsetParent) {
-            let tx = 0;
-            for (let n = tp; n && n !== storyRoot.offsetParent; n = n.offsetParent) tx += n.offsetLeft;
-            for (const b of tp.querySelectorAll(".tp-b:not(.item):not(.top)")) {
-              if (!b.offsetWidth || getComputedStyle(b).display === "none") continue;
-              const left = tx - storyRoot.offsetLeft + new DOMMatrix(getComputedStyle(b).transform).m41;
-              if (left > storyRoot.clientWidth / 2) maxX = Math.min(maxX ?? Infinity, left);
-            }
-          }
-          let lo = ox, hi = Math.min(maxX ?? Infinity, ox + 1280 * k);
-          const gap = bubbleGap(world, gx);
-          if (gap) {
-            lo = Math.max(lo, ox + gap[0] * k);
-            hi = Math.min(hi, ox + gap[1] * k);
-          }
-          return { x: ox + gx * k, y: oy + Math.max(120, p.y - p.z - (world.hintShown ? 362 : 290)) * k, minX: lo, maxX: hi };
-        },
-        emit: (ev, arg) => world?.emit({ type: "custom", name: ev, data: { arg } }),
-        paused: () => shell.paused && !openingOn
-      },
-      { saved: savedFlags }
-    );
-    globalThis.__goeiStory = story;
-    const saveFlags = () => {
-      try {
-        localStorage.setItem("goei-game-story", JSON.stringify(story.flags));
-      } catch {
-      }
-    };
-    const storyKeys = (e) => {
-      if (!story.isBlocking()) return;
-      if (e.code === "Escape") story.skip();
-      else if (/^Digit[1-9]$/.test(e.code)) story.choose(Number(e.code.slice(5)) - 1);
-      else if (["Space", "Enter", "KeyE", "KeyZ", "KeyA"].includes(e.code)) story.advance();
-      else return;
-      e.preventDefault();
-      e.stopImmediatePropagation();
-    };
-    window.addEventListener("keydown", storyKeys, true);
-    const saves = {
-      ...session.hqSaves,
-      restore: async (n) => {
-        const hq3 = await session.hqSaves.restore(n);
-        if (hq3) elevator.reloadMeta();
-        return hq3;
-      }
-    };
-    let floorPick = null;
-    const floorBox = document.createElement("div");
-    floorBox.className = "goei-engine-elev";
-    floorBox.hidden = true;
-    storyRoot.appendChild(floorBox);
-    const closeFloors = (i) => {
-      floorBox.hidden = true;
-      const f = floorPick;
-      floorPick = null;
-      f?.(i);
-    };
-    const chooseFloor = (opts, pick6) => {
-      floorPick = pick6;
-      floorBox.innerHTML = opts.map((o, i) => `<button type="button" data-i="${i}"${o.open && !o.here ? "" : " disabled"}${o.here ? ' class="here"' : ""}>${o.label}</button>`).join("");
-      floorBox.hidden = false;
-      audio.play("panelButton");
-    };
-    floorBox.addEventListener("click", (e) => {
-      const b = e.target.closest("button");
-      if (b && !b.disabled) closeFloors(Number(b.dataset.i));
-    });
-    const floorKeys = (e) => {
-      if (floorBox.hidden) return;
-      if (e.code === "Escape") closeFloors(null);
-      else if (/^Digit[1-9]$/.test(e.code)) {
-        const n = e.code.slice(5);
-        const want = n === "4" ? "B1" : n === "5" ? "B2" : n;
-        const b = [...floorBox.querySelectorAll("button")].find((q) => q.textContent === want);
-        if (b && !b.disabled) closeFloors(Number(b.dataset.i));
-      } else return;
-      e.preventDefault();
-      e.stopImmediatePropagation();
-    };
-    window.addEventListener("keydown", floorKeys, true);
-    const canFilm = () => location.protocol !== "file:";
-    const cutOnce = (id, done2) => {
-      if (!VIDEOS[id] || !canFilm() || story.flags[`cut_${id}`] || story.isBlocking()) return false;
-      story.flags[`cut_${id}`] = 1;
-      saveFlags();
-      story.cutscene(id, done2);
-      return true;
-    };
-    let dinnerDue = false;
-    const hq2 = hqAdapter(saves, bridge, {
-      resuming: () => !!session.checkpoint,
-      chooseFloor,
-      sfx: (n) => audio.play(n),
-      closed: () => {
-        if (dinnerDue) dinnerDue = false, cutOnce("dinner");
-      }
-    });
-    const hqKeys = (e) => {
-      if (e.code !== "Escape" || !game?.inHub || !hq2.isOpen?.()) return;
-      hq2.close();
-      e.preventDefault();
-      e.stopImmediatePropagation();
-    };
-    const saveOnHide = () => {
-      game?.checkpoint();
-      void session.flush();
-    };
-    window.addEventListener("pagehide", saveOnHide);
-    document.addEventListener("visibilitychange", saveOnHide);
-    window.addEventListener("keydown", hqKeys, true);
-    let openingT = null;
-    const cancelStoryForScene = () => {
-      if (openingT) clearTimeout(openingT);
-      openingT = null;
-      story.cancel();
-      openingOn = false;
-      const menuEl = shell.stage.root.querySelector(".gs-ui");
-      if (menuEl) menuEl.style.visibility = "";
-      storyRoot.style.zIndex = "15";
-      storyRoot.style.visibility = shell.paused ? "hidden" : "";
-    };
-    const armOpening = () => {
-      if (openingT) clearTimeout(openingT);
-      openingT = null;
-      if (!VIDEOS.opening || !canFilm()) return;
-      openingT = setTimeout(() => {
-        openingT = null;
-        if (shell.mode !== "title" || story.isBlocking()) return armOpening();
-        const menuEl = shell.stage.root.querySelector(".gs-ui");
-        if (menuEl) menuEl.style.visibility = "hidden";
-        storyRoot.style.visibility = "";
-        storyRoot.style.zIndex = "60";
-        openingOn = true;
-        story.cutscene("opening", () => {
-          openingOn = false;
-          if (menuEl) menuEl.style.visibility = "";
-          storyRoot.style.zIndex = "15";
-          if (shell.paused) storyRoot.style.visibility = "hidden";
-          if (shell.mode === "title") armOpening();
-        });
-      }, 2e4);
-    };
-    const titleInput = (e) => {
-      if (openingOn) {
-        story.skip();
-        e.preventDefault();
-        e.stopImmediatePropagation();
-      } else if (openingT && shell.mode === "title") armOpening();
-    };
-    window.addEventListener("keydown", titleInput, true);
-    window.addEventListener("pointerdown", titleInput, true);
-    const listeners = [
-      (e) => {
-        audio.event(e);
-        if (game?.inHub && (e.type === "enter:floor" || e.type === "custom")) return;
-        shell.fx.onGameEvent(e);
-        story.event(e.type, e);
-        if (e.type === "run:end") saveFlags();
-        if (e.type === "enter:floor" && world) {
-          const f = world.floor;
-          if (f.id.startsWith("ending")) cutOnce("exit");
-          else if ((f.depth ?? 0) >= 2) cutOnce(

@@ -1,4 +1,12 @@
-,
+clip: "jab",
+      ticks: T(1, 1, 4, 2, 2),
+      adv: 6,
+      cancel: 2,
+      whiffCancel: 3,
+      hits: [{ at: [2], dmg: 8, react: "flinch", push: 5, stop: 3, strength: 1, noise: 0.15 }]
+    },
+    cross: {
+      clip: "cross",
       ticks: T(1, 1, 2, 5, 3, 2),
       origin: 6,
       adv: 10,
@@ -1926,101 +1934,266 @@
     }
   };
 
-  // src/game/visit.ts
-  var rooms = { office: "사무실", lounge: "휴게실", infirmary: "의무실", quarters: "숙소" };
-  function mountVisit(root, api) {
-    const wrap = document.createElement("div");
-    wrap.style.cssText = "position:absolute;inset:0;pointer-events:none;z-index:45;font:16px sans-serif;color:#eee";
-    const button = document.createElement("button");
-    button.textContent = "본부 인물 · 대화";
-    button.style.cssText = "position:absolute;right:16px;top:76px;pointer-events:auto;padding:12px;background:#1b292b;color:#eee;border:1px solid #a99c78;border-radius:6px";
-    const panel = document.createElement("section");
-    panel.setAttribute("aria-label", "본부 방문 대화");
-    panel.style.cssText = "position:absolute;inset:12% 5% 5%;background:#111c20f5;padding:20px;pointer-events:auto;display:none;overflow:auto;border:1px solid #a99c78;border-radius:8px";
-    panel.innerHTML = '<header style="display:flex;justify-content:space-between"><b>본부 인물</b><button data-close>닫기</button></header><p>대화는 이 채팅에 저장되어 본편에서도 이어집니다.</p><div data-people></div><p role="status"></p><div data-log style="white-space:pre-wrap;max-height:42vh;overflow:auto"></div><div data-compose style="display:flex;gap:8px"><select aria-label="대화 모델"><option value="main">메인 모델</option><option value="aux">보조 모델</option></select><input aria-label="요원에게 할 말" maxlength="2000" style="flex:1;min-width:0" autocomplete="off"><button type="button" data-send>보내기</button></div>';
-    wrap.append(button, panel);
-    root.append(wrap);
-    let state2 = { agents: [], turns: [] };
-    let selected = "";
+  // src/game/talk.ts
+  var FONT2 = (px) => `${px}px "${PIXEL_FONT}", "Galmuri11", sans-serif`;
+  var REACH = 150;
+  var BUBBLE_W = 340;
+  var OVERHEAR = 480;
+  var CSS2 = `
+.gt-bar{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);width:min(92%,720px);display:none;gap:6px;align-items:center;padding:2px 4px;pointer-events:auto;z-index:46;color:#ece6d4}
+.gt-bar.gk-panel,.gt-log.gk-panel{border-width:17px;border-image-width:17px;box-shadow:none!important}
+.gt-bar[data-open]{display:flex;flex-wrap:wrap}
+.gt-to{font-size:18px;color:#ffe27a;white-space:nowrap;text-shadow:2px 2px 0 #000}
+.gt-in{flex:1;min-width:120px;font:inherit;font-size:20px;padding:2px 6px;background:none;color:#fff;outline:none;border-width:7px;border-image-width:7px;text-shadow:2px 2px 0 #000}
+.gt-in::placeholder{color:#8b8574}
+.gt-in:focus,.gt-in:focus-visible{outline:none;box-shadow:none}
+/* 단추: 모서리를 한 칸 깎은 도트 단추 (kit의 메뉴 줄 판은 이 크기에서 찌그러진다) */
+.gt-bar .gk-btn,.gt-bar .gk-btn:hover,.gt-bar .gk-btn:focus-visible{font-size:18px;line-height:1;padding:6px 10px;margin:0 3px;border:0;border-image:none;background:#2b2620;color:#d8d0bc;box-shadow:0 -3px 0 0 #6e6350,0 3px 0 0 #6e6350,-3px 0 0 0 #6e6350,3px 0 0 0 #6e6350,0 6px 0 0 rgba(0,0,0,.55)}
+.gt-bar .gk-btn:hover,.gt-bar .gk-btn:focus-visible{background:#3d3428;color:#ffe27a;box-shadow:0 -3px 0 0 #c9a74a,0 3px 0 0 #c9a74a,-3px 0 0 0 #c9a74a,3px 0 0 0 #c9a74a,0 6px 0 0 rgba(0,0,0,.55);outline:none}
+.gt-bar .gk-btn:active{transform:translateY(3px);box-shadow:0 -3px 0 0 #c9a74a,0 3px 0 0 #c9a74a,-3px 0 0 0 #c9a74a,3px 0 0 0 #c9a74a}
+.gt-bar .gk-btn:disabled{opacity:.4;cursor:default}
+.gt-msg{flex-basis:100%;font-size:16px;color:#ff9a8a;text-shadow:2px 2px 0 #000}
+.gt-msg:empty{display:none}
+.gt-log{position:absolute;left:50%;bottom:84px;transform:translateX(-50%);width:min(92%,720px);max-height:45%;overflow:auto;display:none;padding:4px 8px;pointer-events:auto;z-index:46;font-size:18px;line-height:1.6;color:#ece6d4;white-space:pre-wrap;text-shadow:2px 2px 0 #000}
+.gt-log[data-open]{display:block}
+`;
+  function mountTalk(root, api) {
+    ensureKit();
+    const st = document.createElement("style");
+    st.textContent = CSS2;
+    const bar2 = document.createElement("div");
+    bar2.className = "gt-bar gk-panel gk-font";
+    bar2.setAttribute("role", "group");
+    bar2.setAttribute("aria-label", "본부 대화");
+    bar2.innerHTML = '<span class="gt-to"></span><input class="gt-in gk-slot gk-font" aria-label="할 말" placeholder="할 말" maxlength="300" autocomplete="off" enterkeyhint="send"><button type="button" class="gk-btn" data-send>말하기</button><button type="button" class="gk-btn" data-log>기록</button><button type="button" class="gk-btn" data-close aria-label="대화 닫기">닫기</button><div class="gt-msg" role="status"></div>';
+    const log = document.createElement("div");
+    log.className = "gt-log gk-panel gk-font";
+    log.setAttribute("aria-label", "이번 대화 기록");
+    root.append(st, bar2, log);
+    const to = bar2.querySelector(".gt-to");
+    const input = bar2.querySelector(".gt-in");
+    const sendBtn = bar2.querySelector("[data-send]");
+    const msg = bar2.querySelector(".gt-msg");
+    let state2 = { visitor: { agentId: "", name: "" }, agents: [], turns: [] };
+    let target = "";
     let busy = false;
     let dead = false;
-    const status = panel.querySelector("[role=status]");
-    const input = panel.querySelector("input");
-    const people = panel.querySelector("[data-people]");
-    const log = panel.querySelector("[data-log]");
-    const submit = panel.querySelector("[data-send]");
-    const render = () => {
-      people.replaceChildren();
-      for (const a of state2.agents.filter((a2) => a2.room)) {
-        const b = document.createElement("button");
-        b.textContent = `${a.name} · ${a.room ? rooms[a.room] || a.room : "부재/위치 미확인"} (${a.state})`;
-        b.disabled = busy || !a.room;
-        b.setAttribute("aria-pressed", String(a.id === selected));
-        b.style.cssText = `margin:3px;padding:8px;background:${a.id === selected ? "#3c5551" : "#263237"};color:#eee;border:1px solid #75817b`;
-        b.onclick = () => {
-          selected = a.id;
-          render();
-          input.focus();
-        };
-        people.append(b);
-      }
-      log.textContent = state2.turns.filter((t) => t.agentId === selected).map((t) => `나: ${t.user}
-${t.name}: ${t.reply}`).join("\n\n");
-      log.scrollTop = log.scrollHeight;
-      submit.disabled = busy || !state2.agents.some((a) => a.id === selected && a.room);
+    const bubbles = [];
+    const me = () => state2.visitor.name || "나";
+    let seen2 = { people: [], player: null };
+    const say = (who, text2, pending = false, delay = 0) => {
+      for (let i = bubbles.length - 1; i >= 0; i--) if (bubbles[i].who === who) bubbles.splice(i, 1);
+      const from = performance.now() + delay;
+      bubbles.push({ who, text: text2, pending, from, until: pending ? Infinity : from + 4e3 + [...text2].length * 80 });
+    };
+    const nearby = (target2) => {
+      const p = seen2.player;
+      if (!p) return [];
+      return seen2.people.filter((q) => q.name !== target2 && Math.abs(q.x - p.x) < OVERHEAR).sort((a, b) => Math.abs(a.x - p.x) - Math.abs(b.x - p.x)).map((q) => state2.agents.find((a) => a.name === q.name && a.room)?.id ?? "").filter(Boolean);
+    };
+    const refresh = () => {
+      sendBtn.disabled = busy || !target;
       input.disabled = busy;
     };
+    const renderLog = () => {
+      const agent = state2.agents.find((a) => a.name === target);
+      const turns = state2.turns.filter((t) => t.agentId === agent?.id || t.extra?.some((e) => e.agentId === agent?.id)).slice(-30);
+      log.textContent = turns.length ? turns.map((t) => [`${t.visitor || me()}: ${t.user}`, `${t.name}: ${t.reply}`, ...(t.extra ?? []).map((e) => `${e.name}: ${e.line}`)].join("\n")).join("\n\n") : "아직 나눈 말이 없어요.";
+      log.scrollTop = log.scrollHeight;
+    };
     async function open(name) {
-      panel.style.display = "block";
-      status.textContent = "본편 상태를 읽는 중…";
+      target = name;
+      msg.textContent = "";
+      to.textContent = `${name}에게`;
+      bar2.setAttribute("data-open", "");
+      refresh();
+      input.focus();
       try {
         state2 = await api.state();
         if (dead) return;
-        selected = state2.agents.find((a) => a.room && (a.name === name || a.id === name))?.id || selected || state2.agents.find((a) => a.room)?.id || "";
-        const away = state2.agents.filter((a) => !a.room).length;
-        status.textContent = state2.agents.some((a) => a.room) ? away ? `지금 본부에 없는 ${away}명은 대화할 수 없어요.` : "" : "본부에 있는 것으로 확인된 요원이 없어요. 본편 상태 태그를 확인해 주세요.";
-        render();
+        if (!state2.agents.some((a) => a.name === name && a.room)) msg.textContent = "지금 이 요원과는 대화할 수 없어요.";
+        if (log.hasAttribute("data-open")) renderLog();
       } catch (e) {
-        if (!dead) status.textContent = String(e instanceof Error ? e.message : e);
+        if (!dead) msg.textContent = e instanceof Error ? e.message : String(e);
       }
     }
-    button.onclick = () => void open();
-    panel.querySelector("[data-close]").onclick = () => {
-      panel.style.display = "none";
-    };
-    for (const type of ["keydown", "keyup", "pointerdown", "pointerup"]) panel.addEventListener(type, (e) => e.stopPropagation());
+    function close() {
+      bar2.removeAttribute("data-open");
+      log.removeAttribute("data-open");
+      input.blur();
+      target = "";
+    }
     const send = async () => {
-      if (busy || !selected || !input.value.trim()) return;
-      const text2 = input.value;
+      const text2 = input.value.trim();
+      const agent = state2.agents.find((a) => a.name === target && a.room);
+      if (busy || !text2 || !agent) return;
       busy = true;
-      render();
-      status.textContent = "답변을 기다리는 중…";
+      msg.textContent = "";
+      input.value = "";
+      say(me(), text2);
+      say(agent.name, "…", true);
+      refresh();
       try {
-        state2 = await api.send(selected, text2, panel.querySelector("select").value === "aux" ? "aux" : "main");
+        state2 = await api.send(agent.id, text2, "aux", nearby(agent.name));
         if (dead) return;
-        input.value = "";
-        status.textContent = "대화를 본편에 기록했어요.";
+        const turn = state2.turns.filter((t) => t.agentId === agent.id).at(-1);
+        say(agent.name, turn?.reply ?? "");
+        let delay = 0;
+        let prev = turn?.reply ?? "";
+        for (const e of turn?.extra ?? []) {
+          delay += 900 + [...prev].length * 45;
+          say(e.name, e.line, false, delay);
+          prev = e.line;
+        }
+        if (log.hasAttribute("data-open")) renderLog();
       } catch (e) {
-        if (!dead) status.textContent = e instanceof Error ? e.message : String(e);
+        if (dead) return;
+        for (let i = bubbles.length - 1; i >= 0; i--) if (bubbles[i].who === agent.name) bubbles.splice(i, 1);
+        msg.textContent = e instanceof Error ? e.message : String(e);
+        input.value = input.value || text2;
       } finally {
         busy = false;
-        if (!dead) {
-          render();
-          input.focus();
-        }
+        refresh();
+        if (!dead && bar2.hasAttribute("data-open")) input.focus();
       }
     };
-    submit.onclick = () => void send();
+    sendBtn.onclick = () => void send();
     input.addEventListener("keydown", (e) => {
       if (e.key === "Enter" && !e.isComposing && e.keyCode !== 229) {
         e.preventDefault();
         void send();
       }
+      if (e.key === "Escape") close();
     });
-    return { open, isOpen: () => panel.style.display !== "none", dispose: () => {
-      dead = true;
-      wrap.remove();
-    } };
+    bar2.querySelector("[data-close]").onclick = close;
+    bar2.querySelector("[data-log]").onclick = () => {
+      if (log.toggleAttribute("data-open")) renderLog();
+    };
+    for (const el of [bar2, log]) for (const type of ["keydown", "keyup", "pointerdown", "pointerup"]) el.addEventListener(type, (e) => e.stopPropagation());
+    function draw(c, people, player) {
+      const now = performance.now();
+      seen2 = { people, player };
+      for (let i = bubbles.length - 1; i >= 0; i--) if (bubbles[i].until < now) bubbles.splice(i, 1);
+      const all = [...people, ...player ? [{ ...player, name: me() }] : []];
+      if (target && player && !busy) {
+        const p = people.find((q) => q.name === target);
+        if (!p || Math.abs(p.x - player.x) > REACH * 1.6) close();
+      }
+      c.save();
+      c.textAlign = "center";
+      c.textBaseline = "middle";
+      const placed = [];
+      const place3 = (cx, w, h, bottom) => {
+        let b = bottom;
+        for (let guard3 = 0; guard3 < 20; guard3++) {
+          const hit2 = placed.find((q) => cx - w / 2 < q.r && cx + w / 2 > q.l && b - h < q.b && b > q.t);
+          if (!hit2) break;
+          b = hit2.t - 4;
+        }
+        placed.push({ l: cx - w / 2, r: cx + w / 2, t: b - h, b });
+        return b;
+      };
+      for (const p of [...all].sort((a, b) => b.y - a.y)) {
+        const isPlayer = !!player && p.name === me() && p.x === player.x;
+        const near2 = !!player && !isPlayer && Math.abs(p.x - player.x) < REACH && Math.abs(p.y - player.y) < 80;
+        const x = Math.round(p.x);
+        c.font = FONT2(TAG_PX);
+        const tw = Math.ceil(c.measureText(p.name).width) + 8;
+        const tagBottom = place3(x, tw, 18, Math.round(p.y + p.top));
+        tag(c, p.name, x, tagBottom - 9, near2 || p.name === target || isPlayer);
+        const typing = isPlayer && !busy && bar2.hasAttribute("data-open") && document.activeElement === input && input.value.trim() !== "";
+        const b = bubbles.find((q) => q.who === p.name && (q.from ?? 0) <= now) ?? (typing ? { who: p.name, text: "", until: Infinity, pending: true } : void 0);
+        if (b) {
+          const size2 = bubbleSize(c, b, now);
+          const bottom = place3(x, size2.w + 4, size2.h + 16, tagBottom - 20);
+          bubble(c, size2, x, bottom);
+        }
+      }
+      c.restore();
+    }
+    return {
+      open: (name) => void open(name),
+      isOpen: () => bar2.hasAttribute("data-open"),
+      close,
+      draw,
+      dispose() {
+        dead = true;
+        st.remove();
+        bar2.remove();
+        log.remove();
+      }
+    };
+  }
+  var U = 3;
+  function pixelBox(c, x, y, w, h, fill, line2, shadow2 = true) {
+    x = Math.round(x / U) * U;
+    y = Math.round(y / U) * U;
+    w = Math.ceil(w / U) * U;
+    h = Math.ceil(h / U) * U;
+    if (shadow2) {
+      c.fillStyle = "rgba(0,0,0,.45)";
+      c.fillRect(x + U, y + h, w - U, U);
+      c.fillRect(x + w, y + U, U, h);
+    }
+    c.fillStyle = line2;
+    c.fillRect(x + U, y, w - 2 * U, h);
+    c.fillRect(x, y + U, w, h - 2 * U);
+    c.fillStyle = fill;
+    c.fillRect(x + 2 * U, y + U, w - 4 * U, h - 2 * U);
+    c.fillRect(x + U, y + 2 * U, w - 2 * U, h - 4 * U);
+    return { x, y, w, h };
+  }
+  var TAG_PX = 12;
+  function tag(c, name, x, y, bright) {
+    c.font = FONT2(TAG_PX);
+    c.fillStyle = "rgba(0,0,0,.75)";
+    for (const [dx, dy] of [[-1, 0], [1, 0], [0, -1], [0, 1], [1, 1]]) c.fillText(name, x + dx, y + dy);
+    c.fillStyle = bright ? "#ece6d6" : "rgba(206,200,186,.72)";
+    c.fillText(name, x, y);
+  }
+  function wrap(c, text2, max) {
+    const lines3 = [];
+    let cur = "";
+    for (const ch of [...text2]) {
+      if (c.measureText(cur + ch).width > max && cur) {
+        const sp = cur.lastIndexOf(" ");
+        if (sp > cur.length / 2) {
+          lines3.push(cur.slice(0, sp));
+          cur = cur.slice(sp + 1) + ch;
+        } else {
+          lines3.push(cur);
+          cur = ch;
+        }
+      } else cur += ch;
+    }
+    if (cur) lines3.push(cur);
+    return lines3;
+  }
+  var LH = 30;
+  function bubbleSize(c, b, now) {
+    c.font = FONT2(22);
+    const text2 = b.pending ? ".".repeat(1 + Math.floor(now / 350) % 3) : b.text;
+    const lines3 = wrap(c, text2, BUBBLE_W - 28);
+    const w = Math.min(BUBBLE_W, Math.max(64, ...lines3.map((l) => Math.ceil(c.measureText(l).width))) + 28);
+    return { lines: lines3, w, h: lines3.length * LH + 20 };
+  }
+  function bubble(c, s2, x, bottom) {
+    c.font = FONT2(22);
+    const { lines: lines3, w, h } = s2;
+    const box2 = pixelBox(c, x - w / 2, bottom - h - 4 * U, w, h, "#f4efe2", "#14110d");
+    const tx = Math.round(x / U) * U;
+    const ty = box2.y + box2.h - U;
+    for (let i = 0; i < 3; i++) {
+      const half = (3 - i) * U;
+      c.fillStyle = "#14110d";
+      c.fillRect(tx - half - U, ty + i * U, (half + U) * 2, U);
+      c.fillStyle = "#f4efe2";
+      c.fillRect(tx - half, ty + i * U, half * 2, U);
+    }
+    c.fillStyle = "#14110d";
+    c.fillRect(tx - U, ty + 3 * U, 2 * U, U);
+    c.fillStyle = "#1b1712";
+    lines3.forEach((l, i) => c.fillText(l, x, box2.y + 10 + LH / 2 + i * LH + 1));
   }
 
   // src/game/action/audio/engine.ts
@@ -4558,10 +4731,10 @@ ${t.name}: ${t.reply}`).join("\n\n");
     "return:evac": (c) => [{ who: "데쥬레", text: `${c.agentName} 씨, 깨, 깨어났어요? 의무실이에요. 다들 걱정했어요.` }],
     "pantry:chat": (c) => FALLBACK["npc:pantry"](c)
   };
-  function lines(tag, ctx) {
-    const got = provider?.(tag, ctx);
+  function lines(tag2, ctx) {
+    const got = provider?.(tag2, ctx);
     if (got && got.length) return got;
-    return FALLBACK[tag]?.(ctx) ?? [];
+    return FALLBACK[tag2]?.(ctx) ?? [];
   }
 
   // src/game/action/hq/link.ts
@@ -4612,4 +4785,4 @@ ${t.name}: ${t.reply}`).join("\n\n");
   }
 
   // src/game/action/story/demo-photos.json
-  var demo_photos_default = { Jyaldi: "data:image/webp;base64,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", Aileen: "data:image/webp;base64,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", Spangdal: "data:image/webp;base64,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", Geshugan: "data:image/webp;base64,UklGRs4LAABXRUJQVlA4IMILAAAQMwCdASqQAJAAPpVAm0klo6KhK3RsILASiWcA0IkXkGBpfenfn5RPougllPtK+vgdTIJtEIAOsh1O/EvmueON4nXovsAfo/0ZtCb1p7CXTF9JVGVq/U01xPx/+VUVcizUmQkWPmrWDtNx2n45UJp66RXhKqeCNPAGfaxuUF96uSNZ/6arJDqFdKKYdadw6ncNRr5ZsVQ5w6RvdoXC5skoxa+SmAmYP5QUCJh5PrCHgRJwvzaPqmvf5ICzgQuXo7ednMqk/3C8flGHYugCqxXefMyKb5Agv7tT3WBqAO8vmokb4qn+LFBp/RUn7gPvuTQs8VrrhKCcj+f8zUmMqAprc+vijz6IlSPXEQrTTJ00CgFPllhgTv3EXadABHJWQt2bANc5NzQRZy0Ilh/yecAulcUx6BS3hz6Lm9WWKxfQkgJ6bjyx1PxJkN22MjYa4Ab4TWHcseQuGsIb72phZvlC4jnDe2802HzVO7evsu/Ap3xfz3qvQEjnli7/Q3S5XBIHQM7pWqmAwUthoMAKzpR+SZrRLWL/ZrrgCsTGYGIptQAA/vhfHRPp3QaVN1NT7FCwLWajSNBucQfV+bhBzjBdE4Yq2iugTUuaDywclR9jUUh5EHMClpCaWiKwV1FedYx5CvH01fzpN0FyyJl7khF2ovoy38OQZVTa5XsJlIgyyS0lytTNdqRoSb5A5ylfSa3+0h4t8bU2d46OOz9Z+1pnS1nvkgeV5q7hKndusxaQ2Gz/OlKsYSbA9lQ0ANaS7aOe+a1SyVx94wT/BV7f9EEwa18JZBkUsKeHyyY7b275uS4WRPt36xX7CckaQoJJyYIf7RKGLP6XyMQ176qa8DmJsoavi2seHleW1ZoWRK+
+  var demo_photos_default = { Jyaldi: "data:image/webp;base64,UklGRjIHAABXRUJQVlA4ICYHAAAQJgCdASqQAJAAPpVEnUulo6KipNK7ILASiWcA0ND93BXMfYY8FB42NAD9DejlodesPYO6S37eFWO1vU5wZHiM9ihohvpzbGXL0Mg5fHHwzoVzKe4C5ctF2ZhpaGIidscjzPqK716eykLP0ElSvYuR2sCghxG03ljx7jJ6KJf5/jGXhk/zBsZBBSj78IlHAWYafa6D6Ja50lFC0h0TgAX0pdTpaZw8YAzZ41QqOXKYMXOGGEl31IMicm4k3xIJ2am61l/FY09tsY//LRaVcZW6mKG3KwHBHxqk9zUcbYF4idT8Cobxa2n8qKcW5I4Jinj6enT43cd3Y2oWM8wT1mG7AMDwpWtZ9k4h6Joxer5hlIWk/AF0DHCSu/0N/G+hfQ7vJxfaFLi4jnyv058Hx6gntuqvIj90IooAAP735EfkxF9fXUA2YHrFuK3/2XzN3M0eZEuxvhLvfLN0C2rLAGGLN1VKz7avF2Y28yZrhJQ6COBvucZRLBE3ScMzNBJsJo9bCFtduzYONozxBrWhYdOc4cZ6vJDlgQOs7Y8MB+H3a9hNWw81AZjGKTkD+olnznm3yt0ufJfD6FPfQR/SLf5UJ5nP/xLbG86gWH6nQFQBk6LZdoN4QJjmHixPWx0w8Jd0xhl/7/5zb68FydsDXC+zr0gocgv7xBRuPgiQIBkFuNdO8Q01cQPmDNGkZfW3V8SEfWzpUcZbwNbP5AuHf9zrdKGZPJ6PKhCBjlT7Lr7uLHcqAgOrnrDMRB2m+Y+46g8j+Qms8aElwjMkHfRMz0L+5bnT364/oQhhnANOvvqThMXPtDtup2bznNYDoRpb7qhjP3FL0kkBRhWaKp6zcL4wrLponRPyqYGPHdO0BWw9+PjtsBdvWjWunqQ5qGag/AzMX2tDAwyw9y7g3BfEHlalNH49opt9ct32+l9MYc5P2Qgf3iiFhrf4kPIBxPNnzIoCL2qosnCWKQ+gpqHm+hDAC7fhqUGTd8UlbitM+6n2i4q869G0tjk1Vv9lY61JGaRV+QNKYAPK+I3R2yRhzOAXBBz706uH5O3mYxc0AUCIs4rA8M+rKYGZm9wslYTFcR3dl4cV+GwI6AQlAw84C1+iUrL0YlxZz4ZOFcSs3CQD0YDaCV2yoZ4hC1tm3XLOcFcubwPJShFKIl0mino4NcP5yf9ESbK/suNAB8mGMmaruWpLMopaRf74Eiw5YQHWIXiToCTCQNQ7HfsCQMQDKT39Whjpev4/cYFxJOF1T3LOW/u/m+oifw+gCI0zqEyNhktNSXqahzuPh64ZxyB6VTIy5Wre93yBe67R5G0tKCDw6r9RNspFuWyEkA92YpDUl4bBLzNdmLR5p5wcdw72ha7WM7739JHmKlMLvAiFQJn09gbeSSN0Q1rQEvK0GJ5zb+ce5bZ+aYw4CukGZNh2yFthHh/2GjIwPVVV0aPXSKeqrF+AlAxUevwn+E3OJVbdgN+Cj/oP18JxRSc+4QAEgJnFbh5xWqOsc2S03eaCUMK92OF3Xpl8hyaI+GVofqmKPaL8Wnn3y4yksjvlfLCrEjWj61Arj6Um5s6BodwIuN0yVgAs2CBrvCf5lahahr5MRExtkSolHqiz1zlpMr3uBqCAL45NMuo2oXmSCM/YKgFZekeivJL08deAzGpep235dNW1IcVkZWXzjPaB6Rp60YmCmR6aMHYFyVGkjydyjrtzSKEHwRkTLcZOSxeTxeDoAro8bdwCNc5Kr4UXdYakqmGpm98lPY2wm1Sefw/dJKQ1btjPD91eTMRXR6uX0wBLIoF6PSLwcr7Jy92AvZkFp9xoaqqdXXdI+ZHhFbXT53SjwVDUdHggVcRf7sZBufv+x20jhvnda+uMzhfGp1g4Nv947Cv8DvDF8JPTDaxBxezsIRjiu5k81AM74/E24OOQFHNsdQ1zfg4hUhFSAb0c+

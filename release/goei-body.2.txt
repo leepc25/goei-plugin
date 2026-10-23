@@ -1,4 +1,4 @@
-= "me");
+ide !== "me");
   }
   function acknowledge(st, post, nick) {
     let changed = false;
@@ -557,7 +557,7 @@ ${JSON.stringify(body4)}`;
     if (!body4) throw new GnetError('Expected {"body":"reply text"} with a non-empty body.', raw);
     return trimTokens(body4, LIMITS.dm_tokens);
   }
-  function mainContext(st, nick, rules2, focus) {
+  function mainContext(st, nick, rules3, focus) {
     const posts = [];
     for (const p of CONTEXT.includePosts ? st.posts : []) {
       if (CONTEXT.ownOnly && !p.mine && !p.comments.some((c) => c.mine)) continue;
@@ -600,7 +600,7 @@ ${comments.map((c) => c.content).join("\n")}`),
       });
     }
     const payload = (records) => `[MODULE_CONTEXT_BEGIN]
-${rules2}
+${rules3}
 ${JSON.stringify({ feature: "gnet", records })}
 [MODULE_CONTEXT_END]`;
     const fits = (records) => !(CONTEXT.tokens > 0 && tokens(payload(records)) > CONTEXT.tokens);
@@ -1273,7 +1273,7 @@ ${JSON.stringify({ feature: "gnet", records })}
     for (let i = list4.length - 1; i >= 0; i--) if (list4[i]?.role === "char") return i;
     return -1;
   }
-  function mainContext2(st, b, set2, rules2, focus) {
+  function mainContext2(st, b, set2, rules3, focus) {
     if (!set2.context) return "";
     const items = [];
     if (set2.contextMessages) {
@@ -1310,7 +1310,7 @@ ${JSON.stringify({ feature: "gnet", records })}
       }
     }
     const payload = (records) => `[MODULE_CONTEXT_BEGIN]
-${rules2}
+${rules3}
 ${JSON.stringify({ feature: "phone", records })}
 [MODULE_CONTEXT_END]`;
     const kept = pickRecords(items, {
@@ -1474,6 +1474,22 @@ ${body4}
         ]
       }
     ],
+    // 본부 방문 대화 (2026-10-22 설계 2판): 지침은 카드 「Visit」 로어북, 여기는 보낼 자료와 길이
+    hq: [
+      {
+        title: "참고 자료",
+        chips: [chip("desc", "봇 설명", 1), chip("authors", "작가 노트", 1), chip("persona", "주인공·페르소나", 1), chip("active", "상시 로어북", 1), chip("related", "관련 로어북", 1), chip("secondary", "2차 참조", 0), chip("interlude", "같은 막간 다른 대화", 1)],
+        items: [turns(6), budget]
+      },
+      {
+        title: "대화",
+        chips: [chip("interject", "옆 요원 끼어들기", 1)],
+        items: [
+          { key: "model", label: "대화 모델", type: "pick", def: "aux", opts: [["aux", "보조"], ["main", "메인"]] },
+          num3("line_chars", "답 길이", 80, 20, 400, "자", { hint: "말풍선 한 장은 80자 안팎이에요" })
+        ]
+      }
+    ],
     nw: [
       {
         title: "참고 자료",
@@ -1487,7 +1503,7 @@ ${body4}
       }
     ]
   };
-  var PREFIX = { gn: "$lb_cfg_lb-gn.adv_", ph: "$ph_adv_", nw: "$nw_adv_", gen: "$gen_" };
+  var PREFIX = { gn: "$lb_cfg_lb-gn.adv_", ph: "$ph_adv_", nw: "$nw_adv_", hq: "$hq_adv_", gen: "$gen_" };
   var advItems = (f) => ADV[f].flatMap((g) => [...g.chips ?? [], ...g.items]);
   var advItem = (f, key2) => advItems(f).find((i) => i.key === key2);
   var advVar = (f, item2) => item2.v ?? `${PREFIX[f]}${item2.key}`;
@@ -1983,6 +1999,7 @@ ${body4}
     "Wiki",
     "Phone",
     "Phone tabs",
+    "Visit",
     "Settings",
     "⚙️설정",
     "괴이봇 플러그인 매니페스트",
@@ -2495,7 +2512,7 @@ ${line2}`;
   }
   var NW_CONTEXT = "$nw_context";
   var wikiContextOn = (state) => String(state?.[NW_CONTEXT] ?? "") === "1";
-  function wikiMainContext(chat, rules2, focus, capOverride) {
+  function wikiMainContext(chat, rules3, focus, capOverride) {
     const s4 = chat.scriptstate;
     const count2 = advNum(s4, "nw", "ctx_count");
     const cap = capOverride ?? advNum(s4, "nw", "ctx_tokens");
@@ -2505,7 +2522,7 @@ ${line2}`;
     const docs = listDocs(chat).filter((d) => (d.meta?.primarySources?.length ?? 0) > 0 ? withLore : created).filter((d) => !onlyMentioned || related(focus, [d.title]) || !!focus?.terms.includes(d.title)).map((d, i) => ({ d, at: Number(d.meta?.created) || 0, i })).sort((a, b) => b.at - a.at || b.i - a.i).slice(0, count2);
     const kept = [];
     const payload = () => `[MODULE_CONTEXT_BEGIN]
-${rules2}
+${rules3}
 ${JSON.stringify({ feature: "wiki", records: kept })}
 [MODULE_CONTEXT_END]`;
     for (const { d } of docs) {
@@ -3646,8 +3663,8 @@ ${after}`);
     }
     const n = userName.trim();
     if (n && agentName && n !== agentName && n.length >= 2 && !/^(?:user|나|유저)$/i.test(n)) {
-      const esc19 = n.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-      const re = new RegExp(/^[A-Za-z]/.test(n) ? `\\b${esc19}\\b` : esc19, "g");
+      const esc20 = n.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const re = new RegExp(/^[A-Za-z]/.test(n) ? `\\b${esc20}\\b` : esc20, "g");
       out = out.map((m) => typeof m?.content === "string" && re.test(m.content) ? { ...m, content: m.content.replace(re, agentName) } : m);
     }
     return out;
@@ -4472,26 +4489,4 @@ The previous response was rejected and nothing was saved. Recreate the complete 
     try {
       const raw = await risuai.pluginStorage.getItem(KEY);
       return setPrefs(typeof raw === "string" ? JSON.parse(raw) : raw);
-    } catch (error) {
-      console.log(`[goei] 기본 설정을 읽지 못했어요: ${error instanceof Error ? error.message : String(error)}`);
-      return getPrefs();
-    }
-  }
-  async function saveVarDefaults(prefixes, state) {
-    const mine = (k) => PREF_VAR.test(k) && prefixes.some((x) => k.startsWith(x));
-    await savePrefs((p) => {
-      const keys = [.../* @__PURE__ */ new Set([...Object.keys(state ?? {}), ...Object.keys(p.vars ?? {})])].filter(mine);
-      const vars = { ...p.vars ?? {} };
-      for (const k of keys) {
-        const v = state?.[k];
-        if (v === void 0 || v === null || v === "" || v === "null") delete vars[k];
-        else vars[k] = String(v);
-      }
-      return { ...p, vars };
-    });
-  }
-  function loadVarDefaults(prefixes, state) {
-    const mine = (k) => PREF_VAR.test(k) && prefixes.some((x) => k.startsWith(x));
-    const saved = getPrefs().vars ?? {};
-    const out = {};
-    for (const k of [.../*
+    } catc

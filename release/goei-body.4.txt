@@ -1,4 +1,17 @@
-ex-wrap: wrap; margin-bottom: 8px; }
+t { border-radius: 3px; background: #9cc4ff; }
+.gx-pin.sealed .gx-dot { background: var(--danger); }
+.gx-pin.hot .gx-dot { background: var(--amber); box-shadow: 0 0 0 2px var(--void), 0 0 0 6px rgba(224, 163, 60, .35); }
+.gx-pin.hot-an .gx-dot { background: var(--danger); box-shadow: 0 0 0 2px var(--void), 0 0 0 6px rgba(255, 143, 143, .3); }
+.gx-pin.hot-ms .gx-dot { background: #c9a7ff; box-shadow: 0 0 0 2px var(--void), 0 0 0 6px rgba(201, 167, 255, .3); }
+.gx-pin.sel .gx-pname { background: var(--signal); color: var(--on-signal); }
+.gx-pin:hover .gx-pname { outline: 1px solid var(--signal); }
+.gx-mini {
+  min-height: 32px; padding: 0 10px; border: 1px solid var(--line); border-radius: 8px;
+  background: var(--void); color: var(--text); font-size: 13px; white-space: nowrap;
+}
+.gx-mini:hover { border-color: var(--mint); }
+.gx-mini.danger { border-color: var(--danger); color: var(--danger); }
+.gx-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
 .gx-chip { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 0 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--void); color: var(--dim); font-size: 13px; }
 .gx-chip b { color: var(--text); font-weight: 600; }
 .gx-chip.on { border-color: var(--signal); color: var(--signal); }
@@ -2194,32 +2207,4 @@ button.mk-go:hover { color: var(--signal); }
     let dragging = false;
     let shown2 = 0;
     let ready = false;
-    const paint = () => {
-      track2.style.transform = shown2 ? `translateX(${shown2}px)` : "";
-      const was = ready;
-      ready = Math.abs(shown2) >= closeW();
-      track2.querySelectorAll(".gx-mclose").forEach((el) => el.classList.toggle("ready", ready));
-      if (ready && !was) navigator.vibrate?.(8);
-    };
-    const end = () => {
-      if (id === null) return;
-      id = null;
-      if (!dragging) return;
-      const close2 = ready;
-      track2.classList.add("back");
-      shown2 = 0;
-      paint();
-      setTimeout(() => track2.classList.remove("back"), 260);
-      if (close2) onClose();
-    };
-    bar.addEventListener("pointerdown", (e) => {
-      if (e.button !== 0) return;
-      id = e.pointerId;
-      x0 = e.clientX;
-      y0 = e.clientY;
-      dragging = false;
-      track2.classList.remove("back");
-    });
-    bar.addEventListener("pointermove", (e) => {
-      if (e.pointerId !== id) return;
-      const dx = e.clientX
+    con

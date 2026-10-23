@@ -1,4 +1,4 @@
-// goei-body 0.16.43
+// goei-body 0.16.44
 "use strict";
 (() => {
   // src/core/dispatch.ts
@@ -3278,11 +3278,11 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
   }
   var imgSize = (v) => pct(v, IMG_SIZE);
   var imgFold = (v) => pct(v, IMG_FOLD);
-  function imgCss(size = IMG_SIZE.def, fold = IMG_FOLD.def, hidden = false) {
+  function imgCss(size = IMG_SIZE.def, fold2 = IMG_FOLD.def, hidden = false) {
     const g = ":is(.gim,.x-risu-gim,.ib-asset-hover,.x-risu-ib-asset-hover)";
     if (hidden) return `${g}{display:none!important}`;
-    const open3 = fold >= 100;
-    const folded = open3 ? `${W}/${H}` : `${W}/${Math.round(H * fold) / 100}`;
+    const open3 = fold2 >= 100;
+    const folded = open3 ? `${W}/${H}` : `${W}/${Math.round(H * fold2) / 100}`;
     return `${g}{display:block!important;box-sizing:border-box;margin:auto;width:100%;max-width:${Math.round(BASE_EM * size) / 100}em!important;aspect-ratio:${folded}!important;overflow:hidden;border-radius:20px;background-color:transparent;background-repeat:no-repeat;background-size:100% auto;background-position:center top;cursor:${open3 ? "default" : "pointer"};outline:none;transition:aspect-ratio .45s ease;-webkit-mask-image:-webkit-radial-gradient(white,black)}` + (open3 ? "" : `${g}:hover,${g}:focus{aspect-ratio:${W}/${H}!important}`);
   }
   var hiddenNow = false;
@@ -3369,11 +3369,11 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
     const dim = int(o.dim, 0, 100);
     const status = o.status === "off" || o.status === "light" || o.status === "dark" || o.status === "paper" ? o.status : void 0;
     const size = imgSize(o.imgSize);
-    const fold = imgFold(o.imgFold);
+    const fold2 = imgFold(o.imgFold);
     const show = imgRecent(o.imgShow);
     const send2 = imgRecent(o.imgSend);
     const marks2 = (Array.isArray(o.marks) ? o.marks : []).filter((m) => !!m && typeof m === "object" && typeof m.name === "string" && !!m.s && typeof m.s.tab === "string").slice(0, MARK_MAX).map((m) => ({ s: m.s, name: m.name.slice(0, 80) }));
-    prefs = { basic, world, ...theme ? { theme } : {}, ...Object.keys(vars).length ? { vars } : {}, ...nav ? { nav } : {}, ...agents ? { agents } : {}, ...dim !== null ? { dim } : {}, ...status ? { status } : {}, ...size !== null ? { imgSize: size } : {}, ...fold !== null ? { imgFold: fold } : {}, ...show !== null ? { imgShow: show } : {}, ...send2 !== null ? { imgSend: send2 } : {}, ...marks2.length ? { marks: marks2 } : {} };
+    prefs = { basic, world, ...theme ? { theme } : {}, ...Object.keys(vars).length ? { vars } : {}, ...nav ? { nav } : {}, ...agents ? { agents } : {}, ...dim !== null ? { dim } : {}, ...status ? { status } : {}, ...size !== null ? { imgSize: size } : {}, ...fold2 !== null ? { imgFold: fold2 } : {}, ...show !== null ? { imgShow: show } : {}, ...send2 !== null ? { imgSend: send2 } : {}, ...marks2.length ? { marks: marks2 } : {} };
     return prefs;
   }
   function readSettingsBook(lore) {
@@ -4119,18 +4119,18 @@ ${themeVars("[x-goei-fab]")}
   function fields2(line2) {
     const out = [];
     let cur = "";
-    let esc19 = false;
+    let esc20 = false;
     for (const c of line2) {
-      if (esc19) {
+      if (esc20) {
         cur += c === "n" ? "\n" : c === "p" ? "|" : c === "\\" ? "\\" : `\\${c}`;
-        esc19 = false;
-      } else if (c === "\\") esc19 = true;
+        esc20 = false;
+      } else if (c === "\\") esc20 = true;
       else if (c === "|") {
         out.push(cur);
         cur = "";
       } else cur += c;
     }
-    if (esc19) cur += "\\";
+    if (esc20) cur += "\\";
     out.push(cur);
     return out;
   }
@@ -4281,4 +4281,4 @@ ${themeVars("[x-goei-fab]")}
       }
     };
     for (const p of st.posts) run3(p.comments, old.get(p.id)?.comments ?? [], (c) => c.mine ? "me" : "npc", (c) => replyForUser(p, c));
-    run3(st.dms, previous.dms, (d) => d.side, (d) => d.side !=
+    run3(st.dms, previous.dms, (d) => d.side, (d) => d.s

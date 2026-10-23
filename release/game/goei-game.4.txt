@@ -1,4 +1,10 @@
-) {
+ + d3.h / 2 - 2, b.x1 - b.x0, 4);
+        ctx.restore();
+        return;
+      }
+      ctx.globalAlpha = d3.harmless ? 0.55 * (1 - this.t / d3.life) + 0.2 : d3.pierce ? 0.55 : 0.95;
+      ctx.fillStyle = d3.color;
+      if (d3.grow) {
         ctx.fillRect(b.x0, this.y - b.z1, 10, b.z1 - b.z0);
         ctx.fillRect(b.x1 - 10, this.y - b.z1, 10, b.z1 - b.z0);
       } else ctx.fillRect(b.x0, this.y - b.z1, b.x1 - b.x0, b.z1 - b.z0);
@@ -4930,12 +4936,4 @@
   var MOVES = {
     // 3연타: 잽(앞손, 예비 없음) → 스트레이트(뒷손) → 강한 스트레이트(앞손). 맞혀야 다음 타로 이어진다
     jab: {
-      clip: "jab",
-      ticks: T(1, 1, 4, 2, 2),
-      adv: 6,
-      cancel: 2,
-      whiffCancel: 3,
-      hits: [{ at: [2], dmg: 8, react: "flinch", push: 5, stop: 3, strength: 1, noise: 0.15 }]
-    },
-    cross: {
-      clip: "cross"
+      
