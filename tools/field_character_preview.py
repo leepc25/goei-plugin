@@ -1,7 +1,7 @@
 """Make one self-contained review page per character; no generation calls."""
 import base64,io,json,zipfile
 from pathlib import Path
-from field_character_production import OUT
+from field_character_production import OUT,TEMPLATES
 
 PAGE='''<!doctype html><html lang="ko"><meta charset="utf-8"><title>캐릭터 개별 검수</title>
 <style>body{background:#20252b;color:#eee;font:16px sans-serif;margin:24px}button,select,input{font:inherit;margin:4px;padding:6px}canvas{image-rendering:pixelated;background:#9baea6}#stage{overflow:auto;max-height:75vh}p{max-width:900px}.bad{color:#ffb2ad}</style>
@@ -35,7 +35,8 @@ def main():
    if not files:continue
    review=json.loads((directory/'visual-review.json').read_text()) if (directory/'visual-review.json').exists() else {}
    result=review.get('result');status='프레임 검수 통과' if result=='pass' else ('반려 · 재작업 대상' if result and result!='pass' else '프레임 검수 대기')
-   clips.append({'name':directory.name,'status':status+' · '+review.get('findings',''),'frames':[uri(f.read_bytes())for f in files]})
+   label=dict(TEMPLATES).get(directory.name,directory.name)
+   clips.append({'name':label+' · '+str(len(files))+'장','status':status+' · '+review.get('findings',''),'frames':[uri(f.read_bytes())for f in files]})
   if not clips:continue
   data=json.dumps({'name':c['name'],'clips':clips},ensure_ascii=False).replace('<','\\u003c')
   (folder/'review.html').write_text(PAGE.replace('__DATA__',data));count+=1

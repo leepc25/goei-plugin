@@ -1,0 +1,25 @@
+{
+  "at": 1792794551.5357533,
+  "character_id": "45e40a13-b3a8-4cee-8f7d-08ab09574ad0",
+  "result": "pass",
+  "directions_reviewed": [
+    "south",
+    "south-east",
+    "east",
+    "north-east",
+    "north",
+    "north-west",
+    "west",
+    "south-west"
+  ],
+  "findings": "AVIF의 검은 단발·이마를 덮는 앞머리·검은 하이넥·짙은 자주색 바지 정장을 8방향 대조. 앞머리 큰 삼각 빈틈 제거 유지, 체격·높이 일관, 회색 외곽 칠 없음. AVIF 우선·로어 보충·전원 완료 장벽 재확인.",
+  "movement_direction": "east",
+  "stationary_direction": "south-east",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF primary",
+    "Lore supplementary height",
+    "All55 before motion",
+    "Gray outer paint reroll"
+  ]
+}

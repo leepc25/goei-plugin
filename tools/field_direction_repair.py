@@ -10,11 +10,13 @@ def main():
   fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
   prod=Production();slug=cfg['slug'];c=prod.s['characters'][slug]
   assert c['character_id']==cfg['character_id'] and not c.get('eight_way_visual_reviewed')
-  folder=OUT/'direction-repairs'/slug/cfg['character_id'];folder.mkdir(parents=True,exist_ok=True)
+  folder=OUT/'direction-repairs'/slug/cfg['character_id']
+  if cfg.get('revision'):folder=folder/cfg['revision']
+  folder.mkdir(parents=True,exist_ok=True)
   atomic(folder/'config.json',cfg)
   with zipfile.ZipFile(OUT/slug/'character.zip') as z:
    for direction,rects in cfg['rectangles'].items():
-    key='direction-repair-'+direction
+    key='direction-repair-'+direction+('-'+cfg['revision'] if cfg.get('revision') else '')
     source=folder/(direction+'-source.png');maskpath=folder/(direction+'-mask.png')
     if not source.exists():source.write_bytes(z.read('Idle/rotations/'+direction+'.png'))
     im=Image.open(source).convert('RGBA');mask=Image.new('RGB',im.size);draw=ImageDraw.Draw(mask)
@@ -43,7 +45,7 @@ def main():
    if args.finalize:
     for direction in cfg['rectangles']:
      assert (folder/(direction+'-verification.json')).exists()
-     jid=c['direction-repair-'+direction]
+     jid=c['direction-repair-'+direction+('-'+cfg['revision'] if cfg.get('revision') else '')]
      assert prod.s['jobs'][jid]['status']=='completed'
     with zipfile.ZipFile(folder/'character.zip','w',zipfile.ZIP_DEFLATED) as target:
      for name in z.namelist():

@@ -1,0 +1,40 @@
+{
+  "slug": "lee-seong-hae",
+  "rectangles": {
+    "south-east": [
+      [
+        62,
+        63,
+        80,
+        71
+      ]
+    ],
+    "east": [
+      [
+        70,
+        63,
+        83,
+        71
+      ]
+    ],
+    "west": [
+      [
+        45,
+        63,
+        58,
+        71
+      ]
+    ],
+    "south-west": [
+      [
+        48,
+        63,
+        68,
+        71
+      ]
+    ]
+  },
+  "description": "Correct ONLY visible iris color to distinct EMERALD GREEN matching the front-view green-eyed identity. Keep exact existing eye shape, black pupils, dark upper eyelashes, pale skin, white hair, face direction and expression. Tiny green iris pixels, not green eyeshadow or makeup. Preserve all unmasked pixels. Native crisp pixel art with no gray halo.",
+  "character_id": "d254a6a5-b284-4ca5-a804-76f83bb47f28",
+  "revision": "eyes-corrected-y"
+}

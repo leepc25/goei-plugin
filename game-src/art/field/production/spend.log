@@ -225,10 +225,10 @@ e5c4d831-8e6c-4102-908b-3c179fef8817	secriem	registration		completed	{"type": "g
 54cadacd-3cb9-410c-99f1-4794aeda8247	lee-byeong-jin	registration		completed	{"type": "generations", "generations": 4.0}
 69ccf53c-8ed0-4e78-a4d3-919d4962ed62	cheong-dal-lae	registration		completed	{"type": "generations", "generations": 4.0}
 f4ac2933-a388-4c25-af41-e7d2174bce29	cha-yeo-jin	registration		completed	{"type": "generations", "generations": 4.0}
-37cf2ead-5019-41ae-a42c-33ed09605f72	jang-heo-un	registration		processing	null
-d87a50ff-3589-49db-8669-0841b3464ab9	go-yeon-ji	registration		processing	null
-80e98e16-d4f1-42f5-89f8-dbfeb0c91e3d	ma-deok-hee	registration		processing	null
-c7717490-a1af-4b91-8ee7-0d88b179806e	mun-hye-ran	registration		processing	null
+37cf2ead-5019-41ae-a42c-33ed09605f72	jang-heo-un	registration		completed	{"type": "generations", "generations": 4.0}
+d87a50ff-3589-49db-8669-0841b3464ab9	go-yeon-ji	registration		completed	{"type": "generations", "generations": 4.0}
+80e98e16-d4f1-42f5-89f8-dbfeb0c91e3d	ma-deok-hee	registration		completed	{"type": "generations", "generations": 4.0}
+c7717490-a1af-4b91-8ee7-0d88b179806e	mun-hye-ran	registration		completed	{"usd": 0.0, "type": "generations", "generations": 0.25}
 fcf1ca24-05e3-4c31-b943-fce1cf62ff6c	shin-yuri	registration		processing	null
 9ef07c27-af3d-487c-8a05-15c5402a6e3c	seo-yun-ji	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
 fd7e8421-f416-410c-9c48-8e1f220251ab	blaret	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
@@ -240,8 +240,12 @@ b340f8f9-71fe-4d3e-bff2-42428be68937	jay	direction-repair-south-east		processing
 de1e9780-8807-4962-9bc2-36f23642d762	jay	direction-repair-east		processing	null
 2f7cae4b-68df-4329-9dca-353d3335c357	jay	direction-repair-west		processing	null
 0f67155e-cd30-4320-ab17-db68dda69bbc	jay	direction-repair-south-west		processing	null
-f25fcc88-05a3-430a-a01c-a7b5381823c7	lee-seong-hae	direction-repair-south-east		processing	null
-977e48af-b079-45c3-ab35-a17bef5ad80d	lee-seong-hae	direction-repair-east		processing	null
-cb6f33ed-14a5-47ce-a9e4-98695a4398ab	lee-seong-hae	direction-repair-west		processing	null
-6fc3092f-4a79-4910-bf1b-da5b2c2e7713	lee-seong-hae	direction-repair-south-west		processing	null
+f25fcc88-05a3-430a-a01c-a7b5381823c7	lee-seong-hae	direction-repair-south-east		failed	{"type": "usd", "usd": 0.0}
+977e48af-b079-45c3-ab35-a17bef5ad80d	lee-seong-hae	direction-repair-east		failed	{"type": "usd", "usd": 0.0}
+cb6f33ed-14a5-47ce-a9e4-98695a4398ab	lee-seong-hae	direction-repair-west		failed	{"type": "usd", "usd": 0.0}
+6fc3092f-4a79-4910-bf1b-da5b2c2e7713	lee-seong-hae	direction-repair-south-west		failed	{"type": "usd", "usd": 0.0}
 fe9b6ba1-00d2-4fd7-9b3b-5b55f55e8463	cha-yeo-jin	direction-repair-north-west		processing	null
+f19b0f36-ec4d-4192-be5f-a7bb0d7fa2bb	lee-seong-hae	direction-repair-south-east-eyes-corrected-y		processing	null
+54809a78-c20d-42e8-b7b3-790d36c17dc1	lee-seong-hae	direction-repair-east-eyes-corrected-y		processing	null
+7bf78da8-0175-43c5-adaf-369d70984f6c	lee-seong-hae	direction-repair-west-eyes-corrected-y		processing	null
+28e2d3c5-bdfc-41b9-943d-94ae2897ccac	lee-seong-hae	direction-repair-south-west-eyes-corrected-y		processing	null

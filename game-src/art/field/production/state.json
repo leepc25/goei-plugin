@@ -17438,7 +17438,7 @@
       "kind": "registration",
       "slug": "jang-heo-un",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792793539.4966831,
       "receipt": {
         "usage": null,
@@ -17450,33 +17450,48 @@
       },
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 4.0
         },
         "id": "37cf2ead-5019-41ae-a42c-33ed09605f72",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-23T22:12:19.622210+00:00",
         "last_response": {
-          "status": "building_skeleton",
-          "progress": 0.98,
+          "status": "completed",
           "character_id": "084edf22-121b-4853-a333-bc29f2c3e8ba",
-          "n_directions": 8,
+          "storage_urls": {
+            "east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/084edf22-121b-4853-a333-bc29f2c3e8ba/rotations/east.png",
+            "west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/084edf22-121b-4853-a333-bc29f2c3e8ba/rotations/west.png",
+            "north": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/084edf22-121b-4853-a333-bc29f2c3e8ba/rotations/north.png",
+            "south": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/084edf22-121b-4853-a333-bc29f2c3e8ba/rotations/south.png",
+            "north-east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/084edf22-121b-4853-a333-bc29f2c3e8ba/rotations/north-east.png",
+            "north-west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/084edf22-121b-4853-a333-bc29f2c3e8ba/rotations/north-west.png",
+            "south-east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/084edf22-121b-4853-a333-bc29f2c3e8ba/rotations/south-east.png",
+            "south-west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/084edf22-121b-4853-a333-bc29f2c3e8ba/rotations/south-west.png"
+          },
+          "billing_usage": {
+            "type": "generations",
+            "generations": 4.0
+          },
           "character_name": "장허운",
-          "queue_position": 0,
           "directions_type": "8-directions",
           "generation_mode": "v3",
-          "skeleton_frames_done": 7,
-          "character_description": "장허운 / Jang Heo-un. Tall lean adult man with slightly slouched posture, long narrow pale face, pronounced dark under-eye shadows, tired half-lidded gray-brown eyes, small weary smile. LONG dark BROWN layered hair extending past shoulders, center part, long curved side locks and outward-flipped ends, untied. Navy suit, white shirt and navy tie. No mask. Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Do not invent patches, badges, logos or markings absent from the supplied image. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches.",
-          "generation_started_at": "2026-10-23T22:12:19.660875+00:00",
-          "skeleton_frames_total": 8
+          "directions_count": 8,
+          "character_description": "장허운 / Jang Heo-un. Tall lean adult man with slightly slouched posture, long narrow pale face, pronounced dark under-eye shadows, tired half-lidded gray-brown eyes, small weary smile. LONG dark BROWN layered hair extending past shoulders, center part, long curved side locks and outward-flipped ends, untied. Navy suit, white shirt and navy tie. No mask. Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Do not invent patches, badges, logos or markings absent from the supplied image. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches."
         }
+      },
+      "observed_end_epoch": 1792794561.2564356,
+      "elapsed_observed_seconds": 1021.7597529888153,
+      "usage": {
+        "type": "generations",
+        "generations": 4.0
       }
     },
     "d87a50ff-3589-49db-8669-0841b3464ab9": {
       "kind": "registration",
       "slug": "go-yeon-ji",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792793539.8135362,
       "receipt": {
         "usage": null,
@@ -17488,26 +17503,41 @@
       },
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 4.0
         },
         "id": "d87a50ff-3589-49db-8669-0841b3464ab9",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-23T22:12:19.943165+00:00",
         "last_response": {
-          "status": "building_skeleton",
-          "progress": 0.98,
+          "status": "completed",
           "character_id": "53c39dd7-2751-4616-b0ae-d7425cdbe07b",
-          "n_directions": 8,
+          "storage_urls": {
+            "east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/53c39dd7-2751-4616-b0ae-d7425cdbe07b/rotations/east.png",
+            "west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/53c39dd7-2751-4616-b0ae-d7425cdbe07b/rotations/west.png",
+            "north": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/53c39dd7-2751-4616-b0ae-d7425cdbe07b/rotations/north.png",
+            "south": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/53c39dd7-2751-4616-b0ae-d7425cdbe07b/rotations/south.png",
+            "north-east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/53c39dd7-2751-4616-b0ae-d7425cdbe07b/rotations/north-east.png",
+            "north-west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/53c39dd7-2751-4616-b0ae-d7425cdbe07b/rotations/north-west.png",
+            "south-east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/53c39dd7-2751-4616-b0ae-d7425cdbe07b/rotations/south-east.png",
+            "south-west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/53c39dd7-2751-4616-b0ae-d7425cdbe07b/rotations/south-west.png"
+          },
+          "billing_usage": {
+            "type": "generations",
+            "generations": 4.0
+          },
           "character_name": "고연지",
-          "queue_position": 0,
           "directions_type": "8-directions",
           "generation_mode": "v3",
-          "skeleton_frames_done": 7,
-          "character_description": "고연지 / Go Yeon-ji. Slim adult woman, pale narrow oval face, cool dark brown-gray eyes, serious neutral mouth. Straight BLACK hair to shoulders with long uneven blunt bangs and ends slightly flipped outward. OPEN white doctor coat over pale mint-blue BUTTONED COLLARED SHIRT, black trousers, stethoscope around neck with silver chestpiece. No navy surgical scrubs in this default outfit, no glasses. Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Do not invent patches, badges, logos or markings absent from the supplied image. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches.",
-          "generation_started_at": "2026-10-23T22:12:19.98509+00:00",
-          "skeleton_frames_total": 8
+          "directions_count": 8,
+          "character_description": "고연지 / Go Yeon-ji. Slim adult woman, pale narrow oval face, cool dark brown-gray eyes, serious neutral mouth. Straight BLACK hair to shoulders with long uneven blunt bangs and ends slightly flipped outward. OPEN white doctor coat over pale mint-blue BUTTONED COLLARED SHIRT, black trousers, stethoscope around neck with silver chestpiece. No navy surgical scrubs in this default outfit, no glasses. Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Do not invent patches, badges, logos or markings absent from the supplied image. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches."
         }
+      },
+      "observed_end_epoch": 1792794666.4591672,
+      "elapsed_observed_seconds": 1126.645631313324,
+      "usage": {
+        "type": "generations",
+        "generations": 4.0
       }
     },
     "80e98e16-d4f1-42f5-89f8-dbfeb0c91e3d": {
@@ -17649,7 +17679,7 @@
           "queue_position": 0,
           "directions_type": "8-directions",
           "generation_mode": "v3",
-          "skeleton_frames_done": 5,
+          "skeleton_frames_done": 6,
           "character_description": "신유리 / Shin Yuri. Athletic adult woman with firm squared shoulders and lean natural muscles, pale angular face, narrow dark eyes and stern flat mouth. BLACK hair swept back into a low ponytail, exposed forehead with two fine temple wisps as visible in original. BLACK leather biker jacket with silver snaps and diagonal zipper over dark GRAY crew-neck T-shirt, slim BLACK jeans, sturdy black laced boots. No tie, no exaggerated bodybuilder muscles. Low ponytail is LOOSE UNBRAIDED hair hanging DOWN the upper back naturally. Never a braid, rope, plait, segmented tail or horizontal sticking-out ponytail. Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Do not invent patches, badges, logos or markings absent from the supplied image. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches.",
           "generation_started_at": "2026-10-23T22:15:50.496947+00:00",
           "skeleton_frames_total": 8
@@ -17869,7 +17899,7 @@
           "queue_position": 0,
           "directions_type": "8-directions",
           "generation_mode": "v3",
-          "skeleton_frames_done": 6,
+          "skeleton_frames_done": 7,
           "character_description": "아벤샤 / Avensha. Adult woman with natural curving figure, pale oval face, GREEN emerald eyes and gentle knowing smile. LONG wavy BLUE hair in thick curled locks framing face and chest. Deep PURPLE hood worn UP, long purple cape with lighter muted purple lining, fastened at throat by LARGE GREEN EMERALD brooch in silver frame. BLACK fitted trouser suit beneath cape, white shirt and black tie, small gold sleeve buttons. Black shoes. No witch hat or staff. Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Do not invent patches, badges, logos or markings absent from the supplied image. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches.",
           "generation_started_at": "2026-10-23T22:17:07.950104+00:00",
           "skeleton_frames_total": 8
@@ -17907,7 +17937,7 @@
           "queue_position": 0,
           "directions_type": "8-directions",
           "generation_mode": "v3",
-          "skeleton_frames_done": 5,
+          "skeleton_frames_done": 7,
           "character_description": "탐미주의 / Aestheticism. Adult-proportioned female ART MANNEQUIN made of smooth matte ivory plastic. Long messy dark RED layered hair, thick uneven bangs and outward wisps, glowing RED eyes, freckles over cheeks and a faint unsettling smile. Clearly visible horizontal STITCHED SEAM around neck. Articulated round elbow/shoulder/wrist/knee joints, seam around waist and molded hip shell. Smooth featureless mannequin torso and pelvis, NO nipples or genitals, no human skin detail. Narrow waist and natural mannequin limbs. Ivory feet shaped like heels. No clothing or accessories; neutral nonsexual upright display stance. Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Do not invent patches, badges, logos or markings absent from the supplied image. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches.",
           "generation_started_at": "2026-10-23T22:17:08.449875+00:00",
           "skeleton_frames_total": 8
@@ -17945,7 +17975,7 @@
           "queue_position": 0,
           "directions_type": "8-directions",
           "generation_mode": "v3",
-          "skeleton_frames_done": 1,
+          "skeleton_frames_done": 2,
           "character_description": "서윤지 / Seo Yun-ji. Adult woman with natural slender build, soft oval face, half-lidded dark BROWN eyes and neutral small mouth. Muted SAGE-GREEN hair, blunt straight bangs and TWO thick long low BRAIDS falling over chest to waist. White collared blouse buttoned to top, sleeves folded to forearms, navy buttoned WAISTCOAT, knee-length navy pencil skirt, dark tights and black low shoes. Square dark digital watch on HER LEFT wrist. NO tie or jacket. Both long braids reach the WAIST, not chest-length braids. Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Do not invent patches, badges, logos or markings absent from the supplied image. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches.",
           "generation_started_at": "2026-10-23T22:24:25.34383+00:00",
           "skeleton_frames_total": 8
@@ -17991,9 +18021,9 @@
           "image_id": "57df4141-f813-5fb2-a334-21f0a91b9d5d",
           "job_kind": "creator-image",
           "progress": 0.75,
-          "queue_position": 5,
+          "queue_position": 3,
           "generation_started_at": "2026-10-23T22:25:11.619731+00:00",
-          "estimated_wait_seconds": 460
+          "estimated_wait_seconds": 279
         }
       }
     },
@@ -18036,9 +18066,9 @@
           "image_id": "6d194fa8-5975-51db-9075-aa3a5996f564",
           "job_kind": "creator-image",
           "progress": 0.75,
-          "queue_position": 6,
+          "queue_position": 4,
           "generation_started_at": "2026-10-23T22:26:04.163365+00:00",
-          "estimated_wait_seconds": 592
+          "estimated_wait_seconds": 398
         }
       }
     },
@@ -18081,9 +18111,9 @@
           "image_id": "541a7946-0340-5849-bf0b-a1b360c5c625",
           "job_kind": "creator-image",
           "progress": 0.75,
-          "queue_position": 5,
+          "queue_position": 4,
           "generation_started_at": "2026-10-23T22:26:04.510304+00:00",
-          "estimated_wait_seconds": 499
+          "estimated_wait_seconds": 330
         }
       }
     },
@@ -18126,9 +18156,9 @@
           "image_id": "38f1f657-c231-54dd-8e3f-7a968755283e",
           "job_kind": "creator-image",
           "progress": 0.75,
-          "queue_position": 8,
+          "queue_position": 5,
           "generation_started_at": "2026-10-23T22:26:04.943349+00:00",
-          "estimated_wait_seconds": 851
+          "estimated_wait_seconds": 541
         }
       }
     },
@@ -18171,9 +18201,9 @@
           "image_id": "f87dc431-4b77-5660-a64d-9c451778eb90",
           "job_kind": "creator-image",
           "progress": 0.75,
-          "queue_position": 6,
+          "queue_position": 4,
           "generation_started_at": "2026-10-23T22:26:05.31541+00:00",
-          "estimated_wait_seconds": 574
+          "estimated_wait_seconds": 330
         }
       }
     },
@@ -18181,7 +18211,7 @@
       "kind": "direction-repair-south-east",
       "slug": "lee-seong-hae",
       "template": null,
-      "status": "processing",
+      "status": "failed",
       "created_epoch": 1792794365.5880136,
       "receipt": {
         "usage": null,
@@ -18203,7 +18233,7 @@
           "usd": 0.0
         },
         "id": "f25fcc88-05a3-430a-a01c-a7b5381823c7",
-        "status": "processing",
+        "status": "failed",
         "created_at": "2026-10-23T22:26:05.814392+00:00",
         "last_response": {
           "type": "message_progress",
@@ -18216,17 +18246,22 @@
           "image_id": "266d2a0c-560d-5b74-8dab-92c11f5e8b2d",
           "job_kind": "creator-image",
           "progress": 0.75,
-          "queue_position": 6,
+          "queue_position": 4,
           "generation_started_at": "2026-10-23T22:26:05.847768+00:00",
-          "estimated_wait_seconds": 587
+          "estimated_wait_seconds": 431
         }
+      },
+      "rejection": "Mask mistakenly below eyes; never apply result",
+      "usage": {
+        "type": "usd",
+        "usd": 0.0
       }
     },
     "977e48af-b079-45c3-ab35-a17bef5ad80d": {
       "kind": "direction-repair-east",
       "slug": "lee-seong-hae",
       "template": null,
-      "status": "processing",
+      "status": "failed",
       "created_epoch": 1792794365.9473946,
       "receipt": {
         "usage": null,
@@ -18248,7 +18283,7 @@
           "usd": 0.0
         },
         "id": "977e48af-b079-45c3-ab35-a17bef5ad80d",
-        "status": "processing",
+        "status": "failed",
         "created_at": "2026-10-23T22:26:06.104440+00:00",
         "last_response": {
           "type": "message_progress",
@@ -18261,17 +18296,22 @@
           "image_id": "f758cd23-7c25-514c-b5ac-9c087f3298c1",
           "job_kind": "creator-image",
           "progress": 0.75,
-          "queue_position": 6,
+          "queue_position": 5,
           "generation_started_at": "2026-10-23T22:26:06.147305+00:00",
-          "estimated_wait_seconds": 583
+          "estimated_wait_seconds": 442
         }
+      },
+      "rejection": "Mask mistakenly below eyes; never apply result",
+      "usage": {
+        "type": "usd",
+        "usd": 0.0
       }
     },
     "cb6f33ed-14a5-47ce-a9e4-98695a4398ab": {
       "kind": "direction-repair-west",
       "slug": "lee-seong-hae",
       "template": null,
-      "status": "processing",
+      "status": "failed",
       "created_epoch": 1792794366.2505255,
       "receipt": {
         "usage": null,
@@ -18293,7 +18333,7 @@
           "usd": 0.0
         },
         "id": "cb6f33ed-14a5-47ce-a9e4-98695a4398ab",
-        "status": "processing",
+        "status": "failed",
         "created_at": "2026-10-23T22:26:06.754755+00:00",
         "last_response": {
           "type": "message_progress",
@@ -18306,17 +18346,22 @@
           "image_id": "a2fb3b08-89d8-5de0-aa1a-c2c943908205",
           "job_kind": "creator-image",
           "progress": 0.75,
-          "queue_position": 6,
+          "queue_position": 5,
           "generation_started_at": "2026-10-23T22:26:06.787814+00:00",
-          "estimated_wait_seconds": 598
+          "estimated_wait_seconds": 442
         }
+      },
+      "rejection": "Mask mistakenly below eyes; never apply result",
+      "usage": {
+        "type": "usd",
+        "usd": 0.0
       }
     },
     "6fc3092f-4a79-4910-bf1b-da5b2c2e7713": {
       "kind": "direction-repair-south-west",
       "slug": "lee-seong-hae",
       "template": null,
-      "status": "processing",
+      "status": "failed",
       "created_epoch": 1792794366.88961,
       "receipt": {
         "usage": null,
@@ -18338,7 +18383,7 @@
           "usd": 0.0
         },
         "id": "6fc3092f-4a79-4910-bf1b-da5b2c2e7713",
-        "status": "processing",
+        "status": "failed",
         "created_at": "2026-10-23T22:26:07.040644+00:00",
         "last_response": {
           "type": "message_progress",
@@ -18351,10 +18396,15 @@
           "image_id": "d305ffe4-cccc-5a7d-b085-3be4e9cb422b",
           "job_kind": "creator-image",
           "progress": 0.75,
-          "queue_position": 6,
+          "queue_position": 4,
           "generation_started_at": "2026-10-23T22:26:07.067708+00:00",
-          "estimated_wait_seconds": 576
+          "estimated_wait_seconds": 422
         }
+      },
+      "rejection": "Mask mistakenly below eyes; never apply result",
+      "usage": {
+        "type": "usd",
+        "usd": 0.0
       }
     },
     "fe9b6ba1-00d2-4fd7-9b3b-5b55f55e8463": {
@@ -18396,9 +18446,181 @@
           "image_id": "e5859591-43e8-505a-a289-0be32bf41498",
           "job_kind": "creator-image",
           "progress": 0.75,
-          "queue_position": 0,
+          "queue_position": 7,
           "generation_started_at": "2026-10-23T22:27:19.153666+00:00",
-          "estimated_wait_seconds": 0
+          "estimated_wait_seconds": 684
+        }
+      }
+    },
+    "f19b0f36-ec4d-4192-be5f-a7bb0d7fa2bb": {
+      "kind": "direction-repair-south-east-eyes-corrected-y",
+      "slug": "lee-seong-hae",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792794664.4788802,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "f19b0f36-ec4d-4192-be5f-a7bb0d7fa2bb",
+        "image_id": "53400d61-48bb-500a-b9ed-9382ce56a065",
+        "source_image_id": "53400d61-48bb-500a-b9ed-9382ce56a065",
+        "status": "processing",
+        "output_count": 1,
+        "image_size": {
+          "width": 128,
+          "height": 256
+        },
+        "estimated_generations": 9,
+        "pricing_provisional": true
+      },
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "f19b0f36-ec4d-4192-be5f-a7bb0d7fa2bb",
+        "status": "processing",
+        "created_at": "2026-10-23T22:31:04.652123+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "model": "inpaint_pro_flash",
+          "width": 128,
+          "action": "Generating image",
+          "height": 256,
+          "prompt": "Correct ONLY visible iris color to distinct EMERALD GREEN matching the front-view green-eyed identity. Keep exact existing eye shape, black pupils, dark upper eyelashes, pale skin, white hair, face direction and expression. Tiny green iris pixels, not green eyeshadow or makeup. Preserve all unmasked pixels. Native crisp pixel art with no gray halo.",
+          "status": "processing",
+          "image_id": "53400d61-48bb-500a-b9ed-9382ce56a065",
+          "job_kind": "creator-image",
+          "progress": 0.05,
+          "generation_started_at": "2026-10-23T22:31:04.692578+00:00"
+        }
+      }
+    },
+    "54809a78-c20d-42e8-b7b3-790d36c17dc1": {
+      "kind": "direction-repair-east-eyes-corrected-y",
+      "slug": "lee-seong-hae",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792794664.7938364,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "54809a78-c20d-42e8-b7b3-790d36c17dc1",
+        "image_id": "407938d6-5f5a-5966-9143-b462f9500a4f",
+        "source_image_id": "407938d6-5f5a-5966-9143-b462f9500a4f",
+        "status": "processing",
+        "output_count": 1,
+        "image_size": {
+          "width": 128,
+          "height": 256
+        },
+        "estimated_generations": 9,
+        "pricing_provisional": true
+      },
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "54809a78-c20d-42e8-b7b3-790d36c17dc1",
+        "status": "processing",
+        "created_at": "2026-10-23T22:31:05.248871+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "model": "inpaint_pro_flash",
+          "width": 128,
+          "action": "Generating image",
+          "height": 256,
+          "prompt": "Correct ONLY visible iris color to distinct EMERALD GREEN matching the front-view green-eyed identity. Keep exact existing eye shape, black pupils, dark upper eyelashes, pale skin, white hair, face direction and expression. Tiny green iris pixels, not green eyeshadow or makeup. Preserve all unmasked pixels. Native crisp pixel art with no gray halo.",
+          "status": "processing",
+          "image_id": "407938d6-5f5a-5966-9143-b462f9500a4f",
+          "job_kind": "creator-image",
+          "progress": 0.05,
+          "generation_started_at": "2026-10-23T22:31:05.290825+00:00"
+        }
+      }
+    },
+    "7bf78da8-0175-43c5-adaf-369d70984f6c": {
+      "kind": "direction-repair-west-eyes-corrected-y",
+      "slug": "lee-seong-hae",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792794665.3908274,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "7bf78da8-0175-43c5-adaf-369d70984f6c",
+        "image_id": "59b067ca-b6c7-5a3e-9f56-854fc5fad34c",
+        "source_image_id": "59b067ca-b6c7-5a3e-9f56-854fc5fad34c",
+        "status": "processing",
+        "output_count": 1,
+        "image_size": {
+          "width": 128,
+          "height": 256
+        },
+        "estimated_generations": 9,
+        "pricing_provisional": true
+      },
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "7bf78da8-0175-43c5-adaf-369d70984f6c",
+        "status": "processing",
+        "created_at": "2026-10-23T22:31:05.598386+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "model": "inpaint_pro_flash",
+          "width": 128,
+          "action": "Generating image",
+          "height": 256,
+          "prompt": "Correct ONLY visible iris color to distinct EMERALD GREEN matching the front-view green-eyed identity. Keep exact existing eye shape, black pupils, dark upper eyelashes, pale skin, white hair, face direction and expression. Tiny green iris pixels, not green eyeshadow or makeup. Preserve all unmasked pixels. Native crisp pixel art with no gray halo.",
+          "status": "processing",
+          "image_id": "59b067ca-b6c7-5a3e-9f56-854fc5fad34c",
+          "job_kind": "creator-image",
+          "progress": 0.05,
+          "generation_started_at": "2026-10-23T22:31:05.650678+00:00"
+        }
+      }
+    },
+    "28e2d3c5-bdfc-41b9-943d-94ae2897ccac": {
+      "kind": "direction-repair-south-west-eyes-corrected-y",
+      "slug": "lee-seong-hae",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792794665.7515273,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "28e2d3c5-bdfc-41b9-943d-94ae2897ccac",
+        "image_id": "a86bcfea-c219-5e01-9266-e6f6a400f4e6",
+        "source_image_id": "a86bcfea-c219-5e01-9266-e6f6a400f4e6",
+        "status": "processing",
+        "output_count": 1,
+        "image_size": {
+          "width": 128,
+          "height": 256
+        },
+        "estimated_generations": 9,
+        "pricing_provisional": true
+      },
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "28e2d3c5-bdfc-41b9-943d-94ae2897ccac",
+        "status": "processing",
+        "created_at": "2026-10-23T22:31:05.928556+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "model": "inpaint_pro_flash",
+          "width": 128,
+          "action": "Generating image",
+          "height": 256,
+          "prompt": "Correct ONLY visible iris color to distinct EMERALD GREEN matching the front-view green-eyed identity. Keep exact existing eye shape, black pupils, dark upper eyelashes, pale skin, white hair, face direction and expression. Tiny green iris pixels, not green eyeshadow or makeup. Preserve all unmasked pixels. Native crisp pixel art with no gray halo.",
+          "status": "processing",
+          "image_id": "a86bcfea-c219-5e01-9266-e6f6a400f4e6",
+          "job_kind": "creator-image",
+          "progress": 0.05,
+          "generation_started_at": "2026-10-23T22:31:05.952332+00:00"
         }
       }
     }
@@ -19340,7 +19562,11 @@
       "direction-repair-south-east": "f25fcc88-05a3-430a-a01c-a7b5381823c7",
       "direction-repair-east": "977e48af-b079-45c3-ab35-a17bef5ad80d",
       "direction-repair-west": "cb6f33ed-14a5-47ce-a9e4-98695a4398ab",
-      "direction-repair-south-west": "6fc3092f-4a79-4910-bf1b-da5b2c2e7713"
+      "direction-repair-south-west": "6fc3092f-4a79-4910-bf1b-da5b2c2e7713",
+      "direction-repair-south-east-eyes-corrected-y": "f19b0f36-ec4d-4192-be5f-a7bb0d7fa2bb",
+      "direction-repair-east-eyes-corrected-y": "54809a78-c20d-42e8-b7b3-790d36c17dc1",
+      "direction-repair-west-eyes-corrected-y": "7bf78da8-0175-43c5-adaf-369d70984f6c",
+      "direction-repair-south-west-eyes-corrected-y": "28e2d3c5-bdfc-41b9-943d-94ae2897ccac"
     },
     "lee-ja-heon": {
       "name": "이자헌",
@@ -19622,7 +19848,7 @@
       "image": "3ad37156-945c-4b0b-b82e-c872f5e6563f",
       "registration": "37cf2ead-5019-41ae-a42c-33ed09605f72",
       "motions": {},
-      "ready": false,
+      "ready": true,
       "visual_rejections": [
         {
           "job": "805f56ae-ae2b-45f8-9219-9c79ca89f4a0",
@@ -19669,8 +19895,8 @@
       ],
       "skeleton_joints": 18,
       "rotation_count": 8,
-      "exported": false,
-      "eight_way_visual_reviewed": false,
+      "exported": true,
+      "eight_way_visual_reviewed": true,
       "image_verified": true,
       "image_visually_reviewed": true
     },
@@ -20018,7 +20244,7 @@
       "image": "02522c5f-7c65-4dea-9097-d37a7f3eece0",
       "registration": "d87a50ff-3589-49db-8669-0841b3464ab9",
       "motions": {},
-      "ready": false,
+      "ready": true,
       "visual_rejections": [
         {
           "job": "9ae5c48b-d9ea-454c-9c24-270560fb1a3a",
@@ -20036,7 +20262,11 @@
         }
       ],
       "image_verified": true,
-      "image_visually_reviewed": true
+      "image_visually_reviewed": true,
+      "skeleton_joints": 18,
+      "rotation_count": 8,
+      "exported": true,
+      "eight_way_visual_reviewed": true
     },
     "yun-ji-a": {
       "name": "윤지아",
@@ -20081,7 +20311,8 @@
       "image_visually_reviewed": true,
       "skeleton_joints": 18,
       "rotation_count": 8,
-      "exported": true
+      "exported": true,
+      "eight_way_visual_reviewed": true
     },
     "mun-hye-ran": {
       "name": "문혜란",
@@ -34097,9 +34328,171 @@
         "bytes": 82578,
         "files": 9
       }
+    },
+    {
+      "at": "2026-10-23T22:29:21Z",
+      "kind": "completed",
+      "slug": "jang-heo-un",
+      "detail": {
+        "kind": "registration",
+        "template": null,
+        "job_id": "37cf2ead-5019-41ae-a42c-33ed09605f72",
+        "usage": {
+          "type": "generations",
+          "generations": 4.0
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T22:29:21Z",
+      "kind": "character-ready",
+      "slug": "jang-heo-un",
+      "detail": {
+        "3d_joints": 18,
+        "directions": 8
+      }
+    },
+    {
+      "at": "2026-10-23T22:29:23Z",
+      "kind": "exported",
+      "slug": "jang-heo-un",
+      "detail": {
+        "bytes": 95538,
+        "files": 9
+      }
+    },
+    {
+      "at": "2026-10-23T22:31:04Z",
+      "kind": "submitted",
+      "slug": "lee-seong-hae",
+      "detail": {
+        "kind": "direction-repair-south-east-eyes-corrected-y",
+        "template": null,
+        "job_id": "f19b0f36-ec4d-4192-be5f-a7bb0d7fa2bb",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "f19b0f36-ec4d-4192-be5f-a7bb0d7fa2bb",
+          "image_id": "53400d61-48bb-500a-b9ed-9382ce56a065",
+          "source_image_id": "53400d61-48bb-500a-b9ed-9382ce56a065",
+          "status": "processing",
+          "output_count": 1,
+          "image_size": {
+            "width": 128,
+            "height": 256
+          },
+          "estimated_generations": 9,
+          "pricing_provisional": true
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T22:31:05Z",
+      "kind": "submitted",
+      "slug": "lee-seong-hae",
+      "detail": {
+        "kind": "direction-repair-east-eyes-corrected-y",
+        "template": null,
+        "job_id": "54809a78-c20d-42e8-b7b3-790d36c17dc1",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "54809a78-c20d-42e8-b7b3-790d36c17dc1",
+          "image_id": "407938d6-5f5a-5966-9143-b462f9500a4f",
+          "source_image_id": "407938d6-5f5a-5966-9143-b462f9500a4f",
+          "status": "processing",
+          "output_count": 1,
+          "image_size": {
+            "width": 128,
+            "height": 256
+          },
+          "estimated_generations": 9,
+          "pricing_provisional": true
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T22:31:05Z",
+      "kind": "submitted",
+      "slug": "lee-seong-hae",
+      "detail": {
+        "kind": "direction-repair-west-eyes-corrected-y",
+        "template": null,
+        "job_id": "7bf78da8-0175-43c5-adaf-369d70984f6c",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "7bf78da8-0175-43c5-adaf-369d70984f6c",
+          "image_id": "59b067ca-b6c7-5a3e-9f56-854fc5fad34c",
+          "source_image_id": "59b067ca-b6c7-5a3e-9f56-854fc5fad34c",
+          "status": "processing",
+          "output_count": 1,
+          "image_size": {
+            "width": 128,
+            "height": 256
+          },
+          "estimated_generations": 9,
+          "pricing_provisional": true
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T22:31:06Z",
+      "kind": "submitted",
+      "slug": "lee-seong-hae",
+      "detail": {
+        "kind": "direction-repair-south-west-eyes-corrected-y",
+        "template": null,
+        "job_id": "28e2d3c5-bdfc-41b9-943d-94ae2897ccac",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "28e2d3c5-bdfc-41b9-943d-94ae2897ccac",
+          "image_id": "a86bcfea-c219-5e01-9266-e6f6a400f4e6",
+          "source_image_id": "a86bcfea-c219-5e01-9266-e6f6a400f4e6",
+          "status": "processing",
+          "output_count": 1,
+          "image_size": {
+            "width": 128,
+            "height": 256
+          },
+          "estimated_generations": 9,
+          "pricing_provisional": true
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T22:31:06Z",
+      "kind": "completed",
+      "slug": "go-yeon-ji",
+      "detail": {
+        "kind": "registration",
+        "template": null,
+        "job_id": "d87a50ff-3589-49db-8669-0841b3464ab9",
+        "usage": {
+          "type": "generations",
+          "generations": 4.0
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T22:31:07Z",
+      "kind": "character-ready",
+      "slug": "go-yeon-ji",
+      "detail": {
+        "3d_joints": 18,
+        "directions": 8
+      }
+    },
+    {
+      "at": "2026-10-23T22:31:08Z",
+      "kind": "exported",
+      "slug": "go-yeon-ji",
+      "detail": {
+        "bytes": 85091,
+        "files": 9
+      }
     }
   ],
-  "updated_at": 1792794534.769417,
+  "updated_at": 1792794668.071698,
   "user_stopped_at": 1792778235.6917784,
   "archived_jobs": {
     "304457e9-6577-44f0-af17-97841a9f6720": {
@@ -35418,19 +35811,19 @@
       "saved_frames": 6
     }
   },
-  "last_git_checkpoint": 1792794209.2162921,
+  "last_git_checkpoint": 1792794536.7836938,
   "summary": {
     "jobs": {
-      "processing": 16,
-      "completed": 223,
-      "failed": 5,
+      "processing": 14,
+      "completed": 225,
+      "failed": 9,
       "stalled": 0
     },
-    "characters_ready": 48,
+    "characters_ready": 50,
     "characters_total": 55,
     "images_format_verified": 54,
     "new_images_visually_reviewed": 42,
-    "eight_way_visually_reviewed": 44,
+    "eight_way_visually_reviewed": 46,
     "characters_motions_visually_reviewed": 0,
     "motions_submitted": 3,
     "motions_target": 1100

@@ -1,0 +1,25 @@
+{
+  "at": 1792794685.1420608,
+  "character_id": "53c39dd7-2751-4616-b0ae-d7425cdbe07b",
+  "result": "pass",
+  "directions_reviewed": [
+    "south",
+    "south-east",
+    "east",
+    "north-east",
+    "north",
+    "north-west",
+    "west",
+    "south-west"
+  ],
+  "findings": "AVIF의 검은 어깨 길이 머리·앞머리·밝은 청색 셔츠·흰 의사 가운·청진기·검은 바지를 8방향 확인. 이전 파란 턱 단발 결함 제거, 체형과 높이 일관, 회색 외곽 없음. AVIF 우선·로어 키 보충·전원8방향 장벽 재확인.",
+  "movement_direction": "east",
+  "stationary_direction": "south-east",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF primary",
+    "Lore supplementary height",
+    "All55 before motion",
+    "Gray outer paint reroll"
+  ]
+}
