@@ -66,9 +66,13 @@ const row = (label: string, help: string, ctl = '') =>
 const group = (title: string, rows: string) => `<section class="ps-group"><h3>${title}</h3><div class="ps-rows">${rows}</div></section>`;
 const dis = () => (busy ? ' disabled' : '');
 
+// 진행·알림 글은 따로 상자를 띄우지 않고 받기 줄(없으면 필드 줄)의 설명 자리에 쓴다 (2026-10-23 사용자)
+const msgOf = () => (busy || notice ? `<span role="status">${esc(busy || notice)}</span>` : '');
+const needFiles = (f: Files) => f.code !== 'ready' || f.need.length > 0;
+
 function filesHtml(f: Files): string {
-  if (f.code === 'ready' && !f.need.length) return '';
-  const what = f.code === 'old' ? '플러그인이 바뀌어 게임 파일을 새로 받아야 해요.' : '처음 한 번만 받아요. 받은 파일은 이 기기의 Risu에 저장돼요.';
+  if (!needFiles(f)) return '';
+  const what = msgOf() || (f.code === 'old' ? '플러그인이 바뀌어 게임 파일을 새로 받아야 해요.' : '처음 한 번만 받아요. 받은 파일은 이 기기의 Risu에 저장돼요.');
   const size = f.index ? ` (${kb(f.bytes)})` : '';
   return group('게임 파일', row('게임 파일 받기', what, `<button class="gx-mini primary" data-g="get"${dis()}>받기${size}</button><button class="gx-mini" data-g="file"${dis()}>파일로 넣기</button>`));
 }
@@ -76,7 +80,7 @@ function filesHtml(f: Files): string {
 // 저장 칸 고르기·불러오기는 게임 안 본부가 맡는다(hq 모듈, bridge.saves). 여기서는 시작 버튼과 마지막 저장만 보인다
 function startHtml(slots: SlotInfo[], last: SlotId | null, ready: boolean): string {
   const s = slots.find((x) => x.slot === last) ?? slots.sort((x, y) => y.savedAt - x.savedAt)[0];
-  const help = s ? `마지막 저장 · ${when(s.savedAt)}${s.summary ? ` · ${esc(s.summary)}` : ''}` : '요원들을 만나 대화해요. 나눈 말은 다음 본편 요청에 막간으로 들어가요.';
+  const help = (ready && msgOf()) || (s ? `마지막 저장 · ${when(s.savedAt)}${s.summary ? ` · ${esc(s.summary)}` : ''}` : '요원들을 만나 대화해요. 나눈 말은 다음 본편 요청에 막간으로 들어가요.');
   return group('필드', row('본부', help, `<button class="gx-mini primary" data-g="play"${ready ? '' : ' disabled'}>들어가기</button>`));
 }
 
@@ -121,8 +125,7 @@ async function home(): Promise<void> {
   const record = ctx ? String(((ctx.chat.localLore as { comment?: string; content?: string }[] | undefined) ?? []).find((e) => e.comment === RECORD_COMMENT)?.content ?? '').split('\n').filter((l) => l.startsWith('- ')).length : 0;
   const open = new Set([...box.querySelectorAll<HTMLDetailsElement>('details[data-keep]')].filter((d) => d.open).map((d) => d.dataset.keep));
   box.innerHTML = `<div class="gx-gl gx-settings">
-    ${notice || busy ? `<div class="gx-gl-msg" role="status">${esc(busy || notice)}</div>` : ''}
-    ${filesHtml(f)}${startHtml(slots, last, f.code === 'ready' && !f.need.length)}${linkHtml(card, reports, record)}
+    ${filesHtml(f)}${startHtml(slots, last, !needFiles(f))}${linkHtml(card, reports, record)}
     <details class="ps-adv gx-gl-dev" data-keep="game-dev"><summary class="ps-adv-sum"><b>시험용</b></summary><div class="ps-rows">${legacyHtml()}${statsHtml()}</div></details>
     <input type="file" accept=".js,.pack" multiple hidden data-g-file></div>`;
   box.querySelectorAll<HTMLDetailsElement>('details[data-keep]').forEach((d) => (d.open = open.has(d.dataset.keep)));

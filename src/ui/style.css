@@ -1866,7 +1866,6 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .gx-gl-ctl { gap: 6px; flex-wrap: wrap; }
 .gx-gl-ctl .gx-mini svg { width: 15px; height: 15px; vertical-align: middle; }
 .gx-gl-dev .ps-rows { margin-top: 8px; }
-.gx-gl-msg { margin: 0; padding: 10px 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); color: var(--text); font-size: 14px; }
 .gx-gl-card { display: flex; flex-direction: column; gap: 10px; min-width: 0; padding: 16px; margin: 0; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); box-sizing: border-box; }
 .gx-gl-card > b, .gx-gl-card > summary { font-size: 16px; font-weight: 700; }
 .gx-gl-card > summary { cursor: pointer; }

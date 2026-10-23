@@ -2198,8 +2198,8 @@ if (fixture.globalLore.some(packed)) {
   await page.waitForSelector('.gx-gl [data-g="get"]');
   assert.equal(await page.locator('.gx-gl-cont:not([disabled])').count(), 0, '파일 받기 전에는 시작 못 함');
   await page.click('[data-g="get"]');
-  await page.waitForSelector('.gx-gl-msg');
-  assert.match(await page.textContent('.gx-gl-msg'), /받지 못했어요/);
+  await page.waitForSelector('.gx-settings [role=status]');
+  assert.match(await page.textContent('.gx-settings [role=status]'), /받지 못했어요/);
   const gdir = new URL('../dist/game/', import.meta.url);
   const gameFiles = Object.fromEntries(readdirSync(gdir).map((n) => [n, readFileSync(new URL(n, gdir)).toString('base64')]));
   await page.evaluate((files) => {
@@ -2377,7 +2377,7 @@ if (fixture.globalLore.some(packed)) {
     input.files = dt.files;
     input.dispatchEvent(new Event('change', { bubbles: true }));
   });
-  await page2.waitForFunction(() => /넣었어요: 팩 bigtest/.test(document.querySelector('.gx-gl-msg')?.textContent ?? ''), null, { timeout: 120000 });
+  await page2.waitForFunction(() => /넣었어요: 팩 bigtest/.test(document.querySelector('.gx-settings [role=status]')?.textContent ?? ''), null, { timeout: 120000 });
   const installMs = Date.now() - tb;
   const storedLen = await page2.evaluate(() => window.__store['p:goei:game:pack:bigtest'].length);
   assert.deepEqual(errors, []);
