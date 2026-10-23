@@ -1,0 +1,14 @@
+{
+  "description": "고영훈 / Go Young-hoon. Adult man mid40s, swept back dark brown hair with a gray streak, black aviator sunglasses, long stern expressionless face, strong lean build, dark brown charcoal trouser suit, white shirt and black necktie, black shoes. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
+  "reference_image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "n_directions": 8,
+  "view": "low top-down",
+  "template_id": "mannequin",
+  "name": "고영훈",
+  "seed": 10222027,
+  "no_background": true
+}
