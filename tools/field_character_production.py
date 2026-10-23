@@ -174,7 +174,7 @@ class Production:
   for a in self.manifest:
    if len(active())>=20:return
    c=self.s['characters'][a['slug']]
-   if c.get('image_verified')and not c.get('registration'):
+   if c.get('image_verified')and not c.get('registration')and a['slug']not in json.loads((OUT/'control.json').read_text()).get('registration_held_slugs',[]):
     self.submit('registration',a['slug'],'create-character-v3',self.registration_request(a))
   for a in self.manifest:
    if len(active())>=20:return
@@ -200,7 +200,7 @@ class Production:
    c=self.s['characters'][a['slug']]
    if c.get('ready'):
     if control.get('release_skeleton_v3_motions')and a['slug']in control.get('motion_allowed_slugs',[])and any(not c['motions'].get(t)for t,_ in TEMPLATES):return False
-   elif c.get('image_verified')and not c.get('registration'):return False
+   elif c.get('image_verified')and not c.get('registration')and a['slug']not in json.loads((OUT/'control.json').read_text()).get('registration_held_slugs',[]):return False
    elif not c.get('image')and a.get('pixel_request'):return False
    elif c.get('registration')in self.s['jobs']and self.s['jobs'][c['registration']]['status']=='completed'and not c.get('skeleton_problem'):return False
   return True

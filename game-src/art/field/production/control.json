@@ -5,7 +5,7 @@
   "max_character_pipeline_in_flight": 6,
   "authorized_total_characters": 55,
   "authorized_clips_per_character": 20,
-  "stop_all": false,
+  "stop_all": true,
   "stopped_by_user_at": 1792778185.5597813,
   "direction_policy": {
     "reference": "front-facing south",
@@ -30,5 +30,8 @@
       "stationary_noncombat": "south-west",
       "reason": "Actual generated east side face hidden by bob; west and southwest face visibly exposed."
     }
-  }
+  },
+  "registration_held_slugs": [
+    "aileen"
+  ]
 }

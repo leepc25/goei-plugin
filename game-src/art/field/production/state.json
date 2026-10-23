@@ -3502,6 +3502,44 @@
         "estimated_generations": 9,
         "pricing_provisional": true
       }
+    },
+    "3cddea2e-3a66-4291-a79c-2be803461b07": {
+      "kind": "animation",
+      "slug": "jyaldi",
+      "template": "walking-8-frames",
+      "status": "processing",
+      "created_epoch": 1792781954.7302444,
+      "receipt": {
+        "background_job_ids": [
+          "3cddea2e-3a66-4291-a79c-2be803461b07"
+        ],
+        "directions": [
+          "west"
+        ],
+        "animation_group_id": "e55a2aa8-8043-49d8-aa56-738827421ecd",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      }
+    },
+    "c8873c16-757b-44c9-817a-9e39fd7247fc": {
+      "kind": "animation",
+      "slug": "jyaldi",
+      "template": "running-8-frames",
+      "status": "processing",
+      "created_epoch": 1792782007.8834424,
+      "receipt": {
+        "background_job_ids": [
+          "c8873c16-757b-44c9-817a-9e39fd7247fc"
+        ],
+        "directions": [
+          "west"
+        ],
+        "animation_group_id": "df6204c1-2c29-4058-a3eb-2815504254e5",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      }
     }
   },
   "characters": {
@@ -3512,7 +3550,9 @@
       "image": "78793c7b-f45f-48a6-ab11-0c1d97f86333",
       "registration": "1a54d3e6-c143-4b60-9c05-2929c084a4cd",
       "motions": {
-        "breathing-idle": "submitting:1792781884584"
+        "breathing-idle": "uncertain:submitting:1792781884584",
+        "walking-8-frames": "3cddea2e-3a66-4291-a79c-2be803461b07",
+        "running-8-frames": "c8873c16-757b-44c9-817a-9e39fd7247fc"
       },
       "ready": true,
       "rebuild_after_direction_policy": true,
@@ -3607,7 +3647,8 @@
       "ready": true,
       "image_verified": true,
       "skeleton_joints": 18,
-      "rotation_count": 8
+      "rotation_count": 8,
+      "exported": true
     },
     "rojemon": {
       "name": "로제몬",
@@ -6159,9 +6200,73 @@
           "pricing_provisional": true
         }
       }
+    },
+    {
+      "at": "2026-10-23T18:59:14Z",
+      "kind": "submission-uncertain",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "breathing-idle",
+        "error": "The read operation timed out",
+        "action": "skip without duplicate POST"
+      }
+    },
+    {
+      "at": "2026-10-23T19:00:07Z",
+      "kind": "submitted",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "walking-8-frames",
+        "job_id": "3cddea2e-3a66-4291-a79c-2be803461b07",
+        "receipt": {
+          "background_job_ids": [
+            "3cddea2e-3a66-4291-a79c-2be803461b07"
+          ],
+          "directions": [
+            "west"
+          ],
+          "animation_group_id": "e55a2aa8-8043-49d8-aa56-738827421ecd",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T19:00:54Z",
+      "kind": "submitted",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "running-8-frames",
+        "job_id": "c8873c16-757b-44c9-817a-9e39fd7247fc",
+        "receipt": {
+          "background_job_ids": [
+            "c8873c16-757b-44c9-817a-9e39fd7247fc"
+          ],
+          "directions": [
+            "west"
+          ],
+          "animation_group_id": "df6204c1-2c29-4058-a3eb-2815504254e5",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T19:00:55Z",
+      "kind": "exported",
+      "slug": "geshugan",
+      "detail": {
+        "bytes": 90088,
+        "files": 9
+      }
     }
   ],
-  "updated_at": 1792781884.5843854,
+  "updated_at": 1792782055.8832996,
   "user_stopped_at": 1792778235.6917784,
   "archived_jobs": {
     "304457e9-6577-44f0-af17-97841a9f6720": {
@@ -7483,15 +7588,15 @@
   "last_git_checkpoint": 1792780948.2542846,
   "summary": {
     "jobs": {
-      "processing": 20,
-      "completed": 21,
-      "failed": 0,
+      "processing": 8,
+      "completed": 34,
+      "failed": 2,
       "stalled": 0
     },
-    "characters_ready": 4,
+    "characters_ready": 5,
     "characters_total": 55,
     "images_verified": 10,
-    "motions_submitted": 15,
+    "motions_submitted": 3,
     "motions_target": 1100
   },
   "applied_repairs": [

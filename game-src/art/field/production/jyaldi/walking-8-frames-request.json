@@ -3,8 +3,8 @@
   "mode": "skeleton-v3",
   "template_animation_id": "walking-8-frames",
   "directions": [
-    "east"
+    "west"
   ],
-  "animation_name": "걷기 (동쪽)",
+  "animation_name": "걷기 (서쪽)",
   "action_description": "walking confidently with an upright steady torso, measured strides and restrained arm swing"
 }
