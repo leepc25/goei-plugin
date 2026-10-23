@@ -5,10 +5,9 @@
     "east": true,
     "north-east": true,
     "north": true,
-    "north-west": true
+    "north-west": true,
+    "west": true,
+    "south-west": true
   },
-  "regenerated_directions": [
-    "west",
-    "south-west"
-  ]
+  "regenerated_directions": []
 }

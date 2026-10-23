@@ -20128,9 +20128,9 @@
           "image_id": "edb5bd66-6257-5263-b311-3fea178ee0a2",
           "job_kind": "creator-image",
           "progress": 0.75,
-          "queue_position": 6,
+          "queue_position": 3,
           "generation_started_at": "2026-10-23T22:45:59.195354+00:00",
-          "estimated_wait_seconds": 616
+          "estimated_wait_seconds": 288
         }
       }
     },
@@ -20173,9 +20173,9 @@
           "image_id": "83e08abc-47bf-5313-b808-7d51d0097f3b",
           "job_kind": "creator-image",
           "progress": 0.75,
-          "queue_position": 7,
+          "queue_position": 3,
           "generation_started_at": "2026-10-23T22:46:45.896236+00:00",
-          "estimated_wait_seconds": 700
+          "estimated_wait_seconds": 290
         }
       }
     },
@@ -20183,7 +20183,7 @@
       "kind": "registration",
       "slug": "jay",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792795691.181319,
       "receipt": {
         "usage": null,
@@ -20195,32 +20195,50 @@
       },
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 0.25
         },
         "id": "0581c47a-927b-4213-9464-6a063a195171",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-23T22:48:11.420048+00:00",
         "last_response": {
-          "status": "building_skeleton",
-          "progress": 0.98,
+          "status": "completed",
           "character_id": "08548050-739d-4a8a-848a-2280b7ef0ef4",
-          "n_directions": 8,
+          "storage_urls": {
+            "east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/08548050-739d-4a8a-848a-2280b7ef0ef4/rotations/east.png",
+            "west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/08548050-739d-4a8a-848a-2280b7ef0ef4/rotations/west.png",
+            "north": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/08548050-739d-4a8a-848a-2280b7ef0ef4/rotations/north.png",
+            "south": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/08548050-739d-4a8a-848a-2280b7ef0ef4/rotations/south.png",
+            "north-east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/08548050-739d-4a8a-848a-2280b7ef0ef4/rotations/north-east.png",
+            "north-west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/08548050-739d-4a8a-848a-2280b7ef0ef4/rotations/north-west.png",
+            "south-east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/08548050-739d-4a8a-848a-2280b7ef0ef4/rotations/south-east.png",
+            "south-west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/08548050-739d-4a8a-848a-2280b7ef0ef4/rotations/south-west.png"
+          },
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 0.25
+          },
           "character_name": "제이",
           "directions_type": "8-directions",
           "generation_mode": "v3",
-          "skeleton_frames_done": 5,
-          "character_description": "제이 / Jay. Very pale gaunt young adult man with thin wiry build. Shaggy SILVER-WHITE hair to jaw and nape, long messy bangs partly obscuring tired YELLOW eyes. Black baseball cap, white pleated medical mask covering nose and mouth. Dark charcoal NAVY security uniform with pointed collar, two buttoned flap chest pockets, long sleeves, matching trousers and black belt. No necktie, no suit jacket. Plain unmarked sleeves and shoulders, NO patches, NO shield emblems, NO police badges, NO logos or shoulder decorations. Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Do not invent patches, badges, logos or markings absent from the supplied image. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches.",
-          "generation_started_at": "2026-10-23T22:48:11.449588+00:00",
-          "skeleton_frames_total": 8
+          "directions_count": 8,
+          "character_description": "제이 / Jay. Very pale gaunt young adult man with thin wiry build. Shaggy SILVER-WHITE hair to jaw and nape, long messy bangs partly obscuring tired YELLOW eyes. Black baseball cap, white pleated medical mask covering nose and mouth. Dark charcoal NAVY security uniform with pointed collar, two buttoned flap chest pockets, long sleeves, matching trousers and black belt. No necktie, no suit jacket. Plain unmarked sleeves and shoulders, NO patches, NO shield emblems, NO police badges, NO logos or shoulder decorations. Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Do not invent patches, badges, logos or markings absent from the supplied image. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches."
         }
+      },
+      "observed_end_epoch": 1792795824.6189218,
+      "elapsed_observed_seconds": 133.43760323524475,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 0.25
       }
     },
     "d5b444e2-ac82-4e32-80a7-b19575064575": {
       "kind": "registration",
       "slug": "cha-yeo-jin",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792795730.51655,
       "receipt": {
         "usage": null,
@@ -20229,6 +20247,132 @@
         "status": "processing",
         "enhanced_prompt": null,
         "enhance_usage": null
+      },
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 0.25
+        },
+        "id": "d5b444e2-ac82-4e32-80a7-b19575064575",
+        "status": "completed",
+        "created_at": "2026-10-23T22:48:50.736875+00:00",
+        "last_response": {
+          "status": "completed",
+          "character_id": "f7e83f56-9a2c-41cb-aa1d-1e27cae0bbed",
+          "storage_urls": {
+            "east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/f7e83f56-9a2c-41cb-aa1d-1e27cae0bbed/rotations/east.png",
+            "west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/f7e83f56-9a2c-41cb-aa1d-1e27cae0bbed/rotations/west.png",
+            "north": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/f7e83f56-9a2c-41cb-aa1d-1e27cae0bbed/rotations/north.png",
+            "south": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/f7e83f56-9a2c-41cb-aa1d-1e27cae0bbed/rotations/south.png",
+            "north-east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/f7e83f56-9a2c-41cb-aa1d-1e27cae0bbed/rotations/north-east.png",
+            "north-west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/f7e83f56-9a2c-41cb-aa1d-1e27cae0bbed/rotations/north-west.png",
+            "south-east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/f7e83f56-9a2c-41cb-aa1d-1e27cae0bbed/rotations/south-east.png",
+            "south-west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/f7e83f56-9a2c-41cb-aa1d-1e27cae0bbed/rotations/south-west.png"
+          },
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 0.25
+          },
+          "character_name": "차여진",
+          "directions_type": "8-directions",
+          "generation_mode": "v3",
+          "directions_count": 8,
+          "character_description": "차여진 / Cha Yeo-jin. Adult woman with natural slim office-worker build, pale angular face, brown eyes with upward sharp outer corners and sly small smile. Very LONG straight dark BURGUNDY red hair to waist, thick straight forehead bangs, long straight face-framing locks. Light warm GRAY tailored trouser suit, white shirt and dark charcoal necktie, dark nail polish. No glasses. Completely plain sleeves and shoulders. NO patches, NO shield symbols, NO badges, NO logos. Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Do not invent patches, badges, logos or markings absent from the supplied image. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches."
+        }
+      },
+      "observed_end_epoch": 1792795824.6190193,
+      "elapsed_observed_seconds": 94.1024694442749,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 0.25
+      }
+    },
+    "0299a9b8-5c56-419b-8e6b-fac525541bee": {
+      "kind": "direction-repair-north-east-two-back-sleeves",
+      "slug": "jay",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792795913.8359709,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "0299a9b8-5c56-419b-8e6b-fac525541bee",
+        "image_id": "f0d33c13-3de7-5a68-ad6e-b0f1da39531f",
+        "source_image_id": "f0d33c13-3de7-5a68-ad6e-b0f1da39531f",
+        "status": "processing",
+        "output_count": 1,
+        "image_size": {
+          "width": 128,
+          "height": 256
+        },
+        "estimated_generations": 9,
+        "pricing_provisional": true
+      },
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "0299a9b8-5c56-419b-8e6b-fac525541bee",
+        "status": "processing",
+        "created_at": "2026-10-23T22:51:54.331914+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "model": "inpaint_pro_flash",
+          "width": 128,
+          "action": "Generating image",
+          "height": 256,
+          "prompt": "Remove the ENTIRE upper-arm sleeve patch including all border and symbol pixels. Replace with PLAIN continuous dark navy sleeve cloth matching surrounding folds. No shield, badge, black rectangle, insignia, sleeve pocket or marking. Preserve exact arm outline, pose, body, hair, uniform and all unmasked pixels. Crisp native pixel rendering, transparent outside.",
+          "status": "processing",
+          "image_id": "f0d33c13-3de7-5a68-ad6e-b0f1da39531f",
+          "job_kind": "creator-image",
+          "progress": 0.05,
+          "generation_started_at": "2026-10-23T22:51:54.355587+00:00"
+        }
+      }
+    },
+    "0cfba687-b89a-4d1e-915f-2c8bfd331f93": {
+      "kind": "direction-repair-north-west-two-back-sleeves",
+      "slug": "jay",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792795914.4604237,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "0cfba687-b89a-4d1e-915f-2c8bfd331f93",
+        "image_id": "6062c573-8361-5f55-8022-15735ac48d97",
+        "source_image_id": "6062c573-8361-5f55-8022-15735ac48d97",
+        "status": "processing",
+        "output_count": 1,
+        "image_size": {
+          "width": 128,
+          "height": 256
+        },
+        "estimated_generations": 9,
+        "pricing_provisional": true
+      },
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "0cfba687-b89a-4d1e-915f-2c8bfd331f93",
+        "status": "processing",
+        "created_at": "2026-10-23T22:51:54.690871+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "model": "inpaint_pro_flash",
+          "width": 128,
+          "action": "Generating image",
+          "height": 256,
+          "prompt": "Remove the ENTIRE upper-arm sleeve patch including all border and symbol pixels. Replace with PLAIN continuous dark navy sleeve cloth matching surrounding folds. No shield, badge, black rectangle, insignia, sleeve pocket or marking. Preserve exact arm outline, pose, body, hair, uniform and all unmasked pixels. Crisp native pixel rendering, transparent outside.",
+          "status": "processing",
+          "image_id": "6062c573-8361-5f55-8022-15735ac48d97",
+          "job_kind": "creator-image",
+          "progress": 0.05,
+          "generation_started_at": "2026-10-23T22:51:54.719271+00:00"
+        }
       }
     }
   },
@@ -21671,7 +21815,7 @@
       "image": "721d1a17-9804-4fa7-8ef8-7069e2588c61",
       "registration": "0581c47a-927b-4213-9464-6a063a195171",
       "motions": {},
-      "ready": false,
+      "ready": true,
       "visual_rejections": [
         {
           "job": "d262fefc-fcef-487d-86ff-e1d757d54170",
@@ -21704,7 +21848,7 @@
       ],
       "image_verified": true,
       "image_visually_reviewed": true,
-      "exported": false,
+      "exported": true,
       "registration_rejections": [
         {
           "character_id": "c49aa95f-8853-4dd4-b03b-77720abf1185",
@@ -21725,7 +21869,11 @@
       "direction-repair-west": "2f7cae4b-68df-4329-9dca-353d3335c357",
       "direction-repair-south-west": "0f67155e-cd30-4320-ab17-db68dda69bbc",
       "direction-repair-south-east-full-patch-borders": "c62c6da1-1894-469a-bb18-2f5f4988e88b",
-      "direction-repair-west-full-patch-borders": "09327278-8913-4fd1-8a2e-998a42b1b87a"
+      "direction-repair-west-full-patch-borders": "09327278-8913-4fd1-8a2e-998a42b1b87a",
+      "skeleton_joints": 18,
+      "rotation_count": 8,
+      "direction-repair-north-east-two-back-sleeves": "0299a9b8-5c56-419b-8e6b-fac525541bee",
+      "direction-repair-north-west-two-back-sleeves": "0cfba687-b89a-4d1e-915f-2c8bfd331f93"
     },
     "ho-yu-won": {
       "name": "호유원",
@@ -21802,10 +21950,10 @@
       "image": "833ae0ce-09fb-4e28-b560-726df7acd16e",
       "registration": "d5b444e2-ac82-4e32-80a7-b19575064575",
       "motions": {},
-      "ready": false,
+      "ready": true,
       "image_verified": true,
       "image_visually_reviewed": true,
-      "exported": false,
+      "exported": true,
       "registration_rejections": [
         {
           "character_id": "139dab6a-7a81-4bb5-a533-8c69f049451c",
@@ -21820,9 +21968,11 @@
           "at": 1792795730.0987809
         }
       ],
-      "eight_way_visual_reviewed": false,
+      "eight_way_visual_reviewed": true,
       "direction-repair-north-west": "fe9b6ba1-00d2-4fd7-9b3b-5b55f55e8463",
-      "direction-repair-north-west-complete-badge-outline": "885929eb-2421-4f97-be6b-532c93f3085b"
+      "direction-repair-north-west-complete-badge-outline": "885929eb-2421-4f97-be6b-532c93f3085b",
+      "skeleton_joints": 18,
+      "rotation_count": 8
     },
     "seo-yun-ji": {
       "name": "서윤지",
@@ -37101,9 +37251,125 @@
           "enhance_usage": null
         }
       }
+    },
+    {
+      "at": "2026-10-23T22:50:24Z",
+      "kind": "completed",
+      "slug": "jay",
+      "detail": {
+        "kind": "registration",
+        "template": null,
+        "job_id": "0581c47a-927b-4213-9464-6a063a195171",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 0.25
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T22:50:24Z",
+      "kind": "completed",
+      "slug": "cha-yeo-jin",
+      "detail": {
+        "kind": "registration",
+        "template": null,
+        "job_id": "d5b444e2-ac82-4e32-80a7-b19575064575",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 0.25
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T22:50:24Z",
+      "kind": "character-ready",
+      "slug": "jay",
+      "detail": {
+        "3d_joints": 18,
+        "directions": 8
+      }
+    },
+    {
+      "at": "2026-10-23T22:50:25Z",
+      "kind": "character-ready",
+      "slug": "cha-yeo-jin",
+      "detail": {
+        "3d_joints": 18,
+        "directions": 8
+      }
+    },
+    {
+      "at": "2026-10-23T22:50:25Z",
+      "kind": "exported",
+      "slug": "jay",
+      "detail": {
+        "bytes": 77151,
+        "files": 9
+      }
+    },
+    {
+      "at": "2026-10-23T22:50:26Z",
+      "kind": "exported",
+      "slug": "cha-yeo-jin",
+      "detail": {
+        "bytes": 97046,
+        "files": 9
+      }
+    },
+    {
+      "at": "2026-10-23T22:51:54Z",
+      "kind": "submitted",
+      "slug": "jay",
+      "detail": {
+        "kind": "direction-repair-north-east-two-back-sleeves",
+        "template": null,
+        "job_id": "0299a9b8-5c56-419b-8e6b-fac525541bee",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "0299a9b8-5c56-419b-8e6b-fac525541bee",
+          "image_id": "f0d33c13-3de7-5a68-ad6e-b0f1da39531f",
+          "source_image_id": "f0d33c13-3de7-5a68-ad6e-b0f1da39531f",
+          "status": "processing",
+          "output_count": 1,
+          "image_size": {
+            "width": 128,
+            "height": 256
+          },
+          "estimated_generations": 9,
+          "pricing_provisional": true
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T22:51:54Z",
+      "kind": "submitted",
+      "slug": "jay",
+      "detail": {
+        "kind": "direction-repair-north-west-two-back-sleeves",
+        "template": null,
+        "job_id": "0cfba687-b89a-4d1e-915f-2c8bfd331f93",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "0cfba687-b89a-4d1e-915f-2c8bfd331f93",
+          "image_id": "6062c573-8361-5f55-8022-15735ac48d97",
+          "source_image_id": "6062c573-8361-5f55-8022-15735ac48d97",
+          "status": "processing",
+          "output_count": 1,
+          "image_size": {
+            "width": 128,
+            "height": 256
+          },
+          "estimated_generations": 9,
+          "pricing_provisional": true
+        }
+      }
     }
   ],
-  "updated_at": 1792795730.9415932,
+  "updated_at": 1792795915.1638398,
   "user_stopped_at": 1792778235.6917784,
   "archived_jobs": {
     "304457e9-6577-44f0-af17-97841a9f6720": {
@@ -38426,15 +38692,15 @@
   "summary": {
     "jobs": {
       "processing": 4,
-      "completed": 251,
+      "completed": 253,
       "failed": 9,
       "stalled": 0
     },
-    "characters_ready": 52,
+    "characters_ready": 54,
     "characters_total": 55,
     "images_format_verified": 54,
     "new_images_visually_reviewed": 42,
-    "eight_way_visually_reviewed": 51,
+    "eight_way_visually_reviewed": 52,
     "characters_motions_visually_reviewed": 0,
     "motions_submitted": 3,
     "motions_target": 1100
