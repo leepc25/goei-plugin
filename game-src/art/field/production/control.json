@@ -104,7 +104,6 @@
     "lee-gi-seok",
     "kim-jo-hak",
     "lee-do-hyeong",
-    "jang-heo-un",
     "go-young-hoon",
     "song-ju-ik",
     "kwak-seong-ju",
@@ -120,7 +119,11 @@
     "kwak-je-gang",
     "no-gi-gyun",
     "lee-ja-heon",
-    "lee-seong-hae"
+    "lee-seong-hae",
+    "lee-yeon-hwa",
+    "lee-byeong-jin",
+    "jay",
+    "ho-yu-won"
   ],
   "source_priority": "AVIF first for identity/build; lore supplements height; explicit user heights override estimates"
 }

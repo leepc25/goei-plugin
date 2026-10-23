@@ -1,0 +1,24 @@
+{
+  "character_id": "4fc7e488-1700-406f-b4d3-72a8d4997bbb",
+  "result": "pass",
+  "directions_reviewed": [
+    "south",
+    "south-east",
+    "east",
+    "north-east",
+    "north",
+    "north-west",
+    "west",
+    "south-west"
+  ],
+  "findings": "원본의 검은 앞머리, 선글라스, 열린 셔츠와 느슨한 타이, 걷은 소매 및 마른 체형 유지. 8방향 외곽 이상 없음.",
+  "movement_direction": "east",
+  "stationary_direction": "south-east",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF primary",
+    "Lore supplementary height",
+    "All55 before motion",
+    "Gray outer paint reroll"
+  ]
+}

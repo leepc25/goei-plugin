@@ -1,0 +1,14 @@
+{
+  "job": "43779337-3a91-47ea-8488-de9d8ef98956",
+  "job_status": "completed",
+  "decision": "pass",
+  "reason": "원작의 큰 배·두꺼운 팔·이중턱·옆가르마·사각 안경·흰 셔츠와 검은 타이 대조. 모발 포함220px의 보통 키에 비만 체형 유지, 정면·외곽 정상.",
+  "at": 1792791856.1966336,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}
