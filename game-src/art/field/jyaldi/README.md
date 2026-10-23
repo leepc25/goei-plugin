@@ -28,4 +28,9 @@
 - 스타일 입력: 기존 여성 도트 `gallery:4db87d5a-70bb-5169-a83d-36222e6bb9ae` 원본. `style_copy=[color_palette, outline, detail, shading]`로 도트 밀도·윤곽·명암·색감만 참고하며 단발·치마·얼굴·오른쪽 3/4 자세를 복사하지 않도록 요청했다.
 - 요청: `width=128`, `height=256`, `no_background=true`, `max_colors=48`, `seed=10242027`. [전체 요청 기록](pro-style-trial/request.json), [실제 접수 응답](pro-style-trial/queue-receipt.txt).
 - 접수 응답: candidate 1장, 외모 참조 1장 및 별도 스타일 참조 사용, 견적 10 generations. Job `9d30ebb3-709d-4613-8ac8-c5cd78ef2ef6`, Creator asset `b99bcd59-d54f-5b2b-a5b4-e8e7ee6758ae`.
-- 상태: 생성 처리 중。 결과·실제 차감은 완료 후 기록하며, 사용자 시각 검수 전에는 승인 자산으로 취급하지 않는다. 캐릭터 등록과 애니메이션은 실행하지 않는다.
+- [PixelLab 생성 원본](pro-style-trial/front-original.png), [4배 확대](pro-style-trial/front-4x.png), [기존 남녀와 비교](pro-style-trial/comparison-4x.png), [완료 영수증](pro-style-trial/completion-receipt.txt), [기술 확인 기록](pro-style-trial/verification.json).
+- 실제 결과: **128×256·48색, 알파 0/255**, 인물 경계 x31~94, y17~247, 몸 높이 231px. 내려받은 원본의 인물·배경 픽셀을 수정하지 않았다.
+- 실제 차감 **10.0 generations**, 요청부터 완료 관측까지 **171.772초**(통신·폴링 포함). 영수증 10회와 계정 전후 차이 10회가 일치한다.
+- 상태: **사용자 시각 검수 대기**. 크기·색 수·알파 확인이 얼굴·체형·스타일의 승인을 뜻하지 않는다. 캐릭터 등록 0회, 애니메이션 생성 0회. 1차 일반 변환 1회와 합쳐 누적 차감 11회다.
+
+![2차 Pro 이미지 생성 원본 크기](pro-style-trial/front-original.png)

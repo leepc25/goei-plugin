@@ -4,4 +4,6 @@
 2026-10-24 Asia/Seoul | 38색 결과이므로 reduce_colors 생략 | 추가 차감 0
 2026-10-24 Asia/Seoul | 외부 단색 배경만 로컬 alpha flood-fill, 인물 픽셀 변경 없음 | PixelLab 차감 0
 1차 상태: 사용자 반려(기존 남녀와 다른 도트 품질, 사용 불가). 비용·원본은 보존하고 같은 일반 변환을 반복하지 않는다.
-2026-10-24 Asia/Seoul | 2차 Pro 이미지 생성 접수 | create_image_pro | approved concept reference + existing female pixel style reference, 128x256, max_colors48 | 접수 견적 10 generations | job 9d30ebb3-709d-4613-8ac8-c5cd78ef2ef6 | 완료 후 실측 기록
+2026-10-24 Asia/Seoul | 2차 Pro 이미지 생성 1장 완료 | create_image_pro | approved concept reference + existing female pixel style reference, 128x256, max_colors48 | 요청~완료 관측 171.772초(통신/폴링 포함) | 예상 10, 실제 영수증 10, 계정 잔여량 차이 10.0 generations | job 9d30ebb3-709d-4613-8ac8-c5cd78ef2ef6
+2차 결과: 128x256, 48색, 알파0/255, 몸 높이231px. 원본 픽셀 수정 없음. 사용자 시각 검수 대기.
+누적: 반려된 1차 변환 1회 + 2차 Pro 이미지 생성 10회 = 실제 차감 11.0 generations. 캐릭터 등록 0회, 애니메이션 생성 0회.
