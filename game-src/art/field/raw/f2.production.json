@@ -1,562 +1,185 @@
 {
   "scene": "f2",
-  "output": "game-src/art/field/raw/f2.png",
-  "generatedSource": "game-src/art/field/source/f2-generated.png",
-  "sourceDimensions": [
-    2149,
-    732
-  ],
-  "guidelineCommit": "2ce56ea30ccdb724b1f192d389758c10c2a0476c",
-  "production": "After updating both field documents, regenerated the whole corridor with props integrated. Corrected native architecture, floor perspective, hard pixel silhouettes, discrete matte material tones and shared 128-color palette. No separately generated prop sheets used. User then requested 2x2 mode downsampling, <=128 colors, one-pixel outline at half resolution, and exact 2x nearest-neighbor upscaling. This latest conversion supersedes the previous final pixel-size check. Latest user revision: sample 2x2 mode every 3 source pixels, one-pixel outlines at 1234x234, exact 3x nearest replication followed by right/bottom crop to 3700x700; final uniform 3x3 pixel grid. This supersedes the 2x conversion.",
-  "separatePropSheetsUsed": false,
+  "guidelineRef": "main",
+  "guidelineCommit": "a9c6ad3c",
+  "guidelineReadInFull": true,
+  "sourceReusedFromRejectedArtwork": false,
+  "conversionScript": "game-src/art/field/tools/convert-f2.cjs",
   "validation": {
-    "source": "f2-before.png",
-    "sourceSha256": "d49a3a685df730d57081cd01432bfba2b8c1fc4e1d05a3577e54c9f06f61cbed",
-    "dimensions": [
+    "source": "game-src/art/field/source/f2-generated.png",
+    "sourceDimensions": [
+      2041,
+      771
+    ],
+    "sourceReusedFromRejectedArtwork": false,
+    "normalization": "Uniform horizontal fit and whole-scene vertical registration before pixel conversion; retained all original painted interiors and shading without local warps",
+    "normalizedSceneDimensions": [
       3700,
       700
     ],
     "workingDimensions": [
-      1234,
-      234
+      7400,
+      1400
     ],
-    "paddedDimensions": [
-      3702,
-      702
+    "modeOutputDimensions": [
+      3700,
+      700
     ],
-    "reduction": "2x2 mode sampled every 3 source pixels, edge replication to padded 3702x702; ties use first source pixel in row-major order; no averages or interpolation",
-    "modeBlocksVerified": 288756,
-    "paletteAfterReduction": 126,
-    "paletteReduction": "No further reduction required: already <=128 colors",
-    "outline": {
-      "widthAtWorkingResolution": 1,
-      "widthAfterUpscale": 3,
-      "color": [
-        7,
-        12,
-        17
-      ],
-      "operations": 5637
-    },
-    "structuralLineRepair": "Reconnected grout lost by mode reduction at 1px in third-resolution, using existing palette colors",
-    "upscale": "exact nearest-neighbor 3x to 3702x702, then crop right and bottom to 3700x700",
-    "finalColors": 125,
-    "all3x3BlocksUniform": true,
-    "noNewIntermediateColors": true,
-    "outputSha256": "6eec7f6809d1a025788dfa4d87c4b04d7667ce66ea85152c26f46e8509923620"
-  },
-  "layout": {
-    "width": 3700,
-    "height": 700,
-    "wallFloorY": 420,
-    "objects": [
+    "modeBlocksVerified": 2590000,
+    "tieBlocks": 1313247,
+    "tieRule": "first in top-left, top-right, bottom-left, bottom-right order",
+    "reduction": "2x2 modal selection, no averaging or interpolation",
+    "paletteColors": 123,
+    "dither": "FloydSteinberg",
+    "outlineWidthPx": 1,
+    "outlineColor": [
+      0,
+      0,
+      0
+    ],
+    "outlinePixelWrites": 27372,
+    "doorOutlines": [
       {
-        "id": "stair",
-        "x": 114,
-        "y": 120,
-        "w": 130,
-        "h": 300,
-        "kind": "fire"
+        "x": 53,
+        "y": 110,
+        "w": 186,
+        "h": 310
       },
       {
-        "id": "direction-west",
-        "x": 256,
-        "y": 111,
-        "w": 170,
-        "h": 50,
-        "kind": "sign"
+        "x": 511,
+        "y": 141,
+        "w": 151,
+        "h": 279
       },
       {
-        "id": "toilet",
-        "x": 554,
-        "y": 120,
-        "w": 130,
-        "h": 300,
-        "kind": "wc"
+        "x": 1064,
+        "y": 117,
+        "w": 268,
+        "h": 303
       },
       {
-        "id": "sign-b-619",
-        "x": 584,
-        "y": 84,
-        "w": 71,
-        "h": 21,
-        "kind": "sign"
+        "x": 1795,
+        "y": 125,
+        "w": 148,
+        "h": 295
       },
       {
-        "id": "response",
-        "x": 1065,
-        "y": 120,
-        "w": 260,
-        "h": 300,
-        "kind": "glass"
+        "x": 1992,
+        "y": 125,
+        "w": 149,
+        "h": 295
       },
       {
-        "id": "sign-b-1195",
-        "x": 1160,
-        "y": 84,
-        "w": 71,
-        "h": 21,
-        "kind": "sign"
-      },
-      {
-        "id": "elevator-west",
-        "x": 1761,
-        "y": 120,
-        "w": 130,
-        "h": 300,
-        "kind": "lift"
-      },
-      {
-        "id": "elevator-east",
-        "x": 1931,
-        "y": 120,
-        "w": 130,
-        "h": 300,
-        "kind": "lift"
-      },
-      {
-        "id": "direction-east",
-        "x": 2201,
-        "y": 111,
-        "w": 170,
-        "h": 50,
-        "kind": "sign"
-      },
-      {
-        "id": "interview",
-        "x": 2556,
-        "y": 120,
-        "w": 130,
-        "h": 300,
-        "kind": "interview"
-      },
-      {
-        "id": "sign-b-2621",
-        "x": 2586,
-        "y": 84,
-        "w": 71,
-        "h": 21,
-        "kind": "sign"
-      },
-      {
-        "id": "lounge",
-        "x": 3195,
-        "y": 120,
-        "w": 260,
-        "h": 300,
-        "kind": "glass"
-      },
-      {
-        "id": "sign-b-3325",
-        "x": 3290,
-        "y": 84,
-        "w": 71,
-        "h": 21,
-        "kind": "sign"
-      },
-      {
-        "id": "exit",
-        "x": 3570,
-        "y": 120,
-        "w": 130,
-        "h": 300,
-        "kind": "fire"
-      },
-      {
-        "id": "plant-426",
-        "x": 398,
-        "y": 239,
-        "w": 57,
-        "h": 199,
-        "kind": "plant"
-      },
-      {
-        "id": "plant-2173",
-        "x": 2145,
-        "y": 239,
-        "w": 57,
-        "h": 199,
-        "kind": "plant"
-      },
-      {
-        "id": "plant-3522",
-        "x": 3501,
-        "y": 366,
-        "w": 43,
-        "h": 71,
-        "kind": "plant"
-      },
-      {
-        "id": "water",
-        "x": 799,
-        "y": 282,
-        "w": 50,
-        "h": 156,
-        "kind": "prop"
-      },
-      {
-        "id": "waste",
-        "x": 860,
-        "y": 310,
-        "w": 71,
-        "h": 128,
-        "kind": "prop"
-      },
-      {
-        "id": "extinguisher-966",
-        "x": 941,
-        "y": 229,
-        "w": 50,
-        "h": 99,
-        "kind": "prop"
-      },
-      {
-        "id": "extinguisher-3096",
-        "x": 3071,
-        "y": 229,
-        "w": 50,
-        "h": 99,
-        "kind": "prop"
-      },
-      {
-        "id": "noticeboard",
-        "x": 1391,
+        "x": 2609,
         "y": 143,
-        "w": 170,
-        "h": 128,
-        "kind": "prop"
+        "w": 147,
+        "h": 277
       },
       {
-        "id": "floor-map",
-        "x": 1562,
-        "y": 129,
-        "w": 114,
-        "h": 156,
-        "kind": "sign"
+        "x": 3114,
+        "y": 117,
+        "w": 260,
+        "h": 303
       },
       {
-        "id": "bench",
-        "x": 2300,
-        "y": 356,
-        "w": 227,
-        "h": 101,
-        "kind": "prop"
-      },
-      {
-        "id": "clock",
-        "x": 2791,
-        "y": 87,
-        "w": 43,
-        "h": 43,
-        "kind": "prop"
-      },
-      {
-        "id": "art",
-        "x": 2854,
-        "y": 151,
-        "w": 114,
-        "h": 85,
-        "kind": "prop"
-      },
-      {
-        "id": "downlight-0",
-        "x": 130,
-        "y": 12,
-        "w": 25,
-        "h": 8,
-        "kind": "ceiling"
-      },
-      {
-        "id": "downlight-1",
-        "x": 556,
-        "y": 12,
-        "w": 25,
-        "h": 8,
-        "kind": "ceiling"
-      },
-      {
-        "id": "downlight-2",
-        "x": 982,
-        "y": 12,
-        "w": 25,
-        "h": 8,
-        "kind": "ceiling"
-      },
-      {
-        "id": "downlight-3",
-        "x": 1408,
-        "y": 12,
-        "w": 25,
-        "h": 8,
-        "kind": "ceiling"
-      },
-      {
-        "id": "downlight-4",
-        "x": 1834,
-        "y": 12,
-        "w": 25,
-        "h": 8,
-        "kind": "ceiling"
-      },
-      {
-        "id": "downlight-5",
-        "x": 2260,
-        "y": 12,
-        "w": 25,
-        "h": 8,
-        "kind": "ceiling"
-      },
-      {
-        "id": "downlight-6",
-        "x": 2686,
-        "y": 12,
-        "w": 25,
-        "h": 8,
-        "kind": "ceiling"
-      },
-      {
-        "id": "downlight-7",
-        "x": 3112,
-        "y": 12,
-        "w": 25,
-        "h": 8,
-        "kind": "ceiling"
-      },
-      {
-        "id": "downlight-8",
-        "x": 3538,
-        "y": 12,
-        "w": 25,
-        "h": 8,
-        "kind": "ceiling"
-      },
-      {
-        "id": "vent-852",
-        "x": 810,
-        "y": 0,
-        "w": 85,
-        "h": 43,
-        "kind": "ceiling"
-      },
-      {
-        "id": "vent-1988",
-        "x": 1946,
-        "y": 0,
-        "w": 85,
-        "h": 43,
-        "kind": "ceiling"
-      },
-      {
-        "id": "vent-3124",
-        "x": 3082,
-        "y": 0,
-        "w": 85,
-        "h": 43,
-        "kind": "ceiling"
-      },
-      {
-        "id": "cctv-568",
-        "x": 558,
-        "y": 16,
-        "w": 21,
-        "h": 21,
-        "kind": "ceiling"
-      },
-      {
-        "id": "cctv-2840",
-        "x": 2830,
-        "y": 16,
-        "w": 21,
-        "h": 21,
-        "kind": "ceiling"
+        "x": 3497,
+        "y": 110,
+        "w": 178,
+        "h": 310
       }
-    ]
-  },
-  "gameIntegrated": false,
-  "previousGeometryValidation": {
-    "dimensions": [
+    ],
+    "fixtureBounds": [
+      {
+        "x": 292,
+        "y": 103,
+        "w": 163,
+        "h": 63
+      },
+      {
+        "x": 524,
+        "y": 104,
+        "w": 123,
+        "h": 31
+      },
+      {
+        "x": 1099,
+        "y": 90,
+        "w": 197,
+        "h": 22
+      },
+      {
+        "x": 1409,
+        "y": 117,
+        "w": 197,
+        "h": 181
+      },
+      {
+        "x": 1666,
+        "y": 125,
+        "w": 92,
+        "h": 196
+      },
+      {
+        "x": 1836,
+        "y": 102,
+        "w": 69,
+        "h": 14
+      },
+      {
+        "x": 2034,
+        "y": 102,
+        "w": 69,
+        "h": 14
+      },
+      {
+        "x": 2331,
+        "y": 103,
+        "w": 162,
+        "h": 63
+      },
+      {
+        "x": 2614,
+        "y": 102,
+        "w": 143,
+        "h": 30
+      },
+      {
+        "x": 3149,
+        "y": 90,
+        "w": 190,
+        "h": 22
+      },
+      {
+        "x": 941,
+        "y": 292,
+        "w": 60,
+        "h": 131
+      },
+      {
+        "x": 2973,
+        "y": 292,
+        "w": 64,
+        "h": 131
+      },
+      {
+        "x": 2939,
+        "y": 149,
+        "w": 94,
+        "h": 114
+      }
+    ],
+    "wallFloorY": 420,
+    "top40": "Only slim crown molding/light ends; no separate ceiling plane, panels or vents",
+    "finalDimensions": [
       3700,
       700
     ],
-    "paletteColors": 128,
-    "indexedPNG": true,
-    "opaque": true,
-    "wallFloorBoundaryY": 420,
-    "doorGeometry": [
-      {
-        "x": 114,
-        "y": 120,
-        "width": 130,
-        "height": 300,
-        "continuousOuterOutline": true,
-        "singlePixelSideOutline": true
-      },
-      {
-        "x": 554,
-        "y": 120,
-        "width": 130,
-        "height": 300,
-        "continuousOuterOutline": true,
-        "singlePixelSideOutline": true
-      },
-      {
-        "x": 1065,
-        "y": 120,
-        "width": 260,
-        "height": 300,
-        "continuousOuterOutline": true,
-        "singlePixelSideOutline": true
-      },
-      {
-        "x": 1761,
-        "y": 120,
-        "width": 130,
-        "height": 300,
-        "continuousOuterOutline": true,
-        "singlePixelSideOutline": true
-      },
-      {
-        "x": 1931,
-        "y": 120,
-        "width": 130,
-        "height": 300,
-        "continuousOuterOutline": true,
-        "singlePixelSideOutline": true
-      },
-      {
-        "x": 2556,
-        "y": 120,
-        "width": 130,
-        "height": 300,
-        "continuousOuterOutline": true,
-        "singlePixelSideOutline": true
-      },
-      {
-        "x": 3195,
-        "y": 120,
-        "width": 260,
-        "height": 300,
-        "continuousOuterOutline": true,
-        "singlePixelSideOutline": true
-      },
-      {
-        "x": 3570,
-        "y": 120,
-        "width": 130,
-        "height": 300,
-        "continuousOuterOutline": true,
-        "singlePixelSideOutline": true
-      }
-    ],
-    "tileWidthNearRearY430": [
-      85,
-      85
-    ],
-    "tileWidthAtFrontY669": [
-      100,
-      100,
-      100,
-      101,
-      100,
-      100,
-      101,
-      100,
-      100,
-      100,
-      101
-    ],
-    "tileRows": [
-      {
-        "y": 469,
-        "darkJointHeightPx": 1
-      },
-      {
-        "y": 520,
-        "darkJointHeightPx": 1
-      },
-      {
-        "y": 573,
-        "darkJointHeightPx": 1
-      },
-      {
-        "y": 628,
-        "darkJointHeightPx": 1
-      },
-      {
-        "y": 686,
-        "darkJointHeightPx": 1
-      }
-    ],
-    "perspective": {
-      "wallFloorY": 420,
-      "projection": "x = 1850 + (rearX - 1850) * (1 + 0.18 * (y - 420) / 249)",
-      "rearTileWidth": 85,
-      "frontTileWidthAt669": 100.3,
-      "rowBoundaries": [
-        420,
-        469,
-        520,
-        573,
-        628,
-        686,
-        747
-      ],
-      "floorInlayBack": [
-        1562,
-        2215
-      ],
-      "floorInlayFront": [
-        1528,
-        2258
-      ],
-      "foregroundClearFromY": 560
-    },
-    "visualInspection": {
-      "wholePanorama": true,
-      "nativeScaleWestCenterEast": true,
-      "checks": [
-        "ground plane visibly recedes",
-        "aligned porcelain grid widens toward foreground",
-        "inlay and mats share ground projection",
-        "foreground walk strip clear",
-        "pixel edges and discrete matte tones"
-      ],
-      "userApproval": "not claimed"
-    },
-    "sha256": "1bbe84940689e54aae791085ade57737bcee69abf24fdccd683c0892618436f0",
-    "measuredChecksPass": true
+    "finalUpscale": false,
+    "previewPolicy": "2x nearest neighbor in memory only; no preview file saved",
+    "pngPixelIdentityVerified": true,
+    "sha256": "f0d48bad0ca55665531f0f814a110fc7d359a86b3950dddc56a80b6155d93289",
+    "previewDisplayedAt2x": true
   },
-  "conversionInput": "game-src/art/field/source/f2-before-mode3.png",
-  "previous2xConversionValidation": {
-    "source": "f2-before.png",
-    "sourceSha256": "1bbe84940689e54aae791085ade57737bcee69abf24fdccd683c0892618436f0",
-    "dimensions": [
-      3700,
-      700
-    ],
-    "workingDimensions": [
-      1850,
-      350
-    ],
-    "reduction": "2x2 mode; ties use first source pixel in row-major order; no averages or interpolation",
-    "modeBlocksVerified": 647500,
-    "paletteAfterReduction": 127,
-    "paletteReduction": "No further reduction required: already <=128 colors",
-    "outline": {
-      "widthAtWorkingResolution": 1,
-      "widthAfterUpscale": 2,
-      "color": [
-        7,
-        12,
-        17
-      ],
-      "operations": 8593
-    },
-    "structuralLineRepair": "Reconnected grout lost by mode reduction at 1px in half-resolution, using existing palette colors",
-    "upscale": "exact nearest-neighbor 2x",
-    "finalColors": 127,
-    "all2x2BlocksUniform": true,
-    "noNewIntermediateColors": true,
-    "outputSha256": "d49a3a685df730d57081cd01432bfba2b8c1fc4e1d05a3577e54c9f06f61cbed"
-  }
+  "userVisualApproval": false,
+  "gameIntegrated": false
 }
