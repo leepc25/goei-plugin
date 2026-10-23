@@ -22451,7 +22451,11 @@
         "type": "generations",
         "generations": 3
       },
-      "saved_frames": 9
+      "saved_frames": 9,
+      "visual_rejection": {
+        "reason": "점프1 얼굴 앞 회색 잔상 및4–6프레임 상반신 잘림",
+        "group": "59516128-df93-42b3-9e6b-8edb0d1ad55d"
+      }
     },
     "b02aaa21-a204-4898-8c46-ad9b2e704756": {
       "kind": "animation",
@@ -23659,7 +23663,7 @@
       "kind": "animation",
       "slug": "jyaldi",
       "template": "running-8-frames",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792798374.2027369,
       "receipt": {
         "background_job_ids": [
@@ -23672,7 +23676,90 @@
         "status": "processing",
         "enhanced_prompt": null,
         "enhance_usage": null
-      }
+      },
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 3.0
+        },
+        "id": "bbfe0553-bf06-4044-a70a-cbdb7135b3cf",
+        "status": "completed",
+        "created_at": "2026-10-23T23:32:54.382799+00:00",
+        "last_response": {
+          "seed": 3477137488,
+          "type": "message_progress",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "progress": 1.0,
+          "direction": "west",
+          "frame_count": 4,
+          "animation_id": "5e55dd9d-db90-4d26-b3e7-4f01f2fee53c",
+          "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+          "storage_urls": {
+            "frames": [
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/5e55dd9d-db90-4d26-b3e7-4f01f2fee53c/west/0.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/5e55dd9d-db90-4d26-b3e7-4f01f2fee53c/west/1.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/5e55dd9d-db90-4d26-b3e7-4f01f2fee53c/west/2.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/5e55dd9d-db90-4d26-b3e7-4f01f2fee53c/west/3.png"
+            ]
+          },
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "d638e216-97de-47fa-9d33-d1eba2bc20b4",
+          "animation_name": null,
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_model": "skeleton-v3_template",
+          "saved_to_storage": true,
+          "animation_group_id": "cd4fb756-0ba2-4f11-ba1f-9cf40fe642dc",
+          "motion_adjustments": {
+            "stride": 1.0,
+            "posture": 0.0,
+            "arm_swing": 1.0,
+            "leg_extension": 0.0
+          },
+          "animation_description": "running decisively with a steady torso, controlled arm swing and firm purposeful strides. Preserve this character identity, costume, hair and native proportions. Keep a clean transparent silhouette in every frame. No gray painted patches, gray halo, ground shadow or opaque background around hair, hands, clothes or feet.",
+          "generation_started_at": "2026-10-23T23:32:55.658451+00:00",
+          "template_animation_id": "running-4-frames",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792798497.444202,
+      "elapsed_observed_seconds": 123.2414653301239,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 4
     },
     "9972940b-0952-42a1-87aa-3ddbaa5e0ee7": {
       "kind": "animation",
@@ -23691,6 +23778,36 @@
         "status": "processing",
         "enhanced_prompt": null,
         "enhance_usage": null
+      },
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "9972940b-0952-42a1-87aa-3ddbaa5e0ee7",
+        "status": "processing",
+        "created_at": "2026-10-23T23:32:55.214715+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "action": "generating",
+          "progress": 0.18847466218427644,
+          "direction": "west",
+          "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+          "animation_name": null,
+          "queue_position": 0,
+          "generation_model": "skeleton-v3_template",
+          "animation_group_id": "b9ca3e46-a65b-478f-91ac-ce6ee459672f",
+          "motion_adjustments": {
+            "stride": 1.0,
+            "posture": 0.0,
+            "arm_swing": 1.0,
+            "leg_extension": 0.0
+          },
+          "animation_description": "running jump. Preserve this character identity, costume, hair and native proportions. Keep a clean transparent silhouette in every frame. No gray painted patches, gray halo, ground shadow or opaque background around hair, hands, clothes or feet.",
+          "generation_started_at": "2026-10-23T23:32:57.723673+00:00",
+          "template_animation_id": "running-jump",
+          "estimated_wait_seconds": 0
+        }
       }
     },
     "e208d558-493e-49d2-a431-cf29054f14c9": {
@@ -23710,6 +23827,36 @@
         "status": "processing",
         "enhanced_prompt": null,
         "enhance_usage": null
+      },
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "e208d558-493e-49d2-a431-cf29054f14c9",
+        "status": "processing",
+        "created_at": "2026-10-23T23:32:56.091146+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "action": "finalizing",
+          "progress": 0.905,
+          "direction": "west",
+          "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+          "animation_name": null,
+          "queue_position": 0,
+          "generation_model": "skeleton-v3_template",
+          "animation_group_id": "855a501e-c976-4402-b94e-29d23739e77d",
+          "motion_adjustments": {
+            "stride": 1.0,
+            "posture": 0.0,
+            "arm_swing": 1.0,
+            "leg_extension": 0.0
+          },
+          "animation_description": "running slide. Preserve this character identity, costume, hair and native proportions. Keep a clean transparent silhouette in every frame. No gray painted patches, gray halo, ground shadow or opaque background around hair, hands, clothes or feet.",
+          "generation_started_at": "2026-10-23T23:33:00.671478+00:00",
+          "template_animation_id": "running-slide",
+          "estimated_wait_seconds": 0
+        }
       }
     },
     "6c3d792a-de83-488b-b92c-fe516e2c35fe": {
@@ -23729,6 +23876,36 @@
         "status": "processing",
         "enhanced_prompt": null,
         "enhance_usage": null
+      },
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "6c3d792a-de83-488b-b92c-fe516e2c35fe",
+        "status": "processing",
+        "created_at": "2026-10-23T23:32:56.656175+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "action": "generating",
+          "progress": 0.18349081729276412,
+          "direction": "west",
+          "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+          "animation_name": null,
+          "queue_position": 0,
+          "generation_model": "skeleton-v3_template",
+          "animation_group_id": "9c0ae873-54e0-4e36-9fec-e7ce5a856f5c",
+          "motion_adjustments": {
+            "stride": 1.0,
+            "posture": 0.0,
+            "arm_swing": 1.0,
+            "leg_extension": 0.0
+          },
+          "animation_description": "front flip. Preserve this character identity, costume, hair and native proportions. Keep a clean transparent silhouette in every frame. No gray painted patches, gray halo, ground shadow or opaque background around hair, hands, clothes or feet.",
+          "generation_started_at": "2026-10-23T23:32:59.054482+00:00",
+          "template_animation_id": "front-flip",
+          "estimated_wait_seconds": 0
+        }
       }
     },
     "abb9eb95-11be-47ab-be0f-3975065d2d78": {
@@ -23748,6 +23925,36 @@
         "status": "processing",
         "enhanced_prompt": null,
         "enhance_usage": null
+      },
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "abb9eb95-11be-47ab-be0f-3975065d2d78",
+        "status": "processing",
+        "created_at": "2026-10-23T23:32:57.334020+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "action": "finalizing",
+          "progress": 0.925,
+          "direction": "west",
+          "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+          "animation_name": null,
+          "queue_position": 0,
+          "generation_model": "skeleton-v3_template",
+          "animation_group_id": "e0643185-70f0-448b-b46d-9422570fca96",
+          "motion_adjustments": {
+            "stride": 1.0,
+            "posture": 0.0,
+            "arm_swing": 1.0,
+            "leg_extension": 0.0
+          },
+          "animation_description": "backflip. Preserve this character identity, costume, hair and native proportions. Keep a clean transparent silhouette in every frame. No gray painted patches, gray halo, ground shadow or opaque background around hair, hands, clothes or feet.",
+          "generation_started_at": "2026-10-23T23:33:00.648054+00:00",
+          "template_animation_id": "backflip",
+          "estimated_wait_seconds": 0
+        }
       }
     },
     "1126e7a0-e1fc-4b4c-ad50-68f43ea5e7c7": {
@@ -23767,6 +23974,36 @@
         "status": "processing",
         "enhanced_prompt": null,
         "enhance_usage": null
+      },
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "1126e7a0-e1fc-4b4c-ad50-68f43ea5e7c7",
+        "status": "processing",
+        "created_at": "2026-10-23T23:32:58.429591+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "action": "finalizing",
+          "progress": 0.905,
+          "direction": "west",
+          "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+          "animation_name": null,
+          "queue_position": 0,
+          "generation_model": "skeleton-v3_template",
+          "animation_group_id": "b8f6402f-fbbf-46cb-8618-bab95ed77794",
+          "motion_adjustments": {
+            "stride": 1.0,
+            "posture": 0.0,
+            "arm_swing": 1.0,
+            "leg_extension": 0.0
+          },
+          "animation_description": "jumping 2. Preserve this character identity, costume, hair and native proportions. Keep a clean transparent silhouette in every frame. No gray painted patches, gray halo, ground shadow or opaque background around hair, hands, clothes or feet.",
+          "generation_started_at": "2026-10-23T23:33:02.553413+00:00",
+          "template_animation_id": "jumping-2",
+          "estimated_wait_seconds": 0
+        }
       }
     },
     "a4cc8130-1878-47ce-9510-c55d1d52023f": {
@@ -23786,13 +24023,43 @@
         "status": "processing",
         "enhanced_prompt": null,
         "enhance_usage": null
+      },
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "a4cc8130-1878-47ce-9510-c55d1d52023f",
+        "status": "processing",
+        "created_at": "2026-10-23T23:32:59.090576+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "action": "finalizing",
+          "progress": 0.905,
+          "direction": "west",
+          "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+          "animation_name": null,
+          "queue_position": 0,
+          "generation_model": "skeleton-v3_template",
+          "animation_group_id": "3395c8fa-f2db-4644-b645-1e5ca9e21c17",
+          "motion_adjustments": {
+            "stride": 1.0,
+            "posture": 0.0,
+            "arm_swing": 1.0,
+            "leg_extension": 0.0
+          },
+          "animation_description": "two footed jump. Preserve this character identity, costume, hair and native proportions. Keep a clean transparent silhouette in every frame. No gray painted patches, gray halo, ground shadow or opaque background around hair, hands, clothes or feet.",
+          "generation_started_at": "2026-10-23T23:33:08.209025+00:00",
+          "template_animation_id": "two-footed-jump",
+          "estimated_wait_seconds": 0
+        }
       }
     },
     "b3b23fc2-8704-4d99-b294-e67ca5bddb1c": {
       "kind": "animation",
       "slug": "jyaldi",
       "template": "picking-up",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792798379.4312465,
       "receipt": {
         "background_job_ids": [
@@ -23805,7 +24072,97 @@
         "status": "processing",
         "enhanced_prompt": null,
         "enhance_usage": null
-      }
+      },
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 3.0
+        },
+        "id": "b3b23fc2-8704-4d99-b294-e67ca5bddb1c",
+        "status": "completed",
+        "created_at": "2026-10-23T23:33:01.242729+00:00",
+        "last_response": {
+          "seed": 3744573633,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "progress": 1.0,
+          "direction": "west",
+          "frame_count": 5,
+          "animation_id": "46789f88-8ebe-4aec-8798-de650f99b4dc",
+          "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+          "storage_urls": {
+            "frames": [
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/46789f88-8ebe-4aec-8798-de650f99b4dc/west/0.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/46789f88-8ebe-4aec-8798-de650f99b4dc/west/1.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/46789f88-8ebe-4aec-8798-de650f99b4dc/west/2.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/46789f88-8ebe-4aec-8798-de650f99b4dc/west/3.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/46789f88-8ebe-4aec-8798-de650f99b4dc/west/4.png"
+            ]
+          },
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "3b11be5a-c410-417f-9482-0177707e9cf6",
+          "animation_name": null,
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_model": "skeleton-v3_template",
+          "saved_to_storage": true,
+          "animation_group_id": "1930136b-b2ae-47e4-9c3a-cdad97f1139a",
+          "motion_adjustments": {
+            "stride": 1.0,
+            "posture": 0.0,
+            "arm_swing": 1.0,
+            "leg_extension": 0.0
+          },
+          "animation_description": "picking up. Preserve this character identity, costume, hair and native proportions. Keep a clean transparent silhouette in every frame. No gray painted patches, gray halo, ground shadow or opaque background around hair, hands, clothes or feet.",
+          "generation_started_at": "2026-10-23T23:33:09.072208+00:00",
+          "template_animation_id": "picking-up",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792798500.6286383,
+      "elapsed_observed_seconds": 121.1973922252655,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 5
     },
     "0ec11e25-704e-47de-8469-9e2a68b93cef": {
       "kind": "animation",
@@ -23824,6 +24181,36 @@
         "status": "processing",
         "enhanced_prompt": null,
         "enhance_usage": null
+      },
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "0ec11e25-704e-47de-8469-9e2a68b93cef",
+        "status": "processing",
+        "created_at": "2026-10-23T23:33:04.587155+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "action": "smoothing frames",
+          "progress": 0.99,
+          "direction": "west",
+          "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+          "animation_name": null,
+          "queue_position": 0,
+          "generation_model": "skeleton-v3_template",
+          "animation_group_id": "dd02d410-8b1b-45f5-8beb-b216406d5519",
+          "motion_adjustments": {
+            "stride": 1.0,
+            "posture": 0.0,
+            "arm_swing": 1.0,
+            "leg_extension": 0.0
+          },
+          "animation_description": "throw object. Preserve this character identity, costume, hair and native proportions. Keep a clean transparent silhouette in every frame. No gray painted patches, gray halo, ground shadow or opaque background around hair, hands, clothes or feet.",
+          "generation_started_at": "2026-10-23T23:33:05.988453+00:00",
+          "template_animation_id": "throw-object",
+          "estimated_wait_seconds": 0
+        }
       }
     },
     "a4b3323c-9576-4a51-ab77-e87a166d025d": {
@@ -23843,13 +24230,43 @@
         "status": "processing",
         "enhanced_prompt": null,
         "enhance_usage": null
+      },
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "a4b3323c-9576-4a51-ab77-e87a166d025d",
+        "status": "processing",
+        "created_at": "2026-10-23T23:33:12.404020+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "action": "generating",
+          "progress": 0.10964281967103919,
+          "direction": "west",
+          "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+          "animation_name": null,
+          "queue_position": 0,
+          "generation_model": "skeleton-v3_template",
+          "animation_group_id": "fdd8c96b-dac3-4f6b-9092-151baa886133",
+          "motion_adjustments": {
+            "stride": 1.0,
+            "posture": 0.0,
+            "arm_swing": 1.0,
+            "leg_extension": 0.0
+          },
+          "animation_description": "fight stance idle 8 frames. Preserve this character identity, costume, hair and native proportions. Keep a clean transparent silhouette in every frame. No gray painted patches, gray halo, ground shadow or opaque background around hair, hands, clothes or feet.",
+          "generation_started_at": "2026-10-23T23:33:18.85954+00:00",
+          "template_animation_id": "fight-stance-idle-8-frames",
+          "estimated_wait_seconds": 0
+        }
       }
     },
     "5745e2b4-2d5c-4e0c-9929-12da32349952": {
       "kind": "animation",
       "slug": "jyaldi",
       "template": "lead-jab",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792798394.2501798,
       "receipt": {
         "background_job_ids": [
@@ -23862,7 +24279,83 @@
         "status": "processing",
         "enhanced_prompt": null,
         "enhance_usage": null
-      }
+      },
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 2.0
+        },
+        "id": "5745e2b4-2d5c-4e0c-9929-12da32349952",
+        "status": "completed",
+        "created_at": "2026-10-23T23:33:14.561933+00:00",
+        "last_response": {
+          "seed": 4007145760,
+          "type": "done",
+          "action": "finalizing",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "progress": 1.0,
+          "direction": "west",
+          "frame_count": 3,
+          "animation_id": "fa70bfa4-8095-42c9-bce0-212915e5350a",
+          "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+          "storage_urls": {
+            "frames": [
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/fa70bfa4-8095-42c9-bce0-212915e5350a/west/0.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/fa70bfa4-8095-42c9-bce0-212915e5350a/west/1.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/fa70bfa4-8095-42c9-bce0-212915e5350a/west/2.png"
+            ]
+          },
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 2
+          },
+          "generation_id": "05f73a48-f49a-486a-ae36-ca13ec5d0fbd",
+          "animation_name": null,
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_model": "skeleton-v3_template",
+          "saved_to_storage": true,
+          "animation_group_id": "2420b5cd-973b-4921-b61d-56f80ed6df90",
+          "motion_adjustments": {
+            "stride": 1.0,
+            "posture": 0.0,
+            "arm_swing": 1.0,
+            "leg_extension": 0.0
+          },
+          "animation_description": "lead jab. Preserve this character identity, costume, hair and native proportions. Keep a clean transparent silhouette in every frame. No gray painted patches, gray halo, ground shadow or opaque background around hair, hands, clothes or feet.",
+          "generation_started_at": "2026-10-23T23:33:17.416097+00:00",
+          "template_animation_id": "lead-jab",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792798537.2714183,
+      "elapsed_observed_seconds": 143.02123880386353,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 2
+      },
+      "saved_frames": 3
     },
     "ee8251d9-7965-4da1-9fd8-c2fd6c8cc963": {
       "kind": "animation",
@@ -23881,6 +24374,84 @@
         "status": "processing",
         "enhanced_prompt": null,
         "enhance_usage": null
+      },
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "ee8251d9-7965-4da1-9fd8-c2fd6c8cc963",
+        "status": "processing",
+        "created_at": "2026-10-23T23:33:15.071860+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "action": "generating",
+          "progress": 0.15278927198167963,
+          "direction": "west",
+          "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+          "animation_name": null,
+          "queue_position": 0,
+          "generation_model": "skeleton-v3_template",
+          "animation_group_id": "d7125c5e-1c48-4cb9-b350-26408db1849c",
+          "motion_adjustments": {
+            "stride": 1.0,
+            "posture": 0.0,
+            "arm_swing": 1.0,
+            "leg_extension": 0.0
+          },
+          "animation_description": "cross punch. Preserve this character identity, costume, hair and native proportions. Keep a clean transparent silhouette in every frame. No gray painted patches, gray halo, ground shadow or opaque background around hair, hands, clothes or feet.",
+          "generation_started_at": "2026-10-23T23:33:22.356428+00:00",
+          "template_animation_id": "cross-punch",
+          "estimated_wait_seconds": 0
+        }
+      }
+    },
+    "966dbb7e-2241-435c-82cd-054e43b0b05a": {
+      "kind": "animation",
+      "slug": "jyaldi",
+      "template": "jumping-1",
+      "status": "processing",
+      "created_epoch": 1792798452.435157,
+      "receipt": {
+        "background_job_ids": [
+          "966dbb7e-2241-435c-82cd-054e43b0b05a"
+        ],
+        "directions": [
+          "west"
+        ],
+        "animation_group_id": "89217ccf-f345-474f-a948-63b1f58c5bf4",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      },
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "966dbb7e-2241-435c-82cd-054e43b0b05a",
+        "status": "processing",
+        "created_at": "2026-10-23T23:34:32.517013+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "progress": 0.1,
+          "direction": "west",
+          "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+          "animation_name": null,
+          "queue_position": 0,
+          "generation_model": "skeleton-v3_template",
+          "animation_group_id": "89217ccf-f345-474f-a948-63b1f58c5bf4",
+          "motion_adjustments": {
+            "stride": 1.0,
+            "posture": 0.0,
+            "arm_swing": 1.0,
+            "leg_extension": 0.0
+          },
+          "animation_description": "jumping 1. Preserve this character identity, costume, hair and native proportions. Keep a clean transparent silhouette in every frame. No gray painted patches, gray halo, ground shadow or opaque background around hair, hands, clothes or feet.",
+          "generation_started_at": "2026-10-23T23:34:50.629255+00:00",
+          "template_animation_id": "jumping-1",
+          "estimated_wait_seconds": 0
+        }
       }
     }
   },
@@ -23896,7 +24467,6 @@
         "breathing-idle": "45bc5aa1-2298-47fe-98f3-6f3981d3fca2",
         "crouched-walking": "8c4f0d0e-1cec-44ba-a650-a0f1e699b6da",
         "sad-walk": "c137cbd9-879d-44da-ba60-da04402748bf",
-        "jumping-1": "2c93eba5-670d-4a12-92f9-1b729b26c869",
         "drinking": "9572ea4b-422f-458e-bc0f-336731cc9084",
         "pushing": "5685bf60-f5bc-4b6b-874c-41236ed8694c",
         "pull-heavy-object": "d06d1fbd-1d41-4d2f-abb6-f974f3994f7e",
@@ -23911,7 +24481,8 @@
         "throw-object": "0ec11e25-704e-47de-8469-9e2a68b93cef",
         "fight-stance-idle-8-frames": "a4b3323c-9576-4a51-ab77-e87a166d025d",
         "lead-jab": "5745e2b4-2d5c-4e0c-9929-12da32349952",
-        "cross-punch": "ee8251d9-7965-4da1-9fd8-c2fd6c8cc963"
+        "cross-punch": "ee8251d9-7965-4da1-9fd8-c2fd6c8cc963",
+        "jumping-1": "966dbb7e-2241-435c-82cd-054e43b0b05a"
       },
       "ready": true,
       "rebuild_after_direction_policy": true,
@@ -42485,9 +43056,79 @@
           "enhance_usage": null
         }
       }
+    },
+    {
+      "at": "2026-10-23T23:34:44Z",
+      "kind": "submitted",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "jumping-1",
+        "job_id": "966dbb7e-2241-435c-82cd-054e43b0b05a",
+        "receipt": {
+          "background_job_ids": [
+            "966dbb7e-2241-435c-82cd-054e43b0b05a"
+          ],
+          "directions": [
+            "west"
+          ],
+          "animation_group_id": "89217ccf-f345-474f-a948-63b1f58c5bf4",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T23:34:57Z",
+      "kind": "completed",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "running-8-frames",
+        "job_id": "bbfe0553-bf06-4044-a70a-cbdb7135b3cf",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T23:35:00Z",
+      "kind": "completed",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "picking-up",
+        "job_id": "b3b23fc2-8704-4d99-b294-e67ca5bddb1c",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T23:35:37Z",
+      "kind": "completed",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "lead-jab",
+        "job_id": "5745e2b4-2d5c-4e0c-9929-12da32349952",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 2
+        },
+        "detail": null
+      }
     }
   ],
-  "updated_at": 1792798395.6355822,
+  "updated_at": 1792798537.728092,
   "user_stopped_at": 1792778235.6917784,
   "archived_jobs": {
     "304457e9-6577-44f0-af17-97841a9f6720": {
@@ -43806,11 +44447,11 @@
       "saved_frames": 6
     }
   },
-  "last_git_checkpoint": 1792797955.7730536,
+  "last_git_checkpoint": 1792798398.6645908,
   "summary": {
     "jobs": {
-      "processing": 12,
-      "completed": 287,
+      "processing": 10,
+      "completed": 290,
       "failed": 9,
       "stalled": 0
     },

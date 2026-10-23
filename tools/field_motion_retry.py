@@ -9,7 +9,10 @@ def main():
   fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
   s=json.loads((OUT/'state.json').read_text());c=s['characters'][a.slug]
   assert all(x.get('ready') and x.get('eight_way_visual_reviewed') for x in s['characters'].values()),'All-roster barrier'
-  assert not any(j['slug']==a.slug and j['status']=='processing' for j in s['jobs'].values())
+  # Other completed groups can be replaced while unrelated clips still render.
+  # Never delete the group belonging to an active job.
+  assert not any(j['slug']==a.slug and j['status']=='processing' and
+                 (not a.template or a.group in json.dumps(j)) for j in s['jobs'].values())
   if a.template:
    jid=c['motions'].get(a.template);job=s['jobs'].get(jid,{})
    assert job.get('status') in {'completed','failed'}
