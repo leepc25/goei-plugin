@@ -224,7 +224,7 @@ e5c4d831-8e6c-4102-908b-3c179fef8817	secriem	registration		completed	{"type": "g
 3407ad40-f360-4618-a4fd-e26d6549b379	jay	registration		completed	{"type": "generations", "generations": 4.0}
 54cadacd-3cb9-410c-99f1-4794aeda8247	lee-byeong-jin	registration		completed	{"type": "generations", "generations": 4.0}
 69ccf53c-8ed0-4e78-a4d3-919d4962ed62	cheong-dal-lae	registration		completed	{"type": "generations", "generations": 4.0}
-f4ac2933-a388-4c25-af41-e7d2174bce29	cha-yeo-jin	registration		processing	null
+f4ac2933-a388-4c25-af41-e7d2174bce29	cha-yeo-jin	registration		completed	{"type": "generations", "generations": 4.0}
 37cf2ead-5019-41ae-a42c-33ed09605f72	jang-heo-un	registration		processing	null
 d87a50ff-3589-49db-8669-0841b3464ab9	go-yeon-ji	registration		processing	null
 80e98e16-d4f1-42f5-89f8-dbfeb0c91e3d	ma-deok-hee	registration		processing	null
@@ -244,3 +244,4 @@ f25fcc88-05a3-430a-a01c-a7b5381823c7	lee-seong-hae	direction-repair-south-east		
 977e48af-b079-45c3-ab35-a17bef5ad80d	lee-seong-hae	direction-repair-east		processing	null
 cb6f33ed-14a5-47ce-a9e4-98695a4398ab	lee-seong-hae	direction-repair-west		processing	null
 6fc3092f-4a79-4910-bf1b-da5b2c2e7713	lee-seong-hae	direction-repair-south-west		processing	null
+fe9b6ba1-00d2-4fd7-9b3b-5b55f55e8463	cha-yeo-jin	direction-repair-north-west		processing	null

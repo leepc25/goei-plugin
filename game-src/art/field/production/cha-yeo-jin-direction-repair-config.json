@@ -1,0 +1,15 @@
+{
+  "slug": "cha-yeo-jin",
+  "character_id": "34a102ab-fd2b-4740-b89e-acef126efad1",
+  "rectangles": {
+    "north-west": [
+      [
+        42,
+        99,
+        55,
+        115
+      ]
+    ]
+  },
+  "description": "Remove the invented small sleeve badge/patch in the selected upper-arm rectangle. Replace it with PLAIN continuous gray suit sleeve cloth matching surrounding gray fabric. No symbol, no shield, no emblem, no insignia. Preserve arm contour, hair, body and all unmasked pixels exactly. Crisp native pixel art, transparent outside."
+}

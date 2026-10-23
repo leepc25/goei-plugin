@@ -169,9 +169,14 @@ class Production:
  def motion_direction(template):
   return 'south-east'if template in {'breathing-idle','drinking'}else'east'
  def animation_request(self,a,template,label):
-  policy=json.loads((OUT/'control.json').read_text()).get('character_direction_overrides',{}).get(a['slug'],{})
+  control=json.loads((OUT/'control.json').read_text())
+  policy=control.get('character_direction_overrides',{}).get(a['slug'],{})
   direction=policy.get('stationary_noncombat' if template in {'breathing-idle','drinking'} else 'movement_and_combat',self.motion_direction(template))
   args={'character_id':self.s['characters'][a['slug']]['character_id'],'mode':'skeleton-v3','template_animation_id':template,'directions':[direction],'animation_name':label+' ('+{'east':'동쪽','south-east':'남동','west':'서쪽','south-west':'남서'}[direction]+')'}
+  override=control.get('motion_template_overrides',{}).get(a['slug'],{}).get(template)
+  if override:
+   assert template=='running-8-frames' and override in {'running-4-frames','running-6-frames'}
+   args['template_animation_id']=override
   if template=='walking-8-frames':
    if any(x in a['appearance']for x in ['broad','muscular','heavy']):gait='walking with grounded measured strides, a stable heavy torso and restrained arm swing'
    elif any(x in a['appearance']for x in ['nervous','shy','worried','weary','exhausted']):gait='walking carefully with short measured steps, slightly restrained shoulders and a gentle arm swing'

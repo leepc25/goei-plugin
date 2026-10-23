@@ -1,0 +1,14 @@
+{
+  "visible_rgba_and_alpha_preserved": {
+    "south": true,
+    "south-east": true,
+    "east": true,
+    "north-east": true,
+    "north": true,
+    "north-west": true
+  },
+  "regenerated_directions": [
+    "west",
+    "south-west"
+  ]
+}
