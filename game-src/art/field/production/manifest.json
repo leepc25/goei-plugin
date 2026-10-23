@@ -128,14 +128,14 @@
     "name": "에일린",
     "group": "management",
     "slug": "aileen",
-    "appearance": "Adult woman early20s, faded platinum blonde hair in a high ponytail with long bangs, dull gray eyes, serious analytical face, slightly shorter adult stature with compact trained athletic build, firm shoulders and solid athletic arms and legs, not delicate or waiflike, practical fitted black trouser suit and black closed shoes as in her original portrait.",
+    "appearance": "Adult woman early20s, faded platinum blonde hair in a high ponytail with long bangs, dull gray eyes, serious analytical face. Natural adult stature and build comparable to Jyaldi, normal shoulders and limbs, no bulky muscles. Black business trouser suit and black closed shoes. A low-profile black ballistic vest worn OVER the white shirt but UNDER the black suit jacket; vest front visible between the open jacket lapels, jacket remains the outermost layer. Subtle vest thickness, no oversized armor plates or external tactical pouches.",
     "original_art": "assets/agents/Aileen_default.avif",
     "original_sha256": "42d7d2096740eb0f76d64ec65c0bb6742a7b7b915dc885d8cc8a9f2bf330c7b3",
     "wiki_appearance": "[Paragraph]바랜 백금발을 높게 묶은 포니테일, 빛이 빠진 탁한 눈. 이 눈이 표지판이나 지형이나 사람을 읽을 때 한층 더 가늘어진다. 늘 뭔가를 판단하는 중인 사람 특유의 정지된 분위기가 있다. 대화 도중에도 총을 손질하고, 질문에는 작업에서 눈을 떼지 않고 답한다.\n[Paragraph]체격은 작고 단단하다. 타고난 몸이 아니라 단련된 몸이다. 움직임에 군더더기가 없어서, 처음 보는 무장 인원들도 이 사람이 자기들보다 계급이 높다는 걸 정확히 알아챈다. 현장 복장은 의전보다 실용이다. 정장 위에 대충 걸친 방탄조끼, 권총집, 점검을 마치고 어깨에 멘 소총.\n[Paragraph]출동 전 장비 착용 순서는 언제나 같다. ❗조끼, 권총, 장총, 점검.❗ 총이 통하지 않을 게 뻔한 괴이 앞에서도 이 순서를 지킨다. 팀원들은 이걸 거의 미신에 가까운 정비 습관이라고 부른다.✂️미신치고는 생존율이 너무 좋다.✂️\n",
     "source_images_visually_reviewed": true,
     "character_id": null,
     "pixel_request": {
-      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult woman early20s, faded platinum blonde hair in a high ponytail with long bangs, dull gray eyes, serious analytical face, slightly shorter adult stature with compact trained athletic build, firm shoulders and solid athletic arms and legs, not delicate or waiflike, practical fitted black trouser suit and black closed shoes as in her original portrait. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 218-226px on128x256; slightly shorter adult, not miniature; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
+      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult woman early20s, faded platinum blonde hair in a high ponytail with long bangs, dull gray eyes, serious analytical face. Natural adult stature and build comparable to Jyaldi, normal shoulders and limbs, no bulky muscles. Black business trouser suit and black closed shoes. A low-profile black ballistic vest worn OVER the white shirt but UNDER the black suit jacket; vest front visible between the open jacket lapels, jacket remains the outermost layer. Subtle vest thickness, no oversized armor plates or external tactical pouches. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 230-236px on128x256; natural adult stature comparable to Jyaldi; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
       "image_size": {
         "width": 128,
         "height": 256
@@ -155,14 +155,15 @@
       "style_usage_description": "Use ONLY pixel rendering, outline, shading and lighting. Do not copy the reference male height, body shape, shoulder width, outfit or identity. Preserve this character own stature, build, age, hair, irises and original clothing colors and silhouette. FRONT view."
     },
     "stature_rendering": {
-      "basis": "slightly shorter adult; compact trained athletic physique; exact height unspecified",
+      "basis": "User correction: stature and natural build comparable to Jyaldi; no bulky muscles",
       "target_body_pixels": [
-        218,
-        226
+        230,
+        236
       ],
       "canonical_height_cm": null,
       "note": "Pixel ranges are production targets, not invented canonical height. Preserve original build and clothing; validate together at identical zoom."
-    }
+    },
+    "outfit_user_override": "Ballistic vest over shirt, under suit jacket. Latest user instruction overrides wiki vest-over-suit description."
   },
   {
     "english": "Gorgodio",

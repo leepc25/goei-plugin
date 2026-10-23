@@ -27,8 +27,8 @@
     "id": "aileen-athletic-v3",
     "slug": "aileen",
     "action": "regenerate-front-and-register",
-    "reason": "User finds Aileen too short. Prior192-204px target was an unsupported overinterpretation of small solid build. Current output223px is only9px below Jyaldi232px but overly narrow; preserve near current height and restore trained compact physique.",
-    "correction": "Updated218-226px target and firm shoulder/limb build; retain native anatomy and original costume. Compare actual output, not prompt target.",
+    "reason": "Superseded by latest user: Jyaldi-comparable natural build, no muscular bulk; ballistic vest UNDER suit jacket.",
+    "correction": "Use updated manifest230-236px natural build; shirt then low-profile ballistic vest then outer black suit jacket. No bulky shoulders or external armor.",
     "estimated_generations": 13
   }
 ]
