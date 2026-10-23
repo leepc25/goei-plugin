@@ -3894,7 +3894,7 @@
       "kind": "registration",
       "slug": "gognija",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792782752.2784128,
       "receipt": {
         "usage": null,
@@ -3906,24 +3906,41 @@
       },
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 4.0
         },
         "id": "9e9f1775-f62b-49a8-a5dc-98686e18c6fc",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-23T19:12:38.243589+00:00",
         "last_response": {
-          "status": "correcting_frames",
-          "progress": 0.84,
+          "status": "completed",
           "character_id": "8b61f17c-abec-4217-bca6-0850c24fe39c",
-          "n_directions": 8,
+          "storage_urls": {
+            "east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/8b61f17c-abec-4217-bca6-0850c24fe39c/rotations/east.png",
+            "west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/8b61f17c-abec-4217-bca6-0850c24fe39c/rotations/west.png",
+            "north": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/8b61f17c-abec-4217-bca6-0850c24fe39c/rotations/north.png",
+            "south": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/8b61f17c-abec-4217-bca6-0850c24fe39c/rotations/south.png",
+            "north-east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/8b61f17c-abec-4217-bca6-0850c24fe39c/rotations/north-east.png",
+            "north-west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/8b61f17c-abec-4217-bca6-0850c24fe39c/rotations/north-west.png",
+            "south-east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/8b61f17c-abec-4217-bca6-0850c24fe39c/rotations/south-east.png",
+            "south-west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/8b61f17c-abec-4217-bca6-0850c24fe39c/rotations/south-west.png"
+          },
+          "billing_usage": {
+            "type": "generations",
+            "generations": 4.0
+          },
           "character_name": "고그니쟈",
-          "queue_position": 0,
           "directions_type": "8-directions",
           "generation_mode": "v3",
-          "character_description": "고그니쟈 / Gognija. Adult male researcher mid40s, unruly shoulder length white hair, round dark protective goggles over eyes, manic cheerful grin, ordinary lean middle aged build, long white lab coat over white shirt and black necktie, dark business trousers and black shoes. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
-          "generation_started_at": "2026-10-23T19:12:50.766389+00:00"
+          "directions_count": 8,
+          "character_description": "고그니쟈 / Gognija. Adult male researcher mid40s, unruly shoulder length white hair, round dark protective goggles over eyes, manic cheerful grin, ordinary lean middle aged build, long white lab coat over white shirt and black necktie, dark business trousers and black shoes. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow."
         }
+      },
+      "observed_end_epoch": 1792783945.8344347,
+      "elapsed_observed_seconds": 1193.5560221672058,
+      "usage": {
+        "type": "generations",
+        "generations": 4.0
       }
     },
     "95f7fbb1-98fc-4481-a293-236e615fb8b8": {
@@ -4345,8 +4362,8 @@
         "status": "processing",
         "created_at": "2026-10-23T19:17:55.970789+00:00",
         "last_response": {
-          "status": "correcting_frames",
-          "progress": 0.84,
+          "status": "building_skeleton",
+          "progress": 0.98,
           "character_id": "558c27ed-873c-4207-9099-171bb64a09b2",
           "n_directions": 8,
           "character_name": "에일린",
@@ -4613,8 +4630,8 @@
         "status": "processing",
         "created_at": "2026-10-23T19:23:55.025835+00:00",
         "last_response": {
-          "status": "processing",
-          "progress": 0.32000000000000006,
+          "status": "correcting_frames",
+          "progress": 0.84,
           "character_id": "da459680-eb0e-48ad-be84-cc8a23d8fc02",
           "n_directions": 8,
           "character_name": "김조학",
@@ -4660,6 +4677,105 @@
           "character_description": "이도형 / Lee Do-hyeong. Adult man late40s, short silver gray hair swept back, black sunglasses, angular confident smiling face, tall solid veteran build, black tailored trouser suit, white shirt, black necktie, black formal shoes. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
           "generation_started_at": "2026-10-23T19:24:42.006832+00:00"
         }
+      }
+    },
+    "514150f7-d075-41e0-a202-51ef91df5b79": {
+      "kind": "image",
+      "slug": "konjyuce",
+      "template": null,
+      "status": "completed",
+      "created_epoch": 1792783949.6223197,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "514150f7-d075-41e0-a202-51ef91df5b79",
+        "image_id": "e1c278c9-3b4b-534c-a3ba-d75018777817",
+        "source_image_id": "e1c278c9-3b4b-534c-a3ba-d75018777817",
+        "status": "processing",
+        "output_count": 1,
+        "image_size": {
+          "width": 128,
+          "height": 256
+        },
+        "estimated_generations": 9,
+        "pricing_provisional": true
+      },
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 9.0
+        },
+        "id": "514150f7-d075-41e0-a202-51ef91df5b79",
+        "status": "completed",
+        "created_at": "2026-10-23T19:32:31.559689+00:00",
+        "last_response": {
+          "seed": 10222027,
+          "type": "message_done",
+          "model": "pro_flash",
+          "width": 128,
+          "action": "Removing background",
+          "height": 256,
+          "images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "prompt": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. 17 year old Korean schoolgirl with natural age-appropriate teen proportions with a normally long ribcage, visible abdomen between ribs and pelvis, natural waist at the top of the pelvis, and balanced torso and leg lengths, shoulder length straight black bob with one distinctive pink streak, blue eyes, determined youthful face. Fully clothed navy school uniform blazer with light piping extending to the upper hips, not cropped, white collared shirt, black necktie, gray knee length pleated school skirt sitting at the natural waist, not high-waisted, dark socks and plain black school loafers. No adult glamour styling. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 192-196px on128x256 at shared1.25px/cm; height 155cm; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
+          "status": "completed",
+          "asset_id": "e1c278c9-3b4b-534c-a3ba-d75018777817",
+          "image_id": "e1c278c9-3b4b-534c-a3ba-d75018777817",
+          "job_kind": "creator-image",
+          "progress": 1.0,
+          "image_url": "https://s3.eu-central-003.backblazeb2.com/pixellab-generations/production/creator/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/e1c278c9-3b4b-534c-a3ba-d75018777817/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0037e6521c1d7c20000000001%2F20261023%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20261023T193353Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=e4f49ef1d77f0e9637961014cb8bee025880d5ae69268bb3a9742780b1e995e7",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 9
+          },
+          "generation_id": "a01d658c-f6a1-4cbc-a06e-ad3b39c8295e",
+          "billing_charged": true,
+          "original_images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "source_image_id": "e1c278c9-3b4b-534c-a3ba-d75018777817",
+          "creator_image_saved": true,
+          "generation_started_at": "2026-10-23T19:32:32.935164+00:00"
+        }
+      },
+      "observed_end_epoch": 1792784077.1142762,
+      "elapsed_observed_seconds": 127.49195694923401,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 9
+      }
+    },
+    "7804981f-35a4-45e7-9853-d233b546c13f": {
+      "kind": "image",
+      "slug": "go-young-hoon",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792784084.1167805,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "7804981f-35a4-45e7-9853-d233b546c13f",
+        "image_id": "c69e342b-c606-5619-a929-7687a943d7d5",
+        "source_image_id": "c69e342b-c606-5619-a929-7687a943d7d5",
+        "status": "processing",
+        "output_count": 1,
+        "image_size": {
+          "width": 128,
+          "height": 256
+        },
+        "estimated_generations": 9,
+        "pricing_provisional": true
       }
     }
   },
@@ -4795,12 +4911,13 @@
       "name": "콘쥬스",
       "group": "management",
       "character_id": null,
-      "image": null,
+      "image": "514150f7-d075-41e0-a202-51ef91df5b79",
       "registration": null,
       "motions": {},
       "ready": false,
       "repair_id": "konjyuce-torso-v2",
-      "visual_review_required": true
+      "visual_review_required": true,
+      "image_verified": true
     },
     "gognija": {
       "name": "고그니쟈",
@@ -4809,8 +4926,11 @@
       "image": "9331805a-b8b1-4a62-9ed2-ac8281cb96f9",
       "registration": "9e9f1775-f62b-49a8-a5dc-98686e18c6fc",
       "motions": {},
-      "ready": false,
-      "image_verified": true
+      "ready": true,
+      "image_verified": true,
+      "skeleton_joints": 18,
+      "rotation_count": 8,
+      "exported": true
     },
     "dejure": {
       "name": "데쥬레",
@@ -4885,7 +5005,7 @@
       "name": "고영훈",
       "group": "fake-bureau",
       "character_id": null,
-      "image": null,
+      "image": "7804981f-35a4-45e7-9853-d233b546c13f",
       "registration": null,
       "motions": {},
       "ready": false
@@ -8253,9 +8373,129 @@
           "enhance_usage": null
         }
       }
+    },
+    {
+      "at": "2026-10-23T19:32:25Z",
+      "kind": "completed",
+      "slug": "gognija",
+      "detail": {
+        "kind": "registration",
+        "template": null,
+        "job_id": "9e9f1775-f62b-49a8-a5dc-98686e18c6fc",
+        "usage": {
+          "type": "generations",
+          "generations": 4.0
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T19:32:29Z",
+      "kind": "character-ready",
+      "slug": "gognija",
+      "detail": {
+        "3d_joints": 18,
+        "directions": 8
+      }
+    },
+    {
+      "at": "2026-10-23T19:32:33Z",
+      "kind": "submitted",
+      "slug": "konjyuce",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "514150f7-d075-41e0-a202-51ef91df5b79",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "514150f7-d075-41e0-a202-51ef91df5b79",
+          "image_id": "e1c278c9-3b4b-534c-a3ba-d75018777817",
+          "source_image_id": "e1c278c9-3b4b-534c-a3ba-d75018777817",
+          "status": "processing",
+          "output_count": 1,
+          "image_size": {
+            "width": 128,
+            "height": 256
+          },
+          "estimated_generations": 9,
+          "pricing_provisional": true
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T19:32:41Z",
+      "kind": "exported",
+      "slug": "gognija",
+      "detail": {
+        "bytes": 108144,
+        "files": 9
+      }
+    },
+    {
+      "at": "2026-10-23T19:34:37Z",
+      "kind": "completed",
+      "slug": "konjyuce",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "514150f7-d075-41e0-a202-51ef91df5b79",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 9
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T19:34:44Z",
+      "kind": "image-verified",
+      "slug": "konjyuce",
+      "detail": {
+        "size": [
+          128,
+          256
+        ],
+        "bbox": [
+          30,
+          23,
+          92,
+          248
+        ],
+        "colors": 48,
+        "alpha": [
+          0,
+          255
+        ],
+        "original_pixels_preserved": true
+      }
+    },
+    {
+      "at": "2026-10-23T19:34:48Z",
+      "kind": "submitted",
+      "slug": "go-young-hoon",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "7804981f-35a4-45e7-9853-d233b546c13f",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "7804981f-35a4-45e7-9853-d233b546c13f",
+          "image_id": "c69e342b-c606-5619-a929-7687a943d7d5",
+          "source_image_id": "c69e342b-c606-5619-a929-7687a943d7d5",
+          "status": "processing",
+          "output_count": 1,
+          "image_size": {
+            "width": 128,
+            "height": 256
+          },
+          "estimated_generations": 9,
+          "pricing_provisional": true
+        }
+      }
     }
   ],
-  "updated_at": 1792783735.3766632,
+  "updated_at": 1792784088.248416,
   "user_stopped_at": 1792778235.6917784,
   "archived_jobs": {
     "304457e9-6577-44f0-af17-97841a9f6720": {
@@ -9574,17 +9814,17 @@
       "saved_frames": 6
     }
   },
-  "last_git_checkpoint": 1792783387.4650097,
+  "last_git_checkpoint": 1792783738.9562235,
   "summary": {
     "jobs": {
       "processing": 6,
-      "completed": 48,
+      "completed": 50,
       "failed": 3,
       "stalled": 0
     },
-    "characters_ready": 8,
+    "characters_ready": 9,
     "characters_total": 55,
-    "images_verified": 16,
+    "images_verified": 17,
     "motions_submitted": 3,
     "motions_target": 1100
   },
