@@ -24,7 +24,7 @@ import { bindSwipeBack } from './swipeback';
 import { agentInner, avatar, factionPic, imageUrl, picAvatar, setImageRedraw, showIdCard, stLabel } from './images';
 import { bindMapZoom } from './mapzoom';
 import { closeGame, gameOpen, hideGame, openGame, reattachGame } from './game';
-import { BRAND, CARD_FILE } from './brand';
+import { BRAND, CARD_FILE, brandHtml } from './brand';
 import { checkLatest, handleUpdate, hasUpdate, updateBanner } from './update';
 import { setCurrentTheme, themeName } from './theme';
 import { bindFootnotes, bindWikiSide, handleWiki, openWikiSettings, resetWiki, wiki, wikiHomeResults, wikiInput, wikiList, wikiTab, type WikiEnv } from './wiki';
@@ -841,7 +841,7 @@ const TAB_TITLE: Record<Tab, string> = {
 
 function header(sub: string, extra = ''): string {
   return `<header class="gx-head">
-    <div class="gx-brand"><span class="gx-logo">${GHOST_ICON}</span><div><b>${BRAND.name}</b><small>${esc(sub)}</small></div></div>
+    <div class="gx-brand"><span class="gx-logo">${GHOST_ICON}</span><div><b aria-label="${BRAND.name}">${brandHtml('var(--text)', 'var(--signal)')}</b><small>${esc(sub)}</small></div></div>
     <div class="gx-head-act">${extra}<button class="gx-x" data-action="close" aria-label="닫기">${ICONS.close}</button></div>
   </header>`;
 }
@@ -852,7 +852,7 @@ const gameShown = (): boolean => true;
 /** 진행 중 화면의 머리: 지금 탭 이름 (위협도는 기준이 헷갈리기만 해서 아예 뺐다, 사용자 결정) */
 function startedHeader(ctx: ChatContext): string {
   return `<header class="gx-head">
-    <div class="gx-brand gx-tabhead"><span class="gx-hmark"><span class="gx-logo">${GHOST_ICON}</span><span class="gx-mark-txt"><b>${BRAND.name}</b><small aria-label="${BRAND.sub}">${[...BRAND.sub].map((ch) => (ch === ' ' ? '<i class="sp">&nbsp;</i>' : `<i>${ch}</i>`)).join('')}</small></span></span><span class="gx-hsep" aria-hidden="true">›</span><span class="gx-tabicon">${tab === 'field' ? ICONS.game : ICONS[tab]}</span><div><b>${TAB_TITLE[tab]}</b></div></div>
+    <div class="gx-brand gx-tabhead"><span class="gx-hmark"><span class="gx-logo">${GHOST_ICON}</span><span class="gx-mark-txt"><b aria-label="${BRAND.name}">${brandHtml('var(--text)', 'var(--signal)')}</b></span></span><span class="gx-hsep" aria-hidden="true">›</span><span class="gx-tabicon">${tab === 'field' ? ICONS.game : ICONS[tab]}</span><div><b>${TAB_TITLE[tab]}</b></div></div>
     <div class="gx-head-act">
       ${gameShown() ? `<button class="gx-x gx-fieldbtn${tab === 'field' ? ' on' : ''}" data-action="tab" data-value="field" aria-label="필드" title="필드">${ICONS.game}</button>` : ''}
       <button class="gx-x gx-idbtn" data-action="id-card" aria-label="내 ID카드">${userInfo().photo ? `<img src="${esc(userInfo().photo!)}" alt="">` : ICONS.idcard}</button>

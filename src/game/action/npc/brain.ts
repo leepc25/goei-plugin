@@ -235,7 +235,7 @@ export function buildPrompt(p: PromptIn): TalkMessage[] {
     ...(p.meta?.events?.length ? [`요즘 관리국 상황판 소식: ${p.meta.events.slice(0, 3).join(' / ')}`] : []),
   ];
   const parts = [
-    `너는 액션 게임 「차원 승강기」 속 인물 「${name}」이다. 괴이 롤플레이 「괴이 ː 이면세계」 세계관이다. 지금 플레이어가 조종하는 관리국 요원과 마주 보고 말한다.`,
+    `너는 액션 게임 「차원 승강기」 속 인물 「${name}」이다. 괴이 롤플레이 「괴이 ː ANOMALY」 세계관이다. 지금 플레이어가 조종하는 관리국 요원과 마주 보고 말한다.`,
     p.sheet ? `[인물 시트: 본편 설정. 영어로 적혀 있지만 대답은 한국어로]\n${p.sheet}` : '',
     t.persona ? `[이 사람]\n${t.persona}` : '',
     `[게임 속 역할] ${def.role}`,

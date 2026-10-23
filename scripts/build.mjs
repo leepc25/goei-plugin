@@ -10,11 +10,11 @@ if (process.env.GOEI_BUILD_VERSION) pkg.version = process.env.GOEI_BUILD_VERSION
 const updateBase = String(process.env.GOEI_UPDATE_BASE ?? pkg.goei?.updateBase ?? '').replace(/\/+$/, '');
 const header = [
   '//@name goei-plugin',
-  '//@display-name 괴이: 이면세계',
+  '//@display-name 괴이: ANOMALY',
   '//@api 3.0',
   `//@version ${pkg.version}`,
   ...(updateBase ? [`//@update-url ${updateBase}/goei-plugin.js`] : []),
-  '//@description 괴이: 이면세계 전용 플러그인 (괴이봇 2탄 기반): 시작 화면, 상황판, 지도·요원 이동, 커스텀 임무, 괴담넷, 괴담톡, 위키, 설정·캐릭터 이미지',
+  '//@description 괴이: ANOMALY 전용 플러그인 (괴이봇 2탄 기반): 시작 화면, 상황판, 지도·요원 이동, 커스텀 임무, 괴담넷, 괴담톡, 위키, 설정·캐릭터 이미지',
   '',
 ].join('\n');
 

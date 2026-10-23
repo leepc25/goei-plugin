@@ -56,9 +56,9 @@ _LOGO = ('display:inline-grid;place-items:center;width:52px;height:52px;border-r
 _KICK = 'font-family:monospace;font-size:11px;letter-spacing:.28em;color:#5EEAD4;opacity:.85'
 
 def _title(text, signal):
-    """제목 「괴이: 이면세계」: 크게, 이면(뒷면)이라는 뜻을 살려 아래로 흐리게 비친 반사 (플러그인 main.ts titleHtml과 같은 모양)"""
-    line = (f'<span style="color:{text}">괴이</span><span style="color:{signal};font-weight:300;margin:0 .18em 0 .06em">:</span>'
-            f'<span style="color:{signal}">이면세계</span>')
+    """제목 「괴이 ː ANOMALY」: 크게, 이면(뒷면)이라는 뜻을 살려 아래로 흐리게 비친 반사 (플러그인 main.ts titleHtml과 같은 모양)"""
+    line = (f'<span style="color:{text}">괴이</span><span style="color:{signal};font-weight:300;margin:0 .3em">ː</span>'
+            f'<span style="color:{signal}">ANOMALY</span>')
     font = 'font-size:2.1em;font-weight:800;letter-spacing:.08em;line-height:1.15;white-space:nowrap'
     return (f'<div style="margin:10px 0 0;{font}">{line}</div>'
             f'<div aria-hidden="true" style="{font};line-height:1;margin:-.06em 0 .02em;transform:scaleY(-1);opacity:.3;'
@@ -69,7 +69,7 @@ def _title(text, signal):
 LANDING = (
     f'<div data-goei="landing" style="{_CARD};text-align:center">'
     f'<span style="{_LOGO}">{GHOST_SVG}</span>'
-    f'<div style="{_KICK}">ANOMALY SIMULATION</div>'
+    # 위의 「ANOMALY SIMULATION」 줄은 뺐다: 이름에 ANOMALY가 들어가서 (사용자 2026-10-23)
     + _title('#E6EEEC', '#5EEAD4') +
     '<div style="color:#9DB0AC">유령 버튼을 눌러 시작하세요</div></div>'
 )
@@ -93,8 +93,7 @@ def creator_notes(original):
     return (
         f'<div style="{_CARD}">'
         f'<div style="display:flex;align-items:center;gap:12px"><span style="{_LOGO};margin:0;flex:none">{GHOST_SVG}</span>'
-        f'<div><div style="{_KICK}">ANOMALY SIMULATION</div>'
-        '<div style="font-size:1.3em;font-weight:700">괴이: 이면세계</div>'
+        '<div><div style="font-size:1.3em;font-weight:700">괴이 <span style="color:#5EEAD4;font-weight:300">ː</span> <span style="color:#5EEAD4">ANOMALY</span></div>'
         '<div style="color:#9DB0AC;font-size:13px">괴이봇 2탄 기반 · 플러그인 전용</div></div></div>'
         f'<div style="{h3}">준비</div>'
         + _step(1, '플러그인 설치', '설정 → 플러그인에서 goei-plugin.js를 추가해요.')
@@ -518,7 +517,7 @@ def write_update(folder, payload):
              'parts': names, 'length': len(text.encode('utf-16-le')) // 2}  # JS 글자 수(UTF-16)
     (folder / UPDATE_FILE).write_text(json.dumps(index, ensure_ascii=False), encoding='utf-8')
     return len(names)
-CARD_NAME = '괴이: 이면세계'  # 정식 이름 (src/ui/brand.ts BRAND.name과 같게)
+CARD_NAME = '괴이: ANOMALY'  # 정식 이름 (src/ui/brand.ts BRAND.name과 같게)
 
 
 def update_payload(data, risu, module, version, min_plugin):

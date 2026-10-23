@@ -4,12 +4,13 @@
 // 그 CSS가 없어도(본 화면 권한 거부) 멈춘 카드는 똑같이 보인다. 움직임은 transform·opacity만 쓴다.
 import { GHOST_ICON } from './icons';
 import type { Palette } from './theme';
+import { brandHtml } from './brand';
 
 const MONO = "'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace";
 
-/** 제목 「괴이 ː 이면세계」와 아래로 비친 반사(이면). 반사는 물결처럼 일렁인다 */
+/** 제목 「괴이 ː ANOMALY」와 아래로 비친 반사(이면). 반사는 물결처럼 일렁인다 */
 function title(p: Palette): string {
-  const line = `<span style="color:${p.text}">괴이</span><span style="color:${p.signal};font-weight:300;margin:0 .3em">ː</span><span style="color:${p.signal}">이면세계</span>`;
+  const line = brandHtml(p.text, p.signal);
   const font = 'font-size:2.1em;font-weight:800;letter-spacing:.08em;line-height:1.15;white-space:nowrap';
   return `<div style="margin:6px 0 0;${font}">${line}</div>`
     + `<div aria-hidden="true" style="${font};line-height:1;margin:-.06em 0 .02em;`
@@ -40,9 +41,7 @@ export function landingHtml(p: Palette): string {
     + `<div data-goei-part="ghost" style="flex:0 0 auto;display:grid;place-items:center;width:96px;height:96px;`
     + `color:${p.signal};filter:drop-shadow(0 6px 14px ${p.accentBg})">${ghost}</div>`
     + `<div data-goei-part="text" style="width:100%;min-width:0">`
-    + `<div style="display:flex;align-items:center;justify-content:center;gap:8px 12px;flex-wrap:wrap;font-family:${MONO};font-size:11px;letter-spacing:.28em">`
-    + `<span data-goei-part="label" style="color:${p.signal}">ANOMALY SIMULATION</span>`
-    + `</div>`
+    // 위의 「ANOMALY SIMULATION」 줄은 뺐다: 이름에 ANOMALY가 들어가서 (사용자 2026-10-23)
     + title(p)
     + `<div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:4px;padding-top:12px;border-top:1px dashed ${p.line};color:${p.sub}">`
     + `<span style="font-family:${MONO};color:${p.signal}">▸</span><span data-goei-part="hint">유령 버튼을 눌러 시작하세요</span></div>`

@@ -73,7 +73,7 @@ function stored(id: string): Promise<Stored | null> {
 /** 팩 바이트를 풀어 저장한다. id를 주면 그 팩인지 확인한다 */
 export async function installGamePack(bytes: Uint8Array, expect?: string, hash?: string): Promise<string> {
   const pack = parseGamePack(bytes);
-  if (!pack) throw new GameFileError('괴이 ː 이면세계 게임 팩 파일이 아니에요.');
+  if (!pack) throw new GameFileError('괴이 ː ANOMALY 게임 팩 파일이 아니에요.');
   if (expect && pack.id !== expect) throw new GameFileError(`다른 팩이에요 (${pack.id}).`);
   const files: Stored['files'] = {};
   for (const [name, b] of pack.files) files[name] = [MIME[name.split('.').pop()!.toLowerCase()] ?? 'application/octet-stream', base64(b)];

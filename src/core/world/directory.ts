@@ -769,7 +769,7 @@ function cleanSpec(spec: FactionSpec): FactionSpec {
 }
 
 const HELP =
-  '괴이: 이면세계 플러그인이 쓰는 명부입니다. 플러그인 창 「설정 → 카드 명부」에서 고치세요. ' +
+  '괴이: ANOMALY 플러그인이 쓰는 명부입니다. 플러그인 창 「설정 → 카드 명부」에서 고치세요. ' +
   '괴이는 🚧괴이, 미스틱 사이트는 🎁파밍, 요원은 🙂요원 폴더에 로어북을 넣으면 자동으로 들어옵니다. 요원의 소속은 창에서 조직을 골라 정합니다. 거점은 지도에 찍히는 장소이고 조직에 묶지 않아도 됩니다. 모델에게는 보내지 않습니다.';
 
 export function directoryContent(data: DirectoryData): string {
