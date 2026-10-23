@@ -1,0 +1,13 @@
+{
+  "job": "71a0632e-a481-489d-8a9b-cceed3ffaa58",
+  "decision": "reroll",
+  "reason": "식별 특징인 이마 및 양볼 흉터 부족, 키 약239px 초과.",
+  "at": 1792788955.6549368,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

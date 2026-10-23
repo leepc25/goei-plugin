@@ -1,0 +1,13 @@
+{
+  "job": "ee2b0075-56bf-4ea7-b10b-45d6c0064d12",
+  "decision": "reroll",
+  "reason": "정면이 아닌 3/4 얼굴, 여성 키 범위보다 큼.",
+  "at": 1792788956.27305,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

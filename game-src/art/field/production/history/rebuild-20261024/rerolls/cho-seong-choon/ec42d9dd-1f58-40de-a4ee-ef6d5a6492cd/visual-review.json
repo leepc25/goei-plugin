@@ -1,0 +1,13 @@
+{
+  "job": "ec42d9dd-1f58-40de-a4ee-ef6d5a6492cd",
+  "decision": "reroll",
+  "reason": "소매·열린 칼라·느슨한 넥타이는 맞으나 키 약237px 초과.",
+  "at": 1792788956.014505,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

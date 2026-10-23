@@ -1,0 +1,13 @@
+{
+  "job": "8a2d9a1c-d7f8-41b6-a6ac-1a7ea22ed3c3",
+  "decision": "reroll",
+  "reason": "헤어·슬림 체형·열린 칼라 맞으나 키 약237px 초과.",
+  "at": 1792788956.099408,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "job": "c468b8a7-6c12-458a-898b-324dc709952a",
+  "decision": "reroll",
+  "reason": "양 입꼬리에서 볼까지 이어진 봉합형 흉터 부족, 키 약240px 초과.",
+  "at": 1792788955.7436185,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

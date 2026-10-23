@@ -1,0 +1,13 @@
+{
+  "job": "fa090bbb-e1a3-4b06-862b-22429954773e",
+  "decision": "reroll",
+  "reason": "키와 중량감·금속판은 적합하나 얼굴이 측면으로 돌아간 상태라 SOUTH 기준 실패.",
+  "at": 1792788955.927317,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

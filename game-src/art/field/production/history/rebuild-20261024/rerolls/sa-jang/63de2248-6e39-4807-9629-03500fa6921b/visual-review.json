@@ -1,0 +1,13 @@
+{
+  "job": "63de2248-6e39-4807-9629-03500fa6921b",
+  "decision": "reroll",
+  "reason": "키 약238px로 잠정214–222px 범위 초과, 뒤로 넘긴 웨이브 머리의 형태 약함.",
+  "at": 1792788955.173153,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

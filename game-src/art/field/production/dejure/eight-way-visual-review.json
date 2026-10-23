@@ -1,0 +1,25 @@
+{
+  "character_id": "8bc8eb42-95a1-4dea-be57-80429b542d36",
+  "directions_reviewed": [
+    "south",
+    "south-east",
+    "east",
+    "north-east",
+    "north",
+    "north-west",
+    "west",
+    "south-west"
+  ],
+  "identity_findings": "Pink high twin tails and bangs, pink eyes, black skirt suit.",
+  "result": "Retain existing management result; user full-rebuild scope is fake bureau. Existing proportions retained, not newly certified against revised pixel-height targets.",
+  "new_user_approval": false,
+  "movement_direction": "east",
+  "stationary_direction": "south-east",
+  "gray_outer_halo_observed": false,
+  "rules_rechecked": [
+    "Original AVIF first",
+    "Lore supplementary",
+    "No motion before all55 directions reviewed",
+    "Reroll gray-outline motion failures"
+  ]
+}

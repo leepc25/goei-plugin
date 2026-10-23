@@ -100,13 +100,22 @@ class Production:
   c=self.s['characters'][slug];jid=c.get('image');j=self.s['jobs'].get(jid,{})
   if j.get('status')!='completed'or c.get('image_verified')or c.get('image_invalid'):return
   try:
-   data=request('/mcp/images/'+jid+'/download')
+   cached=OUT/slug/('.download-'+jid)
+   data=cached.read_bytes() if cached.exists() else request('/mcp/images/'+jid+'/download')
    if data[:2]==b'PK':
     z=zipfile.ZipFile(io.BytesIO(data));pngs=[n for n in z.namelist()if n.endswith('.png')];assert len(pngs)==1;data=z.read(pngs[0])
-   im=Image.open(io.BytesIO(data)).convert('RGBA');im.load();bbox=im.getbbox();colors=len({px for px in im.getdata()if px[3]});alpha=sorted(set(im.getchannel('A').getdata()));checks={'size':list(im.size),'bbox':list(bbox)if bbox else None,'colors':colors,'alpha':alpha,'original_pixels_preserved':True}
+   im=Image.open(io.BytesIO(data)).convert('RGBA');im.load();native_size=im.size
+   if self.by[slug].get('native_height_canvas'):
+    expected=self.by[slug]['pixel_request']['image_size'];assert im.size==(expected['width'],expected['height']),'wrong native canvas'
+    (OUT/slug/'native-generation.png').write_bytes(data)
+    assert im.width==128 and im.height<=256
+    padded=Image.new('RGBA',(128,256));padded.paste(im,(0,256-im.height));im=padded
+    buf=io.BytesIO();im.save(buf,format='PNG');data=buf.getvalue()
+   bbox=im.getbbox();colors=len({px for px in im.getdata()if px[3]});alpha=sorted(set(im.getchannel('A').getdata()));checks={'size':list(im.size),'native_size':list(native_size),'bbox':list(bbox)if bbox else None,'colors':colors,'alpha':alpha,'original_pixels_preserved':True,'resampled':False}
    (OUT/slug/'reference.png').write_bytes(data);atomic(OUT/slug/'image-verification.json',checks)
    assert im.size==(128,256),'wrong canvas';assert bbox and bbox[3]-bbox[1]>=180,'figure too small';assert colors<=48,'palette cap exceeded';assert alpha==[0,255],'unexpected alpha'
    c['image_verified']=True;self.event('image-verified',slug,checks)
+   if cached.exists():cached.unlink()
   except urllib.error.HTTPError as e:
    c['download_error']=str(e) # transient delivery is read-only and can be checked again
   except Exception as e:
@@ -123,7 +132,10 @@ class Production:
   except Exception as e:c['readiness_error']=str(e)
   self.save()
  def image_request(self,a):
-  args=dict(a['pixel_request']);usage=args.pop('style_usage_description');path=ROOT/args.pop('style_reference_local');im=Image.open(path);args['style_image']={'image':{'type':'base64','base64':base64.b64encode(path.read_bytes()).decode(),'format':'png'},'size':{'width':im.width,'height':im.height},'usage_description':usage};return args
+  args=dict(a['pixel_request']);usage=args.pop('style_usage_description',None);source=args.pop('style_reference_local',None)
+  if source:
+   path=ROOT/source;im=Image.open(path);args['style_image']={'image':{'type':'base64','base64':base64.b64encode(path.read_bytes()).decode(),'format':'png'},'size':{'width':im.width,'height':im.height},'usage_description':usage}
+  return args
  def registration_request(self,a):
   return{'description':a['name']+' / '+a['english']+'. '+a['appearance']+' Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.','reference_image':{'type':'base64','base64':base64.b64encode((OUT/a['slug']/'reference.png').read_bytes()).decode(),'format':'png'},'n_directions':8,'view':'low top-down','template_id':'mannequin','name':a['name'],'seed':10222027,'no_background':True}
  @staticmethod
@@ -167,6 +179,18 @@ class Production:
   if time.time()<self.s.get('retry_after',0):return
   self.manifest=json.loads((OUT/'manifest.json').read_text());self.by={a['slug']:a for a in self.manifest}
   self.apply_repairs()
+  # Independent read-only downloads run concurrently; state decisions remain serial.
+  pending=[(a['slug'],self.s['characters'][a['slug']].get('image')) for a in self.manifest
+           if not self.s['characters'][a['slug']].get('image_verified')
+           and not self.s['characters'][a['slug']].get('image_invalid')]
+  def download_one(pair):
+   slug,jid=pair
+   if self.s['jobs'].get(jid,{}).get('status')!='completed':return
+   path=OUT/slug/('.download-'+jid)
+   if path.exists():return
+   try:path.write_bytes(request('/mcp/images/'+jid+'/download'))
+   except Exception:return # validate_image records/retries delivery errors serially
+  with concurrent.futures.ThreadPoolExecutor(max_workers=8)as pool:list(pool.map(download_one,pending))
   for a in self.manifest:
    slug=a['slug'];self.validate_image(slug);self.check_ready(slug)
   # Keep room for both production streams; 20 global in-flight requests at most.

@@ -43,10 +43,75 @@ cad7e67c-dfc7-49fc-8681-18ac2e1070d0	konjyuce	registration		completed	{"type": "
 1c807537-5a53-434b-87ed-56fa81686f57	jyaldi	animation	pushing	failed	{"type": "usd", "usd": 0.0}
 d880b4d6-e420-4c02-be2b-707400f634ed	jyaldi	animation	pull-heavy-object	cancelled	null
 9331805a-b8b1-4a62-9ed2-ac8281cb96f9	gognija	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
-3cddea2e-3a66-4291-a79c-2be803461b07	jyaldi	animation	walking-8-frames	processing	null
-c8873c16-757b-44c9-817a-9e39fd7247fc	jyaldi	animation	running-8-frames	processing	null
-9e9f1775-f62b-49a8-a5dc-98686e18c6fc	gognija	registration		processing	null
-95f7fbb1-98fc-4481-a293-236e615fb8b8	aileen	image		processing	null
-a617bd3c-ab6f-4300-892f-814a35344d48	dejure	image		processing	null
-6c98e078-134a-4596-827d-94539b32efbc	sa-jang	image		processing	null
-313ee595-1c75-4c33-9a9a-99e46b29e9e1	do-pil-heon	image		processing	null
+3cddea2e-3a66-4291-a79c-2be803461b07	jyaldi	animation	walking-8-frames	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+c8873c16-757b-44c9-817a-9e39fd7247fc	jyaldi	animation	running-8-frames	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+9e9f1775-f62b-49a8-a5dc-98686e18c6fc	gognija	registration		completed	{"type": "generations", "generations": 4.0}
+95f7fbb1-98fc-4481-a293-236e615fb8b8	aileen	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+a617bd3c-ab6f-4300-892f-814a35344d48	dejure	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+6c98e078-134a-4596-827d-94539b32efbc	sa-jang	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+313ee595-1c75-4c33-9a9a-99e46b29e9e1	do-pil-heon	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+0983045b-232d-4880-8691-a5e0bf30353c	lee-gil-hwan	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+d95cd572-ed2f-48a9-9835-699c8b3275c5	aileen	registration		completed	{"type": "generations", "generations": 4.0}
+74bb6f61-b7b7-4405-96f8-9cc6759c7dc5	kim-jo-hak	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+97c6be5f-46f6-4216-a783-10760dce00b7	lee-do-hyeong	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+faf43112-9e06-4989-bfc7-8d71cefa0392	do-pil-heon	registration		completed	{"type": "generations", "generations": 4.0}
+acc823fc-13b5-45bc-9047-a7aa6fafebb1	lee-gil-hwan	registration		completed	{"type": "generations", "generations": 4.0}
+38131ffd-13aa-42c6-bd7d-d70030f105a9	kim-jo-hak	registration		completed	{"type": "generations", "generations": 4.0}
+4f676b89-e087-4071-b5de-8f1509e4d6b3	lee-do-hyeong	registration		completed	{"type": "generations", "generations": 4.0}
+514150f7-d075-41e0-a202-51ef91df5b79	konjyuce	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+7804981f-35a4-45e7-9853-d233b546c13f	go-young-hoon	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+e0079880-b3df-4176-9498-5adba07db7ff	go-young-hoon	registration		completed	{"type": "generations", "generations": 4.0}
+b5de6715-8544-46ed-b155-a1dc03a01d1d	no-gi-gyun	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+c5256011-99c7-4078-bbbc-a553b395a670	no-gi-gyun	registration		completed	{"type": "generations", "generations": 4.0}
+2fe5ceb3-5953-4fec-bd88-fd4ccbe2f7d8	song-ju-ik	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+eacc1a24-47d0-4db2-b85b-f4396e250b09	kwak-seong-ju	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+e084a777-c8a1-4db0-bc3c-b87cd6cbb888	cho-seong-choon	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+c2aabcc4-7ed0-4bbe-a667-fa2d992a05fd	song-ju-ik	registration		completed	{"type": "generations", "generations": 4.0}
+4ea02ad2-5c4d-4fde-9d88-1281bd5311d4	kwak-seong-ju	registration		completed	{"type": "generations", "generations": 4.0}
+fd0e0a01-0f88-476d-8a46-0440db3a02ce	cho-seong-choon	registration		completed	{"type": "generations", "generations": 4.0}
+90e177c3-0c95-4f0b-9703-d97ec0b41c00	yun-byeong-su	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+f6f2e349-d5a1-4dfb-8c30-aa7180971954	yun-byeong-su	registration		completed	{"type": "generations", "generations": 4.0}
+388b811b-2c33-41b5-9675-a97b22ed3f6c	lee-do-hyeong	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+93e994f1-cd27-4eb6-9d6b-e7905d5067d9	kim-seong-jin	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+52623aa8-8924-4172-8bcc-6074f3646ea1	song-jin-seob	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+63de2248-6e39-4807-9629-03500fa6921b	sa-jang	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+337a274b-6c96-4062-9f1d-16cf170029b8	do-pil-heon	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+5e401a36-d468-44c5-bb0c-f9c7c21bd32f	lee-gil-hwan	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+84b18533-3b72-4e23-a538-c3e88668fb7a	lee-gi-seok	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+1425bdcd-2e41-4959-8ca2-404855b0a6c5	kim-jo-hak	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+f046db3b-1ebe-4227-a4ee-6102d6460d0e	lee-do-hyeong	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+71a0632e-a481-489d-8a9b-cceed3ffaa58	go-young-hoon	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+c468b8a7-6c12-458a-898b-324dc709952a	no-gi-gyun	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+ad4858c4-2694-4fba-ab33-7cafffec0bc5	song-ju-ik	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+fa090bbb-e1a3-4b06-862b-22429954773e	kwak-seong-ju	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+ec42d9dd-1f58-40de-a4ee-ef6d5a6492cd	cho-seong-choon	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+19cc1b0e-1d92-4aff-bd82-16c5fe2c4dd0	yun-byeong-su	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+8a2d9a1c-d7f8-41b6-a6ac-1a7ea22ed3c3	kim-seong-jin	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+37ea4f25-334e-433e-807e-348451f23456	song-jin-seob	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+ee2b0075-56bf-4ea7-b10b-45d6c0064d12	baek-seok-ju	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+e4954df6-e32b-4a29-a34d-1af5152c4474	jin-na-sol	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+297ce4f8-8ddd-4bd5-8fa0-21a791a8357e	lee-seong-hae	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+1d98dde4-aeff-40fa-9384-f163ccc9561f	lee-ja-heon	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+5c7e4f76-26b0-4035-b107-46de8615e691	eun-ha-je	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+fd7a04c0-2c44-423a-bed4-922bd16a8521	park-min-seong	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+633a5907-5f31-4593-a875-794f14364f7e	baek-sa-heon	image		processing	null
+8deca375-3192-487b-a642-c7838b493969	go-young-eun	image		processing	null
+5364cb5b-94ab-46e7-ae73-9f31f4884caa	kang-i-hak	image		failed	{"type": "usd", "usd": 0.0}
+805f56ae-ae2b-45f8-9219-9c79ca89f4a0	jang-heo-un	image		processing	null
+c5877d53-1b4c-4ecd-b728-57ae99eeb24c	kwak-je-gang	image		processing	null
+9122b278-bc23-44fc-bcb2-e200b53759a7	lee-yeon-hwa	image		processing	null
+9bfa50f6-278e-4074-881f-8a581f373aec	lee-byeong-jin	image		processing	null
+d262fefc-fcef-487d-86ff-e1d757d54170	jay	image		processing	null
+a4bca6d0-4145-4545-a189-998ab06cec55	ho-yu-won	image		processing	null
+d6d15ee8-080b-43fe-a5ec-0f5b6e4e980c	cheong-dal-lae	image		processing	null
+bdf54c59-67c8-4940-bdcf-7b2d16668e32	lee-gil-hwan	registration		processing	null
+6f230ee1-fb81-46b6-88bc-b72bf46cf976	sa-jang	image		processing	null
+da4072f2-c6e1-4bde-8e9a-5c39fbc70364	do-pil-heon	image		processing	null
+f66ff2b3-ff1f-433d-a1c1-773da4f13e63	lee-gi-seok	image		processing	null
+8e59c8fd-27b9-4e1b-979f-7f915108e96a	kim-jo-hak	image		processing	null
+594e5e33-e083-4945-b3a2-904fc2ddcb40	lee-do-hyeong	image		processing	null
+33a4d3d1-441f-4264-9250-1825d239820b	go-young-hoon	image		processing	null
+b73bd52d-98e3-4540-b7d3-2be92f9d1a72	no-gi-gyun	image		processing	null
+d627018c-3c00-4814-9e5d-f2318e432b0b	song-ju-ik	image		processing	null
+2eff4b6f-d77c-4a75-9f44-dd0a92d6207c	kwak-seong-ju	image		processing	null
+42c4e60b-c526-4fcf-82f0-c416a1296b54	konjyuce	registration		processing	null

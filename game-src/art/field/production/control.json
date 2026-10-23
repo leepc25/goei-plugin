@@ -64,8 +64,24 @@
     "lee-byeong-jin",
     "jay",
     "ho-yu-won",
-    "cheong-dal-lae"
+    "cheong-dal-lae",
+    "cha-yeo-jin",
+    "seo-yun-ji",
+    "go-yeon-ji",
+    "yun-ji-a",
+    "ma-deok-hee",
+    "mun-hye-ran",
+    "shin-yuri",
+    "blaret",
+    "saladin",
+    "avensha",
+    "secriem",
+    "brownie",
+    "aestheticism"
   ],
-  "registration_approved_slugs": [],
+  "registration_approved_slugs": [
+    "lee-gil-hwan",
+    "konjyuce"
+  ],
   "source_priority": "AVIF first for identity/build; lore supplements height; explicit user heights override estimates"
 }

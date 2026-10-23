@@ -1,0 +1,13 @@
+{
+  "job": "e4954df6-e32b-4a29-a34d-1af5152c4474",
+  "decision": "reroll",
+  "reason": "얼굴이 EAST로 돌아가 SOUTH 기준 실패, 본체 키도 여성 범위 초과.",
+  "at": 1792788956.3672862,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

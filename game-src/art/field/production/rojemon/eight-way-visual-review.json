@@ -1,0 +1,25 @@
+{
+  "character_id": "27643078-cb88-455f-abf5-3be5bdb3ff68",
+  "directions_reviewed": [
+    "south",
+    "south-east",
+    "east",
+    "north-east",
+    "north",
+    "north-west",
+    "west",
+    "south-west"
+  ],
+  "identity_findings": "Lavender long wavy hair with bangs, purple eyes, black skirt suit and heels.",
+  "result": "Retain existing management result; user full-rebuild scope is fake bureau. Existing proportions retained, not newly certified against revised pixel-height targets.",
+  "new_user_approval": false,
+  "movement_direction": "east",
+  "stationary_direction": "south-east",
+  "gray_outer_halo_observed": false,
+  "rules_rechecked": [
+    "Original AVIF first",
+    "Lore supplementary",
+    "No motion before all55 directions reviewed",
+    "Reroll gray-outline motion failures"
+  ]
+}

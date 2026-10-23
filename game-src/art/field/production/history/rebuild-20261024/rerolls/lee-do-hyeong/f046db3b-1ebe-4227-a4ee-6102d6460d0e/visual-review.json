@@ -1,0 +1,13 @@
+{
+  "job": "f046db3b-1ebe-4227-a4ee-6102d6460d0e",
+  "decision": "reroll",
+  "reason": "뺨의 평행 흉터와 턱 수염 부족, 키 약244px로 다른 장신 대비 검수 필요.",
+  "at": 1792788955.5650156,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

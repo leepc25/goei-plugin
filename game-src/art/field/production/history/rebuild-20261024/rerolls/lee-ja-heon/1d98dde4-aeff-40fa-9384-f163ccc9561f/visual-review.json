@@ -1,0 +1,13 @@
+{
+  "job": "1d98dde4-aeff-40fa-9384-f163ccc9561f",
+  "decision": "reroll",
+  "reason": "얼굴이 EAST로 돌아가 SOUTH 기준 실패.",
+  "at": 1792788956.4530334,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}
