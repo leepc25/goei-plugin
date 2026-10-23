@@ -45,6 +45,7 @@ import { advValue } from './core/advanced';
 import { userInfo } from './host/user';
 import { applyPlayer, hidePlayerTag, playerAgent, playerBlock } from './core/player';
 import { withInterludes } from './core/interlude';
+import { withStatusBlock } from './core/statusctx';
 import { visitRecord } from './core/visit';
 import { visitContextRules } from './core/visitPrompt';
 
@@ -79,6 +80,8 @@ async function onBeforeRequest<M extends PromptMessage>(messages: M[], type: str
       const add = ctx.map((c) => ({ role: 'system', content: c }) as M);
       messages = at < 0 ? [...messages, ...add] : [...messages.slice(0, at), ...add, ...messages.slice(at)];
     }
+    // 지난 응답의 상태창 줄은 지우고 마지막 한 줄만 직전 상태 블록으로 (core/statusctx.ts)
+    messages = withStatusBlock(messages);
   }
   // 시드 표식이 없는 요청은 아무것도 읽지 않고 바로 돌려보낸다 (매 전송마다 드는 비용을 0에 가깝게).
   if (!messages.some((m) => typeof m?.content === 'string' && m.content.includes(SEED_OPEN))) return messages;

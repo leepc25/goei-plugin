@@ -389,6 +389,7 @@ LORE_PATCHES = [
      "including briefing and travel; otherwise `없음`.\n"
      "- Companions = the named individuals currently travelling together with {{user}}, most important first, exact Korean names as used in the story, separated by `,`. `없음` if none. Only people who are physically with {{user}} right now; do not list unnamed crowds or groups.\n"
      "- Deployed = `투입` only while {{user}} (or the party {{user}} leads) is physically inside an anomaly site on an operation. `없음` during briefing, preparation, travel to the site, and after leaving or being evacuated.\n"
+     "- The status line of the previous scene is provided in a `[Previous status]` block just before the latest user input. Continue from it: advance the time and update the other fields. Older responses do not carry their status lines.\n"
      "- Example (no current anomaly):\n[▣|2025.01.01|02:47 AM|☀️|4°C|서울 종로구 거리|없음|없음|없음]\n"
      "- Example (inside an anomaly with two companions):\n[▣|2025.01.01|10:15 PM|🌫️|9°C|명일 아파트 3층 복도|명일 아파트|쟈알디,에일린|투입]"),
     # 배치 칸 띄어쓰기 통일 (2026-10-21 점검)
