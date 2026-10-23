@@ -20722,14 +20722,16 @@
           "type": "message_progress",
           "model": "inpaint_pro_flash",
           "width": 128,
-          "action": "Generating image",
+          "action": "Correcting pixels",
           "height": 256,
           "prompt": "Correct the BLACK NUN VEIL: it must be ONE WIDE CONTINUOUS SHEET OF BLACK CLOTH hanging from the head down the back to HIPS, below both wrists. Fill the selected region with natural solid black veil fabric and subtle dark charcoal vertical folds. Cover the blonde hair on the BACK beneath the veil. Replace all long thin ribbon-like tails with the broad filled veil panel; no strings, ribbons, split tails, exposed blonde back hair, or short shoulder hood. Veil hem at hip level around y165. Preserve visible face, front blonde hair, green eyes, white bib, cross, arms, sleeves, hands, rosary bracelets, dress silhouette and stature; do not invent limbs. Exact unmasked pixels remain unchanged; transparent outside silhouette, crisp pixel edges.",
           "status": "processing",
           "image_id": "1bf55be1-f700-5cfa-881f-cfda7d6b8d12",
           "job_kind": "creator-image",
-          "progress": 0.05,
-          "generation_started_at": "2026-10-23T23:05:34.105585+00:00"
+          "progress": 0.75,
+          "queue_position": 3,
+          "generation_started_at": "2026-10-23T23:05:34.105585+00:00",
+          "estimated_wait_seconds": 235
         }
       }
     },
@@ -20765,14 +20767,16 @@
           "type": "message_progress",
           "model": "inpaint_pro_flash",
           "width": 128,
-          "action": "Generating image",
+          "action": "Correcting pixels",
           "height": 256,
           "prompt": "Correct the BLACK NUN VEIL: it must be ONE WIDE CONTINUOUS SHEET OF BLACK CLOTH hanging from the head down the back to HIPS, below both wrists. Fill the selected region with natural solid black veil fabric and subtle dark charcoal vertical folds. Cover the blonde hair on the BACK beneath the veil. Replace all long thin ribbon-like tails with the broad filled veil panel; no strings, ribbons, split tails, exposed blonde back hair, or short shoulder hood. Veil hem at hip level around y165. Preserve visible face, front blonde hair, green eyes, white bib, cross, arms, sleeves, hands, rosary bracelets, dress silhouette and stature; do not invent limbs. Exact unmasked pixels remain unchanged; transparent outside silhouette, crisp pixel edges.",
           "status": "processing",
           "image_id": "8fcae77a-d79c-57b1-b99f-ba277d37b98c",
           "job_kind": "creator-image",
-          "progress": 0.05,
-          "generation_started_at": "2026-10-23T23:05:34.917948+00:00"
+          "progress": 0.75,
+          "queue_position": 3,
+          "generation_started_at": "2026-10-23T23:05:34.917948+00:00",
+          "estimated_wait_seconds": 224
         }
       }
     },
@@ -20808,14 +20812,16 @@
           "type": "message_progress",
           "model": "inpaint_pro_flash",
           "width": 128,
-          "action": "Generating image",
+          "action": "Correcting pixels",
           "height": 256,
           "prompt": "Correct the BLACK NUN VEIL: it must be ONE WIDE CONTINUOUS SHEET OF BLACK CLOTH hanging from the head down the back to HIPS, below both wrists. Fill the selected region with natural solid black veil fabric and subtle dark charcoal vertical folds. Cover the blonde hair on the BACK beneath the veil. Replace all long thin ribbon-like tails with the broad filled veil panel; no strings, ribbons, split tails, exposed blonde back hair, or short shoulder hood. Veil hem at hip level around y165. Preserve visible face, front blonde hair, green eyes, white bib, cross, arms, sleeves, hands, rosary bracelets, dress silhouette and stature; do not invent limbs. Exact unmasked pixels remain unchanged; transparent outside silhouette, crisp pixel edges.",
           "status": "processing",
           "image_id": "787f4f56-df61-59b4-b36a-1907766ec0a3",
           "job_kind": "creator-image",
-          "progress": 0.05,
-          "generation_started_at": "2026-10-23T23:05:35.562715+00:00"
+          "progress": 0.75,
+          "queue_position": 2,
+          "generation_started_at": "2026-10-23T23:05:35.562715+00:00",
+          "estimated_wait_seconds": 183
         }
       }
     },
@@ -20851,14 +20857,16 @@
           "type": "message_progress",
           "model": "inpaint_pro_flash",
           "width": 128,
-          "action": "Generating image",
+          "action": "Correcting pixels",
           "height": 256,
           "prompt": "Correct the BLACK NUN VEIL: it must be ONE WIDE CONTINUOUS SHEET OF BLACK CLOTH hanging from the head down the back to HIPS, below both wrists. Fill the selected region with natural solid black veil fabric and subtle dark charcoal vertical folds. Cover the blonde hair on the BACK beneath the veil. Replace all long thin ribbon-like tails with the broad filled veil panel; no strings, ribbons, split tails, exposed blonde back hair, or short shoulder hood. Veil hem at hip level around y165. Preserve visible face, front blonde hair, green eyes, white bib, cross, arms, sleeves, hands, rosary bracelets, dress silhouette and stature; do not invent limbs. Exact unmasked pixels remain unchanged; transparent outside silhouette, crisp pixel edges.",
           "status": "processing",
           "image_id": "bd1cca22-5203-571b-9497-0e7d717a58f3",
           "job_kind": "creator-image",
-          "progress": 0.05,
-          "generation_started_at": "2026-10-23T23:05:37.566998+00:00"
+          "progress": 0.75,
+          "queue_position": 3,
+          "generation_started_at": "2026-10-23T23:05:37.566998+00:00",
+          "estimated_wait_seconds": 231
         }
       }
     },
@@ -20894,14 +20902,16 @@
           "type": "message_progress",
           "model": "inpaint_pro_flash",
           "width": 128,
-          "action": "Generating image",
+          "action": "Correcting pixels",
           "height": 256,
           "prompt": "Correct the BLACK NUN VEIL: it must be ONE WIDE CONTINUOUS SHEET OF BLACK CLOTH hanging from the head down the back to HIPS, below both wrists. Fill the selected region with natural solid black veil fabric and subtle dark charcoal vertical folds. Cover the blonde hair on the BACK beneath the veil. Replace all long thin ribbon-like tails with the broad filled veil panel; no strings, ribbons, split tails, exposed blonde back hair, or short shoulder hood. Veil hem at hip level around y165. Preserve visible face, front blonde hair, green eyes, white bib, cross, arms, sleeves, hands, rosary bracelets, dress silhouette and stature; do not invent limbs. Exact unmasked pixels remain unchanged; transparent outside silhouette, crisp pixel edges.",
           "status": "processing",
           "image_id": "0e023f45-e8b9-510d-97a0-6c3df8e9184f",
           "job_kind": "creator-image",
-          "progress": 0.05,
-          "generation_started_at": "2026-10-23T23:05:38.572298+00:00"
+          "progress": 0.75,
+          "queue_position": 3,
+          "generation_started_at": "2026-10-23T23:05:38.572298+00:00",
+          "estimated_wait_seconds": 222
         }
       }
     },
@@ -20937,14 +20947,16 @@
           "type": "message_progress",
           "model": "inpaint_pro_flash",
           "width": 128,
-          "action": "Generating image",
+          "action": "Correcting pixels",
           "height": 256,
           "prompt": "Correct the BLACK NUN VEIL: it must be ONE WIDE CONTINUOUS SHEET OF BLACK CLOTH hanging from the head down the back to HIPS, below both wrists. Fill the selected region with natural solid black veil fabric and subtle dark charcoal vertical folds. Cover the blonde hair on the BACK beneath the veil. Replace all long thin ribbon-like tails with the broad filled veil panel; no strings, ribbons, split tails, exposed blonde back hair, or short shoulder hood. Veil hem at hip level around y165. Preserve visible face, front blonde hair, green eyes, white bib, cross, arms, sleeves, hands, rosary bracelets, dress silhouette and stature; do not invent limbs. Exact unmasked pixels remain unchanged; transparent outside silhouette, crisp pixel edges.",
           "status": "processing",
           "image_id": "a6a761bf-f4b3-5471-b024-d26aff709e9a",
           "job_kind": "creator-image",
-          "progress": 0.05,
-          "generation_started_at": "2026-10-23T23:05:39.120537+00:00"
+          "progress": 0.75,
+          "queue_position": 3,
+          "generation_started_at": "2026-10-23T23:05:39.120537+00:00",
+          "estimated_wait_seconds": 222
         }
       }
     },
@@ -20980,14 +20992,16 @@
           "type": "message_progress",
           "model": "inpaint_pro_flash",
           "width": 128,
-          "action": "Generating image",
+          "action": "Correcting pixels",
           "height": 256,
           "prompt": "Correct the BLACK NUN VEIL: it must be ONE WIDE CONTINUOUS SHEET OF BLACK CLOTH hanging from the head down the back to HIPS, below both wrists. Fill the selected region with natural solid black veil fabric and subtle dark charcoal vertical folds. Cover the blonde hair on the BACK beneath the veil. Replace all long thin ribbon-like tails with the broad filled veil panel; no strings, ribbons, split tails, exposed blonde back hair, or short shoulder hood. Veil hem at hip level around y165. Preserve visible face, front blonde hair, green eyes, white bib, cross, arms, sleeves, hands, rosary bracelets, dress silhouette and stature; do not invent limbs. Exact unmasked pixels remain unchanged; transparent outside silhouette, crisp pixel edges.",
           "status": "processing",
           "image_id": "13642b81-50c0-5f68-a08b-c5e055cd8fc1",
           "job_kind": "creator-image",
-          "progress": 0.05,
-          "generation_started_at": "2026-10-23T23:05:39.811297+00:00"
+          "progress": 0.75,
+          "queue_position": 2,
+          "generation_started_at": "2026-10-23T23:05:39.811297+00:00",
+          "estimated_wait_seconds": 218
         }
       }
     }
@@ -38425,7 +38439,7 @@
       }
     }
   ],
-  "updated_at": 1792796749.3473089,
+  "updated_at": 1792797121.4378355,
   "user_stopped_at": 1792778235.6917784,
   "archived_jobs": {
     "304457e9-6577-44f0-af17-97841a9f6720": {
@@ -39756,7 +39770,7 @@
     "characters_total": 55,
     "images_format_verified": 55,
     "new_images_visually_reviewed": 43,
-    "eight_way_visually_reviewed": 53,
+    "eight_way_visually_reviewed": 54,
     "characters_motions_visually_reviewed": 0,
     "motions_submitted": 3,
     "motions_target": 1100
