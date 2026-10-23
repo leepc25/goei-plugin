@@ -133,11 +133,12 @@ export interface VisitState {
   /** 본부에 온 사람: 상황판 주인공(캐릭터로 플레이)이면 그 요원, 아니면 유저 페르소나(agentId '') */
   visitor: { agentId: string; name: string };
   agents: { id: string; name: string; state: string; situation: string; room: string | null }[];
-  turns: { id: string; at: number; agentId: string; name: string; user: string; reply: string; visitor?: string }[];
+  turns: { id: string; at: number; agentId: string; name: string; user: string; reply: string; visitor?: string; extra?: { agentId: string; name: string; line: string }[] }[];
 }
 export interface GameVisit {
   state(): Promise<VisitState>;
-  send(agentId: string, text: string, which: 'main' | 'aux'): Promise<VisitState>;
+  /** nearby = 같은 방 가까이 있어 끼어들 수 있는 요원 id */
+  send(agentId: string, text: string, which: 'main' | 'aux', nearby?: string[]): Promise<VisitState>;
 }
 
 export interface GameBridge {

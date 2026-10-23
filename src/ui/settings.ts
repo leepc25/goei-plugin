@@ -27,10 +27,11 @@ export interface SettingsEnv {
 /** 원본 테마 변수. 카드 배경 CSS가 이 값으로 갈림 (없으면 라이트) */
 export const THEME_KEY = '$st_fixed_theme';
 
-export const settingsUi = { confirmOff: false, busy: false, notice: '', info: '', scope: 'chat' as SettingsScope, confirm: '' as '' | 'save' | 'load' };
+export const settingsUi = { page: '' as '' | 'visit', confirmOff: false, busy: false, notice: '', info: '', scope: 'chat' as SettingsScope, confirm: '' as '' | 'save' | 'load' };
 
 export function resetSettings(): void {
   settingsUi.confirmOff = false;
+  settingsUi.page = '';
   settingsUi.notice = '';
   settingsUi.scope = 'chat';
   settingsUi.confirm = '';
@@ -164,6 +165,10 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
   if (scope === 'card') {
     return `<main class="gx-body gx-settings">${scopeBar(scope, canChat)}${directoryView(ctx)}${toast('dir', directoryDone(), directoryDoneClear)}</main>${drawerBox(directorySearch(), 'gx-dirdrawer')}`;
   }
+  // 기능별 설정 → 본부 대화: 괴담톡·괴담넷·위키처럼 따로 된 화면 (2026-10-23 사용자)
+  if (settingsUi.page === 'visit' && scope === 'chat' && canChat) {
+    return `<main class="gx-body gx-settings"><header class="ph-room-head"><button class="ph-tool ph-back" data-action="visit-back" aria-label="설정으로">${ICONS.back}</button><div class="ph-room-title"><b>본부 대화 설정</b></div></header>${visitSettings(ctx, ctx.chat.scriptstate)}</main>`;
+  }
   const { basic: s, world, theme } = current(ctx, scope);
   const on = scope === 'chat' ? worldOn(ctx.chat) : s.anomalyOn;
   const busy = settingsUi.busy;
@@ -176,7 +181,7 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
   return `<main class="gx-body gx-settings">
     ${scopeBar(scope, canChat)}
     ${settingsUi.notice ? `<div class="gx-err" role="alert">${esc(settingsUi.notice)}</div>` : ''}
-    ${scope === 'chat' && canChat ? group('기능별 설정', `<div class="st-feats">${[['gnet', '괴담넷', ICONS.gnet], ['phone', '괴담톡', ICONS.phone], ['wiki', '위키', ICONS.wiki]]
+    ${scope === 'chat' && canChat ? group('기능별 설정', `<div class="st-feats">${[['gnet', '괴담넷', ICONS.gnet], ['phone', '괴담톡', ICONS.phone], ['wiki', '위키', ICONS.wiki], ['visit', '본부 대화', ICONS.org]]
       .map(([k, label, icon]) => `<button class="gx-mini st-feat" data-action="feature-set" data-value="${k}">${icon}${label} 설정</button>`)
       .join('')}</div>`) : ''}
     ${group('화면', [
@@ -212,7 +217,6 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
       </div>
     </div></details>
     ${advSections('gen', scope === 'chat' ? ctx.chat.scriptstate : getPrefs().vars, scope === 'chat' && canChat ? { 1: loreCheckBox(ctx) } : {})}
-    ${visitSettings(scope === 'chat' && canChat ? ctx : null, scope === 'chat' ? ctx.chat.scriptstate : getPrefs().vars)}
     ${updateGroup(ctx)}
     ${toast('st', settingsUi.info, (t) => {
       if (settingsUi.info === t) settingsUi.info = '';

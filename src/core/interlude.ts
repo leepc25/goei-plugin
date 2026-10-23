@@ -43,7 +43,7 @@ export function interludeText(g: Interlude, rules: string | null, visitor: strin
       who = t.name;
       parts.push(`\n${safe(t.name)}${t.room ? ` (${ROOM[t.room] ?? t.room})` : ''}`);
     }
-    parts.push(`${safe(t.visitor || visitor)}: ${safe(t.user)}`, `${safe(t.name)}: ${safe(t.reply)}`);
+    parts.push(`${safe(t.visitor || visitor)}: ${safe(t.user)}`, `${safe(t.name)}: ${safe(t.reply)}`, ...(t.extra ?? []).map((e) => `${safe(e.name)}: ${safe(e.line)}`));
   }
   return [INTERLUDE_HEAD, rules?.trim() || DEFAULT_RULES, ...parts].join('\n').replace(/\n{3,}/g, '\n\n');
 }

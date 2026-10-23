@@ -689,6 +689,7 @@ async function handle(action: string, value?: string): Promise<void> {
       if (value === 'phone') Object.assign(phone, { view: 'settings', invite: null, picked: [] });
       else if (value === 'gnet' && GNET_ON) Object.assign(gnet, { settings: true, compose: null, attachMenu: false });
       else if (value === 'wiki') openWikiSettings();
+      else if (value === 'visit') { settingsUi.page = 'visit'; return render(); }
       else return;
       tab = value as Tab;
       notice = '';

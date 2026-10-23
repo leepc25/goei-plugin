@@ -11,6 +11,8 @@ export interface VisitTurn {
   anchor?: string;
   /** 만난 방 (office·lounge·infirmary·quarters) */
   room?: string;
+  /** 요원 답 뒤에 끼어든 옆 요원 말 (설계 2판 7단계) */
+  extra?: { agentId: string; name: string; line: string }[];
 }
 export interface VisitRecord { turns: VisitTurn[] }
 export type VisitRoom = 'office' | 'lounge' | 'infirmary' | 'quarters';
@@ -30,7 +32,7 @@ export function anchorOf(chat: Chat): string {
 }
 export function visitRecord(chat: Chat): VisitRecord {
   const v = chat[VISIT_KEY] as VisitRecord | undefined;
-  return { turns: Array.isArray(v?.turns) ? v.turns.filter(t => t && typeof t.id === 'string' && typeof t.reply === 'string' && typeof t.user === 'string' && typeof t.agentId === 'string').slice(-100) : [] };
+  return { turns: Array.isArray(v?.turns) ? v.turns.filter(t => t && typeof t.id === 'string' && typeof t.reply === 'string' && typeof t.user === 'string' && typeof t.agentId === 'string').slice(-100).map(t => t.extra === undefined ? t : { ...t, extra: Array.isArray(t.extra) ? t.extra.filter(e => e && typeof e.name === 'string' && typeof e.line === 'string') : [] }) : [] };
 }
 /** 모델 응답을 명령으로 실행하지 않고 실제 오간 대화만 저장한다. 본편에는 요청 때 막간으로 끼운다(core/interlude.ts).
  * 0.16.42~43이 넣던 로어북 항목 「본부 방문 대화 기록」은 지운다 */

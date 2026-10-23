@@ -4,12 +4,14 @@ import type { GameVisit, VisitState } from './bridge';
 import { ensureKit, PIXEL_FONT } from './action/ui/kit';
 
 export interface TalkPerson { name: string; x: number; y: number; top: number }
-interface Bubble { who: string; text: string; until: number; pending?: boolean }
+interface Bubble { who: string; text: string; until: number; pending?: boolean; /** 이때부터 보인다 (끼어든 말은 앞 말 뒤에) */ from?: number }
 
 const FONT = (px: number) => `${px}px "${PIXEL_FONT}", "Galmuri11", sans-serif`;
 /** 말을 걸 수 있는 거리 (발 기준 가로). 벗어나면 입력창이 닫힌다 */
 const REACH = 150;
 const BUBBLE_W = 340;
+/** 끼어들 수 있는 거리 (같은 방, 주인공 발 기준 가로) */
+const OVERHEAR = 480;
 
 // 모든 것이 도트 (2026-10-23 사용자): 입력창·기록창은 도트 틀(kit의 panel·slot·row), 글꼴은 도트 글꼴
 const CSS = `
@@ -20,7 +22,10 @@ const CSS = `
 .gt-in{flex:1;min-width:120px;font:inherit;font-size:20px;padding:2px 6px;background:none;color:#fff;outline:none;border-width:7px;border-image-width:7px;text-shadow:2px 2px 0 #000}
 .gt-in::placeholder{color:#8b8574}
 .gt-in:focus,.gt-in:focus-visible{outline:none;box-shadow:none}
-.gt-bar .gk-btn{font-size:18px;padding:0 6px;line-height:1.4;border-width:6px 4px 6px 4px}
+/* 단추: 모서리를 한 칸 깎은 도트 단추 (kit의 메뉴 줄 판은 이 크기에서 찌그러진다) */
+.gt-bar .gk-btn,.gt-bar .gk-btn:hover,.gt-bar .gk-btn:focus-visible{font-size:18px;line-height:1;padding:6px 10px;margin:0 3px;border:0;border-image:none;background:#2b2620;color:#d8d0bc;box-shadow:0 -3px 0 0 #6e6350,0 3px 0 0 #6e6350,-3px 0 0 0 #6e6350,3px 0 0 0 #6e6350,0 6px 0 0 rgba(0,0,0,.55)}
+.gt-bar .gk-btn:hover,.gt-bar .gk-btn:focus-visible{background:#3d3428;color:#ffe27a;box-shadow:0 -3px 0 0 #c9a74a,0 3px 0 0 #c9a74a,-3px 0 0 0 #c9a74a,3px 0 0 0 #c9a74a,0 6px 0 0 rgba(0,0,0,.55);outline:none}
+.gt-bar .gk-btn:active{transform:translateY(3px);box-shadow:0 -3px 0 0 #c9a74a,0 3px 0 0 #c9a74a,-3px 0 0 0 #c9a74a,3px 0 0 0 #c9a74a}
 .gt-bar .gk-btn:disabled{opacity:.4;cursor:default}
 .gt-msg{flex-basis:100%;font-size:16px;color:#ff9a8a;text-shadow:2px 2px 0 #000}
 .gt-msg:empty{display:none}
@@ -52,10 +57,22 @@ export function mountTalk(root: HTMLElement, api: GameVisit) {
   let dead = false;
   const bubbles: Bubble[] = [];
   const me = () => state.visitor.name || '나';
-  const say = (who: string, text: string, pending = false) => {
+  let seen: { people: TalkPerson[]; player: TalkPerson | null } = { people: [], player: null };
+  const say = (who: string, text: string, pending = false, delay = 0) => {
     for (let i = bubbles.length - 1; i >= 0; i--) if (bubbles[i].who === who) bubbles.splice(i, 1);
     // 읽을 시간: 4초 + 글자당 0.08초
-    bubbles.push({ who, text, pending, until: pending ? Infinity : performance.now() + 4000 + [...text].length * 80 });
+    const from = performance.now() + delay;
+    bubbles.push({ who, text, pending, from, until: pending ? Infinity : from + 4000 + [...text].length * 80 });
+  };
+  /** 같은 방에서 가까이 있는 다른 요원 id (끼어들 수 있는 사람) */
+  const nearby = (target: string): string[] => {
+    const p = seen.player;
+    if (!p) return [];
+    return seen.people
+      .filter((q) => q.name !== target && Math.abs(q.x - p.x) < OVERHEAR)
+      .sort((a, b) => Math.abs(a.x - p.x) - Math.abs(b.x - p.x))
+      .map((q) => state.agents.find((a) => a.name === q.name && a.room)?.id ?? '')
+      .filter(Boolean);
   };
   const refresh = () => {
     sendBtn.disabled = busy || !target;
@@ -63,8 +80,8 @@ export function mountTalk(root: HTMLElement, api: GameVisit) {
   };
   const renderLog = () => {
     const agent = state.agents.find((a) => a.name === target);
-    const turns = state.turns.filter((t) => t.agentId === agent?.id).slice(-30);
-    log.textContent = turns.length ? turns.map((t) => `${t.visitor || me()}: ${t.user}\n${t.name}: ${t.reply}`).join('\n\n') : '아직 나눈 말이 없어요.';
+    const turns = state.turns.filter((t) => t.agentId === agent?.id || t.extra?.some((e) => e.agentId === agent?.id)).slice(-30);
+    log.textContent = turns.length ? turns.map((t) => [`${t.visitor || me()}: ${t.user}`, `${t.name}: ${t.reply}`, ...(t.extra ?? []).map((e) => `${e.name}: ${e.line}`)].join('\n')).join('\n\n') : '아직 나눈 말이 없어요.';
     log.scrollTop = log.scrollHeight;
   };
 
@@ -101,10 +118,18 @@ export function mountTalk(root: HTMLElement, api: GameVisit) {
     say(agent.name, '…', true);
     refresh();
     try {
-      state = await api.send(agent.id, text, 'aux');
+      state = await api.send(agent.id, text, 'aux', nearby(agent.name));
       if (dead) return;
-      const reply = state.turns.filter((t) => t.agentId === agent.id).at(-1)?.reply ?? '';
-      say(agent.name, reply);
+      const turn = state.turns.filter((t) => t.agentId === agent.id).at(-1);
+      say(agent.name, turn?.reply ?? '');
+      // 끼어든 말은 앞 말을 읽을 틈을 두고 차례로
+      let delay = 0;
+      let prev = turn?.reply ?? '';
+      for (const e of turn?.extra ?? []) {
+        delay += 900 + [...prev].length * 45;
+        say(e.name, e.line, false, delay);
+        prev = e.line;
+      }
       if (log.hasAttribute('data-open')) renderLog();
     } catch (e) {
       if (dead) return;
@@ -133,6 +158,7 @@ export function mountTalk(root: HTMLElement, api: GameVisit) {
   /** 장면 그리기 끝에 부른다 (월드 좌표). people = 이 방 요원, player = 주인공 발 위치 */
   function draw(c: CanvasRenderingContext2D, people: TalkPerson[], player: TalkPerson | null) {
     const now = performance.now();
+    seen = { people, player };
     for (let i = bubbles.length - 1; i >= 0; i--) if (bubbles[i].until < now) bubbles.splice(i, 1);
     const all = [...people, ...(player ? [{ ...player, name: me() }] : [])];
     // 멀어지면 입력창을 닫는다
@@ -159,16 +185,16 @@ export function mountTalk(root: HTMLElement, api: GameVisit) {
       const isPlayer = !!player && p.name === me() && p.x === player.x;
       const near = !!player && !isPlayer && Math.abs(p.x - player.x) < REACH && Math.abs(p.y - player.y) < 80;
       const x = Math.round(p.x);
-      c.font = FONT(22);
-      const tw = Math.ceil(c.measureText(p.name).width) + 16;
-      const tagBottom = place(x, tw, 28, Math.round(p.y + p.top));
-      tag(c, p.name, x, tagBottom - 14, near || p.name === target || isPlayer);
+      c.font = FONT(TAG_PX);
+      const tw = Math.ceil(c.measureText(p.name).width) + 8;
+      const tagBottom = place(x, tw, 18, Math.round(p.y + p.top));
+      tag(c, p.name, x, tagBottom - 9, near || p.name === target || isPlayer);
       // 내가 입력하는 동안 내 머리 위에 움직이는 점 (말을 보내면 그 말로 바뀐다)
       const typing = isPlayer && !busy && bar.hasAttribute('data-open') && document.activeElement === input && input.value.trim() !== '';
-      const b = bubbles.find((q) => q.who === p.name) ?? (typing ? { who: p.name, text: '', until: Infinity, pending: true } : undefined);
+      const b = bubbles.find((q) => q.who === p.name && (q.from ?? 0) <= now) ?? (typing ? { who: p.name, text: '', until: Infinity, pending: true } : undefined);
       if (b) {
         const size = bubbleSize(c, b, now);
-        const bottom = place(x, size.w + 4, size.h + 16, tagBottom - 30);
+        const bottom = place(x, size.w + 4, size.h + 16, tagBottom - 20);
         bubble(c, size, x, bottom);
       }
     }
@@ -212,14 +238,14 @@ function pixelBox(c: CanvasRenderingContext2D, x: number, y: number, w: number, 
   return { x, y, w, h };
 }
 
+/** 이름표: 상자 없이 작은 글씨와 어두운 테두리만 (2026-10-23 사용자: 투박하다, 튀지 않게) */
+const TAG_PX = 12;
 function tag(c: CanvasRenderingContext2D, name: string, x: number, y: number, bright: boolean) {
-  c.font = FONT(22);
-  const w = Math.ceil(c.measureText(name).width) + 18;
-  pixelBox(c, x - w / 2, y - 15, w, 30, bright ? '#1a1612' : 'rgba(18,16,14,.7)', bright ? '#ffe27a' : 'rgba(120,112,96,.8)', bright);
-  c.fillStyle = '#000';
-  c.fillText(name, x + 2, y + 3);
-  c.fillStyle = bright ? '#ffe27a' : '#cfc8b4';
-  c.fillText(name, x, y + 1);
+  c.font = FONT(TAG_PX);
+  c.fillStyle = 'rgba(0,0,0,.75)';
+  for (const [dx, dy] of [[-1, 0], [1, 0], [0, -1], [0, 1], [1, 1]]) c.fillText(name, x + dx, y + dy);
+  c.fillStyle = bright ? '#ece6d6' : 'rgba(206,200,186,.72)';
+  c.fillText(name, x, y);
 }
 
 function wrap(c: CanvasRenderingContext2D, text: string, max: number): string[] {

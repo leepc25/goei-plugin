@@ -1,7 +1,7 @@
 import type { GameVisit, VisitState } from '../../game/bridge';
 import { cardSnapshot } from '../../core/gamelink';
 import { anchorOf, visitRecord, visitRoom, withoutOldLore, withVisitTurn, type VisitTurn } from '../../core/visit';
-import { agentLore, parseVisitLine, visitPrompt, type VisitLine } from '../../core/visitPrompt';
+import { agentLore, parseVisitGroup, visitPrompt, type VisitAgent, type VisitLine } from '../../core/visitPrompt';
 import { advValue, budgetFor } from '../../core/advanced';
 import { fitPrompt } from '../../core/budget';
 import type { RefSource } from '../../core/refs';
@@ -54,7 +54,7 @@ export function createVisit(): GameVisit {
       if (clean !== c.chat) await updateChat(c.charIndex, c.chatIndex, chat => chat.id === c.chat.id ? withoutOldLore(chat) : null).catch(() => null);
       return stateOf(c);
     },
-    async send(agentId, input, which) {
+    async send(agentId, input, which, nearby = []) {
       if (busy || isWaiting()) throw new Error('진행 중인 응답이 끝난 뒤 보내 주세요.');
       const text = input.trim();
       if (!text || text.length > 2000) throw new Error('대화는 1~2000자로 입력해 주세요.');
@@ -74,24 +74,40 @@ export function createVisit(): GameVisit {
         // 이번 막간 = 지금 마지막 메시지 뒤에서 나눈 말 (본편이 한 턴 진행되면 새 막간)
         const anchor = anchorOf(c.chat);
         const now = visitRecord(c.chat).turns.filter(t => (t.anchor ?? '') === anchor);
-        const lines = (ts: VisitTurn[]): VisitLine[] => ts.flatMap(t => [{ speaker: t.visitor || visitorName, text: t.user }, { speaker: t.name, text: t.reply }]);
-        const others = [...new Set(now.filter(t => t.agentId !== agentId).map(t => t.name))];
+        const lines = (ts: VisitTurn[]): VisitLine[] => ts.flatMap(t => [{ speaker: t.visitor || visitorName, text: t.user }, { speaker: t.name, text: t.reply }, ...(t.extra ?? []).map(e => ({ speaker: e.name, text: e.line }))]);
+        // 이 요원이 말했거나 끼어든 대화는 이 요원과의 대화로 본다
+        const withHim = (t: VisitTurn) => t.agentId === agentId || !!t.extra?.some(e => e.agentId === agentId);
+        const others = [...new Set(now.filter(t => !withHim(t)).map(t => t.name))];
+        // 끼어들 수 있는 요원: 게임이 알려 준 가까운 요원 중 같은 방에서 만날 수 있고 로어북이 있는 사람 (최대 3)
+        const room = visitRoom(a);
+        const bystanders: VisitAgent[] = [];
+        for (const id of [...new Set(nearby)].slice(0, 6)) {
+          const b = id !== agentId && id !== me?.id ? cardSnapshot(c.char, c.chat).agents.find(x => x.id === id) : undefined;
+          if (!b || visitRoom(b) !== room) continue;
+          const r = readDirectory(c.char.globalLore ?? []).agents.find(x => x.id === id);
+          const bl = agentLore(src, r?.lore || b.name);
+          if (bl) bystanders.push({ id, name: b.name, rank: r?.rank, state: b.state, situation: b.situation, room: room ?? '', lore: bl });
+          if (bystanders.length >= 3) break;
+        }
         const ss = c.chat.scriptstate;
         const prompt = fitPrompt(budgetFor(ss, 'hq'), () => visitPrompt(src, {
           agent: { id: a.id, name: a.name, rank: row?.rank, state: a.state, situation: a.situation, room: visitRoom(a) ?? '', lore },
           visitor: visitorName,
-          conversation: lines(now.filter(t => t.agentId === agentId)),
-          elsewhere: others.map(n => ({ agent: n, lines: lines(now.filter(t => t.name === n)) })),
+          conversation: lines(now.filter(withHim)),
+          elsewhere: others.map(n => ({ agent: n, lines: lines(now.filter(t => t.name === n && !withHim(t))) })),
+          bystanders,
           said: text,
           skipBooks: me ? [me.lore] : [],
         }, factionNamesOf(c)));
         const model = advValue(ss, 'hq', 'model') === 'main' ? 'main' : 'aux';
         void which;
         const raw = await runModel(prompt.messages, model);
-        const reply = parseVisitLine(raw, a.name, prompt.limit);
-        lastExchange = { at: Date.now(), model, messages: prompt.messages, raw, reply };
+        const got = parseVisitGroup(raw, a.name, prompt.bystanders, prompt.limit);
+        const reply = got.line;
+        const extra = got.extra.map(e => ({ agentId: bystanders.find(b => b.name === e.speaker)!.id, name: e.speaker, line: e.line }));
+        lastExchange = { at: Date.now(), model, messages: prompt.messages, raw, reply: [reply, ...extra.map(e => `${e.name}: ${e.line}`)].join('\n') };
         // If the active chat changes during inference, save only to the captured origin.
-        const turn: VisitTurn = { id: crypto.randomUUID(), at: Date.now(), agentId, name: a.name, user: text, reply, anchor, room: visitRoom(a) ?? undefined, ...(me ? { visitor: me.name } : {}) };
+        const turn: VisitTurn = { id: crypto.randomUUID(), at: Date.now(), agentId, name: a.name, user: text, reply, anchor, room: visitRoom(a) ?? undefined, ...(me ? { visitor: me.name } : {}), ...(extra.length ? { extra } : {}) };
         const char = await risuai.getCharacterFromIndex(c.charIndex) as { chaId?: string } | null;
         if (!char || char.chaId !== c.char.chaId) throw new Error('원래 카드가 바뀌어 대화를 저장하지 못했어요.');
         const saved = await updateChat(c.charIndex, c.chatIndex, chat => {

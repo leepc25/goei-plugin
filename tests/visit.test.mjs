@@ -9,7 +9,7 @@ const dir = await mkdtemp(join(tmpdir(), 'goei-visit-'));
 await build({ entryPoints: ['src/core/visit.ts', 'src/core/visitPrompt.ts', 'src/core/interlude.ts', 'src/host/game/visit.ts'], outdir: dir, outbase: 'src', bundle: true, platform: 'node', format: 'esm', outExtension: { '.js': '.mjs' }, define: { __PLUGIN_VERSION__: '"test"', __UPDATE_BASE__: '""' }, logLevel: 'silent' });
 const { visitRoom, visitRecord, withVisitTurn, VISIT_LORE } = await import(pathToFileURL(join(dir, 'core/visit.mjs')));
 const { createVisit } = await import(pathToFileURL(join(dir, 'host/game/visit.mjs')));
-const { parseVisitLine, clipLine } = await import(pathToFileURL(join(dir, 'core/visitPrompt.mjs')));
+const { parseVisitLine, parseVisitGroup, clipLine } = await import(pathToFileURL(join(dir, 'core/visitPrompt.mjs')));
 const { withInterludes, orphanTurns, INTERLUDE_HEAD } = await import(pathToFileURL(join(dir, 'core/interlude.mjs')));
 const GUIDE = (await import('node:fs')).readFileSync('card/visit-guide.txt', 'utf8');
 await rm(dir, { recursive: true, force: true });
@@ -116,4 +116,58 @@ test('interlude finds the right one of two identical replies', () => {
   const out=withInterludes(req,chat,null,'주인공');
   assert.equal(out[1].role,'system');
   assert.equal(out[2].content,'다음');
+});
+
+test('nearby agents may chime in: one call, addressed agent first, at most two bystanders, saved and carried into the interlude', async () => {
+  const ag=(id,name)=>({id,name,english:name,lore:name,affiliation:'A00',rank:'요원',aliases:[],roster_for:['A00'],phone_tabs:[]});
+  const roster={version:2,characters:[ag('P001','에일린'),ag('P002','데드폴'),ag('P003','큐라스')]};
+  const char={chaId:'card-1',name:'괴이',globalLore:[{comment:'Agent roster',content:JSON.stringify(roster)},{comment:'에일린',content:'에일린 설정'},{comment:'데드폴',content:'데드폴 설정'},{comment:'큐라스',content:'큐라스 설정'},{comment:'Visit',content:GUIDE}]};
+  const temp=await mkdtemp(join(tmpdir(),'goei-world-'));
+  await build({entryPoints:['src/core/world/index.ts'],outfile:join(temp,'world.mjs'),bundle:true,platform:'node',format:'esm',logLevel:'silent'});
+  const { WORLD_KEY, emptyWorld }=await import(pathToFileURL(join(temp,'world.mjs')));
+  await rm(temp,{recursive:true,force:true});
+  const w=emptyWorld();
+  w.agents.P001={st:'내근',situation:'서류',tagged:true}; w.agents.P002={st:'내근',situation:'장비',tagged:true}; w.agents.P003={st:'휴게',situation:'커피',tagged:true};
+  const chats=[{id:'one',message:[{role:'char',data:'사무실',chatId:'c1'}],scriptstate:{[WORLD_KEY]:JSON.stringify(w)}}];
+  let request, result='{"lines":[{"speaker":"에일린","line":"거의 다 됐어요."},{"speaker":"데드폴","line":"*끼어들며* 장비도 끝났어."},{"speaker":"큐라스","line":"다른 방이라 못 들음"},{"speaker":"데드폴","line":"두 번째"}]}';
+  globalThis.risuai={
+    getCurrentCharacterIndex:async()=>0,getCurrentChatIndex:async()=>0,
+    getCharacterFromIndex:async()=>structuredClone(char),getChatFromIndex:async(_,i)=>structuredClone(chats[i]),
+    setChatToIndex:async(_,i,c)=>{chats[i]=c;},parseRisuChat:async s=>s==='{{user}}'?'방문자':'',
+    runLLMModel:async r=>{request=r;return {type:'success',result};},
+  };
+  const api=createVisit();
+  await api.state();
+  const st=await api.send('P001','서류 다 됐어?','aux',['P002','P003','P001']);
+  assert.match(request.messages[0].content,/bystanders/);
+  assert.match(request.messages[0].content,/"lines"/);
+  const body=JSON.parse(request.messages[1].content);
+  assert.deepEqual(body.bystanders.map(b=>b.name),['데드폴']); // 휴게실 큐라스와 자기 자신은 빠진다
+  assert.equal(body.bystanders[0].lore,'데드폴 설정');
+  const turn=st.turns.at(-1);
+  assert.equal(turn.reply,'거의 다 됐어요.');
+  assert.deepEqual(turn.extra,[{agentId:'P002',name:'데드폴',line:'장비도 끝났어.'}]);
+  // 데드폴에게 말을 걸면 끼어든 말도 데드폴과의 대화로 들어간다
+  result='{"lines":[{"speaker":"데드폴","line":"응?"}]}';
+  await api.send('P002','그래?','aux',[]);
+  const body2=JSON.parse(request.messages[1].content);
+  assert.ok(!body2.bystanders);
+  assert.match(request.messages[0].content,/OUTPUT|line/);
+  assert.ok(body2.conversation.some(l=>l.speaker==='데드폴'&&l.text==='장비도 끝났어.'));
+  const out=withInterludes([{role:'assistant',content:'사무실'}],chats[0],null,'주인공');
+  assert.match(out[1].content,/에일린: 거의 다 됐어요\.\n데드폴: 장비도 끝났어\./);
+  // 끼어들기를 끄면 혼자 답하는 형식
+  chats[0].scriptstate.$hq_adv_interject='0';
+  result='{"line":"네."}';
+  await api.send('P001','고마워','aux',['P002']);
+  assert.ok(!JSON.parse(request.messages[1].content).bystanders);
+  assert.ok(!request.messages[0].content.includes('bystanders'));
+});
+
+test('group reply parsing', () => {
+  assert.deepEqual(parseVisitGroup('{"line":"네."}','에일린',['데드폴'],80),{line:'네.',extra:[]});
+  assert.deepEqual(parseVisitGroup('{"lines":[{"line":"이름 없는 첫 줄"}]}','에일린',[],80),{line:'이름 없는 첫 줄',extra:[]});
+  assert.deepEqual(parseVisitGroup('{"lines":[{"speaker":"데드폴","line":"먼저 말함"},{"speaker":"에일린","line":"제 답이에요."}]}','에일린',['데드폴'],80),{line:'제 답이에요.',extra:[{speaker:'데드폴',line:'먼저 말함'}]});
+  assert.equal(parseVisitGroup('에일린: 산문 답이에요.','에일린',['데드폴'],80).line,'산문 답이에요.');
+  assert.throws(()=>parseVisitGroup('{"lines":[{"speaker":"데드폴","line":"나만"}]}','에일린',['데드폴'],80),/대사/);
 });

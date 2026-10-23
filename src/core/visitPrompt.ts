@@ -21,10 +21,12 @@ export interface VisitPromptInput {
   /** 같은 막간에 다른 요원과 나눈 말 */
   elsewhere: { agent: string; lines: VisitLine[] }[];
   said: string;
+  /** 같은 방 가까이 있어 끼어들 수 있는 요원 (설계 2판 7단계). 비면 혼자 답한다 */
+  bystanders?: VisitAgent[];
   /** 따로 넣었으니 참고 자료에서 뺄 로어북 (주인공 요원의 로어북) */
   skipBooks?: string[];
 }
-export interface VisitPrompt { messages: { role: 'system' | 'user'; content: string }[]; limit: number }
+export interface VisitPrompt { messages: { role: 'system' | 'user'; content: string }[]; limit: number; /** 끼어들기 형식으로 보냈으면 그 요원 이름들 */ bystanders: string[] }
 
 const LANGUAGE = 'Reply in the dominant language of the actual conversation; default to Korean when no conversation is available.';
 const ROOM: Record<string, string> = { office: '사무실', lounge: '휴게실', infirmary: '의무실', quarters: '숙소' };
@@ -32,9 +34,15 @@ const ROOM: Record<string, string> = { office: '사무실', lounge: '휴게실',
 /** 카드에 「Visit」 로어북이 있는지 (없으면 카드 업데이트 안내) */
 export const hasVisitGuide = (src: RefSource): boolean => Object.keys(policySections(src.char.globalLore, VISIT_BOOK)).length > 0;
 
-function rules(src: RefSource, limit: number): string {
+/** 옛 카드(끼어들기 항목 없음)면 혼자 답하는 형식으로 */
+export const canInterject = (src: RefSource): boolean => {
   const p = policySections(src.char.globalLore, VISIT_BOOK);
-  const need = ['COMMON', 'REPLY', 'OUTPUT_REPLY'];
+  return p.INTERJECT !== undefined && p.OUTPUT_GROUP !== undefined;
+};
+
+function rules(src: RefSource, limit: number, group: boolean): string {
+  const p = policySections(src.char.globalLore, VISIT_BOOK);
+  const need = group ? ['COMMON', 'REPLY', 'INTERJECT', 'OUTPUT_GROUP'] : ['COMMON', 'REPLY', 'OUTPUT_REPLY'];
   const missing = need.filter((k) => p[k] === undefined);
   if (missing.length) throw new VisitError(Object.keys(p).length ? `Visit 로어북의 ${missing.join(', ')} 항목이 없어요.` : '카드에 본부 대화 지침(Visit 로어북)이 없어요. 설정 → 업데이트로 카드를 업데이트해 주세요.');
   const text = need.map((k) => p[k].replace(/__LIMIT_LINE__/g, String(limit)).replace(/<!--[\s\S]*?-->/g, '').trim());
@@ -58,6 +66,7 @@ export function visitPrompt(src: RefSource, input: VisitPromptInput, names: Reco
     for (const c of t.char) recentStory.push({ role: 'char', text: c, turn: i + 1 });
   });
   const t = refToggles(ss, 'hq');
+  const by = advOn(ss, 'hq', 'interject') && canInterject(src) ? (input.bystanders ?? []).filter((b) => b.name !== input.agent.name) : [];
   const talk = [...input.conversation.map((l) => l.text), input.said].join('\n');
   const rows = collectRefs(src, {
     scope: 'phone', text: `${talk}\n${recentStory.map((m) => m.text).join('\n')}`, description: t.description, authors: t.authors, persona: t.persona,
@@ -70,10 +79,11 @@ export function visitPrompt(src: RefSource, input: VisitPromptInput, names: Reco
     else if (r.kind === 'base' && r.sources.includes('작가 노트')) universe.authorsNote = r.content;
     else if (r.kind === 'base' && r.sources.includes(PERSONA_SOURCE)) protagonist = r.content;
     // 대화 상대 요원 글은 agent.lore에, 주인공 요원 글은 protagonist에 이미 있다
-    else if (r.content !== input.agent.lore && !r.sources.some((x) => input.skipBooks?.includes(x))) universe.activeLoreBooks.push({ source: r.sources.join(' / '), content: r.content, kind: r.kind });
+    else if (r.content !== input.agent.lore && !by.some((b) => b.lore === r.content) && !r.sources.some((x) => input.skipBooks?.includes(x))) universe.activeLoreBooks.push({ source: r.sources.join(' / '), content: r.content, kind: r.kind });
   }
   const body = {
     agent: { name: input.agent.name, ...(input.agent.rank ? { rank: input.agent.rank } : {}), lore: input.agent.lore, status: input.agent.state, situation: input.agent.situation, where: ROOM[input.agent.room] ?? input.agent.room },
+    ...(by.length ? { bystanders: by.map((b) => ({ name: b.name, ...(b.rank ? { rank: b.rank } : {}), lore: b.lore, status: b.state, situation: b.situation })) } : {}),
     protagonist: { name: input.visitor, ...(protagonist ? { lore: protagonist } : {}) },
     universe,
     recentStory,
@@ -83,8 +93,9 @@ export function visitPrompt(src: RefSource, input: VisitPromptInput, names: Reco
   };
   return {
     limit,
+    bystanders: by.map((b) => b.name),
     messages: [
-      { role: 'system', content: factionCodesToNames(rules(src, limit), names) },
+      { role: 'system', content: factionCodesToNames(rules(src, limit, by.length > 0), names) },
       { role: 'user', content: factionCodesToNames(JSON.stringify(body), names) },
     ],
   };
@@ -134,4 +145,36 @@ export function parseVisitLine(raw: string, speaker: string, limit: number): str
   const line = clipLine(cleanLine(text, speaker, prose), limit);
   if (!line) throw new VisitError('모델 응답에서 대사를 찾지 못했어요.');
   return line;
+}
+
+export interface VisitReply { line: string; extra: { speaker: string; line: string }[] }
+
+/** 끼어들기 형식 응답 → 상대 요원 대사 + 옆 요원 말 (최대 2). 상대 대사가 없으면 VisitError.
+ * JSON이 아니면 혼자 답한 것으로 보고 parseVisitLine으로 */
+export function parseVisitGroup(raw: string, speaker: string, bystanders: string[], limit: number): VisitReply {
+  type Row = { speaker?: unknown; line?: unknown };
+  let rows: Row[] | null = null;
+  try {
+    const v = parseJsonPayload(raw) as { lines?: unknown; line?: unknown } | null;
+    if (v && Array.isArray(v.lines)) rows = (v.lines as unknown[]).filter((r): r is Row => !!r && typeof r === 'object');
+    else if (v && typeof v.line === 'string') rows = [{ speaker, line: v.line }];
+  } catch {
+    /* 아래에서 원문으로 */
+  }
+  if (!rows) return { line: parseVisitLine(raw, speaker, limit), extra: [] };
+  const name = (x: unknown) => String(x ?? '').trim();
+  const say = (r: Row) => clipLine(cleanLine(String(r.line ?? ''), name(r.speaker)), limit);
+  // 상대 요원 대사: 이름이 맞는 첫 줄, 없으면 이름 없는 첫 줄
+  const mine = rows.find((r) => name(r.speaker) === speaker) ?? rows.find((r) => !name(r.speaker));
+  const line = mine ? say(mine) : '';
+  if (!line) throw new VisitError('모델 응답에서 대사를 찾지 못했어요.');
+  const extra: VisitReply['extra'] = [];
+  for (const r of rows) {
+    const who = name(r.speaker);
+    if (r === mine || !bystanders.includes(who) || extra.some((e) => e.speaker === who)) continue;
+    const l = say(r);
+    if (l) extra.push({ speaker: who, line: l });
+    if (extra.length >= 2) break;
+  }
+  return { line, extra };
 }

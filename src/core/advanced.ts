@@ -149,6 +149,7 @@ export const ADV: Record<AdvFeature, AdvGroup[]> = {
     },
     {
       title: '대화',
+      chips: [chip('interject', '옆 요원 끼어들기', 1)],
       items: [
         { key: 'model', label: '대화 모델', type: 'pick', def: 'aux', opts: [['aux', '보조'], ['main', '메인']] },
         num('line_chars', '답 길이', 80, 20, 400, '자', { hint: '말풍선 한 장은 80자 안팎이에요' }),

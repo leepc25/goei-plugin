@@ -1,6 +1,7 @@
 // 설정 → 본부 대화 (2026-10-22 설계 2판 6단계): 보낼 자료·모델·길이와, 실제로 보낸 것·본편에 들어갈 막간 보기.
 import { advSections } from './advanced';
 import { keepOpen } from './panels';
+import { settingsUi } from './settings';
 import { interludes, interludeText, orphanTurns } from '../core/interlude';
 import { tokens } from '../core/gnet';
 import { policySections } from '../core/refs';
@@ -18,7 +19,7 @@ const fold = (key: string, title: string, body: string) => `<details class="ps-a
 export const visitUi = { confirmClear: false };
 
 export function visitSettings(ctx: ChatContext | null, state: Record<string, unknown> | undefined): string {
-  const head = `<section class="ps-group"><h3>본부 대화</h3><p class="ps-note">본부 방문에서 요원과 나눈 말은 다음 본편 요청 때 그 자리(대화한 때의 마지막 답 바로 뒤)에 막간으로 들어가요. 지침은 카드의 「Visit」 로어북에 있어요.</p></section>`;
+  const head = `<section class="ps-group"><p class="ps-note">본부 방문에서 요원과 나눈 말은 다음 본편 요청 때 그 자리(대화한 때의 마지막 답 바로 뒤)에 막간으로 들어가요. 지침은 카드의 「Visit」 로어북에 있어요.</p></section>`;
   if (!ctx) return head + advSections('hq', state);
   const chat = ctx.chat;
   const me = playerAgent(ctx.char.globalLore, chat.scriptstate);
@@ -58,6 +59,12 @@ function prettyJson(s: string): string {
 }
 
 export async function handleVisitSettings(action: string, ctx: ChatContext, render: () => void, refresh: () => Promise<void>): Promise<boolean> {
+  if (action === 'visit-back') {
+    visitUi.confirmClear = false;
+    settingsUi.page = '';
+    render();
+    return true;
+  }
   if (action === 'visit-orphans' || action === 'visit-orphans-no') {
     visitUi.confirmClear = action === 'visit-orphans';
     render();
