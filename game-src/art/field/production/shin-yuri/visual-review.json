@@ -1,0 +1,14 @@
+{
+  "job": "e464915e-93b8-4980-9732-f5871953ed86",
+  "job_status": "completed",
+  "decision": "pass",
+  "reason": "원작의 뒤로 넘긴 검은 묶음머리·드러난 이마·단단한 어깨·검은 바이커 재킷·회색 라운드셔츠·검은 바지·부츠 대조. 모발과 부츠 포함209px, 여성 키 범위. 정면·외곽 정상.",
+  "at": 1792792430.0135972,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

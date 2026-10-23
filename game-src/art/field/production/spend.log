@@ -175,9 +175,9 @@ f6c1a6fc-e1d9-4b0f-9971-06c6e4dbefcf	jin-na-sol	registration		completed	{"type":
 79d54a0f-1b11-4caf-afd2-829ad8052757	lee-seong-hae	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
 bab23124-d118-4b1e-b54f-58e796cf07a7	lee-ja-heon	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
 f7cb3352-6700-4b92-8f6a-5dd9abd550f4	baek-sa-heon	registration		completed	{"type": "generations", "generations": 4.0}
-729bd070-f50e-47fe-a1bf-3a88153558cb	go-young-eun	registration		processing	null
-16dc7d48-8701-4e5c-9d11-36606a2123f6	kwak-je-gang	registration		processing	null
-beb71d9c-d512-48fa-854b-7964e45b6649	no-gi-gyun	registration		processing	null
+729bd070-f50e-47fe-a1bf-3a88153558cb	go-young-eun	registration		completed	{"type": "generations", "generations": 4.0}
+16dc7d48-8701-4e5c-9d11-36606a2123f6	kwak-je-gang	registration		completed	{"type": "generations", "generations": 4.0}
+beb71d9c-d512-48fa-854b-7964e45b6649	no-gi-gyun	registration		completed	{"type": "generations", "generations": 4.0}
 0f784410-ce1f-43e8-85ff-b5431aec8137	lee-yeon-hwa	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
 43779337-3a91-47ea-8488-de9d8ef98956	lee-byeong-jin	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
 721d1a17-9804-4fa7-8ef8-7069e2588c61	jay	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
@@ -186,18 +186,30 @@ beb71d9c-d512-48fa-854b-7964e45b6649	no-gi-gyun	registration		processing	null
 a1dee1b6-2ba5-4b38-bb12-bcfa1221552f	cheong-dal-lae	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
 bfaec31c-775c-44f0-bed5-538a3efcb57d	lee-seong-hae	registration		processing	null
 833ae0ce-09fb-4e28-b560-726df7acd16e	cha-yeo-jin	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
-44e1171b-f408-4556-98b8-05af01d0db2c	jang-heo-un	image		processing	null
-c721800a-1c1a-46f0-90c1-cf2e9c66eae9	seo-yun-ji	image		processing	null
-9ae5c48b-d9ea-454c-9c24-270560fb1a3a	go-yeon-ji	image		processing	null
-0db332dc-7f99-4b4a-84c7-17bdc395ae40	yun-ji-a	image		processing	null
-02b434c1-5096-4b3a-a855-e93482e565b1	ma-deok-hee	image		processing	null
-3c5a9716-28ed-43ea-b88c-75f92a0e1ab6	mun-hye-ran	image		processing	null
-e464915e-93b8-4980-9732-f5871953ed86	shin-yuri	image		processing	null
-124f2988-2c22-4b10-901a-0cc09cc5f1ed	blaret	image		processing	null
-093bd367-7b6f-4606-8958-8a1a2c8bf4f3	saladin	image		processing	null
+44e1171b-f408-4556-98b8-05af01d0db2c	jang-heo-un	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+c721800a-1c1a-46f0-90c1-cf2e9c66eae9	seo-yun-ji	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+9ae5c48b-d9ea-454c-9c24-270560fb1a3a	go-yeon-ji	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+0db332dc-7f99-4b4a-84c7-17bdc395ae40	yun-ji-a	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+02b434c1-5096-4b3a-a855-e93482e565b1	ma-deok-hee	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+3c5a9716-28ed-43ea-b88c-75f92a0e1ab6	mun-hye-ran	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+e464915e-93b8-4980-9732-f5871953ed86	shin-yuri	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+124f2988-2c22-4b10-901a-0cc09cc5f1ed	blaret	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+093bd367-7b6f-4606-8958-8a1a2c8bf4f3	saladin	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
 4369a79b-d399-4fd6-9b63-f3f81af4c88f	lee-yeon-hwa	registration		processing	null
 3a357db9-8465-422e-8639-25913e05af4a	lee-byeong-jin	registration		processing	null
 37ea908d-f39f-4bb1-959d-8be0f487720b	jay	registration		processing	null
 487b6f5d-03ca-4f9c-a404-29861a7d3bd3	ho-yu-won	registration		processing	null
 23a36d4b-9f08-4165-a6d1-3017475bd16e	cheong-dal-lae	registration		processing	null
 ee93e07e-c778-4160-9535-29aaefd70c9c	avensha	image		processing	null
+8231c302-e2fd-48d8-ab4c-4cfe04785808	cha-yeo-jin	registration		processing	null
+49f50cbc-3c79-4f23-8835-3cbea51c83a5	secriem	image		processing	null
+2a5a3aee-9530-48f5-8e80-e770facc5a11	go-young-eun	registration		processing	null
+6aca27e9-15dc-4bbe-ae77-2156ddbbf513	kwak-je-gang	registration		processing	null
+be4b8d4b-01a5-425c-8358-407fa75577ec	brownie	image		processing	null
+6fa8c4eb-2d7b-4deb-87f8-40c37d7e2c98	aestheticism	image		processing	null
+fbe504f0-84fd-4d97-8056-a2c5a3198d75	seo-yun-ji	registration		processing	null
+69400875-73d7-4288-83fa-72d8b3a79d3b	yun-ji-a	registration		processing	null
+5bba1f28-8f10-409c-8b93-ae523046558f	mun-hye-ran	registration		processing	null
+76fa246d-7c0f-4029-a9dd-b3d202836934	shin-yuri	registration		processing	null
+82dc8eed-43b9-433a-aa58-dc4ba39c1a82	blaret	registration		processing	null
+1f201d3e-fc8c-44b5-b508-c14a58d5e02d	saladin	registration		processing	null

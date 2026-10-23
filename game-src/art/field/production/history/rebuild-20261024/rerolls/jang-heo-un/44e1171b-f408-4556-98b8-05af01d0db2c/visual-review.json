@@ -1,0 +1,14 @@
+{
+  "job": "44e1171b-f408-4556-98b8-05af01d0db2c",
+  "job_status": "completed",
+  "decision": "reroll",
+  "reason": "열린 셔츠와 느슨한 타이는 교정됐지만 원작의 어깨를 덮는 장발이 목 길이로 짧아짐. 옆머리만 마스크 교정하고 얼굴·복장·체격은 RGBA 그대로 보존.",
+  "at": 1792792467.13688,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

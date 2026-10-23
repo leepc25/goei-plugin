@@ -1,0 +1,46 @@
+{
+  "at": 1792792341.7455032,
+  "slug": "go-young-eun",
+  "reason": "등록 작업 completed, 회전8장 있으나 skeletons:null. 전체 계정 작업 조회에서도 해당 등록은 종료. 공식 문서에 관절만 복구하는 경로 없어 검수된 정면을 유지하여 재등록.",
+  "state_before": {
+    "name": "고영은",
+    "group": "baekilmong",
+    "character_id": "38d2f10b-164d-4b3b-9c2a-5def8647e9d9",
+    "image": "46eb4795-49b3-48b9-aeb9-375b4d9f1aec",
+    "registration": "729bd070-f50e-47fe-a1bf-3a88153558cb",
+    "motions": {},
+    "ready": false,
+    "visual_rejections": [
+      {
+        "job": "8deca375-3192-487b-a642-c7838b493969",
+        "decision": "reroll",
+        "reason": "얼굴이 측면으로 돌아감, 본체 키가 여성200–206px보다 큼.",
+        "at": 1792789418.1042688,
+        "rules_rechecked": [
+          "AVIF primary identity",
+          "lore/user height",
+          "south-facing",
+          "transparent edge without gray halo",
+          "no motions before all roster eight-way review"
+        ]
+      },
+      {
+        "job": "3181940f-a221-488d-80f7-05f483c19819",
+        "job_status": "completed",
+        "decision": "reroll",
+        "reason": "작은 캔버스 방식에서 키180px 미만으로 출력. 원작 단발·부드러운 체형을 유지하며 은하제 여성 정면·키 참조로 교체.",
+        "at": 1792790259.0230458,
+        "rules_rechecked": [
+          "AVIF primary identity",
+          "lore/user height",
+          "south-facing",
+          "transparent edge without gray halo",
+          "no motions before all roster eight-way review"
+        ],
+        "new_style_source": "eun-ha-je"
+      }
+    ],
+    "image_verified": true,
+    "image_visually_reviewed": true
+  }
+}

@@ -2083,13 +2083,13 @@
     "source_images_visually_reviewed": true,
     "character_id": null,
     "pixel_request": {
-      "description": "Full-body native pixel-art game sprite, STRICTLY FRONT SOUTH view: face, nose, chest, belt and knees directly toward viewer, both ears equally visible. No sideways head or three-quarter turn. IDENTITY: Tall lean adult man with slightly slouched posture, long narrow pale face, pronounced dark under-eye shadows, tired half-lidded gray-brown eyes, small weary smile. LONG dark BROWN layered hair extending past shoulders, center part, long curved side locks and outward-flipped ends, untied. Navy suit, white shirt and navy tie. No mask. Relaxed upright stance, empty hands at sides. Natural adult anatomy, normal torso/pelvis, 7-head proportions. Anatomical crown to soles 230-238px; feet 6px above bottom, hair fully inside frame. Crisp single-pixel clusters, selective dark outlines, restrained game-sprite shading, no antialiasing. Transparent background, no ground shadow, text or weapons. Preserve individual hair, face, stature and clothing. Do not copy any generic character. Anatomical height excludes high hair/headwear. Every outer edge must border transparency directly, never a light gray halo. Use target anatomical height at reference pixel scale. Feet at y250, crown around y16. Do not copy reference identity or body fat. Crucial: unbuttoned open white shirt collar showing lower neck and upper chest; loosened navy tie knot hangs below open collar. Dark charcoal-brown layered shoulder-length hair, sleepy tired grey eyes and under-eye shadows. Never closed buttoned collar, never neat tight tie.",
+      "description": "Full-body native pixel-art game sprite, STRICTLY FRONT SOUTH view: face, nose, chest, belt and knees directly toward viewer, both ears equally visible. No sideways head or three-quarter turn. IDENTITY: Tall lean adult man with slightly slouched posture, long narrow pale face, pronounced dark under-eye shadows, tired half-lidded gray-brown eyes, small weary smile. LONG dark BROWN layered hair extending past shoulders, center part, long curved side locks and outward-flipped ends, untied. Navy suit, white shirt and navy tie. No mask. Relaxed upright stance, empty hands at sides. Natural adult anatomy, normal torso/pelvis, 7-head proportions. Anatomical crown to soles 230-238px; feet 6px above bottom, hair fully inside frame. Crisp single-pixel clusters, selective dark outlines, restrained game-sprite shading, no antialiasing. Transparent background, no ground shadow, text or weapons. Preserve individual hair, face, stature and clothing. Do not copy any generic character. Anatomical height excludes high hair/headwear. Every outer edge must border transparency directly, never a light gray halo.",
       "image_size": {
         "width": 128,
-        "height": 256
+        "height": 252
       },
       "no_background": true,
-      "seed": 1792791780,
+      "seed": 1792792467,
       "target_palette": {
         "max_colors": 48
       },
@@ -2098,9 +2098,7 @@
         "outline": true,
         "detail": true,
         "shading": true
-      },
-      "style_reference_local": "game-src/art/field/production/kim-seong-jin/reference.png",
-      "style_usage_description": "Use only native pixel rendering, standing scale and FRONT SOUTH pose. Preserve target individual identity, age, hair, face, build and clothes from description."
+      }
     },
     "stature_rendering": {
       "basis": "tall",
@@ -2127,7 +2125,13 @@
         "note": "Pixel ranges are production targets, not invented canonical height. Preserve original build and clothing; validate together at identical zoom."
       },
       "reviewed_at": "2026-10-24"
-    }
+    },
+    "native_height_canvas": true,
+    "image_inpaint_source": "game-src/art/field/production/history/rebuild-20261024/rerolls/jang-heo-un/44e1171b-f408-4556-98b8-05af01d0db2c/reference.png",
+    "image_inpaint_mask": "game-src/art/field/production/inputs/jang-heo-un-hair-mask.png",
+    "image_inpaint_description": "Extend the dark charcoal-brown layered hair on both sides down OVER the shoulders to upper chest, ending at y96. Long loose shoulder-covering shaggy hair with outward feathered ends; not a short neck-length haircut. Keep face, center part, open white collar and loose navy tie exactly. Only repair hair in white mask. Crisp native pixels and fully transparent outside silhouette.",
+    "image_validation_palette_limit": 64,
+    "image_palette_limit_reason": "Local masked hair repair preserves unmasked RGBA exactly; generation target48 is not a user hard cap. Allow up to64 to avoid destructive whole-image quantization."
   },
   {
     "english": "Kwak Je-gang",
@@ -2645,13 +2649,13 @@
     "source_images_visually_reviewed": true,
     "character_id": null,
     "pixel_request": {
-      "description": "Full-body native pixel-art game sprite, STRICTLY FRONT SOUTH view: face, nose, chest, belt and knees directly toward viewer, both ears equally visible. No sideways head or three-quarter turn. IDENTITY: Slim adult woman, pale narrow oval face, cool dark brown-gray eyes, serious neutral mouth. Straight BLACK hair to shoulders with long uneven blunt bangs and ends slightly flipped outward. OPEN white doctor coat over pale mint-blue BUTTONED COLLARED SHIRT, black trousers, stethoscope around neck with silver chestpiece. No navy surgical scrubs in this default outfit, no glasses. Relaxed upright stance, empty hands at sides. Natural adult anatomy, normal torso/pelvis, 7-head proportions. Anatomical crown to soles 200-206px; feet 6px above bottom, hair fully inside frame. Crisp single-pixel clusters, selective dark outlines, restrained game-sprite shading, no antialiasing. Transparent background, no ground shadow, text or weapons. Preserve individual hair, face, stature and clothing. Do not copy any generic character. Anatomical height excludes high hair/headwear. Every outer edge must border transparency directly, never a light gray halo. Native anatomical crown around y46, soles at y250. Keep original individual build and clothes.",
+      "description": "Full-body native pixel-art game sprite, STRICTLY FRONT SOUTH view: face, nose, chest, belt and knees directly toward viewer, both ears equally visible. No sideways head or three-quarter turn. IDENTITY: Slim adult woman, pale narrow oval face, cool dark brown-gray eyes, serious neutral mouth. Straight BLACK hair to shoulders with long uneven blunt bangs and ends slightly flipped outward. OPEN white doctor coat over pale mint-blue BUTTONED COLLARED SHIRT, black trousers, stethoscope around neck with silver chestpiece. No navy surgical scrubs in this default outfit, no glasses. Relaxed upright stance, empty hands at sides. Natural adult anatomy, normal torso/pelvis, 7-head proportions. Anatomical crown to soles 200-206px; feet 6px above bottom, hair fully inside frame. Crisp single-pixel clusters, selective dark outlines, restrained game-sprite shading, no antialiasing. Transparent background, no ground shadow, text or weapons. Preserve individual hair, face, stature and clothing. Do not copy any generic character. Anatomical height excludes high hair/headwear. Every outer edge must border transparency directly, never a light gray halo.",
       "image_size": {
         "width": 128,
-        "height": 256
+        "height": 220
       },
       "no_background": true,
-      "seed": 1792789084,
+      "seed": 1792792467,
       "target_palette": {
         "max_colors": 48
       },
@@ -2660,9 +2664,7 @@
         "outline": true,
         "detail": true,
         "shading": true
-      },
-      "style_reference_local": "game-src/art/field/production/eun-ha-je/reference.png",
-      "style_usage_description": "Use ONLY native pixel rendering, 204px adult female standing scale and strict front-facing pose. Do NOT copy reference face, eyes, hair, clothes, color palette or identity. Preserve described target original."
+      }
     },
     "stature_rendering": {
       "basis": "Latest explicit user height specification; overrides previous provisional height classes and conflicting wiki height",
@@ -2699,7 +2701,13 @@
         "note": "Common production scale; do not fit each person to full canvas. Compare anatomical crown-to-sole height; hair/headwear and heels need separate allowance. Unspecified individual female height stays a range."
       },
       "reviewed_at": "2026-10-24"
-    }
+    },
+    "native_height_canvas": true,
+    "image_inpaint_source": "game-src/art/field/production/history/rebuild-20261024/rerolls/go-yeon-ji/9ae5c48b-d9ea-454c-9c24-270560fb1a3a/reference.png",
+    "image_inpaint_mask": "game-src/art/field/production/inputs/go-yeon-ji-hair-mask.png",
+    "image_inpaint_description": "Replace blue short bob with straight natural BLACK shoulder-length hair, charcoal highlights with NO blue hue. Long uneven blunt forehead bangs, sides extending to shoulders at y98 with slightly flipped outward ends. Keep serious face, eyes, white coat, stethoscope and mint collared shirt exactly. Only masked hair changes; crisp native pixels, transparent exterior.",
+    "image_validation_palette_limit": 64,
+    "image_palette_limit_reason": "Local masked hair repair preserves unmasked RGBA exactly; generation target48 is not a user hard cap. Allow up to64 to avoid destructive whole-image quantization."
   },
   {
     "english": "Yun Ji-a",
@@ -2781,13 +2789,13 @@
     "source_images_visually_reviewed": true,
     "character_id": null,
     "pixel_request": {
-      "description": "Full-body native pixel-art game sprite, STRICTLY FRONT SOUTH view: face, nose, chest, belt and knees directly toward viewer, both ears equally visible. No sideways head or three-quarter turn. IDENTITY: Slim sharp adult woman with pale angular face, half-lidded BROWN eyes, thin lips and knowing slight crooked smile. Jet-black angular chin-length BOB with straight thick bangs, sides slightly longer at jaw. BURGUNDY tailored trouser suit over solid BLACK high-neck top. Thin gold bracelet and two plain gold rings. Black loafers. No shirt collar or tie. Relaxed upright stance, empty hands at sides. Natural adult anatomy, normal torso/pelvis, 7-head proportions. Anatomical crown to soles 200-206px; feet 6px above bottom, hair fully inside frame. Crisp single-pixel clusters, selective dark outlines, restrained game-sprite shading, no antialiasing. Transparent background, no ground shadow, text or weapons. Preserve individual hair, face, stature and clothing. Do not copy any generic character. Anatomical height excludes high hair/headwear. Every outer edge must border transparency directly, never a light gray halo. Native anatomical crown around y46, soles at y250. Keep original individual build and clothes.",
+      "description": "Full-body native pixel-art game sprite, STRICTLY FRONT SOUTH view: face, nose, chest, belt and knees directly toward viewer, both ears equally visible. No sideways head or three-quarter turn. IDENTITY: Slim sharp adult woman with pale angular face, half-lidded BROWN eyes, thin lips and knowing slight crooked smile. Jet-black angular chin-length BOB with straight thick bangs, sides slightly longer at jaw. BURGUNDY tailored trouser suit over solid BLACK high-neck top. Thin gold bracelet and two plain gold rings. Black loafers. No shirt collar or tie. Relaxed upright stance, empty hands at sides. Natural adult anatomy, normal torso/pelvis, 7-head proportions. Anatomical crown to soles 200-206px; feet 6px above bottom, hair fully inside frame. Crisp single-pixel clusters, selective dark outlines, restrained game-sprite shading, no antialiasing. Transparent background, no ground shadow, text or weapons. Preserve individual hair, face, stature and clothing. Do not copy any generic character. Anatomical height excludes high hair/headwear. Every outer edge must border transparency directly, never a light gray halo.",
       "image_size": {
         "width": 128,
-        "height": 256
+        "height": 220
       },
       "no_background": true,
-      "seed": 1792789084,
+      "seed": 1792792467,
       "target_palette": {
         "max_colors": 48
       },
@@ -2796,9 +2804,7 @@
         "outline": true,
         "detail": true,
         "shading": true
-      },
-      "style_reference_local": "game-src/art/field/production/eun-ha-je/reference.png",
-      "style_usage_description": "Use ONLY native pixel rendering, 204px adult female standing scale and strict front-facing pose. Do NOT copy reference face, eyes, hair, clothes, color palette or identity. Preserve described target original."
+      }
     },
     "stature_rendering": {
       "basis": "Latest explicit user height specification; overrides previous provisional height classes and conflicting wiki height",
@@ -2835,7 +2841,13 @@
         "note": "Common production scale; do not fit each person to full canvas. Compare anatomical crown-to-sole height; hair/headwear and heels need separate allowance. Unspecified individual female height stays a range."
       },
       "reviewed_at": "2026-10-24"
-    }
+    },
+    "native_height_canvas": true,
+    "image_inpaint_source": "game-src/art/field/production/history/rebuild-20261024/rerolls/ma-deok-hee/02b434c1-5096-4b3a-a855-e93482e565b1/reference.png",
+    "image_inpaint_mask": "game-src/art/field/production/inputs/ma-deok-hee-hair-mask.png",
+    "image_inpaint_description": "Fill the open triangular forehead hair gap with dense straight BLACK blunt bangs. A continuous horizontal fringe across the entire forehead just ABOVE eyebrows at y62. No center part and no bare triangular forehead. Preserve eyes, face, black chin-length bob, suit and body exactly. Match existing black hair palette, crisp native pixel clusters, transparent background.",
+    "image_validation_palette_limit": 64,
+    "image_palette_limit_reason": "Local masked hair repair preserves unmasked RGBA exactly; generation target48 is not a user hard cap. Allow up to64 to avoid destructive whole-image quantization."
   },
   {
     "english": "Mun Hye-ran",

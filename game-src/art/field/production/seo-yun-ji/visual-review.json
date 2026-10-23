@@ -1,0 +1,14 @@
+{
+  "job": "c721800a-1c1a-46f0-90c1-cf2e9c66eae9",
+  "job_status": "completed",
+  "decision": "pass",
+  "reason": "원작의 회녹색 양갈래 땋은 머리·일자 앞머리·흰 블라우스 걷은 소매·네이비 조끼와 치마·왼손목 시계 대조. 모발·신발 포함211px, 본체는 여성 범위 상단. 정면과 외곽 투명 정상.",
+  "at": 1792792429.707587,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

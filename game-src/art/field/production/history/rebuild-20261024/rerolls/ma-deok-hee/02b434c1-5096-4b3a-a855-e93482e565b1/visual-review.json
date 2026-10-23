@@ -1,0 +1,14 @@
+{
+  "job": "02b434c1-5096-4b3a-a855-e93482e565b1",
+  "job_status": "completed",
+  "decision": "reroll",
+  "reason": "원작은 두꺼운 일자 앞머리인데 중앙 이마가 갈라진 앞머리로 출력. 이마의 머리 영역만 마스크 교정, 검은 단발·얼굴·버건디 정장·키는 보존.",
+  "at": 1792792467.349168,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

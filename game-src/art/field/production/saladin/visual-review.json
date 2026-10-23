@@ -1,0 +1,14 @@
+{
+  "job": "093bd367-7b6f-4606-8958-8a1a2c8bf4f3",
+  "job_status": "completed",
+  "decision": "pass",
+  "reason": "원작의 짙은 갈색 피부·짧은 검은 수염·회색 눈·흰 터번·검은 양복 대조. 터번 포함231px이며 두건 제외 보통 남성 키 범위, 넓은 어깨 유지. 정면·외곽 정상.",
+  "at": 1792792430.2089078,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

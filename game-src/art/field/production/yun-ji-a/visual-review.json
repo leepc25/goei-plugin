@@ -1,0 +1,14 @@
+{
+  "job": "0db332dc-7f99-4b4a-84c7-17bdc395ae40",
+  "job_status": "completed",
+  "decision": "pass",
+  "reason": "원작의 살구빛 양쪽 둥근 번·갈색 큰 눈·흰 간호복과 살구 테두리·본인 오른쪽 베이지 주머니·왼손목 검은 밴드 확인. 모발 포함207px, 여성 키 범위, 정면과 외곽 정상.",
+  "at": 1792792429.8131435,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}
