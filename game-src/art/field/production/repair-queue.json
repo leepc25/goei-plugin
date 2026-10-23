@@ -22,5 +22,13 @@
     "action": "regenerate-front-and-register",
     "estimated_generations": 13,
     "correction": "Use updated manifest individual stature range and rendering-only style reference; preserve original costume and build. Review native result before accepting."
+  },
+  {
+    "id": "aileen-athletic-v3",
+    "slug": "aileen",
+    "action": "regenerate-front-and-register",
+    "reason": "User finds Aileen too short. Prior192-204px target was an unsupported overinterpretation of small solid build. Current output223px is only9px below Jyaldi232px but overly narrow; preserve near current height and restore trained compact physique.",
+    "correction": "Updated218-226px target and firm shoulder/limb build; retain native anatomy and original costume. Compare actual output, not prompt target.",
+    "estimated_generations": 13
   }
 ]
