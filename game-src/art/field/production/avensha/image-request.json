@@ -1,30 +1,17 @@
 {
-  "description": "Full-body native pixel-art game sprite, STRICTLY FRONT SOUTH view: face, nose, chest, belt and knees directly toward viewer, both ears equally visible. No sideways head or three-quarter turn. IDENTITY: Adult woman with natural curving figure, pale oval face, GREEN emerald eyes and gentle knowing smile. LONG wavy BLUE hair in thick curled locks framing face and chest. Deep PURPLE hood worn UP, long purple cape with lighter muted purple lining, fastened at throat by LARGE GREEN EMERALD brooch in silver frame. BLACK fitted trouser suit beneath cape, white shirt and black tie, small gold sleeve buttons. Black shoes. No witch hat or staff. Relaxed upright stance, empty hands at sides. Natural adult anatomy, normal torso/pelvis, 7-head proportions. Anatomical crown to soles 200-206px; feet 6px above bottom, hair fully inside frame. Crisp single-pixel clusters, selective dark outlines, restrained game-sprite shading, no antialiasing. Transparent background, no ground shadow, text or weapons. Preserve individual hair, face, stature and clothing. Do not copy any generic character. Anatomical height excludes high hair/headwear. Every outer edge must border transparency directly, never a light gray halo. Native anatomical crown around y46, soles at y250. Keep original individual build and clothes.",
-  "image_size": {
-    "width": 128,
-    "height": 256
+  "image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
   },
+  "mask_image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "description": "Only recolor masked hair and cloak, retaining all shapes and existing pixel-art shading. Hair is muted DARK TEAL-BLUE charcoal with desaturated blue-gray highlights, NOT royal blue. Hood and cape are very DARK muted plum-violet, near-black purple shadows, with dusty gray-lavender lining, NOT bright saturated purple. Preserve green eyes, green emerald brooch, pale face, black suit, anatomy, original height and transparent silhouette exactly. No gray exterior halo.",
   "no_background": true,
-  "seed": 1792789084,
-  "target_palette": {
-    "max_colors": 48
-  },
-  "style_options": {
-    "color_palette": false,
-    "outline": true,
-    "detail": true,
-    "shading": true
-  },
-  "style_image": {
-    "image": {
-      "type": "base64",
-      "base64": "[image payload omitted]",
-      "format": "png"
-    },
-    "size": {
-      "width": 128,
-      "height": 256
-    },
-    "usage_description": "Use ONLY native pixel rendering, 204px adult female standing scale and strict front-facing pose. Do NOT copy reference face, eyes, hair, clothes, color palette or identity. Preserve described target original."
-  }
+  "output_method": "Modify current layer",
+  "crop_to_mask": true,
+  "seed": 1792792775
 }

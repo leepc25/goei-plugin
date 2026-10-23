@@ -182,9 +182,9 @@ beb71d9c-d512-48fa-854b-7964e45b6649	no-gi-gyun	registration		completed	{"type":
 43779337-3a91-47ea-8488-de9d8ef98956	lee-byeong-jin	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
 721d1a17-9804-4fa7-8ef8-7069e2588c61	jay	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
 650690e4-fb7c-4ea4-9829-21bfcf5b2ed2	ho-yu-won	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
-4688380a-e354-4317-b6be-8e0756734020	lee-ja-heon	registration		processing	null
+4688380a-e354-4317-b6be-8e0756734020	lee-ja-heon	registration		completed	{"type": "generations", "generations": 4.0}
 a1dee1b6-2ba5-4b38-bb12-bcfa1221552f	cheong-dal-lae	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
-bfaec31c-775c-44f0-bed5-538a3efcb57d	lee-seong-hae	registration		processing	null
+bfaec31c-775c-44f0-bed5-538a3efcb57d	lee-seong-hae	registration		completed	{"type": "generations", "generations": 4.0}
 833ae0ce-09fb-4e28-b560-726df7acd16e	cha-yeo-jin	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
 44e1171b-f408-4556-98b8-05af01d0db2c	jang-heo-un	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
 c721800a-1c1a-46f0-90c1-cf2e9c66eae9	seo-yun-ji	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
@@ -200,9 +200,9 @@ e464915e-93b8-4980-9732-f5871953ed86	shin-yuri	image		completed	{"usd": 0.0, "ty
 37ea908d-f39f-4bb1-959d-8be0f487720b	jay	registration		processing	null
 487b6f5d-03ca-4f9c-a404-29861a7d3bd3	ho-yu-won	registration		processing	null
 23a36d4b-9f08-4165-a6d1-3017475bd16e	cheong-dal-lae	registration		processing	null
-ee93e07e-c778-4160-9535-29aaefd70c9c	avensha	image		processing	null
+ee93e07e-c778-4160-9535-29aaefd70c9c	avensha	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
 8231c302-e2fd-48d8-ab4c-4cfe04785808	cha-yeo-jin	registration		processing	null
-49f50cbc-3c79-4f23-8835-3cbea51c83a5	secriem	image		processing	null
+49f50cbc-3c79-4f23-8835-3cbea51c83a5	secriem	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
 2a5a3aee-9530-48f5-8e80-e770facc5a11	go-young-eun	registration		processing	null
 6aca27e9-15dc-4bbe-ae77-2156ddbbf513	kwak-je-gang	registration		processing	null
 be4b8d4b-01a5-425c-8358-407fa75577ec	brownie	image		processing	null
@@ -213,3 +213,7 @@ fbe504f0-84fd-4d97-8056-a2c5a3198d75	seo-yun-ji	registration		processing	null
 76fa246d-7c0f-4029-a9dd-b3d202836934	shin-yuri	registration		processing	null
 82dc8eed-43b9-433a-aa58-dc4ba39c1a82	blaret	registration		processing	null
 1f201d3e-fc8c-44b5-b508-c14a58d5e02d	saladin	registration		processing	null
+3ad37156-945c-4b0b-b82e-c872f5e6563f	jang-heo-un	image		processing	null
+02522c5f-7c65-4dea-9097-d37a7f3eece0	go-yeon-ji	image		processing	null
+68d69057-3d33-40ca-8df6-ed30c4d059e4	ma-deok-hee	image		processing	null
+e5c4d831-8e6c-4102-908b-3c179fef8817	secriem	registration		processing	null
