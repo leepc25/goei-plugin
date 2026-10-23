@@ -72,3 +72,16 @@ export function drawTestMan(c: CanvasRenderingContext2D, x: number, y: number, d
 /** 발 기준 머리 꼭대기 (화면 px, 음수, 원근 미포함 — 부르는 쪽이 persp를 곱한다) */
 export const testPlayerTop = () => -(IDLE.fy - IDLE.head) * SCALE;
 export const testManTop = () => -(MAN.fy - MAN.head) * SCALE;
+
+/** 주인공(여자) 얼굴 칸: 서 있는 그림의 머리·어깨 side×side (원본 1도트 = 1px) */
+let face: HTMLCanvasElement | null = null;
+export function testPlayerFace(side = 44): HTMLCanvasElement | null {
+  if (!art) return null;
+  if (face?.width === side) return face;
+  face = document.createElement('canvas');
+  face.width = face.height = side;
+  const o = face.getContext('2d')!;
+  o.imageSmoothingEnabled = false;
+  o.drawImage(art.idle, IDLE.fx - side / 2, IDLE.head - 4, side, side, 0, 0, side, side);
+  return face;
+}

@@ -454,15 +454,81 @@ export class Hud {
     label(c, text, x, y, 15, t < 10 ? C.hpLow : '#bfe0f0');
   }
 
+  /** 필드 주인공 칸 (전투 HUD가 없는 본부·거점): 왼쪽 아래 도트 얼굴 + 이름 + 체력 + 필살 게이지. 터치·좁은 화면은 왼쪽 위(아래는 스틱 자리).
+   * 돌려주는 값 = 칸 오른쪽 끝 x (자막을 그 오른쪽에 둔다) */
+  drawFieldCard(c: CanvasRenderingContext2D, s: { name: string; face?: CanvasImageSource | null; hp: number; maxHp: number; gauge?: number; sub?: string; compact?: boolean; top?: boolean }, dt = 1 / 60): number {
+    this.t += dt;
+    c.save();
+    const k = s.compact ? 1.2 : 1;
+    W = c.canvas.width / k;
+    H = c.canvas.height / k;
+    c.setTransform(k, 0, 0, k, 0, 0);
+    pixelOn = true;
+    const fs = 64, bw = 200, bh = 14;
+    const x = 28, y = s.top ? 104 : H - fs - 28;
+    // 체력이 줄면 얼굴이 붉게 번쩍, 붉은 띠가 늦게 따라온다 (전투 HUD와 같은 느낌)
+    if (this.lastHp >= 0 && s.hp < this.lastHp) (this.hurtT = 0.35), (this.trailHold = 0.5);
+    if (this.trail < 0 || this.trail < s.hp) this.trail = s.hp;
+    else if (this.trailHold > 0) this.trailHold -= dt;
+    else this.trail = Math.max(s.hp, this.trail - s.maxHp * dt * 0.6);
+    this.lastHp = s.hp;
+    this.hurtT = Math.max(0, this.hurtT - dt);
+    // 칸 뒤 어두운 판
+    c.fillStyle = 'rgba(6,10,14,0.72)';
+    c.fillRect(x - 12, y - 12, fs + bw + 52, fs + 24);
+    c.fillStyle = '#141b20';
+    c.fillRect(x, y, fs, fs);
+    c.save();
+    c.imageSmoothingEnabled = false;
+    if (s.face) c.drawImage(s.face, x, y, fs, fs);
+    else label(c, s.name.slice(0, 1) || '?', x + fs / 2, y + fs * 0.7, 34, '#fff', 'center', 900);
+    c.restore();
+    if (this.hurtT > 0) (c.fillStyle = `rgba(255,40,40,${this.hurtT * 1.2})`), c.fillRect(x, y, fs, fs);
+    const pf = kitPiece('portrait');
+    if (pf) nine(c, pf, kitSlice('portrait'), x - 8, y - 8, fs + 16, fs + 16, 1);
+    else (c.strokeStyle = C.frame), (c.lineWidth = 3), c.strokeRect(x - 1.5, y - 1.5, fs + 3, fs + 3);
+    const bx = x + fs + 18;
+    label(c, s.name, bx, y + 16, 18, C.name, 'left', 900);
+    if (s.sub) {
+      c.font = font(18, 900);
+      label(c, s.sub, bx + c.measureText(s.name).width + 10, y + 16, 13, C.amber, 'left', 800);
+    }
+    const by = y + 26;
+    const r = Math.max(0, Math.min(1, s.hp / s.maxHp));
+    c.fillStyle = '#000';
+    c.fillRect(bx - 2, by - 2, bw + 4, bh + 4);
+    c.fillStyle = '#3a1410';
+    c.fillRect(bx, by, bw, bh);
+    c.fillStyle = C.trail;
+    c.fillRect(bx, by, (bw * this.trail) / s.maxHp, bh);
+    c.fillStyle = r < 0.25 ? (Math.sin(this.t * 10) > 0 ? C.hpLow : C.hp) : r < 0.5 ? C.hpMid : C.hp;
+    c.fillRect(bx, by, Math.round(bw * r), bh);
+    c.fillStyle = 'rgba(255,255,255,0.35)';
+    c.fillRect(bx, by + 2, Math.round(bw * r), 2);
+    const bf = kitPiece('bar');
+    if (bf) nine(c, bf, kitSlice('bar'), bx - 14, by - 7, bw + 28, bh + 14, 1);
+    label(c, `${Math.max(0, Math.ceil(s.hp))}`, bx + bw - 4, by + bh - 2, 12, '#fff', 'right', 900);
+    if (s.gauge !== undefined) {
+      const gy = by + bh + 8, gw = 150, gh = 8, full = s.gauge >= 100;
+      c.fillStyle = '#000';
+      c.fillRect(bx - 2, gy - 2, gw + 4, gh + 4);
+      bar(c, bx, gy, gw, gh, s.gauge / 100, full ? `hsl(${40 + Math.sin(this.t * 8) * 10},95%,${60 + Math.sin(this.t * 8) * 12}%)` : C.gaugeFill, '#10181c');
+      if (full) label(c, '필살 S', bx + gw + 8, gy + 9, 12, C.gauge, 'left', 900);
+    }
+    pixelOn = false;
+    c.restore();
+    return (x + fs + bw + 40) * k;
+  }
+
   /** 아래 자막 한 줄만 (본부처럼 전투 HUD가 없는 화면) */
-  drawMessage(c: CanvasRenderingContext2D, text: string, compact?: boolean) {
+  drawMessage(c: CanvasRenderingContext2D, text: string, compact?: boolean, left = 0) {
     // 본부는 draw()를 거치지 않는다. 직전 출동의 W/H/배율을 재사용하지 않는다.
     c.save();
     const k = compact ? 1.2 : 1;
     W = c.canvas.width / k;
     H = c.canvas.height / k;
     c.setTransform(k, 0, 0, k, 0, 0);
-    this.message(c, text, compact);
+    this.message(c, text, compact, left / k);
     c.restore();
   }
 
@@ -480,15 +546,17 @@ export class Hud {
     c.restore();
   }
 
-  private message(c: CanvasRenderingContext2D, text: string, compact?: boolean) {
+  private message(c: CanvasRenderingContext2D, text: string, compact?: boolean, left = 0) {
     c.font = font(17, 600);
     let t = text;
-    t = fitText(c, t, Math.min(900, W - (compact ? 240 : 64)));
+    // left = 왼쪽 아래 주인공 칸 끝: 자막은 그 오른쪽 남은 폭 가운데
+    const cx = left ? (left + W) / 2 : W / 2;
+    t = fitText(c, t, Math.min(900, left ? W - left - 40 : W - (compact ? 240 : 64)));
     const w = c.measureText(t).width + 40;
     // 화면 맨 아래 띠: 몸통을 가로지르지 않게 (독립 검수: 자막이 캐릭터 허리를 관통)
     const y = H - 44;
-    plate(c, W / 2 - w / 2, y, w, 36, 18);
-    label(c, t, W / 2, y + 25, 17, '#fff8e6', 'center', 600);
+    plate(c, cx - w / 2, y, w, 36, 18);
+    label(c, t, cx, y + 25, 17, '#fff8e6', 'center', 600);
   }
 
   private navigation(c: CanvasRenderingContext2D, s: Pick<HudState, 'navigation' | 'prompt' | 'compact' | 'device'>, top?: number) {

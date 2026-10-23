@@ -27,7 +27,8 @@ import { makeHub, type HubHost } from './hub';
 import { linkNpcTalk } from './npcLink';
 import demoPhotos from '../story/demo-photos.json';
 import { whereIs, LANE_TOP, LANE_BOT } from '../hq/map';
-import { hasVisitAgent } from '../art/visitAgents';
+import { hasVisitAgent, visitAgentFaceCanvas } from '../art/visitAgents';
+import { testPlayerFace } from '../art/testPeople';
 import { drawTitleBg, setHudItemIcon } from '../ui';
 import { SUPPLY_CATALOG, drawItemIcon } from '../items';
 import { dummyStage, trainingStage } from './training';
@@ -63,7 +64,7 @@ const hasSaved = () => local(SAVED_KEY).load() === '1';
 const VISIT_TITLE = { title: '괴이 ː ANOMALY', sub: '필드 · 요원들을 만나고 본편 대화를 이어갑니다' };
 const fieldClock: { sec: number | null; place: string } = { sec: null, place: '' };
 
-function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: HubHost['chooseFloor']; sfx: (n: string) => void; closed?: () => void; resuming?: () => boolean; overlay?: HubHost['overlay'] }): HqModuleLike & { close(): void; goto(place: string): void; state(): { day: number; rescued: string[] }; visitReady: Promise<void> } {
+function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: HubHost['chooseFloor']; sfx: (n: string) => void; closed?: () => void; resuming?: () => boolean; overlay?: HubHost['overlay'] }): HqModuleLike & { close(): void; goto(place: string): void; state(): { day: number; rescued: string[] }; visitReady: Promise<void>; visitor(): { agentId: string; name: string } } {
   const hq = createHq();
   const b = bridge as (Partial<GameBridge> & { slot?: number; photo?: (name: string) => string | undefined }) | undefined;
   const slot = b?.slot ?? 0;
@@ -71,8 +72,9 @@ function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui
   let root: HTMLElement | null = null;
   // 본부 방문: 상태 태그로 정한 방(사무실·휴게실·의무실)에 요원을 세운다. 들어가기 전에 한 번 읽는다
   let present: { name: string; room: string }[] = [];
+  let visitor = { agentId: '', name: '' };
   const visitReady = b?.visit
-    ? b.visit.state().then((v) => { present = v.agents.filter((a) => a.room).map((a) => ({ name: a.name, room: a.room! })); }).catch(() => {})
+    ? b.visit.state().then((v) => { visitor = v.visitor; present = v.agents.filter((a) => a.room).map((a) => ({ name: a.name, room: a.room! })); }).catch(() => {})
     : Promise.resolve();
   const ROOM_SCENE: Record<string, string> = { office: 'office', lounge: 'lounge', infirmary: 'clinic' };
   const visitors = (sceneId: string) => {
@@ -112,6 +114,7 @@ function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui
   return {
     ready: () => hq.ready(),
     visitReady,
+    visitor: () => visitor,
     hub: () => hub,
     state: () => hq.state,
     goto: (place: string) => hub.goto(place),
@@ -640,8 +643,17 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       const hs = hudState(w, shell);
       if (npc.isOpen()) hs.message = undefined; // 대화창이 열려 있으면 자막·안내 한 줄은 숨긴다 (같은 말이 두 번, 폰 키보드 자리)
       if (mods.blocking?.() || shell.paused) hs.navigation = undefined;
+      // 필드(방문): 전투 HUD 대신 주인공 칸 (도트 얼굴·이름·체력·필살 게이지). 대화창·메뉴가 열려 있으면 숨긴다
+      let cardEnd = 0;
+      if (game?.inHub && bridge?.visit && !mods.blocking?.() && !shell.paused) {
+        const me = hq.visitor();
+        const name = me.name || '방문자';
+        const face = (me.agentId && visitAgentFaceCanvas(name, 34)) || testPlayerFace() || visitAgentFaceCanvas('쟈알디', 34);
+        cardEnd = shell.hud.drawFieldCard(ctx, { name, face, hp: w.player.hp, maxHp: w.player.hpMax, gauge: w.player.gauge, compact: hs.compact, top: shell.touchShown || hs.compact }, dt);
+        if (shell.touchShown || hs.compact) cardEnd = 0;
+      }
       if (!game?.inHub) shell.hud.draw(ctx, hs, dt); // 본부에서는 전투 HUD 없음
-      else if (hs.message) shell.hud.drawMessage(ctx, hs.message, hs.compact); // 본부 목소리는 아래 자막 한 줄
+      else if (hs.message) shell.hud.drawMessage(ctx, hs.message, hs.compact, cardEnd); // 본부 목소리는 아래 자막 한 줄
       if (game?.inHub && hs.navigation) shell.hud.drawNavigation(ctx, hs.navigation, hs.compact, hs.device);
       if (shell.paused) mapOpen = false;
       if (!game?.inHub && w.stage === elevator) {

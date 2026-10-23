@@ -62,6 +62,12 @@ export function visitAgentTop(name: string): number {
 
 /** 대화창·화면 UI 얼굴: 필드 그림(도트) 첫 장의 머리·어깨를 잘라 1도트 = 1px 그림 주소로 (CSS pixelated로 키운다). 그림이 없으면 '' */
 const faces = new Map<string, string>();
+const faceCanvas = new Map<string, HTMLCanvasElement>();
+/** 같은 얼굴을 캔버스로 (화면 UI에 바로 그린다) */
+export function visitAgentFaceCanvas(name: string, side = 34): HTMLCanvasElement | null {
+  visitAgentFace(name, side);
+  return faceCanvas.get(`${name}|${side}`) ?? null;
+}
 export function visitAgentFace(name: string, side = 34): string {
   const a = sheet?.agents[name];
   if (!sheet || !a?.frames.length) return '';
@@ -87,6 +93,7 @@ export function visitAgentFace(name: string, side = 34): string {
     o.imageSmoothingEnabled = false;
     o.drawImage(src, Math.round(side / 2 - cx), 2 - Math.max(0, top));
     url = out.toDataURL();
+    faceCanvas.set(key, out);
   } catch { /* 읽을 수 없는 그림이면 사진으로 */ }
   faces.set(key, url);
   return url;
