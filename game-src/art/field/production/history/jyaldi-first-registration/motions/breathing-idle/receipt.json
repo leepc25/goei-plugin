@@ -1,0 +1,28 @@
+{
+  "job_status": "completed",
+  "frame_count": 4,
+  "sizes": [
+    [
+      128,
+      256
+    ],
+    [
+      128,
+      256
+    ],
+    [
+      128,
+      256
+    ],
+    [
+      128,
+      256
+    ]
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.0351438873079088
+  },
+  "elapsed_observed_seconds": 127.99887275695801,
+  "visual_approval": false
+}

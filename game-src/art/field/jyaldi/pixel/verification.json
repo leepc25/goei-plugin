@@ -1,0 +1,26 @@
+{
+  "canvas": [
+    128,
+    256
+  ],
+  "raw_opaque_colors": 38,
+  "transparent_opaque_colors": 38,
+  "alpha_values": [
+    0,
+    255
+  ],
+  "bbox_exclusive": [
+    30,
+    11,
+    107,
+    244
+  ],
+  "removed_background_pixels": 22174,
+  "background_operation": "Exact RGB(128,128,128) exterior flood fill to alpha=0; original preserved; all remaining RGBA pixels unchanged.",
+  "raw_sha256": "bb153e47863d1cd1aac33a3ee23d0d3b2b3bc2c984b3e086d0fbc71959ae26d7",
+  "source_image_id": "d9e9c4d1-fa27-5165-8f11-1c75fc27f112",
+  "job_id": "bd98178d-2317-4b11-b86b-af1717e9ef7c",
+  "visual_approval": "pending",
+  "character_registration_calls": 0,
+  "animation_generation_calls": 0
+}

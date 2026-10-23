@@ -1,0 +1,21 @@
+{
+  "description": "One single full-body front-facing Jyaldi sprite. Use the approved illustration ONLY for her identity, full adult physique, long side-parted straight black hair, mature narrow crimson eyes with tired lower lids, black trouser suit, white closed-collar shirt, BLACK NECKTIE, black gloves, low-heeled closed black shoes. Use the separate FEMALE PIXEL SPRITE for the exact native pixel density, clean selective outline, sharp controlled pixel shading, charcoal cloth palette, subdued skin, contrast and finish. Render Jyaldi as a new native pixel sprite in that existing game's style; do not just shrink, trace or quantize the concept illustration. Do not copy the style woman's bob, skirt, face, pose or direction. Realistic mature adult anatomy about seven heads tall, normally sized head, normal torso and pelvis, crotch about 46-48% of standing height above soles. No fashion-model stretched legs or chibi anatomy. Body height about 235px on the 128x256 canvas with safety margins. Squarely front-facing, relaxed upright stance, empty gloved hands visible at sides outside pockets, feet slightly apart, soles level. Mild low top-down belt-scroll game view. Preserve the approved face and costume while adapting their shading to the supplied pixel-art style. Crisp deliberate 1px clusters, readable face, black tie visible on white shirt, no noisy hatching or blur, no antialiasing. Transparent background, no shadow, floor, props, weapons, effects, letters or extra figures. One single sprite.",
+  "width": 128,
+  "height": 256,
+  "no_background": true,
+  "style_copy": [
+    "color_palette",
+    "outline",
+    "detail",
+    "shading"
+  ],
+  "max_colors": 48,
+  "seed": 10242027,
+  "reference_images": [
+    {
+      "local_file": "../reference/front-concept-pro-input.png",
+      "usage": "Approved Jyaldi front-view concept. Preserve this specific woman, her face, hair, full adult physique, black trouser suit, white shirt, BLACK TIE and black gloves. Appearance only; redraw in the separate pixel style."
+    }
+  ],
+  "style_gallery_id": "4db87d5a-70bb-5169-a83d-36222e6bb9ae"
+}

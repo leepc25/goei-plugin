@@ -1,0 +1,23 @@
+{
+  "user_height_cm": {
+    "쟈알디": 170,
+    "게슈간": 170,
+    "큐라스": 180,
+    "고그니쟈": 180,
+    "고르고디오": 190,
+    "기타 여성": [
+      160,
+      165
+    ],
+    "콘쥬스": 155,
+    "유다온": 155
+  },
+  "production_pixels_per_cm": 1.25,
+  "unresolved_roster_names": [
+    "유다온"
+  ],
+  "unresolved_note": "No matching manifest entry or name in current repository. Preserve user specification; do not map to another character by guess.",
+  "existing_results": "Review against new heights; existing accepted jobs are preserved, not cancelled or blindly duplicated. Prompt targets alone are not proof of output stature.",
+  "latest_user_decision": "Leave current production/results as is. No additional stature or outfit repair jobs from pending queue. Keep already accepted jobs; do not cancel them.",
+  "production_pixels_per_cm_status": "provisional request aid, not a reason to reject accepted existing results"
+}

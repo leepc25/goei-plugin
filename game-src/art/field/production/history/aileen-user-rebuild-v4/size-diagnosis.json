@@ -1,0 +1,24 @@
+{
+  "status": "both-versions-rejected-by-user-for-small-stature",
+  "versions": [
+    {
+      "character_id": "07763785-8f52-41d2-8e80-6f20d93f18c4",
+      "front_silhouette_height": 225
+    },
+    {
+      "character_id": "8fc35b6a-3e82-4148-8ed1-db3481d8cede",
+      "front_silhouette_height": 223,
+      "south_height": 223,
+      "east_height": 223,
+      "west_height": 223
+    }
+  ],
+  "findings": [
+    "Both actual submissions described petite compact athletic build.",
+    "Second actual image request additionally requested short and192-204px body height.",
+    "Latest south/east/west retain223px silhouette; observed shrinkage did not happen at8direction registration.",
+    "Later manifest edits do not modify already submitted or generated characters.",
+    "Silhouette includes high ponytail; this measurement alone is not anatomical standing height."
+  ],
+  "next_step": "Correct source stature/whole-body proportions and compare to Jyaldi before another registration; no automatic extra regeneration submitted by this audit."
+}

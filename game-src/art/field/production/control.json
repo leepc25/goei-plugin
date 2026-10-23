@@ -1,0 +1,40 @@
+{
+  "release_skeleton_v3_motions": false,
+  "reason": "Latest user: finish management, then fake bureau, Baekilmong and all other neutral/anomaly characters; register entire roster before new motions.",
+  "max_in_flight": 20,
+  "max_character_pipeline_in_flight": 6,
+  "authorized_total_characters": 55,
+  "authorized_clips_per_character": 20,
+  "stop_all": false,
+  "stopped_by_user_at": 1792778185.5597813,
+  "direction_policy": {
+    "reference": "front-facing south",
+    "movement_and_combat": "east",
+    "stationary_noncombat": "south-east",
+    "southeast_templates": [
+      "breathing-idle",
+      "drinking"
+    ]
+  },
+  "motion_allowed_slugs": [],
+  "character_direction_overrides": {
+    "jyaldi": {
+      "movement_and_combat": "west",
+      "stationary_noncombat": "south-west",
+      "reason": "User: asymmetric hair obscures face in east; west and southwest show face."
+    },
+    "spangdal": {
+      "movement_and_combat": "west",
+      "stationary_noncombat": "south-west",
+      "reason": "Actual generated east side face hidden by bob; west and southwest face visibly exposed."
+    }
+  },
+  "registration_held_slugs": [
+    "konjyuce",
+    "lee-do-hyeong"
+  ],
+  "production_priority": "all-roster-character-registration-first",
+  "after_registration": "roster-order eight-direction visual review and export, then remaining authorized production",
+  "direction_selection_policy": "Compare actual east/west/southeast/southwest rotations per character; select face-visible pair east+southeast or west+southwest. Do not impose one side on all characters.",
+  "registration_failure_policy": "Diagnose and correct source/registration; archive failed results and billing; delete only identified failed character; re-register without duplicating accepted jobs."
+}

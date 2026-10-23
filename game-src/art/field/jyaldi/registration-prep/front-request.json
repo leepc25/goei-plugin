@@ -1,0 +1,18 @@
+{
+  "width": 128,
+  "height": 256,
+  "no_background": true,
+  "seed": 10222027,
+  "max_colors": 48,
+  "description": "One single full-body adult Korean female player persona for the SAME grounded modern supernatural investigation headquarters game as the style reference. The SAME Jyaldi woman as the supplied approved sprite, now viewed straight-on. Preserve her recognizable face, physique, head size and neck length. Jyaldi: a mature woman in her thirties with long loose straight black hair, an asymmetric side part, crimson eyes, a calm stern expression, and a naturally full-busted adult physique. Black tailored blazer and straight black business trousers, white collared shirt with a BLACK NECKTIE, fitted black gloves, plain black closed-toe formal shoes with low practical heels. No weapon, no equipment, no handbag. Natural relaxed standing idle pose: both feet resting on the ground, arms hanging loosely beside her body, both gloved hands clearly visible OUTSIDE all pockets, fingers relaxed. Body, shoulders, pelvis and face squarely FRONT-FACING toward the viewer, SOUTH reference, with a mild LOW TOP-DOWN game camera. Both eyes and both shoulders visible symmetrically. Realistic adult proportions about 7 heads tall, normal-sized head, not chibi. Full head and shoes entirely visible. Figure fills almost the full vertical canvas, target 244px tall on a 128x256 canvas, only 6px top and bottom safety margin, centered. Match the supplied Jyaldi sprite's precise native pixel density, selective dark outlines, controlled pixel shading, realistic proportions, contrast and lighting. Crisp native 1px clusters, no antialiasing. Black cloth uses charcoal and muted blue-gray shadows with subtle warm amber highlights from an overhead-left interior lamp; subdued natural skin; off-white shirt still clearly reads white. Transparent background, no floor, no cast shadow, no text, only one static woman.",
+  "style_image": {
+    "source_image_id": "f66a4343-6730-5c1a-90fb-be40a8d36511",
+    "usage_description": "The approved Jyaldi sprite, not a different woman: keep her identity, long side-parted black hair, crimson eyes, neck length, natural adult body proportions, black trouser suit, white shirt, black tie and gloves. Copy all pixel rendering and palette traits, but turn the entire woman to a straight-on FRONT/SOUTH view, not the current right three-quarter. No new props."
+  },
+  "style_options": {
+    "color_palette": true,
+    "shading": true,
+    "detail": true,
+    "outline": true
+  }
+}

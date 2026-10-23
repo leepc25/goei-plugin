@@ -1,0 +1,8 @@
+{
+  "image_url": "upload:103cf4ae-1ff2-4eec-ab75-89bb97c0ad3b",
+  "output_width": 128,
+  "output_height": 256,
+  "faithful": true,
+  "init_image_strength": 200,
+  "seed": 10242026
+}

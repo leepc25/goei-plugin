@@ -1,0 +1,28 @@
+{
+  "status": "reviewed-defects-queued-for-repair",
+  "reason": "Earlier shared 230-240px body target may flatten canonical stature differences",
+  "characters": [
+    "jyaldi",
+    "spangdal",
+    "jaemtri",
+    "aileen",
+    "gorgodio",
+    "kyuras",
+    "deadpole"
+  ],
+  "requirements": [
+    "same zoom and floor baseline",
+    "original outfit silhouette and details",
+    "body build and relative height",
+    "repair confirmed defects; preserve previous outputs"
+  ],
+  "findings": {
+    "aileen": "225px: petite stature insufficiently distinct from232px tall Jyaldi",
+    "deadpole": "226px: petite stature insufficiently distinct from232px tall Jyaldi",
+    "kyuras": "242px: matches241px Gorgodio despite no 2m stature setting",
+    "gorgodio": "Broad muscular silhouette distinct; keep as relative tallest reference",
+    "jyaldi": "232px tall silhouette; neck, tie, gloves and adult anatomy visible"
+  },
+  "repair_queue": "repair-queue.json",
+  "visual_approval": false
+}

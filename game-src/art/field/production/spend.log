@@ -1,0 +1,52 @@
+# API가 반환한 실제 사용량 — 견적과 구분; 과거 작업은 history/ 및 개별 spend.log 참조
+job_id	slug	kind	template	status	actual_usage_json
+e925d6ba-4f8e-41b9-b58d-53327feda5b9	spangdal	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+8df9126b-f6ce-43bd-be01-027d0588c203	spangdal	registration		completed	{"type": "generations", "generations": 4.0}
+78793c7b-f45f-48a6-ab11-0c1d97f86333	jyaldi	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+a32c319b-d494-4fb0-b04e-1576a6243021	jaemtri	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+10a7c8f0-01b5-438e-91dd-61ba6d991597	aileen	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+2f655338-9c44-48da-b55f-0aab08174ead	gorgodio	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+67d27e4e-ba4e-46dc-abf8-f9bf728557d9	kyuras	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+0568cdf1-af39-4a34-94e1-a492b322a400	deadpole	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+1a54d3e6-c143-4b60-9c05-2929c084a4cd	jyaldi	registration		completed	{"type": "generations", "generations": 4.0}
+c39dacdf-7d7e-4648-bceb-6900ea2c8fd8	jaemtri	registration		completed	{"type": "generations", "generations": 4.0}
+1bbbd641-ee5c-4742-88f5-be9dae77efff	aileen	registration		completed	{"type": "generations", "generations": 4.0}
+3676d347-a999-4fff-93e5-fdef57f7cee7	gorgodio	registration		completed	{"type": "generations", "generations": 4.0}
+1a0b842f-1d61-406f-93bf-f3c0abb364c0	kyuras	registration		completed	{"type": "generations", "generations": 4.0}
+3aa93392-d116-470e-a5f8-bcf3dad5eff9	deadpole	registration		completed	{"type": "generations", "generations": 4.0}
+62740c2d-eb38-4eba-8555-357190310a70	geshugan	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+313da381-5ebe-43ab-997b-d1eb55f6aa2f	jyaldi	animation	breathing-idle	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+83227447-8dd7-480f-8792-56d1ec73f851	jyaldi	animation	walking-8-frames	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+7abf3424-7b93-48da-947d-f6357b0b2874	jyaldi	animation	running-8-frames	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+1a3d97f8-4f8a-490e-afd9-5f5754e87060	aileen	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+3591405c-06e8-4141-9afb-81a4e423f965	kyuras	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+06d28e8f-5791-4543-b918-3fcc4863a8ba	rojemon	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+0dc42b65-e471-4ff1-ae53-3195b75dd1bf	konjyuce	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+20c53ac5-eaa5-488f-a5c8-cff4d09e0b59	jyaldi	animation	running-jump	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+1e3ed3a1-22dc-44a3-86ef-9bd03998c486	jyaldi	animation	running-slide	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+ee2d7d2d-860e-4ff9-b925-f3d9acaf8277	jyaldi	animation	crouched-walking	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+e2d99108-cd3c-4e66-b575-dcdeed69cd5b	jyaldi	animation	sad-walk	failed	{"usd": 0.0, "type": "generations", "generations": 3}
+be258cb3-8f10-40de-af51-75fee8b5f1a8	jyaldi	animation	front-flip	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+3eae8f78-2351-4240-a4b2-98b446f3a1b5	jyaldi	animation	backflip	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+12c55bf7-5e4a-48b6-8536-aeac9c52fd58	jyaldi	animation	jumping-1	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+d188f155-3ae4-4533-8ee4-a017918d68d5	jyaldi	animation	jumping-2	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+42f5a655-5dcb-4294-b435-c657b5721482	jyaldi	animation	two-footed-jump	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+bfd08828-e4de-461d-ad55-c84a3dfeb679	jyaldi	animation	drinking	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+88c8e391-1c49-44a8-bcae-d7ee982ca57f	jyaldi	animation	picking-up	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+a996f9f5-1eb1-41e6-a7af-377263cff9b3	aileen	registration		failed	{"type": "usd", "usd": 0.0}
+b304d6f1-31b5-4a0f-a28c-9c625d4b0fdc	kyuras	registration		completed	{"type": "generations", "generations": 4.0}
+66bfcf1b-fcce-44ef-b0f4-2986e0e1c331	geshugan	registration		completed	{"type": "generations", "generations": 4.0}
+cb41e6eb-69d9-44e7-8d23-c904d87f016c	rojemon	registration		completed	{"type": "generations", "generations": 4.0}
+cad7e67c-dfc7-49fc-8681-18ac2e1070d0	konjyuce	registration		completed	{"type": "generations", "generations": 4.0}
+86ea3180-a8b5-44cb-9018-3aae95668543	deadpole	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+5c0844e8-919f-4527-b663-d748a43fc2a1	deadpole	registration		completed	{"type": "generations", "generations": 4.0}
+1c807537-5a53-434b-87ed-56fa81686f57	jyaldi	animation	pushing	failed	{"type": "usd", "usd": 0.0}
+d880b4d6-e420-4c02-be2b-707400f634ed	jyaldi	animation	pull-heavy-object	cancelled	null
+9331805a-b8b1-4a62-9ed2-ac8281cb96f9	gognija	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+3cddea2e-3a66-4291-a79c-2be803461b07	jyaldi	animation	walking-8-frames	processing	null
+c8873c16-757b-44c9-817a-9e39fd7247fc	jyaldi	animation	running-8-frames	processing	null
+9e9f1775-f62b-49a8-a5dc-98686e18c6fc	gognija	registration		processing	null
+95f7fbb1-98fc-4481-a293-236e615fb8b8	aileen	image		processing	null
+a617bd3c-ab6f-4300-892f-814a35344d48	dejure	image		processing	null
+6c98e078-134a-4596-827d-94539b32efbc	sa-jang	image		processing	null
+313ee595-1c75-4c33-9a9a-99e46b29e9e1	do-pil-heon	image		processing	null

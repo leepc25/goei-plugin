@@ -1,0 +1,31 @@
+{
+  "name": "쟈알디",
+  "group": "management",
+  "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+  "image": "78793c7b-f45f-48a6-ab11-0c1d97f86333",
+  "registration": "1a54d3e6-c143-4b60-9c05-2929c084a4cd",
+  "motions": {
+    "breathing-idle": "313da381-5ebe-43ab-997b-d1eb55f6aa2f",
+    "walking-8-frames": "83227447-8dd7-480f-8792-56d1ec73f851",
+    "running-8-frames": "7abf3424-7b93-48da-947d-f6357b0b2874",
+    "running-jump": "20c53ac5-eaa5-488f-a5c8-cff4d09e0b59",
+    "running-slide": "1e3ed3a1-22dc-44a3-86ef-9bd03998c486",
+    "crouched-walking": "ee2d7d2d-860e-4ff9-b925-f3d9acaf8277",
+    "sad-walk": "e2d99108-cd3c-4e66-b575-dcdeed69cd5b",
+    "front-flip": "be258cb3-8f10-40de-af51-75fee8b5f1a8",
+    "backflip": "3eae8f78-2351-4240-a4b2-98b446f3a1b5",
+    "jumping-1": "12c55bf7-5e4a-48b6-8536-aeac9c52fd58",
+    "jumping-2": "d188f155-3ae4-4533-8ee4-a017918d68d5",
+    "two-footed-jump": "42f5a655-5dcb-4294-b435-c657b5721482",
+    "drinking": "bfd08828-e4de-461d-ad55-c84a3dfeb679",
+    "picking-up": "88c8e391-1c49-44a8-bcae-d7ee982ca57f",
+    "pushing": "1c807537-5a53-434b-87ed-56fa81686f57",
+    "pull-heavy-object": "d880b4d6-e420-4c02-be2b-707400f634ed"
+  },
+  "ready": true,
+  "rebuild_after_direction_policy": true,
+  "image_verified": true,
+  "skeleton_joints": 18,
+  "rotation_count": 8,
+  "exported": false
+}

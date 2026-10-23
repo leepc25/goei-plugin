@@ -1,0 +1,20 @@
+2026-10-24 Asia/Seoul | GPT 정면 전신 기준 그림 | imagegen | 도구 응답 50.307초 | GPT 차감 단위 미제공 | PixelLab 차감 0
+2026-10-24 Asia/Seoul | 기준 그림 입력용 PNG 업로드 | /v2/uploads | 업로드 시간 별도 미측정 | 무료 | upload:103cf4ae-1ff2-4eec-ab75-89bb97c0ad3b
+2026-10-24 Asia/Seoul | 정면 도트 변환 1회 | image_to_pixelart | 128x256, faithful=true, init_image_strength=200, seed=10242026 | 요청~완료 관측 70.654초(통신/폴링 포함) | 예상 1, 실제 영수증 1, 계정 잔여량 차이 1.0 generations | job bd98178d-2317-4b11-b86b-af1717e9ef7c
+2026-10-24 Asia/Seoul | 38색 결과이므로 reduce_colors 생략 | 추가 차감 0
+2026-10-24 Asia/Seoul | 외부 단색 배경만 로컬 alpha flood-fill, 인물 픽셀 변경 없음 | PixelLab 차감 0
+1차 상태: 사용자 반려(기존 남녀와 다른 도트 품질, 사용 불가). 비용·원본은 보존하고 같은 일반 변환을 반복하지 않는다.
+2026-10-24 Asia/Seoul | 2차 Pro 이미지 생성 1장 완료 | create_image_pro | approved concept reference + existing female pixel style reference, 128x256, max_colors48 | 요청~완료 관측 171.772초(통신/폴링 포함) | 예상 10, 실제 영수증 10, 계정 잔여량 차이 10.0 generations | job 9d30ebb3-709d-4613-8ac8-c5cd78ef2ef6
+2차 결과: 128x256, 48색, 알파0/255, 몸 높이231px. 원본 픽셀 수정 없음. 사용자가 큰 머리·짧은 목·이상한 비율을 지적한 미승인 결과.
+누적: 반려된 1차 변환 1회 + 2차 Pro 이미지 생성 10회 = 실제 차감 11.0 generations. 캐릭터 등록 0회, 애니메이션 생성 0회.
+2026-10-24 Asia/Seoul | 3차 기존 여성 방식 재현 1장 | create_image_pro_flash | 여성 요청 복사, 동일 남성 스타일 참조·seed10222027·128x256·48색·스타일4종true·오른쪽3/4·눈높이, 외모/복장 텍스트만 변경 | 요청~완료 관측 133.816초(통신/폴링 포함) | 예상 9, 실제 영수증 9, 계정 잔여량 차이 9.0 generations | job 87ff5295-7f08-4430-8ef9-e5b7cda84b48
+3차 결과: 128x256, 48색, 알파0/255, 몸 높이235px. 원본 픽셀 수정 없음. 사용자 시각 검수 대기.
+현재 누적: 1 + 10 + 9 = 실제 차감 20.0 generations. 캐릭터 등록 0회, 애니메이션 생성 0회.
+2026-10-24 Asia/Seoul | 등록 준비의 정면 보완 1장 | create_image_pro_flash | 3차 쟈알디를 스타일 참조로 정면 보완 | 요청~완료 관측 125.349초(통신/폴링 포함) | 예상 9, 실제 영수증 9, 계정 잔여량 차이 9.0 generations | job f6433c66-495e-443d-b6a0-6016fd81c315
+등록 방식 사후 확인: 기존 Test woman은 비정면 3/4 원본 그대로 south로 저장된 V3 8방향 캐릭터였다. 정면 추가 생성이 API 실행의 필수 조건이라는 설명을 정정했다. 정면 보완은 보존하되 승인된 등록 원본으로 간주하지 않는다.
+2026-10-24 Asia/Seoul | 붉은 홍채6픽셀만 무료 workbench patch, 쟈알디 이름으로 새 갤러리 저장 | pixelart_workbench + save_to_asset | 실제 추가 차감 0.0 generations | gallery46806996-274f-44c2-83dc-e1b86f175dbe | 그 외 모든RGBA 동일,128x256,48색
+현재 누적: 1 + 10 + 9 + 9 = 실제 차감 29.0 generations. 홍채 수정/갤러리 저장 차감0. 캐릭터 등록0회, 애니메이션 생성0회.
+
+2026-10-24 Asia/Seoul | 8방향 V3 참조 등록 완료 | character ed6456b1-dec7-4c1d-851a-5096362ca614 | 실제4.0 generations | 요청~완료 관측871.028초(서버대기·통신·폴링 포함) | 남동 원본RGBA동일,128x256 8방향
+2026-10-24 Asia/Seoul | breathing-idle skeleton-v3 요청 실패 | job7c47bedf-11f5-4434-95a8-7f84f6956fe7 | 실제 추가0.0 generations | 422 no stored 3D skeleton, 같은 방식 반복 안함
+현재 누적 실제33.0 generations. 등록 완료1건, 동작 완료0건.

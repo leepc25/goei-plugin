@@ -1,0 +1,19 @@
+{
+  "status": "failed-visual-review",
+  "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+  "direction": "east",
+  "templates": [
+    "running-jump",
+    "jumping-1",
+    "jumping-2",
+    "two-footed-jump"
+  ],
+  "observations": [
+    "Face hidden by asymmetric hair.",
+    "jumping-1, jumping-2 and two-footed-jump sampled airborne frames hit top y0 and visibly clip head.",
+    "Sampled source alpha values are exactly0/255; visible gray shading is opaque source pixels, not semi-transparent alpha fringes.",
+    "Sampled total RGBA color counts20-60 vary per frame; no stable original48-color palette demonstrated."
+  ],
+  "limits": "Internal model cause not confirmed; source visual defects and opacity measured. Do not claim direction change alone fixes clipping or shading.",
+  "next_step": "Keep generation paused while reviewing canvas/trajectory controls and style/palette preservation; no blind paid rerolls."
+}

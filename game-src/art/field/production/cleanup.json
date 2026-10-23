@@ -1,0 +1,9 @@
+{
+  "keep_character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+  "remove_character_id": "ed6456b1-dec7-4c1d-851a-5096362ca614",
+  "reason": "User explicitly requests removal of failed duplicate Jyaldi to avoid confusion. Old mixed-direction registration superseded by front-based rebuild.",
+  "status": "old-deleted-current-preserved",
+  "project_assignment": "awaiting user choice; only Mighty Hero game project is accessible, Creator folder API unavailable",
+  "old_verification": 404,
+  "current_verification": "completed"
+}

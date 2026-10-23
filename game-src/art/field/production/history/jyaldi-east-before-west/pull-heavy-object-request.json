@@ -1,0 +1,9 @@
+{
+  "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+  "mode": "skeleton-v3",
+  "template_animation_id": "pull-heavy-object",
+  "directions": [
+    "east"
+  ],
+  "animation_name": "무거운 것 끌기 (동쪽)"
+}

@@ -1,0 +1,10 @@
+status: completed
+id: f6433c66-495e-443d-b6a0-6016fd81c315
+job_id: f6433c66-495e-443d-b6a0-6016fd81c315
+frames: 1
+transparent: yes
+asset_id: 8800b687-21ae-532b-8678-03936ed5e49b
+asset_type: image
+asset_status: saved
+gallery: saved to your PixelLab gallery (pixellab.ai/create)
+charged: 9 generations

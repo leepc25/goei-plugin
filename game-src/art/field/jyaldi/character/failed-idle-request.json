@@ -1,0 +1,10 @@
+{
+  "character_id": "ed6456b1-dec7-4c1d-851a-5096362ca614",
+  "directions": [
+    "south-east"
+  ],
+  "mode": "skeleton-v3",
+  "template_animation_id": "breathing-idle",
+  "animation_name": "숨쉬기 대기 (남동)",
+  "action_description": "standing upright with subtle steady breathing and minimal shoulder movement"
+}

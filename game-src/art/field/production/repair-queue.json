@@ -1,0 +1,53 @@
+[
+  {
+    "id": "stature-v2-aileen",
+    "slug": "aileen",
+    "reason": "Petite compact character 225px, only 7px shorter than tall Jyaldi; common height target flattened stature.",
+    "action": "regenerate-front-and-register",
+    "estimated_generations": 13,
+    "correction": "Use latest manifest and height-policy.json cm specification at shared1.25px/cm. Preserve individual original body shape and costume; Aileen has natural non-bulky build and ballistic vest under suit jacket. Actual crown-to-sole result needs comparison."
+  },
+  {
+    "id": "stature-v2-deadpole",
+    "slug": "deadpole",
+    "reason": "Petite character 226px, only 6px shorter than tall Jyaldi; common height target flattened stature.",
+    "action": "regenerate-front-and-register",
+    "estimated_generations": 13,
+    "correction": "Use latest manifest and height-policy.json cm specification at shared1.25px/cm. Preserve individual original body shape and costume; Aileen has natural non-bulky build and ballistic vest under suit jacket. Actual crown-to-sole result needs comparison."
+  },
+  {
+    "id": "stature-v2-kyuras",
+    "slug": "kyuras",
+    "reason": "Wiry character 242px is as tall as canonical 2m Gorgodio241px; stature was not established by original setting.",
+    "action": "regenerate-front-and-register",
+    "estimated_generations": 13,
+    "correction": "Use latest manifest and height-policy.json cm specification at shared1.25px/cm. Preserve individual original body shape and costume; Aileen has natural non-bulky build and ballistic vest under suit jacket. Actual crown-to-sole result needs comparison."
+  },
+  {
+    "id": "aileen-user-rebuild-v4",
+    "slug": "aileen",
+    "action": "regenerate-front-and-register",
+    "reason": "User explicitly ordered delete both failed small versions and recreate. Both deleted with receipts.",
+    "correction": "Remove petite/short wording; normal adult source comparable to Jyaldi,232-238px crown-to-sole not ponytail; vest under jacket. Registration held until actual visual inspection.",
+    "estimated_generations": 9,
+    "registration_cost_after_visual_review": 4
+  },
+  {
+    "id": "konjyuce-torso-v2",
+    "slug": "konjyuce",
+    "action": "regenerate-front-and-register",
+    "reason": "User rejected high waist/short torso. Side rotations show abrupt narrowing beneath chest; previous agent visual pass was wrong. Failed character backed up and deleted.",
+    "correction": "Normal ribcage-abdomen-pelvis spacing, waist at upper pelvis, hip-length blazer and natural-waisted knee-length skirt; preserve original school uniform, age17 and natural proportions. Source must be inspected before releasing registration hold.",
+    "estimated_generations": 9,
+    "registration_cost_after_visual_review": 4
+  },
+  {
+    "id": "lee-do-hyeong-identity-v2",
+    "slug": "lee-do-hyeong",
+    "action": "regenerate-front-and-register",
+    "reason": "User rejected result. Full original confirms ponytail, cheek scars, rolled sleeves; previous prompt falsely described short hair and omitted distinctive features.",
+    "correction": "Use corrected detailed original appearance. Hold registration until source ponytail/scars/rolled sleeves and natural anatomy are actually inspected.",
+    "estimated_generations": 9,
+    "registration_cost_after_visual_review": 4
+  }
+]

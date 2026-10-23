@@ -1,0 +1,29 @@
+{
+  "usage": {
+    "type": "usd",
+    "usd": 0.0
+  },
+  "id": "7c47bedf-11f5-4434-95a8-7f84f6956fe7",
+  "status": "failed",
+  "created_at": "2026-10-23T17:41:32.624507+00:00",
+  "last_response": {
+    "code": 422,
+    "type": "error",
+    "trace": null,
+    "detail": "Character ed6456b1-dec7-4c1d-851a-5096362ca614 has no stored 3D skeleton, so a template animation can't be posed onto it. Send `keypoints` instead.",
+    "direction": "south-east",
+    "limit_type": null,
+    "character_id": "ed6456b1-dec7-4c1d-851a-5096362ca614",
+    "animation_name": null,
+    "generation_model": "skeleton-v3_template",
+    "animation_group_id": "920b2885-a284-41cb-a3b8-902d39a13be4",
+    "motion_adjustments": {
+      "stride": 1.0,
+      "posture": 0.0,
+      "arm_swing": 1.0,
+      "leg_extension": 0.0
+    },
+    "animation_description": "standing upright with subtle steady breathing and minimal shoulder movement",
+    "template_animation_id": "breathing-idle"
+  }
+}

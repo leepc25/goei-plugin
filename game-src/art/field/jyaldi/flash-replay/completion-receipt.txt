@@ -1,0 +1,10 @@
+status: completed
+id: 87ff5295-7f08-4430-8ef9-e5b7cda84b48
+job_id: 87ff5295-7f08-4430-8ef9-e5b7cda84b48
+frames: 1
+transparent: yes
+asset_id: f66a4343-6730-5c1a-90fb-be40a8d36511
+asset_type: image
+asset_status: saved
+gallery: saved to your PixelLab gallery (pixellab.ai/create)
+charged: 9 generations

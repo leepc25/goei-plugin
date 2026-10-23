@@ -1,0 +1,24 @@
+{
+  "model": "create_image_pro_flash",
+  "original_success_record": "game-src/persona-reference-20261022/generation-record.json:female_request",
+  "identical_fields": [
+    "width",
+    "height",
+    "no_background",
+    "seed",
+    "max_colors",
+    "style_options",
+    "style_image.source_image_id"
+  ],
+  "same_direction_and_view_sentence": "Body and face turned three-quarter toward screen RIGHT, EXACTLY the same direction and eye-level side-scrolling camera as the male style reference, NOT top-down.",
+  "only_changed_fields": [
+    "description (appearance/clothing and gloved hands)",
+    "style_image.usage_description (appearance/clothing)"
+  ],
+  "input_concept_image": false,
+  "input_source_style_gallery": "bc8619b0-2610-53be-9470-6de218dc6b17",
+  "job_id": "87ff5295-7f08-4430-8ef9-e5b7cda84b48",
+  "source_image_id": "f66a4343-6730-5c1a-90fb-be40a8d36511",
+  "queued_output_count": 1,
+  "queued_estimated_generations": 9
+}

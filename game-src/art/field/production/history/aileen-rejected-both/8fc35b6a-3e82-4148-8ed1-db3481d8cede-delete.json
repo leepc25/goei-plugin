@@ -1,0 +1,13 @@
+{
+  "jsonrpc": "2.0",
+  "id": 2,
+  "result": {
+    "content": [
+      {
+        "type": "text",
+        "text": "character deleted: Idle\nid: 8fc35b6a-3e82-4148-8ed1-db3481d8cede\ndirections: 8\nanimations_deleted: 0\ngroup: deleted (this was its last state)"
+      }
+    ],
+    "isError": false
+  }
+}

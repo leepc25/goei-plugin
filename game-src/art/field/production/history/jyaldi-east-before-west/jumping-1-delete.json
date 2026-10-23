@@ -1,0 +1,20 @@
+{
+  "request": {
+    "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+    "animation_group_id": "05739c03-4ac1-4303-a232-a9369c6ecfcf",
+    "direction": "east"
+  },
+  "response": {
+    "jsonrpc": "2.0",
+    "id": 2,
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "deleted: jumping-1 (east) — 1 animation(s) removed"
+        }
+      ],
+      "isError": false
+    }
+  }
+}
