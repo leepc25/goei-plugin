@@ -27,3 +27,5 @@
 최신 후속 지시: 이미 작업이 많이 진행됐으므로 그대로 둔다. 미접수 추가 수정 요청은 철회했고 이미 접수된 작업은 취소하거나 중복 생성하지 않는다. 표시 키 조정도 해제했다. 기존 제작은 계속한다.
 
 쟈알디 최신 방향 예외: west 이동/전투, south-west 제자리 비전투. control.character_direction_overrides를 따른다. 이전east 동작은history/jyaldi-east-before-west/로 보존하고 새 요청과 구분한다. 정면8방향 캐릭터ID는 유지한다.
+
+最新 검수: 에일린 실패2종과96px 구쟈알디 삭제 완료(백업/삭제 영수증history). 쟈알디 동쪽 점프는 머리 캔버스 잘림·얼굴 가림·프레임별 음영 차이로 실패. jump-defects.json 참조. 추가유료접수는control.stop_all=true로 잠시 보류; 미확인 서쪽 리롤로 같은 결함을 확대하지 않는다. 에일린 재생성은 사용자 승인됐으나 실제 새 정면 검수 전 등록은registration_held_slugs로 차단한다.

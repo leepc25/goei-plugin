@@ -3070,7 +3070,7 @@
       "kind": "registration",
       "slug": "aileen",
       "template": null,
-      "status": "processing",
+      "status": "failed",
       "created_epoch": 1792780548.9031188,
       "receipt": {
         "usage": null,
@@ -3086,7 +3086,7 @@
           "usd": 0.0
         },
         "id": "a996f9f5-1eb1-41e6-a7af-377263cff9b3",
-        "status": "processing",
+        "status": "failed",
         "created_at": "2026-10-23T18:35:49.802536+00:00",
         "last_response": {
           "status": "building_skeleton",
@@ -3097,18 +3097,24 @@
           "queue_position": 0,
           "directions_type": "8-directions",
           "generation_mode": "v3",
-          "skeleton_frames_done": 1,
+          "skeleton_frames_done": 8,
           "character_description": "에일린 / Aileen. Adult woman early20s, faded platinum blonde hair in a high ponytail with long bangs, dull gray eyes, serious analytical face, petite compact athletic build, practical fitted black trouser suit and black closed shoes as in her original portrait. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
           "generation_started_at": "2026-10-23T18:35:52.929603+00:00",
           "skeleton_frames_total": 8
         }
+      },
+      "observed_end_epoch": 1792782134.0362096,
+      "elapsed_observed_seconds": 1585.133091211319,
+      "usage": {
+        "type": "usd",
+        "usd": 0.0
       }
     },
     "b304d6f1-31b5-4a0f-a28c-9c625d4b0fdc": {
       "kind": "registration",
       "slug": "kyuras",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792780555.5611382,
       "receipt": {
         "usage": null,
@@ -3120,26 +3126,41 @@
       },
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 4.0
         },
         "id": "b304d6f1-31b5-4a0f-a28c-9c625d4b0fdc",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-23T18:36:01.697758+00:00",
         "last_response": {
-          "status": "building_skeleton",
-          "progress": 0.98,
+          "status": "completed",
           "character_id": "7cf2502d-e2e9-4677-bc53-ec1b9d76a11d",
-          "n_directions": 8,
+          "storage_urls": {
+            "east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/7cf2502d-e2e9-4677-bc53-ec1b9d76a11d/rotations/east.png",
+            "west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/7cf2502d-e2e9-4677-bc53-ec1b9d76a11d/rotations/west.png",
+            "north": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/7cf2502d-e2e9-4677-bc53-ec1b9d76a11d/rotations/north.png",
+            "south": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/7cf2502d-e2e9-4677-bc53-ec1b9d76a11d/rotations/south.png",
+            "north-east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/7cf2502d-e2e9-4677-bc53-ec1b9d76a11d/rotations/north-east.png",
+            "north-west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/7cf2502d-e2e9-4677-bc53-ec1b9d76a11d/rotations/north-west.png",
+            "south-east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/7cf2502d-e2e9-4677-bc53-ec1b9d76a11d/rotations/south-east.png",
+            "south-west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/7cf2502d-e2e9-4677-bc53-ec1b9d76a11d/rotations/south-west.png"
+          },
+          "billing_usage": {
+            "type": "generations",
+            "generations": 4.0
+          },
           "character_name": "큐라스",
-          "queue_position": 0,
           "directions_type": "8-directions",
           "generation_mode": "v3",
-          "skeleton_frames_done": 3,
-          "character_description": "큐라스 / Kyuras. Adult man early30s, thin wiry build, pale green hair swept back, narrow face, gray green eyes, lively confident smile, black tailored trouser suit, white shirt, black necktie and black shoes. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
-          "generation_started_at": "2026-10-23T18:36:07.086531+00:00",
-          "skeleton_frames_total": 8
+          "directions_count": 8,
+          "character_description": "큐라스 / Kyuras. Adult man early30s, thin wiry build, pale green hair swept back, narrow face, gray green eyes, lively confident smile, black tailored trouser suit, white shirt, black necktie and black shoes. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow."
         }
+      },
+      "observed_end_epoch": 1792782164.760445,
+      "elapsed_observed_seconds": 1609.1993072032928,
+      "usage": {
+        "type": "generations",
+        "generations": 4.0
       }
     },
     "66bfcf1b-fcce-44ef-b0f4-2986e0e1c331": {
@@ -3199,7 +3220,7 @@
       "kind": "registration",
       "slug": "rojemon",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792780589.74299,
       "receipt": {
         "usage": null,
@@ -3211,33 +3232,48 @@
       },
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 4.0
         },
         "id": "cb41e6eb-69d9-44e7-8d23-c904d87f016c",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-23T18:36:30.120379+00:00",
         "last_response": {
-          "status": "building_skeleton",
-          "progress": 0.98,
+          "status": "completed",
           "character_id": "27643078-cb88-455f-abf5-3be5bdb3ff68",
-          "n_directions": 8,
+          "storage_urls": {
+            "east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/27643078-cb88-455f-abf5-3be5bdb3ff68/rotations/east.png",
+            "west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/27643078-cb88-455f-abf5-3be5bdb3ff68/rotations/west.png",
+            "north": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/27643078-cb88-455f-abf5-3be5bdb3ff68/rotations/north.png",
+            "south": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/27643078-cb88-455f-abf5-3be5bdb3ff68/rotations/south.png",
+            "north-east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/27643078-cb88-455f-abf5-3be5bdb3ff68/rotations/north-east.png",
+            "north-west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/27643078-cb88-455f-abf5-3be5bdb3ff68/rotations/north-west.png",
+            "south-east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/27643078-cb88-455f-abf5-3be5bdb3ff68/rotations/south-east.png",
+            "south-west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/27643078-cb88-455f-abf5-3be5bdb3ff68/rotations/south-west.png"
+          },
+          "billing_usage": {
+            "type": "generations",
+            "generations": 4.0
+          },
           "character_name": "로제몬",
-          "queue_position": 0,
           "directions_type": "8-directions",
           "generation_mode": "v3",
-          "skeleton_frames_done": 3,
-          "character_description": "로제몬 / Rojemon. Adult woman early20s, long wavy lavender purple hair and bangs, violet eyes, petite natural adult build and defined waist, mildly annoyed expression, fitted black office skirt suit, white shirt, black necktie and black office pumps. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
-          "generation_started_at": "2026-10-23T18:36:31.426452+00:00",
-          "skeleton_frames_total": 8
+          "directions_count": 8,
+          "character_description": "로제몬 / Rojemon. Adult woman early20s, long wavy lavender purple hair and bangs, violet eyes, petite natural adult build and defined waist, mildly annoyed expression, fitted black office skirt suit, white shirt, black necktie and black office pumps. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow."
         }
+      },
+      "observed_end_epoch": 1792782134.128211,
+      "elapsed_observed_seconds": 1544.3852214813232,
+      "usage": {
+        "type": "generations",
+        "generations": 4.0
       }
     },
     "cad7e67c-dfc7-49fc-8681-18ac2e1070d0": {
       "kind": "registration",
       "slug": "konjyuce",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792780593.49744,
       "receipt": {
         "usage": null,
@@ -3249,26 +3285,41 @@
       },
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 4.0
         },
         "id": "cad7e67c-dfc7-49fc-8681-18ac2e1070d0",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-23T18:36:34.718701+00:00",
         "last_response": {
-          "status": "building_skeleton",
-          "progress": 0.98,
+          "status": "completed",
           "character_id": "1cfdc1a3-19f6-4c87-85c5-e59329f657f5",
-          "n_directions": 8,
+          "storage_urls": {
+            "east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/1cfdc1a3-19f6-4c87-85c5-e59329f657f5/rotations/east.png",
+            "west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/1cfdc1a3-19f6-4c87-85c5-e59329f657f5/rotations/west.png",
+            "north": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/1cfdc1a3-19f6-4c87-85c5-e59329f657f5/rotations/north.png",
+            "south": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/1cfdc1a3-19f6-4c87-85c5-e59329f657f5/rotations/south.png",
+            "north-east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/1cfdc1a3-19f6-4c87-85c5-e59329f657f5/rotations/north-east.png",
+            "north-west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/1cfdc1a3-19f6-4c87-85c5-e59329f657f5/rotations/north-west.png",
+            "south-east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/1cfdc1a3-19f6-4c87-85c5-e59329f657f5/rotations/south-east.png",
+            "south-west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/1cfdc1a3-19f6-4c87-85c5-e59329f657f5/rotations/south-west.png"
+          },
+          "billing_usage": {
+            "type": "generations",
+            "generations": 4.0
+          },
           "character_name": "콘쥬스",
-          "queue_position": 0,
           "directions_type": "8-directions",
           "generation_mode": "v3",
-          "skeleton_frames_done": 6,
-          "character_description": "콘쥬스 / Konjyuce. 17 year old Korean schoolgirl with ordinary age appropriate teen proportions, shoulder length straight black bob with one distinctive pink streak, blue eyes, determined youthful face. Fully clothed navy school uniform blazer with light piping, white collared shirt, black necktie, gray knee length pleated school skirt, dark socks and plain black school loafers. No adult glamour styling. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
-          "generation_started_at": "2026-10-23T18:36:40.97804+00:00",
-          "skeleton_frames_total": 8
+          "directions_count": 8,
+          "character_description": "콘쥬스 / Konjyuce. 17 year old Korean schoolgirl with ordinary age appropriate teen proportions, shoulder length straight black bob with one distinctive pink streak, blue eyes, determined youthful face. Fully clothed navy school uniform blazer with light piping, white collared shirt, black necktie, gray knee length pleated school skirt, dark socks and plain black school loafers. No adult glamour styling. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow."
         }
+      },
+      "observed_end_epoch": 1792782103.1192126,
+      "elapsed_observed_seconds": 1509.621774673462,
+      "usage": {
+        "type": "generations",
+        "generations": 4.0
       }
     },
     "86ea3180-a8b5-44cb-9018-3aae95668543": {
@@ -3372,16 +3423,18 @@
         "status": "processing",
         "created_at": "2026-10-23T18:39:56.850399+00:00",
         "last_response": {
-          "status": "correcting_frames",
-          "progress": 0.84,
+          "status": "building_skeleton",
+          "progress": 0.98,
           "character_id": "57e9dc0e-913f-443b-bb1f-6be2cdb617cd",
           "n_directions": 8,
           "character_name": "데드폴",
           "queue_position": 0,
           "directions_type": "8-directions",
           "generation_mode": "v3",
+          "skeleton_frames_done": 5,
           "character_description": "데드폴 / Deadpole. Adult woman early20s, petite natural build, long straight black hair with straight bangs, soft round dark gray eyes, gentle cautious expression, black tailored trouser suit, white shirt, black necktie, black protective gloves and plain black shoes. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
-          "generation_started_at": "2026-10-23T18:40:03.779419+00:00"
+          "generation_started_at": "2026-10-23T18:40:03.779419+00:00",
+          "skeleton_frames_total": 8
         }
       }
     },
@@ -3486,7 +3539,7 @@
       "kind": "image",
       "slug": "gognija",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792781814.773056,
       "receipt": {
         "usage": null,
@@ -3501,6 +3554,65 @@
         },
         "estimated_generations": 9,
         "pricing_provisional": true
+      },
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 9.0
+        },
+        "id": "9331805a-b8b1-4a62-9ed2-ac8281cb96f9",
+        "status": "completed",
+        "created_at": "2026-10-23T18:57:27.304281+00:00",
+        "last_response": {
+          "seed": 10222027,
+          "type": "message_done",
+          "model": "pro_flash",
+          "width": 128,
+          "action": "Removing background",
+          "height": 256,
+          "images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "prompt": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult male researcher mid40s, unruly shoulder length white hair, round dark protective goggles over eyes, manic cheerful grin, ordinary lean middle aged build, long white lab coat over white shirt and black necktie, dark business trousers and black shoes. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 223-227px on128x256 at shared1.25px/cm; height 180cm; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
+          "status": "completed",
+          "asset_id": "97b386d8-c4d0-5b15-beda-2681f339b883",
+          "image_id": "97b386d8-c4d0-5b15-beda-2681f339b883",
+          "job_kind": "creator-image",
+          "progress": 1.0,
+          "image_url": "https://s3.eu-central-003.backblazeb2.com/pixellab-generations/production/creator/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/97b386d8-c4d0-5b15-beda-2681f339b883/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0037e6521c1d7c20000000001%2F20261023%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20261023T190148Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=43664c926246f021e203efbc5cb41c499f36bcd33cec2101e317cb3050e1d63b",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 9
+          },
+          "generation_id": "be748b96-f575-4d90-8091-c928f1ff7e66",
+          "queue_position": 0,
+          "billing_charged": true,
+          "original_images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "source_image_id": "97b386d8-c4d0-5b15-beda-2681f339b883",
+          "creator_image_saved": true,
+          "generation_started_at": "2026-10-23T18:58:04.460962+00:00",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792782134.2398376,
+      "elapsed_observed_seconds": 319.4667820930481,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 9
       }
     },
     "3cddea2e-3a66-4291-a79c-2be803461b07": {
@@ -3520,6 +3632,36 @@
         "status": "processing",
         "enhanced_prompt": null,
         "enhance_usage": null
+      },
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "3cddea2e-3a66-4291-a79c-2be803461b07",
+        "status": "processing",
+        "created_at": "2026-10-23T18:59:41.189950+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "action": "generating",
+          "progress": 0.12285985374004413,
+          "direction": "west",
+          "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+          "animation_name": null,
+          "queue_position": 0,
+          "generation_model": "skeleton-v3_template",
+          "animation_group_id": "e55a2aa8-8043-49d8-aa56-738827421ecd",
+          "motion_adjustments": {
+            "stride": 1.0,
+            "posture": 0.0,
+            "arm_swing": 1.0,
+            "leg_extension": 0.0
+          },
+          "animation_description": "walking confidently with an upright steady torso, measured strides and restrained arm swing",
+          "generation_started_at": "2026-10-23T19:01:42.318913+00:00",
+          "template_animation_id": "walking-8-frames",
+          "estimated_wait_seconds": 0
+        }
       }
     },
     "c8873c16-757b-44c9-817a-9e39fd7247fc": {
@@ -3539,6 +3681,36 @@
         "status": "processing",
         "enhanced_prompt": null,
         "enhance_usage": null
+      },
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "c8873c16-757b-44c9-817a-9e39fd7247fc",
+        "status": "processing",
+        "created_at": "2026-10-23T19:00:41.169043+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "action": "generating",
+          "progress": 0.14648130000371712,
+          "direction": "west",
+          "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+          "animation_name": null,
+          "queue_position": 0,
+          "generation_model": "skeleton-v3_template",
+          "animation_group_id": "df6204c1-2c29-4058-a3eb-2815504254e5",
+          "motion_adjustments": {
+            "stride": 1.0,
+            "posture": 0.0,
+            "arm_swing": 1.0,
+            "leg_extension": 0.0
+          },
+          "animation_description": "running decisively with a steady torso, controlled arm swing and firm purposeful strides",
+          "generation_started_at": "2026-10-23T19:01:28.978142+00:00",
+          "template_animation_id": "running-8-frames",
+          "estimated_wait_seconds": 0
+        }
       }
     }
   },
@@ -6264,9 +6436,98 @@
         "bytes": 90088,
         "files": 9
       }
+    },
+    {
+      "at": "2026-10-23T19:01:43Z",
+      "kind": "completed",
+      "slug": "konjyuce",
+      "detail": {
+        "kind": "registration",
+        "template": null,
+        "job_id": "cad7e67c-dfc7-49fc-8681-18ac2e1070d0",
+        "usage": {
+          "type": "generations",
+          "generations": 4.0
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T19:02:14Z",
+      "kind": "failed",
+      "slug": "aileen",
+      "detail": {
+        "kind": "registration",
+        "template": null,
+        "job_id": "a996f9f5-1eb1-41e6-a7af-377263cff9b3",
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "detail": {
+          "status": "building_skeleton",
+          "progress": 0.98,
+          "character_id": "8fc35b6a-3e82-4148-8ed1-db3481d8cede",
+          "n_directions": 8,
+          "character_name": "에일린",
+          "queue_position": 0,
+          "directions_type": "8-directions",
+          "generation_mode": "v3",
+          "skeleton_frames_done": 8,
+          "character_description": "에일린 / Aileen. Adult woman early20s, faded platinum blonde hair in a high ponytail with long bangs, dull gray eyes, serious analytical face, petite compact athletic build, practical fitted black trouser suit and black closed shoes as in her original portrait. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
+          "generation_started_at": "2026-10-23T18:35:52.929603+00:00",
+          "skeleton_frames_total": 8
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T19:02:14Z",
+      "kind": "completed",
+      "slug": "rojemon",
+      "detail": {
+        "kind": "registration",
+        "template": null,
+        "job_id": "cb41e6eb-69d9-44e7-8d23-c904d87f016c",
+        "usage": {
+          "type": "generations",
+          "generations": 4.0
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T19:02:14Z",
+      "kind": "completed",
+      "slug": "gognija",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "9331805a-b8b1-4a62-9ed2-ac8281cb96f9",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 9
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T19:02:44Z",
+      "kind": "completed",
+      "slug": "kyuras",
+      "detail": {
+        "kind": "registration",
+        "template": null,
+        "job_id": "b304d6f1-31b5-4a0f-a28c-9c625d4b0fdc",
+        "usage": {
+          "type": "generations",
+          "generations": 4.0
+        },
+        "detail": null
+      }
     }
   ],
-  "updated_at": 1792782055.8832996,
+  "updated_at": 1792782196.2800477,
   "user_stopped_at": 1792778235.6917784,
   "archived_jobs": {
     "304457e9-6577-44f0-af17-97841a9f6720": {
@@ -7585,12 +7846,12 @@
       "saved_frames": 6
     }
   },
-  "last_git_checkpoint": 1792780948.2542846,
+  "last_git_checkpoint": 1792782057.9141974,
   "summary": {
     "jobs": {
-      "processing": 8,
-      "completed": 34,
-      "failed": 2,
+      "processing": 3,
+      "completed": 38,
+      "failed": 3,
       "stalled": 0
     },
     "characters_ready": 5,
