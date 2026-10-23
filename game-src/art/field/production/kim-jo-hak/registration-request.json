@@ -1,0 +1,14 @@
+{
+  "description": "김조학 / Kim Jo-hak. Adult man late40s, short slicked black hair, rectangular black sunglasses, reserved anonymous middle aged face, broad ordinary build, conservative black trouser suit, white shirt, black necktie, black dress shoes. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
+  "reference_image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "n_directions": 8,
+  "view": "low top-down",
+  "template_id": "mannequin",
+  "name": "김조학",
+  "seed": 10222027,
+  "no_background": true
+}

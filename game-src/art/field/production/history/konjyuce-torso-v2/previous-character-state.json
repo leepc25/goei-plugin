@@ -1,0 +1,13 @@
+{
+  "name": "콘쥬스",
+  "group": "management",
+  "character_id": "1cfdc1a3-19f6-4c87-85c5-e59329f657f5",
+  "image": "0dc42b65-e471-4ff1-ae53-3195b75dd1bf",
+  "registration": "cad7e67c-dfc7-49fc-8681-18ac2e1070d0",
+  "motions": {},
+  "ready": true,
+  "image_verified": true,
+  "skeleton_joints": 18,
+  "rotation_count": 8,
+  "exported": true
+}
