@@ -1825,6 +1825,9 @@ var ui_default = `.gs { position: relative; width: 100%; height: 100%; overflow:
 /* 아이템 칸: 판을 단추 상자 전체에 맞춰 늘려 수량 숫자가 판 안에 들어오게 (독립 검수: 수량이 칸 밖) */
 .tp .tp-b.pl.item { background-size: 100% 100%; }
 .tp .tp-side .tp-b.pl.item u, .tp .tp-b.pl.item u { right: 10px; bottom: 6px; font-size: 18px; }
+/* 시험용: 필드 칸 크기 표시 (오른쪽 아래) */
+.gs-size { position: absolute; right: 8px; bottom: 8px; z-index: 30; padding: 4px 8px; background: rgba(0,0,0,.72); border: 2px solid #ece6d4; color: #ece6d4; font: 16px 'GoeiPixel', 'Galmuri11', monospace; -webkit-font-smoothing: none; pointer-events: none; }
+.gs-size[hidden] { display: none; }
 `;
 
 // src/game/action/ui/stage.ts
@@ -1844,7 +1847,7 @@ function mountStage(box2) {
   const root = document.createElement("div");
   root.className = "gs";
   root.tabIndex = 0;
-  root.innerHTML = `<div class="gs-stage"><canvas class="gs-canvas" width="${W2}" height="${H2}" aria-label="게임 화면"></canvas><div class="gs-crt"></div><div class="gs-ui"></div></div><div class="gs-touch"></div><div class="gs-rotate"><div class="gs-rot-ico"></div><b>폰을 가로로 돌려 주세요</b><span>세로 그대로면 화면이 아주 작습니다</span><div class="gs-rot-row"><button type="button" data-rot="turn">화면 돌려서 크게</button><button type="button" data-rot="keep">세로로 작게</button></div></div>`;
+  root.innerHTML = `<div class="gs-stage"><canvas class="gs-canvas" width="${W2}" height="${H2}" aria-label="게임 화면"></canvas><div class="gs-crt"></div><div class="gs-ui"></div></div><div class="gs-touch"></div><div class="gs-size"></div><div class="gs-rotate"><div class="gs-rot-ico"></div><b>폰을 가로로 돌려 주세요</b><span>세로 그대로면 화면이 아주 작습니다</span><div class="gs-rot-row"><button type="button" data-rot="turn">화면 돌려서 크게</button><button type="button" data-rot="keep">세로로 작게</button></div></div>`;
   box2.append(root);
   const stageEl = root.querySelector(".gs-stage");
   const canvas = root.querySelector("canvas");
@@ -1852,6 +1855,7 @@ function mountStage(box2) {
   const ui = root.querySelector(".gs-ui");
   const touch = root.querySelector(".gs-touch");
   const rotate = root.querySelector(".gs-rotate");
+  const sizeEl = root.querySelector(".gs-size");
   const fns = [];
   let keepPortrait = false;
   let fill = false, byHeight = false;
@@ -1926,33 +1930,29 @@ function mountStage(box2) {
     const portrait = bh > bw * 1.05;
     s.portrait = portrait;
     root.classList.toggle("portrait", portrait);
-    const vw = fill && !portrait && bw / bh > W2 / H2 ? Math.min(1800, Math.round(H2 * bw / bh)) : byHeight && !portrait && bw / bh < W2 / H2 ? Math.max(640, Math.round(H2 * bw / bh)) : W2;
-    if (vw !== s.vw || canvas.width !== vw) {
+    const dpr = window.devicePixelRatio || 1;
+    const fieldFill = byHeight && !portrait && bh >= 600;
+    const k = fieldFill ? Math.max(1, Math.floor(dpr)) / dpr : 1;
+    const vh = fieldFill ? Math.round(bh / k) : H2;
+    const vw = fieldFill ? Math.round(bw / k) : fill && !portrait && bw / bh > W2 / H2 ? Math.min(1800, Math.round(H2 * bw / bh)) : byHeight && !portrait && bw / bh < W2 / H2 ? Math.max(640, Math.round(H2 * bw / bh)) : W2;
+    if (vw !== s.vw || canvas.width !== vw || canvas.height !== vh) {
       s.vw = vw;
       canvas.width = vw;
+      canvas.height = vh;
       canvas.style.width = stageEl.style.width = `${vw}px`;
+      canvas.style.height = stageEl.style.height = `${vh}px`;
     }
-    let scale = Math.min(bw / vw, bh / H2);
-    if (byHeight && !portrait) {
-      const dpr = window.devicePixelRatio || 1, k = Math.floor(bh * dpr / H2) / dpr;
-      if (k * H2 >= bh * 0.75) {
-        scale = k;
-        const nw = Math.min(W2, Math.max(640, Math.floor(bw / k)));
-        if (nw !== s.vw || canvas.width !== nw) {
-          s.vw = nw;
-          canvas.width = nw;
-          canvas.style.width = stageEl.style.width = `${nw}px`;
-        }
-      }
-    }
+    const scale = fieldFill ? k : Math.min(bw / vw, bh / H2);
     s.scale = scale;
-    const w = s.vw * scale, h = H2 * scale;
+    const w = s.vw * scale, h = vh * scale;
     const top = portrait ? portraitTop(bh, h) : (bh - h) / 2;
     stageEl.style.transform = `translate(${Math.round((bw - w) / 2)}px, ${Math.round(top)}px) scale(${scale})`;
     root.style.setProperty("--gs-scale", String(scale));
     root.style.setProperty("--gs-top", `${top}px`);
     root.style.setProperty("--gs-bottom", `${top + h}px`);
     rotate.classList.toggle("on", portrait && coarse() && !keepPortrait);
+    sizeEl.hidden = !byHeight;
+    sizeEl.textContent = `칸 ${bw}×${bh}` + (dpr !== 1 ? ` · 실제 ${Math.round(bw * dpr)}×${Math.round(bh * dpr)} (배율 ${Math.round(dpr * 100)}%)` : "") + ` · 게임 ${Math.round(scale * 100)}%`;
     for (const f of fns) f();
   };
   rotate.addEventListener("click", (e) => {

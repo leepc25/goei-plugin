@@ -1,4 +1,33 @@
-seline = "middle";
+me);
+  function reportPayload(s2) {
+    const l = s2.last;
+    if (!l) return null;
+    const a = AGENT_BY_ID[l.agent];
+    return {
+      mission: MISSION_BY_ID[l.mission]?.title ?? l.mission,
+      outcome: l.how,
+      depth: l.result.depth,
+      agents: [{ id: a.id, name: a.name, hp: l.how === "evac" ? 0 : 1, injured: s2.agents[l.agent].injured > 0 }],
+      rules: l.result.found,
+      loot: l.result.bag.filter(Boolean).map((b) => b.name),
+      summary: reportText(s2)
+    };
+  }
+
+  // src/game/action/hq/runmenu.ts
+  var iconDrawer2 = null;
+  function setItemIconDrawer(f) {
+    iconDrawer2 = f;
+  }
+  var ICON_COLOR = { medkit: "#d05050", bandage: "#e0d0c0", antidote: "#60c080", salt: "#e8e8e8", flash: "#f0f070", smoke: "#8a8a9a", charm: "#d0a040", energy: "#d0b040" };
+  function drawIcon(ctx, id, x, y, size2) {
+    if (iconDrawer2) return iconDrawer2(ctx, id, x, y, size2);
+    ctx.fillStyle = ICON_COLOR[id] ?? "#8a8a8a";
+    ctx.fillRect(x + 4, y + 4, size2 - 8, size2 - 8);
+    ctx.fillStyle = "#111";
+    ctx.font = `${Math.round(size2 * 0.45)}px sans-serif`;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
     ctx.fillText(itemName(id).slice(0, 1), x + size2 / 2, y + size2 / 2 + 1);
   }
   function iconCanvas(id, size2 = 40) {
@@ -3204,20 +3233,4 @@ ${can.ok ? "" : `<p class="hq-warn">${esc2(can.why)}</p>`}</div>
     const hall2 = f.segments[0];
     const chunks = f.segments.filter((s2) => s2.ref.startsWith("chunk:"));
     const terr = f.segments.flatMap((s2) => s2.terrain);
-    const clearAt = (x, d3 = 90) => !f.placed.some((p) => Math.abs(p.x - x) < d3) && !terr.some((t) => x > t.x0 - 80 && x < t.x1 + 80);
-    const decor = (p) => p.kind === "prop" && !Object.keys(p.data).length;
-    const clearIfMoved = (x, d3) => !f.placed.some((p) => !decor(p) && Math.abs(p.x - x) < d3) && !terr.some((t) => x > t.x0 - 80 && x < t.x1 + 80);
-    const spot = (segs, d3, ok = () => true, shuffled2 = false) => {
-      let xs = segs.flatMap((c) => Array.from({ length: 27 }, (_, k) => c.x + 60 + k * 20));
-      if (shuffled2) xs = shuffle2(r, xs);
-      for (const pass of [clearAt, clearIfMoved])
-        for (const x of xs)
-          if (pass(x, d3) && ok(x)) {
-            f.placed = f.placed.filter((p) => !(decor(p) && Math.abs(p.x - x) < d3));
-            return x;
-          }
-      return null;
-    };
-    if (depth >= 2) f.placed.push(place2("upper", hall2.x + UPPER_X, 0, 70, "위층 점검문", {}));
-    if (depth >= 2 && !GATE_FREE.has(type) && chunks.length >= 4 && (depth === 2 || r() < 0.6)) {
-      const gateAt = (gap) => spot(chunks.slice(Math.max(2, Math.floor(chunks.length * 0.5))), 110, (x) => !f.placed.some((p) => p.kind === "shutter" && Math.abs(p.x - x) < 300) && !terr.some((t) => x 
+    const clearAt = (x, d3 = 90) => !f.placed.some((p) => Math.abs(p.x - x) < d3) && !terr.some((t) =>

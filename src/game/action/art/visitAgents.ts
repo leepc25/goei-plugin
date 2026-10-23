@@ -1,6 +1,7 @@
 // 본부 방문: 방에 서 있는 요원 그림 (game-pack/visit-agents, tools/build_visit_agents.py).
 // 각 요원의 기존 대기(idle) 클립만 쓴다. 그림이 없는 요원은 그리지 않고 대화 목록에만 나온다.
 import { PIXEL } from '../engine/contract';
+import { spr } from '../engine/view';
 
 type Frame = { sx: number; sy: number; w: number; h: number; ox: number; oy: number };
 type Sheet = { atlas: HTMLImageElement; agents: Record<string, { ms: number; frames: Frame[] }> };
@@ -41,11 +42,12 @@ export function drawVisitAgent(c: CanvasRenderingContext2D, name: string, x: num
   c.imageSmoothingEnabled = false;
   c.fillStyle = 'rgba(0,0,0,.28)';
   c.beginPath();
-  c.ellipse(x, y, 34, 8, 0, 0, Math.PI * 2);
+  const P = PIXEL * spr(y), k = P / PIXEL;
+  c.ellipse(x, y, 34 * k, 8 * k, 0, 0, Math.PI * 2);
   c.fill();
   c.translate(Math.round(x), Math.round(y));
   if (dir < 0) c.scale(-1, 1);
-  c.drawImage(sheet.atlas, f.sx, f.sy, f.w, f.h, f.ox * PIXEL, f.oy * PIXEL, f.w * PIXEL, f.h * PIXEL);
+  c.drawImage(sheet.atlas, f.sx, f.sy, f.w, f.h, f.ox * P, f.oy * P, f.w * P, f.h * P);
   c.restore();
   return true;
 }

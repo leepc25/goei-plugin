@@ -3,6 +3,7 @@ import { pfont } from './pxfont';
 import { drawPropArt } from '../art/bg';
 import { drawGoSign } from '../ui/title';
 import { PIXEL, SCREEN_H, SCREEN_W, type Body, type WBox } from './contract';
+import { spr } from './view';
 import type { Art } from './art';
 import { Bullet } from './bodies';
 import { Fighter } from './fighter';
@@ -125,7 +126,8 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
     ctx.globalAlpha = alpha * ghostK;
     ctx.translate(Math.round(x), Math.round(y));
     if (dir < 0) ctx.scale(-1, 1);
-    ctx.drawImage(art.atlas, fi.sx, fi.sy, fi.w, fi.h, (fi.ox - origin) * PIXEL, fi.oy * PIXEL, fi.w * PIXEL, fi.h * PIXEL);
+    const P = PIXEL * spr(y);
+    ctx.drawImage(art.atlas, fi.sx, fi.sy, fi.w, fi.h, (fi.ox - origin) * P, fi.oy * P, fi.w * P, fi.h * P);
     ctx.restore();
     return true;
   }

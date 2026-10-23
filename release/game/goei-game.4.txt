@@ -1,4 +1,37 @@
-       const dy = world.player.y - this.y;
+act: d3.react,
+        dir: this.dir,
+        push: d3.push ?? 2,
+        stop: 2,
+        low: d3.low,
+        armorBreak: d3.unblockable,
+        strength: d3.react === "down" ? 3 : d3.react === "stagger" ? 2 : 1
+      };
+      if (d3.debuff) {
+        hit2.debuff = d3.debuff;
+        armDebuff(hit2, d3.debuff, this.id);
+      }
+      return { hit: [hit2], hurt: [] };
+    }
+    step(world) {
+      const d3 = this.def;
+      checkDebuffs(world);
+      if (this.done) return void (this.alive = false);
+      this.t++;
+      if (d3.every && this.t % d3.every === 0) this.attackId = newAttackId();
+      this.x += this.vx;
+      if (d3.gravity) {
+        this.z += this.vz;
+        this.vz -= d3.gravity;
+        if (this.z <= 0) {
+          this.z = 0;
+          world.fx("dust", this.x, this.y, 0);
+          world.shake(4, 2);
+          this.alive = false;
+        }
+      }
+      if (d3.grow) this.half += d3.grow;
+      if (d3.homeY) {
+        const dy = world.player.y - this.y;
         this.y += Math.max(-d3.homeY, Math.min(d3.homeY, dy));
       }
       if (this.t >= d3.life) this.alive = false;
@@ -4587,7 +4620,8 @@
       ctx.globalAlpha = alpha * ghostK;
       ctx.translate(Math.round(x), Math.round(y));
       if (dir < 0) ctx.scale(-1, 1);
-      ctx.drawImage(art5.atlas, fi.sx, fi.sy, fi.w, fi.h, (fi.ox - origin) * PIXEL, fi.oy * PIXEL, fi.w * PIXEL, fi.h * PIXEL);
+      const P = PIXEL * spr(y);
+      ctx.drawImage(art5.atlas, fi.sx, fi.sy, fi.w, fi.h, (fi.ox - origin) * P, fi.oy * P, fi.w * P, fi.h * P);
       ctx.restore();
       return true;
     }
@@ -4909,28 +4943,4 @@
             ctx.save();
             ctx.translate(-camX + jitter, 0);
             b.draw(ctx, w);
-            ctx.restore();
-          } else if (b.draw) {
-            ctx.save();
-            ctx.translate(Math.round(q.x - camX + jitter), Math.round(q.y - q.z));
-            b.draw(ctx, w);
-            ctx.restore();
-          } else grayBody(b, camX - jitter, 0);
-        }
-        propsUpTo(Infinity);
-        {
-          const pl = w.player;
-          if (pl.alive && (w.props.some((p) => p.y > pl.y + 2 && Math.abs(p.x - pl.x) < p.w / 2 + 50 && !["hubdoor", "hubspot", "door", "elevator", "hatch"].includes(p.kind)) || layers.some((l) => l.occludedSilhouette !== false && l.y > pl.y + 2 && pl.x > l.x0 - 50 && pl.x < l.x1 + 50))) {
-            const q = pos(pl);
-            ctx.save();
-            ctx.globalAlpha = 0.4;
-            ghostK = 0.4;
-            drawPlayer(pl, q.x - camX, q.y, q.z, w);
-            ghostK = 1;
-            ctx.restore();
-          }
-        }
-        w.hintShown = false;
-        drawFx(w, camX);
-        if (w.floor.drawForeground) {
-     
+            ctx.re

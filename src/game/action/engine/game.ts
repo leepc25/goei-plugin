@@ -132,9 +132,13 @@ export class Game {
         this.mods.onPause?.(paused);
       }
       if (!this.mods.covered?.()) {
-        const vw = this.canvas.width, w = this.world;
+        const w = this.world;
+        view.zoom = this.canvas.height / SCREEN_H;
+        if (w) view.lane = w.lane;
+        const vw = this.canvas.width / view.zoom;
         view.crop = vw < SCREEN_W && w ? Math.max(0, Math.min(SCREEN_W - vw, Math.round(w.player.x - w.camX - vw / 2))) : 0;
         this.ctx.save();
+        this.ctx.scale(view.zoom, view.zoom);
         this.ctx.translate(-view.crop, 0);
         this.scene.draw(paused ? 1 : this.acc / T);
         this.ctx.restore();

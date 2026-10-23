@@ -12,6 +12,7 @@ import { HQ_PLACE, drawFloor, drawHqWall, drawPropArt, drawHqTextureWall } from 
 import { drawStartRoom, drawStartRoomFurniture } from '../art/startRoom';
 import { drawHqDoorRound2 } from '../art/hqDoorRound2';
 import { drawVisitAgent, visitAgentTop } from '../art/visitAgents';
+import { persp, view as fieldView } from './view';
 import { blockByProps, clearSpot, type BlockProp } from './propBlock';
 import { LANE_BOT, LANE_TOP, type HqBox, type HqDoor, type HqMapView, type HqScene, type HqSpot } from '../hq/map';
 
@@ -134,7 +135,12 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
         const age = (now - enterTick) / (1000 / 30);
         if (!sc.legacy) for (const d of sc.doors) if (isS(d)) drawExitLintel(c, d, camX);
         // 주인공 그림은 쟈알디 그림이라 머리 높이도 쟈알디 기준
-        host.overlay?.(c, people.map((p) => ({ name: p.name, x: p.x, y: p.y, top: visitAgentTop(p.name) })), { name: '', x: w.player.x, y: w.player.y, top: visitAgentTop('쟈알디') });
+        // 말풍선·이름표는 화면 px 그대로 (필드 zoom을 되돌려 글자 도트가 고르게). top은 원근까지 곱한 화면 px
+        const z = fieldView.zoom;
+        c.save();
+        c.scale(1 / z, 1 / z);
+        host.overlay?.(c, people.map((p) => ({ name: p.name, x: p.x * z, y: p.y * z, top: visitAgentTop(p.name) * persp(p.y) })), { name: '', x: w.player.x * z, y: w.player.y * z, top: visitAgentTop('쟈알디') * persp(w.player.y) });
+        c.restore();
         // 출입 표식과 잠금 이유는 render.ts / HUD가 같은 조사 대상으로 표시한다.
         const dark = fadeOut > 0 ? 1 - fadeOut / FADE : age < FADE ? 1 - age / FADE : 0;
         if (dark > 0) {

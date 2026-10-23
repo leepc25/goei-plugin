@@ -600,6 +600,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       audio.setListener(w.camX + 640, 640);
       footsteps(w);
       ctx.save();
+      ctx.scale(view.zoom, view.zoom);
       ctx.translate(-Math.round(w.camX) - view.crop, 0);
       shell.fx.drawWorld(ctx);
       ctx.restore();

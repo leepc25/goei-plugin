@@ -1,4 +1,8 @@
-d: "saladin", name: "살라딘", sheet: "살라딘", group: "faction", color: "#2f6b4f", photo: "Saladin", role: "이슬람 성전대 한국 최고 전사. 이태원 성원이 거점.", speech: "우렁차고 고풍스러운 하오체. 아군에겐 따뜻하고 적에겐 쇠 같다. 「형제여!」", effects: ["favor", "hint", "join", "hostile", "leave"], greet: ["형제여! 날 따르시오!"], lines: ["그렇게 부르시오! 하하! 기분이 아주 좋소!", "형제여! 이교도의 말에 귀 기울이지 마시오!", "지금은 동맹이나 잠시뿐이오!", "사악한 신은 여기서 불탈 것이오!"] }),
+, photo: "Kwak Seong-ju", role: "가짜 관리국 과장. 최전방 중돌격 담당.", speech: "연병장 고함, 욕설 섞인 반말. 명령·농담·객기가 같은 음량.", effects: ["favor", "hint", "hostile", "leave"], greet: ["닥쳐, 이 자식아! 후퇴는 없다!"], lines: ["인류를 위해 목숨 바쳐라! 난 여기서 죽기로 했다!", "날 방패로 써도 좋으니 버텨!", "맛만 봐, 맛만.", "어이, 거기! 쏘지 마! 지켜보기만 해!"] })
+  };
+  var FACTION_NPCS = {
+    blaret: d2({ id: "blaret", name: "블라렛", sheet: "블라렛", group: "faction", color: "#e8e2d0", photo: "Blaret", role: "교황청 특급 수녀. 진조 흡혈귀를 쫓아 한국에 파견.", speech: "장난스럽고 판매원처럼 밝은 반말 섞인 존댓말, 상대를 찔러 본다. 전투에선 심판하듯 차갑게.", effects: ["favor", "hint", "join", "hostile", "leave", "trade"], greet: ["반가워요. 교황청 특급 수녀 블라렛. 흡혈귀 퇴치 건으로 한국에 왔어요."], lines: ["어때요? 그쪽 일 접고 우리 쪽으로 개종하는 거.", "내가 말하면 그쪽도 말하는 거예요. 숨기기 없기.", "재밌는 거 볼래요? …찰칵.", "흡혈귀 사냥이라면 그쪽보다 전문이죠."] }),
+    saladin: d2({ id: "saladin", name: "살라딘", sheet: "살라딘", group: "faction", color: "#2f6b4f", photo: "Saladin", role: "이슬람 성전대 한국 최고 전사. 이태원 성원이 거점.", speech: "우렁차고 고풍스러운 하오체. 아군에겐 따뜻하고 적에겐 쇠 같다. 「형제여!」", effects: ["favor", "hint", "join", "hostile", "leave"], greet: ["형제여! 날 따르시오!"], lines: ["그렇게 부르시오! 하하! 기분이 아주 좋소!", "형제여! 이교도의 말에 귀 기울이지 마시오!", "지금은 동맹이나 잠시뿐이오!", "사악한 신은 여기서 불탈 것이오!"] }),
     avensha: d2({ id: "avensha", name: "아벤샤", sheet: "아벤샤", group: "faction", color: "#6a2c70", photo: "Avensha", role: "발푸르기스 협회 십대 마녀 중 하나.", speech: "격식 있고 화려한 존댓말, 윗 마법사에게 한껏 자신을 낮추는 아첨. 감탄하면 비명.", effects: ["favor", "hint", "trade", "hostile", "leave"], greet: ["어머나! 이런 곳에서 뵙다니요!"], lines: ["땅을 기는 미천한 애벌레의 생애 최고의 은총이에요!", "실력을 증명할 수 있어 기뻐요!", "이번 산책에 심장을 꽤 거뒀어요.", "차를 마시며 감상할 수 있지요. 그 정도 안목은 있답니다."] })
   };
   var ENTITY_NPCS = {
@@ -3038,42 +3042,4 @@ ${t.secret}` : "",
       },
       hasSave: () => session.hasSave || hasSaved(),
       onRetreat: () => bridge?.visit ? bridge.close?.() : game?.endRun("withdraw"),
-      onTitle: () => bridge?.visit ? bridge.close?.() : game?.toTitle(),
-      toLocal: bridge?.viewport ? (x, y, el) => bridge.viewport.toLocal(x, y, el) : void 0,
-      field: bridge?.visit ? { onExit: () => bridge.close?.() } : void 0
-    });
-    const stageStore = {
-      load: () => {
-        if (session.meta) return session.meta;
-        try {
-          const t = localStorage.getItem("goei-game-stage");
-          return t ? JSON.parse(t) : null;
-        } catch {
-          return null;
-        }
-      },
-      save: (m) => {
-        session.setMeta(m);
-        try {
-          localStorage.setItem("goei-game-stage", JSON.stringify(m));
-        } catch {
-        }
-      }
-    };
-    const visit = bridge?.visit ? mountTalk(shell.stage.ui, bridge.visit) : null;
-    const npc = linkNpcTalk({
-      visit: visit ? (name) => {
-        if (name) visit.open(name);
-      } : void 0,
-      layer: shell.stage.ui,
-      bridge,
-      settings: () => shell.settings,
-      agent: () => runAgent,
-      day: () => hq2.state().day,
-      rescued: () => hq2.state().rescued,
-      photo: (k) => bridge?.photo?.(k) || demo_photos_default[k],
-      sfx: (n) => audio.play(n),
-      onOpen: (on) => shell.touch.setVisible(!on && shell.mode === "play")
-    });
-    globalThis.__goeiNpc = npc;
-    globalThis.__goeiStage 
+      onTitle: () => bridge?.visit ?

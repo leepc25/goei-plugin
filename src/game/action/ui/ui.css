@@ -136,3 +136,6 @@
 /* 아이템 칸: 판을 단추 상자 전체에 맞춰 늘려 수량 숫자가 판 안에 들어오게 (독립 검수: 수량이 칸 밖) */
 .tp .tp-b.pl.item { background-size: 100% 100%; }
 .tp .tp-side .tp-b.pl.item u, .tp .tp-b.pl.item u { right: 10px; bottom: 6px; font-size: 18px; }
+/* 시험용: 필드 칸 크기 표시 (오른쪽 아래) */
+.gs-size { position: absolute; right: 8px; bottom: 8px; z-index: 30; padding: 4px 8px; background: rgba(0,0,0,.72); border: 2px solid #ece6d4; color: #ece6d4; font: 16px 'GoeiPixel', 'Galmuri11', monospace; -webkit-font-smoothing: none; pointer-events: none; }
+.gs-size[hidden] { display: none; }

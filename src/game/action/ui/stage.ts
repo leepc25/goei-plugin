@@ -51,7 +51,7 @@ export function mountStage(box: HTMLElement): Stage {
   const root = document.createElement('div');
   root.className = 'gs';
   root.tabIndex = 0;
-  root.innerHTML = `<div class="gs-stage"><canvas class="gs-canvas" width="${W}" height="${H}" aria-label="게임 화면"></canvas><div class="gs-crt"></div><div class="gs-ui"></div></div><div class="gs-touch"></div><div class="gs-rotate"><div class="gs-rot-ico"></div><b>폰을 가로로 돌려 주세요</b><span>세로 그대로면 화면이 아주 작습니다</span><div class="gs-rot-row"><button type="button" data-rot="turn">화면 돌려서 크게</button><button type="button" data-rot="keep">세로로 작게</button></div></div>`;
+  root.innerHTML = `<div class="gs-stage"><canvas class="gs-canvas" width="${W}" height="${H}" aria-label="게임 화면"></canvas><div class="gs-crt"></div><div class="gs-ui"></div></div><div class="gs-touch"></div><div class="gs-size"></div><div class="gs-rotate"><div class="gs-rot-ico"></div><b>폰을 가로로 돌려 주세요</b><span>세로 그대로면 화면이 아주 작습니다</span><div class="gs-rot-row"><button type="button" data-rot="turn">화면 돌려서 크게</button><button type="button" data-rot="keep">세로로 작게</button></div></div>`;
   box.append(root);
   const stageEl = root.querySelector<HTMLElement>('.gs-stage')!;
   const canvas = root.querySelector<HTMLCanvasElement>('canvas')!;
@@ -59,6 +59,8 @@ export function mountStage(box: HTMLElement): Stage {
   const ui = root.querySelector<HTMLElement>('.gs-ui')!;
   const touch = root.querySelector<HTMLElement>('.gs-touch')!;
   const rotate = root.querySelector<HTMLElement>('.gs-rotate')!;
+  // 시험용: 필드 칸 실제 크기 표시 (배경 세로 기준을 정하려고 잠깐 띄운다)
+  const sizeEl = root.querySelector<HTMLElement>('.gs-size')!;
   const fns: (() => void)[] = [];
   let keepPortrait = false;
   // 채우기는 엔진이 넓은 캔버스를 그릴 수 있을 때만 켠다 (setFit('fill'))
@@ -142,31 +144,24 @@ export function mountStage(box: HTMLElement): Stage {
     const portrait = bh > bw * 1.05;
     s.portrait = portrait;
     root.classList.toggle('portrait', portrait);
-    // 채우기: 가로로 긴 폰은 검은 띠 대신 게임 화면을 옆으로 넓힌다 (위아래는 꽉 참)
-    const vw = fill && !portrait && bw / bh > W / H ? Math.min(1800, Math.round((H * bw) / bh)) : byHeight && !portrait && bw / bh < W / H ? Math.max(640, Math.round((H * bw) / bh)) : W;
-    if (vw !== s.vw || canvas.width !== vw) {
+    // 필드(PC): 캔버스가 상자를 위아래·좌우 꽉 채운다. 캔버스 1px = 화면 픽셀 정수배(도트가 고르게), 엔진은 세로 720 월드를 canvas.height/720 배로 그린다.
+    // 상자가 낮으면(폰) 예전처럼 720 화면을 높이에 맞춘다
+    const dpr = window.devicePixelRatio || 1;
+    const fieldFill = byHeight && !portrait && bh >= 600;
+    const k = fieldFill ? Math.max(1, Math.floor(dpr)) / dpr : 1;
+    const vh = fieldFill ? Math.round(bh / k) : H;
+    const vw = fieldFill ? Math.round(bw / k) : fill && !portrait && bw / bh > W / H ? Math.min(1800, Math.round((H * bw) / bh)) : byHeight && !portrait && bw / bh < W / H ? Math.max(640, Math.round((H * bw) / bh)) : W;
+    if (vw !== s.vw || canvas.width !== vw || canvas.height !== vh) {
       s.vw = vw;
       canvas.width = vw;
+      canvas.height = vh;
       canvas.style.width = stageEl.style.width = `${vw}px`;
+      canvas.style.height = stageEl.style.height = `${vh}px`;
     }
-    let scale = Math.min(bw / vw, bh / H);
-    // 필드: 캔버스 1px이 화면 픽셀의 정수배가 되게 (도트가 고르게). 너무 작아지면(폰) 그냥 높이 맞춤
-    if (byHeight && !portrait) {
-      const dpr = window.devicePixelRatio || 1,
-        k = Math.floor((bh * dpr) / H) / dpr;
-      if (k * H >= bh * 0.75) {
-        scale = k;
-        const nw = Math.min(W, Math.max(640, Math.floor(bw / k)));
-        if (nw !== s.vw || canvas.width !== nw) {
-          s.vw = nw;
-          canvas.width = nw;
-          canvas.style.width = stageEl.style.width = `${nw}px`;
-        }
-      }
-    }
+    const scale = fieldFill ? k : Math.min(bw / vw, bh / H);
     s.scale = scale;
     const w = s.vw * scale,
-      h = H * scale;
+      h = vh * scale;
     // 세로 화면: 게임을 위에 붙이고 아래 빈 곳은 터치 버튼 자리
     const top = portrait ? portraitTop(bh, h) : (bh - h) / 2;
     stageEl.style.transform = `translate(${Math.round((bw - w) / 2)}px, ${Math.round(top)}px) scale(${scale})`;
@@ -174,6 +169,8 @@ export function mountStage(box: HTMLElement): Stage {
     root.style.setProperty('--gs-top', `${top}px`);
     root.style.setProperty('--gs-bottom', `${top + h}px`);
     rotate.classList.toggle('on', portrait && coarse() && !keepPortrait);
+    sizeEl.hidden = !byHeight;
+    sizeEl.textContent = `칸 ${bw}×${bh}` + (dpr !== 1 ? ` · 실제 ${Math.round(bw * dpr)}×${Math.round(bh * dpr)} (배율 ${Math.round(dpr * 100)}%)` : '') + ` · 게임 ${Math.round(scale * 100)}%`;
     for (const f of fns) f();
   };
   rotate.addEventListener('click', (e) => {
