@@ -1,0 +1,25 @@
+{
+  "size": [
+    128,
+    256
+  ],
+  "native_size": [
+    128,
+    256
+  ],
+  "bbox": [
+    21,
+    36,
+    97,
+    250
+  ],
+  "colors": 52,
+  "alpha": [
+    0,
+    255
+  ],
+  "original_pixels_preserved": true,
+  "resampled": false,
+  "unmasked_rgba_preserved": true,
+  "palette_limit": 64
+}

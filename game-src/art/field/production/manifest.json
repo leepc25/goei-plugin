@@ -3015,7 +3015,7 @@
         "height": 220
       },
       "no_background": true,
-      "seed": 1792794908,
+      "seed": 1792795549,
       "target_palette": {
         "max_colors": 48
       },
@@ -3064,9 +3064,10 @@
     },
     "image_validation_palette_limit": 64,
     "image_palette_limit_reason": "Local length correction preserving all unmasked RGBA.",
-    "image_inpaint_source": "game-src/art/field/production/history/rebuild-20261024/rerolls/blaret/46cb6f78-2b51-4c55-a94a-fb33cdd7a1e1/reference.png",
-    "image_inpaint_mask": "game-src/art/field/production/inputs/blaret-right-veil-mask.png",
-    "image_inpaint_description": "Extend the BLACK NUN VEIL on VIEWER RIGHT to match the long viewer-left veil. The right black cloth must hang continuously from upper shoulder behind the right arm down to y165, below the right hand. The current short flared right veil ending must disappear and become a long narrow black vertical hanging panel. Do not change the sleeve or arm. Keep face, eyes, hair, white bib, cross, hands, left veil, dress and entire body exactly. Preserve all unmasked pixels. Native crisp pixels and transparent outside; no gray halo."
+    "image_inpaint_source": "game-src/art/field/production/history/rebuild-20261024/rerolls/blaret/e9653deb-de50-4f8a-87d5-4fd7ce9ea263/reference.png",
+    "image_inpaint_mask": "game-src/art/field/production/inputs/blaret-right-context-mask.png",
+    "image_inpaint_crop_to_mask": false,
+    "image_inpaint_description": "Complete the missing VIEWER-RIGHT half of the long black nun veil. Look at the EXISTING VIEWER-LEFT veil beside her left hand: a solid black fabric strip hangs down behind that hand. Add a MATCHING solid BLACK CLOTH PANEL behind the right hand, about SIX pixels wide, filling x96 through x101 from y135 to y164, naturally connected up to existing black veil at right upper arm. Filled black fabric with one subtle dark gray fold, NOT a single vertical outline or line. Hem at same height as left veil. Preserve hands, beads, sleeves, body, face, eyes and every unmasked pixel. Transparent outside the veil."
   },
   {
     "english": "Saladin",

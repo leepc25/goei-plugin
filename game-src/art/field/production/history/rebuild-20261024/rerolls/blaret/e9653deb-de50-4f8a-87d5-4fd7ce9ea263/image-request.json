@@ -1,0 +1,17 @@
+{
+  "image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "mask_image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "description": "Extend the BLACK NUN VEIL on VIEWER RIGHT to match the long viewer-left veil. The right black cloth must hang continuously from upper shoulder behind the right arm down to y165, below the right hand. The current short flared right veil ending must disappear and become a long narrow black vertical hanging panel. Do not change the sleeve or arm. Keep face, eyes, hair, white bib, cross, hands, left veil, dress and entire body exactly. Preserve all unmasked pixels. Native crisp pixels and transparent outside; no gray halo.",
+  "no_background": true,
+  "output_method": "Modify current layer",
+  "crop_to_mask": true,
+  "seed": 1792794908
+}

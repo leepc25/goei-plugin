@@ -19100,7 +19100,7 @@
       "kind": "direction-repair-south-east",
       "slug": "shin-yuri",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792794849.1103628,
       "receipt": {
         "usage": null,
@@ -19118,34 +19118,73 @@
       },
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 9.0
         },
         "id": "8d75c0b8-3f73-45a1-9461-c3600108016c",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-23T22:34:09.275882+00:00",
         "last_response": {
-          "type": "message_progress",
+          "seed": 1792794849,
+          "type": "message_done",
           "model": "inpaint_pro_flash",
           "width": 128,
-          "action": "Correcting pixels",
+          "action": "Removing background",
           "height": 256,
+          "images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
           "prompt": "Replace ONLY the tied hair behind the nape with a SHORT LOOSE BLACK LOW PONYTAIL. It hangs DOWN naturally close to the neck onto the upper back, with smooth untwisted hair strands and free tapered ends. No braid, no plait, no segmented rope, no rigid horizontal tail. Remove the horizontally protruding braided strands and restore transparent background where they were. Retain exact leather jacket shoulder outline and existing fabric under the hair. Do not change face, front hair, clothes, body, pose, scale or any unmasked pixels. Crisp native pixel art and clean transparent outer edges.",
-          "status": "processing",
+          "status": "completed",
+          "paste_x": 0,
+          "paste_y": 0,
+          "asset_id": "e84349c5-d364-5693-a95d-7c3ff8b636f8",
           "image_id": "e84349c5-d364-5693-a95d-7c3ff8b636f8",
           "job_kind": "creator-image",
-          "progress": 0.75,
-          "queue_position": 3,
+          "progress": 1.0,
+          "image_url": "https://s3.eu-central-003.backblazeb2.com/pixellab-generations/production/creator/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/e84349c5-d364-5693-a95d-7c3ff8b636f8/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0037e6521c1d7c20000000001%2F20261023%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20261023T224313Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=b6352e4d91035b5aed6d79f07a31e6b9908a8357df2b8707541b211f6ad43514",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 9
+          },
+          "canvas_growth": false,
+          "generation_id": "da5fd7f6-34de-4b6b-9dac-e2bc92c43b13",
+          "output_method": "Modify current layer",
+          "queue_position": 0,
+          "billing_charged": true,
+          "original_images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "source_image_id": "e84349c5-d364-5693-a95d-7c3ff8b636f8",
+          "creator_image_saved": true,
           "generation_started_at": "2026-10-23T22:34:09.310971+00:00",
-          "estimated_wait_seconds": 275
+          "estimated_wait_seconds": 0
         }
+      },
+      "observed_end_epoch": 1792795410.1717353,
+      "elapsed_observed_seconds": 561.061372756958,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 9
       }
     },
     "4914438a-8ef4-4258-88da-1a7de662d28d": {
       "kind": "direction-repair-east",
       "slug": "shin-yuri",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792794849.4529545,
       "receipt": {
         "usage": null,
@@ -19163,34 +19202,73 @@
       },
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 9.0
         },
         "id": "4914438a-8ef4-4258-88da-1a7de662d28d",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-23T22:34:10.136144+00:00",
         "last_response": {
-          "type": "message_progress",
+          "seed": 1792794849,
+          "type": "message_done",
           "model": "inpaint_pro_flash",
           "width": 128,
-          "action": "Correcting pixels",
+          "action": "Removing background",
           "height": 256,
+          "images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
           "prompt": "Replace ONLY the tied hair behind the nape with a SHORT LOOSE BLACK LOW PONYTAIL. It hangs DOWN naturally close to the neck onto the upper back, with smooth untwisted hair strands and free tapered ends. No braid, no plait, no segmented rope, no rigid horizontal tail. Remove the horizontally protruding braided strands and restore transparent background where they were. Retain exact leather jacket shoulder outline and existing fabric under the hair. Do not change face, front hair, clothes, body, pose, scale or any unmasked pixels. Crisp native pixel art and clean transparent outer edges.",
-          "status": "processing",
+          "status": "completed",
+          "paste_x": 0,
+          "paste_y": 0,
+          "asset_id": "f688c8c0-9fc1-51bf-932d-6a6105f068c2",
           "image_id": "f688c8c0-9fc1-51bf-932d-6a6105f068c2",
           "job_kind": "creator-image",
-          "progress": 0.75,
-          "queue_position": 3,
+          "progress": 1.0,
+          "image_url": "https://s3.eu-central-003.backblazeb2.com/pixellab-generations/production/creator/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/f688c8c0-9fc1-51bf-932d-6a6105f068c2/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0037e6521c1d7c20000000001%2F20261023%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20261023T224318Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=588c43b803c2a4a3b730f6902bbd7355c6c41ff66c9ca3e2fea8ff3bd87bd604",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 9
+          },
+          "canvas_growth": false,
+          "generation_id": "7166fc71-4a04-43c8-bfb0-89f8cd807f7b",
+          "output_method": "Modify current layer",
+          "queue_position": 0,
+          "billing_charged": true,
+          "original_images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "source_image_id": "f688c8c0-9fc1-51bf-932d-6a6105f068c2",
+          "creator_image_saved": true,
           "generation_started_at": "2026-10-23T22:34:10.170169+00:00",
-          "estimated_wait_seconds": 297
+          "estimated_wait_seconds": 0
         }
+      },
+      "observed_end_epoch": 1792795410.1720781,
+      "elapsed_observed_seconds": 560.719123840332,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 9
       }
     },
     "07763be8-6507-4aa2-9414-84f52559175e": {
       "kind": "direction-repair-north-east",
       "slug": "shin-yuri",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792794850.270141,
       "receipt": {
         "usage": null,
@@ -19208,34 +19286,73 @@
       },
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 9.0
         },
         "id": "07763be8-6507-4aa2-9414-84f52559175e",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-23T22:34:10.592285+00:00",
         "last_response": {
-          "type": "message_progress",
+          "seed": 1792794850,
+          "type": "message_done",
           "model": "inpaint_pro_flash",
           "width": 128,
-          "action": "Correcting pixels",
+          "action": "Removing background",
           "height": 256,
+          "images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
           "prompt": "Replace ONLY the tied hair behind the nape with a SHORT LOOSE BLACK LOW PONYTAIL. It hangs DOWN naturally close to the neck onto the upper back, with smooth untwisted hair strands and free tapered ends. No braid, no plait, no segmented rope, no rigid horizontal tail. Remove the horizontally protruding braided strands and restore transparent background where they were. Retain exact leather jacket shoulder outline and existing fabric under the hair. Do not change face, front hair, clothes, body, pose, scale or any unmasked pixels. Crisp native pixel art and clean transparent outer edges.",
-          "status": "processing",
+          "status": "completed",
+          "paste_x": 0,
+          "paste_y": 0,
+          "asset_id": "b46e97ae-8de4-5876-9ec7-272561e20a94",
           "image_id": "b46e97ae-8de4-5876-9ec7-272561e20a94",
           "job_kind": "creator-image",
-          "progress": 0.75,
-          "queue_position": 3,
+          "progress": 1.0,
+          "image_url": "https://s3.eu-central-003.backblazeb2.com/pixellab-generations/production/creator/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/b46e97ae-8de4-5876-9ec7-272561e20a94/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0037e6521c1d7c20000000001%2F20261023%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20261023T224326Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=b1587ae145504704c1ae5e2f9b98fa548ffb3c412761194949e1cdba02e7b17c",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 9
+          },
+          "canvas_growth": false,
+          "generation_id": "2df39bb8-7bf2-40a0-b545-e19e67dea4d1",
+          "output_method": "Modify current layer",
+          "queue_position": 0,
+          "billing_charged": true,
+          "original_images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "source_image_id": "b46e97ae-8de4-5876-9ec7-272561e20a94",
+          "creator_image_saved": true,
           "generation_started_at": "2026-10-23T22:34:10.627181+00:00",
-          "estimated_wait_seconds": 312
+          "estimated_wait_seconds": 0
         }
+      },
+      "observed_end_epoch": 1792795410.172841,
+      "elapsed_observed_seconds": 559.9027004241943,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 9
       }
     },
     "51693c1a-9b7f-452b-9fca-9486eb2ad331": {
       "kind": "direction-repair-north",
       "slug": "shin-yuri",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792794850.7285755,
       "receipt": {
         "usage": null,
@@ -19253,34 +19370,73 @@
       },
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 9.0
         },
         "id": "51693c1a-9b7f-452b-9fca-9486eb2ad331",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-23T22:34:10.889995+00:00",
         "last_response": {
-          "type": "message_progress",
+          "seed": 1792794850,
+          "type": "message_done",
           "model": "inpaint_pro_flash",
           "width": 128,
-          "action": "Correcting pixels",
+          "action": "Removing background",
           "height": 256,
+          "images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
           "prompt": "Replace ONLY the tied hair behind the nape with a SHORT LOOSE BLACK LOW PONYTAIL. It hangs DOWN naturally close to the neck onto the upper back, with smooth untwisted hair strands and free tapered ends. No braid, no plait, no segmented rope, no rigid horizontal tail. Remove the horizontally protruding braided strands and restore transparent background where they were. Retain exact leather jacket shoulder outline and existing fabric under the hair. Do not change face, front hair, clothes, body, pose, scale or any unmasked pixels. Crisp native pixel art and clean transparent outer edges.",
-          "status": "processing",
+          "status": "completed",
+          "paste_x": 0,
+          "paste_y": 0,
+          "asset_id": "b2ecac44-67e2-5d52-a2df-8ffa5da3d571",
           "image_id": "b2ecac44-67e2-5d52-a2df-8ffa5da3d571",
           "job_kind": "creator-image",
-          "progress": 0.75,
-          "queue_position": 3,
+          "progress": 1.0,
+          "image_url": "https://s3.eu-central-003.backblazeb2.com/pixellab-generations/production/creator/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/b2ecac44-67e2-5d52-a2df-8ffa5da3d571/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0037e6521c1d7c20000000001%2F20261023%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20261023T224329Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=a6219a40e21aaeaf5bd459ad0ed889d15f01cfdb534fba93d2334a22335871e1",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 9
+          },
+          "canvas_growth": false,
+          "generation_id": "c3510a84-ab48-45fa-a167-f380273cb6e4",
+          "output_method": "Modify current layer",
+          "queue_position": 0,
+          "billing_charged": true,
+          "original_images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "source_image_id": "b2ecac44-67e2-5d52-a2df-8ffa5da3d571",
+          "creator_image_saved": true,
           "generation_started_at": "2026-10-23T22:34:10.935466+00:00",
-          "estimated_wait_seconds": 279
+          "estimated_wait_seconds": 0
         }
+      },
+      "observed_end_epoch": 1792795410.17296,
+      "elapsed_observed_seconds": 559.4443848133087,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 9
       }
     },
     "0def0b16-6bca-460b-b16d-b621d6cb8030": {
       "kind": "direction-repair-north-west",
       "slug": "shin-yuri",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792794851.0564253,
       "receipt": {
         "usage": null,
@@ -19298,34 +19454,73 @@
       },
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 9.0
         },
         "id": "0def0b16-6bca-460b-b16d-b621d6cb8030",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-23T22:34:11.327723+00:00",
         "last_response": {
-          "type": "message_progress",
+          "seed": 1792794851,
+          "type": "message_done",
           "model": "inpaint_pro_flash",
           "width": 128,
-          "action": "Correcting pixels",
+          "action": "Removing background",
           "height": 256,
+          "images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
           "prompt": "Replace ONLY the tied hair behind the nape with a SHORT LOOSE BLACK LOW PONYTAIL. It hangs DOWN naturally close to the neck onto the upper back, with smooth untwisted hair strands and free tapered ends. No braid, no plait, no segmented rope, no rigid horizontal tail. Remove the horizontally protruding braided strands and restore transparent background where they were. Retain exact leather jacket shoulder outline and existing fabric under the hair. Do not change face, front hair, clothes, body, pose, scale or any unmasked pixels. Crisp native pixel art and clean transparent outer edges.",
-          "status": "processing",
+          "status": "completed",
+          "paste_x": 0,
+          "paste_y": 0,
+          "asset_id": "cee186ca-236a-518a-9f93-2c3331f76482",
           "image_id": "cee186ca-236a-518a-9f93-2c3331f76482",
           "job_kind": "creator-image",
-          "progress": 0.75,
-          "queue_position": 4,
+          "progress": 1.0,
+          "image_url": "https://s3.eu-central-003.backblazeb2.com/pixellab-generations/production/creator/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/cee186ca-236a-518a-9f93-2c3331f76482/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0037e6521c1d7c20000000001%2F20261023%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20261023T224357Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=2f146761444e75fe303de462e316900d43a88492b033184987c74345b4200d87",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 9
+          },
+          "canvas_growth": false,
+          "generation_id": "bbdbb4dd-03a1-49f9-9e40-0ce8c2f657e0",
+          "output_method": "Modify current layer",
+          "queue_position": 0,
+          "billing_charged": true,
+          "original_images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "source_image_id": "cee186ca-236a-518a-9f93-2c3331f76482",
+          "creator_image_saved": true,
           "generation_started_at": "2026-10-23T22:34:11.352708+00:00",
-          "estimated_wait_seconds": 348
+          "estimated_wait_seconds": 0
         }
+      },
+      "observed_end_epoch": 1792795459.690686,
+      "elapsed_observed_seconds": 608.634260892868,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 9
       }
     },
     "7d19f4cf-e64a-4281-bbdd-924949016b12": {
       "kind": "direction-repair-west",
       "slug": "shin-yuri",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792794851.5057695,
       "receipt": {
         "usage": null,
@@ -19343,34 +19538,73 @@
       },
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 9.0
         },
         "id": "7d19f4cf-e64a-4281-bbdd-924949016b12",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-23T22:34:11.675065+00:00",
         "last_response": {
-          "type": "message_progress",
+          "seed": 1792794851,
+          "type": "message_done",
           "model": "inpaint_pro_flash",
           "width": 128,
-          "action": "Correcting pixels",
+          "action": "Removing background",
           "height": 256,
+          "images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
           "prompt": "Replace ONLY the tied hair behind the nape with a SHORT LOOSE BLACK LOW PONYTAIL. It hangs DOWN naturally close to the neck onto the upper back, with smooth untwisted hair strands and free tapered ends. No braid, no plait, no segmented rope, no rigid horizontal tail. Remove the horizontally protruding braided strands and restore transparent background where they were. Retain exact leather jacket shoulder outline and existing fabric under the hair. Do not change face, front hair, clothes, body, pose, scale or any unmasked pixels. Crisp native pixel art and clean transparent outer edges.",
-          "status": "processing",
+          "status": "completed",
+          "paste_x": 0,
+          "paste_y": 0,
+          "asset_id": "7e72fe07-a1a4-5e92-9d2d-156422d6e571",
           "image_id": "7e72fe07-a1a4-5e92-9d2d-156422d6e571",
           "job_kind": "creator-image",
-          "progress": 0.75,
-          "queue_position": 3,
+          "progress": 1.0,
+          "image_url": "https://s3.eu-central-003.backblazeb2.com/pixellab-generations/production/creator/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/7e72fe07-a1a4-5e92-9d2d-156422d6e571/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0037e6521c1d7c20000000001%2F20261023%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20261023T224319Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=84f8a0cdbf59f77bf3f3b9f7d1e4e67efcd53f37c5526e5339d4400f8687d8b0",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 9
+          },
+          "canvas_growth": false,
+          "generation_id": "89f2ad97-d5c5-46d1-8860-28d81b4861c3",
+          "output_method": "Modify current layer",
+          "queue_position": 0,
+          "billing_charged": true,
+          "original_images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "source_image_id": "7e72fe07-a1a4-5e92-9d2d-156422d6e571",
+          "creator_image_saved": true,
           "generation_started_at": "2026-10-23T22:34:11.713578+00:00",
-          "estimated_wait_seconds": 308
+          "estimated_wait_seconds": 0
         }
+      },
+      "observed_end_epoch": 1792795410.1811018,
+      "elapsed_observed_seconds": 558.6753325462341,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 9
       }
     },
     "3c788037-0100-4941-a61d-ca9d4c6fd1ec": {
       "kind": "direction-repair-south-west",
       "slug": "shin-yuri",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792794851.8552592,
       "receipt": {
         "usage": null,
@@ -19388,34 +19622,73 @@
       },
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 9.0
         },
         "id": "3c788037-0100-4941-a61d-ca9d4c6fd1ec",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-23T22:34:12.037386+00:00",
         "last_response": {
-          "type": "message_progress",
+          "seed": 1792794851,
+          "type": "message_done",
           "model": "inpaint_pro_flash",
           "width": 128,
-          "action": "Correcting pixels",
+          "action": "Removing background",
           "height": 256,
+          "images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
           "prompt": "Replace ONLY the tied hair behind the nape with a SHORT LOOSE BLACK LOW PONYTAIL. It hangs DOWN naturally close to the neck onto the upper back, with smooth untwisted hair strands and free tapered ends. No braid, no plait, no segmented rope, no rigid horizontal tail. Remove the horizontally protruding braided strands and restore transparent background where they were. Retain exact leather jacket shoulder outline and existing fabric under the hair. Do not change face, front hair, clothes, body, pose, scale or any unmasked pixels. Crisp native pixel art and clean transparent outer edges.",
-          "status": "processing",
+          "status": "completed",
+          "paste_x": 0,
+          "paste_y": 0,
+          "asset_id": "df6e87f2-0f25-5d49-99f8-d64fa19f9109",
           "image_id": "df6e87f2-0f25-5d49-99f8-d64fa19f9109",
           "job_kind": "creator-image",
-          "progress": 0.75,
-          "queue_position": 3,
+          "progress": 1.0,
+          "image_url": "https://s3.eu-central-003.backblazeb2.com/pixellab-generations/production/creator/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/df6e87f2-0f25-5d49-99f8-d64fa19f9109/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0037e6521c1d7c20000000001%2F20261023%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20261023T224329Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=725fadcb39d8a7429b904cfc5adce5a6d81d6f358a9e054a1b9b72ad69af2781",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 9
+          },
+          "canvas_growth": false,
+          "generation_id": "cffcc621-e6f2-4963-aa2d-33268e77f1d8",
+          "output_method": "Modify current layer",
+          "queue_position": 0,
+          "billing_charged": true,
+          "original_images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "source_image_id": "df6e87f2-0f25-5d49-99f8-d64fa19f9109",
+          "creator_image_saved": true,
           "generation_started_at": "2026-10-23T22:34:12.116052+00:00",
-          "estimated_wait_seconds": 323
+          "estimated_wait_seconds": 0
         }
+      },
+      "observed_end_epoch": 1792795410.1811743,
+      "elapsed_observed_seconds": 558.3259150981903,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 9
       }
     },
     "e9653deb-de50-4f8a-87d5-4fd7ce9ea263": {
       "kind": "image",
       "slug": "blaret",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792794909.1132963,
       "receipt": {
         "usage": null,
@@ -19433,27 +19706,80 @@
       },
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 9.0
         },
         "id": "e9653deb-de50-4f8a-87d5-4fd7ce9ea263",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-23T22:35:09.289481+00:00",
         "last_response": {
-          "type": "message_progress",
+          "seed": 1792794908,
+          "type": "message_done",
           "model": "inpaint_pro_flash",
           "width": 128,
-          "action": "Correcting pixels",
+          "action": "Removing background",
           "height": 256,
+          "images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
           "prompt": "Extend the BLACK NUN VEIL on VIEWER RIGHT to match the long viewer-left veil. The right black cloth must hang continuously from upper shoulder behind the right arm down to y165, below the right hand. The current short flared right veil ending must disappear and become a long narrow black vertical hanging panel. Do not change the sleeve or arm. Keep face, eyes, hair, white bib, cross, hands, left veil, dress and entire body exactly. Preserve all unmasked pixels. Native crisp pixels and transparent outside; no gray halo.",
-          "status": "processing",
+          "status": "completed",
+          "paste_x": 0,
+          "paste_y": 0,
+          "asset_id": "203ff1dd-be27-5bca-9cd0-0dbabc6eecb6",
           "image_id": "203ff1dd-be27-5bca-9cd0-0dbabc6eecb6",
           "job_kind": "creator-image",
-          "progress": 0.75,
-          "queue_position": 4,
+          "progress": 1.0,
+          "image_url": "https://s3.eu-central-003.backblazeb2.com/pixellab-generations/production/creator/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/203ff1dd-be27-5bca-9cd0-0dbabc6eecb6/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0037e6521c1d7c20000000001%2F20261023%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20261023T224408Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=3635f790e927e30b5a5b55197048dc7645647ba69d66eba059236f9ef5bb2c57",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 9
+          },
+          "canvas_growth": false,
+          "generation_id": "b205d963-c40c-4408-8893-e3b4accc7dbe",
+          "output_method": "Modify current layer",
+          "queue_position": 0,
+          "billing_charged": true,
+          "original_images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "source_image_id": "203ff1dd-be27-5bca-9cd0-0dbabc6eecb6",
+          "creator_image_saved": true,
           "generation_started_at": "2026-10-23T22:35:09.329907+00:00",
-          "estimated_wait_seconds": 416
+          "estimated_wait_seconds": 0
         }
+      },
+      "observed_end_epoch": 1792795459.7017848,
+      "elapsed_observed_seconds": 550.5884890556335,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 9
+      },
+      "visual_rejection": {
+        "job": "e9653deb-de50-4f8a-87d5-4fd7ce9ea263",
+        "job_status": "completed",
+        "decision": "reroll",
+        "reason": "오른쪽 베일 연장이 천 면 대신 1px 선으로 생성됨. crop_to_mask 부분 확대가 전체 베일 좌우 관계를 놓치는 것으로 판단. 전체 캔버스 문맥을 유지하는 crop_to_mask=false와 연결부를 포함한 마스크로 교정.",
+        "at": 1792795549.7707343,
+        "rules_rechecked": [
+          "AVIF primary identity",
+          "lore/user height",
+          "south-facing",
+          "transparent edge without gray halo",
+          "no motions before all roster eight-way review"
+        ]
       }
     },
     "c62c6da1-1894-469a-bb18-2f5f4988e88b": {
@@ -19495,9 +19821,9 @@
           "image_id": "f4b104ba-eac7-50d8-ae02-475c56efbe41",
           "job_kind": "creator-image",
           "progress": 0.75,
-          "queue_position": 7,
+          "queue_position": 1,
           "generation_started_at": "2026-10-23T22:37:37.992819+00:00",
-          "estimated_wait_seconds": 671
+          "estimated_wait_seconds": 86
         }
       }
     },
@@ -19540,9 +19866,9 @@
           "image_id": "c0b95c06-2b0b-55dd-be38-682e8f068a14",
           "job_kind": "creator-image",
           "progress": 0.75,
-          "queue_position": 7,
+          "queue_position": 1,
           "generation_started_at": "2026-10-23T22:37:38.474459+00:00",
-          "estimated_wait_seconds": 697
+          "estimated_wait_seconds": 84
         }
       }
     },
@@ -19585,9 +19911,9 @@
           "image_id": "68a1e2f8-7bbc-586a-82e9-bc6bbda13ad7",
           "job_kind": "creator-image",
           "progress": 0.75,
-          "queue_position": 8,
+          "queue_position": 2,
           "generation_started_at": "2026-10-23T22:38:35.564829+00:00",
-          "estimated_wait_seconds": 785
+          "estimated_wait_seconds": 189
         }
       }
     },
@@ -19595,7 +19921,7 @@
       "kind": "registration",
       "slug": "lee-seong-hae",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792795227.1916497,
       "receipt": {
         "usage": null,
@@ -19604,6 +19930,89 @@
         "status": "processing",
         "enhanced_prompt": null,
         "enhance_usage": null
+      },
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 0.25
+        },
+        "id": "15582365-0025-433a-9775-c83f9076e9a9",
+        "status": "completed",
+        "created_at": "2026-10-23T22:40:27.521945+00:00",
+        "last_response": {
+          "status": "completed",
+          "character_id": "3db7b924-b4d0-484f-aac7-b834ebc001c5",
+          "storage_urls": {
+            "east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/3db7b924-b4d0-484f-aac7-b834ebc001c5/rotations/east.png",
+            "west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/3db7b924-b4d0-484f-aac7-b834ebc001c5/rotations/west.png",
+            "north": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/3db7b924-b4d0-484f-aac7-b834ebc001c5/rotations/north.png",
+            "south": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/3db7b924-b4d0-484f-aac7-b834ebc001c5/rotations/south.png",
+            "north-east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/3db7b924-b4d0-484f-aac7-b834ebc001c5/rotations/north-east.png",
+            "north-west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/3db7b924-b4d0-484f-aac7-b834ebc001c5/rotations/north-west.png",
+            "south-east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/3db7b924-b4d0-484f-aac7-b834ebc001c5/rotations/south-east.png",
+            "south-west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/3db7b924-b4d0-484f-aac7-b834ebc001c5/rotations/south-west.png"
+          },
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 0.25
+          },
+          "character_name": "이성해",
+          "directions_type": "8-directions",
+          "generation_mode": "v3",
+          "directions_count": 8,
+          "character_description": "이성해 / Lee Seong-hae. Small slender adult woman, soft youthful face with a fixed sweet smile, pale skin, green sparkling eyes. White hair with blunt curved forehead bangs and chin-length curled face-framing layers; the LONG CURLY remainder tied LOW and draped over HER RIGHT shoulder (viewer left). Navy-blue fitted trouser suit, white shirt, dark navy tie, cushioned sneakers. Bare face, no mask. Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Do not invent patches, badges, logos or markings absent from the supplied image. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches."
+        }
+      },
+      "observed_end_epoch": 1792795559.638961,
+      "elapsed_observed_seconds": 332.4473125934601,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 0.25
+      }
+    },
+    "818368ba-951c-4b93-8e89-8b66cabd4b29": {
+      "kind": "direction-repair-north-east-remove-old-hair-speck",
+      "slug": "shin-yuri",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792795558.6628258,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "818368ba-951c-4b93-8e89-8b66cabd4b29",
+        "image_id": "edb5bd66-6257-5263-b311-3fea178ee0a2",
+        "source_image_id": "edb5bd66-6257-5263-b311-3fea178ee0a2",
+        "status": "processing",
+        "output_count": 1,
+        "image_size": {
+          "width": 128,
+          "height": 256
+        },
+        "estimated_generations": 9,
+        "pricing_provisional": true
+      },
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "818368ba-951c-4b93-8e89-8b66cabd4b29",
+        "status": "processing",
+        "created_at": "2026-10-23T22:45:59.165543+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "model": "inpaint_pro_flash",
+          "width": 128,
+          "action": "Generating image",
+          "height": 256,
+          "prompt": "Erase the tiny detached BLACK SPECK in this selected otherwise EMPTY BACKGROUND. Remove the three disconnected black pixels completely to transparent empty background. Do not add hair, shading, cloth or any object here. Preserve all unmasked pixels and the nearby ponytail and jacket exactly.",
+          "status": "processing",
+          "image_id": "edb5bd66-6257-5263-b311-3fea178ee0a2",
+          "job_kind": "creator-image",
+          "progress": 0.05,
+          "generation_started_at": "2026-10-23T22:45:59.195354+00:00"
+        }
       }
     }
   },
@@ -20484,7 +20893,7 @@
       "image": "79d54a0f-1b11-4caf-afd2-829ad8052757",
       "registration": "15582365-0025-433a-9775-c83f9076e9a9",
       "motions": {},
-      "ready": false,
+      "ready": true,
       "visual_rejections": [
         {
           "job": "297ce4f8-8ddd-4bd5-8fa0-21a791a8357e",
@@ -20543,7 +20952,7 @@
           "at": 1792795226.319304
         }
       ],
-      "exported": false,
+      "exported": true,
       "eight_way_visual_reviewed": false,
       "direction-repair-south-east": "f25fcc88-05a3-430a-a01c-a7b5381823c7",
       "direction-repair-east": "977e48af-b079-45c3-ab35-a17bef5ad80d",
@@ -20552,7 +20961,9 @@
       "direction-repair-south-east-eyes-corrected-y": "f19b0f36-ec4d-4192-be5f-a7bb0d7fa2bb",
       "direction-repair-east-eyes-corrected-y": "54809a78-c20d-42e8-b7b3-790d36c17dc1",
       "direction-repair-west-eyes-corrected-y": "7bf78da8-0175-43c5-adaf-369d70984f6c",
-      "direction-repair-south-west-eyes-corrected-y": "28e2d3c5-bdfc-41b9-943d-94ae2897ccac"
+      "direction-repair-south-west-eyes-corrected-y": "28e2d3c5-bdfc-41b9-943d-94ae2897ccac",
+      "skeleton_joints": 18,
+      "rotation_count": 8
     },
     "lee-ja-heon": {
       "name": "이자헌",
@@ -21356,13 +21767,14 @@
       "direction-repair-north": "51693c1a-9b7f-452b-9fca-9486eb2ad331",
       "direction-repair-north-west": "0def0b16-6bca-460b-b16d-b621d6cb8030",
       "direction-repair-west": "7d19f4cf-e64a-4281-bbdd-924949016b12",
-      "direction-repair-south-west": "3c788037-0100-4941-a61d-ca9d4c6fd1ec"
+      "direction-repair-south-west": "3c788037-0100-4941-a61d-ca9d4c6fd1ec",
+      "direction-repair-north-east-remove-old-hair-speck": "818368ba-951c-4b93-8e89-8b66cabd4b29"
     },
     "blaret": {
       "name": "블라렛",
       "group": "religious",
       "character_id": null,
-      "image": "e9653deb-de50-4f8a-87d5-4fd7ce9ea263",
+      "image": "failed:422",
       "registration": null,
       "motions": {},
       "ready": false,
@@ -21411,6 +21823,20 @@
           "decision": "reroll",
           "reason": "왼쪽 베일만 손 아래까지 연장됐고 오른쪽은 팔꿈치에서 끝남. 오른쪽 기존 끝이 마스크 경계 밖에 남은 문제 확인. 오른쪽 끝과 연장 영역을 함께 교정하고 왼쪽 및 몸체는 보존.",
           "at": 1792794908.0499072,
+          "rules_rechecked": [
+            "AVIF primary identity",
+            "lore/user height",
+            "south-facing",
+            "transparent edge without gray halo",
+            "no motions before all roster eight-way review"
+          ]
+        },
+        {
+          "job": "e9653deb-de50-4f8a-87d5-4fd7ce9ea263",
+          "job_status": "completed",
+          "decision": "reroll",
+          "reason": "오른쪽 베일 연장이 천 면 대신 1px 선으로 생성됨. crop_to_mask 부분 확대가 전체 베일 좌우 관계를 놓치는 것으로 판단. 전체 캔버스 문맥을 유지하는 crop_to_mask=false와 연결부를 포함한 마스크로 교정.",
+          "at": 1792795549.7707343,
           "rules_rechecked": [
             "AVIF primary identity",
             "lore/user height",
@@ -36116,9 +36542,236 @@
           "enhance_usage": null
         }
       }
+    },
+    {
+      "at": "2026-10-23T22:43:30Z",
+      "kind": "completed",
+      "slug": "shin-yuri",
+      "detail": {
+        "kind": "direction-repair-south-east",
+        "template": null,
+        "job_id": "8d75c0b8-3f73-45a1-9461-c3600108016c",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 9
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T22:43:30Z",
+      "kind": "completed",
+      "slug": "shin-yuri",
+      "detail": {
+        "kind": "direction-repair-east",
+        "template": null,
+        "job_id": "4914438a-8ef4-4258-88da-1a7de662d28d",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 9
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T22:43:30Z",
+      "kind": "completed",
+      "slug": "shin-yuri",
+      "detail": {
+        "kind": "direction-repair-north-east",
+        "template": null,
+        "job_id": "07763be8-6507-4aa2-9414-84f52559175e",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 9
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T22:43:30Z",
+      "kind": "completed",
+      "slug": "shin-yuri",
+      "detail": {
+        "kind": "direction-repair-north",
+        "template": null,
+        "job_id": "51693c1a-9b7f-452b-9fca-9486eb2ad331",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 9
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T22:43:30Z",
+      "kind": "completed",
+      "slug": "shin-yuri",
+      "detail": {
+        "kind": "direction-repair-west",
+        "template": null,
+        "job_id": "7d19f4cf-e64a-4281-bbdd-924949016b12",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 9
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T22:43:30Z",
+      "kind": "completed",
+      "slug": "shin-yuri",
+      "detail": {
+        "kind": "direction-repair-south-west",
+        "template": null,
+        "job_id": "3c788037-0100-4941-a61d-ca9d4c6fd1ec",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 9
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T22:44:19Z",
+      "kind": "completed",
+      "slug": "shin-yuri",
+      "detail": {
+        "kind": "direction-repair-north-west",
+        "template": null,
+        "job_id": "0def0b16-6bca-460b-b16d-b621d6cb8030",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 9
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T22:44:19Z",
+      "kind": "completed",
+      "slug": "blaret",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "e9653deb-de50-4f8a-87d5-4fd7ce9ea263",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 9
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T22:44:20Z",
+      "kind": "image-format-verified",
+      "slug": "blaret",
+      "detail": {
+        "size": [
+          128,
+          256
+        ],
+        "native_size": [
+          128,
+          256
+        ],
+        "bbox": [
+          21,
+          36,
+          97,
+          250
+        ],
+        "colors": 52,
+        "alpha": [
+          0,
+          255
+        ],
+        "original_pixels_preserved": true,
+        "resampled": false,
+        "unmasked_rgba_preserved": true,
+        "palette_limit": 64
+      }
+    },
+    {
+      "at": "2026-10-23T22:45:59Z",
+      "kind": "submitted",
+      "slug": "shin-yuri",
+      "detail": {
+        "kind": "direction-repair-north-east-remove-old-hair-speck",
+        "template": null,
+        "job_id": "818368ba-951c-4b93-8e89-8b66cabd4b29",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "818368ba-951c-4b93-8e89-8b66cabd4b29",
+          "image_id": "edb5bd66-6257-5263-b311-3fea178ee0a2",
+          "source_image_id": "edb5bd66-6257-5263-b311-3fea178ee0a2",
+          "status": "processing",
+          "output_count": 1,
+          "image_size": {
+            "width": 128,
+            "height": 256
+          },
+          "estimated_generations": 9,
+          "pricing_provisional": true
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T22:45:59Z",
+      "kind": "completed",
+      "slug": "lee-seong-hae",
+      "detail": {
+        "kind": "registration",
+        "template": null,
+        "job_id": "15582365-0025-433a-9775-c83f9076e9a9",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 0.25
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T22:45:59Z",
+      "kind": "character-ready",
+      "slug": "lee-seong-hae",
+      "detail": {
+        "3d_joints": 18,
+        "directions": 8
+      }
+    },
+    {
+      "at": "2026-10-23T22:46:00Z",
+      "kind": "submission-failed",
+      "slug": "blaret",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "code": 422,
+        "detail": "{\"detail\":[{\"type\":\"literal_error\",\"loc\":[\"body\",\"crop_to_mask\"],\"msg\":\"Input should be True\",\"input\":false,\"ctx\":{\"expected\":\"True\"}}]}"
+      }
+    },
+    {
+      "at": "2026-10-23T22:46:00Z",
+      "kind": "exported",
+      "slug": "lee-seong-hae",
+      "detail": {
+        "bytes": 106313,
+        "files": 9
+      }
     }
   ],
-  "updated_at": 1792795258.7367356,
+  "updated_at": 1792795560.9113605,
   "user_stopped_at": 1792778235.6917784,
   "archived_jobs": {
     "304457e9-6577-44f0-af17-97841a9f6720": {
@@ -37440,12 +38093,12 @@
   "last_git_checkpoint": 1792795195.3022285,
   "summary": {
     "jobs": {
-      "processing": 12,
-      "completed": 239,
+      "processing": 4,
+      "completed": 248,
       "failed": 9,
       "stalled": 0
     },
-    "characters_ready": 53,
+    "characters_ready": 54,
     "characters_total": 55,
     "images_format_verified": 54,
     "new_images_visually_reviewed": 42,

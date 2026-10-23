@@ -143,7 +143,7 @@ class Production:
  def image_request(self,a):
   if a.get('image_inpaint_source'):
    encoded=lambda path:{'type':'base64','base64':base64.b64encode((ROOT/path).read_bytes()).decode(),'format':'png'}
-   return {'image':encoded(a['image_inpaint_source']),'mask_image':encoded(a['image_inpaint_mask']),'description':a['image_inpaint_description'],'no_background':True,'output_method':'Modify current layer','crop_to_mask':True,'seed':a['pixel_request'].get('seed',0)}
+   return {'image':encoded(a['image_inpaint_source']),'mask_image':encoded(a['image_inpaint_mask']),'description':a['image_inpaint_description'],'no_background':True,'output_method':'Modify current layer','crop_to_mask':a.get('image_inpaint_crop_to_mask',True),'seed':a['pixel_request'].get('seed',0)}
   if a.get('image_edit_source'):
    return {'image':{'type':'base64','base64':base64.b64encode((ROOT/a['image_edit_source']).read_bytes()).decode(),'format':'png'},'method':'text','description':a['image_edit_description'],'no_background':True,'use_color_palette_correction':True,'seed':a['pixel_request'].get('seed',0)}
   args=dict(a['pixel_request']);usage=args.pop('style_usage_description',None);source=args.pop('style_reference_local',None)
