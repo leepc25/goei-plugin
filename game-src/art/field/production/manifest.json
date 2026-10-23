@@ -1692,7 +1692,10 @@
     "image_inpaint_mask": "game-src/art/field/production/inputs/lee-seong-hae-loose-ponytail-mask.png",
     "image_inpaint_description": "In the selected shoulder-hair area, replace the braided/plaited white hair with a LOOSE LOW SIDE PONYTAIL made of long flowing WHITE S-shaped WAVES with wispy curled ends. No braid links, no interwoven strands. It drapes over HER RIGHT shoulder (viewer LEFT), tapering over upper chest. Keep the navy suit and white shirt underneath visible naturally. Match the existing crisp native pixel style and existing white/gray hair palette, no antialiasing and no new unrelated colors. Transparent background remains transparent. Preserve every unmasked pixel including green eyes, head, body and shoes exactly.",
     "image_validation_palette_limit": 64,
-    "palette_validation_note": "Local inpaint preserves all unmasked RGBA exactly and adds17 hair shades (59 total). 48 was the creator request target/successful reference example, not a user-mandated hard limit for all outputs. Native hard-edged pixels and transparent alpha remain mandatory; allow64 for this masked repair without reducing colors and losing green irises."
+    "palette_validation_note": "Local inpaint preserves all unmasked RGBA exactly and adds17 hair shades (59 total). 48 was the creator request target/successful reference example, not a user-mandated hard limit for all outputs. Native hard-edged pixels and transparent alpha remain mandatory; allow64 for this masked repair without reducing colors and losing green irises.",
+    "registration_import_zip": "game-src/art/field/production/direction-repairs/lee-seong-hae/d254a6a5-b284-4ca5-a804-76f83bb47f28/eyes-corrected-y/character.zip",
+    "registration_import_review": "수정4방향의 초록 홍채를 확대 및 전신으로 확인. 원화의 흰 낮은 옆포니테일·남색 정장·운동화·작은 체격 보존. 눈 외 RGBA 동일, 나머지4방향 기존 검수 유지. 회색 외곽 없음. AVIF 우선·로어 키 보충·전원 장벽 재확인.",
+    "registration_regenerate_directions": []
   },
   {
     "english": "Lee Ja-heon",

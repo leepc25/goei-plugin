@@ -1,7 +1,7 @@
 """Submit/poll explicitly masked direction repairs; never grants visual approval."""
 import argparse,base64,fcntl,io,json,time,zipfile
 from PIL import Image,ImageDraw
-from field_character_production import OUT,Production,atomic,request
+from field_character_production import OUT,ROOT,Production,atomic,request
 
 def main():
  p=argparse.ArgumentParser();p.add_argument('config');p.add_argument('--finalize',help='Explicit findings after viewing every repaired direction');args=p.parse_args()
@@ -14,7 +14,11 @@ def main():
   if cfg.get('revision'):folder=folder/cfg['revision']
   folder.mkdir(parents=True,exist_ok=True)
   atomic(folder/'config.json',cfg)
-  with zipfile.ZipFile(OUT/slug/'character.zip') as z:
+  source_zip=OUT/slug/'character.zip'
+  if cfg.get('base_zip'):
+   source_zip=ROOT/cfg['base_zip'];meta=json.loads((source_zip.parent/'rejection.json').read_text())
+   assert meta['slug']==slug and meta['state_before']['image']==c['image']
+  with zipfile.ZipFile(source_zip) as z:
    for direction,rects in cfg['rectangles'].items():
     key='direction-repair-'+direction+('-'+cfg['revision'] if cfg.get('revision') else '')
     source=folder/(direction+'-source.png');maskpath=folder/(direction+'-mask.png')
