@@ -4,7 +4,7 @@
 //   hq/    본부와 임무 흐름 (createHq)
 // 층(stage/)·적(enemy/)·아이템(items/)·대사(story/)는 들어오는 대로 여기에 잇는다. 없으면 엔진 기본(훈련장·임시 적·기본 지급품).
 import type { GameBridge } from '../../bridge';
-import { mountVisit } from '../../visit';
+import { mountTalk } from '../../talk';
 import { createGameAudio } from '../audio';
 import { VIDEO_AUDIO_EVENT, type VideoTrack } from '../audio/videoTrack';
 import { createHq, idbSaves, setItemIconDrawer, setLineProvider, setSupplyCatalog, type MissionLaunch, type RunResult, type SaveSlots } from '../hq';
@@ -55,7 +55,7 @@ const markSaved = () => local(SAVED_KEY).save('1');
 const hasSaved = () => local(SAVED_KEY).load() === '1';
 
 /** 본부 모듈을 엔진 모양으로 감싼다 */
-function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: HubHost['chooseFloor']; sfx: (n: string) => void; closed?: () => void; resuming?: () => boolean }): HqModuleLike & { close(): void; goto(place: string): void; state(): { day: number; rescued: string[] }; visitReady: Promise<void> } {
+function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: HubHost['chooseFloor']; sfx: (n: string) => void; closed?: () => void; resuming?: () => boolean; overlay?: HubHost['overlay'] }): HqModuleLike & { close(): void; goto(place: string): void; state(): { day: number; rescued: string[] }; visitReady: Promise<void> } {
   const hq = createHq();
   const b = bridge as (Partial<GameBridge> & { slot?: number; photo?: (name: string) => string | undefined }) | undefined;
   const slot = b?.slot ?? 0;
@@ -86,6 +86,7 @@ function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui
       chooseFloor: (o, pick) => ui.chooseFloor(o, pick),
       sfx: (n) => ui.sfx(n),
       visitors,
+      overlay: ui.overlay,
       // 본부 대화창이 떠 있으면 머리 위 표시를 숨긴다 (독립 검수: 브리핑 뒤 ↓ 표시)
       busy: () => typeof document !== 'undefined' && !!document.querySelector('.hq-talk, .hq-over:not(:empty)'),
     },
@@ -257,9 +258,10 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     },
   };
   // NPC 자유 대화 (npcLink.ts): 껍데기 놀이판 층에 대화창, 승객은 층 모듈 훅으로
-  const visit = bridge?.visit ? mountVisit(shell.stage.ui, bridge.visit) : null;
+  // 본부 방문: 머리 위 이름표·말풍선과 아래 한 줄 입력 (talk.ts)
+  const visit = bridge?.visit ? mountTalk(shell.stage.ui, bridge.visit) : null;
   const npc = linkNpcTalk({
-    visit: visit ? name => void visit.open(name) : undefined,
+    visit: visit ? name => { if (name) visit.open(name); } : undefined,
     layer: shell.stage.ui,
     bridge,
     settings: () => shell.settings,
@@ -478,6 +480,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     closed: () => {
       if (dinnerDue) (dinnerDue = false), cutOnce('dinner');
     },
+    overlay: visit ? (c, people, player) => visit.draw(c, people, player) : undefined,
   });
   // 본부 메뉴 창이 열려 있으면 Esc는 창 닫기 (껍데기 일시정지보다 먼저)
   const hqKeys = (e: KeyboardEvent) => {

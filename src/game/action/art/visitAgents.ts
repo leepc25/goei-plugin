@@ -49,3 +49,11 @@ export function drawVisitAgent(c: CanvasRenderingContext2D, name: string, x: num
   c.restore();
   return true;
 }
+
+/** 발 기준 머리 꼭대기 높이 (화면 px, 음수). frames.json의 head(원본 px)가 있으면 그것, 없으면 그림 윗변 */
+export function visitAgentTop(name: string): number {
+  const a = sheet?.agents[name] as ({ head?: number; frames: Frame[] } | undefined);
+  if (!a?.frames.length) return -260;
+  if (typeof a.head === 'number') return -a.head * PIXEL;
+  return Math.min(...a.frames.map((f) => f.oy)) * PIXEL;
+}

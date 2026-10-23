@@ -11,7 +11,7 @@ import { SCREEN_H, SCREEN_W } from './contract';
 import { HQ_PLACE, drawFloor, drawHqWall, drawPropArt, drawHqTextureWall } from '../art/bg';
 import { drawStartRoom, drawStartRoomFurniture } from '../art/startRoom';
 import { drawHqDoorRound2 } from '../art/hqDoorRound2';
-import { drawVisitAgent } from '../art/visitAgents';
+import { drawVisitAgent, visitAgentTop } from '../art/visitAgents';
 import { blockByProps, clearSpot, type BlockProp } from './propBlock';
 import { LANE_BOT, LANE_TOP, type HqBox, type HqDoor, type HqMapView, type HqScene, type HqSpot } from '../hq/map';
 
@@ -32,6 +32,8 @@ export interface HubHost {
   act?(seq: string[], face: 1 | -1 | undefined): void;
   /** 본부 방문: 이 장면에 서 있는 요원 (상태 태그로 정한 방). 발 위치와 보는 쪽 */
   visitors?(sceneId: string): { name: string; x: number; y: number; face: 1 | -1 }[];
+  /** 장면 맨 위에 그리기 (월드 좌표): 이름표·말풍선. people = 이 방 요원, player = 주인공 발 */
+  overlay?(c: CanvasRenderingContext2D, people: { name: string; x: number; y: number; top: number }[], player: { name: string; x: number; y: number; top: number }): void;
 }
 
 const TOP = 440;
@@ -77,7 +79,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
     enterTick = -1;
     opening = null;
     near = null;
-    solids = [...sc.boxes.filter((b) => b.solid).map((b) => ({ x: b.x, y: b.y, w: b.w, back: b.d + 6, front: 8 })), ...people.map((p) => ({ x: p.x, y: p.y, w: 56, back: 18, front: 6 }))];
+    solids = [...sc.boxes.filter((b) => b.solid).map((b) => ({ x: b.x, y: b.y, w: b.w, back: b.d + 6, front: 8 })), ...people.map((p) => ({ x: p.x, y: p.y, w: 80, back: 24, front: 24 }))];
     const len = Math.max(SCREEN_W, sc.length);
     const sx = Math.max(60, Math.min(len - 60, x));
     arrive = { x: sx, y };
@@ -131,6 +133,8 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
         if (enterTick < 0) enterTick = now;
         const age = (now - enterTick) / (1000 / 30);
         if (!sc.legacy) for (const d of sc.doors) if (isS(d)) drawExitLintel(c, d, camX);
+        // 주인공 그림은 쟈알디 그림이라 머리 높이도 쟈알디 기준
+        host.overlay?.(c, people.map((p) => ({ name: p.name, x: p.x, y: p.y, top: visitAgentTop(p.name) })), { name: '', x: w.player.x, y: w.player.y, top: visitAgentTop('쟈알디') });
         // 출입 표식과 잠금 이유는 render.ts / HUD가 같은 조사 대상으로 표시한다.
         const dark = fadeOut > 0 ? 1 - fadeOut / FADE : age < FADE ? 1 - age / FADE : 0;
         if (dark > 0) {
