@@ -16,6 +16,16 @@
 - [투명 배경 파생 파일](pixel/front-transparent.png): 외부와 연결된 정확한 RGB(128,128,128) 배경만 alpha=0으로 처리했다. 남은 인물 RGBA 픽셀은 모두 PixelLab 원본과 동일하다. 인물 경계는 x30~106, y11~243, 몸 높이 233px. 별도의 PixelLab 생성·배경 제거 호출은 없었다.
 - [4배 정수 확대](pixel/front-transparent-4x.png), [기술 확인 기록](pixel/verification.json), [변환 요청 인자](pixel/conversion-request.json), [원본 생성 영수증](pixel/conversion-receipt.txt), [실측 기록](spend.log).
 - 실제 차감 **1.0 generations**, 요청부터 완료 관측까지 **70.654초**(폴링·통신 포함). 생성 영수증의 차감 1회와 계정 전후 차이 1회가 일치한다. 결과가 이미 48색 이하이므로 `reduce_colors`는 실행하지 않았고 추가 0.1회 차감도 없었다.
-- 상태: **사용자 시각 검수 대기**, 8방향 등록 0회, 동작 생성 0회, 게임 반영 없음. 기술 수치가 맞는 것만으로 얼굴·체형·도트 품질이 승인됐다고 판단하지 않는다.
+- 상태: **사용자 반려 — 기존 남녀와 다른 도트 품질로 사용 불가.** 8방향 등록 0회, 동작 생성 0회, 게임 반영 없음. 기술 수치가 맞는 것만으로 얼굴·체형·도트 품질이 승인됐다고 판단하지 않는다. 아래 그림은 반려 기록 보존용이다.
 
 ![도트 변환 결과 원본 크기](pixel/front-transparent.png)
+
+## 2차 시험 · 외모와 도트 스타일을 분리한 Pro 이미지 생성
+
+1차의 일반 변환은 사용자 반려 상태이므로 같은 방식으로 반복하지 않는다. 2차는 **`create_image_pro`**로 128×256 정면 도트 1장을 새로 생성한다. 기존 남녀의 Pro Flash와도 구분해서 기록한다.
+
+- 외모 입력: 사용자가 선택한 고해상도 기준 그림. [Pro용 입력](reference/front-concept-pro-input.png)은 840×1680 입력을 비율 그대로 256×512로 축소한 참조용 PNG이며 최종 도트가 아니다. 얼굴·복식·전신 형태의 지침으로 사용한다.
+- 스타일 입력: 기존 여성 도트 `gallery:4db87d5a-70bb-5169-a83d-36222e6bb9ae` 원본. `style_copy=[color_palette, outline, detail, shading]`로 도트 밀도·윤곽·명암·색감만 참고하며 단발·치마·얼굴·오른쪽 3/4 자세를 복사하지 않도록 요청했다.
+- 요청: `width=128`, `height=256`, `no_background=true`, `max_colors=48`, `seed=10242027`. [전체 요청 기록](pro-style-trial/request.json), [실제 접수 응답](pro-style-trial/queue-receipt.txt).
+- 접수 응답: candidate 1장, 외모 참조 1장 및 별도 스타일 참조 사용, 견적 10 generations. Job `9d30ebb3-709d-4613-8ac8-c5cd78ef2ef6`, Creator asset `b99bcd59-d54f-5b2b-a5b4-e8e7ee6758ae`.
+- 상태: 생성 처리 중。 결과·실제 차감은 완료 후 기록하며, 사용자 시각 검수 전에는 승인 자산으로 취급하지 않는다. 캐릭터 등록과 애니메이션은 실행하지 않는다.

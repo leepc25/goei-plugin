@@ -1,0 +1,17 @@
+id: 9d30ebb3-709d-4613-8ac8-c5cd78ef2ef6
+job_id: 9d30ebb3-709d-4613-8ac8-c5cd78ef2ef6
+model: pro
+description: One single full-body front-facing Jyaldi sprite. Use the approved illustration ONLY for her identity, full adult physique, long side-parted straight black hair, mature narrow crimson eyes with tired lower lids, black trouser suit, white closed-collar shirt, BLACK NECKTIE, black gloves, low-heeled closed black shoes. Use the separate FEMALE PIXEL SPRITE for the exact native pixel density, clean selective outline, sharp controlled pixel shading, charcoal cloth palette, subdued skin, contrast and finish. Render Jyaldi as a new native pixel sprite in that existing game's style; do not just shrink, trace or quantize the concept illustration. Do not copy the style woman's bob, skirt, face, pose or direction. Realistic mature adult anatomy about seven heads tall, normally sized head, normal torso and pelvis, crotch about 46-48% of standing height above soles. No fashion-model stretched legs or chibi anatomy. Body height about 235px on the 128x256 canvas with safety margins. Squarely front-facing, relaxed upright stance, empty gloved hands visible at sides outside pockets, feet slightly apart, soles level. Mild low top-down belt-scroll game view. Preserve the approved face and costume while adapting their shading to the supplied pixel-art style. Crisp deliberate 1px clusters, readable face, black tie visible on white shirt, no noisy hatching or blur, no antialiasing. Transparent background, no shadow, floor, props, weapons, effects, letters or extra figures. One single sprite.
+size: 128x256px
+transparent: True
+candidates: 1
+references: 1
+style_image: yes (color_palette, outline, detail, shading)
+max colours: 48 per image
+seed: 10242027
+asset_id: b99bcd59-d54f-5b2b-a5b4-e8e7ee6758ae
+asset_status: pending (saved when generation completes)
+cost: 10 generations
+status: processing (~1-10 min)
+
+hint: get_image(job_id="9d30ebb3-709d-4613-8ac8-c5cd78ef2ef6")
