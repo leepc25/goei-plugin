@@ -6,10 +6,11 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 const dir = await mkdtemp(join(tmpdir(), 'goei-visit-'));
-await build({ entryPoints: ['src/core/visit.ts', 'src/core/visitPrompt.ts', 'src/host/game/visit.ts'], outdir: dir, outbase: 'src', bundle: true, platform: 'node', format: 'esm', outExtension: { '.js': '.mjs' }, define: { __PLUGIN_VERSION__: '"test"', __UPDATE_BASE__: '""' }, logLevel: 'silent' });
+await build({ entryPoints: ['src/core/visit.ts', 'src/core/visitPrompt.ts', 'src/core/interlude.ts', 'src/host/game/visit.ts'], outdir: dir, outbase: 'src', bundle: true, platform: 'node', format: 'esm', outExtension: { '.js': '.mjs' }, define: { __PLUGIN_VERSION__: '"test"', __UPDATE_BASE__: '""' }, logLevel: 'silent' });
 const { visitRoom, visitRecord, withVisitTurn, VISIT_LORE } = await import(pathToFileURL(join(dir, 'core/visit.mjs')));
 const { createVisit } = await import(pathToFileURL(join(dir, 'host/game/visit.mjs')));
 const { parseVisitLine, clipLine } = await import(pathToFileURL(join(dir, 'core/visitPrompt.mjs')));
+const { withInterludes, orphanTurns, INTERLUDE_HEAD } = await import(pathToFileURL(join(dir, 'core/interlude.mjs')));
 const GUIDE = (await import('node:fs')).readFileSync('card/visit-guide.txt', 'utf8');
 await rm(dir, { recursive: true, force: true });
 
@@ -25,9 +26,10 @@ test('visit record deduplicates, bounds context and preserves other chat data', 
   const twice = withVisitTurn(chat,visitRecord(chat).turns.at(-1));
   assert.equal(twice,chat);
   assert.equal(visitRecord(chat).turns.length,100);
-  assert.equal(chat.localLore.length,2);
-  assert.equal(chat.localLore.find(l=>l.comment===VISIT_LORE).content.match(/유저:/g).length,8);
-  assert.ok(!chat.localLore[1].content.includes('{{'));
+  // 옛 로어북 기록 항목은 쓰지 않고, 있던 것은 지운다
+  assert.deepEqual(chat.localLore,[{comment:'other',content:'keep'}]);
+  const old={...chat,localLore:[...chat.localLore,{comment:VISIT_LORE,content:'x'}]};
+  assert.deepEqual(withVisitTurn(old,{id:'new',at:0,agentId:'P1',name:'요원',user:'a',reply:'b'}).localLore,[{comment:'other',content:'keep'}]);
   assert.equal(chat.message[0].data,'본편');
   assert.deepEqual(chat.scriptstate,{state:'same'});
 });
@@ -82,4 +84,36 @@ test('reply keeps only spoken words within the limit', () => {
   assert.equal(clipLine('첫 문장입니다. 두 번째 문장은 아주 길어서 넘칩니다.',12),'첫 문장입니다.');
   assert.equal([...clipLine('가'.repeat(100),80)].length,80);
   assert.throws(()=>parseVisitLine('{"line":"*고개만 끄덕인다*"}','에일린',80),/대사/);
+});
+
+test('interlude goes right after its anchor message in the main request, and drops when the anchor is rerolled away', () => {
+  const t=(id,anchor,name,user,reply)=>({id,at:0,agentId:name,name,user,reply,anchor,room:'office',visitor:'쟈알디'});
+  const chat={message:[{role:'user',data:'출근했다.',chatId:'u1'},{role:'char',data:'에일린이 서류를 정리하고 있다. 사무실은 조용하다.',chatId:'c1'},{role:'user',data:'회의실로 간다.',chatId:'u2'}],
+    goeiHqVisitV1:{turns:[t('1','c1','에일린','서류 다 됐어?','거의 다 됐어요.'),t('2','c1','데드폴','장비는?','점검 끝났습니다.'),t('3','gone','에일린','옛날 얘기','사라진 답')]}};
+  const req=[{role:'system',content:'main prompt'},{role:'user',content:'출근했다.'},{role:'assistant',content:'에일린이 서류를 정리하고 있다. 사무실은 조용하다.'},{role:'system',content:'post'},{role:'user',content:'회의실로 간다.'}];
+  const out=withInterludes(req,chat,'RULES','주인공');
+  assert.equal(out.length,6);
+  assert.equal(out[3].role,'system');
+  assert.ok(out[3].content.startsWith(INTERLUDE_HEAD));
+  assert.match(out[3].content,/RULES/);
+  assert.match(out[3].content,/쟈알디: 서류 다 됐어\?\n에일린: 거의 다 됐어요\./);
+  assert.match(out[3].content,/데드폴 \(사무실\)/);
+  assert.ok(!out[3].content.includes('사라진 답'));
+  assert.deepEqual(orphanTurns(chat).map(x=>x.id),['3']);
+  // 두 번 넣지 않는다
+  assert.equal(withInterludes(out,chat,'RULES','주인공').length,6);
+  // 기준 메시지 글이 요청에서 바뀌어 못 찾아도, 새 입력 바로 앞이면 마지막 사용자 메시지 앞에
+  const req2=[{role:'system',content:'main'},{role:'assistant',content:'(다르게 가공된 글)'},{role:'user',content:'회의실로 간다.'}];
+  const out2=withInterludes(req2,chat,null,'주인공');
+  assert.equal(out2[2].role,'system');
+  assert.equal(out2[3].content,'회의실로 간다.');
+});
+
+test('interlude finds the right one of two identical replies', () => {
+  const chat={message:[{role:'char',data:'같은 답',chatId:'a'},{role:'user',data:'다음',chatId:'b'},{role:'char',data:'같은 답',chatId:'c'},{role:'user',data:'또',chatId:'d'}],
+    goeiHqVisitV1:{turns:[{id:'1',at:0,agentId:'x',name:'에일린',user:'u',reply:'r',anchor:'a'}]}};
+  const req=[{role:'assistant',content:'같은 답'},{role:'user',content:'다음'},{role:'assistant',content:'같은 답'},{role:'user',content:'또'}];
+  const out=withInterludes(req,chat,null,'주인공');
+  assert.equal(out[1].role,'system');
+  assert.equal(out[2].content,'다음');
 });

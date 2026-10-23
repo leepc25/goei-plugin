@@ -1,6 +1,6 @@
 import type { GameVisit, VisitState } from '../../game/bridge';
 import { cardSnapshot } from '../../core/gamelink';
-import { anchorOf, visitRecord, visitRoom, withVisitTurn, type VisitTurn } from '../../core/visit';
+import { anchorOf, visitRecord, visitRoom, withoutOldLore, withVisitTurn, type VisitTurn } from '../../core/visit';
 import { agentLore, parseVisitLine, visitPrompt, type VisitLine } from '../../core/visitPrompt';
 import { advValue, budgetFor } from '../../core/advanced';
 import { fitPrompt } from '../../core/budget';
@@ -47,7 +47,13 @@ export function createVisit(): GameVisit {
     };
   }
   return {
-    async state() { return stateOf(await context()); },
+    async state() {
+      const c = await context();
+      // 옛 판(0.16.42~43)의 로어북 기록 항목은 막간 끼우기로 바뀌어 지운다
+      const clean = withoutOldLore(c.chat);
+      if (clean !== c.chat) await updateChat(c.charIndex, c.chatIndex, chat => chat.id === c.chat.id ? withoutOldLore(chat) : null).catch(() => null);
+      return stateOf(c);
+    },
     async send(agentId, input, which) {
       if (busy || isWaiting()) throw new Error('진행 중인 응답이 끝난 뒤 보내 주세요.');
       const text = input.trim();
@@ -85,7 +91,7 @@ export function createVisit(): GameVisit {
         const reply = parseVisitLine(raw, a.name, prompt.limit);
         lastExchange = { at: Date.now(), model, messages: prompt.messages, raw, reply };
         // If the active chat changes during inference, save only to the captured origin.
-        const turn: VisitTurn = { id: crypto.randomUUID(), at: Date.now(), agentId, name: a.name, user: text, reply, anchor, ...(me ? { visitor: me.name } : {}) };
+        const turn: VisitTurn = { id: crypto.randomUUID(), at: Date.now(), agentId, name: a.name, user: text, reply, anchor, room: visitRoom(a) ?? undefined, ...(me ? { visitor: me.name } : {}) };
         const char = await risuai.getCharacterFromIndex(c.charIndex) as { chaId?: string } | null;
         if (!char || char.chaId !== c.char.chaId) throw new Error('원래 카드가 바뀌어 대화를 저장하지 못했어요.');
         const saved = await updateChat(c.charIndex, c.chatIndex, chat => {

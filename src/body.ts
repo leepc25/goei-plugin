@@ -44,6 +44,9 @@ import { syncDecorators, computeLore, loreOptions, patchSlots, sameVars, trimRos
 import { advValue } from './core/advanced';
 import { userInfo } from './host/user';
 import { applyPlayer, hidePlayerTag, playerAgent, playerBlock } from './core/player';
+import { withInterludes } from './core/interlude';
+import { visitRecord } from './core/visit';
+import { visitContextRules } from './core/visitPrompt';
 
 const PLUGIN_ID = 'goei-plugin';
 const WATCH_MS = 1000;
@@ -67,6 +70,7 @@ async function onBeforeRequest<M extends PromptMessage>(messages: M[], type: str
     messages = stripHistoryTags(messages);
     messages = await fixLore(messages).catch(() => messages);
     messages = await withPlayer(messages).catch(() => messages);
+    messages = await withVisit(messages).catch(() => messages);
     messages = trimRoster(messages);
     const ctx = await moduleContext(sceneText(messages)).catch(() => [] as string[]);
     if (ctx.length) {
@@ -153,6 +157,16 @@ async function withPlayer<M extends PromptMessage>(messages: M[]): Promise<M[]> 
   const env = { vars: chat.scriptstate ?? {}, char: char.name, user: agent.name };
   const out = applyPlayer(messages, playerBlock(char.globalLore, agent, env), await readPersona(), userInfo().name, agent.name);
   return basicSettings(char.globalLore, chat.scriptstate).assetPlayer ? out : hidePlayerTag(out, [agent.english]);
+}
+
+/** 본부 막간: 대화가 일어난 메시지 바로 뒤에 끼운다 (core/interlude.ts). 채팅은 바꾸지 않는다 */
+async function withVisit<M extends PromptMessage>(messages: M[]): Promise<M[]> {
+  const charIndex = await risuai.getCurrentCharacterIndex();
+  const chat = (await risuai.getChatFromIndex(charIndex, await risuai.getCurrentChatIndex())) as Chat | null;
+  if (!chat || !visitRecord(chat).turns.length) return messages;
+  const char = (await risuai.getCharacterFromIndex(charIndex)) as LoreChar | null;
+  const me = char ? playerAgent(char.globalLore, chat.scriptstate) : undefined;
+  return withInterludes(messages, chat, char ? visitContextRules({ char }) : null, me?.name || userInfo().name || '주인공');
 }
 
 let rulesCache: { charIndex: number; gnet: string | null; phone: string | null; wiki: string | null; registry: Registry } | null = null;
