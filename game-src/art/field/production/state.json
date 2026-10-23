@@ -84,7 +84,7 @@
     "8df9126b-f6ce-43bd-be01-027d0588c203": {
       "kind": "registration",
       "slug": "spangdal",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792778281.737,
       "receipt": {
         "background_job_id": "8df9126b-f6ce-43bd-be01-027d0588c203",
@@ -93,33 +93,48 @@
       },
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 4.0
         },
         "id": "8df9126b-f6ce-43bd-be01-027d0588c203",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-23T17:58:02.918839+00:00",
         "last_response": {
-          "status": "building_skeleton",
-          "progress": 0.98,
+          "status": "completed",
           "character_id": "9095375d-b39a-447b-b577-fcb345e78928",
-          "n_directions": 8,
+          "storage_urls": {
+            "east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/9095375d-b39a-447b-b577-fcb345e78928/rotations/east.png",
+            "west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/9095375d-b39a-447b-b577-fcb345e78928/rotations/west.png",
+            "north": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/9095375d-b39a-447b-b577-fcb345e78928/rotations/north.png",
+            "south": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/9095375d-b39a-447b-b577-fcb345e78928/rotations/south.png",
+            "north-east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/9095375d-b39a-447b-b577-fcb345e78928/rotations/north-east.png",
+            "north-west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/9095375d-b39a-447b-b577-fcb345e78928/rotations/north-west.png",
+            "south-east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/9095375d-b39a-447b-b577-fcb345e78928/rotations/south-east.png",
+            "south-west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/9095375d-b39a-447b-b577-fcb345e78928/rotations/south-west.png"
+          },
+          "billing_usage": {
+            "type": "generations",
+            "generations": 4.0
+          },
           "character_name": "스팡달",
-          "queue_position": 0,
           "directions_type": "8-directions",
           "generation_mode": "v3",
-          "skeleton_frames_done": 6,
-          "character_description": "스팡달 / Spangdal. Adult woman mid20s, pale skin, short wavy purple bob covering one eye, clearly gold irises, faint unsettling half smile, slender natural adult build, black tailored skirt suit, white closed shirt, black necktie, black pumps. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
-          "generation_started_at": "2026-10-23T17:58:07.45931+00:00",
-          "skeleton_frames_total": 8
+          "directions_count": 8,
+          "character_description": "스팡달 / Spangdal. Adult woman mid20s, pale skin, short wavy purple bob covering one eye, clearly gold irises, faint unsettling half smile, slender natural adult build, black tailored skirt suit, white closed shirt, black necktie, black pumps. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow."
         }
+      },
+      "observed_end_epoch": 1792779174.244252,
+      "elapsed_observed_seconds": 892.5072519779205,
+      "usage": {
+        "type": "generations",
+        "generations": 4.0
       }
     },
     "78793c7b-f45f-48a6-ab11-0c1d97f86333": {
       "kind": "image",
       "slug": "jyaldi",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792779099.7971036,
       "receipt": {
         "usage": null,
@@ -134,13 +149,72 @@
         },
         "estimated_generations": 9,
         "pricing_provisional": true
+      },
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 9.0
+        },
+        "id": "78793c7b-f45f-48a6-ab11-0c1d97f86333",
+        "status": "completed",
+        "created_at": "2026-10-23T18:11:40.885551+00:00",
+        "last_response": {
+          "seed": 10222027,
+          "type": "message_done",
+          "model": "pro_flash",
+          "width": 128,
+          "action": "Removing background",
+          "height": 256,
+          "images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "prompt": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult Korean woman in her thirties, long loose straight black hair with asymmetric side part, distinct crimson red irises, mature narrow eyes and calm stern expression, tall naturally full-busted adult physique, black tailored blazer and straight black business trousers, white closed collared shirt with BLACK NECKTIE, fitted black gloves and plain black formal shoes with low practical heels. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height230-240px on128x256. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
+          "status": "completed",
+          "asset_id": "166dfde2-7e7a-564f-9598-2cc6bdb4e242",
+          "image_id": "166dfde2-7e7a-564f-9598-2cc6bdb4e242",
+          "job_kind": "creator-image",
+          "progress": 1.0,
+          "image_url": "https://s3.eu-central-003.backblazeb2.com/pixellab-generations/production/creator/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/166dfde2-7e7a-564f-9598-2cc6bdb4e242/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0037e6521c1d7c20000000001%2F20261023%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20261023T181359Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=8ab1bd11b68c8f1199dc85b23d5f62efb6e326bf2460cc32936c7c018ba3dd9c",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 9
+          },
+          "generation_id": "63cd0f39-c7de-4bf0-b98d-5ed7f75b8d3e",
+          "queue_position": 0,
+          "billing_charged": true,
+          "original_images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "source_image_id": "166dfde2-7e7a-564f-9598-2cc6bdb4e242",
+          "creator_image_saved": true,
+          "generation_started_at": "2026-10-23T18:11:41.089951+00:00",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792779272.2241185,
+      "elapsed_observed_seconds": 172.42701530456543,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 9
       }
     },
     "a32c319b-d494-4fb0-b04e-1576a6243021": {
       "kind": "image",
       "slug": "jaemtri",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792779101.181986,
       "receipt": {
         "usage": null,
@@ -155,13 +229,72 @@
         },
         "estimated_generations": 9,
         "pricing_provisional": true
+      },
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 9.0
+        },
+        "id": "a32c319b-d494-4fb0-b04e-1576a6243021",
+        "status": "completed",
+        "created_at": "2026-10-23T18:11:45.140363+00:00",
+        "last_response": {
+          "seed": 10222027,
+          "type": "message_done",
+          "model": "pro_flash",
+          "width": 128,
+          "action": "Removing background",
+          "height": 256,
+          "images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "prompt": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult woman late20s, long chestnut brown wavy hair below shoulders, soft green eyes, warm friendly smile, curvy natural adult build, black tailored office skirt suit, white shirt, black necktie, black high heels. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height230-240px on128x256. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
+          "status": "completed",
+          "asset_id": "6bc84ed9-205a-5845-9fe2-15c44029152e",
+          "image_id": "6bc84ed9-205a-5845-9fe2-15c44029152e",
+          "job_kind": "creator-image",
+          "progress": 1.0,
+          "image_url": "https://s3.eu-central-003.backblazeb2.com/pixellab-generations/production/creator/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/6bc84ed9-205a-5845-9fe2-15c44029152e/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0037e6521c1d7c20000000001%2F20261023%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20261023T181457Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=4025345606378177bb33a8cb6d73b350dc391ef170d7a948f6ad3b8409897c95",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 9
+          },
+          "generation_id": "5e86a29c-0837-4b39-ab1d-ba3a59ba4eae",
+          "queue_position": 0,
+          "billing_charged": true,
+          "original_images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "source_image_id": "6bc84ed9-205a-5845-9fe2-15c44029152e",
+          "creator_image_saved": true,
+          "generation_started_at": "2026-10-23T18:11:47.988788+00:00",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792779319.606821,
+      "elapsed_observed_seconds": 218.42483520507812,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 9
       }
     },
     "10a7c8f0-01b5-438e-91dd-61ba6d991597": {
       "kind": "image",
       "slug": "aileen",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792779108.1049678,
       "receipt": {
         "usage": null,
@@ -176,13 +309,72 @@
         },
         "estimated_generations": 9,
         "pricing_provisional": true
+      },
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 9.0
+        },
+        "id": "10a7c8f0-01b5-438e-91dd-61ba6d991597",
+        "status": "completed",
+        "created_at": "2026-10-23T18:11:55.028218+00:00",
+        "last_response": {
+          "seed": 10222027,
+          "type": "message_done",
+          "model": "pro_flash",
+          "width": 128,
+          "action": "Removing background",
+          "height": 256,
+          "images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "prompt": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult woman early20s, faded platinum blonde hair in a high ponytail with long bangs, dull gray eyes, serious analytical face, petite compact athletic build, practical fitted black trouser suit and black closed shoes as in her original portrait. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height230-240px on128x256. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
+          "status": "completed",
+          "asset_id": "d8e30b8f-37ae-5a25-86a4-b7f860f7affc",
+          "image_id": "d8e30b8f-37ae-5a25-86a4-b7f860f7affc",
+          "job_kind": "creator-image",
+          "progress": 1.0,
+          "image_url": "https://s3.eu-central-003.backblazeb2.com/pixellab-generations/production/creator/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/d8e30b8f-37ae-5a25-86a4-b7f860f7affc/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0037e6521c1d7c20000000001%2F20261023%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20261023T181450Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=0ee40d9c957cc8f4b07f0a6c3ba923b0f6cae92cfe93a419ceeceddb84ce1bed",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 9
+          },
+          "generation_id": "e7cfd22d-0520-4615-9407-638f3f02ccea",
+          "queue_position": 0,
+          "billing_charged": true,
+          "original_images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "source_image_id": "d8e30b8f-37ae-5a25-86a4-b7f860f7affc",
+          "creator_image_saved": true,
+          "generation_started_at": "2026-10-23T18:12:05.814456+00:00",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792779323.6858196,
+      "elapsed_observed_seconds": 215.58085203170776,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 9
       }
     },
     "2f655338-9c44-48da-b55f-0aab08174ead": {
       "kind": "image",
       "slug": "gorgodio",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792779126.016721,
       "receipt": {
         "usage": null,
@@ -197,13 +389,72 @@
         },
         "estimated_generations": 9,
         "pricing_provisional": true
+      },
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 9.0
+        },
+        "id": "2f655338-9c44-48da-b55f-0aab08174ead",
+        "status": "completed",
+        "created_at": "2026-10-23T18:12:12.013360+00:00",
+        "last_response": {
+          "seed": 10222027,
+          "type": "message_done",
+          "model": "pro_flash",
+          "width": 128,
+          "action": "Removing background",
+          "height": 256,
+          "images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "prompt": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult man early30s, very tall broad muscular wrestler build, bald head, neatly trimmed black goatee, confident stern face, black leather motorcycle jacket over white shirt and black necktie, black business trousers and heavy black shoes. No summoned armor. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height230-240px on128x256. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
+          "status": "completed",
+          "asset_id": "42c213fa-66f3-5377-9ede-567f7ff7245e",
+          "image_id": "42c213fa-66f3-5377-9ede-567f7ff7245e",
+          "job_kind": "creator-image",
+          "progress": 1.0,
+          "image_url": "https://s3.eu-central-003.backblazeb2.com/pixellab-generations/production/creator/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/42c213fa-66f3-5377-9ede-567f7ff7245e/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0037e6521c1d7c20000000001%2F20261023%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20261023T181429Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=6af0f79941f56b209ad00b463414975f44070d5b69750b1f76d740f7ef848f9b",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 9
+          },
+          "generation_id": "353001b4-ac92-493e-a3f8-82112b31bb13",
+          "queue_position": 0,
+          "billing_charged": true,
+          "original_images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "source_image_id": "42c213fa-66f3-5377-9ede-567f7ff7245e",
+          "creator_image_saved": true,
+          "generation_started_at": "2026-10-23T18:12:15.36276+00:00",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792779336.6788116,
+      "elapsed_observed_seconds": 210.662091255188,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 9
       }
     },
     "67d27e4e-ba4e-46dc-abf8-f9bf728557d9": {
       "kind": "image",
       "slug": "kyuras",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792779135.5438151,
       "receipt": {
         "usage": null,
@@ -218,6 +469,206 @@
         },
         "estimated_generations": 9,
         "pricing_provisional": true
+      },
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 9.0
+        },
+        "id": "67d27e4e-ba4e-46dc-abf8-f9bf728557d9",
+        "status": "completed",
+        "created_at": "2026-10-23T18:12:17.847544+00:00",
+        "last_response": {
+          "seed": 10222027,
+          "type": "message_done",
+          "model": "pro_flash",
+          "width": 128,
+          "action": "Removing background",
+          "height": 256,
+          "images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "prompt": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult man early30s, thin wiry build, pale green hair swept back, narrow face, gray green eyes, lively confident smile, black tailored trouser suit, white shirt, black necktie and black shoes. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height230-240px on128x256. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
+          "status": "completed",
+          "asset_id": "558a76ff-63e4-5e7a-9018-0f5478dcf740",
+          "image_id": "558a76ff-63e4-5e7a-9018-0f5478dcf740",
+          "job_kind": "creator-image",
+          "progress": 1.0,
+          "image_url": "https://s3.eu-central-003.backblazeb2.com/pixellab-generations/production/creator/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558a76ff-63e4-5e7a-9018-0f5478dcf740/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0037e6521c1d7c20000000001%2F20261023%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20261023T181502Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=3821df13a0d69c05f2a70fddcb0c9fb0936cbe96660fe200974b2f0841c5a335",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 9
+          },
+          "generation_id": "510b6d03-a37d-4a3f-9000-4b9be03413ff",
+          "queue_position": 0,
+          "billing_charged": true,
+          "original_images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "source_image_id": "558a76ff-63e4-5e7a-9018-0f5478dcf740",
+          "creator_image_saved": true,
+          "generation_started_at": "2026-10-23T18:12:21.881792+00:00",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792779336.6789393,
+      "elapsed_observed_seconds": 201.13512444496155,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 9
+      }
+    },
+    "0568cdf1-af39-4a34-94e1-a492b322a400": {
+      "kind": "image",
+      "slug": "deadpole",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792779194.4393775,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "0568cdf1-af39-4a34-94e1-a492b322a400",
+        "image_id": "58683a0a-e2ca-59b9-ba3f-972b071d4378",
+        "source_image_id": "58683a0a-e2ca-59b9-ba3f-972b071d4378",
+        "status": "processing",
+        "output_count": 1,
+        "image_size": {
+          "width": 128,
+          "height": 256
+        },
+        "estimated_generations": 9,
+        "pricing_provisional": true
+      },
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "0568cdf1-af39-4a34-94e1-a492b322a400",
+        "status": "processing",
+        "created_at": "2026-10-23T18:13:18.053512+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "model": "pro_flash",
+          "width": 128,
+          "action": "Correcting pixels",
+          "height": 256,
+          "prompt": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult woman early20s, petite natural build, long straight black hair with straight bangs, soft round dark gray eyes, gentle cautious expression, black tailored trouser suit, white shirt, black necktie, black protective gloves and plain black shoes. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height230-240px on128x256. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
+          "status": "processing",
+          "image_id": "58683a0a-e2ca-59b9-ba3f-972b071d4378",
+          "job_kind": "creator-image",
+          "progress": 0.72,
+          "queue_position": 19,
+          "generation_started_at": "2026-10-23T18:13:24.53075+00:00",
+          "estimated_wait_seconds": 2057
+        }
+      }
+    },
+    "1a54d3e6-c143-4b60-9c05-2929c084a4cd": {
+      "kind": "registration",
+      "slug": "jyaldi",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792779283.9001126,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "1a54d3e6-c143-4b60-9c05-2929c084a4cd",
+        "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      },
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "1a54d3e6-c143-4b60-9c05-2929c084a4cd",
+        "status": "processing",
+        "created_at": "2026-10-23T18:14:44.589045+00:00",
+        "last_response": {
+          "status": "processing",
+          "progress": 0.05333333333333334,
+          "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+          "n_directions": 8,
+          "character_name": "쟈알디",
+          "queue_position": 0,
+          "directions_type": "8-directions",
+          "generation_mode": "v3",
+          "character_description": "쟈알디 / Jyaldi. Adult Korean woman in her thirties, long loose straight black hair with asymmetric side part, distinct crimson red irises, mature narrow eyes and calm stern expression, tall naturally full-busted adult physique, black tailored blazer and straight black business trousers, white closed collared shirt with BLACK NECKTIE, fitted black gloves and plain black formal shoes with low practical heels. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
+          "generation_started_at": "2026-10-23T18:14:45.480814+00:00"
+        }
+      }
+    },
+    "c39dacdf-7d7e-4648-bceb-6900ea2c8fd8": {
+      "kind": "registration",
+      "slug": "jaemtri",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792779374.0653114,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "c39dacdf-7d7e-4648-bceb-6900ea2c8fd8",
+        "character_id": "f937666b-c116-4408-8864-55e7743850a5",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      }
+    },
+    "1bbbd641-ee5c-4742-88f5-be9dae77efff": {
+      "kind": "registration",
+      "slug": "aileen",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792779381.2876024,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "1bbbd641-ee5c-4742-88f5-be9dae77efff",
+        "character_id": "07763785-8f52-41d2-8e80-6f20d93f18c4",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      }
+    },
+    "3676d347-a999-4fff-93e5-fdef57f7cee7": {
+      "kind": "registration",
+      "slug": "gorgodio",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792779385.76632,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "3676d347-a999-4fff-93e5-fdef57f7cee7",
+        "character_id": "1d8d12e4-06d5-4df8-8812-0754f77b736b",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      }
+    },
+    "1a0b842f-1d61-406f-93bf-f3c0abb364c0": {
+      "kind": "registration",
+      "slug": "kyuras",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792779410.1426444,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "1a0b842f-1d61-406f-93bf-f3c0abb364c0",
+        "character_id": "5b11c6b4-98e8-4911-99ca-5115904b8237",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
       }
     }
   },
@@ -225,12 +676,13 @@
     "jyaldi": {
       "name": "쟈알디",
       "group": "management",
-      "character_id": null,
+      "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
       "image": "78793c7b-f45f-48a6-ab11-0c1d97f86333",
-      "registration": null,
+      "registration": "1a54d3e6-c143-4b60-9c05-2929c084a4cd",
       "motions": {},
       "ready": false,
-      "rebuild_after_direction_policy": true
+      "rebuild_after_direction_policy": true,
+      "image_verified": true
     },
     "spangdal": {
       "name": "스팡달",
@@ -239,50 +691,57 @@
       "image": "e925d6ba-4f8e-41b9-b58d-53327feda5b9",
       "registration": "8df9126b-f6ce-43bd-be01-027d0588c203",
       "motions": {},
-      "ready": false,
-      "image_verified": true
+      "ready": true,
+      "image_verified": true,
+      "skeleton_joints": 18,
+      "rotation_count": 8,
+      "exported": true
     },
     "jaemtri": {
       "name": "잼트리",
       "group": "management",
-      "character_id": null,
+      "character_id": "f937666b-c116-4408-8864-55e7743850a5",
       "image": "a32c319b-d494-4fb0-b04e-1576a6243021",
-      "registration": null,
+      "registration": "c39dacdf-7d7e-4648-bceb-6900ea2c8fd8",
       "motions": {},
-      "ready": false
+      "ready": false,
+      "image_verified": true
     },
     "aileen": {
       "name": "에일린",
       "group": "management",
-      "character_id": null,
+      "character_id": "07763785-8f52-41d2-8e80-6f20d93f18c4",
       "image": "10a7c8f0-01b5-438e-91dd-61ba6d991597",
-      "registration": null,
+      "registration": "1bbbd641-ee5c-4742-88f5-be9dae77efff",
       "motions": {},
-      "ready": false
+      "ready": false,
+      "image_verified": true
     },
     "gorgodio": {
       "name": "고르고디오",
       "group": "management",
-      "character_id": null,
+      "character_id": "1d8d12e4-06d5-4df8-8812-0754f77b736b",
       "image": "2f655338-9c44-48da-b55f-0aab08174ead",
-      "registration": null,
+      "registration": "3676d347-a999-4fff-93e5-fdef57f7cee7",
       "motions": {},
-      "ready": false
+      "ready": false,
+      "image_verified": true
     },
     "kyuras": {
       "name": "큐라스",
       "group": "management",
-      "character_id": null,
+      "character_id": "5b11c6b4-98e8-4911-99ca-5115904b8237",
       "image": "67d27e4e-ba4e-46dc-abf8-f9bf728557d9",
-      "registration": null,
+      "registration": "1a0b842f-1d61-406f-93bf-f3c0abb364c0",
       "motions": {},
-      "ready": false
+      "ready": false,
+      "image_verified": true
     },
     "deadpole": {
       "name": "데드폴",
       "group": "management",
       "character_id": null,
-      "image": null,
+      "image": "0568cdf1-af39-4a34-94e1-a492b322a400",
       "registration": null,
       "motions": {},
       "ready": false
@@ -1055,9 +1514,351 @@
           "pricing_provisional": true
         }
       }
+    },
+    {
+      "at": "2026-10-23T18:12:54Z",
+      "kind": "completed",
+      "slug": "spangdal",
+      "detail": {
+        "kind": "registration",
+        "template": null,
+        "job_id": "8df9126b-f6ce-43bd-be01-027d0588c203",
+        "usage": {
+          "type": "generations",
+          "generations": 4.0
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T18:13:14Z",
+      "kind": "character-ready",
+      "slug": "spangdal",
+      "detail": {
+        "3d_joints": 18,
+        "directions": 8
+      }
+    },
+    {
+      "at": "2026-10-23T18:13:24Z",
+      "kind": "submitted",
+      "slug": "deadpole",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "0568cdf1-af39-4a34-94e1-a492b322a400",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "0568cdf1-af39-4a34-94e1-a492b322a400",
+          "image_id": "58683a0a-e2ca-59b9-ba3f-972b071d4378",
+          "source_image_id": "58683a0a-e2ca-59b9-ba3f-972b071d4378",
+          "status": "processing",
+          "output_count": 1,
+          "image_size": {
+            "width": 128,
+            "height": 256
+          },
+          "estimated_generations": 9,
+          "pricing_provisional": true
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T18:13:27Z",
+      "kind": "exported",
+      "slug": "spangdal",
+      "detail": {
+        "bytes": 77752,
+        "files": 9
+      }
+    },
+    {
+      "at": "2026-10-23T18:14:32Z",
+      "kind": "completed",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "78793c7b-f45f-48a6-ab11-0c1d97f86333",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 9
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T18:14:43Z",
+      "kind": "image-verified",
+      "slug": "jyaldi",
+      "detail": {
+        "size": [
+          128,
+          256
+        ],
+        "bbox": [
+          30,
+          15,
+          95,
+          247
+        ],
+        "colors": 48,
+        "alpha": [
+          0,
+          255
+        ],
+        "original_pixels_preserved": true
+      }
+    },
+    {
+      "at": "2026-10-23T18:14:48Z",
+      "kind": "submitted",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "registration",
+        "template": null,
+        "job_id": "1a54d3e6-c143-4b60-9c05-2929c084a4cd",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "1a54d3e6-c143-4b60-9c05-2929c084a4cd",
+          "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T18:15:19Z",
+      "kind": "completed",
+      "slug": "jaemtri",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "a32c319b-d494-4fb0-b04e-1576a6243021",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 9
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T18:15:23Z",
+      "kind": "completed",
+      "slug": "aileen",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "10a7c8f0-01b5-438e-91dd-61ba6d991597",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 9
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T18:15:36Z",
+      "kind": "completed",
+      "slug": "gorgodio",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "2f655338-9c44-48da-b55f-0aab08174ead",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 9
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T18:15:36Z",
+      "kind": "completed",
+      "slug": "kyuras",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "67d27e4e-ba4e-46dc-abf8-f9bf728557d9",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 9
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T18:15:44Z",
+      "kind": "image-verified",
+      "slug": "jaemtri",
+      "detail": {
+        "size": [
+          128,
+          256
+        ],
+        "bbox": [
+          30,
+          17,
+          94,
+          249
+        ],
+        "colors": 48,
+        "alpha": [
+          0,
+          255
+        ],
+        "original_pixels_preserved": true
+      }
+    },
+    {
+      "at": "2026-10-23T18:15:54Z",
+      "kind": "image-verified",
+      "slug": "aileen",
+      "detail": {
+        "size": [
+          128,
+          256
+        ],
+        "bbox": [
+          32,
+          23,
+          94,
+          248
+        ],
+        "colors": 48,
+        "alpha": [
+          0,
+          255
+        ],
+        "original_pixels_preserved": true
+      }
+    },
+    {
+      "at": "2026-10-23T18:16:02Z",
+      "kind": "image-verified",
+      "slug": "gorgodio",
+      "detail": {
+        "size": [
+          128,
+          256
+        ],
+        "bbox": [
+          17,
+          8,
+          108,
+          249
+        ],
+        "colors": 20,
+        "alpha": [
+          0,
+          255
+        ],
+        "original_pixels_preserved": true
+      }
+    },
+    {
+      "at": "2026-10-23T18:16:12Z",
+      "kind": "image-verified",
+      "slug": "kyuras",
+      "detail": {
+        "size": [
+          128,
+          256
+        ],
+        "bbox": [
+          28,
+          7,
+          99,
+          249
+        ],
+        "colors": 48,
+        "alpha": [
+          0,
+          255
+        ],
+        "original_pixels_preserved": true
+      }
+    },
+    {
+      "at": "2026-10-23T18:16:21Z",
+      "kind": "submitted",
+      "slug": "jaemtri",
+      "detail": {
+        "kind": "registration",
+        "template": null,
+        "job_id": "c39dacdf-7d7e-4648-bceb-6900ea2c8fd8",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "c39dacdf-7d7e-4648-bceb-6900ea2c8fd8",
+          "character_id": "f937666b-c116-4408-8864-55e7743850a5",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T18:16:25Z",
+      "kind": "submitted",
+      "slug": "aileen",
+      "detail": {
+        "kind": "registration",
+        "template": null,
+        "job_id": "1bbbd641-ee5c-4742-88f5-be9dae77efff",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "1bbbd641-ee5c-4742-88f5-be9dae77efff",
+          "character_id": "07763785-8f52-41d2-8e80-6f20d93f18c4",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T18:16:50Z",
+      "kind": "submitted",
+      "slug": "gorgodio",
+      "detail": {
+        "kind": "registration",
+        "template": null,
+        "job_id": "3676d347-a999-4fff-93e5-fdef57f7cee7",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "3676d347-a999-4fff-93e5-fdef57f7cee7",
+          "character_id": "1d8d12e4-06d5-4df8-8812-0754f77b736b",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T18:16:54Z",
+      "kind": "submitted",
+      "slug": "kyuras",
+      "detail": {
+        "kind": "registration",
+        "template": null,
+        "job_id": "1a0b842f-1d61-406f-93bf-f3c0abb364c0",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "1a0b842f-1d61-406f-93bf-f3c0abb364c0",
+          "character_id": "5b11c6b4-98e8-4911-99ca-5115904b8237",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
     }
   ],
-  "updated_at": 1792779143.3841407,
+  "updated_at": 1792779414.264236,
   "user_stopped_at": 1792778235.6917784,
   "archived_jobs": {
     "304457e9-6577-44f0-af17-97841a9f6720": {
@@ -2380,13 +3181,13 @@
   "summary": {
     "jobs": {
       "processing": 6,
-      "completed": 1,
+      "completed": 7,
       "failed": 0,
       "stalled": 0
     },
-    "characters_ready": 0,
+    "characters_ready": 1,
     "characters_total": 55,
-    "images_verified": 1,
+    "images_verified": 6,
     "motions_submitted": 0,
     "motions_target": 1100
   }
