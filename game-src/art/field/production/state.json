@@ -3404,7 +3404,7 @@
       "kind": "registration",
       "slug": "deadpole",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792780794.3121269,
       "receipt": {
         "usage": null,
@@ -3416,26 +3416,41 @@
       },
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 4.0
         },
         "id": "5c0844e8-919f-4527-b663-d748a43fc2a1",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-23T18:39:56.850399+00:00",
         "last_response": {
-          "status": "building_skeleton",
-          "progress": 0.98,
+          "status": "completed",
           "character_id": "57e9dc0e-913f-443b-bb1f-6be2cdb617cd",
-          "n_directions": 8,
+          "storage_urls": {
+            "east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/57e9dc0e-913f-443b-bb1f-6be2cdb617cd/rotations/east.png",
+            "west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/57e9dc0e-913f-443b-bb1f-6be2cdb617cd/rotations/west.png",
+            "north": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/57e9dc0e-913f-443b-bb1f-6be2cdb617cd/rotations/north.png",
+            "south": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/57e9dc0e-913f-443b-bb1f-6be2cdb617cd/rotations/south.png",
+            "north-east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/57e9dc0e-913f-443b-bb1f-6be2cdb617cd/rotations/north-east.png",
+            "north-west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/57e9dc0e-913f-443b-bb1f-6be2cdb617cd/rotations/north-west.png",
+            "south-east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/57e9dc0e-913f-443b-bb1f-6be2cdb617cd/rotations/south-east.png",
+            "south-west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/57e9dc0e-913f-443b-bb1f-6be2cdb617cd/rotations/south-west.png"
+          },
+          "billing_usage": {
+            "type": "generations",
+            "generations": 4.0
+          },
           "character_name": "데드폴",
-          "queue_position": 0,
           "directions_type": "8-directions",
           "generation_mode": "v3",
-          "skeleton_frames_done": 5,
-          "character_description": "데드폴 / Deadpole. Adult woman early20s, petite natural build, long straight black hair with straight bangs, soft round dark gray eyes, gentle cautious expression, black tailored trouser suit, white shirt, black necktie, black protective gloves and plain black shoes. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
-          "generation_started_at": "2026-10-23T18:40:03.779419+00:00",
-          "skeleton_frames_total": 8
+          "directions_count": 8,
+          "character_description": "데드폴 / Deadpole. Adult woman early20s, petite natural build, long straight black hair with straight bangs, soft round dark gray eyes, gentle cautious expression, black tailored trouser suit, white shirt, black necktie, black protective gloves and plain black shoes. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow."
         }
+      },
+      "observed_end_epoch": 1792782289.9010077,
+      "elapsed_observed_seconds": 1495.5888810157776,
+      "usage": {
+        "type": "generations",
+        "generations": 4.0
       }
     },
     "1c807537-5a53-434b-87ed-56fa81686f57": {
@@ -3643,12 +3658,12 @@
         "created_at": "2026-10-23T18:59:41.189950+00:00",
         "last_response": {
           "type": "message_progress",
-          "action": "generating",
-          "progress": 0.12285985374004413,
+          "action": "finalizing",
+          "progress": 0.9441718803252981,
           "direction": "west",
           "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
           "animation_name": null,
-          "queue_position": 0,
+          "queue_position": 28,
           "generation_model": "skeleton-v3_template",
           "animation_group_id": "e55a2aa8-8043-49d8-aa56-738827421ecd",
           "motion_adjustments": {
@@ -3660,7 +3675,7 @@
           "animation_description": "walking confidently with an upright steady torso, measured strides and restrained arm swing",
           "generation_started_at": "2026-10-23T19:01:42.318913+00:00",
           "template_animation_id": "walking-8-frames",
-          "estimated_wait_seconds": 0
+          "estimated_wait_seconds": 3027
         }
       }
     },
@@ -3692,8 +3707,8 @@
         "created_at": "2026-10-23T19:00:41.169043+00:00",
         "last_response": {
           "type": "message_progress",
-          "action": "generating",
-          "progress": 0.14648130000371712,
+          "action": "finalizing",
+          "progress": 0.905,
           "direction": "west",
           "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
           "animation_name": null,
@@ -6525,9 +6540,24 @@
         },
         "detail": null
       }
+    },
+    {
+      "at": "2026-10-23T19:04:49Z",
+      "kind": "completed",
+      "slug": "deadpole",
+      "detail": {
+        "kind": "registration",
+        "template": null,
+        "job_id": "5c0844e8-919f-4527-b663-d748a43fc2a1",
+        "usage": {
+          "type": "generations",
+          "generations": 4.0
+        },
+        "detail": null
+      }
     }
   ],
-  "updated_at": 1792782196.2800477,
+  "updated_at": 1792782389.1437154,
   "user_stopped_at": 1792778235.6917784,
   "archived_jobs": {
     "304457e9-6577-44f0-af17-97841a9f6720": {
@@ -7849,8 +7879,8 @@
   "last_git_checkpoint": 1792782057.9141974,
   "summary": {
     "jobs": {
-      "processing": 3,
-      "completed": 38,
+      "processing": 2,
+      "completed": 39,
       "failed": 3,
       "stalled": 0
     },
