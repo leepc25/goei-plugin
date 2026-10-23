@@ -98,6 +98,7 @@ export function mountGameShell(box: HTMLElement, o: ShellOptions = {}): Shell {
     else tap(code);
   });
   touch.vw = () => stage.vw;
+  if (o.field) touch.setField(true);
   touch.toLocal = o.toLocal ?? ((x, y, el) => stage.toLocal(x, y, el));
   if (o.fill) stage.setFit('fill');
   else if (o.field) stage.setFit('height');

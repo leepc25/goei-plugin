@@ -4018,6 +4018,20 @@ var TouchPad = class {
     });
     __publicField(this, "baseX", 0);
     __publicField(this, "baseY", 0);
+    /** 필드: 조사(E)와 메뉴만 둔다. 전투 단추는 숨긴다 */
+    __publicField(this, "fieldMode", false);
+    /** 입력기(키보드)가 떠 있으면 스틱과 단추를 숨긴다 */
+    __publicField(this, "imeUp", false);
+    __publicField(this, "onIme", () => {
+      const vv = typeof visualViewport !== "undefined" ? visualViewport : null;
+      const typing = /^(INPUT|TEXTAREA)$/.test(document.activeElement?.tagName ?? "") || !!document.activeElement?.isContentEditable;
+      const shrunk = !!vv && vv.height < innerHeight * 0.75;
+      const up = typing && (shrunk || this.fieldMode) || shrunk;
+      if (up === this.imeUp) return;
+      this.imeUp = up;
+      if (up) this.releaseAll();
+      this.refresh();
+    });
     this.root = document.createElement("div");
     this.root.className = "tp gk-font";
     this.root.innerHTML = `<div class="tp-zone"><div class="tp-base"><div class="tp-knob"></div></div></div>`;
@@ -4055,6 +4069,9 @@ var TouchPad = class {
     document.addEventListener("visibilitychange", this.onVisibility);
     this.root.addEventListener("contextmenu", (e) => e.preventDefault());
     window.addEventListener("touchstart", this.onAnyTouch, { passive: true, capture: true });
+    document.addEventListener("focusin", this.onIme);
+    document.addEventListener("focusout", this.onIme);
+    if (typeof visualViewport !== "undefined") visualViewport?.addEventListener("resize", this.onIme);
     this.layout();
   }
   /** 설정·화면 크기가 바뀌면 다시 배치 */
@@ -4082,7 +4099,7 @@ var TouchPad = class {
     const ax = s.lefty ? safeS + u * 0.8 : bw - safeS - u * 0.8;
     const ay = bh - safeB - u * 0.85;
     const squeeze = portrait ? 0.8 : 1;
-    const rowBtns = portrait ? ["item1", "item2", "item3", "item4", "reload", "support"] : ["item1", "item2", "item3", "item4"];
+    const rowBtns = this.fieldMode ? [] : portrait ? ["item1", "item2", "item3", "item4", "reload", "support"] : ["item1", "item2", "item3", "item4"];
     const side = (bw - stageW) / 2;
     const topInSide = !portrait && side >= u * 0.75;
     for (const b of this.btns) {
@@ -4125,9 +4142,9 @@ var TouchPad = class {
   layoutSide(bw, bh, side) {
     const s = this.st();
     const g = 4, edge = 6;
-    const right = ["ult", "unique", "shoot", "guard", "evade", "interact", "jump", "attack"];
-    const left = ["menu", "map", "item1", "item2", "item3", "item4", "reload", "support"];
-    const wR = [1, 1, 1, 1, 1, 1, 1, 1.25];
+    const right = this.fieldMode ? ["interact"] : ["ult", "unique", "shoot", "guard", "evade", "interact", "jump", "attack"];
+    const left = this.fieldMode ? ["menu"] : ["menu", "map", "item1", "item2", "item3", "item4", "reload", "support"];
+    const wR = this.fieldMode ? [1.25] : [1, 1, 1, 1, 1, 1, 1, 1.25];
     const sum = wR.reduce((a, v) => a + v, 0);
     const unit = Math.max(36, Math.min((bh - 2 * edge - (right.length - 1) * g) / sum, side > 40 ? side - 8 : 999, 70)) * s.touchSize;
     this.u = unit / 0.88;
@@ -4183,11 +4200,23 @@ var TouchPad = class {
     this.baseX = x;
     this.baseY = y;
   }
+  usable(b) {
+    return !this.fieldMode || b.id === "interact" || b.id === "menu";
+  }
+  setField(on) {
+    if (this.fieldMode === on) return;
+    this.fieldMode = on;
+    const it = this.btns.find((b) => b.id === "interact");
+    Object.assign(it, on ? { dx: 0, dy: 0, d: 1.45 } : { dx: -1.55, dy: -2.5, d: 0.95 });
+    it.el.classList.toggle("big", on);
+    for (const b of this.btns) b.el.style.display = this.usable(b) ? "" : "none";
+    this.refresh();
+  }
   refresh() {
     const s = this.st();
     const coarse = typeof matchMedia !== "undefined" && matchMedia("(pointer: coarse)").matches;
     const show = s.touch === "on" || s.touch === "auto" && (coarse || this.seenTouch);
-    this.root.classList.toggle("hide", !show || !this.visible);
+    this.root.classList.toggle("hide", !show || !this.visible || this.imeUp);
     this.layout();
   }
   setVisible(on) {
@@ -4239,6 +4268,7 @@ var TouchPad = class {
   hit(x, y) {
     let best = null, bd = Infinity;
     for (const b of this.btns) {
+      if (!this.usable(b)) continue;
       if (this.root.closest(".exploration-map") && b.id !== "map" && b.id !== "menu") continue;
       if (b.hw) {
         const d2 = Math.max(Math.abs(x - b.cx) / (b.hw + 3), Math.abs(y - b.cy) / (b.hh + 3));
@@ -4401,6 +4431,9 @@ var TouchPad = class {
     window.removeEventListener("pointerup", this.onPointerEnd);
     window.removeEventListener("pointercancel", this.onPointerEnd);
     window.removeEventListener("blur", this.onBlur);
+    document.removeEventListener("focusin", this.onIme);
+    document.removeEventListener("focusout", this.onIme);
+    if (typeof visualViewport !== "undefined") visualViewport?.removeEventListener("resize", this.onIme);
     document.removeEventListener("visibilitychange", this.onVisibility);
     window.removeEventListener("touchstart", this.onAnyTouch, { capture: true });
     this.releaseAll();
@@ -4430,6 +4463,7 @@ function mountGameShell(box2, o = {}) {
     else tap(code);
   });
   touch.vw = () => stage.vw;
+  if (o.field) touch.setField(true);
   touch.toLocal = o.toLocal ?? ((x, y, el) => stage.toLocal(x, y, el));
   if (o.fill) stage.setFit("fill");
   else if (o.field) stage.setFit("height");

@@ -112,6 +112,9 @@ export class TouchPad {
     document.addEventListener('visibilitychange', this.onVisibility);
     this.root.addEventListener('contextmenu', (e) => e.preventDefault());
     window.addEventListener('touchstart', this.onAnyTouch, { passive: true, capture: true });
+    document.addEventListener('focusin', this.onIme);
+    document.addEventListener('focusout', this.onIme);
+    if (typeof visualViewport !== 'undefined') visualViewport?.addEventListener('resize', this.onIme);
     this.layout();
   }
   private onPointerEnd = (e: PointerEvent) => this.up(e);
@@ -152,7 +155,7 @@ export class TouchPad {
     const ay = bh - safeB - u * 0.85;
     // 세로: 버튼 무리를 조금 좁히고, 장전·지원은 아이템 줄로 옮긴다
     const squeeze = portrait ? 0.8 : 1;
-    const rowBtns = portrait ? ['item1', 'item2', 'item3', 'item4', 'reload', 'support'] : ['item1', 'item2', 'item3', 'item4'];
+    const rowBtns = this.fieldMode ? [] : portrait ? ['item1', 'item2', 'item3', 'item4', 'reload', 'support'] : ['item1', 'item2', 'item3', 'item4'];
     const side = (bw - stageW) / 2;
     const topInSide = !portrait && side >= u * 0.75;
     for (const b of this.btns) {
@@ -200,9 +203,9 @@ export class TouchPad {
     const s = this.st();
     const g = 4,
       edge = 6;
-    const right = ['ult', 'unique', 'shoot', 'guard', 'evade', 'interact', 'jump', 'attack'];
-    const left = ['menu', 'map', 'item1', 'item2', 'item3', 'item4', 'reload', 'support'];
-    const wR = [1, 1, 1, 1, 1, 1, 1, 1.25];
+    const right = this.fieldMode ? ['interact'] : ['ult', 'unique', 'shoot', 'guard', 'evade', 'interact', 'jump', 'attack'];
+    const left = this.fieldMode ? ['menu'] : ['menu', 'map', 'item1', 'item2', 'item3', 'item4', 'reload', 'support'];
+    const wR = this.fieldMode ? [1.25] : [1, 1, 1, 1, 1, 1, 1, 1.25];
     const sum = wR.reduce((a, v) => a + v, 0);
     // 버튼 한 칸 지름: 높이에 8개가 들어가고 띠 폭을 넘지 않게 (띠가 좁으면 그만큼 캔버스에 걸친다)
     const unit = Math.max(36, Math.min((bh - 2 * edge - (right.length - 1) * g) / sum, side > 40 ? side - 8 : 999, 70)) * s.touchSize;
@@ -265,11 +268,38 @@ export class TouchPad {
   }
   private baseX = 0;
   private baseY = 0;
+  /** 필드: 조사(E)와 메뉴만 둔다. 전투 단추는 숨긴다 */
+  private fieldMode = false;
+  /** 입력기(키보드)가 떠 있으면 스틱과 단추를 숨긴다 */
+  private imeUp = false;
+  private usable(b: Btn) {
+    return !this.fieldMode || b.id === 'interact' || b.id === 'menu';
+  }
+  setField(on: boolean) {
+    if (this.fieldMode === on) return;
+    this.fieldMode = on;
+    const it = this.btns.find((b) => b.id === 'interact')!;
+    // 세로 화면: 조사를 공격 자리에 크게
+    Object.assign(it, on ? { dx: 0, dy: 0, d: 1.45 } : { dx: -1.55, dy: -2.5, d: 0.95 });
+    it.el!.classList.toggle('big', on);
+    for (const b of this.btns) b.el!.style.display = this.usable(b) ? '' : 'none';
+    this.refresh();
+  }
+  private onIme = () => {
+    const vv = typeof visualViewport !== 'undefined' ? visualViewport : null;
+    const typing = /^(INPUT|TEXTAREA)$/.test(document.activeElement?.tagName ?? '') || !!(document.activeElement as HTMLElement | null)?.isContentEditable;
+    const shrunk = !!vv && vv.height < innerHeight * 0.75;
+    const up = typing && (shrunk || this.fieldMode) || shrunk;
+    if (up === this.imeUp) return;
+    this.imeUp = up;
+    if (up) this.releaseAll();
+    this.refresh();
+  };
   refresh() {
     const s = this.st();
     const coarse = typeof matchMedia !== 'undefined' && matchMedia('(pointer: coarse)').matches;
     const show = s.touch === 'on' || (s.touch === 'auto' && (coarse || this.seenTouch));
-    this.root.classList.toggle('hide', !show || !this.visible);
+    this.root.classList.toggle('hide', !show || !this.visible || this.imeUp);
     this.layout();
   }
   setVisible(on: boolean) {
@@ -323,6 +353,7 @@ export class TouchPad {
     let best: Btn | null = null,
       bd = Infinity;
     for (const b of this.btns) {
+      if (!this.usable(b)) continue;
       if (this.root.closest('.exploration-map') && b.id !== 'map' && b.id !== 'menu') continue;
       if (b.hw) {
         // 네모 단추: 띠 안에서 붙어 있으므로 여유 없이 칸 그대로 (사이 틈은 가까운 쪽)
@@ -494,6 +525,9 @@ export class TouchPad {
     window.removeEventListener('pointerup', this.onPointerEnd);
     window.removeEventListener('pointercancel', this.onPointerEnd);
     window.removeEventListener('blur', this.onBlur);
+    document.removeEventListener('focusin', this.onIme);
+    document.removeEventListener('focusout', this.onIme);
+    if (typeof visualViewport !== 'undefined') visualViewport?.removeEventListener('resize', this.onIme);
     document.removeEventListener('visibilitychange', this.onVisibility);
     window.removeEventListener('touchstart', this.onAnyTouch, { capture: true });
     this.releaseAll();
