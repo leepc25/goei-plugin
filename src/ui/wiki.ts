@@ -968,3 +968,6 @@ export function wikiInput(name: string, value: string): boolean {
   if (name === 'wiki-docreq') return void (wiki.docReq = value), true;
   return false;
 }
+
+/** 메인 설정 「기능별 설정」에서 연다 */
+export const wikiSettingsPane = (ctx: ChatContext): string => settingsView(ctx);

@@ -1,7 +1,6 @@
 // 설정 → 기능별 설정 → 필드 (2026-10-22 설계 2판 6단계): 보낼 자료·모델·길이와, 실제로 보낸 것·본편에 들어갈 막간 보기.
 import { advSections } from './advanced';
 import { keepOpen } from './panels';
-import { settingsUi } from './settings';
 import { interludes, interludeText, orphanTurns } from '../core/interlude';
 import { tokens } from '../core/gnet';
 import { policySections } from '../core/refs';
@@ -59,12 +58,6 @@ function prettyJson(s: string): string {
 }
 
 export async function handleVisitSettings(action: string, ctx: ChatContext, render: () => void, refresh: () => Promise<void>): Promise<boolean> {
-  if (action === 'visit-back') {
-    visitUi.confirmClear = false;
-    settingsUi.page = '';
-    render();
-    return true;
-  }
   if (action === 'visit-orphans' || action === 'visit-orphans-no') {
     visitUi.confirmClear = action === 'visit-orphans';
     render();

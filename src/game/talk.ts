@@ -142,6 +142,8 @@ export function mountTalk(root: HTMLElement, api: GameVisit) {
       if (!dead && bar.hasAttribute('data-open')) input.focus();
     }
   };
+  // 내 이름표가 처음부터 주인공 이름이게 (입력창을 열기 전에도)
+  void api.state().then((v) => { if (!dead && !busy) state = v; }).catch(() => {});
   sendBtn.onclick = () => void send();
   // Risu 플러그인 창은 form submit이 막혀 있다: 버튼과 Enter로 보낸다 (한글 조합 중 Enter 제외)
   input.addEventListener('keydown', (e) => {

@@ -237,6 +237,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     onRetreat: () => bridge?.visit ? bridge.close?.() : game?.endRun('withdraw'),
     onTitle: () => bridge?.visit ? bridge.close?.() : game?.toTitle(),
     toLocal: bridge?.viewport ? (x, y, el) => bridge.viewport!.toLocal(x, y, el) : undefined,
+    field: bridge?.visit ? { onExit: () => bridge.close?.() } : undefined,
   });
   const stageStore = {
     load: () => {

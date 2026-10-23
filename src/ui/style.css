@@ -611,8 +611,8 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
   .gx-mclose.l { right: 100%; }
   .gx-mclose.r { left: 100%; }
   .gx-mclose.ready { color: #fff; background: var(--danger); }
-  /* 순찰은 상황판 하단 서랍에만 (2026-10-19 사용자: 위가 꽉 참) */
-  .gx-head-act [data-action="game-open"] { display: none; }
+  /* 필드: 모바일은 머리 버튼 (PC는 옆 메뉴) */
+  .gx .gx-head-act .gx-fieldbtn { display: grid; }
   .gx-facs { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: 82%; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 6px; scrollbar-width: none; }
   .gx-fac { scroll-snap-align: start; }
   .gx-fac.has-img { min-height: 188px; }
@@ -1920,7 +1920,7 @@ details.gx-gl-card:not([open]) { gap: 0; }
 .st-range output { min-width: 3.2em; text-align: right; font-variant-numeric: tabular-nums; color: var(--sub); }
 
 /* 메인 설정 맨 위 「기능별 설정」: 세 기능 설정을 바로 여는 단추 */
-.gx .st-feats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; padding: 10px 12px; }
+.gx .st-feats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; padding: 10px 12px; }
 .gx .st-feat { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 40px; white-space: nowrap; }
 .gx .st-feat svg { width: 16px; height: 16px; flex: none; }
 .gx .ps-group > .ps-adv { margin: 10px 0 0; }
@@ -2556,3 +2556,9 @@ button.mk-go:hover { color: var(--signal); }
 .gx-opview.feed.k-an.fx-breath::after { animation: gx-breath 2.1s ease-in-out 2; }
 @keyframes gx-breath { 0%, 100% { box-shadow: inset 0 0 40px rgba(255, 112, 96, .18); } 50% { box-shadow: inset 0 0 120px rgba(190, 18, 10, var(--bq)); } }
 @media (prefers-reduced-motion: reduce) { .gx-opview.feed.k-an::after { animation: none; } }
+
+/* 필드 (2026-10-23 사용자): 창 본문 자리 안에서만 돈다. 머리·메뉴는 그대로, 게임 자체 머리는 숨긴다 (나가기는 Esc 메뉴) */
+.gx-head-act .gx-fieldbtn { display: none; }
+.gx-body.gx-fieldhost { position: relative; padding: 0; overflow: hidden; scrollbar-gutter: auto; min-height: 0; }
+.gx-fieldhost .gx-game, .gx-fieldhost .gx-game.gx-full { position: absolute; inset: 0; z-index: auto; }
+.gx-fieldhost .gx-game .gx-head { display: none; }

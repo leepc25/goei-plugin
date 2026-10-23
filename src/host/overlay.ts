@@ -30,7 +30,7 @@ export const INTRO_MS = 2000;
 const FAB_CSS = `
 ${themeVars('[x-goei-fab]')}
 [x-goei-fab] {
-  position: fixed; right: 16px; bottom: 96px; z-index: 100;
+  position: fixed; right: 16px; bottom: 96px; z-index: 45; /* 플러그인 창(49)·Risu 경고(50) 아래 */
   display: none;
 }
 [x-goei-fab] button {

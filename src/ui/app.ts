@@ -1,4 +1,5 @@
 import { findFaction, findScenario, defaultScenario, SCENARIOS } from '../core/scenarios';
+import { showWindow } from '../host/container';
 import { factionList } from '../core/factions';
 import { setOpeningHint } from '../host/openinghint';
 import { NavHistory } from '../core/navhist';
@@ -81,8 +82,8 @@ let busy = false;
 let notice = '';
 /** 괴담넷 탭 (완성 전까지 숨김) */
 const GNET_ON = true;
-type Tab = 'board' | 'map' | 'mission' | 'gnet' | 'phone' | 'wiki' | 'settings';
-const TABS: Tab[] = ['board', 'map', 'mission', ...(GNET_ON ? (['gnet'] as Tab[]) : []), 'phone', 'wiki', 'settings'];
+type Tab = 'board' | 'map' | 'mission' | 'gnet' | 'phone' | 'wiki' | 'field' | 'settings';
+const TABS: Tab[] = ['board', 'map', 'mission', ...(GNET_ON ? (['gnet'] as Tab[]) : []), 'phone', 'wiki', 'field', 'settings'];
 let tab: Tab = 'board';
 /** 커스텀 임무 시작 화면에서 "다시 고르기"를 눌렀을 때 */
 let repick = false;
@@ -406,6 +407,8 @@ function ensureRoot(): HTMLElement {
   bindAgentTips(root);
   document.addEventListener('keydown', (ev) => {
     if (ev.key !== 'Escape') return;
+    // 필드에서 Esc는 게임 일시정지 메뉴 (창을 닫지 않는다, 2026-10-23 사용자)
+    if (tab === 'field' && view.kind === 'started') return;
     if (evUi.pop || agUi.pop) {
       evUi.pop = agUi.pop = '';
       render();
@@ -456,7 +459,7 @@ export async function openApp(opts: { quietIfNotLite?: boolean } = {}): Promise<
   render();
   shown = true;
   if (root) startCctvFx(root);
-  await risuai.showContainer('fullscreen');
+  await showWindow();
   await refresh();
   // 에셋 모듈의 표정 세트(위키 인물 사진). 목록이 바뀌었으면 한 번 다시 그린다
   void loadModuleAssets().then((changed) => {
@@ -574,7 +577,8 @@ async function handle(action: string, value?: string): Promise<void> {
     if (action === 'set-theme' && view.kind === 'picker' && view.staged) await stagedTheme(view.ctx, value);
     return;
   }
-  if (view.kind === 'started' && action.startsWith('set-')) {
+  // visit-*: 필드 설정 화면 (2026-10-23: 이 경로가 없어 뒤로가기·기록 지우기가 안 먹었다)
+  if (view.kind === 'started' && (action.startsWith('set-') || action.startsWith('visit-'))) {
     if (!settingsUi.busy) await handleSettings(action, value, view.ctx, settingsEnv, settingsUi.scope === 'defaults' ? 'chat' : settingsUi.scope);
     return;
   }
@@ -605,10 +609,11 @@ async function handle(action: string, value?: string): Promise<void> {
     case 'close':
       return close();
     case 'game-open':
-      return openGame(view.kind === 'started' ? root?.querySelector('.gx-panel') ?? null : null);
+      return handle('tab', 'field');
     case 'game-close':
-      // 본부에서 나눈 대화가 상황판·설정(본부 대화)에 바로 보이게 채팅을 다시 읽는다
+      // 필드에서 나눈 대화가 상황판·설정(필드)에 바로 보이게 채팅을 다시 읽는다
       closeGame();
+      if (tab === 'field') tab = 'board';
       return refresh();
     case 'faction': {
       const facs = view.kind === 'picker' ? factionList(view.ctx.char.globalLore) : SCENARIOS.factions;
@@ -684,16 +689,9 @@ async function handle(action: string, value?: string): Promise<void> {
       await removeMarkAt(Number(value));
       return render();
     case 'feature-set':
-      // 메인 설정 맨 위 「기능별 설정」: 그 탭으로 넘어가 설정 화면을 연다
+      // 메인 설정 「기능별 설정」: 그 기능 탭으로 넘어가지 않고 설정창 안에서 그 기능 설정을 연다 (2026-10-23 사용자)
       if (view.kind !== 'started') return;
-      if (value === 'phone') Object.assign(phone, { view: 'settings', invite: null, picked: [] });
-      else if (value === 'gnet' && GNET_ON) Object.assign(gnet, { settings: true, compose: null, attachMenu: false });
-      else if (value === 'wiki') openWikiSettings();
-      else if (value === 'visit') { settingsUi.page = 'visit'; return render(); }
-      else return;
-      tab = value as Tab;
-      notice = '';
-      resetSettings();
+      if (value === 'phone' || value === 'wiki' || value === 'visit' || (value === 'gnet' && GNET_ON)) settingsUi.page = value;
       return render();
     case 'ops-sel':
       // 관제실 상황판: 일지 줄·지도 표시 → 왼쪽 큰 보기가 그 상황으로. 보던 화면(CCTV·위성)은 그대로 (2026-10-21 사용자). 모바일은 큰 보기로 올라간다
@@ -837,7 +835,7 @@ async function turnWorldOn(): Promise<void> {
 }
 
 const TAB_TITLE: Record<Tab, string> = {
-  board: '상황판', map: '임무', mission: '커스텀', gnet: '괴담넷', phone: '괴담톡', wiki: '위키', settings: '설정',
+  board: '상황판', map: '임무', mission: '커스텀', gnet: '괴담넷', phone: '괴담톡', wiki: '위키', field: '필드', settings: '설정',
 };
 
 function header(sub: string, extra = ''): string {
@@ -847,15 +845,15 @@ function header(sub: string, extra = ''): string {
   </header>`;
 }
 
-// 본부 방문은 상황판 머리 버튼으로 연다 (2026-10-22 사용자: 테스트하게 릴리스에 버튼을 넣어 달라)
+// 필드: PC는 옆 메뉴, 모바일은 머리 버튼 (2026-10-23 사용자)
 const gameShown = (): boolean => true;
 
 /** 진행 중 화면의 머리: 지금 탭 이름 (위협도는 기준이 헷갈리기만 해서 아예 뺐다, 사용자 결정) */
 function startedHeader(ctx: ChatContext): string {
   return `<header class="gx-head">
-    <div class="gx-brand gx-tabhead"><span class="gx-hmark"><span class="gx-logo">${GHOST_ICON}</span><span class="gx-mark-txt"><b>${BRAND.name}</b><small aria-label="${BRAND.sub}">${[...BRAND.sub].map((ch) => (ch === ' ' ? '<i class="sp">&nbsp;</i>' : `<i>${ch}</i>`)).join('')}</small></span></span><span class="gx-hsep" aria-hidden="true">›</span><span class="gx-tabicon">${ICONS[tab]}</span><div><b>${TAB_TITLE[tab]}</b></div></div>
+    <div class="gx-brand gx-tabhead"><span class="gx-hmark"><span class="gx-logo">${GHOST_ICON}</span><span class="gx-mark-txt"><b>${BRAND.name}</b><small aria-label="${BRAND.sub}">${[...BRAND.sub].map((ch) => (ch === ' ' ? '<i class="sp">&nbsp;</i>' : `<i>${ch}</i>`)).join('')}</small></span></span><span class="gx-hsep" aria-hidden="true">›</span><span class="gx-tabicon">${tab === 'field' ? ICONS.game : ICONS[tab]}</span><div><b>${TAB_TITLE[tab]}</b></div></div>
     <div class="gx-head-act">
-      ${gameShown() ? `<button class="gx-x" data-action="game-open" aria-label="필드" title="필드">${ICONS.game}</button>` : ''}
+      ${gameShown() ? `<button class="gx-x gx-fieldbtn${tab === 'field' ? ' on' : ''}" data-action="tab" data-value="field" aria-label="필드" title="필드">${ICONS.game}</button>` : ''}
       <button class="gx-x gx-idbtn" data-action="id-card" aria-label="내 ID카드">${userInfo().photo ? `<img src="${esc(userInfo().photo!)}" alt="">` : ICONS.idcard}</button>
       <button class="gx-x${tab === 'settings' ? ' on' : ''}" data-action="tab" data-value="settings" aria-label="설정">${ICONS.settings}${hasUpdate(ctx) ? '<span class="gx-xdot" aria-label="새 버전"></span>' : ''}</button>
       <button class="gx-x" data-action="close" aria-label="닫기">${ICONS.close}</button></div>
@@ -936,7 +934,7 @@ function render(): void {
       if (caret) try { el.setSelectionRange(caret[0], caret[1]); } catch { /* 커서를 못 두는 칸 */ }
     }
   }
-  reattachGame(view.kind === 'started' ? root.querySelector('.gx-panel') : null);
+  syncField();
   const next = root.querySelector('.gx-body');
   if (next && keep) next.scrollTop = keep;
   if (inner.length) root.querySelectorAll<HTMLElement>(INNER_SCROLL).forEach((el, i) => inner[i] && (el.scrollTop = inner[i]));
@@ -1055,13 +1053,28 @@ function applyNav(s: NavState): void {
   render();
 }
 
+/** 필드 탭이면 게임을 본문 자리에 붙이고(없으면 연다), 다른 탭이면 닫는다 */
+function syncField(): void {
+  const host = view.kind === 'started' && tab === 'field' ? root?.querySelector('.gx-fieldhost') ?? null : null;
+  if (!host) {
+    if (gameOpen()) {
+      closeGame();
+      // 필드에서 나눈 대화가 바로 보이게
+      void refresh();
+    }
+    return;
+  }
+  if (gameOpen()) reattachGame(host);
+  else openGame(host, () => void handle('game-close'));
+}
+
 /** 모바일 쓸기가 할 일 (브라우저 ←·→ 처럼): dir -1 뒤로, 1 앞으로. 갈 곳이 없으면 null */
 function navStep(dir: -1 | 1): (() => void) | null {
   const go = (action: string, value?: string) => () => void handle(action, value);
   if (view.kind === 'picker') return dir < 0 && pickerPrefs ? go('prefs-close') : null;
   if (view.kind === 'opening') return dir < 0 ? go('repick') : null;
   if (view.kind !== 'started') return null;
-  if (gameOpen()) return dir < 0 ? () => closeGame() : null;
+  if (gameOpen()) return dir < 0 ? () => void handle('game-close') : null;
   if (evUi.pop && dir < 0) return () => void handle('ev-pop', evUi.pop);
   if (agUi.pop && dir < 0) return () => void handle('agent-info', agUi.pop);
   if (!navHist.can(dir)) return null;
@@ -1092,6 +1105,9 @@ function startedBody(ctx: ChatContext): string {
       return gnetTab(ctx, gnetEnv);
     case 'phone':
       return phoneTab(ctx, phoneEnv);
+    case 'field':
+      // 게임은 그린 뒤 이 자리에 붙인다 (afterRender → syncField)
+      return '<main class="gx-body gx-fieldhost"></main>';
     case 'settings':
     {
       // 설정은 상황판 위에서 여는 화면이라 상황판 서랍(즐겨찾기)도 그대로 둔다 (2026-10-20 사용자: 설정을 열면 서랍이 가려진 것처럼 보임).
@@ -1205,6 +1221,7 @@ function tabs(): string {
     ${item('phone', '괴담톡', ICONS.phone, '', unreadPhone ? '<span class="gx-nbadge dot" aria-label="새 메시지"></span>' : '')}
     ${GNET_ON ? item('gnet', '괴담넷', ICONS.gnet) : ''}
     ${item('wiki', '위키', ICONS.wiki)}
+    ${gameShown() ? item('field', '필드', ICONS.game, 'desk') : ''}
     ${item('settings', '설정', ICONS.settings, 'desk', ctx && hasUpdate(ctx) ? '<span class="gx-nbadge dot" aria-label="새 버전"></span>' : '')}
     <span class="gx-nav-gap"></span>
     ${ctx ? navHistBar(markOf(navState())) : ''}

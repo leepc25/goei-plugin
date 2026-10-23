@@ -187,7 +187,7 @@ async function play(slot: SlotId | null, mode: View): Promise<void> {
     viewport.fill(true);
     setHead();
     box.innerHTML = '';
-    const bridge = makeBridge(viewport, slot ?? 0, closeGame);
+    const bridge = makeBridge(viewport, slot ?? 0, () => (onExit ? onExit() : closeGame()));
     const t1 = performance.now();
     const legacy = mode === 'play' ? null : mod.legacy?.[mode];
     unmount = legacy ? legacy(box, bridge) : mod.mount(box, bridge);
@@ -227,7 +227,6 @@ function setHead(): void {
   layer?.classList.toggle('gx-playing', inGame);
   head.innerHTML = `<div class="gx-brand gx-tabhead"><span class="gx-tabicon">${ICONS.game}</span><div><b>${view === 'patrol' ? '관리국 순찰' : view === 'action' ? '1인 전투 검증판' : '필드'}</b></div></div>
     <div class="gx-head-act">${inGame ? `<button class="gx-x" data-g="home" aria-label="시작 화면">${ICONS.back}</button>` : ''}
-    <button class="gx-x" data-g="full" aria-label="${viewport?.full ? '전체화면 끄기' : '전체화면'}" aria-pressed="${!!viewport?.full}">${ICONS.expand}</button>
     <button class="gx-x" data-action="game-close" aria-label="게임 닫기">${ICONS.close}</button></div>`;
 }
 
@@ -286,15 +285,19 @@ async function onClick(e: MouseEvent): Promise<void> {
 }
 
 export const gameOpen = () => !!layer;
+/** 게임 안 「필드 나가기」: 창이 상황판으로 돌아간다 */
+let onExit: (() => void) | null = null;
 
-export function openGame(panel: Element | null): void {
+/** host = 창 본문 자리(필드 탭). 게임은 그 틀 안에서만 돈다 (2026-10-23 사용자: 전체화면이면 Risu 경고·메뉴·뒤로가기가 가려진다) */
+export function openGame(panel: Element | null, exit?: () => void): void {
   if (layer || !panel) return;
+  onExit = exit ?? null;
   const t0 = performance.now();
   layer = document.createElement('div');
   layer.className = 'gx-game';
   layer.innerHTML = `<div class="gx-game-in"><header class="gx-head"></header><div class="gx-game-box"></div></div>`;
   panel.append(layer);
-  viewport = makeViewport(layer);
+  viewport = makeViewport(layer, { inFrame: true });
   view = 'home';
   notice = '';
   setHead();
@@ -317,6 +320,7 @@ export function closeGame(): void {
   viewport = null;
   layer?.remove();
   layer = null;
+  onExit = null;
   view = 'home';
   busy = '';
 }

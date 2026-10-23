@@ -13,7 +13,7 @@ export interface ViewportCtl extends GameViewport {
 const portrait = () => innerHeight > innerWidth;
 const phone = () => Math.min(innerWidth, innerHeight) <= 560 || matchMedia('(pointer: coarse)').matches;
 
-export function makeViewport(layer: HTMLElement): ViewportCtl {
+export function makeViewport(layer: HTMLElement, opt: { inFrame?: boolean } = {}): ViewportCtl {
   let full = false;
   let rotated = false;
   /** 사용자가 돌려 보기를 원하는가 (전체화면을 누르면 켜진다) */
@@ -22,7 +22,8 @@ export function makeViewport(layer: HTMLElement): ViewportCtl {
   const emit = () => subs.forEach((f) => f());
 
   const apply = () => {
-    const rot = wantRotate && full && portrait() && phone();
+    // 창 틀 안에서 돌릴 때는 돌려 보이지 않는다 (틀 크기 그대로)
+    const rot = !opt.inFrame && wantRotate && full && portrait() && phone();
     if (rot !== rotated) rotated = rot;
     layer.classList.toggle('gx-full', full);
     layer.classList.toggle('gx-rot', rotated);

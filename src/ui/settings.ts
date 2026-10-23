@@ -27,7 +27,7 @@ export interface SettingsEnv {
 /** 원본 테마 변수. 카드 배경 CSS가 이 값으로 갈림 (없으면 라이트) */
 export const THEME_KEY = '$st_fixed_theme';
 
-export const settingsUi = { page: '' as '' | 'visit', confirmOff: false, busy: false, notice: '', info: '', scope: 'chat' as SettingsScope, confirm: '' as '' | 'save' | 'load' };
+export const settingsUi = { page: '' as '' | 'visit' | 'phone' | 'gnet' | 'wiki', confirmOff: false, busy: false, notice: '', info: '', scope: 'chat' as SettingsScope, confirm: '' as '' | 'save' | 'load' };
 
 export function resetSettings(): void {
   settingsUi.confirmOff = false;
@@ -39,6 +39,9 @@ export function resetSettings(): void {
 
 import { updateGroup } from './update';
 import { handleVisitSettings, visitSettings } from './visitset';
+import { phoneSettingsPane } from './phone';
+import { gnetSettingsPane } from './gnet';
+import { wikiSettingsPane } from './wiki';
 
 const esc = (s: unknown) =>
   String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
@@ -160,15 +163,26 @@ function scopeBar(scope: SettingsScope, canChat: boolean): string {
   return `<div class="st-scopebar">${tabs}${btns}</div>${confirm}`;
 }
 
+const BACK = `<button class="ph-tool ph-back" data-action="set-feat-back" aria-label="설정으로">${ICONS.back}</button>`;
+/** 기능별 설정을 설정창 안에서 (각 기능의 설정 화면을 그대로 쓰고, 뒤로가기만 설정으로) */
+function featurePage(ctx: ChatContext, page: NonNullable<typeof settingsUi.page>): string {
+  let pane = '';
+  if (page === 'visit') pane = `<header class="ph-room-head">${BACK}<div class="ph-room-title"><b>필드 설정</b></div></header>${visitSettings(ctx, ctx.chat.scriptstate)}`;
+  else {
+    const raw = page === 'phone' ? phoneSettingsPane(ctx) : page === 'gnet' ? gnetSettingsPane(ctx) : wikiSettingsPane(ctx);
+    // 첫 머리의 뒤로 단추를 설정으로 돌아가는 단추로 (없으면 넣는다)
+    pane = raw.replace(/<header class="ph-room-head[^"]*">(\s*<button class="ph-tool ph-back"[^>]*>[\s\S]*?<\/button>)?/, `<header class="ph-room-head">${BACK}`);
+  }
+  return `<main class="gx-body gx-settings st-featpage">${pane}</main>`;
+}
+
 export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', canChat = true): string {
   // 명부: 모바일은 검색을 하단 서랍에 (괴이·특수·요원·조직 탭은 위에 고정)
   if (scope === 'card') {
     return `<main class="gx-body gx-settings">${scopeBar(scope, canChat)}${directoryView(ctx)}${toast('dir', directoryDone(), directoryDoneClear)}</main>${drawerBox(directorySearch(), 'gx-dirdrawer')}`;
   }
   // 기능별 설정 → 본부 대화: 괴담톡·괴담넷·위키처럼 따로 된 화면 (2026-10-23 사용자)
-  if (settingsUi.page === 'visit' && scope === 'chat' && canChat) {
-    return `<main class="gx-body gx-settings"><header class="ph-room-head"><button class="ph-tool ph-back" data-action="visit-back" aria-label="설정으로">${ICONS.back}</button><div class="ph-room-title"><b>필드 설정</b></div></header>${visitSettings(ctx, ctx.chat.scriptstate)}</main>`;
-  }
+  if (settingsUi.page && scope === 'chat' && canChat) return featurePage(ctx, settingsUi.page);
   const { basic: s, world, theme } = current(ctx, scope);
   const on = scope === 'chat' ? worldOn(ctx.chat) : s.anomalyOn;
   const busy = settingsUi.busy;
@@ -182,7 +196,7 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
     ${scopeBar(scope, canChat)}
     ${settingsUi.notice ? `<div class="gx-err" role="alert">${esc(settingsUi.notice)}</div>` : ''}
     ${scope === 'chat' && canChat ? group('기능별 설정', `<div class="st-feats">${[['gnet', '괴담넷', ICONS.gnet], ['phone', '괴담톡', ICONS.phone], ['wiki', '위키', ICONS.wiki], ['visit', '필드', ICONS.game]]
-      .map(([k, label, icon]) => `<button class="gx-mini st-feat" data-action="feature-set" data-value="${k}">${icon}${label} 설정</button>`)
+      .map(([k, label, icon]) => `<button class="gx-mini st-feat" data-action="feature-set" data-value="${k}" aria-label="${label} 설정">${icon}${label}</button>`)
       .join('')}</div>`) : ''}
     ${group('화면', [
       field('테마', seg('set-theme', theme, [['light', '라이트'], ['dark', '다크'], ['paper', '페이퍼']], busy), '채팅 화면의 캐릭터 이미지 배경과 상태창(「테마」를 골랐을 때) 배색이에요.'),
@@ -275,6 +289,11 @@ function nextWorld(w: WorldSettings, v: string): [WorldField['key'], number] | n
 export async function handleSettings(action: string, value: string | undefined, ctx: ChatContext, env: SettingsEnv, scope: SettingsScope = 'chat'): Promise<boolean> {
   const v = value ?? '';
   const lore = ctx.char.globalLore;
+  if (action === 'set-feat-back') {
+    settingsUi.page = '';
+    env.render();
+    return true;
+  }
   if (action.startsWith('visit-') && (await handleVisitSettings(action, ctx, env.render, env.refresh))) return true;
   if (action === 'set-bar') {
     settingsUi.confirm = v === 'save' || v === 'load' ? v : '';

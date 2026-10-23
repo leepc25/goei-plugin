@@ -971,3 +971,6 @@ export async function handleGnet(action: string, value: string | undefined, ctx:
   env.render();
   return true;
 }
+
+/** 메인 설정 「기능별 설정」에서 연다 */
+export const gnetSettingsPane = (ctx: ChatContext): string => settingsView(ctx, true);

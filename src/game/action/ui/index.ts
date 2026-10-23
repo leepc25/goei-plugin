@@ -41,6 +41,8 @@ export interface ShellOptions {
   toLocal?: (clientX: number, clientY: number, el: HTMLElement) => { x: number; y: number };
   /** 일시정지 메뉴 위쪽 한 줄 요약 */
   pauseInfo?: () => string;
+  /** 필드(봇 보조): 일시정지는 계속·설정·조작법·나가기만, 설정에서 전체 화면·NPC 대화 칸을 뺀다 (2026-10-23 사용자) */
+  field?: { onExit: () => void };
 }
 
 export interface Shell {
@@ -155,7 +157,7 @@ export function mountGameShell(box: HTMLElement, o: ShellOptions = {}): Shell {
       { type: 'toggle', label: '피해 숫자', get: () => s.numbers, set: (v) => (s.numbers = v) },
       { type: 'slider', label: '밝기', get: () => s.bright, set: (v) => (s.bright = v), min: 0.7, max: 1.4, step: 0.05, fmt: pct },
       { type: 'toggle', label: '도트 선명하게', get: () => s.pixel, set: (v) => (s.pixel = v) },
-      { type: 'button', label: '전체 화면', sub: '폰은 가로로 고정', act: () => void stage.fullscreen() },
+      ...(o.field ? [] : [{ type: 'button' as const, label: '전체 화면', sub: '폰은 가로로 고정', act: () => void stage.fullscreen() }]),
       { type: 'head', label: '소리' },
       { type: 'slider', label: '전체', get: () => s.master, set: (v) => (s.master = v), min: 0, max: 1, step: 0.1, fmt: pct },
       { type: 'slider', label: '음악', get: () => s.music, set: (v) => (s.music = v), min: 0, max: 1, step: 0.1, fmt: pct },
@@ -167,9 +169,12 @@ export function mountGameShell(box: HTMLElement, o: ShellOptions = {}): Shell {
       { type: 'toggle', label: '스틱 끝까지 밀면 달리기', get: () => s.stickRun, set: (v) => (s.stickRun = v) },
       { type: 'toggle', label: '왼손 배치', get: () => s.lefty, set: (v) => (s.lefty = v) },
       { type: 'toggle', label: '진동', get: () => s.vibrate, set: (v) => (s.vibrate = v) },
-      { type: 'head', label: '대화' },
-      { type: 'choice', label: 'NPC 대화 모델', options: [['main', '주 모델'], ['aux', '보조 모델']], get: () => s.talkModel, set: (v) => (s.talkModel = v as UiSettings['talkModel']) },
-      { type: 'toggle', label: '본편 최근 채팅 같이 보내기', get: () => s.talkRecent, set: (v) => (s.talkRecent = v) },
+      // 필드 대화 설정은 플러그인 설정 → 기능별 설정 「필드」에 있다
+      ...(o.field ? [] : [
+        { type: 'head' as const, label: '대화' },
+        { type: 'choice' as const, label: 'NPC 대화 모델', options: [['main', '주 모델'], ['aux', '보조 모델']] as [string, string][], get: () => s.talkModel, set: (v: string) => (s.talkModel = v as UiSettings['talkModel']) },
+        { type: 'toggle' as const, label: '본편 최근 채팅 같이 보내기', get: () => s.talkRecent, set: (v: boolean) => (s.talkRecent = v) },
+      ]),
       { type: 'html', html: `<p style="font-size:14px;color:#9aa6ab">게임패드: ${esc(pad.connected ? pad.connected.slice(0, 48) : '연결 안 됨 (버튼을 하나 누르면 잡힙니다)')}</p>` },
       { type: 'button', label: '기본값으로', act: () => ((settings = { ...DEFAULT_SETTINGS }), apply(), saveSettings(), menu.replace(settingsScreen())) },
     ];
@@ -240,7 +245,12 @@ export function mountGameShell(box: HTMLElement, o: ShellOptions = {}): Shell {
         id: 'pause',
         title: '일시정지',
         sub: o.pauseInfo?.() ?? '',
-        items: [
+        items: o.field ? [
+          { type: 'button', label: '계속', sub: key('Esc'), act: () => menu.closeAll() },
+          { type: 'button', label: '설정', act: () => shell.openSettings() },
+          { type: 'button', label: '조작법', act: () => shell.openControls() },
+          { type: 'button', label: '필드 나가기', sub: '상황판으로', act: () => (menu.closeAll(), o.field!.onExit()) },
+        ] : [
           ...(hud.last ? [{ type: 'html' as const, html: statusHtml(hud.last) }] : []),
           { type: 'button', label: '계속', sub: key('Esc'), act: () => menu.closeAll() },
           { type: 'button', label: '설정', act: () => shell.openSettings() },

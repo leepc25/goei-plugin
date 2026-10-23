@@ -1360,3 +1360,6 @@ export function phoneUnread(ctx: ChatContext): boolean {
     return false;
   }
 }
+
+/** 메인 설정 「기능별 설정」에서 연다 */
+export const phoneSettingsPane = (ctx: ChatContext): string => settingsView(ctx);
