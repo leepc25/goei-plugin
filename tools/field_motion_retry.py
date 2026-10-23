@@ -16,6 +16,17 @@ def main():
   if a.template:
    jid=c['motions'].get(a.template);job=s['jobs'].get(jid,{})
    assert job.get('status') in {'completed','failed'}
+   if job.get('endpoint')=='animate-with-skeleton-v3':
+    assert a.group==jid,'Standalone retries are addressed by exact job ID'
+    b=OUT/'history/rebuild-20261024/rejected-motions'/a.slug/jid
+    atomic(b/'rejection.json',{'reason':a.reason,'job':job,'at':time.time(),'state_before':c,'standalone':True})
+    old=OUT/a.slug/'motions'/a.template
+    if old.exists():shutil.copytree(old,b/'frames',dirs_exist_ok=True);shutil.rmtree(old)
+    req=OUT/a.slug/(a.template+'-request.json')
+    if req.exists():shutil.copy2(req,b/'request.json')
+    job['visual_rejection']={'reason':a.reason,'standalone':True};c['motions'].pop(a.template)
+    c['motions_visual_reviewed']=False;c['exported']=False;atomic(OUT/'state.json',s)
+    print(a.slug,jid,'standalone frames archived; no remote group exists');return
    assert a.group in json.dumps(job),'Selected group does not belong to this motion slot'
   cid=c['character_id'];detail=api('characters/'+cid)
   group=next((x for x in detail.get('animations',[]) if x['animation_group_id']==a.group),None)
