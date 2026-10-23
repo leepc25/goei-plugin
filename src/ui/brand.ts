@@ -12,4 +12,4 @@ export function brandHtml(text: string, signal: string): string {
 }
 
 /** 배포 카드 파일 이름 */
-export const CARD_FILE = '괴이_이면세계.charx';
+export const CARD_FILE = '괴이_ANOMALY.charx';
