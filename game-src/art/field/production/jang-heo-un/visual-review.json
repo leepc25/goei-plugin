@@ -1,0 +1,14 @@
+{
+  "job": "3ad37156-945c-4b0b-b82e-c872f5e6563f",
+  "job_status": "completed",
+  "decision": "pass",
+  "reason": "원작의 어깨를 덮는 어두운 갈색 층진 장발·피곤한 눈·열린 흰 셔츠 깃·느슨한 네이비 타이 확인. 머리 외 RGBA 보존,223px의 보통 남성 키, 정면·외곽 정상.",
+  "at": 1792793530.0284326,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

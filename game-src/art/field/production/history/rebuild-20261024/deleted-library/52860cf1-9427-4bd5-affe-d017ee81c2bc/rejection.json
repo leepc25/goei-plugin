@@ -1,0 +1,19 @@
+{
+  "at": 1792793742.9661212,
+  "slug": "shin-yuri",
+  "reason": "측면과 사선의 낮은 포니테일이 뻗친 땋은 머리로 변형. 원작은 풀린 낮은 포니테일. 정면은 유지하고 등 쪽으로 내려오는 땋지 않은 묶음머리로 재등록.",
+  "state_before": {
+    "name": "신유리",
+    "group": "underground",
+    "character_id": "52860cf1-9427-4bd5-affe-d017ee81c2bc",
+    "image": "e464915e-93b8-4980-9732-f5871953ed86",
+    "registration": "76fa246d-7c0f-4029-a9dd-b3d202836934",
+    "motions": {},
+    "ready": true,
+    "image_verified": true,
+    "image_visually_reviewed": true,
+    "skeleton_joints": 18,
+    "rotation_count": 8,
+    "exported": true
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "group_id": "bdd90ed6-d372-4415-a514-3ccc02cac79c",
+  "states": [
+    {
+      "character": {
+        "id": "72668525-2ddb-4ee7-94b5-350d695bd1d7",
+        "name": "Idle",
+        "prompt": "윤지아 / Yun Ji-a. Small soft-built adult woman, round youthful face, large gentle warm BROWN eyes, small kind smile. APRICOT-peach hair in TWO round side BUNS with straight blunt bangs. WHITE short-sleeved nurse tunic and white trousers, pale peach trim on collar/cuffs and front pockets. Beige waist belt and small beige pouch on HER RIGHT hip. Thin dark hairband around HER LEFT wrist. White practical shoes. Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches.",
+        "size": {
+          "width": 128,
+          "height": 256
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "low top-down",
+        "created_at": "2026-10-23T21:53:51.322429+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {}
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-10-23T22:12:22.467319"
+}

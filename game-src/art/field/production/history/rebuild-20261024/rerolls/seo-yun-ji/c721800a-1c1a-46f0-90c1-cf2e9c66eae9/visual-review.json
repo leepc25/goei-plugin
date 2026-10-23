@@ -1,0 +1,14 @@
+{
+  "job": "c721800a-1c1a-46f0-90c1-cf2e9c66eae9",
+  "job_status": "completed",
+  "decision": "reroll",
+  "reason": "원작의 두 갈래 땋은 머리 끝은 허리인데 생성본은 가슴 아래에서 끝남. 하단 머리만 허리까지 연장하고 얼굴·상체·치마·키는 보존.",
+  "at": 1792793746.5629823,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

@@ -106,7 +106,7 @@ class Production:
    if data[:2]==b'PK':
     z=zipfile.ZipFile(io.BytesIO(data));pngs=[n for n in z.namelist()if n.endswith('.png')];assert len(pngs)==1;data=z.read(pngs[0])
    im=Image.open(io.BytesIO(data)).convert('RGBA');im.load();native_size=im.size
-   if self.by[slug].get('native_height_canvas'):
+   if self.by[slug].get('native_height_canvas') and not (self.by[slug].get('image_inpaint_source') or self.by[slug].get('image_edit_source')):
     expected=self.by[slug]['pixel_request']['image_size'];assert im.size==(expected['width'],expected['height']),'wrong native canvas'
     (OUT/slug/'native-generation.png').write_bytes(data)
     assert im.width==128 and im.height<=256
@@ -151,7 +151,20 @@ class Production:
    path=ROOT/source;im=Image.open(path);args['style_image']={'image':{'type':'base64','base64':base64.b64encode(path.read_bytes()).decode(),'format':'png'},'size':{'width':im.width,'height':im.height},'usage_description':usage}
   return args
  def registration_request(self,a):
-  return{'description':a['name']+' / '+a['english']+'. '+a['appearance']+' Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches.','reference_image':{'type':'base64','base64':base64.b64encode((OUT/a['slug']/'reference.png').read_bytes()).decode(),'format':'png'},'n_directions':8,'view':'low top-down','template_id':'mannequin','name':a['name'],'seed':10222027,'no_background':True}
+  args={'description':a['name']+' / '+a['english']+'. '+a['appearance']+' Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Do not invent patches, badges, logos or markings absent from the supplied image. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches.','reference_image':{'type':'base64','base64':base64.b64encode((OUT/a['slug']/'reference.png').read_bytes()).decode(),'format':'png'},'n_directions':8,'view':'low top-down','template_id':'mannequin','name':a['name'],'seed':10222027,'no_background':True}
+  if a.get('registration_import_zip'):
+   assert a.get('registration_import_review'),'Previously generated directions require explicit visual review'
+   path=ROOT/a['registration_import_zip'];meta=json.loads((path.parent/'rejection.json').read_text())
+   assert meta['slug']==a['slug'] and meta['state_before']['image']==self.s['characters'][a['slug']]['image'],'Do not import another identity or an obsolete source'
+   directions=['south','south-east','east','north-east','north','north-west','west','south-west']
+   redo=set(a.get('registration_regenerate_directions',[]));assert redo<=set(directions)-{'south'}
+   with zipfile.ZipFile(path) as z:
+    frames={dr:z.read('Idle/rotations/'+dr+'.png') for dr in directions}
+   assert all(Image.open(io.BytesIO(data)).size==(128,256) for data in frames.values())
+   encode=lambda data:{'type':'base64','base64':base64.b64encode(data).decode(),'format':'png'}
+   args['reference_image']=encode(frames['south'])
+   args['direction_images']={dr:encode(frames[dr])for dr in directions if dr!='south' and dr not in redo}
+  return args
  @staticmethod
  def motion_direction(template):
   return 'south-east'if template in {'breathing-idle','drinking'}else'east'

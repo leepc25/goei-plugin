@@ -1,0 +1,14 @@
+{
+  "job": "68d69057-3d33-40ca-8df6-ed30c4d059e4",
+  "job_status": "completed",
+  "decision": "pass",
+  "reason": "앞머리 전후 확대 대조로 큰 삼각형 이마 틈이 닫히고 두꺼운 검은 앞머리 유지 확인. 원작 검은 단발·버건디 정장·검은 하이넥·체격 보존. 머리 외 RGBA 정확히 같고 정면·외곽 정상.",
+  "at": 1792793530.2377377,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

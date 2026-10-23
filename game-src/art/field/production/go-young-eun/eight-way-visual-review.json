@@ -1,0 +1,25 @@
+{
+  "at": 1792793530.3405912,
+  "character_id": "10488058-f484-4585-8da1-25b2fad1a00c",
+  "result": "pass",
+  "directions_reviewed": [
+    "south",
+    "south-east",
+    "east",
+    "north-east",
+    "north",
+    "north-west",
+    "west",
+    "south-west"
+  ],
+  "findings": "새 등록에서18개3D관절 확인. 원작 갈색 둥근 단발·일자 앞머리·부드러운 체형·네이비 정장 유지. 8방향 키·얼굴·외곽 일관성, 임의 소매 패치와 회색 외부 칠 없음.",
+  "movement_direction": "east",
+  "stationary_direction": "south-east",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF primary",
+    "Lore supplementary height",
+    "All55 before motion",
+    "Gray outer paint reroll"
+  ]
+}

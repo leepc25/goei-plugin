@@ -1,0 +1,25 @@
+{
+  "at": 1792793737.9085197,
+  "character_id": "9e926b19-797f-4c96-9623-f93b60165828",
+  "result": "pass",
+  "directions_reviewed": [
+    "south",
+    "south-east",
+    "east",
+    "north-east",
+    "north",
+    "north-west",
+    "west",
+    "south-west"
+  ],
+  "findings": "원작의 짙은 갈색 피부·회색 눈·짧은 검은 턱수염·흰 터번·검은 정장·넓은 어깨 유지. 8방향 두건 제외 보통 남성 키, 얼굴 동쪽 노출. 외부 회색 덧칠 없음.",
+  "movement_direction": "east",
+  "stationary_direction": "south-east",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF primary",
+    "Lore supplementary height",
+    "All55 before motion",
+    "Gray outer paint reroll"
+  ]
+}

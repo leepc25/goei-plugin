@@ -1,0 +1,14 @@
+{
+  "job": "124f2988-2c22-4b10-901a-0cc09cc5f1ed",
+  "job_status": "completed",
+  "decision": "reroll",
+  "reason": "원작의 긴 검은 베일이 지나치게 짧음. 기존 인물 픽셀은 보존하고 팔 뒤·양옆의 투명 영역에 골반까지 내려오는 베일 연장.",
+  "at": 1792793748.89077,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

@@ -131,14 +131,15 @@
     "ho-yu-won",
     "cheong-dal-lae",
     "cha-yeo-jin",
-    "seo-yun-ji",
     "yun-ji-a",
     "mun-hye-ran",
     "shin-yuri",
-    "blaret",
     "saladin",
     "secriem",
-    "brownie"
+    "brownie",
+    "jang-heo-un",
+    "go-yeon-ji",
+    "ma-deok-hee"
   ],
   "source_priority": "AVIF first for identity/build; lore supplements height; explicit user heights override estimates"
 }
