@@ -17,5 +17,7 @@
     "유다온"
   ],
   "unresolved_note": "No matching manifest entry or name in current repository. Preserve user specification; do not map to another character by guess.",
-  "existing_results": "Review against new heights; existing accepted jobs are preserved, not cancelled or blindly duplicated. Prompt targets alone are not proof of output stature."
+  "existing_results": "Review against new heights; existing accepted jobs are preserved, not cancelled or blindly duplicated. Prompt targets alone are not proof of output stature.",
+  "latest_user_decision": "Keep current results; enlarge only Aileen and Gorgodio. No further height-only regeneration for others.",
+  "production_pixels_per_cm_status": "provisional request aid, not a reason to reject accepted existing results"
 }

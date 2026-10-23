@@ -1035,11 +1035,11 @@
         "last_response": {
           "type": "message_progress",
           "action": "finalizing",
-          "progress": 0.9499987827271497,
+          "progress": 0.9499992839984454,
           "direction": "south-east",
           "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
           "animation_name": null,
-          "queue_position": 4,
+          "queue_position": 0,
           "generation_model": "skeleton-v3_template",
           "animation_group_id": "4e748226-7bec-46bf-bb77-a3392b9522a4",
           "motion_adjustments": {
@@ -1051,7 +1051,7 @@
           "animation_description": "breathing idle",
           "generation_started_at": "2026-10-23T18:30:39.836983+00:00",
           "template_animation_id": "breathing-idle",
-          "estimated_wait_seconds": 378
+          "estimated_wait_seconds": 0
         }
       }
     },
@@ -1084,11 +1084,11 @@
         "last_response": {
           "type": "message_progress",
           "action": "finalizing",
-          "progress": 0.9499181213306289,
+          "progress": 0.9499498321403592,
           "direction": "east",
           "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
           "animation_name": null,
-          "queue_position": 7,
+          "queue_position": 3,
           "generation_model": "skeleton-v3_template",
           "animation_group_id": "e7bd558a-c320-4ba1-acaf-b018fc0ac3ed",
           "motion_adjustments": {
@@ -1100,7 +1100,7 @@
           "animation_description": "walking confidently with an upright steady torso, measured strides and restrained arm swing",
           "generation_started_at": "2026-10-23T18:30:49.685761+00:00",
           "template_animation_id": "walking-8-frames",
-          "estimated_wait_seconds": 686
+          "estimated_wait_seconds": 262
         }
       }
     },
@@ -1133,11 +1133,11 @@
         "last_response": {
           "type": "message_progress",
           "action": "finalizing",
-          "progress": 0.9498544256765016,
+          "progress": 0.9499382295629153,
           "direction": "east",
           "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
           "animation_name": null,
-          "queue_position": 8,
+          "queue_position": 6,
           "generation_model": "skeleton-v3_template",
           "animation_group_id": "4e7a2ac9-f9f2-42cc-83eb-835cf0062a2e",
           "motion_adjustments": {
@@ -1149,7 +1149,7 @@
           "animation_description": "running decisively with a steady torso, controlled arm swing and firm purposeful strides",
           "generation_started_at": "2026-10-23T18:31:08.11423+00:00",
           "template_animation_id": "running-8-frames",
-          "estimated_wait_seconds": 821
+          "estimated_wait_seconds": 587
         }
       }
     },
@@ -1500,11 +1500,11 @@
         "last_response": {
           "type": "message_progress",
           "action": "finalizing",
-          "progress": 0.9499421387702359,
+          "progress": 0.9499630706874502,
           "direction": "east",
           "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
           "animation_name": null,
-          "queue_position": 11,
+          "queue_position": 10,
           "generation_model": "skeleton-v3_template",
           "animation_group_id": "47e8b847-f4cd-4872-bfd3-84f289bd42c4",
           "motion_adjustments": {
@@ -1516,7 +1516,7 @@
           "animation_description": "running jump",
           "generation_started_at": "2026-10-23T18:32:20.993163+00:00",
           "template_animation_id": "running-jump",
-          "estimated_wait_seconds": 1173
+          "estimated_wait_seconds": 999
         }
       }
     },
@@ -1549,11 +1549,11 @@
         "last_response": {
           "type": "message_progress",
           "action": "finalizing",
-          "progress": 0.9499851019962864,
+          "progress": 0.9499908718477598,
           "direction": "east",
           "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
           "animation_name": null,
-          "queue_position": 9,
+          "queue_position": 6,
           "generation_model": "skeleton-v3_template",
           "animation_group_id": "a932cdb0-4016-4583-97fb-80dc044328fa",
           "motion_adjustments": {
@@ -1565,7 +1565,7 @@
           "animation_description": "running slide",
           "generation_started_at": "2026-10-23T18:32:35.920266+00:00",
           "template_animation_id": "running-slide",
-          "estimated_wait_seconds": 884
+          "estimated_wait_seconds": 585
         }
       }
     },
@@ -1598,11 +1598,11 @@
         "last_response": {
           "type": "message_progress",
           "action": "finalizing",
-          "progress": 0.9499267934416937,
+          "progress": 0.9499586622102351,
           "direction": "east",
           "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
           "animation_name": null,
-          "queue_position": 9,
+          "queue_position": 8,
           "generation_model": "skeleton-v3_template",
           "animation_group_id": "39e4964a-3385-4d99-95da-7c48ff1e3455",
           "motion_adjustments": {
@@ -1614,7 +1614,7 @@
           "animation_description": "walking while crouched",
           "generation_started_at": "2026-10-23T18:32:43.741919+00:00",
           "template_animation_id": "crouched-walking",
-          "estimated_wait_seconds": 972
+          "estimated_wait_seconds": 794
         }
       }
     },
@@ -1647,11 +1647,11 @@
         "last_response": {
           "type": "message_progress",
           "action": "finalizing",
-          "progress": 0.9496710753721994,
+          "progress": 0.9497627172012336,
           "direction": "east",
           "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
           "animation_name": null,
-          "queue_position": 23,
+          "queue_position": 20,
           "generation_model": "skeleton-v3_template",
           "animation_group_id": "f1d0e8b4-ae8d-4ff9-ae48-b22b311ab350",
           "motion_adjustments": {
@@ -1663,7 +1663,7 @@
           "animation_description": "walking sadly",
           "generation_started_at": "2026-10-23T18:32:59.16647+00:00",
           "template_animation_id": "sad-walk",
-          "estimated_wait_seconds": 2528
+          "estimated_wait_seconds": 2145
         }
       }
     },
@@ -1696,11 +1696,11 @@
         "last_response": {
           "type": "message_progress",
           "action": "finalizing",
-          "progress": 0.9499884755620439,
+          "progress": 0.9499978385743115,
           "direction": "east",
           "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
           "animation_name": null,
-          "queue_position": 12,
+          "queue_position": 10,
           "generation_model": "skeleton-v3_template",
           "animation_group_id": "601cbfbe-9a2b-4875-a842-b6fe5b640074",
           "motion_adjustments": {
@@ -1712,7 +1712,7 @@
           "animation_description": "front flip",
           "generation_started_at": "2026-10-23T18:33:14.289163+00:00",
           "template_animation_id": "front-flip",
-          "estimated_wait_seconds": 1212
+          "estimated_wait_seconds": 1027
         }
       }
     },
@@ -1745,11 +1745,11 @@
         "last_response": {
           "type": "message_progress",
           "action": "finalizing",
-          "progress": 0.9494452084797669,
+          "progress": 0.9496736708693786,
           "direction": "east",
           "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
           "animation_name": null,
-          "queue_position": 13,
+          "queue_position": 11,
           "generation_model": "skeleton-v3_template",
           "animation_group_id": "68d30996-0f7e-459f-ba79-d0d4a6d48f68",
           "motion_adjustments": {
@@ -1761,7 +1761,7 @@
           "animation_description": "backflip",
           "generation_started_at": "2026-10-23T18:34:18.313943+00:00",
           "template_animation_id": "backflip",
-          "estimated_wait_seconds": 1390
+          "estimated_wait_seconds": 1159
         }
       }
     },
@@ -1794,11 +1794,11 @@
         "last_response": {
           "type": "message_progress",
           "action": "finalizing",
-          "progress": 0.9495640095061411,
+          "progress": 0.9497538078036772,
           "direction": "east",
           "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
           "animation_name": null,
-          "queue_position": 13,
+          "queue_position": 11,
           "generation_model": "skeleton-v3_template",
           "animation_group_id": "05739c03-4ac1-4303-a232-a9369c6ecfcf",
           "motion_adjustments": {
@@ -1810,7 +1810,7 @@
           "animation_description": "jumping",
           "generation_started_at": "2026-10-23T18:34:23.129143+00:00",
           "template_animation_id": "jumping-1",
-          "estimated_wait_seconds": 1377
+          "estimated_wait_seconds": 1195
         }
       }
     },
@@ -1843,11 +1843,11 @@
         "last_response": {
           "type": "message_progress",
           "action": "finalizing",
-          "progress": 0.9499754249312,
+          "progress": 0.9499933445994293,
           "direction": "east",
           "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
           "animation_name": null,
-          "queue_position": 18,
+          "queue_position": 16,
           "generation_model": "skeleton-v3_template",
           "animation_group_id": "33f5e645-ddb7-43cf-b558-73c444c55a12",
           "motion_adjustments": {
@@ -1859,7 +1859,7 @@
           "animation_description": "jumping",
           "generation_started_at": "2026-10-23T18:34:13.06784+00:00",
           "template_animation_id": "jumping-2",
-          "estimated_wait_seconds": 1945
+          "estimated_wait_seconds": 1742
         }
       }
     },
@@ -1892,11 +1892,11 @@
         "last_response": {
           "type": "message_progress",
           "action": "finalizing",
-          "progress": 0.949983398667842,
+          "progress": 0.9499956838788218,
           "direction": "east",
           "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
           "animation_name": null,
-          "queue_position": 15,
+          "queue_position": 13,
           "generation_model": "skeleton-v3_template",
           "animation_group_id": "d1211797-55a9-46b8-bae4-be57a80d706c",
           "motion_adjustments": {
@@ -1908,7 +1908,7 @@
           "animation_description": "two footed jump",
           "generation_started_at": "2026-10-23T18:34:14.627959+00:00",
           "template_animation_id": "two-footed-jump",
-          "estimated_wait_seconds": 1591
+          "estimated_wait_seconds": 1355
         }
       }
     },
@@ -1941,11 +1941,11 @@
         "last_response": {
           "type": "message_progress",
           "action": "finalizing",
-          "progress": 0.9499785159616807,
+          "progress": 0.9499946378637918,
           "direction": "south-east",
           "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
           "animation_name": null,
-          "queue_position": 18,
+          "queue_position": 16,
           "generation_model": "skeleton-v3_template",
           "animation_group_id": "5f91faf9-3c67-472e-a8c5-d7d1480b503c",
           "motion_adjustments": {
@@ -1957,7 +1957,7 @@
           "animation_description": "drinking",
           "generation_started_at": "2026-10-23T18:34:45.851344+00:00",
           "template_animation_id": "drinking",
-          "estimated_wait_seconds": 1879
+          "estimated_wait_seconds": 1674
         }
       }
     },
@@ -1990,11 +1990,11 @@
         "last_response": {
           "type": "message_progress",
           "action": "finalizing",
-          "progress": 0.9499988957705934,
+          "progress": 0.9499996619934885,
           "direction": "east",
           "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
           "animation_name": null,
-          "queue_position": 13,
+          "queue_position": 11,
           "generation_model": "skeleton-v3_template",
           "animation_group_id": "071c3c12-cc09-4e53-b6d0-bbac428cfd15",
           "motion_adjustments": {
@@ -2006,7 +2006,7 @@
           "animation_description": "picking up",
           "generation_started_at": "2026-10-23T18:34:30.045348+00:00",
           "template_animation_id": "picking-up",
-          "estimated_wait_seconds": 1333
+          "estimated_wait_seconds": 1166
         }
       }
     },
@@ -4550,7 +4550,7 @@
       }
     }
   ],
-  "updated_at": 1792780946.0042603,
+  "updated_at": 1792780990.6951685,
   "user_stopped_at": 1792778235.6917784,
   "archived_jobs": {
     "304457e9-6577-44f0-af17-97841a9f6720": {
@@ -5869,7 +5869,7 @@
       "saved_frames": 6
     }
   },
-  "last_git_checkpoint": 1792780610.4904232,
+  "last_git_checkpoint": 1792780948.2542846,
   "summary": {
     "jobs": {
       "processing": 20,
