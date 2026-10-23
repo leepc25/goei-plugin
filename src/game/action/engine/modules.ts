@@ -3,6 +3,7 @@
 //   audio/ 효과음·음악 (createGameAudio)
 //   hq/    본부와 임무 흐름 (createHq)
 // 층(stage/)·적(enemy/)·아이템(items/)·대사(story/)는 들어오는 대로 여기에 잇는다. 없으면 엔진 기본(훈련장·임시 적·기본 지급품).
+import { walkSeconds, clockText, mergeClock, DOOR_S, STAIR_S } from '../../../core/fieldclock';
 import type { GameBridge } from '../../bridge';
 import { view } from './view';
 import { setPixelScale } from './contract';
@@ -57,6 +58,9 @@ const markSaved = () => local(SAVED_KEY).save('1');
 const hasSaved = () => local(SAVED_KEY).load() === '1';
 
 /** 본부 모듈을 엔진 모양으로 감싼다 */
+/** 필드 시각 (초). 입장할 때 본편 시각과 합치고, 걸을 때마다 늘어난다 */
+const fieldClock: { sec: number | null } = { sec: null };
+
 function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: HubHost['chooseFloor']; sfx: (n: string) => void; closed?: () => void; resuming?: () => boolean; overlay?: HubHost['overlay'] }): HqModuleLike & { close(): void; goto(place: string): void; state(): { day: number; rescued: string[] }; visitReady: Promise<void> } {
   const hq = createHq();
   const b = bridge as (Partial<GameBridge> & { slot?: number; photo?: (name: string) => string | undefined }) | undefined;
@@ -89,7 +93,13 @@ function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui
       sfx: (n) => ui.sfx(n),
       visitors,
       // 장면을 옮기면 장부에 이동 사건과 지금 위치(확정 사실)를 남긴다
-      entered: (to, from) => void b?.field?.record({ kind: 'move', text: `${from.name} → ${to.name}`, scene: to.name, weight: 1, fact: { key: '주인공 위치', value: to.name } }).catch(() => {}),
+      entered: (to, from, walkedPx) => {
+        const sec = walkSeconds(walkedPx) + (to.floor !== from.floor ? STAIR_S : DOOR_S);
+        if (fieldClock.sec !== null) fieldClock.sec += sec;
+        const at = fieldClock.sec === null ? '' : ` (${clockText(fieldClock.sec)})`;
+        void b?.field?.record({ kind: 'move', text: `${from.name} → ${to.name}${at}`, scene: to.name, weight: 1, fact: { key: '주인공 위치', value: to.name } }).catch(() => {});
+        if (fieldClock.sec !== null) void b?.field?.record({ kind: 'move', text: `필드 시각 ${clockText(fieldClock.sec)}`, scene: to.name, weight: 1, fact: { key: '필드 시각', value: clockText(fieldClock.sec) } }).catch(() => {});
+      },
       overlay: ui.overlay,
       // 본부 대화창이 떠 있으면 머리 위 표시를 숨긴다 (독립 검수: 브리핑 뒤 ↓ 표시)
       busy: () => typeof document !== 'undefined' && !!document.querySelector('.hq-talk, .hq-over:not(:empty)'),
@@ -212,13 +222,27 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
   setItemIconDrawer(drawItemIcon as never);
   const audio = createGameAudio(local('goei-game-audio'));
   let game: Game | null = null;
+  /** 필드 입장 판정. 막히면 이유를 보이고 「밖에 있어요」로 고칠 수 있다. 들어가도 되면 true */
+  async function gate(): Promise<boolean> {
+    const f = bridge?.field;
+    if (!f?.entry) return true;
+    let info = await f.entry().catch(() => null);
+    while (info && !info.allow) {
+      const i = await shell.choose({ title: '지금은 들어갈 수 없어요', lines: [info.reason ?? ''], options: ['닫기', '밖에 있어요'] });
+      if (i !== 1) return false;
+      f.override?.('outside');
+      info = await f.entry().catch(() => null);
+    }
+    if (info?.notice) await shell.choose({ title: '알림', lines: [info.notice], options: ['확인'] });
+      return true;
+  }
   const shell = mountGameShell(box, {
     synth: true,
     title: bridge?.visit ? '필드' : '차원 승강기',
     sub: bridge?.visit ? '요원들을 만나고 본편 대화를 이어갑니다' : 'ANOMALY SIMULATION · 관리국 액션',
     pauseInfo: () => session.error ?? (game?.inHub ? '본부 자동 저장' : '안전 지점 자동 저장 · 전투 중 중단하면 직전 안전 지점부터'),
     onNew: async () => {
-      if (bridge?.visit) { game?.start_new(); return; }
+      if (bridge?.visit) { if (await gate()) game?.start_new(); return; }
       await session.ready;
       if (session.checkpoint) { await game?.resume(session.checkpoint); game?.endRun('withdraw'); return; }
       // 새 저장: 영상 깃발을 지운다 (저장마다 한 번)
@@ -227,7 +251,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       game?.start_new();
     },
     onContinue: async () => {
-      if (bridge?.visit) { game?.start_new(); return; }
+      if (bridge?.visit) { if (await gate()) game?.start_new(); return; }
       await session.ready;
       try {
         if (session.checkpoint) await game?.resume(session.checkpoint);

@@ -152,8 +152,23 @@ export interface GameFieldEvent {
   /** 지금 확정된 사실 하나 (같은 key는 나중 것이 이긴다) */
   fact?: { key: string; value: string; permanent?: boolean };
 }
+/** 필드에 들어갈 수 있는지 (본편 주인공이 괴이 안이면 막는다) */
+export interface GameEntry {
+  allow: boolean;
+  presence: 'none' | 'prep' | 'inside' | 'unknown';
+  reason?: string;
+  notice?: string;
+  /** 시작 거점 id (표에 없는 소속은 본부) */
+  site: string;
+  /** 본편 현재 시각 (자정부터 분). 모르면 null */
+  minute: number | null;
+}
 export interface GameField {
   record(ev: GameFieldEvent): Promise<void>;
+  /** 입장 판정. 못 읽으면 막지 않는다 */
+  entry?(): Promise<GameEntry>;
+  /** 사용자가 판정을 직접 고친다 (null = 자동) */
+  override?(v: 'inside' | 'outside' | null): void;
 }
 
 export interface GameBridge {

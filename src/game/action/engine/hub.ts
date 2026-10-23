@@ -29,7 +29,7 @@ export interface HubHost {
   chooseFloor(opts: { label: string; open: boolean; here: boolean }[], pick: (i: number | null) => void): void;
   sfx(name: string): void;
   /** 장면이 바뀌었다 (처음 들어갈 때는 부르지 않는다) */
-  entered?(to: { id: string; name: string }, from: { id: string; name: string }): void;
+  entered?(to: { id: string; name: string; floor?: string }, from: { id: string; name: string; floor?: string }, walkedPx: number): void;
   /** 메뉴·대화창이 떠 있나 */
   busy?(): boolean;
   /** 자리 동작(앉기·눕기…) 클립 순서. 플레이어 동작 재생이 붙으면 여기로 */
@@ -65,6 +65,9 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
   let opening: { id: string; t: number; then: () => void } | null = null;
   let near: string | null = null;
   let solids: BlockProp[] = [];
+  /** 이 장면에서 걸은 거리 (px). 필드 시계가 쓴다 */
+  let walked = 0;
+  let lastX: number | null = null;
 
   const sceneOf = (id: string): Scene => view!.scenes.find((s) => s.id === id) ?? view!.scenes[0];
   const openOf = (id: string) => (opening && opening.id === id ? Math.min(1, opening.t / OPEN_T) : 0);
@@ -80,7 +83,9 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
     const sc: Scene = { ...base, spots: [...base.spots, ...people.map((p) => ({ id: `visit:${p.name}`, x: p.x, y: p.y, who: p.name, verb: '대화', face: p.face, open: true }))] };
     const prev = scene;
     scene = sc;
-    if (prev && prev.id !== sc.id) host.entered?.({ id: sc.id, name: sc.name }, { id: prev.id, name: prev.name });
+    if (prev && prev.id !== sc.id) host.entered?.({ id: sc.id, name: sc.name, floor: sc.floor }, { id: prev.id, name: prev.name, floor: prev.floor }, walked);
+    walked = 0;
+    lastX = null;
     barked = null;
     enterTick = -1;
     opening = null;
@@ -226,7 +231,10 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
         const at = clearSpot(arrive.x, y, solids, scene?.lane ?? LANE);
         a.movePlayer(at.x, at.y);
         arrive = null;
+        lastX = null;
       }
+      if (lastX !== null) { const d = Math.abs(p.x - lastX); if (d < 60) walked += d; }
+      lastX = p.x;
       if (opening && opening.t < OPEN_T && ++opening.t === OPEN_T) {
         const then = opening.then;
         opening.t = OPEN_T;
