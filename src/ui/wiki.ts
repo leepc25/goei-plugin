@@ -557,9 +557,9 @@ function newView(ctx: ChatContext): string {
     <div class="ph-form-foot"><button class="gx-start" data-action="wiki-write" data-take="wiki-new">작성 화면 열기</button></div></div>`;
 }
 
-/** 작성·다시 쓰기의 지침 칸: 공용 지침은 보여 주기만, 이 문서 지침은 여기서 적는다 */
+/** 작성·다시 쓰기의 지침 칸: 공용 지침은 보여 주기만, 이 문서 지침은 여기서 적는다 (칸 위 제목 글자는 뺐다, 사용자 2026-10-23) */
 function docReqBox(shared: string): string {
-  return `<label class="nw-reqlabel">이 문서 지침<textarea class="gx-search nw-reqbox" data-input="wiki-docreq" rows="3" maxlength="2000" placeholder="이 문서에만 덧붙일 내용·관점·분량">${esc(wiki.docReq)}</textarea></label>
+  return `<label class="nw-reqlabel"><textarea class="gx-search nw-reqbox" data-input="wiki-docreq" rows="3" maxlength="2000" aria-label="이 문서 지침" placeholder="이 문서에만 덧붙일 지침 (내용·관점·분량)">${esc(wiki.docReq)}</textarea></label>
       ${shared ? `<p class="nw-creq">공용 지침: ${esc(shared)}</p>` : ''}`;
 }
 
