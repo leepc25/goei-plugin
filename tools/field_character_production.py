@@ -104,7 +104,7 @@ class Production:
     z=zipfile.ZipFile(io.BytesIO(data));pngs=[n for n in z.namelist()if n.endswith('.png')];assert len(pngs)==1;data=z.read(pngs[0])
    im=Image.open(io.BytesIO(data)).convert('RGBA');im.load();bbox=im.getbbox();colors=len({px for px in im.getdata()if px[3]});alpha=sorted(set(im.getchannel('A').getdata()));checks={'size':list(im.size),'bbox':list(bbox)if bbox else None,'colors':colors,'alpha':alpha,'original_pixels_preserved':True}
    (OUT/slug/'reference.png').write_bytes(data);atomic(OUT/slug/'image-verification.json',checks)
-   assert im.size==(128,256),'wrong canvas';assert bbox and bbox[3]-bbox[1]>=200,'figure too small';assert colors<=48,'palette cap exceeded';assert alpha==[0,255],'unexpected alpha'
+   assert im.size==(128,256),'wrong canvas';assert bbox and bbox[3]-bbox[1]>=180,'figure too small';assert colors<=48,'palette cap exceeded';assert alpha==[0,255],'unexpected alpha'
    c['image_verified']=True;self.event('image-verified',slug,checks)
   except urllib.error.HTTPError as e:
    c['download_error']=str(e) # transient delivery is read-only and can be checked again
@@ -141,6 +141,7 @@ class Production:
  def schedule(self):
   if json.loads((OUT/'control.json').read_text()).get('stop_all'):return
   if time.time()<self.s.get('retry_after',0):return
+  self.manifest=json.loads((OUT/'manifest.json').read_text());self.by={a['slug']:a for a in self.manifest}
   for a in self.manifest:
    slug=a['slug'];self.validate_image(slug);self.check_ready(slug)
   # Keep room for both production streams; 20 global in-flight requests at most.

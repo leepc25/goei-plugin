@@ -1,0 +1,19 @@
+{
+  "status": "needs-comparative-visual-review",
+  "reason": "Earlier shared 230-240px body target may flatten canonical stature differences",
+  "characters": [
+    "jyaldi",
+    "spangdal",
+    "jaemtri",
+    "aileen",
+    "gorgodio",
+    "kyuras",
+    "deadpole"
+  ],
+  "requirements": [
+    "same zoom and floor baseline",
+    "original outfit silhouette and details",
+    "body build and relative height",
+    "repair confirmed defects; preserve previous outputs"
+  ]
+}

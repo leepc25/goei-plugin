@@ -1,6 +1,6 @@
 {
   "release_skeleton_v3_motions": true,
-  "reason": "User ordered docs first then complete Jyaldi rebuild under front-south/east-movement/southeast-stationary policy. Continue all character images/registration. Only Jyaldi motions authorized to restart; all other motion expansion remains gated.",
+  "reason": "인물별 키·체격·복장 보존 요청 반영 후 제작 재개. 기존7명 상대 키 비교검수 필요.",
   "max_in_flight": 20,
   "max_character_pipeline_in_flight": 6,
   "authorized_total_characters": 55,
