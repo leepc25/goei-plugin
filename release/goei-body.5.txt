@@ -548,7 +548,7 @@
     }
     return { next, lore: lore.count, scripts: scripts.count, fields: fields3 };
   }
-  var PLUGIN_VERSION = true ? "0.16.54" : "0";
+  var PLUGIN_VERSION = true ? "0.16.55" : "0";
 
   // src/host/game/fetch.ts
   var GAME_BASE = UPDATE_BASE ? `${UPDATE_BASE}/game` : "";
@@ -613,7 +613,7 @@
 
   // src/host/game/code.ts
   var CODE_KEY = "goei:game:code";
-  var VERSION = true ? "0.16.54" : "";
+  var VERSION = true ? "0.16.55" : "";
   var codeVersion = (code) => /^\/\/ goei-game (\S+)/.exec(code)?.[1] ?? null;
   var mod = null;
   var codeStats = { readMs: 0, runMs: 0, bytes: 0, fromNet: false };
@@ -2479,7 +2479,7 @@ ${recentStory.map((m) => m.text).join("\n")}`,
     <div class="ph-form-foot"><button class="gx-start" data-action="wiki-write" data-take="wiki-new">작성 화면 열기</button></div></div>`;
   }
   function docReqBox(shared) {
-    return `<label class="nw-reqlabel">이 문서 지침<textarea class="gx-search nw-reqbox" data-input="wiki-docreq" rows="3" maxlength="2000" placeholder="이 문서에만 덧붙일 내용·관점·분량">${esc13(wiki.docReq)}</textarea></label>
+    return `<label class="nw-reqlabel"><textarea class="gx-search nw-reqbox" data-input="wiki-docreq" rows="3" maxlength="2000" aria-label="이 문서 지침" placeholder="이 문서에만 덧붙일 지침 (내용·관점·분량)">${esc13(wiki.docReq)}</textarea></label>
       ${shared ? `<p class="nw-creq">공용 지침: ${esc13(shared)}</p>` : ""}`;
   }
   function compose(ctx2) {
@@ -3906,4 +3906,4 @@ ${recentStory.map((m) => m.text).join("\n")}`,
     return hit3 === "loading" ? null : hit3;
   }
   var boardMapUrl = (ctx2, env2) => mapImage(ctx2, "01", env2);
-  function pin(action, value, label, x, y, cls, coun
+  function pin(action, value,

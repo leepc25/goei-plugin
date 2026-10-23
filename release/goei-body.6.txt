@@ -1,4 +1,4 @@
-t2 = 0) {
+ label, x, y, cls, count2 = 0) {
     return `<button class="gx-pin ${cls}" style="left:${x}%;top:${y}%" data-action="${action}" data-value="${esc15(value)}" aria-label="${esc15(label)}">
     <span class="gx-dot"></span><span class="gx-pname">${esc15(label)}${count2 ? `<b>${count2}</b>` : ""}</span></button>`;
   }
@@ -2711,5 +2711,5 @@ ${NOTE}`;
   }
 
   // src/body-entry.ts
-  globalThis.__goeiBody = { version: "0.16.54", start: start2 };
+  globalThis.__goeiBody = { version: "0.16.55", start: start2 };
 })();
