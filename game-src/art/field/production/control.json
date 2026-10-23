@@ -89,7 +89,12 @@
     "konjyuce",
     "do-pil-heon",
     "kim-seong-jin",
-    "eun-ha-je"
+    "eun-ha-je",
+    "sa-jang",
+    "lee-gi-seok",
+    "kim-jo-hak",
+    "lee-do-hyeong",
+    "jang-heo-un"
   ],
   "source_priority": "AVIF first for identity/build; lore supplements height; explicit user heights override estimates"
 }

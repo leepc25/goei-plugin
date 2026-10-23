@@ -1,0 +1,14 @@
+{
+  "job": "d74b3585-0555-4f34-93c8-8df0c0aacf52",
+  "job_status": "completed",
+  "decision": "pass",
+  "reason": "원작 특징인 한쪽으로 내려온 검은 가르마 머리, 갸름한 얼굴·비대칭 미소·슬림한 정장 체형 유지. 정면, 모발 포함230px·본체 약222–224px로 보통 키 상단 근처. 투명 외곽 확인.",
+  "at": 1792790258.6712391,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

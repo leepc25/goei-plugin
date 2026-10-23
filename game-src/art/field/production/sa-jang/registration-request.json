@@ -1,0 +1,14 @@
+{
+  "description": "사장 / Sa-jang. Adult male silhouette with broad straight shoulders and a tapered waist. Thick black wavy hair swept back with loose curved locks. Entire face is an opaque pitch-black shadow, including eyes and nose: ONLY a tiny thin white smile is visible. NO sunglasses. Black single-breasted tailored suit, white pointed collar, straight black necktie. Pale hands. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
+  "reference_image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "n_directions": 8,
+  "view": "low top-down",
+  "template_id": "mannequin",
+  "name": "사장",
+  "seed": 10222027,
+  "no_background": true
+}

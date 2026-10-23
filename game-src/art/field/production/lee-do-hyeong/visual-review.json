@@ -1,0 +1,14 @@
+{
+  "job": "c0fb1cbb-3f99-4c40-8f35-d1283384bd68",
+  "job_status": "completed",
+  "decision": "pass",
+  "reason": "은백색 로우 포니테일·정면·선글라스·양쪽 팔꿈치까지 걷은 소매 유지. 뺨의 평행 흉터와 양팔·손등의 갈라진 흉터, 턱 수염 보완 확인. 기존 장신 체격·244px 모발 포함 영역 유지, 회색 외곽 없음.",
+  "at": 1792790258.906904,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

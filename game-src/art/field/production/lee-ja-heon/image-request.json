@@ -1,0 +1,12 @@
+{
+  "image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "method": "text",
+  "description": "Correct standing orientation to STRICT FRONT SOUTH: rotate the head and chest toward viewer, nose centered, both eyes and shoulders equally visible, belt centered. Preserve the exact existing tall native body height, broad naturally solid build and handsome angular face. Irises must be RED. Short white hair swept backward with two curved forelocks. Preserve navy buttoned waistcoat, white long-sleeved shirt, navy tie, dark trousers and shoes. Do not add suit jacket, mask or gloves. Do not shrink body or exaggerate muscles. Same crisp pixel rendering and transparent background; no gray outer halo.",
+  "no_background": true,
+  "use_color_palette_correction": true,
+  "seed": 1792789965
+}

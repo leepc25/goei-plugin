@@ -1,0 +1,12 @@
+{
+  "image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "method": "text",
+  "description": "Change ONLY the haircut fringe: make the straight rounded bowl-cut bangs SHORT, ending clearly ABOVE eyebrows, exposing a visible pale forehead band between fringe and eyebrows, as in a neat short schoolboy bowl cut. Keep dark brown-black hair, soft youthful oval face, small chin, gentle smile, large black aviator sunglasses. Preserve exact full-body pixels outside forehead/hair: slim build, brown-charcoal buttoned suit, white shirt, neat tie, pose, height and shoes. Transparent background, crisp pixel art, no gray halo.",
+  "no_background": true,
+  "use_color_palette_correction": true,
+  "seed": 1792789965
+}

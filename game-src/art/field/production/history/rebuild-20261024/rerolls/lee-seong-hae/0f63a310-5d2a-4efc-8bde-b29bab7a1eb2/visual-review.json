@@ -1,0 +1,13 @@
+{
+  "job": "0f63a310-5d2a-4efc-8bde-b29bab7a1eb2",
+  "decision": "reroll",
+  "reason": "원작을 다시 대조: 키202px(모발포함)와 정면은 맞지만 오른쪽 어깨의 느슨한 웨이브 묶음이 땋은 머리처럼 보임. 해당 머리만 교정.",
+  "at": 1792790055.6810653,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

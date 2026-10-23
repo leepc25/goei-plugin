@@ -1,0 +1,13 @@
+{
+  "job": "a7426a39-9d10-44d4-9436-cfeae0021249",
+  "decision": "reroll",
+  "reason": "키190px로 큰 체격·장신 목표228–234px보다 작음. 기존 관리국의 장신 남성 스타일 참조로 교체.",
+  "at": 1792790055.575006,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

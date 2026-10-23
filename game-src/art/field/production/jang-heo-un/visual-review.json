@@ -1,0 +1,14 @@
+{
+  "job": "c1b8d77b-a677-453e-9644-8276cc1f3fe1",
+  "job_status": "completed",
+  "decision": "pass",
+  "reason": "어깨 아래로 내려오는 갈색 레이어드 장발·가운데 가르마·피곤한 눈밑·긴 얼굴·남색 정장 유지. 정면, 모발 포함247px로 장신 계열이며 본체 약238–241px. 회색 외곽 없음.",
+  "at": 1792790279.201742,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "description": "이기석 / Lee Gi-seok. Lean wiry adult man with narrow waist, angular narrow cheeks, pointed chin and confident crooked smile. Glossy black SIDE-PARTED hair, long curved curtain lock hanging over one side of forehead, opposite side swept back. Black aviator sunglasses. Fitted black single-breasted suit, white shirt, neat narrow black tie. Both hands look human; do not invent an exposed robot arm. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
+  "reference_image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "n_directions": 8,
+  "view": "low top-down",
+  "template_id": "mannequin",
+  "name": "이기석",
+  "seed": 10222027,
+  "no_background": true
+}

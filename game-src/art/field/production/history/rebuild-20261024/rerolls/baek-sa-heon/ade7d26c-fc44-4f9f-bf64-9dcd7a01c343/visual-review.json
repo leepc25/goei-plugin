@@ -1,0 +1,14 @@
+{
+  "job": "ade7d26c-fc44-4f9f-bf64-9dcd7a01c343",
+  "job_status": "completed",
+  "decision": "reroll",
+  "reason": "곱슬머리·안대 위치·정면은 맞으나 안대 반대편 눈에 안경테처럼 보이는 사각 선이 생김. 원작에는 안경이 없으므로 이 부분만 제거.",
+  "at": 1792790163.8298154,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}
