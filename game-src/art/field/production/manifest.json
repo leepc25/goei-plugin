@@ -2375,7 +2375,10 @@
         "note": "Pixel ranges are production targets, not invented canonical height. Preserve original build and clothing; validate together at identical zoom."
       },
       "reviewed_at": "2026-10-24"
-    }
+    },
+    "registration_import_zip": "game-src/art/field/production/direction-repairs/jay/aa4b3caf-fe72-4a4a-851d-8de11e49c79e/full-patch-borders/character.zip",
+    "registration_import_review": "남동/서쪽 패치의 전체 테두리 제거 확인. 앞서 통과한 동/남서쪽 수정본을 base_zip으로 보존하고, 나머지4방향 원본 유지. 원작의 검은 모자·은발·안경·마스크·무늬 없는 남색 작업복과 체격 유지. 마스크 밖 RGBA 동일, 회색 외곽 없음. AVIF 우선·로어 보충·전원 장벽 재확인.",
+    "registration_regenerate_directions": []
   },
   {
     "english": "Ho Yu-won",
@@ -2570,12 +2573,9 @@
       },
       "reviewed_at": "2026-10-24"
     },
-    "registration_import_zip": "game-src/art/field/production/history/rebuild-20261024/deleted-library/139dab6a-7a81-4bb5-a533-8c69f049451c/character.zip",
-    "registration_regenerate_directions": [
-      "west",
-      "south-west"
-    ],
-    "registration_import_review": "S,SE,E,NE,N,NW individually inspected against original: long burgundy hair, light gray suit, stature and clean edge retained. W,SW rejected for invented sleeve patch; preserve other6 exactly."
+    "registration_import_zip": "game-src/art/field/production/direction-repairs/cha-yeo-jin/34a102ab-fd2b-4740-b89e-acef126efad1/complete-badge-outline/character.zip",
+    "registration_regenerate_directions": [],
+    "registration_import_review": "북서쪽 소매 문양과 모든 테두리 완전 제거 확인. 나머지7방향은 이전 검수본 그대로, 붉은 긴 머리·회색 정장·넥타이·체격과 키 유지. 마스크 밖 RGBA 동일, 회색 외곽 없음. AVIF 우선·로어 보충·전원 장벽 재확인."
   },
   {
     "english": "Seo Yun-ji",
@@ -3066,8 +3066,14 @@
     "image_palette_limit_reason": "Local length correction preserving all unmasked RGBA.",
     "image_inpaint_source": "game-src/art/field/production/history/rebuild-20261024/rerolls/blaret/e9653deb-de50-4f8a-87d5-4fd7ce9ea263/reference.png",
     "image_inpaint_mask": "game-src/art/field/production/inputs/blaret-right-context-mask.png",
-    "image_inpaint_crop_to_mask": false,
-    "image_inpaint_description": "Complete the missing VIEWER-RIGHT half of the long black nun veil. Look at the EXISTING VIEWER-LEFT veil beside her left hand: a solid black fabric strip hangs down behind that hand. Add a MATCHING solid BLACK CLOTH PANEL behind the right hand, about SIX pixels wide, filling x96 through x101 from y135 to y164, naturally connected up to existing black veil at right upper arm. Filled black fabric with one subtle dark gray fold, NOT a single vertical outline or line. Hem at same height as left veil. Preserve hands, beads, sleeves, body, face, eyes and every unmasked pixel. Transparent outside the veil."
+    "image_inpaint_description": "Complete the missing VIEWER-RIGHT half of the long black nun veil. Look at the EXISTING VIEWER-LEFT veil beside her left hand: a solid black fabric strip hangs down behind that hand. Add a MATCHING solid BLACK CLOTH PANEL behind the right hand, about SIX pixels wide, filling x96 through x101 from y135 to y164, naturally connected up to existing black veil at right upper arm. Filled black fabric with one subtle dark gray fold, NOT a single vertical outline or line. Hem at same height as left veil. Preserve hands, beads, sleeves, body, face, eyes and every unmasked pixel. Transparent outside the veil.",
+    "image_inpaint_context_source": "game-src/art/field/production/history/rebuild-20261024/rerolls/blaret/e9653deb-de50-4f8a-87d5-4fd7ce9ea263/reference.png",
+    "image_inpaint_context_box": {
+      "x": 0,
+      "y": 0,
+      "width": 128,
+      "height": 256
+    }
   },
   {
     "english": "Saladin",

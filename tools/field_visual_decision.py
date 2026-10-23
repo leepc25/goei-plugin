@@ -6,7 +6,7 @@ from field_character_production import OUT,atomic
 def native_prompt(a):
  for key in ['registration_import_zip','registration_import_review','registration_regenerate_directions']:a.pop(key,None)
  a.pop('image_edit_source',None);a.pop('image_edit_description',None)
- for key in ['image_inpaint_source','image_inpaint_mask','image_inpaint_description']:a.pop(key,None)
+ for key in ['image_inpaint_source','image_inpaint_mask','image_inpaint_description','image_inpaint_crop_to_mask','image_inpaint_context_source','image_inpaint_context_box']:a.pop(key,None)
  lo,hi=a['stature_rendering']['target_body_pixels']
  h=min(256,4*math.ceil((hi+12)/4))
  a['native_height_canvas']=True

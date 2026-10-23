@@ -1,0 +1,29 @@
+{
+  "slug": "cha-yeo-jin",
+  "state_before": {
+    "name": "차여진",
+    "group": "association",
+    "character_id": "34a102ab-fd2b-4740-b89e-acef126efad1",
+    "image": "833ae0ce-09fb-4e28-b560-726df7acd16e",
+    "registration": "f4ac2933-a388-4c25-af41-e7d2174bce29",
+    "motions": {},
+    "ready": true,
+    "image_verified": true,
+    "image_visually_reviewed": true,
+    "exported": true,
+    "registration_rejections": [
+      {
+        "character_id": "139dab6a-7a81-4bb5-a533-8c69f049451c",
+        "job": "8231c302-e2fd-48d8-ab4c-4cfe04785808",
+        "reason": "서쪽·남서쪽 소매에 원작과 정면에 없는 방패 패치 추가. 다른6방향은 원작 정체성·키·긴 버건디 머리·외곽 검수 통과. 정상6방향 보존하고 문제2방향만 재생성.",
+        "at": 1792793391.6707006
+      }
+    ],
+    "eight_way_visual_reviewed": false,
+    "skeleton_joints": 18,
+    "rotation_count": 8,
+    "direction-repair-north-west": "fe9b6ba1-00d2-4fd7-9b3b-5b55f55e8463",
+    "direction-repair-north-west-complete-badge-outline": "885929eb-2421-4f97-be6b-532c93f3085b"
+  },
+  "reason": "Original rotation defects repaired locally through PixelLab masked inpainting"
+}

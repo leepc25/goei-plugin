@@ -1,0 +1,13 @@
+{
+  "findings": "북서쪽 소매 문양과 모든 테두리 완전 제거 확인. 나머지7방향은 이전 검수본 그대로, 붉은 긴 머리·회색 정장·넥타이·체격과 키 유지. 마스크 밖 RGBA 동일, 회색 외곽 없음. AVIF 우선·로어 보충·전원 장벽 재확인.",
+  "directions": [
+    "north-west"
+  ],
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF primary",
+    "lore height supplementary",
+    "all55 barrier",
+    "gray exterior rejection"
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "findings": "남동/서쪽 패치의 전체 테두리 제거 확인. 앞서 통과한 동/남서쪽 수정본을 base_zip으로 보존하고, 나머지4방향 원본 유지. 원작의 검은 모자·은발·안경·마스크·무늬 없는 남색 작업복과 체격 유지. 마스크 밖 RGBA 동일, 회색 외곽 없음. AVIF 우선·로어 보충·전원 장벽 재확인.",
+  "directions": [
+    "south-east",
+    "west"
+  ],
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF primary",
+    "lore height supplementary",
+    "all55 barrier",
+    "gray exterior rejection"
+  ]
+}

@@ -36,6 +36,16 @@
       "type": "base64",
       "base64": "[image payload omitted]",
       "format": "png"
+    },
+    "west": {
+      "type": "base64",
+      "base64": "[image payload omitted]",
+      "format": "png"
+    },
+    "south-west": {
+      "type": "base64",
+      "base64": "[image payload omitted]",
+      "format": "png"
     }
   }
 }
