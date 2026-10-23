@@ -1,0 +1,20 @@
+{
+  "at": 1792799773.8524039,
+  "job_id": "e5a7229a-de64-459a-8372-457dfc1927cc",
+  "result": "reroll-required",
+  "findings": "직접 관절12프레임 중5프레임 얼굴/머리 큰 투명 구멍과 분리 픽셀. 잘림은 해결됐지만 원형 보존 실패, 새 시드로 재시도 필요.",
+  "frame_count": 12,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

@@ -229,14 +229,19 @@
       "jumping-2": "game-src/art/field/production/motion-inputs/jyaldi/jumping-2-v1/spec.json",
       "running-8-frames": "game-src/art/field/production/motion-inputs/jyaldi/running-8-frames-v1/spec.json",
       "running-jump": "game-src/art/field/production/motion-inputs/jyaldi/running-jump-v1/spec.json",
-      "running-slide": "game-src/art/field/production/motion-inputs/jyaldi/running-slide-v1/spec.json",
-      "front-flip": "game-src/art/field/production/motion-inputs/jyaldi/front-flip-v1/spec.json",
-      "backflip": "game-src/art/field/production/motion-inputs/jyaldi/backflip-v1/spec.json",
+      "running-slide": "game-src/art/field/production/motion-inputs/jyaldi/running-slide-v2/spec.json",
+      "front-flip": "game-src/art/field/production/motion-inputs/jyaldi/front-flip-v2/spec.json",
+      "backflip": "game-src/art/field/production/motion-inputs/jyaldi/backflip-v2/spec.json",
       "two-footed-jump": "game-src/art/field/production/motion-inputs/jyaldi/two-footed-jump-v1/spec.json",
-      "picking-up": "game-src/art/field/production/motion-inputs/jyaldi/picking-up-v1/spec.json",
-      "throw-object": "game-src/art/field/production/motion-inputs/jyaldi/throw-object-v1/spec.json",
+      "picking-up": "game-src/art/field/production/motion-inputs/jyaldi/picking-up-v2/spec.json",
+      "throw-object": "game-src/art/field/production/motion-inputs/jyaldi/throw-object-v2/spec.json",
       "cross-punch": "game-src/art/field/production/motion-inputs/jyaldi/cross-punch-v1/spec.json",
       "jumping-1": "game-src/art/field/production/motion-inputs/jyaldi/jumping-1-v1/spec.json"
+    },
+    "spangdal": {
+      "jumping-1": "game-src/art/field/production/motion-inputs/spangdal/jumping-1-v1/spec.json",
+      "jumping-2": "game-src/art/field/production/motion-inputs/spangdal/jumping-2-v1/spec.json",
+      "two-footed-jump": "game-src/art/field/production/motion-inputs/spangdal/two-footed-jump-v1/spec.json"
     }
   }
 }

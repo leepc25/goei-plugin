@@ -25664,7 +25664,11 @@
         "type": "generations",
         "generations": 3
       },
-      "saved_frames": 8
+      "saved_frames": 8,
+      "visual_rejection": {
+        "reason": "직접 관절에서도3·5프레임 양 종아리 뒤에 넓은 회색 삼각형 채움. 두 다리가 겹친 낮은 자세의 외곽 복원이 실패하여 다리 간격과 접지 자세를 바꿔 재작업 필요.",
+        "standalone": true
+      }
     },
     "deb66491-c65e-4c50-a2d8-536a3c2ba0d7": {
       "kind": "animation",
@@ -25786,13 +25790,17 @@
         "type": "generations",
         "generations": 3
       },
-      "saved_frames": 12
+      "saved_frames": 12,
+      "visual_rejection": {
+        "reason": "직접 관절로 잘림은 해소됐지만5프레임 허리 옆 회색 면,11프레임 머리 뒤 회색 덩어리,12프레임 얼굴/몸 투명 구멍. 시각 기준 미달로 재시도 필요.",
+        "standalone": true
+      }
     },
     "e5a7229a-de64-459a-8372-457dfc1927cc": {
       "kind": "animation",
       "slug": "jyaldi",
       "template": "backflip",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792799210.991391,
       "receipt": {
         "usage": null,
@@ -25802,22 +25810,116 @@
       "endpoint": "animate-with-skeleton-v3",
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 3.0
         },
         "id": "e5a7229a-de64-459a-8372-457dfc1927cc",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-23T23:46:56.302197+00:00",
         "last_response": {
-          "type": "message_progress",
-          "action": "generating",
+          "seed": 2026102604,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
           "status": "initializing",
-          "progress": 0.34888282647122015,
+          "progress": 1.0,
           "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "de447404-4c09-4c1a-bb39-8987b16ec033",
           "queue_position": 0,
+          "billing_charged": true,
           "generation_started_at": "2026-10-23T23:47:45.981349+00:00",
           "estimated_wait_seconds": 0
         }
+      },
+      "observed_end_epoch": 1792799747.7682307,
+      "elapsed_observed_seconds": 536.7768399715424,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 12,
+      "visual_rejection": {
+        "reason": "뒤공중제비5프레임 얼굴/머리 투명 구멍",
+        "standalone": true
       }
     },
     "78c4596b-d8e7-45c8-9e8f-efba27b0e34a": {
@@ -26112,7 +26214,11 @@
         "type": "generations",
         "generations": 3
       },
-      "saved_frames": 8
+      "saved_frames": 8,
+      "visual_rejection": {
+        "reason": "직접 관절5프레임 머리와 손에 투명 구멍,6·7프레임 손 앞 회색 덩어리. 갈색 소품 문제는 없어졌으나 외곽/신체 보존 실패로 반려.",
+        "standalone": true
+      }
     },
     "ca8355e6-7376-485d-9334-3ffbae2087b4": {
       "kind": "animation",
@@ -26210,7 +26316,11 @@
         "type": "generations",
         "generations": 3
       },
-      "saved_frames": 8
+      "saved_frames": 8,
+      "visual_rejection": {
+        "reason": "3프레임 뒤쪽 손이 갈색 덩어리로 변하고6프레임 던지는 팔이 충분히 뻗지 않아 머리를 만지는 동작처럼 읽힘. 검은 장갑·던지기 궤적을 유지하도록 팔 좌표 재작업.",
+        "standalone": true
+      }
     },
     "abcd5997-80d8-4545-9c3e-a78739f74f37": {
       "kind": "animation",
@@ -26309,6 +26419,454 @@
         "generations": 3
       },
       "saved_frames": 8
+    },
+    "0cc1f03b-baf8-4cba-8b49-7151ad7ace0b": {
+      "kind": "animation",
+      "slug": "jyaldi",
+      "template": "running-slide",
+      "status": "completed",
+      "created_epoch": 1792799598.0898445,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "0cc1f03b-baf8-4cba-8b49-7151ad7ace0b",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3",
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 3.0
+        },
+        "id": "0cc1f03b-baf8-4cba-8b49-7151ad7ace0b",
+        "status": "completed",
+        "created_at": "2026-10-23T23:53:29.521195+00:00",
+        "last_response": {
+          "seed": 2026102701,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "status": "initializing",
+          "progress": 1.0,
+          "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "4f9aa4f2-e893-45e4-bb93-688bad72be4d",
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_started_at": "2026-10-23T23:54:37.287113+00:00",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792799827.4911623,
+      "elapsed_observed_seconds": 229.4013180732727,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 8
+    },
+    "22fce3f7-2e89-4fe9-a3af-8bbbbc2cfa85": {
+      "kind": "animation",
+      "slug": "jyaldi",
+      "template": "front-flip",
+      "status": "completed",
+      "created_epoch": 1792799614.4125676,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "22fce3f7-2e89-4fe9-a3af-8bbbbc2cfa85",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3",
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 3.0
+        },
+        "id": "22fce3f7-2e89-4fe9-a3af-8bbbbc2cfa85",
+        "status": "completed",
+        "created_at": "2026-10-23T23:53:35.525541+00:00",
+        "last_response": {
+          "seed": 2026102704,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "status": "initializing",
+          "progress": 1.0,
+          "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "9926b296-d25d-4d95-aeec-321f65c37d6e",
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_started_at": "2026-10-23T23:54:23.289059+00:00",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792799827.7612286,
+      "elapsed_observed_seconds": 213.3486611843109,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 12
+    },
+    "99276a0e-7f7d-4266-ad3d-3a5826fe8f5a": {
+      "kind": "animation",
+      "slug": "jyaldi",
+      "template": "picking-up",
+      "status": "completed",
+      "created_epoch": 1792799617.0503585,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "99276a0e-7f7d-4266-ad3d-3a5826fe8f5a",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3",
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 3.0
+        },
+        "id": "99276a0e-7f7d-4266-ad3d-3a5826fe8f5a",
+        "status": "completed",
+        "created_at": "2026-10-23T23:53:37.280185+00:00",
+        "last_response": {
+          "seed": 2026102702,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "status": "initializing",
+          "progress": 1.0,
+          "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "c80ad451-902a-40e7-947a-db8d7931653e",
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_started_at": "2026-10-23T23:54:24.040529+00:00",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792799828.0385664,
+      "elapsed_observed_seconds": 210.9882082939148,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 8
+    },
+    "b2e2ca3b-ce95-48c7-a05f-1aa1c6bb8deb": {
+      "kind": "animation",
+      "slug": "jyaldi",
+      "template": "throw-object",
+      "status": "completed",
+      "created_epoch": 1792799617.4740965,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "b2e2ca3b-ce95-48c7-a05f-1aa1c6bb8deb",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3",
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 3.0
+        },
+        "id": "b2e2ca3b-ce95-48c7-a05f-1aa1c6bb8deb",
+        "status": "completed",
+        "created_at": "2026-10-23T23:53:37.735416+00:00",
+        "last_response": {
+          "seed": 2026102703,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "status": "initializing",
+          "progress": 1.0,
+          "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "8be5bab4-4010-4008-9536-0c25e5fe3d75",
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_started_at": "2026-10-23T23:54:23.792459+00:00",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792799775.019063,
+      "elapsed_observed_seconds": 157.54496693611145,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 8
+    },
+    "61a3ec4e-de54-499f-a700-7750aa3cac75": {
+      "kind": "animation",
+      "slug": "jyaldi",
+      "template": "backflip",
+      "status": "processing",
+      "created_epoch": 1792799775.1020453,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "61a3ec4e-de54-499f-a700-7750aa3cac75",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3",
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "61a3ec4e-de54-499f-a700-7750aa3cac75",
+        "status": "processing",
+        "created_at": "2026-10-23T23:56:16.784589+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "action": "generating",
+          "status": "initializing",
+          "progress": 0.18148678179288374,
+          "flow_kind": "animation",
+          "queue_position": 0,
+          "generation_started_at": "2026-10-23T23:57:14.128584+00:00",
+          "estimated_wait_seconds": 0
+        }
+      }
     }
   },
   "characters": {
@@ -26331,14 +26889,14 @@
         "jumping-2": "8b8ec1b7-5fb0-43cf-8cde-a18586116dc6",
         "running-8-frames": "c331aff3-ce7c-45ee-92d3-99392449063c",
         "running-jump": "4ab34876-571f-4240-a369-3f2190a7f73e",
-        "running-slide": "c71e10c2-bf4a-4a84-9211-f99673420f8d",
-        "front-flip": "deb66491-c65e-4c50-a2d8-536a3c2ba0d7",
-        "backflip": "e5a7229a-de64-459a-8372-457dfc1927cc",
         "jumping-1": "78c4596b-d8e7-45c8-9e8f-efba27b0e34a",
         "two-footed-jump": "4674f370-f7aa-4841-94c7-b7c1fe8adb2f",
-        "picking-up": "8c2c1146-e60e-48f7-aaef-ba389ad31aec",
-        "throw-object": "ca8355e6-7376-485d-9334-3ffbae2087b4",
-        "cross-punch": "abcd5997-80d8-4545-9c3e-a78739f74f37"
+        "cross-punch": "abcd5997-80d8-4545-9c3e-a78739f74f37",
+        "running-slide": "0cc1f03b-baf8-4cba-8b49-7151ad7ace0b",
+        "front-flip": "22fce3f7-2e89-4fe9-a3af-8bbbbc2cfa85",
+        "picking-up": "99276a0e-7f7d-4266-ad3d-3a5826fe8f5a",
+        "throw-object": "b2e2ca3b-ce95-48c7-a05f-1aa1c6bb8deb",
+        "backflip": "61a3ec4e-de54-499f-a700-7750aa3cac75"
       },
       "ready": true,
       "rebuild_after_direction_policy": true,
@@ -45486,9 +46044,164 @@
         },
         "detail": null
       }
+    },
+    {
+      "at": "2026-10-23T23:53:34Z",
+      "kind": "submitted",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "running-slide",
+        "job_id": "0cc1f03b-baf8-4cba-8b49-7151ad7ace0b",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "0cc1f03b-baf8-4cba-8b49-7151ad7ace0b",
+          "status": "processing"
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T23:53:36Z",
+      "kind": "submitted",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "front-flip",
+        "job_id": "22fce3f7-2e89-4fe9-a3af-8bbbbc2cfa85",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "22fce3f7-2e89-4fe9-a3af-8bbbbc2cfa85",
+          "status": "processing"
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T23:53:37Z",
+      "kind": "submitted",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "picking-up",
+        "job_id": "99276a0e-7f7d-4266-ad3d-3a5826fe8f5a",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "99276a0e-7f7d-4266-ad3d-3a5826fe8f5a",
+          "status": "processing"
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T23:53:37Z",
+      "kind": "submitted",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "throw-object",
+        "job_id": "b2e2ca3b-ce95-48c7-a05f-1aa1c6bb8deb",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "b2e2ca3b-ce95-48c7-a05f-1aa1c6bb8deb",
+          "status": "processing"
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T23:55:47Z",
+      "kind": "completed",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "backflip",
+        "job_id": "e5a7229a-de64-459a-8372-457dfc1927cc",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T23:56:15Z",
+      "kind": "completed",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "throw-object",
+        "job_id": "b2e2ca3b-ce95-48c7-a05f-1aa1c6bb8deb",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T23:56:17Z",
+      "kind": "submitted",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "backflip",
+        "job_id": "61a3ec4e-de54-499f-a700-7750aa3cac75",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "61a3ec4e-de54-499f-a700-7750aa3cac75",
+          "status": "processing"
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T23:57:07Z",
+      "kind": "completed",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "running-slide",
+        "job_id": "0cc1f03b-baf8-4cba-8b49-7151ad7ace0b",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T23:57:07Z",
+      "kind": "completed",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "front-flip",
+        "job_id": "22fce3f7-2e89-4fe9-a3af-8bbbbc2cfa85",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T23:57:08Z",
+      "kind": "completed",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "picking-up",
+        "job_id": "99276a0e-7f7d-4266-ad3d-3a5826fe8f5a",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
     }
   ],
-  "updated_at": 1792799559.6277907,
+  "updated_at": 1792799916.701935,
   "user_stopped_at": 1792778235.6917784,
   "archived_jobs": {
     "304457e9-6577-44f0-af17-97841a9f6720": {
@@ -46807,11 +47520,11 @@
       "saved_frames": 6
     }
   },
-  "last_git_checkpoint": 1792799232.1740184,
+  "last_git_checkpoint": 1792799561.587209,
   "summary": {
     "jobs": {
       "processing": 1,
-      "completed": 310,
+      "completed": 315,
       "failed": 9,
       "stalled": 0
     },
