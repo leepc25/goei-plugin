@@ -1,4 +1,6 @@
- push: 6, pierce: true, arm: 20, color: "#c8b8ff" },
+,
+    ring: { label: "충격파", w: 20, h: 26, z: 0, speed: 0, life: 26, dmg: 10, react: "stagger", push: 10, low: true, grow: 13, pierce: true, unblockable: true, color: "#e86b4f" },
+    beam: { label: "모서리 빛", w: 1400, h: 46, z: 70, speed: 0, life: 34, dmg: 16, react: "stagger", push: 6, pierce: true, arm: 20, color: "#c8b8ff" },
     cloud: { label: "썩은 내", w: 160, h: 150, z: 0, speed: 0, life: 210, dmg: 2, react: "none", pierce: true, every: 15, unblockable: true, debuff: { kind: "taint", ticks: 300 }, color: "#7c8a4a" },
     smoke: { label: "연막", w: 180, h: 160, z: 0, speed: 0, life: 70, dmg: 0, react: "none", pierce: true, harmless: true, color: "#9a98a8" },
     whistle: { label: "호루라기", w: 20, h: 200, z: 0, speed: 0, life: 22, dmg: 6, react: "stagger", push: 12, grow: 18, pierce: true, unblockable: true, debuff: { kind: "fear", ticks: 45 }, color: "#f0e9a0" }
@@ -4941,11 +4943,4 @@
         background(w, camX);
         const layers = w.floor.depthLayers ?? [];
         const props2 = [...w.props.map((p) => ({ y: p.y, prop: p })), ...layers.map((l) => ({ y: l.y, layer: l }))].sort((a, b) => a.y - b.y);
-        const all = [w.player, ...w.bodies].filter((b) => b.alive);
-        let pi = 0;
-        const propsUpTo = (y) => {
-          while (pi < props2.length && props2[pi].y <= y) {
-            const d3 = props2[pi++];
-            if (d3.prop) drawProps(w, camX, [d3.prop]);
-            else if (d3.layer) {
-              c
+        const all = [w.player, ...

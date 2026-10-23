@@ -1,4 +1,28 @@
-fs();
+ata-theme", theme);
+    box.addEventListener("click", (e) => {
+      if (e.target.closest(".gx-idpop-card") && !e.target.closest(".gx-agpop-x")) return;
+      box.remove();
+    });
+    document.body.appendChild(box);
+  }
+
+  // src/core/josa.ts
+  function josa(word, withBatchim, without) {
+    const last2 = word.trim().slice(-1);
+    const code = last2.charCodeAt(0) - 44032;
+    if (!(code >= 0 && code <= 11171)) return `${word}${withBatchim}(${without})`;
+    return `${word}${code % 28 ? withBatchim : without}`;
+  }
+
+  // src/host/prefs.ts
+  var KEY = "goei:prefs";
+  async function loadPrefs() {
+    try {
+      const raw = await risuai.pluginStorage.getItem(KEY);
+      return setPrefs(typeof raw === "string" ? JSON.parse(raw) : raw);
+    } catch (error) {
+      console.log(`[goei] 기본 설정을 읽지 못했어요: ${error instanceof Error ? error.message : String(error)}`);
+      return getPrefs();
     }
   }
   async function saveVarDefaults(prefixes, state) {
@@ -1932,13 +1956,13 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
     const head = inline ? "" : `<header class="gn-post-head"><h2 class="gn-post-title">${esc7(p.title)}</h2>
           <div class="gn-post-meta"><span class="gn-post-who">${p.mine ? `<b class="gn-me">${esc7(p.nick)}</b>` : who}</span>
             <span>${esc7(p.date)}</span><span class="gn-post-stat"><span>조회 ${p.views.toLocaleString()}</span><span>추천 ${p.votes.toLocaleString()}</span><span>댓글 ${p.comments.length}</span></span></div></header>`;
-    const tail = inline ? `<span class="gn-chead-act">${again}${p.mine ? right : `<span class="gn-chead-dm">${ICONS.mail}${who}</span>`}</span>` : "";
+    const tail2 = inline ? `<span class="gn-chead-act">${again}${p.mine ? right : `<span class="gn-chead-dm">${ICONS.mail}${who}</span>`}</span>` : "";
     return `<div class="${inline ? "gn-inline" : "ph-room gn-pane"}">${inline ? "" : paneHead2("게시판", `#${p.id}`, again + right)}
     <div class="gn-doc">
       <article class="gn-post">${head}
         <div class="gn-post-body">${body2(p.body)}</div>
       </article>
-      <section class="gn-csec"><div class="gn-chead"><h3 class="gn-ccount">전체 댓글 <b>${p.comments.length}</b>개</h3>${tail}</div>
+      <section class="gn-csec"><div class="gn-chead"><h3 class="gn-ccount">전체 댓글 <b>${p.comments.length}</b>개</h3>${tail2}</div>
         ${p.comments.length ? `<ul class="gn-comments">${commentTree(p, busy5)}</ul>` : '<p class="gn-cnone">아직 댓글이 없어요.</p>'}</section>
     </div>
     ${inline || reply ? "" : composer(busy5, "댓글 입력")}
@@ -3579,15 +3603,4 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .gx-tab { white-space: nowrap; flex: none; }
 .gx-tab-end { margin-left: auto; font-size: 14px; }
 .gx-field { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(340px, 1fr); gap: 20px; padding-top: 12px; padding-bottom: 16px; align-items: start; align-content: start; }
-/* PC: 지도는 옆 목록을 내려도 따라오고, 창 높이에 맞춰 최대한 크게 (v0.11.0) */
-.gx-field > .gx-mapcol { position: sticky; top: 12px; }
-.gx-mapcol, .gx-sidecol { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
-.gx-sidecol .gx-sec { padding: 0; }
-.gx-mapbar { display: flex; gap: 8px; align-items: center; }
-/* 임무 탭 (v0.16.21): 지역 고르기 옆에 장소 검색. 결과는 아래로 펼쳐지는 작은 목록 */
-.gx-mapbar > .gx-select { flex: 0 0 200px; min-width: 0; }
-.gx-mapfind { position: relative; flex: 1; min-width: 0; }
-.gx-mapfind .gx-search { width: 100%; font-size: 13px; }
-.gx-mapsug { position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 30; display: flex; flex-direction: column; max-height: 320px; overflow-y: auto; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); box-shadow: var(--shadow); }
-.gx-mapsug:empty { display: none; }
-.gx-sugi { display
+/* PC: 지도는 옆 목록을 내려도 따라오고,

@@ -1,4 +1,23 @@
-if (c.unread) [c.unread, changed] = [false, true];
+st old = new Map(previous.posts.map((p) => [p.id, p]));
+    const run3 = (rows2, prior, side, wanted) => {
+      const queue2 = /* @__PURE__ */ new Map();
+      for (const r of prior) {
+        const k = `${side(r)}\0${r.nick}\0${r.body}`;
+        queue2.set(k, [...queue2.get(k) ?? [], r]);
+      }
+      for (const r of rows2) {
+        const before = queue2.get(`${side(r)}\0${r.nick}\0${r.body}`)?.shift();
+        r.unread = before ? before.unread : wanted(r);
+        if (!wanted(r)) r.unread = false;
+      }
+    };
+    for (const p of st.posts) run3(p.comments, old.get(p.id)?.comments ?? [], (c) => c.mine ? "me" : "npc", (c) => replyForUser(p, c));
+    run3(st.dms, previous.dms, (d) => d.side, (d) => d.side !== "me");
+  }
+  function acknowledge(st, post, nick) {
+    let changed = false;
+    if (post !== void 0) {
+      for (const c of findPost(st, post)?.comments ?? []) if (c.unread) [c.unread, changed] = [false, true];
     }
     if (nick !== void 0) {
       for (const d of st.dms) if (d.nick === nick && d.unread) [d.unread, changed] = [false, true];
@@ -377,8 +396,8 @@ if (c.unread) [c.unread, changed] = [false, true];
     if (!hasAttachment(input2)) return draft2;
     const literal = /* @__PURE__ */ new Set();
     for (const p of bodyParts(input2)) if (p.kind === "text") for (const line2 of p.text.split("\n")) literal.add(line2.trim());
-    const plain = bodyParts(draft2.content).filter((p) => p.kind === "text").map((p) => p.text).join("").replace(/\[ATTACHMENT A\d+\]/g, "");
-    const kept = plain.split("\n").filter((line2) => {
+    const plain2 = bodyParts(draft2.content).filter((p) => p.kind === "text").map((p) => p.text).join("").replace(/\[ATTACHMENT A\d+\]/g, "");
+    const kept = plain2.split("\n").filter((line2) => {
       const t = line2.trim();
       const note = /^[(\[](.*)[)\]]$/.exec(t)?.[1];
       const label = note?.replace(/：/g, ":").match(/^\s*(.*?)\s*:/)?.[1]?.toLowerCase();
@@ -1592,11 +1611,11 @@ ${body4}
   function updateChat(charIndex, chatIndex, mutate3) {
     const key2 = `${charIndex}:${chatIndex}`;
     const run3 = (queues.get(key2) ?? Promise.resolve()).then(() => saveChat(charIndex, chatIndex, mutate3));
-    const tail = run3.catch(() => {
+    const tail2 = run3.catch(() => {
     });
-    queues.set(key2, tail);
-    void tail.then(() => {
-      if (queues.get(key2) === tail) queues.delete(key2);
+    queues.set(key2, tail2);
+    void tail2.then(() => {
+      if (queues.get(key2) === tail2) queues.delete(key2);
     });
     return run3;
   }
@@ -2917,13 +2936,13 @@ ${outro}${attachments ? `
 
 ${b.read("ATTACHMENTS.READ")}` : ""}`;
   }
-  function pack2(src, b, guideline, format, extras, factionNames2, identity) {
+  function pack2(src, b, guideline, format, extras2, factionNames2, identity) {
     const n = trimTurns(HISTORY.turns);
     const story = n ? storyText(recentTurns(src.chat, n)) : "";
     const t = refToggles(src.chat.scriptstate, "gn");
     const rows2 = collectRefs(src, {
       scope: "gnet",
-      text: `${extras}
+      text: `${extras2}
 ${story}`,
       description: t.description,
       authors: t.authors,
@@ -2938,7 +2957,7 @@ ${refText(rows2)}
 [최근 본문]
 ${story}
 [현재 작업]
-${extras}`;
+${extras2}`;
     const attachments = hasAttachment(material);
     return {
       messages: [
@@ -2996,7 +3015,7 @@ ${commentTimeRule(dateNow(src.chat))}`;
       if (prot) protectedIds.push(p.id);
       return i < HISTORY.refresh || prot;
     });
-    const extras = fill2(b.read("EXTENSION.REQUEST"), {
+    const extras2 = fill2(b.read("EXTENSION.REQUEST"), {
       TIME: dateNow(src.chat),
       USER_NICK: nick,
       KEEP_OWN: String(s4.keepOwn),
@@ -3007,15 +3026,15 @@ ${commentTimeRule(dateNow(src.chat))}`;
       ACTION: b.read("ACTION.REFRESH"),
       BOARD: boardJson(reference)
     }) + incomingTask(plan);
-    return pack2(src, b, guideline, format, extras, factionNames2);
+    return pack2(src, b, guideline, format, extras2, factionNames2);
   }
   function postPrompt(src, st, input2, plan, factionNames2) {
     const b = gnetBooks(src);
     const activity = activityContext(st, null);
     const guideline = [b.read("LB"), b.read("ATTACHMENTS"), b.read("TITLE.GUIDELINE"), b.read("REACT.GUIDELINE"), b.read("PUBLIC.GUIDELINE"), incomingRules(b, plan), activityRules(b, activity.posts)].join("\n\n");
-    const extras = input2 + incomingTask(plan, activity.posts);
+    const extras2 = input2 + incomingTask(plan, activity.posts);
     return { ...pack2(src, b, guideline, `${b.read("PUBLIC.POST_FORMAT")}
-${commentTimeRule(dateNow(src.chat))}`, extras, factionNames2), activity };
+${commentTimeRule(dateNow(src.chat))}`, extras2, factionNames2), activity };
   }
   function commentPrompt(src, st, postId2, replyTo, body4, plan, nick, factionNames2, action = `The protagonist publicly commented: ${body4}`) {
     const b = gnetBooks(src);
@@ -3046,9 +3065,9 @@ ${commentTimeRule(dateNow(src.chat))}`, extras, factionNames2), activity };
     });
     const activity = activityContext(st, p.id);
     const guideline = [b.read("LB"), b.read("ATTACHMENTS"), b.read("REACT.GUIDELINE"), b.read("PUBLIC.GUIDELINE"), incomingRules(b, plan), activityRules(b, activity.posts)].join("\n\n");
-    const extras = task + incomingTask(plan, activity.posts);
+    const extras2 = task + incomingTask(plan, activity.posts);
     return { ...pack2(src, b, guideline, `${b.read("PUBLIC.REACT_FORMAT")}
-${commentTimeRule(dateNow(src.chat))}`, extras, factionNames2), activity, supplied: selected, total };
+${commentTimeRule(dateNow(src.chat))}`, extras2, factionNames2), activity, supplied: selected, total };
   }
   var POST_REFRESH_ACTION = "Time has passed since this post was last viewed. The protagonist did nothing on this post. Other readers return to it: add a few new comments or replies that continue the existing discussion naturally, each from someone other than the protagonist, without repeating earlier comments.";
   function publicBoard(st, query) {
@@ -3166,9 +3185,9 @@ Only print the corrected data wrapped in the required node, without apologies, e
       }
       const END = "%%/SCENE_CARD%%";
       const end = m.content.lastIndexOf(END);
-      const tail = end >= 0 ? m.content.slice(end + END.length).trim() : "";
+      const tail2 = end >= 0 ? m.content.slice(end + END.length).trim() : "";
       let content = stripSceneCard(end >= 0 ? m.content.slice(0, end + END.length) : m.content);
-      const extra = tail ? [tail] : [];
+      const extra = tail2 ? [tail2] : [];
       const next = messages[i + 1];
       if (next?.role === "user" && typeof next.content === "string" && !hasSceneCard(next.content)) {
         if (next.content.trim()) extra.push(next.content.trim());
@@ -3414,13 +3433,13 @@ ${content}` };
     return text.slice(a, b).replace(/\s+/g, " ").trim();
   }
   function rightOk(text, end) {
-    const tail = text.slice(end);
-    if (!isLetter(tail[0])) {
-      const next = tail.replace(/^\s+/, "");
+    const tail2 = text.slice(end);
+    if (!isLetter(tail2[0])) {
+      const next = tail2.replace(/^\s+/, "");
       const honorAt = (h) => next.startsWith(h) && (!isLetter(next[h.length]) || JOSA.some((j) => next.startsWith(j, h.length)));
-      return { ok: true, honor: tail.length !== next.length && HONOR2.some(honorAt) };
+      return { ok: true, honor: tail2.length !== next.length && HONOR2.some(honorAt) };
     }
-    const sfx = SUFFIXES2.find((s4) => tail.startsWith(s4));
+    const sfx = SUFFIXES2.find((s4) => tail2.startsWith(s4));
     if (!sfx) return { ok: false, honor: false };
     return { ok: true, honor: HONOR2.includes(sfx) || sfx === "아" || sfx === "야" };
   }
@@ -3436,10 +3455,10 @@ ${content}` };
           const end = start3 + m[0].length;
           const r = key2.en ? { ok: true, honor: EN_TITLE.test(lower.slice(Math.max(0, start3 - 16), start3)) } : rightOk(lower, end);
           if (!r.ok) continue;
-          const tail = lower.slice(end).replace(/^\s+/, "");
+          const tail2 = lower.slice(end).replace(/^\s+/, "");
           const quoted = OPEN.includes(lower[start3 - 1] ?? "") && CLOSE.includes(lower[end] ?? "");
           const before = lower.slice(Math.max(0, start3 - 20), start3).trimEnd();
-          const marked = quoted || MARKERS2.some((w) => tail.startsWith(w)) || e.groups.some((g) => g && before.endsWith(g.toLowerCase()));
+          const marked = quoted || MARKERS2.some((w) => tail2.startsWith(w)) || e.groups.some((g) => g && before.endsWith(g.toLowerCase()));
           hits.push({ entry: ei, key: key2, start: start3, end, marked, honor: r.honor, snippet: around(text, start3, end) });
         }
       }
@@ -4462,28 +4481,4 @@ The previous response was rejected and nothing was saved. Recreate the complete 
     box.setAttribute("role", "dialog");
     box.innerHTML = `<div class="gx-idpop-card">${html}<button class="gx-agpop-x" aria-label="닫기">✕</button></div>`;
     const theme = document.querySelector(".gx")?.getAttribute("data-theme");
-    if (theme) box.setAttribute("data-theme", theme);
-    box.addEventListener("click", (e) => {
-      if (e.target.closest(".gx-idpop-card") && !e.target.closest(".gx-agpop-x")) return;
-      box.remove();
-    });
-    document.body.appendChild(box);
-  }
-
-  // src/core/josa.ts
-  function josa(word, withBatchim, without) {
-    const last2 = word.trim().slice(-1);
-    const code = last2.charCodeAt(0) - 44032;
-    if (!(code >= 0 && code <= 11171)) return `${word}${withBatchim}(${without})`;
-    return `${word}${code % 28 ? withBatchim : without}`;
-  }
-
-  // src/host/prefs.ts
-  var KEY = "goei:prefs";
-  async function loadPrefs() {
-    try {
-      const raw = await risuai.pluginStorage.getItem(KEY);
-      return setPrefs(typeof raw === "string" ? JSON.parse(raw) : raw);
-    } catch (error) {
-      console.log(`[goei] 기본 설정을 읽지 못했어요: ${error instanceof Error ? error.message : String(error)}`);
-      return getPre
+    if (theme) box.setAttribute("d

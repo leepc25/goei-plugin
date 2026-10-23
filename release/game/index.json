@@ -1,5 +1,5 @@
 {
- "version": "0.16.53",
+ "version": "0.16.54",
  "code": {
   "parts": [
    "goei-game.1.txt",
@@ -13,8 +13,8 @@
    "goei-game.9.txt",
    "goei-game.10.txt"
   ],
-  "length": 1848227,
-  "bytes": 1937272
+  "length": 1855755,
+  "bytes": 1945402
  },
  "packs": [
   {

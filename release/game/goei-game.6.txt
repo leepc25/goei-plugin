@@ -1,4 +1,23 @@
-장", text: "허수아비가 기다린다. 기록은 벽에 붙어 있다." }],
+1100px, 100%); }\n@media (max-height: 520px) {\n  .hq-talk { gap: 10px; padding: 8px 12px; }\n  .hq-face { width: 64px; height: 64px; }\n  .hq .hq-choice { font-size: 15px; }\n  .hq-who { font-size: 15px; }\n  .hq-line { font-size: 15px; margin: 2px 0 6px; }\n  .hq .hq-choice { font-size: 14px; padding: 6px 10px; }\n  .hq-choices { flex-direction: row; flex-wrap: wrap; }\n  .hq-kit { font-size: 15px; margin-bottom: 4px; }\n}\n.hq-result { margin: 0 0 10px; padding-left: 22px; font-size: 22px; line-height: 1.5; text-shadow: 2px 2px 0 #000; }\n@media (max-height: 520px) { .hq-result { font-size: 13px; margin-bottom: 4px; line-height: 1.35; } }\n/* 초점은 하나만: 마우스를 올리거나 초점이 간 단추가 있으면 기본 강조(.on)는 끈다 */\n.hq-talk:not(.fresh):has(.gk-btn:hover, .gk-btn:focus-visible) .gk-btn.on:not(:hover):not(:focus-visible) { border-image: none; color: #b8ae96; }\n.hq-talk.fresh .gk-btn:hover:not(.on) { border-image: none; color: #b8ae96; }\n\n/* 한 글자만 다음 줄로 넘어가지 않게 (독립 검수: 「가세/요.」) */\n.hq-talk, .hq-choice { word-break: keep-all; }\n/* 마지막 줄에 한 단어만 남지 않게 (독립 검수: 「나와요.」「가세요.」) */\n.hq-line, .hq-kit, .hq-talk p { text-wrap: pretty; }\n";
+
+  // src/game/action/hq/lines.ts
+  var provider = null;
+  function setLineProvider(p) {
+    provider = p;
+  }
+  var pick2 = (xs, r) => xs[Math.floor(r() * xs.length) % xs.length];
+  var FALLBACK = {
+    "npc:jaemtri": (c) => [{ who: "잼트리", text: pick2(["오늘 들어온 글 정리해 뒀어요. 하나 골라 주세요.", "출동 전에 규칙서 한 번만 더 봐요. 진짜로요.", "연유 커피 남았는데, 드실래요?"], c.rand) }],
+    "npc:chief": (c) => [{ who: "부장", text: pick2(["예산은 결과로 말하는 거야.", "위험 단계? 기준부터 가져와."], c.rand) }],
+    "npc:supply": (c) => [{ who: "콘쥬스", text: pick2(["아저씨, 아니 오빠! 오늘 회복약 싸게 드릴게요.", "칸은 네 개예요. 욕심내면 다 못 써요."], c.rand) }],
+    "npc:pantry": (c) => [{ who: "데쥬레", text: "미, 믹스커피가 제일이에요. 아메리카노는… 그, 쓴 물이잖아요." }, { who: "고그니쟈", text: "믹스는 진리일세!!! 아메리카노 마시는 자는 내 연구실 출입 금지일세!!!" }],
+    "npc:appraisal": () => [{ who: "데쥬레", text: "이, 이거 가져오신 거예요? 감정해 볼게요. 터지지만 않으면요." }],
+    "npc:lab": () => [{ who: "고그니쟈", text: "자료를 가져왔나!!! 좋네!!! 연구는 돈과 시간이 드는 법일세!!!" }],
+    "npc:tooth": () => [{ who: "격리팀", text: "이빨 요정은 이빨을 먹으면 상자를 줘요. 안에 뭐가 있는지는 저희도 몰라요." }],
+    "npc:office": (c) => [{ who: c.agentName, text: c.fatigue >= 2 ? "…또 나가요? 좀 쉬고 싶은데." : "갈 데 있으면 불러요." }],
+    "npc:clinic": () => [{ who: "의무실", text: "다친 사람은 쉬거나, 예산을 쓰거나." }],
+    "npc:interview": () => [{ who: "면담실", text: "구조된 분들이 기다리고 있어요." }],
+    "npc:training": () => [{ who: "훈련장", text: "허수아비가 기다린다. 기록은 벽에 붙어 있다." }],
     "npc:street": () => [{ who: "종로", text: "사람이 하나도 없는 거리. 인식의 장막 안쪽이다." }],
     "npc:gallery": () => [{ who: "격리 구역", text: "진열장에 회수물이 하나둘 늘어 간다." }],
     "npc:pasta": () => [{ who: "파스타집", text: "공략 축하는 여기서. 오늘은 부장님이 산대요." }],
@@ -1180,6 +1199,9 @@
       document.addEventListener("visibilitychange", this.onVisibility);
       this.root.addEventListener("contextmenu", (e) => e.preventDefault());
       window.addEventListener("touchstart", this.onAnyTouch, { passive: true, capture: true });
+      document.addEventListener("focusin", this.onIme);
+      document.addEventListener("focusout", this.onIme);
+      if (typeof visualViewport !== "undefined") visualViewport?.addEventListener("resize", this.onIme);
       this.layout();
     }
     root;
@@ -1246,7 +1268,7 @@
       const ax = s2.lefty ? safeS + u * 0.8 : bw - safeS - u * 0.8;
       const ay = bh - safeB - u * 0.85;
       const squeeze = portrait ? 0.8 : 1;
-      const rowBtns = portrait ? ["item1", "item2", "item3", "item4", "reload", "support"] : ["item1", "item2", "item3", "item4"];
+      const rowBtns = this.fieldMode ? [] : portrait ? ["item1", "item2", "item3", "item4", "reload", "support"] : ["item1", "item2", "item3", "item4"];
       const side = (bw - stageW) / 2;
       const topInSide = !portrait && side >= u * 0.75;
       for (const b of this.btns) {
@@ -1289,9 +1311,9 @@
     layoutSide(bw, bh, side) {
       const s2 = this.st();
       const g2 = 4, edge2 = 6;
-      const right = ["ult", "unique", "shoot", "guard", "evade", "interact", "jump", "attack"];
-      const left = ["menu", "map", "item1", "item2", "item3", "item4", "reload", "support"];
-      const wR = [1, 1, 1, 1, 1, 1, 1, 1.25];
+      const right = this.fieldMode ? ["interact"] : ["ult", "unique", "shoot", "guard", "evade", "interact", "jump", "attack"];
+      const left = this.fieldMode ? ["menu"] : ["menu", "map", "item1", "item2", "item3", "item4", "reload", "support"];
+      const wR = this.fieldMode ? [1.25] : [1, 1, 1, 1, 1, 1, 1, 1.25];
       const sum = wR.reduce((a, v) => a + v, 0);
       const unit = Math.max(36, Math.min((bh - 2 * edge2 - (right.length - 1) * g2) / sum, side > 40 ? side - 8 : 999, 70)) * s2.touchSize;
       this.u = unit / 0.88;
@@ -1349,11 +1371,37 @@
     }
     baseX = 0;
     baseY = 0;
+    /** 필드: 조사(E)와 메뉴만 둔다. 전투 단추는 숨긴다 */
+    fieldMode = false;
+    /** 입력기(키보드)가 떠 있으면 스틱과 단추를 숨긴다 */
+    imeUp = false;
+    usable(b) {
+      return !this.fieldMode || b.id === "interact" || b.id === "menu";
+    }
+    setField(on) {
+      if (this.fieldMode === on) return;
+      this.fieldMode = on;
+      const it = this.btns.find((b) => b.id === "interact");
+      Object.assign(it, on ? { dx: 0, dy: 0, d: 1.45 } : { dx: -1.55, dy: -2.5, d: 0.95 });
+      it.el.classList.toggle("big", on);
+      for (const b of this.btns) b.el.style.display = this.usable(b) ? "" : "none";
+      this.refresh();
+    }
+    onIme = () => {
+      const vv = typeof visualViewport !== "undefined" ? visualViewport : null;
+      const typing = /^(INPUT|TEXTAREA)$/.test(document.activeElement?.tagName ?? "") || !!document.activeElement?.isContentEditable;
+      const shrunk = !!vv && vv.height < innerHeight * 0.75;
+      const up = typing && (shrunk || this.fieldMode) || shrunk;
+      if (up === this.imeUp) return;
+      this.imeUp = up;
+      if (up) this.releaseAll();
+      this.refresh();
+    };
     refresh() {
       const s2 = this.st();
       const coarse = typeof matchMedia !== "undefined" && matchMedia("(pointer: coarse)").matches;
       const show = s2.touch === "on" || s2.touch === "auto" && (coarse || this.seenTouch);
-      this.root.classList.toggle("hide", !show || !this.visible);
+      this.root.classList.toggle("hide", !show || !this.visible || this.imeUp);
       this.layout();
     }
     setVisible(on) {
@@ -1405,6 +1453,7 @@
     hit(x, y) {
       let best = null, bd = Infinity;
       for (const b of this.btns) {
+        if (!this.usable(b)) continue;
         if (this.root.closest(".exploration-map") && b.id !== "map" && b.id !== "menu") continue;
         if (b.hw) {
           const d4 = Math.max(Math.abs(x - b.cx) / (b.hw + 3), Math.abs(y - b.cy) / (b.hh + 3));
@@ -1567,6 +1616,9 @@
       window.removeEventListener("pointerup", this.onPointerEnd);
       window.removeEventListener("pointercancel", this.onPointerEnd);
       window.removeEventListener("blur", this.onBlur);
+      document.removeEventListener("focusin", this.onIme);
+      document.removeEventListener("focusout", this.onIme);
+      if (typeof visualViewport !== "undefined") visualViewport?.removeEventListener("resize", this.onIme);
       document.removeEventListener("visibilitychange", this.onVisibility);
       window.removeEventListener("touchstart", this.onAnyTouch, { capture: true });
       this.releaseAll();
@@ -1596,6 +1648,7 @@
       else tap(code);
     });
     touch2.vw = () => stage.vw;
+    if (o.field) touch2.setField(true);
     touch2.toLocal = o.toLocal ?? ((x, y, el) => stage.toLocal(x, y, el));
     if (o.fill) stage.setFit("fill");
     else if (o.field) stage.setFit("height");
@@ -3130,83 +3183,4 @@ ${can.ok ? "" : `<p class="hq-warn">${esc2(can.why)}</p>`}</div>
             else if (type === "lobby") spawns.push(hook2("enemy", "lurker", px, lane, 0, false, { harmless: true }));
             break;
           case "enemy":
-            break;
-        }
-      }
-      if (type === "replica" && sub === "red" && r() < 0.6) {
-        const a = cb.x + 120 + Math.floor(r() * 240);
-        const lane0 = r() < 0.5 ? 0 : 80;
-        segments.find((s2) => s2.x === cb.x).terrain.push({ kind: "redfloor", x0: a, x1: a + 160, lane0, lane1: lane0 + 80 });
-      }
-    }
-    const tired = ctx.tired ? 1.3 : 1;
-    const pool = def.enemies;
-    let total = 0;
-    if (pool.length && (!room2 || room2.enemies)) {
-      for (const cb of chunkBase) {
-        if (type === "lobby" && depth === 1 && cb.index < 2 && (!room2 || room2.arrival)) continue;
-        const slots = cb.t.slots.filter((s2) => s2.kind === "enemy");
-        if (!slots.length) continue;
-        let left = Math.round(budgetFor2(depth, cb.index + (room2?.index0 ?? 0), ctx.danger, ctx.flags.length * 2, ctx.growth) * tired);
-        total += left;
-        let n = 0;
-        while (left >= 8 && n < 8) {
-          const ok = pool.filter((e2) => e2.price <= left);
-          if (!ok.length) break;
-          const e = pick3(r, ok);
-          const s2 = slots[n % slots.length];
-          const px = cb.x + (cb.flip ? CHUNK_W - s2.x : s2.x) + (n >= slots.length ? (r() - 0.5) * 160 : 0);
-          spawns.push(hook2("enemy", e.kind, px, n % 2 ? s2.lane ?? MID : r() * LANE_DEPTH, n >= 4 ? 1 : 0, false, {}));
-          left -= e.price;
-          n++;
-        }
-        const mine = spawns.filter((h) => h.role === "enemy" && h.x >= cb.x && h.x < cb.x + CHUNK_W);
-        while (left >= 15 && mine.some((m) => !m.elite)) {
-          mine.find((m) => !m.elite).elite = true;
-          left -= 15;
-        }
-      }
-    }
-    if (type === "dark") spawns.push(hook2("stalker", "warmth", 0, MID, 0, false, { follows: true }));
-    if (type === "deep") for (let k = 0; k < (room2 ? 2 : 6); k++) spawns.push(hook2("stalker", "toucher", chunkBase[Math.min(chunkBase.length - 1, 1 + k % Math.max(1, chunkBase.length - 1))].x + 320, r() * LANE_DEPTH, 0, false, {}));
-    if (type === "replica" && sub === "red" && chunkBase.length) {
-      spawns.push(hook2("stalker", "wallface", chunkBase[0].x + 320, 0, 0, false, { rule: "r11" }));
-    }
-    const b12mark = depth > 4 && type !== "deep" && (!room2 || room2.arrival) && r() < 0.15;
-    if (b12mark) placed.push(place2("b12", chunkBase[0].x + 300, 0, 80, "B-12", { rule: "b12" }));
-    let guardian = null;
-    const guardianP = type === "deep" ? 1 : depth === 3 ? 1 : depth < 3 ? 0 : Math.min(1, (0.35 + (depth - 4) * 0.05) * (b12mark ? 2 : 1));
-    if (room2 ? room2.guardian || type === "trial" && room2.goal : r() < guardianP || type === "trial") {
-      const gx = addRoom("guardian_room");
-      const cands = def.guardians;
-      const g2 = type === "replica" && sub ? cands.find((c) => c.kind === REPLICA_SUB_GUARDIAN[sub]) : cands[mix2(ctx.epoch, depth) % cands.length];
-      guardian = g2.kind;
-      if (type === "deep") {
-        spawns.push(hook2("guardian", g2.kind, gx + 640, MID, 0, false, { label: g2.label, weakness: g2.weakness, survive: true }));
-      } else {
-        spawns.push(hook2("guardian", g2.kind, gx + 900, MID, 0, depth >= 9, { label: g2.label, weakness: g2.weakness, onFail: type === "trial" }));
-        if (g2.kind === "family208") {
-          placed.push(place2("sign", gx + 240, 0, 50, "생존자의 쪽지", { rule: "r11" }));
-          placed.push(place2("childkey", gx + 650, MID, 40, "아이 방 열쇠", { rule: "r11" }));
-          placed.push(place2("childdoor", gx + 1060, 0, 90, "잠긴 아이 방 문", { rule: "r11" }));
-        }
-        if (g2.kind === "elder") placed.push(place2("table", gx + 520, 40, 160, "405호 밥상", { rule: "r_meal", guardian: true }));
-        if (g2.kind === "legs") for (let k = 0; k < 3; k++) placed.push(place2("prop", gx + 200 + k * 300, 120, 60, "틈새 (밀어 막기)", { gap: k }));
-        if (g2.kind === "guard" || g2.kind === "conductor") placed.push(place2("prop", gx + 120, 0, 40, "순찰 경로 표시"));
-      }
-    }
-    if (!room2 || room2.exit) {
-      const end = addRoom(ctx.exitOpen ? "exit_hall" : "elevator_hall");
-      placed.push(place2("panel", end + 900, 0, 80, ctx.exitOpen ? "승강기 패널 (EXIT 불이 켜짐)" : "승강기 패널", { exit: !!ctx.exitOpen }));
-      placed.push(place2("elevator", end + 1080, 0, 160, "열린 엘리베이터"));
-    }
-    if (room2 ? room2.passenger : depth >= 2 && type !== "deep" && r() < 0.5) {
-      const kinds = ["three_years", "markers", "supply", "nothuman", "missing"];
-      const kind = pick3(r, depth < 5 ? kinds.slice(0, 3) : kinds);
-      const honest = rng(mix2(ctx.seed, depth, ctx.epoch, 5150))() < 0.5;
-      const cb = chunkBase[Math.min(chunkBase.length - 1, 1 + Math.floor(r() * Math.max(1, chunkBase.length - 2)))];
-      const flip = ctx.flags.includes("passenger_flip");
-      const storyLong = flip ? honest : !honest;
-      spawns.push(hook2("passenger", kind, cb.x + 420, 30, 0, false, { honest, long: storyLong, fork: forkN > 0 ? 1 : 0 }));
-    }
-    const minor = /* @__PURE__ */
+           

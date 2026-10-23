@@ -1,4 +1,11 @@
- 깨짐: 화면 위 글자 전부가 붉게 번지며 떨린다 (글자는 ui/cctvfx.ts가 바꿈) */
+은 채 0.2초 만에 가로지르고, 지나간 뒤 카메라 노출이 잠깐 튄다 */
+.gx-opshade { z-index: 2; inset: -20% auto -30% 0; width: 85%; }
+.gx-opshade svg { width: 100%; height: 100%; fill: #030204; filter: blur(16px); }
+.gx-opview.fx-shade > .gx-opshade { display: block; animation: gx-shade .22s cubic-bezier(.4, 0, .6, 1) both; }
+@keyframes gx-shade { 0% { transform: translateX(125%) rotate(4deg); opacity: .96; } 100% { transform: translateX(-130%) rotate(-3deg); opacity: .96; } }
+.gx-opview.fx-shade > .gx-opfeed { animation: gx-shadeimg 1.4s ease-out both; }
+@keyframes gx-shadeimg { 0%, 14% { filter: saturate(.5) contrast(1.15) brightness(.85) sepia(.15); } 19% { filter: saturate(.2) contrast(1.4) brightness(1.55) sepia(.1); } 60% { filter: saturate(.35) contrast(1.25) brightness(1.1) sepia(.15); } 100% { filter: saturate(.5) contrast(1.15) brightness(.85) sepia(.15); } }
+/* 글자 깨짐: 화면 위 글자 전부가 붉게 번지며 떨린다 (글자는 ui/cctvfx.ts가 바꿈) */
 .gx-opview.fx-text :is(.gx-oposd, .gx-opcap) { animation: gx-textjit .75s steps(1) both; }
 @keyframes gx-textjit {
   0% { transform: translate(2px, 0); text-shadow: 2px 0 rgba(255, 30, 60, .8), -2px 0 rgba(0, 230, 255, .6); }
@@ -541,7 +548,7 @@
     }
     return { next, lore: lore.count, scripts: scripts.count, fields: fields3 };
   }
-  var PLUGIN_VERSION = true ? "0.16.53" : "0";
+  var PLUGIN_VERSION = true ? "0.16.54" : "0";
 
   // src/host/game/fetch.ts
   var GAME_BASE = UPDATE_BASE ? `${UPDATE_BASE}/game` : "";
@@ -606,7 +613,7 @@
 
   // src/host/game/code.ts
   var CODE_KEY = "goei:game:code";
-  var VERSION = true ? "0.16.53" : "";
+  var VERSION = true ? "0.16.54" : "";
   var codeVersion = (code) => /^\/\/ goei-game (\S+)/.exec(code)?.[1] ?? null;
   var mod = null;
   var codeStats = { readMs: 0, runMs: 0, bytes: 0, fromNet: false };
@@ -1181,11 +1188,114 @@ ${recentStory.map((m) => m.text).join("\n")}`,
     };
   }
 
+  // src/core/field.ts
+  var FIELD_KEY = "goeiFieldV1";
+  var MAX_EVENTS = 300;
+  var KINDS = /* @__PURE__ */ new Set(["move", "act", "hurt", "down", "kill", "flee", "provoke", "gift", "trade", "quest", "follow", "unfollow", "enter_anomaly", "exit_anomaly", "enter_site", "detected", "appoint", "call"]);
+  var plain = (s4, max = 300) => String(s4 ?? "").replace(/\{\{/g, "｛｛").replace(/\}\}/g, "｝｝").replace(/%%/g, "％％").replace(/\s+/g, " ").trim().slice(0, max);
+  function fieldRecord(chat) {
+    const v = chat[FIELD_KEY];
+    const list4 = Array.isArray(v?.events) ? v.events : [];
+    return {
+      events: list4.filter((e) => e && typeof e.id === "string" && typeof e.text === "string" && typeof e.anchor === "string" && typeof e.at === "number" && KINDS.has(e.kind)).slice(-MAX_EVENTS)
+    };
+  }
+  function withFieldEvent(chat, ev) {
+    const old = fieldRecord(chat).events;
+    if (old.some((e) => e.id === ev.id)) return chat;
+    const clean3 = {
+      ...ev,
+      text: plain(ev.text),
+      scene: ev.scene ? plain(ev.scene, 60) : void 0,
+      who: ev.who?.map((w) => plain(w, 40)).slice(0, 8),
+      fact: ev.fact ? { key: plain(ev.fact.key, 40), value: plain(ev.fact.value, 120), ...ev.fact.permanent ? { permanent: true } : {} } : void 0
+    };
+    return { ...chat, [FIELD_KEY]: { events: [...old, clean3].slice(-MAX_EVENTS) } };
+  }
+  function currentFacts(events) {
+    const by = /* @__PURE__ */ new Map();
+    for (const e of [...events].sort((a, b) => a.at - b.at)) if (e.fact?.key) by.set(e.fact.key, e.fact);
+    return [...by.values()];
+  }
+
+  // src/core/fieldgate.ts
+  var IN_STATE = /작전\s*투입/;
+  function presence(i) {
+    if (i.override === "inside") return "inside";
+    const prep = (i.target ?? "").trim() ? "prep" : "none";
+    if (i.override === "outside") return prep;
+    const deployed = i.deployed ?? null;
+    if (i.player) {
+      if (IN_STATE.test(i.state ?? "")) return "inside";
+      if (deployed === true) return "unknown";
+      return prep;
+    }
+    if (deployed === true) return "inside";
+    if (deployed === null) return prep === "prep" ? "unknown" : "none";
+    return prep;
+  }
+  function entryDecision(p) {
+    if (p === "inside") return { allow: false, presence: p, reason: "본편에서 지금 괴이 안에 있어요. 밖으로 나온 뒤에 들어갈 수 있어요." };
+    if (p === "unknown") return { allow: true, presence: p, notice: "본편 상태를 확실히 판단하지 못해 그대로 들어가요." };
+    return { allow: true, presence: p };
+  }
+
+  // src/core/fieldsites.ts
+  var SITES = [
+    { id: "hq", name: "관리국 본부", factions: [] }
+  ];
+  var FALLBACK_SITE = SITES[0];
+  function siteFor(faction) {
+    const f = faction.trim();
+    const hit3 = f ? SITES.find((s4) => s4.factions.includes(f)) : void 0;
+    return hit3 ? { site: hit3, exact: true } : { site: FALLBACK_SITE, exact: false };
+  }
+
+  // src/host/game/field.ts
+  var KINDS2 = ["move", "act", "hurt", "down", "kill", "flee", "provoke", "gift", "trade", "quest", "follow", "unfollow", "enter_anomaly", "exit_anomaly", "enter_site", "detected", "appoint", "call"];
+  function createField() {
+    const opening = loadContext();
+    let chain = Promise.resolve();
+    let forced = null;
+    return {
+      override(v) {
+        forced = v;
+      },
+      async entry() {
+        const c = await loadContext();
+        if (!c) return { allow: true, presence: "unknown", site: "hq", minute: null };
+        const snap = cardSnapshot(c.char, c.chat);
+        const st = lastStatusFields((c.chat.message ?? []).filter((m) => m.role === "char").slice(-6).map((m) => String(m.data ?? "")));
+        const me = snap.agents.find((a) => a.id === snap.player);
+        const p = presence({ player: !!me, state: me?.state, target: st?.target, deployed: st?.deployed ?? null, override: forced });
+        const t = /(\d{1,2}):(\d{2})/.exec(st?.time ?? "");
+        const minute = snap.minute ?? (t ? Number(t[1]) * 60 + Number(t[2]) : null);
+        return { ...entryDecision(p), site: siteFor(snap.faction).site.id, minute };
+      },
+      record(ev) {
+        const run3 = async () => {
+          const origin = await opening;
+          if (!origin) return;
+          const c = await loadContext();
+          if (!c || c.charIndex !== origin.charIndex || c.chatIndex !== origin.chatIndex || c.char.chaId !== origin.char.chaId || c.chat.id !== origin.chat.id) return;
+          if (!KINDS2.includes(ev.kind)) return;
+          const event = { id: crypto.randomUUID(), at: Date.now(), anchor: anchorOf(c.chat), kind: ev.kind, text: ev.text, scene: ev.scene, who: ev.who, weight: ev.weight, fact: ev.fact };
+          await updateChat(c.charIndex, c.chatIndex, (chat) => chat.id === c.chat.id ? withFieldEvent(chat, event) : null);
+        };
+        const next = chain.then(run3, run3);
+        chain = next.catch(() => {
+        });
+        return next;
+      }
+    };
+  }
+
   // src/host/game/index.ts
   function makeBridge(viewport2, slot, close2, onHidden) {
     return {
       api: 1,
       visit: createVisit(),
+      field: createField(),
       slot,
       saves: gameSaves,
       assets: gameAssets,
@@ -3796,112 +3906,4 @@ ${recentStory.map((m) => m.text).join("\n")}`,
     return hit3 === "loading" ? null : hit3;
   }
   var boardMapUrl = (ctx2, env2) => mapImage(ctx2, "01", env2);
-  function pin(action, value, label, x, y, cls, count2 = 0) {
-    return `<button class="gx-pin ${cls}" style="left:${x}%;top:${y}%" data-action="${action}" data-value="${esc15(value)}" aria-label="${esc15(label)}">
-    <span class="gx-dot"></span><span class="gx-pname">${esc15(label)}${count2 ? `<b>${count2}</b>` : ""}</span></button>`;
-  }
-  function hotClass(list4) {
-    if (!list4.length) return "";
-    const kinds = new Set(list4.map((e) => e.kind));
-    return ` hot hot-${kinds.size === 1 ? [...kinds][0] : "all"}`;
-  }
-  var narrow2 = () => matchMedia("(max-width: 760px)").matches;
-  function mapBar(x) {
-    const code = field2.region;
-    const options = ["01", ...MAP_CODES].map((c) => `<option value="${c}"${c === code ? " selected" : ""}>${c === "01" ? "전국" : esc15(regionName(c))}</option>`).join("");
-    const bar = `<div class="gx-mapbar">
-      <select class="gx-select" data-change="map-region" aria-label="지역">${options}</select>
-      <div class="gx-mapfind"><input class="gx-search" type="search" placeholder="장소 검색" value="${esc15(field2.mapq)}" data-input="map-query" aria-label="장소 검색" autocomplete="off">
-        <div class="gx-mapsug">${mapSuggest(x.catalog)}</div></div>
-    </div>`;
-    return bar;
-  }
-  function mapCanvas(ctx2, x, events, env2) {
-    const code = field2.region;
-    const url = mapImage(ctx2, code, env2);
-    const byPlace = /* @__PURE__ */ new Map();
-    for (const e of events) {
-      const k = placeKey(e, x.catalog);
-      byPlace.set(k, [...byPlace.get(k) ?? [], e]);
-    }
-    let pins = "";
-    if (code === "01") {
-      for (const [nn, label, px, py] of NATION_PINS) {
-        const here = events.filter((e) => sidoOf(e.loc) === nn);
-        pins += pin("map-region", nn, label, px, py, `nation${hotClass(here)}`, here.length);
-      }
-    } else {
-      (SIGUN[code] ?? []).forEach((gu, i) => {
-        const xy = REGION_PINS[code]?.[i];
-        const loc = `${code}-${i}`;
-        if (!xy) return;
-        const here = byPlace.get(loc) ?? [];
-        const sel = field2.place === loc || sameTarget(field2.target, loc) ? " sel" : "";
-        pins += pin("map-place", loc, gu, xy[0], xy[1], `${loc === SEALED_LOC ? "sealed" : ""}${hotClass(here)}${sel}`, here.length > 1 ? here.length : 0);
-      });
-      for (const lm of x.catalog.landmarks) {
-        if (lm.sido !== code) continue;
-        const key2 = `fac:${lm.name}`;
-        const here = byPlace.get(key2) ?? [];
-        const sel = field2.place === key2 || sameTarget(field2.target, key2) ? " sel" : "";
-        pins += pin("map-place", key2, lm.label || lm.name, lm.x, lm.y, `fac${hotClass(here)}${sel}`);
-      }
-    }
-    const img = url ? `<img class="gx-mapimg" src="${esc15(url)}" alt="${esc15(code === "01" ? "전국" : regionName(code))} 지도">` : `<div class="gx-mapph">${mapUrls[code] === null ? "지도 이미지를 찾지 못했어요" : "지도 불러오는 중…"}</div>`;
-    return `${narrow2() ? "" : mapBar(x)}
-    <div class="gx-canvas${url ? "" : " ph"}"${url ? ` data-map="${code}"` : ""}><div class="gx-mapzoom">${img}${pins}</div>${url ? mapZoomControls(code !== "01") : ""}</div>`;
-  }
-  function mapSuggest(c) {
-    const q = field2.mapq.trim().toLowerCase();
-    if (!q) return "";
-    const hits = [];
-    for (const code of MAP_CODES) {
-      (SIGUN[code] ?? []).forEach((gu, i) => {
-        if (`${regionName(code)} ${gu}`.toLowerCase().includes(q)) hits.push({ value: `${code}|${code}-${i}`, name: gu, sub: regionName(code) });
-      });
-    }
-    for (const lm of c.landmarks) {
-      if (!MAP_CODES.includes(lm.sido)) continue;
-      if (`${lm.name} ${lm.label ?? ""}`.toLowerCase().includes(q)) hits.push({ value: `${lm.sido}|fac:${lm.name}`, name: lm.label || lm.name, sub: `${regionName(lm.sido)} ${lm.gu}`.trim() });
-    }
-    if (!hits.length) return '<p class="gx-sugnone">일치하는 장소가 없어요.</p>';
-    return hits.slice(0, 8).map((h) => `<button class="gx-sugi" data-action="map-jump" data-value="${esc15(h.value)}"><b>${esc15(h.name)}</b><small>${esc15(h.sub)}</small></button>`).join("");
-  }
-  function mapSuggestFor(ctx2, q) {
-    field2.mapq = q;
-    const x = readCtx(ctx2);
-    return typeof x === "string" ? "" : mapSuggest(x.catalog);
-  }
-  var artCtx = null;
-  function eventRow(e, x, agents) {
-    const w = x.world;
-    const src = e.kind === "an" ? w.an[e.index] : e.kind === "in" ? w.inc[e.index] : w.ms[e.index];
-    const since = src && "since" in src ? elapsedText(w.minute, src.since) : "";
-    const an = e.kind === "an" ? w.an[e.index] : void 0;
-    const badge2 = e.kind === "an" ? an?.exploring ? '<span class="gx-badge op">탐사 중</span>' : '<span class="gx-badge live">활성</span>' : e.kind === "in" ? '<span class="gx-badge hot">진행</span>' : '<span class="gx-badge live">출현</span>';
-    const names4 = codesToNames(e.people || "없음", x.catalog, x.faction).split(/\s*,\s*/).map((n) => n.trim());
-    return evCard({
-      kind: e.kind,
-      name: e.name,
-      grade: e.grade,
-      loc: `${esc15(locName(e.loc))}${since ? ` · ${since}` : ""}`,
-      badge: badge2,
-      chips: peopleChips(x.char, names4, agents, factionNames(x.catalog, x.faction)[x.faction] ?? ""),
-      extra: e.report ? `<span class="gx-evc-sit" title="${esc15(e.report)}">${esc15(e.report)}</span>` : "",
-      key: e.key,
-      open: "pick-event",
-      art: artCtx ? evArt(artCtx, e.name, e.kind, `${locName(e.loc)} ${e.report ?? ""}`) : void 0,
-      pop: e.key,
-      locCode: e.loc,
-      selected: field2.target?.type === "event" && field2.target.key === e.key,
-      confirmEnd: field2.confirmEnd === e.key
-    });
-  }
-  function placeCard(key2, c, on2) {
-    let name;
-    let sub;
-    let wiki2;
-    if (key2.startsWith("fac:")) {
-      const lm = c.landmarks.find((l) => l.name === key2.slice(4));
-      name = lm?.label || lm?.name || key2.slice(4);
-      sub = lm ? placeWhere(lm.sido, lm.gu) :
+  function pin(action, value, label, x, y, cls, coun

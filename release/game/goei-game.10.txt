@@ -1,4 +1,147 @@
-드 중이거나 닳았을 때만
+(key2);
+      } catch {
+        return null;
+      }
+    },
+    save: (v) => {
+      try {
+        localStorage.setItem(key2, v);
+      } catch {
+      }
+    }
+  });
+  var SAVED_KEY = "goei-game-saved";
+  var markSaved = () => local(SAVED_KEY).save("1");
+  var hasSaved = () => local(SAVED_KEY).load() === "1";
+  var fieldClock = { sec: null, place: "" };
+  function hqAdapter(saves, bridge, ui) {
+    const hq2 = createHq();
+    const b = bridge;
+    const slot = b?.slot ?? 0;
+    let root = null;
+    let present = [];
+    const visitReady = b?.visit ? b.visit.state().then((v) => {
+      present = v.agents.filter((a) => a.room).map((a) => ({ name: a.name, room: a.room }));
+    }).catch(() => {
+    }) : Promise.resolve();
+    const ROOM_SCENE = { office: "office", lounge: "lounge", infirmary: "clinic" };
+    const visitors = (sceneId) => {
+      const here = present.filter((p) => ROOM_SCENE[p.room] === sceneId && hasVisitAgent(p.name));
+      const sc = hq2.map().scenes.find((s2) => s2.id === sceneId);
+      if (!sc || !here.length) return [];
+      const [top, bot] = sc.lane ?? [LANE_TOP, LANE_BOT];
+      const slots = sceneId === "office" ? [[630, 0.4], [1e3, 0.5], [1130, 0.85], [620, 0.9], [900, 0.15], [1180, 0.3]] : [[0.36, 0.55], [0.5, 0.35], [0.62, 0.75], [0.44, 0.9], [0.72, 0.45], [0.28, 0.8]].map(([fx2, fy]) => [sc.length * fx2, fy]);
+      return here.slice(0, slots.length).map((p, i) => ({ name: p.name, x: slots[i][0], y: top + (bot - top) * slots[i][1], face: slots[i][0] > (sceneId === "office" ? 820 : sc.length / 2) ? -1 : 1 }));
+    };
+    const hub = makeHub(
+      {
+        map: () => hq2.map(),
+        openPlace: (id) => hq2.openPlace(id),
+        bark: (place3) => hq2.bark(place3),
+        chooseFloor: (o, pick6) => ui.chooseFloor(o, pick6),
+        sfx: (n) => ui.sfx(n),
+        visitors,
+        // 장면을 옮기면 장부에 이동 사건과 지금 위치(확정 사실)를 남긴다
+        entered: (to, from, walkedPx) => {
+          fieldClock.place = to.name;
+          const sec = walkSeconds(walkedPx) + (to.floor !== from.floor ? STAIR_S : DOOR_S);
+          if (fieldClock.sec !== null) fieldClock.sec += sec;
+          const at2 = fieldClock.sec === null ? "" : ` (${clockText(fieldClock.sec)})`;
+          void b?.field?.record({ kind: "move", text: `${from.name} → ${to.name}${at2}`, scene: to.name, weight: 1, fact: { key: "주인공 위치", value: to.name } }).catch(() => {
+          });
+          if (fieldClock.sec !== null) void b?.field?.record({ kind: "move", text: `필드 시각 ${clockText(fieldClock.sec)}`, scene: to.name, weight: 1, fact: { key: "필드 시각", value: clockText(fieldClock.sec) } }).catch(() => {
+          });
+        },
+        overlay: ui.overlay,
+        // 본부 대화창이 떠 있으면 머리 위 표시를 숨긴다 (독립 검수: 브리핑 뒤 ↓ 표시)
+        busy: () => typeof document !== "undefined" && !!document.querySelector(".hq-talk, .hq-over:not(:empty)")
+      },
+      (place3) => whereIs(place3)
+    );
+    return {
+      ready: () => hq2.ready(),
+      visitReady,
+      hub: () => hub,
+      state: () => hq2.state,
+      goto: (place3) => hub.goto(place3),
+      isOpen: () => hq2.isOpen(),
+      close: () => hq2.close(),
+      mount(r, host) {
+        root = r;
+        hq2.mount(r, {
+          deploy: (l) => !bridge?.visit && host.deploy({ ...l, hpMax: l.stats?.hp, launch: l }),
+          load: () => saves.read(slot),
+          resuming: ui.resuming,
+          save: (d3) => (markSaved(), saves.write(slot, d3, { title: "자동 저장", summary: `${hq2.state.day}일차`, schema: "goei-hq/1" })),
+          saves,
+          link: bridge?.card ? {
+            card: async () => {
+              const c = await bridge.card();
+              return c ? { agents: c.agents.map((a) => ({ id: a.id, name: a.name, english: a.english, photo: (b?.photo && a.photo ? b.photo(a.photo) : "") ?? "" })), events: c.events.map((e) => ({ kind: e.kind, name: e.name, loc: e.loc, state: e.state })) } : null;
+            },
+            report: async (p) => {
+              bridge.report?.(p);
+              return "정산 결과를 넘겼습니다. 시작 화면의 본편 연동에서 보고서 붙이기·기록 로어북을 고를 수 있어요.";
+            }
+          } : void 0,
+          closed: () => ui.closed?.(),
+          goto: (id) => hub.goto(id)
+        }, { walk: false });
+      },
+      onReturn(r, run) {
+        const l = run.launch;
+        if (l) hq2.onReturn({ ...r, runId: r.runId ?? l.runId }, l);
+      },
+      unmount: () => hq2.unmount()
+    };
+  }
+  function toHqResult(r, w) {
+    const n = r.notes;
+    return {
+      how: r.how,
+      runId: w.run.launch?.runId,
+      missionDone: n.missionDone ?? r.how === "return",
+      depth: n.depth ?? Math.max(1, w.floor?.depth ?? r.floors),
+      floors: r.floors,
+      kills: r.kills,
+      cash: n.cash ?? 0,
+      shards: n.shards ?? 0,
+      debt: n.debt ?? 0,
+      budget: n.budget ?? 0,
+      teeth: n.teeth ?? 0,
+      bag: n.bag ?? [],
+      itemsLeft: n.itemsLeft ?? w.items.map((it) => it && it.n > 0 ? { id: it.id, n: it.n } : null),
+      found: n.found ?? [],
+      sent: n.sent ?? [],
+      rescued: n.rescued ?? [],
+      bigHit: !!n.bigHit,
+      seconds: r.timeSec,
+      notes: r.notes
+    };
+  }
+  function hudState(w, shell) {
+    const p = w.player;
+    const boss2 = w.boss();
+    const f = w.floor;
+    const d3 = f.depth ?? 0;
+    return {
+      agent: { name: p.label ?? "쟈알디", color: "#c0453a" },
+      hp: p.hp,
+      maxHp: p.hpMax,
+      energy: p.skillCd > 0 ? 75 - p.skillCd : 75,
+      maxEnergy: 75,
+      gauge: p.gauge,
+      armor: p.armor,
+      weapon: heldWeapon(w) ?? { name: "권총", mag: p.ammo, magMax: p.mag, reserve: p.reserve, reload: p.moveKey === "reload" ? p.mf / 4 : null },
+      items: w.items.map((it) => ({ id: it?.id, label: it?.label ?? "", count: it?.n ?? 0 })),
+      field: fieldClock.sec !== null || fieldClock.place ? { clock: fieldClock.sec === null ? void 0 : clockText(fieldClock.sec), place: fieldClock.place || void 0 } : void 0,
+      floor: { depth: d3 ? d3 <= 3 ? `L${d3}` : `B-${d3 - 3}` : "", name: f.title },
+      favor: 0,
+      money: { cash: w.notes.cash ?? 0, budget: 0, research: 0, teeth: 0 },
+      boss: boss2 ? { name: boss2.label, hp: boss2.hp, max: boss2.hpMax } : null,
+      // 아래 자막은 3초까지만 (바닥 띠를 오래 가리지 않게)
+      message: w.subtitle && w.tick - w.subtitleAt < 90 ? w.subtitle.text : void 0,
+      // 가드 게이지는 가드 중이거나 닳았을 때만
       meters: p.guarding || p.guardMeter < 100 ? [{ label: "가드", v: p.guardMeter, max: 100, color: "#9ad08a" }] : [],
       compact: shell.touchShown,
       device: shell.touchShown ? "touch" : shell.input.last,
@@ -17,6 +160,19 @@
     setItemIconDrawer(drawItemIcon);
     const audio = createGameAudio(local("goei-game-audio"));
     let game = null;
+    async function gate2() {
+      const f = bridge?.field;
+      if (!f?.entry) return true;
+      let info = await f.entry().catch(() => null);
+      while (info && !info.allow) {
+        const i = await shell.choose({ title: "지금은 들어갈 수 없어요", lines: [info.reason ?? ""], options: ["닫기", "밖에 있어요"] });
+        if (i !== 1) return false;
+        f.override?.("outside");
+        info = await f.entry().catch(() => null);
+      }
+      if (info?.notice) await shell.choose({ title: "알림", lines: [info.notice], options: ["확인"] });
+      return true;
+    }
     const shell = mountGameShell(box2, {
       synth: true,
       title: bridge?.visit ? "필드" : "차원 승강기",
@@ -24,7 +180,7 @@
       pauseInfo: () => session.error ?? (game?.inHub ? "본부 자동 저장" : "안전 지점 자동 저장 · 전투 중 중단하면 직전 안전 지점부터"),
       onNew: async () => {
         if (bridge?.visit) {
-          game?.start_new();
+          if (await gate2()) game?.start_new();
           return;
         }
         await session.ready;
@@ -39,7 +195,7 @@
       },
       onContinue: async () => {
         if (bridge?.visit) {
-          game?.start_new();
+          if (await gate2()) game?.start_new();
           return;
         }
         await session.ready;
@@ -74,7 +230,7 @@
         }
       }
     };
-    const visit = bridge?.visit ? mountTalk(shell.stage.ui, bridge.visit) : null;
+    const visit = bridge?.visit ? mountTalk(shell.stage.ui, bridge.visit, bridge.field) : null;
     const npc = linkNpcTalk({
       visit: visit ? (name) => {
         if (name) visit.open(name);
@@ -430,6 +586,18 @@
         if (world) world.paused = p;
       },
       onWorld: (w, run) => {
+        if (bridge?.field && run.stageId !== "hq") {
+          const label3 = String(run.stageId ?? "괴이");
+          void bridge.field.record({ kind: "enter_anomaly", text: `작전 투입: ${label3}`, weight: 3, fact: { key: "작전", value: `투입 중 (${label3})` } }).catch(() => {
+          });
+          w.on((e) => {
+            if (e.type !== "run:end") return;
+            const how = e.how;
+            const text2 = `작전 종료 (${how === "evac" ? "후송" : how === "withdraw" ? "철수" : "귀환"}): ${label3}, 처치 ${w.kills}, 부상 ${Math.max(0, Math.round(w.player.hpMax - w.player.hp))}`;
+            void bridge.field.record({ kind: "exit_anomaly", text: text2, weight: 3, fact: { key: "작전", value: `종료 (${how === "evac" ? "후송" : how === "withdraw" ? "철수" : "귀환"})` } }).catch(() => {
+            });
+          });
+        }
         cancelStoryForScene();
         world = w;
         runAgent = run.agent;
@@ -480,7 +648,7 @@
       boot: (g2) => {
         void Promise.all([session.ready, hq2.visitReady]).then(() => {
           elevator.reloadMeta();
-          if (bridge?.visit) g2.start_new();
+          if (bridge?.visit) void gate2().then((ok) => ok ? g2.start_new() : bridge.close?.());
           else if (!bootFromUrl(g2)) g2.toTitle();
         });
         return true;
@@ -3288,7 +3456,7 @@
     }
   }
   var mod = {
-    version: "0.16.53",
+    version: "0.16.54",
     mount: (box2, bridge) => mountPlay(box2, bridge),
     // 이전 시험판: 저장 키와 그림 팩은 예전 그대로 (goei:game · goei:game-action:v1)
     legacy: {

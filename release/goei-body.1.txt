@@ -1,4 +1,4 @@
-// goei-body 0.16.53
+// goei-body 0.16.54
 "use strict";
 (() => {
   // src/core/dispatch.ts
@@ -115,9 +115,9 @@ ${body4}
   }
   function setUnsent(text, on2) {
     if (hasSceneCard(text)) return setSceneUnsent(text, on2);
-    const plain = text.replace(UNSENT_RE, "");
-    return on2 ? `${plain}
-${UNSENT_MARK}` : plain;
+    const plain2 = text.replace(UNSENT_RE, "");
+    return on2 ? `${plain2}
+${UNSENT_MARK}` : plain2;
   }
   var START_RE = /%%GOEI_START%%\r?\n([\s\S]*?)\r?\n%%\/GOEI_START%%(\r?\n?%%GOEI_UNSENT%%)?/g;
   var START_MARK = "%%GOEI_START%%";
@@ -596,10 +596,10 @@ ${tpl.replace(/\[\[INPUT\]\]/g, extra)}`;
       };
     });
     if (placeholdersReady(books)) {
-      const extras = [];
+      const extras2 = [];
       for (const [name, spec] of specs) {
-        if (!spec.playable || !spec.code || BUILTIN.includes(spec.code) || extras.some((f) => f.code === spec.code)) continue;
-        extras.push({
+        if (!spec.playable || !spec.code || BUILTIN.includes(spec.code) || extras2.some((f) => f.code === spec.code)) continue;
+        extras2.push({
           code: spec.code,
           name: spec.title || name,
           affiliation: name,
@@ -617,7 +617,7 @@ ${tpl.replace(/\[\[INPUT\]\]/g, extra)}`;
           org: name
         });
       }
-      out.push(...extras.sort((a, b) => a.code.localeCompare(b.code)));
+      out.push(...extras2.sort((a, b) => a.code.localeCompare(b.code)));
     }
     cache.set(books, out);
     return out;
@@ -649,15 +649,15 @@ ${tpl.replace(/\[\[INPUT\]\]/g, extra)}`;
     freelancer: "Freelancer-type: members take contracted missions."
   };
   function factionVars(lore) {
-    const extras = extraFactions(lore);
+    const extras2 = extraFactions(lore);
     const tag = loreText(lore ?? [], TAG_BOOK);
     const gmName = (f) => f.gmName || f.org || f.name;
     return {
-      $fac_codes: extras.map((f) => ` | ${f.code}`).join(""),
-      $fac_ac: extras.map((f) => `
+      $fac_codes: extras2.map((f) => ` | ${f.code}`).join(""),
+      $fac_ac: extras2.map((f) => `
    - ${f.code} = ${gmName(f)}`).join(""),
-      $fac_pool: extras.map((f) => f.org ?? f.name).filter((n) => !tag.includes(n)).map((n) => ` | ${n}`).join(""),
-      $fac_extra: extras.map((f) => `
+      $fac_pool: extras2.map((f) => f.org ?? f.name).filter((n) => !tag.includes(n)).map((n) => ` | ${n}`).join(""),
+      $fac_extra: extras2.map((f) => `
 
 ### ${gmName(f)} [${f.code}]
 ${f.gmDesc || `A faction the protagonist can belong to. See the 「${f.org}」 entry.`}
@@ -1580,12 +1580,27 @@ ${body4.slice(at).replace(/^\s+/, "")}
   function hasStatusTag(text) {
     return typeof text === "string" && /[[【［]\s*▣\s*[|｜]/.test(text);
   }
+  function extras(x) {
+    const none = (t) => !t || t === "없음" || t === "-" || t === "—";
+    const companions = none(x[0] ?? "") ? [] : x[0].split(/[,，、]/).map((n) => n.trim()).filter((n) => n && !none(n));
+    const d = (x[1] ?? "").trim();
+    return { companions, deployed: x.length < 2 ? null : none(d) ? false : /투입|deployed/i.test(d) };
+  }
+  function tail(rest) {
+    const clean3 = (t) => t === "없음" || t === "-" || t === "—" ? "" : t;
+    const after = rest.slice(1);
+    if (after.length <= 1) return { target: clean3(after[0] ?? ""), ...extras([]) };
+    return { target: clean3(after[0]), ...extras(after.slice(1, 3)) };
+  }
   function fieldsOf(inner) {
     const f = inner.split(/[|｜]/).map((s4) => s4.trim());
     while (f.length && f[f.length - 1] === "") f.pop();
     const clean3 = (t) => t === "없음" || t === "-" || t === "—" ? "" : t;
     if (f.length === 6 && DATE_RE.test(f[0]) && TIME_RE.test(f[1])) {
-      return { date: f[0], time: f[1], weather: f[2], temp: f[3], place: f[4], target: clean3(f[5]) };
+      return { date: f[0], time: f[1], weather: f[2], temp: f[3], place: f[4], target: clean3(f[5]), ...extras([]) };
+    }
+    if (f.length === 8 && DATE_RE.test(f[0]) && TIME_RE.test(f[1])) {
+      return { date: f[0], time: f[1], weather: f[2], temp: f[3], place: f[4], target: clean3(f[5]), ...extras(f.slice(6)) };
     }
     const rest = [...f];
     const take = (re) => {
@@ -1600,9 +1615,9 @@ ${body4.slice(at).replace(/^\s+/, "")}
     if (wi >= 0 && wi <= 1) weather = rest.splice(wi, 1)[0];
     if (!temp && weather) {
       const m = /^(.*?)\s*([-−+]?\d+(?:\.\d+)?\s*(?:°\s*[CcFf]?|℃))$/.exec(weather);
-      if (m) return { date, time: time2, weather: m[1], temp: m[2], place: rest[0] ?? "", target: clean3(rest.slice(1).join(" | ")) };
+      if (m) return { date, time: time2, weather: m[1], temp: m[2], place: rest[0] ?? "", ...tail(rest) };
     }
-    return { date, time: time2, weather, temp, place: rest[0] ?? "", target: clean3(rest.slice(1).join(" | ")) };
+    return { date, time: time2, weather, temp, place: rest[0] ?? "", ...tail(rest) };
   }
   function findStatusTags(text) {
     if (!hasStatusTag(text)) return [];
@@ -1786,7 +1801,7 @@ ${body4.slice(at).replace(/^\s+/, "")}
       const all = findStatusTags(texts[i] ?? "");
       if (!all.length) continue;
       const t = all[all.length - 1];
-      return { date: t.date, time: t.time, weather: t.weather, temp: t.temp, place: t.place, target: t.target };
+      return { date: t.date, time: t.time, weather: t.weather, temp: t.temp, place: t.place, target: t.target, companions: t.companions, deployed: t.deployed };
     }
     return null;
   }
@@ -2985,8 +3000,8 @@ ${body4.slice(at).replace(/^\s+/, "")}
       const left = a === 0 ? "" : hay[a - 1];
       if (!isWord(left)) {
         if (!isWord(hay[b] ?? "")) return true;
-        const tail = hay.slice(b);
-        if (SUFFIXES.some((sfx) => tail.startsWith(sfx) && !isWord(tail[sfx.length] ?? ""))) return true;
+        const tail2 = hay.slice(b);
+        if (SUFFIXES.some((sfx) => tail2.startsWith(sfx) && !isWord(tail2[sfx.length] ?? ""))) return true;
       }
       from = a + 1;
     }
@@ -2996,8 +3011,8 @@ ${body4.slice(at).replace(/^\s+/, "")}
     const hay = content.toLowerCase();
     for (let a = hay.indexOf(term); a >= 0; a = hay.indexOf(term, a + 1)) {
       if (a > 0 && isWord(hay[a - 1])) continue;
-      const tail = hay.slice(a + term.length).replace(/^\s/, "");
-      if (HONOR.some((h) => tail.startsWith(h))) return true;
+      const tail2 = hay.slice(a + term.length).replace(/^\s/, "");
+      if (HONOR.some((h) => tail2.startsWith(h))) return true;
     }
     return false;
   }
@@ -4268,23 +4283,4 @@ ${themeVars("[x-goei-fab]")}
     return false;
   }
   function reconcileUnread(st, previous) {
-    const old = new Map(previous.posts.map((p) => [p.id, p]));
-    const run3 = (rows2, prior, side, wanted) => {
-      const queue2 = /* @__PURE__ */ new Map();
-      for (const r of prior) {
-        const k = `${side(r)}\0${r.nick}\0${r.body}`;
-        queue2.set(k, [...queue2.get(k) ?? [], r]);
-      }
-      for (const r of rows2) {
-        const before = queue2.get(`${side(r)}\0${r.nick}\0${r.body}`)?.shift();
-        r.unread = before ? before.unread : wanted(r);
-        if (!wanted(r)) r.unread = false;
-      }
-    };
-    for (const p of st.posts) run3(p.comments, old.get(p.id)?.comments ?? [], (c) => c.mine ? "me" : "npc", (c) => replyForUser(p, c));
-    run3(st.dms, previous.dms, (d) => d.side, (d) => d.side !== "me");
-  }
-  function acknowledge(st, post, nick) {
-    let changed = false;
-    if (post !== void 0) {
-      for (const c of findPost(st, post)?.comments ?? []) 
+    con

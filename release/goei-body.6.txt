@@ -1,4 +1,112 @@
- "거점";
+t2 = 0) {
+    return `<button class="gx-pin ${cls}" style="left:${x}%;top:${y}%" data-action="${action}" data-value="${esc15(value)}" aria-label="${esc15(label)}">
+    <span class="gx-dot"></span><span class="gx-pname">${esc15(label)}${count2 ? `<b>${count2}</b>` : ""}</span></button>`;
+  }
+  function hotClass(list4) {
+    if (!list4.length) return "";
+    const kinds = new Set(list4.map((e) => e.kind));
+    return ` hot hot-${kinds.size === 1 ? [...kinds][0] : "all"}`;
+  }
+  var narrow2 = () => matchMedia("(max-width: 760px)").matches;
+  function mapBar(x) {
+    const code = field2.region;
+    const options = ["01", ...MAP_CODES].map((c) => `<option value="${c}"${c === code ? " selected" : ""}>${c === "01" ? "전국" : esc15(regionName(c))}</option>`).join("");
+    const bar = `<div class="gx-mapbar">
+      <select class="gx-select" data-change="map-region" aria-label="지역">${options}</select>
+      <div class="gx-mapfind"><input class="gx-search" type="search" placeholder="장소 검색" value="${esc15(field2.mapq)}" data-input="map-query" aria-label="장소 검색" autocomplete="off">
+        <div class="gx-mapsug">${mapSuggest(x.catalog)}</div></div>
+    </div>`;
+    return bar;
+  }
+  function mapCanvas(ctx2, x, events, env2) {
+    const code = field2.region;
+    const url = mapImage(ctx2, code, env2);
+    const byPlace = /* @__PURE__ */ new Map();
+    for (const e of events) {
+      const k = placeKey(e, x.catalog);
+      byPlace.set(k, [...byPlace.get(k) ?? [], e]);
+    }
+    let pins = "";
+    if (code === "01") {
+      for (const [nn, label, px, py] of NATION_PINS) {
+        const here = events.filter((e) => sidoOf(e.loc) === nn);
+        pins += pin("map-region", nn, label, px, py, `nation${hotClass(here)}`, here.length);
+      }
+    } else {
+      (SIGUN[code] ?? []).forEach((gu, i) => {
+        const xy = REGION_PINS[code]?.[i];
+        const loc = `${code}-${i}`;
+        if (!xy) return;
+        const here = byPlace.get(loc) ?? [];
+        const sel = field2.place === loc || sameTarget(field2.target, loc) ? " sel" : "";
+        pins += pin("map-place", loc, gu, xy[0], xy[1], `${loc === SEALED_LOC ? "sealed" : ""}${hotClass(here)}${sel}`, here.length > 1 ? here.length : 0);
+      });
+      for (const lm of x.catalog.landmarks) {
+        if (lm.sido !== code) continue;
+        const key2 = `fac:${lm.name}`;
+        const here = byPlace.get(key2) ?? [];
+        const sel = field2.place === key2 || sameTarget(field2.target, key2) ? " sel" : "";
+        pins += pin("map-place", key2, lm.label || lm.name, lm.x, lm.y, `fac${hotClass(here)}${sel}`);
+      }
+    }
+    const img = url ? `<img class="gx-mapimg" src="${esc15(url)}" alt="${esc15(code === "01" ? "전국" : regionName(code))} 지도">` : `<div class="gx-mapph">${mapUrls[code] === null ? "지도 이미지를 찾지 못했어요" : "지도 불러오는 중…"}</div>`;
+    return `${narrow2() ? "" : mapBar(x)}
+    <div class="gx-canvas${url ? "" : " ph"}"${url ? ` data-map="${code}"` : ""}><div class="gx-mapzoom">${img}${pins}</div>${url ? mapZoomControls(code !== "01") : ""}</div>`;
+  }
+  function mapSuggest(c) {
+    const q = field2.mapq.trim().toLowerCase();
+    if (!q) return "";
+    const hits = [];
+    for (const code of MAP_CODES) {
+      (SIGUN[code] ?? []).forEach((gu, i) => {
+        if (`${regionName(code)} ${gu}`.toLowerCase().includes(q)) hits.push({ value: `${code}|${code}-${i}`, name: gu, sub: regionName(code) });
+      });
+    }
+    for (const lm of c.landmarks) {
+      if (!MAP_CODES.includes(lm.sido)) continue;
+      if (`${lm.name} ${lm.label ?? ""}`.toLowerCase().includes(q)) hits.push({ value: `${lm.sido}|fac:${lm.name}`, name: lm.label || lm.name, sub: `${regionName(lm.sido)} ${lm.gu}`.trim() });
+    }
+    if (!hits.length) return '<p class="gx-sugnone">일치하는 장소가 없어요.</p>';
+    return hits.slice(0, 8).map((h) => `<button class="gx-sugi" data-action="map-jump" data-value="${esc15(h.value)}"><b>${esc15(h.name)}</b><small>${esc15(h.sub)}</small></button>`).join("");
+  }
+  function mapSuggestFor(ctx2, q) {
+    field2.mapq = q;
+    const x = readCtx(ctx2);
+    return typeof x === "string" ? "" : mapSuggest(x.catalog);
+  }
+  var artCtx = null;
+  function eventRow(e, x, agents) {
+    const w = x.world;
+    const src = e.kind === "an" ? w.an[e.index] : e.kind === "in" ? w.inc[e.index] : w.ms[e.index];
+    const since = src && "since" in src ? elapsedText(w.minute, src.since) : "";
+    const an = e.kind === "an" ? w.an[e.index] : void 0;
+    const badge2 = e.kind === "an" ? an?.exploring ? '<span class="gx-badge op">탐사 중</span>' : '<span class="gx-badge live">활성</span>' : e.kind === "in" ? '<span class="gx-badge hot">진행</span>' : '<span class="gx-badge live">출현</span>';
+    const names4 = codesToNames(e.people || "없음", x.catalog, x.faction).split(/\s*,\s*/).map((n) => n.trim());
+    return evCard({
+      kind: e.kind,
+      name: e.name,
+      grade: e.grade,
+      loc: `${esc15(locName(e.loc))}${since ? ` · ${since}` : ""}`,
+      badge: badge2,
+      chips: peopleChips(x.char, names4, agents, factionNames(x.catalog, x.faction)[x.faction] ?? ""),
+      extra: e.report ? `<span class="gx-evc-sit" title="${esc15(e.report)}">${esc15(e.report)}</span>` : "",
+      key: e.key,
+      open: "pick-event",
+      art: artCtx ? evArt(artCtx, e.name, e.kind, `${locName(e.loc)} ${e.report ?? ""}`) : void 0,
+      pop: e.key,
+      locCode: e.loc,
+      selected: field2.target?.type === "event" && field2.target.key === e.key,
+      confirmEnd: field2.confirmEnd === e.key
+    });
+  }
+  function placeCard(key2, c, on2) {
+    let name;
+    let sub;
+    let wiki2;
+    if (key2.startsWith("fac:")) {
+      const lm = c.landmarks.find((l) => l.name === key2.slice(4));
+      name = lm?.label || lm?.name || key2.slice(4);
+      sub = lm ? placeWhere(lm.sido, lm.gu) : "거점";
       wiki2 = lm?.name ?? name;
     } else {
       const full = locName(key2);
@@ -499,16 +607,47 @@ ${note.trim()}` : card2;
   var DEFAULT_RULES = "The block below is a face-to-face conversation the protagonist had at bureau HQ right after the preceding scene and before the next input. It really happened. Nothing else happened in between and only a few minutes passed.";
   var ROOM2 = { office: "사무실", lounge: "휴게실", infirmary: "의무실", quarters: "숙소" };
   var MAX_TURNS = 30;
-  function interludes(chat) {
+  var KIND_LABEL3 = {
+    move: "이동",
+    act: "행동",
+    hurt: "부상",
+    down: "쓰러짐",
+    kill: "살해",
+    flee: "도주",
+    provoke: "도발",
+    gift: "선물",
+    trade: "거래",
+    quest: "의뢰",
+    follow: "동행",
+    unfollow: "동행 해제",
+    enter_anomaly: "괴이 진입",
+    exit_anomaly: "괴이 퇴장",
+    enter_site: "거점 진입",
+    detected: "발각",
+    appoint: "약속",
+    call: "통화"
+  };
+  var MAX_EVENTS2 = 60;
+  var FACTS_HEAD = "[Field facts]";
+  var EVENT_NOTE = "Besides conversations, the block lists other things that happened in the field (movement, actions, fights and so on) in the order they happened. All of it really happened, and time passes naturally as these events imply. If the protagonist ended up somewhere other than where the preceding scene was, continue from the final location in the [Field facts] block.";
+  var FACTS_NOTE = "These are the current facts established in the field. Do not contradict them; permanent changes cannot be undone.";
+  function anchorsOf(chat) {
     const msgs = chat.message ?? [];
     const at = /* @__PURE__ */ new Map();
     msgs.forEach((m, i) => at.set(m.chatId ? String(m.chatId) : `#${i + 1}`, i));
+    return at;
+  }
+  function interludes(chat) {
+    const at = anchorsOf(chat);
     const groups = /* @__PURE__ */ new Map();
-    for (const t of visitRecord(chat).turns) {
-      if (!t.anchor || !at.has(t.anchor)) continue;
-      groups.set(t.anchor, [...groups.get(t.anchor) ?? [], t]);
-    }
-    return [...groups].map(([anchor, turns2]) => ({ anchor, index: at.get(anchor), turns: turns2.slice(-MAX_TURNS) })).sort((a, b) => a.index - b.index);
+    const slot = (a) => groups.get(a) ?? (groups.set(a, { turns: [], events: [] }), groups.get(a));
+    for (const t of visitRecord(chat).turns) if (t.anchor && at.has(t.anchor)) slot(t.anchor).turns.push(t);
+    for (const e of fieldRecord(chat).events) if (at.has(e.anchor)) slot(e.anchor).events.push(e);
+    return [...groups].map(([anchor, g]) => ({ anchor, index: at.get(anchor), turns: g.turns.slice(-MAX_TURNS), events: g.events.slice(-MAX_EVENTS2) })).sort((a, b) => a.index - b.index);
+  }
+  function liveFacts(chat) {
+    const at = anchorsOf(chat);
+    return currentFacts(fieldRecord(chat).events.filter((e) => at.has(e.anchor)));
   }
   function orphanTurns(chat) {
     const live = new Set(interludes(chat).flatMap((g) => g.turns.map((t) => t.id)));
@@ -519,7 +658,14 @@ ${note.trim()}` : card2;
   function interludeText(g, rules3, visitor) {
     const parts = [];
     let at = "";
-    [...g.turns].sort((a, b) => (a.at || 0) - (b.at || 0)).forEach((t) => {
+    const items = [...g.turns.map((t) => ({ at: t.at || 0, turn: t })), ...g.events.map((e) => ({ at: e.at || 0, ev: e }))].sort((a, b) => a.at - b.at);
+    items.forEach(({ turn: t, ev }) => {
+      if (ev) {
+        at = "";
+        parts.push("", `(${KIND_LABEL3[ev.kind]}) ${safe(ev.text)}`);
+        return;
+      }
+      if (!t) return;
       const me = safe(t.visitor || visitor);
       const here = `${t.room ?? ""}|${t.name}`;
       if (here !== at) {
@@ -528,17 +674,27 @@ ${note.trim()}` : card2;
       }
       parts.push(t.act ? `${me} (행동): ${safe(t.user)}` : `${me}: ${safe(t.user)}`, `${safe(t.name)}: ${safe(t.reply)}`, ...(t.extra ?? []).map((e) => `${safe(e.name)} (끼어듦): ${safe(e.line)}`));
     });
-    return [INTERLUDE_HEAD, rules3?.trim() || DEFAULT_RULES, ORDER_NOTE, ...parts].join("\n").replace(/\n{3,}/g, "\n\n");
+    const base = rules3?.trim() || DEFAULT_RULES;
+    const head = g.events.length ? [base.replace(/\s*Nothing else happened in between and only a few minutes passed\./, ""), EVENT_NOTE] : [base];
+    return [INTERLUDE_HEAD, ...head, ORDER_NOTE, ...parts].join("\n").replace(/\n{3,}/g, "\n\n");
+  }
+  function withFieldFacts(messages, chat) {
+    const facts = liveFacts(chat);
+    if (!facts.length || messages.some((m) => typeof m?.content === "string" && m.content.startsWith(FACTS_HEAD))) return messages;
+    const text = [FACTS_HEAD, FACTS_NOTE, ...facts.map((f) => `- ${safe(f.key)}: ${safe(f.value)}${f.permanent ? " (permanent)" : ""}`)].join("\n");
+    const at = messages.map((m) => m?.role).lastIndexOf("user");
+    const block2 = { role: "system", content: text };
+    return at < 0 ? [...messages, block2] : [...messages.slice(0, at), block2, ...messages.slice(at)];
   }
   var norm = (s4) => s4.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
   function findInRequest(messages, msgs, index2) {
     const text = norm(messageText(String(msgs[index2]?.data ?? "")));
     if (!text) return -1;
-    const tail = text.slice(-40);
-    let skip = msgs.slice(index2 + 1).filter((m) => norm(messageText(String(m.data ?? ""))).includes(tail)).length;
+    const tail2 = text.slice(-40);
+    let skip = msgs.slice(index2 + 1).filter((m) => norm(messageText(String(m.data ?? ""))).includes(tail2)).length;
     for (let j = messages.length - 1; j >= 0; j--) {
       const m = messages[j];
-      if (m?.role === "system" || typeof m?.content !== "string" || !norm(m.content).includes(tail)) continue;
+      if (m?.role === "system" || typeof m?.content !== "string" || !norm(m.content).includes(tail2)) continue;
       if (skip-- > 0) continue;
       return j;
     }
@@ -574,6 +730,7 @@ ${note.trim()}` : card2;
     const groups = interludes(chat);
     const rules3 = visitContextRules(ctx2);
     const preview = groups.length ? groups.map((g) => interludeText(g, rules3, visitor)).join("\n\n―――\n\n") : "";
+    const facts = liveFacts(chat);
     const orphans = orphanTurns(chat);
     const p = policySections(ctx2.char.globalLore, VISIT_BOOK);
     const guide = Object.keys(p).length ? Object.entries(p).map(([k, v]) => `@@SECTION ${k}
@@ -582,7 +739,8 @@ ${v.trim()}`).join("\n\n") : "";
     const lastBody = last2 ? `<p class="ps-note">${new Date(last2.at).toLocaleTimeString()} · ${last2.model === "aux" ? "보조" : "메인"} 모델 · 약 ${tokens(last2.messages.map((m) => m.content).join("\n")).toLocaleString()}토큰</p>` + last2.messages.map((m) => `<p class="ps-note"><b>${esc17(m.role)}</b></p>${pre(m.role === "user" ? prettyJson(m.content) : m.content)}`).join("") + `<p class="ps-note"><b>응답 원문</b></p>${pre(last2.raw)}<p class="ps-note"><b>말풍선에 넣은 대사</b></p>${pre(last2.reply)}` : '<p class="ps-note">이번에 창을 연 뒤로 필드에서 보낸 말이 없어요. 필드에서 말을 걸면 여기에 실제로 보낸 내용이 나와요.</p>';
     const clear = orphans.length ? visitUi.confirmClear ? `<div class="st-confirm"><p>본편에 들어가지 않는 대화 ${orphans.length}개를 지울까요?</p><div class="gx-row-btns"><button class="gx-mini danger" data-action="visit-orphans-yes">지우기</button><button class="gx-mini" data-action="visit-orphans-no">취소</button></div></div>` : `<p class="ps-note">다시 굴리거나 지운 답 뒤에서 나눈 대화 ${orphans.length}개는 본편에 들어가지 않아요.</p><div class="gx-row-btns"><button class="gx-mini" data-action="visit-orphans">그 대화 지우기</button></div>` : "";
     const view3 = `<section class="ps-group"><h3>보내는 내용 보기</h3>
-    ${fold("hq-next", `다음 본편 요청에 들어갈 막간 (${groups.reduce((n, g) => n + g.turns.length, 0)}개 대화)`, preview ? pre(preview) : '<p class="ps-note">들어갈 막간이 없어요.</p>')}
+    ${fold("hq-next", `다음 본편 요청에 들어갈 막간 (${groups.reduce((n, g) => n + g.turns.length, 0)}개 대화 · ${groups.reduce((n, g) => n + g.events.length, 0)}개 사건)`, preview ? pre(preview) : '<p class="ps-note">들어갈 막간이 없어요.</p>')}
+    ${fold("hq-facts", `다음 본편 요청에 들어갈 확정 사실 (${facts.length}개)`, facts.length ? pre([FACTS_HEAD, ...facts.map((f) => `- ${f.key}: ${f.value}${f.permanent ? " (permanent)" : ""}`)].join("\n")) : '<p class="ps-note">확정된 사실이 없어요. 필드에서 장면을 옮기면 주인공 위치가 여기에 쌓여요.</p>')}
     ${clear}
     ${fold("hq-last", "마지막 대화 요청", lastBody)}
     ${fold("hq-guide", "지침 전문 (카드 「Visit」 로어북)", guide ? pre(guide) : '<p class="ps-note">카드에 Visit 로어북이 없어요. 설정 → 업데이트로 카드를 업데이트해 주세요.</p>')}
@@ -1418,7 +1576,8 @@ ${v.trim()}`).join("\n\n") : "";
   async function close() {
     shown = false;
     stopCctvFx();
-    closeGame();
+    fieldShown = false;
+    hideGame();
     await risuai.hideContainer();
   }
   async function stagedTheme(ctx2, value) {
@@ -1881,7 +2040,7 @@ ${v.trim()}`).join("\n\n") : "";
       return;
     }
     fieldShown = true;
-    const anchor = view2.kind === "started" ? anchorOf(view2.ctx.chat) : "";
+    const anchor = view2.kind === "started" ? `${view2.ctx.chat.id ?? ""}:${anchorOf(view2.ctx.chat)}` : "";
     if (gameOpen() && anchor !== fieldAnchor) closeGame();
     fieldAnchor = anchor;
     if (gameOpen()) reattachGame(host);
@@ -2138,6 +2297,43 @@ ${v.trim()}`).join("\n\n") : "";
     return [st?.date, st?.time].filter(Boolean).join(" ");
   }
 
+  // src/core/statusctx.ts
+  var STATUS_HEAD = "[Previous status]";
+  var NOTE = "This is the status line of the scene right before the next input; older status lines were removed from the history. Continue from it: advance the time, update the other fields, and output exactly one new [▣] line at the very end of your response.";
+  function lastStatusLine(messages) {
+    for (let i = messages.length - 1; i >= 0; i--) {
+      const m = messages[i];
+      if (m?.role !== "assistant" || typeof m.content !== "string") continue;
+      const tags = findStatusTags(m.content);
+      if (tags.length) return tags[tags.length - 1].raw.trim();
+    }
+    return null;
+  }
+  function stripStatusLines(messages) {
+    return messages.map((m) => {
+      if (m?.role !== "assistant" || typeof m.content !== "string") return m;
+      const tags = findStatusTags(m.content);
+      if (!tags.length) return m;
+      let c = m.content;
+      for (const t of tags) c = c.replace(t.raw, "");
+      return { ...m, content: c.replace(/[ \t]+\n/g, "\n").replace(/\n{3,}/g, "\n\n").trim() };
+    });
+  }
+  function statusBlock(line2) {
+    return `${STATUS_HEAD}
+${line2}
+${NOTE}`;
+  }
+  function withStatusBlock(messages) {
+    if (messages.some((m) => typeof m?.content === "string" && m.content.startsWith(STATUS_HEAD))) return messages;
+    const line2 = lastStatusLine(messages);
+    if (!line2) return messages;
+    const out = stripStatusLines(messages);
+    const at = out.map((m) => m?.role).lastIndexOf("user");
+    const block2 = { role: "system", content: statusBlock(line2) };
+    return at < 0 ? [...out, block2] : [...out.slice(0, at), block2, ...out.slice(at)];
+  }
+
   // src/body.ts
   var PLUGIN_ID = "goei-plugin";
   var WATCH_MS = 1e3;
@@ -2164,6 +2360,7 @@ ${v.trim()}`).join("\n\n") : "";
         const add = ctx2.map((c) => ({ role: "system", content: c }));
         messages = at < 0 ? [...messages, ...add] : [...messages.slice(0, at), ...add, ...messages.slice(at)];
       }
+      messages = withStatusBlock(messages);
     }
     if (!messages.some((m) => typeof m?.content === "string" && m.content.includes(SEED_OPEN))) return messages;
     try {
@@ -2229,10 +2426,10 @@ ${v.trim()}`).join("\n\n") : "";
   async function withVisit(messages) {
     const charIndex = await risuai.getCurrentCharacterIndex();
     const chat = await risuai.getChatFromIndex(charIndex, await risuai.getCurrentChatIndex());
-    if (!chat || !visitRecord(chat).turns.length) return messages;
+    if (!chat || !visitRecord(chat).turns.length && !fieldRecord(chat).events.length) return messages;
     const char = await risuai.getCharacterFromIndex(charIndex);
     const me = char ? playerAgent(char.globalLore, chat.scriptstate) : void 0;
-    return withInterludes(messages, chat, char ? visitContextRules({ char }) : null, me?.name || userInfo().name || "주인공");
+    return withFieldFacts(withInterludes(messages, chat, char ? visitContextRules({ char }) : null, me?.name || userInfo().name || "주인공"), chat);
   }
   var rulesCache = null;
   async function moduleContext(scene) {
@@ -2514,5 +2711,5 @@ ${v.trim()}`).join("\n\n") : "";
   }
 
   // src/body-entry.ts
-  globalThis.__goeiBody = { version: "0.16.53", start: start2 };
+  globalThis.__goeiBody = { version: "0.16.54", start: start2 };
 })();
