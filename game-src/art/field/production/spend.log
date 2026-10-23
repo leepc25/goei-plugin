@@ -1,0 +1,9 @@
+# 전체 캐릭터 제작 비용: API 실사용량과 접수 견적을 구분. 기존 쟈알디 이력은history/state 및 별도spend.log 참고.
+spangdal | image | - | e925d6ba-4f8e-41b9-b58d-53327feda5b9 | status=completed | actual_api_usage={"usd": 0.0, "type": "generations", "generations": 9} | quoted_generations=9
+spangdal | registration | - | 8df9126b-f6ce-43bd-be01-027d0588c203 | status=completed | actual_api_usage={"type": "generations", "generations": 4.0} | quoted_generations=None
+jyaldi | image | - | 78793c7b-f45f-48a6-ab11-0c1d97f86333 | status=processing | actual_api_usage=null | quoted_generations=9
+jaemtri | image | - | a32c319b-d494-4fb0-b04e-1576a6243021 | status=processing | actual_api_usage=null | quoted_generations=9
+aileen | image | - | 10a7c8f0-01b5-438e-91dd-61ba6d991597 | status=processing | actual_api_usage=null | quoted_generations=9
+gorgodio | image | - | 2f655338-9c44-48da-b55f-0aab08174ead | status=processing | actual_api_usage=null | quoted_generations=9
+kyuras | image | - | 67d27e4e-ba4e-46dc-abf8-f9bf728557d9 | status=processing | actual_api_usage=null | quoted_generations=9
+deadpole | image | - | 0568cdf1-af39-4a34-94e1-a492b322a400 | status=processing | actual_api_usage=null | quoted_generations=9
