@@ -1,0 +1,36 @@
+{
+  "group_id": "2cff4536-b35d-4665-847e-83e423c19742",
+  "states": [
+    {
+      "character": {
+        "id": "68f76e20-467c-47ca-b3b8-45cdbaafa109",
+        "name": "Idle",
+        "prompt": "청달래 / Cheong Dal-lae. Adult woman with composed natural slender figure, oval mature face, pale blue-gray eyes and a calm knowing smile. Dark TEAL hair center-parted with LONG STRAIGHT cheek locks down to shoulders, the rest gathered in a low rounded bun behind head. Very dark navy tailored trouser suit, white shirt and dark navy tie. Bare face, no mask or glasses. Do not replace visible pale eyes with black irises from lore. Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches.",
+        "size": {
+          "width": 128,
+          "height": 256
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "low top-down",
+        "created_at": "2026-10-23T22:08:00.052819+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {}
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-10-23T22:23:26.366738"
+}

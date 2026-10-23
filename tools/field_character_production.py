@@ -266,7 +266,17 @@ class Production:
    if any(self.s['jobs'].get(j,{}).get('status')=='processing'for j in c['motions'].values()):continue
    try:
     data=request('/v2/characters/'+c['character_id']+'/zip');(OUT/slug/'character.zip').write_bytes(data)
-    z=zipfile.ZipFile(io.BytesIO(data));meta=json.loads(z.read('metadata.json'));atomic(OUT/slug/'export-metadata.json',meta);c['exported']=True;self.event('exported',slug,{'bytes':len(data),'files':len(z.namelist())})
+    z=zipfile.ZipFile(io.BytesIO(data));meta=json.loads(z.read('metadata.json'));atomic(OUT/slug/'export-metadata.json',meta)
+    if a.get('registration_import_zip'):
+     preserved={}
+     with zipfile.ZipFile(ROOT/a['registration_import_zip']) as before_zip:
+      for dr in ['south','south-east','east','north-east','north','north-west','west','south-west']:
+       if dr in a.get('registration_regenerate_directions',[]):continue
+       name='Idle/rotations/'+dr+'.png';before=Image.open(io.BytesIO(before_zip.read(name))).convert('RGBA');after=Image.open(io.BytesIO(z.read(name))).convert('RGBA')
+       preserved[dr]=before.size==after.size and all(x[3]==y[3] and (not x[3] or x==y)for x,y in zip(before.getdata(),after.getdata()))
+     atomic(OUT/slug/'import-preservation.json',{'visible_rgba_and_alpha_preserved':preserved,'regenerated_directions':a.get('registration_regenerate_directions',[])})
+     assert all(preserved.values()),'Imported direction pixels changed; inspect before export approval'
+    c['exported']=True;self.event('exported',slug,{'bytes':len(data),'files':len(z.namelist())})
    except Exception as e:c['export_error']=str(e)
   self.save()
  def checkpoint(self):

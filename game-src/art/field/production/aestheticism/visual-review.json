@@ -1,0 +1,14 @@
+{
+  "job": "9980fc63-ce77-4f2a-8628-2092e1bf1afe",
+  "job_status": "completed",
+  "decision": "pass",
+  "reason": "입을 닫은 표정과 목의 가는 어두운 봉합 표시를 확대 확인. 붉은 눈·긴 붉은 층진 머리·주근깨·아이보리 관절형 마네킹·목 바깥 RGBA 보존. 머리 볼륨 제외 여성 키 범위, 정면·외곽 정상.",
+  "at": 1792793826.7355766,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

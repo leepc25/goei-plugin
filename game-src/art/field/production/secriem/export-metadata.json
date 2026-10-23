@@ -1,0 +1,36 @@
+{
+  "group_id": "6892004b-97f7-435d-acdc-fd467df52ad5",
+  "states": [
+    {
+      "character": {
+        "id": "cc736d14-93e1-4242-9d54-904baff03c3b",
+        "name": "Idle",
+        "prompt": "세크리엠 / Secriem. Adult vampire woman with pale porcelain skin, natural curving figure, narrow face and calm confident smile, RED eyes. Very LONG straight WHITE hair below waist with thick blunt bangs. Deep RED fitted sleeveless high-neck long dress with a DIAMOND-shaped upper-chest cutout and side slit, matching red dress shoes. Bare arms, no gloves, no extra jewelry, no wings or cape. Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches.",
+        "size": {
+          "width": 128,
+          "height": 256
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "low top-down",
+        "created_at": "2026-10-23T22:00:28.524258+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {}
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-10-23T22:19:32.402990"
+}
