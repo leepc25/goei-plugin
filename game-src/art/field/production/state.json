@@ -4556,7 +4556,7 @@
       "kind": "registration",
       "slug": "do-pil-heon",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792783359.038538,
       "receipt": {
         "usage": null,
@@ -4568,26 +4568,41 @@
       },
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 4.0
         },
         "id": "faf43112-9e06-4989-bfc7-8d71cefa0392",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-23T19:22:39.757719+00:00",
         "last_response": {
-          "status": "building_skeleton",
-          "progress": 0.98,
+          "status": "completed",
           "character_id": "33a06296-5806-4d9c-a827-eb837a91b543",
-          "n_directions": 8,
+          "storage_urls": {
+            "east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/33a06296-5806-4d9c-a827-eb837a91b543/rotations/east.png",
+            "west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/33a06296-5806-4d9c-a827-eb837a91b543/rotations/west.png",
+            "north": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/33a06296-5806-4d9c-a827-eb837a91b543/rotations/north.png",
+            "south": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/33a06296-5806-4d9c-a827-eb837a91b543/rotations/south.png",
+            "north-east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/33a06296-5806-4d9c-a827-eb837a91b543/rotations/north-east.png",
+            "north-west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/33a06296-5806-4d9c-a827-eb837a91b543/rotations/north-west.png",
+            "south-east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/33a06296-5806-4d9c-a827-eb837a91b543/rotations/south-east.png",
+            "south-west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/33a06296-5806-4d9c-a827-eb837a91b543/rotations/south-west.png"
+          },
+          "billing_usage": {
+            "type": "generations",
+            "generations": 4.0
+          },
           "character_name": "도필헌",
-          "queue_position": 0,
           "directions_type": "8-directions",
           "generation_mode": "v3",
-          "skeleton_frames_done": 7,
-          "character_description": "도필헌 / Do Pil-heon. Adult man early50s, neatly swept dark brown hair with gray temples, rectangular black sunglasses, calm dignified clean shaven face, conservative dark brown charcoal trouser suit, white shirt, black necktie and polished black formal shoes. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
-          "generation_started_at": "2026-10-23T19:22:40.981338+00:00",
-          "skeleton_frames_total": 8
+          "directions_count": 8,
+          "character_description": "도필헌 / Do Pil-heon. Adult man early50s, neatly swept dark brown hair with gray temples, rectangular black sunglasses, calm dignified clean shaven face, conservative dark brown charcoal trouser suit, white shirt, black necktie and polished black formal shoes. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow."
         }
+      },
+      "observed_end_epoch": 1792784524.7139611,
+      "elapsed_observed_seconds": 1165.6754231452942,
+      "usage": {
+        "type": "generations",
+        "generations": 4.0
       }
     },
     "acc823fc-13b5-45bc-9047-a7aa6fafebb1": {
@@ -4666,16 +4681,18 @@
         "status": "processing",
         "created_at": "2026-10-23T19:23:55.025835+00:00",
         "last_response": {
-          "status": "correcting_frames",
-          "progress": 0.84,
+          "status": "building_skeleton",
+          "progress": 0.98,
           "character_id": "da459680-eb0e-48ad-be84-cc8a23d8fc02",
           "n_directions": 8,
           "character_name": "김조학",
           "queue_position": 0,
           "directions_type": "8-directions",
           "generation_mode": "v3",
+          "skeleton_frames_done": 3,
           "character_description": "김조학 / Kim Jo-hak. Adult man late40s, short slicked black hair, rectangular black sunglasses, reserved anonymous middle aged face, broad ordinary build, conservative black trouser suit, white shirt, black necktie, black dress shoes. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
-          "generation_started_at": "2026-10-23T19:23:56.200525+00:00"
+          "generation_started_at": "2026-10-23T19:23:56.200525+00:00",
+          "skeleton_frames_total": 8
         }
       }
     },
@@ -4683,7 +4700,7 @@
       "kind": "registration",
       "slug": "lee-do-hyeong",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792783479.6102374,
       "receipt": {
         "usage": null,
@@ -4695,26 +4712,41 @@
       },
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 4.0
         },
         "id": "4f676b89-e087-4071-b5de-8f1509e4d6b3",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-23T19:24:40.155391+00:00",
         "last_response": {
-          "status": "building_skeleton",
-          "progress": 0.98,
+          "status": "completed",
           "character_id": "2e2a302d-0b74-4e22-8af7-4b3f9cfbbbe2",
-          "n_directions": 8,
+          "storage_urls": {
+            "east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/2e2a302d-0b74-4e22-8af7-4b3f9cfbbbe2/rotations/east.png",
+            "west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/2e2a302d-0b74-4e22-8af7-4b3f9cfbbbe2/rotations/west.png",
+            "north": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/2e2a302d-0b74-4e22-8af7-4b3f9cfbbbe2/rotations/north.png",
+            "south": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/2e2a302d-0b74-4e22-8af7-4b3f9cfbbbe2/rotations/south.png",
+            "north-east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/2e2a302d-0b74-4e22-8af7-4b3f9cfbbbe2/rotations/north-east.png",
+            "north-west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/2e2a302d-0b74-4e22-8af7-4b3f9cfbbbe2/rotations/north-west.png",
+            "south-east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/2e2a302d-0b74-4e22-8af7-4b3f9cfbbbe2/rotations/south-east.png",
+            "south-west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/2e2a302d-0b74-4e22-8af7-4b3f9cfbbbe2/rotations/south-west.png"
+          },
+          "billing_usage": {
+            "type": "generations",
+            "generations": 4.0
+          },
           "character_name": "이도형",
-          "queue_position": 0,
           "directions_type": "8-directions",
           "generation_mode": "v3",
-          "skeleton_frames_done": 4,
-          "character_description": "이도형 / Lee Do-hyeong. Adult man late40s, short silver gray hair swept back, black sunglasses, angular confident smiling face, tall solid veteran build, black tailored trouser suit, white shirt, black necktie, black formal shoes. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
-          "generation_started_at": "2026-10-23T19:24:42.006832+00:00",
-          "skeleton_frames_total": 8
+          "directions_count": 8,
+          "character_description": "이도형 / Lee Do-hyeong. Adult man late40s, short silver gray hair swept back, black sunglasses, angular confident smiling face, tall solid veteran build, black tailored trouser suit, white shirt, black necktie, black formal shoes. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow."
         }
+      },
+      "observed_end_epoch": 1792784525.942796,
+      "elapsed_observed_seconds": 1046.3325588703156,
+      "usage": {
+        "type": "generations",
+        "generations": 4.0
       }
     },
     "514150f7-d075-41e0-a202-51ef91df5b79": {
@@ -5000,13 +5032,34 @@
         "status": "processing",
         "enhanced_prompt": null,
         "enhance_usage": null
+      },
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "c5256011-99c7-4078-bbbc-a553b395a670",
+        "status": "processing",
+        "created_at": "2026-10-23T19:41:00.124304+00:00",
+        "last_response": {
+          "status": "correcting_frames",
+          "progress": 0.84,
+          "character_id": "c99d8406-4bd5-4897-aaf2-90b00fa9acab",
+          "n_directions": 8,
+          "character_name": "노기균",
+          "queue_position": 0,
+          "directions_type": "8-directions",
+          "generation_mode": "v3",
+          "character_description": "노기균 / No Gi-gyun. Adult man mid30s, swept back black hair, black aviator sunglasses, prominent healed horizontal scar from the corner of mouth across cheek, sardonic grin, strong athletic build, black trouser suit, white shirt, black necktie, black shoes. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
+          "generation_started_at": "2026-10-23T19:41:02.982467+00:00"
+        }
       }
     },
     "2fe5ceb3-5953-4fec-bd88-fd4ccbe2f7d8": {
       "kind": "image",
       "slug": "song-ju-ik",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792784464.8422585,
       "receipt": {
         "usage": null,
@@ -5021,6 +5074,331 @@
         },
         "estimated_generations": 9,
         "pricing_provisional": true
+      },
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 9.0
+        },
+        "id": "2fe5ceb3-5953-4fec-bd88-fd4ccbe2f7d8",
+        "status": "completed",
+        "created_at": "2026-10-23T19:41:24.407918+00:00",
+        "last_response": {
+          "seed": 10222027,
+          "type": "message_done",
+          "model": "pro_flash",
+          "width": 128,
+          "action": "Removing background",
+          "height": 256,
+          "images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "prompt": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult man late20s, slicked back short black hair, black aviator sunglasses, clean shaven angular confident face, muscular broad shouldered build, dark charcoal trouser suit, white shirt, black necktie, black formal shoes. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 212-224px on128x256; height unspecified; provisional medium stature; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
+          "status": "completed",
+          "asset_id": "92f08423-b057-5b31-9145-65a7ce530454",
+          "image_id": "92f08423-b057-5b31-9145-65a7ce530454",
+          "job_kind": "creator-image",
+          "progress": 1.0,
+          "image_url": "https://s3.eu-central-003.backblazeb2.com/pixellab-generations/production/creator/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/92f08423-b057-5b31-9145-65a7ce530454/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0037e6521c1d7c20000000001%2F20261023%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20261023T194320Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=df204485018ceca045cd3209add1afead9935396777c20a24404b2f0ad282f46",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 9
+          },
+          "generation_id": "974907b0-fb1f-4685-8228-ad23c5b7a229",
+          "billing_charged": true,
+          "original_images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "source_image_id": "92f08423-b057-5b31-9145-65a7ce530454",
+          "creator_image_saved": true,
+          "generation_started_at": "2026-10-23T19:41:27.052346+00:00"
+        }
+      },
+      "observed_end_epoch": 1792784619.8657286,
+      "elapsed_observed_seconds": 155.02347040176392,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 9
+      }
+    },
+    "eacc1a24-47d0-4db2-b85b-f4396e250b09": {
+      "kind": "image",
+      "slug": "kwak-seong-ju",
+      "template": null,
+      "status": "completed",
+      "created_epoch": 1792784544.9029927,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "eacc1a24-47d0-4db2-b85b-f4396e250b09",
+        "image_id": "6bb149f4-2612-50ad-9d82-b8baabe6fc14",
+        "source_image_id": "6bb149f4-2612-50ad-9d82-b8baabe6fc14",
+        "status": "processing",
+        "output_count": 1,
+        "image_size": {
+          "width": 128,
+          "height": 256
+        },
+        "estimated_generations": 9,
+        "pricing_provisional": true
+      },
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 9.0
+        },
+        "id": "eacc1a24-47d0-4db2-b85b-f4396e250b09",
+        "status": "completed",
+        "created_at": "2026-10-23T19:42:27.403357+00:00",
+        "last_response": {
+          "seed": 10222027,
+          "type": "message_done",
+          "model": "pro_flash",
+          "width": 128,
+          "action": "Removing background",
+          "height": 256,
+          "images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "prompt": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult man mid40s, enormous muscular broad build, short spiky black hair, black sunglasses, stern square jaw. Original everyday black trouser suit, white shirt, black necktie, gray tactical shoulder harness visible over jacket, heavy black shoes. Use original portrait daily clothing, no summoned armor or guns. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 212-224px on128x256; height unspecified; provisional medium stature; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
+          "status": "completed",
+          "asset_id": "6bb149f4-2612-50ad-9d82-b8baabe6fc14",
+          "image_id": "6bb149f4-2612-50ad-9d82-b8baabe6fc14",
+          "job_kind": "creator-image",
+          "progress": 1.0,
+          "image_url": "https://s3.eu-central-003.backblazeb2.com/pixellab-generations/production/creator/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/6bb149f4-2612-50ad-9d82-b8baabe6fc14/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0037e6521c1d7c20000000001%2F20261023%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20261023T194429Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=08407cf961c8794f5405c0e597585bf2fc4f76dbbdf881a7bb6f33591e4be531",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 9
+          },
+          "generation_id": "b90d4248-df1f-42e1-85d1-7597e3008959",
+          "queue_position": 0,
+          "billing_charged": true,
+          "original_images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "source_image_id": "6bb149f4-2612-50ad-9d82-b8baabe6fc14",
+          "creator_image_saved": true,
+          "generation_started_at": "2026-10-23T19:42:28.510314+00:00",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792784722.7886558,
+      "elapsed_observed_seconds": 177.8856635093689,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 9
+      }
+    },
+    "e084a777-c8a1-4db0-bc3c-b87cd6cbb888": {
+      "kind": "image",
+      "slug": "cho-seong-choon",
+      "template": null,
+      "status": "completed",
+      "created_epoch": 1792784548.6676152,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "e084a777-c8a1-4db0-bc3c-b87cd6cbb888",
+        "image_id": "01305d4f-fa22-55ab-a799-5ee5a957e49a",
+        "source_image_id": "01305d4f-fa22-55ab-a799-5ee5a957e49a",
+        "status": "processing",
+        "output_count": 1,
+        "image_size": {
+          "width": 128,
+          "height": 256
+        },
+        "estimated_generations": 9,
+        "pricing_provisional": true
+      },
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 9.0
+        },
+        "id": "e084a777-c8a1-4db0-bc3c-b87cd6cbb888",
+        "status": "completed",
+        "created_at": "2026-10-23T19:42:41.424456+00:00",
+        "last_response": {
+          "seed": 10222027,
+          "type": "message_done",
+          "model": "pro_flash",
+          "width": 128,
+          "action": "Removing background",
+          "height": 256,
+          "images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "prompt": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult man late40s, shaggy black hair over forehead, black round sunglasses, weary frowning face, lean veteran build, open black blazer with sleeves rolled to elbows, unbuttoned white shirt collar and visibly loosened black necktie, black trousers and black shoes. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 212-224px on128x256; height unspecified; provisional medium stature; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
+          "status": "completed",
+          "asset_id": "01305d4f-fa22-55ab-a799-5ee5a957e49a",
+          "image_id": "01305d4f-fa22-55ab-a799-5ee5a957e49a",
+          "job_kind": "creator-image",
+          "progress": 1.0,
+          "image_url": "https://s3.eu-central-003.backblazeb2.com/pixellab-generations/production/creator/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/01305d4f-fa22-55ab-a799-5ee5a957e49a/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0037e6521c1d7c20000000001%2F20261023%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20261023T194430Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=ab8d34012ddd4870d8cb9bad8701078fa40ad82138dd0109ce154f1da27ace9a",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 9
+          },
+          "generation_id": "d17f3579-a061-4e59-aa58-a9103c0deb5a",
+          "queue_position": 0,
+          "billing_charged": true,
+          "original_images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "source_image_id": "01305d4f-fa22-55ab-a799-5ee5a957e49a",
+          "creator_image_saved": true,
+          "generation_started_at": "2026-10-23T19:42:43.996871+00:00",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792784722.7888165,
+      "elapsed_observed_seconds": 174.12120151519775,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 9
+      }
+    },
+    "c2aabcc4-7ed0-4bbe-a667-fa2d992a05fd": {
+      "kind": "registration",
+      "slug": "song-ju-ik",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792784632.2271504,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "c2aabcc4-7ed0-4bbe-a667-fa2d992a05fd",
+        "character_id": "76866032-a328-4c7c-84cf-1beb0b1c7cbb",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      },
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "c2aabcc4-7ed0-4bbe-a667-fa2d992a05fd",
+        "status": "processing",
+        "created_at": "2026-10-23T19:43:54.908665+00:00",
+        "last_response": {
+          "status": "correcting_frames",
+          "progress": 0.84,
+          "character_id": "76866032-a328-4c7c-84cf-1beb0b1c7cbb",
+          "n_directions": 8,
+          "character_name": "송주익",
+          "queue_position": 0,
+          "directions_type": "8-directions",
+          "generation_mode": "v3",
+          "character_description": "송주익 / Song Ju-ik. Adult man late20s, slicked back short black hair, black aviator sunglasses, clean shaven angular confident face, muscular broad shouldered build, dark charcoal trouser suit, white shirt, black necktie, black formal shoes. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
+          "generation_started_at": "2026-10-23T19:43:59.132265+00:00"
+        }
+      }
+    },
+    "4ea02ad2-5c4d-4fde-9d88-1281bd5311d4": {
+      "kind": "registration",
+      "slug": "kwak-seong-ju",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792784768.0026062,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "4ea02ad2-5c4d-4fde-9d88-1281bd5311d4",
+        "character_id": "8b308102-0d58-42d4-b73c-10b1aa815d88",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      },
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "4ea02ad2-5c4d-4fde-9d88-1281bd5311d4",
+        "status": "processing",
+        "created_at": "2026-10-23T19:46:08.989943+00:00",
+        "last_response": {
+          "status": "processing",
+          "progress": 0.16000000000000003,
+          "character_id": "8b308102-0d58-42d4-b73c-10b1aa815d88",
+          "n_directions": 8,
+          "character_name": "곽성주",
+          "queue_position": 0,
+          "directions_type": "8-directions",
+          "generation_mode": "v3",
+          "character_description": "곽성주 / Kwak Seong-ju. Adult man mid40s, enormous muscular broad build, short spiky black hair, black sunglasses, stern square jaw. Original everyday black trouser suit, white shirt, black necktie, gray tactical shoulder harness visible over jacket, heavy black shoes. Use original portrait daily clothing, no summoned armor or guns. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
+          "generation_started_at": "2026-10-23T19:46:10.94797+00:00"
+        }
+      }
+    },
+    "fd0e0a01-0f88-476d-8a46-0440db3a02ce": {
+      "kind": "registration",
+      "slug": "cho-seong-choon",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792784773.8684793,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "fd0e0a01-0f88-476d-8a46-0440db3a02ce",
+        "character_id": "1f2250cb-ca5c-4d1f-9b0d-885f752c5974",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      },
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "fd0e0a01-0f88-476d-8a46-0440db3a02ce",
+        "status": "processing",
+        "created_at": "2026-10-23T19:46:15.706632+00:00",
+        "last_response": {
+          "status": "processing",
+          "progress": 0,
+          "character_id": "1f2250cb-ca5c-4d1f-9b0d-885f752c5974",
+          "n_directions": 8,
+          "character_name": "조성춘",
+          "queue_position": 0,
+          "directions_type": "8-directions",
+          "generation_mode": "v3",
+          "character_description": "조성춘 / Cho Seong-choon. Adult man late40s, shaggy black hair over forehead, black round sunglasses, weary frowning face, lean veteran build, open black blazer with sleeves rolled to elbows, unbuttoned white shirt collar and visibly loosened black necktie, black trousers and black shoes. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
+          "generation_started_at": "2026-10-23T19:46:24.699064+00:00"
+        }
       }
     }
   },
@@ -5207,8 +5585,11 @@
       "image": "313ee595-1c75-4c33-9a9a-99e46b29e9e1",
       "registration": "faf43112-9e06-4989-bfc7-8d71cefa0392",
       "motions": {},
-      "ready": false,
-      "image_verified": true
+      "ready": true,
+      "image_verified": true,
+      "skeleton_joints": 18,
+      "rotation_count": 8,
+      "exported": true
     },
     "lee-gil-hwan": {
       "name": "이길환",
@@ -5249,8 +5630,11 @@
       "image": "97c6be5f-46f6-4216-a783-10760dce00b7",
       "registration": "4f676b89-e087-4071-b5de-8f1509e4d6b3",
       "motions": {},
-      "ready": false,
-      "image_verified": true
+      "ready": true,
+      "image_verified": true,
+      "skeleton_joints": 18,
+      "rotation_count": 8,
+      "exported": true
     },
     "go-young-hoon": {
       "name": "고영훈",
@@ -5275,29 +5659,32 @@
     "song-ju-ik": {
       "name": "송주익",
       "group": "fake-bureau",
-      "character_id": null,
+      "character_id": "76866032-a328-4c7c-84cf-1beb0b1c7cbb",
       "image": "2fe5ceb3-5953-4fec-bd88-fd4ccbe2f7d8",
-      "registration": null,
+      "registration": "c2aabcc4-7ed0-4bbe-a667-fa2d992a05fd",
       "motions": {},
-      "ready": false
+      "ready": false,
+      "image_verified": true
     },
     "kwak-seong-ju": {
       "name": "곽성주",
       "group": "fake-bureau",
-      "character_id": null,
-      "image": null,
-      "registration": null,
+      "character_id": "8b308102-0d58-42d4-b73c-10b1aa815d88",
+      "image": "eacc1a24-47d0-4db2-b85b-f4396e250b09",
+      "registration": "4ea02ad2-5c4d-4fde-9d88-1281bd5311d4",
       "motions": {},
-      "ready": false
+      "ready": false,
+      "image_verified": true
     },
     "cho-seong-choon": {
       "name": "조성춘",
       "group": "fake-bureau",
-      "character_id": null,
-      "image": null,
-      "registration": null,
+      "character_id": "1f2250cb-ca5c-4d1f-9b0d-885f752c5974",
+      "image": "e084a777-c8a1-4db0-bc3c-b87cd6cbb888",
+      "registration": "fd0e0a01-0f88-476d-8a46-0440db3a02ce",
       "motions": {},
-      "ready": false
+      "ready": false,
+      "image_verified": true
     },
     "yun-byeong-su": {
       "name": "윤병수",
@@ -8974,9 +9361,294 @@
         "bytes": 102147,
         "files": 9
       }
+    },
+    {
+      "at": "2026-10-23T19:42:04Z",
+      "kind": "completed",
+      "slug": "do-pil-heon",
+      "detail": {
+        "kind": "registration",
+        "template": null,
+        "job_id": "faf43112-9e06-4989-bfc7-8d71cefa0392",
+        "usage": {
+          "type": "generations",
+          "generations": 4.0
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T19:42:05Z",
+      "kind": "completed",
+      "slug": "lee-do-hyeong",
+      "detail": {
+        "kind": "registration",
+        "template": null,
+        "job_id": "4f676b89-e087-4071-b5de-8f1509e4d6b3",
+        "usage": {
+          "type": "generations",
+          "generations": 4.0
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T19:42:23Z",
+      "kind": "character-ready",
+      "slug": "do-pil-heon",
+      "detail": {
+        "3d_joints": 18,
+        "directions": 8
+      }
+    },
+    {
+      "at": "2026-10-23T19:42:24Z",
+      "kind": "character-ready",
+      "slug": "lee-do-hyeong",
+      "detail": {
+        "3d_joints": 18,
+        "directions": 8
+      }
+    },
+    {
+      "at": "2026-10-23T19:42:28Z",
+      "kind": "submitted",
+      "slug": "kwak-seong-ju",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "eacc1a24-47d0-4db2-b85b-f4396e250b09",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "eacc1a24-47d0-4db2-b85b-f4396e250b09",
+          "image_id": "6bb149f4-2612-50ad-9d82-b8baabe6fc14",
+          "source_image_id": "6bb149f4-2612-50ad-9d82-b8baabe6fc14",
+          "status": "processing",
+          "output_count": 1,
+          "image_size": {
+            "width": 128,
+            "height": 256
+          },
+          "estimated_generations": 9,
+          "pricing_provisional": true
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T19:42:44Z",
+      "kind": "submitted",
+      "slug": "cho-seong-choon",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "e084a777-c8a1-4db0-bc3c-b87cd6cbb888",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "e084a777-c8a1-4db0-bc3c-b87cd6cbb888",
+          "image_id": "01305d4f-fa22-55ab-a799-5ee5a957e49a",
+          "source_image_id": "01305d4f-fa22-55ab-a799-5ee5a957e49a",
+          "status": "processing",
+          "output_count": 1,
+          "image_size": {
+            "width": 128,
+            "height": 256
+          },
+          "estimated_generations": 9,
+          "pricing_provisional": true
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T19:42:52Z",
+      "kind": "exported",
+      "slug": "do-pil-heon",
+      "detail": {
+        "bytes": 104180,
+        "files": 9
+      }
+    },
+    {
+      "at": "2026-10-23T19:43:02Z",
+      "kind": "exported",
+      "slug": "lee-do-hyeong",
+      "detail": {
+        "bytes": 97710,
+        "files": 9
+      }
+    },
+    {
+      "at": "2026-10-23T19:43:39Z",
+      "kind": "completed",
+      "slug": "song-ju-ik",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "2fe5ceb3-5953-4fec-bd88-fd4ccbe2f7d8",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 9
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T19:43:52Z",
+      "kind": "image-verified",
+      "slug": "song-ju-ik",
+      "detail": {
+        "size": [
+          128,
+          256
+        ],
+        "bbox": [
+          24,
+          8,
+          104,
+          250
+        ],
+        "colors": 48,
+        "alpha": [
+          0,
+          255
+        ],
+        "original_pixels_preserved": true
+      }
+    },
+    {
+      "at": "2026-10-23T19:44:01Z",
+      "kind": "submitted",
+      "slug": "song-ju-ik",
+      "detail": {
+        "kind": "registration",
+        "template": null,
+        "job_id": "c2aabcc4-7ed0-4bbe-a667-fa2d992a05fd",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "c2aabcc4-7ed0-4bbe-a667-fa2d992a05fd",
+          "character_id": "76866032-a328-4c7c-84cf-1beb0b1c7cbb",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T19:45:22Z",
+      "kind": "completed",
+      "slug": "kwak-seong-ju",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "eacc1a24-47d0-4db2-b85b-f4396e250b09",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 9
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T19:45:22Z",
+      "kind": "completed",
+      "slug": "cho-seong-choon",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "e084a777-c8a1-4db0-bc3c-b87cd6cbb888",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 9
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T19:45:59Z",
+      "kind": "image-verified",
+      "slug": "kwak-seong-ju",
+      "detail": {
+        "size": [
+          128,
+          256
+        ],
+        "bbox": [
+          15,
+          6,
+          110,
+          249
+        ],
+        "colors": 48,
+        "alpha": [
+          0,
+          255
+        ],
+        "original_pixels_preserved": true
+      }
+    },
+    {
+      "at": "2026-10-23T19:46:07Z",
+      "kind": "image-verified",
+      "slug": "cho-seong-choon",
+      "detail": {
+        "size": [
+          128,
+          256
+        ],
+        "bbox": [
+          22,
+          8,
+          99,
+          248
+        ],
+        "colors": 48,
+        "alpha": [
+          0,
+          255
+        ],
+        "original_pixels_preserved": true
+      }
+    },
+    {
+      "at": "2026-10-23T19:46:13Z",
+      "kind": "submitted",
+      "slug": "kwak-seong-ju",
+      "detail": {
+        "kind": "registration",
+        "template": null,
+        "job_id": "4ea02ad2-5c4d-4fde-9d88-1281bd5311d4",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "4ea02ad2-5c4d-4fde-9d88-1281bd5311d4",
+          "character_id": "8b308102-0d58-42d4-b73c-10b1aa815d88",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T19:46:31Z",
+      "kind": "submitted",
+      "slug": "cho-seong-choon",
+      "detail": {
+        "kind": "registration",
+        "template": null,
+        "job_id": "fd0e0a01-0f88-476d-8a46-0440db3a02ce",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "fd0e0a01-0f88-476d-8a46-0440db3a02ce",
+          "character_id": "1f2250cb-ca5c-4d1f-9b0d-885f752c5974",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
     }
   ],
-  "updated_at": 1792784491.4224117,
+  "updated_at": 1792784827.057525,
   "user_stopped_at": 1792778235.6917784,
   "archived_jobs": {
     "304457e9-6577-44f0-af17-97841a9f6720": {
@@ -10295,17 +10967,17 @@
       "saved_frames": 6
     }
   },
-  "last_git_checkpoint": 1792784090.2348592,
+  "last_git_checkpoint": 1792784493.3319528,
   "summary": {
     "jobs": {
       "processing": 6,
-      "completed": 54,
+      "completed": 59,
       "failed": 3,
       "stalled": 0
     },
-    "characters_ready": 11,
+    "characters_ready": 13,
     "characters_total": 55,
-    "images_verified": 19,
+    "images_verified": 22,
     "motions_submitted": 3,
     "motions_target": 1100
   },

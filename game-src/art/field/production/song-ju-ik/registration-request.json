@@ -1,0 +1,14 @@
+{
+  "description": "송주익 / Song Ju-ik. Adult man late20s, slicked back short black hair, black aviator sunglasses, clean shaven angular confident face, muscular broad shouldered build, dark charcoal trouser suit, white shirt, black necktie, black formal shoes. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
+  "reference_image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "n_directions": 8,
+  "view": "low top-down",
+  "template_id": "mannequin",
+  "name": "송주익",
+  "seed": 10222027,
+  "no_background": true
+}

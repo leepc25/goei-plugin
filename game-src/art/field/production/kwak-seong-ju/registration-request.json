@@ -1,0 +1,14 @@
+{
+  "description": "곽성주 / Kwak Seong-ju. Adult man mid40s, enormous muscular broad build, short spiky black hair, black sunglasses, stern square jaw. Original everyday black trouser suit, white shirt, black necktie, gray tactical shoulder harness visible over jacket, heavy black shoes. Use original portrait daily clothing, no summoned armor or guns. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
+  "reference_image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "n_directions": 8,
+  "view": "low top-down",
+  "template_id": "mannequin",
+  "name": "곽성주",
+  "seed": 10222027,
+  "no_background": true
+}
