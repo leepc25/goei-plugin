@@ -1,0 +1,36 @@
+{
+  "group_id": "19a8fa35-6d92-4e2f-9da1-6e5837283d0b",
+  "states": [
+    {
+      "character": {
+        "id": "1f2250cb-ca5c-4d1f-9b0d-885f752c5974",
+        "name": "Idle",
+        "prompt": "조성춘 / Cho Seong-choon. Adult man late40s, shaggy black hair over forehead, black round sunglasses, weary frowning face, lean veteran build, open black blazer with sleeves rolled to elbows, unbuttoned white shirt collar and visibly loosened black necktie, black trousers and black shoes. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
+        "size": {
+          "width": 128,
+          "height": 256
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "low top-down",
+        "created_at": "2026-10-23T19:46:26.114261+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {}
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-10-23T20:10:25.942859"
+}

@@ -1,0 +1,36 @@
+{
+  "group_id": "6a43375e-ba4d-4871-bfae-02bb3bc9d725",
+  "states": [
+    {
+      "character": {
+        "id": "4390bb9b-0e2a-4c65-b70f-da09751397bf",
+        "name": "Idle",
+        "prompt": "윤병수 / Yun Byeong-su. Adult man mid30s, short black hair swept back, black aviator sunglasses, angular stern face, solid athletic build, dark charcoal trouser suit, white shirt, black necktie and black shoes. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
+        "size": {
+          "width": 128,
+          "height": 256
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "low top-down",
+        "created_at": "2026-10-23T19:52:09.393026+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {}
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-10-23T20:10:27.691722"
+}

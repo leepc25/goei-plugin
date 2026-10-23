@@ -5452,7 +5452,7 @@
       "kind": "registration",
       "slug": "cho-seong-choon",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792784773.8684793,
       "receipt": {
         "usage": null,
@@ -5464,24 +5464,41 @@
       },
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 4.0
         },
         "id": "fd0e0a01-0f88-476d-8a46-0440db3a02ce",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-23T19:46:15.706632+00:00",
         "last_response": {
-          "status": "uploading_rotations",
-          "progress": 0.905,
+          "status": "completed",
           "character_id": "1f2250cb-ca5c-4d1f-9b0d-885f752c5974",
-          "n_directions": 8,
+          "storage_urls": {
+            "east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/1f2250cb-ca5c-4d1f-9b0d-885f752c5974/rotations/east.png",
+            "west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/1f2250cb-ca5c-4d1f-9b0d-885f752c5974/rotations/west.png",
+            "north": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/1f2250cb-ca5c-4d1f-9b0d-885f752c5974/rotations/north.png",
+            "south": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/1f2250cb-ca5c-4d1f-9b0d-885f752c5974/rotations/south.png",
+            "north-east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/1f2250cb-ca5c-4d1f-9b0d-885f752c5974/rotations/north-east.png",
+            "north-west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/1f2250cb-ca5c-4d1f-9b0d-885f752c5974/rotations/north-west.png",
+            "south-east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/1f2250cb-ca5c-4d1f-9b0d-885f752c5974/rotations/south-east.png",
+            "south-west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/1f2250cb-ca5c-4d1f-9b0d-885f752c5974/rotations/south-west.png"
+          },
+          "billing_usage": {
+            "type": "generations",
+            "generations": 4.0
+          },
           "character_name": "조성춘",
-          "queue_position": 0,
           "directions_type": "8-directions",
           "generation_mode": "v3",
-          "character_description": "조성춘 / Cho Seong-choon. Adult man late40s, shaggy black hair over forehead, black round sunglasses, weary frowning face, lean veteran build, open black blazer with sleeves rolled to elbows, unbuttoned white shirt collar and visibly loosened black necktie, black trousers and black shoes. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
-          "generation_started_at": "2026-10-23T19:46:24.699064+00:00"
+          "directions_count": 8,
+          "character_description": "조성춘 / Cho Seong-choon. Adult man late40s, shaggy black hair over forehead, black round sunglasses, weary frowning face, lean veteran build, open black blazer with sleeves rolled to elbows, unbuttoned white shirt collar and visibly loosened black necktie, black trousers and black shoes. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow."
         }
+      },
+      "observed_end_epoch": 1792786214.966625,
+      "elapsed_observed_seconds": 1441.0981459617615,
+      "usage": {
+        "type": "generations",
+        "generations": 4.0
       }
     },
     "90e177c3-0c95-4f0b-9703-d97ec0b41c00": {
@@ -5568,7 +5585,7 @@
       "kind": "registration",
       "slug": "yun-byeong-su",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792785118.1640217,
       "receipt": {
         "usage": null,
@@ -5580,24 +5597,41 @@
       },
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 4.0
         },
         "id": "f6f2e349-d5a1-4dfb-8c30-aa7180971954",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-23T19:51:59.539106+00:00",
         "last_response": {
-          "status": "correcting_frames",
-          "progress": 0.84,
+          "status": "completed",
           "character_id": "4390bb9b-0e2a-4c65-b70f-da09751397bf",
-          "n_directions": 8,
+          "storage_urls": {
+            "east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4390bb9b-0e2a-4c65-b70f-da09751397bf/rotations/east.png",
+            "west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4390bb9b-0e2a-4c65-b70f-da09751397bf/rotations/west.png",
+            "north": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4390bb9b-0e2a-4c65-b70f-da09751397bf/rotations/north.png",
+            "south": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4390bb9b-0e2a-4c65-b70f-da09751397bf/rotations/south.png",
+            "north-east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4390bb9b-0e2a-4c65-b70f-da09751397bf/rotations/north-east.png",
+            "north-west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4390bb9b-0e2a-4c65-b70f-da09751397bf/rotations/north-west.png",
+            "south-east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4390bb9b-0e2a-4c65-b70f-da09751397bf/rotations/south-east.png",
+            "south-west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4390bb9b-0e2a-4c65-b70f-da09751397bf/rotations/south-west.png"
+          },
+          "billing_usage": {
+            "type": "generations",
+            "generations": 4.0
+          },
           "character_name": "윤병수",
-          "queue_position": 0,
           "directions_type": "8-directions",
           "generation_mode": "v3",
-          "character_description": "윤병수 / Yun Byeong-su. Adult man mid30s, short black hair swept back, black aviator sunglasses, angular stern face, solid athletic build, dark charcoal trouser suit, white shirt, black necktie and black shoes. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
-          "generation_started_at": "2026-10-23T19:52:07.459426+00:00"
+          "directions_count": 8,
+          "character_description": "윤병수 / Yun Byeong-su. Adult man mid30s, short black hair swept back, black aviator sunglasses, angular stern face, solid athletic build, dark charcoal trouser suit, white shirt, black necktie and black shoes. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow."
         }
+      },
+      "observed_end_epoch": 1792786214.966736,
+      "elapsed_observed_seconds": 1096.8027143478394,
+      "usage": {
+        "type": "generations",
+        "generations": 4.0
       }
     },
     "388b811b-2c33-41b5-9675-a97b22ed3f6c": {
@@ -6136,8 +6170,11 @@
       "image": "e084a777-c8a1-4db0-bc3c-b87cd6cbb888",
       "registration": "fd0e0a01-0f88-476d-8a46-0440db3a02ce",
       "motions": {},
-      "ready": false,
-      "image_verified": true
+      "ready": true,
+      "image_verified": true,
+      "skeleton_joints": 18,
+      "rotation_count": 8,
+      "exported": true
     },
     "yun-byeong-su": {
       "name": "윤병수",
@@ -6146,8 +6183,11 @@
       "image": "90e177c3-0c95-4f0b-9703-d97ec0b41c00",
       "registration": "f6f2e349-d5a1-4dfb-8c30-aa7180971954",
       "motions": {},
-      "ready": false,
-      "image_verified": true
+      "ready": true,
+      "image_verified": true,
+      "skeleton_joints": 18,
+      "rotation_count": 8,
+      "exported": true
     },
     "kim-seong-jin": {
       "name": "김성진",
@@ -10551,9 +10591,75 @@
         "bytes": 129944,
         "files": 9
       }
+    },
+    {
+      "at": "2026-10-23T20:10:14Z",
+      "kind": "completed",
+      "slug": "cho-seong-choon",
+      "detail": {
+        "kind": "registration",
+        "template": null,
+        "job_id": "fd0e0a01-0f88-476d-8a46-0440db3a02ce",
+        "usage": {
+          "type": "generations",
+          "generations": 4.0
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T20:10:14Z",
+      "kind": "completed",
+      "slug": "yun-byeong-su",
+      "detail": {
+        "kind": "registration",
+        "template": null,
+        "job_id": "f6f2e349-d5a1-4dfb-8c30-aa7180971954",
+        "usage": {
+          "type": "generations",
+          "generations": 4.0
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T20:10:15Z",
+      "kind": "character-ready",
+      "slug": "cho-seong-choon",
+      "detail": {
+        "3d_joints": 18,
+        "directions": 8
+      }
+    },
+    {
+      "at": "2026-10-23T20:10:17Z",
+      "kind": "character-ready",
+      "slug": "yun-byeong-su",
+      "detail": {
+        "3d_joints": 18,
+        "directions": 8
+      }
+    },
+    {
+      "at": "2026-10-23T20:10:26Z",
+      "kind": "exported",
+      "slug": "cho-seong-choon",
+      "detail": {
+        "bytes": 105042,
+        "files": 9
+      }
+    },
+    {
+      "at": "2026-10-23T20:10:28Z",
+      "kind": "exported",
+      "slug": "yun-byeong-su",
+      "detail": {
+        "bytes": 101912,
+        "files": 9
+      }
     }
   ],
-  "updated_at": 1792786103.9507067,
+  "updated_at": 1792786408.3671105,
   "user_stopped_at": 1792778235.6917784,
   "archived_jobs": {
     "304457e9-6577-44f0-af17-97841a9f6720": {
@@ -11872,15 +11978,15 @@
       "saved_frames": 6
     }
   },
-  "last_git_checkpoint": 1792785765.1262062,
+  "last_git_checkpoint": 1792786108.3662016,
   "summary": {
     "jobs": {
-      "processing": 2,
-      "completed": 68,
+      "processing": 0,
+      "completed": 70,
       "failed": 3,
       "stalled": 0
     },
-    "characters_ready": 17,
+    "characters_ready": 19,
     "characters_total": 55,
     "images_verified": 25,
     "motions_submitted": 3,
