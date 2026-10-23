@@ -229,7 +229,13 @@ export function mountGameShell(box: HTMLElement, o: ShellOptions = {}): Shell {
         title: o.title ?? '차원 승강기',
         sub: o.sub ?? 'ANOMALY SIMULATION · 관리국 액션',
         noBack: true,
-        items: [
+        // 필드: 저장 이어하기가 없다 (본편 상황판이 곧 저장). 입장 판정은 onNew가 한다
+        items: o.field ? [
+          { type: 'button', label: '필드 입장', act: () => o.onNew?.() },
+          { type: 'button', label: '설정', act: () => shell.openSettings() },
+          { type: 'button', label: '조작법', act: () => shell.openControls() },
+          { type: 'button', label: '나가기', sub: '상황판으로', act: () => (menu.closeAll(), o.field!.onExit()) },
+        ] : [
           ...(has ? [{ type: 'button' as const, label: '이어하기', act: () => o.onContinue?.() }] : []),
           { type: 'button', label: '새로 시작', act: () => o.onNew?.() },
           { type: 'button', label: '설정', act: () => shell.openSettings() },
@@ -251,6 +257,7 @@ export function mountGameShell(box: HTMLElement, o: ShellOptions = {}): Shell {
           { type: 'button', label: '계속', sub: key('Esc'), act: () => menu.closeAll() },
           { type: 'button', label: '설정', act: () => shell.openSettings() },
           { type: 'button', label: '조작법', act: () => shell.openControls() },
+          ...(o.onTitle ? [{ type: 'button' as const, label: '타이틀로', act: () => (menu.closeAll(), o.onTitle!()) }] : []),
           { type: 'button', label: '필드 나가기', sub: '상황판으로', act: () => (menu.closeAll(), o.field!.onExit()) },
         ] : [
           ...(hud.last ? [{ type: 'html' as const, html: statusHtml(hud.last) }] : []),

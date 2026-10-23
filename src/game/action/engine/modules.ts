@@ -59,6 +59,8 @@ const hasSaved = () => local(SAVED_KEY).load() === '1';
 
 /** 본부 모듈을 엔진 모양으로 감싼다 */
 /** 필드 시각 (초). 입장할 때 본편 시각과 합치고, 걸을 때마다 늘어난다 */
+/** 필드 제목 화면 글자 (이름 「괴이 ː ANOMALY」) */
+const VISIT_TITLE = { title: '괴이 ː ANOMALY', sub: '필드 · 요원들을 만나고 본편 대화를 이어갑니다' };
 const fieldClock: { sec: number | null; place: string } = { sec: null, place: '' };
 
 function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: HubHost['chooseFloor']; sfx: (n: string) => void; closed?: () => void; resuming?: () => boolean; overlay?: HubHost['overlay'] }): HqModuleLike & { close(): void; goto(place: string): void; state(): { day: number; rescued: string[] }; visitReady: Promise<void> } {
@@ -240,8 +242,8 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
   }
   const shell = mountGameShell(box, {
     synth: true,
-    title: bridge?.visit ? '필드' : '차원 승강기',
-    sub: bridge?.visit ? '요원들을 만나고 본편 대화를 이어갑니다' : 'ANOMALY SIMULATION · 관리국 액션',
+    title: bridge?.visit ? VISIT_TITLE.title : '차원 승강기',
+    sub: bridge?.visit ? VISIT_TITLE.sub : 'ANOMALY SIMULATION · 관리국 액션',
     pauseInfo: () => session.error ?? (game?.inHub ? '본부 자동 저장' : '안전 지점 자동 저장 · 전투 중 중단하면 직전 안전 지점부터'),
     onNew: async () => {
       if (bridge?.visit) { if (await gate()) game?.start_new(); return; }
@@ -265,7 +267,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     },
     hasSave: () => session.hasSave || hasSaved(),
     onRetreat: () => bridge?.visit ? bridge.close?.() : game?.endRun('withdraw'),
-    onTitle: () => bridge?.visit ? bridge.close?.() : game?.toTitle(),
+    onTitle: () => game?.toTitle(),
     toLocal: bridge?.viewport ? (x, y, el) => bridge.viewport!.toLocal(x, y, el) : undefined,
     field: bridge?.visit ? { onExit: () => bridge.close?.() } : undefined,
   });
@@ -554,7 +556,8 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
   const armOpening = () => {
     if (openingT) clearTimeout(openingT);
     openingT = null;
-    if (!VIDEOS.opening || !canFilm()) return;
+    // 필드: 오프닝 영상은 차원 승강기 이야기라 틀지 않는다
+    if (bridge?.visit || !VIDEOS.opening || !canFilm()) return;
     openingT = setTimeout(() => {
       openingT = null;
       if (shell.mode !== 'title' || story.isBlocking()) return armOpening();
@@ -728,9 +731,9 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       if (!cutOnce(how === 'evac' ? 'evac' : 'attic', once)) once();
     },
     drawIdle: (name, ctx, t) => {
-      if (name === 'title') drawTitleBg(ctx, t);
+      if (name === 'title') bridge?.visit ? drawTitleBg(ctx, t, VISIT_TITLE.title, VISIT_TITLE.sub) : drawTitleBg(ctx, t);
     },
-    boot: (g) => { void Promise.all([session.ready, hq.visitReady]).then(() => { elevator.reloadMeta(); if (bridge?.visit) void gate().then((ok) => (ok ? g.start_new() : bridge.close?.())); else if (!bootFromUrl(g)) g.toTitle(); }); return true; },
+    boot: (g) => { void Promise.all([session.ready, hq.visitReady]).then(() => { elevator.reloadMeta(); if (bridge?.visit || !bootFromUrl(g)) g.toTitle(); }); return true; },
     dispose: () => {
       window.removeEventListener('pagehide', saveOnHide);
       document.removeEventListener('visibilitychange', saveOnHide);

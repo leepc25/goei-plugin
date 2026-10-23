@@ -3104,7 +3104,8 @@ function drawTitleBg(c, t2, title = "차원 승강기", sub = "ANOMALY SIMULATIO
   c.save();
   c.shadowColor = `rgba(255,90,40,${0.55 * glow})`;
   c.shadowBlur = 30;
-  blit(c, pixelText(title, 30, "#fff3d0", "#ffb43a"), 640, 138, 5);
+  const logo = pixelText(title, 30, "#fff3d0", "#ffb43a");
+  blit(c, logo, 640, 138, Math.min(5, Math.floor(1180 / logo.width)));
   c.restore();
   blit(c, pixelText(sub, 10, "#c8d0d4", "#9aa6ab", 700), 640, 362, 2);
   if (Math.sin(t2 * 3.2) > -0.3) blit(c, pixelText("무료 플레이", 10, "#ffe9a8", "#f0b45a", 800), 1180, 676, 2);
@@ -4594,7 +4595,13 @@ function mountGameShell(box2, o = {}) {
         title: o.title ?? "차원 승강기",
         sub: o.sub ?? "ANOMALY SIMULATION · 관리국 액션",
         noBack: true,
-        items: [
+        // 필드: 저장 이어하기가 없다 (본편 상황판이 곧 저장). 입장 판정은 onNew가 한다
+        items: o.field ? [
+          { type: "button", label: "필드 입장", act: () => o.onNew?.() },
+          { type: "button", label: "설정", act: () => shell2.openSettings() },
+          { type: "button", label: "조작법", act: () => shell2.openControls() },
+          { type: "button", label: "나가기", sub: "상황판으로", act: () => (menu.closeAll(), o.field.onExit()) }
+        ] : [
           ...has ? [{ type: "button", label: "이어하기", act: () => o.onContinue?.() }] : [],
           { type: "button", label: "새로 시작", act: () => o.onNew?.() },
           { type: "button", label: "설정", act: () => shell2.openSettings() },
@@ -4615,6 +4622,7 @@ function mountGameShell(box2, o = {}) {
           { type: "button", label: "계속", sub: key("Esc"), act: () => menu.closeAll() },
           { type: "button", label: "설정", act: () => shell2.openSettings() },
           { type: "button", label: "조작법", act: () => shell2.openControls() },
+          ...o.onTitle ? [{ type: "button", label: "타이틀로", act: () => (menu.closeAll(), o.onTitle()) }] : [],
           { type: "button", label: "필드 나가기", sub: "상황판으로", act: () => (menu.closeAll(), o.field.onExit()) }
         ] : [
           ...hud2.last ? [{ type: "html", html: statusHtml(hud2.last) }] : [],

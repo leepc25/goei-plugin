@@ -163,7 +163,8 @@ export function drawTitleBg(c: CanvasRenderingContext2D, t: number, title = '차
   c.save();
   c.shadowColor = `rgba(255,90,40,${0.55 * glow})`;
   c.shadowBlur = 30;
-  blit(c, pixelText(title, 30, '#fff3d0', '#ffb43a'), 640, 138, 5);
+  const logo = pixelText(title, 30, '#fff3d0', '#ffb43a');
+  blit(c, logo, 640, 138, Math.min(5, Math.floor(1180 / logo.width))); // 긴 제목은 화면 폭에 맞춰 줄인다
   c.restore();
   blit(c, pixelText(sub, 10, '#c8d0d4', '#9aa6ab', 700), 640, 362, 2);
   // 오락실 구석 글자
