@@ -30,5 +30,8 @@
     }
   },
   "registration_held_slugs": [],
-  "production_priority": "all-roster-character-registration-first"
+  "production_priority": "all-roster-character-registration-first",
+  "after_registration": "roster-order eight-direction visual review and export, then remaining authorized production",
+  "direction_selection_policy": "Compare actual east/west/southeast/southwest rotations per character; select face-visible pair east+southeast or west+southwest. Do not impose one side on all characters.",
+  "registration_failure_policy": "Diagnose and correct source/registration; archive failed results and billing; delete only identified failed character; re-register without duplicating accepted jobs."
 }
