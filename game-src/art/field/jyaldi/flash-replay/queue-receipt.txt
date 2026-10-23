@@ -1,0 +1,19 @@
+{
+  "background_job_id": "87ff5295-7f08-4430-8ef9-e5b7cda84b48",
+  "image_id": "f66a4343-6730-5c1a-90fb-be40a8d36511",
+  "status": "processing",
+  "source_image_id": "f66a4343-6730-5c1a-90fb-be40a8d36511",
+  "job_id": "87ff5295-7f08-4430-8ef9-e5b7cda84b48",
+  "description": "One single full-body adult Korean female player persona for the SAME grounded modern supernatural investigation headquarters game as the style reference. NEW original woman, not a recolor. Jyaldi: a mature woman in her thirties with long loose straight black hair, an asymmetric side part, crimson eyes, a calm stern expression, and a naturally full-busted adult physique. Black tailored blazer and straight black business trousers, white collared shirt with a BLACK NECKTIE, fitted black gloves, plain black closed-toe formal shoes with low practical heels. No weapon, no equipment, no handbag. Natural relaxed standing idle pose: both feet resting on the ground, arms hanging loosely beside her body, both gloved hands clearly visible OUTSIDE all pockets, fingers relaxed. Body and face turned three-quarter toward screen RIGHT, EXACTLY the same direction and eye-level side-scrolling camera as the male style reference, NOT top-down. Realistic adult proportions about 7 heads tall, normal-sized head, not chibi. Full head and shoes entirely visible. Figure fills almost the full vertical canvas, target 244px tall on a 128x256 canvas, only 6px top and bottom safety margin, centered. Match the reference man's precise native pixel density, selective dark outlines, controlled pixel shading, realistic proportions, contrast and lighting. Crisp native 1px clusters, no antialiasing. Black cloth uses charcoal and muted blue-gray shadows with subtle warm amber highlights from an overhead-left interior lamp; subdued natural skin; off-white shirt still clearly reads white. Transparent background, no floor, no cast shadow, no text, only one static woman.",
+  "seed": 10222027,
+  "image_size": {
+    "width": 128,
+    "height": 256
+  },
+  "output_count": 1,
+  "estimated_generations": 9,
+  "pricing_provisional": true,
+  "poll_tool": "get_image",
+  "download_path": "/mcp/images/87ff5295-7f08-4430-8ef9-e5b7cda84b48/download"
+}
+Poll get_image(job_id="87ff5295-7f08-4430-8ef9-e5b7cda84b48"). The source_image_id is usable after completion; it is an image ID, not a character/object ID. Actual usage is reported on completion. cancel_job(job_id=...) cancels unfinished work.

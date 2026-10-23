@@ -1,0 +1,30 @@
+{
+  "canvas": [
+    128,
+    256
+  ],
+  "opaque_colors": 48,
+  "alpha_values": [
+    0,
+    255
+  ],
+  "bbox_exclusive": [
+    28,
+    15,
+    93,
+    250
+  ],
+  "body_height": 235,
+  "sha256": "cb30710df3f6f245eb42006676ad438ee6bb8668f5fb3c24a08eea3756fed5aa",
+  "model": "create_image_pro_flash",
+  "style_gallery_id": "bc8619b0-2610-53be-9470-6de218dc6b17",
+  "seed": 10222027,
+  "job_id": "87ff5295-7f08-4430-8ef9-e5b7cda84b48",
+  "source_image_id": "f66a4343-6730-5c1a-90fb-be40a8d36511",
+  "charged_generations": 9,
+  "elapsed_seconds": 133.81594514846802,
+  "raw_pixels_edited": false,
+  "user_visual_approval": "pending",
+  "registration_calls": 0,
+  "animation_generation_calls": 0
+}

@@ -1,0 +1,18 @@
+{
+  "width": 128,
+  "height": 256,
+  "no_background": true,
+  "seed": 10222027,
+  "max_colors": 48,
+  "description": "One single full-body adult Korean female player persona for the SAME grounded modern supernatural investigation headquarters game as the style reference. NEW original woman, not a recolor. Jyaldi: a mature woman in her thirties with long loose straight black hair, an asymmetric side part, crimson eyes, a calm stern expression, and a naturally full-busted adult physique. Black tailored blazer and straight black business trousers, white collared shirt with a BLACK NECKTIE, fitted black gloves, plain black closed-toe formal shoes with low practical heels. No weapon, no equipment, no handbag. Natural relaxed standing idle pose: both feet resting on the ground, arms hanging loosely beside her body, both gloved hands clearly visible OUTSIDE all pockets, fingers relaxed. Body and face turned three-quarter toward screen RIGHT, EXACTLY the same direction and eye-level side-scrolling camera as the male style reference, NOT top-down. Realistic adult proportions about 7 heads tall, normal-sized head, not chibi. Full head and shoes entirely visible. Figure fills almost the full vertical canvas, target 244px tall on a 128x256 canvas, only 6px top and bottom safety margin, centered. Match the reference man's precise native pixel density, selective dark outlines, controlled pixel shading, realistic proportions, contrast and lighting. Crisp native 1px clusters, no antialiasing. Black cloth uses charcoal and muted blue-gray shadows with subtle warm amber highlights from an overhead-left interior lamp; subdued natural skin; off-white shirt still clearly reads white. Transparent background, no floor, no cast shadow, no text, only one static woman.",
+  "style_image": {
+    "source_image_id": "bc8619b0-2610-53be-9470-6de218dc6b17",
+    "usage_description": "Use this newly created male persona only as the paired character's art-style reference: identical pixel density, rendering detail, adult body proportions, right-facing three-quarter side-scroller view, charcoal black cloth palette, muted skin and warm overhead-left lighting. Make a distinct woman with long straight black hair, black necktie, black gloves and trouser suit; do not retain the male subject."
+  },
+  "style_options": {
+    "color_palette": true,
+    "shading": true,
+    "detail": true,
+    "outline": true
+  }
+}

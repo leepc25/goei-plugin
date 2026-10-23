@@ -31,6 +31,20 @@
 - [PixelLab 생성 원본](pro-style-trial/front-original.png), [4배 확대](pro-style-trial/front-4x.png), [기존 남녀와 비교](pro-style-trial/comparison-4x.png), [완료 영수증](pro-style-trial/completion-receipt.txt), [기술 확인 기록](pro-style-trial/verification.json).
 - 실제 결과: **128×256·48색, 알파 0/255**, 인물 경계 x31~94, y17~247, 몸 높이 231px. 내려받은 원본의 인물·배경 픽셀을 수정하지 않았다.
 - 실제 차감 **10.0 generations**, 요청부터 완료 관측까지 **171.772초**(통신·폴링 포함). 영수증 10회와 계정 전후 차이 10회가 일치한다.
-- 상태: **사용자 시각 검수 대기**. 크기·색 수·알파 확인이 얼굴·체형·스타일의 승인을 뜻하지 않는다. 캐릭터 등록 0회, 애니메이션 생성 0회. 1차 일반 변환 1회와 합쳐 누적 차감 11회다.
+- 상태: **사용자가 기존 여성보다 큰 머리·짧은 목·이상한 비율을 지적한 미승인 결과**. 크기·색 수·알파 확인이 얼굴·체형·스타일의 승인을 뜻하지 않는다. 캐릭터 등록 0회, 애니메이션 생성 0회. 1차 일반 변환 1회와 합쳐 누적 차감 11회다.
 
 ![2차 Pro 이미지 생성 원본 크기](pro-style-trial/front-original.png)
+
+## 3차 시험 · 기존 여성의 Pro Flash 생성 방식 그대로 재현
+
+사용자가 기존 여성과 똑같이 하라고 지시했다. 이전 생성과 다른 도구·편집·변환 경로를 사용하지 않고, 기존 여성의 요청 기록을 복사했다.
+
+- 도구: **`create_image_pro_flash`**, 입력은 **텍스트 + 기존 남성 도트 스타일 참조**(`bc8619b0-2610-53be-9470-6de218dc6b17`). 고해상도 콘셉트 이미지를 별도로 넣지 않았다.
+- 원래 여성과 동일: **128×256, no_background=true, max_colors=48, seed=10222027**, 스타일 옵션 `color_palette/shading/detail/outline` 모두 true. 오른쪽 3/4·눈높이 시점·편하게 서 있는 자세·비율 지시도 같은 문장을 유지했다.
+- 바꾼 것은 외모·복장 설명(쟈알디의 긴 검은 생머리·붉은 눈·성숙한 표정·풍만한 성인 체형·바지 정장·검은 넥타이·장갑)과 그에 해당하는 스타일 사용 설명뿐이다. [동일 설정 검증](flash-replay/same-settings-verification.json), [실제 요청](flash-replay/request.json).
+- [수정 없는 생성 원본](flash-replay/front-original.png), [4배 정수 확대](flash-replay/front-4x.png), [기존 남녀와 같은 배율 비교](flash-replay/comparison-4x.png), [접수 응답](flash-replay/queue-receipt.txt), [완료 영수증](flash-replay/completion-receipt.txt), [파일 검증](flash-replay/verification.json).
+- 실제 결과: **128×256·48색·알파 0/255**, 인물 경계 x28~92, y15~249, 몸 높이 235px. **원본 픽셀·비율·팔레트 수정 없음.**
+- 실제 차감 **9.0 generations**, 요청~완료 관측 **133.816초**(통신·폴링 포함). 실제 영수증과 계정 전후 차이가 일치한다. Job `87ff5295-7f08-4430-8ef9-e5b7cda84b48`, Creator asset `f66a4343-6730-5c1a-90fb-be40a8d36511`.
+- 상태: **사용자 시각 검수 대기**, 등록 0회·동작 생성 0회·게임 반영 없음. 이전 1차·2차 비용을 포함한 누적 실제 차감은 20회다. 기술 검증이나 기존 설정 재현이 자동으로 시각 승인을 뜻하지 않는다.
+
+![3차 Pro Flash 생성 원본 크기](flash-replay/front-original.png)
