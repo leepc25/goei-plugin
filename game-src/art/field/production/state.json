@@ -3659,11 +3659,11 @@
         "last_response": {
           "type": "message_progress",
           "action": "finalizing",
-          "progress": 0.9441718803252981,
+          "progress": 0.9494967283769934,
           "direction": "west",
           "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
           "animation_name": null,
-          "queue_position": 28,
+          "queue_position": 19,
           "generation_model": "skeleton-v3_template",
           "animation_group_id": "e55a2aa8-8043-49d8-aa56-738827421ecd",
           "motion_adjustments": {
@@ -3675,9 +3675,10 @@
           "animation_description": "walking confidently with an upright steady torso, measured strides and restrained arm swing",
           "generation_started_at": "2026-10-23T19:01:42.318913+00:00",
           "template_animation_id": "walking-8-frames",
-          "estimated_wait_seconds": 3027
+          "estimated_wait_seconds": 1984
         }
-      }
+      },
+      "poll_error": "HTTP Error 401: Unauthorized"
     },
     "c8873c16-757b-44c9-817a-9e39fd7247fc": {
       "kind": "animation",
@@ -3708,11 +3709,11 @@
         "last_response": {
           "type": "message_progress",
           "action": "finalizing",
-          "progress": 0.905,
+          "progress": 0.9489454159377614,
           "direction": "west",
           "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
           "animation_name": null,
-          "queue_position": 0,
+          "queue_position": 18,
           "generation_model": "skeleton-v3_template",
           "animation_group_id": "df6204c1-2c29-4058-a3eb-2815504254e5",
           "motion_adjustments": {
@@ -3724,8 +3725,23 @@
           "animation_description": "running decisively with a steady torso, controlled arm swing and firm purposeful strides",
           "generation_started_at": "2026-10-23T19:01:28.978142+00:00",
           "template_animation_id": "running-8-frames",
-          "estimated_wait_seconds": 0
+          "estimated_wait_seconds": 1929
         }
+      }
+    },
+    "9e9f1775-f62b-49a8-a5dc-98686e18c6fc": {
+      "kind": "registration",
+      "slug": "gognija",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792782752.2784128,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "9e9f1775-f62b-49a8-a5dc-98686e18c6fc",
+        "character_id": "8b61f17c-abec-4217-bca6-0850c24fe39c",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
       }
     }
   },
@@ -3778,14 +3794,13 @@
     "aileen": {
       "name": "에일린",
       "group": "management",
-      "character_id": "8fc35b6a-3e82-4148-8ed1-db3481d8cede",
-      "image": "1a3d97f8-4f8a-490e-afd9-5f5754e87060",
-      "registration": "a996f9f5-1eb1-41e6-a7af-377263cff9b3",
+      "character_id": null,
+      "image": "submitting:1792782776649",
+      "registration": null,
       "motions": {},
       "ready": false,
-      "repair_id": "stature-v2-aileen",
-      "visual_review_required": true,
-      "image_verified": true
+      "repair_id": "aileen-user-rebuild-v4",
+      "visual_review_required": true
     },
     "gorgodio": {
       "name": "고르고디오",
@@ -3807,10 +3822,12 @@
       "image": "3591405c-06e8-4141-9afb-81a4e423f965",
       "registration": "b304d6f1-31b5-4a0f-a28c-9c625d4b0fdc",
       "motions": {},
-      "ready": false,
+      "ready": true,
       "repair_id": "stature-v2-kyuras",
       "visual_review_required": true,
-      "image_verified": true
+      "image_verified": true,
+      "skeleton_joints": 18,
+      "rotation_count": 8
     },
     "deadpole": {
       "name": "데드폴",
@@ -3819,10 +3836,12 @@
       "image": "86ea3180-a8b5-44cb-9018-3aae95668543",
       "registration": "5c0844e8-919f-4527-b663-d748a43fc2a1",
       "motions": {},
-      "ready": false,
+      "ready": true,
       "repair_id": "stature-v2-deadpole",
       "visual_review_required": true,
-      "image_verified": true
+      "image_verified": true,
+      "skeleton_joints": 18,
+      "rotation_count": 8
     },
     "geshugan": {
       "name": "게슈간",
@@ -3845,7 +3864,8 @@
       "registration": "cb41e6eb-69d9-44e7-8d23-c904d87f016c",
       "motions": {},
       "ready": false,
-      "image_verified": true
+      "image_verified": true,
+      "readiness_error": "HTTP Error 401: Unauthorized"
     },
     "konjyuce": {
       "name": "콘쥬스",
@@ -3854,17 +3874,20 @@
       "image": "0dc42b65-e471-4ff1-ae53-3195b75dd1bf",
       "registration": "cad7e67c-dfc7-49fc-8681-18ac2e1070d0",
       "motions": {},
-      "ready": false,
-      "image_verified": true
+      "ready": true,
+      "image_verified": true,
+      "skeleton_joints": 18,
+      "rotation_count": 8
     },
     "gognija": {
       "name": "고그니쟈",
       "group": "management",
-      "character_id": null,
+      "character_id": "8b61f17c-abec-4217-bca6-0850c24fe39c",
       "image": "9331805a-b8b1-4a62-9ed2-ac8281cb96f9",
-      "registration": null,
+      "registration": "9e9f1775-f62b-49a8-a5dc-98686e18c6fc",
       "motions": {},
-      "ready": false
+      "ready": false,
+      "image_verified": true
     },
     "dejure": {
       "name": "데쥬레",
@@ -6555,9 +6578,91 @@
         },
         "detail": null
       }
+    },
+    {
+      "at": "2026-10-23T19:10:49Z",
+      "kind": "repair-started",
+      "slug": "aileen",
+      "detail": {
+        "id": "aileen-user-rebuild-v4",
+        "slug": "aileen",
+        "action": "regenerate-front-and-register",
+        "reason": "User explicitly ordered delete both failed small versions and recreate. Both deleted with receipts.",
+        "correction": "Remove petite/short wording; normal adult source comparable to Jyaldi,232-238px crown-to-sole not ponytail; vest under jacket. Registration held until actual visual inspection.",
+        "estimated_generations": 9,
+        "registration_cost_after_visual_review": 4
+      }
+    },
+    {
+      "at": "2026-10-23T19:11:43Z",
+      "kind": "character-ready",
+      "slug": "kyuras",
+      "detail": {
+        "3d_joints": 18,
+        "directions": 8
+      }
+    },
+    {
+      "at": "2026-10-23T19:12:02Z",
+      "kind": "character-ready",
+      "slug": "deadpole",
+      "detail": {
+        "3d_joints": 18,
+        "directions": 8
+      }
+    },
+    {
+      "at": "2026-10-23T19:12:29Z",
+      "kind": "character-ready",
+      "slug": "konjyuce",
+      "detail": {
+        "3d_joints": 18,
+        "directions": 8
+      }
+    },
+    {
+      "at": "2026-10-23T19:12:32Z",
+      "kind": "image-verified",
+      "slug": "gognija",
+      "detail": {
+        "size": [
+          128,
+          256
+        ],
+        "bbox": [
+          24,
+          9,
+          100,
+          249
+        ],
+        "colors": 48,
+        "alpha": [
+          0,
+          255
+        ],
+        "original_pixels_preserved": true
+      }
+    },
+    {
+      "at": "2026-10-23T19:12:56Z",
+      "kind": "submitted",
+      "slug": "gognija",
+      "detail": {
+        "kind": "registration",
+        "template": null,
+        "job_id": "9e9f1775-f62b-49a8-a5dc-98686e18c6fc",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "9e9f1775-f62b-49a8-a5dc-98686e18c6fc",
+          "character_id": "8b61f17c-abec-4217-bca6-0850c24fe39c",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
     }
   ],
-  "updated_at": 1792782389.1437154,
+  "updated_at": 1792782776.6495736,
   "user_stopped_at": 1792778235.6917784,
   "archived_jobs": {
     "304457e9-6577-44f0-af17-97841a9f6720": {
@@ -7876,7 +7981,7 @@
       "saved_frames": 6
     }
   },
-  "last_git_checkpoint": 1792782057.9141974,
+  "last_git_checkpoint": 1792782390.8717914,
   "summary": {
     "jobs": {
       "processing": 2,
@@ -7893,6 +7998,7 @@
   "applied_repairs": [
     "stature-v2-aileen",
     "stature-v2-kyuras",
-    "stature-v2-deadpole"
+    "stature-v2-deadpole",
+    "aileen-user-rebuild-v4"
   ]
 }

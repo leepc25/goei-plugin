@@ -1,11 +1,11 @@
 {
   "release_skeleton_v3_motions": true,
-  "reason": "인물별 키·체격·복장 보존 요청 반영 후 제작 재개. 기존7명 상대 키 비교검수 필요.",
+  "reason": "Continue authorized character production and corrected Aileen source; new motion submissions held pending west results and defect diagnosis. Preserve west/southwest exceptions.",
   "max_in_flight": 20,
   "max_character_pipeline_in_flight": 6,
   "authorized_total_characters": 55,
   "authorized_clips_per_character": 20,
-  "stop_all": true,
+  "stop_all": false,
   "stopped_by_user_at": 1792778185.5597813,
   "direction_policy": {
     "reference": "front-facing south",
@@ -16,9 +16,7 @@
       "drinking"
     ]
   },
-  "motion_allowed_slugs": [
-    "jyaldi"
-  ],
+  "motion_allowed_slugs": [],
   "character_direction_overrides": {
     "jyaldi": {
       "movement_and_combat": "west",

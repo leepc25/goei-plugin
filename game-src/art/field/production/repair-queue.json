@@ -22,5 +22,14 @@
     "action": "regenerate-front-and-register",
     "estimated_generations": 13,
     "correction": "Use latest manifest and height-policy.json cm specification at shared1.25px/cm. Preserve individual original body shape and costume; Aileen has natural non-bulky build and ballistic vest under suit jacket. Actual crown-to-sole result needs comparison."
+  },
+  {
+    "id": "aileen-user-rebuild-v4",
+    "slug": "aileen",
+    "action": "regenerate-front-and-register",
+    "reason": "User explicitly ordered delete both failed small versions and recreate. Both deleted with receipts.",
+    "correction": "Remove petite/short wording; normal adult source comparable to Jyaldi,232-238px crown-to-sole not ponytail; vest under jacket. Registration held until actual visual inspection.",
+    "estimated_generations": 9,
+    "registration_cost_after_visual_review": 4
   }
 ]

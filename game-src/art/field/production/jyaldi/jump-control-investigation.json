@@ -1,0 +1,14 @@
+{
+  "status": "controls-checked-no-paid-jump-retry",
+  "mode": "skeleton-v3",
+  "source": "Live OpenAPI CreateCharacterAnimationRequest and MCP search_help,2026-10-24KST",
+  "findings": {
+    "canvas_or_padding": "No documented request parameter",
+    "template_vertical_motion_scale_or_translation": "No documented request parameter",
+    "target_palette": "Live OpenAPI explicitly documents palette enforcement for pro,v3,pixminimax, not skeleton-v3. Help claimed general support; insufficient evidence for skeleton-v3, do not assume or spend to test blindly.",
+    "ai_freedom": "Template-only; not a skeleton-v3 repair",
+    "custom_start_frame": "Not supported by skeleton-v3 per MCP contract",
+    "direct_skeleton_v3": "Separate API accepts manual normalized2D joint sequences; requires source-pose matching and validated new trajectory. No direct custom skeleton job submitted."
+  },
+  "decision": "Keep failed jump rerolls held. Independently continue original roster and inspect already accepted west walk/run. Preserve uncertain southwest breathing submission until exact job can be recovered."
+}

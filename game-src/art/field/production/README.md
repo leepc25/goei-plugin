@@ -29,3 +29,6 @@
 쟈알디 최신 방향 예외: west 이동/전투, south-west 제자리 비전투. control.character_direction_overrides를 따른다. 이전east 동작은history/jyaldi-east-before-west/로 보존하고 새 요청과 구분한다. 정면8방향 캐릭터ID는 유지한다.
 
 最新 검수: 에일린 실패2종과96px 구쟈알디 삭제 완료(백업/삭제 영수증history). 쟈알디 동쪽 점프는 머리 캔버스 잘림·얼굴 가림·프레임별 음영 차이로 실패. jump-defects.json 참조. 추가유료접수는control.stop_all=true로 잠시 보류; 미확인 서쪽 리롤로 같은 결함을 확대하지 않는다. 에일린 재생성은 사용자 승인됐으나 실제 새 정면 검수 전 등록은registration_held_slugs로 차단한다.
+
+2026-10-24 이어가기: 일괄 보류를 해제하고 캐릭터 그림/등록은 재개했다. 쟈알디 신규 동작 접수는 motion_allowed_slugs=[]로 검수 대기; 이미 접수한서쪽 걷기/달리기2건은 계속 관측한다. 남서 숨쉬기 POST는 응답불명이며 최근job목록과캐릭터결과에 확정적으로 대응하지 못해 중복재요청하지 않았다. 점프 캔버스/궤적 조절은공식인자없음. 팔레트는OpenAPI가pro/v3/pixminimax만명시하므로skeleton-v3지원으로단정하지않는다. 자세한기록jyaldi/jump-control-investigation.json.
+에일린두실패캐릭터는삭제완료. aileen-user-rebuild-v4는작은체구표현을제거하고방탄조끼를재킷안에입힌새정면1장만생성한다. registration_held_slugs에에일린이있으며 실제키/체형/복장검수전추가등록금지. 다른인물키는사용자그대로사용지시를존중해재생성하지않는다.
