@@ -100,6 +100,7 @@ export function mountGameShell(box: HTMLElement, o: ShellOptions = {}): Shell {
   touch.vw = () => stage.vw;
   touch.toLocal = o.toLocal ?? ((x, y, el) => stage.toLocal(x, y, el));
   if (o.fill) stage.setFit('fill');
+  else if (o.field) stage.setFit('height');
   const apply = () => {
     stage.setCrt(settings.crt);
     stage.setBright(settings.bright);

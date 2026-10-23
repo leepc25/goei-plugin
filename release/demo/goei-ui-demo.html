@@ -1854,7 +1854,7 @@ function mountStage(box2) {
   const rotate = root.querySelector(".gs-rotate");
   const fns = [];
   let keepPortrait = false;
-  let fill = false;
+  let fill = false, byHeight = false;
   const coarse = () => typeof matchMedia !== "undefined" && matchMedia("(pointer: coarse)").matches;
   let turn = coarse();
   const s = {
@@ -1868,6 +1868,7 @@ function mountStage(box2) {
     vw: W2,
     setFit(mode) {
       fill = mode === "fill";
+      byHeight = mode === "height";
       layout();
     },
     portrait: false,
@@ -1925,7 +1926,7 @@ function mountStage(box2) {
     const portrait = bh > bw * 1.05;
     s.portrait = portrait;
     root.classList.toggle("portrait", portrait);
-    const vw = fill && !portrait && bw / bh > W2 / H2 ? Math.min(1800, Math.round(H2 * bw / bh)) : W2;
+    const vw = fill && !portrait && bw / bh > W2 / H2 ? Math.min(1800, Math.round(H2 * bw / bh)) : byHeight && !portrait && bw / bh < W2 / H2 ? Math.max(640, Math.round(H2 * bw / bh)) : W2;
     if (vw !== s.vw || canvas.width !== vw) {
       s.vw = vw;
       canvas.width = vw;
@@ -4425,6 +4426,7 @@ function mountGameShell(box2, o = {}) {
   touch.vw = () => stage.vw;
   touch.toLocal = o.toLocal ?? ((x, y, el) => stage.toLocal(x, y, el));
   if (o.fill) stage.setFit("fill");
+  else if (o.field) stage.setFit("height");
   const apply = () => {
     stage.setCrt(settings.crt);
     stage.setBright(settings.bright);

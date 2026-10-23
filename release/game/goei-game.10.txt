@@ -1,4 +1,12 @@
-aves: [[{ kind: "dummy", x: 1600, y: 560 }, { kind: "dummy", x: 2400, y: 620 }]] }] }),
+= shell.input.on((code, down2) => {
+      if (!down2) return;
+      if ((code === "KeyZ" || code === "KeyM") && world && world.stage === elevator && !game?.inHub && !shell.paused && !story.isBlocking()) mapOpen = !mapOpen;
+    });
+    setLineProvider(hqLines);
+    const itemStage = {
+      id: "itemroom",
+      label: "아이템 진열실",
+      firstFloor: () => ({ id: "itemroom", title: "아이템 진열실", length: 3200, startX: 300, exitX: Infinity, banner: "아이템 진열실 · E 줍기·들기 · A 던지기·휘두르기", encounters: [{ triggerX: 0, lockFrom: 0, lockTo: 3200, waves: [[{ kind: "dummy", x: 1600, y: 560 }, { kind: "dummy", x: 2400, y: 620 }]] }] }),
       nextFloor: () => null
     };
     const unknownKinds = /* @__PURE__ */ new Set();
@@ -285,7 +293,7 @@ aves: [[{ kind: "dummy", x: 1600, y: 560 }, { kind: "dummy", x: 2400, y: 620 }]]
         audio.setListener(w.camX + 640, 640);
         footsteps(w);
         ctx.save();
-        ctx.translate(-Math.round(w.camX), 0);
+        ctx.translate(-Math.round(w.camX) - view.crop, 0);
         shell.fx.drawWorld(ctx);
         ctx.restore();
         shell.fx.drawScreen(ctx, w.player.hp / w.player.hpMax);
@@ -3173,7 +3181,7 @@ aves: [[{ kind: "dummy", x: 1600, y: 560 }, { kind: "dummy", x: 2400, y: 620 }]]
     }
   }
   var mod = {
-    version: "0.16.47",
+    version: "0.16.48",
     mount: (box2, bridge) => mountPlay(box2, bridge),
     // 이전 시험판: 저장 키와 그림 팩은 예전 그대로 (goei:game · goei:game-action:v1)
     legacy: {

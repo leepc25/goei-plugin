@@ -1,8 +1,4 @@
-arget.key === e.key,
-      confirmEnd: field2.confirmEnd === e.key
-    });
-  }
-  function placeCard(key2, c, on2) {
+ on2) {
     let name;
     let sub;
     let wiki2;
@@ -2525,5 +2521,5 @@ ${v.trim()}`).join("\n\n") : "";
   }
 
   // src/body-entry.ts
-  globalThis.__goeiBody = { version: "0.16.47", start: start2 };
+  globalThis.__goeiBody = { version: "0.16.48", start: start2 };
 })();

@@ -2,6 +2,7 @@
 // 장면: 제목 → 본부(hq 모듈, 없으면 바로 출동) → 출동(층 → 층 …) → 본부 정산 / 엔진 정산 화면 → 제목·본부.
 // 화면 틀·메뉴·HUD는 ui 모듈(껍데기)이 있으면 그쪽을, 없으면 엔진 기본을 쓴다.
 import { pfont } from './pxfont';
+import { view } from './view';
 import { SCREEN_H, SCREEN_W, TICK_HZ, type GameEvent, type HqModuleLike, type RunConfigCore, type RunResultCore, type StageModule } from './contract';
 import type { Art } from './art';
 import { Input, type Pad } from './input';
@@ -131,7 +132,12 @@ export class Game {
         this.mods.onPause?.(paused);
       }
       if (!this.mods.covered?.()) {
+        const vw = this.canvas.width, w = this.world;
+        view.crop = vw < SCREEN_W && w ? Math.max(0, Math.min(SCREEN_W - vw, Math.round(w.player.x - w.camX - vw / 2))) : 0;
+        this.ctx.save();
+        this.ctx.translate(-view.crop, 0);
         this.scene.draw(paused ? 1 : this.acc / T);
+        this.ctx.restore();
         this.mods.overlay?.(this.ctx, this.world, dt);
       }
     };

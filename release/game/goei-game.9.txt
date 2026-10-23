@@ -1,4 +1,5 @@
-을 기는 미천한 애벌레의 생애 최고의 은총이에요!", "실력을 증명할 수 있어 기뻐요!", "이번 산책에 심장을 꽤 거뒀어요.", "차를 마시며 감상할 수 있지요. 그 정도 안목은 있답니다."] })
+귀 기울이지 마시오!", "지금은 동맹이나 잠시뿐이오!", "사악한 신은 여기서 불탈 것이오!"] }),
+    avensha: d2({ id: "avensha", name: "아벤샤", sheet: "아벤샤", group: "faction", color: "#6a2c70", photo: "Avensha", role: "발푸르기스 협회 십대 마녀 중 하나.", speech: "격식 있고 화려한 존댓말, 윗 마법사에게 한껏 자신을 낮추는 아첨. 감탄하면 비명.", effects: ["favor", "hint", "trade", "hostile", "leave"], greet: ["어머나! 이런 곳에서 뵙다니요!"], lines: ["땅을 기는 미천한 애벌레의 생애 최고의 은총이에요!", "실력을 증명할 수 있어 기뻐요!", "이번 산책에 심장을 꽤 거뒀어요.", "차를 마시며 감상할 수 있지요. 그 정도 안목은 있답니다."] })
   };
   var ENTITY_NPCS = {
     brownie: d2({ id: "brownie", name: "브라우니", sheet: "브라우니", group: "entity", color: "#8a5a2b", photo: "Brownie", role: "「브라우니의 화요 퀴즈쇼」 진행자이자 주인인 괴이 존재. 손님 대접과 예의를 지키면 거래·통과, 무례하거나 형식을 어기면 퀴즈쇼 무대가 열린다.", speech: "황금기 방송 진행자처럼 따뜻하고 끝없이 밝은 말투, 상대를 「친구」. 박수·드럼 소리 흉내. 역겨우면 잠깐 목소리가 일그러진다.", effects: ["favor", "trade", "hint", "hostile", "leave", "gift"], gifts: ["medkit"], greet: ["자, 친구! 오늘의 손님을 소개합니다! 박수!", "그냥 브라우니라고 불러 줘! 친구끼리 호칭은 오글거리잖아!"], lines: ["맞혀 볼까? …정답!", "복잡한 서명 절차는 우리 스타일이 아니지. 악수 한 번이면 돼!", "아쉽지만 화난 스폰서들이 오기 전에 헤어져야 해! 내일 또 만나!", "친구, 밥은 먹고 다니는 거야?"], never: ["방송 형식을 스스로 깨지 않는다"] }),
@@ -3075,6 +3076,7 @@ ${t.secret}` : "",
       onOpen: (on) => shell.touch.setVisible(!on && shell.mode === "play")
     });
     globalThis.__goeiNpc = npc;
+    globalThis.__goeiStage = shell.stage;
     const elevator = createElevatorStage(stageStore, {
       ...npc.stageHooks(stageHooks()),
       pickUpgrade: (v, done2) => {
@@ -3083,12 +3085,4 @@ ${t.secret}` : "",
       }
     });
     let mapOpen = false;
-    const offMapKey = shell.input.on((code, down2) => {
-      if (!down2) return;
-      if ((code === "KeyZ" || code === "KeyM") && world && world.stage === elevator && !game?.inHub && !shell.paused && !story.isBlocking()) mapOpen = !mapOpen;
-    });
-    setLineProvider(hqLines);
-    const itemStage = {
-      id: "itemroom",
-      label: "아이템 진열실",
-      firstFloor: () => ({ id: "itemroom", title: "아이템 진열실", length: 3200, startX: 300, exitX: Infinity, banner: "아이템 진열실 · E 줍기·들기 · A 던지기·휘두르기", encounters: [{ triggerX: 0, lockFrom: 0, lockTo: 3200, w
+    const offMapKey 

@@ -4,6 +4,7 @@
 //   hq/    본부와 임무 흐름 (createHq)
 // 층(stage/)·적(enemy/)·아이템(items/)·대사(story/)는 들어오는 대로 여기에 잇는다. 없으면 엔진 기본(훈련장·임시 적·기본 지급품).
 import type { GameBridge } from '../../bridge';
+import { view } from './view';
 import { mountTalk } from '../../talk';
 import { createGameAudio } from '../audio';
 import { VIDEO_AUDIO_EVENT, type VideoTrack } from '../audio/videoTrack';
@@ -274,6 +275,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     onOpen: (on) => shell.touch.setVisible(!on && shell.mode === 'play'),
   });
   (globalThis as { __goeiNpc?: unknown }).__goeiNpc = npc; // 시험용
+  (globalThis as { __goeiStage?: unknown }).__goeiStage = shell.stage; // 시험용
   // 강화 선택(기본기획서 15.2)은 껍데기 선택 창으로: 창이 열린 동안 게임이 멈춘다
   const elevator = createElevatorStage(stageStore, {
     ...npc.stageHooks(stageHooks()),
@@ -595,7 +597,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       audio.setListener(w.camX + 640, 640);
       footsteps(w);
       ctx.save();
-      ctx.translate(-Math.round(w.camX), 0);
+      ctx.translate(-Math.round(w.camX) - view.crop, 0);
       shell.fx.drawWorld(ctx);
       ctx.restore();
       shell.fx.drawScreen(ctx, w.player.hp / w.player.hpMax);

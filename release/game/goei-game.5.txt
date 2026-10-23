@@ -1,4 +1,9 @@
-ticks: T(1, 1, 4, 2, 2),
+ = (...n) => n;
+  var MOVES = {
+    // 3연타: 잽(앞손, 예비 없음) → 스트레이트(뒷손) → 강한 스트레이트(앞손). 맞혀야 다음 타로 이어진다
+    jab: {
+      clip: "jab",
+      ticks: T(1, 1, 4, 2, 2),
       adv: 6,
       cancel: 2,
       whiffCancel: 3,
@@ -1604,7 +1609,12 @@ ticks: T(1, 1, 4, 2, 2),
           this.mods.onPause?.(paused);
         }
         if (!this.mods.covered?.()) {
+          const vw = this.canvas.width, w = this.world;
+          view.crop = vw < SCREEN_W && w ? Math.max(0, Math.min(SCREEN_W - vw, Math.round(w.player.x - w.camX - vw / 2))) : 0;
+          this.ctx.save();
+          this.ctx.translate(-view.crop, 0);
           this.scene.draw(paused ? 1 : this.acc / T3);
+          this.ctx.restore();
           this.mods.overlay?.(this.ctx, this.world, dt);
         }
       };
@@ -4812,4 +4822,4 @@ ticks: T(1, 1, 4, 2, 2),
   }
 
   // src/game/action/story/demo-photos.json
-  var demo_photos_default = { Jyaldi: "data:image/webp;base64,UklGRjIHAABXRUJQVlA4ICYHAAAQJgCdASqQAJAAPpVEnUulo6KipNK7ILASiWcA0ND93BXMfYY8FB42NAD9DejlodesPYO6S37eFWO1vU5wZHiM9ihohvpzbGXL0Mg5fHHwzoVzKe4C5ctF2ZhpaGIidscjzPqK716eykLP0ElSvYuR2sCghxG03ljx7jJ6KJf5/jGXhk/zBsZBBSj78IlHAWYafa6D6Ja50lFC0h0TgAX0pdTpaZw8YAzZ41QqOXKYMXOGGEl31IMicm4k3xIJ2am61l/FY09tsY//LRaVcZW6mKG3KwHBHxqk9zUcbYF4idT8Cobxa2n8qKcW5I4Jinj6enT43cd3Y2oWM8wT1mG7AMDwpWtZ9k4h6Joxer5hlIWk/AF0DHCSu/0N/G+hfQ7vJxfaFLi4jnyv058Hx6gntuqvIj90IooAAP735EfkxF9fXUA2YHrFuK3/2XzN3M0eZEuxvhLvfLN0C2rLAGGLN1VKz7avF2Y28yZrhJQ6COBvucZRLBE3ScMzNBJsJo9bCFtduzYONozxBrWhYdOc4cZ6vJDlgQ
+  var demo_photos_default = { Jyaldi: "data:image/webp;base64,UklGRjIHAABXRUJQVlA4ICYHAAAQJgCdASqQAJAAPpVEnUulo6KipNK7ILASiWcA0ND93BXMf

@@ -1,4 +1,15 @@
-== "set") {
+m[1], to: m[2] };
+        for (const b of m[3].matchAll(/\[(if|set)\s+([^\]]+)\]/g)) opt[b[1]] = b[2].trim();
+        const labelHere = Object.values(cur.labels).includes(nodes.length);
+        if (prev?.t === "choice" && !labelHere) prev.options.push(opt);
+        else nodes.push({ t: "choice", options: [opt], line: n });
+        continue;
+      }
+      if (raw.startsWith(">")) {
+        const cmd = raw.slice(1).trim();
+        const [head, ...rest] = cmd.split(/\s+/);
+        const tail = cmd.slice(head.length).trim();
+        if (head === "set") {
           const m = /^([\w.]+)\s*(\+=|-=|=)\s*(.+)$/.exec(tail);
           if (!m) throw new ScriptError(`${where}:${n} set 형식: > set 이름 = 식`);
           nodes.push({ t: "set", key: m[1], op: m[2], expr: m[3], line: n });
@@ -3220,7 +3231,7 @@ ${who}: ${text2.replace(/\n/g, " ")}
   var isS = (d3) => d3.side === "S";
   var doorY = (d3, lane = LANE) => isS(d3) ? lane[1] - 14 : lane[0] + 16;
   function makeHub(host, whereIs2) {
-    let view = null;
+    let view2 = null;
     let scene = null;
     let artDoors = /* @__PURE__ */ new Set();
     let pending = null;
@@ -3231,10 +3242,10 @@ ${who}: ${text2.replace(/\n/g, " ")}
     let opening = null;
     let near2 = null;
     let solids = [];
-    const sceneOf = (id) => view.scenes.find((s2) => s2.id === id) ?? view.scenes[0];
+    const sceneOf = (id) => view2.scenes.find((s2) => s2.id === id) ?? view2.scenes[0];
     const openOf = (id) => opening && opening.id === id ? Math.min(1, opening.t / OPEN_T) : 0;
     const build = (id, x, y) => {
-      view = host.map();
+      view2 = host.map();
       const base2 = sceneOf(id);
       const people = (host.visitors?.(base2.id) ?? []).map((p) => {
         const at2 = clearSpot(p.x, p.y, base2.boxes.filter((b) => b.solid).map((b) => ({ x: b.x, y: b.y, w: b.w, back: b.d + 6, front: 8 })), base2.lane ?? LANE);
@@ -3351,7 +3362,7 @@ ${who}: ${text2.replace(/\n/g, " ")}
       label: "본부",
       firstFloor: () => {
         const v = host.map();
-        view = v;
+        view2 = v;
         const s2 = pending ?? v.start;
         pending = null;
         fadeOut = 0;
@@ -3419,10 +3430,10 @@ ${who}: ${text2.replace(/\n/g, " ")}
         if (!d3.open) return host.sfx("knock");
         if (d3.kind === "elevator") {
           const here = scene.id;
-          const opts = view.elevator.map((e) => ({ label: e.label, open: e.open, here: e.scene === here }));
+          const opts = view2.elevator.map((e) => ({ label: e.label, open: e.open, here: e.scene === here }));
           host.chooseFloor(opts, (i) => {
             if (i == null) return;
-            const e = view.elevator[i];
+            const e = view2.elevator[i];
             if (!e?.open || e.scene === here) return;
             host.sfx("ding");
             opening = { id: d3.id, t: 0, then: () => goDoor(e.scene, e.door) };
@@ -3437,12 +3448,12 @@ ${who}: ${text2.replace(/\n/g, " ")}
       },
       /** 검사·스크린샷용: 장면으로 바로 */
       jump(sceneId, x = 400, y) {
-        if (view) go(sceneId, x, y);
+        if (view2) go(sceneId, x, y);
       },
-      sceneIds: () => (view ?? host.map()).scenes.map((s2) => s2.id),
+      sceneIds: () => (view2 ?? host.map()).scenes.map((s2) => s2.id),
       current: () => scene,
       goto(place3) {
-        if (!view) return;
+        if (!view2) return;
         const t = whereIs2(place3);
         go(t.scene, t.x, t.y);
       }
@@ -4141,5 +4152,4 @@ ${who}: ${text2.replace(/\n/g, " ")}
   };
   var FACTION_NPCS = {
     blaret: d2({ id: "blaret", name: "블라렛", sheet: "블라렛", group: "faction", color: "#e8e2d0", photo: "Blaret", role: "교황청 특급 수녀. 진조 흡혈귀를 쫓아 한국에 파견.", speech: "장난스럽고 판매원처럼 밝은 반말 섞인 존댓말, 상대를 찔러 본다. 전투에선 심판하듯 차갑게.", effects: ["favor", "hint", "join", "hostile", "leave", "trade"], greet: ["반가워요. 교황청 특급 수녀 블라렛. 흡혈귀 퇴치 건으로 한국에 왔어요."], lines: ["어때요? 그쪽 일 접고 우리 쪽으로 개종하는 거.", "내가 말하면 그쪽도 말하는 거예요. 숨기기 없기.", "재밌는 거 볼래요? …찰칵.", "흡혈귀 사냥이라면 그쪽보다 전문이죠."] }),
-    saladin: d2({ id: "saladin", name: "살라딘", sheet: "살라딘", group: "faction", color: "#2f6b4f", photo: "Saladin", role: "이슬람 성전대 한국 최고 전사. 이태원 성원이 거점.", speech: "우렁차고 고풍스러운 하오체. 아군에겐 따뜻하고 적에겐 쇠 같다. 「형제여!」", effects: ["favor", "hint", "join", "hostile", "leave"], greet: ["형제여! 날 따르시오!"], lines: ["그렇게 부르시오! 하하! 기분이 아주 좋소!", "형제여! 이교도의 말에 귀 기울이지 마시오!", "지금은 동맹이나 잠시뿐이오!", "사악한 신은 여기서 불탈 것이오!"] }),
-    avensha: d2({ id: "avensha", name: "아벤샤", sheet: "아벤샤", group: "faction", color: "#6a2c70", photo: "Avensha", role: "발푸르기스 협회 십대 마녀 중 하나.", speech: "격식 있고 화려한 존댓말, 윗 마법사에게 한껏 자신을 낮추는 아첨. 감탄하면 비명.", effects: ["favor", "hint", "trade", "hostile", "leave"], greet: ["어머나! 이런 곳에서 뵙다니요!"], lines: ["땅
+    saladin: d2({ id: "saladin", name: "살라딘", sheet: "살라딘", group: "faction", color: "#2f6b4f", photo: "Saladin", role: "이슬람 성전대 한국 최고 전사. 이태원 성원이 거점.", speech: "우렁차고 고풍스러운 하오체. 아군에겐 따뜻하고 적에겐 쇠 같다. 「형제여!」", effects: ["favor", "hint", "join", "hostile", "leave"], greet: ["형제여! 날 따르시오!"], lines: ["그렇게 부르시오! 하하! 기분이 아주 좋소!", "형제여! 이교도의 말에 

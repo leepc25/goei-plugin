@@ -18,7 +18,8 @@ export interface Stage {
   scale: number;
   /** 캔버스 가로 (논리 px). 맞춤이면 1280, 채우기면 화면 비율만큼 넓어진다 (최대 1800). 세로는 늘 720 */
   vw: number;
-  setFit(mode: 'fill' | 'fit'): void;
+  /** height: 필드용. 창 높이에 맞추고, 창이 16:9보다 좁으면 캔버스를 좁힌다(가로는 엔진이 주인공을 따라 자름) */
+  setFit(mode: 'fill' | 'fit' | 'height'): void;
   /** 세로로 든 폰에서 게임 전체를 90도 돌려 크게 보여 주는 중 */
   turned: boolean;
   /** 화면 좌표 → 요소 기준 좌표 (돌려 보기 중에도 맞음) */
@@ -61,7 +62,8 @@ export function mountStage(box: HTMLElement): Stage {
   const fns: (() => void)[] = [];
   let keepPortrait = false;
   // 채우기는 엔진이 넓은 캔버스를 그릴 수 있을 때만 켠다 (setFit('fill'))
-  let fill = false;
+  let fill = false,
+    byHeight = false;
   const coarse = () => typeof matchMedia !== 'undefined' && matchMedia('(pointer: coarse)').matches;
   // 세로로 든 폰은 처음부터 90도 돌려 꽉 채운다 (통합 규격 3장: 세로에 작게 넣지 않는다)
   let turn = coarse();
@@ -76,6 +78,7 @@ export function mountStage(box: HTMLElement): Stage {
     vw: W,
     setFit(mode) {
       fill = mode === 'fill';
+      byHeight = mode === 'height';
       layout();
     },
     portrait: false,
@@ -140,7 +143,7 @@ export function mountStage(box: HTMLElement): Stage {
     s.portrait = portrait;
     root.classList.toggle('portrait', portrait);
     // 채우기: 가로로 긴 폰은 검은 띠 대신 게임 화면을 옆으로 넓힌다 (위아래는 꽉 참)
-    const vw = fill && !portrait && bw / bh > W / H ? Math.min(1800, Math.round((H * bw) / bh)) : W;
+    const vw = fill && !portrait && bw / bh > W / H ? Math.min(1800, Math.round((H * bw) / bh)) : byHeight && !portrait && bw / bh < W / H ? Math.max(640, Math.round((H * bw) / bh)) : W;
     if (vw !== s.vw || canvas.width !== vw) {
       s.vw = vw;
       canvas.width = vw;

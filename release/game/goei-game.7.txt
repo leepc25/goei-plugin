@@ -1,4 +1,15 @@
- x, 0, 80, pick3(r, SIDE_NAMES[type] ?? SIDE_NAMES.lobby), { side: made }));
+ind === "hatch" || p.kind === "servicedoor") && p.x < gx - 100)) {
+          f.placed.push(place2("locked", gx, MID, 40, "잠긴 방화셔터", { key: depth }));
+          f.tuning.keyGate = 1;
+        }
+      }
+    }
+    const want = depth === 1 ? 1 : 1 + (r() < 0.45 ? 1 : 0);
+    const plainChunks = chunks.slice(1).filter((c) => !CHUNK_BY_ID[c.ref.slice(6)]?.device);
+    for (let made = 0; made < want; made++) {
+      const x = spot(plainChunks, 120, () => true, true);
+      if (x === null) break;
+      f.placed.push(place2("sidedoor", x, 0, 80, pick3(r, SIDE_NAMES[type] ?? SIDE_NAMES.lobby), { side: made }));
     }
     if (ctx.secret) {
       const crack = r() < 0.55;
@@ -3364,8 +3375,8 @@ ${RULE[id].variant.text}` : ""}`, 4);
         api.heal(40);
         return void api.world.say(`${why}: 더 고를 강화가 없다. 체력 회복.`, 2);
       }
-      const view = opts.map((u) => ({ id: u.id, label: u.label, text: u.text, set: SET_LABEL[u.set] }));
-      if (hooks.pickUpgrade?.({ why, options: view }, defer((api2, i) => applyUpgrade(api2, opts[Math.max(0, Math.min(opts.length - 1, i))])))) return;
+      const view2 = opts.map((u) => ({ id: u.id, label: u.label, text: u.text, set: SET_LABEL[u.set] }));
+      if (hooks.pickUpgrade?.({ why, options: view2 }, defer((api2, i) => applyUpgrade(api2, opts[Math.max(0, Math.min(opts.length - 1, i))])))) return;
       api.world.say(`${why}: 강화 하나를 고른다 (E)`, 3);
       const stub = { id: 0, role: "passenger", kind: "upgrade", x: 0, lane: 0, wave: 0, elite: false, data: {} };
       const p = api.world.player;
@@ -3801,15 +3812,4 @@ ${SET_BONUS[u.set]}`;
       if (raw.startsWith("*")) {
         const m = /^\*\s*(.+?)\s*->\s*([\w.]+)\s*(.*)$/.exec(raw);
         if (!m) throw new ScriptError(`${where}:${n} 선택지 형식: * 글 -> 표지 [if 조건] [set ...]`);
-        const opt = { text: m[1], to: m[2] };
-        for (const b of m[3].matchAll(/\[(if|set)\s+([^\]]+)\]/g)) opt[b[1]] = b[2].trim();
-        const labelHere = Object.values(cur.labels).includes(nodes.length);
-        if (prev?.t === "choice" && !labelHere) prev.options.push(opt);
-        else nodes.push({ t: "choice", options: [opt], line: n });
-        continue;
-      }
-      if (raw.startsWith(">")) {
-        const cmd = raw.slice(1).trim();
-        const [head, ...rest] = cmd.split(/\s+/);
-        const tail = cmd.slice(head.length).trim();
-        if (head =
+        const opt = { text: 

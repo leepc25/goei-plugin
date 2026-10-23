@@ -1,4 +1,9 @@
-x1 - b.x0, 4);
+);
+      ctx.save();
+      if (d3.arm && this.t < d3.arm) {
+        ctx.globalAlpha = 0.25 + 0.5 * (this.t >> 2 & 1);
+        ctx.fillStyle = "#ff4040";
+        ctx.fillRect(b.x0, this.y - b.z1 + d3.h / 2 - 2, b.x1 - b.x0, 4);
         ctx.restore();
         return;
       }
@@ -4932,9 +4937,4 @@ x1 - b.x0, 4);
   }
 
   // src/game/action/engine/moves.ts
-  var T = (...n) => n;
-  var MOVES = {
-    // 3연타: 잽(앞손, 예비 없음) → 스트레이트(뒷손) → 강한 스트레이트(앞손). 맞혀야 다음 타로 이어진다
-    jab: {
-      clip: "jab",
-      
+  var T

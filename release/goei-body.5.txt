@@ -1,5 +1,4 @@
-x-opview.fx-shade > .gx-opfeed { animation: gx-shadeimg 1.4s ease-out both; }
-@keyframes gx-shadeimg { 0%, 14% { filter: saturate(.5) contrast(1.15) brightness(.85) sepia(.15); } 19% { filter: saturate(.2) contrast(1.4) brightness(1.55) sepia(.1); } 60% { filter: saturate(.35) contrast(1.25) brightness(1.1) sepia(.15); } 100% { filter: saturate(.5) contrast(1.15) brightness(.85) sepia(.15); } }
+85) sepia(.15); } 19% { filter: saturate(.2) contrast(1.4) brightness(1.55) sepia(.1); } 60% { filter: saturate(.35) contrast(1.25) brightness(1.1) sepia(.15); } 100% { filter: saturate(.5) contrast(1.15) brightness(.85) sepia(.15); } }
 /* 글자 깨짐: 화면 위 글자 전부가 붉게 번지며 떨린다 (글자는 ui/cctvfx.ts가 바꿈) */
 .gx-opview.fx-text :is(.gx-oposd, .gx-opcap) { animation: gx-textjit .75s steps(1) both; }
 @keyframes gx-textjit {
@@ -543,7 +542,7 @@ x-opview.fx-shade > .gx-opfeed { animation: gx-shadeimg 1.4s ease-out both; }
     }
     return { next, lore: lore.count, scripts: scripts.count, fields: fields3 };
   }
-  var PLUGIN_VERSION = true ? "0.16.47" : "0";
+  var PLUGIN_VERSION = true ? "0.16.48" : "0";
 
   // src/host/game/fetch.ts
   var GAME_BASE = UPDATE_BASE ? `${UPDATE_BASE}/game` : "";
@@ -608,7 +607,7 @@ x-opview.fx-shade > .gx-opfeed { animation: gx-shadeimg 1.4s ease-out both; }
 
   // src/host/game/code.ts
   var CODE_KEY = "goei:game:code";
-  var VERSION = true ? "0.16.47" : "";
+  var VERSION = true ? "0.16.48" : "";
   var codeVersion = (code) => /^\/\/ goei-game (\S+)/.exec(code)?.[1] ?? null;
   var mod = null;
   var codeStats = { readMs: 0, runMs: 0, bytes: 0, fromNet: false };
@@ -1329,15 +1328,17 @@ ${recentStory.map((m) => m.text).join("\n")}`,
   var row5 = (label, help, ctl = "") => `<div class="ps-row"><div class="ps-label"><b>${label}</b>${help ? `<small>${help}</small>` : ""}</div>${ctl ? `<div class="ps-ctl gx-gl-ctl">${ctl}</div>` : ""}</div>`;
   var group3 = (title2, rows2) => `<section class="ps-group"><h3>${title2}</h3><div class="ps-rows">${rows2}</div></section>`;
   var dis = () => busy3 ? " disabled" : "";
+  var msgOf = () => busy3 || notice ? `<span role="status">${esc11(busy3 || notice)}</span>` : "";
+  var needFiles = (f) => f.code !== "ready" || f.need.length > 0;
   function filesHtml(f) {
-    if (f.code === "ready" && !f.need.length) return "";
-    const what = f.code === "old" ? "플러그인이 바뀌어 게임 파일을 새로 받아야 해요." : "처음 한 번만 받아요. 받은 파일은 이 기기의 Risu에 저장돼요.";
+    if (!needFiles(f)) return "";
+    const what = msgOf() || (f.code === "old" ? "플러그인이 바뀌어 게임 파일을 새로 받아야 해요." : "처음 한 번만 받아요. 받은 파일은 이 기기의 Risu에 저장돼요.");
     const size = f.index ? ` (${kb(f.bytes)})` : "";
     return group3("게임 파일", row5("게임 파일 받기", what, `<button class="gx-mini primary" data-g="get"${dis()}>받기${size}</button><button class="gx-mini" data-g="file"${dis()}>파일로 넣기</button>`));
   }
   function startHtml(slots, last2, ready) {
     const s4 = slots.find((x) => x.slot === last2) ?? slots.sort((x, y) => y.savedAt - x.savedAt)[0];
-    const help = s4 ? `마지막 저장 · ${when(s4.savedAt)}${s4.summary ? ` · ${esc11(s4.summary)}` : ""}` : "요원들을 만나 대화해요. 나눈 말은 다음 본편 요청에 막간으로 들어가요.";
+    const help = ready && msgOf() || (s4 ? `마지막 저장 · ${when(s4.savedAt)}${s4.summary ? ` · ${esc11(s4.summary)}` : ""}` : "요원들을 만나 대화해요. 나눈 말은 다음 본편 요청에 막간으로 들어가요.");
     return group3("필드", row5("본부", help, `<button class="gx-mini primary" data-g="play"${ready ? "" : " disabled"}>들어가기</button>`));
   }
   function linkHtml(card2, reports2, record) {
@@ -1378,8 +1379,7 @@ ${recentStory.map((m) => m.text).join("\n")}`,
     const record = ctx2 ? String((ctx2.chat.localLore ?? []).find((e) => e.comment === RECORD_COMMENT)?.content ?? "").split("\n").filter((l) => l.startsWith("- ")).length : 0;
     const open3 = new Set([...box.querySelectorAll("details[data-keep]")].filter((d) => d.open).map((d) => d.dataset.keep));
     box.innerHTML = `<div class="gx-gl gx-settings">
-    ${notice || busy3 ? `<div class="gx-gl-msg" role="status">${esc11(busy3 || notice)}</div>` : ""}
-    ${filesHtml(f)}${startHtml(slots, last2, f.code === "ready" && !f.need.length)}${linkHtml(card2, reports2, record)}
+    ${filesHtml(f)}${startHtml(slots, last2, !needFiles(f))}${linkHtml(card2, reports2, record)}
     <details class="ps-adv gx-gl-dev" data-keep="game-dev"><summary class="ps-adv-sum"><b>시험용</b></summary><div class="ps-rows">${legacyHtml()}${statsHtml()}</div></details>
     <input type="file" accept=".js,.pack" multiple hidden data-g-file></div>`;
     box.querySelectorAll("details[data-keep]").forEach((d) => d.open = open3.has(d.dataset.keep));
@@ -3894,4 +3894,8 @@ ${recentStory.map((m) => m.text).join("\n")}`,
       art: artCtx ? evArt(artCtx, e.name, e.kind, `${locName(e.loc)} ${e.report ?? ""}`) : void 0,
       pop: e.key,
       locCode: e.loc,
-      selected: field2.target?.type === "event" && field2.t
+      selected: field2.target?.type === "event" && field2.target.key === e.key,
+      confirmEnd: field2.confirmEnd === e.key
+    });
+  }
+  function placeCard(key2, c,
