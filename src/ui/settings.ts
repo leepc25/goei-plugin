@@ -37,6 +37,7 @@ export function resetSettings(): void {
 }
 
 import { updateGroup } from './update';
+import { handleVisitSettings, visitSettings } from './visitset';
 
 const esc = (s: unknown) =>
   String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
@@ -211,6 +212,7 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
       </div>
     </div></details>
     ${advSections('gen', scope === 'chat' ? ctx.chat.scriptstate : getPrefs().vars, scope === 'chat' && canChat ? { 1: loreCheckBox(ctx) } : {})}
+    ${visitSettings(scope === 'chat' && canChat ? ctx : null, scope === 'chat' ? ctx.chat.scriptstate : getPrefs().vars)}
     ${updateGroup(ctx)}
     ${toast('st', settingsUi.info, (t) => {
       if (settingsUi.info === t) settingsUi.info = '';
@@ -269,6 +271,7 @@ function nextWorld(w: WorldSettings, v: string): [WorldField['key'], number] | n
 export async function handleSettings(action: string, value: string | undefined, ctx: ChatContext, env: SettingsEnv, scope: SettingsScope = 'chat'): Promise<boolean> {
   const v = value ?? '';
   const lore = ctx.char.globalLore;
+  if (action.startsWith('visit-') && (await handleVisitSettings(action, ctx, env.render, env.refresh))) return true;
   if (action === 'set-bar') {
     settingsUi.confirm = v === 'save' || v === 'load' ? v : '';
     env.render();
@@ -286,14 +289,14 @@ export async function handleSettings(action: string, value: string | undefined, 
       // 지금 채팅의 화면·상황판·괴이 발생·캐릭터 이미지 설정을 새 채팅 기본값으로
       const cur = current(ctx, 'chat');
       await saveDefaults(env, (p) => ({ ...p, basic: { ...cur.basic }, world: { ...cur.world }, theme: cur.theme }));
-      if (!settingsUi.notice) await saveVarDefaults(['$gen_'], ctx.chat.scriptstate).catch((error) => (settingsUi.notice = `기본값을 저장하지 못했어요: ${error instanceof Error ? error.message : String(error)}`));
+      if (!settingsUi.notice) await saveVarDefaults(['$gen_', '$hq_adv_'], ctx.chat.scriptstate).catch((error) => (settingsUi.notice = `기본값을 저장하지 못했어요: ${error instanceof Error ? error.message : String(error)}`));
       if (!settingsUi.notice) settingsUi.info = '지금 설정을 새 채팅 기본값으로 저장했어요.';
       env.render();
     } else if (what === 'load') {
       // 새 채팅 기본값을 지금 채팅에. 상황판 켜기·끄기는 상태를 비우거나 새로 만들기 때문에 그대로 둔다
       const d = current(ctx, 'defaults');
       await save(ctx, env, (chat) => {
-        const vars: ScriptState = { ...basicVars(d.basic), [THEME_KEY]: d.theme, ...loadVarDefaults(['$gen_'], chat.scriptstate) };
+        const vars: ScriptState = { ...basicVars(d.basic), [THEME_KEY]: d.theme, ...loadVarDefaults(['$gen_', '$hq_adv_'], chat.scriptstate) };
         for (const f of WORLD_SPEC) vars[wgKey(f.key)] = String(d.world[f.key]);
         if (worldOn(chat)) {
           const ss = { ...(chat.scriptstate ?? {}), ...vars };

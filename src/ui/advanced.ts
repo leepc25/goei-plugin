@@ -78,7 +78,7 @@ const blank = (item: AdvItem) => (item.v ? String(item.def) : '');
 
 /** "f:key=값" → [기능, 항목, 저장할 값('' = 기본값)] */
 function parse(value: string): [AdvFeature, AdvItem, string] | null {
-  const m = /^(gn|ph|nw|gen):([a-z_]+)=(.*)$/.exec(value);
+  const m = /^(gn|ph|nw|hq|gen):([a-z_]+)=(.*)$/.exec(value);
   if (!m) return null;
   const f = m[1] as AdvFeature;
   const item = advItem(f, m[2]);

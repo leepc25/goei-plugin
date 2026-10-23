@@ -11,17 +11,20 @@ const FONT = (px: number) => `${px}px "${PIXEL_FONT}", "Galmuri11", sans-serif`;
 const REACH = 150;
 const BUBBLE_W = 340;
 
+// 모든 것이 도트 (2026-10-23 사용자): 입력창·기록창은 도트 틀(kit의 panel·slot·row), 글꼴은 도트 글꼴
 const CSS = `
-.gt-bar{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);width:min(92%,760px);display:none;gap:8px;align-items:center;padding:10px;background:#0d1417ee;border:2px solid #a99c78;pointer-events:auto;z-index:46;font-family:"${PIXEL_FONT}","Galmuri11",sans-serif;color:#ece6d4;-webkit-font-smoothing:none}
+.gt-bar{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);width:min(92%,720px);display:none;gap:6px;align-items:center;padding:2px 4px;pointer-events:auto;z-index:46;color:#ece6d4}
+.gt-bar.gk-panel,.gt-log.gk-panel{border-width:17px;border-image-width:17px;box-shadow:none!important}
 .gt-bar[data-open]{display:flex;flex-wrap:wrap}
-.gt-to{font-size:16px;color:#ffd27a;white-space:nowrap}
-.gt-in{flex:1;min-width:120px;font:inherit;font-size:18px;padding:8px 10px;background:#05090b;color:#fff;border:2px solid #5b6a72;outline:none}
-.gt-in:focus{border-color:#ffd27a}
-.gt-bar button{font:inherit;font-size:16px;padding:8px 12px;background:#1b292b;color:#ece6d4;border:2px solid #75817b;cursor:pointer}
-.gt-bar button:disabled{opacity:.45;cursor:default}
-.gt-msg{flex-basis:100%;font-size:14px;color:#ff9a8a;min-height:0}
+.gt-to{font-size:18px;color:#ffe27a;white-space:nowrap;text-shadow:2px 2px 0 #000}
+.gt-in{flex:1;min-width:120px;font:inherit;font-size:20px;padding:2px 6px;background:none;color:#fff;outline:none;border-width:7px;border-image-width:7px;text-shadow:2px 2px 0 #000}
+.gt-in::placeholder{color:#8b8574}
+.gt-in:focus,.gt-in:focus-visible{outline:none;box-shadow:none}
+.gt-bar .gk-btn{font-size:18px;padding:0 6px;line-height:1.4;border-width:6px 4px 6px 4px}
+.gt-bar .gk-btn:disabled{opacity:.4;cursor:default}
+.gt-msg{flex-basis:100%;font-size:16px;color:#ff9a8a;text-shadow:2px 2px 0 #000}
 .gt-msg:empty{display:none}
-.gt-log{position:absolute;left:50%;bottom:76px;transform:translateX(-50%);width:min(92%,760px);max-height:45%;overflow:auto;display:none;padding:12px 14px;background:#0d1417f2;border:2px solid #a99c78;pointer-events:auto;z-index:46;font-family:"${PIXEL_FONT}","Galmuri11",sans-serif;font-size:16px;line-height:1.6;color:#ece6d4;white-space:pre-wrap}
+.gt-log{position:absolute;left:50%;bottom:84px;transform:translateX(-50%);width:min(92%,720px);max-height:45%;overflow:auto;display:none;padding:4px 8px;pointer-events:auto;z-index:46;font-size:18px;line-height:1.6;color:#ece6d4;white-space:pre-wrap;text-shadow:2px 2px 0 #000}
 .gt-log[data-open]{display:block}
 `;
 
@@ -30,12 +33,12 @@ export function mountTalk(root: HTMLElement, api: GameVisit) {
   const st = document.createElement('style');
   st.textContent = CSS;
   const bar = document.createElement('div');
-  bar.className = 'gt-bar';
+  bar.className = 'gt-bar gk-panel gk-font';
   bar.setAttribute('role', 'group');
   bar.setAttribute('aria-label', '본부 대화');
-  bar.innerHTML = '<span class="gt-to"></span><input class="gt-in" aria-label="할 말" maxlength="300" autocomplete="off" enterkeyhint="send"><button type="button" data-send>말하기</button><button type="button" data-log>기록</button><button type="button" data-close aria-label="대화 닫기">닫기</button><div class="gt-msg" role="status"></div>';
+  bar.innerHTML = '<span class="gt-to"></span><input class="gt-in gk-slot gk-font" aria-label="할 말" placeholder="할 말" maxlength="300" autocomplete="off" enterkeyhint="send"><button type="button" class="gk-btn" data-send>말하기</button><button type="button" class="gk-btn" data-log>기록</button><button type="button" class="gk-btn" data-close aria-label="대화 닫기">닫기</button><div class="gt-msg" role="status"></div>';
   const log = document.createElement('div');
-  log.className = 'gt-log';
+  log.className = 'gt-log gk-panel gk-font';
   log.setAttribute('aria-label', '이번 대화 기록');
   root.append(st, bar, log);
   const to = bar.querySelector<HTMLElement>('.gt-to')!;
@@ -160,7 +163,9 @@ export function mountTalk(root: HTMLElement, api: GameVisit) {
       const tw = Math.ceil(c.measureText(p.name).width) + 16;
       const tagBottom = place(x, tw, 28, Math.round(p.y + p.top));
       tag(c, p.name, x, tagBottom - 14, near || p.name === target || isPlayer);
-      const b = bubbles.find((q) => q.who === p.name);
+      // 내가 입력하는 동안 내 머리 위에 움직이는 점 (말을 보내면 그 말로 바뀐다)
+      const typing = isPlayer && !busy && bar.hasAttribute('data-open') && document.activeElement === input && input.value.trim() !== '';
+      const b = bubbles.find((q) => q.who === p.name) ?? (typing ? { who: p.name, text: '', until: Infinity, pending: true } : undefined);
       if (b) {
         const size = bubbleSize(c, b, now);
         const bottom = place(x, size.w + 4, size.h + 16, tagBottom - 30);
@@ -184,12 +189,36 @@ export function mountTalk(root: HTMLElement, api: GameVisit) {
   };
 }
 
+/** 도트 한 칸 (게임 그림 배율 2.75에 맞춰 3) */
+const U = 3;
+
+/** 도트 상자: 모서리 한 칸씩 깎은 테두리 + 아래 그림자 */
+function pixelBox(c: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, fill: string, line: string, shadow = true) {
+  x = Math.round(x / U) * U;
+  y = Math.round(y / U) * U;
+  w = Math.ceil(w / U) * U;
+  h = Math.ceil(h / U) * U;
+  if (shadow) {
+    c.fillStyle = 'rgba(0,0,0,.45)';
+    c.fillRect(x + U, y + h, w - U, U);
+    c.fillRect(x + w, y + U, U, h);
+  }
+  c.fillStyle = line;
+  c.fillRect(x + U, y, w - 2 * U, h);
+  c.fillRect(x, y + U, w, h - 2 * U);
+  c.fillStyle = fill;
+  c.fillRect(x + 2 * U, y + U, w - 4 * U, h - 2 * U);
+  c.fillRect(x + U, y + 2 * U, w - 2 * U, h - 4 * U);
+  return { x, y, w, h };
+}
+
 function tag(c: CanvasRenderingContext2D, name: string, x: number, y: number, bright: boolean) {
   c.font = FONT(22);
-  const w = Math.ceil(c.measureText(name).width) + 16;
-  c.fillStyle = bright ? 'rgba(10,14,16,.85)' : 'rgba(10,14,16,.55)';
-  c.fillRect(x - w / 2, y - 14, w, 28);
-  c.fillStyle = bright ? '#ffd27a' : '#cfc8b4';
+  const w = Math.ceil(c.measureText(name).width) + 18;
+  pixelBox(c, x - w / 2, y - 15, w, 30, bright ? '#1a1612' : 'rgba(18,16,14,.7)', bright ? '#ffe27a' : 'rgba(120,112,96,.8)', bright);
+  c.fillStyle = '#000';
+  c.fillText(name, x + 2, y + 3);
+  c.fillStyle = bright ? '#ffe27a' : '#cfc8b4';
   c.fillText(name, x, y + 1);
 }
 
@@ -217,23 +246,23 @@ function bubbleSize(c: CanvasRenderingContext2D, b: Bubble, now: number): Bubble
   return { lines, w, h: lines.length * LH + 20 };
 }
 
-/** bottom = 꼬리 끝 */
+/** bottom = 꼬리 끝. 도트 상자 + 계단 꼬리 */
 function bubble(c: CanvasRenderingContext2D, s: BubbleSize, x: number, bottom: number) {
   c.font = FONT(22);
   const { lines, w, h } = s;
-  const left = x - w / 2;
-  const top = bottom - h - 12;
-  c.fillStyle = '#000';
-  c.fillRect(left - 2, top - 2, w + 4, h + 4);
-  c.fillStyle = '#f4efe2';
-  c.fillRect(left, top, w, h);
-  // 꼬리 (도트 계단)
-  for (let i = 0; i < 4; i++) {
-    c.fillStyle = '#000';
-    c.fillRect(x - 10 + i * 2, top + h + i * 3, 16 - i * 4 + 2, 3);
+  const box = pixelBox(c, x - w / 2, bottom - h - 4 * U, w, h, '#f4efe2', '#14110d');
+  const tx = Math.round(x / U) * U;
+  const ty = box.y + box.h - U;
+  // 꼬리: 세 칸 계단 (테두리 한 칸)
+  for (let i = 0; i < 3; i++) {
+    const half = (3 - i) * U;
+    c.fillStyle = '#14110d';
+    c.fillRect(tx - half - U, ty + i * U, (half + U) * 2, U);
     c.fillStyle = '#f4efe2';
-    c.fillRect(x - 8 + i * 2, top + h + i * 3, 12 - i * 4, 3);
+    c.fillRect(tx - half, ty + i * U, half * 2, U);
   }
+  c.fillStyle = '#14110d';
+  c.fillRect(tx - U, ty + 3 * U, 2 * U, U);
   c.fillStyle = '#1b1712';
-  lines.forEach((l, i) => c.fillText(l, x, top + 10 + LH / 2 + i * LH + 1));
+  lines.forEach((l, i) => c.fillText(l, x, box.y + 10 + LH / 2 + i * LH + 1));
 }

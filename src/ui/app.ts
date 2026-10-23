@@ -607,7 +607,9 @@ async function handle(action: string, value?: string): Promise<void> {
     case 'game-open':
       return openGame(view.kind === 'started' ? root?.querySelector('.gx-panel') ?? null : null);
     case 'game-close':
-      return closeGame();
+      // 본부에서 나눈 대화가 상황판·설정(본부 대화)에 바로 보이게 채팅을 다시 읽는다
+      closeGame();
+      return refresh();
     case 'faction': {
       const facs = view.kind === 'picker' ? factionList(view.ctx.char.globalLore) : SCENARIOS.factions;
       const f = findFaction(value ?? '', facs);
