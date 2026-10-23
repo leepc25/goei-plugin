@@ -1,9 +1,14 @@
-# 전체 캐릭터 제작 비용: API 실사용량과 접수 견적을 구분. 기존 쟈알디 이력은history/state 및 별도spend.log 참고.
-spangdal | image | - | e925d6ba-4f8e-41b9-b58d-53327feda5b9 | status=completed | actual_api_usage={"usd": 0.0, "type": "generations", "generations": 9} | quoted_generations=9
-spangdal | registration | - | 8df9126b-f6ce-43bd-be01-027d0588c203 | status=completed | actual_api_usage={"type": "generations", "generations": 4.0} | quoted_generations=None
-jyaldi | image | - | 78793c7b-f45f-48a6-ab11-0c1d97f86333 | status=processing | actual_api_usage=null | quoted_generations=9
-jaemtri | image | - | a32c319b-d494-4fb0-b04e-1576a6243021 | status=processing | actual_api_usage=null | quoted_generations=9
-aileen | image | - | 10a7c8f0-01b5-438e-91dd-61ba6d991597 | status=processing | actual_api_usage=null | quoted_generations=9
-gorgodio | image | - | 2f655338-9c44-48da-b55f-0aab08174ead | status=processing | actual_api_usage=null | quoted_generations=9
-kyuras | image | - | 67d27e4e-ba4e-46dc-abf8-f9bf728557d9 | status=processing | actual_api_usage=null | quoted_generations=9
-deadpole | image | - | 0568cdf1-af39-4a34-94e1-a492b322a400 | status=processing | actual_api_usage=null | quoted_generations=9
+# API 실제 사용량과 견적은 별도. 동시 작업 전후잔여량을 개별호출 차감으로 배분하지 않음.
+spangdal | image | - | e925d6ba-4f8e-41b9-b58d-53327feda5b9 | completed | actual={"usd": 0.0, "type": "generations", "generations": 9} | quote=9
+spangdal | registration | - | 8df9126b-f6ce-43bd-be01-027d0588c203 | completed | actual={"type": "generations", "generations": 4.0} | quote=None
+jyaldi | image | - | 78793c7b-f45f-48a6-ab11-0c1d97f86333 | completed | actual={"usd": 0.0, "type": "generations", "generations": 9} | quote=9
+jaemtri | image | - | a32c319b-d494-4fb0-b04e-1576a6243021 | completed | actual={"usd": 0.0, "type": "generations", "generations": 9} | quote=9
+aileen | image | - | 10a7c8f0-01b5-438e-91dd-61ba6d991597 | completed | actual={"usd": 0.0, "type": "generations", "generations": 9} | quote=9
+gorgodio | image | - | 2f655338-9c44-48da-b55f-0aab08174ead | completed | actual={"usd": 0.0, "type": "generations", "generations": 9} | quote=9
+kyuras | image | - | 67d27e4e-ba4e-46dc-abf8-f9bf728557d9 | completed | actual={"usd": 0.0, "type": "generations", "generations": 9} | quote=9
+deadpole | image | - | 0568cdf1-af39-4a34-94e1-a492b322a400 | processing | actual=null | quote=9
+jyaldi | registration | - | 1a54d3e6-c143-4b60-9c05-2929c084a4cd | processing | actual=null | quote=None
+jaemtri | registration | - | c39dacdf-7d7e-4648-bceb-6900ea2c8fd8 | processing | actual=null | quote=None
+aileen | registration | - | 1bbbd641-ee5c-4742-88f5-be9dae77efff | processing | actual=null | quote=None
+gorgodio | registration | - | 3676d347-a999-4fff-93e5-fdef57f7cee7 | processing | actual=null | quote=None
+kyuras | registration | - | 1a0b842f-1d61-406f-93bf-f3c0abb364c0 | processing | actual=null | quote=None

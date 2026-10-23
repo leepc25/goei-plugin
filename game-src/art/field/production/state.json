@@ -534,7 +534,7 @@
       "kind": "image",
       "slug": "deadpole",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792779194.4393775,
       "receipt": {
         "usage": null,
@@ -552,27 +552,62 @@
       },
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 9.0
         },
         "id": "0568cdf1-af39-4a34-94e1-a492b322a400",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-23T18:13:18.053512+00:00",
         "last_response": {
-          "type": "message_progress",
+          "seed": 10222027,
+          "type": "message_done",
           "model": "pro_flash",
           "width": 128,
-          "action": "Correcting pixels",
+          "action": "Removing background",
           "height": 256,
+          "images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
           "prompt": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult woman early20s, petite natural build, long straight black hair with straight bangs, soft round dark gray eyes, gentle cautious expression, black tailored trouser suit, white shirt, black necktie, black protective gloves and plain black shoes. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height230-240px on128x256. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
-          "status": "processing",
+          "status": "completed",
+          "asset_id": "58683a0a-e2ca-59b9-ba3f-972b071d4378",
           "image_id": "58683a0a-e2ca-59b9-ba3f-972b071d4378",
           "job_kind": "creator-image",
-          "progress": 0.72,
-          "queue_position": 19,
+          "progress": 1.0,
+          "image_url": "https://s3.eu-central-003.backblazeb2.com/pixellab-generations/production/creator/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/58683a0a-e2ca-59b9-ba3f-972b071d4378/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0037e6521c1d7c20000000001%2F20261023%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20261023T181552Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=a1c65bcd7712d07338c90c7e372df242bc81629d0a1a1bfe5fe7838f10b74511",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 9
+          },
+          "generation_id": "be16a1da-0701-4a54-851f-30c34f775a6b",
+          "queue_position": 0,
+          "billing_charged": true,
+          "original_images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "source_image_id": "58683a0a-e2ca-59b9-ba3f-972b071d4378",
+          "creator_image_saved": true,
           "generation_started_at": "2026-10-23T18:13:24.53075+00:00",
-          "estimated_wait_seconds": 2057
+          "estimated_wait_seconds": 0
         }
+      },
+      "observed_end_epoch": 1792779449.128342,
+      "elapsed_observed_seconds": 254.68896484375,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 9
       }
     },
     "1a54d3e6-c143-4b60-9c05-2929c084a4cd": {
@@ -598,8 +633,8 @@
         "status": "processing",
         "created_at": "2026-10-23T18:14:44.589045+00:00",
         "last_response": {
-          "status": "processing",
-          "progress": 0.05333333333333334,
+          "status": "correcting_frames",
+          "progress": 0.84,
           "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
           "n_directions": 8,
           "character_name": "쟈알디",
@@ -624,6 +659,27 @@
         "status": "processing",
         "enhanced_prompt": null,
         "enhance_usage": null
+      },
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "c39dacdf-7d7e-4648-bceb-6900ea2c8fd8",
+        "status": "processing",
+        "created_at": "2026-10-23T18:16:16.387453+00:00",
+        "last_response": {
+          "status": "correcting_frames",
+          "progress": 0.84,
+          "character_id": "f937666b-c116-4408-8864-55e7743850a5",
+          "n_directions": 8,
+          "character_name": "잼트리",
+          "queue_position": 0,
+          "directions_type": "8-directions",
+          "generation_mode": "v3",
+          "character_description": "잼트리 / Jaemtri. Adult woman late20s, long chestnut brown wavy hair below shoulders, soft green eyes, warm friendly smile, curvy natural adult build, black tailored office skirt suit, white shirt, black necktie, black high heels. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
+          "generation_started_at": "2026-10-23T18:16:17.784046+00:00"
+        }
       }
     },
     "1bbbd641-ee5c-4742-88f5-be9dae77efff": {
@@ -639,6 +695,27 @@
         "status": "processing",
         "enhanced_prompt": null,
         "enhance_usage": null
+      },
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "1bbbd641-ee5c-4742-88f5-be9dae77efff",
+        "status": "processing",
+        "created_at": "2026-10-23T18:16:23.270782+00:00",
+        "last_response": {
+          "status": "correcting_frames",
+          "progress": 0.84,
+          "character_id": "07763785-8f52-41d2-8e80-6f20d93f18c4",
+          "n_directions": 8,
+          "character_name": "에일린",
+          "queue_position": 0,
+          "directions_type": "8-directions",
+          "generation_mode": "v3",
+          "character_description": "에일린 / Aileen. Adult woman early20s, faded platinum blonde hair in a high ponytail with long bangs, dull gray eyes, serious analytical face, petite compact athletic build, practical fitted black trouser suit and black closed shoes as in her original portrait. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
+          "generation_started_at": "2026-10-23T18:16:24.219188+00:00"
+        }
       }
     },
     "3676d347-a999-4fff-93e5-fdef57f7cee7": {
@@ -654,6 +731,27 @@
         "status": "processing",
         "enhanced_prompt": null,
         "enhance_usage": null
+      },
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "3676d347-a999-4fff-93e5-fdef57f7cee7",
+        "status": "processing",
+        "created_at": "2026-10-23T18:16:35.553091+00:00",
+        "last_response": {
+          "status": "correcting_frames",
+          "progress": 0.84,
+          "character_id": "1d8d12e4-06d5-4df8-8812-0754f77b736b",
+          "n_directions": 8,
+          "character_name": "고르고디오",
+          "queue_position": 0,
+          "directions_type": "8-directions",
+          "generation_mode": "v3",
+          "character_description": "고르고디오 / Gorgodio. Adult man early30s, very tall broad muscular wrestler build, bald head, neatly trimmed black goatee, confident stern face, black leather motorcycle jacket over white shirt and black necktie, black business trousers and heavy black shoes. No summoned armor. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
+          "generation_started_at": "2026-10-23T18:16:40.801018+00:00"
+        }
       }
     },
     "1a0b842f-1d61-406f-93bf-f3c0abb364c0": {
@@ -669,6 +767,63 @@
         "status": "processing",
         "enhanced_prompt": null,
         "enhance_usage": null
+      },
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "1a0b842f-1d61-406f-93bf-f3c0abb364c0",
+        "status": "processing",
+        "created_at": "2026-10-23T18:16:51.003443+00:00",
+        "last_response": {
+          "status": "correcting_frames",
+          "progress": 0.84,
+          "character_id": "5b11c6b4-98e8-4911-99ca-5115904b8237",
+          "n_directions": 8,
+          "character_name": "큐라스",
+          "queue_position": 0,
+          "directions_type": "8-directions",
+          "generation_mode": "v3",
+          "character_description": "큐라스 / Kyuras. Adult man early30s, thin wiry build, pale green hair swept back, narrow face, gray green eyes, lively confident smile, black tailored trouser suit, white shirt, black necktie and black shoes. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
+          "generation_started_at": "2026-10-23T18:16:51.877741+00:00"
+        }
+      }
+    },
+    "3aa93392-d116-470e-a5f8-bcf3dad5eff9": {
+      "kind": "registration",
+      "slug": "deadpole",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792779463.1282864,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "3aa93392-d116-470e-a5f8-bcf3dad5eff9",
+        "character_id": "0c652edd-65f2-4d86-9294-196376a2d0ea",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      },
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "3aa93392-d116-470e-a5f8-bcf3dad5eff9",
+        "status": "processing",
+        "created_at": "2026-10-23T18:17:44.314628+00:00",
+        "last_response": {
+          "status": "correcting_frames",
+          "progress": 0.84,
+          "character_id": "0c652edd-65f2-4d86-9294-196376a2d0ea",
+          "n_directions": 8,
+          "character_name": "데드폴",
+          "queue_position": 0,
+          "directions_type": "8-directions",
+          "generation_mode": "v3",
+          "character_description": "데드폴 / Deadpole. Adult woman early20s, petite natural build, long straight black hair with straight bangs, soft round dark gray eyes, gentle cautious expression, black tailored trouser suit, white shirt, black necktie, black protective gloves and plain black shoes. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
+          "generation_started_at": "2026-10-23T18:17:47.842129+00:00"
+        }
       }
     }
   },
@@ -740,11 +895,12 @@
     "deadpole": {
       "name": "데드폴",
       "group": "management",
-      "character_id": null,
+      "character_id": "0c652edd-65f2-4d86-9294-196376a2d0ea",
       "image": "0568cdf1-af39-4a34-94e1-a492b322a400",
-      "registration": null,
+      "registration": "3aa93392-d116-470e-a5f8-bcf3dad5eff9",
       "motions": {},
-      "ready": false
+      "ready": false,
+      "image_verified": true
     },
     "geshugan": {
       "name": "게슈간",
@@ -1856,9 +2012,66 @@
           "enhance_usage": null
         }
       }
+    },
+    {
+      "at": "2026-10-23T18:17:29Z",
+      "kind": "completed",
+      "slug": "deadpole",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "0568cdf1-af39-4a34-94e1-a492b322a400",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 9
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T18:17:43Z",
+      "kind": "image-verified",
+      "slug": "deadpole",
+      "detail": {
+        "size": [
+          128,
+          256
+        ],
+        "bbox": [
+          31,
+          22,
+          94,
+          248
+        ],
+        "colors": 48,
+        "alpha": [
+          0,
+          255
+        ],
+        "original_pixels_preserved": true
+      }
+    },
+    {
+      "at": "2026-10-23T18:17:49Z",
+      "kind": "submitted",
+      "slug": "deadpole",
+      "detail": {
+        "kind": "registration",
+        "template": null,
+        "job_id": "3aa93392-d116-470e-a5f8-bcf3dad5eff9",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "3aa93392-d116-470e-a5f8-bcf3dad5eff9",
+          "character_id": "0c652edd-65f2-4d86-9294-196376a2d0ea",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
     }
   ],
-  "updated_at": 1792779414.264236,
+  "updated_at": 1792779735.2413378,
   "user_stopped_at": 1792778235.6917784,
   "archived_jobs": {
     "304457e9-6577-44f0-af17-97841a9f6720": {
@@ -3177,17 +3390,17 @@
       "saved_frames": 6
     }
   },
-  "last_git_checkpoint": 1792779070.5727022,
+  "last_git_checkpoint": 1792779415.958207,
   "summary": {
     "jobs": {
       "processing": 6,
-      "completed": 7,
+      "completed": 8,
       "failed": 0,
       "stalled": 0
     },
     "characters_ready": 1,
     "characters_total": 55,
-    "images_verified": 6,
+    "images_verified": 7,
     "motions_submitted": 0,
     "motions_target": 1100
   }
