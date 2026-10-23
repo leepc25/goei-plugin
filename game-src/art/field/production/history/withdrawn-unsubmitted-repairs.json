@@ -1,0 +1,13 @@
+{
+  "reason": "User says existing work is already far along; leave it as is. Do not cancel or repeat accepted jobs.",
+  "withdrawn": [
+    {
+      "id": "aileen-athletic-v3",
+      "slug": "aileen",
+      "action": "regenerate-front-and-register",
+      "reason": "Latest user: keep others; increase Aileen height and retain under-jacket ballistic vest, natural non-bulky build.",
+      "correction": "Use updated Aileen manifest230-236px body; do not shrink to previous200-206 target. Clothing correction still requires new source, while Gorgodio size is a display-scale adjustment preserving source.",
+      "estimated_generations": 13
+    }
+  ]
+}

@@ -22,13 +22,5 @@
     "action": "regenerate-front-and-register",
     "estimated_generations": 13,
     "correction": "Use latest manifest and height-policy.json cm specification at shared1.25px/cm. Preserve individual original body shape and costume; Aileen has natural non-bulky build and ballistic vest under suit jacket. Actual crown-to-sole result needs comparison."
-  },
-  {
-    "id": "aileen-athletic-v3",
-    "slug": "aileen",
-    "action": "regenerate-front-and-register",
-    "reason": "Latest user: keep others; increase Aileen height and retain under-jacket ballistic vest, natural non-bulky build.",
-    "correction": "Use updated Aileen manifest230-236px body; do not shrink to previous200-206 target. Clothing correction still requires new source, while Gorgodio size is a display-scale adjustment preserving source.",
-    "estimated_generations": 13
   }
 ]
