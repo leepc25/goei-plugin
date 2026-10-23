@@ -3,7 +3,8 @@
   "mode": "skeleton-v3",
   "template_animation_id": "two-footed-jump",
   "directions": [
-    "east"
+    "west"
   ],
-  "animation_name": "두발 점프 (동쪽)"
+  "animation_name": "두발 점프 (서쪽)",
+  "action_description": "two footed jump. Preserve this character identity, costume, hair and native proportions. Keep a clean transparent silhouette in every frame. No gray painted patches, gray halo, ground shadow or opaque background around hair, hands, clothes or feet."
 }

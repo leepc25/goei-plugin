@@ -1,22 +1,20 @@
 {
-  "at": 1792792136.4733248,
+  "at": 1792797831.6754005,
+  "job_id": "3cddea2e-3a66-4291-a79c-2be803461b07",
   "result": "pass",
-  "frames_reviewed": [
-    0,
-    1,
-    2,
-    3,
-    4,
-    5,
-    6,
-    7
+  "findings": "8프레임 전부 재검토. 서쪽 얼굴 노출, 긴 검은 생머리와 검은 정장·장갑 유지. 보행 다리 교차와 팔 움직임 정상, 외곽 회색 칠 없음. 원본 우선·키 보조·전원 8방향 완료 기준 재확인.",
+  "frame_count": 8,
+  "directions": [
+    "west"
   ],
-  "findings": "8프레임 개별 확인. 서쪽으로 얼굴 노출, 의상·긴 머리 유지, 좌우 교대 보행과 투명 외곽 정상. 기존에 접수된 결과의 검수이며 새 생성 아님.",
+  "actual_template": "walking-8-frames",
+  "new_user_approval": false,
   "rules_rechecked": [
-    "AVIF primary",
-    "Lore supplementary height",
-    "All55 before new motion",
-    "Gray outer paint reroll"
-  ],
-  "new_user_approval": false
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
 }

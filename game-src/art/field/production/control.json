@@ -1,5 +1,5 @@
 {
-  "release_skeleton_v3_motions": false,
+  "release_skeleton_v3_motions": true,
   "reason": "2026-10-24 user explicitly authorized full fake-bureau rebuild and roster completion. Per-character visual gates remain.",
   "max_in_flight": 20,
   "max_character_pipeline_in_flight": 20,
@@ -16,7 +16,63 @@
       "drinking"
     ]
   },
-  "motion_allowed_slugs": [],
+  "motion_allowed_slugs": [
+    "jyaldi",
+    "spangdal",
+    "jaemtri",
+    "aileen",
+    "gorgodio",
+    "kyuras",
+    "deadpole",
+    "geshugan",
+    "rojemon",
+    "konjyuce",
+    "gognija",
+    "dejure",
+    "sa-jang",
+    "do-pil-heon",
+    "lee-gil-hwan",
+    "lee-gi-seok",
+    "kim-jo-hak",
+    "lee-do-hyeong",
+    "go-young-hoon",
+    "no-gi-gyun",
+    "song-ju-ik",
+    "kwak-seong-ju",
+    "cho-seong-choon",
+    "yun-byeong-su",
+    "kim-seong-jin",
+    "song-jin-seob",
+    "baek-seok-ju",
+    "jin-na-sol",
+    "lee-seong-hae",
+    "lee-ja-heon",
+    "eun-ha-je",
+    "park-min-seong",
+    "baek-sa-heon",
+    "go-young-eun",
+    "kang-i-hak",
+    "jang-heo-un",
+    "kwak-je-gang",
+    "lee-yeon-hwa",
+    "lee-byeong-jin",
+    "jay",
+    "ho-yu-won",
+    "cheong-dal-lae",
+    "cha-yeo-jin",
+    "seo-yun-ji",
+    "go-yeon-ji",
+    "yun-ji-a",
+    "ma-deok-hee",
+    "mun-hye-ran",
+    "shin-yuri",
+    "blaret",
+    "saladin",
+    "avensha",
+    "secriem",
+    "brownie",
+    "aestheticism"
+  ],
   "character_direction_overrides": {
     "jyaldi": {
       "movement_and_combat": "west",
@@ -145,5 +201,10 @@
     "seo-yun-ji",
     "blaret"
   ],
-  "source_priority": "AVIF first for identity/build; lore supplements height; explicit user heights override estimates"
+  "source_priority": "AVIF first for identity/build; lore supplements height; explicit user heights override estimates",
+  "motion_template_overrides": {
+    "jyaldi": {
+      "running-8-frames": "running-6-frames"
+    }
+  }
 }

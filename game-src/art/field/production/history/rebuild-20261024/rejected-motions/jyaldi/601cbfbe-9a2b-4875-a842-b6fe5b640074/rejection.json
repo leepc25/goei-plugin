@@ -1,0 +1,44 @@
+{
+  "reason": "쟈알디 얼굴을 보이는 서쪽/남서쪽 확정 방위와 다른 이전 동작. 검수된 서쪽 걷기는 별도 보존.",
+  "group": {
+    "animation_type": "front-flip",
+    "display_name": null,
+    "animation_group_id": "601cbfbe-9a2b-4875-a842-b6fe5b640074",
+    "directions": [
+      {
+        "direction": "east",
+        "frame_count": 6,
+        "frames": [
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/aa591ba3-b47e-4e25-86e4-2bedf76d34b9/east/0.png?t=1792781145",
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/aa591ba3-b47e-4e25-86e4-2bedf76d34b9/east/1.png?t=1792781145",
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/aa591ba3-b47e-4e25-86e4-2bedf76d34b9/east/2.png?t=1792781145",
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/aa591ba3-b47e-4e25-86e4-2bedf76d34b9/east/3.png?t=1792781145",
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/aa591ba3-b47e-4e25-86e4-2bedf76d34b9/east/4.png?t=1792781145",
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/aa591ba3-b47e-4e25-86e4-2bedf76d34b9/east/5.png?t=1792781145"
+        ]
+      }
+    ]
+  },
+  "at": 1792797606.4079766,
+  "state_before": {
+    "name": "쟈알디",
+    "group": "management",
+    "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+    "image": "78793c7b-f45f-48a6-ab11-0c1d97f86333",
+    "registration": "1a54d3e6-c143-4b60-9c05-2929c084a4cd",
+    "motions": {
+      "breathing-idle": "uncertain:submitting:1792781884584",
+      "walking-8-frames": "3cddea2e-3a66-4291-a79c-2be803461b07",
+      "running-8-frames": "c8873c16-757b-44c9-817a-9e39fd7247fc"
+    },
+    "ready": true,
+    "rebuild_after_direction_policy": true,
+    "image_verified": true,
+    "skeleton_joints": 18,
+    "rotation_count": 8,
+    "exported": false,
+    "motion_direction_revision": "west-southwest",
+    "eight_way_visual_reviewed": true,
+    "motions_visual_reviewed": false
+  }
+}

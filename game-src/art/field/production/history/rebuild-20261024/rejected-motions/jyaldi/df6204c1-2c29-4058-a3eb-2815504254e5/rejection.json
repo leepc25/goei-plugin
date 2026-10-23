@@ -1,0 +1,46 @@
+{
+  "reason": "서쪽 달리기4·5프레임 뒤팔이 머리 뒤로 과도하게 꺾여 반려. 실제 자세 프리셋을6프레임 달리기로 교체.",
+  "group": {
+    "animation_type": "running-8-frames",
+    "display_name": null,
+    "animation_group_id": "df6204c1-2c29-4058-a3eb-2815504254e5",
+    "directions": [
+      {
+        "direction": "west",
+        "frame_count": 8,
+        "frames": [
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/e4078a5a-5381-466c-83a1-2759459bb5ea/west/0.png?t=1792783194",
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/e4078a5a-5381-466c-83a1-2759459bb5ea/west/1.png?t=1792783194",
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/e4078a5a-5381-466c-83a1-2759459bb5ea/west/2.png?t=1792783194",
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/e4078a5a-5381-466c-83a1-2759459bb5ea/west/3.png?t=1792783194",
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/e4078a5a-5381-466c-83a1-2759459bb5ea/west/4.png?t=1792783194",
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/e4078a5a-5381-466c-83a1-2759459bb5ea/west/5.png?t=1792783194",
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/e4078a5a-5381-466c-83a1-2759459bb5ea/west/6.png?t=1792783194",
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/e4078a5a-5381-466c-83a1-2759459bb5ea/west/7.png?t=1792783194"
+        ]
+      }
+    ]
+  },
+  "at": 1792797621.6541245,
+  "state_before": {
+    "name": "쟈알디",
+    "group": "management",
+    "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+    "image": "78793c7b-f45f-48a6-ab11-0c1d97f86333",
+    "registration": "1a54d3e6-c143-4b60-9c05-2929c084a4cd",
+    "motions": {
+      "breathing-idle": "uncertain:submitting:1792781884584",
+      "walking-8-frames": "3cddea2e-3a66-4291-a79c-2be803461b07",
+      "running-8-frames": "c8873c16-757b-44c9-817a-9e39fd7247fc"
+    },
+    "ready": true,
+    "rebuild_after_direction_policy": true,
+    "image_verified": true,
+    "skeleton_joints": 18,
+    "rotation_count": 8,
+    "exported": false,
+    "motion_direction_revision": "west-southwest",
+    "eight_way_visual_reviewed": true,
+    "motions_visual_reviewed": false
+  }
+}

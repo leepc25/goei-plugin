@@ -1,0 +1,10 @@
+{
+  "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+  "mode": "skeleton-v3",
+  "template_animation_id": "throw-object",
+  "directions": [
+    "west"
+  ],
+  "animation_name": "던지기 (서쪽)",
+  "action_description": "throw object. Preserve this character identity, costume, hair and native proportions. Keep a clean transparent silhouette in every frame. No gray painted patches, gray halo, ground shadow or opaque background around hair, hands, clothes or feet."
+}

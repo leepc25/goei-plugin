@@ -3888,7 +3888,11 @@
         "type": "generations",
         "generations": 3
       },
-      "saved_frames": 8
+      "saved_frames": 8,
+      "visual_rejection": {
+        "reason": "서쪽 달리기4·5프레임 뒤팔이 머리 뒤로 과도하게 꺾여 반려. 실제 자세 프리셋을6프레임 달리기로 교체.",
+        "group": "df6204c1-2c29-4058-a3eb-2815504254e5"
+      }
     },
     "9e9f1775-f62b-49a8-a5dc-98686e18c6fc": {
       "kind": "registration",
@@ -21282,12 +21286,402 @@
       "kind": "registration",
       "slug": "blaret",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792797460.3000722,
       "receipt": {
         "usage": null,
         "background_job_id": "68f0581c-57c2-49c3-8ac8-f6a5d0482358",
         "character_id": "84db0331-2810-48ce-aefb-a26b3525e628",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      },
+      "last_response": {
+        "usage": null,
+        "id": "68f0581c-57c2-49c3-8ac8-f6a5d0482358",
+        "status": "completed",
+        "created_at": "2026-10-23T23:17:40.662404+00:00",
+        "last_response": {
+          "status": "completed",
+          "character_id": "84db0331-2810-48ce-aefb-a26b3525e628",
+          "storage_urls": {
+            "east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/84db0331-2810-48ce-aefb-a26b3525e628/rotations/east.png",
+            "west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/84db0331-2810-48ce-aefb-a26b3525e628/rotations/west.png",
+            "north": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/84db0331-2810-48ce-aefb-a26b3525e628/rotations/north.png",
+            "south": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/84db0331-2810-48ce-aefb-a26b3525e628/rotations/south.png",
+            "north-east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/84db0331-2810-48ce-aefb-a26b3525e628/rotations/north-east.png",
+            "north-west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/84db0331-2810-48ce-aefb-a26b3525e628/rotations/north-west.png",
+            "south-east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/84db0331-2810-48ce-aefb-a26b3525e628/rotations/south-east.png",
+            "south-west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/84db0331-2810-48ce-aefb-a26b3525e628/rotations/south-west.png"
+          },
+          "billing_usage": null,
+          "character_name": "블라렛",
+          "directions_type": "8-directions",
+          "generation_mode": "v3",
+          "directions_count": 8,
+          "character_description": "블라렛 / Blaret. Adult woman with natural slim athletic body, oval pale face, vivid GREEN eyes and playful smile. Long straight sandy BLONDE hair with blunt bangs visible beneath WHITE forehead band and long BLACK nun veil. Fitted BLACK long-sleeved nun habit, WHITE high-neck wimple and white shoulder bib, modest side slit. Several thick dark SILVER chains with large silver cross pendant and small green stone. WOODEN brown prayer beads around both wrists. Black boots. No handheld weapons. The long black veil hangs down to the HIPS, clearly below the waist, never a short shoulder-length veil. The BLACK NUN VEIL is LONG, hanging from the head down behind both arms to hips/upper thighs, below both hands. Preserve this full length in every side and back view; never a short shoulder hood. Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Do not invent patches, badges, logos or markings absent from the supplied image. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches."
+        }
+      },
+      "observed_end_epoch": 1792797534.7507432,
+      "elapsed_observed_seconds": 74.45067119598389,
+      "usage": null
+    },
+    "45bc5aa1-2298-47fe-98f3-6f3981d3fca2": {
+      "kind": "animation",
+      "slug": "jyaldi",
+      "template": "breathing-idle",
+      "status": "processing",
+      "created_epoch": 1792797847.2388818,
+      "receipt": {
+        "background_job_ids": [
+          "45bc5aa1-2298-47fe-98f3-6f3981d3fca2"
+        ],
+        "directions": [
+          "south-west"
+        ],
+        "animation_group_id": "7330bcd9-cb19-4931-80c7-4a2bf6473c03",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      }
+    },
+    "b8f6a0ed-f701-407a-815f-8322ce8c17d2": {
+      "kind": "animation",
+      "slug": "jyaldi",
+      "template": "running-8-frames",
+      "status": "processing",
+      "created_epoch": 1792797854.4811308,
+      "receipt": {
+        "background_job_ids": [
+          "b8f6a0ed-f701-407a-815f-8322ce8c17d2"
+        ],
+        "directions": [
+          "west"
+        ],
+        "animation_group_id": "cd7d0903-4cf0-430f-a36f-c0ebe7a1a7d8",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      }
+    },
+    "793b3211-fc07-41e0-95ec-12d8bed05eaf": {
+      "kind": "animation",
+      "slug": "jyaldi",
+      "template": "running-jump",
+      "status": "processing",
+      "created_epoch": 1792797864.110398,
+      "receipt": {
+        "background_job_ids": [
+          "793b3211-fc07-41e0-95ec-12d8bed05eaf"
+        ],
+        "directions": [
+          "west"
+        ],
+        "animation_group_id": "70a1193e-41d0-4e65-86a6-e9a7ae7b5ec0",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      }
+    },
+    "d65a2ba8-9a3a-49ef-a737-9e089f899515": {
+      "kind": "animation",
+      "slug": "jyaldi",
+      "template": "running-slide",
+      "status": "processing",
+      "created_epoch": 1792797866.1330264,
+      "receipt": {
+        "background_job_ids": [
+          "d65a2ba8-9a3a-49ef-a737-9e089f899515"
+        ],
+        "directions": [
+          "west"
+        ],
+        "animation_group_id": "1ab94f66-a46e-491c-8f62-edb6623299ab",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      }
+    },
+    "8c4f0d0e-1cec-44ba-a650-a0f1e699b6da": {
+      "kind": "animation",
+      "slug": "jyaldi",
+      "template": "crouched-walking",
+      "status": "processing",
+      "created_epoch": 1792797878.78352,
+      "receipt": {
+        "background_job_ids": [
+          "8c4f0d0e-1cec-44ba-a650-a0f1e699b6da"
+        ],
+        "directions": [
+          "west"
+        ],
+        "animation_group_id": "e630bbed-b9bb-49a9-804e-567ef3ba6c6e",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      }
+    },
+    "c137cbd9-879d-44da-ba60-da04402748bf": {
+      "kind": "animation",
+      "slug": "jyaldi",
+      "template": "sad-walk",
+      "status": "processing",
+      "created_epoch": 1792797903.9317,
+      "receipt": {
+        "background_job_ids": [
+          "c137cbd9-879d-44da-ba60-da04402748bf"
+        ],
+        "directions": [
+          "west"
+        ],
+        "animation_group_id": "eefc53aa-33ed-4ab6-971f-42ec3bc8e474",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      }
+    },
+    "a6d0a514-71b8-4d30-954b-cdb49eac9196": {
+      "kind": "animation",
+      "slug": "jyaldi",
+      "template": "front-flip",
+      "status": "processing",
+      "created_epoch": 1792797918.7428062,
+      "receipt": {
+        "background_job_ids": [
+          "a6d0a514-71b8-4d30-954b-cdb49eac9196"
+        ],
+        "directions": [
+          "west"
+        ],
+        "animation_group_id": "e8ec0937-3c86-4a85-adda-1905305915e3",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      }
+    },
+    "fb002850-cd93-464d-8e62-343c9fbc74fa": {
+      "kind": "animation",
+      "slug": "jyaldi",
+      "template": "backflip",
+      "status": "processing",
+      "created_epoch": 1792797920.8999207,
+      "receipt": {
+        "background_job_ids": [
+          "fb002850-cd93-464d-8e62-343c9fbc74fa"
+        ],
+        "directions": [
+          "west"
+        ],
+        "animation_group_id": "7a4ffd4f-6358-420a-9061-f8c5a5c01449",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      }
+    },
+    "2c93eba5-670d-4a12-92f9-1b729b26c869": {
+      "kind": "animation",
+      "slug": "jyaldi",
+      "template": "jumping-1",
+      "status": "processing",
+      "created_epoch": 1792797925.7013154,
+      "receipt": {
+        "background_job_ids": [
+          "2c93eba5-670d-4a12-92f9-1b729b26c869"
+        ],
+        "directions": [
+          "west"
+        ],
+        "animation_group_id": "59516128-df93-42b3-9e6b-8edb0d1ad55d",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      }
+    },
+    "b02aaa21-a204-4898-8c46-ad9b2e704756": {
+      "kind": "animation",
+      "slug": "jyaldi",
+      "template": "jumping-2",
+      "status": "processing",
+      "created_epoch": 1792797928.0196865,
+      "receipt": {
+        "background_job_ids": [
+          "b02aaa21-a204-4898-8c46-ad9b2e704756"
+        ],
+        "directions": [
+          "west"
+        ],
+        "animation_group_id": "c660fa57-155c-41c5-b62f-02b6d01e25b5",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      }
+    },
+    "f91bc8e4-e06e-4a4d-911f-f953bed08f2f": {
+      "kind": "animation",
+      "slug": "jyaldi",
+      "template": "two-footed-jump",
+      "status": "processing",
+      "created_epoch": 1792797932.089982,
+      "receipt": {
+        "background_job_ids": [
+          "f91bc8e4-e06e-4a4d-911f-f953bed08f2f"
+        ],
+        "directions": [
+          "west"
+        ],
+        "animation_group_id": "cf402e5c-f00e-4edc-bacf-f2e45d18b672",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      }
+    },
+    "9572ea4b-422f-458e-bc0f-336731cc9084": {
+      "kind": "animation",
+      "slug": "jyaldi",
+      "template": "drinking",
+      "status": "processing",
+      "created_epoch": 1792797933.0578341,
+      "receipt": {
+        "background_job_ids": [
+          "9572ea4b-422f-458e-bc0f-336731cc9084"
+        ],
+        "directions": [
+          "south-west"
+        ],
+        "animation_group_id": "d82b0b0a-0448-4164-b857-91ae63f907e5",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      }
+    },
+    "b6e88a54-93ff-4be0-8129-09b00161303e": {
+      "kind": "animation",
+      "slug": "jyaldi",
+      "template": "picking-up",
+      "status": "processing",
+      "created_epoch": 1792797934.5288558,
+      "receipt": {
+        "background_job_ids": [
+          "b6e88a54-93ff-4be0-8129-09b00161303e"
+        ],
+        "directions": [
+          "west"
+        ],
+        "animation_group_id": "71203393-a965-4443-b1a9-64a4bd88487d",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      }
+    },
+    "5685bf60-f5bc-4b6b-874c-41236ed8694c": {
+      "kind": "animation",
+      "slug": "jyaldi",
+      "template": "pushing",
+      "status": "processing",
+      "created_epoch": 1792797936.0582123,
+      "receipt": {
+        "background_job_ids": [
+          "5685bf60-f5bc-4b6b-874c-41236ed8694c"
+        ],
+        "directions": [
+          "west"
+        ],
+        "animation_group_id": "c9bb616c-d775-4b43-aab3-af1de8db3113",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      }
+    },
+    "d06d1fbd-1d41-4d2f-abb6-f974f3994f7e": {
+      "kind": "animation",
+      "slug": "jyaldi",
+      "template": "pull-heavy-object",
+      "status": "processing",
+      "created_epoch": 1792797936.5712688,
+      "receipt": {
+        "background_job_ids": [
+          "d06d1fbd-1d41-4d2f-abb6-f974f3994f7e"
+        ],
+        "directions": [
+          "west"
+        ],
+        "animation_group_id": "dbee07b2-2a17-41e5-8b5b-11bae7d69bbe",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      }
+    },
+    "4109d0e0-2399-4cc7-97a6-896f2fdf2b00": {
+      "kind": "animation",
+      "slug": "jyaldi",
+      "template": "throw-object",
+      "status": "processing",
+      "created_epoch": 1792797937.1714041,
+      "receipt": {
+        "background_job_ids": [
+          "4109d0e0-2399-4cc7-97a6-896f2fdf2b00"
+        ],
+        "directions": [
+          "west"
+        ],
+        "animation_group_id": "3c45c5cc-a42e-4c30-b202-ae8606090fd3",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      }
+    },
+    "05fd54a9-cfdf-4a82-a75d-b97b0cf15d17": {
+      "kind": "animation",
+      "slug": "jyaldi",
+      "template": "fight-stance-idle-8-frames",
+      "status": "processing",
+      "created_epoch": 1792797937.9298615,
+      "receipt": {
+        "background_job_ids": [
+          "05fd54a9-cfdf-4a82-a75d-b97b0cf15d17"
+        ],
+        "directions": [
+          "west"
+        ],
+        "animation_group_id": "b075dd7a-bce1-411c-b63e-a33f2dff7510",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      }
+    },
+    "58509341-51b2-4853-936f-c0c46fd92c08": {
+      "kind": "animation",
+      "slug": "jyaldi",
+      "template": "lead-jab",
+      "status": "processing",
+      "created_epoch": 1792797944.6019855,
+      "receipt": {
+        "background_job_ids": [
+          "58509341-51b2-4853-936f-c0c46fd92c08"
+        ],
+        "directions": [
+          "west"
+        ],
+        "animation_group_id": "8a59c7f8-fc6d-4315-b2c0-2acdb14e45c7",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      }
+    },
+    "3039c443-d199-4d80-807e-11856697e4ba": {
+      "kind": "animation",
+      "slug": "jyaldi",
+      "template": "cross-punch",
+      "status": "processing",
+      "created_epoch": 1792797950.9735384,
+      "receipt": {
+        "background_job_ids": [
+          "3039c443-d199-4d80-807e-11856697e4ba"
+        ],
+        "directions": [
+          "west"
+        ],
+        "animation_group_id": "6ea7c70e-1e39-4788-8c33-d9d9246528b8",
         "status": "processing",
         "enhanced_prompt": null,
         "enhance_usage": null
@@ -21302,18 +21696,36 @@
       "image": "78793c7b-f45f-48a6-ab11-0c1d97f86333",
       "registration": "1a54d3e6-c143-4b60-9c05-2929c084a4cd",
       "motions": {
-        "breathing-idle": "uncertain:submitting:1792781884584",
         "walking-8-frames": "3cddea2e-3a66-4291-a79c-2be803461b07",
-        "running-8-frames": "c8873c16-757b-44c9-817a-9e39fd7247fc"
+        "breathing-idle": "45bc5aa1-2298-47fe-98f3-6f3981d3fca2",
+        "running-8-frames": "b8f6a0ed-f701-407a-815f-8322ce8c17d2",
+        "running-jump": "793b3211-fc07-41e0-95ec-12d8bed05eaf",
+        "running-slide": "d65a2ba8-9a3a-49ef-a737-9e089f899515",
+        "crouched-walking": "8c4f0d0e-1cec-44ba-a650-a0f1e699b6da",
+        "sad-walk": "c137cbd9-879d-44da-ba60-da04402748bf",
+        "front-flip": "a6d0a514-71b8-4d30-954b-cdb49eac9196",
+        "backflip": "fb002850-cd93-464d-8e62-343c9fbc74fa",
+        "jumping-1": "2c93eba5-670d-4a12-92f9-1b729b26c869",
+        "jumping-2": "b02aaa21-a204-4898-8c46-ad9b2e704756",
+        "two-footed-jump": "f91bc8e4-e06e-4a4d-911f-f953bed08f2f",
+        "drinking": "9572ea4b-422f-458e-bc0f-336731cc9084",
+        "picking-up": "b6e88a54-93ff-4be0-8129-09b00161303e",
+        "pushing": "5685bf60-f5bc-4b6b-874c-41236ed8694c",
+        "pull-heavy-object": "d06d1fbd-1d41-4d2f-abb6-f974f3994f7e",
+        "throw-object": "4109d0e0-2399-4cc7-97a6-896f2fdf2b00",
+        "fight-stance-idle-8-frames": "05fd54a9-cfdf-4a82-a75d-b97b0cf15d17",
+        "lead-jab": "58509341-51b2-4853-936f-c0c46fd92c08",
+        "cross-punch": "3039c443-d199-4d80-807e-11856697e4ba"
       },
       "ready": true,
       "rebuild_after_direction_policy": true,
       "image_verified": true,
       "skeleton_joints": 18,
       "rotation_count": 8,
-      "exported": true,
+      "exported": false,
       "motion_direction_revision": "west-southwest",
-      "eight_way_visual_reviewed": true
+      "eight_way_visual_reviewed": true,
+      "motions_visual_reviewed": false
     },
     "spangdal": {
       "name": "스팡달",
@@ -23081,8 +23493,8 @@
       "image": "0f18021b-f069-4958-825d-d830176a1892",
       "registration": "68f0581c-57c2-49c3-8ac8-f6a5d0482358",
       "motions": {},
-      "ready": false,
-      "exported": false,
+      "ready": true,
+      "exported": true,
       "registration_rejections": [
         {
           "character_id": "a1e68911-325e-4aef-a66c-df643e8832de",
@@ -23097,7 +23509,7 @@
           "at": 1792797459.9942079
         }
       ],
-      "eight_way_visual_reviewed": false,
+      "eight_way_visual_reviewed": true,
       "visual_rejections": [
         {
           "job": "124f2988-2c22-4b10-901a-0cc09cc5f1ed",
@@ -23164,7 +23576,9 @@
       "direction-repair-north-wide-long-veil": "570f4680-eeeb-47e8-9979-2f9b5d706a9b",
       "direction-repair-north-west-wide-long-veil": "65477007-079f-4fec-9691-cd8fbf1e41a9",
       "direction-repair-west-wide-long-veil": "7fcb0406-f75a-4062-b35d-e50fce22fb17",
-      "direction-repair-south-west-wide-long-veil": "0976945d-ef6a-4bad-9850-14556f91f15b"
+      "direction-repair-south-west-wide-long-veil": "0976945d-ef6a-4bad-9850-14556f91f15b",
+      "skeleton_joints": 18,
+      "rotation_count": 8
     },
     "saladin": {
       "name": "살라딘",
@@ -38859,9 +39273,457 @@
           "enhance_usage": null
         }
       }
+    },
+    {
+      "at": "2026-10-23T23:18:54Z",
+      "kind": "completed",
+      "slug": "blaret",
+      "detail": {
+        "kind": "registration",
+        "template": null,
+        "job_id": "68f0581c-57c2-49c3-8ac8-f6a5d0482358",
+        "usage": null,
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T23:18:55Z",
+      "kind": "character-ready",
+      "slug": "blaret",
+      "detail": {
+        "3d_joints": 18,
+        "directions": 8
+      }
+    },
+    {
+      "at": "2026-10-23T23:19:03Z",
+      "kind": "exported",
+      "slug": "blaret",
+      "detail": {
+        "bytes": 96299,
+        "files": 9
+      }
+    },
+    {
+      "at": "2026-10-23T23:24:14Z",
+      "kind": "submitted",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "breathing-idle",
+        "job_id": "45bc5aa1-2298-47fe-98f3-6f3981d3fca2",
+        "receipt": {
+          "background_job_ids": [
+            "45bc5aa1-2298-47fe-98f3-6f3981d3fca2"
+          ],
+          "directions": [
+            "south-west"
+          ],
+          "animation_group_id": "7330bcd9-cb19-4931-80c7-4a2bf6473c03",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T23:24:24Z",
+      "kind": "submitted",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "running-8-frames",
+        "job_id": "b8f6a0ed-f701-407a-815f-8322ce8c17d2",
+        "receipt": {
+          "background_job_ids": [
+            "b8f6a0ed-f701-407a-815f-8322ce8c17d2"
+          ],
+          "directions": [
+            "west"
+          ],
+          "animation_group_id": "cd7d0903-4cf0-430f-a36f-c0ebe7a1a7d8",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T23:24:26Z",
+      "kind": "submitted",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "running-jump",
+        "job_id": "793b3211-fc07-41e0-95ec-12d8bed05eaf",
+        "receipt": {
+          "background_job_ids": [
+            "793b3211-fc07-41e0-95ec-12d8bed05eaf"
+          ],
+          "directions": [
+            "west"
+          ],
+          "animation_group_id": "70a1193e-41d0-4e65-86a6-e9a7ae7b5ec0",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T23:24:38Z",
+      "kind": "submitted",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "running-slide",
+        "job_id": "d65a2ba8-9a3a-49ef-a737-9e089f899515",
+        "receipt": {
+          "background_job_ids": [
+            "d65a2ba8-9a3a-49ef-a737-9e089f899515"
+          ],
+          "directions": [
+            "west"
+          ],
+          "animation_group_id": "1ab94f66-a46e-491c-8f62-edb6623299ab",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T23:25:03Z",
+      "kind": "submitted",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "crouched-walking",
+        "job_id": "8c4f0d0e-1cec-44ba-a650-a0f1e699b6da",
+        "receipt": {
+          "background_job_ids": [
+            "8c4f0d0e-1cec-44ba-a650-a0f1e699b6da"
+          ],
+          "directions": [
+            "west"
+          ],
+          "animation_group_id": "e630bbed-b9bb-49a9-804e-567ef3ba6c6e",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T23:25:18Z",
+      "kind": "submitted",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "sad-walk",
+        "job_id": "c137cbd9-879d-44da-ba60-da04402748bf",
+        "receipt": {
+          "background_job_ids": [
+            "c137cbd9-879d-44da-ba60-da04402748bf"
+          ],
+          "directions": [
+            "west"
+          ],
+          "animation_group_id": "eefc53aa-33ed-4ab6-971f-42ec3bc8e474",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T23:25:20Z",
+      "kind": "submitted",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "front-flip",
+        "job_id": "a6d0a514-71b8-4d30-954b-cdb49eac9196",
+        "receipt": {
+          "background_job_ids": [
+            "a6d0a514-71b8-4d30-954b-cdb49eac9196"
+          ],
+          "directions": [
+            "west"
+          ],
+          "animation_group_id": "e8ec0937-3c86-4a85-adda-1905305915e3",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T23:25:25Z",
+      "kind": "submitted",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "backflip",
+        "job_id": "fb002850-cd93-464d-8e62-343c9fbc74fa",
+        "receipt": {
+          "background_job_ids": [
+            "fb002850-cd93-464d-8e62-343c9fbc74fa"
+          ],
+          "directions": [
+            "west"
+          ],
+          "animation_group_id": "7a4ffd4f-6358-420a-9061-f8c5a5c01449",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T23:25:27Z",
+      "kind": "submitted",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "jumping-1",
+        "job_id": "2c93eba5-670d-4a12-92f9-1b729b26c869",
+        "receipt": {
+          "background_job_ids": [
+            "2c93eba5-670d-4a12-92f9-1b729b26c869"
+          ],
+          "directions": [
+            "west"
+          ],
+          "animation_group_id": "59516128-df93-42b3-9e6b-8edb0d1ad55d",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T23:25:32Z",
+      "kind": "submitted",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "jumping-2",
+        "job_id": "b02aaa21-a204-4898-8c46-ad9b2e704756",
+        "receipt": {
+          "background_job_ids": [
+            "b02aaa21-a204-4898-8c46-ad9b2e704756"
+          ],
+          "directions": [
+            "west"
+          ],
+          "animation_group_id": "c660fa57-155c-41c5-b62f-02b6d01e25b5",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T23:25:32Z",
+      "kind": "submitted",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "two-footed-jump",
+        "job_id": "f91bc8e4-e06e-4a4d-911f-f953bed08f2f",
+        "receipt": {
+          "background_job_ids": [
+            "f91bc8e4-e06e-4a4d-911f-f953bed08f2f"
+          ],
+          "directions": [
+            "west"
+          ],
+          "animation_group_id": "cf402e5c-f00e-4edc-bacf-f2e45d18b672",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T23:25:34Z",
+      "kind": "submitted",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "drinking",
+        "job_id": "9572ea4b-422f-458e-bc0f-336731cc9084",
+        "receipt": {
+          "background_job_ids": [
+            "9572ea4b-422f-458e-bc0f-336731cc9084"
+          ],
+          "directions": [
+            "south-west"
+          ],
+          "animation_group_id": "d82b0b0a-0448-4164-b857-91ae63f907e5",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T23:25:35Z",
+      "kind": "submitted",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "picking-up",
+        "job_id": "b6e88a54-93ff-4be0-8129-09b00161303e",
+        "receipt": {
+          "background_job_ids": [
+            "b6e88a54-93ff-4be0-8129-09b00161303e"
+          ],
+          "directions": [
+            "west"
+          ],
+          "animation_group_id": "71203393-a965-4443-b1a9-64a4bd88487d",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T23:25:36Z",
+      "kind": "submitted",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "pushing",
+        "job_id": "5685bf60-f5bc-4b6b-874c-41236ed8694c",
+        "receipt": {
+          "background_job_ids": [
+            "5685bf60-f5bc-4b6b-874c-41236ed8694c"
+          ],
+          "directions": [
+            "west"
+          ],
+          "animation_group_id": "c9bb616c-d775-4b43-aab3-af1de8db3113",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T23:25:37Z",
+      "kind": "submitted",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "pull-heavy-object",
+        "job_id": "d06d1fbd-1d41-4d2f-abb6-f974f3994f7e",
+        "receipt": {
+          "background_job_ids": [
+            "d06d1fbd-1d41-4d2f-abb6-f974f3994f7e"
+          ],
+          "directions": [
+            "west"
+          ],
+          "animation_group_id": "dbee07b2-2a17-41e5-8b5b-11bae7d69bbe",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T23:25:37Z",
+      "kind": "submitted",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "throw-object",
+        "job_id": "4109d0e0-2399-4cc7-97a6-896f2fdf2b00",
+        "receipt": {
+          "background_job_ids": [
+            "4109d0e0-2399-4cc7-97a6-896f2fdf2b00"
+          ],
+          "directions": [
+            "west"
+          ],
+          "animation_group_id": "3c45c5cc-a42e-4c30-b202-ae8606090fd3",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T23:25:44Z",
+      "kind": "submitted",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "fight-stance-idle-8-frames",
+        "job_id": "05fd54a9-cfdf-4a82-a75d-b97b0cf15d17",
+        "receipt": {
+          "background_job_ids": [
+            "05fd54a9-cfdf-4a82-a75d-b97b0cf15d17"
+          ],
+          "directions": [
+            "west"
+          ],
+          "animation_group_id": "b075dd7a-bce1-411c-b63e-a33f2dff7510",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T23:25:50Z",
+      "kind": "submitted",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "lead-jab",
+        "job_id": "58509341-51b2-4853-936f-c0c46fd92c08",
+        "receipt": {
+          "background_job_ids": [
+            "58509341-51b2-4853-936f-c0c46fd92c08"
+          ],
+          "directions": [
+            "west"
+          ],
+          "animation_group_id": "8a59c7f8-fc6d-4315-b2c0-2acdb14e45c7",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T23:25:52Z",
+      "kind": "submitted",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "cross-punch",
+        "job_id": "3039c443-d199-4d80-807e-11856697e4ba",
+        "receipt": {
+          "background_job_ids": [
+            "3039c443-d199-4d80-807e-11856697e4ba"
+          ],
+          "directions": [
+            "west"
+          ],
+          "animation_group_id": "6ea7c70e-1e39-4788-8c33-d9d9246528b8",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
     }
   ],
-  "updated_at": 1792797460.9852116,
+  "updated_at": 1792797952.708163,
   "user_stopped_at": 1792778235.6917784,
   "archived_jobs": {
     "304457e9-6577-44f0-af17-97841a9f6720": {
@@ -40180,21 +41042,21 @@
       "saved_frames": 6
     }
   },
-  "last_git_checkpoint": 1792797123.1165566,
+  "last_git_checkpoint": 1792797462.9328756,
   "summary": {
     "jobs": {
-      "processing": 1,
-      "completed": 267,
+      "processing": 19,
+      "completed": 268,
       "failed": 9,
       "stalled": 0
     },
-    "characters_ready": 54,
+    "characters_ready": 55,
     "characters_total": 55,
     "images_format_verified": 55,
     "new_images_visually_reviewed": 43,
-    "eight_way_visually_reviewed": 54,
+    "eight_way_visually_reviewed": 55,
     "characters_motions_visually_reviewed": 0,
-    "motions_submitted": 3,
+    "motions_submitted": 20,
     "motions_target": 1100
   },
   "applied_repairs": [
