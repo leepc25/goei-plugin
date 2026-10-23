@@ -59,7 +59,7 @@ const hasSaved = () => local(SAVED_KEY).load() === '1';
 
 /** 본부 모듈을 엔진 모양으로 감싼다 */
 /** 필드 시각 (초). 입장할 때 본편 시각과 합치고, 걸을 때마다 늘어난다 */
-const fieldClock: { sec: number | null } = { sec: null };
+const fieldClock: { sec: number | null; place: string } = { sec: null, place: '' };
 
 function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: HubHost['chooseFloor']; sfx: (n: string) => void; closed?: () => void; resuming?: () => boolean; overlay?: HubHost['overlay'] }): HqModuleLike & { close(): void; goto(place: string): void; state(): { day: number; rescued: string[] }; visitReady: Promise<void> } {
   const hq = createHq();
@@ -94,6 +94,7 @@ function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui
       visitors,
       // 장면을 옮기면 장부에 이동 사건과 지금 위치(확정 사실)를 남긴다
       entered: (to, from, walkedPx) => {
+        fieldClock.place = to.name;
         const sec = walkSeconds(walkedPx) + (to.floor !== from.floor ? STAIR_S : DOOR_S);
         if (fieldClock.sec !== null) fieldClock.sec += sec;
         const at = fieldClock.sec === null ? '' : ` (${clockText(fieldClock.sec)})`;
@@ -187,6 +188,7 @@ function hudState(w: World, shell: Shell): HudState {
     armor: p.armor,
     weapon: heldWeapon(w) ?? { name: '권총', mag: p.ammo, magMax: p.mag, reserve: p.reserve, reload: p.moveKey === 'reload' ? p.mf / 4 : null },
     items: w.items.map((it) => ({ id: it?.id, label: it?.label ?? '', count: it?.n ?? 0 })),
+    field: fieldClock.sec !== null || fieldClock.place ? { clock: fieldClock.sec === null ? undefined : clockText(fieldClock.sec), place: fieldClock.place || undefined } : undefined,
     floor: { depth: d ? (d <= 3 ? `L${d}` : `B-${d - 3}`) : '', name: f.title },
     favor: 0,
     money: { cash: (w.notes.cash as number | undefined) ?? 0, budget: 0, research: 0, teeth: 0 },

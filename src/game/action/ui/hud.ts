@@ -37,6 +37,8 @@ export interface HudState {
   weapon?: { name: string; mag: number; magMax: number; reserve: number; reload?: number | null; temp?: { name: string; uses: number } | null } | null;
   items: HudItem[];
   floor: { depth: string; name: string; variant?: string };
+  /** 필드: 시각과 장소 이름 (우상단 작게) */
+  field?: { clock?: string; place?: string };
   rules?: { text: string; fresh?: boolean }[];
   ruleCount?: { found: number; sent: number };
   /** 승강기 총애 -3~+3 */
@@ -355,6 +357,11 @@ export class Hud {
   /** 층: 오른쪽 위 구석에 글자만 (판 없음). 바뀔 때는 Fx 층 제목이 크게 알린다 */
   private floor(c: CanvasRenderingContext2D, s: HudState) {
     const f = s.floor;
+    if (s.field) {
+      const r = W - (s.compact ? 100 : 20);
+      if (s.field.clock) label(c, s.field.clock, r, 34, 26, '#fff', 'right', 900);
+      if (s.field.place) label(c, s.field.place, r, 56, 15, C.amber, 'right', 800);
+    }
     if (!f.depth) return;
     const right = W - (s.compact ? 100 : 20);
     label(c, f.depth, right, 44, 32, '#fff', 'right', 900);
