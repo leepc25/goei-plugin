@@ -1,0 +1,14 @@
+{
+  "job": "bab23124-d118-4b1e-b54f-58e796cf07a7",
+  "job_status": "completed",
+  "decision": "pass",
+  "reason": "얼굴 확대에서 붉은 홍채 확인. 뒤로 넘긴 흰 머리·두 앞머리 곡선·각진 미남형 얼굴·넓은 어깨·남색 조끼와 흰 셔츠·무재킷 유지. 정면·245px 모발 포함 장신 체격·투명 경계 정상.",
+  "at": 1792791299.8476555,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

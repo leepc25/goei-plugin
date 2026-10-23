@@ -1,0 +1,24 @@
+{
+  "character_id": "aacc2fe3-a93c-4363-ad70-8bb3687e34ab",
+  "result": "pass",
+  "directions_reviewed": [
+    "south",
+    "south-east",
+    "east",
+    "north-east",
+    "north",
+    "north-west",
+    "west",
+    "south-west"
+  ],
+  "findings": "Short receding brown hair, mature forehead/cheek creases, sunglasses and ordinary solid dark suited body retained across8 views. Consistent height and clean outside silhouette.",
+  "movement_direction": "east",
+  "stationary_direction": "south-east",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF primary",
+    "Lore supplementary height",
+    "All55 before motion",
+    "Gray outer paint reroll"
+  ]
+}

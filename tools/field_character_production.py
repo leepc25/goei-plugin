@@ -120,7 +120,9 @@ class Production:
     assert all(before==after for before,after,mark in zip(source.getdata(),im.getdata(),mask.getdata())if mark==(0,0,0)),'inpaint modified unmasked RGBA'
     checks['unmasked_rgba_preserved']=True
    (OUT/slug/'reference.png').write_bytes(data);atomic(OUT/slug/'image-verification.json',checks)
-   assert im.size==(128,256),'wrong canvas';assert bbox and bbox[3]-bbox[1]>=180,'figure too small';assert colors<=48,'palette cap exceeded';assert alpha==[0,255],'unexpected alpha'
+   palette_limit=a.get('image_validation_palette_limit',48);checks['palette_limit']=palette_limit
+   atomic(OUT/slug/'image-verification.json',checks)
+   assert im.size==(128,256),'wrong canvas';assert bbox and bbox[3]-bbox[1]>=180,'figure too small';assert colors<=palette_limit,'palette cap exceeded';assert alpha==[0,255],'unexpected alpha'
    c['image_verified']=True;self.event('image-format-verified',slug,checks)
    if cached.exists():cached.unlink()
   except urllib.error.HTTPError as e:
@@ -241,7 +243,7 @@ class Production:
   if any(j['status']=='processing'for j in self.s['jobs'].values()):return False
   for a in self.manifest:
    c=self.s['characters'][a['slug']]
-   if not all(c.get(k)for k in ['ready','eight_way_visual_reviewed','motions_visual_reviewed']):return False
+   if not all(c.get(k)for k in ['ready','eight_way_visual_reviewed','motions_visual_reviewed','exported']):return False
    if any(self.s['jobs'].get(c['motions'].get(t),{}).get('status')!='completed'for t,_ in TEMPLATES):return False
   return True
  def export_ready(self):

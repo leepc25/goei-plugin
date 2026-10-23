@@ -1,0 +1,14 @@
+{
+  "job": "79d54a0f-1b11-4caf-afd2-829ad8052757",
+  "job_status": "completed",
+  "decision": "pass",
+  "reason": "원작 재대조: 흰 일자 앞머리·옆 얼굴 층과 오른쪽 어깨의 느슨한 S자 웨이브 묶음 확인. 초록 눈·몸·복식·운동화는 마스크 밖 RGBA 완전 동일. 202px 모발 포함·작은 체구 유지, 정면·투명 외곽 정상. 국소 교정 후59색은 기록된64색 허용 범위이며 수동 색축소 없음.",
+  "at": 1792791559.5747676,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

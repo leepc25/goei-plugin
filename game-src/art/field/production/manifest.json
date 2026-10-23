@@ -1690,7 +1690,9 @@
     },
     "image_inpaint_source": "game-src/art/field/production/history/rebuild-20261024/rerolls/lee-seong-hae/0f63a310-5d2a-4efc-8bde-b29bab7a1eb2/reference.png",
     "image_inpaint_mask": "game-src/art/field/production/inputs/lee-seong-hae-loose-ponytail-mask.png",
-    "image_inpaint_description": "In the selected shoulder-hair area, replace the braided/plaited white hair with a LOOSE LOW SIDE PONYTAIL made of long flowing WHITE S-shaped WAVES with wispy curled ends. No braid links, no interwoven strands. It drapes over HER RIGHT shoulder (viewer LEFT), tapering over upper chest. Keep the navy suit and white shirt underneath visible naturally. Match the existing crisp native pixel style and existing white/gray hair palette, no antialiasing and no new unrelated colors. Transparent background remains transparent. Preserve every unmasked pixel including green eyes, head, body and shoes exactly."
+    "image_inpaint_description": "In the selected shoulder-hair area, replace the braided/plaited white hair with a LOOSE LOW SIDE PONYTAIL made of long flowing WHITE S-shaped WAVES with wispy curled ends. No braid links, no interwoven strands. It drapes over HER RIGHT shoulder (viewer LEFT), tapering over upper chest. Keep the navy suit and white shirt underneath visible naturally. Match the existing crisp native pixel style and existing white/gray hair palette, no antialiasing and no new unrelated colors. Transparent background remains transparent. Preserve every unmasked pixel including green eyes, head, body and shoes exactly.",
+    "image_validation_palette_limit": 64,
+    "palette_validation_note": "Local inpaint preserves all unmasked RGBA exactly and adds17 hair shades (59 total). 48 was the creator request target/successful reference example, not a user-mandated hard limit for all outputs. Native hard-edged pixels and transparent alpha remain mandatory; allow64 for this masked repair without reducing colors and losing green irises."
   },
   {
     "english": "Lee Ja-heon",
