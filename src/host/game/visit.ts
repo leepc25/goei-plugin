@@ -6,6 +6,7 @@ import { advValue, budgetFor } from '../../core/advanced';
 import { fitPrompt } from '../../core/budget';
 import type { RefSource } from '../../core/refs';
 import { readDirectory } from '../../core/world';
+import { lastStatusFields } from '../../core/world/tags';
 import { factionNames, parseCatalog } from '../../core/world/catalog';
 import { playerAgent, playerSource } from '../../core/player';
 import { loadContext, updateChat, type ChatContext } from '../risu';
@@ -22,6 +23,13 @@ function factionNamesOf(c: ChatContext): Record<string, string> {
   } catch {
     return {};
   }
+}
+
+/** 본편이 멈춘 자리: 마지막 상태창의 위치·목표·시각, 캐릭터로 플레이면 그 요원 상태 */
+function sceneOf(c: ChatContext, playerId?: string) {
+  const st = lastStatusFields(((c.chat.message ?? []) as { role?: string; data?: string }[]).filter(m => m.role === 'char').slice(-6).map(m => String(m.data ?? '')));
+  const me = playerId ? cardSnapshot(c.char, c.chat).agents.find(a => a.id === playerId) : undefined;
+  return { place: st?.place, target: st?.target, time: st ? [st.date, st.time].filter(Boolean).join(' ') : undefined, protagonistStatus: me ? [me.state, me.situation].filter(Boolean).join(' · ') : undefined };
 }
 
 /** One instance per mounted visit; never retarget to a newly selected chat. */
@@ -101,6 +109,7 @@ export function createVisit(): GameVisit {
           bystanders,
           said: text,
           act,
+          scene: sceneOf(c, me?.id),
           skipBooks: me ? [me.lore] : [],
         }, factionNamesOf(c)));
         const model = advValue(ss, 'hq', 'model') === 'main' ? 'main' : 'aux';

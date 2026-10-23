@@ -21,6 +21,8 @@ export interface VisitPromptInput {
   /** 같은 막간에 다른 요원과 나눈 말 */
   elsewhere: { agent: string; lines: VisitLine[] }[];
   said: string;
+  /** 본편이 멈춘 자리 (상태창 위치·목표, 주인공 요원 상태) */
+  scene?: { place?: string; target?: string; time?: string; protagonistStatus?: string };
   /** said가 말이 아니라 주인공의 행동 */
   act?: boolean;
   /** 같은 방 가까이 있어 끼어들 수 있는 요원 (설계 2판 7단계). 비면 혼자 답한다 */
@@ -87,6 +89,7 @@ export function visitPrompt(src: RefSource, input: VisitPromptInput, names: Reco
     agent: { name: input.agent.name, ...(input.agent.rank ? { rank: input.agent.rank } : {}), lore: input.agent.lore, status: input.agent.state, situation: input.agent.situation, where: ROOM[input.agent.room] ?? input.agent.room },
     ...(by.length ? { bystanders: by.map((b) => ({ name: b.name, ...(b.rank ? { rank: b.rank } : {}), lore: b.lore, status: b.state, situation: b.situation })) } : {}),
     protagonist: { name: input.visitor, ...(protagonist ? { lore: protagonist } : {}) },
+    ...(input.scene && Object.values(input.scene).some(Boolean) ? { mainScene: Object.fromEntries(Object.entries(input.scene).filter(([, v]) => v)) } : {}),
     universe,
     recentStory,
     ...(advOn(ss, 'hq', 'interlude') && input.elsewhere.length ? { earlierThisInterlude: input.elsewhere } : {}),
