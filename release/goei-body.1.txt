@@ -1,4 +1,4 @@
-// goei-body 0.16.51
+// goei-body 0.16.52
 "use strict";
 (() => {
   // src/core/dispatch.ts

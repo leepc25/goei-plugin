@@ -1,13 +1,4 @@
-me);
-  function reportPayload(s2) {
-    const l = s2.last;
-    if (!l) return null;
-    const a = AGENT_BY_ID[l.agent];
-    return {
-      mission: MISSION_BY_ID[l.mission]?.title ?? l.mission,
-      outcome: l.how,
-      depth: l.result.depth,
-      agents: [{ id: a.id, name: a.name, hp: l.how === "evac" ? 0 : 1, injured: s2.agents[l.agent].injured > 0 }],
+: l.how === "evac" ? 0 : 1, injured: s2.agents[l.agent].injured > 0 }],
       rules: l.result.found,
       loot: l.result.bag.filter(Boolean).map((b) => b.name),
       summary: reportText(s2)
@@ -3233,4 +3224,7 @@ ${can.ok ? "" : `<p class="hq-warn">${esc2(can.why)}</p>`}</div>
     const hall2 = f.segments[0];
     const chunks = f.segments.filter((s2) => s2.ref.startsWith("chunk:"));
     const terr = f.segments.flatMap((s2) => s2.terrain);
-    const clearAt = (x, d3 = 90) => !f.placed.some((p) => Math.abs(p.x - x) < d3) && !terr.some((t) =>
+    const clearAt = (x, d3 = 90) => !f.placed.some((p) => Math.abs(p.x - x) < d3) && !terr.some((t) => x > t.x0 - 80 && x < t.x1 + 80);
+    const decor = (p) => p.kind === "prop" && !Object.keys(p.data).length;
+    const clearIfMoved = (x, d3) => !f.placed.some((p) => !decor(p) && Math.abs(p.x - x) < d3) && !terr.some((t) => x > t.x0 - 80 && x < t.x1 + 80);
+    const spot = (segs, d3, ok

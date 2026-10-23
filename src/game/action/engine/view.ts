@@ -14,3 +14,9 @@ export const persp = (y: number) => {
 };
 /** 발 y에 선 사람 그림의 도트 배율 (월드 좌표 기준). 필드가 아니면 1 */
 export const spr = (y: number) => persp(y) / view.zoom;
+/** 사람 그림 원점을 (x, y)로 옮기되 화면 픽셀 정수에 붙인다 (필드는 월드를 zoom배로 그려서 월드 정수 좌표가 화면 소수 px이 된다) */
+export function snapTo(c: CanvasRenderingContext2D, x: number, y: number) {
+  c.translate(x, y);
+  const t = c.getTransform();
+  c.setTransform(t.a, t.b, t.c, t.d, Math.round(t.e), Math.round(t.f));
+}

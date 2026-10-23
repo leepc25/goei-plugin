@@ -1,23 +1,4 @@
-act: d3.react,
-        dir: this.dir,
-        push: d3.push ?? 2,
-        stop: 2,
-        low: d3.low,
-        armorBreak: d3.unblockable,
-        strength: d3.react === "down" ? 3 : d3.react === "stagger" ? 2 : 1
-      };
-      if (d3.debuff) {
-        hit2.debuff = d3.debuff;
-        armDebuff(hit2, d3.debuff, this.id);
-      }
-      return { hit: [hit2], hurt: [] };
-    }
-    step(world) {
-      const d3 = this.def;
-      checkDebuffs(world);
-      if (this.done) return void (this.alive = false);
-      this.t++;
-      if (d3.every && this.t % d3.every === 0) this.attackId = newAttackId();
+&& this.t % d3.every === 0) this.attackId = newAttackId();
       this.x += this.vx;
       if (d3.gravity) {
         this.z += this.vz;
@@ -4618,7 +4599,7 @@ act: d3.react,
       if (!fi || !art5.atlas) return false;
       ctx.save();
       ctx.globalAlpha = alpha * ghostK;
-      ctx.translate(Math.round(x), Math.round(y));
+      snapTo(ctx, x, y);
       if (dir < 0) ctx.scale(-1, 1);
       const P = PIXEL * spr(y);
       ctx.drawImage(art5.atlas, fi.sx, fi.sy, fi.w, fi.h, (fi.ox - origin) * P, fi.oy * P, fi.w * P, fi.h * P);
@@ -4943,4 +4924,15 @@ act: d3.react,
             ctx.save();
             ctx.translate(-camX + jitter, 0);
             b.draw(ctx, w);
-            ctx.re
+            ctx.restore();
+          } else if (b.draw) {
+            ctx.save();
+            ctx.translate(Math.round(q.x - camX + jitter), Math.round(q.y - q.z));
+            b.draw(ctx, w);
+            ctx.restore();
+          } else grayBody(b, camX - jitter, 0);
+        }
+        propsUpTo(Infinity);
+        {
+          const pl = w.player;
+          if (pl.alive && (w.props.some((p) => p.y > pl.y + 2 && Math.abs(p.x - pl.x) < p.w / 2 + 50 && !["hubdoor", "hubspot", "door", "elevator", "hatch"].includes(p.kind)) || layers.some((l) => l.occludedSilhouette !== false && l.y > 

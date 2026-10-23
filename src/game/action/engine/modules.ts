@@ -277,8 +277,8 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
   });
   (globalThis as { __goeiNpc?: unknown }).__goeiNpc = npc; // 시험용
   (globalThis as { __goeiStage?: unknown }).__goeiStage = shell.stage; // 시험용
-  // 필드 요원: 지금 그림(몸 약 97도트)을 화면 약 340px로 (PixelLab 256 캔버스 ×2 크기를 미리 보기). 원근은 view.persp
-  setPixelScale(bridge?.visit ? 3.5 : 2.75);
+  // 필드 요원: 지금 그림(몸 약 97도트)을 화면 약 255px로 (PixelLab 256 캔버스 몸 약 170도트 ×1.5 크기를 미리 보기). 원근은 view.persp
+  setPixelScale(bridge?.visit ? 2.625 : 2.75);
   (globalThis as { __goeiSetPixel?: (p: number) => void }).__goeiSetPixel = setPixelScale; // 시험용
   // 강화 선택(기본기획서 15.2)은 껍데기 선택 창으로: 창이 열린 동안 게임이 멈춘다
   const elevator = createElevatorStage(stageStore, {

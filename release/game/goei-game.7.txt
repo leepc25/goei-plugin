@@ -1,7 +1,4 @@
- x > t.x0 - 80 && x < t.x1 + 80);
-    const decor = (p) => p.kind === "prop" && !Object.keys(p.data).length;
-    const clearIfMoved = (x, d3) => !f.placed.some((p) => !decor(p) && Math.abs(p.x - x) < d3) && !terr.some((t) => x > t.x0 - 80 && x < t.x1 + 80);
-    const spot = (segs, d3, ok = () => true, shuffled2 = false) => {
+ = () => true, shuffled2 = false) => {
       let xs = segs.flatMap((c) => Array.from({ length: 27 }, (_, k) => c.x + 60 + k * 20));
       if (shuffled2) xs = shuffle2(r, xs);
       for (const pass of [clearAt, clearIfMoved])
@@ -3800,4 +3797,12 @@ ${SET_BONUS[u.set]}`;
     const m = /^([a-z]+)(?:\((\w+)\))?\s*:\s*(.+)$/.exec(body2);
     if (!m) throw new ScriptError(`${where}:${line2} 말 줄 형식이 아니에요: ${body2}`);
     const mood = m[2] ?? "base";
-    if (!MOODS.has(mood)) throw new ScriptError(`${where}:${li
+    if (!MOODS.has(mood)) throw new ScriptError(`${where}:${line2} 모르는 표정: ${m[2]}`);
+    return { t: "say", who: m[1], mood, text: m[3].trim(), line: line2 };
+  }
+  function parseScripts(src, where = "script") {
+    const out = [];
+    let cur = null;
+    const lines3 = src.split(/\r?\n/);
+    for (let i = 0; i < lines3.length; i++) {
+  

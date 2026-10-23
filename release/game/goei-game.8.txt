@@ -1,12 +1,4 @@
-ne2} 모르는 표정: ${m[2]}`);
-    return { t: "say", who: m[1], mood, text: m[3].trim(), line: line2 };
-  }
-  function parseScripts(src, where = "script") {
-    const out = [];
-    let cur = null;
-    const lines3 = src.split(/\r?\n/);
-    for (let i = 0; i < lines3.length; i++) {
-      const n = i + 1;
+    const n = i + 1;
       const raw = lines3[i].trim();
       if (!raw || raw.startsWith("//")) continue;
       if (raw.startsWith("===")) {
@@ -4188,4 +4180,4 @@ ${who}: ${text2.replace(/\n/g, " ")}
   DAYDREAM_NPCS.goyoungeun.gifts = ["bandage"];
   var FAKE_NPCS = {
     leedohyeong: d2({ id: "leedohyeong", name: "이도형", sheet: "이도형", group: "fake", color: "#444b55", photo: "Lee Do-hyeong", role: "가짜 관리국 검객 부서 부장. 최강의 개인 전투원.", speech: "건들건들 오만한 반말, 명령은 한 단어와 턱짓.", effects: ["favor", "hint", "hostile", "leave"], greet: ["어, 다들 수고. 신입 왔다며?"], lines: ["들어가.", "감각을 깨워야 돼. 여기서 베면 죽는다, 그 감각.", "나머지는 다 엑스트라야.", "귀찮게 하네."] }),
-    kwakseongju: d2({ id: "kwakseongju", name: "곽성주", sheet: "곽성주", group: "fake", color: "#5a4a3a"
+    kwakseongju: d2({ id: "kwakseongju", name: "곽성주", sheet: "곽성주", group: "fake", color: "#5a4a3a", photo: "Kwak Seong-ju", role: "가짜 관리국 과장. 최전방 중돌격 담당.", speech: "연병장 고함, 욕설 섞인 반말. 명령·농담·객기가 같은 음량.", effects: ["favor", "hint", "hostile", "leave"], greet: ["닥쳐, 이 자식아! 후퇴는 없다!"], lines: 

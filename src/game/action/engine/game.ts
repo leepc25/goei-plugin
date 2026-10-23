@@ -136,7 +136,16 @@ export class Game {
         view.zoom = this.canvas.height / SCREEN_H;
         if (w) view.lane = w.lane;
         const vw = this.canvas.width / view.zoom;
-        view.crop = vw < SCREEN_W && w ? Math.max(0, Math.min(SCREEN_W - vw, Math.round(w.player.x - w.camX - vw / 2))) : 0;
+        // 화면 밀기는 그림과 같은 보간 위치로 (틱 위치로 하면 걸을 때 화면이 30Hz로 툭툭 따라가 캐릭터가 떨린다).
+        // 렌더러는 camX를 정수로 반올림하므로, 둘을 합한 이동이 화면 px 정수가 되게 crop을 맞춘다
+        view.crop = 0;
+        if (vw < SCREEN_W && w) {
+          const a = paused ? 1 : this.acc / T,
+            cam = Math.round(w.prevCamX + (w.camX - w.prevCamX) * a),
+            px = (w.player.px ?? w.player.x) + (w.player.x - (w.player.px ?? w.player.x)) * a,
+            raw = Math.max(0, Math.min(SCREEN_W - vw, px - cam - vw / 2));
+          view.crop = Math.round((cam + raw) * view.zoom) / view.zoom - cam;
+        }
         this.ctx.save();
         this.ctx.scale(view.zoom, view.zoom);
         this.ctx.translate(-view.crop, 0);
