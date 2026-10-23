@@ -1,4 +1,4 @@
-: 0, lockTo: 3200, waves: [[{ kind: "dummy", x: 1600, y: 560 }, { kind: "dummy", x: 2400, y: 620 }]] }] }),
+aves: [[{ kind: "dummy", x: 1600, y: 560 }, { kind: "dummy", x: 2400, y: 620 }]] }] }),
       nextFloor: () => null
     };
     const unknownKinds = /* @__PURE__ */ new Set();
@@ -182,6 +182,16 @@
       game?.checkpoint();
       void session.flush();
     };
+    let hiddenNow = false;
+    const offHidden = bridge?.onHidden?.((h) => {
+      hiddenNow = h;
+      if (h) {
+        visit?.close();
+        if (shell.mode === "play" && !shell.paused) shell.openPause();
+        audio.setPaused(true);
+        saveOnHide();
+      }
+    });
     window.addEventListener("pagehide", saveOnHide);
     document.addEventListener("visibilitychange", saveOnHide);
     window.addEventListener("keydown", hqKeys, true);
@@ -264,7 +274,7 @@
       onPlay: () => shell.play(),
       frame: (dt) => {
         syncVolume();
-        audio.setPaused(shell.paused && !openingOn);
+        audio.setPaused(hiddenNow || shell.paused && !openingOn);
         audio.setCutscene(story.isVideoPlaying());
         story.update(dt);
         shell.frame(dt);
@@ -366,6 +376,7 @@
       dispose: () => {
         window.removeEventListener("pagehide", saveOnHide);
         document.removeEventListener("visibilitychange", saveOnHide);
+        offHidden?.();
         npc.dispose();
         unmountItems();
         const g2 = globalThis;
@@ -3162,7 +3173,7 @@
     }
   }
   var mod = {
-    version: "0.16.46",
+    version: "0.16.47",
     mount: (box2, bridge) => mountPlay(box2, bridge),
     // 이전 시험판: 저장 키와 그림 팩은 예전 그대로 (goei:game · goei:game-action:v1)
     legacy: {

@@ -1,4 +1,4 @@
-// goei-body 0.16.46
+// goei-body 0.16.47
 "use strict";
 (() => {
   // src/core/dispatch.ts
@@ -27,10 +27,10 @@
       destination: ["name", "located"],
       party: ["solo", "group", "support_one", "support_many", "separator", "pair_separator", "last_separator"]
     };
-    for (const [group4, list4] of Object.entries(keys)) {
-      const obj3 = format?.[group4];
-      if (!obj3 || typeof obj3 !== "object") throw new DirectiveError(`Directive FORMAT.${group4}가 없어요.`);
-      for (const k of list4) if (typeof obj3[k] !== "string") throw new DirectiveError(`Directive FORMAT.${group4}.${k}는 문자열이어야 해요.`);
+    for (const [group5, list4] of Object.entries(keys)) {
+      const obj3 = format?.[group5];
+      if (!obj3 || typeof obj3 !== "object") throw new DirectiveError(`Directive FORMAT.${group5}가 없어요.`);
+      for (const k of list4) if (typeof obj3[k] !== "string") throw new DirectiveError(`Directive FORMAT.${group5}.${k}는 문자열이어야 해요.`);
     }
     if (typeof format.user_input !== "string") throw new DirectiveError("Directive FORMAT.user_input은 문자열이어야 해요.");
     for (const name of REQUIRED) if (!sections2[name]) throw new DirectiveError(`Directive의 ${name} 섹션을 확인하세요.`);
@@ -953,9 +953,9 @@ ${body4.slice(at).replace(/^\s+/, "")}
   function guessEnglish(e) {
     return keysOf(e).find(ascii) ?? "";
   }
-  function legacyPlaces(lore, group4) {
+  function legacyPlaces(lore, group5) {
     const world = obj2(book(lore, "World catalog"));
-    const rows2 = Array.isArray(world[group4]) ? world[group4] : [];
+    const rows2 = Array.isArray(world[group5]) ? world[group5] : [];
     const out = [];
     for (const r of rows2) {
       if (!Array.isArray(r) || r.length !== 5) continue;
@@ -1074,12 +1074,12 @@ ${body4.slice(at).replace(/^\s+/, "")}
     for (const f of FACTIONS) if (s2(m[f])) out[f] = s2(m[f]);
     return { ...extraNames(lore), ...out };
   }
-  function groupFaction(group4, names4) {
+  function groupFaction(group5, names4) {
     let best = "";
     let len = 0;
     for (const f of FACTIONS) {
       const n = names4[f];
-      if (n && group4.includes(n) && n.length > len) {
+      if (n && group5.includes(n) && n.length > len) {
         best = f;
         len = n.length;
       }
@@ -1169,11 +1169,11 @@ ${body4.slice(at).replace(/^\s+/, "")}
     }
     return out;
   }
-  function orgHint(group4, orgs, lore) {
-    if (!group4) return void 0;
-    const code = groupFaction(group4, factionDisplayNames(lore));
+  function orgHint(group5, orgs, lore) {
+    if (!group5) return void 0;
+    const code = groupFaction(group5, factionDisplayNames(lore));
     if (code) return orgs.find((o) => o.faction === code);
-    return orgs.find((o) => o.name === group4) ?? [...orgs].sort((x, y) => y.name.length - x.name.length).find((o) => !o.faction && group4.includes(o.name));
+    return orgs.find((o) => o.name === group5) ?? [...orgs].sort((x, y) => y.name.length - x.name.length).find((o) => !o.faction && group5.includes(o.name));
   }
   function assignOrg(a, o) {
     a.affiliation = o ? orgAffiliation(o) : "";
@@ -1206,9 +1206,9 @@ ${body4.slice(at).replace(/^\s+/, "")}
     const exists = new Set(books.filter((e) => !isFolder(e)).map((e) => s2(e.comment)));
     const byLore = new Map(books.filter((e) => !isFolder(e)).map((e) => [s2(e.comment), e]));
     const places = (kind) => {
-      const group4 = kind === "anomaly" ? "괴이" : "미스틱 사이트";
-      const legacy = legacyPlaces(books, group4);
-      const saved = obj2(data?.[group4]);
+      const group5 = kind === "anomaly" ? "괴이" : "미스틱 사이트";
+      const legacy = legacyPlaces(books, group5);
+      const saved = obj2(data?.[group5]);
       const folder = members?.[kind] ?? [];
       const used = /* @__PURE__ */ new Set();
       const legacyLore = /* @__PURE__ */ new Map();
@@ -1272,13 +1272,13 @@ ${body4.slice(at).replace(/^\s+/, "")}
         rosterFor: Array.isArray(d.roster_for) ? list2(d.roster_for) : base.rosterFor,
         phoneTabs: Array.isArray(d.phone_tabs) ? list2(d.phone_tabs) : base.phoneTabs
       });
-      let group4 = "";
+      let group5 = "";
       for (const e of members?.agent ?? []) {
         const name = s2(e.comment);
         const sep = SEPARATOR.exec(name);
         if (sep) {
-          group4 = sep[1].trim();
-          if (group4 && !groups.includes(group4)) groups.push(group4);
+          group5 = sep[1].trim();
+          if (group5 && !groups.includes(group5)) groups.push(group5);
           continue;
         }
         if (seen2.has(name)) continue;
@@ -1289,11 +1289,11 @@ ${body4.slice(at).replace(/^\s+/, "")}
           legacyLore.set(name, old.lore);
         }
         let base;
-        if (old) base = { ...old, lore: name, group: group4, inFolder: true };
-        else base = { lore: name, id: "", name, english: guessEnglish(e), aliases: [], legacyEnglish: [], affiliation: "", rosterFor: [], phoneTabs: [], rank: "", department: "", group: group4, inFolder: true };
-        const row6 = merge(base, obj2(saved[name]));
-        if (!old && !saved[name]) fresh.add(row6);
-        out.push(row6);
+        if (old) base = { ...old, lore: name, group: group5, inFolder: true };
+        else base = { lore: name, id: "", name, english: guessEnglish(e), aliases: [], legacyEnglish: [], affiliation: "", rosterFor: [], phoneTabs: [], rank: "", department: "", group: group5, inFolder: true };
+        const row7 = merge(base, obj2(saved[name]));
+        if (!old && !saved[name]) fresh.add(row7);
+        out.push(row7);
       }
       for (const [name, d] of Object.entries(saved)) {
         if (seen2.has(name) || !exists.has(name)) continue;
@@ -1451,9 +1451,9 @@ ${body4.slice(at).replace(/^\s+/, "")}
     const members = folderMembers(lore);
     const inside2 = new Set([...members?.anomaly ?? [], ...members?.site ?? []].map((e) => s2(e.comment)));
     let hit3 = false;
-    const strip = (group4) => {
-      if (!group4) return group4;
-      const next2 = { ...group4 };
+    const strip = (group5) => {
+      if (!group5) return group5;
+      const next2 = { ...group5 };
       for (const name of OLD_OUTSIDE_PLACES) if (name in next2 && !inside2.has(name)) delete next2[name], hit3 = true;
       return next2;
     };
@@ -1476,9 +1476,9 @@ ${body4.slice(at).replace(/^\s+/, "")}
     }
     const to = d.agents.findIndex((a) => a.lore === target);
     if (to < 0 || to === from || agentGroup(d.agents[to]) !== g) return false;
-    const [row6] = d.agents.splice(from, 1);
+    const [row7] = d.agents.splice(from, 1);
     const at = (to > from ? to - 1 : to) + (how === "after" ? 1 : 0);
-    d.agents.splice(at, 0, row6);
+    d.agents.splice(at, 0, row7);
     return true;
   }
   function loreGender(lore, name) {
@@ -1881,11 +1881,11 @@ ${body4.slice(at).replace(/^\s+/, "")}
     const taken = occupied(w);
     return pick2(POOL.filter((l) => !taken.has(l) && l !== skip), rng);
   }
-  function block(w, group4, name) {
-    if (name) w.blocks[`${group4}:${name}`] = w.epoch + 1;
+  function block(w, group5, name) {
+    if (name) w.blocks[`${group5}:${name}`] = w.epoch + 1;
   }
-  function blocked(w, group4, name) {
-    return (w.blocks[`${group4}:${name}`] ?? -1) >= w.epoch;
+  function blocked(w, group5, name) {
+    return (w.blocks[`${group5}:${name}`] ?? -1) >= w.epoch;
   }
   function remember(w, kind, e, grade) {
     if (e.state === "발생대기") return;
@@ -1910,9 +1910,9 @@ ${body4.slice(at).replace(/^\s+/, "")}
     w.ms = w.ms.filter((x) => x !== e);
   }
   function spawnAn(w, c, s4, preset, rng) {
-    const group4 = preset ? "preset" : "random";
-    const n = w.an.filter((e) => e.origin === "auto" && e.kind === group4).length;
-    if (n >= s4[`${group4}_cap`] || !(rng() * 100 < s4[`${group4}_p`])) return;
+    const group5 = preset ? "preset" : "random";
+    const n = w.an.filter((e) => e.origin === "auto" && e.kind === group5).length;
+    if (n >= s4[`${group5}_cap`] || !(rng() * 100 < s4[`${group5}_p`])) return;
     let name = "";
     if (preset) {
       const active = new Set(w.an.map((e) => e.presetName || presetCanon(c, e.name)));
@@ -1928,7 +1928,7 @@ ${body4.slice(at).replace(/^\s+/, "")}
       state: "발생대기",
       grade: "",
       deploy: "",
-      kind: group4,
+      kind: group5,
       origin: "auto",
       presetName: name,
       since: null,
@@ -1974,10 +1974,10 @@ ${body4.slice(at).replace(/^\s+/, "")}
   function expire(w, s4) {
     const now = w.minute;
     if (now === null) return;
-    const old = (e, group4) => {
+    const old = (e, group5) => {
       if (e.born === null) e.born = e.since ?? now;
-      const hours = s4[`${group4}_ttl`];
-      return s4[`${group4}_expire`] === 1 && hours > 0 && now - e.born >= hours * 60;
+      const hours = s4[`${group5}_ttl`];
+      return s4[`${group5}_expire`] === 1 && hours > 0 && now - e.born >= hours * 60;
     };
     for (const e of [...w.an]) if (!e.exploring && old(e, e.kind)) endAn(w, e);
     for (const e of [...w.inc]) if (old(e, "incident")) endIn(w, e);
@@ -2947,8 +2947,8 @@ ${body4.slice(at).replace(/^\s+/, "")}
     const { aliasesOf, own, low } = aliasRules(books, dir2);
     const places = { 괴이: dir2.anomalies, "미스틱 사이트": dir2.sites };
     const tag = { 괴이: "an", "미스틱 사이트": "ms" };
-    for (const [group4, rows2] of Object.entries(places)) {
-      rows2.forEach((p, i) => add(`World catalog/${group4}/${i + 1}`, p.label, p.lore, [p.english, ...aliasesOf(p.aliases, `${tag[group4]}${i}`, p.lore)]));
+    for (const [group5, rows2] of Object.entries(places)) {
+      rows2.forEach((p, i) => add(`World catalog/${group5}/${i + 1}`, p.label, p.lore, [p.english, ...aliasesOf(p.aliases, `${tag[group5]}${i}`, p.lore)]));
     }
     dir2.bases.forEach((b, i) => add(`거점/${i + 1}`, b.name, b.lore || (b.org ? orgLoreName(books, b.org) : ""), [b.english, b.label, ...b.aliases.filter((t) => (own.get(low(t)) ?? `lm${i}`) === `lm${i}`)]));
     for (const a of dir2.agents) add(`Agent roster/${a.id}`, a.name, a.lore, [a.english, ...aliasesOf(a.aliases, `ag${a.id}`, a.lore), ...a.legacyEnglish]);
@@ -4260,9 +4260,9 @@ ${themeVars("[x-goei-fab]")}
     const seen2 = /* @__PURE__ */ new Set();
     while (parent && p.comments[parent - 1] && !seen2.has(parent)) {
       seen2.add(parent);
-      const row6 = p.comments[parent - 1];
-      if (row6.mine) return true;
-      parent = row6.parent;
+      const row7 = p.comments[parent - 1];
+      if (row7.mine) return true;
+      parent = row7.parent;
     }
     return false;
   }

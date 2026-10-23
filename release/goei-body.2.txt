@@ -730,9 +730,9 @@ ${JSON.stringify({ feature: "gnet", records })}
     const data = phoneTabsSection(lore);
     if (!data.tabs.length) throw new PhoneError("괴담톡 탭 설정이 없어요.");
     const entries2 = [];
-    for (const row6 of data.tabs) {
-      if (entries2.some((e) => e.id === row6.id)) continue;
-      entries2.push({ id: row6.id, name: row6.name || row6.id, names: { ...row6.name_by_faction }, visibleFor: new Set(row6.visible_for) });
+    for (const row7 of data.tabs) {
+      if (entries2.some((e) => e.id === row7.id)) continue;
+      entries2.push({ id: row7.id, name: row7.name || row7.id, names: { ...row7.name_by_faction }, visibleFor: new Set(row7.visible_for) });
     }
     const extra = extraFactions(lore).map((f) => f.code);
     if (extra.length) {
@@ -772,29 +772,29 @@ ${JSON.stringify({ feature: "gnet", records })}
     const roster = { characters: rosterOf(readDirectory(books)) };
     const map = /* @__PURE__ */ new Map();
     const contacts = [];
-    for (const row6 of roster.characters ?? []) {
-      const agentId = s3(row6?.id);
-      if (!/^P\d{3,}$/.test(agentId) || !s3(row6.name)) continue;
+    for (const row7 of roster.characters ?? []) {
+      const agentId = s3(row7?.id);
+      if (!/^P\d{3,}$/.test(agentId) || !s3(row7.name)) continue;
       if (agentId === String(chat.scriptstate?.["$st_player"] ?? "")) continue;
-      const english = s3(row6.english);
+      const english = s3(row7.english);
       const c = {
         id: contactId(agentId),
         agentId,
-        name: s3(row6.name),
+        name: s3(row7.name),
         english,
-        lore: s3(row6.lore),
-        group: s3(row6.affiliation),
-        rank: s3(row6.rank),
-        department: s3(row6.department),
-        tabs: list3(row6.phone_tabs),
-        terms: [s3(row6.name), english, s3(row6.lore), ...list3(row6.aliases), ...list3(row6.legacy_english)].filter(Boolean),
+        lore: s3(row7.lore),
+        group: s3(row7.affiliation),
+        rank: s3(row7.rank),
+        department: s3(row7.department),
+        tabs: list3(row7.phone_tabs),
+        terms: [s3(row7.name), english, s3(row7.lore), ...list3(row7.aliases), ...list3(row7.legacy_english)].filter(Boolean),
         visible: false,
         saved: false
       };
       c.visible = c.tabs.some((t) => visible2.has(t));
       map.set(c.id, c);
       if (c.visible) contacts.push(c);
-      for (const name of [english, ...list3(row6.legacy_english)]) if (name) map.set(`c_${hex2(name.toLowerCase())}`, c);
+      for (const name of [english, ...list3(row7.legacy_english)]) if (name) map.set(`c_${hex2(name.toLowerCase())}`, c);
     }
     for (const entry of readCustom(chat).items) {
       let c = map.get(entry.id);
@@ -890,7 +890,7 @@ ${JSON.stringify({ feature: "gnet", records })}
     let senders = /* @__PURE__ */ new Map();
     if (r.conversationBaseline && typeof r.conversationBaseline === "object") {
       out = JSON.parse(JSON.stringify(r.conversationBaseline));
-      for (const row6 of out.senders ?? []) senders.set(row6.sender, row6);
+      for (const row7 of out.senders ?? []) senders.set(row7.sender, row7);
       out.senders = [];
     }
     for (const m of r.messages) {
@@ -905,18 +905,18 @@ ${JSON.stringify({ feature: "gnet", records })}
         senders = /* @__PURE__ */ new Map();
       } else {
         out.npcMessagesSinceOwner++;
-        const row6 = senders.get(m.sender) ?? { sender: m.sender, messagesSinceOwner: 0, firstMessageTime: m.time || "" };
-        row6.messagesSinceOwner++;
-        row6.lastMessageTime = m.time || "";
-        row6.lastRecordID = m.id;
-        senders.set(m.sender, row6);
+        const row7 = senders.get(m.sender) ?? { sender: m.sender, messagesSinceOwner: 0, firstMessageTime: m.time || "" };
+        row7.messagesSinceOwner++;
+        row7.lastMessageTime = m.time || "";
+        row7.lastRecordID = m.id;
+        senders.set(m.sender, row7);
       }
     }
     const rt = r.readThrough;
     for (const key2 of [...senders.keys()].sort()) {
-      const row6 = senders.get(key2);
-      row6.lastMessageRead = rt !== void 0 && row6.lastRecordID !== void 0 ? row6.lastRecordID <= rt ? "read" : "unread" : "unknown";
-      out.senders.push(row6);
+      const row7 = senders.get(key2);
+      row7.lastMessageRead = rt !== void 0 && row7.lastRecordID !== void 0 ? row7.lastRecordID <= rt ? "read" : "unread" : "unknown";
+      out.senders.push(row7);
     }
     out.readReceipt = rt !== void 0 ? "tracked" : "unknown";
     out.ownerReadThroughRecordID = rt;
@@ -1100,7 +1100,7 @@ ${JSON.stringify({ feature: "gnet", records })}
     try {
       const v = JSON.parse(raw);
       if (v && Array.isArray(v.items)) {
-        for (const row6 of v.items) if (row6.read === void 0) row6.read = true;
+        for (const row7 of v.items) if (row7.read === void 0) row7.read = true;
         return { version: 2, seq: Number(v.seq) || 0, items: v.items, checks: v.checks ?? {}, seen: v.seen ?? {}, lastIssuedTurns: v.lastIssuedTurns };
       }
     } catch {
@@ -1108,12 +1108,12 @@ ${JSON.stringify({ feature: "gnet", records })}
     throw new PhoneError("공지 기록을 읽지 못했어요. 원본 기록은 그대로 둬요.");
   }
   var bulletinUnread = (b) => b.items.some((r) => r.read === false);
-  var signature = (row6) => JSON.stringify([row6.channel, row6.title.trim(), row6.text.trim()]);
+  var signature = (row7) => JSON.stringify([row7.channel, row7.title.trim(), row7.text.trim()]);
   function trimBulletins(b, cap = STORAGE.notice) {
     const n = Math.max(0, b.items.length - cap);
     b.items = b.items.slice(n);
     b.seen = {};
-    for (const row6 of b.items) b.seen[signature(row6)] = true;
+    for (const row7 of b.items) b.seen[signature(row7)] = true;
   }
   function noticeChannel(chat) {
     const code = String(chat.scriptstate?.["$st_faction"] ?? "");
@@ -1142,31 +1142,31 @@ ${JSON.stringify({ feature: "gnet", records })}
   function validateAnnouncements(rows2, packet, dropped = []) {
     if (rows2 != null && !Array.isArray(rows2)) fail("공지 목록이 배열이 아니에요.");
     const out = [];
-    for (const row6 of rows2 ?? []) {
-      const why = noticeProblem(row6);
+    for (const row7 of rows2 ?? []) {
+      const why = noticeProblem(row7);
       if (why) dropped.push(why);
       else if (out.length >= (packet?.maxNew ?? 0)) dropped.push("한 번에 받을 공지 수를 넘었어요.");
-      else out.push(row6);
+      else out.push(row7);
     }
     return out;
   }
-  function noticeProblem(row6) {
-    if (!row6 || typeof row6.issuer !== "string" || typeof row6.category !== "string" || typeof row6.title !== "string" || typeof row6.text !== "string") return "공지 형식이 잘못됐어요.";
-    if (!CATEGORIES.has(row6.category)) return "공지 분류가 올바르지 않아요.";
-    if (!row6.issuer.trim() || [...row6.issuer].length > LIMITS2.notice_issuer || !row6.title.trim() || [...row6.title].length > LIMITS2.notice_title || !row6.text.trim()) return "공지 발신처·제목·본문을 확인하세요.";
-    if (tokens(row6.text) > LIMITS2.notice_tokens) return `공지 한 개는 ${LIMITS2.notice_tokens}토큰 이내여야 해요.`;
+  function noticeProblem(row7) {
+    if (!row7 || typeof row7.issuer !== "string" || typeof row7.category !== "string" || typeof row7.title !== "string" || typeof row7.text !== "string") return "공지 형식이 잘못됐어요.";
+    if (!CATEGORIES.has(row7.category)) return "공지 분류가 올바르지 않아요.";
+    if (!row7.issuer.trim() || [...row7.issuer].length > LIMITS2.notice_issuer || !row7.title.trim() || [...row7.title].length > LIMITS2.notice_title || !row7.text.trim()) return "공지 발신처·제목·본문을 확인하세요.";
+    if (tokens(row7.text) > LIMITS2.notice_tokens) return `공지 한 개는 ${LIMITS2.notice_tokens}토큰 이내여야 해요.`;
     return null;
   }
   function commitAnnouncements(b, st, rows2, packet, time2) {
     let added = 0;
-    for (const row6 of rows2) {
-      const rec = { channel: packet.channel, title: row6.title.trim(), text: row6.text.trim() };
+    for (const row7 of rows2) {
+      const rec = { channel: packet.channel, title: row7.title.trim(), text: row7.text.trim() };
       const sig = signature(rec);
       if (b.seen[sig]) continue;
       b.seen[sig] = true;
       b.seq += 1;
       st.mid += 1;
-      b.items.push({ id: b.seq, order: st.mid, read: false, channel: packet.channel, channelName: packet.channelName, issuer: row6.issuer.trim(), category: row6.category, title: rec.title, text: rec.text, time: time2 });
+      b.items.push({ id: b.seq, order: st.mid, read: false, channel: packet.channel, channelName: packet.channelName, issuer: row7.issuer.trim(), category: row7.category, title: rec.title, text: rec.text, time: time2 });
       added++;
     }
     if (added && packet.allowed) b.lastIssuedTurns = { ...b.lastIssuedTurns ?? {}, [packet.channel]: packet.turn };
@@ -1187,16 +1187,16 @@ ${JSON.stringify({ feature: "gnet", records })}
     const sig = (m) => [...m].sort().join(",");
     const out = [];
     const fresh = /* @__PURE__ */ new Set();
-    for (const row6 of rows2 ?? []) {
+    for (const row7 of rows2 ?? []) {
       if (out.length >= (packet?.maxNew ?? 0)) {
         dropped.push("한 번에 받을 단톡방 초대 수를 넘었어요.");
         continue;
       }
       try {
-        if (!row6 || typeof row6.inviter !== "string" || !Array.isArray(row6.members) || typeof row6.name !== "string" || !Array.isArray(row6.patch)) fail("단톡방 초대 형식이 잘못됐어요.");
-        const name = row6.name.trim();
+        if (!row7 || typeof row7.inviter !== "string" || !Array.isArray(row7.members) || typeof row7.name !== "string" || !Array.isArray(row7.patch)) fail("단톡방 초대 형식이 잘못됐어요.");
+        const name = row7.name.trim();
         if (!name || [...name].length > LIMITS2.room_name) fail("초대할 단톡방 이름이 길이 제한을 넘었어요.");
-        const members = row6.members;
+        const members = row7.members;
         if (members.length < 2 || members.length > LIMITS2.members) fail("단톡방에는 NPC 2명 이상이 필요하고 최대 인원을 넘을 수 없어요.");
         const people = {};
         for (const cid of members) {
@@ -1204,12 +1204,12 @@ ${JSON.stringify({ feature: "gnet", records })}
           if (typeof cid !== "string" || !allowed.has(cid) || !c || people[cid]) fail("단톡방 초대에 허용되지 않거나 중복된 참여자가 있어요.");
           people[cid] = personOf(c);
         }
-        if (!people[row6.inviter]) fail("초대한 인물은 단톡방 참여자여야 해요.");
+        if (!people[row7.inviter]) fail("초대한 인물은 단톡방 참여자여야 해요.");
         const key2 = `${name}\0${sig(members)}`;
         if (fresh.has(key2)) fail("같은 단톡방 초대가 중복됐어요.");
         for (const r of Object.values(st.rooms)) if (r.kind === "group" && roomLabel(r).trim() === name && sig(r.members) === sig(members)) fail("같은 이름과 참여자의 단톡방이 이미 있어요.");
-        const room = { id: "", kind: "group", name, members: [...members], people, messages: [], draft: "", unread: 0, inviter: row6.inviter };
-        room.events = eventsFromPatch(row6.patch, room, false, dropped).events;
+        const room = { id: "", kind: "group", name, members: [...members], people, messages: [], draft: "", unread: 0, inviter: row7.inviter };
+        room.events = eventsFromPatch(row7.patch, room, false, dropped).events;
         fresh.add(key2);
         out.push(room);
       } catch (error) {
@@ -3066,11 +3066,11 @@ ${commentTimeRule(dateNow(src.chat))}`, extras, factionNames2), activity, suppli
     for (const { p } of ranked) {
       if (rows2.length >= 8) break;
       const comments = p.comments.slice(-12).map((c, j, arr) => ({ id: p.comments.length - arr.length + j + 1, parent: c.parent, author: c.nick, ...whenField(p, c), content: trimTokens(c.body, LIMITS.quote_tokens) }));
-      const row6 = { id: p.id, title: p.title, author: p.nick, date: p.date, content: trimTokens(p.body, LIMITS.origin_tokens), comments };
-      while (JSON.stringify(row6).length > (cap - used) * 2 && row6.comments.length) row6.comments.shift();
-      const n = Math.ceil(JSON.stringify(row6).length / 2);
+      const row7 = { id: p.id, title: p.title, author: p.nick, date: p.date, content: trimTokens(p.body, LIMITS.origin_tokens), comments };
+      while (JSON.stringify(row7).length > (cap - used) * 2 && row7.comments.length) row7.comments.shift();
+      const n = Math.ceil(JSON.stringify(row7).length / 2);
       if (used + n <= cap) {
-        rows2.push(row6);
+        rows2.push(row7);
         used += n;
       }
     }
@@ -3701,18 +3701,18 @@ ${after}`);
     const p = sections(src);
     const keys = ["COMMON"];
     let direct = false;
-    let group4 = false;
+    let group5 = false;
     for (const r of body4.rooms ?? (body4.room ? [body4.room] : [])) {
       if (r.receiveMessages === false) continue;
-      if (r.kind === "group") group4 = true;
+      if (r.kind === "group") group5 = true;
       else direct = true;
     }
-    if (body4.invitationCheck?.allowed) group4 = true;
+    if (body4.invitationCheck?.allowed) group5 = true;
     const manual = body4.participants.some((x) => x.manuallySavedContact);
-    if (direct || group4) {
+    if (direct || group5) {
       keys.push("CONVERSATION");
       if (direct) keys.push("DIRECT_ROOMS");
-      if (group4) keys.push("GROUP_ROOMS");
+      if (group5) keys.push("GROUP_ROOMS");
       if (body4.publicBoard?.posts?.length) keys.push("PUBLIC_BOARD");
       if (body4.crossRoomMessages?.length || (body4.rooms?.length ?? 0) > 1) keys.push("CROSS_ROOM");
       if (hasAttachment(JSON.stringify(body4))) keys.push("ATTACHMENT_READ");
@@ -4125,9 +4125,9 @@ The previous response was rejected and nothing was saved. Recreate the complete 
     return `<div class="at-editor" data-drop-photo="${prefix}">${rows2}${showMenu ? `<div class="at-menu" role="group" aria-label="첨부 추가">${menu}${full ? `<small class="gx-muted">첨부는 ${ATTACH_MAX}개까지예요.</small>` : ""}</div>` : ""}</div>`;
   }
   function attachInput(items, key2, value) {
-    const row6 = items[Number(key2)];
-    if (!row6) return false;
-    row6.content = value;
+    const row7 = items[Number(key2)];
+    if (!row7) return false;
+    row7.content = value;
     return true;
   }
   function attachAction(items, op, value, kinds) {
@@ -4354,12 +4354,12 @@ The previous response was rejected and nothing was saved. Recreate the complete 
   }
   var hasAsset = (char, name) => !!name && !!findRow(char, splitPic(name).name);
   function assetUrl(char, name) {
-    const row6 = findRow(char, name);
-    if (!row6) return Promise.resolve(null);
-    const key2 = `${String(char.chaId ?? char.name ?? "")}|${row6[1]}`;
+    const row7 = findRow(char, name);
+    if (!row7) return Promise.resolve(null);
+    const key2 = `${String(char.chaId ?? char.name ?? "")}|${row7[1]}`;
     let hit3 = cache5.get(key2);
     if (!hit3) {
-      hit3 = load(row6[1], String(row6[2] ?? row6[1].split(".").pop() ?? ""));
+      hit3 = load(row7[1], String(row7[2] ?? row7[1].split(".").pop() ?? ""));
       cache5.set(key2, hit3);
       void hit3.then((url) => {
         if (!url) cache5.delete(key2);

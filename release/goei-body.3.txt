@@ -1360,9 +1360,9 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
         else Object.assign(phone, { openNotice: id, view: "notice" });
         {
           const b = readBulletins(ctx2.chat);
-          const row6 = b.items.find((x) => x.id === id);
-          if (row6 && row6.read === false) {
-            row6.read = true;
+          const row7 = b.items.find((x) => x.id === id);
+          if (row7 && row7.read === false) {
+            row7.read = true;
             await setVars(ctx2, env2, writeBulletins(b, ctx2.chat.scriptstate));
             return true;
           }
@@ -1376,7 +1376,7 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
       case "ph-notice-all": {
         const b = readBulletins(ctx2.chat);
         if (!b.items.some((x) => x.read === false)) break;
-        for (const row6 of b.items) row6.read = true;
+        for (const row7 of b.items) row7.read = true;
         await setVars(ctx2, env2, writeBulletins(b, ctx2.chat.scriptstate));
         return true;
       }
@@ -2791,6 +2791,37 @@ ${job.trailing}` : body4;
     }
   };
 
+  // src/core/visit.ts
+  var VISIT_KEY = "goeiHqVisitV1";
+  var VISIT_LORE = "본부 방문 대화 기록";
+  function visitRoom(a) {
+    if (a.locked) return null;
+    if (/외근|비번|격리|작전투입|실종|사망|미정/.test(a.state)) return null;
+    if (/부상|치료/.test(a.state)) return "infirmary";
+    if (/수면|취침/.test(a.state)) return "quarters";
+    if (/휴게|휴식/.test(a.state)) return "lounge";
+    return !a.locked && /내근|대기/.test(a.state) ? "office" : null;
+  }
+  function anchorOf(chat) {
+    const msgs = Array.isArray(chat.message) ? chat.message : [];
+    const last2 = msgs[msgs.length - 1];
+    return last2?.chatId ? String(last2.chatId) : `#${msgs.length}`;
+  }
+  function visitRecord(chat) {
+    const v = chat[VISIT_KEY];
+    return { turns: Array.isArray(v?.turns) ? v.turns.filter((t) => t && typeof t.id === "string" && typeof t.reply === "string" && typeof t.user === "string" && typeof t.agentId === "string").slice(-100).map((t) => t.extra === void 0 ? t : { ...t, extra: Array.isArray(t.extra) ? t.extra.filter((e) => e && typeof e.name === "string" && typeof e.line === "string") : [] }) : [] };
+  }
+  function withVisitTurn(chat, turn) {
+    const old = visitRecord(chat).turns;
+    if (old.some((t) => t.id === turn.id)) return chat;
+    const turns2 = [...old, turn].slice(-100);
+    return withoutOldLore({ ...chat, [VISIT_KEY]: { turns: turns2 } });
+  }
+  function withoutOldLore(chat) {
+    const local = Array.isArray(chat.localLore) ? chat.localLore : [];
+    return local.some((l) => l.comment === VISIT_LORE) ? { ...chat, localLore: local.filter((l) => l.comment !== VISIT_LORE) } : chat;
+  }
+
   // src/host/container.ts
   var BELOW_ALERTS = "49";
   var doc;
@@ -3561,23 +3592,4 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .gx-mapbar > .gx-select { flex: 0 0 200px; min-width: 0; }
 .gx-mapfind { position: relative; flex: 1; min-width: 0; }
 .gx-mapfind .gx-search { width: 100%; font-size: 13px; }
-.gx-mapsug { position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 30; display: flex; flex-direction: column; max-height: 320px; overflow-y: auto; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); box-shadow: var(--shadow); }
-.gx-mapsug:empty { display: none; }
-.gx-sugi { display: flex; align-items: baseline; gap: 8px; min-height: 40px; padding: 8px 12px; border: 0; border-bottom: 1px solid var(--panel2); background: none; color: var(--text); text-align: left; font: inherit; font-size: 14px; cursor: pointer; }
-.gx-sugi:last-child { border-bottom: 0; }
-.gx-sugi:hover, .gx-sugi:focus-visible { background: var(--panel2); outline: none; }
-.gx-sugi small { color: var(--dim); font-size: 12px; }
-.gx-sugnone { margin: 0; padding: 10px 12px; color: var(--dim); font-size: 13px; text-align: center; }
-@media (max-width: 760px) { .gx-mapbar > .gx-select { flex-basis: 38%; } }
-.gx-select, .gx-search {
-  min-height: 40px; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px;
-  background: var(--void); color: var(--text); font: inherit;
-}
-.gx-select { flex: 1; }
-.gx-search { width: 100%; }
-.gx-search:focus, .gx-select:focus { outline: 2px solid var(--signal); outline-offset: 1px; }
-.gx-canvas { position: relative; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--void); }
-.gx-canvas.ph { aspect-ratio: 4 / 5; }
-.gx-mapcol .gx-canvas:not(.ph) { width: fit-content; max-width: 100%; margin: 0 auto; }
-.gx-mapimg { display: block; width: auto; max-width: 100%; height: auto; max-height: calc(min(100vh - 28px, 950px) - 210px); user-select: none; }
-.gx-mapph { position: absolute; inset: 0; display: grid; place-items: center; color: var(--dim); fo
+.gx-mapsug { position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-in

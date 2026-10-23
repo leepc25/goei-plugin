@@ -1,4 +1,14 @@
-el || lm?.name || key2.slice(4);
+arget.key === e.key,
+      confirmEnd: field2.confirmEnd === e.key
+    });
+  }
+  function placeCard(key2, c, on2) {
+    let name;
+    let sub;
+    let wiki2;
+    if (key2.startsWith("fac:")) {
+      const lm = c.landmarks.find((l) => l.name === key2.slice(4));
+      name = lm?.label || lm?.name || key2.slice(4);
       sub = lm ? placeWhere(lm.sido, lm.gu) : "거점";
       wiki2 = lm?.name ?? name;
     } else {
@@ -135,7 +145,7 @@ el || lm?.name || key2.slice(4);
     const x = readCtx(ctx2);
     if (typeof x === "string") return "";
     const q = field2.query.trim().toLowerCase();
-    const row6 = (kind, r) => {
+    const row7 = (kind, r) => {
       const sel = field2.mname === r.name && field2.mpick === kind;
       const val = `${kind}:${esc15(r.name)}`;
       const open3 = field2.mopen === `${kind}:${r.name}`;
@@ -160,10 +170,10 @@ el || lm?.name || key2.slice(4);
     if (!q) {
       const rows2 = missionCatalog(x.catalog, field2.mkind);
       if (!rows2.length) return '<p class="gx-none">일치하는 대상이 없어요.</p>';
-      return `<ul class="gx-list gx-mlist">${rows2.map((r) => row6(field2.mkind, r)).join("")}</ul>`;
+      return `<ul class="gx-list gx-mlist">${rows2.map((r) => row7(field2.mkind, r)).join("")}</ul>`;
     }
     const order = [field2.mkind, ...["an", "ms", "lm"].filter((k) => k !== field2.mkind)];
-    const groups = order.map((k) => ({ k, rows: missionCatalog(x.catalog, k).filter(hit3) })).filter((g) => g.rows.length).map((g) => `<li class="gx-mgrp">${MISSION_LABEL[g.k]}<small>${g.rows.length}</small></li>${g.rows.map((r) => row6(g.k, r)).join("")}`).join("");
+    const groups = order.map((k) => ({ k, rows: missionCatalog(x.catalog, k).filter(hit3) })).filter((g) => g.rows.length).map((g) => `<li class="gx-mgrp">${MISSION_LABEL[g.k]}<small>${g.rows.length}</small></li>${g.rows.map((r) => row7(g.k, r)).join("")}`).join("");
     return groups ? `<ul class="gx-list gx-mlist">${groups}</ul>` : '<p class="gx-none">일치하는 대상이 없어요.</p>';
   }
   function missionTab(ctx2, opening, notice3, busy5) {
@@ -640,7 +650,7 @@ ${v.trim()}`).join("\n\n") : "";
     const all = n === 0;
     return `<div class="st-recent">${seg4(`set-${key2}-mode`, all ? "all" : "recent", [["recent", "최근만"], ["all", "전부"]], busy5)}` + (all ? "" : `<label class="st-range"><input type="range" min="${IMG_RECENT.min}" max="${IMG_RECENT.max}" step="1" value="${n}" data-input="count" data-change="set-${key2}" aria-label="${label}"${busy5 ? " disabled" : ""}><output>${n}개</output></label>`) + "</div>";
   }
-  var group3 = (title2, body4, note = "") => `<section class="ps-group"><h3>${title2}</h3>${note ? `<p class="ps-note">${note}</p>` : ""}<div class="ps-rows">${body4}</div></section>`;
+  var group4 = (title2, body4, note = "") => `<section class="ps-group"><h3>${title2}</h3>${note ? `<p class="ps-note">${note}</p>` : ""}<div class="ps-rows">${body4}</div></section>`;
   function worldOffVars() {
     return { $st_anomaly_on: "0", [WORLD_KEY]: "", $an_report: "", $in_report: "", $ms_report: "", $ag_report: "" };
   }
@@ -724,15 +734,15 @@ ${v.trim()}`).join("\n\n") : "";
     return `<main class="gx-body gx-settings">
     ${scopeBar(scope, canChat)}
     ${settingsUi.notice ? `<div class="gx-err" role="alert">${esc18(settingsUi.notice)}</div>` : ""}
-    ${scope === "chat" && canChat ? group3("기능별 설정", `<div class="st-feats">${[["gnet", "괴담넷", ICONS.gnet], ["phone", "괴담톡", ICONS.phone], ["wiki", "위키", ICONS.wiki], ["visit", "필드", ICONS.game]].map(([k, label, icon2]) => `<button class="gx-mini st-feat" data-action="feature-set" data-value="${k}" aria-label="${label} 설정">${icon2}${label}</button>`).join("")}</div>`) : ""}
-    ${group3("화면", [
+    ${scope === "chat" && canChat ? group4("기능별 설정", `<div class="st-feats">${[["gnet", "괴담넷", ICONS.gnet], ["phone", "괴담톡", ICONS.phone], ["wiki", "위키", ICONS.wiki], ["visit", "필드", ICONS.game]].map(([k, label, icon2]) => `<button class="gx-mini st-feat" data-action="feature-set" data-value="${k}" aria-label="${label} 설정">${icon2}${label}</button>`).join("")}</div>`) : ""}
+    ${group4("화면", [
       field3("테마", seg4("set-theme", theme, [["light", "라이트"], ["dark", "다크"], ["paper", "페이퍼"]], busy5), "채팅 화면의 캐릭터 이미지 배경과 상태창(「테마」를 골랐을 때) 배색이에요."),
       field3("상태창", seg4("set-status", getPrefs().status ?? "auto", [["auto", "테마"], ["dark", "다크"], ["light", "라이트"], ["paper", "페이퍼"], ["off", "미표시"]], busy5), "채팅 속 상태창의 배색이에요. 「테마」는 위 테마를 따라가요. 미표시를 고르면 상자만 숨기고, 모델은 상태 태그를 계속 써요."),
       field3("메뉴 위치", seg4("set-nav", getPrefs().nav ?? "left", [["left", "왼쪽"], ["right", "오른쪽"]], busy5), "PC 창에서 메뉴 목록을 놓을 쪽이에요. 이 기기의 모든 채팅에 같이 적용돼요."),
       field3("요원 칸", seg4("set-agents", getPrefs().agents ?? "wall", [["wall", "모니터"], ["list", "목록"]], busy5), "상황판 요원 칸 모양이에요. 이 기기의 모든 채팅에 같이 적용돼요."),
       field3("창 바깥 불투명도", dimSlider(getPrefs().dim ?? DIM_DEFAULT, busy5), "창 뒤 채팅 화면을 가리는 정도예요. 0%면 그대로 보이고 100%면 다 가려요.")
     ].join(""))}
-    ${group3("캐릭터 이미지", [
+    ${group4("캐릭터 이미지", [
       field3("에셋 출력", seg4("set-asset", s4.assetOn ? "1" : "0", [["1", "ON"], ["0", "OFF"]], busy5), "본문에 등장하는 캐릭터의 등록 이미지를 표시하도록 이미지 태그를 적어요. 이미지와 태그 목록은 봇 카드에 들어 있어요."),
       s4.assetOn ? field3("이미지 크기", pctSlider("set-img-size", getPrefs().imgSize ?? IMG_SIZE.def, IMG_SIZE, "이미지 크기", busy5), "채팅 속 캐릭터 이미지 칸의 크기예요. 100%가 원래 크기이고, 채팅 폭보다 커지지는 않아요. 이 기기의 모든 채팅에 같이 적용돼요.") : "",
       s4.assetOn ? field3("접힌 높이", pctSlider("set-img-fold", getPrefs().imgFold ?? IMG_FOLD.def, IMG_FOLD, "접힌 높이", busy5), "이미지는 위쪽만 보이게 접혀 있다가 누르거나 마우스를 올리면 펼쳐져요. 접혔을 때 그림 높이의 몇 %를 보여 줄지예요. 원래는 68%(정사각형)이고 100%면 접지 않아요.") : "",
@@ -743,7 +753,7 @@ ${v.trim()}`).join("\n\n") : "";
       s4.assetOn && s4.assetModel === "aux" ? field3("캐릭터당 이미지 수", seg4("set-asset-limit", String(s4.assetLimit), [["1", "1"], ["2", "2"], ["3", "3"], ["4", "4"]], busy5), "보조모델이 한 응답에서 캐릭터 한 명에게 붙일 이미지 태그의 최대 개수") : ""
     ].join(""))}
     ${scope === "chat" && s4.assetOn && s4.assetModel === "aux" && note ? `<p class="gx-hint">최근 보충: ${esc18(note)}</p>` : ""}
-    ${group3("상황판", [
+    ${group4("상황판", [
       field3("괴이 발생 · 요원 시스템", anomaly, scope === "chat" ? "ON이면 괴이·사건·특수가 자동으로 발생하고 응답마다 지도와 요원 상태를 갱신해요. OFF로 바꾸면 현재 상황판을 비워요. 커스텀 임무는 OFF에서도 쓸 수 있어요." : "새 채팅을 상황판을 켠 채로 시작할지 정해요."),
       field3("요원 표시 인원", stepper("set-agent", "n", `${s4.agentLimit}명`, s4.agentLimit > 0, s4.agentLimit < AGENT_MAX, "요원 표시 인원", busy5), `상황판과 편성에 보일 등록 요원 수 (0~${AGENT_MAX}명, 0이면 숨김)`),
       field3("지원 투입", seg4("set-support", s4.supportOn ? "1" : "0", [["1", "ON"], ["0", "OFF"]], busy5), "편성에서 등록 요원 외의 일반 지원 인원을 더할 수 있어요.")
@@ -1131,12 +1141,12 @@ ${v.trim()}`).join("\n\n") : "";
     });
     root.addEventListener("pointerdown", (ev) => {
       const grip = ev.target.closest?.("[data-drag-agent]");
-      const row6 = grip?.closest("[data-agent-row]");
-      if (!grip || !row6 || !root) return;
+      const row7 = grip?.closest("[data-agent-row]");
+      if (!grip || !row7 || !root) return;
       ev.preventDefault();
       const box = root;
-      const group4 = row6.dataset.agentGroup ?? "";
-      const rows2 = [...box.querySelectorAll("[data-agent-row]")].filter((r) => r !== row6 && r.dataset.agentGroup === group4);
+      const group5 = row7.dataset.agentGroup ?? "";
+      const rows2 = [...box.querySelectorAll("[data-agent-row]")].filter((r) => r !== row7 && r.dataset.agentGroup === group5);
       let drop = null;
       const mark2 = (next) => {
         drop?.el.classList.remove("drop-before", "drop-after");
@@ -1153,14 +1163,14 @@ ${v.trim()}`).join("\n\n") : "";
         }
         if (best?.el !== drop?.el || best?.after !== drop?.after) mark2(best);
       };
-      row6.classList.add("dragging");
+      row7.classList.add("dragging");
       box.classList.add("dir-dragging");
       grip.setPointerCapture?.(ev.pointerId);
       const up = () => {
         grip.removeEventListener("pointermove", move);
         grip.removeEventListener("pointerup", up);
         grip.removeEventListener("pointercancel", up);
-        row6.classList.remove("dragging");
+        row7.classList.remove("dragging");
         box.classList.remove("dir-dragging");
         const target = drop;
         mark2(null);
@@ -1869,15 +1879,22 @@ ${v.trim()}`).join("\n\n") : "";
     if (s4.f && s4.f !== field2.step) return void handle("field-step", s4.f);
     render();
   }
+  var fieldShown = false;
+  var fieldAnchor = "";
   function syncField() {
     const host = view2.kind === "started" && tab === "field" ? root?.querySelector(".gx-fieldhost") ?? null : null;
     if (!host) {
-      if (gameOpen()) {
-        closeGame();
+      if (gameOpen() && fieldShown) {
+        fieldShown = false;
+        hideGame();
         void refresh();
       }
       return;
     }
+    fieldShown = true;
+    const anchor = view2.kind === "started" ? anchorOf(view2.ctx.chat) : "";
+    if (gameOpen() && anchor !== fieldAnchor) closeGame();
+    fieldAnchor = anchor;
     if (gameOpen()) reattachGame(host);
     else openGame(host, () => void handle("game-close"));
   }
@@ -2356,8 +2373,8 @@ ${v.trim()}`).join("\n\n") : "";
   }
   function startCardHtml(body4, unsent) {
     const p = cardPalette2();
-    const row6 = unsent ? `<span style="display:flex;align-items:center;gap:10px;margin-top:8px;padding-top:6px;border-top:1px solid ${p.accentLine}">${unsentRow()}</span>` : "";
-    return `<div data-goei-card="start" style="${cardStyle()}display:block"><span style="display:block;color:${p.signal};font-weight:600;margin-bottom:4px">첫 상황</span><span style="display:block;color:${p.text};white-space:pre-wrap">${escHtml(body4.trim())}</span>${row6}</div>`;
+    const row7 = unsent ? `<span style="display:flex;align-items:center;gap:10px;margin-top:8px;padding-top:6px;border-top:1px solid ${p.accentLine}">${unsentRow()}</span>` : "";
+    return `<div data-goei-card="start" style="${cardStyle()}display:block"><span style="display:block;color:${p.signal};font-weight:600;margin-bottom:4px">첫 상황</span><span style="display:block;color:${p.text};white-space:pre-wrap">${escHtml(body4.trim())}</span>${row7}</div>`;
   }
   function unsentMarkHtml() {
     return `<div data-goei-card="unsent" style="${cardStyle()}display:flex;margin-top:8px">${unsentRow()}</div>`;
@@ -2508,5 +2525,5 @@ ${v.trim()}`).join("\n\n") : "";
   }
 
   // src/body-entry.ts
-  globalThis.__goeiBody = { version: "0.16.46", start: start2 };
+  globalThis.__goeiBody = { version: "0.16.47", start: start2 };
 })();

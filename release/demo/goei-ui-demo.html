@@ -1704,6 +1704,8 @@ var ui_default = `.gs { position: relative; width: 100%; height: 100%; overflow:
 .gs-ui { position: absolute; inset: 0; pointer-events: none; }
 .gs-ui.menu-on { pointer-events: auto; }
 .gs-touch { position: absolute; inset: 0; pointer-events: none; }
+.gs.exploration-map .tp-b:not([data-id="map"]):not([data-id="menu"]),
+.gs.exploration-map .tp-zone { visibility: hidden; }
 
 /* 세로 화면 안내 */
 .gs-rotate { position: absolute; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 12px; background: rgba(2,4,7,0.94); z-index: 20; text-align: center; padding: 24px; }
@@ -1954,6 +1956,57 @@ function mountStage(box2) {
   return s;
 }
 
+// src/game/action/ui/mapLayout.ts
+function setExplorationMap(canvas, open) {
+  canvas.closest(".gs")?.classList.toggle("exploration-map", open);
+}
+
+// src/game/action/engine/hint.ts
+var SHAPE = [
+  "..###..",
+  "..#o#..",
+  "..#o#..",
+  "###o###",
+  "#ooooo#",
+  ".#ooo#.",
+  "..#o#..",
+  "...#..."
+];
+var D = 4;
+function drawHintIcon(c, x, y, tick, state = "available") {
+  if (state === "decoration") return;
+  const bob = Math.round(Math.sin(tick / 5) * 1.5) * D;
+  const w = SHAPE[0].length * D;
+  const ox = Math.round(x - w / 2);
+  const oy = Math.round(y - SHAPE.length * D + bob);
+  c.save();
+  c.imageSmoothingEnabled = false;
+  const P = 4;
+  const R = 9;
+  const cx = Math.round(x), cy = Math.round(oy + SHAPE.length * D / 2);
+  for (let gy = -R; gy <= R; gy++)
+    for (let gx = -R; gx <= R; gx++) {
+      const d = Math.hypot(gx, gy);
+      if (d > R + 0.3) continue;
+      c.fillStyle = d > R - 1.2 ? state === "locked" ? "#c87858" : "#c89a3a" : d > R - 2.2 ? "#1a1410" : "rgba(20,16,12,0.82)";
+      c.fillRect(cx + gx * P - P / 2, cy + gy * P - P / 2, P, P);
+    }
+  if (state === "locked") {
+    c.font = "bold 28px sans-serif";
+    c.textAlign = "center";
+    c.textBaseline = "middle";
+    c.fillStyle = "#ffd1ae";
+    c.fillText("!", cx, cy);
+  } else for (let r = 0; r < SHAPE.length; r++)
+    for (let k = 0; k < SHAPE[r].length; k++) {
+      const ch = SHAPE[r][k];
+      if (ch === ".") continue;
+      c.fillStyle = ch === "#" ? "#1a1410" : r < 3 ? "#fff4c8" : "#f0c860";
+      c.fillRect(ox + k * D, oy + r * D, D, D);
+    }
+  c.restore();
+}
+
 // src/game/action/ui/hud.ts
 var W3 = W2;
 var H3 = H2;
@@ -1998,6 +2051,27 @@ function label(c, s, x, y, size2 = 16, color = C.text, align = "left", weight = 
   c.fillText(s, x, y);
 }
 var pixelOn = false;
+function fitText(c, text, width) {
+  if (c.measureText(text).width <= width) return text;
+  const chars = Array.from(text);
+  while (chars.length && c.measureText(chars.join("") + "…").width > width) chars.pop();
+  return chars.join("") + "…";
+}
+function wrapText(c, text, width, maxRows) {
+  const rows = [];
+  let line = "";
+  const chars = Array.from(text.replace(/\s+/g, " "));
+  for (let i = 0; i < chars.length; i++) {
+    if (line && c.measureText(line + chars[i]).width > width) {
+      rows.push(line);
+      if (rows.length === maxRows - 1) return [...rows, fitText(c, chars.slice(i).join(""), width)];
+      line = "";
+    }
+    line += chars[i];
+  }
+  if (line) rows.push(line);
+  return rows;
+}
 function setPixelText(on) {
   pixelOn = on;
 }
@@ -2046,6 +2120,7 @@ var Hud = class {
     this.lastItems = [];
   }
   draw(c, s, dt) {
+    setExplorationMap(c.canvas, false);
     this.t += dt;
     this.track(s, dt);
     c.save();
@@ -2063,7 +2138,7 @@ var Hud = class {
     if (s.boss) this.boss(c, s.boss, s.compact);
     this.timer(c, s);
     if (s.message) this.message(c, s.message, s.compact);
-    if (s.prompt) this.prompt(c, s.prompt, s.device);
+    this.navigation(c, s);
     this.drawToasts(c, dt);
     pixelOn = false;
     c.restore();
@@ -2100,7 +2175,7 @@ var Hud = class {
   }
   /** 왼쪽 위 한 묶음: 얼굴 + 이름 + 굵은 체력 막대 + 필살 게이지 + 탄. 판 없이 오락실처럼 */
   agent(c, s) {
-    const x = 22, y = 18, fs = 80;
+    const x = s.compact ? 100 : 22, y = 18, fs = 80;
     const g = c.createLinearGradient(0, 0, 460, 0);
     g.addColorStop(0, "rgba(0,0,0,0.5)");
     g.addColorStop(0.75, "rgba(0,0,0,0.25)");
@@ -2128,7 +2203,7 @@ var Hud = class {
       c.strokeRect(x - 1.5, y - 1.5, fs + 3, fs + 3);
     }
     if (s.maxEnergy) bar(c, x - 2, y + fs + 12, fs + 4, 5, (s.energy ?? 0) / s.maxEnergy, "#e8e2d0", "#000");
-    const bx = x + fs + 30, bw = 300;
+    const bx = x + fs + 30, bw = s.compact ? 250 : 300;
     label(c, s.agent.name, bx, y + 20, 22, C.name, "left", 900);
     c.font = font(22, 900);
     let ax = bx + c.measureText(s.agent.name).width + 10;
@@ -2151,7 +2226,7 @@ var Hud = class {
     c.fillRect(bx, by + bh - 5, bw * r, 5);
     const bf = kitPiece("bar");
     if (bf) nine(c, bf, kitSlice("bar"), bx - 22, by - 10, bw + 44, bh + 20, 2);
-    const gy = by + bh + 9, gw = 220, gh = 12;
+    const gy = by + bh + 9, gw = s.compact ? 180 : 220, gh = 12;
     const full = s.gauge >= 100;
     c.fillStyle = "#000";
     c.fillRect(bx - 2, gy - 2, gw + 4, gh + 4);
@@ -2167,7 +2242,7 @@ var Hud = class {
       label(c, s.device === "pad" ? "RT" : s.device === "touch" ? "필살" : "W", bx + gw + 10, gy + 12, 15, C.gauge, "left", 900);
     }
     if (s.weapon) this.ammo(c, s.weapon, bx, gy + gh + 30);
-    let my = y + fs + 22;
+    let my = y + fs + 52;
     for (const m of s.meters ?? []) {
       label(c, m.label, x, my + 10, 13, m.color, "left", 800);
       bar(c, x + 40, my + 1, 160, 9, m.v / m.max, m.color, "#000");
@@ -2204,8 +2279,9 @@ var Hud = class {
   floor(c, s) {
     const f = s.floor;
     if (!f.depth) return;
-    label(c, f.depth, W3 - 20, 44, 32, "#fff", "right", 900);
-    if (f.variant) label(c, f.variant, W3 - 20, 68, 15, C.amber, "right", 800);
+    const right = W3 - (s.compact ? 100 : 20);
+    label(c, f.depth, right, 44, 32, "#fff", "right", 900);
+    if (f.variant) label(c, f.variant, right, 68, 15, C.amber, "right", 800);
   }
   /** 규칙서: 새로 찾은 규칙이 있을 때만 오른쪽 위에 잠깐. 전체 목록은 일시정지 메뉴 */
   rules(c, s) {
@@ -2263,7 +2339,7 @@ var Hud = class {
     }
   }
   boss(c, b, compact) {
-    const w = 640, x = W3 / 2 - w / 2, y = compact ? 84 : H3 - 128;
+    const w = 640, x = W3 / 2 - w / 2, y = H3 - 128;
     label(c, b.name, x, y - 6, 16, "#f0c0b0");
     c.fillStyle = "rgba(0,0,0,0.7)";
     c.fillRect(x, y, w, 14);
@@ -2277,48 +2353,79 @@ var Hud = class {
   timer(c, s) {
     if (!s.timer) return;
     const t2 = Math.max(0, s.timer.sec);
-    label(c, `${s.timer.label} ${Math.floor(t2 / 60)}:${String(Math.floor(t2 % 60)).padStart(2, "0")}`, W3 / 2, 40, 26, t2 < 10 ? C.hpLow : "#bfe0f0", "center", 900);
+    const x = s.compact ? 340 : 482, y = s.compact ? 174 : 116;
+    c.font = font(15);
+    const text = fitText(c, `${s.timer.label} ${Math.floor(t2 / 60)}:${String(Math.floor(t2 % 60)).padStart(2, "0")}`, s.compact ? 120 : 230);
+    label(c, text, x, y, 15, t2 < 10 ? C.hpLow : "#bfe0f0");
   }
   /** 아래 자막 한 줄만 (본부처럼 전투 HUD가 없는 화면) */
   drawMessage(c, text, compact) {
+    c.save();
+    const k = compact ? 1.2 : 1;
+    W3 = c.canvas.width / k;
+    H3 = c.canvas.height / k;
+    c.setTransform(k, 0, 0, k, 0, 0);
     this.message(c, text, compact);
+    c.restore();
+  }
+  /** 본부의 전투 HUD 없는 화면에서도 동일한 안내 영역을 쓴다. */
+  drawNavigation(c, navigation, compact = false, device) {
+    c.save();
+    const k = compact ? 1.2 : 1;
+    W3 = c.canvas.width / k;
+    H3 = c.canvas.height / k;
+    c.setTransform(k, 0, 0, k, 0, 0);
+    pixelOn = true;
+    this.navigation(c, { navigation, compact, device }, 20);
+    pixelOn = false;
+    c.restore();
   }
   message(c, text, compact) {
     c.font = font(17, 600);
     let t2 = text;
-    while (c.measureText(t2).width > 900 && t2.length > 4) t2 = t2.slice(0, -2);
-    if (t2 !== text) t2 += "…";
+    t2 = fitText(c, t2, Math.min(900, W3 - (compact ? 240 : 64)));
     const w = c.measureText(t2).width + 40;
     const y = H3 - 44;
     plate(c, W3 / 2 - w / 2, y, w, 36, 18);
     label(c, t2, W3 / 2, y + 25, 17, "#fff8e6", "center", 600);
   }
-  prompt(c, p, device) {
-    const bob = Math.sin(this.t * 5) * 3;
-    const key = device === "pad" ? "B" : device === "touch" ? "조사" : p.key;
+  navigation(c, s, top) {
+    const nav = s.navigation;
+    if (!nav && !s.prompt) return;
+    const y = top ?? (s.compact ? 220 : 204);
+    const x = s.compact ? 100 : 20, width = W3 - x * 2;
+    const lines = [];
+    if (nav?.objective) lines.push({ text: `현재 목표 · ${nav.objective}`, color: C.rule });
+    const target = nav?.target;
+    if (target) {
+      const key = target.kind === "locked" ? "잠김" : target.kind === "decoration" ? "장식" : s.device === "pad" ? "B" : s.device === "touch" || s.compact ? "조사" : "E";
+      lines.push({ text: `[${key}] ${target.text}${target.reason ? ` · ${target.reason}` : ""}`, color: target.kind === "locked" ? C.amber : C.text });
+    } else if (s.prompt) {
+      const key = s.device === "pad" ? "B" : s.device === "touch" || s.compact ? "조사" : s.prompt.key;
+      lines.push({ text: `[${key}] ${s.prompt.text}`, color: C.text });
+    }
+    if (!lines.length) return;
     c.font = font(15);
-    const kw = Math.max(28, c.measureText(key).width + 14);
-    const tw = c.measureText(p.text).width;
-    const w = kw + tw + 22;
-    const x = Math.max(8, Math.min(W3 - w - 8, p.x - w / 2)), y = Math.max(8, p.y - 40 + bob);
-    plate(c, x, y, w, 32, 8);
-    c.beginPath();
-    c.roundRect(x + 5, y + 5, kw, 22, 5);
-    c.fillStyle = "#ece6d4";
-    c.fill();
-    c.font = font(14, 800);
-    c.fillStyle = "#111";
-    c.textAlign = "center";
-    c.fillText(key, x + 5 + kw / 2, y + 21);
-    label(c, p.text, x + kw + 13, y + 22, 15, "#fff");
+    const rows = lines.flatMap((line) => wrapText(c, line.text.replace(/[①②③④]/g, (ch) => `${"①②③④".indexOf(ch) + 1}번`), width - 64, 2).map((text) => ({ ...line, text })));
+    plate(c, x, y, width, rows.length * 28 + 14);
+    rows.forEach((row, i) => label(c, row.text, x + 12, y + 27 + i * 28, 15, row.color));
+    if (target) {
+      c.save();
+      c.translate(x + width - 24, y + rows.length * 28 - 2);
+      c.scale(0.4, 0.4);
+      drawHintIcon(c, 0, 0, 0, target.kind === "locked" ? "locked" : target.kind === "decoration" ? "decoration" : "available");
+      c.restore();
+    }
   }
   drawToasts(c, dt) {
-    let y = 196;
+    let y = this.last?.navigation || this.last?.prompt ? (this.last.compact ? 220 : 204) + 154 : 196;
     for (const t2 of this.toasts) {
       t2.t += dt;
       const a = t2.t < 0.15 ? t2.t / 0.15 : t2.t > 2.2 ? Math.max(0, 1 - (t2.t - 2.2) / 0.5) : 1;
       c.globalAlpha = a;
-      label(c, t2.text, 22 + (1 - Math.min(1, t2.t / 0.15)) * -20, y, 15, t2.color);
+      const x = this.last?.compact ? 100 : 22;
+      c.font = font(15);
+      label(c, fitText(c, t2.text, W3 - x * 2), x + (1 - Math.min(1, t2.t / 0.15)) * -20, y, 15, t2.color);
       c.globalAlpha = 1;
       y += 22;
     }
@@ -3369,6 +3476,7 @@ var PadReader = class {
     __publicField(this, "connected", "");
     __publicField(this, "prev", /* @__PURE__ */ new Map());
     __publicField(this, "rumbleOn", true);
+    __publicField(this, "index", null);
   }
   setRumble(on) {
     this.rumbleOn = on;
@@ -3381,9 +3489,17 @@ var PadReader = class {
   poll() {
     const p = this.pad();
     if (!p) {
-      if (this.connected) this.connected = "", this.hub.releaseSource("pad"), this.prev.clear();
+      this.connected = "";
+      this.index = null;
+      this.hub.releaseSource("pad");
+      this.prev.clear();
       return;
     }
+    if (this.index !== p.index || this.connected !== p.id) {
+      this.hub.releaseSource("pad");
+      this.prev.clear();
+    }
+    this.index = p.index;
     this.connected = p.id;
     const want = /* @__PURE__ */ new Map();
     const set = (code, on) => want.set(code, (want.get(code) ?? false) || on);
@@ -3398,6 +3514,7 @@ var PadReader = class {
     set("ArrowRight", x > 0.45);
     set("ArrowUp", y < -0.45);
     set("ArrowDown", y > 0.45);
+    for (const code of this.prev.keys()) if (!want.has(code)) want.set(code, false);
     for (const [code, on] of want) {
       if (on && !this.prev.get(code)) this.hub.press(code, "pad");
       else if (!on && this.prev.get(code)) this.hub.release(code, "pad");
@@ -3429,7 +3546,7 @@ var InputHub = class {
     __publicField(this, "analog", /* @__PURE__ */ new Map());
     /** 마지막으로 쓴 입력 장치 (안내 글자 고르기용) */
     __publicField(this, "last", "kb");
-    /** 켜면 터치·패드 입력을 가짜 KeyboardEvent 로 target 에 쏜다 */
+    /** 켜면 장치별 입력을 합친 KeyboardEvent만 target에 보낸다 (키보드 원본은 차단). */
     __publicField(this, "synth", false);
     __publicField(this, "target", null);
     /** 메뉴가 열려 있으면 게임 입력을 막고 메뉴가 받는다 */
@@ -3453,7 +3570,7 @@ var InputHub = class {
       this.down.add(code);
       this.edgeDown.add(code);
       this.since.set(code, this.now());
-      if (src !== "kb") this.emit(code, true);
+      this.emit(code, true);
       for (const f of this.listeners) f(code, true, src);
     }
   }
@@ -3467,7 +3584,7 @@ var InputHub = class {
     for (const s of this.bySrc.values()) if (s.has(code)) return;
     this.down.delete(code);
     this.edgeUp.add(code);
-    if (src !== "kb") this.emit(code, false);
+    this.emit(code, false);
     for (const f of this.listeners) f(code, false, src);
   }
   releaseSource(src) {
@@ -3518,19 +3635,30 @@ var InputHub = class {
   /** 키보드 받기. 글 입력칸에 초점이 있으면 무시한다 */
   attachKeyboard(el, opts = {}) {
     this.detach?.();
+    const physical = /* @__PURE__ */ new Set();
     const onKey = (e) => {
       const ev = e;
       if (ev[MARK]) return;
       const t2 = ev.target;
-      if (t2 && (t2.tagName === "INPUT" || t2.tagName === "TEXTAREA" || t2.tagName === "SELECT" || t2.isContentEditable)) return;
+      const editing = t2 && (t2.tagName === "INPUT" || t2.tagName === "TEXTAREA" || t2.tagName === "SELECT" || t2.isContentEditable);
+      if (editing && ev.type === "keydown") return;
+      if (this.synth) ev.stopImmediatePropagation();
       if (ev.type === "keydown") {
         if (opts.prevent?.(ev.code) ?? true) ev.preventDefault();
         if (ev.repeat) return;
+        physical.add(ev.code);
         this.press(ev.code, "kb");
-      } else this.release(ev.code, "kb");
+      } else {
+        physical.delete(ev.code);
+        const code = ALIAS[ev.code] ?? ev.code;
+        if (![...physical].some((c) => (ALIAS[c] ?? c) === code)) this.release(code, "kb");
+      }
     };
-    const blur = () => this.releaseAll();
-    const vis = () => document.hidden && this.releaseAll();
+    const blur = () => {
+      physical.clear();
+      this.releaseAll();
+    };
+    const vis = () => document.hidden && blur();
     el.addEventListener("keydown", onKey);
     el.addEventListener("keyup", onKey);
     window.addEventListener("blur", blur);
@@ -3870,8 +3998,16 @@ var TouchPad = class {
     __publicField(this, "visible", false);
     __publicField(this, "seenTouch", false);
     __publicField(this, "iconRedraw", 2400);
+    __publicField(this, "onPointerEnd", (e) => this.up(e));
+    __publicField(this, "onBlur", () => this.releaseAll());
+    __publicField(this, "onVisibility", () => {
+      if (document.hidden) this.releaseAll();
+    });
     __publicField(this, "onAnyTouch", () => {
-      if (!this.seenTouch) this.seenTouch = true, this.refresh();
+      if (!this.seenTouch) {
+        this.seenTouch = true;
+        if (!this.shown) this.refresh();
+      }
     });
     __publicField(this, "baseX", 0);
     __publicField(this, "baseY", 0);
@@ -3905,12 +4041,18 @@ var TouchPad = class {
     this.root.addEventListener("pointermove", (e) => this.move(e), opt);
     this.root.addEventListener("pointerup", (e) => this.up(e), opt);
     this.root.addEventListener("pointercancel", (e) => this.up(e), opt);
+    this.root.addEventListener("lostpointercapture", (e) => this.up(e), opt);
+    window.addEventListener("pointerup", this.onPointerEnd);
+    window.addEventListener("pointercancel", this.onPointerEnd);
+    window.addEventListener("blur", this.onBlur);
+    document.addEventListener("visibilitychange", this.onVisibility);
     this.root.addEventListener("contextmenu", (e) => e.preventDefault());
     window.addEventListener("touchstart", this.onAnyTouch, { passive: true, capture: true });
     this.layout();
   }
   /** 설정·화면 크기가 바뀌면 다시 배치 */
   layout() {
+    this.releaseAll();
     const s = this.st();
     const bw = this.layer.clientWidth || 800, bh = this.layer.clientHeight || 400;
     const portrait = bh > bw * 1.05;
@@ -4090,6 +4232,7 @@ var TouchPad = class {
   hit(x, y) {
     let best = null, bd = Infinity;
     for (const b of this.btns) {
+      if (this.root.closest(".exploration-map") && b.id !== "map" && b.id !== "menu") continue;
       if (b.hw) {
         const d2 = Math.max(Math.abs(x - b.cx) / (b.hw + 3), Math.abs(y - b.cy) / (b.hh + 3));
         if (d2 < 1 && d2 < bd) best = b, bd = d2;
@@ -4111,7 +4254,10 @@ var TouchPad = class {
     this.count.set(b.code, Math.max(0, n));
     b.el.classList.toggle("on", n > 0);
     if (b.code === "Escape" || b.code === "KeyZ") {
-      if (on && n === 1) this.onMenu(b.code);
+      if (on && n === 1) {
+        this.releaseAll();
+        this.onMenu(b.code);
+      }
       return;
     }
     if (on && n === 1) {
@@ -4120,6 +4266,7 @@ var TouchPad = class {
     } else if (!on && n <= 0) this.hub.release(b.code, "touch");
   }
   down(e) {
+    if (!this.shown || e.pointerType === "mouse" && e.button !== 0) return;
     e.preventDefault();
     const p = this.local(e);
     const b = this.hit(p.x, p.y);
@@ -4132,6 +4279,7 @@ var TouchPad = class {
       this.hold(b, true);
       return;
     }
+    if (this.root.closest(".exploration-map")) return;
     const zr = this.zr;
     const zx = p.x - zr.x, zy = p.y - zr.y;
     if (this.stickPid === null && zx >= 0 && zy >= 0 && zx <= zr.w && zy <= zr.h) {
@@ -4147,23 +4295,29 @@ var TouchPad = class {
     if (!st) return;
     e.preventDefault();
     const p = this.local(e);
+    if (p.x < 0 || p.y < 0 || p.x >= this.layer.clientWidth || p.y >= this.layer.clientHeight) {
+      this.up(e);
+      return;
+    }
     if (st.kind === "stick") {
       this.stickTo(p.x - this.zr.x, p.y - this.zr.y);
       return;
     }
     const b = this.hit(p.x, p.y);
-    if (b && b !== st.b) {
-      this.hold(st.b, false);
-      this.hold(b, true);
+    if (b !== st.b) {
+      if (st.b) this.hold(st.b, false);
       st.b = b;
+      if (b) this.hold(b, true);
     }
   }
   up(e) {
     const st = this.ptr.get(e.pointerId);
     if (!st) return;
     this.ptr.delete(e.pointerId);
-    if (st.kind === "btn") this.hold(st.b, false);
-    else {
+    if (this.root.hasPointerCapture(e.pointerId)) this.root.releasePointerCapture(e.pointerId);
+    if (st.kind === "btn") {
+      if (st.b) this.hold(st.b, false);
+    } else {
       this.stickPid = null;
       this.setStick(0, 0);
       this.restBase();
@@ -4206,22 +4360,29 @@ var TouchPad = class {
     if (wantRun && !this.runOn) {
       this.runOn = true;
       this.runSince = performance.now();
+      const pending = this.runTimer !== 0;
       clearTimeout(this.runTimer);
-      this.hold(shiftBtn, true);
+      this.runTimer = 0;
+      if (!pending) this.hold(shiftBtn, true);
     } else if (!wantRun && this.runOn) {
       this.runOn = false;
       const left = 250 - (performance.now() - this.runSince);
       clearTimeout(this.runTimer);
-      if (left > 0) this.runTimer = window.setTimeout(() => this.hold(shiftBtn, false), left);
+      this.runTimer = 0;
+      if (left > 0) this.runTimer = window.setTimeout(() => {
+        this.runTimer = 0;
+        this.hold(shiftBtn, false);
+      }, left);
       else this.hold(shiftBtn, false);
     }
   }
   releaseAll() {
-    for (const [id, st] of this.ptr) {
-      if (st.kind === "btn") this.hold(st.b, false);
-      this.ptr.delete(id);
-    }
-    if (this.runOn) this.runOn = false, clearTimeout(this.runTimer), this.hold(this.btns.find((b) => b.code === "ShiftLeft"), false);
+    const ids = [...this.ptr.keys()];
+    this.ptr.clear();
+    for (const id of ids) if (this.root.hasPointerCapture(id)) this.root.releasePointerCapture(id);
+    clearTimeout(this.runTimer);
+    this.runTimer = 0;
+    this.runOn = false;
     this.stickPid = null;
     this.setStick(0, 0);
     this.count.clear();
@@ -4230,6 +4391,10 @@ var TouchPad = class {
     this.restBase();
   }
   dispose() {
+    window.removeEventListener("pointerup", this.onPointerEnd);
+    window.removeEventListener("pointercancel", this.onPointerEnd);
+    window.removeEventListener("blur", this.onBlur);
+    document.removeEventListener("visibilitychange", this.onVisibility);
     window.removeEventListener("touchstart", this.onAnyTouch, { capture: true });
     this.releaseAll();
     this.root.remove();
@@ -4313,7 +4478,7 @@ function mountGameShell(box2, o = {}) {
       { type: "toggle", label: "피해 숫자", get: () => s.numbers, set: (v) => s.numbers = v },
       { type: "slider", label: "밝기", get: () => s.bright, set: (v) => s.bright = v, min: 0.7, max: 1.4, step: 0.05, fmt: pct },
       { type: "toggle", label: "도트 선명하게", get: () => s.pixel, set: (v) => s.pixel = v },
-      { type: "button", label: "전체 화면", sub: "폰은 가로로 고정", act: () => void stage.fullscreen() },
+      ...o.field ? [] : [{ type: "button", label: "전체 화면", sub: "폰은 가로로 고정", act: () => void stage.fullscreen() }],
       { type: "head", label: "소리" },
       { type: "slider", label: "전체", get: () => s.master, set: (v) => s.master = v, min: 0, max: 1, step: 0.1, fmt: pct },
       { type: "slider", label: "음악", get: () => s.music, set: (v) => s.music = v, min: 0, max: 1, step: 0.1, fmt: pct },
@@ -4325,9 +4490,12 @@ function mountGameShell(box2, o = {}) {
       { type: "toggle", label: "스틱 끝까지 밀면 달리기", get: () => s.stickRun, set: (v) => s.stickRun = v },
       { type: "toggle", label: "왼손 배치", get: () => s.lefty, set: (v) => s.lefty = v },
       { type: "toggle", label: "진동", get: () => s.vibrate, set: (v) => s.vibrate = v },
-      { type: "head", label: "대화" },
-      { type: "choice", label: "NPC 대화 모델", options: [["main", "주 모델"], ["aux", "보조 모델"]], get: () => s.talkModel, set: (v) => s.talkModel = v },
-      { type: "toggle", label: "본편 최근 채팅 같이 보내기", get: () => s.talkRecent, set: (v) => s.talkRecent = v },
+      // 필드 대화 설정은 플러그인 설정 → 기능별 설정 「필드」에 있다
+      ...o.field ? [] : [
+        { type: "head", label: "대화" },
+        { type: "choice", label: "NPC 대화 모델", options: [["main", "주 모델"], ["aux", "보조 모델"]], get: () => s.talkModel, set: (v) => s.talkModel = v },
+        { type: "toggle", label: "본편 최근 채팅 같이 보내기", get: () => s.talkRecent, set: (v) => s.talkRecent = v }
+      ],
       { type: "html", html: `<p style="font-size:14px;color:#9aa6ab">게임패드: ${esc(pad.connected ? pad.connected.slice(0, 48) : "연결 안 됨 (버튼을 하나 누르면 잡힙니다)")}</p>` },
       { type: "button", label: "기본값으로", act: () => (settings = { ...DEFAULT_SETTINGS }, apply(), saveSettings(), menu.replace(settingsScreen())) }
     ];
@@ -4396,7 +4564,12 @@ function mountGameShell(box2, o = {}) {
         id: "pause",
         title: "일시정지",
         sub: o.pauseInfo?.() ?? "",
-        items: [
+        items: o.field ? [
+          { type: "button", label: "계속", sub: key("Esc"), act: () => menu.closeAll() },
+          { type: "button", label: "설정", act: () => shell2.openSettings() },
+          { type: "button", label: "조작법", act: () => shell2.openControls() },
+          { type: "button", label: "필드 나가기", sub: "상황판으로", act: () => (menu.closeAll(), o.field.onExit()) }
+        ] : [
           ...hud2.last ? [{ type: "html", html: statusHtml(hud2.last) }] : [],
           { type: "button", label: "계속", sub: key("Esc"), act: () => menu.closeAll() },
           { type: "button", label: "설정", act: () => shell2.openSettings() },

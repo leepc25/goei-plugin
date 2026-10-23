@@ -1,4 +1,4 @@
-(place2("sidedoor", x, 0, 80, pick3(r, SIDE_NAMES[type] ?? SIDE_NAMES.lobby), { side: made }));
+ x, 0, 80, pick3(r, SIDE_NAMES[type] ?? SIDE_NAMES.lobby), { side: made }));
     }
     if (ctx.secret) {
       const crack = r() < 0.55;
@@ -3812,3 +3812,4 @@ ${SET_BONUS[u.set]}`;
         const cmd = raw.slice(1).trim();
         const [head, ...rest] = cmd.split(/\s+/);
         const tail = cmd.slice(head.length).trim();
+        if (head =

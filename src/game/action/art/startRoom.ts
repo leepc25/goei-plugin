@@ -37,9 +37,8 @@ export function drawStartRoom(c: CanvasRenderingContext2D, open: number): boolea
 export function drawStartRoomFurniture(c: CanvasRenderingContext2D, kind: string) {
   if (!art || !['desk', 'chair'].includes(kind)) return;
   c.save(); c.imageSmoothingEnabled = false;
-  // The extraction is a larger cutout than the source workstation. Uniform .55
-  // scaling restores its floor contact at y520; no separate width/height warping.
+  // tools/startroom_pixelize.py already placed the cutout at screen scale (floor contact y520).
   c.beginPath(); c.rect(kind === 'chair' ? 180 : 294, 270, kind === 'chair' ? 114 : 266, 256); c.clip();
-  c.drawImage(art.workstation, 90, 107.5, 1672 * .55, 941 * .55);
+  c.drawImage(art.workstation, 0, 0, 1280, 720);
   c.restore();
 }
