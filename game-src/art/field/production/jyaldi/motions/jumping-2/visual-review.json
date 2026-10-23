@@ -1,0 +1,20 @@
+{
+  "at": 1792799018.6820638,
+  "job_id": "8b8ec1b7-5fb0-43cf-8cde-a18586116dc6",
+  "result": "pass",
+  "findings": "직접 관절8프레임 전체 검토. 이전 머리/상반신 잘림 완전 해소, 손·머리·발 외곽 회색 채움 없음. 준비 웅크림→무릎 접고 도약→착지→기준 자세, 긴 검은 머리·정장·장갑·얼굴과 native 키 비율 유지.",
+  "frame_count": 8,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}
