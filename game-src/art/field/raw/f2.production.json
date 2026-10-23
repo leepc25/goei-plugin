@@ -7,39 +7,43 @@
     732
   ],
   "guidelineCommit": "2ce56ea30ccdb724b1f192d389758c10c2a0476c",
-  "production": "After updating both field documents, regenerated the whole corridor with props integrated. Corrected native architecture, floor perspective, hard pixel silhouettes, discrete matte material tones and shared 128-color palette. No separately generated prop sheets used. User then requested 2x2 mode downsampling, <=128 colors, one-pixel outline at half resolution, and exact 2x nearest-neighbor upscaling. This latest conversion supersedes the previous final pixel-size check.",
+  "production": "After updating both field documents, regenerated the whole corridor with props integrated. Corrected native architecture, floor perspective, hard pixel silhouettes, discrete matte material tones and shared 128-color palette. No separately generated prop sheets used. User then requested 2x2 mode downsampling, <=128 colors, one-pixel outline at half resolution, and exact 2x nearest-neighbor upscaling. This latest conversion supersedes the previous final pixel-size check. Latest user revision: sample 2x2 mode every 3 source pixels, one-pixel outlines at 1234x234, exact 3x nearest replication followed by right/bottom crop to 3700x700; final uniform 3x3 pixel grid. This supersedes the 2x conversion.",
   "separatePropSheetsUsed": false,
   "validation": {
     "source": "f2-before.png",
-    "sourceSha256": "1bbe84940689e54aae791085ade57737bcee69abf24fdccd683c0892618436f0",
+    "sourceSha256": "d49a3a685df730d57081cd01432bfba2b8c1fc4e1d05a3577e54c9f06f61cbed",
     "dimensions": [
       3700,
       700
     ],
     "workingDimensions": [
-      1850,
-      350
+      1234,
+      234
     ],
-    "reduction": "2x2 mode; ties use first source pixel in row-major order; no averages or interpolation",
-    "modeBlocksVerified": 647500,
-    "paletteAfterReduction": 127,
+    "paddedDimensions": [
+      3702,
+      702
+    ],
+    "reduction": "2x2 mode sampled every 3 source pixels, edge replication to padded 3702x702; ties use first source pixel in row-major order; no averages or interpolation",
+    "modeBlocksVerified": 288756,
+    "paletteAfterReduction": 126,
     "paletteReduction": "No further reduction required: already <=128 colors",
     "outline": {
       "widthAtWorkingResolution": 1,
-      "widthAfterUpscale": 2,
+      "widthAfterUpscale": 3,
       "color": [
         7,
         12,
         17
       ],
-      "operations": 8593
+      "operations": 5637
     },
-    "structuralLineRepair": "Reconnected grout lost by mode reduction at 1px in half-resolution, using existing palette colors",
-    "upscale": "exact nearest-neighbor 2x",
-    "finalColors": 127,
-    "all2x2BlocksUniform": true,
+    "structuralLineRepair": "Reconnected grout lost by mode reduction at 1px in third-resolution, using existing palette colors",
+    "upscale": "exact nearest-neighbor 3x to 3702x702, then crop right and bottom to 3700x700",
+    "finalColors": 125,
+    "all3x3BlocksUniform": true,
     "noNewIntermediateColors": true,
-    "outputSha256": "d49a3a685df730d57081cd01432bfba2b8c1fc4e1d05a3577e54c9f06f61cbed"
+    "outputSha256": "6eec7f6809d1a025788dfa4d87c4b04d7667ce66ea85152c26f46e8509923620"
   },
   "layout": {
     "width": 3700,
@@ -522,5 +526,37 @@
     "sha256": "1bbe84940689e54aae791085ade57737bcee69abf24fdccd683c0892618436f0",
     "measuredChecksPass": true
   },
-  "conversionInput": "game-src/art/field/source/f2-before-mode.png"
+  "conversionInput": "game-src/art/field/source/f2-before-mode3.png",
+  "previous2xConversionValidation": {
+    "source": "f2-before.png",
+    "sourceSha256": "1bbe84940689e54aae791085ade57737bcee69abf24fdccd683c0892618436f0",
+    "dimensions": [
+      3700,
+      700
+    ],
+    "workingDimensions": [
+      1850,
+      350
+    ],
+    "reduction": "2x2 mode; ties use first source pixel in row-major order; no averages or interpolation",
+    "modeBlocksVerified": 647500,
+    "paletteAfterReduction": 127,
+    "paletteReduction": "No further reduction required: already <=128 colors",
+    "outline": {
+      "widthAtWorkingResolution": 1,
+      "widthAfterUpscale": 2,
+      "color": [
+        7,
+        12,
+        17
+      ],
+      "operations": 8593
+    },
+    "structuralLineRepair": "Reconnected grout lost by mode reduction at 1px in half-resolution, using existing palette colors",
+    "upscale": "exact nearest-neighbor 2x",
+    "finalColors": 127,
+    "all2x2BlocksUniform": true,
+    "noNewIntermediateColors": true,
+    "outputSha256": "d49a3a685df730d57081cd01432bfba2b8c1fc4e1d05a3577e54c9f06f61cbed"
+  }
 }
