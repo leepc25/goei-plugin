@@ -1,0 +1,14 @@
+{
+  "usage": null,
+  "background_job_id": "4914438a-8ef4-4258-88da-1a7de662d28d",
+  "image_id": "f688c8c0-9fc1-51bf-932d-6a6105f068c2",
+  "source_image_id": "f688c8c0-9fc1-51bf-932d-6a6105f068c2",
+  "status": "processing",
+  "output_count": 1,
+  "image_size": {
+    "width": 128,
+    "height": 256
+  },
+  "estimated_generations": 9,
+  "pricing_provisional": true
+}

@@ -1,0 +1,25 @@
+{
+  "at": 1792794835.1571505,
+  "character_id": "11b39e21-4716-4def-9ced-54e9f4c38551",
+  "result": "pass",
+  "directions_reviewed": [
+    "south",
+    "south-east",
+    "east",
+    "north-east",
+    "north",
+    "north-west",
+    "west",
+    "south-west"
+  ],
+  "findings": "AVIF의 붉은 장발·선명한 붉은 눈·닫힌 입·목 봉합선·아이보리 인형 몸체와 관절을 8방향 대조. 의상을 임의 추가하지 않았으며 관절과 체격 일관, 회색 외곽 없음. AVIF 우선·로어 키 보충·전원 장벽 재확인.",
+  "movement_direction": "east",
+  "stationary_direction": "south-east",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF primary",
+    "Lore supplementary height",
+    "All55 before motion",
+    "Gray outer paint reroll"
+  ]
+}
