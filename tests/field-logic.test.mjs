@@ -88,3 +88,17 @@ test('전화: 조건 판정', () => {
   assert.equal(P.canCall({ available: false, inAnomaly: false }).reason, '받지 않는다.');
   assert.equal(P.canCall({ state: '사망', available: true, inAnomaly: false }).ok, false);
 });
+
+test('이동수단: 운행 시간과 이동 중 괴이 접촉', async () => {
+  await build({ entryPoints: ['src/core/fieldtravel.ts'], outdir: dir, outbase: 'src', bundle: true, platform: 'node', format: 'esm', outExtension: { '.js': '.mjs' }, logLevel: 'silent' });
+  const T = await imp('travel');
+  const tbl = [{ id: 's', mode: 'subway', from: 'a', to: 'b', minutes: 12, open: [330, 1440], via: ['jongno'] }, { id: 'n', mode: 'bus', from: 'a', to: 'c', minutes: 30, open: [1380, 300] }];
+  assert.deepEqual(T.routesFrom('a', 600, tbl).map(r => r.id), ['s']);
+  assert.deepEqual(T.routesFrom('a', 60, tbl).map(r => r.id), ['n']);
+  const act = [{ name: '명일 아파트', loc: 'jongno' }];
+  assert.equal(T.contactAlong(tbl[0], act, 0.05).stage, 'caught');
+  assert.equal(T.contactAlong(tbl[0], act, 0.5).stage, 'sign');
+  assert.equal(T.contactAlong(tbl[0], act, 0.9).stage, 'none');
+  assert.equal(T.contactAlong(tbl[1], act, 0.05).stage, 'none');
+  assert.match(T.contactText({ stage: 'sign', anomaly: 'X' }), /징후/);
+});

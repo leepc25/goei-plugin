@@ -665,6 +665,17 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       if (world) world.paused = p;
     },
     onWorld: (w, run) => {
+      // 괴이 안으로 들어갔다: 장부에 남긴다 (끝날 때 결과 한 줄이 더 들어간다)
+      if (bridge?.field && (run as { stageId?: string }).stageId !== 'hq') {
+        const label = String((run as { stageId?: string }).stageId ?? '괴이');
+        void bridge.field.record({ kind: 'enter_anomaly', text: `작전 투입: ${label}`, weight: 3, fact: { key: '작전', value: `투입 중 (${label})` } }).catch(() => {});
+        w.on((e) => {
+          if (e.type !== 'run:end') return;
+          const how = (e as unknown as { how: string }).how;
+          const text = `작전 종료 (${how === 'evac' ? '후송' : how === 'withdraw' ? '철수' : '귀환'}): ${label}, 처치 ${w.kills}, 부상 ${Math.max(0, Math.round(w.player.hpMax - w.player.hp))}`;
+          void bridge.field!.record({ kind: 'exit_anomaly', text, weight: 3, fact: { key: '작전', value: `종료 (${how === 'evac' ? '후송' : how === 'withdraw' ? '철수' : '귀환'})` } }).catch(() => {});
+        });
+      }
       cancelStoryForScene();
       world = w;
       runAgent = run.agent as AgentId;
@@ -719,7 +730,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     drawIdle: (name, ctx, t) => {
       if (name === 'title') drawTitleBg(ctx, t);
     },
-    boot: (g) => { void Promise.all([session.ready, hq.visitReady]).then(() => { elevator.reloadMeta(); if (bridge?.visit) g.start_new(); else if (!bootFromUrl(g)) g.toTitle(); }); return true; },
+    boot: (g) => { void Promise.all([session.ready, hq.visitReady]).then(() => { elevator.reloadMeta(); if (bridge?.visit) void gate().then((ok) => (ok ? g.start_new() : bridge.close?.())); else if (!bootFromUrl(g)) g.toTitle(); }); return true; },
     dispose: () => {
       window.removeEventListener('pagehide', saveOnHide);
       document.removeEventListener('visibilitychange', saveOnHide);
