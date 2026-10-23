@@ -80,11 +80,11 @@ export interface HqScene {
   things: HqThing[];
 }
 
-/** 화면 px: 가로 1 m = 155 px (키 1.65 m = 256 px), 깊이는 방 깊이를 걷는 띠 전체에 */
-export const PX_M = 155;
-export const LANE_TOP = 470;
-export const LANE_BOT = 690;
-const HEIGHT: Record<string, number> = { desk: 116, big: 90, wall: 280, glass: 190 };
+/** 화면 px (docs/필드_그림_통합_지침.md): 맨 뒤 줄에서 1 m = 142 px (키 1.65 m = 235 px), 벽·바닥 선 y420, 걷는 띠 y420–669, 배경 세로 700 */
+export const PX_M = 142;
+export const LANE_TOP = 420;
+export const LANE_BOT = 669;
+const HEIGHT: Record<string, number> = { desk: 106, big: 121, wall: 283, glass: 190 };
 
 function fromRoom(r: Room) {
   const yOf = (m: number) => LANE_TOP + (m / r.d) * (LANE_BOT - LANE_TOP);
@@ -121,7 +121,7 @@ function core(cx: number, up?: [SceneId, string], down?: [SceneId, string]) {
 const hall = (b: Omit<Base, 'doors'>, wm: number, c: ReturnType<typeof core>, doors: HqDoor[], extra: Partial<HqScene> = {}): HqScene => ({
   ...b, length: Math.max(1280, M(wm)), doors: [...c.doors, ...doors], spots: [], boxes: [], fixtures: [c.sign], things: [], ...extra,
 });
-const gate = (xm: number): HqBox[] => [0.5, 1.7, 2.9].map((ym) => ({ kind: 'gate', x: M(xm), w: 40, y: LANE_TOP + ((ym + 0.6) / 4) * 220, d: (0.6 / 4) * 220, h: 150, solid: true }));
+const gate = (xm: number): HqBox[] => [0.5, 1.7, 2.9].map((ym) => ({ kind: 'gate', x: M(xm), w: 40, y: LANE_TOP + ((ym + 0.6) / 4) * (LANE_BOT - LANE_TOP), d: (0.6 / 4) * (LANE_BOT - LANE_TOP), h: 150, solid: true }));
 
 export const HQ_SCENES: HqScene[] = [
   // ── 바깥 (그대로 둠) ──
