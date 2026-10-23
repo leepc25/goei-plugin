@@ -1,11 +1,11 @@
 {
-  "description": "Single full-body native pixel-art game sprite. IDENTITY MUST MATCH: Young adult man with ordinary soft slim build, gentle long face, warm brown eyes and friendly small smile. Thick messy WAVY black hair with loose center part and curled forehead strands. Large thin rectangular clear eyeglasses. OPEN long off-white lab coat over pale gray-blue collared shirt, straight black necktie and black trousers. No mask, no held book. Relaxed upright SOUTH-facing stance, empty hands visible at sides, low top-down camera. Natural adult anatomy and normal torso/pelvis. Anatomical crown-to-sole height 212-224px on128x256, hair/cap excluded from body height. Soles at y248, leave unused space above shorter people, NEVER enlarge to fill canvas. Keep original individual body shape. Match style reference ONLY for crisp native1px clusters, selective dark outlines and controlled shading; own colors and clothes. Transparent background, no shadow, no text, no weapons. Entire hair and shoes inside frame.",
+  "description": "Full-body native pixel-art game sprite, STRICTLY FRONT SOUTH view: face, nose, chest, belt and knees directly toward viewer, both ears equally visible. No sideways head or three-quarter turn. IDENTITY: Young adult man with ordinary soft slim build, gentle long face, warm brown eyes and friendly small smile. Thick messy WAVY black hair with loose center part and curled forehead strands. Large thin rectangular clear eyeglasses. OPEN long off-white lab coat over pale gray-blue collared shirt, straight black necktie and black trousers. No mask, no held book. Relaxed upright stance, empty hands at sides. Natural adult anatomy, normal torso/pelvis, 7-head proportions. Anatomical crown to soles 212-224px; feet 6px above bottom, hair fully inside frame. Crisp single-pixel clusters, selective dark outlines, restrained game-sprite shading, no antialiasing. Transparent background, no ground shadow, text or weapons. Preserve individual hair, face, stature and clothing. Do not copy any generic character. Anatomical height excludes high hair/headwear. Every outer edge must border transparency directly, never a light gray halo.",
   "image_size": {
     "width": 128,
-    "height": 256
+    "height": 236
   },
   "no_background": true,
-  "seed": 10222027,
+  "seed": 1792789418,
   "target_palette": {
     "max_colors": 48
   },
@@ -14,17 +14,5 @@
     "outline": true,
     "detail": true,
     "shading": true
-  },
-  "style_image": {
-    "image": {
-      "type": "base64",
-      "base64": "[image payload omitted]",
-      "format": "png"
-    },
-    "size": {
-      "width": 128,
-      "height": 256
-    },
-    "usage_description": "Use ONLY pixel rendering, outline, shading and lighting. Do not copy the reference male height, body shape, shoulder width, outfit or identity. Preserve this character own stature, build, age, hair, irises and original clothing colors and silhouette. FRONT view."
   }
 }

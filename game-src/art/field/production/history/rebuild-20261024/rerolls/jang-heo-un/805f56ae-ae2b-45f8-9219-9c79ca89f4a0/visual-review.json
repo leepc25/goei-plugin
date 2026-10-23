@@ -1,0 +1,13 @@
+{
+  "job": "805f56ae-ae2b-45f8-9219-9c79ca89f4a0",
+  "decision": "reroll",
+  "reason": "장신·장발 형태는 맞지만 얼굴과 몸이 측면으로 돌아가 SOUTH 기준 실패.",
+  "at": 1792789500.1814444,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

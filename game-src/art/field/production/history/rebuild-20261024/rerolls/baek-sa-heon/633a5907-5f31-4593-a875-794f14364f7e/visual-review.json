@@ -1,0 +1,13 @@
+{
+  "job": "633a5907-5f31-4593-a875-794f14364f7e",
+  "decision": "reroll",
+  "reason": "머리 포함239px로 보통 키 범위 초과, 몸통·발이 돌아간 상태. 안대 방향과 곱슬머리는 유지해야 함.",
+  "at": 1792789418.0075443,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "job": "d6d15ee8-080b-43fe-a5ec-0f5b6e4e980c",
+  "decision": "reroll",
+  "reason": "청록색 로우번은 맞지만 정면이 아닌 얼굴·몸통 및 여성 키 초과.",
+  "at": 1792789500.5086281,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

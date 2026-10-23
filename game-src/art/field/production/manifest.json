@@ -661,13 +661,13 @@
     "source_images_visually_reviewed": true,
     "character_id": null,
     "pixel_request": {
-      "description": "Full-body native pixel-art game sprite, STRICTLY FRONT SOUTH view: face, nose, chest, belt and knees directly toward viewer, both ears equally visible. No sideways head or three-quarter turn. IDENTITY: Adult male silhouette with broad straight shoulders and a tapered waist. Thick black wavy hair swept back with loose curved locks. Entire face is an opaque pitch-black shadow, including eyes and nose: ONLY a tiny thin white smile is visible. NO sunglasses. Black single-breasted tailored suit, white pointed collar, straight black necktie. Pale hands. Relaxed upright stance, empty hands at sides. Natural adult anatomy, normal torso/pelvis, 7-head proportions. Anatomical crown to soles 214-222px; feet 6px above bottom, hair fully inside frame. Crisp single-pixel clusters, selective dark outlines, restrained game-sprite shading, no antialiasing. Transparent background, no ground shadow, text or weapons. Preserve individual hair, face, stature and clothing. Do not copy any generic character. Anatomical height excludes high hair/headwear. Every outer edge must border transparency directly, never a light gray halo.",
+      "description": "Full-body native pixel-art game sprite, STRICTLY FRONT SOUTH view: face, nose, chest, belt and knees directly toward viewer, both ears equally visible. No sideways head or three-quarter turn. IDENTITY: Adult male silhouette with broad straight shoulders and a tapered waist. Thick black wavy hair swept back with loose curved locks. Entire face is an opaque pitch-black shadow, including eyes and nose: ONLY a tiny thin white smile is visible. NO sunglasses. Black single-breasted tailored suit, white pointed collar, straight black necktie. Pale hands. Relaxed upright stance, empty hands at sides. Natural adult anatomy, normal torso/pelvis, 7-head proportions. Anatomical crown to soles 214-222px; feet 6px above bottom, hair fully inside frame. Crisp single-pixel clusters, selective dark outlines, restrained game-sprite shading, no antialiasing. Transparent background, no ground shadow, text or weapons. Preserve individual hair, face, stature and clothing. Do not copy any generic character. Anatomical height excludes high hair/headwear. Every outer edge must border transparency directly, never a light gray halo. Place soles at y248 and anatomical crown at y30, leaving 30 transparent rows above. Broad straight shoulders and tapered waist, NOT reference belly. Hair is swept BACK off forehead in thick black waves.",
       "image_size": {
         "width": 128,
-        "height": 236
+        "height": 256
       },
       "no_background": true,
-      "seed": 1792788955,
+      "seed": 1792789569,
       "target_palette": {
         "max_colors": 48
       },
@@ -676,7 +676,9 @@
         "outline": true,
         "detail": true,
         "shading": true
-      }
+      },
+      "style_reference_local": "game-src/art/field/production/lee-gil-hwan/reference.png",
+      "style_usage_description": "Use only native pixel scale, rendering, 216px standing height and STRICT FRONT SOUTH pose. Do NOT copy reference hair, face, glasses, body fat or suit shape. Draw target individual identity and build from the description."
     },
     "stature_rendering": {
       "canonical_height_cm": null,
@@ -705,8 +707,7 @@
         "comparison": "Same native scale; crown-to-sole excludes hair volume; no frame-fitting enlargement."
       },
       "reviewed_at": "2026-10-24"
-    },
-    "native_height_canvas": true
+    }
   },
   {
     "english": "Do Pil-heon",
@@ -1870,13 +1871,13 @@
     "source_images_visually_reviewed": true,
     "character_id": null,
     "pixel_request": {
-      "description": "Single full-body native pixel-art game sprite. IDENTITY MUST MATCH: Thin frail young man with narrow shoulders and pale angular face, smug slight smile. Voluminous light ash-brown tightly WAVY/CURLY hair over forehead and ears. Dark navy rectangular medical EYEPATCH over HIS LEFT eye (viewer right), thin diagonal strap crossing bridge of nose; other eye gray-brown and half-lidded. Navy suit, white shirt and dark navy tie. No mask, no sunglasses. Relaxed upright SOUTH-facing stance, empty hands visible at sides, low top-down camera. Natural adult anatomy and normal torso/pelvis. Anatomical crown-to-sole height 212-224px on128x256, hair/cap excluded from body height. Soles at y248, leave unused space above shorter people, NEVER enlarge to fill canvas. Keep original individual body shape. Match style reference ONLY for crisp native1px clusters, selective dark outlines and controlled shading; own colors and clothes. Transparent background, no shadow, no text, no weapons. Entire hair and shoes inside frame.",
+      "description": "Full-body native pixel-art game sprite, STRICTLY FRONT SOUTH view: face, nose, chest, belt and knees directly toward viewer, both ears equally visible. No sideways head or three-quarter turn. IDENTITY: Thin frail young man with narrow shoulders and pale angular face, smug slight smile. Voluminous light ash-brown tightly WAVY/CURLY hair over forehead and ears. Dark navy rectangular medical EYEPATCH over HIS LEFT eye (viewer right), thin diagonal strap crossing bridge of nose; other eye gray-brown and half-lidded. Navy suit, white shirt and dark navy tie. No mask, no sunglasses. Relaxed upright stance, empty hands at sides. Natural adult anatomy, normal torso/pelvis, 7-head proportions. Anatomical crown to soles 212-224px; feet 6px above bottom, hair fully inside frame. Crisp single-pixel clusters, selective dark outlines, restrained game-sprite shading, no antialiasing. Transparent background, no ground shadow, text or weapons. Preserve individual hair, face, stature and clothing. Do not copy any generic character. Anatomical height excludes high hair/headwear. Every outer edge must border transparency directly, never a light gray halo.",
       "image_size": {
         "width": 128,
-        "height": 256
+        "height": 236
       },
       "no_background": true,
-      "seed": 10222027,
+      "seed": 1792789418,
       "target_palette": {
         "max_colors": 48
       },
@@ -1885,9 +1886,7 @@
         "outline": true,
         "detail": true,
         "shading": true
-      },
-      "style_reference_local": "game-src/persona-reference-20261022/persona-male-original.png",
-      "style_usage_description": "Use ONLY pixel rendering, outline, shading and lighting. Do not copy the reference male height, body shape, shoulder width, outfit or identity. Preserve this character own stature, build, age, hair, irises and original clothing colors and silhouette. FRONT view."
+      }
     },
     "stature_rendering": {
       "basis": "height unspecified; provisional medium stature",
@@ -1914,7 +1913,8 @@
         "note": "Pixel ranges are production targets, not invented canonical height. Preserve original build and clothing; validate together at identical zoom."
       },
       "reviewed_at": "2026-10-24"
-    }
+    },
+    "native_height_canvas": true
   },
   {
     "english": "Go Young-eun",
@@ -1928,13 +1928,13 @@
     "source_images_visually_reviewed": true,
     "character_id": null,
     "pixel_request": {
-      "description": "Single full-body native pixel-art game sprite. IDENTITY MUST MATCH: Ordinary soft nonathletic adult woman, oval gentle face, brown-gray eyes and modest smile. Dark BROWN chin-length rounded bob, thick straight bangs above eyes and inward-curled ends; one side tucked behind the visible ear. Navy fitted trouser suit, white shirt and navy tie. No mask or glasses. Preserve visible ear shape from original; do not invent a conspicuous amputated ear on the exposed side. Relaxed upright SOUTH-facing stance, empty hands visible at sides, low top-down camera. Natural adult anatomy and normal torso/pelvis. Anatomical crown-to-sole height 200-206px on128x256, hair/cap excluded from body height. Soles at y248, leave unused space above shorter people, NEVER enlarge to fill canvas. Keep original individual body shape. Match style reference ONLY for crisp native1px clusters, selective dark outlines and controlled shading; own colors and clothes. Transparent background, no shadow, no text, no weapons. Entire hair and shoes inside frame.",
+      "description": "Full-body native pixel-art game sprite, STRICTLY FRONT SOUTH view: face, nose, chest, belt and knees directly toward viewer, both ears equally visible. No sideways head or three-quarter turn. IDENTITY: Ordinary soft nonathletic adult woman, oval gentle face, brown-gray eyes and modest smile. Dark BROWN chin-length rounded bob, thick straight bangs above eyes and inward-curled ends; one side tucked behind the visible ear. Navy fitted trouser suit, white shirt and navy tie. No mask or glasses. Preserve visible ear shape from original; do not invent a conspicuous amputated ear on the exposed side. Relaxed upright stance, empty hands at sides. Natural adult anatomy, normal torso/pelvis, 7-head proportions. Anatomical crown to soles 200-206px; feet 6px above bottom, hair fully inside frame. Crisp single-pixel clusters, selective dark outlines, restrained game-sprite shading, no antialiasing. Transparent background, no ground shadow, text or weapons. Preserve individual hair, face, stature and clothing. Do not copy any generic character. Anatomical height excludes high hair/headwear. Every outer edge must border transparency directly, never a light gray halo.",
       "image_size": {
         "width": 128,
-        "height": 256
+        "height": 220
       },
       "no_background": true,
-      "seed": 10222027,
+      "seed": 1792789418,
       "target_palette": {
         "max_colors": 48
       },
@@ -1943,9 +1943,7 @@
         "outline": true,
         "detail": true,
         "shading": true
-      },
-      "style_reference_local": "game-src/persona-reference-20261022/persona-male-original.png",
-      "style_usage_description": "Use ONLY pixel rendering, outline, shading and lighting. Do not copy the reference male height, body shape, shoulder width, outfit or identity. Preserve this character own stature, build, age, hair, irises and original clothing colors and silhouette. FRONT view."
+      }
     },
     "stature_rendering": {
       "basis": "Latest explicit user height specification; overrides previous provisional height classes and conflicting wiki height",
@@ -1982,7 +1980,8 @@
         "note": "Common production scale; do not fit each person to full canvas. Compare anatomical crown-to-sole height; hair/headwear and heels need separate allowance. Unspecified individual female height stays a range."
       },
       "reviewed_at": "2026-10-24"
-    }
+    },
+    "native_height_canvas": true
   },
   {
     "english": "Kang I-hak",
@@ -2063,13 +2062,13 @@
     "source_images_visually_reviewed": true,
     "character_id": null,
     "pixel_request": {
-      "description": "Single full-body native pixel-art game sprite. IDENTITY MUST MATCH: Tall lean adult man with slightly slouched posture, long narrow pale face, pronounced dark under-eye shadows, tired half-lidded gray-brown eyes, small weary smile. LONG dark BROWN layered hair extending past shoulders, center part, long curved side locks and outward-flipped ends, untied. Navy suit, white shirt and navy tie. No mask. Relaxed upright SOUTH-facing stance, empty hands visible at sides, low top-down camera. Natural adult anatomy and normal torso/pelvis. Anatomical crown-to-sole height 230-238px on128x256, hair/cap excluded from body height. Soles at y248, leave unused space above shorter people, NEVER enlarge to fill canvas. Keep original individual body shape. Match style reference ONLY for crisp native1px clusters, selective dark outlines and controlled shading; own colors and clothes. Transparent background, no shadow, no text, no weapons. Entire hair and shoes inside frame.",
+      "description": "Full-body native pixel-art game sprite, STRICTLY FRONT SOUTH view: face, nose, chest, belt and knees directly toward viewer, both ears equally visible. No sideways head or three-quarter turn. IDENTITY: Tall lean adult man with slightly slouched posture, long narrow pale face, pronounced dark under-eye shadows, tired half-lidded gray-brown eyes, small weary smile. LONG dark BROWN layered hair extending past shoulders, center part, long curved side locks and outward-flipped ends, untied. Navy suit, white shirt and navy tie. No mask. Relaxed upright stance, empty hands at sides. Natural adult anatomy, normal torso/pelvis, 7-head proportions. Anatomical crown to soles 230-238px; feet 6px above bottom, hair fully inside frame. Crisp single-pixel clusters, selective dark outlines, restrained game-sprite shading, no antialiasing. Transparent background, no ground shadow, text or weapons. Preserve individual hair, face, stature and clothing. Do not copy any generic character. Anatomical height excludes high hair/headwear. Every outer edge must border transparency directly, never a light gray halo.",
       "image_size": {
         "width": 128,
-        "height": 256
+        "height": 252
       },
       "no_background": true,
-      "seed": 10222027,
+      "seed": 1792789500,
       "target_palette": {
         "max_colors": 48
       },
@@ -2078,9 +2077,7 @@
         "outline": true,
         "detail": true,
         "shading": true
-      },
-      "style_reference_local": "game-src/persona-reference-20261022/persona-male-original.png",
-      "style_usage_description": "Use ONLY pixel rendering, outline, shading and lighting. Do not copy the reference male height, body shape, shoulder width, outfit or identity. Preserve this character own stature, build, age, hair, irises and original clothing colors and silhouette. FRONT view."
+      }
     },
     "stature_rendering": {
       "basis": "tall",
@@ -2107,7 +2104,8 @@
         "note": "Pixel ranges are production targets, not invented canonical height. Preserve original build and clothing; validate together at identical zoom."
       },
       "reviewed_at": "2026-10-24"
-    }
+    },
+    "native_height_canvas": true
   },
   {
     "english": "Kwak Je-gang",
@@ -2121,13 +2119,13 @@
     "source_images_visually_reviewed": true,
     "character_id": null,
     "pixel_request": {
-      "description": "Single full-body native pixel-art game sprite. IDENTITY MUST MATCH: Young adult man with ordinary soft slim build, gentle long face, warm brown eyes and friendly small smile. Thick messy WAVY black hair with loose center part and curled forehead strands. Large thin rectangular clear eyeglasses. OPEN long off-white lab coat over pale gray-blue collared shirt, straight black necktie and black trousers. No mask, no held book. Relaxed upright SOUTH-facing stance, empty hands visible at sides, low top-down camera. Natural adult anatomy and normal torso/pelvis. Anatomical crown-to-sole height 212-224px on128x256, hair/cap excluded from body height. Soles at y248, leave unused space above shorter people, NEVER enlarge to fill canvas. Keep original individual body shape. Match style reference ONLY for crisp native1px clusters, selective dark outlines and controlled shading; own colors and clothes. Transparent background, no shadow, no text, no weapons. Entire hair and shoes inside frame.",
+      "description": "Full-body native pixel-art game sprite, STRICTLY FRONT SOUTH view: face, nose, chest, belt and knees directly toward viewer, both ears equally visible. No sideways head or three-quarter turn. IDENTITY: Young adult man with ordinary soft slim build, gentle long face, warm brown eyes and friendly small smile. Thick messy WAVY black hair with loose center part and curled forehead strands. Large thin rectangular clear eyeglasses. OPEN long off-white lab coat over pale gray-blue collared shirt, straight black necktie and black trousers. No mask, no held book. Relaxed upright stance, empty hands at sides. Natural adult anatomy, normal torso/pelvis, 7-head proportions. Anatomical crown to soles 212-224px; feet 6px above bottom, hair fully inside frame. Crisp single-pixel clusters, selective dark outlines, restrained game-sprite shading, no antialiasing. Transparent background, no ground shadow, text or weapons. Preserve individual hair, face, stature and clothing. Do not copy any generic character. Anatomical height excludes high hair/headwear. Every outer edge must border transparency directly, never a light gray halo.",
       "image_size": {
         "width": 128,
-        "height": 256
+        "height": 236
       },
       "no_background": true,
-      "seed": 10222027,
+      "seed": 1792789418,
       "target_palette": {
         "max_colors": 48
       },
@@ -2136,9 +2134,7 @@
         "outline": true,
         "detail": true,
         "shading": true
-      },
-      "style_reference_local": "game-src/persona-reference-20261022/persona-male-original.png",
-      "style_usage_description": "Use ONLY pixel rendering, outline, shading and lighting. Do not copy the reference male height, body shape, shoulder width, outfit or identity. Preserve this character own stature, build, age, hair, irises and original clothing colors and silhouette. FRONT view."
+      }
     },
     "stature_rendering": {
       "basis": "height unspecified; provisional medium stature",
@@ -2165,7 +2161,8 @@
         "note": "Pixel ranges are production targets, not invented canonical height. Preserve original build and clothing; validate together at identical zoom."
       },
       "reviewed_at": "2026-10-24"
-    }
+    },
+    "native_height_canvas": true
   },
   {
     "english": "Lee Yeon-hwa",
@@ -2179,13 +2176,13 @@
     "source_images_visually_reviewed": true,
     "character_id": null,
     "pixel_request": {
-      "description": "Single full-body native pixel-art game sprite. IDENTITY MUST MATCH: Adult woman with natural nonathletic build, tired oval face, brown-gray eyes, under-eye shadows and subdued mouth. Black hair center-parted, long straight cheek locks, tied LOW behind neck into a small ponytail. Thin black rectangular clear eyeglasses. OPEN off-white long lab coat over a dusty PINK collared blouse with no tie; dark high-waisted skirt visible below. No mask. Relaxed upright SOUTH-facing stance, empty hands visible at sides, low top-down camera. Natural adult anatomy and normal torso/pelvis. Anatomical crown-to-sole height 200-206px on128x256, hair/cap excluded from body height. Soles at y248, leave unused space above shorter people, NEVER enlarge to fill canvas. Keep original individual body shape. Match style reference ONLY for crisp native1px clusters, selective dark outlines and controlled shading; own colors and clothes. Transparent background, no shadow, no text, no weapons. Entire hair and shoes inside frame.",
+      "description": "Full-body native pixel-art game sprite, STRICTLY FRONT SOUTH view: face, nose, chest, belt and knees directly toward viewer, both ears equally visible. No sideways head or three-quarter turn. IDENTITY: Adult woman with natural nonathletic build, tired oval face, brown-gray eyes, under-eye shadows and subdued mouth. Black hair center-parted, long straight cheek locks, tied LOW behind neck into a small ponytail. Thin black rectangular clear eyeglasses. OPEN off-white long lab coat over a dusty PINK collared blouse with no tie; dark high-waisted skirt visible below. No mask. Relaxed upright stance, empty hands at sides. Natural adult anatomy, normal torso/pelvis, 7-head proportions. Anatomical crown to soles 200-206px; feet 6px above bottom, hair fully inside frame. Crisp single-pixel clusters, selective dark outlines, restrained game-sprite shading, no antialiasing. Transparent background, no ground shadow, text or weapons. Preserve individual hair, face, stature and clothing. Do not copy any generic character. Anatomical height excludes high hair/headwear. Every outer edge must border transparency directly, never a light gray halo.",
       "image_size": {
         "width": 128,
-        "height": 256
+        "height": 220
       },
       "no_background": true,
-      "seed": 10222027,
+      "seed": 1792789500,
       "target_palette": {
         "max_colors": 48
       },
@@ -2194,9 +2191,7 @@
         "outline": true,
         "detail": true,
         "shading": true
-      },
-      "style_reference_local": "game-src/persona-reference-20261022/persona-male-original.png",
-      "style_usage_description": "Use ONLY pixel rendering, outline, shading and lighting. Do not copy the reference male height, body shape, shoulder width, outfit or identity. Preserve this character own stature, build, age, hair, irises and original clothing colors and silhouette. FRONT view."
+      }
     },
     "stature_rendering": {
       "basis": "Latest explicit user height specification; overrides previous provisional height classes and conflicting wiki height",
@@ -2233,7 +2228,8 @@
         "note": "Common production scale; do not fit each person to full canvas. Compare anatomical crown-to-sole height; hair/headwear and heels need separate allowance. Unspecified individual female height stays a range."
       },
       "reviewed_at": "2026-10-24"
-    }
+    },
+    "native_height_canvas": true
   },
   {
     "english": "Lee Byeong-jin",
@@ -2247,13 +2243,13 @@
     "source_images_visually_reviewed": true,
     "character_id": null,
     "pixel_request": {
-      "description": "Single full-body native pixel-art game sprite. IDENTITY MUST MATCH: Stocky FAT middle-aged office man with large round belly, soft thick arms, round full face and double chin, tired narrow brown eyes and worried strained smile. Short dark brown hair side-parted with short uneven fringe, receding temples. Thin rectangular clear glasses. White long-sleeved shirt stretched over belly, dark black tie, black trousers and belt. NO jacket or lab coat. Relaxed upright SOUTH-facing stance, empty hands visible at sides, low top-down camera. Natural adult anatomy and normal torso/pelvis. Anatomical crown-to-sole height 212-224px on128x256, hair/cap excluded from body height. Soles at y248, leave unused space above shorter people, NEVER enlarge to fill canvas. Keep original individual body shape. Match style reference ONLY for crisp native1px clusters, selective dark outlines and controlled shading; own colors and clothes. Transparent background, no shadow, no text, no weapons. Entire hair and shoes inside frame.",
+      "description": "Full-body native pixel-art game sprite, STRICTLY FRONT SOUTH view: face, nose, chest, belt and knees directly toward viewer, both ears equally visible. No sideways head or three-quarter turn. IDENTITY: Stocky FAT middle-aged office man with large round belly, soft thick arms, round full face and double chin, tired narrow brown eyes and worried strained smile. Short dark brown hair side-parted with short uneven fringe, receding temples. Thin rectangular clear glasses. White long-sleeved shirt stretched over belly, dark black tie, black trousers and belt. NO jacket or lab coat. Relaxed upright stance, empty hands at sides. Natural adult anatomy, normal torso/pelvis, 7-head proportions. Anatomical crown to soles 212-224px; feet 6px above bottom, hair fully inside frame. Crisp single-pixel clusters, selective dark outlines, restrained game-sprite shading, no antialiasing. Transparent background, no ground shadow, text or weapons. Preserve individual hair, face, stature and clothing. Do not copy any generic character. Anatomical height excludes high hair/headwear. Every outer edge must border transparency directly, never a light gray halo.",
       "image_size": {
         "width": 128,
-        "height": 256
+        "height": 236
       },
       "no_background": true,
-      "seed": 10222027,
+      "seed": 1792789418,
       "target_palette": {
         "max_colors": 48
       },
@@ -2262,9 +2258,7 @@
         "outline": true,
         "detail": true,
         "shading": true
-      },
-      "style_reference_local": "game-src/persona-reference-20261022/persona-male-original.png",
-      "style_usage_description": "Use ONLY pixel rendering, outline, shading and lighting. Do not copy the reference male height, body shape, shoulder width, outfit or identity. Preserve this character own stature, build, age, hair, irises and original clothing colors and silhouette. FRONT view."
+      }
     },
     "stature_rendering": {
       "basis": "height unspecified; provisional medium stature",
@@ -2291,7 +2285,8 @@
         "note": "Pixel ranges are production targets, not invented canonical height. Preserve original build and clothing; validate together at identical zoom."
       },
       "reviewed_at": "2026-10-24"
-    }
+    },
+    "native_height_canvas": true
   },
   {
     "english": "Jay",
@@ -2305,13 +2300,13 @@
     "source_images_visually_reviewed": true,
     "character_id": null,
     "pixel_request": {
-      "description": "Single full-body native pixel-art game sprite. IDENTITY MUST MATCH: Very pale gaunt young adult man with thin wiry build. Shaggy SILVER-WHITE hair to jaw and nape, long messy bangs partly obscuring tired YELLOW eyes. Black baseball cap, white pleated medical mask covering nose and mouth. Dark charcoal NAVY security uniform with pointed collar, two buttoned flap chest pockets, long sleeves, matching trousers and black belt. No necktie, no suit jacket. Relaxed upright SOUTH-facing stance, empty hands visible at sides, low top-down camera. Natural adult anatomy and normal torso/pelvis. Anatomical crown-to-sole height 212-224px on128x256, hair/cap excluded from body height. Soles at y248, leave unused space above shorter people, NEVER enlarge to fill canvas. Keep original individual body shape. Match style reference ONLY for crisp native1px clusters, selective dark outlines and controlled shading; own colors and clothes. Transparent background, no shadow, no text, no weapons. Entire hair and shoes inside frame.",
+      "description": "Full-body native pixel-art game sprite, STRICTLY FRONT SOUTH view: face, nose, chest, belt and knees directly toward viewer, both ears equally visible. No sideways head or three-quarter turn. IDENTITY: Very pale gaunt young adult man with thin wiry build. Shaggy SILVER-WHITE hair to jaw and nape, long messy bangs partly obscuring tired YELLOW eyes. Black baseball cap, white pleated medical mask covering nose and mouth. Dark charcoal NAVY security uniform with pointed collar, two buttoned flap chest pockets, long sleeves, matching trousers and black belt. No necktie, no suit jacket. Relaxed upright stance, empty hands at sides. Natural adult anatomy, normal torso/pelvis, 7-head proportions. Anatomical crown to soles 212-224px; feet 6px above bottom, hair fully inside frame. Crisp single-pixel clusters, selective dark outlines, restrained game-sprite shading, no antialiasing. Transparent background, no ground shadow, text or weapons. Preserve individual hair, face, stature and clothing. Do not copy any generic character. Anatomical height excludes high hair/headwear. Every outer edge must border transparency directly, never a light gray halo.",
       "image_size": {
         "width": 128,
-        "height": 256
+        "height": 236
       },
       "no_background": true,
-      "seed": 10222027,
+      "seed": 1792789500,
       "target_palette": {
         "max_colors": 48
       },
@@ -2320,9 +2315,7 @@
         "outline": true,
         "detail": true,
         "shading": true
-      },
-      "style_reference_local": "game-src/persona-reference-20261022/persona-male-original.png",
-      "style_usage_description": "Use ONLY pixel rendering, outline, shading and lighting. Do not copy the reference male height, body shape, shoulder width, outfit or identity. Preserve this character own stature, build, age, hair, irises and original clothing colors and silhouette. FRONT view."
+      }
     },
     "stature_rendering": {
       "basis": "height unspecified; provisional medium stature",
@@ -2349,7 +2342,8 @@
         "note": "Pixel ranges are production targets, not invented canonical height. Preserve original build and clothing; validate together at identical zoom."
       },
       "reviewed_at": "2026-10-24"
-    }
+    },
+    "native_height_canvas": true
   },
   {
     "english": "Ho Yu-won",
@@ -2363,13 +2357,13 @@
     "source_images_visually_reviewed": true,
     "character_id": null,
     "pixel_request": {
-      "description": "Single full-body native pixel-art game sprite. IDENTITY MUST MATCH: Lean adult man with narrow waist and natural shoulders, pale angular youthful face, ORANGE amber eyes and a soft knowing smile. Thick tousled dark BROWN hair side-parted, long curved curtain strands over forehead and eyes. Light warm GRAY suit jacket worn open and matching trousers, white shirt with OPEN collar, LOOSE dark brown tie, black belt. No mask or glasses. Relaxed upright SOUTH-facing stance, empty hands visible at sides, low top-down camera. Natural adult anatomy and normal torso/pelvis. Anatomical crown-to-sole height 212-224px on128x256, hair/cap excluded from body height. Soles at y248, leave unused space above shorter people, NEVER enlarge to fill canvas. Keep original individual body shape. Match style reference ONLY for crisp native1px clusters, selective dark outlines and controlled shading; own colors and clothes. Transparent background, no shadow, no text, no weapons. Entire hair and shoes inside frame.",
+      "description": "Full-body native pixel-art game sprite, STRICTLY FRONT SOUTH view: face, nose, chest, belt and knees directly toward viewer, both ears equally visible. No sideways head or three-quarter turn. IDENTITY: Lean adult man with narrow waist and natural shoulders, pale angular youthful face, ORANGE amber eyes and a soft knowing smile. Thick tousled dark BROWN hair side-parted, long curved curtain strands over forehead and eyes. Light warm GRAY suit jacket worn open and matching trousers, white shirt with OPEN collar, LOOSE dark brown tie, black belt. No mask or glasses. Relaxed upright stance, empty hands at sides. Natural adult anatomy, normal torso/pelvis, 7-head proportions. Anatomical crown to soles 212-224px; feet 6px above bottom, hair fully inside frame. Crisp single-pixel clusters, selective dark outlines, restrained game-sprite shading, no antialiasing. Transparent background, no ground shadow, text or weapons. Preserve individual hair, face, stature and clothing. Do not copy any generic character. Anatomical height excludes high hair/headwear. Every outer edge must border transparency directly, never a light gray halo.",
       "image_size": {
         "width": 128,
-        "height": 256
+        "height": 236
       },
       "no_background": true,
-      "seed": 10222027,
+      "seed": 1792789418,
       "target_palette": {
         "max_colors": 48
       },
@@ -2378,9 +2372,7 @@
         "outline": true,
         "detail": true,
         "shading": true
-      },
-      "style_reference_local": "game-src/persona-reference-20261022/persona-male-original.png",
-      "style_usage_description": "Use ONLY pixel rendering, outline, shading and lighting. Do not copy the reference male height, body shape, shoulder width, outfit or identity. Preserve this character own stature, build, age, hair, irises and original clothing colors and silhouette. FRONT view."
+      }
     },
     "stature_rendering": {
       "basis": "height unspecified; provisional medium stature",
@@ -2407,7 +2399,8 @@
         "note": "Pixel ranges are production targets, not invented canonical height. Preserve original build and clothing; validate together at identical zoom."
       },
       "reviewed_at": "2026-10-24"
-    }
+    },
+    "native_height_canvas": true
   },
   {
     "english": "Cheong Dal-lae",
@@ -2421,13 +2414,13 @@
     "source_images_visually_reviewed": true,
     "character_id": null,
     "pixel_request": {
-      "description": "Single full-body native pixel-art game sprite. IDENTITY MUST MATCH: Adult woman with composed natural slender figure, oval mature face, pale blue-gray eyes and a calm knowing smile. Dark TEAL hair center-parted with LONG STRAIGHT cheek locks down to shoulders, the rest gathered in a low rounded bun behind head. Very dark navy tailored trouser suit, white shirt and dark navy tie. Bare face, no mask or glasses. Do not replace visible pale eyes with black irises from lore. Relaxed upright SOUTH-facing stance, empty hands visible at sides, low top-down camera. Natural adult anatomy and normal torso/pelvis. Anatomical crown-to-sole height 200-206px on128x256, hair/cap excluded from body height. Soles at y248, leave unused space above shorter people, NEVER enlarge to fill canvas. Keep original individual body shape. Match style reference ONLY for crisp native1px clusters, selective dark outlines and controlled shading; own colors and clothes. Transparent background, no shadow, no text, no weapons. Entire hair and shoes inside frame.",
+      "description": "Full-body native pixel-art game sprite, STRICTLY FRONT SOUTH view: face, nose, chest, belt and knees directly toward viewer, both ears equally visible. No sideways head or three-quarter turn. IDENTITY: Adult woman with composed natural slender figure, oval mature face, pale blue-gray eyes and a calm knowing smile. Dark TEAL hair center-parted with LONG STRAIGHT cheek locks down to shoulders, the rest gathered in a low rounded bun behind head. Very dark navy tailored trouser suit, white shirt and dark navy tie. Bare face, no mask or glasses. Do not replace visible pale eyes with black irises from lore. Relaxed upright stance, empty hands at sides. Natural adult anatomy, normal torso/pelvis, 7-head proportions. Anatomical crown to soles 200-206px; feet 6px above bottom, hair fully inside frame. Crisp single-pixel clusters, selective dark outlines, restrained game-sprite shading, no antialiasing. Transparent background, no ground shadow, text or weapons. Preserve individual hair, face, stature and clothing. Do not copy any generic character. Anatomical height excludes high hair/headwear. Every outer edge must border transparency directly, never a light gray halo.",
       "image_size": {
         "width": 128,
-        "height": 256
+        "height": 220
       },
       "no_background": true,
-      "seed": 10222027,
+      "seed": 1792789500,
       "target_palette": {
         "max_colors": 48
       },
@@ -2436,9 +2429,7 @@
         "outline": true,
         "detail": true,
         "shading": true
-      },
-      "style_reference_local": "game-src/persona-reference-20261022/persona-male-original.png",
-      "style_usage_description": "Use ONLY pixel rendering, outline, shading and lighting. Do not copy the reference male height, body shape, shoulder width, outfit or identity. Preserve this character own stature, build, age, hair, irises and original clothing colors and silhouette. FRONT view."
+      }
     },
     "stature_rendering": {
       "basis": "Latest explicit user height specification; overrides previous provisional height classes and conflicting wiki height",
@@ -2475,7 +2466,8 @@
         "note": "Common production scale; do not fit each person to full canvas. Compare anatomical crown-to-sole height; hair/headwear and heels need separate allowance. Unspecified individual female height stays a range."
       },
       "reviewed_at": "2026-10-24"
-    }
+    },
+    "native_height_canvas": true
   },
   {
     "english": "Cha Yeo-jin",

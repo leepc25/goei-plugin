@@ -1,0 +1,13 @@
+{
+  "job": "6f230ee1-fb81-46b6-88bc-b72bf46cf976",
+  "decision": "reroll",
+  "reason": "참조 제거 후 정면 개선됐으나 머리 포함181px로 키 부족. 검수 통과한 이길환 정면 도트를 스타일·스케일 참조로 교체하고 원작 사장 외형 유지.",
+  "at": 1792789569.63723,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

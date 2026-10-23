@@ -1,0 +1,13 @@
+{
+  "job": "d262fefc-fcef-487d-86ff-e1d757d54170",
+  "decision": "reroll",
+  "reason": "은발·모자·의료 마스크·경비복은 맞지만 얼굴 측면 및 보통 키 범위 초과.",
+  "at": 1792789500.4164922,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

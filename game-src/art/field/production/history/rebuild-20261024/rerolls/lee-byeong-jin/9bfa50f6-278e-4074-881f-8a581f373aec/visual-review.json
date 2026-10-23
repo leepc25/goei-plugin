@@ -1,0 +1,13 @@
+{
+  "job": "9bfa50f6-278e-4074-881f-8a581f373aec",
+  "decision": "reroll",
+  "reason": "둥근 복부·얼굴·안경·셔츠는 맞으나 얼굴과 몸통이 3/4로 돌아가 SOUTH 기준 실패.",
+  "at": 1792789418.292294,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}
