@@ -56,7 +56,10 @@ export function createVisit(): GameVisit {
     },
     async send(agentId, input, which, nearby = []) {
       if (busy || isWaiting()) throw new Error('진행 중인 응답이 끝난 뒤 보내 주세요.');
-      const text = input.trim();
+      // *…*로 감싸면 말이 아니라 행동 (2026-10-23 사용자: 행동 지시를 대사로 받아들임)
+      const acted = /^\*([^*]+)\*?$/.exec(input.trim());
+      const act = !!acted;
+      const text = (acted ? acted[1] : input).trim();
       if (!text || text.length > 2000) throw new Error('대화는 1~2000자로 입력해 주세요.');
       busy = true;
       try {
@@ -74,7 +77,7 @@ export function createVisit(): GameVisit {
         // 이번 막간 = 지금 마지막 메시지 뒤에서 나눈 말 (본편이 한 턴 진행되면 새 막간)
         const anchor = anchorOf(c.chat);
         const now = visitRecord(c.chat).turns.filter(t => (t.anchor ?? '') === anchor);
-        const lines = (ts: VisitTurn[]): VisitLine[] => ts.flatMap(t => [{ speaker: t.visitor || visitorName, text: t.user }, { speaker: t.name, text: t.reply }, ...(t.extra ?? []).map(e => ({ speaker: e.name, text: e.line }))]);
+        const lines = (ts: VisitTurn[]): VisitLine[] => ts.flatMap(t => [{ speaker: t.visitor || visitorName, text: t.user, ...(t.act ? { action: true } : {}) }, { speaker: t.name, text: t.reply }, ...(t.extra ?? []).map(e => ({ speaker: e.name, text: e.line }))]);
         // 이 요원이 말했거나 끼어든 대화는 이 요원과의 대화로 본다
         const withHim = (t: VisitTurn) => t.agentId === agentId || !!t.extra?.some(e => e.agentId === agentId);
         const others = [...new Set(now.filter(t => !withHim(t)).map(t => t.name))];
@@ -97,6 +100,7 @@ export function createVisit(): GameVisit {
           elsewhere: others.map(n => ({ agent: n, lines: lines(now.filter(t => t.name === n && !withHim(t))) })),
           bystanders,
           said: text,
+          act,
           skipBooks: me ? [me.lore] : [],
         }, factionNamesOf(c)));
         const model = advValue(ss, 'hq', 'model') === 'main' ? 'main' : 'aux';
@@ -107,7 +111,7 @@ export function createVisit(): GameVisit {
         const extra = got.extra.map(e => ({ agentId: bystanders.find(b => b.name === e.speaker)!.id, name: e.speaker, line: e.line }));
         lastExchange = { at: Date.now(), model, messages: prompt.messages, raw, reply: [reply, ...extra.map(e => `${e.name}: ${e.line}`)].join('\n') };
         // If the active chat changes during inference, save only to the captured origin.
-        const turn: VisitTurn = { id: crypto.randomUUID(), at: Date.now(), agentId, name: a.name, user: text, reply, anchor, room: visitRoom(a) ?? undefined, ...(me ? { visitor: me.name } : {}), ...(extra.length ? { extra } : {}) };
+        const turn: VisitTurn = { id: crypto.randomUUID(), at: Date.now(), agentId, name: a.name, user: text, reply, anchor, room: visitRoom(a) ?? undefined, ...(me ? { visitor: me.name } : {}), ...(act ? { act } : {}), ...(extra.length ? { extra } : {}) };
         const char = await risuai.getCharacterFromIndex(c.charIndex) as { chaId?: string } | null;
         if (!char || char.chaId !== c.char.chaId) throw new Error('원래 카드가 바뀌어 대화를 저장하지 못했어요.');
         const saved = await updateChat(c.charIndex, c.chatIndex, chat => {

@@ -41,7 +41,7 @@ export function mountTalk(root: HTMLElement, api: GameVisit) {
   bar.className = 'gt-bar gk-panel gk-font';
   bar.setAttribute('role', 'group');
   bar.setAttribute('aria-label', '본부 대화');
-  bar.innerHTML = '<span class="gt-to"></span><input class="gt-in gk-slot gk-font" aria-label="할 말" placeholder="할 말" maxlength="300" autocomplete="off" enterkeyhint="send"><button type="button" class="gk-btn" data-send>말하기</button><button type="button" class="gk-btn" data-log>기록</button><button type="button" class="gk-btn" data-close aria-label="대화 닫기">닫기</button><div class="gt-msg" role="status"></div>';
+  bar.innerHTML = '<span class="gt-to"></span><input class="gt-in gk-slot gk-font" aria-label="할 말" placeholder="할 말 (행동은 *행동*)" maxlength="300" autocomplete="off" enterkeyhint="send"><button type="button" class="gk-btn" data-send>말하기</button><button type="button" class="gk-btn" data-log>기록</button><button type="button" class="gk-btn" data-close aria-label="대화 닫기">닫기</button><div class="gt-msg" role="status"></div>';
   const log = document.createElement('div');
   log.className = 'gt-log gk-panel gk-font';
   log.setAttribute('aria-label', '이번 대화 기록');
@@ -81,7 +81,7 @@ export function mountTalk(root: HTMLElement, api: GameVisit) {
   const renderLog = () => {
     const agent = state.agents.find((a) => a.name === target);
     const turns = state.turns.filter((t) => t.agentId === agent?.id || t.extra?.some((e) => e.agentId === agent?.id)).slice(-30);
-    log.textContent = turns.length ? turns.map((t) => [`${t.visitor || me()}: ${t.user}`, `${t.name}: ${t.reply}`, ...(t.extra ?? []).map((e) => `${e.name}: ${e.line}`)].join('\n')).join('\n\n') : '아직 나눈 말이 없어요.';
+    log.textContent = turns.length ? turns.map((t) => [t.act ? `${t.visitor || me()}: *${t.user}*` : `${t.visitor || me()}: ${t.user}`, `${t.name}: ${t.reply}`, ...(t.extra ?? []).map((e) => `${e.name}: ${e.line}`)].join('\n')).join('\n\n') : '아직 나눈 말이 없어요.';
     log.scrollTop = log.scrollHeight;
   };
 

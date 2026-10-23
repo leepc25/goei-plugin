@@ -11,7 +11,7 @@ export class VisitError extends Error {}
 
 export interface VisitAgent { id: string; name: string; rank?: string; state: string; situation: string; room: string; lore: string }
 /** 이번 막간에 오간 말 (말한 사람 이름, 말) */
-export interface VisitLine { speaker: string; text: string }
+export interface VisitLine { speaker: string; text: string; /** 말이 아니라 행동 */ action?: boolean }
 export interface VisitPromptInput {
   agent: VisitAgent;
   /** 방문자 이름 (주인공 요원 이름, 아니면 페르소나 이름) */
@@ -21,6 +21,8 @@ export interface VisitPromptInput {
   /** 같은 막간에 다른 요원과 나눈 말 */
   elsewhere: { agent: string; lines: VisitLine[] }[];
   said: string;
+  /** said가 말이 아니라 주인공의 행동 */
+  act?: boolean;
   /** 같은 방 가까이 있어 끼어들 수 있는 요원 (설계 2판 7단계). 비면 혼자 답한다 */
   bystanders?: VisitAgent[];
   /** 따로 넣었으니 참고 자료에서 뺄 로어북 (주인공 요원의 로어북) */
@@ -89,7 +91,7 @@ export function visitPrompt(src: RefSource, input: VisitPromptInput, names: Reco
     recentStory,
     ...(advOn(ss, 'hq', 'interlude') && input.elsewhere.length ? { earlierThisInterlude: input.elsewhere } : {}),
     conversation: input.conversation,
-    said: input.said,
+    ...(input.act ? { did: input.said } : { said: input.said }),
   };
   return {
     limit,

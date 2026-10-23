@@ -5,6 +5,8 @@ export const VISIT_KEY = 'goeiHqVisitV1';
 export const VISIT_LORE = '본부 방문 대화 기록';
 export interface VisitTurn {
   id: string; at: number; agentId: string; name: string; user: string; reply: string;
+  /** user가 말이 아니라 행동 (입력을 *…*로 감쌌을 때) */
+  act?: boolean;
   /** 주인공 요원 이름 (캐릭터로 플레이일 때) */
   visitor?: string;
   /** 이 대화가 일어난 자리: 그때 마지막 본편 메시지 (막간 끼우기의 기준) */

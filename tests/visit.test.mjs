@@ -97,7 +97,7 @@ test('interlude goes right after its anchor message in the main request, and dro
   assert.ok(out[3].content.startsWith(INTERLUDE_HEAD));
   assert.match(out[3].content,/RULES/);
   assert.match(out[3].content,/쟈알디: 서류 다 됐어\?\n에일린: 거의 다 됐어요\./);
-  assert.match(out[3].content,/데드폴 \(사무실\)/);
+  assert.match(out[3].content,/— 사무실, 데드폴에게 —/);
   assert.ok(!out[3].content.includes('사라진 답'));
   assert.deepEqual(orphanTurns(chat).map(x=>x.id),['3']);
   // 두 번 넣지 않는다
@@ -155,7 +155,7 @@ test('nearby agents may chime in: one call, addressed agent first, at most two b
   assert.match(request.messages[0].content,/OUTPUT|line/);
   assert.ok(body2.conversation.some(l=>l.speaker==='데드폴'&&l.text==='장비도 끝났어.'));
   const out=withInterludes([{role:'assistant',content:'사무실'}],chats[0],null,'주인공');
-  assert.match(out[1].content,/에일린: 거의 다 됐어요\.\n데드폴: 장비도 끝났어\./);
+  assert.match(out[1].content,/에일린: 거의 다 됐어요\.\n데드폴 \(끼어듦\): 장비도 끝났어\./);
   // 끼어들기를 끄면 혼자 답하는 형식
   chats[0].scriptstate.$hq_adv_interject='0';
   result='{"line":"네."}';
@@ -170,4 +170,14 @@ test('group reply parsing', () => {
   assert.deepEqual(parseVisitGroup('{"lines":[{"speaker":"데드폴","line":"먼저 말함"},{"speaker":"에일린","line":"제 답이에요."}]}','에일린',['데드폴'],80),{line:'제 답이에요.',extra:[{speaker:'데드폴',line:'먼저 말함'}]});
   assert.equal(parseVisitGroup('에일린: 산문 답이에요.','에일린',['데드폴'],80).line,'산문 답이에요.');
   assert.throws(()=>parseVisitGroup('{"lines":[{"speaker":"데드폴","line":"나만"}]}','에일린',['데드폴'],80),/대사/);
+});
+
+test('interlude keeps the real order across agents and marks actions', () => {
+  const t=(id,at,name,user,reply,extra)=>({id,at,agentId:name,name,user,reply,anchor:'c1',room:'office',...extra});
+  const chat={message:[{role:'char',data:'사무실',chatId:'c1'}],goeiHqVisitV1:{turns:[
+    t('1',1,'잼트리','안녕','어머.'),t('2',2,'로제몬','치마를 내린다','미쳤어?!',{act:true,extra:[{agentId:'J',name:'잼트리',line:'어머나...'}]}),t('3',3,'잼트리','미안','흥.')]}};
+  const text=withInterludes([{role:'assistant',content:'사무실'}],chat,null,'데드폴')[1].content;
+  const a=text.indexOf('잼트리에게'), b=text.indexOf('로제몬에게'), c=text.lastIndexOf('잼트리에게');
+  assert.ok(a<b && b<c && a!==c, text);
+  assert.match(text,/데드폴 \(행동\): 치마를 내린다\n로제몬: 미쳤어\?!\n잼트리 \(끼어듦\): 어머나\.\.\./);
 });

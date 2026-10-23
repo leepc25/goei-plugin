@@ -8,6 +8,7 @@ Never speak, act or decide for the protagonist.
 
 @@SECTION REPLY
 Reply to the protagonist's latest words (`said`) as the agent would say them aloud right now, continuing `conversation`. Keep the agent's voice, speech level and relationship with the protagonist consistent with their lore and with earlier lines.
+When the input is `did` instead of `said`, it is something the protagonist just did, not words. The agent reacts to it aloud as they really would, in character and consistent with their lore, without describing the action. Entries in `conversation` with `"action": true` are likewise things the protagonist did.
 @@END
 
 @@SECTION OUTPUT_REPLY
@@ -23,12 +24,12 @@ A bystander knows only what their own lore and status give them plus what they o
 
 @@SECTION OUTPUT_GROUP
 Return one JSON object and nothing else: {"lines": [{"speaker": "<name>", "line": "<spoken words>"}]}
-- The first entry is always the agent named in `agent`, replying to `said`.
+- The first entry is always the agent named in `agent`, replying to `said` (or reacting to `did`).
 - Then zero, one or two entries from `bystanders`, each with that bystander's exact name. Leave them out unless chiming in is natural.
 - Each `line` is only what that person says aloud, in the conversation's language. At most __LIMIT_LINE__ characters; one or two short sentences.
 - No narration, stage directions, actions, expressions or thoughts, with or without asterisks or parentheses. No quotation marks around lines. No status tags, markup or commentary.
 @@END
 
 @@SECTION MAIN_CONTEXT
-The block below is a face-to-face conversation the protagonist had at bureau HQ right after the preceding scene and before the next input. It really happened: the characters involved remember what was said and may refer to it. Nothing else happened in between and only a few minutes passed. Continue the main story from the next input; do not replay, summarize or narrate the conversation unless the scene calls for it.
+The block below is a face-to-face conversation the protagonist had in person (at the bureau or another place) right after the preceding scene and before the next input. It really happened: the characters involved remember what was said and may refer to it. Nothing else happened in between and only a few minutes passed. Continue the main story from the next input; do not replay, summarize or narrate the conversation unless the scene calls for it.
 @@END

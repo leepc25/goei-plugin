@@ -6,7 +6,7 @@ import { messageText } from './refs';
 import type { Chat } from './types';
 import { visitRecord, type VisitTurn } from './visit';
 
-export const INTERLUDE_HEAD = '[본부 막간]';
+export const INTERLUDE_HEAD = '[필드 막간]';
 const DEFAULT_RULES = 'The block below is a face-to-face conversation the protagonist had at bureau HQ right after the preceding scene and before the next input. It really happened. Nothing else happened in between and only a few minutes passed.';
 const ROOM: Record<string, string> = { office: '사무실', lounge: '휴게실', infirmary: '의무실', quarters: '숙소' };
 /** 막간 하나에 넣을 최대 대화 수 (가장 최근 것부터) */
@@ -35,17 +35,22 @@ export function orphanTurns(chat: Chat): VisitTurn[] {
 
 const safe = (s: string) => s.replace(/\{\{/g, '｛｛').replace(/\}\}/g, '｝｝').replace(/%%/g, '％％');
 
+const ORDER_NOTE = 'Lines are in the order they happened. A heading marks where and to whom the protagonist spoke next; "(행동)" is something the protagonist did rather than said; "(끼어듦)" is a nearby person chiming in.';
+
+/** 막간 글: 일어난 순서대로 (2026-10-23 사용자: 요원별로 묶으면 순서와 끼어들기를 알 수 없다) */
 export function interludeText(g: Interlude, rules: string | null, visitor: string): string {
   const parts: string[] = [];
-  let who = '';
-  for (const t of g.turns) {
-    if (t.name !== who) {
-      who = t.name;
-      parts.push(`\n${safe(t.name)}${t.room ? ` (${ROOM[t.room] ?? t.room})` : ''}`);
+  let at = '';
+  [...g.turns].sort((a, b) => (a.at || 0) - (b.at || 0)).forEach((t) => {
+    const me = safe(t.visitor || visitor);
+    const here = `${t.room ?? ''}|${t.name}`;
+    if (here !== at) {
+      at = here;
+      parts.push('', `— ${t.room ? `${ROOM[t.room] ?? t.room}, ` : ''}${safe(t.name)}에게 —`);
     }
-    parts.push(`${safe(t.visitor || visitor)}: ${safe(t.user)}`, `${safe(t.name)}: ${safe(t.reply)}`, ...(t.extra ?? []).map((e) => `${safe(e.name)}: ${safe(e.line)}`));
-  }
-  return [INTERLUDE_HEAD, rules?.trim() || DEFAULT_RULES, ...parts].join('\n').replace(/\n{3,}/g, '\n\n');
+    parts.push(t.act ? `${me} (행동): ${safe(t.user)}` : `${me}: ${safe(t.user)}`, `${safe(t.name)}: ${safe(t.reply)}`, ...(t.extra ?? []).map((e) => `${safe(e.name)} (끼어듦): ${safe(e.line)}`));
+  });
+  return [INTERLUDE_HEAD, rules?.trim() || DEFAULT_RULES, ORDER_NOTE, ...parts].join('\n').replace(/\n{3,}/g, '\n\n');
 }
 
 const norm = (s: string) => s.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
