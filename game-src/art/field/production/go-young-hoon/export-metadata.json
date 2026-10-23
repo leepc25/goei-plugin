@@ -1,0 +1,36 @@
+{
+  "group_id": "6174a1c3-3ed5-442d-a33e-948986ab8873",
+  "states": [
+    {
+      "character": {
+        "id": "4e9a6e84-09a2-49ae-b1cb-09ecbfef5022",
+        "name": "Idle",
+        "prompt": "고영훈 / Go Young-hoon. Adult man mid40s, swept back dark brown hair with a gray streak, black aviator sunglasses, long stern expressionless face, strong lean build, dark brown charcoal trouser suit, white shirt and black necktie, black shoes. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
+        "size": {
+          "width": 128,
+          "height": 256
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "low top-down",
+        "created_at": "2026-10-23T19:37:04.334736+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {}
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-10-23T19:57:19.273315"
+}

@@ -4924,7 +4924,7 @@
       "kind": "registration",
       "slug": "go-young-hoon",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792784213.8747559,
       "receipt": {
         "usage": null,
@@ -4936,26 +4936,41 @@
       },
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 4.0
         },
         "id": "e0079880-b3df-4176-9498-5adba07db7ff",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-23T19:36:54.802028+00:00",
         "last_response": {
-          "status": "building_skeleton",
-          "progress": 0.98,
+          "status": "completed",
           "character_id": "4e9a6e84-09a2-49ae-b1cb-09ecbfef5022",
-          "n_directions": 8,
+          "storage_urls": {
+            "east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e9a6e84-09a2-49ae-b1cb-09ecbfef5022/rotations/east.png",
+            "west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e9a6e84-09a2-49ae-b1cb-09ecbfef5022/rotations/west.png",
+            "north": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e9a6e84-09a2-49ae-b1cb-09ecbfef5022/rotations/north.png",
+            "south": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e9a6e84-09a2-49ae-b1cb-09ecbfef5022/rotations/south.png",
+            "north-east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e9a6e84-09a2-49ae-b1cb-09ecbfef5022/rotations/north-east.png",
+            "north-west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e9a6e84-09a2-49ae-b1cb-09ecbfef5022/rotations/north-west.png",
+            "south-east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e9a6e84-09a2-49ae-b1cb-09ecbfef5022/rotations/south-east.png",
+            "south-west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e9a6e84-09a2-49ae-b1cb-09ecbfef5022/rotations/south-west.png"
+          },
+          "billing_usage": {
+            "type": "generations",
+            "generations": 4.0
+          },
           "character_name": "고영훈",
-          "queue_position": 0,
           "directions_type": "8-directions",
           "generation_mode": "v3",
-          "skeleton_frames_done": 2,
-          "character_description": "고영훈 / Go Young-hoon. Adult man mid40s, swept back dark brown hair with a gray streak, black aviator sunglasses, long stern expressionless face, strong lean build, dark brown charcoal trouser suit, white shirt and black necktie, black shoes. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
-          "generation_started_at": "2026-10-23T19:37:04.110155+00:00",
-          "skeleton_frames_total": 8
+          "directions_count": 8,
+          "character_description": "고영훈 / Go Young-hoon. Adult man mid40s, swept back dark brown hair with a gray streak, black aviator sunglasses, long stern expressionless face, strong lean build, dark brown charcoal trouser suit, white shirt and black necktie, black shoes. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow."
         }
+      },
+      "observed_end_epoch": 1792785429.1736248,
+      "elapsed_observed_seconds": 1215.2988693714142,
+      "usage": {
+        "type": "generations",
+        "generations": 4.0
       }
     },
     "b5de6715-8544-46ed-b155-a1dc03a01d1d": {
@@ -5059,16 +5074,18 @@
         "status": "processing",
         "created_at": "2026-10-23T19:41:00.124304+00:00",
         "last_response": {
-          "status": "correcting_frames",
-          "progress": 0.84,
+          "status": "building_skeleton",
+          "progress": 0.98,
           "character_id": "c99d8406-4bd5-4897-aaf2-90b00fa9acab",
           "n_directions": 8,
           "character_name": "노기균",
           "queue_position": 0,
           "directions_type": "8-directions",
           "generation_mode": "v3",
+          "skeleton_frames_done": 4,
           "character_description": "노기균 / No Gi-gyun. Adult man mid30s, swept back black hair, black aviator sunglasses, prominent healed horizontal scar from the corner of mouth across cheek, sardonic grin, strong athletic build, black trouser suit, white shirt, black necktie, black shoes. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
-          "generation_started_at": "2026-10-23T19:41:02.982467+00:00"
+          "generation_started_at": "2026-10-23T19:41:02.982467+00:00",
+          "skeleton_frames_total": 8
         }
       }
     },
@@ -5521,8 +5538,8 @@
         "status": "processing",
         "created_at": "2026-10-23T19:51:59.539106+00:00",
         "last_response": {
-          "status": "processing",
-          "progress": 0.26666666666666666,
+          "status": "correcting_frames",
+          "progress": 0.84,
           "character_id": "4390bb9b-0e2a-4c65-b70f-da09751397bf",
           "n_directions": 8,
           "character_name": "윤병수",
@@ -5531,6 +5548,137 @@
           "generation_mode": "v3",
           "character_description": "윤병수 / Yun Byeong-su. Adult man mid30s, short black hair swept back, black aviator sunglasses, angular stern face, solid athletic build, dark charcoal trouser suit, white shirt, black necktie and black shoes. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
           "generation_started_at": "2026-10-23T19:52:07.459426+00:00"
+        }
+      }
+    },
+    "388b811b-2c33-41b5-9675-a97b22ed3f6c": {
+      "kind": "image",
+      "slug": "lee-do-hyeong",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792785345.262169,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "388b811b-2c33-41b5-9675-a97b22ed3f6c",
+        "image_id": "ad1b1194-cc0b-5434-b6c4-0d41c7392d09",
+        "source_image_id": "ad1b1194-cc0b-5434-b6c4-0d41c7392d09",
+        "status": "processing",
+        "output_count": 1,
+        "image_size": {
+          "width": 128,
+          "height": 256
+        },
+        "estimated_generations": 9,
+        "pricing_provisional": true
+      },
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "388b811b-2c33-41b5-9675-a97b22ed3f6c",
+        "status": "processing",
+        "created_at": "2026-10-23T19:56:09.493390+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "model": "pro_flash",
+          "width": 128,
+          "action": "Correcting pixels",
+          "height": 256,
+          "prompt": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult man late40s, tall broad solid muscular veteran. Long silver-white hair swept back and TIED into a visible LOW PONYTAIL falling behind his neck, not short cropped hair. Black aviator sunglasses. Multiple prominent old diagonal battle scars crossing the cheeks, angular rugged face, short chin stubble and a confident dangerous grin. Black tailored business suit with BOTH jacket sleeves and white shirt cuffs ROLLED UP TO THE ELBOWS, exposing strong muscular forearms covered in MANY old visible scars on BOTH arms. White collared shirt, black necktie, black trousers and formal black shoes. Original reference costume; no held sword. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 230-238px on128x256; tall; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
+          "status": "processing",
+          "image_id": "ad1b1194-cc0b-5434-b6c4-0d41c7392d09",
+          "job_kind": "creator-image",
+          "progress": 0.74,
+          "generation_started_at": "2026-10-23T19:56:12.23818+00:00"
+        }
+      }
+    },
+    "93e994f1-cd27-4eb6-9d6b-e7905d5067d9": {
+      "kind": "image",
+      "slug": "kim-seong-jin",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792785372.5046632,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "93e994f1-cd27-4eb6-9d6b-e7905d5067d9",
+        "image_id": "9d6602dc-9e18-5229-ad92-afc55028b07e",
+        "source_image_id": "9d6602dc-9e18-5229-ad92-afc55028b07e",
+        "status": "processing",
+        "output_count": 1,
+        "image_size": {
+          "width": 128,
+          "height": 256
+        },
+        "estimated_generations": 9,
+        "pricing_provisional": true
+      },
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "93e994f1-cd27-4eb6-9d6b-e7905d5067d9",
+        "status": "processing",
+        "created_at": "2026-10-23T19:56:17.753944+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "model": "pro_flash",
+          "width": 128,
+          "action": "Correcting pixels",
+          "height": 256,
+          "prompt": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult man mid20s, normal lean nonmuscular young adult build, tousled black hair parted with uneven long fringe, black aviator sunglasses, a playful mischievous half-smile. Black charcoal business suit with open unbuttoned blazer, white shirt with top buttons undone and open collar, loosely knotted black necktie, black belt, matching trousers and black shoes. Confident relaxed demeanor, not anxious or timid. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 212-224px on128x256; height unspecified; provisional medium stature; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
+          "status": "processing",
+          "image_id": "9d6602dc-9e18-5229-ad92-afc55028b07e",
+          "job_kind": "creator-image",
+          "progress": 0.75,
+          "queue_position": 28,
+          "generation_started_at": "2026-10-23T19:56:21.465001+00:00",
+          "estimated_wait_seconds": 2977
+        }
+      }
+    },
+    "52623aa8-8924-4172-8bcc-6074f3646ea1": {
+      "kind": "image",
+      "slug": "song-jin-seob",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792785381.6902776,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "52623aa8-8924-4172-8bcc-6074f3646ea1",
+        "image_id": "003eb72f-85da-56d1-95f3-6410de3c08f9",
+        "source_image_id": "003eb72f-85da-56d1-95f3-6410de3c08f9",
+        "status": "processing",
+        "output_count": 1,
+        "image_size": {
+          "width": 128,
+          "height": 256
+        },
+        "estimated_generations": 9,
+        "pricing_provisional": true
+      },
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "52623aa8-8924-4172-8bcc-6074f3646ea1",
+        "status": "processing",
+        "created_at": "2026-10-23T19:56:32.271260+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "model": "pro_flash",
+          "width": 128,
+          "action": "Generating image",
+          "height": 256,
+          "prompt": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. 19 year old young adult man, ordinary slim nonmuscular build, short neat dark bowl cut with straight fringe, black aviator sunglasses sitting slightly low, youthful mildly startled awkward expression. Conservative black-brown charcoal trouser suit slightly too large for him with loose sleeves, white collared shirt, slightly crooked black necktie and plain black dress shoes. No intimidating or muscular veteran styling. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 212-224px on128x256; height unspecified; provisional medium stature; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
+          "status": "processing",
+          "image_id": "003eb72f-85da-56d1-95f3-6410de3c08f9",
+          "job_kind": "creator-image",
+          "progress": 0.05,
+          "generation_started_at": "2026-10-23T19:56:38.261798+00:00"
         }
       }
     }
@@ -5763,7 +5911,7 @@
       "name": "이도형",
       "group": "fake-bureau",
       "character_id": null,
-      "image": null,
+      "image": "388b811b-2c33-41b5-9675-a97b22ed3f6c",
       "registration": null,
       "motions": {},
       "ready": false,
@@ -5777,8 +5925,11 @@
       "image": "7804981f-35a4-45e7-9853-d233b546c13f",
       "registration": "e0079880-b3df-4176-9498-5adba07db7ff",
       "motions": {},
-      "ready": false,
-      "image_verified": true
+      "ready": true,
+      "image_verified": true,
+      "skeleton_joints": 18,
+      "rotation_count": 8,
+      "exported": true
     },
     "no-gi-gyun": {
       "name": "노기균",
@@ -5834,7 +5985,7 @@
       "name": "김성진",
       "group": "fake-bureau",
       "character_id": null,
-      "image": null,
+      "image": "93e994f1-cd27-4eb6-9d6b-e7905d5067d9",
       "registration": null,
       "motions": {},
       "ready": false
@@ -5843,7 +5994,7 @@
       "name": "송진섭",
       "group": "fake-bureau",
       "character_id": null,
-      "image": null,
+      "image": "52623aa8-8924-4172-8bcc-6074f3646ea1",
       "registration": null,
       "motions": {},
       "ready": false
@@ -9909,9 +10060,114 @@
         "estimated_generations": 9,
         "registration_cost_after_visual_review": 4
       }
+    },
+    {
+      "at": "2026-10-23T19:56:12Z",
+      "kind": "submitted",
+      "slug": "lee-do-hyeong",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "388b811b-2c33-41b5-9675-a97b22ed3f6c",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "388b811b-2c33-41b5-9675-a97b22ed3f6c",
+          "image_id": "ad1b1194-cc0b-5434-b6c4-0d41c7392d09",
+          "source_image_id": "ad1b1194-cc0b-5434-b6c4-0d41c7392d09",
+          "status": "processing",
+          "output_count": 1,
+          "image_size": {
+            "width": 128,
+            "height": 256
+          },
+          "estimated_generations": 9,
+          "pricing_provisional": true
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T19:56:21Z",
+      "kind": "submitted",
+      "slug": "kim-seong-jin",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "93e994f1-cd27-4eb6-9d6b-e7905d5067d9",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "93e994f1-cd27-4eb6-9d6b-e7905d5067d9",
+          "image_id": "9d6602dc-9e18-5229-ad92-afc55028b07e",
+          "source_image_id": "9d6602dc-9e18-5229-ad92-afc55028b07e",
+          "status": "processing",
+          "output_count": 1,
+          "image_size": {
+            "width": 128,
+            "height": 256
+          },
+          "estimated_generations": 9,
+          "pricing_provisional": true
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T19:56:38Z",
+      "kind": "submitted",
+      "slug": "song-jin-seob",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "52623aa8-8924-4172-8bcc-6074f3646ea1",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "52623aa8-8924-4172-8bcc-6074f3646ea1",
+          "image_id": "003eb72f-85da-56d1-95f3-6410de3c08f9",
+          "source_image_id": "003eb72f-85da-56d1-95f3-6410de3c08f9",
+          "status": "processing",
+          "output_count": 1,
+          "image_size": {
+            "width": 128,
+            "height": 256
+          },
+          "estimated_generations": 9,
+          "pricing_provisional": true
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T19:57:09Z",
+      "kind": "completed",
+      "slug": "go-young-hoon",
+      "detail": {
+        "kind": "registration",
+        "template": null,
+        "job_id": "e0079880-b3df-4176-9498-5adba07db7ff",
+        "usage": {
+          "type": "generations",
+          "generations": 4.0
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T19:57:15Z",
+      "kind": "character-ready",
+      "slug": "go-young-hoon",
+      "detail": {
+        "3d_joints": 18,
+        "directions": 8
+      }
+    },
+    {
+      "at": "2026-10-23T19:57:19Z",
+      "kind": "exported",
+      "slug": "go-young-hoon",
+      "detail": {
+        "bytes": 102971,
+        "files": 9
+      }
     }
   ],
-  "updated_at": 1792785242.8775845,
+  "updated_at": 1792785439.818857,
   "user_stopped_at": 1792778235.6917784,
   "archived_jobs": {
     "304457e9-6577-44f0-af17-97841a9f6720": {
@@ -11233,12 +11489,12 @@
   "last_git_checkpoint": 1792785132.440435,
   "summary": {
     "jobs": {
-      "processing": 6,
-      "completed": 61,
+      "processing": 8,
+      "completed": 62,
       "failed": 3,
       "stalled": 0
     },
-    "characters_ready": 13,
+    "characters_ready": 14,
     "characters_total": 55,
     "images_verified": 22,
     "motions_submitted": 3,

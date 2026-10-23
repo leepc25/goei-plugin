@@ -179,7 +179,7 @@ class Production:
   for a in self.manifest:
    if len(active())>=20:return
    c=self.s['characters'][a['slug']]
-   if a.get('pixel_request')and not c.get('image')and a['slug']in json.loads((OUT/'control.json').read_text()).get('image_approved_slugs',[x['slug']for x in self.manifest])and sum(j['kind']in['image','registration']for j in active())<6:
+   if a.get('pixel_request')and not c.get('image')and a['slug']in json.loads((OUT/'control.json').read_text()).get('image_approved_slugs',[x['slug']for x in self.manifest])and sum(j['kind']in['image','registration']for j in active())<json.loads((OUT/'control.json').read_text()).get('max_character_pipeline_in_flight',6):
     self.submit('image',a['slug'],'create-image-pro-flash',self.image_request(a))
   # A visual gate prevents spreading a broken animation route to the whole roster.
   control=json.loads((OUT/'control.json').read_text())

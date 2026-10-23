@@ -2,7 +2,7 @@
   "release_skeleton_v3_motions": false,
   "reason": "Latest user requires individual full asset and lore review before generation; Lee Do-hyeong source request has been fully corrected and reviewed. Other unsubmitted requests need individual audit; registration needs actual generated-source identity review.",
   "max_in_flight": 20,
-  "max_character_pipeline_in_flight": 6,
+  "max_character_pipeline_in_flight": 20,
   "authorized_total_characters": 55,
   "authorized_clips_per_character": 20,
   "stop_all": false,
