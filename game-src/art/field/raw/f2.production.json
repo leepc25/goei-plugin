@@ -1,0 +1,493 @@
+{
+  "scene": "f2",
+  "output": "game-src/art/field/raw/f2.png",
+  "generatedSource": "game-src/art/field/source/f2-generated.png",
+  "sourceDimensions": [
+    2149,
+    732
+  ],
+  "guidelineCommit": "2ce56ea30ccdb724b1f192d389758c10c2a0476c",
+  "production": "After updating both field documents, regenerated the whole corridor with props integrated. Corrected native architecture, floor perspective, hard pixel silhouettes, discrete matte material tones and shared 128-color palette. No separately generated prop sheets used.",
+  "separatePropSheetsUsed": false,
+  "validation": {
+    "dimensions": [
+      3700,
+      700
+    ],
+    "paletteColors": 128,
+    "indexedPNG": true,
+    "opaque": true,
+    "wallFloorBoundaryY": 420,
+    "doorGeometry": [
+      {
+        "x": 114,
+        "y": 120,
+        "width": 130,
+        "height": 300,
+        "continuousOuterOutline": true,
+        "singlePixelSideOutline": true
+      },
+      {
+        "x": 554,
+        "y": 120,
+        "width": 130,
+        "height": 300,
+        "continuousOuterOutline": true,
+        "singlePixelSideOutline": true
+      },
+      {
+        "x": 1065,
+        "y": 120,
+        "width": 260,
+        "height": 300,
+        "continuousOuterOutline": true,
+        "singlePixelSideOutline": true
+      },
+      {
+        "x": 1761,
+        "y": 120,
+        "width": 130,
+        "height": 300,
+        "continuousOuterOutline": true,
+        "singlePixelSideOutline": true
+      },
+      {
+        "x": 1931,
+        "y": 120,
+        "width": 130,
+        "height": 300,
+        "continuousOuterOutline": true,
+        "singlePixelSideOutline": true
+      },
+      {
+        "x": 2556,
+        "y": 120,
+        "width": 130,
+        "height": 300,
+        "continuousOuterOutline": true,
+        "singlePixelSideOutline": true
+      },
+      {
+        "x": 3195,
+        "y": 120,
+        "width": 260,
+        "height": 300,
+        "continuousOuterOutline": true,
+        "singlePixelSideOutline": true
+      },
+      {
+        "x": 3570,
+        "y": 120,
+        "width": 130,
+        "height": 300,
+        "continuousOuterOutline": true,
+        "singlePixelSideOutline": true
+      }
+    ],
+    "tileWidthNearRearY430": [
+      85,
+      85
+    ],
+    "tileWidthAtFrontY669": [
+      100,
+      100,
+      100,
+      101,
+      100,
+      100,
+      101,
+      100,
+      100,
+      100,
+      101
+    ],
+    "tileRows": [
+      {
+        "y": 469,
+        "darkJointHeightPx": 1
+      },
+      {
+        "y": 520,
+        "darkJointHeightPx": 1
+      },
+      {
+        "y": 573,
+        "darkJointHeightPx": 1
+      },
+      {
+        "y": 628,
+        "darkJointHeightPx": 1
+      },
+      {
+        "y": 686,
+        "darkJointHeightPx": 1
+      }
+    ],
+    "perspective": {
+      "wallFloorY": 420,
+      "projection": "x = 1850 + (rearX - 1850) * (1 + 0.18 * (y - 420) / 249)",
+      "rearTileWidth": 85,
+      "frontTileWidthAt669": 100.3,
+      "rowBoundaries": [
+        420,
+        469,
+        520,
+        573,
+        628,
+        686,
+        747
+      ],
+      "floorInlayBack": [
+        1562,
+        2215
+      ],
+      "floorInlayFront": [
+        1528,
+        2258
+      ],
+      "foregroundClearFromY": 560
+    },
+    "visualInspection": {
+      "wholePanorama": true,
+      "nativeScaleWestCenterEast": true,
+      "checks": [
+        "ground plane visibly recedes",
+        "aligned porcelain grid widens toward foreground",
+        "inlay and mats share ground projection",
+        "foreground walk strip clear",
+        "pixel edges and discrete matte tones"
+      ],
+      "userApproval": "not claimed"
+    },
+    "sha256": "1bbe84940689e54aae791085ade57737bcee69abf24fdccd683c0892618436f0",
+    "measuredChecksPass": true
+  },
+  "layout": {
+    "width": 3700,
+    "height": 700,
+    "wallFloorY": 420,
+    "objects": [
+      {
+        "id": "stair",
+        "x": 114,
+        "y": 120,
+        "w": 130,
+        "h": 300,
+        "kind": "fire"
+      },
+      {
+        "id": "direction-west",
+        "x": 256,
+        "y": 111,
+        "w": 170,
+        "h": 50,
+        "kind": "sign"
+      },
+      {
+        "id": "toilet",
+        "x": 554,
+        "y": 120,
+        "w": 130,
+        "h": 300,
+        "kind": "wc"
+      },
+      {
+        "id": "sign-b-619",
+        "x": 584,
+        "y": 84,
+        "w": 71,
+        "h": 21,
+        "kind": "sign"
+      },
+      {
+        "id": "response",
+        "x": 1065,
+        "y": 120,
+        "w": 260,
+        "h": 300,
+        "kind": "glass"
+      },
+      {
+        "id": "sign-b-1195",
+        "x": 1160,
+        "y": 84,
+        "w": 71,
+        "h": 21,
+        "kind": "sign"
+      },
+      {
+        "id": "elevator-west",
+        "x": 1761,
+        "y": 120,
+        "w": 130,
+        "h": 300,
+        "kind": "lift"
+      },
+      {
+        "id": "elevator-east",
+        "x": 1931,
+        "y": 120,
+        "w": 130,
+        "h": 300,
+        "kind": "lift"
+      },
+      {
+        "id": "direction-east",
+        "x": 2201,
+        "y": 111,
+        "w": 170,
+        "h": 50,
+        "kind": "sign"
+      },
+      {
+        "id": "interview",
+        "x": 2556,
+        "y": 120,
+        "w": 130,
+        "h": 300,
+        "kind": "interview"
+      },
+      {
+        "id": "sign-b-2621",
+        "x": 2586,
+        "y": 84,
+        "w": 71,
+        "h": 21,
+        "kind": "sign"
+      },
+      {
+        "id": "lounge",
+        "x": 3195,
+        "y": 120,
+        "w": 260,
+        "h": 300,
+        "kind": "glass"
+      },
+      {
+        "id": "sign-b-3325",
+        "x": 3290,
+        "y": 84,
+        "w": 71,
+        "h": 21,
+        "kind": "sign"
+      },
+      {
+        "id": "exit",
+        "x": 3570,
+        "y": 120,
+        "w": 130,
+        "h": 300,
+        "kind": "fire"
+      },
+      {
+        "id": "plant-426",
+        "x": 398,
+        "y": 239,
+        "w": 57,
+        "h": 199,
+        "kind": "plant"
+      },
+      {
+        "id": "plant-2173",
+        "x": 2145,
+        "y": 239,
+        "w": 57,
+        "h": 199,
+        "kind": "plant"
+      },
+      {
+        "id": "plant-3522",
+        "x": 3501,
+        "y": 366,
+        "w": 43,
+        "h": 71,
+        "kind": "plant"
+      },
+      {
+        "id": "water",
+        "x": 799,
+        "y": 282,
+        "w": 50,
+        "h": 156,
+        "kind": "prop"
+      },
+      {
+        "id": "waste",
+        "x": 860,
+        "y": 310,
+        "w": 71,
+        "h": 128,
+        "kind": "prop"
+      },
+      {
+        "id": "extinguisher-966",
+        "x": 941,
+        "y": 229,
+        "w": 50,
+        "h": 99,
+        "kind": "prop"
+      },
+      {
+        "id": "extinguisher-3096",
+        "x": 3071,
+        "y": 229,
+        "w": 50,
+        "h": 99,
+        "kind": "prop"
+      },
+      {
+        "id": "noticeboard",
+        "x": 1391,
+        "y": 143,
+        "w": 170,
+        "h": 128,
+        "kind": "prop"
+      },
+      {
+        "id": "floor-map",
+        "x": 1562,
+        "y": 129,
+        "w": 114,
+        "h": 156,
+        "kind": "sign"
+      },
+      {
+        "id": "bench",
+        "x": 2300,
+        "y": 356,
+        "w": 227,
+        "h": 101,
+        "kind": "prop"
+      },
+      {
+        "id": "clock",
+        "x": 2791,
+        "y": 87,
+        "w": 43,
+        "h": 43,
+        "kind": "prop"
+      },
+      {
+        "id": "art",
+        "x": 2854,
+        "y": 151,
+        "w": 114,
+        "h": 85,
+        "kind": "prop"
+      },
+      {
+        "id": "downlight-0",
+        "x": 130,
+        "y": 12,
+        "w": 25,
+        "h": 8,
+        "kind": "ceiling"
+      },
+      {
+        "id": "downlight-1",
+        "x": 556,
+        "y": 12,
+        "w": 25,
+        "h": 8,
+        "kind": "ceiling"
+      },
+      {
+        "id": "downlight-2",
+        "x": 982,
+        "y": 12,
+        "w": 25,
+        "h": 8,
+        "kind": "ceiling"
+      },
+      {
+        "id": "downlight-3",
+        "x": 1408,
+        "y": 12,
+        "w": 25,
+        "h": 8,
+        "kind": "ceiling"
+      },
+      {
+        "id": "downlight-4",
+        "x": 1834,
+        "y": 12,
+        "w": 25,
+        "h": 8,
+        "kind": "ceiling"
+      },
+      {
+        "id": "downlight-5",
+        "x": 2260,
+        "y": 12,
+        "w": 25,
+        "h": 8,
+        "kind": "ceiling"
+      },
+      {
+        "id": "downlight-6",
+        "x": 2686,
+        "y": 12,
+        "w": 25,
+        "h": 8,
+        "kind": "ceiling"
+      },
+      {
+        "id": "downlight-7",
+        "x": 3112,
+        "y": 12,
+        "w": 25,
+        "h": 8,
+        "kind": "ceiling"
+      },
+      {
+        "id": "downlight-8",
+        "x": 3538,
+        "y": 12,
+        "w": 25,
+        "h": 8,
+        "kind": "ceiling"
+      },
+      {
+        "id": "vent-852",
+        "x": 810,
+        "y": 0,
+        "w": 85,
+        "h": 43,
+        "kind": "ceiling"
+      },
+      {
+        "id": "vent-1988",
+        "x": 1946,
+        "y": 0,
+        "w": 85,
+        "h": 43,
+        "kind": "ceiling"
+      },
+      {
+        "id": "vent-3124",
+        "x": 3082,
+        "y": 0,
+        "w": 85,
+        "h": 43,
+        "kind": "ceiling"
+      },
+      {
+        "id": "cctv-568",
+        "x": 558,
+        "y": 16,
+        "w": 21,
+        "h": 21,
+        "kind": "ceiling"
+      },
+      {
+        "id": "cctv-2840",
+        "x": 2830,
+        "y": 16,
+        "w": 21,
+        "h": 21,
+        "kind": "ceiling"
+      }
+    ]
+  },
+  "gameIntegrated": false
+}
