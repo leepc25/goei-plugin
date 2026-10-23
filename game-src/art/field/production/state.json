@@ -5346,7 +5346,7 @@
       "kind": "registration",
       "slug": "song-ju-ik",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792784632.2271504,
       "receipt": {
         "usage": null,
@@ -5358,33 +5358,48 @@
       },
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 4.0
         },
         "id": "c2aabcc4-7ed0-4bbe-a667-fa2d992a05fd",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-23T19:43:54.908665+00:00",
         "last_response": {
-          "status": "building_skeleton",
-          "progress": 0.98,
+          "status": "completed",
           "character_id": "76866032-a328-4c7c-84cf-1beb0b1c7cbb",
-          "n_directions": 8,
+          "storage_urls": {
+            "east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/76866032-a328-4c7c-84cf-1beb0b1c7cbb/rotations/east.png",
+            "west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/76866032-a328-4c7c-84cf-1beb0b1c7cbb/rotations/west.png",
+            "north": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/76866032-a328-4c7c-84cf-1beb0b1c7cbb/rotations/north.png",
+            "south": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/76866032-a328-4c7c-84cf-1beb0b1c7cbb/rotations/south.png",
+            "north-east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/76866032-a328-4c7c-84cf-1beb0b1c7cbb/rotations/north-east.png",
+            "north-west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/76866032-a328-4c7c-84cf-1beb0b1c7cbb/rotations/north-west.png",
+            "south-east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/76866032-a328-4c7c-84cf-1beb0b1c7cbb/rotations/south-east.png",
+            "south-west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/76866032-a328-4c7c-84cf-1beb0b1c7cbb/rotations/south-west.png"
+          },
+          "billing_usage": {
+            "type": "generations",
+            "generations": 4.0
+          },
           "character_name": "송주익",
-          "queue_position": 0,
           "directions_type": "8-directions",
           "generation_mode": "v3",
-          "skeleton_frames_done": 5,
-          "character_description": "송주익 / Song Ju-ik. Adult man late20s, slicked back short black hair, black aviator sunglasses, clean shaven angular confident face, muscular broad shouldered build, dark charcoal trouser suit, white shirt, black necktie, black formal shoes. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
-          "generation_started_at": "2026-10-23T19:43:59.132265+00:00",
-          "skeleton_frames_total": 8
+          "directions_count": 8,
+          "character_description": "송주익 / Song Ju-ik. Adult man late20s, slicked back short black hair, black aviator sunglasses, clean shaven angular confident face, muscular broad shouldered build, dark charcoal trouser suit, white shirt, black necktie, black formal shoes. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow."
         }
+      },
+      "observed_end_epoch": 1792786042.1855125,
+      "elapsed_observed_seconds": 1409.9583625793457,
+      "usage": {
+        "type": "generations",
+        "generations": 4.0
       }
     },
     "4ea02ad2-5c4d-4fde-9d88-1281bd5311d4": {
       "kind": "registration",
       "slug": "kwak-seong-ju",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792784768.0026062,
       "receipt": {
         "usage": null,
@@ -5396,26 +5411,41 @@
       },
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 4.0
         },
         "id": "4ea02ad2-5c4d-4fde-9d88-1281bd5311d4",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-23T19:46:08.989943+00:00",
         "last_response": {
-          "status": "building_skeleton",
-          "progress": 0.98,
+          "status": "completed",
           "character_id": "8b308102-0d58-42d4-b73c-10b1aa815d88",
-          "n_directions": 8,
+          "storage_urls": {
+            "east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/8b308102-0d58-42d4-b73c-10b1aa815d88/rotations/east.png",
+            "west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/8b308102-0d58-42d4-b73c-10b1aa815d88/rotations/west.png",
+            "north": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/8b308102-0d58-42d4-b73c-10b1aa815d88/rotations/north.png",
+            "south": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/8b308102-0d58-42d4-b73c-10b1aa815d88/rotations/south.png",
+            "north-east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/8b308102-0d58-42d4-b73c-10b1aa815d88/rotations/north-east.png",
+            "north-west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/8b308102-0d58-42d4-b73c-10b1aa815d88/rotations/north-west.png",
+            "south-east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/8b308102-0d58-42d4-b73c-10b1aa815d88/rotations/south-east.png",
+            "south-west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/8b308102-0d58-42d4-b73c-10b1aa815d88/rotations/south-west.png"
+          },
+          "billing_usage": {
+            "type": "generations",
+            "generations": 4.0
+          },
           "character_name": "곽성주",
-          "queue_position": 0,
           "directions_type": "8-directions",
           "generation_mode": "v3",
-          "skeleton_frames_done": 3,
-          "character_description": "곽성주 / Kwak Seong-ju. Adult man mid40s, enormous muscular broad build, short spiky black hair, black sunglasses, stern square jaw. Original everyday black trouser suit, white shirt, black necktie, gray tactical shoulder harness visible over jacket, heavy black shoes. Use original portrait daily clothing, no summoned armor or guns. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
-          "generation_started_at": "2026-10-23T19:46:10.94797+00:00",
-          "skeleton_frames_total": 8
+          "directions_count": 8,
+          "character_description": "곽성주 / Kwak Seong-ju. Adult man mid40s, enormous muscular broad build, short spiky black hair, black sunglasses, stern square jaw. Original everyday black trouser suit, white shirt, black necktie, gray tactical shoulder harness visible over jacket, heavy black shoes. Use original portrait daily clothing, no summoned armor or guns. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow."
         }
+      },
+      "observed_end_epoch": 1792786050.3790772,
+      "elapsed_observed_seconds": 1282.3764712810516,
+      "usage": {
+        "type": "generations",
+        "generations": 4.0
       }
     },
     "fd0e0a01-0f88-476d-8a46-0440db3a02ce": {
@@ -5441,8 +5471,8 @@
         "status": "processing",
         "created_at": "2026-10-23T19:46:15.706632+00:00",
         "last_response": {
-          "status": "correcting_frames",
-          "progress": 0.84,
+          "status": "uploading_rotations",
+          "progress": 0.905,
           "character_id": "1f2250cb-ca5c-4d1f-9b0d-885f752c5974",
           "n_directions": 8,
           "character_name": "조성춘",
@@ -6080,8 +6110,11 @@
       "image": "2fe5ceb3-5953-4fec-bd88-fd4ccbe2f7d8",
       "registration": "c2aabcc4-7ed0-4bbe-a667-fa2d992a05fd",
       "motions": {},
-      "ready": false,
-      "image_verified": true
+      "ready": true,
+      "image_verified": true,
+      "skeleton_joints": 18,
+      "rotation_count": 8,
+      "exported": true
     },
     "kwak-seong-ju": {
       "name": "곽성주",
@@ -6090,8 +6123,11 @@
       "image": "eacc1a24-47d0-4db2-b85b-f4396e250b09",
       "registration": "4ea02ad2-5c4d-4fde-9d88-1281bd5311d4",
       "motions": {},
-      "ready": false,
-      "image_verified": true
+      "ready": true,
+      "image_verified": true,
+      "skeleton_joints": 18,
+      "rotation_count": 8,
+      "exported": true
     },
     "cho-seong-choon": {
       "name": "조성춘",
@@ -10449,9 +10485,75 @@
         ],
         "original_pixels_preserved": true
       }
+    },
+    {
+      "at": "2026-10-23T20:07:22Z",
+      "kind": "completed",
+      "slug": "song-ju-ik",
+      "detail": {
+        "kind": "registration",
+        "template": null,
+        "job_id": "c2aabcc4-7ed0-4bbe-a667-fa2d992a05fd",
+        "usage": {
+          "type": "generations",
+          "generations": 4.0
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T20:07:30Z",
+      "kind": "completed",
+      "slug": "kwak-seong-ju",
+      "detail": {
+        "kind": "registration",
+        "template": null,
+        "job_id": "4ea02ad2-5c4d-4fde-9d88-1281bd5311d4",
+        "usage": {
+          "type": "generations",
+          "generations": 4.0
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T20:07:31Z",
+      "kind": "character-ready",
+      "slug": "song-ju-ik",
+      "detail": {
+        "3d_joints": 18,
+        "directions": 8
+      }
+    },
+    {
+      "at": "2026-10-23T20:07:34Z",
+      "kind": "character-ready",
+      "slug": "kwak-seong-ju",
+      "detail": {
+        "3d_joints": 18,
+        "directions": 8
+      }
+    },
+    {
+      "at": "2026-10-23T20:08:15Z",
+      "kind": "exported",
+      "slug": "song-ju-ik",
+      "detail": {
+        "bytes": 111246,
+        "files": 9
+      }
+    },
+    {
+      "at": "2026-10-23T20:08:23Z",
+      "kind": "exported",
+      "slug": "kwak-seong-ju",
+      "detail": {
+        "bytes": 129944,
+        "files": 9
+      }
     }
   ],
-  "updated_at": 1792785761.0420535,
+  "updated_at": 1792786103.9507067,
   "user_stopped_at": 1792778235.6917784,
   "archived_jobs": {
     "304457e9-6577-44f0-af17-97841a9f6720": {
@@ -11770,15 +11872,15 @@
       "saved_frames": 6
     }
   },
-  "last_git_checkpoint": 1792785441.5669675,
+  "last_git_checkpoint": 1792785765.1262062,
   "summary": {
     "jobs": {
-      "processing": 4,
-      "completed": 66,
+      "processing": 2,
+      "completed": 68,
       "failed": 3,
       "stalled": 0
     },
-    "characters_ready": 15,
+    "characters_ready": 17,
     "characters_total": 55,
     "images_verified": 25,
     "motions_submitted": 3,

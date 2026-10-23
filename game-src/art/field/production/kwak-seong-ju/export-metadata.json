@@ -1,0 +1,36 @@
+{
+  "group_id": "913c6458-8fe4-4056-baca-e28a38a816ec",
+  "states": [
+    {
+      "character": {
+        "id": "8b308102-0d58-42d4-b73c-10b1aa815d88",
+        "name": "Idle",
+        "prompt": "곽성주 / Kwak Seong-ju. Adult man mid40s, enormous muscular broad build, short spiky black hair, black sunglasses, stern square jaw. Original everyday black trouser suit, white shirt, black necktie, gray tactical shoulder harness visible over jacket, heavy black shoes. Use original portrait daily clothing, no summoned armor or guns. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
+        "size": {
+          "width": 128,
+          "height": 256
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "low top-down",
+        "created_at": "2026-10-23T19:46:11.978460+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {}
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-10-23T20:08:23.282891"
+}
