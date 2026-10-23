@@ -88,6 +88,8 @@ function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui
       chooseFloor: (o, pick) => ui.chooseFloor(o, pick),
       sfx: (n) => ui.sfx(n),
       visitors,
+      // 장면을 옮기면 장부에 이동 사건과 지금 위치(확정 사실)를 남긴다
+      entered: (to, from) => void b?.field?.record({ kind: 'move', text: `${from.name} → ${to.name}`, scene: to.name, weight: 1, fact: { key: '주인공 위치', value: to.name } }).catch(() => {}),
       overlay: ui.overlay,
       // 본부 대화창이 떠 있으면 머리 위 표시를 숨긴다 (독립 검수: 브리핑 뒤 ↓ 표시)
       busy: () => typeof document !== 'undefined' && !!document.querySelector('.hq-talk, .hq-over:not(:empty)'),

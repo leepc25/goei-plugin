@@ -6,12 +6,14 @@ import { gameAssets } from './packs';
 import { gameSaves } from './saves';
 import { gameTalk } from './talk';
 import { createVisit } from './visit';
+import { createField } from './field';
 import type { ViewportCtl } from './viewport';
 
 export function makeBridge(viewport: ViewportCtl, slot: SlotId, close: () => void, onHidden?: GameBridge['onHidden']): GameBridge {
   return {
     api: 1,
     visit: createVisit(),
+    field: createField(),
     slot,
     saves: gameSaves,
     assets: gameAssets,

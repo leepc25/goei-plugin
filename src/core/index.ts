@@ -30,3 +30,4 @@ export * from './player';
 export * from './gamelink';
 export * as imgtag from './imgtag';
 export * from './statusctx';
+export * from './field';

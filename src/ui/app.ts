@@ -527,7 +527,9 @@ async function refresh(): Promise<void> {
 async function close(): Promise<void> {
   shown = false;
   stopCctvFx();
-  closeGame();
+  // 창을 닫아도 필드는 유지한다 (멈추고 떼어 둠). 끝나는 때는 「필드 나가기」·채팅 전송(본편이 한 턴 진행)·채팅 바꿈뿐 (2026-10-23 사용자)
+  fieldShown = false;
+  hideGame();
   await risuai.hideContainer();
 }
 
@@ -1071,7 +1073,7 @@ function syncField(): void {
   }
   fieldShown = true;
   // 본편이 한 턴 진행됐으면(마지막 메시지가 바뀜) 요원 배치·막간이 새로 정해지니 처음부터
-  const anchor = view.kind === 'started' ? anchorOf(view.ctx.chat) : '';
+  const anchor = view.kind === 'started' ? `${view.ctx.chat.id ?? ''}:${anchorOf(view.ctx.chat)}` : '';
   if (gameOpen() && anchor !== fieldAnchor) closeGame();
   fieldAnchor = anchor;
   if (gameOpen()) reattachGame(host);

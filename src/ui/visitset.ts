@@ -1,7 +1,7 @@
 // 설정 → 기능별 설정 → 필드 (2026-10-22 설계 2판 6단계): 보낼 자료·모델·길이와, 실제로 보낸 것·본편에 들어갈 막간 보기.
 import { advSections } from './advanced';
 import { keepOpen } from './panels';
-import { interludes, interludeText, orphanTurns } from '../core/interlude';
+import { FACTS_HEAD, interludes, interludeText, liveFacts, orphanTurns } from '../core/interlude';
 import { tokens } from '../core/gnet';
 import { policySections } from '../core/refs';
 import { VISIT_KEY, visitRecord } from '../core/visit';
@@ -26,6 +26,7 @@ export function visitSettings(ctx: ChatContext | null, state: Record<string, unk
   const groups = interludes(chat);
   const rules = visitContextRules(ctx);
   const preview = groups.length ? groups.map((g) => interludeText(g, rules, visitor)).join('\n\n―――\n\n') : '';
+  const facts = liveFacts(chat);
   const orphans = orphanTurns(chat);
   const p = policySections(ctx.char.globalLore, VISIT_BOOK);
   const guide = Object.keys(p).length ? Object.entries(p).map(([k, v]) => `@@SECTION ${k}\n${v.trim()}`).join('\n\n') : '';
@@ -41,7 +42,8 @@ export function visitSettings(ctx: ChatContext | null, state: Record<string, unk
       : `<p class="ps-note">다시 굴리거나 지운 답 뒤에서 나눈 대화 ${orphans.length}개는 본편에 들어가지 않아요.</p><div class="gx-row-btns"><button class="gx-mini" data-action="visit-orphans">그 대화 지우기</button></div>`
     : '';
   const view = `<section class="ps-group"><h3>보내는 내용 보기</h3>
-    ${fold('hq-next', `다음 본편 요청에 들어갈 막간 (${groups.reduce((n, g) => n + g.turns.length, 0)}개 대화)`, preview ? pre(preview) : '<p class="ps-note">들어갈 막간이 없어요.</p>')}
+    ${fold('hq-next', `다음 본편 요청에 들어갈 막간 (${groups.reduce((n, g) => n + g.turns.length, 0)}개 대화 · ${groups.reduce((n, g) => n + g.events.length, 0)}개 사건)`, preview ? pre(preview) : '<p class="ps-note">들어갈 막간이 없어요.</p>')}
+    ${fold('hq-facts', `다음 본편 요청에 들어갈 확정 사실 (${facts.length}개)`, facts.length ? pre([FACTS_HEAD, ...facts.map((f) => `- ${f.key}: ${f.value}${f.permanent ? ' (permanent)' : ''}`)].join('\n')) : '<p class="ps-note">확정된 사실이 없어요. 필드에서 장면을 옮기면 주인공 위치가 여기에 쌓여요.</p>')}
     ${clear}
     ${fold('hq-last', '마지막 대화 요청', lastBody)}
     ${fold('hq-guide', '지침 전문 (카드 「Visit」 로어북)', guide ? pre(guide) : '<p class="ps-note">카드에 Visit 로어북이 없어요. 설정 → 업데이트로 카드를 업데이트해 주세요.</p>')}

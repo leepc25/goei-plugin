@@ -44,7 +44,8 @@ import { syncDecorators, computeLore, loreOptions, patchSlots, sameVars, trimRos
 import { advValue } from './core/advanced';
 import { userInfo } from './host/user';
 import { applyPlayer, hidePlayerTag, playerAgent, playerBlock } from './core/player';
-import { withInterludes } from './core/interlude';
+import { withFieldFacts, withInterludes } from './core/interlude';
+import { fieldRecord } from './core/field';
 import { withStatusBlock } from './core/statusctx';
 import { visitRecord } from './core/visit';
 import { visitContextRules } from './core/visitPrompt';
@@ -166,10 +167,10 @@ async function withPlayer<M extends PromptMessage>(messages: M[]): Promise<M[]> 
 async function withVisit<M extends PromptMessage>(messages: M[]): Promise<M[]> {
   const charIndex = await risuai.getCurrentCharacterIndex();
   const chat = (await risuai.getChatFromIndex(charIndex, await risuai.getCurrentChatIndex())) as Chat | null;
-  if (!chat || !visitRecord(chat).turns.length) return messages;
+  if (!chat || (!visitRecord(chat).turns.length && !fieldRecord(chat).events.length)) return messages;
   const char = (await risuai.getCharacterFromIndex(charIndex)) as LoreChar | null;
   const me = char ? playerAgent(char.globalLore, chat.scriptstate) : undefined;
-  return withInterludes(messages, chat, char ? visitContextRules({ char }) : null, me?.name || userInfo().name || '주인공');
+  return withFieldFacts(withInterludes(messages, chat, char ? visitContextRules({ char }) : null, me?.name || userInfo().name || '주인공'), chat);
 }
 
 let rulesCache: { charIndex: number; gnet: string | null; phone: string | null; wiki: string | null; registry: Registry } | null = null;

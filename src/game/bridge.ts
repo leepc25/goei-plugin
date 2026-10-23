@@ -141,7 +141,24 @@ export interface GameVisit {
   send(agentId: string, text: string, which: 'main' | 'aux', nearby?: string[]): Promise<VisitState>;
 }
 
+/** 필드 장부에 남길 사건 (게임 코드가 만든다). 본편 응답을 요청할 때 정제돼 들어간다 (docs/필드_기능_설계.md 8장) */
+export interface GameFieldEvent {
+  kind: string;
+  /** 사람이 읽는 한 줄 */
+  text: string;
+  scene?: string;
+  who?: string[];
+  weight?: 1 | 2 | 3;
+  /** 지금 확정된 사실 하나 (같은 key는 나중 것이 이긴다) */
+  fact?: { key: string; value: string; permanent?: boolean };
+}
+export interface GameField {
+  record(ev: GameFieldEvent): Promise<void>;
+}
+
 export interface GameBridge {
+  /** 필드 장부. 없으면 사건을 남기지 않는다 */
+  field?: GameField;
   /** 봇 보조 본부 방문. 응답은 시작한 채팅에 즉시 기록된다. */
   visit?: GameVisit;
   readonly api: 1;

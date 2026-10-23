@@ -28,6 +28,8 @@ export interface HubHost {
   /** 엘리베이터 층 단추. pick(i) 또는 취소(null) */
   chooseFloor(opts: { label: string; open: boolean; here: boolean }[], pick: (i: number | null) => void): void;
   sfx(name: string): void;
+  /** 장면이 바뀌었다 (처음 들어갈 때는 부르지 않는다) */
+  entered?(to: { id: string; name: string }, from: { id: string; name: string }): void;
   /** 메뉴·대화창이 떠 있나 */
   busy?(): boolean;
   /** 자리 동작(앉기·눕기…) 클립 순서. 플레이어 동작 재생이 붙으면 여기로 */
@@ -76,7 +78,9 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
       return { ...p, x: at.x, y: at.y };
     });
     const sc: Scene = { ...base, spots: [...base.spots, ...people.map((p) => ({ id: `visit:${p.name}`, x: p.x, y: p.y, who: p.name, verb: '대화', face: p.face, open: true }))] };
+    const prev = scene;
     scene = sc;
+    if (prev && prev.id !== sc.id) host.entered?.({ id: sc.id, name: sc.name }, { id: prev.id, name: prev.name });
     barked = null;
     enterTick = -1;
     opening = null;
