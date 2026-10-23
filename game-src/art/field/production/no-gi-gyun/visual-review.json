@@ -1,0 +1,14 @@
+{
+  "job": "7a9380e7-d19b-484d-9668-aa3efdb30d16",
+  "job_status": "completed",
+  "decision": "pass",
+  "reason": "얼굴 확대 재검수: 양 입꼬리에서 볼로 이어지는 갈색 흉터와 수직 봉합 자국이 확인됨. 검은 선글라스·가르마 머리·정면·기존 보통 키 유지, 회색 외곽 없음.",
+  "at": 1792791120.7410657,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

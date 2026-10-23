@@ -236,17 +236,13 @@ class Production:
    # Finish and visually review this person before moving to the next one.
    if not c.get('motions_visual_reviewed'):return
  def overview(self):
-  jobs=list(self.s['jobs'].values());counts={k:sum(j['status']==k for j in jobs)for k in ['processing','completed','failed','stalled']};self.s['summary']={'jobs':counts,'characters_ready':sum(bool(c.get('ready'))for c in self.s['characters'].values()),'characters_total':len(self.manifest),'images_verified':sum(bool(c.get('image_verified'))for c in self.s['characters'].values()),'motions_submitted':sum(len(c['motions'])for c in self.s['characters'].values()),'motions_target':len(self.manifest)*len(TEMPLATES)};self.save();print(json.dumps(self.s['summary'],ensure_ascii=False),flush=True)
+  jobs=list(self.s['jobs'].values());counts={k:sum(j['status']==k for j in jobs)for k in ['processing','completed','failed','stalled']};chars=list(self.s['characters'].values());self.s['summary']={'jobs':counts,'characters_ready':sum(bool(c.get('ready'))for c in chars),'characters_total':len(self.manifest),'images_format_verified':sum(bool(c.get('image_verified'))for c in chars),'new_images_visually_reviewed':sum(bool(c.get('image_visually_reviewed'))for c in chars),'eight_way_visually_reviewed':sum(bool(c.get('eight_way_visual_reviewed'))for c in chars),'characters_motions_visually_reviewed':sum(bool(c.get('motions_visual_reviewed'))for c in chars),'motions_submitted':sum(len(c['motions'])for c in chars),'motions_target':len(self.manifest)*len(TEMPLATES)};self.save();print(json.dumps(self.s['summary'],ensure_ascii=False),flush=True)
  def done(self):
-  control=json.loads((OUT/'control.json').read_text())
   if any(j['status']=='processing'for j in self.s['jobs'].values()):return False
   for a in self.manifest:
    c=self.s['characters'][a['slug']]
-   if c.get('ready'):
-    if control.get('release_skeleton_v3_motions')and a['slug']in control.get('motion_allowed_slugs',[])and any(not c['motions'].get(t)for t,_ in TEMPLATES):return False
-   elif c.get('image_verified')and not c.get('registration')and a['slug']in json.loads((OUT/'control.json').read_text()).get('registration_approved_slugs',[x['slug']for x in self.manifest])and a['slug']not in json.loads((OUT/'control.json').read_text()).get('registration_held_slugs',[]):return False
-   elif not c.get('image')and a.get('pixel_request'):return False
-   elif c.get('registration')in self.s['jobs']and self.s['jobs'][c['registration']]['status']=='completed'and not c.get('skeleton_problem'):return False
+   if not all(c.get(k)for k in ['ready','eight_way_visual_reviewed','motions_visual_reviewed']):return False
+   if any(self.s['jobs'].get(c['motions'].get(t),{}).get('status')!='completed'for t,_ in TEMPLATES):return False
   return True
  def export_ready(self):
   for a in self.manifest:
@@ -286,7 +282,7 @@ def main():
  while True:
   try:
    p.poll();p.schedule();p.export_ready();p.overview();p.checkpoint()
-   if p.done():p.event('all-independent-work-finished','all',p.s['summary']);p.save();break
+   if p.done():p.event('all-production-visually-reviewed','all',p.s['summary']);p.save();break
   except Exception as e:
    p.event('runner-cycle-error','all',str(e));p.save()
   if args.once:break

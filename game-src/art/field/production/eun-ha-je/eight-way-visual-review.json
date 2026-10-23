@@ -1,0 +1,25 @@
+{
+  "character_id": "c4c1df6c-5df9-400d-b85b-cf84cb8e5034",
+  "result": "pass",
+  "directions_reviewed": [
+    "south",
+    "south-east",
+    "east",
+    "north-east",
+    "north",
+    "north-west",
+    "west",
+    "south-west"
+  ],
+  "findings": "Dark blue chin bob with asymmetric forehead gap, pale blue-gray eyes, neutral tired face and navy trouser suit retained across8 views; scale consistent and no gray outside patches.",
+  "movement_direction": "west",
+  "stationary_direction": "south-west",
+  "gray_outer_halo_observed": false,
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF primary",
+    "Lore supplementary height",
+    "All55 before motion",
+    "Gray exterior reroll"
+  ]
+}

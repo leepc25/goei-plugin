@@ -32,6 +32,11 @@
       "movement_and_combat": "west",
       "stationary_noncombat": "south-west",
       "reason": "Both profiles have a visible face; west additionally shows the identifying pink hair streak."
+    },
+    "eun-ha-je": {
+      "movement_and_combat": "west",
+      "stationary_noncombat": "south-west",
+      "reason": "Both profiles show an eye; actual west/southwest better exposes original asymmetric forehead opening and face."
     }
   },
   "registration_held_slugs": [],
@@ -104,7 +109,11 @@
     "baek-seok-ju",
     "jin-na-sol",
     "park-min-seong",
-    "kang-i-hak"
+    "kang-i-hak",
+    "baek-sa-heon",
+    "go-young-eun",
+    "kwak-je-gang",
+    "no-gi-gyun"
   ],
   "source_priority": "AVIF first for identity/build; lore supplements height; explicit user heights override estimates"
 }

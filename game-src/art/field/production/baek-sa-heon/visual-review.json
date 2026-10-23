@@ -1,0 +1,14 @@
+{
+  "job": "de4bb97f-cf93-44cf-a0b0-155ed274b055",
+  "job_status": "completed",
+  "decision": "pass",
+  "reason": "원작의 밝은 잿빛 갈색 곱슬머리, 왼쪽 눈의 남색 사각 안대와 코를 비스듬히 지나는 끈 확인. 반대편 눈의 안경테 제거, 여린 체격·남색 정장·정면 유지. 모발 포함211px로 잠정 보통 키 하한 근처이며 확정cm는 없음, 회색 외곽 없음.",
+  "at": 1792790948.375196,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}
