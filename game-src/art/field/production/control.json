@@ -1,6 +1,6 @@
 {
-  "release_skeleton_v3_motions": true,
-  "reason": "Continue authorized character production and corrected Aileen source; new motion submissions held pending west results and defect diagnosis. Preserve west/southwest exceptions.",
+  "release_skeleton_v3_motions": false,
+  "reason": "Latest user: finish management, then fake bureau, Baekilmong and all other neutral/anomaly characters; register entire roster before new motions.",
   "max_in_flight": 20,
   "max_character_pipeline_in_flight": 6,
   "authorized_total_characters": 55,
@@ -29,7 +29,6 @@
       "reason": "Actual generated east side face hidden by bob; west and southwest face visibly exposed."
     }
   },
-  "registration_held_slugs": [
-    "aileen"
-  ]
+  "registration_held_slugs": [],
+  "production_priority": "all-roster-character-registration-first"
 }

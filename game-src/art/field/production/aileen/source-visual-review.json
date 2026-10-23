@@ -1,0 +1,15 @@
+{
+  "job_id": "95f7fbb1-98fc-4481-a293-236e615fb8b8",
+  "source_sha256": "9f4f7bd0d9d36db0fef3773970c8f6d51e50e0c0e06fd51572b7c433508322fa",
+  "reviewer": "assistant actual native image inspection",
+  "status": "source acceptable for registration; user approval not implied",
+  "silhouette_height": 237,
+  "anatomical_height_note": "Silhouette includes ponytail; crown-to-sole visually near Jyaldi, no exact cm inferred from native canvas.",
+  "observations": [
+    "Natural adult proportions, head and neck visible; no exaggerated muscular bulk.",
+    "Thin black ballistic vest visible over white shirt and under outer black suit jacket.",
+    "White/platinum hair and high ponytail retained.",
+    "128x256,48opaque colors,alpha0/255."
+  ],
+  "previous_silhouette_height": 223
+}
