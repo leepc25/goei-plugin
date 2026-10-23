@@ -1035,11 +1035,11 @@
         "last_response": {
           "type": "message_progress",
           "action": "finalizing",
-          "progress": 0.948327447773804,
+          "progress": 0.9499987827271497,
           "direction": "south-east",
           "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
           "animation_name": null,
-          "queue_position": 17,
+          "queue_position": 4,
           "generation_model": "skeleton-v3_template",
           "animation_group_id": "4e748226-7bec-46bf-bb77-a3392b9522a4",
           "motion_adjustments": {
@@ -1051,7 +1051,7 @@
           "animation_description": "breathing idle",
           "generation_started_at": "2026-10-23T18:30:39.836983+00:00",
           "template_animation_id": "breathing-idle",
-          "estimated_wait_seconds": 1797
+          "estimated_wait_seconds": 378
         }
       }
     },
@@ -1084,11 +1084,11 @@
         "last_response": {
           "type": "message_progress",
           "action": "finalizing",
-          "progress": 0.9334837867717348,
+          "progress": 0.9499181213306289,
           "direction": "east",
           "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
           "animation_name": null,
-          "queue_position": 18,
+          "queue_position": 7,
           "generation_model": "skeleton-v3_template",
           "animation_group_id": "e7bd558a-c320-4ba1-acaf-b018fc0ac3ed",
           "motion_adjustments": {
@@ -1100,7 +1100,7 @@
           "animation_description": "walking confidently with an upright steady torso, measured strides and restrained arm swing",
           "generation_started_at": "2026-10-23T18:30:49.685761+00:00",
           "template_animation_id": "walking-8-frames",
-          "estimated_wait_seconds": 1969
+          "estimated_wait_seconds": 686
         }
       }
     },
@@ -1132,12 +1132,12 @@
         "created_at": "2026-10-23T18:30:38.282585+00:00",
         "last_response": {
           "type": "message_progress",
-          "action": "generating",
-          "progress": 0.915,
+          "action": "finalizing",
+          "progress": 0.9498544256765016,
           "direction": "east",
           "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
           "animation_name": null,
-          "queue_position": 22,
+          "queue_position": 8,
           "generation_model": "skeleton-v3_template",
           "animation_group_id": "4e7a2ac9-f9f2-42cc-83eb-835cf0062a2e",
           "motion_adjustments": {
@@ -1149,7 +1149,7 @@
           "animation_description": "running decisively with a steady torso, controlled arm swing and firm purposeful strides",
           "generation_started_at": "2026-10-23T18:31:08.11423+00:00",
           "template_animation_id": "running-8-frames",
-          "estimated_wait_seconds": 2312
+          "estimated_wait_seconds": 821
         }
       }
     },
@@ -1499,12 +1499,12 @@
         "created_at": "2026-10-23T18:32:09.023371+00:00",
         "last_response": {
           "type": "message_progress",
-          "action": "generating",
-          "progress": 0.17746061569285204,
+          "action": "finalizing",
+          "progress": 0.9499421387702359,
           "direction": "east",
           "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
           "animation_name": null,
-          "queue_position": 0,
+          "queue_position": 11,
           "generation_model": "skeleton-v3_template",
           "animation_group_id": "47e8b847-f4cd-4872-bfd3-84f289bd42c4",
           "motion_adjustments": {
@@ -1516,7 +1516,7 @@
           "animation_description": "running jump",
           "generation_started_at": "2026-10-23T18:32:20.993163+00:00",
           "template_animation_id": "running-jump",
-          "estimated_wait_seconds": 0
+          "estimated_wait_seconds": 1173
         }
       }
     },
@@ -1549,11 +1549,11 @@
         "last_response": {
           "type": "message_progress",
           "action": "finalizing",
-          "progress": 0.915,
+          "progress": 0.9499851019962864,
           "direction": "east",
           "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
           "animation_name": null,
-          "queue_position": 22,
+          "queue_position": 9,
           "generation_model": "skeleton-v3_template",
           "animation_group_id": "a932cdb0-4016-4583-97fb-80dc044328fa",
           "motion_adjustments": {
@@ -1565,7 +1565,7 @@
           "animation_description": "running slide",
           "generation_started_at": "2026-10-23T18:32:35.920266+00:00",
           "template_animation_id": "running-slide",
-          "estimated_wait_seconds": 2402
+          "estimated_wait_seconds": 884
         }
       }
     },
@@ -1598,11 +1598,11 @@
         "last_response": {
           "type": "message_progress",
           "action": "finalizing",
-          "progress": 0.915,
+          "progress": 0.9499267934416937,
           "direction": "east",
           "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
           "animation_name": null,
-          "queue_position": 23,
+          "queue_position": 9,
           "generation_model": "skeleton-v3_template",
           "animation_group_id": "39e4964a-3385-4d99-95da-7c48ff1e3455",
           "motion_adjustments": {
@@ -1614,7 +1614,7 @@
           "animation_description": "walking while crouched",
           "generation_started_at": "2026-10-23T18:32:43.741919+00:00",
           "template_animation_id": "crouched-walking",
-          "estimated_wait_seconds": 2433
+          "estimated_wait_seconds": 972
         }
       }
     },
@@ -1647,11 +1647,11 @@
         "last_response": {
           "type": "message_progress",
           "action": "finalizing",
-          "progress": 0.905,
+          "progress": 0.9496710753721994,
           "direction": "east",
           "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
           "animation_name": null,
-          "queue_position": 0,
+          "queue_position": 23,
           "generation_model": "skeleton-v3_template",
           "animation_group_id": "f1d0e8b4-ae8d-4ff9-ae48-b22b311ab350",
           "motion_adjustments": {
@@ -1663,7 +1663,7 @@
           "animation_description": "walking sadly",
           "generation_started_at": "2026-10-23T18:32:59.16647+00:00",
           "template_animation_id": "sad-walk",
-          "estimated_wait_seconds": 0
+          "estimated_wait_seconds": 2528
         }
       }
     },
@@ -1695,12 +1695,12 @@
         "created_at": "2026-10-23T18:32:43.616633+00:00",
         "last_response": {
           "type": "message_progress",
-          "action": "generating",
-          "progress": 0.13584093414476014,
+          "action": "finalizing",
+          "progress": 0.9499884755620439,
           "direction": "east",
           "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
           "animation_name": null,
-          "queue_position": 0,
+          "queue_position": 12,
           "generation_model": "skeleton-v3_template",
           "animation_group_id": "601cbfbe-9a2b-4875-a842-b6fe5b640074",
           "motion_adjustments": {
@@ -1712,7 +1712,7 @@
           "animation_description": "front flip",
           "generation_started_at": "2026-10-23T18:33:14.289163+00:00",
           "template_animation_id": "front-flip",
-          "estimated_wait_seconds": 0
+          "estimated_wait_seconds": 1212
         }
       }
     },
@@ -1744,11 +1744,12 @@
         "created_at": "2026-10-23T18:33:13.358395+00:00",
         "last_response": {
           "type": "message_progress",
-          "progress": 0.1,
+          "action": "finalizing",
+          "progress": 0.9494452084797669,
           "direction": "east",
           "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
           "animation_name": null,
-          "queue_position": 0,
+          "queue_position": 13,
           "generation_model": "skeleton-v3_template",
           "animation_group_id": "68d30996-0f7e-459f-ba79-d0d4a6d48f68",
           "motion_adjustments": {
@@ -1760,7 +1761,7 @@
           "animation_description": "backflip",
           "generation_started_at": "2026-10-23T18:34:18.313943+00:00",
           "template_animation_id": "backflip",
-          "estimated_wait_seconds": 0
+          "estimated_wait_seconds": 1390
         }
       }
     },
@@ -1792,11 +1793,12 @@
         "created_at": "2026-10-23T18:33:42.837306+00:00",
         "last_response": {
           "type": "message_progress",
-          "progress": 0.1,
+          "action": "finalizing",
+          "progress": 0.9495640095061411,
           "direction": "east",
           "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
           "animation_name": null,
-          "queue_position": 0,
+          "queue_position": 13,
           "generation_model": "skeleton-v3_template",
           "animation_group_id": "05739c03-4ac1-4303-a232-a9369c6ecfcf",
           "motion_adjustments": {
@@ -1808,7 +1810,7 @@
           "animation_description": "jumping",
           "generation_started_at": "2026-10-23T18:34:23.129143+00:00",
           "template_animation_id": "jumping-1",
-          "estimated_wait_seconds": 0
+          "estimated_wait_seconds": 1377
         }
       }
     },
@@ -1840,12 +1842,12 @@
         "created_at": "2026-10-23T18:33:56.372578+00:00",
         "last_response": {
           "type": "message_progress",
-          "action": "generating",
-          "progress": 0.1029444827701249,
+          "action": "finalizing",
+          "progress": 0.9499754249312,
           "direction": "east",
           "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
           "animation_name": null,
-          "queue_position": 0,
+          "queue_position": 18,
           "generation_model": "skeleton-v3_template",
           "animation_group_id": "33f5e645-ddb7-43cf-b558-73c444c55a12",
           "motion_adjustments": {
@@ -1857,7 +1859,7 @@
           "animation_description": "jumping",
           "generation_started_at": "2026-10-23T18:34:13.06784+00:00",
           "template_animation_id": "jumping-2",
-          "estimated_wait_seconds": 0
+          "estimated_wait_seconds": 1945
         }
       }
     },
@@ -1889,11 +1891,12 @@
         "created_at": "2026-10-23T18:34:08.874687+00:00",
         "last_response": {
           "type": "message_progress",
-          "progress": 0.1,
+          "action": "finalizing",
+          "progress": 0.949983398667842,
           "direction": "east",
           "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
           "animation_name": null,
-          "queue_position": 0,
+          "queue_position": 15,
           "generation_model": "skeleton-v3_template",
           "animation_group_id": "d1211797-55a9-46b8-bae4-be57a80d706c",
           "motion_adjustments": {
@@ -1905,7 +1908,7 @@
           "animation_description": "two footed jump",
           "generation_started_at": "2026-10-23T18:34:14.627959+00:00",
           "template_animation_id": "two-footed-jump",
-          "estimated_wait_seconds": 0
+          "estimated_wait_seconds": 1591
         }
       }
     },
@@ -1937,11 +1940,12 @@
         "created_at": "2026-10-23T18:34:21.168598+00:00",
         "last_response": {
           "type": "message_progress",
-          "progress": 0.1,
+          "action": "finalizing",
+          "progress": 0.9499785159616807,
           "direction": "south-east",
           "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
           "animation_name": null,
-          "queue_position": 0,
+          "queue_position": 18,
           "generation_model": "skeleton-v3_template",
           "animation_group_id": "5f91faf9-3c67-472e-a8c5-d7d1480b503c",
           "motion_adjustments": {
@@ -1953,7 +1957,7 @@
           "animation_description": "drinking",
           "generation_started_at": "2026-10-23T18:34:45.851344+00:00",
           "template_animation_id": "drinking",
-          "estimated_wait_seconds": 0
+          "estimated_wait_seconds": 1879
         }
       }
     },
@@ -1985,11 +1989,12 @@
         "created_at": "2026-10-23T18:34:24.414162+00:00",
         "last_response": {
           "type": "message_progress",
-          "progress": 0.1,
+          "action": "finalizing",
+          "progress": 0.9499988957705934,
           "direction": "east",
           "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
           "animation_name": null,
-          "queue_position": 0,
+          "queue_position": 13,
           "generation_model": "skeleton-v3_template",
           "animation_group_id": "071c3c12-cc09-4e53-b6d0-bbac428cfd15",
           "motion_adjustments": {
@@ -2001,7 +2006,7 @@
           "animation_description": "picking up",
           "generation_started_at": "2026-10-23T18:34:30.045348+00:00",
           "template_animation_id": "picking-up",
-          "estimated_wait_seconds": 0
+          "estimated_wait_seconds": 1333
         }
       }
     },
@@ -2018,6 +2023,27 @@
         "status": "processing",
         "enhanced_prompt": null,
         "enhance_usage": null
+      },
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "a996f9f5-1eb1-41e6-a7af-377263cff9b3",
+        "status": "processing",
+        "created_at": "2026-10-23T18:35:49.802536+00:00",
+        "last_response": {
+          "status": "correcting_frames",
+          "progress": 0.84,
+          "character_id": "8fc35b6a-3e82-4148-8ed1-db3481d8cede",
+          "n_directions": 8,
+          "character_name": "에일린",
+          "queue_position": 0,
+          "directions_type": "8-directions",
+          "generation_mode": "v3",
+          "character_description": "에일린 / Aileen. Adult woman early20s, faded platinum blonde hair in a high ponytail with long bangs, dull gray eyes, serious analytical face, petite compact athletic build, practical fitted black trouser suit and black closed shoes as in her original portrait. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
+          "generation_started_at": "2026-10-23T18:35:52.929603+00:00"
+        }
       }
     },
     "b304d6f1-31b5-4a0f-a28c-9c625d4b0fdc": {
@@ -2033,6 +2059,27 @@
         "status": "processing",
         "enhanced_prompt": null,
         "enhance_usage": null
+      },
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "b304d6f1-31b5-4a0f-a28c-9c625d4b0fdc",
+        "status": "processing",
+        "created_at": "2026-10-23T18:36:01.697758+00:00",
+        "last_response": {
+          "status": "correcting_frames",
+          "progress": 0.84,
+          "character_id": "7cf2502d-e2e9-4677-bc53-ec1b9d76a11d",
+          "n_directions": 8,
+          "character_name": "큐라스",
+          "queue_position": 0,
+          "directions_type": "8-directions",
+          "generation_mode": "v3",
+          "character_description": "큐라스 / Kyuras. Adult man early30s, thin wiry build, pale green hair swept back, narrow face, gray green eyes, lively confident smile, black tailored trouser suit, white shirt, black necktie and black shoes. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
+          "generation_started_at": "2026-10-23T18:36:07.086531+00:00"
+        }
       }
     },
     "66bfcf1b-fcce-44ef-b0f4-2986e0e1c331": {
@@ -2048,6 +2095,27 @@
         "status": "processing",
         "enhanced_prompt": null,
         "enhance_usage": null
+      },
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "66bfcf1b-fcce-44ef-b0f4-2986e0e1c331",
+        "status": "processing",
+        "created_at": "2026-10-23T18:36:25.050316+00:00",
+        "last_response": {
+          "status": "correcting_frames",
+          "progress": 0.84,
+          "character_id": "a3af18df-782b-44d0-9fa6-c05ee03d84ab",
+          "n_directions": 8,
+          "character_name": "게슈간",
+          "queue_position": 0,
+          "directions_type": "8-directions",
+          "generation_mode": "v3",
+          "character_description": "게슈간 / Geshugan. Adult woman mid20s, short snow white blunt bob with bangs, cold clear blue eyes, athletic toned natural build, impassive face, loose white open collar long sleeve shirt with sleeves rolled to elbows, black business trousers and black shoes. No necktie. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
+          "generation_started_at": "2026-10-23T18:36:28.231236+00:00"
+        }
       }
     },
     "cb41e6eb-69d9-44e7-8d23-c904d87f016c": {
@@ -2063,6 +2131,27 @@
         "status": "processing",
         "enhanced_prompt": null,
         "enhance_usage": null
+      },
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "cb41e6eb-69d9-44e7-8d23-c904d87f016c",
+        "status": "processing",
+        "created_at": "2026-10-23T18:36:30.120379+00:00",
+        "last_response": {
+          "status": "correcting_frames",
+          "progress": 0.84,
+          "character_id": "27643078-cb88-455f-abf5-3be5bdb3ff68",
+          "n_directions": 8,
+          "character_name": "로제몬",
+          "queue_position": 0,
+          "directions_type": "8-directions",
+          "generation_mode": "v3",
+          "character_description": "로제몬 / Rojemon. Adult woman early20s, long wavy lavender purple hair and bangs, violet eyes, petite natural adult build and defined waist, mildly annoyed expression, fitted black office skirt suit, white shirt, black necktie and black office pumps. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
+          "generation_started_at": "2026-10-23T18:36:31.426452+00:00"
+        }
       }
     },
     "cad7e67c-dfc7-49fc-8681-18ac2e1070d0": {
@@ -2078,13 +2167,34 @@
         "status": "processing",
         "enhanced_prompt": null,
         "enhance_usage": null
+      },
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "cad7e67c-dfc7-49fc-8681-18ac2e1070d0",
+        "status": "processing",
+        "created_at": "2026-10-23T18:36:34.718701+00:00",
+        "last_response": {
+          "status": "correcting_frames",
+          "progress": 0.84,
+          "character_id": "1cfdc1a3-19f6-4c87-85c5-e59329f657f5",
+          "n_directions": 8,
+          "character_name": "콘쥬스",
+          "queue_position": 0,
+          "directions_type": "8-directions",
+          "generation_mode": "v3",
+          "character_description": "콘쥬스 / Konjyuce. 17 year old Korean schoolgirl with ordinary age appropriate teen proportions, shoulder length straight black bob with one distinctive pink streak, blue eyes, determined youthful face. Fully clothed navy school uniform blazer with light piping, white collared shirt, black necktie, gray knee length pleated school skirt, dark socks and plain black school loafers. No adult glamour styling. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
+          "generation_started_at": "2026-10-23T18:36:40.97804+00:00"
+        }
       }
     },
     "86ea3180-a8b5-44cb-9018-3aae95668543": {
       "kind": "image",
       "slug": "deadpole",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792780603.2460616,
       "receipt": {
         "usage": null,
@@ -2099,6 +2209,99 @@
         },
         "estimated_generations": 9,
         "pricing_provisional": true
+      },
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 9.0
+        },
+        "id": "86ea3180-a8b5-44cb-9018-3aae95668543",
+        "status": "completed",
+        "created_at": "2026-10-23T18:36:46.212912+00:00",
+        "last_response": {
+          "seed": 10222027,
+          "type": "message_done",
+          "model": "pro_flash",
+          "width": 128,
+          "action": "Removing background",
+          "height": 256,
+          "images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "prompt": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult woman early20s, petite natural build, long straight black hair with straight bangs, soft round dark gray eyes, gentle cautious expression, black tailored trouser suit, white shirt, black necktie, black protective gloves and plain black shoes. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 192-204px on128x256; short; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
+          "status": "completed",
+          "asset_id": "44ce8654-2856-5973-b506-776914923ecd",
+          "image_id": "44ce8654-2856-5973-b506-776914923ecd",
+          "job_kind": "creator-image",
+          "progress": 1.0,
+          "image_url": "https://s3.eu-central-003.backblazeb2.com/pixellab-generations/production/creator/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/44ce8654-2856-5973-b506-776914923ecd/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0037e6521c1d7c20000000001%2F20261023%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20261023T183853Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=37b499b333a05bb5abf1d5addbdc08358bddf0821836b57861491bace3d7e7a8",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 9
+          },
+          "generation_id": "624a2bc8-8dd9-4b9b-8c24-f43bb6587fdf",
+          "billing_charged": true,
+          "original_images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "source_image_id": "44ce8654-2856-5973-b506-776914923ecd",
+          "creator_image_saved": true,
+          "generation_started_at": "2026-10-23T18:36:48.326146+00:00"
+        }
+      },
+      "observed_end_epoch": 1792780790.9659367,
+      "elapsed_observed_seconds": 187.71987533569336,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 9
+      }
+    },
+    "5c0844e8-919f-4527-b663-d748a43fc2a1": {
+      "kind": "registration",
+      "slug": "deadpole",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792780794.3121269,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "5c0844e8-919f-4527-b663-d748a43fc2a1",
+        "character_id": "57e9dc0e-913f-443b-bb1f-6be2cdb617cd",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      },
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "5c0844e8-919f-4527-b663-d748a43fc2a1",
+        "status": "processing",
+        "created_at": "2026-10-23T18:39:56.850399+00:00",
+        "last_response": {
+          "status": "correcting_frames",
+          "progress": 0.84,
+          "character_id": "57e9dc0e-913f-443b-bb1f-6be2cdb617cd",
+          "n_directions": 8,
+          "character_name": "데드폴",
+          "queue_position": 0,
+          "directions_type": "8-directions",
+          "generation_mode": "v3",
+          "character_description": "데드폴 / Deadpole. Adult woman early20s, petite natural build, long straight black hair with straight bangs, soft round dark gray eyes, gentle cautious expression, black tailored trouser suit, white shirt, black necktie, black protective gloves and plain black shoes. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
+          "generation_started_at": "2026-10-23T18:40:03.779419+00:00"
+        }
       }
     }
   },
@@ -2198,13 +2401,14 @@
     "deadpole": {
       "name": "데드폴",
       "group": "management",
-      "character_id": null,
+      "character_id": "57e9dc0e-913f-443b-bb1f-6be2cdb617cd",
       "image": "86ea3180-a8b5-44cb-9018-3aae95668543",
-      "registration": null,
+      "registration": "5c0844e8-919f-4527-b663-d748a43fc2a1",
       "motions": {},
       "ready": false,
       "repair_id": "stature-v2-deadpole",
-      "visual_review_required": true
+      "visual_review_required": true,
+      "image_verified": true
     },
     "geshugan": {
       "name": "게슈간",
@@ -4287,9 +4491,66 @@
           "pricing_provisional": true
         }
       }
+    },
+    {
+      "at": "2026-10-23T18:39:50Z",
+      "kind": "completed",
+      "slug": "deadpole",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "86ea3180-a8b5-44cb-9018-3aae95668543",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 9
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T18:39:54Z",
+      "kind": "image-verified",
+      "slug": "deadpole",
+      "detail": {
+        "size": [
+          128,
+          256
+        ],
+        "bbox": [
+          32,
+          21,
+          93,
+          247
+        ],
+        "colors": 24,
+        "alpha": [
+          0,
+          255
+        ],
+        "original_pixels_preserved": true
+      }
+    },
+    {
+      "at": "2026-10-23T18:40:07Z",
+      "kind": "submitted",
+      "slug": "deadpole",
+      "detail": {
+        "kind": "registration",
+        "template": null,
+        "job_id": "5c0844e8-919f-4527-b663-d748a43fc2a1",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "5c0844e8-919f-4527-b663-d748a43fc2a1",
+          "character_id": "57e9dc0e-913f-443b-bb1f-6be2cdb617cd",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
     }
   ],
-  "updated_at": 1792780608.5700843,
+  "updated_at": 1792780946.0042603,
   "user_stopped_at": 1792778235.6917784,
   "archived_jobs": {
     "304457e9-6577-44f0-af17-97841a9f6720": {
@@ -5608,17 +5869,17 @@
       "saved_frames": 6
     }
   },
-  "last_git_checkpoint": 1792780251.120596,
+  "last_git_checkpoint": 1792780610.4904232,
   "summary": {
     "jobs": {
       "processing": 20,
-      "completed": 19,
+      "completed": 20,
       "failed": 0,
       "stalled": 0
     },
     "characters_ready": 4,
     "characters_total": 55,
-    "images_verified": 9,
+    "images_verified": 10,
     "motions_submitted": 14,
     "motions_target": 1100
   },
