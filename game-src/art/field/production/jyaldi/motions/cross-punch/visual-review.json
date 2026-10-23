@@ -1,0 +1,20 @@
+{
+  "at": 1792798660.9984608,
+  "job_id": "ee8251d9-7965-4da1-9fd8-c2fd6c8cc963",
+  "result": "reroll-required",
+  "findings": "새 시드1프레임 머리 아래에 넓은 밝은 회색 면,얼굴 앞 머리끝 회색 잔상. 주먹 아래 조각은 개선됐지만 외곽 회색 결함 남음.",
+  "frame_count": 6,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "cross-punch",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

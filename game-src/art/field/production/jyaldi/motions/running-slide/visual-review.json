@@ -1,0 +1,20 @@
+{
+  "at": 1792798599.105358,
+  "job_id": "e208d558-493e-49d2-a431-cf29054f14c9",
+  "result": "reroll-required",
+  "findings": "재시도3프레임 엉덩이 아래 회색 면,5프레임 얼굴/머리에 구멍과 분리 픽셀. 시드 변경으로 개선되지 않아 반려.",
+  "frame_count": 6,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "running-slide",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

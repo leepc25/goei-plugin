@@ -1,0 +1,20 @@
+{
+  "at": 1792798631.7741036,
+  "job_id": "a4cc8130-1878-47ce-9510-c55d1d52023f",
+  "result": "reroll-required",
+  "findings": "새 시드에서도5프레임 머리/팔이 위쪽에서 잘림. 프리셋 수직 이동에 의한 잘림 반복, 시드 재시도만으로 해결되지 않음.",
+  "frame_count": 7,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "two-footed-jump",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

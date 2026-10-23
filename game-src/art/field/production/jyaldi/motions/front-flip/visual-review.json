@@ -1,0 +1,20 @@
+{
+  "at": 1792798660.7535627,
+  "job_id": "6c3d792a-de83-488b-b92c-fe516e2c35fe",
+  "result": "reroll-required",
+  "findings": "4프레임 구두 상단 잘림과 머리 옆 회색 채움,5프레임 다리/손 실루엣 훼손. 새 시드에서도 반려 기준 반복.",
+  "frame_count": 6,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "front-flip",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

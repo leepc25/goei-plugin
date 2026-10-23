@@ -67,7 +67,7 @@ class Production:
   jid=d.get('background_job_id')or next(iter(d.get('background_job_ids',[])),None)
   if not jid:
    slot[key]='uncertain:'+marker;self.event('submission-unknown-response',slug,public(d));self.save();return False
-  job={'kind':kind,'slug':slug,'template':template,'status':'processing','created_epoch':started,'receipt':d};self.s['jobs'][jid]=job;slot[key]=jid
+  job={'kind':kind,'slug':slug,'template':template,'status':'processing','created_epoch':started,'receipt':d,'endpoint':path};self.s['jobs'][jid]=job;slot[key]=jid
   if kind=='registration':c['character_id']=d['character_id']
   if kind=='animation':c['exported']=False
   atomic(OUT/slug/((template or kind)+'-queue.json'),d);self.event('submitted',slug,{'kind':kind,'template':template,'job_id':jid,'receipt':d});self.save();return True
@@ -152,6 +152,17 @@ class Production:
   args=dict(a['pixel_request']);usage=args.pop('style_usage_description',None);source=args.pop('style_reference_local',None)
   if source:
    path=ROOT/source;im=Image.open(path);args['style_image']={'image':{'type':'base64','base64':base64.b64encode(path.read_bytes()).decode(),'format':'png'},'size':{'width':im.width,'height':im.height},'usage_description':usage}
+  return args
+ def custom_motion_request(self,slug,template,spec_path):
+  spec=json.loads((ROOT/spec_path).read_text())
+  assert spec['character_id']==self.s['characters'][slug]['character_id']
+  assert spec['slug']==slug and spec['slot']==template and spec.get('skeleton_visually_reviewed')
+  args=spec['request'];assert args['no_background'] is True
+  assert 3<=len(args['keypoints'])<=15
+  for frame in [args['first_frame_keypoints'],*args['keypoints']]:
+   assert len(frame)==18 and len({p['label'] for p in frame})==18
+   assert all(0<=p['x']<=1 and 0<=p['y']<=1 for p in frame)
+  args['first_frame']={'type':'base64','format':'png','base64':base64.b64encode((ROOT/spec['first_frame_path']).read_bytes()).decode()}
   return args
  def registration_request(self,a):
   args={'description':a['name']+' / '+a['english']+'. '+a['appearance']+' Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Do not invent patches, badges, logos or markings absent from the supplied image. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches.','reference_image':{'type':'base64','base64':base64.b64encode((OUT/a['slug']/'reference.png').read_bytes()).decode(),'format':'png'},'n_directions':8,'view':'low top-down','template_id':'mannequin','name':a['name'],'seed':10222027,'no_background':True}
@@ -259,7 +270,11 @@ class Production:
    if not c.get('ready')or a['slug']not in control.get('motion_allowed_slugs',[]):continue
    for template,label in TEMPLATES:
     if len(active())>=20:return
-    if not c['motions'].get(template):self.submit('animation',a['slug'],'animate-character',self.animation_request(a,template,label),template)
+    if not c['motions'].get(template):
+     custom=control.get('custom_motion_specs',{}).get(a['slug'],{}).get(template)
+     path='animate-with-skeleton-v3' if custom else 'animate-character'
+     args=self.custom_motion_request(a['slug'],template,custom) if custom else self.animation_request(a,template,label)
+     self.submit('animation',a['slug'],path,args,template)
    # Finish and visually review this person before moving to the next one.
    if not c.get('motions_visual_reviewed'):return
  def overview(self):

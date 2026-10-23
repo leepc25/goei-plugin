@@ -1,0 +1,20 @@
+{
+  "at": 1792798599.287058,
+  "job_id": "abb9eb95-11be-47ab-be0f-3975065d2d78",
+  "result": "reroll-required",
+  "findings": "재시도6·7프레임 몸 주변에 큰 회색 불투명 덩어리,5프레임 손 잘림 반복. 외곽 결함 명확하여 반려.",
+  "frame_count": 10,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "backflip",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

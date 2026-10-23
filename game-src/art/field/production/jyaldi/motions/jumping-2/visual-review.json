@@ -1,0 +1,20 @@
+{
+  "at": 1792798599.4499068,
+  "job_id": "1126e7a0-e1fc-4b4c-ad50-68f43ea5e7c7",
+  "result": "reroll-required",
+  "findings": "재시도5프레임 머리 잘림,6프레임 얼굴 앞 회색/검은 잔상 및7프레임 팔 뒤 솟는 조각. 프리셋 수직 이동/외곽 문제가 계속되어 반려.",
+  "frame_count": 8,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "jumping-2",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

@@ -28,99 +28,169 @@
           "south-west": "Idle/rotations/south-west.png"
         },
         "animations": {
-          "picking_up": {
-            "east": [
-              "Idle/animations/picking_up/east/frame_000.png",
-              "Idle/animations/picking_up/east/frame_001.png",
-              "Idle/animations/picking_up/east/frame_002.png",
-              "Idle/animations/picking_up/east/frame_003.png",
-              "Idle/animations/picking_up/east/frame_004.png"
+          "picking_up._Preserve_this_character_identity_costu": {
+            "west": [
+              "Idle/animations/picking_up._Preserve_this_character_identity_costu/west/frame_000.png",
+              "Idle/animations/picking_up._Preserve_this_character_identity_costu/west/frame_001.png",
+              "Idle/animations/picking_up._Preserve_this_character_identity_costu/west/frame_002.png",
+              "Idle/animations/picking_up._Preserve_this_character_identity_costu/west/frame_003.png",
+              "Idle/animations/picking_up._Preserve_this_character_identity_costu/west/frame_004.png"
             ]
           },
-          "walking_while_crouched": {
-            "east": [
-              "Idle/animations/walking_while_crouched/east/frame_000.png",
-              "Idle/animations/walking_while_crouched/east/frame_001.png",
-              "Idle/animations/walking_while_crouched/east/frame_002.png",
-              "Idle/animations/walking_while_crouched/east/frame_003.png",
-              "Idle/animations/walking_while_crouched/east/frame_004.png",
-              "Idle/animations/walking_while_crouched/east/frame_005.png"
+          "lead_jab._Preserve_this_character_identity_costume": {
+            "west": [
+              "Idle/animations/lead_jab._Preserve_this_character_identity_costume/west/frame_000.png",
+              "Idle/animations/lead_jab._Preserve_this_character_identity_costume/west/frame_001.png",
+              "Idle/animations/lead_jab._Preserve_this_character_identity_costume/west/frame_002.png"
             ]
           },
-          "breathing_idle": {
-            "south-east": [
-              "Idle/animations/breathing_idle/south-east/frame_000.png",
-              "Idle/animations/breathing_idle/south-east/frame_001.png",
-              "Idle/animations/breathing_idle/south-east/frame_002.png",
-              "Idle/animations/breathing_idle/south-east/frame_003.png"
+          "two_footed_jump._Preserve_this_character_identity": {
+            "west": [
+              "Idle/animations/two_footed_jump._Preserve_this_character_identity/west/frame_000.png",
+              "Idle/animations/two_footed_jump._Preserve_this_character_identity/west/frame_001.png",
+              "Idle/animations/two_footed_jump._Preserve_this_character_identity/west/frame_002.png",
+              "Idle/animations/two_footed_jump._Preserve_this_character_identity/west/frame_003.png",
+              "Idle/animations/two_footed_jump._Preserve_this_character_identity/west/frame_004.png",
+              "Idle/animations/two_footed_jump._Preserve_this_character_identity/west/frame_005.png",
+              "Idle/animations/two_footed_jump._Preserve_this_character_identity/west/frame_006.png"
+            ]
+          },
+          "breathing_idle._Preserve_this_character_identity_c": {
+            "south-west": [
+              "Idle/animations/breathing_idle._Preserve_this_character_identity_c/south-west/frame_000.png",
+              "Idle/animations/breathing_idle._Preserve_this_character_identity_c/south-west/frame_001.png",
+              "Idle/animations/breathing_idle._Preserve_this_character_identity_c/south-west/frame_002.png",
+              "Idle/animations/breathing_idle._Preserve_this_character_identity_c/south-west/frame_003.png"
+            ]
+          },
+          "running_slide._Preserve_this_character_identity_co": {
+            "west": [
+              "Idle/animations/running_slide._Preserve_this_character_identity_co/west/frame_000.png",
+              "Idle/animations/running_slide._Preserve_this_character_identity_co/west/frame_001.png",
+              "Idle/animations/running_slide._Preserve_this_character_identity_co/west/frame_002.png",
+              "Idle/animations/running_slide._Preserve_this_character_identity_co/west/frame_003.png",
+              "Idle/animations/running_slide._Preserve_this_character_identity_co/west/frame_004.png",
+              "Idle/animations/running_slide._Preserve_this_character_identity_co/west/frame_005.png"
+            ]
+          },
+          "jumping_1._Preserve_this_character_identity_costum": {
+            "west": [
+              "Idle/animations/jumping_1._Preserve_this_character_identity_costum/west/frame_000.png",
+              "Idle/animations/jumping_1._Preserve_this_character_identity_costum/west/frame_001.png",
+              "Idle/animations/jumping_1._Preserve_this_character_identity_costum/west/frame_002.png",
+              "Idle/animations/jumping_1._Preserve_this_character_identity_costum/west/frame_003.png",
+              "Idle/animations/jumping_1._Preserve_this_character_identity_costum/west/frame_004.png",
+              "Idle/animations/jumping_1._Preserve_this_character_identity_costum/west/frame_005.png",
+              "Idle/animations/jumping_1._Preserve_this_character_identity_costum/west/frame_006.png",
+              "Idle/animations/jumping_1._Preserve_this_character_identity_costum/west/frame_007.png",
+              "Idle/animations/jumping_1._Preserve_this_character_identity_costum/west/frame_008.png"
+            ]
+          },
+          "front_flip._Preserve_this_character_identity_costu": {
+            "west": [
+              "Idle/animations/front_flip._Preserve_this_character_identity_costu/west/frame_000.png",
+              "Idle/animations/front_flip._Preserve_this_character_identity_costu/west/frame_001.png",
+              "Idle/animations/front_flip._Preserve_this_character_identity_costu/west/frame_002.png",
+              "Idle/animations/front_flip._Preserve_this_character_identity_costu/west/frame_003.png",
+              "Idle/animations/front_flip._Preserve_this_character_identity_costu/west/frame_004.png",
+              "Idle/animations/front_flip._Preserve_this_character_identity_costu/west/frame_005.png"
+            ]
+          },
+          "jumping_2._Preserve_this_character_identity_costum": {
+            "west": [
+              "Idle/animations/jumping_2._Preserve_this_character_identity_costum/west/frame_000.png",
+              "Idle/animations/jumping_2._Preserve_this_character_identity_costum/west/frame_001.png",
+              "Idle/animations/jumping_2._Preserve_this_character_identity_costum/west/frame_002.png",
+              "Idle/animations/jumping_2._Preserve_this_character_identity_costum/west/frame_003.png",
+              "Idle/animations/jumping_2._Preserve_this_character_identity_costum/west/frame_004.png",
+              "Idle/animations/jumping_2._Preserve_this_character_identity_costum/west/frame_005.png",
+              "Idle/animations/jumping_2._Preserve_this_character_identity_costum/west/frame_006.png",
+              "Idle/animations/jumping_2._Preserve_this_character_identity_costum/west/frame_007.png"
+            ]
+          },
+          "running_jump._Preserve_this_character_identity_cos": {
+            "west": [
+              "Idle/animations/running_jump._Preserve_this_character_identity_cos/west/frame_000.png",
+              "Idle/animations/running_jump._Preserve_this_character_identity_cos/west/frame_001.png",
+              "Idle/animations/running_jump._Preserve_this_character_identity_cos/west/frame_002.png",
+              "Idle/animations/running_jump._Preserve_this_character_identity_cos/west/frame_003.png",
+              "Idle/animations/running_jump._Preserve_this_character_identity_cos/west/frame_004.png",
+              "Idle/animations/running_jump._Preserve_this_character_identity_cos/west/frame_005.png",
+              "Idle/animations/running_jump._Preserve_this_character_identity_cos/west/frame_006.png",
+              "Idle/animations/running_jump._Preserve_this_character_identity_cos/west/frame_007.png"
+            ]
+          },
+          "pushing._Preserve_this_character_identity_costume": {
+            "west": [
+              "Idle/animations/pushing._Preserve_this_character_identity_costume/west/frame_000.png",
+              "Idle/animations/pushing._Preserve_this_character_identity_costume/west/frame_001.png",
+              "Idle/animations/pushing._Preserve_this_character_identity_costume/west/frame_002.png",
+              "Idle/animations/pushing._Preserve_this_character_identity_costume/west/frame_003.png",
+              "Idle/animations/pushing._Preserve_this_character_identity_costume/west/frame_004.png",
+              "Idle/animations/pushing._Preserve_this_character_identity_costume/west/frame_005.png"
             ]
           },
           "running_decisively_with_a_steady_torso_controlled": {
-            "east": [
-              "Idle/animations/running_decisively_with_a_steady_torso_controlled/east/frame_000.png",
-              "Idle/animations/running_decisively_with_a_steady_torso_controlled/east/frame_001.png",
-              "Idle/animations/running_decisively_with_a_steady_torso_controlled/east/frame_002.png",
-              "Idle/animations/running_decisively_with_a_steady_torso_controlled/east/frame_003.png",
-              "Idle/animations/running_decisively_with_a_steady_torso_controlled/east/frame_004.png",
-              "Idle/animations/running_decisively_with_a_steady_torso_controlled/east/frame_005.png",
-              "Idle/animations/running_decisively_with_a_steady_torso_controlled/east/frame_006.png",
-              "Idle/animations/running_decisively_with_a_steady_torso_controlled/east/frame_007.png"
-            ]
-          },
-          "drinking": {
-            "south-east": [
-              "Idle/animations/drinking/south-east/frame_000.png",
-              "Idle/animations/drinking/south-east/frame_001.png",
-              "Idle/animations/drinking/south-east/frame_002.png",
-              "Idle/animations/drinking/south-east/frame_003.png",
-              "Idle/animations/drinking/south-east/frame_004.png",
-              "Idle/animations/drinking/south-east/frame_005.png"
-            ]
-          },
-          "front_flip": {
-            "east": [
-              "Idle/animations/front_flip/east/frame_000.png",
-              "Idle/animations/front_flip/east/frame_001.png",
-              "Idle/animations/front_flip/east/frame_002.png",
-              "Idle/animations/front_flip/east/frame_003.png",
-              "Idle/animations/front_flip/east/frame_004.png",
-              "Idle/animations/front_flip/east/frame_005.png"
-            ]
-          },
-          "backflip": {
-            "east": [
-              "Idle/animations/backflip/east/frame_000.png",
-              "Idle/animations/backflip/east/frame_001.png",
-              "Idle/animations/backflip/east/frame_002.png",
-              "Idle/animations/backflip/east/frame_003.png",
-              "Idle/animations/backflip/east/frame_004.png",
-              "Idle/animations/backflip/east/frame_005.png",
-              "Idle/animations/backflip/east/frame_006.png",
-              "Idle/animations/backflip/east/frame_007.png",
-              "Idle/animations/backflip/east/frame_008.png",
-              "Idle/animations/backflip/east/frame_009.png"
-            ]
-          },
-          "running_slide": {
-            "east": [
-              "Idle/animations/running_slide/east/frame_000.png",
-              "Idle/animations/running_slide/east/frame_001.png",
-              "Idle/animations/running_slide/east/frame_002.png",
-              "Idle/animations/running_slide/east/frame_003.png",
-              "Idle/animations/running_slide/east/frame_004.png",
-              "Idle/animations/running_slide/east/frame_005.png"
-            ]
-          },
-          "running_decisively_with_a_steady_torso_controlled-df6204c1": {
             "west": [
-              "Idle/animations/running_decisively_with_a_steady_torso_controlled-df6204c1/west/frame_000.png",
-              "Idle/animations/running_decisively_with_a_steady_torso_controlled-df6204c1/west/frame_001.png",
-              "Idle/animations/running_decisively_with_a_steady_torso_controlled-df6204c1/west/frame_002.png",
-              "Idle/animations/running_decisively_with_a_steady_torso_controlled-df6204c1/west/frame_003.png",
-              "Idle/animations/running_decisively_with_a_steady_torso_controlled-df6204c1/west/frame_004.png",
-              "Idle/animations/running_decisively_with_a_steady_torso_controlled-df6204c1/west/frame_005.png",
-              "Idle/animations/running_decisively_with_a_steady_torso_controlled-df6204c1/west/frame_006.png",
-              "Idle/animations/running_decisively_with_a_steady_torso_controlled-df6204c1/west/frame_007.png"
+              "Idle/animations/running_decisively_with_a_steady_torso_controlled/west/frame_000.png",
+              "Idle/animations/running_decisively_with_a_steady_torso_controlled/west/frame_001.png",
+              "Idle/animations/running_decisively_with_a_steady_torso_controlled/west/frame_002.png",
+              "Idle/animations/running_decisively_with_a_steady_torso_controlled/west/frame_003.png"
+            ]
+          },
+          "cross_punch._Preserve_this_character_identity_cost": {
+            "west": [
+              "Idle/animations/cross_punch._Preserve_this_character_identity_cost/west/frame_000.png",
+              "Idle/animations/cross_punch._Preserve_this_character_identity_cost/west/frame_001.png",
+              "Idle/animations/cross_punch._Preserve_this_character_identity_cost/west/frame_002.png",
+              "Idle/animations/cross_punch._Preserve_this_character_identity_cost/west/frame_003.png",
+              "Idle/animations/cross_punch._Preserve_this_character_identity_cost/west/frame_004.png",
+              "Idle/animations/cross_punch._Preserve_this_character_identity_cost/west/frame_005.png"
+            ]
+          },
+          "drinking._Preserve_this_character_identity_costume": {
+            "south-west": [
+              "Idle/animations/drinking._Preserve_this_character_identity_costume/south-west/frame_000.png",
+              "Idle/animations/drinking._Preserve_this_character_identity_costume/south-west/frame_001.png",
+              "Idle/animations/drinking._Preserve_this_character_identity_costume/south-west/frame_002.png",
+              "Idle/animations/drinking._Preserve_this_character_identity_costume/south-west/frame_003.png",
+              "Idle/animations/drinking._Preserve_this_character_identity_costume/south-west/frame_004.png",
+              "Idle/animations/drinking._Preserve_this_character_identity_costume/south-west/frame_005.png"
+            ]
+          },
+          "pull_heavy_object._Preserve_this_character_identit": {
+            "west": [
+              "Idle/animations/pull_heavy_object._Preserve_this_character_identit/west/frame_000.png",
+              "Idle/animations/pull_heavy_object._Preserve_this_character_identit/west/frame_001.png",
+              "Idle/animations/pull_heavy_object._Preserve_this_character_identit/west/frame_002.png",
+              "Idle/animations/pull_heavy_object._Preserve_this_character_identit/west/frame_003.png",
+              "Idle/animations/pull_heavy_object._Preserve_this_character_identit/west/frame_004.png",
+              "Idle/animations/pull_heavy_object._Preserve_this_character_identit/west/frame_005.png"
+            ]
+          },
+          "throw_object._Preserve_this_character_identity_cos": {
+            "west": [
+              "Idle/animations/throw_object._Preserve_this_character_identity_cos/west/frame_000.png",
+              "Idle/animations/throw_object._Preserve_this_character_identity_cos/west/frame_001.png",
+              "Idle/animations/throw_object._Preserve_this_character_identity_cos/west/frame_002.png",
+              "Idle/animations/throw_object._Preserve_this_character_identity_cos/west/frame_003.png",
+              "Idle/animations/throw_object._Preserve_this_character_identity_cos/west/frame_004.png",
+              "Idle/animations/throw_object._Preserve_this_character_identity_cos/west/frame_005.png",
+              "Idle/animations/throw_object._Preserve_this_character_identity_cos/west/frame_006.png"
+            ]
+          },
+          "backflip._Preserve_this_character_identity_costume": {
+            "west": [
+              "Idle/animations/backflip._Preserve_this_character_identity_costume/west/frame_000.png",
+              "Idle/animations/backflip._Preserve_this_character_identity_costume/west/frame_001.png",
+              "Idle/animations/backflip._Preserve_this_character_identity_costume/west/frame_002.png",
+              "Idle/animations/backflip._Preserve_this_character_identity_costume/west/frame_003.png",
+              "Idle/animations/backflip._Preserve_this_character_identity_costume/west/frame_004.png",
+              "Idle/animations/backflip._Preserve_this_character_identity_costume/west/frame_005.png",
+              "Idle/animations/backflip._Preserve_this_character_identity_costume/west/frame_006.png",
+              "Idle/animations/backflip._Preserve_this_character_identity_costume/west/frame_007.png",
+              "Idle/animations/backflip._Preserve_this_character_identity_costume/west/frame_008.png",
+              "Idle/animations/backflip._Preserve_this_character_identity_costume/west/frame_009.png"
             ]
           },
           "walking_confidently_with_an_upright_steady_torso_m": {
@@ -135,28 +205,38 @@
               "Idle/animations/walking_confidently_with_an_upright_steady_torso_m/west/frame_007.png"
             ]
           },
-          "walking_confidently_with_an_upright_steady_torso_m-e7bd558a": {
-            "east": [
-              "Idle/animations/walking_confidently_with_an_upright_steady_torso_m-e7bd558a/east/frame_000.png",
-              "Idle/animations/walking_confidently_with_an_upright_steady_torso_m-e7bd558a/east/frame_001.png",
-              "Idle/animations/walking_confidently_with_an_upright_steady_torso_m-e7bd558a/east/frame_002.png",
-              "Idle/animations/walking_confidently_with_an_upright_steady_torso_m-e7bd558a/east/frame_003.png",
-              "Idle/animations/walking_confidently_with_an_upright_steady_torso_m-e7bd558a/east/frame_004.png",
-              "Idle/animations/walking_confidently_with_an_upright_steady_torso_m-e7bd558a/east/frame_005.png",
-              "Idle/animations/walking_confidently_with_an_upright_steady_torso_m-e7bd558a/east/frame_006.png",
-              "Idle/animations/walking_confidently_with_an_upright_steady_torso_m-e7bd558a/east/frame_007.png"
+          "crouched_walking._Preserve_this_character_identity": {
+            "west": [
+              "Idle/animations/crouched_walking._Preserve_this_character_identity/west/frame_000.png",
+              "Idle/animations/crouched_walking._Preserve_this_character_identity/west/frame_001.png",
+              "Idle/animations/crouched_walking._Preserve_this_character_identity/west/frame_002.png",
+              "Idle/animations/crouched_walking._Preserve_this_character_identity/west/frame_003.png",
+              "Idle/animations/crouched_walking._Preserve_this_character_identity/west/frame_004.png",
+              "Idle/animations/crouched_walking._Preserve_this_character_identity/west/frame_005.png"
             ]
           },
-          "walking_sadly": {
-            "east": [
-              "Idle/animations/walking_sadly/east/frame_000.png",
-              "Idle/animations/walking_sadly/east/frame_001.png",
-              "Idle/animations/walking_sadly/east/frame_002.png",
-              "Idle/animations/walking_sadly/east/frame_003.png",
-              "Idle/animations/walking_sadly/east/frame_004.png",
-              "Idle/animations/walking_sadly/east/frame_005.png",
-              "Idle/animations/walking_sadly/east/frame_006.png",
-              "Idle/animations/walking_sadly/east/frame_007.png"
+          "sad_walk._Preserve_this_character_identity_costume": {
+            "west": [
+              "Idle/animations/sad_walk._Preserve_this_character_identity_costume/west/frame_000.png",
+              "Idle/animations/sad_walk._Preserve_this_character_identity_costume/west/frame_001.png",
+              "Idle/animations/sad_walk._Preserve_this_character_identity_costume/west/frame_002.png",
+              "Idle/animations/sad_walk._Preserve_this_character_identity_costume/west/frame_003.png",
+              "Idle/animations/sad_walk._Preserve_this_character_identity_costume/west/frame_004.png",
+              "Idle/animations/sad_walk._Preserve_this_character_identity_costume/west/frame_005.png",
+              "Idle/animations/sad_walk._Preserve_this_character_identity_costume/west/frame_006.png",
+              "Idle/animations/sad_walk._Preserve_this_character_identity_costume/west/frame_007.png"
+            ]
+          },
+          "fight_stance_idle_8_frames._Preserve_this_characte": {
+            "west": [
+              "Idle/animations/fight_stance_idle_8_frames._Preserve_this_characte/west/frame_000.png",
+              "Idle/animations/fight_stance_idle_8_frames._Preserve_this_characte/west/frame_001.png",
+              "Idle/animations/fight_stance_idle_8_frames._Preserve_this_characte/west/frame_002.png",
+              "Idle/animations/fight_stance_idle_8_frames._Preserve_this_characte/west/frame_003.png",
+              "Idle/animations/fight_stance_idle_8_frames._Preserve_this_characte/west/frame_004.png",
+              "Idle/animations/fight_stance_idle_8_frames._Preserve_this_characte/west/frame_005.png",
+              "Idle/animations/fight_stance_idle_8_frames._Preserve_this_characte/west/frame_006.png",
+              "Idle/animations/fight_stance_idle_8_frames._Preserve_this_characte/west/frame_007.png"
             ]
           }
         }
@@ -164,5 +244,5 @@
     }
   ],
   "export_version": "3.1",
-  "export_date": "2026-10-23T19:23:04.530452"
+  "export_date": "2026-10-23T23:38:58.653159"
 }
