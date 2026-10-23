@@ -1,0 +1,497 @@
+[
+  {
+    "slug": "jyaldi",
+    "name": "쟈알디",
+    "original_reviewed": true,
+    "risk": "priority",
+    "reason": "Asymmetric long fringe; user confirmed east face occlusion.",
+    "generated_side_review": "west/south-west selected",
+    "not_a_visual_approval": true
+  },
+  {
+    "slug": "spangdal",
+    "name": "스팡달",
+    "original_reviewed": true,
+    "risk": "priority",
+    "reason": "Original one-eye-covering bob; generated east face hidden, west face visible.",
+    "generated_side_review": "west/south-west selected",
+    "not_a_visual_approval": true
+  },
+  {
+    "slug": "jaemtri",
+    "name": "잼트리",
+    "original_reviewed": true,
+    "risk": "no-obvious-one-sided-face-occlusion-in-original",
+    "reason": null,
+    "generated_side_review": "both sides readable; keep east/southeast",
+    "not_a_visual_approval": true
+  },
+  {
+    "slug": "aileen",
+    "name": "에일린",
+    "original_reviewed": true,
+    "risk": "check-side-fringe-or-asymmetric-feature",
+    "reason": null,
+    "generated_side_review": "pending actual rotations",
+    "not_a_visual_approval": true
+  },
+  {
+    "slug": "gorgodio",
+    "name": "고르고디오",
+    "original_reviewed": true,
+    "risk": "no-obvious-one-sided-face-occlusion-in-original",
+    "reason": null,
+    "generated_side_review": "pending actual rotations",
+    "not_a_visual_approval": true
+  },
+  {
+    "slug": "kyuras",
+    "name": "큐라스",
+    "original_reviewed": true,
+    "risk": "no-obvious-one-sided-face-occlusion-in-original",
+    "reason": null,
+    "generated_side_review": "pending actual rotations",
+    "not_a_visual_approval": true
+  },
+  {
+    "slug": "deadpole",
+    "name": "데드폴",
+    "original_reviewed": true,
+    "risk": "no-obvious-one-sided-face-occlusion-in-original",
+    "reason": null,
+    "generated_side_review": "pending actual rotations",
+    "not_a_visual_approval": true
+  },
+  {
+    "slug": "geshugan",
+    "name": "게슈간",
+    "original_reviewed": true,
+    "risk": "no-obvious-one-sided-face-occlusion-in-original",
+    "reason": null,
+    "generated_side_review": "pending actual rotations",
+    "not_a_visual_approval": true
+  },
+  {
+    "slug": "rojemon",
+    "name": "로제몬",
+    "original_reviewed": true,
+    "risk": "no-obvious-one-sided-face-occlusion-in-original",
+    "reason": null,
+    "generated_side_review": "pending actual rotations",
+    "not_a_visual_approval": true
+  },
+  {
+    "slug": "konjyuce",
+    "name": "콘쥬스",
+    "original_reviewed": true,
+    "risk": "check-side-fringe-or-asymmetric-feature",
+    "reason": null,
+    "generated_side_review": "pending actual rotations",
+    "not_a_visual_approval": true
+  },
+  {
+    "slug": "gognija",
+    "name": "고그니쟈",
+    "original_reviewed": true,
+    "risk": "no-obvious-one-sided-face-occlusion-in-original",
+    "reason": null,
+    "generated_side_review": "pending actual rotations",
+    "not_a_visual_approval": true
+  },
+  {
+    "slug": "dejure",
+    "name": "데쥬레",
+    "original_reviewed": true,
+    "risk": "no-obvious-one-sided-face-occlusion-in-original",
+    "reason": null,
+    "generated_side_review": "pending actual rotations",
+    "not_a_visual_approval": true
+  },
+  {
+    "slug": "sa-jang",
+    "name": "사장",
+    "original_reviewed": true,
+    "risk": "no-obvious-one-sided-face-occlusion-in-original",
+    "reason": null,
+    "generated_side_review": "pending actual rotations",
+    "not_a_visual_approval": true
+  },
+  {
+    "slug": "do-pil-heon",
+    "name": "도필헌",
+    "original_reviewed": true,
+    "risk": "no-obvious-one-sided-face-occlusion-in-original",
+    "reason": null,
+    "generated_side_review": "pending actual rotations",
+    "not_a_visual_approval": true
+  },
+  {
+    "slug": "lee-gil-hwan",
+    "name": "이길환",
+    "original_reviewed": true,
+    "risk": "no-obvious-one-sided-face-occlusion-in-original",
+    "reason": null,
+    "generated_side_review": "pending actual rotations",
+    "not_a_visual_approval": true
+  },
+  {
+    "slug": "lee-gi-seok",
+    "name": "이기석",
+    "original_reviewed": true,
+    "risk": "check-side-fringe-or-asymmetric-feature",
+    "reason": null,
+    "generated_side_review": "pending actual rotations",
+    "not_a_visual_approval": true
+  },
+  {
+    "slug": "kim-jo-hak",
+    "name": "김조학",
+    "original_reviewed": true,
+    "risk": "no-obvious-one-sided-face-occlusion-in-original",
+    "reason": null,
+    "generated_side_review": "pending actual rotations",
+    "not_a_visual_approval": true
+  },
+  {
+    "slug": "lee-do-hyeong",
+    "name": "이도형",
+    "original_reviewed": true,
+    "risk": "no-obvious-one-sided-face-occlusion-in-original",
+    "reason": null,
+    "generated_side_review": "pending actual rotations",
+    "not_a_visual_approval": true
+  },
+  {
+    "slug": "go-young-hoon",
+    "name": "고영훈",
+    "original_reviewed": true,
+    "risk": "no-obvious-one-sided-face-occlusion-in-original",
+    "reason": null,
+    "generated_side_review": "pending actual rotations",
+    "not_a_visual_approval": true
+  },
+  {
+    "slug": "no-gi-gyun",
+    "name": "노기균",
+    "original_reviewed": true,
+    "risk": "no-obvious-one-sided-face-occlusion-in-original",
+    "reason": null,
+    "generated_side_review": "pending actual rotations",
+    "not_a_visual_approval": true
+  },
+  {
+    "slug": "song-ju-ik",
+    "name": "송주익",
+    "original_reviewed": true,
+    "risk": "no-obvious-one-sided-face-occlusion-in-original",
+    "reason": null,
+    "generated_side_review": "pending actual rotations",
+    "not_a_visual_approval": true
+  },
+  {
+    "slug": "kwak-seong-ju",
+    "name": "곽성주",
+    "original_reviewed": true,
+    "risk": "no-obvious-one-sided-face-occlusion-in-original",
+    "reason": null,
+    "generated_side_review": "pending actual rotations",
+    "not_a_visual_approval": true
+  },
+  {
+    "slug": "cho-seong-choon",
+    "name": "조성춘",
+    "original_reviewed": true,
+    "risk": "no-obvious-one-sided-face-occlusion-in-original",
+    "reason": null,
+    "generated_side_review": "pending actual rotations",
+    "not_a_visual_approval": true
+  },
+  {
+    "slug": "yun-byeong-su",
+    "name": "윤병수",
+    "original_reviewed": true,
+    "risk": "no-obvious-one-sided-face-occlusion-in-original",
+    "reason": null,
+    "generated_side_review": "pending actual rotations",
+    "not_a_visual_approval": true
+  },
+  {
+    "slug": "kim-seong-jin",
+    "name": "김성진",
+    "original_reviewed": true,
+    "risk": "no-obvious-one-sided-face-occlusion-in-original",
+    "reason": null,
+    "generated_side_review": "pending actual rotations",
+    "not_a_visual_approval": true
+  },
+  {
+    "slug": "song-jin-seob",
+    "name": "송진섭",
+    "original_reviewed": true,
+    "risk": "no-obvious-one-sided-face-occlusion-in-original",
+    "reason": null,
+    "generated_side_review": "pending actual rotations",
+    "not_a_visual_approval": true
+  },
+  {
+    "slug": "baek-seok-ju",
+    "name": "백석주",
+    "original_reviewed": true,
+    "risk": "no-obvious-one-sided-face-occlusion-in-original",
+    "reason": null,
+    "generated_side_review": "pending actual rotations",
+    "not_a_visual_approval": true
+  },
+  {
+    "slug": "jin-na-sol",
+    "name": "진나솔",
+    "original_reviewed": true,
+    "risk": "check-side-fringe-or-asymmetric-feature",
+    "reason": null,
+    "generated_side_review": "pending actual rotations",
+    "not_a_visual_approval": true
+  },
+  {
+    "slug": "lee-seong-hae",
+    "name": "이성해",
+    "original_reviewed": true,
+    "risk": "check-side-fringe-or-asymmetric-feature",
+    "reason": null,
+    "generated_side_review": "pending actual rotations",
+    "not_a_visual_approval": true
+  },
+  {
+    "slug": "lee-ja-heon",
+    "name": "이자헌",
+    "original_reviewed": true,
+    "risk": "no-obvious-one-sided-face-occlusion-in-original",
+    "reason": null,
+    "generated_side_review": "pending actual rotations",
+    "not_a_visual_approval": true
+  },
+  {
+    "slug": "eun-ha-je",
+    "name": "은하제",
+    "original_reviewed": true,
+    "risk": "priority",
+    "reason": "Deep side fringe covers one eye.",
+    "generated_side_review": "pending actual rotations",
+    "not_a_visual_approval": true
+  },
+  {
+    "slug": "park-min-seong",
+    "name": "박민성",
+    "original_reviewed": true,
+    "risk": "check-side-fringe-or-asymmetric-feature",
+    "reason": null,
+    "generated_side_review": "pending actual rotations",
+    "not_a_visual_approval": true
+  },
+  {
+    "slug": "baek-sa-heon",
+    "name": "백사헌",
+    "original_reviewed": true,
+    "risk": "priority",
+    "reason": "Asymmetric eye patch; preserve correct side, select readable exposed eye.",
+    "generated_side_review": "pending actual rotations",
+    "not_a_visual_approval": true
+  },
+  {
+    "slug": "go-young-eun",
+    "name": "고영은",
+    "original_reviewed": true,
+    "risk": "no-obvious-one-sided-face-occlusion-in-original",
+    "reason": null,
+    "generated_side_review": "pending actual rotations",
+    "not_a_visual_approval": true
+  },
+  {
+    "slug": "kang-i-hak",
+    "name": "강이학",
+    "original_reviewed": true,
+    "risk": "check-side-fringe-or-asymmetric-feature",
+    "reason": null,
+    "generated_side_review": "pending actual rotations",
+    "not_a_visual_approval": true
+  },
+  {
+    "slug": "jang-heo-un",
+    "name": "장허운",
+    "original_reviewed": true,
+    "risk": "priority",
+    "reason": "Long side hair across one eye.",
+    "generated_side_review": "pending actual rotations",
+    "not_a_visual_approval": true
+  },
+  {
+    "slug": "kwak-je-gang",
+    "name": "곽제강",
+    "original_reviewed": true,
+    "risk": "no-obvious-one-sided-face-occlusion-in-original",
+    "reason": null,
+    "generated_side_review": "pending actual rotations",
+    "not_a_visual_approval": true
+  },
+  {
+    "slug": "lee-yeon-hwa",
+    "name": "이연화",
+    "original_reviewed": true,
+    "risk": "no-obvious-one-sided-face-occlusion-in-original",
+    "reason": null,
+    "generated_side_review": "pending actual rotations",
+    "not_a_visual_approval": true
+  },
+  {
+    "slug": "lee-byeong-jin",
+    "name": "이병진",
+    "original_reviewed": true,
+    "risk": "no-obvious-one-sided-face-occlusion-in-original",
+    "reason": null,
+    "generated_side_review": "pending actual rotations",
+    "not_a_visual_approval": true
+  },
+  {
+    "slug": "jay",
+    "name": "제이",
+    "original_reviewed": true,
+    "risk": "priority",
+    "reason": "Heavy fringe plus cap hides eye region; both sides need inspection.",
+    "generated_side_review": "pending actual rotations",
+    "not_a_visual_approval": true
+  },
+  {
+    "slug": "ho-yu-won",
+    "name": "호유원",
+    "original_reviewed": true,
+    "risk": "check-side-fringe-or-asymmetric-feature",
+    "reason": null,
+    "generated_side_review": "pending actual rotations",
+    "not_a_visual_approval": true
+  },
+  {
+    "slug": "cheong-dal-lae",
+    "name": "청달래",
+    "original_reviewed": true,
+    "risk": "no-obvious-one-sided-face-occlusion-in-original",
+    "reason": null,
+    "generated_side_review": "pending actual rotations",
+    "not_a_visual_approval": true
+  },
+  {
+    "slug": "cha-yeo-jin",
+    "name": "차여진",
+    "original_reviewed": true,
+    "risk": "check-side-fringe-or-asymmetric-feature",
+    "reason": null,
+    "generated_side_review": "pending actual rotations",
+    "not_a_visual_approval": true
+  },
+  {
+    "slug": "seo-yun-ji",
+    "name": "서윤지",
+    "original_reviewed": true,
+    "risk": "no-obvious-one-sided-face-occlusion-in-original",
+    "reason": null,
+    "generated_side_review": "pending actual rotations",
+    "not_a_visual_approval": true
+  },
+  {
+    "slug": "go-yeon-ji",
+    "name": "고연지",
+    "original_reviewed": true,
+    "risk": "no-obvious-one-sided-face-occlusion-in-original",
+    "reason": null,
+    "generated_side_review": "pending actual rotations",
+    "not_a_visual_approval": true
+  },
+  {
+    "slug": "yun-ji-a",
+    "name": "윤지아",
+    "original_reviewed": true,
+    "risk": "no-obvious-one-sided-face-occlusion-in-original",
+    "reason": null,
+    "generated_side_review": "pending actual rotations",
+    "not_a_visual_approval": true
+  },
+  {
+    "slug": "ma-deok-hee",
+    "name": "마덕희",
+    "original_reviewed": true,
+    "risk": "check-side-fringe-or-asymmetric-feature",
+    "reason": null,
+    "generated_side_review": "pending actual rotations",
+    "not_a_visual_approval": true
+  },
+  {
+    "slug": "mun-hye-ran",
+    "name": "문혜란",
+    "original_reviewed": true,
+    "risk": "check-side-fringe-or-asymmetric-feature",
+    "reason": null,
+    "generated_side_review": "pending actual rotations",
+    "not_a_visual_approval": true
+  },
+  {
+    "slug": "shin-yuri",
+    "name": "신유리",
+    "original_reviewed": true,
+    "risk": "no-obvious-one-sided-face-occlusion-in-original",
+    "reason": null,
+    "generated_side_review": "pending actual rotations",
+    "not_a_visual_approval": true
+  },
+  {
+    "slug": "blaret",
+    "name": "블라렛",
+    "original_reviewed": true,
+    "risk": "no-obvious-one-sided-face-occlusion-in-original",
+    "reason": null,
+    "generated_side_review": "pending actual rotations",
+    "not_a_visual_approval": true
+  },
+  {
+    "slug": "saladin",
+    "name": "살라딘",
+    "original_reviewed": true,
+    "risk": "no-obvious-one-sided-face-occlusion-in-original",
+    "reason": null,
+    "generated_side_review": "pending actual rotations",
+    "not_a_visual_approval": true
+  },
+  {
+    "slug": "avensha",
+    "name": "아벤샤",
+    "original_reviewed": true,
+    "risk": "check-side-fringe-or-asymmetric-feature",
+    "reason": null,
+    "generated_side_review": "pending actual rotations",
+    "not_a_visual_approval": true
+  },
+  {
+    "slug": "secriem",
+    "name": "세크리엠",
+    "original_reviewed": true,
+    "risk": "no-obvious-one-sided-face-occlusion-in-original",
+    "reason": null,
+    "generated_side_review": "pending actual rotations",
+    "not_a_visual_approval": true
+  },
+  {
+    "slug": "brownie",
+    "name": "브라우니",
+    "original_reviewed": true,
+    "risk": "no-obvious-one-sided-face-occlusion-in-original",
+    "reason": null,
+    "generated_side_review": "pending actual rotations",
+    "not_a_visual_approval": true
+  },
+  {
+    "slug": "aestheticism",
+    "name": "탐미주의",
+    "original_reviewed": true,
+    "risk": "check-side-fringe-or-asymmetric-feature",
+    "reason": null,
+    "generated_side_review": "pending actual rotations",
+    "not_a_visual_approval": true
+  }
+]

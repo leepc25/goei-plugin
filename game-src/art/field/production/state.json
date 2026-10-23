@@ -1010,7 +1010,7 @@
       "kind": "animation",
       "slug": "jyaldi",
       "template": "breathing-idle",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792780200.6127641,
       "receipt": {
         "background_job_ids": [
@@ -1026,21 +1026,66 @@
       },
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 3.0
         },
         "id": "313da381-5ebe-43ab-997b-d1eb55f6aa2f",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-23T18:30:13.958713+00:00",
         "last_response": {
-          "type": "message_progress",
+          "seed": 1712909476,
+          "type": "done",
           "action": "finalizing",
-          "progress": 0.9499992839984454,
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "progress": 1.0,
           "direction": "south-east",
+          "frame_count": 4,
+          "animation_id": "89f31c94-becd-41ed-a1a9-a85c89628416",
           "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+          "storage_urls": {
+            "frames": [
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/89f31c94-becd-41ed-a1a9-a85c89628416/south-east/0.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/89f31c94-becd-41ed-a1a9-a85c89628416/south-east/1.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/89f31c94-becd-41ed-a1a9-a85c89628416/south-east/2.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/89f31c94-becd-41ed-a1a9-a85c89628416/south-east/3.png"
+            ]
+          },
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "f9c2fbaa-a400-40cf-ae80-f96ba1a7dd25",
           "animation_name": null,
           "queue_position": 0,
+          "billing_charged": true,
           "generation_model": "skeleton-v3_template",
+          "saved_to_storage": true,
           "animation_group_id": "4e748226-7bec-46bf-bb77-a3392b9522a4",
           "motion_adjustments": {
             "stride": 1.0,
@@ -1053,13 +1098,22 @@
           "template_animation_id": "breathing-idle",
           "estimated_wait_seconds": 0
         }
-      }
+      },
+      "observed_end_epoch": 1792781025.1543186,
+      "elapsed_observed_seconds": 824.5415546894073,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 4,
+      "archive_output": "history/jyaldi-east-before-west/motions/breathing-idle"
     },
     "83227447-8dd7-480f-8792-56d1ec73f851": {
       "kind": "animation",
       "slug": "jyaldi",
       "template": "walking-8-frames",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792780216.854243,
       "receipt": {
         "background_job_ids": [
@@ -1075,21 +1129,94 @@
       },
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 3.0
         },
         "id": "83227447-8dd7-480f-8792-56d1ec73f851",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-23T18:30:26.500632+00:00",
         "last_response": {
-          "type": "message_progress",
+          "seed": 3948637743,
+          "type": "done",
           "action": "finalizing",
-          "progress": 0.9499498321403592,
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "progress": 1.0,
           "direction": "east",
+          "frame_count": 8,
+          "animation_id": "d30670cc-0d61-4e6f-ae84-c15ee46ef2e8",
           "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+          "storage_urls": {
+            "frames": [
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/d30670cc-0d61-4e6f-ae84-c15ee46ef2e8/east/0.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/d30670cc-0d61-4e6f-ae84-c15ee46ef2e8/east/1.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/d30670cc-0d61-4e6f-ae84-c15ee46ef2e8/east/2.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/d30670cc-0d61-4e6f-ae84-c15ee46ef2e8/east/3.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/d30670cc-0d61-4e6f-ae84-c15ee46ef2e8/east/4.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/d30670cc-0d61-4e6f-ae84-c15ee46ef2e8/east/5.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/d30670cc-0d61-4e6f-ae84-c15ee46ef2e8/east/6.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/d30670cc-0d61-4e6f-ae84-c15ee46ef2e8/east/7.png"
+            ]
+          },
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "6d1d987c-5b1e-4dce-81b8-948dc2413bb4",
           "animation_name": null,
-          "queue_position": 3,
+          "queue_position": 0,
+          "billing_charged": true,
           "generation_model": "skeleton-v3_template",
+          "saved_to_storage": true,
           "animation_group_id": "e7bd558a-c320-4ba1-acaf-b018fc0ac3ed",
           "motion_adjustments": {
             "stride": 1.0,
@@ -1100,15 +1227,24 @@
           "animation_description": "walking confidently with an upright steady torso, measured strides and restrained arm swing",
           "generation_started_at": "2026-10-23T18:30:49.685761+00:00",
           "template_animation_id": "walking-8-frames",
-          "estimated_wait_seconds": 262
+          "estimated_wait_seconds": 0
         }
-      }
+      },
+      "observed_end_epoch": 1792781661.6321344,
+      "elapsed_observed_seconds": 1444.7778918743134,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 8,
+      "archive_output": "history/jyaldi-east-before-west/motions/walking-8-frames"
     },
     "7abf3424-7b93-48da-947d-f6357b0b2874": {
       "kind": "animation",
       "slug": "jyaldi",
       "template": "running-8-frames",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792780229.4643633,
       "receipt": {
         "background_job_ids": [
@@ -1124,21 +1260,94 @@
       },
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 3.0
         },
         "id": "7abf3424-7b93-48da-947d-f6357b0b2874",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-23T18:30:38.282585+00:00",
         "last_response": {
-          "type": "message_progress",
+          "seed": 3325254364,
+          "type": "message_done",
           "action": "finalizing",
-          "progress": 0.9499382295629153,
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "progress": 0.9499879321474268,
           "direction": "east",
+          "frame_count": 8,
+          "animation_id": "b696341d-d757-49c4-bcd9-3787e51170db",
           "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+          "storage_urls": {
+            "frames": [
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/b696341d-d757-49c4-bcd9-3787e51170db/east/0.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/b696341d-d757-49c4-bcd9-3787e51170db/east/1.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/b696341d-d757-49c4-bcd9-3787e51170db/east/2.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/b696341d-d757-49c4-bcd9-3787e51170db/east/3.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/b696341d-d757-49c4-bcd9-3787e51170db/east/4.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/b696341d-d757-49c4-bcd9-3787e51170db/east/5.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/b696341d-d757-49c4-bcd9-3787e51170db/east/6.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/b696341d-d757-49c4-bcd9-3787e51170db/east/7.png"
+            ]
+          },
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "f0b3d63b-dbfa-48ab-8f1e-2f1aa97f53ab",
           "animation_name": null,
-          "queue_position": 6,
+          "queue_position": 0,
+          "billing_charged": true,
           "generation_model": "skeleton-v3_template",
+          "saved_to_storage": true,
           "animation_group_id": "4e7a2ac9-f9f2-42cc-83eb-835cf0062a2e",
           "motion_adjustments": {
             "stride": 1.0,
@@ -1149,9 +1358,18 @@
           "animation_description": "running decisively with a steady torso, controlled arm swing and firm purposeful strides",
           "generation_started_at": "2026-10-23T18:31:08.11423+00:00",
           "template_animation_id": "running-8-frames",
-          "estimated_wait_seconds": 587
+          "estimated_wait_seconds": 0
         }
-      }
+      },
+      "observed_end_epoch": 1792781151.8096724,
+      "elapsed_observed_seconds": 922.3453097343445,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 8,
+      "archive_output": "history/jyaldi-east-before-west/motions/running-8-frames"
     },
     "1a3d97f8-4f8a-490e-afd9-5f5754e87060": {
       "kind": "image",
@@ -1475,7 +1693,7 @@
       "kind": "animation",
       "slug": "jyaldi",
       "template": "running-jump",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792780322.055167,
       "receipt": {
         "background_job_ids": [
@@ -1491,21 +1709,94 @@
       },
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 3.0
         },
         "id": "20c53ac5-eaa5-488f-a5c8-cff4d09e0b59",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-23T18:32:09.023371+00:00",
         "last_response": {
-          "type": "message_progress",
+          "seed": 2164158558,
+          "type": "done",
           "action": "finalizing",
-          "progress": 0.9499630706874502,
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "progress": 1.0,
           "direction": "east",
+          "frame_count": 8,
+          "animation_id": "88c85ccb-be24-428f-b040-5a8edaabe3e3",
           "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+          "storage_urls": {
+            "frames": [
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/88c85ccb-be24-428f-b040-5a8edaabe3e3/east/0.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/88c85ccb-be24-428f-b040-5a8edaabe3e3/east/1.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/88c85ccb-be24-428f-b040-5a8edaabe3e3/east/2.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/88c85ccb-be24-428f-b040-5a8edaabe3e3/east/3.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/88c85ccb-be24-428f-b040-5a8edaabe3e3/east/4.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/88c85ccb-be24-428f-b040-5a8edaabe3e3/east/5.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/88c85ccb-be24-428f-b040-5a8edaabe3e3/east/6.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/88c85ccb-be24-428f-b040-5a8edaabe3e3/east/7.png"
+            ]
+          },
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "531ebe87-603b-4023-bfd2-717ad223558b",
           "animation_name": null,
-          "queue_position": 10,
+          "queue_position": 0,
+          "billing_charged": true,
           "generation_model": "skeleton-v3_template",
+          "saved_to_storage": true,
           "animation_group_id": "47e8b847-f4cd-4872-bfd3-84f289bd42c4",
           "motion_adjustments": {
             "stride": 1.0,
@@ -1516,15 +1807,24 @@
           "animation_description": "running jump",
           "generation_started_at": "2026-10-23T18:32:20.993163+00:00",
           "template_animation_id": "running-jump",
-          "estimated_wait_seconds": 999
+          "estimated_wait_seconds": 0
         }
-      }
+      },
+      "observed_end_epoch": 1792781661.669386,
+      "elapsed_observed_seconds": 1339.6142194271088,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 8,
+      "archive_output": "history/jyaldi-east-before-west/motions/running-jump"
     },
     "1e3ed3a1-22dc-44a3-86ef-9bd03998c486": {
       "kind": "animation",
       "slug": "jyaldi",
       "template": "running-slide",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792780331.9877746,
       "receipt": {
         "background_job_ids": [
@@ -1540,21 +1840,80 @@
       },
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 3.0
         },
         "id": "1e3ed3a1-22dc-44a3-86ef-9bd03998c486",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-23T18:32:22.386348+00:00",
         "last_response": {
-          "type": "message_progress",
+          "seed": 1861091860,
+          "type": "done",
           "action": "finalizing",
-          "progress": 0.9499908718477598,
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "progress": 1.0,
           "direction": "east",
+          "frame_count": 6,
+          "animation_id": "97fe750c-f004-45e1-b598-8d648d74699b",
           "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+          "storage_urls": {
+            "frames": [
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/97fe750c-f004-45e1-b598-8d648d74699b/east/0.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/97fe750c-f004-45e1-b598-8d648d74699b/east/1.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/97fe750c-f004-45e1-b598-8d648d74699b/east/2.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/97fe750c-f004-45e1-b598-8d648d74699b/east/3.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/97fe750c-f004-45e1-b598-8d648d74699b/east/4.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/97fe750c-f004-45e1-b598-8d648d74699b/east/5.png"
+            ]
+          },
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "446336d4-b3d8-458f-b07a-8e9939ee705b",
           "animation_name": null,
-          "queue_position": 6,
+          "queue_position": 0,
+          "billing_charged": true,
           "generation_model": "skeleton-v3_template",
+          "saved_to_storage": true,
           "animation_group_id": "a932cdb0-4016-4583-97fb-80dc044328fa",
           "motion_adjustments": {
             "stride": 1.0,
@@ -1565,15 +1924,24 @@
           "animation_description": "running slide",
           "generation_started_at": "2026-10-23T18:32:35.920266+00:00",
           "template_animation_id": "running-slide",
-          "estimated_wait_seconds": 585
+          "estimated_wait_seconds": 0
         }
-      }
+      },
+      "observed_end_epoch": 1792781151.9149604,
+      "elapsed_observed_seconds": 819.9271862506866,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 6,
+      "archive_output": "history/jyaldi-east-before-west/motions/running-slide"
     },
     "ee2d7d2d-860e-4ff9-b925-f3d9acaf8277": {
       "kind": "animation",
       "slug": "jyaldi",
       "template": "crouched-walking",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792780346.4596634,
       "receipt": {
         "background_job_ids": [
@@ -1589,21 +1957,80 @@
       },
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 3.0
         },
         "id": "ee2d7d2d-860e-4ff9-b925-f3d9acaf8277",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-23T18:32:31.726152+00:00",
         "last_response": {
+          "seed": 4276778985,
           "type": "message_progress",
           "action": "finalizing",
-          "progress": 0.9499586622102351,
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "progress": 1.0,
           "direction": "east",
+          "frame_count": 6,
+          "animation_id": "d2b40713-7078-4787-ad23-ec74e8fb66af",
           "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+          "storage_urls": {
+            "frames": [
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/d2b40713-7078-4787-ad23-ec74e8fb66af/east/0.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/d2b40713-7078-4787-ad23-ec74e8fb66af/east/1.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/d2b40713-7078-4787-ad23-ec74e8fb66af/east/2.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/d2b40713-7078-4787-ad23-ec74e8fb66af/east/3.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/d2b40713-7078-4787-ad23-ec74e8fb66af/east/4.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/d2b40713-7078-4787-ad23-ec74e8fb66af/east/5.png"
+            ]
+          },
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "8f2a1251-d67a-4e57-adcd-ede7fc9bc809",
           "animation_name": null,
-          "queue_position": 8,
+          "queue_position": 0,
+          "billing_charged": true,
           "generation_model": "skeleton-v3_template",
+          "saved_to_storage": true,
           "animation_group_id": "39e4964a-3385-4d99-95da-7c48ff1e3455",
           "motion_adjustments": {
             "stride": 1.0,
@@ -1614,15 +2041,24 @@
           "animation_description": "walking while crouched",
           "generation_started_at": "2026-10-23T18:32:43.741919+00:00",
           "template_animation_id": "crouched-walking",
-          "estimated_wait_seconds": 794
+          "estimated_wait_seconds": 0
         }
-      }
+      },
+      "observed_end_epoch": 1792781151.9204702,
+      "elapsed_observed_seconds": 805.4608068466187,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 6,
+      "archive_output": "history/jyaldi-east-before-west/motions/crouched-walking"
     },
     "e2d99108-cd3c-4e66-b575-dcdeed69cd5b": {
       "kind": "animation",
       "slug": "jyaldi",
       "template": "sad-walk",
-      "status": "processing",
+      "status": "failed",
       "created_epoch": 1792780353.9290974,
       "receipt": {
         "background_job_ids": [
@@ -1638,21 +2074,94 @@
       },
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 3.0
         },
         "id": "e2d99108-cd3c-4e66-b575-dcdeed69cd5b",
-        "status": "processing",
+        "status": "failed",
         "created_at": "2026-10-23T18:32:37.779897+00:00",
         "last_response": {
+          "seed": 97806516,
           "type": "message_progress",
           "action": "finalizing",
-          "progress": 0.9497627172012336,
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "progress": 1.0,
           "direction": "east",
+          "frame_count": 8,
+          "animation_id": "fc9ce303-32fb-498e-8625-43c721d4fa3b",
           "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+          "storage_urls": {
+            "frames": [
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/fc9ce303-32fb-498e-8625-43c721d4fa3b/east/0.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/fc9ce303-32fb-498e-8625-43c721d4fa3b/east/1.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/fc9ce303-32fb-498e-8625-43c721d4fa3b/east/2.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/fc9ce303-32fb-498e-8625-43c721d4fa3b/east/3.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/fc9ce303-32fb-498e-8625-43c721d4fa3b/east/4.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/fc9ce303-32fb-498e-8625-43c721d4fa3b/east/5.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/fc9ce303-32fb-498e-8625-43c721d4fa3b/east/6.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/fc9ce303-32fb-498e-8625-43c721d4fa3b/east/7.png"
+            ]
+          },
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "dee51536-fa6a-477c-88b7-5c81ee4a4298",
           "animation_name": null,
-          "queue_position": 20,
+          "queue_position": 0,
+          "billing_charged": true,
           "generation_model": "skeleton-v3_template",
+          "saved_to_storage": true,
           "animation_group_id": "f1d0e8b4-ae8d-4ff9-ae48-b22b311ab350",
           "motion_adjustments": {
             "stride": 1.0,
@@ -1663,15 +2172,23 @@
           "animation_description": "walking sadly",
           "generation_started_at": "2026-10-23T18:32:59.16647+00:00",
           "template_animation_id": "sad-walk",
-          "estimated_wait_seconds": 2145
+          "estimated_wait_seconds": 0
         }
+      },
+      "archive_output": "history/jyaldi-east-before-west/motions/sad-walk",
+      "observed_end_epoch": 1792781805.2137613,
+      "elapsed_observed_seconds": 1451.2846643924713,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
       }
     },
     "be258cb3-8f10-40de-af51-75fee8b5f1a8": {
       "kind": "animation",
       "slug": "jyaldi",
       "template": "front-flip",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792780359.5629323,
       "receipt": {
         "background_job_ids": [
@@ -1687,21 +2204,80 @@
       },
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 3.0
         },
         "id": "be258cb3-8f10-40de-af51-75fee8b5f1a8",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-23T18:32:43.616633+00:00",
         "last_response": {
-          "type": "message_progress",
+          "seed": 2522549528,
+          "type": "message_done",
           "action": "finalizing",
-          "progress": 0.9499978385743115,
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "progress": 0.99,
           "direction": "east",
+          "frame_count": 6,
+          "animation_id": "aa591ba3-b47e-4e25-86e4-2bedf76d34b9",
           "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+          "storage_urls": {
+            "frames": [
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/aa591ba3-b47e-4e25-86e4-2bedf76d34b9/east/0.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/aa591ba3-b47e-4e25-86e4-2bedf76d34b9/east/1.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/aa591ba3-b47e-4e25-86e4-2bedf76d34b9/east/2.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/aa591ba3-b47e-4e25-86e4-2bedf76d34b9/east/3.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/aa591ba3-b47e-4e25-86e4-2bedf76d34b9/east/4.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/aa591ba3-b47e-4e25-86e4-2bedf76d34b9/east/5.png"
+            ]
+          },
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "5e380ef1-5837-4862-a2cd-b885d4b7cc8f",
           "animation_name": null,
-          "queue_position": 10,
+          "queue_position": 0,
+          "billing_charged": true,
           "generation_model": "skeleton-v3_template",
+          "saved_to_storage": true,
           "animation_group_id": "601cbfbe-9a2b-4875-a842-b6fe5b640074",
           "motion_adjustments": {
             "stride": 1.0,
@@ -1712,15 +2288,24 @@
           "animation_description": "front flip",
           "generation_started_at": "2026-10-23T18:33:14.289163+00:00",
           "template_animation_id": "front-flip",
-          "estimated_wait_seconds": 1027
+          "estimated_wait_seconds": 0
         }
-      }
+      },
+      "observed_end_epoch": 1792781154.6283529,
+      "elapsed_observed_seconds": 795.0654211044312,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 6,
+      "archive_output": "history/jyaldi-east-before-west/motions/front-flip"
     },
     "3eae8f78-2351-4240-a4b2-98b446f3a1b5": {
       "kind": "animation",
       "slug": "jyaldi",
       "template": "backflip",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792780372.9613366,
       "receipt": {
         "background_job_ids": [
@@ -1736,21 +2321,108 @@
       },
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 3.0
         },
         "id": "3eae8f78-2351-4240-a4b2-98b446f3a1b5",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-23T18:33:13.358395+00:00",
         "last_response": {
-          "type": "message_progress",
+          "seed": 3141344454,
+          "type": "done",
           "action": "finalizing",
-          "progress": 0.9496736708693786,
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "progress": 1.0,
           "direction": "east",
+          "frame_count": 10,
+          "animation_id": "c8e3ebdb-8533-47e9-a2e1-32210572a314",
           "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+          "storage_urls": {
+            "frames": [
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/c8e3ebdb-8533-47e9-a2e1-32210572a314/east/0.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/c8e3ebdb-8533-47e9-a2e1-32210572a314/east/1.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/c8e3ebdb-8533-47e9-a2e1-32210572a314/east/2.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/c8e3ebdb-8533-47e9-a2e1-32210572a314/east/3.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/c8e3ebdb-8533-47e9-a2e1-32210572a314/east/4.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/c8e3ebdb-8533-47e9-a2e1-32210572a314/east/5.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/c8e3ebdb-8533-47e9-a2e1-32210572a314/east/6.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/c8e3ebdb-8533-47e9-a2e1-32210572a314/east/7.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/c8e3ebdb-8533-47e9-a2e1-32210572a314/east/8.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/c8e3ebdb-8533-47e9-a2e1-32210572a314/east/9.png"
+            ]
+          },
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "f8ffc7d6-bce2-4514-8e6c-79ad8d330133",
           "animation_name": null,
-          "queue_position": 11,
+          "queue_position": 0,
+          "billing_charged": true,
           "generation_model": "skeleton-v3_template",
+          "saved_to_storage": true,
           "animation_group_id": "68d30996-0f7e-459f-ba79-d0d4a6d48f68",
           "motion_adjustments": {
             "stride": 1.0,
@@ -1761,15 +2433,24 @@
           "animation_description": "backflip",
           "generation_started_at": "2026-10-23T18:34:18.313943+00:00",
           "template_animation_id": "backflip",
-          "estimated_wait_seconds": 1159
+          "estimated_wait_seconds": 0
         }
-      }
+      },
+      "observed_end_epoch": 1792781661.7035062,
+      "elapsed_observed_seconds": 1288.7421698570251,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 10,
+      "archive_output": "history/jyaldi-east-before-west/motions/backflip"
     },
     "12c55bf7-5e4a-48b6-8536-aeac9c52fd58": {
       "kind": "animation",
       "slug": "jyaldi",
       "template": "jumping-1",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792780411.8495963,
       "receipt": {
         "background_job_ids": [
@@ -1785,21 +2466,101 @@
       },
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 3.0
         },
         "id": "12c55bf7-5e4a-48b6-8536-aeac9c52fd58",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-23T18:33:42.837306+00:00",
         "last_response": {
-          "type": "message_progress",
+          "seed": 2696848004,
+          "type": "done",
           "action": "finalizing",
-          "progress": 0.9497538078036772,
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "progress": 1.0,
           "direction": "east",
+          "frame_count": 9,
+          "animation_id": "1b5108d2-d573-4fa2-a145-6f9a10449427",
           "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+          "storage_urls": {
+            "frames": [
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/1b5108d2-d573-4fa2-a145-6f9a10449427/east/0.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/1b5108d2-d573-4fa2-a145-6f9a10449427/east/1.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/1b5108d2-d573-4fa2-a145-6f9a10449427/east/2.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/1b5108d2-d573-4fa2-a145-6f9a10449427/east/3.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/1b5108d2-d573-4fa2-a145-6f9a10449427/east/4.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/1b5108d2-d573-4fa2-a145-6f9a10449427/east/5.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/1b5108d2-d573-4fa2-a145-6f9a10449427/east/6.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/1b5108d2-d573-4fa2-a145-6f9a10449427/east/7.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/1b5108d2-d573-4fa2-a145-6f9a10449427/east/8.png"
+            ]
+          },
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "bf4a47cc-41d8-4bdf-94d0-a4f9515c5b60",
           "animation_name": null,
-          "queue_position": 11,
+          "queue_position": 0,
+          "billing_charged": true,
           "generation_model": "skeleton-v3_template",
+          "saved_to_storage": true,
           "animation_group_id": "05739c03-4ac1-4303-a232-a9369c6ecfcf",
           "motion_adjustments": {
             "stride": 1.0,
@@ -1810,15 +2571,24 @@
           "animation_description": "jumping",
           "generation_started_at": "2026-10-23T18:34:23.129143+00:00",
           "template_animation_id": "jumping-1",
-          "estimated_wait_seconds": 1195
+          "estimated_wait_seconds": 0
         }
-      }
+      },
+      "observed_end_epoch": 1792781661.7286317,
+      "elapsed_observed_seconds": 1249.8790357112885,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 9,
+      "archive_output": "history/jyaldi-east-before-west/motions/jumping-1"
     },
     "d188f155-3ae4-4533-8ee4-a017918d68d5": {
       "kind": "animation",
       "slug": "jyaldi",
       "template": "jumping-2",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792780429.9372332,
       "receipt": {
         "background_job_ids": [
@@ -1834,21 +2604,94 @@
       },
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 3.0
         },
         "id": "d188f155-3ae4-4533-8ee4-a017918d68d5",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-23T18:33:56.372578+00:00",
         "last_response": {
-          "type": "message_progress",
+          "seed": 4282964626,
+          "type": "done",
           "action": "finalizing",
-          "progress": 0.9499933445994293,
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "progress": 1.0,
           "direction": "east",
+          "frame_count": 8,
+          "animation_id": "8473f0a3-2d90-46f2-afc2-a8434d597bab",
           "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+          "storage_urls": {
+            "frames": [
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/8473f0a3-2d90-46f2-afc2-a8434d597bab/east/0.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/8473f0a3-2d90-46f2-afc2-a8434d597bab/east/1.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/8473f0a3-2d90-46f2-afc2-a8434d597bab/east/2.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/8473f0a3-2d90-46f2-afc2-a8434d597bab/east/3.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/8473f0a3-2d90-46f2-afc2-a8434d597bab/east/4.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/8473f0a3-2d90-46f2-afc2-a8434d597bab/east/5.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/8473f0a3-2d90-46f2-afc2-a8434d597bab/east/6.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/8473f0a3-2d90-46f2-afc2-a8434d597bab/east/7.png"
+            ]
+          },
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "e22f664c-0543-44e1-95a1-0cde52fdf55e",
           "animation_name": null,
-          "queue_position": 16,
+          "queue_position": 0,
+          "billing_charged": true,
           "generation_model": "skeleton-v3_template",
+          "saved_to_storage": true,
           "animation_group_id": "33f5e645-ddb7-43cf-b558-73c444c55a12",
           "motion_adjustments": {
             "stride": 1.0,
@@ -1859,15 +2702,24 @@
           "animation_description": "jumping",
           "generation_started_at": "2026-10-23T18:34:13.06784+00:00",
           "template_animation_id": "jumping-2",
-          "estimated_wait_seconds": 1742
+          "estimated_wait_seconds": 0
         }
-      }
+      },
+      "observed_end_epoch": 1792781661.7498457,
+      "elapsed_observed_seconds": 1231.812612771988,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 8,
+      "archive_output": "history/jyaldi-east-before-west/motions/jumping-2"
     },
     "42f5a655-5dcb-4294-b435-c657b5721482": {
       "kind": "animation",
       "slug": "jyaldi",
       "template": "two-footed-jump",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792780439.498037,
       "receipt": {
         "background_job_ids": [
@@ -1883,21 +2735,87 @@
       },
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 3.0
         },
         "id": "42f5a655-5dcb-4294-b435-c657b5721482",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-23T18:34:08.874687+00:00",
         "last_response": {
-          "type": "message_progress",
+          "seed": 1246901562,
+          "type": "done",
           "action": "finalizing",
-          "progress": 0.9499956838788218,
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "progress": 1.0,
           "direction": "east",
+          "frame_count": 7,
+          "animation_id": "08471a02-d2ea-490e-a007-251de9f9545c",
           "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+          "storage_urls": {
+            "frames": [
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/08471a02-d2ea-490e-a007-251de9f9545c/east/0.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/08471a02-d2ea-490e-a007-251de9f9545c/east/1.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/08471a02-d2ea-490e-a007-251de9f9545c/east/2.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/08471a02-d2ea-490e-a007-251de9f9545c/east/3.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/08471a02-d2ea-490e-a007-251de9f9545c/east/4.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/08471a02-d2ea-490e-a007-251de9f9545c/east/5.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/08471a02-d2ea-490e-a007-251de9f9545c/east/6.png"
+            ]
+          },
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "f573e571-83eb-4b37-9743-e50d3c629f5c",
           "animation_name": null,
-          "queue_position": 13,
+          "queue_position": 0,
+          "billing_charged": true,
           "generation_model": "skeleton-v3_template",
+          "saved_to_storage": true,
           "animation_group_id": "d1211797-55a9-46b8-bae4-be57a80d706c",
           "motion_adjustments": {
             "stride": 1.0,
@@ -1908,15 +2826,24 @@
           "animation_description": "two footed jump",
           "generation_started_at": "2026-10-23T18:34:14.627959+00:00",
           "template_animation_id": "two-footed-jump",
-          "estimated_wait_seconds": 1355
+          "estimated_wait_seconds": 0
         }
-      }
+      },
+      "observed_end_epoch": 1792781661.7787867,
+      "elapsed_observed_seconds": 1222.280749797821,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 7,
+      "archive_output": "history/jyaldi-east-before-west/motions/two-footed-jump"
     },
     "bfd08828-e4de-461d-ad55-c84a3dfeb679": {
       "kind": "animation",
       "slug": "jyaldi",
       "template": "drinking",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792780450.7838085,
       "receipt": {
         "background_job_ids": [
@@ -1932,21 +2859,80 @@
       },
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 3.0
         },
         "id": "bfd08828-e4de-461d-ad55-c84a3dfeb679",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-23T18:34:21.168598+00:00",
         "last_response": {
-          "type": "message_progress",
+          "seed": 3521660822,
+          "type": "done",
           "action": "finalizing",
-          "progress": 0.9499946378637918,
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "progress": 1.0,
           "direction": "south-east",
+          "frame_count": 6,
+          "animation_id": "dd23d0f5-5ca5-4580-a449-24b240346d68",
           "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+          "storage_urls": {
+            "frames": [
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/dd23d0f5-5ca5-4580-a449-24b240346d68/south-east/0.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/dd23d0f5-5ca5-4580-a449-24b240346d68/south-east/1.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/dd23d0f5-5ca5-4580-a449-24b240346d68/south-east/2.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/dd23d0f5-5ca5-4580-a449-24b240346d68/south-east/3.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/dd23d0f5-5ca5-4580-a449-24b240346d68/south-east/4.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/dd23d0f5-5ca5-4580-a449-24b240346d68/south-east/5.png"
+            ]
+          },
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "1dba8e5a-14c7-432a-8118-8a103972e049",
           "animation_name": null,
-          "queue_position": 16,
+          "queue_position": 0,
+          "billing_charged": true,
           "generation_model": "skeleton-v3_template",
+          "saved_to_storage": true,
           "animation_group_id": "5f91faf9-3c67-472e-a8c5-d7d1480b503c",
           "motion_adjustments": {
             "stride": 1.0,
@@ -1957,15 +2943,24 @@
           "animation_description": "drinking",
           "generation_started_at": "2026-10-23T18:34:45.851344+00:00",
           "template_animation_id": "drinking",
-          "estimated_wait_seconds": 1674
+          "estimated_wait_seconds": 0
         }
-      }
+      },
+      "observed_end_epoch": 1792781661.79374,
+      "elapsed_observed_seconds": 1211.0099318027496,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 6,
+      "archive_output": "history/jyaldi-east-before-west/motions/drinking"
     },
     "88c8e391-1c49-44a8-bcae-d7ee982ca57f": {
       "kind": "animation",
       "slug": "jyaldi",
       "template": "picking-up",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792780462.9543135,
       "receipt": {
         "background_job_ids": [
@@ -1981,21 +2976,73 @@
       },
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 3.0
         },
         "id": "88c8e391-1c49-44a8-bcae-d7ee982ca57f",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-23T18:34:24.414162+00:00",
         "last_response": {
-          "type": "message_progress",
+          "seed": 789688552,
+          "type": "done",
           "action": "finalizing",
-          "progress": 0.9499996619934885,
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "progress": 1.0,
           "direction": "east",
+          "frame_count": 5,
+          "animation_id": "40af9a4f-775c-497d-b2e1-db881ab64a55",
           "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+          "storage_urls": {
+            "frames": [
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/40af9a4f-775c-497d-b2e1-db881ab64a55/east/0.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/40af9a4f-775c-497d-b2e1-db881ab64a55/east/1.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/40af9a4f-775c-497d-b2e1-db881ab64a55/east/2.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/40af9a4f-775c-497d-b2e1-db881ab64a55/east/3.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/40af9a4f-775c-497d-b2e1-db881ab64a55/east/4.png"
+            ]
+          },
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "8808bd08-80ce-4582-b3a2-058776d350af",
           "animation_name": null,
-          "queue_position": 11,
+          "queue_position": 0,
+          "billing_charged": true,
           "generation_model": "skeleton-v3_template",
+          "saved_to_storage": true,
           "animation_group_id": "071c3c12-cc09-4e53-b6d0-bbac428cfd15",
           "motion_adjustments": {
             "stride": 1.0,
@@ -2006,9 +3053,18 @@
           "animation_description": "picking up",
           "generation_started_at": "2026-10-23T18:34:30.045348+00:00",
           "template_animation_id": "picking-up",
-          "estimated_wait_seconds": 1166
+          "estimated_wait_seconds": 0
         }
-      }
+      },
+      "observed_end_epoch": 1792781159.9655447,
+      "elapsed_observed_seconds": 697.0112316608429,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 5,
+      "archive_output": "history/jyaldi-east-before-west/motions/picking-up"
     },
     "a996f9f5-1eb1-41e6-a7af-377263cff9b3": {
       "kind": "registration",
@@ -2033,16 +3089,18 @@
         "status": "processing",
         "created_at": "2026-10-23T18:35:49.802536+00:00",
         "last_response": {
-          "status": "correcting_frames",
-          "progress": 0.84,
+          "status": "building_skeleton",
+          "progress": 0.98,
           "character_id": "8fc35b6a-3e82-4148-8ed1-db3481d8cede",
           "n_directions": 8,
           "character_name": "에일린",
           "queue_position": 0,
           "directions_type": "8-directions",
           "generation_mode": "v3",
+          "skeleton_frames_done": 1,
           "character_description": "에일린 / Aileen. Adult woman early20s, faded platinum blonde hair in a high ponytail with long bangs, dull gray eyes, serious analytical face, petite compact athletic build, practical fitted black trouser suit and black closed shoes as in her original portrait. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
-          "generation_started_at": "2026-10-23T18:35:52.929603+00:00"
+          "generation_started_at": "2026-10-23T18:35:52.929603+00:00",
+          "skeleton_frames_total": 8
         }
       }
     },
@@ -2069,16 +3127,18 @@
         "status": "processing",
         "created_at": "2026-10-23T18:36:01.697758+00:00",
         "last_response": {
-          "status": "correcting_frames",
-          "progress": 0.84,
+          "status": "building_skeleton",
+          "progress": 0.98,
           "character_id": "7cf2502d-e2e9-4677-bc53-ec1b9d76a11d",
           "n_directions": 8,
           "character_name": "큐라스",
           "queue_position": 0,
           "directions_type": "8-directions",
           "generation_mode": "v3",
+          "skeleton_frames_done": 3,
           "character_description": "큐라스 / Kyuras. Adult man early30s, thin wiry build, pale green hair swept back, narrow face, gray green eyes, lively confident smile, black tailored trouser suit, white shirt, black necktie and black shoes. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
-          "generation_started_at": "2026-10-23T18:36:07.086531+00:00"
+          "generation_started_at": "2026-10-23T18:36:07.086531+00:00",
+          "skeleton_frames_total": 8
         }
       }
     },
@@ -2086,7 +3146,7 @@
       "kind": "registration",
       "slug": "geshugan",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792780580.8578606,
       "receipt": {
         "usage": null,
@@ -2098,24 +3158,41 @@
       },
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 4.0
         },
         "id": "66bfcf1b-fcce-44ef-b0f4-2986e0e1c331",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-23T18:36:25.050316+00:00",
         "last_response": {
-          "status": "correcting_frames",
-          "progress": 0.84,
+          "status": "completed",
           "character_id": "a3af18df-782b-44d0-9fa6-c05ee03d84ab",
-          "n_directions": 8,
+          "storage_urls": {
+            "east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/a3af18df-782b-44d0-9fa6-c05ee03d84ab/rotations/east.png",
+            "west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/a3af18df-782b-44d0-9fa6-c05ee03d84ab/rotations/west.png",
+            "north": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/a3af18df-782b-44d0-9fa6-c05ee03d84ab/rotations/north.png",
+            "south": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/a3af18df-782b-44d0-9fa6-c05ee03d84ab/rotations/south.png",
+            "north-east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/a3af18df-782b-44d0-9fa6-c05ee03d84ab/rotations/north-east.png",
+            "north-west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/a3af18df-782b-44d0-9fa6-c05ee03d84ab/rotations/north-west.png",
+            "south-east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/a3af18df-782b-44d0-9fa6-c05ee03d84ab/rotations/south-east.png",
+            "south-west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/a3af18df-782b-44d0-9fa6-c05ee03d84ab/rotations/south-west.png"
+          },
+          "billing_usage": {
+            "type": "generations",
+            "generations": 4.0
+          },
           "character_name": "게슈간",
-          "queue_position": 0,
           "directions_type": "8-directions",
           "generation_mode": "v3",
-          "character_description": "게슈간 / Geshugan. Adult woman mid20s, short snow white blunt bob with bangs, cold clear blue eyes, athletic toned natural build, impassive face, loose white open collar long sleeve shirt with sleeves rolled to elbows, black business trousers and black shoes. No necktie. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
-          "generation_started_at": "2026-10-23T18:36:28.231236+00:00"
+          "directions_count": 8,
+          "character_description": "게슈간 / Geshugan. Adult woman mid20s, short snow white blunt bob with bangs, cold clear blue eyes, athletic toned natural build, impassive face, loose white open collar long sleeve shirt with sleeves rolled to elbows, black business trousers and black shoes. No necktie. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow."
         }
+      },
+      "observed_end_epoch": 1792781805.213988,
+      "elapsed_observed_seconds": 1224.3561277389526,
+      "usage": {
+        "type": "generations",
+        "generations": 4.0
       }
     },
     "cb41e6eb-69d9-44e7-8d23-c904d87f016c": {
@@ -2141,16 +3218,18 @@
         "status": "processing",
         "created_at": "2026-10-23T18:36:30.120379+00:00",
         "last_response": {
-          "status": "correcting_frames",
-          "progress": 0.84,
+          "status": "building_skeleton",
+          "progress": 0.98,
           "character_id": "27643078-cb88-455f-abf5-3be5bdb3ff68",
           "n_directions": 8,
           "character_name": "로제몬",
           "queue_position": 0,
           "directions_type": "8-directions",
           "generation_mode": "v3",
+          "skeleton_frames_done": 3,
           "character_description": "로제몬 / Rojemon. Adult woman early20s, long wavy lavender purple hair and bangs, violet eyes, petite natural adult build and defined waist, mildly annoyed expression, fitted black office skirt suit, white shirt, black necktie and black office pumps. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
-          "generation_started_at": "2026-10-23T18:36:31.426452+00:00"
+          "generation_started_at": "2026-10-23T18:36:31.426452+00:00",
+          "skeleton_frames_total": 8
         }
       }
     },
@@ -2177,16 +3256,18 @@
         "status": "processing",
         "created_at": "2026-10-23T18:36:34.718701+00:00",
         "last_response": {
-          "status": "correcting_frames",
-          "progress": 0.84,
+          "status": "building_skeleton",
+          "progress": 0.98,
           "character_id": "1cfdc1a3-19f6-4c87-85c5-e59329f657f5",
           "n_directions": 8,
           "character_name": "콘쥬스",
           "queue_position": 0,
           "directions_type": "8-directions",
           "generation_mode": "v3",
+          "skeleton_frames_done": 6,
           "character_description": "콘쥬스 / Konjyuce. 17 year old Korean schoolgirl with ordinary age appropriate teen proportions, shoulder length straight black bob with one distinctive pink streak, blue eyes, determined youthful face. Fully clothed navy school uniform blazer with light piping, white collared shirt, black necktie, gray knee length pleated school skirt, dark socks and plain black school loafers. No adult glamour styling. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
-          "generation_started_at": "2026-10-23T18:36:40.97804+00:00"
+          "generation_started_at": "2026-10-23T18:36:40.97804+00:00",
+          "skeleton_frames_total": 8
         }
       }
     },
@@ -2303,6 +3384,124 @@
           "generation_started_at": "2026-10-23T18:40:03.779419+00:00"
         }
       }
+    },
+    "1c807537-5a53-434b-87ed-56fa81686f57": {
+      "kind": "animation",
+      "slug": "jyaldi",
+      "template": "pushing",
+      "status": "failed",
+      "created_epoch": 1792781038.8924391,
+      "receipt": {
+        "background_job_ids": [
+          "1c807537-5a53-434b-87ed-56fa81686f57"
+        ],
+        "directions": [
+          "east"
+        ],
+        "animation_group_id": "1eca4d14-c806-4fe8-a12b-0bfc30a00b9b",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      },
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "1c807537-5a53-434b-87ed-56fa81686f57",
+        "status": "failed",
+        "created_at": "2026-10-23T18:44:13.380863+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "action": "finalizing",
+          "progress": 0.9495564924192439,
+          "direction": "east",
+          "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+          "animation_name": null,
+          "queue_position": 12,
+          "generation_model": "skeleton-v3_template",
+          "animation_group_id": "1eca4d14-c806-4fe8-a12b-0bfc30a00b9b",
+          "motion_adjustments": {
+            "stride": 1.0,
+            "posture": 0.0,
+            "arm_swing": 1.0,
+            "leg_extension": 0.0
+          },
+          "animation_description": "pushing",
+          "generation_started_at": "2026-10-23T18:44:41.829782+00:00",
+          "template_animation_id": "pushing",
+          "estimated_wait_seconds": 1217
+        }
+      },
+      "archive_output": "history/jyaldi-east-before-west/motions/pushing",
+      "observed_end_epoch": 1792781805.2140474,
+      "elapsed_observed_seconds": 766.321608543396,
+      "usage": {
+        "type": "usd",
+        "usd": 0.0
+      }
+    },
+    "d880b4d6-e420-4c02-be2b-707400f634ed": {
+      "kind": "animation",
+      "slug": "jyaldi",
+      "template": "pull-heavy-object",
+      "status": "cancelled",
+      "created_epoch": 1792781169.44,
+      "receipt": {
+        "recovered_from_pending_job": true
+      },
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "d880b4d6-e420-4c02-be2b-707400f634ed",
+        "status": "processing",
+        "created_at": "2026-10-23T18:46:32.701369+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "action": "finalizing",
+          "progress": 0.9420367950777724,
+          "direction": "east",
+          "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+          "animation_name": null,
+          "queue_position": 17,
+          "generation_model": "skeleton-v3_template",
+          "animation_group_id": "c824c935-f172-41b7-b855-1249911b1abf",
+          "motion_adjustments": {
+            "stride": 1.0,
+            "posture": 0.0,
+            "arm_swing": 1.0,
+            "leg_extension": 0.0
+          },
+          "animation_description": "pull heavy object",
+          "generation_started_at": "2026-10-23T18:47:48.756442+00:00",
+          "template_animation_id": "pull-heavy-object",
+          "estimated_wait_seconds": 1844
+        }
+      },
+      "archive_output": "history/jyaldi-east-before-west/motions/pull-heavy-object"
+    },
+    "9331805a-b8b1-4a62-9ed2-ac8281cb96f9": {
+      "kind": "image",
+      "slug": "gognija",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792781814.773056,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "9331805a-b8b1-4a62-9ed2-ac8281cb96f9",
+        "image_id": "97b386d8-c4d0-5b15-beda-2681f339b883",
+        "source_image_id": "97b386d8-c4d0-5b15-beda-2681f339b883",
+        "status": "processing",
+        "output_count": 1,
+        "image_size": {
+          "width": 128,
+          "height": 256
+        },
+        "estimated_generations": 9,
+        "pricing_provisional": true
+      }
     }
   },
   "characters": {
@@ -2313,27 +3512,15 @@
       "image": "78793c7b-f45f-48a6-ab11-0c1d97f86333",
       "registration": "1a54d3e6-c143-4b60-9c05-2929c084a4cd",
       "motions": {
-        "breathing-idle": "313da381-5ebe-43ab-997b-d1eb55f6aa2f",
-        "walking-8-frames": "83227447-8dd7-480f-8792-56d1ec73f851",
-        "running-8-frames": "7abf3424-7b93-48da-947d-f6357b0b2874",
-        "running-jump": "20c53ac5-eaa5-488f-a5c8-cff4d09e0b59",
-        "running-slide": "1e3ed3a1-22dc-44a3-86ef-9bd03998c486",
-        "crouched-walking": "ee2d7d2d-860e-4ff9-b925-f3d9acaf8277",
-        "sad-walk": "e2d99108-cd3c-4e66-b575-dcdeed69cd5b",
-        "front-flip": "be258cb3-8f10-40de-af51-75fee8b5f1a8",
-        "backflip": "3eae8f78-2351-4240-a4b2-98b446f3a1b5",
-        "jumping-1": "12c55bf7-5e4a-48b6-8536-aeac9c52fd58",
-        "jumping-2": "d188f155-3ae4-4533-8ee4-a017918d68d5",
-        "two-footed-jump": "42f5a655-5dcb-4294-b435-c657b5721482",
-        "drinking": "bfd08828-e4de-461d-ad55-c84a3dfeb679",
-        "picking-up": "88c8e391-1c49-44a8-bcae-d7ee982ca57f"
+        "breathing-idle": "submitting:1792781884584"
       },
       "ready": true,
       "rebuild_after_direction_policy": true,
       "image_verified": true,
       "skeleton_joints": 18,
       "rotation_count": 8,
-      "exported": false
+      "exported": false,
+      "motion_direction_revision": "west-southwest"
     },
     "spangdal": {
       "name": "스팡달",
@@ -2417,8 +3604,10 @@
       "image": "62740c2d-eb38-4eba-8555-357190310a70",
       "registration": "66bfcf1b-fcce-44ef-b0f4-2986e0e1c331",
       "motions": {},
-      "ready": false,
-      "image_verified": true
+      "ready": true,
+      "image_verified": true,
+      "skeleton_joints": 18,
+      "rotation_count": 8
     },
     "rojemon": {
       "name": "로제몬",
@@ -2444,7 +3633,7 @@
       "name": "고그니쟈",
       "group": "management",
       "character_id": null,
-      "image": null,
+      "image": "9331805a-b8b1-4a62-9ed2-ac8281cb96f9",
       "registration": null,
       "motions": {},
       "ready": false
@@ -4548,9 +5737,431 @@
           "enhance_usage": null
         }
       }
+    },
+    {
+      "at": "2026-10-23T18:43:45Z",
+      "kind": "completed",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "breathing-idle",
+        "job_id": "313da381-5ebe-43ab-997b-d1eb55f6aa2f",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T18:44:23Z",
+      "kind": "submitted",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "pushing",
+        "job_id": "1c807537-5a53-434b-87ed-56fa81686f57",
+        "receipt": {
+          "background_job_ids": [
+            "1c807537-5a53-434b-87ed-56fa81686f57"
+          ],
+          "directions": [
+            "east"
+          ],
+          "animation_group_id": "1eca4d14-c806-4fe8-a12b-0bfc30a00b9b",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T18:45:51Z",
+      "kind": "completed",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "running-8-frames",
+        "job_id": "7abf3424-7b93-48da-947d-f6357b0b2874",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T18:45:51Z",
+      "kind": "completed",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "running-slide",
+        "job_id": "1e3ed3a1-22dc-44a3-86ef-9bd03998c486",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T18:45:51Z",
+      "kind": "completed",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "crouched-walking",
+        "job_id": "ee2d7d2d-860e-4ff9-b925-f3d9acaf8277",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T18:45:54Z",
+      "kind": "completed",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "front-flip",
+        "job_id": "be258cb3-8f10-40de-af51-75fee8b5f1a8",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T18:45:59Z",
+      "kind": "completed",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "picking-up",
+        "job_id": "88c8e391-1c49-44a8-bcae-d7ee982ca57f",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T18:54:21Z",
+      "kind": "completed",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "walking-8-frames",
+        "job_id": "83227447-8dd7-480f-8792-56d1ec73f851",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T18:54:21Z",
+      "kind": "completed",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "running-jump",
+        "job_id": "20c53ac5-eaa5-488f-a5c8-cff4d09e0b59",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T18:54:21Z",
+      "kind": "completed",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "backflip",
+        "job_id": "3eae8f78-2351-4240-a4b2-98b446f3a1b5",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T18:54:21Z",
+      "kind": "completed",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "jumping-1",
+        "job_id": "12c55bf7-5e4a-48b6-8536-aeac9c52fd58",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T18:54:21Z",
+      "kind": "completed",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "jumping-2",
+        "job_id": "d188f155-3ae4-4533-8ee4-a017918d68d5",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T18:54:21Z",
+      "kind": "completed",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "two-footed-jump",
+        "job_id": "42f5a655-5dcb-4294-b435-c657b5721482",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T18:54:21Z",
+      "kind": "completed",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "drinking",
+        "job_id": "bfd08828-e4de-461d-ad55-c84a3dfeb679",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T18:56:45Z",
+      "kind": "failed",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "sad-walk",
+        "job_id": "e2d99108-cd3c-4e66-b575-dcdeed69cd5b",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": {
+          "seed": 97806516,
+          "type": "message_progress",
+          "action": "finalizing",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "progress": 1.0,
+          "direction": "east",
+          "frame_count": 8,
+          "animation_id": "fc9ce303-32fb-498e-8625-43c721d4fa3b",
+          "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+          "storage_urls": {
+            "frames": [
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/fc9ce303-32fb-498e-8625-43c721d4fa3b/east/0.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/fc9ce303-32fb-498e-8625-43c721d4fa3b/east/1.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/fc9ce303-32fb-498e-8625-43c721d4fa3b/east/2.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/fc9ce303-32fb-498e-8625-43c721d4fa3b/east/3.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/fc9ce303-32fb-498e-8625-43c721d4fa3b/east/4.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/fc9ce303-32fb-498e-8625-43c721d4fa3b/east/5.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/fc9ce303-32fb-498e-8625-43c721d4fa3b/east/6.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/fc9ce303-32fb-498e-8625-43c721d4fa3b/east/7.png"
+            ]
+          },
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "dee51536-fa6a-477c-88b7-5c81ee4a4298",
+          "animation_name": null,
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_model": "skeleton-v3_template",
+          "saved_to_storage": true,
+          "animation_group_id": "f1d0e8b4-ae8d-4ff9-ae48-b22b311ab350",
+          "motion_adjustments": {
+            "stride": 1.0,
+            "posture": 0.0,
+            "arm_swing": 1.0,
+            "leg_extension": 0.0
+          },
+          "animation_description": "walking sadly",
+          "generation_started_at": "2026-10-23T18:32:59.16647+00:00",
+          "template_animation_id": "sad-walk",
+          "estimated_wait_seconds": 0
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T18:56:45Z",
+      "kind": "completed",
+      "slug": "geshugan",
+      "detail": {
+        "kind": "registration",
+        "template": null,
+        "job_id": "66bfcf1b-fcce-44ef-b0f4-2986e0e1c331",
+        "usage": {
+          "type": "generations",
+          "generations": 4.0
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T18:56:45Z",
+      "kind": "failed",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "pushing",
+        "job_id": "1c807537-5a53-434b-87ed-56fa81686f57",
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "detail": {
+          "type": "message_progress",
+          "action": "finalizing",
+          "progress": 0.9495564924192439,
+          "direction": "east",
+          "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+          "animation_name": null,
+          "queue_position": 12,
+          "generation_model": "skeleton-v3_template",
+          "animation_group_id": "1eca4d14-c806-4fe8-a12b-0bfc30a00b9b",
+          "motion_adjustments": {
+            "stride": 1.0,
+            "posture": 0.0,
+            "arm_swing": 1.0,
+            "leg_extension": 0.0
+          },
+          "animation_description": "pushing",
+          "generation_started_at": "2026-10-23T18:44:41.829782+00:00",
+          "template_animation_id": "pushing",
+          "estimated_wait_seconds": 1217
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T18:56:54Z",
+      "kind": "character-ready",
+      "slug": "geshugan",
+      "detail": {
+        "3d_joints": 18,
+        "directions": 8
+      }
+    },
+    {
+      "at": "2026-10-23T18:58:04Z",
+      "kind": "submitted",
+      "slug": "gognija",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "9331805a-b8b1-4a62-9ed2-ac8281cb96f9",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "9331805a-b8b1-4a62-9ed2-ac8281cb96f9",
+          "image_id": "97b386d8-c4d0-5b15-beda-2681f339b883",
+          "source_image_id": "97b386d8-c4d0-5b15-beda-2681f339b883",
+          "status": "processing",
+          "output_count": 1,
+          "image_size": {
+            "width": 128,
+            "height": 256
+          },
+          "estimated_generations": 9,
+          "pricing_provisional": true
+        }
+      }
     }
   ],
-  "updated_at": 1792780990.6951685,
+  "updated_at": 1792781884.5843854,
   "user_stopped_at": 1792778235.6917784,
   "archived_jobs": {
     "304457e9-6577-44f0-af17-97841a9f6720": {
@@ -5873,14 +7484,14 @@
   "summary": {
     "jobs": {
       "processing": 20,
-      "completed": 20,
+      "completed": 21,
       "failed": 0,
       "stalled": 0
     },
     "characters_ready": 4,
     "characters_total": 55,
     "images_verified": 10,
-    "motions_submitted": 14,
+    "motions_submitted": 15,
     "motions_target": 1100
   },
   "applied_repairs": [

@@ -18,5 +18,17 @@
   },
   "motion_allowed_slugs": [
     "jyaldi"
-  ]
+  ],
+  "character_direction_overrides": {
+    "jyaldi": {
+      "movement_and_combat": "west",
+      "stationary_noncombat": "south-west",
+      "reason": "User: asymmetric hair obscures face in east; west and southwest show face."
+    },
+    "spangdal": {
+      "movement_and_combat": "west",
+      "stationary_noncombat": "south-west",
+      "reason": "Actual generated east side face hidden by bob; west and southwest face visibly exposed."
+    }
+  }
 }

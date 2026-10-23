@@ -1,0 +1,13 @@
+{
+  "jsonrpc": "2.0",
+  "id": 2,
+  "result": {
+    "content": [
+      {
+        "type": "text",
+        "text": "9 jobs:\nd880b4d6-e420-4c02-be2b-707400f634ed processing 94%, eta ~60s (generation, 7m26s old)\n1c807537-5a53-434b-87ed-56fa81686f57 processing 94%, eta ~60s (generation, 9m45s old)\n5c0844e8-919f-4527-b663-d748a43fc2a1 processing 84%, eta ~900s (v3, 14m2s old)\ncad7e67c-dfc7-49fc-8681-18ac2e1070d0 processing 95%, eta ~60s (v3, 17m24s old)\ncb41e6eb-69d9-44e7-8d23-c904d87f016c processing 95%, eta ~60s (v3, 17m28s old)\n66bfcf1b-fcce-44ef-b0f4-2986e0e1c331 processing 95%, eta ~60s (v3, 17m33s old)\nb304d6f1-31b5-4a0f-a28c-9c625d4b0fdc processing 95%, eta ~60s (v3, 17m57s old)\na996f9f5-1eb1-41e6-a7af-377263cff9b3 processing 87%, eta ~162s (v3, 18m9s old)\ne2d99108-cd3c-4e66-b575-dcdeed69cd5b processing 94%, eta ~60s (generation, 21m21s old)\nhint: cancel_job(job_id=\"...\") to release a stuck job's concurrency slot"
+      }
+    ],
+    "isError": false
+  }
+}

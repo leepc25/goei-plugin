@@ -3,7 +3,7 @@
   "mode": "skeleton-v3",
   "template_animation_id": "breathing-idle",
   "directions": [
-    "south-east"
+    "south-west"
   ],
-  "animation_name": "숨쉬기 대기 (남동)"
+  "animation_name": "숨쉬기 대기 (남서)"
 }
