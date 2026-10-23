@@ -1,0 +1,50 @@
+{
+  "reason": "3프레임 앞 주먹 아래 분리된 회색 세로 잔상,1프레임 머리 끝 외곽 회색 흔적 발견. 투명 외곽 기준에 따라 반려.",
+  "group": {
+    "animation_type": "cross-punch",
+    "display_name": null,
+    "animation_group_id": "6ea7c70e-1e39-4788-8c33-d9d9246528b8",
+    "directions": [
+      {
+        "direction": "west",
+        "frame_count": 6,
+        "frames": [
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/ea487e3f-5733-4c9e-a1fe-a8e991796954/west/0.png?t=1792798115",
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/ea487e3f-5733-4c9e-a1fe-a8e991796954/west/1.png?t=1792798115",
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/ea487e3f-5733-4c9e-a1fe-a8e991796954/west/2.png?t=1792798115",
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/ea487e3f-5733-4c9e-a1fe-a8e991796954/west/3.png?t=1792798115",
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/ea487e3f-5733-4c9e-a1fe-a8e991796954/west/4.png?t=1792798115",
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/ea487e3f-5733-4c9e-a1fe-a8e991796954/west/5.png?t=1792798115"
+        ]
+      }
+    ]
+  },
+  "at": 1792798373.3836932,
+  "state_before": {
+    "name": "쟈알디",
+    "group": "management",
+    "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+    "image": "78793c7b-f45f-48a6-ab11-0c1d97f86333",
+    "registration": "1a54d3e6-c143-4b60-9c05-2929c084a4cd",
+    "motions": {
+      "walking-8-frames": "3cddea2e-3a66-4291-a79c-2be803461b07",
+      "breathing-idle": "45bc5aa1-2298-47fe-98f3-6f3981d3fca2",
+      "crouched-walking": "8c4f0d0e-1cec-44ba-a650-a0f1e699b6da",
+      "sad-walk": "c137cbd9-879d-44da-ba60-da04402748bf",
+      "jumping-1": "2c93eba5-670d-4a12-92f9-1b729b26c869",
+      "drinking": "9572ea4b-422f-458e-bc0f-336731cc9084",
+      "pushing": "5685bf60-f5bc-4b6b-874c-41236ed8694c",
+      "pull-heavy-object": "d06d1fbd-1d41-4d2f-abb6-f974f3994f7e",
+      "cross-punch": "3039c443-d199-4d80-807e-11856697e4ba"
+    },
+    "ready": true,
+    "rebuild_after_direction_policy": true,
+    "image_verified": true,
+    "skeleton_joints": 18,
+    "rotation_count": 8,
+    "exported": false,
+    "motion_direction_revision": "west-southwest",
+    "eight_way_visual_reviewed": true,
+    "motions_visual_reviewed": false
+  }
+}

@@ -21330,7 +21330,7 @@
       "kind": "animation",
       "slug": "jyaldi",
       "template": "breathing-idle",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792797847.2388818,
       "receipt": {
         "background_job_ids": [
@@ -21343,13 +21343,96 @@
         "status": "processing",
         "enhanced_prompt": null,
         "enhance_usage": null
-      }
+      },
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 3.0
+        },
+        "id": "45bc5aa1-2298-47fe-98f3-6f3981d3fca2",
+        "status": "completed",
+        "created_at": "2026-10-23T23:24:11.199771+00:00",
+        "last_response": {
+          "seed": 50809388,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "progress": 1.0,
+          "direction": "south-west",
+          "frame_count": 4,
+          "animation_id": "b38b0f97-8782-498e-ab0d-cae250fc96fc",
+          "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+          "storage_urls": {
+            "frames": [
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/b38b0f97-8782-498e-ab0d-cae250fc96fc/south-west/0.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/b38b0f97-8782-498e-ab0d-cae250fc96fc/south-west/1.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/b38b0f97-8782-498e-ab0d-cae250fc96fc/south-west/2.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/b38b0f97-8782-498e-ab0d-cae250fc96fc/south-west/3.png"
+            ]
+          },
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "ff6dc0b0-1bba-42e8-a0d7-157faf2408bc",
+          "animation_name": null,
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_model": "skeleton-v3_template",
+          "saved_to_storage": true,
+          "animation_group_id": "7330bcd9-cb19-4931-80c7-4a2bf6473c03",
+          "motion_adjustments": {
+            "stride": 1.0,
+            "posture": 0.0,
+            "arm_swing": 1.0,
+            "leg_extension": 0.0
+          },
+          "animation_description": "breathing idle. Preserve this character identity, costume, hair and native proportions. Keep a clean transparent silhouette in every frame. No gray painted patches, gray halo, ground shadow or opaque background around hair, hands, clothes or feet.",
+          "generation_started_at": "2026-10-23T23:24:16.832754+00:00",
+          "template_animation_id": "breathing-idle",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792798032.3910697,
+      "elapsed_observed_seconds": 185.15218830108643,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 4
     },
     "b8f6a0ed-f701-407a-815f-8322ce8c17d2": {
       "kind": "animation",
       "slug": "jyaldi",
       "template": "running-8-frames",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792797854.4811308,
       "receipt": {
         "background_job_ids": [
@@ -21362,13 +21445,114 @@
         "status": "processing",
         "enhanced_prompt": null,
         "enhance_usage": null
+      },
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 3.0
+        },
+        "id": "b8f6a0ed-f701-407a-815f-8322ce8c17d2",
+        "status": "completed",
+        "created_at": "2026-10-23T23:24:21.745887+00:00",
+        "last_response": {
+          "seed": 3403058838,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "progress": 1.0,
+          "direction": "west",
+          "frame_count": 6,
+          "animation_id": "86942723-ece4-4d4f-acce-20d2826c6001",
+          "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+          "storage_urls": {
+            "frames": [
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/86942723-ece4-4d4f-acce-20d2826c6001/west/0.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/86942723-ece4-4d4f-acce-20d2826c6001/west/1.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/86942723-ece4-4d4f-acce-20d2826c6001/west/2.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/86942723-ece4-4d4f-acce-20d2826c6001/west/3.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/86942723-ece4-4d4f-acce-20d2826c6001/west/4.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/86942723-ece4-4d4f-acce-20d2826c6001/west/5.png"
+            ]
+          },
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "3d5799d2-0f50-4329-8760-8d735b2255b0",
+          "animation_name": null,
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_model": "skeleton-v3_template",
+          "saved_to_storage": true,
+          "animation_group_id": "cd7d0903-4cf0-430f-a36f-c0ebe7a1a7d8",
+          "motion_adjustments": {
+            "stride": 1.0,
+            "posture": 0.0,
+            "arm_swing": 1.0,
+            "leg_extension": 0.0
+          },
+          "animation_description": "running decisively with a steady torso, controlled arm swing and firm purposeful strides. Preserve this character identity, costume, hair and native proportions. Keep a clean transparent silhouette in every frame. No gray painted patches, gray halo, ground shadow or opaque background around hair, hands, clothes or feet.",
+          "generation_started_at": "2026-10-23T23:24:34.033848+00:00",
+          "template_animation_id": "running-6-frames",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792798181.5958695,
+      "elapsed_observed_seconds": 327.1147391796112,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 6,
+      "visual_rejection": {
+        "reason": "6프레임 머리 끝 회색 면,4·5프레임 뒤팔이 머리 뒤로 올라가는 자세 반복. 6프레임 대체만으로 해결되지 않아 반려.",
+        "group": "cd7d0903-4cf0-430f-a36f-c0ebe7a1a7d8"
       }
     },
     "793b3211-fc07-41e0-95ec-12d8bed05eaf": {
       "kind": "animation",
       "slug": "jyaldi",
       "template": "running-jump",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792797864.110398,
       "receipt": {
         "background_job_ids": [
@@ -21381,13 +21565,128 @@
         "status": "processing",
         "enhanced_prompt": null,
         "enhance_usage": null
+      },
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 3.0
+        },
+        "id": "793b3211-fc07-41e0-95ec-12d8bed05eaf",
+        "status": "completed",
+        "created_at": "2026-10-23T23:24:24.943071+00:00",
+        "last_response": {
+          "seed": 2734899931,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "progress": 1.0,
+          "direction": "west",
+          "frame_count": 8,
+          "animation_id": "de029373-a587-47d9-956d-8e1b5c6a9cb2",
+          "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+          "storage_urls": {
+            "frames": [
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/de029373-a587-47d9-956d-8e1b5c6a9cb2/west/0.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/de029373-a587-47d9-956d-8e1b5c6a9cb2/west/1.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/de029373-a587-47d9-956d-8e1b5c6a9cb2/west/2.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/de029373-a587-47d9-956d-8e1b5c6a9cb2/west/3.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/de029373-a587-47d9-956d-8e1b5c6a9cb2/west/4.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/de029373-a587-47d9-956d-8e1b5c6a9cb2/west/5.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/de029373-a587-47d9-956d-8e1b5c6a9cb2/west/6.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/de029373-a587-47d9-956d-8e1b5c6a9cb2/west/7.png"
+            ]
+          },
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "cf397374-ebcb-49a2-a117-f59b259d7a07",
+          "animation_name": null,
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_model": "skeleton-v3_template",
+          "saved_to_storage": true,
+          "animation_group_id": "70a1193e-41d0-4e65-86a6-e9a7ae7b5ec0",
+          "motion_adjustments": {
+            "stride": 1.0,
+            "posture": 0.0,
+            "arm_swing": 1.0,
+            "leg_extension": 0.0
+          },
+          "animation_description": "running jump. Preserve this character identity, costume, hair and native proportions. Keep a clean transparent silhouette in every frame. No gray painted patches, gray halo, ground shadow or opaque background around hair, hands, clothes or feet.",
+          "generation_started_at": "2026-10-23T23:24:56.582592+00:00",
+          "template_animation_id": "running-jump",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792798146.1647913,
+      "elapsed_observed_seconds": 282.05439376831055,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 8,
+      "visual_rejection": {
+        "reason": "2·6·8프레임 머리카락 바깥에 회색 덧칠 및 잔상. 특히6프레임 머리 끝이 회색 덩어리로 바뀌어 사용자 기준에 따라 반려.",
+        "group": "70a1193e-41d0-4e65-86a6-e9a7ae7b5ec0"
       }
     },
     "d65a2ba8-9a3a-49ef-a737-9e089f899515": {
       "kind": "animation",
       "slug": "jyaldi",
       "template": "running-slide",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792797866.1330264,
       "receipt": {
         "background_job_ids": [
@@ -21400,13 +21699,114 @@
         "status": "processing",
         "enhanced_prompt": null,
         "enhance_usage": null
+      },
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 3.0
+        },
+        "id": "d65a2ba8-9a3a-49ef-a737-9e089f899515",
+        "status": "completed",
+        "created_at": "2026-10-23T23:24:28.022873+00:00",
+        "last_response": {
+          "seed": 2419355735,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "progress": 1.0,
+          "direction": "west",
+          "frame_count": 6,
+          "animation_id": "74f1679b-fc0f-48ee-af94-f999a0a329c7",
+          "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+          "storage_urls": {
+            "frames": [
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/74f1679b-fc0f-48ee-af94-f999a0a329c7/west/0.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/74f1679b-fc0f-48ee-af94-f999a0a329c7/west/1.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/74f1679b-fc0f-48ee-af94-f999a0a329c7/west/2.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/74f1679b-fc0f-48ee-af94-f999a0a329c7/west/3.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/74f1679b-fc0f-48ee-af94-f999a0a329c7/west/4.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/74f1679b-fc0f-48ee-af94-f999a0a329c7/west/5.png"
+            ]
+          },
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "a2466830-0b54-467a-bf16-e493eac7902f",
+          "animation_name": null,
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_model": "skeleton-v3_template",
+          "saved_to_storage": true,
+          "animation_group_id": "1ab94f66-a46e-491c-8f62-edb6623299ab",
+          "motion_adjustments": {
+            "stride": 1.0,
+            "posture": 0.0,
+            "arm_swing": 1.0,
+            "leg_extension": 0.0
+          },
+          "animation_description": "running slide. Preserve this character identity, costume, hair and native proportions. Keep a clean transparent silhouette in every frame. No gray painted patches, gray halo, ground shadow or opaque background around hair, hands, clothes or feet.",
+          "generation_started_at": "2026-10-23T23:24:46.571689+00:00",
+          "template_animation_id": "running-slide",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792798077.900012,
+      "elapsed_observed_seconds": 211.7669861316681,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 6,
+      "visual_rejection": {
+        "reason": "3·4프레임 접지 무릎/발 아래 회색 잔상 면과5프레임 다리 주변 흩어진 외곽 픽셀 발견. 사용자 회색 외곽 금지에 따라 반려, 재생성 필요.",
+        "group": "1ab94f66-a46e-491c-8f62-edb6623299ab"
       }
     },
     "8c4f0d0e-1cec-44ba-a650-a0f1e699b6da": {
       "kind": "animation",
       "slug": "jyaldi",
       "template": "crouched-walking",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792797878.78352,
       "receipt": {
         "background_job_ids": [
@@ -21419,13 +21819,110 @@
         "status": "processing",
         "enhanced_prompt": null,
         "enhance_usage": null
-      }
+      },
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 3.0
+        },
+        "id": "8c4f0d0e-1cec-44ba-a650-a0f1e699b6da",
+        "status": "completed",
+        "created_at": "2026-10-23T23:25:00.426122+00:00",
+        "last_response": {
+          "seed": 2376638426,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "progress": 1.0,
+          "direction": "west",
+          "frame_count": 6,
+          "animation_id": "2219ab52-0d20-4f49-ac86-93439c01fc92",
+          "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+          "storage_urls": {
+            "frames": [
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/2219ab52-0d20-4f49-ac86-93439c01fc92/west/0.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/2219ab52-0d20-4f49-ac86-93439c01fc92/west/1.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/2219ab52-0d20-4f49-ac86-93439c01fc92/west/2.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/2219ab52-0d20-4f49-ac86-93439c01fc92/west/3.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/2219ab52-0d20-4f49-ac86-93439c01fc92/west/4.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/2219ab52-0d20-4f49-ac86-93439c01fc92/west/5.png"
+            ]
+          },
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "425d10b7-7276-4bde-94df-d9a405239e35",
+          "animation_name": null,
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_model": "skeleton-v3_template",
+          "saved_to_storage": true,
+          "animation_group_id": "e630bbed-b9bb-49a9-804e-567ef3ba6c6e",
+          "motion_adjustments": {
+            "stride": 1.0,
+            "posture": 0.0,
+            "arm_swing": 1.0,
+            "leg_extension": 0.0
+          },
+          "animation_description": "crouched walking. Preserve this character identity, costume, hair and native proportions. Keep a clean transparent silhouette in every frame. No gray painted patches, gray halo, ground shadow or opaque background around hair, hands, clothes or feet.",
+          "generation_started_at": "2026-10-23T23:25:10.376987+00:00",
+          "template_animation_id": "crouched-walking",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792798057.4223917,
+      "elapsed_observed_seconds": 178.63887190818787,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 6
     },
     "c137cbd9-879d-44da-ba60-da04402748bf": {
       "kind": "animation",
       "slug": "jyaldi",
       "template": "sad-walk",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792797903.9317,
       "receipt": {
         "background_job_ids": [
@@ -21438,13 +21935,124 @@
         "status": "processing",
         "enhanced_prompt": null,
         "enhance_usage": null
-      }
+      },
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 3.0
+        },
+        "id": "c137cbd9-879d-44da-ba60-da04402748bf",
+        "status": "completed",
+        "created_at": "2026-10-23T23:25:17.103645+00:00",
+        "last_response": {
+          "seed": 2946730761,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "progress": 1.0,
+          "direction": "west",
+          "frame_count": 8,
+          "animation_id": "35f38e63-2901-4382-a375-c605e5f7fd48",
+          "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+          "storage_urls": {
+            "frames": [
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/35f38e63-2901-4382-a375-c605e5f7fd48/west/0.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/35f38e63-2901-4382-a375-c605e5f7fd48/west/1.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/35f38e63-2901-4382-a375-c605e5f7fd48/west/2.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/35f38e63-2901-4382-a375-c605e5f7fd48/west/3.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/35f38e63-2901-4382-a375-c605e5f7fd48/west/4.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/35f38e63-2901-4382-a375-c605e5f7fd48/west/5.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/35f38e63-2901-4382-a375-c605e5f7fd48/west/6.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/35f38e63-2901-4382-a375-c605e5f7fd48/west/7.png"
+            ]
+          },
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "31e23d75-0c07-48e9-bdd3-2f40e3f5b08f",
+          "animation_name": null,
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_model": "skeleton-v3_template",
+          "saved_to_storage": true,
+          "animation_group_id": "eefc53aa-33ed-4ab6-971f-42ec3bc8e474",
+          "motion_adjustments": {
+            "stride": 1.0,
+            "posture": 0.0,
+            "arm_swing": 1.0,
+            "leg_extension": 0.0
+          },
+          "animation_description": "sad walk. Preserve this character identity, costume, hair and native proportions. Keep a clean transparent silhouette in every frame. No gray painted patches, gray halo, ground shadow or opaque background around hair, hands, clothes or feet.",
+          "generation_started_at": "2026-10-23T23:25:31.703362+00:00",
+          "template_animation_id": "sad-walk",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792798146.8803146,
+      "elapsed_observed_seconds": 242.94861507415771,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 8
     },
     "a6d0a514-71b8-4d30-954b-cdb49eac9196": {
       "kind": "animation",
       "slug": "jyaldi",
       "template": "front-flip",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792797918.7428062,
       "receipt": {
         "background_job_ids": [
@@ -21457,13 +22065,114 @@
         "status": "processing",
         "enhanced_prompt": null,
         "enhance_usage": null
+      },
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 3.0
+        },
+        "id": "a6d0a514-71b8-4d30-954b-cdb49eac9196",
+        "status": "completed",
+        "created_at": "2026-10-23T23:25:20.035168+00:00",
+        "last_response": {
+          "seed": 4218848282,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "progress": 1.0,
+          "direction": "west",
+          "frame_count": 6,
+          "animation_id": "89381800-a069-49b3-9586-5c24de0b5267",
+          "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+          "storage_urls": {
+            "frames": [
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/89381800-a069-49b3-9586-5c24de0b5267/west/0.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/89381800-a069-49b3-9586-5c24de0b5267/west/1.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/89381800-a069-49b3-9586-5c24de0b5267/west/2.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/89381800-a069-49b3-9586-5c24de0b5267/west/3.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/89381800-a069-49b3-9586-5c24de0b5267/west/4.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/89381800-a069-49b3-9586-5c24de0b5267/west/5.png"
+            ]
+          },
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "47efda05-e94a-4050-9b70-c540cf58f020",
+          "animation_name": null,
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_model": "skeleton-v3_template",
+          "saved_to_storage": true,
+          "animation_group_id": "e8ec0937-3c86-4a85-adda-1905305915e3",
+          "motion_adjustments": {
+            "stride": 1.0,
+            "posture": 0.0,
+            "arm_swing": 1.0,
+            "leg_extension": 0.0
+          },
+          "animation_description": "front flip. Preserve this character identity, costume, hair and native proportions. Keep a clean transparent silhouette in every frame. No gray painted patches, gray halo, ground shadow or opaque background around hair, hands, clothes or feet.",
+          "generation_started_at": "2026-10-23T23:25:24.965845+00:00",
+          "template_animation_id": "front-flip",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792798105.0665169,
+      "elapsed_observed_seconds": 186.3237111568451,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 6,
+      "visual_rejection": {
+        "reason": "4프레임 위쪽 구두 외곽에 회색 면과 잔상 발견. 뒤집힌 자세에서도 검은 구두 실루엣과 투명이 유지되어야 하므로 반려.",
+        "group": "e8ec0937-3c86-4a85-adda-1905305915e3"
       }
     },
     "fb002850-cd93-464d-8e62-343c9fbc74fa": {
       "kind": "animation",
       "slug": "jyaldi",
       "template": "backflip",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792797920.8999207,
       "receipt": {
         "background_job_ids": [
@@ -21476,13 +22185,142 @@
         "status": "processing",
         "enhanced_prompt": null,
         "enhance_usage": null
+      },
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 3.0
+        },
+        "id": "fb002850-cd93-464d-8e62-343c9fbc74fa",
+        "status": "completed",
+        "created_at": "2026-10-23T23:25:23.295850+00:00",
+        "last_response": {
+          "seed": 1170728629,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "progress": 1.0,
+          "direction": "west",
+          "frame_count": 10,
+          "animation_id": "adc07233-3c7c-4032-a90d-f67797ec9405",
+          "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+          "storage_urls": {
+            "frames": [
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/adc07233-3c7c-4032-a90d-f67797ec9405/west/0.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/adc07233-3c7c-4032-a90d-f67797ec9405/west/1.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/adc07233-3c7c-4032-a90d-f67797ec9405/west/2.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/adc07233-3c7c-4032-a90d-f67797ec9405/west/3.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/adc07233-3c7c-4032-a90d-f67797ec9405/west/4.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/adc07233-3c7c-4032-a90d-f67797ec9405/west/5.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/adc07233-3c7c-4032-a90d-f67797ec9405/west/6.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/adc07233-3c7c-4032-a90d-f67797ec9405/west/7.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/adc07233-3c7c-4032-a90d-f67797ec9405/west/8.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/adc07233-3c7c-4032-a90d-f67797ec9405/west/9.png"
+            ]
+          },
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "72491517-9895-4544-9cb1-7cde3b8256f6",
+          "animation_name": null,
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_model": "skeleton-v3_template",
+          "saved_to_storage": true,
+          "animation_group_id": "7a4ffd4f-6358-420a-9061-f8c5a5c01449",
+          "motion_adjustments": {
+            "stride": 1.0,
+            "posture": 0.0,
+            "arm_swing": 1.0,
+            "leg_extension": 0.0
+          },
+          "animation_description": "backflip. Preserve this character identity, costume, hair and native proportions. Keep a clean transparent silhouette in every frame. No gray painted patches, gray halo, ground shadow or opaque background around hair, hands, clothes or feet.",
+          "generation_started_at": "2026-10-23T23:25:28.244726+00:00",
+          "template_animation_id": "backflip",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792798183.9353356,
+      "elapsed_observed_seconds": 263.0354154109955,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 10,
+      "visual_rejection": {
+        "reason": "5프레임 손 잘림,7·8프레임 팔·다리 사이 및 바깥에 큰 회색 채움 면. 사용자 대표 실패 유형이 반복되어 전체 반려.",
+        "group": "7a4ffd4f-6358-420a-9061-f8c5a5c01449"
       }
     },
     "2c93eba5-670d-4a12-92f9-1b729b26c869": {
       "kind": "animation",
       "slug": "jyaldi",
       "template": "jumping-1",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792797925.7013154,
       "receipt": {
         "background_job_ids": [
@@ -21495,13 +22333,131 @@
         "status": "processing",
         "enhanced_prompt": null,
         "enhance_usage": null
-      }
+      },
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 3.0
+        },
+        "id": "2c93eba5-670d-4a12-92f9-1b729b26c869",
+        "status": "completed",
+        "created_at": "2026-10-23T23:25:26.740825+00:00",
+        "last_response": {
+          "seed": 3053111822,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "progress": 1.0,
+          "direction": "west",
+          "frame_count": 9,
+          "animation_id": "89e59b5d-8847-47f7-974c-2da29a3bce16",
+          "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+          "storage_urls": {
+            "frames": [
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/89e59b5d-8847-47f7-974c-2da29a3bce16/west/0.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/89e59b5d-8847-47f7-974c-2da29a3bce16/west/1.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/89e59b5d-8847-47f7-974c-2da29a3bce16/west/2.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/89e59b5d-8847-47f7-974c-2da29a3bce16/west/3.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/89e59b5d-8847-47f7-974c-2da29a3bce16/west/4.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/89e59b5d-8847-47f7-974c-2da29a3bce16/west/5.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/89e59b5d-8847-47f7-974c-2da29a3bce16/west/6.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/89e59b5d-8847-47f7-974c-2da29a3bce16/west/7.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/89e59b5d-8847-47f7-974c-2da29a3bce16/west/8.png"
+            ]
+          },
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "7bb05f84-98e3-4caf-aa6c-2f723477a7f3",
+          "animation_name": null,
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_model": "skeleton-v3_template",
+          "saved_to_storage": true,
+          "animation_group_id": "59516128-df93-42b3-9e6b-8edb0d1ad55d",
+          "motion_adjustments": {
+            "stride": 1.0,
+            "posture": 0.0,
+            "arm_swing": 1.0,
+            "leg_extension": 0.0
+          },
+          "animation_description": "jumping 1. Preserve this character identity, costume, hair and native proportions. Keep a clean transparent silhouette in every frame. No gray painted patches, gray halo, ground shadow or opaque background around hair, hands, clothes or feet.",
+          "generation_started_at": "2026-10-23T23:25:32.206493+00:00",
+          "template_animation_id": "jumping-1",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792798374.1236618,
+      "elapsed_observed_seconds": 448.42234659194946,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 9
     },
     "b02aaa21-a204-4898-8c46-ad9b2e704756": {
       "kind": "animation",
       "slug": "jyaldi",
       "template": "jumping-2",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792797928.0196865,
       "receipt": {
         "background_job_ids": [
@@ -21514,13 +22470,128 @@
         "status": "processing",
         "enhanced_prompt": null,
         "enhance_usage": null
+      },
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 3.0
+        },
+        "id": "b02aaa21-a204-4898-8c46-ad9b2e704756",
+        "status": "completed",
+        "created_at": "2026-10-23T23:25:31.253116+00:00",
+        "last_response": {
+          "seed": 400926504,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "progress": 1.0,
+          "direction": "west",
+          "frame_count": 8,
+          "animation_id": "237eef89-3a40-48d4-81a7-62f2fbc5e289",
+          "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+          "storage_urls": {
+            "frames": [
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/237eef89-3a40-48d4-81a7-62f2fbc5e289/west/0.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/237eef89-3a40-48d4-81a7-62f2fbc5e289/west/1.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/237eef89-3a40-48d4-81a7-62f2fbc5e289/west/2.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/237eef89-3a40-48d4-81a7-62f2fbc5e289/west/3.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/237eef89-3a40-48d4-81a7-62f2fbc5e289/west/4.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/237eef89-3a40-48d4-81a7-62f2fbc5e289/west/5.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/237eef89-3a40-48d4-81a7-62f2fbc5e289/west/6.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/237eef89-3a40-48d4-81a7-62f2fbc5e289/west/7.png"
+            ]
+          },
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "4ea12646-cfbb-4734-884f-842104e71743",
+          "animation_name": null,
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_model": "skeleton-v3_template",
+          "saved_to_storage": true,
+          "animation_group_id": "c660fa57-155c-41c5-b62f-02b6d01e25b5",
+          "motion_adjustments": {
+            "stride": 1.0,
+            "posture": 0.0,
+            "arm_swing": 1.0,
+            "leg_extension": 0.0
+          },
+          "animation_description": "jumping 2. Preserve this character identity, costume, hair and native proportions. Keep a clean transparent silhouette in every frame. No gray painted patches, gray halo, ground shadow or opaque background around hair, hands, clothes or feet.",
+          "generation_started_at": "2026-10-23T23:25:35.036272+00:00",
+          "template_animation_id": "jumping-2",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792798105.2271562,
+      "elapsed_observed_seconds": 177.20746994018555,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 8,
+      "visual_rejection": {
+        "reason": "5·6프레임 머리가 캔버스 위로 잘리고7·8프레임 얼굴 앞/머리 끝에 회색 외곽 잔상. 전체 신체 가시성과 깨끗한 외곽 조건 미달.",
+        "group": "c660fa57-155c-41c5-b62f-02b6d01e25b5"
       }
     },
     "f91bc8e4-e06e-4a4d-911f-f953bed08f2f": {
       "kind": "animation",
       "slug": "jyaldi",
       "template": "two-footed-jump",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792797932.089982,
       "receipt": {
         "background_job_ids": [
@@ -21533,13 +22604,121 @@
         "status": "processing",
         "enhanced_prompt": null,
         "enhance_usage": null
+      },
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 3.0
+        },
+        "id": "f91bc8e4-e06e-4a4d-911f-f953bed08f2f",
+        "status": "completed",
+        "created_at": "2026-10-23T23:25:32.563783+00:00",
+        "last_response": {
+          "seed": 2290455856,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "progress": 1.0,
+          "direction": "west",
+          "frame_count": 7,
+          "animation_id": "fb4871cf-8b30-4a8c-b487-0160ec1cc253",
+          "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+          "storage_urls": {
+            "frames": [
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/fb4871cf-8b30-4a8c-b487-0160ec1cc253/west/0.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/fb4871cf-8b30-4a8c-b487-0160ec1cc253/west/1.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/fb4871cf-8b30-4a8c-b487-0160ec1cc253/west/2.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/fb4871cf-8b30-4a8c-b487-0160ec1cc253/west/3.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/fb4871cf-8b30-4a8c-b487-0160ec1cc253/west/4.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/fb4871cf-8b30-4a8c-b487-0160ec1cc253/west/5.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/fb4871cf-8b30-4a8c-b487-0160ec1cc253/west/6.png"
+            ]
+          },
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "975a64f1-e23c-465f-b8a5-55b3b6dfd6ef",
+          "animation_name": null,
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_model": "skeleton-v3_template",
+          "saved_to_storage": true,
+          "animation_group_id": "cf402e5c-f00e-4edc-bacf-f2e45d18b672",
+          "motion_adjustments": {
+            "stride": 1.0,
+            "posture": 0.0,
+            "arm_swing": 1.0,
+            "leg_extension": 0.0
+          },
+          "animation_description": "two footed jump. Preserve this character identity, costume, hair and native proportions. Keep a clean transparent silhouette in every frame. No gray painted patches, gray halo, ground shadow or opaque background around hair, hands, clothes or feet.",
+          "generation_started_at": "2026-10-23T23:25:35.236508+00:00",
+          "template_animation_id": "two-footed-jump",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792798105.2333581,
+      "elapsed_observed_seconds": 173.14337611198425,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 7,
+      "visual_rejection": {
+        "reason": "5프레임 머리와 들어올린 팔이 위쪽 캔버스에서 잘림.4프레임 뒤쪽 발의 회색 외곽도 확인, 점프 전체 동작 재생성 필요.",
+        "group": "cf402e5c-f00e-4edc-bacf-f2e45d18b672"
       }
     },
     "9572ea4b-422f-458e-bc0f-336731cc9084": {
       "kind": "animation",
       "slug": "jyaldi",
       "template": "drinking",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792797933.0578341,
       "receipt": {
         "background_job_ids": [
@@ -21552,13 +22731,110 @@
         "status": "processing",
         "enhanced_prompt": null,
         "enhance_usage": null
-      }
+      },
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 3.0
+        },
+        "id": "9572ea4b-422f-458e-bc0f-336731cc9084",
+        "status": "completed",
+        "created_at": "2026-10-23T23:25:33.840543+00:00",
+        "last_response": {
+          "seed": 1746621985,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "progress": 1.0,
+          "direction": "south-west",
+          "frame_count": 6,
+          "animation_id": "8cb451d3-7a03-4f20-b599-b154ae66d111",
+          "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+          "storage_urls": {
+            "frames": [
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/8cb451d3-7a03-4f20-b599-b154ae66d111/south-west/0.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/8cb451d3-7a03-4f20-b599-b154ae66d111/south-west/1.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/8cb451d3-7a03-4f20-b599-b154ae66d111/south-west/2.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/8cb451d3-7a03-4f20-b599-b154ae66d111/south-west/3.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/8cb451d3-7a03-4f20-b599-b154ae66d111/south-west/4.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/8cb451d3-7a03-4f20-b599-b154ae66d111/south-west/5.png"
+            ]
+          },
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "bd09bb30-65a7-4ec7-b37c-76529392bcdb",
+          "animation_name": null,
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_model": "skeleton-v3_template",
+          "saved_to_storage": true,
+          "animation_group_id": "d82b0b0a-0448-4164-b857-91ae63f907e5",
+          "motion_adjustments": {
+            "stride": 1.0,
+            "posture": 0.0,
+            "arm_swing": 1.0,
+            "leg_extension": 0.0
+          },
+          "animation_description": "drinking. Preserve this character identity, costume, hair and native proportions. Keep a clean transparent silhouette in every frame. No gray painted patches, gray halo, ground shadow or opaque background around hair, hands, clothes or feet.",
+          "generation_started_at": "2026-10-23T23:25:35.884988+00:00",
+          "template_animation_id": "drinking",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792798106.0456474,
+      "elapsed_observed_seconds": 172.9878134727478,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 6
     },
     "b6e88a54-93ff-4be0-8129-09b00161303e": {
       "kind": "animation",
       "slug": "jyaldi",
       "template": "picking-up",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792797934.5288558,
       "receipt": {
         "background_job_ids": [
@@ -21571,13 +22847,107 @@
         "status": "processing",
         "enhanced_prompt": null,
         "enhance_usage": null
+      },
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 3.0
+        },
+        "id": "b6e88a54-93ff-4be0-8129-09b00161303e",
+        "status": "completed",
+        "created_at": "2026-10-23T23:25:35.344860+00:00",
+        "last_response": {
+          "seed": 2439133550,
+          "type": "done",
+          "action": "finalizing",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "progress": 1.0,
+          "direction": "west",
+          "frame_count": 5,
+          "animation_id": "97ca841b-4d81-4f70-93b1-31681c82c1dc",
+          "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+          "storage_urls": {
+            "frames": [
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/97ca841b-4d81-4f70-93b1-31681c82c1dc/west/0.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/97ca841b-4d81-4f70-93b1-31681c82c1dc/west/1.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/97ca841b-4d81-4f70-93b1-31681c82c1dc/west/2.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/97ca841b-4d81-4f70-93b1-31681c82c1dc/west/3.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/97ca841b-4d81-4f70-93b1-31681c82c1dc/west/4.png"
+            ]
+          },
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "547ff992-0aed-495c-8625-e6ab39bbe870",
+          "animation_name": null,
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_model": "skeleton-v3_template",
+          "saved_to_storage": true,
+          "animation_group_id": "71203393-a965-4443-b1a9-64a4bd88487d",
+          "motion_adjustments": {
+            "stride": 1.0,
+            "posture": 0.0,
+            "arm_swing": 1.0,
+            "leg_extension": 0.0
+          },
+          "animation_description": "picking up. Preserve this character identity, costume, hair and native proportions. Keep a clean transparent silhouette in every frame. No gray painted patches, gray halo, ground shadow or opaque background around hair, hands, clothes or feet.",
+          "generation_started_at": "2026-10-23T23:25:37.091242+00:00",
+          "template_animation_id": "picking-up",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792798078.922875,
+      "elapsed_observed_seconds": 144.39401960372925,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 5,
+      "visual_rejection": {
+        "reason": "3프레임 손에 큰 갈색 원형 덩어리가 생기고 다음 프레임에 사라짐. 원본 검은 장갑 및 물건 줍기 연속성과 불일치, 현재 결과 반려.",
+        "group": "71203393-a965-4443-b1a9-64a4bd88487d"
       }
     },
     "5685bf60-f5bc-4b6b-874c-41236ed8694c": {
       "kind": "animation",
       "slug": "jyaldi",
       "template": "pushing",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792797936.0582123,
       "receipt": {
         "background_job_ids": [
@@ -21590,13 +22960,110 @@
         "status": "processing",
         "enhanced_prompt": null,
         "enhance_usage": null
-      }
+      },
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 3.0
+        },
+        "id": "5685bf60-f5bc-4b6b-874c-41236ed8694c",
+        "status": "completed",
+        "created_at": "2026-10-23T23:25:36.268204+00:00",
+        "last_response": {
+          "seed": 2493601586,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "progress": 1.0,
+          "direction": "west",
+          "frame_count": 6,
+          "animation_id": "0679a632-e500-4a0f-b618-8af51d4bdae3",
+          "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+          "storage_urls": {
+            "frames": [
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/0679a632-e500-4a0f-b618-8af51d4bdae3/west/0.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/0679a632-e500-4a0f-b618-8af51d4bdae3/west/1.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/0679a632-e500-4a0f-b618-8af51d4bdae3/west/2.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/0679a632-e500-4a0f-b618-8af51d4bdae3/west/3.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/0679a632-e500-4a0f-b618-8af51d4bdae3/west/4.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/0679a632-e500-4a0f-b618-8af51d4bdae3/west/5.png"
+            ]
+          },
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "b6feca65-350c-4e78-9803-abe9b4196c46",
+          "animation_name": null,
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_model": "skeleton-v3_template",
+          "saved_to_storage": true,
+          "animation_group_id": "c9bb616c-d775-4b43-aab3-af1de8db3113",
+          "motion_adjustments": {
+            "stride": 1.0,
+            "posture": 0.0,
+            "arm_swing": 1.0,
+            "leg_extension": 0.0
+          },
+          "animation_description": "pushing. Preserve this character identity, costume, hair and native proportions. Keep a clean transparent silhouette in every frame. No gray painted patches, gray halo, ground shadow or opaque background around hair, hands, clothes or feet.",
+          "generation_started_at": "2026-10-23T23:25:38.172477+00:00",
+          "template_animation_id": "pushing",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792798106.0541446,
+      "elapsed_observed_seconds": 169.99593257904053,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 6
     },
     "d06d1fbd-1d41-4d2f-abb6-f974f3994f7e": {
       "kind": "animation",
       "slug": "jyaldi",
       "template": "pull-heavy-object",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792797936.5712688,
       "receipt": {
         "background_job_ids": [
@@ -21609,13 +23076,110 @@
         "status": "processing",
         "enhanced_prompt": null,
         "enhance_usage": null
-      }
+      },
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 3.0
+        },
+        "id": "d06d1fbd-1d41-4d2f-abb6-f974f3994f7e",
+        "status": "completed",
+        "created_at": "2026-10-23T23:25:36.882009+00:00",
+        "last_response": {
+          "seed": 72710852,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "progress": 1.0,
+          "direction": "west",
+          "frame_count": 6,
+          "animation_id": "065d6a6f-3397-475e-aee9-9cecc28e6d64",
+          "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+          "storage_urls": {
+            "frames": [
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/065d6a6f-3397-475e-aee9-9cecc28e6d64/west/0.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/065d6a6f-3397-475e-aee9-9cecc28e6d64/west/1.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/065d6a6f-3397-475e-aee9-9cecc28e6d64/west/2.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/065d6a6f-3397-475e-aee9-9cecc28e6d64/west/3.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/065d6a6f-3397-475e-aee9-9cecc28e6d64/west/4.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/065d6a6f-3397-475e-aee9-9cecc28e6d64/west/5.png"
+            ]
+          },
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "085a01e2-fbf4-460b-88ec-e645f9a04634",
+          "animation_name": null,
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_model": "skeleton-v3_template",
+          "saved_to_storage": true,
+          "animation_group_id": "dbee07b2-2a17-41e5-8b5b-11bae7d69bbe",
+          "motion_adjustments": {
+            "stride": 1.0,
+            "posture": 0.0,
+            "arm_swing": 1.0,
+            "leg_extension": 0.0
+          },
+          "animation_description": "pull heavy object. Preserve this character identity, costume, hair and native proportions. Keep a clean transparent silhouette in every frame. No gray painted patches, gray halo, ground shadow or opaque background around hair, hands, clothes or feet.",
+          "generation_started_at": "2026-10-23T23:25:40.953087+00:00",
+          "template_animation_id": "pull-heavy-object",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792798146.886342,
+      "elapsed_observed_seconds": 210.31507349014282,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 6
     },
     "4109d0e0-2399-4cc7-97a6-896f2fdf2b00": {
       "kind": "animation",
       "slug": "jyaldi",
       "template": "throw-object",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792797937.1714041,
       "receipt": {
         "background_job_ids": [
@@ -21628,13 +23192,121 @@
         "status": "processing",
         "enhanced_prompt": null,
         "enhance_usage": null
+      },
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 3.0
+        },
+        "id": "4109d0e0-2399-4cc7-97a6-896f2fdf2b00",
+        "status": "completed",
+        "created_at": "2026-10-23T23:25:37.398445+00:00",
+        "last_response": {
+          "seed": 1022457095,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "progress": 1.0,
+          "direction": "west",
+          "frame_count": 7,
+          "animation_id": "6eb65472-e5f9-4415-a038-26b47fbc8440",
+          "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+          "storage_urls": {
+            "frames": [
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/6eb65472-e5f9-4415-a038-26b47fbc8440/west/0.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/6eb65472-e5f9-4415-a038-26b47fbc8440/west/1.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/6eb65472-e5f9-4415-a038-26b47fbc8440/west/2.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/6eb65472-e5f9-4415-a038-26b47fbc8440/west/3.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/6eb65472-e5f9-4415-a038-26b47fbc8440/west/4.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/6eb65472-e5f9-4415-a038-26b47fbc8440/west/5.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/6eb65472-e5f9-4415-a038-26b47fbc8440/west/6.png"
+            ]
+          },
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "8ee38f2d-2885-4a38-aa87-03c39d489fae",
+          "animation_name": null,
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_model": "skeleton-v3_template",
+          "saved_to_storage": true,
+          "animation_group_id": "3c45c5cc-a42e-4c30-b202-ae8606090fd3",
+          "motion_adjustments": {
+            "stride": 1.0,
+            "posture": 0.0,
+            "arm_swing": 1.0,
+            "leg_extension": 0.0
+          },
+          "animation_description": "throw object. Preserve this character identity, costume, hair and native proportions. Keep a clean transparent silhouette in every frame. No gray painted patches, gray halo, ground shadow or opaque background around hair, hands, clothes or feet.",
+          "generation_started_at": "2026-10-23T23:25:41.897747+00:00",
+          "template_animation_id": "throw-object",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792798106.129721,
+      "elapsed_observed_seconds": 168.9583170413971,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 7,
+      "visual_rejection": {
+        "reason": "4프레임 위로 든 손 주변 회색 면·잔상,7프레임 얼굴 앞 분리 갈색 물체가 다시 생김. 원본 검은 장갑/투명 외곽 및 던지기 연속성 미달.",
+        "group": "3c45c5cc-a42e-4c30-b202-ae8606090fd3"
       }
     },
     "05fd54a9-cfdf-4a82-a75d-b97b0cf15d17": {
       "kind": "animation",
       "slug": "jyaldi",
       "template": "fight-stance-idle-8-frames",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792797937.9298615,
       "receipt": {
         "background_job_ids": [
@@ -21647,13 +23319,128 @@
         "status": "processing",
         "enhanced_prompt": null,
         "enhance_usage": null
+      },
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 3.0
+        },
+        "id": "05fd54a9-cfdf-4a82-a75d-b97b0cf15d17",
+        "status": "completed",
+        "created_at": "2026-10-23T23:25:39.945510+00:00",
+        "last_response": {
+          "seed": 1402570153,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "progress": 1.0,
+          "direction": "west",
+          "frame_count": 8,
+          "animation_id": "11c36470-bd12-468d-a346-d9acfcf7cc61",
+          "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+          "storage_urls": {
+            "frames": [
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/11c36470-bd12-468d-a346-d9acfcf7cc61/west/0.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/11c36470-bd12-468d-a346-d9acfcf7cc61/west/1.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/11c36470-bd12-468d-a346-d9acfcf7cc61/west/2.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/11c36470-bd12-468d-a346-d9acfcf7cc61/west/3.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/11c36470-bd12-468d-a346-d9acfcf7cc61/west/4.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/11c36470-bd12-468d-a346-d9acfcf7cc61/west/5.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/11c36470-bd12-468d-a346-d9acfcf7cc61/west/6.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/11c36470-bd12-468d-a346-d9acfcf7cc61/west/7.png"
+            ]
+          },
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "4c1508f9-b133-413d-b7ad-02b4acc33756",
+          "animation_name": null,
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_model": "skeleton-v3_template",
+          "saved_to_storage": true,
+          "animation_group_id": "b075dd7a-bce1-411c-b63e-a33f2dff7510",
+          "motion_adjustments": {
+            "stride": 1.0,
+            "posture": 0.0,
+            "arm_swing": 1.0,
+            "leg_extension": 0.0
+          },
+          "animation_description": "fight stance idle 8 frames. Preserve this character identity, costume, hair and native proportions. Keep a clean transparent silhouette in every frame. No gray painted patches, gray halo, ground shadow or opaque background around hair, hands, clothes or feet.",
+          "generation_started_at": "2026-10-23T23:25:49.321598+00:00",
+          "template_animation_id": "fight-stance-idle-8-frames",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792798110.0662377,
+      "elapsed_observed_seconds": 172.1363763809204,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 8,
+      "visual_rejection": {
+        "reason": "1·3·4프레임 주먹과 턱 사이에 회색 채움 면 발견. 셔츠 깃/소매 내부를 벗어난 투명 공간의 회색 영역으로 판단하여 반려, 외곽 재생성 필요.",
+        "group": "b075dd7a-bce1-411c-b63e-a33f2dff7510"
       }
     },
     "58509341-51b2-4853-936f-c0c46fd92c08": {
       "kind": "animation",
       "slug": "jyaldi",
       "template": "lead-jab",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792797944.6019855,
       "receipt": {
         "background_job_ids": [
@@ -21666,13 +23453,93 @@
         "status": "processing",
         "enhanced_prompt": null,
         "enhance_usage": null
+      },
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 2.0
+        },
+        "id": "58509341-51b2-4853-936f-c0c46fd92c08",
+        "status": "completed",
+        "created_at": "2026-10-23T23:25:48.576631+00:00",
+        "last_response": {
+          "seed": 2681532016,
+          "type": "done",
+          "action": "finalizing",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "progress": 1.0,
+          "direction": "west",
+          "frame_count": 3,
+          "animation_id": "2cea22fb-3b13-417b-9555-722fbf34afe4",
+          "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+          "storage_urls": {
+            "frames": [
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/2cea22fb-3b13-417b-9555-722fbf34afe4/west/0.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/2cea22fb-3b13-417b-9555-722fbf34afe4/west/1.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/2cea22fb-3b13-417b-9555-722fbf34afe4/west/2.png"
+            ]
+          },
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 2
+          },
+          "generation_id": "93f502b4-0311-47a3-9c92-dce74c3a8edf",
+          "animation_name": null,
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_model": "skeleton-v3_template",
+          "saved_to_storage": true,
+          "animation_group_id": "8a59c7f8-fc6d-4315-b2c0-2acdb14e45c7",
+          "motion_adjustments": {
+            "stride": 1.0,
+            "posture": 0.0,
+            "arm_swing": 1.0,
+            "leg_extension": 0.0
+          },
+          "animation_description": "lead jab. Preserve this character identity, costume, hair and native proportions. Keep a clean transparent silhouette in every frame. No gray painted patches, gray halo, ground shadow or opaque background around hair, hands, clothes or feet.",
+          "generation_started_at": "2026-10-23T23:25:54.742534+00:00",
+          "template_animation_id": "lead-jab",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792798079.156568,
+      "elapsed_observed_seconds": 134.55458283424377,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 2
+      },
+      "saved_frames": 3,
+      "visual_rejection": {
+        "reason": "1·3프레임 얼굴 앞에 분리된 살색/회색 조각,2프레임 주먹도 검은 장갑과 불일치. 잽 팔 뻗음이 불명확해 현재 결과 반려.",
+        "group": "8a59c7f8-fc6d-4315-b2c0-2acdb14e45c7"
       }
     },
     "3039c443-d199-4d80-807e-11856697e4ba": {
       "kind": "animation",
       "slug": "jyaldi",
       "template": "cross-punch",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792797950.9735384,
       "receipt": {
         "background_job_ids": [
@@ -21682,6 +23549,335 @@
           "west"
         ],
         "animation_group_id": "6ea7c70e-1e39-4788-8c33-d9d9246528b8",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      },
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 3.0
+        },
+        "id": "3039c443-d199-4d80-807e-11856697e4ba",
+        "status": "completed",
+        "created_at": "2026-10-23T23:25:52.095940+00:00",
+        "last_response": {
+          "seed": 1640877853,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "progress": 1.0,
+          "direction": "west",
+          "frame_count": 6,
+          "animation_id": "ea487e3f-5733-4c9e-a1fe-a8e991796954",
+          "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+          "storage_urls": {
+            "frames": [
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/ea487e3f-5733-4c9e-a1fe-a8e991796954/west/0.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/ea487e3f-5733-4c9e-a1fe-a8e991796954/west/1.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/ea487e3f-5733-4c9e-a1fe-a8e991796954/west/2.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/ea487e3f-5733-4c9e-a1fe-a8e991796954/west/3.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/ea487e3f-5733-4c9e-a1fe-a8e991796954/west/4.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/ea487e3f-5733-4c9e-a1fe-a8e991796954/west/5.png"
+            ]
+          },
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "2976dfc0-a6ef-4067-9090-8beedde5661b",
+          "animation_name": null,
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_model": "skeleton-v3_template",
+          "saved_to_storage": true,
+          "animation_group_id": "6ea7c70e-1e39-4788-8c33-d9d9246528b8",
+          "motion_adjustments": {
+            "stride": 1.0,
+            "posture": 0.0,
+            "arm_swing": 1.0,
+            "leg_extension": 0.0
+          },
+          "animation_description": "cross punch. Preserve this character identity, costume, hair and native proportions. Keep a clean transparent silhouette in every frame. No gray painted patches, gray halo, ground shadow or opaque background around hair, hands, clothes or feet.",
+          "generation_started_at": "2026-10-23T23:25:56.069148+00:00",
+          "template_animation_id": "cross-punch",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792798146.8908782,
+      "elapsed_observed_seconds": 195.9173400402069,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 6,
+      "visual_rejection": {
+        "reason": "3프레임 앞 주먹 아래 분리된 회색 세로 잔상,1프레임 머리 끝 외곽 회색 흔적 발견. 투명 외곽 기준에 따라 반려.",
+        "group": "6ea7c70e-1e39-4788-8c33-d9d9246528b8"
+      }
+    },
+    "bbfe0553-bf06-4044-a70a-cbdb7135b3cf": {
+      "kind": "animation",
+      "slug": "jyaldi",
+      "template": "running-8-frames",
+      "status": "processing",
+      "created_epoch": 1792798374.2027369,
+      "receipt": {
+        "background_job_ids": [
+          "bbfe0553-bf06-4044-a70a-cbdb7135b3cf"
+        ],
+        "directions": [
+          "west"
+        ],
+        "animation_group_id": "cd4fb756-0ba2-4f11-ba1f-9cf40fe642dc",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      }
+    },
+    "9972940b-0952-42a1-87aa-3ddbaa5e0ee7": {
+      "kind": "animation",
+      "slug": "jyaldi",
+      "template": "running-jump",
+      "status": "processing",
+      "created_epoch": 1792798374.7288504,
+      "receipt": {
+        "background_job_ids": [
+          "9972940b-0952-42a1-87aa-3ddbaa5e0ee7"
+        ],
+        "directions": [
+          "west"
+        ],
+        "animation_group_id": "b9ca3e46-a65b-478f-91ac-ce6ee459672f",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      }
+    },
+    "e208d558-493e-49d2-a431-cf29054f14c9": {
+      "kind": "animation",
+      "slug": "jyaldi",
+      "template": "running-slide",
+      "status": "processing",
+      "created_epoch": 1792798375.7910488,
+      "receipt": {
+        "background_job_ids": [
+          "e208d558-493e-49d2-a431-cf29054f14c9"
+        ],
+        "directions": [
+          "west"
+        ],
+        "animation_group_id": "855a501e-c976-4402-b94e-29d23739e77d",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      }
+    },
+    "6c3d792a-de83-488b-b92c-fe516e2c35fe": {
+      "kind": "animation",
+      "slug": "jyaldi",
+      "template": "front-flip",
+      "status": "processing",
+      "created_epoch": 1792798376.393602,
+      "receipt": {
+        "background_job_ids": [
+          "6c3d792a-de83-488b-b92c-fe516e2c35fe"
+        ],
+        "directions": [
+          "west"
+        ],
+        "animation_group_id": "9c0ae873-54e0-4e36-9fec-e7ce5a856f5c",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      }
+    },
+    "abb9eb95-11be-47ab-be0f-3975065d2d78": {
+      "kind": "animation",
+      "slug": "jyaldi",
+      "template": "backflip",
+      "status": "processing",
+      "created_epoch": 1792798376.9396877,
+      "receipt": {
+        "background_job_ids": [
+          "abb9eb95-11be-47ab-be0f-3975065d2d78"
+        ],
+        "directions": [
+          "west"
+        ],
+        "animation_group_id": "e0643185-70f0-448b-b46d-9422570fca96",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      }
+    },
+    "1126e7a0-e1fc-4b4c-ad50-68f43ea5e7c7": {
+      "kind": "animation",
+      "slug": "jyaldi",
+      "template": "jumping-2",
+      "status": "processing",
+      "created_epoch": 1792798377.5742419,
+      "receipt": {
+        "background_job_ids": [
+          "1126e7a0-e1fc-4b4c-ad50-68f43ea5e7c7"
+        ],
+        "directions": [
+          "west"
+        ],
+        "animation_group_id": "b8f6402f-fbbf-46cb-8618-bab95ed77794",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      }
+    },
+    "a4cc8130-1878-47ce-9510-c55d1d52023f": {
+      "kind": "animation",
+      "slug": "jyaldi",
+      "template": "two-footed-jump",
+      "status": "processing",
+      "created_epoch": 1792798378.6919668,
+      "receipt": {
+        "background_job_ids": [
+          "a4cc8130-1878-47ce-9510-c55d1d52023f"
+        ],
+        "directions": [
+          "west"
+        ],
+        "animation_group_id": "3395c8fa-f2db-4644-b645-1e5ca9e21c17",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      }
+    },
+    "b3b23fc2-8704-4d99-b294-e67ca5bddb1c": {
+      "kind": "animation",
+      "slug": "jyaldi",
+      "template": "picking-up",
+      "status": "processing",
+      "created_epoch": 1792798379.4312465,
+      "receipt": {
+        "background_job_ids": [
+          "b3b23fc2-8704-4d99-b294-e67ca5bddb1c"
+        ],
+        "directions": [
+          "west"
+        ],
+        "animation_group_id": "1930136b-b2ae-47e4-9c3a-cdad97f1139a",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      }
+    },
+    "0ec11e25-704e-47de-8469-9e2a68b93cef": {
+      "kind": "animation",
+      "slug": "jyaldi",
+      "template": "throw-object",
+      "status": "processing",
+      "created_epoch": 1792798384.070946,
+      "receipt": {
+        "background_job_ids": [
+          "0ec11e25-704e-47de-8469-9e2a68b93cef"
+        ],
+        "directions": [
+          "west"
+        ],
+        "animation_group_id": "dd02d410-8b1b-45f5-8beb-b216406d5519",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      }
+    },
+    "a4b3323c-9576-4a51-ab77-e87a166d025d": {
+      "kind": "animation",
+      "slug": "jyaldi",
+      "template": "fight-stance-idle-8-frames",
+      "status": "processing",
+      "created_epoch": 1792798384.8927135,
+      "receipt": {
+        "background_job_ids": [
+          "a4b3323c-9576-4a51-ab77-e87a166d025d"
+        ],
+        "directions": [
+          "west"
+        ],
+        "animation_group_id": "fdd8c96b-dac3-4f6b-9092-151baa886133",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      }
+    },
+    "5745e2b4-2d5c-4e0c-9929-12da32349952": {
+      "kind": "animation",
+      "slug": "jyaldi",
+      "template": "lead-jab",
+      "status": "processing",
+      "created_epoch": 1792798394.2501798,
+      "receipt": {
+        "background_job_ids": [
+          "5745e2b4-2d5c-4e0c-9929-12da32349952"
+        ],
+        "directions": [
+          "west"
+        ],
+        "animation_group_id": "2420b5cd-973b-4921-b61d-56f80ed6df90",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      }
+    },
+    "ee8251d9-7965-4da1-9fd8-c2fd6c8cc963": {
+      "kind": "animation",
+      "slug": "jyaldi",
+      "template": "cross-punch",
+      "status": "processing",
+      "created_epoch": 1792798394.8659673,
+      "receipt": {
+        "background_job_ids": [
+          "ee8251d9-7965-4da1-9fd8-c2fd6c8cc963"
+        ],
+        "directions": [
+          "west"
+        ],
+        "animation_group_id": "d7125c5e-1c48-4cb9-b350-26408db1849c",
         "status": "processing",
         "enhanced_prompt": null,
         "enhance_usage": null
@@ -21698,24 +23894,24 @@
       "motions": {
         "walking-8-frames": "3cddea2e-3a66-4291-a79c-2be803461b07",
         "breathing-idle": "45bc5aa1-2298-47fe-98f3-6f3981d3fca2",
-        "running-8-frames": "b8f6a0ed-f701-407a-815f-8322ce8c17d2",
-        "running-jump": "793b3211-fc07-41e0-95ec-12d8bed05eaf",
-        "running-slide": "d65a2ba8-9a3a-49ef-a737-9e089f899515",
         "crouched-walking": "8c4f0d0e-1cec-44ba-a650-a0f1e699b6da",
         "sad-walk": "c137cbd9-879d-44da-ba60-da04402748bf",
-        "front-flip": "a6d0a514-71b8-4d30-954b-cdb49eac9196",
-        "backflip": "fb002850-cd93-464d-8e62-343c9fbc74fa",
         "jumping-1": "2c93eba5-670d-4a12-92f9-1b729b26c869",
-        "jumping-2": "b02aaa21-a204-4898-8c46-ad9b2e704756",
-        "two-footed-jump": "f91bc8e4-e06e-4a4d-911f-f953bed08f2f",
         "drinking": "9572ea4b-422f-458e-bc0f-336731cc9084",
-        "picking-up": "b6e88a54-93ff-4be0-8129-09b00161303e",
         "pushing": "5685bf60-f5bc-4b6b-874c-41236ed8694c",
         "pull-heavy-object": "d06d1fbd-1d41-4d2f-abb6-f974f3994f7e",
-        "throw-object": "4109d0e0-2399-4cc7-97a6-896f2fdf2b00",
-        "fight-stance-idle-8-frames": "05fd54a9-cfdf-4a82-a75d-b97b0cf15d17",
-        "lead-jab": "58509341-51b2-4853-936f-c0c46fd92c08",
-        "cross-punch": "3039c443-d199-4d80-807e-11856697e4ba"
+        "running-8-frames": "bbfe0553-bf06-4044-a70a-cbdb7135b3cf",
+        "running-jump": "9972940b-0952-42a1-87aa-3ddbaa5e0ee7",
+        "running-slide": "e208d558-493e-49d2-a431-cf29054f14c9",
+        "front-flip": "6c3d792a-de83-488b-b92c-fe516e2c35fe",
+        "backflip": "abb9eb95-11be-47ab-be0f-3975065d2d78",
+        "jumping-2": "1126e7a0-e1fc-4b4c-ad50-68f43ea5e7c7",
+        "two-footed-jump": "a4cc8130-1878-47ce-9510-c55d1d52023f",
+        "picking-up": "b3b23fc2-8704-4d99-b294-e67ca5bddb1c",
+        "throw-object": "0ec11e25-704e-47de-8469-9e2a68b93cef",
+        "fight-stance-idle-8-frames": "a4b3323c-9576-4a51-ab77-e87a166d025d",
+        "lead-jab": "5745e2b4-2d5c-4e0c-9929-12da32349952",
+        "cross-punch": "ee8251d9-7965-4da1-9fd8-c2fd6c8cc963"
       },
       "ready": true,
       "rebuild_after_direction_policy": true,
@@ -39721,9 +41917,577 @@
           "enhance_usage": null
         }
       }
+    },
+    {
+      "at": "2026-10-23T23:27:12Z",
+      "kind": "completed",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "breathing-idle",
+        "job_id": "45bc5aa1-2298-47fe-98f3-6f3981d3fca2",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T23:27:37Z",
+      "kind": "completed",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "crouched-walking",
+        "job_id": "8c4f0d0e-1cec-44ba-a650-a0f1e699b6da",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T23:27:57Z",
+      "kind": "completed",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "running-slide",
+        "job_id": "d65a2ba8-9a3a-49ef-a737-9e089f899515",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T23:27:58Z",
+      "kind": "completed",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "picking-up",
+        "job_id": "b6e88a54-93ff-4be0-8129-09b00161303e",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T23:27:59Z",
+      "kind": "completed",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "lead-jab",
+        "job_id": "58509341-51b2-4853-936f-c0c46fd92c08",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 2
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T23:28:25Z",
+      "kind": "completed",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "front-flip",
+        "job_id": "a6d0a514-71b8-4d30-954b-cdb49eac9196",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T23:28:25Z",
+      "kind": "completed",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "jumping-2",
+        "job_id": "b02aaa21-a204-4898-8c46-ad9b2e704756",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T23:28:25Z",
+      "kind": "completed",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "two-footed-jump",
+        "job_id": "f91bc8e4-e06e-4a4d-911f-f953bed08f2f",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T23:28:26Z",
+      "kind": "completed",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "drinking",
+        "job_id": "9572ea4b-422f-458e-bc0f-336731cc9084",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T23:28:26Z",
+      "kind": "completed",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "pushing",
+        "job_id": "5685bf60-f5bc-4b6b-874c-41236ed8694c",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T23:28:26Z",
+      "kind": "completed",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "throw-object",
+        "job_id": "4109d0e0-2399-4cc7-97a6-896f2fdf2b00",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T23:28:30Z",
+      "kind": "completed",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "fight-stance-idle-8-frames",
+        "job_id": "05fd54a9-cfdf-4a82-a75d-b97b0cf15d17",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T23:29:06Z",
+      "kind": "completed",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "running-jump",
+        "job_id": "793b3211-fc07-41e0-95ec-12d8bed05eaf",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T23:29:06Z",
+      "kind": "completed",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "sad-walk",
+        "job_id": "c137cbd9-879d-44da-ba60-da04402748bf",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T23:29:06Z",
+      "kind": "completed",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "pull-heavy-object",
+        "job_id": "d06d1fbd-1d41-4d2f-abb6-f974f3994f7e",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T23:29:06Z",
+      "kind": "completed",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "cross-punch",
+        "job_id": "3039c443-d199-4d80-807e-11856697e4ba",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T23:29:41Z",
+      "kind": "completed",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "running-8-frames",
+        "job_id": "b8f6a0ed-f701-407a-815f-8322ce8c17d2",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T23:29:43Z",
+      "kind": "completed",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "backflip",
+        "job_id": "fb002850-cd93-464d-8e62-343c9fbc74fa",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T23:32:54Z",
+      "kind": "completed",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "jumping-1",
+        "job_id": "2c93eba5-670d-4a12-92f9-1b729b26c869",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T23:32:54Z",
+      "kind": "submitted",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "running-8-frames",
+        "job_id": "bbfe0553-bf06-4044-a70a-cbdb7135b3cf",
+        "receipt": {
+          "background_job_ids": [
+            "bbfe0553-bf06-4044-a70a-cbdb7135b3cf"
+          ],
+          "directions": [
+            "west"
+          ],
+          "animation_group_id": "cd4fb756-0ba2-4f11-ba1f-9cf40fe642dc",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T23:32:55Z",
+      "kind": "submitted",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "running-jump",
+        "job_id": "9972940b-0952-42a1-87aa-3ddbaa5e0ee7",
+        "receipt": {
+          "background_job_ids": [
+            "9972940b-0952-42a1-87aa-3ddbaa5e0ee7"
+          ],
+          "directions": [
+            "west"
+          ],
+          "animation_group_id": "b9ca3e46-a65b-478f-91ac-ce6ee459672f",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T23:32:56Z",
+      "kind": "submitted",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "running-slide",
+        "job_id": "e208d558-493e-49d2-a431-cf29054f14c9",
+        "receipt": {
+          "background_job_ids": [
+            "e208d558-493e-49d2-a431-cf29054f14c9"
+          ],
+          "directions": [
+            "west"
+          ],
+          "animation_group_id": "855a501e-c976-4402-b94e-29d23739e77d",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T23:32:56Z",
+      "kind": "submitted",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "front-flip",
+        "job_id": "6c3d792a-de83-488b-b92c-fe516e2c35fe",
+        "receipt": {
+          "background_job_ids": [
+            "6c3d792a-de83-488b-b92c-fe516e2c35fe"
+          ],
+          "directions": [
+            "west"
+          ],
+          "animation_group_id": "9c0ae873-54e0-4e36-9fec-e7ce5a856f5c",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T23:32:57Z",
+      "kind": "submitted",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "backflip",
+        "job_id": "abb9eb95-11be-47ab-be0f-3975065d2d78",
+        "receipt": {
+          "background_job_ids": [
+            "abb9eb95-11be-47ab-be0f-3975065d2d78"
+          ],
+          "directions": [
+            "west"
+          ],
+          "animation_group_id": "e0643185-70f0-448b-b46d-9422570fca96",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T23:32:58Z",
+      "kind": "submitted",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "jumping-2",
+        "job_id": "1126e7a0-e1fc-4b4c-ad50-68f43ea5e7c7",
+        "receipt": {
+          "background_job_ids": [
+            "1126e7a0-e1fc-4b4c-ad50-68f43ea5e7c7"
+          ],
+          "directions": [
+            "west"
+          ],
+          "animation_group_id": "b8f6402f-fbbf-46cb-8618-bab95ed77794",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T23:32:59Z",
+      "kind": "submitted",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "two-footed-jump",
+        "job_id": "a4cc8130-1878-47ce-9510-c55d1d52023f",
+        "receipt": {
+          "background_job_ids": [
+            "a4cc8130-1878-47ce-9510-c55d1d52023f"
+          ],
+          "directions": [
+            "west"
+          ],
+          "animation_group_id": "3395c8fa-f2db-4644-b645-1e5ca9e21c17",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T23:33:04Z",
+      "kind": "submitted",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "picking-up",
+        "job_id": "b3b23fc2-8704-4d99-b294-e67ca5bddb1c",
+        "receipt": {
+          "background_job_ids": [
+            "b3b23fc2-8704-4d99-b294-e67ca5bddb1c"
+          ],
+          "directions": [
+            "west"
+          ],
+          "animation_group_id": "1930136b-b2ae-47e4-9c3a-cdad97f1139a",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T23:33:04Z",
+      "kind": "submitted",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "throw-object",
+        "job_id": "0ec11e25-704e-47de-8469-9e2a68b93cef",
+        "receipt": {
+          "background_job_ids": [
+            "0ec11e25-704e-47de-8469-9e2a68b93cef"
+          ],
+          "directions": [
+            "west"
+          ],
+          "animation_group_id": "dd02d410-8b1b-45f5-8beb-b216406d5519",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T23:33:14Z",
+      "kind": "submitted",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "fight-stance-idle-8-frames",
+        "job_id": "a4b3323c-9576-4a51-ab77-e87a166d025d",
+        "receipt": {
+          "background_job_ids": [
+            "a4b3323c-9576-4a51-ab77-e87a166d025d"
+          ],
+          "directions": [
+            "west"
+          ],
+          "animation_group_id": "fdd8c96b-dac3-4f6b-9092-151baa886133",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T23:33:14Z",
+      "kind": "submitted",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "lead-jab",
+        "job_id": "5745e2b4-2d5c-4e0c-9929-12da32349952",
+        "receipt": {
+          "background_job_ids": [
+            "5745e2b4-2d5c-4e0c-9929-12da32349952"
+          ],
+          "directions": [
+            "west"
+          ],
+          "animation_group_id": "2420b5cd-973b-4921-b61d-56f80ed6df90",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T23:33:15Z",
+      "kind": "submitted",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "cross-punch",
+        "job_id": "ee8251d9-7965-4da1-9fd8-c2fd6c8cc963",
+        "receipt": {
+          "background_job_ids": [
+            "ee8251d9-7965-4da1-9fd8-c2fd6c8cc963"
+          ],
+          "directions": [
+            "west"
+          ],
+          "animation_group_id": "d7125c5e-1c48-4cb9-b350-26408db1849c",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
     }
   ],
-  "updated_at": 1792797955.7730653,
+  "updated_at": 1792798395.6355822,
   "user_stopped_at": 1792778235.6917784,
   "archived_jobs": {
     "304457e9-6577-44f0-af17-97841a9f6720": {
@@ -41045,8 +43809,8 @@
   "last_git_checkpoint": 1792797955.7730536,
   "summary": {
     "jobs": {
-      "processing": 19,
-      "completed": 268,
+      "processing": 12,
+      "completed": 287,
       "failed": 9,
       "stalled": 0
     },

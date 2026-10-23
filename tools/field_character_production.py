@@ -180,6 +180,10 @@ class Production:
   if override:
    assert template=='running-8-frames' and override in {'running-4-frames','running-6-frames'}
    args['template_animation_id']=override
+  seed=control.get('motion_seed_overrides',{}).get(a['slug'],{}).get(template)
+  if seed is not None:
+   assert isinstance(seed,int) and seed>=0
+   args['seed']=seed
   if template=='walking-8-frames':
    if any(x in a['appearance']for x in ['broad','muscular','heavy']):gait='walking with grounded measured strides, a stable heavy torso and restrained arm swing'
    elif any(x in a['appearance']for x in ['nervous','shy','worried','weary','exhausted']):gait='walking carefully with short measured steps, slightly restrained shoulders and a gentle arm swing'

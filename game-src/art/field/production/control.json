@@ -204,7 +204,23 @@
   "source_priority": "AVIF first for identity/build; lore supplements height; explicit user heights override estimates",
   "motion_template_overrides": {
     "jyaldi": {
-      "running-8-frames": "running-6-frames"
+      "running-8-frames": "running-4-frames"
+    }
+  },
+  "motion_seed_overrides": {
+    "jyaldi": {
+      "running-8-frames": 2026102400,
+      "running-jump": 2026102401,
+      "running-slide": 2026102402,
+      "front-flip": 2026102403,
+      "backflip": 2026102404,
+      "jumping-2": 2026102405,
+      "two-footed-jump": 2026102406,
+      "picking-up": 2026102407,
+      "throw-object": 2026102408,
+      "fight-stance-idle-8-frames": 2026102409,
+      "lead-jab": 2026102410,
+      "cross-punch": 2026102411
     }
   }
 }

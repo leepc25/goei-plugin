@@ -1,0 +1,20 @@
+{
+  "at": 1792798180.4036467,
+  "job_id": "793b3211-fc07-41e0-95ec-12d8bed05eaf",
+  "result": "reroll-required",
+  "findings": "2·6·8프레임 머리카락 바깥에 회색 덧칠 및 잔상. 특히6프레임 머리 끝이 회색 덩어리로 바뀌어 사용자 기준에 따라 반려.",
+  "frame_count": 8,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "running-jump",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

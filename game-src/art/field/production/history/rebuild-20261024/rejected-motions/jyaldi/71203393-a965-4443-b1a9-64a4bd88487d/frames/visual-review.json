@@ -1,0 +1,20 @@
+{
+  "at": 1792798103.1433396,
+  "job_id": "b6e88a54-93ff-4be0-8129-09b00161303e",
+  "result": "reroll-required",
+  "findings": "3프레임 손에 큰 갈색 원형 덩어리가 생기고 다음 프레임에 사라짐. 원본 검은 장갑 및 물건 줍기 연속성과 불일치, 현재 결과 반려.",
+  "frame_count": 5,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "picking-up",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

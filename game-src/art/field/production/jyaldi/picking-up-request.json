@@ -6,5 +6,6 @@
     "west"
   ],
   "animation_name": "물건 줍기 (서쪽)",
+  "seed": 2026102407,
   "action_description": "picking up. Preserve this character identity, costume, hair and native proportions. Keep a clean transparent silhouette in every frame. No gray painted patches, gray halo, ground shadow or opaque background around hair, hands, clothes or feet."
 }

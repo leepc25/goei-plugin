@@ -1,0 +1,20 @@
+{
+  "at": 1792798144.6989903,
+  "job_id": "9572ea4b-422f-458e-bc0f-336731cc9084",
+  "result": "pass",
+  "findings": "남서쪽6프레임 전체 확인. 컵을 들어 입에 대고 내리는 연속 동작, 검은 장갑·정장·긴 머리와 얼굴 유지. 회색 외곽 칠 없음, 발 접지와 신체 비율 유지.",
+  "frame_count": 6,
+  "directions": [
+    "south-west"
+  ],
+  "actual_template": "drinking",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

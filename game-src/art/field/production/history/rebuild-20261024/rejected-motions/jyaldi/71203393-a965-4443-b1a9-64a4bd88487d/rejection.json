@@ -1,0 +1,53 @@
+{
+  "reason": "3프레임 손에 큰 갈색 원형 덩어리가 생기고 다음 프레임에 사라짐. 원본 검은 장갑 및 물건 줍기 연속성과 불일치, 현재 결과 반려.",
+  "group": {
+    "animation_type": "picking-up",
+    "display_name": null,
+    "animation_group_id": "71203393-a965-4443-b1a9-64a4bd88487d",
+    "directions": [
+      {
+        "direction": "west",
+        "frame_count": 5,
+        "frames": [
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/97ca841b-4d81-4f70-93b1-31681c82c1dc/west/0.png?t=1792798068",
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/97ca841b-4d81-4f70-93b1-31681c82c1dc/west/1.png?t=1792798068",
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/97ca841b-4d81-4f70-93b1-31681c82c1dc/west/2.png?t=1792798068",
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/97ca841b-4d81-4f70-93b1-31681c82c1dc/west/3.png?t=1792798068",
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/97ca841b-4d81-4f70-93b1-31681c82c1dc/west/4.png?t=1792798068"
+        ]
+      }
+    ]
+  },
+  "at": 1792798360.3922443,
+  "state_before": {
+    "name": "쟈알디",
+    "group": "management",
+    "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+    "image": "78793c7b-f45f-48a6-ab11-0c1d97f86333",
+    "registration": "1a54d3e6-c143-4b60-9c05-2929c084a4cd",
+    "motions": {
+      "walking-8-frames": "3cddea2e-3a66-4291-a79c-2be803461b07",
+      "breathing-idle": "45bc5aa1-2298-47fe-98f3-6f3981d3fca2",
+      "crouched-walking": "8c4f0d0e-1cec-44ba-a650-a0f1e699b6da",
+      "sad-walk": "c137cbd9-879d-44da-ba60-da04402748bf",
+      "jumping-1": "2c93eba5-670d-4a12-92f9-1b729b26c869",
+      "drinking": "9572ea4b-422f-458e-bc0f-336731cc9084",
+      "picking-up": "b6e88a54-93ff-4be0-8129-09b00161303e",
+      "pushing": "5685bf60-f5bc-4b6b-874c-41236ed8694c",
+      "pull-heavy-object": "d06d1fbd-1d41-4d2f-abb6-f974f3994f7e",
+      "throw-object": "4109d0e0-2399-4cc7-97a6-896f2fdf2b00",
+      "fight-stance-idle-8-frames": "05fd54a9-cfdf-4a82-a75d-b97b0cf15d17",
+      "lead-jab": "58509341-51b2-4853-936f-c0c46fd92c08",
+      "cross-punch": "3039c443-d199-4d80-807e-11856697e4ba"
+    },
+    "ready": true,
+    "rebuild_after_direction_policy": true,
+    "image_verified": true,
+    "skeleton_joints": 18,
+    "rotation_count": 8,
+    "exported": false,
+    "motion_direction_revision": "west-southwest",
+    "eight_way_visual_reviewed": true,
+    "motions_visual_reviewed": false
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "at": 1792798180.7576554,
+  "job_id": "3039c443-d199-4d80-807e-11856697e4ba",
+  "result": "reroll-required",
+  "findings": "3프레임 앞 주먹 아래 분리된 회색 세로 잔상,1프레임 머리 끝 외곽 회색 흔적 발견. 투명 외곽 기준에 따라 반려.",
+  "frame_count": 6,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "cross-punch",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

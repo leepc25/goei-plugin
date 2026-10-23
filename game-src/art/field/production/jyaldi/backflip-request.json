@@ -6,5 +6,6 @@
     "west"
   ],
   "animation_name": "뒤 공중제비 (서쪽)",
+  "seed": 2026102404,
   "action_description": "backflip. Preserve this character identity, costume, hair and native proportions. Keep a clean transparent silhouette in every frame. No gray painted patches, gray halo, ground shadow or opaque background around hair, hands, clothes or feet."
 }

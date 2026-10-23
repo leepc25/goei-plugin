@@ -1,0 +1,20 @@
+{
+  "at": 1792798180.5184884,
+  "job_id": "c137cbd9-879d-44da-ba60-da04402748bf",
+  "result": "pass",
+  "findings": "서쪽8프레임 전체 검토. 고개 숙인 보행과 작은 팔 움직임, 긴 검은 머리·정장·장갑·얼굴 유지. 회색 외곽 잔상 없음, 다리 길이와 발 교대 유지.",
+  "frame_count": 8,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "sad-walk",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

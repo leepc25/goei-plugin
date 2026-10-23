@@ -1,10 +1,11 @@
 {
   "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
   "mode": "skeleton-v3",
-  "template_animation_id": "running-6-frames",
+  "template_animation_id": "running-4-frames",
   "directions": [
     "west"
   ],
   "animation_name": "달리기 (서쪽)",
+  "seed": 2026102400,
   "action_description": "running decisively with a steady torso, controlled arm swing and firm purposeful strides. Preserve this character identity, costume, hair and native proportions. Keep a clean transparent silhouette in every frame. No gray painted patches, gray halo, ground shadow or opaque background around hair, hands, clothes or feet."
 }
