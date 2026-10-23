@@ -2285,6 +2285,11 @@ var Hud = class {
   /** 층: 오른쪽 위 구석에 글자만 (판 없음). 바뀔 때는 Fx 층 제목이 크게 알린다 */
   floor(c, s) {
     const f = s.floor;
+    if (s.field) {
+      const r = W3 - (s.compact ? 100 : 20);
+      if (s.field.clock) label(c, s.field.clock, r, 34, 26, "#fff", "right", 900);
+      if (s.field.place) label(c, s.field.place, r, 56, 15, C.amber, "right", 800);
+    }
     if (!f.depth) return;
     const right = W3 - (s.compact ? 100 : 20);
     label(c, f.depth, right, 44, 32, "#fff", "right", 900);

@@ -290,7 +290,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
   };
   // NPC 자유 대화 (npcLink.ts): 껍데기 놀이판 층에 대화창, 승객은 층 모듈 훅으로
   // 본부 방문: 머리 위 이름표·말풍선과 아래 한 줄 입력 (talk.ts)
-  const visit = bridge?.visit ? mountTalk(shell.stage.ui, bridge.visit) : null;
+  const visit = bridge?.visit ? mountTalk(shell.stage.ui, bridge.visit, bridge.field) : null;
   const npc = linkNpcTalk({
     visit: visit ? name => { if (name) visit.open(name); } : undefined,
     layer: shell.stage.ui,

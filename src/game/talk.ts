@@ -1,6 +1,7 @@
 // 본부 방문 대화 화면 (2026-10-22 설계 2판): RPG처럼 머리 위 이름표와 말풍선, 아래 한 줄 입력.
 // 요청·모델·저장은 플러그인(host/game/visit.ts)이 한다. 여기는 보이는 것만.
-import type { GameVisit, VisitState } from './bridge';
+import type { GameField, GameVisit, VisitState } from './bridge';
+import { canJoin, classify, fieldCompanions } from '../core/fieldfollow';
 import { ensureKit, PIXEL_FONT } from './action/ui/kit';
 
 export interface TalkPerson { name: string; x: number; y: number; top: number }
@@ -36,7 +37,7 @@ const CSS = `
 .gt-log[data-open]{display:block}
 `;
 
-export function mountTalk(root: HTMLElement, api: GameVisit) {
+export function mountTalk(root: HTMLElement, api: GameVisit, field?: GameField) {
   ensureKit();
   const st = document.createElement('style');
   st.textContent = CSS;
@@ -125,6 +126,25 @@ export function mountTalk(root: HTMLElement, api: GameVisit) {
     input.blur();
     target = '';
   }
+  /** 「따라와」「기다려」 같은 분명한 부탁은 모델 없이 코드가 장부에 남긴다 (7-2). 애매하면 아무것도 하지 않는다 */
+  const followers: string[] = [];
+  function follow(agent: { name: string; state?: string }, text: string) {
+    if (!field || /^\*/.test(text)) return;
+    const want = classify(text);
+    if (want === 'follow') {
+      const ok = canJoin({ state: agent.state, affinity: 0 });
+      if (!ok.ok) { msg.textContent = ok.reason ?? ''; return; }
+      if (followers.includes(agent.name)) return;
+      followers.push(agent.name);
+      const { shown, rest } = fieldCompanions(followers);
+      void field.record({ kind: 'follow', text: `${agent.name}이(가) 주인공을 따라나섰다`, who: [agent.name], weight: 2, fact: { key: '동행', value: [...shown, ...(rest.length ? [`(그 외 ${rest.join(', ')})`] : [])].join(', ') } }).catch(() => {});
+    } else if (want === 'wait' || want === 'return') {
+      const i = followers.indexOf(agent.name);
+      if (i < 0) return;
+      followers.splice(i, 1);
+      void field.record({ kind: 'unfollow', text: `${agent.name}이(가) ${want === 'wait' ? '그 자리에서 기다리기로 했다' : '원래 자리로 돌아갔다'}`, who: [agent.name], weight: 2, fact: { key: '동행', value: followers.join(', ') || '없음' } }).catch(() => {});
+    }
+  }
   const send = async () => {
     const raw = input.value.trim();
     const agent = state.agents.find((a) => a.name === target && a.room);
@@ -141,6 +161,7 @@ export function mountTalk(root: HTMLElement, api: GameVisit) {
     try {
       state = await api.send(agent.id, text, 'aux', nearby(agent.name));
       if (dead) return;
+      follow(agent, text);
       const turn = state.turns.filter((t) => t.agentId === agent.id).at(-1);
       say(agent.name, turn?.reply ?? '');
       // 끼어든 말은 앞 말을 읽을 틈을 두고 차례로
