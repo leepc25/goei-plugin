@@ -2,7 +2,7 @@
   "slug": "jyaldi",
   "slot": "jumping-2",
   "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
-  "skeleton_visually_reviewed": false,
+  "skeleton_visually_reviewed": true,
   "first_frame_path": "game-src/art/field/production/motion-inputs/jyaldi/jumping-2-v1/first-frame.png",
   "new_user_approval": false,
   "request": {
@@ -843,5 +843,6 @@
     "template_id": "mannequin",
     "seed": 2026102501,
     "no_background": true
-  }
+  },
+  "review_findings": "원본 서쪽 위 관절 대조, 머리·손 상단 경계 내 유지. 원본 픽셀 무변경·좌우64px 투명 패딩.8개 관절 자세 시트 검토."
 }

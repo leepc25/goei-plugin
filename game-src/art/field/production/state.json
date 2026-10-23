@@ -24395,7 +24395,11 @@
         "type": "generations",
         "generations": 3
       },
-      "saved_frames": 8
+      "saved_frames": 8,
+      "visual_rejection": {
+        "reason": "점프2 프리셋 재시도에서도 머리 잘림과 회색 잔상 반복; 직접 관절 지정 skeleton-v3로 재작업",
+        "group": "b8f6402f-fbbf-46cb-8618-bab95ed77794"
+      }
     },
     "a4cc8130-1878-47ce-9510-c55d1d52023f": {
       "kind": "animation",
@@ -25229,6 +25233,19 @@
         "generations": 3
       },
       "saved_frames": 9
+    },
+    "8b8ec1b7-5fb0-43cf-8cde-a18586116dc6": {
+      "kind": "animation",
+      "slug": "jyaldi",
+      "template": "jumping-2",
+      "status": "processing",
+      "created_epoch": 1792798764.2165809,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "8b8ec1b7-5fb0-43cf-8cde-a18586116dc6",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3"
     }
   },
   "characters": {
@@ -25251,21 +25268,21 @@
         "running-slide": "e208d558-493e-49d2-a431-cf29054f14c9",
         "front-flip": "6c3d792a-de83-488b-b92c-fe516e2c35fe",
         "backflip": "abb9eb95-11be-47ab-be0f-3975065d2d78",
-        "jumping-2": "1126e7a0-e1fc-4b4c-ad50-68f43ea5e7c7",
         "two-footed-jump": "a4cc8130-1878-47ce-9510-c55d1d52023f",
         "picking-up": "b3b23fc2-8704-4d99-b294-e67ca5bddb1c",
         "throw-object": "0ec11e25-704e-47de-8469-9e2a68b93cef",
         "fight-stance-idle-8-frames": "a4b3323c-9576-4a51-ab77-e87a166d025d",
         "lead-jab": "5745e2b4-2d5c-4e0c-9929-12da32349952",
         "cross-punch": "ee8251d9-7965-4da1-9fd8-c2fd6c8cc963",
-        "jumping-1": "966dbb7e-2241-435c-82cd-054e43b0b05a"
+        "jumping-1": "966dbb7e-2241-435c-82cd-054e43b0b05a",
+        "jumping-2": "8b8ec1b7-5fb0-43cf-8cde-a18586116dc6"
       },
       "ready": true,
       "rebuild_after_direction_policy": true,
       "image_verified": true,
       "skeleton_joints": 18,
       "rotation_count": 8,
-      "exported": true,
+      "exported": false,
       "motion_direction_revision": "west-southwest",
       "eight_way_visual_reviewed": true,
       "motions_visual_reviewed": false
@@ -44071,9 +44088,24 @@
         "bytes": 1516474,
         "files": 140
       }
+    },
+    {
+      "at": "2026-10-23T23:39:30Z",
+      "kind": "submitted",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "jumping-2",
+        "job_id": "8b8ec1b7-5fb0-43cf-8cde-a18586116dc6",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "8b8ec1b7-5fb0-43cf-8cde-a18586116dc6",
+          "status": "processing"
+        }
+      }
     }
   ],
-  "updated_at": 1792798739.23319,
+  "updated_at": 1792798770.2755895,
   "user_stopped_at": 1792778235.6917784,
   "archived_jobs": {
     "304457e9-6577-44f0-af17-97841a9f6720": {
@@ -45392,10 +45424,10 @@
       "saved_frames": 6
     }
   },
-  "last_git_checkpoint": 1792798398.6645908,
+  "last_git_checkpoint": 1792798741.504254,
   "summary": {
     "jobs": {
-      "processing": 0,
+      "processing": 1,
       "completed": 300,
       "failed": 9,
       "stalled": 0

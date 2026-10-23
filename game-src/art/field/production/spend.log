@@ -298,15 +298,16 @@ d06d1fbd-1d41-4d2f-abb6-f974f3994f7e	jyaldi	animation	pull-heavy-object	complete
 58509341-51b2-4853-936f-c0c46fd92c08	jyaldi	animation	lead-jab	completed	{"usd": 0.0, "type": "generations", "generations": 2}
 3039c443-d199-4d80-807e-11856697e4ba	jyaldi	animation	cross-punch	completed	{"usd": 0.0, "type": "generations", "generations": 3}
 bbfe0553-bf06-4044-a70a-cbdb7135b3cf	jyaldi	animation	running-8-frames	completed	{"usd": 0.0, "type": "generations", "generations": 3}
-9972940b-0952-42a1-87aa-3ddbaa5e0ee7	jyaldi	animation	running-jump	processing	null
-e208d558-493e-49d2-a431-cf29054f14c9	jyaldi	animation	running-slide	processing	null
-6c3d792a-de83-488b-b92c-fe516e2c35fe	jyaldi	animation	front-flip	processing	null
-abb9eb95-11be-47ab-be0f-3975065d2d78	jyaldi	animation	backflip	processing	null
-1126e7a0-e1fc-4b4c-ad50-68f43ea5e7c7	jyaldi	animation	jumping-2	processing	null
-a4cc8130-1878-47ce-9510-c55d1d52023f	jyaldi	animation	two-footed-jump	processing	null
+9972940b-0952-42a1-87aa-3ddbaa5e0ee7	jyaldi	animation	running-jump	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+e208d558-493e-49d2-a431-cf29054f14c9	jyaldi	animation	running-slide	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+6c3d792a-de83-488b-b92c-fe516e2c35fe	jyaldi	animation	front-flip	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+abb9eb95-11be-47ab-be0f-3975065d2d78	jyaldi	animation	backflip	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+1126e7a0-e1fc-4b4c-ad50-68f43ea5e7c7	jyaldi	animation	jumping-2	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+a4cc8130-1878-47ce-9510-c55d1d52023f	jyaldi	animation	two-footed-jump	completed	{"usd": 0.0, "type": "generations", "generations": 3}
 b3b23fc2-8704-4d99-b294-e67ca5bddb1c	jyaldi	animation	picking-up	completed	{"usd": 0.0, "type": "generations", "generations": 3}
-0ec11e25-704e-47de-8469-9e2a68b93cef	jyaldi	animation	throw-object	processing	null
-a4b3323c-9576-4a51-ab77-e87a166d025d	jyaldi	animation	fight-stance-idle-8-frames	processing	null
+0ec11e25-704e-47de-8469-9e2a68b93cef	jyaldi	animation	throw-object	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+a4b3323c-9576-4a51-ab77-e87a166d025d	jyaldi	animation	fight-stance-idle-8-frames	completed	{"usd": 0.0, "type": "generations", "generations": 3}
 5745e2b4-2d5c-4e0c-9929-12da32349952	jyaldi	animation	lead-jab	completed	{"usd": 0.0, "type": "generations", "generations": 2}
-ee8251d9-7965-4da1-9fd8-c2fd6c8cc963	jyaldi	animation	cross-punch	processing	null
-966dbb7e-2241-435c-82cd-054e43b0b05a	jyaldi	animation	jumping-1	processing	null
+ee8251d9-7965-4da1-9fd8-c2fd6c8cc963	jyaldi	animation	cross-punch	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+966dbb7e-2241-435c-82cd-054e43b0b05a	jyaldi	animation	jumping-1	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+8b8ec1b7-5fb0-43cf-8cde-a18586116dc6	jyaldi	animation	jumping-2	processing	null

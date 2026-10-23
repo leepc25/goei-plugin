@@ -223,5 +223,10 @@
       "cross-punch": 2026102411,
       "jumping-1": 2026102499
     }
+  },
+  "custom_motion_specs": {
+    "jyaldi": {
+      "jumping-2": "game-src/art/field/production/motion-inputs/jyaldi/jumping-2-v1/spec.json"
+    }
   }
 }

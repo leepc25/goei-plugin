@@ -158,6 +158,7 @@ class Production:
   assert spec['character_id']==self.s['characters'][slug]['character_id']
   assert spec['slug']==slug and spec['slot']==template and spec.get('skeleton_visually_reviewed')
   args=spec['request'];assert args['no_background'] is True
+  with Image.open(ROOT/spec['first_frame_path']) as im:assert max(im.size)<=256
   assert 3<=len(args['keypoints'])<=15
   for frame in [args['first_frame_keypoints'],*args['keypoints']]:
    assert len(frame)==18 and len({p['label'] for p in frame})==18
@@ -303,7 +304,21 @@ class Production:
        preserved[dr]=before.size==after.size and all(x[3]==y[3] and (not x[3] or x==y)for x,y in zip(before.getdata(),after.getdata()))
      atomic(OUT/slug/'import-preservation.json',{'visible_rgba_and_alpha_preserved':preserved,'regenerated_directions':a.get('registration_regenerate_directions',[])})
      assert all(preserved.values()),'Imported direction pixels changed; inspect before export approval'
-    c['exported']=True;self.event('exported',slug,{'bytes':len(data),'files':len(z.namelist())})
+    # Direct skeleton jobs are standalone, so include every selected local clip
+    # in an explicit production pack rather than claiming it is in the service ZIP.
+    pack_meta={'character_id':c['character_id'],'motions_visually_reviewed':bool(c.get('motions_visual_reviewed')),'new_user_approval':False,'clips':{}}
+    with zipfile.ZipFile(OUT/slug/'production-pack.zip','w',zipfile.ZIP_DEFLATED) as pack:
+     for name in z.namelist():
+      if name.startswith('Idle/rotations/') and name.endswith('.png'):pack.writestr(name,z.read(name))
+     for template,jid in c['motions'].items():
+      folder=OUT/slug/'motions'/template;job=self.s['jobs'].get(jid,{})
+      if job.get('status')!='completed':continue
+      files=sorted(folder.glob('*.png'),key=lambda x:int(x.stem))
+      review=json.loads((folder/'visual-review.json').read_text()) if (folder/'visual-review.json').exists() else None
+      pack_meta['clips'][template]={'job_id':jid,'endpoint':job.get('endpoint','animate-character'),'frame_count':len(files),'review':review}
+      for f in files:pack.write(f,'motions/'+template+'/'+f.name)
+     pack.writestr('production-metadata.json',json.dumps(pack_meta,ensure_ascii=False,indent=2))
+    c['exported']=True;self.event('exported',slug,{'bytes':len(data),'files':len(z.namelist()),'production_pack_clips':len(pack_meta['clips'])})
    except Exception as e:c['export_error']=str(e)
   self.save()
  def checkpoint(self):

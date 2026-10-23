@@ -1,0 +1,20 @@
+{
+  "at": 1792798801.786537,
+  "job_id": "966dbb7e-2241-435c-82cd-054e43b0b05a",
+  "result": "reroll-required",
+  "findings": "재시도4–6프레임 상반신 잘림 반복,7프레임 신체 대부분에 투명 구멍과 분리 픽셀. 프리셋 재시도로 해결되지 않아 직접 관절 지정 재작업 대상.",
+  "frame_count": 9,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "jumping-1",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

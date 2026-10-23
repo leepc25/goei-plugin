@@ -5,6 +5,19 @@ from unittest.mock import patch
 import field_character_production as f
 
 class SchedulingGuards(unittest.TestCase):
+ def test_custom_motion_requires_review_identity_and_bounded_complete_rig(self):
+  with tempfile.TemporaryDirectory() as tmp,patch.object(f,'ROOT',Path(tmp)):
+   root=Path(tmp);f.Image.new('RGBA',(256,256)).save(root/'first.png')
+   joints=[{'label':str(i),'x':0.5,'y':0.5} for i in range(18)]
+   spec={'slug':'a','slot':'jumping-2','character_id':'current','skeleton_visually_reviewed':True,'first_frame_path':'first.png','request':{'no_background':True,'first_frame_keypoints':joints,'keypoints':[joints]*8}}
+   f.atomic(root/'spec.json',spec);p=object.__new__(f.Production);p.s={'characters':{'a':{'character_id':'current'}}}
+   self.assertEqual(len(p.custom_motion_request('a','jumping-2','spec.json')['keypoints']),8)
+   for key,value in [('character_id','wrong'),('skeleton_visually_reviewed',False)]:
+    changed=dict(spec);changed[key]=value;f.atomic(root/'spec.json',changed)
+    with self.assertRaises(AssertionError):p.custom_motion_request('a','jumping-2','spec.json')
+   joints[0]['y']=-0.1;f.atomic(root/'spec.json',spec)
+   with self.assertRaises(AssertionError):p.custom_motion_request('a','jumping-2','spec.json')
+
  def test_import_preserves_supplied_pixels_and_rejects_other_identity(self):
   with tempfile.TemporaryDirectory() as tmp,patch.object(f,'OUT',Path(tmp)/'production'),patch.object(f,'ROOT',Path(tmp)):
    root=Path(tmp);folder=f.OUT/'a';folder.mkdir(parents=True)
