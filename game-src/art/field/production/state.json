@@ -3743,6 +3743,111 @@
         "enhanced_prompt": null,
         "enhance_usage": null
       }
+    },
+    "95f7fbb1-98fc-4481-a293-236e615fb8b8": {
+      "kind": "image",
+      "slug": "aileen",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792782776.6612036,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "95f7fbb1-98fc-4481-a293-236e615fb8b8",
+        "image_id": "d3dee4b0-e85f-5a07-a17d-3cd930f3e630",
+        "source_image_id": "d3dee4b0-e85f-5a07-a17d-3cd930f3e630",
+        "status": "processing",
+        "output_count": 1,
+        "image_size": {
+          "width": 128,
+          "height": 256
+        },
+        "estimated_generations": 9,
+        "pricing_provisional": true
+      }
+    },
+    "a617bd3c-ab6f-4300-892f-814a35344d48": {
+      "kind": "image",
+      "slug": "dejure",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792782800.7256598,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "a617bd3c-ab6f-4300-892f-814a35344d48",
+        "image_id": "4a32fd85-867e-5efb-8fe8-c01ff70b90bd",
+        "source_image_id": "4a32fd85-867e-5efb-8fe8-c01ff70b90bd",
+        "status": "processing",
+        "output_count": 1,
+        "image_size": {
+          "width": 128,
+          "height": 256
+        },
+        "estimated_generations": 9,
+        "pricing_provisional": true
+      }
+    },
+    "6c98e078-134a-4596-827d-94539b32efbc": {
+      "kind": "image",
+      "slug": "sa-jang",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792782817.6434157,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "6c98e078-134a-4596-827d-94539b32efbc",
+        "image_id": "1ef89bbb-97ea-5985-9564-034f81a68ada",
+        "source_image_id": "1ef89bbb-97ea-5985-9564-034f81a68ada",
+        "status": "processing",
+        "output_count": 1,
+        "image_size": {
+          "width": 128,
+          "height": 256
+        },
+        "estimated_generations": 9,
+        "pricing_provisional": true
+      }
+    },
+    "313ee595-1c75-4c33-9a9a-99e46b29e9e1": {
+      "kind": "image",
+      "slug": "do-pil-heon",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792782850.3203065,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "313ee595-1c75-4c33-9a9a-99e46b29e9e1",
+        "image_id": "9f20794d-9cf0-5ef9-bd32-8348802a624e",
+        "source_image_id": "9f20794d-9cf0-5ef9-bd32-8348802a624e",
+        "status": "processing",
+        "output_count": 1,
+        "image_size": {
+          "width": 128,
+          "height": 256
+        },
+        "estimated_generations": 9,
+        "pricing_provisional": true
+      }
+    },
+    "0983045b-232d-4880-8691-a5e0bf30353c": {
+      "kind": "image",
+      "slug": "lee-gil-hwan",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792782916.908672,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "0983045b-232d-4880-8691-a5e0bf30353c",
+        "image_id": "dab958f6-4fa8-5817-b8e4-0366e0c13f59",
+        "source_image_id": "dab958f6-4fa8-5817-b8e4-0366e0c13f59",
+        "status": "processing",
+        "output_count": 1,
+        "image_size": {
+          "width": 128,
+          "height": 256
+        },
+        "estimated_generations": 9,
+        "pricing_provisional": true
+      }
     }
   },
   "characters": {
@@ -3795,7 +3900,7 @@
       "name": "에일린",
       "group": "management",
       "character_id": null,
-      "image": "submitting:1792782776649",
+      "image": "95f7fbb1-98fc-4481-a293-236e615fb8b8",
       "registration": null,
       "motions": {},
       "ready": false,
@@ -3827,7 +3932,8 @@
       "visual_review_required": true,
       "image_verified": true,
       "skeleton_joints": 18,
-      "rotation_count": 8
+      "rotation_count": 8,
+      "exported": true
     },
     "deadpole": {
       "name": "데드폴",
@@ -3841,7 +3947,8 @@
       "visual_review_required": true,
       "image_verified": true,
       "skeleton_joints": 18,
-      "rotation_count": 8
+      "rotation_count": 8,
+      "exported": true
     },
     "geshugan": {
       "name": "게슈간",
@@ -3877,7 +3984,8 @@
       "ready": true,
       "image_verified": true,
       "skeleton_joints": 18,
-      "rotation_count": 8
+      "rotation_count": 8,
+      "exported": true
     },
     "gognija": {
       "name": "고그니쟈",
@@ -3893,7 +4001,7 @@
       "name": "데쥬레",
       "group": "management",
       "character_id": null,
-      "image": null,
+      "image": "a617bd3c-ab6f-4300-892f-814a35344d48",
       "registration": null,
       "motions": {},
       "ready": false
@@ -3902,7 +4010,7 @@
       "name": "사장",
       "group": "fake-bureau",
       "character_id": null,
-      "image": null,
+      "image": "6c98e078-134a-4596-827d-94539b32efbc",
       "registration": null,
       "motions": {},
       "ready": false
@@ -3911,7 +4019,7 @@
       "name": "도필헌",
       "group": "fake-bureau",
       "character_id": null,
-      "image": null,
+      "image": "313ee595-1c75-4c33-9a9a-99e46b29e9e1",
       "registration": null,
       "motions": {},
       "ready": false
@@ -3920,7 +4028,7 @@
       "name": "이길환",
       "group": "fake-bureau",
       "character_id": null,
-      "image": null,
+      "image": "0983045b-232d-4880-8691-a5e0bf30353c",
       "registration": null,
       "motions": {},
       "ready": false
@@ -6660,9 +6768,156 @@
           "enhance_usage": null
         }
       }
+    },
+    {
+      "at": "2026-10-23T19:13:20Z",
+      "kind": "submitted",
+      "slug": "aileen",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "95f7fbb1-98fc-4481-a293-236e615fb8b8",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "95f7fbb1-98fc-4481-a293-236e615fb8b8",
+          "image_id": "d3dee4b0-e85f-5a07-a17d-3cd930f3e630",
+          "source_image_id": "d3dee4b0-e85f-5a07-a17d-3cd930f3e630",
+          "status": "processing",
+          "output_count": 1,
+          "image_size": {
+            "width": 128,
+            "height": 256
+          },
+          "estimated_generations": 9,
+          "pricing_provisional": true
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T19:13:37Z",
+      "kind": "submitted",
+      "slug": "dejure",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "a617bd3c-ab6f-4300-892f-814a35344d48",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "a617bd3c-ab6f-4300-892f-814a35344d48",
+          "image_id": "4a32fd85-867e-5efb-8fe8-c01ff70b90bd",
+          "source_image_id": "4a32fd85-867e-5efb-8fe8-c01ff70b90bd",
+          "status": "processing",
+          "output_count": 1,
+          "image_size": {
+            "width": 128,
+            "height": 256
+          },
+          "estimated_generations": 9,
+          "pricing_provisional": true
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T19:14:10Z",
+      "kind": "submitted",
+      "slug": "sa-jang",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "6c98e078-134a-4596-827d-94539b32efbc",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "6c98e078-134a-4596-827d-94539b32efbc",
+          "image_id": "1ef89bbb-97ea-5985-9564-034f81a68ada",
+          "source_image_id": "1ef89bbb-97ea-5985-9564-034f81a68ada",
+          "status": "processing",
+          "output_count": 1,
+          "image_size": {
+            "width": 128,
+            "height": 256
+          },
+          "estimated_generations": 9,
+          "pricing_provisional": true
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T19:15:16Z",
+      "kind": "submitted",
+      "slug": "do-pil-heon",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "313ee595-1c75-4c33-9a9a-99e46b29e9e1",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "313ee595-1c75-4c33-9a9a-99e46b29e9e1",
+          "image_id": "9f20794d-9cf0-5ef9-bd32-8348802a624e",
+          "source_image_id": "9f20794d-9cf0-5ef9-bd32-8348802a624e",
+          "status": "processing",
+          "output_count": 1,
+          "image_size": {
+            "width": 128,
+            "height": 256
+          },
+          "estimated_generations": 9,
+          "pricing_provisional": true
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T19:16:12Z",
+      "kind": "submitted",
+      "slug": "lee-gil-hwan",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "0983045b-232d-4880-8691-a5e0bf30353c",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "0983045b-232d-4880-8691-a5e0bf30353c",
+          "image_id": "dab958f6-4fa8-5817-b8e4-0366e0c13f59",
+          "source_image_id": "dab958f6-4fa8-5817-b8e4-0366e0c13f59",
+          "status": "processing",
+          "output_count": 1,
+          "image_size": {
+            "width": 128,
+            "height": 256
+          },
+          "estimated_generations": 9,
+          "pricing_provisional": true
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T19:16:24Z",
+      "kind": "exported",
+      "slug": "kyuras",
+      "detail": {
+        "bytes": 92538,
+        "files": 9
+      }
+    },
+    {
+      "at": "2026-10-23T19:16:44Z",
+      "kind": "exported",
+      "slug": "deadpole",
+      "detail": {
+        "bytes": 75054,
+        "files": 9
+      }
+    },
+    {
+      "at": "2026-10-23T19:16:53Z",
+      "kind": "exported",
+      "slug": "konjyuce",
+      "detail": {
+        "bytes": 87832,
+        "files": 9
+      }
     }
   ],
-  "updated_at": 1792782776.6495736,
+  "updated_at": 1792783013.6473153,
   "user_stopped_at": 1792778235.6917784,
   "archived_jobs": {
     "304457e9-6577-44f0-af17-97841a9f6720": {
@@ -7984,12 +8239,12 @@
   "last_git_checkpoint": 1792782390.8717914,
   "summary": {
     "jobs": {
-      "processing": 2,
+      "processing": 8,
       "completed": 39,
       "failed": 3,
       "stalled": 0
     },
-    "characters_ready": 5,
+    "characters_ready": 8,
     "characters_total": 55,
     "images_verified": 10,
     "motions_submitted": 3,
