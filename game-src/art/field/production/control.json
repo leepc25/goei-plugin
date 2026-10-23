@@ -5,7 +5,7 @@
   "max_character_pipeline_in_flight": 6,
   "authorized_total_characters": 55,
   "authorized_clips_per_character": 20,
-  "stop_all": true,
+  "stop_all": false,
   "stopped_by_user_at": 1792778185.5597813,
   "direction_policy": {
     "reference": "front-facing south",

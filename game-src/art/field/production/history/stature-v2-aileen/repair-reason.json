@@ -1,0 +1,8 @@
+{
+  "id": "stature-v2-aileen",
+  "slug": "aileen",
+  "reason": "Petite compact character 225px, only 7px shorter than tall Jyaldi; common height target flattened stature.",
+  "action": "regenerate-front-and-register",
+  "estimated_generations": 13,
+  "correction": "Use updated manifest individual stature range and rendering-only style reference; preserve original costume and build. Review native result before accepting."
+}

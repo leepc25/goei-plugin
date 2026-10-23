@@ -1,0 +1,8 @@
+{
+  "id": "stature-v2-kyuras",
+  "slug": "kyuras",
+  "reason": "Wiry character 242px is as tall as canonical 2m Gorgodio241px; stature was not established by original setting.",
+  "action": "regenerate-front-and-register",
+  "estimated_generations": 13,
+  "correction": "Use updated manifest individual stature range and rendering-only style reference; preserve original costume and build. Review native result before accepting."
+}
