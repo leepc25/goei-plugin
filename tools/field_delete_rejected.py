@@ -11,6 +11,8 @@ def call(path, method='GET'):
 
 def main():
  BACK.mkdir(parents=True,exist_ok=True)
+ if (BACK/'library-before.json').exists():
+  raise SystemExit('Deletion audit already exists. Do not repeat name-based deletion: new accepted registrations may now exist. Reconcile only specific unverified old IDs.')
  manifest=json.loads((OUT/'manifest.json').read_text())
  names={a['name'] for a in manifest if a['group']=='fake-bureau'}
  rows=[];offset=0

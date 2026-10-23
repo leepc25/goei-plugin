@@ -5,6 +5,7 @@ from field_character_production import OUT,atomic
 
 def native_prompt(a):
  a.pop('image_edit_source',None);a.pop('image_edit_description',None)
+ for key in ['image_inpaint_source','image_inpaint_mask','image_inpaint_description']:a.pop(key,None)
  lo,hi=a['stature_rendering']['target_body_pixels']
  h=min(256,4*math.ceil((hi+12)/4))
  a['native_height_canvas']=True
@@ -41,6 +42,7 @@ def main():
   if args.style_source:
    assert s['characters'][args.style_source].get('image_visually_reviewed'),'Style source must have passed visual review'
    a.pop('native_height_canvas',None);r=a['pixel_request'];r['image_size']={'width':128,'height':256}
+   r.setdefault('style_options',{})['color_palette']=False
    r['style_reference_local']='game-src/art/field/production/'+args.style_source+'/reference.png'
    r['style_usage_description']='Use only native pixel rendering, standing scale and FRONT SOUTH pose. Preserve target individual identity, age, hair, face, build and clothes from description.'
    crown=250-round(sum(a['stature_rendering']['target_body_pixels'])/2)
