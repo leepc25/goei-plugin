@@ -210,7 +210,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
   let game: Game | null = null;
   const shell = mountGameShell(box, {
     synth: true,
-    title: bridge?.visit ? '본부 방문' : '차원 승강기',
+    title: bridge?.visit ? '필드' : '차원 승강기',
     sub: bridge?.visit ? '요원들을 만나고 본편 대화를 이어갑니다' : 'ANOMALY SIMULATION · 관리국 액션',
     pauseInfo: () => session.error ?? (game?.inHub ? '본부 자동 저장' : '안전 지점 자동 저장 · 전투 중 중단하면 직전 안전 지점부터'),
     onNew: async () => {

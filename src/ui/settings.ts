@@ -167,7 +167,7 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
   }
   // 기능별 설정 → 본부 대화: 괴담톡·괴담넷·위키처럼 따로 된 화면 (2026-10-23 사용자)
   if (settingsUi.page === 'visit' && scope === 'chat' && canChat) {
-    return `<main class="gx-body gx-settings"><header class="ph-room-head"><button class="ph-tool ph-back" data-action="visit-back" aria-label="설정으로">${ICONS.back}</button><div class="ph-room-title"><b>게임 설정</b></div></header>${visitSettings(ctx, ctx.chat.scriptstate)}</main>`;
+    return `<main class="gx-body gx-settings"><header class="ph-room-head"><button class="ph-tool ph-back" data-action="visit-back" aria-label="설정으로">${ICONS.back}</button><div class="ph-room-title"><b>필드 설정</b></div></header>${visitSettings(ctx, ctx.chat.scriptstate)}</main>`;
   }
   const { basic: s, world, theme } = current(ctx, scope);
   const on = scope === 'chat' ? worldOn(ctx.chat) : s.anomalyOn;
@@ -181,7 +181,7 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
   return `<main class="gx-body gx-settings">
     ${scopeBar(scope, canChat)}
     ${settingsUi.notice ? `<div class="gx-err" role="alert">${esc(settingsUi.notice)}</div>` : ''}
-    ${scope === 'chat' && canChat ? group('기능별 설정', `<div class="st-feats">${[['gnet', '괴담넷', ICONS.gnet], ['phone', '괴담톡', ICONS.phone], ['wiki', '위키', ICONS.wiki], ['visit', '게임', ICONS.game]]
+    ${scope === 'chat' && canChat ? group('기능별 설정', `<div class="st-feats">${[['gnet', '괴담넷', ICONS.gnet], ['phone', '괴담톡', ICONS.phone], ['wiki', '위키', ICONS.wiki], ['visit', '필드', ICONS.game]]
       .map(([k, label, icon]) => `<button class="gx-mini st-feat" data-action="feature-set" data-value="${k}">${icon}${label} 설정</button>`)
       .join('')}</div>`) : ''}
     ${group('화면', [

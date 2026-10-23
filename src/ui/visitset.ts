@@ -1,4 +1,4 @@
-// 설정 → 기능별 설정 → 게임 (2026-10-22 설계 2판 6단계): 보낼 자료·모델·길이와, 실제로 보낸 것·본편에 들어갈 막간 보기.
+// 설정 → 기능별 설정 → 필드 (2026-10-22 설계 2판 6단계): 보낼 자료·모델·길이와, 실제로 보낸 것·본편에 들어갈 막간 보기.
 import { advSections } from './advanced';
 import { keepOpen } from './panels';
 import { settingsUi } from './settings';
@@ -19,7 +19,7 @@ const fold = (key: string, title: string, body: string) => `<details class="ps-a
 export const visitUi = { confirmClear: false };
 
 export function visitSettings(ctx: ChatContext | null, state: Record<string, unknown> | undefined): string {
-  const head = `<section class="ps-group"><p class="ps-note">게임에서 만난 사람과 나눈 말은 다음 본편 요청 때 그 자리(대화한 때의 마지막 답 바로 뒤)에 막간으로 들어가요. 지침은 카드의 「Visit」 로어북에 있어요.</p></section>`;
+  const head = `<section class="ps-group"><p class="ps-note">필드에서 만난 사람과 나눈 말은 다음 본편 요청 때 그 자리(대화한 때의 마지막 답 바로 뒤)에 막간으로 들어가요. 지침은 카드의 「Visit」 로어북에 있어요.</p></section>`;
   if (!ctx) return head + advSections('hq', state);
   const chat = ctx.chat;
   const me = playerAgent(ctx.char.globalLore, chat.scriptstate);
@@ -35,7 +35,7 @@ export function visitSettings(ctx: ChatContext | null, state: Record<string, unk
     ? `<p class="ps-note">${new Date(last.at).toLocaleTimeString()} · ${last.model === 'aux' ? '보조' : '메인'} 모델 · 약 ${tokens(last.messages.map((m) => m.content).join('\n')).toLocaleString()}토큰</p>`
       + last.messages.map((m) => `<p class="ps-note"><b>${esc(m.role)}</b></p>${pre(m.role === 'user' ? prettyJson(m.content) : m.content)}`).join('')
       + `<p class="ps-note"><b>응답 원문</b></p>${pre(last.raw)}<p class="ps-note"><b>말풍선에 넣은 대사</b></p>${pre(last.reply)}`
-    : '<p class="ps-note">이번에 창을 연 뒤로 게임에서 보낸 말이 없어요. 게임에서 말을 걸면 여기에 실제로 보낸 내용이 나와요.</p>';
+    : '<p class="ps-note">이번에 창을 연 뒤로 필드에서 보낸 말이 없어요. 필드에서 말을 걸면 여기에 실제로 보낸 내용이 나와요.</p>';
   const clear = orphans.length
     ? visitUi.confirmClear
       ? `<div class="st-confirm"><p>본편에 들어가지 않는 대화 ${orphans.length}개를 지울까요?</p><div class="gx-row-btns"><button class="gx-mini danger" data-action="visit-orphans-yes">지우기</button><button class="gx-mini" data-action="visit-orphans-no">취소</button></div></div>`
