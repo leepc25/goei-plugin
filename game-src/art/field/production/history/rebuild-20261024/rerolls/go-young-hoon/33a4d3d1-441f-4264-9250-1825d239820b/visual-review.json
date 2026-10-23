@@ -1,0 +1,13 @@
+{
+  "job": "33a4d3d1-441f-4264-9250-1825d239820b",
+  "decision": "reroll",
+  "reason": "서버 heavy load 오류5000, 청구0. 결과없음. 스타일·크기는 통과한 도필헌으로 참조 교체.",
+  "at": 1792789697.3491936,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

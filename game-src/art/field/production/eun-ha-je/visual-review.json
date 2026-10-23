@@ -1,0 +1,13 @@
+{
+  "job": "cbc94035-0c88-4b26-9034-0120fa874397",
+  "decision": "pass",
+  "reason": "원본 재대조: 청남색 턱단발, 불균일한 앞머리와 왼쪽 이마 틈, 창백한 푸른 회색 눈·무표정, 남색 바지정장. 머리 포함208px로 본체 약204px. 정면과 투명 외곽 확인.",
+  "at": 1792789909.8726552,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

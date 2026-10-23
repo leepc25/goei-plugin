@@ -1,0 +1,26 @@
+{
+  "character_id": "ce496b33-584e-44be-9e28-9e3eabc9ae8a",
+  "directions_reviewed": [
+    "south",
+    "south-east",
+    "east",
+    "north-east",
+    "north",
+    "north-west",
+    "west",
+    "south-west"
+  ],
+  "identity_findings": "Rounded bowl cut, aviator sunglasses, round cheeks and belly preserved across8 views; dark suit, tie, white shirt; full figure within canvas.",
+  "stature": "Native standing size consistent across rotations; source216px inclusive hair.",
+  "gray_outer_halo_observed": false,
+  "movement_direction": "east",
+  "stationary_direction": "south-east",
+  "result": "pass",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "Lore supplementary height",
+    "All55 before motions",
+    "Gray-outline reroll"
+  ]
+}

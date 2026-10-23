@@ -1,0 +1,20 @@
+{
+  "character_id": "596e5d65-64de-43bb-bc61-ea653f418729",
+  "directions_reviewed": [
+    "south",
+    "south-east",
+    "east",
+    "north-east",
+    "north",
+    "north-west",
+    "west",
+    "south-west"
+  ],
+  "identity_findings": "Black bob, pink streak on HER LEFT preserved (visible west/southwest), blue eyes, piped navy blazer, gray tie and pleated skirt; corrected torso preserved.",
+  "gray_outer_halo_observed": false,
+  "result": "Retain existing corrected management source, eight-way review complete; previous management scale retained.",
+  "movement_direction": "west",
+  "stationary_direction": "south-west",
+  "reason": "Both profiles have a visible face; west additionally shows the identifying pink hair streak.",
+  "new_user_approval": false
+}

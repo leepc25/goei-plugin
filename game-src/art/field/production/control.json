@@ -27,6 +27,11 @@
       "movement_and_combat": "west",
       "stationary_noncombat": "south-west",
       "reason": "Actual generated east side face hidden by bob; west and southwest face visibly exposed."
+    },
+    "konjyuce": {
+      "movement_and_combat": "west",
+      "stationary_noncombat": "south-west",
+      "reason": "Both profiles have a visible face; west additionally shows the identifying pink hair streak."
     }
   },
   "registration_held_slugs": [],
@@ -81,7 +86,10 @@
   ],
   "registration_approved_slugs": [
     "lee-gil-hwan",
-    "konjyuce"
+    "konjyuce",
+    "do-pil-heon",
+    "kim-seong-jin",
+    "eun-ha-je"
   ],
   "source_priority": "AVIF first for identity/build; lore supplements height; explicit user heights override estimates"
 }

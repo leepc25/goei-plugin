@@ -1,11 +1,11 @@
 {
-  "description": "Full-body native pixel-art game sprite, STRICTLY FRONT SOUTH view: face, nose, chest, belt and knees directly toward viewer, both ears equally visible. No sideways head or three-quarter turn. IDENTITY: Lean wiry adult man with narrow waist, angular narrow cheeks, pointed chin and confident crooked smile. Glossy black SIDE-PARTED hair, long curved curtain lock hanging over one side of forehead, opposite side swept back. Black aviator sunglasses. Fitted black single-breasted suit, white shirt, neat narrow black tie. Both hands look human; do not invent an exposed robot arm. Relaxed upright stance, empty hands at sides. Natural adult anatomy, normal torso/pelvis, 7-head proportions. Anatomical crown to soles 214-222px; feet 6px above bottom, hair fully inside frame. Crisp single-pixel clusters, selective dark outlines, restrained game-sprite shading, no antialiasing. Transparent background, no ground shadow, text or weapons. Preserve individual hair, face, stature and clothing. Do not copy any generic character. Anatomical height excludes high hair/headwear. Every outer edge must border transparency directly, never a light gray halo.",
+  "description": "Full-body native pixel-art game sprite, STRICTLY FRONT SOUTH view: face, nose, chest, belt and knees directly toward viewer, both ears equally visible. No sideways head or three-quarter turn. IDENTITY: Lean wiry adult man with narrow waist, angular narrow cheeks, pointed chin and confident crooked smile. Glossy black SIDE-PARTED hair, long curved curtain lock hanging over one side of forehead, opposite side swept back. Black aviator sunglasses. Fitted black single-breasted suit, white shirt, neat narrow black tie. Both hands look human; do not invent an exposed robot arm. Relaxed upright stance, empty hands at sides. Natural adult anatomy, normal torso/pelvis, 7-head proportions. Anatomical crown to soles 214-222px; feet 6px above bottom, hair fully inside frame. Crisp single-pixel clusters, selective dark outlines, restrained game-sprite shading, no antialiasing. Transparent background, no ground shadow, text or weapons. Preserve individual hair, face, stature and clothing. Do not copy any generic character. Anatomical height excludes high hair/headwear. Every outer edge must border transparency directly, never a light gray halo. Match reference native anatomical height, crown about y30 and soles y250. Preserve target individual face and body shape.",
   "image_size": {
     "width": 128,
-    "height": 236
+    "height": 256
   },
   "no_background": true,
-  "seed": 1792788955,
+  "seed": 1792789696,
   "target_palette": {
     "max_colors": 48
   },
@@ -14,5 +14,17 @@
     "outline": true,
     "detail": true,
     "shading": true
+  },
+  "style_image": {
+    "image": {
+      "type": "base64",
+      "base64": "[image payload omitted]",
+      "format": "png"
+    },
+    "size": {
+      "width": 128,
+      "height": 256
+    },
+    "usage_description": "Copy ONLY pixel rendering, scale and front-facing pose. Keep target individual head, hair, facial features, build and clothing from description. No copied identity."
   }
 }

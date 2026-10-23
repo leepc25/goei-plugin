@@ -1,0 +1,13 @@
+{
+  "job": "d5dfbca5-a1ff-47cb-964c-567ab8f36b3b",
+  "decision": "reroll",
+  "reason": "키·정면·부드러운 얼굴은 개선됐으나 원작의 짧은 앞머리 위 이마 노출이 부족. 이번 결과에서 앞머리만 짧게 교정.",
+  "at": 1792789965.4933074,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

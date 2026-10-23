@@ -1,0 +1,13 @@
+{
+  "job": "d627018c-3c00-4814-9e5d-f2318e432b0b",
+  "decision": "reroll",
+  "reason": "큰 사각 아래턱은 개선됐으나 본체180px 미만으로 키 부족.",
+  "at": 1792789697.1006117,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

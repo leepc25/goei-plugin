@@ -1,0 +1,36 @@
+{
+  "group_id": "6979fc53-a05e-451f-86bb-90c2675a0989",
+  "states": [
+    {
+      "character": {
+        "id": "596e5d65-64de-43bb-bc61-ea653f418729",
+        "name": "Idle",
+        "prompt": "콘쥬스 / Konjyuce. 17 year old Korean schoolgirl with natural age-appropriate teen proportions with a normally long ribcage, visible abdomen between ribs and pelvis, natural waist at the top of the pelvis, and balanced torso and leg lengths, shoulder length straight black bob with one distinctive pink streak, blue eyes, determined youthful face. Fully clothed navy school uniform blazer with light piping extending to the upper hips, not cropped, white collared shirt, black necktie, gray knee length pleated school skirt sitting at the natural waist, not high-waisted, dark socks and plain black school loafers. No adult glamour styling. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
+        "size": {
+          "width": 128,
+          "height": 256
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "low top-down",
+        "created_at": "2026-10-23T20:58:11.003463+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {}
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-10-23T21:10:58.036673"
+}

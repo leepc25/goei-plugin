@@ -1,0 +1,13 @@
+{
+  "job": "594e5e33-e083-4945-b3a2-904fc2ddcb40",
+  "decision": "reroll",
+  "reason": "키200px로 장신 목표보다 작고 얼굴이 측면으로 돌아감. 첫 신규 제작본은 본체 키가 맞았으므로 그 원본에서 얼굴·팔 흉터만 교정한다.",
+  "at": 1792789795.7496948,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

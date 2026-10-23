@@ -132,6 +132,8 @@ class Production:
   except Exception as e:c['readiness_error']=str(e)
   self.save()
  def image_request(self,a):
+  if a.get('image_edit_source'):
+   return {'image':{'type':'base64','base64':base64.b64encode((ROOT/a['image_edit_source']).read_bytes()).decode(),'format':'png'},'method':'text','description':a['image_edit_description'],'no_background':True,'use_color_palette_correction':True,'seed':a['pixel_request'].get('seed',0)}
   args=dict(a['pixel_request']);usage=args.pop('style_usage_description',None);source=args.pop('style_reference_local',None)
   if source:
    path=ROOT/source;im=Image.open(path);args['style_image']={'image':{'type':'base64','base64':base64.b64encode(path.read_bytes()).decode(),'format':'png'},'size':{'width':im.width,'height':im.height},'usage_description':usage}
@@ -204,7 +206,7 @@ class Production:
    if len(active())>=20:return
    c=self.s['characters'][a['slug']]
    if a.get('pixel_request')and not c.get('image')and a['slug']in json.loads((OUT/'control.json').read_text()).get('image_approved_slugs',[x['slug']for x in self.manifest])and sum(j['kind']in['image','registration']for j in active())<json.loads((OUT/'control.json').read_text()).get('max_character_pipeline_in_flight',6):
-    self.submit('image',a['slug'],'create-image-pro-flash',self.image_request(a))
+    self.submit('image',a['slug'],'edit-image-pro-flash' if a.get('image_edit_source') else 'create-image-pro-flash',self.image_request(a))
   # A visual gate prevents spreading a broken animation route to the whole roster.
   control=json.loads((OUT/'control.json').read_text())
   if not control.get('release_skeleton_v3_motions'):return

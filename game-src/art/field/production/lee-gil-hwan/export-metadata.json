@@ -1,0 +1,36 @@
+{
+  "group_id": "79d2e59f-e028-4fbe-a88e-adf339ffa882",
+  "states": [
+    {
+      "character": {
+        "id": "ce496b33-584e-44be-9e28-9e3eabc9ae8a",
+        "name": "Idle",
+        "prompt": "이길환 / Lee Gil-hwan. Stocky plump middle-aged man with broad rounded torso and visible belly, round full cheeks and soft double chin, mild closed-mouth smile. Smooth dark brown-black BOWL haircut with thick straight rounded fringe touching the sunglasses. Black aviator sunglasses. Charcoal suit fitted over the round belly, white shirt, neat black tie. NOT slim or muscular. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
+        "size": {
+          "width": 128,
+          "height": 256
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "low top-down",
+        "created_at": "2026-10-23T20:56:42.267215+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {}
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-10-23T21:08:54.758945"
+}
