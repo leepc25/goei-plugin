@@ -1,5 +1,4 @@
-85) sepia(.15); } 19% { filter: saturate(.2) contrast(1.4) brightness(1.55) sepia(.1); } 60% { filter: saturate(.35) contrast(1.25) brightness(1.1) sepia(.15); } 100% { filter: saturate(.5) contrast(1.15) brightness(.85) sepia(.15); } }
-/* 글자 깨짐: 화면 위 글자 전부가 붉게 번지며 떨린다 (글자는 ui/cctvfx.ts가 바꿈) */
+ 깨짐: 화면 위 글자 전부가 붉게 번지며 떨린다 (글자는 ui/cctvfx.ts가 바꿈) */
 .gx-opview.fx-text :is(.gx-oposd, .gx-opcap) { animation: gx-textjit .75s steps(1) both; }
 @keyframes gx-textjit {
   0% { transform: translate(2px, 0); text-shadow: 2px 0 rgba(255, 30, 60, .8), -2px 0 rgba(0, 230, 255, .6); }
@@ -542,7 +541,7 @@
     }
     return { next, lore: lore.count, scripts: scripts.count, fields: fields3 };
   }
-  var PLUGIN_VERSION = true ? "0.16.52" : "0";
+  var PLUGIN_VERSION = true ? "0.16.53" : "0";
 
   // src/host/game/fetch.ts
   var GAME_BASE = UPDATE_BASE ? `${UPDATE_BASE}/game` : "";
@@ -607,7 +606,7 @@
 
   // src/host/game/code.ts
   var CODE_KEY = "goei:game:code";
-  var VERSION = true ? "0.16.52" : "";
+  var VERSION = true ? "0.16.53" : "";
   var codeVersion = (code) => /^\/\/ goei-game (\S+)/.exec(code)?.[1] ?? null;
   var mod = null;
   var codeStats = { readMs: 0, runMs: 0, bytes: 0, fromNet: false };
@@ -725,7 +724,7 @@
   }
   async function installGamePack(bytes, expect, hash) {
     const pack3 = parseGamePack(bytes);
-    if (!pack3) throw new GameFileError("괴이 ː 이면세계 게임 팩 파일이 아니에요.");
+    if (!pack3) throw new GameFileError("괴이 ː ANOMALY 게임 팩 파일이 아니에요.");
     if (expect && pack3.id !== expect) throw new GameFileError(`다른 팩이에요 (${pack3.id}).`);
     const files2 = {};
     for (const [name, b] of pack3.files) files2[name] = [MIME3[name.split(".").pop().toLowerCase()] ?? "application/octet-stream", base642(b)];
@@ -3898,4 +3897,11 @@ ${recentStory.map((m) => m.text).join("\n")}`,
       confirmEnd: field2.confirmEnd === e.key
     });
   }
-  function placeCard(key2, c,
+  function placeCard(key2, c, on2) {
+    let name;
+    let sub;
+    let wiki2;
+    if (key2.startsWith("fac:")) {
+      const lm = c.landmarks.find((l) => l.name === key2.slice(4));
+      name = lm?.label || lm?.name || key2.slice(4);
+      sub = lm ? placeWhere(lm.sido, lm.gu) :

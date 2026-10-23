@@ -1,4 +1,12 @@
-["인류를 위해 목숨 바쳐라! 난 여기서 죽기로 했다!", "날 방패로 써도 좋으니 버텨!", "맛만 봐, 맛만.", "어이, 거기! 쏘지 마! 지켜보기만 해!"] })
+위기엔 단호한 선생님 반말.", ["괜찮으세요?"], ["벌써 끝난 것처럼 굴면 남은 기회까지 버리는 거예요.", "다친 데 보여 주세요.", "같이 나가요. 협조해 주세요.", "…알았어요. 해 볼게요."], ["favor", "hint", "join", "leave", "gift"]),
+    kangihak: dd("kangihak", "강이학", "Kang I-hak", "조랑말", "I조 사원. 돈(금)만, 늘 웃음", "밝고 길게 끄는 감탄형, 사과는 빠르고 크게.", ["강이학, 반가워요! 사원입니다!"], ["네네!", "하하. 오케이.", "근데! 거짓말이면 개인정보 다 넘기고 장기 담보 대출 하나 받아 갈 거예요!", "퇴근 후 사망은 회사가 알아서!"]),
+    janghunun: dd("janghunun", "장허운", "Jang Heo-un", "소", "Y조(마무리조) 사원. 소원 때문에 못 그만둠", "낮고 거친 목소리, 누구에게나 공손한 존댓말. 짧게 말하다 막힌다.", ["저는… 장허운입니다."], ["…압니다.", "소원권이 필요합니다. 그만둘 수 없습니다.", "죽은 사람을… 되살릴 수 있습니까.", "오늘 많이 도움받았습니다. 꼭 갚겠습니다."], ["favor", "hint", "join", "leave"]),
+    hoyuwon: dd("hoyuwon", "호유원", "Ho Yu-won", "여우", "이사. 웃는 상담사", "부드럽고 공손한 해요체, 누구에게나 「~님」, 조금 지나치게 기뻐한다. 아홉 번 대답하게 하려 한다.", ["어머, 이런 우연이 다 있네요."], ["이건 명백한 승낙이고 통화 기록에 남아요. 환영합니다!", "실수하지 않으시게 미리 준비해 뒀어요.", "참 신기한 우연이죠?", "부끄럽고 무서워라."], ["favor", "hint", "hostile", "leave"])
+  };
+  DAYDREAM_NPCS.goyoungeun.gifts = ["bandage"];
+  var FAKE_NPCS = {
+    leedohyeong: d2({ id: "leedohyeong", name: "이도형", sheet: "이도형", group: "fake", color: "#444b55", photo: "Lee Do-hyeong", role: "가짜 관리국 검객 부서 부장. 최강의 개인 전투원.", speech: "건들건들 오만한 반말, 명령은 한 단어와 턱짓.", effects: ["favor", "hint", "hostile", "leave"], greet: ["어, 다들 수고. 신입 왔다며?"], lines: ["들어가.", "감각을 깨워야 돼. 여기서 베면 죽는다, 그 감각.", "나머지는 다 엑스트라야.", "귀찮게 하네."] }),
+    kwakseongju: d2({ id: "kwakseongju", name: "곽성주", sheet: "곽성주", group: "fake", color: "#5a4a3a", photo: "Kwak Seong-ju", role: "가짜 관리국 과장. 최전방 중돌격 담당.", speech: "연병장 고함, 욕설 섞인 반말. 명령·농담·객기가 같은 음량.", effects: ["favor", "hint", "hostile", "leave"], greet: ["닥쳐, 이 자식아! 후퇴는 없다!"], lines: ["인류를 위해 목숨 바쳐라! 난 여기서 죽기로 했다!", "날 방패로 써도 좋으니 버텨!", "맛만 봐, 맛만.", "어이, 거기! 쏘지 마! 지켜보기만 해!"] })
   };
   var FACTION_NPCS = {
     blaret: d2({ id: "blaret", name: "블라렛", sheet: "블라렛", group: "faction", color: "#e8e2d0", photo: "Blaret", role: "교황청 특급 수녀. 진조 흡혈귀를 쫓아 한국에 파견.", speech: "장난스럽고 판매원처럼 밝은 반말 섞인 존댓말, 상대를 찔러 본다. 전투에선 심판하듯 차갑게.", effects: ["favor", "hint", "join", "hostile", "leave", "trade"], greet: ["반가워요. 교황청 특급 수녀 블라렛. 흡혈귀 퇴치 건으로 한국에 왔어요."], lines: ["어때요? 그쪽 일 접고 우리 쪽으로 개종하는 거.", "내가 말하면 그쪽도 말하는 거예요. 숨기기 없기.", "재밌는 거 볼래요? …찰칵.", "흡혈귀 사냥이라면 그쪽보다 전문이죠."] }),
@@ -132,7 +140,7 @@ ${lines3.join("\n")}`);
       ...p.meta?.events?.length ? [`요즘 관리국 상황판 소식: ${p.meta.events.slice(0, 3).join(" / ")}`] : []
     ];
     const parts = [
-      `너는 액션 게임 「차원 승강기」 속 인물 「${name}」이다. 괴이 롤플레이 「괴이 ː 이면세계」 세계관이다. 지금 플레이어가 조종하는 관리국 요원과 마주 보고 말한다.`,
+      `너는 액션 게임 「차원 승강기」 속 인물 「${name}」이다. 괴이 롤플레이 「괴이 ː ANOMALY」 세계관이다. 지금 플레이어가 조종하는 관리국 요원과 마주 보고 말한다.`,
       p.sheet ? `[인물 시트: 본편 설정. 영어로 적혀 있지만 대답은 한국어로]
 ${p.sheet}` : "",
       t.persona ? `[이 사람]
@@ -2988,64 +2996,4 @@ ${t.secret}` : "",
       boss: boss2 ? { name: boss2.label, hp: boss2.hp, max: boss2.hpMax } : null,
       // 아래 자막은 3초까지만 (바닥 띠를 오래 가리지 않게)
       message: w.subtitle && w.tick - w.subtitleAt < 90 ? w.subtitle.text : void 0,
-      // 가드 게이지는 가드 중이거나 닳았을 때만
-      meters: p.guarding || p.guardMeter < 100 ? [{ label: "가드", v: p.guardMeter, max: 100, color: "#9ad08a" }] : [],
-      compact: shell.touchShown,
-      device: shell.touchShown ? "touch" : shell.input.last,
-      navigation: navigationFeedback(w)
-    };
-  }
-  function heldWeapon(w) {
-    const h = w.notes.held;
-    return h ? { name: h.name, mag: h.uses, magMax: h.max, reserve: 0, reload: null } : null;
-  }
-  function engineModules(box2, bridge) {
-    const rawSaves = bridge?.saves ?? idbSaves("goei-game");
-    const session = new SessionStore(rawSaves, bridge?.slot ?? 0, typeof localStorage === "undefined" ? void 0 : localStorage);
-    setSupplyCatalog(SUPPLY_CATALOG);
-    setHudItemIcon(drawItemIcon);
-    setItemIconDrawer(drawItemIcon);
-    const audio = createGameAudio(local("goei-game-audio"));
-    let game = null;
-    const shell = mountGameShell(box2, {
-      synth: true,
-      title: bridge?.visit ? "필드" : "차원 승강기",
-      sub: bridge?.visit ? "요원들을 만나고 본편 대화를 이어갑니다" : "ANOMALY SIMULATION · 관리국 액션",
-      pauseInfo: () => session.error ?? (game?.inHub ? "본부 자동 저장" : "안전 지점 자동 저장 · 전투 중 중단하면 직전 안전 지점부터"),
-      onNew: async () => {
-        if (bridge?.visit) {
-          game?.start_new();
-          return;
-        }
-        await session.ready;
-        if (session.checkpoint) {
-          await game?.resume(session.checkpoint);
-          game?.endRun("withdraw");
-          return;
-        }
-        for (const k of Object.keys(story.flags)) if (k.startsWith("cut_") || k === "told_rope") delete story.flags[k];
-        saveFlags();
-        game?.start_new();
-      },
-      onContinue: async () => {
-        if (bridge?.visit) {
-          game?.start_new();
-          return;
-        }
-        await session.ready;
-        try {
-          if (session.checkpoint) await game?.resume(session.checkpoint);
-          else game?.start_new();
-        } catch {
-          void shell.choose({ title: "출동 복원 실패", lines: ["저장 기록을 읽지 못했습니다. 원본 기록은 보존했습니다."], options: ["닫기"] });
-        }
-      },
-      hasSave: () => session.hasSave || hasSaved(),
-      onRetreat: () => bridge?.visit ? bridge.close?.() : game?.endRun("withdraw"),
-      onTitle: () => bridge?.visit ? bridge.close?.() : game?.toTitle(),
-      toLocal: bridge?.viewport ? (x, y, el) => bridge.viewport.toLocal(x, y, el) : void 0,
-      field: bridge?.visit ? { onExit: () => bridge.close?.() } : void 0
-    });
-    const stageStore = {
-      load: () => {
-        if (session.meta) return 
+      // 가드 게이지는 가

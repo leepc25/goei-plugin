@@ -207,12 +207,16 @@ await build({ ...common, entryPoints: ['src/game/action/engine/demo.ts'], format
   for (const key of ['room', 'workstation']) {
     startRoom[key] = `data:image/png;base64,${readFileSync(`game-pack/start-room/${key}.png`).toString('base64')}`;
   }
+  const testPeople = {};
+  for (const key of ['woman_idle', 'woman_run', 'man']) {
+    testPeople[key] = `data:image/png;base64,${readFileSync(`game-pack/test-people/${key}.png`).toString('base64')}`;
+  }
   const hqDoor = {};
   for (const key of ['frame', 'aperture', 'leaf-left', 'leaf-right', 'entry-marker']) {
     hqDoor[key] = `data:image/png;base64,${readFileSync(`game-pack/hq-door-round2/${key}.png`).toString('base64')}`;
   }
   const code = readFileSync('dist-test/engine-demo.js', 'utf8').replace(/<\/script/gi, '<\\/script');
-  const html = `<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>관리국 액션 · 전투 시연</title><style>html,body{margin:0;height:100%;background:#000;overflow:hidden}#box{position:fixed;inset:0}</style><div id="box"></div><script>window.__GOEI_ENGINE_ART__=${JSON.stringify(art)};window.__GOEI_BG_ART__=${JSON.stringify(bg)};window.__GOEI_ITEM_ART__=${JSON.stringify(items)};window.__GOEI_HQ_DOOR_ROUND2__=${JSON.stringify(hqDoor)};window.__GOEI_START_ROOM__=${JSON.stringify(startRoom)}</script><script type="module">${code}</script></html>`;
+  const html = `<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>관리국 액션 · 전투 시연</title><style>html,body{margin:0;height:100%;background:#000;overflow:hidden}#box{position:fixed;inset:0}</style><div id="box"></div><script>window.__GOEI_ENGINE_ART__=${JSON.stringify(art)};window.__GOEI_BG_ART__=${JSON.stringify(bg)};window.__GOEI_ITEM_ART__=${JSON.stringify(items)};window.__GOEI_HQ_DOOR_ROUND2__=${JSON.stringify(hqDoor)};window.__GOEI_START_ROOM__=${JSON.stringify(startRoom)};window.__GOEI_TEST_PEOPLE__=${JSON.stringify(testPeople)}</script><script type="module">${code}</script></html>`;
   writeFileSync('dist/goei-action-game.html', html);
   mkdirSync('release/demo', { recursive: true });
   writeFileSync('release/demo/goei-action-game.html', html);

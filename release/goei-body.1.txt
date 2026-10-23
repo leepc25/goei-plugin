@@ -1,4 +1,4 @@
-// goei-body 0.16.52
+// goei-body 0.16.53
 "use strict";
 (() => {
   // src/core/dispatch.ts
@@ -239,18 +239,19 @@ ${tpl.replace(/\[\[INPUT\]\]/g, extra)}`;
   // src/ui/brand.ts
   var BRAND = {
     /** 창 머리·표지 이름 */
-    name: "괴이 ː 이면세계",
-    /** 표지 아래 작은 영문 */
-    sub: "ANOMALY SIM",
+    name: "괴이 ː ANOMALY",
     /** 떠 있는 여는 버튼에 마우스를 올렸을 때 */
-    fab: "괴이 ː 이면세계"
+    fab: "괴이 ː ANOMALY"
   };
+  function brandHtml(text, signal) {
+    return `<span style="color:${text}">괴이</span><span style="color:${signal};font-weight:300;margin:0 .3em">ː</span><span style="color:${signal}">ANOMALY</span>`;
+  }
   var CARD_FILE = "괴이_이면세계.charx";
 
   // src/ui/landing.ts
   var MONO = "'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace";
   function title(p) {
-    const line2 = `<span style="color:${p.text}">괴이</span><span style="color:${p.signal};font-weight:300;margin:0 .3em">ː</span><span style="color:${p.signal}">이면세계</span>`;
+    const line2 = brandHtml(p.text, p.signal);
     const font = "font-size:2.1em;font-weight:800;letter-spacing:.08em;line-height:1.15;white-space:nowrap";
     return `<div style="margin:6px 0 0;${font}">${line2}</div><div aria-hidden="true" style="${font};line-height:1;margin:-.06em 0 .02em;-webkit-mask-image:linear-gradient(to bottom,#000,transparent 60%);mask-image:linear-gradient(to bottom,#000,transparent 60%)"><div data-goei-part="mirror" style="transform:scaleY(-1);opacity:.3">${line2}</div></div>`;
   }
@@ -260,7 +261,7 @@ ${tpl.replace(/\[\[INPUT\]\]/g, extra)}`;
   }
   function landingHtml(p) {
     const ghost = GHOST_ICON.replace('width="24" height="24"', 'width="92" height="92"');
-    return `<div data-goei-card="landing" style="position:relative;overflow:hidden;box-sizing:border-box;max-width:23em;margin:18px auto;padding:30px 30px 22px;border-radius:20px;background:${p.void};border:1px solid ${p.line};color:${p.text};line-height:1.6;font-size:15px;text-align:center;box-shadow:0 20px 40px -24px rgba(0,0,0,.45)"><span aria-hidden="true" data-goei-part="scan" style="position:absolute;left:0;right:0;top:0;height:40%;pointer-events:none;opacity:0;background:linear-gradient(to bottom,transparent,${p.accentBg} 70%,transparent)"></span>` + corner("top left", p) + corner("top right", p) + corner("bottom left", p) + corner("bottom right", p) + `<span style="position:absolute;top:13px;right:34px;display:inline-flex;align-items:center;gap:6px;font-family:${MONO};font-size:10px;letter-spacing:.2em;color:${p.sub}"><span data-goei-part="dot" style="width:6px;height:6px;border-radius:50%;background:${p.signal}"></span>STANDBY</span><div data-goei-part="row" style="position:relative;display:flex;flex-direction:column;align-items:center;gap:14px"><div data-goei-part="ghost" style="flex:0 0 auto;display:grid;place-items:center;width:96px;height:96px;color:${p.signal};filter:drop-shadow(0 6px 14px ${p.accentBg})">${ghost}</div><div data-goei-part="text" style="width:100%;min-width:0"><div style="display:flex;align-items:center;justify-content:center;gap:8px 12px;flex-wrap:wrap;font-family:${MONO};font-size:11px;letter-spacing:.28em"><span data-goei-part="label" style="color:${p.signal}">ANOMALY SIMULATION</span></div>` + title(p) + `<div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:4px;padding-top:12px;border-top:1px dashed ${p.line};color:${p.sub}"><span style="font-family:${MONO};color:${p.signal}">▸</span><span data-goei-part="hint">유령 버튼을 눌러 시작하세요</span></div></div></div></div>`;
+    return `<div data-goei-card="landing" style="position:relative;overflow:hidden;box-sizing:border-box;max-width:23em;margin:18px auto;padding:30px 30px 22px;border-radius:20px;background:${p.void};border:1px solid ${p.line};color:${p.text};line-height:1.6;font-size:15px;text-align:center;box-shadow:0 20px 40px -24px rgba(0,0,0,.45)"><span aria-hidden="true" data-goei-part="scan" style="position:absolute;left:0;right:0;top:0;height:40%;pointer-events:none;opacity:0;background:linear-gradient(to bottom,transparent,${p.accentBg} 70%,transparent)"></span>` + corner("top left", p) + corner("top right", p) + corner("bottom left", p) + corner("bottom right", p) + `<span style="position:absolute;top:13px;right:34px;display:inline-flex;align-items:center;gap:6px;font-family:${MONO};font-size:10px;letter-spacing:.2em;color:${p.sub}"><span data-goei-part="dot" style="width:6px;height:6px;border-radius:50%;background:${p.signal}"></span>STANDBY</span><div data-goei-part="row" style="position:relative;display:flex;flex-direction:column;align-items:center;gap:14px"><div data-goei-part="ghost" style="flex:0 0 auto;display:grid;place-items:center;width:96px;height:96px;color:${p.signal};filter:drop-shadow(0 6px 14px ${p.accentBg})">${ghost}</div><div data-goei-part="text" style="width:100%;min-width:0">` + title(p) + `<div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:4px;padding-top:12px;border-top:1px dashed ${p.line};color:${p.sub}"><span style="font-family:${MONO};color:${p.signal}">▸</span><span data-goei-part="hint">유령 버튼을 눌러 시작하세요</span></div></div></div></div>`;
   }
   var LANDING_CSS = `
 [data-goei-card="landing"] { container-type: inline-size; }
@@ -1409,7 +1410,7 @@ ${body4.slice(at).replace(/^\s+/, "")}
     }
     return out;
   }
-  var HELP = "괴이: 이면세계 플러그인이 쓰는 명부입니다. 플러그인 창 「설정 → 카드 명부」에서 고치세요. 괴이는 🚧괴이, 미스틱 사이트는 🎁파밍, 요원은 🙂요원 폴더에 로어북을 넣으면 자동으로 들어옵니다. 요원의 소속은 창에서 조직을 골라 정합니다. 거점은 지도에 찍히는 장소이고 조직에 묶지 않아도 됩니다. 모델에게는 보내지 않습니다.";
+  var HELP = "괴이: ANOMALY 플러그인이 쓰는 명부입니다. 플러그인 창 「설정 → 카드 명부」에서 고치세요. 괴이는 🚧괴이, 미스틱 사이트는 🎁파밍, 요원은 🙂요원 폴더에 로어북을 넣으면 자동으로 들어옵니다. 요원의 소속은 창에서 조직을 골라 정합니다. 거점은 지도에 찍히는 장소이고 조직에 묶지 않아도 됩니다. 모델에게는 보내지 않습니다.";
   function directoryContent(data) {
     return JSON.stringify({ schema: data.schema, _help: HELP, refill: data.refill, 괴이: data.괴이, "미스틱 사이트": data["미스틱 사이트"], 요원: data.요원, 조직: data.조직, ...data.거점 ? { 거점: data.거점 } : {}, ...data.호칭 ? { 호칭: data.호칭 } : {}, ...data["괴담톡 탭"] ? { "괴담톡 탭": data["괴담톡 탭"] } : {}, ...data["시작 로어북"] ? { "시작 로어북": data["시작 로어북"] } : {}, ...data.codes_used?.length ? { codes_used: data.codes_used } : {} }, null, 1);
   }
@@ -4280,4 +4281,10 @@ ${themeVars("[x-goei-fab]")}
         if (!wanted(r)) r.unread = false;
       }
     };
-    for (const p of st.posts) run3(p.comments, old.get(p.id)?.comments ?? [], (c) => c.mine ? "me" : "npc", (c) => r
+    for (const p of st.posts) run3(p.comments, old.get(p.id)?.comments ?? [], (c) => c.mine ? "me" : "npc", (c) => replyForUser(p, c));
+    run3(st.dms, previous.dms, (d) => d.side, (d) => d.side !== "me");
+  }
+  function acknowledge(st, post, nick) {
+    let changed = false;
+    if (post !== void 0) {
+      for (const c of findPost(st, post)?.comments ?? []) 

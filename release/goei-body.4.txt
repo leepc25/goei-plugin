@@ -1,6 +1,4 @@
-dex: 30; display: flex; flex-direction: column; max-height: 320px; overflow-y: auto; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); box-shadow: var(--shadow); }
-.gx-mapsug:empty { display: none; }
-.gx-sugi { display: flex; align-items: baseline; gap: 8px; min-height: 40px; padding: 8px 12px; border: 0; border-bottom: 1px solid var(--panel2); background: none; color: var(--text); text-align: left; font: inherit; font-size: 14px; cursor: pointer; }
+: flex; align-items: baseline; gap: 8px; min-height: 40px; padding: 8px 12px; border: 0; border-bottom: 1px solid var(--panel2); background: none; color: var(--text); text-align: left; font: inherit; font-size: 14px; cursor: pointer; }
 .gx-sugi:last-child { border-bottom: 0; }
 .gx-sugi:hover, .gx-sugi:focus-visible { background: var(--panel2); outline: none; }
 .gx-sugi small { color: var(--dim); font-size: 12px; }
@@ -2208,4 +2206,5 @@ button.mk-go:hover { color: var(--signal); }
 .gx-opview.fx-shade > .gx-opshade { display: block; animation: gx-shade .22s cubic-bezier(.4, 0, .6, 1) both; }
 @keyframes gx-shade { 0% { transform: translateX(125%) rotate(4deg); opacity: .96; } 100% { transform: translateX(-130%) rotate(-3deg); opacity: .96; } }
 .gx-opview.fx-shade > .gx-opfeed { animation: gx-shadeimg 1.4s ease-out both; }
-@keyframes gx-shadeimg { 0%, 14% { filter: saturate(.5) contrast(1.15) brightness(.
+@keyframes gx-shadeimg { 0%, 14% { filter: saturate(.5) contrast(1.15) brightness(.85) sepia(.15); } 19% { filter: saturate(.2) contrast(1.4) brightness(1.55) sepia(.1); } 60% { filter: saturate(.35) contrast(1.25) brightness(1.1) sepia(.15); } 100% { filter: saturate(.5) contrast(1.15) brightness(.85) sepia(.15); } }
+/* 글자

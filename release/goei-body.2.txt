@@ -1,10 +1,4 @@
-eplyForUser(p, c));
-    run3(st.dms, previous.dms, (d) => d.side, (d) => d.side !== "me");
-  }
-  function acknowledge(st, post, nick) {
-    let changed = false;
-    if (post !== void 0) {
-      for (const c of findPost(st, post)?.comments ?? []) if (c.unread) [c.unread, changed] = [false, true];
+if (c.unread) [c.unread, changed] = [false, true];
     }
     if (nick !== void 0) {
       for (const d of st.dms) if (d.nick === nick && d.unread) [d.unread, changed] = [false, true];
@@ -4488,4 +4482,8 @@ The previous response was rejected and nothing was saved. Recreate the complete 
   var KEY = "goei:prefs";
   async function loadPrefs() {
     try {
-      const raw = await risuai.pluginStorage.getIte
+      const raw = await risuai.pluginStorage.getItem(KEY);
+      return setPrefs(typeof raw === "string" ? JSON.parse(raw) : raw);
+    } catch (error) {
+      console.log(`[goei] 기본 설정을 읽지 못했어요: ${error instanceof Error ? error.message : String(error)}`);
+      return getPre

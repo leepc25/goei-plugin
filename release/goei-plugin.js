@@ -1,9 +1,9 @@
 //@name goei-plugin
-//@display-name 괴이: 이면세계
+//@display-name 괴이: ANOMALY
 //@api 3.0
-//@version 0.16.52
+//@version 0.16.53
 //@update-url https://raw.githubusercontent.com/leepc25/goei-plugin/main/release/goei-plugin.js
-//@description 괴이: 이면세계 전용 플러그인 (괴이봇 2탄 기반): 시작 화면, 상황판, 지도·요원 이동, 커스텀 임무, 괴담넷, 괴담톡, 위키, 설정·캐릭터 이미지
+//@description 괴이: ANOMALY 전용 플러그인 (괴이봇 2탄 기반): 시작 화면, 상황판, 지도·요원 이동, 커스텀 임무, 괴담넷, 괴담톡, 위키, 설정·캐릭터 이미지
 // src/loader/body.ts
 var BODY_KEY = "goei:body";
 var BASE = true ? "https://raw.githubusercontent.com/leepc25/goei-plugin/main/release" : "";
@@ -101,8 +101,8 @@ function closePanel() {
 function showPanel(version, install2) {
   if (root) return;
   root = document.createElement("div");
-  root.innerHTML = `<style>${CSS}</style><div class="gl-back"><div class="gl-card" role="dialog" aria-label="괴이 ː 이면세계">
-      <b>괴이 ː 이면세계</b>
+  root.innerHTML = `<style>${CSS}</style><div class="gl-back"><div class="gl-card" role="dialog" aria-label="괴이 ː ANOMALY">
+      <b>괴이 ː ANOMALY</b>
       <p>플러그인 본체를 받지 못했어요. 다시 받거나, 릴리스 zip에 든 goei-body.js를 넣어 주세요.</p>
       <p class="gl-msg" hidden></p>
       <div class="gl-act"><button class="primary" data-gl="get">다시 받기</button><button data-gl="file">파일로 넣기</button><button data-gl="close">닫기</button></div>
@@ -143,7 +143,7 @@ function showPanel(version, install2) {
 }
 
 // src/main.ts
-var VERSION = true ? "0.16.52" : "";
+var VERSION = true ? "0.16.53" : "";
 var WATCH_MS = 1e3;
 var MARKS = ["%%SEED%%", "%%SCENE_CARD:", "%%PHONE_CALL:", "%%GOEI_UNSENT%%", "%%GOEI_START%%", 'data-goei="landing"', "ANOMALY SIMULATION", "[▣"];
 var ours = (t) => typeof t === "string" && MARKS.some((m) => t.includes(m));

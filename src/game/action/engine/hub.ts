@@ -12,6 +12,7 @@ import { HQ_PLACE, drawFloor, drawHqWall, drawPropArt, drawHqTextureWall } from 
 import { drawStartRoom, drawStartRoomFurniture } from '../art/startRoom';
 import { drawHqDoorRound2 } from '../art/hqDoorRound2';
 import { drawVisitAgent, visitAgentTop } from '../art/visitAgents';
+import { drawTestMan, hasTestPeople, testManTop, testPlayerTop } from '../art/testPeople';
 import { persp, view as fieldView } from './view';
 import { blockByProps, clearSpot, type BlockProp } from './propBlock';
 import { LANE_BOT, LANE_TOP, type HqBox, type HqDoor, type HqMapView, type HqScene, type HqSpot } from '../hq/map';
@@ -80,7 +81,9 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
     enterTick = -1;
     opening = null;
     near = null;
-    solids = [...sc.boxes.filter((b) => b.solid).map((b) => ({ x: b.x, y: b.y, w: b.w, back: b.d + 6, front: 8 })), ...people.map((p) => ({ x: p.x, y: p.y, w: 80, back: 24, front: 24 }))];
+    // 필드 시험: 사무실에 서 있는 남자 (임시)
+    const man = sc.id === 'office' && hasTestPeople() ? { x: 900, y: 560 } : null;
+    solids = [...(man ? [{ x: man.x, y: man.y, w: 70, back: 20, front: 20 }] : []), ...sc.boxes.filter((b) => b.solid).map((b) => ({ x: b.x, y: b.y, w: b.w, back: b.d + 6, front: 8 })), ...people.map((p) => ({ x: p.x, y: p.y, w: 80, back: 24, front: 24 }))];
     const len = Math.max(SCREEN_W, sc.length);
     const sx = Math.max(60, Math.min(len - 60, x));
     arrive = { x: sx, y };
@@ -98,7 +101,8 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
       depthLayers: sc.boxes.map((b) => ({ y: sc.id === 'office' && b.kind === 'chair' ? 495 : b.y, occludedSilhouette: sc.id !== 'office', x0: sc.id === 'office' ? 180 : b.x - b.w / 2, x1: sc.id === 'office' ? 560 : b.x + b.w / 2, draw: (c: CanvasRenderingContext2D) => {
         if (sc.id === 'office') { drawStartRoomFurniture(c, b.kind); return; }
         drawBox(c, b, sc.look);
-      } })).concat(people.map((p) => ({ y: p.y, x0: p.x - 60, x1: p.x + 60, occludedSilhouette: false, draw: (c: CanvasRenderingContext2D) => { drawVisitAgent(c, p.name, p.x, p.y, p.face, performance.now()); } }))),
+      } })).concat(people.map((p) => ({ y: p.y, x0: p.x - 60, x1: p.x + 60, occludedSilhouette: false, draw: (c: CanvasRenderingContext2D) => { drawVisitAgent(c, p.name, p.x, p.y, p.face, performance.now()); } })))
+        .concat(man ? [{ y: man.y, x0: man.x - 60, x1: man.x + 60, occludedSilhouette: false, draw: (c: CanvasRenderingContext2D) => { drawTestMan(c, man.x, man.y, -1); } }] : []),
       drawBackground(c: CanvasRenderingContext2D, camX: number) {
         if (sc.id === 'office' && drawStartRoom(c, openOf('out'))) return;
         if (sc.legacy) {
@@ -139,7 +143,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
         const z = fieldView.zoom;
         c.save();
         c.scale(1 / z, 1 / z);
-        host.overlay?.(c, people.map((p) => ({ name: p.name, x: p.x * z, y: p.y * z, top: visitAgentTop(p.name) * persp(p.y) })), { name: '', x: w.player.x * z, y: w.player.y * z, top: visitAgentTop('쟈알디') * persp(w.player.y) });
+        host.overlay?.(c, people.map((p) => ({ name: p.name, x: p.x * z, y: p.y * z, top: visitAgentTop(p.name) * persp(p.y) })), { name: '', x: w.player.x * z, y: w.player.y * z, top: (hasTestPeople() ? testPlayerTop() : visitAgentTop('쟈알디')) * persp(w.player.y) });
         c.restore();
         // 출입 표식과 잠금 이유는 render.ts / HUD가 같은 조사 대상으로 표시한다.
         const dark = fadeOut > 0 ? 1 - fadeOut / FADE : age < FADE ? 1 - age / FADE : 0;

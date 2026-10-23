@@ -1,4 +1,61 @@
-pl.y + 2 && pl.x > l.x0 - 50 && pl.x < l.x1 + 50))) {
+onst l = d3.layer;
+              ctx.save();
+              ctx.translate(-camX, 0);
+              l.draw(ctx);
+              ctx.restore();
+            }
+          }
+        };
+        propsUpTo(w.lane[0]);
+        for (const u of w.underlays) u(ctx, camX);
+        const pos = (b) => {
+          const f = b;
+          return { x: lerp2(f.px ?? b.x, b.x, alpha), y: lerp2(f.py ?? b.y, b.y, alpha), z: lerp2(f.pz ?? b.z, b.z, alpha) };
+        };
+        for (const b of all) {
+          if (b.kind === "bullet" || !(b instanceof Fighter)) continue;
+          const q = pos(b);
+          ctx.fillStyle = "rgba(0,0,0,0.35)";
+          ctx.beginPath();
+          ctx.ellipse(q.x - camX, q.y, 46 * Math.max(0.5, 1 - q.z / 400), 12, 0, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        for (const g2 of ghosts) {
+          sprite(g2.clip, g2.frame, g2.origin, g2.x - camX, g2.y, g2.dir, g2.t / 8 * 0.35);
+          g2.t--;
+        }
+        for (let i = ghosts.length - 1; i >= 0; i--) if (ghosts[i].t <= 0) ghosts.splice(i, 1);
+        const worldSpace = (b) => !(b instanceof Fighter) && !(b instanceof Bullet);
+        for (const b of all) {
+          const back = b.drawBack;
+          if (!back) continue;
+          ctx.save();
+          ctx.translate(-camX, 0);
+          back.call(b, ctx);
+          ctx.restore();
+        }
+        all.sort((a, b) => a.y - b.y);
+        for (const b of all) {
+          const q = pos(b);
+          propsUpTo(q.y);
+          const jitter = b.stop > 0 && b !== w.player ? w.tick % 2 ? 3 : -3 : 0;
+          if (b === w.player) drawPlayer(w.player, q.x - camX, q.y, q.z, w);
+          else if (b.draw && worldSpace(b)) {
+            ctx.save();
+            ctx.translate(-camX + jitter, 0);
+            b.draw(ctx, w);
+            ctx.restore();
+          } else if (b.draw) {
+            ctx.save();
+            ctx.translate(Math.round(q.x - camX + jitter), Math.round(q.y - q.z));
+            b.draw(ctx, w);
+            ctx.restore();
+          } else grayBody(b, camX - jitter, 0);
+        }
+        propsUpTo(Infinity);
+        {
+          const pl = w.player;
+          if (pl.alive && (w.props.some((p) => p.y > pl.y + 2 && Math.abs(p.x - pl.x) < p.w / 2 + 50 && !["hubdoor", "hubspot", "door", "elevator", "hatch"].includes(p.kind)) || layers.some((l) => l.occludedSilhouette !== false && l.y > pl.y + 2 && pl.x > l.x0 - 50 && pl.x < l.x1 + 50))) {
             const q = pos(pl);
             ctx.save();
             ctx.globalAlpha = 0.4;
@@ -1571,9 +1628,9 @@ pl.y + 2 && pl.x > l.x0 - 50 && pl.x < l.x1 + 50))) {
 
   // src/game/action/engine/game.ts
   var Game = class {
-    constructor(box2, art5, mods) {
+    constructor(box2, art6, mods) {
       this.box = box2;
-      this.art = art5;
+      this.art = art6;
       this.mods = mods;
       if (mods.surface) {
         this.canvas = mods.surface.canvas;
@@ -1588,7 +1645,7 @@ pl.y + 2 && pl.x > l.x0 - 50 && pl.x < l.x1 + 50))) {
         this.ctx = this.canvas.getContext("2d");
         this.ownCanvas = true;
       }
-      this.renderer = makeRenderer(this.ctx, art5, { hud: mods.hud !== false });
+      this.renderer = makeRenderer(this.ctx, art6, { hud: mods.hud !== false });
       this.input.attach();
       this.canvas.addEventListener("pointerdown", (e) => this.onPointer(e));
       this.scene = this.idleScene("title");
@@ -2201,12 +2258,12 @@ pl.y + 2 && pl.x > l.x0 - 50 && pl.x < l.x1 + 50))) {
     };
   }
   var U = 3;
-  function pixelBox(c, x, y, w, h, fill, line2, shadow2 = true) {
+  function pixelBox(c, x, y, w, h, fill, line2, shadow3 = true) {
     x = Math.round(x / U) * U;
     y = Math.round(y / U) * U;
     w = Math.ceil(w / U) * U;
     h = Math.ceil(h / U) * U;
-    if (shadow2) {
+    if (shadow3) {
       c.fillStyle = "rgba(0,0,0,.45)";
       c.fillRect(x + U, y + h, w - U, U);
       c.fillRect(x + w, y + U, U, h);
@@ -4795,38 +4852,4 @@ pl.y + 2 && pl.x > l.x0 - 50 && pl.x < l.x1 + 50))) {
     "npc:office": (c) => [{ who: c.agentName, text: c.fatigue >= 2 ? "…또 나가요? 좀 쉬고 싶은데." : "갈 데 있으면 불러요." }],
     "npc:clinic": () => [{ who: "의무실", text: "다친 사람은 쉬거나, 예산을 쓰거나." }],
     "npc:interview": () => [{ who: "면담실", text: "구조된 분들이 기다리고 있어요." }],
-    "npc:training": () => [{ who: "훈련장", text: "허수아비가 기다린다. 기록은 벽에 붙어 있다." }],
-    "npc:street": () => [{ who: "종로", text: "사람이 하나도 없는 거리. 인식의 장막 안쪽이다." }],
-    "npc:gallery": () => [{ who: "격리 구역", text: "진열장에 회수물이 하나둘 늘어 간다." }],
-    "npc:pasta": () => [{ who: "파스타집", text: "공략 축하는 여기서. 오늘은 부장님이 산대요." }],
-    "brief:jaemtri": (c) => [{ who: "잼트리", text: c.rules?.length ? `알려진 규칙부터요. ${c.rules.slice(0, 2).join(" / ")}` : "점검표요. 서명란이 비어 있으면 그게 입구래요. …네, 지금 타신 그거요." }, ...c.variantHint ? [{ who: "잼트리", text: c.variantHint }] : []],
-    "brief:chief": (c) => [{ who: "부장", text: `목표: ${c.mission ?? "조사"}. 위험하면 다락방 로프로 철수해. 살아서 오는 게 먼저다.` }],
-    "brief:reply": (c) => [{ who: c.agentName, text: c.agent === "jyaldi" ? "알겠어. 금방 갔다 온다." : "확인. 다녀오겠습니다." }],
-    "return:return": () => [{ who: "잼트리", text: "돌아오셨네요! 보고서는 제가 정리할게요." }],
-    "return:withdraw": () => [{ who: "잼트리", text: "철수도 판단이에요. 잘하셨어요." }],
-    "return:evac": (c) => [{ who: "데쥬레", text: `${c.agentName} 씨, 깨, 깨어났어요? 의무실이에요. 다들 걱정했어요.` }],
-    "pantry:chat": (c) => FALLBACK["npc:pantry"](c)
-  };
-  function lines(tag2, ctx) {
-    const got = provider?.(tag2, ctx);
-    if (got && got.length) return got;
-    return FALLBACK[tag2]?.(ctx) ?? [];
-  }
-
-  // src/game/action/hq/link.ts
-  function rosterFor(card, id) {
-    if (!card) return null;
-    const a = AGENT_BY_ID[id];
-    const en = id === "eileen" ? "aileen" : id;
-    return card.agents.find((x) => x.name === a.name || (x.english ?? "").toLowerCase().startsWith(en)) ?? null;
-  }
-  var boardNames = (card) => (card?.events ?? []).filter((e) => !e.state || /활성|진행|출현/.test(e.state)).map((e) => e.name);
-  function reportPayload(s2) {
-    const l = s2.last;
-    if (!l) return null;
-    const a = AGENT_BY_ID[l.agent];
-    return {
-      mission: MISSION_BY_ID[l.mission]?.title ?? l.mission,
-      outcome: l.how,
-      depth: l.result.depth,
-      agents: [{ id: a.id, name: a.name, hp
+    "npc:training": () => [{ who: "훈련

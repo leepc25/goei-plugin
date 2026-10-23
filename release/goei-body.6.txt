@@ -1,11 +1,4 @@
- on2) {
-    let name;
-    let sub;
-    let wiki2;
-    if (key2.startsWith("fac:")) {
-      const lm = c.landmarks.find((l) => l.name === key2.slice(4));
-      name = lm?.label || lm?.name || key2.slice(4);
-      sub = lm ? placeWhere(lm.sido, lm.gu) : "거점";
+ "거점";
       wiki2 = lm?.name ?? name;
     } else {
       const full = locName(key2);
@@ -1712,14 +1705,14 @@ ${v.trim()}`).join("\n\n") : "";
   };
   function header(sub, extra = "") {
     return `<header class="gx-head">
-    <div class="gx-brand"><span class="gx-logo">${GHOST_ICON}</span><div><b>${BRAND.name}</b><small>${esc19(sub)}</small></div></div>
+    <div class="gx-brand"><span class="gx-logo">${GHOST_ICON}</span><div><b aria-label="${BRAND.name}">${brandHtml("var(--text)", "var(--signal)")}</b><small>${esc19(sub)}</small></div></div>
     <div class="gx-head-act">${extra}<button class="gx-x" data-action="close" aria-label="닫기">${ICONS.close}</button></div>
   </header>`;
   }
   var gameShown = () => true;
   function startedHeader(ctx2) {
     return `<header class="gx-head">
-    <div class="gx-brand gx-tabhead"><span class="gx-hmark"><span class="gx-logo">${GHOST_ICON}</span><span class="gx-mark-txt"><b>${BRAND.name}</b><small aria-label="${BRAND.sub}">${[...BRAND.sub].map((ch) => ch === " " ? '<i class="sp">&nbsp;</i>' : `<i>${ch}</i>`).join("")}</small></span></span><span class="gx-hsep" aria-hidden="true">›</span><span class="gx-tabicon">${tab === "field" ? ICONS.game : ICONS[tab]}</span><div><b>${TAB_TITLE[tab]}</b></div></div>
+    <div class="gx-brand gx-tabhead"><span class="gx-hmark"><span class="gx-logo">${GHOST_ICON}</span><span class="gx-mark-txt"><b aria-label="${BRAND.name}">${brandHtml("var(--text)", "var(--signal)")}</b></span></span><span class="gx-hsep" aria-hidden="true">›</span><span class="gx-tabicon">${tab === "field" ? ICONS.game : ICONS[tab]}</span><div><b>${TAB_TITLE[tab]}</b></div></div>
     <div class="gx-head-act">
       ${gameShown() ? `<button class="gx-x gx-fieldbtn${tab === "field" ? " on" : ""}" data-action="tab" data-value="field" aria-label="필드" title="필드">${ICONS.game}</button>` : ""}
       <button class="gx-x gx-idbtn" data-action="id-card" aria-label="내 ID카드">${userInfo().photo ? `<img src="${esc19(userInfo().photo)}" alt="">` : ICONS.idcard}</button>
@@ -2521,5 +2514,5 @@ ${v.trim()}`).join("\n\n") : "";
   }
 
   // src/body-entry.ts
-  globalThis.__goeiBody = { version: "0.16.52", start: start2 };
+  globalThis.__goeiBody = { version: "0.16.53", start: start2 };
 })();

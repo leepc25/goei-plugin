@@ -1,4 +1,64 @@
-session.meta;
+드 중이거나 닳았을 때만
+      meters: p.guarding || p.guardMeter < 100 ? [{ label: "가드", v: p.guardMeter, max: 100, color: "#9ad08a" }] : [],
+      compact: shell.touchShown,
+      device: shell.touchShown ? "touch" : shell.input.last,
+      navigation: navigationFeedback(w)
+    };
+  }
+  function heldWeapon(w) {
+    const h = w.notes.held;
+    return h ? { name: h.name, mag: h.uses, magMax: h.max, reserve: 0, reload: null } : null;
+  }
+  function engineModules(box2, bridge) {
+    const rawSaves = bridge?.saves ?? idbSaves("goei-game");
+    const session = new SessionStore(rawSaves, bridge?.slot ?? 0, typeof localStorage === "undefined" ? void 0 : localStorage);
+    setSupplyCatalog(SUPPLY_CATALOG);
+    setHudItemIcon(drawItemIcon);
+    setItemIconDrawer(drawItemIcon);
+    const audio = createGameAudio(local("goei-game-audio"));
+    let game = null;
+    const shell = mountGameShell(box2, {
+      synth: true,
+      title: bridge?.visit ? "필드" : "차원 승강기",
+      sub: bridge?.visit ? "요원들을 만나고 본편 대화를 이어갑니다" : "ANOMALY SIMULATION · 관리국 액션",
+      pauseInfo: () => session.error ?? (game?.inHub ? "본부 자동 저장" : "안전 지점 자동 저장 · 전투 중 중단하면 직전 안전 지점부터"),
+      onNew: async () => {
+        if (bridge?.visit) {
+          game?.start_new();
+          return;
+        }
+        await session.ready;
+        if (session.checkpoint) {
+          await game?.resume(session.checkpoint);
+          game?.endRun("withdraw");
+          return;
+        }
+        for (const k of Object.keys(story.flags)) if (k.startsWith("cut_") || k === "told_rope") delete story.flags[k];
+        saveFlags();
+        game?.start_new();
+      },
+      onContinue: async () => {
+        if (bridge?.visit) {
+          game?.start_new();
+          return;
+        }
+        await session.ready;
+        try {
+          if (session.checkpoint) await game?.resume(session.checkpoint);
+          else game?.start_new();
+        } catch {
+          void shell.choose({ title: "출동 복원 실패", lines: ["저장 기록을 읽지 못했습니다. 원본 기록은 보존했습니다."], options: ["닫기"] });
+        }
+      },
+      hasSave: () => session.hasSave || hasSaved(),
+      onRetreat: () => bridge?.visit ? bridge.close?.() : game?.endRun("withdraw"),
+      onTitle: () => bridge?.visit ? bridge.close?.() : game?.toTitle(),
+      toLocal: bridge?.viewport ? (x, y, el) => bridge.viewport.toLocal(x, y, el) : void 0,
+      field: bridge?.visit ? { onExit: () => bridge.close?.() } : void 0
+    });
+    const stageStore = {
+      load: () => {
+        if (session.meta) return session.meta;
         try {
           const t = localStorage.getItem("goei-game-stage");
           return t ? JSON.parse(t) : null;
@@ -652,13 +712,14 @@ session.meta;
     const releaseHqArt = prepareHqTextures(bridge?.assets ? (f) => bridge.assets.url("hq-textures", f) : void 0);
     const releaseDoorArt = prepareHqDoorRound2(bridge?.assets ? (f) => bridge.assets.url("hq-door-round2", f) : void 0);
     const startRoom = prepareStartRoom(bridge?.assets ? (f) => bridge.assets.url("start-room", f) : void 0);
+    const testPeople = bridge?.visit || window.__GOEI_TEST_PEOPLE__ ? prepareTestPeople(bridge?.assets ? (f) => bridge.assets.url("test-people", f) : void 0) : null;
     const visitArt = bridge?.visit ? prepareVisitAgents(bridge.assets ? (f) => bridge.assets.url("visit-agents", f) : void 0, bridge.assets ? (f) => bridge.assets.bytes("visit-agents", f) : void 0) : null;
-    void Promise.all([loadArt(urlOf, bridge?.assets ? (f) => bridge.assets.bytes("jyaldi", f) : void 0), startRoom.ready, visitArt?.ready]).then(([art5]) => {
+    void Promise.all([loadArt(urlOf, bridge?.assets ? (f) => bridge.assets.bytes("jyaldi", f) : void 0), startRoom.ready, visitArt?.ready, testPeople?.ready]).then(([art6]) => {
       if (dead) return;
       stage.remove();
       root.style.display = "block";
       const wiring = engineModules(root, bridge);
-      game = new Game(wiring.box, art5, wiring.mods);
+      game = new Game(wiring.box, art6, wiring.mods);
       wiring.bind(game);
       if (!wiring.mods.surface) offTouch = mountTouch(stage, game.input);
       game.start();
@@ -678,6 +739,7 @@ session.meta;
       releaseHqArt();
       startRoom.dispose();
       visitArt?.dispose();
+      testPeople?.dispose();
       offTouch?.();
       game?.destroy();
       const g2 = globalThis;
@@ -1354,11 +1416,11 @@ session.meta;
       this.ctx = canvas.getContext("2d");
     }
     atlas = {};
-    async load(art5) {
-      this.atlas = art5.atlas;
+    async load(art6) {
+      this.atlas = art6.atlas;
       await Promise.all([
-        ...Object.entries(SHEET_FILES).map(async ([k, v]) => this.sheets.set(k, await loadImage(art5.url(v)))),
-        ...Object.entries(BACK_FILES).map(async ([k, v]) => this.backs.set(k, await loadImage(art5.url(v))))
+        ...Object.entries(SHEET_FILES).map(async ([k, v]) => this.sheets.set(k, await loadImage(art6.url(v)))),
+        ...Object.entries(BACK_FILES).map(async ([k, v]) => this.backs.set(k, await loadImage(art6.url(v))))
       ]);
       this.ready = true;
     }
@@ -1721,9 +1783,9 @@ session.meta;
     };
     void (async () => {
       try {
-        const art5 = await host.art();
-        faces = art5.url(FACE_FILE);
-        const [raw] = await Promise.all([host.load().catch(() => null), renderer.load(art5)]);
+        const art6 = await host.art();
+        faces = art6.url(FACE_FILE);
+        const [raw] = await Promise.all([host.load().catch(() => null), renderer.load(art6)]);
         if (disposed) return;
         meta = readMeta(raw);
         run = lastRun && lastRun.squad === meta.squad.join() ? lastRun.run : newRun(meta);
@@ -2335,15 +2397,15 @@ session.meta;
     disposed = false;
     preview = null;
     ctx;
-    async load(art5) {
-      this.art = art5;
+    async load(art6) {
+      this.art = art6;
       await Promise.all(
         ["a-jyaldi-action", "e-corner", "e-watchman", "bg-bureau-action"].map(async (name) => {
           const img4 = new Image();
           await new Promise((resolve, reject) => {
             img4.onload = () => resolve();
             img4.onerror = () => reject(new Error(`그림 읽기 실패: ${name}`));
-            img4.src = art5.url(name);
+            img4.src = art6.url(name);
           });
           if (!this.disposed) this.images.set(name, img4);
         })
@@ -2909,15 +2971,15 @@ session.meta;
     };
     void (async () => {
       try {
-        const [raw, art5] = await Promise.all([
+        const [raw, art6] = await Promise.all([
           (writes.get(host) ?? Promise.resolve()).then(() => host.load()),
           host.art()
         ]);
         if (disposed) return;
         const restored = restore(raw);
         run = restored ?? newRun2();
-        await renderer.load(art5);
-        root.dataset.artProfile = art5.atlas.action?.profile ?? "unknown";
+        await renderer.load(art6);
+        root.dataset.artProfile = art6.atlas.action?.profile ?? "unknown";
         if (disposed) return;
         ready = true;
         if (raw && !restored) {
@@ -3016,16 +3078,16 @@ session.meta;
   }
   async function installPack(bytes) {
     const pack2 = parsePack(bytes);
-    if (!pack2 || pack2.id !== PACK_ID) throw new PackError("괴이 ː 이면세계 순찰 그림 팩 파일이 아니에요.");
+    if (!pack2 || pack2.id !== PACK_ID) throw new PackError("괴이 ː ANOMALY 순찰 그림 팩 파일이 아니에요.");
     if (pack2.version !== PACK_VERSION) throw new PackError("플러그인과 맞지 않는 판의 그림 팩이에요. 최신 팩을 받아 주세요.");
     const files = {};
     for (const name of PACK_FILES) files[name] = base64(pack2.files.get(name));
     await risuai.pluginStorage.setItem(KEY2, JSON.stringify({ version: pack2.version, atlas: pack2.atlas, files }));
-    art4 = null;
+    art5 = null;
   }
-  var art4 = null;
+  var art5 = null;
   function loadArt2() {
-    art4 ??= (async () => {
+    art5 ??= (async () => {
       const s2 = await stored();
       if (!s2 || s2.version !== PACK_VERSION) throw new PackError("그림 팩이 없어요.");
       const urls = /* @__PURE__ */ new Map();
@@ -3035,8 +3097,8 @@ session.meta;
       }
       return { atlas: s2.atlas, url: (f) => urls.get(f) ?? "" };
     })();
-    art4.catch(() => art4 = null);
-    return art4;
+    art5.catch(() => art5 = null);
+    return art5;
   }
 
   // src/host/actionpack.ts
@@ -3226,7 +3288,7 @@ session.meta;
     }
   }
   var mod = {
-    version: "0.16.52",
+    version: "0.16.53",
     mount: (box2, bridge) => mountPlay(box2, bridge),
     // 이전 시험판: 저장 키와 그림 팩은 예전 그대로 (goei:game · goei:game-action:v1)
     legacy: {

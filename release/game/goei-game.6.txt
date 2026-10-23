@@ -1,4 +1,38 @@
-: l.how === "evac" ? 0 : 1, injured: s2.agents[l.agent].injured > 0 }],
+장", text: "허수아비가 기다린다. 기록은 벽에 붙어 있다." }],
+    "npc:street": () => [{ who: "종로", text: "사람이 하나도 없는 거리. 인식의 장막 안쪽이다." }],
+    "npc:gallery": () => [{ who: "격리 구역", text: "진열장에 회수물이 하나둘 늘어 간다." }],
+    "npc:pasta": () => [{ who: "파스타집", text: "공략 축하는 여기서. 오늘은 부장님이 산대요." }],
+    "brief:jaemtri": (c) => [{ who: "잼트리", text: c.rules?.length ? `알려진 규칙부터요. ${c.rules.slice(0, 2).join(" / ")}` : "점검표요. 서명란이 비어 있으면 그게 입구래요. …네, 지금 타신 그거요." }, ...c.variantHint ? [{ who: "잼트리", text: c.variantHint }] : []],
+    "brief:chief": (c) => [{ who: "부장", text: `목표: ${c.mission ?? "조사"}. 위험하면 다락방 로프로 철수해. 살아서 오는 게 먼저다.` }],
+    "brief:reply": (c) => [{ who: c.agentName, text: c.agent === "jyaldi" ? "알겠어. 금방 갔다 온다." : "확인. 다녀오겠습니다." }],
+    "return:return": () => [{ who: "잼트리", text: "돌아오셨네요! 보고서는 제가 정리할게요." }],
+    "return:withdraw": () => [{ who: "잼트리", text: "철수도 판단이에요. 잘하셨어요." }],
+    "return:evac": (c) => [{ who: "데쥬레", text: `${c.agentName} 씨, 깨, 깨어났어요? 의무실이에요. 다들 걱정했어요.` }],
+    "pantry:chat": (c) => FALLBACK["npc:pantry"](c)
+  };
+  function lines(tag2, ctx) {
+    const got = provider?.(tag2, ctx);
+    if (got && got.length) return got;
+    return FALLBACK[tag2]?.(ctx) ?? [];
+  }
+
+  // src/game/action/hq/link.ts
+  function rosterFor(card, id) {
+    if (!card) return null;
+    const a = AGENT_BY_ID[id];
+    const en = id === "eileen" ? "aileen" : id;
+    return card.agents.find((x) => x.name === a.name || (x.english ?? "").toLowerCase().startsWith(en)) ?? null;
+  }
+  var boardNames = (card) => (card?.events ?? []).filter((e) => !e.state || /활성|진행|출현/.test(e.state)).map((e) => e.name);
+  function reportPayload(s2) {
+    const l = s2.last;
+    if (!l) return null;
+    const a = AGENT_BY_ID[l.agent];
+    return {
+      mission: MISSION_BY_ID[l.mission]?.title ?? l.mission,
+      outcome: l.how,
+      depth: l.result.depth,
+      agents: [{ id: a.id, name: a.name, hp: l.how === "evac" ? 0 : 1, injured: s2.agents[l.agent].injured > 0 }],
       rules: l.result.found,
       loot: l.result.bag.filter(Boolean).map((b) => b.name),
       summary: reportText(s2)
@@ -3175,56 +3209,4 @@ ${can.ok ? "" : `<p class="hq-warn">${esc2(can.why)}</p>`}</div>
       const storyLong = flip ? honest : !honest;
       spawns.push(hook2("passenger", kind, cb.x + 420, 30, 0, false, { honest, long: storyLong, fork: forkN > 0 ? 1 : 0 }));
     }
-    const minor = /* @__PURE__ */ new Set(["item", "symbol", "belonging", "mark", "prop"]);
-    const ways = placed.filter((p) => !minor.has(p.kind));
-    for (let i = placed.length - 1; i >= 0; i--) {
-      const p = placed[i];
-      if (minor.has(p.kind) && p.kind !== "prop" && (ways.some((w) => Math.abs(w.x - p.x) < 60) || placed.some((q, j) => j < i && minor.has(q.kind) && q.kind !== "prop" && Math.abs(q.x - p.x) < 60))) {
-        if (p.kind === "mark") markXs.splice(markXs.indexOf(p.x), 1);
-        placed.splice(i, 1);
-      }
-    }
-    const palette = def.palette;
-    const label3 = `${depthLabel(depth)} · ${def.label}${sub ? ` (${REPLICA_SUB_LABEL[sub]})` : ""}${room2 ? ` · ${room2.name}` : ""}`;
-    const tuning = {
-      chaseSpeed: (150 + depth * 6) * (ctx.flags.includes("chase_fast") ? 1.4 : 1),
-      noiseMul: ctx.flags.includes("silent_fast") ? 2 : 1,
-      lightFade: ctx.flags.includes("dark_fast") ? 2 : 1,
-      squeeze: 70 + seq.length * 12,
-      b12: b12mark ? 1 : 0
-    };
-    const floor = {
-      depth,
-      label: label3,
-      type,
-      sub,
-      seed,
-      width: x,
-      segments,
-      placed,
-      spawns,
-      budget: total,
-      guardian,
-      goal: goalBox.g ? { ...goalBox.g, need: Math.min(goalBox.g.need, goalBox.g.kind === "marks" ? Math.max(1, markXs.length) : 99) } : null,
-      rules: type === "replica" && sub ? REPLICA_SUB_RULES[sub] : def.rules,
-      tuning,
-      palette,
-      fallback: fallback ?? "",
-      tries: 0,
-      room: room2 ? { col: room2.col, row: room2.row, name: room2.name } : void 0
-    };
-    if (!room2) addMetro(floor, ctx, r);
-    return floor;
-  }
-  var GATE_FREE = /* @__PURE__ */ new Set(["chase", "deep"]);
-  var UPPER_X = 1100;
-  function addMetro(f, ctx, r) {
-    const { depth, type } = f;
-    if (type === "deep") return;
-    const hall2 = f.segments[0];
-    const chunks = f.segments.filter((s2) => s2.ref.startsWith("chunk:"));
-    const terr = f.segments.flatMap((s2) => s2.terrain);
-    const clearAt = (x, d3 = 90) => !f.placed.some((p) => Math.abs(p.x - x) < d3) && !terr.some((t) => x > t.x0 - 80 && x < t.x1 + 80);
-    const decor = (p) => p.kind === "prop" && !Object.keys(p.data).length;
-    const clearIfMoved = (x, d3) => !f.placed.some((p) => !decor(p) && Math.abs(p.x - x) < d3) && !terr.some((t) => x > t.x0 - 80 && x < t.x1 + 80);
-    const spot = (segs, d3, ok
+    const minor = /* @__PURE__ */

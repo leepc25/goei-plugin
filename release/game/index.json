@@ -1,5 +1,5 @@
 {
- "version": "0.16.52",
+ "version": "0.16.53",
  "code": {
   "parts": [
    "goei-game.1.txt",
@@ -13,8 +13,8 @@
    "goei-game.9.txt",
    "goei-game.10.txt"
   ],
-  "length": 1845307,
-  "bytes": 1934368
+  "length": 1848227,
+  "bytes": 1937272
  },
  "packs": [
   {
@@ -48,10 +48,22 @@
   },
   {
    "id": "start-room",
-   "hash": "39f2277597d6e2a9",
-   "bytes": 113583,
+   "hash": "ac1c5cd3def14d50",
+   "bytes": 2001478,
    "parts": [
-    "start-room.1.bin"
+    "start-room.1.bin",
+    "start-room.2.bin",
+    "start-room.3.bin",
+    "start-room.4.bin"
+   ],
+   "required": true
+  },
+  {
+   "id": "test-people",
+   "hash": "dfd590d8f3d61152",
+   "bytes": 97595,
+   "parts": [
+    "test-people.1.bin"
    ],
    "required": true
   },

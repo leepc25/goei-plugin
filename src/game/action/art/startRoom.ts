@@ -17,7 +17,7 @@ export function prepareStartRoom(urlOf?: (file: string) => Promise<string>) {
 }
 export function drawStartRoom(c: CanvasRenderingContext2D, open: number): boolean {
   if (!art) return false;
-  c.save(); c.imageSmoothingEnabled = false;
+  c.save(); c.imageSmoothingEnabled = true; c.imageSmoothingQuality = 'high'; // 고화질 원본(임시 시험)
   c.drawImage(art.room, 0, 0, 1280, 720);
   // Existing wall doorway, hinge on its right. No extra door is pasted elsewhere.
   if (open > 0) {
@@ -36,7 +36,7 @@ export function drawStartRoom(c: CanvasRenderingContext2D, open: number): boolea
 }
 export function drawStartRoomFurniture(c: CanvasRenderingContext2D, kind: string) {
   if (!art || !['desk', 'chair'].includes(kind)) return;
-  c.save(); c.imageSmoothingEnabled = false;
+  c.save(); c.imageSmoothingEnabled = true; c.imageSmoothingQuality = 'high'; // 고화질 원본(임시 시험)
   // tools/startroom_pixelize.py already placed the cutout at screen scale (floor contact y520).
   c.beginPath(); c.rect(kind === 'chair' ? 180 : 294, 270, kind === 'chair' ? 114 : 266, 256); c.clip();
   c.drawImage(art.workstation, 0, 0, 1280, 720);

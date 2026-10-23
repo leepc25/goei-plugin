@@ -10,6 +10,7 @@ import { Fighter } from './fighter';
 import type { Player } from './player';
 import type { World } from './world';
 import { drawSupply } from './itemsLink';
+import { drawTestPlayer } from '../art/testPeople';
 
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
@@ -141,6 +142,8 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
   function drawPlayer(p: Player, x: number, y: number, z: number, w: World) {
     if (p.ally) sprite(p.ally.clip, p.ally.f, 0, x + (p.ally.x - p.x), y + (p.ally.y - p.y), p.ally.dir);
     const a = p.anim();
+    // 필드 시험 캐릭터가 있으면 그 그림 (서기 / 움직이면 달리기)
+    if (drawTestPlayer(ctx, /walk|run/.test(a.clip), x, y - z, p.dir)) return;
     const blink = p.invuln > 0 && w.tick % 4 < 2 ? 0.5 : 1;
     if (!sprite(a.clip, a.frame, a.origin, x, y - z, p.dir, blink)) {
       ctx.fillStyle = '#c0453a';
