@@ -14,16 +14,23 @@ class SchedulingGuards(unittest.TestCase):
    p.apply_repairs=lambda:None;p.validate_image=lambda _:None;p.check_ready=lambda _:None;p.animation_request=lambda *args:{}
    calls=[]
    def submit(kind,slug,path,args,template=None):
-    calls.append((slug,template));p.s['characters'][slug]['motions'][template]='test'
-    p.s['jobs'][str(len(calls))]={'kind':'animation','status':'processing'}
+    calls.append((slug,template));jid=str(len(calls));p.s['characters'][slug]['motions'][template]=jid
+    p.s['jobs'][jid]={'kind':'animation','status':'processing'}
    p.submit=submit
    with patch.object(f,'request',side_effect=AssertionError('Unexpected network request')):
-    p.schedule();self.assertEqual(calls,[])
+    p.schedule();self.assertEqual(calls,[]);self.assertFalse(p.done())
     p.s['characters']['b']['eight_way_visual_reviewed']=True
     p.schedule();self.assertEqual(len(calls),20);self.assertEqual({slug for slug,_ in calls},{'a'})
     for j in p.s['jobs'].values():j['status']='completed'
     p.schedule();self.assertEqual(len(calls),20)
     p.s['characters']['a']['motions_visual_reviewed']=True
     p.schedule();self.assertEqual(len(calls),40)
+    self.assertFalse(p.done())
+    for j in p.s['jobs'].values():j['status']='completed'
+    self.assertFalse(p.done())
+    p.s['characters']['b']['motions_visual_reviewed']=True
+    self.assertFalse(p.done())
+    for c in p.s['characters'].values():c['exported']=True
+    self.assertTrue(p.done())
 
 if __name__=='__main__':unittest.main()
