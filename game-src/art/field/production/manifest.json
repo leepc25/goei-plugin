@@ -763,14 +763,14 @@
     "name": "이도형",
     "group": "fake-bureau",
     "slug": "lee-do-hyeong",
-    "appearance": "Adult man late40s, short silver gray hair swept back, black sunglasses, angular confident smiling face, tall solid veteran build, black tailored trouser suit, white shirt, black necktie, black formal shoes.",
+    "appearance": "Adult man late40s, tall broad solid muscular veteran. Long silver-white hair swept back and TIED into a visible LOW PONYTAIL falling behind his neck, not short cropped hair. Black aviator sunglasses. Multiple prominent old diagonal battle scars crossing the cheeks, angular rugged face, short chin stubble and a confident dangerous grin. Black tailored business suit with BOTH jacket sleeves and white shirt cuffs ROLLED UP TO THE ELBOWS, exposing strong muscular scarred forearms. White collared shirt, black necktie, black trousers and formal black shoes. Original reference costume; no held sword.",
     "original_art": "assets/agents/Lee Do-hyeong_default.avif",
     "original_sha256": "f9f2eb137f34aa1d13e785b4a636a6135a5871a7c85cb1fe4a82b7e6c2af3857",
     "wiki_appearance": "[Paragraph]큰 키에 단단하게 다져진 근육질 몸. 팔꿈치까지 걷어 올린 소매 아래로 핏줄이 불거진 팔뚝이 드러난다. 흰 머리를 뒤로 묶어 꽁지머리를 했고, 얼굴에는 오래된 전투 흉터가 겹겹이 지나간다. 훈련과 사열 때는 선글라스를 쓴다. 대원들이 그를 ❗흉백❗이라는 별명으로 부르는 것도 이 흰 머리와 흉터에서 나왔다는 설이 유력하다.\n[Paragraph]가장 유명한 건 표정이다. 괴이를 썰고 있는 도중에 대놓고 웃는다. 전투 중독자의 웃음이라는 평이 일반적이고, 그 웃음을 본 생존자들은 하나같이 괴이보다 그쪽이 더 무서웠다고 증언한다. 검은 정장에 허리에는 긴 일본도. 여기까지는 평범한 가짜 관리국 간부다. 문제는 정장 안감이다.\n[Heading]Level:2|Title:햄스터 갑옷\n[Paragraph]이도형의 정장 안쪽에는 ❗햄스터❗가 들어 있다. 한두 마리가 아니다. 갈색 부목 붕대로 머리만 내놓은 채 한 마리씩 감싸서, 비늘 갑옷의 미늘처럼 줄줄이 꿰매 넣었다. 적이 저주나 마법을 걸어 오면 이 햄스터들이 대신 받아 낸다. 다시 말해 이 남자는 마법을 햄스터 목숨으로 막는다.\n[Paragraph]처음 이 이야기를 들은 사람들의 반응은 대개 세 단계를 거친다. 웃는다, 사실이라는 걸 알게 된다, 웃지 못한다. 발푸르기스 쪽 마법사들 사이에서는 이도형에게 저주를 걸면 햄스터만 죽는다는 게 거의 격언처럼 돈다.✂️동물 보호 단체가 이 사실을 알면 이면세계에 새로운 세력이 하나 생길 것이다.✂️ 이 햄스터들을 키우는 일은 검사부대 막내의 몫이라는데, 자세한 사정은 ➡️송주익➡️ 문서에 나온다.📌정장을 벗어서 걸어 두면 안감이 꼼지락거린다는 목격담이 있다. 사실이라면 세탁은 어떻게 하는지가 커뮤니티의 오랜 의문이다.📌\n",
     "source_images_visually_reviewed": true,
     "character_id": null,
     "pixel_request": {
-      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult man late40s, short silver gray hair swept back, black sunglasses, angular confident smiling face, tall solid veteran build, black tailored trouser suit, white shirt, black necktie, black formal shoes. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 230-238px on128x256; tall; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
+      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult man late40s, tall broad solid muscular veteran. Long silver-white hair swept back and TIED into a visible LOW PONYTAIL falling behind his neck, not short cropped hair. Black aviator sunglasses. Multiple prominent old diagonal battle scars crossing the cheeks, angular rugged face, short chin stubble and a confident dangerous grin. Black tailored business suit with BOTH jacket sleeves and white shirt cuffs ROLLED UP TO THE ELBOWS, exposing strong muscular scarred forearms. White collared shirt, black necktie, black trousers and formal black shoes. Original reference costume; no held sword. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 230-238px on128x256; tall; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
       "image_size": {
         "width": 128,
         "height": 256
@@ -797,6 +797,17 @@
       ],
       "canonical_height_cm": null,
       "note": "Pixel ranges are production targets, not invented canonical height. Preserve original build and clothing; validate together at identical zoom."
+    },
+    "source_review_details": {
+      "full_original_reviewed": true,
+      "required_features": [
+        "long white tied ponytail",
+        "multiple cheek scars",
+        "black aviator sunglasses",
+        "jacket and shirt sleeves rolled to elbows",
+        "strong exposed forearms"
+      ],
+      "previous_error": "Contact-sheet review missed identity details; short hair description was false."
     }
   },
   {

@@ -40,5 +40,14 @@
     "correction": "Normal ribcage-abdomen-pelvis spacing, waist at upper pelvis, hip-length blazer and natural-waisted knee-length skirt; preserve original school uniform, age17 and natural proportions. Source must be inspected before releasing registration hold.",
     "estimated_generations": 9,
     "registration_cost_after_visual_review": 4
+  },
+  {
+    "id": "lee-do-hyeong-identity-v2",
+    "slug": "lee-do-hyeong",
+    "action": "regenerate-front-and-register",
+    "reason": "User rejected result. Full original confirms ponytail, cheek scars, rolled sleeves; previous prompt falsely described short hair and omitted distinctive features.",
+    "correction": "Use corrected detailed original appearance. Hold registration until source ponytail/scars/rolled sleeves and natural anatomy are actually inspected.",
+    "estimated_generations": 9,
+    "registration_cost_after_visual_review": 4
   }
 ]

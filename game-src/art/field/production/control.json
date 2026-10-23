@@ -30,7 +30,8 @@
     }
   },
   "registration_held_slugs": [
-    "konjyuce"
+    "konjyuce",
+    "lee-do-hyeong"
   ],
   "production_priority": "all-roster-character-registration-first",
   "after_registration": "roster-order eight-direction visual review and export, then remaining authorized production",

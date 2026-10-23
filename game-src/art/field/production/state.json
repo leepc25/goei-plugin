@@ -4662,7 +4662,7 @@
       "kind": "registration",
       "slug": "kim-jo-hak",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792783433.9658515,
       "receipt": {
         "usage": null,
@@ -4674,26 +4674,41 @@
       },
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 4.0
         },
         "id": "38131ffd-13aa-42c6-bd7d-d70030f105a9",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-23T19:23:55.025835+00:00",
         "last_response": {
-          "status": "building_skeleton",
-          "progress": 0.98,
+          "status": "completed",
           "character_id": "da459680-eb0e-48ad-be84-cc8a23d8fc02",
-          "n_directions": 8,
+          "storage_urls": {
+            "east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/da459680-eb0e-48ad-be84-cc8a23d8fc02/rotations/east.png",
+            "west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/da459680-eb0e-48ad-be84-cc8a23d8fc02/rotations/west.png",
+            "north": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/da459680-eb0e-48ad-be84-cc8a23d8fc02/rotations/north.png",
+            "south": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/da459680-eb0e-48ad-be84-cc8a23d8fc02/rotations/south.png",
+            "north-east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/da459680-eb0e-48ad-be84-cc8a23d8fc02/rotations/north-east.png",
+            "north-west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/da459680-eb0e-48ad-be84-cc8a23d8fc02/rotations/north-west.png",
+            "south-east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/da459680-eb0e-48ad-be84-cc8a23d8fc02/rotations/south-east.png",
+            "south-west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/da459680-eb0e-48ad-be84-cc8a23d8fc02/rotations/south-west.png"
+          },
+          "billing_usage": {
+            "type": "generations",
+            "generations": 4.0
+          },
           "character_name": "김조학",
-          "queue_position": 0,
           "directions_type": "8-directions",
           "generation_mode": "v3",
-          "skeleton_frames_done": 3,
-          "character_description": "김조학 / Kim Jo-hak. Adult man late40s, short slicked black hair, rectangular black sunglasses, reserved anonymous middle aged face, broad ordinary build, conservative black trouser suit, white shirt, black necktie, black dress shoes. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
-          "generation_started_at": "2026-10-23T19:23:56.200525+00:00",
-          "skeleton_frames_total": 8
+          "directions_count": 8,
+          "character_description": "김조학 / Kim Jo-hak. Adult man late40s, short slicked black hair, rectangular black sunglasses, reserved anonymous middle aged face, broad ordinary build, conservative black trouser suit, white shirt, black necktie, black dress shoes. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow."
         }
+      },
+      "observed_end_epoch": 1792784932.1623006,
+      "elapsed_observed_seconds": 1498.1964490413666,
+      "usage": {
+        "type": "generations",
+        "generations": 4.0
       }
     },
     "4f676b89-e087-4071-b5de-8f1509e4d6b3": {
@@ -5352,8 +5367,8 @@
         "status": "processing",
         "created_at": "2026-10-23T19:46:08.989943+00:00",
         "last_response": {
-          "status": "processing",
-          "progress": 0.16000000000000003,
+          "status": "correcting_frames",
+          "progress": 0.84,
           "character_id": "8b308102-0d58-42d4-b73c-10b1aa815d88",
           "n_directions": 8,
           "character_name": "곽성주",
@@ -5389,7 +5404,7 @@
         "created_at": "2026-10-23T19:46:15.706632+00:00",
         "last_response": {
           "status": "processing",
-          "progress": 0,
+          "progress": 0.48,
           "character_id": "1f2250cb-ca5c-4d1f-9b0d-885f752c5974",
           "n_directions": 8,
           "character_name": "조성춘",
@@ -5399,6 +5414,101 @@
           "character_description": "조성춘 / Cho Seong-choon. Adult man late40s, shaggy black hair over forehead, black round sunglasses, weary frowning face, lean veteran build, open black blazer with sleeves rolled to elbows, unbuttoned white shirt collar and visibly loosened black necktie, black trousers and black shoes. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
           "generation_started_at": "2026-10-23T19:46:24.699064+00:00"
         }
+      }
+    },
+    "90e177c3-0c95-4f0b-9703-d97ec0b41c00": {
+      "kind": "image",
+      "slug": "yun-byeong-su",
+      "template": null,
+      "status": "completed",
+      "created_epoch": 1792784944.2718263,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "90e177c3-0c95-4f0b-9703-d97ec0b41c00",
+        "image_id": "d10fd4e9-4b31-5c6d-a3aa-767f85be55a0",
+        "source_image_id": "d10fd4e9-4b31-5c6d-a3aa-767f85be55a0",
+        "status": "processing",
+        "output_count": 1,
+        "image_size": {
+          "width": 128,
+          "height": 256
+        },
+        "estimated_generations": 9,
+        "pricing_provisional": true
+      },
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 9.0
+        },
+        "id": "90e177c3-0c95-4f0b-9703-d97ec0b41c00",
+        "status": "completed",
+        "created_at": "2026-10-23T19:49:13.833768+00:00",
+        "last_response": {
+          "seed": 10222027,
+          "type": "message_done",
+          "model": "pro_flash",
+          "width": 128,
+          "action": "Removing background",
+          "height": 256,
+          "images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "prompt": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult man mid30s, short black hair swept back, black aviator sunglasses, angular stern face, solid athletic build, dark charcoal trouser suit, white shirt, black necktie and black shoes. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 212-224px on128x256; height unspecified; provisional medium stature; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
+          "status": "completed",
+          "asset_id": "d10fd4e9-4b31-5c6d-a3aa-767f85be55a0",
+          "image_id": "d10fd4e9-4b31-5c6d-a3aa-767f85be55a0",
+          "job_kind": "creator-image",
+          "progress": 1.0,
+          "image_url": "https://s3.eu-central-003.backblazeb2.com/pixellab-generations/production/creator/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/d10fd4e9-4b31-5c6d-a3aa-767f85be55a0/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0037e6521c1d7c20000000001%2F20261023%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20261023T195112Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=0a7c3b7ed4c35a7ddbe52c38b7683a58c7939433f695db579480d2350ea78c5d",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 9
+          },
+          "generation_id": "fdb0a213-e2ea-4c3b-ab0e-2623b122ce6d",
+          "queue_position": 0,
+          "billing_charged": true,
+          "original_images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "source_image_id": "d10fd4e9-4b31-5c6d-a3aa-767f85be55a0",
+          "creator_image_saved": true,
+          "generation_started_at": "2026-10-23T19:49:15.986777+00:00",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792785106.2560647,
+      "elapsed_observed_seconds": 161.98423886299133,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 9
+      }
+    },
+    "f6f2e349-d5a1-4dfb-8c30-aa7180971954": {
+      "kind": "registration",
+      "slug": "yun-byeong-su",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792785118.1640217,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "f6f2e349-d5a1-4dfb-8c30-aa7180971954",
+        "character_id": "4390bb9b-0e2a-4c65-b70f-da09751397bf",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
       }
     }
   },
@@ -5620,8 +5730,11 @@
       "image": "74bb6f61-b7b7-4405-96f8-9cc6759c7dc5",
       "registration": "38131ffd-13aa-42c6-bd7d-d70030f105a9",
       "motions": {},
-      "ready": false,
-      "image_verified": true
+      "ready": true,
+      "image_verified": true,
+      "skeleton_joints": 18,
+      "rotation_count": 8,
+      "exported": true
     },
     "lee-do-hyeong": {
       "name": "이도형",
@@ -5689,11 +5802,12 @@
     "yun-byeong-su": {
       "name": "윤병수",
       "group": "fake-bureau",
-      "character_id": null,
-      "image": null,
-      "registration": null,
+      "character_id": "4390bb9b-0e2a-4c65-b70f-da09751397bf",
+      "image": "90e177c3-0c95-4f0b-9703-d97ec0b41c00",
+      "registration": "f6f2e349-d5a1-4dfb-8c30-aa7180971954",
       "motions": {},
-      "ready": false
+      "ready": false,
+      "image_verified": true
     },
     "kim-seong-jin": {
       "name": "김성진",
@@ -9646,9 +9760,123 @@
           "enhance_usage": null
         }
       }
+    },
+    {
+      "at": "2026-10-23T19:48:52Z",
+      "kind": "completed",
+      "slug": "kim-jo-hak",
+      "detail": {
+        "kind": "registration",
+        "template": null,
+        "job_id": "38131ffd-13aa-42c6-bd7d-d70030f105a9",
+        "usage": {
+          "type": "generations",
+          "generations": 4.0
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T19:49:04Z",
+      "kind": "character-ready",
+      "slug": "kim-jo-hak",
+      "detail": {
+        "3d_joints": 18,
+        "directions": 8
+      }
+    },
+    {
+      "at": "2026-10-23T19:49:16Z",
+      "kind": "submitted",
+      "slug": "yun-byeong-su",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "90e177c3-0c95-4f0b-9703-d97ec0b41c00",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "90e177c3-0c95-4f0b-9703-d97ec0b41c00",
+          "image_id": "d10fd4e9-4b31-5c6d-a3aa-767f85be55a0",
+          "source_image_id": "d10fd4e9-4b31-5c6d-a3aa-767f85be55a0",
+          "status": "processing",
+          "output_count": 1,
+          "image_size": {
+            "width": 128,
+            "height": 256
+          },
+          "estimated_generations": 9,
+          "pricing_provisional": true
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T19:49:18Z",
+      "kind": "exported",
+      "slug": "kim-jo-hak",
+      "detail": {
+        "bytes": 102598,
+        "files": 9
+      }
+    },
+    {
+      "at": "2026-10-23T19:51:46Z",
+      "kind": "completed",
+      "slug": "yun-byeong-su",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "90e177c3-0c95-4f0b-9703-d97ec0b41c00",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 9
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T19:51:58Z",
+      "kind": "image-verified",
+      "slug": "yun-byeong-su",
+      "detail": {
+        "size": [
+          128,
+          256
+        ],
+        "bbox": [
+          23,
+          7,
+          99,
+          250
+        ],
+        "colors": 48,
+        "alpha": [
+          0,
+          255
+        ],
+        "original_pixels_preserved": true
+      }
+    },
+    {
+      "at": "2026-10-23T19:52:10Z",
+      "kind": "submitted",
+      "slug": "yun-byeong-su",
+      "detail": {
+        "kind": "registration",
+        "template": null,
+        "job_id": "f6f2e349-d5a1-4dfb-8c30-aa7180971954",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "f6f2e349-d5a1-4dfb-8c30-aa7180971954",
+          "character_id": "4390bb9b-0e2a-4c65-b70f-da09751397bf",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
     }
   ],
-  "updated_at": 1792784827.057525,
+  "updated_at": 1792785130.7028065,
   "user_stopped_at": 1792778235.6917784,
   "archived_jobs": {
     "304457e9-6577-44f0-af17-97841a9f6720": {
@@ -10967,17 +11195,17 @@
       "saved_frames": 6
     }
   },
-  "last_git_checkpoint": 1792784493.3319528,
+  "last_git_checkpoint": 1792784830.1957433,
   "summary": {
     "jobs": {
       "processing": 6,
-      "completed": 59,
+      "completed": 61,
       "failed": 3,
       "stalled": 0
     },
-    "characters_ready": 13,
+    "characters_ready": 14,
     "characters_total": 55,
-    "images_verified": 22,
+    "images_verified": 23,
     "motions_submitted": 3,
     "motions_target": 1100
   },
