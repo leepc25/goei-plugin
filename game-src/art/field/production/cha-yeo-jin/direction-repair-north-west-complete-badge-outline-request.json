@@ -1,0 +1,17 @@
+{
+  "image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "mask_image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "description": "Remove the COMPLETE sleeve insignia including its upper edge and every black symbol and border. Replace the selected upper arm with completely PLAIN continuous gray suit sleeve fabric matching the surrounding cloth. No small badge, no marks, no black rectangle, no symbol. Keep the exact arm silhouette and hair. Preserve all unmasked pixels. Crisp native pixel art and clean transparent outer edge.",
+  "no_background": true,
+  "output_method": "Modify current layer",
+  "crop_to_mask": true,
+  "seed": 1792795115
+}

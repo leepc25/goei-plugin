@@ -3012,7 +3012,7 @@
         "height": 220
       },
       "no_background": true,
-      "seed": 1792794301,
+      "seed": 1792794908,
       "target_palette": {
         "max_colors": 48
       },
@@ -3061,9 +3061,9 @@
     },
     "image_validation_palette_limit": 64,
     "image_palette_limit_reason": "Local length correction preserving all unmasked RGBA.",
-    "image_inpaint_source": "game-src/art/field/production/history/rebuild-20261024/rerolls/blaret/fd7e8421-f416-410c-9c48-8e1f220251ab/reference.png",
-    "image_inpaint_mask": "game-src/art/field/production/inputs/blaret-veil-tip-and-extension-mask.png",
-    "image_inpaint_description": "Lengthen the BLACK NUN VEIL in the selected side strips. Replace the short outward-flared shoulder veil endings with LONG VERTICAL hanging BLACK FABRIC panels extending down to y174, below both hands to upper-thigh level. The selected strips must contain continuous black veil cloth from upper back to low hem. Subtle dark-charcoal cloth folds, black edges. No gray halo, no cape flaring sideways, no new arms. Preserve the unselected face, blonde hair, green eyes, white bib, cross, sleeves, hands, prayer beads, dress and boots exactly. Native crisp pixels, transparent outside."
+    "image_inpaint_source": "game-src/art/field/production/history/rebuild-20261024/rerolls/blaret/46cb6f78-2b51-4c55-a94a-fb33cdd7a1e1/reference.png",
+    "image_inpaint_mask": "game-src/art/field/production/inputs/blaret-right-veil-mask.png",
+    "image_inpaint_description": "Extend the BLACK NUN VEIL on VIEWER RIGHT to match the long viewer-left veil. The right black cloth must hang continuously from upper shoulder behind the right arm down to y165, below the right hand. The current short flared right veil ending must disappear and become a long narrow black vertical hanging panel. Do not change the sleeve or arm. Keep face, eyes, hair, white bib, cross, hands, left veil, dress and entire body exactly. Preserve all unmasked pixels. Native crisp pixels and transparent outside; no gray halo."
   },
   {
     "english": "Saladin",

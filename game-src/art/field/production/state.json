@@ -17993,7 +17993,7 @@
       "kind": "registration",
       "slug": "seo-yun-ji",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792794265.104334,
       "receipt": {
         "usage": null,
@@ -18005,26 +18005,41 @@
       },
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 4.0
         },
         "id": "60d21a2b-d55f-40fe-99f1-dd9a7c31be04",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-23T22:24:25.269712+00:00",
         "last_response": {
-          "status": "building_skeleton",
-          "progress": 0.98,
+          "status": "completed",
           "character_id": "763e3594-9c92-4d08-82b2-e3fb7d286647",
-          "n_directions": 8,
+          "storage_urls": {
+            "east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/763e3594-9c92-4d08-82b2-e3fb7d286647/rotations/east.png",
+            "west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/763e3594-9c92-4d08-82b2-e3fb7d286647/rotations/west.png",
+            "north": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/763e3594-9c92-4d08-82b2-e3fb7d286647/rotations/north.png",
+            "south": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/763e3594-9c92-4d08-82b2-e3fb7d286647/rotations/south.png",
+            "north-east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/763e3594-9c92-4d08-82b2-e3fb7d286647/rotations/north-east.png",
+            "north-west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/763e3594-9c92-4d08-82b2-e3fb7d286647/rotations/north-west.png",
+            "south-east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/763e3594-9c92-4d08-82b2-e3fb7d286647/rotations/south-east.png",
+            "south-west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/763e3594-9c92-4d08-82b2-e3fb7d286647/rotations/south-west.png"
+          },
+          "billing_usage": {
+            "type": "generations",
+            "generations": 4.0
+          },
           "character_name": "서윤지",
-          "queue_position": 0,
           "directions_type": "8-directions",
           "generation_mode": "v3",
-          "skeleton_frames_done": 5,
-          "character_description": "서윤지 / Seo Yun-ji. Adult woman with natural slender build, soft oval face, half-lidded dark BROWN eyes and neutral small mouth. Muted SAGE-GREEN hair, blunt straight bangs and TWO thick long low BRAIDS falling over chest to waist. White collared blouse buttoned to top, sleeves folded to forearms, navy buttoned WAISTCOAT, knee-length navy pencil skirt, dark tights and black low shoes. Square dark digital watch on HER LEFT wrist. NO tie or jacket. Both long braids reach the WAIST, not chest-length braids. Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Do not invent patches, badges, logos or markings absent from the supplied image. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches.",
-          "generation_started_at": "2026-10-23T22:24:25.34383+00:00",
-          "skeleton_frames_total": 8
+          "directions_count": 8,
+          "character_description": "서윤지 / Seo Yun-ji. Adult woman with natural slender build, soft oval face, half-lidded dark BROWN eyes and neutral small mouth. Muted SAGE-GREEN hair, blunt straight bangs and TWO thick long low BRAIDS falling over chest to waist. White collared blouse buttoned to top, sleeves folded to forearms, navy buttoned WAISTCOAT, knee-length navy pencil skirt, dark tights and black low shoes. Square dark digital watch on HER LEFT wrist. NO tie or jacket. Both long braids reach the WAIST, not chest-length braids. Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Do not invent patches, badges, logos or markings absent from the supplied image. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches."
         }
+      },
+      "observed_end_epoch": 1792795116.1340063,
+      "elapsed_observed_seconds": 851.0296723842621,
+      "usage": {
+        "type": "generations",
+        "generations": 4.0
       }
     },
     "46cb6f78-2b51-4c55-a94a-fb33cdd7a1e1": {
@@ -18109,13 +18124,27 @@
         "usd": 0.0,
         "type": "generations",
         "generations": 9
+      },
+      "visual_rejection": {
+        "job": "46cb6f78-2b51-4c55-a94a-fb33cdd7a1e1",
+        "job_status": "completed",
+        "decision": "reroll",
+        "reason": "왼쪽 베일만 손 아래까지 연장됐고 오른쪽은 팔꿈치에서 끝남. 오른쪽 기존 끝이 마스크 경계 밖에 남은 문제 확인. 오른쪽 끝과 연장 영역을 함께 교정하고 왼쪽 및 몸체는 보존.",
+        "at": 1792794908.0499072,
+        "rules_rechecked": [
+          "AVIF primary identity",
+          "lore/user height",
+          "south-facing",
+          "transparent edge without gray halo",
+          "no motions before all roster eight-way review"
+        ]
       }
     },
     "b340f8f9-71fe-4d3e-bff2-42428be68937": {
       "kind": "direction-repair-south-east",
       "slug": "jay",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792794363.9160216,
       "receipt": {
         "usage": null,
@@ -18133,34 +18162,73 @@
       },
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 9.0
         },
         "id": "b340f8f9-71fe-4d3e-bff2-42428be68937",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-23T22:26:04.127548+00:00",
         "last_response": {
-          "type": "message_progress",
+          "seed": 1792794363,
+          "type": "message_done",
           "model": "inpaint_pro_flash",
           "width": 128,
-          "action": "Correcting pixels",
+          "action": "Removing background",
           "height": 256,
+          "images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
           "prompt": "Remove the invented sleeve badge/patch in the selected upper-arm rectangle. Replace it with PLAIN continuous dark navy uniform sleeve fabric matching surrounding folds and palette. No outlined shield, no pocket, no badge, no emblem, no insignia, no symbols. Preserve sleeve shape, anatomy, all unmasked pixels and crisp native pixel rendering exactly. Transparent background.",
-          "status": "processing",
+          "status": "completed",
+          "paste_x": 0,
+          "paste_y": 0,
+          "asset_id": "6d194fa8-5975-51db-9075-aa3a5996f564",
           "image_id": "6d194fa8-5975-51db-9075-aa3a5996f564",
           "job_kind": "creator-image",
-          "progress": 0.75,
-          "queue_position": 1,
+          "progress": 1.0,
+          "image_url": "https://s3.eu-central-003.backblazeb2.com/pixellab-generations/production/creator/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/6d194fa8-5975-51db-9075-aa3a5996f564/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0037e6521c1d7c20000000001%2F20261023%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20261023T223513Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=b8963a4c601db3e9ff912fa5eea488f8cc3f7eb2fa4c9ce056a912b0b3c1d559",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 9
+          },
+          "canvas_growth": false,
+          "generation_id": "fa87fdc4-3274-47d7-8c45-1fc764de19f6",
+          "output_method": "Modify current layer",
+          "queue_position": 0,
+          "billing_charged": true,
+          "original_images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "source_image_id": "6d194fa8-5975-51db-9075-aa3a5996f564",
+          "creator_image_saved": true,
           "generation_started_at": "2026-10-23T22:26:04.163365+00:00",
-          "estimated_wait_seconds": 75
+          "estimated_wait_seconds": 0
         }
+      },
+      "observed_end_epoch": 1792794938.0211413,
+      "elapsed_observed_seconds": 574.1051199436188,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 9
       }
     },
     "de1e9780-8807-4962-9bc2-36f23642d762": {
       "kind": "direction-repair-east",
       "slug": "jay",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792794364.2932785,
       "receipt": {
         "usage": null,
@@ -18178,34 +18246,73 @@
       },
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 9.0
         },
         "id": "de1e9780-8807-4962-9bc2-36f23642d762",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-23T22:26:04.485159+00:00",
         "last_response": {
-          "type": "message_progress",
+          "seed": 1792794364,
+          "type": "message_done",
           "model": "inpaint_pro_flash",
           "width": 128,
           "action": "Removing background",
           "height": 256,
+          "images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
           "prompt": "Remove the invented sleeve badge/patch in the selected upper-arm rectangle. Replace it with PLAIN continuous dark navy uniform sleeve fabric matching surrounding folds and palette. No outlined shield, no pocket, no badge, no emblem, no insignia, no symbols. Preserve sleeve shape, anatomy, all unmasked pixels and crisp native pixel rendering exactly. Transparent background.",
-          "status": "processing",
+          "status": "completed",
+          "paste_x": 0,
+          "paste_y": 0,
+          "asset_id": "541a7946-0340-5849-bf0b-a1b360c5c625",
           "image_id": "541a7946-0340-5849-bf0b-a1b360c5c625",
           "job_kind": "creator-image",
-          "progress": 0.75,
+          "progress": 1.0,
+          "image_url": "https://s3.eu-central-003.backblazeb2.com/pixellab-generations/production/creator/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/541a7946-0340-5849-bf0b-a1b360c5c625/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0037e6521c1d7c20000000001%2F20261023%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20261023T223421Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=ba0aa12e6dc552f82ccc4b4c65949e235770573f13e181bf51fac664dc5159d0",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 9
+          },
+          "canvas_growth": false,
+          "generation_id": "01911980-881f-4013-9f44-9bd9ea51cc81",
+          "output_method": "Modify current layer",
           "queue_position": 0,
+          "billing_charged": true,
+          "original_images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "source_image_id": "541a7946-0340-5849-bf0b-a1b360c5c625",
+          "creator_image_saved": true,
           "generation_started_at": "2026-10-23T22:26:04.510304+00:00",
           "estimated_wait_seconds": 0
         }
+      },
+      "observed_end_epoch": 1792794908.5646396,
+      "elapsed_observed_seconds": 544.2713611125946,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 9
       }
     },
     "2f7cae4b-68df-4329-9dca-353d3335c357": {
       "kind": "direction-repair-west",
       "slug": "jay",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792794364.6947887,
       "receipt": {
         "usage": null,
@@ -18223,34 +18330,73 @@
       },
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 9.0
         },
         "id": "2f7cae4b-68df-4329-9dca-353d3335c357",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-23T22:26:04.906188+00:00",
         "last_response": {
-          "type": "message_progress",
+          "seed": 1792794364,
+          "type": "message_done",
           "model": "inpaint_pro_flash",
           "width": 128,
-          "action": "Correcting pixels",
+          "action": "Removing background",
           "height": 256,
+          "images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
           "prompt": "Remove the invented sleeve badge/patch in the selected upper-arm rectangle. Replace it with PLAIN continuous dark navy uniform sleeve fabric matching surrounding folds and palette. No outlined shield, no pocket, no badge, no emblem, no insignia, no symbols. Preserve sleeve shape, anatomy, all unmasked pixels and crisp native pixel rendering exactly. Transparent background.",
-          "status": "processing",
+          "status": "completed",
+          "paste_x": 0,
+          "paste_y": 0,
+          "asset_id": "38f1f657-c231-54dd-8e3f-7a968755283e",
           "image_id": "38f1f657-c231-54dd-8e3f-7a968755283e",
           "job_kind": "creator-image",
-          "progress": 0.75,
-          "queue_position": 3,
+          "progress": 1.0,
+          "image_url": "https://s3.eu-central-003.backblazeb2.com/pixellab-generations/production/creator/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/38f1f657-c231-54dd-8e3f-7a968755283e/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0037e6521c1d7c20000000001%2F20261023%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20261023T223616Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=71de59663a2fd3f93d4e720924cc07daa5b209e768b2c2c37c210402edb4e78f",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 9
+          },
+          "canvas_growth": false,
+          "generation_id": "feaabd55-a60e-4100-bd1a-8792946d7589",
+          "output_method": "Modify current layer",
+          "queue_position": 0,
+          "billing_charged": true,
+          "original_images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "source_image_id": "38f1f657-c231-54dd-8e3f-7a968755283e",
+          "creator_image_saved": true,
           "generation_started_at": "2026-10-23T22:26:04.943349+00:00",
-          "estimated_wait_seconds": 220
+          "estimated_wait_seconds": 0
         }
+      },
+      "observed_end_epoch": 1792794983.6039844,
+      "elapsed_observed_seconds": 618.9091958999634,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 9
       }
     },
     "0f67155e-cd30-4320-ab17-db68dda69bbc": {
       "kind": "direction-repair-south-west",
       "slug": "jay",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792794365.0871632,
       "receipt": {
         "usage": null,
@@ -18268,27 +18414,66 @@
       },
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 9.0
         },
         "id": "0f67155e-cd30-4320-ab17-db68dda69bbc",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-23T22:26:05.284457+00:00",
         "last_response": {
-          "type": "message_progress",
+          "seed": 1792794365,
+          "type": "message_done",
           "model": "inpaint_pro_flash",
           "width": 128,
-          "action": "Correcting pixels",
+          "action": "Removing background",
           "height": 256,
+          "images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
           "prompt": "Remove the invented sleeve badge/patch in the selected upper-arm rectangle. Replace it with PLAIN continuous dark navy uniform sleeve fabric matching surrounding folds and palette. No outlined shield, no pocket, no badge, no emblem, no insignia, no symbols. Preserve sleeve shape, anatomy, all unmasked pixels and crisp native pixel rendering exactly. Transparent background.",
-          "status": "processing",
+          "status": "completed",
+          "paste_x": 0,
+          "paste_y": 0,
+          "asset_id": "f87dc431-4b77-5660-a64d-9c451778eb90",
           "image_id": "f87dc431-4b77-5660-a64d-9c451778eb90",
           "job_kind": "creator-image",
-          "progress": 0.75,
-          "queue_position": 1,
+          "progress": 1.0,
+          "image_url": "https://s3.eu-central-003.backblazeb2.com/pixellab-generations/production/creator/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/f87dc431-4b77-5660-a64d-9c451778eb90/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0037e6521c1d7c20000000001%2F20261023%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20261023T223448Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=59aa396109ab943ef40daa56522a403a178e7f15bf01c7c31084be9f0f740ec8",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 9
+          },
+          "canvas_growth": false,
+          "generation_id": "b358a881-c8d7-435b-83b2-0bd9b712a33b",
+          "output_method": "Modify current layer",
+          "queue_position": 0,
+          "billing_charged": true,
+          "original_images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "source_image_id": "f87dc431-4b77-5660-a64d-9c451778eb90",
+          "creator_image_saved": true,
           "generation_started_at": "2026-10-23T22:26:05.31541+00:00",
-          "estimated_wait_seconds": 42
+          "estimated_wait_seconds": 0
         }
+      },
+      "observed_end_epoch": 1792794909.0543227,
+      "elapsed_observed_seconds": 543.967159986496,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 9
       }
     },
     "f25fcc88-05a3-430a-a01c-a7b5381823c7": {
@@ -18495,7 +18680,7 @@
       "kind": "direction-repair-north-west",
       "slug": "cha-yeo-jin",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792794438.888602,
       "receipt": {
         "usage": null,
@@ -18513,34 +18698,73 @@
       },
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 9.0
         },
         "id": "fe9b6ba1-00d2-4fd7-9b3b-5b55f55e8463",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-23T22:27:19.122395+00:00",
         "last_response": {
-          "type": "message_progress",
+          "seed": 1792794438,
+          "type": "message_done",
           "model": "inpaint_pro_flash",
           "width": 128,
-          "action": "Correcting pixels",
+          "action": "Removing background",
           "height": 256,
+          "images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
           "prompt": "Remove the invented small sleeve badge/patch in the selected upper-arm rectangle. Replace it with PLAIN continuous gray suit sleeve cloth matching surrounding gray fabric. No symbol, no shield, no emblem, no insignia. Preserve arm contour, hair, body and all unmasked pixels exactly. Crisp native pixel art, transparent outside.",
-          "status": "processing",
+          "status": "completed",
+          "paste_x": 0,
+          "paste_y": 0,
+          "asset_id": "e5859591-43e8-505a-a289-0be32bf41498",
           "image_id": "e5859591-43e8-505a-a289-0be32bf41498",
           "job_kind": "creator-image",
-          "progress": 0.75,
-          "queue_position": 4,
+          "progress": 1.0,
+          "image_url": "https://s3.eu-central-003.backblazeb2.com/pixellab-generations/production/creator/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/e5859591-43e8-505a-a289-0be32bf41498/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0037e6521c1d7c20000000001%2F20261023%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20261023T223720Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=82440b188782344bb0c2912c8e5b6332052c2c5cc3301bd0adf7b6f799d9bc50",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 9
+          },
+          "canvas_growth": false,
+          "generation_id": "96bc9419-50e8-4712-8f7e-fe6192aec711",
+          "output_method": "Modify current layer",
+          "queue_position": 0,
+          "billing_charged": true,
+          "original_images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "source_image_id": "e5859591-43e8-505a-a289-0be32bf41498",
+          "creator_image_saved": true,
           "generation_started_at": "2026-10-23T22:27:19.153666+00:00",
-          "estimated_wait_seconds": 354
+          "estimated_wait_seconds": 0
         }
+      },
+      "observed_end_epoch": 1792795059.1139822,
+      "elapsed_observed_seconds": 620.2253806591034,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 9
       }
     },
     "f19b0f36-ec4d-4192-be5f-a7bb0d7fa2bb": {
       "kind": "direction-repair-south-east-eyes-corrected-y",
       "slug": "lee-seong-hae",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792794664.4788802,
       "receipt": {
         "usage": null,
@@ -18558,34 +18782,73 @@
       },
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 9.0
         },
         "id": "f19b0f36-ec4d-4192-be5f-a7bb0d7fa2bb",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-23T22:31:04.652123+00:00",
         "last_response": {
-          "type": "message_progress",
+          "seed": 1792794664,
+          "type": "message_done",
           "model": "inpaint_pro_flash",
           "width": 128,
-          "action": "Correcting pixels",
+          "action": "Removing background",
           "height": 256,
+          "images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
           "prompt": "Correct ONLY visible iris color to distinct EMERALD GREEN matching the front-view green-eyed identity. Keep exact existing eye shape, black pupils, dark upper eyelashes, pale skin, white hair, face direction and expression. Tiny green iris pixels, not green eyeshadow or makeup. Preserve all unmasked pixels. Native crisp pixel art with no gray halo.",
-          "status": "processing",
+          "status": "completed",
+          "paste_x": 0,
+          "paste_y": 0,
+          "asset_id": "53400d61-48bb-500a-b9ed-9382ce56a065",
           "image_id": "53400d61-48bb-500a-b9ed-9382ce56a065",
           "job_kind": "creator-image",
-          "progress": 0.75,
-          "queue_position": 6,
+          "progress": 1.0,
+          "image_url": "https://s3.eu-central-003.backblazeb2.com/pixellab-generations/production/creator/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/53400d61-48bb-500a-b9ed-9382ce56a065/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0037e6521c1d7c20000000001%2F20261023%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20261023T223932Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=c40665d79196ccda7ca633253c797cb96b8b8e5ca0ba33fd711858b33242b8e6",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 9
+          },
+          "canvas_growth": false,
+          "generation_id": "ab6eaf94-beca-4743-b056-d01341f926b7",
+          "output_method": "Modify current layer",
+          "queue_position": 0,
+          "billing_charged": true,
+          "original_images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "source_image_id": "53400d61-48bb-500a-b9ed-9382ce56a065",
+          "creator_image_saved": true,
           "generation_started_at": "2026-10-23T22:31:04.692578+00:00",
-          "estimated_wait_seconds": 609
+          "estimated_wait_seconds": 0
         }
+      },
+      "observed_end_epoch": 1792795193.0828974,
+      "elapsed_observed_seconds": 528.604017496109,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 9
       }
     },
     "54809a78-c20d-42e8-b7b3-790d36c17dc1": {
       "kind": "direction-repair-east-eyes-corrected-y",
       "slug": "lee-seong-hae",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792794664.7938364,
       "receipt": {
         "usage": null,
@@ -18603,34 +18866,73 @@
       },
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 9.0
         },
         "id": "54809a78-c20d-42e8-b7b3-790d36c17dc1",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-23T22:31:05.248871+00:00",
         "last_response": {
-          "type": "message_progress",
+          "seed": 1792794664,
+          "type": "message_done",
           "model": "inpaint_pro_flash",
           "width": 128,
-          "action": "Correcting pixels",
+          "action": "Removing background",
           "height": 256,
+          "images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
           "prompt": "Correct ONLY visible iris color to distinct EMERALD GREEN matching the front-view green-eyed identity. Keep exact existing eye shape, black pupils, dark upper eyelashes, pale skin, white hair, face direction and expression. Tiny green iris pixels, not green eyeshadow or makeup. Preserve all unmasked pixels. Native crisp pixel art with no gray halo.",
-          "status": "processing",
+          "status": "completed",
+          "paste_x": 0,
+          "paste_y": 0,
+          "asset_id": "407938d6-5f5a-5966-9143-b462f9500a4f",
           "image_id": "407938d6-5f5a-5966-9143-b462f9500a4f",
           "job_kind": "creator-image",
-          "progress": 0.75,
-          "queue_position": 6,
+          "progress": 1.0,
+          "image_url": "https://s3.eu-central-003.backblazeb2.com/pixellab-generations/production/creator/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/407938d6-5f5a-5966-9143-b462f9500a4f/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0037e6521c1d7c20000000001%2F20261023%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20261023T223947Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=1b7d3aab26f2c6ca7fae8977b3e6e3f370aadfa49c16dd3db41fd7fe99a442e2",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 9
+          },
+          "canvas_growth": false,
+          "generation_id": "b94ed77a-5f1f-4031-8199-6ec820e8aefb",
+          "output_method": "Modify current layer",
+          "queue_position": 0,
+          "billing_charged": true,
+          "original_images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "source_image_id": "407938d6-5f5a-5966-9143-b462f9500a4f",
+          "creator_image_saved": true,
           "generation_started_at": "2026-10-23T22:31:05.290825+00:00",
-          "estimated_wait_seconds": 609
+          "estimated_wait_seconds": 0
         }
+      },
+      "observed_end_epoch": 1792795193.1649299,
+      "elapsed_observed_seconds": 528.3710939884186,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 9
       }
     },
     "7bf78da8-0175-43c5-adaf-369d70984f6c": {
       "kind": "direction-repair-west-eyes-corrected-y",
       "slug": "lee-seong-hae",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792794665.3908274,
       "receipt": {
         "usage": null,
@@ -18648,34 +18950,73 @@
       },
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 9.0
         },
         "id": "7bf78da8-0175-43c5-adaf-369d70984f6c",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-23T22:31:05.598386+00:00",
         "last_response": {
-          "type": "message_progress",
+          "seed": 1792794665,
+          "type": "message_done",
           "model": "inpaint_pro_flash",
           "width": 128,
-          "action": "Correcting pixels",
+          "action": "Removing background",
           "height": 256,
+          "images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
           "prompt": "Correct ONLY visible iris color to distinct EMERALD GREEN matching the front-view green-eyed identity. Keep exact existing eye shape, black pupils, dark upper eyelashes, pale skin, white hair, face direction and expression. Tiny green iris pixels, not green eyeshadow or makeup. Preserve all unmasked pixels. Native crisp pixel art with no gray halo.",
-          "status": "processing",
+          "status": "completed",
+          "paste_x": 0,
+          "paste_y": 0,
+          "asset_id": "59b067ca-b6c7-5a3e-9f56-854fc5fad34c",
           "image_id": "59b067ca-b6c7-5a3e-9f56-854fc5fad34c",
           "job_kind": "creator-image",
-          "progress": 0.75,
-          "queue_position": 6,
+          "progress": 1.0,
+          "image_url": "https://s3.eu-central-003.backblazeb2.com/pixellab-generations/production/creator/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/59b067ca-b6c7-5a3e-9f56-854fc5fad34c/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0037e6521c1d7c20000000001%2F20261023%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20261023T223927Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=6b2bdb9df94ead5340ee4749cfed47f2420cd26af4e927f3c2065f4a334224c4",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 9
+          },
+          "canvas_growth": false,
+          "generation_id": "b1d5667b-2a72-43e5-b076-d8ffcb2d7dd9",
+          "output_method": "Modify current layer",
+          "queue_position": 0,
+          "billing_charged": true,
+          "original_images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "source_image_id": "59b067ca-b6c7-5a3e-9f56-854fc5fad34c",
+          "creator_image_saved": true,
           "generation_started_at": "2026-10-23T22:31:05.650678+00:00",
-          "estimated_wait_seconds": 605
+          "estimated_wait_seconds": 0
         }
+      },
+      "observed_end_epoch": 1792795193.165119,
+      "elapsed_observed_seconds": 527.7742915153503,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 9
       }
     },
     "28e2d3c5-bdfc-41b9-943d-94ae2897ccac": {
       "kind": "direction-repair-south-west-eyes-corrected-y",
       "slug": "lee-seong-hae",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792794665.7515273,
       "receipt": {
         "usage": null,
@@ -18693,27 +19034,66 @@
       },
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 9.0
         },
         "id": "28e2d3c5-bdfc-41b9-943d-94ae2897ccac",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-23T22:31:05.928556+00:00",
         "last_response": {
-          "type": "message_progress",
+          "seed": 1792794665,
+          "type": "message_done",
           "model": "inpaint_pro_flash",
           "width": 128,
-          "action": "Correcting pixels",
+          "action": "Removing background",
           "height": 256,
+          "images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
           "prompt": "Correct ONLY visible iris color to distinct EMERALD GREEN matching the front-view green-eyed identity. Keep exact existing eye shape, black pupils, dark upper eyelashes, pale skin, white hair, face direction and expression. Tiny green iris pixels, not green eyeshadow or makeup. Preserve all unmasked pixels. Native crisp pixel art with no gray halo.",
-          "status": "processing",
+          "status": "completed",
+          "paste_x": 0,
+          "paste_y": 0,
+          "asset_id": "a86bcfea-c219-5e01-9266-e6f6a400f4e6",
           "image_id": "a86bcfea-c219-5e01-9266-e6f6a400f4e6",
           "job_kind": "creator-image",
-          "progress": 0.75,
-          "queue_position": 6,
+          "progress": 1.0,
+          "image_url": "https://s3.eu-central-003.backblazeb2.com/pixellab-generations/production/creator/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/a86bcfea-c219-5e01-9266-e6f6a400f4e6/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0037e6521c1d7c20000000001%2F20261023%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20261023T223930Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=f023e7ecefb2bbb583ffaad4e631cf95a7cd1fa1df5c35d0b63268244542ea7a",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 9
+          },
+          "canvas_growth": false,
+          "generation_id": "f02392ba-9974-4b27-b566-e0aac93bad76",
+          "output_method": "Modify current layer",
+          "queue_position": 0,
+          "billing_charged": true,
+          "original_images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "source_image_id": "a86bcfea-c219-5e01-9266-e6f6a400f4e6",
+          "creator_image_saved": true,
           "generation_started_at": "2026-10-23T22:31:05.952332+00:00",
-          "estimated_wait_seconds": 574
+          "estimated_wait_seconds": 0
         }
+      },
+      "observed_end_epoch": 1792795193.1651616,
+      "elapsed_observed_seconds": 527.4136347770691,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 9
       }
     },
     "8d75c0b8-3f73-45a1-9461-c3600108016c": {
@@ -18748,14 +19128,16 @@
           "type": "message_progress",
           "model": "inpaint_pro_flash",
           "width": 128,
-          "action": "Generating image",
+          "action": "Correcting pixels",
           "height": 256,
           "prompt": "Replace ONLY the tied hair behind the nape with a SHORT LOOSE BLACK LOW PONYTAIL. It hangs DOWN naturally close to the neck onto the upper back, with smooth untwisted hair strands and free tapered ends. No braid, no plait, no segmented rope, no rigid horizontal tail. Remove the horizontally protruding braided strands and restore transparent background where they were. Retain exact leather jacket shoulder outline and existing fabric under the hair. Do not change face, front hair, clothes, body, pose, scale or any unmasked pixels. Crisp native pixel art and clean transparent outer edges.",
           "status": "processing",
           "image_id": "e84349c5-d364-5693-a95d-7c3ff8b636f8",
           "job_kind": "creator-image",
-          "progress": 0.05,
-          "generation_started_at": "2026-10-23T22:34:09.310971+00:00"
+          "progress": 0.75,
+          "queue_position": 3,
+          "generation_started_at": "2026-10-23T22:34:09.310971+00:00",
+          "estimated_wait_seconds": 317
         }
       }
     },
@@ -18791,14 +19173,16 @@
           "type": "message_progress",
           "model": "inpaint_pro_flash",
           "width": 128,
-          "action": "Generating image",
+          "action": "Correcting pixels",
           "height": 256,
           "prompt": "Replace ONLY the tied hair behind the nape with a SHORT LOOSE BLACK LOW PONYTAIL. It hangs DOWN naturally close to the neck onto the upper back, with smooth untwisted hair strands and free tapered ends. No braid, no plait, no segmented rope, no rigid horizontal tail. Remove the horizontally protruding braided strands and restore transparent background where they were. Retain exact leather jacket shoulder outline and existing fabric under the hair. Do not change face, front hair, clothes, body, pose, scale or any unmasked pixels. Crisp native pixel art and clean transparent outer edges.",
           "status": "processing",
           "image_id": "f688c8c0-9fc1-51bf-932d-6a6105f068c2",
           "job_kind": "creator-image",
-          "progress": 0.05,
-          "generation_started_at": "2026-10-23T22:34:10.170169+00:00"
+          "progress": 0.75,
+          "queue_position": 4,
+          "generation_started_at": "2026-10-23T22:34:10.170169+00:00",
+          "estimated_wait_seconds": 339
         }
       }
     },
@@ -18834,14 +19218,16 @@
           "type": "message_progress",
           "model": "inpaint_pro_flash",
           "width": 128,
-          "action": "Generating image",
+          "action": "Correcting pixels",
           "height": 256,
           "prompt": "Replace ONLY the tied hair behind the nape with a SHORT LOOSE BLACK LOW PONYTAIL. It hangs DOWN naturally close to the neck onto the upper back, with smooth untwisted hair strands and free tapered ends. No braid, no plait, no segmented rope, no rigid horizontal tail. Remove the horizontally protruding braided strands and restore transparent background where they were. Retain exact leather jacket shoulder outline and existing fabric under the hair. Do not change face, front hair, clothes, body, pose, scale or any unmasked pixels. Crisp native pixel art and clean transparent outer edges.",
           "status": "processing",
           "image_id": "b46e97ae-8de4-5876-9ec7-272561e20a94",
           "job_kind": "creator-image",
-          "progress": 0.05,
-          "generation_started_at": "2026-10-23T22:34:10.627181+00:00"
+          "progress": 0.75,
+          "queue_position": 4,
+          "generation_started_at": "2026-10-23T22:34:10.627181+00:00",
+          "estimated_wait_seconds": 354
         }
       }
     },
@@ -18877,14 +19263,16 @@
           "type": "message_progress",
           "model": "inpaint_pro_flash",
           "width": 128,
-          "action": "Generating image",
+          "action": "Correcting pixels",
           "height": 256,
           "prompt": "Replace ONLY the tied hair behind the nape with a SHORT LOOSE BLACK LOW PONYTAIL. It hangs DOWN naturally close to the neck onto the upper back, with smooth untwisted hair strands and free tapered ends. No braid, no plait, no segmented rope, no rigid horizontal tail. Remove the horizontally protruding braided strands and restore transparent background where they were. Retain exact leather jacket shoulder outline and existing fabric under the hair. Do not change face, front hair, clothes, body, pose, scale or any unmasked pixels. Crisp native pixel art and clean transparent outer edges.",
           "status": "processing",
           "image_id": "b2ecac44-67e2-5d52-a2df-8ffa5da3d571",
           "job_kind": "creator-image",
-          "progress": 0.05,
-          "generation_started_at": "2026-10-23T22:34:10.935466+00:00"
+          "progress": 0.75,
+          "queue_position": 3,
+          "generation_started_at": "2026-10-23T22:34:10.935466+00:00",
+          "estimated_wait_seconds": 328
         }
       }
     },
@@ -18920,14 +19308,16 @@
           "type": "message_progress",
           "model": "inpaint_pro_flash",
           "width": 128,
-          "action": "Generating image",
+          "action": "Correcting pixels",
           "height": 256,
           "prompt": "Replace ONLY the tied hair behind the nape with a SHORT LOOSE BLACK LOW PONYTAIL. It hangs DOWN naturally close to the neck onto the upper back, with smooth untwisted hair strands and free tapered ends. No braid, no plait, no segmented rope, no rigid horizontal tail. Remove the horizontally protruding braided strands and restore transparent background where they were. Retain exact leather jacket shoulder outline and existing fabric under the hair. Do not change face, front hair, clothes, body, pose, scale or any unmasked pixels. Crisp native pixel art and clean transparent outer edges.",
           "status": "processing",
           "image_id": "cee186ca-236a-518a-9f93-2c3331f76482",
           "job_kind": "creator-image",
-          "progress": 0.05,
-          "generation_started_at": "2026-10-23T22:34:11.352708+00:00"
+          "progress": 0.75,
+          "queue_position": 4,
+          "generation_started_at": "2026-10-23T22:34:11.352708+00:00",
+          "estimated_wait_seconds": 396
         }
       }
     },
@@ -18963,14 +19353,16 @@
           "type": "message_progress",
           "model": "inpaint_pro_flash",
           "width": 128,
-          "action": "Generating image",
+          "action": "Correcting pixels",
           "height": 256,
           "prompt": "Replace ONLY the tied hair behind the nape with a SHORT LOOSE BLACK LOW PONYTAIL. It hangs DOWN naturally close to the neck onto the upper back, with smooth untwisted hair strands and free tapered ends. No braid, no plait, no segmented rope, no rigid horizontal tail. Remove the horizontally protruding braided strands and restore transparent background where they were. Retain exact leather jacket shoulder outline and existing fabric under the hair. Do not change face, front hair, clothes, body, pose, scale or any unmasked pixels. Crisp native pixel art and clean transparent outer edges.",
           "status": "processing",
           "image_id": "7e72fe07-a1a4-5e92-9d2d-156422d6e571",
           "job_kind": "creator-image",
-          "progress": 0.05,
-          "generation_started_at": "2026-10-23T22:34:11.713578+00:00"
+          "progress": 0.75,
+          "queue_position": 4,
+          "generation_started_at": "2026-10-23T22:34:11.713578+00:00",
+          "estimated_wait_seconds": 365
         }
       }
     },
@@ -19006,14 +19398,196 @@
           "type": "message_progress",
           "model": "inpaint_pro_flash",
           "width": 128,
-          "action": "Generating image",
+          "action": "Correcting pixels",
           "height": 256,
           "prompt": "Replace ONLY the tied hair behind the nape with a SHORT LOOSE BLACK LOW PONYTAIL. It hangs DOWN naturally close to the neck onto the upper back, with smooth untwisted hair strands and free tapered ends. No braid, no plait, no segmented rope, no rigid horizontal tail. Remove the horizontally protruding braided strands and restore transparent background where they were. Retain exact leather jacket shoulder outline and existing fabric under the hair. Do not change face, front hair, clothes, body, pose, scale or any unmasked pixels. Crisp native pixel art and clean transparent outer edges.",
           "status": "processing",
           "image_id": "df6e87f2-0f25-5d49-99f8-d64fa19f9109",
           "job_kind": "creator-image",
-          "progress": 0.05,
-          "generation_started_at": "2026-10-23T22:34:12.116052+00:00"
+          "progress": 0.75,
+          "queue_position": 4,
+          "generation_started_at": "2026-10-23T22:34:12.116052+00:00",
+          "estimated_wait_seconds": 383
+        }
+      }
+    },
+    "e9653deb-de50-4f8a-87d5-4fd7ce9ea263": {
+      "kind": "image",
+      "slug": "blaret",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792794909.1132963,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "e9653deb-de50-4f8a-87d5-4fd7ce9ea263",
+        "image_id": "203ff1dd-be27-5bca-9cd0-0dbabc6eecb6",
+        "source_image_id": "203ff1dd-be27-5bca-9cd0-0dbabc6eecb6",
+        "status": "processing",
+        "output_count": 1,
+        "image_size": {
+          "width": 128,
+          "height": 256
+        },
+        "estimated_generations": 9,
+        "pricing_provisional": true
+      },
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "e9653deb-de50-4f8a-87d5-4fd7ce9ea263",
+        "status": "processing",
+        "created_at": "2026-10-23T22:35:09.289481+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "model": "inpaint_pro_flash",
+          "width": 128,
+          "action": "Correcting pixels",
+          "height": 256,
+          "prompt": "Extend the BLACK NUN VEIL on VIEWER RIGHT to match the long viewer-left veil. The right black cloth must hang continuously from upper shoulder behind the right arm down to y165, below the right hand. The current short flared right veil ending must disappear and become a long narrow black vertical hanging panel. Do not change the sleeve or arm. Keep face, eyes, hair, white bib, cross, hands, left veil, dress and entire body exactly. Preserve all unmasked pixels. Native crisp pixels and transparent outside; no gray halo.",
+          "status": "processing",
+          "image_id": "203ff1dd-be27-5bca-9cd0-0dbabc6eecb6",
+          "job_kind": "creator-image",
+          "progress": 0.75,
+          "queue_position": 5,
+          "generation_started_at": "2026-10-23T22:35:09.329907+00:00",
+          "estimated_wait_seconds": 473
+        }
+      }
+    },
+    "c62c6da1-1894-469a-bb18-2f5f4988e88b": {
+      "kind": "direction-repair-south-east-full-patch-borders",
+      "slug": "jay",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792795057.643583,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "c62c6da1-1894-469a-bb18-2f5f4988e88b",
+        "image_id": "f4b104ba-eac7-50d8-ae02-475c56efbe41",
+        "source_image_id": "f4b104ba-eac7-50d8-ae02-475c56efbe41",
+        "status": "processing",
+        "output_count": 1,
+        "image_size": {
+          "width": 128,
+          "height": 256
+        },
+        "estimated_generations": 9,
+        "pricing_provisional": true
+      },
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "c62c6da1-1894-469a-bb18-2f5f4988e88b",
+        "status": "processing",
+        "created_at": "2026-10-23T22:37:37.923460+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "model": "inpaint_pro_flash",
+          "width": 128,
+          "action": "Correcting pixels",
+          "height": 256,
+          "prompt": "Erase the ENTIRE rectangular sleeve patch including ALL black border edges and its interior. Reconstruct completely plain dark navy sleeve fabric continuously across this whole upper-arm area. No square outline, no badge, no shield, no pocket, no black rectangle, no insignia. Retain existing arm silhouette and surrounding natural fabric folds. Preserve all unmasked pixels and all character identity exactly. Native crisp pixel art, transparent outside.",
+          "status": "processing",
+          "image_id": "f4b104ba-eac7-50d8-ae02-475c56efbe41",
+          "job_kind": "creator-image",
+          "progress": 0.75,
+          "queue_position": 7,
+          "generation_started_at": "2026-10-23T22:37:37.992819+00:00",
+          "estimated_wait_seconds": 713
+        }
+      }
+    },
+    "09327278-8913-4fd1-8a2e-998a42b1b87a": {
+      "kind": "direction-repair-west-full-patch-borders",
+      "slug": "jay",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792795058.1336324,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "09327278-8913-4fd1-8a2e-998a42b1b87a",
+        "image_id": "c0b95c06-2b0b-55dd-be38-682e8f068a14",
+        "source_image_id": "c0b95c06-2b0b-55dd-be38-682e8f068a14",
+        "status": "processing",
+        "output_count": 1,
+        "image_size": {
+          "width": 128,
+          "height": 256
+        },
+        "estimated_generations": 9,
+        "pricing_provisional": true
+      },
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "09327278-8913-4fd1-8a2e-998a42b1b87a",
+        "status": "processing",
+        "created_at": "2026-10-23T22:37:38.428806+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "model": "inpaint_pro_flash",
+          "width": 128,
+          "action": "Correcting pixels",
+          "height": 256,
+          "prompt": "Erase the ENTIRE rectangular sleeve patch including ALL black border edges and its interior. Reconstruct completely plain dark navy sleeve fabric continuously across this whole upper-arm area. No square outline, no badge, no shield, no pocket, no black rectangle, no insignia. Retain existing arm silhouette and surrounding natural fabric folds. Preserve all unmasked pixels and all character identity exactly. Native crisp pixel art, transparent outside.",
+          "status": "processing",
+          "image_id": "c0b95c06-2b0b-55dd-be38-682e8f068a14",
+          "job_kind": "creator-image",
+          "progress": 0.75,
+          "queue_position": 8,
+          "generation_started_at": "2026-10-23T22:37:38.474459+00:00",
+          "estimated_wait_seconds": 774
+        }
+      }
+    },
+    "885929eb-2421-4f97-be6b-532c93f3085b": {
+      "kind": "direction-repair-north-west-complete-badge-outline",
+      "slug": "cha-yeo-jin",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792795115.3533003,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "885929eb-2421-4f97-be6b-532c93f3085b",
+        "image_id": "68a1e2f8-7bbc-586a-82e9-bc6bbda13ad7",
+        "source_image_id": "68a1e2f8-7bbc-586a-82e9-bc6bbda13ad7",
+        "status": "processing",
+        "output_count": 1,
+        "image_size": {
+          "width": 128,
+          "height": 256
+        },
+        "estimated_generations": 9,
+        "pricing_provisional": true
+      },
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "885929eb-2421-4f97-be6b-532c93f3085b",
+        "status": "processing",
+        "created_at": "2026-10-23T22:38:35.520770+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "model": "inpaint_pro_flash",
+          "width": 128,
+          "action": "Correcting pixels",
+          "height": 256,
+          "prompt": "Remove the COMPLETE sleeve insignia including its upper edge and every black symbol and border. Replace the selected upper arm with completely PLAIN continuous gray suit sleeve fabric matching the surrounding cloth. No small badge, no marks, no black rectangle, no symbol. Keep the exact arm silhouette and hair. Preserve all unmasked pixels. Crisp native pixel art and clean transparent outer edge.",
+          "status": "processing",
+          "image_id": "68a1e2f8-7bbc-586a-82e9-bc6bbda13ad7",
+          "job_kind": "creator-image",
+          "progress": 0.75,
+          "queue_position": 9,
+          "generation_started_at": "2026-10-23T22:38:35.564829+00:00",
+          "estimated_wait_seconds": 902
         }
       }
     }
@@ -20499,7 +21073,9 @@
       "direction-repair-south-east": "b340f8f9-71fe-4d3e-bff2-42428be68937",
       "direction-repair-east": "de1e9780-8807-4962-9bc2-36f23642d762",
       "direction-repair-west": "2f7cae4b-68df-4329-9dca-353d3335c357",
-      "direction-repair-south-west": "0f67155e-cd30-4320-ab17-db68dda69bbc"
+      "direction-repair-south-west": "0f67155e-cd30-4320-ab17-db68dda69bbc",
+      "direction-repair-south-east-full-patch-borders": "c62c6da1-1894-469a-bb18-2f5f4988e88b",
+      "direction-repair-west-full-patch-borders": "09327278-8913-4fd1-8a2e-998a42b1b87a"
     },
     "ho-yu-won": {
       "name": "호유원",
@@ -20591,7 +21167,8 @@
       "eight_way_visual_reviewed": false,
       "skeleton_joints": 18,
       "rotation_count": 8,
-      "direction-repair-north-west": "fe9b6ba1-00d2-4fd7-9b3b-5b55f55e8463"
+      "direction-repair-north-west": "fe9b6ba1-00d2-4fd7-9b3b-5b55f55e8463",
+      "direction-repair-north-west-complete-badge-outline": "885929eb-2421-4f97-be6b-532c93f3085b"
     },
     "seo-yun-ji": {
       "name": "서윤지",
@@ -20600,8 +21177,8 @@
       "image": "9ef07c27-af3d-487c-8a05-15c5402a6e3c",
       "registration": "60d21a2b-d55f-40fe-99f1-dd9a7c31be04",
       "motions": {},
-      "ready": false,
-      "exported": false,
+      "ready": true,
+      "exported": true,
       "registration_rejections": [
         {
           "character_id": "58ad10b4-0d27-488d-8c56-fa4291230abc",
@@ -20610,7 +21187,7 @@
           "at": 1792793746.456427
         }
       ],
-      "eight_way_visual_reviewed": false,
+      "eight_way_visual_reviewed": true,
       "visual_rejections": [
         {
           "job": "c721800a-1c1a-46f0-90c1-cf2e9c66eae9",
@@ -20628,7 +21205,9 @@
         }
       ],
       "image_verified": true,
-      "image_visually_reviewed": true
+      "image_visually_reviewed": true,
+      "skeleton_joints": 18,
+      "rotation_count": 8
     },
     "go-yeon-ji": {
       "name": "고연지",
@@ -20764,7 +21343,7 @@
       "name": "블라렛",
       "group": "religious",
       "character_id": null,
-      "image": "46cb6f78-2b51-4c55-a94a-fb33cdd7a1e1",
+      "image": "e9653deb-de50-4f8a-87d5-4fd7ce9ea263",
       "registration": null,
       "motions": {},
       "ready": false,
@@ -20806,9 +21385,22 @@
             "transparent edge without gray halo",
             "no motions before all roster eight-way review"
           ]
+        },
+        {
+          "job": "46cb6f78-2b51-4c55-a94a-fb33cdd7a1e1",
+          "job_status": "completed",
+          "decision": "reroll",
+          "reason": "왼쪽 베일만 손 아래까지 연장됐고 오른쪽은 팔꿈치에서 끝남. 오른쪽 기존 끝이 마스크 경계 밖에 남은 문제 확인. 오른쪽 끝과 연장 영역을 함께 교정하고 왼쪽 및 몸체는 보존.",
+          "at": 1792794908.0499072,
+          "rules_rechecked": [
+            "AVIF primary identity",
+            "lore/user height",
+            "south-facing",
+            "transparent edge without gray halo",
+            "no motions before all roster eight-way review"
+          ]
         }
-      ],
-      "image_verified": true
+      ]
     },
     "saladin": {
       "name": "살라딘",
@@ -35214,9 +35806,282 @@
         "unmasked_rgba_preserved": true,
         "palette_limit": 64
       }
+    },
+    {
+      "at": "2026-10-23T22:35:08Z",
+      "kind": "completed",
+      "slug": "jay",
+      "detail": {
+        "kind": "direction-repair-east",
+        "template": null,
+        "job_id": "de1e9780-8807-4962-9bc2-36f23642d762",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 9
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T22:35:09Z",
+      "kind": "completed",
+      "slug": "jay",
+      "detail": {
+        "kind": "direction-repair-south-west",
+        "template": null,
+        "job_id": "0f67155e-cd30-4320-ab17-db68dda69bbc",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 9
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T22:35:09Z",
+      "kind": "submitted",
+      "slug": "blaret",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "e9653deb-de50-4f8a-87d5-4fd7ce9ea263",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "e9653deb-de50-4f8a-87d5-4fd7ce9ea263",
+          "image_id": "203ff1dd-be27-5bca-9cd0-0dbabc6eecb6",
+          "source_image_id": "203ff1dd-be27-5bca-9cd0-0dbabc6eecb6",
+          "status": "processing",
+          "output_count": 1,
+          "image_size": {
+            "width": 128,
+            "height": 256
+          },
+          "estimated_generations": 9,
+          "pricing_provisional": true
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T22:35:38Z",
+      "kind": "completed",
+      "slug": "jay",
+      "detail": {
+        "kind": "direction-repair-south-east",
+        "template": null,
+        "job_id": "b340f8f9-71fe-4d3e-bff2-42428be68937",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 9
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T22:36:23Z",
+      "kind": "completed",
+      "slug": "jay",
+      "detail": {
+        "kind": "direction-repair-west",
+        "template": null,
+        "job_id": "2f7cae4b-68df-4329-9dca-353d3335c357",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 9
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T22:37:38Z",
+      "kind": "submitted",
+      "slug": "jay",
+      "detail": {
+        "kind": "direction-repair-south-east-full-patch-borders",
+        "template": null,
+        "job_id": "c62c6da1-1894-469a-bb18-2f5f4988e88b",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "c62c6da1-1894-469a-bb18-2f5f4988e88b",
+          "image_id": "f4b104ba-eac7-50d8-ae02-475c56efbe41",
+          "source_image_id": "f4b104ba-eac7-50d8-ae02-475c56efbe41",
+          "status": "processing",
+          "output_count": 1,
+          "image_size": {
+            "width": 128,
+            "height": 256
+          },
+          "estimated_generations": 9,
+          "pricing_provisional": true
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T22:37:38Z",
+      "kind": "submitted",
+      "slug": "jay",
+      "detail": {
+        "kind": "direction-repair-west-full-patch-borders",
+        "template": null,
+        "job_id": "09327278-8913-4fd1-8a2e-998a42b1b87a",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "09327278-8913-4fd1-8a2e-998a42b1b87a",
+          "image_id": "c0b95c06-2b0b-55dd-be38-682e8f068a14",
+          "source_image_id": "c0b95c06-2b0b-55dd-be38-682e8f068a14",
+          "status": "processing",
+          "output_count": 1,
+          "image_size": {
+            "width": 128,
+            "height": 256
+          },
+          "estimated_generations": 9,
+          "pricing_provisional": true
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T22:37:39Z",
+      "kind": "completed",
+      "slug": "cha-yeo-jin",
+      "detail": {
+        "kind": "direction-repair-north-west",
+        "template": null,
+        "job_id": "fe9b6ba1-00d2-4fd7-9b3b-5b55f55e8463",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 9
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T22:38:35Z",
+      "kind": "submitted",
+      "slug": "cha-yeo-jin",
+      "detail": {
+        "kind": "direction-repair-north-west-complete-badge-outline",
+        "template": null,
+        "job_id": "885929eb-2421-4f97-be6b-532c93f3085b",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "885929eb-2421-4f97-be6b-532c93f3085b",
+          "image_id": "68a1e2f8-7bbc-586a-82e9-bc6bbda13ad7",
+          "source_image_id": "68a1e2f8-7bbc-586a-82e9-bc6bbda13ad7",
+          "status": "processing",
+          "output_count": 1,
+          "image_size": {
+            "width": 128,
+            "height": 256
+          },
+          "estimated_generations": 9,
+          "pricing_provisional": true
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T22:38:36Z",
+      "kind": "completed",
+      "slug": "seo-yun-ji",
+      "detail": {
+        "kind": "registration",
+        "template": null,
+        "job_id": "60d21a2b-d55f-40fe-99f1-dd9a7c31be04",
+        "usage": {
+          "type": "generations",
+          "generations": 4.0
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T22:38:37Z",
+      "kind": "character-ready",
+      "slug": "seo-yun-ji",
+      "detail": {
+        "3d_joints": 18,
+        "directions": 8
+      }
+    },
+    {
+      "at": "2026-10-23T22:38:38Z",
+      "kind": "exported",
+      "slug": "seo-yun-ji",
+      "detail": {
+        "bytes": 84727,
+        "files": 9
+      }
+    },
+    {
+      "at": "2026-10-23T22:39:53Z",
+      "kind": "completed",
+      "slug": "lee-seong-hae",
+      "detail": {
+        "kind": "direction-repair-south-east-eyes-corrected-y",
+        "template": null,
+        "job_id": "f19b0f36-ec4d-4192-be5f-a7bb0d7fa2bb",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 9
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T22:39:53Z",
+      "kind": "completed",
+      "slug": "lee-seong-hae",
+      "detail": {
+        "kind": "direction-repair-east-eyes-corrected-y",
+        "template": null,
+        "job_id": "54809a78-c20d-42e8-b7b3-790d36c17dc1",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 9
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T22:39:53Z",
+      "kind": "completed",
+      "slug": "lee-seong-hae",
+      "detail": {
+        "kind": "direction-repair-west-eyes-corrected-y",
+        "template": null,
+        "job_id": "7bf78da8-0175-43c5-adaf-369d70984f6c",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 9
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T22:39:53Z",
+      "kind": "completed",
+      "slug": "lee-seong-hae",
+      "detail": {
+        "kind": "direction-repair-south-west-eyes-corrected-y",
+        "template": null,
+        "job_id": "28e2d3c5-bdfc-41b9-943d-94ae2897ccac",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 9
+        },
+        "detail": null
+      }
     }
   ],
-  "updated_at": 1792794862.4466417,
+  "updated_at": 1792795193.4458032,
   "user_stopped_at": 1792778235.6917784,
   "archived_jobs": {
     "304457e9-6577-44f0-af17-97841a9f6720": {
@@ -36535,19 +37400,19 @@
       "saved_frames": 6
     }
   },
-  "last_git_checkpoint": 1792794536.7836938,
+  "last_git_checkpoint": 1792794864.9155278,
   "summary": {
     "jobs": {
-      "processing": 17,
-      "completed": 229,
+      "processing": 11,
+      "completed": 239,
       "failed": 9,
       "stalled": 0
     },
-    "characters_ready": 53,
+    "characters_ready": 54,
     "characters_total": 55,
-    "images_format_verified": 55,
+    "images_format_verified": 54,
     "new_images_visually_reviewed": 42,
-    "eight_way_visually_reviewed": 49,
+    "eight_way_visually_reviewed": 50,
     "characters_motions_visually_reviewed": 0,
     "motions_submitted": 3,
     "motions_target": 1100

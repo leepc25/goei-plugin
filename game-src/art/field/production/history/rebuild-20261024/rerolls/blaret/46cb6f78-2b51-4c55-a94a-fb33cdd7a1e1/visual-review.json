@@ -1,0 +1,14 @@
+{
+  "job": "46cb6f78-2b51-4c55-a94a-fb33cdd7a1e1",
+  "job_status": "completed",
+  "decision": "reroll",
+  "reason": "왼쪽 베일만 손 아래까지 연장됐고 오른쪽은 팔꿈치에서 끝남. 오른쪽 기존 끝이 마스크 경계 밖에 남은 문제 확인. 오른쪽 끝과 연장 영역을 함께 교정하고 왼쪽 및 몸체는 보존.",
+  "at": 1792794908.0499072,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

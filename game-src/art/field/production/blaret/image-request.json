@@ -9,9 +9,9 @@
     "base64": "[image payload omitted]",
     "format": "png"
   },
-  "description": "Lengthen the BLACK NUN VEIL in the selected side strips. Replace the short outward-flared shoulder veil endings with LONG VERTICAL hanging BLACK FABRIC panels extending down to y174, below both hands to upper-thigh level. The selected strips must contain continuous black veil cloth from upper back to low hem. Subtle dark-charcoal cloth folds, black edges. No gray halo, no cape flaring sideways, no new arms. Preserve the unselected face, blonde hair, green eyes, white bib, cross, sleeves, hands, prayer beads, dress and boots exactly. Native crisp pixels, transparent outside.",
+  "description": "Extend the BLACK NUN VEIL on VIEWER RIGHT to match the long viewer-left veil. The right black cloth must hang continuously from upper shoulder behind the right arm down to y165, below the right hand. The current short flared right veil ending must disappear and become a long narrow black vertical hanging panel. Do not change the sleeve or arm. Keep face, eyes, hair, white bib, cross, hands, left veil, dress and entire body exactly. Preserve all unmasked pixels. Native crisp pixels and transparent outside; no gray halo.",
   "no_background": true,
   "output_method": "Modify current layer",
   "crop_to_mask": true,
-  "seed": 1792794301
+  "seed": 1792794908
 }

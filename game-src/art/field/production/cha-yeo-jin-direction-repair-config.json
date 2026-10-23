@@ -4,12 +4,13 @@
   "rectangles": {
     "north-west": [
       [
-        42,
-        99,
-        55,
-        115
+        40,
+        88,
+        56,
+        111
       ]
     ]
   },
-  "description": "Remove the invented small sleeve badge/patch in the selected upper-arm rectangle. Replace it with PLAIN continuous gray suit sleeve cloth matching surrounding gray fabric. No symbol, no shield, no emblem, no insignia. Preserve arm contour, hair, body and all unmasked pixels exactly. Crisp native pixel art, transparent outside."
+  "description": "Remove the COMPLETE sleeve insignia including its upper edge and every black symbol and border. Replace the selected upper arm with completely PLAIN continuous gray suit sleeve fabric matching the surrounding cloth. No small badge, no marks, no black rectangle, no symbol. Keep the exact arm silhouette and hair. Preserve all unmasked pixels. Crisp native pixel art and clean transparent outer edge.",
+  "revision": "complete-badge-outline"
 }
