@@ -9,9 +9,9 @@
     "base64": "[image payload omitted]",
     "format": "png"
   },
-  "description": "Extend the existing BLACK NUN VEIL as long hanging black cloth BEHIND the body and arms down to HIPS at y181. Broad black veil panels visible outside both upper arms and beside waist, from existing hood down naturally, folds follow gravity. This is long nun head veil, not short shoulder-length hood. Preserve ALL existing figure pixels: blonde hair, green eyes, face, white bib, cross, beads, arms, black dress and stature. Only white masked empty regions may become new black veil; remaining outside must stay transparent. Crisp native pixel clusters, no gray exterior patches.",
+  "description": "Lengthen the BLACK NUN VEIL in the selected side strips. Replace the short outward-flared shoulder veil endings with LONG VERTICAL hanging BLACK FABRIC panels extending down to y174, below both hands to upper-thigh level. The selected strips must contain continuous black veil cloth from upper back to low hem. Subtle dark-charcoal cloth folds, black edges. No gray halo, no cape flaring sideways, no new arms. Preserve the unselected face, blonde hair, green eyes, white bib, cross, sleeves, hands, prayer beads, dress and boots exactly. Native crisp pixels, transparent outside.",
   "no_background": true,
   "output_method": "Modify current layer",
   "crop_to_mask": true,
-  "seed": 1792793748
+  "seed": 1792794301
 }

@@ -4,6 +4,7 @@ from pathlib import Path
 from field_character_production import OUT,atomic
 
 def native_prompt(a):
+ for key in ['registration_import_zip','registration_import_review','registration_regenerate_directions']:a.pop(key,None)
  a.pop('image_edit_source',None);a.pop('image_edit_description',None)
  for key in ['image_inpaint_source','image_inpaint_mask','image_inpaint_description']:a.pop(key,None)
  lo,hi=a['stature_rendering']['target_body_pixels']

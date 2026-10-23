@@ -18,7 +18,7 @@ def main():
    im=Image.new('RGB',a.size,(85,105,100));im.paste(a,mask=a)
    target=DEST/'references'/f'{slug}-latest.png';target.parent.mkdir(parents=True,exist_ok=True);im.save(target)
    print('SOURCE',slug,target)
-  if c.get('ready') and not c.get('eight_way_visual_reviewed') and (OUT/slug/'character.zip').exists():
+  if not c.get('eight_way_visual_reviewed') and (OUT/slug/'character.zip').exists():
    z=zipfile.ZipFile(OUT/slug/'character.zip');im=Image.new('RGB',(1024,1080),(155,174,166));d=ImageDraw.Draw(im)
    for i,dr in enumerate(DIRECTIONS):
     a=Image.open(io.BytesIO(z.read('Idle/rotations/'+dr+'.png'))).convert('RGBA')

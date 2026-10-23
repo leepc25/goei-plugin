@@ -1,0 +1,39 @@
+{
+  "slug": "jay",
+  "rectangles": {
+    "south-east": [
+      [
+        36,
+        76,
+        47,
+        91
+      ]
+    ],
+    "east": [
+      [
+        50,
+        75,
+        63,
+        92
+      ]
+    ],
+    "west": [
+      [
+        69,
+        75,
+        82,
+        92
+      ]
+    ],
+    "south-west": [
+      [
+        80,
+        75,
+        92,
+        92
+      ]
+    ]
+  },
+  "description": "Remove the invented sleeve badge/patch in the selected upper-arm rectangle. Replace it with PLAIN continuous dark navy uniform sleeve fabric matching surrounding folds and palette. No outlined shield, no pocket, no badge, no emblem, no insignia, no symbols. Preserve sleeve shape, anatomy, all unmasked pixels and crisp native pixel rendering exactly. Transparent background.",
+  "character_id": "aa4b3caf-fe72-4a4a-851d-8de11e49c79e"
+}

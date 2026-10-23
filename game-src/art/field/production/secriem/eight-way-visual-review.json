@@ -1,0 +1,25 @@
+{
+  "at": 1792794217.3622432,
+  "character_id": "cc736d14-93e1-4242-9d54-904baff03c3b",
+  "result": "pass",
+  "directions_reviewed": [
+    "south",
+    "south-east",
+    "east",
+    "north-east",
+    "north",
+    "north-west",
+    "west",
+    "south-west"
+  ],
+  "findings": "디폴트 AVIF의 긴 은발·붉은 눈·붉은 민소매 하이넥·가슴 마름모 트임·옆트임을 8방향 대조. 굽 포함 높이와 체형 유지, 회색 외곽 칠 없음. 원화 우선·로어 키 보충·55명 장벽 재확인.",
+  "movement_direction": "east",
+  "stationary_direction": "south-east",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF primary",
+    "Lore supplementary height",
+    "All55 before motion",
+    "Gray outer paint reroll"
+  ]
+}

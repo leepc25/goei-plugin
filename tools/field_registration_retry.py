@@ -36,7 +36,7 @@ def main():
   c.setdefault('registration_rejections',[]).append({'character_id':cid,'job':c['registration'],'reason':a.reason,'at':time.time()})
   c.update(character_id=None,registration=None,ready=False,exported=False,eight_way_visual_reviewed=False)
   for k in ['skeleton_problem','skeleton_joints','rotation_count','readiness_error']:c.pop(k,None)
-  for filename in ['character.zip','character-verification.json','export-metadata.json','registration-request.json','registration-queue.json','eight-way-visual-review.json']:
+  for filename in ['character.zip','character-verification.json','export-metadata.json','registration-request.json','registration-queue.json','eight-way-visual-review.json','review.html']:
    path=OUT/a.slug/filename
    if path.exists():path.unlink()
   atomic(OUT/'state.json',s)

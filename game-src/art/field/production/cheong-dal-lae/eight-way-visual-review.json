@@ -1,0 +1,25 @@
+{
+  "at": 1792794262.902398,
+  "character_id": "68f76e20-467c-47ca-b3b8-45cdbaafa109",
+  "result": "pass",
+  "directions_reviewed": [
+    "south",
+    "south-east",
+    "east",
+    "north-east",
+    "north",
+    "north-west",
+    "west",
+    "south-west"
+  ],
+  "findings": "AVIF의 짙은 청록빛 머리·얼굴 양옆 긴 머리·낮게 묶은 뒤머리를 측후면 포함 확인. 정장과 체형 유지, 회색 외곽 없음. AVIF 우선·로어 보충·전원 장벽 재확인.",
+  "movement_direction": "east",
+  "stationary_direction": "south-east",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF primary",
+    "Lore supplementary height",
+    "All55 before motion",
+    "Gray outer paint reroll"
+  ]
+}
