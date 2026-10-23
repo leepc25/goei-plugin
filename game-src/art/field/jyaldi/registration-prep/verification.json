@@ -1,0 +1,14 @@
+{
+  "existing_test_woman_id": "5983a05c-93e6-4c72-aa51-4c13114873f4",
+  "generation_mode": "v3",
+  "view": "side",
+  "directions": 8,
+  "stored_south_pixels_equal_original_three_quarter_creator_image": true,
+  "frontal_input_is_hard_runtime_requirement": false,
+  "direction_labels_are_relative_to_assumed_south_input": true,
+  "front_supplement_generated_before_this_check": true,
+  "front_generation_charge": 9,
+  "front_generation_elapsed_seconds": 125.34863352775574,
+  "jyaldi_registration_calls": 0,
+  "animation_calls": 0
+}

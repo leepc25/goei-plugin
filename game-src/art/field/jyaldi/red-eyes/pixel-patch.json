@@ -1,0 +1,48 @@
+[
+  {
+    "operation": "patch_pixels",
+    "layer": "image",
+    "frames": [
+      1
+    ],
+    "pixels": [
+      [
+        65,
+        32,
+        "#c7250c",
+        "#e52b50"
+      ],
+      [
+        64,
+        33,
+        "#ae271a",
+        "#bd1f42"
+      ],
+      [
+        65,
+        33,
+        "#c7250c",
+        "#e52b50"
+      ],
+      [
+        66,
+        33,
+        "#6a120e",
+        "#7e1531"
+      ],
+      [
+        72,
+        33,
+        "#ae271a",
+        "#bd1f42"
+      ],
+      [
+        72,
+        34,
+        "#6a120e",
+        "#7e1531"
+      ]
+    ],
+    "reason": "User requires Jyaldi crimson eyes to read clearly. The six iris pixels use warm orange/brown-red shades; replace only those observed pixels with a distinct crimson ramp. Leave sclera, lids, face, hair, silhouette, clothes and all other pixels unchanged."
+  }
+]

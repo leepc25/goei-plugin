@@ -48,3 +48,19 @@
 - 상태: **사용자 시각 검수 대기**, 등록 0회·동작 생성 0회·게임 반영 없음. 이전 1차·2차 비용을 포함한 누적 실제 차감은 20회다. 기술 검증이나 기존 설정 재현이 자동으로 시각 승인을 뜻하지 않는다.
 
 ![3차 Pro Flash 생성 원본 크기](flash-replay/front-original.png)
+
+## 등록 준비와 실제 기존 캐릭터 확인
+
+사용자가 3차 그림을 투입 재료로 지정하고 다음 단계를 요청했다. 등록 준비 과정에서 [정면 보완](registration-prep/front-supplement.png)을 Pro Flash로 1장 생성했다. [요청](registration-prep/front-request.json), [영수증](registration-prep/front-receipt.txt), [확인 기록](registration-prep/verification.json). 실제 9회 차감, 요청~완료 관측 125.349초였다.
+
+그 뒤 사용자가 자신의 캐릭터는 정면 없이도 8방향을 만들었다고 지적해 실제 Test woman을 조회·다운로드했다. V3·side·8방향이며 저장된 south 원본 RGBA가 기존 오른쪽 3/4 여성 원본과 완전히 같았다. **정면 추가 생성은 등록 실행의 필수 조건이 아니었다.** 참조를 south로 가정하는 방향 기준의 문제와 API 실행 가능 여부를 구분한다. 쟈알디 캐릭터 등록·동작 생성은 아직 0회이며, 위 정면 보완을 승인된 정면으로 취급하지 않는다.
+
+## 현재 작업용 · 이름과 붉은 눈 수정
+
+- Creator 저장 이름: **쟈알디 | Jyaldi | 오른쪽 3/4 기준 도트 · 붉은 눈 수정본**. 갤러리 ID **`46806996-274f-44c2-83dc-e1b86f175dbe`**. 기존의 일반 설명 제목을 덮어쓴 것이 아니라 수정본을 이름이 분명한 새 갤러리 항목으로 저장하고 원본을 보존했다. 새 캐릭터 등록은 아니다.
+- 도구: 무료 `pixelart_workbench edit`, 이어서 무료 `save_to_asset(target=gallery:new)`. **추가 생성 0회·추가 차감 0회**이며 계정 전후 차이도 0이었다.
+- 변경: 관측한 홍채 **6픽셀만** 기대 색상 검사를 거쳐 진홍색 ramp로 수정. **나머지 모든 RGBA 픽셀·알파·형태는 동일**, 캔버스 128×256·팔레트 48색 유지. [정확한 수정 명령](red-eyes/pixel-patch.json), [픽셀별 검증](red-eyes/verification.json), [갤러리 정보](red-eyes/gallery.json), [저장 응답](red-eyes/gallery-save-receipt.txt).
+- [현재 작업용 원본](red-eyes/jyaldi-right-three-quarter.png), [4배 정수 확대](red-eyes/jyaldi-right-three-quarter-4x.png), [눈 수정 전/후](red-eyes/eyes-before-after.png).
+- 상태: 눈 색 수정본은 사용자 시각 검수 대상이다. 8방향 등록·동작 생성·게임 적용은 아직 없다. 정면 보완을 포함한 누적 실제 차감은 **29회**, 이번 픽셀 수정과 이름을 붙인 저장 자체는 **0회**다.
+
+![붉은 눈 수정본](red-eyes/jyaldi-right-three-quarter.png)
