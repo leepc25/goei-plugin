@@ -1398,14 +1398,14 @@
     "name": "백석주",
     "group": "baekilmong",
     "slug": "baek-seok-ju",
-    "appearance": "Adult woman late30s, dark brown hair neatly twisted into a low bun, warm brown eyes, confident gentle managerial smile, natural mature build, navy business trouser suit, white shirt, black necktie and formal black shoes. Unmasked everyday appearance matching original portrait.",
+    "appearance": "Adult woman, natural slender build, oval face and warm restrained smile, narrow muted brown-gray eyes. Dark brown hair center-parted with long curved cheek-length side locks, gathered in a low rounded bun behind head. Navy-blue fitted single-breasted trouser suit, white shirt, navy tie. Bare face, no mask or glasses. Thin plain rings on fingers.",
     "original_art": "assets/agents/Baek Seok-ju_default.avif",
     "original_sha256": "716bc77d0ef2e22e99e9fe6f68b3d11e96799fbaf4d160665a278b9168e963b8",
     "wiki_appearance": "[Paragraph]갈색 머리를 하나로 틀어 올린 단정한 쪽머리, 네이비 바지 정장에 구두. 가면은 금빛 청둥오리인데, 가면 아래로 보이는 입가가 늘 사람 좋게 웃고 있다. 처음 보는 사람도 서 있는 자세만 보고 \"아, 저분이 상사구나\" 하고 알아본다. 직급을 입고 다니는 타입이다.\n[Paragraph]그 웃는 얼굴이 변하는 순간이 두 번 있다. 일이 늘어지면 눈이 가늘어지고, 누군가의 실수로 자기 조원이 다치거나 죽으면 ❗눈에 핏발이 선다❗. 두 번째를 본 사람은 다시는 그 얼굴을 보고 싶지 않다고 입을 모은다.📌핏발 선 눈으로 웃는 입가를 상상해 보면 이해가 빠르다. 상상하지 않는 게 더 좋다.📌\n[Paragraph]버릇도 뚜렷하다. 감탄하면 대놓고 박수를 친다. 마음에 드는 후배는 어깨를 두드리는데, 이게 사실상 \"이 애는 내 거\"라는 도장이다. 그리고 받아 줄 생각이 없는 사과에는 손을 휘휘 젓는다. 손 젓는 걸 \"괜찮아\"라는 뜻으로 받아들였다가 1년 뒤에 그 일이 다시 거론되는 걸 겪은 사람이 한둘이 아니다.\n",
-    "source_images_visually_reviewed": false,
+    "source_images_visually_reviewed": true,
     "character_id": null,
     "pixel_request": {
-      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult woman late30s, dark brown hair neatly twisted into a low bun, warm brown eyes, confident gentle managerial smile, natural mature build, navy business trouser suit, white shirt, black necktie and formal black shoes. Unmasked everyday appearance matching original portrait. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 200-206px on128x256 at shared1.25px/cm; height 160-165cm; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
+      "description": "Single full-body native pixel-art game sprite. IDENTITY MUST MATCH: Adult woman, natural slender build, oval face and warm restrained smile, narrow muted brown-gray eyes. Dark brown hair center-parted with long curved cheek-length side locks, gathered in a low rounded bun behind head. Navy-blue fitted single-breasted trouser suit, white shirt, navy tie. Bare face, no mask or glasses. Thin plain rings on fingers. Relaxed upright SOUTH-facing stance, empty hands visible at sides, low top-down camera. Natural adult anatomy and normal torso/pelvis. Anatomical crown-to-sole height 200-206px on128x256, hair/cap excluded from body height. Soles at y248, leave unused space above shorter people, NEVER enlarge to fill canvas. Keep original individual body shape. Match style reference ONLY for crisp native1px clusters, selective dark outlines and controlled shading; own colors and clothes. Transparent background, no shadow, no text, no weapons. Entire hair and shoes inside frame.",
       "image_size": {
         "width": 128,
         "height": 256
@@ -1437,6 +1437,28 @@
       ],
       "pixels_per_cm": 1.25,
       "note": "Common production scale; do not fit each person to full canvas. Compare anatomical crown-to-sole height; hair/headwear and heels need separate allowance. Unspecified individual female height stays a range."
+    },
+    "source_review_details": {
+      "reviewed_individually": true,
+      "original_sha256": "716bc77d0ef2e22e99e9fe6f68b3d11e96799fbaf4d160665a278b9168e963b8",
+      "visual_findings": "Adult woman, natural slender build, oval face and warm restrained smile, narrow muted brown-gray eyes. Dark brown hair center-parted with long curved cheek-length side locks, gathered in a low rounded bun behind head. Navy-blue fitted single-breasted trouser suit, white shirt, navy tie. Bare face, no mask or glasses. Thin plain rings on fingers.",
+      "lore_appearance_read": true,
+      "source_priority": "AVIF for appearance, lore supplements height; original unmasked default overrides masks mentioned by lore",
+      "height": {
+        "basis": "Latest explicit user height specification; overrides previous provisional height classes and conflicting wiki height",
+        "height_cm_range": [
+          160,
+          165
+        ],
+        "canonical_height_cm": null,
+        "target_body_pixels": [
+          200,
+          206
+        ],
+        "pixels_per_cm": 1.25,
+        "note": "Common production scale; do not fit each person to full canvas. Compare anatomical crown-to-sole height; hair/headwear and heels need separate allowance. Unspecified individual female height stays a range."
+      },
+      "reviewed_at": "2026-10-24"
     }
   },
   {
@@ -1444,14 +1466,14 @@
     "name": "진나솔",
     "group": "baekilmong",
     "slug": "jin-na-sol",
-    "appearance": "Adult woman late20s, lean build, black hair in a high sleek ponytail, sharp bored dark eyes, cold severe face, fitted navy business trouser suit, white shirt, black necktie, sturdy black heels, tiny colored nail art. Unmasked original portrait appearance.",
+    "appearance": "Tall slender adult woman, narrow angular face with bored sharp gray-brown eyes and thin straight mouth. Blue-black hair in a very HIGH long straight ponytail, thick BLUNT STRAIGHT BANGS across forehead; not an exposed forehead. Fitted dark navy trouser suit, white shirt, navy tie. Long black and gold decorated nails. Bare face, no mask.",
     "original_art": "assets/agents/Jin Na-sol_default.avif",
     "original_sha256": "0109e8418f4321767278f883733993f2c5e0809b7f04b842dcf8f896dfc21163",
     "wiki_appearance": "[Paragraph]키가 크고 마른 체형. 검은 머리를 높게 하나로 묶었는데, 흐트러진 걸 본 사람이 없다. 날카롭고 어딘가 지루해 보이는 얼굴에 금빛 나비 가면. 몸에 딱 맞는 정장과 굽 단단한 구두를 신어서, ❗복도 저쪽에서 구두 소리만 들려도 다들 대화를 멈춘다❗.✂️사내 조기 경보 체계✂️\n[Paragraph]손톱에는 화려한 네일아트가 올라가 있고, 짜증이 나면 그걸 만지작거린다. 사정을 아는 사람들은 이 버릇을 보면 반 발짝 물러선다. 그 손톱이 장식이 아니라 무기이기 때문이다. 유난히 비싼 보상이 걸린 이야기가 나오면 눈빛이 포식자처럼 바뀐다는 증언도 있다.\n[Heading]Level:2|Title:표정 읽는 법\n[Paragraph]진나솔과 일하려면 세 가지 신호를 외워야 한다는 게 사내 정설이다.\n[List]❗혀 차는 소리❗: 경멸. 대체로 당신에게 하는 것이다.\n[List]❗한쪽 눈썹이 몇 밀리 올라감❗: \"확인했음, 알아서 해, 책임은 네가.\" 허락처럼 보이지만 면책 선언에 가깝다.\n[List]❗완전한 무표정❗: 진짜로 화났다. 이 단계에서는 말을 걸지 말고 그냥 시키는 대로 하는 게 좋다.\n[Paragraph]말투도 외모만큼 날이 서 있다. 아래로는 최소한의 단어로 된 반말 평서문뿐이다. \"야.\" \"조용히 해.\" \"귀찮네.\" 위협할 때도 목소리를 높이지 않는다. 오히려 낮아진다. 그래서 진나솔이 조용히 말할수록 듣는 쪽은 귀를 더 쫑긋 세운다.\n[Paragraph]관자놀이에 핏줄이 서는 건 덤이다. 이건 화가 난 게 아니라 머리가 아픈 것일 때가 많은데, 겉으로 보기엔 구분이 안 돼서 다들 똑같이 피한다.\n",
-    "source_images_visually_reviewed": false,
+    "source_images_visually_reviewed": true,
     "character_id": null,
     "pixel_request": {
-      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult woman late20s, lean build, black hair in a high sleek ponytail, sharp bored dark eyes, cold severe face, fitted navy business trouser suit, white shirt, black necktie, sturdy black heels, tiny colored nail art. Unmasked original portrait appearance. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 200-206px on128x256 at shared1.25px/cm; height 160-165cm; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
+      "description": "Single full-body native pixel-art game sprite. IDENTITY MUST MATCH: Tall slender adult woman, narrow angular face with bored sharp gray-brown eyes and thin straight mouth. Blue-black hair in a very HIGH long straight ponytail, thick BLUNT STRAIGHT BANGS across forehead; not an exposed forehead. Fitted dark navy trouser suit, white shirt, navy tie. Long black and gold decorated nails. Bare face, no mask. Relaxed upright SOUTH-facing stance, empty hands visible at sides, low top-down camera. Natural adult anatomy and normal torso/pelvis. Anatomical crown-to-sole height 205-208px on128x256, hair/cap excluded from body height. Soles at y248, leave unused space above shorter people, NEVER enlarge to fill canvas. Keep original individual body shape. Match style reference ONLY for crisp native1px clusters, selective dark outlines and controlled shading; own colors and clothes. Transparent background, no shadow, no text, no weapons. Entire hair and shoes inside frame.",
       "image_size": {
         "width": 128,
         "height": 256
@@ -1471,18 +1493,40 @@
       "style_usage_description": "Use ONLY pixel rendering, outline, shading and lighting. Do not copy the reference male height, body shape, shoulder width, outfit or identity. Preserve this character own stature, build, age, hair, irises and original clothing colors and silhouette. FRONT view."
     },
     "stature_rendering": {
-      "basis": "Latest explicit user height specification; overrides previous provisional height classes and conflicting wiki height",
+      "basis": "Prior user female range, upper end selected because lore explicitly says tall; ponytail excluded.",
       "height_cm_range": [
         160,
         165
       ],
       "canonical_height_cm": null,
       "target_body_pixels": [
-        200,
-        206
+        205,
+        208
       ],
       "pixels_per_cm": 1.25,
       "note": "Common production scale; do not fit each person to full canvas. Compare anatomical crown-to-sole height; hair/headwear and heels need separate allowance. Unspecified individual female height stays a range."
+    },
+    "source_review_details": {
+      "reviewed_individually": true,
+      "original_sha256": "0109e8418f4321767278f883733993f2c5e0809b7f04b842dcf8f896dfc21163",
+      "visual_findings": "Tall slender adult woman, narrow angular face with bored sharp gray-brown eyes and thin straight mouth. Blue-black hair in a very HIGH long straight ponytail, thick BLUNT STRAIGHT BANGS across forehead; not an exposed forehead. Fitted dark navy trouser suit, white shirt, navy tie. Long black and gold decorated nails. Bare face, no mask.",
+      "lore_appearance_read": true,
+      "source_priority": "AVIF for appearance, lore supplements height; original unmasked default overrides masks mentioned by lore",
+      "height": {
+        "basis": "Prior user female range, upper end selected because lore explicitly says tall; ponytail excluded.",
+        "height_cm_range": [
+          160,
+          165
+        ],
+        "canonical_height_cm": null,
+        "target_body_pixels": [
+          205,
+          208
+        ],
+        "pixels_per_cm": 1.25,
+        "note": "Common production scale; do not fit each person to full canvas. Compare anatomical crown-to-sole height; hair/headwear and heels need separate allowance. Unspecified individual female height stays a range."
+      },
+      "reviewed_at": "2026-10-24"
     }
   },
   {
@@ -1490,14 +1534,14 @@
     "name": "이성해",
     "group": "baekilmong",
     "slug": "lee-seong-hae",
-    "appearance": "Adult woman mid20s, petite slender build, long white wavy hair tied low over one shoulder and straight bangs, dark irises with distinct green glints, unfailing soft smile, immaculate navy trouser suit, white shirt, black necktie, cushioned dark sneakers. Unmasked everyday portrait appearance.",
+    "appearance": "Small slender adult woman, soft youthful face with a fixed sweet smile, pale skin, green sparkling eyes. White hair with blunt curved forehead bangs and chin-length curled face-framing layers; the LONG CURLY remainder tied LOW and draped over HER RIGHT shoulder (viewer left). Navy-blue fitted trouser suit, white shirt, dark navy tie, cushioned sneakers. Bare face, no mask.",
     "original_art": "assets/agents/Lee Seong-hae_default.avif",
     "original_sha256": "7ae8d0731d542d6e33fd6d7caf560af2eed0ef9e2ac47f63abe7d0e652eacf33",
     "wiki_appearance": "[Paragraph]길고 하얀 곱슬머리를 낮게 하나로 묶어 한쪽 어깨로 넘긴다. 작고 가녀린 체구에 금빛 돌고래 가면. 정장은 늘 티끌 하나 없고, 신발만 구두 대신 쿠션 좋은 운동화를 신는다. 정예조 사람들이 다 피 칠갑을 하고 나오는 현장에서도 이성해 혼자 깨끗하게 걸어 나온다는 게 유명하다.✂️세탁비 정산 내역이 없는 유일한 정예조원✂️\n[Paragraph]가장 많이 언급되는 건 눈이다. 검은 홍채에 초록빛이 어른거리는데, 묘하게 맑고 빛난다. 웃는 얼굴은 언제나 같다. 사람을 도울 때도, 사람을 처리할 때도 미소의 각도가 1도도 안 바뀐다는 게 목격자들의 공통된 증언이다. 그 일관성이 무섭다는 사람이 많다.\n[Heading]Level:2|Title:말투\n[Paragraph]이성해의 시그니처는 ❗\"~요\" 대신 \"~여\"❗다. 직급 상관없이 누구에게나 쓴다. 신입에게도, 조장에게도, 이사에게도, 괴담 속 존재에게도. 끝을 길게 늘이며 신나게 말하고, 고마워할 일이 아닌 데서도 고맙다고 한다.\n[List]\"좋아여.\" \"괜찮아여?\" \"그쳐?\" \"잘 지냈어여?\"\n[List]\"저는 늘 건강해여!\" \"알겠습니다아!\"\n[List]\"이거 드리려고 사 왔어여!\"\n[List]\"그분은 우리 팀 아니에여.\" \"미친놈이네여.\"\n[Paragraph]마지막 두 줄이 나오면 분위기가 바뀐다. 특히 \"미친놈이네여\"는 같은 웃음, 같은 억양으로 나오기 때문에 처음 듣는 사람은 그게 욕인지도 모르고 따라 웃다가, 다음 장면에서 웃음이 쏙 들어간다.📌사내에서는 이 말이 \"이성해의 판결 선고\"로 불린다.📌\n",
-    "source_images_visually_reviewed": false,
+    "source_images_visually_reviewed": true,
     "character_id": null,
     "pixel_request": {
-      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult woman mid20s, petite slender build, long white wavy hair tied low over one shoulder and straight bangs, dark irises with distinct green glints, unfailing soft smile, immaculate navy trouser suit, white shirt, black necktie, cushioned dark sneakers. Unmasked everyday portrait appearance. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 200-206px on128x256 at shared1.25px/cm; height 160-165cm; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
+      "description": "Single full-body native pixel-art game sprite. IDENTITY MUST MATCH: Small slender adult woman, soft youthful face with a fixed sweet smile, pale skin, green sparkling eyes. White hair with blunt curved forehead bangs and chin-length curled face-framing layers; the LONG CURLY remainder tied LOW and draped over HER RIGHT shoulder (viewer left). Navy-blue fitted trouser suit, white shirt, dark navy tie, cushioned sneakers. Bare face, no mask. Relaxed upright SOUTH-facing stance, empty hands visible at sides, low top-down camera. Natural adult anatomy and normal torso/pelvis. Anatomical crown-to-sole height 198-201px on128x256, hair/cap excluded from body height. Soles at y248, leave unused space above shorter people, NEVER enlarge to fill canvas. Keep original individual body shape. Match style reference ONLY for crisp native1px clusters, selective dark outlines and controlled shading; own colors and clothes. Transparent background, no shadow, no text, no weapons. Entire hair and shoes inside frame.",
       "image_size": {
         "width": 128,
         "height": 256
@@ -1517,18 +1561,40 @@
       "style_usage_description": "Use ONLY pixel rendering, outline, shading and lighting. Do not copy the reference male height, body shape, shoulder width, outfit or identity. Preserve this character own stature, build, age, hair, irises and original clothing colors and silhouette. FRONT view."
     },
     "stature_rendering": {
-      "basis": "Latest explicit user height specification; overrides previous provisional height classes and conflicting wiki height",
+      "basis": "Prior user female range, lower end selected because lore explicitly says small slender.",
       "height_cm_range": [
         160,
         165
       ],
       "canonical_height_cm": null,
       "target_body_pixels": [
-        200,
-        206
+        198,
+        201
       ],
       "pixels_per_cm": 1.25,
       "note": "Common production scale; do not fit each person to full canvas. Compare anatomical crown-to-sole height; hair/headwear and heels need separate allowance. Unspecified individual female height stays a range."
+    },
+    "source_review_details": {
+      "reviewed_individually": true,
+      "original_sha256": "7ae8d0731d542d6e33fd6d7caf560af2eed0ef9e2ac47f63abe7d0e652eacf33",
+      "visual_findings": "Small slender adult woman, soft youthful face with a fixed sweet smile, pale skin, green sparkling eyes. White hair with blunt curved forehead bangs and chin-length curled face-framing layers; the LONG CURLY remainder tied LOW and draped over HER RIGHT shoulder (viewer left). Navy-blue fitted trouser suit, white shirt, dark navy tie, cushioned sneakers. Bare face, no mask.",
+      "lore_appearance_read": true,
+      "source_priority": "AVIF for appearance, lore supplements height; original unmasked default overrides masks mentioned by lore",
+      "height": {
+        "basis": "Prior user female range, lower end selected because lore explicitly says small slender.",
+        "height_cm_range": [
+          160,
+          165
+        ],
+        "canonical_height_cm": null,
+        "target_body_pixels": [
+          198,
+          201
+        ],
+        "pixels_per_cm": 1.25,
+        "note": "Common production scale; do not fit each person to full canvas. Compare anatomical crown-to-sole height; hair/headwear and heels need separate allowance. Unspecified individual female height stays a range."
+      },
+      "reviewed_at": "2026-10-24"
     }
   },
   {
@@ -1536,14 +1602,14 @@
     "name": "이자헌",
     "group": "baekilmong",
     "slug": "lee-ja-heon",
-    "appearance": "Adult man appearing mid30s, tall heavy strong build, handsome sculpted impassive face, short white hair swept back, pale gray eyes, navy fitted waistcoat over white long sleeve shirt with sleeves rolled to elbows, black necktie, dark trousers and black shoes. Human face, no lizard transformation or mask, matching original.",
+    "appearance": "Tall large solidly built adult man, broad shoulders and thick chest, exceptionally handsome angular long face, stern neutral mouth, RED irises. Short white hair swept BACK in loose waves with two curved forelocks on forehead. Navy-blue buttoned WAISTCOAT over white long-sleeved shirt, navy necktie and dark trousers. NO suit jacket, no mask, no gloves in default appearance.",
     "original_art": "assets/agents/Lee Ja-heon_default.avif",
     "original_sha256": "068d9422fe36ca4acefe1d51aceddfe524ed256c9747fe6f84f2912b9d4f0b4e",
     "wiki_appearance": "[Paragraph]키가 크고 덩치가 묵직하다. 공황에 빠진 군중 속에서도 아는 사람은 단번에 그를 찾아낼 만큼 눈에 띈다. 앉아 있을 때는 조각상처럼 꼿꼿한 자세를 한 번도 흐트러뜨리지 않는다. 검은 정장은 규정 그대로 재단됐고, 사원증은 늘 달려 있다. 작전 때는 목장갑을 낀다. 정장에 목장갑이라는 조합이 처음엔 우스꽝스러워 보이는데, 그 장갑을 낀 손이 철문을 뜯는 걸 한 번 보고 나면 다들 웃음기를 거둔다.\n[Paragraph]그리고 ❗엄청나게 잘생겼다❗. 흰 머리에 조각 같은 얼굴이라, 위기 한복판에서 처음 본 민간인이 \"와, 잘생겼다\"고 중얼거린 일이 실제로 여러 번 있었다. 동료들은 \"저 얼굴이 저 사람한테 붙어 있는 게 낭비\"라고 하고, 가끔은 \"조장님은 사람이 아니라 다른 종 같다\"는 농담도 한다.✂️농담 맞겠지?✂️\n[Heading]Level:2|Title:도마뱀 목격담\n[Paragraph]이상한 증언이 하나 있다. 아주 드물게, 이자헌을 보고 잘생긴 남자가 아니라 ❗흰 도마뱀 머리를 한 사람❗을 봤다는 사람들이 있다. 붉은 세로 동공, 파충류의 주둥이와 턱, 아무 표정 없는 얼굴. 같은 자리에 있던 다른 사람들은 그냥 사람 얼굴을 봤다고 해서, 이 증언은 대개 \"가면 때문에 헛것을 봤다\"로 정리된다. 가면이 도마뱀이긴 하다.📌증언자들은 가면을 벗은 상태였다고 주장한다. 이 부분에서 늘 편집 분쟁이 난다.📌\n",
-    "source_images_visually_reviewed": false,
+    "source_images_visually_reviewed": true,
     "character_id": null,
     "pixel_request": {
-      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult man appearing mid30s, tall heavy strong build, handsome sculpted impassive face, short white hair swept back, pale gray eyes, navy fitted waistcoat over white long sleeve shirt with sleeves rolled to elbows, black necktie, dark trousers and black shoes. Human face, no lizard transformation or mask, matching original. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 230-238px on128x256; tall; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
+      "description": "Single full-body native pixel-art game sprite. IDENTITY MUST MATCH: Tall large solidly built adult man, broad shoulders and thick chest, exceptionally handsome angular long face, stern neutral mouth, RED irises. Short white hair swept BACK in loose waves with two curved forelocks on forehead. Navy-blue buttoned WAISTCOAT over white long-sleeved shirt, navy necktie and dark trousers. NO suit jacket, no mask, no gloves in default appearance. Relaxed upright SOUTH-facing stance, empty hands visible at sides, low top-down camera. Natural adult anatomy and normal torso/pelvis. Anatomical crown-to-sole height 230-238px on128x256, hair/cap excluded from body height. Soles at y248, leave unused space above shorter people, NEVER enlarge to fill canvas. Keep original individual body shape. Match style reference ONLY for crisp native1px clusters, selective dark outlines and controlled shading; own colors and clothes. Transparent background, no shadow, no text, no weapons. Entire hair and shoes inside frame.",
       "image_size": {
         "width": 128,
         "height": 256
@@ -1570,6 +1636,23 @@
       ],
       "canonical_height_cm": null,
       "note": "Pixel ranges are production targets, not invented canonical height. Preserve original build and clothing; validate together at identical zoom."
+    },
+    "source_review_details": {
+      "reviewed_individually": true,
+      "original_sha256": "068d9422fe36ca4acefe1d51aceddfe524ed256c9747fe6f84f2912b9d4f0b4e",
+      "visual_findings": "Tall large solidly built adult man, broad shoulders and thick chest, exceptionally handsome angular long face, stern neutral mouth, RED irises. Short white hair swept BACK in loose waves with two curved forelocks on forehead. Navy-blue buttoned WAISTCOAT over white long-sleeved shirt, navy necktie and dark trousers. NO suit jacket, no mask, no gloves in default appearance.",
+      "lore_appearance_read": true,
+      "source_priority": "AVIF for appearance, lore supplements height; original unmasked default overrides masks mentioned by lore",
+      "height": {
+        "basis": "tall",
+        "target_body_pixels": [
+          230,
+          238
+        ],
+        "canonical_height_cm": null,
+        "note": "Pixel ranges are production targets, not invented canonical height. Preserve original build and clothing; validate together at identical zoom."
+      },
+      "reviewed_at": "2026-10-24"
     }
   },
   {
@@ -1577,14 +1660,14 @@
     "name": "은하제",
     "group": "baekilmong",
     "slug": "eun-ha-je",
-    "appearance": "Adult woman early30s, chin length navy blue straight bob with side fringe partly covering one eye, sharp tired gray eyes, pale face and cool impassive expression, lean natural build, navy trouser suit, white shirt, black necktie, black formal shoes. Unmasked original appearance.",
+    "appearance": "Lean adult woman with pale angular face, tired narrow pale icy blue-gray eyes and flat annoyed mouth. Glossy dark BLUE chin-length BOB with heavy uneven fringe, a small forehead opening to HER LEFT (viewer right), inward-curled ends and one cheek lock. Navy fitted trouser suit, white shirt and dark blue tie. No mask, no glasses.",
     "original_art": "assets/agents/Eun Ha-je_default.avif",
     "original_sha256": "8e3a28e3470951d89a7118c486b0987c255217abd376e4c8f2870dde3c302481",
     "wiki_appearance": "[Paragraph]턱선까지 오는 파란 단발을 짜증 날 때마다 손으로 쓸어 넘긴다. 창백하고 선이 깔끔한 얼굴에 피곤한 눈, 차가운 무표정. 그런데 그 눈이 매처럼 날카롭고 밝아서 오래 마주 보기가 힘들다. 송골매 가면이 이렇게 잘 어울리는 사람도 드물다는 평이다.\n[Paragraph]정장은 그냥 작업복으로 입는다. 작전 때는 장갑을 끼고, 주머니에는 늘 담배가 들어 있다. 마르고 군더더기 없는 체형인데, 앉을 때는 털썩 주저앉고 지치면 아무 데나 퍼지고 기지개는 온몸으로 켠다. 기자 시절 마감 끝난 편집국에서 몸에 밴 동작이라는 해석이 있다.\n[Heading]Level:2|Title:담배\n[Paragraph]은하제를 상징하는 동작은 단 하나다. ❗담배를 꺼내서, 손에 쥐고 무게를 재듯 굴리다가, 피우지 않고 도로 넣는다.❗ 하루에도 몇 번씩 반복된다. 왜 안 피우냐고 물으면 대답 대신 긴 한숨이 나온다. D조 조원들은 이 동작의 빈도로 그날 현장의 난이도를 가늠한다.✂️세 번 넘으면 유서 쓰라는 뜻✂️\n[Paragraph]그 밖의 버릇도 있다. 긴 한숨, 혀 차기, 그리고 연설 대신 어깨 한 번 툭 치기. 은하제가 신입 어깨를 치는 건 \"잘했다\"와 \"살아서 다행이다\" 사이 어딘가의 뜻이라고 한다. 말투도 독특하다. 낮고 건조하고 담담하다. 아래로는 가면 이름으로 부르며 툭툭 던지는 반말을 쓰고, 말끝마다 \"~구먼\", \"~잖냐\", \"~거든\" 같은 고참 어미가 붙는다. 욕도 자유롭게 한다. 처음 듣는 신입은 혼나는 줄 알고 얼어붙는데, 은하제 기준으로는 그게 평상시 대화다.\n",
-    "source_images_visually_reviewed": false,
+    "source_images_visually_reviewed": true,
     "character_id": null,
     "pixel_request": {
-      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult woman early30s, chin length navy blue straight bob with side fringe partly covering one eye, sharp tired gray eyes, pale face and cool impassive expression, lean natural build, navy trouser suit, white shirt, black necktie, black formal shoes. Unmasked original appearance. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 200-206px on128x256 at shared1.25px/cm; height 160-165cm; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
+      "description": "Single full-body native pixel-art game sprite. IDENTITY MUST MATCH: Lean adult woman with pale angular face, tired narrow pale icy blue-gray eyes and flat annoyed mouth. Glossy dark BLUE chin-length BOB with heavy uneven fringe, a small forehead opening to HER LEFT (viewer right), inward-curled ends and one cheek lock. Navy fitted trouser suit, white shirt and dark blue tie. No mask, no glasses. Relaxed upright SOUTH-facing stance, empty hands visible at sides, low top-down camera. Natural adult anatomy and normal torso/pelvis. Anatomical crown-to-sole height 200-206px on128x256, hair/cap excluded from body height. Soles at y248, leave unused space above shorter people, NEVER enlarge to fill canvas. Keep original individual body shape. Match style reference ONLY for crisp native1px clusters, selective dark outlines and controlled shading; own colors and clothes. Transparent background, no shadow, no text, no weapons. Entire hair and shoes inside frame.",
       "image_size": {
         "width": 128,
         "height": 256
@@ -1616,6 +1699,28 @@
       ],
       "pixels_per_cm": 1.25,
       "note": "Common production scale; do not fit each person to full canvas. Compare anatomical crown-to-sole height; hair/headwear and heels need separate allowance. Unspecified individual female height stays a range."
+    },
+    "source_review_details": {
+      "reviewed_individually": true,
+      "original_sha256": "8e3a28e3470951d89a7118c486b0987c255217abd376e4c8f2870dde3c302481",
+      "visual_findings": "Lean adult woman with pale angular face, tired narrow pale icy blue-gray eyes and flat annoyed mouth. Glossy dark BLUE chin-length BOB with heavy uneven fringe, a small forehead opening to HER LEFT (viewer right), inward-curled ends and one cheek lock. Navy fitted trouser suit, white shirt and dark blue tie. No mask, no glasses.",
+      "lore_appearance_read": true,
+      "source_priority": "AVIF for appearance, lore supplements height; original unmasked default overrides masks mentioned by lore",
+      "height": {
+        "basis": "Latest explicit user height specification; overrides previous provisional height classes and conflicting wiki height",
+        "height_cm_range": [
+          160,
+          165
+        ],
+        "canonical_height_cm": null,
+        "target_body_pixels": [
+          200,
+          206
+        ],
+        "pixels_per_cm": 1.25,
+        "note": "Common production scale; do not fit each person to full canvas. Compare anatomical crown-to-sole height; hair/headwear and heels need separate allowance. Unspecified individual female height stays a range."
+      },
+      "reviewed_at": "2026-10-24"
     }
   },
   {
@@ -1623,14 +1728,14 @@
     "name": "박민성",
     "group": "baekilmong",
     "slug": "park-min-seong",
-    "appearance": "Adult man late20s, very broad muscular college athlete build, short wavy dark brown hair, dark eyes, large gentle slightly worried face, navy business trouser suit tight across shoulders, white shirt, black necktie, black shoes. Unmasked original portrait.",
+    "appearance": "Large broad athletic young man with thick chest and shoulders, strong natural limbs. Warm fair skin, broad friendly clean-shaven face, thick dark eyebrows, gray-brown eyes and gentle smile. Thick dark brown wavy side-parted hair with long sweeping curved forelock over one forehead side, short other side. Navy suit stretched over broad shoulders, white shirt, blue tie. No mask.",
     "original_art": "assets/agents/Park Min-seong_default.avif",
     "original_sha256": "ccf1db3c86c3051699916da159cce7378552aae053a9b65f4184a032daa20e0b",
     "wiki_appearance": "[Paragraph]크고 넓은 체대생 체형. 가슴과 어깨가 두꺼워서 장비든 사람이든 잘 나르게 생겼다. 근육 위로 정장이 팽팽하게 당겨져 있고, 사원증과 오소리 가면을 단다. 얼굴은 크고 순하게 생겼는데, 작전 중에는 눈에 띄게 겁에 질려 땀을 흘리다가도 결국 씩 웃어 버린다.\n[Paragraph]버릇이 많다. 들키면 머리를 긁적인다. 출발 전에는 꼭 기지개를 켜고 끙 소리를 낸다. 한숨을 쉬고, 체념을 큰 소리로 선언하고, 그다음에 일을 한다. \"아이고, 그래, 내가 간다, 가.\" 이 순서가 한 번도 바뀐 적이 없어서, D조 조원들은 박민성의 체념 선언을 작전 개시 신호로 쓴다.✂️체념이 출발 신호인 조✂️\n",
-    "source_images_visually_reviewed": false,
+    "source_images_visually_reviewed": true,
     "character_id": null,
     "pixel_request": {
-      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult man late20s, very broad muscular college athlete build, short wavy dark brown hair, dark eyes, large gentle slightly worried face, navy business trouser suit tight across shoulders, white shirt, black necktie, black shoes. Unmasked original portrait. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 212-224px on128x256; height unspecified; provisional medium stature; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
+      "description": "Single full-body native pixel-art game sprite. IDENTITY MUST MATCH: Large broad athletic young man with thick chest and shoulders, strong natural limbs. Warm fair skin, broad friendly clean-shaven face, thick dark eyebrows, gray-brown eyes and gentle smile. Thick dark brown wavy side-parted hair with long sweeping curved forelock over one forehead side, short other side. Navy suit stretched over broad shoulders, white shirt, blue tie. No mask. Relaxed upright SOUTH-facing stance, empty hands visible at sides, low top-down camera. Natural adult anatomy and normal torso/pelvis. Anatomical crown-to-sole height 228-234px on128x256, hair/cap excluded from body height. Soles at y248, leave unused space above shorter people, NEVER enlarge to fill canvas. Keep original individual body shape. Match style reference ONLY for crisp native1px clusters, selective dark outlines and controlled shading; own colors and clothes. Transparent background, no shadow, no text, no weapons. Entire hair and shoes inside frame.",
       "image_size": {
         "width": 128,
         "height": 256
@@ -1650,13 +1755,30 @@
       "style_usage_description": "Use ONLY pixel rendering, outline, shading and lighting. Do not copy the reference male height, body shape, shoulder width, outfit or identity. Preserve this character own stature, build, age, hair, irises and original clothing colors and silhouette. FRONT view."
     },
     "stature_rendering": {
-      "basis": "height unspecified; provisional medium stature",
+      "basis": "Lore says large broad athlete; inferred taller-than-ordinary adult, not canonical cm.",
       "target_body_pixels": [
-        212,
-        224
+        228,
+        234
       ],
       "canonical_height_cm": null,
       "note": "Pixel ranges are production targets, not invented canonical height. Preserve original build and clothing; validate together at identical zoom."
+    },
+    "source_review_details": {
+      "reviewed_individually": true,
+      "original_sha256": "ccf1db3c86c3051699916da159cce7378552aae053a9b65f4184a032daa20e0b",
+      "visual_findings": "Large broad athletic young man with thick chest and shoulders, strong natural limbs. Warm fair skin, broad friendly clean-shaven face, thick dark eyebrows, gray-brown eyes and gentle smile. Thick dark brown wavy side-parted hair with long sweeping curved forelock over one forehead side, short other side. Navy suit stretched over broad shoulders, white shirt, blue tie. No mask.",
+      "lore_appearance_read": true,
+      "source_priority": "AVIF for appearance, lore supplements height; original unmasked default overrides masks mentioned by lore",
+      "height": {
+        "basis": "Lore says large broad athlete; inferred taller-than-ordinary adult, not canonical cm.",
+        "target_body_pixels": [
+          228,
+          234
+        ],
+        "canonical_height_cm": null,
+        "note": "Pixel ranges are production targets, not invented canonical height. Preserve original build and clothing; validate together at identical zoom."
+      },
+      "reviewed_at": "2026-10-24"
     }
   },
   {
@@ -1664,14 +1786,14 @@
     "name": "백사헌",
     "group": "baekilmong",
     "slug": "baek-sa-heon",
-    "appearance": "Adult man late20s, very slim slight build, fluffy light brown curly hair, one dark medical eye patch matching portrait, remaining brown eye, sly faint smile, navy trouser suit, white shirt, black necktie and black dress shoes. No goat mask in this daily portrait.",
+    "appearance": "Thin frail young man with narrow shoulders and pale angular face, smug slight smile. Voluminous light ash-brown tightly WAVY/CURLY hair over forehead and ears. Dark navy rectangular medical EYEPATCH over HIS LEFT eye (viewer right), thin diagonal strap crossing bridge of nose; other eye gray-brown and half-lidded. Navy suit, white shirt and dark navy tie. No mask, no sunglasses.",
     "original_art": "assets/agents/Baek Sa-heon_default.avif",
     "original_sha256": "05fc3b064ea3f24b8e8169678643c41ffd40713f2c339a6df2c894d32aea8947",
     "wiki_appearance": "[Paragraph]마르고 가냘프다. 환기 덕트 안에 쏙 들어가서 소리 하나 안 내고 몇 시간이고 버틸 수 있는 체형이다. 밝은 곱슬머리에 허약해 보이는 인상이라, 독사라는 별명과 전혀 안 어울린다. 처음 본 사람들은 대개 \"저 사람이 그 독사?\"라고 되묻는다.\n[Paragraph]입사 과정에서 한쪽 눈을 잃었다. 그 자리에는 보라색 의안이 들어가 있고, 그 위에 늘 의료용 안대를 쓴다. ❗집에서도 벗지 않는다❗. 얼굴이 쉽게 붉어지거나 창백해지는 체질인데, 본인은 이게 감정을 들키는 것 같아서 극도로 싫어한다.\n[Paragraph]표정의 순서가 정해져 있다는 게 겪어 본 사람들의 공통된 증언이다. 처음엔 비웃는다. 일이 틀어지면 흰자위를 드러내며 분노한다. 그리고 졌다는 게 확실해지면 이를 악문 채 억지 미소를 짓는다. 이 세 번째 표정이 나오면 백사헌이 계산을 끝내고 줄을 갈아타는 중이라는 뜻이다.✂️갈아탈 줄이 있다는 게 놀랍다✂️\n[Paragraph]정장, 사원증, 염소 가면. 장비는 절대 겉으로 드러내지 않는다. 주운 물건은 전부 몸 어딘가에 숨긴다. 몸수색을 하면 주머니가 몇 개인지부터 헷갈린다는 말이 있다.\n",
-    "source_images_visually_reviewed": false,
+    "source_images_visually_reviewed": true,
     "character_id": null,
     "pixel_request": {
-      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult man late20s, very slim slight build, fluffy light brown curly hair, one dark medical eye patch matching portrait, remaining brown eye, sly faint smile, navy trouser suit, white shirt, black necktie and black dress shoes. No goat mask in this daily portrait. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 212-224px on128x256; height unspecified; provisional medium stature; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
+      "description": "Single full-body native pixel-art game sprite. IDENTITY MUST MATCH: Thin frail young man with narrow shoulders and pale angular face, smug slight smile. Voluminous light ash-brown tightly WAVY/CURLY hair over forehead and ears. Dark navy rectangular medical EYEPATCH over HIS LEFT eye (viewer right), thin diagonal strap crossing bridge of nose; other eye gray-brown and half-lidded. Navy suit, white shirt and dark navy tie. No mask, no sunglasses. Relaxed upright SOUTH-facing stance, empty hands visible at sides, low top-down camera. Natural adult anatomy and normal torso/pelvis. Anatomical crown-to-sole height 212-224px on128x256, hair/cap excluded from body height. Soles at y248, leave unused space above shorter people, NEVER enlarge to fill canvas. Keep original individual body shape. Match style reference ONLY for crisp native1px clusters, selective dark outlines and controlled shading; own colors and clothes. Transparent background, no shadow, no text, no weapons. Entire hair and shoes inside frame.",
       "image_size": {
         "width": 128,
         "height": 256
@@ -1698,6 +1820,23 @@
       ],
       "canonical_height_cm": null,
       "note": "Pixel ranges are production targets, not invented canonical height. Preserve original build and clothing; validate together at identical zoom."
+    },
+    "source_review_details": {
+      "reviewed_individually": true,
+      "original_sha256": "05fc3b064ea3f24b8e8169678643c41ffd40713f2c339a6df2c894d32aea8947",
+      "visual_findings": "Thin frail young man with narrow shoulders and pale angular face, smug slight smile. Voluminous light ash-brown tightly WAVY/CURLY hair over forehead and ears. Dark navy rectangular medical EYEPATCH over HIS LEFT eye (viewer right), thin diagonal strap crossing bridge of nose; other eye gray-brown and half-lidded. Navy suit, white shirt and dark navy tie. No mask, no sunglasses.",
+      "lore_appearance_read": true,
+      "source_priority": "AVIF for appearance, lore supplements height; original unmasked default overrides masks mentioned by lore",
+      "height": {
+        "basis": "height unspecified; provisional medium stature",
+        "target_body_pixels": [
+          212,
+          224
+        ],
+        "canonical_height_cm": null,
+        "note": "Pixel ranges are production targets, not invented canonical height. Preserve original build and clothing; validate together at identical zoom."
+      },
+      "reviewed_at": "2026-10-24"
     }
   },
   {
@@ -1705,14 +1844,14 @@
     "name": "고영은",
     "group": "baekilmong",
     "slug": "go-young-eun",
-    "appearance": "Adult woman late20s, ordinary nonathletic natural build, chin length dark brown bob with straight bangs, worried brown eyes, navy trouser suit, white shirt, black necktie and black shoes. One ear has an old healed surgical seam hidden partly by hair. Unmasked original appearance.",
+    "appearance": "Ordinary soft nonathletic adult woman, oval gentle face, brown-gray eyes and modest smile. Dark BROWN chin-length rounded bob, thick straight bangs above eyes and inward-curled ends; one side tucked behind the visible ear. Navy fitted trouser suit, white shirt and navy tie. No mask or glasses. Preserve visible ear shape from original; do not invent a conspicuous amputated ear on the exposed side.",
     "original_art": "assets/agents/Go Young-eun_default.avif",
     "original_sha256": "50c29adcc495359eab128068e49946432742b1215aeca98622663d393711a205",
     "wiki_appearance": "[Paragraph]평범하고 운동과는 거리가 먼 체형. 전술적인 구석이 하나도 없다. 턱선까지 오는 갈색 단발을 마음을 다잡을 때마다 뒤로 넘기는데, 그때 한쪽 귓바퀴가 있어야 할 자리의 ❗수술 봉합 자국❗이 드러난다. 어떻게 생긴 상처인지는 본인이 말한 적이 없다. 다만 입사 이후에 생긴 거라는 데는 다들 동의한다.\n[Paragraph]표정이 정직하다. 처음엔 읽기 쉬운 공포, 그다음엔 일하는 사람의 침착함, 마지막엔 창백함과 피로. 긴 작전이 끝나면 눈이 빨개져 있다. 정장, 사원증, 그리고 산양 가면. 가면 아래 표정이 늘 어색하다는 게 동료들의 증언이다. 손질을 거르지 않는 헤드램프와, 쓸 때마다 다시 채워 넣는 구급상자를 늘 갖고 다닌다.✂️R조 구급상자 재고 관리 담당 (자원봉사)✂️\n",
-    "source_images_visually_reviewed": false,
+    "source_images_visually_reviewed": true,
     "character_id": null,
     "pixel_request": {
-      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult woman late20s, ordinary nonathletic natural build, chin length dark brown bob with straight bangs, worried brown eyes, navy trouser suit, white shirt, black necktie and black shoes. One ear has an old healed surgical seam hidden partly by hair. Unmasked original appearance. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 200-206px on128x256 at shared1.25px/cm; height 160-165cm; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
+      "description": "Single full-body native pixel-art game sprite. IDENTITY MUST MATCH: Ordinary soft nonathletic adult woman, oval gentle face, brown-gray eyes and modest smile. Dark BROWN chin-length rounded bob, thick straight bangs above eyes and inward-curled ends; one side tucked behind the visible ear. Navy fitted trouser suit, white shirt and navy tie. No mask or glasses. Preserve visible ear shape from original; do not invent a conspicuous amputated ear on the exposed side. Relaxed upright SOUTH-facing stance, empty hands visible at sides, low top-down camera. Natural adult anatomy and normal torso/pelvis. Anatomical crown-to-sole height 200-206px on128x256, hair/cap excluded from body height. Soles at y248, leave unused space above shorter people, NEVER enlarge to fill canvas. Keep original individual body shape. Match style reference ONLY for crisp native1px clusters, selective dark outlines and controlled shading; own colors and clothes. Transparent background, no shadow, no text, no weapons. Entire hair and shoes inside frame.",
       "image_size": {
         "width": 128,
         "height": 256
@@ -1744,6 +1883,28 @@
       ],
       "pixels_per_cm": 1.25,
       "note": "Common production scale; do not fit each person to full canvas. Compare anatomical crown-to-sole height; hair/headwear and heels need separate allowance. Unspecified individual female height stays a range."
+    },
+    "source_review_details": {
+      "reviewed_individually": true,
+      "original_sha256": "50c29adcc495359eab128068e49946432742b1215aeca98622663d393711a205",
+      "visual_findings": "Ordinary soft nonathletic adult woman, oval gentle face, brown-gray eyes and modest smile. Dark BROWN chin-length rounded bob, thick straight bangs above eyes and inward-curled ends; one side tucked behind the visible ear. Navy fitted trouser suit, white shirt and navy tie. No mask or glasses. Preserve visible ear shape from original; do not invent a conspicuous amputated ear on the exposed side.",
+      "lore_appearance_read": true,
+      "source_priority": "AVIF for appearance, lore supplements height; original unmasked default overrides masks mentioned by lore",
+      "height": {
+        "basis": "Latest explicit user height specification; overrides previous provisional height classes and conflicting wiki height",
+        "height_cm_range": [
+          160,
+          165
+        ],
+        "canonical_height_cm": null,
+        "target_body_pixels": [
+          200,
+          206
+        ],
+        "pixels_per_cm": 1.25,
+        "note": "Common production scale; do not fit each person to full canvas. Compare anatomical crown-to-sole height; hair/headwear and heels need separate allowance. Unspecified individual female height stays a range."
+      },
+      "reviewed_at": "2026-10-24"
     }
   },
   {
@@ -1751,14 +1912,14 @@
     "name": "강이학",
     "group": "baekilmong",
     "slug": "kang-i-hak",
-    "appearance": "Adult woman late20s, short light brown side parted hair, brown eyes, bright businesslike friendly smile, ordinary natural build, neatly fitted navy trouser suit, white shirt, black necktie and polished black shoes. No pony mask; match original portrait.",
+    "appearance": "Adult woman with ordinary natural build, soft oval face, golden amber eyes, kind small smile. Short sandy BLONDE pixie/bowl cut with side-parted curved fringe, ears and neck visible, no ponytail. Fitted navy-blue trouser suit, white pointed shirt collar and navy tie. Bare face, no mask.",
     "original_art": "assets/agents/Kang I-hak_default.avif",
     "original_sha256": "ee603baed2e405a74aead0fd4e142e393dea644dc8059d01cbd3c32d7d00e6b7",
     "wiki_appearance": "[Paragraph]평범하고, 일부러 위협적이지 않게 생겼다. 금발 픽시컷에 호감 가는 순한 얼굴, 그리고 언제나 웃는 입. 돈 이야기가 나오면 눈이 순식간에 반짝인다. 반짝이는 속도가 너무 빨라서, 말하는 사람이 \"포인트\"의 \"포\"를 발음하는 순간 이미 눈빛이 바뀌어 있다는 증언이 있다.\n[Paragraph]정장, 사원증, 조랑말 가면. 늘 사진발 잘 받게 정돈되어 있다. 본인 말로는 \"인상이 곧 거래 조건\"이라서다. 엄지 척, 두 손 모으기, 밝은 꾸벅 인사, 그리고 돈 동그라미. 이 네 가지 손짓만으로 대화의 절반을 해결한다.✂️나머지 절반은 계좌번호✂️\n[Heading]Level:2|Title:말투\n[Paragraph]밝고, 감탄사가 많고, 끝을 길게 늘인다. \"하하.\" \"넵.\" \"네네!\" 사과는 빠르고 크게 한다. 이유가 명확하다. ❗빠르고 큰 사과가 느린 사과보다 싸게 먹히기 때문❗이다. 실제로 강이학이 사과하는 속도를 보면 상대가 화를 낼 틈이 없다. 화가 날 무렵엔 이미 사과가 끝나 있고, 다음 안건이 올라와 있다.\n[Paragraph]협박할 때도 웃는다. 그리고 협박 내용이 놀랍도록 구체적이다.\n[Quote]근데! 저한테 거짓말하신 거면요, 개인 정보 전부 관리국에 넘기고, 나가는 길에 그쪽 명의로 장기 담보 대출도 하나 받아 드릴게요!|Source:강이학, 여전히 웃으면서\n",
-    "source_images_visually_reviewed": false,
+    "source_images_visually_reviewed": true,
     "character_id": null,
     "pixel_request": {
-      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult woman late20s, short light brown side parted hair, brown eyes, bright businesslike friendly smile, ordinary natural build, neatly fitted navy trouser suit, white shirt, black necktie and polished black shoes. No pony mask; match original portrait. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 200-206px on128x256 at shared1.25px/cm; height 160-165cm; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
+      "description": "Single full-body native pixel-art game sprite. IDENTITY MUST MATCH: Adult woman with ordinary natural build, soft oval face, golden amber eyes, kind small smile. Short sandy BLONDE pixie/bowl cut with side-parted curved fringe, ears and neck visible, no ponytail. Fitted navy-blue trouser suit, white pointed shirt collar and navy tie. Bare face, no mask. Relaxed upright SOUTH-facing stance, empty hands visible at sides, low top-down camera. Natural adult anatomy and normal torso/pelvis. Anatomical crown-to-sole height 200-206px on128x256, hair/cap excluded from body height. Soles at y248, leave unused space above shorter people, NEVER enlarge to fill canvas. Keep original individual body shape. Match style reference ONLY for crisp native1px clusters, selective dark outlines and controlled shading; own colors and clothes. Transparent background, no shadow, no text, no weapons. Entire hair and shoes inside frame.",
       "image_size": {
         "width": 128,
         "height": 256
@@ -1790,6 +1951,28 @@
       ],
       "pixels_per_cm": 1.25,
       "note": "Common production scale; do not fit each person to full canvas. Compare anatomical crown-to-sole height; hair/headwear and heels need separate allowance. Unspecified individual female height stays a range."
+    },
+    "source_review_details": {
+      "reviewed_individually": true,
+      "original_sha256": "ee603baed2e405a74aead0fd4e142e393dea644dc8059d01cbd3c32d7d00e6b7",
+      "visual_findings": "Adult woman with ordinary natural build, soft oval face, golden amber eyes, kind small smile. Short sandy BLONDE pixie/bowl cut with side-parted curved fringe, ears and neck visible, no ponytail. Fitted navy-blue trouser suit, white pointed shirt collar and navy tie. Bare face, no mask.",
+      "lore_appearance_read": true,
+      "source_priority": "AVIF for appearance, lore supplements height; original unmasked default overrides masks mentioned by lore",
+      "height": {
+        "basis": "Latest explicit user height specification; overrides previous provisional height classes and conflicting wiki height",
+        "height_cm_range": [
+          160,
+          165
+        ],
+        "canonical_height_cm": null,
+        "target_body_pixels": [
+          200,
+          206
+        ],
+        "pixels_per_cm": 1.25,
+        "note": "Common production scale; do not fit each person to full canvas. Compare anatomical crown-to-sole height; hair/headwear and heels need separate allowance. Unspecified individual female height stays a range."
+      },
+      "reviewed_at": "2026-10-24"
     }
   },
   {
@@ -1797,14 +1980,14 @@
     "name": "장허운",
     "group": "baekilmong",
     "slug": "jang-heo-un",
-    "appearance": "Adult man late20s, tall laborer's strong build, long untidy dark brown hair reaching shoulders and hanging over one eye, weary dark eyes and subdued awkward face, navy trouser suit, white shirt, black necktie and practical black shoes. No cow mask; match original portrait.",
+    "appearance": "Tall lean adult man with slightly slouched posture, long narrow pale face, pronounced dark under-eye shadows, tired half-lidded gray-brown eyes, small weary smile. LONG dark BROWN layered hair extending past shoulders, center part, long curved side locks and outward-flipped ends, untied. Navy suit, white shirt and navy tie. No mask.",
     "original_art": "assets/agents/Jang Heo-un_default.avif",
     "original_sha256": "53b55171f1516aa3fc628390b1ccba7c9702fd4b4721a312d0967afc9b788dd3",
     "wiki_appearance": "[Paragraph]키가 크다. 훈련으로 다듬은 몸이 아니라 육체노동에 익숙한 몸이다. 그런데 늘 등을 살짝 구부정하게 굽혀서, 자리를 덜 차지하려는 사람처럼 보인다. 갈색 머리는 보통 회사의 복장 규정으로는 한참 긴 편인데, 이 회사는 그런 걸 거의 신경 쓰지 않는다.\n[Paragraph]소 가면은 작전과 작전 사이 사무실에서도 벗지 않는다. 가면 아래로 드러난 턱과 입가는 충격을 받으면 하얗게 질리고, 힘든 일을 버틸 때면 단단하게 굳는다. 표준 현장 장비를 늘 몸에 걸치고 다니는데, 언제든 그게 필요해질 거라고 생각하는 사람의 착용법이다.✂️출근 복장이 곧 출동 복장✂️\n",
-    "source_images_visually_reviewed": false,
+    "source_images_visually_reviewed": true,
     "character_id": null,
     "pixel_request": {
-      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult man late20s, tall laborer's strong build, long untidy dark brown hair reaching shoulders and hanging over one eye, weary dark eyes and subdued awkward face, navy trouser suit, white shirt, black necktie and practical black shoes. No cow mask; match original portrait. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 230-238px on128x256; tall; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
+      "description": "Single full-body native pixel-art game sprite. IDENTITY MUST MATCH: Tall lean adult man with slightly slouched posture, long narrow pale face, pronounced dark under-eye shadows, tired half-lidded gray-brown eyes, small weary smile. LONG dark BROWN layered hair extending past shoulders, center part, long curved side locks and outward-flipped ends, untied. Navy suit, white shirt and navy tie. No mask. Relaxed upright SOUTH-facing stance, empty hands visible at sides, low top-down camera. Natural adult anatomy and normal torso/pelvis. Anatomical crown-to-sole height 230-238px on128x256, hair/cap excluded from body height. Soles at y248, leave unused space above shorter people, NEVER enlarge to fill canvas. Keep original individual body shape. Match style reference ONLY for crisp native1px clusters, selective dark outlines and controlled shading; own colors and clothes. Transparent background, no shadow, no text, no weapons. Entire hair and shoes inside frame.",
       "image_size": {
         "width": 128,
         "height": 256
@@ -1831,6 +2014,23 @@
       ],
       "canonical_height_cm": null,
       "note": "Pixel ranges are production targets, not invented canonical height. Preserve original build and clothing; validate together at identical zoom."
+    },
+    "source_review_details": {
+      "reviewed_individually": true,
+      "original_sha256": "53b55171f1516aa3fc628390b1ccba7c9702fd4b4721a312d0967afc9b788dd3",
+      "visual_findings": "Tall lean adult man with slightly slouched posture, long narrow pale face, pronounced dark under-eye shadows, tired half-lidded gray-brown eyes, small weary smile. LONG dark BROWN layered hair extending past shoulders, center part, long curved side locks and outward-flipped ends, untied. Navy suit, white shirt and navy tie. No mask.",
+      "lore_appearance_read": true,
+      "source_priority": "AVIF for appearance, lore supplements height; original unmasked default overrides masks mentioned by lore",
+      "height": {
+        "basis": "tall",
+        "target_body_pixels": [
+          230,
+          238
+        ],
+        "canonical_height_cm": null,
+        "note": "Pixel ranges are production targets, not invented canonical height. Preserve original build and clothing; validate together at identical zoom."
+      },
+      "reviewed_at": "2026-10-24"
     }
   },
   {
@@ -1838,14 +2038,14 @@
     "name": "곽제강",
     "group": "baekilmong",
     "slug": "kwak-je-gang",
-    "appearance": "Adult man mid30s, tousled wavy black hair, small round spectacles, warm brown curious eyes, smiling youthful face, soft nonathletic natural build, white laboratory coat over white shirt, black necktie, dark trousers and black shoes.",
+    "appearance": "Young adult man with ordinary soft slim build, gentle long face, warm brown eyes and friendly small smile. Thick messy WAVY black hair with loose center part and curled forehead strands. Large thin rectangular clear eyeglasses. OPEN long off-white lab coat over pale gray-blue collared shirt, straight black necktie and black trousers. No mask, no held book.",
     "original_art": "assets/agents/Kwak Je-gang_default.avif",
     "original_sha256": "662356a59e3eac324e2852ab6f2f6eeeef4471dd17135f8fbed9ddc6ffad71fa",
     "wiki_appearance": "[Paragraph]실험실에서 자란 듯한 가볍고 물렁한 몸. 현장 체력도 전투력도 없지만, 그걸 조금도 신경 쓰지 않는다. 젊고 털털한 얼굴에 안경. 안경 너머의 다정한 눈이 흥미로운 공포를 만나면 반짝이고, 확신이 차오르면 황홀경으로 변한다.\n[Paragraph]사무복 위에 흰 가운. 어디서 났는지 모를 볼펜 한 자루, 그리고 ❗남의 노트❗를 늘 옆구리에 끼고 다닌다. 그 노트의 원래 주인을 찾으면 대개 연구1팀 누군가이거나, 가끔은 곽제강이 면담한 이상 인원이다.✂️돌려받은 사람은 아직 없다✂️\n[Heading]Level:2|Title:버릇\n[List]웃으면서 서류를 톡톡 두드린다. 이게 나오면 듣기 좋은 말이 끝났다는 뜻이다.\n[List]끔찍한 대목을 말하기 직전에 턱을 문지른다. 연구1팀원들은 이 동작을 보면 마음의 준비를 한다.\n[List]흥미로운 시체 앞에서 콧노래를 흥얼거린다.\n[List]흥미로운 대상을 만나면 손으로 쓴 면담 노트를 받아 간다. 팬이 사인을 받듯이.\n[Paragraph]남의 불행 앞에서 터져 나오는 웃음을 참는 표정도 유명하다. 참는 게 다 보인다. 그리고 동료들이 \"경고\"로 읽는 의미심장한 미소가 따로 있다. 그 미소가 나오면 연구1팀 대리 이연화가 \"과장님!\"을 외칠 준비를 한다.\n",
-    "source_images_visually_reviewed": false,
+    "source_images_visually_reviewed": true,
     "character_id": null,
     "pixel_request": {
-      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult man mid30s, tousled wavy black hair, small round spectacles, warm brown curious eyes, smiling youthful face, soft nonathletic natural build, white laboratory coat over white shirt, black necktie, dark trousers and black shoes. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 212-224px on128x256; height unspecified; provisional medium stature; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
+      "description": "Single full-body native pixel-art game sprite. IDENTITY MUST MATCH: Young adult man with ordinary soft slim build, gentle long face, warm brown eyes and friendly small smile. Thick messy WAVY black hair with loose center part and curled forehead strands. Large thin rectangular clear eyeglasses. OPEN long off-white lab coat over pale gray-blue collared shirt, straight black necktie and black trousers. No mask, no held book. Relaxed upright SOUTH-facing stance, empty hands visible at sides, low top-down camera. Natural adult anatomy and normal torso/pelvis. Anatomical crown-to-sole height 212-224px on128x256, hair/cap excluded from body height. Soles at y248, leave unused space above shorter people, NEVER enlarge to fill canvas. Keep original individual body shape. Match style reference ONLY for crisp native1px clusters, selective dark outlines and controlled shading; own colors and clothes. Transparent background, no shadow, no text, no weapons. Entire hair and shoes inside frame.",
       "image_size": {
         "width": 128,
         "height": 256
@@ -1872,6 +2072,23 @@
       ],
       "canonical_height_cm": null,
       "note": "Pixel ranges are production targets, not invented canonical height. Preserve original build and clothing; validate together at identical zoom."
+    },
+    "source_review_details": {
+      "reviewed_individually": true,
+      "original_sha256": "662356a59e3eac324e2852ab6f2f6eeeef4471dd17135f8fbed9ddc6ffad71fa",
+      "visual_findings": "Young adult man with ordinary soft slim build, gentle long face, warm brown eyes and friendly small smile. Thick messy WAVY black hair with loose center part and curled forehead strands. Large thin rectangular clear eyeglasses. OPEN long off-white lab coat over pale gray-blue collared shirt, straight black necktie and black trousers. No mask, no held book.",
+      "lore_appearance_read": true,
+      "source_priority": "AVIF for appearance, lore supplements height; original unmasked default overrides masks mentioned by lore",
+      "height": {
+        "basis": "height unspecified; provisional medium stature",
+        "target_body_pixels": [
+          212,
+          224
+        ],
+        "canonical_height_cm": null,
+        "note": "Pixel ranges are production targets, not invented canonical height. Preserve original build and clothing; validate together at identical zoom."
+      },
+      "reviewed_at": "2026-10-24"
     }
   },
   {
@@ -1879,14 +2096,14 @@
     "name": "이연화",
     "group": "baekilmong",
     "slug": "lee-yeon-hwa",
-    "appearance": "Adult woman late20s, medium length straight dark brown hair, rectangular thin rimmed glasses, brown eyes with deep tired dark circles, calm exhausted face, ordinary unathletic build, spotless white laboratory coat over pink collared blouse, black pencil skirt and practical black low heels.",
+    "appearance": "Adult woman with natural nonathletic build, tired oval face, brown-gray eyes, under-eye shadows and subdued mouth. Black hair center-parted, long straight cheek locks, tied LOW behind neck into a small ponytail. Thin black rectangular clear eyeglasses. OPEN off-white long lab coat over a dusty PINK collared blouse with no tie; dark high-waisted skirt visible below. No mask.",
     "original_art": "assets/agents/Lee Yeon-hwa_default.avif",
     "original_sha256": "46de86c214d9c6f7196ee2340cf1e04ca61e03ac08fa15ed71e2ddeec720630a",
     "wiki_appearance": "[Paragraph]앉아서 일하는 커리어 연구원의 몸. 체력이 없다. 그리고 그걸 뛸 때마다 뼈저리게 느낀다. 안경 아래로 깊게 내려앉은 다크서클이 트레이드마크다. 흰 연구 가운은 늘 흠잡을 데 없이 단정하다. 피곤함이 얼굴에 다 드러나는 어른 책상 연구원의 모습 그대로다.\n[Paragraph]감정을 참을 때의 버릇이 뚜렷하다. 침을 꿀꺽 삼키고, 입술을 깨물고, 화를 누를 때는 이를 악문다. 그리고 ❗진짜 잔혹한 것❗을 보면 손으로 입을 가린다. 연구1팀에서 이연화가 입을 가리는 걸 봤다면, 그날 본 것이 이 팀 기준으로도 선을 넘었다는 뜻이다.✂️연구1팀 공식 잔혹도 측정기✂️\n[Heading]Level:2|Title:말투\n[Paragraph]떨릴 때도 침착하다. 조심스럽고, 단서를 달고, 정확하다. 문장을 끝까지 말해도 안전한지 저울질하느라 말끝이 흐려지는 일이 잦다. 모두에게 존댓말을 쓴다. 상사를 꾸짖는 도중에도 존댓말은 긴장한 채로 끝까지 유지된다. 그래서 이연화의 꾸지람은 묘하게 더 아프다는 평이 있다.\n",
-    "source_images_visually_reviewed": false,
+    "source_images_visually_reviewed": true,
     "character_id": null,
     "pixel_request": {
-      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult woman late20s, medium length straight dark brown hair, rectangular thin rimmed glasses, brown eyes with deep tired dark circles, calm exhausted face, ordinary unathletic build, spotless white laboratory coat over pink collared blouse, black pencil skirt and practical black low heels. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 200-206px on128x256 at shared1.25px/cm; height 160-165cm; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
+      "description": "Single full-body native pixel-art game sprite. IDENTITY MUST MATCH: Adult woman with natural nonathletic build, tired oval face, brown-gray eyes, under-eye shadows and subdued mouth. Black hair center-parted, long straight cheek locks, tied LOW behind neck into a small ponytail. Thin black rectangular clear eyeglasses. OPEN off-white long lab coat over a dusty PINK collared blouse with no tie; dark high-waisted skirt visible below. No mask. Relaxed upright SOUTH-facing stance, empty hands visible at sides, low top-down camera. Natural adult anatomy and normal torso/pelvis. Anatomical crown-to-sole height 200-206px on128x256, hair/cap excluded from body height. Soles at y248, leave unused space above shorter people, NEVER enlarge to fill canvas. Keep original individual body shape. Match style reference ONLY for crisp native1px clusters, selective dark outlines and controlled shading; own colors and clothes. Transparent background, no shadow, no text, no weapons. Entire hair and shoes inside frame.",
       "image_size": {
         "width": 128,
         "height": 256
@@ -1918,6 +2135,28 @@
       ],
       "pixels_per_cm": 1.25,
       "note": "Common production scale; do not fit each person to full canvas. Compare anatomical crown-to-sole height; hair/headwear and heels need separate allowance. Unspecified individual female height stays a range."
+    },
+    "source_review_details": {
+      "reviewed_individually": true,
+      "original_sha256": "46de86c214d9c6f7196ee2340cf1e04ca61e03ac08fa15ed71e2ddeec720630a",
+      "visual_findings": "Adult woman with natural nonathletic build, tired oval face, brown-gray eyes, under-eye shadows and subdued mouth. Black hair center-parted, long straight cheek locks, tied LOW behind neck into a small ponytail. Thin black rectangular clear eyeglasses. OPEN off-white long lab coat over a dusty PINK collared blouse with no tie; dark high-waisted skirt visible below. No mask.",
+      "lore_appearance_read": true,
+      "source_priority": "AVIF for appearance, lore supplements height; original unmasked default overrides masks mentioned by lore",
+      "height": {
+        "basis": "Latest explicit user height specification; overrides previous provisional height classes and conflicting wiki height",
+        "height_cm_range": [
+          160,
+          165
+        ],
+        "canonical_height_cm": null,
+        "target_body_pixels": [
+          200,
+          206
+        ],
+        "pixels_per_cm": 1.25,
+        "note": "Common production scale; do not fit each person to full canvas. Compare anatomical crown-to-sole height; hair/headwear and heels need separate allowance. Unspecified individual female height stays a range."
+      },
+      "reviewed_at": "2026-10-24"
     }
   },
   {
@@ -1925,14 +2164,14 @@
     "name": "이병진",
     "group": "baekilmong",
     "slug": "lee-byeong-jin",
-    "appearance": "Adult man early40s, short neat brown hair, rectangular glasses, anxious eyes and nervous polite smile, soft overweight middle aged office worker build with round belly, white long sleeve office shirt, loosened dark necktie, dark trousers and black shoes, no blazer.",
+    "appearance": "Stocky FAT middle-aged office man with large round belly, soft thick arms, round full face and double chin, tired narrow brown eyes and worried strained smile. Short dark brown hair side-parted with short uneven fringe, receding temples. Thin rectangular clear glasses. White long-sleeved shirt stretched over belly, dark black tie, black trousers and belt. NO jacket or lab coat.",
     "original_art": "assets/agents/Lee Byeong-jin_default.avif",
     "original_sha256": "008017c73b72e3bbaa02ded4f03a8ef21422f40355c0f8b2536f4d407f78c7de",
     "wiki_appearance": "[Paragraph]살집 있고 물렁한 중년 사무직 체형. 체력 단련과는 평생 담을 쌓은 몸이다. 안경을 쓰는데, 당황할 때마다 이 안경을 벗어서 닦는다. 렌즈가 더러워서가 아니라 대답할 시간을 버는 동작이다.📌후배들 사이에서는 \"과장님 안경이 반짝이면 지금 머리가 하얗다는 뜻\"이라는 해석이 정설이다.📌\n[Paragraph]긴장하면 몸이 먼저 자백한다. 이마와 목덜미에 땀이 맺히고, 충혈된 눈알이 사방으로 굴러가고, 두 손을 쥐어짜듯 비비다가 말하는 도중에 자기 손가락을 뚝뚝 꺾는다. 진짜로 무너지면 자세도 같이 무너져서, 바닥을 기어가 옆 사람의 바짓가랑이에 매달린다. 현장탐사팀 사이에서 \"이병진 과장이 바지 잡았다\"는 말은 상황이 최악이라는 뜻의 관용구로 쓰인다. ✂️그 바지가 본인 것이었다는 목격담은 아직 없다.✂️\n",
-    "source_images_visually_reviewed": false,
+    "source_images_visually_reviewed": true,
     "character_id": null,
     "pixel_request": {
-      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult man early40s, short neat brown hair, rectangular glasses, anxious eyes and nervous polite smile, soft overweight middle aged office worker build with round belly, white long sleeve office shirt, loosened dark necktie, dark trousers and black shoes, no blazer. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 212-224px on128x256; height unspecified; provisional medium stature; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
+      "description": "Single full-body native pixel-art game sprite. IDENTITY MUST MATCH: Stocky FAT middle-aged office man with large round belly, soft thick arms, round full face and double chin, tired narrow brown eyes and worried strained smile. Short dark brown hair side-parted with short uneven fringe, receding temples. Thin rectangular clear glasses. White long-sleeved shirt stretched over belly, dark black tie, black trousers and belt. NO jacket or lab coat. Relaxed upright SOUTH-facing stance, empty hands visible at sides, low top-down camera. Natural adult anatomy and normal torso/pelvis. Anatomical crown-to-sole height 212-224px on128x256, hair/cap excluded from body height. Soles at y248, leave unused space above shorter people, NEVER enlarge to fill canvas. Keep original individual body shape. Match style reference ONLY for crisp native1px clusters, selective dark outlines and controlled shading; own colors and clothes. Transparent background, no shadow, no text, no weapons. Entire hair and shoes inside frame.",
       "image_size": {
         "width": 128,
         "height": 256
@@ -1959,6 +2198,23 @@
       ],
       "canonical_height_cm": null,
       "note": "Pixel ranges are production targets, not invented canonical height. Preserve original build and clothing; validate together at identical zoom."
+    },
+    "source_review_details": {
+      "reviewed_individually": true,
+      "original_sha256": "008017c73b72e3bbaa02ded4f03a8ef21422f40355c0f8b2536f4d407f78c7de",
+      "visual_findings": "Stocky FAT middle-aged office man with large round belly, soft thick arms, round full face and double chin, tired narrow brown eyes and worried strained smile. Short dark brown hair side-parted with short uneven fringe, receding temples. Thin rectangular clear glasses. White long-sleeved shirt stretched over belly, dark black tie, black trousers and belt. NO jacket or lab coat.",
+      "lore_appearance_read": true,
+      "source_priority": "AVIF for appearance, lore supplements height; original unmasked default overrides masks mentioned by lore",
+      "height": {
+        "basis": "height unspecified; provisional medium stature",
+        "target_body_pixels": [
+          212,
+          224
+        ],
+        "canonical_height_cm": null,
+        "note": "Pixel ranges are production targets, not invented canonical height. Preserve original build and clothing; validate together at identical zoom."
+      },
+      "reviewed_at": "2026-10-24"
     }
   },
   {
@@ -1966,14 +2222,14 @@
     "name": "제이",
     "group": "baekilmong",
     "slug": "jay",
-    "appearance": "Adult man appearing20s, extremely pale skinny weary build, shaggy faded white hair over eyes, dull pale yellow eyes, tired blank face, worn dark navy security uniform shirt and trousers, low black security cap, black work belt and black shoes. No mask indoors as in original portrait.",
+    "appearance": "Very pale gaunt young adult man with thin wiry build. Shaggy SILVER-WHITE hair to jaw and nape, long messy bangs partly obscuring tired YELLOW eyes. Black baseball cap, white pleated medical mask covering nose and mouth. Dark charcoal NAVY security uniform with pointed collar, two buttoned flap chest pockets, long sleeves, matching trousers and black belt. No necktie, no suit jacket.",
     "original_art": "assets/agents/Jay_default.avif",
     "original_sha256": "9e6aee67775356eae339bf718fdc324ddae0127dc4006ef935c26b695c1a2f50",
     "wiki_appearance": "[Paragraph]말라 죽은 나무처럼 창백하고 마른 체구. 낮게 눌러쓴 모자 아래로 빛바랜 덥수룩한 머리가 삐져나오고, 멍하고 지친 얼굴에 짐승처럼 빛이 빠진 눈이 박혀 있다. 근무 중이든 아니든 늘 같은 낡은 경비복 차림이고, 밖에 나갈 때는 평범한 치과용 마스크를 쓴다. 모자를 안 쓰고 있을 때도 모자챙을 고쳐 잡는 손짓을 한다.📌모자가 없는데 모자를 고치는 걸 처음 본 신입은 한참 동안 자기 눈을 의심했다고 한다.📌\n[Paragraph]겉보기엔 20대 청년인데, 오염된 기간을 따지면 ❗거의 30년❗에 가깝다는 추정이 있다. 늘어진 움직임이 기본값이지만 위협이 감지되는 순간 동작이 기계처럼 정확해지고 눈빛이 바뀐다. 안쪽의 무언가가 움직이면 바랜 눈이 노랗게 빛난다. 이 노란빛을 봤다는 사람들은 대체로 그날 일을 길게 이야기하지 않는다.\n",
-    "source_images_visually_reviewed": false,
+    "source_images_visually_reviewed": true,
     "character_id": null,
     "pixel_request": {
-      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult man appearing20s, extremely pale skinny weary build, shaggy faded white hair over eyes, dull pale yellow eyes, tired blank face, worn dark navy security uniform shirt and trousers, low black security cap, black work belt and black shoes. No mask indoors as in original portrait. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 212-224px on128x256; height unspecified; provisional medium stature; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
+      "description": "Single full-body native pixel-art game sprite. IDENTITY MUST MATCH: Very pale gaunt young adult man with thin wiry build. Shaggy SILVER-WHITE hair to jaw and nape, long messy bangs partly obscuring tired YELLOW eyes. Black baseball cap, white pleated medical mask covering nose and mouth. Dark charcoal NAVY security uniform with pointed collar, two buttoned flap chest pockets, long sleeves, matching trousers and black belt. No necktie, no suit jacket. Relaxed upright SOUTH-facing stance, empty hands visible at sides, low top-down camera. Natural adult anatomy and normal torso/pelvis. Anatomical crown-to-sole height 212-224px on128x256, hair/cap excluded from body height. Soles at y248, leave unused space above shorter people, NEVER enlarge to fill canvas. Keep original individual body shape. Match style reference ONLY for crisp native1px clusters, selective dark outlines and controlled shading; own colors and clothes. Transparent background, no shadow, no text, no weapons. Entire hair and shoes inside frame.",
       "image_size": {
         "width": 128,
         "height": 256
@@ -2000,6 +2256,23 @@
       ],
       "canonical_height_cm": null,
       "note": "Pixel ranges are production targets, not invented canonical height. Preserve original build and clothing; validate together at identical zoom."
+    },
+    "source_review_details": {
+      "reviewed_individually": true,
+      "original_sha256": "9e6aee67775356eae339bf718fdc324ddae0127dc4006ef935c26b695c1a2f50",
+      "visual_findings": "Very pale gaunt young adult man with thin wiry build. Shaggy SILVER-WHITE hair to jaw and nape, long messy bangs partly obscuring tired YELLOW eyes. Black baseball cap, white pleated medical mask covering nose and mouth. Dark charcoal NAVY security uniform with pointed collar, two buttoned flap chest pockets, long sleeves, matching trousers and black belt. No necktie, no suit jacket.",
+      "lore_appearance_read": true,
+      "source_priority": "AVIF for appearance, lore supplements height; original unmasked default overrides masks mentioned by lore",
+      "height": {
+        "basis": "height unspecified; provisional medium stature",
+        "target_body_pixels": [
+          212,
+          224
+        ],
+        "canonical_height_cm": null,
+        "note": "Pixel ranges are production targets, not invented canonical height. Preserve original build and clothing; validate together at identical zoom."
+      },
+      "reviewed_at": "2026-10-24"
     }
   },
   {
@@ -2007,14 +2280,14 @@
     "name": "호유원",
     "group": "baekilmong",
     "slug": "ho-yu-won",
-    "appearance": "Adult man appearing early30s, wavy dark brown hair parted across forehead, warm brown eyes, disarmingly friendly smile, slim elegant natural build, relaxed gray executive trouser suit, white shirt, loosely worn dark necktie and polished black shoes.",
+    "appearance": "Lean adult man with narrow waist and natural shoulders, pale angular youthful face, ORANGE amber eyes and a soft knowing smile. Thick tousled dark BROWN hair side-parted, long curved curtain strands over forehead and eyes. Light warm GRAY suit jacket worn open and matching trousers, white shirt with OPEN collar, LOOSE dark brown tie, black belt. No mask or glasses.",
     "original_art": "assets/agents/Ho Yu-won_default.avif",
     "original_sha256": "89a16a8aa6876a18f3eb9deae220863f053424705651ad5a0e191da94d155fe5",
     "wiki_appearance": "[Paragraph]편하게 걸친 회색 임원 정장, 늘 먼저 내미는 따뜻한 손. 첫인상은 놀라울 만큼 다정하다. 경계를 풀게 만드는 데 특화된 얼굴이라는 평이 있다.\n[Paragraph]그 다정함에 금이 가는 순간들이 목격담으로 전해진다. 무언가를 강하게 원할 때 눈이 기분 나쁘게 번들거린다는 것. 그리고 아주 가끔 미소가 떨어지는데, 그 아래 드러나는 정적이 얼굴과 전혀 어울리지 않는다는 것이다. 본 사람들은 \"표정이 없어진 게 아니라 원래 그 자리에 아무것도 없었던 것 같았다\"고 표현한다.📌이 목격담을 남긴 직원은 이후 그 장면을 다시 떠올리는 것만으로 소름이 돋는다고 했다. 다행히 본인은 아직 재직 중이다.📌\n[Paragraph]불타는 복도를 그을음 하나 없이 걸어 나오면서, 연기 때문에 힘든 척 예의 바르게 콜록거렸다는 증언도 있다. 시체를 밟고 선 채로 구두에 흙이 묻었는지 확인하는 모습을 봤다는 이야기도 있다. 둘 다 같은 날의 일인지는 증언자들이 말을 맞추지 않아서 모른다. ✂️맞춰 볼 생각도 없어 보인다.✂️\n",
-    "source_images_visually_reviewed": false,
+    "source_images_visually_reviewed": true,
     "character_id": null,
     "pixel_request": {
-      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult man appearing early30s, wavy dark brown hair parted across forehead, warm brown eyes, disarmingly friendly smile, slim elegant natural build, relaxed gray executive trouser suit, white shirt, loosely worn dark necktie and polished black shoes. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 212-224px on128x256; height unspecified; provisional medium stature; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
+      "description": "Single full-body native pixel-art game sprite. IDENTITY MUST MATCH: Lean adult man with narrow waist and natural shoulders, pale angular youthful face, ORANGE amber eyes and a soft knowing smile. Thick tousled dark BROWN hair side-parted, long curved curtain strands over forehead and eyes. Light warm GRAY suit jacket worn open and matching trousers, white shirt with OPEN collar, LOOSE dark brown tie, black belt. No mask or glasses. Relaxed upright SOUTH-facing stance, empty hands visible at sides, low top-down camera. Natural adult anatomy and normal torso/pelvis. Anatomical crown-to-sole height 212-224px on128x256, hair/cap excluded from body height. Soles at y248, leave unused space above shorter people, NEVER enlarge to fill canvas. Keep original individual body shape. Match style reference ONLY for crisp native1px clusters, selective dark outlines and controlled shading; own colors and clothes. Transparent background, no shadow, no text, no weapons. Entire hair and shoes inside frame.",
       "image_size": {
         "width": 128,
         "height": 256
@@ -2041,6 +2314,23 @@
       ],
       "canonical_height_cm": null,
       "note": "Pixel ranges are production targets, not invented canonical height. Preserve original build and clothing; validate together at identical zoom."
+    },
+    "source_review_details": {
+      "reviewed_individually": true,
+      "original_sha256": "89a16a8aa6876a18f3eb9deae220863f053424705651ad5a0e191da94d155fe5",
+      "visual_findings": "Lean adult man with narrow waist and natural shoulders, pale angular youthful face, ORANGE amber eyes and a soft knowing smile. Thick tousled dark BROWN hair side-parted, long curved curtain strands over forehead and eyes. Light warm GRAY suit jacket worn open and matching trousers, white shirt with OPEN collar, LOOSE dark brown tie, black belt. No mask or glasses.",
+      "lore_appearance_read": true,
+      "source_priority": "AVIF for appearance, lore supplements height; original unmasked default overrides masks mentioned by lore",
+      "height": {
+        "basis": "height unspecified; provisional medium stature",
+        "target_body_pixels": [
+          212,
+          224
+        ],
+        "canonical_height_cm": null,
+        "note": "Pixel ranges are production targets, not invented canonical height. Preserve original build and clothing; validate together at identical zoom."
+      },
+      "reviewed_at": "2026-10-24"
     }
   },
   {
@@ -2048,14 +2338,14 @@
     "name": "청달래",
     "group": "baekilmong",
     "slug": "cheong-dal-lae",
-    "appearance": "Adult woman appearing mid30s, immaculate dark teal hair twisted into a low updo with side lock, black eyes, serene benevolent yet cold executive expression, mature natural build, immaculate dark navy three piece trouser suit, white shirt, black necktie and firm black heels.",
+    "appearance": "Adult woman with composed natural slender figure, oval mature face, pale blue-gray eyes and a calm knowing smile. Dark TEAL hair center-parted with LONG STRAIGHT cheek locks down to shoulders, the rest gathered in a low rounded bun behind head. Very dark navy tailored trouser suit, white shirt and dark navy tie. Bare face, no mask or glasses. Do not replace visible pale eyes with black irises from lore.",
     "original_art": "assets/agents/Cheong Dal-lae_default.avif",
     "original_sha256": "b85407676df5ba68417501f4548bf68053d84983bdd19ee66900b3900d04ca6d",
     "wiki_appearance": "[Paragraph]흐트러짐 없이 틀어 올린 짙은 청록색 올림머리. 회사 사람들이 그녀를 멀리서 알아보는 표식이다. 나이를 가늠할 수 없는 얼굴에는 자애로운 표정이 얹혀 있는데, 그 아래 깔린 것은 차가운 침착함이다. 검은 눈동자는 방 안을 한 바퀴 감사(監査)하듯 훑다가, 곤란한 처지에 놓인 사람 위에 정확히 멈춘다.📌\"전무님 눈이 나한테 멈췄다\"는 말은 백일몽 사내에서 \"나 오늘 망했다\"와 같은 뜻이다.📌\n[Paragraph]그녀가 오는 건 보기 전에 먼저 들린다. 복도 저편에서 단단한 구두 굽 소리가 서두름 없이 다가온다. 이 소리가 들리면 사무실 공기가 바뀐다. 실제로 방 안의 압력이 달라지는 느낌이라는 증언이 많다. 귀가 먹먹해졌다는 사람, 숨이 얕아졌다는 사람, 등 뒤로 식은땀이 흘렀다는 사람도 있다.\n[Paragraph]옷차림은 늘 완벽한 쓰리피스 정장. 이 정장은 ❗학살 현장 한복판에서도 주름 하나 가지 않는다❗고 한다. 이 말이 비유가 아니라는 걸 아는 사람들은 그 이야기를 할 때 목소리를 낮춘다. ✂️세탁소가 어딘지 묻는 직원은 아직 없다.✂️\n",
-    "source_images_visually_reviewed": false,
+    "source_images_visually_reviewed": true,
     "character_id": null,
     "pixel_request": {
-      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult woman appearing mid30s, immaculate dark teal hair twisted into a low updo with side lock, black eyes, serene benevolent yet cold executive expression, mature natural build, immaculate dark navy three piece trouser suit, white shirt, black necktie and firm black heels. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 200-206px on128x256 at shared1.25px/cm; height 160-165cm; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
+      "description": "Single full-body native pixel-art game sprite. IDENTITY MUST MATCH: Adult woman with composed natural slender figure, oval mature face, pale blue-gray eyes and a calm knowing smile. Dark TEAL hair center-parted with LONG STRAIGHT cheek locks down to shoulders, the rest gathered in a low rounded bun behind head. Very dark navy tailored trouser suit, white shirt and dark navy tie. Bare face, no mask or glasses. Do not replace visible pale eyes with black irises from lore. Relaxed upright SOUTH-facing stance, empty hands visible at sides, low top-down camera. Natural adult anatomy and normal torso/pelvis. Anatomical crown-to-sole height 200-206px on128x256, hair/cap excluded from body height. Soles at y248, leave unused space above shorter people, NEVER enlarge to fill canvas. Keep original individual body shape. Match style reference ONLY for crisp native1px clusters, selective dark outlines and controlled shading; own colors and clothes. Transparent background, no shadow, no text, no weapons. Entire hair and shoes inside frame.",
       "image_size": {
         "width": 128,
         "height": 256
@@ -2087,6 +2377,28 @@
       ],
       "pixels_per_cm": 1.25,
       "note": "Common production scale; do not fit each person to full canvas. Compare anatomical crown-to-sole height; hair/headwear and heels need separate allowance. Unspecified individual female height stays a range."
+    },
+    "source_review_details": {
+      "reviewed_individually": true,
+      "original_sha256": "b85407676df5ba68417501f4548bf68053d84983bdd19ee66900b3900d04ca6d",
+      "visual_findings": "Adult woman with composed natural slender figure, oval mature face, pale blue-gray eyes and a calm knowing smile. Dark TEAL hair center-parted with LONG STRAIGHT cheek locks down to shoulders, the rest gathered in a low rounded bun behind head. Very dark navy tailored trouser suit, white shirt and dark navy tie. Bare face, no mask or glasses. Do not replace visible pale eyes with black irises from lore.",
+      "lore_appearance_read": true,
+      "source_priority": "AVIF for appearance, lore supplements height; original unmasked default overrides masks mentioned by lore",
+      "height": {
+        "basis": "Latest explicit user height specification; overrides previous provisional height classes and conflicting wiki height",
+        "height_cm_range": [
+          160,
+          165
+        ],
+        "canonical_height_cm": null,
+        "target_body_pixels": [
+          200,
+          206
+        ],
+        "pixels_per_cm": 1.25,
+        "note": "Common production scale; do not fit each person to full canvas. Compare anatomical crown-to-sole height; hair/headwear and heels need separate allowance. Unspecified individual female height stays a range."
+      },
+      "reviewed_at": "2026-10-24"
     }
   },
   {

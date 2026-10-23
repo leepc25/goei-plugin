@@ -5902,7 +5902,7 @@
       "kind": "image",
       "slug": "sa-jang",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792788394.832406,
       "receipt": {
         "usage": null,
@@ -5917,13 +5917,72 @@
         },
         "estimated_generations": 9,
         "pricing_provisional": true
+      },
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 9.0
+        },
+        "id": "63de2248-6e39-4807-9629-03500fa6921b",
+        "status": "completed",
+        "created_at": "2026-10-23T20:46:35.091829+00:00",
+        "last_response": {
+          "seed": 10222027,
+          "type": "message_done",
+          "model": "pro_flash",
+          "width": 128,
+          "action": "Removing background",
+          "height": 256,
+          "images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "prompt": "Single full-body native pixel-art game sprite. IDENTITY MUST MATCH: Adult male silhouette with broad straight shoulders and a tapered waist. Thick black wavy hair swept back with loose curved locks. Entire face is an opaque pitch-black shadow, including eyes and nose: ONLY a tiny thin white smile is visible. NO sunglasses. Black single-breasted tailored suit, white pointed collar, straight black necktie. Pale hands. Black trousers and plain black formal shoes. Relaxed upright stance with empty hands at sides. Front-facing SOUTH, low top-down camera. Natural adult anatomy, about 7 heads tall, normal torso and pelvis. Anatomical crown-to-sole height 214-222 pixels on a 128x256 canvas; hair may extend above crown. Soles at y248; leave unused space ABOVE shorter people, do NOT enlarge to fill frame. Keep individual build and facial features. Match reference ONLY for crisp 1px pixel clusters, selective dark outlines and controlled shading. Keep own hair and costume colors. Transparent background, no ground shadow, no text, no held weapons. Whole hair and shoes within frame.",
+          "status": "completed",
+          "asset_id": "269a3d39-ac0f-5eb0-b00a-07c27130dddd",
+          "image_id": "269a3d39-ac0f-5eb0-b00a-07c27130dddd",
+          "job_kind": "creator-image",
+          "progress": 1.0,
+          "image_url": "https://s3.eu-central-003.backblazeb2.com/pixellab-generations/production/creator/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/269a3d39-ac0f-5eb0-b00a-07c27130dddd/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0037e6521c1d7c20000000001%2F20261023%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20261023T205129Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=f7bb059f9d84264d7e3e598435bfb3e4e5647c33472475b37fe65ef9afbcf7e9",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 9
+          },
+          "generation_id": "94020c30-4338-4221-bd1a-97fb2f5ee4de",
+          "queue_position": 0,
+          "billing_charged": true,
+          "original_images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "source_image_id": "269a3d39-ac0f-5eb0-b00a-07c27130dddd",
+          "creator_image_saved": true,
+          "generation_started_at": "2026-10-23T20:46:35.1428+00:00",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792788759.4650607,
+      "elapsed_observed_seconds": 364.6326551437378,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 9
       }
     },
     "337a274b-6c96-4062-9f1d-16cf170029b8": {
       "kind": "image",
       "slug": "do-pil-heon",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792788395.2162948,
       "receipt": {
         "usage": null,
@@ -5938,13 +5997,72 @@
         },
         "estimated_generations": 9,
         "pricing_provisional": true
+      },
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 9.0
+        },
+        "id": "337a274b-6c96-4062-9f1d-16cf170029b8",
+        "status": "completed",
+        "created_at": "2026-10-23T20:46:35.476191+00:00",
+        "last_response": {
+          "seed": 10222027,
+          "type": "message_done",
+          "model": "pro_flash",
+          "width": 128,
+          "action": "Removing background",
+          "height": 256,
+          "images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "prompt": "Single full-body native pixel-art game sprite. IDENTITY MUST MATCH: Mature man with lean ordinary build, narrow angular long face, slight restrained smile and creases beside mouth. Dark brown-black wavy side-parted hair swept back, curved forelock on forehead. Black aviator sunglasses. Dark warm-charcoal single-breasted two-button suit, white shirt and neatly tightened black tie. No armor. Black trousers and plain black formal shoes. Relaxed upright stance with empty hands at sides. Front-facing SOUTH, low top-down camera. Natural adult anatomy, about 7 heads tall, normal torso and pelvis. Anatomical crown-to-sole height 214-222 pixels on a 128x256 canvas; hair may extend above crown. Soles at y248; leave unused space ABOVE shorter people, do NOT enlarge to fill frame. Keep individual build and facial features. Match reference ONLY for crisp 1px pixel clusters, selective dark outlines and controlled shading. Keep own hair and costume colors. Transparent background, no ground shadow, no text, no held weapons. Whole hair and shoes within frame.",
+          "status": "completed",
+          "asset_id": "00bfc0a7-fc0d-5c9e-b2f1-67840c614525",
+          "image_id": "00bfc0a7-fc0d-5c9e-b2f1-67840c614525",
+          "job_kind": "creator-image",
+          "progress": 1.0,
+          "image_url": "https://s3.eu-central-003.backblazeb2.com/pixellab-generations/production/creator/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/00bfc0a7-fc0d-5c9e-b2f1-67840c614525/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0037e6521c1d7c20000000001%2F20261023%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20261023T205121Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=b9b81ed5379391f86237ae495fcdc786f639084f95b83e4767842fcd500d1e93",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 9
+          },
+          "generation_id": "99fedcca-aaa2-437d-9340-73e7e578eb6e",
+          "queue_position": 0,
+          "billing_charged": true,
+          "original_images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "source_image_id": "00bfc0a7-fc0d-5c9e-b2f1-67840c614525",
+          "creator_image_saved": true,
+          "generation_started_at": "2026-10-23T20:46:35.585877+00:00",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792788759.4652343,
+      "elapsed_observed_seconds": 364.24893975257874,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 9
       }
     },
     "5e401a36-d468-44c5-bb0c-f9c7c21bd32f": {
       "kind": "image",
       "slug": "lee-gil-hwan",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792788395.6644516,
       "receipt": {
         "usage": null,
@@ -5959,13 +6077,72 @@
         },
         "estimated_generations": 9,
         "pricing_provisional": true
+      },
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 9.0
+        },
+        "id": "5e401a36-d468-44c5-bb0c-f9c7c21bd32f",
+        "status": "completed",
+        "created_at": "2026-10-23T20:46:35.857714+00:00",
+        "last_response": {
+          "seed": 10222027,
+          "type": "message_done",
+          "model": "pro_flash",
+          "width": 128,
+          "action": "Removing background",
+          "height": 256,
+          "images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "prompt": "Single full-body native pixel-art game sprite. IDENTITY MUST MATCH: Stocky plump middle-aged man with broad rounded torso and visible belly, round full cheeks and soft double chin, mild closed-mouth smile. Smooth dark brown-black BOWL haircut with thick straight rounded fringe touching the sunglasses. Black aviator sunglasses. Charcoal suit fitted over the round belly, white shirt, neat black tie. NOT slim or muscular. Black trousers and plain black formal shoes. Relaxed upright stance with empty hands at sides. Front-facing SOUTH, low top-down camera. Natural adult anatomy, about 7 heads tall, normal torso and pelvis. Anatomical crown-to-sole height 214-222 pixels on a 128x256 canvas; hair may extend above crown. Soles at y248; leave unused space ABOVE shorter people, do NOT enlarge to fill frame. Keep individual build and facial features. Match reference ONLY for crisp 1px pixel clusters, selective dark outlines and controlled shading. Keep own hair and costume colors. Transparent background, no ground shadow, no text, no held weapons. Whole hair and shoes within frame.",
+          "status": "completed",
+          "asset_id": "2720e6fd-bf29-582b-a007-e2530ae75864",
+          "image_id": "2720e6fd-bf29-582b-a007-e2530ae75864",
+          "job_kind": "creator-image",
+          "progress": 1.0,
+          "image_url": "https://s3.eu-central-003.backblazeb2.com/pixellab-generations/production/creator/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/2720e6fd-bf29-582b-a007-e2530ae75864/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0037e6521c1d7c20000000001%2F20261023%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20261023T205114Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=1802c778396aa06d712c44567a810374e9d765e63f450e6c3110bd80d3f8b138",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 9
+          },
+          "generation_id": "3e1d1773-0f97-43c6-8319-f9c6d0b4744d",
+          "queue_position": 0,
+          "billing_charged": true,
+          "original_images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "source_image_id": "2720e6fd-bf29-582b-a007-e2530ae75864",
+          "creator_image_saved": true,
+          "generation_started_at": "2026-10-23T20:46:35.918371+00:00",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792788759.6099265,
+      "elapsed_observed_seconds": 363.94547510147095,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 9
       }
     },
     "84b18533-3b72-4e23-a538-c3e88668fb7a": {
       "kind": "image",
       "slug": "lee-gi-seok",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792788395.985353,
       "receipt": {
         "usage": null,
@@ -5980,13 +6157,72 @@
         },
         "estimated_generations": 9,
         "pricing_provisional": true
+      },
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 9.0
+        },
+        "id": "84b18533-3b72-4e23-a538-c3e88668fb7a",
+        "status": "completed",
+        "created_at": "2026-10-23T20:46:36.184658+00:00",
+        "last_response": {
+          "seed": 10222027,
+          "type": "message_done",
+          "model": "pro_flash",
+          "width": 128,
+          "action": "Removing background",
+          "height": 256,
+          "images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "prompt": "Single full-body native pixel-art game sprite. IDENTITY MUST MATCH: Lean wiry adult man with narrow waist, angular narrow cheeks, pointed chin and confident crooked smile. Glossy black SIDE-PARTED hair, long curved curtain lock hanging over one side of forehead, opposite side swept back. Black aviator sunglasses. Fitted black single-breasted suit, white shirt, neat narrow black tie. Both hands look human; do not invent an exposed robot arm. Black trousers and plain black formal shoes. Relaxed upright stance with empty hands at sides. Front-facing SOUTH, low top-down camera. Natural adult anatomy, about 7 heads tall, normal torso and pelvis. Anatomical crown-to-sole height 214-222 pixels on a 128x256 canvas; hair may extend above crown. Soles at y248; leave unused space ABOVE shorter people, do NOT enlarge to fill frame. Keep individual build and facial features. Match reference ONLY for crisp 1px pixel clusters, selective dark outlines and controlled shading. Keep own hair and costume colors. Transparent background, no ground shadow, no text, no held weapons. Whole hair and shoes within frame.",
+          "status": "completed",
+          "asset_id": "ca6ae9bf-5659-557c-8d88-53bae3de710e",
+          "image_id": "ca6ae9bf-5659-557c-8d88-53bae3de710e",
+          "job_kind": "creator-image",
+          "progress": 1.0,
+          "image_url": "https://s3.eu-central-003.backblazeb2.com/pixellab-generations/production/creator/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/ca6ae9bf-5659-557c-8d88-53bae3de710e/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0037e6521c1d7c20000000001%2F20261023%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20261023T205134Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=f2c659da3c67a6aecda7488b2fd6d5fc10ac8e6a24ffaa0de0ad8130b4b1b8c6",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 9
+          },
+          "generation_id": "d526d37f-8572-44f9-9b30-22607ba274bf",
+          "queue_position": 0,
+          "billing_charged": true,
+          "original_images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "source_image_id": "ca6ae9bf-5659-557c-8d88-53bae3de710e",
+          "creator_image_saved": true,
+          "generation_started_at": "2026-10-23T20:46:36.237276+00:00",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792788759.610019,
+      "elapsed_observed_seconds": 363.6246659755707,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 9
       }
     },
     "1425bdcd-2e41-4959-8ca2-404855b0a6c5": {
       "kind": "image",
       "slug": "kim-jo-hak",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792788396.3065107,
       "receipt": {
         "usage": null,
@@ -6001,13 +6237,72 @@
         },
         "estimated_generations": 9,
         "pricing_provisional": true
+      },
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 9.0
+        },
+        "id": "1425bdcd-2e41-4959-8ca2-404855b0a6c5",
+        "status": "completed",
+        "created_at": "2026-10-23T20:46:36.545200+00:00",
+        "last_response": {
+          "seed": 10222027,
+          "type": "message_done",
+          "model": "pro_flash",
+          "width": 128,
+          "action": "Removing background",
+          "height": 256,
+          "images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "prompt": "Single full-body native pixel-art game sprite. IDENTITY MUST MATCH: Mature middle-aged man, ordinary solid build, broad forehead with pronounced horizontal wrinkles, long angular lined cheeks, deep nasolabial folds and restrained thin-lipped smile. Short dark brown hair receding slightly at temples, combed back and sideways. Black aviator sunglasses. Dark charcoal suit, white shirt, straight black tie. No scars and no beard. Black trousers and plain black formal shoes. Relaxed upright stance with empty hands at sides. Front-facing SOUTH, low top-down camera. Natural adult anatomy, about 7 heads tall, normal torso and pelvis. Anatomical crown-to-sole height 214-222 pixels on a 128x256 canvas; hair may extend above crown. Soles at y248; leave unused space ABOVE shorter people, do NOT enlarge to fill frame. Keep individual build and facial features. Match reference ONLY for crisp 1px pixel clusters, selective dark outlines and controlled shading. Keep own hair and costume colors. Transparent background, no ground shadow, no text, no held weapons. Whole hair and shoes within frame.",
+          "status": "completed",
+          "asset_id": "b3b45288-6160-544d-8bfa-21748cbc1d19",
+          "image_id": "b3b45288-6160-544d-8bfa-21748cbc1d19",
+          "job_kind": "creator-image",
+          "progress": 1.0,
+          "image_url": "https://s3.eu-central-003.backblazeb2.com/pixellab-generations/production/creator/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/b3b45288-6160-544d-8bfa-21748cbc1d19/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0037e6521c1d7c20000000001%2F20261023%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20261023T205141Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=8d23aa641c4ad81df3e37cb1da655ecbed49111396ad2f15c56ae3b7f91e64b3",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 9
+          },
+          "generation_id": "36eff134-281a-43f8-be62-f4b7f7186b2a",
+          "queue_position": 0,
+          "billing_charged": true,
+          "original_images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "source_image_id": "b3b45288-6160-544d-8bfa-21748cbc1d19",
+          "creator_image_saved": true,
+          "generation_started_at": "2026-10-23T20:46:36.625771+00:00",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792788759.61006,
+      "elapsed_observed_seconds": 363.30354952812195,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 9
       }
     },
     "f046db3b-1ebe-4227-a4ee-6102d6460d0e": {
       "kind": "image",
       "slug": "lee-do-hyeong",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792788396.750237,
       "receipt": {
         "usage": null,
@@ -6022,13 +6317,72 @@
         },
         "estimated_generations": 9,
         "pricing_provisional": true
+      },
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 9.0
+        },
+        "id": "f046db3b-1ebe-4227-a4ee-6102d6460d0e",
+        "status": "completed",
+        "created_at": "2026-10-23T20:46:36.922047+00:00",
+        "last_response": {
+          "seed": 10222027,
+          "type": "message_done",
+          "model": "pro_flash",
+          "width": 128,
+          "action": "Removing background",
+          "height": 256,
+          "images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "prompt": "Single full-body native pixel-art game sprite. IDENTITY MUST MATCH: Tall solid muscular mature man. SILVER-WHITE hair swept back into a visible low PONYTAIL behind neck. Black aviator sunglasses. Rugged angular face with several long parallel diagonal old scars across cheek, light chin stubble and confident smirk. Black suit jacket AND white shirt sleeves ROLLED UP TO BOTH ELBOWS; strong bare forearms and hands covered with many branching old scars. White shirt and black tie. Ponytail, cheek scars, rolled sleeves and forearm scars are essential. Black trousers and plain black formal shoes. Relaxed upright stance with empty hands at sides. Front-facing SOUTH, low top-down camera. Natural adult anatomy, about 7 heads tall, normal torso and pelvis. Anatomical crown-to-sole height 230-236 pixels on a 128x256 canvas; hair may extend above crown. Soles at y248; leave unused space ABOVE shorter people, do NOT enlarge to fill frame. Keep individual build and facial features. Match reference ONLY for crisp 1px pixel clusters, selective dark outlines and controlled shading. Keep own hair and costume colors. Transparent background, no ground shadow, no text, no held weapons. Whole hair and shoes within frame.",
+          "status": "completed",
+          "asset_id": "df00ebdd-5e29-5682-bb3d-8badaa4c56b6",
+          "image_id": "df00ebdd-5e29-5682-bb3d-8badaa4c56b6",
+          "job_kind": "creator-image",
+          "progress": 1.0,
+          "image_url": "https://s3.eu-central-003.backblazeb2.com/pixellab-generations/production/creator/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/df00ebdd-5e29-5682-bb3d-8badaa4c56b6/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0037e6521c1d7c20000000001%2F20261023%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20261023T205133Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=79b54dbd92a23fc99910cd061fd5877a31fed7c9936886cd1b1b1e080f42cad2",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 9
+          },
+          "generation_id": "aca789e8-56a8-4fa7-b991-ebc11c0e8b94",
+          "queue_position": 0,
+          "billing_charged": true,
+          "original_images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "source_image_id": "df00ebdd-5e29-5682-bb3d-8badaa4c56b6",
+          "creator_image_saved": true,
+          "generation_started_at": "2026-10-23T20:46:36.968636+00:00",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792788759.6100945,
+      "elapsed_observed_seconds": 362.8598577976227,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 9
       }
     },
     "71a0632e-a481-489d-8a9b-cceed3ffaa58": {
       "kind": "image",
       "slug": "go-young-hoon",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792788397.076284,
       "receipt": {
         "usage": null,
@@ -6043,13 +6397,72 @@
         },
         "estimated_generations": 9,
         "pricing_provisional": true
+      },
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 9.0
+        },
+        "id": "71a0632e-a481-489d-8a9b-cceed3ffaa58",
+        "status": "completed",
+        "created_at": "2026-10-23T20:46:37.242329+00:00",
+        "last_response": {
+          "seed": 10222027,
+          "type": "message_done",
+          "model": "pro_flash",
+          "width": 128,
+          "action": "Removing background",
+          "height": 256,
+          "images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "prompt": "Single full-body native pixel-art game sprite. IDENTITY MUST MATCH: Lean hard-bodied mature man with narrow waist and squared shoulders, long angular expressionless face. Short dark brown-black hair side-parted and swept back. MANY clearly visible old scars: branching vertical scar on forehead above one lens, diagonal scars crossing BOTH cheeks and near mouth. Black aviator sunglasses do not hide all scars. Dark brown-black suit, long sleeves down to wrists, white shirt and neatly tied black tie. No smile. Black trousers and plain black formal shoes. Relaxed upright stance with empty hands at sides. Front-facing SOUTH, low top-down camera. Natural adult anatomy, about 7 heads tall, normal torso and pelvis. Anatomical crown-to-sole height 214-222 pixels on a 128x256 canvas; hair may extend above crown. Soles at y248; leave unused space ABOVE shorter people, do NOT enlarge to fill frame. Keep individual build and facial features. Match reference ONLY for crisp 1px pixel clusters, selective dark outlines and controlled shading. Keep own hair and costume colors. Transparent background, no ground shadow, no text, no held weapons. Whole hair and shoes within frame.",
+          "status": "completed",
+          "asset_id": "16a1d3c3-aa9e-5d6c-8352-42f998078cff",
+          "image_id": "16a1d3c3-aa9e-5d6c-8352-42f998078cff",
+          "job_kind": "creator-image",
+          "progress": 1.0,
+          "image_url": "https://s3.eu-central-003.backblazeb2.com/pixellab-generations/production/creator/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/16a1d3c3-aa9e-5d6c-8352-42f998078cff/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0037e6521c1d7c20000000001%2F20261023%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20261023T205137Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=5509831611c44d2e25b3c224ea380f3903e46e2523c6237f65f5cbd01b089d77",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 9
+          },
+          "generation_id": "5f4cb37a-19d2-402d-ba7c-554de93183a1",
+          "queue_position": 0,
+          "billing_charged": true,
+          "original_images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "source_image_id": "16a1d3c3-aa9e-5d6c-8352-42f998078cff",
+          "creator_image_saved": true,
+          "generation_started_at": "2026-10-23T20:46:37.283822+00:00",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792788759.6101322,
+      "elapsed_observed_seconds": 362.53384828567505,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 9
       }
     },
     "c468b8a7-6c12-458a-898b-324dc709952a": {
       "kind": "image",
       "slug": "no-gi-gyun",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792788397.3512008,
       "receipt": {
         "usage": null,
@@ -6064,13 +6477,72 @@
         },
         "estimated_generations": 9,
         "pricing_provisional": true
+      },
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 9.0
+        },
+        "id": "c468b8a7-6c12-458a-898b-324dc709952a",
+        "status": "completed",
+        "created_at": "2026-10-23T20:46:37.811599+00:00",
+        "last_response": {
+          "seed": 10222027,
+          "type": "message_done",
+          "model": "pro_flash",
+          "width": 128,
+          "action": "Removing background",
+          "height": 256,
+          "images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "prompt": "Single full-body native pixel-art game sprite. IDENTITY MUST MATCH: Fit adult man with broad shoulders and tapered waist. Dark brown-black hair swept upward and back with a side part. Black aviator sunglasses. Narrow face and VERY DISTINCT healed jagged Glasgow-smile scars extending from BOTH mouth corners across the cheeks, with short perpendicular stitch-like scar marks. Closed-mouth sinister slight smile. This is scar tissue, not a moustache or beard. Black tailored suit, white shirt, neat black tie. Black trousers and plain black formal shoes. Relaxed upright stance with empty hands at sides. Front-facing SOUTH, low top-down camera. Natural adult anatomy, about 7 heads tall, normal torso and pelvis. Anatomical crown-to-sole height 214-222 pixels on a 128x256 canvas; hair may extend above crown. Soles at y248; leave unused space ABOVE shorter people, do NOT enlarge to fill frame. Keep individual build and facial features. Match reference ONLY for crisp 1px pixel clusters, selective dark outlines and controlled shading. Keep own hair and costume colors. Transparent background, no ground shadow, no text, no held weapons. Whole hair and shoes within frame.",
+          "status": "completed",
+          "asset_id": "ffd8de86-b222-5eed-b407-6680ab686eb0",
+          "image_id": "ffd8de86-b222-5eed-b407-6680ab686eb0",
+          "job_kind": "creator-image",
+          "progress": 1.0,
+          "image_url": "https://s3.eu-central-003.backblazeb2.com/pixellab-generations/production/creator/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/ffd8de86-b222-5eed-b407-6680ab686eb0/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0037e6521c1d7c20000000001%2F20261023%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20261023T205148Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=c0f28b680e596036b243d7cb2dfa7bd3c2273062a75836fd218dcf79b7efb2dc",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 9
+          },
+          "generation_id": "1df82e2a-ab6d-4a0b-8895-2c4687b7c875",
+          "queue_position": 0,
+          "billing_charged": true,
+          "original_images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "source_image_id": "ffd8de86-b222-5eed-b407-6680ab686eb0",
+          "creator_image_saved": true,
+          "generation_started_at": "2026-10-23T20:46:37.999422+00:00",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792788759.7099004,
+      "elapsed_observed_seconds": 362.358699798584,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 9
       }
     },
     "ad4858c4-2694-4fba-ab33-7cafffec0bc5": {
       "kind": "image",
       "slug": "song-ju-ik",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792788398.0721052,
       "receipt": {
         "usage": null,
@@ -6085,13 +6557,72 @@
         },
         "estimated_generations": 9,
         "pricing_provisional": true
+      },
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 9.0
+        },
+        "id": "ad4858c4-2694-4fba-ab33-7cafffec0bc5",
+        "status": "completed",
+        "created_at": "2026-10-23T20:46:38.237235+00:00",
+        "last_response": {
+          "seed": 10222027,
+          "type": "message_done",
+          "model": "pro_flash",
+          "width": 128,
+          "action": "Removing background",
+          "height": 256,
+          "images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "prompt": "Single full-body native pixel-art game sprite. IDENTITY MUST MATCH: Young athletic man, wide shoulders, long neck and lean strong torso. Very short dark BUZZ CUT, almost shaved, NOT swept hair. Black aviator sunglasses and thick eyebrows. Exceptionally LARGE long square projecting lower JAW and chin, conspicuously bigger lower face, confident closed mouth. Preserve the oversized angular jaw as his identifying trait without making a giant head. Dark black-brown fitted suit, white shirt, black tie. Black trousers and plain black formal shoes. Relaxed upright stance with empty hands at sides. Front-facing SOUTH, low top-down camera. Natural adult anatomy, about 7 heads tall, normal torso and pelvis. Anatomical crown-to-sole height 214-222 pixels on a 128x256 canvas; hair may extend above crown. Soles at y248; leave unused space ABOVE shorter people, do NOT enlarge to fill frame. Keep individual build and facial features. Match reference ONLY for crisp 1px pixel clusters, selective dark outlines and controlled shading. Keep own hair and costume colors. Transparent background, no ground shadow, no text, no held weapons. Whole hair and shoes within frame.",
+          "status": "completed",
+          "asset_id": "0d9745d6-3fef-5921-a9c4-4f747cb51dfb",
+          "image_id": "0d9745d6-3fef-5921-a9c4-4f747cb51dfb",
+          "job_kind": "creator-image",
+          "progress": 1.0,
+          "image_url": "https://s3.eu-central-003.backblazeb2.com/pixellab-generations/production/creator/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/0d9745d6-3fef-5921-a9c4-4f747cb51dfb/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0037e6521c1d7c20000000001%2F20261023%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20261023T205136Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=ba89741d9c8cb50ac61ddad0749e48a5ee22f1de11882a6aabc1afad65456603",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 9
+          },
+          "generation_id": "e4ed4b04-6c16-40dc-8894-59c0dac088b2",
+          "queue_position": 0,
+          "billing_charged": true,
+          "original_images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "source_image_id": "0d9745d6-3fef-5921-a9c4-4f747cb51dfb",
+          "creator_image_saved": true,
+          "generation_started_at": "2026-10-23T20:46:38.308277+00:00",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792788759.7099845,
+      "elapsed_observed_seconds": 361.63787937164307,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 9
       }
     },
     "fa090bbb-e1a3-4b06-862b-22429954773e": {
       "kind": "image",
       "slug": "kwak-seong-ju",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792788398.4182315,
       "receipt": {
         "usage": null,
@@ -6106,13 +6637,72 @@
         },
         "estimated_generations": 9,
         "pricing_provisional": true
+      },
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 9.0
+        },
+        "id": "fa090bbb-e1a3-4b06-862b-22429954773e",
+        "status": "completed",
+        "created_at": "2026-10-23T20:46:39.911913+00:00",
+        "last_response": {
+          "seed": 10222027,
+          "type": "message_done",
+          "model": "pro_flash",
+          "width": 128,
+          "action": "Removing background",
+          "height": 256,
+          "images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "prompt": "Single full-body native pixel-art game sprite. IDENTITY MUST MATCH: Huge heavily muscular mature man, by far broadest largest build in this faction, thick arms and massive torso. Tall spiky BLACK hair with very short shaved sides, thick eyebrows, black aviator sunglasses, square jaw with short dark beard stubble. Black suit and white shirt with black tie. SILVER-GRAY METAL PLATES bolted OVER BOTH shoulders, two long angular upper-chest plates beside lapels, and paired plates on BOTH upper arms. Cloth suit remains visible at torso center, abdomen and forearms. No helmet, no full torso cuirass, no ammunition belts. Black trousers and plain black formal shoes. Relaxed upright stance with empty hands at sides. Front-facing SOUTH, low top-down camera. Natural adult anatomy, about 7 heads tall, normal torso and pelvis. Anatomical crown-to-sole height 240-246 pixels on a 128x256 canvas; hair may extend above crown. Soles at y248; leave unused space ABOVE shorter people, do NOT enlarge to fill frame. Keep individual build and facial features. Match reference ONLY for crisp 1px pixel clusters, selective dark outlines and controlled shading. Keep own hair and costume colors. Transparent background, no ground shadow, no text, no held weapons. Whole hair and shoes within frame.",
+          "status": "completed",
+          "asset_id": "cba970ed-e4c6-5858-81d4-28e0eef720db",
+          "image_id": "cba970ed-e4c6-5858-81d4-28e0eef720db",
+          "job_kind": "creator-image",
+          "progress": 1.0,
+          "image_url": "https://s3.eu-central-003.backblazeb2.com/pixellab-generations/production/creator/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/cba970ed-e4c6-5858-81d4-28e0eef720db/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0037e6521c1d7c20000000001%2F20261023%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20261023T205148Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=61bb6068c7d66447eb9af6ccb40ad7ec5961458b1b6c17139fb095112bc848af",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 9
+          },
+          "generation_id": "37441b84-24da-4c80-a52d-1ca682527f83",
+          "queue_position": 0,
+          "billing_charged": true,
+          "original_images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "source_image_id": "cba970ed-e4c6-5858-81d4-28e0eef720db",
+          "creator_image_saved": true,
+          "generation_started_at": "2026-10-23T20:46:40.071558+00:00",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792788759.7154574,
+      "elapsed_observed_seconds": 361.29722595214844,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 9
       }
     },
     "ec42d9dd-1f58-40de-a4ee-ef6d5a6492cd": {
       "kind": "image",
       "slug": "cho-seong-choon",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792788400.2485223,
       "receipt": {
         "usage": null,
@@ -6127,6 +6717,65 @@
         },
         "estimated_generations": 9,
         "pricing_provisional": true
+      },
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 9.0
+        },
+        "id": "ec42d9dd-1f58-40de-a4ee-ef6d5a6492cd",
+        "status": "completed",
+        "created_at": "2026-10-23T20:46:40.897971+00:00",
+        "last_response": {
+          "seed": 10222027,
+          "type": "message_done",
+          "model": "pro_flash",
+          "width": 128,
+          "action": "Removing background",
+          "height": 256,
+          "images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "prompt": "Single full-body native pixel-art game sprite. IDENTITY MUST MATCH: Lean ordinary young adult man, slender long neck and narrow jaw, sly sideways smile. Smooth black bowl-like hair with thick long blunt bangs hanging down to aviator sunglasses. Black jacket sleeves and white shirt sleeves ROLLED to elbows, both forearms bare. White shirt collar OPEN revealing upper chest, black necktie very LOOSE with knot low on chest. Black jacket open. Do not button collar or tighten tie. Black trousers and plain black formal shoes. Relaxed upright stance with empty hands at sides. Front-facing SOUTH, low top-down camera. Natural adult anatomy, about 7 heads tall, normal torso and pelvis. Anatomical crown-to-sole height 214-222 pixels on a 128x256 canvas; hair may extend above crown. Soles at y248; leave unused space ABOVE shorter people, do NOT enlarge to fill frame. Keep individual build and facial features. Match reference ONLY for crisp 1px pixel clusters, selective dark outlines and controlled shading. Keep own hair and costume colors. Transparent background, no ground shadow, no text, no held weapons. Whole hair and shoes within frame.",
+          "status": "completed",
+          "asset_id": "67cdc011-670d-5397-9587-a027c7af7bf8",
+          "image_id": "67cdc011-670d-5397-9587-a027c7af7bf8",
+          "job_kind": "creator-image",
+          "progress": 1.0,
+          "image_url": "https://s3.eu-central-003.backblazeb2.com/pixellab-generations/production/creator/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/67cdc011-670d-5397-9587-a027c7af7bf8/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0037e6521c1d7c20000000001%2F20261023%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20261023T205154Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=10302b73138aa022d44a86cc3f5b3b027f6f4b50c6fe4cd5abfa0e01e93d5c39",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 9
+          },
+          "generation_id": "2176dbae-6857-4642-a26e-a95e5494b823",
+          "queue_position": 0,
+          "billing_charged": true,
+          "original_images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "source_image_id": "67cdc011-670d-5397-9587-a027c7af7bf8",
+          "creator_image_saved": true,
+          "generation_started_at": "2026-10-23T20:46:41.687103+00:00",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792788759.7898905,
+      "elapsed_observed_seconds": 359.54136848449707,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 9
       }
     },
     "19cc1b0e-1d92-4aff-bd82-16c5fe2c4dd0": {
@@ -6148,13 +6797,37 @@
         },
         "estimated_generations": 9,
         "pricing_provisional": true
+      },
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "19cc1b0e-1d92-4aff-bd82-16c5fe2c4dd0",
+        "status": "processing",
+        "created_at": "2026-10-23T20:46:42.275365+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "model": "pro_flash",
+          "width": 128,
+          "action": "Correcting pixels",
+          "height": 256,
+          "prompt": "Single full-body native pixel-art game sprite. IDENTITY MUST MATCH: Adult man with moderately broad shoulders, lean firm torso, long angular clean-shaven face, strong jaw and flat unimpressed mouth. Short dark brown-black hair swept back with a shallow side part and small lifted tufts, short sides. Black aviator sunglasses. Dark charcoal-brown tailored suit, white shirt, correctly tied black tie, sleeves down. No scars, beard, cigarette or handheld device in this default appearance. Black trousers and plain black formal shoes. Relaxed upright stance with empty hands at sides. Front-facing SOUTH, low top-down camera. Natural adult anatomy, about 7 heads tall, normal torso and pelvis. Anatomical crown-to-sole height 214-222 pixels on a 128x256 canvas; hair may extend above crown. Soles at y248; leave unused space ABOVE shorter people, do NOT enlarge to fill frame. Keep individual build and facial features. Match reference ONLY for crisp 1px pixel clusters, selective dark outlines and controlled shading. Keep own hair and costume colors. Transparent background, no ground shadow, no text, no held weapons. Whole hair and shoes within frame.",
+          "status": "processing",
+          "image_id": "1e6aa728-ae8e-5ef2-adbd-a5720677f648",
+          "job_kind": "creator-image",
+          "progress": 0.69,
+          "queue_position": 6,
+          "generation_started_at": "2026-10-23T20:46:42.375751+00:00",
+          "estimated_wait_seconds": 612
+        }
       }
     },
     "8a2d9a1c-d7f8-41b6-a6ac-1a7ea22ed3c3": {
       "kind": "image",
       "slug": "kim-seong-jin",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792788402.4445488,
       "receipt": {
         "usage": null,
@@ -6169,19 +6842,792 @@
         },
         "estimated_generations": 9,
         "pricing_provisional": true
+      },
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 9.0
+        },
+        "id": "8a2d9a1c-d7f8-41b6-a6ac-1a7ea22ed3c3",
+        "status": "completed",
+        "created_at": "2026-10-23T20:46:42.656238+00:00",
+        "last_response": {
+          "seed": 10222027,
+          "type": "message_done",
+          "model": "pro_flash",
+          "width": 128,
+          "action": "Removing background",
+          "height": 256,
+          "images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "prompt": "Single full-body native pixel-art game sprite. IDENTITY MUST MATCH: Slim young adult man with narrow youthful face, smooth pale skin, small pointed chin and playful slanted smile. Messy medium-length BLACK hair parted near center, long separated curtain strands falling across forehead toward sunglasses, tousled outward wisps at sides. Black aviator sunglasses. OPEN black suit jacket, white shirt OPEN at collar, slightly loosened long black necktie. Narrow natural shoulders and slim limbs, not muscular. Black trousers and plain black formal shoes. Relaxed upright stance with empty hands at sides. Front-facing SOUTH, low top-down camera. Natural adult anatomy, about 7 heads tall, normal torso and pelvis. Anatomical crown-to-sole height 214-222 pixels on a 128x256 canvas; hair may extend above crown. Soles at y248; leave unused space ABOVE shorter people, do NOT enlarge to fill frame. Keep individual build and facial features. Match reference ONLY for crisp 1px pixel clusters, selective dark outlines and controlled shading. Keep own hair and costume colors. Transparent background, no ground shadow, no text, no held weapons. Whole hair and shoes within frame.",
+          "status": "completed",
+          "asset_id": "cecb1d59-d14e-5bb1-ae54-9c93fd372d22",
+          "image_id": "cecb1d59-d14e-5bb1-ae54-9c93fd372d22",
+          "job_kind": "creator-image",
+          "progress": 1.0,
+          "image_url": "https://s3.eu-central-003.backblazeb2.com/pixellab-generations/production/creator/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/cecb1d59-d14e-5bb1-ae54-9c93fd372d22/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0037e6521c1d7c20000000001%2F20261023%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20261023T205202Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=ebd55583390ad2def93c7974a7a2fb1be08afb02c28dcfc52c7ee598be00b291",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 9
+          },
+          "generation_id": "c9443032-766c-4478-b84e-ffd702b67052",
+          "queue_position": 0,
+          "billing_charged": true,
+          "original_images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "source_image_id": "cecb1d59-d14e-5bb1-ae54-9c93fd372d22",
+          "creator_image_saved": true,
+          "generation_started_at": "2026-10-23T20:46:42.694742+00:00",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792788760.237305,
+      "elapsed_observed_seconds": 357.792756319046,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 9
       }
     },
     "37ea4f25-334e-433e-807e-348451f23456": {
       "kind": "image",
       "slug": "song-jin-seob",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792788402.7604375,
       "receipt": {
         "usage": null,
         "background_job_id": "37ea4f25-334e-433e-807e-348451f23456",
         "image_id": "43e78639-77fa-5ca4-9a2d-f9d465dd920d",
         "source_image_id": "43e78639-77fa-5ca4-9a2d-f9d465dd920d",
+        "status": "processing",
+        "output_count": 1,
+        "image_size": {
+          "width": 128,
+          "height": 256
+        },
+        "estimated_generations": 9,
+        "pricing_provisional": true
+      },
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 9.0
+        },
+        "id": "37ea4f25-334e-433e-807e-348451f23456",
+        "status": "completed",
+        "created_at": "2026-10-23T20:46:43.017788+00:00",
+        "last_response": {
+          "seed": 10222027,
+          "type": "message_done",
+          "model": "pro_flash",
+          "width": 128,
+          "action": "Removing background",
+          "height": 256,
+          "images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "prompt": "Single full-body native pixel-art game sprite. IDENTITY MUST MATCH: Slim youthful man with soft oval face, small chin, gentle modest closed-mouth smile, NOT rugged. Neat rounded dark brown-black BOWL haircut with SHORT straight fringe well ABOVE eyebrows, visible forehead strip. Large black aviator sunglasses. Narrow natural shoulders and slender arms. Dark brown-charcoal single-breasted suit neatly buttoned, white shirt and tidy black necktie. No scars, beard or muscular bulk. Black trousers and plain black formal shoes. Relaxed upright stance with empty hands at sides. Front-facing SOUTH, low top-down camera. Natural adult anatomy, about 7 heads tall, normal torso and pelvis. Anatomical crown-to-sole height 214-222 pixels on a 128x256 canvas; hair may extend above crown. Soles at y248; leave unused space ABOVE shorter people, do NOT enlarge to fill frame. Keep individual build and facial features. Match reference ONLY for crisp 1px pixel clusters, selective dark outlines and controlled shading. Keep own hair and costume colors. Transparent background, no ground shadow, no text, no held weapons. Whole hair and shoes within frame.",
+          "status": "completed",
+          "asset_id": "43e78639-77fa-5ca4-9a2d-f9d465dd920d",
+          "image_id": "43e78639-77fa-5ca4-9a2d-f9d465dd920d",
+          "job_kind": "creator-image",
+          "progress": 1.0,
+          "image_url": "https://s3.eu-central-003.backblazeb2.com/pixellab-generations/production/creator/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/43e78639-77fa-5ca4-9a2d-f9d465dd920d/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0037e6521c1d7c20000000001%2F20261023%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20261023T205147Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=4bae96e7cbcc3ed621c56d392b7172feca41380b1433a51c15ee551d7adefefb",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 9
+          },
+          "generation_id": "ec817d5e-2da6-428c-8cd0-d62a6f702ffb",
+          "queue_position": 0,
+          "billing_charged": true,
+          "original_images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "source_image_id": "43e78639-77fa-5ca4-9a2d-f9d465dd920d",
+          "creator_image_saved": true,
+          "generation_started_at": "2026-10-23T20:46:43.146907+00:00",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792788760.2373817,
+      "elapsed_observed_seconds": 357.47694420814514,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 9
+      }
+    },
+    "ee2b0075-56bf-4ea7-b10b-45d6c0064d12": {
+      "kind": "image",
+      "slug": "baek-seok-ju",
+      "template": null,
+      "status": "completed",
+      "created_epoch": 1792788435.7421205,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "ee2b0075-56bf-4ea7-b10b-45d6c0064d12",
+        "image_id": "49fb1d80-0c36-5b0a-9c1c-31dfa15cacc6",
+        "source_image_id": "49fb1d80-0c36-5b0a-9c1c-31dfa15cacc6",
+        "status": "processing",
+        "output_count": 1,
+        "image_size": {
+          "width": 128,
+          "height": 256
+        },
+        "estimated_generations": 9,
+        "pricing_provisional": true
+      },
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 9.0
+        },
+        "id": "ee2b0075-56bf-4ea7-b10b-45d6c0064d12",
+        "status": "completed",
+        "created_at": "2026-10-23T20:47:15.957995+00:00",
+        "last_response": {
+          "seed": 10222027,
+          "type": "message_done",
+          "model": "pro_flash",
+          "width": 128,
+          "action": "Removing background",
+          "height": 256,
+          "images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "prompt": "Single full-body native pixel-art game sprite. IDENTITY MUST MATCH: Adult woman, natural slender build, oval face and warm restrained smile, narrow muted brown-gray eyes. Dark brown hair center-parted with long curved cheek-length side locks, gathered in a low rounded bun behind head. Navy-blue fitted single-breasted trouser suit, white shirt, navy tie. Bare face, no mask or glasses. Thin plain rings on fingers. Relaxed upright SOUTH-facing stance, empty hands visible at sides, low top-down camera. Natural adult anatomy and normal torso/pelvis. Anatomical crown-to-sole height 200-206px on128x256, hair/cap excluded from body height. Soles at y248, leave unused space above shorter people, NEVER enlarge to fill canvas. Keep original individual body shape. Match style reference ONLY for crisp native1px clusters, selective dark outlines and controlled shading; own colors and clothes. Transparent background, no shadow, no text, no weapons. Entire hair and shoes inside frame.",
+          "status": "completed",
+          "asset_id": "49fb1d80-0c36-5b0a-9c1c-31dfa15cacc6",
+          "image_id": "49fb1d80-0c36-5b0a-9c1c-31dfa15cacc6",
+          "job_kind": "creator-image",
+          "progress": 1.0,
+          "image_url": "https://s3.eu-central-003.backblazeb2.com/pixellab-generations/production/creator/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/49fb1d80-0c36-5b0a-9c1c-31dfa15cacc6/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0037e6521c1d7c20000000001%2F20261023%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20261023T205233Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=7c50c03a6f9d809c9a0435a3de609ae8cbf35ac59d4afb5b3b6e73db0e39cc23",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 9
+          },
+          "generation_id": "3c5deb47-c631-4e1e-baa4-778e5d6390c7",
+          "queue_position": 0,
+          "billing_charged": true,
+          "original_images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "source_image_id": "49fb1d80-0c36-5b0a-9c1c-31dfa15cacc6",
+          "creator_image_saved": true,
+          "generation_started_at": "2026-10-23T20:47:16.009675+00:00",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792788760.2374115,
+      "elapsed_observed_seconds": 324.49529099464417,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 9
+      }
+    },
+    "e4954df6-e32b-4a29-a34d-1af5152c4474": {
+      "kind": "image",
+      "slug": "jin-na-sol",
+      "template": null,
+      "status": "completed",
+      "created_epoch": 1792788436.1256037,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "e4954df6-e32b-4a29-a34d-1af5152c4474",
+        "image_id": "c88cff01-b3a7-58c6-bd69-5e54f06ee1e4",
+        "source_image_id": "c88cff01-b3a7-58c6-bd69-5e54f06ee1e4",
+        "status": "processing",
+        "output_count": 1,
+        "image_size": {
+          "width": 128,
+          "height": 256
+        },
+        "estimated_generations": 9,
+        "pricing_provisional": true
+      },
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 9.0
+        },
+        "id": "e4954df6-e32b-4a29-a34d-1af5152c4474",
+        "status": "completed",
+        "created_at": "2026-10-23T20:47:16.302013+00:00",
+        "last_response": {
+          "seed": 10222027,
+          "type": "message_done",
+          "model": "pro_flash",
+          "width": 128,
+          "action": "Removing background",
+          "height": 256,
+          "images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "prompt": "Single full-body native pixel-art game sprite. IDENTITY MUST MATCH: Tall slender adult woman, narrow angular face with bored sharp gray-brown eyes and thin straight mouth. Blue-black hair in a very HIGH long straight ponytail, thick BLUNT STRAIGHT BANGS across forehead; not an exposed forehead. Fitted dark navy trouser suit, white shirt, navy tie. Long black and gold decorated nails. Bare face, no mask. Relaxed upright SOUTH-facing stance, empty hands visible at sides, low top-down camera. Natural adult anatomy and normal torso/pelvis. Anatomical crown-to-sole height 205-208px on128x256, hair/cap excluded from body height. Soles at y248, leave unused space above shorter people, NEVER enlarge to fill canvas. Keep original individual body shape. Match style reference ONLY for crisp native1px clusters, selective dark outlines and controlled shading; own colors and clothes. Transparent background, no shadow, no text, no weapons. Entire hair and shoes inside frame.",
+          "status": "completed",
+          "asset_id": "c88cff01-b3a7-58c6-bd69-5e54f06ee1e4",
+          "image_id": "c88cff01-b3a7-58c6-bd69-5e54f06ee1e4",
+          "job_kind": "creator-image",
+          "progress": 1.0,
+          "image_url": "https://s3.eu-central-003.backblazeb2.com/pixellab-generations/production/creator/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/c88cff01-b3a7-58c6-bd69-5e54f06ee1e4/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0037e6521c1d7c20000000001%2F20261023%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20261023T205202Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=919e501dc70a0e24919a5bd3f55115cf2c71a8ce79136ffc8a23c0d4d4bb6e3e",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 9
+          },
+          "generation_id": "ea2dd4e2-38f7-4bf4-8845-2d4001d2c68b",
+          "queue_position": 0,
+          "billing_charged": true,
+          "original_images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "source_image_id": "c88cff01-b3a7-58c6-bd69-5e54f06ee1e4",
+          "creator_image_saved": true,
+          "generation_started_at": "2026-10-23T20:47:16.382517+00:00",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792788760.2374334,
+      "elapsed_observed_seconds": 324.11182975769043,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 9
+      }
+    },
+    "297ce4f8-8ddd-4bd5-8fa0-21a791a8357e": {
+      "kind": "image",
+      "slug": "lee-seong-hae",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792788436.473869,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "297ce4f8-8ddd-4bd5-8fa0-21a791a8357e",
+        "image_id": "312a8343-d5bd-5aa5-889b-40711105da03",
+        "source_image_id": "312a8343-d5bd-5aa5-889b-40711105da03",
+        "status": "processing",
+        "output_count": 1,
+        "image_size": {
+          "width": 128,
+          "height": 256
+        },
+        "estimated_generations": 9,
+        "pricing_provisional": true
+      },
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "297ce4f8-8ddd-4bd5-8fa0-21a791a8357e",
+        "status": "processing",
+        "created_at": "2026-10-23T20:47:16.684537+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "model": "pro_flash",
+          "width": 128,
+          "action": "Removing background",
+          "height": 256,
+          "prompt": "Single full-body native pixel-art game sprite. IDENTITY MUST MATCH: Small slender adult woman, soft youthful face with a fixed sweet smile, pale skin, green sparkling eyes. White hair with blunt curved forehead bangs and chin-length curled face-framing layers; the LONG CURLY remainder tied LOW and draped over HER RIGHT shoulder (viewer left). Navy-blue fitted trouser suit, white shirt, dark navy tie, cushioned sneakers. Bare face, no mask. Relaxed upright SOUTH-facing stance, empty hands visible at sides, low top-down camera. Natural adult anatomy and normal torso/pelvis. Anatomical crown-to-sole height 198-201px on128x256, hair/cap excluded from body height. Soles at y248, leave unused space above shorter people, NEVER enlarge to fill canvas. Keep original individual body shape. Match style reference ONLY for crisp native1px clusters, selective dark outlines and controlled shading; own colors and clothes. Transparent background, no shadow, no text, no weapons. Entire hair and shoes inside frame.",
+          "status": "processing",
+          "image_id": "312a8343-d5bd-5aa5-889b-40711105da03",
+          "job_kind": "creator-image",
+          "progress": 0.75,
+          "queue_position": 0,
+          "generation_started_at": "2026-10-23T20:47:16.72482+00:00",
+          "estimated_wait_seconds": 0
+        }
+      }
+    },
+    "1d98dde4-aeff-40fa-9384-f163ccc9561f": {
+      "kind": "image",
+      "slug": "lee-ja-heon",
+      "template": null,
+      "status": "completed",
+      "created_epoch": 1792788436.8033698,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "1d98dde4-aeff-40fa-9384-f163ccc9561f",
+        "image_id": "ee0d9807-d42a-582b-b5dd-75efd6f49e58",
+        "source_image_id": "ee0d9807-d42a-582b-b5dd-75efd6f49e58",
+        "status": "processing",
+        "output_count": 1,
+        "image_size": {
+          "width": 128,
+          "height": 256
+        },
+        "estimated_generations": 9,
+        "pricing_provisional": true
+      },
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 9.0
+        },
+        "id": "1d98dde4-aeff-40fa-9384-f163ccc9561f",
+        "status": "completed",
+        "created_at": "2026-10-23T20:47:17.058095+00:00",
+        "last_response": {
+          "seed": 10222027,
+          "type": "message_done",
+          "model": "pro_flash",
+          "width": 128,
+          "action": "Removing background",
+          "height": 256,
+          "images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "prompt": "Single full-body native pixel-art game sprite. IDENTITY MUST MATCH: Tall large solidly built adult man, broad shoulders and thick chest, exceptionally handsome angular long face, stern neutral mouth, RED irises. Short white hair swept BACK in loose waves with two curved forelocks on forehead. Navy-blue buttoned WAISTCOAT over white long-sleeved shirt, navy necktie and dark trousers. NO suit jacket, no mask, no gloves in default appearance. Relaxed upright SOUTH-facing stance, empty hands visible at sides, low top-down camera. Natural adult anatomy and normal torso/pelvis. Anatomical crown-to-sole height 230-238px on128x256, hair/cap excluded from body height. Soles at y248, leave unused space above shorter people, NEVER enlarge to fill canvas. Keep original individual body shape. Match style reference ONLY for crisp native1px clusters, selective dark outlines and controlled shading; own colors and clothes. Transparent background, no shadow, no text, no weapons. Entire hair and shoes inside frame.",
+          "status": "completed",
+          "asset_id": "ee0d9807-d42a-582b-b5dd-75efd6f49e58",
+          "image_id": "ee0d9807-d42a-582b-b5dd-75efd6f49e58",
+          "job_kind": "creator-image",
+          "progress": 1.0,
+          "image_url": "https://s3.eu-central-003.backblazeb2.com/pixellab-generations/production/creator/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/ee0d9807-d42a-582b-b5dd-75efd6f49e58/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0037e6521c1d7c20000000001%2F20261023%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20261023T205228Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=a650df2f172049cebb7c1aad9ea27b949d8193ccba6d5b47e44f2d6db68071df",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 9
+          },
+          "generation_id": "80596232-fd79-45b4-b9fd-6f5dfb43a613",
+          "queue_position": 0,
+          "billing_charged": true,
+          "original_images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "source_image_id": "ee0d9807-d42a-582b-b5dd-75efd6f49e58",
+          "creator_image_saved": true,
+          "generation_started_at": "2026-10-23T20:47:17.105072+00:00",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792788760.2374887,
+      "elapsed_observed_seconds": 323.43411922454834,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 9
+      }
+    },
+    "5c7e4f76-26b0-4035-b107-46de8615e691": {
+      "kind": "image",
+      "slug": "eun-ha-je",
+      "template": null,
+      "status": "completed",
+      "created_epoch": 1792788437.2259808,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "5c7e4f76-26b0-4035-b107-46de8615e691",
+        "image_id": "176906b5-00c9-577b-9bb4-561538336268",
+        "source_image_id": "176906b5-00c9-577b-9bb4-561538336268",
+        "status": "processing",
+        "output_count": 1,
+        "image_size": {
+          "width": 128,
+          "height": 256
+        },
+        "estimated_generations": 9,
+        "pricing_provisional": true
+      },
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 9.0
+        },
+        "id": "5c7e4f76-26b0-4035-b107-46de8615e691",
+        "status": "completed",
+        "created_at": "2026-10-23T20:47:17.398723+00:00",
+        "last_response": {
+          "seed": 10222027,
+          "type": "message_done",
+          "model": "pro_flash",
+          "width": 128,
+          "action": "Removing background",
+          "height": 256,
+          "images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "prompt": "Single full-body native pixel-art game sprite. IDENTITY MUST MATCH: Lean adult woman with pale angular face, tired narrow pale icy blue-gray eyes and flat annoyed mouth. Glossy dark BLUE chin-length BOB with heavy uneven fringe, a small forehead opening to HER LEFT (viewer right), inward-curled ends and one cheek lock. Navy fitted trouser suit, white shirt and dark blue tie. No mask, no glasses. Relaxed upright SOUTH-facing stance, empty hands visible at sides, low top-down camera. Natural adult anatomy and normal torso/pelvis. Anatomical crown-to-sole height 200-206px on128x256, hair/cap excluded from body height. Soles at y248, leave unused space above shorter people, NEVER enlarge to fill canvas. Keep original individual body shape. Match style reference ONLY for crisp native1px clusters, selective dark outlines and controlled shading; own colors and clothes. Transparent background, no shadow, no text, no weapons. Entire hair and shoes inside frame.",
+          "status": "completed",
+          "asset_id": "176906b5-00c9-577b-9bb4-561538336268",
+          "image_id": "176906b5-00c9-577b-9bb4-561538336268",
+          "job_kind": "creator-image",
+          "progress": 1.0,
+          "image_url": "https://s3.eu-central-003.backblazeb2.com/pixellab-generations/production/creator/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/176906b5-00c9-577b-9bb4-561538336268/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0037e6521c1d7c20000000001%2F20261023%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20261023T205220Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=234c16515fbad2883d7fe6dcc20524c5f170fa0ba013fa53881f1f4939c10944",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 9
+          },
+          "generation_id": "55b8eecb-0919-4404-96ee-1168565a1951",
+          "queue_position": 0,
+          "billing_charged": true,
+          "original_images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "source_image_id": "176906b5-00c9-577b-9bb4-561538336268",
+          "creator_image_saved": true,
+          "generation_started_at": "2026-10-23T20:47:17.456+00:00",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792788760.2375143,
+      "elapsed_observed_seconds": 323.01153349876404,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 9
+      }
+    },
+    "fd7a04c0-2c44-423a-bed4-922bd16a8521": {
+      "kind": "image",
+      "slug": "park-min-seong",
+      "template": null,
+      "status": "completed",
+      "created_epoch": 1792788437.5261917,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "fd7a04c0-2c44-423a-bed4-922bd16a8521",
+        "image_id": "1733d540-f1c7-5dc8-b792-4e2dedb799d1",
+        "source_image_id": "1733d540-f1c7-5dc8-b792-4e2dedb799d1",
+        "status": "processing",
+        "output_count": 1,
+        "image_size": {
+          "width": 128,
+          "height": 256
+        },
+        "estimated_generations": 9,
+        "pricing_provisional": true
+      },
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 9.0
+        },
+        "id": "fd7a04c0-2c44-423a-bed4-922bd16a8521",
+        "status": "completed",
+        "created_at": "2026-10-23T20:47:18.490988+00:00",
+        "last_response": {
+          "seed": 10222027,
+          "type": "message_done",
+          "model": "pro_flash",
+          "width": 128,
+          "action": "Removing background",
+          "height": 256,
+          "images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "prompt": "Single full-body native pixel-art game sprite. IDENTITY MUST MATCH: Large broad athletic young man with thick chest and shoulders, strong natural limbs. Warm fair skin, broad friendly clean-shaven face, thick dark eyebrows, gray-brown eyes and gentle smile. Thick dark brown wavy side-parted hair with long sweeping curved forelock over one forehead side, short other side. Navy suit stretched over broad shoulders, white shirt, blue tie. No mask. Relaxed upright SOUTH-facing stance, empty hands visible at sides, low top-down camera. Natural adult anatomy and normal torso/pelvis. Anatomical crown-to-sole height 228-234px on128x256, hair/cap excluded from body height. Soles at y248, leave unused space above shorter people, NEVER enlarge to fill canvas. Keep original individual body shape. Match style reference ONLY for crisp native1px clusters, selective dark outlines and controlled shading; own colors and clothes. Transparent background, no shadow, no text, no weapons. Entire hair and shoes inside frame.",
+          "status": "completed",
+          "asset_id": "1733d540-f1c7-5dc8-b792-4e2dedb799d1",
+          "image_id": "1733d540-f1c7-5dc8-b792-4e2dedb799d1",
+          "job_kind": "creator-image",
+          "progress": 1.0,
+          "image_url": "https://s3.eu-central-003.backblazeb2.com/pixellab-generations/production/creator/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/1733d540-f1c7-5dc8-b792-4e2dedb799d1/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0037e6521c1d7c20000000001%2F20261023%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20261023T205205Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=0ddbeede1abbca86ae49b90138a2a672205e5e536b277872051b77eba5a6e5c1",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 9
+          },
+          "generation_id": "fe2b3e72-43bc-45e1-972a-6e5de46e4cdd",
+          "queue_position": 0,
+          "billing_charged": true,
+          "original_images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "source_image_id": "1733d540-f1c7-5dc8-b792-4e2dedb799d1",
+          "creator_image_saved": true,
+          "generation_started_at": "2026-10-23T20:47:18.616749+00:00",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792788760.2375383,
+      "elapsed_observed_seconds": 322.7113468647003,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 9
+      }
+    },
+    "633a5907-5f31-4593-a875-794f14364f7e": {
+      "kind": "image",
+      "slug": "baek-sa-heon",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792788860.4886472,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "633a5907-5f31-4593-a875-794f14364f7e",
+        "image_id": "296b34e5-0cb3-5894-a523-86c0a7cf966c",
+        "source_image_id": "296b34e5-0cb3-5894-a523-86c0a7cf966c",
+        "status": "processing",
+        "output_count": 1,
+        "image_size": {
+          "width": 128,
+          "height": 256
+        },
+        "estimated_generations": 9,
+        "pricing_provisional": true
+      }
+    },
+    "8deca375-3192-487b-a642-c7838b493969": {
+      "kind": "image",
+      "slug": "go-young-eun",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792788862.729789,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "8deca375-3192-487b-a642-c7838b493969",
+        "image_id": "62f58de5-8712-5c51-b7f0-8249cab87fa2",
+        "source_image_id": "62f58de5-8712-5c51-b7f0-8249cab87fa2",
+        "status": "processing",
+        "output_count": 1,
+        "image_size": {
+          "width": 128,
+          "height": 256
+        },
+        "estimated_generations": 9,
+        "pricing_provisional": true
+      }
+    },
+    "5364cb5b-94ab-46e7-ae73-9f31f4884caa": {
+      "kind": "image",
+      "slug": "kang-i-hak",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792788866.2449968,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "5364cb5b-94ab-46e7-ae73-9f31f4884caa",
+        "image_id": "538d3310-b059-5e12-b52e-5ca6ede60cf7",
+        "source_image_id": "538d3310-b059-5e12-b52e-5ca6ede60cf7",
+        "status": "processing",
+        "output_count": 1,
+        "image_size": {
+          "width": 128,
+          "height": 256
+        },
+        "estimated_generations": 9,
+        "pricing_provisional": true
+      }
+    },
+    "805f56ae-ae2b-45f8-9219-9c79ca89f4a0": {
+      "kind": "image",
+      "slug": "jang-heo-un",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792788868.1477864,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "805f56ae-ae2b-45f8-9219-9c79ca89f4a0",
+        "image_id": "bdb8338c-2697-5ab9-b20f-580c3b982661",
+        "source_image_id": "bdb8338c-2697-5ab9-b20f-580c3b982661",
+        "status": "processing",
+        "output_count": 1,
+        "image_size": {
+          "width": 128,
+          "height": 256
+        },
+        "estimated_generations": 9,
+        "pricing_provisional": true
+      }
+    },
+    "c5877d53-1b4c-4ecd-b728-57ae99eeb24c": {
+      "kind": "image",
+      "slug": "kwak-je-gang",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792788870.6004164,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "c5877d53-1b4c-4ecd-b728-57ae99eeb24c",
+        "image_id": "7ee2ecda-676b-5a41-bdd9-128be3ee80ee",
+        "source_image_id": "7ee2ecda-676b-5a41-bdd9-128be3ee80ee",
+        "status": "processing",
+        "output_count": 1,
+        "image_size": {
+          "width": 128,
+          "height": 256
+        },
+        "estimated_generations": 9,
+        "pricing_provisional": true
+      }
+    },
+    "9122b278-bc23-44fc-bcb2-e200b53759a7": {
+      "kind": "image",
+      "slug": "lee-yeon-hwa",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792788872.011655,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "9122b278-bc23-44fc-bcb2-e200b53759a7",
+        "image_id": "940d09c5-acdf-5de7-a9ed-4a7e8e30c284",
+        "source_image_id": "940d09c5-acdf-5de7-a9ed-4a7e8e30c284",
+        "status": "processing",
+        "output_count": 1,
+        "image_size": {
+          "width": 128,
+          "height": 256
+        },
+        "estimated_generations": 9,
+        "pricing_provisional": true
+      }
+    },
+    "9bfa50f6-278e-4074-881f-8a581f373aec": {
+      "kind": "image",
+      "slug": "lee-byeong-jin",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792788881.6496303,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "9bfa50f6-278e-4074-881f-8a581f373aec",
+        "image_id": "6bf345b2-0dfd-5e97-9638-65671cb3d8aa",
+        "source_image_id": "6bf345b2-0dfd-5e97-9638-65671cb3d8aa",
+        "status": "processing",
+        "output_count": 1,
+        "image_size": {
+          "width": 128,
+          "height": 256
+        },
+        "estimated_generations": 9,
+        "pricing_provisional": true
+      }
+    },
+    "d262fefc-fcef-487d-86ff-e1d757d54170": {
+      "kind": "image",
+      "slug": "jay",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792788884.0739536,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "d262fefc-fcef-487d-86ff-e1d757d54170",
+        "image_id": "336a0cf0-771a-5a99-b1e6-05fba0dcd3aa",
+        "source_image_id": "336a0cf0-771a-5a99-b1e6-05fba0dcd3aa",
+        "status": "processing",
+        "output_count": 1,
+        "image_size": {
+          "width": 128,
+          "height": 256
+        },
+        "estimated_generations": 9,
+        "pricing_provisional": true
+      }
+    },
+    "a4bca6d0-4145-4545-a189-998ab06cec55": {
+      "kind": "image",
+      "slug": "ho-yu-won",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792788889.2735758,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "a4bca6d0-4145-4545-a189-998ab06cec55",
+        "image_id": "3188f519-6c29-5ff2-9caf-57e701360af9",
+        "source_image_id": "3188f519-6c29-5ff2-9caf-57e701360af9",
+        "status": "processing",
+        "output_count": 1,
+        "image_size": {
+          "width": 128,
+          "height": 256
+        },
+        "estimated_generations": 9,
+        "pricing_provisional": true
+      }
+    },
+    "d6d15ee8-080b-43fe-a5ec-0f5b6e4e980c": {
+      "kind": "image",
+      "slug": "cheong-dal-lae",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792788893.1548762,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "d6d15ee8-080b-43fe-a5ec-0f5b6e4e980c",
+        "image_id": "984297ff-9076-5563-8bed-3d67d5909cef",
+        "source_image_id": "984297ff-9076-5563-8bed-3d67d5909cef",
         "status": "processing",
         "output_count": 1,
         "image_size": {
@@ -6368,7 +7814,8 @@
       "motions": {},
       "ready": false,
       "visual_review_required": true,
-      "rebuild": "20261024"
+      "rebuild": "20261024",
+      "image_verified": true
     },
     "do-pil-heon": {
       "name": "도필헌",
@@ -6379,7 +7826,8 @@
       "motions": {},
       "ready": false,
       "visual_review_required": true,
-      "rebuild": "20261024"
+      "rebuild": "20261024",
+      "image_verified": true
     },
     "lee-gil-hwan": {
       "name": "이길환",
@@ -6390,7 +7838,8 @@
       "motions": {},
       "ready": false,
       "visual_review_required": true,
-      "rebuild": "20261024"
+      "rebuild": "20261024",
+      "image_verified": true
     },
     "lee-gi-seok": {
       "name": "이기석",
@@ -6401,7 +7850,8 @@
       "motions": {},
       "ready": false,
       "visual_review_required": true,
-      "rebuild": "20261024"
+      "rebuild": "20261024",
+      "image_verified": true
     },
     "kim-jo-hak": {
       "name": "김조학",
@@ -6412,7 +7862,8 @@
       "motions": {},
       "ready": false,
       "visual_review_required": true,
-      "rebuild": "20261024"
+      "rebuild": "20261024",
+      "image_verified": true
     },
     "lee-do-hyeong": {
       "name": "이도형",
@@ -6423,7 +7874,8 @@
       "motions": {},
       "ready": false,
       "visual_review_required": true,
-      "rebuild": "20261024"
+      "rebuild": "20261024",
+      "image_verified": true
     },
     "go-young-hoon": {
       "name": "고영훈",
@@ -6434,7 +7886,8 @@
       "motions": {},
       "ready": false,
       "visual_review_required": true,
-      "rebuild": "20261024"
+      "rebuild": "20261024",
+      "image_verified": true
     },
     "no-gi-gyun": {
       "name": "노기균",
@@ -6445,7 +7898,8 @@
       "motions": {},
       "ready": false,
       "visual_review_required": true,
-      "rebuild": "20261024"
+      "rebuild": "20261024",
+      "image_verified": true
     },
     "song-ju-ik": {
       "name": "송주익",
@@ -6456,7 +7910,8 @@
       "motions": {},
       "ready": false,
       "visual_review_required": true,
-      "rebuild": "20261024"
+      "rebuild": "20261024",
+      "image_verified": true
     },
     "kwak-seong-ju": {
       "name": "곽성주",
@@ -6467,7 +7922,8 @@
       "motions": {},
       "ready": false,
       "visual_review_required": true,
-      "rebuild": "20261024"
+      "rebuild": "20261024",
+      "image_verified": true
     },
     "cho-seong-choon": {
       "name": "조성춘",
@@ -6478,7 +7934,8 @@
       "motions": {},
       "ready": false,
       "visual_review_required": true,
-      "rebuild": "20261024"
+      "rebuild": "20261024",
+      "image_verified": true
     },
     "yun-byeong-su": {
       "name": "윤병수",
@@ -6500,7 +7957,8 @@
       "motions": {},
       "ready": false,
       "visual_review_required": true,
-      "rebuild": "20261024"
+      "rebuild": "20261024",
+      "image_verified": true
     },
     "song-jin-seob": {
       "name": "송진섭",
@@ -6511,31 +7969,34 @@
       "motions": {},
       "ready": false,
       "visual_review_required": true,
-      "rebuild": "20261024"
+      "rebuild": "20261024",
+      "image_verified": true
     },
     "baek-seok-ju": {
       "name": "백석주",
       "group": "baekilmong",
       "character_id": null,
-      "image": null,
+      "image": "ee2b0075-56bf-4ea7-b10b-45d6c0064d12",
       "registration": null,
       "motions": {},
-      "ready": false
+      "ready": false,
+      "image_verified": true
     },
     "jin-na-sol": {
       "name": "진나솔",
       "group": "baekilmong",
       "character_id": null,
-      "image": null,
+      "image": "e4954df6-e32b-4a29-a34d-1af5152c4474",
       "registration": null,
       "motions": {},
-      "ready": false
+      "ready": false,
+      "image_verified": true
     },
     "lee-seong-hae": {
       "name": "이성해",
       "group": "baekilmong",
       "character_id": null,
-      "image": null,
+      "image": "297ce4f8-8ddd-4bd5-8fa0-21a791a8357e",
       "registration": null,
       "motions": {},
       "ready": false
@@ -6544,34 +8005,37 @@
       "name": "이자헌",
       "group": "baekilmong",
       "character_id": null,
-      "image": null,
+      "image": "1d98dde4-aeff-40fa-9384-f163ccc9561f",
       "registration": null,
       "motions": {},
-      "ready": false
+      "ready": false,
+      "image_verified": true
     },
     "eun-ha-je": {
       "name": "은하제",
       "group": "baekilmong",
       "character_id": null,
-      "image": null,
+      "image": "5c7e4f76-26b0-4035-b107-46de8615e691",
       "registration": null,
       "motions": {},
-      "ready": false
+      "ready": false,
+      "image_verified": true
     },
     "park-min-seong": {
       "name": "박민성",
       "group": "baekilmong",
       "character_id": null,
-      "image": null,
+      "image": "fd7a04c0-2c44-423a-bed4-922bd16a8521",
       "registration": null,
       "motions": {},
-      "ready": false
+      "ready": false,
+      "image_verified": true
     },
     "baek-sa-heon": {
       "name": "백사헌",
       "group": "baekilmong",
       "character_id": null,
-      "image": null,
+      "image": "633a5907-5f31-4593-a875-794f14364f7e",
       "registration": null,
       "motions": {},
       "ready": false
@@ -6580,7 +8044,7 @@
       "name": "고영은",
       "group": "baekilmong",
       "character_id": null,
-      "image": null,
+      "image": "8deca375-3192-487b-a642-c7838b493969",
       "registration": null,
       "motions": {},
       "ready": false
@@ -6589,7 +8053,7 @@
       "name": "강이학",
       "group": "baekilmong",
       "character_id": null,
-      "image": null,
+      "image": "5364cb5b-94ab-46e7-ae73-9f31f4884caa",
       "registration": null,
       "motions": {},
       "ready": false
@@ -6598,7 +8062,7 @@
       "name": "장허운",
       "group": "baekilmong",
       "character_id": null,
-      "image": null,
+      "image": "805f56ae-ae2b-45f8-9219-9c79ca89f4a0",
       "registration": null,
       "motions": {},
       "ready": false
@@ -6607,7 +8071,7 @@
       "name": "곽제강",
       "group": "baekilmong",
       "character_id": null,
-      "image": null,
+      "image": "c5877d53-1b4c-4ecd-b728-57ae99eeb24c",
       "registration": null,
       "motions": {},
       "ready": false
@@ -6616,7 +8080,7 @@
       "name": "이연화",
       "group": "baekilmong",
       "character_id": null,
-      "image": null,
+      "image": "9122b278-bc23-44fc-bcb2-e200b53759a7",
       "registration": null,
       "motions": {},
       "ready": false
@@ -6625,7 +8089,7 @@
       "name": "이병진",
       "group": "baekilmong",
       "character_id": null,
-      "image": null,
+      "image": "9bfa50f6-278e-4074-881f-8a581f373aec",
       "registration": null,
       "motions": {},
       "ready": false
@@ -6634,7 +8098,7 @@
       "name": "제이",
       "group": "baekilmong",
       "character_id": null,
-      "image": null,
+      "image": "d262fefc-fcef-487d-86ff-e1d757d54170",
       "registration": null,
       "motions": {},
       "ready": false
@@ -6643,7 +8107,7 @@
       "name": "호유원",
       "group": "baekilmong",
       "character_id": null,
-      "image": null,
+      "image": "a4bca6d0-4145-4545-a189-998ab06cec55",
       "registration": null,
       "motions": {},
       "ready": false
@@ -6652,7 +8116,7 @@
       "name": "청달래",
       "group": "baekilmong",
       "character_id": null,
-      "image": null,
+      "image": "d6d15ee8-080b-43fe-a5ec-0f5b6e4e980c",
       "registration": null,
       "motions": {},
       "ready": false
@@ -11297,9 +12761,1095 @@
           "pricing_provisional": true
         }
       }
+    },
+    {
+      "at": "2026-10-23T20:47:16Z",
+      "kind": "submitted",
+      "slug": "baek-seok-ju",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "ee2b0075-56bf-4ea7-b10b-45d6c0064d12",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "ee2b0075-56bf-4ea7-b10b-45d6c0064d12",
+          "image_id": "49fb1d80-0c36-5b0a-9c1c-31dfa15cacc6",
+          "source_image_id": "49fb1d80-0c36-5b0a-9c1c-31dfa15cacc6",
+          "status": "processing",
+          "output_count": 1,
+          "image_size": {
+            "width": 128,
+            "height": 256
+          },
+          "estimated_generations": 9,
+          "pricing_provisional": true
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T20:47:16Z",
+      "kind": "submitted",
+      "slug": "jin-na-sol",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "e4954df6-e32b-4a29-a34d-1af5152c4474",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "e4954df6-e32b-4a29-a34d-1af5152c4474",
+          "image_id": "c88cff01-b3a7-58c6-bd69-5e54f06ee1e4",
+          "source_image_id": "c88cff01-b3a7-58c6-bd69-5e54f06ee1e4",
+          "status": "processing",
+          "output_count": 1,
+          "image_size": {
+            "width": 128,
+            "height": 256
+          },
+          "estimated_generations": 9,
+          "pricing_provisional": true
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T20:47:16Z",
+      "kind": "submitted",
+      "slug": "lee-seong-hae",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "297ce4f8-8ddd-4bd5-8fa0-21a791a8357e",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "297ce4f8-8ddd-4bd5-8fa0-21a791a8357e",
+          "image_id": "312a8343-d5bd-5aa5-889b-40711105da03",
+          "source_image_id": "312a8343-d5bd-5aa5-889b-40711105da03",
+          "status": "processing",
+          "output_count": 1,
+          "image_size": {
+            "width": 128,
+            "height": 256
+          },
+          "estimated_generations": 9,
+          "pricing_provisional": true
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T20:47:17Z",
+      "kind": "submitted",
+      "slug": "lee-ja-heon",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "1d98dde4-aeff-40fa-9384-f163ccc9561f",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "1d98dde4-aeff-40fa-9384-f163ccc9561f",
+          "image_id": "ee0d9807-d42a-582b-b5dd-75efd6f49e58",
+          "source_image_id": "ee0d9807-d42a-582b-b5dd-75efd6f49e58",
+          "status": "processing",
+          "output_count": 1,
+          "image_size": {
+            "width": 128,
+            "height": 256
+          },
+          "estimated_generations": 9,
+          "pricing_provisional": true
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T20:47:17Z",
+      "kind": "submitted",
+      "slug": "eun-ha-je",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "5c7e4f76-26b0-4035-b107-46de8615e691",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "5c7e4f76-26b0-4035-b107-46de8615e691",
+          "image_id": "176906b5-00c9-577b-9bb4-561538336268",
+          "source_image_id": "176906b5-00c9-577b-9bb4-561538336268",
+          "status": "processing",
+          "output_count": 1,
+          "image_size": {
+            "width": 128,
+            "height": 256
+          },
+          "estimated_generations": 9,
+          "pricing_provisional": true
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T20:47:18Z",
+      "kind": "submitted",
+      "slug": "park-min-seong",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "fd7a04c0-2c44-423a-bed4-922bd16a8521",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "fd7a04c0-2c44-423a-bed4-922bd16a8521",
+          "image_id": "1733d540-f1c7-5dc8-b792-4e2dedb799d1",
+          "source_image_id": "1733d540-f1c7-5dc8-b792-4e2dedb799d1",
+          "status": "processing",
+          "output_count": 1,
+          "image_size": {
+            "width": 128,
+            "height": 256
+          },
+          "estimated_generations": 9,
+          "pricing_provisional": true
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T20:52:39Z",
+      "kind": "completed",
+      "slug": "sa-jang",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "63de2248-6e39-4807-9629-03500fa6921b",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 9
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T20:52:39Z",
+      "kind": "completed",
+      "slug": "do-pil-heon",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "337a274b-6c96-4062-9f1d-16cf170029b8",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 9
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T20:52:39Z",
+      "kind": "completed",
+      "slug": "lee-gil-hwan",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "5e401a36-d468-44c5-bb0c-f9c7c21bd32f",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 9
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T20:52:39Z",
+      "kind": "completed",
+      "slug": "lee-gi-seok",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "84b18533-3b72-4e23-a538-c3e88668fb7a",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 9
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T20:52:39Z",
+      "kind": "completed",
+      "slug": "kim-jo-hak",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "1425bdcd-2e41-4959-8ca2-404855b0a6c5",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 9
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T20:52:39Z",
+      "kind": "completed",
+      "slug": "lee-do-hyeong",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "f046db3b-1ebe-4227-a4ee-6102d6460d0e",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 9
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T20:52:39Z",
+      "kind": "completed",
+      "slug": "go-young-hoon",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "71a0632e-a481-489d-8a9b-cceed3ffaa58",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 9
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T20:52:39Z",
+      "kind": "completed",
+      "slug": "no-gi-gyun",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "c468b8a7-6c12-458a-898b-324dc709952a",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 9
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T20:52:39Z",
+      "kind": "completed",
+      "slug": "song-ju-ik",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "ad4858c4-2694-4fba-ab33-7cafffec0bc5",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 9
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T20:52:39Z",
+      "kind": "completed",
+      "slug": "kwak-seong-ju",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "fa090bbb-e1a3-4b06-862b-22429954773e",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 9
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T20:52:39Z",
+      "kind": "completed",
+      "slug": "cho-seong-choon",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "ec42d9dd-1f58-40de-a4ee-ef6d5a6492cd",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 9
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T20:52:40Z",
+      "kind": "completed",
+      "slug": "kim-seong-jin",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "8a2d9a1c-d7f8-41b6-a6ac-1a7ea22ed3c3",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 9
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T20:52:40Z",
+      "kind": "completed",
+      "slug": "song-jin-seob",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "37ea4f25-334e-433e-807e-348451f23456",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 9
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T20:52:40Z",
+      "kind": "completed",
+      "slug": "baek-seok-ju",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "ee2b0075-56bf-4ea7-b10b-45d6c0064d12",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 9
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T20:52:40Z",
+      "kind": "completed",
+      "slug": "jin-na-sol",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "e4954df6-e32b-4a29-a34d-1af5152c4474",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 9
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T20:52:40Z",
+      "kind": "completed",
+      "slug": "lee-ja-heon",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "1d98dde4-aeff-40fa-9384-f163ccc9561f",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 9
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T20:52:40Z",
+      "kind": "completed",
+      "slug": "eun-ha-je",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "5c7e4f76-26b0-4035-b107-46de8615e691",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 9
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T20:52:40Z",
+      "kind": "completed",
+      "slug": "park-min-seong",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "fd7a04c0-2c44-423a-bed4-922bd16a8521",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 9
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T20:52:40Z",
+      "kind": "image-verified",
+      "slug": "sa-jang",
+      "detail": {
+        "size": [
+          128,
+          256
+        ],
+        "bbox": [
+          26,
+          12,
+          97,
+          250
+        ],
+        "colors": 48,
+        "alpha": [
+          0,
+          255
+        ],
+        "original_pixels_preserved": true
+      }
+    },
+    {
+      "at": "2026-10-23T20:52:43Z",
+      "kind": "image-verified",
+      "slug": "do-pil-heon",
+      "detail": {
+        "size": [
+          128,
+          256
+        ],
+        "bbox": [
+          28,
+          10,
+          99,
+          248
+        ],
+        "colors": 48,
+        "alpha": [
+          0,
+          255
+        ],
+        "original_pixels_preserved": true
+      }
+    },
+    {
+      "at": "2026-10-23T20:52:48Z",
+      "kind": "image-verified",
+      "slug": "lee-gil-hwan",
+      "detail": {
+        "size": [
+          128,
+          256
+        ],
+        "bbox": [
+          17,
+          30,
+          109,
+          246
+        ],
+        "colors": 33,
+        "alpha": [
+          0,
+          255
+        ],
+        "original_pixels_preserved": true
+      }
+    },
+    {
+      "at": "2026-10-23T20:52:52Z",
+      "kind": "image-verified",
+      "slug": "lee-gi-seok",
+      "detail": {
+        "size": [
+          128,
+          256
+        ],
+        "bbox": [
+          25,
+          8,
+          98,
+          249
+        ],
+        "colors": 48,
+        "alpha": [
+          0,
+          255
+        ],
+        "original_pixels_preserved": true
+      }
+    },
+    {
+      "at": "2026-10-23T20:52:55Z",
+      "kind": "image-verified",
+      "slug": "kim-jo-hak",
+      "detail": {
+        "size": [
+          128,
+          256
+        ],
+        "bbox": [
+          26,
+          12,
+          101,
+          249
+        ],
+        "colors": 48,
+        "alpha": [
+          0,
+          255
+        ],
+        "original_pixels_preserved": true
+      }
+    },
+    {
+      "at": "2026-10-23T20:53:09Z",
+      "kind": "image-verified",
+      "slug": "lee-do-hyeong",
+      "detail": {
+        "size": [
+          128,
+          256
+        ],
+        "bbox": [
+          18,
+          6,
+          104,
+          250
+        ],
+        "colors": 48,
+        "alpha": [
+          0,
+          255
+        ],
+        "original_pixels_preserved": true
+      }
+    },
+    {
+      "at": "2026-10-23T20:53:16Z",
+      "kind": "image-verified",
+      "slug": "go-young-hoon",
+      "detail": {
+        "size": [
+          128,
+          256
+        ],
+        "bbox": [
+          26,
+          11,
+          98,
+          250
+        ],
+        "colors": 48,
+        "alpha": [
+          0,
+          255
+        ],
+        "original_pixels_preserved": true
+      }
+    },
+    {
+      "at": "2026-10-23T20:53:24Z",
+      "kind": "image-verified",
+      "slug": "no-gi-gyun",
+      "detail": {
+        "size": [
+          128,
+          256
+        ],
+        "bbox": [
+          25,
+          9,
+          101,
+          249
+        ],
+        "colors": 48,
+        "alpha": [
+          0,
+          255
+        ],
+        "original_pixels_preserved": true
+      }
+    },
+    {
+      "at": "2026-10-23T20:53:30Z",
+      "kind": "image-verified",
+      "slug": "song-ju-ik",
+      "detail": {
+        "size": [
+          128,
+          256
+        ],
+        "bbox": [
+          22,
+          9,
+          102,
+          250
+        ],
+        "colors": 48,
+        "alpha": [
+          0,
+          255
+        ],
+        "original_pixels_preserved": true
+      }
+    },
+    {
+      "at": "2026-10-23T20:53:39Z",
+      "kind": "image-verified",
+      "slug": "kwak-seong-ju",
+      "detail": {
+        "size": [
+          128,
+          256
+        ],
+        "bbox": [
+          7,
+          5,
+          110,
+          253
+        ],
+        "colors": 48,
+        "alpha": [
+          0,
+          255
+        ],
+        "original_pixels_preserved": true
+      }
+    },
+    {
+      "at": "2026-10-23T20:53:47Z",
+      "kind": "image-verified",
+      "slug": "cho-seong-choon",
+      "detail": {
+        "size": [
+          128,
+          256
+        ],
+        "bbox": [
+          27,
+          11,
+          100,
+          248
+        ],
+        "colors": 48,
+        "alpha": [
+          0,
+          255
+        ],
+        "original_pixels_preserved": true
+      }
+    },
+    {
+      "at": "2026-10-23T20:53:53Z",
+      "kind": "image-verified",
+      "slug": "kim-seong-jin",
+      "detail": {
+        "size": [
+          128,
+          256
+        ],
+        "bbox": [
+          29,
+          12,
+          101,
+          249
+        ],
+        "colors": 48,
+        "alpha": [
+          0,
+          255
+        ],
+        "original_pixels_preserved": true
+      }
+    },
+    {
+      "at": "2026-10-23T20:53:58Z",
+      "kind": "image-verified",
+      "slug": "song-jin-seob",
+      "detail": {
+        "size": [
+          128,
+          256
+        ],
+        "bbox": [
+          31,
+          10,
+          94,
+          248
+        ],
+        "colors": 48,
+        "alpha": [
+          0,
+          255
+        ],
+        "original_pixels_preserved": true
+      }
+    },
+    {
+      "at": "2026-10-23T20:54:02Z",
+      "kind": "image-verified",
+      "slug": "baek-seok-ju",
+      "detail": {
+        "size": [
+          128,
+          256
+        ],
+        "bbox": [
+          27,
+          23,
+          94,
+          251
+        ],
+        "colors": 48,
+        "alpha": [
+          0,
+          255
+        ],
+        "original_pixels_preserved": true
+      }
+    },
+    {
+      "at": "2026-10-23T20:54:08Z",
+      "kind": "image-verified",
+      "slug": "jin-na-sol",
+      "detail": {
+        "size": [
+          128,
+          256
+        ],
+        "bbox": [
+          29,
+          18,
+          95,
+          249
+        ],
+        "colors": 31,
+        "alpha": [
+          0,
+          255
+        ],
+        "original_pixels_preserved": true
+      }
+    },
+    {
+      "at": "2026-10-23T20:54:08Z",
+      "kind": "image-verified",
+      "slug": "lee-ja-heon",
+      "detail": {
+        "size": [
+          128,
+          256
+        ],
+        "bbox": [
+          18,
+          7,
+          97,
+          251
+        ],
+        "colors": 24,
+        "alpha": [
+          0,
+          255
+        ],
+        "original_pixels_preserved": true
+      }
+    },
+    {
+      "at": "2026-10-23T20:54:16Z",
+      "kind": "image-verified",
+      "slug": "eun-ha-je",
+      "detail": {
+        "size": [
+          128,
+          256
+        ],
+        "bbox": [
+          31,
+          22,
+          93,
+          251
+        ],
+        "colors": 32,
+        "alpha": [
+          0,
+          255
+        ],
+        "original_pixels_preserved": true
+      }
+    },
+    {
+      "at": "2026-10-23T20:54:20Z",
+      "kind": "image-verified",
+      "slug": "park-min-seong",
+      "detail": {
+        "size": [
+          128,
+          256
+        ],
+        "bbox": [
+          18,
+          6,
+          99,
+          251
+        ],
+        "colors": 26,
+        "alpha": [
+          0,
+          255
+        ],
+        "original_pixels_preserved": true
+      }
+    },
+    {
+      "at": "2026-10-23T20:54:22Z",
+      "kind": "submitted",
+      "slug": "baek-sa-heon",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "633a5907-5f31-4593-a875-794f14364f7e",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "633a5907-5f31-4593-a875-794f14364f7e",
+          "image_id": "296b34e5-0cb3-5894-a523-86c0a7cf966c",
+          "source_image_id": "296b34e5-0cb3-5894-a523-86c0a7cf966c",
+          "status": "processing",
+          "output_count": 1,
+          "image_size": {
+            "width": 128,
+            "height": 256
+          },
+          "estimated_generations": 9,
+          "pricing_provisional": true
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T20:54:26Z",
+      "kind": "submitted",
+      "slug": "go-young-eun",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "8deca375-3192-487b-a642-c7838b493969",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "8deca375-3192-487b-a642-c7838b493969",
+          "image_id": "62f58de5-8712-5c51-b7f0-8249cab87fa2",
+          "source_image_id": "62f58de5-8712-5c51-b7f0-8249cab87fa2",
+          "status": "processing",
+          "output_count": 1,
+          "image_size": {
+            "width": 128,
+            "height": 256
+          },
+          "estimated_generations": 9,
+          "pricing_provisional": true
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T20:54:28Z",
+      "kind": "submitted",
+      "slug": "kang-i-hak",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "5364cb5b-94ab-46e7-ae73-9f31f4884caa",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "5364cb5b-94ab-46e7-ae73-9f31f4884caa",
+          "image_id": "538d3310-b059-5e12-b52e-5ca6ede60cf7",
+          "source_image_id": "538d3310-b059-5e12-b52e-5ca6ede60cf7",
+          "status": "processing",
+          "output_count": 1,
+          "image_size": {
+            "width": 128,
+            "height": 256
+          },
+          "estimated_generations": 9,
+          "pricing_provisional": true
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T20:54:30Z",
+      "kind": "submitted",
+      "slug": "jang-heo-un",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "805f56ae-ae2b-45f8-9219-9c79ca89f4a0",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "805f56ae-ae2b-45f8-9219-9c79ca89f4a0",
+          "image_id": "bdb8338c-2697-5ab9-b20f-580c3b982661",
+          "source_image_id": "bdb8338c-2697-5ab9-b20f-580c3b982661",
+          "status": "processing",
+          "output_count": 1,
+          "image_size": {
+            "width": 128,
+            "height": 256
+          },
+          "estimated_generations": 9,
+          "pricing_provisional": true
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T20:54:31Z",
+      "kind": "submitted",
+      "slug": "kwak-je-gang",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "c5877d53-1b4c-4ecd-b728-57ae99eeb24c",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "c5877d53-1b4c-4ecd-b728-57ae99eeb24c",
+          "image_id": "7ee2ecda-676b-5a41-bdd9-128be3ee80ee",
+          "source_image_id": "7ee2ecda-676b-5a41-bdd9-128be3ee80ee",
+          "status": "processing",
+          "output_count": 1,
+          "image_size": {
+            "width": 128,
+            "height": 256
+          },
+          "estimated_generations": 9,
+          "pricing_provisional": true
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T20:54:41Z",
+      "kind": "submitted",
+      "slug": "lee-yeon-hwa",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "9122b278-bc23-44fc-bcb2-e200b53759a7",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "9122b278-bc23-44fc-bcb2-e200b53759a7",
+          "image_id": "940d09c5-acdf-5de7-a9ed-4a7e8e30c284",
+          "source_image_id": "940d09c5-acdf-5de7-a9ed-4a7e8e30c284",
+          "status": "processing",
+          "output_count": 1,
+          "image_size": {
+            "width": 128,
+            "height": 256
+          },
+          "estimated_generations": 9,
+          "pricing_provisional": true
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T20:54:44Z",
+      "kind": "submitted",
+      "slug": "lee-byeong-jin",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "9bfa50f6-278e-4074-881f-8a581f373aec",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "9bfa50f6-278e-4074-881f-8a581f373aec",
+          "image_id": "6bf345b2-0dfd-5e97-9638-65671cb3d8aa",
+          "source_image_id": "6bf345b2-0dfd-5e97-9638-65671cb3d8aa",
+          "status": "processing",
+          "output_count": 1,
+          "image_size": {
+            "width": 128,
+            "height": 256
+          },
+          "estimated_generations": 9,
+          "pricing_provisional": true
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T20:54:49Z",
+      "kind": "submitted",
+      "slug": "jay",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "d262fefc-fcef-487d-86ff-e1d757d54170",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "d262fefc-fcef-487d-86ff-e1d757d54170",
+          "image_id": "336a0cf0-771a-5a99-b1e6-05fba0dcd3aa",
+          "source_image_id": "336a0cf0-771a-5a99-b1e6-05fba0dcd3aa",
+          "status": "processing",
+          "output_count": 1,
+          "image_size": {
+            "width": 128,
+            "height": 256
+          },
+          "estimated_generations": 9,
+          "pricing_provisional": true
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T20:54:53Z",
+      "kind": "submitted",
+      "slug": "ho-yu-won",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "a4bca6d0-4145-4545-a189-998ab06cec55",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "a4bca6d0-4145-4545-a189-998ab06cec55",
+          "image_id": "3188f519-6c29-5ff2-9caf-57e701360af9",
+          "source_image_id": "3188f519-6c29-5ff2-9caf-57e701360af9",
+          "status": "processing",
+          "output_count": 1,
+          "image_size": {
+            "width": 128,
+            "height": 256
+          },
+          "estimated_generations": 9,
+          "pricing_provisional": true
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T20:55:03Z",
+      "kind": "submitted",
+      "slug": "cheong-dal-lae",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "d6d15ee8-080b-43fe-a5ec-0f5b6e4e980c",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "d6d15ee8-080b-43fe-a5ec-0f5b6e4e980c",
+          "image_id": "984297ff-9076-5563-8bed-3d67d5909cef",
+          "source_image_id": "984297ff-9076-5563-8bed-3d67d5909cef",
+          "status": "processing",
+          "output_count": 1,
+          "image_size": {
+            "width": 128,
+            "height": 256
+          },
+          "estimated_generations": 9,
+          "pricing_provisional": true
+        }
+      }
     }
   ],
-  "updated_at": 1792788403.2199156,
+  "updated_at": 1792788903.151376,
   "user_stopped_at": 1792778235.6917784,
   "archived_jobs": {
     "304457e9-6577-44f0-af17-97841a9f6720": {
@@ -12618,17 +15168,17 @@
       "saved_frames": 6
     }
   },
-  "last_git_checkpoint": 1792786713.4276478,
+  "last_git_checkpoint": 1792788408.0442123,
   "summary": {
     "jobs": {
-      "processing": 14,
-      "completed": 70,
+      "processing": 12,
+      "completed": 88,
       "failed": 3,
       "stalled": 0
     },
     "characters_ready": 10,
     "characters_total": 55,
-    "images_verified": 12,
+    "images_verified": 30,
     "motions_submitted": 3,
     "motions_target": 1100
   },
