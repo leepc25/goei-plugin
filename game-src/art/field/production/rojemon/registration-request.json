@@ -1,0 +1,14 @@
+{
+  "description": "로제몬 / Rojemon. Adult woman early20s, long wavy lavender purple hair and bangs, violet eyes, petite natural adult build and defined waist, mildly annoyed expression, fitted black office skirt suit, white shirt, black necktie and black office pumps. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
+  "reference_image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "n_directions": 8,
+  "view": "low top-down",
+  "template_id": "mannequin",
+  "name": "로제몬",
+  "seed": 10222027,
+  "no_background": true
+}

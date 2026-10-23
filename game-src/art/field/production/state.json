@@ -879,7 +879,7 @@
       "kind": "registration",
       "slug": "deadpole",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792779463.1282864,
       "receipt": {
         "usage": null,
@@ -891,33 +891,48 @@
       },
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 4.0
         },
         "id": "3aa93392-d116-470e-a5f8-bcf3dad5eff9",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-23T18:17:44.314628+00:00",
         "last_response": {
-          "status": "building_skeleton",
-          "progress": 0.98,
+          "status": "completed",
           "character_id": "0c652edd-65f2-4d86-9294-196376a2d0ea",
-          "n_directions": 8,
+          "storage_urls": {
+            "east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/0c652edd-65f2-4d86-9294-196376a2d0ea/rotations/east.png",
+            "west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/0c652edd-65f2-4d86-9294-196376a2d0ea/rotations/west.png",
+            "north": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/0c652edd-65f2-4d86-9294-196376a2d0ea/rotations/north.png",
+            "south": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/0c652edd-65f2-4d86-9294-196376a2d0ea/rotations/south.png",
+            "north-east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/0c652edd-65f2-4d86-9294-196376a2d0ea/rotations/north-east.png",
+            "north-west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/0c652edd-65f2-4d86-9294-196376a2d0ea/rotations/north-west.png",
+            "south-east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/0c652edd-65f2-4d86-9294-196376a2d0ea/rotations/south-east.png",
+            "south-west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/0c652edd-65f2-4d86-9294-196376a2d0ea/rotations/south-west.png"
+          },
+          "billing_usage": {
+            "type": "generations",
+            "generations": 4.0
+          },
           "character_name": "데드폴",
-          "queue_position": 0,
           "directions_type": "8-directions",
           "generation_mode": "v3",
-          "skeleton_frames_done": 7,
-          "character_description": "데드폴 / Deadpole. Adult woman early20s, petite natural build, long straight black hair with straight bangs, soft round dark gray eyes, gentle cautious expression, black tailored trouser suit, white shirt, black necktie, black protective gloves and plain black shoes. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
-          "generation_started_at": "2026-10-23T18:17:47.842129+00:00",
-          "skeleton_frames_total": 8
+          "directions_count": 8,
+          "character_description": "데드폴 / Deadpole. Adult woman early20s, petite natural build, long straight black hair with straight bangs, soft round dark gray eyes, gentle cautious expression, black tailored trouser suit, white shirt, black necktie, black protective gloves and plain black shoes. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow."
         }
+      },
+      "observed_end_epoch": 1792780511.3951952,
+      "elapsed_observed_seconds": 1048.2669093608856,
+      "usage": {
+        "type": "generations",
+        "generations": 4.0
       }
     },
     "62740c2d-eb38-4eba-8555-357190310a70": {
       "kind": "image",
       "slug": "geshugan",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792780194.3411055,
       "receipt": {
         "usage": null,
@@ -935,25 +950,60 @@
       },
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 9.0
         },
         "id": "62740c2d-eb38-4eba-8555-357190310a70",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-23T18:29:59.021759+00:00",
         "last_response": {
-          "type": "message_progress",
+          "seed": 10222027,
+          "type": "message_done",
           "model": "pro_flash",
           "width": 128,
-          "action": "Correcting pixels",
+          "action": "Removing background",
           "height": 256,
+          "images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
           "prompt": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult woman mid20s, short snow white blunt bob with bangs, cold clear blue eyes, athletic toned natural build, impassive face, loose white open collar long sleeve shirt with sleeves rolled to elbows, black business trousers and black shoes. No necktie. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 212-224px on128x256; height unspecified; provisional medium stature; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
-          "status": "processing",
+          "status": "completed",
+          "asset_id": "bb738ee7-c33c-5026-bfa5-287296a828db",
           "image_id": "bb738ee7-c33c-5026-bfa5-287296a828db",
           "job_kind": "creator-image",
-          "progress": 0.74,
+          "progress": 1.0,
+          "image_url": "https://s3.eu-central-003.backblazeb2.com/pixellab-generations/production/creator/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/bb738ee7-c33c-5026-bfa5-287296a828db/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0037e6521c1d7c20000000001%2F20261023%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20261023T183133Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=b61b8695eabbad5c0a16901e2bcd9e3613ca18d3769e7fb8acf764a3900d975c",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 9
+          },
+          "generation_id": "f17d57ae-369a-4f07-aa0c-575043efc3b4",
+          "billing_charged": true,
+          "original_images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "source_image_id": "bb738ee7-c33c-5026-bfa5-287296a828db",
+          "creator_image_saved": true,
           "generation_started_at": "2026-10-23T18:30:00.362906+00:00"
         }
+      },
+      "observed_end_epoch": 1792780513.2998571,
+      "elapsed_observed_seconds": 318.9587519168854,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 9
       }
     },
     "313da381-5ebe-43ab-997b-d1eb55f6aa2f": {
@@ -984,11 +1034,12 @@
         "created_at": "2026-10-23T18:30:13.958713+00:00",
         "last_response": {
           "type": "message_progress",
-          "progress": 0.1,
+          "action": "finalizing",
+          "progress": 0.948327447773804,
           "direction": "south-east",
           "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
           "animation_name": null,
-          "queue_position": 0,
+          "queue_position": 17,
           "generation_model": "skeleton-v3_template",
           "animation_group_id": "4e748226-7bec-46bf-bb77-a3392b9522a4",
           "motion_adjustments": {
@@ -1000,7 +1051,7 @@
           "animation_description": "breathing idle",
           "generation_started_at": "2026-10-23T18:30:39.836983+00:00",
           "template_animation_id": "breathing-idle",
-          "estimated_wait_seconds": 0
+          "estimated_wait_seconds": 1797
         }
       }
     },
@@ -1032,11 +1083,12 @@
         "created_at": "2026-10-23T18:30:26.500632+00:00",
         "last_response": {
           "type": "message_progress",
-          "progress": 0.1,
+          "action": "finalizing",
+          "progress": 0.9334837867717348,
           "direction": "east",
           "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
           "animation_name": null,
-          "queue_position": 0,
+          "queue_position": 18,
           "generation_model": "skeleton-v3_template",
           "animation_group_id": "e7bd558a-c320-4ba1-acaf-b018fc0ac3ed",
           "motion_adjustments": {
@@ -1048,7 +1100,7 @@
           "animation_description": "walking confidently with an upright steady torso, measured strides and restrained arm swing",
           "generation_started_at": "2026-10-23T18:30:49.685761+00:00",
           "template_animation_id": "walking-8-frames",
-          "estimated_wait_seconds": 0
+          "estimated_wait_seconds": 1969
         }
       }
     },
@@ -1079,10 +1131,13 @@
         "status": "processing",
         "created_at": "2026-10-23T18:30:38.282585+00:00",
         "last_response": {
-          "type": "connected",
+          "type": "message_progress",
+          "action": "generating",
+          "progress": 0.915,
           "direction": "east",
           "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
           "animation_name": null,
+          "queue_position": 22,
           "generation_model": "skeleton-v3_template",
           "animation_group_id": "4e7a2ac9-f9f2-42cc-83eb-835cf0062a2e",
           "motion_adjustments": {
@@ -1092,7 +1147,9 @@
             "leg_extension": 0.0
           },
           "animation_description": "running decisively with a steady torso, controlled arm swing and firm purposeful strides",
-          "template_animation_id": "running-8-frames"
+          "generation_started_at": "2026-10-23T18:31:08.11423+00:00",
+          "template_animation_id": "running-8-frames",
+          "estimated_wait_seconds": 2312
         }
       }
     },
@@ -1100,7 +1157,7 @@
       "kind": "image",
       "slug": "aileen",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792780294.6318796,
       "receipt": {
         "usage": null,
@@ -1115,13 +1172,70 @@
         },
         "estimated_generations": 9,
         "pricing_provisional": true
+      },
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 9.0
+        },
+        "id": "1a3d97f8-4f8a-490e-afd9-5f5754e87060",
+        "status": "completed",
+        "created_at": "2026-10-23T18:31:40.531093+00:00",
+        "last_response": {
+          "seed": 10222027,
+          "type": "message_done",
+          "model": "pro_flash",
+          "width": 128,
+          "action": "Removing background",
+          "height": 256,
+          "images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "prompt": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult woman early20s, faded platinum blonde hair in a high ponytail with long bangs, dull gray eyes, serious analytical face, petite compact athletic build, practical fitted black trouser suit and black closed shoes as in her original portrait. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 192-204px on128x256; short; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
+          "status": "completed",
+          "asset_id": "4a89eead-6442-51f1-8765-b59a46daf80d",
+          "image_id": "4a89eead-6442-51f1-8765-b59a46daf80d",
+          "job_kind": "creator-image",
+          "progress": 1.0,
+          "image_url": "https://s3.eu-central-003.backblazeb2.com/pixellab-generations/production/creator/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4a89eead-6442-51f1-8765-b59a46daf80d/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0037e6521c1d7c20000000001%2F20261023%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20261023T183240Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=13a86da51a0e3471802e8450d502e7394be56ffac80a3202df8d81dee0f9381e",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 9
+          },
+          "generation_id": "255d7183-2126-492c-90fb-fdd399a90cd1",
+          "billing_charged": true,
+          "original_images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "source_image_id": "4a89eead-6442-51f1-8765-b59a46daf80d",
+          "creator_image_saved": true,
+          "generation_started_at": "2026-10-23T18:31:42.436059+00:00"
+        }
+      },
+      "observed_end_epoch": 1792780513.3000834,
+      "elapsed_observed_seconds": 218.668203830719,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 9
       }
     },
     "3591405c-06e8-4141-9afb-81a4e423f965": {
       "kind": "image",
       "slug": "kyuras",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792780302.6081161,
       "receipt": {
         "usage": null,
@@ -1136,19 +1250,847 @@
         },
         "estimated_generations": 9,
         "pricing_provisional": true
+      },
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 9.0
+        },
+        "id": "3591405c-06e8-4141-9afb-81a4e423f965",
+        "status": "completed",
+        "created_at": "2026-10-23T18:31:44.199168+00:00",
+        "last_response": {
+          "seed": 10222027,
+          "type": "message_done",
+          "model": "pro_flash",
+          "width": 128,
+          "action": "Removing background",
+          "height": 256,
+          "images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "prompt": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult man early30s, thin wiry build, pale green hair swept back, narrow face, gray green eyes, lively confident smile, black tailored trouser suit, white shirt, black necktie and black shoes. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 212-224px on128x256; height unspecified; provisional medium stature; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
+          "status": "completed",
+          "asset_id": "0185343d-68d7-5f5d-997c-7db4b85d5bfc",
+          "image_id": "0185343d-68d7-5f5d-997c-7db4b85d5bfc",
+          "job_kind": "creator-image",
+          "progress": 1.0,
+          "image_url": "https://s3.eu-central-003.backblazeb2.com/pixellab-generations/production/creator/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/0185343d-68d7-5f5d-997c-7db4b85d5bfc/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0037e6521c1d7c20000000001%2F20261023%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20261023T183304Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=0680eac6ac804db18470ef57667fb98897ed5f3caaf4b9e349b32e2ce7ebb2ba",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 9
+          },
+          "generation_id": "3c4b395d-7451-4077-8763-b6a659374196",
+          "queue_position": 0,
+          "billing_charged": true,
+          "original_images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "source_image_id": "0185343d-68d7-5f5d-997c-7db4b85d5bfc",
+          "creator_image_saved": true,
+          "generation_started_at": "2026-10-23T18:31:45.258391+00:00",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792780513.3001208,
+      "elapsed_observed_seconds": 210.69200491905212,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 9
       }
     },
     "06d28e8f-5791-4543-b918-3fcc4863a8ba": {
       "kind": "image",
       "slug": "rojemon",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792780305.4705167,
       "receipt": {
         "usage": null,
         "background_job_id": "06d28e8f-5791-4543-b918-3fcc4863a8ba",
         "image_id": "80674fdc-7e47-5efb-b3c9-1278aa724e13",
         "source_image_id": "80674fdc-7e47-5efb-b3c9-1278aa724e13",
+        "status": "processing",
+        "output_count": 1,
+        "image_size": {
+          "width": 128,
+          "height": 256
+        },
+        "estimated_generations": 9,
+        "pricing_provisional": true
+      },
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 9.0
+        },
+        "id": "06d28e8f-5791-4543-b918-3fcc4863a8ba",
+        "status": "completed",
+        "created_at": "2026-10-23T18:31:47.156738+00:00",
+        "last_response": {
+          "seed": 10222027,
+          "type": "message_done",
+          "model": "pro_flash",
+          "width": 128,
+          "action": "Removing background",
+          "height": 256,
+          "images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "prompt": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult woman early20s, long wavy lavender purple hair and bangs, violet eyes, petite natural adult build and defined waist, mildly annoyed expression, fitted black office skirt suit, white shirt, black necktie and black office pumps. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 192-204px on128x256; short; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
+          "status": "completed",
+          "asset_id": "80674fdc-7e47-5efb-b3c9-1278aa724e13",
+          "image_id": "80674fdc-7e47-5efb-b3c9-1278aa724e13",
+          "job_kind": "creator-image",
+          "progress": 1.0,
+          "image_url": "https://s3.eu-central-003.backblazeb2.com/pixellab-generations/production/creator/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/80674fdc-7e47-5efb-b3c9-1278aa724e13/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0037e6521c1d7c20000000001%2F20261023%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20261023T183305Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=e300b05d3e79e3ad313c628566777fc24b177ab9f1af8e29ddfd8b95d6fe4f76",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 9
+          },
+          "generation_id": "90bd380b-f214-40e4-bb4e-cc50b6894b38",
+          "queue_position": 0,
+          "billing_charged": true,
+          "original_images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "source_image_id": "80674fdc-7e47-5efb-b3c9-1278aa724e13",
+          "creator_image_saved": true,
+          "generation_started_at": "2026-10-23T18:31:48.381143+00:00",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792780513.3001487,
+      "elapsed_observed_seconds": 207.8296320438385,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 9
+      }
+    },
+    "0dc42b65-e471-4ff1-ae53-3195b75dd1bf": {
+      "kind": "image",
+      "slug": "konjyuce",
+      "template": null,
+      "status": "completed",
+      "created_epoch": 1792780308.5543263,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "0dc42b65-e471-4ff1-ae53-3195b75dd1bf",
+        "image_id": "9f8fb1e1-bca5-5212-bbe4-64c2529f244c",
+        "source_image_id": "9f8fb1e1-bca5-5212-bbe4-64c2529f244c",
+        "status": "processing",
+        "output_count": 1,
+        "image_size": {
+          "width": 128,
+          "height": 256
+        },
+        "estimated_generations": 9,
+        "pricing_provisional": true
+      },
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 9.0
+        },
+        "id": "0dc42b65-e471-4ff1-ae53-3195b75dd1bf",
+        "status": "completed",
+        "created_at": "2026-10-23T18:31:58.154659+00:00",
+        "last_response": {
+          "seed": 10222027,
+          "type": "message_done",
+          "model": "pro_flash",
+          "width": 128,
+          "action": "Removing background",
+          "height": 256,
+          "images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "prompt": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. 17 year old Korean schoolgirl with ordinary age appropriate teen proportions, shoulder length straight black bob with one distinctive pink streak, blue eyes, determined youthful face. Fully clothed navy school uniform blazer with light piping, white collared shirt, black necktie, gray knee length pleated school skirt, dark socks and plain black school loafers. No adult glamour styling. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 212-224px on128x256; height unspecified; provisional medium stature; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
+          "status": "completed",
+          "asset_id": "9f8fb1e1-bca5-5212-bbe4-64c2529f244c",
+          "image_id": "9f8fb1e1-bca5-5212-bbe4-64c2529f244c",
+          "job_kind": "creator-image",
+          "progress": 1.0,
+          "image_url": "https://s3.eu-central-003.backblazeb2.com/pixellab-generations/production/creator/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/9f8fb1e1-bca5-5212-bbe4-64c2529f244c/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0037e6521c1d7c20000000001%2F20261023%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20261023T183320Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=fb2c3d83debc47df5b0f1fc8cefb97f900a063bf4c6b3a502a6426f5de57b64c",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 9
+          },
+          "generation_id": "02ac2bec-79d3-4afc-8c00-f8b78579e716",
+          "queue_position": 0,
+          "billing_charged": true,
+          "original_images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "source_image_id": "9f8fb1e1-bca5-5212-bbe4-64c2529f244c",
+          "creator_image_saved": true,
+          "generation_started_at": "2026-10-23T18:32:01.787173+00:00",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792780513.3001738,
+      "elapsed_observed_seconds": 204.74584770202637,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 9
+      }
+    },
+    "20c53ac5-eaa5-488f-a5c8-cff4d09e0b59": {
+      "kind": "animation",
+      "slug": "jyaldi",
+      "template": "running-jump",
+      "status": "processing",
+      "created_epoch": 1792780322.055167,
+      "receipt": {
+        "background_job_ids": [
+          "20c53ac5-eaa5-488f-a5c8-cff4d09e0b59"
+        ],
+        "directions": [
+          "east"
+        ],
+        "animation_group_id": "47e8b847-f4cd-4872-bfd3-84f289bd42c4",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      },
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "20c53ac5-eaa5-488f-a5c8-cff4d09e0b59",
+        "status": "processing",
+        "created_at": "2026-10-23T18:32:09.023371+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "action": "generating",
+          "progress": 0.17746061569285204,
+          "direction": "east",
+          "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+          "animation_name": null,
+          "queue_position": 0,
+          "generation_model": "skeleton-v3_template",
+          "animation_group_id": "47e8b847-f4cd-4872-bfd3-84f289bd42c4",
+          "motion_adjustments": {
+            "stride": 1.0,
+            "posture": 0.0,
+            "arm_swing": 1.0,
+            "leg_extension": 0.0
+          },
+          "animation_description": "running jump",
+          "generation_started_at": "2026-10-23T18:32:20.993163+00:00",
+          "template_animation_id": "running-jump",
+          "estimated_wait_seconds": 0
+        }
+      }
+    },
+    "1e3ed3a1-22dc-44a3-86ef-9bd03998c486": {
+      "kind": "animation",
+      "slug": "jyaldi",
+      "template": "running-slide",
+      "status": "processing",
+      "created_epoch": 1792780331.9877746,
+      "receipt": {
+        "background_job_ids": [
+          "1e3ed3a1-22dc-44a3-86ef-9bd03998c486"
+        ],
+        "directions": [
+          "east"
+        ],
+        "animation_group_id": "a932cdb0-4016-4583-97fb-80dc044328fa",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      },
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "1e3ed3a1-22dc-44a3-86ef-9bd03998c486",
+        "status": "processing",
+        "created_at": "2026-10-23T18:32:22.386348+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "action": "finalizing",
+          "progress": 0.915,
+          "direction": "east",
+          "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+          "animation_name": null,
+          "queue_position": 22,
+          "generation_model": "skeleton-v3_template",
+          "animation_group_id": "a932cdb0-4016-4583-97fb-80dc044328fa",
+          "motion_adjustments": {
+            "stride": 1.0,
+            "posture": 0.0,
+            "arm_swing": 1.0,
+            "leg_extension": 0.0
+          },
+          "animation_description": "running slide",
+          "generation_started_at": "2026-10-23T18:32:35.920266+00:00",
+          "template_animation_id": "running-slide",
+          "estimated_wait_seconds": 2402
+        }
+      }
+    },
+    "ee2d7d2d-860e-4ff9-b925-f3d9acaf8277": {
+      "kind": "animation",
+      "slug": "jyaldi",
+      "template": "crouched-walking",
+      "status": "processing",
+      "created_epoch": 1792780346.4596634,
+      "receipt": {
+        "background_job_ids": [
+          "ee2d7d2d-860e-4ff9-b925-f3d9acaf8277"
+        ],
+        "directions": [
+          "east"
+        ],
+        "animation_group_id": "39e4964a-3385-4d99-95da-7c48ff1e3455",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      },
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "ee2d7d2d-860e-4ff9-b925-f3d9acaf8277",
+        "status": "processing",
+        "created_at": "2026-10-23T18:32:31.726152+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "action": "finalizing",
+          "progress": 0.915,
+          "direction": "east",
+          "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+          "animation_name": null,
+          "queue_position": 23,
+          "generation_model": "skeleton-v3_template",
+          "animation_group_id": "39e4964a-3385-4d99-95da-7c48ff1e3455",
+          "motion_adjustments": {
+            "stride": 1.0,
+            "posture": 0.0,
+            "arm_swing": 1.0,
+            "leg_extension": 0.0
+          },
+          "animation_description": "walking while crouched",
+          "generation_started_at": "2026-10-23T18:32:43.741919+00:00",
+          "template_animation_id": "crouched-walking",
+          "estimated_wait_seconds": 2433
+        }
+      }
+    },
+    "e2d99108-cd3c-4e66-b575-dcdeed69cd5b": {
+      "kind": "animation",
+      "slug": "jyaldi",
+      "template": "sad-walk",
+      "status": "processing",
+      "created_epoch": 1792780353.9290974,
+      "receipt": {
+        "background_job_ids": [
+          "e2d99108-cd3c-4e66-b575-dcdeed69cd5b"
+        ],
+        "directions": [
+          "east"
+        ],
+        "animation_group_id": "f1d0e8b4-ae8d-4ff9-ae48-b22b311ab350",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      },
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "e2d99108-cd3c-4e66-b575-dcdeed69cd5b",
+        "status": "processing",
+        "created_at": "2026-10-23T18:32:37.779897+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "action": "finalizing",
+          "progress": 0.905,
+          "direction": "east",
+          "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+          "animation_name": null,
+          "queue_position": 0,
+          "generation_model": "skeleton-v3_template",
+          "animation_group_id": "f1d0e8b4-ae8d-4ff9-ae48-b22b311ab350",
+          "motion_adjustments": {
+            "stride": 1.0,
+            "posture": 0.0,
+            "arm_swing": 1.0,
+            "leg_extension": 0.0
+          },
+          "animation_description": "walking sadly",
+          "generation_started_at": "2026-10-23T18:32:59.16647+00:00",
+          "template_animation_id": "sad-walk",
+          "estimated_wait_seconds": 0
+        }
+      }
+    },
+    "be258cb3-8f10-40de-af51-75fee8b5f1a8": {
+      "kind": "animation",
+      "slug": "jyaldi",
+      "template": "front-flip",
+      "status": "processing",
+      "created_epoch": 1792780359.5629323,
+      "receipt": {
+        "background_job_ids": [
+          "be258cb3-8f10-40de-af51-75fee8b5f1a8"
+        ],
+        "directions": [
+          "east"
+        ],
+        "animation_group_id": "601cbfbe-9a2b-4875-a842-b6fe5b640074",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      },
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "be258cb3-8f10-40de-af51-75fee8b5f1a8",
+        "status": "processing",
+        "created_at": "2026-10-23T18:32:43.616633+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "action": "generating",
+          "progress": 0.13584093414476014,
+          "direction": "east",
+          "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+          "animation_name": null,
+          "queue_position": 0,
+          "generation_model": "skeleton-v3_template",
+          "animation_group_id": "601cbfbe-9a2b-4875-a842-b6fe5b640074",
+          "motion_adjustments": {
+            "stride": 1.0,
+            "posture": 0.0,
+            "arm_swing": 1.0,
+            "leg_extension": 0.0
+          },
+          "animation_description": "front flip",
+          "generation_started_at": "2026-10-23T18:33:14.289163+00:00",
+          "template_animation_id": "front-flip",
+          "estimated_wait_seconds": 0
+        }
+      }
+    },
+    "3eae8f78-2351-4240-a4b2-98b446f3a1b5": {
+      "kind": "animation",
+      "slug": "jyaldi",
+      "template": "backflip",
+      "status": "processing",
+      "created_epoch": 1792780372.9613366,
+      "receipt": {
+        "background_job_ids": [
+          "3eae8f78-2351-4240-a4b2-98b446f3a1b5"
+        ],
+        "directions": [
+          "east"
+        ],
+        "animation_group_id": "68d30996-0f7e-459f-ba79-d0d4a6d48f68",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      },
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "3eae8f78-2351-4240-a4b2-98b446f3a1b5",
+        "status": "processing",
+        "created_at": "2026-10-23T18:33:13.358395+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "progress": 0.1,
+          "direction": "east",
+          "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+          "animation_name": null,
+          "queue_position": 0,
+          "generation_model": "skeleton-v3_template",
+          "animation_group_id": "68d30996-0f7e-459f-ba79-d0d4a6d48f68",
+          "motion_adjustments": {
+            "stride": 1.0,
+            "posture": 0.0,
+            "arm_swing": 1.0,
+            "leg_extension": 0.0
+          },
+          "animation_description": "backflip",
+          "generation_started_at": "2026-10-23T18:34:18.313943+00:00",
+          "template_animation_id": "backflip",
+          "estimated_wait_seconds": 0
+        }
+      }
+    },
+    "12c55bf7-5e4a-48b6-8536-aeac9c52fd58": {
+      "kind": "animation",
+      "slug": "jyaldi",
+      "template": "jumping-1",
+      "status": "processing",
+      "created_epoch": 1792780411.8495963,
+      "receipt": {
+        "background_job_ids": [
+          "12c55bf7-5e4a-48b6-8536-aeac9c52fd58"
+        ],
+        "directions": [
+          "east"
+        ],
+        "animation_group_id": "05739c03-4ac1-4303-a232-a9369c6ecfcf",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      },
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "12c55bf7-5e4a-48b6-8536-aeac9c52fd58",
+        "status": "processing",
+        "created_at": "2026-10-23T18:33:42.837306+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "progress": 0.1,
+          "direction": "east",
+          "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+          "animation_name": null,
+          "queue_position": 0,
+          "generation_model": "skeleton-v3_template",
+          "animation_group_id": "05739c03-4ac1-4303-a232-a9369c6ecfcf",
+          "motion_adjustments": {
+            "stride": 1.0,
+            "posture": 0.0,
+            "arm_swing": 1.0,
+            "leg_extension": 0.0
+          },
+          "animation_description": "jumping",
+          "generation_started_at": "2026-10-23T18:34:23.129143+00:00",
+          "template_animation_id": "jumping-1",
+          "estimated_wait_seconds": 0
+        }
+      }
+    },
+    "d188f155-3ae4-4533-8ee4-a017918d68d5": {
+      "kind": "animation",
+      "slug": "jyaldi",
+      "template": "jumping-2",
+      "status": "processing",
+      "created_epoch": 1792780429.9372332,
+      "receipt": {
+        "background_job_ids": [
+          "d188f155-3ae4-4533-8ee4-a017918d68d5"
+        ],
+        "directions": [
+          "east"
+        ],
+        "animation_group_id": "33f5e645-ddb7-43cf-b558-73c444c55a12",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      },
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "d188f155-3ae4-4533-8ee4-a017918d68d5",
+        "status": "processing",
+        "created_at": "2026-10-23T18:33:56.372578+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "action": "generating",
+          "progress": 0.1029444827701249,
+          "direction": "east",
+          "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+          "animation_name": null,
+          "queue_position": 0,
+          "generation_model": "skeleton-v3_template",
+          "animation_group_id": "33f5e645-ddb7-43cf-b558-73c444c55a12",
+          "motion_adjustments": {
+            "stride": 1.0,
+            "posture": 0.0,
+            "arm_swing": 1.0,
+            "leg_extension": 0.0
+          },
+          "animation_description": "jumping",
+          "generation_started_at": "2026-10-23T18:34:13.06784+00:00",
+          "template_animation_id": "jumping-2",
+          "estimated_wait_seconds": 0
+        }
+      }
+    },
+    "42f5a655-5dcb-4294-b435-c657b5721482": {
+      "kind": "animation",
+      "slug": "jyaldi",
+      "template": "two-footed-jump",
+      "status": "processing",
+      "created_epoch": 1792780439.498037,
+      "receipt": {
+        "background_job_ids": [
+          "42f5a655-5dcb-4294-b435-c657b5721482"
+        ],
+        "directions": [
+          "east"
+        ],
+        "animation_group_id": "d1211797-55a9-46b8-bae4-be57a80d706c",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      },
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "42f5a655-5dcb-4294-b435-c657b5721482",
+        "status": "processing",
+        "created_at": "2026-10-23T18:34:08.874687+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "progress": 0.1,
+          "direction": "east",
+          "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+          "animation_name": null,
+          "queue_position": 0,
+          "generation_model": "skeleton-v3_template",
+          "animation_group_id": "d1211797-55a9-46b8-bae4-be57a80d706c",
+          "motion_adjustments": {
+            "stride": 1.0,
+            "posture": 0.0,
+            "arm_swing": 1.0,
+            "leg_extension": 0.0
+          },
+          "animation_description": "two footed jump",
+          "generation_started_at": "2026-10-23T18:34:14.627959+00:00",
+          "template_animation_id": "two-footed-jump",
+          "estimated_wait_seconds": 0
+        }
+      }
+    },
+    "bfd08828-e4de-461d-ad55-c84a3dfeb679": {
+      "kind": "animation",
+      "slug": "jyaldi",
+      "template": "drinking",
+      "status": "processing",
+      "created_epoch": 1792780450.7838085,
+      "receipt": {
+        "background_job_ids": [
+          "bfd08828-e4de-461d-ad55-c84a3dfeb679"
+        ],
+        "directions": [
+          "south-east"
+        ],
+        "animation_group_id": "5f91faf9-3c67-472e-a8c5-d7d1480b503c",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      },
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "bfd08828-e4de-461d-ad55-c84a3dfeb679",
+        "status": "processing",
+        "created_at": "2026-10-23T18:34:21.168598+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "progress": 0.1,
+          "direction": "south-east",
+          "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+          "animation_name": null,
+          "queue_position": 0,
+          "generation_model": "skeleton-v3_template",
+          "animation_group_id": "5f91faf9-3c67-472e-a8c5-d7d1480b503c",
+          "motion_adjustments": {
+            "stride": 1.0,
+            "posture": 0.0,
+            "arm_swing": 1.0,
+            "leg_extension": 0.0
+          },
+          "animation_description": "drinking",
+          "generation_started_at": "2026-10-23T18:34:45.851344+00:00",
+          "template_animation_id": "drinking",
+          "estimated_wait_seconds": 0
+        }
+      }
+    },
+    "88c8e391-1c49-44a8-bcae-d7ee982ca57f": {
+      "kind": "animation",
+      "slug": "jyaldi",
+      "template": "picking-up",
+      "status": "processing",
+      "created_epoch": 1792780462.9543135,
+      "receipt": {
+        "background_job_ids": [
+          "88c8e391-1c49-44a8-bcae-d7ee982ca57f"
+        ],
+        "directions": [
+          "east"
+        ],
+        "animation_group_id": "071c3c12-cc09-4e53-b6d0-bbac428cfd15",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      },
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "88c8e391-1c49-44a8-bcae-d7ee982ca57f",
+        "status": "processing",
+        "created_at": "2026-10-23T18:34:24.414162+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "progress": 0.1,
+          "direction": "east",
+          "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+          "animation_name": null,
+          "queue_position": 0,
+          "generation_model": "skeleton-v3_template",
+          "animation_group_id": "071c3c12-cc09-4e53-b6d0-bbac428cfd15",
+          "motion_adjustments": {
+            "stride": 1.0,
+            "posture": 0.0,
+            "arm_swing": 1.0,
+            "leg_extension": 0.0
+          },
+          "animation_description": "picking up",
+          "generation_started_at": "2026-10-23T18:34:30.045348+00:00",
+          "template_animation_id": "picking-up",
+          "estimated_wait_seconds": 0
+        }
+      }
+    },
+    "a996f9f5-1eb1-41e6-a7af-377263cff9b3": {
+      "kind": "registration",
+      "slug": "aileen",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792780548.9031188,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "a996f9f5-1eb1-41e6-a7af-377263cff9b3",
+        "character_id": "8fc35b6a-3e82-4148-8ed1-db3481d8cede",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      }
+    },
+    "b304d6f1-31b5-4a0f-a28c-9c625d4b0fdc": {
+      "kind": "registration",
+      "slug": "kyuras",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792780555.5611382,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "b304d6f1-31b5-4a0f-a28c-9c625d4b0fdc",
+        "character_id": "7cf2502d-e2e9-4677-bc53-ec1b9d76a11d",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      }
+    },
+    "66bfcf1b-fcce-44ef-b0f4-2986e0e1c331": {
+      "kind": "registration",
+      "slug": "geshugan",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792780580.8578606,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "66bfcf1b-fcce-44ef-b0f4-2986e0e1c331",
+        "character_id": "a3af18df-782b-44d0-9fa6-c05ee03d84ab",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      }
+    },
+    "cb41e6eb-69d9-44e7-8d23-c904d87f016c": {
+      "kind": "registration",
+      "slug": "rojemon",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792780589.74299,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "cb41e6eb-69d9-44e7-8d23-c904d87f016c",
+        "character_id": "27643078-cb88-455f-abf5-3be5bdb3ff68",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      }
+    },
+    "cad7e67c-dfc7-49fc-8681-18ac2e1070d0": {
+      "kind": "registration",
+      "slug": "konjyuce",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792780593.49744,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "cad7e67c-dfc7-49fc-8681-18ac2e1070d0",
+        "character_id": "1cfdc1a3-19f6-4c87-85c5-e59329f657f5",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      }
+    },
+    "86ea3180-a8b5-44cb-9018-3aae95668543": {
+      "kind": "image",
+      "slug": "deadpole",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792780603.2460616,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "86ea3180-a8b5-44cb-9018-3aae95668543",
+        "image_id": "44ce8654-2856-5973-b506-776914923ecd",
+        "source_image_id": "44ce8654-2856-5973-b506-776914923ecd",
         "status": "processing",
         "output_count": 1,
         "image_size": {
@@ -1170,13 +2112,25 @@
       "motions": {
         "breathing-idle": "313da381-5ebe-43ab-997b-d1eb55f6aa2f",
         "walking-8-frames": "83227447-8dd7-480f-8792-56d1ec73f851",
-        "running-8-frames": "7abf3424-7b93-48da-947d-f6357b0b2874"
+        "running-8-frames": "7abf3424-7b93-48da-947d-f6357b0b2874",
+        "running-jump": "20c53ac5-eaa5-488f-a5c8-cff4d09e0b59",
+        "running-slide": "1e3ed3a1-22dc-44a3-86ef-9bd03998c486",
+        "crouched-walking": "ee2d7d2d-860e-4ff9-b925-f3d9acaf8277",
+        "sad-walk": "e2d99108-cd3c-4e66-b575-dcdeed69cd5b",
+        "front-flip": "be258cb3-8f10-40de-af51-75fee8b5f1a8",
+        "backflip": "3eae8f78-2351-4240-a4b2-98b446f3a1b5",
+        "jumping-1": "12c55bf7-5e4a-48b6-8536-aeac9c52fd58",
+        "jumping-2": "d188f155-3ae4-4533-8ee4-a017918d68d5",
+        "two-footed-jump": "42f5a655-5dcb-4294-b435-c657b5721482",
+        "drinking": "bfd08828-e4de-461d-ad55-c84a3dfeb679",
+        "picking-up": "88c8e391-1c49-44a8-bcae-d7ee982ca57f"
       },
       "ready": true,
       "rebuild_after_direction_policy": true,
       "image_verified": true,
       "skeleton_joints": 18,
-      "rotation_count": 8
+      "rotation_count": 8,
+      "exported": false
     },
     "spangdal": {
       "name": "스팡달",
@@ -1201,18 +2155,20 @@
       "ready": true,
       "image_verified": true,
       "skeleton_joints": 18,
-      "rotation_count": 8
+      "rotation_count": 8,
+      "exported": true
     },
     "aileen": {
       "name": "에일린",
       "group": "management",
-      "character_id": null,
+      "character_id": "8fc35b6a-3e82-4148-8ed1-db3481d8cede",
       "image": "1a3d97f8-4f8a-490e-afd9-5f5754e87060",
-      "registration": null,
+      "registration": "a996f9f5-1eb1-41e6-a7af-377263cff9b3",
       "motions": {},
       "ready": false,
       "repair_id": "stature-v2-aileen",
-      "visual_review_required": true
+      "visual_review_required": true,
+      "image_verified": true
     },
     "gorgodio": {
       "name": "고르고디오",
@@ -1224,55 +2180,61 @@
       "ready": true,
       "image_verified": true,
       "skeleton_joints": 18,
-      "rotation_count": 8
+      "rotation_count": 8,
+      "exported": true
     },
     "kyuras": {
       "name": "큐라스",
       "group": "management",
-      "character_id": null,
+      "character_id": "7cf2502d-e2e9-4677-bc53-ec1b9d76a11d",
       "image": "3591405c-06e8-4141-9afb-81a4e423f965",
-      "registration": null,
+      "registration": "b304d6f1-31b5-4a0f-a28c-9c625d4b0fdc",
       "motions": {},
       "ready": false,
       "repair_id": "stature-v2-kyuras",
-      "visual_review_required": true
+      "visual_review_required": true,
+      "image_verified": true
     },
     "deadpole": {
       "name": "데드폴",
       "group": "management",
-      "character_id": "0c652edd-65f2-4d86-9294-196376a2d0ea",
-      "image": "0568cdf1-af39-4a34-94e1-a492b322a400",
-      "registration": "3aa93392-d116-470e-a5f8-bcf3dad5eff9",
+      "character_id": null,
+      "image": "86ea3180-a8b5-44cb-9018-3aae95668543",
+      "registration": null,
       "motions": {},
       "ready": false,
-      "image_verified": true
+      "repair_id": "stature-v2-deadpole",
+      "visual_review_required": true
     },
     "geshugan": {
       "name": "게슈간",
       "group": "management",
-      "character_id": null,
+      "character_id": "a3af18df-782b-44d0-9fa6-c05ee03d84ab",
       "image": "62740c2d-eb38-4eba-8555-357190310a70",
-      "registration": null,
+      "registration": "66bfcf1b-fcce-44ef-b0f4-2986e0e1c331",
       "motions": {},
-      "ready": false
+      "ready": false,
+      "image_verified": true
     },
     "rojemon": {
       "name": "로제몬",
       "group": "management",
-      "character_id": null,
+      "character_id": "27643078-cb88-455f-abf5-3be5bdb3ff68",
       "image": "06d28e8f-5791-4543-b918-3fcc4863a8ba",
-      "registration": null,
+      "registration": "cb41e6eb-69d9-44e7-8d23-c904d87f016c",
       "motions": {},
-      "ready": false
+      "ready": false,
+      "image_verified": true
     },
     "konjyuce": {
       "name": "콘쥬스",
       "group": "management",
-      "character_id": null,
-      "image": "submitting:1792780308550",
-      "registration": null,
+      "character_id": "1cfdc1a3-19f6-4c87-85c5-e59329f657f5",
+      "image": "0dc42b65-e471-4ff1-ae53-3195b75dd1bf",
+      "registration": "cad7e67c-dfc7-49fc-8681-18ac2e1070d0",
       "motions": {},
-      "ready": false
+      "ready": false,
+      "image_verified": true
     },
     "gognija": {
       "name": "고그니쟈",
@@ -2704,9 +3666,630 @@
           "pricing_provisional": true
         }
       }
+    },
+    {
+      "at": "2026-10-23T18:32:02Z",
+      "kind": "submitted",
+      "slug": "konjyuce",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "0dc42b65-e471-4ff1-ae53-3195b75dd1bf",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "0dc42b65-e471-4ff1-ae53-3195b75dd1bf",
+          "image_id": "9f8fb1e1-bca5-5212-bbe4-64c2529f244c",
+          "source_image_id": "9f8fb1e1-bca5-5212-bbe4-64c2529f244c",
+          "status": "processing",
+          "output_count": 1,
+          "image_size": {
+            "width": 128,
+            "height": 256
+          },
+          "estimated_generations": 9,
+          "pricing_provisional": true
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T18:32:11Z",
+      "kind": "submitted",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "running-jump",
+        "job_id": "20c53ac5-eaa5-488f-a5c8-cff4d09e0b59",
+        "receipt": {
+          "background_job_ids": [
+            "20c53ac5-eaa5-488f-a5c8-cff4d09e0b59"
+          ],
+          "directions": [
+            "east"
+          ],
+          "animation_group_id": "47e8b847-f4cd-4872-bfd3-84f289bd42c4",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T18:32:26Z",
+      "kind": "submitted",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "running-slide",
+        "job_id": "1e3ed3a1-22dc-44a3-86ef-9bd03998c486",
+        "receipt": {
+          "background_job_ids": [
+            "1e3ed3a1-22dc-44a3-86ef-9bd03998c486"
+          ],
+          "directions": [
+            "east"
+          ],
+          "animation_group_id": "a932cdb0-4016-4583-97fb-80dc044328fa",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T18:32:33Z",
+      "kind": "submitted",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "crouched-walking",
+        "job_id": "ee2d7d2d-860e-4ff9-b925-f3d9acaf8277",
+        "receipt": {
+          "background_job_ids": [
+            "ee2d7d2d-860e-4ff9-b925-f3d9acaf8277"
+          ],
+          "directions": [
+            "east"
+          ],
+          "animation_group_id": "39e4964a-3385-4d99-95da-7c48ff1e3455",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T18:32:39Z",
+      "kind": "submitted",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "sad-walk",
+        "job_id": "e2d99108-cd3c-4e66-b575-dcdeed69cd5b",
+        "receipt": {
+          "background_job_ids": [
+            "e2d99108-cd3c-4e66-b575-dcdeed69cd5b"
+          ],
+          "directions": [
+            "east"
+          ],
+          "animation_group_id": "f1d0e8b4-ae8d-4ff9-ae48-b22b311ab350",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T18:32:52Z",
+      "kind": "submitted",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "front-flip",
+        "job_id": "be258cb3-8f10-40de-af51-75fee8b5f1a8",
+        "receipt": {
+          "background_job_ids": [
+            "be258cb3-8f10-40de-af51-75fee8b5f1a8"
+          ],
+          "directions": [
+            "east"
+          ],
+          "animation_group_id": "601cbfbe-9a2b-4875-a842-b6fe5b640074",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T18:33:31Z",
+      "kind": "submitted",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "backflip",
+        "job_id": "3eae8f78-2351-4240-a4b2-98b446f3a1b5",
+        "receipt": {
+          "background_job_ids": [
+            "3eae8f78-2351-4240-a4b2-98b446f3a1b5"
+          ],
+          "directions": [
+            "east"
+          ],
+          "animation_group_id": "68d30996-0f7e-459f-ba79-d0d4a6d48f68",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T18:33:49Z",
+      "kind": "submitted",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "jumping-1",
+        "job_id": "12c55bf7-5e4a-48b6-8536-aeac9c52fd58",
+        "receipt": {
+          "background_job_ids": [
+            "12c55bf7-5e4a-48b6-8536-aeac9c52fd58"
+          ],
+          "directions": [
+            "east"
+          ],
+          "animation_group_id": "05739c03-4ac1-4303-a232-a9369c6ecfcf",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T18:33:59Z",
+      "kind": "submitted",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "jumping-2",
+        "job_id": "d188f155-3ae4-4533-8ee4-a017918d68d5",
+        "receipt": {
+          "background_job_ids": [
+            "d188f155-3ae4-4533-8ee4-a017918d68d5"
+          ],
+          "directions": [
+            "east"
+          ],
+          "animation_group_id": "33f5e645-ddb7-43cf-b558-73c444c55a12",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T18:34:10Z",
+      "kind": "submitted",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "two-footed-jump",
+        "job_id": "42f5a655-5dcb-4294-b435-c657b5721482",
+        "receipt": {
+          "background_job_ids": [
+            "42f5a655-5dcb-4294-b435-c657b5721482"
+          ],
+          "directions": [
+            "east"
+          ],
+          "animation_group_id": "d1211797-55a9-46b8-bae4-be57a80d706c",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T18:34:22Z",
+      "kind": "submitted",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "drinking",
+        "job_id": "bfd08828-e4de-461d-ad55-c84a3dfeb679",
+        "receipt": {
+          "background_job_ids": [
+            "bfd08828-e4de-461d-ad55-c84a3dfeb679"
+          ],
+          "directions": [
+            "south-east"
+          ],
+          "animation_group_id": "5f91faf9-3c67-472e-a8c5-d7d1480b503c",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T18:34:26Z",
+      "kind": "submitted",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "picking-up",
+        "job_id": "88c8e391-1c49-44a8-bcae-d7ee982ca57f",
+        "receipt": {
+          "background_job_ids": [
+            "88c8e391-1c49-44a8-bcae-d7ee982ca57f"
+          ],
+          "directions": [
+            "east"
+          ],
+          "animation_group_id": "071c3c12-cc09-4e53-b6d0-bbac428cfd15",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T18:34:28Z",
+      "kind": "exported",
+      "slug": "jaemtri",
+      "detail": {
+        "bytes": 99036,
+        "files": 9
+      }
+    },
+    {
+      "at": "2026-10-23T18:34:39Z",
+      "kind": "exported",
+      "slug": "gorgodio",
+      "detail": {
+        "bytes": 97166,
+        "files": 9
+      }
+    },
+    {
+      "at": "2026-10-23T18:35:11Z",
+      "kind": "completed",
+      "slug": "deadpole",
+      "detail": {
+        "kind": "registration",
+        "template": null,
+        "job_id": "3aa93392-d116-470e-a5f8-bcf3dad5eff9",
+        "usage": {
+          "type": "generations",
+          "generations": 4.0
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T18:35:13Z",
+      "kind": "completed",
+      "slug": "geshugan",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "62740c2d-eb38-4eba-8555-357190310a70",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 9
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T18:35:13Z",
+      "kind": "completed",
+      "slug": "aileen",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "1a3d97f8-4f8a-490e-afd9-5f5754e87060",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 9
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T18:35:13Z",
+      "kind": "completed",
+      "slug": "kyuras",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "3591405c-06e8-4141-9afb-81a4e423f965",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 9
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T18:35:13Z",
+      "kind": "completed",
+      "slug": "rojemon",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "06d28e8f-5791-4543-b918-3fcc4863a8ba",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 9
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T18:35:13Z",
+      "kind": "completed",
+      "slug": "konjyuce",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "0dc42b65-e471-4ff1-ae53-3195b75dd1bf",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 9
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T18:35:19Z",
+      "kind": "repair-started",
+      "slug": "deadpole",
+      "detail": {
+        "id": "stature-v2-deadpole",
+        "slug": "deadpole",
+        "reason": "Petite character 226px, only 6px shorter than tall Jyaldi; common height target flattened stature.",
+        "action": "regenerate-front-and-register",
+        "estimated_generations": 13,
+        "correction": "Use updated manifest individual stature range and rendering-only style reference; preserve original costume and build. Review native result before accepting."
+      }
+    },
+    {
+      "at": "2026-10-23T18:35:22Z",
+      "kind": "image-verified",
+      "slug": "aileen",
+      "detail": {
+        "size": [
+          128,
+          256
+        ],
+        "bbox": [
+          34,
+          23,
+          92,
+          246
+        ],
+        "colors": 48,
+        "alpha": [
+          0,
+          255
+        ],
+        "original_pixels_preserved": true
+      }
+    },
+    {
+      "at": "2026-10-23T18:35:32Z",
+      "kind": "image-verified",
+      "slug": "kyuras",
+      "detail": {
+        "size": [
+          128,
+          256
+        ],
+        "bbox": [
+          28,
+          8,
+          98,
+          250
+        ],
+        "colors": 48,
+        "alpha": [
+          0,
+          255
+        ],
+        "original_pixels_preserved": true
+      }
+    },
+    {
+      "at": "2026-10-23T18:35:38Z",
+      "kind": "image-verified",
+      "slug": "geshugan",
+      "detail": {
+        "size": [
+          128,
+          256
+        ],
+        "bbox": [
+          26,
+          12,
+          92,
+          250
+        ],
+        "colors": 48,
+        "alpha": [
+          0,
+          255
+        ],
+        "original_pixels_preserved": true
+      }
+    },
+    {
+      "at": "2026-10-23T18:35:46Z",
+      "kind": "image-verified",
+      "slug": "rojemon",
+      "detail": {
+        "size": [
+          128,
+          256
+        ],
+        "bbox": [
+          33,
+          25,
+          96,
+          246
+        ],
+        "colors": 48,
+        "alpha": [
+          0,
+          255
+        ],
+        "original_pixels_preserved": true
+      }
+    },
+    {
+      "at": "2026-10-23T18:35:48Z",
+      "kind": "image-verified",
+      "slug": "konjyuce",
+      "detail": {
+        "size": [
+          128,
+          256
+        ],
+        "bbox": [
+          28,
+          24,
+          89,
+          246
+        ],
+        "colors": 48,
+        "alpha": [
+          0,
+          255
+        ],
+        "original_pixels_preserved": true
+      }
+    },
+    {
+      "at": "2026-10-23T18:35:55Z",
+      "kind": "submitted",
+      "slug": "aileen",
+      "detail": {
+        "kind": "registration",
+        "template": null,
+        "job_id": "a996f9f5-1eb1-41e6-a7af-377263cff9b3",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "a996f9f5-1eb1-41e6-a7af-377263cff9b3",
+          "character_id": "8fc35b6a-3e82-4148-8ed1-db3481d8cede",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T18:36:20Z",
+      "kind": "submitted",
+      "slug": "kyuras",
+      "detail": {
+        "kind": "registration",
+        "template": null,
+        "job_id": "b304d6f1-31b5-4a0f-a28c-9c625d4b0fdc",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "b304d6f1-31b5-4a0f-a28c-9c625d4b0fdc",
+          "character_id": "7cf2502d-e2e9-4677-bc53-ec1b9d76a11d",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T18:36:29Z",
+      "kind": "submitted",
+      "slug": "geshugan",
+      "detail": {
+        "kind": "registration",
+        "template": null,
+        "job_id": "66bfcf1b-fcce-44ef-b0f4-2986e0e1c331",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "66bfcf1b-fcce-44ef-b0f4-2986e0e1c331",
+          "character_id": "a3af18df-782b-44d0-9fa6-c05ee03d84ab",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T18:36:33Z",
+      "kind": "submitted",
+      "slug": "rojemon",
+      "detail": {
+        "kind": "registration",
+        "template": null,
+        "job_id": "cb41e6eb-69d9-44e7-8d23-c904d87f016c",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "cb41e6eb-69d9-44e7-8d23-c904d87f016c",
+          "character_id": "27643078-cb88-455f-abf5-3be5bdb3ff68",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T18:36:43Z",
+      "kind": "submitted",
+      "slug": "konjyuce",
+      "detail": {
+        "kind": "registration",
+        "template": null,
+        "job_id": "cad7e67c-dfc7-49fc-8681-18ac2e1070d0",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "cad7e67c-dfc7-49fc-8681-18ac2e1070d0",
+          "character_id": "1cfdc1a3-19f6-4c87-85c5-e59329f657f5",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T18:36:48Z",
+      "kind": "submitted",
+      "slug": "deadpole",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "86ea3180-a8b5-44cb-9018-3aae95668543",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "86ea3180-a8b5-44cb-9018-3aae95668543",
+          "image_id": "44ce8654-2856-5973-b506-776914923ecd",
+          "source_image_id": "44ce8654-2856-5973-b506-776914923ecd",
+          "status": "processing",
+          "output_count": 1,
+          "image_size": {
+            "width": 128,
+            "height": 256
+          },
+          "estimated_generations": 9,
+          "pricing_provisional": true
+        }
+      }
     }
   ],
-  "updated_at": 1792780308.5501685,
+  "updated_at": 1792780608.5700843,
   "user_stopped_at": 1792778235.6917784,
   "archived_jobs": {
     "304457e9-6577-44f0-af17-97841a9f6720": {
@@ -4028,19 +5611,20 @@
   "last_git_checkpoint": 1792780251.120596,
   "summary": {
     "jobs": {
-      "processing": 9,
-      "completed": 9,
+      "processing": 20,
+      "completed": 19,
       "failed": 0,
       "stalled": 0
     },
-    "characters_ready": 2,
+    "characters_ready": 4,
     "characters_total": 55,
-    "images_verified": 7,
-    "motions_submitted": 3,
+    "images_verified": 9,
+    "motions_submitted": 14,
     "motions_target": 1100
   },
   "applied_repairs": [
     "stature-v2-aileen",
-    "stature-v2-kyuras"
+    "stature-v2-kyuras",
+    "stature-v2-deadpole"
   ]
 }

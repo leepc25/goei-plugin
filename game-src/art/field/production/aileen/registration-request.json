@@ -1,0 +1,14 @@
+{
+  "description": "에일린 / Aileen. Adult woman early20s, faded platinum blonde hair in a high ponytail with long bangs, dull gray eyes, serious analytical face, petite compact athletic build, practical fitted black trouser suit and black closed shoes as in her original portrait. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
+  "reference_image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "n_directions": 8,
+  "view": "low top-down",
+  "template_id": "mannequin",
+  "name": "에일린",
+  "seed": 10222027,
+  "no_background": true
+}

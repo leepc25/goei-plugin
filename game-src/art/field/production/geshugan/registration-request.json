@@ -1,0 +1,14 @@
+{
+  "description": "게슈간 / Geshugan. Adult woman mid20s, short snow white blunt bob with bangs, cold clear blue eyes, athletic toned natural build, impassive face, loose white open collar long sleeve shirt with sleeves rolled to elbows, black business trousers and black shoes. No necktie. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
+  "reference_image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "n_directions": 8,
+  "view": "low top-down",
+  "template_id": "mannequin",
+  "name": "게슈간",
+  "seed": 10222027,
+  "no_background": true
+}
