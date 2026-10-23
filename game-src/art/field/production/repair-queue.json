@@ -5,7 +5,7 @@
     "reason": "Petite compact character 225px, only 7px shorter than tall Jyaldi; common height target flattened stature.",
     "action": "regenerate-front-and-register",
     "estimated_generations": 13,
-    "correction": "Use updated manifest individual stature range and rendering-only style reference; preserve original costume and build. Review native result before accepting."
+    "correction": "Use latest manifest and height-policy.json cm specification at shared1.25px/cm. Preserve individual original body shape and costume; Aileen has natural non-bulky build and ballistic vest under suit jacket. Actual crown-to-sole result needs comparison."
   },
   {
     "id": "stature-v2-deadpole",
@@ -13,7 +13,7 @@
     "reason": "Petite character 226px, only 6px shorter than tall Jyaldi; common height target flattened stature.",
     "action": "regenerate-front-and-register",
     "estimated_generations": 13,
-    "correction": "Use updated manifest individual stature range and rendering-only style reference; preserve original costume and build. Review native result before accepting."
+    "correction": "Use latest manifest and height-policy.json cm specification at shared1.25px/cm. Preserve individual original body shape and costume; Aileen has natural non-bulky build and ballistic vest under suit jacket. Actual crown-to-sole result needs comparison."
   },
   {
     "id": "stature-v2-kyuras",
@@ -21,14 +21,14 @@
     "reason": "Wiry character 242px is as tall as canonical 2m Gorgodio241px; stature was not established by original setting.",
     "action": "regenerate-front-and-register",
     "estimated_generations": 13,
-    "correction": "Use updated manifest individual stature range and rendering-only style reference; preserve original costume and build. Review native result before accepting."
+    "correction": "Use latest manifest and height-policy.json cm specification at shared1.25px/cm. Preserve individual original body shape and costume; Aileen has natural non-bulky build and ballistic vest under suit jacket. Actual crown-to-sole result needs comparison."
   },
   {
     "id": "aileen-athletic-v3",
     "slug": "aileen",
     "action": "regenerate-front-and-register",
     "reason": "Superseded by latest user: Jyaldi-comparable natural build, no muscular bulk; ballistic vest UNDER suit jacket.",
-    "correction": "Use updated manifest230-236px natural build; shirt then low-profile ballistic vest then outer black suit jacket. No bulky shoulders or external armor.",
+    "correction": "Use latest manifest and height-policy.json cm specification at shared1.25px/cm. Preserve individual original body shape and costume; Aileen has natural non-bulky build and ballistic vest under suit jacket. Actual crown-to-sole result needs comparison.",
     "estimated_generations": 13
   }
 ]

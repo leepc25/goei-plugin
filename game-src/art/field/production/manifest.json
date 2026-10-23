@@ -12,7 +12,7 @@
     "character_id": null,
     "previous_character_id": "ed6456b1-dec7-4c1d-851a-5096362ca614",
     "pixel_request": {
-      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult Korean woman in her thirties, long loose straight black hair with asymmetric side part, distinct crimson red irises, mature narrow eyes and calm stern expression, tall naturally full-busted adult physique, black tailored blazer and straight black business trousers, white closed collared shirt with BLACK NECKTIE, fitted black gloves and plain black formal shoes with low practical heels. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 230-238px on128x256; tall; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
+      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult Korean woman in her thirties, long loose straight black hair with asymmetric side part, distinct crimson red irises, mature narrow eyes and calm stern expression, tall naturally full-busted adult physique, black tailored blazer and straight black business trousers, white closed collared shirt with BLACK NECKTIE, fitted black gloves and plain black formal shoes with low practical heels. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 210-214px on128x256 at shared1.25px/cm; height 170cm; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
       "image_size": {
         "width": 128,
         "height": 256
@@ -32,13 +32,18 @@
       "style_usage_description": "Use ONLY pixel rendering, outline, shading and lighting. Do not copy the reference male height, body shape, shoulder width, outfit or identity. Preserve this character own stature, build, age, hair, irises and original clothing colors and silhouette. FRONT view."
     },
     "stature_rendering": {
-      "basis": "tall",
-      "target_body_pixels": [
-        230,
-        238
+      "basis": "Latest explicit user height specification; overrides previous provisional height classes and conflicting wiki height",
+      "height_cm_range": [
+        170,
+        170
       ],
-      "canonical_height_cm": null,
-      "note": "Pixel ranges are production targets, not invented canonical height. Preserve original build and clothing; validate together at identical zoom."
+      "canonical_height_cm": 170,
+      "target_body_pixels": [
+        210,
+        214
+      ],
+      "pixels_per_cm": 1.25,
+      "note": "Common production scale; do not fit each person to full canvas. Compare anatomical crown-to-sole height; hair/headwear and heels need separate allowance. Unspecified individual female height stays a range."
     }
   },
   {
@@ -53,7 +58,7 @@
     "source_images_visually_reviewed": true,
     "character_id": null,
     "pixel_request": {
-      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult woman mid20s, pale skin, short wavy purple bob covering one eye, clearly gold irises, faint unsettling half smile, slender natural adult build, black tailored skirt suit, white closed shirt, black necktie, black pumps. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 212-224px on128x256; height unspecified; provisional medium stature; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
+      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult woman mid20s, pale skin, short wavy purple bob covering one eye, clearly gold irises, faint unsettling half smile, slender natural adult build, black tailored skirt suit, white closed shirt, black necktie, black pumps. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 200-206px on128x256 at shared1.25px/cm; height 160-165cm; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
       "image_size": {
         "width": 128,
         "height": 256
@@ -73,13 +78,18 @@
       "style_usage_description": "Use ONLY pixel rendering, outline, shading and lighting. Do not copy the reference male height, body shape, shoulder width, outfit or identity. Preserve this character own stature, build, age, hair, irises and original clothing colors and silhouette. FRONT view."
     },
     "stature_rendering": {
-      "basis": "height unspecified; provisional medium stature",
-      "target_body_pixels": [
-        212,
-        224
+      "basis": "Latest explicit user height specification; overrides previous provisional height classes and conflicting wiki height",
+      "height_cm_range": [
+        160,
+        165
       ],
       "canonical_height_cm": null,
-      "note": "Pixel ranges are production targets, not invented canonical height. Preserve original build and clothing; validate together at identical zoom."
+      "target_body_pixels": [
+        200,
+        206
+      ],
+      "pixels_per_cm": 1.25,
+      "note": "Common production scale; do not fit each person to full canvas. Compare anatomical crown-to-sole height; hair/headwear and heels need separate allowance. Unspecified individual female height stays a range."
     }
   },
   {
@@ -94,7 +104,7 @@
     "source_images_visually_reviewed": true,
     "character_id": null,
     "pixel_request": {
-      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult woman late20s, long chestnut brown wavy hair below shoulders, soft green eyes, warm friendly smile, curvy natural adult build, black tailored office skirt suit, white shirt, black necktie, black high heels. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 212-224px on128x256; height unspecified; provisional medium stature; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
+      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult woman late20s, long chestnut brown wavy hair below shoulders, soft green eyes, warm friendly smile, curvy natural adult build, black tailored office skirt suit, white shirt, black necktie, black high heels. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 200-206px on128x256 at shared1.25px/cm; height 160-165cm; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
       "image_size": {
         "width": 128,
         "height": 256
@@ -114,13 +124,18 @@
       "style_usage_description": "Use ONLY pixel rendering, outline, shading and lighting. Do not copy the reference male height, body shape, shoulder width, outfit or identity. Preserve this character own stature, build, age, hair, irises and original clothing colors and silhouette. FRONT view."
     },
     "stature_rendering": {
-      "basis": "height unspecified; provisional medium stature",
-      "target_body_pixels": [
-        212,
-        224
+      "basis": "Latest explicit user height specification; overrides previous provisional height classes and conflicting wiki height",
+      "height_cm_range": [
+        160,
+        165
       ],
       "canonical_height_cm": null,
-      "note": "Pixel ranges are production targets, not invented canonical height. Preserve original build and clothing; validate together at identical zoom."
+      "target_body_pixels": [
+        200,
+        206
+      ],
+      "pixels_per_cm": 1.25,
+      "note": "Common production scale; do not fit each person to full canvas. Compare anatomical crown-to-sole height; hair/headwear and heels need separate allowance. Unspecified individual female height stays a range."
     }
   },
   {
@@ -128,14 +143,14 @@
     "name": "에일린",
     "group": "management",
     "slug": "aileen",
-    "appearance": "Adult woman early20s, faded platinum blonde hair in a high ponytail with long bangs, dull gray eyes, serious analytical face. Natural adult stature and build comparable to Jyaldi, normal shoulders and limbs, no bulky muscles. Black business trouser suit and black closed shoes. A low-profile black ballistic vest worn OVER the white shirt but UNDER the black suit jacket; vest front visible between the open jacket lapels, jacket remains the outermost layer. Subtle vest thickness, no oversized armor plates or external tactical pouches.",
+    "appearance": "Adult woman early20s, faded platinum blonde hair in a high ponytail with long bangs, dull gray eyes, serious analytical face. Natural adult build comparable to Jyaldi; height160-165cm, slightly shorter than170cm Jyaldi, normal shoulders and limbs, no bulky muscles. Black business trouser suit and black closed shoes. A low-profile black ballistic vest worn OVER the white shirt but UNDER the black suit jacket; vest front visible between the open jacket lapels, jacket remains the outermost layer. Subtle vest thickness, no oversized armor plates or external tactical pouches.",
     "original_art": "assets/agents/Aileen_default.avif",
     "original_sha256": "42d7d2096740eb0f76d64ec65c0bb6742a7b7b915dc885d8cc8a9f2bf330c7b3",
     "wiki_appearance": "[Paragraph]바랜 백금발을 높게 묶은 포니테일, 빛이 빠진 탁한 눈. 이 눈이 표지판이나 지형이나 사람을 읽을 때 한층 더 가늘어진다. 늘 뭔가를 판단하는 중인 사람 특유의 정지된 분위기가 있다. 대화 도중에도 총을 손질하고, 질문에는 작업에서 눈을 떼지 않고 답한다.\n[Paragraph]체격은 작고 단단하다. 타고난 몸이 아니라 단련된 몸이다. 움직임에 군더더기가 없어서, 처음 보는 무장 인원들도 이 사람이 자기들보다 계급이 높다는 걸 정확히 알아챈다. 현장 복장은 의전보다 실용이다. 정장 위에 대충 걸친 방탄조끼, 권총집, 점검을 마치고 어깨에 멘 소총.\n[Paragraph]출동 전 장비 착용 순서는 언제나 같다. ❗조끼, 권총, 장총, 점검.❗ 총이 통하지 않을 게 뻔한 괴이 앞에서도 이 순서를 지킨다. 팀원들은 이걸 거의 미신에 가까운 정비 습관이라고 부른다.✂️미신치고는 생존율이 너무 좋다.✂️\n",
     "source_images_visually_reviewed": true,
     "character_id": null,
     "pixel_request": {
-      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult woman early20s, faded platinum blonde hair in a high ponytail with long bangs, dull gray eyes, serious analytical face. Natural adult stature and build comparable to Jyaldi, normal shoulders and limbs, no bulky muscles. Black business trouser suit and black closed shoes. A low-profile black ballistic vest worn OVER the white shirt but UNDER the black suit jacket; vest front visible between the open jacket lapels, jacket remains the outermost layer. Subtle vest thickness, no oversized armor plates or external tactical pouches. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 230-236px on128x256; natural adult stature comparable to Jyaldi; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
+      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult woman early20s, faded platinum blonde hair in a high ponytail with long bangs, dull gray eyes, serious analytical face. Natural adult build comparable to Jyaldi; height160-165cm, slightly shorter than170cm Jyaldi, normal shoulders and limbs, no bulky muscles. Black business trouser suit and black closed shoes. A low-profile black ballistic vest worn OVER the white shirt but UNDER the black suit jacket; vest front visible between the open jacket lapels, jacket remains the outermost layer. Subtle vest thickness, no oversized armor plates or external tactical pouches. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 200-206px on128x256 at shared1.25px/cm; height 160-165cm; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
       "image_size": {
         "width": 128,
         "height": 256
@@ -155,13 +170,18 @@
       "style_usage_description": "Use ONLY pixel rendering, outline, shading and lighting. Do not copy the reference male height, body shape, shoulder width, outfit or identity. Preserve this character own stature, build, age, hair, irises and original clothing colors and silhouette. FRONT view."
     },
     "stature_rendering": {
-      "basis": "User correction: stature and natural build comparable to Jyaldi; no bulky muscles",
-      "target_body_pixels": [
-        230,
-        236
+      "basis": "Latest explicit user height specification; overrides previous provisional height classes and conflicting wiki height",
+      "height_cm_range": [
+        160,
+        165
       ],
       "canonical_height_cm": null,
-      "note": "Pixel ranges are production targets, not invented canonical height. Preserve original build and clothing; validate together at identical zoom."
+      "target_body_pixels": [
+        200,
+        206
+      ],
+      "pixels_per_cm": 1.25,
+      "note": "Common production scale; do not fit each person to full canvas. Compare anatomical crown-to-sole height; hair/headwear and heels need separate allowance. Unspecified individual female height stays a range."
     },
     "outfit_user_override": "Ballistic vest over shirt, under suit jacket. Latest user instruction overrides wiki vest-over-suit description."
   },
@@ -177,7 +197,7 @@
     "source_images_visually_reviewed": true,
     "character_id": null,
     "pixel_request": {
-      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult man early30s, very tall broad muscular wrestler build, bald head, neatly trimmed black goatee, confident stern face, black leather motorcycle jacket over white shirt and black necktie, black business trousers and heavy black shoes. No summoned armor. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 240-244px on128x256; very tall; canonical height 2 metres; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
+      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult man early30s, very tall broad muscular wrestler build, bald head, neatly trimmed black goatee, confident stern face, black leather motorcycle jacket over white shirt and black necktie, black business trousers and heavy black shoes. No summoned armor. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 236-240px on128x256 at shared1.25px/cm; height 190cm; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
       "image_size": {
         "width": 128,
         "height": 256
@@ -197,13 +217,18 @@
       "style_usage_description": "Use ONLY pixel rendering, outline, shading and lighting. Do not copy the reference male height, body shape, shoulder width, outfit or identity. Preserve this character own stature, build, age, hair, irises and original clothing colors and silhouette. FRONT view."
     },
     "stature_rendering": {
-      "basis": "very tall; canonical height 2 metres",
-      "target_body_pixels": [
-        240,
-        244
+      "basis": "Latest explicit user height specification; overrides previous provisional height classes and conflicting wiki height",
+      "height_cm_range": [
+        190,
+        190
       ],
-      "canonical_height_cm": 200,
-      "note": "Pixel ranges are production targets, not invented canonical height. Preserve original build and clothing; validate together at identical zoom."
+      "canonical_height_cm": 190,
+      "target_body_pixels": [
+        236,
+        240
+      ],
+      "pixels_per_cm": 1.25,
+      "note": "Common production scale; do not fit each person to full canvas. Compare anatomical crown-to-sole height; hair/headwear and heels need separate allowance. Unspecified individual female height stays a range."
     }
   },
   {
@@ -218,7 +243,7 @@
     "source_images_visually_reviewed": true,
     "character_id": null,
     "pixel_request": {
-      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult man early30s, thin wiry build, pale green hair swept back, narrow face, gray green eyes, lively confident smile, black tailored trouser suit, white shirt, black necktie and black shoes. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 212-224px on128x256; height unspecified; provisional medium stature; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
+      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult man early30s, thin wiry build, pale green hair swept back, narrow face, gray green eyes, lively confident smile, black tailored trouser suit, white shirt, black necktie and black shoes. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 223-227px on128x256 at shared1.25px/cm; height 180cm; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
       "image_size": {
         "width": 128,
         "height": 256
@@ -238,13 +263,18 @@
       "style_usage_description": "Use ONLY pixel rendering, outline, shading and lighting. Do not copy the reference male height, body shape, shoulder width, outfit or identity. Preserve this character own stature, build, age, hair, irises and original clothing colors and silhouette. FRONT view."
     },
     "stature_rendering": {
-      "basis": "height unspecified; provisional medium stature",
-      "target_body_pixels": [
-        212,
-        224
+      "basis": "Latest explicit user height specification; overrides previous provisional height classes and conflicting wiki height",
+      "height_cm_range": [
+        180,
+        180
       ],
-      "canonical_height_cm": null,
-      "note": "Pixel ranges are production targets, not invented canonical height. Preserve original build and clothing; validate together at identical zoom."
+      "canonical_height_cm": 180,
+      "target_body_pixels": [
+        223,
+        227
+      ],
+      "pixels_per_cm": 1.25,
+      "note": "Common production scale; do not fit each person to full canvas. Compare anatomical crown-to-sole height; hair/headwear and heels need separate allowance. Unspecified individual female height stays a range."
     }
   },
   {
@@ -259,7 +289,7 @@
     "source_images_visually_reviewed": true,
     "character_id": null,
     "pixel_request": {
-      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult woman early20s, petite natural build, long straight black hair with straight bangs, soft round dark gray eyes, gentle cautious expression, black tailored trouser suit, white shirt, black necktie, black protective gloves and plain black shoes. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 192-204px on128x256; short; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
+      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult woman early20s, petite natural build, long straight black hair with straight bangs, soft round dark gray eyes, gentle cautious expression, black tailored trouser suit, white shirt, black necktie, black protective gloves and plain black shoes. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 200-206px on128x256 at shared1.25px/cm; height 160-165cm; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
       "image_size": {
         "width": 128,
         "height": 256
@@ -279,13 +309,18 @@
       "style_usage_description": "Use ONLY pixel rendering, outline, shading and lighting. Do not copy the reference male height, body shape, shoulder width, outfit or identity. Preserve this character own stature, build, age, hair, irises and original clothing colors and silhouette. FRONT view."
     },
     "stature_rendering": {
-      "basis": "short",
-      "target_body_pixels": [
-        192,
-        204
+      "basis": "Latest explicit user height specification; overrides previous provisional height classes and conflicting wiki height",
+      "height_cm_range": [
+        160,
+        165
       ],
       "canonical_height_cm": null,
-      "note": "Pixel ranges are production targets, not invented canonical height. Preserve original build and clothing; validate together at identical zoom."
+      "target_body_pixels": [
+        200,
+        206
+      ],
+      "pixels_per_cm": 1.25,
+      "note": "Common production scale; do not fit each person to full canvas. Compare anatomical crown-to-sole height; hair/headwear and heels need separate allowance. Unspecified individual female height stays a range."
     }
   },
   {
@@ -300,7 +335,7 @@
     "source_images_visually_reviewed": true,
     "character_id": null,
     "pixel_request": {
-      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult woman mid20s, short snow white blunt bob with bangs, cold clear blue eyes, athletic toned natural build, impassive face, loose white open collar long sleeve shirt with sleeves rolled to elbows, black business trousers and black shoes. No necktie. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 212-224px on128x256; height unspecified; provisional medium stature; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
+      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult woman mid20s, short snow white blunt bob with bangs, cold clear blue eyes, athletic toned natural build, impassive face, loose white open collar long sleeve shirt with sleeves rolled to elbows, black business trousers and black shoes. No necktie. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 210-214px on128x256 at shared1.25px/cm; height 170cm; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
       "image_size": {
         "width": 128,
         "height": 256
@@ -320,13 +355,18 @@
       "style_usage_description": "Use ONLY pixel rendering, outline, shading and lighting. Do not copy the reference male height, body shape, shoulder width, outfit or identity. Preserve this character own stature, build, age, hair, irises and original clothing colors and silhouette. FRONT view."
     },
     "stature_rendering": {
-      "basis": "height unspecified; provisional medium stature",
-      "target_body_pixels": [
-        212,
-        224
+      "basis": "Latest explicit user height specification; overrides previous provisional height classes and conflicting wiki height",
+      "height_cm_range": [
+        170,
+        170
       ],
-      "canonical_height_cm": null,
-      "note": "Pixel ranges are production targets, not invented canonical height. Preserve original build and clothing; validate together at identical zoom."
+      "canonical_height_cm": 170,
+      "target_body_pixels": [
+        210,
+        214
+      ],
+      "pixels_per_cm": 1.25,
+      "note": "Common production scale; do not fit each person to full canvas. Compare anatomical crown-to-sole height; hair/headwear and heels need separate allowance. Unspecified individual female height stays a range."
     }
   },
   {
@@ -341,7 +381,7 @@
     "source_images_visually_reviewed": true,
     "character_id": null,
     "pixel_request": {
-      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult woman early20s, long wavy lavender purple hair and bangs, violet eyes, petite natural adult build and defined waist, mildly annoyed expression, fitted black office skirt suit, white shirt, black necktie and black office pumps. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 192-204px on128x256; short; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
+      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult woman early20s, long wavy lavender purple hair and bangs, violet eyes, petite natural adult build and defined waist, mildly annoyed expression, fitted black office skirt suit, white shirt, black necktie and black office pumps. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 200-206px on128x256 at shared1.25px/cm; height 160-165cm; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
       "image_size": {
         "width": 128,
         "height": 256
@@ -361,13 +401,18 @@
       "style_usage_description": "Use ONLY pixel rendering, outline, shading and lighting. Do not copy the reference male height, body shape, shoulder width, outfit or identity. Preserve this character own stature, build, age, hair, irises and original clothing colors and silhouette. FRONT view."
     },
     "stature_rendering": {
-      "basis": "short",
-      "target_body_pixels": [
-        192,
-        204
+      "basis": "Latest explicit user height specification; overrides previous provisional height classes and conflicting wiki height",
+      "height_cm_range": [
+        160,
+        165
       ],
       "canonical_height_cm": null,
-      "note": "Pixel ranges are production targets, not invented canonical height. Preserve original build and clothing; validate together at identical zoom."
+      "target_body_pixels": [
+        200,
+        206
+      ],
+      "pixels_per_cm": 1.25,
+      "note": "Common production scale; do not fit each person to full canvas. Compare anatomical crown-to-sole height; hair/headwear and heels need separate allowance. Unspecified individual female height stays a range."
     }
   },
   {
@@ -382,7 +427,7 @@
     "source_images_visually_reviewed": true,
     "character_id": null,
     "pixel_request": {
-      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. 17 year old Korean schoolgirl with ordinary age appropriate teen proportions, shoulder length straight black bob with one distinctive pink streak, blue eyes, determined youthful face. Fully clothed navy school uniform blazer with light piping, white collared shirt, black necktie, gray knee length pleated school skirt, dark socks and plain black school loafers. No adult glamour styling. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 212-224px on128x256; height unspecified; provisional medium stature; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
+      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. 17 year old Korean schoolgirl with ordinary age appropriate teen proportions, shoulder length straight black bob with one distinctive pink streak, blue eyes, determined youthful face. Fully clothed navy school uniform blazer with light piping, white collared shirt, black necktie, gray knee length pleated school skirt, dark socks and plain black school loafers. No adult glamour styling. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 192-196px on128x256 at shared1.25px/cm; height 155cm; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
       "image_size": {
         "width": 128,
         "height": 256
@@ -402,13 +447,18 @@
       "style_usage_description": "Use ONLY pixel rendering, outline, shading and lighting. Do not copy the reference male height, body shape, shoulder width, outfit or identity. Preserve this character own stature, build, age, hair, irises and original clothing colors and silhouette. FRONT view."
     },
     "stature_rendering": {
-      "basis": "height unspecified; provisional medium stature",
-      "target_body_pixels": [
-        212,
-        224
+      "basis": "Latest explicit user height specification; overrides previous provisional height classes and conflicting wiki height",
+      "height_cm_range": [
+        155,
+        155
       ],
-      "canonical_height_cm": null,
-      "note": "Pixel ranges are production targets, not invented canonical height. Preserve original build and clothing; validate together at identical zoom."
+      "canonical_height_cm": 155,
+      "target_body_pixels": [
+        192,
+        196
+      ],
+      "pixels_per_cm": 1.25,
+      "note": "Common production scale; do not fit each person to full canvas. Compare anatomical crown-to-sole height; hair/headwear and heels need separate allowance. Unspecified individual female height stays a range."
     }
   },
   {
@@ -423,7 +473,7 @@
     "source_images_visually_reviewed": true,
     "character_id": null,
     "pixel_request": {
-      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult male researcher mid40s, unruly shoulder length white hair, round dark protective goggles over eyes, manic cheerful grin, ordinary lean middle aged build, long white lab coat over white shirt and black necktie, dark business trousers and black shoes. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 212-224px on128x256; height unspecified; provisional medium stature; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
+      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult male researcher mid40s, unruly shoulder length white hair, round dark protective goggles over eyes, manic cheerful grin, ordinary lean middle aged build, long white lab coat over white shirt and black necktie, dark business trousers and black shoes. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 223-227px on128x256 at shared1.25px/cm; height 180cm; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
       "image_size": {
         "width": 128,
         "height": 256
@@ -443,13 +493,18 @@
       "style_usage_description": "Use ONLY pixel rendering, outline, shading and lighting. Do not copy the reference male height, body shape, shoulder width, outfit or identity. Preserve this character own stature, build, age, hair, irises and original clothing colors and silhouette. FRONT view."
     },
     "stature_rendering": {
-      "basis": "height unspecified; provisional medium stature",
-      "target_body_pixels": [
-        212,
-        224
+      "basis": "Latest explicit user height specification; overrides previous provisional height classes and conflicting wiki height",
+      "height_cm_range": [
+        180,
+        180
       ],
-      "canonical_height_cm": null,
-      "note": "Pixel ranges are production targets, not invented canonical height. Preserve original build and clothing; validate together at identical zoom."
+      "canonical_height_cm": 180,
+      "target_body_pixels": [
+        223,
+        227
+      ],
+      "pixels_per_cm": 1.25,
+      "note": "Common production scale; do not fit each person to full canvas. Compare anatomical crown-to-sole height; hair/headwear and heels need separate allowance. Unspecified individual female height stays a range."
     }
   },
   {
@@ -464,7 +519,7 @@
     "source_images_visually_reviewed": true,
     "character_id": null,
     "pixel_request": {
-      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult woman early20s, pink twin ponytails and bangs, pinkish brown eyes, nervous shy expression, short natural adult build, black skirt suit, white collared shirt, black necktie, black low heel shoes, small plain access pass. Do not make chibi. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 192-204px on128x256; short; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
+      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult woman early20s, pink twin ponytails and bangs, pinkish brown eyes, nervous shy expression, short natural adult build, black skirt suit, white collared shirt, black necktie, black low heel shoes, small plain access pass. Do not make chibi. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 200-206px on128x256 at shared1.25px/cm; height 160-165cm; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
       "image_size": {
         "width": 128,
         "height": 256
@@ -484,13 +539,18 @@
       "style_usage_description": "Use ONLY pixel rendering, outline, shading and lighting. Do not copy the reference male height, body shape, shoulder width, outfit or identity. Preserve this character own stature, build, age, hair, irises and original clothing colors and silhouette. FRONT view."
     },
     "stature_rendering": {
-      "basis": "short",
-      "target_body_pixels": [
-        192,
-        204
+      "basis": "Latest explicit user height specification; overrides previous provisional height classes and conflicting wiki height",
+      "height_cm_range": [
+        160,
+        165
       ],
       "canonical_height_cm": null,
-      "note": "Pixel ranges are production targets, not invented canonical height. Preserve original build and clothing; validate together at identical zoom."
+      "target_body_pixels": [
+        200,
+        206
+      ],
+      "pixels_per_cm": 1.25,
+      "note": "Common production scale; do not fit each person to full canvas. Compare anatomical crown-to-sole height; hair/headwear and heels need separate allowance. Unspecified individual female height stays a range."
     }
   },
   {
@@ -1079,7 +1139,7 @@
     "source_images_visually_reviewed": true,
     "character_id": null,
     "pixel_request": {
-      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult woman late30s, dark brown hair neatly twisted into a low bun, warm brown eyes, confident gentle managerial smile, natural mature build, navy business trouser suit, white shirt, black necktie and formal black shoes. Unmasked everyday appearance matching original portrait. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 212-224px on128x256; height unspecified; provisional medium stature; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
+      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult woman late30s, dark brown hair neatly twisted into a low bun, warm brown eyes, confident gentle managerial smile, natural mature build, navy business trouser suit, white shirt, black necktie and formal black shoes. Unmasked everyday appearance matching original portrait. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 200-206px on128x256 at shared1.25px/cm; height 160-165cm; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
       "image_size": {
         "width": 128,
         "height": 256
@@ -1099,13 +1159,18 @@
       "style_usage_description": "Use ONLY pixel rendering, outline, shading and lighting. Do not copy the reference male height, body shape, shoulder width, outfit or identity. Preserve this character own stature, build, age, hair, irises and original clothing colors and silhouette. FRONT view."
     },
     "stature_rendering": {
-      "basis": "height unspecified; provisional medium stature",
-      "target_body_pixels": [
-        212,
-        224
+      "basis": "Latest explicit user height specification; overrides previous provisional height classes and conflicting wiki height",
+      "height_cm_range": [
+        160,
+        165
       ],
       "canonical_height_cm": null,
-      "note": "Pixel ranges are production targets, not invented canonical height. Preserve original build and clothing; validate together at identical zoom."
+      "target_body_pixels": [
+        200,
+        206
+      ],
+      "pixels_per_cm": 1.25,
+      "note": "Common production scale; do not fit each person to full canvas. Compare anatomical crown-to-sole height; hair/headwear and heels need separate allowance. Unspecified individual female height stays a range."
     }
   },
   {
@@ -1113,14 +1178,14 @@
     "name": "진나솔",
     "group": "baekilmong",
     "slug": "jin-na-sol",
-    "appearance": "Adult woman late20s, tall lean build, black hair in a high sleek ponytail, sharp bored dark eyes, cold severe face, fitted navy business trouser suit, white shirt, black necktie, sturdy black heels, tiny colored nail art. Unmasked original portrait appearance.",
+    "appearance": "Adult woman late20s, lean build, black hair in a high sleek ponytail, sharp bored dark eyes, cold severe face, fitted navy business trouser suit, white shirt, black necktie, sturdy black heels, tiny colored nail art. Unmasked original portrait appearance.",
     "original_art": "assets/agents/Jin Na-sol_default.avif",
     "original_sha256": "0109e8418f4321767278f883733993f2c5e0809b7f04b842dcf8f896dfc21163",
     "wiki_appearance": "[Paragraph]키가 크고 마른 체형. 검은 머리를 높게 하나로 묶었는데, 흐트러진 걸 본 사람이 없다. 날카롭고 어딘가 지루해 보이는 얼굴에 금빛 나비 가면. 몸에 딱 맞는 정장과 굽 단단한 구두를 신어서, ❗복도 저쪽에서 구두 소리만 들려도 다들 대화를 멈춘다❗.✂️사내 조기 경보 체계✂️\n[Paragraph]손톱에는 화려한 네일아트가 올라가 있고, 짜증이 나면 그걸 만지작거린다. 사정을 아는 사람들은 이 버릇을 보면 반 발짝 물러선다. 그 손톱이 장식이 아니라 무기이기 때문이다. 유난히 비싼 보상이 걸린 이야기가 나오면 눈빛이 포식자처럼 바뀐다는 증언도 있다.\n[Heading]Level:2|Title:표정 읽는 법\n[Paragraph]진나솔과 일하려면 세 가지 신호를 외워야 한다는 게 사내 정설이다.\n[List]❗혀 차는 소리❗: 경멸. 대체로 당신에게 하는 것이다.\n[List]❗한쪽 눈썹이 몇 밀리 올라감❗: \"확인했음, 알아서 해, 책임은 네가.\" 허락처럼 보이지만 면책 선언에 가깝다.\n[List]❗완전한 무표정❗: 진짜로 화났다. 이 단계에서는 말을 걸지 말고 그냥 시키는 대로 하는 게 좋다.\n[Paragraph]말투도 외모만큼 날이 서 있다. 아래로는 최소한의 단어로 된 반말 평서문뿐이다. \"야.\" \"조용히 해.\" \"귀찮네.\" 위협할 때도 목소리를 높이지 않는다. 오히려 낮아진다. 그래서 진나솔이 조용히 말할수록 듣는 쪽은 귀를 더 쫑긋 세운다.\n[Paragraph]관자놀이에 핏줄이 서는 건 덤이다. 이건 화가 난 게 아니라 머리가 아픈 것일 때가 많은데, 겉으로 보기엔 구분이 안 돼서 다들 똑같이 피한다.\n",
     "source_images_visually_reviewed": true,
     "character_id": null,
     "pixel_request": {
-      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult woman late20s, tall lean build, black hair in a high sleek ponytail, sharp bored dark eyes, cold severe face, fitted navy business trouser suit, white shirt, black necktie, sturdy black heels, tiny colored nail art. Unmasked original portrait appearance. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 230-238px on128x256; tall; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
+      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult woman late20s, lean build, black hair in a high sleek ponytail, sharp bored dark eyes, cold severe face, fitted navy business trouser suit, white shirt, black necktie, sturdy black heels, tiny colored nail art. Unmasked original portrait appearance. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 200-206px on128x256 at shared1.25px/cm; height 160-165cm; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
       "image_size": {
         "width": 128,
         "height": 256
@@ -1140,13 +1205,18 @@
       "style_usage_description": "Use ONLY pixel rendering, outline, shading and lighting. Do not copy the reference male height, body shape, shoulder width, outfit or identity. Preserve this character own stature, build, age, hair, irises and original clothing colors and silhouette. FRONT view."
     },
     "stature_rendering": {
-      "basis": "tall",
-      "target_body_pixels": [
-        230,
-        238
+      "basis": "Latest explicit user height specification; overrides previous provisional height classes and conflicting wiki height",
+      "height_cm_range": [
+        160,
+        165
       ],
       "canonical_height_cm": null,
-      "note": "Pixel ranges are production targets, not invented canonical height. Preserve original build and clothing; validate together at identical zoom."
+      "target_body_pixels": [
+        200,
+        206
+      ],
+      "pixels_per_cm": 1.25,
+      "note": "Common production scale; do not fit each person to full canvas. Compare anatomical crown-to-sole height; hair/headwear and heels need separate allowance. Unspecified individual female height stays a range."
     }
   },
   {
@@ -1161,7 +1231,7 @@
     "source_images_visually_reviewed": true,
     "character_id": null,
     "pixel_request": {
-      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult woman mid20s, petite slender build, long white wavy hair tied low over one shoulder and straight bangs, dark irises with distinct green glints, unfailing soft smile, immaculate navy trouser suit, white shirt, black necktie, cushioned dark sneakers. Unmasked everyday portrait appearance. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 192-204px on128x256; short; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
+      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult woman mid20s, petite slender build, long white wavy hair tied low over one shoulder and straight bangs, dark irises with distinct green glints, unfailing soft smile, immaculate navy trouser suit, white shirt, black necktie, cushioned dark sneakers. Unmasked everyday portrait appearance. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 200-206px on128x256 at shared1.25px/cm; height 160-165cm; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
       "image_size": {
         "width": 128,
         "height": 256
@@ -1181,13 +1251,18 @@
       "style_usage_description": "Use ONLY pixel rendering, outline, shading and lighting. Do not copy the reference male height, body shape, shoulder width, outfit or identity. Preserve this character own stature, build, age, hair, irises and original clothing colors and silhouette. FRONT view."
     },
     "stature_rendering": {
-      "basis": "short",
-      "target_body_pixels": [
-        192,
-        204
+      "basis": "Latest explicit user height specification; overrides previous provisional height classes and conflicting wiki height",
+      "height_cm_range": [
+        160,
+        165
       ],
       "canonical_height_cm": null,
-      "note": "Pixel ranges are production targets, not invented canonical height. Preserve original build and clothing; validate together at identical zoom."
+      "target_body_pixels": [
+        200,
+        206
+      ],
+      "pixels_per_cm": 1.25,
+      "note": "Common production scale; do not fit each person to full canvas. Compare anatomical crown-to-sole height; hair/headwear and heels need separate allowance. Unspecified individual female height stays a range."
     }
   },
   {
@@ -1243,7 +1318,7 @@
     "source_images_visually_reviewed": true,
     "character_id": null,
     "pixel_request": {
-      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult woman early30s, chin length navy blue straight bob with side fringe partly covering one eye, sharp tired gray eyes, pale face and cool impassive expression, lean natural build, navy trouser suit, white shirt, black necktie, black formal shoes. Unmasked original appearance. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 212-224px on128x256; height unspecified; provisional medium stature; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
+      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult woman early30s, chin length navy blue straight bob with side fringe partly covering one eye, sharp tired gray eyes, pale face and cool impassive expression, lean natural build, navy trouser suit, white shirt, black necktie, black formal shoes. Unmasked original appearance. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 200-206px on128x256 at shared1.25px/cm; height 160-165cm; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
       "image_size": {
         "width": 128,
         "height": 256
@@ -1263,13 +1338,18 @@
       "style_usage_description": "Use ONLY pixel rendering, outline, shading and lighting. Do not copy the reference male height, body shape, shoulder width, outfit or identity. Preserve this character own stature, build, age, hair, irises and original clothing colors and silhouette. FRONT view."
     },
     "stature_rendering": {
-      "basis": "height unspecified; provisional medium stature",
-      "target_body_pixels": [
-        212,
-        224
+      "basis": "Latest explicit user height specification; overrides previous provisional height classes and conflicting wiki height",
+      "height_cm_range": [
+        160,
+        165
       ],
       "canonical_height_cm": null,
-      "note": "Pixel ranges are production targets, not invented canonical height. Preserve original build and clothing; validate together at identical zoom."
+      "target_body_pixels": [
+        200,
+        206
+      ],
+      "pixels_per_cm": 1.25,
+      "note": "Common production scale; do not fit each person to full canvas. Compare anatomical crown-to-sole height; hair/headwear and heels need separate allowance. Unspecified individual female height stays a range."
     }
   },
   {
@@ -1366,7 +1446,7 @@
     "source_images_visually_reviewed": true,
     "character_id": null,
     "pixel_request": {
-      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult woman late20s, ordinary nonathletic natural build, chin length dark brown bob with straight bangs, worried brown eyes, navy trouser suit, white shirt, black necktie and black shoes. One ear has an old healed surgical seam hidden partly by hair. Unmasked original appearance. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 212-224px on128x256; height unspecified; provisional medium stature; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
+      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult woman late20s, ordinary nonathletic natural build, chin length dark brown bob with straight bangs, worried brown eyes, navy trouser suit, white shirt, black necktie and black shoes. One ear has an old healed surgical seam hidden partly by hair. Unmasked original appearance. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 200-206px on128x256 at shared1.25px/cm; height 160-165cm; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
       "image_size": {
         "width": 128,
         "height": 256
@@ -1386,13 +1466,18 @@
       "style_usage_description": "Use ONLY pixel rendering, outline, shading and lighting. Do not copy the reference male height, body shape, shoulder width, outfit or identity. Preserve this character own stature, build, age, hair, irises and original clothing colors and silhouette. FRONT view."
     },
     "stature_rendering": {
-      "basis": "height unspecified; provisional medium stature",
-      "target_body_pixels": [
-        212,
-        224
+      "basis": "Latest explicit user height specification; overrides previous provisional height classes and conflicting wiki height",
+      "height_cm_range": [
+        160,
+        165
       ],
       "canonical_height_cm": null,
-      "note": "Pixel ranges are production targets, not invented canonical height. Preserve original build and clothing; validate together at identical zoom."
+      "target_body_pixels": [
+        200,
+        206
+      ],
+      "pixels_per_cm": 1.25,
+      "note": "Common production scale; do not fit each person to full canvas. Compare anatomical crown-to-sole height; hair/headwear and heels need separate allowance. Unspecified individual female height stays a range."
     }
   },
   {
@@ -1407,7 +1492,7 @@
     "source_images_visually_reviewed": true,
     "character_id": null,
     "pixel_request": {
-      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult woman late20s, short light brown side parted hair, brown eyes, bright businesslike friendly smile, ordinary natural build, neatly fitted navy trouser suit, white shirt, black necktie and polished black shoes. No pony mask; match original portrait. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 212-224px on128x256; height unspecified; provisional medium stature; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
+      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult woman late20s, short light brown side parted hair, brown eyes, bright businesslike friendly smile, ordinary natural build, neatly fitted navy trouser suit, white shirt, black necktie and polished black shoes. No pony mask; match original portrait. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 200-206px on128x256 at shared1.25px/cm; height 160-165cm; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
       "image_size": {
         "width": 128,
         "height": 256
@@ -1427,13 +1512,18 @@
       "style_usage_description": "Use ONLY pixel rendering, outline, shading and lighting. Do not copy the reference male height, body shape, shoulder width, outfit or identity. Preserve this character own stature, build, age, hair, irises and original clothing colors and silhouette. FRONT view."
     },
     "stature_rendering": {
-      "basis": "height unspecified; provisional medium stature",
-      "target_body_pixels": [
-        212,
-        224
+      "basis": "Latest explicit user height specification; overrides previous provisional height classes and conflicting wiki height",
+      "height_cm_range": [
+        160,
+        165
       ],
       "canonical_height_cm": null,
-      "note": "Pixel ranges are production targets, not invented canonical height. Preserve original build and clothing; validate together at identical zoom."
+      "target_body_pixels": [
+        200,
+        206
+      ],
+      "pixels_per_cm": 1.25,
+      "note": "Common production scale; do not fit each person to full canvas. Compare anatomical crown-to-sole height; hair/headwear and heels need separate allowance. Unspecified individual female height stays a range."
     }
   },
   {
@@ -1530,7 +1620,7 @@
     "source_images_visually_reviewed": true,
     "character_id": null,
     "pixel_request": {
-      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult woman late20s, medium length straight dark brown hair, rectangular thin rimmed glasses, brown eyes with deep tired dark circles, calm exhausted face, ordinary unathletic build, spotless white laboratory coat over pink collared blouse, black pencil skirt and practical black low heels. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 212-224px on128x256; height unspecified; provisional medium stature; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
+      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult woman late20s, medium length straight dark brown hair, rectangular thin rimmed glasses, brown eyes with deep tired dark circles, calm exhausted face, ordinary unathletic build, spotless white laboratory coat over pink collared blouse, black pencil skirt and practical black low heels. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 200-206px on128x256 at shared1.25px/cm; height 160-165cm; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
       "image_size": {
         "width": 128,
         "height": 256
@@ -1550,13 +1640,18 @@
       "style_usage_description": "Use ONLY pixel rendering, outline, shading and lighting. Do not copy the reference male height, body shape, shoulder width, outfit or identity. Preserve this character own stature, build, age, hair, irises and original clothing colors and silhouette. FRONT view."
     },
     "stature_rendering": {
-      "basis": "height unspecified; provisional medium stature",
-      "target_body_pixels": [
-        212,
-        224
+      "basis": "Latest explicit user height specification; overrides previous provisional height classes and conflicting wiki height",
+      "height_cm_range": [
+        160,
+        165
       ],
       "canonical_height_cm": null,
-      "note": "Pixel ranges are production targets, not invented canonical height. Preserve original build and clothing; validate together at identical zoom."
+      "target_body_pixels": [
+        200,
+        206
+      ],
+      "pixels_per_cm": 1.25,
+      "note": "Common production scale; do not fit each person to full canvas. Compare anatomical crown-to-sole height; hair/headwear and heels need separate allowance. Unspecified individual female height stays a range."
     }
   },
   {
@@ -1694,7 +1789,7 @@
     "source_images_visually_reviewed": true,
     "character_id": null,
     "pixel_request": {
-      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult woman appearing mid30s, immaculate dark teal hair twisted into a low updo with side lock, black eyes, serene benevolent yet cold executive expression, mature natural build, immaculate dark navy three piece trouser suit, white shirt, black necktie and firm black heels. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 212-224px on128x256; height unspecified; provisional medium stature; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
+      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult woman appearing mid30s, immaculate dark teal hair twisted into a low updo with side lock, black eyes, serene benevolent yet cold executive expression, mature natural build, immaculate dark navy three piece trouser suit, white shirt, black necktie and firm black heels. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 200-206px on128x256 at shared1.25px/cm; height 160-165cm; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
       "image_size": {
         "width": 128,
         "height": 256
@@ -1714,13 +1809,18 @@
       "style_usage_description": "Use ONLY pixel rendering, outline, shading and lighting. Do not copy the reference male height, body shape, shoulder width, outfit or identity. Preserve this character own stature, build, age, hair, irises and original clothing colors and silhouette. FRONT view."
     },
     "stature_rendering": {
-      "basis": "height unspecified; provisional medium stature",
-      "target_body_pixels": [
-        212,
-        224
+      "basis": "Latest explicit user height specification; overrides previous provisional height classes and conflicting wiki height",
+      "height_cm_range": [
+        160,
+        165
       ],
       "canonical_height_cm": null,
-      "note": "Pixel ranges are production targets, not invented canonical height. Preserve original build and clothing; validate together at identical zoom."
+      "target_body_pixels": [
+        200,
+        206
+      ],
+      "pixels_per_cm": 1.25,
+      "note": "Common production scale; do not fit each person to full canvas. Compare anatomical crown-to-sole height; hair/headwear and heels need separate allowance. Unspecified individual female height stays a range."
     }
   },
   {
@@ -1735,7 +1835,7 @@
     "source_images_visually_reviewed": true,
     "character_id": null,
     "pixel_request": {
-      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult woman late20s, very long straight dark burgundy red hair with bangs, sharp reddish brown eyes, playful calculating smile, natural adult build, slim fitted light gray trouser suit, white shirt, black necktie and black office heels. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 212-224px on128x256; height unspecified; provisional medium stature; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
+      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult woman late20s, very long straight dark burgundy red hair with bangs, sharp reddish brown eyes, playful calculating smile, natural adult build, slim fitted light gray trouser suit, white shirt, black necktie and black office heels. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 200-206px on128x256 at shared1.25px/cm; height 160-165cm; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
       "image_size": {
         "width": 128,
         "height": 256
@@ -1755,13 +1855,18 @@
       "style_usage_description": "Use ONLY pixel rendering, outline, shading and lighting. Do not copy the reference male height, body shape, shoulder width, outfit or identity. Preserve this character own stature, build, age, hair, irises and original clothing colors and silhouette. FRONT view."
     },
     "stature_rendering": {
-      "basis": "height unspecified; provisional medium stature",
-      "target_body_pixels": [
-        212,
-        224
+      "basis": "Latest explicit user height specification; overrides previous provisional height classes and conflicting wiki height",
+      "height_cm_range": [
+        160,
+        165
       ],
       "canonical_height_cm": null,
-      "note": "Pixel ranges are production targets, not invented canonical height. Preserve original build and clothing; validate together at identical zoom."
+      "target_body_pixels": [
+        200,
+        206
+      ],
+      "pixels_per_cm": 1.25,
+      "note": "Common production scale; do not fit each person to full canvas. Compare anatomical crown-to-sole height; hair/headwear and heels need separate allowance. Unspecified individual female height stays a range."
     }
   },
   {
@@ -1776,7 +1881,7 @@
     "source_images_visually_reviewed": true,
     "character_id": null,
     "pixel_request": {
-      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult woman mid20s, sage green hair with straight fringe and two long low braids, half closed dark brown eyes, expressionless calm face, ordinary natural build, fully buttoned white long sleeve blouse, navy vest, knee length navy pencil skirt, sheer black tights and plain black pumps, small black digital wristwatch on left wrist. No necktie. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 212-224px on128x256; height unspecified; provisional medium stature; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
+      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult woman mid20s, sage green hair with straight fringe and two long low braids, half closed dark brown eyes, expressionless calm face, ordinary natural build, fully buttoned white long sleeve blouse, navy vest, knee length navy pencil skirt, sheer black tights and plain black pumps, small black digital wristwatch on left wrist. No necktie. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 200-206px on128x256 at shared1.25px/cm; height 160-165cm; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
       "image_size": {
         "width": 128,
         "height": 256
@@ -1796,13 +1901,18 @@
       "style_usage_description": "Use ONLY pixel rendering, outline, shading and lighting. Do not copy the reference male height, body shape, shoulder width, outfit or identity. Preserve this character own stature, build, age, hair, irises and original clothing colors and silhouette. FRONT view."
     },
     "stature_rendering": {
-      "basis": "height unspecified; provisional medium stature",
-      "target_body_pixels": [
-        212,
-        224
+      "basis": "Latest explicit user height specification; overrides previous provisional height classes and conflicting wiki height",
+      "height_cm_range": [
+        160,
+        165
       ],
       "canonical_height_cm": null,
-      "note": "Pixel ranges are production targets, not invented canonical height. Preserve original build and clothing; validate together at identical zoom."
+      "target_body_pixels": [
+        200,
+        206
+      ],
+      "pixels_per_cm": 1.25,
+      "note": "Common production scale; do not fit each person to full canvas. Compare anatomical crown-to-sole height; hair/headwear and heels need separate allowance. Unspecified individual female height stays a range."
     }
   },
   {
@@ -1817,7 +1927,7 @@
     "source_images_visually_reviewed": true,
     "character_id": null,
     "pixel_request": {
-      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult woman early30s, midlength straight black hair tucked behind ears and blunt bangs, cold dark brown eyes, pale skin, slim precise build, spotless white doctor's coat, muted teal medical blouse as in original portrait, dark trousers and practical black shoes, stethoscope around neck. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 212-224px on128x256; height unspecified; provisional medium stature; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
+      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult woman early30s, midlength straight black hair tucked behind ears and blunt bangs, cold dark brown eyes, pale skin, slim precise build, spotless white doctor's coat, muted teal medical blouse as in original portrait, dark trousers and practical black shoes, stethoscope around neck. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 200-206px on128x256 at shared1.25px/cm; height 160-165cm; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
       "image_size": {
         "width": 128,
         "height": 256
@@ -1837,13 +1947,18 @@
       "style_usage_description": "Use ONLY pixel rendering, outline, shading and lighting. Do not copy the reference male height, body shape, shoulder width, outfit or identity. Preserve this character own stature, build, age, hair, irises and original clothing colors and silhouette. FRONT view."
     },
     "stature_rendering": {
-      "basis": "height unspecified; provisional medium stature",
-      "target_body_pixels": [
-        212,
-        224
+      "basis": "Latest explicit user height specification; overrides previous provisional height classes and conflicting wiki height",
+      "height_cm_range": [
+        160,
+        165
       ],
       "canonical_height_cm": null,
-      "note": "Pixel ranges are production targets, not invented canonical height. Preserve original build and clothing; validate together at identical zoom."
+      "target_body_pixels": [
+        200,
+        206
+      ],
+      "pixels_per_cm": 1.25,
+      "note": "Common production scale; do not fit each person to full canvas. Compare anatomical crown-to-sole height; hair/headwear and heels need separate allowance. Unspecified individual female height stays a range."
     }
   },
   {
@@ -1858,7 +1973,7 @@
     "source_images_visually_reviewed": true,
     "character_id": null,
     "pixel_request": {
-      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult woman age24, short rounded natural adult build, peach apricot hair in two round side buns with bangs, large soft brown eyes, constant gentle innocent smile, clean white short sleeve nurse uniform with subtle peach piping and white trousers, beige utility pouch at waist, thin black hair band on left wrist, white practical nursing shoes. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 192-204px on128x256; short; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
+      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult woman age24, short rounded natural adult build, peach apricot hair in two round side buns with bangs, large soft brown eyes, constant gentle innocent smile, clean white short sleeve nurse uniform with subtle peach piping and white trousers, beige utility pouch at waist, thin black hair band on left wrist, white practical nursing shoes. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 200-206px on128x256 at shared1.25px/cm; height 160-165cm; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
       "image_size": {
         "width": 128,
         "height": 256
@@ -1878,13 +1993,18 @@
       "style_usage_description": "Use ONLY pixel rendering, outline, shading and lighting. Do not copy the reference male height, body shape, shoulder width, outfit or identity. Preserve this character own stature, build, age, hair, irises and original clothing colors and silhouette. FRONT view."
     },
     "stature_rendering": {
-      "basis": "short",
-      "target_body_pixels": [
-        192,
-        204
+      "basis": "Latest explicit user height specification; overrides previous provisional height classes and conflicting wiki height",
+      "height_cm_range": [
+        160,
+        165
       ],
       "canonical_height_cm": null,
-      "note": "Pixel ranges are production targets, not invented canonical height. Preserve original build and clothing; validate together at identical zoom."
+      "target_body_pixels": [
+        200,
+        206
+      ],
+      "pixels_per_cm": 1.25,
+      "note": "Common production scale; do not fit each person to full canvas. Compare anatomical crown-to-sole height; hair/headwear and heels need separate allowance. Unspecified individual female height stays a range."
     }
   },
   {
@@ -1899,7 +2019,7 @@
     "source_images_visually_reviewed": true,
     "character_id": null,
     "pixel_request": {
-      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult woman mid30s, short black angled inverted bob, half lowered brown eyes, pale skin and thin lips, sly faint smile with tiny left cheek dimple, lean agile build, burgundy blazer and matching business trousers over black high neck top, black loafers, thin gold bracelet and two simple rings. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 212-224px on128x256; height unspecified; provisional medium stature; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
+      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult woman mid30s, short black angled inverted bob, half lowered brown eyes, pale skin and thin lips, sly faint smile with tiny left cheek dimple, lean agile build, burgundy blazer and matching business trousers over black high neck top, black loafers, thin gold bracelet and two simple rings. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 200-206px on128x256 at shared1.25px/cm; height 160-165cm; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
       "image_size": {
         "width": 128,
         "height": 256
@@ -1919,13 +2039,18 @@
       "style_usage_description": "Use ONLY pixel rendering, outline, shading and lighting. Do not copy the reference male height, body shape, shoulder width, outfit or identity. Preserve this character own stature, build, age, hair, irises and original clothing colors and silhouette. FRONT view."
     },
     "stature_rendering": {
-      "basis": "height unspecified; provisional medium stature",
-      "target_body_pixels": [
-        212,
-        224
+      "basis": "Latest explicit user height specification; overrides previous provisional height classes and conflicting wiki height",
+      "height_cm_range": [
+        160,
+        165
       ],
       "canonical_height_cm": null,
-      "note": "Pixel ranges are production targets, not invented canonical height. Preserve original build and clothing; validate together at identical zoom."
+      "target_body_pixels": [
+        200,
+        206
+      ],
+      "pixels_per_cm": 1.25,
+      "note": "Common production scale; do not fit each person to full canvas. Compare anatomical crown-to-sole height; hair/headwear and heels need separate allowance. Unspecified individual female height stays a range."
     }
   },
   {
@@ -1933,14 +2058,14 @@
     "name": "문혜란",
     "group": "underground",
     "slug": "mun-hye-ran",
-    "appearance": "Adult woman late30s, tall naturally lean build, brown hair in low ponytail, sharp upward eyes with faint smile lines, wine lipstick, calculating relaxed smile, dark brown single breasted trouser suit, black collared shirt with top button open, pointed black formal shoes, prominent gold wristwatch.",
+    "appearance": "Adult woman late30s, naturally lean build, brown hair in low ponytail, sharp upward eyes with faint smile lines, wine lipstick, calculating relaxed smile, dark brown single breasted trouser suit, black collared shirt with top button open, pointed black formal shoes, prominent gold wristwatch.",
     "original_art": "assets/agents/Mun Hye-ran_default.avif",
     "original_sha256": "d9829bfc934110e72a2a11fa39e428df06046487261de35dec0b463928ebc1ad",
     "wiki_appearance": "[Paragraph]키가 크고 팔다리가 길쭉하다. 느슨하게 어깨를 흔들며 걷는 여유로운 걸음걸이가 특징인데, 이 여유가 사무실의 다른 모든 것과 똑같이 ❗계산된 것❗이라는 게 지하상가 사람들의 공통된 평이다. 갈색 머리를 낮게 묶었고, 날카롭게 치켜 올라간 눈, 와인색 립스틱. 눈가의 옅은 웃음 주름은 프리랜서 시절에 생긴 건데, 지금은 협상 테이블에서 아주 잘 써먹고 있다.\n[Paragraph]옷차림은 짙은 갈색 싱글 재킷에 맨 위 단추를 푼 차림, 검은 칼라 셔츠, 짙은 갈색 정장 바지, 그리고 밑창이 닳았지만 광이 나는 검은 뾰족구두. 손목에는 묵직한 금장 시계가 있다. 이 시계를 ❗딱 한 번 톡❗ 두드리는 버릇이 있는데, 방 안 사람들에게 시간이 흐르고 있다는 걸 들려주고 싶을 때만 한다. 이 톡 소리를 들은 프리랜서들은 반사적으로 펜을 집는다고 한다.📌톡 소리 한 번에 계약 체결률이 30퍼센트 오른다는 지하상가 통계가 있다는 카더라. 출처는 문혜란 본인이다.📌\n[Paragraph]재킷 안주머니에는 두툼한 가죽 장부, 색깔이 다른 대포폰 세 대, 카드 한 벌이 들어 있다는 목격담이 있다. 허리 뒤에는 짧은 접이식 진압봉. 카운터 뒤에는 비상용 야구방망이. ✂️평화로운 알선소의 기본 장비다.✂️\n",
     "source_images_visually_reviewed": true,
     "character_id": null,
     "pixel_request": {
-      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult woman late30s, tall naturally lean build, brown hair in low ponytail, sharp upward eyes with faint smile lines, wine lipstick, calculating relaxed smile, dark brown single breasted trouser suit, black collared shirt with top button open, pointed black formal shoes, prominent gold wristwatch. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 230-238px on128x256; tall; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
+      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult woman late30s, naturally lean build, brown hair in low ponytail, sharp upward eyes with faint smile lines, wine lipstick, calculating relaxed smile, dark brown single breasted trouser suit, black collared shirt with top button open, pointed black formal shoes, prominent gold wristwatch. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 200-206px on128x256 at shared1.25px/cm; height 160-165cm; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
       "image_size": {
         "width": 128,
         "height": 256
@@ -1960,13 +2085,18 @@
       "style_usage_description": "Use ONLY pixel rendering, outline, shading and lighting. Do not copy the reference male height, body shape, shoulder width, outfit or identity. Preserve this character own stature, build, age, hair, irises and original clothing colors and silhouette. FRONT view."
     },
     "stature_rendering": {
-      "basis": "tall",
-      "target_body_pixels": [
-        230,
-        238
+      "basis": "Latest explicit user height specification; overrides previous provisional height classes and conflicting wiki height",
+      "height_cm_range": [
+        160,
+        165
       ],
       "canonical_height_cm": null,
-      "note": "Pixel ranges are production targets, not invented canonical height. Preserve original build and clothing; validate together at identical zoom."
+      "target_body_pixels": [
+        200,
+        206
+      ],
+      "pixels_per_cm": 1.25,
+      "note": "Common production scale; do not fit each person to full canvas. Compare anatomical crown-to-sole height; hair/headwear and heels need separate allowance. Unspecified individual female height stays a range."
     }
   },
   {
@@ -1981,7 +2111,7 @@
     "source_images_visually_reviewed": true,
     "character_id": null,
     "pixel_request": {
-      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult woman early30s, long black hair slicked back tightly into ponytail with no bangs, narrow dark eyes, firm unflinching face, strong square shouldered athletic build, black leather jacket over dark gray T shirt, slim black trousers, tightly laced black steel toe work boots. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 212-224px on128x256; height unspecified; provisional medium stature; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
+      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult woman early30s, long black hair slicked back tightly into ponytail with no bangs, narrow dark eyes, firm unflinching face, strong square shouldered athletic build, black leather jacket over dark gray T shirt, slim black trousers, tightly laced black steel toe work boots. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 200-206px on128x256 at shared1.25px/cm; height 160-165cm; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
       "image_size": {
         "width": 128,
         "height": 256
@@ -2001,13 +2131,18 @@
       "style_usage_description": "Use ONLY pixel rendering, outline, shading and lighting. Do not copy the reference male height, body shape, shoulder width, outfit or identity. Preserve this character own stature, build, age, hair, irises and original clothing colors and silhouette. FRONT view."
     },
     "stature_rendering": {
-      "basis": "height unspecified; provisional medium stature",
-      "target_body_pixels": [
-        212,
-        224
+      "basis": "Latest explicit user height specification; overrides previous provisional height classes and conflicting wiki height",
+      "height_cm_range": [
+        160,
+        165
       ],
       "canonical_height_cm": null,
-      "note": "Pixel ranges are production targets, not invented canonical height. Preserve original build and clothing; validate together at identical zoom."
+      "target_body_pixels": [
+        200,
+        206
+      ],
+      "pixels_per_cm": 1.25,
+      "note": "Common production scale; do not fit each person to full canvas. Compare anatomical crown-to-sole height; hair/headwear and heels need separate allowance. Unspecified individual female height stays a range."
     }
   },
   {
@@ -2022,7 +2157,7 @@
     "source_images_visually_reviewed": true,
     "character_id": null,
     "pixel_request": {
-      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult woman appearing mid20s, long natural blonde hair with straight fringe beneath black and white Catholic nun veil, bright green eyes and playful confident smile, fit combatant's natural build, traditional long black nun habit with white collar and practical side slit, heavy silver cross pendant and wooden rosary at wrist, black practical boots. No held weapons. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 212-224px on128x256; height unspecified; provisional medium stature; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
+      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult woman appearing mid20s, long natural blonde hair with straight fringe beneath black and white Catholic nun veil, bright green eyes and playful confident smile, fit combatant's natural build, traditional long black nun habit with white collar and practical side slit, heavy silver cross pendant and wooden rosary at wrist, black practical boots. No held weapons. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 200-206px on128x256 at shared1.25px/cm; height 160-165cm; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
       "image_size": {
         "width": 128,
         "height": 256
@@ -2042,13 +2177,18 @@
       "style_usage_description": "Use ONLY pixel rendering, outline, shading and lighting. Do not copy the reference male height, body shape, shoulder width, outfit or identity. Preserve this character own stature, build, age, hair, irises and original clothing colors and silhouette. FRONT view."
     },
     "stature_rendering": {
-      "basis": "height unspecified; provisional medium stature",
-      "target_body_pixels": [
-        212,
-        224
+      "basis": "Latest explicit user height specification; overrides previous provisional height classes and conflicting wiki height",
+      "height_cm_range": [
+        160,
+        165
       ],
       "canonical_height_cm": null,
-      "note": "Pixel ranges are production targets, not invented canonical height. Preserve original build and clothing; validate together at identical zoom."
+      "target_body_pixels": [
+        200,
+        206
+      ],
+      "pixels_per_cm": 1.25,
+      "note": "Common production scale; do not fit each person to full canvas. Compare anatomical crown-to-sole height; hair/headwear and heels need separate allowance. Unspecified individual female height stays a range."
     }
   },
   {
@@ -2104,7 +2244,7 @@
     "source_images_visually_reviewed": true,
     "character_id": null,
     "pixel_request": {
-      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult woman appearing late20s, long wavy dark teal hair beneath dark purple hood, light gray green eyes, refined theatrical warm smile, natural mature build, tailored black trouser suit, white shirt and black necktie, dark purple hooded cloak with muted purple lining fastened by green jewel at neck, black heels. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 212-224px on128x256; height unspecified; provisional medium stature; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
+      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult woman appearing late20s, long wavy dark teal hair beneath dark purple hood, light gray green eyes, refined theatrical warm smile, natural mature build, tailored black trouser suit, white shirt and black necktie, dark purple hooded cloak with muted purple lining fastened by green jewel at neck, black heels. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 200-206px on128x256 at shared1.25px/cm; height 160-165cm; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
       "image_size": {
         "width": 128,
         "height": 256
@@ -2124,13 +2264,18 @@
       "style_usage_description": "Use ONLY pixel rendering, outline, shading and lighting. Do not copy the reference male height, body shape, shoulder width, outfit or identity. Preserve this character own stature, build, age, hair, irises and original clothing colors and silhouette. FRONT view."
     },
     "stature_rendering": {
-      "basis": "height unspecified; provisional medium stature",
-      "target_body_pixels": [
-        212,
-        224
+      "basis": "Latest explicit user height specification; overrides previous provisional height classes and conflicting wiki height",
+      "height_cm_range": [
+        160,
+        165
       ],
       "canonical_height_cm": null,
-      "note": "Pixel ranges are production targets, not invented canonical height. Preserve original build and clothing; validate together at identical zoom."
+      "target_body_pixels": [
+        200,
+        206
+      ],
+      "pixels_per_cm": 1.25,
+      "note": "Common production scale; do not fit each person to full canvas. Compare anatomical crown-to-sole height; hair/headwear and heels need separate allowance. Unspecified individual female height stays a range."
     }
   },
   {
@@ -2145,7 +2290,7 @@
     "source_images_visually_reviewed": true,
     "character_id": null,
     "pixel_request": {
-      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult woman appearing late20s, extremely long straight platinum blonde hair with blunt bangs, crimson red eyes, pale skin, elegant predatory smile, natural mature adult build, floor length crimson high neck sleeveless evening gown with a small geometric chest cutout as in original portrait and a practical leg slit, dark red formal heels. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 212-224px on128x256; height unspecified; provisional medium stature; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
+      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult woman appearing late20s, extremely long straight platinum blonde hair with blunt bangs, crimson red eyes, pale skin, elegant predatory smile, natural mature adult build, floor length crimson high neck sleeveless evening gown with a small geometric chest cutout as in original portrait and a practical leg slit, dark red formal heels. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 200-206px on128x256 at shared1.25px/cm; height 160-165cm; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
       "image_size": {
         "width": 128,
         "height": 256
@@ -2165,13 +2310,18 @@
       "style_usage_description": "Use ONLY pixel rendering, outline, shading and lighting. Do not copy the reference male height, body shape, shoulder width, outfit or identity. Preserve this character own stature, build, age, hair, irises and original clothing colors and silhouette. FRONT view."
     },
     "stature_rendering": {
-      "basis": "height unspecified; provisional medium stature",
-      "target_body_pixels": [
-        212,
-        224
+      "basis": "Latest explicit user height specification; overrides previous provisional height classes and conflicting wiki height",
+      "height_cm_range": [
+        160,
+        165
       ],
       "canonical_height_cm": null,
-      "note": "Pixel ranges are production targets, not invented canonical height. Preserve original build and clothing; validate together at identical zoom."
+      "target_body_pixels": [
+        200,
+        206
+      ],
+      "pixels_per_cm": 1.25,
+      "note": "Common production scale; do not fit each person to full canvas. Compare anatomical crown-to-sole height; hair/headwear and heels need separate allowance. Unspecified individual female height stays a range."
     }
   },
   {
@@ -2227,7 +2377,7 @@
     "source_images_visually_reviewed": true,
     "character_id": null,
     "pixel_request": {
-      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult female presenting articulated ivory artist mannequin, long tousled dark auburn red hair, glowing red eyes and faint uncanny smile, visible ball joints at shoulders elbows wrists hips and knees, smooth featureless ivory synthetic mannequin torso and limbs, elegant natural seven head adult doll anatomy, ivory articulated feet. Preserve original sculptural mannequin appearance, no human skin texture, no clothing substitution, no explicit anatomical detail. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 212-224px on128x256; height unspecified; provisional medium stature; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
+      "description": "One single full-body character for the SAME grounded modern supernatural investigation headquarters game as the style reference. Adult female presenting articulated ivory artist mannequin, long tousled dark auburn red hair, glowing red eyes and faint uncanny smile, visible ball joints at shoulders elbows wrists hips and knees, smooth featureless ivory synthetic mannequin torso and limbs, elegant natural seven head adult doll anatomy, ivory articulated feet. Preserve original sculptural mannequin appearance, no human skin texture, no clothing substitution, no explicit anatomical detail. Relaxed upright standing, empty hands visible at sides, feet flat. Front-facing SOUTH, body and face straight toward viewer; camera slightly above eye level, LOW TOP-DOWN. Realistic natural human anatomy about 7 heads tall; normal head and visible neck; crotch 45-48 percent of total height above soles. No chibi, giant head, shortened neck or exaggerated long legs. Full head and shoes visible, 6px minimum top/bottom margin, target body height 200-206px on128x256 at shared1.25px/cm; height 160-165cm; preserve the described individual shoulder width, torso fullness and limb thickness, not the reference male body. Match reference precise native pixel density, selective dark outlines, controlled pixel shading and subdued interior lighting. Keep THIS character own hair, iris and clothing colors. Crisp native1px clusters, no antialiasing, transparent background, no floor or shadow, no text, no weapons or held props, one character only.",
       "image_size": {
         "width": 128,
         "height": 256
@@ -2247,13 +2397,18 @@
       "style_usage_description": "Use ONLY pixel rendering, outline, shading and lighting. Do not copy the reference male height, body shape, shoulder width, outfit or identity. Preserve this character own stature, build, age, hair, irises and original clothing colors and silhouette. FRONT view."
     },
     "stature_rendering": {
-      "basis": "height unspecified; provisional medium stature",
-      "target_body_pixels": [
-        212,
-        224
+      "basis": "Latest explicit user height specification; overrides previous provisional height classes and conflicting wiki height",
+      "height_cm_range": [
+        160,
+        165
       ],
       "canonical_height_cm": null,
-      "note": "Pixel ranges are production targets, not invented canonical height. Preserve original build and clothing; validate together at identical zoom."
+      "target_body_pixels": [
+        200,
+        206
+      ],
+      "pixels_per_cm": 1.25,
+      "note": "Common production scale; do not fit each person to full canvas. Compare anatomical crown-to-sole height; hair/headwear and heels need separate allowance. Unspecified individual female height stays a range."
     }
   }
 ]
