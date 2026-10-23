@@ -1,0 +1,6 @@
+2026-10-24 Asia/Seoul | GPT 정면 전신 기준 그림 | imagegen | 도구 응답 50.307초 | GPT 차감 단위 미제공 | PixelLab 차감 0
+2026-10-24 Asia/Seoul | 기준 그림 입력용 PNG 업로드 | /v2/uploads | 업로드 시간 별도 미측정 | 무료 | upload:103cf4ae-1ff2-4eec-ab75-89bb97c0ad3b
+2026-10-24 Asia/Seoul | 정면 도트 변환 1회 | image_to_pixelart | 128x256, faithful=true, init_image_strength=200, seed=10242026 | 요청~완료 관측 70.654초(통신/폴링 포함) | 예상 1, 실제 영수증 1, 계정 잔여량 차이 1.0 generations | job bd98178d-2317-4b11-b86b-af1717e9ef7c
+2026-10-24 Asia/Seoul | 38색 결과이므로 reduce_colors 생략 | 추가 차감 0
+2026-10-24 Asia/Seoul | 외부 단색 배경만 로컬 alpha flood-fill, 인물 픽셀 변경 없음 | PixelLab 차감 0
+합계: PixelLab 실제 차감 1.0 generations. 캐릭터 등록 0회, 애니메이션 생성 0회. 사용자 시각 승인 대기.
