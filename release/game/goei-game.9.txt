@@ -1,4 +1,4 @@
-귀 기울이지 마시오!", "지금은 동맹이나 잠시뿐이오!", "사악한 신은 여기서 불탈 것이오!"] }),
+d: "saladin", name: "살라딘", sheet: "살라딘", group: "faction", color: "#2f6b4f", photo: "Saladin", role: "이슬람 성전대 한국 최고 전사. 이태원 성원이 거점.", speech: "우렁차고 고풍스러운 하오체. 아군에겐 따뜻하고 적에겐 쇠 같다. 「형제여!」", effects: ["favor", "hint", "join", "hostile", "leave"], greet: ["형제여! 날 따르시오!"], lines: ["그렇게 부르시오! 하하! 기분이 아주 좋소!", "형제여! 이교도의 말에 귀 기울이지 마시오!", "지금은 동맹이나 잠시뿐이오!", "사악한 신은 여기서 불탈 것이오!"] }),
     avensha: d2({ id: "avensha", name: "아벤샤", sheet: "아벤샤", group: "faction", color: "#6a2c70", photo: "Avensha", role: "발푸르기스 협회 십대 마녀 중 하나.", speech: "격식 있고 화려한 존댓말, 윗 마법사에게 한껏 자신을 낮추는 아첨. 감탄하면 비명.", effects: ["favor", "hint", "trade", "hostile", "leave"], greet: ["어머나! 이런 곳에서 뵙다니요!"], lines: ["땅을 기는 미천한 애벌레의 생애 최고의 은총이에요!", "실력을 증명할 수 있어 기뻐요!", "이번 산책에 심장을 꽤 거뒀어요.", "차를 마시며 감상할 수 있지요. 그 정도 안목은 있답니다."] })
   };
   var ENTITY_NPCS = {
@@ -3076,13 +3076,4 @@ ${t.secret}` : "",
       onOpen: (on) => shell.touch.setVisible(!on && shell.mode === "play")
     });
     globalThis.__goeiNpc = npc;
-    globalThis.__goeiStage = shell.stage;
-    const elevator = createElevatorStage(stageStore, {
-      ...npc.stageHooks(stageHooks()),
-      pickUpgrade: (v, done2) => {
-        void shell.choose({ title: `${v.why} · 강화 하나`, lines: ["이번 출동 동안만 남는다. 같은 계열 셋이면 완성 효과."], options: v.options.map((o) => `[${o.set}] ${o.label} — ${o.text}`), cancel: false }).then((i) => done2(Math.max(0, i)));
-        return true;
-      }
-    });
-    let mapOpen = false;
-    const offMapKey 
+    globalThis.__goeiStage 

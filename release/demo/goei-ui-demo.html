@@ -1932,9 +1932,21 @@ function mountStage(box2) {
       canvas.width = vw;
       canvas.style.width = stageEl.style.width = `${vw}px`;
     }
-    const scale = Math.min(bw / vw, bh / H2);
+    let scale = Math.min(bw / vw, bh / H2);
+    if (byHeight && !portrait) {
+      const dpr = window.devicePixelRatio || 1, k = Math.floor(bh * dpr / H2) / dpr;
+      if (k * H2 >= bh * 0.75) {
+        scale = k;
+        const nw = Math.min(W2, Math.max(640, Math.floor(bw / k)));
+        if (nw !== s.vw || canvas.width !== nw) {
+          s.vw = nw;
+          canvas.width = nw;
+          canvas.style.width = stageEl.style.width = `${nw}px`;
+        }
+      }
+    }
     s.scale = scale;
-    const w = vw * scale, h = H2 * scale;
+    const w = s.vw * scale, h = H2 * scale;
     const top = portrait ? portraitTop(bh, h) : (bh - h) / 2;
     stageEl.style.transform = `translate(${Math.round((bw - w) / 2)}px, ${Math.round(top)}px) scale(${scale})`;
     root.style.setProperty("--gs-scale", String(scale));

@@ -149,9 +149,23 @@ export function mountStage(box: HTMLElement): Stage {
       canvas.width = vw;
       canvas.style.width = stageEl.style.width = `${vw}px`;
     }
-    const scale = Math.min(bw / vw, bh / H);
+    let scale = Math.min(bw / vw, bh / H);
+    // 필드: 캔버스 1px이 화면 픽셀의 정수배가 되게 (도트가 고르게). 너무 작아지면(폰) 그냥 높이 맞춤
+    if (byHeight && !portrait) {
+      const dpr = window.devicePixelRatio || 1,
+        k = Math.floor((bh * dpr) / H) / dpr;
+      if (k * H >= bh * 0.75) {
+        scale = k;
+        const nw = Math.min(W, Math.max(640, Math.floor(bw / k)));
+        if (nw !== s.vw || canvas.width !== nw) {
+          s.vw = nw;
+          canvas.width = nw;
+          canvas.style.width = stageEl.style.width = `${nw}px`;
+        }
+      }
+    }
     s.scale = scale;
-    const w = vw * scale,
+    const w = s.vw * scale,
       h = H * scale;
     // 세로 화면: 게임을 위에 붙이고 아래 빈 곳은 터치 버튼 자리
     const top = portrait ? portraitTop(bh, h) : (bh - h) / 2;

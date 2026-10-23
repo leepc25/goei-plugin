@@ -2521,5 +2521,5 @@ ${v.trim()}`).join("\n\n") : "";
   }
 
   // src/body-entry.ts
-  globalThis.__goeiBody = { version: "0.16.48", start: start2 };
+  globalThis.__goeiBody = { version: "0.16.49", start: start2 };
 })();

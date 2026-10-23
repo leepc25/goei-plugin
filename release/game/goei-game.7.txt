@@ -1,4 +1,12 @@
-ind === "hatch" || p.kind === "servicedoor") && p.x < gx - 100)) {
+> t.x0 - gap && x < t.x1 + gap));
+      const gx = gateAt(260) ?? (depth === 2 ? gateAt(170) ?? gateAt(100) : null) ?? -1;
+      if (gx > 0) {
+        const before = f.placed.filter((p) => (p.kind === "hatch" || p.kind === "servicedoor") && p.x < gx - 100);
+        if (!before.length) {
+          const sx = spot(chunks.filter((c) => c.x + 600 < gx - 200), 80);
+          if (sx !== null) f.placed.push(place2("servicedoor", sx, 0, 70, "점검문"));
+        }
+        if (f.placed.some((p) => (p.kind === "hatch" || p.kind === "servicedoor") && p.x < gx - 100)) {
           f.placed.push(place2("locked", gx, MID, 40, "잠긴 방화셔터", { key: depth }));
           f.tuning.keyGate = 1;
         }
@@ -3803,13 +3811,4 @@ ${SET_BONUS[u.set]}`;
         continue;
       }
       if (raw.startsWith("~")) {
-        const say = parseSay(raw.slice(1).trim(), n, where);
-        const labelHere = Object.values(cur.labels).includes(nodes.length);
-        if (prev?.t === "pick" && !labelHere) prev.lines.push(say);
-        else nodes.push({ t: "pick", lines: [say], line: n });
-        continue;
-      }
-      if (raw.startsWith("*")) {
-        const m = /^\*\s*(.+?)\s*->\s*([\w.]+)\s*(.*)$/.exec(raw);
-        if (!m) throw new ScriptError(`${where}:${n} 선택지 형식: * 글 -> 표지 [if 조건] [set ...]`);
-        const opt = { text: 
+        const say = parseSay(raw.sl

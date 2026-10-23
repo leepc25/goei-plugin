@@ -1,4 +1,13 @@
-m[1], to: m[2] };
+ice(1).trim(), n, where);
+        const labelHere = Object.values(cur.labels).includes(nodes.length);
+        if (prev?.t === "pick" && !labelHere) prev.lines.push(say);
+        else nodes.push({ t: "pick", lines: [say], line: n });
+        continue;
+      }
+      if (raw.startsWith("*")) {
+        const m = /^\*\s*(.+?)\s*->\s*([\w.]+)\s*(.*)$/.exec(raw);
+        if (!m) throw new ScriptError(`${where}:${n} 선택지 형식: * 글 -> 표지 [if 조건] [set ...]`);
+        const opt = { text: m[1], to: m[2] };
         for (const b of m[3].matchAll(/\[(if|set)\s+([^\]]+)\]/g)) opt[b[1]] = b[2].trim();
         const labelHere = Object.values(cur.labels).includes(nodes.length);
         if (prev?.t === "choice" && !labelHere) prev.options.push(opt);
@@ -4152,4 +4161,4 @@ ${who}: ${text2.replace(/\n/g, " ")}
   };
   var FACTION_NPCS = {
     blaret: d2({ id: "blaret", name: "블라렛", sheet: "블라렛", group: "faction", color: "#e8e2d0", photo: "Blaret", role: "교황청 특급 수녀. 진조 흡혈귀를 쫓아 한국에 파견.", speech: "장난스럽고 판매원처럼 밝은 반말 섞인 존댓말, 상대를 찔러 본다. 전투에선 심판하듯 차갑게.", effects: ["favor", "hint", "join", "hostile", "leave", "trade"], greet: ["반가워요. 교황청 특급 수녀 블라렛. 흡혈귀 퇴치 건으로 한국에 왔어요."], lines: ["어때요? 그쪽 일 접고 우리 쪽으로 개종하는 거.", "내가 말하면 그쪽도 말하는 거예요. 숨기기 없기.", "재밌는 거 볼래요? …찰칵.", "흡혈귀 사냥이라면 그쪽보다 전문이죠."] }),
-    saladin: d2({ id: "saladin", name: "살라딘", sheet: "살라딘", group: "faction", color: "#2f6b4f", photo: "Saladin", role: "이슬람 성전대 한국 최고 전사. 이태원 성원이 거점.", speech: "우렁차고 고풍스러운 하오체. 아군에겐 따뜻하고 적에겐 쇠 같다. 「형제여!」", effects: ["favor", "hint", "join", "hostile", "leave"], greet: ["형제여! 날 따르시오!"], lines: ["그렇게 부르시오! 하하! 기분이 아주 좋소!", "형제여! 이교도의 말에 
+    saladin: d2({ i

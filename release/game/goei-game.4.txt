@@ -1,4 +1,18 @@
-);
+       const dy = world.player.y - this.y;
+        this.y += Math.max(-d3.homeY, Math.min(d3.homeY, dy));
+      }
+      if (this.t >= d3.life) this.alive = false;
+      if (!d3.pierce && !d3.harmless && !(d3.arm && this.t < d3.arm)) {
+        const p = world.player;
+        if (p.alive && p.frame().hurt.some((h) => overlap2(this.box(), h))) this.done = true;
+      }
+    }
+    applyHit() {
+      return { kind: "immune" };
+    }
+    draw(ctx) {
+      const d3 = this.def;
+      const b = this.box();
       ctx.save();
       if (d3.arm && this.t < d3.arm) {
         ctx.globalAlpha = 0.25 + 0.5 * (this.t >> 2 & 1);
@@ -4919,22 +4933,4 @@
         w.hintShown = false;
         drawFx(w, camX);
         if (w.floor.drawForeground) {
-          ctx.save();
-          ctx.translate(-camX, 0);
-          w.floor.drawForeground(ctx, camX, w);
-          ctx.restore();
-        } else if (w.light < 1) {
-          ctx.fillStyle = `rgba(0,0,0,${(1 - w.light) * 0.9})`;
-          ctx.fillRect(0, 0, SCREEN_W, SCREEN_H);
-        }
-        if (w.showBoxes) boxes(w, camX);
-        ctx.restore();
-        if (w.cutin > 0) cutin(w);
-        if (opt.hud) hud(w);
-        overlayText(w);
-      }
-    };
-  }
-
-  // src/game/action/engine/moves.ts
-  var T
+     
