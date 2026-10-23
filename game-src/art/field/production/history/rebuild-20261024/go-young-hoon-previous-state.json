@@ -1,0 +1,13 @@
+{
+  "name": "고영훈",
+  "group": "fake-bureau",
+  "character_id": "4e9a6e84-09a2-49ae-b1cb-09ecbfef5022",
+  "image": "7804981f-35a4-45e7-9853-d233b546c13f",
+  "registration": "e0079880-b3df-4176-9498-5adba07db7ff",
+  "motions": {},
+  "ready": true,
+  "image_verified": true,
+  "skeleton_joints": 18,
+  "rotation_count": 8,
+  "exported": true
+}

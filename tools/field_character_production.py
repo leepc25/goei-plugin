@@ -184,6 +184,10 @@ class Production:
   # A visual gate prevents spreading a broken animation route to the whole roster.
   control=json.loads((OUT/'control.json').read_text())
   if not control.get('release_skeleton_v3_motions'):return
+  # User requires every roster member's eight directions before the first new motion.
+  if not all(self.s['characters'][a['slug']].get('ready') and
+             self.s['characters'][a['slug']].get('eight_way_visual_reviewed')
+             for a in self.manifest):return
   # Fill motion slots in roster/faction order without waiting for previous clip completion.
   for a in self.manifest:
    c=self.s['characters'][a['slug']]
@@ -191,6 +195,8 @@ class Production:
    for template,label in TEMPLATES:
     if len(active())>=20:return
     if not c['motions'].get(template):self.submit('animation',a['slug'],'animate-character',self.animation_request(a,template,label),template)
+   # Finish and visually review this person before moving to the next one.
+   if not c.get('motions_visual_reviewed'):return
  def overview(self):
   jobs=list(self.s['jobs'].values());counts={k:sum(j['status']==k for j in jobs)for k in ['processing','completed','failed','stalled']};self.s['summary']={'jobs':counts,'characters_ready':sum(bool(c.get('ready'))for c in self.s['characters'].values()),'characters_total':len(self.manifest),'images_verified':sum(bool(c.get('image_verified'))for c in self.s['characters'].values()),'motions_submitted':sum(len(c['motions'])for c in self.s['characters'].values()),'motions_target':len(self.manifest)*len(TEMPLATES)};self.save();print(json.dumps(self.s['summary'],ensure_ascii=False),flush=True)
  def done(self):

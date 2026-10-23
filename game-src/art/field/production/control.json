@@ -1,11 +1,11 @@
 {
   "release_skeleton_v3_motions": false,
-  "reason": "User rejected fake-bureau results. No further paid generation or registration before individual original/lore comparison and user confirmation.",
+  "reason": "2026-10-24 user explicitly authorized full fake-bureau rebuild and roster completion. Per-character visual gates remain.",
   "max_in_flight": 20,
   "max_character_pipeline_in_flight": 20,
   "authorized_total_characters": 55,
   "authorized_clips_per_character": 20,
-  "stop_all": true,
+  "stop_all": false,
   "stopped_by_user_at": 1792778185.5597813,
   "direction_policy": {
     "reference": "front-facing south",
@@ -29,14 +29,27 @@
       "reason": "Actual generated east side face hidden by bob; west and southwest face visibly exposed."
     }
   },
-  "registration_held_slugs": [
-    "konjyuce",
-    "lee-do-hyeong"
-  ],
-  "production_priority": "all-roster-character-registration-first",
+  "registration_held_slugs": [],
+  "production_priority": "fake-bureau then baekilmong then remainder; all 55 registered and eight-way visually reviewed before any new motion",
   "after_registration": "roster-order eight-direction visual review and export, then remaining authorized production",
   "direction_selection_policy": "Compare actual east/west/southeast/southwest rotations per character; select face-visible pair east+southeast or west+southwest. Do not impose one side on all characters.",
   "registration_failure_policy": "Diagnose and correct source/registration; archive failed results and billing; delete only identified failed character; re-register without duplicating accepted jobs.",
-  "image_approved_slugs": [],
-  "registration_approved_slugs": []
+  "image_approved_slugs": [
+    "sa-jang",
+    "do-pil-heon",
+    "lee-gil-hwan",
+    "lee-gi-seok",
+    "kim-jo-hak",
+    "lee-do-hyeong",
+    "go-young-hoon",
+    "no-gi-gyun",
+    "song-ju-ik",
+    "kwak-seong-ju",
+    "cho-seong-choon",
+    "yun-byeong-su",
+    "kim-seong-jin",
+    "song-jin-seob"
+  ],
+  "registration_approved_slugs": [],
+  "source_priority": "AVIF first for identity/build; lore supplements height; explicit user heights override estimates"
 }

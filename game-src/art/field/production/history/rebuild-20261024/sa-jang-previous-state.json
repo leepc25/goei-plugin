@@ -1,0 +1,10 @@
+{
+  "name": "사장",
+  "group": "fake-bureau",
+  "character_id": null,
+  "image": "6c98e078-134a-4596-827d-94539b32efbc",
+  "registration": "failed:500",
+  "motions": {},
+  "ready": false,
+  "image_verified": true
+}

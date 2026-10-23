@@ -4177,7 +4177,8 @@
         "usd": 0.0,
         "type": "generations",
         "generations": 9
-      }
+      },
+      "superseded_by": "rebuild-20261024"
     },
     "313ee595-1c75-4c33-9a9a-99e46b29e9e1": {
       "kind": "image",
@@ -4257,7 +4258,8 @@
         "usd": 0.0,
         "type": "generations",
         "generations": 9
-      }
+      },
+      "superseded_by": "rebuild-20261024"
     },
     "0983045b-232d-4880-8691-a5e0bf30353c": {
       "kind": "image",
@@ -4337,7 +4339,8 @@
         "usd": 0.0,
         "type": "generations",
         "generations": 9
-      }
+      },
+      "superseded_by": "rebuild-20261024"
     },
     "d95cd572-ed2f-48a9-9835-699c8b3275c5": {
       "kind": "registration",
@@ -4470,7 +4473,8 @@
         "usd": 0.0,
         "type": "generations",
         "generations": 9
-      }
+      },
+      "superseded_by": "rebuild-20261024"
     },
     "97c6be5f-46f6-4216-a783-10760dce00b7": {
       "kind": "image",
@@ -4550,7 +4554,8 @@
         "usd": 0.0,
         "type": "generations",
         "generations": 9
-      }
+      },
+      "superseded_by": "rebuild-20261024"
     },
     "faf43112-9e06-4989-bfc7-8d71cefa0392": {
       "kind": "registration",
@@ -4603,7 +4608,8 @@
       "usage": {
         "type": "generations",
         "generations": 4.0
-      }
+      },
+      "superseded_by": "rebuild-20261024"
     },
     "acc823fc-13b5-45bc-9047-a7aa6fafebb1": {
       "kind": "registration",
@@ -4656,7 +4662,8 @@
       "usage": {
         "type": "generations",
         "generations": 4.0
-      }
+      },
+      "superseded_by": "rebuild-20261024"
     },
     "38131ffd-13aa-42c6-bd7d-d70030f105a9": {
       "kind": "registration",
@@ -4709,7 +4716,8 @@
       "usage": {
         "type": "generations",
         "generations": 4.0
-      }
+      },
+      "superseded_by": "rebuild-20261024"
     },
     "4f676b89-e087-4071-b5de-8f1509e4d6b3": {
       "kind": "registration",
@@ -4762,7 +4770,8 @@
       "usage": {
         "type": "generations",
         "generations": 4.0
-      }
+      },
+      "superseded_by": "rebuild-20261024"
     },
     "514150f7-d075-41e0-a202-51ef91df5b79": {
       "kind": "image",
@@ -4918,7 +4927,8 @@
         "usd": 0.0,
         "type": "generations",
         "generations": 9
-      }
+      },
+      "superseded_by": "rebuild-20261024"
     },
     "e0079880-b3df-4176-9498-5adba07db7ff": {
       "kind": "registration",
@@ -4971,7 +4981,8 @@
       "usage": {
         "type": "generations",
         "generations": 4.0
-      }
+      },
+      "superseded_by": "rebuild-20261024"
     },
     "b5de6715-8544-46ed-b155-a1dc03a01d1d": {
       "kind": "image",
@@ -5049,7 +5060,8 @@
         "usd": 0.0,
         "type": "generations",
         "generations": 9
-      }
+      },
+      "superseded_by": "rebuild-20261024"
     },
     "c5256011-99c7-4078-bbbc-a553b395a670": {
       "kind": "registration",
@@ -5102,7 +5114,8 @@
       "usage": {
         "type": "generations",
         "generations": 4.0
-      }
+      },
+      "superseded_by": "rebuild-20261024"
     },
     "2fe5ceb3-5953-4fec-bd88-fd4ccbe2f7d8": {
       "kind": "image",
@@ -5180,7 +5193,8 @@
         "usd": 0.0,
         "type": "generations",
         "generations": 9
-      }
+      },
+      "superseded_by": "rebuild-20261024"
     },
     "eacc1a24-47d0-4db2-b85b-f4396e250b09": {
       "kind": "image",
@@ -5260,7 +5274,8 @@
         "usd": 0.0,
         "type": "generations",
         "generations": 9
-      }
+      },
+      "superseded_by": "rebuild-20261024"
     },
     "e084a777-c8a1-4db0-bc3c-b87cd6cbb888": {
       "kind": "image",
@@ -5340,7 +5355,8 @@
         "usd": 0.0,
         "type": "generations",
         "generations": 9
-      }
+      },
+      "superseded_by": "rebuild-20261024"
     },
     "c2aabcc4-7ed0-4bbe-a667-fa2d992a05fd": {
       "kind": "registration",
@@ -5393,7 +5409,8 @@
       "usage": {
         "type": "generations",
         "generations": 4.0
-      }
+      },
+      "superseded_by": "rebuild-20261024"
     },
     "4ea02ad2-5c4d-4fde-9d88-1281bd5311d4": {
       "kind": "registration",
@@ -5446,7 +5463,8 @@
       "usage": {
         "type": "generations",
         "generations": 4.0
-      }
+      },
+      "superseded_by": "rebuild-20261024"
     },
     "fd0e0a01-0f88-476d-8a46-0440db3a02ce": {
       "kind": "registration",
@@ -5499,7 +5517,8 @@
       "usage": {
         "type": "generations",
         "generations": 4.0
-      }
+      },
+      "superseded_by": "rebuild-20261024"
     },
     "90e177c3-0c95-4f0b-9703-d97ec0b41c00": {
       "kind": "image",
@@ -5579,7 +5598,8 @@
         "usd": 0.0,
         "type": "generations",
         "generations": 9
-      }
+      },
+      "superseded_by": "rebuild-20261024"
     },
     "f6f2e349-d5a1-4dfb-8c30-aa7180971954": {
       "kind": "registration",
@@ -5632,7 +5652,8 @@
       "usage": {
         "type": "generations",
         "generations": 4.0
-      }
+      },
+      "superseded_by": "rebuild-20261024"
     },
     "388b811b-2c33-41b5-9675-a97b22ed3f6c": {
       "kind": "image",
@@ -5712,7 +5733,8 @@
         "usd": 0.0,
         "type": "generations",
         "generations": 9
-      }
+      },
+      "superseded_by": "rebuild-20261024"
     },
     "93e994f1-cd27-4eb6-9d6b-e7905d5067d9": {
       "kind": "image",
@@ -5792,7 +5814,8 @@
         "usd": 0.0,
         "type": "generations",
         "generations": 9
-      }
+      },
+      "superseded_by": "rebuild-20261024"
     },
     "52623aa8-8924-4172-8bcc-6074f3646ea1": {
       "kind": "image",
@@ -5872,6 +5895,301 @@
         "usd": 0.0,
         "type": "generations",
         "generations": 9
+      },
+      "superseded_by": "rebuild-20261024"
+    },
+    "63de2248-6e39-4807-9629-03500fa6921b": {
+      "kind": "image",
+      "slug": "sa-jang",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792788394.832406,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "63de2248-6e39-4807-9629-03500fa6921b",
+        "image_id": "269a3d39-ac0f-5eb0-b00a-07c27130dddd",
+        "source_image_id": "269a3d39-ac0f-5eb0-b00a-07c27130dddd",
+        "status": "processing",
+        "output_count": 1,
+        "image_size": {
+          "width": 128,
+          "height": 256
+        },
+        "estimated_generations": 9,
+        "pricing_provisional": true
+      }
+    },
+    "337a274b-6c96-4062-9f1d-16cf170029b8": {
+      "kind": "image",
+      "slug": "do-pil-heon",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792788395.2162948,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "337a274b-6c96-4062-9f1d-16cf170029b8",
+        "image_id": "00bfc0a7-fc0d-5c9e-b2f1-67840c614525",
+        "source_image_id": "00bfc0a7-fc0d-5c9e-b2f1-67840c614525",
+        "status": "processing",
+        "output_count": 1,
+        "image_size": {
+          "width": 128,
+          "height": 256
+        },
+        "estimated_generations": 9,
+        "pricing_provisional": true
+      }
+    },
+    "5e401a36-d468-44c5-bb0c-f9c7c21bd32f": {
+      "kind": "image",
+      "slug": "lee-gil-hwan",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792788395.6644516,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "5e401a36-d468-44c5-bb0c-f9c7c21bd32f",
+        "image_id": "2720e6fd-bf29-582b-a007-e2530ae75864",
+        "source_image_id": "2720e6fd-bf29-582b-a007-e2530ae75864",
+        "status": "processing",
+        "output_count": 1,
+        "image_size": {
+          "width": 128,
+          "height": 256
+        },
+        "estimated_generations": 9,
+        "pricing_provisional": true
+      }
+    },
+    "84b18533-3b72-4e23-a538-c3e88668fb7a": {
+      "kind": "image",
+      "slug": "lee-gi-seok",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792788395.985353,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "84b18533-3b72-4e23-a538-c3e88668fb7a",
+        "image_id": "ca6ae9bf-5659-557c-8d88-53bae3de710e",
+        "source_image_id": "ca6ae9bf-5659-557c-8d88-53bae3de710e",
+        "status": "processing",
+        "output_count": 1,
+        "image_size": {
+          "width": 128,
+          "height": 256
+        },
+        "estimated_generations": 9,
+        "pricing_provisional": true
+      }
+    },
+    "1425bdcd-2e41-4959-8ca2-404855b0a6c5": {
+      "kind": "image",
+      "slug": "kim-jo-hak",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792788396.3065107,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "1425bdcd-2e41-4959-8ca2-404855b0a6c5",
+        "image_id": "b3b45288-6160-544d-8bfa-21748cbc1d19",
+        "source_image_id": "b3b45288-6160-544d-8bfa-21748cbc1d19",
+        "status": "processing",
+        "output_count": 1,
+        "image_size": {
+          "width": 128,
+          "height": 256
+        },
+        "estimated_generations": 9,
+        "pricing_provisional": true
+      }
+    },
+    "f046db3b-1ebe-4227-a4ee-6102d6460d0e": {
+      "kind": "image",
+      "slug": "lee-do-hyeong",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792788396.750237,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "f046db3b-1ebe-4227-a4ee-6102d6460d0e",
+        "image_id": "df00ebdd-5e29-5682-bb3d-8badaa4c56b6",
+        "source_image_id": "df00ebdd-5e29-5682-bb3d-8badaa4c56b6",
+        "status": "processing",
+        "output_count": 1,
+        "image_size": {
+          "width": 128,
+          "height": 256
+        },
+        "estimated_generations": 9,
+        "pricing_provisional": true
+      }
+    },
+    "71a0632e-a481-489d-8a9b-cceed3ffaa58": {
+      "kind": "image",
+      "slug": "go-young-hoon",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792788397.076284,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "71a0632e-a481-489d-8a9b-cceed3ffaa58",
+        "image_id": "16a1d3c3-aa9e-5d6c-8352-42f998078cff",
+        "source_image_id": "16a1d3c3-aa9e-5d6c-8352-42f998078cff",
+        "status": "processing",
+        "output_count": 1,
+        "image_size": {
+          "width": 128,
+          "height": 256
+        },
+        "estimated_generations": 9,
+        "pricing_provisional": true
+      }
+    },
+    "c468b8a7-6c12-458a-898b-324dc709952a": {
+      "kind": "image",
+      "slug": "no-gi-gyun",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792788397.3512008,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "c468b8a7-6c12-458a-898b-324dc709952a",
+        "image_id": "ffd8de86-b222-5eed-b407-6680ab686eb0",
+        "source_image_id": "ffd8de86-b222-5eed-b407-6680ab686eb0",
+        "status": "processing",
+        "output_count": 1,
+        "image_size": {
+          "width": 128,
+          "height": 256
+        },
+        "estimated_generations": 9,
+        "pricing_provisional": true
+      }
+    },
+    "ad4858c4-2694-4fba-ab33-7cafffec0bc5": {
+      "kind": "image",
+      "slug": "song-ju-ik",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792788398.0721052,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "ad4858c4-2694-4fba-ab33-7cafffec0bc5",
+        "image_id": "0d9745d6-3fef-5921-a9c4-4f747cb51dfb",
+        "source_image_id": "0d9745d6-3fef-5921-a9c4-4f747cb51dfb",
+        "status": "processing",
+        "output_count": 1,
+        "image_size": {
+          "width": 128,
+          "height": 256
+        },
+        "estimated_generations": 9,
+        "pricing_provisional": true
+      }
+    },
+    "fa090bbb-e1a3-4b06-862b-22429954773e": {
+      "kind": "image",
+      "slug": "kwak-seong-ju",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792788398.4182315,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "fa090bbb-e1a3-4b06-862b-22429954773e",
+        "image_id": "cba970ed-e4c6-5858-81d4-28e0eef720db",
+        "source_image_id": "cba970ed-e4c6-5858-81d4-28e0eef720db",
+        "status": "processing",
+        "output_count": 1,
+        "image_size": {
+          "width": 128,
+          "height": 256
+        },
+        "estimated_generations": 9,
+        "pricing_provisional": true
+      }
+    },
+    "ec42d9dd-1f58-40de-a4ee-ef6d5a6492cd": {
+      "kind": "image",
+      "slug": "cho-seong-choon",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792788400.2485223,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "ec42d9dd-1f58-40de-a4ee-ef6d5a6492cd",
+        "image_id": "67cdc011-670d-5397-9587-a027c7af7bf8",
+        "source_image_id": "67cdc011-670d-5397-9587-a027c7af7bf8",
+        "status": "processing",
+        "output_count": 1,
+        "image_size": {
+          "width": 128,
+          "height": 256
+        },
+        "estimated_generations": 9,
+        "pricing_provisional": true
+      }
+    },
+    "19cc1b0e-1d92-4aff-bd82-16c5fe2c4dd0": {
+      "kind": "image",
+      "slug": "yun-byeong-su",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792788401.8379636,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "19cc1b0e-1d92-4aff-bd82-16c5fe2c4dd0",
+        "image_id": "1e6aa728-ae8e-5ef2-adbd-a5720677f648",
+        "source_image_id": "1e6aa728-ae8e-5ef2-adbd-a5720677f648",
+        "status": "processing",
+        "output_count": 1,
+        "image_size": {
+          "width": 128,
+          "height": 256
+        },
+        "estimated_generations": 9,
+        "pricing_provisional": true
+      }
+    },
+    "8a2d9a1c-d7f8-41b6-a6ac-1a7ea22ed3c3": {
+      "kind": "image",
+      "slug": "kim-seong-jin",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792788402.4445488,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "8a2d9a1c-d7f8-41b6-a6ac-1a7ea22ed3c3",
+        "image_id": "cecb1d59-d14e-5bb1-ae54-9c93fd372d22",
+        "source_image_id": "cecb1d59-d14e-5bb1-ae54-9c93fd372d22",
+        "status": "processing",
+        "output_count": 1,
+        "image_size": {
+          "width": 128,
+          "height": 256
+        },
+        "estimated_generations": 9,
+        "pricing_provisional": true
+      }
+    },
+    "37ea4f25-334e-433e-807e-348451f23456": {
+      "kind": "image",
+      "slug": "song-jin-seob",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792788402.7604375,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "37ea4f25-334e-433e-807e-348451f23456",
+        "image_id": "43e78639-77fa-5ca4-9a2d-f9d465dd920d",
+        "source_image_id": "43e78639-77fa-5ca4-9a2d-f9d465dd920d",
+        "status": "processing",
+        "output_count": 1,
+        "image_size": {
+          "width": 128,
+          "height": 256
+        },
+        "estimated_generations": 9,
+        "pricing_provisional": true
       }
     }
   },
@@ -6045,169 +6363,155 @@
       "name": "사장",
       "group": "fake-bureau",
       "character_id": null,
-      "image": "6c98e078-134a-4596-827d-94539b32efbc",
-      "registration": "failed:500",
+      "image": "63de2248-6e39-4807-9629-03500fa6921b",
+      "registration": null,
       "motions": {},
       "ready": false,
-      "image_verified": true
+      "visual_review_required": true,
+      "rebuild": "20261024"
     },
     "do-pil-heon": {
       "name": "도필헌",
       "group": "fake-bureau",
-      "character_id": "33a06296-5806-4d9c-a827-eb837a91b543",
-      "image": "313ee595-1c75-4c33-9a9a-99e46b29e9e1",
-      "registration": "faf43112-9e06-4989-bfc7-8d71cefa0392",
+      "character_id": null,
+      "image": "337a274b-6c96-4062-9f1d-16cf170029b8",
+      "registration": null,
       "motions": {},
-      "ready": true,
-      "image_verified": true,
-      "skeleton_joints": 18,
-      "rotation_count": 8,
-      "exported": true
+      "ready": false,
+      "visual_review_required": true,
+      "rebuild": "20261024"
     },
     "lee-gil-hwan": {
       "name": "이길환",
       "group": "fake-bureau",
-      "character_id": "5db8f990-b89a-4a20-b003-25b65c7958c1",
-      "image": "0983045b-232d-4880-8691-a5e0bf30353c",
-      "registration": "acc823fc-13b5-45bc-9047-a7aa6fafebb1",
+      "character_id": null,
+      "image": "5e401a36-d468-44c5-bb0c-f9c7c21bd32f",
+      "registration": null,
       "motions": {},
-      "ready": true,
-      "image_verified": true,
-      "skeleton_joints": 18,
-      "rotation_count": 8,
-      "exported": true
+      "ready": false,
+      "visual_review_required": true,
+      "rebuild": "20261024"
     },
     "lee-gi-seok": {
       "name": "이기석",
       "group": "fake-bureau",
       "character_id": null,
-      "image": "uncertain:submitting:1792783196056",
+      "image": "84b18533-3b72-4e23-a538-c3e88668fb7a",
       "registration": null,
       "motions": {},
-      "ready": false
+      "ready": false,
+      "visual_review_required": true,
+      "rebuild": "20261024"
     },
     "kim-jo-hak": {
       "name": "김조학",
       "group": "fake-bureau",
-      "character_id": "da459680-eb0e-48ad-be84-cc8a23d8fc02",
-      "image": "74bb6f61-b7b7-4405-96f8-9cc6759c7dc5",
-      "registration": "38131ffd-13aa-42c6-bd7d-d70030f105a9",
+      "character_id": null,
+      "image": "1425bdcd-2e41-4959-8ca2-404855b0a6c5",
+      "registration": null,
       "motions": {},
-      "ready": true,
-      "image_verified": true,
-      "skeleton_joints": 18,
-      "rotation_count": 8,
-      "exported": true
+      "ready": false,
+      "visual_review_required": true,
+      "rebuild": "20261024"
     },
     "lee-do-hyeong": {
       "name": "이도형",
       "group": "fake-bureau",
       "character_id": null,
-      "image": "388b811b-2c33-41b5-9675-a97b22ed3f6c",
+      "image": "f046db3b-1ebe-4227-a4ee-6102d6460d0e",
       "registration": null,
       "motions": {},
       "ready": false,
-      "repair_id": "lee-do-hyeong-identity-v2",
       "visual_review_required": true,
-      "image_verified": true
+      "rebuild": "20261024"
     },
     "go-young-hoon": {
       "name": "고영훈",
       "group": "fake-bureau",
-      "character_id": "4e9a6e84-09a2-49ae-b1cb-09ecbfef5022",
-      "image": "7804981f-35a4-45e7-9853-d233b546c13f",
-      "registration": "e0079880-b3df-4176-9498-5adba07db7ff",
+      "character_id": null,
+      "image": "71a0632e-a481-489d-8a9b-cceed3ffaa58",
+      "registration": null,
       "motions": {},
-      "ready": true,
-      "image_verified": true,
-      "skeleton_joints": 18,
-      "rotation_count": 8,
-      "exported": true
+      "ready": false,
+      "visual_review_required": true,
+      "rebuild": "20261024"
     },
     "no-gi-gyun": {
       "name": "노기균",
       "group": "fake-bureau",
-      "character_id": "c99d8406-4bd5-4897-aaf2-90b00fa9acab",
-      "image": "b5de6715-8544-46ed-b155-a1dc03a01d1d",
-      "registration": "c5256011-99c7-4078-bbbc-a553b395a670",
+      "character_id": null,
+      "image": "c468b8a7-6c12-458a-898b-324dc709952a",
+      "registration": null,
       "motions": {},
-      "ready": true,
-      "image_verified": true,
-      "skeleton_joints": 18,
-      "rotation_count": 8,
-      "exported": true
+      "ready": false,
+      "visual_review_required": true,
+      "rebuild": "20261024"
     },
     "song-ju-ik": {
       "name": "송주익",
       "group": "fake-bureau",
-      "character_id": "76866032-a328-4c7c-84cf-1beb0b1c7cbb",
-      "image": "2fe5ceb3-5953-4fec-bd88-fd4ccbe2f7d8",
-      "registration": "c2aabcc4-7ed0-4bbe-a667-fa2d992a05fd",
+      "character_id": null,
+      "image": "ad4858c4-2694-4fba-ab33-7cafffec0bc5",
+      "registration": null,
       "motions": {},
-      "ready": true,
-      "image_verified": true,
-      "skeleton_joints": 18,
-      "rotation_count": 8,
-      "exported": true
+      "ready": false,
+      "visual_review_required": true,
+      "rebuild": "20261024"
     },
     "kwak-seong-ju": {
       "name": "곽성주",
       "group": "fake-bureau",
-      "character_id": "8b308102-0d58-42d4-b73c-10b1aa815d88",
-      "image": "eacc1a24-47d0-4db2-b85b-f4396e250b09",
-      "registration": "4ea02ad2-5c4d-4fde-9d88-1281bd5311d4",
+      "character_id": null,
+      "image": "fa090bbb-e1a3-4b06-862b-22429954773e",
+      "registration": null,
       "motions": {},
-      "ready": true,
-      "image_verified": true,
-      "skeleton_joints": 18,
-      "rotation_count": 8,
-      "exported": true
+      "ready": false,
+      "visual_review_required": true,
+      "rebuild": "20261024"
     },
     "cho-seong-choon": {
       "name": "조성춘",
       "group": "fake-bureau",
-      "character_id": "1f2250cb-ca5c-4d1f-9b0d-885f752c5974",
-      "image": "e084a777-c8a1-4db0-bc3c-b87cd6cbb888",
-      "registration": "fd0e0a01-0f88-476d-8a46-0440db3a02ce",
+      "character_id": null,
+      "image": "ec42d9dd-1f58-40de-a4ee-ef6d5a6492cd",
+      "registration": null,
       "motions": {},
-      "ready": true,
-      "image_verified": true,
-      "skeleton_joints": 18,
-      "rotation_count": 8,
-      "exported": true
+      "ready": false,
+      "visual_review_required": true,
+      "rebuild": "20261024"
     },
     "yun-byeong-su": {
       "name": "윤병수",
       "group": "fake-bureau",
-      "character_id": "4390bb9b-0e2a-4c65-b70f-da09751397bf",
-      "image": "90e177c3-0c95-4f0b-9703-d97ec0b41c00",
-      "registration": "f6f2e349-d5a1-4dfb-8c30-aa7180971954",
+      "character_id": null,
+      "image": "19cc1b0e-1d92-4aff-bd82-16c5fe2c4dd0",
+      "registration": null,
       "motions": {},
-      "ready": true,
-      "image_verified": true,
-      "skeleton_joints": 18,
-      "rotation_count": 8,
-      "exported": true
+      "ready": false,
+      "visual_review_required": true,
+      "rebuild": "20261024"
     },
     "kim-seong-jin": {
       "name": "김성진",
       "group": "fake-bureau",
       "character_id": null,
-      "image": "93e994f1-cd27-4eb6-9d6b-e7905d5067d9",
+      "image": "8a2d9a1c-d7f8-41b6-a6ac-1a7ea22ed3c3",
       "registration": null,
       "motions": {},
       "ready": false,
-      "image_verified": true
+      "visual_review_required": true,
+      "rebuild": "20261024"
     },
     "song-jin-seob": {
       "name": "송진섭",
       "group": "fake-bureau",
       "character_id": null,
-      "image": "52623aa8-8924-4172-8bcc-6074f3646ea1",
+      "image": "37ea4f25-334e-433e-807e-348451f23456",
       "registration": null,
       "motions": {},
       "ready": false,
-      "image_verified": true
+      "visual_review_required": true,
+      "rebuild": "20261024"
     },
     "baek-seok-ju": {
       "name": "백석주",
@@ -10657,9 +10961,345 @@
         "bytes": 101912,
         "files": 9
       }
+    },
+    {
+      "at": "2026-10-23T20:46:35Z",
+      "kind": "submitted",
+      "slug": "sa-jang",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "63de2248-6e39-4807-9629-03500fa6921b",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "63de2248-6e39-4807-9629-03500fa6921b",
+          "image_id": "269a3d39-ac0f-5eb0-b00a-07c27130dddd",
+          "source_image_id": "269a3d39-ac0f-5eb0-b00a-07c27130dddd",
+          "status": "processing",
+          "output_count": 1,
+          "image_size": {
+            "width": 128,
+            "height": 256
+          },
+          "estimated_generations": 9,
+          "pricing_provisional": true
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T20:46:35Z",
+      "kind": "submitted",
+      "slug": "do-pil-heon",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "337a274b-6c96-4062-9f1d-16cf170029b8",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "337a274b-6c96-4062-9f1d-16cf170029b8",
+          "image_id": "00bfc0a7-fc0d-5c9e-b2f1-67840c614525",
+          "source_image_id": "00bfc0a7-fc0d-5c9e-b2f1-67840c614525",
+          "status": "processing",
+          "output_count": 1,
+          "image_size": {
+            "width": 128,
+            "height": 256
+          },
+          "estimated_generations": 9,
+          "pricing_provisional": true
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T20:46:35Z",
+      "kind": "submitted",
+      "slug": "lee-gil-hwan",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "5e401a36-d468-44c5-bb0c-f9c7c21bd32f",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "5e401a36-d468-44c5-bb0c-f9c7c21bd32f",
+          "image_id": "2720e6fd-bf29-582b-a007-e2530ae75864",
+          "source_image_id": "2720e6fd-bf29-582b-a007-e2530ae75864",
+          "status": "processing",
+          "output_count": 1,
+          "image_size": {
+            "width": 128,
+            "height": 256
+          },
+          "estimated_generations": 9,
+          "pricing_provisional": true
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T20:46:36Z",
+      "kind": "submitted",
+      "slug": "lee-gi-seok",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "84b18533-3b72-4e23-a538-c3e88668fb7a",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "84b18533-3b72-4e23-a538-c3e88668fb7a",
+          "image_id": "ca6ae9bf-5659-557c-8d88-53bae3de710e",
+          "source_image_id": "ca6ae9bf-5659-557c-8d88-53bae3de710e",
+          "status": "processing",
+          "output_count": 1,
+          "image_size": {
+            "width": 128,
+            "height": 256
+          },
+          "estimated_generations": 9,
+          "pricing_provisional": true
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T20:46:36Z",
+      "kind": "submitted",
+      "slug": "kim-jo-hak",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "1425bdcd-2e41-4959-8ca2-404855b0a6c5",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "1425bdcd-2e41-4959-8ca2-404855b0a6c5",
+          "image_id": "b3b45288-6160-544d-8bfa-21748cbc1d19",
+          "source_image_id": "b3b45288-6160-544d-8bfa-21748cbc1d19",
+          "status": "processing",
+          "output_count": 1,
+          "image_size": {
+            "width": 128,
+            "height": 256
+          },
+          "estimated_generations": 9,
+          "pricing_provisional": true
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T20:46:37Z",
+      "kind": "submitted",
+      "slug": "lee-do-hyeong",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "f046db3b-1ebe-4227-a4ee-6102d6460d0e",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "f046db3b-1ebe-4227-a4ee-6102d6460d0e",
+          "image_id": "df00ebdd-5e29-5682-bb3d-8badaa4c56b6",
+          "source_image_id": "df00ebdd-5e29-5682-bb3d-8badaa4c56b6",
+          "status": "processing",
+          "output_count": 1,
+          "image_size": {
+            "width": 128,
+            "height": 256
+          },
+          "estimated_generations": 9,
+          "pricing_provisional": true
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T20:46:37Z",
+      "kind": "submitted",
+      "slug": "go-young-hoon",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "71a0632e-a481-489d-8a9b-cceed3ffaa58",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "71a0632e-a481-489d-8a9b-cceed3ffaa58",
+          "image_id": "16a1d3c3-aa9e-5d6c-8352-42f998078cff",
+          "source_image_id": "16a1d3c3-aa9e-5d6c-8352-42f998078cff",
+          "status": "processing",
+          "output_count": 1,
+          "image_size": {
+            "width": 128,
+            "height": 256
+          },
+          "estimated_generations": 9,
+          "pricing_provisional": true
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T20:46:38Z",
+      "kind": "submitted",
+      "slug": "no-gi-gyun",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "c468b8a7-6c12-458a-898b-324dc709952a",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "c468b8a7-6c12-458a-898b-324dc709952a",
+          "image_id": "ffd8de86-b222-5eed-b407-6680ab686eb0",
+          "source_image_id": "ffd8de86-b222-5eed-b407-6680ab686eb0",
+          "status": "processing",
+          "output_count": 1,
+          "image_size": {
+            "width": 128,
+            "height": 256
+          },
+          "estimated_generations": 9,
+          "pricing_provisional": true
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T20:46:38Z",
+      "kind": "submitted",
+      "slug": "song-ju-ik",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "ad4858c4-2694-4fba-ab33-7cafffec0bc5",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "ad4858c4-2694-4fba-ab33-7cafffec0bc5",
+          "image_id": "0d9745d6-3fef-5921-a9c4-4f747cb51dfb",
+          "source_image_id": "0d9745d6-3fef-5921-a9c4-4f747cb51dfb",
+          "status": "processing",
+          "output_count": 1,
+          "image_size": {
+            "width": 128,
+            "height": 256
+          },
+          "estimated_generations": 9,
+          "pricing_provisional": true
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T20:46:40Z",
+      "kind": "submitted",
+      "slug": "kwak-seong-ju",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "fa090bbb-e1a3-4b06-862b-22429954773e",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "fa090bbb-e1a3-4b06-862b-22429954773e",
+          "image_id": "cba970ed-e4c6-5858-81d4-28e0eef720db",
+          "source_image_id": "cba970ed-e4c6-5858-81d4-28e0eef720db",
+          "status": "processing",
+          "output_count": 1,
+          "image_size": {
+            "width": 128,
+            "height": 256
+          },
+          "estimated_generations": 9,
+          "pricing_provisional": true
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T20:46:41Z",
+      "kind": "submitted",
+      "slug": "cho-seong-choon",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "ec42d9dd-1f58-40de-a4ee-ef6d5a6492cd",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "ec42d9dd-1f58-40de-a4ee-ef6d5a6492cd",
+          "image_id": "67cdc011-670d-5397-9587-a027c7af7bf8",
+          "source_image_id": "67cdc011-670d-5397-9587-a027c7af7bf8",
+          "status": "processing",
+          "output_count": 1,
+          "image_size": {
+            "width": 128,
+            "height": 256
+          },
+          "estimated_generations": 9,
+          "pricing_provisional": true
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T20:46:42Z",
+      "kind": "submitted",
+      "slug": "yun-byeong-su",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "19cc1b0e-1d92-4aff-bd82-16c5fe2c4dd0",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "19cc1b0e-1d92-4aff-bd82-16c5fe2c4dd0",
+          "image_id": "1e6aa728-ae8e-5ef2-adbd-a5720677f648",
+          "source_image_id": "1e6aa728-ae8e-5ef2-adbd-a5720677f648",
+          "status": "processing",
+          "output_count": 1,
+          "image_size": {
+            "width": 128,
+            "height": 256
+          },
+          "estimated_generations": 9,
+          "pricing_provisional": true
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T20:46:42Z",
+      "kind": "submitted",
+      "slug": "kim-seong-jin",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "8a2d9a1c-d7f8-41b6-a6ac-1a7ea22ed3c3",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "8a2d9a1c-d7f8-41b6-a6ac-1a7ea22ed3c3",
+          "image_id": "cecb1d59-d14e-5bb1-ae54-9c93fd372d22",
+          "source_image_id": "cecb1d59-d14e-5bb1-ae54-9c93fd372d22",
+          "status": "processing",
+          "output_count": 1,
+          "image_size": {
+            "width": 128,
+            "height": 256
+          },
+          "estimated_generations": 9,
+          "pricing_provisional": true
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T20:46:43Z",
+      "kind": "submitted",
+      "slug": "song-jin-seob",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "37ea4f25-334e-433e-807e-348451f23456",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "37ea4f25-334e-433e-807e-348451f23456",
+          "image_id": "43e78639-77fa-5ca4-9a2d-f9d465dd920d",
+          "source_image_id": "43e78639-77fa-5ca4-9a2d-f9d465dd920d",
+          "status": "processing",
+          "output_count": 1,
+          "image_size": {
+            "width": 128,
+            "height": 256
+          },
+          "estimated_generations": 9,
+          "pricing_provisional": true
+        }
+      }
     }
   ],
-  "updated_at": 1792786954.0593708,
+  "updated_at": 1792788403.2199156,
   "user_stopped_at": 1792778235.6917784,
   "archived_jobs": {
     "304457e9-6577-44f0-af17-97841a9f6720": {
@@ -11981,14 +12621,14 @@
   "last_git_checkpoint": 1792786713.4276478,
   "summary": {
     "jobs": {
-      "processing": 0,
+      "processing": 14,
       "completed": 70,
       "failed": 3,
       "stalled": 0
     },
-    "characters_ready": 19,
+    "characters_ready": 10,
     "characters_total": 55,
-    "images_verified": 25,
+    "images_verified": 12,
     "motions_submitted": 3,
     "motions_target": 1100
   },

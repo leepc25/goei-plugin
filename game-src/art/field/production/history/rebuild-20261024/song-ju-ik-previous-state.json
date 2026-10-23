@@ -1,0 +1,13 @@
+{
+  "name": "송주익",
+  "group": "fake-bureau",
+  "character_id": "76866032-a328-4c7c-84cf-1beb0b1c7cbb",
+  "image": "2fe5ceb3-5953-4fec-bd88-fd4ccbe2f7d8",
+  "registration": "c2aabcc4-7ed0-4bbe-a667-fa2d992a05fd",
+  "motions": {},
+  "ready": true,
+  "image_verified": true,
+  "skeleton_joints": 18,
+  "rotation_count": 8,
+  "exported": true
+}

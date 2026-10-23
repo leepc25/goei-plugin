@@ -1,0 +1,13 @@
+{
+  "name": "윤병수",
+  "group": "fake-bureau",
+  "character_id": "4390bb9b-0e2a-4c65-b70f-da09751397bf",
+  "image": "90e177c3-0c95-4f0b-9703-d97ec0b41c00",
+  "registration": "f6f2e349-d5a1-4dfb-8c30-aa7180971954",
+  "motions": {},
+  "ready": true,
+  "image_verified": true,
+  "skeleton_joints": 18,
+  "rotation_count": 8,
+  "exported": true
+}

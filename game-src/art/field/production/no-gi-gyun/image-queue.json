@@ -1,8 +1,8 @@
 {
   "usage": null,
-  "background_job_id": "b5de6715-8544-46ed-b155-a1dc03a01d1d",
-  "image_id": "a970680d-5832-5146-9890-b33594b6544d",
-  "source_image_id": "a970680d-5832-5146-9890-b33594b6544d",
+  "background_job_id": "c468b8a7-6c12-458a-898b-324dc709952a",
+  "image_id": "ffd8de86-b222-5eed-b407-6680ab686eb0",
+  "source_image_id": "ffd8de86-b222-5eed-b407-6680ab686eb0",
   "status": "processing",
   "output_count": 1,
   "image_size": {

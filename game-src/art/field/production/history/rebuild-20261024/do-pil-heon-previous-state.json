@@ -1,0 +1,13 @@
+{
+  "name": "도필헌",
+  "group": "fake-bureau",
+  "character_id": "33a06296-5806-4d9c-a827-eb837a91b543",
+  "image": "313ee595-1c75-4c33-9a9a-99e46b29e9e1",
+  "registration": "faf43112-9e06-4989-bfc7-8d71cefa0392",
+  "motions": {},
+  "ready": true,
+  "image_verified": true,
+  "skeleton_joints": 18,
+  "rotation_count": 8,
+  "exported": true
+}
