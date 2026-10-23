@@ -1,0 +1,14 @@
+{
+  "description": "백석주 / Baek Seok-ju. Adult woman, natural slender build, oval face and warm restrained smile, narrow muted brown-gray eyes. Dark brown hair center-parted with long curved cheek-length side locks, gathered in a low rounded bun behind head. Navy-blue fitted single-breasted trouser suit, white shirt, navy tie. Bare face, no mask or glasses. Thin plain rings on fingers. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
+  "reference_image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "n_directions": 8,
+  "view": "low top-down",
+  "template_id": "mannequin",
+  "name": "백석주",
+  "seed": 10222027,
+  "no_background": true
+}

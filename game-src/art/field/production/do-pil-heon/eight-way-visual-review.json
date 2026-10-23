@@ -1,0 +1,24 @@
+{
+  "character_id": "c3307c4c-568c-463d-841c-4eff89b4fc4c",
+  "result": "pass",
+  "directions_reviewed": [
+    "south",
+    "south-east",
+    "east",
+    "north-east",
+    "north",
+    "north-west",
+    "west",
+    "south-west"
+  ],
+  "findings": "Dark brown swept-back waves, aviator sunglasses, mature narrow face and charcoal suit preserved across8 views. Standing size consistent. No gray opaque outer patches.",
+  "movement_direction": "east",
+  "stationary_direction": "south-east",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF primary",
+    "Lore supplements height",
+    "All55 before motion",
+    "Gray exterior means reroll"
+  ]
+}

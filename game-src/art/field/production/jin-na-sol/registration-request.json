@@ -1,0 +1,14 @@
+{
+  "description": "진나솔 / Jin Na-sol. Tall slender adult woman, narrow angular face with bored sharp gray-brown eyes and thin straight mouth. Blue-black hair in a very HIGH long straight ponytail, thick BLUNT STRAIGHT BANGS across forehead; not an exposed forehead. Fitted dark navy trouser suit, white shirt, navy tie. Long black and gold decorated nails. Bare face, no mask. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
+  "reference_image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "n_directions": 8,
+  "view": "low top-down",
+  "template_id": "mannequin",
+  "name": "진나솔",
+  "seed": 10222027,
+  "no_background": true
+}

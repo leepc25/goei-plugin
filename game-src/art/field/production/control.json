@@ -94,7 +94,17 @@
     "lee-gi-seok",
     "kim-jo-hak",
     "lee-do-hyeong",
-    "jang-heo-un"
+    "jang-heo-un",
+    "go-young-hoon",
+    "song-ju-ik",
+    "kwak-seong-ju",
+    "cho-seong-choon",
+    "yun-byeong-su",
+    "song-jin-seob",
+    "baek-seok-ju",
+    "jin-na-sol",
+    "park-min-seong",
+    "kang-i-hak"
   ],
   "source_priority": "AVIF first for identity/build; lore supplements height; explicit user heights override estimates"
 }

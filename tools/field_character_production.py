@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Resumable PixelLab production. Authorized scope: manifest roster, 20 classified-direction clips each.
-Never repeat failed/ambiguous paid submissions. Continue other independent work.
+Never blindly repeat ambiguous paid submissions. Confirmed failures are archived and
+retried with a reviewed correction through field_visual_decision.py.
 Run with PIXELLAB_API_KEY; secrets and image payloads are never written to logs.
 """
 import argparse,shutil,base64,concurrent.futures,fcntl,io,json,os,re,subprocess,time,urllib.request,urllib.error,zipfile
@@ -112,9 +113,15 @@ class Production:
     padded=Image.new('RGBA',(128,256));padded.paste(im,(0,256-im.height));im=padded
     buf=io.BytesIO();im.save(buf,format='PNG');data=buf.getvalue()
    bbox=im.getbbox();colors=len({px for px in im.getdata()if px[3]});alpha=sorted(set(im.getchannel('A').getdata()));checks={'size':list(im.size),'native_size':list(native_size),'bbox':list(bbox)if bbox else None,'colors':colors,'alpha':alpha,'original_pixels_preserved':True,'resampled':False}
+   a=self.by[slug]
+   if a.get('image_inpaint_source'):
+    source=Image.open(ROOT/a['image_inpaint_source']).convert('RGBA');mask=Image.open(ROOT/a['image_inpaint_mask']).convert('RGB')
+    assert source.size==mask.size==im.size,'inpaint canvas changed'
+    assert all(before==after for before,after,mark in zip(source.getdata(),im.getdata(),mask.getdata())if mark==(0,0,0)),'inpaint modified unmasked RGBA'
+    checks['unmasked_rgba_preserved']=True
    (OUT/slug/'reference.png').write_bytes(data);atomic(OUT/slug/'image-verification.json',checks)
    assert im.size==(128,256),'wrong canvas';assert bbox and bbox[3]-bbox[1]>=180,'figure too small';assert colors<=48,'palette cap exceeded';assert alpha==[0,255],'unexpected alpha'
-   c['image_verified']=True;self.event('image-verified',slug,checks)
+   c['image_verified']=True;self.event('image-format-verified',slug,checks)
    if cached.exists():cached.unlink()
   except urllib.error.HTTPError as e:
    c['download_error']=str(e) # transient delivery is read-only and can be checked again
@@ -132,6 +139,9 @@ class Production:
   except Exception as e:c['readiness_error']=str(e)
   self.save()
  def image_request(self,a):
+  if a.get('image_inpaint_source'):
+   encoded=lambda path:{'type':'base64','base64':base64.b64encode((ROOT/path).read_bytes()).decode(),'format':'png'}
+   return {'image':encoded(a['image_inpaint_source']),'mask_image':encoded(a['image_inpaint_mask']),'description':a['image_inpaint_description'],'no_background':True,'output_method':'Modify current layer','crop_to_mask':True,'seed':a['pixel_request'].get('seed',0)}
   if a.get('image_edit_source'):
    return {'image':{'type':'base64','base64':base64.b64encode((ROOT/a['image_edit_source']).read_bytes()).decode(),'format':'png'},'method':'text','description':a['image_edit_description'],'no_background':True,'use_color_palette_correction':True,'seed':a['pixel_request'].get('seed',0)}
   args=dict(a['pixel_request']);usage=args.pop('style_usage_description',None);source=args.pop('style_reference_local',None)
@@ -139,7 +149,7 @@ class Production:
    path=ROOT/source;im=Image.open(path);args['style_image']={'image':{'type':'base64','base64':base64.b64encode(path.read_bytes()).decode(),'format':'png'},'size':{'width':im.width,'height':im.height},'usage_description':usage}
   return args
  def registration_request(self,a):
-  return{'description':a['name']+' / '+a['english']+'. '+a['appearance']+' Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.','reference_image':{'type':'base64','base64':base64.b64encode((OUT/a['slug']/'reference.png').read_bytes()).decode(),'format':'png'},'n_directions':8,'view':'low top-down','template_id':'mannequin','name':a['name'],'seed':10222027,'no_background':True}
+  return{'description':a['name']+' / '+a['english']+'. '+a['appearance']+' Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches.','reference_image':{'type':'base64','base64':base64.b64encode((OUT/a['slug']/'reference.png').read_bytes()).decode(),'format':'png'},'n_directions':8,'view':'low top-down','template_id':'mannequin','name':a['name'],'seed':10222027,'no_background':True}
  @staticmethod
  def motion_direction(template):
   return 'south-east'if template in {'breathing-idle','drinking'}else'east'
@@ -154,6 +164,7 @@ class Production:
    else:gait='walking confidently with an upright steady torso, measured strides and restrained arm swing'
    args['action_description']=gait
   elif template=='running-8-frames':args['action_description']='running decisively with a steady torso, controlled arm swing and firm purposeful strides'
+  args['action_description']=args.get('action_description',template.replace('-',' '))+'. Preserve this character identity, costume, hair and native proportions. Keep a clean transparent silhouette in every frame. No gray painted patches, gray halo, ground shadow or opaque background around hair, hands, clothes or feet.'
   return args
  def apply_repairs(self):
   path=OUT/'repair-queue.json'
@@ -206,7 +217,8 @@ class Production:
    if len(active())>=20:return
    c=self.s['characters'][a['slug']]
    if a.get('pixel_request')and not c.get('image')and a['slug']in json.loads((OUT/'control.json').read_text()).get('image_approved_slugs',[x['slug']for x in self.manifest])and sum(j['kind']in['image','registration']for j in active())<json.loads((OUT/'control.json').read_text()).get('max_character_pipeline_in_flight',6):
-    self.submit('image',a['slug'],'edit-image-pro-flash' if a.get('image_edit_source') else 'create-image-pro-flash',self.image_request(a))
+    route='inpaint-image-pro-flash' if a.get('image_inpaint_source') else 'edit-image-pro-flash' if a.get('image_edit_source') else 'create-image-pro-flash'
+    self.submit('image',a['slug'],route,self.image_request(a))
   # A visual gate prevents spreading a broken animation route to the whole roster.
   control=json.loads((OUT/'control.json').read_text())
   if not control.get('release_skeleton_v3_motions'):return

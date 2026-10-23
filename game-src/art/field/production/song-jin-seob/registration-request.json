@@ -1,0 +1,14 @@
+{
+  "description": "송진섭 / Song Jin-seob. Slim youthful man with soft oval face, small chin, gentle modest closed-mouth smile, NOT rugged. Neat rounded dark brown-black BOWL haircut with SHORT straight fringe well ABOVE eyebrows, visible forehead strip. Large black aviator sunglasses. Narrow natural shoulders and slender arms. Dark brown-charcoal single-breasted suit neatly buttoned, white shirt and tidy black necktie. No scars, beard or muscular bulk. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
+  "reference_image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "n_directions": 8,
+  "view": "low top-down",
+  "template_id": "mannequin",
+  "name": "송진섭",
+  "seed": 10222027,
+  "no_background": true
+}

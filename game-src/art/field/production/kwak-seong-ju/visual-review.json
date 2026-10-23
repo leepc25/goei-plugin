@@ -1,0 +1,14 @@
+{
+  "job": "c1db0244-0d40-4360-849e-0db29f0f72ae",
+  "job_status": "completed",
+  "decision": "pass",
+  "reason": "얼굴 정면 교정 확인. 큰 근육 체격, 검은 스파이크 머리, 양어깨·상흉부·상완 금속판과 정장 유지. 모발 포함248px, 큰 체격·장신 기준 유지, 외곽 회색 덧칠 없음.",
+  "at": 1792790384.8406515,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "method": "text",
+  "description": "Correct ONLY the white hair hanging over HER RIGHT shoulder (viewer LEFT). It is a loose LOW SIDE PONYTAIL with long soft flowing S-shaped WAVES and wispy curled ends. It is NOT BRAIDED: remove all plaited woven segments or alternating braid links. Preserve white blunt bangs, short curled face-framing layers, green eyes, sweet youthful face and normal human ears. Preserve every body/clothes/height pixel, navy suit, sneakers, strict front pose, 202px total figure height and transparent canvas. Crisp same pixel style; no gray outer halo.",
+  "no_background": true,
+  "use_color_palette_correction": true,
+  "seed": 1792790055
+}

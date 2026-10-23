@@ -1,12 +1,30 @@
 {
-  "image": {
-    "type": "base64",
-    "base64": "[image payload omitted]",
-    "format": "png"
+  "description": "Full-body native pixel-art game sprite, STRICTLY FRONT SOUTH view: face, nose, chest, belt and knees directly toward viewer, both ears equally visible. No sideways head or three-quarter turn. IDENTITY: Tall large solidly built adult man, broad shoulders and thick chest, exceptionally handsome angular long face, stern neutral mouth, RED irises. Short white hair swept BACK in loose waves with two curved forelocks on forehead. Navy-blue buttoned WAISTCOAT over white long-sleeved shirt, navy necktie and dark trousers. NO suit jacket, no mask, no gloves in default appearance. Relaxed upright stance, empty hands at sides. Natural adult anatomy, normal torso/pelvis, 7-head proportions. Anatomical crown to soles 230-238px; feet 6px above bottom, hair fully inside frame. Crisp single-pixel clusters, selective dark outlines, restrained game-sprite shading, no antialiasing. Transparent background, no ground shadow, text or weapons. Preserve individual hair, face, stature and clothing. Do not copy any generic character. Anatomical height excludes high hair/headwear. Every outer edge must border transparency directly, never a light gray halo. Use target anatomical height at reference pixel scale. Feet at y250, crown around y16. Do not copy reference identity or body fat.",
+  "image_size": {
+    "width": 128,
+    "height": 256
   },
-  "method": "text",
-  "description": "Correct standing orientation to STRICT FRONT SOUTH: rotate the head and chest toward viewer, nose centered, both eyes and shoulders equally visible, belt centered. Preserve the exact existing tall native body height, broad naturally solid build and handsome angular face. Irises must be RED. Short white hair swept backward with two curved forelocks. Preserve navy buttoned waistcoat, white long-sleeved shirt, navy tie, dark trousers and shoes. Do not add suit jacket, mask or gloves. Do not shrink body or exaggerate muscles. Same crisp pixel rendering and transparent background; no gray outer halo.",
   "no_background": true,
-  "use_color_palette_correction": true,
-  "seed": 1792789965
+  "seed": 1792790749,
+  "target_palette": {
+    "max_colors": 48
+  },
+  "style_options": {
+    "color_palette": false,
+    "outline": true,
+    "detail": true,
+    "shading": true
+  },
+  "style_image": {
+    "image": {
+      "type": "base64",
+      "base64": "[image payload omitted]",
+      "format": "png"
+    },
+    "size": {
+      "width": 128,
+      "height": 256
+    },
+    "usage_description": "Use only native pixel rendering, standing scale and FRONT SOUTH pose. Preserve target individual identity, age, hair, face, build and clothes from description."
+  }
 }
