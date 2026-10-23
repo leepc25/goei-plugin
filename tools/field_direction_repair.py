@@ -25,12 +25,15 @@ def main():
     if not source.exists():source.write_bytes(z.read('Idle/rotations/'+direction+'.png'))
     im=Image.open(source).convert('RGBA');mask=Image.new('RGB',im.size);draw=ImageDraw.Draw(mask)
     for rect in rects:draw.rectangle(rect,fill='white')
+    for rect in cfg.get('exclude_rectangles',{}).get(direction,[]):draw.rectangle(rect,fill='black')
     mask.save(maskpath)
     jid=c.get(key)
     if not jid:
      if sum(j['status']=='processing' for j in prod.s['jobs'].values())>=20:break
      encode=lambda path:{'type':'base64','base64':base64.b64encode(path.read_bytes()).decode(),'format':'png'}
      data={'image':encode(source),'mask_image':encode(maskpath),'description':cfg['description'],'no_background':True,'output_method':'Modify current layer','crop_to_mask':True,'seed':int(time.time())}
+     if cfg.get('context_full_frame'):
+      data['context_image']=encode(source);data['bounding_box']={'x':0,'y':0,'width':im.width,'height':im.height}
      prod.submit(key,slug,'inpaint-image-pro-flash',data)
      continue
     job=prod.s['jobs'].get(jid,{})

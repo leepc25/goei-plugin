@@ -22485,7 +22485,7 @@
           "at": 1792796355.404262
         }
       ],
-      "eight_way_visual_reviewed": false,
+      "eight_way_visual_reviewed": true,
       "direction-repair-south-east": "b340f8f9-71fe-4d3e-bff2-42428be68937",
       "direction-repair-east": "de1e9780-8807-4962-9bc2-36f23642d762",
       "direction-repair-west": "2f7cae4b-68df-4329-9dca-353d3335c357",
@@ -38425,7 +38425,7 @@
       }
     }
   ],
-  "updated_at": 1792796747.1726165,
+  "updated_at": 1792796749.3473089,
   "user_stopped_at": 1792778235.6917784,
   "archived_jobs": {
     "304457e9-6577-44f0-af17-97841a9f6720": {
@@ -39744,7 +39744,7 @@
       "saved_frames": 6
     }
   },
-  "last_git_checkpoint": 1792796260.3196242,
+  "last_git_checkpoint": 1792796749.3472826,
   "summary": {
     "jobs": {
       "processing": 7,

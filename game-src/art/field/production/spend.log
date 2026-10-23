@@ -265,7 +265,15 @@ c62c6da1-1894-469a-bb18-2f5f4988e88b	jay	direction-repair-south-east-full-patch-
 0f18021b-f069-4958-825d-d830176a1892	blaret	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
 0581c47a-927b-4213-9464-6a063a195171	jay	registration		completed	{"usd": 0.0, "type": "generations", "generations": 0.25}
 d5b444e2-ac82-4e32-80a7-b19575064575	cha-yeo-jin	registration		completed	{"usd": 0.0, "type": "generations", "generations": 0.25}
-0299a9b8-5c56-419b-8e6b-fac525541bee	jay	direction-repair-north-east-two-back-sleeves		processing	null
-0cfba687-b89a-4d1e-915f-2c8bfd331f93	jay	direction-repair-north-west-two-back-sleeves		processing	null
-b700a94b-9efc-4772-badf-c0e0d4172f24	shin-yuri	registration		processing	null
-217f749c-ee0b-43c8-88ca-d8d9d3db80bb	blaret	registration		processing	null
+0299a9b8-5c56-419b-8e6b-fac525541bee	jay	direction-repair-north-east-two-back-sleeves		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+0cfba687-b89a-4d1e-915f-2c8bfd331f93	jay	direction-repair-north-west-two-back-sleeves		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+b700a94b-9efc-4772-badf-c0e0d4172f24	shin-yuri	registration		completed	{"usd": 0.0, "type": "generations", "generations": 0.25}
+217f749c-ee0b-43c8-88ca-d8d9d3db80bb	blaret	registration		completed	{"type": "generations", "generations": 4.0}
+fe4732ce-298d-42aa-ac98-ecfab7d09d84	jay	registration		completed	{"usd": 0.0, "type": "generations", "generations": 0.25}
+d0388e93-0ed8-438b-a327-5300457d622e	blaret	direction-repair-south-east-wide-long-veil		processing	null
+d2e8d457-f5a5-4338-ae9e-96d70db85590	blaret	direction-repair-east-wide-long-veil		processing	null
+aa198451-112b-4f2c-aa9d-88add755be6a	blaret	direction-repair-north-east-wide-long-veil		processing	null
+570f4680-eeeb-47e8-9979-2f9b5d706a9b	blaret	direction-repair-north-wide-long-veil		processing	null
+65477007-079f-4fec-9691-cd8fbf1e41a9	blaret	direction-repair-north-west-wide-long-veil		processing	null
+7fcb0406-f75a-4062-b35d-e50fce22fb17	blaret	direction-repair-west-wide-long-veil		processing	null
+0976945d-ef6a-4bad-9850-14556f91f15b	blaret	direction-repair-south-west-wide-long-veil		processing	null
