@@ -1,0 +1,14 @@
+{
+  "description": "도필헌 / Do Pil-heon. Adult man early50s, neatly swept dark brown hair with gray temples, rectangular black sunglasses, calm dignified clean shaven face, conservative dark brown charcoal trouser suit, white shirt, black necktie and polished black formal shoes. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
+  "reference_image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "n_directions": 8,
+  "view": "low top-down",
+  "template_id": "mannequin",
+  "name": "도필헌",
+  "seed": 10222027,
+  "no_background": true
+}

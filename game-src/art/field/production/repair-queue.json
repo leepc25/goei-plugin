@@ -31,5 +31,14 @@
     "correction": "Remove petite/short wording; normal adult source comparable to Jyaldi,232-238px crown-to-sole not ponytail; vest under jacket. Registration held until actual visual inspection.",
     "estimated_generations": 9,
     "registration_cost_after_visual_review": 4
+  },
+  {
+    "id": "konjyuce-torso-v2",
+    "slug": "konjyuce",
+    "action": "regenerate-front-and-register",
+    "reason": "User rejected high waist/short torso. Side rotations show abrupt narrowing beneath chest; previous agent visual pass was wrong. Failed character backed up and deleted.",
+    "correction": "Normal ribcage-abdomen-pelvis spacing, waist at upper pelvis, hip-length blazer and natural-waisted knee-length skirt; preserve original school uniform, age17 and natural proportions. Source must be inspected before releasing registration hold.",
+    "estimated_generations": 9,
+    "registration_cost_after_visual_review": 4
   }
 ]

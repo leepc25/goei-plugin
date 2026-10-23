@@ -29,7 +29,9 @@
       "reason": "Actual generated east side face hidden by bob; west and southwest face visibly exposed."
     }
   },
-  "registration_held_slugs": [],
+  "registration_held_slugs": [
+    "konjyuce"
+  ],
   "production_priority": "all-roster-character-registration-first",
   "after_registration": "roster-order eight-direction visual review and export, then remaining authorized production",
   "direction_selection_policy": "Compare actual east/west/southeast/southwest rotations per character; select face-visible pair east+southeast or west+southwest. Do not impose one side on all characters.",

@@ -1,0 +1,14 @@
+{
+  "description": "데쥬레 / Dejure. Adult woman early20s, pink twin ponytails and bangs, pinkish brown eyes, nervous shy expression, short natural adult build, black skirt suit, white collared shirt, black necktie, black low heel shoes, small plain access pass. Do not make chibi. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
+  "reference_image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "n_directions": 8,
+  "view": "low top-down",
+  "template_id": "mannequin",
+  "name": "데쥬레",
+  "seed": 10222027,
+  "no_background": true
+}

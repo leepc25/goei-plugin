@@ -1,0 +1,14 @@
+{
+  "description": "이길환 / Lee Gil-hwan. Adult man mid40s, round friendly face, plump rounded middle aged body, neat dark bowl cut, black sunglasses, practiced warm smile, softly fitted black trouser suit, white shirt, neat black necktie and black shoes. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
+  "reference_image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "n_directions": 8,
+  "view": "low top-down",
+  "template_id": "mannequin",
+  "name": "이길환",
+  "seed": 10222027,
+  "no_background": true
+}

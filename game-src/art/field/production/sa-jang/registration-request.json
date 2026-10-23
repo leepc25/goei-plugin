@@ -1,0 +1,14 @@
+{
+  "description": "사장 / Sa-jang. Adult male presenting humanoid, black short hair, entire face remains featureless pitch black in shadow even under light, ordinary black tailored trouser suit, white shirt and black necktie, black formal shoes. Preserve the supernatural shadow face; do not invent eyes or facial features. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
+  "reference_image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "n_directions": 8,
+  "view": "low top-down",
+  "template_id": "mannequin",
+  "name": "사장",
+  "seed": 10222027,
+  "no_background": true
+}
