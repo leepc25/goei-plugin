@@ -7,160 +7,39 @@
     732
   ],
   "guidelineCommit": "2ce56ea30ccdb724b1f192d389758c10c2a0476c",
-  "production": "After updating both field documents, regenerated the whole corridor with props integrated. Corrected native architecture, floor perspective, hard pixel silhouettes, discrete matte material tones and shared 128-color palette. No separately generated prop sheets used.",
+  "production": "After updating both field documents, regenerated the whole corridor with props integrated. Corrected native architecture, floor perspective, hard pixel silhouettes, discrete matte material tones and shared 128-color palette. No separately generated prop sheets used. User then requested 2x2 mode downsampling, <=128 colors, one-pixel outline at half resolution, and exact 2x nearest-neighbor upscaling. This latest conversion supersedes the previous final pixel-size check.",
   "separatePropSheetsUsed": false,
   "validation": {
+    "source": "f2-before.png",
+    "sourceSha256": "1bbe84940689e54aae791085ade57737bcee69abf24fdccd683c0892618436f0",
     "dimensions": [
       3700,
       700
     ],
-    "paletteColors": 128,
-    "indexedPNG": true,
-    "opaque": true,
-    "wallFloorBoundaryY": 420,
-    "doorGeometry": [
-      {
-        "x": 114,
-        "y": 120,
-        "width": 130,
-        "height": 300,
-        "continuousOuterOutline": true,
-        "singlePixelSideOutline": true
-      },
-      {
-        "x": 554,
-        "y": 120,
-        "width": 130,
-        "height": 300,
-        "continuousOuterOutline": true,
-        "singlePixelSideOutline": true
-      },
-      {
-        "x": 1065,
-        "y": 120,
-        "width": 260,
-        "height": 300,
-        "continuousOuterOutline": true,
-        "singlePixelSideOutline": true
-      },
-      {
-        "x": 1761,
-        "y": 120,
-        "width": 130,
-        "height": 300,
-        "continuousOuterOutline": true,
-        "singlePixelSideOutline": true
-      },
-      {
-        "x": 1931,
-        "y": 120,
-        "width": 130,
-        "height": 300,
-        "continuousOuterOutline": true,
-        "singlePixelSideOutline": true
-      },
-      {
-        "x": 2556,
-        "y": 120,
-        "width": 130,
-        "height": 300,
-        "continuousOuterOutline": true,
-        "singlePixelSideOutline": true
-      },
-      {
-        "x": 3195,
-        "y": 120,
-        "width": 260,
-        "height": 300,
-        "continuousOuterOutline": true,
-        "singlePixelSideOutline": true
-      },
-      {
-        "x": 3570,
-        "y": 120,
-        "width": 130,
-        "height": 300,
-        "continuousOuterOutline": true,
-        "singlePixelSideOutline": true
-      }
+    "workingDimensions": [
+      1850,
+      350
     ],
-    "tileWidthNearRearY430": [
-      85,
-      85
-    ],
-    "tileWidthAtFrontY669": [
-      100,
-      100,
-      100,
-      101,
-      100,
-      100,
-      101,
-      100,
-      100,
-      100,
-      101
-    ],
-    "tileRows": [
-      {
-        "y": 469,
-        "darkJointHeightPx": 1
-      },
-      {
-        "y": 520,
-        "darkJointHeightPx": 1
-      },
-      {
-        "y": 573,
-        "darkJointHeightPx": 1
-      },
-      {
-        "y": 628,
-        "darkJointHeightPx": 1
-      },
-      {
-        "y": 686,
-        "darkJointHeightPx": 1
-      }
-    ],
-    "perspective": {
-      "wallFloorY": 420,
-      "projection": "x = 1850 + (rearX - 1850) * (1 + 0.18 * (y - 420) / 249)",
-      "rearTileWidth": 85,
-      "frontTileWidthAt669": 100.3,
-      "rowBoundaries": [
-        420,
-        469,
-        520,
-        573,
-        628,
-        686,
-        747
+    "reduction": "2x2 mode; ties use first source pixel in row-major order; no averages or interpolation",
+    "modeBlocksVerified": 647500,
+    "paletteAfterReduction": 127,
+    "paletteReduction": "No further reduction required: already <=128 colors",
+    "outline": {
+      "widthAtWorkingResolution": 1,
+      "widthAfterUpscale": 2,
+      "color": [
+        7,
+        12,
+        17
       ],
-      "floorInlayBack": [
-        1562,
-        2215
-      ],
-      "floorInlayFront": [
-        1528,
-        2258
-      ],
-      "foregroundClearFromY": 560
+      "operations": 8593
     },
-    "visualInspection": {
-      "wholePanorama": true,
-      "nativeScaleWestCenterEast": true,
-      "checks": [
-        "ground plane visibly recedes",
-        "aligned porcelain grid widens toward foreground",
-        "inlay and mats share ground projection",
-        "foreground walk strip clear",
-        "pixel edges and discrete matte tones"
-      ],
-      "userApproval": "not claimed"
-    },
-    "sha256": "1bbe84940689e54aae791085ade57737bcee69abf24fdccd683c0892618436f0",
-    "measuredChecksPass": true
+    "structuralLineRepair": "Reconnected grout lost by mode reduction at 1px in half-resolution, using existing palette colors",
+    "upscale": "exact nearest-neighbor 2x",
+    "finalColors": 127,
+    "all2x2BlocksUniform": true,
+    "noNewIntermediateColors": true,
+    "outputSha256": "d49a3a685df730d57081cd01432bfba2b8c1fc4e1d05a3577e54c9f06f61cbed"
   },
   "layout": {
     "width": 3700,
@@ -489,5 +368,159 @@
       }
     ]
   },
-  "gameIntegrated": false
+  "gameIntegrated": false,
+  "previousGeometryValidation": {
+    "dimensions": [
+      3700,
+      700
+    ],
+    "paletteColors": 128,
+    "indexedPNG": true,
+    "opaque": true,
+    "wallFloorBoundaryY": 420,
+    "doorGeometry": [
+      {
+        "x": 114,
+        "y": 120,
+        "width": 130,
+        "height": 300,
+        "continuousOuterOutline": true,
+        "singlePixelSideOutline": true
+      },
+      {
+        "x": 554,
+        "y": 120,
+        "width": 130,
+        "height": 300,
+        "continuousOuterOutline": true,
+        "singlePixelSideOutline": true
+      },
+      {
+        "x": 1065,
+        "y": 120,
+        "width": 260,
+        "height": 300,
+        "continuousOuterOutline": true,
+        "singlePixelSideOutline": true
+      },
+      {
+        "x": 1761,
+        "y": 120,
+        "width": 130,
+        "height": 300,
+        "continuousOuterOutline": true,
+        "singlePixelSideOutline": true
+      },
+      {
+        "x": 1931,
+        "y": 120,
+        "width": 130,
+        "height": 300,
+        "continuousOuterOutline": true,
+        "singlePixelSideOutline": true
+      },
+      {
+        "x": 2556,
+        "y": 120,
+        "width": 130,
+        "height": 300,
+        "continuousOuterOutline": true,
+        "singlePixelSideOutline": true
+      },
+      {
+        "x": 3195,
+        "y": 120,
+        "width": 260,
+        "height": 300,
+        "continuousOuterOutline": true,
+        "singlePixelSideOutline": true
+      },
+      {
+        "x": 3570,
+        "y": 120,
+        "width": 130,
+        "height": 300,
+        "continuousOuterOutline": true,
+        "singlePixelSideOutline": true
+      }
+    ],
+    "tileWidthNearRearY430": [
+      85,
+      85
+    ],
+    "tileWidthAtFrontY669": [
+      100,
+      100,
+      100,
+      101,
+      100,
+      100,
+      101,
+      100,
+      100,
+      100,
+      101
+    ],
+    "tileRows": [
+      {
+        "y": 469,
+        "darkJointHeightPx": 1
+      },
+      {
+        "y": 520,
+        "darkJointHeightPx": 1
+      },
+      {
+        "y": 573,
+        "darkJointHeightPx": 1
+      },
+      {
+        "y": 628,
+        "darkJointHeightPx": 1
+      },
+      {
+        "y": 686,
+        "darkJointHeightPx": 1
+      }
+    ],
+    "perspective": {
+      "wallFloorY": 420,
+      "projection": "x = 1850 + (rearX - 1850) * (1 + 0.18 * (y - 420) / 249)",
+      "rearTileWidth": 85,
+      "frontTileWidthAt669": 100.3,
+      "rowBoundaries": [
+        420,
+        469,
+        520,
+        573,
+        628,
+        686,
+        747
+      ],
+      "floorInlayBack": [
+        1562,
+        2215
+      ],
+      "floorInlayFront": [
+        1528,
+        2258
+      ],
+      "foregroundClearFromY": 560
+    },
+    "visualInspection": {
+      "wholePanorama": true,
+      "nativeScaleWestCenterEast": true,
+      "checks": [
+        "ground plane visibly recedes",
+        "aligned porcelain grid widens toward foreground",
+        "inlay and mats share ground projection",
+        "foreground walk strip clear",
+        "pixel edges and discrete matte tones"
+      ],
+      "userApproval": "not claimed"
+    },
+    "sha256": "1bbe84940689e54aae791085ade57737bcee69abf24fdccd683c0892618436f0",
+    "measuredChecksPass": true
+  },
+  "conversionInput": "game-src/art/field/source/f2-before-mode.png"
 }
