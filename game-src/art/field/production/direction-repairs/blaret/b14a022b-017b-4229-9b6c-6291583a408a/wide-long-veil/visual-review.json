@@ -1,0 +1,19 @@
+{
+  "findings": "7방향 모두 개별 시각 검수: 짧은 후드/가느다란 외곽 끈이 넓고 연속된 검은 베일 천으로 교정되어 엉덩이 부근까지 내려옴. 뒤쪽 노출 금발은 베일로 덮이고, 앞쪽 금발·초록 눈·흰 머리띠/빕·십자가·손목 염주·검은 수녀복·키는 보존. 보호 마스크 밖 RGBA 동일, 회색 외곽 칠 없음. 정면과 합친8장 보존 등록용. AVIF 우선·로어 키 보충·전원 장벽 재확인.",
+  "directions": [
+    "south-east",
+    "east",
+    "north-east",
+    "north",
+    "north-west",
+    "west",
+    "south-west"
+  ],
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF primary",
+    "lore height supplementary",
+    "all55 barrier",
+    "gray exterior rejection"
+  ]
+}

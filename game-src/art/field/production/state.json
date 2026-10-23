@@ -20694,7 +20694,7 @@
       "kind": "direction-repair-south-east-wide-long-veil",
       "slug": "blaret",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792796731.3577678,
       "receipt": {
         "usage": null,
@@ -20712,34 +20712,73 @@
       },
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 9.0
         },
         "id": "d0388e93-0ed8-438b-a327-5300457d622e",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-23T23:05:33.063511+00:00",
         "last_response": {
-          "type": "message_progress",
+          "seed": 1792796731,
+          "type": "message_done",
           "model": "inpaint_pro_flash",
           "width": 128,
-          "action": "Correcting pixels",
+          "action": "Removing background",
           "height": 256,
+          "images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
           "prompt": "Correct the BLACK NUN VEIL: it must be ONE WIDE CONTINUOUS SHEET OF BLACK CLOTH hanging from the head down the back to HIPS, below both wrists. Fill the selected region with natural solid black veil fabric and subtle dark charcoal vertical folds. Cover the blonde hair on the BACK beneath the veil. Replace all long thin ribbon-like tails with the broad filled veil panel; no strings, ribbons, split tails, exposed blonde back hair, or short shoulder hood. Veil hem at hip level around y165. Preserve visible face, front blonde hair, green eyes, white bib, cross, arms, sleeves, hands, rosary bracelets, dress silhouette and stature; do not invent limbs. Exact unmasked pixels remain unchanged; transparent outside silhouette, crisp pixel edges.",
-          "status": "processing",
+          "status": "completed",
+          "paste_x": 0,
+          "paste_y": 0,
+          "asset_id": "1bf55be1-f700-5cfa-881f-cfda7d6b8d12",
           "image_id": "1bf55be1-f700-5cfa-881f-cfda7d6b8d12",
           "job_kind": "creator-image",
-          "progress": 0.75,
-          "queue_position": 3,
+          "progress": 1.0,
+          "image_url": "https://s3.eu-central-003.backblazeb2.com/pixellab-generations/production/creator/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/1bf55be1-f700-5cfa-881f-cfda7d6b8d12/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0037e6521c1d7c20000000001%2F20261023%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20261023T231442Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=416d8469b843ea4f71c8a2526273867a1a3883f83ede7740b74f8fedfc1860cf",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 9
+          },
+          "canvas_growth": false,
+          "generation_id": "53ff43bb-333f-4893-9e27-7151d132dd32",
+          "output_method": "Modify current layer",
+          "queue_position": 0,
+          "billing_charged": true,
+          "original_images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "source_image_id": "1bf55be1-f700-5cfa-881f-cfda7d6b8d12",
+          "creator_image_saved": true,
           "generation_started_at": "2026-10-23T23:05:34.105585+00:00",
-          "estimated_wait_seconds": 235
+          "estimated_wait_seconds": 0
         }
+      },
+      "observed_end_epoch": 1792797327.5634334,
+      "elapsed_observed_seconds": 596.2056658267975,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 9
       }
     },
     "d2e8d457-f5a5-4338-ae9e-96d70db85590": {
       "kind": "direction-repair-east-wide-long-veil",
       "slug": "blaret",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792796734.3337667,
       "receipt": {
         "usage": null,
@@ -20757,34 +20796,73 @@
       },
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 9.0
         },
         "id": "d2e8d457-f5a5-4338-ae9e-96d70db85590",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-23T23:05:34.723743+00:00",
         "last_response": {
-          "type": "message_progress",
+          "seed": 1792796734,
+          "type": "message_done",
           "model": "inpaint_pro_flash",
           "width": 128,
-          "action": "Correcting pixels",
+          "action": "Removing background",
           "height": 256,
+          "images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
           "prompt": "Correct the BLACK NUN VEIL: it must be ONE WIDE CONTINUOUS SHEET OF BLACK CLOTH hanging from the head down the back to HIPS, below both wrists. Fill the selected region with natural solid black veil fabric and subtle dark charcoal vertical folds. Cover the blonde hair on the BACK beneath the veil. Replace all long thin ribbon-like tails with the broad filled veil panel; no strings, ribbons, split tails, exposed blonde back hair, or short shoulder hood. Veil hem at hip level around y165. Preserve visible face, front blonde hair, green eyes, white bib, cross, arms, sleeves, hands, rosary bracelets, dress silhouette and stature; do not invent limbs. Exact unmasked pixels remain unchanged; transparent outside silhouette, crisp pixel edges.",
-          "status": "processing",
+          "status": "completed",
+          "paste_x": 0,
+          "paste_y": 0,
+          "asset_id": "8fcae77a-d79c-57b1-b99f-ba277d37b98c",
           "image_id": "8fcae77a-d79c-57b1-b99f-ba277d37b98c",
           "job_kind": "creator-image",
-          "progress": 0.75,
-          "queue_position": 3,
+          "progress": 1.0,
+          "image_url": "https://s3.eu-central-003.backblazeb2.com/pixellab-generations/production/creator/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/8fcae77a-d79c-57b1-b99f-ba277d37b98c/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0037e6521c1d7c20000000001%2F20261023%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20261023T231640Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=dd883aea9a5932129346018a48954898eb33b3d76ff164a4f1d4271f45a74c69",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 9
+          },
+          "canvas_growth": false,
+          "generation_id": "843d0878-0ca0-4ff0-88ee-b62a68a26c93",
+          "output_method": "Modify current layer",
+          "queue_position": 0,
+          "billing_charged": true,
+          "original_images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "source_image_id": "8fcae77a-d79c-57b1-b99f-ba277d37b98c",
+          "creator_image_saved": true,
           "generation_started_at": "2026-10-23T23:05:34.917948+00:00",
-          "estimated_wait_seconds": 224
+          "estimated_wait_seconds": 0
         }
+      },
+      "observed_end_epoch": 1792797414.8367255,
+      "elapsed_observed_seconds": 680.5029590129852,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 9
       }
     },
     "aa198451-112b-4f2c-aa9d-88add755be6a": {
       "kind": "direction-repair-north-east-wide-long-veil",
       "slug": "blaret",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792796735.044458,
       "receipt": {
         "usage": null,
@@ -20802,34 +20880,73 @@
       },
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 9.0
         },
         "id": "aa198451-112b-4f2c-aa9d-88add755be6a",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-23T23:05:35.468809+00:00",
         "last_response": {
-          "type": "message_progress",
+          "seed": 1792796735,
+          "type": "message_done",
           "model": "inpaint_pro_flash",
           "width": 128,
-          "action": "Correcting pixels",
+          "action": "Removing background",
           "height": 256,
+          "images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
           "prompt": "Correct the BLACK NUN VEIL: it must be ONE WIDE CONTINUOUS SHEET OF BLACK CLOTH hanging from the head down the back to HIPS, below both wrists. Fill the selected region with natural solid black veil fabric and subtle dark charcoal vertical folds. Cover the blonde hair on the BACK beneath the veil. Replace all long thin ribbon-like tails with the broad filled veil panel; no strings, ribbons, split tails, exposed blonde back hair, or short shoulder hood. Veil hem at hip level around y165. Preserve visible face, front blonde hair, green eyes, white bib, cross, arms, sleeves, hands, rosary bracelets, dress silhouette and stature; do not invent limbs. Exact unmasked pixels remain unchanged; transparent outside silhouette, crisp pixel edges.",
-          "status": "processing",
+          "status": "completed",
+          "paste_x": 0,
+          "paste_y": 0,
+          "asset_id": "787f4f56-df61-59b4-b36a-1907766ec0a3",
           "image_id": "787f4f56-df61-59b4-b36a-1907766ec0a3",
           "job_kind": "creator-image",
-          "progress": 0.75,
-          "queue_position": 2,
+          "progress": 1.0,
+          "image_url": "https://s3.eu-central-003.backblazeb2.com/pixellab-generations/production/creator/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/787f4f56-df61-59b4-b36a-1907766ec0a3/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0037e6521c1d7c20000000001%2F20261023%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20261023T231357Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=975be63499c8cd1492526730456daf405a55471106a1c305bf1c5909a27cdaa5",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 9
+          },
+          "canvas_growth": false,
+          "generation_id": "815d2dca-0b70-4247-b87d-c95f95b02a9c",
+          "output_method": "Modify current layer",
+          "queue_position": 0,
+          "billing_charged": true,
+          "original_images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "source_image_id": "787f4f56-df61-59b4-b36a-1907766ec0a3",
+          "creator_image_saved": true,
           "generation_started_at": "2026-10-23T23:05:35.562715+00:00",
-          "estimated_wait_seconds": 183
+          "estimated_wait_seconds": 0
         }
+      },
+      "observed_end_epoch": 1792797251.742941,
+      "elapsed_observed_seconds": 516.698483467102,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 9
       }
     },
     "570f4680-eeeb-47e8-9979-2f9b5d706a9b": {
       "kind": "direction-repair-north-wide-long-veil",
       "slug": "blaret",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792796735.6861675,
       "receipt": {
         "usage": null,
@@ -20847,34 +20964,73 @@
       },
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 9.0
         },
         "id": "570f4680-eeeb-47e8-9979-2f9b5d706a9b",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-23T23:05:37.141187+00:00",
         "last_response": {
-          "type": "message_progress",
+          "seed": 1792796735,
+          "type": "message_done",
           "model": "inpaint_pro_flash",
           "width": 128,
-          "action": "Correcting pixels",
+          "action": "Removing background",
           "height": 256,
+          "images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
           "prompt": "Correct the BLACK NUN VEIL: it must be ONE WIDE CONTINUOUS SHEET OF BLACK CLOTH hanging from the head down the back to HIPS, below both wrists. Fill the selected region with natural solid black veil fabric and subtle dark charcoal vertical folds. Cover the blonde hair on the BACK beneath the veil. Replace all long thin ribbon-like tails with the broad filled veil panel; no strings, ribbons, split tails, exposed blonde back hair, or short shoulder hood. Veil hem at hip level around y165. Preserve visible face, front blonde hair, green eyes, white bib, cross, arms, sleeves, hands, rosary bracelets, dress silhouette and stature; do not invent limbs. Exact unmasked pixels remain unchanged; transparent outside silhouette, crisp pixel edges.",
-          "status": "processing",
+          "status": "completed",
+          "paste_x": 0,
+          "paste_y": 0,
+          "asset_id": "bd1cca22-5203-571b-9497-0e7d717a58f3",
           "image_id": "bd1cca22-5203-571b-9497-0e7d717a58f3",
           "job_kind": "creator-image",
-          "progress": 0.75,
-          "queue_position": 3,
+          "progress": 1.0,
+          "image_url": "https://s3.eu-central-003.backblazeb2.com/pixellab-generations/production/creator/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/bd1cca22-5203-571b-9497-0e7d717a58f3/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0037e6521c1d7c20000000001%2F20261023%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20261023T231414Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=5ba2655622c20310085d59057f82633eb7fd04daa52ea25343dbebb3c110f2c9",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 9
+          },
+          "canvas_growth": false,
+          "generation_id": "5161c3a3-70be-4d70-bdda-6429722613cf",
+          "output_method": "Modify current layer",
+          "queue_position": 0,
+          "billing_charged": true,
+          "original_images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "source_image_id": "bd1cca22-5203-571b-9497-0e7d717a58f3",
+          "creator_image_saved": true,
           "generation_started_at": "2026-10-23T23:05:37.566998+00:00",
-          "estimated_wait_seconds": 231
+          "estimated_wait_seconds": 0
         }
+      },
+      "observed_end_epoch": 1792797328.2793102,
+      "elapsed_observed_seconds": 592.5931432247162,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 9
       }
     },
     "65477007-079f-4fec-9691-cd8fbf1e41a9": {
       "kind": "direction-repair-north-west-wide-long-veil",
       "slug": "blaret",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792796737.9670048,
       "receipt": {
         "usage": null,
@@ -20892,34 +21048,73 @@
       },
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 9.0
         },
         "id": "65477007-079f-4fec-9691-cd8fbf1e41a9",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-23T23:05:38.544691+00:00",
         "last_response": {
-          "type": "message_progress",
+          "seed": 1792796737,
+          "type": "message_done",
           "model": "inpaint_pro_flash",
           "width": 128,
-          "action": "Correcting pixels",
+          "action": "Removing background",
           "height": 256,
+          "images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
           "prompt": "Correct the BLACK NUN VEIL: it must be ONE WIDE CONTINUOUS SHEET OF BLACK CLOTH hanging from the head down the back to HIPS, below both wrists. Fill the selected region with natural solid black veil fabric and subtle dark charcoal vertical folds. Cover the blonde hair on the BACK beneath the veil. Replace all long thin ribbon-like tails with the broad filled veil panel; no strings, ribbons, split tails, exposed blonde back hair, or short shoulder hood. Veil hem at hip level around y165. Preserve visible face, front blonde hair, green eyes, white bib, cross, arms, sleeves, hands, rosary bracelets, dress silhouette and stature; do not invent limbs. Exact unmasked pixels remain unchanged; transparent outside silhouette, crisp pixel edges.",
-          "status": "processing",
+          "status": "completed",
+          "paste_x": 0,
+          "paste_y": 0,
+          "asset_id": "0e023f45-e8b9-510d-97a0-6c3df8e9184f",
           "image_id": "0e023f45-e8b9-510d-97a0-6c3df8e9184f",
           "job_kind": "creator-image",
-          "progress": 0.75,
-          "queue_position": 3,
+          "progress": 1.0,
+          "image_url": "https://s3.eu-central-003.backblazeb2.com/pixellab-generations/production/creator/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/0e023f45-e8b9-510d-97a0-6c3df8e9184f/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0037e6521c1d7c20000000001%2F20261023%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20261023T231355Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=2bee36f57e63e29c7240f63d682831a8f9fe86217ad2731e6c7441d23223e78b",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 9
+          },
+          "canvas_growth": false,
+          "generation_id": "f20e0751-eb7a-48f5-a13d-5759bb925a4b",
+          "output_method": "Modify current layer",
+          "queue_position": 0,
+          "billing_charged": true,
+          "original_images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "source_image_id": "0e023f45-e8b9-510d-97a0-6c3df8e9184f",
+          "creator_image_saved": true,
           "generation_started_at": "2026-10-23T23:05:38.572298+00:00",
-          "estimated_wait_seconds": 222
+          "estimated_wait_seconds": 0
         }
+      },
+      "observed_end_epoch": 1792797252.0966084,
+      "elapsed_observed_seconds": 514.129604101181,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 9
       }
     },
     "7fcb0406-f75a-4062-b35d-e50fce22fb17": {
       "kind": "direction-repair-west-wide-long-veil",
       "slug": "blaret",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792796738.8127005,
       "receipt": {
         "usage": null,
@@ -20937,34 +21132,73 @@
       },
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 9.0
         },
         "id": "7fcb0406-f75a-4062-b35d-e50fce22fb17",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-23T23:05:39.069012+00:00",
         "last_response": {
-          "type": "message_progress",
+          "seed": 1792796738,
+          "type": "message_done",
           "model": "inpaint_pro_flash",
           "width": 128,
-          "action": "Correcting pixels",
+          "action": "Removing background",
           "height": 256,
+          "images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
           "prompt": "Correct the BLACK NUN VEIL: it must be ONE WIDE CONTINUOUS SHEET OF BLACK CLOTH hanging from the head down the back to HIPS, below both wrists. Fill the selected region with natural solid black veil fabric and subtle dark charcoal vertical folds. Cover the blonde hair on the BACK beneath the veil. Replace all long thin ribbon-like tails with the broad filled veil panel; no strings, ribbons, split tails, exposed blonde back hair, or short shoulder hood. Veil hem at hip level around y165. Preserve visible face, front blonde hair, green eyes, white bib, cross, arms, sleeves, hands, rosary bracelets, dress silhouette and stature; do not invent limbs. Exact unmasked pixels remain unchanged; transparent outside silhouette, crisp pixel edges.",
-          "status": "processing",
+          "status": "completed",
+          "paste_x": 0,
+          "paste_y": 0,
+          "asset_id": "a6a761bf-f4b3-5471-b024-d26aff709e9a",
           "image_id": "a6a761bf-f4b3-5471-b024-d26aff709e9a",
           "job_kind": "creator-image",
-          "progress": 0.75,
-          "queue_position": 3,
+          "progress": 1.0,
+          "image_url": "https://s3.eu-central-003.backblazeb2.com/pixellab-generations/production/creator/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/a6a761bf-f4b3-5471-b024-d26aff709e9a/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0037e6521c1d7c20000000001%2F20261023%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20261023T231640Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=e4551292f25ffc16b302099a4f63cb63ceca64eeb200c622d87ad96af77cd796",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 9
+          },
+          "canvas_growth": false,
+          "generation_id": "8b847c3f-b8b6-49f0-8f2c-ecb78690614b",
+          "output_method": "Modify current layer",
+          "queue_position": 0,
+          "billing_charged": true,
+          "original_images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "source_image_id": "a6a761bf-f4b3-5471-b024-d26aff709e9a",
+          "creator_image_saved": true,
           "generation_started_at": "2026-10-23T23:05:39.120537+00:00",
-          "estimated_wait_seconds": 222
+          "estimated_wait_seconds": 0
         }
+      },
+      "observed_end_epoch": 1792797415.2257562,
+      "elapsed_observed_seconds": 676.413055896759,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 9
       }
     },
     "0976945d-ef6a-4bad-9850-14556f91f15b": {
       "kind": "direction-repair-south-west-wide-long-veil",
       "slug": "blaret",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792796739.3730156,
       "receipt": {
         "usage": null,
@@ -20982,27 +21216,81 @@
       },
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 9.0
         },
         "id": "0976945d-ef6a-4bad-9850-14556f91f15b",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-23T23:05:39.752520+00:00",
         "last_response": {
-          "type": "message_progress",
+          "seed": 1792796739,
+          "type": "message_done",
           "model": "inpaint_pro_flash",
           "width": 128,
-          "action": "Correcting pixels",
+          "action": "Removing background",
           "height": 256,
+          "images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
           "prompt": "Correct the BLACK NUN VEIL: it must be ONE WIDE CONTINUOUS SHEET OF BLACK CLOTH hanging from the head down the back to HIPS, below both wrists. Fill the selected region with natural solid black veil fabric and subtle dark charcoal vertical folds. Cover the blonde hair on the BACK beneath the veil. Replace all long thin ribbon-like tails with the broad filled veil panel; no strings, ribbons, split tails, exposed blonde back hair, or short shoulder hood. Veil hem at hip level around y165. Preserve visible face, front blonde hair, green eyes, white bib, cross, arms, sleeves, hands, rosary bracelets, dress silhouette and stature; do not invent limbs. Exact unmasked pixels remain unchanged; transparent outside silhouette, crisp pixel edges.",
-          "status": "processing",
+          "status": "completed",
+          "paste_x": 0,
+          "paste_y": 0,
+          "asset_id": "13642b81-50c0-5f68-a08b-c5e055cd8fc1",
           "image_id": "13642b81-50c0-5f68-a08b-c5e055cd8fc1",
           "job_kind": "creator-image",
-          "progress": 0.75,
-          "queue_position": 2,
+          "progress": 1.0,
+          "image_url": "https://s3.eu-central-003.backblazeb2.com/pixellab-generations/production/creator/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/13642b81-50c0-5f68-a08b-c5e055cd8fc1/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0037e6521c1d7c20000000001%2F20261023%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20261023T231415Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=7310e9dbd66350cf755beeba7dd5444cea15f3d7cfffe6d72150b2dacd0069fc",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 9
+          },
+          "canvas_growth": false,
+          "generation_id": "4d5c494e-0eb1-494a-ab0d-0f4d8a4cc3ce",
+          "output_method": "Modify current layer",
+          "queue_position": 0,
+          "billing_charged": true,
+          "original_images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "source_image_id": "13642b81-50c0-5f68-a08b-c5e055cd8fc1",
+          "creator_image_saved": true,
           "generation_started_at": "2026-10-23T23:05:39.811297+00:00",
-          "estimated_wait_seconds": 218
+          "estimated_wait_seconds": 0
         }
+      },
+      "observed_end_epoch": 1792797328.2794323,
+      "elapsed_observed_seconds": 588.9064168930054,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 9
+      }
+    },
+    "68f0581c-57c2-49c3-8ac8-f6a5d0482358": {
+      "kind": "registration",
+      "slug": "blaret",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792797460.3000722,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "68f0581c-57c2-49c3-8ac8-f6a5d0482358",
+        "character_id": "84db0331-2810-48ce-aefb-a26b3525e628",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
       }
     }
   },
@@ -22789,18 +23077,24 @@
     "blaret": {
       "name": "블라렛",
       "group": "religious",
-      "character_id": "b14a022b-017b-4229-9b6c-6291583a408a",
+      "character_id": "84db0331-2810-48ce-aefb-a26b3525e628",
       "image": "0f18021b-f069-4958-825d-d830176a1892",
-      "registration": "217f749c-ee0b-43c8-88ca-d8d9d3db80bb",
+      "registration": "68f0581c-57c2-49c3-8ac8-f6a5d0482358",
       "motions": {},
-      "ready": true,
-      "exported": true,
+      "ready": false,
+      "exported": false,
       "registration_rejections": [
         {
           "character_id": "a1e68911-325e-4aef-a66c-df643e8832de",
           "job": "82dc8eed-43b9-433a-aa58-dc4ba39c1a82",
           "reason": "원작의 허리·골반까지 내려오는 긴 검은 베일이 어깨뼈 길이로 짧아짐. 베일을 늘린 정면으로 다시 등록 필요.",
           "at": 1792793748.776734
+        },
+        {
+          "character_id": "b14a022b-017b-4229-9b6c-6291583a408a",
+          "job": "217f749c-ee0b-43c8-88ca-d8d9d3db80bb",
+          "reason": "회전에서 짧아지고 끈처럼 갈라진 베일을7방향 모두 넓은 천으로 교정·검수 완료. 수정8장 보존 등록으로 실패 라이브 등록 교체.",
+          "at": 1792797459.9942079
         }
       ],
       "eight_way_visual_reviewed": false,
@@ -22870,9 +23164,7 @@
       "direction-repair-north-wide-long-veil": "570f4680-eeeb-47e8-9979-2f9b5d706a9b",
       "direction-repair-north-west-wide-long-veil": "65477007-079f-4fec-9691-cd8fbf1e41a9",
       "direction-repair-west-wide-long-veil": "7fcb0406-f75a-4062-b35d-e50fce22fb17",
-      "direction-repair-south-west-wide-long-veil": "0976945d-ef6a-4bad-9850-14556f91f15b",
-      "skeleton_joints": 18,
-      "rotation_count": 8
+      "direction-repair-south-west-wide-long-veil": "0976945d-ef6a-4bad-9850-14556f91f15b"
     },
     "saladin": {
       "name": "살라딘",
@@ -38437,9 +38729,139 @@
         "bytes": 105926,
         "files": 9
       }
+    },
+    {
+      "at": "2026-10-23T23:14:11Z",
+      "kind": "completed",
+      "slug": "blaret",
+      "detail": {
+        "kind": "direction-repair-north-east-wide-long-veil",
+        "template": null,
+        "job_id": "aa198451-112b-4f2c-aa9d-88add755be6a",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 9
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T23:14:12Z",
+      "kind": "completed",
+      "slug": "blaret",
+      "detail": {
+        "kind": "direction-repair-north-west-wide-long-veil",
+        "template": null,
+        "job_id": "65477007-079f-4fec-9691-cd8fbf1e41a9",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 9
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T23:15:27Z",
+      "kind": "completed",
+      "slug": "blaret",
+      "detail": {
+        "kind": "direction-repair-south-east-wide-long-veil",
+        "template": null,
+        "job_id": "d0388e93-0ed8-438b-a327-5300457d622e",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 9
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T23:15:28Z",
+      "kind": "completed",
+      "slug": "blaret",
+      "detail": {
+        "kind": "direction-repair-north-wide-long-veil",
+        "template": null,
+        "job_id": "570f4680-eeeb-47e8-9979-2f9b5d706a9b",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 9
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T23:15:28Z",
+      "kind": "completed",
+      "slug": "blaret",
+      "detail": {
+        "kind": "direction-repair-south-west-wide-long-veil",
+        "template": null,
+        "job_id": "0976945d-ef6a-4bad-9850-14556f91f15b",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 9
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T23:16:54Z",
+      "kind": "completed",
+      "slug": "blaret",
+      "detail": {
+        "kind": "direction-repair-east-wide-long-veil",
+        "template": null,
+        "job_id": "d2e8d457-f5a5-4338-ae9e-96d70db85590",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 9
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T23:16:55Z",
+      "kind": "completed",
+      "slug": "blaret",
+      "detail": {
+        "kind": "direction-repair-west-wide-long-veil",
+        "template": null,
+        "job_id": "7fcb0406-f75a-4062-b35d-e50fce22fb17",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 9
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T23:17:40Z",
+      "kind": "submitted",
+      "slug": "blaret",
+      "detail": {
+        "kind": "registration",
+        "template": null,
+        "job_id": "68f0581c-57c2-49c3-8ac8-f6a5d0482358",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "68f0581c-57c2-49c3-8ac8-f6a5d0482358",
+          "character_id": "84db0331-2810-48ce-aefb-a26b3525e628",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
     }
   ],
-  "updated_at": 1792797121.4378355,
+  "updated_at": 1792797460.9852116,
   "user_stopped_at": 1792778235.6917784,
   "archived_jobs": {
     "304457e9-6577-44f0-af17-97841a9f6720": {
@@ -39758,15 +40180,15 @@
       "saved_frames": 6
     }
   },
-  "last_git_checkpoint": 1792796749.3472826,
+  "last_git_checkpoint": 1792797123.1165566,
   "summary": {
     "jobs": {
-      "processing": 7,
-      "completed": 260,
+      "processing": 1,
+      "completed": 267,
       "failed": 9,
       "stalled": 0
     },
-    "characters_ready": 55,
+    "characters_ready": 54,
     "characters_total": 55,
     "images_format_verified": 55,
     "new_images_visually_reviewed": 43,

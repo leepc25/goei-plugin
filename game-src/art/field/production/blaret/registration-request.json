@@ -10,5 +10,42 @@
   "template_id": "mannequin",
   "name": "블라렛",
   "seed": 10222027,
-  "no_background": true
+  "no_background": true,
+  "direction_images": {
+    "south-east": {
+      "type": "base64",
+      "base64": "[image payload omitted]",
+      "format": "png"
+    },
+    "east": {
+      "type": "base64",
+      "base64": "[image payload omitted]",
+      "format": "png"
+    },
+    "north-east": {
+      "type": "base64",
+      "base64": "[image payload omitted]",
+      "format": "png"
+    },
+    "north": {
+      "type": "base64",
+      "base64": "[image payload omitted]",
+      "format": "png"
+    },
+    "north-west": {
+      "type": "base64",
+      "base64": "[image payload omitted]",
+      "format": "png"
+    },
+    "west": {
+      "type": "base64",
+      "base64": "[image payload omitted]",
+      "format": "png"
+    },
+    "south-west": {
+      "type": "base64",
+      "base64": "[image payload omitted]",
+      "format": "png"
+    }
+  }
 }
