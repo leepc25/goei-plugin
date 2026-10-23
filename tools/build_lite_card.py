@@ -382,6 +382,15 @@ def lore_activation(entries):
 
 # 원본 지침 문장 고치기 (주석 이름, 옛 문장, 새 문장). 옛 문장이 없으면 빌드를 멈춘다
 LORE_PATCHES = [
+    # 상태창에 동행·투입 칸 (2026-10-23 사용자 승인: 필드가 동행 인물과 괴이 안/밖을 알 수 있게). 플러그인 v0.16.54부터 읽는다. 옛 6칸도 읽힌다
+    ('🏷️Tag', '[▣|YYYY.MM.DD|HH:MM AM/PM|weather|temperature|location|anomaly]\n',
+     '[▣|YYYY.MM.DD|HH:MM AM/PM|weather|temperature|location|anomaly|companions|deployed]\n'),
+    ('🏷️Tag', "including briefing and travel; otherwise `없음`.\n- Example (no current anomaly):\n[▣|2025.01.01|02:47 AM|☀️|4°C|서울 종로구 거리|없음]",
+     "including briefing and travel; otherwise `없음`.\n"
+     "- Companions = the named individuals currently travelling together with {{user}}, most important first, exact Korean names as used in the story, separated by `,`. `없음` if none. Only people who are physically with {{user}} right now; do not list unnamed crowds or groups.\n"
+     "- Deployed = `투입` only while {{user}} (or the party {{user}} leads) is physically inside an anomaly site on an operation. `없음` during briefing, preparation, travel to the site, and after leaving or being evacuated.\n"
+     "- Example (no current anomaly):\n[▣|2025.01.01|02:47 AM|☀️|4°C|서울 종로구 거리|없음|없음|없음]\n"
+     "- Example (inside an anomaly with two companions):\n[▣|2025.01.01|10:15 PM|🌫️|9°C|명일 아파트 3층 복도|명일 아파트|쟈알디,에일린|투입]"),
     # 배치 칸 띄어쓰기 통일 (2026-10-21 점검)
     ('🏷️Tag', '- 배치 : Agent code(s) | External faction name | 없음\n', '- 배치: Agent code(s) | External faction name | 없음\n'),
     # 요원 상태 값만 한국어로 쓰게: 괄호 영어 풀이를 따로 줄로 (모델이 「휴게 (On-duty break)」를 그대로 베끼지 않게)

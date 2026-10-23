@@ -159,14 +159,14 @@ export function scanStatus(text: string): StatusLine {
 }
 
 /** 마지막 상태창 [▣|날짜|시각|날씨|기온|위치|괴이]의 칸들 (간이 상태창 표시용) */
-export interface StatusFields { date: string; time: string; weather: string; temp: string; place: string; target: string }
+export interface StatusFields { date: string; time: string; weather: string; temp: string; place: string; target: string; companions: string[]; deployed: boolean | null }
 
 export function lastStatusFields(texts: string[]): StatusFields | null {
   for (let i = texts.length - 1; i >= 0; i--) {
     const all = findStatusTags(texts[i] ?? '');
     if (!all.length) continue;
     const t = all[all.length - 1];
-    return { date: t.date, time: t.time, weather: t.weather, temp: t.temp, place: t.place, target: t.target };
+    return { date: t.date, time: t.time, weather: t.weather, temp: t.temp, place: t.place, target: t.target, companions: t.companions, deployed: t.deployed };
   }
   return null;
 }
