@@ -1,0 +1,46 @@
+{
+  "at": 1792793149.3619275,
+  "slug": "lee-byeong-jin",
+  "reason": "종료된 등록은 회전8장만 있고 skeletons:null. 동작 필수 관절 누락이므로 백업·삭제 후 비만 체형 정면 그대로 재등록.",
+  "state_before": {
+    "name": "이병진",
+    "group": "baekilmong",
+    "character_id": "7180fb34-b900-43da-bc0c-82a91948b1e8",
+    "image": "43779337-3a91-47ea-8488-de9d8ef98956",
+    "registration": "3a357db9-8465-422e-8639-25913e05af4a",
+    "motions": {},
+    "ready": false,
+    "visual_rejections": [
+      {
+        "job": "9bfa50f6-278e-4074-881f-8a581f373aec",
+        "decision": "reroll",
+        "reason": "둥근 복부·얼굴·안경·셔츠는 맞으나 얼굴과 몸통이 3/4로 돌아가 SOUTH 기준 실패.",
+        "at": 1792789418.292294,
+        "rules_rechecked": [
+          "AVIF primary identity",
+          "lore/user height",
+          "south-facing",
+          "transparent edge without gray halo",
+          "no motions before all roster eight-way review"
+        ]
+      },
+      {
+        "job": "776e4bb4-46e4-4717-8515-ca8f4e9c2953",
+        "job_status": "completed",
+        "decision": "reroll",
+        "reason": "키180px 미만. 둥근 얼굴과 큰 복부가 맞는 이길환을 스타일·키 참조로 사용하고 흰 셔츠·안경·무재킷 유지.",
+        "at": 1792790385.1513457,
+        "rules_rechecked": [
+          "AVIF primary identity",
+          "lore/user height",
+          "south-facing",
+          "transparent edge without gray halo",
+          "no motions before all roster eight-way review"
+        ],
+        "new_style_source": "lee-gil-hwan"
+      }
+    ],
+    "image_verified": true,
+    "image_visually_reviewed": true
+  }
+}

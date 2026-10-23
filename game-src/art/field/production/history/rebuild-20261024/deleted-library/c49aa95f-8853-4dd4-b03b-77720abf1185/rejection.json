@@ -1,0 +1,49 @@
+{
+  "at": 1792793095.4326382,
+  "slug": "jay",
+  "reason": "측면·사선 회전에 원작과 검수된 정면에 없는 방패형 소매 패치가 추가됨. 은발 목덜미 길이는 확인됨. 정면 유지하고 무늬 없는 소매를 명시해 재등록.",
+  "state_before": {
+    "name": "제이",
+    "group": "baekilmong",
+    "character_id": "c49aa95f-8853-4dd4-b03b-77720abf1185",
+    "image": "721d1a17-9804-4fa7-8ef8-7069e2588c61",
+    "registration": "37ea908d-f39f-4bb1-959d-8be0f487720b",
+    "motions": {},
+    "ready": true,
+    "visual_rejections": [
+      {
+        "job": "d262fefc-fcef-487d-86ff-e1d757d54170",
+        "decision": "reroll",
+        "reason": "은발·모자·의료 마스크·경비복은 맞지만 얼굴 측면 및 보통 키 범위 초과.",
+        "at": 1792789500.4164922,
+        "rules_rechecked": [
+          "AVIF primary identity",
+          "lore/user height",
+          "south-facing",
+          "transparent edge without gray halo",
+          "no motions before all roster eight-way review"
+        ]
+      },
+      {
+        "job": "726695bb-3a3e-483d-b68e-25ee10887393",
+        "job_status": "completed",
+        "decision": "reroll",
+        "reason": "키180px 미만으로 성인 목표보다 작음. 김성진의 슬림한 성인 정면·키 참조로 교체, 은발·검은 모자·흰 의료마스크·경비복 유지.",
+        "at": 1792790948.676978,
+        "rules_rechecked": [
+          "AVIF primary identity",
+          "lore/user height",
+          "south-facing",
+          "transparent edge without gray halo",
+          "no motions before all roster eight-way review"
+        ],
+        "new_style_source": "kim-seong-jin"
+      }
+    ],
+    "image_verified": true,
+    "image_visually_reviewed": true,
+    "skeleton_joints": 18,
+    "rotation_count": 8,
+    "exported": true
+  }
+}

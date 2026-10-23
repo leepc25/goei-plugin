@@ -1,0 +1,25 @@
+{
+  "at": 1792793132.518825,
+  "character_id": "8fdfa656-d124-4442-b153-61a0542175bb",
+  "result": "pass",
+  "directions_reviewed": [
+    "south",
+    "south-east",
+    "east",
+    "north-east",
+    "north",
+    "north-west",
+    "west",
+    "south-west"
+  ],
+  "findings": "원작의 갈색 흐트러진 앞머리·주황 눈·밝은 회갈색 열린 정장·느슨한 타이 유지. 동쪽은 앞머리가 눈을 가리고 서쪽·남서쪽은 눈과 얼굴이 더 드러나 서쪽 쌍 선택. 8방향 키 일관, 회색 정장 내부 음영과 외곽 투명 구분 확인.",
+  "movement_direction": "west",
+  "stationary_direction": "south-west",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF primary",
+    "Lore supplementary height",
+    "All55 before motion",
+    "Gray outer paint reroll"
+  ]
+}

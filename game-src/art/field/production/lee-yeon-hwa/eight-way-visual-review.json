@@ -1,0 +1,25 @@
+{
+  "at": 1792793043.6007144,
+  "character_id": "9cdc0864-7418-4623-b687-845da6f66e88",
+  "result": "pass",
+  "directions_reviewed": [
+    "south",
+    "south-east",
+    "east",
+    "north-east",
+    "north",
+    "north-west",
+    "west",
+    "south-west"
+  ],
+  "findings": "원작의 낮은 검은 포니테일·사각 안경·분홍 셔츠·흰 가운·검은 치마 유지. 양 측면에서 머리와 안경 확인, 8방향 여성 키 일관. 가운 회색 음영은 의복 내부이며 외곽 덧칠 없음.",
+  "movement_direction": "east",
+  "stationary_direction": "south-east",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF primary",
+    "Lore supplementary height",
+    "All55 before motion",
+    "Gray outer paint reroll"
+  ]
+}

@@ -2322,7 +2322,7 @@
     "name": "제이",
     "group": "baekilmong",
     "slug": "jay",
-    "appearance": "Very pale gaunt young adult man with thin wiry build. Shaggy SILVER-WHITE hair to jaw and nape, long messy bangs partly obscuring tired YELLOW eyes. Black baseball cap, white pleated medical mask covering nose and mouth. Dark charcoal NAVY security uniform with pointed collar, two buttoned flap chest pockets, long sleeves, matching trousers and black belt. No necktie, no suit jacket.",
+    "appearance": "Very pale gaunt young adult man with thin wiry build. Shaggy SILVER-WHITE hair to jaw and nape, long messy bangs partly obscuring tired YELLOW eyes. Black baseball cap, white pleated medical mask covering nose and mouth. Dark charcoal NAVY security uniform with pointed collar, two buttoned flap chest pockets, long sleeves, matching trousers and black belt. No necktie, no suit jacket. Plain unmarked sleeves and shoulders, NO patches, NO shield emblems, NO police badges, NO logos or shoulder decorations.",
     "original_art": "assets/agents/Jay_default.avif",
     "original_sha256": "9e6aee67775356eae339bf718fdc324ddae0127dc4006ef935c26b695c1a2f50",
     "wiki_appearance": "[Paragraph]말라 죽은 나무처럼 창백하고 마른 체구. 낮게 눌러쓴 모자 아래로 빛바랜 덥수룩한 머리가 삐져나오고, 멍하고 지친 얼굴에 짐승처럼 빛이 빠진 눈이 박혀 있다. 근무 중이든 아니든 늘 같은 낡은 경비복 차림이고, 밖에 나갈 때는 평범한 치과용 마스크를 쓴다. 모자를 안 쓰고 있을 때도 모자챙을 고쳐 잡는 손짓을 한다.📌모자가 없는데 모자를 고치는 걸 처음 본 신입은 한참 동안 자기 눈을 의심했다고 한다.📌\n[Paragraph]겉보기엔 20대 청년인데, 오염된 기간을 따지면 ❗거의 30년❗에 가깝다는 추정이 있다. 늘어진 움직임이 기본값이지만 위협이 감지되는 순간 동작이 기계처럼 정확해지고 눈빛이 바뀐다. 안쪽의 무언가가 움직이면 바랜 눈이 노랗게 빛난다. 이 노란빛을 봤다는 사람들은 대체로 그날 일을 길게 이야기하지 않는다.\n",
@@ -3321,13 +3321,13 @@
     "source_images_visually_reviewed": true,
     "character_id": null,
     "pixel_request": {
-      "description": "Full-body native pixel-art game sprite, STRICTLY FRONT SOUTH view: face, nose, chest, belt and knees directly toward viewer, both ears equally visible. No sideways head or three-quarter turn. IDENTITY: Adult-proportioned female ART MANNEQUIN made of smooth matte ivory plastic. Long messy dark RED layered hair, thick uneven bangs and outward wisps, glowing RED eyes, freckles over cheeks and a faint unsettling smile. Clearly visible horizontal STITCHED SEAM around neck. Articulated round elbow/shoulder/wrist/knee joints, seam around waist and molded hip shell. Smooth featureless mannequin torso and pelvis, NO nipples or genitals, no human skin detail. Narrow waist and natural mannequin limbs. Ivory feet shaped like heels. No clothing or accessories; neutral nonsexual upright display stance. Relaxed upright stance, empty hands at sides. Natural adult anatomy, normal torso/pelvis, 7-head proportions. Anatomical crown to soles 200-206px; feet 6px above bottom, hair fully inside frame. Crisp single-pixel clusters, selective dark outlines, restrained game-sprite shading, no antialiasing. Transparent background, no ground shadow, text or weapons. Preserve individual hair, face, stature and clothing. Do not copy any generic character. Anatomical height excludes high hair/headwear. Every outer edge must border transparency directly, never a light gray halo. Native anatomical crown around y46, soles at y250. Keep original individual build and clothes.",
+      "description": "Full-body native pixel-art game sprite, STRICTLY FRONT SOUTH view: face, nose, chest, belt and knees directly toward viewer, both ears equally visible. No sideways head or three-quarter turn. IDENTITY: Adult-proportioned female ART MANNEQUIN made of smooth matte ivory plastic. Long messy dark RED layered hair, thick uneven bangs and outward wisps, glowing RED eyes, freckles over cheeks and a faint unsettling smile. Clearly visible horizontal STITCHED SEAM around neck. Articulated round elbow/shoulder/wrist/knee joints, seam around waist and molded hip shell. Smooth featureless mannequin torso and pelvis, NO nipples or genitals, no human skin detail. Narrow waist and natural mannequin limbs. Ivory feet shaped like heels. No clothing or accessories; neutral nonsexual upright display stance. Relaxed upright stance, empty hands at sides. Natural adult anatomy, normal torso/pelvis, 7-head proportions. Anatomical crown to soles 200-206px; feet 6px above bottom, hair fully inside frame. Crisp single-pixel clusters, selective dark outlines, restrained game-sprite shading, no antialiasing. Transparent background, no ground shadow, text or weapons. Preserve individual hair, face, stature and clothing. Do not copy any generic character. Anatomical height excludes high hair/headwear. Every outer edge must border transparency directly, never a light gray halo.",
       "image_size": {
         "width": 128,
-        "height": 256
+        "height": 220
       },
       "no_background": true,
-      "seed": 1792789084,
+      "seed": 1792793043,
       "target_palette": {
         "max_colors": 48
       },
@@ -3336,9 +3336,7 @@
         "outline": true,
         "detail": true,
         "shading": true
-      },
-      "style_reference_local": "game-src/art/field/production/eun-ha-je/reference.png",
-      "style_usage_description": "Use ONLY native pixel rendering, 204px adult female standing scale and strict front-facing pose. Do NOT copy reference face, eyes, hair, clothes, color palette or identity. Preserve described target original."
+      }
     },
     "stature_rendering": {
       "basis": "Latest explicit user height specification; overrides previous provisional height classes and conflicting wiki height",
@@ -3375,6 +3373,12 @@
         "note": "Common production scale; do not fit each person to full canvas. Compare anatomical crown-to-sole height; hair/headwear and heels need separate allowance. Unspecified individual female height stays a range."
       },
       "reviewed_at": "2026-10-24"
-    }
+    },
+    "native_height_canvas": true,
+    "image_inpaint_source": "game-src/art/field/production/history/rebuild-20261024/rerolls/aestheticism/6fa8c4eb-2d7b-4deb-87f8-40c37d7e2c98/reference.png",
+    "image_inpaint_mask": "game-src/art/field/production/inputs/aestheticism-mouth-neck-mask.png",
+    "image_inpaint_description": "Only two tiny repairs to this ivory art mannequin: mouth is a small CLOSED neutral horizontal line, no open pink mouth or happy grin. Neck has one THIN dark horizontal stitched seam with several short perpendicular stitches, directly on smooth ivory plastic. No necklace, collar, beads, knobs or thick band. Preserve red eyes, freckles, hair, ivory mannequin anatomy and body pixel-for-pixel outside white mask. Same crisp native pixel art.",
+    "image_validation_palette_limit": 64,
+    "image_palette_limit_reason": "Masked local correction preserving unmasked RGBA; avoid destructive full palette quantization."
   }
 ]

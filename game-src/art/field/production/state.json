@@ -15582,7 +15582,7 @@
       "kind": "registration",
       "slug": "lee-byeong-jin",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792791997.7856104,
       "receipt": {
         "usage": null,
@@ -15594,33 +15594,48 @@
       },
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 4.0
         },
         "id": "3a357db9-8465-422e-8639-25913e05af4a",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-23T21:46:38.616989+00:00",
         "last_response": {
-          "status": "building_skeleton",
-          "progress": 0.98,
+          "status": "completed",
           "character_id": "7180fb34-b900-43da-bc0c-82a91948b1e8",
-          "n_directions": 8,
+          "storage_urls": {
+            "east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/7180fb34-b900-43da-bc0c-82a91948b1e8/rotations/east.png",
+            "west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/7180fb34-b900-43da-bc0c-82a91948b1e8/rotations/west.png",
+            "north": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/7180fb34-b900-43da-bc0c-82a91948b1e8/rotations/north.png",
+            "south": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/7180fb34-b900-43da-bc0c-82a91948b1e8/rotations/south.png",
+            "north-east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/7180fb34-b900-43da-bc0c-82a91948b1e8/rotations/north-east.png",
+            "north-west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/7180fb34-b900-43da-bc0c-82a91948b1e8/rotations/north-west.png",
+            "south-east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/7180fb34-b900-43da-bc0c-82a91948b1e8/rotations/south-east.png",
+            "south-west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/7180fb34-b900-43da-bc0c-82a91948b1e8/rotations/south-west.png"
+          },
+          "billing_usage": {
+            "type": "generations",
+            "generations": 4.0
+          },
           "character_name": "이병진",
-          "queue_position": 0,
           "directions_type": "8-directions",
           "generation_mode": "v3",
-          "skeleton_frames_done": 6,
-          "character_description": "이병진 / Lee Byeong-jin. Stocky FAT middle-aged office man with large round belly, soft thick arms, round full face and double chin, tired narrow brown eyes and worried strained smile. Short dark brown hair side-parted with short uneven fringe, receding temples. Thin rectangular clear glasses. White long-sleeved shirt stretched over belly, dark black tie, black trousers and belt. NO jacket or lab coat. Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches.",
-          "generation_started_at": "2026-10-23T21:46:39.019467+00:00",
-          "skeleton_frames_total": 8
+          "directions_count": 8,
+          "character_description": "이병진 / Lee Byeong-jin. Stocky FAT middle-aged office man with large round belly, soft thick arms, round full face and double chin, tired narrow brown eyes and worried strained smile. Short dark brown hair side-parted with short uneven fringe, receding temples. Thin rectangular clear glasses. White long-sleeved shirt stretched over belly, dark black tie, black trousers and belt. NO jacket or lab coat. Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches."
         }
+      },
+      "observed_end_epoch": 1792793096.9179869,
+      "elapsed_observed_seconds": 1099.1323766708374,
+      "usage": {
+        "type": "generations",
+        "generations": 4.0
       }
     },
     "37ea908d-f39f-4bb1-959d-8be0f487720b": {
       "kind": "registration",
       "slug": "jay",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792791999.2567086,
       "receipt": {
         "usage": null,
@@ -15632,33 +15647,48 @@
       },
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 4.0
         },
         "id": "37ea908d-f39f-4bb1-959d-8be0f487720b",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-23T21:46:39.385919+00:00",
         "last_response": {
-          "status": "building_skeleton",
-          "progress": 0.98,
+          "status": "completed",
           "character_id": "c49aa95f-8853-4dd4-b03b-77720abf1185",
-          "n_directions": 8,
+          "storage_urls": {
+            "east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/c49aa95f-8853-4dd4-b03b-77720abf1185/rotations/east.png",
+            "west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/c49aa95f-8853-4dd4-b03b-77720abf1185/rotations/west.png",
+            "north": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/c49aa95f-8853-4dd4-b03b-77720abf1185/rotations/north.png",
+            "south": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/c49aa95f-8853-4dd4-b03b-77720abf1185/rotations/south.png",
+            "north-east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/c49aa95f-8853-4dd4-b03b-77720abf1185/rotations/north-east.png",
+            "north-west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/c49aa95f-8853-4dd4-b03b-77720abf1185/rotations/north-west.png",
+            "south-east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/c49aa95f-8853-4dd4-b03b-77720abf1185/rotations/south-east.png",
+            "south-west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/c49aa95f-8853-4dd4-b03b-77720abf1185/rotations/south-west.png"
+          },
+          "billing_usage": {
+            "type": "generations",
+            "generations": 4.0
+          },
           "character_name": "제이",
-          "queue_position": 0,
           "directions_type": "8-directions",
           "generation_mode": "v3",
-          "skeleton_frames_done": 7,
-          "character_description": "제이 / Jay. Very pale gaunt young adult man with thin wiry build. Shaggy SILVER-WHITE hair to jaw and nape, long messy bangs partly obscuring tired YELLOW eyes. Black baseball cap, white pleated medical mask covering nose and mouth. Dark charcoal NAVY security uniform with pointed collar, two buttoned flap chest pockets, long sleeves, matching trousers and black belt. No necktie, no suit jacket. Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches.",
-          "generation_started_at": "2026-10-23T21:46:39.45065+00:00",
-          "skeleton_frames_total": 8
+          "directions_count": 8,
+          "character_description": "제이 / Jay. Very pale gaunt young adult man with thin wiry build. Shaggy SILVER-WHITE hair to jaw and nape, long messy bangs partly obscuring tired YELLOW eyes. Black baseball cap, white pleated medical mask covering nose and mouth. Dark charcoal NAVY security uniform with pointed collar, two buttoned flap chest pockets, long sleeves, matching trousers and black belt. No necktie, no suit jacket. Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches."
         }
+      },
+      "observed_end_epoch": 1792793044.4397888,
+      "elapsed_observed_seconds": 1045.1830804347992,
+      "usage": {
+        "type": "generations",
+        "generations": 4.0
       }
     },
     "487b6f5d-03ca-4f9c-a404-29861a7d3bd3": {
       "kind": "registration",
       "slug": "ho-yu-won",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792792022.695449,
       "receipt": {
         "usage": null,
@@ -15670,33 +15700,48 @@
       },
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 4.0
         },
         "id": "487b6f5d-03ca-4f9c-a404-29861a7d3bd3",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-23T21:47:02.829361+00:00",
         "last_response": {
-          "status": "building_skeleton",
-          "progress": 0.98,
+          "status": "completed",
           "character_id": "8fdfa656-d124-4442-b153-61a0542175bb",
-          "n_directions": 8,
+          "storage_urls": {
+            "east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/8fdfa656-d124-4442-b153-61a0542175bb/rotations/east.png",
+            "west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/8fdfa656-d124-4442-b153-61a0542175bb/rotations/west.png",
+            "north": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/8fdfa656-d124-4442-b153-61a0542175bb/rotations/north.png",
+            "south": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/8fdfa656-d124-4442-b153-61a0542175bb/rotations/south.png",
+            "north-east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/8fdfa656-d124-4442-b153-61a0542175bb/rotations/north-east.png",
+            "north-west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/8fdfa656-d124-4442-b153-61a0542175bb/rotations/north-west.png",
+            "south-east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/8fdfa656-d124-4442-b153-61a0542175bb/rotations/south-east.png",
+            "south-west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/8fdfa656-d124-4442-b153-61a0542175bb/rotations/south-west.png"
+          },
+          "billing_usage": {
+            "type": "generations",
+            "generations": 4.0
+          },
           "character_name": "호유원",
-          "queue_position": 0,
           "directions_type": "8-directions",
           "generation_mode": "v3",
-          "skeleton_frames_done": 7,
-          "character_description": "호유원 / Ho Yu-won. Lean adult man with narrow waist and natural shoulders, pale angular youthful face, ORANGE amber eyes and a soft knowing smile. Thick tousled dark BROWN hair side-parted, long curved curtain strands over forehead and eyes. Light warm GRAY suit jacket worn open and matching trousers, white shirt with OPEN collar, LOOSE dark brown tie, black belt. No mask or glasses. Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches.",
-          "generation_started_at": "2026-10-23T21:47:02.900402+00:00",
-          "skeleton_frames_total": 8
+          "directions_count": 8,
+          "character_description": "호유원 / Ho Yu-won. Lean adult man with narrow waist and natural shoulders, pale angular youthful face, ORANGE amber eyes and a soft knowing smile. Thick tousled dark BROWN hair side-parted, long curved curtain strands over forehead and eyes. Light warm GRAY suit jacket worn open and matching trousers, white shirt with OPEN collar, LOOSE dark brown tie, black belt. No mask or glasses. Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches."
         }
+      },
+      "observed_end_epoch": 1792793096.9296186,
+      "elapsed_observed_seconds": 1074.2341697216034,
+      "usage": {
+        "type": "generations",
+        "generations": 4.0
       }
     },
     "23a36d4b-9f08-4165-a6d1-3017475bd16e": {
       "kind": "registration",
       "slug": "cheong-dal-lae",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792792137.7877924,
       "receipt": {
         "usage": null,
@@ -15708,26 +15753,41 @@
       },
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 4.0
         },
         "id": "23a36d4b-9f08-4165-a6d1-3017475bd16e",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-23T21:48:57.914281+00:00",
         "last_response": {
-          "status": "building_skeleton",
-          "progress": 0.98,
+          "status": "completed",
           "character_id": "2cbf84e1-7afa-4a30-9b59-a28af323a0a7",
-          "n_directions": 8,
+          "storage_urls": {
+            "east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/2cbf84e1-7afa-4a30-9b59-a28af323a0a7/rotations/east.png",
+            "west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/2cbf84e1-7afa-4a30-9b59-a28af323a0a7/rotations/west.png",
+            "north": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/2cbf84e1-7afa-4a30-9b59-a28af323a0a7/rotations/north.png",
+            "south": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/2cbf84e1-7afa-4a30-9b59-a28af323a0a7/rotations/south.png",
+            "north-east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/2cbf84e1-7afa-4a30-9b59-a28af323a0a7/rotations/north-east.png",
+            "north-west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/2cbf84e1-7afa-4a30-9b59-a28af323a0a7/rotations/north-west.png",
+            "south-east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/2cbf84e1-7afa-4a30-9b59-a28af323a0a7/rotations/south-east.png",
+            "south-west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/2cbf84e1-7afa-4a30-9b59-a28af323a0a7/rotations/south-west.png"
+          },
+          "billing_usage": {
+            "type": "generations",
+            "generations": 4.0
+          },
           "character_name": "청달래",
-          "queue_position": 0,
           "directions_type": "8-directions",
           "generation_mode": "v3",
-          "skeleton_frames_done": 5,
-          "character_description": "청달래 / Cheong Dal-lae. Adult woman with composed natural slender figure, oval mature face, pale blue-gray eyes and a calm knowing smile. Dark TEAL hair center-parted with LONG STRAIGHT cheek locks down to shoulders, the rest gathered in a low rounded bun behind head. Very dark navy tailored trouser suit, white shirt and dark navy tie. Bare face, no mask or glasses. Do not replace visible pale eyes with black irises from lore. Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches.",
-          "generation_started_at": "2026-10-23T21:48:58.038614+00:00",
-          "skeleton_frames_total": 8
+          "directions_count": 8,
+          "character_description": "청달래 / Cheong Dal-lae. Adult woman with composed natural slender figure, oval mature face, pale blue-gray eyes and a calm knowing smile. Dark TEAL hair center-parted with LONG STRAIGHT cheek locks down to shoulders, the rest gathered in a low rounded bun behind head. Very dark navy tailored trouser suit, white shirt and dark navy tie. Bare face, no mask or glasses. Do not replace visible pale eyes with black irises from lore. Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches."
         }
+      },
+      "observed_end_epoch": 1792793232.3151774,
+      "elapsed_observed_seconds": 1094.5273852348328,
+      "usage": {
+        "type": "generations",
+        "generations": 4.0
       }
     },
     "ee93e07e-c778-4160-9535-29aaefd70c9c": {
@@ -15828,7 +15888,7 @@
       "kind": "registration",
       "slug": "cha-yeo-jin",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792792234.4030662,
       "receipt": {
         "usage": null,
@@ -15840,26 +15900,41 @@
       },
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 4.0
         },
         "id": "8231c302-e2fd-48d8-ab4c-4cfe04785808",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-23T21:50:34.749845+00:00",
         "last_response": {
-          "status": "building_skeleton",
-          "progress": 0.98,
+          "status": "completed",
           "character_id": "139dab6a-7a81-4bb5-a533-8c69f049451c",
-          "n_directions": 8,
+          "storage_urls": {
+            "east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/139dab6a-7a81-4bb5-a533-8c69f049451c/rotations/east.png",
+            "west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/139dab6a-7a81-4bb5-a533-8c69f049451c/rotations/west.png",
+            "north": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/139dab6a-7a81-4bb5-a533-8c69f049451c/rotations/north.png",
+            "south": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/139dab6a-7a81-4bb5-a533-8c69f049451c/rotations/south.png",
+            "north-east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/139dab6a-7a81-4bb5-a533-8c69f049451c/rotations/north-east.png",
+            "north-west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/139dab6a-7a81-4bb5-a533-8c69f049451c/rotations/north-west.png",
+            "south-east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/139dab6a-7a81-4bb5-a533-8c69f049451c/rotations/south-east.png",
+            "south-west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/139dab6a-7a81-4bb5-a533-8c69f049451c/rotations/south-west.png"
+          },
+          "billing_usage": {
+            "type": "generations",
+            "generations": 4.0
+          },
           "character_name": "차여진",
-          "queue_position": 0,
           "directions_type": "8-directions",
           "generation_mode": "v3",
-          "skeleton_frames_done": 5,
-          "character_description": "차여진 / Cha Yeo-jin. Adult woman with natural slim office-worker build, pale angular face, brown eyes with upward sharp outer corners and sly small smile. Very LONG straight dark BURGUNDY red hair to waist, thick straight forehead bangs, long straight face-framing locks. Light warm GRAY tailored trouser suit, white shirt and dark charcoal necktie, dark nail polish. No glasses. Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches.",
-          "generation_started_at": "2026-10-23T21:50:34.814952+00:00",
-          "skeleton_frames_total": 8
+          "directions_count": 8,
+          "character_description": "차여진 / Cha Yeo-jin. Adult woman with natural slim office-worker build, pale angular face, brown eyes with upward sharp outer corners and sly small smile. Very LONG straight dark BURGUNDY red hair to waist, thick straight forehead bangs, long straight face-framing locks. Light warm GRAY tailored trouser suit, white shirt and dark charcoal necktie, dark nail polish. No glasses. Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches."
         }
+      },
+      "observed_end_epoch": 1792793279.2040095,
+      "elapsed_observed_seconds": 1044.800943851471,
+      "usage": {
+        "type": "generations",
+        "generations": 4.0
       }
     },
     "49f50cbc-3c79-4f23-8835-3cbea51c83a5": {
@@ -15973,7 +16048,7 @@
           "queue_position": 0,
           "directions_type": "8-directions",
           "generation_mode": "v3",
-          "skeleton_frames_done": 4,
+          "skeleton_frames_done": 7,
           "character_description": "고영은 / Go Young-eun. Ordinary soft nonathletic adult woman, oval gentle face, brown-gray eyes and modest smile. Dark BROWN chin-length rounded bob, thick straight bangs above eyes and inward-curled ends; one side tucked behind the visible ear. Navy fitted trouser suit, white shirt and navy tie. No mask or glasses. Preserve visible ear shape from original; do not invent a conspicuous amputated ear on the exposed side. Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches.",
           "generation_started_at": "2026-10-23T21:52:27.419498+00:00",
           "skeleton_frames_total": 8
@@ -16011,7 +16086,7 @@
           "queue_position": 0,
           "directions_type": "8-directions",
           "generation_mode": "v3",
-          "skeleton_frames_done": 4,
+          "skeleton_frames_done": 6,
           "character_description": "곽제강 / Kwak Je-gang. Young adult man with ordinary soft slim build, gentle long face, warm brown eyes and friendly small smile. Thick messy WAVY black hair with loose center part and curled forehead strands. Large thin rectangular clear eyeglasses. OPEN long off-white lab coat over pale gray-blue collared shirt, straight black necktie and black trousers. No mask, no held book. Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches.",
           "generation_started_at": "2026-10-23T21:52:27.81485+00:00",
           "skeleton_frames_total": 8
@@ -16176,6 +16251,20 @@
         "usd": 0.0,
         "type": "generations",
         "generations": 9
+      },
+      "visual_rejection": {
+        "job": "6fa8c4eb-2d7b-4deb-87f8-40c37d7e2c98",
+        "job_status": "completed",
+        "decision": "reroll",
+        "reason": "목의 가는 수평 봉합선이 굵은 목걸이처럼 뭉침. 원작의 절제된 무표정에 가깝게 입을 다물고 목 봉합선만 정리. 머리·붉은 눈·마네킹 관절·체격은 마스크 밖 RGBA 보존.",
+        "at": 1792793043.8335228,
+        "rules_rechecked": [
+          "AVIF primary identity",
+          "lore/user height",
+          "south-facing",
+          "transparent edge without gray halo",
+          "no motions before all roster eight-way review"
+        ]
       }
     },
     "fbe504f0-84fd-4d97-8056-a2c5a3198d75": {
@@ -16209,7 +16298,7 @@
           "queue_position": 0,
           "directions_type": "8-directions",
           "generation_mode": "v3",
-          "skeleton_frames_done": 3,
+          "skeleton_frames_done": 5,
           "character_description": "서윤지 / Seo Yun-ji. Adult woman with natural slender build, soft oval face, half-lidded dark BROWN eyes and neutral small mouth. Muted SAGE-GREEN hair, blunt straight bangs and TWO thick long low BRAIDS falling over chest to waist. White collared blouse buttoned to top, sleeves folded to forearms, navy buttoned WAISTCOAT, knee-length navy pencil skirt, dark tights and black low shoes. Square dark digital watch on HER LEFT wrist. NO tie or jacket. Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches.",
           "generation_started_at": "2026-10-23T21:53:51.011408+00:00",
           "skeleton_frames_total": 8
@@ -16247,7 +16336,7 @@
           "queue_position": 0,
           "directions_type": "8-directions",
           "generation_mode": "v3",
-          "skeleton_frames_done": 3,
+          "skeleton_frames_done": 6,
           "character_description": "윤지아 / Yun Ji-a. Small soft-built adult woman, round youthful face, large gentle warm BROWN eyes, small kind smile. APRICOT-peach hair in TWO round side BUNS with straight blunt bangs. WHITE short-sleeved nurse tunic and white trousers, pale peach trim on collar/cuffs and front pockets. Beige waist belt and small beige pouch on HER RIGHT hip. Thin dark hairband around HER LEFT wrist. White practical shoes. Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches.",
           "generation_started_at": "2026-10-23T21:53:51.315999+00:00",
           "skeleton_frames_total": 8
@@ -16285,7 +16374,7 @@
           "queue_position": 0,
           "directions_type": "8-directions",
           "generation_mode": "v3",
-          "skeleton_frames_done": 3,
+          "skeleton_frames_done": 6,
           "character_description": "문혜란 / Mun Hye-ran. Tall long-limbed adult woman with natural slender figure, mature oval face, narrow brown eyes, faint smile lines and subtle wine-colored lips. Dark BROWN hair side-parted with long cheek-length locks and LOW PONYTAIL behind neck. Dark BROWN single-breasted trouser suit over BLACK collared shirt, no tie. Heavy GOLD wristwatch on HER LEFT wrist and black pointed shoes. Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches.",
           "generation_started_at": "2026-10-23T21:53:51.639429+00:00",
           "skeleton_frames_total": 8
@@ -16323,7 +16412,7 @@
           "queue_position": 0,
           "directions_type": "8-directions",
           "generation_mode": "v3",
-          "skeleton_frames_done": 3,
+          "skeleton_frames_done": 6,
           "character_description": "신유리 / Shin Yuri. Athletic adult woman with firm squared shoulders and lean natural muscles, pale angular face, narrow dark eyes and stern flat mouth. BLACK hair swept back into a low ponytail, exposed forehead with two fine temple wisps as visible in original. BLACK leather biker jacket with silver snaps and diagonal zipper over dark GRAY crew-neck T-shirt, slim BLACK jeans, sturdy black laced boots. No tie, no exaggerated bodybuilder muscles. Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches.",
           "generation_started_at": "2026-10-23T21:53:52.065586+00:00",
           "skeleton_frames_total": 8
@@ -16361,7 +16450,7 @@
           "queue_position": 0,
           "directions_type": "8-directions",
           "generation_mode": "v3",
-          "skeleton_frames_done": 3,
+          "skeleton_frames_done": 6,
           "character_description": "블라렛 / Blaret. Adult woman with natural slim athletic body, oval pale face, vivid GREEN eyes and playful smile. Long straight sandy BLONDE hair with blunt bangs visible beneath WHITE forehead band and long BLACK nun veil. Fitted BLACK long-sleeved nun habit, WHITE high-neck wimple and white shoulder bib, modest side slit. Several thick dark SILVER chains with large silver cross pendant and small green stone. WOODEN brown prayer beads around both wrists. Black boots. No handheld weapons. Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches.",
           "generation_started_at": "2026-10-23T21:53:52.369656+00:00",
           "skeleton_frames_total": 8
@@ -16399,7 +16488,7 @@
           "queue_position": 0,
           "directions_type": "8-directions",
           "generation_mode": "v3",
-          "skeleton_frames_done": 3,
+          "skeleton_frames_done": 6,
           "character_description": "살라딘 / Saladin. Broad strong adult man with DARK BROWN skin, angular handsome face, pale gray eyes, thick eyebrows, full short BLACK beard and moustache, friendly restrained smile. Large WHITE wrapped TURBAN. BLACK tailored trouser suit, white collared shirt and black tie, black dress shoes. Match unarmed original: no ammunition vest, explosives or carried rifle. Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches.",
           "generation_started_at": "2026-10-23T21:53:52.696311+00:00",
           "skeleton_frames_total": 8
@@ -16445,9 +16534,9 @@
           "image_id": "b584c617-ac2f-5363-88a9-778ccadc8f88",
           "job_kind": "creator-image",
           "progress": 0.75,
-          "queue_position": 7,
+          "queue_position": 2,
           "generation_started_at": "2026-10-23T21:58:14.610219+00:00",
-          "estimated_wait_seconds": 748
+          "estimated_wait_seconds": 119
         }
       }
     },
@@ -16490,9 +16579,9 @@
           "image_id": "f705b12e-5ded-5c1c-9e10-acf0a0344a45",
           "job_kind": "creator-image",
           "progress": 0.75,
-          "queue_position": 7,
+          "queue_position": 2,
           "generation_started_at": "2026-10-23T21:58:14.992704+00:00",
-          "estimated_wait_seconds": 759
+          "estimated_wait_seconds": 117
         }
       }
     },
@@ -16535,9 +16624,9 @@
           "image_id": "5dfc5fa2-ffa5-5175-932c-c367657f98bb",
           "job_kind": "creator-image",
           "progress": 0.75,
-          "queue_position": 8,
+          "queue_position": 2,
           "generation_started_at": "2026-10-23T21:59:17.907125+00:00",
-          "estimated_wait_seconds": 856
+          "estimated_wait_seconds": 205
         }
       }
     },
@@ -16572,8 +16661,10 @@
           "queue_position": 0,
           "directions_type": "8-directions",
           "generation_mode": "v3",
+          "skeleton_frames_done": 3,
           "character_description": "세크리엠 / Secriem. Adult vampire woman with pale porcelain skin, natural curving figure, narrow face and calm confident smile, RED eyes. Very LONG straight WHITE hair below waist with thick blunt bangs. Deep RED fitted sleeveless high-neck long dress with a DIAMOND-shaped upper-chest cutout and side slit, matching red dress shoes. Bare arms, no gloves, no extra jewelry, no wings or cape. Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches.",
-          "generation_started_at": "2026-10-23T22:00:28.515217+00:00"
+          "generation_started_at": "2026-10-23T22:00:28.515217+00:00",
+          "skeleton_frames_total": 8
         }
       }
     },
@@ -16590,6 +16681,29 @@
         "status": "processing",
         "enhanced_prompt": null,
         "enhance_usage": null
+      },
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "795a45fa-90fb-4ecf-bf62-4ee8e32ea163",
+        "status": "processing",
+        "created_at": "2026-10-23T22:02:40.248931+00:00",
+        "last_response": {
+          "status": "building_skeleton",
+          "progress": 0.98,
+          "character_id": "d254a6a5-b284-4ca5-a804-76f83bb47f28",
+          "n_directions": 8,
+          "character_name": "이성해",
+          "queue_position": 0,
+          "directions_type": "8-directions",
+          "generation_mode": "v3",
+          "skeleton_frames_done": 1,
+          "character_description": "이성해 / Lee Seong-hae. Small slender adult woman, soft youthful face with a fixed sweet smile, pale skin, green sparkling eyes. White hair with blunt curved forehead bangs and chin-length curled face-framing layers; the LONG CURLY remainder tied LOW and draped over HER RIGHT shoulder (viewer left). Navy-blue fitted trouser suit, white shirt, dark navy tie, cushioned sneakers. Bare face, no mask. Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches.",
+          "generation_started_at": "2026-10-23T22:02:40.307182+00:00",
+          "skeleton_frames_total": 8
+        }
       }
     },
     "11ff3fba-e34c-487a-8456-b666e9c44fe8": {
@@ -16611,6 +16725,200 @@
         },
         "estimated_generations": 9,
         "pricing_provisional": true
+      },
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "11ff3fba-e34c-487a-8456-b666e9c44fe8",
+        "status": "processing",
+        "created_at": "2026-10-23T22:02:40.676757+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "model": "inpaint_pro_flash",
+          "width": 128,
+          "action": "Correcting pixels",
+          "height": 256,
+          "prompt": "Only recolor masked hair and cloak, retaining all shapes and existing pixel-art shading. Hair is muted DARK TEAL-BLUE charcoal with desaturated blue-gray highlights, NOT royal blue. Hood and cape are very DARK muted plum-violet, near-black purple shadows, with dusty gray-lavender lining, NOT bright saturated purple. Preserve green eyes, green emerald brooch, pale face, black suit, anatomy, original height and transparent silhouette exactly. No gray exterior halo.",
+          "status": "processing",
+          "image_id": "959f1d80-0a94-59a9-be00-c281ae2b0172",
+          "job_kind": "creator-image",
+          "progress": 0.75,
+          "queue_position": 6,
+          "generation_started_at": "2026-10-23T22:02:40.697809+00:00",
+          "estimated_wait_seconds": 596
+        }
+      }
+    },
+    "8ce50ccd-46f9-4bb6-8ad6-659986df75bf": {
+      "kind": "registration",
+      "slug": "brownie",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792793045.1766627,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "8ce50ccd-46f9-4bb6-8ad6-659986df75bf",
+        "character_id": "31336750-c528-4f6d-98fa-ab42f7c54086",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      },
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "8ce50ccd-46f9-4bb6-8ad6-659986df75bf",
+        "status": "processing",
+        "created_at": "2026-10-23T22:04:05.310089+00:00",
+        "last_response": {
+          "status": "building_skeleton",
+          "progress": 0.98,
+          "character_id": "31336750-c528-4f6d-98fa-ab42f7c54086",
+          "n_directions": 8,
+          "character_name": "브라우니",
+          "queue_position": 0,
+          "directions_type": "8-directions",
+          "generation_mode": "v3",
+          "skeleton_frames_done": 1,
+          "character_description": "브라우니 / Brownie. Large broad humanoid television host. HEAD is a bulky old rectangular CRT TELEVISION with dark brown-black frame, bottom buttons and sepia static SCREEN showing two white happy curved eyes and a tiny white smiling mouth. No human face or hair. BROWN three-piece suit: open jacket, buttoned brown waistcoat, matching trousers, WHITE dress shirt, dark tie, BLACK gloves with long fingers, black lace-up shoes. Natural humanoid body, television replaces entire head. Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches.",
+          "generation_started_at": "2026-10-23T22:04:05.350525+00:00",
+          "skeleton_frames_total": 8
+        }
+      }
+    },
+    "9980fc63-ce77-4f2a-8628-2092e1bf1afe": {
+      "kind": "image",
+      "slug": "aestheticism",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792793045.4992664,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "9980fc63-ce77-4f2a-8628-2092e1bf1afe",
+        "image_id": "6f8d49c1-bb61-5be8-952a-d31e14ed4cd2",
+        "source_image_id": "6f8d49c1-bb61-5be8-952a-d31e14ed4cd2",
+        "status": "processing",
+        "output_count": 1,
+        "image_size": {
+          "width": 128,
+          "height": 256
+        },
+        "estimated_generations": 9,
+        "pricing_provisional": true
+      },
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "9980fc63-ce77-4f2a-8628-2092e1bf1afe",
+        "status": "processing",
+        "created_at": "2026-10-23T22:04:05.650296+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "model": "inpaint_pro_flash",
+          "width": 128,
+          "action": "Correcting pixels",
+          "height": 256,
+          "prompt": "Only two tiny repairs to this ivory art mannequin: mouth is a small CLOSED neutral horizontal line, no open pink mouth or happy grin. Neck has one THIN dark horizontal stitched seam with several short perpendicular stitches, directly on smooth ivory plastic. No necklace, collar, beads, knobs or thick band. Preserve red eyes, freckles, hair, ivory mannequin anatomy and body pixel-for-pixel outside white mask. Same crisp native pixel art.",
+          "status": "processing",
+          "image_id": "6f8d49c1-bb61-5be8-952a-d31e14ed4cd2",
+          "job_kind": "creator-image",
+          "progress": 0.75,
+          "queue_position": 7,
+          "generation_started_at": "2026-10-23T22:04:05.680178+00:00",
+          "estimated_wait_seconds": 744
+        }
+      }
+    },
+    "3407ad40-f360-4618-a4fd-e26d6549b379": {
+      "kind": "registration",
+      "slug": "jay",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792793097.8072166,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "3407ad40-f360-4618-a4fd-e26d6549b379",
+        "character_id": "aa4b3caf-fe72-4a4a-851d-8de11e49c79e",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      },
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "3407ad40-f360-4618-a4fd-e26d6549b379",
+        "status": "processing",
+        "created_at": "2026-10-23T22:04:57.952549+00:00",
+        "last_response": {
+          "status": "building_skeleton",
+          "progress": 0.98,
+          "character_id": "aa4b3caf-fe72-4a4a-851d-8de11e49c79e",
+          "n_directions": 8,
+          "character_name": "제이",
+          "queue_position": 0,
+          "directions_type": "8-directions",
+          "generation_mode": "v3",
+          "character_description": "제이 / Jay. Very pale gaunt young adult man with thin wiry build. Shaggy SILVER-WHITE hair to jaw and nape, long messy bangs partly obscuring tired YELLOW eyes. Black baseball cap, white pleated medical mask covering nose and mouth. Dark charcoal NAVY security uniform with pointed collar, two buttoned flap chest pockets, long sleeves, matching trousers and black belt. No necktie, no suit jacket. Plain unmarked sleeves and shoulders, NO patches, NO shield emblems, NO police badges, NO logos or shoulder decorations. Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches.",
+          "generation_started_at": "2026-10-23T22:04:58.015471+00:00"
+        }
+      }
+    },
+    "54cadacd-3cb9-410c-99f1-4794aeda8247": {
+      "kind": "registration",
+      "slug": "lee-byeong-jin",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792793151.2944472,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "54cadacd-3cb9-410c-99f1-4794aeda8247",
+        "character_id": "de8535c0-fe94-45eb-ae6d-0e4c99bb4f2a",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      },
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "54cadacd-3cb9-410c-99f1-4794aeda8247",
+        "status": "processing",
+        "created_at": "2026-10-23T22:05:51.429210+00:00",
+        "last_response": {
+          "status": "processing",
+          "progress": 0.7466666666666667,
+          "character_id": "de8535c0-fe94-45eb-ae6d-0e4c99bb4f2a",
+          "n_directions": 8,
+          "character_name": "이병진",
+          "queue_position": 0,
+          "directions_type": "8-directions",
+          "generation_mode": "v3",
+          "character_description": "이병진 / Lee Byeong-jin. Stocky FAT middle-aged office man with large round belly, soft thick arms, round full face and double chin, tired narrow brown eyes and worried strained smile. Short dark brown hair side-parted with short uneven fringe, receding temples. Thin rectangular clear glasses. White long-sleeved shirt stretched over belly, dark black tie, black trousers and belt. NO jacket or lab coat. Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches.",
+          "generation_started_at": "2026-10-23T22:05:51.469832+00:00"
+        }
+      }
+    },
+    "69ccf53c-8ed0-4e78-a4d3-919d4962ed62": {
+      "kind": "registration",
+      "slug": "cheong-dal-lae",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792793279.8311408,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "69ccf53c-8ed0-4e78-a4d3-919d4962ed62",
+        "character_id": "68f76e20-467c-47ca-b3b8-45cdbaafa109",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
       }
     }
   },
@@ -17968,14 +18276,15 @@
       "image_visually_reviewed": true,
       "skeleton_joints": 18,
       "rotation_count": 8,
-      "exported": true
+      "exported": true,
+      "eight_way_visual_reviewed": true
     },
     "lee-byeong-jin": {
       "name": "이병진",
       "group": "baekilmong",
-      "character_id": "7180fb34-b900-43da-bc0c-82a91948b1e8",
+      "character_id": "de8535c0-fe94-45eb-ae6d-0e4c99bb4f2a",
       "image": "43779337-3a91-47ea-8488-de9d8ef98956",
-      "registration": "3a357db9-8465-422e-8639-25913e05af4a",
+      "registration": "54cadacd-3cb9-410c-99f1-4794aeda8247",
       "motions": {},
       "ready": false,
       "visual_rejections": [
@@ -18009,14 +18318,24 @@
         }
       ],
       "image_verified": true,
-      "image_visually_reviewed": true
+      "image_visually_reviewed": true,
+      "registration_rejections": [
+        {
+          "character_id": "7180fb34-b900-43da-bc0c-82a91948b1e8",
+          "job": "3a357db9-8465-422e-8639-25913e05af4a",
+          "reason": "종료된 등록은 회전8장만 있고 skeletons:null. 동작 필수 관절 누락이므로 백업·삭제 후 비만 체형 정면 그대로 재등록.",
+          "at": 1792793149.9566283
+        }
+      ],
+      "exported": false,
+      "eight_way_visual_reviewed": false
     },
     "jay": {
       "name": "제이",
       "group": "baekilmong",
-      "character_id": "c49aa95f-8853-4dd4-b03b-77720abf1185",
+      "character_id": "aa4b3caf-fe72-4a4a-851d-8de11e49c79e",
       "image": "721d1a17-9804-4fa7-8ef8-7069e2588c61",
-      "registration": "37ea908d-f39f-4bb1-959d-8be0f487720b",
+      "registration": "3407ad40-f360-4618-a4fd-e26d6549b379",
       "motions": {},
       "ready": false,
       "visual_rejections": [
@@ -18050,7 +18369,17 @@
         }
       ],
       "image_verified": true,
-      "image_visually_reviewed": true
+      "image_visually_reviewed": true,
+      "exported": false,
+      "registration_rejections": [
+        {
+          "character_id": "c49aa95f-8853-4dd4-b03b-77720abf1185",
+          "job": "37ea908d-f39f-4bb1-959d-8be0f487720b",
+          "reason": "측면·사선 회전에 원작과 검수된 정면에 없는 방패형 소매 패치가 추가됨. 은발 목덜미 길이는 확인됨. 정면 유지하고 무늬 없는 소매를 명시해 재등록.",
+          "at": 1792793096.5364456
+        }
+      ],
+      "eight_way_visual_reviewed": false
     },
     "ho-yu-won": {
       "name": "호유원",
@@ -18059,7 +18388,7 @@
       "image": "650690e4-fb7c-4ea4-9829-21bfcf5b2ed2",
       "registration": "487b6f5d-03ca-4f9c-a404-29861a7d3bd3",
       "motions": {},
-      "ready": false,
+      "ready": true,
       "visual_rejections": [
         {
           "job": "a4bca6d0-4145-4545-a189-998ab06cec55",
@@ -18076,14 +18405,18 @@
         }
       ],
       "image_verified": true,
-      "image_visually_reviewed": true
+      "image_visually_reviewed": true,
+      "skeleton_joints": 18,
+      "rotation_count": 8,
+      "exported": true,
+      "eight_way_visual_reviewed": true
     },
     "cheong-dal-lae": {
       "name": "청달래",
       "group": "baekilmong",
-      "character_id": "2cbf84e1-7afa-4a30-9b59-a28af323a0a7",
+      "character_id": "68f76e20-467c-47ca-b3b8-45cdbaafa109",
       "image": "a1dee1b6-2ba5-4b38-bb12-bcfa1221552f",
-      "registration": "23a36d4b-9f08-4165-a6d1-3017475bd16e",
+      "registration": "69ccf53c-8ed0-4e78-a4d3-919d4962ed62",
       "motions": {},
       "ready": false,
       "visual_rejections": [
@@ -18102,7 +18435,17 @@
         }
       ],
       "image_verified": true,
-      "image_visually_reviewed": true
+      "image_visually_reviewed": true,
+      "registration_rejections": [
+        {
+          "character_id": "2cbf84e1-7afa-4a30-9b59-a28af323a0a7",
+          "job": "23a36d4b-9f08-4165-a6d1-3017475bd16e",
+          "reason": "종료된 등록의 회전8장은 존재하나 skeletons:null. 원작 대조한 정면은 보존하고 불완전 등록만 백업·삭제하여 재등록.",
+          "at": 1792793278.70841
+        }
+      ],
+      "exported": false,
+      "eight_way_visual_reviewed": false
     },
     "cha-yeo-jin": {
       "name": "차여진",
@@ -18111,9 +18454,12 @@
       "image": "833ae0ce-09fb-4e28-b560-726df7acd16e",
       "registration": "8231c302-e2fd-48d8-ab4c-4cfe04785808",
       "motions": {},
-      "ready": false,
+      "ready": true,
       "image_verified": true,
-      "image_visually_reviewed": true
+      "image_visually_reviewed": true,
+      "skeleton_joints": 18,
+      "rotation_count": 8,
+      "exported": true
     },
     "seo-yun-ji": {
       "name": "서윤지",
@@ -18270,22 +18616,38 @@
     "brownie": {
       "name": "브라우니",
       "group": "entities",
-      "character_id": null,
+      "character_id": "31336750-c528-4f6d-98fa-ab42f7c54086",
       "image": "be4b8d4b-01a5-425c-8358-407fa75577ec",
-      "registration": null,
+      "registration": "8ce50ccd-46f9-4bb6-8ad6-659986df75bf",
       "motions": {},
       "ready": false,
-      "image_verified": true
+      "image_verified": true,
+      "image_visually_reviewed": true
     },
     "aestheticism": {
       "name": "탐미주의",
       "group": "entities",
       "character_id": null,
-      "image": "6fa8c4eb-2d7b-4deb-87f8-40c37d7e2c98",
+      "image": "9980fc63-ce77-4f2a-8628-2092e1bf1afe",
       "registration": null,
       "motions": {},
       "ready": false,
-      "image_verified": true
+      "visual_rejections": [
+        {
+          "job": "6fa8c4eb-2d7b-4deb-87f8-40c37d7e2c98",
+          "job_status": "completed",
+          "decision": "reroll",
+          "reason": "목의 가는 수평 봉합선이 굵은 목걸이처럼 뭉침. 원작의 절제된 무표정에 가깝게 입을 다물고 목 봉합선만 정리. 머리·붉은 눈·마네킹 관절·체격은 마스크 밖 RGBA 보존.",
+          "at": 1792793043.8335228,
+          "rules_rechecked": [
+            "AVIF primary identity",
+            "lore/user height",
+            "south-facing",
+            "transparent edge without gray halo",
+            "no motions before all roster eight-way review"
+          ]
+        }
+      ]
     }
   },
   "events": [
@@ -30544,9 +30906,234 @@
         "bytes": 67107,
         "files": 9
       }
+    },
+    {
+      "at": "2026-10-23T22:04:04Z",
+      "kind": "completed",
+      "slug": "jay",
+      "detail": {
+        "kind": "registration",
+        "template": null,
+        "job_id": "37ea908d-f39f-4bb1-959d-8be0f487720b",
+        "usage": {
+          "type": "generations",
+          "generations": 4.0
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T22:04:05Z",
+      "kind": "character-ready",
+      "slug": "jay",
+      "detail": {
+        "3d_joints": 18,
+        "directions": 8
+      }
+    },
+    {
+      "at": "2026-10-23T22:04:05Z",
+      "kind": "submitted",
+      "slug": "brownie",
+      "detail": {
+        "kind": "registration",
+        "template": null,
+        "job_id": "8ce50ccd-46f9-4bb6-8ad6-659986df75bf",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "8ce50ccd-46f9-4bb6-8ad6-659986df75bf",
+          "character_id": "31336750-c528-4f6d-98fa-ab42f7c54086",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T22:04:05Z",
+      "kind": "submitted",
+      "slug": "aestheticism",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "9980fc63-ce77-4f2a-8628-2092e1bf1afe",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "9980fc63-ce77-4f2a-8628-2092e1bf1afe",
+          "image_id": "6f8d49c1-bb61-5be8-952a-d31e14ed4cd2",
+          "source_image_id": "6f8d49c1-bb61-5be8-952a-d31e14ed4cd2",
+          "status": "processing",
+          "output_count": 1,
+          "image_size": {
+            "width": 128,
+            "height": 256
+          },
+          "estimated_generations": 9,
+          "pricing_provisional": true
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T22:04:06Z",
+      "kind": "exported",
+      "slug": "jay",
+      "detail": {
+        "bytes": 78125,
+        "files": 9
+      }
+    },
+    {
+      "at": "2026-10-23T22:04:56Z",
+      "kind": "completed",
+      "slug": "lee-byeong-jin",
+      "detail": {
+        "kind": "registration",
+        "template": null,
+        "job_id": "3a357db9-8465-422e-8639-25913e05af4a",
+        "usage": {
+          "type": "generations",
+          "generations": 4.0
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T22:04:56Z",
+      "kind": "completed",
+      "slug": "ho-yu-won",
+      "detail": {
+        "kind": "registration",
+        "template": null,
+        "job_id": "487b6f5d-03ca-4f9c-a404-29861a7d3bd3",
+        "usage": {
+          "type": "generations",
+          "generations": 4.0
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T22:04:57Z",
+      "kind": "character-ready",
+      "slug": "ho-yu-won",
+      "detail": {
+        "3d_joints": 18,
+        "directions": 8
+      }
+    },
+    {
+      "at": "2026-10-23T22:04:58Z",
+      "kind": "submitted",
+      "slug": "jay",
+      "detail": {
+        "kind": "registration",
+        "template": null,
+        "job_id": "3407ad40-f360-4618-a4fd-e26d6549b379",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "3407ad40-f360-4618-a4fd-e26d6549b379",
+          "character_id": "aa4b3caf-fe72-4a4a-851d-8de11e49c79e",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T22:04:58Z",
+      "kind": "exported",
+      "slug": "ho-yu-won",
+      "detail": {
+        "bytes": 86260,
+        "files": 9
+      }
+    },
+    {
+      "at": "2026-10-23T22:05:51Z",
+      "kind": "submitted",
+      "slug": "lee-byeong-jin",
+      "detail": {
+        "kind": "registration",
+        "template": null,
+        "job_id": "54cadacd-3cb9-410c-99f1-4794aeda8247",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "54cadacd-3cb9-410c-99f1-4794aeda8247",
+          "character_id": "de8535c0-fe94-45eb-ae6d-0e4c99bb4f2a",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T22:07:12Z",
+      "kind": "completed",
+      "slug": "cheong-dal-lae",
+      "detail": {
+        "kind": "registration",
+        "template": null,
+        "job_id": "23a36d4b-9f08-4165-a6d1-3017475bd16e",
+        "usage": {
+          "type": "generations",
+          "generations": 4.0
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T22:07:59Z",
+      "kind": "completed",
+      "slug": "cha-yeo-jin",
+      "detail": {
+        "kind": "registration",
+        "template": null,
+        "job_id": "8231c302-e2fd-48d8-ab4c-4cfe04785808",
+        "usage": {
+          "type": "generations",
+          "generations": 4.0
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T22:07:59Z",
+      "kind": "character-ready",
+      "slug": "cha-yeo-jin",
+      "detail": {
+        "3d_joints": 18,
+        "directions": 8
+      }
+    },
+    {
+      "at": "2026-10-23T22:08:00Z",
+      "kind": "submitted",
+      "slug": "cheong-dal-lae",
+      "detail": {
+        "kind": "registration",
+        "template": null,
+        "job_id": "69ccf53c-8ed0-4e78-a4d3-919d4962ed62",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "69ccf53c-8ed0-4e78-a4d3-919d4962ed62",
+          "character_id": "68f76e20-467c-47ca-b3b8-45cdbaafa109",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T22:08:00Z",
+      "kind": "exported",
+      "slug": "cha-yeo-jin",
+      "detail": {
+        "bytes": 97411,
+        "files": 9
+      }
     }
   ],
-  "updated_at": 1792792962.4275978,
+  "updated_at": 1792793280.8781366,
   "user_stopped_at": 1792778235.6917784,
   "archived_jobs": {
     "304457e9-6577-44f0-af17-97841a9f6720": {
@@ -31865,19 +32452,19 @@
       "saved_frames": 6
     }
   },
-  "last_git_checkpoint": 1792792629.0293822,
+  "last_git_checkpoint": 1792792965.060544,
   "summary": {
     "jobs": {
       "processing": 19,
-      "completed": 194,
+      "completed": 199,
       "failed": 5,
       "stalled": 0
     },
-    "characters_ready": 34,
+    "characters_ready": 36,
     "characters_total": 55,
-    "images_format_verified": 51,
-    "new_images_visually_reviewed": 37,
-    "eight_way_visually_reviewed": 33,
+    "images_format_verified": 50,
+    "new_images_visually_reviewed": 38,
+    "eight_way_visually_reviewed": 35,
     "characters_motions_visually_reviewed": 0,
     "motions_submitted": 3,
     "motions_target": 1100
