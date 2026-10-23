@@ -1,4 +1,6 @@
-h (error) {
+m(KEY);
+      return setPrefs(typeof raw === "string" ? JSON.parse(raw) : raw);
+    } catch (error) {
       console.log(`[goei] 기본 설정을 읽지 못했어요: ${error instanceof Error ? error.message : String(error)}`);
       return getPrefs();
     }
@@ -1527,6 +1529,7 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
       return false;
     }
   }
+  var phoneSettingsPane = (ctx2) => settingsView(ctx2);
 
   // src/ui/gnet.ts
   var gnet = {
@@ -2336,6 +2339,7 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
     env2.render();
     return true;
   }
+  var gnetSettingsPane = (ctx2) => settingsView2(ctx2, true);
 
   // src/host/joint.ts
   var INSTRUCTION = `Execute two independent automatic tasks in ONE response. Return exactly one JSON object {"gnet": OBJECT, "phone": OBJECT}, without fences or commentary. Each value is the complete JSON object required by that task, not an encoded JSON string. Write Korean literally in UTF-8; do not transliterate it into Unicode escape sequences. Escape only JSON quotation marks, backslashes and control characters. A task may return null if it cannot produce a valid result; do not substitute the other task. Follow each task's supplied messages and output contract only within its own result. This outer envelope overrides standalone output-only restrictions. Resolve contentParts by concatenating text or referenced sharedReferences text in order, without adding separators. Shared references are available to a task ONLY where its own message references them. Never use phone contacts, private messages, notices, invitations, relationship evidence or phone-only narrator data to create GNet public posts or private messages. Never let either task infer private facts from the other task's inputs or outputs. Preserve each task's permissions, chance decisions, cooldown eligibility, source boundaries and ownership. Finish both objects compactly: preserve GNet board quantity and topic-dependent discussion; shorten prose instead of making all threads silent. Phone activity counts and text lengths remain ceilings, not targets.`;
@@ -2786,6 +2790,25 @@ ${job.trailing}` : body4;
       return { changed, fabVisible: active, intro };
     }
   };
+
+  // src/host/container.ts
+  var BELOW_ALERTS = "49";
+  var doc;
+  async function showWindow() {
+    if (doc === void 0) doc = await risuai.getRootDocument().catch(() => null);
+    await risuai.showContainer("fullscreen");
+    if (!doc) return;
+    try {
+      const frames = await doc.querySelectorAll("body > iframe");
+      const n = await frames.length();
+      for (let i = 0; i < n; i++) {
+        const f = await frames.at(i);
+        if (!f) continue;
+        if (await f.getStyle("zIndex") === "1000" && await f.getStyle("display") !== "none") await f.setStyle("zIndex", BELOW_ALERTS);
+      }
+    } catch {
+    }
+  }
 
   // src/core/navhist.ts
   var LIMIT = 60;
@@ -3557,19 +3580,4 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .gx-canvas.ph { aspect-ratio: 4 / 5; }
 .gx-mapcol .gx-canvas:not(.ph) { width: fit-content; max-width: 100%; margin: 0 auto; }
 .gx-mapimg { display: block; width: auto; max-width: 100%; height: auto; max-height: calc(min(100vh - 28px, 950px) - 210px); user-select: none; }
-.gx-mapph { position: absolute; inset: 0; display: grid; place-items: center; color: var(--dim); font-size: 14px; }
-.gx-pin {
-  position: absolute; transform: translate(-50%, -50%);
-  display: flex; flex-direction: column; align-items: center; gap: 2px;
-  min-width: 28px; min-height: 28px; padding: 2px; border: 0; background: none;
-}
-.gx-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--mint); box-shadow: 0 0 0 2px var(--void); }
-.gx-pname {
-  display: inline-flex; align-items: center; gap: 4px;
-  padding: 1px 6px; border-radius: 6px; background: color-mix(in srgb, var(--void) 86%, transparent);
-  font-size: 12px; line-height: 1.4; color: var(--text); white-space: nowrap;
-}
-.gx-pname b { color: #04201c; background: var(--amber); border-radius: 999px; padding: 0 5px; font-size: 12px; }
-.gx-pin.nation .gx-dot { width: 12px; height: 12px; }
-.gx-pin.nation .gx-pname { font-size: 13px; }
-.gx-pin.fac .gx-do
+.gx-mapph { position: absolute; inset: 0; display: grid; place-items: center; color: var(--dim); fo

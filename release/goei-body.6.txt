@@ -1,4 +1,17 @@
-" : field2.place || field2.filter !== "all" ? "조건에 맞는 상황이 없어요." : "지금 발생한 상황이 없어요. 지도에서 장소를 골라 이동할 수 있어요.";
+an>
+    <span class="gx-evc-act"><button class="gx-icon" data-action="wiki-goto" data-value="${esc15(wiki2)}" title="위키" aria-label="${esc15(name)} 위키">${ICONS.wiki}</button></span></span>
+    <small>${esc15(sub || "장소")}</small></span></li>`;
+  }
+  function situations(x, events) {
+    const counts = { all: events.length, an: 0, in: 0, ms: 0 };
+    for (const e of events) counts[e.kind]++;
+    const chips3 = ["all", "an", "in", "ms"].map((f) => `<button class="gx-chip${field2.filter === f ? " on" : ""}" data-action="map-filter" data-value="${f}">${f === "all" ? "전체" : KIND_LABEL2[f]}<b>${counts[f]}</b></button>`).join("");
+    const agents = new Map(rosterFor(x.world, x.catalog, x.faction, x.settings.agent_limit).map((p) => [p.name, p]));
+    const shown2 = events.filter((e) => (field2.filter === "all" || e.kind === field2.filter) && (!field2.place || placeKey(e, x.catalog) === field2.place));
+    const place2 = field2.place ? placeCard(field2.place, x.catalog, sameTarget(field2.target, field2.place)) : "";
+    const cancel = cancelChip("map-unplace", !!(field2.place || field2.target));
+    const gone = field2.place ? "" : endedShown(x.world).filter((e) => field2.filter === "all" || e.kind === field2.filter).map((e) => endedCard(e, (n, k) => artCtx ? evArt(artCtx, n, k) : void 0)).join("");
+    const empty = !x.on ? "상황판이 꺼져 있어 발생한 상황이 없어요. 지도에서 장소를 골라 이동할 수 있어요." : field2.place || field2.filter !== "all" ? "조건에 맞는 상황이 없어요." : "지금 발생한 상황이 없어요. 지도에서 장소를 골라 이동할 수 있어요.";
     return `<div class="gx-chips gx-sitbar">${chips3}${cancel}</div>
     ${shown2.length || place2 || gone ? `<ul class="gx-evcs">${place2}${shown2.map((e) => eventRow(e, x, agents)).join("")}${gone}</ul>` : `<p class="gx-none">${empty}</p>`}`;
   }
@@ -472,7 +485,7 @@ ${note.trim()}` : card2;
   }
 
   // src/core/interlude.ts
-  var INTERLUDE_HEAD = "[본부 막간]";
+  var INTERLUDE_HEAD = "[필드 막간]";
   var DEFAULT_RULES = "The block below is a face-to-face conversation the protagonist had at bureau HQ right after the preceding scene and before the next input. It really happened. Nothing else happened in between and only a few minutes passed.";
   var ROOM2 = { office: "사무실", lounge: "휴게실", infirmary: "의무실", quarters: "숙소" };
   var MAX_TURNS = 30;
@@ -492,18 +505,20 @@ ${note.trim()}` : card2;
     return visitRecord(chat).turns.filter((t) => t.anchor && !live.has(t.id));
   }
   var safe = (s4) => s4.replace(/\{\{/g, "｛｛").replace(/\}\}/g, "｝｝").replace(/%%/g, "％％");
+  var ORDER_NOTE = 'Lines are in the order they happened. A heading marks where and to whom the protagonist spoke next; "(행동)" is something the protagonist did rather than said; "(끼어듦)" is a nearby person chiming in.';
   function interludeText(g, rules3, visitor) {
     const parts = [];
-    let who = "";
-    for (const t of g.turns) {
-      if (t.name !== who) {
-        who = t.name;
-        parts.push(`
-${safe(t.name)}${t.room ? ` (${ROOM2[t.room] ?? t.room})` : ""}`);
+    let at = "";
+    [...g.turns].sort((a, b) => (a.at || 0) - (b.at || 0)).forEach((t) => {
+      const me = safe(t.visitor || visitor);
+      const here = `${t.room ?? ""}|${t.name}`;
+      if (here !== at) {
+        at = here;
+        parts.push("", `— ${t.room ? `${ROOM2[t.room] ?? t.room}, ` : ""}${safe(t.name)}에게 —`);
       }
-      parts.push(`${safe(t.visitor || visitor)}: ${safe(t.user)}`, `${safe(t.name)}: ${safe(t.reply)}`, ...(t.extra ?? []).map((e) => `${safe(e.name)}: ${safe(e.line)}`));
-    }
-    return [INTERLUDE_HEAD, rules3?.trim() || DEFAULT_RULES, ...parts].join("\n").replace(/\n{3,}/g, "\n\n");
+      parts.push(t.act ? `${me} (행동): ${safe(t.user)}` : `${me}: ${safe(t.user)}`, `${safe(t.name)}: ${safe(t.reply)}`, ...(t.extra ?? []).map((e) => `${safe(e.name)} (끼어듦): ${safe(e.line)}`));
+    });
+    return [INTERLUDE_HEAD, rules3?.trim() || DEFAULT_RULES, ORDER_NOTE, ...parts].join("\n").replace(/\n{3,}/g, "\n\n");
   }
   var norm = (s4) => s4.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
   function findInRequest(messages, msgs, index2) {
@@ -572,12 +587,6 @@ ${v.trim()}`).join("\n\n") : "";
     }
   }
   async function handleVisitSettings(action, ctx2, render2, refresh2) {
-    if (action === "visit-back") {
-      visitUi.confirmClear = false;
-      settingsUi.page = "";
-      render2();
-      return true;
-    }
     if (action === "visit-orphans" || action === "visit-orphans-no") {
       visitUi.confirmClear = action === "visit-orphans";
       render2();
@@ -679,13 +688,21 @@ ${v.trim()}`).join("\n\n") : "";
     const confirm2 = c ? `<div class="st-confirm st-barconfirm"><p>${c[0]}</p><div class="gx-row-btns"><button class="gx-mini${settingsUi.confirm === "load" ? " danger" : " ps-save"}" data-action="${yes}" data-value="${settingsUi.confirm}">${c[1]}</button><button class="gx-mini" data-action="set-bar-no">취소</button></div></div>` : "";
     return `<div class="st-scopebar">${tabs2}${btns}</div>${confirm2}`;
   }
+  var BACK = `<button class="ph-tool ph-back" data-action="set-feat-back" aria-label="설정으로">${ICONS.back}</button>`;
+  function featurePage(ctx2, page) {
+    let pane = "";
+    if (page === "visit") pane = `<header class="ph-room-head">${BACK}<div class="ph-room-title"><b>필드 설정</b></div></header>${visitSettings(ctx2, ctx2.chat.scriptstate)}`;
+    else {
+      const raw = page === "phone" ? phoneSettingsPane(ctx2) : page === "gnet" ? gnetSettingsPane(ctx2) : wikiSettingsPane(ctx2);
+      pane = raw.replace(/<header class="ph-room-head[^"]*">(\s*<button class="ph-tool ph-back"[^>]*>[\s\S]*?<\/button>)?/, `<header class="ph-room-head">${BACK}`);
+    }
+    return `<main class="gx-body gx-settings st-featpage">${pane}</main>`;
+  }
   function settingsTab(ctx2, scope = "chat", canChat = true) {
     if (scope === "card") {
       return `<main class="gx-body gx-settings">${scopeBar(scope, canChat)}${directoryView(ctx2)}${toast("dir", directoryDone(), directoryDoneClear)}</main>${drawerBox(directorySearch(), "gx-dirdrawer")}`;
     }
-    if (settingsUi.page === "visit" && scope === "chat" && canChat) {
-      return `<main class="gx-body gx-settings"><header class="ph-room-head"><button class="ph-tool ph-back" data-action="visit-back" aria-label="설정으로">${ICONS.back}</button><div class="ph-room-title"><b>필드 설정</b></div></header>${visitSettings(ctx2, ctx2.chat.scriptstate)}</main>`;
-    }
+    if (settingsUi.page && scope === "chat" && canChat) return featurePage(ctx2, settingsUi.page);
     const { basic: s4, world, theme } = current2(ctx2, scope);
     const on2 = scope === "chat" ? worldOn(ctx2.chat) : s4.anomalyOn;
     const busy5 = settingsUi.busy;
@@ -696,7 +713,7 @@ ${v.trim()}`).join("\n\n") : "";
     return `<main class="gx-body gx-settings">
     ${scopeBar(scope, canChat)}
     ${settingsUi.notice ? `<div class="gx-err" role="alert">${esc18(settingsUi.notice)}</div>` : ""}
-    ${scope === "chat" && canChat ? group3("기능별 설정", `<div class="st-feats">${[["gnet", "괴담넷", ICONS.gnet], ["phone", "괴담톡", ICONS.phone], ["wiki", "위키", ICONS.wiki], ["visit", "필드", ICONS.game]].map(([k, label, icon2]) => `<button class="gx-mini st-feat" data-action="feature-set" data-value="${k}">${icon2}${label} 설정</button>`).join("")}</div>`) : ""}
+    ${scope === "chat" && canChat ? group3("기능별 설정", `<div class="st-feats">${[["gnet", "괴담넷", ICONS.gnet], ["phone", "괴담톡", ICONS.phone], ["wiki", "위키", ICONS.wiki], ["visit", "필드", ICONS.game]].map(([k, label, icon2]) => `<button class="gx-mini st-feat" data-action="feature-set" data-value="${k}" aria-label="${label} 설정">${icon2}${label}</button>`).join("")}</div>`) : ""}
     ${group3("화면", [
       field3("테마", seg4("set-theme", theme, [["light", "라이트"], ["dark", "다크"], ["paper", "페이퍼"]], busy5), "채팅 화면의 캐릭터 이미지 배경과 상태창(「테마」를 골랐을 때) 배색이에요."),
       field3("상태창", seg4("set-status", getPrefs().status ?? "auto", [["auto", "테마"], ["dark", "다크"], ["light", "라이트"], ["paper", "페이퍼"], ["off", "미표시"]], busy5), "채팅 속 상태창의 배색이에요. 「테마」는 위 테마를 따라가요. 미표시를 고르면 상자만 숨기고, 모델은 상태 태그를 계속 써요."),
@@ -781,6 +798,11 @@ ${v.trim()}`).join("\n\n") : "";
   async function handleSettings(action, value, ctx2, env2, scope = "chat") {
     const v = value ?? "";
     const lore = ctx2.char.globalLore;
+    if (action === "set-feat-back") {
+      settingsUi.page = "";
+      env2.render();
+      return true;
+    }
     if (action.startsWith("visit-") && await handleVisitSettings(action, ctx2, env2.render, env2.refresh)) return true;
     if (action === "set-bar") {
       settingsUi.confirm = v === "save" || v === "load" ? v : "";
@@ -978,7 +1000,7 @@ ${v.trim()}`).join("\n\n") : "";
   var busy4 = false;
   var notice2 = "";
   var GNET_ON = true;
-  var TABS2 = ["board", "map", "mission", ...GNET_ON ? ["gnet"] : [], "phone", "wiki", "settings"];
+  var TABS2 = ["board", "map", "mission", ...GNET_ON ? ["gnet"] : [], "phone", "wiki", "field", "settings"];
   var tab = "board";
   var repick = false;
   var pickerPrefs = false;
@@ -1278,6 +1300,7 @@ ${v.trim()}`).join("\n\n") : "";
     bindAgentTips(root);
     document.addEventListener("keydown", (ev) => {
       if (ev.key !== "Escape") return;
+      if (tab === "field" && view2.kind === "started") return;
       if (evUi.pop || agUi.pop) {
         evUi.pop = agUi.pop = "";
         render();
@@ -1324,7 +1347,7 @@ ${v.trim()}`).join("\n\n") : "";
     render();
     shown = true;
     if (root) startCctvFx(root);
-    await risuai.showContainer("fullscreen");
+    await showWindow();
     await refresh();
     void loadModuleAssets().then((changed) => {
       if (shown && changed) render();
@@ -1431,7 +1454,7 @@ ${v.trim()}`).join("\n\n") : "";
       if (action === "set-theme" && view2.kind === "picker" && view2.staged) await stagedTheme(view2.ctx, value);
       return;
     }
-    if (view2.kind === "started" && action.startsWith("set-")) {
+    if (view2.kind === "started" && (action.startsWith("set-") || action.startsWith("visit-"))) {
       if (!settingsUi.busy) await handleSettings(action, value, view2.ctx, settingsEnv, settingsUi.scope === "defaults" ? "chat" : settingsUi.scope);
       return;
     }
@@ -1459,9 +1482,10 @@ ${v.trim()}`).join("\n\n") : "";
       case "close":
         return close();
       case "game-open":
-        return openGame(view2.kind === "started" ? root?.querySelector(".gx-panel") ?? null : null);
+        return handle("tab", "field");
       case "game-close":
         closeGame();
+        if (tab === "field") tab = "board";
         return refresh();
       case "faction": {
         const facs = view2.kind === "picker" ? factionList(view2.ctx.char.globalLore) : SCENARIOS.factions;
@@ -1534,16 +1558,7 @@ ${v.trim()}`).join("\n\n") : "";
         return render();
       case "feature-set":
         if (view2.kind !== "started") return;
-        if (value === "phone") Object.assign(phone, { view: "settings", invite: null, picked: [] });
-        else if (value === "gnet" && GNET_ON) Object.assign(gnet, { settings: true, compose: null, attachMenu: false });
-        else if (value === "wiki") openWikiSettings();
-        else if (value === "visit") {
-          settingsUi.page = "visit";
-          return render();
-        } else return;
-        tab = value;
-        notice2 = "";
-        resetSettings();
+        if (value === "phone" || value === "wiki" || value === "visit" || value === "gnet" && GNET_ON) settingsUi.page = value;
         return render();
       case "ops-sel":
         opsUi.sel = value ?? "";
@@ -1675,6 +1690,7 @@ ${v.trim()}`).join("\n\n") : "";
     gnet: "괴담넷",
     phone: "괴담톡",
     wiki: "위키",
+    field: "필드",
     settings: "설정"
   };
   function header(sub, extra = "") {
@@ -1686,9 +1702,9 @@ ${v.trim()}`).join("\n\n") : "";
   var gameShown = () => true;
   function startedHeader(ctx2) {
     return `<header class="gx-head">
-    <div class="gx-brand gx-tabhead"><span class="gx-hmark"><span class="gx-logo">${GHOST_ICON}</span><span class="gx-mark-txt"><b>${BRAND.name}</b><small aria-label="${BRAND.sub}">${[...BRAND.sub].map((ch) => ch === " " ? '<i class="sp">&nbsp;</i>' : `<i>${ch}</i>`).join("")}</small></span></span><span class="gx-hsep" aria-hidden="true">›</span><span class="gx-tabicon">${ICONS[tab]}</span><div><b>${TAB_TITLE[tab]}</b></div></div>
+    <div class="gx-brand gx-tabhead"><span class="gx-hmark"><span class="gx-logo">${GHOST_ICON}</span><span class="gx-mark-txt"><b>${BRAND.name}</b><small aria-label="${BRAND.sub}">${[...BRAND.sub].map((ch) => ch === " " ? '<i class="sp">&nbsp;</i>' : `<i>${ch}</i>`).join("")}</small></span></span><span class="gx-hsep" aria-hidden="true">›</span><span class="gx-tabicon">${tab === "field" ? ICONS.game : ICONS[tab]}</span><div><b>${TAB_TITLE[tab]}</b></div></div>
     <div class="gx-head-act">
-      ${gameShown() ? `<button class="gx-x" data-action="game-open" aria-label="필드" title="필드">${ICONS.game}</button>` : ""}
+      ${gameShown() ? `<button class="gx-x gx-fieldbtn${tab === "field" ? " on" : ""}" data-action="tab" data-value="field" aria-label="필드" title="필드">${ICONS.game}</button>` : ""}
       <button class="gx-x gx-idbtn" data-action="id-card" aria-label="내 ID카드">${userInfo().photo ? `<img src="${esc19(userInfo().photo)}" alt="">` : ICONS.idcard}</button>
       <button class="gx-x${tab === "settings" ? " on" : ""}" data-action="tab" data-value="settings" aria-label="설정">${ICONS.settings}${hasUpdate(ctx2) ? '<span class="gx-xdot" aria-label="새 버전"></span>' : ""}</button>
       <button class="gx-x" data-action="close" aria-label="닫기">${ICONS.close}</button></div>
@@ -1751,7 +1767,7 @@ ${v.trim()}`).join("\n\n") : "";
         }
       }
     }
-    reattachGame(view2.kind === "started" ? root.querySelector(".gx-panel") : null);
+    syncField();
     const next = root.querySelector(".gx-body");
     if (next && keep) next.scrollTop = keep;
     if (inner.length) root.querySelectorAll(INNER_SCROLL).forEach((el, i) => inner[i] && (el.scrollTop = inner[i]));
@@ -1842,12 +1858,24 @@ ${v.trim()}`).join("\n\n") : "";
     if (s4.f && s4.f !== field2.step) return void handle("field-step", s4.f);
     render();
   }
+  function syncField() {
+    const host = view2.kind === "started" && tab === "field" ? root?.querySelector(".gx-fieldhost") ?? null : null;
+    if (!host) {
+      if (gameOpen()) {
+        closeGame();
+        void refresh();
+      }
+      return;
+    }
+    if (gameOpen()) reattachGame(host);
+    else openGame(host, () => void handle("game-close"));
+  }
   function navStep(dir2) {
     const go2 = (action, value) => () => void handle(action, value);
     if (view2.kind === "picker") return dir2 < 0 && pickerPrefs ? go2("prefs-close") : null;
     if (view2.kind === "opening") return dir2 < 0 ? go2("repick") : null;
     if (view2.kind !== "started") return null;
-    if (gameOpen()) return dir2 < 0 ? () => closeGame() : null;
+    if (gameOpen()) return dir2 < 0 ? () => void handle("game-close") : null;
     if (evUi.pop && dir2 < 0) return () => void handle("ev-pop", evUi.pop);
     if (agUi.pop && dir2 < 0) return () => void handle("agent-info", agUi.pop);
     if (!navHist.can(dir2)) return null;
@@ -1875,6 +1903,8 @@ ${v.trim()}`).join("\n\n") : "";
         return gnetTab(ctx2, gnetEnv);
       case "phone":
         return phoneTab(ctx2, phoneEnv);
+      case "field":
+        return '<main class="gx-body gx-fieldhost"></main>';
       case "settings": {
         const html = settingsTab(ctx2, settingsUi.scope === "defaults" ? "chat" : settingsUi.scope);
         return html.includes("ph-drawer") ? html : html + boardDrawer();
@@ -1961,6 +1991,7 @@ ${v.trim()}`).join("\n\n") : "";
     ${item2("phone", "괴담톡", ICONS.phone, "", unreadPhone ? '<span class="gx-nbadge dot" aria-label="새 메시지"></span>' : "")}
     ${GNET_ON ? item2("gnet", "괴담넷", ICONS.gnet) : ""}
     ${item2("wiki", "위키", ICONS.wiki)}
+    ${gameShown() ? item2("field", "필드", ICONS.game, "desk") : ""}
     ${item2("settings", "설정", ICONS.settings, "desk", ctx2 && hasUpdate(ctx2) ? '<span class="gx-nbadge dot" aria-label="새 버전"></span>' : "")}
     <span class="gx-nav-gap"></span>
     ${ctx2 ? navHistBar(markOf(navState())) : ""}
@@ -2466,5 +2497,5 @@ ${v.trim()}`).join("\n\n") : "";
   }
 
   // src/body-entry.ts
-  globalThis.__goeiBody = { version: "0.16.44", start: start2 };
+  globalThis.__goeiBody = { version: "0.16.45", start: start2 };
 })();

@@ -1,4 +1,5 @@
-ide !== "me");
+eplyForUser(p, c));
+    run3(st.dms, previous.dms, (d) => d.side, (d) => d.side !== "me");
   }
   function acknowledge(st, post, nick) {
     let changed = false;
@@ -2194,10 +2195,10 @@ ${c}`)]).join("\n\n");
       if (!name.startsWith(WIKI_PREFIX)) continue;
       const title2 = name.slice(WIKI_PREFIX.length);
       if (seen2.has(title2)) continue;
-      const doc = parseDocContent(title2, String(e.content ?? ""));
-      if (doc) {
+      const doc2 = parseDocContent(title2, String(e.content ?? ""));
+      if (doc2) {
         seen2.add(title2);
-        out.push(doc);
+        out.push(doc2);
       }
     }
     return out;
@@ -2222,8 +2223,8 @@ ${c}`)]).join("\n\n");
     const map = JSON.parse(text);
     const docs = [];
     for (const [title2, body4] of Object.entries(map)) {
-      const doc = typeof body4 === "string" ? parseDocContent(title2, body4) : null;
-      if (doc) docs.push(doc);
+      const doc2 = typeof body4 === "string" ? parseDocContent(title2, body4) : null;
+      if (doc2) docs.push(doc2);
     }
     pack = { src, docs };
   }
@@ -2570,12 +2571,12 @@ ${JSON.stringify({ feature: "wiki", records: kept })}
     for (const t of tags) out = out.replace(t.raw, statusHtml(t, ctx));
     return out;
   }
-  onChatClick("status", async (doc, x, y) => {
-    const boxes = await elements(doc, "[data-goei-status]");
+  onChatClick("status", async (doc2, x, y) => {
+    const boxes = await elements(doc2, "[data-goei-status]");
     if (!boxes.length) return "idle";
     let inside2 = false;
     for (const b of boxes) if (await hit2(b, x, y)) inside2 = true;
-    const tips = await elements(doc, "[data-gst-tip]");
+    const tips = await elements(doc2, "[data-gst-tip]");
     let hitTip = false;
     for (const el of tips) {
       const on2 = inside2 && await hit2(el, x, y);
@@ -2587,7 +2588,7 @@ ${JSON.stringify({ feature: "wiki", records: kept })}
       if (on2) hitTip = true;
     }
     if (hitTip || !inside2) return hitTip;
-    for (const el of await elements(doc, "[data-goei-wiki]")) {
+    for (const el of await elements(doc2, "[data-goei-wiki]")) {
       if (!await hit2(el, x, y)) continue;
       const name = (await el.textContent().catch(() => "") ?? "").trim();
       const title2 = ctx.terms.find((t) => t.term === name)?.title;
@@ -2744,8 +2745,8 @@ ${SEED_CLOSE}` : "", missing };
     setOpeningHint(chat && openingStaged(chat, char?.globalLore) && Number.isInteger(fm) && fm >= 0 ? char?.alternateGreetings?.[fm] ?? null : null);
   }
   var busy2 = false;
-  onChatClick("opening", async (doc, x, y) => {
-    const list4 = await elements(doc, "[data-goei-repick]");
+  onChatClick("opening", async (doc2, x, y) => {
+    const list4 = await elements(doc2, "[data-goei-repick]");
     if (!list4.length) return "idle";
     let on2 = false;
     for (const el of list4) if (await hit2(el, x, y)) on2 = true;
@@ -2813,8 +2814,8 @@ ${SEED_CLOSE}` : "", missing };
     let name = cached.name;
     let photo = cached.photo;
     try {
-      const doc = await risuai.getRootDocument();
-      const box = await doc.querySelector("[data-goei-user]");
+      const doc2 = await risuai.getRootDocument();
+      const box = await doc2.querySelector("[data-goei-user]");
       const html = box ? await box.getInnerHTML() : "";
       const shownName2 = unescape(html.match(/<b[^>]*data-goei-uname[^>]*>([^<]*)<\/b>/)?.[1] ?? "").trim();
       if (shownName2 && shownName2 !== "{{user}}") {
@@ -4487,6 +4488,4 @@ The previous response was rejected and nothing was saved. Recreate the complete 
   var KEY = "goei:prefs";
   async function loadPrefs() {
     try {
-      const raw = await risuai.pluginStorage.getItem(KEY);
-      return setPrefs(typeof raw === "string" ? JSON.parse(raw) : raw);
-    } catc
+      const raw = await risuai.pluginStorage.getIte

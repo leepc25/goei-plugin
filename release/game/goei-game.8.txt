@@ -1,4 +1,23 @@
-= (v2) => {
+\d+)?)|'([^']*)'|"([^"]*)"|([A-Za-z_가-힣][\w.가-힣]*)|(==|!=|>=|<=|&&|\|\||[<>!+\-()]))/y;
+    let i = 0;
+    while (i < src.length) {
+      if (/^\s*$/.test(src.slice(i))) break;
+      re.lastIndex = i;
+      const m = re.exec(src);
+      if (!m) throw new ScriptError(`조건식을 읽을 수 없어요: ${src}`);
+      i = re.lastIndex;
+      if (m[1] !== void 0) out.push({ k: "num", v: m[1] });
+      else if (m[2] !== void 0 || m[3] !== void 0) out.push({ k: "str", v: m[2] ?? m[3] });
+      else if (m[4] !== void 0) out.push({ k: "id", v: m[4] });
+      else out.push({ k: "op", v: m[5] });
+    }
+    return out;
+  }
+  function evaluate(src, flags) {
+    const t = lex(src);
+    let p = 0;
+    const peek = () => t[p]?.v;
+    const eat = (v2) => {
       if (t[p]?.v !== v2) throw new ScriptError(`조건식에 ${v2}가 필요해요: ${src}`);
       p++;
     };
@@ -4101,5 +4120,4 @@ ${who}: ${text2.replace(/\n/g, " ")}
     avensha: d2({ id: "avensha", name: "아벤샤", sheet: "아벤샤", group: "faction", color: "#6a2c70", photo: "Avensha", role: "발푸르기스 협회 십대 마녀 중 하나.", speech: "격식 있고 화려한 존댓말, 윗 마법사에게 한껏 자신을 낮추는 아첨. 감탄하면 비명.", effects: ["favor", "hint", "trade", "hostile", "leave"], greet: ["어머나! 이런 곳에서 뵙다니요!"], lines: ["땅을 기는 미천한 애벌레의 생애 최고의 은총이에요!", "실력을 증명할 수 있어 기뻐요!", "이번 산책에 심장을 꽤 거뒀어요.", "차를 마시며 감상할 수 있지요. 그 정도 안목은 있답니다."] })
   };
   var ENTITY_NPCS = {
-    brownie: d2({ id: "brownie", name: "브라우니", sheet: "브라우니", group: "entity", color: "#8a5a2b", photo: "Brownie", role: "「브라우니의 화요 퀴즈쇼」 진행자이자 주인인 괴이 존재. 손님 대접과 예의를 지키면 거래·통과, 무례하거나 형식을 어기면 퀴즈쇼 무대가 열린다.", speech: "황금기 방송 진행자처럼 따뜻하고 끝없이 밝은 말투, 상대를 「친구」. 박수·드럼 소리 흉내. 역겨우면 잠깐 목소리가 일그러진다.", effects: ["favor", "trade", "hint", "hostile", "leave", "gift"], gifts: ["medkit"], greet: ["자, 친구! 오늘의 손님을 소개합니다! 박수!", "그냥 브라우니라고 불러 줘! 친구끼리 호칭은 오글거리잖아!"], lines: ["맞혀 볼까? …정답!", "복잡한 서명 절차는 우리 스타일이 아니지. 악수 한 번이면 돼!", "아쉽지만 화난 스폰서들이 오기 전에 헤어져야 해! 내일 또 만나!", "친구, 밥은 먹고 다니는 거야?"], never: ["방송 형식을 스스로 깨지 않는다"] }),
-    aesthete: d2({ id: "aesthete", name: "탐미주의", sheet: "탐미주의", group: "entity", color: "#b23a48", photo: "Aestheticism", role: "살아 있는 것을 작품으로 만드는 예측 불가능한 괴이 예술가. 흥정과 대답이 마음에 들면 놓아주고, 아니면 작품으로 삼으려 한다.", speech: "오랜 친구처럼 따뜻한 말투. 먹잇감에겐 다정하게, 작품에겐 부모처럼.", effects: ["favor", "hint", "hostile", "leave"], greet: ["멀리 못 갔구나, 응?"], lines: ["살아 있는 건 다 목표가 있어. 네 목표는 뭐야?", "넌 내 걸작이 될 거야.", "
+    brownie: d2({ id: "brownie", name: "브라우니", sheet: "브라우니", group: "entity", color: "#8a5a2b", photo: "Brownie", role: "「브라우니의 화요 퀴즈쇼」 진행자이자 주인인 괴이 존재. 손님 대접과 예의를 지키면 거래·통과, 무례하거나 형식을 어기면 퀴즈쇼 무대가 열린다.", speech: "황금기 방송 진행자처럼 따뜻하고 끝없이 밝은 말투, 상대를 「친구」. 박수·드럼 소리 흉내. 역겨우면 잠깐 목소리가 일그러진다.", effects: ["favor", "trade", "hint", "hostile", "leave", "gift"], gifts: ["medkit"], greet: ["자, 친구! 오늘의 손님을 소개합니다! 박수!", "그냥 브라우니라고 불러 줘! 친구끼리 호칭은 오글거리잖아!"], lines: ["맞혀 볼까? …정답!", "복잡한 서명 절차는 우리 스타일이 아니지. 악수 한 번이면 돼!", "아쉽지만 화난 스폰서들이 오기 전에 헤어져야 

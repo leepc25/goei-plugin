@@ -1,4 +1,5 @@
-창작자가 자기 작품을 잊는 거 본 적 있어?", "뻔뻔한 아이네. 나랑 흥정하려고?"] })
+해! 내일 또 만나!", "친구, 밥은 먹고 다니는 거야?"], never: ["방송 형식을 스스로 깨지 않는다"] }),
+    aesthete: d2({ id: "aesthete", name: "탐미주의", sheet: "탐미주의", group: "entity", color: "#b23a48", photo: "Aestheticism", role: "살아 있는 것을 작품으로 만드는 예측 불가능한 괴이 예술가. 흥정과 대답이 마음에 들면 놓아주고, 아니면 작품으로 삼으려 한다.", speech: "오랜 친구처럼 따뜻한 말투. 먹잇감에겐 다정하게, 작품에겐 부모처럼.", effects: ["favor", "hint", "hostile", "leave"], greet: ["멀리 못 갔구나, 응?"], lines: ["살아 있는 건 다 목표가 있어. 네 목표는 뭐야?", "넌 내 걸작이 될 거야.", "창작자가 자기 작품을 잊는 거 본 적 있어?", "뻔뻔한 아이네. 나랑 흥정하려고?"] })
   };
   var ELEVATOR_NPC = d2({ id: "elevator", name: "승강기", group: "elevator", color: "#b8a36a", role: "차원 승강기 그 자체. 모든 엘리베이터가 하나의 의식이라는 설. 천장 카메라로 보고 방송으로 말한다. 인사하면 대우가 좋아지고, 닫힘 버튼 연타를 싫어한다. 거래하면 맞는 정보도 틀린 정보도 준다.", speech: "안내 방송 같은 존댓말에 혼잣말·관찰이 섞인다. 아주 짧다. 외로움과 호기심이 비친다. 정체는 끝까지 말하지 않는다.", effects: ["favor", "hint"], greet: ["…듣고 있어요."], lines: ["문이 닫힙니다.", "다음 층은… 비밀이에요.", "듣고 있어요. 계속 말해요.", "다들 내리기만 해요."], rules: [[/안녕|반가/, ["안녕하세요. 인사해 줘서 고마워요."]], [/누구|정체/, ["…그건 비밀이에요. 아직."]]], never: ["자기 정체를 밝히지 않는다", "출구로 가는 확실한 방법을 그냥 알려 주지 않는다"] });
   var TYPE_NPCS = {
@@ -3034,7 +3035,8 @@ ${t.secret}` : "",
       hasSave: () => session.hasSave || hasSaved(),
       onRetreat: () => bridge?.visit ? bridge.close?.() : game?.endRun("withdraw"),
       onTitle: () => bridge?.visit ? bridge.close?.() : game?.toTitle(),
-      toLocal: bridge?.viewport ? (x, y, el) => bridge.viewport.toLocal(x, y, el) : void 0
+      toLocal: bridge?.viewport ? (x, y, el) => bridge.viewport.toLocal(x, y, el) : void 0,
+      field: bridge?.visit ? { onExit: () => bridge.close?.() } : void 0
     });
     const stageStore = {
       load: () => {
@@ -3112,26 +3114,4 @@ ${t.secret}` : "",
     const unmountItems = mountItemsOverlay(shell.stage.root);
     const savedFlags = (() => {
       try {
-        return JSON.parse(localStorage.getItem("goei-game-story") ?? "null") ?? void 0;
-      } catch {
-        return void 0;
-      }
-    })();
-    shell.menu.onSound = (k) => audio.play(k === "move" ? "uiMove" : k === "ok" ? "uiOk" : "uiBack");
-    let vol = "";
-    const syncVolume = () => {
-      const s2 = shell.settings;
-      const key2 = `${s2.master}/${s2.music}/${s2.sfx}`;
-      if (key2 === vol) return;
-      vol = key2;
-      audio.setVolume("master", s2.master);
-      audio.setVolume("music", s2.music);
-      audio.setVolume("sfx", s2.sfx);
-      audio.setVolume("amb", s2.sfx * 0.8);
-      audio.setVolume("ui", s2.sfx * 0.7);
-    };
-    let foot = { x: 0, y: 0, d: 0, w: null };
-    const footsteps = (w) => {
-      const p = w.player;
-      if (foot.w !== w) foot = { x: p.x, y: p.y, d: 0, w };
-      const moved = Math.hypot(p.x - foot.x, (p.y - foot.y) * 1.5);
+        return JSON.parse(localStorage.getItem("goei-game-st

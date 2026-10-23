@@ -1,4 +1,28 @@
-st paint = () => {
+. 머리·메뉴는 그대로, 게임 자체 머리는 숨긴다 (나가기는 Esc 메뉴) */
+.gx-head-act .gx-fieldbtn { display: none; }
+.gx-body.gx-fieldhost { position: relative; padding: 0; overflow: hidden; scrollbar-gutter: auto; min-height: 0; }
+.gx-fieldhost .gx-game, .gx-fieldhost .gx-game.gx-full { position: absolute; inset: 0; z-index: auto; }
+.gx-fieldhost .gx-game .gx-head { display: none; }
+`;
+
+  // src/ui/mbar.ts
+  function mbarHtml(items) {
+    const x = (side) => `<span class="gx-mclose ${side}" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg><span>닫기</span></span>`;
+    return `<div class="gx-mbar"><div class="gx-mtrack">${x("l")}${items.join("")}${x("r")}</div></div>`;
+  }
+  var rubber = (dx, w) => Math.sign(dx) * (Math.abs(dx) / (1 + Math.abs(dx) / (4 * w)));
+  function bindMbar(root2, onClose) {
+    const bar = root2.querySelector(".gx-mbar");
+    const track2 = bar?.querySelector(".gx-mtrack");
+    if (!bar || !track2) return;
+    const closeW = () => track2.querySelector(".gx-mclose")?.offsetWidth || 72;
+    let x0 = 0;
+    let y0 = 0;
+    let id = null;
+    let dragging = false;
+    let shown2 = 0;
+    let ready = false;
+    const paint = () => {
       track2.style.transform = shown2 ? `translateX(${shown2}px)` : "";
       const was = ready;
       ready = Math.abs(shown2) >= closeW();
@@ -501,7 +525,7 @@ st paint = () => {
     }
     return { next, lore: lore.count, scripts: scripts.count, fields: fields3 };
   }
-  var PLUGIN_VERSION = true ? "0.16.44" : "0";
+  var PLUGIN_VERSION = true ? "0.16.45" : "0";
 
   // src/host/game/fetch.ts
   var GAME_BASE = UPDATE_BASE ? `${UPDATE_BASE}/game` : "";
@@ -566,7 +590,7 @@ st paint = () => {
 
   // src/host/game/code.ts
   var CODE_KEY = "goei:game:code";
-  var VERSION = true ? "0.16.44" : "";
+  var VERSION = true ? "0.16.45" : "";
   var codeVersion = (code) => /^\/\/ goei-game (\S+)/.exec(code)?.[1] ?? null;
   var mod = null;
   var codeStats = { readMs: 0, runMs: 0, bytes: 0, fromNet: false };
@@ -988,7 +1012,7 @@ ${recentStory.map((m) => m.text).join("\n")}`,
       recentStory,
       ...advOn(ss, "hq", "interlude") && input2.elsewhere.length ? { earlierThisInterlude: input2.elsewhere } : {},
       conversation: input2.conversation,
-      said: input2.said
+      ...input2.act ? { did: input2.said } : { said: input2.said }
     };
     return {
       limit,
@@ -1100,7 +1124,9 @@ ${recentStory.map((m) => m.text).join("\n")}`,
       },
       async send(agentId, input2, which, nearby = []) {
         if (busy5 || isWaiting()) throw new Error("진행 중인 응답이 끝난 뒤 보내 주세요.");
-        const text = input2.trim();
+        const acted = /^\*([^*]+)\*?$/.exec(input2.trim());
+        const act = !!acted;
+        const text = (acted ? acted[1] : input2).trim();
         if (!text || text.length > 2e3) throw new Error("대화는 1~2000자로 입력해 주세요.");
         busy5 = true;
         try {
@@ -1116,7 +1142,7 @@ ${recentStory.map((m) => m.text).join("\n")}`,
           await context();
           const anchor = anchorOf(c.chat);
           const now = visitRecord(c.chat).turns.filter((t) => (t.anchor ?? "") === anchor);
-          const lines = (ts) => ts.flatMap((t) => [{ speaker: t.visitor || visitorName, text: t.user }, { speaker: t.name, text: t.reply }, ...(t.extra ?? []).map((e) => ({ speaker: e.name, text: e.line }))]);
+          const lines = (ts) => ts.flatMap((t) => [{ speaker: t.visitor || visitorName, text: t.user, ...t.act ? { action: true } : {} }, { speaker: t.name, text: t.reply }, ...(t.extra ?? []).map((e) => ({ speaker: e.name, text: e.line }))]);
           const withHim = (t) => t.agentId === agentId || !!t.extra?.some((e) => e.agentId === agentId);
           const others = [...new Set(now.filter((t) => !withHim(t)).map((t) => t.name))];
           const room = visitRoom(a);
@@ -1137,6 +1163,7 @@ ${recentStory.map((m) => m.text).join("\n")}`,
             elsewhere: others.map((n) => ({ agent: n, lines: lines(now.filter((t) => t.name === n && !withHim(t))) })),
             bystanders,
             said: text,
+            act,
             skipBooks: me ? [me.lore] : []
           }, factionNamesOf(c)));
           const model2 = advValue(ss, "hq", "model") === "main" ? "main" : "aux";
@@ -1146,7 +1173,7 @@ ${recentStory.map((m) => m.text).join("\n")}`,
           const reply = got.line;
           const extra = got.extra.map((e) => ({ agentId: bystanders.find((b) => b.name === e.speaker).id, name: e.speaker, line: e.line }));
           lastExchange = { at: Date.now(), model: model2, messages: prompt.messages, raw, reply: [reply, ...extra.map((e) => `${e.name}: ${e.line}`)].join("\n") };
-          const turn = { id: crypto.randomUUID(), at: Date.now(), agentId, name: a.name, user: text, reply, anchor, room: visitRoom(a) ?? void 0, ...me ? { visitor: me.name } : {}, ...extra.length ? { extra } : {} };
+          const turn = { id: crypto.randomUUID(), at: Date.now(), agentId, name: a.name, user: text, reply, anchor, room: visitRoom(a) ?? void 0, ...me ? { visitor: me.name } : {}, ...act ? { act } : {}, ...extra.length ? { extra } : {} };
           const char = await risuai.getCharacterFromIndex(c.charIndex);
           if (!char || char.chaId !== c.char.chaId) throw new Error("원래 카드가 바뀌어 대화를 저장하지 못했어요.");
           const saved = await updateChat(c.charIndex, c.chatIndex, (chat) => {
@@ -1185,14 +1212,14 @@ ${recentStory.map((m) => m.text).join("\n")}`,
   // src/host/game/viewport.ts
   var portrait = () => innerHeight > innerWidth;
   var phone2 = () => Math.min(innerWidth, innerHeight) <= 560 || matchMedia("(pointer: coarse)").matches;
-  function makeViewport(layer2) {
+  function makeViewport(layer2, opt = {}) {
     let full = false;
     let rotated = false;
     let wantRotate = false;
     const subs2 = /* @__PURE__ */ new Set();
     const emit = () => subs2.forEach((f) => f());
     const apply = () => {
-      const rot = wantRotate && full && portrait() && phone2();
+      const rot = !opt.inFrame && wantRotate && full && portrait() && phone2();
       if (rot !== rotated) rotated = rot;
       layer2.classList.toggle("gx-full", full);
       layer2.classList.toggle("gx-rot", rotated);
@@ -1418,7 +1445,7 @@ ${recentStory.map((m) => m.text).join("\n")}`,
       viewport.fill(true);
       setHead();
       box.innerHTML = "";
-      const bridge = makeBridge(viewport, slot ?? 0, closeGame);
+      const bridge = makeBridge(viewport, slot ?? 0, () => onExit ? onExit() : closeGame());
       const t1 = performance.now();
       const legacy = mode2 === "play" ? null : mod2.legacy?.[mode2];
       unmount = legacy ? legacy(box, bridge) : mod2.mount(box, bridge);
@@ -1455,7 +1482,6 @@ ${recentStory.map((m) => m.text).join("\n")}`,
     layer?.classList.toggle("gx-playing", inGame);
     head.innerHTML = `<div class="gx-brand gx-tabhead"><span class="gx-tabicon">${ICONS.game}</span><div><b>${view === "patrol" ? "관리국 순찰" : view === "action" ? "1인 전투 검증판" : "필드"}</b></div></div>
     <div class="gx-head-act">${inGame ? `<button class="gx-x" data-g="home" aria-label="시작 화면">${ICONS.back}</button>` : ""}
-    <button class="gx-x" data-g="full" aria-label="${viewport?.full ? "전체화면 끄기" : "전체화면"}" aria-pressed="${!!viewport?.full}">${ICONS.expand}</button>
     <button class="gx-x" data-action="game-close" aria-label="게임 닫기">${ICONS.close}</button></div>`;
   }
   async function onClick(e) {
@@ -1511,14 +1537,16 @@ ${recentStory.map((m) => m.text).join("\n")}`,
     }
   }
   var gameOpen = () => !!layer;
-  function openGame(panel) {
+  var onExit = null;
+  function openGame(panel, exit) {
     if (layer || !panel) return;
+    onExit = exit ?? null;
     const t0 = performance.now();
     layer = document.createElement("div");
     layer.className = "gx-game";
     layer.innerHTML = `<div class="gx-game-in"><header class="gx-head"></header><div class="gx-game-box"></div></div>`;
     panel.append(layer);
-    viewport = makeViewport(layer);
+    viewport = makeViewport(layer, { inFrame: true });
     view = "home";
     notice = "";
     setHead();
@@ -1540,6 +1568,7 @@ ${recentStory.map((m) => m.text).join("\n")}`,
     viewport = null;
     layer?.remove();
     layer = null;
+    onExit = null;
     view = "home";
     busy3 = "";
   }
@@ -1935,8 +1964,8 @@ ${recentStory.map((m) => m.text).join("\n")}`,
     const title2 = r?.title ?? name;
     let desc = descs.get(title2);
     if (desc === void 0) {
-      const doc = findDoc(ctx2.chat, title2, ctx2.char.globalLore);
-      desc = doc ? docSummary(doc.body) : "";
+      const doc2 = findDoc(ctx2.chat, title2, ctx2.char.globalLore);
+      desc = doc2 ? docSummary(doc2.body) : "";
       descs.set(title2, desc);
     }
     return { pic, desc };
@@ -1994,10 +2023,6 @@ ${recentStory.map((m) => m.text).join("\n")}`,
     wiki.query = query;
     wiki.confirmDelete = null;
     wiki.notice = "";
-  }
-  function openWikiSettings() {
-    if (wiki.view !== "settings") go("settings");
-    wiki.listOpen = false;
   }
   function openTitle(ctx2, raw, from) {
     const title2 = canon(ctx2)(raw.trim());
@@ -2114,11 +2139,11 @@ ${recentStory.map((m) => m.text).join("\n")}`,
     for (const o of dir2.orgs) {
       const f = o.faction ? facs.find((x) => x.code === o.faction) : facs.find((x) => !x.builtin && x.affiliation === o.name);
       if (f?.hidden) continue;
-      const doc = orgLoreName(lore, o.name);
-      if (!f && !hasLore.has(doc)) continue;
+      const doc2 = orgLoreName(lore, o.name);
+      if (!f && !hasLore.has(doc2)) continue;
       const name = f?.name ?? o.name;
-      const title2 = [c(doc), c(o.name), c(name)].find((t) => findDoc(ctx2.chat, t, lore)) ?? c(doc);
-      list4.push({ cat: "org", name, title: title2, sub: o.name !== name ? o.name : "", photo: mainPic(ctx2.char, { ...o.spec, shared: o.shared }), face: facePic(ctx2.char, { ...o.spec, shared: o.shared }), terms: [name, o.name, doc, o.spec.english ?? ""] });
+      const title2 = [c(doc2), c(o.name), c(name)].find((t) => findDoc(ctx2.chat, t, lore)) ?? c(doc2);
+      list4.push({ cat: "org", name, title: title2, sub: o.name !== name ? o.name : "", photo: mainPic(ctx2.char, { ...o.spec, shared: o.shared }), face: facePic(ctx2.char, { ...o.spec, shared: o.shared }), terms: [name, o.name, doc2, o.spec.english ?? ""] });
     }
     const seen2 = /* @__PURE__ */ new Set();
     const out = list4.filter((e) => seen2.has(`${e.cat}|${e.title}`) ? false : (seen2.add(`${e.cat}|${e.title}`), true));
@@ -2363,37 +2388,37 @@ ${recentStory.map((m) => m.text).join("\n")}`,
     return ![title2, e.name, e.title].some((n) => cleared.has(n));
   }
   function docView(ctx2) {
-    const doc = findDoc(ctx2.chat, wiki.title, ctx2.char.globalLore);
-    if (!doc) {
+    const doc2 = findDoc(ctx2.chat, wiki.title, ctx2.char.globalLore);
+    if (!doc2) {
       wiki.view = "compose";
       return compose(ctx2);
     }
     const c = canon(ctx2);
     const saved = new Set(listDocs(ctx2.chat, ctx2.char.globalLore).map((d) => d.title));
-    const e = entryFor(ctx2, doc.title);
+    const e = entryFor(ctx2, doc2.title);
     const photo = e?.photo ? imageUrl(ctx2.char, e.photo) : null;
-    const r = renderArticle(doc.body, { saved: (t) => saved.has(t), canon: c, photo, fold: spoilerFold(ctx2, doc.title, e) });
+    const r = renderArticle(doc2.body, { saved: (t) => saved.has(t), canon: c, photo, fold: spoilerFold(ctx2, doc2.title, e) });
     const job = jobs3.get(chatKey3(ctx2));
     const links = (label, list4) => list4.length ? `<div class="nw-more"><b>${label}</b><div class="nw-chips">${list4.map((t) => {
       const le = entryFor(ctx2, t);
       return `<button class="nw-chip${saved.has(t) ? "" : " none"}" data-action="wiki-open" data-value="${esc13(t)}">${face2(ctx2, le, " xs")}<span>${esc13(le?.name ?? t)}</span></button>`;
     }).join("")}</div></div>` : "";
-    const m = doc.meta;
+    const m = doc2.meta;
     const info = m ? `<details class="nw-meta"><summary>참조 자료</summary><p>${m.mode === "faithful" ? "원본 충실" : "확장"} · ${{ short: "짧게", standard: "보통", detailed: "상세" }[m.length] ?? m.length} · ${m.model === "aux" ? "보조 모델" : "메인 모델"}</p>
        ${m.sources.length ? `<p>${esc13(m.sources.join(", "))}</p>` : ""}${m.writingRequest ? `<p>공용 지침: ${esc13(m.writingRequest)}</p>` : ""}${m.docRequest ? `<p>이 문서 지침: ${esc13(m.docRequest)}</p>` : ""}</details>` : "";
-    const confirm2 = wiki.confirmDelete === doc.title;
-    const hasBase = baseDocs(ctx2.char.globalLore).some((d) => d.title === doc.title);
-    const del = doc.base ? "" : confirm2 ? `<button class="gx-mini danger" data-action="wiki-delete" data-value="${esc13(doc.title)}">${hasBase ? "되돌리기" : "정말 삭제"}</button>` : tool3("wiki-delete", ICONS.trash, hasBase ? "기본 문서로 되돌리기" : "문서 삭제", `data-value="${esc13(doc.title)}"`);
-    const open3 = wiki.rewrite === doc.title;
-    const right = `${tool3("wiki-rewrite", ICONS.pen, job?.title === doc.title ? "작성하는 중" : "다시 쓰기", `data-value="${esc13(doc.title)}" ${open3 ? 'aria-pressed="true"' : ""} ${job ? "disabled" : ""}`)}${del}`;
+    const confirm2 = wiki.confirmDelete === doc2.title;
+    const hasBase = baseDocs(ctx2.char.globalLore).some((d) => d.title === doc2.title);
+    const del = doc2.base ? "" : confirm2 ? `<button class="gx-mini danger" data-action="wiki-delete" data-value="${esc13(doc2.title)}">${hasBase ? "되돌리기" : "정말 삭제"}</button>` : tool3("wiki-delete", ICONS.trash, hasBase ? "기본 문서로 되돌리기" : "문서 삭제", `data-value="${esc13(doc2.title)}"`);
+    const open3 = wiki.rewrite === doc2.title;
+    const right = `${tool3("wiki-rewrite", ICONS.pen, job?.title === doc2.title ? "작성하는 중" : "다시 쓰기", `data-value="${esc13(doc2.title)}" ${open3 ? 'aria-pressed="true"' : ""} ${job ? "disabled" : ""}`)}${del}`;
     const req = String(ctx2.chat.scriptstate?.["$nw_writing_request"] ?? "");
     const rewrite = open3 ? `<section class="nw-rewrite">${docReqBox(req)}
         <div class="nw-rwrow"><span>이전 문서 참고</span><div class="gx-segs gx-segs-sm">${[["1", "켜기"], ["0", "끄기"]].map(([v, l]) => `<button class="gx-seg${(wiki.rewritePrev ? "1" : "0") === v ? " on" : ""}" data-action="wiki-rw-prev" data-value="${v}" aria-pressed="${(wiki.rewritePrev ? "1" : "0") === v}">${l}</button>`).join("")}</div></div>
-        <div class="gx-row-btns"><button class="gx-mini ps-save" data-action="wiki-rw-go" data-value="${esc13(doc.title)}" ${job ? "disabled" : ""}>${job?.title === doc.title ? "작성하는 중…" : "다시 쓰기"}</button><button class="gx-mini" data-action="wiki-rw-cancel">취소</button></div></section>` : "";
-    const sub = [e ? CAT_LABEL[e.cat] : "", doc.base ? "기본 문서" : m?.created ? when2(m.created) : ""].filter(Boolean).join(" · ");
-    return `<div class="ph-room nw-pane">${paneHead3(ctx2, e?.name ?? doc.title, sub, right, e)}
+        <div class="gx-row-btns"><button class="gx-mini ps-save" data-action="wiki-rw-go" data-value="${esc13(doc2.title)}" ${job ? "disabled" : ""}>${job?.title === doc2.title ? "작성하는 중…" : "다시 쓰기"}</button><button class="gx-mini" data-action="wiki-rw-cancel">취소</button></div></section>` : "";
+    const sub = [e ? CAT_LABEL[e.cat] : "", doc2.base ? "기본 문서" : m?.created ? when2(m.created) : ""].filter(Boolean).join(" · ");
+    return `<div class="ph-room nw-pane">${paneHead3(ctx2, e?.name ?? doc2.title, sub, right, e)}
     <article class="nw-doc">
-      ${rewrite}<header class="nw-dochead"><h2 class="nw-title">${esc13(doc.title)}</h2>${e && e.sub && e.cat !== "lm" ? `<small>${esc13(e.sub)}</small>` : ""}</header>
+      ${rewrite}<header class="nw-dochead"><h2 class="nw-title">${esc13(doc2.title)}</h2>${e && e.sub && e.cat !== "lm" ? `<small>${esc13(e.sub)}</small>` : ""}</header>
       <div class="nw-body">${r.html}</div>
       ${links("상세 문서", r.related)}${links("관련 문서", r.recent)}${info}
     </article></div>`;
@@ -2432,45 +2457,45 @@ ${recentStory.map((m) => m.text).join("\n")}`,
   </main>`;
   }
   function bindFootnotes(root2) {
-    const doc = root2.querySelector(".nw-doc");
-    if (!doc?.querySelector(".nw-fn")) return;
+    const doc2 = root2.querySelector(".nw-doc");
+    if (!doc2?.querySelector(".nw-fn")) return;
     const hover = matchMedia("(hover: hover) and (pointer: fine)").matches;
     const pop = document.createElement("div");
     pop.className = "nw-fnpop";
     pop.hidden = true;
-    doc.appendChild(pop);
+    doc2.appendChild(pop);
     let cur = null;
     const hide = () => {
       pop.hidden = true;
       cur = null;
     };
     const show = (sup) => {
-      const li = doc.querySelector(`.nw-notes li[data-fn="${sup.dataset.fn}"]`);
+      const li = doc2.querySelector(`.nw-notes li[data-fn="${sup.dataset.fn}"]`);
       if (!li) return;
       cur = sup;
       pop.innerHTML = `<b>[${sup.dataset.fn}]</b> ${(li.querySelector(".nw-fn-t") ?? li).innerHTML}`;
       pop.hidden = false;
-      const box = doc.getBoundingClientRect();
+      const box = doc2.getBoundingClientRect();
       const r = sup.getBoundingClientRect();
       const w = Math.min(360, box.width - 24);
       pop.style.width = `${w}px`;
       const left = Math.max(12, Math.min(r.left - box.left - w / 2 + r.width / 2, box.width - w - 12));
-      let top = r.bottom - box.top + doc.scrollTop + 6;
-      if (r.bottom + pop.offsetHeight + 12 > box.bottom && r.top - pop.offsetHeight - 12 > box.top) top = r.top - box.top + doc.scrollTop - pop.offsetHeight - 6;
+      let top = r.bottom - box.top + doc2.scrollTop + 6;
+      if (r.bottom + pop.offsetHeight + 12 > box.bottom && r.top - pop.offsetHeight - 12 > box.top) top = r.top - box.top + doc2.scrollTop - pop.offsetHeight - 6;
       pop.style.left = `${left}px`;
       pop.style.top = `${top}px`;
     };
     const supOf = (e) => e.target.closest(".nw-fn");
     if (hover) {
-      doc.addEventListener("mouseover", (e) => {
+      doc2.addEventListener("mouseover", (e) => {
         const sup = supOf(e);
         if (sup && sup !== cur) show(sup);
       });
-      doc.addEventListener("mouseout", (e) => {
+      doc2.addEventListener("mouseout", (e) => {
         if (supOf(e) && !e.relatedTarget?.closest?.(".nw-fn")) hide();
       });
     }
-    doc.addEventListener("click", (e) => {
+    doc2.addEventListener("click", (e) => {
       const sup = supOf(e);
       if (!sup) {
         if (!hover && !e.target.closest(".nw-fnpop")) hide();
@@ -2483,14 +2508,14 @@ ${recentStory.map((m) => m.text).join("\n")}`,
         return;
       }
       hide();
-      const li = doc.querySelector(`.nw-notes li[data-fn="${sup.dataset.fn}"]`);
+      const li = doc2.querySelector(`.nw-notes li[data-fn="${sup.dataset.fn}"]`);
       if (!li) return;
       li.scrollIntoView({ behavior: "smooth", block: "center" });
       li.classList.remove("hit");
       void li.offsetWidth;
       li.classList.add("hit");
     });
-    doc.addEventListener("scroll", () => !hover && hide(), { passive: true });
+    doc2.addEventListener("scroll", () => !hover && hide(), { passive: true });
   }
   function bindWikiSide(root2, act) {
     const bar = root2.querySelector(".nw-rail");
@@ -2694,6 +2719,7 @@ ${recentStory.map((m) => m.text).join("\n")}`,
     if (name === "wiki-docreq") return void (wiki.docReq = value), true;
     return false;
   }
+  var wikiSettingsPane = (ctx2) => settingsView3(ctx2);
 
   // src/ui/cctvfx.ts
   var BASE = { tear: 0.12, lost: 0.03, shade: 0.04, text: 0.05, breath: 0.04 };
@@ -3881,17 +3907,4 @@ ${recentStory.map((m) => m.text).join("\n")}`,
       wiki2 = full;
     }
     const tag = on2 ? '<span class="gx-badge gx-goaltag">목표</span>' : "";
-    return `<li class="gx-evc go gx-placecard${on2 ? " sel" : ""}" data-action="pick-place" data-value="${esc15(key2)}"><i class="gx-gmark pl">${ICONS.pin}</i><span class="gx-evc-main"><span class="gx-evc-top"><span class="gx-evc-name"><b>${esc15(name)}</b>${tag}</span>
-    <span class="gx-evc-act"><button class="gx-icon" data-action="wiki-goto" data-value="${esc15(wiki2)}" title="위키" aria-label="${esc15(name)} 위키">${ICONS.wiki}</button></span></span>
-    <small>${esc15(sub || "장소")}</small></span></li>`;
-  }
-  function situations(x, events) {
-    const counts = { all: events.length, an: 0, in: 0, ms: 0 };
-    for (const e of events) counts[e.kind]++;
-    const chips3 = ["all", "an", "in", "ms"].map((f) => `<button class="gx-chip${field2.filter === f ? " on" : ""}" data-action="map-filter" data-value="${f}">${f === "all" ? "전체" : KIND_LABEL2[f]}<b>${counts[f]}</b></button>`).join("");
-    const agents = new Map(rosterFor(x.world, x.catalog, x.faction, x.settings.agent_limit).map((p) => [p.name, p]));
-    const shown2 = events.filter((e) => (field2.filter === "all" || e.kind === field2.filter) && (!field2.place || placeKey(e, x.catalog) === field2.place));
-    const place2 = field2.place ? placeCard(field2.place, x.catalog, sameTarget(field2.target, field2.place)) : "";
-    const cancel = cancelChip("map-unplace", !!(field2.place || field2.target));
-    const gone = field2.place ? "" : endedShown(x.world).filter((e) => field2.filter === "all" || e.kind === field2.filter).map((e) => endedCard(e, (n, k) => artCtx ? evArt(artCtx, n, k) : void 0)).join("");
-    const empty = !x.on ? "상황판이 꺼져 있어 발생한 상황이 없어요. 지도에서 장소를 골라 이동할 수 있어요.
+    return `<li class="gx-evc go gx-placecard${on2 ? " sel" : ""}" data-action="pick-place" data-value="${esc15(key2)}"><i class="gx-gmark pl">${ICONS.pin}</i><span class="gx-evc-main"><span class="gx-evc-top"><span class="gx-evc-name"><b>${esc15(name)}</b>${tag}</sp

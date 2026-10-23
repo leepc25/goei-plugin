@@ -1965,7 +1965,7 @@ clip: "jab",
     bar2.className = "gt-bar gk-panel gk-font";
     bar2.setAttribute("role", "group");
     bar2.setAttribute("aria-label", "본부 대화");
-    bar2.innerHTML = '<span class="gt-to"></span><input class="gt-in gk-slot gk-font" aria-label="할 말" placeholder="할 말" maxlength="300" autocomplete="off" enterkeyhint="send"><button type="button" class="gk-btn" data-send>말하기</button><button type="button" class="gk-btn" data-log>기록</button><button type="button" class="gk-btn" data-close aria-label="대화 닫기">닫기</button><div class="gt-msg" role="status"></div>';
+    bar2.innerHTML = '<span class="gt-to"></span><input class="gt-in gk-slot gk-font" aria-label="할 말" placeholder="할 말 (행동은 *행동*)" maxlength="300" autocomplete="off" enterkeyhint="send"><button type="button" class="gk-btn" data-send>말하기</button><button type="button" class="gk-btn" data-log>기록</button><button type="button" class="gk-btn" data-close aria-label="대화 닫기">닫기</button><div class="gt-msg" role="status"></div>';
     const log = document.createElement("div");
     log.className = "gt-log gk-panel gk-font";
     log.setAttribute("aria-label", "이번 대화 기록");
@@ -1998,7 +1998,7 @@ clip: "jab",
     const renderLog = () => {
       const agent = state2.agents.find((a) => a.name === target);
       const turns = state2.turns.filter((t) => t.agentId === agent?.id || t.extra?.some((e) => e.agentId === agent?.id)).slice(-30);
-      log.textContent = turns.length ? turns.map((t) => [`${t.visitor || me()}: ${t.user}`, `${t.name}: ${t.reply}`, ...(t.extra ?? []).map((e) => `${e.name}: ${e.line}`)].join("\n")).join("\n\n") : "아직 나눈 말이 없어요.";
+      log.textContent = turns.length ? turns.map((t) => [t.act ? `${t.visitor || me()}: *${t.user}*` : `${t.visitor || me()}: ${t.user}`, `${t.name}: ${t.reply}`, ...(t.extra ?? []).map((e) => `${e.name}: ${e.line}`)].join("\n")).join("\n\n") : "아직 나눈 말이 없어요.";
       log.scrollTop = log.scrollHeight;
     };
     async function open(name) {
@@ -2057,6 +2057,10 @@ clip: "jab",
         if (!dead && bar2.hasAttribute("data-open")) input.focus();
       }
     };
+    void api.state().then((v) => {
+      if (!dead && !busy) state2 = v;
+    }).catch(() => {
+    });
     sendBtn.onclick = () => void send();
     input.addEventListener("keydown", (e) => {
       if (e.key === "Enter" && !e.isComposing && e.keyCode !== 229) {
@@ -4785,4 +4789,4 @@ clip: "jab",
   }
 
   // src/game/action/story/demo-photos.json
-  var demo_photos_default = { Jyaldi: "data:image/webp;base64,UklGRjIHAABXRUJQVlA4ICYHAAAQJgCdASqQAJAAPpVEnUulo6KipNK7ILASiWcA0ND93BXMfYY8FB42NAD9DejlodesPYO6S37eFWO1vU5wZHiM9ihohvpzbGXL0Mg5fHHwzoVzKe4C5ctF2ZhpaGIidscjzPqK716eykLP0ElSvYuR2sCghxG03ljx7jJ6KJf5/jGXhk/zBsZBBSj78IlHAWYafa6D6Ja50lFC0h0TgAX0pdTpaZw8YAzZ41QqOXKYMXOGGEl31IMicm4k3xIJ2am61l/FY09tsY//LRaVcZW6mKG3KwHBHxqk9zUcbYF4idT8Cobxa2n8qKcW5I4Jinj6enT43cd3Y2oWM8wT1mG7AMDwpWtZ9k4h6Joxer5hlIWk/AF0DHCSu/0N/G+hfQ7vJxfaFLi4jnyv058Hx6gntuqvIj90IooAAP735EfkxF9fXUA2YHrFuK3/2XzN3M0eZEuxvhLvfLN0C2rLAGGLN1VKz7avF2Y28yZrhJQ6COBvucZRLBE3ScMzNBJsJo9bCFtduzYONozxBrWhYdOc4cZ6vJDlgQOs7Y8MB+H3a9hNWw81AZjGKTkD+olnznm3yt0ufJfD6FPfQR/SLf5UJ5nP/xLbG86gWH6nQFQBk6LZdoN4QJjmHixPWx0w8Jd0xhl/7/5zb68FydsDXC+zr0gocgv7xBRuPgiQIBkFuNdO8Q01cQPmDNGkZfW3V8SEfWzpUcZbwNbP5AuHf9zrdKGZPJ6PKhCBjlT7Lr7uLHcqAgOrnrDMRB2m+Y+46g8j+Qms8aElwjMkHfRMz0L+5bnT364/oQhhnANOvvqThMXPtDtup2bznNYDoRpb7qhjP3FL0kkBRhWaKp6zcL4wrLponRPyqYGPHdO0BWw9+PjtsBdvWjWunqQ5qGag/AzMX2tDAwyw9y7g3BfEHlalNH49opt9ct32+l9MYc5P2Qgf3iiFhrf4kPIBxPNnzIoCL2qosnCWKQ+gpqHm+hDAC7fhqUGTd8UlbitM+6n2i4q869G0tjk1Vv9lY61JGaRV+QNKYAPK+I3R2yRhzOAXBBz706uH5O3mYxc0AUCIs4rA8M+rKYGZm9wslYTFcR3dl4cV+GwI6AQlAw84C1+iUrL0YlxZz4ZOFcSs3CQD0YDaCV2yoZ4hC1tm3XLOcFcubwPJShFKIl0mino4NcP5yf9ESbK/suNAB8mGMmaruWpLMopaRf74Eiw5YQHWIXiToCTCQNQ7HfsCQMQDKT39Whjpev4/cYFxJOF1T3LOW/u/m+oifw+gCI0zqEyNhktNSXqahzuPh64ZxyB6VTIy5Wre93yBe67R5G0tKCDw6r9RNspFuWyEkA92YpDUl4bBLzNdmLR5p5wcdw72ha7WM7739JHmKlMLvAiFQJn09gbeSSN0Q1rQEvK0GJ5zb+ce5bZ+aYw4CukGZNh2yFthHh/2GjIwPVVV0aPXSKeqrF+AlAxUevwn+E3OJVbdgN+Cj/oP18JxRSc+4QAEgJnFbh5xWqOsc2S03eaCUMK92OF3Xpl8hyaI+GVofqmKPaL8Wnn3y4yksjvlfLCrEjWj61Arj6Um5s6BodwIuN0yVgAs2CBrvCf5lahahr5MRExtkSolHqiz1zlpMr3uBqCAL45NMuo2oXmSCM/YKgFZekeivJL08deAzGpep235dNW1IcVkZWXzjPaB6Rp60YmCmR6aMHYFyVGkjydyjrtzSKEHwRkTLcZOSxeTxeDoAro8bdwCNc5Kr4UXdYakqmGpm98lPY2wm1Sefw/dJKQ1btjPD91eTMRXR6uX0wBLIoF6PSLwcr7Jy92AvZkFp9xoaqqdXXdI+ZHhFbXT53SjwVDUdHggVcRf7sZBufv+x20jhvnda+uMzhfGp1g4Nv947Cv8DvDF8JPTDaxBxezsIRjiu5k81AM74/E24OOQFHNsdQ1zfg4hUhFSAb0c+
+  var demo_photos_default = { Jyaldi: "data:image/webp;base64,UklGRjIHAABXRUJQVlA4ICYHAAAQJgCdASqQAJAAPpVEnUulo6KipNK7ILASiWcA0ND93BXMfYY8FB42NAD9DejlodesPYO6S37eFWO1vU5wZHiM9ihohvpzbGXL0Mg5fHHwzoVzKe4C5ctF2ZhpaGIidscjzPqK716eykLP0ElSvYuR2sCghxG03ljx7jJ6KJf5/jGXhk/zBsZBBSj78IlHAWYafa6D6Ja50lFC0h0TgAX0pdTpaZw8YAzZ41QqOXKYMXOGGEl31IMicm4k3xIJ2am61l/FY09tsY//LRaVcZW6mKG3KwHBHxqk9zUcbYF4idT8Cobxa2n8qKcW5I4Jinj6enT43cd3Y2oWM8wT1mG7AMDwpWtZ9k4h6Joxer5hlIWk/AF0DHCSu/0N/G+hfQ7vJxfaFLi4jnyv058Hx6gntuqvIj90IooAAP735EfkxF9fXUA2YHrFuK3/2XzN3M0eZEuxvhLvfLN0C2rLAGGLN1VKz7avF2Y28yZrhJQ6COBvucZRLBE3ScMzNBJsJo9bCFtduzYONozxBrWhYdOc4cZ6vJDlgQOs7Y8MB+H3a9hNWw81AZjGKTkD+olnznm3yt0ufJfD6FPfQR/SLf5UJ5nP/xLbG86gWH6nQFQBk6LZdoN4QJjmHixPWx0w8Jd0xhl/7/5zb68FydsDXC+zr0gocgv7xBRuPgiQIBkFuNdO8Q01cQPmDNGkZfW3V8SEfWzpUcZbwNbP5AuHf9zrdKGZPJ6PKhCBjlT7Lr7uLHcqAgOrnrDMRB2m+Y+46g8j+Qms8aElwjMkHfRMz0L+5bnT364/oQhhnANOvvqThMXPtDtup2bznNYDoRpb7qhjP3FL0kkBRhWaKp6zcL4wrLponRPyqYGPHdO0BWw9+PjtsBdvWjWunqQ5qGag/AzMX2tDAwyw9y7g3BfEHlalNH49opt9ct32+l9MYc5P2Qgf3iiFhrf4kPIBxPNnzIoCL2qosnCWKQ+gpqHm+hDAC7fhqUGTd8UlbitM+6n2i4q869G0tjk1Vv9lY61JGaRV+QNKYAPK+I3R2yRhzOAXBBz706uH5O3mYxc0AUCIs4rA8M+rKYGZm9wslYTFcR3dl4cV+GwI6AQlAw84C1+iUrL0YlxZz4ZOFcSs3CQD0YDaCV2yoZ4hC1tm3XLOcFcubwPJShFKIl0mino4NcP5yf9ESbK/suNAB8mGMmaruWpLMopaRf74Eiw5YQHWIXiToCTCQNQ7HfsCQMQDKT39Whjpev4/cYFxJOF1T3LOW/u/m+oifw+gCI0zqEyNhktNSXqahzuPh64ZxyB6VTIy5Wre93yBe67R5G0tKCDw6r9RNspFuWyEkA92YpDUl4bBLzNdmLR5p5wcdw72ha7WM7739JHmKlMLvAiFQJn09gbeSSN0Q1rQEvK0GJ5zb+ce5bZ+aYw4CukGZNh2yFthHh/2GjIwPVVV0aPXSKeqrF+AlAxUevwn+E3OJVbdgN+Cj/oP18JxRSc+4QAEgJnFbh5xWqOsc2S03eaCUMK92OF3Xpl8hyaI+GVofqmKPaL8Wnn3y4yksjvlfLCrEjWj61Arj6Um5s6BodwIuN0yVgAs2CBrvCf5lahahr5MRExtkSolHqiz1zlpMr3uBqCAL45NMuo2oXmSCM/YKgFZekeivJL08deAzGpep235dNW1IcVkZWXzjPaB6Rp60YmCmR6aMHYFyVGkjydyjrtzSKEHwRkTLcZOSxeTxeDoAro8bdwCNc5Kr4UXdYakqmGpm98lPY2wm1Sefw/dJKQ1

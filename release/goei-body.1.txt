@@ -1,4 +1,4 @@
-// goei-body 0.16.44
+// goei-body 0.16.45
 "use strict";
 (() => {
   // src/core/dispatch.ts
@@ -3498,7 +3498,7 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
   var FAB_CSS = `
 ${themeVars("[x-goei-fab]")}
 [x-goei-fab] {
-  position: fixed; right: 16px; bottom: 96px; z-index: 100;
+  position: fixed; right: 16px; bottom: 96px; z-index: 45; /* 플러그인 창(49)·Risu 경고(50) 아래 */
   display: none;
 }
 [x-goei-fab] button {
@@ -3589,10 +3589,10 @@ ${themeVars("[x-goei-fab]")}
 <span data-gl aria-hidden="true"><span data-gs></span><span data-gt>ANOMALY SIMULATION</span></span>
 <button type="button" aria-label="${label}">${GHOST_ICON}</button>`;
   async function body() {
-    const doc = await risuai.getRootDocument();
-    if (!doc) return null;
-    const b = await doc.querySelector("body");
-    return b ? { doc, body: b } : null;
+    const doc2 = await risuai.getRootDocument();
+    if (!doc2) return null;
+    const b = await doc2.querySelector("body");
+    return b ? { doc: doc2, body: b } : null;
   }
   var POS_KEY = "goei-plugin:fab-pos";
   async function loadPos() {
@@ -3602,9 +3602,9 @@ ${themeVars("[x-goei-fab]")}
       return { ...DEFAULT_FAB_POS };
     }
   }
-  async function removeLeftovers(doc) {
+  async function removeLeftovers(doc2) {
     try {
-      const list4 = await risuai.unwarpSafeArray(await doc.querySelectorAll("[x-goei-fab], [x-goei-intro]"));
+      const list4 = await risuai.unwarpSafeArray(await doc2.querySelectorAll("[x-goei-fab], [x-goei-intro]"));
       for (const el of list4) await el.remove().catch(() => {
       });
     } catch {
@@ -3613,15 +3613,15 @@ ${themeVars("[x-goei-fab]")}
   async function createFab(onOpen) {
     const root2 = await body();
     if (!root2) throw new Error("Risu 화면 접근 권한이 없어요.");
-    const { doc } = root2;
-    await removeLeftovers(doc);
-    const host = await doc.createElement("div");
+    const { doc: doc2 } = root2;
+    await removeLeftovers(doc2);
+    const host = await doc2.createElement("div");
     await host.setAttribute("x-goei-fab", "true");
     await host.setInnerHTML(FAB_HTML(`${BRAND.fab} 열기 (끌어서 옮기기)`));
-    const style = await doc.createElement("style");
+    const style = await doc2.createElement("style");
     await style.setTextContent(FAB_CSS);
     await host.appendChild(style);
-    const cardStyle2 = await doc.createElement("style");
+    const cardStyle2 = await doc2.createElement("style");
     await cardStyle2.setTextContent(chatCss("dark"));
     await host.appendChild(cardStyle2);
     await root2.body.appendChild(host);
@@ -3782,7 +3782,7 @@ ${themeVars("[x-goei-fab]")}
         await cardStyle2.setTextContent(chatCss(theme));
       },
       async chatScreenVisible() {
-        return !!await doc.querySelector(".default-chat-screen");
+        return !!await doc2.querySelector(".default-chat-screen");
       },
       async remove() {
         visible2 = false;
@@ -3815,11 +3815,11 @@ ${themeVars("[x-goei-fab]")}
       listening = false;
     }
   }
-  async function dispatch(doc, x, y) {
+  async function dispatch(doc2, x, y) {
     for (const h of handlers.values()) {
       if (!h.armed) continue;
       try {
-        const r = await h.run(doc, x, y);
+        const r = await h.run(doc2, x, y);
         if (r === "idle") h.armed = false;
         else if (r) return;
       } catch (error) {
@@ -3827,8 +3827,8 @@ ${themeVars("[x-goei-fab]")}
       }
     }
   }
-  async function elements(doc, selector) {
-    return await risuai.unwarpSafeArray(await doc.querySelectorAll(selector)).catch(() => []);
+  async function elements(doc2, selector) {
+    return await risuai.unwarpSafeArray(await doc2.querySelectorAll(selector)).catch(() => []);
   }
   async function hit2(el, x, y) {
     const r = await el.getBoundingClientRect().catch(() => null);
@@ -4280,5 +4280,4 @@ ${themeVars("[x-goei-fab]")}
         if (!wanted(r)) r.unread = false;
       }
     };
-    for (const p of st.posts) run3(p.comments, old.get(p.id)?.comments ?? [], (c) => c.mine ? "me" : "npc", (c) => replyForUser(p, c));
-    run3(st.dms, previous.dms, (d) => d.side, (d) => d.s
+    for (const p of st.posts) run3(p.comments, old.get(p.id)?.comments ?? [], (c) => c.mine ? "me" : "npc", (c) => r
