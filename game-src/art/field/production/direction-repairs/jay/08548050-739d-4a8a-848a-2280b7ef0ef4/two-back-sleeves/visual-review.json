@@ -1,0 +1,14 @@
+{
+  "findings": "북동/북서의 잔여 소매 패치와 테두리 완전 제거를 확대 검수. 기존4개 교정 방향과 정면/뒤정면을 모두 재확인해8방향 무늬 없는 남색 소매 유지. 검은 모자·은발·안경·흰 마스크·체격 및 키 보존. 마스크 밖 RGBA 동일, 회색 외곽 없음. AVIF 우선·로어 보충·전원 장벽 재확인.",
+  "directions": [
+    "north-east",
+    "north-west"
+  ],
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF primary",
+    "lore height supplementary",
+    "all55 barrier",
+    "gray exterior rejection"
+  ]
+}

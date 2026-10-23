@@ -1,0 +1,25 @@
+{
+  "at": 1792796275.0346024,
+  "character_id": "fc908cfd-71aa-48aa-9805-f1d7c8cb1b8d",
+  "result": "pass",
+  "directions_reviewed": [
+    "south",
+    "south-east",
+    "east",
+    "north-east",
+    "north",
+    "north-west",
+    "west",
+    "south-west"
+  ],
+  "findings": "AVIF의 뒤로 넘겨 낮게 묶은 검은 머리·느슨한 얼굴 옆 잔머리·가죽 재킷·회색 이너·검은 바지와 부츠를8방향 최종 대조. 수평으로 뻗은 땋은 꼬리 결함 제거, 짧은 포니테일이 아래로 내려옴. 검수8장 가시RGBA/알파 보존 및18관절 확인. 회색 외곽 없음, AVIF 우선·로어 보충·전원 장벽 재확인.",
+  "movement_direction": "east",
+  "stationary_direction": "south-east",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF primary",
+    "Lore supplementary height",
+    "All55 before motion",
+    "Gray outer paint reroll"
+  ]
+}

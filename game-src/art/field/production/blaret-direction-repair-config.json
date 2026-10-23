@@ -1,0 +1,82 @@
+{
+  "slug": "blaret",
+  "character_id": "b14a022b-017b-4229-9b6c-6291583a408a",
+  "revision": "wide-long-veil",
+  "base_zip": "game-src/art/field/production/direction-repairs/blaret/b14a022b-017b-4229-9b6c-6291583a408a/registration-rotation-input/character.zip",
+  "rectangles": {
+    "south-east": [
+      [
+        17,
+        78,
+        39,
+        172
+      ]
+    ],
+    "east": [
+      [
+        25,
+        75,
+        51,
+        173
+      ]
+    ],
+    "north-east": [
+      [
+        24,
+        77,
+        75,
+        174
+      ]
+    ],
+    "north": [
+      [
+        20,
+        77,
+        106,
+        174
+      ]
+    ],
+    "north-west": [
+      [
+        57,
+        77,
+        106,
+        174
+      ]
+    ],
+    "west": [
+      [
+        77,
+        75,
+        103,
+        173
+      ]
+    ],
+    "south-west": [
+      [
+        89,
+        78,
+        111,
+        172
+      ]
+    ]
+  },
+  "description": "Correct the BLACK NUN VEIL: it must be ONE WIDE CONTINUOUS SHEET OF BLACK CLOTH hanging from the head down the back to HIPS, below both wrists. Fill the selected region with natural solid black veil fabric and subtle dark charcoal vertical folds. Cover the blonde hair on the BACK beneath the veil. Replace all long thin ribbon-like tails with the broad filled veil panel; no strings, ribbons, split tails, exposed blonde back hair, or short shoulder hood. Veil hem at hip level around y165. Preserve visible face, front blonde hair, green eyes, white bib, cross, arms, sleeves, hands, rosary bracelets, dress silhouette and stature; do not invent limbs. Exact unmasked pixels remain unchanged; transparent outside silhouette, crisp pixel edges.",
+  "exclude_rectangles": {
+    "north": [
+      [
+        28,
+        103,
+        43,
+        177
+      ],
+      [
+        86,
+        103,
+        99,
+        177
+      ]
+    ]
+  },
+  "context_full_frame": true
+}

@@ -1,0 +1,72 @@
+{
+  "at": 1792796354.7849739,
+  "slug": "jay",
+  "reason": "최종 후면 검수에서 발견한 북동/북서 소매 패치까지 국소 제거 완료. 완전 교정8장 보존 등록.",
+  "state_before": {
+    "name": "제이",
+    "group": "baekilmong",
+    "character_id": "08548050-739d-4a8a-848a-2280b7ef0ef4",
+    "image": "721d1a17-9804-4fa7-8ef8-7069e2588c61",
+    "registration": "0581c47a-927b-4213-9464-6a063a195171",
+    "motions": {},
+    "ready": true,
+    "visual_rejections": [
+      {
+        "job": "d262fefc-fcef-487d-86ff-e1d757d54170",
+        "decision": "reroll",
+        "reason": "은발·모자·의료 마스크·경비복은 맞지만 얼굴 측면 및 보통 키 범위 초과.",
+        "at": 1792789500.4164922,
+        "rules_rechecked": [
+          "AVIF primary identity",
+          "lore/user height",
+          "south-facing",
+          "transparent edge without gray halo",
+          "no motions before all roster eight-way review"
+        ]
+      },
+      {
+        "job": "726695bb-3a3e-483d-b68e-25ee10887393",
+        "job_status": "completed",
+        "decision": "reroll",
+        "reason": "키180px 미만으로 성인 목표보다 작음. 김성진의 슬림한 성인 정면·키 참조로 교체, 은발·검은 모자·흰 의료마스크·경비복 유지.",
+        "at": 1792790948.676978,
+        "rules_rechecked": [
+          "AVIF primary identity",
+          "lore/user height",
+          "south-facing",
+          "transparent edge without gray halo",
+          "no motions before all roster eight-way review"
+        ],
+        "new_style_source": "kim-seong-jin"
+      }
+    ],
+    "image_verified": true,
+    "image_visually_reviewed": true,
+    "exported": true,
+    "registration_rejections": [
+      {
+        "character_id": "c49aa95f-8853-4dd4-b03b-77720abf1185",
+        "job": "37ea908d-f39f-4bb1-959d-8be0f487720b",
+        "reason": "측면·사선 회전에 원작과 검수된 정면에 없는 방패형 소매 패치가 추가됨. 은발 목덜미 길이는 확인됨. 정면 유지하고 무늬 없는 소매를 명시해 재등록.",
+        "at": 1792793096.5364456
+      },
+      {
+        "character_id": "aa4b3caf-fe72-4a4a-851d-8de11e49c79e",
+        "job": "3407ad40-f360-4618-a4fd-e26d6549b379",
+        "reason": "원작에 없는 소매 패치 제거 완료. 8방향 검수본 보존 등록으로 실패 라이브 등록 교체.",
+        "at": 1792795690.727432
+      }
+    ],
+    "eight_way_visual_reviewed": false,
+    "direction-repair-south-east": "b340f8f9-71fe-4d3e-bff2-42428be68937",
+    "direction-repair-east": "de1e9780-8807-4962-9bc2-36f23642d762",
+    "direction-repair-west": "2f7cae4b-68df-4329-9dca-353d3335c357",
+    "direction-repair-south-west": "0f67155e-cd30-4320-ab17-db68dda69bbc",
+    "direction-repair-south-east-full-patch-borders": "c62c6da1-1894-469a-bb18-2f5f4988e88b",
+    "direction-repair-west-full-patch-borders": "09327278-8913-4fd1-8a2e-998a42b1b87a",
+    "skeleton_joints": 18,
+    "rotation_count": 8,
+    "direction-repair-north-east-two-back-sleeves": "0299a9b8-5c56-419b-8e6b-fac525541bee",
+    "direction-repair-north-west-two-back-sleeves": "0cfba687-b89a-4d1e-915f-2c8bfd331f93"
+  }
+}
