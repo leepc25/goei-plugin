@@ -1,0 +1,26 @@
+[
+  {
+    "id": "stature-v2-aileen",
+    "slug": "aileen",
+    "reason": "Petite compact character 225px, only 7px shorter than tall Jyaldi; common height target flattened stature.",
+    "action": "regenerate-front-and-register",
+    "estimated_generations": 13,
+    "correction": "Use updated manifest individual stature range and rendering-only style reference; preserve original costume and build. Review native result before accepting."
+  },
+  {
+    "id": "stature-v2-deadpole",
+    "slug": "deadpole",
+    "reason": "Petite character 226px, only 6px shorter than tall Jyaldi; common height target flattened stature.",
+    "action": "regenerate-front-and-register",
+    "estimated_generations": 13,
+    "correction": "Use updated manifest individual stature range and rendering-only style reference; preserve original costume and build. Review native result before accepting."
+  },
+  {
+    "id": "stature-v2-kyuras",
+    "slug": "kyuras",
+    "reason": "Wiry character 242px is as tall as canonical 2m Gorgodio241px; stature was not established by original setting.",
+    "action": "regenerate-front-and-register",
+    "estimated_generations": 13,
+    "correction": "Use updated manifest individual stature range and rendering-only style reference; preserve original costume and build. Review native result before accepting."
+  }
+]

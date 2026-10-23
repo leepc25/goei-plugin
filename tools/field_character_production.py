@@ -3,7 +3,7 @@
 Never repeat failed/ambiguous paid submissions. Continue other independent work.
 Run with PIXELLAB_API_KEY; secrets and image payloads are never written to logs.
 """
-import argparse,base64,concurrent.futures,fcntl,io,json,os,re,subprocess,time,urllib.request,urllib.error,zipfile
+import argparse,shutil,base64,concurrent.futures,fcntl,io,json,os,re,subprocess,time,urllib.request,urllib.error,zipfile
 from pathlib import Path
 from PIL import Image
 ROOT=Path(__file__).resolve().parents[1]
@@ -68,6 +68,7 @@ class Production:
    slot[key]='uncertain:'+marker;self.event('submission-unknown-response',slug,public(d));self.save();return False
   job={'kind':kind,'slug':slug,'template':template,'status':'processing','created_epoch':started,'receipt':d};self.s['jobs'][jid]=job;slot[key]=jid
   if kind=='registration':c['character_id']=d['character_id']
+  if kind=='animation':c['exported']=False
   atomic(OUT/slug/((template or kind)+'-queue.json'),d);self.event('submitted',slug,{'kind':kind,'template':template,'job_id':jid,'receipt':d});self.save();return True
  def poll(self):
   active=[(jid,j)for jid,j in self.s['jobs'].items()if j['status']=='processing']
@@ -138,10 +139,32 @@ class Production:
    args['action_description']=gait
   elif template=='running-8-frames':args['action_description']='running decisively with a steady torso, controlled arm swing and firm purposeful strides'
   return args
+ def apply_repairs(self):
+  path=OUT/'repair-queue.json'
+  if not path.exists():return
+  for repair in json.loads(path.read_text()):
+   if repair['id']in self.s.get('applied_repairs',[]):continue
+   slug=repair['slug'];c=self.s['characters'][slug]
+   # An accepted job must finish and be accounted for before replacing its slot.
+   if any(j['slug']==slug and j['status']=='processing'for j in self.s['jobs'].values()):continue
+   if any(str(v).startswith(('submitting:','uncertain:'))for v in [c.get('image'),c.get('registration'),*c['motions'].values()]):continue
+   if repair.get('action')!='regenerate-front-and-register':continue
+   history=OUT/'history'/repair['id'];history.mkdir(parents=True,exist_ok=True)
+   atomic(history/'previous-character-state.json',c)
+   atomic(history/'repair-reason.json',repair)
+   folder=OUT/slug
+   for file in folder.iterdir():
+    if file.is_file():shutil.copy2(file,history/file.name)
+   for file in folder.iterdir():
+    if file.is_file():file.unlink()
+   self.s['characters'][slug]={'name':c['name'],'group':c['group'],'character_id':None,'image':None,'registration':None,'motions':{},'ready':False,'repair_id':repair['id'],'visual_review_required':True}
+   self.s.setdefault('applied_repairs',[]).append(repair['id'])
+   self.event('repair-started',slug,repair);self.save()
  def schedule(self):
   if json.loads((OUT/'control.json').read_text()).get('stop_all'):return
   if time.time()<self.s.get('retry_after',0):return
   self.manifest=json.loads((OUT/'manifest.json').read_text());self.by={a['slug']:a for a in self.manifest}
+  self.apply_repairs()
   for a in self.manifest:
    slug=a['slug'];self.validate_image(slug);self.check_ready(slug)
   # Keep room for both production streams; 20 global in-flight requests at most.

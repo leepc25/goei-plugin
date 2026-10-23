@@ -614,7 +614,7 @@
       "kind": "registration",
       "slug": "jyaldi",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792779283.9001126,
       "receipt": {
         "usage": null,
@@ -626,24 +626,41 @@
       },
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 4.0
         },
         "id": "1a54d3e6-c143-4b60-9c05-2929c084a4cd",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-23T18:14:44.589045+00:00",
         "last_response": {
-          "status": "correcting_frames",
-          "progress": 0.84,
+          "status": "completed",
           "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
-          "n_directions": 8,
+          "storage_urls": {
+            "east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/rotations/east.png",
+            "west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/rotations/west.png",
+            "north": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/rotations/north.png",
+            "south": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/rotations/south.png",
+            "north-east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/rotations/north-east.png",
+            "north-west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/rotations/north-west.png",
+            "south-east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/rotations/south-east.png",
+            "south-west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/rotations/south-west.png"
+          },
+          "billing_usage": {
+            "type": "generations",
+            "generations": 4.0
+          },
           "character_name": "쟈알디",
-          "queue_position": 0,
           "directions_type": "8-directions",
           "generation_mode": "v3",
-          "character_description": "쟈알디 / Jyaldi. Adult Korean woman in her thirties, long loose straight black hair with asymmetric side part, distinct crimson red irises, mature narrow eyes and calm stern expression, tall naturally full-busted adult physique, black tailored blazer and straight black business trousers, white closed collared shirt with BLACK NECKTIE, fitted black gloves and plain black formal shoes with low practical heels. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
-          "generation_started_at": "2026-10-23T18:14:45.480814+00:00"
+          "directions_count": 8,
+          "character_description": "쟈알디 / Jyaldi. Adult Korean woman in her thirties, long loose straight black hair with asymmetric side part, distinct crimson red irises, mature narrow eyes and calm stern expression, tall naturally full-busted adult physique, black tailored blazer and straight black business trousers, white closed collared shirt with BLACK NECKTIE, fitted black gloves and plain black formal shoes with low practical heels. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow."
         }
+      },
+      "observed_end_epoch": 1792780188.5015721,
+      "elapsed_observed_seconds": 904.6014597415924,
+      "usage": {
+        "type": "generations",
+        "generations": 4.0
       }
     },
     "c39dacdf-7d7e-4648-bceb-6900ea2c8fd8": {
@@ -669,16 +686,18 @@
         "status": "processing",
         "created_at": "2026-10-23T18:16:16.387453+00:00",
         "last_response": {
-          "status": "correcting_frames",
-          "progress": 0.84,
+          "status": "building_skeleton",
+          "progress": 0.98,
           "character_id": "f937666b-c116-4408-8864-55e7743850a5",
           "n_directions": 8,
           "character_name": "잼트리",
           "queue_position": 0,
           "directions_type": "8-directions",
           "generation_mode": "v3",
+          "skeleton_frames_done": 7,
           "character_description": "잼트리 / Jaemtri. Adult woman late20s, long chestnut brown wavy hair below shoulders, soft green eyes, warm friendly smile, curvy natural adult build, black tailored office skirt suit, white shirt, black necktie, black high heels. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
-          "generation_started_at": "2026-10-23T18:16:17.784046+00:00"
+          "generation_started_at": "2026-10-23T18:16:17.784046+00:00",
+          "skeleton_frames_total": 8
         }
       }
     },
@@ -705,16 +724,18 @@
         "status": "processing",
         "created_at": "2026-10-23T18:16:23.270782+00:00",
         "last_response": {
-          "status": "correcting_frames",
-          "progress": 0.84,
+          "status": "building_skeleton",
+          "progress": 0.98,
           "character_id": "07763785-8f52-41d2-8e80-6f20d93f18c4",
           "n_directions": 8,
           "character_name": "에일린",
           "queue_position": 0,
           "directions_type": "8-directions",
           "generation_mode": "v3",
+          "skeleton_frames_done": 3,
           "character_description": "에일린 / Aileen. Adult woman early20s, faded platinum blonde hair in a high ponytail with long bangs, dull gray eyes, serious analytical face, petite compact athletic build, practical fitted black trouser suit and black closed shoes as in her original portrait. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
-          "generation_started_at": "2026-10-23T18:16:24.219188+00:00"
+          "generation_started_at": "2026-10-23T18:16:24.219188+00:00",
+          "skeleton_frames_total": 8
         }
       }
     },
@@ -741,16 +762,18 @@
         "status": "processing",
         "created_at": "2026-10-23T18:16:35.553091+00:00",
         "last_response": {
-          "status": "correcting_frames",
-          "progress": 0.84,
+          "status": "building_skeleton",
+          "progress": 0.98,
           "character_id": "1d8d12e4-06d5-4df8-8812-0754f77b736b",
           "n_directions": 8,
           "character_name": "고르고디오",
           "queue_position": 0,
           "directions_type": "8-directions",
           "generation_mode": "v3",
+          "skeleton_frames_done": 3,
           "character_description": "고르고디오 / Gorgodio. Adult man early30s, very tall broad muscular wrestler build, bald head, neatly trimmed black goatee, confident stern face, black leather motorcycle jacket over white shirt and black necktie, black business trousers and heavy black shoes. No summoned armor. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
-          "generation_started_at": "2026-10-23T18:16:40.801018+00:00"
+          "generation_started_at": "2026-10-23T18:16:40.801018+00:00",
+          "skeleton_frames_total": 8
         }
       }
     },
@@ -777,16 +800,18 @@
         "status": "processing",
         "created_at": "2026-10-23T18:16:51.003443+00:00",
         "last_response": {
-          "status": "correcting_frames",
-          "progress": 0.84,
+          "status": "building_skeleton",
+          "progress": 0.98,
           "character_id": "5b11c6b4-98e8-4911-99ca-5115904b8237",
           "n_directions": 8,
           "character_name": "큐라스",
           "queue_position": 0,
           "directions_type": "8-directions",
           "generation_mode": "v3",
+          "skeleton_frames_done": 8,
           "character_description": "큐라스 / Kyuras. Adult man early30s, thin wiry build, pale green hair swept back, narrow face, gray green eyes, lively confident smile, black tailored trouser suit, white shirt, black necktie and black shoes. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
-          "generation_started_at": "2026-10-23T18:16:51.877741+00:00"
+          "generation_started_at": "2026-10-23T18:16:51.877741+00:00",
+          "skeleton_frames_total": 8
         }
       }
     },
@@ -813,8 +838,8 @@
         "status": "processing",
         "created_at": "2026-10-23T18:17:44.314628+00:00",
         "last_response": {
-          "status": "correcting_frames",
-          "progress": 0.84,
+          "status": "building_skeleton",
+          "progress": 0.98,
           "character_id": "0c652edd-65f2-4d86-9294-196376a2d0ea",
           "n_directions": 8,
           "character_name": "데드폴",
@@ -825,6 +850,84 @@
           "generation_started_at": "2026-10-23T18:17:47.842129+00:00"
         }
       }
+    },
+    "62740c2d-eb38-4eba-8555-357190310a70": {
+      "kind": "image",
+      "slug": "geshugan",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792780194.3411055,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "62740c2d-eb38-4eba-8555-357190310a70",
+        "image_id": "bb738ee7-c33c-5026-bfa5-287296a828db",
+        "source_image_id": "bb738ee7-c33c-5026-bfa5-287296a828db",
+        "status": "processing",
+        "output_count": 1,
+        "image_size": {
+          "width": 128,
+          "height": 256
+        },
+        "estimated_generations": 9,
+        "pricing_provisional": true
+      }
+    },
+    "313da381-5ebe-43ab-997b-d1eb55f6aa2f": {
+      "kind": "animation",
+      "slug": "jyaldi",
+      "template": "breathing-idle",
+      "status": "processing",
+      "created_epoch": 1792780200.6127641,
+      "receipt": {
+        "background_job_ids": [
+          "313da381-5ebe-43ab-997b-d1eb55f6aa2f"
+        ],
+        "directions": [
+          "south-east"
+        ],
+        "animation_group_id": "4e748226-7bec-46bf-bb77-a3392b9522a4",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      }
+    },
+    "83227447-8dd7-480f-8792-56d1ec73f851": {
+      "kind": "animation",
+      "slug": "jyaldi",
+      "template": "walking-8-frames",
+      "status": "processing",
+      "created_epoch": 1792780216.854243,
+      "receipt": {
+        "background_job_ids": [
+          "83227447-8dd7-480f-8792-56d1ec73f851"
+        ],
+        "directions": [
+          "east"
+        ],
+        "animation_group_id": "e7bd558a-c320-4ba1-acaf-b018fc0ac3ed",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      }
+    },
+    "7abf3424-7b93-48da-947d-f6357b0b2874": {
+      "kind": "animation",
+      "slug": "jyaldi",
+      "template": "running-8-frames",
+      "status": "processing",
+      "created_epoch": 1792780229.4643633,
+      "receipt": {
+        "background_job_ids": [
+          "7abf3424-7b93-48da-947d-f6357b0b2874"
+        ],
+        "directions": [
+          "east"
+        ],
+        "animation_group_id": "4e7a2ac9-f9f2-42cc-83eb-835cf0062a2e",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      }
     }
   },
   "characters": {
@@ -834,10 +937,16 @@
       "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
       "image": "78793c7b-f45f-48a6-ab11-0c1d97f86333",
       "registration": "1a54d3e6-c143-4b60-9c05-2929c084a4cd",
-      "motions": {},
-      "ready": false,
+      "motions": {
+        "breathing-idle": "313da381-5ebe-43ab-997b-d1eb55f6aa2f",
+        "walking-8-frames": "83227447-8dd7-480f-8792-56d1ec73f851",
+        "running-8-frames": "7abf3424-7b93-48da-947d-f6357b0b2874"
+      },
+      "ready": true,
       "rebuild_after_direction_policy": true,
-      "image_verified": true
+      "image_verified": true,
+      "skeleton_joints": 18,
+      "rotation_count": 8
     },
     "spangdal": {
       "name": "스팡달",
@@ -906,7 +1015,7 @@
       "name": "게슈간",
       "group": "management",
       "character_id": null,
-      "image": null,
+      "image": "62740c2d-eb38-4eba-8555-357190310a70",
       "registration": null,
       "motions": {},
       "ready": false
@@ -2069,9 +2178,123 @@
           "enhance_usage": null
         }
       }
+    },
+    {
+      "at": "2026-10-23T18:29:48Z",
+      "kind": "completed",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "registration",
+        "template": null,
+        "job_id": "1a54d3e6-c143-4b60-9c05-2929c084a4cd",
+        "usage": {
+          "type": "generations",
+          "generations": 4.0
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T18:29:54Z",
+      "kind": "character-ready",
+      "slug": "jyaldi",
+      "detail": {
+        "3d_joints": 18,
+        "directions": 8
+      }
+    },
+    {
+      "at": "2026-10-23T18:30:00Z",
+      "kind": "submitted",
+      "slug": "geshugan",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "62740c2d-eb38-4eba-8555-357190310a70",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "62740c2d-eb38-4eba-8555-357190310a70",
+          "image_id": "bb738ee7-c33c-5026-bfa5-287296a828db",
+          "source_image_id": "bb738ee7-c33c-5026-bfa5-287296a828db",
+          "status": "processing",
+          "output_count": 1,
+          "image_size": {
+            "width": 128,
+            "height": 256
+          },
+          "estimated_generations": 9,
+          "pricing_provisional": true
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T18:30:16Z",
+      "kind": "submitted",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "breathing-idle",
+        "job_id": "313da381-5ebe-43ab-997b-d1eb55f6aa2f",
+        "receipt": {
+          "background_job_ids": [
+            "313da381-5ebe-43ab-997b-d1eb55f6aa2f"
+          ],
+          "directions": [
+            "south-east"
+          ],
+          "animation_group_id": "4e748226-7bec-46bf-bb77-a3392b9522a4",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T18:30:29Z",
+      "kind": "submitted",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "walking-8-frames",
+        "job_id": "83227447-8dd7-480f-8792-56d1ec73f851",
+        "receipt": {
+          "background_job_ids": [
+            "83227447-8dd7-480f-8792-56d1ec73f851"
+          ],
+          "directions": [
+            "east"
+          ],
+          "animation_group_id": "e7bd558a-c320-4ba1-acaf-b018fc0ac3ed",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T18:30:48Z",
+      "kind": "submitted",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "running-8-frames",
+        "job_id": "7abf3424-7b93-48da-947d-f6357b0b2874",
+        "receipt": {
+          "background_job_ids": [
+            "7abf3424-7b93-48da-947d-f6357b0b2874"
+          ],
+          "directions": [
+            "east"
+          ],
+          "animation_group_id": "4e7a2ac9-f9f2-42cc-83eb-835cf0062a2e",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
     }
   ],
-  "updated_at": 1792779735.2413378,
+  "updated_at": 1792780248.1369903,
   "user_stopped_at": 1792778235.6917784,
   "archived_jobs": {
     "304457e9-6577-44f0-af17-97841a9f6720": {
@@ -3390,18 +3613,18 @@
       "saved_frames": 6
     }
   },
-  "last_git_checkpoint": 1792779415.958207,
+  "last_git_checkpoint": 1792779738.6907787,
   "summary": {
     "jobs": {
-      "processing": 6,
-      "completed": 8,
+      "processing": 9,
+      "completed": 9,
       "failed": 0,
       "stalled": 0
     },
-    "characters_ready": 1,
+    "characters_ready": 2,
     "characters_total": 55,
     "images_verified": 7,
-    "motions_submitted": 0,
+    "motions_submitted": 3,
     "motions_target": 1100
   }
 }
