@@ -1,0 +1,20 @@
+{
+  "at": 1792799462.5219808,
+  "job_id": "4ab34876-571f-4240-a369-3f2190a7f73e",
+  "result": "pass",
+  "findings": "직접 관절8프레임 검토. 달리기 발 교대에서 도약 후 착지로 이어지며 신체 잘림 없음. 이전 머리 주변 회색 덩어리 제거, 서쪽 얼굴·긴 검은 머리·정장·장갑과 원본 키 비율 유지.",
+  "frame_count": 8,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

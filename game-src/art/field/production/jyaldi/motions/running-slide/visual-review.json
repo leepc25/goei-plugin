@@ -1,0 +1,20 @@
+{
+  "at": 1792799462.8085113,
+  "job_id": "c71e10c2-bf4a-4a84-9211-f99673420f8d",
+  "result": "reroll-required",
+  "findings": "직접 관절에서도3·5프레임 양 종아리 뒤에 넓은 회색 삼각형 채움. 두 다리가 겹친 낮은 자세의 외곽 복원이 실패하여 다리 간격과 접지 자세를 바꿔 재작업 필요.",
+  "frame_count": 8,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "at": 1792799555.276685,
+  "job_id": "ca8355e6-7376-485d-9334-3ffbae2087b4",
+  "result": "reroll-required",
+  "findings": "3프레임 뒤쪽 손이 갈색 덩어리로 변하고6프레임 던지는 팔이 충분히 뻗지 않아 머리를 만지는 동작처럼 읽힘. 검은 장갑·던지기 궤적을 유지하도록 팔 좌표 재작업.",
+  "frame_count": 8,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

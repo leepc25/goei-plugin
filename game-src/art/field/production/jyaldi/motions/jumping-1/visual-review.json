@@ -1,0 +1,20 @@
+{
+  "at": 1792799502.4742935,
+  "job_id": "78c4596b-d8e7-45c8-9e8f-efba27b0e34a",
+  "result": "pass",
+  "findings": "직접 관절8프레임 검토. 이전 상반신 잘림과7프레임 투명 구멍 해소. 비대칭 무릎 접기 도약/착지, 얼굴·긴 머리·정장·장갑과 원본 크기 유지, 회색 외곽 채움 없음.",
+  "frame_count": 8,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}
