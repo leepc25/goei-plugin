@@ -1,0 +1,22 @@
+{
+  "at": 1792792136.4733248,
+  "result": "pass",
+  "frames_reviewed": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+  ],
+  "findings": "8프레임 개별 확인. 서쪽으로 얼굴 노출, 의상·긴 머리 유지, 좌우 교대 보행과 투명 외곽 정상. 기존에 접수된 결과의 검수이며 새 생성 아님.",
+  "rules_rechecked": [
+    "AVIF primary",
+    "Lore supplementary height",
+    "All55 before new motion",
+    "Gray outer paint reroll"
+  ],
+  "new_user_approval": false
+}

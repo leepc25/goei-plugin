@@ -1,0 +1,25 @@
+{
+  "at": 1792792063.4037929,
+  "character_id": "12ac86a5-8639-4cf2-a629-a944f823df1d",
+  "result": "pass",
+  "directions_reviewed": [
+    "south",
+    "south-east",
+    "east",
+    "north-east",
+    "north",
+    "north-west",
+    "west",
+    "south-west"
+  ],
+  "findings": "원본의 짧고 둥근 금발 가르마·황갈색 눈·부드러운 미소·네이비 정장 유지. 같은 여성 키 범위에서 8방향 비율 일관, 얼굴 동쪽에서 보임. 외곽 회색 칠 없음.",
+  "movement_direction": "east",
+  "stationary_direction": "south-east",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF primary",
+    "Lore supplementary height",
+    "All55 before motion",
+    "Gray outer paint reroll"
+  ]
+}

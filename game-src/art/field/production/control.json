@@ -123,7 +123,9 @@
     "lee-yeon-hwa",
     "lee-byeong-jin",
     "jay",
-    "ho-yu-won"
+    "ho-yu-won",
+    "cheong-dal-lae",
+    "cha-yeo-jin"
   ],
   "source_priority": "AVIF first for identity/build; lore supplements height; explicit user heights override estimates"
 }

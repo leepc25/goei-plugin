@@ -1,0 +1,25 @@
+{
+  "at": 1792792176.0692356,
+  "character_id": "dcd8fbf1-126e-43ea-a83f-fed78e9fd646",
+  "result": "pass",
+  "directions_reviewed": [
+    "south",
+    "south-east",
+    "east",
+    "north-east",
+    "north",
+    "north-west",
+    "west",
+    "south-west"
+  ],
+  "findings": "원작의 밝은 잿갈색 곱슬머리·본인 왼눈 안대와 코를 지나는 끈·마른 체격·네이비 타이 정장 유지. 목 부분 확대 대조로 흰 셔츠와 타이 확인. 동쪽은 노출된 눈이 보이고 서쪽은 안대 쪽이므로 동쪽 선택. 8방향 외곽 회색 칠 없음.",
+  "movement_direction": "east",
+  "stationary_direction": "south-east",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF primary",
+    "Lore supplementary height",
+    "All55 before motion",
+    "Gray outer paint reroll"
+  ]
+}

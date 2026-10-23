@@ -1,0 +1,36 @@
+{
+  "id": "38d2f10b-164d-4b3b-9c2a-5def8647e9d9",
+  "name": "고영은",
+  "state_name": "Idle",
+  "prompt": "고영은 / Go Young-eun. Ordinary soft nonathletic adult woman, oval gentle face, brown-gray eyes and modest smile. Dark BROWN chin-length rounded bob, thick straight bangs above eyes and inward-curled ends; one side tucked behind the visible ear. Navy fitted trouser suit, white shirt and navy tie. No mask or glasses. Preserve visible ear shape from original; do not invent a conspicuous amputated ear on the exposed side. Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches.",
+  "size": {
+    "width": 128,
+    "height": 256
+  },
+  "directions": 8,
+  "created_at": "2026-10-23T21:29:12.994769+00:00",
+  "updated_at": "2026-10-23T21:49:42.152112+00:00",
+  "animation_count": 0,
+  "template_id": "mannequin",
+  "view": "low top-down",
+  "status": "completed",
+  "rotation_urls": {
+    "south": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/38d2f10b-164d-4b3b-9c2a-5def8647e9d9/rotations/south.png?t=1792792182",
+    "west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/38d2f10b-164d-4b3b-9c2a-5def8647e9d9/rotations/west.png?t=1792792182",
+    "east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/38d2f10b-164d-4b3b-9c2a-5def8647e9d9/rotations/east.png?t=1792792182",
+    "north": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/38d2f10b-164d-4b3b-9c2a-5def8647e9d9/rotations/north.png?t=1792792182",
+    "south-east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/38d2f10b-164d-4b3b-9c2a-5def8647e9d9/rotations/south-east.png?t=1792792182",
+    "north-east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/38d2f10b-164d-4b3b-9c2a-5def8647e9d9/rotations/north-east.png?t=1792792182",
+    "north-west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/38d2f10b-164d-4b3b-9c2a-5def8647e9d9/rotations/north-west.png?t=1792792182",
+    "south-west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/38d2f10b-164d-4b3b-9c2a-5def8647e9d9/rotations/south-west.png?t=1792792182"
+  },
+  "style_settings": {
+    "generation_mode": "v3"
+  },
+  "guidance": null,
+  "ai_freedom": null,
+  "tags": [],
+  "group_id": "91696245-4629-46da-85a5-426656e78069",
+  "skeletons": null,
+  "animations": []
+}
