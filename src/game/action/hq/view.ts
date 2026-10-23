@@ -373,6 +373,17 @@ ${can.ok ? '' : `<p class="hq-warn">${esc(can.why)}</p>`}</div>
     const res = `<ul class="hq-result gk-font">${l.lines.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>`;
     return talkBox(who, `${title}. ${first?.text ?? ''}`, `<div class="hq-choice-row"><button class="gk-btn hq-choice primary on" data-act="close">확인</button>${host?.link ? '<button class="gk-btn hq-choice" data-act="report">본편에 보고서 붙이기</button>' : ''}</div>`, res);
   };
+  // 대화창 선택지 키보드 조작: ↑↓←→로 옮기고 Enter·Space·Z로 고름, 숫자키는 바로 고름
+  let talkKey = '';
+  let tcur = 0;
+  const talkButtons = () => Array.from(wrap?.querySelectorAll<HTMLButtonElement>('.hq-talk .hq-choice') ?? []).filter((b) => !b.disabled);
+  const markTalk = (reset: boolean) => {
+    const bs = talkButtons();
+    if (!bs.length) return;
+    if (reset) tcur = Math.max(0, bs.findIndex((b) => b.classList.contains('on')));
+    tcur = Math.min(Math.max(tcur, 0), bs.length - 1);
+    bs.forEach((b, i) => b.classList.toggle('kb', i === tcur));
+  };
   const renderFloat = () => {
     const ov = wrap!.querySelector<HTMLElement>('.hq-over')!;
     const open = !!(overlay || panel);
@@ -383,6 +394,9 @@ ${can.ok ? '' : `<p class="hq-warn">${esc(can.why)}</p>`}</div>
     if (talk) {
       ensureKit();
       ov.innerHTML = (overlay === 'brief' ? briefTalk() : overlay === 'settle' ? settleTalk() : missionTalk()) + (notice ? `<p class="hq-notice hq-talk-notice">${esc(notice)}</p>` : '');
+      const k = `${overlay ?? ''}/${panel ?? ''}`;
+      markTalk(k !== talkKey);
+      talkKey = k;
       return;
     }
     const body = overlay === 'brief' ? briefHtml() : overlay === 'settle' ? settleHtml() : overlay === 'menu' ? menuHtml() : placeHtml(panel!);
@@ -532,6 +546,23 @@ ${can.ok ? '' : `<p class="hq-warn">${esc(can.why)}</p>`}</div>
     const tg = ev.target as HTMLElement | null;
     if (tg && (tg.tagName === 'INPUT' || tg.tagName === 'TEXTAREA' || tg.isContentEditable)) return;
     if (ev.type === 'keyup') return void keys.delete(ev.code);
+    const tb = wrap.querySelector('.hq-talk') ? talkButtons() : [];
+    if (tb.length) {
+      const n = /^Digit([1-9])$/.exec(ev.code);
+      if (ev.code === 'ArrowUp' || ev.code === 'ArrowLeft' || ev.code === 'ArrowDown' || ev.code === 'ArrowRight') {
+        tcur = (tcur + (ev.code === 'ArrowUp' || ev.code === 'ArrowLeft' ? -1 : 1) + tb.length) % tb.length;
+        markTalk(false);
+        ev.preventDefault();
+        ev.stopImmediatePropagation();
+        return;
+      }
+      if (ev.code === 'Enter' || ev.code === 'NumpadEnter' || ev.code === 'Space' || ev.code === 'KeyZ' || n) {
+        if (!ev.repeat) tb[n ? Number(n[1]) - 1 : tcur]?.click();
+        ev.preventDefault();
+        ev.stopImmediatePropagation();
+        return;
+      }
+    }
     if (ev.code === 'ArrowLeft' || ev.code === 'ArrowRight') (keys.add(ev.code), ev.preventDefault());
     if (ev.repeat) return;
     if (ev.code === 'Escape') {
