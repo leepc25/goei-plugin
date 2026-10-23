@@ -4943,16 +4943,18 @@
         "status": "processing",
         "created_at": "2026-10-23T19:36:54.802028+00:00",
         "last_response": {
-          "status": "correcting_frames",
-          "progress": 0.84,
+          "status": "building_skeleton",
+          "progress": 0.98,
           "character_id": "4e9a6e84-09a2-49ae-b1cb-09ecbfef5022",
           "n_directions": 8,
           "character_name": "고영훈",
           "queue_position": 0,
           "directions_type": "8-directions",
           "generation_mode": "v3",
+          "skeleton_frames_done": 2,
           "character_description": "고영훈 / Go Young-hoon. Adult man mid40s, swept back dark brown hair with a gray streak, black aviator sunglasses, long stern expressionless face, strong lean build, dark brown charcoal trouser suit, white shirt and black necktie, black shoes. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
-          "generation_started_at": "2026-10-23T19:37:04.110155+00:00"
+          "generation_started_at": "2026-10-23T19:37:04.110155+00:00",
+          "skeleton_frames_total": 8
         }
       }
     },
@@ -5403,8 +5405,8 @@
         "status": "processing",
         "created_at": "2026-10-23T19:46:15.706632+00:00",
         "last_response": {
-          "status": "processing",
-          "progress": 0.48,
+          "status": "correcting_frames",
+          "progress": 0.84,
           "character_id": "1f2250cb-ca5c-4d1f-9b0d-885f752c5974",
           "n_directions": 8,
           "character_name": "조성춘",
@@ -5509,6 +5511,27 @@
         "status": "processing",
         "enhanced_prompt": null,
         "enhance_usage": null
+      },
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "f6f2e349-d5a1-4dfb-8c30-aa7180971954",
+        "status": "processing",
+        "created_at": "2026-10-23T19:51:59.539106+00:00",
+        "last_response": {
+          "status": "processing",
+          "progress": 0.26666666666666666,
+          "character_id": "4390bb9b-0e2a-4c65-b70f-da09751397bf",
+          "n_directions": 8,
+          "character_name": "윤병수",
+          "queue_position": 0,
+          "directions_type": "8-directions",
+          "generation_mode": "v3",
+          "character_description": "윤병수 / Yun Byeong-su. Adult man mid30s, short black hair swept back, black aviator sunglasses, angular stern face, solid athletic build, dark charcoal trouser suit, white shirt, black necktie and black shoes. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
+          "generation_started_at": "2026-10-23T19:52:07.459426+00:00"
+        }
       }
     }
   },
@@ -5739,15 +5762,13 @@
     "lee-do-hyeong": {
       "name": "이도형",
       "group": "fake-bureau",
-      "character_id": "2e2a302d-0b74-4e22-8af7-4b3f9cfbbbe2",
-      "image": "97c6be5f-46f6-4216-a783-10760dce00b7",
-      "registration": "4f676b89-e087-4071-b5de-8f1509e4d6b3",
+      "character_id": null,
+      "image": null,
+      "registration": null,
       "motions": {},
-      "ready": true,
-      "image_verified": true,
-      "skeleton_joints": 18,
-      "rotation_count": 8,
-      "exported": true
+      "ready": false,
+      "repair_id": "lee-do-hyeong-identity-v2",
+      "visual_review_required": true
     },
     "go-young-hoon": {
       "name": "고영훈",
@@ -9874,9 +9895,23 @@
           "enhance_usage": null
         }
       }
+    },
+    {
+      "at": "2026-10-23T19:52:57Z",
+      "kind": "repair-started",
+      "slug": "lee-do-hyeong",
+      "detail": {
+        "id": "lee-do-hyeong-identity-v2",
+        "slug": "lee-do-hyeong",
+        "action": "regenerate-front-and-register",
+        "reason": "User rejected result. Full original confirms ponytail, cheek scars, rolled sleeves; previous prompt falsely described short hair and omitted distinctive features.",
+        "correction": "Use corrected detailed original appearance. Hold registration until source ponytail/scars/rolled sleeves and natural anatomy are actually inspected.",
+        "estimated_generations": 9,
+        "registration_cost_after_visual_review": 4
+      }
     }
   ],
-  "updated_at": 1792785130.7028065,
+  "updated_at": 1792785242.8775845,
   "user_stopped_at": 1792778235.6917784,
   "archived_jobs": {
     "304457e9-6577-44f0-af17-97841a9f6720": {
@@ -11195,7 +11230,7 @@
       "saved_frames": 6
     }
   },
-  "last_git_checkpoint": 1792784830.1957433,
+  "last_git_checkpoint": 1792785132.440435,
   "summary": {
     "jobs": {
       "processing": 6,
@@ -11203,9 +11238,9 @@
       "failed": 3,
       "stalled": 0
     },
-    "characters_ready": 14,
+    "characters_ready": 13,
     "characters_total": 55,
-    "images_verified": 23,
+    "images_verified": 22,
     "motions_submitted": 3,
     "motions_target": 1100
   },
@@ -11214,6 +11249,7 @@
     "stature-v2-kyuras",
     "stature-v2-deadpole",
     "aileen-user-rebuild-v4",
-    "konjyuce-torso-v2"
+    "konjyuce-torso-v2",
+    "lee-do-hyeong-identity-v2"
   ]
 }

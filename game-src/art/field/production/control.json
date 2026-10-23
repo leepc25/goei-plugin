@@ -1,6 +1,6 @@
 {
   "release_skeleton_v3_motions": false,
-  "reason": "Latest user: finish management, then fake bureau, Baekilmong and all other neutral/anomaly characters; register entire roster before new motions.",
+  "reason": "Latest user requires individual full asset and lore review before generation; Lee Do-hyeong source request has been fully corrected and reviewed. Other unsubmitted requests need individual audit; registration needs actual generated-source identity review.",
   "max_in_flight": 20,
   "max_character_pipeline_in_flight": 6,
   "authorized_total_characters": 55,
@@ -36,5 +36,11 @@
   "production_priority": "all-roster-character-registration-first",
   "after_registration": "roster-order eight-direction visual review and export, then remaining authorized production",
   "direction_selection_policy": "Compare actual east/west/southeast/southwest rotations per character; select face-visible pair east+southeast or west+southwest. Do not impose one side on all characters.",
-  "registration_failure_policy": "Diagnose and correct source/registration; archive failed results and billing; delete only identified failed character; re-register without duplicating accepted jobs."
+  "registration_failure_policy": "Diagnose and correct source/registration; archive failed results and billing; delete only identified failed character; re-register without duplicating accepted jobs.",
+  "image_approved_slugs": [
+    "lee-do-hyeong",
+    "kim-seong-jin",
+    "song-jin-seob"
+  ],
+  "registration_approved_slugs": []
 }

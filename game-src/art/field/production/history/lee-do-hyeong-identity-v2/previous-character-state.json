@@ -1,0 +1,13 @@
+{
+  "name": "이도형",
+  "group": "fake-bureau",
+  "character_id": "2e2a302d-0b74-4e22-8af7-4b3f9cfbbbe2",
+  "image": "97c6be5f-46f6-4216-a783-10760dce00b7",
+  "registration": "4f676b89-e087-4071-b5de-8f1509e4d6b3",
+  "motions": {},
+  "ready": true,
+  "image_verified": true,
+  "skeleton_joints": 18,
+  "rotation_count": 8,
+  "exported": true
+}

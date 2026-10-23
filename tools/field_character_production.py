@@ -174,12 +174,12 @@ class Production:
   for a in self.manifest:
    if len(active())>=20:return
    c=self.s['characters'][a['slug']]
-   if c.get('image_verified')and not c.get('registration')and a['slug']not in json.loads((OUT/'control.json').read_text()).get('registration_held_slugs',[]):
+   if c.get('image_verified')and not c.get('registration')and a['slug']in json.loads((OUT/'control.json').read_text()).get('registration_approved_slugs',[x['slug']for x in self.manifest])and a['slug']not in json.loads((OUT/'control.json').read_text()).get('registration_held_slugs',[]):
     self.submit('registration',a['slug'],'create-character-v3',self.registration_request(a))
   for a in self.manifest:
    if len(active())>=20:return
    c=self.s['characters'][a['slug']]
-   if a.get('pixel_request')and not c.get('image')and sum(j['kind']in['image','registration']for j in active())<6:
+   if a.get('pixel_request')and not c.get('image')and a['slug']in json.loads((OUT/'control.json').read_text()).get('image_approved_slugs',[x['slug']for x in self.manifest])and sum(j['kind']in['image','registration']for j in active())<6:
     self.submit('image',a['slug'],'create-image-pro-flash',self.image_request(a))
   # A visual gate prevents spreading a broken animation route to the whole roster.
   control=json.loads((OUT/'control.json').read_text())
@@ -200,7 +200,7 @@ class Production:
    c=self.s['characters'][a['slug']]
    if c.get('ready'):
     if control.get('release_skeleton_v3_motions')and a['slug']in control.get('motion_allowed_slugs',[])and any(not c['motions'].get(t)for t,_ in TEMPLATES):return False
-   elif c.get('image_verified')and not c.get('registration')and a['slug']not in json.loads((OUT/'control.json').read_text()).get('registration_held_slugs',[]):return False
+   elif c.get('image_verified')and not c.get('registration')and a['slug']in json.loads((OUT/'control.json').read_text()).get('registration_approved_slugs',[x['slug']for x in self.manifest])and a['slug']not in json.loads((OUT/'control.json').read_text()).get('registration_held_slugs',[]):return False
    elif not c.get('image')and a.get('pixel_request'):return False
    elif c.get('registration')in self.s['jobs']and self.s['jobs'][c['registration']]['status']=='completed'and not c.get('skeleton_problem'):return False
   return True
