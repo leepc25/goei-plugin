@@ -1,4 +1,32 @@
-marks" ? `${g2.time}초 안에 표식 ${g2.need}개를 찾아라` : g2.kind === "nostop" ? `${g2.time}초 안에 끝까지 가라. 멈추지 마라` : `${g2.time}초 안에 이 층의 것들을 쓰러뜨려라`;
+(place2("sidedoor", x, 0, 80, pick3(r, SIDE_NAMES[type] ?? SIDE_NAMES.lobby), { side: made }));
+    }
+    if (ctx.secret) {
+      const crack = r() < 0.55;
+      const x = spot(plainChunks, 120, () => true, true);
+      if (x !== null) f.placed.push(place2(crack ? "crack" : "vent", x, crack ? 0 : MID, crack ? 90 : 60, crack ? "금 간 벽" : "막힌 덕트", { hp: 3 }));
+    }
+  }
+  var SIDE_NAMES = {
+    lobby: ["옆 사무실", "문서 창고", "숙직실", "탕비실"],
+    silent: ["열람실 안쪽", "서고"],
+    dark: ["불 꺼진 방", "배전실"],
+    puzzle: ["같은 방", "거꾸로 된 방"],
+    replica: ["옆집", "작은방", "다용도실"],
+    trial: ["대기실", "심판석"],
+    chase: ["비상구 옆방"]
+  };
+  function hook2(role, kind, x, lane, wave, elite, data) {
+    return { id: nextId++, role, kind, x: Math.round(x), lane: Math.round(lane), wave, elite, data };
+  }
+  function makeGoal(r, depth) {
+    const n = depth - 3;
+    const opts = [
+      { kind: "marks", need: Math.min(4, 2 + Math.floor(n / 3)), time: 60, text: "" },
+      { kind: "nostop", need: 1, time: 50, text: "" },
+      { kind: "clear", need: 1, time: 75, text: "" }
+    ];
+    const g2 = pick3(r, opts);
+    g2.text = g2.kind === "marks" ? `${g2.time}초 안에 표식 ${g2.need}개를 찾아라` : g2.kind === "nostop" ? `${g2.time}초 안에 끝까지 가라. 멈추지 마라` : `${g2.time}초 안에 이 층의 것들을 쓰러뜨려라`;
     return g2;
   }
   function propLabel(type, sub, r) {
@@ -3784,29 +3812,3 @@ ${SET_BONUS[u.set]}`;
         const cmd = raw.slice(1).trim();
         const [head, ...rest] = cmd.split(/\s+/);
         const tail = cmd.slice(head.length).trim();
-        if (head === "set") {
-          const m = /^([\w.]+)\s*(\+=|-=|=)\s*(.+)$/.exec(tail);
-          if (!m) throw new ScriptError(`${where}:${n} set 형식: > set 이름 = 식`);
-          nodes.push({ t: "set", key: m[1], op: m[2], expr: m[3], line: n });
-        } else if (head === "goto") {
-          const m = /^([\w.]+)(?:\s+if\s+(.+))?$/.exec(tail);
-          if (!m) throw new ScriptError(`${where}:${n} goto 형식: > goto 표지 [if 조건]`);
-          nodes.push({ t: "goto", to: m[1], if: m[2], line: n });
-        } else if (head === "emit") {
-          nodes.push({ t: "emit", event: rest[0] ?? "", arg: rest.slice(1).join(" "), line: n });
-        } else if (head === "call") {
-          nodes.push({ t: "call", script: tail, line: n });
-        } else if (head === "agent" || head === "line") {
-          nodes.push({ t: "agentline", tag: rest[0] ?? "", who: rest[1] ?? "agent", line: n });
-        } else if (head === "end") {
-          nodes.push({ t: "end", line: n });
-        } else throw new ScriptError(`${where}:${n} 모르는 명령: ${head}`);
-        continue;
-      }
-      nodes.push(parseSay(raw, n, where));
-    }
-    return out;
-  }
-  function lex(src) {
-    const out = [];
-    const re = /\s*(?:(\d+(?:\.

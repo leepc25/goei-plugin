@@ -1,4 +1,4 @@
-// goei-game 0.16.45
+// goei-game 0.16.46
 "use strict";
 (() => {
   // src/game/action/art/startRoom.ts

@@ -525,7 +525,7 @@
     }
     return { next, lore: lore.count, scripts: scripts.count, fields: fields3 };
   }
-  var PLUGIN_VERSION = true ? "0.16.45" : "0";
+  var PLUGIN_VERSION = true ? "0.16.46" : "0";
 
   // src/host/game/fetch.ts
   var GAME_BASE = UPDATE_BASE ? `${UPDATE_BASE}/game` : "";
@@ -590,7 +590,7 @@
 
   // src/host/game/code.ts
   var CODE_KEY = "goei:game:code";
-  var VERSION = true ? "0.16.45" : "";
+  var VERSION = true ? "0.16.46" : "";
   var codeVersion = (code) => /^\/\/ goei-game (\S+)/.exec(code)?.[1] ?? null;
   var mod = null;
   var codeStats = { readMs: 0, runMs: 0, bytes: 0, fromNet: false };
@@ -1008,6 +1008,7 @@ ${recentStory.map((m) => m.text).join("\n")}`,
       agent: { name: input2.agent.name, ...input2.agent.rank ? { rank: input2.agent.rank } : {}, lore: input2.agent.lore, status: input2.agent.state, situation: input2.agent.situation, where: ROOM[input2.agent.room] ?? input2.agent.room },
       ...by.length ? { bystanders: by.map((b) => ({ name: b.name, ...b.rank ? { rank: b.rank } : {}, lore: b.lore, status: b.state, situation: b.situation })) } : {},
       protagonist: { name: input2.visitor, ...protagonist ? { lore: protagonist } : {} },
+      ...input2.scene && Object.values(input2.scene).some(Boolean) ? { mainScene: Object.fromEntries(Object.entries(input2.scene).filter(([, v]) => v)) } : {},
       universe,
       recentStory,
       ...advOn(ss, "hq", "interlude") && input2.elsewhere.length ? { earlierThisInterlude: input2.elsewhere } : {},
@@ -1095,6 +1096,11 @@ ${recentStory.map((m) => m.text).join("\n")}`,
       return {};
     }
   }
+  function sceneOf(c, playerId2) {
+    const st = lastStatusFields((c.chat.message ?? []).filter((m) => m.role === "char").slice(-6).map((m) => String(m.data ?? "")));
+    const me = playerId2 ? cardSnapshot(c.char, c.chat).agents.find((a) => a.id === playerId2) : void 0;
+    return { place: st?.place, target: st?.target, time: st ? [st.date, st.time].filter(Boolean).join(" ") : void 0, protagonistStatus: me ? [me.state, me.situation].filter(Boolean).join(" · ") : void 0 };
+  }
   function createVisit() {
     const opening = loadContext();
     let origin = null;
@@ -1164,6 +1170,7 @@ ${recentStory.map((m) => m.text).join("\n")}`,
             bystanders,
             said: text,
             act,
+            scene: sceneOf(c, me?.id),
             skipBooks: me ? [me.lore] : []
           }, factionNamesOf(c)));
           const model2 = advValue(ss, "hq", "model") === "main" ? "main" : "aux";
@@ -3896,15 +3903,4 @@ ${recentStory.map((m) => m.text).join("\n")}`,
     let wiki2;
     if (key2.startsWith("fac:")) {
       const lm = c.landmarks.find((l) => l.name === key2.slice(4));
-      name = lm?.label || lm?.name || key2.slice(4);
-      sub = lm ? placeWhere(lm.sido, lm.gu) : "거점";
-      wiki2 = lm?.name ?? name;
-    } else {
-      const full = locName(key2);
-      const cut2 = full.lastIndexOf(" ");
-      name = cut2 > 0 ? full.slice(cut2 + 1) : full;
-      sub = cut2 > 0 ? full.slice(0, cut2) : "";
-      wiki2 = full;
-    }
-    const tag = on2 ? '<span class="gx-badge gx-goaltag">목표</span>' : "";
-    return `<li class="gx-evc go gx-placecard${on2 ? " sel" : ""}" data-action="pick-place" data-value="${esc15(key2)}"><i class="gx-gmark pl">${ICONS.pin}</i><span class="gx-evc-main"><span class="gx-evc-top"><span class="gx-evc-name"><b>${esc15(name)}</b>${tag}</sp
+      name = lm?.lab

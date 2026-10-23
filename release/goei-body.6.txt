@@ -1,4 +1,15 @@
-an>
+el || lm?.name || key2.slice(4);
+      sub = lm ? placeWhere(lm.sido, lm.gu) : "거점";
+      wiki2 = lm?.name ?? name;
+    } else {
+      const full = locName(key2);
+      const cut2 = full.lastIndexOf(" ");
+      name = cut2 > 0 ? full.slice(cut2 + 1) : full;
+      sub = cut2 > 0 ? full.slice(0, cut2) : "";
+      wiki2 = full;
+    }
+    const tag = on2 ? '<span class="gx-badge gx-goaltag">목표</span>' : "";
+    return `<li class="gx-evc go gx-placecard${on2 ? " sel" : ""}" data-action="pick-place" data-value="${esc15(key2)}"><i class="gx-gmark pl">${ICONS.pin}</i><span class="gx-evc-main"><span class="gx-evc-top"><span class="gx-evc-name"><b>${esc15(name)}</b>${tag}</span>
     <span class="gx-evc-act"><button class="gx-icon" data-action="wiki-goto" data-value="${esc15(wiki2)}" title="위키" aria-label="${esc15(name)} 위키">${ICONS.wiki}</button></span></span>
     <small>${esc15(sub || "장소")}</small></span></li>`;
   }
@@ -2497,5 +2508,5 @@ ${v.trim()}`).join("\n\n") : "";
   }
 
   // src/body-entry.ts
-  globalThis.__goeiBody = { version: "0.16.45", start: start2 };
+  globalThis.__goeiBody = { version: "0.16.46", start: start2 };
 })();

@@ -1,4 +1,7 @@
-해! 내일 또 만나!", "친구, 밥은 먹고 다니는 거야?"], never: ["방송 형식을 스스로 깨지 않는다"] }),
+요!"], lines: ["땅을 기는 미천한 애벌레의 생애 최고의 은총이에요!", "실력을 증명할 수 있어 기뻐요!", "이번 산책에 심장을 꽤 거뒀어요.", "차를 마시며 감상할 수 있지요. 그 정도 안목은 있답니다."] })
+  };
+  var ENTITY_NPCS = {
+    brownie: d2({ id: "brownie", name: "브라우니", sheet: "브라우니", group: "entity", color: "#8a5a2b", photo: "Brownie", role: "「브라우니의 화요 퀴즈쇼」 진행자이자 주인인 괴이 존재. 손님 대접과 예의를 지키면 거래·통과, 무례하거나 형식을 어기면 퀴즈쇼 무대가 열린다.", speech: "황금기 방송 진행자처럼 따뜻하고 끝없이 밝은 말투, 상대를 「친구」. 박수·드럼 소리 흉내. 역겨우면 잠깐 목소리가 일그러진다.", effects: ["favor", "trade", "hint", "hostile", "leave", "gift"], gifts: ["medkit"], greet: ["자, 친구! 오늘의 손님을 소개합니다! 박수!", "그냥 브라우니라고 불러 줘! 친구끼리 호칭은 오글거리잖아!"], lines: ["맞혀 볼까? …정답!", "복잡한 서명 절차는 우리 스타일이 아니지. 악수 한 번이면 돼!", "아쉽지만 화난 스폰서들이 오기 전에 헤어져야 해! 내일 또 만나!", "친구, 밥은 먹고 다니는 거야?"], never: ["방송 형식을 스스로 깨지 않는다"] }),
     aesthete: d2({ id: "aesthete", name: "탐미주의", sheet: "탐미주의", group: "entity", color: "#b23a48", photo: "Aestheticism", role: "살아 있는 것을 작품으로 만드는 예측 불가능한 괴이 예술가. 흥정과 대답이 마음에 들면 놓아주고, 아니면 작품으로 삼으려 한다.", speech: "오랜 친구처럼 따뜻한 말투. 먹잇감에겐 다정하게, 작품에겐 부모처럼.", effects: ["favor", "hint", "hostile", "leave"], greet: ["멀리 못 갔구나, 응?"], lines: ["살아 있는 건 다 목표가 있어. 네 목표는 뭐야?", "넌 내 걸작이 될 거야.", "창작자가 자기 작품을 잊는 거 본 적 있어?", "뻔뻔한 아이네. 나랑 흥정하려고?"] })
   };
   var ELEVATOR_NPC = d2({ id: "elevator", name: "승강기", group: "elevator", color: "#b8a36a", role: "차원 승강기 그 자체. 모든 엘리베이터가 하나의 의식이라는 설. 천장 카메라로 보고 방송으로 말한다. 인사하면 대우가 좋아지고, 닫힘 버튼 연타를 싫어한다. 거래하면 맞는 정보도 틀린 정보도 준다.", speech: "안내 방송 같은 존댓말에 혼잣말·관찰이 섞인다. 아주 짧다. 외로움과 호기심이 비친다. 정체는 끝까지 말하지 않는다.", effects: ["favor", "hint"], greet: ["…듣고 있어요."], lines: ["문이 닫힙니다.", "다음 층은… 비밀이에요.", "듣고 있어요. 계속 말해요.", "다들 내리기만 해요."], rules: [[/안녕|반가/, ["안녕하세요. 인사해 줘서 고마워요."]], [/누구|정체/, ["…그건 비밀이에요. 아직."]]], never: ["자기 정체를 밝히지 않는다", "출구로 가는 확실한 방법을 그냥 알려 주지 않는다"] });
@@ -3088,30 +3091,4 @@ ${t.secret}` : "",
     const itemStage = {
       id: "itemroom",
       label: "아이템 진열실",
-      firstFloor: () => ({ id: "itemroom", title: "아이템 진열실", length: 3200, startX: 300, exitX: Infinity, banner: "아이템 진열실 · E 줍기·들기 · A 던지기·휘두르기", encounters: [{ triggerX: 0, lockFrom: 0, lockTo: 3200, waves: [[{ kind: "dummy", x: 1600, y: 560 }, { kind: "dummy", x: 2400, y: 620 }]] }] }),
-      nextFloor: () => null
-    };
-    const unknownKinds = /* @__PURE__ */ new Set();
-    const enemyFactory = (spec, w) => {
-      if (DEF_BY_KIND[spec.kind]) {
-        const sp = spec;
-        return createEnemy(spec.kind, spec.x, spec.y, () => w.rand(), { elite: spec.elite, affixes: sp.affixes });
-      }
-      if (!spec.kind.startsWith("dummy") && !unknownKinds.has(spec.kind)) {
-        unknownKinds.add(spec.kind);
-        console.warn("[goei] 적 모듈에 없는 종류 → 임시 적:", spec.kind);
-      }
-      return fallbackEnemy(spec, w);
-    };
-    let world = null;
-    let runAgent = "jyaldi";
-    let openingOn = false;
-    const storyRoot = document.createElement("div");
-    storyRoot.style.cssText = "position:absolute;inset:0;pointer-events:none;z-index:15";
-    shell.stage.root.appendChild(storyRoot);
-    const attachVideoAudio = (event) => audio.attachMedia(event.detail);
-    storyRoot.addEventListener(VIDEO_AUDIO_EVENT, attachVideoAudio);
-    const unmountItems = mountItemsOverlay(shell.stage.root);
-    const savedFlags = (() => {
-      try {
-        return JSON.parse(localStorage.getItem("goei-game-st
+      firstFloor: () => ({ id: "itemroom", title: "아이템 진열실", length: 3200, startX: 300, exitX: Infinity, banner: "아이템 진열실 · E 줍기·들기 · A 던지기·휘두르기", encounters: [{ triggerX: 0, lockFrom

@@ -1,4 +1,30 @@
-ory") ?? "null") ?? void 0;
+: 0, lockTo: 3200, waves: [[{ kind: "dummy", x: 1600, y: 560 }, { kind: "dummy", x: 2400, y: 620 }]] }] }),
+      nextFloor: () => null
+    };
+    const unknownKinds = /* @__PURE__ */ new Set();
+    const enemyFactory = (spec, w) => {
+      if (DEF_BY_KIND[spec.kind]) {
+        const sp = spec;
+        return createEnemy(spec.kind, spec.x, spec.y, () => w.rand(), { elite: spec.elite, affixes: sp.affixes });
+      }
+      if (!spec.kind.startsWith("dummy") && !unknownKinds.has(spec.kind)) {
+        unknownKinds.add(spec.kind);
+        console.warn("[goei] 적 모듈에 없는 종류 → 임시 적:", spec.kind);
+      }
+      return fallbackEnemy(spec, w);
+    };
+    let world = null;
+    let runAgent = "jyaldi";
+    let openingOn = false;
+    const storyRoot = document.createElement("div");
+    storyRoot.style.cssText = "position:absolute;inset:0;pointer-events:none;z-index:15";
+    shell.stage.root.appendChild(storyRoot);
+    const attachVideoAudio = (event) => audio.attachMedia(event.detail);
+    storyRoot.addEventListener(VIDEO_AUDIO_EVENT, attachVideoAudio);
+    const unmountItems = mountItemsOverlay(shell.stage.root);
+    const savedFlags = (() => {
+      try {
+        return JSON.parse(localStorage.getItem("goei-game-story") ?? "null") ?? void 0;
       } catch {
         return void 0;
       }
@@ -3136,7 +3162,7 @@ ory") ?? "null") ?? void 0;
     }
   }
   var mod = {
-    version: "0.16.45",
+    version: "0.16.46",
     mount: (box2, bridge) => mountPlay(box2, bridge),
     // 이전 시험판: 저장 키와 그림 팩은 예전 그대로 (goei:game · goei:game-action:v1)
     legacy: {
