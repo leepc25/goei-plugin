@@ -2995,14 +2995,17 @@
         "note": "Common production scale; do not fit each person to full canvas. Compare anatomical crown-to-sole height; hair/headwear and heels need separate allowance. Unspecified individual female height stays a range."
       },
       "reviewed_at": "2026-10-24"
-    }
+    },
+    "registration_import_zip": "game-src/art/field/production/direction-repairs/shin-yuri/6d890b31-7194-48f6-bf12-e95897095d36/remove-old-hair-speck/character.zip",
+    "registration_import_review": "7방향의 가로로 뻗은 땋은 머리를 느슨하고 아래로 내려오는 짧은 검은 포니테일로 교정한 결과를 모두 시각 확인. 북동쪽에 남았던 이전 머리3픽셀도 alpha0으로 제거 확인. 원작의 가죽 재킷·짙은 회색 이너·바지·부츠·얼굴·키 유지, 마스크 밖 RGBA 동일. 회색 외곽 없음. AVIF 우선·로어 키 보충·전원 장벽 재확인.",
+    "registration_regenerate_directions": []
   },
   {
     "english": "Blaret",
     "name": "블라렛",
     "group": "religious",
     "slug": "blaret",
-    "appearance": "Adult woman with natural slim athletic body, oval pale face, vivid GREEN eyes and playful smile. Long straight sandy BLONDE hair with blunt bangs visible beneath WHITE forehead band and long BLACK nun veil. Fitted BLACK long-sleeved nun habit, WHITE high-neck wimple and white shoulder bib, modest side slit. Several thick dark SILVER chains with large silver cross pendant and small green stone. WOODEN brown prayer beads around both wrists. Black boots. No handheld weapons. The long black veil hangs down to the HIPS, clearly below the waist, never a short shoulder-length veil.",
+    "appearance": "Adult woman with natural slim athletic body, oval pale face, vivid GREEN eyes and playful smile. Long straight sandy BLONDE hair with blunt bangs visible beneath WHITE forehead band and long BLACK nun veil. Fitted BLACK long-sleeved nun habit, WHITE high-neck wimple and white shoulder bib, modest side slit. Several thick dark SILVER chains with large silver cross pendant and small green stone. WOODEN brown prayer beads around both wrists. Black boots. No handheld weapons. The long black veil hangs down to the HIPS, clearly below the waist, never a short shoulder-length veil. The BLACK NUN VEIL is LONG, hanging from the head down behind both arms to hips/upper thighs, below both hands. Preserve this full length in every side and back view; never a short shoulder hood.",
     "original_art": "assets/agents/Blaret_default.avif",
     "original_sha256": "c8eb672ee07881fd8d12305647460023e668c2eedfa49b8dbdcf5ec7744fc61c",
     "wiki_appearance": "[Paragraph]자연스러운 금발 긴 머리를 풀어 두거나 흰 작전용 베일 아래 감춘다. 초록 눈에, 밝고 장난기 넘치고 사진발 잘 받는 미소. 군살 없는 전투원의 몸을 수녀복 아래 숨기고 있고, 근무 시간이 아닐 때는 결투가처럼 움직인다. 자기 직함을 무대 이름처럼 소개하는 과시형 자신감은 덤이다.\n[Paragraph]근무복은 전통적인 흑백 가톨릭 수녀복과 베일인데, ❗전투 기동을 위해 옆트임이 들어가 있다❗. 트임 사이로 흰 허벅지와 검은 가터벨트 홀스터가 보이고, 거기에 은탄 쌍권총이 걸려 있다. 그 아래에는 은 말뚝. 목에는 굵은 사슬에 묵직한 은 십자가, 한쪽 손목에는 나무 묵주. 이 차림으로 성당 앞을 지나가면 신자들이 성호를 긋는데, 그게 축복의 의미인지 자기 보호의 의미인지는 분명하지 않다.📌교황청 복식 규정에 옆트임 조항이 있는지 묻는 글이 매년 올라온다. 아무도 교황청에 직접 물어볼 용기는 없다.📌\n[Paragraph]비번일 때는 평범한 사복 차림이다. 다만 손바닥만 한 십자가를 하나 들고 다니는데, 이걸 ❗망치처럼❗ 휘두른다. 사복에 팔짱을 끼고 서 있으면 평소의 밝음이 사라지고 형사 같은 평평한 눈빛이 남는다. 같은 사람인지 의심했다는 목격담이 많다.\n[Paragraph]반쪽 흡혈귀의 혈통은 겉으로 거의 드러나지 않는다. 사람 같지 않은 몸놀림, 그리고 흡혈귀들만 알아보는 특유의 냄새 정도. 흡혈귀들은 그녀를 냄새로 먼저 알아보고, 그다음에 은탄으로 확실히 알게 된다.\n",

@@ -20093,7 +20093,7 @@
       "kind": "direction-repair-north-east-remove-old-hair-speck",
       "slug": "shin-yuri",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792795558.6628258,
       "receipt": {
         "usage": null,
@@ -20111,34 +20111,65 @@
       },
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 9.0
         },
         "id": "818368ba-951c-4b93-8e89-8b66cabd4b29",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-23T22:45:59.165543+00:00",
         "last_response": {
-          "type": "message_progress",
+          "seed": 1792795558,
+          "type": "message_done",
           "model": "inpaint_pro_flash",
           "width": 128,
-          "action": "Correcting pixels",
+          "action": "Removing background",
           "height": 256,
+          "images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
           "prompt": "Erase the tiny detached BLACK SPECK in this selected otherwise EMPTY BACKGROUND. Remove the three disconnected black pixels completely to transparent empty background. Do not add hair, shading, cloth or any object here. Preserve all unmasked pixels and the nearby ponytail and jacket exactly.",
-          "status": "processing",
+          "status": "completed",
+          "paste_x": 0,
+          "paste_y": 0,
+          "asset_id": "edb5bd66-6257-5263-b311-3fea178ee0a2",
           "image_id": "edb5bd66-6257-5263-b311-3fea178ee0a2",
           "job_kind": "creator-image",
-          "progress": 0.75,
-          "queue_position": 3,
+          "progress": 1.0,
+          "image_url": "https://s3.eu-central-003.backblazeb2.com/pixellab-generations/production/creator/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/edb5bd66-6257-5263-b311-3fea178ee0a2/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0037e6521c1d7c20000000001%2F20261023%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20261023T225342Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=3dd01dd9278580d2705c0a4d35b72602cd588477b1228d002db97376c9b7685a",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 9
+          },
+          "canvas_growth": false,
+          "generation_id": "c08531f4-d027-4ce4-a5be-99df71374792",
+          "output_method": "Modify current layer",
+          "queue_position": 0,
+          "billing_charged": true,
+          "source_image_id": "edb5bd66-6257-5263-b311-3fea178ee0a2",
+          "creator_image_saved": true,
           "generation_started_at": "2026-10-23T22:45:59.195354+00:00",
-          "estimated_wait_seconds": 288
+          "estimated_wait_seconds": 0
         }
+      },
+      "observed_end_epoch": 1792796034.2098496,
+      "elapsed_observed_seconds": 475.54702401161194,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 9
       }
     },
     "0f18021b-f069-4958-825d-d830176a1892": {
       "kind": "image",
       "slug": "blaret",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792795605.5784204,
       "receipt": {
         "usage": null,
@@ -20156,27 +20187,66 @@
       },
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 9.0
         },
         "id": "0f18021b-f069-4958-825d-d830176a1892",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-23T22:46:45.864886+00:00",
         "last_response": {
-          "type": "message_progress",
+          "seed": 1792795549,
+          "type": "message_done",
           "model": "inpaint_pro_flash",
           "width": 128,
-          "action": "Correcting pixels",
+          "action": "Removing background",
           "height": 256,
+          "images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
           "prompt": "Complete the missing VIEWER-RIGHT half of the long black nun veil. Look at the EXISTING VIEWER-LEFT veil beside her left hand: a solid black fabric strip hangs down behind that hand. Add a MATCHING solid BLACK CLOTH PANEL behind the right hand, about SIX pixels wide, filling x96 through x101 from y135 to y164, naturally connected up to existing black veil at right upper arm. Filled black fabric with one subtle dark gray fold, NOT a single vertical outline or line. Hem at same height as left veil. Preserve hands, beads, sleeves, body, face, eyes and every unmasked pixel. Transparent outside the veil.",
-          "status": "processing",
+          "status": "completed",
+          "paste_x": 0,
+          "paste_y": 0,
+          "asset_id": "83e08abc-47bf-5313-b808-7d51d0097f3b",
           "image_id": "83e08abc-47bf-5313-b808-7d51d0097f3b",
           "job_kind": "creator-image",
-          "progress": 0.75,
-          "queue_position": 3,
+          "progress": 1.0,
+          "image_url": "https://s3.eu-central-003.backblazeb2.com/pixellab-generations/production/creator/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/83e08abc-47bf-5313-b808-7d51d0097f3b/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0037e6521c1d7c20000000001%2F20261023%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20261023T225424Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=600167d10c9f152da0a18bd2735ed5305de66e6e339b5a34284816b8c0b6205c",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 9
+          },
+          "canvas_growth": false,
+          "generation_id": "7c399ea5-4bed-4058-baf2-36a5704d4258",
+          "output_method": "Modify current layer",
+          "queue_position": 0,
+          "billing_charged": true,
+          "original_images": [
+            {
+              "type": "base64",
+              "width": 128,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "source_image_id": "83e08abc-47bf-5313-b808-7d51d0097f3b",
+          "creator_image_saved": true,
           "generation_started_at": "2026-10-23T22:46:45.896236+00:00",
-          "estimated_wait_seconds": 290
+          "estimated_wait_seconds": 0
         }
+      },
+      "observed_end_epoch": 1792796143.3240762,
+      "elapsed_observed_seconds": 537.7456564903259,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 9
       }
     },
     "0581c47a-927b-4213-9464-6a063a195171": {
@@ -20321,14 +20391,16 @@
           "type": "message_progress",
           "model": "inpaint_pro_flash",
           "width": 128,
-          "action": "Generating image",
+          "action": "Correcting pixels",
           "height": 256,
           "prompt": "Remove the ENTIRE upper-arm sleeve patch including all border and symbol pixels. Replace with PLAIN continuous dark navy sleeve cloth matching surrounding folds. No shield, badge, black rectangle, insignia, sleeve pocket or marking. Preserve exact arm outline, pose, body, hair, uniform and all unmasked pixels. Crisp native pixel rendering, transparent outside.",
           "status": "processing",
           "image_id": "f0d33c13-3de7-5a68-ad6e-b0f1da39531f",
           "job_kind": "creator-image",
-          "progress": 0.05,
-          "generation_started_at": "2026-10-23T22:51:54.355587+00:00"
+          "progress": 0.75,
+          "queue_position": 1,
+          "generation_started_at": "2026-10-23T22:51:54.355587+00:00",
+          "estimated_wait_seconds": 97
         }
       }
     },
@@ -20364,14 +20436,107 @@
           "type": "message_progress",
           "model": "inpaint_pro_flash",
           "width": 128,
-          "action": "Generating image",
+          "action": "Correcting pixels",
           "height": 256,
           "prompt": "Remove the ENTIRE upper-arm sleeve patch including all border and symbol pixels. Replace with PLAIN continuous dark navy sleeve cloth matching surrounding folds. No shield, badge, black rectangle, insignia, sleeve pocket or marking. Preserve exact arm outline, pose, body, hair, uniform and all unmasked pixels. Crisp native pixel rendering, transparent outside.",
           "status": "processing",
           "image_id": "6062c573-8361-5f55-8022-15735ac48d97",
           "job_kind": "creator-image",
-          "progress": 0.05,
-          "generation_started_at": "2026-10-23T22:51:54.719271+00:00"
+          "progress": 0.75,
+          "queue_position": 1,
+          "generation_started_at": "2026-10-23T22:51:54.719271+00:00",
+          "estimated_wait_seconds": 108
+        }
+      }
+    },
+    "b700a94b-9efc-4772-badf-c0e0d4172f24": {
+      "kind": "registration",
+      "slug": "shin-yuri",
+      "template": null,
+      "status": "completed",
+      "created_epoch": 1792796056.6074116,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "b700a94b-9efc-4772-badf-c0e0d4172f24",
+        "character_id": "fc908cfd-71aa-48aa-9805-f1d7c8cb1b8d",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      },
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 0.25
+        },
+        "id": "b700a94b-9efc-4772-badf-c0e0d4172f24",
+        "status": "completed",
+        "created_at": "2026-10-23T22:54:16.957550+00:00",
+        "last_response": {
+          "status": "completed",
+          "character_id": "fc908cfd-71aa-48aa-9805-f1d7c8cb1b8d",
+          "storage_urls": {
+            "east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/fc908cfd-71aa-48aa-9805-f1d7c8cb1b8d/rotations/east.png",
+            "west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/fc908cfd-71aa-48aa-9805-f1d7c8cb1b8d/rotations/west.png",
+            "north": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/fc908cfd-71aa-48aa-9805-f1d7c8cb1b8d/rotations/north.png",
+            "south": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/fc908cfd-71aa-48aa-9805-f1d7c8cb1b8d/rotations/south.png",
+            "north-east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/fc908cfd-71aa-48aa-9805-f1d7c8cb1b8d/rotations/north-east.png",
+            "north-west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/fc908cfd-71aa-48aa-9805-f1d7c8cb1b8d/rotations/north-west.png",
+            "south-east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/fc908cfd-71aa-48aa-9805-f1d7c8cb1b8d/rotations/south-east.png",
+            "south-west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/fc908cfd-71aa-48aa-9805-f1d7c8cb1b8d/rotations/south-west.png"
+          },
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 0.25
+          },
+          "character_name": "신유리",
+          "directions_type": "8-directions",
+          "generation_mode": "v3",
+          "directions_count": 8,
+          "character_description": "신유리 / Shin Yuri. Athletic adult woman with firm squared shoulders and lean natural muscles, pale angular face, narrow dark eyes and stern flat mouth. BLACK hair swept back into a low ponytail, exposed forehead with two fine temple wisps as visible in original. BLACK leather biker jacket with silver snaps and diagonal zipper over dark GRAY crew-neck T-shirt, slim BLACK jeans, sturdy black laced boots. No tie, no exaggerated bodybuilder muscles. Low ponytail is LOOSE UNBRAIDED hair hanging DOWN the upper back naturally. Never a braid, rope, plait, segmented tail or horizontal sticking-out ponytail. Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Do not invent patches, badges, logos or markings absent from the supplied image. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches."
+        }
+      },
+      "observed_end_epoch": 1792796257.0156088,
+      "elapsed_observed_seconds": 200.4081974029541,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 0.25
+      }
+    },
+    "217f749c-ee0b-43c8-88ca-d8d9d3db80bb": {
+      "kind": "registration",
+      "slug": "blaret",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792796169.2311862,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "217f749c-ee0b-43c8-88ca-d8d9d3db80bb",
+        "character_id": "b14a022b-017b-4229-9b6c-6291583a408a",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      },
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "217f749c-ee0b-43c8-88ca-d8d9d3db80bb",
+        "status": "processing",
+        "created_at": "2026-10-23T22:56:09.382319+00:00",
+        "last_response": {
+          "status": "processing",
+          "progress": 0.37333333333333335,
+          "character_id": "b14a022b-017b-4229-9b6c-6291583a408a",
+          "n_directions": 8,
+          "character_name": "블라렛",
+          "queue_position": 0,
+          "directions_type": "8-directions",
+          "generation_mode": "v3",
+          "character_description": "블라렛 / Blaret. Adult woman with natural slim athletic body, oval pale face, vivid GREEN eyes and playful smile. Long straight sandy BLONDE hair with blunt bangs visible beneath WHITE forehead band and long BLACK nun veil. Fitted BLACK long-sleeved nun habit, WHITE high-neck wimple and white shoulder bib, modest side slit. Several thick dark SILVER chains with large silver cross pendant and small green stone. WOODEN brown prayer beads around both wrists. Black boots. No handheld weapons. The long black veil hangs down to the HIPS, clearly below the waist, never a short shoulder-length veil. The BLACK NUN VEIL is LONG, hanging from the head down behind both arms to hips/upper thighs, below both hands. Preserve this full length in every side and back view; never a short shoulder hood. Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Do not invent patches, badges, logos or markings absent from the supplied image. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches.",
+          "generation_started_at": "2026-10-23T22:56:09.425497+00:00"
         }
       }
     }
@@ -22116,9 +22281,9 @@
     "shin-yuri": {
       "name": "신유리",
       "group": "underground",
-      "character_id": "6d890b31-7194-48f6-bf12-e95897095d36",
+      "character_id": "fc908cfd-71aa-48aa-9805-f1d7c8cb1b8d",
       "image": "e464915e-93b8-4980-9732-f5871953ed86",
-      "registration": "fcf1ca24-05e3-4c31-b943-fce1cf62ff6c",
+      "registration": "b700a94b-9efc-4772-badf-c0e0d4172f24",
       "motions": {},
       "ready": true,
       "image_verified": true,
@@ -22130,11 +22295,15 @@
           "job": "76fa246d-7c0f-4029-a9dd-b3d202836934",
           "reason": "측면과 사선의 낮은 포니테일이 뻗친 땋은 머리로 변형. 원작은 풀린 낮은 포니테일. 정면은 유지하고 등 쪽으로 내려오는 땋지 않은 묶음머리로 재등록.",
           "at": 1792793744.8064396
+        },
+        {
+          "character_id": "6d890b31-7194-48f6-bf12-e95897095d36",
+          "job": "fcf1ca24-05e3-4c31-b943-fce1cf62ff6c",
+          "reason": "회전 머리의 땋은 수평 꼬리 및 남은 분리 픽셀 교정 완료. 검수된8방향 보존 등록으로 실패 라이브 등록 교체.",
+          "at": 1792796056.154139
         }
       ],
       "eight_way_visual_reviewed": false,
-      "skeleton_joints": 18,
-      "rotation_count": 8,
       "direction-repair-south-east": "8d75c0b8-3f73-45a1-9461-c3600108016c",
       "direction-repair-east": "4914438a-8ef4-4258-88da-1a7de662d28d",
       "direction-repair-north-east": "07763be8-6507-4aa2-9414-84f52559175e",
@@ -22142,14 +22311,16 @@
       "direction-repair-north-west": "0def0b16-6bca-460b-b16d-b621d6cb8030",
       "direction-repair-west": "7d19f4cf-e64a-4281-bbdd-924949016b12",
       "direction-repair-south-west": "3c788037-0100-4941-a61d-ca9d4c6fd1ec",
-      "direction-repair-north-east-remove-old-hair-speck": "818368ba-951c-4b93-8e89-8b66cabd4b29"
+      "direction-repair-north-east-remove-old-hair-speck": "818368ba-951c-4b93-8e89-8b66cabd4b29",
+      "skeleton_joints": 18,
+      "rotation_count": 8
     },
     "blaret": {
       "name": "블라렛",
       "group": "religious",
-      "character_id": null,
+      "character_id": "b14a022b-017b-4229-9b6c-6291583a408a",
       "image": "0f18021b-f069-4958-825d-d830176a1892",
-      "registration": null,
+      "registration": "217f749c-ee0b-43c8-88ca-d8d9d3db80bb",
       "motions": {},
       "ready": false,
       "exported": false,
@@ -22219,7 +22390,9 @@
             "no motions before all roster eight-way review"
           ]
         }
-      ]
+      ],
+      "image_verified": true,
+      "image_visually_reviewed": true
     },
     "saladin": {
       "name": "살라딘",
@@ -37367,9 +37540,141 @@
           "pricing_provisional": true
         }
       }
+    },
+    {
+      "at": "2026-10-23T22:53:54Z",
+      "kind": "completed",
+      "slug": "shin-yuri",
+      "detail": {
+        "kind": "direction-repair-north-east-remove-old-hair-speck",
+        "template": null,
+        "job_id": "818368ba-951c-4b93-8e89-8b66cabd4b29",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 9
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T22:54:17Z",
+      "kind": "submitted",
+      "slug": "shin-yuri",
+      "detail": {
+        "kind": "registration",
+        "template": null,
+        "job_id": "b700a94b-9efc-4772-badf-c0e0d4172f24",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "b700a94b-9efc-4772-badf-c0e0d4172f24",
+          "character_id": "fc908cfd-71aa-48aa-9805-f1d7c8cb1b8d",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T22:55:43Z",
+      "kind": "completed",
+      "slug": "blaret",
+      "detail": {
+        "kind": "image",
+        "template": null,
+        "job_id": "0f18021b-f069-4958-825d-d830176a1892",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 9
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T22:55:43Z",
+      "kind": "image-format-verified",
+      "slug": "blaret",
+      "detail": {
+        "size": [
+          128,
+          256
+        ],
+        "native_size": [
+          128,
+          256
+        ],
+        "bbox": [
+          21,
+          36,
+          101,
+          250
+        ],
+        "colors": 53,
+        "alpha": [
+          0,
+          255
+        ],
+        "original_pixels_preserved": true,
+        "resampled": false,
+        "unmasked_rgba_preserved": true,
+        "palette_limit": 64
+      }
+    },
+    {
+      "at": "2026-10-23T22:56:09Z",
+      "kind": "submitted",
+      "slug": "blaret",
+      "detail": {
+        "kind": "registration",
+        "template": null,
+        "job_id": "217f749c-ee0b-43c8-88ca-d8d9d3db80bb",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "217f749c-ee0b-43c8-88ca-d8d9d3db80bb",
+          "character_id": "b14a022b-017b-4229-9b6c-6291583a408a",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-23T22:57:37Z",
+      "kind": "completed",
+      "slug": "shin-yuri",
+      "detail": {
+        "kind": "registration",
+        "template": null,
+        "job_id": "b700a94b-9efc-4772-badf-c0e0d4172f24",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 0.25
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-23T22:57:37Z",
+      "kind": "character-ready",
+      "slug": "shin-yuri",
+      "detail": {
+        "3d_joints": 18,
+        "directions": 8
+      }
+    },
+    {
+      "at": "2026-10-23T22:57:37Z",
+      "kind": "exported",
+      "slug": "shin-yuri",
+      "detail": {
+        "bytes": 96834,
+        "files": 9
+      }
     }
   ],
-  "updated_at": 1792795915.1638398,
+  "updated_at": 1792796257.791151,
   "user_stopped_at": 1792778235.6917784,
   "archived_jobs": {
     "304457e9-6577-44f0-af17-97841a9f6720": {
@@ -38688,18 +38993,18 @@
       "saved_frames": 6
     }
   },
-  "last_git_checkpoint": 1792795562.6397538,
+  "last_git_checkpoint": 1792795917.0001624,
   "summary": {
     "jobs": {
-      "processing": 4,
-      "completed": 253,
+      "processing": 3,
+      "completed": 256,
       "failed": 9,
       "stalled": 0
     },
     "characters_ready": 54,
     "characters_total": 55,
-    "images_format_verified": 54,
-    "new_images_visually_reviewed": 42,
+    "images_format_verified": 55,
+    "new_images_visually_reviewed": 43,
     "eight_way_visually_reviewed": 52,
     "characters_motions_visually_reviewed": 0,
     "motions_submitted": 3,

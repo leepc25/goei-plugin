@@ -229,23 +229,43 @@ f4ac2933-a388-4c25-af41-e7d2174bce29	cha-yeo-jin	registration		completed	{"type"
 d87a50ff-3589-49db-8669-0841b3464ab9	go-yeon-ji	registration		completed	{"type": "generations", "generations": 4.0}
 80e98e16-d4f1-42f5-89f8-dbfeb0c91e3d	ma-deok-hee	registration		completed	{"type": "generations", "generations": 4.0}
 c7717490-a1af-4b91-8ee7-0d88b179806e	mun-hye-ran	registration		completed	{"usd": 0.0, "type": "generations", "generations": 0.25}
-fcf1ca24-05e3-4c31-b943-fce1cf62ff6c	shin-yuri	registration		processing	null
+fcf1ca24-05e3-4c31-b943-fce1cf62ff6c	shin-yuri	registration		completed	{"type": "generations", "generations": 4.0}
 9ef07c27-af3d-487c-8a05-15c5402a6e3c	seo-yun-ji	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
 fd7e8421-f416-410c-9c48-8e1f220251ab	blaret	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
-d33f703c-1659-4286-b02b-9211d275a5b7	avensha	registration		processing	null
-eec10dd3-bde6-42ac-ba86-86387906a16d	aestheticism	registration		processing	null
-60d21a2b-d55f-40fe-99f1-dd9a7c31be04	seo-yun-ji	registration		processing	null
-46cb6f78-2b51-4c55-a94a-fb33cdd7a1e1	blaret	image		processing	null
-b340f8f9-71fe-4d3e-bff2-42428be68937	jay	direction-repair-south-east		processing	null
-de1e9780-8807-4962-9bc2-36f23642d762	jay	direction-repair-east		processing	null
-2f7cae4b-68df-4329-9dca-353d3335c357	jay	direction-repair-west		processing	null
-0f67155e-cd30-4320-ab17-db68dda69bbc	jay	direction-repair-south-west		processing	null
+d33f703c-1659-4286-b02b-9211d275a5b7	avensha	registration		completed	{"type": "generations", "generations": 4.0}
+eec10dd3-bde6-42ac-ba86-86387906a16d	aestheticism	registration		completed	{"type": "generations", "generations": 4.0}
+60d21a2b-d55f-40fe-99f1-dd9a7c31be04	seo-yun-ji	registration		completed	{"type": "generations", "generations": 4.0}
+46cb6f78-2b51-4c55-a94a-fb33cdd7a1e1	blaret	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+b340f8f9-71fe-4d3e-bff2-42428be68937	jay	direction-repair-south-east		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+de1e9780-8807-4962-9bc2-36f23642d762	jay	direction-repair-east		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+2f7cae4b-68df-4329-9dca-353d3335c357	jay	direction-repair-west		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+0f67155e-cd30-4320-ab17-db68dda69bbc	jay	direction-repair-south-west		completed	{"usd": 0.0, "type": "generations", "generations": 9}
 f25fcc88-05a3-430a-a01c-a7b5381823c7	lee-seong-hae	direction-repair-south-east		failed	{"type": "usd", "usd": 0.0}
 977e48af-b079-45c3-ab35-a17bef5ad80d	lee-seong-hae	direction-repair-east		failed	{"type": "usd", "usd": 0.0}
 cb6f33ed-14a5-47ce-a9e4-98695a4398ab	lee-seong-hae	direction-repair-west		failed	{"type": "usd", "usd": 0.0}
 6fc3092f-4a79-4910-bf1b-da5b2c2e7713	lee-seong-hae	direction-repair-south-west		failed	{"type": "usd", "usd": 0.0}
-fe9b6ba1-00d2-4fd7-9b3b-5b55f55e8463	cha-yeo-jin	direction-repair-north-west		processing	null
-f19b0f36-ec4d-4192-be5f-a7bb0d7fa2bb	lee-seong-hae	direction-repair-south-east-eyes-corrected-y		processing	null
-54809a78-c20d-42e8-b7b3-790d36c17dc1	lee-seong-hae	direction-repair-east-eyes-corrected-y		processing	null
-7bf78da8-0175-43c5-adaf-369d70984f6c	lee-seong-hae	direction-repair-west-eyes-corrected-y		processing	null
-28e2d3c5-bdfc-41b9-943d-94ae2897ccac	lee-seong-hae	direction-repair-south-west-eyes-corrected-y		processing	null
+fe9b6ba1-00d2-4fd7-9b3b-5b55f55e8463	cha-yeo-jin	direction-repair-north-west		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+f19b0f36-ec4d-4192-be5f-a7bb0d7fa2bb	lee-seong-hae	direction-repair-south-east-eyes-corrected-y		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+54809a78-c20d-42e8-b7b3-790d36c17dc1	lee-seong-hae	direction-repair-east-eyes-corrected-y		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+7bf78da8-0175-43c5-adaf-369d70984f6c	lee-seong-hae	direction-repair-west-eyes-corrected-y		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+28e2d3c5-bdfc-41b9-943d-94ae2897ccac	lee-seong-hae	direction-repair-south-west-eyes-corrected-y		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+8d75c0b8-3f73-45a1-9461-c3600108016c	shin-yuri	direction-repair-south-east		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+4914438a-8ef4-4258-88da-1a7de662d28d	shin-yuri	direction-repair-east		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+07763be8-6507-4aa2-9414-84f52559175e	shin-yuri	direction-repair-north-east		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+51693c1a-9b7f-452b-9fca-9486eb2ad331	shin-yuri	direction-repair-north		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+0def0b16-6bca-460b-b16d-b621d6cb8030	shin-yuri	direction-repair-north-west		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+7d19f4cf-e64a-4281-bbdd-924949016b12	shin-yuri	direction-repair-west		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+3c788037-0100-4941-a61d-ca9d4c6fd1ec	shin-yuri	direction-repair-south-west		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+e9653deb-de50-4f8a-87d5-4fd7ce9ea263	blaret	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+c62c6da1-1894-469a-bb18-2f5f4988e88b	jay	direction-repair-south-east-full-patch-borders		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+09327278-8913-4fd1-8a2e-998a42b1b87a	jay	direction-repair-west-full-patch-borders		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+885929eb-2421-4f97-be6b-532c93f3085b	cha-yeo-jin	direction-repair-north-west-complete-badge-outline		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+15582365-0025-433a-9775-c83f9076e9a9	lee-seong-hae	registration		completed	{"usd": 0.0, "type": "generations", "generations": 0.25}
+818368ba-951c-4b93-8e89-8b66cabd4b29	shin-yuri	direction-repair-north-east-remove-old-hair-speck		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+0f18021b-f069-4958-825d-d830176a1892	blaret	image		completed	{"usd": 0.0, "type": "generations", "generations": 9}
+0581c47a-927b-4213-9464-6a063a195171	jay	registration		completed	{"usd": 0.0, "type": "generations", "generations": 0.25}
+d5b444e2-ac82-4e32-80a7-b19575064575	cha-yeo-jin	registration		completed	{"usd": 0.0, "type": "generations", "generations": 0.25}
+0299a9b8-5c56-419b-8e6b-fac525541bee	jay	direction-repair-north-east-two-back-sleeves		processing	null
+0cfba687-b89a-4d1e-915f-2c8bfd331f93	jay	direction-repair-north-west-two-back-sleeves		processing	null
+b700a94b-9efc-4772-badf-c0e0d4172f24	shin-yuri	registration		processing	null
+217f749c-ee0b-43c8-88ca-d8d9d3db80bb	blaret	registration		processing	null

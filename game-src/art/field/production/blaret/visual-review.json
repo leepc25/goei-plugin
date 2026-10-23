@@ -1,0 +1,14 @@
+{
+  "job": "0f18021b-f069-4958-825d-d830176a1892",
+  "job_status": "completed",
+  "decision": "pass",
+  "reason": "AVIF의 금발·초록 눈·흰 머리띠/빕·검은 수녀복·은색 십자가·양 손목 염주 유지. 좌우 검은 베일 모두 손 아래/엉덩이까지 연결된 천 면으로 연장됨. 마스크 밖 RGBA 동일, 체형·높이 보존, 회색 외곽 없음.",
+  "at": 1792796168.544412,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

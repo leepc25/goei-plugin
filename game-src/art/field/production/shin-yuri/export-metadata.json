@@ -1,9 +1,9 @@
 {
-  "group_id": "aab00c18-3eb3-4b0c-abe6-7a3847a73ac3",
+  "group_id": "456f57c2-5fe4-4799-8a69-793ce0f32763",
   "states": [
     {
       "character": {
-        "id": "6d890b31-7194-48f6-bf12-e95897095d36",
+        "id": "fc908cfd-71aa-48aa-9805-f1d7c8cb1b8d",
         "name": "Idle",
         "prompt": "신유리 / Shin Yuri. Athletic adult woman with firm squared shoulders and lean natural muscles, pale angular face, narrow dark eyes and stern flat mouth. BLACK hair swept back into a low ponytail, exposed forehead with two fine temple wisps as visible in original. BLACK leather biker jacket with silver snaps and diagonal zipper over dark GRAY crew-neck T-shirt, slim BLACK jeans, sturdy black laced boots. No tie, no exaggerated bodybuilder muscles. Low ponytail is LOOSE UNBRAIDED hair hanging DOWN the upper back naturally. Never a braid, rope, plait, segmented tail or horizontal sticking-out ponytail. Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Do not invent patches, badges, logos or markings absent from the supplied image. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches.",
         "size": {
@@ -13,7 +13,7 @@
         "template_id": "mannequin",
         "directions": 8,
         "view": "low top-down",
-        "created_at": "2026-10-23T22:15:50.507608+00:00"
+        "created_at": "2026-10-23T22:54:17.057402+00:00"
       },
       "folder": "Idle",
       "frames": {
@@ -32,5 +32,5 @@
     }
   ],
   "export_version": "3.1",
-  "export_date": "2026-10-23T22:33:11.437648"
+  "export_date": "2026-10-23T22:57:37.665653"
 }
