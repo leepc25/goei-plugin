@@ -59,3 +59,35 @@ export function visitAgentTop(name: string): number {
   if (typeof a.head === 'number') return -a.head * PIXEL;
   return Math.min(...a.frames.map((f) => f.oy)) * PIXEL;
 }
+
+/** 대화창·화면 UI 얼굴: 필드 그림(도트) 첫 장의 머리·어깨를 잘라 1도트 = 1px 그림 주소로 (CSS pixelated로 키운다). 그림이 없으면 '' */
+const faces = new Map<string, string>();
+export function visitAgentFace(name: string, side = 34): string {
+  const a = sheet?.agents[name];
+  if (!sheet || !a?.frames.length) return '';
+  const key = `${name}|${side}`;
+  const hit = faces.get(key);
+  if (hit !== undefined) return hit;
+  const f = a.frames[0];
+  const src = document.createElement('canvas');
+  src.width = f.w;
+  src.height = f.h;
+  const g = src.getContext('2d')!;
+  g.drawImage(sheet.atlas, f.sx, f.sy, f.w, f.h, 0, 0, f.w, f.h);
+  let url = '';
+  try {
+    // 머리 가운데: 맨 위 14줄의 불투명 칸 가로 평균
+    const d = g.getImageData(0, 0, f.w, Math.min(14, f.h)).data;
+    let sx = 0, n = 0, top = -1;
+    for (let i = 3; i < d.length; i += 4) if (d[i] > 40) { const p = (i - 3) / 4; sx += p % f.w; n++; if (top < 0) top = Math.floor(p / f.w); }
+    const cx = n ? sx / n : f.w / 2;
+    const out = document.createElement('canvas');
+    out.width = out.height = side;
+    const o = out.getContext('2d')!;
+    o.imageSmoothingEnabled = false;
+    o.drawImage(src, Math.round(side / 2 - cx), 2 - Math.max(0, top));
+    url = out.toDataURL();
+  } catch { /* 읽을 수 없는 그림이면 사진으로 */ }
+  faces.set(key, url);
+  return url;
+}

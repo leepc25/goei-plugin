@@ -12,6 +12,8 @@ import {
 import { iconCanvas } from './runmenu';
 import { hqMap, type HqMapView } from './map';
 import photos from '../story/demo-photos.json';
+import { visitAgentFace } from '../art/visitAgents';
+import { pixelPhoto } from '../ui/pixelFace';
 import { ensureKit } from '../ui';
 import { HQ_SCHEMA, newSave, parseSave, saveText, type HqSave } from './state';
 import type { SaveSlots } from './store';
@@ -323,8 +325,9 @@ ${can.ok ? '' : `<p class="hq-warn">${esc(can.why)}</p>`}</div>
   const bar = () => `<div class="hq-bar"><b>본부 · ${s.day}일차</b><span>예산 ${s.currencies.budget}</span><span>연구 자료 ${s.currencies.research}</span><span>이빨 ${s.currencies.teeth}</span><span>규칙서 ${s.rulebook.length}줄</span><button data-act="close" class="hq-x" aria-label="닫기">닫기 (Esc)</button></div>`;
   // 잼트리 임무·브리핑: 게임 화면 위 대화창 (얼굴 + 큰 글씨 + 선택지). 폰에서도 게임이 보이게 아래쪽만 덮는다
   const talkBox = (who: string, text: string, choices: string, extra = '') => {
-    const ph = photoOf(who);
-    return `<div class="hq-talk gk-panel fresh" role="dialog" aria-label="${esc(who)}"><div class="hq-face gk-face">${ph ? `<img src="${ph}" alt="">` : `<i>${esc(who.slice(0, 1))}</i>`}</div><div class="hq-talk-body"><b class="hq-who gk-font">${esc(who)}</b><p class="hq-line gk-font">${esc(text)}</p>${extra}<div class="hq-choices">${choices}</div></div><button data-act="close" class="hq-x" aria-label="닫기">✕</button></div>`;
+    // 얼굴은 도트로: 필드 그림의 머리·어깨, 없으면 사진을 코드로 거칠게 줄인 것 (다 줄일 때까지는 칸만)
+    const ph = visitAgentFace(who === '부장' ? '쟈알디' : who) || pixelPhoto(photoOf(who), () => { if (wrap?.querySelector('.hq-talk')) renderFloat(); });
+    return `<div class="hq-talk gk-panel fresh" role="dialog" aria-label="${esc(who)}"><div class="hq-face gk-face">${ph ? `<img src="${ph}" alt="">` : photoOf(who) ? '' : `<i>${esc(who.slice(0, 1))}</i>`}</div><div class="hq-talk-body"><b class="hq-who gk-font">${esc(who)}</b><p class="hq-line gk-font">${esc(text)}</p>${extra}<div class="hq-choices">${choices}</div></div><button data-act="close" class="hq-x" aria-label="닫기">✕</button></div>`;
   };
   // 잼트리 말투 (선택지에는 임무 이름만, 대사에서는 되풀이하지 않는다)
   const pitch = (c: MissionCard) => {
