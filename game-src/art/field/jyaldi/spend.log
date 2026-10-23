@@ -14,3 +14,7 @@
 등록 방식 사후 확인: 기존 Test woman은 비정면 3/4 원본 그대로 south로 저장된 V3 8방향 캐릭터였다. 정면 추가 생성이 API 실행의 필수 조건이라는 설명을 정정했다. 정면 보완은 보존하되 승인된 등록 원본으로 간주하지 않는다.
 2026-10-24 Asia/Seoul | 붉은 홍채6픽셀만 무료 workbench patch, 쟈알디 이름으로 새 갤러리 저장 | pixelart_workbench + save_to_asset | 실제 추가 차감 0.0 generations | gallery46806996-274f-44c2-83dc-e1b86f175dbe | 그 외 모든RGBA 동일,128x256,48색
 현재 누적: 1 + 10 + 9 + 9 = 실제 차감 29.0 generations. 홍채 수정/갤러리 저장 차감0. 캐릭터 등록0회, 애니메이션 생성0회.
+
+2026-10-24 Asia/Seoul | 8방향 V3 참조 등록 완료 | character ed6456b1-dec7-4c1d-851a-5096362ca614 | 실제4.0 generations | 요청~완료 관측871.028초(서버대기·통신·폴링 포함) | 남동 원본RGBA동일,128x256 8방향
+2026-10-24 Asia/Seoul | breathing-idle skeleton-v3 요청 실패 | job7c47bedf-11f5-4434-95a8-7f84f6956fe7 | 실제 추가0.0 generations | 422 no stored 3D skeleton, 같은 방식 반복 안함
+현재 누적 실제33.0 generations. 등록 완료1건, 동작 완료0건.

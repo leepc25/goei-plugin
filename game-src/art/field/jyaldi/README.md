@@ -64,3 +64,9 @@
 - 상태: 눈 색 수정본은 사용자 시각 검수 대상이다. 8방향 등록·동작 생성·게임 적용은 아직 없다. 정면 보완을 포함한 누적 실제 차감은 **29회**, 이번 픽셀 수정과 이름을 붙인 저장 자체는 **0회**다.
 
 ![붉은 눈 수정본](red-eyes/jyaldi-right-three-quarter.png)
+
+## 8방향 등록 완료 · 2026-10-24
+
+사용자가 붉은 눈 수정본으로 진행을 지시해 `쟈알디` 캐릭터 `ed6456b1-dec7-4c1d-851a-5096362ca614`를 V3 참조·low top-down·8방향으로 등록했다. 기존 정면 보완을 south, 붉은 눈 수정본을 south-east로 지정했다. 8장 모두 128×256이며 **남동 원본 RGBA가 선택한 수정본과 완전히 동일**하다. 실제 차감 4회, 요청~완료 관측 871.028초(서버 대기·통신·폴링 포함). [결과와 검증](character/registration-verification.json), [8방향 원본 ZIP](character/registered-character.zip). 누적 실제 차감 33회. 게임 적용·동작 완료를 뜻하지 않는다.
+
+후속 `skeleton-v3` 숨쉬기 요청은 저장된 3D 골격이 없다는 422 오류로 실패했다. 추가 차감은 0회이며 같은 경로로 반복하지 않는다. [오류 응답](character/failed-idle-status.json), [비용 확인](character/failed-idle-cost.json).

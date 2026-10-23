@@ -1,0 +1,11 @@
+{
+  "description": "Jyaldi, the same mature Korean female field-team director as the supplied sprites. Long side-parted straight black hair, crimson eyes, naturally full adult physique, black tailored trouser business suit, white closed-collar shirt, black necktie, black gloves and practical low-heel black formal shoes. Maintain the same face, head size, neck length, adult anatomy, clothing and native pixel style. Relaxed upright stance with empty visible hands at sides. Preserve the supplied south-east sprite exactly; it is the approved working source for the two animation tests. No props, weapons, background or shadow.",
+  "name": "쟈알디",
+  "mode": "v3",
+  "n_directions": 8,
+  "view": "low top-down",
+  "reference_image_local": "../registration-prep/front-supplement.png",
+  "direction_images": {
+    "south-east": "../red-eyes/jyaldi-right-three-quarter.png"
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "character_id": "ed6456b1-dec7-4c1d-851a-5096362ca614",
+  "name": "쟈알디",
+  "directions": [
+    "east",
+    "north",
+    "north-east",
+    "north-west",
+    "south",
+    "south-east",
+    "south-west",
+    "west"
+  ],
+  "rotation_dimensions": {
+    "north-west": [
+      128,
+      256
+    ],
+    "south-west": [
+      128,
+      256
+    ],
+    "south": [
+      128,
+      256
+    ],
+    "south-east": [
+      128,
+      256
+    ],
+    "west": [
+      128,
+      256
+    ],
+    "north": [
+      128,
+      256
+    ],
+    "east": [
+      128,
+      256
+    ],
+    "north-east": [
+      128,
+      256
+    ]
+  },
+  "southeast_RGBA_identical_to_selected_source": true,
+  "charged_estimate_from_receipt": 4,
+  "observed_generation_delta": 4.0,
+  "elapsed_seconds": 871.0280306339264
+}

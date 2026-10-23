@@ -1,0 +1,10 @@
+id: ed6456b1-dec7-4c1d-851a-5096362ca614
+name: 쟈알디
+mode: v3 reference (4 generations, 8 directions, 2 yours)
+body: humanoid
+size: 128x256px
+view: low top-down
+style: from reference image (outline/detail hints ignored)
+status: processing (~3-5 min)
+
+hint: get_character(character_id="ed6456b1-dec7-4c1d-851a-5096362ca614")
