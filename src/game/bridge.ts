@@ -165,6 +165,8 @@ export interface GameBridge {
   narrow(): boolean;
   /** 게임 창을 닫는다 */
   close(): void;
+  /** 창의 다른 탭으로 가서 게임이 안 보이게 됐다/다시 보인다. 게임은 멈추고 소리를 끈다 (2026-10-23) */
+  onHidden?(cb: (hidden: boolean) => void): () => void;
 }
 
 /** 코드 팩이 남기는 것 */

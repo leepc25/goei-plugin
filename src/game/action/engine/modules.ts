@@ -491,6 +491,17 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     e.stopImmediatePropagation();
   };
   const saveOnHide = () => { game?.checkpoint(); void session.flush(); };
+  // 창의 다른 탭으로 가면 일시정지 메뉴를 열어 둔다 (게임 멈춤·소리 끔). 돌아오면 「계속」으로 이어 간다
+  let hiddenNow = false;
+  const offHidden = bridge?.onHidden?.((h) => {
+    hiddenNow = h;
+    if (h) {
+      visit?.close();
+      if (shell.mode === 'play' && !shell.paused) shell.openPause();
+      audio.setPaused(true);
+      saveOnHide();
+    }
+  });
   window.addEventListener('pagehide', saveOnHide);
   document.addEventListener('visibilitychange', saveOnHide);
   window.addEventListener('keydown', hqKeys, true);
@@ -573,7 +584,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     onPlay: () => shell.play(),
     frame: (dt) => {
       syncVolume();
-      audio.setPaused(shell.paused && !openingOn);
+      audio.setPaused(hiddenNow || (shell.paused && !openingOn));
       audio.setCutscene(story.isVideoPlaying());
       story.update(dt);
       shell.frame(dt);
@@ -677,6 +688,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     dispose: () => {
       window.removeEventListener('pagehide', saveOnHide);
       document.removeEventListener('visibilitychange', saveOnHide);
+      offHidden?.();
       npc.dispose();
       unmountItems();
       const g = globalThis as { __goeiStory?: unknown; __goeiStoryStart?: unknown; __goeiNpc?: unknown };

@@ -60,50 +60,50 @@ async function files(): Promise<Files> {
   return { index, code, need, bytes };
 }
 
+// 필드 첫 화면은 설정 화면과 같은 틀 (2026-10-23 사용자: 버튼·여백·톤이 다른 설정 칸과 안 맞고 PC에서 두 줄로 나옴)
+const row = (label: string, help: string, ctl = '') =>
+  `<div class="ps-row"><div class="ps-label"><b>${label}</b>${help ? `<small>${help}</small>` : ''}</div>${ctl ? `<div class="ps-ctl gx-gl-ctl">${ctl}</div>` : ''}</div>`;
+const group = (title: string, rows: string) => `<section class="ps-group"><h3>${title}</h3><div class="ps-rows">${rows}</div></section>`;
+const dis = () => (busy ? ' disabled' : '');
+
 function filesHtml(f: Files): string {
   if (f.code === 'ready' && !f.need.length) return '';
-  const what = f.code === 'old' ? '플러그인이 바뀌어 게임 파일을 새로 받아야 해요.' : '게임 파일은 처음 한 번만 받아요. 받은 파일은 이 기기의 Risu에 저장돼요.';
+  const what = f.code === 'old' ? '플러그인이 바뀌어 게임 파일을 새로 받아야 해요.' : '처음 한 번만 받아요. 받은 파일은 이 기기의 Risu에 저장돼요.';
   const size = f.index ? ` (${kb(f.bytes)})` : '';
-  return `<section class="gx-gl-card"><b>게임 파일 받기</b><p>${what}</p>
-    <div class="gx-gl-act"><button class="gx-gp-btn primary" data-g="get"${busy ? ' disabled' : ''}>받기${size}</button><button class="gx-gp-btn" data-g="file"${busy ? ' disabled' : ''}>파일로 넣기</button></div></section>`;
+  return group('게임 파일', row('게임 파일 받기', what, `<button class="gx-mini primary" data-g="get"${dis()}>받기${size}</button><button class="gx-mini" data-g="file"${dis()}>파일로 넣기</button>`));
 }
 
 // 저장 칸 고르기·불러오기는 게임 안 본부가 맡는다(hq 모듈, bridge.saves). 여기서는 시작 버튼과 마지막 저장만 보인다
 function startHtml(slots: SlotInfo[], last: SlotId | null, ready: boolean): string {
   const s = slots.find((x) => x.slot === last) ?? slots.sort((x, y) => y.savedAt - x.savedAt)[0];
-  return `<section class="gx-gl-card"><b>필드</b>
-    <p>${s ? `마지막 저장: ${esc(s.title)} · ${when(s.savedAt)}${s.summary ? ` · ${esc(s.summary)}` : ''}` : '저장 칸은 게임 안 본부에서 고르고 불러와요.'}</p>
-    <button class="gx-gp-btn primary gx-gl-cont" data-g="play"${ready ? '' : ' disabled'}>본부 들어가기</button></section>`;
+  const help = s ? `마지막 저장 · ${when(s.savedAt)}${s.summary ? ` · ${esc(s.summary)}` : ''}` : '요원들을 만나 대화해요. 나눈 말은 다음 본편 요청에 막간으로 들어가요.';
+  return group('필드', row('본부', help, `<button class="gx-mini primary" data-g="play"${ready ? '' : ' disabled'}>들어가기</button>`));
 }
 
 function linkHtml(card: CardSnapshot | null, reports: PendingReport[], record: number): string {
-  if (!card) return `<section class="gx-gl-card"><b>본편 연동</b><p>괴이 카드 채팅을 열면 명부 요원과 상황판을 게임이 읽어요.</p></section>`;
+  if (!card) return group('본편 연동', row('채팅 연결 안 됨', '괴이 카드 채팅을 열면 명부 요원과 상황판을 게임이 읽어요.'));
   const n = (k: string) => card.events.filter((e) => e.kind === k).length;
   const free = card.agents.filter((a) => !a.locked).length;
-  const reps = reports
-    .map(
-      (p) => `<li class="gx-gl-rep"><div><b>${esc(p.report.mission)}</b><span>${{ return: '귀환', evac: '후송', withdraw: '자발 철수' }[p.report.outcome]}${p.report.depth ? ` · ${esc(p.report.depth)}` : ''} · ${when(p.at)}</span>${p.report.summary ? `<small>${esc(p.report.summary)}</small>` : ''}</div>
-      <div class="gx-gl-sact"><button class="gx-gp-btn${p.posted ? '' : ' primary'}" data-g="post" data-at="${p.at}"${p.posted || busy ? ' disabled' : ''}>${p.posted ? '채팅에 놓음' : '보고서 붙이기'}</button>
-      <button class="gx-gp-btn" data-g="record" data-at="${p.at}"${p.recorded || busy ? ' disabled' : ''}>${p.recorded ? '기록함' : '기록 로어북에 남기기'}</button>
-      <button class="gx-gp-btn" data-g="drop" data-at="${p.at}" aria-label="결과 지우기">${ICONS.trash}</button></div></li>`,
-    )
-    .join('');
-  return `<section class="gx-gl-card"><b>본편 연동</b>
-    <p>이 채팅에서 읽은 것: 요원 ${card.agents.length}명(편성 가능 ${free}) · 괴이 ${n('an')} · 사건 ${n('in')} · 특수 ${n('ms')}</p>
-    ${reps ? `<p>귀환 결과는 누를 때만 이 채팅에 써요. 보고서는 「전송 대기」로 놓이고, 보낼지는 직접 정해요.</p><ul class="gx-gl-slots">${reps}</ul>` : '<p>게임에서 정산까지 마치면 결과가 여기에 쌓여요.</p>'}
-    ${record ? `<div class="gx-gl-act"><span class="gx-gl-note">「${RECORD_COMMENT}」 로어북 ${record}줄</span><button class="gx-gp-btn" data-g="unrecord">기록 로어북 지우기</button></div>` : ''}</section>`;
+  const reps = reports.map((p) => row(
+    esc(p.report.mission),
+    `${{ return: '귀환', evac: '후송', withdraw: '자발 철수' }[p.report.outcome]}${p.report.depth ? ` · ${esc(p.report.depth)}` : ''} · ${when(p.at)}${p.report.summary ? ` · ${esc(p.report.summary)}` : ''}`,
+    `<button class="gx-mini${p.posted ? '' : ' primary'}" data-g="post" data-at="${p.at}"${p.posted || busy ? ' disabled' : ''}>${p.posted ? '채팅에 놓음' : '보고서 붙이기'}</button>
+     <button class="gx-mini" data-g="record" data-at="${p.at}"${p.recorded || busy ? ' disabled' : ''}>${p.recorded ? '기록함' : '기록 로어북에 남기기'}</button>
+     <button class="gx-mini" data-g="drop" data-at="${p.at}" aria-label="결과 지우기">${ICONS.trash}</button>`,
+  )).join('');
+  return group('본편 연동', [
+    row('이 채팅에서 읽은 것', `요원 ${card.agents.length}명(편성 가능 ${free}) · 괴이 ${n('an')} · 사건 ${n('in')} · 특수 ${n('ms')}`),
+    reps || '',
+    record ? row(`「${esc(RECORD_COMMENT)}」 로어북`, `${record}줄`, '<button class="gx-mini" data-g="unrecord">지우기</button>') : '',
+  ].join(''));
 }
 
 function statsHtml(): string {
   const s = gameStats;
-  return `<details class="gx-gl-card gx-gl-stats" data-keep="game-stats"><summary>측정</summary>
-    <p>게임 코드 ${kb(codeStats.bytes || 0)} · 꺼내기 ${codeStats.readMs}ms · 실행 ${codeStats.runMs}ms${codeStats.fromNet ? ' (방금 받음)' : ''} · 게임 붙이기 ${s.mountMs}ms</p>
-    <p>받은 양 ${kb(fetchStats.bytes)} / ${fetchStats.requests}번 · 살아 있는 그림 주소 ${liveUrls()}개${s.heapOpen ? ` · 힙 ${kb(s.heapOpen)} → ${kb(heap())}` : ''}</p></details>`;
+  return row('측정', `게임 코드 ${kb(codeStats.bytes || 0)} · 꺼내기 ${codeStats.readMs}ms · 실행 ${codeStats.runMs}ms${codeStats.fromNet ? ' (방금 받음)' : ''} · 붙이기 ${s.mountMs}ms · 받은 양 ${kb(fetchStats.bytes)}/${fetchStats.requests}번 · 그림 주소 ${liveUrls()}개${s.heapOpen ? ` · 힙 ${kb(s.heapOpen)} → ${kb(heap())}` : ''}`);
 }
 
-const legacyHtml = () => `<details class="gx-gl-card" data-keep="game-legacy"><summary>이전 시험판</summary>
-  <p>예전 순찰과 1인 전투 검증판이에요. 저장과 그림은 따로예요.</p>
-  <div class="gx-gl-act"><button class="gx-gp-btn" data-g="legacy" data-mode="patrol">관리국 순찰</button><button class="gx-gp-btn" data-g="legacy" data-mode="action">1인 전투 검증판</button></div></details>`;
+const legacyHtml = () => row('이전 시험판', '예전 순찰과 1인 전투 검증판이에요. 저장과 그림은 따로예요.', '<button class="gx-mini" data-g="legacy" data-mode="patrol">관리국 순찰</button><button class="gx-mini" data-g="legacy" data-mode="action">1인 전투 검증판</button>');
 
 async function home(): Promise<void> {
   const box = layer?.querySelector<HTMLElement>('.gx-game-box');
@@ -120,9 +120,10 @@ async function home(): Promise<void> {
   if (me !== generation || view !== 'home' || !layer) return;
   const record = ctx ? String(((ctx.chat.localLore as { comment?: string; content?: string }[] | undefined) ?? []).find((e) => e.comment === RECORD_COMMENT)?.content ?? '').split('\n').filter((l) => l.startsWith('- ')).length : 0;
   const open = new Set([...box.querySelectorAll<HTMLDetailsElement>('details[data-keep]')].filter((d) => d.open).map((d) => d.dataset.keep));
-  box.innerHTML = `<div class="gx-gl">
-    ${notice || busy ? `<p class="gx-gp-msg gx-gl-msg">${esc(busy || notice)}</p>` : ''}
-    ${filesHtml(f)}${startHtml(slots, last, f.code === 'ready' && !f.need.length)}${linkHtml(card, reports, record)}${legacyHtml()}${statsHtml()}
+  box.innerHTML = `<div class="gx-gl gx-settings">
+    ${notice || busy ? `<div class="gx-gl-msg" role="status">${esc(busy || notice)}</div>` : ''}
+    ${filesHtml(f)}${startHtml(slots, last, f.code === 'ready' && !f.need.length)}${linkHtml(card, reports, record)}
+    <details class="ps-adv gx-gl-dev" data-keep="game-dev"><summary class="ps-adv-sum"><b>시험용</b></summary><div class="ps-rows">${legacyHtml()}${statsHtml()}</div></details>
     <input type="file" accept=".js,.pack" multiple hidden data-g-file></div>`;
   box.querySelectorAll<HTMLDetailsElement>('details[data-keep]').forEach((d) => (d.open = open.has(d.dataset.keep)));
 }
@@ -187,7 +188,10 @@ async function play(slot: SlotId | null, mode: View): Promise<void> {
     viewport.fill(true);
     setHead();
     box.innerHTML = '';
-    const bridge = makeBridge(viewport, slot ?? 0, () => (onExit ? onExit() : closeGame()));
+    const bridge = makeBridge(viewport, slot ?? 0, () => (onExit ? onExit() : closeGame()), (cb) => {
+      hiddenSubs.add(cb);
+      return () => void hiddenSubs.delete(cb);
+    });
     const t1 = performance.now();
     const legacy = mode === 'play' ? null : mod.legacy?.[mode];
     unmount = legacy ? legacy(box, bridge) : mod.mount(box, bridge);
@@ -285,6 +289,13 @@ async function onClick(e: MouseEvent): Promise<void> {
 }
 
 export const gameOpen = () => !!layer;
+const hiddenSubs = new Set<(hidden: boolean) => void>();
+/** 다른 탭으로 갈 때: 게임을 떼어 두고 멈춘다. 돌아오면 다시 붙인다 (닫지 않는다, 2026-10-23 사용자) */
+export function hideGame(): void {
+  if (!layer?.isConnected) return;
+  layer.remove();
+  hiddenSubs.forEach((f) => f(true));
+}
 /** 게임 안 「필드 나가기」: 창이 상황판으로 돌아간다 */
 let onExit: (() => void) | null = null;
 
@@ -321,11 +332,15 @@ export function closeGame(): void {
   layer?.remove();
   layer = null;
   onExit = null;
+  hiddenSubs.clear();
   view = 'home';
   busy = '';
 }
 
 /** 창을 다시 그린 뒤: 열려 있던 게임을 새 창 틀에 다시 붙인다 */
 export function reattachGame(panel: Element | null): void {
-  if (layer && panel && layer.parentElement !== panel) panel.append(layer);
+  if (!layer || !panel || layer.parentElement === panel) return;
+  const was = layer.isConnected;
+  panel.append(layer);
+  if (!was) hiddenSubs.forEach((f) => f(false));
 }

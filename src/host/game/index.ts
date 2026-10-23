@@ -8,7 +8,7 @@ import { gameTalk } from './talk';
 import { createVisit } from './visit';
 import type { ViewportCtl } from './viewport';
 
-export function makeBridge(viewport: ViewportCtl, slot: SlotId, close: () => void): GameBridge {
+export function makeBridge(viewport: ViewportCtl, slot: SlotId, close: () => void, onHidden?: GameBridge['onHidden']): GameBridge {
   return {
     api: 1,
     visit: createVisit(),
@@ -24,5 +24,6 @@ export function makeBridge(viewport: ViewportCtl, slot: SlotId, close: () => voi
     onWaiting,
     narrow: () => matchMedia('(max-width: 760px)').matches,
     close,
+    onHidden,
   };
 }

@@ -1,4 +1,5 @@
 import { findFaction, findScenario, defaultScenario, SCENARIOS } from '../core/scenarios';
+import { anchorOf } from '../core/visit';
 import { showWindow } from '../host/container';
 import { factionList } from '../core/factions';
 import { setOpeningHint } from '../host/openinghint';
@@ -22,7 +23,7 @@ import { addMark, isMarked, markCandidates, markPop, marks, markSlots, markUi, n
 import { bindSwipeBack } from './swipeback';
 import { agentInner, avatar, factionPic, imageUrl, picAvatar, setImageRedraw, showIdCard, stLabel } from './images';
 import { bindMapZoom } from './mapzoom';
-import { closeGame, gameOpen, openGame, reattachGame } from './game';
+import { closeGame, gameOpen, hideGame, openGame, reattachGame } from './game';
 import { BRAND, CARD_FILE } from './brand';
 import { checkLatest, handleUpdate, hasUpdate, updateBanner } from './update';
 import { setCurrentTheme, themeName } from './theme';
@@ -1053,17 +1054,26 @@ function applyNav(s: NavState): void {
   render();
 }
 
+let fieldShown = false;
+let fieldAnchor = '';
 /** 필드 탭이면 게임을 본문 자리에 붙이고(없으면 연다), 다른 탭이면 닫는다 */
 function syncField(): void {
   const host = view.kind === 'started' && tab === 'field' ? root?.querySelector('.gx-fieldhost') ?? null : null;
   if (!host) {
-    if (gameOpen()) {
-      closeGame();
+    // 다른 탭: 게임은 닫지 않고 떼어 둔다(멈춤·소리 끔). 창을 닫거나 「필드 나가기」 때만 끝난다
+    if (gameOpen() && fieldShown) {
+      fieldShown = false;
+      hideGame();
       // 필드에서 나눈 대화가 바로 보이게
       void refresh();
     }
     return;
   }
+  fieldShown = true;
+  // 본편이 한 턴 진행됐으면(마지막 메시지가 바뀜) 요원 배치·막간이 새로 정해지니 처음부터
+  const anchor = view.kind === 'started' ? anchorOf(view.ctx.chat) : '';
+  if (gameOpen() && anchor !== fieldAnchor) closeGame();
+  fieldAnchor = anchor;
   if (gameOpen()) reattachGame(host);
   else openGame(host, () => void handle('game-close'));
 }
