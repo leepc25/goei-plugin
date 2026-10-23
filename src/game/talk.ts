@@ -21,6 +21,9 @@ const CSS = `
 .gt-to{font-size:18px;color:#ffe27a;white-space:nowrap;text-shadow:2px 2px 0 #000}
 .gt-in{flex:1;min-width:120px;font:inherit;font-size:20px;padding:2px 6px;background:none;color:#fff;outline:none;border-width:7px;border-image-width:7px;text-shadow:2px 2px 0 #000}
 .gt-in::placeholder{color:#8b8574}
+.gt-bar .gk-btn.gt-mode{min-width:3.4em;text-align:center}
+.gt-bar[data-act] .gk-btn.gt-mode{background:#3a2f4a;color:#e6c8ff;box-shadow:0 -3px 0 0 #9b7bc4,0 3px 0 0 #9b7bc4,-3px 0 0 0 #9b7bc4,3px 0 0 0 #9b7bc4,0 6px 0 0 rgba(0,0,0,.55)}
+.gt-bar[data-act] .gt-in{font-style:italic}
 .gt-in:focus,.gt-in:focus-visible{outline:none;box-shadow:none}
 /* 단추: 모서리를 한 칸 깎은 도트 단추 (kit의 메뉴 줄 판은 이 크기에서 찌그러진다) */
 .gt-bar .gk-btn,.gt-bar .gk-btn:hover,.gt-bar .gk-btn:focus-visible{font-size:18px;line-height:1;padding:6px 10px;margin:0 3px;border:0;border-image:none;background:#2b2620;color:#d8d0bc;box-shadow:0 -3px 0 0 #6e6350,0 3px 0 0 #6e6350,-3px 0 0 0 #6e6350,3px 0 0 0 #6e6350,0 6px 0 0 rgba(0,0,0,.55)}
@@ -41,7 +44,7 @@ export function mountTalk(root: HTMLElement, api: GameVisit) {
   bar.className = 'gt-bar gk-panel gk-font';
   bar.setAttribute('role', 'group');
   bar.setAttribute('aria-label', '본부 대화');
-  bar.innerHTML = '<span class="gt-to"></span><input class="gt-in gk-slot gk-font" aria-label="할 말" placeholder="할 말 (행동은 *행동*)" maxlength="300" autocomplete="off" enterkeyhint="send"><button type="button" class="gk-btn" data-send>말하기</button><button type="button" class="gk-btn" data-log>기록</button><button type="button" class="gk-btn" data-close aria-label="대화 닫기">닫기</button><div class="gt-msg" role="status"></div>';
+  bar.innerHTML = '<span class="gt-to"></span><button type="button" class="gk-btn gt-mode" data-mode aria-label="말로 보내기 (Tab: 행동으로 바꾸기)">말</button><input class="gt-in gk-slot gk-font" aria-label="할 말" placeholder="할 말" maxlength="300" autocomplete="off" enterkeyhint="send"><button type="button" class="gk-btn" data-send>말하기</button><button type="button" class="gk-btn" data-log>기록</button><button type="button" class="gk-btn" data-close aria-label="대화 닫기">닫기</button><div class="gt-msg" role="status"></div>';
   const log = document.createElement('div');
   log.className = 'gt-log gk-panel gk-font';
   log.setAttribute('aria-label', '이번 대화 기록');
@@ -49,6 +52,21 @@ export function mountTalk(root: HTMLElement, api: GameVisit) {
   const to = bar.querySelector<HTMLElement>('.gt-to')!;
   const input = bar.querySelector<HTMLInputElement>('.gt-in')!;
   const sendBtn = bar.querySelector<HTMLButtonElement>('[data-send]')!;
+  const modeBtn = bar.querySelector<HTMLButtonElement>('[data-mode]')!;
+  // 말·행동 전환 (2026-10-23 사용자: 입력하면서 별표 치기가 어렵다). 단추나 Tab으로 바꾼다. 별표로 감싸도 행동
+  let act = false;
+  const setMode = (on: boolean) => {
+    act = on;
+    bar.toggleAttribute('data-act', on);
+    modeBtn.textContent = on ? '행동' : '말';
+    modeBtn.setAttribute('aria-label', on ? '행동으로 보내기 (Tab: 말로 바꾸기)' : '말로 보내기 (Tab: 행동으로 바꾸기)');
+    input.placeholder = on ? '할 행동 (예: 서류를 건넨다)' : '할 말';
+    input.setAttribute('aria-label', on ? '할 행동' : '할 말');
+  };
+  modeBtn.onclick = () => {
+    setMode(!act);
+    input.focus();
+  };
   const msg = bar.querySelector<HTMLElement>('.gt-msg')!;
 
   let state: VisitState = { visitor: { agentId: '', name: '' }, agents: [], turns: [] };
@@ -108,9 +126,12 @@ export function mountTalk(root: HTMLElement, api: GameVisit) {
     target = '';
   }
   const send = async () => {
-    const text = input.value.trim();
+    const raw = input.value.trim();
     const agent = state.agents.find((a) => a.name === target && a.room);
-    if (busy || !text || !agent) return;
+    if (busy || !raw || !agent) return;
+    const bare = raw.replace(/^\*+|\*+$/g, '').trim();
+    const text = act || /^\*/.test(raw) ? `*${bare}*` : raw;
+    if (!bare) return;
     busy = true;
     msg.textContent = '';
     input.value = '';
@@ -135,7 +156,7 @@ export function mountTalk(root: HTMLElement, api: GameVisit) {
       if (dead) return;
       for (let i = bubbles.length - 1; i >= 0; i--) if (bubbles[i].who === agent.name) bubbles.splice(i, 1);
       msg.textContent = e instanceof Error ? e.message : String(e);
-      input.value = input.value || text;
+      input.value = input.value || raw;
     } finally {
       busy = false;
       refresh();
@@ -148,6 +169,7 @@ export function mountTalk(root: HTMLElement, api: GameVisit) {
   // Risu 플러그인 창은 form submit이 막혀 있다: 버튼과 Enter로 보낸다 (한글 조합 중 Enter 제외)
   input.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && !e.isComposing && e.keyCode !== 229) { e.preventDefault(); void send(); }
+    if (e.key === 'Tab' && !e.isComposing) { e.preventDefault(); setMode(!act); }
     if (e.key === 'Escape') close();
   });
   bar.querySelector<HTMLButtonElement>('[data-close]')!.onclick = close;
