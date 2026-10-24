@@ -56,7 +56,8 @@ const ACTIONS = [
  ['run','뛰기(누른 채)','ShiftLeft'],['jump','점프 · 공중에서 2단','Space'],
  ['light','약 공격 · 뛰며 = 슬라이딩 · 공중 = 점프 공격','KeyZ'],['heavy','강 공격(콤보 마무리) · 공중 = 강한 점프 공격','KeyX'],
  ['dodge','회피(누른 방향으로)','KeyC'],['block','막기(누른 채)','KeyV'],['shoot','원거리(누른 채 = 연사)','KeyA'],
- ['skill','고유기술 판독','KeyS'],['charge','충전(누른 채) → 떼면 방출','KeyD'],['super','필살기','KeyF'],
+ ['skill','고유기술 제압사격','KeyS'],['charge','충전(누른 채) → 떼면 방출','KeyD'],['super','필살기 RPG','KeyF'],
+ ['skillOld','옛 고유기술 판독','KeyY'],['superOld','옛 필살기 연사','KeyU'],
  ['combat','전투 자세 켜기/끄기','Tab'],['weapon','무기 꺼내기/넣기','KeyQ'],
  ['hit','맞기(슈퍼아머 중엔 버팀)','Digit1'],['knock','날아가 쓰러지기','Digit2'],['stun','스턴(연타로 빨리 풀림)','Digit3'],['crawl','쓰러진 뒤 엎드려 기기','KeyE'],
  ['dying','빈사 켜기/끄기','KeyP'],
@@ -91,8 +92,9 @@ function atkSeq(id, heavy) {
 // ── 상태 ──
 const P = { x: 420, y: 580, z: 0, vz: 0, face: 1, mode: 'ground', combat: false, armed: false, clip: null, pvx: 0, pvy: 0, pdec: 0,
             jumps: 0, airAtk: false, airVX: 230, takeoff: 0, spin: 0, buf: null, chainT: 0, combo: 0, stunT: 0, idleT: 0, lastTap: {}, runLatch: false,
-            hp: 100, armorT: 0, inv: 0, charge: 0, ghostT: 0, dying: false, t: 0 };
+            hp: 100, heat: 0, overT: 0, lastShot: 0, chargeShown: 0, armorT: 0, inv: 0, charge: 0, ghostT: 0, dying: false, t: 0 };
 const D = { x: 860, y: 600, vx: 0, z: 0, vz: 0, ang: 0, va: 0, hits: 0, hitT: 0, flash: 0, stag: 0, hp: 400, mark: 0, atkT: 2.2, wind: 0 };
+let zoom = 0, zx = W / 2, zy = H / 2, dShake = 0;
 let hitstop = 0, shake = 0, flash = 0, dark = 0, cut = 0, speed = 1, showNo = false, showDummy = true, counter = false, last = performance.now();
 let charScale = store.get('size', 1), persp = true;
 // 원근: 화면 안쪽(위)일수록 작게, 바깥쪽(아래)일수록 크게
@@ -118,7 +120,7 @@ function tickClip(dt) {
   while (c.t >= c.seq[c.i].d) {
     c.t -= c.seq[c.i].d;
     const cur = c.seq[c.i];
-    if (cur.rep && down(cur.rep.key)) { c.i = cur.rep.to; fireEv(c.seq[c.i]); continue; }
+    if (cur.rep && down(cur.rep.key) && !(cur.rep.key === 'shoot' && P.overT > 0)) { c.i = cur.rep.to; fireEv(c.seq[c.i]); continue; }
     if (c.i + 1 < c.seq.length) { c.i++; fireEv(c.seq[c.i]); }
     else if (c.loopFrom >= 0) { c.i = c.loopFrom; fireEv(c.seq[c.i]); }
     else { c.done = true; c.t = 0; const f = c.onEnd; c.onEnd = null; if (f) f(); break; }
@@ -143,6 +145,7 @@ function sparks(x, y, n, big, col) {
   for (let i = 0; i < n; i++) { const a = Math.random() * Math.PI * 2, v = (big ? 520 : 280) * (0.35 + Math.random());
     fx.push({ k: 'spark', x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 140, t: 0.16 + Math.random() * 0.18, c: col || (Math.random() < 0.5 ? '#fff' : '#ffd866'), s: big ? 5 : 3 }); }
 }
+const steam = (x, y, s = 1) => fx.push({ k: 'steam', x: x + (Math.random() - 0.5) * 10, y, vx: (Math.random() - 0.5) * 30, vy: -50 - Math.random() * 50, r: 4 * s, t: 0.9, t0: 0.9 });
 const ring = (x, y, r, t, c, w = 4, sy = 1) => fx.push({ k: 'ring', x, y, r0: r * 0.2, r, t, t0: t, c, w, sy });
 const num = (x, y, v, big) => fx.push({ k: 'num', x, y, v, t: 0.7, big });
 const dust = (x, y, n, s = 1) => { for (let i = 0; i < n; i++) fx.push({ k: 'dust', x: x + (Math.random() - 0.5) * 30 * s, y, vx: (Math.random() - 0.5) * 160 * s, vy: -Math.random() * 60, r: 6 + Math.random() * 8 * s, t: 0.45, t0: 0.45 }); };
@@ -152,13 +155,13 @@ function muzzleFlash(p, big) {
 }
 
 // 맞았는지: 샌드백이 같은 줄에 있고 앞쪽 사정거리 안
-function inReach(hx, pad = 60) { pad *= K(P.y); return showDummy && Math.abs(D.y - P.y) < 48 && (D.x - P.x) * P.face > -20 && Math.abs(D.x - hx) < pad && D.z < 140; }
+function inReach(hx, pad = 60) { pad *= K(P.y); return showDummy && Math.abs(D.y - P.y) < 64 && (D.x - P.x) * P.face > -20 && Math.abs(D.x - hx) < pad && D.z < 140; }
 function hurtDummy(dmg, kind, hx, hy) {
   if (D.mark > 0) dmg = Math.round(dmg * 1.5);
   D.hp = Math.max(0, D.hp - dmg); D.hits++; D.hitT = 1.0; D.flash = 0.09;
   const big = kind !== 'light';
   D.stag = kind === 'launch' ? 0.9 : big ? 0.42 : 0.24;
-  D.vx = P.face * (kind === 'launch' ? 420 : big ? 300 : 120);
+  D.vx = P.face * (kind === 'launch' ? 520 : big ? 460 : 150);
   D.va += P.face * (kind === 'launch' ? 7 : big ? 4.5 : 2);
   if (kind === 'launch') { D.vz = 720; }
   num(D.x + (Math.random() - 0.5) * 30, D.y - 200 - D.z, dmg, big);
@@ -172,15 +175,27 @@ function fireEv(e) {
     const p = framePt(id, f, a.reach[f], a.h * 0.42);
     if (inReach(p.x, big ? 75 : 60)) {
       // 맞았을 때만: 살짝 멈춤 + 샌드백 경직
-      hitstop = big ? 0.13 : 0.07; shake = big ? 12 : 5;
+      hitstop = big ? 0.16 : 0.075; shake = big ? 16 : 6; dShake = big ? 9 : 5;
       hurtDummy(big ? 34 : 12, e.ev === 'hitL' ? 'launch' : big ? 'heavy' : 'light', p.x, p.y);
-      sfx('hit', { strength: big ? 2 : 1, kind: KICK.has(id) ? 'kick' : undefined });
-      sparks(D.x - P.face * 18, p.y, big ? 22 : 10, big);
-      ring(D.x - P.face * 18, p.y, big ? 90 : 46, big ? 0.22 : 0.14, big ? '#ffe9a8' : '#ffffff', big ? 6 : 3);
-      if (big) ring(D.x, D.y, 120, 0.3, 'rgba(255,255,255,.6)', 3, 0.25);
+      sfx('hit', { strength: big ? 3 : 1, kind: KICK.has(id) ? 'kick' : undefined });
+      const cx = D.x - P.face * 18 * K(D.y);
+      // 맞은 자리: 번쩍 + 초승달 타격선 + 불꽃 + 충격 고리
+      fx.push({ k: 'impact', x: cx, y: p.y, dir: P.face, t: big ? 0.16 : 0.1, t0: big ? 0.16 : 0.1, big });
+      sparks(cx, p.y, big ? 30 : 12, big);
+      ring(cx, p.y, big ? 110 : 50, big ? 0.24 : 0.14, big ? '#ffe9a8' : '#ffffff', big ? 7 : 3);
+      if (big) {   // 강: 화면 당김(줌) + 집중선 + 바닥 충격파 + 먼지
+        zoom = 0.06; zx = cx; zy = p.y; flash = 0.07;
+        fx.push({ k: 'speed', x: cx, y: p.y, t: 0.2, t0: 0.2 });
+        ring(D.x, D.y, 150, 0.35, 'rgba(255,255,255,.7)', 4, 0.25);
+        dust(D.x, D.y, 10, 1.6);
+      }
     }
   } else if (e.ev === 'shot' || e.ev === 'shotS' || e.ev === 'shotH') {
     const big = e.ev === 'shotH', p = muzzle();
+    if (id === '15') {   // 원거리 연사: 총열 열이 차면 과열 → 쿨다운
+      P.heat = Math.min(100, P.heat + 9); P.lastShot = P.t;
+      if (P.heat >= 100) { P.overT = 2.6; sfx('empty'); for (let i = 0; i < 8; i++) steam(p.x, p.y, 1.4); }
+    }
     muzzleFlash(p, big || e.ev === 'shotS'); sfx('shot');
     const hitD = showDummy && Math.abs(D.y - P.y) < 60 && (D.x - P.x) * P.face > 0;
     const endX = hitD ? D.x - P.face * 14 : (P.face > 0 ? W + 20 : -20);
@@ -190,14 +205,47 @@ function fireEv(e) {
   } else if (e.ev === 'beam') {
     const p = muzzle(), lv = P.chargeLv;
     muzzleFlash(p, true); sfx('shot'); sfx('hit', { strength: 3, kind: 'bullet' });
-    fx.push({ k: 'beam', x: p.x, y: p.y, dir: P.face, t: 0.28, t0: 0.28, w: lv === 2 ? 26 : 14 });
-    ring(p.x, p.y, lv === 2 ? 130 : 80, 0.25, '#ffffff', 5);
-    shake = lv === 2 ? 18 : 11;
-    if (showDummy && Math.abs(D.y - P.y) < 46 && (D.x - P.x) * P.face > 0) { hitstop = lv === 2 ? 0.18 : 0.11; hurtDummy(lv === 2 ? 70 : 38, lv === 2 ? 'launch' : 'heavy'); sparks(D.x, p.y, 24, true); }
+    // 단계마다 다르게: 1단 = 가는 흰 광선, 2단 = 굵은 푸른 광선 + 충격파, 3단(최대) = 보라 대구경 + 화면 번쩍·띄우기
+    const W_ = [0, 10, 24, 40][lv], col = CH_COL[lv];
+    fx.push({ k: 'beam', x: p.x, y: p.y, dir: P.face, t: 0.22 + lv * 0.08, t0: 0.22 + lv * 0.08, w: W_, c: col, lv });
+    ring(p.x, p.y, 60 + lv * 45, 0.25, col, 3 + lv * 2);
+    if (lv >= 2) for (let x = p.x; x > 0 && x < W; x += P.face * 140) ring(x, p.y, 30 + lv * 10, 0.3, col, 3, 1.6);
+    if (lv >= 3) { flash = 0.2; dust(P.x - P.face * 30, P.y, 10, 1.6); }
+    shake = [0, 8, 15, 24][lv];
+    if (showDummy && Math.abs(D.y - P.y) < 30 + W_ && (D.x - P.x) * P.face > 0) { hitstop = [0, 0.08, 0.15, 0.24][lv]; hurtDummy([0, 30, 60, 110][lv], lv >= 2 ? 'launch' : 'heavy'); sparks(D.x, p.y, 10 + lv * 10, true, col); ring(D.x, p.y, 50 + lv * 30, 0.3, col, 4); }
   } else if (e.ev === 'cut') { sfx('super'); cut = 1.1; dark = 2.6; flash = 0.15; hitstop = 0.25; }
   else if (e.ev === 'scan') { sfx('ability'); fx.push({ k: 'scan', x: P.x, y: P.y - 190, dir: P.face, t: 0.55, t0: 0.55 }); }
   else if (e.ev === 'mark') { if (showDummy) { D.mark = 6; ring(D.x, D.y - 230, 40, 0.3, '#ff5a4a', 3); } }
+  else if (e.ev === 'sup') {   // 제압사격: 쓸면서 쏨, 넓은 폭, 약한 경직
+    const p = muzzle(); muzzleFlash(p, false); sfx('shot');
+    const spread = (Math.random() - 0.5) * 90, hitD = showDummy && Math.abs(D.y - P.y) < 90 && (D.x - P.x) * P.face > 0;
+    fx.push({ k: 'tracer', x: p.x, y: p.y, x2: hitD ? D.x : (P.face > 0 ? W + 20 : -20), t: 0.05, big: false, dy: spread });
+    shake = Math.max(shake, 3);
+    if (hitD) { hurtDummy(5, 'light'); sparks(D.x, p.y + spread * 0.4, 4, false); }
+  }
+  else if (e.ev === 'rocket') {
+    const p = muzzle(); sfx('shot'); sfx('super'); backblast(p); muzzleFlash(p, true); shake = 16; hitstop = 0.06;
+    fx.push({ k: 'rocket', x: p.x + P.face * 20, x0: P.x, y: p.y, gy: P.y, dir: P.face, t: 5 });
+  }
   else if (e.ev === 'dust') { dust(P.x, P.y, 6, 1.2); sfx(P.clip.id === '19' ? 'down' : 'step'); }
+}
+
+function explode(x, y, gy, hitD) {
+  sfx('hit', { strength: 3, kind: 'super' });
+  shake = 24; flash = 0.22; if (hitD) hitstop = 0.2;
+  fx.push({ k: 'ring', x, y, r0: 0, r: 60, t: 0.08, t0: 0.08, c: '#fff', w: 40, sy: 1 });
+  for (let i = 0; i < 26; i++) { const a = Math.random() * Math.PI * 2, v = 80 + Math.random() * 380; fx.push({ k: 'fire', x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v * 0.7 - 60, r: 10 + Math.random() * 16, t: 0.5 + Math.random() * 0.4, t0: 0.9 }); }
+  for (let i = 0; i < 16; i++) fx.push({ k: 'smoke', x: x + (Math.random() - 0.5) * 80, y: y + (Math.random() - 0.5) * 50, vx: (Math.random() - 0.5) * 60, vy: -40 - Math.random() * 70, r: 16 + Math.random() * 14, t: 1.4 + Math.random() * 0.6, t0: 2 });
+  sparks(x, y, 40, true, '#ffb347');
+  ring(x, gy, 220, 0.45, 'rgba(255,230,180,.9)', 6, 0.28);
+  fx.push({ k: 'scorch', x, y: gy, r: 90, t: 3.5 });
+  dust(x, gy, 14, 2.2);
+  if (showDummy && Math.abs(D.x - x) < 200 && Math.abs(D.y - gy) < 70) hurtDummy(140, 'launch');
+}
+function backblast(p) {
+  for (let i = 0; i < 14; i++) fx.push({ k: 'fire', x: p.x - P.face * 60, y: p.y, vx: -P.face * (200 + Math.random() * 400), vy: (Math.random() - 0.5) * 160, r: 8 + Math.random() * 10, t: 0.3 + Math.random() * 0.25, t0: 0.55 });
+  for (let i = 0; i < 10; i++) fx.push({ k: 'smoke', x: p.x - P.face * 80, y: p.y, vx: -P.face * (60 + Math.random() * 160), vy: -20 - Math.random() * 40, r: 12 + Math.random() * 10, t: 1.2, t0: 1.2, c: 150 });
+  dust(P.x - P.face * 60, P.y, 10, 1.8);
 }
 
 // ── 흐름 ──
@@ -216,7 +264,7 @@ function afterBuf(fallback) {
   if (b === 'jump') return jump();
   fallback();
 }
-const ARMOR = new Set(['12', '13', '23', '24', '25']);
+const ARMOR = new Set(['12', '13', '23', '24', '25', '22_1', '25_1']);
 const armored = () => P.clip && ARMOR.has(P.clip.id) && (P.mode === 'act' || P.mode === 'charge');
 
 // ── 공격 ──
@@ -247,17 +295,39 @@ function dodge() {
   act(fwd ? '16_1' : '16', { seq: S(R(0, 7), 0.04).map((e, i) => i >= 6 ? { ...e, cancel: true } : e), onEnd: () => { P.dodgeV = null; afterBuf(toIdle); } });
 }
 function shoot() {
+  if (P.overT > 0) { sfx('empty'); const p = P.armed ? muzzle() : { x: P.x + P.face * 40, y: P.y - 150 }; for (let i = 0; i < 3; i++) steam(p.x, p.y, 1); return; }
   ensureArmed(() => {
     const s = [{ f: 0, d: 0.03 }, { f: 1, d: 0.035 }, { f: 2, d: 0.035 }, { f: 3, d: 0.05, ev: 'shot' }, { f: 4, d: 0.06, rep: { key: 'shoot', to: 3 } }, { f: 5, d: 0.05 }, { f: 6, d: 0.05 }, { f: 7, d: 0.05 }];
     act('15', { seq: s });
   });
 }
-function skill() { ensureArmed(() => act('22', { seq: S(R(0, 7), 0.09).map((e, i) => i === 1 ? { ...e, ev: 'scan' } : i === 5 ? { ...e, ev: 'mark' } : e) })); }
+function skill() {
+  if (!has('22_1')) return skillOld();
+  ensureArmed(() => {
+    const a = A['22_1'], s = [{ f: 0, d: 0.04 }, { f: 1, d: 0.05 }];
+    for (let f = 2; f <= a.n - 2; f++) for (let k = 0; k < 3; k++) s.push({ f, d: 0.045, ev: 'sup' });
+    s.push({ f: a.n - 1, d: 0.07 });
+    act('22_1', { seq: s });
+  });
+}
+function rocketSuper() {
+  if (!has('25_1')) return superMove();
+  P.armed = false; P.combat = true;
+  const a = A['25_1'], fire = ROCKET_FIRE ?? (() => { let m = 3; for (let f = 3; f < a.n - 2; f++) if (a.top[f] > a.top[m]) m = f; return m; })();
+  const s = [{ f: 0, d: 0.35, ev: 'cut' }];
+  for (let f = 1; f < a.n; f++) s.push({ f, d: f === fire ? 0.3 : f < fire ? 0.075 : 0.08, ev: f === fire ? 'rocket' : undefined });
+  act('25_1', { seq: s });
+}
+const ROCKET_FIRE = null;   // 발사 장(그림 보고 정함, null = 무릎 꿇은 장 자동)
+function skillOld() {
+  ensureArmed(() => act('22', { seq: S(R(0, 7), 0.09).map((e, i) => i === 1 ? { ...e, ev: 'scan' } : i === 5 ? { ...e, ev: 'mark' } : e) })); }
+const CH_COL = ['rgba(255,255,255,.8)', '#fff6c0', '#8fdcff', '#c89bff'];
 function charge() {
-  ensureArmed(() => { P.mode = 'charge'; P.charge = 0; play('23', { seq: [...S(R(0, 3), 0.055), ...S(R(4, 7), 0.11)], loopFrom: 4 }); });
+  ensureArmed(() => { P.mode = 'charge'; P.charge = 0; P.chargeShown = 0; play('23', { seq: [...S(R(0, 3), 0.055), ...S(R(4, 7), 0.11)], loopFrom: 4 }); });
 }
 function release() {
-  P.chargeLv = P.charge > 1.3 ? 2 : P.charge > 0.5 ? 1 : 0;
+  P.chargeLv = P.charge >= 2 ? 3 : P.charge > 1.3 ? 2 : P.charge > 0.5 ? 1 : 0;
+  if (P.chargeLv >= 2) pushP(-320, 900);   // 큰 반동
   // 떼는 순간 바로 발사(첫 장 총구에서), 그 뒤 반동
   const s = S(R(0, A['24'].n - 1), 0.06); s[0] = { f: 0, d: 0.05, ev: P.chargeLv ? 'beam' : 'shotH' };
   act('24', { seq: s });
@@ -367,7 +437,9 @@ function onPress(a) {
     case 'shoot': return shoot();
     case 'skill': return skill();
     case 'charge': return charge();
-    case 'super': return superMove();
+    case 'super': return rocketSuper();
+    case 'skillOld': return skillOld();
+    case 'superOld': return superMove();
     case 'combat':
       if (P.armed) return;
       if (!P.combat) return act('3_0', { seq: S(R(0, 3), 0.055), onEnd: () => { P.combat = true; toIdle(); } });
@@ -378,15 +450,18 @@ function onPress(a) {
     case 'stun': return stun();
     case 'respond': return emote('28', 7);
     case 'talk': return emote('29', 7, { seq: S([...R(0, 3), ...R(0, 3), ...R(0, 3)], 1 / 7) });
-    case 'nod': return emote('30', 8);
-    case 'shake': return emote('31', 9, { seq: S([...R(0, 3), ...R(1, 3), ...R(1, 3), 0], 1 / 9) });   // 최소 두 번 도리도리
+    // 끄덕이기: 내려갈 땐 빠르게, 아래서 잠깐 멈춤, 올라올 땐 조금 느리게 × 2 (두 번째는 살짝 빠르게)
+    case 'nod': return emote('30', 8, { seq: [{ f: 0, d: 0.1 }, { f: 1, d: 0.05 }, { f: 2, d: 0.13 }, { f: 1, d: 0.07 }, { f: 0, d: 0.07 }, { f: 1, d: 0.045 }, { f: 2, d: 0.1 }, { f: 1, d: 0.07 }, { f: 3, d: 0.09 }, { f: 0, d: 0.2 }] });
+    // 고개 젓기: 한쪽 끝·반대쪽 끝에서 살짝 머물고 가운데는 빨리 지나감 × 2
+    case 'shake': return emote('31', 9, { seq: [{ f: 0, d: 0.06 }, { f: 1, d: 0.05 }, { f: 2, d: 0.09 }, { f: 1, d: 0.04 }, { f: 0, d: 0.04 }, { f: 3, d: 0.09 }, { f: 0, d: 0.04 }, { f: 1, d: 0.04 }, { f: 2, d: 0.08 }, { f: 1, d: 0.04 }, { f: 0, d: 0.05 }, { f: 3, d: 0.08 }, { f: 0, d: 0.18 }] });
     case 'angry': return emote('32', 9);
     case 'happy': return emote('35', 8);
     case 'surprise': return emote('34', 8, { seq: [...S(R(0, 1), 0.06), { f: 2, d: 0.35 }, ...S(R(3, A['34'].n - 1), 0.12)] });
     case 'eat': return emote('26', 7, { seq: A['26'].n === 8 ? [...S(R(0, 2), 0.12), ...S(R(3, 5), 0.22), ...S(R(6, 7), 0.2)] : undefined });
     case 'pick': return emote('27', 8);
     case 'personal': return emote('2', 7);
-    case 'notice': fx.push({ k: 'icon', v: '!', t: 1.0 }); return act('33', { seq: S(R(0, A['33'].n - 1), 0.11) });
+    // 발견 반응: 주먹 올리는 뒤 3장(6~8장)은 빼고, 움찔한 뒤 바라보는 장에서 잠깐 머묾
+    case 'notice': fx.push({ k: 'icon', v: '!', t: 1.0 }); return act('33', { seq: [{ f: 0, d: 0.06 }, { f: 1, d: 0.06 }, { f: 2, d: 0.1 }, { f: 3, d: 0.12 }, { f: 4, d: 0.4 }] });
     case 'sit': return sit();
     case 'crouch': return crouch();
   }
@@ -405,6 +480,15 @@ function updateFx(dt) {
     else if (e.k === 'dust') { e.x += e.vx * dt; e.y += e.vy * dt; e.vx *= 0.92; }
     else if (e.k === 'num') e.y -= 60 * dt;
     else if (e.k === 'blood') { if (!e.landed) { e.x += e.vx * dt; e.y += e.vy * dt; e.vy += 1300 * dt; if (e.y >= e.g) { e.y = e.g; e.landed = true; e.t = Math.min(e.t, 2.2); } } }
+    else if (e.k === 'steam' || e.k === 'smoke') { e.x += e.vx * dt; e.y += e.vy * dt; e.r += (e.k === 'smoke' ? 26 : 10) * dt; e.vx *= 0.97; }
+    else if (e.k === 'mote') e.y += e.vy * dt;
+    else if (e.k === 'fire') { e.x += e.vx * dt; e.y += e.vy * dt; e.vx *= 0.9; e.vy *= 0.9; e.r += 60 * dt; }
+    else if (e.k === 'rocket') {
+      e.x += e.dir * 1500 * dt;
+      if (Math.random() < 0.9) fx.push({ k: 'smoke', x: e.x - e.dir * 20, y: e.y + (Math.random() - 0.5) * 6, vx: -e.dir * 40, vy: -10, r: 6, t: 0.8, t0: 0.8, c: 200 });
+      const hitD = showDummy && Math.abs(D.y - e.gy) < 60 && (D.x - e.x) * e.dir <= 0 && (D.x - e.x0) * e.dir > 0;
+      if (hitD || e.x < -40 || e.x > W + 40) { e.t = 0; explode(hitD ? D.x : Math.max(20, Math.min(W - 20, e.x)), e.y, e.gy, hitD); }
+    }
     else if (e.k === 'shell') { e.x += e.vx * dt; e.y += e.vy * dt; e.vy += 1400 * dt; if (e.y > e.g) { e.y = e.g; e.vy *= -0.35; e.vx *= 0.6; } }
   }
   fx = fx.filter(e => e.t > 0);
@@ -415,7 +499,7 @@ function updateDummy(dt) {
   D.flash = Math.max(0, D.flash - dt); D.stag = Math.max(0, D.stag - dt); D.mark = Math.max(0, D.mark - dt);
   D.x += D.vx * dt; D.vx *= Math.pow(0.02, dt);
   if (D.z > 0 || D.vz > 0) { D.z += D.vz * dt; D.vz -= 2200 * dt; if (D.z <= 0) { D.z = 0; D.vz = 0; dust(D.x, D.y, 6); shake = Math.max(shake, 4); } }
-  D.x += (860 - D.x) * Math.min(1, dt * 0.6);   // 천천히 제자리로
+  D.x += (860 - D.x) * Math.min(1, dt * 0.25);   // 천천히 제자리로
   if (counter && showDummy && D.stag === 0) {
     D.atkT -= dt;
     if (D.atkT < 0.45 && D.atkT > 0) D.wind = 1;
@@ -432,7 +516,7 @@ function updateDummy(dt) {
 function update(dt) {
   P.t += dt;
   updateFx(dt);
-  shake = Math.max(0, shake - 70 * dt); flash = Math.max(0, flash - dt); cut = Math.max(0, cut - dt); dark = Math.max(0, dark - dt);
+  shake = Math.max(0, shake - 70 * dt); zoom = Math.max(0, zoom - 0.5 * dt); flash = Math.max(0, flash - dt); cut = Math.max(0, cut - dt); dark = Math.max(0, dark - dt);
   P.armorT = Math.max(0, P.armorT - dt);
   if (P.hp <= 25 && Math.random() < dt * 3.5) {   // 빈사: 몸에서 핏방울이 떨어져 바닥에 번짐
     const a = A[P.clip ? P.clip.id : '1'], f = curF(), k = K(P.y);
@@ -444,6 +528,8 @@ function update(dt) {
   updateDummy(dt);
   tickClip(dt);
   P.inv = Math.max(0, P.inv - dt);
+  if (P.overT > 0) { P.overT -= dt; P.heat = 100 * Math.max(0, P.overT) / 2.6; if (Math.random() < dt * 14) { const p = P.armed ? muzzle() : { x: P.x + P.face * 30 * K(P.y), y: P.y - 150 * K(P.y) }; steam(p.x, p.y, 1.2); } }
+  else if (P.t - P.lastShot > 0.35) P.heat = Math.max(0, P.heat - 30 * dt);
   if (P.ghostT > 0) { P.ghostT -= dt; if (P.clip) fx.push({ k: 'ghost', id: P.clip.id, f: curF(), x: P.x, y: P.y, z: P.z, face: P.face, t: 0.18, t0: 0.18 }); }
   if (P.dodgeV) { P.x += P.dodgeV.x * dt; P.y += P.dodgeV.y * dt; P.dodgeV.x *= Math.pow(0.004, dt); P.dodgeV.y *= Math.pow(0.004, dt); }
   if (P.pvx) { P.x += P.face * P.pvx * dt; const s = Math.sign(P.pvx); P.pvx -= s * P.pdec * dt; if (Math.sign(P.pvx) !== s) P.pvx = 0; }
@@ -488,7 +574,14 @@ function update(dt) {
       }
       break;
     }
-    case 'charge': P.charge += dt; break;
+    case 'charge': {
+      if (!down('charge')) { release(); break; }   // 떼면(버튼이 씹혀도) 무조건 발사
+      P.charge = Math.min(2.2, P.charge + dt);
+      const lv = P.charge >= 2 ? 3 : P.charge > 1.3 ? 2 : P.charge > 0.5 ? 1 : 0;
+      if (lv > P.chargeShown) { P.chargeShown = lv; sfx('ability'); ring(P.x, P.y - 110 * K(P.y), 70 + lv * 25, 0.3, CH_COL[lv], 4); flash = 0.04; }
+      if (Math.random() < dt * (8 + lv * 10)) fx.push({ k: 'mote', x: P.x + (Math.random() - 0.5) * 90 * K(P.y), y: P.y, vy: -120 - Math.random() * 160, c: CH_COL[lv], t: 0.7, t0: 0.7 });
+      break;
+    }
     case 'belly': { const go = dx !== 0; if (go) P.face = dx; P.clip.paused = !go && P.clip.i >= 4; if (go && P.clip.i >= 4) P.x += dx * 55 * dt; break; }
     case 'stun': P.stunT -= dt; if (P.stunT <= 0) reverseOut('21', [curF() > 1 ? 1 : curF(), 0], 0.07); break;
     case 'flee': if (!down('flee')) { toIdle(); break; } if (dx) P.face = dx; P.x += P.face * 400 * dt; P.y += dy * 180 * dt; break;
@@ -550,10 +643,15 @@ function drawPlayer() {
   const ft = a.foot[f], kk = K(P.y), fx0 = (flip ? -ft[0] : ft[0]) * kk;
   const lift = air ? 0 : (a.floor - a.bot[f]);   // 그림 속에서 뜬 장이면 그림자를 작게
   shadow(P.x + fx0, P.y, P.z + lift * kk, Math.min(70, ft[1] * 0.9) * kk, kk);
+  if (P.mode === 'charge') {   // 몸 둘레 기운
+    const lv = P.charge >= 2 ? 3 : P.charge > 1.3 ? 2 : P.charge > 0.5 ? 1 : 0, cy = P.y - 100 * kk, r = (80 + lv * 14 + Math.sin(P.t * 12) * 6) * kk;
+    const g = ctx.createRadialGradient(P.x, cy, r * 0.3, P.x, cy, r); g.addColorStop(0, 'rgba(255,255,255,0)'); g.addColorStop(0.7, CH_COL[lv]); g.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.globalAlpha = 0.25 + lv * 0.08; ctx.fillStyle = g; ctx.beginPath(); ctx.ellipse(P.x, cy, r * 0.7, r * 1.25, 0, 0, Math.PI * 2); ctx.fill(); ctx.globalAlpha = 1;
+  }
   let tint = null;
   if (P.armorT > 0) tint = { c: '#ff2a2a', over: 0.35 * (P.armorT / 0.28) };
   else if (P.hp <= 25) tint = { c: '#d0101a', over: 0.42 * (0.5 + 0.5 * Math.sin(P.t * Math.PI * 2 * 1.3)), noEdge: true };
-  else if (P.mode === 'charge') tint = { c: P.charge > 1.3 ? '#9fe0ff' : P.charge > 0.5 ? '#ffffff' : 'rgba(255,255,255,.4)', over: 0 };
+  else if (P.mode === 'charge') { const lv = P.charge >= 2 ? 3 : P.charge > 1.3 ? 2 : P.charge > 0.5 ? 1 : 0; tint = { c: CH_COL[lv], over: 0.1 + 0.12 * Math.sin(P.t * 20) }; }
   drawSprite(id, f, P.x, P.y, P.z, P.face, 1, tint);
   if (P.mode === 'stun') {   // 머리 위 별
     const hy = P.y - (a.floor - a.top[f]) * kk - 14;
@@ -566,7 +664,8 @@ function drawDummy() {
   if (!showDummy) return;
   const dk = K(D.y);
   shadow(D.x, D.y, D.z, 60 * dk, dk);
-  ctx.save(); ctx.translate(D.x + (D.stag > 0 ? (Math.random() - 0.5) * 6 : 0), D.y - D.z); ctx.scale(dk, dk); ctx.rotate(D.ang * 0.25);
+  const vib = hitstop > 0 ? (Math.random() - 0.5) * dShake * 2 : D.stag > 0 ? (Math.random() - 0.5) * 4 : 0;
+  ctx.save(); ctx.translate(D.x + vib, D.y - D.z); ctx.scale(dk, dk); ctx.rotate(D.ang * 0.25);
   ctx.fillStyle = '#3a2d22'; ctx.fillRect(-4, -40, 8, 40);
   ctx.fillStyle = D.flash > 0 ? '#ffffff' : D.wind ? '#c0503a' : '#9a6b3f'; ctx.fillRect(-26, -190, 52, 150);
   ctx.fillStyle = D.flash > 0 ? '#ffffff' : '#7d5531'; ctx.fillRect(-26, -150, 52, 6); ctx.fillRect(-26, -90, 52, 6);
@@ -579,6 +678,7 @@ function drawDummy() {
   if (D.hits > 1) { ctx.fillStyle = '#ffe08a'; ctx.font = 'bold 30px sans-serif'; ctx.fillText(`${D.hits} HIT`, D.x + 40, hb + 20); }
 }
 function drawFxUnder() {
+  for (const e of fx) if (e.k === 'scorch') { ctx.fillStyle = `rgba(20,14,10,${0.55 * Math.min(1, e.t)})`; ctx.beginPath(); ctx.ellipse(e.x, e.y, e.r, e.r * 0.28, 0, 0, Math.PI * 2); ctx.fill(); }
   for (const e of fx) if (e.k === 'dust') { const k = e.t / e.t0; ctx.fillStyle = `rgba(200,190,170,${0.45 * k})`; ctx.beginPath(); ctx.arc(e.x, e.y - 4, e.r * (1.6 - k), 0, Math.PI * 2); ctx.fill(); }
   for (const e of fx) if (e.k === 'ghost') drawSprite(e.id, e.f, e.x, e.y, e.z, e.face, 0.35 * e.t / e.t0, { c: '#7fb8ff', over: 0.6 });
 }
@@ -588,14 +688,33 @@ function drawFx() {
     if (e.k === 'spark') { ctx.fillStyle = e.c; ctx.fillRect(e.x - e.s / 2, e.y - e.s / 2, e.s, e.s); }
     else if (e.k === 'ring') { ctx.strokeStyle = e.c; ctx.globalAlpha = k; ctx.lineWidth = e.w * k + 1; ctx.beginPath(); ctx.ellipse(e.x, e.y, e.r0 + (e.r - e.r0) * (1 - k), (e.r0 + (e.r - e.r0) * (1 - k)) * e.sy, 0, 0, Math.PI * 2); ctx.stroke(); ctx.globalAlpha = 1; }
     else if (e.k === 'num') { ctx.fillStyle = typeof e.v === 'string' ? '#9fd0ff' : e.big ? '#ffcf4a' : '#fff'; ctx.font = `bold ${e.big ? 30 : 22}px sans-serif`; ctx.strokeStyle = '#000'; ctx.lineWidth = 4; ctx.strokeText(e.v, e.x - 14, e.y); ctx.fillText(e.v, e.x - 14, e.y); }
-    else if (e.k === 'tracer') { ctx.strokeStyle = e.big ? 'rgba(255,236,160,.95)' : 'rgba(255,244,190,.85)'; ctx.lineWidth = e.big ? 5 : 2; ctx.beginPath(); ctx.moveTo(e.x, e.y); ctx.lineTo(e.x2, e.y); ctx.stroke(); }
+    else if (e.k === 'tracer') { ctx.strokeStyle = e.big ? 'rgba(255,236,160,.95)' : 'rgba(255,244,190,.85)'; ctx.lineWidth = e.big ? 5 : 2; ctx.beginPath(); ctx.moveTo(e.x, e.y); ctx.lineTo(e.x2, e.y + (e.dy || 0)); ctx.stroke(); }
     else if (e.k === 'flash') { const r = e.big ? 34 : 20; ctx.fillStyle = 'rgba(255,230,140,.95)'; star(e.x + e.dir * r * 0.4, e.y, r, 'rgba(255,220,120,.95)'); star(e.x + e.dir * r * 0.4, e.y, r * 0.5, '#fff'); }
     else if (e.k === 'blood') { ctx.fillStyle = `rgba(150,10,16,${Math.min(1, e.t)})`; if (e.landed) { ctx.beginPath(); ctx.ellipse(e.x, e.y, e.s * 2.2, e.s * 0.8, 0, 0, Math.PI * 2); ctx.fill(); } else ctx.fillRect(e.x - e.s / 2, e.y - e.s / 2, e.s, e.s); }
+    else if (e.k === 'impact') {
+      const r = (e.big ? 70 : 42) * (1.2 - k * 0.4);
+      star(e.x, e.y, r * 0.8 * k + 6, 'rgba(255,255,255,.95)');
+      ctx.strokeStyle = e.big ? `rgba(255,220,120,${k})` : `rgba(255,255,255,${k})`; ctx.lineWidth = (e.big ? 10 : 6) * k + 1;
+      ctx.beginPath(); ctx.arc(e.x - e.dir * r * 0.4, e.y, r, -Math.PI / 2.6, Math.PI / 2.6, e.dir < 0); ctx.stroke();
+    }
+    else if (e.k === 'speed') {
+      ctx.strokeStyle = `rgba(255,255,255,${0.6 * k})`; ctx.lineWidth = 2;
+      for (let i = 0; i < 18; i++) { const a = i / 18 * Math.PI * 2 + i, r0 = 120 + (i % 3) * 30; ctx.beginPath(); ctx.moveTo(e.x + Math.cos(a) * r0, e.y + Math.sin(a) * r0 * 0.7); ctx.lineTo(e.x + Math.cos(a) * (r0 + 220), e.y + Math.sin(a) * (r0 + 220) * 0.7); ctx.stroke(); }
+    }
+    else if (e.k === 'steam') { ctx.fillStyle = `rgba(220,220,225,${0.5 * k})`; ctx.beginPath(); ctx.arc(e.x, e.y, e.r, 0, Math.PI * 2); ctx.fill(); }
+    else if (e.k === 'smoke') { const c = e.c || 90; ctx.fillStyle = `rgba(${c},${c},${c + 5},${0.55 * k})`; ctx.beginPath(); ctx.arc(e.x, e.y, e.r, 0, Math.PI * 2); ctx.fill(); }
+    else if (e.k === 'mote') { ctx.fillStyle = e.c; ctx.globalAlpha = k; ctx.fillRect(e.x - 2, e.y - 2, 4, 4); ctx.globalAlpha = 1; }
+    else if (e.k === 'fire') {   // 불덩이: 흰 → 노랑 → 주황 → 검붉은
+      const c = k > 0.8 ? '255,255,230' : k > 0.55 ? '255,214,90' : k > 0.3 ? '255,120,30' : '120,30,20';
+      ctx.fillStyle = `rgba(${c},${Math.min(1, k * 1.6)})`; ctx.beginPath(); ctx.arc(e.x, e.y, e.r, 0, Math.PI * 2); ctx.fill();
+    }
+    else if (e.k === 'rocket') { ctx.fillStyle = '#5a5f52'; ctx.fillRect(e.x - 16, e.y - 4, 32, 8); ctx.fillStyle = '#c33'; ctx.fillRect(e.x + e.dir * 12 - 4, e.y - 4, 8, 8); star(e.x - e.dir * 20, e.y, 9, '#ffcf5a'); }
     else if (e.k === 'shell') { ctx.fillStyle = '#e8c35a'; ctx.fillRect(e.x - 2, e.y - 1, 5, 3); }
     else if (e.k === 'beam') {
-      const x2 = e.dir > 0 ? W : 0, w = e.w * k;
-      ctx.fillStyle = `rgba(160,220,255,${0.5 * k})`; ctx.fillRect(Math.min(e.x, x2), e.y - w, Math.abs(x2 - e.x), w * 2);
-      ctx.fillStyle = `rgba(255,255,255,${k})`; ctx.fillRect(Math.min(e.x, x2), e.y - w * 0.35, Math.abs(x2 - e.x), w * 0.7);
+      const x2 = e.dir > 0 ? W : 0, w = e.w * (0.4 + 0.6 * k), x0 = Math.min(e.x, x2), len = Math.abs(x2 - e.x);
+      ctx.globalAlpha = 0.45 * k; ctx.fillStyle = e.c || '#a0dcff'; ctx.fillRect(x0, e.y - w, len, w * 2);
+      if (e.lv >= 2) { ctx.strokeStyle = e.c; ctx.lineWidth = 2; ctx.beginPath(); for (let x = 0; x <= len; x += 24) ctx.lineTo(x0 + x, e.y - w * 1.2 + Math.random() * w * 2.4); ctx.stroke(); }
+      ctx.globalAlpha = k; ctx.fillStyle = '#fff'; ctx.fillRect(x0, e.y - w * 0.35, len, w * 0.7); ctx.globalAlpha = 1;
     }
     else if (e.k === 'burst') {
       const r = 18 + 60 * (1 - k); ctx.strokeStyle = `rgba(230,245,255,${k})`; ctx.lineWidth = 3;
@@ -610,19 +729,32 @@ function drawFx() {
     else if (e.k === 'icon') { const a = A[P.clip ? P.clip.id : '1']; const y = P.y - (a.floor - a.top[curF()]) * K(P.y) - 40; ctx.fillStyle = '#ff4a3a'; ctx.font = 'bold 44px sans-serif'; ctx.fillText(e.v, P.x - 8, y); }
   }
 }
+function drawHeat() {
+  if (P.heat < 50 || !P.armed) return;
+  const p = muzzle(), a = (P.heat - 50) / 50;
+  const g = ctx.createRadialGradient(p.x - P.face * 14, p.y, 0, p.x - P.face * 14, p.y, 22);
+  g.addColorStop(0, `rgba(255,${P.overT > 0 ? 60 : 120},30,${0.8 * a})`); g.addColorStop(1, 'rgba(255,80,20,0)');
+  ctx.fillStyle = g; ctx.beginPath(); ctx.arc(p.x - P.face * 14, p.y, 22, 0, Math.PI * 2); ctx.fill();
+}
 function drawChargeAim() {
   if (P.mode !== 'charge') return;
-  const p = muzzle(), lv = P.charge > 1.3 ? 2 : P.charge > 0.5 ? 1 : 0;
+  const p = muzzle(), lv = P.charge >= 2 ? 3 : P.charge > 1.3 ? 2 : P.charge > 0.5 ? 1 : 0;
+  const orb = 4 + P.charge * 9 + Math.sin(P.t * 30) * 2;
+  const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, orb * 2.2); g.addColorStop(0, '#fff'); g.addColorStop(0.4, CH_COL[lv]); g.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.fillStyle = g; ctx.beginPath(); ctx.arc(p.x, p.y, orb * 2.2, 0, Math.PI * 2); ctx.fill();
   const w = Math.max(1, 6 - P.charge * 3.5);
   ctx.strokeStyle = lv === 2 ? 'rgba(160,220,255,.9)' : 'rgba(255,90,74,.75)'; ctx.lineWidth = w;
   ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(P.face > 0 ? W : 0, p.y); ctx.stroke();
   for (let i = 0; i < 3; i++) { const a = Math.random() * Math.PI * 2, r = 40 + Math.random() * 30; ctx.fillStyle = lv === 2 ? '#bfe8ff' : '#fff'; ctx.fillRect(p.x + Math.cos(a) * r * (1 - (P.charge % 0.3) / 0.3), p.y + Math.sin(a) * r * (1 - (P.charge % 0.3) / 0.3), 3, 3); }
-  if (lv) { ctx.fillStyle = '#fff'; ctx.font = 'bold 18px sans-serif'; ctx.fillText(lv === 2 ? '2단' : '1단', P.x - 14, P.y - 250); }
+  if (lv) { ctx.fillStyle = CH_COL[lv]; ctx.font = 'bold 20px sans-serif'; ctx.fillText(['', '1단', '2단', '최대'][lv], P.x - 16, P.y - 250 * K(P.y)); }
 }
 function drawHud() {
   ctx.fillStyle = '#000a'; ctx.fillRect(20, 20, 260, 16);
   ctx.fillStyle = P.hp <= 25 ? (Math.sin(P.t * 7) > 0 ? '#ff2a2a' : '#8a1010') : '#5fd17a'; ctx.fillRect(20, 20, 260 * P.hp / 100, 16);
   ctx.fillStyle = '#fff'; ctx.font = 'bold 13px sans-serif'; ctx.fillText(`에일린 HP ${P.hp}`, 26, 33);
+  ctx.fillStyle = '#000a'; ctx.fillRect(20, 40, 160, 9);
+  ctx.fillStyle = P.overT > 0 ? (Math.sin(P.t * 16) > 0 ? '#ff3a2a' : '#7a1a10') : P.heat > 70 ? '#ff8a2a' : '#f2c14e'; ctx.fillRect(20, 40, 160 * P.heat / 100, 9);
+  ctx.fillStyle = '#fff'; ctx.font = '11px sans-serif'; ctx.fillText(P.overT > 0 ? `과열! ${P.overT.toFixed(1)}초` : '총열 열', 186, 49);
 }
 function drawDying() {
   if (P.hp > 25) return;
@@ -634,12 +766,14 @@ function drawDying() {
 }
 function draw() {
   ctx.save();
+  if (zoom) { ctx.translate(zx, zy); ctx.scale(1 + zoom, 1 + zoom); ctx.translate(-zx, -zy); }
   if (shake) ctx.translate((Math.random() - 0.5) * shake, (Math.random() - 0.5) * shake);
   drawBg();
   if (dark) { ctx.fillStyle = `rgba(0,0,0,${Math.min(0.7, dark * 0.9)})`; ctx.fillRect(0, 0, W, H); }
   drawFxUnder();
   if (D.y < P.y) { drawDummy(); drawPlayer(); } else { drawPlayer(); drawDummy(); }
   drawChargeAim();
+  drawHeat();
   drawFx();
   ctx.restore();
   drawDying();
