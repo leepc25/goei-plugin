@@ -12,7 +12,7 @@ DOC = OUT.parents[3] / "docs/동작표/1.4_에일린.md"
 LOG = OUT.parent / "spend.log"
 PICKS = OUT / "picks.json"   # {"전투 자세 장": ["3-0", 3], "무기 자세 장": ["W", 3], "5번 한 장": ["5", 2], ...}
 MAXQ = 10
-DIRS = {"E": "east", "SE": "south-east"}
+DIRS = {"E": "east", "SE": "south-east", "SW": "south-west"}
 lock = threading.Lock()
 
 def log(msg):
@@ -80,7 +80,7 @@ def frame_ref(ref, r):
     """표의 장 이름 → 그림. None = 그 칸 비움(등록 그림 = API 기본)."""
     ref = ref.replace("*", "").strip()
     if ref.startswith("등록"): return "REG"
-    m = re.match(r"(\d+(-\d+)?)번? 끝 장$", ref)
+    m = re.match(r"(\d+(?:-\d+)?(?:_[A-Z]+)?)번? 끝 장$", ref)
     if m:
         fr = load_frames(m[1])
         if not fr: raise RuntimeError(f"{m[1]} 결과 없음")
