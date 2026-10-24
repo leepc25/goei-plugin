@@ -1,6 +1,6 @@
 """PixelLab generate-image-v2로 배경 한 장. 인증은 프록시가 넣는다.
 사용: python3 gen_bg.py <프롬프트.txt> <화풍그림> <출력.png> <가로> <세로> [화풍그림 축소배율]"""
-import base64, io, json, sys, time
+import base64, io, json, os, sys, time
 import requests
 from PIL import Image
 
@@ -24,6 +24,9 @@ body = {"description": open(prompt_path, encoding="utf-8").read().strip(), "imag
         "no_background": False}
 if style:
     body["style_image"] = style
+    # STYLE_NO_COLOR=1이면 화풍 그림의 색(팔레트)은 가져오지 않는다(윤곽·디테일·명암만).
+    if os.environ.get("STYLE_NO_COLOR") == "1":
+        body["style_options"] = {"color_palette": False, "outline": True, "detail": True, "shading": True}
 t0 = time.time()
 r = requests.post(API + "/generate-image-v2", json=body, timeout=60)
 if r.status_code >= 300:
