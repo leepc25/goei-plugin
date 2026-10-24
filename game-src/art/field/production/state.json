@@ -26638,7 +26638,11 @@
         "type": "generations",
         "generations": 3
       },
-      "saved_frames": 12
+      "saved_frames": 12,
+      "visual_rejection": {
+        "reason": "Face holes in frame 5 and gray foot exterior in frame 7; add intermediate rotation angle.",
+        "standalone": true
+      }
     },
     "99276a0e-7f7d-4266-ad3d-3a5826fe8f5a": {
       "kind": "animation",
@@ -26736,7 +26740,11 @@
         "type": "generations",
         "generations": 3
       },
-      "saved_frames": 8
+      "saved_frames": 8,
+      "visual_rejection": {
+        "reason": "Face/hair holes in frame 5 and stray pixels in frame 6; lower head tilt and use deeper knee bend.",
+        "standalone": true
+      }
     },
     "b2e2ca3b-ce95-48c7-a05f-1aa1c6bb8deb": {
       "kind": "animation",
@@ -26840,7 +26848,7 @@
       "kind": "animation",
       "slug": "jyaldi",
       "template": "backflip",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792799775.1020453,
       "receipt": {
         "usage": null,
@@ -26850,23 +26858,139 @@
       "endpoint": "animate-with-skeleton-v3",
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 3.0
         },
         "id": "61a3ec4e-de54-499f-a700-7750aa3cac75",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-23T23:56:16.784589+00:00",
         "last_response": {
-          "type": "message_progress",
-          "action": "generating",
+          "seed": 2026102705,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
           "status": "initializing",
-          "progress": 0.18148678179288374,
+          "progress": 1.0,
           "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "9f05acd7-4070-441a-900e-4abf99a14cb9",
           "queue_position": 0,
+          "billing_charged": true,
           "generation_started_at": "2026-10-23T23:57:14.128584+00:00",
           "estimated_wait_seconds": 0
         }
-      }
+      },
+      "observed_end_epoch": 1792800018.4151063,
+      "elapsed_observed_seconds": 243.31306147575378,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 12
+    },
+    "f12abd78-49c6-4558-8a6f-ee68a5e99669": {
+      "kind": "animation",
+      "slug": "jyaldi",
+      "template": "front-flip",
+      "status": "processing",
+      "created_epoch": 1792800237.5575101,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "f12abd78-49c6-4558-8a6f-ee68a5e99669",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3"
+    },
+    "a22f34bb-be49-41c0-9537-cd17aca48365": {
+      "kind": "animation",
+      "slug": "jyaldi",
+      "template": "picking-up",
+      "status": "processing",
+      "created_epoch": 1792800238.9408228,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "a22f34bb-be49-41c0-9537-cd17aca48365",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3"
     }
   },
   "characters": {
@@ -26893,10 +27017,10 @@
         "two-footed-jump": "4674f370-f7aa-4841-94c7-b7c1fe8adb2f",
         "cross-punch": "abcd5997-80d8-4545-9c3e-a78739f74f37",
         "running-slide": "0cc1f03b-baf8-4cba-8b49-7151ad7ace0b",
-        "front-flip": "22fce3f7-2e89-4fe9-a3af-8bbbbc2cfa85",
-        "picking-up": "99276a0e-7f7d-4266-ad3d-3a5826fe8f5a",
         "throw-object": "b2e2ca3b-ce95-48c7-a05f-1aa1c6bb8deb",
-        "backflip": "61a3ec4e-de54-499f-a700-7750aa3cac75"
+        "backflip": "61a3ec4e-de54-499f-a700-7750aa3cac75",
+        "front-flip": "f12abd78-49c6-4558-8a6f-ee68a5e99669",
+        "picking-up": "a22f34bb-be49-41c0-9537-cd17aca48365"
       },
       "ready": true,
       "rebuild_after_direction_policy": true,
@@ -46199,9 +46323,65 @@
         },
         "detail": null
       }
+    },
+    {
+      "at": "2026-10-24T00:00:18Z",
+      "kind": "completed",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "backflip",
+        "job_id": "61a3ec4e-de54-499f-a700-7750aa3cac75",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T00:00:22Z",
+      "kind": "exported",
+      "slug": "jyaldi",
+      "detail": {
+        "bytes": 668391,
+        "files": 64,
+        "production_pack_clips": 20
+      }
+    },
+    {
+      "at": "2026-10-24T00:03:58Z",
+      "kind": "submitted",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "front-flip",
+        "job_id": "f12abd78-49c6-4558-8a6f-ee68a5e99669",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "f12abd78-49c6-4558-8a6f-ee68a5e99669",
+          "status": "processing"
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T00:03:59Z",
+      "kind": "submitted",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "picking-up",
+        "job_id": "a22f34bb-be49-41c0-9537-cd17aca48365",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "a22f34bb-be49-41c0-9537-cd17aca48365",
+          "status": "processing"
+        }
+      }
     }
   ],
-  "updated_at": 1792799916.701935,
+  "updated_at": 1792800239.3518615,
   "user_stopped_at": 1792778235.6917784,
   "archived_jobs": {
     "304457e9-6577-44f0-af17-97841a9f6720": {
@@ -47520,11 +47700,11 @@
       "saved_frames": 6
     }
   },
-  "last_git_checkpoint": 1792799561.587209,
+  "last_git_checkpoint": 1792799918.8331583,
   "summary": {
     "jobs": {
-      "processing": 1,
-      "completed": 315,
+      "processing": 2,
+      "completed": 316,
       "failed": 9,
       "stalled": 0
     },

@@ -1,0 +1,20 @@
+{
+  "at": 1792800227.5148778,
+  "job_id": "61a3ec4e-de54-499f-a700-7750aa3cac75",
+  "result": "reroll-required",
+  "findings": "Frame 6 has a large gray painted exterior beside the torso; reject and adjust intermediate rotation poses.",
+  "frame_count": 12,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}
