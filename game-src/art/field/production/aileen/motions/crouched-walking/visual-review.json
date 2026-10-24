@@ -1,13 +1,13 @@
 {
-  "at": 1792807294.679614,
-  "job_id": "46cd568a-1485-4a9d-9a13-b30c0bb01051",
+  "at": 1792808315.908935,
+  "job_id": "970167c6-8bec-410a-9164-5e405ab367b7",
   "result": "reroll-required",
-  "findings": "1번째 아래쪽 발이 캔버스에서 잘림. 전체 높이와 발 좌표를 제한한 본인 관절 재작업 필요.",
-  "frame_count": 6,
+  "findings": "7번째 얼굴 앞 대형 회색 면, 여러 프레임 포니테일 회색 평면. 참조를 정상 가드 실측으로 변경해 전체 재작업.",
+  "frame_count": 8,
   "directions": [
     "east"
   ],
-  "actual_template": "crouched-walking",
+  "actual_template": "custom-skeleton",
   "new_user_approval": false,
   "rules_rechecked": [
     "AVIF identity primary",

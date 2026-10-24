@@ -1,13 +1,13 @@
 {
-  "at": 1792807337.8854346,
-  "job_id": "9d222834-64bd-4f65-9961-1a4e5394d69d",
-  "result": "reroll-required",
-  "findings": "마젠타 확대에서 포니테일 아래 회색 세로 잔상과 면 확인. 금발 머리 자체의 음영과 구별, 외곽 불량으로 반려.",
+  "at": 1792808279.948343,
+  "job_id": "1e0a9c2c-3942-48e7-b284-89a703da3c56",
+  "result": "pass",
+  "findings": "8프레임 전체 확인. 머리에 손을 대고 작게 걷는 풀죽은 동작, 동쪽 방위와 금발 포니테일·바지 정장·체격 유지. 외곽 회색 면/잘림/투명 구멍 없음.",
   "frame_count": 8,
   "directions": [
     "east"
   ],
-  "actual_template": "sad-walk",
+  "actual_template": "custom-skeleton",
   "new_user_approval": false,
   "rules_rechecked": [
     "AVIF identity primary",

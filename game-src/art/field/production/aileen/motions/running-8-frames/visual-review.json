@@ -1,13 +1,13 @@
 {
-  "at": 1792807686.0491812,
-  "job_id": "01f17a00-0eee-49e9-8b50-54af4860ff37",
+  "at": 1792808280.0868776,
+  "job_id": "f00d15ee-3b58-427d-8133-90e79d287869",
   "result": "reroll-required",
-  "findings": "포니테일 끝 회색 면 특히 2·3·6·7번째. 달리기 팔 관절 궤적과 실제 참조 정합 수정 필요.",
+  "findings": "4번째 머리카락 끝 회색 테두리 덩어리, 8번째 앞발 끝 회색 꼬리. 2·6번째 머리카락 끝도 거칠어 해당 자세 보정 필요.",
   "frame_count": 8,
   "directions": [
     "east"
   ],
-  "actual_template": "running-8-frames",
+  "actual_template": "custom-skeleton",
   "new_user_approval": false,
   "rules_rechecked": [
     "AVIF identity primary",

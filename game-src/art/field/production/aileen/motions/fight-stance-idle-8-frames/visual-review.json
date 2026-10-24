@@ -1,13 +1,13 @@
 {
-  "at": 1792807663.1812155,
-  "job_id": "6e00595c-7d91-4320-ab72-27424e97ee97",
+  "at": 1792808291.988926,
+  "job_id": "523b81e5-836f-4581-9bdd-767b51b4b964",
   "result": "reroll-required",
-  "findings": "1·2·6번째 포니테일 끝 회색 면 및 아래로 늘어진 잔상.",
-  "frame_count": 8,
+  "findings": "전 프레임 포니테일이 회색 면/고리로 변형됨. 정상 지상 가드 참조로 교체 필요.",
+  "frame_count": 4,
   "directions": [
     "east"
   ],
-  "actual_template": "fight-stance-idle-8-frames",
+  "actual_template": "custom-skeleton",
   "new_user_approval": false,
   "rules_rechecked": [
     "AVIF identity primary",

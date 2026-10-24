@@ -1,0 +1,20 @@
+{
+  "at": 1792807655.4884515,
+  "job_id": "397540b8-892b-4d6e-ab1e-fd52471c681a",
+  "result": "reroll-required",
+  "findings": "4번째 손 오른쪽 경계 접촉 및 회색 손 외곽, 6번째 포니테일 회색 늘어짐.",
+  "frame_count": 7,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "throw-object",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

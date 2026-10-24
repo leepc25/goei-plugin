@@ -1,13 +1,13 @@
 {
-  "at": 1792807366.8330305,
-  "job_id": "490758e4-b763-4f05-a4a7-4d959c421d54",
+  "at": 1792808329.4911175,
+  "job_id": "4f5af81e-2821-4551-a8ea-79cdfba35c2f",
   "result": "reroll-required",
-  "findings": "5번째 손/팔 위 경계 잘림,7·8번째 얼굴/팔/다리 주위 큰 회색 면, 여러 포니테일 회색 잔상. 본인 제한된9자세로 재작업.",
-  "frame_count": 10,
+  "findings": "2·5번째 얼굴/머리 투명 파괴, 3·6·7번째 머리/손 회색 외곽 덩어리. 정상 참조와 맞춘 재작업 필요.",
+  "frame_count": 9,
   "directions": [
     "east"
   ],
-  "actual_template": "backflip",
+  "actual_template": "custom-skeleton",
   "new_user_approval": false,
   "rules_rechecked": [
     "AVIF identity primary",

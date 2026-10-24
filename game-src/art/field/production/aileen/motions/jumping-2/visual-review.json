@@ -1,0 +1,20 @@
+{
+  "at": 1792808167.8750305,
+  "job_id": "0c838ac4-ea02-4932-84f4-74a6070d3464",
+  "result": "pass",
+  "findings": "8프레임 전체 확인. 동쪽 가드 자세 도약과 착지, 금발 포니테일/검정 바지 정장/체격 유지. 외곽 회색 매트·잘림·투명 손상 없음.",
+  "frame_count": 8,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

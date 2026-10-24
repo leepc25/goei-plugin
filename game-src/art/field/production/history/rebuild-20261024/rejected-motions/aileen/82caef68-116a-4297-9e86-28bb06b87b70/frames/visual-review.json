@@ -1,0 +1,20 @@
+{
+  "at": 1792807337.8854346,
+  "job_id": "9d222834-64bd-4f65-9961-1a4e5394d69d",
+  "result": "reroll-required",
+  "findings": "마젠타 확대에서 포니테일 아래 회색 세로 잔상과 면 확인. 금발 머리 자체의 음영과 구별, 외곽 불량으로 반려.",
+  "frame_count": 8,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "sad-walk",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

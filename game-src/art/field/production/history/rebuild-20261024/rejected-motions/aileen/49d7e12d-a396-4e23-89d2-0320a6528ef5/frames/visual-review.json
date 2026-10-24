@@ -1,0 +1,20 @@
+{
+  "at": 1792807693.9905872,
+  "job_id": "63f11ca8-0bb6-43a9-b01b-0b45af85765c",
+  "result": "reroll-required",
+  "findings": "포니테일 회색 띠 및 6·7번째 머리카락 바깥 큰 회색 잔상.",
+  "frame_count": 8,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "running-jump",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

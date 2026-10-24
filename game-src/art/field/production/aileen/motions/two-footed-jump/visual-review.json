@@ -1,0 +1,20 @@
+{
+  "at": 1792808129.209618,
+  "job_id": "44166189-82df-4f97-9e28-dbdb8b64a266",
+  "result": "pass",
+  "findings": "8프레임 전체 확인. 금발 높은 포니테일·검정 바지 정장·체격 유지, 동쪽 두발 도약/착지. 머리카락 음영은 연속된 가닥 내부이며 바깥 회색 매트 면·잘림·투명 구멍 없음.",
+  "frame_count": 8,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

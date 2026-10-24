@@ -1,7 +1,15 @@
 {
   "job_status": "completed",
-  "frame_count": 6,
+  "frame_count": 8,
   "sizes": [
+    [
+      256,
+      256
+    ],
+    [
+      256,
+      256
+    ],
     [
       256,
       256
@@ -32,6 +40,6 @@
     "type": "generations",
     "generations": 3
   },
-  "elapsed_observed_seconds": 639.0598132610321,
+  "elapsed_observed_seconds": 198.70051264762878,
   "visual_approval": false
 }

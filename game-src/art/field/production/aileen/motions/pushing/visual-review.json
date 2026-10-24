@@ -1,13 +1,13 @@
 {
-  "at": 1792807708.4918427,
-  "job_id": "32a66515-c84f-4e4e-a964-1732d1110899",
+  "at": 1792808355.259789,
+  "job_id": "5dd63261-e259-416c-892b-d58501ab8e11",
   "result": "reroll-required",
-  "findings": "5·6번째 포니테일 회색 잔상과 전신 노이즈/투명 손상. 주먹 대신 미는 손과 팔 궤적 수정.",
-  "frame_count": 6,
+  "findings": "1번째 손 회색 잔상, 3번째 엉덩이 뒤 큰 회색 면 및 5번째 분리 회색 덩어리. 지상 가드 실측 참조로 변경 필요.",
+  "frame_count": 8,
   "directions": [
     "east"
   ],
-  "actual_template": "pushing",
+  "actual_template": "custom-skeleton",
   "new_user_approval": false,
   "rules_rechecked": [
     "AVIF identity primary",

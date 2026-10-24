@@ -1,13 +1,13 @@
 {
-  "at": 1792807640.5935512,
-  "job_id": "1e4ca37b-b652-4121-ad22-271d9c0f7b18",
+  "at": 1792808341.9941044,
+  "job_id": "bee49ff3-4ec7-4708-a9b0-3e53974164cb",
   "result": "reroll-required",
-  "findings": "3번째 포니테일 끝 큰 회색 면 및 손 외곽 잔상. 4번째 전면 신체와 소품 오른쪽 캔버스 잘림.",
-  "frame_count": 5,
+  "findings": "외곽은 대체로 정상이나 손이 무릎 위에 머물러 물건을 집는 궤적이 성립하지 않음. 더 깊은 굽힘과 손의 아래쪽 도달 궤적 필요.",
+  "frame_count": 8,
   "directions": [
     "east"
   ],
-  "actual_template": "picking-up",
+  "actual_template": "custom-skeleton",
   "new_user_approval": false,
   "rules_rechecked": [
     "AVIF identity primary",

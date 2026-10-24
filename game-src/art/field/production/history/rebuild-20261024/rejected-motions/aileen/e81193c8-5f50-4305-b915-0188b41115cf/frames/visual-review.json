@@ -1,0 +1,20 @@
+{
+  "at": 1792807366.8330305,
+  "job_id": "490758e4-b763-4f05-a4a7-4d959c421d54",
+  "result": "reroll-required",
+  "findings": "5번째 손/팔 위 경계 잘림,7·8번째 얼굴/팔/다리 주위 큰 회색 면, 여러 포니테일 회색 잔상. 본인 제한된9자세로 재작업.",
+  "frame_count": 10,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "backflip",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

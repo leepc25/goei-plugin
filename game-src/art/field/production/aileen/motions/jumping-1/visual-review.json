@@ -1,0 +1,20 @@
+{
+  "at": 1792808129.3618877,
+  "job_id": "5a82b49c-23cd-42e3-9ebb-6d5ad82a2b4b",
+  "result": "reroll-required",
+  "findings": "두번째 프레임 포니테일 끝 회색 덩어리. 나머지 정상 프레임을 보존하며 해당 자세 후보를 재생성.",
+  "frame_count": 8,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}
