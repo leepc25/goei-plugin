@@ -1,0 +1,20 @@
+{
+  "at": 1792802508.3292532,
+  "job_id": "0d5d5df5-a91e-4d87-8633-ecc603538d9c",
+  "result": "reroll-required",
+  "findings": "Raised rear arm and separated shorts-like black hems in airborne frames 3-4 depart from the skirt silhouette; use a restrained own-body jump trajectory preserving skirt.",
+  "frame_count": 8,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "running-jump",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

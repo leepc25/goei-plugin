@@ -1,0 +1,20 @@
+{
+  "at": 1792802601.3121004,
+  "job_id": "74674eff-c597-48da-a98f-332e065866c9",
+  "result": "pass",
+  "findings": "All eight own-rig frames inspected: feet kept together in tuck, stable standing endpoints, own silhouette retained, clean face/hair and transparent exterior.",
+  "frame_count": 8,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

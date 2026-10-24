@@ -1,0 +1,20 @@
+{
+  "at": 1792802601.7828772,
+  "job_id": "6982a605-edfc-4440-8c5f-4b715b3f9729",
+  "result": "reroll-required",
+  "findings": "Frame 5 has damaged transparent lower legs; middle frames turn away from intended visible west profile. Replace with controlled side-facing slide.",
+  "frame_count": 6,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "running-slide",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

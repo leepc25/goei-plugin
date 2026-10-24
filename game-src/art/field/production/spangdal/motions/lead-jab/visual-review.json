@@ -1,0 +1,20 @@
+{
+  "at": 1792802601.5467062,
+  "job_id": "4cf5d376-176e-4f4d-ae08-bb746d2350a7",
+  "result": "pass",
+  "findings": "All three regenerated frames inspected: near left-arm jab visible, stable stance and body identity, no gray hand polygon or holes. Guard frames followed by extension; loop returns to guard.",
+  "frame_count": 3,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

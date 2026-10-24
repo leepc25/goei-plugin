@@ -1,0 +1,20 @@
+{
+  "at": 1792802611.966565,
+  "job_id": "643377e4-36a4-4a29-9438-455e82e06c31",
+  "result": "reroll-required",
+  "findings": "Frame 5 face and legs disintegrate with missing pixels; airborne poses have excessive extension and unstable skirt. Use compact own-body rotation.",
+  "frame_count": 6,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "front-flip",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

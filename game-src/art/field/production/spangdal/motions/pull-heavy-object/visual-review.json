@@ -1,0 +1,20 @@
+{
+  "at": 1792802508.0844166,
+  "job_id": "6d6586d6-7391-4a07-85a8-57b76ee10eed",
+  "result": "pass",
+  "findings": "All six west frames inspected: consistent handle-like prop, connected hands, stable pulling stance, purple bob and skirt suit retained; no gray halo or body holes.",
+  "frame_count": 6,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "pull-heavy-object",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "at": 1792802302.034144,
+  "job_id": "628133da-1d7d-4b81-b5d8-a4098921d739",
+  "result": "pass",
+  "findings": "All four south-west idle frames inspected: purple asymmetric wavy bob, visible eye, skirt suit and pumps retained; restrained breathing, unchanged stature, no gray exterior paint or transparency holes.",
+  "frame_count": 4,
+  "directions": [
+    "south-west"
+  ],
+  "actual_template": "breathing-idle",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

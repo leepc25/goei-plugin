@@ -1,0 +1,20 @@
+{
+  "at": 1792802507.9581144,
+  "job_id": "7778bc41-67b6-483d-b2af-8844bbcc4775",
+  "result": "pass",
+  "findings": "All eight west frames inspected: bowed head and short steps, own purple bob and skirt suit/pumps retained, no gray exterior paint or holes.",
+  "frame_count": 8,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "sad-walk",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "at": 1792802508.611264,
+  "job_id": "e44d35d3-0cb1-4d9d-856d-14098f085508",
+  "result": "reroll-required",
+  "findings": "Frame 3 contains gray inner-arm exterior and elongated malformed hand; later hand/arm poses are inconsistent. Use shallower head bend and explicit reach.",
+  "frame_count": 5,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "picking-up",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

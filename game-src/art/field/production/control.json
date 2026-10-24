@@ -241,7 +241,8 @@
     "spangdal": {
       "jumping-1": "game-src/art/field/production/motion-inputs/spangdal/jumping-1-v1/spec.json",
       "jumping-2": "game-src/art/field/production/motion-inputs/spangdal/jumping-2-v1/spec.json",
-      "two-footed-jump": "game-src/art/field/production/motion-inputs/spangdal/two-footed-jump-v1/spec.json"
+      "two-footed-jump": "game-src/art/field/production/motion-inputs/spangdal/two-footed-jump-v1/spec.json",
+      "lead-jab": "game-src/art/field/production/motion-inputs/spangdal/lead-jab-v1/spec.json"
     }
   }
 }

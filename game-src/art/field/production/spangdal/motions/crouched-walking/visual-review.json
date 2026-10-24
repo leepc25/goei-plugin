@@ -1,0 +1,20 @@
+{
+  "at": 1792802601.9062643,
+  "job_id": "5261e3f4-30e6-4c1a-88db-0dac3e6a0464",
+  "result": "reroll-required",
+  "findings": "Frame 5 front lower leg and shoe contain missing pixels/transparent damage; reroll using a controlled shallower own-body crouch gait.",
+  "frame_count": 6,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "crouched-walking",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "at": 1792802601.66421,
+  "job_id": "3187f398-c14c-4675-a218-c22f4c3b6eb0",
+  "result": "reroll-required",
+  "findings": "Rear elbow rises behind head in frames 4-6 and arm pose jumps unnaturally; use controlled restrained arm cycle from own landmarks.",
+  "frame_count": 8,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "running-8-frames",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

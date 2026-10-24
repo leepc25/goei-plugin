@@ -1,0 +1,20 @@
+{
+  "at": 1792802601.0720048,
+  "job_id": "1c9f81ee-20eb-435b-9a9a-ad8fc62c19e5",
+  "result": "pass",
+  "findings": "All eight own-rig frames inspected: compact jump and landing, full body within canvas, intact face and skirt. Back hair inspected at 6x on magenta: purple hair tips rather than gray painted exterior.",
+  "frame_count": 8,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}
