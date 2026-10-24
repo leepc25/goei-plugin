@@ -65,7 +65,15 @@ for aid, folder, d, name in LIST:
     buf = io.BytesIO(); sheet.save(buf, "PNG", optimize=True)  # WebP는 일부 앱 보기 화면에서 안 나옴
     data[aid] = dict(name=name, dir=d, n=len(ims), w=w, h=h, bot=bot, top=top, reach=reach, foot=foot, mz=mz, floor=max(bot),
                      src="data:image/png;base64," + base64.b64encode(buf.getvalue()).decode())
-html = (HERE / "room.html").read_text(encoding="utf-8").replace("/*__DATA__*/null", json.dumps(data, ensure_ascii=False)).replace("/*__AUDIO__*/", (HERE / "audio.js").read_text(encoding="utf-8"))
+# PixelLab VFX(이펙트 그림): vfx/<이름>.png + .json
+VFX = {}
+for js in sorted((HERE.parent / "vfx").glob("*.json")):
+    meta = json.loads(js.read_text())
+    png = js.with_suffix(".png").read_bytes()
+    VFX[js.stem] = dict(frames=[[f["frame"]["x"], f["frame"]["y"], f["frame"]["w"], f["frame"]["h"], f["duration"]] for f in meta["frames"]],
+                        pivot=[meta["frames"][0]["pivot"]["x"], meta["frames"][0]["pivot"]["y"]],
+                        src="data:image/png;base64," + base64.b64encode(png).decode())
+html = (HERE / "room.html").read_text(encoding="utf-8").replace("/*__DATA__*/null", json.dumps(data, ensure_ascii=False)).replace("/*__VFX__*/null", json.dumps(VFX)).replace("/*__AUDIO__*/", (HERE / "audio.js").read_text(encoding="utf-8"))
 out = M / "에일린_테스트룸.html"
 out.write_text(html, encoding="utf-8")
 print(out, out.stat().st_size // 1024, "KB")

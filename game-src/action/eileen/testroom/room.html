@@ -46,6 +46,9 @@ button.cap{border-color:var(--acc);color:var(--acc)}
 <script>
 const A = /*__DATA__*/null;
 const IMG = {}; for (const k in A) { IMG[k] = new Image(); IMG[k].src = A[k].src; }
+const VFX = /*__VFX__*/null || {}; for (const k in VFX) { VFX[k].img = new Image(); VFX[k].img.src = VFX[k].src; }
+// PixelLab 이펙트 그림 재생: 2배 도트로, 기준점(pivot)을 x,y에
+const vfx = (name, x, y, scale = 2) => { if (VFX[name]) fx.push({ k: 'sheet', name, x, y, s: scale, t0: VFX[name].frames.reduce((a, f) => a + f[4], 0) / 1000, t: VFX[name].frames.reduce((a, f) => a + f[4], 0) / 1000 }); };
 const has = id => !!A[id];
 const cv = document.getElementById('cv'); let ctx = cv.getContext('2d'); ctx.imageSmoothingEnabled = false;
 // 이펙트는 1/3 크기 층에 그려 도트로 키움(캐릭터 도트와 맞춤). 빛나는 것은 가산 혼합 층
@@ -244,6 +247,7 @@ function explode(x, y, gy, hitD) {
   sfx('hit', { strength: 3, kind: 'super' });
   shake = 24; flash = 0.22; if (hitD) hitstop = 0.2;
   fx.push({ k: 'ring', x, y, r0: 0, r: 60, t: 0.08, t0: 0.08, c: '#fff', w: 40, sy: 1 });
+  if (VFX['eileen-rpg-explosion']) { vfx('eileen-rpg-explosion', x, gy - 4, 2.4); ring(x, gy, 220, 0.45, 'rgba(255,230,180,.9)', 6, 0.28); fx.push({ k: 'scorch', x, y: gy, r: 90, t: 3.5 }); dust(x, gy, 10, 2); if (showDummy && Math.abs(D.x - x) < 200 && Math.abs(D.y - gy) < 70) hurtDummy(140, 'launch'); return; }
   for (let i = 0; i < 26; i++) { const a = Math.random() * Math.PI * 2, v = 80 + Math.random() * 380; fx.push({ k: 'fire', x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v * 0.7 - 60, r: 10 + Math.random() * 16, t: 0.5 + Math.random() * 0.4, t0: 0.9 }); }
   for (let i = 0; i < 16; i++) fx.push({ k: 'smoke', x: x + (Math.random() - 0.5) * 80, y: y + (Math.random() - 0.5) * 50, vx: (Math.random() - 0.5) * 60, vy: -40 - Math.random() * 70, r: 16 + Math.random() * 14, t: 1.4 + Math.random() * 0.6, t0: 2 });
   sparks(x, y, 40, true, '#ffb347');
@@ -716,6 +720,14 @@ function drawDummy() {
   if (D.mark > 0) { const y = hb - 28; ctx.strokeStyle = '#ff5a4a'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(D.x, y, 12 + Math.sin(P.t * 8) * 2, 0, Math.PI * 2); ctx.moveTo(D.x - 20, y); ctx.lineTo(D.x + 20, y); ctx.moveTo(D.x, y - 20); ctx.lineTo(D.x, y + 20); ctx.stroke(); }
   if (D.hits > 1) { ctx.fillStyle = '#ffe08a'; ctx.font = 'bold 30px sans-serif'; ctx.fillText(`${D.hits} HIT`, D.x + 40, hb + 20); }
 }
+function drawSheets() {
+  for (const e of fx) if (e.k === 'sheet') {
+    const v = VFX[e.name]; if (!v.img.complete) continue;
+    let el = (e.t0 - e.t) * 1000, i = 0; while (i < v.frames.length - 1 && el >= v.frames[i][4]) { el -= v.frames[i][4]; i++; }
+    const [fx0, fy0, fw, fh] = v.frames[i];
+    ctx.drawImage(v.img, fx0, fy0, fw, fh, Math.round(e.x - fw * v.pivot[0] * e.s), Math.round(e.y - fh * v.pivot[1] * e.s), fw * e.s, fh * e.s);
+  }
+}
 function drawFxUnder() {
   for (const e of fx) if (e.k === 'scorch') { ctx.fillStyle = `rgba(20,14,10,${0.55 * Math.min(1, e.t)})`; ctx.beginPath(); ctx.ellipse(e.x, e.y, e.r, e.r * 0.28, 0, 0, Math.PI * 2); ctx.fill(); }
   for (const e of fx) if (e.k === 'dust') { const k = e.t / e.t0; ctx.fillStyle = `rgba(200,190,170,${0.45 * k})`; ctx.beginPath(); ctx.arc(e.x, e.y - 4, e.r * (1.6 - k), 0, Math.PI * 2); ctx.fill(); }
@@ -823,6 +835,7 @@ function draw() {
   ctx = fxL; fxL.globalCompositeOperation = 'lighter'; drawChargeAim(); drawHeat(); drawFx(true);
   ctx = main;
   ctx.drawImage(fxNc, 0, 0, W, H);
+  drawSheets();
   ctx.globalCompositeOperation = 'lighter'; ctx.drawImage(fxLc, 0, 0, W, H); ctx.globalCompositeOperation = 'source-over';
   ctx.restore();
   drawDying();
