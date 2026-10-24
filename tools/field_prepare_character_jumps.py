@@ -6,7 +6,8 @@ from field_character_production import OUT,ROOT,atomic
 EDGES=[('NECK','NOSE'),('NECK','LEFT SHOULDER'),('NECK','RIGHT SHOULDER'),('LEFT SHOULDER','LEFT ELBOW'),('LEFT ELBOW','LEFT ARM'),('RIGHT SHOULDER','RIGHT ELBOW'),('RIGHT ELBOW','RIGHT ARM'),('LEFT SHOULDER','LEFT HIP'),('RIGHT SHOULDER','RIGHT HIP'),('LEFT HIP','LEFT KNEE'),('LEFT KNEE','LEFT LEG'),('RIGHT HIP','RIGHT KNEE'),('RIGHT KNEE','RIGHT LEG')]
 
 def main():
- p=argparse.ArgumentParser();p.add_argument('slug');a=p.parse_args();slug=a.slug
+ p=argparse.ArgumentParser();p.add_argument('slug');p.add_argument('--motion-scale',type=float,default=1.0);a=p.parse_args();slug=a.slug
+ assert 0<a.motion_scale<=1,'Only reduce displacement; never resize character pixels'
  s=json.loads((OUT/'state.json').read_text());c=s['characters'][slug]
  manifest=next(x for x in json.loads((OUT/'manifest.json').read_text()) if x['slug']==slug)
  ctl=json.loads((OUT/'control.json').read_text());direction=ctl.get('character_direction_overrides',{}).get(slug,{}).get('movement_and_combat','east')
@@ -24,7 +25,7 @@ def main():
   scale=own_length/ref_length
   # Slender, quiet Spangdal uses restrained movement; source landmarks keep her
   # individual proportions. No other character's pixels are used.
-  restraint=0.94 if slug=='spangdal' else 1.0
+  restraint=a.motion_scale*(0.94 if slug=='spangdal' else 1.0)
   frames=[]
   for f in source['request']['keypoints']:
    frame=[]
@@ -34,6 +35,7 @@ def main():
    assert all(0.03<=v['x']<=0.97 and 0.04<=v['y']<=0.95 for v in frame)
    frames.append(frame)
   spec={'slug':slug,'slot':slot,'character_id':c['character_id'],'skeleton_visually_reviewed':False,'first_frame_path':str((root/'first-frame.png').relative_to(ROOT)),'new_user_approval':False,'landmark_source':'current character own '+direction+' estimated 2d reference','request':{'description':manifest['appearance'],'action':slot.replace('-',' '),'direction':direction,'view':'low top-down','first_frame_keypoints':list(own.values()),'keypoints':frames,'template_id':'mannequin','seed':2026110000+index,'no_background':True}}
+  spec['motion_displacement_scale']=restraint
   target=root/(slot+'-v1');target.mkdir(exist_ok=True);atomic(target/'spec.json',spec)
   sheet=Image.new('RGBA',(1024,840),'#9baea6');draw=ImageDraw.Draw(sheet)
   for i,f in enumerate([list(own.values()),*frames]):

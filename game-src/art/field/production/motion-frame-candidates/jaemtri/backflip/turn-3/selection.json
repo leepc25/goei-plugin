@@ -1,0 +1,9 @@
+{
+  "frame_index": 5,
+  "source_job_id": "a2ffabd5-ec0c-4076-85f1-e491aa7d2978",
+  "source_frame_index": 1,
+  "target_pose_index": 5,
+  "source_path": "motion-frame-candidates/jaemtri/backflip/turn-3/frames/1.png",
+  "sha256": "bd7f1976ad2f6eaa54e4f9964563a508fae9889328ab85bfdd364957e16fbe5a",
+  "findings": "재측정한 같은 방향 회전 참조로 목표 뒤회전 자세 일치. 얼굴/머리/손발과 신발 외곽 정상, 회색 덩어리 없음."
+}

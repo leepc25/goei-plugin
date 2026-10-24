@@ -1,0 +1,10 @@
+{
+  "character_id": "558c27ed-873c-4207-9099-171bb64a09b2",
+  "mode": "skeleton-v3",
+  "template_animation_id": "cross-punch",
+  "directions": [
+    "east"
+  ],
+  "animation_name": "스트레이트 (동쪽)",
+  "action_description": "cross punch. Preserve this character identity, costume, hair and native proportions. Keep a clean transparent silhouette in every frame. No gray painted patches, gray halo, ground shadow or opaque background around hair, hands, clothes or feet."
+}

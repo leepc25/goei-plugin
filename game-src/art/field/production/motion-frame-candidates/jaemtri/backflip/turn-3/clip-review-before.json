@@ -1,0 +1,91 @@
+{
+  "at": 1792806527.0666938,
+  "job_id": "eb443f25-dd14-4633-ab0a-39a595fe2928",
+  "result": "reroll-required",
+  "findings": "준비/역전/하강3자세 교체. 6번째 동일 자세 후보3장 모두 신발 뒤 회색 덩어리로 반려, 깨끗한 본인 역전 프레임으로 참조 변경 필요.",
+  "frame_count": 9,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ],
+  "frame_assembly": {
+    "base_job_id": "eb443f25-dd14-4633-ab0a-39a595fe2928",
+    "frame_sources": [
+      {
+        "frame_index": 0,
+        "source_job_id": "eb443f25-dd14-4633-ab0a-39a595fe2928",
+        "source_frame_index": 0,
+        "sha256": "d0b40ac7aeab782f63d01ce889238503651c389d93d7716264c993ff608b91d2"
+      },
+      {
+        "frame_index": 1,
+        "source_job_id": "0e625b9e-9e57-45b9-84b4-83c15f014587",
+        "source_frame_index": 1,
+        "target_pose_index": 1,
+        "source_path": "motion-frame-candidates/jaemtri/backflip/prep-1/frames/1.png",
+        "sha256": "91e7eb10c7e35b897613c9a06ac4fd3858222ea3d377265f9c78466adb996ea9",
+        "findings": "준비 자세의 떨어진 손 조각 제거, 얼굴/팔/머리와 외곽 온전."
+      },
+      {
+        "frame_index": 2,
+        "source_job_id": "eb443f25-dd14-4633-ab0a-39a595fe2928",
+        "source_frame_index": 2,
+        "sha256": "3d704f4fb2a17f65c9873627eead906aab37bad1d9c4126fd8f31db4499c6775"
+      },
+      {
+        "frame_index": 3,
+        "source_job_id": "0fc54ecd-45cf-4e51-bd78-ad5d8e717c4a",
+        "source_frame_index": 1,
+        "target_pose_index": 3,
+        "source_path": "motion-frame-candidates/jaemtri/backflip/inverted-1/frames/1.png",
+        "sha256": "7d60f7007249963a41b0b2b2fb425ff35b2d2e9fa7864dcac88f94d8e80c8053",
+        "findings": "역전 단계의 손발/얼굴/머리와 신발 외곽 온전. 0번 흐린 신발 반려,1번 정상 후보 선택."
+      },
+      {
+        "frame_index": 4,
+        "source_job_id": "eb443f25-dd14-4633-ab0a-39a595fe2928",
+        "source_frame_index": 4,
+        "sha256": "13c5ff98e1d3341c84e15eaf54aaa43add44e17911eacc268ac3806c4abb738e"
+      },
+      {
+        "frame_index": 5,
+        "source_job_id": "eb443f25-dd14-4633-ab0a-39a595fe2928",
+        "source_frame_index": 5,
+        "sha256": "2578e370aa0ce648a8b7a09aa806ed99971a02d60af34397798cb5cfa03c69c3"
+      },
+      {
+        "frame_index": 6,
+        "source_job_id": "6fd95721-122b-47fa-b292-82011a28c054",
+        "source_frame_index": 1,
+        "target_pose_index": 6,
+        "source_path": "motion-frame-candidates/jaemtri/backflip/descent-1/frames/1.png",
+        "sha256": "2d5a56e5cd8365c06d733a6ecba1b6cb08c7966b24a7a72e116ec8a75f6f91b4",
+        "findings": "회전 종료 자세의 머리/얼굴/손발 온전, 기존 회색 덩어리 제거. 전체 연결은 별도 검토."
+      },
+      {
+        "frame_index": 7,
+        "source_job_id": "eb443f25-dd14-4633-ab0a-39a595fe2928",
+        "source_frame_index": 7,
+        "sha256": "b97a5d946c18aa82741a64d11ea95a0a5b971b4535e6187b7c618f0ddf7bed3a"
+      },
+      {
+        "frame_index": 8,
+        "source_job_id": "eb443f25-dd14-4633-ab0a-39a595fe2928",
+        "source_frame_index": 8,
+        "sha256": "272673949e9dbb528b14206c65b4904cdbd5627ad0cca1406533b65ed75e70d8"
+      }
+    ],
+    "method": "select complete same-pose regenerated frames; no pixel editing",
+    "new_user_approval": false,
+    "visual_reviewed": false
+  }
+}

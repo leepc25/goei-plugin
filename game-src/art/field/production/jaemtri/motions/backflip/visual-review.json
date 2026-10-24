@@ -1,8 +1,8 @@
 {
-  "at": 1792806527.0666938,
+  "at": 1792806929.3207965,
   "job_id": "eb443f25-dd14-4633-ab0a-39a595fe2928",
-  "result": "reroll-required",
-  "findings": "준비/역전/하강3자세 교체. 6번째 동일 자세 후보3장 모두 신발 뒤 회색 덩어리로 반려, 깨끗한 본인 역전 프레임으로 참조 변경 필요.",
+  "result": "pass",
+  "findings": "교체된 전체9프레임 재검토. 준비→뒤회전→역전→회복→착지 순서, 얼굴/머리/치마/손발 유지. 회색 외곽 덩어리와 손 조각 제거. AVIF 우선·로어 키 보충·동향 및 전원8방향 장벽 재확인.",
   "frame_count": 9,
   "directions": [
     "east"
@@ -58,9 +58,12 @@
       },
       {
         "frame_index": 5,
-        "source_job_id": "eb443f25-dd14-4633-ab0a-39a595fe2928",
-        "source_frame_index": 5,
-        "sha256": "2578e370aa0ce648a8b7a09aa806ed99971a02d60af34397798cb5cfa03c69c3"
+        "source_job_id": "a2ffabd5-ec0c-4076-85f1-e491aa7d2978",
+        "source_frame_index": 1,
+        "target_pose_index": 5,
+        "source_path": "motion-frame-candidates/jaemtri/backflip/turn-3/frames/1.png",
+        "sha256": "bd7f1976ad2f6eaa54e4f9964563a508fae9889328ab85bfdd364957e16fbe5a",
+        "findings": "재측정한 같은 방향 회전 참조로 목표 뒤회전 자세 일치. 얼굴/머리/손발과 신발 외곽 정상, 회색 덩어리 없음."
       },
       {
         "frame_index": 6,
@@ -86,6 +89,6 @@
     ],
     "method": "select complete same-pose regenerated frames; no pixel editing",
     "new_user_approval": false,
-    "visual_reviewed": false
+    "visual_reviewed": true
   }
 }
