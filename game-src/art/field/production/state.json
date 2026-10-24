@@ -27868,7 +27868,7 @@
           "type": "message_progress",
           "action": "generating",
           "status": "initializing",
-          "progress": 0.11296943207025778,
+          "progress": 0.19045774976571353,
           "flow_kind": "animation",
           "queue_position": 0,
           "generation_started_at": "2026-10-24T00:30:31.599671+00:00",
@@ -47578,7 +47578,7 @@
       }
     }
   ],
-  "updated_at": 1792801845.0889645,
+  "updated_at": 1792801930.1278276,
   "user_stopped_at": 1792778235.6917784,
   "archived_jobs": {
     "304457e9-6577-44f0-af17-97841a9f6720": {
