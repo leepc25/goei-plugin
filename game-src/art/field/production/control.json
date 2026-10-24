@@ -277,7 +277,8 @@
     "aileen": {
       "jumping-1": "game-src/art/field/production/motion-inputs/aileen/jumping-1-v1/spec.json",
       "jumping-2": "game-src/art/field/production/motion-inputs/aileen/jumping-2-v1/spec.json",
-      "two-footed-jump": "game-src/art/field/production/motion-inputs/aileen/two-footed-jump-v1/spec.json"
+      "two-footed-jump": "game-src/art/field/production/motion-inputs/aileen/two-footed-jump-v1/spec.json",
+      "lead-jab": "game-src/art/field/production/motion-inputs/aileen/lead-jab-bounded-v1/spec.json"
     },
     "gorgodio": {
       "jumping-1": "game-src/art/field/production/motion-inputs/gorgodio/jumping-1-v1/spec.json",

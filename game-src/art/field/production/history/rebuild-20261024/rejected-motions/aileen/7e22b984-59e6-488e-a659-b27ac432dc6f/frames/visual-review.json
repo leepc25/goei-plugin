@@ -1,0 +1,20 @@
+{
+  "at": 1792807129.3461099,
+  "job_id": "bda03f39-a598-4391-a404-17765206e619",
+  "result": "reroll-required",
+  "findings": "전체3프레임 발이 캔버스 아래 잘리고, 포니테일 끝 회색 면/잔상. 본인 관절의 제한된 발 간격/잽 궤적으로 직접 재작업.",
+  "frame_count": 3,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "lead-jab",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

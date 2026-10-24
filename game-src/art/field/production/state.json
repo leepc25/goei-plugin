@@ -38826,7 +38826,7 @@
       "kind": "animation",
       "slug": "aileen",
       "template": "breathing-idle",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792806967.5710776,
       "receipt": {
         "background_job_ids": [
@@ -38840,13 +38840,96 @@
         "enhanced_prompt": null,
         "enhance_usage": null
       },
-      "endpoint": "animate-character"
+      "endpoint": "animate-character",
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 3.0
+        },
+        "id": "db123cd2-3718-480f-863c-1a528f708a4a",
+        "status": "completed",
+        "created_at": "2026-10-24T01:56:09.028967+00:00",
+        "last_response": {
+          "seed": 2232355324,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "progress": 1.0,
+          "direction": "south-east",
+          "frame_count": 4,
+          "animation_id": "2d8fd192-be29-4ba2-abf1-dc423f79b7f8",
+          "character_id": "558c27ed-873c-4207-9099-171bb64a09b2",
+          "storage_urls": {
+            "frames": [
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/2d8fd192-be29-4ba2-abf1-dc423f79b7f8/south-east/0.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/2d8fd192-be29-4ba2-abf1-dc423f79b7f8/south-east/1.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/2d8fd192-be29-4ba2-abf1-dc423f79b7f8/south-east/2.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/2d8fd192-be29-4ba2-abf1-dc423f79b7f8/south-east/3.png"
+            ]
+          },
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "2abd9a40-a2ee-4979-96f0-9f6f39b6b19b",
+          "animation_name": null,
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_model": "skeleton-v3_template",
+          "saved_to_storage": true,
+          "animation_group_id": "cb2600da-2065-4161-80da-f5df8cf291da",
+          "motion_adjustments": {
+            "stride": 1.0,
+            "posture": 0.0,
+            "arm_swing": 1.0,
+            "leg_extension": 0.0
+          },
+          "animation_description": "breathing idle. Preserve this character identity, costume, hair and native proportions. Keep a clean transparent silhouette in every frame. No gray painted patches, gray halo, ground shadow or opaque background around hair, hands, clothes or feet.",
+          "generation_started_at": "2026-10-24T01:56:13.300369+00:00",
+          "template_animation_id": "breathing-idle",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792807201.0511746,
+      "elapsed_observed_seconds": 233.48009729385376,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 4
     },
     "58f5bc8d-90fb-4cff-9c65-72967dc983ba": {
       "kind": "animation",
       "slug": "aileen",
       "template": "walking-8-frames",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792806970.2408113,
       "receipt": {
         "background_job_ids": [
@@ -38860,7 +38943,118 @@
         "enhanced_prompt": null,
         "enhance_usage": null
       },
-      "endpoint": "animate-character"
+      "endpoint": "animate-character",
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 3.0
+        },
+        "id": "58f5bc8d-90fb-4cff-9c65-72967dc983ba",
+        "status": "completed",
+        "created_at": "2026-10-24T01:56:10.496721+00:00",
+        "last_response": {
+          "seed": 3508730648,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "progress": 1.0,
+          "direction": "east",
+          "frame_count": 8,
+          "animation_id": "bcf6d658-47f1-4368-9cad-45bfcdb881f6",
+          "character_id": "558c27ed-873c-4207-9099-171bb64a09b2",
+          "storage_urls": {
+            "frames": [
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/bcf6d658-47f1-4368-9cad-45bfcdb881f6/east/0.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/bcf6d658-47f1-4368-9cad-45bfcdb881f6/east/1.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/bcf6d658-47f1-4368-9cad-45bfcdb881f6/east/2.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/bcf6d658-47f1-4368-9cad-45bfcdb881f6/east/3.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/bcf6d658-47f1-4368-9cad-45bfcdb881f6/east/4.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/bcf6d658-47f1-4368-9cad-45bfcdb881f6/east/5.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/bcf6d658-47f1-4368-9cad-45bfcdb881f6/east/6.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/bcf6d658-47f1-4368-9cad-45bfcdb881f6/east/7.png"
+            ]
+          },
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "7e5f61c4-0e46-4ed9-84d8-c9faac19bb09",
+          "animation_name": null,
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_model": "skeleton-v3_template",
+          "saved_to_storage": true,
+          "animation_group_id": "98b33cf7-74bd-46a9-b2aa-d33baa0de48b",
+          "motion_adjustments": {
+            "stride": 1.0,
+            "posture": 0.0,
+            "arm_swing": 1.0,
+            "leg_extension": 0.0
+          },
+          "animation_description": "walking confidently with an upright steady torso, measured strides and restrained arm swing. Preserve this character identity, costume, hair and native proportions. Keep a clean transparent silhouette in every frame. No gray painted patches, gray halo, ground shadow or opaque background around hair, hands, clothes or feet.",
+          "generation_started_at": "2026-10-24T01:56:19.249329+00:00",
+          "template_animation_id": "walking-8-frames",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792807201.0647192,
+      "elapsed_observed_seconds": 230.82390809059143,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 8
     },
     "01f17a00-0eee-49e9-8b50-54af4860ff37": {
       "kind": "animation",
@@ -38880,7 +39074,95 @@
         "enhanced_prompt": null,
         "enhance_usage": null
       },
-      "endpoint": "animate-character"
+      "endpoint": "animate-character",
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 3.0
+        },
+        "id": "01f17a00-0eee-49e9-8b50-54af4860ff37",
+        "status": "processing",
+        "created_at": "2026-10-24T01:56:12.184766+00:00",
+        "last_response": {
+          "seed": 1997429788,
+          "type": "message_done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "progress": 0.99,
+          "direction": "east",
+          "character_id": "558c27ed-873c-4207-9099-171bb64a09b2",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "a1c458ee-94d7-4eb1-be6d-c44959623871",
+          "animation_name": null,
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_model": "skeleton-v3_template",
+          "animation_group_id": "d3a65829-d40f-45c9-9150-1790e478b7b7",
+          "motion_adjustments": {
+            "stride": 1.0,
+            "posture": 0.0,
+            "arm_swing": 1.0,
+            "leg_extension": 0.0
+          },
+          "animation_description": "running decisively with a steady torso, controlled arm swing and firm purposeful strides. Preserve this character identity, costume, hair and native proportions. Keep a clean transparent silhouette in every frame. No gray painted patches, gray halo, ground shadow or opaque background around hair, hands, clothes or feet.",
+          "generation_started_at": "2026-10-24T01:56:19.248904+00:00",
+          "template_animation_id": "running-8-frames",
+          "estimated_wait_seconds": 0
+        }
+      }
     },
     "63f11ca8-0bb6-43a9-b01b-0b45af85765c": {
       "kind": "animation",
@@ -38900,13 +39182,43 @@
         "enhanced_prompt": null,
         "enhance_usage": null
       },
-      "endpoint": "animate-character"
+      "endpoint": "animate-character",
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "63f11ca8-0bb6-43a9-b01b-0b45af85765c",
+        "status": "processing",
+        "created_at": "2026-10-24T01:56:12.724924+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "action": "generating",
+          "progress": 0.2738058425630442,
+          "direction": "east",
+          "character_id": "558c27ed-873c-4207-9099-171bb64a09b2",
+          "animation_name": null,
+          "queue_position": 0,
+          "generation_model": "skeleton-v3_template",
+          "animation_group_id": "49d7e12d-a396-4e23-89d2-0320a6528ef5",
+          "motion_adjustments": {
+            "stride": 1.0,
+            "posture": 0.0,
+            "arm_swing": 1.0,
+            "leg_extension": 0.0
+          },
+          "animation_description": "running jump. Preserve this character identity, costume, hair and native proportions. Keep a clean transparent silhouette in every frame. No gray painted patches, gray halo, ground shadow or opaque background around hair, hands, clothes or feet.",
+          "generation_started_at": "2026-10-24T01:56:23.65499+00:00",
+          "template_animation_id": "running-jump",
+          "estimated_wait_seconds": 0
+        }
+      }
     },
     "f0d9aba3-44bb-47f8-944e-ef511286e384": {
       "kind": "animation",
       "slug": "aileen",
       "template": "running-slide",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792806973.3739328,
       "receipt": {
         "background_job_ids": [
@@ -38920,13 +39232,110 @@
         "enhanced_prompt": null,
         "enhance_usage": null
       },
-      "endpoint": "animate-character"
+      "endpoint": "animate-character",
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 3.0
+        },
+        "id": "f0d9aba3-44bb-47f8-944e-ef511286e384",
+        "status": "completed",
+        "created_at": "2026-10-24T01:56:13.646743+00:00",
+        "last_response": {
+          "seed": 3138011085,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "progress": 1.0,
+          "direction": "east",
+          "frame_count": 6,
+          "animation_id": "7b3c1ca7-1b6b-4703-8acc-069cc793ca23",
+          "character_id": "558c27ed-873c-4207-9099-171bb64a09b2",
+          "storage_urls": {
+            "frames": [
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/7b3c1ca7-1b6b-4703-8acc-069cc793ca23/east/0.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/7b3c1ca7-1b6b-4703-8acc-069cc793ca23/east/1.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/7b3c1ca7-1b6b-4703-8acc-069cc793ca23/east/2.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/7b3c1ca7-1b6b-4703-8acc-069cc793ca23/east/3.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/7b3c1ca7-1b6b-4703-8acc-069cc793ca23/east/4.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/7b3c1ca7-1b6b-4703-8acc-069cc793ca23/east/5.png"
+            ]
+          },
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "76621fae-16b1-4c5a-b4aa-859158f83e3a",
+          "animation_name": null,
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_model": "skeleton-v3_template",
+          "saved_to_storage": true,
+          "animation_group_id": "d7ff8b91-2fc0-4c3b-9112-599dc261871d",
+          "motion_adjustments": {
+            "stride": 1.0,
+            "posture": 0.0,
+            "arm_swing": 1.0,
+            "leg_extension": 0.0
+          },
+          "animation_description": "running slide. Preserve this character identity, costume, hair and native proportions. Keep a clean transparent silhouette in every frame. No gray painted patches, gray halo, ground shadow or opaque background around hair, hands, clothes or feet.",
+          "generation_started_at": "2026-10-24T01:56:22.339007+00:00",
+          "template_animation_id": "running-slide",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792807204.0247045,
+      "elapsed_observed_seconds": 230.65077185630798,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 6
     },
     "46cd568a-1485-4a9d-9a13-b30c0bb01051": {
       "kind": "animation",
       "slug": "aileen",
       "template": "crouched-walking",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792806974.0970335,
       "receipt": {
         "background_job_ids": [
@@ -38940,13 +39349,110 @@
         "enhanced_prompt": null,
         "enhance_usage": null
       },
-      "endpoint": "animate-character"
+      "endpoint": "animate-character",
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 3.0
+        },
+        "id": "46cd568a-1485-4a9d-9a13-b30c0bb01051",
+        "status": "completed",
+        "created_at": "2026-10-24T01:56:14.842957+00:00",
+        "last_response": {
+          "seed": 1357984017,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "progress": 1.0,
+          "direction": "east",
+          "frame_count": 6,
+          "animation_id": "6c63efee-d2ca-4ef8-90b3-8ff2e86572ea",
+          "character_id": "558c27ed-873c-4207-9099-171bb64a09b2",
+          "storage_urls": {
+            "frames": [
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/6c63efee-d2ca-4ef8-90b3-8ff2e86572ea/east/0.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/6c63efee-d2ca-4ef8-90b3-8ff2e86572ea/east/1.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/6c63efee-d2ca-4ef8-90b3-8ff2e86572ea/east/2.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/6c63efee-d2ca-4ef8-90b3-8ff2e86572ea/east/3.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/6c63efee-d2ca-4ef8-90b3-8ff2e86572ea/east/4.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/6c63efee-d2ca-4ef8-90b3-8ff2e86572ea/east/5.png"
+            ]
+          },
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "c13c70af-164c-40cb-9cf8-c2167345d40b",
+          "animation_name": null,
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_model": "skeleton-v3_template",
+          "saved_to_storage": true,
+          "animation_group_id": "474be96e-043f-4407-962a-3aaff667aa91",
+          "motion_adjustments": {
+            "stride": 1.0,
+            "posture": 0.0,
+            "arm_swing": 1.0,
+            "leg_extension": 0.0
+          },
+          "animation_description": "crouched walking. Preserve this character identity, costume, hair and native proportions. Keep a clean transparent silhouette in every frame. No gray painted patches, gray halo, ground shadow or opaque background around hair, hands, clothes or feet.",
+          "generation_started_at": "2026-10-24T01:56:24.407048+00:00",
+          "template_animation_id": "crouched-walking",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792807204.0303698,
+      "elapsed_observed_seconds": 229.93333673477173,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 6
     },
     "9d222834-64bd-4f65-9961-1a4e5394d69d": {
       "kind": "animation",
       "slug": "aileen",
       "template": "sad-walk",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792806976.2649632,
       "receipt": {
         "background_job_ids": [
@@ -38960,13 +39466,124 @@
         "enhanced_prompt": null,
         "enhance_usage": null
       },
-      "endpoint": "animate-character"
+      "endpoint": "animate-character",
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 3.0
+        },
+        "id": "9d222834-64bd-4f65-9961-1a4e5394d69d",
+        "status": "completed",
+        "created_at": "2026-10-24T01:56:17.197446+00:00",
+        "last_response": {
+          "seed": 2587196992,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "progress": 1.0,
+          "direction": "east",
+          "frame_count": 8,
+          "animation_id": "985eed01-f6dd-4b74-8339-a11666902519",
+          "character_id": "558c27ed-873c-4207-9099-171bb64a09b2",
+          "storage_urls": {
+            "frames": [
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/985eed01-f6dd-4b74-8339-a11666902519/east/0.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/985eed01-f6dd-4b74-8339-a11666902519/east/1.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/985eed01-f6dd-4b74-8339-a11666902519/east/2.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/985eed01-f6dd-4b74-8339-a11666902519/east/3.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/985eed01-f6dd-4b74-8339-a11666902519/east/4.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/985eed01-f6dd-4b74-8339-a11666902519/east/5.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/985eed01-f6dd-4b74-8339-a11666902519/east/6.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/985eed01-f6dd-4b74-8339-a11666902519/east/7.png"
+            ]
+          },
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "3c577738-eef4-41d6-9800-08be19411e0a",
+          "animation_name": null,
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_model": "skeleton-v3_template",
+          "saved_to_storage": true,
+          "animation_group_id": "82caef68-116a-4297-9e86-28bb06b87b70",
+          "motion_adjustments": {
+            "stride": 1.0,
+            "posture": 0.0,
+            "arm_swing": 1.0,
+            "leg_extension": 0.0
+          },
+          "animation_description": "sad walk. Preserve this character identity, costume, hair and native proportions. Keep a clean transparent silhouette in every frame. No gray painted patches, gray halo, ground shadow or opaque background around hair, hands, clothes or feet.",
+          "generation_started_at": "2026-10-24T01:56:18.486878+00:00",
+          "template_animation_id": "sad-walk",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792807204.0348854,
+      "elapsed_observed_seconds": 227.7699224948883,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 8
     },
     "bdd8d878-7689-4e18-bb99-6a11b17ff8e0": {
       "kind": "animation",
       "slug": "aileen",
       "template": "front-flip",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792806977.5680199,
       "receipt": {
         "background_job_ids": [
@@ -38980,13 +39597,110 @@
         "enhanced_prompt": null,
         "enhance_usage": null
       },
-      "endpoint": "animate-character"
+      "endpoint": "animate-character",
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 3.0
+        },
+        "id": "bdd8d878-7689-4e18-bb99-6a11b17ff8e0",
+        "status": "completed",
+        "created_at": "2026-10-24T01:56:20.570844+00:00",
+        "last_response": {
+          "seed": 2667139435,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "progress": 1.0,
+          "direction": "east",
+          "frame_count": 6,
+          "animation_id": "3c61a9db-9047-4206-9a56-084c6f4f0e25",
+          "character_id": "558c27ed-873c-4207-9099-171bb64a09b2",
+          "storage_urls": {
+            "frames": [
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/3c61a9db-9047-4206-9a56-084c6f4f0e25/east/0.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/3c61a9db-9047-4206-9a56-084c6f4f0e25/east/1.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/3c61a9db-9047-4206-9a56-084c6f4f0e25/east/2.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/3c61a9db-9047-4206-9a56-084c6f4f0e25/east/3.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/3c61a9db-9047-4206-9a56-084c6f4f0e25/east/4.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/3c61a9db-9047-4206-9a56-084c6f4f0e25/east/5.png"
+            ]
+          },
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "63476013-b0bf-4d0f-8aff-9b3b807e27cd",
+          "animation_name": null,
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_model": "skeleton-v3_template",
+          "saved_to_storage": true,
+          "animation_group_id": "f95efb95-ee10-4015-bb87-fbec157b2f7e",
+          "motion_adjustments": {
+            "stride": 1.0,
+            "posture": 0.0,
+            "arm_swing": 1.0,
+            "leg_extension": 0.0
+          },
+          "animation_description": "front flip. Preserve this character identity, costume, hair and native proportions. Keep a clean transparent silhouette in every frame. No gray painted patches, gray halo, ground shadow or opaque background around hair, hands, clothes or feet.",
+          "generation_started_at": "2026-10-24T01:56:24.321126+00:00",
+          "template_animation_id": "front-flip",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792807204.041079,
+      "elapsed_observed_seconds": 226.47305917739868,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 6
     },
     "490758e4-b763-4f05-a4a7-4d959c421d54": {
       "kind": "animation",
       "slug": "aileen",
       "template": "backflip",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792806981.9434557,
       "receipt": {
         "background_job_ids": [
@@ -39000,20 +39714,230 @@
         "enhanced_prompt": null,
         "enhance_usage": null
       },
-      "endpoint": "animate-character"
+      "endpoint": "animate-character",
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 3.0
+        },
+        "id": "490758e4-b763-4f05-a4a7-4d959c421d54",
+        "status": "completed",
+        "created_at": "2026-10-24T01:56:23.647581+00:00",
+        "last_response": {
+          "seed": 1044351041,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "progress": 1.0,
+          "direction": "east",
+          "frame_count": 10,
+          "animation_id": "4be20ce9-24ae-4969-aada-1dbd70a025d1",
+          "character_id": "558c27ed-873c-4207-9099-171bb64a09b2",
+          "storage_urls": {
+            "frames": [
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/4be20ce9-24ae-4969-aada-1dbd70a025d1/east/0.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/4be20ce9-24ae-4969-aada-1dbd70a025d1/east/1.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/4be20ce9-24ae-4969-aada-1dbd70a025d1/east/2.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/4be20ce9-24ae-4969-aada-1dbd70a025d1/east/3.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/4be20ce9-24ae-4969-aada-1dbd70a025d1/east/4.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/4be20ce9-24ae-4969-aada-1dbd70a025d1/east/5.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/4be20ce9-24ae-4969-aada-1dbd70a025d1/east/6.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/4be20ce9-24ae-4969-aada-1dbd70a025d1/east/7.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/4be20ce9-24ae-4969-aada-1dbd70a025d1/east/8.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/4be20ce9-24ae-4969-aada-1dbd70a025d1/east/9.png"
+            ]
+          },
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "54d2b5c4-8d4f-4959-918a-0fe22f7a02b0",
+          "animation_name": null,
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_model": "skeleton-v3_template",
+          "saved_to_storage": true,
+          "animation_group_id": "e81193c8-5f50-4305-b915-0188b41115cf",
+          "motion_adjustments": {
+            "stride": 1.0,
+            "posture": 0.0,
+            "arm_swing": 1.0,
+            "leg_extension": 0.0
+          },
+          "animation_description": "backflip. Preserve this character identity, costume, hair and native proportions. Keep a clean transparent silhouette in every frame. No gray painted patches, gray halo, ground shadow or opaque background around hair, hands, clothes or feet.",
+          "generation_started_at": "2026-10-24T01:56:26.56085+00:00",
+          "template_animation_id": "backflip",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792807204.0453634,
+      "elapsed_observed_seconds": 222.10190773010254,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 10
     },
     "b922a7a6-f01a-4dce-a06f-4f213187824b": {
       "kind": "animation",
       "slug": "aileen",
       "template": "jumping-1",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792806984.4044235,
       "receipt": {
         "usage": null,
         "background_job_id": "b922a7a6-f01a-4dce-a06f-4f213187824b",
         "status": "processing"
       },
-      "endpoint": "animate-with-skeleton-v3"
+      "endpoint": "animate-with-skeleton-v3",
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 3.0
+        },
+        "id": "b922a7a6-f01a-4dce-a06f-4f213187824b",
+        "status": "completed",
+        "created_at": "2026-10-24T01:56:24.625121+00:00",
+        "last_response": {
+          "seed": 2026110000,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "status": "initializing",
+          "progress": 1.0,
+          "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "97c527e0-ee45-4a86-a826-9083c4c9c814",
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_started_at": "2026-10-24T01:57:17.544533+00:00",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792807204.0521796,
+      "elapsed_observed_seconds": 219.6477563381195,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 8
     },
     "f5ec3eae-324f-48a3-97f6-8e9b5f374aaa": {
       "kind": "animation",
@@ -39026,26 +39950,130 @@
         "background_job_id": "f5ec3eae-324f-48a3-97f6-8e9b5f374aaa",
         "status": "processing"
       },
-      "endpoint": "animate-with-skeleton-v3"
+      "endpoint": "animate-with-skeleton-v3",
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "f5ec3eae-324f-48a3-97f6-8e9b5f374aaa",
+        "status": "processing",
+        "created_at": "2026-10-24T01:56:25.597688+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "action": "generating",
+          "status": "initializing",
+          "progress": 0.2580246751291193,
+          "flow_kind": "animation",
+          "queue_position": 0,
+          "generation_started_at": "2026-10-24T01:56:36.778469+00:00",
+          "estimated_wait_seconds": 0
+        }
+      }
     },
     "926ed31d-6357-4ff3-a61b-42dd38a09a67": {
       "kind": "animation",
       "slug": "aileen",
       "template": "two-footed-jump",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792806985.9286275,
       "receipt": {
         "usage": null,
         "background_job_id": "926ed31d-6357-4ff3-a61b-42dd38a09a67",
         "status": "processing"
       },
-      "endpoint": "animate-with-skeleton-v3"
+      "endpoint": "animate-with-skeleton-v3",
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 3.0
+        },
+        "id": "926ed31d-6357-4ff3-a61b-42dd38a09a67",
+        "status": "completed",
+        "created_at": "2026-10-24T01:56:26.127906+00:00",
+        "last_response": {
+          "seed": 2026110002,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "status": "initializing",
+          "progress": 1.0,
+          "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "a3a0cae6-c12d-4cee-9c92-37ff67dbb9fb",
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_started_at": "2026-10-24T01:57:19.05884+00:00",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792807204.0583634,
+      "elapsed_observed_seconds": 218.12973618507385,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 8
     },
     "68a1c28c-7789-422e-86af-7c2bf6c00e26": {
       "kind": "animation",
       "slug": "aileen",
       "template": "drinking",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792806986.329405,
       "receipt": {
         "background_job_ids": [
@@ -39059,13 +40087,110 @@
         "enhanced_prompt": null,
         "enhance_usage": null
       },
-      "endpoint": "animate-character"
+      "endpoint": "animate-character",
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 3.0
+        },
+        "id": "68a1c28c-7789-422e-86af-7c2bf6c00e26",
+        "status": "completed",
+        "created_at": "2026-10-24T01:56:26.556956+00:00",
+        "last_response": {
+          "seed": 2532451648,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "progress": 1.0,
+          "direction": "south-east",
+          "frame_count": 6,
+          "animation_id": "02823ff7-93db-4886-808e-238e9380801e",
+          "character_id": "558c27ed-873c-4207-9099-171bb64a09b2",
+          "storage_urls": {
+            "frames": [
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/02823ff7-93db-4886-808e-238e9380801e/south-east/0.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/02823ff7-93db-4886-808e-238e9380801e/south-east/1.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/02823ff7-93db-4886-808e-238e9380801e/south-east/2.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/02823ff7-93db-4886-808e-238e9380801e/south-east/3.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/02823ff7-93db-4886-808e-238e9380801e/south-east/4.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/02823ff7-93db-4886-808e-238e9380801e/south-east/5.png"
+            ]
+          },
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "8aaffdfe-e5a3-4cc6-ae29-0cca3b41754f",
+          "animation_name": null,
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_model": "skeleton-v3_template",
+          "saved_to_storage": true,
+          "animation_group_id": "af333657-6c08-40f4-a9aa-f6b9883fe2df",
+          "motion_adjustments": {
+            "stride": 1.0,
+            "posture": 0.0,
+            "arm_swing": 1.0,
+            "leg_extension": 0.0
+          },
+          "animation_description": "drinking. Preserve this character identity, costume, hair and native proportions. Keep a clean transparent silhouette in every frame. No gray painted patches, gray halo, ground shadow or opaque background around hair, hands, clothes or feet.",
+          "generation_started_at": "2026-10-24T01:56:30.139043+00:00",
+          "template_animation_id": "drinking",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792807204.0653658,
+      "elapsed_observed_seconds": 217.7359607219696,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 6
     },
     "1e4ca37b-b652-4121-ad22-271d9c0f7b18": {
       "kind": "animation",
       "slug": "aileen",
       "template": "picking-up",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792806987.7275267,
       "receipt": {
         "background_job_ids": [
@@ -39079,7 +40204,97 @@
         "enhanced_prompt": null,
         "enhance_usage": null
       },
-      "endpoint": "animate-character"
+      "endpoint": "animate-character",
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 3.0
+        },
+        "id": "1e4ca37b-b652-4121-ad22-271d9c0f7b18",
+        "status": "completed",
+        "created_at": "2026-10-24T01:56:28.019412+00:00",
+        "last_response": {
+          "seed": 3877921576,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "progress": 1.0,
+          "direction": "east",
+          "frame_count": 5,
+          "animation_id": "b8c0eb75-35dd-4c27-a85c-db1e1327e490",
+          "character_id": "558c27ed-873c-4207-9099-171bb64a09b2",
+          "storage_urls": {
+            "frames": [
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/b8c0eb75-35dd-4c27-a85c-db1e1327e490/east/0.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/b8c0eb75-35dd-4c27-a85c-db1e1327e490/east/1.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/b8c0eb75-35dd-4c27-a85c-db1e1327e490/east/2.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/b8c0eb75-35dd-4c27-a85c-db1e1327e490/east/3.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/b8c0eb75-35dd-4c27-a85c-db1e1327e490/east/4.png"
+            ]
+          },
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "6f95cc24-c7ad-40c2-98b8-8141a08693b1",
+          "animation_name": null,
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_model": "skeleton-v3_template",
+          "saved_to_storage": true,
+          "animation_group_id": "5b833413-7b74-4558-bed0-b64470966c67",
+          "motion_adjustments": {
+            "stride": 1.0,
+            "posture": 0.0,
+            "arm_swing": 1.0,
+            "leg_extension": 0.0
+          },
+          "animation_description": "picking up. Preserve this character identity, costume, hair and native proportions. Keep a clean transparent silhouette in every frame. No gray painted patches, gray halo, ground shadow or opaque background around hair, hands, clothes or feet.",
+          "generation_started_at": "2026-10-24T01:56:30.194011+00:00",
+          "template_animation_id": "picking-up",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792807204.0699303,
+      "elapsed_observed_seconds": 216.3424036502838,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 5
     },
     "32a66515-c84f-4e4e-a964-1732d1110899": {
       "kind": "animation",
@@ -39099,13 +40314,43 @@
         "enhanced_prompt": null,
         "enhance_usage": null
       },
-      "endpoint": "animate-character"
+      "endpoint": "animate-character",
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "32a66515-c84f-4e4e-a964-1732d1110899",
+        "status": "processing",
+        "created_at": "2026-10-24T01:56:29.503410+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "action": "generating",
+          "progress": 0.2900075584633658,
+          "direction": "east",
+          "character_id": "558c27ed-873c-4207-9099-171bb64a09b2",
+          "animation_name": null,
+          "queue_position": 0,
+          "generation_model": "skeleton-v3_template",
+          "animation_group_id": "734aa1dd-e372-453e-bbcd-238e9c481cd2",
+          "motion_adjustments": {
+            "stride": 1.0,
+            "posture": 0.0,
+            "arm_swing": 1.0,
+            "leg_extension": 0.0
+          },
+          "animation_description": "pushing. Preserve this character identity, costume, hair and native proportions. Keep a clean transparent silhouette in every frame. No gray painted patches, gray halo, ground shadow or opaque background around hair, hands, clothes or feet.",
+          "generation_started_at": "2026-10-24T01:56:31.925467+00:00",
+          "template_animation_id": "pushing",
+          "estimated_wait_seconds": 0
+        }
+      }
     },
     "f105a00e-1847-4eb7-b741-b12b72fba3f9": {
       "kind": "animation",
       "slug": "aileen",
       "template": "pull-heavy-object",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792806989.8931968,
       "receipt": {
         "background_job_ids": [
@@ -39119,13 +40364,110 @@
         "enhanced_prompt": null,
         "enhance_usage": null
       },
-      "endpoint": "animate-character"
+      "endpoint": "animate-character",
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 3.0
+        },
+        "id": "f105a00e-1847-4eb7-b741-b12b72fba3f9",
+        "status": "completed",
+        "created_at": "2026-10-24T01:56:30.223741+00:00",
+        "last_response": {
+          "seed": 2523025543,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "progress": 1.0,
+          "direction": "east",
+          "frame_count": 6,
+          "animation_id": "af193b2c-a652-4586-abcb-1bb9a44ab466",
+          "character_id": "558c27ed-873c-4207-9099-171bb64a09b2",
+          "storage_urls": {
+            "frames": [
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/af193b2c-a652-4586-abcb-1bb9a44ab466/east/0.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/af193b2c-a652-4586-abcb-1bb9a44ab466/east/1.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/af193b2c-a652-4586-abcb-1bb9a44ab466/east/2.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/af193b2c-a652-4586-abcb-1bb9a44ab466/east/3.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/af193b2c-a652-4586-abcb-1bb9a44ab466/east/4.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/af193b2c-a652-4586-abcb-1bb9a44ab466/east/5.png"
+            ]
+          },
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "3ede480f-020f-49f3-a8f3-4feb852b2b6f",
+          "animation_name": null,
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_model": "skeleton-v3_template",
+          "saved_to_storage": true,
+          "animation_group_id": "0fca4cbd-ca57-4d59-a5dc-8746e98bb766",
+          "motion_adjustments": {
+            "stride": 1.0,
+            "posture": 0.0,
+            "arm_swing": 1.0,
+            "leg_extension": 0.0
+          },
+          "animation_description": "pull heavy object. Preserve this character identity, costume, hair and native proportions. Keep a clean transparent silhouette in every frame. No gray painted patches, gray halo, ground shadow or opaque background around hair, hands, clothes or feet.",
+          "generation_started_at": "2026-10-24T01:56:34.999436+00:00",
+          "template_animation_id": "pull-heavy-object",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792807204.0737777,
+      "elapsed_observed_seconds": 214.18058109283447,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 6
     },
     "397540b8-892b-4d6e-ab1e-fd52471c681a": {
       "kind": "animation",
       "slug": "aileen",
       "template": "throw-object",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792806990.5859878,
       "receipt": {
         "background_job_ids": [
@@ -39139,13 +40481,117 @@
         "enhanced_prompt": null,
         "enhance_usage": null
       },
-      "endpoint": "animate-character"
+      "endpoint": "animate-character",
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 3.0
+        },
+        "id": "397540b8-892b-4d6e-ab1e-fd52471c681a",
+        "status": "completed",
+        "created_at": "2026-10-24T01:56:30.794643+00:00",
+        "last_response": {
+          "seed": 1262958949,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "progress": 1.0,
+          "direction": "east",
+          "frame_count": 7,
+          "animation_id": "db616636-bc86-439e-8000-81fcc7e26589",
+          "character_id": "558c27ed-873c-4207-9099-171bb64a09b2",
+          "storage_urls": {
+            "frames": [
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/db616636-bc86-439e-8000-81fcc7e26589/east/0.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/db616636-bc86-439e-8000-81fcc7e26589/east/1.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/db616636-bc86-439e-8000-81fcc7e26589/east/2.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/db616636-bc86-439e-8000-81fcc7e26589/east/3.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/db616636-bc86-439e-8000-81fcc7e26589/east/4.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/db616636-bc86-439e-8000-81fcc7e26589/east/5.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/db616636-bc86-439e-8000-81fcc7e26589/east/6.png"
+            ]
+          },
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "0003b438-0896-4c74-83d9-0f3b5419bb65",
+          "animation_name": null,
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_model": "skeleton-v3_template",
+          "saved_to_storage": true,
+          "animation_group_id": "f787ccf4-41cd-4ea0-a5b2-a924623d0c3a",
+          "motion_adjustments": {
+            "stride": 1.0,
+            "posture": 0.0,
+            "arm_swing": 1.0,
+            "leg_extension": 0.0
+          },
+          "animation_description": "throw object. Preserve this character identity, costume, hair and native proportions. Keep a clean transparent silhouette in every frame. No gray painted patches, gray halo, ground shadow or opaque background around hair, hands, clothes or feet.",
+          "generation_started_at": "2026-10-24T01:56:35.236151+00:00",
+          "template_animation_id": "throw-object",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792807204.07904,
+      "elapsed_observed_seconds": 213.49305248260498,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 7
     },
     "6e00595c-7d91-4320-ab72-27424e97ee97": {
       "kind": "animation",
       "slug": "aileen",
       "template": "fight-stance-idle-8-frames",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792806992.1579554,
       "receipt": {
         "background_job_ids": [
@@ -39159,13 +40605,124 @@
         "enhanced_prompt": null,
         "enhance_usage": null
       },
-      "endpoint": "animate-character"
+      "endpoint": "animate-character",
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 3.0
+        },
+        "id": "6e00595c-7d91-4320-ab72-27424e97ee97",
+        "status": "completed",
+        "created_at": "2026-10-24T01:56:32.707493+00:00",
+        "last_response": {
+          "seed": 2452492580,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "progress": 1.0,
+          "direction": "east",
+          "frame_count": 8,
+          "animation_id": "b477b0e5-abcc-4c12-bf97-8b2fa5399626",
+          "character_id": "558c27ed-873c-4207-9099-171bb64a09b2",
+          "storage_urls": {
+            "frames": [
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/b477b0e5-abcc-4c12-bf97-8b2fa5399626/east/0.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/b477b0e5-abcc-4c12-bf97-8b2fa5399626/east/1.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/b477b0e5-abcc-4c12-bf97-8b2fa5399626/east/2.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/b477b0e5-abcc-4c12-bf97-8b2fa5399626/east/3.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/b477b0e5-abcc-4c12-bf97-8b2fa5399626/east/4.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/b477b0e5-abcc-4c12-bf97-8b2fa5399626/east/5.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/b477b0e5-abcc-4c12-bf97-8b2fa5399626/east/6.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/b477b0e5-abcc-4c12-bf97-8b2fa5399626/east/7.png"
+            ]
+          },
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "6c4a84e3-0951-48e7-a540-70443c129e88",
+          "animation_name": null,
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_model": "skeleton-v3_template",
+          "saved_to_storage": true,
+          "animation_group_id": "ef8143f4-ff39-4d2d-b38d-4ddebf09ae49",
+          "motion_adjustments": {
+            "stride": 1.0,
+            "posture": 0.0,
+            "arm_swing": 1.0,
+            "leg_extension": 0.0
+          },
+          "animation_description": "fight stance idle 8 frames. Preserve this character identity, costume, hair and native proportions. Keep a clean transparent silhouette in every frame. No gray painted patches, gray halo, ground shadow or opaque background around hair, hands, clothes or feet.",
+          "generation_started_at": "2026-10-24T01:56:35.01644+00:00",
+          "template_animation_id": "fight-stance-idle-8-frames",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792807204.084421,
+      "elapsed_observed_seconds": 211.9264657497406,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 8
     },
     "bda03f39-a598-4391-a404-17765206e619": {
       "kind": "animation",
       "slug": "aileen",
       "template": "lead-jab",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792806993.428664,
       "receipt": {
         "background_job_ids": [
@@ -39179,13 +40736,93 @@
         "enhanced_prompt": null,
         "enhance_usage": null
       },
-      "endpoint": "animate-character"
+      "endpoint": "animate-character",
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 2.0
+        },
+        "id": "bda03f39-a598-4391-a404-17765206e619",
+        "status": "completed",
+        "created_at": "2026-10-24T01:56:34.795093+00:00",
+        "last_response": {
+          "seed": 4120088813,
+          "type": "done",
+          "action": "finalizing",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "progress": 1.0,
+          "direction": "east",
+          "frame_count": 3,
+          "animation_id": "bbca4cd0-02f9-4d34-9d1e-b4008e2e70e7",
+          "character_id": "558c27ed-873c-4207-9099-171bb64a09b2",
+          "storage_urls": {
+            "frames": [
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/bbca4cd0-02f9-4d34-9d1e-b4008e2e70e7/east/0.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/bbca4cd0-02f9-4d34-9d1e-b4008e2e70e7/east/1.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/bbca4cd0-02f9-4d34-9d1e-b4008e2e70e7/east/2.png"
+            ]
+          },
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 2
+          },
+          "generation_id": "3172b686-a361-4405-9c50-295afe56fa93",
+          "animation_name": null,
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_model": "skeleton-v3_template",
+          "saved_to_storage": true,
+          "animation_group_id": "7e22b984-59e6-488e-a659-b27ac432dc6f",
+          "motion_adjustments": {
+            "stride": 1.0,
+            "posture": 0.0,
+            "arm_swing": 1.0,
+            "leg_extension": 0.0
+          },
+          "animation_description": "lead jab. Preserve this character identity, costume, hair and native proportions. Keep a clean transparent silhouette in every frame. No gray painted patches, gray halo, ground shadow or opaque background around hair, hands, clothes or feet.",
+          "generation_started_at": "2026-10-24T01:56:39.332486+00:00",
+          "template_animation_id": "lead-jab",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792807091.5302467,
+      "elapsed_observed_seconds": 98.10158371925354,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 2
+      },
+      "saved_frames": 3,
+      "visual_rejection": {
+        "reason": "발이 캔버스 밖으로 잘리고 포니테일 회색 잔상. 자체 팔/다리 길이로 제한된 스탠스와 잽3자세 직접 입력.",
+        "group": "7e22b984-59e6-488e-a659-b27ac432dc6f"
+      }
     },
     "bc1e737a-2b62-4105-9f15-b9b48a7826bb": {
       "kind": "animation",
       "slug": "aileen",
       "template": "cross-punch",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792806995.3297138,
       "receipt": {
         "background_job_ids": [
@@ -39199,7 +40836,117 @@
         "enhanced_prompt": null,
         "enhance_usage": null
       },
-      "endpoint": "animate-character"
+      "endpoint": "animate-character",
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 3.0
+        },
+        "id": "bc1e737a-2b62-4105-9f15-b9b48a7826bb",
+        "status": "completed",
+        "created_at": "2026-10-24T01:56:35.672390+00:00",
+        "last_response": {
+          "seed": 3090285829,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "progress": 1.0,
+          "direction": "east",
+          "frame_count": 6,
+          "animation_id": "6408f70d-d0ba-40f1-b884-1613938ff160",
+          "character_id": "558c27ed-873c-4207-9099-171bb64a09b2",
+          "storage_urls": {
+            "frames": [
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/6408f70d-d0ba-40f1-b884-1613938ff160/east/0.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/6408f70d-d0ba-40f1-b884-1613938ff160/east/1.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/6408f70d-d0ba-40f1-b884-1613938ff160/east/2.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/6408f70d-d0ba-40f1-b884-1613938ff160/east/3.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/6408f70d-d0ba-40f1-b884-1613938ff160/east/4.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/6408f70d-d0ba-40f1-b884-1613938ff160/east/5.png"
+            ]
+          },
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "d3a97584-63a1-4922-ae0f-df6c06c2962a",
+          "animation_name": null,
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_model": "skeleton-v3_template",
+          "saved_to_storage": true,
+          "animation_group_id": "5eb583c5-d284-4091-8dc2-b3a15e94eca0",
+          "motion_adjustments": {
+            "stride": 1.0,
+            "posture": 0.0,
+            "arm_swing": 1.0,
+            "leg_extension": 0.0
+          },
+          "animation_description": "cross punch. Preserve this character identity, costume, hair and native proportions. Keep a clean transparent silhouette in every frame. No gray painted patches, gray halo, ground shadow or opaque background around hair, hands, clothes or feet.",
+          "generation_started_at": "2026-10-24T01:56:37.402213+00:00",
+          "template_animation_id": "cross-punch",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792807204.090251,
+      "elapsed_observed_seconds": 208.76053738594055,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 6
+    },
+    "458e2f1e-151e-4272-b8ee-ecd7c8993c90": {
+      "kind": "animation",
+      "slug": "aileen",
+      "template": "lead-jab",
+      "status": "processing",
+      "created_epoch": 1792807204.19776,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "458e2f1e-151e-4272-b8ee-ecd7c8993c90",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3"
     }
   },
   "characters": {
@@ -40262,8 +42009,8 @@
         "pull-heavy-object": "f105a00e-1847-4eb7-b741-b12b72fba3f9",
         "throw-object": "397540b8-892b-4d6e-ab1e-fd52471c681a",
         "fight-stance-idle-8-frames": "6e00595c-7d91-4320-ab72-27424e97ee97",
-        "lead-jab": "bda03f39-a598-4391-a404-17765206e619",
-        "cross-punch": "bc1e737a-2b62-4105-9f15-b9b48a7826bb"
+        "cross-punch": "bc1e737a-2b62-4105-9f15-b9b48a7826bb",
+        "lead-jab": "458e2f1e-151e-4272-b8ee-ecd7c8993c90"
       },
       "ready": true,
       "repair_id": "aileen-user-rebuild-v4",
@@ -40272,7 +42019,8 @@
       "skeleton_joints": 18,
       "rotation_count": 8,
       "exported": false,
-      "eight_way_visual_reviewed": true
+      "eight_way_visual_reviewed": true,
+      "motions_visual_reviewed": false
     },
     "gorgodio": {
       "name": "고르고디오",
@@ -64129,9 +65877,280 @@
           "enhance_usage": null
         }
       }
+    },
+    {
+      "at": "2026-10-24T01:58:11Z",
+      "kind": "completed",
+      "slug": "aileen",
+      "detail": {
+        "kind": "animation",
+        "template": "lead-jab",
+        "job_id": "bda03f39-a598-4391-a404-17765206e619",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 2
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T02:00:01Z",
+      "kind": "completed",
+      "slug": "aileen",
+      "detail": {
+        "kind": "animation",
+        "template": "breathing-idle",
+        "job_id": "db123cd2-3718-480f-863c-1a528f708a4a",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T02:00:01Z",
+      "kind": "completed",
+      "slug": "aileen",
+      "detail": {
+        "kind": "animation",
+        "template": "walking-8-frames",
+        "job_id": "58f5bc8d-90fb-4cff-9c65-72967dc983ba",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T02:00:04Z",
+      "kind": "completed",
+      "slug": "aileen",
+      "detail": {
+        "kind": "animation",
+        "template": "running-slide",
+        "job_id": "f0d9aba3-44bb-47f8-944e-ef511286e384",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T02:00:04Z",
+      "kind": "completed",
+      "slug": "aileen",
+      "detail": {
+        "kind": "animation",
+        "template": "crouched-walking",
+        "job_id": "46cd568a-1485-4a9d-9a13-b30c0bb01051",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T02:00:04Z",
+      "kind": "completed",
+      "slug": "aileen",
+      "detail": {
+        "kind": "animation",
+        "template": "sad-walk",
+        "job_id": "9d222834-64bd-4f65-9961-1a4e5394d69d",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T02:00:04Z",
+      "kind": "completed",
+      "slug": "aileen",
+      "detail": {
+        "kind": "animation",
+        "template": "front-flip",
+        "job_id": "bdd8d878-7689-4e18-bb99-6a11b17ff8e0",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T02:00:04Z",
+      "kind": "completed",
+      "slug": "aileen",
+      "detail": {
+        "kind": "animation",
+        "template": "backflip",
+        "job_id": "490758e4-b763-4f05-a4a7-4d959c421d54",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T02:00:04Z",
+      "kind": "completed",
+      "slug": "aileen",
+      "detail": {
+        "kind": "animation",
+        "template": "jumping-1",
+        "job_id": "b922a7a6-f01a-4dce-a06f-4f213187824b",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T02:00:04Z",
+      "kind": "completed",
+      "slug": "aileen",
+      "detail": {
+        "kind": "animation",
+        "template": "two-footed-jump",
+        "job_id": "926ed31d-6357-4ff3-a61b-42dd38a09a67",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T02:00:04Z",
+      "kind": "completed",
+      "slug": "aileen",
+      "detail": {
+        "kind": "animation",
+        "template": "drinking",
+        "job_id": "68a1c28c-7789-422e-86af-7c2bf6c00e26",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T02:00:04Z",
+      "kind": "completed",
+      "slug": "aileen",
+      "detail": {
+        "kind": "animation",
+        "template": "picking-up",
+        "job_id": "1e4ca37b-b652-4121-ad22-271d9c0f7b18",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T02:00:04Z",
+      "kind": "completed",
+      "slug": "aileen",
+      "detail": {
+        "kind": "animation",
+        "template": "pull-heavy-object",
+        "job_id": "f105a00e-1847-4eb7-b741-b12b72fba3f9",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T02:00:04Z",
+      "kind": "completed",
+      "slug": "aileen",
+      "detail": {
+        "kind": "animation",
+        "template": "throw-object",
+        "job_id": "397540b8-892b-4d6e-ab1e-fd52471c681a",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T02:00:04Z",
+      "kind": "completed",
+      "slug": "aileen",
+      "detail": {
+        "kind": "animation",
+        "template": "fight-stance-idle-8-frames",
+        "job_id": "6e00595c-7d91-4320-ab72-27424e97ee97",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T02:00:04Z",
+      "kind": "completed",
+      "slug": "aileen",
+      "detail": {
+        "kind": "animation",
+        "template": "cross-punch",
+        "job_id": "bc1e737a-2b62-4105-9f15-b9b48a7826bb",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T02:00:06Z",
+      "kind": "submitted",
+      "slug": "aileen",
+      "detail": {
+        "kind": "animation",
+        "template": "lead-jab",
+        "job_id": "458e2f1e-151e-4272-b8ee-ecd7c8993c90",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "458e2f1e-151e-4272-b8ee-ecd7c8993c90",
+          "status": "processing"
+        }
+      }
     }
   ],
-  "updated_at": 1792806996.0931485,
+  "updated_at": 1792807206.1191,
   "user_stopped_at": 1792778235.6917784,
   "archived_jobs": {
     "304457e9-6577-44f0-af17-97841a9f6720": {
@@ -65453,8 +67472,8 @@
   "last_git_checkpoint": 1792806872.1036918,
   "summary": {
     "jobs": {
-      "processing": 20,
-      "completed": 436,
+      "processing": 5,
+      "completed": 452,
       "failed": 9,
       "stalled": 0
     },

@@ -1,10 +1,384 @@
 {
-  "character_id": "558c27ed-873c-4207-9099-171bb64a09b2",
-  "mode": "skeleton-v3",
-  "template_animation_id": "lead-jab",
-  "directions": [
-    "east"
+  "description": "Adult woman early20s, faded platinum blonde high ponytail and long bangs, dull gray eyes, serious analytical expression. Natural adult build comparable to Jyaldi, normal shoulders and limbs, no bulky muscles. Black tailored business trouser suit, black closed shoes. White shirt under a thin black ballistic vest; the BLACK SUIT JACKET is worn OVER the vest, its open lapels revealing the vest front. No external armor, oversized plates or pouches.",
+  "action": "lead jab and recover",
+  "direction": "east",
+  "view": "low top-down",
+  "first_frame_keypoints": [
+    {
+      "label": "NECK",
+      "x": 0.49263572692871094,
+      "y": 0.2506217956542969
+    },
+    {
+      "label": "NOSE",
+      "x": 0.5383834838867188,
+      "y": 0.1635894775390625
+    },
+    {
+      "label": "LEFT ARM",
+      "x": 0.5294570922851562,
+      "y": 0.48940277099609375
+    },
+    {
+      "label": "LEFT EAR",
+      "x": 0.5049095153808594,
+      "y": 0.136810302734375
+    },
+    {
+      "label": "LEFT EYE",
+      "x": 0.5339202880859375,
+      "y": 0.14350509643554688
+    },
+    {
+      "label": "LEFT HIP",
+      "x": 0.5428466796875,
+      "y": 0.4514656066894531
+    },
+    {
+      "label": "LEFT LEG",
+      "x": 0.5116043090820312,
+      "y": 0.8843955993652344
+    },
+    {
+      "label": "LEFT KNEE",
+      "x": 0.5205307006835938,
+      "y": 0.672393798828125
+    },
+    {
+      "label": "RIGHT ARM",
+      "x": 0.48482513427734375,
+      "y": 0.493865966796875
+    },
+    {
+      "label": "RIGHT EAR",
+      "x": 0.489288330078125,
+      "y": 0.13904190063476562
+    },
+    {
+      "label": "RIGHT EYE",
+      "x": 0.5272254943847656,
+      "y": 0.1457366943359375
+    },
+    {
+      "label": "RIGHT HIP",
+      "x": 0.49375152587890625,
+      "y": 0.458160400390625
+    },
+    {
+      "label": "RIGHT LEG",
+      "x": 0.4736671447753906,
+      "y": 0.9111747741699219
+    },
+    {
+      "label": "LEFT ELBOW",
+      "x": 0.5316886901855469,
+      "y": 0.3666648864746094
+    },
+    {
+      "label": "RIGHT KNEE",
+      "x": 0.50714111328125,
+      "y": 0.6768569946289062
+    },
+    {
+      "label": "RIGHT ELBOW",
+      "x": 0.453582763671875,
+      "y": 0.37335968017578125
+    },
+    {
+      "label": "LEFT SHOULDER",
+      "x": 0.5272254943847656,
+      "y": 0.24839019775390625
+    },
+    {
+      "label": "RIGHT SHOULDER",
+      "x": 0.45804595947265625,
+      "y": 0.2528533935546875
+    }
   ],
-  "animation_name": "잽 (동쪽)",
-  "action_description": "lead jab. Preserve this character identity, costume, hair and native proportions. Keep a clean transparent silhouette in every frame. No gray painted patches, gray halo, ground shadow or opaque background around hair, hands, clothes or feet."
+  "keypoints": [
+    [
+      {
+        "label": "NECK",
+        "x": 0.49263572692871094,
+        "y": 0.2779655456542969
+      },
+      {
+        "label": "NOSE",
+        "x": 0.5383834838867188,
+        "y": 0.1909332275390625
+      },
+      {
+        "label": "LEFT ARM",
+        "x": 0.6092052880198673,
+        "y": 0.36012491179004025
+      },
+      {
+        "label": "LEFT EAR",
+        "x": 0.5049095153808594,
+        "y": 0.164154052734375
+      },
+      {
+        "label": "LEFT EYE",
+        "x": 0.5339202880859375,
+        "y": 0.17084884643554688
+      },
+      {
+        "label": "LEFT HIP",
+        "x": 0.5428466796875,
+        "y": 0.4788093566894531
+      },
+      {
+        "label": "LEFT LEG",
+        "x": 0.5584793090820312,
+        "y": 0.8843955993652344
+      },
+      {
+        "label": "LEFT KNEE",
+        "x": 0.627957358834205,
+        "y": 0.6839030945162121
+      },
+      {
+        "label": "RIGHT ARM",
+        "x": 0.5413729128032491,
+        "y": 0.3659748896302978
+      },
+      {
+        "label": "RIGHT EAR",
+        "x": 0.489288330078125,
+        "y": 0.16638565063476562
+      },
+      {
+        "label": "RIGHT EYE",
+        "x": 0.5272254943847656,
+        "y": 0.1730804443359375
+      },
+      {
+        "label": "RIGHT HIP",
+        "x": 0.49375152587890625,
+        "y": 0.485504150390625
+      },
+      {
+        "label": "RIGHT LEG",
+        "x": 0.4267921447753906,
+        "y": 0.9111747741699219
+      },
+      {
+        "label": "LEFT ELBOW",
+        "x": 0.48964655635617604,
+        "y": 0.38796872634494173
+      },
+      {
+        "label": "RIGHT KNEE",
+        "x": 0.5350458248170982,
+        "y": 0.7006837550408606
+      },
+      {
+        "label": "RIGHT ELBOW",
+        "x": 0.42024375138866465,
+        "y": 0.39470774697609956
+      },
+      {
+        "label": "LEFT SHOULDER",
+        "x": 0.5272254943847656,
+        "y": 0.27573394775390625
+      },
+      {
+        "label": "RIGHT SHOULDER",
+        "x": 0.45804595947265625,
+        "y": 0.2801971435546875
+      }
+    ],
+    [
+      {
+        "label": "NECK",
+        "x": 0.49263572692871094,
+        "y": 0.2779655456542969
+      },
+      {
+        "label": "NOSE",
+        "x": 0.5383834838867188,
+        "y": 0.1909332275390625
+      },
+      {
+        "label": "LEFT ARM",
+        "x": 0.7538755120818112,
+        "y": 0.28745269775390625
+      },
+      {
+        "label": "LEFT EAR",
+        "x": 0.5049095153808594,
+        "y": 0.164154052734375
+      },
+      {
+        "label": "LEFT EYE",
+        "x": 0.5339202880859375,
+        "y": 0.17084884643554688
+      },
+      {
+        "label": "LEFT HIP",
+        "x": 0.5428466796875,
+        "y": 0.4788093566894531
+      },
+      {
+        "label": "LEFT LEG",
+        "x": 0.5584793090820312,
+        "y": 0.8843955993652344
+      },
+      {
+        "label": "LEFT KNEE",
+        "x": 0.627957358834205,
+        "y": 0.6839030945162121
+      },
+      {
+        "label": "RIGHT ARM",
+        "x": 0.5413729128032491,
+        "y": 0.3659748896302978
+      },
+      {
+        "label": "RIGHT EAR",
+        "x": 0.489288330078125,
+        "y": 0.16638565063476562
+      },
+      {
+        "label": "RIGHT EYE",
+        "x": 0.5272254943847656,
+        "y": 0.1730804443359375
+      },
+      {
+        "label": "RIGHT HIP",
+        "x": 0.49375152587890625,
+        "y": 0.485504150390625
+      },
+      {
+        "label": "RIGHT LEG",
+        "x": 0.4267921447753906,
+        "y": 0.9111747741699219
+      },
+      {
+        "label": "LEFT ELBOW",
+        "x": 0.6361149120977969,
+        "y": 0.3221227052157344
+      },
+      {
+        "label": "RIGHT KNEE",
+        "x": 0.5350458248170982,
+        "y": 0.7006837550408606
+      },
+      {
+        "label": "RIGHT ELBOW",
+        "x": 0.42024375138866465,
+        "y": 0.39470774697609956
+      },
+      {
+        "label": "LEFT SHOULDER",
+        "x": 0.5272254943847656,
+        "y": 0.27573394775390625
+      },
+      {
+        "label": "RIGHT SHOULDER",
+        "x": 0.45804595947265625,
+        "y": 0.2801971435546875
+      }
+    ],
+    [
+      {
+        "label": "NECK",
+        "x": 0.49263572692871094,
+        "y": 0.2779655456542969
+      },
+      {
+        "label": "NOSE",
+        "x": 0.5383834838867188,
+        "y": 0.1909332275390625
+      },
+      {
+        "label": "LEFT ARM",
+        "x": 0.6092052880198673,
+        "y": 0.36012491179004025
+      },
+      {
+        "label": "LEFT EAR",
+        "x": 0.5049095153808594,
+        "y": 0.164154052734375
+      },
+      {
+        "label": "LEFT EYE",
+        "x": 0.5339202880859375,
+        "y": 0.17084884643554688
+      },
+      {
+        "label": "LEFT HIP",
+        "x": 0.5428466796875,
+        "y": 0.4788093566894531
+      },
+      {
+        "label": "LEFT LEG",
+        "x": 0.5584793090820312,
+        "y": 0.8843955993652344
+      },
+      {
+        "label": "LEFT KNEE",
+        "x": 0.627957358834205,
+        "y": 0.6839030945162121
+      },
+      {
+        "label": "RIGHT ARM",
+        "x": 0.5413729128032491,
+        "y": 0.3659748896302978
+      },
+      {
+        "label": "RIGHT EAR",
+        "x": 0.489288330078125,
+        "y": 0.16638565063476562
+      },
+      {
+        "label": "RIGHT EYE",
+        "x": 0.5272254943847656,
+        "y": 0.1730804443359375
+      },
+      {
+        "label": "RIGHT HIP",
+        "x": 0.49375152587890625,
+        "y": 0.485504150390625
+      },
+      {
+        "label": "RIGHT LEG",
+        "x": 0.4267921447753906,
+        "y": 0.9111747741699219
+      },
+      {
+        "label": "LEFT ELBOW",
+        "x": 0.48964655635617604,
+        "y": 0.38796872634494173
+      },
+      {
+        "label": "RIGHT KNEE",
+        "x": 0.5350458248170982,
+        "y": 0.7006837550408606
+      },
+      {
+        "label": "RIGHT ELBOW",
+        "x": 0.42024375138866465,
+        "y": 0.39470774697609956
+      },
+      {
+        "label": "LEFT SHOULDER",
+        "x": 0.5272254943847656,
+        "y": 0.27573394775390625
+      },
+      {
+        "label": "RIGHT SHOULDER",
+        "x": 0.45804595947265625,
+        "y": 0.2801971435546875
+      }
+    ]
+  ],
+  "template_id": "mannequin",
+  "seed": 2026112201,
+  "no_background": true,
+  "first_frame": {
+    "type": "base64",
+    "format": "png",
+    "base64": "[image payload omitted]"
+  }
 }
