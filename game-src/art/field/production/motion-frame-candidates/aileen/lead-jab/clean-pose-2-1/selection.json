@@ -1,0 +1,9 @@
+{
+  "frame_index": 2,
+  "source_job_id": "5bd5cbe5-7393-4461-a381-2479450a0b42",
+  "source_frame_index": 2,
+  "target_pose_index": 2,
+  "source_path": "motion-frame-candidates/aileen/lead-jab/clean-pose-2-1/frames/2.png",
+  "sha256": "b42dbd39f75c6bc303674de50d5bcdbbdb1eb2ac0a5a9bb6381a8116434f4fa9",
+  "findings": "회복 가드와 포니테일 가닥 정상, 앞선 두 후보의 넓은 회색 매트가 없는 2번 선택."
+}

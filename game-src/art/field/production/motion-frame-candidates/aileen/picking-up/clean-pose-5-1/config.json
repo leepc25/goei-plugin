@@ -1,0 +1,102 @@
+{
+  "slug": "aileen",
+  "slot": "picking-up",
+  "base_job_id": "5b324971-dbda-45e9-b71d-e482518ee2e7",
+  "target_frame_index": 5,
+  "source_spec": "game-src/art/field/production/motion-inputs/aileen/picking-up-deep-v2/spec.json",
+  "seed": 2026113605,
+  "pose": [
+    {
+      "label": "NECK",
+      "x": 0.6302142579599728,
+      "y": 0.46804365283675375
+    },
+    {
+      "label": "NOSE",
+      "x": 0.721271831146226,
+      "y": 0.4309491784688583
+    },
+    {
+      "label": "LEFT ARM",
+      "x": 0.7144055405970873,
+      "y": 0.7226265731562199
+    },
+    {
+      "label": "LEFT EAR",
+      "x": 0.7129211459159219,
+      "y": 0.3889028132640554
+    },
+    {
+      "label": "LEFT EYE",
+      "x": 0.7307969042517847,
+      "y": 0.4127125268189218
+    },
+    {
+      "label": "LEFT HIP",
+      "x": 0.5392305774525709,
+      "y": 0.6540042564317031
+    },
+    {
+      "label": "LEFT LEG",
+      "x": 0.5471511840820312,
+      "y": 0.8843955993652344
+    },
+    {
+      "label": "LEFT KNEE",
+      "x": 0.7272325161143662,
+      "y": 0.7721674489239985
+    },
+    {
+      "label": "RIGHT ARM",
+      "x": 0.6308677232906807,
+      "y": 0.6904342387485674
+    },
+    {
+      "label": "RIGHT EAR",
+      "x": 0.6995357695427682,
+      "y": 0.3805461896156906
+    },
+    {
+      "label": "RIGHT EYE",
+      "x": 0.7242388087557279,
+      "y": 0.4101064425234937
+    },
+    {
+      "label": "RIGHT HIP",
+      "x": 0.4973676281138353,
+      "y": 0.627496750648375
+    },
+    {
+      "label": "RIGHT LEG",
+      "x": 0.45179214477539065,
+      "y": 0.9111747741699219
+    },
+    {
+      "label": "LEFT ELBOW",
+      "x": 0.6787148486211186,
+      "y": 0.6051712930183105
+    },
+    {
+      "label": "RIGHT KNEE",
+      "x": 0.651147649916474,
+      "y": 0.7835710479449138
+    },
+    {
+      "label": "RIGHT ELBOW",
+      "x": 0.6090703596833171,
+      "y": 0.5678670091314179
+    },
+    {
+      "label": "LEFT SHOULDER",
+      "x": 0.6581076061969576,
+      "y": 0.4886201726101086
+    },
+    {
+      "label": "RIGHT SHOULDER",
+      "x": 0.602320909722988,
+      "y": 0.4474671330633989
+    }
+  ],
+  "new_user_approval": false,
+  "action": "Hold the supplied low crouched pose completely still, bare hands reaching down toward the floor. Natural platinum blonde ponytail strands."
+}

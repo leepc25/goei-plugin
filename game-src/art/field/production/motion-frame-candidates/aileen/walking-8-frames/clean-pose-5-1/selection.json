@@ -1,0 +1,9 @@
+{
+  "frame_index": 5,
+  "source_job_id": "134f0c81-ac61-40ae-be63-5a835b8a6e65",
+  "source_frame_index": 0,
+  "target_pose_index": 5,
+  "source_path": "motion-frame-candidates/aileen/walking-8-frames/clean-pose-5-1/frames/0.png",
+  "sha256": "1a759dfcc63612d8045bf8e742a3a2c6b71aca14553f36f70a9e73954c2a24df",
+  "findings": "세 후보 확대 확인. 선택 프레임은 목표 자세와 포니테일 가닥/구두 유지, 넓은 외곽 회색 매트 없음."
+}

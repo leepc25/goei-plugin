@@ -1,0 +1,20 @@
+{
+  "at": 1792809144.0189085,
+  "job_id": "1e854cac-038d-40ea-9a5f-1fc134afae55",
+  "result": "pass",
+  "findings": "본인 실제 가드와 미세호흡4프레임 전체 확인. 포니테일 가닥·얼굴·손·정장·구두 정상. 회색 매트/잘림/투명 구멍 없이 동쪽 전투 대기 유지.",
+  "frame_count": 4,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

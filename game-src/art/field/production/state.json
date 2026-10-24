@@ -44643,7 +44643,7 @@
       "kind": "motion-frame-candidate-running-8-frames-clean-pose-5-1",
       "slug": "aileen",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792808967.6054296,
       "receipt": {
         "usage": null,
@@ -44658,11 +44658,11 @@
           "generations": 2.0
         },
         "id": "7f28d40d-ed25-4a6f-b8b9-aa54dadcaf92",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-24T02:29:27.869624+00:00",
         "last_response": {
           "seed": 2026113305,
-          "type": "message_done",
+          "type": "done",
           "action": "finalizing",
           "images": [
             {
@@ -44685,7 +44685,7 @@
             }
           ],
           "status": "initializing",
-          "progress": 0.925,
+          "progress": 1.0,
           "flow_kind": "animation",
           "billing_usage": {
             "usd": 0.0,
@@ -44698,13 +44698,21 @@
           "generation_started_at": "2026-10-24T02:30:12.127332+00:00",
           "estimated_wait_seconds": 0
         }
-      }
+      },
+      "observed_end_epoch": 1792809246.9747512,
+      "elapsed_observed_seconds": 279.3693218231201,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 2
+      },
+      "saved_frames": 3
     },
     "06fa1d78-327a-4a2a-b825-5fc3d863a448": {
       "kind": "motion-frame-candidate-running-8-frames-clean-pose-6-1",
       "slug": "aileen",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792808968.2763362,
       "receipt": {
         "usage": null,
@@ -44719,11 +44727,11 @@
           "generations": 2.0
         },
         "id": "06fa1d78-327a-4a2a-b825-5fc3d863a448",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-24T02:29:28.488175+00:00",
         "last_response": {
           "seed": 2026113306,
-          "type": "message_done",
+          "type": "done",
           "action": "smoothing frames",
           "images": [
             {
@@ -44746,7 +44754,7 @@
             }
           ],
           "status": "initializing",
-          "progress": 0.965,
+          "progress": 1.0,
           "flow_kind": "animation",
           "billing_usage": {
             "usd": 0.0,
@@ -44759,7 +44767,15 @@
           "generation_started_at": "2026-10-24T02:30:13.126153+00:00",
           "estimated_wait_seconds": 0
         }
-      }
+      },
+      "observed_end_epoch": 1792809246.9854462,
+      "elapsed_observed_seconds": 278.70911026000977,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 2
+      },
+      "saved_frames": 3
     },
     "1ad7de38-189a-4ec7-87fe-ba349eed5e65": {
       "kind": "motion-frame-candidate-running-8-frames-clean-pose-7-1",
@@ -44834,7 +44850,7 @@
       "kind": "motion-frame-candidate-crouched-walking-clean-pose-2-1",
       "slug": "aileen",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792808969.5977113,
       "receipt": {
         "usage": null,
@@ -44845,29 +44861,65 @@
       "archive_output": "motion-frame-candidates/aileen/crouched-walking/clean-pose-2-1/frames",
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 2.0
         },
         "id": "3afee199-257e-438a-a103-7613ac9313a5",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-24T02:29:29.800826+00:00",
         "last_response": {
-          "type": "message_progress",
-          "action": "generating",
+          "seed": 2026113312,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
           "status": "initializing",
-          "progress": 0.19045774976571353,
+          "progress": 1.0,
           "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 2
+          },
+          "generation_id": "c4d07e7d-b77c-4114-99f2-732d4aa91054",
           "queue_position": 0,
+          "billing_charged": true,
           "generation_started_at": "2026-10-24T02:30:14.13024+00:00",
           "estimated_wait_seconds": 0
         }
-      }
+      },
+      "observed_end_epoch": 1792809246.9886093,
+      "elapsed_observed_seconds": 277.39089822769165,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 2
+      },
+      "saved_frames": 3
     },
     "72f1eb24-f70b-4c3a-8742-8c914617dc4b": {
       "kind": "motion-frame-candidate-crouched-walking-clean-pose-3-1",
       "slug": "aileen",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792808970.1371346,
       "receipt": {
         "usage": null,
@@ -44878,29 +44930,65 @@
       "archive_output": "motion-frame-candidates/aileen/crouched-walking/clean-pose-3-1/frames",
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 2.0
         },
         "id": "72f1eb24-f70b-4c3a-8742-8c914617dc4b",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-24T02:29:30.307975+00:00",
         "last_response": {
-          "type": "message_progress",
-          "action": "generating",
+          "seed": 2026113313,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
           "status": "initializing",
-          "progress": 0.17846942476931277,
+          "progress": 1.0,
           "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 2
+          },
+          "generation_id": "22f9d7e3-5c76-4c38-851b-660d1de1f708",
           "queue_position": 0,
+          "billing_charged": true,
           "generation_started_at": "2026-10-24T02:30:26.711097+00:00",
           "estimated_wait_seconds": 0
         }
-      }
+      },
+      "observed_end_epoch": 1792809247.8406212,
+      "elapsed_observed_seconds": 277.7034869194031,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 2
+      },
+      "saved_frames": 3
     },
     "0d0cd67b-2185-47b1-9457-6ce630dda6ea": {
       "kind": "motion-frame-candidate-crouched-walking-clean-pose-5-1",
       "slug": "aileen",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792808970.6514823,
       "receipt": {
         "usage": null,
@@ -44911,23 +44999,59 @@
       "archive_output": "motion-frame-candidates/aileen/crouched-walking/clean-pose-5-1/frames",
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 2.0
         },
         "id": "0d0cd67b-2185-47b1-9457-6ce630dda6ea",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-24T02:29:30.970964+00:00",
         "last_response": {
-          "type": "message_progress",
-          "action": "finalizing",
+          "seed": 2026113315,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
           "status": "initializing",
-          "progress": 0.21721679554297538,
+          "progress": 1.0,
           "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 2
+          },
+          "generation_id": "cf163abe-bce6-48f1-becb-5aa7f14924a0",
           "queue_position": 0,
+          "billing_charged": true,
           "generation_started_at": "2026-10-24T02:30:17.897317+00:00",
           "estimated_wait_seconds": 0
         }
-      }
+      },
+      "observed_end_epoch": 1792809247.9277287,
+      "elapsed_observed_seconds": 277.276246547699,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 2
+      },
+      "saved_frames": 3
     },
     "c20ce2ed-c57f-44d6-bdbb-5cc86bf7acd5": {
       "kind": "motion-frame-candidate-walking-8-frames-clean-pose-0-1",
@@ -45140,7 +45264,7 @@
       "kind": "motion-frame-candidate-walking-8-frames-clean-pose-5-1",
       "slug": "aileen",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792808973.0254002,
       "receipt": {
         "usage": null,
@@ -45151,29 +45275,65 @@
       "archive_output": "motion-frame-candidates/aileen/walking-8-frames/clean-pose-5-1/frames",
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 2.0
         },
         "id": "134f0c81-ac61-40ae-be63-5a835b8a6e65",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-24T02:29:33.188109+00:00",
         "last_response": {
-          "type": "message_progress",
-          "action": "generating",
+          "seed": 2026113325,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
           "status": "initializing",
-          "progress": 0.18148678179288374,
+          "progress": 1.0,
           "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 2
+          },
+          "generation_id": "df5b515c-33fd-4902-a76f-bb6ada9664bc",
           "queue_position": 0,
+          "billing_charged": true,
           "generation_started_at": "2026-10-24T02:30:24.163057+00:00",
           "estimated_wait_seconds": 0
         }
-      }
+      },
+      "observed_end_epoch": 1792809247.9307413,
+      "elapsed_observed_seconds": 274.90534114837646,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 2
+      },
+      "saved_frames": 3
     },
     "f0ca365e-b4d0-4989-b1da-c9d89be699f9": {
       "kind": "motion-frame-candidate-walking-8-frames-clean-pose-6-1",
       "slug": "aileen",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792808973.5351396,
       "receipt": {
         "usage": null,
@@ -45184,23 +45344,59 @@
       "archive_output": "motion-frame-candidates/aileen/walking-8-frames/clean-pose-6-1/frames",
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 2.0
         },
         "id": "f0ca365e-b4d0-4989-b1da-c9d89be699f9",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-24T02:29:33.692167+00:00",
         "last_response": {
-          "type": "message_progress",
-          "action": "finalizing",
+          "seed": 2026113326,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
           "status": "initializing",
-          "progress": 0.25112679407276,
+          "progress": 1.0,
           "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 2
+          },
+          "generation_id": "d8e2234b-9a6a-41c9-bbf1-53e530f4fb51",
           "queue_position": 0,
+          "billing_charged": true,
           "generation_started_at": "2026-10-24T02:30:21.214389+00:00",
           "estimated_wait_seconds": 0
         }
-      }
+      },
+      "observed_end_epoch": 1792809247.9340413,
+      "elapsed_observed_seconds": 274.3989019393921,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 2
+      },
+      "saved_frames": 3
     },
     "5bd5cbe5-7393-4461-a381-2479450a0b42": {
       "kind": "motion-frame-candidate-lead-jab-clean-pose-2-1",
@@ -45275,7 +45471,7 @@
       "kind": "motion-frame-candidate-front-flip-clean-pose-4-1",
       "slug": "aileen",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792809039.8172007,
       "receipt": {
         "usage": null,
@@ -45286,26 +45482,65 @@
       "archive_output": "motion-frame-candidates/aileen/front-flip/clean-pose-4-1/frames",
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 2.0
         },
         "id": "e4766aea-cf0e-4071-a0bc-be40752a7c9c",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-24T02:30:40.066045+00:00",
         "last_response": {
-          "type": "background",
+          "seed": 2026113400,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
           "status": "initializing",
+          "progress": 1.0,
           "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 2
+          },
+          "generation_id": "ecfb7f18-6a4f-48e5-a9c8-3e42f5158889",
           "queue_position": 0,
+          "billing_charged": true,
+          "generation_started_at": "2026-10-24T02:31:38.464892+00:00",
           "estimated_wait_seconds": 0
         }
-      }
+      },
+      "observed_end_epoch": 1792809247.9368477,
+      "elapsed_observed_seconds": 208.119647026062,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 2
+      },
+      "saved_frames": 3
     },
     "b87a717a-5da3-4c61-9000-dcff4cdd2b74": {
       "kind": "motion-frame-candidate-front-flip-clean-pose-9-1",
       "slug": "aileen",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792809040.4263413,
       "receipt": {
         "usage": null,
@@ -45316,26 +45551,65 @@
       "archive_output": "motion-frame-candidates/aileen/front-flip/clean-pose-9-1/frames",
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 2.0
         },
         "id": "b87a717a-5da3-4c61-9000-dcff4cdd2b74",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-24T02:30:40.681600+00:00",
         "last_response": {
-          "type": "background",
+          "seed": 2026113401,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
           "status": "initializing",
+          "progress": 1.0,
           "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 2
+          },
+          "generation_id": "229dcb87-6d2c-4134-8874-c5ca5eaaf341",
           "queue_position": 0,
+          "billing_charged": true,
+          "generation_started_at": "2026-10-24T02:31:35.394786+00:00",
           "estimated_wait_seconds": 0
         }
-      }
+      },
+      "observed_end_epoch": 1792809247.9391704,
+      "elapsed_observed_seconds": 207.51282906532288,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 2
+      },
+      "saved_frames": 3
     },
     "2b5bd3b4-f86a-46dc-ab8a-77ba3030ae6e": {
       "kind": "motion-frame-candidate-running-slide-clean-pose-2-1",
       "slug": "aileen",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792809041.0095701,
       "receipt": {
         "usage": null,
@@ -45346,26 +45620,65 @@
       "archive_output": "motion-frame-candidates/aileen/running-slide/clean-pose-2-1/frames",
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 2.0
         },
         "id": "2b5bd3b4-f86a-46dc-ab8a-77ba3030ae6e",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-24T02:30:41.209879+00:00",
         "last_response": {
-          "type": "background",
+          "seed": 2026113402,
+          "type": "done",
+          "action": "finalizing",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
           "status": "initializing",
+          "progress": 1.0,
           "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 2
+          },
+          "generation_id": "0b8c3697-9062-40dc-96ea-8755e7ad03a0",
           "queue_position": 0,
+          "billing_charged": true,
+          "generation_started_at": "2026-10-24T02:31:35.895286+00:00",
           "estimated_wait_seconds": 0
         }
-      }
+      },
+      "observed_end_epoch": 1792809247.9421518,
+      "elapsed_observed_seconds": 206.9325816631317,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 2
+      },
+      "saved_frames": 3
     },
     "d85f8f38-a3bb-4c85-8f81-f73db04ed1d1": {
       "kind": "motion-frame-candidate-pushing-clean-pose-5-1",
       "slug": "aileen",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792809041.5703266,
       "receipt": {
         "usage": null,
@@ -45376,26 +45689,65 @@
       "archive_output": "motion-frame-candidates/aileen/pushing/clean-pose-5-1/frames",
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 2.0
         },
         "id": "d85f8f38-a3bb-4c85-8f81-f73db04ed1d1",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-24T02:30:41.773095+00:00",
         "last_response": {
-          "type": "background",
+          "seed": 2026113403,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
           "status": "initializing",
+          "progress": 1.0,
           "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 2
+          },
+          "generation_id": "0ab4d8f9-5cd5-4aad-a146-d8be04b1a38e",
           "queue_position": 0,
+          "billing_charged": true,
+          "generation_started_at": "2026-10-24T02:31:36.398407+00:00",
           "estimated_wait_seconds": 0
         }
-      }
+      },
+      "observed_end_epoch": 1792809247.9450312,
+      "elapsed_observed_seconds": 206.3747045993805,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 2
+      },
+      "saved_frames": 3
     },
     "05c75e3e-500e-4668-ae08-4212b5354b57": {
       "kind": "motion-frame-candidate-throw-object-clean-pose-4-1",
       "slug": "aileen",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792809042.1561985,
       "receipt": {
         "usage": null,
@@ -45406,12 +45758,663 @@
       "archive_output": "motion-frame-candidates/aileen/throw-object/clean-pose-4-1/frames",
       "last_response": {
         "usage": {
+          "type": "generations",
+          "generations": 2.0
+        },
+        "id": "05c75e3e-500e-4668-ae08-4212b5354b57",
+        "status": "completed",
+        "created_at": "2026-10-24T02:30:42.396017+00:00",
+        "last_response": {
+          "seed": 2026113404,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "status": "initializing",
+          "progress": 1.0,
+          "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 2
+          },
+          "generation_id": "35c2060a-6753-4b1e-a3d4-d5be79d4eeb0",
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_started_at": "2026-10-24T02:31:37.399702+00:00",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792809247.9473114,
+      "elapsed_observed_seconds": 205.79111289978027,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 2
+      },
+      "saved_frames": 3
+    },
+    "a096416d-d44e-48a8-ade5-10cdabae0a2d": {
+      "kind": "motion-frame-candidate-backflip-clean-pose-0-1",
+      "slug": "aileen",
+      "template": null,
+      "status": "completed",
+      "created_epoch": 1792809101.4622304,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "a096416d-d44e-48a8-ade5-10cdabae0a2d",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3",
+      "archive_output": "motion-frame-candidates/aileen/backflip/clean-pose-0-1/frames",
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 2.0
+        },
+        "id": "a096416d-d44e-48a8-ade5-10cdabae0a2d",
+        "status": "completed",
+        "created_at": "2026-10-24T02:31:42.123590+00:00",
+        "last_response": {
+          "seed": 2026113500,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "status": "initializing",
+          "progress": 1.0,
+          "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 2
+          },
+          "generation_id": "0ada2aa3-90d4-46c3-ad0d-cc632f151f58",
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_started_at": "2026-10-24T02:32:49.798099+00:00",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792809247.949571,
+      "elapsed_observed_seconds": 146.48734068870544,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 2
+      },
+      "saved_frames": 3
+    },
+    "3f341d9c-c1be-4dca-8388-cbda96f23275": {
+      "kind": "motion-frame-candidate-backflip-clean-pose-1-1",
+      "slug": "aileen",
+      "template": null,
+      "status": "completed",
+      "created_epoch": 1792809102.4625418,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "3f341d9c-c1be-4dca-8388-cbda96f23275",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3",
+      "archive_output": "motion-frame-candidates/aileen/backflip/clean-pose-1-1/frames",
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 2.0
+        },
+        "id": "3f341d9c-c1be-4dca-8388-cbda96f23275",
+        "status": "completed",
+        "created_at": "2026-10-24T02:31:42.661799+00:00",
+        "last_response": {
+          "seed": 2026113501,
+          "type": "done",
+          "action": "finalizing",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "status": "initializing",
+          "progress": 1.0,
+          "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 2
+          },
+          "generation_id": "1f476f40-3336-4d7d-9da6-51b8a8235e88",
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_started_at": "2026-10-24T02:32:27.720182+00:00",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792809247.9518516,
+      "elapsed_observed_seconds": 145.48930978775024,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 2
+      },
+      "saved_frames": 3
+    },
+    "969b581d-436c-464e-b489-d803e2bcbe3b": {
+      "kind": "motion-frame-candidate-backflip-clean-pose-2-1",
+      "slug": "aileen",
+      "template": null,
+      "status": "completed",
+      "created_epoch": 1792809103.0015452,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "969b581d-436c-464e-b489-d803e2bcbe3b",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3",
+      "archive_output": "motion-frame-candidates/aileen/backflip/clean-pose-2-1/frames",
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 2.0
+        },
+        "id": "969b581d-436c-464e-b489-d803e2bcbe3b",
+        "status": "completed",
+        "created_at": "2026-10-24T02:31:43.196482+00:00",
+        "last_response": {
+          "seed": 2026113502,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "status": "initializing",
+          "progress": 1.0,
+          "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 2
+          },
+          "generation_id": "ef5e2fd0-b39b-4d4e-bd19-e81c0d24e952",
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_started_at": "2026-10-24T02:32:50.532753+00:00",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792809247.9540496,
+      "elapsed_observed_seconds": 144.95250463485718,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 2
+      },
+      "saved_frames": 3
+    },
+    "25ef5e16-2816-49a9-b73d-a92248857d94": {
+      "kind": "motion-frame-candidate-backflip-clean-pose-3-1",
+      "slug": "aileen",
+      "template": null,
+      "status": "completed",
+      "created_epoch": 1792809103.5711963,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "25ef5e16-2816-49a9-b73d-a92248857d94",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3",
+      "archive_output": "motion-frame-candidates/aileen/backflip/clean-pose-3-1/frames",
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 2.0
+        },
+        "id": "25ef5e16-2816-49a9-b73d-a92248857d94",
+        "status": "completed",
+        "created_at": "2026-10-24T02:31:43.757751+00:00",
+        "last_response": {
+          "seed": 2026113503,
+          "type": "done",
+          "action": "finalizing",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "status": "initializing",
+          "progress": 0.28756183371947974,
+          "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 2
+          },
+          "generation_id": "5de889f9-975a-42e2-a2cf-f888c024e92d",
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_started_at": "2026-10-24T02:32:27.65656+00:00",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792809247.9560025,
+      "elapsed_observed_seconds": 144.38480639457703,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 2
+      },
+      "saved_frames": 3
+    },
+    "132d4a58-a8b9-4bd4-af33-2c1944e5f289": {
+      "kind": "motion-frame-candidate-backflip-clean-pose-5-1",
+      "slug": "aileen",
+      "template": null,
+      "status": "completed",
+      "created_epoch": 1792809104.141804,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "132d4a58-a8b9-4bd4-af33-2c1944e5f289",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3",
+      "archive_output": "motion-frame-candidates/aileen/backflip/clean-pose-5-1/frames",
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 2.0
+        },
+        "id": "132d4a58-a8b9-4bd4-af33-2c1944e5f289",
+        "status": "completed",
+        "created_at": "2026-10-24T02:31:44.404231+00:00",
+        "last_response": {
+          "seed": 2026113505,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "status": "initializing",
+          "progress": 1.0,
+          "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 2
+          },
+          "generation_id": "0e8de4e1-3759-4c02-9287-00aa32efd113",
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_started_at": "2026-10-24T02:32:30.299635+00:00",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792809247.9579895,
+      "elapsed_observed_seconds": 143.81618571281433,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 2
+      },
+      "saved_frames": 3
+    },
+    "3d893b9a-8afa-46fc-a9c8-469f0171d734": {
+      "kind": "motion-frame-candidate-backflip-clean-pose-6-1",
+      "slug": "aileen",
+      "template": null,
+      "status": "completed",
+      "created_epoch": 1792809104.818947,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "3d893b9a-8afa-46fc-a9c8-469f0171d734",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3",
+      "archive_output": "motion-frame-candidates/aileen/backflip/clean-pose-6-1/frames",
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 2.0
+        },
+        "id": "3d893b9a-8afa-46fc-a9c8-469f0171d734",
+        "status": "completed",
+        "created_at": "2026-10-24T02:31:45.019810+00:00",
+        "last_response": {
+          "seed": 2026113506,
+          "type": "done",
+          "action": "finalizing",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "status": "initializing",
+          "progress": 1.0,
+          "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 2
+          },
+          "generation_id": "628491f5-c74f-45fc-ba0b-5cca0c2a5e57",
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_started_at": "2026-10-24T02:32:29.877196+00:00",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792809247.959847,
+      "elapsed_observed_seconds": 143.14090013504028,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 2
+      },
+      "saved_frames": 3
+    },
+    "ba502b83-69af-44c6-83ef-8a3a041a0503": {
+      "kind": "motion-frame-candidate-picking-up-clean-pose-4-1",
+      "slug": "aileen",
+      "template": null,
+      "status": "completed",
+      "created_epoch": 1792809178.5693793,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "ba502b83-69af-44c6-83ef-8a3a041a0503",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3",
+      "archive_output": "motion-frame-candidates/aileen/picking-up/clean-pose-4-1/frames",
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 2.0
+        },
+        "id": "ba502b83-69af-44c6-83ef-8a3a041a0503",
+        "status": "completed",
+        "created_at": "2026-10-24T02:32:58.770116+00:00",
+        "last_response": {
+          "seed": 2026113604,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "status": "initializing",
+          "progress": 1.0,
+          "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 2
+          },
+          "generation_id": "80734387-ca44-48bb-8b86-4302a3c1ee97",
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_started_at": "2026-10-24T02:33:42.399576+00:00",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792809455.0537581,
+      "elapsed_observed_seconds": 276.48437905311584,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 2
+      },
+      "saved_frames": 3
+    },
+    "8363ef06-2b89-4508-b1ce-eff4e51b7871": {
+      "kind": "motion-frame-candidate-picking-up-clean-pose-5-1",
+      "slug": "aileen",
+      "template": null,
+      "status": "completed",
+      "created_epoch": 1792809179.164797,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "8363ef06-2b89-4508-b1ce-eff4e51b7871",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3",
+      "archive_output": "motion-frame-candidates/aileen/picking-up/clean-pose-5-1/frames",
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 2.0
+        },
+        "id": "8363ef06-2b89-4508-b1ce-eff4e51b7871",
+        "status": "completed",
+        "created_at": "2026-10-24T02:32:59.539134+00:00",
+        "last_response": {
+          "seed": 2026113605,
+          "type": "done",
+          "action": "finalizing",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "status": "initializing",
+          "progress": 1.0,
+          "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 2
+          },
+          "generation_id": "32dd8d02-e175-4dd8-82a7-52cb4de86b3b",
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_started_at": "2026-10-24T02:34:00.277603+00:00",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792809455.064135,
+      "elapsed_observed_seconds": 275.89933824539185,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 2
+      },
+      "saved_frames": 3
+    },
+    "c0b29250-2cca-4e00-8c0a-5e67924f75df": {
+      "kind": "motion-frame-candidate-crouched-walking-clean-pose-2-2",
+      "slug": "aileen",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792809453.1509426,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "c0b29250-2cca-4e00-8c0a-5e67924f75df",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3",
+      "archive_output": "motion-frame-candidates/aileen/crouched-walking/clean-pose-2-2/frames",
+      "last_response": {
+        "usage": {
           "type": "usd",
           "usd": 0.0
         },
-        "id": "05c75e3e-500e-4668-ae08-4212b5354b57",
+        "id": "c0b29250-2cca-4e00-8c0a-5e67924f75df",
         "status": "processing",
-        "created_at": "2026-10-24T02:30:42.396017+00:00",
+        "created_at": "2026-10-24T02:37:33.769854+00:00",
+        "last_response": {
+          "type": "background",
+          "status": "initializing",
+          "flow_kind": "animation",
+          "queue_position": 0,
+          "estimated_wait_seconds": 0
+        }
+      }
+    },
+    "9486488c-81d9-46af-9dc6-2c39db6a4705": {
+      "kind": "motion-frame-candidate-crouched-walking-clean-pose-3-2",
+      "slug": "aileen",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792809454.1694558,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "9486488c-81d9-46af-9dc6-2c39db6a4705",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3",
+      "archive_output": "motion-frame-candidates/aileen/crouched-walking/clean-pose-3-2/frames",
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "9486488c-81d9-46af-9dc6-2c39db6a4705",
+        "status": "processing",
+        "created_at": "2026-10-24T02:37:34.420889+00:00",
         "last_response": {
           "type": "background",
           "status": "initializing",
@@ -46575,9 +47578,207 @@
             },
             {
               "frame_index": 2,
-              "source_job_id": "630cb67c-2386-4e45-96c3-6f3f47c9dbc3",
+              "source_job_id": "5bd5cbe5-7393-4461-a381-2479450a0b42",
               "source_frame_index": 2,
-              "sha256": "3495d4c31216118f223940689b128cf514a2a1cd83bcc46a1b332704a2fb535f"
+              "target_pose_index": 2,
+              "source_path": "motion-frame-candidates/aileen/lead-jab/clean-pose-2-1/frames/2.png",
+              "sha256": "b42dbd39f75c6bc303674de50d5bcdbbdb1eb2ac0a5a9bb6381a8116434f4fa9",
+              "findings": "회복 가드와 포니테일 가닥 정상, 앞선 두 후보의 넓은 회색 매트가 없는 2번 선택."
+            }
+          ],
+          "method": "select complete same-pose regenerated frames; no pixel editing",
+          "new_user_approval": false,
+          "visual_reviewed": true
+        },
+        "running-8-frames": {
+          "base_job_id": "4ab2d492-12dc-4192-bdb2-0d529d464617",
+          "frame_sources": [
+            {
+              "frame_index": 0,
+              "source_job_id": "4ab2d492-12dc-4192-bdb2-0d529d464617",
+              "source_frame_index": 0,
+              "sha256": "80f147262e2a8ff2190e11ad718de45281f19de990c4c34c9a134bf672e4286f"
+            },
+            {
+              "frame_index": 1,
+              "source_job_id": "62ce07ec-3b83-4dae-b960-50762c788d6a",
+              "source_frame_index": 1,
+              "target_pose_index": 1,
+              "source_path": "motion-frame-candidates/aileen/running-8-frames/clean-pose-1-1/frames/1.png",
+              "sha256": "e2766f714f219d117de374d064c625fb4920288eb340c09ed3eeb61781745d05",
+              "findings": "세 후보 전체 확인 후 머리카락 가닥과 몸/구두 외곽이 깨끗한 1번 선택. 목표 자세 유지, 회색 매트 덩어리 없음."
+            },
+            {
+              "frame_index": 2,
+              "source_job_id": "4ab2d492-12dc-4192-bdb2-0d529d464617",
+              "source_frame_index": 2,
+              "sha256": "e6f88eaa9f467d2a320a3a7fbdf6d6bd0947ad0c85ef1811c6d07d0aa384251b"
+            },
+            {
+              "frame_index": 3,
+              "source_job_id": "4ab2d492-12dc-4192-bdb2-0d529d464617",
+              "source_frame_index": 3,
+              "sha256": "7b69f29154aea1d303fb572c5501a2ad7d829a1d8e67ed336e8f060996a149e8"
+            },
+            {
+              "frame_index": 4,
+              "source_job_id": "4ab2d492-12dc-4192-bdb2-0d529d464617",
+              "source_frame_index": 4,
+              "sha256": "0d4881cd6a7a7bd2f8f271f20fdfc897ae64f3c85fe60dbd2e55b00dbcd92c6b"
+            },
+            {
+              "frame_index": 5,
+              "source_job_id": "7f28d40d-ed25-4a6f-b8b9-aa54dadcaf92",
+              "source_frame_index": 1,
+              "target_pose_index": 5,
+              "source_path": "motion-frame-candidates/aileen/running-8-frames/clean-pose-5-1/frames/1.png",
+              "sha256": "8b4fcbb5a9c6441953ae352d6e5db2de91ac73e7213ad119d2ece53f8e0cdb26",
+              "findings": "세 후보 확대 확인. 선택 프레임은 목표 자세와 포니테일 가닥/구두 유지, 넓은 외곽 회색 매트 없음."
+            },
+            {
+              "frame_index": 6,
+              "source_job_id": "06fa1d78-327a-4a2a-b825-5fc3d863a448",
+              "source_frame_index": 2,
+              "target_pose_index": 6,
+              "source_path": "motion-frame-candidates/aileen/running-8-frames/clean-pose-6-1/frames/2.png",
+              "sha256": "a624139ce1ad7c2edd8dd8f375ee3e595aa04e2081b015003ba6404f65cf9ea7",
+              "findings": "세 후보 확대 확인. 선택 프레임은 목표 자세와 포니테일 가닥/구두 유지, 넓은 외곽 회색 매트 없음."
+            },
+            {
+              "frame_index": 7,
+              "source_job_id": "4ab2d492-12dc-4192-bdb2-0d529d464617",
+              "source_frame_index": 7,
+              "sha256": "92f6af983d0d12de577e16c66a156b33121edb4ca7164c5eaae9b94773884949"
+            }
+          ],
+          "method": "select complete same-pose regenerated frames; no pixel editing",
+          "new_user_approval": false,
+          "visual_reviewed": false
+        },
+        "walking-8-frames": {
+          "base_job_id": "40dd87bc-564a-44ce-b5d3-f4398f67b6a6",
+          "frame_sources": [
+            {
+              "frame_index": 0,
+              "source_job_id": "c20ce2ed-c57f-44d6-bdbb-5cc86bf7acd5",
+              "source_frame_index": 1,
+              "target_pose_index": 0,
+              "source_path": "motion-frame-candidates/aileen/walking-8-frames/clean-pose-0-1/frames/1.png",
+              "sha256": "c5274841237e0cbab5b3bd1e9c47f6e7a3ce26475dc50764cd6da946886ff970",
+              "findings": "세 후보 전체 확인 후 머리카락 가닥과 몸/구두 외곽이 깨끗한 1번 선택. 목표 자세 유지, 회색 매트 덩어리 없음."
+            },
+            {
+              "frame_index": 1,
+              "source_job_id": "40dd87bc-564a-44ce-b5d3-f4398f67b6a6",
+              "source_frame_index": 1,
+              "sha256": "8dc53992dbf8781614b85523c86bf872d37957a314ae4af79088c199b796ee4e"
+            },
+            {
+              "frame_index": 2,
+              "source_job_id": "40dd87bc-564a-44ce-b5d3-f4398f67b6a6",
+              "source_frame_index": 2,
+              "sha256": "28e704175a999d0c601c5a983b10477de4311818b2d01b933bbecdd5121f5384"
+            },
+            {
+              "frame_index": 3,
+              "source_job_id": "87315976-4880-4787-8987-bddb6513b049",
+              "source_frame_index": 1,
+              "target_pose_index": 3,
+              "source_path": "motion-frame-candidates/aileen/walking-8-frames/clean-pose-3-1/frames/1.png",
+              "sha256": "417827280d1cee367292da730d47be77f13bdb5d0af43b737d06816173fa6994",
+              "findings": "세 후보 전체 확인 후 머리카락 가닥과 몸/구두 외곽이 깨끗한 1번 선택. 목표 자세 유지, 회색 매트 덩어리 없음."
+            },
+            {
+              "frame_index": 4,
+              "source_job_id": "9ecba54d-36c5-4c6a-b6b9-14be4caba63f",
+              "source_frame_index": 1,
+              "target_pose_index": 4,
+              "source_path": "motion-frame-candidates/aileen/walking-8-frames/clean-pose-4-1/frames/1.png",
+              "sha256": "65c29c170d815d9c1ed8b79ff1241bcd1bdb4fe890000d18e8385790e3d77761",
+              "findings": "세 후보 전체 확인 후 머리카락 가닥과 몸/구두 외곽이 깨끗한 1번 선택. 목표 자세 유지, 회색 매트 덩어리 없음."
+            },
+            {
+              "frame_index": 5,
+              "source_job_id": "134f0c81-ac61-40ae-be63-5a835b8a6e65",
+              "source_frame_index": 0,
+              "target_pose_index": 5,
+              "source_path": "motion-frame-candidates/aileen/walking-8-frames/clean-pose-5-1/frames/0.png",
+              "sha256": "1a759dfcc63612d8045bf8e742a3a2c6b71aca14553f36f70a9e73954c2a24df",
+              "findings": "세 후보 확대 확인. 선택 프레임은 목표 자세와 포니테일 가닥/구두 유지, 넓은 외곽 회색 매트 없음."
+            },
+            {
+              "frame_index": 6,
+              "source_job_id": "f0ca365e-b4d0-4989-b1da-c9d89be699f9",
+              "source_frame_index": 1,
+              "target_pose_index": 6,
+              "source_path": "motion-frame-candidates/aileen/walking-8-frames/clean-pose-6-1/frames/1.png",
+              "sha256": "3c319db260fcf196f7ab0c9ef821206b562a503cb1c9cf245fe5df67d37a8df9",
+              "findings": "세 후보 확대 확인. 선택 프레임은 목표 자세와 포니테일 가닥/구두 유지, 넓은 외곽 회색 매트 없음."
+            },
+            {
+              "frame_index": 7,
+              "source_job_id": "40dd87bc-564a-44ce-b5d3-f4398f67b6a6",
+              "source_frame_index": 7,
+              "sha256": "eb8d61dfea95a51285df9bbbab15633b563b7b9eb2027da566a99829bebb3c3d"
+            }
+          ],
+          "method": "select complete same-pose regenerated frames; no pixel editing",
+          "new_user_approval": false,
+          "visual_reviewed": true
+        },
+        "crouched-walking": {
+          "base_job_id": "6699c4cc-6914-4c0d-9cfa-16b8d1ac0971",
+          "frame_sources": [
+            {
+              "frame_index": 0,
+              "source_job_id": "6699c4cc-6914-4c0d-9cfa-16b8d1ac0971",
+              "source_frame_index": 0,
+              "sha256": "6d76a77958d77424512a347efca9275a8aa4a20f9b58fc0a10d1f1c2c0b86b6c"
+            },
+            {
+              "frame_index": 1,
+              "source_job_id": "6699c4cc-6914-4c0d-9cfa-16b8d1ac0971",
+              "source_frame_index": 1,
+              "sha256": "f318cb075f8ec99b43fd10ce27995981437e3dbecef60566b79fe5b257824925"
+            },
+            {
+              "frame_index": 2,
+              "source_job_id": "6699c4cc-6914-4c0d-9cfa-16b8d1ac0971",
+              "source_frame_index": 2,
+              "sha256": "a606f12a29aeef0e090d80b51f866060b4d35f149a8c330c5859774e9f2f1cd9"
+            },
+            {
+              "frame_index": 3,
+              "source_job_id": "6699c4cc-6914-4c0d-9cfa-16b8d1ac0971",
+              "source_frame_index": 3,
+              "sha256": "0dbc56495cba1814750b6ba83619797b5d93e97d6139f8d9a982d04ff84c09d6"
+            },
+            {
+              "frame_index": 4,
+              "source_job_id": "6699c4cc-6914-4c0d-9cfa-16b8d1ac0971",
+              "source_frame_index": 4,
+              "sha256": "80e99c0ec3b6e4a855c461749d37050259f8677c0856459279921983b7df8e6a"
+            },
+            {
+              "frame_index": 5,
+              "source_job_id": "0d0cd67b-2185-47b1-9457-6ce630dda6ea",
+              "source_frame_index": 1,
+              "target_pose_index": 5,
+              "source_path": "motion-frame-candidates/aileen/crouched-walking/clean-pose-5-1/frames/1.png",
+              "sha256": "e157432bc883a41013a9c0a3d8580e4c7e458720491804de98726d5d7746ab49",
+              "findings": "세 후보 확대 확인. 선택 프레임은 목표 자세와 포니테일 가닥/구두 유지, 넓은 외곽 회색 매트 없음."
+            },
+            {
+              "frame_index": 6,
+              "source_job_id": "6699c4cc-6914-4c0d-9cfa-16b8d1ac0971",
+              "source_frame_index": 6,
+              "sha256": "87badafa0ef4d2c78f76e36feb77149b6000fb4e7d7205b5c59f71cd493984f8"
+            },
+            {
+              "frame_index": 7,
+              "source_job_id": "6699c4cc-6914-4c0d-9cfa-16b8d1ac0971",
+              "source_frame_index": 7,
+              "sha256": "6ee0968649cd0936c1b3617ba959481715909ac467d7b5536de2f7181da7b9ec"
             }
           ],
           "method": "select complete same-pose regenerated frames; no pixel editing",
@@ -46603,7 +47804,17 @@
       "motion-frame-candidate-front-flip-clean-pose-9-1": "b87a717a-5da3-4c61-9000-dcff4cdd2b74",
       "motion-frame-candidate-running-slide-clean-pose-2-1": "2b5bd3b4-f86a-46dc-ab8a-77ba3030ae6e",
       "motion-frame-candidate-pushing-clean-pose-5-1": "d85f8f38-a3bb-4c85-8f81-f73db04ed1d1",
-      "motion-frame-candidate-throw-object-clean-pose-4-1": "05c75e3e-500e-4668-ae08-4212b5354b57"
+      "motion-frame-candidate-throw-object-clean-pose-4-1": "05c75e3e-500e-4668-ae08-4212b5354b57",
+      "motion-frame-candidate-backflip-clean-pose-0-1": "a096416d-d44e-48a8-ade5-10cdabae0a2d",
+      "motion-frame-candidate-backflip-clean-pose-1-1": "3f341d9c-c1be-4dca-8388-cbda96f23275",
+      "motion-frame-candidate-backflip-clean-pose-2-1": "969b581d-436c-464e-b489-d803e2bcbe3b",
+      "motion-frame-candidate-backflip-clean-pose-3-1": "25ef5e16-2816-49a9-b73d-a92248857d94",
+      "motion-frame-candidate-backflip-clean-pose-5-1": "132d4a58-a8b9-4bd4-af33-2c1944e5f289",
+      "motion-frame-candidate-backflip-clean-pose-6-1": "3d893b9a-8afa-46fc-a9c8-469f0171d734",
+      "motion-frame-candidate-picking-up-clean-pose-4-1": "ba502b83-69af-44c6-83ef-8a3a041a0503",
+      "motion-frame-candidate-picking-up-clean-pose-5-1": "8363ef06-2b89-4508-b1ce-eff4e51b7871",
+      "motion-frame-candidate-crouched-walking-clean-pose-2-2": "c0b29250-2cca-4e00-8c0a-5e67924f75df",
+      "motion-frame-candidate-crouched-walking-clean-pose-3-2": "9486488c-81d9-46af-9dc6-2c39db6a4705"
     },
     "gorgodio": {
       "name": "고르고디오",
@@ -72261,9 +73472,499 @@
         "files": 13,
         "production_pack_clips": 20
       }
+    },
+    {
+      "at": "2026-10-24T02:31:42Z",
+      "kind": "submitted",
+      "slug": "aileen",
+      "detail": {
+        "kind": "motion-frame-candidate-backflip-clean-pose-0-1",
+        "template": null,
+        "job_id": "a096416d-d44e-48a8-ade5-10cdabae0a2d",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "a096416d-d44e-48a8-ade5-10cdabae0a2d",
+          "status": "processing"
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T02:31:42Z",
+      "kind": "submitted",
+      "slug": "aileen",
+      "detail": {
+        "kind": "motion-frame-candidate-backflip-clean-pose-1-1",
+        "template": null,
+        "job_id": "3f341d9c-c1be-4dca-8388-cbda96f23275",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "3f341d9c-c1be-4dca-8388-cbda96f23275",
+          "status": "processing"
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T02:31:43Z",
+      "kind": "submitted",
+      "slug": "aileen",
+      "detail": {
+        "kind": "motion-frame-candidate-backflip-clean-pose-2-1",
+        "template": null,
+        "job_id": "969b581d-436c-464e-b489-d803e2bcbe3b",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "969b581d-436c-464e-b489-d803e2bcbe3b",
+          "status": "processing"
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T02:31:43Z",
+      "kind": "submitted",
+      "slug": "aileen",
+      "detail": {
+        "kind": "motion-frame-candidate-backflip-clean-pose-3-1",
+        "template": null,
+        "job_id": "25ef5e16-2816-49a9-b73d-a92248857d94",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "25ef5e16-2816-49a9-b73d-a92248857d94",
+          "status": "processing"
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T02:31:44Z",
+      "kind": "submitted",
+      "slug": "aileen",
+      "detail": {
+        "kind": "motion-frame-candidate-backflip-clean-pose-5-1",
+        "template": null,
+        "job_id": "132d4a58-a8b9-4bd4-af33-2c1944e5f289",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "132d4a58-a8b9-4bd4-af33-2c1944e5f289",
+          "status": "processing"
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T02:31:45Z",
+      "kind": "submitted",
+      "slug": "aileen",
+      "detail": {
+        "kind": "motion-frame-candidate-backflip-clean-pose-6-1",
+        "template": null,
+        "job_id": "3d893b9a-8afa-46fc-a9c8-469f0171d734",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "3d893b9a-8afa-46fc-a9c8-469f0171d734",
+          "status": "processing"
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T02:32:58Z",
+      "kind": "submitted",
+      "slug": "aileen",
+      "detail": {
+        "kind": "motion-frame-candidate-picking-up-clean-pose-4-1",
+        "template": null,
+        "job_id": "ba502b83-69af-44c6-83ef-8a3a041a0503",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "ba502b83-69af-44c6-83ef-8a3a041a0503",
+          "status": "processing"
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T02:32:59Z",
+      "kind": "submitted",
+      "slug": "aileen",
+      "detail": {
+        "kind": "motion-frame-candidate-picking-up-clean-pose-5-1",
+        "template": null,
+        "job_id": "8363ef06-2b89-4508-b1ce-eff4e51b7871",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "8363ef06-2b89-4508-b1ce-eff4e51b7871",
+          "status": "processing"
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T02:34:06Z",
+      "kind": "completed",
+      "slug": "aileen",
+      "detail": {
+        "kind": "motion-frame-candidate-running-8-frames-clean-pose-5-1",
+        "template": null,
+        "job_id": "7f28d40d-ed25-4a6f-b8b9-aa54dadcaf92",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 2
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T02:34:06Z",
+      "kind": "completed",
+      "slug": "aileen",
+      "detail": {
+        "kind": "motion-frame-candidate-running-8-frames-clean-pose-6-1",
+        "template": null,
+        "job_id": "06fa1d78-327a-4a2a-b825-5fc3d863a448",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 2
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T02:34:06Z",
+      "kind": "completed",
+      "slug": "aileen",
+      "detail": {
+        "kind": "motion-frame-candidate-crouched-walking-clean-pose-2-1",
+        "template": null,
+        "job_id": "3afee199-257e-438a-a103-7613ac9313a5",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 2
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T02:34:07Z",
+      "kind": "completed",
+      "slug": "aileen",
+      "detail": {
+        "kind": "motion-frame-candidate-crouched-walking-clean-pose-3-1",
+        "template": null,
+        "job_id": "72f1eb24-f70b-4c3a-8742-8c914617dc4b",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 2
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T02:34:07Z",
+      "kind": "completed",
+      "slug": "aileen",
+      "detail": {
+        "kind": "motion-frame-candidate-crouched-walking-clean-pose-5-1",
+        "template": null,
+        "job_id": "0d0cd67b-2185-47b1-9457-6ce630dda6ea",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 2
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T02:34:07Z",
+      "kind": "completed",
+      "slug": "aileen",
+      "detail": {
+        "kind": "motion-frame-candidate-walking-8-frames-clean-pose-5-1",
+        "template": null,
+        "job_id": "134f0c81-ac61-40ae-be63-5a835b8a6e65",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 2
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T02:34:07Z",
+      "kind": "completed",
+      "slug": "aileen",
+      "detail": {
+        "kind": "motion-frame-candidate-walking-8-frames-clean-pose-6-1",
+        "template": null,
+        "job_id": "f0ca365e-b4d0-4989-b1da-c9d89be699f9",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 2
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T02:34:07Z",
+      "kind": "completed",
+      "slug": "aileen",
+      "detail": {
+        "kind": "motion-frame-candidate-front-flip-clean-pose-4-1",
+        "template": null,
+        "job_id": "e4766aea-cf0e-4071-a0bc-be40752a7c9c",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 2
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T02:34:07Z",
+      "kind": "completed",
+      "slug": "aileen",
+      "detail": {
+        "kind": "motion-frame-candidate-front-flip-clean-pose-9-1",
+        "template": null,
+        "job_id": "b87a717a-5da3-4c61-9000-dcff4cdd2b74",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 2
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T02:34:07Z",
+      "kind": "completed",
+      "slug": "aileen",
+      "detail": {
+        "kind": "motion-frame-candidate-running-slide-clean-pose-2-1",
+        "template": null,
+        "job_id": "2b5bd3b4-f86a-46dc-ab8a-77ba3030ae6e",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 2
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T02:34:07Z",
+      "kind": "completed",
+      "slug": "aileen",
+      "detail": {
+        "kind": "motion-frame-candidate-pushing-clean-pose-5-1",
+        "template": null,
+        "job_id": "d85f8f38-a3bb-4c85-8f81-f73db04ed1d1",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 2
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T02:34:07Z",
+      "kind": "completed",
+      "slug": "aileen",
+      "detail": {
+        "kind": "motion-frame-candidate-throw-object-clean-pose-4-1",
+        "template": null,
+        "job_id": "05c75e3e-500e-4668-ae08-4212b5354b57",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 2
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T02:34:07Z",
+      "kind": "completed",
+      "slug": "aileen",
+      "detail": {
+        "kind": "motion-frame-candidate-backflip-clean-pose-0-1",
+        "template": null,
+        "job_id": "a096416d-d44e-48a8-ade5-10cdabae0a2d",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 2
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T02:34:07Z",
+      "kind": "completed",
+      "slug": "aileen",
+      "detail": {
+        "kind": "motion-frame-candidate-backflip-clean-pose-1-1",
+        "template": null,
+        "job_id": "3f341d9c-c1be-4dca-8388-cbda96f23275",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 2
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T02:34:07Z",
+      "kind": "completed",
+      "slug": "aileen",
+      "detail": {
+        "kind": "motion-frame-candidate-backflip-clean-pose-2-1",
+        "template": null,
+        "job_id": "969b581d-436c-464e-b489-d803e2bcbe3b",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 2
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T02:34:07Z",
+      "kind": "completed",
+      "slug": "aileen",
+      "detail": {
+        "kind": "motion-frame-candidate-backflip-clean-pose-3-1",
+        "template": null,
+        "job_id": "25ef5e16-2816-49a9-b73d-a92248857d94",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 2
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T02:34:07Z",
+      "kind": "completed",
+      "slug": "aileen",
+      "detail": {
+        "kind": "motion-frame-candidate-backflip-clean-pose-5-1",
+        "template": null,
+        "job_id": "132d4a58-a8b9-4bd4-af33-2c1944e5f289",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 2
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T02:34:07Z",
+      "kind": "completed",
+      "slug": "aileen",
+      "detail": {
+        "kind": "motion-frame-candidate-backflip-clean-pose-6-1",
+        "template": null,
+        "job_id": "3d893b9a-8afa-46fc-a9c8-469f0171d734",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 2
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T02:34:09Z",
+      "kind": "exported",
+      "slug": "aileen",
+      "detail": {
+        "bytes": 130346,
+        "files": 13,
+        "production_pack_clips": 20
+      }
+    },
+    {
+      "at": "2026-10-24T02:37:33Z",
+      "kind": "submitted",
+      "slug": "aileen",
+      "detail": {
+        "kind": "motion-frame-candidate-crouched-walking-clean-pose-2-2",
+        "template": null,
+        "job_id": "c0b29250-2cca-4e00-8c0a-5e67924f75df",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "c0b29250-2cca-4e00-8c0a-5e67924f75df",
+          "status": "processing"
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T02:37:34Z",
+      "kind": "submitted",
+      "slug": "aileen",
+      "detail": {
+        "kind": "motion-frame-candidate-crouched-walking-clean-pose-3-2",
+        "template": null,
+        "job_id": "9486488c-81d9-46af-9dc6-2c39db6a4705",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "9486488c-81d9-46af-9dc6-2c39db6a4705",
+          "status": "processing"
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T02:37:35Z",
+      "kind": "completed",
+      "slug": "aileen",
+      "detail": {
+        "kind": "motion-frame-candidate-picking-up-clean-pose-4-1",
+        "template": null,
+        "job_id": "ba502b83-69af-44c6-83ef-8a3a041a0503",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 2
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T02:37:35Z",
+      "kind": "completed",
+      "slug": "aileen",
+      "detail": {
+        "kind": "motion-frame-candidate-picking-up-clean-pose-5-1",
+        "template": null,
+        "job_id": "8363ef06-2b89-4508-b1ce-eff4e51b7871",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 2
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T02:37:36Z",
+      "kind": "exported",
+      "slug": "aileen",
+      "detail": {
+        "bytes": 130346,
+        "files": 13,
+        "production_pack_clips": 20
+      }
     }
   ],
-  "updated_at": 1792809076.3145564,
+  "updated_at": 1792809456.2836642,
   "user_stopped_at": 1792778235.6917784,
   "archived_jobs": {
     "304457e9-6577-44f0-af17-97841a9f6720": {
@@ -73582,11 +75283,11 @@
       "saved_frames": 6
     }
   },
-  "last_git_checkpoint": 1792808771.09746,
+  "last_git_checkpoint": 1792809078.9966478,
   "summary": {
     "jobs": {
-      "processing": 12,
-      "completed": 497,
+      "processing": 2,
+      "completed": 517,
       "failed": 9,
       "stalled": 0
     },

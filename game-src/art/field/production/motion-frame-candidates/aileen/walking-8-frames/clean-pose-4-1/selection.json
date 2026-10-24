@@ -1,0 +1,9 @@
+{
+  "frame_index": 4,
+  "source_job_id": "9ecba54d-36c5-4c6a-b6b9-14be4caba63f",
+  "source_frame_index": 1,
+  "target_pose_index": 4,
+  "source_path": "motion-frame-candidates/aileen/walking-8-frames/clean-pose-4-1/frames/1.png",
+  "sha256": "65c29c170d815d9c1ed8b79ff1241bcd1bdb4fe890000d18e8385790e3d77761",
+  "findings": "세 후보 전체 확인 후 머리카락 가닥과 몸/구두 외곽이 깨끗한 1번 선택. 목표 자세 유지, 회색 매트 덩어리 없음."
+}

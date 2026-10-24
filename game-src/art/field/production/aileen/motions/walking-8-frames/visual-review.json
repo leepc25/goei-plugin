@@ -1,8 +1,8 @@
 {
-  "at": 1792808965.9943647,
+  "at": 1792809434.8912463,
   "job_id": "40dd87bc-564a-44ce-b5d3-f4398f67b6a6",
-  "result": "reroll-required",
-  "findings": "발 접촉은 해결. 1·4·5·6·7번째 포니테일 끝 회색 매트 잔류. 정상 자세는 보존하고 해당 자세만 정지 후보로 재생성.",
+  "result": "pass",
+  "findings": "문제5자세를 개별 정상 후보 전체PNG로 교체한 뒤8장 재검토. 동쪽 걷기/발 접촉/얼굴/포니테일/정장 유지, 회색 매트와 공중에 뜨는 오류 해결. 해시 및 선택 원job 기록.",
   "frame_count": 8,
   "directions": [
     "east"
@@ -16,5 +16,76 @@
     "correct face-visible direction",
     "no gray exterior paint in every frame",
     "pose and foot contact consistency"
-  ]
+  ],
+  "frame_assembly": {
+    "base_job_id": "40dd87bc-564a-44ce-b5d3-f4398f67b6a6",
+    "frame_sources": [
+      {
+        "frame_index": 0,
+        "source_job_id": "c20ce2ed-c57f-44d6-bdbb-5cc86bf7acd5",
+        "source_frame_index": 1,
+        "target_pose_index": 0,
+        "source_path": "motion-frame-candidates/aileen/walking-8-frames/clean-pose-0-1/frames/1.png",
+        "sha256": "c5274841237e0cbab5b3bd1e9c47f6e7a3ce26475dc50764cd6da946886ff970",
+        "findings": "세 후보 전체 확인 후 머리카락 가닥과 몸/구두 외곽이 깨끗한 1번 선택. 목표 자세 유지, 회색 매트 덩어리 없음."
+      },
+      {
+        "frame_index": 1,
+        "source_job_id": "40dd87bc-564a-44ce-b5d3-f4398f67b6a6",
+        "source_frame_index": 1,
+        "sha256": "8dc53992dbf8781614b85523c86bf872d37957a314ae4af79088c199b796ee4e"
+      },
+      {
+        "frame_index": 2,
+        "source_job_id": "40dd87bc-564a-44ce-b5d3-f4398f67b6a6",
+        "source_frame_index": 2,
+        "sha256": "28e704175a999d0c601c5a983b10477de4311818b2d01b933bbecdd5121f5384"
+      },
+      {
+        "frame_index": 3,
+        "source_job_id": "87315976-4880-4787-8987-bddb6513b049",
+        "source_frame_index": 1,
+        "target_pose_index": 3,
+        "source_path": "motion-frame-candidates/aileen/walking-8-frames/clean-pose-3-1/frames/1.png",
+        "sha256": "417827280d1cee367292da730d47be77f13bdb5d0af43b737d06816173fa6994",
+        "findings": "세 후보 전체 확인 후 머리카락 가닥과 몸/구두 외곽이 깨끗한 1번 선택. 목표 자세 유지, 회색 매트 덩어리 없음."
+      },
+      {
+        "frame_index": 4,
+        "source_job_id": "9ecba54d-36c5-4c6a-b6b9-14be4caba63f",
+        "source_frame_index": 1,
+        "target_pose_index": 4,
+        "source_path": "motion-frame-candidates/aileen/walking-8-frames/clean-pose-4-1/frames/1.png",
+        "sha256": "65c29c170d815d9c1ed8b79ff1241bcd1bdb4fe890000d18e8385790e3d77761",
+        "findings": "세 후보 전체 확인 후 머리카락 가닥과 몸/구두 외곽이 깨끗한 1번 선택. 목표 자세 유지, 회색 매트 덩어리 없음."
+      },
+      {
+        "frame_index": 5,
+        "source_job_id": "134f0c81-ac61-40ae-be63-5a835b8a6e65",
+        "source_frame_index": 0,
+        "target_pose_index": 5,
+        "source_path": "motion-frame-candidates/aileen/walking-8-frames/clean-pose-5-1/frames/0.png",
+        "sha256": "1a759dfcc63612d8045bf8e742a3a2c6b71aca14553f36f70a9e73954c2a24df",
+        "findings": "세 후보 확대 확인. 선택 프레임은 목표 자세와 포니테일 가닥/구두 유지, 넓은 외곽 회색 매트 없음."
+      },
+      {
+        "frame_index": 6,
+        "source_job_id": "f0ca365e-b4d0-4989-b1da-c9d89be699f9",
+        "source_frame_index": 1,
+        "target_pose_index": 6,
+        "source_path": "motion-frame-candidates/aileen/walking-8-frames/clean-pose-6-1/frames/1.png",
+        "sha256": "3c319db260fcf196f7ab0c9ef821206b562a503cb1c9cf245fe5df67d37a8df9",
+        "findings": "세 후보 확대 확인. 선택 프레임은 목표 자세와 포니테일 가닥/구두 유지, 넓은 외곽 회색 매트 없음."
+      },
+      {
+        "frame_index": 7,
+        "source_job_id": "40dd87bc-564a-44ce-b5d3-f4398f67b6a6",
+        "source_frame_index": 7,
+        "sha256": "eb8d61dfea95a51285df9bbbab15633b563b7b9eb2027da566a99829bebb3c3d"
+      }
+    ],
+    "method": "select complete same-pose regenerated frames; no pixel editing",
+    "new_user_approval": false,
+    "visual_reviewed": true
+  }
 }

@@ -1,8 +1,8 @@
 {
-  "at": 1792808840.58276,
+  "at": 1792809160.7378862,
   "job_id": "630cb67c-2386-4e45-96c3-6f3f47c9dbc3",
-  "result": "reroll-required",
-  "findings": "두번째 뻗은 자세는 이펙트 없는 정상 후보로 교체. 전체 재검토에서 마지막 회복 자세 포니테일 끝 회색 매트가 남아 해당 자세 추가 수정.",
+  "result": "pass",
+  "findings": "뻗기/회복 두 자세를 개별 정상 후보 PNG로 교체하고 전체3장 재확인. 동쪽 가드→잽→회복, 맨주먹 이펙트 제거, 발 사이 회색 면 제거, 머리카락 외곽 넓은 회색 매트 없음. 선택 원본/해시 기록.",
   "frame_count": 3,
   "directions": [
     "east"
@@ -37,13 +37,16 @@
       },
       {
         "frame_index": 2,
-        "source_job_id": "630cb67c-2386-4e45-96c3-6f3f47c9dbc3",
+        "source_job_id": "5bd5cbe5-7393-4461-a381-2479450a0b42",
         "source_frame_index": 2,
-        "sha256": "3495d4c31216118f223940689b128cf514a2a1cd83bcc46a1b332704a2fb535f"
+        "target_pose_index": 2,
+        "source_path": "motion-frame-candidates/aileen/lead-jab/clean-pose-2-1/frames/2.png",
+        "sha256": "b42dbd39f75c6bc303674de50d5bcdbbdb1eb2ac0a5a9bb6381a8116434f4fa9",
+        "findings": "회복 가드와 포니테일 가닥 정상, 앞선 두 후보의 넓은 회색 매트가 없는 2번 선택."
       }
     ],
     "method": "select complete same-pose regenerated frames; no pixel editing",
     "new_user_approval": false,
-    "visual_reviewed": false
+    "visual_reviewed": true
   }
 }
