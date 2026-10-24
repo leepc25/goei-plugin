@@ -707,7 +707,8 @@
         "comparison": "Same native scale; crown-to-sole excludes hair volume; no frame-fitting enlargement."
       },
       "reviewed_at": "2026-10-24"
-    }
+    },
+    "user_rejected_deleted": true
   },
   {
     "english": "Do Pil-heon",
@@ -766,7 +767,8 @@
       },
       "reviewed_at": "2026-10-24"
     },
-    "native_height_canvas": true
+    "native_height_canvas": true,
+    "user_rejected_deleted": true
   },
   {
     "english": "Lee Gil-hwan",
@@ -826,7 +828,8 @@
         "comparison": "Same native scale; crown-to-sole excludes hair volume; no frame-fitting enlargement."
       },
       "reviewed_at": "2026-10-24"
-    }
+    },
+    "user_rejected_deleted": true
   },
   {
     "english": "Lee Gi-seok",
@@ -886,7 +889,8 @@
         "comparison": "Same native scale; crown-to-sole excludes hair volume; no frame-fitting enlargement."
       },
       "reviewed_at": "2026-10-24"
-    }
+    },
+    "user_rejected_deleted": true
   },
   {
     "english": "Kim Jo-hak",
@@ -946,7 +950,8 @@
         "comparison": "Same native scale; crown-to-sole excludes hair volume; no frame-fitting enlargement."
       },
       "reviewed_at": "2026-10-24"
-    }
+    },
+    "user_rejected_deleted": true
   },
   {
     "english": "Lee Do-hyeong",
@@ -1066,7 +1071,8 @@
         "comparison": "Same native scale; crown-to-sole excludes hair volume; no frame-fitting enlargement."
       },
       "reviewed_at": "2026-10-24"
-    }
+    },
+    "user_rejected_deleted": true
   },
   {
     "english": "No Gi-gyun",
@@ -1126,7 +1132,8 @@
       "reviewed_at": "2026-10-24"
     },
     "image_edit_source": "game-src/art/field/production/history/rebuild-20261024/rerolls/no-gi-gyun/055f27fb-a9b7-4c74-9d2a-e398f3bbc39d/reference.png",
-    "image_edit_description": "Change ONLY the healed SCARS around the mouth: a clearly readable dark-brown jagged scar line extends from EACH corner of the closed lips across BOTH cheeks toward ears. Add several short perpendicular stitch-like scar marks crossing each line. These wide old healed Glasgow-smile scars are the identifying feature and must remain readable at native pixel scale. No blood, no moustache, no beard, no fresh wounds. Preserve aviator sunglasses, clean-shaven narrow face, dark swept-back side-part hair, entire suit, exact height and body proportions, front pose and hands. Same pixel style and transparent background; no outer gray halo."
+    "image_edit_description": "Change ONLY the healed SCARS around the mouth: a clearly readable dark-brown jagged scar line extends from EACH corner of the closed lips across BOTH cheeks toward ears. Add several short perpendicular stitch-like scar marks crossing each line. These wide old healed Glasgow-smile scars are the identifying feature and must remain readable at native pixel scale. No blood, no moustache, no beard, no fresh wounds. Preserve aviator sunglasses, clean-shaven narrow face, dark swept-back side-part hair, entire suit, exact height and body proportions, front pose and hands. Same pixel style and transparent background; no outer gray halo.",
+    "user_rejected_deleted": true
   },
   {
     "english": "Song Ju-ik",
@@ -1186,7 +1193,8 @@
         "comparison": "Same native scale; crown-to-sole excludes hair volume; no frame-fitting enlargement."
       },
       "reviewed_at": "2026-10-24"
-    }
+    },
+    "user_rejected_deleted": true
   },
   {
     "english": "Kwak Seong-ju",
@@ -1306,7 +1314,8 @@
         "comparison": "Same native scale; crown-to-sole excludes hair volume; no frame-fitting enlargement."
       },
       "reviewed_at": "2026-10-24"
-    }
+    },
+    "user_rejected_deleted": true
   },
   {
     "english": "Yun Byeong-su",
@@ -1366,7 +1375,8 @@
         "comparison": "Same native scale; crown-to-sole excludes hair volume; no frame-fitting enlargement."
       },
       "reviewed_at": "2026-10-24"
-    }
+    },
+    "user_rejected_deleted": true
   },
   {
     "english": "Kim Seong-jin",
@@ -1425,7 +1435,8 @@
       },
       "reviewed_at": "2026-10-24"
     },
-    "native_height_canvas": true
+    "native_height_canvas": true,
+    "user_rejected_deleted": true
   },
   {
     "english": "Song Jin-seob",
@@ -1485,7 +1496,8 @@
       "reviewed_at": "2026-10-24"
     },
     "image_edit_source": "game-src/art/field/production/history/rebuild-20261024/rerolls/song-jin-seob/d5dfbca5-a1ff-47cb-964c-567ab8f36b3b/reference.png",
-    "image_edit_description": "Change ONLY the haircut fringe: make the straight rounded bowl-cut bangs SHORT, ending clearly ABOVE eyebrows, exposing a visible pale forehead band between fringe and eyebrows, as in a neat short schoolboy bowl cut. Keep dark brown-black hair, soft youthful oval face, small chin, gentle smile, large black aviator sunglasses. Preserve exact full-body pixels outside forehead/hair: slim build, brown-charcoal buttoned suit, white shirt, neat tie, pose, height and shoes. Transparent background, crisp pixel art, no gray halo."
+    "image_edit_description": "Change ONLY the haircut fringe: make the straight rounded bowl-cut bangs SHORT, ending clearly ABOVE eyebrows, exposing a visible pale forehead band between fringe and eyebrows, as in a neat short schoolboy bowl cut. Keep dark brown-black hair, soft youthful oval face, small chin, gentle smile, large black aviator sunglasses. Preserve exact full-body pixels outside forehead/hair: slim build, brown-charcoal buttoned suit, white shirt, neat tie, pose, height and shoes. Transparent background, crisp pixel art, no gray halo.",
+    "user_rejected_deleted": true
   },
   {
     "english": "Baek Seok-ju",
@@ -1553,7 +1565,8 @@
         "note": "Common production scale; do not fit each person to full canvas. Compare anatomical crown-to-sole height; hair/headwear and heels need separate allowance. Unspecified individual female height stays a range."
       },
       "reviewed_at": "2026-10-24"
-    }
+    },
+    "user_rejected_deleted": true
   },
   {
     "english": "Jin Na-sol",
@@ -1621,7 +1634,8 @@
         "note": "Common production scale; do not fit each person to full canvas. Compare anatomical crown-to-sole height; hair/headwear and heels need separate allowance. Unspecified individual female height stays a range."
       },
       "reviewed_at": "2026-10-24"
-    }
+    },
+    "user_rejected_deleted": true
   },
   {
     "english": "Lee Seong-hae",
@@ -1695,7 +1709,8 @@
     "palette_validation_note": "Local inpaint preserves all unmasked RGBA exactly and adds17 hair shades (59 total). 48 was the creator request target/successful reference example, not a user-mandated hard limit for all outputs. Native hard-edged pixels and transparent alpha remain mandatory; allow64 for this masked repair without reducing colors and losing green irises.",
     "registration_import_zip": "game-src/art/field/production/direction-repairs/lee-seong-hae/d254a6a5-b284-4ca5-a804-76f83bb47f28/eyes-corrected-y/character.zip",
     "registration_import_review": "수정4방향의 초록 홍채를 확대 및 전신으로 확인. 원화의 흰 낮은 옆포니테일·남색 정장·운동화·작은 체격 보존. 눈 외 RGBA 동일, 나머지4방향 기존 검수 유지. 회색 외곽 없음. AVIF 우선·로어 키 보충·전원 장벽 재확인.",
-    "registration_regenerate_directions": []
+    "registration_regenerate_directions": [],
+    "user_rejected_deleted": true
   },
   {
     "english": "Lee Ja-heon",
@@ -1820,7 +1835,8 @@
       },
       "reviewed_at": "2026-10-24"
     },
-    "native_height_canvas": true
+    "native_height_canvas": true,
+    "user_rejected_deleted": true
   },
   {
     "english": "Park Min-seong",
@@ -1936,7 +1952,8 @@
       "reviewed_at": "2026-10-24"
     },
     "image_edit_source": "game-src/art/field/production/history/rebuild-20261024/rerolls/baek-sa-heon/ade7d26c-fc44-4f9f-bf64-9dcd7a01c343/reference.png",
-    "image_edit_description": "Remove ONLY the clear eyeglass/frame-like rectangle around the uncovered eye (HIS RIGHT eye, viewer LEFT). He does NOT wear glasses. Draw a narrow half-lidded gray-brown eye naturally in pale skin with NO eyeglass frame. Keep the navy rectangular medical EYEPATCH over HIS LEFT eye (viewer RIGHT), held by one thin DIAGONAL strap crossing bridge of nose as in a medical eye patch. Preserve curly ash-brown hair, youthful thin face, smug small smile, entire navy suited body, slim build, exact native height, front-facing pose and all clothes. Same crisp pixel style, transparent background, no gray halo."
+    "image_edit_description": "Remove ONLY the clear eyeglass/frame-like rectangle around the uncovered eye (HIS RIGHT eye, viewer LEFT). He does NOT wear glasses. Draw a narrow half-lidded gray-brown eye naturally in pale skin with NO eyeglass frame. Keep the navy rectangular medical EYEPATCH over HIS LEFT eye (viewer RIGHT), held by one thin DIAGONAL strap crossing bridge of nose as in a medical eye patch. Preserve curly ash-brown hair, youthful thin face, smug small smile, entire navy suited body, slim build, exact native height, front-facing pose and all clothes. Same crisp pixel style, transparent background, no gray halo.",
+    "user_rejected_deleted": true
   },
   {
     "english": "Go Young-eun",
@@ -2004,7 +2021,8 @@
         "note": "Common production scale; do not fit each person to full canvas. Compare anatomical crown-to-sole height; hair/headwear and heels need separate allowance. Unspecified individual female height stays a range."
       },
       "reviewed_at": "2026-10-24"
-    }
+    },
+    "user_rejected_deleted": true
   },
   {
     "english": "Kang I-hak",
@@ -2072,7 +2090,8 @@
         "note": "Common production scale; do not fit each person to full canvas. Compare anatomical crown-to-sole height; hair/headwear and heels need separate allowance. Unspecified individual female height stays a range."
       },
       "reviewed_at": "2026-10-24"
-    }
+    },
+    "user_rejected_deleted": true
   },
   {
     "english": "Jang Heo-un",
@@ -2133,7 +2152,8 @@
     "image_inpaint_mask": "game-src/art/field/production/inputs/jang-heo-un-hair-mask.png",
     "image_inpaint_description": "Extend the dark charcoal-brown layered hair on both sides down OVER the shoulders to upper chest, ending at y96. Long loose shoulder-covering shaggy hair with outward feathered ends; not a short neck-length haircut. Keep face, center part, open white collar and loose navy tie exactly. Only repair hair in white mask. Crisp native pixels and fully transparent outside silhouette.",
     "image_validation_palette_limit": 64,
-    "image_palette_limit_reason": "Local masked hair repair preserves unmasked RGBA exactly; generation target48 is not a user hard cap. Allow up to64 to avoid destructive whole-image quantization."
+    "image_palette_limit_reason": "Local masked hair repair preserves unmasked RGBA exactly; generation target48 is not a user hard cap. Allow up to64 to avoid destructive whole-image quantization.",
+    "user_rejected_deleted": true
   },
   {
     "english": "Kwak Je-gang",
@@ -2259,7 +2279,8 @@
         "note": "Common production scale; do not fit each person to full canvas. Compare anatomical crown-to-sole height; hair/headwear and heels need separate allowance. Unspecified individual female height stays a range."
       },
       "reviewed_at": "2026-10-24"
-    }
+    },
+    "user_rejected_deleted": true
   },
   {
     "english": "Lee Byeong-jin",
@@ -2317,7 +2338,8 @@
         "note": "Pixel ranges are production targets, not invented canonical height. Preserve original build and clothing; validate together at identical zoom."
       },
       "reviewed_at": "2026-10-24"
-    }
+    },
+    "user_rejected_deleted": true
   },
   {
     "english": "Jay",
@@ -2378,7 +2400,8 @@
     },
     "registration_import_zip": "game-src/art/field/production/direction-repairs/jay/08548050-739d-4a8a-848a-2280b7ef0ef4/two-back-sleeves/character.zip",
     "registration_import_review": "북동/북서의 잔여 소매 패치와 테두리 완전 제거를 확대 검수. 기존4개 교정 방향과 정면/뒤정면을 모두 재확인해8방향 무늬 없는 남색 소매 유지. 검은 모자·은발·안경·흰 마스크·체격 및 키 보존. 마스크 밖 RGBA 동일, 회색 외곽 없음. AVIF 우선·로어 보충·전원 장벽 재확인.",
-    "registration_regenerate_directions": []
+    "registration_regenerate_directions": [],
+    "user_rejected_deleted": true
   },
   {
     "english": "Ho Yu-won",
@@ -2436,7 +2459,8 @@
         "note": "Pixel ranges are production targets, not invented canonical height. Preserve original build and clothing; validate together at identical zoom."
       },
       "reviewed_at": "2026-10-24"
-    }
+    },
+    "user_rejected_deleted": true
   },
   {
     "english": "Cheong Dal-lae",
@@ -2504,7 +2528,8 @@
         "note": "Common production scale; do not fit each person to full canvas. Compare anatomical crown-to-sole height; hair/headwear and heels need separate allowance. Unspecified individual female height stays a range."
       },
       "reviewed_at": "2026-10-24"
-    }
+    },
+    "user_rejected_deleted": true
   },
   {
     "english": "Cha Yeo-jin",
@@ -2575,7 +2600,8 @@
     },
     "registration_import_zip": "game-src/art/field/production/direction-repairs/cha-yeo-jin/34a102ab-fd2b-4740-b89e-acef126efad1/complete-badge-outline/character.zip",
     "registration_regenerate_directions": [],
-    "registration_import_review": "북서쪽 소매 문양과 모든 테두리 완전 제거 확인. 나머지7방향은 이전 검수본 그대로, 붉은 긴 머리·회색 정장·넥타이·체격과 키 유지. 마스크 밖 RGBA 동일, 회색 외곽 없음. AVIF 우선·로어 보충·전원 장벽 재확인."
+    "registration_import_review": "북서쪽 소매 문양과 모든 테두리 완전 제거 확인. 나머지7방향은 이전 검수본 그대로, 붉은 긴 머리·회색 정장·넥타이·체격과 키 유지. 마스크 밖 RGBA 동일, 회색 외곽 없음. AVIF 우선·로어 보충·전원 장벽 재확인.",
+    "user_rejected_deleted": true
   },
   {
     "english": "Seo Yun-ji",
@@ -2646,7 +2672,8 @@
     "image_inpaint_mask": "game-src/art/field/production/inputs/seo-yun-ji-length-mask.png",
     "image_inpaint_description": "Extend the lower ends of BOTH existing sage-green braids down to WAIST y147. Two thick long braided pigtails hanging symmetrically over the chest and ending at the waist, small tied ends. Continue existing braid texture and color, no floating gaps or ribbons. Do not shorten to chest length. Preserve face, upper braids, white sleeves, navy vest, skirt and body stature outside white mask exactly.",
     "image_validation_palette_limit": 64,
-    "image_palette_limit_reason": "Local length correction preserving all unmasked RGBA."
+    "image_palette_limit_reason": "Local length correction preserving all unmasked RGBA.",
+    "user_rejected_deleted": true
   },
   {
     "english": "Go Yeon-ji",
@@ -2717,7 +2744,8 @@
     "image_inpaint_mask": "game-src/art/field/production/inputs/go-yeon-ji-hair-mask.png",
     "image_inpaint_description": "Replace blue short bob with straight natural BLACK shoulder-length hair, charcoal highlights with NO blue hue. Long uneven blunt forehead bangs, sides extending to shoulders at y98 with slightly flipped outward ends. Keep serious face, eyes, white coat, stethoscope and mint collared shirt exactly. Only masked hair changes; crisp native pixels, transparent exterior.",
     "image_validation_palette_limit": 65,
-    "image_palette_limit_reason": "Visually inspected masked black shoulder-length hair repair has65 opaque colors. Unmasked source RGBA is exactly retained;64 was a provisional local cap, not a user requirement. Accept this bounded native palette rather than quantize face and costume."
+    "image_palette_limit_reason": "Visually inspected masked black shoulder-length hair repair has65 opaque colors. Unmasked source RGBA is exactly retained;64 was a provisional local cap, not a user requirement. Accept this bounded native palette rather than quantize face and costume.",
+    "user_rejected_deleted": true
   },
   {
     "english": "Yun Ji-a",
@@ -2785,7 +2813,8 @@
         "note": "Common production scale; do not fit each person to full canvas. Compare anatomical crown-to-sole height; hair/headwear and heels need separate allowance. Unspecified individual female height stays a range."
       },
       "reviewed_at": "2026-10-24"
-    }
+    },
+    "user_rejected_deleted": true
   },
   {
     "english": "Ma Deok-hee",
@@ -2856,7 +2885,8 @@
     "image_inpaint_mask": "game-src/art/field/production/inputs/ma-deok-hee-hair-mask.png",
     "image_inpaint_description": "Fill the open triangular forehead hair gap with dense straight BLACK blunt bangs. A continuous horizontal fringe across the entire forehead just ABOVE eyebrows at y62. No center part and no bare triangular forehead. Preserve eyes, face, black chin-length bob, suit and body exactly. Match existing black hair palette, crisp native pixel clusters, transparent background.",
     "image_validation_palette_limit": 64,
-    "image_palette_limit_reason": "Local masked hair repair preserves unmasked RGBA exactly; generation target48 is not a user hard cap. Allow up to64 to avoid destructive whole-image quantization."
+    "image_palette_limit_reason": "Local masked hair repair preserves unmasked RGBA exactly; generation target48 is not a user hard cap. Allow up to64 to avoid destructive whole-image quantization.",
+    "user_rejected_deleted": true
   },
   {
     "english": "Mun Hye-ran",
@@ -2927,7 +2957,8 @@
     },
     "registration_import_zip": "game-src/art/field/production/history/rebuild-20261024/deleted-library/99684006-a13e-4ca1-b55c-5f4ecb1069de/character.zip",
     "registration_regenerate_directions": [],
-    "registration_import_review": "All8 individually inspected: dark brown low ponytail, cheek locks, mature face, brown suit, black collar, left gold watch, consistent stature and clean edges. Preserve all8 existing PNGs exactly; only reconstruct registration/skeleton."
+    "registration_import_review": "All8 individually inspected: dark brown low ponytail, cheek locks, mature face, brown suit, black collar, left gold watch, consistent stature and clean edges. Preserve all8 existing PNGs exactly; only reconstruct registration/skeleton.",
+    "user_rejected_deleted": true
   },
   {
     "english": "Shin Yuri",
@@ -2998,7 +3029,8 @@
     },
     "registration_import_zip": "game-src/art/field/production/direction-repairs/shin-yuri/6d890b31-7194-48f6-bf12-e95897095d36/remove-old-hair-speck/character.zip",
     "registration_import_review": "7방향의 가로로 뻗은 땋은 머리를 느슨하고 아래로 내려오는 짧은 검은 포니테일로 교정한 결과를 모두 시각 확인. 북동쪽에 남았던 이전 머리3픽셀도 alpha0으로 제거 확인. 원작의 가죽 재킷·짙은 회색 이너·바지·부츠·얼굴·키 유지, 마스크 밖 RGBA 동일. 회색 외곽 없음. AVIF 우선·로어 키 보충·전원 장벽 재확인.",
-    "registration_regenerate_directions": []
+    "registration_regenerate_directions": [],
+    "user_rejected_deleted": true
   },
   {
     "english": "Blaret",
@@ -3079,7 +3111,8 @@
     },
     "registration_import_zip": "game-src/art/field/production/direction-repairs/blaret/b14a022b-017b-4229-9b6c-6291583a408a/wide-long-veil/character.zip",
     "registration_import_review": "7방향 모두 개별 시각 검수: 짧은 후드/가느다란 외곽 끈이 넓고 연속된 검은 베일 천으로 교정되어 엉덩이 부근까지 내려옴. 뒤쪽 노출 금발은 베일로 덮이고, 앞쪽 금발·초록 눈·흰 머리띠/빕·십자가·손목 염주·검은 수녀복·키는 보존. 보호 마스크 밖 RGBA 동일, 회색 외곽 칠 없음. 정면과 합친8장 보존 등록용. AVIF 우선·로어 키 보충·전원 장벽 재확인.",
-    "registration_regenerate_directions": []
+    "registration_regenerate_directions": [],
+    "user_rejected_deleted": true
   },
   {
     "english": "Saladin",
@@ -3137,7 +3170,8 @@
         "note": "Pixel ranges are production targets, not invented canonical height. Preserve original build and clothing; validate together at identical zoom."
       },
       "reviewed_at": "2026-10-24"
-    }
+    },
+    "user_rejected_deleted": true
   },
   {
     "english": "Avensha",
@@ -3208,7 +3242,8 @@
     "image_inpaint_mask": "game-src/art/field/production/inputs/avensha-muted-hair-cape-mask.png",
     "image_inpaint_description": "Only recolor masked hair and cloak, retaining all shapes and existing pixel-art shading. Hair is muted DARK TEAL-BLUE charcoal with desaturated blue-gray highlights, NOT royal blue. Hood and cape are very DARK muted plum-violet, near-black purple shadows, with dusty gray-lavender lining, NOT bright saturated purple. Preserve green eyes, green emerald brooch, pale face, black suit, anatomy, original height and transparent silhouette exactly. No gray exterior halo.",
     "image_validation_palette_limit": 64,
-    "image_palette_limit_reason": "Masked color correction; preserve every unmasked RGBA instead of whole-image quantization."
+    "image_palette_limit_reason": "Masked color correction; preserve every unmasked RGBA instead of whole-image quantization.",
+    "user_rejected_deleted": true
   },
   {
     "english": "Secriem",
@@ -3276,7 +3311,8 @@
         "note": "Common production scale; do not fit each person to full canvas. Compare anatomical crown-to-sole height; hair/headwear and heels need separate allowance. Unspecified individual female height stays a range."
       },
       "reviewed_at": "2026-10-24"
-    }
+    },
+    "user_rejected_deleted": true
   },
   {
     "english": "Brownie",
@@ -3405,6 +3441,7 @@
     "image_inpaint_mask": "game-src/art/field/production/inputs/aestheticism-mouth-neck-mask.png",
     "image_inpaint_description": "Only two tiny repairs to this ivory art mannequin: mouth is a small CLOSED neutral horizontal line, no open pink mouth or happy grin. Neck has one THIN dark horizontal stitched seam with several short perpendicular stitches, directly on smooth ivory plastic. No necklace, collar, beads, knobs or thick band. Preserve red eyes, freckles, hair, ivory mannequin anatomy and body pixel-for-pixel outside white mask. Same crisp native pixel art.",
     "image_validation_palette_limit": 64,
-    "image_palette_limit_reason": "Masked local correction preserving unmasked RGBA; avoid destructive full palette quantization."
+    "image_palette_limit_reason": "Masked local correction preserving unmasked RGBA; avoid destructive full palette quantization.",
+    "user_rejected_deleted": true
   }
 ]

@@ -50,6 +50,7 @@ class Production:
   self.save()
  def submit(self,kind,slug,path,args,template=None,archive_output=None):
   if json.loads((OUT/'control.json').read_text()).get('stop_all')or time.time()<self.s.get('retry_after',0):return False
+  if self.s['characters'][slug].get('status')=='user-rejected-deleted':return False
   c=self.s['characters'][slug];key=template if kind=='animation'else kind;slot=c['motions']if kind=='animation'else c
   if slot.get(key):return False
   # An uncertain POST is deliberately never retried: it may already be billed.

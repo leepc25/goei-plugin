@@ -54119,186 +54119,82 @@
     "sa-jang": {
       "name": "사장",
       "group": "fake-bureau",
-      "character_id": "f34f1d17-eee3-4767-85f5-69cbdfa6ac76",
-      "image": "22200cfe-c549-401a-88b5-8063d9c6118b",
-      "registration": "4d88261e-58be-4073-a5a7-09bb19aaea87",
+      "character_id": null,
+      "image": null,
+      "registration": null,
       "motions": {},
-      "ready": true,
-      "visual_review_required": true,
-      "rebuild": "20261024",
-      "visual_rejections": [
-        {
-          "job": "63de2248-6e39-4807-9629-03500fa6921b",
-          "decision": "reroll",
-          "reason": "키 약238px로 잠정214–222px 범위 초과, 뒤로 넘긴 웨이브 머리의 형태 약함.",
-          "at": 1792788955.173153,
-          "rules_rechecked": [
-            "AVIF primary identity",
-            "lore/user height",
-            "south-facing",
-            "transparent edge without gray halo",
-            "no motions before all roster eight-way review"
-          ]
-        },
-        {
-          "job": "6f230ee1-fb81-46b6-88bc-b72bf46cf976",
-          "decision": "reroll",
-          "reason": "참조 제거 후 정면 개선됐으나 머리 포함181px로 키 부족. 검수 통과한 이길환 정면 도트를 스타일·스케일 참조로 교체하고 원작 사장 외형 유지.",
-          "at": 1792789569.63723,
-          "rules_rechecked": [
-            "AVIF primary identity",
-            "lore/user height",
-            "south-facing",
-            "transparent edge without gray halo",
-            "no motions before all roster eight-way review"
-          ]
-        }
-      ],
-      "image_verified": true,
-      "image_visually_reviewed": true,
-      "skeleton_joints": 18,
-      "rotation_count": 8,
-      "exported": true,
-      "eight_way_visual_reviewed": true
+      "ready": false,
+      "exported": false,
+      "image_verified": false,
+      "image_visually_reviewed": false,
+      "eight_way_visual_reviewed": false,
+      "status": "user-rejected-deleted",
+      "deleted_character_id": "f34f1d17-eee3-4767-85f5-69cbdfa6ac76",
+      "deletion_audit": "game-src/art/field/production/history/user-rejected-20261024-37/f34f1d17-eee3-4767-85f5-69cbdfa6ac76"
     },
     "do-pil-heon": {
       "name": "도필헌",
       "group": "fake-bureau",
-      "character_id": "c3307c4c-568c-463d-841c-4eff89b4fc4c",
-      "image": "da4072f2-c6e1-4bde-8e9a-5c39fbc70364",
-      "registration": "94540a52-404f-46cc-a9c0-2da426970546",
+      "character_id": null,
+      "image": null,
+      "registration": null,
       "motions": {},
-      "ready": true,
-      "visual_review_required": true,
-      "rebuild": "20261024",
-      "visual_rejections": [
-        {
-          "job": "337a274b-6c96-4062-9f1d-16cf170029b8",
-          "decision": "reroll",
-          "reason": "키 약238px로 잠정214–222px 초과.",
-          "at": 1792788955.2709565,
-          "rules_rechecked": [
-            "AVIF primary identity",
-            "lore/user height",
-            "south-facing",
-            "transparent edge without gray halo",
-            "no motions before all roster eight-way review"
-          ]
-        }
-      ],
-      "image_verified": true,
-      "image_visually_reviewed": true,
-      "skeleton_joints": 18,
-      "rotation_count": 8,
-      "exported": true,
-      "eight_way_visual_reviewed": true
+      "ready": false,
+      "exported": false,
+      "image_verified": false,
+      "image_visually_reviewed": false,
+      "eight_way_visual_reviewed": false,
+      "status": "user-rejected-deleted",
+      "deleted_character_id": "c3307c4c-568c-463d-841c-4eff89b4fc4c",
+      "deletion_audit": "game-src/art/field/production/history/user-rejected-20261024-37/c3307c4c-568c-463d-841c-4eff89b4fc4c"
     },
     "lee-gil-hwan": {
       "name": "이길환",
       "group": "fake-bureau",
-      "character_id": "ce496b33-584e-44be-9e28-9e3eabc9ae8a",
-      "image": "5e401a36-d468-44c5-bb0c-f9c7c21bd32f",
-      "registration": "bdf54c59-67c8-4940-bdcf-7b2d16668e32",
+      "character_id": null,
+      "image": null,
+      "registration": null,
       "motions": {},
-      "ready": true,
-      "visual_review_required": true,
-      "rebuild": "20261024",
-      "image_verified": true,
-      "image_visually_reviewed": true,
-      "skeleton_joints": 18,
-      "rotation_count": 8,
-      "exported": true,
-      "eight_way_visual_reviewed": true
+      "ready": false,
+      "exported": false,
+      "image_verified": false,
+      "image_visually_reviewed": false,
+      "eight_way_visual_reviewed": false,
+      "status": "user-rejected-deleted",
+      "deleted_character_id": "ce496b33-584e-44be-9e28-9e3eabc9ae8a",
+      "deletion_audit": "game-src/art/field/production/history/user-rejected-20261024-37/ce496b33-584e-44be-9e28-9e3eabc9ae8a"
     },
     "lee-gi-seok": {
       "name": "이기석",
       "group": "fake-bureau",
-      "character_id": "486210c4-4334-42d1-bfd4-329bc16b00a3",
-      "image": "d74b3585-0555-4f34-93c8-8df0c0aacf52",
-      "registration": "2791a73c-d3b2-4672-9ed7-e64b23487661",
+      "character_id": null,
+      "image": null,
+      "registration": null,
       "motions": {},
-      "ready": true,
-      "visual_review_required": true,
-      "rebuild": "20261024",
-      "visual_rejections": [
-        {
-          "job": "84b18533-3b72-4e23-a538-c3e88668fb7a",
-          "decision": "reroll",
-          "reason": "키 약241px로 잠정214–222px 초과.",
-          "at": 1792788955.3653862,
-          "rules_rechecked": [
-            "AVIF primary identity",
-            "lore/user height",
-            "south-facing",
-            "transparent edge without gray halo",
-            "no motions before all roster eight-way review"
-          ]
-        },
-        {
-          "job": "f66ff2b3-ff1f-433d-a1c1-773da4f13e63",
-          "decision": "reroll",
-          "reason": "키180px 미만으로 보통 성인 키 목표보다 현저히 작음.",
-          "at": 1792789696.8500063,
-          "rules_rechecked": [
-            "AVIF primary identity",
-            "lore/user height",
-            "south-facing",
-            "transparent edge without gray halo",
-            "no motions before all roster eight-way review"
-          ]
-        }
-      ],
-      "image_verified": true,
-      "image_visually_reviewed": true,
-      "skeleton_joints": 18,
-      "rotation_count": 8,
-      "exported": true,
-      "eight_way_visual_reviewed": true
+      "ready": false,
+      "exported": false,
+      "image_verified": false,
+      "image_visually_reviewed": false,
+      "eight_way_visual_reviewed": false,
+      "status": "user-rejected-deleted",
+      "deleted_character_id": "486210c4-4334-42d1-bfd4-329bc16b00a3",
+      "deletion_audit": "game-src/art/field/production/history/user-rejected-20261024-37/486210c4-4334-42d1-bfd4-329bc16b00a3"
     },
     "kim-jo-hak": {
       "name": "김조학",
       "group": "fake-bureau",
-      "character_id": "aacc2fe3-a93c-4363-ad70-8bb3687e34ab",
-      "image": "f8268bbe-7e6a-41ca-a92a-e1dc1cf067b5",
-      "registration": "b2198b81-2cb7-4298-8f9d-b7a6164b50e8",
+      "character_id": null,
+      "image": null,
+      "registration": null,
       "motions": {},
-      "ready": true,
-      "visual_review_required": true,
-      "rebuild": "20261024",
-      "visual_rejections": [
-        {
-          "job": "1425bdcd-2e41-4959-8ca2-404855b0a6c5",
-          "decision": "reroll",
-          "reason": "키 약237px 초과, 이마 주름과 나이 표현 부족.",
-          "at": 1792788955.4634326,
-          "rules_rechecked": [
-            "AVIF primary identity",
-            "lore/user height",
-            "south-facing",
-            "transparent edge without gray halo",
-            "no motions before all roster eight-way review"
-          ]
-        },
-        {
-          "job": "8e59c8fd-27b9-4e1b-979f-7f915108e96a",
-          "decision": "reroll",
-          "reason": "키180px 미만으로 보통 성인 키 목표보다 현저히 작음.",
-          "at": 1792789696.9857712,
-          "rules_rechecked": [
-            "AVIF primary identity",
-            "lore/user height",
-            "south-facing",
-            "transparent edge without gray halo",
-            "no motions before all roster eight-way review"
-          ]
-        }
-      ],
-      "image_verified": true,
-      "image_visually_reviewed": true,
-      "skeleton_joints": 18,
-      "rotation_count": 8,
-      "exported": true,
-      "eight_way_visual_reviewed": true
+      "ready": false,
+      "exported": false,
+      "image_verified": false,
+      "image_visually_reviewed": false,
+      "eight_way_visual_reviewed": false,
+      "status": "user-rejected-deleted",
+      "deleted_character_id": "aacc2fe3-a93c-4363-ad70-8bb3687e34ab",
+      "deletion_audit": "game-src/art/field/production/history/user-rejected-20261024-37/aacc2fe3-a93c-4363-ad70-8bb3687e34ab"
     },
     "lee-do-hyeong": {
       "name": "이도형",
@@ -54348,151 +54244,50 @@
     "go-young-hoon": {
       "name": "고영훈",
       "group": "fake-bureau",
-      "character_id": "a1a6a298-13f9-45c8-85a6-ed9433ae8e75",
-      "image": "334e84ed-d91b-4be7-9e74-d88b5ca1cf80",
-      "registration": "92b8721e-c204-4739-bf1d-b33683986f24",
+      "character_id": null,
+      "image": null,
+      "registration": null,
       "motions": {},
-      "ready": true,
-      "visual_review_required": true,
-      "rebuild": "20261024",
-      "visual_rejections": [
-        {
-          "job": "71a0632e-a481-489d-8a9b-cceed3ffaa58",
-          "decision": "reroll",
-          "reason": "식별 특징인 이마 및 양볼 흉터 부족, 키 약239px 초과.",
-          "at": 1792788955.6549368,
-          "rules_rechecked": [
-            "AVIF primary identity",
-            "lore/user height",
-            "south-facing",
-            "transparent edge without gray halo",
-            "no motions before all roster eight-way review"
-          ]
-        },
-        {
-          "job": "33a4d3d1-441f-4264-9250-1825d239820b",
-          "decision": "reroll",
-          "reason": "서버 heavy load 오류5000, 청구0. 결과없음. 스타일·크기는 통과한 도필헌으로 참조 교체.",
-          "at": 1792789697.3491936,
-          "rules_rechecked": [
-            "AVIF primary identity",
-            "lore/user height",
-            "south-facing",
-            "transparent edge without gray halo",
-            "no motions before all roster eight-way review"
-          ]
-        }
-      ],
-      "image_verified": true,
-      "image_visually_reviewed": true,
-      "skeleton_joints": 18,
-      "rotation_count": 8,
-      "exported": true,
-      "eight_way_visual_reviewed": true
+      "ready": false,
+      "exported": false,
+      "image_verified": false,
+      "image_visually_reviewed": false,
+      "eight_way_visual_reviewed": false,
+      "status": "user-rejected-deleted",
+      "deleted_character_id": "a1a6a298-13f9-45c8-85a6-ed9433ae8e75",
+      "deletion_audit": "game-src/art/field/production/history/user-rejected-20261024-37/a1a6a298-13f9-45c8-85a6-ed9433ae8e75"
     },
     "no-gi-gyun": {
       "name": "노기균",
       "group": "fake-bureau",
-      "character_id": "d8cca93c-3a77-43bc-bc24-61b0b478fe95",
-      "image": "7a9380e7-d19b-484d-9668-aa3efdb30d16",
-      "registration": "beb71d9c-d512-48fa-854b-7964e45b6649",
+      "character_id": null,
+      "image": null,
+      "registration": null,
       "motions": {},
-      "ready": true,
-      "visual_review_required": true,
-      "rebuild": "20261024",
-      "visual_rejections": [
-        {
-          "job": "c468b8a7-6c12-458a-898b-324dc709952a",
-          "decision": "reroll",
-          "reason": "양 입꼬리에서 볼까지 이어진 봉합형 흉터 부족, 키 약240px 초과.",
-          "at": 1792788955.7436185,
-          "rules_rechecked": [
-            "AVIF primary identity",
-            "lore/user height",
-            "south-facing",
-            "transparent edge without gray halo",
-            "no motions before all roster eight-way review"
-          ]
-        },
-        {
-          "job": "b73bd52d-98e3-4540-b7d3-2be92f9d1a72",
-          "decision": "reroll",
-          "reason": "키183px로 보통 성인 목표보다 작음. 양 입꼬리 흉터도 부족. 통과한 정면 스타일·스케일로 교체.",
-          "at": 1792789795.8571312,
-          "rules_rechecked": [
-            "AVIF primary identity",
-            "lore/user height",
-            "south-facing",
-            "transparent edge without gray halo",
-            "no motions before all roster eight-way review"
-          ]
-        },
-        {
-          "job": "055f27fb-a9b7-4c74-9d2a-e398f3bbc39d",
-          "job_status": "completed",
-          "decision": "reroll",
-          "reason": "키와 정면은 통과 수준이나 원작의 양볼을 가로지르는 봉합형 입꼬리 흉터가 아직 약함. 현재 결과의 입가만 교정.",
-          "at": 1792790384.9403148,
-          "rules_rechecked": [
-            "AVIF primary identity",
-            "lore/user height",
-            "south-facing",
-            "transparent edge without gray halo",
-            "no motions before all roster eight-way review"
-          ]
-        }
-      ],
-      "image_verified": true,
-      "image_visually_reviewed": true,
-      "skeleton_joints": 18,
-      "rotation_count": 8,
-      "exported": true,
-      "eight_way_visual_reviewed": true
+      "ready": false,
+      "exported": false,
+      "image_verified": false,
+      "image_visually_reviewed": false,
+      "eight_way_visual_reviewed": false,
+      "status": "user-rejected-deleted",
+      "deleted_character_id": "d8cca93c-3a77-43bc-bc24-61b0b478fe95",
+      "deletion_audit": "game-src/art/field/production/history/user-rejected-20261024-37/d8cca93c-3a77-43bc-bc24-61b0b478fe95"
     },
     "song-ju-ik": {
       "name": "송주익",
       "group": "fake-bureau",
-      "character_id": "c3d13941-2145-4e24-ad38-de6e56059ef5",
-      "image": "27c36b7a-07cd-4bc2-a762-0289b3314781",
-      "registration": "d9a94f91-ed99-4f0a-8304-ef6afcf24f91",
+      "character_id": null,
+      "image": null,
+      "registration": null,
       "motions": {},
-      "ready": true,
-      "visual_review_required": true,
-      "rebuild": "20261024",
-      "visual_rejections": [
-        {
-          "job": "ad4858c4-2694-4fba-ab33-7cafffec0bc5",
-          "decision": "reroll",
-          "reason": "식별 특징인 크게 돌출된 사각 아래턱 부족, 키 약241px 초과.",
-          "at": 1792788955.833986,
-          "rules_rechecked": [
-            "AVIF primary identity",
-            "lore/user height",
-            "south-facing",
-            "transparent edge without gray halo",
-            "no motions before all roster eight-way review"
-          ]
-        },
-        {
-          "job": "d627018c-3c00-4814-9e5d-f2318e432b0b",
-          "decision": "reroll",
-          "reason": "큰 사각 아래턱은 개선됐으나 본체180px 미만으로 키 부족.",
-          "at": 1792789697.1006117,
-          "rules_rechecked": [
-            "AVIF primary identity",
-            "lore/user height",
-            "south-facing",
-            "transparent edge without gray halo",
-            "no motions before all roster eight-way review"
-          ]
-        }
-      ],
-      "image_verified": true,
-      "image_visually_reviewed": true,
-      "skeleton_joints": 18,
-      "rotation_count": 8,
-      "exported": true,
-      "eight_way_visual_reviewed": true
+      "ready": false,
+      "exported": false,
+      "image_verified": false,
+      "image_visually_reviewed": false,
+      "eight_way_visual_reviewed": false,
+      "status": "user-rejected-deleted",
+      "deleted_character_id": "c3d13941-2145-4e24-ad38-de6e56059ef5",
+      "deletion_audit": "game-src/art/field/production/history/user-rejected-20261024-37/c3d13941-2145-4e24-ad38-de6e56059ef5"
     },
     "kwak-seong-ju": {
       "name": "곽성주",
@@ -54542,338 +54337,114 @@
     "cho-seong-choon": {
       "name": "조성춘",
       "group": "fake-bureau",
-      "character_id": "4fc7e488-1700-406f-b4d3-72a8d4997bbb",
-      "image": "c8c1ddea-1597-49b4-9f7b-c70ee9104cef",
-      "registration": "481360a7-e115-4d3a-adc3-3e1bcb15c48e",
+      "character_id": null,
+      "image": null,
+      "registration": null,
       "motions": {},
-      "ready": true,
-      "visual_review_required": true,
-      "rebuild": "20261024",
-      "visual_rejections": [
-        {
-          "job": "ec42d9dd-1f58-40de-a4ee-ef6d5a6492cd",
-          "decision": "reroll",
-          "reason": "소매·열린 칼라·느슨한 넥타이는 맞으나 키 약237px 초과.",
-          "at": 1792788956.014505,
-          "rules_rechecked": [
-            "AVIF primary identity",
-            "lore/user height",
-            "south-facing",
-            "transparent edge without gray halo",
-            "no motions before all roster eight-way review"
-          ]
-        },
-        {
-          "job": "0a9abf34-924c-4e70-8a0e-90bb156a439c",
-          "decision": "reroll",
-          "reason": "소매·열린 칼라·느슨한 넥타이·머리는 맞지만 키191px로 부족. 검수 통과한 도필헌 정면 크기 참조로 교체.",
-          "at": 1792789852.2284286,
-          "rules_rechecked": [
-            "AVIF primary identity",
-            "lore/user height",
-            "south-facing",
-            "transparent edge without gray halo",
-            "no motions before all roster eight-way review"
-          ],
-          "new_style_source": "do-pil-heon"
-        }
-      ],
-      "image_verified": true,
-      "image_visually_reviewed": true,
-      "skeleton_joints": 18,
-      "rotation_count": 8,
-      "exported": true,
-      "eight_way_visual_reviewed": true
+      "ready": false,
+      "exported": false,
+      "image_verified": false,
+      "image_visually_reviewed": false,
+      "eight_way_visual_reviewed": false,
+      "status": "user-rejected-deleted",
+      "deleted_character_id": "4fc7e488-1700-406f-b4d3-72a8d4997bbb",
+      "deletion_audit": "game-src/art/field/production/history/user-rejected-20261024-37/4fc7e488-1700-406f-b4d3-72a8d4997bbb"
     },
     "yun-byeong-su": {
       "name": "윤병수",
       "group": "fake-bureau",
-      "character_id": "782f7865-f3cf-4b60-a537-0d1a0c40d9ab",
-      "image": "f440cd1e-41ed-486f-9293-c7a63d669b52",
-      "registration": "5553bf43-9bd3-4d07-8232-c1b8bcbfd451",
+      "character_id": null,
+      "image": null,
+      "registration": null,
       "motions": {},
-      "ready": true,
-      "visual_review_required": true,
-      "rebuild": "20261024",
-      "visual_rejections": [
-        {
-          "job": "19cc1b0e-1d92-4aff-bd82-16c5fe2c4dd0",
-          "decision": "reroll",
-          "reason": "키 약239px로 잠정214–222px 초과, 평평한 표정보다 웃는 인상.",
-          "at": 1792789084.648674,
-          "rules_rechecked": [
-            "AVIF primary identity",
-            "lore/user height",
-            "south-facing",
-            "transparent edge without gray halo",
-            "no motions before all roster eight-way review"
-          ]
-        },
-        {
-          "job": "cb0b8d81-d408-4591-b896-bb207d3b5b8d",
-          "decision": "reroll",
-          "reason": "키180px 미만으로 보통 성인 기준보다 작음. 도필헌 정면 스타일·스케일 참조로 교체.",
-          "at": 1792789909.9728823,
-          "rules_rechecked": [
-            "AVIF primary identity",
-            "lore/user height",
-            "south-facing",
-            "transparent edge without gray halo",
-            "no motions before all roster eight-way review"
-          ],
-          "new_style_source": "do-pil-heon"
-        }
-      ],
-      "image_verified": true,
-      "image_visually_reviewed": true,
-      "skeleton_joints": 18,
-      "rotation_count": 8,
-      "exported": true,
-      "eight_way_visual_reviewed": true
+      "ready": false,
+      "exported": false,
+      "image_verified": false,
+      "image_visually_reviewed": false,
+      "eight_way_visual_reviewed": false,
+      "status": "user-rejected-deleted",
+      "deleted_character_id": "782f7865-f3cf-4b60-a537-0d1a0c40d9ab",
+      "deletion_audit": "game-src/art/field/production/history/user-rejected-20261024-37/782f7865-f3cf-4b60-a537-0d1a0c40d9ab"
     },
     "kim-seong-jin": {
       "name": "김성진",
       "group": "fake-bureau",
-      "character_id": "0d3d950a-c811-4ff9-8f05-f2b802858b95",
-      "image": "55de84a4-57cc-4ed3-9d2d-812fa4f60aaf",
-      "registration": "237324f6-a8a1-4a27-8ae8-4b7f9fe0ec3b",
+      "character_id": null,
+      "image": null,
+      "registration": null,
       "motions": {},
-      "ready": true,
-      "visual_review_required": true,
-      "rebuild": "20261024",
-      "visual_rejections": [
-        {
-          "job": "8a2d9a1c-d7f8-41b6-a6ac-1a7ea22ed3c3",
-          "decision": "reroll",
-          "reason": "헤어·슬림 체형·열린 칼라 맞으나 키 약237px 초과.",
-          "at": 1792788956.099408,
-          "rules_rechecked": [
-            "AVIF primary identity",
-            "lore/user height",
-            "south-facing",
-            "transparent edge without gray halo",
-            "no motions before all roster eight-way review"
-          ]
-        }
-      ],
-      "image_verified": true,
-      "image_visually_reviewed": true,
-      "skeleton_joints": 18,
-      "rotation_count": 8,
-      "exported": true,
-      "eight_way_visual_reviewed": true
+      "ready": false,
+      "exported": false,
+      "image_verified": false,
+      "image_visually_reviewed": false,
+      "eight_way_visual_reviewed": false,
+      "status": "user-rejected-deleted",
+      "deleted_character_id": "0d3d950a-c811-4ff9-8f05-f2b802858b95",
+      "deletion_audit": "game-src/art/field/production/history/user-rejected-20261024-37/0d3d950a-c811-4ff9-8f05-f2b802858b95"
     },
     "song-jin-seob": {
       "name": "송진섭",
       "group": "fake-bureau",
-      "character_id": "46a8383f-cf68-4920-abbc-9952ce83432e",
-      "image": "616dba31-ffe0-4117-b461-e29aa124d5d4",
-      "registration": "795ef049-b7e2-4ce0-bdbe-e6ef7b4c9549",
+      "character_id": null,
+      "image": null,
+      "registration": null,
       "motions": {},
-      "ready": true,
-      "visual_review_required": true,
-      "rebuild": "20261024",
-      "visual_rejections": [
-        {
-          "job": "37ea4f25-334e-433e-807e-348451f23456",
-          "decision": "reroll",
-          "reason": "짧은 앞머리 위 이마 노출 부족, 키 약238px 초과.",
-          "at": 1792788956.1835165,
-          "rules_rechecked": [
-            "AVIF primary identity",
-            "lore/user height",
-            "south-facing",
-            "transparent edge without gray halo",
-            "no motions before all roster eight-way review"
-          ]
-        },
-        {
-          "job": "d5dfbca5-a1ff-47cb-964c-567ab8f36b3b",
-          "decision": "reroll",
-          "reason": "키·정면·부드러운 얼굴은 개선됐으나 원작의 짧은 앞머리 위 이마 노출이 부족. 이번 결과에서 앞머리만 짧게 교정.",
-          "at": 1792789965.4933074,
-          "rules_rechecked": [
-            "AVIF primary identity",
-            "lore/user height",
-            "south-facing",
-            "transparent edge without gray halo",
-            "no motions before all roster eight-way review"
-          ]
-        }
-      ],
-      "image_verified": true,
-      "image_visually_reviewed": true,
-      "skeleton_joints": 18,
-      "rotation_count": 8,
-      "exported": true,
-      "eight_way_visual_reviewed": true
+      "ready": false,
+      "exported": false,
+      "image_verified": false,
+      "image_visually_reviewed": false,
+      "eight_way_visual_reviewed": false,
+      "status": "user-rejected-deleted",
+      "deleted_character_id": "46a8383f-cf68-4920-abbc-9952ce83432e",
+      "deletion_audit": "game-src/art/field/production/history/user-rejected-20261024-37/46a8383f-cf68-4920-abbc-9952ce83432e"
     },
     "baek-seok-ju": {
       "name": "백석주",
       "group": "baekilmong",
-      "character_id": "4d94d407-bfad-42c1-9f4d-b30e9f05f467",
-      "image": "31eb87bb-3cfe-4197-a140-d70b6d48a7e0",
-      "registration": "f483bb0b-e67c-421f-991e-510c981c39cf",
+      "character_id": null,
+      "image": null,
+      "registration": null,
       "motions": {},
-      "ready": true,
-      "visual_rejections": [
-        {
-          "job": "ee2b0075-56bf-4ea7-b10b-45d6c0064d12",
-          "decision": "reroll",
-          "reason": "정면이 아닌 3/4 얼굴, 여성 키 범위보다 큼.",
-          "at": 1792788956.27305,
-          "rules_rechecked": [
-            "AVIF primary identity",
-            "lore/user height",
-            "south-facing",
-            "transparent edge without gray halo",
-            "no motions before all roster eight-way review"
-          ]
-        },
-        {
-          "job": "3cc3c7c4-6f8f-4b7d-a65c-5b8a12b300b9",
-          "decision": "reroll",
-          "reason": "본체180px 미만으로 여성 키 목표보다 작음. 검수 통과 은하제의 여성 정면 스타일·스케일로 교체.",
-          "at": 1792789910.079857,
-          "rules_rechecked": [
-            "AVIF primary identity",
-            "lore/user height",
-            "south-facing",
-            "transparent edge without gray halo",
-            "no motions before all roster eight-way review"
-          ],
-          "new_style_source": "eun-ha-je"
-        }
-      ],
-      "image_verified": true,
-      "image_visually_reviewed": true,
-      "skeleton_joints": 18,
-      "rotation_count": 8,
-      "exported": true,
-      "eight_way_visual_reviewed": true
+      "ready": false,
+      "exported": false,
+      "image_verified": false,
+      "image_visually_reviewed": false,
+      "eight_way_visual_reviewed": false,
+      "status": "user-rejected-deleted",
+      "deleted_character_id": "4d94d407-bfad-42c1-9f4d-b30e9f05f467",
+      "deletion_audit": "game-src/art/field/production/history/user-rejected-20261024-37/4d94d407-bfad-42c1-9f4d-b30e9f05f467"
     },
     "jin-na-sol": {
       "name": "진나솔",
       "group": "baekilmong",
-      "character_id": "464c6bf2-dc72-4f0d-82f4-a6c97ee139ba",
-      "image": "cfe770bf-8f39-4d9a-9827-3fc3d4139221",
-      "registration": "f6c1a6fc-e1d9-4b0f-9971-06c6e4dbefcf",
+      "character_id": null,
+      "image": null,
+      "registration": null,
       "motions": {},
-      "ready": true,
-      "visual_rejections": [
-        {
-          "job": "e4954df6-e32b-4a29-a34d-1af5152c4474",
-          "decision": "reroll",
-          "reason": "얼굴이 EAST로 돌아가 SOUTH 기준 실패, 본체 키도 여성 범위 초과.",
-          "at": 1792788956.3672862,
-          "rules_rechecked": [
-            "AVIF primary identity",
-            "lore/user height",
-            "south-facing",
-            "transparent edge without gray halo",
-            "no motions before all roster eight-way review"
-          ]
-        },
-        {
-          "job": "4523e25a-ff79-472b-bfda-01183deb3e85",
-          "decision": "reroll",
-          "reason": "본체180px 미만으로 키 부족, 높은 묶음이 둥근 번처럼 읽힘. 은하제 여성 정면·키 참조로 바꾸고 긴 하이포니테일 강조.",
-          "at": 1792790055.47579,
-          "rules_rechecked": [
-            "AVIF primary identity",
-            "lore/user height",
-            "south-facing",
-            "transparent edge without gray halo",
-            "no motions before all roster eight-way review"
-          ],
-          "new_style_source": "eun-ha-je"
-        }
-      ],
-      "image_verified": true,
-      "image_visually_reviewed": true,
-      "skeleton_joints": 18,
-      "rotation_count": 8,
-      "exported": true,
-      "eight_way_visual_reviewed": true
+      "ready": false,
+      "exported": false,
+      "image_verified": false,
+      "image_visually_reviewed": false,
+      "eight_way_visual_reviewed": false,
+      "status": "user-rejected-deleted",
+      "deleted_character_id": "464c6bf2-dc72-4f0d-82f4-a6c97ee139ba",
+      "deletion_audit": "game-src/art/field/production/history/user-rejected-20261024-37/464c6bf2-dc72-4f0d-82f4-a6c97ee139ba"
     },
     "lee-seong-hae": {
       "name": "이성해",
       "group": "baekilmong",
-      "character_id": "3db7b924-b4d0-484f-aac7-b834ebc001c5",
-      "image": "79d54a0f-1b11-4caf-afd2-829ad8052757",
-      "registration": "15582365-0025-433a-9775-c83f9076e9a9",
+      "character_id": null,
+      "image": null,
+      "registration": null,
       "motions": {},
-      "ready": true,
-      "visual_rejections": [
-        {
-          "job": "297ce4f8-8ddd-4bd5-8fa0-21a791a8357e",
-          "decision": "reroll",
-          "reason": "키 약214px로 작은 체구198–201px 범위 초과, 정면 대신 3/4 방향.",
-          "at": 1792789084.7415783,
-          "rules_rechecked": [
-            "AVIF primary identity",
-            "lore/user height",
-            "south-facing",
-            "transparent edge without gray halo",
-            "no motions before all roster eight-way review"
-          ]
-        },
-        {
-          "job": "0f63a310-5d2a-4efc-8bde-b29bab7a1eb2",
-          "decision": "reroll",
-          "reason": "원작을 다시 대조: 키202px(모발포함)와 정면은 맞지만 오른쪽 어깨의 느슨한 웨이브 묶음이 땋은 머리처럼 보임. 해당 머리만 교정.",
-          "at": 1792790055.6810653,
-          "rules_rechecked": [
-            "AVIF primary identity",
-            "lore/user height",
-            "south-facing",
-            "transparent edge without gray halo",
-            "no motions before all roster eight-way review"
-          ]
-        },
-        {
-          "job": "48573c0d-7057-4d1a-a39b-1aea4245574d",
-          "job_status": "completed",
-          "decision": "reroll",
-          "reason": "전체 교정 뒤 팔레트11색에서 원작의 초록 홍채가 사라짐. 초록 눈·몸이 맞았던 이번 생성본을 사용해 옆머리만 마스크 교정, 나머지 RGBA 보존 검증.",
-          "at": 1792790749.2992353,
-          "rules_rechecked": [
-            "AVIF primary identity",
-            "lore/user height",
-            "south-facing",
-            "transparent edge without gray halo",
-            "no motions before all roster eight-way review"
-          ]
-        }
-      ],
-      "image_verified": true,
-      "image_visually_reviewed": true,
-      "registration_rejections": [
-        {
-          "character_id": "213e13ae-1f3d-4309-801a-86af862b6a87",
-          "job": "bfaec31c-775c-44f0-bed5-538a3efcb57d",
-          "reason": "등록 completed와8방향 이미지 있으나 skeletons:null. 종료된 불완전 등록 백업·삭제 후 이미 검수한 초록 눈·옆머리 정면을 유지하여 재등록.",
-          "at": 1792792870.4768307
-        },
-        {
-          "character_id": "d254a6a5-b284-4ca5-a804-76f83bb47f28",
-          "job": "795a45fa-90fb-4ecf-bf62-4ee8e32ea163",
-          "reason": "회전4방향에서 초록 홍채 소실. 눈 국소 교정 및 전방향 검수 완료한8장을 보존 등록하기 위해 실패 라이브 등록 교체.",
-          "at": 1792795226.319304
-        }
-      ],
-      "exported": true,
-      "eight_way_visual_reviewed": true,
-      "direction-repair-south-east": "f25fcc88-05a3-430a-a01c-a7b5381823c7",
-      "direction-repair-east": "977e48af-b079-45c3-ab35-a17bef5ad80d",
-      "direction-repair-west": "cb6f33ed-14a5-47ce-a9e4-98695a4398ab",
-      "direction-repair-south-west": "6fc3092f-4a79-4910-bf1b-da5b2c2e7713",
-      "direction-repair-south-east-eyes-corrected-y": "f19b0f36-ec4d-4192-be5f-a7bb0d7fa2bb",
-      "direction-repair-east-eyes-corrected-y": "54809a78-c20d-42e8-b7b3-790d36c17dc1",
-      "direction-repair-west-eyes-corrected-y": "7bf78da8-0175-43c5-adaf-369d70984f6c",
-      "direction-repair-south-west-eyes-corrected-y": "28e2d3c5-bdfc-41b9-943d-94ae2897ccac",
-      "skeleton_joints": 18,
-      "rotation_count": 8
+      "ready": false,
+      "exported": false,
+      "image_verified": false,
+      "image_visually_reviewed": false,
+      "eight_way_visual_reviewed": false,
+      "status": "user-rejected-deleted",
+      "deleted_character_id": "3db7b924-b4d0-484f-aac7-b834ebc001c5",
+      "deletion_audit": "game-src/art/field/production/history/user-rejected-20261024-37/3db7b924-b4d0-484f-aac7-b834ebc001c5"
     },
     "lee-ja-heon": {
       "name": "이자헌",
@@ -54936,32 +54507,18 @@
     "eun-ha-je": {
       "name": "은하제",
       "group": "baekilmong",
-      "character_id": "c4c1df6c-5df9-400d-b85b-cf84cb8e5034",
-      "image": "cbc94035-0c88-4b26-9034-0120fa874397",
-      "registration": "06e250cd-0979-4329-a92c-683117568023",
+      "character_id": null,
+      "image": null,
+      "registration": null,
       "motions": {},
-      "ready": true,
-      "visual_rejections": [
-        {
-          "job": "5c7e4f76-26b0-4035-b107-46de8615e691",
-          "decision": "reroll",
-          "reason": "정면이 아닌 3/4 얼굴, 여성 키 범위 초과.",
-          "at": 1792788956.5391595,
-          "rules_rechecked": [
-            "AVIF primary identity",
-            "lore/user height",
-            "south-facing",
-            "transparent edge without gray halo",
-            "no motions before all roster eight-way review"
-          ]
-        }
-      ],
-      "image_verified": true,
-      "image_visually_reviewed": true,
-      "skeleton_joints": 18,
-      "rotation_count": 8,
-      "exported": true,
-      "eight_way_visual_reviewed": true
+      "ready": false,
+      "exported": false,
+      "image_verified": false,
+      "image_visually_reviewed": false,
+      "eight_way_visual_reviewed": false,
+      "status": "user-rejected-deleted",
+      "deleted_character_id": "c4c1df6c-5df9-400d-b85b-cf84cb8e5034",
+      "deletion_audit": "game-src/art/field/production/history/user-rejected-20261024-37/c4c1df6c-5df9-400d-b85b-cf84cb8e5034"
     },
     "park-min-seong": {
       "name": "박민성",
@@ -55009,203 +54566,66 @@
     "baek-sa-heon": {
       "name": "백사헌",
       "group": "baekilmong",
-      "character_id": "dcd8fbf1-126e-43ea-a83f-fed78e9fd646",
-      "image": "de4bb97f-cf93-44cf-a0b0-155ed274b055",
-      "registration": "f7cb3352-6700-4b92-8f6a-5dd9abd550f4",
+      "character_id": null,
+      "image": null,
+      "registration": null,
       "motions": {},
-      "ready": true,
-      "visual_rejections": [
-        {
-          "job": "633a5907-5f31-4593-a875-794f14364f7e",
-          "decision": "reroll",
-          "reason": "머리 포함239px로 보통 키 범위 초과, 몸통·발이 돌아간 상태. 안대 방향과 곱슬머리는 유지해야 함.",
-          "at": 1792789418.0075443,
-          "rules_rechecked": [
-            "AVIF primary identity",
-            "lore/user height",
-            "south-facing",
-            "transparent edge without gray halo",
-            "no motions before all roster eight-way review"
-          ]
-        },
-        {
-          "job": "ade7d26c-fc44-4f9f-bf64-9dcd7a01c343",
-          "job_status": "completed",
-          "decision": "reroll",
-          "reason": "곱슬머리·안대 위치·정면은 맞으나 안대 반대편 눈에 안경테처럼 보이는 사각 선이 생김. 원작에는 안경이 없으므로 이 부분만 제거.",
-          "at": 1792790163.8298154,
-          "rules_rechecked": [
-            "AVIF primary identity",
-            "lore/user height",
-            "south-facing",
-            "transparent edge without gray halo",
-            "no motions before all roster eight-way review"
-          ]
-        }
-      ],
-      "image_verified": true,
-      "image_visually_reviewed": true,
-      "skeleton_joints": 18,
-      "rotation_count": 8,
-      "exported": true,
-      "eight_way_visual_reviewed": true
+      "ready": false,
+      "exported": false,
+      "image_verified": false,
+      "image_visually_reviewed": false,
+      "eight_way_visual_reviewed": false,
+      "status": "user-rejected-deleted",
+      "deleted_character_id": "dcd8fbf1-126e-43ea-a83f-fed78e9fd646",
+      "deletion_audit": "game-src/art/field/production/history/user-rejected-20261024-37/dcd8fbf1-126e-43ea-a83f-fed78e9fd646"
     },
     "go-young-eun": {
       "name": "고영은",
       "group": "baekilmong",
-      "character_id": "10488058-f484-4585-8da1-25b2fad1a00c",
-      "image": "46eb4795-49b3-48b9-aeb9-375b4d9f1aec",
-      "registration": "2a5a3aee-9530-48f5-8e80-e770facc5a11",
+      "character_id": null,
+      "image": null,
+      "registration": null,
       "motions": {},
-      "ready": true,
-      "visual_rejections": [
-        {
-          "job": "8deca375-3192-487b-a642-c7838b493969",
-          "decision": "reroll",
-          "reason": "얼굴이 측면으로 돌아감, 본체 키가 여성200–206px보다 큼.",
-          "at": 1792789418.1042688,
-          "rules_rechecked": [
-            "AVIF primary identity",
-            "lore/user height",
-            "south-facing",
-            "transparent edge without gray halo",
-            "no motions before all roster eight-way review"
-          ]
-        },
-        {
-          "job": "3181940f-a221-488d-80f7-05f483c19819",
-          "job_status": "completed",
-          "decision": "reroll",
-          "reason": "작은 캔버스 방식에서 키180px 미만으로 출력. 원작 단발·부드러운 체형을 유지하며 은하제 여성 정면·키 참조로 교체.",
-          "at": 1792790259.0230458,
-          "rules_rechecked": [
-            "AVIF primary identity",
-            "lore/user height",
-            "south-facing",
-            "transparent edge without gray halo",
-            "no motions before all roster eight-way review"
-          ],
-          "new_style_source": "eun-ha-je"
-        }
-      ],
-      "image_verified": true,
-      "image_visually_reviewed": true,
-      "registration_rejections": [
-        {
-          "character_id": "38d2f10b-164d-4b3b-9c2a-5def8647e9d9",
-          "job": "729bd070-f50e-47fe-a1bf-3a88153558cb",
-          "reason": "등록 작업 completed, 회전8장 있으나 skeletons:null. 전체 계정 작업 조회에서도 해당 등록은 종료. 공식 문서에 관절만 복구하는 경로 없어 검수된 정면을 유지하여 재등록.",
-          "at": 1792792342.3690722
-        }
-      ],
-      "exported": true,
-      "eight_way_visual_reviewed": true,
-      "skeleton_joints": 18,
-      "rotation_count": 8
+      "ready": false,
+      "exported": false,
+      "image_verified": false,
+      "image_visually_reviewed": false,
+      "eight_way_visual_reviewed": false,
+      "status": "user-rejected-deleted",
+      "deleted_character_id": "10488058-f484-4585-8da1-25b2fad1a00c",
+      "deletion_audit": "game-src/art/field/production/history/user-rejected-20261024-37/10488058-f484-4585-8da1-25b2fad1a00c"
     },
     "kang-i-hak": {
       "name": "강이학",
       "group": "baekilmong",
-      "character_id": "12ac86a5-8639-4cf2-a629-a944f823df1d",
-      "image": "63ae0b42-4da6-45b0-8512-2dd2fcb09f04",
-      "registration": "271d1a22-fdb5-4076-b35c-6a5d1b0d2ebe",
+      "character_id": null,
+      "image": null,
+      "registration": null,
       "motions": {},
-      "ready": true,
-      "visual_rejections": [
-        {
-          "job": "5364cb5b-94ab-46e7-ae73-9f31f4884caa",
-          "decision": "reroll",
-          "reason": "서버 heavy load 오류5000, 청구0 확인. 결과 없음. 다른 재시도와 동일하게 남성 구도 참조를 제거하고 여성 키 원본 캔버스 사용.",
-          "at": 1792789151.9770055,
-          "rules_rechecked": [
-            "AVIF primary identity",
-            "lore/user height",
-            "south-facing",
-            "transparent edge without gray halo",
-            "no motions before all roster eight-way review"
-          ]
-        },
-        {
-          "job": "eff5c63b-1d19-42a8-8569-95340e3ec4fc",
-          "job_status": "completed",
-          "decision": "reroll",
-          "reason": "키180px 미만으로 여성 키 목표보다 작음. 은하제 여성 정면·스케일 참조로 교체.",
-          "at": 1792790163.92912,
-          "rules_rechecked": [
-            "AVIF primary identity",
-            "lore/user height",
-            "south-facing",
-            "transparent edge without gray halo",
-            "no motions before all roster eight-way review"
-          ],
-          "new_style_source": "eun-ha-je"
-        }
-      ],
-      "image_verified": true,
-      "image_visually_reviewed": true,
-      "skeleton_joints": 18,
-      "rotation_count": 8,
-      "exported": true,
-      "eight_way_visual_reviewed": true
+      "ready": false,
+      "exported": false,
+      "image_verified": false,
+      "image_visually_reviewed": false,
+      "eight_way_visual_reviewed": false,
+      "status": "user-rejected-deleted",
+      "deleted_character_id": "12ac86a5-8639-4cf2-a629-a944f823df1d",
+      "deletion_audit": "game-src/art/field/production/history/user-rejected-20261024-37/12ac86a5-8639-4cf2-a629-a944f823df1d"
     },
     "jang-heo-un": {
       "name": "장허운",
       "group": "baekilmong",
-      "character_id": "084edf22-121b-4853-a333-bc29f2c3e8ba",
-      "image": "3ad37156-945c-4b0b-b82e-c872f5e6563f",
-      "registration": "37cf2ead-5019-41ae-a42c-33ed09605f72",
+      "character_id": null,
+      "image": null,
+      "registration": null,
       "motions": {},
-      "ready": true,
-      "visual_rejections": [
-        {
-          "job": "805f56ae-ae2b-45f8-9219-9c79ca89f4a0",
-          "decision": "reroll",
-          "reason": "장신·장발 형태는 맞지만 얼굴과 몸이 측면으로 돌아가 SOUTH 기준 실패.",
-          "at": 1792789500.1814444,
-          "rules_rechecked": [
-            "AVIF primary identity",
-            "lore/user height",
-            "south-facing",
-            "transparent edge without gray halo",
-            "no motions before all roster eight-way review"
-          ]
-        },
-        {
-          "job": "c1b8d77b-a677-453e-9644-8276cc1f3fe1",
-          "job_status": "completed",
-          "decision": "reroll",
-          "reason": "원본 재대조에서 열린 셔츠 깃과 느슨한 넥타이가 잠긴 형태로 변형. 어두운 회갈색 장발 및 피곤한 눈도 강조해 재생성.",
-          "at": 1792791780.7289226,
-          "rules_rechecked": [
-            "AVIF primary identity",
-            "lore/user height",
-            "south-facing",
-            "transparent edge without gray halo",
-            "no motions before all roster eight-way review"
-          ],
-          "new_style_source": "kim-seong-jin"
-        },
-        {
-          "job": "44e1171b-f408-4556-98b8-05af01d0db2c",
-          "job_status": "completed",
-          "decision": "reroll",
-          "reason": "열린 셔츠와 느슨한 타이는 교정됐지만 원작의 어깨를 덮는 장발이 목 길이로 짧아짐. 옆머리만 마스크 교정하고 얼굴·복장·체격은 RGBA 그대로 보존.",
-          "at": 1792792467.13688,
-          "rules_rechecked": [
-            "AVIF primary identity",
-            "lore/user height",
-            "south-facing",
-            "transparent edge without gray halo",
-            "no motions before all roster eight-way review"
-          ]
-        }
-      ],
-      "skeleton_joints": 18,
-      "rotation_count": 8,
-      "exported": true,
-      "eight_way_visual_reviewed": true,
-      "image_verified": true,
-      "image_visually_reviewed": true
+      "ready": false,
+      "exported": false,
+      "image_verified": false,
+      "image_visually_reviewed": false,
+      "eight_way_visual_reviewed": false,
+      "status": "user-rejected-deleted",
+      "deleted_character_id": "084edf22-121b-4853-a333-bc29f2c3e8ba",
+      "deletion_audit": "game-src/art/field/production/history/user-rejected-20261024-37/084edf22-121b-4853-a333-bc29f2c3e8ba"
     },
     "kwak-je-gang": {
       "name": "곽제강",
@@ -55263,603 +54683,258 @@
     "lee-yeon-hwa": {
       "name": "이연화",
       "group": "baekilmong",
-      "character_id": "9cdc0864-7418-4623-b687-845da6f66e88",
-      "image": "0f784410-ce1f-43e8-85ff-b5431aec8137",
-      "registration": "4369a79b-d399-4fd6-9b63-f3f81af4c88f",
+      "character_id": null,
+      "image": null,
+      "registration": null,
       "motions": {},
-      "ready": true,
-      "visual_rejections": [
-        {
-          "job": "9122b278-bc23-44fc-bcb2-e200b53759a7",
-          "decision": "reroll",
-          "reason": "코트·분홍 블라우스·안경은 맞지만 얼굴 측면 및 여성 키 초과.",
-          "at": 1792789500.3086424,
-          "rules_rechecked": [
-            "AVIF primary identity",
-            "lore/user height",
-            "south-facing",
-            "transparent edge without gray halo",
-            "no motions before all roster eight-way review"
-          ]
-        },
-        {
-          "job": "c6ccffd6-6fc2-4f40-bc57-12057b533278",
-          "job_status": "completed",
-          "decision": "reroll",
-          "reason": "키180px 미만. 은하제의 여성 정면·크기 참조로 교체하며 분홍 블라우스·흰 코트·안경 유지.",
-          "at": 1792790385.0344284,
-          "rules_rechecked": [
-            "AVIF primary identity",
-            "lore/user height",
-            "south-facing",
-            "transparent edge without gray halo",
-            "no motions before all roster eight-way review"
-          ],
-          "new_style_source": "eun-ha-je"
-        }
-      ],
-      "image_verified": true,
-      "image_visually_reviewed": true,
-      "skeleton_joints": 18,
-      "rotation_count": 8,
-      "exported": true,
-      "eight_way_visual_reviewed": true
+      "ready": false,
+      "exported": false,
+      "image_verified": false,
+      "image_visually_reviewed": false,
+      "eight_way_visual_reviewed": false,
+      "status": "user-rejected-deleted",
+      "deleted_character_id": "9cdc0864-7418-4623-b687-845da6f66e88",
+      "deletion_audit": "game-src/art/field/production/history/user-rejected-20261024-37/9cdc0864-7418-4623-b687-845da6f66e88"
     },
     "lee-byeong-jin": {
       "name": "이병진",
       "group": "baekilmong",
-      "character_id": "de8535c0-fe94-45eb-ae6d-0e4c99bb4f2a",
-      "image": "43779337-3a91-47ea-8488-de9d8ef98956",
-      "registration": "54cadacd-3cb9-410c-99f1-4794aeda8247",
+      "character_id": null,
+      "image": null,
+      "registration": null,
       "motions": {},
-      "ready": true,
-      "visual_rejections": [
-        {
-          "job": "9bfa50f6-278e-4074-881f-8a581f373aec",
-          "decision": "reroll",
-          "reason": "둥근 복부·얼굴·안경·셔츠는 맞으나 얼굴과 몸통이 3/4로 돌아가 SOUTH 기준 실패.",
-          "at": 1792789418.292294,
-          "rules_rechecked": [
-            "AVIF primary identity",
-            "lore/user height",
-            "south-facing",
-            "transparent edge without gray halo",
-            "no motions before all roster eight-way review"
-          ]
-        },
-        {
-          "job": "776e4bb4-46e4-4717-8515-ca8f4e9c2953",
-          "job_status": "completed",
-          "decision": "reroll",
-          "reason": "키180px 미만. 둥근 얼굴과 큰 복부가 맞는 이길환을 스타일·키 참조로 사용하고 흰 셔츠·안경·무재킷 유지.",
-          "at": 1792790385.1513457,
-          "rules_rechecked": [
-            "AVIF primary identity",
-            "lore/user height",
-            "south-facing",
-            "transparent edge without gray halo",
-            "no motions before all roster eight-way review"
-          ],
-          "new_style_source": "lee-gil-hwan"
-        }
-      ],
-      "image_verified": true,
-      "image_visually_reviewed": true,
-      "registration_rejections": [
-        {
-          "character_id": "7180fb34-b900-43da-bc0c-82a91948b1e8",
-          "job": "3a357db9-8465-422e-8639-25913e05af4a",
-          "reason": "종료된 등록은 회전8장만 있고 skeletons:null. 동작 필수 관절 누락이므로 백업·삭제 후 비만 체형 정면 그대로 재등록.",
-          "at": 1792793149.9566283
-        }
-      ],
-      "exported": true,
-      "eight_way_visual_reviewed": true,
-      "skeleton_joints": 18,
-      "rotation_count": 8
+      "ready": false,
+      "exported": false,
+      "image_verified": false,
+      "image_visually_reviewed": false,
+      "eight_way_visual_reviewed": false,
+      "status": "user-rejected-deleted",
+      "deleted_character_id": "de8535c0-fe94-45eb-ae6d-0e4c99bb4f2a",
+      "deletion_audit": "game-src/art/field/production/history/user-rejected-20261024-37/de8535c0-fe94-45eb-ae6d-0e4c99bb4f2a"
     },
     "jay": {
       "name": "제이",
       "group": "baekilmong",
-      "character_id": "6ed7df46-400c-4300-ad42-4da74ed2bc0b",
-      "image": "721d1a17-9804-4fa7-8ef8-7069e2588c61",
-      "registration": "fe4732ce-298d-42aa-ac98-ecfab7d09d84",
+      "character_id": null,
+      "image": null,
+      "registration": null,
       "motions": {},
-      "ready": true,
-      "visual_rejections": [
-        {
-          "job": "d262fefc-fcef-487d-86ff-e1d757d54170",
-          "decision": "reroll",
-          "reason": "은발·모자·의료 마스크·경비복은 맞지만 얼굴 측면 및 보통 키 범위 초과.",
-          "at": 1792789500.4164922,
-          "rules_rechecked": [
-            "AVIF primary identity",
-            "lore/user height",
-            "south-facing",
-            "transparent edge without gray halo",
-            "no motions before all roster eight-way review"
-          ]
-        },
-        {
-          "job": "726695bb-3a3e-483d-b68e-25ee10887393",
-          "job_status": "completed",
-          "decision": "reroll",
-          "reason": "키180px 미만으로 성인 목표보다 작음. 김성진의 슬림한 성인 정면·키 참조로 교체, 은발·검은 모자·흰 의료마스크·경비복 유지.",
-          "at": 1792790948.676978,
-          "rules_rechecked": [
-            "AVIF primary identity",
-            "lore/user height",
-            "south-facing",
-            "transparent edge without gray halo",
-            "no motions before all roster eight-way review"
-          ],
-          "new_style_source": "kim-seong-jin"
-        }
-      ],
-      "image_verified": true,
-      "image_visually_reviewed": true,
-      "exported": true,
-      "registration_rejections": [
-        {
-          "character_id": "c49aa95f-8853-4dd4-b03b-77720abf1185",
-          "job": "37ea908d-f39f-4bb1-959d-8be0f487720b",
-          "reason": "측면·사선 회전에 원작과 검수된 정면에 없는 방패형 소매 패치가 추가됨. 은발 목덜미 길이는 확인됨. 정면 유지하고 무늬 없는 소매를 명시해 재등록.",
-          "at": 1792793096.5364456
-        },
-        {
-          "character_id": "aa4b3caf-fe72-4a4a-851d-8de11e49c79e",
-          "job": "3407ad40-f360-4618-a4fd-e26d6549b379",
-          "reason": "원작에 없는 소매 패치 제거 완료. 8방향 검수본 보존 등록으로 실패 라이브 등록 교체.",
-          "at": 1792795690.727432
-        },
-        {
-          "character_id": "08548050-739d-4a8a-848a-2280b7ef0ef4",
-          "job": "0581c47a-927b-4213-9464-6a063a195171",
-          "reason": "최종 후면 검수에서 발견한 북동/북서 소매 패치까지 국소 제거 완료. 완전 교정8장 보존 등록.",
-          "at": 1792796355.404262
-        }
-      ],
-      "eight_way_visual_reviewed": true,
-      "direction-repair-south-east": "b340f8f9-71fe-4d3e-bff2-42428be68937",
-      "direction-repair-east": "de1e9780-8807-4962-9bc2-36f23642d762",
-      "direction-repair-west": "2f7cae4b-68df-4329-9dca-353d3335c357",
-      "direction-repair-south-west": "0f67155e-cd30-4320-ab17-db68dda69bbc",
-      "direction-repair-south-east-full-patch-borders": "c62c6da1-1894-469a-bb18-2f5f4988e88b",
-      "direction-repair-west-full-patch-borders": "09327278-8913-4fd1-8a2e-998a42b1b87a",
-      "direction-repair-north-east-two-back-sleeves": "0299a9b8-5c56-419b-8e6b-fac525541bee",
-      "direction-repair-north-west-two-back-sleeves": "0cfba687-b89a-4d1e-915f-2c8bfd331f93",
-      "skeleton_joints": 18,
-      "rotation_count": 8
+      "ready": false,
+      "exported": false,
+      "image_verified": false,
+      "image_visually_reviewed": false,
+      "eight_way_visual_reviewed": false,
+      "status": "user-rejected-deleted",
+      "deleted_character_id": "6ed7df46-400c-4300-ad42-4da74ed2bc0b",
+      "deletion_audit": "game-src/art/field/production/history/user-rejected-20261024-37/6ed7df46-400c-4300-ad42-4da74ed2bc0b"
     },
     "ho-yu-won": {
       "name": "호유원",
       "group": "baekilmong",
-      "character_id": "8fdfa656-d124-4442-b153-61a0542175bb",
-      "image": "650690e4-fb7c-4ea4-9829-21bfcf5b2ed2",
-      "registration": "487b6f5d-03ca-4f9c-a404-29861a7d3bd3",
+      "character_id": null,
+      "image": null,
+      "registration": null,
       "motions": {},
-      "ready": true,
-      "visual_rejections": [
-        {
-          "job": "a4bca6d0-4145-4545-a189-998ab06cec55",
-          "decision": "reroll",
-          "reason": "키 약243px로 보통 키 범위 초과, 정면이 아닌 3/4 얼굴.",
-          "at": 1792789418.378704,
-          "rules_rechecked": [
-            "AVIF primary identity",
-            "lore/user height",
-            "south-facing",
-            "transparent edge without gray halo",
-            "no motions before all roster eight-way review"
-          ]
-        }
-      ],
-      "image_verified": true,
-      "image_visually_reviewed": true,
-      "skeleton_joints": 18,
-      "rotation_count": 8,
-      "exported": true,
-      "eight_way_visual_reviewed": true
+      "ready": false,
+      "exported": false,
+      "image_verified": false,
+      "image_visually_reviewed": false,
+      "eight_way_visual_reviewed": false,
+      "status": "user-rejected-deleted",
+      "deleted_character_id": "8fdfa656-d124-4442-b153-61a0542175bb",
+      "deletion_audit": "game-src/art/field/production/history/user-rejected-20261024-37/8fdfa656-d124-4442-b153-61a0542175bb"
     },
     "cheong-dal-lae": {
       "name": "청달래",
       "group": "baekilmong",
-      "character_id": "68f76e20-467c-47ca-b3b8-45cdbaafa109",
-      "image": "a1dee1b6-2ba5-4b38-bb12-bcfa1221552f",
-      "registration": "69ccf53c-8ed0-4e78-a4d3-919d4962ed62",
+      "character_id": null,
+      "image": null,
+      "registration": null,
       "motions": {},
-      "ready": true,
-      "visual_rejections": [
-        {
-          "job": "d6d15ee8-080b-43fe-a5ec-0f5b6e4e980c",
-          "decision": "reroll",
-          "reason": "청록색 로우번은 맞지만 정면이 아닌 얼굴·몸통 및 여성 키 초과.",
-          "at": 1792789500.5086281,
-          "rules_rechecked": [
-            "AVIF primary identity",
-            "lore/user height",
-            "south-facing",
-            "transparent edge without gray halo",
-            "no motions before all roster eight-way review"
-          ]
-        }
-      ],
-      "image_verified": true,
-      "image_visually_reviewed": true,
-      "registration_rejections": [
-        {
-          "character_id": "2cbf84e1-7afa-4a30-9b59-a28af323a0a7",
-          "job": "23a36d4b-9f08-4165-a6d1-3017475bd16e",
-          "reason": "종료된 등록의 회전8장은 존재하나 skeletons:null. 원작 대조한 정면은 보존하고 불완전 등록만 백업·삭제하여 재등록.",
-          "at": 1792793278.70841
-        }
-      ],
-      "exported": true,
-      "eight_way_visual_reviewed": true,
-      "skeleton_joints": 18,
-      "rotation_count": 8
+      "ready": false,
+      "exported": false,
+      "image_verified": false,
+      "image_visually_reviewed": false,
+      "eight_way_visual_reviewed": false,
+      "status": "user-rejected-deleted",
+      "deleted_character_id": "68f76e20-467c-47ca-b3b8-45cdbaafa109",
+      "deletion_audit": "game-src/art/field/production/history/user-rejected-20261024-37/68f76e20-467c-47ca-b3b8-45cdbaafa109"
     },
     "cha-yeo-jin": {
       "name": "차여진",
       "group": "association",
-      "character_id": "f7e83f56-9a2c-41cb-aa1d-1e27cae0bbed",
-      "image": "833ae0ce-09fb-4e28-b560-726df7acd16e",
-      "registration": "d5b444e2-ac82-4e32-80a7-b19575064575",
+      "character_id": null,
+      "image": null,
+      "registration": null,
       "motions": {},
-      "ready": true,
-      "image_verified": true,
-      "image_visually_reviewed": true,
-      "exported": true,
-      "registration_rejections": [
-        {
-          "character_id": "139dab6a-7a81-4bb5-a533-8c69f049451c",
-          "job": "8231c302-e2fd-48d8-ab4c-4cfe04785808",
-          "reason": "서쪽·남서쪽 소매에 원작과 정면에 없는 방패 패치 추가. 다른6방향은 원작 정체성·키·긴 버건디 머리·외곽 검수 통과. 정상6방향 보존하고 문제2방향만 재생성.",
-          "at": 1792793391.6707006
-        },
-        {
-          "character_id": "34a102ab-fd2b-4740-b89e-acef126efad1",
-          "job": "f4ac2933-a388-4c25-af41-e7d2174bce29",
-          "reason": "북서쪽 잔여 소매 문양 국소 제거 검수 완료. 검수8장 보존 등록으로 라이브 실패 등록 교체.",
-          "at": 1792795730.0987809
-        }
-      ],
-      "eight_way_visual_reviewed": true,
-      "direction-repair-north-west": "fe9b6ba1-00d2-4fd7-9b3b-5b55f55e8463",
-      "direction-repair-north-west-complete-badge-outline": "885929eb-2421-4f97-be6b-532c93f3085b",
-      "skeleton_joints": 18,
-      "rotation_count": 8
+      "ready": false,
+      "exported": false,
+      "image_verified": false,
+      "image_visually_reviewed": false,
+      "eight_way_visual_reviewed": false,
+      "status": "user-rejected-deleted",
+      "deleted_character_id": "f7e83f56-9a2c-41cb-aa1d-1e27cae0bbed",
+      "deletion_audit": "game-src/art/field/production/history/user-rejected-20261024-37/f7e83f56-9a2c-41cb-aa1d-1e27cae0bbed"
     },
     "seo-yun-ji": {
       "name": "서윤지",
       "group": "association",
-      "character_id": "763e3594-9c92-4d08-82b2-e3fb7d286647",
-      "image": "9ef07c27-af3d-487c-8a05-15c5402a6e3c",
-      "registration": "60d21a2b-d55f-40fe-99f1-dd9a7c31be04",
+      "character_id": null,
+      "image": null,
+      "registration": null,
       "motions": {},
-      "ready": true,
-      "exported": true,
-      "registration_rejections": [
-        {
-          "character_id": "58ad10b4-0d27-488d-8c56-fa4291230abc",
-          "job": "fbe504f0-84fd-4d97-8056-a2c5a3198d75",
-          "reason": "원작의 허리까지 오는 양갈래 땋은 머리가 가슴 아래에서 짧게 끝남. 정면에서 땋은 머리 아래 부분을 연장한 뒤 재등록.",
-          "at": 1792793746.456427
-        }
-      ],
-      "eight_way_visual_reviewed": true,
-      "visual_rejections": [
-        {
-          "job": "c721800a-1c1a-46f0-90c1-cf2e9c66eae9",
-          "job_status": "completed",
-          "decision": "reroll",
-          "reason": "원작의 두 갈래 땋은 머리 끝은 허리인데 생성본은 가슴 아래에서 끝남. 하단 머리만 허리까지 연장하고 얼굴·상체·치마·키는 보존.",
-          "at": 1792793746.5629823,
-          "rules_rechecked": [
-            "AVIF primary identity",
-            "lore/user height",
-            "south-facing",
-            "transparent edge without gray halo",
-            "no motions before all roster eight-way review"
-          ]
-        }
-      ],
-      "image_verified": true,
-      "image_visually_reviewed": true,
-      "skeleton_joints": 18,
-      "rotation_count": 8
+      "ready": false,
+      "exported": false,
+      "image_verified": false,
+      "image_visually_reviewed": false,
+      "eight_way_visual_reviewed": false,
+      "status": "user-rejected-deleted",
+      "deleted_character_id": "763e3594-9c92-4d08-82b2-e3fb7d286647",
+      "deletion_audit": "game-src/art/field/production/history/user-rejected-20261024-37/763e3594-9c92-4d08-82b2-e3fb7d286647"
     },
     "go-yeon-ji": {
       "name": "고연지",
       "group": "underground",
-      "character_id": "53c39dd7-2751-4616-b0ae-d7425cdbe07b",
-      "image": "02522c5f-7c65-4dea-9097-d37a7f3eece0",
-      "registration": "d87a50ff-3589-49db-8669-0841b3464ab9",
+      "character_id": null,
+      "image": null,
+      "registration": null,
       "motions": {},
-      "ready": true,
-      "visual_rejections": [
-        {
-          "job": "9ae5c48b-d9ea-454c-9c24-270560fb1a3a",
-          "job_status": "completed",
-          "decision": "reroll",
-          "reason": "원작은 검은 어깨 길이 생머리인데 푸른 턱 길이 단발로 출력. 머리 영역만 마스크 교정, 가운·청진기·민트 셔츠·키는 보존.",
-          "at": 1792792467.2470343,
-          "rules_rechecked": [
-            "AVIF primary identity",
-            "lore/user height",
-            "south-facing",
-            "transparent edge without gray halo",
-            "no motions before all roster eight-way review"
-          ]
-        }
-      ],
-      "image_verified": true,
-      "image_visually_reviewed": true,
-      "skeleton_joints": 18,
-      "rotation_count": 8,
-      "exported": true,
-      "eight_way_visual_reviewed": true
+      "ready": false,
+      "exported": false,
+      "image_verified": false,
+      "image_visually_reviewed": false,
+      "eight_way_visual_reviewed": false,
+      "status": "user-rejected-deleted",
+      "deleted_character_id": "53c39dd7-2751-4616-b0ae-d7425cdbe07b",
+      "deletion_audit": "game-src/art/field/production/history/user-rejected-20261024-37/53c39dd7-2751-4616-b0ae-d7425cdbe07b"
     },
     "yun-ji-a": {
       "name": "윤지아",
       "group": "underground",
-      "character_id": "72668525-2ddb-4ee7-94b5-350d695bd1d7",
-      "image": "0db332dc-7f99-4b4a-84c7-17bdc395ae40",
-      "registration": "69400875-73d7-4288-83fa-72d8b3a79d3b",
+      "character_id": null,
+      "image": null,
+      "registration": null,
       "motions": {},
-      "ready": true,
-      "image_verified": true,
-      "image_visually_reviewed": true,
-      "skeleton_joints": 18,
-      "rotation_count": 8,
-      "exported": true,
-      "eight_way_visual_reviewed": true
+      "ready": false,
+      "exported": false,
+      "image_verified": false,
+      "image_visually_reviewed": false,
+      "eight_way_visual_reviewed": false,
+      "status": "user-rejected-deleted",
+      "deleted_character_id": "72668525-2ddb-4ee7-94b5-350d695bd1d7",
+      "deletion_audit": "game-src/art/field/production/history/user-rejected-20261024-37/72668525-2ddb-4ee7-94b5-350d695bd1d7"
     },
     "ma-deok-hee": {
       "name": "마덕희",
       "group": "underground",
-      "character_id": "45e40a13-b3a8-4cee-8f7d-08ab09574ad0",
-      "image": "68d69057-3d33-40ca-8df6-ed30c4d059e4",
-      "registration": "80e98e16-d4f1-42f5-89f8-dbfeb0c91e3d",
+      "character_id": null,
+      "image": null,
+      "registration": null,
       "motions": {},
-      "ready": true,
-      "visual_rejections": [
-        {
-          "job": "02b434c1-5096-4b3a-a855-e93482e565b1",
-          "job_status": "completed",
-          "decision": "reroll",
-          "reason": "원작은 두꺼운 일자 앞머리인데 중앙 이마가 갈라진 앞머리로 출력. 이마의 머리 영역만 마스크 교정, 검은 단발·얼굴·버건디 정장·키는 보존.",
-          "at": 1792792467.349168,
-          "rules_rechecked": [
-            "AVIF primary identity",
-            "lore/user height",
-            "south-facing",
-            "transparent edge without gray halo",
-            "no motions before all roster eight-way review"
-          ]
-        }
-      ],
-      "image_verified": true,
-      "image_visually_reviewed": true,
-      "skeleton_joints": 18,
-      "rotation_count": 8,
-      "exported": true,
-      "eight_way_visual_reviewed": true
+      "ready": false,
+      "exported": false,
+      "image_verified": false,
+      "image_visually_reviewed": false,
+      "eight_way_visual_reviewed": false,
+      "status": "user-rejected-deleted",
+      "deleted_character_id": "45e40a13-b3a8-4cee-8f7d-08ab09574ad0",
+      "deletion_audit": "game-src/art/field/production/history/user-rejected-20261024-37/45e40a13-b3a8-4cee-8f7d-08ab09574ad0"
     },
     "mun-hye-ran": {
       "name": "문혜란",
       "group": "underground",
-      "character_id": "bf75f6c8-793b-4995-85e9-a6a40dd9121f",
-      "image": "3c5a9716-28ed-43ea-b88c-75f92a0e1ab6",
-      "registration": "c7717490-a1af-4b91-8ee7-0d88b179806e",
+      "character_id": null,
+      "image": null,
+      "registration": null,
       "motions": {},
-      "ready": true,
-      "image_verified": true,
-      "image_visually_reviewed": true,
-      "registration_rejections": [
-        {
-          "character_id": "99684006-a13e-4ca1-b55c-5f4ecb1069de",
-          "job": "5bba1f28-8f10-409c-8b93-ae523046558f",
-          "reason": "관절 누락 skeletons:null. 8방향은 원작 낮은 갈색 포니테일·긴 옆머리·갈색 정장·검은 셔츠·왼손목 금시계·키·외곽을 개별 검수해 모두 통과. 같은8장 그대로 가져오는 등록으로 관절 재구성 시도.",
-          "at": 1792793741.7488494
-        }
-      ],
-      "exported": true,
-      "eight_way_visual_reviewed": true,
-      "skeleton_joints": 18,
-      "rotation_count": 8
+      "ready": false,
+      "exported": false,
+      "image_verified": false,
+      "image_visually_reviewed": false,
+      "eight_way_visual_reviewed": false,
+      "status": "user-rejected-deleted",
+      "deleted_character_id": "bf75f6c8-793b-4995-85e9-a6a40dd9121f",
+      "deletion_audit": "game-src/art/field/production/history/user-rejected-20261024-37/bf75f6c8-793b-4995-85e9-a6a40dd9121f"
     },
     "shin-yuri": {
       "name": "신유리",
       "group": "underground",
-      "character_id": "fc908cfd-71aa-48aa-9805-f1d7c8cb1b8d",
-      "image": "e464915e-93b8-4980-9732-f5871953ed86",
-      "registration": "b700a94b-9efc-4772-badf-c0e0d4172f24",
+      "character_id": null,
+      "image": null,
+      "registration": null,
       "motions": {},
-      "ready": true,
-      "image_verified": true,
-      "image_visually_reviewed": true,
-      "exported": true,
-      "registration_rejections": [
-        {
-          "character_id": "52860cf1-9427-4bd5-affe-d017ee81c2bc",
-          "job": "76fa246d-7c0f-4029-a9dd-b3d202836934",
-          "reason": "측면과 사선의 낮은 포니테일이 뻗친 땋은 머리로 변형. 원작은 풀린 낮은 포니테일. 정면은 유지하고 등 쪽으로 내려오는 땋지 않은 묶음머리로 재등록.",
-          "at": 1792793744.8064396
-        },
-        {
-          "character_id": "6d890b31-7194-48f6-bf12-e95897095d36",
-          "job": "fcf1ca24-05e3-4c31-b943-fce1cf62ff6c",
-          "reason": "회전 머리의 땋은 수평 꼬리 및 남은 분리 픽셀 교정 완료. 검수된8방향 보존 등록으로 실패 라이브 등록 교체.",
-          "at": 1792796056.154139
-        }
-      ],
-      "eight_way_visual_reviewed": true,
-      "direction-repair-south-east": "8d75c0b8-3f73-45a1-9461-c3600108016c",
-      "direction-repair-east": "4914438a-8ef4-4258-88da-1a7de662d28d",
-      "direction-repair-north-east": "07763be8-6507-4aa2-9414-84f52559175e",
-      "direction-repair-north": "51693c1a-9b7f-452b-9fca-9486eb2ad331",
-      "direction-repair-north-west": "0def0b16-6bca-460b-b16d-b621d6cb8030",
-      "direction-repair-west": "7d19f4cf-e64a-4281-bbdd-924949016b12",
-      "direction-repair-south-west": "3c788037-0100-4941-a61d-ca9d4c6fd1ec",
-      "direction-repair-north-east-remove-old-hair-speck": "818368ba-951c-4b93-8e89-8b66cabd4b29",
-      "skeleton_joints": 18,
-      "rotation_count": 8
+      "ready": false,
+      "exported": false,
+      "image_verified": false,
+      "image_visually_reviewed": false,
+      "eight_way_visual_reviewed": false,
+      "status": "user-rejected-deleted",
+      "deleted_character_id": "fc908cfd-71aa-48aa-9805-f1d7c8cb1b8d",
+      "deletion_audit": "game-src/art/field/production/history/user-rejected-20261024-37/fc908cfd-71aa-48aa-9805-f1d7c8cb1b8d"
     },
     "blaret": {
       "name": "블라렛",
       "group": "religious",
-      "character_id": "84db0331-2810-48ce-aefb-a26b3525e628",
-      "image": "0f18021b-f069-4958-825d-d830176a1892",
-      "registration": "68f0581c-57c2-49c3-8ac8-f6a5d0482358",
+      "character_id": null,
+      "image": null,
+      "registration": null,
       "motions": {},
-      "ready": true,
-      "exported": true,
-      "registration_rejections": [
-        {
-          "character_id": "a1e68911-325e-4aef-a66c-df643e8832de",
-          "job": "82dc8eed-43b9-433a-aa58-dc4ba39c1a82",
-          "reason": "원작의 허리·골반까지 내려오는 긴 검은 베일이 어깨뼈 길이로 짧아짐. 베일을 늘린 정면으로 다시 등록 필요.",
-          "at": 1792793748.776734
-        },
-        {
-          "character_id": "b14a022b-017b-4229-9b6c-6291583a408a",
-          "job": "217f749c-ee0b-43c8-88ca-d8d9d3db80bb",
-          "reason": "회전에서 짧아지고 끈처럼 갈라진 베일을7방향 모두 넓은 천으로 교정·검수 완료. 수정8장 보존 등록으로 실패 라이브 등록 교체.",
-          "at": 1792797459.9942079
-        }
-      ],
-      "eight_way_visual_reviewed": true,
-      "visual_rejections": [
-        {
-          "job": "124f2988-2c22-4b10-901a-0cc09cc5f1ed",
-          "job_status": "completed",
-          "decision": "reroll",
-          "reason": "원작의 긴 검은 베일이 지나치게 짧음. 기존 인물 픽셀은 보존하고 팔 뒤·양옆의 투명 영역에 골반까지 내려오는 베일 연장.",
-          "at": 1792793748.89077,
-          "rules_rechecked": [
-            "AVIF primary identity",
-            "lore/user height",
-            "south-facing",
-            "transparent edge without gray halo",
-            "no motions before all roster eight-way review"
-          ]
-        },
-        {
-          "job": "fd7e8421-f416-410c-9c48-8e1f220251ab",
-          "job_status": "completed",
-          "decision": "reroll",
-          "reason": "수정 후에도 검은 베일 끝이 팔꿈치 부근에 머물러 AVIF의 엉덩이까지 내려오는 길이에 못 미침. 빈 영역만 마스킹한 방식이 기존 짧은 끝을 고정했으므로 다음에는 베일 끝 자체와 연장 영역을 함께 마스킹.",
-          "at": 1792794301.7582169,
-          "rules_rechecked": [
-            "AVIF primary identity",
-            "lore/user height",
-            "south-facing",
-            "transparent edge without gray halo",
-            "no motions before all roster eight-way review"
-          ]
-        },
-        {
-          "job": "46cb6f78-2b51-4c55-a94a-fb33cdd7a1e1",
-          "job_status": "completed",
-          "decision": "reroll",
-          "reason": "왼쪽 베일만 손 아래까지 연장됐고 오른쪽은 팔꿈치에서 끝남. 오른쪽 기존 끝이 마스크 경계 밖에 남은 문제 확인. 오른쪽 끝과 연장 영역을 함께 교정하고 왼쪽 및 몸체는 보존.",
-          "at": 1792794908.0499072,
-          "rules_rechecked": [
-            "AVIF primary identity",
-            "lore/user height",
-            "south-facing",
-            "transparent edge without gray halo",
-            "no motions before all roster eight-way review"
-          ]
-        },
-        {
-          "job": "e9653deb-de50-4f8a-87d5-4fd7ce9ea263",
-          "job_status": "completed",
-          "decision": "reroll",
-          "reason": "오른쪽 베일 연장이 천 면 대신 1px 선으로 생성됨. crop_to_mask 부분 확대가 전체 베일 좌우 관계를 놓치는 것으로 판단. 전체 캔버스 문맥을 유지하는 crop_to_mask=false와 연결부를 포함한 마스크로 교정.",
-          "at": 1792795549.7707343,
-          "rules_rechecked": [
-            "AVIF primary identity",
-            "lore/user height",
-            "south-facing",
-            "transparent edge without gray halo",
-            "no motions before all roster eight-way review"
-          ]
-        }
-      ],
-      "image_verified": true,
-      "image_visually_reviewed": true,
-      "direction-repair-south-east-wide-long-veil": "d0388e93-0ed8-438b-a327-5300457d622e",
-      "direction-repair-east-wide-long-veil": "d2e8d457-f5a5-4338-ae9e-96d70db85590",
-      "direction-repair-north-east-wide-long-veil": "aa198451-112b-4f2c-aa9d-88add755be6a",
-      "direction-repair-north-wide-long-veil": "570f4680-eeeb-47e8-9979-2f9b5d706a9b",
-      "direction-repair-north-west-wide-long-veil": "65477007-079f-4fec-9691-cd8fbf1e41a9",
-      "direction-repair-west-wide-long-veil": "7fcb0406-f75a-4062-b35d-e50fce22fb17",
-      "direction-repair-south-west-wide-long-veil": "0976945d-ef6a-4bad-9850-14556f91f15b",
-      "skeleton_joints": 18,
-      "rotation_count": 8
+      "ready": false,
+      "exported": false,
+      "image_verified": false,
+      "image_visually_reviewed": false,
+      "eight_way_visual_reviewed": false,
+      "status": "user-rejected-deleted",
+      "deleted_character_id": "84db0331-2810-48ce-aefb-a26b3525e628",
+      "deletion_audit": "game-src/art/field/production/history/user-rejected-20261024-37/84db0331-2810-48ce-aefb-a26b3525e628"
     },
     "saladin": {
       "name": "살라딘",
       "group": "religious",
-      "character_id": "9e926b19-797f-4c96-9623-f93b60165828",
-      "image": "093bd367-7b6f-4606-8958-8a1a2c8bf4f3",
-      "registration": "1f201d3e-fc8c-44b5-b508-c14a58d5e02d",
+      "character_id": null,
+      "image": null,
+      "registration": null,
       "motions": {},
-      "ready": true,
-      "image_verified": true,
-      "image_visually_reviewed": true,
-      "skeleton_joints": 18,
-      "rotation_count": 8,
-      "exported": true,
-      "eight_way_visual_reviewed": true
+      "ready": false,
+      "exported": false,
+      "image_verified": false,
+      "image_visually_reviewed": false,
+      "eight_way_visual_reviewed": false,
+      "status": "user-rejected-deleted",
+      "deleted_character_id": "9e926b19-797f-4c96-9623-f93b60165828",
+      "deletion_audit": "game-src/art/field/production/history/user-rejected-20261024-37/9e926b19-797f-4c96-9623-f93b60165828"
     },
     "avensha": {
       "name": "아벤샤",
       "group": "witches",
-      "character_id": "e26cb210-17f2-4cc1-ae6a-cf3cee08a6ea",
-      "image": "11ff3fba-e34c-487a-8456-b666e9c44fe8",
-      "registration": "d33f703c-1659-4286-b02b-9211d275a5b7",
+      "character_id": null,
+      "image": null,
+      "registration": null,
       "motions": {},
-      "ready": true,
-      "visual_rejections": [
-        {
-          "job": "ee93e07e-c778-4160-9535-29aaefd70c9c",
-          "job_status": "completed",
-          "decision": "reroll",
-          "reason": "원작의 낮은 채도 청회색 머리와 어두운 자주색 망토가 선명한 파랑·보라로 변함. 해당 색 영역만 마스크 교정해 얼굴·초록 눈·체형·검은 정장 보존.",
-          "at": 1792792775.2408257,
-          "rules_rechecked": [
-            "AVIF primary identity",
-            "lore/user height",
-            "south-facing",
-            "transparent edge without gray halo",
-            "no motions before all roster eight-way review"
-          ]
-        }
-      ],
-      "image_verified": true,
-      "image_visually_reviewed": true,
-      "skeleton_joints": 18,
-      "rotation_count": 8,
-      "exported": true,
-      "eight_way_visual_reviewed": true
+      "ready": false,
+      "exported": false,
+      "image_verified": false,
+      "image_visually_reviewed": false,
+      "eight_way_visual_reviewed": false,
+      "status": "user-rejected-deleted",
+      "deleted_character_id": "e26cb210-17f2-4cc1-ae6a-cf3cee08a6ea",
+      "deletion_audit": "game-src/art/field/production/history/user-rejected-20261024-37/e26cb210-17f2-4cc1-ae6a-cf3cee08a6ea"
     },
     "secriem": {
       "name": "세크리엠",
       "group": "vampires",
-      "character_id": "cc736d14-93e1-4242-9d54-904baff03c3b",
-      "image": "49f50cbc-3c79-4f23-8835-3cbea51c83a5",
-      "registration": "e5c4d831-8e6c-4102-908b-3c179fef8817",
+      "character_id": null,
+      "image": null,
+      "registration": null,
       "motions": {},
-      "ready": true,
-      "image_verified": true,
-      "image_visually_reviewed": true,
-      "skeleton_joints": 18,
-      "rotation_count": 8,
-      "exported": true,
-      "eight_way_visual_reviewed": true
+      "ready": false,
+      "exported": false,
+      "image_verified": false,
+      "image_visually_reviewed": false,
+      "eight_way_visual_reviewed": false,
+      "status": "user-rejected-deleted",
+      "deleted_character_id": "cc736d14-93e1-4242-9d54-904baff03c3b",
+      "deletion_audit": "game-src/art/field/production/history/user-rejected-20261024-37/cc736d14-93e1-4242-9d54-904baff03c3b"
     },
     "brownie": {
       "name": "브라우니",
@@ -55879,33 +54954,18 @@
     "aestheticism": {
       "name": "탐미주의",
       "group": "entities",
-      "character_id": "11b39e21-4716-4def-9ced-54e9f4c38551",
-      "image": "9980fc63-ce77-4f2a-8628-2092e1bf1afe",
-      "registration": "eec10dd3-bde6-42ac-ba86-86387906a16d",
+      "character_id": null,
+      "image": null,
+      "registration": null,
       "motions": {},
-      "ready": true,
-      "visual_rejections": [
-        {
-          "job": "6fa8c4eb-2d7b-4deb-87f8-40c37d7e2c98",
-          "job_status": "completed",
-          "decision": "reroll",
-          "reason": "목의 가는 수평 봉합선이 굵은 목걸이처럼 뭉침. 원작의 절제된 무표정에 가깝게 입을 다물고 목 봉합선만 정리. 머리·붉은 눈·마네킹 관절·체격은 마스크 밖 RGBA 보존.",
-          "at": 1792793043.8335228,
-          "rules_rechecked": [
-            "AVIF primary identity",
-            "lore/user height",
-            "south-facing",
-            "transparent edge without gray halo",
-            "no motions before all roster eight-way review"
-          ]
-        }
-      ],
-      "image_verified": true,
-      "image_visually_reviewed": true,
-      "skeleton_joints": 18,
-      "rotation_count": 8,
-      "exported": true,
-      "eight_way_visual_reviewed": true
+      "ready": false,
+      "exported": false,
+      "image_verified": false,
+      "image_visually_reviewed": false,
+      "eight_way_visual_reviewed": false,
+      "status": "user-rejected-deleted",
+      "deleted_character_id": "11b39e21-4716-4def-9ced-54e9f4c38551",
+      "deletion_audit": "game-src/art/field/production/history/user-rejected-20261024-37/11b39e21-4716-4def-9ced-54e9f4c38551"
     }
   },
   "events": [
@@ -82400,9 +81460,52 @@
           "status": "processing"
         }
       }
+    },
+    {
+      "type": "user-requested-deletion",
+      "names": [
+        "이길환",
+        "도필헌",
+        "김성진",
+        "은하제",
+        "사장",
+        "이기석",
+        "김조학",
+        "고영훈",
+        "송주익",
+        "조성춘",
+        "윤병수",
+        "송진섭",
+        "백석주",
+        "진나솔",
+        "강이학",
+        "백사헌",
+        "노기균",
+        "이연화",
+        "호유원",
+        "고영은",
+        "윤지아",
+        "살라딘",
+        "세크리엠",
+        "이병진",
+        "청달래",
+        "장허운",
+        "고연지",
+        "마덕희",
+        "문혜란",
+        "아벤샤",
+        "탐미주의",
+        "서윤지",
+        "이성해",
+        "차여진",
+        "신유리",
+        "제이",
+        "블라렛"
+      ],
+      "audit": "game-src/art/field/production/history/user-rejected-20261024-37"
     }
   ],
-  "updated_at": 1792813007.340781,
+  "updated_at": 1792813013.6752503,
   "user_stopped_at": 1792778235.6917784,
   "archived_jobs": {
     "304457e9-6577-44f0-af17-97841a9f6720": {
@@ -83721,22 +82824,11 @@
       "saved_frames": 6
     }
   },
-  "last_git_checkpoint": 1792812099.9298186,
+  "last_git_checkpoint": 1792813013.675209,
   "summary": {
-    "jobs": {
-      "processing": 4,
-      "completed": 581,
-      "failed": 9,
-      "stalled": 0
-    },
-    "characters_ready": 55,
-    "characters_total": 55,
-    "images_format_verified": 55,
-    "new_images_visually_reviewed": 43,
-    "eight_way_visually_reviewed": 55,
-    "characters_motions_visually_reviewed": 4,
-    "motions_submitted": 90,
-    "motions_target": 1100
+    "status": "stopped-after-user-rejection",
+    "deleted_characters": 37,
+    "remaining_registered_characters": 18
   },
   "applied_repairs": [
     "stature-v2-aileen",
