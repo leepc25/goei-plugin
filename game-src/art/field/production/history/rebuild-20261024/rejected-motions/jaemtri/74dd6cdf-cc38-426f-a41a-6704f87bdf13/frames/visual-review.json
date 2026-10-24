@@ -1,0 +1,20 @@
+{
+  "at": 1792804142.624722,
+  "job_id": "74dd6cdf-cc38-426f-a41a-6704f87bdf13",
+  "result": "reroll-required",
+  "findings": "Frames 2/3/6/7 have gray masses along dynamic hair and hair crosses face unnaturally; use own clean airborne frame as first reference with matching known pose.",
+  "frame_count": 8,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

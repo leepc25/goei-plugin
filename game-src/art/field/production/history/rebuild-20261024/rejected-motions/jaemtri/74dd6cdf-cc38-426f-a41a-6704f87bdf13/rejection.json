@@ -1,0 +1,129 @@
+{
+  "reason": "Visual rejection recorded; replace with reviewed own-image bounded skeleton or clean airborne source.",
+  "job": {
+    "kind": "animation",
+    "slug": "jaemtri",
+    "template": "jumping-1",
+    "status": "completed",
+    "created_epoch": 1792803732.0410013,
+    "receipt": {
+      "usage": null,
+      "background_job_id": "74dd6cdf-cc38-426f-a41a-6704f87bdf13",
+      "status": "processing"
+    },
+    "endpoint": "animate-with-skeleton-v3",
+    "last_response": {
+      "usage": {
+        "type": "generations",
+        "generations": 3.0
+      },
+      "id": "74dd6cdf-cc38-426f-a41a-6704f87bdf13",
+      "status": "completed",
+      "created_at": "2026-10-24T01:02:12.354735+00:00",
+      "last_response": {
+        "seed": 2026110000,
+        "type": "done",
+        "action": "smoothing frames",
+        "images": [
+          {
+            "type": "base64",
+            "width": 256,
+            "base64": "[image payload omitted]",
+            "height": 256
+          },
+          {
+            "type": "base64",
+            "width": 256,
+            "base64": "[image payload omitted]",
+            "height": 256
+          },
+          {
+            "type": "base64",
+            "width": 256,
+            "base64": "[image payload omitted]",
+            "height": 256
+          },
+          {
+            "type": "base64",
+            "width": 256,
+            "base64": "[image payload omitted]",
+            "height": 256
+          },
+          {
+            "type": "base64",
+            "width": 256,
+            "base64": "[image payload omitted]",
+            "height": 256
+          },
+          {
+            "type": "base64",
+            "width": 256,
+            "base64": "[image payload omitted]",
+            "height": 256
+          },
+          {
+            "type": "base64",
+            "width": 256,
+            "base64": "[image payload omitted]",
+            "height": 256
+          },
+          {
+            "type": "base64",
+            "width": 256,
+            "base64": "[image payload omitted]",
+            "height": 256
+          }
+        ],
+        "status": "initializing",
+        "progress": 1.0,
+        "flow_kind": "animation",
+        "billing_usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "generation_id": "27176a54-8da6-48cd-9ab2-5813706fc81f",
+        "queue_position": 0,
+        "billing_charged": true,
+        "generation_started_at": "2026-10-24T01:02:57.437058+00:00",
+        "estimated_wait_seconds": 0
+      }
+    },
+    "observed_end_epoch": 1792804085.3183825,
+    "elapsed_observed_seconds": 353.27738189697266,
+    "usage": {
+      "usd": 0.0,
+      "type": "generations",
+      "generations": 3
+    },
+    "saved_frames": 8
+  },
+  "at": 1792804291.8752494,
+  "state_before": {
+    "name": "잼트리",
+    "group": "management",
+    "character_id": "f937666b-c116-4408-8864-55e7743850a5",
+    "image": "a32c319b-d494-4fb0-b04e-1576a6243021",
+    "registration": "c39dacdf-7d7e-4648-bceb-6900ea2c8fd8",
+    "motions": {
+      "breathing-idle": "585dd8b2-dab9-49c4-867d-650294089a71",
+      "walking-8-frames": "2f3d540f-6770-442f-a9f4-a2a12320fe11",
+      "jumping-1": "74dd6cdf-cc38-426f-a41a-6704f87bdf13",
+      "jumping-2": "4f69917a-c032-4a01-8b78-ee5eccd2e952",
+      "two-footed-jump": "274e5ad7-0ea5-4815-bde9-cbddb9708422",
+      "drinking": "dc6f89a3-0b61-4e26-bb08-73ecb7852b25",
+      "pull-heavy-object": "df4b0e3c-2074-4bbe-8551-1f693b36c9ad",
+      "fight-stance-idle-8-frames": "4e33ccea-e38f-4f32-9cfe-8ded7f02e6dc",
+      "picking-up": "1a8ae1e5-ecae-4bd6-9367-d0c75519e4cc",
+      "lead-jab": "da3739c8-609a-43a1-9bbd-acb9c7f0d250"
+    },
+    "ready": true,
+    "image_verified": true,
+    "skeleton_joints": 18,
+    "rotation_count": 8,
+    "exported": false,
+    "eight_way_visual_reviewed": true,
+    "motions_visual_reviewed": false
+  },
+  "standalone": true
+}

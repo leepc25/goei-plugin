@@ -372,24 +372,40 @@ bbb0fb6d-76b3-44b7-8cc7-397bda37b237	spangdal	motion-frame-candidate-throw-objec
 e4a8b8a0-4167-4a16-a9de-857b14e4fdac	spangdal	motion-frame-candidate-front-flip-rotation-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
 2f422a48-f57e-4298-ba5d-a2544d7f7269	spangdal	animation	drinking	completed	{"usd": 0.0, "type": "generations", "generations": 3}
 1c31a9a8-6be0-4d79-8896-292cb2417ab9	spangdal	motion-frame-candidate-throw-object-release-empty-2		completed	{"usd": 0.0, "type": "generations", "generations": 2}
-585dd8b2-dab9-49c4-867d-650294089a71	jaemtri	animation	breathing-idle	processing	null
-2f3d540f-6770-442f-a9f4-a2a12320fe11	jaemtri	animation	walking-8-frames	processing	null
-10b26ddd-9882-4ce8-a083-988939e93793	jaemtri	animation	running-8-frames	processing	null
-19d630c1-dcf5-47d6-b025-67e49b711261	jaemtri	animation	running-jump	processing	null
-f10af28f-db88-4022-9c06-ac7a7d61bbf1	jaemtri	animation	running-slide	processing	null
-49803979-a317-4432-82e5-e978129ce4b9	jaemtri	animation	crouched-walking	processing	null
-39dbed40-e030-446e-acb8-7416fcb300fb	jaemtri	animation	sad-walk	processing	null
-765a0855-4ec4-4945-8cbc-6e7ebe80d2df	jaemtri	animation	front-flip	processing	null
-dede7581-a559-42d1-968f-7eba821c32aa	jaemtri	animation	backflip	processing	null
-74dd6cdf-cc38-426f-a41a-6704f87bdf13	jaemtri	animation	jumping-1	processing	null
-4f69917a-c032-4a01-8b78-ee5eccd2e952	jaemtri	animation	jumping-2	processing	null
-274e5ad7-0ea5-4815-bde9-cbddb9708422	jaemtri	animation	two-footed-jump	processing	null
-dc6f89a3-0b61-4e26-bb08-73ecb7852b25	jaemtri	animation	drinking	processing	null
-b447e786-642b-4d67-9ecf-ad1f0334ca55	jaemtri	animation	picking-up	processing	null
-afca63ff-3579-4df3-97d7-b87aa1af9138	jaemtri	animation	pushing	processing	null
-df4b0e3c-2074-4bbe-8551-1f693b36c9ad	jaemtri	animation	pull-heavy-object	processing	null
-3903df4e-0994-4ae9-be4b-093312403c31	jaemtri	animation	throw-object	processing	null
-4e33ccea-e38f-4f32-9cfe-8ded7f02e6dc	jaemtri	animation	fight-stance-idle-8-frames	processing	null
-9b27b5bf-cb67-4451-b43b-c65fab1dfd97	jaemtri	animation	lead-jab	processing	null
-0d2894ac-f760-4ec9-88eb-045cba6fecb4	jaemtri	animation	cross-punch	processing	null
+585dd8b2-dab9-49c4-867d-650294089a71	jaemtri	animation	breathing-idle	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+2f3d540f-6770-442f-a9f4-a2a12320fe11	jaemtri	animation	walking-8-frames	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+10b26ddd-9882-4ce8-a083-988939e93793	jaemtri	animation	running-8-frames	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+19d630c1-dcf5-47d6-b025-67e49b711261	jaemtri	animation	running-jump	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+f10af28f-db88-4022-9c06-ac7a7d61bbf1	jaemtri	animation	running-slide	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+49803979-a317-4432-82e5-e978129ce4b9	jaemtri	animation	crouched-walking	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+39dbed40-e030-446e-acb8-7416fcb300fb	jaemtri	animation	sad-walk	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+765a0855-4ec4-4945-8cbc-6e7ebe80d2df	jaemtri	animation	front-flip	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+dede7581-a559-42d1-968f-7eba821c32aa	jaemtri	animation	backflip	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+74dd6cdf-cc38-426f-a41a-6704f87bdf13	jaemtri	animation	jumping-1	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+4f69917a-c032-4a01-8b78-ee5eccd2e952	jaemtri	animation	jumping-2	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+274e5ad7-0ea5-4815-bde9-cbddb9708422	jaemtri	animation	two-footed-jump	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+dc6f89a3-0b61-4e26-bb08-73ecb7852b25	jaemtri	animation	drinking	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+b447e786-642b-4d67-9ecf-ad1f0334ca55	jaemtri	animation	picking-up	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+afca63ff-3579-4df3-97d7-b87aa1af9138	jaemtri	animation	pushing	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+df4b0e3c-2074-4bbe-8551-1f693b36c9ad	jaemtri	animation	pull-heavy-object	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+3903df4e-0994-4ae9-be4b-093312403c31	jaemtri	animation	throw-object	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+4e33ccea-e38f-4f32-9cfe-8ded7f02e6dc	jaemtri	animation	fight-stance-idle-8-frames	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+9b27b5bf-cb67-4451-b43b-c65fab1dfd97	jaemtri	animation	lead-jab	completed	{"usd": 0.0, "type": "generations", "generations": 2}
+0d2894ac-f760-4ec9-88eb-045cba6fecb4	jaemtri	animation	cross-punch	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+1a8ae1e5-ecae-4bd6-9367-d0c75519e4cc	jaemtri	animation	picking-up	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+da3739c8-609a-43a1-9bbd-acb9c7f0d250	jaemtri	animation	lead-jab	completed	{"usd": 0.0, "type": "generations", "generations": 2}
+85cc46f4-f282-4c85-84a5-8806f0c0dbb8	jaemtri	animation	running-8-frames	processing	null
+4bb32c3d-07b2-4740-8353-aff4290d93ca	jaemtri	animation	running-jump	processing	null
+f0edcb83-0b00-45e5-aef3-53223e4c989a	jaemtri	animation	running-slide	processing	null
+8e822486-043a-4c72-ae8c-322e4a2d86d6	jaemtri	animation	crouched-walking	processing	null
+dd2dc9ab-c87a-4894-9eb1-4daf3f005733	jaemtri	animation	sad-walk	processing	null
+8f183936-03f3-4f8f-8002-668ee31d5977	jaemtri	animation	front-flip	processing	null
+ef10ae23-11ce-484f-8d5b-634bbb15a4c9	jaemtri	animation	backflip	processing	null
+74d1cc71-5cd6-4798-ab81-6884fc25bb29	jaemtri	animation	jumping-1	processing	null
+3c6c64ce-622e-44c3-8eb2-a043ee45d221	jaemtri	animation	jumping-2	processing	null
+2be8354d-3922-4535-8152-cab5ef51f1f9	jaemtri	animation	two-footed-jump	processing	null
+e2ecce09-d661-43c2-aeff-84504ad0d133	jaemtri	animation	pushing	processing	null
+62f4c3b9-4d84-4975-b7b3-22c513a5f2fb	jaemtri	animation	throw-object	processing	null
+a2d20675-c8f9-4e9a-a44f-df1ec4e7f2f0	jaemtri	animation	cross-punch	processing	null
+40c26d95-c80c-468d-bd5f-30bf1465acb6	jaemtri	motion-frame-candidate-picking-up-low-pose-1		processing	null
 local-sync:jyaldi-backflip-v7-estimate	jyaldi	estimate-skeleton	backflip	synchronous-completed	{"type": "generations", "generations": 0.1}

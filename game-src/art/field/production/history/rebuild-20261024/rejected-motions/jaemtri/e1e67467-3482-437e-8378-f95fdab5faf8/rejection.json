@@ -1,0 +1,54 @@
+{
+  "reason": "Visual rejection recorded; replace with reviewed own-image bounded skeleton or clean airborne source.",
+  "group": {
+    "animation_type": "throw-object",
+    "display_name": null,
+    "animation_group_id": "e1e67467-3482-437e-8378-f95fdab5faf8",
+    "directions": [
+      {
+        "direction": "east",
+        "frame_count": 7,
+        "frames": [
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/f937666b-c116-4408-8864-55e7743850a5/animations/2a3e85db-3ddf-46eb-ac8a-c09cfd202953/east/0.png?t=1792803888",
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/f937666b-c116-4408-8864-55e7743850a5/animations/2a3e85db-3ddf-46eb-ac8a-c09cfd202953/east/1.png?t=1792803888",
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/f937666b-c116-4408-8864-55e7743850a5/animations/2a3e85db-3ddf-46eb-ac8a-c09cfd202953/east/2.png?t=1792803888",
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/f937666b-c116-4408-8864-55e7743850a5/animations/2a3e85db-3ddf-46eb-ac8a-c09cfd202953/east/3.png?t=1792803888",
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/f937666b-c116-4408-8864-55e7743850a5/animations/2a3e85db-3ddf-46eb-ac8a-c09cfd202953/east/4.png?t=1792803888",
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/f937666b-c116-4408-8864-55e7743850a5/animations/2a3e85db-3ddf-46eb-ac8a-c09cfd202953/east/5.png?t=1792803888",
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/f937666b-c116-4408-8864-55e7743850a5/animations/2a3e85db-3ddf-46eb-ac8a-c09cfd202953/east/6.png?t=1792803888"
+        ]
+      }
+    ]
+  },
+  "at": 1792804286.380223,
+  "state_before": {
+    "name": "잼트리",
+    "group": "management",
+    "character_id": "f937666b-c116-4408-8864-55e7743850a5",
+    "image": "a32c319b-d494-4fb0-b04e-1576a6243021",
+    "registration": "c39dacdf-7d7e-4648-bceb-6900ea2c8fd8",
+    "motions": {
+      "breathing-idle": "585dd8b2-dab9-49c4-867d-650294089a71",
+      "walking-8-frames": "2f3d540f-6770-442f-a9f4-a2a12320fe11",
+      "sad-walk": "39dbed40-e030-446e-acb8-7416fcb300fb",
+      "jumping-1": "74dd6cdf-cc38-426f-a41a-6704f87bdf13",
+      "jumping-2": "4f69917a-c032-4a01-8b78-ee5eccd2e952",
+      "two-footed-jump": "274e5ad7-0ea5-4815-bde9-cbddb9708422",
+      "drinking": "dc6f89a3-0b61-4e26-bb08-73ecb7852b25",
+      "pushing": "afca63ff-3579-4df3-97d7-b87aa1af9138",
+      "pull-heavy-object": "df4b0e3c-2074-4bbe-8551-1f693b36c9ad",
+      "throw-object": "3903df4e-0994-4ae9-be4b-093312403c31",
+      "fight-stance-idle-8-frames": "4e33ccea-e38f-4f32-9cfe-8ded7f02e6dc",
+      "cross-punch": "0d2894ac-f760-4ec9-88eb-045cba6fecb4",
+      "picking-up": "1a8ae1e5-ecae-4bd6-9367-d0c75519e4cc",
+      "lead-jab": "da3739c8-609a-43a1-9bbd-acb9c7f0d250"
+    },
+    "ready": true,
+    "image_verified": true,
+    "skeleton_joints": 18,
+    "rotation_count": 8,
+    "exported": false,
+    "eight_way_visual_reviewed": true,
+    "motions_visual_reviewed": false
+  }
+}

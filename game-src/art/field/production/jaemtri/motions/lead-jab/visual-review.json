@@ -1,0 +1,20 @@
+{
+  "at": 1792804112.767541,
+  "job_id": "da3739c8-609a-43a1-9bbd-acb9c7f0d250",
+  "result": "pass",
+  "findings": "All three direct EAST jab frames viewed: clean bare fist extends and returns, no white/gray fist blob or gray hair exterior; own long brown hair, skirt and heels preserved.",
+  "frame_count": 3,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}
