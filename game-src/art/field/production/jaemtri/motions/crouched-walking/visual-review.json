@@ -1,0 +1,20 @@
+{
+  "at": 1792803974.995793,
+  "job_id": "49803979-a317-4432-82e5-e978129ce4b9",
+  "result": "reroll-required",
+  "findings": "Gray mass over trailing hair in first frames and unstable lowered posture; regenerate own compact crouched gait with feet inside canvas.",
+  "frame_count": 6,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "crouched-walking",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

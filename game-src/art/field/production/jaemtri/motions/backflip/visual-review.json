@@ -1,0 +1,20 @@
+{
+  "at": 1792804010.1848116,
+  "job_id": "dede7581-a559-42d1-968f-7eba821c32aa",
+  "result": "reroll-required",
+  "findings": "Frame 5 limbs disintegrate, raised arms clip at top; rotation frames contain gray hair/body exterior. Replace with own bounded backward-rotation skeleton.",
+  "frame_count": 10,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "backflip",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

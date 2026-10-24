@@ -1,0 +1,20 @@
+{
+  "at": 1792804042.459282,
+  "job_id": "dc6f89a3-0b61-4e26-bb08-73ecb7852b25",
+  "result": "pass",
+  "findings": "All six SE frames viewed: coherent cup stays in hand while raising/drinking/lowering; gray cup surface is the prop, no floating exterior artifact. Own long brown waves, skirt suit and heels intact.",
+  "frame_count": 6,
+  "directions": [
+    "south-east"
+  ],
+  "actual_template": "drinking",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

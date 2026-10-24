@@ -1,0 +1,20 @@
+{
+  "at": 1792804054.6182601,
+  "job_id": "afca63ff-3579-4df3-97d7-b87aa1af9138",
+  "result": "reroll-required",
+  "findings": "First frame has gray exterior over trailing hair and rear shoe/hand edge; replace with compact planted pushing cycle from own reference.",
+  "frame_count": 6,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "pushing",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

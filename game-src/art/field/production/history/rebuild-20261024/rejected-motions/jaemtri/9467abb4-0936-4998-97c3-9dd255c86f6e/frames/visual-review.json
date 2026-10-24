@@ -1,0 +1,20 @@
+{
+  "at": 1792803870.6237433,
+  "job_id": "9b27b5bf-cb67-4451-b43b-c65fab1dfd97",
+  "result": "reroll-required",
+  "findings": "Frame 2 fist becomes pale gray/white painted blob and hair has gray outer remnants; change to own explicit jab skeleton and preserve plain bare fist.",
+  "frame_count": 3,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "lead-jab",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

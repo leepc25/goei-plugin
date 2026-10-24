@@ -1,0 +1,20 @@
+{
+  "at": 1792803956.6479511,
+  "job_id": "19d630c1-dcf5-47d6-b025-67e49b711261",
+  "result": "reroll-required",
+  "findings": "Gray painted hair boundary in takeoff/landing frames and awkward rear arm above head; regenerate own reference with compact running jump path, keeping skirt and high heels.",
+  "frame_count": 8,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "running-jump",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "at": 1792803947.9766822,
+  "job_id": "10b26ddd-9882-4ce8-a083-988939e93793",
+  "result": "reroll-required",
+  "findings": "Gray remnants around flowing hair in frames 2/6 and rear arm rising behind head in early frames; regenerate restrained own-proportion running skeleton with bounded arm path.",
+  "frame_count": 8,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "running-8-frames",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "at": 1792803966.8624425,
+  "job_id": "f10af28f-db88-4022-9c06-ac7a7d61bbf1",
+  "result": "reroll-required",
+  "findings": "Frames 3/4 turn toward camera with legs clipped below canvas, gray debris around raised hand, frame 5 leg damage. Replace preset with bounded EAST slide skeleton.",
+  "frame_count": 6,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "running-slide",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

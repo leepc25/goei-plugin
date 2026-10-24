@@ -1,0 +1,20 @@
+{
+  "at": 1792804022.4112873,
+  "job_id": "4f69917a-c032-4a01-8b78-ee5eccd2e952",
+  "result": "reroll-required",
+  "findings": "Gray exterior remnants follow brown hair in frames 2/3/6/7 despite correct skeleton; use clean same-character airborne pose as reference for regenerated sequence, preserving original geometry.",
+  "frame_count": 8,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

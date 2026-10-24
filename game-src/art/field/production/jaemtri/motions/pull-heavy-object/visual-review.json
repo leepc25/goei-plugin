@@ -1,0 +1,20 @@
+{
+  "at": 1792804064.3982508,
+  "job_id": "df4b0e3c-2074-4bbe-8551-1f693b36c9ad",
+  "result": "pass",
+  "findings": "Six EAST pull frames inspected: handle/rope stays aligned with hands, own long brown waves/skirt/heels retained, no separate gray exterior patches or broken limbs.",
+  "frame_count": 6,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "pull-heavy-object",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}
