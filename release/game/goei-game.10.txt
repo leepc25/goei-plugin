@@ -1,4 +1,715 @@
-(key2);
+op);
+      if (prop?.kind === "passenger") {
+        if (pending.has(prop.id)) return passengerOpen(w, prop.id);
+        lastPassengerProp = prop;
+        return false;
+      }
+      if (prop?.kind === "npc" && residentNear(w, prop.x)) return residentTalk(w, prop);
+      if (prop?.kind === "greet") return elevatorTalk(w, prop);
+      if (!prop || Math.abs(prop.x - w.player.x) > 40) return daydreamTalk(w);
+      return false;
+    };
+    const link = {
+      talk,
+      isOpen: () => talk.isOpen(),
+      attach(w, a) {
+        world = w;
+        hq2 = a.hq;
+        items = a.items ?? null;
+        talk.close();
+        w.talkHook = talkHook(w, a.hub ?? null);
+        if (hq2) return;
+        w.hooks.push(() => {
+          for (const bd of w.bodies) {
+            if (!(bd instanceof Enemy) || bd.def.faction !== "daydream" || bd.mem.npc) continue;
+            bd.mem.npc = FIELD_DD[(bd.id * 7 + (w.run.seed | 0)) % FIELD_DD.length];
+            bd.label = `백일몽 ${ddName(bd)}`;
+            bd.mem.parley = true;
+            bd.mem.brain0 = bd.brain;
+            bd.brain = { ...bd.brain, tick: (e, ww) => e.mem.parley ? parley.tick(e, ww) : bd.mem.brain0.tick?.(e, ww) };
+            bd.hostile = false;
+          }
+        });
+        w.on((e) => {
+          if (e.type === "run:end") talk.endRun();
+        });
+      },
+      stageHooks(h) {
+        return {
+          ...h,
+          meetPassenger(v, done2) {
+            const w = world;
+            const prop = lastPassengerProp;
+            lastPassengerProp = null;
+            if (!w || !prop) return h.meetPassenger?.(v, done2) ?? false;
+            pending.set(prop.id, { info: { kind: v.kind, honest: v.honest, long: v.long, fork: v.fork, agent: v.agent, depth: v.depth }, done: done2 });
+            return passengerOpen(w, prop.id);
+          }
+        };
+      },
+      talkTo(npc, extra = {}) {
+        const w = world;
+        if (!w || !ROSTER2[npc]) return;
+        open({ npc, place: hq2 ? "관리국 본부" : floorPlace(w), facts: hq2 ? [] : floorFacts(w), hints: hq2 ? [] : floorHints(w), ...extra });
+      },
+      dispose() {
+        talk.dispose();
+        pending.clear();
+        world = null;
+      }
+    };
+    return link;
+  }
+
+  // src/game/action/fx/fieldFx.ts
+  var HITSTOP = { light: 3, mid: 5, heavy: 8, super: 12 };
+  var SHAKE = { light: 2, mid: 5, heavy: 9, super: 14 };
+  var DOT = 1.5;
+  var snap = (v) => Math.round(v / DOT) * DOT;
+  function parseFxList(text2) {
+    const out = [];
+    for (const line2 of text2.split(/\r?\n/)) {
+      const cols = line2.split("|").map((s2) => s2.trim());
+      if (cols.length < 3 || !cols[0] || cols[0].startsWith("#")) continue;
+      const m = /(\d+)\s*[×x*]\s*(\d+)/.exec(cols[1]);
+      const n = parseInt(cols[2], 10);
+      if (!m || !(n > 0)) continue;
+      out.push({ name: cols[0].replace(/\.png$/, ""), w: +m[1], h: +m[2], n, loop: /반복|loop|예|yes|o\b/i.test(cols[3] ?? "") });
+    }
+    return out;
+  }
+  var CUT = { total: 1.4, bandIn: [0.05, 0.17], artIn: [0.1, 0.25], slam: 0.25, typed: 0.3, out: [0.95, 1.1] };
+  var FieldFx = class {
+    opt = { shake: 1, flash: true, numbers: true };
+    /** 효과음 자리 ('쿵' 'slam' 등). 엔진이 소리 모듈을 꽂는다 */
+    sfx = null;
+    stop = 0;
+    shakeT = 0;
+    shakeDur = 0;
+    shakePow = 0;
+    flashT = 0;
+    flashA = 0;
+    flashColor = "#fff";
+    sparks = [];
+    rings = [];
+    nums = [];
+    totals = /* @__PURE__ */ new Map();
+    ghosts = [];
+    plays = [];
+    marks = [];
+    sheets = /* @__PURE__ */ new Map();
+    bodyFlash = /* @__PURE__ */ new Map();
+    cut = null;
+    time = 0;
+    /* ── 상태 ── */
+    /** 히트스톱·필살 컷인 중이면 true: 엔진은 이 동안 월드를 진행하지 않는다 */
+    frozen() {
+      return this.stop > 0 || !!this.cut;
+    }
+    /** 필살 컷인이 도는 중인가 */
+    inSuper() {
+      return !!this.cut;
+    }
+    /** 화면 흔들림 오프셋 (카메라에 더한다) */
+    camera() {
+      if (this.shakeT <= 0 || this.opt.shake <= 0) return { x: 0, y: 0 };
+      const k = this.shakeT / this.shakeDur * this.shakePow * this.opt.shake;
+      return { x: Math.round((Math.random() * 2 - 1) * k), y: Math.round((Math.random() * 2 - 1) * k) };
+    }
+    /** 맞은 몸 번쩍: 'white' 1장 → 'color' 1장 → null (id = 맞은 몸) */
+    flashOf(id) {
+      const f = this.bodyFlash.get(id);
+      return f === void 0 ? null : f >= 1 ? "white" : "color";
+    }
+    /* ── 하나씩 ── */
+    hitstop(frames) {
+      this.stop = Math.max(this.stop, frames);
+    }
+    shake(px, dur = 0.25) {
+      if (px >= this.shakePow * (this.shakeT / (this.shakeDur || 1))) this.shakePow = px, this.shakeT = this.shakeDur = dur;
+    }
+    flash(color = "#fff", dur = 0.1, a = 0.6) {
+      if (!this.opt.flash) return;
+      this.flashColor = color;
+      this.flashT = dur;
+      this.flashA = a;
+    }
+    /** 정사각 도트 파편 (1.5px 격자) */
+    sparks_(x, y, n, color, speed = 4, lift = 0) {
+      for (let i = 0; i < n; i++) {
+        const a = Math.random() * Math.PI * 2, v = speed * (0.4 + Math.random());
+        this.sparks.push({ x, y, vx: Math.cos(a) * v * 60, vy: (Math.sin(a) * v + lift) * 60, t: 0, life: 0.25 + Math.random() * 0.25, color, size: Math.random() < 0.3 ? 3 * DOT : 2 * DOT });
+      }
+    }
+    /** 바닥에 눕힌 타원 고리 (원근: 세로 = 가로 × 0.28) */
+    ring(x, y, r0, r1, color, life = 0.3) {
+      this.rings.push({ x, y, r0, r1, color, t: 0, life });
+    }
+    /** 잔상: 몸 그리기 함수를 요원 색으로 남긴다 (빠른 이동·돌진 때 3장) */
+    ghost(draw, color, life = 0.22) {
+      this.ghosts.push({ draw, color, t: 0, life });
+      if (this.ghosts.length > 6) this.ghosts.shift();
+    }
+    /** 피해 숫자: 같은 key(맞은 몸)에 이어 맞으면 위로 쌓이고, 0.5초 쉬면 합계 */
+    number(key2, x, y, dmg, color = "#fff", big = false) {
+      if (!this.opt.numbers || !(dmg > 0)) return;
+      const tot = this.totals.get(key2);
+      const live = tot && this.time - tot.last < 0.5;
+      const row = live ? tot.rows : 0;
+      this.nums.push({ key: key2, x: snap(x), y: snap(y), text: String(Math.round(dmg)), color, t: 0, big, row });
+      this.totals.set(key2, { sum: (live ? tot.sum : 0) + dmg, last: this.time, x, y, rows: row + 1 });
+    }
+    /** 바닥 그을음 같은 자국 (기본 3초) */
+    scorch(x, y, w = 120, life = 3) {
+      this.marks.push({ x, y, w, t: 0, life });
+    }
+    /** 도트 시트 등록 (fx_목록.txt 한 줄 + 그림) */
+    register(def, img4) {
+      this.sheets.set(def.name, { def, img: img4 });
+    }
+    hasSheet(name) {
+      return this.sheets.has(name);
+    }
+    /** 시트 재생: x,y = 기준점(칸 아래 가운데). flip = 왼쪽 보기. 없는 시트면 false (코드 효과만 쓴다) */
+    play(name, x, y, o = {}) {
+      const s2 = this.sheets.get(name);
+      if (!s2) return false;
+      this.plays.push({ def: s2.def, img: s2.img, x, y, t: 0, fps: o.fps ?? 20, flip: !!o.flip, scale: o.scale ?? DOT, tint: o.tint, until: s2.def.loop ? o.seconds ?? 1 : void 0 });
+      return true;
+    }
+    /* ── 묶음: 한 번 맞을 때 ── */
+    /** 공통 타격감: 히트스톱 + 흔들림 + 몸 번쩍 + 스파크 + 고리 + 숫자 (+ 시트가 있으면 공용 타격 시트) */
+    hit(o) {
+      const t = o.tier, n = t === "light" ? 1 : t === "mid" ? 2 : t === "heavy" ? 3 : 4;
+      this.hitstop(HITSTOP[t]);
+      this.shake(SHAKE[t], 0.12 + n * 0.06);
+      this.bodyFlash.set(o.target, 2);
+      this.sparks_(o.x, o.y, 6 + n * 5, o.color ?? "#ffe0a0", 2.5 + n);
+      if (o.ground !== void 0 && n >= 3) this.ring(o.x, o.ground, 12, 50 + n * 30, o.color ?? "#ffd890", 0.3);
+      if (o.dmg !== void 0) this.number(o.target, o.x, o.y - 40, o.dmg, t === "super" ? "#ffe070" : "#fff", n >= 3);
+      if (t === "super") this.flash("#fff", 0.1, 0.7);
+      this.play(n >= 3 ? "fx_공용_타격_강" : "fx_공용_타격_약", o.x, o.y + 20, { flip: o.flip });
+    }
+    /** 필살 컷인 (약 1.4초, 그동안 frozen). 끝나면 resolve */
+    super_(c) {
+      return new Promise((done2) => {
+        this.cut?.done();
+        this.cut = { ...c, t: 0, done: done2 };
+        this.sfx?.("super");
+      });
+    }
+    /* ── 흐름 ── */
+    /** 실제 시간 dt(초). 히트스톱은 장 단위로 줄인다 */
+    update(dt) {
+      this.time += dt;
+      if (this.stop > 0) this.stop = Math.max(0, this.stop - dt * 60);
+      this.shakeT = Math.max(0, this.shakeT - dt);
+      this.flashT = Math.max(0, this.flashT - dt);
+      for (const [k, v] of this.bodyFlash) v - 1 <= 0 ? this.bodyFlash.delete(k) : this.bodyFlash.set(k, v - dt * 60);
+      if (this.cut) {
+        const before = this.cut.t;
+        this.cut.t += dt;
+        if (before < CUT.slam && this.cut.t >= CUT.slam) this.shake(SHAKE.light, 0.12), this.sfx?.("slam");
+        if (this.cut.t >= CUT.total) {
+          const d3 = this.cut.done;
+          this.cut = null;
+          d3();
+        }
+      }
+      if (this.frozen() && !this.cut) return;
+      const g2 = 900;
+      this.sparks = this.sparks.filter((s2) => (s2.t += dt, s2.x += s2.vx * dt, s2.y += s2.vy * dt, s2.vy += g2 * dt * 0.5, s2.t < s2.life));
+      this.rings = this.rings.filter((r) => (r.t += dt) < r.life);
+      this.nums = this.nums.filter((n) => (n.t += dt) < 0.9);
+      this.ghosts = this.ghosts.filter((h) => (h.t += dt) < h.life);
+      this.marks = this.marks.filter((m) => (m.t += dt) < m.life);
+      this.plays = this.plays.filter((p) => {
+        p.t += dt;
+        const f = Math.floor(p.t * p.fps);
+        return p.until !== void 0 ? p.t < p.until : f < p.def.n;
+      });
+      for (const [k, v] of this.totals) {
+        if (this.time - v.last > 0.5 && v.rows > 1) {
+          this.nums.push({ key: k, x: snap(v.x), y: snap(v.y - 40), text: `${Math.round(v.sum)}`, color: "#ffd23a", t: 0, big: true, row: v.rows });
+          this.totals.delete(k);
+        } else if (this.time - v.last > 0.5) this.totals.delete(k);
+      }
+    }
+    /** 월드 좌표(카메라 적용된 c)에: 자국 · 잔상 · 고리 · 시트 · 파편 · 숫자 */
+    drawWorld(c) {
+      c.save();
+      c.imageSmoothingEnabled = false;
+      for (const m of this.marks) {
+        c.globalAlpha = 0.45 * (1 - m.t / m.life);
+        c.fillStyle = "#120c08";
+        c.beginPath();
+        c.ellipse(m.x, m.y, m.w / 2, m.w * 0.14, 0, 0, Math.PI * 2);
+        c.fill();
+      }
+      for (const h of this.ghosts) {
+        c.globalAlpha = 0.5 * (1 - h.t / h.life);
+        tinted(c, h.draw, h.color);
+      }
+      c.globalAlpha = 1;
+      for (const r of this.rings) {
+        const k = r.t / r.life, rr = r.r0 + (r.r1 - r.r0) * (1 - (1 - k) * (1 - k));
+        c.globalAlpha = 1 - k;
+        c.strokeStyle = r.color;
+        c.lineWidth = 3 * DOT * (1 - k) + DOT;
+        c.beginPath();
+        c.ellipse(r.x, r.y, rr, rr * 0.28, 0, 0, Math.PI * 2);
+        c.stroke();
+      }
+      c.globalAlpha = 1;
+      for (const p of this.plays) {
+        const f = Math.floor(p.t * p.fps) % p.def.n, w = p.def.w * p.scale, h = p.def.h * p.scale;
+        c.save();
+        c.translate(Math.round(p.x), Math.round(p.y));
+        if (p.flip) c.scale(-1, 1);
+        if (p.tint) tinted(c, (o) => o.drawImage(p.img, f * p.def.w, 0, p.def.w, p.def.h, -w / 2, -h, w, h), p.tint, 0.5);
+        else c.drawImage(p.img, f * p.def.w, 0, p.def.w, p.def.h, -w / 2, -h, w, h);
+        c.restore();
+      }
+      for (const s2 of this.sparks) {
+        c.globalAlpha = 1 - s2.t / s2.life;
+        c.fillStyle = s2.color;
+        c.fillRect(snap(s2.x), snap(s2.y), s2.size, s2.size);
+      }
+      c.globalAlpha = 1;
+      for (const n of this.nums) {
+        const rise = Math.min(1, n.t / 0.25);
+        const y = n.y - n.row * 28 - rise * 24;
+        c.globalAlpha = n.t > 0.6 ? 1 - (n.t - 0.6) / 0.3 : 1;
+        const pop = n.t < 0.08 ? 1.5 - n.t * 6 : 1;
+        dotText(c, n.text, n.x, y, (n.big ? 26 : 18) * pop, n.color, "#000", "center");
+      }
+      c.restore();
+    }
+    /** 화면 좌표에: 번쩍 · 필살 컷인 (맨 위) */
+    drawScreen(c) {
+      if (this.flashT > 0) {
+        c.save();
+        c.setTransform(1, 0, 0, 1, 0, 0);
+        c.globalAlpha = this.flashA * Math.min(1, this.flashT / 0.05);
+        c.fillStyle = this.flashColor;
+        c.fillRect(0, 0, c.canvas.width, c.canvas.height);
+        c.restore();
+      }
+      if (this.cut) this.drawCut(c, this.cut);
+    }
+    drawCut(c, k) {
+      const t = k.t;
+      c.save();
+      c.setTransform(1, 0, 0, 1, 0, 0);
+      c.scale(c.canvas.width / 1280, c.canvas.height / 720);
+      c.imageSmoothingEnabled = false;
+      const dark2 = t > CUT.out[1] ? 0.7 * (1 - (t - CUT.out[1]) / (CUT.total - CUT.out[1])) : 0.7;
+      c.fillStyle = `rgba(0,0,0,${dark2})`;
+      c.fillRect(0, 0, 1280, 720);
+      const open = t < CUT.bandIn[0] ? 0 : t < CUT.bandIn[1] ? (t - CUT.bandIn[0]) / (CUT.bandIn[1] - CUT.bandIn[0]) : t < CUT.out[0] ? 1 : Math.max(0, 1 - (t - CUT.out[0]) / (CUT.out[1] - CUT.out[0]));
+      const bandH = 260 * (t < CUT.out[0] ? 1 : open);
+      if (open > 0 && bandH > 1) {
+        c.save();
+        c.translate(640, 380);
+        c.rotate(-12 * Math.PI / 180);
+        const bw = 1700 * (t < CUT.out[0] ? open : 1);
+        c.beginPath();
+        c.rect(-850, -bandH / 2, bw, bandH);
+        c.clip();
+        c.fillStyle = k.color;
+        c.fillRect(-850, -bandH / 2, bw, bandH);
+        c.fillStyle = "#000";
+        c.fillRect(-850, -bandH / 2, bw, 6);
+        c.fillRect(-850, bandH / 2 - 6, bw, 6);
+        c.fillStyle = "rgba(255,255,255,0.35)";
+        c.fillRect(-850, -bandH / 2 + 6, bw, 3);
+        c.fillStyle = "rgba(255,255,255,0.55)";
+        for (let i = 0; i < 18; i++) {
+          const ly = -bandH / 2 + 16 + i * 53 % Math.max(1, bandH - 32);
+          const len = 80 + i * 97 % 160;
+          const lx = -850 + (i * 211 + t * 2600) % 1900 - 100;
+          c.fillRect(Math.round(lx / 3) * 3, Math.round(ly / 3) * 3, len, 3);
+        }
+        const art6 = k.art ?? k.fallback;
+        if (art6) {
+          const fromFallback = !k.art;
+          const aw = fromFallback ? 400 : 800, ah = fromFallback ? 400 : 400;
+          const stopX = 1700 * 0.6 - 850 - aw;
+          let x;
+          if (t < CUT.artIn[0]) x = -850 - aw;
+          else if (t < CUT.artIn[1]) {
+            const q = (t - CUT.artIn[0]) / (CUT.artIn[1] - CUT.artIn[0]);
+            x = -850 - aw + (stopX + 850 + aw) * (1 - (1 - q) ** 3);
+          } else if (t < CUT.artIn[1] + 0.06) x = stopX + 4 * Math.sin((t - CUT.artIn[1]) / 0.06 * Math.PI);
+          else if (t < CUT.out[0]) x = stopX;
+          else x = stopX + (t - CUT.out[0]) / (CUT.out[1] - CUT.out[0]) * 1800;
+          const blink = k.art2 && t > CUT.slam && t < CUT.out[0] && Math.floor((t - CUT.slam) / 0.1) % 2 === 1;
+          const im = blink ? k.art2 : art6;
+          c.drawImage(im, Math.round(x), Math.round(-ah / 2 - (fromFallback ? 40 : 0)), aw, ah);
+          if (!k.art2 && k.eye && t > CUT.slam && t < CUT.out[0]) {
+            const ex = Math.round(x + k.eye.x * aw), ey = Math.round(-ah / 2 - (fromFallback ? 40 : 0) + k.eye.y * ah);
+            const s2 = Math.floor(t * 12) % 2 ? 6 : 9;
+            c.fillStyle = "#fff";
+            c.fillRect(ex - 1, ey - s2, 3, s2 * 2 + 1);
+            c.fillRect(ex - s2, ey - 1, s2 * 2 + 1, 3);
+          }
+        }
+        c.restore();
+      }
+      if (t >= CUT.slam) {
+        const out = t > CUT.out[0] ? (t - CUT.out[0]) / (CUT.out[1] - CUT.out[0]) * 900 : 0;
+        const sc = t < CUT.slam + 0.08 ? 1.6 - (t - CUT.slam) / 0.08 * 0.6 : 1;
+        c.save();
+        c.translate(1e3 + out, 330);
+        c.rotate(-12 * Math.PI / 180);
+        c.scale(sc, sc);
+        nameText(c, k.name, 0, 0, k.color);
+        c.restore();
+        if (k.sub) {
+          const n = Math.min(k.sub.length, Math.floor((t - CUT.slam) / CUT.typed * k.sub.length));
+          c.save();
+          c.translate(1e3 + out, 390);
+          c.rotate(-12 * Math.PI / 180);
+          dotText(c, k.sub.slice(0, n), 0, 0, 22, "#d8dde0", "#000", "center");
+          c.restore();
+        }
+      }
+      c.restore();
+    }
+  };
+  var textCache2 = /* @__PURE__ */ new Map();
+  function crisp(text2, size2, fill, edge2, edgeW, shadow3) {
+    const ready = typeof document !== "undefined" && document.fonts?.check?.(`11px "${PIXEL_FONT}"`);
+    const key2 = `${text2}|${size2}|${fill}|${edge2}|${edgeW}|${shadow3}|${ready}`;
+    const hit2 = textCache2.get(key2);
+    if (hit2) return hit2;
+    const pad = edgeW + shadow3 + 2;
+    const m = document.createElement("canvas").getContext("2d");
+    m.font = `${size2}px "${PIXEL_FONT}", sans-serif`;
+    const w = Math.ceil(m.measureText(text2).width) + pad * 2, h = Math.ceil(size2 * 1.25) + pad * 2;
+    const mask = document.createElement("canvas");
+    mask.width = w;
+    mask.height = h;
+    const g2 = mask.getContext("2d");
+    g2.font = m.font;
+    g2.textBaseline = "top";
+    g2.fillStyle = "#fff";
+    g2.fillText(text2, pad, pad);
+    const d3 = g2.getImageData(0, 0, w, h);
+    for (let i = 3; i < d3.data.length; i += 4) d3.data[i] = d3.data[i] > 110 ? 255 : 0;
+    g2.putImageData(d3, 0, 0);
+    const solid = (color) => {
+      const cv = document.createElement("canvas");
+      cv.width = w;
+      cv.height = h;
+      const o2 = cv.getContext("2d");
+      o2.drawImage(mask, 0, 0);
+      o2.globalCompositeOperation = "source-in";
+      o2.fillStyle = color;
+      o2.fillRect(0, 0, w, h);
+      return cv;
+    };
+    const out = document.createElement("canvas");
+    out.width = w;
+    out.height = h;
+    const o = out.getContext("2d");
+    if (shadow3) {
+      const b = solid("#000");
+      for (let dy = 1; dy <= shadow3; dy++) o.drawImage(b, dy, dy);
+    }
+    if (edgeW) {
+      const e = solid(edge2);
+      for (let dx = -edgeW; dx <= edgeW; dx++) for (let dy = -edgeW; dy <= edgeW; dy++) if (dx || dy) o.drawImage(e, dx, dy);
+    }
+    o.drawImage(solid(fill), 0, 0);
+    textCache2.set(key2, out);
+    return out;
+  }
+  function dotText(c, text2, x, y, size2, fill, edge2 = "#000", align = "left") {
+    if (!text2) return;
+    const im = crisp(text2, Math.round(size2), fill, edge2, 2, 2);
+    c.drawImage(im, Math.round(align === "center" ? x - im.width / 2 : x), Math.round(y - im.height / 2));
+  }
+  function nameText(c, text2, x, y, color) {
+    const im = crisp(text2, 44, "#ffffff", color, 2, 4);
+    c.drawImage(im, Math.round(x - im.width / 2), Math.round(y - im.height / 2));
+  }
+  var tintCv = null;
+  function tinted(c, draw, color, a = 1) {
+    const W5 = c.canvas.width, H7 = c.canvas.height;
+    if (!tintCv) tintCv = document.createElement("canvas");
+    if (tintCv.width !== W5 || tintCv.height !== H7) tintCv.width = W5, tintCv.height = H7;
+    const o = tintCv.getContext("2d");
+    o.setTransform(1, 0, 0, 1, 0, 0);
+    o.globalCompositeOperation = "source-over";
+    o.clearRect(0, 0, W5, H7);
+    o.setTransform(c.getTransform());
+    o.imageSmoothingEnabled = false;
+    draw(o);
+    if (a < 1) {
+      c.save();
+      c.setTransform(1, 0, 0, 1, 0, 0);
+      c.drawImage(tintCv, 0, 0);
+      c.restore();
+    }
+    o.setTransform(1, 0, 0, 1, 0, 0);
+    o.globalCompositeOperation = "source-in";
+    o.globalAlpha = a;
+    o.fillStyle = color;
+    o.fillRect(0, 0, W5, H7);
+    o.globalAlpha = 1;
+    c.save();
+    c.setTransform(1, 0, 0, 1, 0, 0);
+    c.drawImage(tintCv, 0, 0);
+    c.restore();
+  }
+
+  // src/game/action/fx/superText.ts
+  var SUPER_TEXT = {
+    "쟈알디": { color: "#C8283C", name: "보면 알아", sub: "설명하기 어려워. 보면 알아." },
+    "스팡달": { color: "#7A3FB0", name: "우습네. 정말.", sub: "뒤를 보는 버릇을 들여." },
+    "잼트리": { color: "#6E9A3C", name: "모두의 언니", sub: "반박 시 커피 없음~" },
+    "에일린": { color: "#CFC7A6", name: "증명해.", sub: "규칙은 읽었어?" },
+    "고그니쟈": { color: "#E8D23A", name: "성질이 좀 있지!", sub: "자네, 커피는 다 마셨나!" },
+    "큐라스": { color: "#8FE36A", name: "지휘", sub: "왼쪽 괜찮아? 형님 괜찮아?" },
+    "고르고디오": { color: "#2F6BFF", name: "붕괴 돌파", sub: "꽉 잡아. 벽은 내가 맞을게." },
+    "데쥬레": { color: "#FF7EB6", name: "이건 꽝이에요", sub: "주, 죽는 거 아니죠…?" },
+    "데드폴": { color: "#3A4C8C", name: "한 번 죽으면", sub: "시간이 벌리니까요." },
+    "게슈간": { color: "#6EC6FF", name: "가리키고, 보고, 쥐고", sub: "…끝." },
+    "로제몬": { color: "#B04FD0", name: "앙상블", sub: "나 사무직이라니까?!" },
+    "콘쥬스": { color: "#FF5FA2", name: "제가 다 치울게요!", sub: "아저씨들은 뒤에 계세요!" },
+    "사장": { color: "#8A8A96", name: "정지", sub: "……" },
+    "도필헌": { color: "#B08A4E", name: "거짓말이 빠진 방", sub: "자네 정도라면 당연히 알 줄 알았네." },
+    "이길환": { color: "#E8955A", name: "튜토리얼", sub: "아, 아, 테스트, 테스트." },
+    "이기석": { color: "#E6C14A", name: "팀 발표", sub: "다음 팀은…… 바로 여러분입니다!" },
+    "김조학": { color: "#5E7C8C", name: "영상 올리기 전에", sub: "뭘 올렸는지는 다 압니다." },
+    "이도형": { color: "#E9EEF2", name: "건물 가르기", sub: "연필심만 남아도 충분해." },
+    "고영훈": { color: "#4F5D70", name: "킹", sub: "요점." },
+    "노기균": { color: "#D2453C", name: "수고하십시오!", sub: "이 녀석은 된다!" },
+    "송주익": { color: "#2E9C9A", name: "예카테리나", sub: "예카테리나니까요." },
+    "곽성주": { color: "#7D8793", name: "후퇴는 없다", sub: "전원 내 뒤로!" },
+    "조성춘": { color: "#D9A82E", name: "진공작전", sub: "……조용히. 지금부터 진짜다." },
+    "윤병수": { color: "#F07A22", name: "채점 중", sub: "칭찬은 끝까지 듣고 해." },
+    "김성진": { color: "#6BD45A", name: "생환 기록", sub: "나 방금 멋있지 않았냐?" },
+    "송진섭": { color: "#4FA6E6", name: "우리 팀 눈", sub: "지도 왼쪽이요, 지도 왼쪽!" },
+    "청달래": { color: "#1F6E6A", name: "무슨 소란인가", sub: "참으로 지저분한 꼴이군." },
+    "호유원": { color: "#E0A43A", name: "소중한 것이 만나러 와요", sub: "잘 보살펴 드릴게요, ~님." },
+    "백석주": { color: "#2E8B57", name: "A조에 온 걸 환영해", sub: "환영은 입구까지만." },
+    "진나솔": { color: "#8E5CC9", name: "퇴근", sub: "그럴 시간에 퇴근해." },
+    "이성해": { color: "#5EC4D6", name: "다들 데리고 나왔어여", sub: "늦어서 죄송해여!" },
+    "이자헌": { color: "#E6E2D3", name: "물리 퇴마", sub: "괴담입니다. 그런데 됩니다." },
+    "은하제": { color: "#3D6FD9", name: "통화 연결", sub: "응, 그래. 됐고. 빨리 와." },
+    "박민성": { color: "#8A6A4A", name: "다시는 안 해", sub: "……다음 주에 또 함." },
+    "백사헌": { color: "#9B4DD6", name: "추가 지급", sub: "어차피 죽을 사람들인데요." },
+    "고영은": { color: "#F2F0D8", name: "R조의 양심", sub: "그냥 조명이에요." },
+    "강이학": { color: "#F2C230", name: "매뉴얼만 지키면요", sub: "평사원 둘이어도 괜찮아요!" },
+    "장허운": { color: "#7A5233", name: "사람으로 대할 것", sub: "…도망, 안 갑니다." },
+    "곽제강": { color: "#B79CF0", name: "분기별 기상 특보", sub: "와, 이거 정말 흥미로운데요!" },
+    "이연화": { color: "#5B5D8F", name: "과장님!", sub: "……잠깐만요. 여기 멈추세요." },
+    "이병진": { color: "#D23C3C", name: "처음으로 쓸모 있어진 순간", sub: "……이건 내가 읽지." },
+    "제이": { color: "#E2C23A", name: "완전 발현", sub: "…냄새가 달라요……" },
+    "차여진": { color: "#8C1F2E", name: "두 번째 휴대전화", sub: "이건 사적인 용도라서요~" },
+    "서윤지": { color: "#9CB89A", name: "수정 요청 없음", sub: "적힌 것은 하나도 봐주지 않습니다." },
+    "고연지": { color: "#2C3E66", name: "수술 여섯 시간째", sub: "네, 그래서 견적이 이 정도입니다." },
+    "윤지아": { color: "#F4A97A", name: "시술 준비 끝", sub: "사탕 하나 드실래요?" },
+    "마덕희": { color: "#7A1E34", name: "헐값매입", sub: "자기 얼굴에 다 쓰여 있어요~" },
+    "문혜란": { color: "#6B1F3A", name: "대박알선 뒷방", sub: "친구, 사인부터 하자." },
+    "신유리": { color: "#B8BEC6", name: "사전 통보 없음", sub: "친구 아니야. 채무자지." },
+    "블라렛": { color: "#FFF4D6", name: "영원한 십자군", sub: "서울은 교회가 많아서 좋아!" },
+    "살라딘": { color: "#3A8FE0", name: "메카의 군세", sub: "형제여! 바다의 물고기처럼 끝이 없다!" },
+    "아벤샤": { color: "#2FB37A", name: "모래 해일", sub: "어머, 이건 꼭 갖고 싶다!" },
+    "세크리엠": { color: "#B0102A", name: "붉은 눈", sub: "눈을 마주쳤구나." },
+    "브라우니": { color: "#7FE0A0", name: "화요퀴즈쇼", sub: "친구! 다음 문제 나갑니다!" },
+    "탐미주의": { color: "#E0402A", name: "예술은 조각이다", sub: "가만히 있어. 지금 너는 작품이야." }
+  };
+
+  // src/game/action/engine/training.ts
+  function trainingFloor() {
+    const L = 4200;
+    return {
+      id: "training-1",
+      title: "관리국 지하 훈련장",
+      type: "lobby",
+      depth: 0,
+      length: L,
+      lane: [440, 690],
+      startX: 200,
+      exitX: L - 120,
+      banner: "관리국 지하 훈련장 · 조작 연습",
+      palette: { wall: "#2b343a", floor: "#3c4549", accent: "#6c7b83" },
+      props: [
+        { id: "sign1", kind: "sign", x: 420, y: 445, w: 140, h: 60, label: "A 연타 · ↓↓ 앉기 · Shift 회피/달리기" }
+      ],
+      encounters: [
+        { triggerX: 500, lockFrom: 0, lockTo: 1400, waves: [[{ kind: "dummy-once", x: 1e3, y: 590 }], [{ kind: "thug", x: 1300, y: 560 }, { kind: "thug", x: 1350, y: 650 }]] },
+        { triggerX: 1800, lockFrom: 1500, lockTo: 2800, waves: [[{ kind: "thug", x: 2700, y: 540 }, { kind: "thug", x: 2750, y: 620 }, { kind: "thug", x: 1520, y: 670 }], [{ kind: "thug", x: 2750, y: 560, elite: true }, { kind: "thug", x: 1530, y: 600 }]] },
+        { triggerX: 3e3, lockFrom: 2900, lockTo: 4200, waves: [[{ kind: "thug", x: 4100, y: 590, boss: true }, { kind: "thug", x: 2950, y: 560 }, { kind: "thug", x: 4150, y: 660 }]] }
+      ]
+    };
+  }
+  var trainingStage = {
+    id: "training",
+    label: "훈련장",
+    firstFloor: () => trainingFloor(),
+    nextFloor: () => null
+  };
+  var dummyStage = {
+    id: "dummy",
+    label: "허수아비 연습",
+    firstFloor: () => ({
+      id: "dummy-room",
+      title: "허수아비 연습",
+      length: 1280,
+      startX: 360,
+      exitX: Infinity,
+      banner: "허수아비 연습 · H 판정 보기 · Esc 메뉴",
+      encounters: [{ triggerX: 0, lockFrom: 0, lockTo: 1280, waves: [[{ kind: "dummy", x: 760, y: 565 }, { kind: "dummy", x: 980, y: 540 }], [{ kind: "dummy", x: 900, y: 590 }]] }]
+    }),
+    nextFloor: () => null
+  };
+
+  // src/game/action/engine/sessionStore.ts
+  var empty = () => ({ schema: "goei-session/1", revision: 0, hq: null, meta: null, checkpoint: null });
+  var parse = (raw) => {
+    if (!raw) return empty();
+    const value = JSON.parse(raw);
+    if (value?.schema === "goei-session/1") {
+      if (!Number.isFinite(value.revision) || value.revision < 0 || value.hq !== null && typeof value.hq !== "string") throw new Error("손상된 저장 봉투");
+      return { ...empty(), ...value };
+    }
+    if (!parseSave(raw)) throw new Error("지원하지 않는 저장");
+    return { ...empty(), hq: raw };
+  };
+  var SessionStore = class {
+    constructor(saves, slot, journal) {
+      this.saves = saves;
+      this.slot = slot;
+      this.journal = journal;
+      let cached = null;
+      try {
+        const raw = journal?.getItem(this.key);
+        if (raw) cached = parse(raw);
+      } catch {
+      }
+      if (cached) this.value = cached;
+      this.ready = saves.read(slot).then((raw) => {
+        const remote = parse(raw);
+        if (!cached || remote.revision > cached.revision) this.value = remote;
+        if (cached && cached.revision > remote.revision) this.persist();
+      }).catch(() => {
+        this.error = "저장 칸을 읽지 못했습니다. 이 기기의 복구 기록을 사용합니다.";
+      }).then(() => {
+        this.loaded = true;
+      });
+      this.hqSaves = {
+        list: () => saves.list(),
+        read: async (n) => {
+          await this.ready;
+          return n === slot ? this.value.hq : parse(await saves.read(n)).hq;
+        },
+        write: async (n, hq2, info) => {
+          if (!this.loaded) await this.ready;
+          if (n !== slot) {
+            let oldRevision = 0;
+            try {
+              oldRevision = parse(await saves.read(n)).revision;
+            } catch {
+            }
+            try {
+              oldRevision = Math.max(oldRevision, parse(this.journal?.getItem(this.keyFor(n)) ?? null).revision);
+            } catch {
+            }
+            const snapshot = { ...this.value, hq: hq2, revision: Math.max(Date.now(), this.value.revision + 1, oldRevision + 1) };
+            const text2 = JSON.stringify(snapshot);
+            try {
+              this.journal?.setItem(this.keyFor(n), text2);
+            } catch {
+            }
+            return saves.write(n, text2, { ...info, schema: "goei-session/1" });
+          }
+          this.value.hq = hq2;
+          const completed = parseSave(hq2);
+          const run = this.value.checkpoint?.run;
+          if (!completed?.active && completed?.last && completed.last.runId === (run?.launch?.runId ?? run?.runId)) this.value.checkpoint = null;
+          this.persist();
+          await this.flush();
+        },
+        restore: async (n) => {
+          await this.ready;
+          await this.flush();
+          let remote = null, cached2 = null;
+          try {
+            remote = parse(await saves.read(n));
+          } catch {
+          }
+          try {
+            cached2 = parse(this.journal?.getItem(this.keyFor(n)) ?? null);
+          } catch {
+          }
+          const next = cached2 && (!remote || cached2.revision > remote.revision) ? cached2 : remote;
+          if (!next?.hq || !parseSave(next.hq)) return null;
+          this.value = { ...next, revision: Math.max(next.revision, this.value.revision) };
+          this.persist();
+          await this.flush();
+          return this.value.hq;
+        }
+      };
+    }
+    value = empty();
+    queue = Promise.resolve();
+    loaded = false;
+    ready;
+    error = null;
+    hqSaves;
+    keyFor(slot) {
+      return `goei-session-journal:${slot}`;
+    }
+    get key() {
+      return this.keyFor(this.slot);
+    }
+    get checkpoint() {
+      return this.value.checkpoint;
+    }
+    get meta() {
+      return this.value.meta;
+    }
+    get hasSave() {
+      return !!(this.value.hq || this.value.checkpoint);
+    }
+    setMeta(meta) {
+      this.value.meta = JSON.parse(JSON.stringify(meta));
+    }
+    setCheckpoint(checkpoint) {
+      this.value.checkpoint = checkpoint;
+      this.persist();
+    }
+    persist() {
+      this.value.revision = Math.max(Date.now(), this.value.revision + 1);
+      const text2 = JSON.stringify(this.value);
+      try {
+        this.journal?.setItem(this.key, text2);
+      } catch {
+        this.error = "기기 복구 기록을 쓰지 못했습니다.";
+      }
+      this.queue = this.queue.catch(() => {
+      }).then(() => this.saves.write(this.slot, text2, {
+        title: this.value.checkpoint ? "출동 중 · 안전 지점" : "자동 저장",
+        summary: "본부 · 규칙서 · 출동 기록",
+        schema: "goei-session/1"
+      })).catch(() => {
+        this.error = "자동 저장에 실패했습니다. 기기 복구 기록을 유지합니다.";
+      });
+    }
+    flush() {
+      return this.queue;
+    }
+  };
+
+  // src/game/action/engine/modules.ts
+  var local = (key2) => ({
+    load: () => {
+      try {
+        return localStorage.getItem(key2);
       } catch {
         return null;
       }
@@ -13,6 +724,7 @@
   var SAVED_KEY = "goei-game-saved";
   var markSaved = () => local(SAVED_KEY).save("1");
   var hasSaved = () => local(SAVED_KEY).load() === "1";
+  var VISIT_TITLE = { title: "괴이 ː ANOMALY", sub: "필드 · 요원들을 만나고 본편 대화를 이어갑니다" };
   var fieldClock = { sec: null, place: "" };
   function hqAdapter(saves, bridge, ui) {
     const hq2 = createHq();
@@ -20,7 +732,9 @@
     const slot = b?.slot ?? 0;
     let root = null;
     let present = [];
+    let visitor = { agentId: "", name: "" };
     const visitReady = b?.visit ? b.visit.state().then((v) => {
+      visitor = v.visitor;
       present = v.agents.filter((a) => a.room).map((a) => ({ name: a.name, room: a.room }));
     }).catch(() => {
     }) : Promise.resolve();
@@ -61,6 +775,7 @@
     return {
       ready: () => hq2.ready(),
       visitReady,
+      visitor: () => visitor,
       hub: () => hub,
       state: () => hq2.state,
       goto: (place3) => hub.goto(place3),
@@ -175,8 +890,8 @@
     }
     const shell = mountGameShell(box2, {
       synth: true,
-      title: bridge?.visit ? "필드" : "차원 승강기",
-      sub: bridge?.visit ? "요원들을 만나고 본편 대화를 이어갑니다" : "ANOMALY SIMULATION · 관리국 액션",
+      title: bridge?.visit ? VISIT_TITLE.title : "차원 승강기",
+      sub: bridge?.visit ? VISIT_TITLE.sub : "ANOMALY SIMULATION · 관리국 액션",
       pauseInfo: () => session.error ?? (game?.inHub ? "본부 자동 저장" : "안전 지점 자동 저장 · 전투 중 중단하면 직전 안전 지점부터"),
       onNew: async () => {
         if (bridge?.visit) {
@@ -208,10 +923,41 @@
       },
       hasSave: () => session.hasSave || hasSaved(),
       onRetreat: () => bridge?.visit ? bridge.close?.() : game?.endRun("withdraw"),
-      onTitle: () => bridge?.visit ? bridge.close?.() : game?.toTitle(),
+      onTitle: () => game?.toTitle(),
       toLocal: bridge?.viewport ? (x, y, el) => bridge.viewport.toLocal(x, y, el) : void 0,
       field: bridge?.visit ? { onExit: () => bridge.close?.() } : void 0
     });
+    const ffx = new FieldFx();
+    globalThis.__goeiFieldFx = ffx;
+    ffx.sfx = (n) => audio.event({ type: n === "super" ? "super" : "hit", kind: n === "slam" ? "super" : void 0, strength: 3 });
+    const cutins = /* @__PURE__ */ new Map();
+    if (bridge?.visit && bridge.assets) void loadFieldFx(bridge.assets, ffx, cutins);
+    const inField = () => !!game?.inHub && !!bridge?.visit && !mods.blocking?.() && !shell.paused;
+    const previewSuper = () => {
+      const w = game?.world;
+      if (!w || ffx.inSuper()) return;
+      const me = hq2.visitor();
+      const name = me.name || "방문자";
+      const t = SUPER_TEXT[name] ?? { color: "#C8283C", name: "필살기", sub: "" };
+      const fallback = me.agentId && visitAgentFaceCanvas(name, 60) || testPlayerFace(60);
+      void ffx.super_({ ...t, art: cutins.get(name), art2: cutins.get(`${name}_2`), fallback, eye: { x: 0.62, y: 0.42 } }).then(() => {
+        ffx.flash("#fff", 0.1, 0.7);
+        ffx.shake(14, 0.6);
+        const p = w.player;
+        ffx.sparks_(p.x, p.y - 120, 30, t.color, 6);
+        ffx.ring(p.x, p.y, 20, 260, t.color, 0.45);
+        ffx.scorch(p.x, p.y, 160, 3);
+      });
+    };
+    const fieldFxKeys = (e) => {
+      if (e.code !== "KeyS" && e.code !== "KeyW" || e.repeat || !inField()) return;
+      const el = document.activeElement;
+      if (el && (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.isContentEditable)) return;
+      previewSuper();
+      e.preventDefault();
+      e.stopImmediatePropagation();
+    };
+    window.addEventListener("keydown", fieldFxKeys, true);
     const stageStore = {
       load: () => {
         if (session.meta) return session.meta;
@@ -476,7 +1222,7 @@
     const armOpening = () => {
       if (openingT) clearTimeout(openingT);
       openingT = null;
-      if (!VIDEOS.opening || !canFilm()) return;
+      if (bridge?.visit || !VIDEOS.opening || !canFilm()) return;
       openingT = setTimeout(() => {
         openingT = null;
         if (shell.mode !== "title" || story.isBlocking()) return armOpening();
@@ -522,6 +1268,7 @@
         markSaved();
         session.setCheckpoint(v);
       },
+      frozen: () => ffx.frozen(),
       stages: [elevator, trainingStage, dummyStage, arenaStage, itemStage],
       enemyFactory,
       hq: hq2,
@@ -540,6 +1287,12 @@
       },
       onPlay: () => shell.play(),
       frame: (dt) => {
+        ffx.opt = { shake: shell.settings.shake, flash: shell.settings.flash, numbers: shell.settings.numbers };
+        ffx.update(shell.paused ? 0 : dt);
+        {
+          const o = ffx.camera();
+          shell.canvas.style.translate = o.x || o.y ? `${o.x}px ${o.y}px` : "";
+        }
         syncVolume();
         audio.setPaused(hiddenNow || shell.paused && !openingOn);
         audio.setCutscene(story.isVideoPlaying());
@@ -555,14 +1308,24 @@
         ctx.scale(view.zoom, view.zoom);
         ctx.translate(-Math.round(w.camX) - view.crop, 0);
         shell.fx.drawWorld(ctx);
+        ffx.drawWorld(ctx);
         ctx.restore();
         shell.fx.drawScreen(ctx, w.player.hp / w.player.hpMax);
         const hs = hudState(w, shell);
         if (npc.isOpen()) hs.message = void 0;
         if (mods.blocking?.() || shell.paused) hs.navigation = void 0;
+        let cardEnd = 0;
+        if (game?.inHub && bridge?.visit && !mods.blocking?.() && !shell.paused) {
+          const me = hq2.visitor();
+          const name = me.name || "방문자";
+          const face2 = me.agentId && visitAgentFaceCanvas(name, 34) || testPlayerFace() || visitAgentFaceCanvas("쟈알디", 34);
+          cardEnd = shell.hud.drawFieldCard(ctx, { name, face: face2, hp: w.player.hp, maxHp: w.player.hpMax, gauge: w.player.gauge, compact: hs.compact, top: shell.touchShown || hs.compact }, dt);
+          if (shell.touchShown || hs.compact) cardEnd = 0;
+        }
         if (!game?.inHub) shell.hud.draw(ctx, hs, dt);
-        else if (hs.message) shell.hud.drawMessage(ctx, hs.message, hs.compact);
+        else if (hs.message) shell.hud.drawMessage(ctx, hs.message, hs.compact, cardEnd);
         if (game?.inHub && hs.navigation) shell.hud.drawNavigation(ctx, hs.navigation, hs.compact, hs.device);
+        ffx.drawScreen(ctx);
         if (shell.paused) mapOpen = false;
         if (!game?.inHub && w.stage === elevator) {
           const m = elevator.mapView();
@@ -643,13 +1406,12 @@
         if (!cutOnce(how === "evac" ? "evac" : "attic", once)) once();
       },
       drawIdle: (name, ctx, t) => {
-        if (name === "title") drawTitleBg(ctx, t);
+        if (name === "title") bridge?.visit ? drawTitleBg(ctx, t, VISIT_TITLE.title, VISIT_TITLE.sub) : drawTitleBg(ctx, t);
       },
       boot: (g2) => {
         void Promise.all([session.ready, hq2.visitReady]).then(() => {
           elevator.reloadMeta();
-          if (bridge?.visit) void gate2().then((ok) => ok ? g2.start_new() : bridge.close?.());
-          else if (!bootFromUrl(g2)) g2.toTitle();
+          if (bridge?.visit || !bootFromUrl(g2)) g2.toTitle();
         });
         return true;
       },
@@ -671,6 +1433,7 @@
         window.removeEventListener("pointerdown", titleInput, true);
         if (openingT) clearTimeout(openingT);
         window.removeEventListener("keydown", hqKeys, true);
+        window.removeEventListener("keydown", fieldFxKeys, true);
         window.removeEventListener("keydown", floorKeys, true);
         saveFlags();
         storyRoot.removeEventListener(VIDEO_AUDIO_EVENT, attachVideoAudio);
@@ -733,6 +1496,31 @@
     const dist = (g2) => gx < g2[0] ? g2[0] - gx : gx > g2[1] ? gx - g2[1] : 0;
     gaps.sort((a, b) => dist(a) - dist(b));
     return dist(gaps[0]) < 360 ? gaps[0] : null;
+  }
+  async function loadFieldFx(assets2, ffx, cutins) {
+    try {
+      if (!await assets2.ready("field-fx")) return;
+      const list = await assets2.bytes("field-fx", "fx/fx_목록.txt");
+      const img4 = async (file) => {
+        const u = await assets2.url("field-fx", file);
+        if (!u) return null;
+        const im = new Image();
+        im.src = u;
+        await im.decode();
+        return im;
+      };
+      for (const d3 of list ? parseFxList(new TextDecoder().decode(list)) : []) {
+        const im = await img4(`fx/${d3.name}.png`).catch(() => null);
+        if (im) ffx.register(d3, im);
+      }
+      for (const name of Object.keys(SUPER_TEXT)) {
+        for (const k of [name, `${name}_2`]) {
+          const im = await img4(`cutin/${k}.png`).catch(() => null);
+          if (im) cutins.set(k, im);
+        }
+      }
+    } catch {
+    }
   }
 
   // src/game/action/engine/touch.ts
@@ -1611,7 +2399,7 @@
     back(run) {
       return run.phase === "camp" || run.phase === "retreat" && run.pt > 0.6 ? CAMP.back : ROOMS2[run.rooms[run.room]].back;
     }
-    camera(run, snap) {
+    camera(run, snap2) {
       const team = run.units.filter((u) => u.side === "a");
       const foes = run.units.filter((u) => u.side === "e" && alive(u));
       let goal;
@@ -1624,7 +2412,7 @@
         else goal = front - this.w * 0.45;
       }
       goal = Math.max(0, goal);
-      this.cam = snap ? goal : this.cam + (goal - this.cam) * 0.08;
+      this.cam = snap2 ? goal : this.cam + (goal - this.cam) * 0.08;
       return Math.round(this.cam);
     }
     draw(run, snapCam = false) {
@@ -1800,9 +2588,9 @@
   var lastRun = null;
   var STEP4 = 1 / 30;
   var esc6 = (s2) => s2.replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
-  var faces = "";
+  var faces2 = "";
   function faceStyle(id, size2) {
-    return `background-image:url('${faces}');background-position:${-agentDef(id).face * size2}px 0`;
+    return `background-image:url('${faces2}');background-position:${-agentDef(id).face * size2}px 0`;
   }
   function mountGame2(box2, host) {
     let disposed = false;
@@ -1952,7 +2740,7 @@
     void (async () => {
       try {
         const art6 = await host.art();
-        faces = art6.url(FACE_FILE);
+        faces2 = art6.url(FACE_FILE);
         const [raw] = await Promise.all([host.load().catch(() => null), renderer.load(art6)]);
         if (disposed) return;
         meta = readMeta(raw);
@@ -2184,7 +2972,7 @@
     } else if (!b.armor) act(b, down2 ? "down" : "hurt", down2 ? 0.9 : 0.23);
     return true;
   }
-  function move2(b, x, y, speed, dt, face = true) {
+  function move2(b, x, y, speed, dt, face2 = true) {
     const len = Math.max(1, Math.hypot(x, y)), ox = b.x, oy = b.y;
     b.x = clamp2(b.x + x / len * speed * dt, 55, WIDTH - 55);
     b.y = clamp2(b.y + y / len * speed * dt, SCENE.floorMin, SCENE.floorMax);
@@ -2192,7 +2980,7 @@
     b.speed = Math.min(1200, distance / dt);
     if (b.z === 0 && b.act !== "dash")
       b.stride = (b.stride + distance / (b.act === "run" ? GAIT.run : b.act === "crouchwalk" ? GAIT.crouch : GAIT.walk)) % 1;
-    if (x && face) b.dir = x > 0 ? 1 : -1;
+    if (x && face2) b.dir = x > 0 ? 1 : -1;
   }
   function nearTarget(r) {
     const p = r.player;
@@ -3456,7 +4244,7 @@
     }
   }
   var mod = {
-    version: "0.16.55",
+    version: "0.16.56",
     mount: (box2, bridge) => mountPlay(box2, bridge),
     // 이전 시험판: 저장 키와 그림 팩은 예전 그대로 (goei:game · goei:game-action:v1)
     legacy: {

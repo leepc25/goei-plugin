@@ -1,4 +1,157 @@
- break;
+.device && r() < 0.4 }));
+  }
+  function roomTerrain() {
+    return [];
+  }
+  function makeFloor(ctx) {
+    for (let tries = 0; tries < 4; tries++) {
+      const f2 = buildFloor(ctx, mix2(ctx.seed, ctx.depth, ctx.epoch, tries * 7919), null);
+      f2.tries = tries;
+      if (validateFloor(f2).length === 0) return f2;
+    }
+    const f = buildFloor(ctx, mix2(ctx.seed, ctx.depth, 31337), ctx.seed % 2 ? "A" : "B");
+    f.tries = 4;
+    return f;
+  }
+  function makeRoomFloor(ctx) {
+    for (let tries = 0; tries < 5; tries++) {
+      const f2 = buildFloor(ctx, mix2(ctx.seed, ctx.depth, ctx.room.col * 31 + ctx.room.row, ctx.epoch, tries * 7919), null);
+      f2.tries = tries;
+      if (validateFloor(f2).length === 0) return f2;
+    }
+    const f = buildFloor(ctx, mix2(ctx.seed, ctx.depth, ctx.room.col, ctx.room.row, 31337), "A");
+    f.tries = 5;
+    return f;
+  }
+  var FALLBACK2 = {
+    A: ["c_flat", "c_service", "c_step", "c_flat", "c_wide", "c_flat"],
+    B: ["c_flat", "c_pit", "c_hatch", "c_narrow", "c_flat", "c_flat"]
+  };
+  function buildFloor(ctx, seed, fallback) {
+    nextId = 1;
+    const r = rng(seed);
+    const { depth, type } = ctx;
+    const def = FLOOR_TYPES[type];
+    const sub = type === "replica" ? ctx.sub ?? "pretending" : null;
+    const room2 = ctx.room;
+    const count = room2 ? room2.chunks : type === "lobby" ? range(r, 4, 6) : type === "deep" ? 8 : Math.min(12, range(r, 6, 9) + Math.floor((depth - 4) / 4));
+    let seq = fallback && room2 ? [...room2.need.map((id) => ({ t: CHUNK_BY_ID[id], flip: false })), ...Array.from({ length: Math.max(1, count - room2.need.length) }, () => ({ t: CHUNK_BY_ID.c_flat, flip: false }))] : fallback ? FALLBACK2[fallback].map((id) => ({ t: CHUNK_BY_ID[id], flip: false })) : pickSequence(ctx, r, count);
+    if (fallback && !room2 && type === "puzzle") seq.splice(2, 0, { t: CHUNK_BY_ID.p_fork, flip: false }, { t: CHUNK_BY_ID.p_switch, flip: false });
+    if (fallback && !room2 && type === "trial") seq.splice(2, 0, { t: CHUNK_BY_ID.t_marks, flip: false });
+    if (fallback && !room2 && type === "replica") seq.splice(2, 0, { t: CHUNK_BY_ID.r_living, flip: false }, { t: CHUNK_BY_ID.r_storage, flip: false });
+    if (fallback && !room2 && type === "chase") seq.splice(1, 0, { t: CHUNK_BY_ID.h_doors, flip: false });
+    if (type === "lobby" && depth === 1) seq = seq.map((c, i) => i < 2 && c.t.terrain.some((t) => t.kind === "pit" || t.kind === "low") ? { t: CHUNK_BY_ID.c_flat, flip: false } : c);
+    if (type === "lobby" && depth === 1) seq = seq.map((c) => c.t.terrain.some((t) => t.kind === "block") ? { ...c, t: { ...c.t, terrain: c.t.terrain.filter((t) => t.kind !== "block") } } : c);
+    const segments = [];
+    const placed = [];
+    const spawns = [];
+    let x = 0;
+    const addRoom = (kind, w = ROOM_W) => {
+      segments.push({ ref: `room:${kind}`, x, w, flip: false, terrain: roomTerrain() });
+      const x0 = x;
+      x += w;
+      return x0;
+    };
+    const addChunk = (t, flip) => {
+      const terrain = t.terrain.map((tr) => flip ? flipTerrain(tr) : tr).map((tr) => ({ ...tr, x0: tr.x0 + x, x1: tr.x1 + x }));
+      segments.push({ ref: `chunk:${t.id}`, x, w: CHUNK_W, flip, terrain });
+      const x0 = x;
+      x += CHUNK_W;
+      return x0;
+    };
+    if (!room2 || room2.arrival) {
+      const hall2 = addRoom("elevator_hall");
+      placed.push(place2("elevator", hall2 + 200, 0, 160, "타고 온 엘리베이터", { noreturn: true }));
+      placed.push(place2("mirror", hall2 + 470, 0, 60, "거울"));
+      if (depth === 1) placed.push(place2("checklist", hall2 + 640, 0, 50, "정기 점검표", { rule: "entry" }));
+      if (depth === 1) placed.push(place2("sign", hall2 + (room2 ? 1e3 : 2040), 0, 50, "안내문", { rule: "noreturn" }));
+      if (depth === 2) placed.push(place2("sign", hall2 + 860, 0, 50, "안내판 (글자가 섞임)", { rule: "lobby" }));
+      if (type === "deep") placed.push(place2("sign", hall2 + 860, 0, 50, "긁힌 글씨", { rule: "b12" }));
+    }
+    const goalBox = { g: null };
+    const goalMid = ctx.flags.includes("trial_mid");
+    const goalRoom = () => {
+      const gx = addRoom("trial_goal", CHUNK_W);
+      const goal = goalBox.g = makeGoal(r, depth);
+      placed.push(place2("goalwall", gx + 320, 0, 240, "목표", { text: goal.text }));
+      placed.push(place2("sign", gx + 80, 0, 50, "시험 안내", { rule: "trial" }));
+    };
+    if (type === "trial" && (room2 ? room2.goal : !goalMid)) goalRoom();
+    let ruleSigns = [...type === "replica" && sub ? REPLICA_SUB_RULES[sub] : def.rules];
+    if (type === "lobby" && depth !== 2) ruleSigns = depth === 3 ? ["l_clock"] : ["greet"];
+    if (room2 && !room2.rules) ruleSigns = [];
+    let forkN = 0;
+    const chunkBase = [];
+    seq.forEach((c, i) => {
+      if (type === "trial" && !room2 && goalMid && i === Math.floor(seq.length / 2)) goalRoom();
+      const bx = addChunk(c.t, c.flip);
+      chunkBase.push({ x: bx, t: c.t, flip: c.flip, index: i });
+    });
+    const markXs = [];
+    const bellXs = [];
+    let serviceCount = 0;
+    for (const cb of chunkBase) {
+      const sx = (v) => cb.x + (cb.flip ? CHUNK_W - v : v);
+      const t = cb.t;
+      if (t.device === "fork") {
+        forkN++;
+        const doors = t.slots.filter((s2) => s2.kind === "door");
+        const correct = r() < 0.5 ? 0 : 1;
+        const shown = ctx.flags.includes("puzzle_mirror") ? 1 - correct : correct;
+        const signSlot = t.slots.find((s2) => s2.kind === "sign");
+        placed.push(place2("sign", sx(signSlot.x), 0, 50, "표지 (읽어야 보임)", { rule: "p_sign", arrow: shown === 0 ? "왼쪽 문" : "오른쪽 문", fork: forkN }));
+        doors.forEach((d3, k) => placed.push(place2("door", sx(d3.x), 0, 90, k === 0 ? "왼쪽 문" : "오른쪽 문", { correct: k === correct, fork: forkN })));
+        placed.push(place2("shutter", cb.x + CHUNK_W - 30, MID, 40, "닫힌 셔터", { fork: forkN, open: false }));
+        continue;
+      }
+      if (t.device === "switches") {
+        const sw = t.slots.filter((s2) => s2.kind === "switch");
+        const order = shuffle2(r, sw.map((_, k) => k + 1));
+        const signSlot = t.slots.find((s2) => s2.kind === "sign");
+        placed.push(place2("sign", sx(signSlot.x), 0, 50, "순서 표지", { rule: "p_order", order: order.join("-") }));
+        sw.forEach((s2, k) => placed.push(place2("switch", sx(s2.x), s2.lane ?? 20, 40, `스위치 ${"①②③④"[k]}`, { n: k + 1, group: cb.index })));
+        placed.push(place2("shutter", cb.x + CHUNK_W - 30, MID, 40, "닫힌 셔터", { group: cb.index, order: order.join("-"), open: false }));
+        continue;
+      }
+      if (t.device === "meal" && sub === "pretending") placed.push(place2("table", cb.x + 320, 40, 140, "차려진 밥상", { rule: "r_meal" }));
+      for (const s2 of t.slots) {
+        const px = sx(s2.x), lane = s2.lane ?? MID;
+        switch (s2.kind) {
+          case "servicedoor":
+            serviceCount++;
+            placed.push(place2("servicedoor", px, 0, 70, "점검문"));
+            break;
+          case "hatch":
+            if (serviceCount < 2 || r() < 0.4) serviceCount++, placed.push(place2("hatch", px, lane, 80, "천장 해치"));
+            break;
+          case "door":
+            if (type === "chase") placed.push(place2("chasedoor", px, 0, 60, "방화문", { closed: false }));
+            else if (r() < 0.5) placed.push(place2("prop", px, 0, 70, "닫힌 사무실 문"));
+            break;
+          case "sign":
+            if (ruleSigns.length) {
+              const id = ruleSigns.shift();
+              placed.push(place2("sign", px, 0, 50, "규칙 표지", { rule: id }));
+            } else if (r() < 0.25) placed.push(place2("symbol", px, 0, 40, "벽 기호", { danger: r() < 0.5 ? 1 : 0 }));
+            else if (type === "lobby" && r() < 0.5) placed.push(place2("prop", px, 0, 50, "거꾸로 가는 시계"));
+            break;
+          case "prop":
+            placed.push(place2("prop", px, lane, 60, propLabel(type, sub, r)));
+            break;
+          case "item":
+            if (type === "trial") markXs.push(px), placed.push(place2("mark", px, lane, 30, "표식", { found: false }));
+            else if (type === "replica" && sub === "vacant") placed.push(place2("belonging", px, lane, 30, pick3(r, ["남의 지갑", "아이 신발", "가족 사진", "열쇠 꾸러미"]), { rule: "r_things" }));
+            else if (r() < 0.5) placed.push(place2("item", px, lane, 28, "보급품", { item: pick3(r, ["heal", "heal", "light", "guard", "ammo"]) }));
+            break;
+          case "switch":
+            if (type === "trial") bellXs.push(px), placed.push(place2("switch", px, lane, 40, "종", { bell: true, n: bellXs.length }));
+            break;
+          case "npc":
+            if (type === "replica" && sub !== "vacant") spawns.push(hook2("resident", "resident", px, lane, 0, false, { greeted: false, asleep: true }));
+            else if (type === "lobby") spawns.push(hook2("enemy", "lurker", px, lane, 0, false, { harmless: true }));
+            break;
+          case "enemy":
+            break;
         }
       }
       if (type === "replica" && sub === "red" && r() < 0.6) {
@@ -3782,140 +3935,4 @@ ${SET_BONUS[u.set]}`;
       }
       const named = ch >= 44 * scale && cw >= 95 * scale;
       fit2(c, roomSymbols(r), rx + 5, ry + ch * (named ? 0.4 : 0.65), 13 * scale, cw - 10, r.panel ? C3.panel : C3.here);
-      if (named) fit2(c, r.name, rx + 20 * scale, ry + ch - 13 * scale, 12 * scale, cw - 24 * scale, C3.sub);
-      if (current) marker(c, rx + 9 * scale, ry + ch - 9 * scale, 9 * scale);
-    }
-  }
-  function service2(c, m, s2, x, y, cw, ch, gap, scale, c0 = 0, r0 = 0, mini = false) {
-    const known = new Set(s2.cells.filter((q) => q.seen || q.key || q.kind === "attic").map((q) => `${q.col},${q.row}`));
-    for (const q of s2.cells.filter((q2) => q2.seen)) for (const d3 of DIRS2) {
-      if (!q.open[d3]) continue;
-      const [dx, dy] = STEP3[d3];
-      known.add(`${q.col + dx},${q.row + dy}`);
-      const x0 = x + (q.col - c0) * (cw + gap) + cw / 2, y0 = y + (q.row - r0) * (ch + gap) + ch / 2;
-      c.strokeStyle = C3.service;
-      c.lineWidth = 3 * scale;
-      c.beginPath();
-      c.moveTo(x0, y0);
-      c.lineTo(x0 + dx * (cw / 2 + gap), y0 + dy * (ch / 2 + gap));
-      c.stroke();
-    }
-    for (const q of s2.cells) {
-      if (!known.has(`${q.col},${q.row}`)) continue;
-      const rx = x + (q.col - c0) * (cw + gap), ry = y + (q.row - r0) * (ch + gap);
-      const current = q.col === m.cell?.[0] && q.row === m.cell?.[1];
-      c.fillStyle = q.seen ? "#39304d" : "#191c2b";
-      c.fillRect(rx, ry, cw, ch);
-      c.strokeStyle = current ? C3.here : C3.service;
-      c.lineWidth = (current ? 3 : 1) * scale;
-      c.setLineDash(q.seen ? [] : [5, 4]);
-      c.strokeRect(rx, ry, cw, ch);
-      c.setLineDash([]);
-      const symbol = !q.seen && q.kind !== "attic" && !q.key ? "?" : q.kind === "attic" ? "R" : q.key ? "K" : q.kind === "down" ? m.panelReady === false ? "×" : "↓" : q.kind === "entry" ? "↑" : "";
-      text(c, symbol, rx + cw / 2, ry + ch / 2, (mini ? 12 : 16) * scale, C3.text, "center");
-      if (current) marker(c, rx + 8 * scale, ry + ch - 8 * scale, 9 * scale);
-    }
-  }
-  function drawRunMap(c, m, _px, _t, U2 = 1, W5 = c.canvas.width, H7 = c.canvas.height) {
-    setExplorationMap(c.canvas, true);
-    const v = mapViewport(c.canvas, U2, W5, H7), S2 = v.scale, left = v.margin, right = W5 - left;
-    c.save();
-    c.setTransform(1, 0, 0, 1, 0, 0);
-    c.fillStyle = C3.bg;
-    c.fillRect(0, 0, W5, H7);
-    const world = m.worlds.find((w) => w.depth === m.depth);
-    const here = world?.rooms.find((r) => r.col === m.room?.[0] && r.row === m.room?.[1]);
-    fit2(c, `출동 지도 · ${world?.label ?? `깊이 ${m.depth}`}`, left, 35 * S2, 21 * S2, right - left - 190 * S2);
-    text(c, v.touch ? "「지도」로 닫기" : "Z / Tab / M 닫기", right, 35 * S2, 13 * S2, C3.sub, "right");
-    text(c, `보유 열쇠 ${m.keys.join(" ") || "없음"}   ·   강화 ${m.upgrades.length}`, left, 65 * S2, 14 * S2, C3.key);
-    const goal = m.goal.replaceAll("(★)", " R").replaceAll("(▮)", " P");
-    const goalHeight = lines2(c, goal, left, 94 * S2, 14 * S2, right - left);
-    const top = 94 * S2 + goalHeight + 20 * S2, bottom = H7 - 48 * S2;
-    const sideW = 240 * S2, mapRight = right - sideW - 24 * S2;
-    const mapW = mapRight - left, mapH = bottom - top - 28 * S2;
-    fit2(c, m.where === "service" ? "정비 구역 · R 다락방 / 귀환 로프" : `◆ 현재 ${here?.name ?? (m.where === "car" ? "승강기 안" : "이동 중")}`, left, top - 3 * S2, 14 * S2, mapW, C3.here);
-    const sx = mapRight + 24 * S2;
-    const legend = m.where === "service" ? [
-      ["◆", "현재 칸", C3.here],
-      ["?", "점선 · 미탐색", C3.sub],
-      ["R", "다락방 · 휴식 / 귀환 로프", C3.service],
-      ["↑", "위층 점검문", C3.sub],
-      [m.panelReady === false ? "×" : "↓", `아래 점검문 · ${m.panelReady === void 0 ? "목표 확인" : m.panelReady ? "하강 가능" : "층 정리 전 잠김"}`, C3.sub],
-      ["K", "열쇠", C3.key],
-      ["─", "발견한 연결", C3.service]
-    ] : [
-      ["◆", "현재 방 · 노란 테두리", C3.here],
-      ["?", "점선 · 미탐색 방", C3.sub],
-      ["✓ / ·", "정리 완료 / 미정리", C3.clear],
-      ["①", "잠김 · 같은 번호 열쇠 필요", C3.locked],
-      ["①", "열쇠 보유 · 문에서 조사", C3.key],
-      ["✓", "초록 연결 · 열린 길", C3.clear],
-      ["K / P", "열쇠 / 승강기 패널", C3.panel],
-      ["+ / −", "보상 남음 / 수령 완료", C3.here],
-      ["S / 入", "정비 입구 / 도착 방", C3.service],
-      ["! / ◇", "수호자 / 숨은 방(선택)", C3.sub]
-    ];
-    legend.forEach(([mark, label3, color], i) => {
-      text(c, mark, sx, top + i * 19 * S2, 14 * S2, color);
-      text(c, label3, sx + 47 * S2, top + i * 19 * S2, 12.5 * S2, C3.sub);
-    });
-    const hintY = top + legend.length * 19 * S2 + 8 * S2;
-    if (m.where === "floor") {
-      const panel = m.panelReady === void 0 ? "패널: 위 목표 안내 확인" : m.panelReady ? "패널 켜짐 · 조사해서 하강" : "패널 꺼짐 · 층 목표 해결";
-      text(c, panel, sx, hintY, 13 * S2, C3.panel);
-      text(c, "귀환: 점검문 → 정비 → R 로프", sx, hintY + 23 * S2, 12.5 * S2, C3.service);
-    } else if (m.where === "service") {
-      text(c, "R 로프 조사 → 안전 귀환", sx, hintY, 13 * S2, C3.service);
-      text(c, "메뉴의 긴급 철수는 보상 감소", sx, hintY + 23 * S2, 12.5 * S2, C3.sub);
-    }
-    const zone = m.where === "service" ? m.services.find((s2) => s2.depth === m.depth) : world;
-    if (zone && mapW > 0 && mapH > 0) {
-      const gap = 12 * S2;
-      const cw = Math.min(150 * S2, (mapW - gap * (zone.cols - 1)) / zone.cols);
-      const ch = Math.min(68 * S2, (mapH - gap * (zone.rows - 1)) / zone.rows);
-      const gx = left + (mapW - (cw + gap) * zone.cols + gap) / 2, gy = top + 24 * S2 + (mapH - (ch + gap) * zone.rows + gap) / 2;
-      c.save();
-      c.beginPath();
-      c.rect(left - 6, top + 18 * S2, mapW + 12, mapH + 12);
-      c.clip();
-      if (m.where === "service") service2(c, m, zone, gx, gy, cw, ch, gap, S2);
-      else rooms(c, m, zone, gx, gy, cw, ch, gap, S2);
-      c.restore();
-    }
-    fit2(c, mapExits(m), left, H7 - 23 * S2, 13 * S2, right - left, C3.sub);
-    c.restore();
-  }
-  function drawMiniMap(c, m, _px, _t, U2 = 1) {
-    setExplorationMap(c.canvas, false);
-    if (m.where !== "floor" && m.where !== "service") return;
-    const v = mapViewport(c.canvas, U2), S2 = v.scale;
-    const x = v.touch ? 560 : 740, y = 12, width = v.width - x - (v.touch ? 155 : 130);
-    const h = 100 * S2;
-    if (width < 230) return;
-    c.save();
-    c.setTransform(1, 0, 0, 1, 0, 0);
-    frame(c, x, y, width, h);
-    const mapW = Math.min(width * 0.42, 150 * S2), tx = x + 10 * S2, tw = width - mapW - 24 * S2;
-    text(c, m.where === "service" ? "정비 · R 로프 귀환" : `열쇠 ${m.keys.join(" ") || "없음"}`, tx, y + 16 * S2, 13 * S2, C3.key);
-    const shortGoal = m.where === "service" ? "다락방을 찾아 조사" : m.goal.startsWith("층 정리 끝") ? "패널로 하강 / 로프로 귀환" : m.goal.includes("노랗게") ? "노란 잠금 앞에서 조사" : m.goal.includes("잠긴 길") ? "열린 방에서 열쇠 찾기" : m.goal.match(/남은 방 \d+/)?.[0] ? `${m.goal.match(/남은 방 \d+/)[0]} · 목표 해결` : "방의 목표를 확인";
-    fit2(c, shortGoal, tx, y + 44 * S2, 14 * S2, tw, C3.text);
-    fit2(c, v.touch ? "「지도」 전체 / 범례" : "Z · Tab · M 전체 지도", tx, y + 77 * S2, 12.5 * S2, tw, C3.sub);
-    const gap = 5 * S2, cw = (mapW - 2 * gap - 16) / 3, ch = (h - 20 - 2 * gap) / 3;
-    const gx = x + width - mapW + 4, gy = y + 10;
-    c.save();
-    c.beginPath();
-    c.rect(gx - 3, gy - 3, mapW - 2, h - 14);
-    c.clip();
-    if (m.where === "floor" && m.room) {
-      const w = m.worlds.find((w2) => w2.depth === m.depth);
-      if (w) rooms(c, m, w, gx, gy, cw, ch, gap, S2, m.room[0] - 1, m.room[1] - 1, true);
-    } else if (m.cell) {
-      const s2 = m.services.find((s3) => s3.depth === m.depth);
-      if (s2) service2(c, m, s2, gx, gy, cw, ch, gap, S2, m.cell[0] - 1, m.cell[1] - 1, true);
-    }
-    c.restore();
-    c.restore();
-  }
-
-  // src/game/action/story/style.css
-  var style_default2 = ".gsy{position:absolute;inset:0;pointer-events:none;font-family:'GoeiPixel','Galmuri11',monospace;-webkit-font-smoothing:none;color:#e8ece9;z-index:20;overflow:hidden}\n.gsy-fade{position:absolute;inset:0;background:#000;opacity:0;pointer-events:none}\n.gsy-bubbles{position:absolute;inset:0}\n.gsy-bubble{position:absolute;left:0;top:0;max-width:min(280px,60vw);padding:6px 10px;border-radius:0;background:#f4f1e8;color:#1b1f22;font-family:'GoeiPixel','Galmuri11',monospace;-webkit-font-smoothing:none;font-size:16px;line-height:1.35;border:3px solid #1b1f22;box-shadow:inset 0 -3px 0 #c9c2ae,0 0 0 2px var(--who,#888),4px 4px 0 2px rgba(0,0,0,.45);transition:opacity .25s;word-break:keep-all;image-rendering:pixelated}\n.gsy-bubble::after{content:'';position:absolute;left:calc(50% + var(--tail,0px));bottom:-12px;margin-left:-6px;width:12px;height:9px;background:#1b1f22;clip-path:polygon(0 0,100% 0,100% 33%,67% 33%,67% 67%,33% 67%,33% 100%,0 100%)}\n.gsy-bubble b{display:block;font-size:12px;color:var(--who);filter:brightness(.7);margin-bottom:1px}\n.gsy-bubble.free{left:50%;top:14px;transform:translateX(-50%)!important}\n.gsy-b
+      if (named) fit2(c, r.name, rx + 20 * scale, ry + ch - 13 * scale, 12 * sc

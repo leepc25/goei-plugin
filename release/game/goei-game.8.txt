@@ -1,4 +1,140 @@
-ubble.free::after{display:none}\n@media (max-height:500px){.gsy-bubble.free{max-width:240px;font-size:14px}}\n.gsy-bubble.out{opacity:0}\n.gsy-caption{position:absolute;left:50%;top:38%;transform:translate(-50%,-50%);width:min(88%,640px);text-align:center;font-size:17px;line-height:1.6;letter-spacing:.02em;text-shadow:0 2px 6px #000,0 0 2px #000;transition:opacity .3s;word-break:keep-all}\n.gsy-caption.out{opacity:0}\n.gsy-skip{position:absolute;right:12px;top:10px;pointer-events:auto;padding:4px 14px}\n.gsy-dock{position:absolute;left:0;right:0;bottom:12px;display:flex;flex-direction:column;align-items:center;gap:8px;padding:0 12px;pointer-events:none}\n.gsy-box{position:relative;width:min(100%,860px);min-height:112px;display:flex;gap:12px;align-items:flex-start;padding:12px 14px 14px;background:rgba(14,19,22,.94);border:1px solid rgba(255,255,255,.12);border-top:3px solid var(--who,#888);border-radius:12px;pointer-events:auto;box-sizing:border-box;cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:manipulation}\n.gsy-box[hidden],.gsy-choices[hidden],.gsy-caption[hidden],.gsy-skip[hidden],.gsy-talk[hidden]{display:none}\n.gsy-photo{flex:0 0 72px;width:72px;height:72px;border-radius:12px;overflow:hidden;background:var(--who,#555);display:grid;place-items:center}\n.gsy-photo[hidden]{display:none}\n.gsy-photo img{width:100%;height:100%;object-fit:cover;object-position:50% 15%}\n.gsy-photo span{font-size:30px;font-weight:700;color:rgba(255,255,255,.85)}\n.gsy-body{flex:1;min-width:0}\n.gsy-name{display:block;font-size:14px;color:var(--who,#ccc);filter:brightness(1.35);margin-bottom:4px}\n.gsy-text{text-wrap:pretty;margin:0;font-size:16px;line-height:1.6;white-space:pre-wrap;word-break:keep-all;min-height:3.2em}\n.gsy-box.narr{border-top-color:#555}\n.gsy-box.narr .gsy-text{font-style:italic;color:#c9d0cc;text-align:center}\n.gsy-box[data-mood=serious] .gsy-photo{filter:saturate(.7) brightness(.9)}\n.gsy-box[data-mood=hurt] .gsy-photo{filter:saturate(.6)}\n.gsy-box[data-mood=surprise] .gsy-photo{animation:gsy-hop .25s}\n@keyframes gsy-hop{50%{transform:translateY(-4px)}}\n.gsy-next{position:absolute;right:14px;bottom:8px;font-style:normal;font-size:12px;opacity:0;color:var(--who)}\n.gsy-box.done:not(.asking) .gsy-next{opacity:.9;animation:gsy-blink 1s infinite}\n@keyframes gsy-blink{50%{opacity:.2}}\n.gsy-choices{width:min(100%,560px);display:flex;flex-direction:column;gap:6px;pointer-events:auto}\n.gsy-choices button{display:flex;align-items:center;gap:10px;text-align:left;padding:11px 14px;font-size:15px;color:#f1f3f0;background:rgba(22,30,34,.96);border:1px solid rgba(255,255,255,.18);border-radius:10px;cursor:pointer;touch-action:manipulation}\n.gsy-choices button:hover,.gsy-choices button:focus-visible{background:#2b3a40;border-color:#b8a36a}\n.gsy-choices kbd{font:12px ui-monospace,monospace;opacity:.6;border:1px solid rgba(255,255,255,.3);border-radius:4px;padding:0 5px}\n.gsy-talk{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);width:min(calc(100% - 24px),560px);height:min(62%,420px);display:flex;flex-direction:column;background:rgba(14,19,22,.97);border:1px solid rgba(255,255,255,.14);border-top:3px solid var(--who,#888);border-radius:12px;pointer-events:auto;box-sizing:border-box}\n.gsy-talk-head{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.08)}\n.gsy-talk-head .gsy-photo{flex-basis:40px;width:40px;height:40px;border-radius:9px}\n.gsy-talk-head .gsy-photo span{font-size:18px}\n.gsy-talk-head b{flex:1;color:var(--who);filter:brightness(1.35)}\n.gsy-talk-head button{background:none;border:0;color:#ccc;font-size:18px;padding:6px 8px;cursor:pointer}\n.gsy-talk-log{flex:1;overflow:auto;padding:10px 12px;display:flex;flex-direction:column;gap:8px}\n.gsy-talk-log p{margin:0;max-width:82%;padding:8px 11px;border-radius:12px;font-size:15px;line-height:1.5;word-break:keep-all}\n.gsy-talk-log .npc{align-self:flex-start;background:#26323a}\n.gsy-talk-log .me{align-self:flex-end;background:#3d5a4f}\n.gsy-talk-log .wait{opacity:.6;animation:gsy-blink 1s infinite}\n.gsy-talk form{display:flex;gap:8px;padding:10px 12px;border-top:1px solid rgba(255,255,255,.08)}\n.gsy-talk input{flex:1;min-width:0;padding:10px 12px;font-size:16px;border-radius:9px;border:1px solid rgba(255,255,255,.2);background:#0b1013;color:#eef}\n.gsy-talk form button{padding:0 16px;border-radius:9px;border:0;background:#b8a36a;color:#1a1a12;font-weight:700;font-size:15px}\n.gsy-talk form button:disabled{opacity:.5}\n@media (max-width:560px){.gsy-photo{flex-basis:56px;width:56px;height:56px}.gsy-text{font-size:15px}.gsy-box{min-height:96px;padding:10px 12px 12px}}\n.gsy-top .gsy-dock{top:var(--gsy-dock-top,16%);bottom:auto;flex-direction:column-reverse}\n/* 폰 가로(낮은 화면): 좌우 터치 버튼 사이 가운데 위쪽에 작게. 선택지는 두 칸씩 */\n@media (max-height:500px){.gsy-box,.gsy-choices{width:min(52%,560px)}.gsy-dock{align-items:flex-start;padding-left:17%}.gsy-box{min-height:0;padding:7px 10px 9px;gap:8px;border-radius:10px}.gsy-photo{flex-basis:40px;width:40px;height:40px;border-radius:8px}.gsy-photo span{font-size:18px}.gsy-name{font-size:12px;margin-bottom:2px}.gsy-text{font-size:13px;line-height:1.45;min-height:2.9em}.gsy-choices{display:grid;grid-template-columns:1fr 1fr;gap:4px}.gsy-choices button{padding:6px 9px;font-size:12px;gap:6px;border-radius:8px}.gsy-dock{gap:5px}.gsy-skip{top:auto;bottom:8px;left:50%;right:auto;transform:translateX(-50%);padding:2px 10px;font-size:16px}}\n/* 컷신 도트 애니메이션: 화면 전체, 검은 바탕, 도트가 뭉개지지 않게 */\n.gsy-video{position:absolute;inset:0;background:#000;pointer-events:auto;z-index:30;display:flex;align-items:center;justify-content:center}\n.gsy-video[hidden]{display:none}\n.gsy-video canvas{width:100%;height:100%;object-fit:contain;image-rendering:pixelated}\n.gsy-vsub{position:absolute;left:50%;bottom:4%;transform:translateX(-50%);width:max-content;max-width:min(92%,1100px);box-sizing:border-box;margin:0;padding:4px 14px;font-size:22px;line-height:1.5;text-align:center;word-break:keep-all;color:#f1f3f0;text-shadow:2px 2px 0 #000}\n.gsy-vsub[hidden]{display:none}\n.gsy-vsub b{color:#ffe27a;font-weight:400;margin-right:8px}\n.gsy-vskip,.gsy-vsound{position:absolute;top:10px;padding:4px 14px}\n.gsy-vskip{right:12px}\n.gsy-vsound{left:12px}\n.gsy-vsound[hidden]{display:none}\n@media (max-height:500px){.gsy-vsub{font-size:16px;padding:2px 10px;bottom:3%}.gsy-vskip,.gsy-vsound{font-size:16px;top:6px;padding:2px 10px}}\n";
+ale, cw - 24 * scale, C3.sub);
+      if (current) marker(c, rx + 9 * scale, ry + ch - 9 * scale, 9 * scale);
+    }
+  }
+  function service2(c, m, s2, x, y, cw, ch, gap, scale, c0 = 0, r0 = 0, mini = false) {
+    const known = new Set(s2.cells.filter((q) => q.seen || q.key || q.kind === "attic").map((q) => `${q.col},${q.row}`));
+    for (const q of s2.cells.filter((q2) => q2.seen)) for (const d3 of DIRS2) {
+      if (!q.open[d3]) continue;
+      const [dx, dy] = STEP3[d3];
+      known.add(`${q.col + dx},${q.row + dy}`);
+      const x0 = x + (q.col - c0) * (cw + gap) + cw / 2, y0 = y + (q.row - r0) * (ch + gap) + ch / 2;
+      c.strokeStyle = C3.service;
+      c.lineWidth = 3 * scale;
+      c.beginPath();
+      c.moveTo(x0, y0);
+      c.lineTo(x0 + dx * (cw / 2 + gap), y0 + dy * (ch / 2 + gap));
+      c.stroke();
+    }
+    for (const q of s2.cells) {
+      if (!known.has(`${q.col},${q.row}`)) continue;
+      const rx = x + (q.col - c0) * (cw + gap), ry = y + (q.row - r0) * (ch + gap);
+      const current = q.col === m.cell?.[0] && q.row === m.cell?.[1];
+      c.fillStyle = q.seen ? "#39304d" : "#191c2b";
+      c.fillRect(rx, ry, cw, ch);
+      c.strokeStyle = current ? C3.here : C3.service;
+      c.lineWidth = (current ? 3 : 1) * scale;
+      c.setLineDash(q.seen ? [] : [5, 4]);
+      c.strokeRect(rx, ry, cw, ch);
+      c.setLineDash([]);
+      const symbol = !q.seen && q.kind !== "attic" && !q.key ? "?" : q.kind === "attic" ? "R" : q.key ? "K" : q.kind === "down" ? m.panelReady === false ? "×" : "↓" : q.kind === "entry" ? "↑" : "";
+      text(c, symbol, rx + cw / 2, ry + ch / 2, (mini ? 12 : 16) * scale, C3.text, "center");
+      if (current) marker(c, rx + 8 * scale, ry + ch - 8 * scale, 9 * scale);
+    }
+  }
+  function drawRunMap(c, m, _px, _t, U2 = 1, W5 = c.canvas.width, H7 = c.canvas.height) {
+    setExplorationMap(c.canvas, true);
+    const v = mapViewport(c.canvas, U2, W5, H7), S2 = v.scale, left = v.margin, right = W5 - left;
+    c.save();
+    c.setTransform(1, 0, 0, 1, 0, 0);
+    c.fillStyle = C3.bg;
+    c.fillRect(0, 0, W5, H7);
+    const world = m.worlds.find((w) => w.depth === m.depth);
+    const here = world?.rooms.find((r) => r.col === m.room?.[0] && r.row === m.room?.[1]);
+    fit2(c, `출동 지도 · ${world?.label ?? `깊이 ${m.depth}`}`, left, 35 * S2, 21 * S2, right - left - 190 * S2);
+    text(c, v.touch ? "「지도」로 닫기" : "Z / Tab / M 닫기", right, 35 * S2, 13 * S2, C3.sub, "right");
+    text(c, `보유 열쇠 ${m.keys.join(" ") || "없음"}   ·   강화 ${m.upgrades.length}`, left, 65 * S2, 14 * S2, C3.key);
+    const goal = m.goal.replaceAll("(★)", " R").replaceAll("(▮)", " P");
+    const goalHeight = lines2(c, goal, left, 94 * S2, 14 * S2, right - left);
+    const top = 94 * S2 + goalHeight + 20 * S2, bottom = H7 - 48 * S2;
+    const sideW = 240 * S2, mapRight = right - sideW - 24 * S2;
+    const mapW = mapRight - left, mapH = bottom - top - 28 * S2;
+    fit2(c, m.where === "service" ? "정비 구역 · R 다락방 / 귀환 로프" : `◆ 현재 ${here?.name ?? (m.where === "car" ? "승강기 안" : "이동 중")}`, left, top - 3 * S2, 14 * S2, mapW, C3.here);
+    const sx = mapRight + 24 * S2;
+    const legend = m.where === "service" ? [
+      ["◆", "현재 칸", C3.here],
+      ["?", "점선 · 미탐색", C3.sub],
+      ["R", "다락방 · 휴식 / 귀환 로프", C3.service],
+      ["↑", "위층 점검문", C3.sub],
+      [m.panelReady === false ? "×" : "↓", `아래 점검문 · ${m.panelReady === void 0 ? "목표 확인" : m.panelReady ? "하강 가능" : "층 정리 전 잠김"}`, C3.sub],
+      ["K", "열쇠", C3.key],
+      ["─", "발견한 연결", C3.service]
+    ] : [
+      ["◆", "현재 방 · 노란 테두리", C3.here],
+      ["?", "점선 · 미탐색 방", C3.sub],
+      ["✓ / ·", "정리 완료 / 미정리", C3.clear],
+      ["①", "잠김 · 같은 번호 열쇠 필요", C3.locked],
+      ["①", "열쇠 보유 · 문에서 조사", C3.key],
+      ["✓", "초록 연결 · 열린 길", C3.clear],
+      ["K / P", "열쇠 / 승강기 패널", C3.panel],
+      ["+ / −", "보상 남음 / 수령 완료", C3.here],
+      ["S / 入", "정비 입구 / 도착 방", C3.service],
+      ["! / ◇", "수호자 / 숨은 방(선택)", C3.sub]
+    ];
+    legend.forEach(([mark, label3, color], i) => {
+      text(c, mark, sx, top + i * 19 * S2, 14 * S2, color);
+      text(c, label3, sx + 47 * S2, top + i * 19 * S2, 12.5 * S2, C3.sub);
+    });
+    const hintY = top + legend.length * 19 * S2 + 8 * S2;
+    if (m.where === "floor") {
+      const panel = m.panelReady === void 0 ? "패널: 위 목표 안내 확인" : m.panelReady ? "패널 켜짐 · 조사해서 하강" : "패널 꺼짐 · 층 목표 해결";
+      text(c, panel, sx, hintY, 13 * S2, C3.panel);
+      text(c, "귀환: 점검문 → 정비 → R 로프", sx, hintY + 23 * S2, 12.5 * S2, C3.service);
+    } else if (m.where === "service") {
+      text(c, "R 로프 조사 → 안전 귀환", sx, hintY, 13 * S2, C3.service);
+      text(c, "메뉴의 긴급 철수는 보상 감소", sx, hintY + 23 * S2, 12.5 * S2, C3.sub);
+    }
+    const zone = m.where === "service" ? m.services.find((s2) => s2.depth === m.depth) : world;
+    if (zone && mapW > 0 && mapH > 0) {
+      const gap = 12 * S2;
+      const cw = Math.min(150 * S2, (mapW - gap * (zone.cols - 1)) / zone.cols);
+      const ch = Math.min(68 * S2, (mapH - gap * (zone.rows - 1)) / zone.rows);
+      const gx = left + (mapW - (cw + gap) * zone.cols + gap) / 2, gy = top + 24 * S2 + (mapH - (ch + gap) * zone.rows + gap) / 2;
+      c.save();
+      c.beginPath();
+      c.rect(left - 6, top + 18 * S2, mapW + 12, mapH + 12);
+      c.clip();
+      if (m.where === "service") service2(c, m, zone, gx, gy, cw, ch, gap, S2);
+      else rooms(c, m, zone, gx, gy, cw, ch, gap, S2);
+      c.restore();
+    }
+    fit2(c, mapExits(m), left, H7 - 23 * S2, 13 * S2, right - left, C3.sub);
+    c.restore();
+  }
+  function drawMiniMap(c, m, _px, _t, U2 = 1) {
+    setExplorationMap(c.canvas, false);
+    if (m.where !== "floor" && m.where !== "service") return;
+    const v = mapViewport(c.canvas, U2), S2 = v.scale;
+    const x = v.touch ? 560 : 740, y = 12, width = v.width - x - (v.touch ? 155 : 130);
+    const h = 100 * S2;
+    if (width < 230) return;
+    c.save();
+    c.setTransform(1, 0, 0, 1, 0, 0);
+    frame(c, x, y, width, h);
+    const mapW = Math.min(width * 0.42, 150 * S2), tx = x + 10 * S2, tw = width - mapW - 24 * S2;
+    text(c, m.where === "service" ? "정비 · R 로프 귀환" : `열쇠 ${m.keys.join(" ") || "없음"}`, tx, y + 16 * S2, 13 * S2, C3.key);
+    const shortGoal = m.where === "service" ? "다락방을 찾아 조사" : m.goal.startsWith("층 정리 끝") ? "패널로 하강 / 로프로 귀환" : m.goal.includes("노랗게") ? "노란 잠금 앞에서 조사" : m.goal.includes("잠긴 길") ? "열린 방에서 열쇠 찾기" : m.goal.match(/남은 방 \d+/)?.[0] ? `${m.goal.match(/남은 방 \d+/)[0]} · 목표 해결` : "방의 목표를 확인";
+    fit2(c, shortGoal, tx, y + 44 * S2, 14 * S2, tw, C3.text);
+    fit2(c, v.touch ? "「지도」 전체 / 범례" : "Z · Tab · M 전체 지도", tx, y + 77 * S2, 12.5 * S2, tw, C3.sub);
+    const gap = 5 * S2, cw = (mapW - 2 * gap - 16) / 3, ch = (h - 20 - 2 * gap) / 3;
+    const gx = x + width - mapW + 4, gy = y + 10;
+    c.save();
+    c.beginPath();
+    c.rect(gx - 3, gy - 3, mapW - 2, h - 14);
+    c.clip();
+    if (m.where === "floor" && m.room) {
+      const w = m.worlds.find((w2) => w2.depth === m.depth);
+      if (w) rooms(c, m, w, gx, gy, cw, ch, gap, S2, m.room[0] - 1, m.room[1] - 1, true);
+    } else if (m.cell) {
+      const s2 = m.services.find((s3) => s3.depth === m.depth);
+      if (s2) service2(c, m, s2, gx, gy, cw, ch, gap, S2, m.cell[0] - 1, m.cell[1] - 1, true);
+    }
+    c.restore();
+    c.restore();
+  }
+
+  // src/game/action/story/style.css
+  var style_default2 = ".gsy{position:absolute;inset:0;pointer-events:none;font-family:'GoeiPixel','Galmuri11',monospace;-webkit-font-smoothing:none;color:#e8ece9;z-index:20;overflow:hidden}\n.gsy-fade{position:absolute;inset:0;background:#000;opacity:0;pointer-events:none}\n.gsy-bubbles{position:absolute;inset:0}\n.gsy-bubble{position:absolute;left:0;top:0;max-width:min(280px,60vw);padding:6px 10px;border-radius:0;background:#f4f1e8;color:#1b1f22;font-family:'GoeiPixel','Galmuri11',monospace;-webkit-font-smoothing:none;font-size:16px;line-height:1.35;border:3px solid #1b1f22;box-shadow:inset 0 -3px 0 #c9c2ae,0 0 0 2px var(--who,#888),4px 4px 0 2px rgba(0,0,0,.45);transition:opacity .25s;word-break:keep-all;image-rendering:pixelated}\n.gsy-bubble::after{content:'';position:absolute;left:calc(50% + var(--tail,0px));bottom:-12px;margin-left:-6px;width:12px;height:9px;background:#1b1f22;clip-path:polygon(0 0,100% 0,100% 33%,67% 33%,67% 67%,33% 67%,33% 100%,0 100%)}\n.gsy-bubble b{display:block;font-size:12px;color:var(--who);filter:brightness(.7);margin-bottom:1px}\n.gsy-bubble.free{left:50%;top:14px;transform:translateX(-50%)!important}\n.gsy-bubble.free::after{display:none}\n@media (max-height:500px){.gsy-bubble.free{max-width:240px;font-size:14px}}\n.gsy-bubble.out{opacity:0}\n.gsy-caption{position:absolute;left:50%;top:38%;transform:translate(-50%,-50%);width:min(88%,640px);text-align:center;font-size:17px;line-height:1.6;letter-spacing:.02em;text-shadow:0 2px 6px #000,0 0 2px #000;transition:opacity .3s;word-break:keep-all}\n.gsy-caption.out{opacity:0}\n.gsy-skip{position:absolute;right:12px;top:10px;pointer-events:auto;padding:4px 14px}\n.gsy-dock{position:absolute;left:0;right:0;bottom:12px;display:flex;flex-direction:column;align-items:center;gap:8px;padding:0 12px;pointer-events:none}\n.gsy-box{position:relative;width:min(100%,860px);min-height:112px;display:flex;gap:12px;align-items:flex-start;padding:12px 14px 14px;background:rgba(14,19,22,.94);border:1px solid rgba(255,255,255,.12);border-top:3px solid var(--who,#888);border-radius:12px;pointer-events:auto;box-sizing:border-box;cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:manipulation}\n.gsy-box[hidden],.gsy-choices[hidden],.gsy-caption[hidden],.gsy-skip[hidden],.gsy-talk[hidden]{display:none}\n.gsy-photo{flex:0 0 72px;width:72px;height:72px;border-radius:12px;overflow:hidden;background:var(--who,#555);display:grid;place-items:center}\n.gsy-photo[hidden]{display:none}\n.gsy-photo img{width:100%;height:100%;object-fit:cover;object-position:50% 15%}\n.gsy-photo span{font-size:30px;font-weight:700;color:rgba(255,255,255,.85)}\n.gsy-body{flex:1;min-width:0}\n.gsy-name{display:block;font-size:14px;color:var(--who,#ccc);filter:brightness(1.35);margin-bottom:4px}\n.gsy-text{text-wrap:pretty;margin:0;font-size:16px;line-height:1.6;white-space:pre-wrap;word-break:keep-all;min-height:3.2em}\n.gsy-box.narr{border-top-color:#555}\n.gsy-box.narr .gsy-text{font-style:italic;color:#c9d0cc;text-align:center}\n.gsy-box[data-mood=serious] .gsy-photo{filter:saturate(.7) brightness(.9)}\n.gsy-box[data-mood=hurt] .gsy-photo{filter:saturate(.6)}\n.gsy-box[data-mood=surprise] .gsy-photo{animation:gsy-hop .25s}\n@keyframes gsy-hop{50%{transform:translateY(-4px)}}\n.gsy-next{position:absolute;right:14px;bottom:8px;font-style:normal;font-size:12px;opacity:0;color:var(--who)}\n.gsy-box.done:not(.asking) .gsy-next{opacity:.9;animation:gsy-blink 1s infinite}\n@keyframes gsy-blink{50%{opacity:.2}}\n.gsy-choices{width:min(100%,560px);display:flex;flex-direction:column;gap:6px;pointer-events:auto}\n.gsy-choices button{display:flex;align-items:center;gap:10px;text-align:left;padding:11px 14px;font-size:15px;color:#f1f3f0;background:rgba(22,30,34,.96);border:1px solid rgba(255,255,255,.18);border-radius:10px;cursor:pointer;touch-action:manipulation}\n.gsy-choices button:hover,.gsy-choices button:focus-visible{background:#2b3a40;border-color:#b8a36a}\n.gsy-choices kbd{font:12px ui-monospace,monospace;opacity:.6;border:1px solid rgba(255,255,255,.3);border-radius:4px;padding:0 5px}\n.gsy-talk{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);width:min(calc(100% - 24px),560px);height:min(62%,420px);display:flex;flex-direction:column;background:rgba(14,19,22,.97);border:1px solid rgba(255,255,255,.14);border-top:3px solid var(--who,#888);border-radius:12px;pointer-events:auto;box-sizing:border-box}\n.gsy-talk-head{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.08)}\n.gsy-talk-head .gsy-photo{flex-basis:40px;width:40px;height:40px;border-radius:9px}\n.gsy-talk-head .gsy-photo span{font-size:18px}\n.gsy-talk-head b{flex:1;color:var(--who);filter:brightness(1.35)}\n.gsy-talk-head button{background:none;border:0;color:#ccc;font-size:18px;padding:6px 8px;cursor:pointer}\n.gsy-talk-log{flex:1;overflow:auto;padding:10px 12px;display:flex;flex-direction:column;gap:8px}\n.gsy-talk-log p{margin:0;max-width:82%;padding:8px 11px;border-radius:12px;font-size:15px;line-height:1.5;word-break:keep-all}\n.gsy-talk-log .npc{align-self:flex-start;background:#26323a}\n.gsy-talk-log .me{align-self:flex-end;background:#3d5a4f}\n.gsy-talk-log .wait{opacity:.6;animation:gsy-blink 1s infinite}\n.gsy-talk form{display:flex;gap:8px;padding:10px 12px;border-top:1px solid rgba(255,255,255,.08)}\n.gsy-talk input{flex:1;min-width:0;padding:10px 12px;font-size:16px;border-radius:9px;border:1px solid rgba(255,255,255,.2);background:#0b1013;color:#eef}\n.gsy-talk form button{padding:0 16px;border-radius:9px;border:0;background:#b8a36a;color:#1a1a12;font-weight:700;font-size:15px}\n.gsy-talk form button:disabled{opacity:.5}\n@media (max-width:560px){.gsy-photo{flex-basis:56px;width:56px;height:56px}.gsy-text{font-size:15px}.gsy-box{min-height:96px;padding:10px 12px 12px}}\n.gsy-top .gsy-dock{top:var(--gsy-dock-top,16%);bottom:auto;flex-direction:column-reverse}\n/* 폰 가로(낮은 화면): 좌우 터치 버튼 사이 가운데 위쪽에 작게. 선택지는 두 칸씩 */\n@media (max-height:500px){.gsy-box,.gsy-choices{width:min(52%,560px)}.gsy-dock{align-items:flex-start;padding-left:17%}.gsy-box{min-height:0;padding:7px 10px 9px;gap:8px;border-radius:10px}.gsy-photo{flex-basis:40px;width:40px;height:40px;border-radius:8px}.gsy-photo span{font-size:18px}.gsy-name{font-size:12px;margin-bottom:2px}.gsy-text{font-size:13px;line-height:1.45;min-height:2.9em}.gsy-choices{display:grid;grid-template-columns:1fr 1fr;gap:4px}.gsy-choices button{padding:6px 9px;font-size:12px;gap:6px;border-radius:8px}.gsy-dock{gap:5px}.gsy-skip{top:auto;bottom:8px;left:50%;right:auto;transform:translateX(-50%);padding:2px 10px;font-size:16px}}\n/* 컷신 도트 애니메이션: 화면 전체, 검은 바탕, 도트가 뭉개지지 않게 */\n.gsy-video{position:absolute;inset:0;background:#000;pointer-events:auto;z-index:30;display:flex;align-items:center;justify-content:center}\n.gsy-video[hidden]{display:none}\n.gsy-video canvas{width:100%;height:100%;object-fit:contain;image-rendering:pixelated}\n.gsy-vsub{position:absolute;left:50%;bottom:4%;transform:translateX(-50%);width:max-content;max-width:min(92%,1100px);box-sizing:border-box;margin:0;padding:4px 14px;font-size:22px;line-height:1.5;text-align:center;word-break:keep-all;color:#f1f3f0;text-shadow:2px 2px 0 #000}\n.gsy-vsub[hidden]{display:none}\n.gsy-vsub b{color:#ffe27a;font-weight:400;margin-right:8px}\n.gsy-vskip,.gsy-vsound{position:absolute;top:10px;padding:4px 14px}\n.gsy-vskip{right:12px}\n.gsy-vsound{left:12px}\n.gsy-vsound[hidden]{display:none}\n@media (max-height:500px){.gsy-vsub{font-size:16px;padding:2px 10px;bottom:3%}.gsy-vskip,.gsy-vsound{font-size:16px;top:6px;padding:2px 10px}}\n";
 
   // src/game/action/story/script.ts
   var MOODS = /* @__PURE__ */ new Set(["base", "smile", "serious", "hurt", "surprise"]);
@@ -4174,22 +4310,4 @@ ${who}: ${text2.replace(/\n/g, " ")}
   var base = { effects: ["favor", "hint"] };
   var d2 = (x) => ({ ...base, ...x, effects: x.effects ?? base.effects });
   var AGENT_NPCS = {
-    jyaldi: d2({ id: "jyaldi", name: "쟈알디", sheet: "쟈알디", group: "agent", color: "#c0392b", photo: "Jyaldi", role: "종합대응팀 부장. 본부 부장실에서 결재하고, 출동 땐 현장 지휘.", speech: "짧은 평서형 반말, 보고서처럼 묻는다. 감정 표현 거의 없음. 한숨 섞인 「하아, 잼트리.」", effects: ["favor", "hint", "join"], greet: ["보고해.", "…용건."], lines: ["짧게 말해. 듣고 있다.", "살아서 왔으면 됐다. 다음.", "결재는 결과 보고 한다.", "하아. 잼트리한테 말해."] }),
-    eileen: d2({ id: "eileen", name: "에일린", sheet: "에일린", group: "agent", color: "#d8c98a", photo: "Aileen", role: "종합대응팀 선임. 부장 없을 때 현장 지휘.", speech: "한두 마디 반말. 직함으로 부르면 고쳐 준다(「에일린이라고 불러.」).", effects: ["favor", "hint", "join"], greet: ["준비됐어?", "에일린."], lines: ["됐어.", "증명해.", "가는 길에 죽지 마. 회수 귀찮아.", "몰라. 그래도 해."] }),
-    spangdal: d2({ id: "spangdal", name: "스팡달", sheet: "스팡달", group: "agent", color: "#8e6bd1", photo: "Spangdal", role: "종합대응팀 선임 전투 요원, 가시 이능.", speech: "느리게 끄는 반말, 「후후」 웃음, 무서운 상상을 속삭이듯 묻는다. 끝에 「농담이야」.", effects: ["favor", "hint", "join"], greet: ["어머, 왔어? 후후.", "자기소개 안 해? 곧 죽을 거라서?"], lines: ["있잖아, 언제 죽을 것 같아? 내일? 모레? 후후.", "후후후. 농담이야.", "데쥬레 봤어? 요즘 나 피해 다니더라.", "무서워? 그 얼굴 좋다."] }),
-    geshugan: d2({ id: "geshugan", name: "게슈간", sheet: "게슈간", group: "agent", color: "#9fc6e8", photo: "Geshugan", role: "종합대응팀 제압 담당.", speech: "아주 짧은 반말과 말줄임표. 사과는 「그래. 미안.」", effects: ["favor", "hint", "join"], greet: ["…뭐.", "…왜."], lines: ["…그래.", "알았어. 미안.", "…총 잘 쏘네?", "…거리 둬."] }),
-    gorgodio: d2({ id: "gorgodio", name: "고르고디오", sheet: "고르고디오", group: "agent", color: "#d98b3a", photo: "Gorgodio", role: "진압팀 선임, 중장갑 전열.", speech: "크고 정직한 말투, 존댓말과 반말 섞임, 기분 좋으면 사투리.", effects: ["favor", "hint", "join"], greet: ["어이! 무슨 일이고?", "건물 먼저 확인하고 올게!"], lines: ["위험하다 안 했나! 뒤로 빠져 있어라!", "요원 될 깜냥이 있네. 좋다!", "봉쇄 먼저다. 늦으면 더 비싸게 먹힌다!", "쉬어라. 고생 많았다."] }),
-    kyuras: d2({ id: "kyuras", name: "큐라스", sheet: "큐라스", group: "agent", color: "#9bd36a", photo: "Kyuras", role: "진압팀 선임, 화염 이능 원거리 지원.", speech: "밝고 빠른 반말, 느낌표 많음. 틈만 나면 진압팀 전입 권유.", effects: ["favor", "hint", "join"], greet: ["오! 진압팀 올 생각 있어?!", "왔냐! 스타 한 판?"], lines: ["진압팀은 너 같은 인재가 필요해! 전입 신청서 써!", "그 대사 백 번은 들었다!", "스팡달 선배랑 일하기 무섭지?!", "불 필요하면 불러!"] }),
-    deadpole: d2({ id: "deadpole", name: "데드폴", sheet: "데드폴", group: "agent", color: "#6f7c8a", photo: "Deadpole", role: "종합대응팀 회수·노출 담당. 죽어도 돌아온다.", speech: "조심스러운 존댓말, 말 끊고 다시 시작, 고맙다는 말이 많다.", effects: ["favor", "hint", "join"], greet: ["아, 저… 무슨 일이세요?", "…늘 신세 지고 있어요."], lines: ["괜찮으세요…? 아, 저 말고요. 그쪽이요.", "…고마워요. 정말로요.", "제가 먼저 들어갈게요. 저는… 돌아오니까요.", "등 찔리면 아프겠죠. 그래도 살아요, 저는."] }),
-    rojemon: d2({ id: "rojemon", name: "로제몬", sheet: "로제몬", group: "agent", color: "#b05cc8", photo: "Rojemon", role: "종합대응팀 정신 간섭·최면 해제 담당 (자칭 사무직).", speech: "빠르고 날카로운 반말, 투덜거림. 일할 땐 목소리가 차분해진다.", effects: ["favor", "hint", "join"], greet: ["헛소리하지 마.", "현장이면 안 가."], lines: ["그거 아무 맛도 안 나.", "못 해. 안 돼. 뭘 원하는데?", "옆에 있어.", "목숨 한 번 빚졌으니까 이번은 봐줄게."] })
-  };
-  var HQ_NPCS = {
-    jaemtri: d2({ id: "jaemtri", name: "잼트리", sheet: "잼트리", group: "hq", color: "#27685b", photo: "Jaemtri", role: "종합대응팀 내근 선임. 임무 창구, 생존자 면담, 매뉴얼 관리. 탕비실 연유 커피 담당.", speech: "다정하고 장난스러운 반말, 스스로 「언니」. 웃는 얼굴로 절차를 집행(「스톱. 이름 말하지 마.」). 부장(쟈알디)에게만 존댓말.", greet: ["어머, 후배 왔어?", "응, 후배. 무슨 얘기 하고 싶어?"], lines: ["고민 있으면 꼭 언니한테 물어봐.", "응응. 그건 언니가 알아볼게. 대신 진술서 먼저.", "출동 전에 규칙서 한 번만 더 봐. 진짜로.", "연유 커피 남았는데, 마실래?"], rules: [[/이름|본명/, ["스톱. 이름 말하지 마. 응, 그렇지. 착하다."]], [/커피|연유/, ["연유 커피는 언니만 타. 레시피는 묻지 마."]]], never: ["본명을 묻거나 말하지 않는다", "현장에 나가지 않는다"] }),
-    gognija: d2({ id: "gognija", name: "고그니쟈", sheet: "고그니쟈", group: "hq", color: "#c9a227", photo: "Gognija", role: "격리팀 연구 책임자. 지하 연구실에서 회수물 연구.", speech: "고풍스러운 하게체(「~하게」「~일세」「~라네」), 최대 음량, 느낌표 많음.", greet: ["오오! 무엇이든 묻게! 대답은 장담 못 하네!", "자료를 가져왔나!!!"], lines: ["좋은 질문일세! 대답은… 연구가 끝나면 알려 주겠네!", "이곳에서는 누구나 달달한 믹스커피를 마셔야 하네!", "데쥬레!!! 커피 좀 타 오게!!!", "아, 그건 비상 탈출 장치라네!"], rules: [[/블랙|아메리카노/, ["블랙이라니! 설탕 두 스푼 추가일세!"]]] }),
-    dejure: d2({ id: "dejure", name: "데쥬레", sheet: "데쥬레", group: "hq", color: "#e58fb5", photo: "Dejure", role: "격리팀 연구원. 감정실에서 회수물 분류·감정, 믹스커피 제조.", speech: "더듬고 말끝 흐리는 존댓말(「저, 저기…」), 놀라면 「아, 아와와…!」. 유물 다룰 때만 또렷.", greet: ["네, 네…? 저, 저한테요…?", "아, 안녕하세요…"], lines: ["저, 저기… 다시 한 번만…", "조, 조심히 다녀오세요… 꼭이요…", "황금 비율은… 비, 비밀이에요…", "주시면… 분류할게요. 무섭지만요."], rules: [[/스팡달/, ["아, 아와와…! 제, 제가 잘못했어요…!"]], [/선배/, ["서, 선배요…? 헤헤…"]]] }),
-    konjyuce: d2({ id: "konjyuce", name: "콘쥬스", sheet: "콘쥬스", group: "hq", color: "#e0457b", photo: "Konjyuce", minor: true, role: "17세 고등학생 요원. 괴력. 정비·보급실 담당, 전투 투입은 팀이 막는다.", speech: "밝고 고집 센 존댓말. 호칭을 상황 따라 바꾼다(아저씨→오빠, 선배님→언니). 호칭이 바뀌면 부탁(간식)이 온다.", greet: ["네! 뭐든 물어보세요!", "오빠, 아니 선배님! 안녕하세요!"], lines: ["잠깐만요! 저도 이 팀 정식 멤버거든요!", "그 말 좀 이상한데요? 아까랑 다르잖아요.", "그거 들어 드릴까요? 상자 열 개까진 괜찮아요!", "저도 갈 수 있는데… 네, 알아요. 팀 결정."], never: ["전투에 나가겠다고 우기지 않는다"] })
-  };
-  var MERCHANT_NPCS = {
-    madeokhee: d2({ id: "madeokhee", name: "마덕희", sheet: "마덕희", group: "merchant", color: "#7d2a3a", photo: "Ma Deok-hee", role: "중림 장물 매입점 「헐값매입」 주인. 출동 중 휴식방에 나타나 회수물을 사고 물건을 판다(현금).", speech: "다정한 척 깎는 존댓말, 상대를 「자기야」. 상대 말을 작게 따라 하고 값을 후려친다(「80. 얘기 끝났어요. 쟁반 열렸습니다.」).", effects: ["favor", "trade", "hint", "leave"], greet: ["어머, 자기야. 뭐 팔 거 있어요?", "현금만 받아요. 관리국 결재는 여기서 안 통하고."], lines: ["자기야, 그런 얘기는 쟁반 위에 뭐 올려놓고 해요.", "흐음. 계속해 봐요.", "80. 얘기 끝났어요. 쟁반 열렸습니다.", "'열 배는 하는 거예요.' 열 배. 음. 그럼 열 배 받으러 가세요."] }),
-    goyeonji: d2({ id: "goyeonji", name: "고연지", sheet: "고연지", group: "merchant", color: "#5a6f7d", photo: "Go Yeon-ji", role: "중림 무면허 외과의. 출동 중 휴식방에서 봉합·처치를 판다(선불).", speech: "건조하고 평평한 존댓말 반, 반말 반. 손상·수리·값을 정비사처럼 늘어놓는다.", effects: ["favor", "trade", "hint", "leave"], greet: ["어디 찢어졌어? 보여 줘 봐.", "선불이야. 마취는 별도고."], lines: ["갈비 두 대. 고칠 수 있어. 돈 먼저.", "병원엔 심의위원회가 있지. 나한텐 가격표가 있고.", "아니. 그 태도는 내가 수술 안 하는 합병증이야. 문은 뒤에.", "다음엔 덜 다쳐서 와."] }),
-    yunjia: d2({ id: "yunjia", name: "윤지아", sheet: "윤지아", group: "merchant", color: "#8fb3a0", photo: "Yun Ji-a", role: "
+    jyaldi: d2({ id: "jyaldi", name: "쟈알디", sheet: "쟈알디", group: "agent", color: "#c0392b", photo: "Jyaldi", role: "종합대응팀 부장. 본부 부장실에서 결재하고, 출동 땐 현장 지휘.", speech: "짧은 평서형 반말, 보고서처럼 묻는다. 감정 표현 거의 없음. 한숨 섞인 「하아, 잼트리.」", effects: ["favor", "hint", "join"], greet: ["보고해.", "

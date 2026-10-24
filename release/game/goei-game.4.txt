@@ -1,4 +1,131 @@
-,
+ ` · 빚 ${run.debt}` : ""}</span></header>
+      <p class="say">「${shop.greet}」</p>${rows}${bag}<p class="msg">${msg}</p><footer><button data-close>나가기</button></footer></div>`;
+      box2.querySelectorAll("canvas[data-icon]").forEach((c) => drawItemIcon(c.getContext("2d"), c.dataset.icon, 0, 0, c.width));
+      const list = [...box2.querySelectorAll(".row")];
+      sel = Math.max(0, Math.min(sel, list.length - 1));
+      list[sel]?.classList.add("sel");
+    };
+    const press = (b) => {
+      if (!cur) return;
+      if (b.dataset.close !== void 0) return close();
+      if (b.dataset.sell !== void 0) {
+        msg = `${sell(cur.shop, cur.run, +b.dataset.sell)}원 받음`;
+        return render();
+      }
+      const k = b.dataset.k;
+      if (!k) return;
+      const r = buy2(cur.shop, cur.run, k, cur.context?.());
+      if (r.ok) {
+        cur.onBuy(r);
+        msg = `받음: ${r.got}`;
+      } else msg = r.message ?? (r.currency === "hp" ? "체력이 모자라거나 체력 거래를 사용할 수 없다" : WHY[r.why]);
+      render();
+    };
+    box2.addEventListener("click", (e) => {
+      const b = e.target.closest("button");
+      if (b) press(b);
+    });
+    const onKey = (e) => {
+      if (!cur) return;
+      e.stopImmediatePropagation();
+      e.preventDefault();
+      if (e.repeat) return;
+      const list = [...box2.querySelectorAll(".row")];
+      if (e.code === "Escape" || e.code === "KeyQ") close();
+      else if (e.code === "ArrowDown" || e.code === "ArrowUp") {
+        sel = (sel + (e.code === "ArrowDown" ? 1 : list.length - 1)) % Math.max(1, list.length);
+        render();
+        list[sel]?.scrollIntoView({ block: "nearest" });
+      } else if (["KeyA", "KeyE", "Enter", "Space"].includes(e.code) && list[sel] && !list[sel].disabled) press(list[sel]);
+    };
+    window.addEventListener("keydown", onKey, true);
+    function close() {
+      if (!cur) return;
+      const c = cur.onClose;
+      cur = null;
+      box2.hidden = true;
+      box2.innerHTML = "";
+      c?.();
+    }
+    return {
+      open(shop, run, onBuy, onClose, context) {
+        cur = { shop, run, onBuy, onClose, context };
+        sel = 0;
+        msg = "";
+        box2.hidden = false;
+        render();
+      },
+      close,
+      isOpen: () => !!cur,
+      dispose() {
+        window.removeEventListener("keydown", onKey, true);
+        box2.remove();
+      }
+    };
+  }
+
+  // src/game/action/enemy/debuff.ts
+  var DEBUFF_TEXT = {
+    bleed: "출혈 · 피가 멎지 않는다",
+    taint: "오염 · 숨이 탁해진다",
+    headache: "두통 · 머리가 울린다",
+    confuse: "혼란 · 방향이 뒤집힌다",
+    fear: "공포 · 몸이 굳는다",
+    slow: "느려졌다",
+    silence: "목소리가 안 나온다"
+  };
+  var seen = /* @__PURE__ */ new WeakMap();
+  var armed = [];
+  function state(w) {
+    let s2 = seen.get(w);
+    if (!s2) seen.set(w, s2 = { tick: -1, hp: w.player.hp, said: {} });
+    return s2;
+  }
+  function emitDebuff(w, debuff, from) {
+    const s2 = state(w);
+    const quiet = w.tick - (s2.said[debuff.kind] ?? -999) < 90;
+    if (!quiet) s2.said[debuff.kind] = w.tick;
+    w.emit({ type: "custom", name: "debuff", data: { ...debuff, from, text: quiet ? void 0 : DEBUFF_TEXT[debuff.kind] } });
+  }
+  function armDebuff(hit2, debuff, from) {
+    armed.push({ hit: hit2, debuff, from });
+  }
+  function checkDebuffs(w) {
+    const s2 = state(w);
+    if (s2.tick === w.tick) return;
+    s2.tick = w.tick;
+    const p = w.player;
+    if (p.hp < s2.hp) {
+      for (const a of armed) {
+        const h = a.hit;
+        if (p.x >= h.x0 - 30 && p.x <= h.x1 + 30 && Math.abs(p.y - h.y) <= (h.dy ?? 20) + 20) {
+          emitDebuff(w, a.debuff, a.from);
+          break;
+        }
+      }
+    }
+    s2.hp = p.hp;
+    armed = [];
+  }
+
+  // src/game/action/enemy/geom.ts
+  function overlap2(a, b) {
+    return a.x0 < b.x1 && b.x0 < a.x1 && a.z0 < b.z1 && b.z0 < a.z1 && Math.abs(a.y - b.y) <= (a.dy ?? 18) + (b.dy ?? 18);
+  }
+  function toWorld2(b, x, y, z, dir) {
+    const a = x + b.fx0 * dir, c = x + b.fx1 * dir;
+    return { x0: Math.min(a, c), x1: Math.max(a, c), z0: z + b.z0, z1: z + b.z1, y, dy: b.dy, part: b.part };
+  }
+
+  // src/game/action/enemy/proj.ts
+  var PROJ = {
+    bullet: { label: "탄", w: 18, h: 6, z: 128, speed: 17, life: 48, dmg: 5, react: "none", color: "#ffd36b" },
+    shard: { label: "조각", w: 24, h: 24, z: 110, speed: 9, life: 80, dmg: 8, react: "flinch", push: 4, homeY: 1.2, color: "#a99cf0" },
+    static: { label: "지지직", w: 40, h: 170, z: 0, speed: 6.5, life: 110, dmg: 7, react: "stagger", push: 8, unblockable: true, debuff: { kind: "headache", ticks: 60 }, color: "#9fd3e6" },
+    table: { label: "밥상", w: 90, h: 40, z: 150, speed: 8, vz: 9, gravity: 0.55, life: 70, dmg: 18, react: "down", push: 8, color: "#8a6a44" },
+    chair: { label: "날아오는 가구", w: 70, h: 60, z: 90, speed: 11, life: 140, dmg: 14, react: "stagger", push: 10, color: "#7a5a36" },
+    spoon: { label: "숟가락", w: 22, h: 6, z: 120, speed: 15, life: 50, dmg: 4, react: "flinch", color: "#d8d8d8" },
+    web: { label: "거미줄", w: 36, h: 36, z: 90, speed: 7, life: 90, dmg: 2, react: "none", debuff: { kind: "slow", ticks: 120 }, color: "#e8e2d0" },
     ring: { label: "충격파", w: 20, h: 26, z: 0, speed: 0, life: 26, dmg: 10, react: "stagger", push: 10, low: true, grow: 13, pierce: true, unblockable: true, color: "#e86b4f" },
     beam: { label: "모서리 빛", w: 1400, h: 46, z: 70, speed: 0, life: 34, dmg: 16, react: "stagger", push: 6, pierce: true, arm: 20, color: "#c8b8ff" },
     cloud: { label: "썩은 내", w: 160, h: 150, z: 0, speed: 0, life: 210, dmg: 2, react: "none", pierce: true, every: 15, unblockable: true, debuff: { kind: "taint", ticks: 300 }, color: "#7c8a4a" },
@@ -4810,137 +4937,4 @@
         const f = b.frame();
         for (const h of f.hurt) rect2(h, "#3dff7a");
         for (const h of f.hit) rect2(h, h.grab ? "#ffe03d" : "#ff3d3d");
-        ctx.fillStyle = "#fff";
-        ctx.fillRect(b.x - camX - 3, b.y - 3, 6, 6);
-      }
-      ctx.fillStyle = "#ffffffcc";
-      ctx.font = "16px monospace";
-      const p = w.player;
-      ctx.fillText(`판정 보기 · ${p.state} 장 ${p.mf} · x ${p.x.toFixed(0)} y ${p.y.toFixed(0)} z ${p.z.toFixed(0)} · 틱 ${w.tick}`, 20, SCREEN_H - 16);
-    }
-    function hud(w) {
-      const p = w.player;
-      ctx.fillStyle = "rgba(0,0,0,0.55)";
-      ctx.fillRect(20, 20, 420, 92);
-      ctx.fillStyle = "#e8eef0";
-      ctx.font = pfont(20).f;
-      ctx.fillText("쟈알디", 34, 46);
-      ctx.fillStyle = "#3a2224";
-      ctx.fillRect(120, 30, 300, 18);
-      ctx.fillStyle = p.hp < p.hpMax * 0.3 ? "#ff5148" : "#e2b23c";
-      ctx.fillRect(120, 30, 300 * p.hp / p.hpMax, 18);
-      ctx.fillStyle = "#222b30";
-      ctx.fillRect(120, 54, 300, 8);
-      ctx.fillStyle = p.gauge >= 100 ? w.tick % 10 < 5 ? "#ffffff" : "#6ad0ff" : "#3f9fd6";
-      ctx.fillRect(120, 54, 3 * p.gauge, 8);
-      ctx.fillStyle = "#222b30";
-      ctx.fillRect(120, 66, 300, 5);
-      ctx.fillStyle = "#9ad08a";
-      ctx.fillRect(120, 66, 3 * p.guardMeter, 5);
-      ctx.font = pfont(16).f;
-      ctx.fillStyle = "#c9d3d8";
-      ctx.fillText("탄", 34, 98);
-      for (let i = 0; i < p.mag; i++) {
-        ctx.fillStyle = i < p.ammo ? "#ffd36a" : "#3a4247";
-        ctx.fillRect(60 + i * 14, 84, 9, 18);
-      }
-      ctx.fillStyle = "#c9d3d8";
-      ctx.fillText(`/ ${p.reserve}${p.moveKey === "reload" ? "  재장전…" : ""}`, 60 + p.mag * 14 + 6, 98);
-      ctx.fillText(p.skillCd > 0 ? `폭파 ${Math.ceil(p.skillCd / 30)}` : "폭파 준비", 300, 98);
-      w.items.forEach((it, i) => {
-        const x = 460 + i * 64;
-        ctx.fillStyle = "rgba(0,0,0,0.55)";
-        ctx.fillRect(x, 20, 58, 58);
-        ctx.fillStyle = "#8e9aa1";
-        ctx.font = pfont(14).f;
-        ctx.fillText(String(i + 1), x + 4, 36);
-        if (it) {
-          ctx.fillStyle = it.n > 0 ? "#e8eef0" : "#5a646a";
-          ctx.fillText(it.label, x + 4, 58);
-          ctx.fillText(`×${it.n}`, x + 30, 74);
-        }
-      });
-      if (p.combo >= 2) {
-        ctx.save();
-        ctx.font = pfont(54).f;
-        ctx.textAlign = "right";
-        ctx.fillStyle = "#ffd36a";
-        ctx.strokeStyle = "#000";
-        ctx.lineWidth = 6;
-        ctx.strokeText(`${p.combo} HIT`, SCREEN_W - 30, 80);
-        ctx.fillText(`${p.combo} HIT`, SCREEN_W - 30, 80);
-        ctx.restore();
-      }
-      const boss2 = w.boss();
-      if (boss2) {
-        ctx.fillStyle = "rgba(0,0,0,0.6)";
-        ctx.fillRect(240, SCREEN_H - 62, 800, 40);
-        ctx.fillStyle = "#e8eef0";
-        ctx.font = pfont(18).f;
-        ctx.fillText(boss2.label, 252, SCREEN_H - 36);
-        ctx.fillStyle = "#5a1e1e";
-        ctx.fillRect(470, SCREEN_H - 50, 556, 16);
-        ctx.fillStyle = "#ff5148";
-        ctx.fillRect(470, SCREEN_H - 50, 556 * boss2.hp / boss2.hpMax, 16);
-      }
-    }
-    function overlayText(w) {
-      if (w.goT > 0 && !w.paused && w.tick % 20 < 13) {
-        drawGoSign(ctx, 790, 18, w.tick / 30);
-      }
-      if (w.banner && opt.hud) {
-        const a = Math.min(1, w.banner.t / 15);
-        ctx.fillStyle = `rgba(0,0,0,${0.6 * a})`;
-        ctx.fillRect(0, 170, SCREEN_W, 70);
-        ctx.fillStyle = `rgba(232,238,240,${a})`;
-        ctx.font = pfont(34).f;
-        ctx.textAlign = "center";
-        ctx.fillText(w.banner.text, SCREEN_W / 2, 217);
-        ctx.textAlign = "left";
-      }
-      if (w.subtitle && opt.hud) {
-        ctx.font = pfont(24).f;
-        ctx.textAlign = "center";
-        const tw = ctx.measureText(w.subtitle.text).width;
-        ctx.fillStyle = "rgba(0,0,0,0.65)";
-        ctx.fillRect(SCREEN_W / 2 - tw / 2 - 18, 130, tw + 36, 40);
-        ctx.fillStyle = "#fff";
-        ctx.fillText(w.subtitle.text, SCREEN_W / 2, 159);
-        ctx.textAlign = "left";
-      }
-    }
-    function cutin(w) {
-      const k = 1 - w.cutin / 22;
-      ctx.fillStyle = "rgba(0,0,0,0.72)";
-      ctx.fillRect(0, 0, SCREEN_W, SCREEN_H);
-      ctx.fillStyle = "#b8352c";
-      const bandY = 230;
-      ctx.fillRect(0, bandY, SCREEN_W, 260);
-      ctx.strokeStyle = "rgba(255,255,255,0.25)";
-      for (let i = 0; i < 18; i++) {
-        const y = bandY + (i * 37 + w.tick * 23) % 260;
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(SCREEN_W, y);
-        ctx.stroke();
-      }
-      const x = lerp2(-400, 260, Math.min(1, k * 3));
-      if (art6.cutin) {
-        ctx.imageSmoothingEnabled = false;
-        ctx.drawImage(art6.cutin, x - 200, bandY - 40, 340, 340);
-      }
-      ctx.font = pfont(72).f;
-      ctx.fillStyle = "#fff";
-      ctx.fillText("전부 폭파", x + 220, bandY + 160);
-    }
-    return {
-      draw(w, alpha) {
-        ctx.imageSmoothingEnabled = false;
-        const shake = w.shakeT > 0 ? (w.tick % 2 ? 1 : -1) * w.shakeP * 2 : 0;
-        const camX = Math.round(lerp2(w.prevCamX, w.camX, alpha));
-        ctx.save();
-        ctx.translate(shake, w.shakeT > 0 ? w.tick % 3 - 1 : 0);
-        background(w, camX);
-        const layers = w.floor.depthLayers ?? [];
-        const props2 = [...w.props.map((p) => ({ y: p.y, prop: p })), ...layers.map((l) => ({ y: l.y, layer: l }))].sort((a, b) => a.y - b.y);
-        const all = [w.player, ...
+        ctx.

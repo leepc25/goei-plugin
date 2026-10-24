@@ -1,4 +1,4 @@
-// goei-body 0.16.55
+// goei-body 0.16.56
 "use strict";
 (() => {
   // src/core/dispatch.ts
@@ -246,7 +246,7 @@ ${tpl.replace(/\[\[INPUT\]\]/g, extra)}`;
   function brandHtml(text, signal) {
     return `<span style="color:${text}">괴이</span><span style="color:${signal};font-weight:300;margin:0 .3em">ː</span><span style="color:${signal}">ANOMALY</span>`;
   }
-  var CARD_FILE = "괴이_이면세계.charx";
+  var CARD_FILE = "괴이_ANOMALY.charx";
 
   // src/ui/landing.ts
   var MONO = "'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace";
@@ -4283,4 +4283,4 @@ ${themeVars("[x-goei-fab]")}
     return false;
   }
   function reconcileUnread(st, previous) {
-    con
+    const ol

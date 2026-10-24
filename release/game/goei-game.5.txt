@@ -1,4 +1,137 @@
-w.bodies].filter((b) => b.alive);
+fillStyle = "#fff";
+        ctx.fillRect(b.x - camX - 3, b.y - 3, 6, 6);
+      }
+      ctx.fillStyle = "#ffffffcc";
+      ctx.font = "16px monospace";
+      const p = w.player;
+      ctx.fillText(`판정 보기 · ${p.state} 장 ${p.mf} · x ${p.x.toFixed(0)} y ${p.y.toFixed(0)} z ${p.z.toFixed(0)} · 틱 ${w.tick}`, 20, SCREEN_H - 16);
+    }
+    function hud(w) {
+      const p = w.player;
+      ctx.fillStyle = "rgba(0,0,0,0.55)";
+      ctx.fillRect(20, 20, 420, 92);
+      ctx.fillStyle = "#e8eef0";
+      ctx.font = pfont(20).f;
+      ctx.fillText("쟈알디", 34, 46);
+      ctx.fillStyle = "#3a2224";
+      ctx.fillRect(120, 30, 300, 18);
+      ctx.fillStyle = p.hp < p.hpMax * 0.3 ? "#ff5148" : "#e2b23c";
+      ctx.fillRect(120, 30, 300 * p.hp / p.hpMax, 18);
+      ctx.fillStyle = "#222b30";
+      ctx.fillRect(120, 54, 300, 8);
+      ctx.fillStyle = p.gauge >= 100 ? w.tick % 10 < 5 ? "#ffffff" : "#6ad0ff" : "#3f9fd6";
+      ctx.fillRect(120, 54, 3 * p.gauge, 8);
+      ctx.fillStyle = "#222b30";
+      ctx.fillRect(120, 66, 300, 5);
+      ctx.fillStyle = "#9ad08a";
+      ctx.fillRect(120, 66, 3 * p.guardMeter, 5);
+      ctx.font = pfont(16).f;
+      ctx.fillStyle = "#c9d3d8";
+      ctx.fillText("탄", 34, 98);
+      for (let i = 0; i < p.mag; i++) {
+        ctx.fillStyle = i < p.ammo ? "#ffd36a" : "#3a4247";
+        ctx.fillRect(60 + i * 14, 84, 9, 18);
+      }
+      ctx.fillStyle = "#c9d3d8";
+      ctx.fillText(`/ ${p.reserve}${p.moveKey === "reload" ? "  재장전…" : ""}`, 60 + p.mag * 14 + 6, 98);
+      ctx.fillText(p.skillCd > 0 ? `폭파 ${Math.ceil(p.skillCd / 30)}` : "폭파 준비", 300, 98);
+      w.items.forEach((it, i) => {
+        const x = 460 + i * 64;
+        ctx.fillStyle = "rgba(0,0,0,0.55)";
+        ctx.fillRect(x, 20, 58, 58);
+        ctx.fillStyle = "#8e9aa1";
+        ctx.font = pfont(14).f;
+        ctx.fillText(String(i + 1), x + 4, 36);
+        if (it) {
+          ctx.fillStyle = it.n > 0 ? "#e8eef0" : "#5a646a";
+          ctx.fillText(it.label, x + 4, 58);
+          ctx.fillText(`×${it.n}`, x + 30, 74);
+        }
+      });
+      if (p.combo >= 2) {
+        ctx.save();
+        ctx.font = pfont(54).f;
+        ctx.textAlign = "right";
+        ctx.fillStyle = "#ffd36a";
+        ctx.strokeStyle = "#000";
+        ctx.lineWidth = 6;
+        ctx.strokeText(`${p.combo} HIT`, SCREEN_W - 30, 80);
+        ctx.fillText(`${p.combo} HIT`, SCREEN_W - 30, 80);
+        ctx.restore();
+      }
+      const boss2 = w.boss();
+      if (boss2) {
+        ctx.fillStyle = "rgba(0,0,0,0.6)";
+        ctx.fillRect(240, SCREEN_H - 62, 800, 40);
+        ctx.fillStyle = "#e8eef0";
+        ctx.font = pfont(18).f;
+        ctx.fillText(boss2.label, 252, SCREEN_H - 36);
+        ctx.fillStyle = "#5a1e1e";
+        ctx.fillRect(470, SCREEN_H - 50, 556, 16);
+        ctx.fillStyle = "#ff5148";
+        ctx.fillRect(470, SCREEN_H - 50, 556 * boss2.hp / boss2.hpMax, 16);
+      }
+    }
+    function overlayText(w) {
+      if (w.goT > 0 && !w.paused && w.tick % 20 < 13) {
+        drawGoSign(ctx, 790, 18, w.tick / 30);
+      }
+      if (w.banner && opt.hud) {
+        const a = Math.min(1, w.banner.t / 15);
+        ctx.fillStyle = `rgba(0,0,0,${0.6 * a})`;
+        ctx.fillRect(0, 170, SCREEN_W, 70);
+        ctx.fillStyle = `rgba(232,238,240,${a})`;
+        ctx.font = pfont(34).f;
+        ctx.textAlign = "center";
+        ctx.fillText(w.banner.text, SCREEN_W / 2, 217);
+        ctx.textAlign = "left";
+      }
+      if (w.subtitle && opt.hud) {
+        ctx.font = pfont(24).f;
+        ctx.textAlign = "center";
+        const tw = ctx.measureText(w.subtitle.text).width;
+        ctx.fillStyle = "rgba(0,0,0,0.65)";
+        ctx.fillRect(SCREEN_W / 2 - tw / 2 - 18, 130, tw + 36, 40);
+        ctx.fillStyle = "#fff";
+        ctx.fillText(w.subtitle.text, SCREEN_W / 2, 159);
+        ctx.textAlign = "left";
+      }
+    }
+    function cutin(w) {
+      const k = 1 - w.cutin / 22;
+      ctx.fillStyle = "rgba(0,0,0,0.72)";
+      ctx.fillRect(0, 0, SCREEN_W, SCREEN_H);
+      ctx.fillStyle = "#b8352c";
+      const bandY = 230;
+      ctx.fillRect(0, bandY, SCREEN_W, 260);
+      ctx.strokeStyle = "rgba(255,255,255,0.25)";
+      for (let i = 0; i < 18; i++) {
+        const y = bandY + (i * 37 + w.tick * 23) % 260;
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(SCREEN_W, y);
+        ctx.stroke();
+      }
+      const x = lerp2(-400, 260, Math.min(1, k * 3));
+      if (art6.cutin) {
+        ctx.imageSmoothingEnabled = false;
+        ctx.drawImage(art6.cutin, x - 200, bandY - 40, 340, 340);
+      }
+      ctx.font = pfont(72).f;
+      ctx.fillStyle = "#fff";
+      ctx.fillText("전부 폭파", x + 220, bandY + 160);
+    }
+    return {
+      draw(w, alpha) {
+        ctx.imageSmoothingEnabled = false;
+        const shake = w.shakeT > 0 ? (w.tick % 2 ? 1 : -1) * w.shakeP * 2 : 0;
+        const camX = Math.round(lerp2(w.prevCamX, w.camX, alpha));
+        ctx.save();
+        ctx.translate(shake, w.shakeT > 0 ? w.tick % 3 - 1 : 0);
+        background(w, camX);
+        const layers = w.floor.depthLayers ?? [];
+        const props2 = [...w.props.map((p) => ({ y: p.y, prop: p })), ...layers.map((l) => ({ y: l.y, layer: l }))].sort((a, b) => a.y - b.y);
+        const all = [w.player, ...w.bodies].filter((b) => b.alive);
         let pi = 0;
         const propsUpTo = (y) => {
           while (pi < props2.length && props2[pi].y <= y) {
@@ -353,7 +486,7 @@ w.bodies].filter((b) => b.alive);
     /** 든 것이 있을 때 A·S를 아이템 쪽이 받는다. 돌려준 동작을 재생, null이면 엔진 기본 */
     itemAct = null;
     seat = null;
-    sit(clip, x, y, face, exit) {
+    sit(clip, x, y, face2, exit) {
       if (!this.clips[clip]?.length || this.z > 0 || this.phase !== "free" || this.move && this.moveKey !== "pickup") return false;
       this.cancelMove();
       this.buf = null;
@@ -364,7 +497,7 @@ w.bodies].filter((b) => b.alive);
       this.vx = this.vy = this.vz = 0;
       this.x = this.px = x;
       this.y = this.py = y;
-      this.dir = face;
+      this.dir = face2;
       this.resetLocomotion();
       this.seat = { clip, frame: 0, tick: 0, rising: false, exit };
       return true;
@@ -1904,7 +2037,7 @@ w.bodies].filter((b) => b.alive);
             this.hqRoot.hidden = !open;
             if (open) return;
           }
-          if (this.mods.blocking?.()) return;
+          if (this.mods.blocking?.() || this.mods.frozen?.()) return;
           w.step(p);
           if (w.ended) {
             const how = w.ended;
@@ -2140,7 +2273,7 @@ w.bodies].filter((b) => b.alive);
     const msg = bar2.querySelector(".gt-msg");
     let state2 = { visitor: { agentId: "", name: "" }, agents: [], turns: [] };
     let target = "";
-    let busy = false;
+    let busy2 = false;
     let dead = false;
     const bubbles = [];
     const me = () => state2.visitor.name || "나";
@@ -2156,8 +2289,8 @@ w.bodies].filter((b) => b.alive);
       return seen2.people.filter((q) => q.name !== target2 && Math.abs(q.x - p.x) < OVERHEAR).sort((a, b) => Math.abs(a.x - p.x) - Math.abs(b.x - p.x)).map((q) => state2.agents.find((a) => a.name === q.name && a.room)?.id ?? "").filter(Boolean);
     };
     const refresh = () => {
-      sendBtn.disabled = busy || !target;
-      input.disabled = busy;
+      sendBtn.disabled = busy2 || !target;
+      input.disabled = busy2;
     };
     const renderLog = () => {
       const agent = state2.agents.find((a) => a.name === target);
@@ -2213,11 +2346,11 @@ w.bodies].filter((b) => b.alive);
     const send = async () => {
       const raw = input.value.trim();
       const agent = state2.agents.find((a) => a.name === target && a.room);
-      if (busy || !raw || !agent) return;
+      if (busy2 || !raw || !agent) return;
       const bare = raw.replace(/^\*+|\*+$/g, "").trim();
       const text2 = act2 || /^\*/.test(raw) ? `*${bare}*` : raw;
       if (!bare) return;
-      busy = true;
+      busy2 = true;
       msg.textContent = "";
       input.value = "";
       say(me(), text2);
@@ -2243,13 +2376,13 @@ w.bodies].filter((b) => b.alive);
         msg.textContent = e instanceof Error ? e.message : String(e);
         input.value = input.value || raw;
       } finally {
-        busy = false;
+        busy2 = false;
         refresh();
         if (!dead && bar2.hasAttribute("data-open")) input.focus();
       }
     };
     void api.state().then((v) => {
-      if (!dead && !busy) state2 = v;
+      if (!dead && !busy2) state2 = v;
     }).catch(() => {
     });
     sendBtn.onclick = () => void send();
@@ -2274,7 +2407,7 @@ w.bodies].filter((b) => b.alive);
       seen2 = { people, player };
       for (let i = bubbles.length - 1; i >= 0; i--) if (bubbles[i].until < now) bubbles.splice(i, 1);
       const all = [...people, ...player ? [{ ...player, name: me() }] : []];
-      if (target && player && !busy) {
+      if (target && player && !busy2) {
         const p = people.find((q) => q.name === target);
         if (!p || Math.abs(p.x - player.x) > REACH * 1.6) close();
       }
@@ -2300,7 +2433,7 @@ w.bodies].filter((b) => b.alive);
         const tw = Math.ceil(c.measureText(p.name).width) + 8;
         const tagBottom = place3(x, tw, 18, Math.round(p.y + p.top));
         tag(c, p.name, x, tagBottom - 9, near2 || p.name === target || isPlayer);
-        const typing = isPlayer && !busy && bar2.hasAttribute("data-open") && document.activeElement === input && input.value.trim() !== "";
+        const typing = isPlayer && !busy2 && bar2.hasAttribute("data-open") && document.activeElement === input && input.value.trim() !== "";
         const b = bubbles.find((q) => q.who === p.name && (q.from ?? 0) <= now) ?? (typing ? { who: p.name, text: "", until: Infinity, pending: true } : void 0);
         if (b) {
           const size2 = bubbleSize(c, b, now);
@@ -4899,4 +5032,4 @@ w.bodies].filter((b) => b.alive);
   };
 
   // src/game/action/hq/style.css
-  var style_default = ".hq { --bg: #0b0f13; --panel: #141b21; --line: #3a4a54; --text: #e8e2c8; --dim: #9fb2ba; --accent: #ffd080; --warn: #ff9a8a; position: relative; display: flex; flex-direction: column; width: 100%; height: 100%; background: var(--bg); color: var(--text); font: 14px/1.5 system-ui, sans-serif; overflow: hidden; outline: none; color-scheme: dark; }\n.hq * { box-sizing: border-box; }\n.hq button:not(.gk-btn) { font: inherit; color: inherit; background: #1d2a33; border: 1px solid var(--line); border-radius: 6px; padding: 8px 12px; cursor: pointer; touch-action: manipulation; text-align: left; }\n.hq button:disabled { opacity: 0.45; cursor: default; }\n.hq button.sel:not(.gk-btn) { border-color: var(--accent); background: #3a2e14; }\n.hq button.primary:not(.gk-btn) { background: #6a4a14; border-color: var(--accent); font-weight: bold; }\n.hq-head { flex: none; padding: 6px 10px; border-bottom: 1px solid var(--line); }\n.hq-top { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; }\n.hq-top button { margin-left: auto; padding: 4px 10px; }\n.hq-places { display: flex; gap: 6px; overflow-x: auto; padding: 6px 0 2px; scrollbar-width: thin; }\n.hq-places button { flex: none; padding: 5px 10px; font-size: 13px; }\n.hq-view { flex: none; background: #000; display: flex; justify-content: center; }\n.hq-view canvas { width: 100%; max-width: 1280px; aspect-ratio: 1280 / 400; display: block; }\n.hq-move { flex: none; display: none; gap: 8px; padding: 6px 10px; }\n.hq-move button { flex: 1; text-align: center; padding: 12px; font-size: 16px; }\n.hq-pane { flex: 1; min-height: 0; overflow: auto; padding: 10px 16px 20px; }\n.hq-pane h2, .hq-sheet h2 { margin: 4px 0 8px; font-size: 20px; color: var(--accent); }\n.hq h3 { margin: 14px 0 6px; font-size: 15px; color: var(--dim); }\n.hq p { margin: 6px 0; }\n.hq-dim { color: var(--dim); }\n.hq-say { background: #1a2228; border-radius: 8px; padding: 8px 12px; }\n.hq-say b { color: var(--accent); margin-right: 6px; }\n.hq-notice { display: block; margin: 10px 0; padding: 8px 12px; background: #2a2414; border-radius: 6px; color: var(--accent); }\n.hq-warn { color: var(--warn); }\n.hq em { color: var(--warn); font-style: normal; }\n.hq-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }\n.hq-cards, .hq-buy, .hq-agents { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 8px; }\n.hq-agent { display: flex; gap: 10px; align-items: center; }\n.hq-agent img, .hq-agent i { flex: none; width: 56px; height: 56px; border-radius: 10px; object-fit: cover; display: block; }\n.hq-slotrow, .hq-stash { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid #222c33; }\n.hq-slotrow button, .hq-stash button { padding: 4px 10px; font-size: 13px; }\n.hq-icon { width: 28px; height: 28px; vertical-align: middle; image-rendering: pixelated; }\n.hq-buy button span { margin-right: 6px; }\n.hq-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }\n.hq-over, .hq-runmenu { position: absolute; inset: 0; background: #000a; display: flex; align-items: center; justify-content: center; padding: 12px; z-index: 5; }\n.hq-over[hidden] { display: none; }\n.hq-sheet { width: min(900px, 100%); max-height: 100%; overflow: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 18px; }\n.hq-runmenu { font: 14px/1.5 system-ui, sans-serif; color: #e8e2c8; color-scheme: dark; }\n.hq-runmenu .hq-sheet { background: #141b21; border: 1px solid #3a4a54; }\n.hq-runmenu button { font: inherit; color: inherit; background: #1d2a33; border: 1px solid #3a4a54; border-radius: 6px; padding: 8px 12px; cursor: pointer; }\n.hq-runmenu button:disabled { opacity: 0.45; }\n.hq-runmenu h3 { margin: 12px 0 6px; font-size: 15px; color: #9fb2ba; }\n.hq-sheet-head { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }\n.hq-sheet-head button { margin-left: auto; }\n.hq-slots { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }\n.hq-slot { display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; }\n.hq-bag { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }\n.hq-cell { border: 1px solid #3a4a54; border-radius: 6px; padding: 8px 4px; min-height: 52px; font-size: 12px; text-align: center; }\n.hq-cell.empty { color: #5a6a72; }\n@media (max-width: 760px) {\n  .hq-move { display: flex; }\n  .hq-cols { grid-template-columns: 1fr; }\n  .hq-bag { grid-template-columns: repeat(3, 1fr); }\n  .hq-slots { grid-template-columns: repeat(2, 1fr); }\n  .hq-pane { padding: 8px 12px 16px; }\n}\n.hq-run { position: absolute; inset: 0; display: flex; flex-direction: column; background: #05080c; color: #e8e2c8; font: 14px/1.4 system-ui, sans-serif; outline: none; color-scheme: dark; overflow: hidden; }\n.hq-run button { font: inherit; color: inherit; background: #1d2a33; border: 1px solid #3a4a54; border-radius: 6px; padding: 8px 10px; cursor: pointer; touch-action: none; user-select: none; }\n.hq-run button:disabled { opacity: 0.45; }\n.hq-run-top { flex: none; display: flex; align-items: center; gap: 10px; padding: 6px 10px; border-bottom: 1px solid #223; }\n.hq-run-top button { margin-left: auto; }\n.hq-run-view { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; background: #000; }\n.hq-run-view canvas { max-width: 100%; max-height: 100%; aspect-ratio: 16 / 9; display: block; }\n.hq-run-items { flex: none; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding: 6px 10px; }\n.hq-run-items button { display: flex; align-items: center; gap: 4px; padding: 4px 8px; font-size: 13px; }\n.hq-run-items span { margin-left: auto; color: #9fb2ba; font-size: 13px; }\n.hq-run-pad { flex: none; display: none; gap: 10px; padding: 6px 10px 10px; align-items: center; }\n.hq-run-btns { flex: 1; display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }\n.hq-run-btns button { padding: 10px 2px; text-align: center; font-size: 13px; }\n.hq-stick { flex: none; width: 104px; height: 104px; border: 2px solid #567; border-radius: 50%; position: relative; touch-action: none; }\n.hq-stick i { position: absolute; left: 33px; top: 33px; width: 34px; height: 34px; background: #8ab; border-radius: 50%; }\n.hq-run-note { margin: 0; padding: 4px 10px 8px; color: #9fb2ba; font-size: 12px; }\n@media (max-width: 900px), (pointer: coarse) { .hq-run-pad { display: flex; } .hq-run-note { display: none; } }\n.hq[hidden] { display: none; }\n.hq-cell { display: flex; align-items: center; justify-content: center; }\n.hq-run-view { flex-direction: column; }\n.hq-rotate { display: none; margin: 8px; color: #9fb2ba; font-size: 13px; }\n@media (orientation: portrait) and (max-width: 760px) { .hq-rotate { display: block; } }\n/* 가로로 눕힌 폰 (높이가 낮은 화면): 본부 그림은 왼쪽 작게, 장소 창은 오른쪽에 길게 */\n@media (max-height: 520px) {\n  .hq { display: grid; grid-template-columns: minmax(0, 42%) minmax(0, 1fr); grid-template-rows: auto auto 1fr; }\n  .hq-head { grid-column: 1 / -1; padding: 4px 8px; }\n  .hq-top { font-size: 12px; gap: 2px 10px; }\n  .hq-places { padding-top: 4px; }\n  .hq-places button { padding: 4px 8px; font-size: 12px; }\n  .hq-view { grid-column: 1; grid-row: 2; align-self: start; }\n  .hq-move { grid-column: 1; grid-row: 3; display: flex; align-self: start; }\n  .hq-move button { padding: 8px; }\n  .hq-pane { grid-column: 2; grid-row: 2 / 4; padding: 6px 12px 12px; }\n  .hq-pane h2, .hq-sheet h2 { font-size: 17px; margin: 2px 0 6px; }\n  .hq-sheet { padding: 10px 14px; }\n  .hq-cards, .hq-buy, .hq-agents { grid-template-columns: 1fr; }\n}\n@media (pointer: coarse) { .hq-move { display: flex; } }\n/* 엔진 벨트 장면 위의 메뉴 창만 (walk:false). 뒤 캔버스가 보이게 반투명, 캔버스 크기는 건드리지 않는다 */\n.hq.hq-float { position: absolute; inset: 0; display: block; background: transparent; pointer-events: none; overflow: visible; }\n.hq-float .hq-over { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.45); pointer-events: auto; padding: 2%; }\n.hq-float .hq-sheet { width: min(980px, 100%); max-height: 100%; background: rgba(20, 27, 33, 0.94); }\n.hq-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; padding-bottom: 8px; margin-bottom: 6px; border-bottom: 1px solid var(--line); font-size: 13px; color: var(--dim); }\n.hq-bar b { color: var(--text); }\n.hq-bar .hq-x { margin-left: auto; padding: 4px 12px; }\n@media (max-height: 520px) { .hq-float .hq-over { padding: 6px; } .hq-float .hq-sheet { padding: 8px 12px; } .hq-float .hq-cards, .hq-float .hq-buy, .hq-float .hq-agents { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); } }\n/* 잼트리 임무·브리핑 대화창: 게임 화면 아래쪽만 덮는다 (위쪽 게임이 보이게) */\n.hq-float .hq-over.talk { background: linear-gradient(to top, rgba(0, 0, 0, 0.55), transparent 55%); align-items: flex-end; padding: 0 2% 2%; flex-direction: column; justify-content: flex-end; }\n.hq-talk { position: relative; display: flex; gap: 22px; width: min(1100px, 100%); padding: 6px 8px; }\n.hq-face { flex: none; width: 128px; height: 128px; margin: 8px; background: #27685b; }\n.hq-face img { width: 100%; height: 100%; object-fit: cover; display: block; }\n.hq-face i { display: flex; width: 100%; height: 100%; align-items: center; justify-content: center; font: bold 54px sans-serif; font-style: normal; color: #fff; }\n.hq-talk-body { flex: 1; min-width: 0; }\n.hq-who { color: #ffe9a8; font-size: 22px; text-shadow: 2px 2px 0 #000; }\n.hq-line { margin: 6px 0 10px; font-size: 22px; line-height: 1.5; text-shadow: 2px 2px 0 #000; word-break: keep-all; }\n.hq-kit { margin: 0 0 8px; color: #dfe4dc; font-size: 22px; line-height: 1.4; word-break: keep-all; }\n.hq-choices { display: flex; flex-direction: column; gap: 6px; }\n.hq-choice-row { display: flex; gap: 6px; flex-wrap: wrap; }\n.hq .hq-choice { padding: 2px 14px 2px 24px; text-align: left; }\n.hq .hq-choice:disabled { opacity: 0.45; cursor: default; }\n.hq .hq-talk .hq-x { position: absolute; top: 4px; right: 10px; padding: 0 6px; background: none; border: 0; color: #ffe27a; font-size: 33px; line-height: 1; text-shadow: 2px 2px 0 #000; }\n.hq-talk-notice { width: min(
+  var style_default = ".hq { --bg: #0b0f13; --panel: #141b21; --line: #3a4a54; --text: #e8e2c8; --dim: #9fb2ba; --accent: #ffd080; --warn: #ff9a8a; position: relative; display: flex; flex-direction: column; width: 100%; height: 100%; background: var(--bg); color: var(--text); font: 14px/1.5 system-ui, sans-serif; overflow: hidden; outline: none; color-scheme: dark; }\n.hq * { box-sizing: border-box; }\n.hq button:not(.gk-btn) { font: inherit; color: inherit; background: #1d2a33; border: 1px solid var(--line); border-radius: 6px; padding: 8px 12px; cursor: pointer; touch-action: manipulation; text-align: left; }\n.hq button:disabled { opacity: 0.45; cursor: default; }\n.hq button.sel:not(.gk-btn) { border-color: var(--accent); background: #3a2e14; }\n.hq button.primary:not(.gk-btn) { background: #6a4a14; border-color: var(--accent); font-weight: bold; }\n.hq-head { flex: none; padding: 6px 10px; border-bottom: 1px solid var(--line); }\n.hq-top { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; }\n.hq-top button { margin-left: auto; padding: 4px 10px; }\n.hq-places { display: flex; gap: 6px; overflow-x: auto; padding: 6px 0 2px; scrollbar-width: thin; }\n.hq-places button { flex: none; padding: 5px 10px; font-size: 13px; }\n.hq-view { flex: none; background: #000; display: flex; justify-content: center; }\n.hq-view canvas { width: 100%; max-width: 1280px; aspect-ratio: 1280 / 400; display: block; }\n.hq-move { flex: none; display: none; gap: 8px; padding: 6px 10px; }\n.hq-move button { flex: 1; text-align: center; padding: 12px; font-size: 16px; }\n.hq-pane { flex: 1; min-height: 0; overflow: auto; padding: 10px 16px 20px; }\n.hq-pane h2, .hq-sheet h2 { margin: 4px 0 8px; font-size: 20px; color: var(--accent); }\n.hq h3 { margin: 14px 0 6px; font-size: 15px; color: var(--dim); }\n.hq p { margin: 6px 0; }\n.hq-dim { color: var(--dim); }\n.hq-say { background: #1a2228; border-radius: 8px; padding: 8px 12px; }\n.hq-say b { color: var(--accent); margin-right: 6px; }\n.hq-notice { display: block; margin: 10px 0; padding: 8px 12px; background: #2a2414; border-radius: 6px; color: var(--accent); }\n.hq-warn { color: var(--warn); }\n.hq em { color: var(--warn); font-style: normal; }\n.hq-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }\n.hq-cards, .hq-buy, .hq-agents { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 8px; }\n.hq-agent { display: flex; gap: 10px; align-items: center; }\n.hq-agent img, .hq-agent i { flex: none; width: 56px; height: 56px; border-radius: 10px; object-fit: cover; display: block; }\n.hq-slotrow, .hq-stash { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid #222c33; }\n.hq-slotrow button, .hq-stash button { padding: 4px 10px; font-size: 13px; }\n.hq-icon { width: 28px; height: 28px; vertical-align: middle; image-rendering: pixelated; }\n.hq-buy button span { margin-right: 6px; }\n.hq-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }\n.hq-over, .hq-runmenu { position: absolute; inset: 0; background: #000a; display: flex; align-items: center; justify-content: center; padding: 12px; z-index: 5; }\n.hq-over[hidden] { display: none; }\n.hq-sheet { width: min(900px, 100%); max-height: 100%; overflow: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 18px; }\n.hq-runmenu { font: 14px/1.5 system-ui, sans-serif; color: #e8e2c8; color-scheme: dark; }\n.hq-runmenu .hq-sheet { background: #141b21; border: 1px solid #3a4a54; }\n.hq-runmenu button { font: inherit; color: inherit; background: #1d2a33; border: 1px solid #3a4a54; border-radius: 6px; padding: 8px 12px; cursor: pointer; }\n.hq-runmenu button:disabled { opacity: 0.45; }\n.hq-runmenu h3 { margin: 12px 0 6px; font-size: 15px; color: #9fb2ba; }\n.hq-sheet-head { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }\n.hq-sheet-head button { margin-left: auto; }\n.hq-slots { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }\n.hq-slot { display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; }\n.hq-bag { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }\n.hq-cell { border: 1px solid #3a4a54; border-radius: 6px; padding: 8px 4px; min-height: 52px; font-size: 12px; text-align: center; }\n.hq-cell.empty { color: #5a6a72; }\n@media (max-width: 760px) {\n  .hq-move { display: flex; }\n  .hq-cols { grid-template-columns: 1fr; }\n  .hq-bag { grid-template-columns: repeat(3, 1fr); }\n  .hq-slots { grid-template-columns: repeat(2, 1fr); }\n  .hq-pane { padding: 8px 12px 16px; }\n}\n.hq-run { position: absolute; inset: 0; display: flex; flex-direction: column; background: #05080c; color: #e8e2c8; font: 14px/1.4 system-ui, sans-serif; outline: none; color-scheme: dark; overflow: hidden; }\n.hq-run button { font: inherit; color: inherit; background: #1d2a33; border: 1px solid #3a4a54; border-radius: 6px; padding: 8px 10px; cursor: pointer; touch-action: none; user-select: none; }\n.hq-run button:disabled { opacity: 

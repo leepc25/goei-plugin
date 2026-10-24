@@ -1,4 +1,4 @@
-ata-theme", theme);
+heme", theme);
     box.addEventListener("click", (e) => {
       if (e.target.closest(".gx-idpop-card") && !e.target.closest(".gx-agpop-x")) return;
       box.remove();
@@ -3603,4 +3603,4 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .gx-tab { white-space: nowrap; flex: none; }
 .gx-tab-end { margin-left: auto; font-size: 14px; }
 .gx-field { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(340px, 1fr); gap: 20px; padding-top: 12px; padding-bottom: 16px; align-items: start; align-content: start; }
-/* PC: 지도는 옆 목록을 내려도 따라오고,
+/* PC: 지도는 옆 목록을 내려도 따라오고, 창 
