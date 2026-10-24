@@ -109,7 +109,7 @@ function atkSeq(id, heavy) {
 const P = { x: 420, y: 580, z: 0, vz: 0, face: 1, mode: 'ground', combat: false, armed: false, clip: null, pvx: 0, pvy: 0, pdec: 0,
             jumps: 0, airAtk: false, airVX: 230, takeoff: 0, spin: 0, buf: null, chainT: 0, combo: 0, stunT: 0, idleT: 0, lastTap: {}, runLatch: false,
             hp: 100, sp: 0, heat: 0, overT: 0, lastShot: 0, chargeShown: 0, armorT: 0, inv: 0, charge: 0, ghostT: 0, dying: false, t: 0 };
-const D = { x: 860, y: 600, vx: 0, z: 0, vz: 0, ang: 0, va: 0, hits: 0, hitT: 0, flash: 0, stag: 0, hp: 400, mark: 0, atkT: 2.2, wind: 0 };
+const D = { juggle: 0, bounced: false, stunT: 0, x: 860, y: 600, vx: 0, z: 0, vz: 0, ang: 0, va: 0, hits: 0, hitT: 0, flash: 0, stag: 0, hp: 400, mark: 0, atkT: 2.2, wind: 0 };
 let zoom = 0, zx = W / 2, zy = H / 2, dShake = 0;
 let hitstop = 0, shake = 0, flash = 0, dark = 0, cut = 0, speed = 1, showNo = false, showDummy = true, counter = false, last = performance.now();
 let freeSuper = false, showArmor = true, showCancelMark = true;
@@ -176,15 +176,20 @@ function muzzleFlash(p, big) {
 }
 
 // 맞았는지: 샌드백이 같은 줄에 있고 앞쪽 사정거리 안
-function inReach(hx, pad = 60) { pad *= K(P.y); return showDummy && Math.abs(D.y - P.y) < 64 && (D.x - P.x) * P.face > -20 && Math.abs(D.x - hx) < pad && D.z < 140; }
+function inReach(hx, pad = 60) { pad *= K(P.y); const hOk = P.mode === 'air' ? Math.abs(D.z - P.z) < 170 : D.z < 160; return showDummy && Math.abs(D.y - P.y) < 64 && (D.x - P.x) * P.face > -20 && Math.abs(D.x - hx) < pad && hOk; }
 function hurtDummy(dmg, kind, hx, hy) {
   if (D.mark > 0) dmg = Math.round(dmg * 1.5);
   D.hp = Math.max(0, D.hp - dmg); D.hits++; if (!(P.clip && (P.clip.id === '25' || P.clip.id === '25_1'))) gainSp(dmg * 0.45); D.hitT = 1.0; D.flash = 0.09;
-  const big = kind !== 'light';
+  const big = kind !== 'light', air = D.z > 0 || D.vz > 0;
   D.stag = kind === 'launch' ? 0.9 : big ? 0.42 : 0.24;
-  D.vx = P.face * (kind === 'launch' ? 520 : big ? 460 : 150);
   D.va += P.face * (kind === 'launch' ? 7 : big ? 4.5 : 2);
-  if (kind === 'launch') { D.vz = 720; }
+  if (kind === 'spike' && air) { D.vz = -1100; D.vx = P.face * 120; D.juggle++; }               // 공중 강공격: 바닥에 내리꽂음 → 튕김
+  else if (kind === 'launch') { D.vz = air ? Math.max(D.vz, 720) : 980; D.vx = P.face * 90; D.juggle = air ? D.juggle + 1 : 0; D.bounced = false; }   // 약2 → 강: 높이 띄움
+  else if (kind === 'blow') { D.vz = 420; D.vx = P.face * 980; D.juggle++; D.bounced = true; }   // 약3 → 강: 멀리 날림
+  else if (kind === 'stun') { D.stunT = 1.4; D.vx = P.face * 200; }                             // 단독·약1 → 강: 스턴
+  else if (air) {                                                                                 // 뜬 적을 치면 조금 다시 떠오름(오래 띄울수록 덜 뜸)
+    D.juggle++; D.vz = Math.max(D.vz, (big ? 560 : 420) * Math.max(0.3, 1 - D.juggle * 0.12)); D.vx = P.face * (big ? 160 : 70);
+  } else D.vx = P.face * (big ? 460 : 55);   // 약공격은 조금만 밀어 콤보가 이어지게
   num(D.x + (Math.random() - 0.5) * 30, D.y - 200 - D.z, dmg, big);
   if (D.hp === 0) setTimeout(() => { D.hp = 400; }, 1200);
 }
@@ -195,10 +200,10 @@ function fireEv(e) {
   if (e.ev === 'hit' || e.ev === 'hitH' || e.ev === 'hitL') {
     const big = e.ev !== 'hit';
     const p = framePt(id, f, a.reach[f], a.h * (e.hy || 0.42));   // 슬라이딩은 발끝 높이(hy)
-    if (inReach(p.x, big ? 75 : 60)) {
+    if (inReach(p.x, big ? 100 : 70)) {
       // 맞았을 때만: 살짝 멈춤 + 샌드백 경직
       hitstop = big ? 0.16 : 0.075; shake = big ? 16 : 6; dShake = big ? 9 : 5;
-      hurtDummy(big ? 34 : 12, e.ev === 'hitL' ? 'launch' : big ? 'heavy' : 'light', p.x, p.y);
+      hurtDummy(big ? 34 : 12, e.kind || (e.ev === 'hitL' ? 'launch' : big ? 'heavy' : 'light'), p.x, p.y);
       sfx('hit', { strength: big ? 3 : 1, kind: KICK.has(id) ? 'kick' : undefined });
       const cx = D.x - P.face * 18 * K(D.y);
       // 맞은 자리: 번쩍 + 초승달 타격선 + 불꽃 + 충격 고리
@@ -305,12 +310,17 @@ function light() {
   const id = ['9', '10', '11'][P.combo]; P.combo++; sfx('whiff');
   pushP(170, 900);
   act(id, { seq: atkSeq(id, false), onEnd: () => {
-    if (id === '11') { P.combo = 0; return afterBuf(toIdle); }
+    if (id === '11') { P.blowWin = P.t + 0.35; P.combo = 0; return afterBuf(toIdle); }   // 약3 뒤 잠깐은 강 = 날리기
     if (P.buf) return afterBuf(toIdle);
     P.mode = 'chain'; P.chainT = 0.26;   // 친 자세로 잠깐 → 이어지지 않으면 거꾸로 틀어 전투 자세로
   } });
 }
-function heavy() { sfx('whiff', { strength: 2 }); P.combat = true; P.armed = false; P.combo = 0; pushP(140, 700); act('12', { seq: atkSeq('12', true) }); }
+function heavy() {
+  const prev = P.combo || (P.t < (P.blowWin || 0) ? 3 : 0);   // 콤보 마무리: 단독·약1 → 스턴, 약2 → 띄우기, 약3 → 날리기
+  const kind = prev === 2 ? 'launch' : prev >= 3 ? 'blow' : 'stun'; P.lastHeavy = kind;
+  sfx('whiff', { strength: 2 }); P.combat = true; P.armed = false; P.combo = 0; pushP(140, 700);
+  act('12', { seq: atkSeq('12', true).map(e => e.ev ? { ...e, kind } : e) });
+}
 function chainExpire() { const id = P.clip.id; P.combo = 0; reverseOut(id, R(A[id].n - 1, 0), 0.03); }
 function slide() {
   P.combat = true; P.combo = 0; pushP(840, 1150);
@@ -429,7 +439,7 @@ function doubleJump() {
 }
 function jumpAttack(heavyKind) {
   P.airAtk = true;
-  play('14', { seq: atkSeq('14', heavyKind).map((e, i, s) => ({ ...(e.ev ? { ...e, ev: heavyKind ? 'hitH' : 'hit' } : e), d: i === s.length - 1 ? 9 : e.d })) });
+  play('14', { seq: atkSeq('14', heavyKind).map((e, i, s) => ({ ...(e.ev ? { ...e, ev: heavyKind ? 'hitH' : 'hit', kind: heavyKind ? 'spike' : undefined } : e), d: i === s.length - 1 ? 9 : e.d })) });
 }
 function land() {
   sfx('land'); P.z = 0; P.vz = 0; P.airAtk = false; shake = Math.max(shake, 2); if (!vfx('land_dust', P.x, P.y, 2.2)) dust(P.x, P.y, 5);
@@ -585,9 +595,16 @@ function updateDummy(dt) {
   D.hitT = Math.max(0, D.hitT - dt); if (D.hitT === 0) D.hits = 0;
   D.flash = Math.max(0, D.flash - dt); D.stag = Math.max(0, D.stag - dt); D.mark = Math.max(0, D.mark - dt);
   D.x += D.vx * dt; D.vx *= Math.pow(0.02, dt);
-  if (D.z > 0 || D.vz > 0) { D.z += D.vz * dt; D.vz -= 2200 * dt; if (D.z <= 0) { D.z = 0; D.vz = 0; dust(D.x, D.y, 6); shake = Math.max(shake, 4); } }
+  D.stunT = Math.max(0, D.stunT - dt);
+  if (D.z > 0 || D.vz > 0) {
+    D.z += D.vz * dt; D.vz -= 2200 * dt;
+    if (D.z <= 0) {
+      if (!D.bounced && D.vz < -650) { D.z = 0; D.vz = 340; D.bounced = true; dust(D.x, D.y, 8, 1.4); shake = Math.max(shake, 8); sfx('down'); vfx('land_dust', D.x, D.y, 2.4); }   // 세게 떨어지면 한 번 튕김(이때 다시 띄울 수 있음)
+      else { D.z = 0; D.vz = 0; D.juggle = 0; D.bounced = false; dust(D.x, D.y, 6); shake = Math.max(shake, 4); }
+    }
+  }
   D.x += (860 - D.x) * Math.min(1, dt * 0.25);   // 천천히 제자리로
-  if (counter && showDummy && D.stag === 0) {
+  if (counter && showDummy && D.stag === 0 && D.stunT === 0 && D.z === 0) {
     D.atkT -= dt;
     if (D.atkT < 0.45 && D.atkT > 0) D.wind = 1;
     if (D.atkT <= 0) {
@@ -771,6 +788,8 @@ function drawDummy() {
   ctx.fillStyle = '#e04a3a'; ctx.fillRect(D.x - 40, hb, 80 * D.hp / 400, 7);
   if (D.mark > 0) { const y = hb - 28; ctx.strokeStyle = '#ff5a4a'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(D.x, y, 12 + Math.sin(P.t * 8) * 2, 0, Math.PI * 2); ctx.moveTo(D.x - 20, y); ctx.lineTo(D.x + 20, y); ctx.moveTo(D.x, y - 20); ctx.lineTo(D.x, y + 20); ctx.stroke(); }
   if (D.hits > 1) { ctx.fillStyle = '#ffe08a'; ctx.font = 'bold 30px sans-serif'; ctx.fillText(`${D.hits} HIT`, D.x + 40, hb + 20); }
+  if (D.z > 0) { ctx.fillStyle = '#9fe0ff'; ctx.font = 'bold 16px sans-serif'; ctx.fillText(`공중 ${Math.round(D.z)} · 저글 ${D.juggle}`, D.x + 40, hb + 42); }
+  if (D.stunT > 0 && !drawVfxAt('stun_stars', D.x, hb - 6, 2, P.t)) for (let i = 0; i < 3; i++) { const t = P.t * 4 + i * 2.09; star(D.x + Math.cos(t) * 22, hb - 6 + Math.sin(t) * 6, 6, '#ffe066'); }
 }
 function drawVfxAt(name, x, y, sc, el, flip) {   // 캐릭터를 따라다니는 반복 이펙트(스턴 별·충전 모으기)
   const v = VFX[name]; if (!v || !v.img.complete) return false;
