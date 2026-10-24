@@ -37711,7 +37711,7 @@
           "type": "message_progress",
           "action": "generating",
           "status": "initializing",
-          "progress": 0.11296943207025778,
+          "progress": 0.19637141493592467,
           "flow_kind": "animation",
           "queue_position": 0,
           "generation_started_at": "2026-10-24T01:37:08.124254+00:00",
@@ -37734,19 +37734,47 @@
       "archive_output": "motion-frame-candidates/jaemtri/running-slide/low-slide-4/frames",
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 2.0
         },
         "id": "5798bb45-4918-4b31-88a1-0026c782d179",
         "status": "processing",
         "created_at": "2026-10-24T01:36:15.931829+00:00",
         "last_response": {
-          "type": "message_progress",
-          "action": "generating",
+          "seed": 2026111404,
+          "type": "message_done",
+          "action": "finalizing",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
           "status": "initializing",
-          "progress": 0.11075335544153263,
+          "progress": 0.2782014264334998,
           "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 2
+          },
+          "generation_id": "9a401b02-1b47-40b0-8817-f47ff3216e25",
           "queue_position": 0,
+          "billing_charged": true,
           "generation_started_at": "2026-10-24T01:37:09.124531+00:00",
           "estimated_wait_seconds": 0
         }
@@ -37773,10 +37801,13 @@
         "status": "processing",
         "created_at": "2026-10-24T01:36:21.302981+00:00",
         "last_response": {
-          "type": "background",
+          "type": "message_progress",
+          "action": "generating",
           "status": "initializing",
+          "progress": 0.16317712194619777,
           "flow_kind": "animation",
           "queue_position": 0,
+          "generation_started_at": "2026-10-24T01:37:22.221505+00:00",
           "estimated_wait_seconds": 0
         }
       }
@@ -37802,6 +37833,99 @@
         "id": "0e4d09ee-b593-4c6d-8dca-9fa7b032eb07",
         "status": "processing",
         "created_at": "2026-10-24T01:37:13.360117+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "action": "generating",
+          "status": "initializing",
+          "progress": 0.1184806029980836,
+          "flow_kind": "animation",
+          "queue_position": 0,
+          "generation_started_at": "2026-10-24T01:38:02.364648+00:00",
+          "estimated_wait_seconds": 0
+        }
+      }
+    },
+    "c9da948c-5316-46c0-8564-48412c7653da": {
+      "kind": "motion-frame-candidate-front-flip-ascent-1",
+      "slug": "jaemtri",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792805889.5375996,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "c9da948c-5316-46c0-8564-48412c7653da",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3",
+      "archive_output": "motion-frame-candidates/jaemtri/front-flip/ascent-1/frames",
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "c9da948c-5316-46c0-8564-48412c7653da",
+        "status": "processing",
+        "created_at": "2026-10-24T01:38:09.757992+00:00",
+        "last_response": {
+          "type": "background",
+          "status": "initializing",
+          "flow_kind": "animation",
+          "queue_position": 0,
+          "estimated_wait_seconds": 0
+        }
+      }
+    },
+    "30252226-16d4-4f9f-9069-7e57d73edf60": {
+      "kind": "motion-frame-candidate-front-flip-turn-1",
+      "slug": "jaemtri",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792805890.1002388,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "30252226-16d4-4f9f-9069-7e57d73edf60",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3",
+      "archive_output": "motion-frame-candidates/jaemtri/front-flip/turn-1/frames",
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "30252226-16d4-4f9f-9069-7e57d73edf60",
+        "status": "processing",
+        "created_at": "2026-10-24T01:38:10.306520+00:00",
+        "last_response": {
+          "type": "background",
+          "status": "initializing",
+          "flow_kind": "animation",
+          "queue_position": 0,
+          "estimated_wait_seconds": 0
+        }
+      }
+    },
+    "6ef612eb-3af3-4b11-9199-4b387ff261b1": {
+      "kind": "motion-frame-candidate-front-flip-descent-1",
+      "slug": "jaemtri",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792805890.6690094,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "6ef612eb-3af3-4b11-9199-4b387ff261b1",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3",
+      "archive_output": "motion-frame-candidates/jaemtri/front-flip/descent-1/frames",
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "6ef612eb-3af3-4b11-9199-4b387ff261b1",
+        "status": "processing",
+        "created_at": "2026-10-24T01:38:10.835772+00:00",
         "last_response": {
           "type": "background",
           "status": "initializing",
@@ -38608,7 +38732,10 @@
       "motion-frame-candidate-running-jump-hair-end-1": "a48c333f-951a-452f-b8ec-12c617d74ccd",
       "motion-frame-candidate-running-8-frames-hair-4": "5849e88b-07e4-4c17-951e-df6524c7e092",
       "motion-frame-candidate-running-slide-low-slide-4": "5798bb45-4918-4b31-88a1-0026c782d179",
-      "motion-frame-candidate-running-jump-hair-recover-2": "0e4d09ee-b593-4c6d-8dca-9fa7b032eb07"
+      "motion-frame-candidate-running-jump-hair-recover-2": "0e4d09ee-b593-4c6d-8dca-9fa7b032eb07",
+      "motion-frame-candidate-front-flip-ascent-1": "c9da948c-5316-46c0-8564-48412c7653da",
+      "motion-frame-candidate-front-flip-turn-1": "30252226-16d4-4f9f-9069-7e57d73edf60",
+      "motion-frame-candidate-front-flip-descent-1": "6ef612eb-3af3-4b11-9199-4b387ff261b1"
     },
     "aileen": {
       "name": "에일린",
@@ -61617,9 +61744,54 @@
         },
         "detail": null
       }
+    },
+    {
+      "at": "2026-10-24T01:38:09Z",
+      "kind": "submitted",
+      "slug": "jaemtri",
+      "detail": {
+        "kind": "motion-frame-candidate-front-flip-ascent-1",
+        "template": null,
+        "job_id": "c9da948c-5316-46c0-8564-48412c7653da",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "c9da948c-5316-46c0-8564-48412c7653da",
+          "status": "processing"
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T01:38:10Z",
+      "kind": "submitted",
+      "slug": "jaemtri",
+      "detail": {
+        "kind": "motion-frame-candidate-front-flip-turn-1",
+        "template": null,
+        "job_id": "30252226-16d4-4f9f-9069-7e57d73edf60",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "30252226-16d4-4f9f-9069-7e57d73edf60",
+          "status": "processing"
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T01:38:11Z",
+      "kind": "submitted",
+      "slug": "jaemtri",
+      "detail": {
+        "kind": "motion-frame-candidate-front-flip-descent-1",
+        "template": null,
+        "job_id": "6ef612eb-3af3-4b11-9199-4b387ff261b1",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "6ef612eb-3af3-4b11-9199-4b387ff261b1",
+          "status": "processing"
+        }
+      }
     }
   ],
-  "updated_at": 1792805835.3024514,
+  "updated_at": 1792805892.0556712,
   "user_stopped_at": 1792778235.6917784,
   "archived_jobs": {
     "304457e9-6577-44f0-af17-97841a9f6720": {
@@ -62938,10 +63110,10 @@
       "saved_frames": 6
     }
   },
-  "last_git_checkpoint": 1792805520.9694264,
+  "last_git_checkpoint": 1792805837.2752388,
   "summary": {
     "jobs": {
-      "processing": 4,
+      "processing": 7,
       "completed": 421,
       "failed": 9,
       "stalled": 0

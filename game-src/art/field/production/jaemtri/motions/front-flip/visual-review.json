@@ -1,0 +1,20 @@
+{
+  "at": 1792805879.1554615,
+  "job_id": "7a207771-608b-4a7c-8012-e504c6f31919",
+  "result": "reroll-required",
+  "findings": "정방향 참조로 체형 회복. 3번째 머리/다리 회색 외곽, 4번째 머리 위 회색 덩어리, 10번째 얼굴/사지 손상. 해당 자세 후보 재작업 및 전체 재검수 필요.",
+  "frame_count": 13,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}
