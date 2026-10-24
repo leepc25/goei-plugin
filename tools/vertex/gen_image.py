@@ -1,4 +1,4 @@
-"""Vertex AI Gemini 이미지 모델로 한 장 생성. 사용: python3 gen_image.py <프롬프트.txt> <참고그림> <출력.png> [비율] [크기] [모델]"""
+"""Vertex AI Gemini 이미지 모델로 한 장 생성. 사용: python3 gen_image.py <프롬프트.txt> <참고그림[,참고그림2]> <출력.png> [비율] [크기] [모델]"""
 import base64, json, sys, time
 import requests
 from vertex_token import get_token
@@ -12,7 +12,7 @@ tok, proj = get_token()
 url = f"https://aiplatform.googleapis.com/v1/projects/{proj}/locations/global/publishers/google/models/{model}:generateContent"
 body = {
     "contents": [{"role": "user", "parts": [
-        {"inlineData": {"mimeType": "image/png", "data": base64.b64encode(open(ref_path, "rb").read()).decode()}},
+        *[{"inlineData": {"mimeType": "image/png", "data": base64.b64encode(open(p, "rb").read()).decode()}} for p in ref_path.split(",")],
         {"text": open(prompt_path, encoding="utf-8").read()},
     ]}],
     "generationConfig": {"responseModalities": ["TEXT", "IMAGE"], "imageConfig": {"aspectRatio": aspect, "imageSize": size}},
