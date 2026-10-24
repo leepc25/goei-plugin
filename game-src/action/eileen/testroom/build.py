@@ -30,9 +30,9 @@ for aid, folder, d, name in LIST:
         sheet.paste(im, (i * w, 0))
         bb = im.getchannel("A").point(lambda v: 255 if v > 40 else 0).getbbox() or (0, 0, w, h)
         bot.append(bb[3]); top.append(bb[1]); reach.append(bb[2] - w // 2)
-    buf = io.BytesIO(); sheet.save(buf, "WEBP", lossless=True, quality=100, method=6)
+    buf = io.BytesIO(); sheet.save(buf, "PNG", optimize=True)  # WebP는 일부 앱 보기 화면에서 안 나옴
     data[aid] = dict(name=name, dir=d, n=len(ims), w=w, h=h, bot=bot, top=top, reach=reach,
-                     src="data:image/webp;base64," + base64.b64encode(buf.getvalue()).decode())
+                     src="data:image/png;base64," + base64.b64encode(buf.getvalue()).decode())
 html = (HERE / "room.html").read_text(encoding="utf-8").replace("/*__DATA__*/null", json.dumps(data, ensure_ascii=False))
 out = M / "에일린_테스트룸.html"
 out.write_text(html, encoding="utf-8")
