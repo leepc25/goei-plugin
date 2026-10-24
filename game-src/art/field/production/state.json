@@ -31149,7 +31149,11 @@
         "type": "generations",
         "generations": 3
       },
-      "saved_frames": 6
+      "saved_frames": 6,
+      "visual_rejection": {
+        "reason": "Repeated cup and hand fragmentation at frame 5; replace template with own SW source and explicit upright drinking path.",
+        "group": "e4f6bc00-0874-438e-a56a-3b9ab8d3a986"
+      }
     },
     "1d24245d-d3f3-4764-9912-1f5675743a80": {
       "kind": "animation",
@@ -31449,7 +31453,7 @@
       "kind": "motion-frame-candidate-backflip-inverted-1",
       "slug": "spangdal",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792803280.9008627,
       "receipt": {
         "usage": null,
@@ -31460,26 +31464,65 @@
       "archive_output": "motion-frame-candidates/spangdal/backflip/inverted-1/frames",
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 2.0
         },
         "id": "4cf1145a-2955-438f-a514-1e99a5cb9e7f",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-24T00:54:41.647638+00:00",
         "last_response": {
-          "type": "background",
+          "seed": 2026110101,
+          "type": "done",
+          "action": "finalizing",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
           "status": "initializing",
+          "progress": 0.22587885208789876,
           "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 2
+          },
+          "generation_id": "82298a76-5fff-4dc6-ac14-1cbebfb97645",
           "queue_position": 0,
+          "billing_charged": true,
+          "generation_started_at": "2026-10-24T00:55:29.912773+00:00",
           "estimated_wait_seconds": 0
         }
-      }
+      },
+      "observed_end_epoch": 1792803365.5413141,
+      "elapsed_observed_seconds": 84.640451669693,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 2
+      },
+      "saved_frames": 3
     },
     "2c303eed-1fe3-484b-bf16-d095744d05c8": {
       "kind": "motion-frame-candidate-picking-up-low-pose-1",
       "slug": "spangdal",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792803282.0032449,
       "receipt": {
         "usage": null,
@@ -31490,12 +31533,174 @@
       "archive_output": "motion-frame-candidates/spangdal/picking-up/low-pose-1/frames",
       "last_response": {
         "usage": {
+          "type": "generations",
+          "generations": 2.0
+        },
+        "id": "2c303eed-1fe3-484b-bf16-d095744d05c8",
+        "status": "completed",
+        "created_at": "2026-10-24T00:54:42.367640+00:00",
+        "last_response": {
+          "seed": 2026110102,
+          "type": "done",
+          "action": "finalizing",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "status": "initializing",
+          "progress": 1.0,
+          "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 2
+          },
+          "generation_id": "71562e36-0874-4688-ad1f-66bc8a1c6c52",
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_started_at": "2026-10-24T00:55:31.327897+00:00",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792803384.697422,
+      "elapsed_observed_seconds": 102.69417762756348,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 2
+      },
+      "saved_frames": 3
+    },
+    "bbb0fb6d-76b3-44b7-8cc7-397bda37b237": {
+      "kind": "motion-frame-candidate-throw-object-release-1",
+      "slug": "spangdal",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792803329.2401502,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "bbb0fb6d-76b3-44b7-8cc7-397bda37b237",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3",
+      "archive_output": "motion-frame-candidates/spangdal/throw-object/release-1/frames",
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 2.0
+        },
+        "id": "bbb0fb6d-76b3-44b7-8cc7-397bda37b237",
+        "status": "processing",
+        "created_at": "2026-10-24T00:55:29.452521+00:00",
+        "last_response": {
+          "seed": 2026110103,
+          "type": "message_done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "status": "initializing",
+          "progress": 0.95,
+          "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 2
+          },
+          "generation_id": "7df2bfc6-b502-47af-a6b1-38cb28f6398a",
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_started_at": "2026-10-24T00:56:28.839971+00:00",
+          "estimated_wait_seconds": 0
+        }
+      }
+    },
+    "e4a8b8a0-4167-4a16-a9de-857b14e4fdac": {
+      "kind": "motion-frame-candidate-front-flip-rotation-1",
+      "slug": "spangdal",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792803329.8150792,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "e4a8b8a0-4167-4a16-a9de-857b14e4fdac",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3",
+      "archive_output": "motion-frame-candidates/spangdal/front-flip/rotation-1/frames",
+      "last_response": {
+        "usage": {
           "type": "usd",
           "usd": 0.0
         },
-        "id": "2c303eed-1fe3-484b-bf16-d095744d05c8",
+        "id": "e4a8b8a0-4167-4a16-a9de-857b14e4fdac",
         "status": "processing",
-        "created_at": "2026-10-24T00:54:42.367640+00:00",
+        "created_at": "2026-10-24T00:55:31.602633+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "action": "finalizing",
+          "status": "initializing",
+          "progress": 0.1856816845507588,
+          "flow_kind": "animation",
+          "queue_position": 0,
+          "generation_started_at": "2026-10-24T00:56:16.365934+00:00",
+          "estimated_wait_seconds": 0
+        }
+      }
+    },
+    "2f422a48-f57e-4298-ba5d-a2544d7f7269": {
+      "kind": "animation",
+      "slug": "spangdal",
+      "template": "drinking",
+      "status": "processing",
+      "created_epoch": 1792803365.6245568,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "2f422a48-f57e-4298-ba5d-a2544d7f7269",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3",
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "2f422a48-f57e-4298-ba5d-a2544d7f7269",
+        "status": "processing",
+        "created_at": "2026-10-24T00:56:08.618197+00:00",
         "last_response": {
           "type": "background",
           "status": "initializing",
@@ -31643,20 +31848,148 @@
         "crouched-walking": "fd7b0005-d7a5-48f7-9de0-c6c7a7392afc",
         "front-flip": "05ffd49c-1b78-4114-937b-5e4ae1e132f5",
         "backflip": "e589b375-cb78-4b4a-8fed-c43782fc9684",
-        "drinking": "4bf1b642-34eb-45e2-a179-23146d96b855",
         "picking-up": "1d24245d-d3f3-4764-9912-1f5675743a80",
         "throw-object": "ddbb44f9-e4c4-409a-9e76-d4a85126b4c0",
-        "cross-punch": "68c43543-8768-48bb-82cb-2b52bc2d8435"
+        "cross-punch": "68c43543-8768-48bb-82cb-2b52bc2d8435",
+        "drinking": "2f422a48-f57e-4298-ba5d-a2544d7f7269"
       },
       "ready": true,
       "image_verified": true,
       "skeleton_joints": 18,
       "rotation_count": 8,
-      "exported": true,
+      "exported": false,
       "eight_way_visual_reviewed": true,
       "motions_visual_reviewed": false,
       "motion-frame-candidate-backflip-inverted-1": "4cf1145a-2955-438f-a514-1e99a5cb9e7f",
-      "motion-frame-candidate-picking-up-low-pose-1": "2c303eed-1fe3-484b-bf16-d095744d05c8"
+      "motion-frame-candidate-picking-up-low-pose-1": "2c303eed-1fe3-484b-bf16-d095744d05c8",
+      "motion-frame-candidate-throw-object-release-1": "bbb0fb6d-76b3-44b7-8cc7-397bda37b237",
+      "motion-frame-candidate-front-flip-rotation-1": "e4a8b8a0-4167-4a16-a9de-857b14e4fdac",
+      "motion_assemblies": {
+        "backflip": {
+          "base_job_id": "e589b375-cb78-4b4a-8fed-c43782fc9684",
+          "frame_sources": [
+            {
+              "frame_index": 0,
+              "source_job_id": "e589b375-cb78-4b4a-8fed-c43782fc9684",
+              "source_frame_index": 0,
+              "sha256": "6751c71b1865efaa229dd292ee2b6f40892633eec9eef3b3cfde8fd58de5eb66"
+            },
+            {
+              "frame_index": 1,
+              "source_job_id": "e589b375-cb78-4b4a-8fed-c43782fc9684",
+              "source_frame_index": 1,
+              "sha256": "e7957221de38be0d8903c4c724653cf1f165bb5927ff1b7bf045f65fbfb86e51"
+            },
+            {
+              "frame_index": 2,
+              "source_job_id": "e589b375-cb78-4b4a-8fed-c43782fc9684",
+              "source_frame_index": 2,
+              "sha256": "b746b04e2f97d8a118f7c2e4f34e789dc733b4c51f62696fdf43aaf9e5d05b24"
+            },
+            {
+              "frame_index": 3,
+              "source_job_id": "e589b375-cb78-4b4a-8fed-c43782fc9684",
+              "source_frame_index": 3,
+              "sha256": "9a924cbb749c810b9e3e0af0f26cf8b2c507343723384b73632ad0e6faaf8185"
+            },
+            {
+              "frame_index": 4,
+              "source_job_id": "4cf1145a-2955-438f-a514-1e99a5cb9e7f",
+              "source_frame_index": 1,
+              "target_pose_index": 4,
+              "source_path": "motion-frame-candidates/spangdal/backflip/inverted-1/frames/1.png",
+              "sha256": "e82d40f9c9d638822bfeaa4e1d76d4e5ebebc91954266620f09317bb5567eabd",
+              "findings": "Candidate 1 viewed at 2x: same tucked inverted target pose, continuous neck and face, purple hair and skirt intact, no gray exterior paint. Candidate 0 malformed and unused."
+            },
+            {
+              "frame_index": 5,
+              "source_job_id": "e589b375-cb78-4b4a-8fed-c43782fc9684",
+              "source_frame_index": 5,
+              "sha256": "b01b7d54696c75ce20519ac32e9d406951dc4ec1a504771b387bffa6d8dda79c"
+            },
+            {
+              "frame_index": 6,
+              "source_job_id": "e589b375-cb78-4b4a-8fed-c43782fc9684",
+              "source_frame_index": 6,
+              "sha256": "4e0acd6c6f79b24ffd20f67da01b1eefd8e610c5436910bbe04378c575fc8eeb"
+            },
+            {
+              "frame_index": 7,
+              "source_job_id": "e589b375-cb78-4b4a-8fed-c43782fc9684",
+              "source_frame_index": 7,
+              "sha256": "6d308f450f90e2f5e73b90f1a2b13e67f81e1382a6769a62355551867fa1d5df"
+            },
+            {
+              "frame_index": 8,
+              "source_job_id": "e589b375-cb78-4b4a-8fed-c43782fc9684",
+              "source_frame_index": 8,
+              "sha256": "0495a3c185340b909ac86724d6f010ace4a77dc69e1d54df6b3b49e800d8f29e"
+            }
+          ],
+          "method": "select complete same-pose regenerated frames; no pixel editing",
+          "new_user_approval": false,
+          "visual_reviewed": true
+        },
+        "picking-up": {
+          "base_job_id": "1d24245d-d3f3-4764-9912-1f5675743a80",
+          "frame_sources": [
+            {
+              "frame_index": 0,
+              "source_job_id": "1d24245d-d3f3-4764-9912-1f5675743a80",
+              "source_frame_index": 0,
+              "sha256": "0820cca87187cc0d402806d3f5f020c450a51f1758a5afe2afa1e2d044f79c0c"
+            },
+            {
+              "frame_index": 1,
+              "source_job_id": "1d24245d-d3f3-4764-9912-1f5675743a80",
+              "source_frame_index": 1,
+              "sha256": "c62223d1e6c734fcdc40ef5f2272bd3c3b23cfbee3b0543feca4bab121751d95"
+            },
+            {
+              "frame_index": 2,
+              "source_job_id": "1d24245d-d3f3-4764-9912-1f5675743a80",
+              "source_frame_index": 2,
+              "sha256": "19406f9a7574a58b1371df0d7c4da090f00459df98aea99ef19cbd4d39d34a62"
+            },
+            {
+              "frame_index": 3,
+              "source_job_id": "1d24245d-d3f3-4764-9912-1f5675743a80",
+              "source_frame_index": 3,
+              "sha256": "0d15a2cf659e18a633d8b5fd397733dc8215d362f8491033e2f843f30283e241"
+            },
+            {
+              "frame_index": 4,
+              "source_job_id": "2c303eed-1fe3-484b-bf16-d095744d05c8",
+              "source_frame_index": 1,
+              "target_pose_index": 4,
+              "source_path": "motion-frame-candidates/spangdal/picking-up/low-pose-1/frames/1.png",
+              "sha256": "29811d27a59f67ab3f1891105c3eb3b10d9a6d8eb3feaa6bb4235066c8cd6c9e",
+              "findings": "Candidate 1 matches low pickup target with intact face, neck, hands and legs; own purple bob/skirt/pumps; no gray exterior or transparent holes."
+            },
+            {
+              "frame_index": 5,
+              "source_job_id": "1d24245d-d3f3-4764-9912-1f5675743a80",
+              "source_frame_index": 5,
+              "sha256": "60aaa1d7b6d0216c1fb73f3766b86e9d1f5d40f7c68ad7a3a23f973ccfca12fc"
+            },
+            {
+              "frame_index": 6,
+              "source_job_id": "1d24245d-d3f3-4764-9912-1f5675743a80",
+              "source_frame_index": 6,
+              "sha256": "80b46d39a4f16f4310d829b590bd12c144838d463eb6421041e62656f2600663"
+            },
+            {
+              "frame_index": 7,
+              "source_job_id": "1d24245d-d3f3-4764-9912-1f5675743a80",
+              "source_frame_index": 7,
+              "sha256": "6371679a11197209df73a2fdd74d7dec2bc7fba9c0091462e71b0de21da5cad1"
+            }
+          ],
+          "method": "select complete same-pose regenerated frames; no pixel editing",
+          "new_user_approval": false,
+          "visual_reviewed": true
+        }
+      }
     },
     "jaemtri": {
       "name": "잼트리",
@@ -52475,9 +52808,86 @@
         "files": 55,
         "production_pack_clips": 20
       }
+    },
+    {
+      "at": "2026-10-24T00:55:29Z",
+      "kind": "submitted",
+      "slug": "spangdal",
+      "detail": {
+        "kind": "motion-frame-candidate-throw-object-release-1",
+        "template": null,
+        "job_id": "bbb0fb6d-76b3-44b7-8cc7-397bda37b237",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "bbb0fb6d-76b3-44b7-8cc7-397bda37b237",
+          "status": "processing"
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T00:55:31Z",
+      "kind": "submitted",
+      "slug": "spangdal",
+      "detail": {
+        "kind": "motion-frame-candidate-front-flip-rotation-1",
+        "template": null,
+        "job_id": "e4a8b8a0-4167-4a16-a9de-857b14e4fdac",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "e4a8b8a0-4167-4a16-a9de-857b14e4fdac",
+          "status": "processing"
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T00:56:05Z",
+      "kind": "completed",
+      "slug": "spangdal",
+      "detail": {
+        "kind": "motion-frame-candidate-backflip-inverted-1",
+        "template": null,
+        "job_id": "4cf1145a-2955-438f-a514-1e99a5cb9e7f",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 2
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T00:56:09Z",
+      "kind": "submitted",
+      "slug": "spangdal",
+      "detail": {
+        "kind": "animation",
+        "template": "drinking",
+        "job_id": "2f422a48-f57e-4298-ba5d-a2544d7f7269",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "2f422a48-f57e-4298-ba5d-a2544d7f7269",
+          "status": "processing"
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T00:56:24Z",
+      "kind": "completed",
+      "slug": "spangdal",
+      "detail": {
+        "kind": "motion-frame-candidate-picking-up-low-pose-1",
+        "template": null,
+        "job_id": "2c303eed-1fe3-484b-bf16-d095744d05c8",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 2
+        },
+        "detail": null
+      }
     }
   ],
-  "updated_at": 1792803298.1952953,
+  "updated_at": 1792803416.1675727,
   "user_stopped_at": 1792778235.6917784,
   "archived_jobs": {
     "304457e9-6577-44f0-af17-97841a9f6720": {
@@ -53796,11 +54206,11 @@
       "saved_frames": 6
     }
   },
-  "last_git_checkpoint": 1792802981.7144468,
+  "last_git_checkpoint": 1792803300.8335168,
   "summary": {
     "jobs": {
-      "processing": 2,
-      "completed": 356,
+      "processing": 3,
+      "completed": 358,
       "failed": 9,
       "stalled": 0
     },

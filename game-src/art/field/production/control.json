@@ -254,7 +254,8 @@
       "picking-up": "game-src/art/field/production/motion-inputs/spangdal/picking-up-repair-v1/spec.json",
       "throw-object": "game-src/art/field/production/motion-inputs/spangdal/throw-object-repair-v1/spec.json",
       "cross-punch": "game-src/art/field/production/motion-inputs/spangdal/cross-punch-repair-v1/spec.json",
-      "crouched-walking": "game-src/art/field/production/motion-inputs/spangdal/crouched-walking-repair-v1/spec.json"
+      "crouched-walking": "game-src/art/field/production/motion-inputs/spangdal/crouched-walking-repair-v1/spec.json",
+      "drinking": "game-src/art/field/production/motion-inputs/spangdal/drinking-v1/spec.json"
     }
   }
 }

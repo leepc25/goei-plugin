@@ -1,0 +1,9 @@
+{
+  "frame_index": 4,
+  "source_job_id": "2c303eed-1fe3-484b-bf16-d095744d05c8",
+  "source_frame_index": 1,
+  "target_pose_index": 4,
+  "source_path": "motion-frame-candidates/spangdal/picking-up/low-pose-1/frames/1.png",
+  "sha256": "29811d27a59f67ab3f1891105c3eb3b10d9a6d8eb3feaa6bb4235066c8cd6c9e",
+  "findings": "Candidate 1 matches low pickup target with intact face, neck, hands and legs; own purple bob/skirt/pumps; no gray exterior or transparent holes."
+}

@@ -1,0 +1,63 @@
+{
+  "reason": "Repeated cup and hand fragmentation at frame 5; replace template with own SW source and explicit upright drinking path.",
+  "group": {
+    "animation_type": "drinking",
+    "display_name": null,
+    "animation_group_id": "e4f6bc00-0874-438e-a56a-3b9ab8d3a986",
+    "directions": [
+      {
+        "direction": "south-west",
+        "frame_count": 6,
+        "frames": [
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/9095375d-b39a-447b-b577-fcb345e78928/animations/b4195686-7ef4-4d1d-aba9-3c45a131d2eb/south-west/0.png?t=1792803048",
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/9095375d-b39a-447b-b577-fcb345e78928/animations/b4195686-7ef4-4d1d-aba9-3c45a131d2eb/south-west/1.png?t=1792803048",
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/9095375d-b39a-447b-b577-fcb345e78928/animations/b4195686-7ef4-4d1d-aba9-3c45a131d2eb/south-west/2.png?t=1792803048",
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/9095375d-b39a-447b-b577-fcb345e78928/animations/b4195686-7ef4-4d1d-aba9-3c45a131d2eb/south-west/3.png?t=1792803048",
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/9095375d-b39a-447b-b577-fcb345e78928/animations/b4195686-7ef4-4d1d-aba9-3c45a131d2eb/south-west/4.png?t=1792803048",
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/9095375d-b39a-447b-b577-fcb345e78928/animations/b4195686-7ef4-4d1d-aba9-3c45a131d2eb/south-west/5.png?t=1792803048"
+        ]
+      }
+    ]
+  },
+  "at": 1792803364.7116117,
+  "state_before": {
+    "name": "스팡달",
+    "group": "management",
+    "character_id": "9095375d-b39a-447b-b577-fcb345e78928",
+    "image": "e925d6ba-4f8e-41b9-b58d-53327feda5b9",
+    "registration": "8df9126b-f6ce-43bd-be01-027d0588c203",
+    "motions": {
+      "breathing-idle": "628133da-1d7d-4b81-b5d8-a4098921d739",
+      "walking-8-frames": "9812d187-c2e4-47ae-86a2-da18039e4640",
+      "sad-walk": "7778bc41-67b6-483d-b2af-8844bbcc4775",
+      "jumping-1": "1c9f81ee-20eb-435b-9a9a-ad8fc62c19e5",
+      "jumping-2": "476b3574-8365-451e-98f8-1153a158f480",
+      "two-footed-jump": "74674eff-c597-48da-a98f-332e065866c9",
+      "pushing": "c9fba02d-31ab-4b7d-a674-7617f35b7e0e",
+      "pull-heavy-object": "6d6586d6-7391-4a07-85a8-57b76ee10eed",
+      "fight-stance-idle-8-frames": "9dea4c3b-ea98-465b-b6b4-5b9d5606d6cd",
+      "lead-jab": "4cf5d376-176e-4f4d-ae08-bb746d2350a7",
+      "running-8-frames": "eb8485c3-a461-47e3-acd7-c96b1a67daf1",
+      "running-jump": "312920e3-9e50-48cb-8cd5-f4338fc30c24",
+      "running-slide": "ab649897-6863-47bc-bd2c-3b384cea90f1",
+      "crouched-walking": "fd7b0005-d7a5-48f7-9de0-c6c7a7392afc",
+      "front-flip": "05ffd49c-1b78-4114-937b-5e4ae1e132f5",
+      "backflip": "e589b375-cb78-4b4a-8fed-c43782fc9684",
+      "drinking": "4bf1b642-34eb-45e2-a179-23146d96b855",
+      "picking-up": "1d24245d-d3f3-4764-9912-1f5675743a80",
+      "throw-object": "ddbb44f9-e4c4-409a-9e76-d4a85126b4c0",
+      "cross-punch": "68c43543-8768-48bb-82cb-2b52bc2d8435"
+    },
+    "ready": true,
+    "image_verified": true,
+    "skeleton_joints": 18,
+    "rotation_count": 8,
+    "exported": false,
+    "eight_way_visual_reviewed": true,
+    "motions_visual_reviewed": false,
+    "motion-frame-candidate-backflip-inverted-1": "4cf1145a-2955-438f-a514-1e99a5cb9e7f",
+    "motion-frame-candidate-picking-up-low-pose-1": "2c303eed-1fe3-484b-bf16-d095744d05c8",
+    "motion-frame-candidate-throw-object-release-1": "bbb0fb6d-76b3-44b7-8cc7-397bda37b237",
+    "motion-frame-candidate-front-flip-rotation-1": "e4a8b8a0-4167-4a16-a9de-857b14e4fdac"
+  }
+}
