@@ -18,7 +18,7 @@ LIST = [
  ("30","30","SE","끄덕이기"),("31","31","SE","고개 젓기"),("32","32","SE","화내기"),("33","33","E","발견 반응"),("34","34","SE","놀라기"),
  ("35","35","SE","기뻐하기"),("36","36","E","도망"),("37","37","E","뒷걸음질"),("37_1","37_1","E","뒷걸음질 반복"),("38","38_SW","SW","엎드려 기기"),("38_1","38_1","SW","엎드려 기기 반복"),("39","39","SE","주저앉기"),
  ("40","40","SE","주저앉아 뒤로 기어나가기"),("41","41","SE","웅크려 떨기"),("42","42_E","E","네발로 기기"),
- ("W1","W_1","E","무기 대기"),("22_1","22_1","E","고유기술 제압사격"),("25_1","25_1","E","필살기 바주카 꺼내기"),("25_2","25_2","E","필살기 바주카 발사"),
+ ("W1","W_1","E","무기 대기"),("22_1","22_1","E","고유기술 제압사격"),
 ]
 CLEAN = {}   # (동작, 장): 왼쪽 몇 px 지우기 — 그림 찌꺼기용
 GUN = {"W", "15", "22", "23", "24", "25", "W1", "22_1", "25_1", "25_2"}
@@ -48,11 +48,11 @@ for aid, folder, d, name in LIST:
                 for x in range(xmax): px[x, y] = (0, 0, 0, 0)
     w, h = ims[0].size
     sheet = Image.new("RGBA", (w * len(ims), h))
-    bot, reach, top, mz, foot = [], [], [], [], []
+    bot, reach, top, mz, foot, cx = [], [], [], [], [], []
     for i, im in enumerate(ims):
         sheet.paste(im, (i * w, 0))
         bb = im.getchannel("A").point(lambda v: 255 if v > 40 else 0).getbbox() or (0, 0, w, h)
-        bot.append(bb[3]); top.append(bb[1]); reach.append(bb[2] - w // 2)
+        bot.append(bb[3]); top.append(bb[1]); reach.append(bb[2] - w // 2); cx.append((bb[0] + bb[2]) // 2 - w // 2)
         px = im.load()
         # 발 = 맨 아래 12줄의 불투명 픽셀 범위(그림자 위치·폭)
         xs = [x for y in range(max(0, bb[3] - 26), bb[3]) for x in range(w) if px[x, y][3] > 40]
@@ -77,7 +77,7 @@ for aid, folder, d, name in LIST:
                         break
             mz.append([best[0] - w // 2, best[1]] if best else [40, h // 2])
     buf = io.BytesIO(); sheet.save(buf, "PNG", optimize=True)  # WebP는 일부 앱 보기 화면에서 안 나옴
-    data[aid] = dict(name=name, dir=d, n=len(ims), w=w, h=h, bot=bot, top=top, reach=reach, foot=foot, mz=mz, floor=max(bot),
+    data[aid] = dict(name=name, dir=d, n=len(ims), w=w, h=h, bot=bot, top=top, reach=reach, foot=foot, mz=mz, cx=cx, floor=max(bot),
                      src="data:image/png;base64," + base64.b64encode(buf.getvalue()).decode())
 # PixelLab VFX(이펙트 그림): vfx/<이름>.png + .json
 VFX = {}
