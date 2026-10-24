@@ -39060,7 +39060,7 @@
       "kind": "animation",
       "slug": "aileen",
       "template": "running-8-frames",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792806971.9445238,
       "receipt": {
         "background_job_ids": [
@@ -39081,11 +39081,11 @@
           "generations": 3.0
         },
         "id": "01f17a00-0eee-49e9-8b50-54af4860ff37",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-24T01:56:12.184766+00:00",
         "last_response": {
           "seed": 1997429788,
-          "type": "message_done",
+          "type": "done",
           "action": "smoothing frames",
           "images": [
             {
@@ -39137,9 +39137,23 @@
               "height": 256
             }
           ],
-          "progress": 0.99,
+          "progress": 1.0,
           "direction": "east",
+          "frame_count": 8,
+          "animation_id": "2601cf57-8f8d-4e09-bb93-b5264e323f62",
           "character_id": "558c27ed-873c-4207-9099-171bb64a09b2",
+          "storage_urls": {
+            "frames": [
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/2601cf57-8f8d-4e09-bb93-b5264e323f62/east/0.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/2601cf57-8f8d-4e09-bb93-b5264e323f62/east/1.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/2601cf57-8f8d-4e09-bb93-b5264e323f62/east/2.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/2601cf57-8f8d-4e09-bb93-b5264e323f62/east/3.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/2601cf57-8f8d-4e09-bb93-b5264e323f62/east/4.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/2601cf57-8f8d-4e09-bb93-b5264e323f62/east/5.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/2601cf57-8f8d-4e09-bb93-b5264e323f62/east/6.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/2601cf57-8f8d-4e09-bb93-b5264e323f62/east/7.png"
+            ]
+          },
           "billing_usage": {
             "usd": 0.0,
             "type": "generations",
@@ -39150,6 +39164,7 @@
           "queue_position": 0,
           "billing_charged": true,
           "generation_model": "skeleton-v3_template",
+          "saved_to_storage": true,
           "animation_group_id": "d3a65829-d40f-45c9-9150-1790e478b7b7",
           "motion_adjustments": {
             "stride": 1.0,
@@ -39162,13 +39177,21 @@
           "template_animation_id": "running-8-frames",
           "estimated_wait_seconds": 0
         }
-      }
+      },
+      "observed_end_epoch": 1792807627.5382247,
+      "elapsed_observed_seconds": 655.5937011241913,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 8
     },
     "63f11ca8-0bb6-43a9-b01b-0b45af85765c": {
       "kind": "animation",
       "slug": "aileen",
       "template": "running-jump",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792806972.4663363,
       "receipt": {
         "background_job_ids": [
@@ -39185,21 +39208,94 @@
       "endpoint": "animate-character",
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 3.0
         },
         "id": "63f11ca8-0bb6-43a9-b01b-0b45af85765c",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-24T01:56:12.724924+00:00",
         "last_response": {
-          "type": "message_progress",
-          "action": "generating",
-          "progress": 0.2738058425630442,
+          "seed": 1268283199,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "progress": 1.0,
           "direction": "east",
+          "frame_count": 8,
+          "animation_id": "b3352161-597a-43a0-b12a-38a55abb7a1a",
           "character_id": "558c27ed-873c-4207-9099-171bb64a09b2",
+          "storage_urls": {
+            "frames": [
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/b3352161-597a-43a0-b12a-38a55abb7a1a/east/0.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/b3352161-597a-43a0-b12a-38a55abb7a1a/east/1.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/b3352161-597a-43a0-b12a-38a55abb7a1a/east/2.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/b3352161-597a-43a0-b12a-38a55abb7a1a/east/3.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/b3352161-597a-43a0-b12a-38a55abb7a1a/east/4.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/b3352161-597a-43a0-b12a-38a55abb7a1a/east/5.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/b3352161-597a-43a0-b12a-38a55abb7a1a/east/6.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/b3352161-597a-43a0-b12a-38a55abb7a1a/east/7.png"
+            ]
+          },
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "684067fe-40ca-4d5a-8ef6-743fe5facdfc",
           "animation_name": null,
           "queue_position": 0,
+          "billing_charged": true,
           "generation_model": "skeleton-v3_template",
+          "saved_to_storage": true,
           "animation_group_id": "49d7e12d-a396-4e23-89d2-0320a6528ef5",
           "motion_adjustments": {
             "stride": 1.0,
@@ -39212,7 +39308,15 @@
           "template_animation_id": "running-jump",
           "estimated_wait_seconds": 0
         }
-      }
+      },
+      "observed_end_epoch": 1792807627.5533602,
+      "elapsed_observed_seconds": 655.0870244503021,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 8
     },
     "f0d9aba3-44bb-47f8-944e-ef511286e384": {
       "kind": "animation",
@@ -39943,7 +40047,7 @@
       "kind": "animation",
       "slug": "aileen",
       "template": "jumping-2",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792806984.8913424,
       "receipt": {
         "usage": null,
@@ -39953,23 +40057,89 @@
       "endpoint": "animate-with-skeleton-v3",
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 3.0
         },
         "id": "f5ec3eae-324f-48a3-97f6-8e9b5f374aaa",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-24T01:56:25.597688+00:00",
         "last_response": {
-          "type": "message_progress",
-          "action": "generating",
+          "seed": 2026110001,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
           "status": "initializing",
-          "progress": 0.2580246751291193,
+          "progress": 1.0,
           "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "ed76e709-caa0-4f60-be0b-1916fbba1b37",
           "queue_position": 0,
+          "billing_charged": true,
           "generation_started_at": "2026-10-24T01:56:36.778469+00:00",
           "estimated_wait_seconds": 0
         }
-      }
+      },
+      "observed_end_epoch": 1792807627.5591211,
+      "elapsed_observed_seconds": 642.667778968811,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 8
     },
     "926ed31d-6357-4ff3-a61b-42dd38a09a67": {
       "kind": "animation",
@@ -40300,7 +40470,7 @@
       "kind": "animation",
       "slug": "aileen",
       "template": "pushing",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792806988.505596,
       "receipt": {
         "background_job_ids": [
@@ -40317,21 +40487,80 @@
       "endpoint": "animate-character",
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 3.0
         },
         "id": "32a66515-c84f-4e4e-a964-1732d1110899",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-24T01:56:29.503410+00:00",
         "last_response": {
-          "type": "message_progress",
-          "action": "generating",
-          "progress": 0.2900075584633658,
+          "seed": 3403039188,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "progress": 1.0,
           "direction": "east",
+          "frame_count": 6,
+          "animation_id": "b53f6477-0110-42d7-b132-d2bb3d4691e1",
           "character_id": "558c27ed-873c-4207-9099-171bb64a09b2",
+          "storage_urls": {
+            "frames": [
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/b53f6477-0110-42d7-b132-d2bb3d4691e1/east/0.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/b53f6477-0110-42d7-b132-d2bb3d4691e1/east/1.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/b53f6477-0110-42d7-b132-d2bb3d4691e1/east/2.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/b53f6477-0110-42d7-b132-d2bb3d4691e1/east/3.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/b53f6477-0110-42d7-b132-d2bb3d4691e1/east/4.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/b53f6477-0110-42d7-b132-d2bb3d4691e1/east/5.png"
+            ]
+          },
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "5f984907-ebfc-4715-9e5c-a68e5a0cef1d",
           "animation_name": null,
           "queue_position": 0,
+          "billing_charged": true,
           "generation_model": "skeleton-v3_template",
+          "saved_to_storage": true,
           "animation_group_id": "734aa1dd-e372-453e-bbcd-238e9c481cd2",
           "motion_adjustments": {
             "stride": 1.0,
@@ -40344,7 +40573,15 @@
           "template_animation_id": "pushing",
           "estimated_wait_seconds": 0
         }
-      }
+      },
+      "observed_end_epoch": 1792807627.565409,
+      "elapsed_observed_seconds": 639.0598132610321,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 6
     },
     "f105a00e-1847-4eb7-b741-b12b72fba3f9": {
       "kind": "animation",
@@ -40939,14 +41176,69 @@
       "kind": "animation",
       "slug": "aileen",
       "template": "lead-jab",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792807204.19776,
       "receipt": {
         "usage": null,
         "background_job_id": "458e2f1e-151e-4272-b8ee-ecd7c8993c90",
         "status": "processing"
       },
-      "endpoint": "animate-with-skeleton-v3"
+      "endpoint": "animate-with-skeleton-v3",
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 2.0
+        },
+        "id": "458e2f1e-151e-4272-b8ee-ecd7c8993c90",
+        "status": "completed",
+        "created_at": "2026-10-24T02:00:05.913081+00:00",
+        "last_response": {
+          "seed": 2026112201,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "status": "initializing",
+          "progress": 1.0,
+          "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 2
+          },
+          "generation_id": "0715bd2b-ca97-4afc-92eb-e0e7d04fc8c7",
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_started_at": "2026-10-24T02:01:11.448521+00:00",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792807627.569705,
+      "elapsed_observed_seconds": 423.371945142746,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 2
+      },
+      "saved_frames": 3
     }
   },
   "characters": {
@@ -42018,7 +42310,7 @@
       "image_verified": true,
       "skeleton_joints": 18,
       "rotation_count": 8,
-      "exported": false,
+      "exported": true,
       "eight_way_visual_reviewed": true,
       "motions_visual_reviewed": false
     },
@@ -66148,9 +66440,99 @@
           "status": "processing"
         }
       }
+    },
+    {
+      "at": "2026-10-24T02:07:07Z",
+      "kind": "completed",
+      "slug": "aileen",
+      "detail": {
+        "kind": "animation",
+        "template": "running-8-frames",
+        "job_id": "01f17a00-0eee-49e9-8b50-54af4860ff37",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T02:07:07Z",
+      "kind": "completed",
+      "slug": "aileen",
+      "detail": {
+        "kind": "animation",
+        "template": "running-jump",
+        "job_id": "63f11ca8-0bb6-43a9-b01b-0b45af85765c",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T02:07:07Z",
+      "kind": "completed",
+      "slug": "aileen",
+      "detail": {
+        "kind": "animation",
+        "template": "jumping-2",
+        "job_id": "f5ec3eae-324f-48a3-97f6-8e9b5f374aaa",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T02:07:07Z",
+      "kind": "completed",
+      "slug": "aileen",
+      "detail": {
+        "kind": "animation",
+        "template": "pushing",
+        "job_id": "32a66515-c84f-4e4e-a964-1732d1110899",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T02:07:07Z",
+      "kind": "completed",
+      "slug": "aileen",
+      "detail": {
+        "kind": "animation",
+        "template": "lead-jab",
+        "job_id": "458e2f1e-151e-4272-b8ee-ecd7c8993c90",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 2
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T02:07:11Z",
+      "kind": "exported",
+      "slug": "aileen",
+      "detail": {
+        "bytes": 1263822,
+        "files": 117,
+        "production_pack_clips": 20
+      }
     }
   ],
-  "updated_at": 1792807206.1191,
+  "updated_at": 1792807631.5117464,
   "user_stopped_at": 1792778235.6917784,
   "archived_jobs": {
     "304457e9-6577-44f0-af17-97841a9f6720": {
@@ -67469,11 +67851,11 @@
       "saved_frames": 6
     }
   },
-  "last_git_checkpoint": 1792806872.1036918,
+  "last_git_checkpoint": 1792807208.3963351,
   "summary": {
     "jobs": {
-      "processing": 5,
-      "completed": 452,
+      "processing": 0,
+      "completed": 457,
       "failed": 9,
       "stalled": 0
     },

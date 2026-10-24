@@ -1,0 +1,20 @@
+{
+  "at": 1792807624.02523,
+  "job_id": "926ed31d-6357-4ff3-a61b-42dd38a09a67",
+  "result": "reroll-required",
+  "findings": "포니테일 끝 회색 덩어리와 6번째 머리카락 외곽 회색 잔상. 본인 기준 이미지와 실제 관절을 맞춰 재작업.",
+  "frame_count": 8,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "at": 1792807385.7791886,
+  "job_id": "b922a7a6-f01a-4dce-a06f-4f213187824b",
+  "result": "reroll-required",
+  "findings": "2·3·6·7번째 얼굴 앞 회색 덩어리 및 포니테일 끝 회색 면. 본인 정상 공중 자세 참조를 실제 관절 측정 후 사용해 재작업.",
+  "frame_count": 8,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

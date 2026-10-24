@@ -1,0 +1,20 @@
+{
+  "at": 1792807279.8280282,
+  "job_id": "f0d9aba3-44bb-47f8-944e-ef511286e384",
+  "result": "reroll-required",
+  "findings": "5·6번째 얼굴/머리/사지 투명 손상,2번째 머리/팔 회색 면, 방위와 동작 형태 변화. 자체 제한된 슬라이드 관절로 재작업.",
+  "frame_count": 6,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "running-slide",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

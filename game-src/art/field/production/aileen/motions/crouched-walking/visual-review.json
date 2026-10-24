@@ -1,0 +1,20 @@
+{
+  "at": 1792807294.679614,
+  "job_id": "46cd568a-1485-4a9d-9a13-b30c0bb01051",
+  "result": "reroll-required",
+  "findings": "1번째 아래쪽 발이 캔버스에서 잘림. 전체 높이와 발 좌표를 제한한 본인 관절 재작업 필요.",
+  "frame_count": 6,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "crouched-walking",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

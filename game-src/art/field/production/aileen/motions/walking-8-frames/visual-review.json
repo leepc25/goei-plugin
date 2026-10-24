@@ -1,0 +1,20 @@
+{
+  "at": 1792807337.6908307,
+  "job_id": "58f5bc8d-90fb-4cff-9c65-72967dc983ba",
+  "result": "reroll-required",
+  "findings": "마젠타 확대에서 포니테일 끝에 머리 음영과 구별되는 평평한 중성 회색 면 확인(1번째 등). 외곽 불량으로 반려.",
+  "frame_count": 8,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "walking-8-frames",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}
