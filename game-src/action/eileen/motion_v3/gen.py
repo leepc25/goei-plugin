@@ -35,6 +35,13 @@ def fetch_png(url):
     data = subprocess.run(["curl", "-sSf", "--retry", "3", url], capture_output=True, check=True).stdout
     return Image.open(io.BytesIO(data)).convert("RGBA")
 
+def pad(img, size):
+    """PixelLab은 결과 캔버스 폭을 몸에 맞춰 바꿔 준다(키는 같음). 가운데 맞춰 같은 크기로."""
+    if img.size == size: return img
+    c = Image.new("RGBA", size, (0, 0, 0, 0))
+    c.paste(img, ((size[0] - img.width) // 2, size[1] - img.height))
+    return c
+
 def b64(img):
     buf = io.BytesIO(); img.save(buf, "PNG")
     return {"type": "base64", "base64": base64.b64encode(buf.getvalue()).decode(), "format": "png"}
@@ -110,6 +117,11 @@ def run(n, dry=False):
         if start == "REG": start_img = None
         else: start_img = start
         if end == "REG": end = registered(r["dir"])
+        if end is not None:
+            base = start_img if start_img is not None else registered(r["dir"])
+            if end.size != base.size:
+                size = (max(end.width, base.width), max(end.height, base.height))
+                start_img, end = pad(base, size), pad(end, size)
         body = {"character_id": CID, "mode": "pixminimax", "action_description": r["prompt"],
                 "animation_name": f"v3 {n} {r['name']}", "directions": [r["dir"]],
                 "frame_count": r["frames"], "subject_description": subject, "initial_pose": r["pose"],
