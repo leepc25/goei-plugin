@@ -9,12 +9,12 @@ def main():
   prod=Production();c=prod.s['characters'][a.slug];base=c['motions'][a.slot];basejob=prod.s['jobs'][base]
   assert basejob['status']=='completed' and basejob.get('endpoint')=='animate-with-skeleton-v3'
   assert all(x.get('ready') and x.get('eight_way_visual_reviewed') for x in prod.s['characters'].values())
-  ctl=json.loads((OUT/'control.json').read_text());specpath=ctl['custom_motion_specs'][a.slug][a.slot];spec=json.loads((ROOT/specpath).read_text())
+  root=OUT/'motion-frame-candidates'/a.slug/a.slot/a.revision;key='motion-frame-candidate-'+a.slot+'-'+a.revision;jid=c.get(key)
+  ctl=json.loads((OUT/'control.json').read_text());specpath=json.loads((root/'config.json').read_text())['source_spec'] if jid else ctl['custom_motion_specs'][a.slug][a.slot];spec=json.loads((ROOT/specpath).read_text())
   assert spec['character_id']==c['character_id'] and spec.get('skeleton_visually_reviewed')
   request=json.loads((OUT/a.slug/(a.slot+'-request.json')).read_text())
   assert request['keypoints']==spec['request']['keypoints'] and request['direction']==spec['request']['direction']
   assert 0<=a.index<len(request['keypoints'])
-  root=OUT/'motion-frame-candidates'/a.slug/a.slot/a.revision;key='motion-frame-candidate-'+a.slot+'-'+a.revision;jid=c.get(key)
   config={'slug':a.slug,'slot':a.slot,'base_job_id':base,'target_frame_index':a.index,'source_spec':specpath,'seed':a.seed,'pose':request['keypoints'][a.index],'new_user_approval':False}
   reference=None
   if a.reference_index is not None:
