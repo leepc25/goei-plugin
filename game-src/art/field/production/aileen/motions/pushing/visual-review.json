@@ -1,8 +1,8 @@
 {
-  "at": 1792810484.6643567,
+  "at": 1792810728.4773164,
   "job_id": "26112962-08ae-494b-9f9b-82a398e44e85",
   "result": "reroll-required",
-  "findings": "Remaining frame 6 has exterior gray/brown mass; clean nearby selected pose will be reference for retry.",
+  "findings": "Full clip has closed fists in seven frames; only index5 has open pressing palms. Require consistent open palms, not a forward boxing guard.",
   "frame_count": 8,
   "directions": [
     "east"
@@ -22,9 +22,12 @@
     "frame_sources": [
       {
         "frame_index": 0,
-        "source_job_id": "26112962-08ae-494b-9f9b-82a398e44e85",
-        "source_frame_index": 0,
-        "sha256": "2a38e99ca77fe52a2237162e7ce49f816b16502aeabb6dea878ccdce77673f71"
+        "source_job_id": "d90d1824-7c56-429b-8f65-28b510ed4d22",
+        "source_frame_index": 2,
+        "target_pose_index": 0,
+        "source_path": "motion-frame-candidates/aileen/pushing/clean-pose-0-2/frames/2.png",
+        "sha256": "3f19418f001bcbaccbe67acd6721fe8b707d1ec2cf5ac482be013c893e1cb5aa",
+        "findings": "Candidate2 separates hair tips without broad gray end matte present in candidates0/1; intact braced body."
       },
       {
         "frame_index": 1,
@@ -73,9 +76,12 @@
       },
       {
         "frame_index": 6,
-        "source_job_id": "26112962-08ae-494b-9f9b-82a398e44e85",
-        "source_frame_index": 6,
-        "sha256": "c2796e163323984d97f205d5f4fed31cd46d2d857deda24a0f376884d4f6dfd3"
+        "source_job_id": "319991db-7083-4a02-aa24-1a8a8aaba674",
+        "source_frame_index": 1,
+        "target_pose_index": 6,
+        "source_path": "motion-frame-candidates/aileen/pushing/clean-pose-6-2/frames/1.png",
+        "sha256": "191475a3d1c05f6dd96835af505ce1103501e7faab8a14d38973ef989aa204f4",
+        "findings": "Candidate1 removes candidate0 gray hair-end mass; transparent space around legs and intact black suit."
       },
       {
         "frame_index": 7,

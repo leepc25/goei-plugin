@@ -1,0 +1,8 @@
+{
+  "slug": "secriem",
+  "character_id": "cc736d14-93e1-4242-9d54-904baff03c3b",
+  "direction": "east",
+  "image_sha256": "0dcaee26627f404fb77274cbf7c1b6f0ff2fd8fb9f65627edb7339dd3d2d9b86",
+  "started_epoch": 1792810701.9995193,
+  "expected_generations": 0.1
+}

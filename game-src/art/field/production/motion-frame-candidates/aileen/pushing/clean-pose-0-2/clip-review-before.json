@@ -1,0 +1,94 @@
+{
+  "at": 1792810484.6643567,
+  "job_id": "26112962-08ae-494b-9f9b-82a398e44e85",
+  "result": "reroll-required",
+  "findings": "Remaining frame 6 has exterior gray/brown mass; clean nearby selected pose will be reference for retry.",
+  "frame_count": 8,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ],
+  "frame_assembly": {
+    "base_job_id": "26112962-08ae-494b-9f9b-82a398e44e85",
+    "frame_sources": [
+      {
+        "frame_index": 0,
+        "source_job_id": "26112962-08ae-494b-9f9b-82a398e44e85",
+        "source_frame_index": 0,
+        "sha256": "2a38e99ca77fe52a2237162e7ce49f816b16502aeabb6dea878ccdce77673f71"
+      },
+      {
+        "frame_index": 1,
+        "source_job_id": "9e197c33-2796-4686-b512-87fd1659fe40",
+        "source_frame_index": 0,
+        "target_pose_index": 1,
+        "source_path": "motion-frame-candidates/aileen/pushing/clean-pose-1-1/frames/0.png",
+        "sha256": "2ce3a0ed19f786f9109af2d6a7b8683aa6bc08814cab107273d5557d8b457c89",
+        "findings": "Selected intact forward braced pose with separated blonde strands and transparent exterior; rejected alternative candidates with gray or brown background blobs."
+      },
+      {
+        "frame_index": 2,
+        "source_job_id": "6ff4baf9-1e68-42a9-a10d-5a8760ec9c55",
+        "source_frame_index": 0,
+        "target_pose_index": 2,
+        "source_path": "motion-frame-candidates/aileen/pushing/clean-pose-2-1/frames/0.png",
+        "sha256": "6a06d1bab4075921ddb250d29fa0e1fae9d70e35f428827e8f1c69a63196ba60",
+        "findings": "Selected intact forward braced pose with separated blonde strands and transparent exterior; rejected alternative candidates with gray or brown background blobs."
+      },
+      {
+        "frame_index": 3,
+        "source_job_id": "de57d1ed-2821-4b0a-86d8-766de3462445",
+        "source_frame_index": 1,
+        "target_pose_index": 3,
+        "source_path": "motion-frame-candidates/aileen/pushing/clean-pose-3-1/frames/1.png",
+        "sha256": "6b472259af6eba33e6f63d4c458d84d6ea4c0fc5ca8535784393d2427d3242cc",
+        "findings": "Selected intact forward braced pose with separated blonde strands and transparent exterior; rejected alternative candidates with gray or brown background blobs."
+      },
+      {
+        "frame_index": 4,
+        "source_job_id": "755c1a8d-92b4-4c4a-8bb5-8acb118e9440",
+        "source_frame_index": 1,
+        "target_pose_index": 4,
+        "source_path": "motion-frame-candidates/aileen/pushing/clean-pose-4-1/frames/1.png",
+        "sha256": "e38ed194ec666b97065b050e92877dbf4d17d7a28cacc1b783317948b4629324",
+        "findings": "Selected intact forward braced pose with separated blonde strands and transparent exterior; rejected alternative candidates with gray or brown background blobs."
+      },
+      {
+        "frame_index": 5,
+        "source_job_id": "d85f8f38-a3bb-4c85-8f81-f73db04ed1d1",
+        "source_frame_index": 2,
+        "target_pose_index": 5,
+        "source_path": "motion-frame-candidates/aileen/pushing/clean-pose-5-1/frames/2.png",
+        "sha256": "5c383a7a8ff6e2c96a32c785320e0f1a0c908de2b86d1e06f4bca5cc168508b2",
+        "findings": "후보 전체 확인. 선택 프레임은 얼굴·손·구두 외곽이 온전하고 몸 밖 회색 덩어리 없음. 같은 목표 자세 유지."
+      },
+      {
+        "frame_index": 6,
+        "source_job_id": "26112962-08ae-494b-9f9b-82a398e44e85",
+        "source_frame_index": 6,
+        "sha256": "c2796e163323984d97f205d5f4fed31cd46d2d857deda24a0f376884d4f6dfd3"
+      },
+      {
+        "frame_index": 7,
+        "source_job_id": "832a7f3c-dd38-48e1-b16d-782e9fb84e2a",
+        "source_frame_index": 0,
+        "target_pose_index": 7,
+        "source_path": "motion-frame-candidates/aileen/pushing/clean-pose-7-1/frames/0.png",
+        "sha256": "1a655b19645a6b22690564635ac379b976b80f5d0d6e7ad9c74dda3b0de2b493",
+        "findings": "Selected intact forward braced pose with separated blonde strands and transparent exterior; rejected alternative candidates with gray or brown background blobs."
+      }
+    ],
+    "method": "select complete same-pose regenerated frames; no pixel editing",
+    "new_user_approval": false,
+    "visual_reviewed": false
+  }
+}

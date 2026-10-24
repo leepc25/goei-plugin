@@ -1,0 +1,9 @@
+{
+  "frame_index": 10,
+  "source_job_id": "8eae1f21-0440-4210-addc-3bb8335b10f6",
+  "source_frame_index": 2,
+  "target_pose_index": 10,
+  "source_path": "motion-frame-candidates/aileen/front-flip/clean-pose-10-1/frames/2.png",
+  "sha256": "797887469a70a7c781e324c1afd5e0348b2251fda7d6c4344afa8667977b65f6",
+  "findings": "Only candidate2 has transparent exterior and separated blonde ponytail tips; candidates0/1 have large opaque brown masses and are rejected."
+}

@@ -1,0 +1,8 @@
+{
+  "slug": "baek-sa-heon",
+  "character_id": "dcd8fbf1-126e-43ea-a83f-fed78e9fd646",
+  "direction": "east",
+  "image_sha256": "683074a08fe35635e6444b4f0f2f5bfce68fb896791cadad49e33e435911659f",
+  "started_epoch": 1792810660.97588,
+  "expected_generations": 0.1
+}
