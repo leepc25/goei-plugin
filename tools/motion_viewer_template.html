@@ -38,6 +38,7 @@ nav.side input { width: 100%; font: inherit; padding: 6px 10px; border: 1px soli
 .who .nm { flex: 1; min-width: 0 } .who .tag { font-size: 11px; color: var(--muted) }
 .who[aria-current="true"] { background: var(--accent-soft); color: var(--accent); font-weight: 700 }
 .mob { display: none }
+.tabs { display: flex; gap: 6px; margin-bottom: 10px } .tab { flex: 1; font-size: 12px; padding: 6px 4px } .tab[aria-pressed="true"] { background: var(--accent); color: #fff; border-color: var(--accent) }
 main { min-width: 0 }
 .card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 18px }
 .hero { display: flex; gap: 20px; align-items: flex-end; flex-wrap: wrap }
@@ -83,8 +84,8 @@ td.small { white-space: nowrap; font-variant-numeric: tabular-nums; width: 46px 
     <button id="tgl" type="button">확인할 것 보기</button>
   </header>
   <section class="checks" id="checks" hidden><h2>사용자 확인이 필요한 것</h2><ol id="chk"></ol></section>
-  <div class="mob"><label for="sel" class="tmpl">인물</label> <select id="sel"></select></div>
-  <nav class="side" id="side"><input id="q" type="search" placeholder="이름 찾기" aria-label="이름 찾기"><div id="list"></div></nav>
+  <div class="mob"><div class="tabs"><button type="button" class="tab" data-set="chars">이름 있는 55명</button><button type="button" class="tab" data-set="npcs">일반 NPC 71명</button></div><label for="sel" class="tmpl">인물</label> <select id="sel"></select></div>
+  <nav class="side" id="side"><div class="tabs" role="tablist"><button type="button" id="t1" class="tab" data-set="chars">이름 있는 55명</button><button type="button" id="t2" class="tab" data-set="npcs">일반 NPC 71명</button></div><input id="q" type="search" placeholder="이름 찾기" aria-label="이름 찾기"><div id="list"></div></nav>
   <main id="main"></main>
 </div>
 
@@ -92,15 +93,19 @@ td.small { white-space: nowrap; font-variant-numeric: tabular-nums; width: 46px 
 const D = /*DATA*/null;
 const SEC = [[1,'기본'],[4,'이동'],[6,'점프'],[9,'공격'],[16,'방어'],[18,'피격'],[22,'기술'],[26,'생활'],[28,'대화 · 반응'],[36,'비전투 반응']];
 const KEY = {1:'—',2:'무작위',3:'—',4:'방향',5:'Shift+방향',6:'Space',7:'방향+Space',8:'뛰다 Space',9:'Z',10:'Z Z',11:'Z Z Z',12:'X',13:'뛰다 Z',14:'공중 Z',15:'A',16:'D 짧게',17:'D 길게',18:'맞을 때',19:'크게 맞을 때',20:'—',21:'—',22:'C 짧게',23:'C 길게',24:'C 뗌',25:'S',26:'E',27:'E',28:'E 받음',29:'대사 중',30:'결과 좋음',31:'결과 싫음',32:'호감 크게 하락',33:'적 발견',34:'겁먹은 조우',35:'호감 크게 상승',36:'패닉',37:'겁먹음',38:'쓰러진 뒤',39:'주저앉은 뒤',40:'겁먹음',41:'겁먹음'};
+const NSEC = [[1,'기본'],[4,'이동'],[6,'공격'],[12,'방어'],[14,'피격'],[18,'기술'],[20,'대화'],[26,'반응']];
+const NKEY = {1:'늘',2:'무작위',3:'싸울 때',4:'일과·서성이기',5:'쫓기',6:'근접',7:'근접 연타',8:'근접 연타',9:'큰 한 방',10:'달려들기',11:'사격',12:'짧게 피함',13:'막음',14:'맞음',15:'크게 맞음',16:'쓰러진 뒤',17:'강에 맞음',18:'모으기',19:'방출',20:'E 받음',21:'대사 중',22:'결과 좋음',23:'결과 싫음',24:'호감 크게 하락',25:'호감 크게 상승',26:'적 발견',27:'겁먹은 조우',28:'패닉',29:'겁먹음',30:'쓰러진 뒤',31:'주저앉은 뒤',32:'겁먹음',33:'겁먹음'};
 const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-$('#sum').textContent = `55명 · 합계 ${D.total.toLocaleString()}회 · 생성 0회 · 사용자 확인 전`;
+$('#sum').textContent = `이름 있는 55명 ${D.total.toLocaleString()}회 · 일반 NPC ${D.npcs.length}명 ${D.ntotal.toLocaleString()}회 · 생성 0회 · 사용자 확인 전`;
+let SET = 'chars';
+const ALL = () => D.chars.concat(D.npcs);
 $('#chk').innerHTML = D.checks.map(c => `<li>${esc(c)}</li>`).join('');
 $('#tgl').onclick = () => { const h = $('#checks'); h.hidden = !h.hidden; $('#tgl').textContent = h.hidden ? '확인할 것 보기' : '확인할 것 닫기'; };
 
 function list(filter='') {
   let html = '', g = '';
-  for (const c of D.chars) {
+  for (const c of D[SET]) {
     if (filter && !(c.ko + c.en).toLowerCase().includes(filter.toLowerCase())) continue;
     if (c.grp !== g) { g = c.grp; html += `<div class="grp">${g}</div>`; }
     html += `<button class="who" type="button" data-no="${c.no}"><img src="${c.img[0]}" alt=""><span class="nm">${c.ko}</span><span class="tag">${c.combat ? '' : '비전투'}</span></button>`;
@@ -110,21 +115,26 @@ function list(filter='') {
   mark();
 }
 $('#q').oninput = e => list(e.target.value);
-$('#sel').innerHTML = D.chars.map(c => `<option value="${c.no}">${c.no} ${c.ko} · ${c.grp}</option>`).join('');
+function setSet(k, keep) {
+  SET = k; document.querySelectorAll('.tab').forEach(b => b.setAttribute('aria-pressed', b.dataset.set === k ? 'true' : 'false'));
+  $('#sel').innerHTML = D[k].map(c => `<option value="${c.no}">${c.npc ? '' : c.no + ' '}${c.ko} · ${c.grp}</option>`).join('');
+  $('#q').value = ''; list(); if (!keep) show(D[k][0].no);
+}
+document.querySelectorAll('.tab').forEach(b => b.onclick = () => setSet(b.dataset.set));
 $('#sel').onchange = e => show(e.target.value);
 
 let cur = null;
 function mark() { document.querySelectorAll('.who').forEach(b => b.setAttribute('aria-current', b.dataset.no === cur ? 'true' : 'false')); }
 function show(no) {
-  const c = D.chars.find(x => x.no === no) || D.chars[0]; cur = c.no; mark(); $('#sel').value = c.no;
+  const c = ALL().find(x => x.no === no) || D.chars[0]; cur = c.no; mark(); $('#sel').value = c.no;
   try { localStorage.setItem('mv-cur', c.no) } catch (e) {}
   const W = c.dir.startsWith('W');
-  let rows = '', si = 0;
+  let rows = '', si = 0; const sec = c.npc ? NSEC : SEC, key = c.npc ? NKEY : KEY;
   for (const r of c.rows) {
-    while (si < SEC.length && SEC[si][0] <= r.n) { rows += `<tr class="sec"><td colspan="6">${SEC[si][1]}</td></tr>`; si++; }
+    while (si < sec.length && sec[si][0] <= r.n) { rows += `<tr class="sec"><td colspan="6">${sec[si][1]}</td></tr>`; si++; }
     const tmpl = r.en.startsWith('(견본');
     rows += `<tr><td class="n">${r.n}</td>
-      <td class="nm"><b>${esc(r.name)}</b><span class="key">${KEY[r.n] || ''}</span></td>
+      <td class="nm"><b>${esc(r.name)}</b><span class="key">${key[r.n] || ''}</span></td>
       <td class="small"><span class="dir">${esc(r.dir)}</span></td>
       <td class="small">${esc(r.fr)}장</td><td class="small">${esc(r.cost)}회</td>
       <td>${tmpl ? `<span class="tmpl">PixMiniMax Free motion 견본 (${r.n === 4 ? 'walking' : 'running'}), 프롬프트 없음</span>` :
@@ -139,9 +149,9 @@ function show(no) {
       </div>
       <div class="info">
         <h2>${c.ko}<small>${esc(c.en)}</small></h2>
-        <div class="role">${c.no} · ${c.grp} · ${esc(c.title)}</div>
+        <div class="role">${c.npc ? '' : c.no + ' · '}${c.grp} · ${esc(c.title)}</div>
         <div class="pills">
-          <span class="pill on">${c.combat ? '전투' : '비전투'}</span>
+          <span class="pill on">${c.npc ? '일반 NPC' : (c.combat ? '전투' : '비전투')}</span>
           <span class="pill">방향 ${W ? '서 / 남서' : '동 / 남동'}</span>
           <span class="pill">${c.rows.length}줄</span>
           <span class="pill">${c.cost}회</span>
@@ -159,7 +169,8 @@ function show(no) {
     setTimeout(() => b.textContent = '복사', 1200);
   });
 }
-list();
 let start = null; try { start = localStorage.getItem('mv-cur') } catch (e) {}
-show(start || '1.1');
+const st = ALL().find(x => x.no === start);
+setSet(st && st.npc ? 'npcs' : 'chars', true);
+show(st ? st.no : '1.1');
 </script>

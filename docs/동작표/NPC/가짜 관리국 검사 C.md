@@ -24,7 +24,7 @@
 | 14 | 맞기 | E | 4 | narrow forward stance, right hand beside the hilt, sword sheathed | The thin body snaps back at the shoulders from a hit and the head jolts, then he resettles forward.<br>（마른 몸이 맞아서 어깨부터 뒤로 꺾이고 고개가 튕겼다가 다시 앞으로 자리 잡는다.） | 1 |
 | 15 | 날아가 쓰러지기 | E | 8 | narrow forward stance, right hand beside the hilt, sword sheathed | Is flung back in a long low arc, the limbs trailing loosely, skids on the back and ends still with one arm stretched above the head.<br>（길고 낮은 포물선으로 뒤로 날아가며 팔다리가 늘어지고, 등으로 미끄러져 한 팔을 머리 위로 뻗은 채 멈춘다.） | 1 |
 | 16 | 일어나기 | E | 8 | lying on the back, one arm above the head | Rolls onto the stomach, pushes up into a low crouch, rises without a sound and settles the left thumb on the guard.<br>（엎드려 굴러 낮게 웅크린 자세로 밀어 올리고 소리 없이 일어나 왼엄지를 코등이에 얹는다.） | 1 |
-| 17 | 스턴 | SE | 8 | standing upright, arms at the sides | Dazed, the thin frame wavers like a reed, the head drooping to one shoulder while the arms dangle, swaying back and forth.<br>（멍해서 마른 몸이 갈대처럼 흔들리고 고개가 한쪽 어깨로 처지며 팔이 늘어진 채 앞뒤로 흔들린다.） | 1 |
+| 17 | 스턴 | SE | 8 | standing upright, arms at the sides | Dazed, the thin frame wavers loosely, the head drooping to one shoulder while the arms dangle, swaying back and forth.<br>（멍해서 마른 몸이 휘청휘청 흔들리고 고개가 한쪽 어깨로 처지며 팔이 늘어진 채 앞뒤로 흔들린다.） | 1 |
 | 18 | 충전 모으기 | E | 8 | — | — 없음 | 0 |
 | 19 | 충전 방출 | E | 8 | — | — 없음 | 0 |
 | 20 | 응대 | SE | 4 | standing upright, arms at the sides | Turns only the eyes and then the head toward the viewer, no other movement, expression flat.<br>（눈만 먼저, 이어 고개만 보는 사람 쪽으로 돌린다. 다른 움직임 없이 무표정.） | 1 |
