@@ -46368,7 +46368,7 @@
       "kind": "motion-frame-candidate-crouched-walking-clean-pose-2-2",
       "slug": "aileen",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792809453.1509426,
       "receipt": {
         "usage": null,
@@ -46379,26 +46379,65 @@
       "archive_output": "motion-frame-candidates/aileen/crouched-walking/clean-pose-2-2/frames",
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 2.0
         },
         "id": "c0b29250-2cca-4e00-8c0a-5e67924f75df",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-24T02:37:33.769854+00:00",
         "last_response": {
-          "type": "background",
+          "seed": 2026113702,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
           "status": "initializing",
+          "progress": 1.0,
           "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 2
+          },
+          "generation_id": "9860bbdd-5d14-4bf0-86ee-1bfaefdd8ec3",
           "queue_position": 0,
+          "billing_charged": true,
+          "generation_started_at": "2026-10-24T02:38:18.861257+00:00",
           "estimated_wait_seconds": 0
         }
-      }
+      },
+      "observed_end_epoch": 1792809845.4261005,
+      "elapsed_observed_seconds": 392.2751581668854,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 2
+      },
+      "saved_frames": 3
     },
     "9486488c-81d9-46af-9dc6-2c39db6a4705": {
       "kind": "motion-frame-candidate-crouched-walking-clean-pose-3-2",
       "slug": "aileen",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792809454.1694558,
       "receipt": {
         "usage": null,
@@ -46409,12 +46448,141 @@
       "archive_output": "motion-frame-candidates/aileen/crouched-walking/clean-pose-3-2/frames",
       "last_response": {
         "usage": {
+          "type": "generations",
+          "generations": 2.0
+        },
+        "id": "9486488c-81d9-46af-9dc6-2c39db6a4705",
+        "status": "completed",
+        "created_at": "2026-10-24T02:37:34.420889+00:00",
+        "last_response": {
+          "seed": 2026113703,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "status": "initializing",
+          "progress": 1.0,
+          "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 2
+          },
+          "generation_id": "216b4b36-72e6-47b4-a8f7-727555da49df",
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_started_at": "2026-10-24T02:38:20.018687+00:00",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792809847.0747757,
+      "elapsed_observed_seconds": 392.9053204059601,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 2
+      },
+      "saved_frames": 3
+    },
+    "08cdb028-8b59-4175-89ad-4018de45da49": {
+      "kind": "motion-frame-candidate-front-flip-clean-pose-4-2",
+      "slug": "aileen",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792809841.4083788,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "08cdb028-8b59-4175-89ad-4018de45da49",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3",
+      "archive_output": "motion-frame-candidates/aileen/front-flip/clean-pose-4-2/frames",
+      "last_response": {
+        "usage": {
           "type": "usd",
           "usd": 0.0
         },
-        "id": "9486488c-81d9-46af-9dc6-2c39db6a4705",
+        "id": "08cdb028-8b59-4175-89ad-4018de45da49",
         "status": "processing",
-        "created_at": "2026-10-24T02:37:34.420889+00:00",
+        "created_at": "2026-10-24T02:44:02.733075+00:00",
+        "last_response": {
+          "type": "background",
+          "status": "initializing",
+          "flow_kind": "animation",
+          "queue_position": 0,
+          "estimated_wait_seconds": 0
+        }
+      }
+    },
+    "84042bad-5240-4eeb-94f2-bbddc967bf97": {
+      "kind": "motion-frame-candidate-backflip-clean-pose-3-2",
+      "slug": "aileen",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792809843.083201,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "84042bad-5240-4eeb-94f2-bbddc967bf97",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3",
+      "archive_output": "motion-frame-candidates/aileen/backflip/clean-pose-3-2/frames",
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "84042bad-5240-4eeb-94f2-bbddc967bf97",
+        "status": "processing",
+        "created_at": "2026-10-24T02:44:03.701512+00:00",
+        "last_response": {
+          "type": "background",
+          "status": "initializing",
+          "flow_kind": "animation",
+          "queue_position": 0,
+          "estimated_wait_seconds": 0
+        }
+      }
+    },
+    "77f2e27b-6c0b-438b-b5a9-6b258bfcfd1f": {
+      "kind": "motion-frame-candidate-running-8-frames-clean-pose-7-2",
+      "slug": "aileen",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792809844.2002485,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "77f2e27b-6c0b-438b-b5a9-6b258bfcfd1f",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3",
+      "archive_output": "motion-frame-candidates/aileen/running-8-frames/clean-pose-7-2/frames",
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "77f2e27b-6c0b-438b-b5a9-6b258bfcfd1f",
+        "status": "processing",
+        "created_at": "2026-10-24T02:44:04.486235+00:00",
         "last_response": {
           "type": "background",
           "status": "initializing",
@@ -47784,6 +47952,415 @@
           "method": "select complete same-pose regenerated frames; no pixel editing",
           "new_user_approval": false,
           "visual_reviewed": false
+        },
+        "front-flip": {
+          "base_job_id": "7c0469a4-dedb-4e04-bd72-706ac1b4983c",
+          "frame_sources": [
+            {
+              "frame_index": 0,
+              "source_job_id": "7c0469a4-dedb-4e04-bd72-706ac1b4983c",
+              "source_frame_index": 0,
+              "sha256": "3b11dbe39b083ae8d84e8d636a93fd0534e878d87f9a9f9e0cd2ffabf3ad007d"
+            },
+            {
+              "frame_index": 1,
+              "source_job_id": "7c0469a4-dedb-4e04-bd72-706ac1b4983c",
+              "source_frame_index": 1,
+              "sha256": "4c48bbbf89fdc549a4604b4944478741d0818988389fa1d277c3ded98628714c"
+            },
+            {
+              "frame_index": 2,
+              "source_job_id": "7c0469a4-dedb-4e04-bd72-706ac1b4983c",
+              "source_frame_index": 2,
+              "sha256": "43d0690c86a10beaca174e5134ca5a75a1954c54783eec2e89bfe71a912a6dee"
+            },
+            {
+              "frame_index": 3,
+              "source_job_id": "7c0469a4-dedb-4e04-bd72-706ac1b4983c",
+              "source_frame_index": 3,
+              "sha256": "07bc6b9b883bf0ec35fcb89f11b4d31d15de8d295b9272a384fae1c1aa2b283d"
+            },
+            {
+              "frame_index": 4,
+              "source_job_id": "7c0469a4-dedb-4e04-bd72-706ac1b4983c",
+              "source_frame_index": 4,
+              "sha256": "9b4aa7057c2b94f7ee6e951770028e22e53789829c950c1c3b8e640a473b7221"
+            },
+            {
+              "frame_index": 5,
+              "source_job_id": "7c0469a4-dedb-4e04-bd72-706ac1b4983c",
+              "source_frame_index": 5,
+              "sha256": "bbd952e4d00a7a7e406817b6f3f8304ab71a822249b82bce78b2f593cbaadb88"
+            },
+            {
+              "frame_index": 6,
+              "source_job_id": "7c0469a4-dedb-4e04-bd72-706ac1b4983c",
+              "source_frame_index": 6,
+              "sha256": "dcd4bfcbe2c991d54660a3c856715a30dda603804f32c22a9c693b94bf4dcbe6"
+            },
+            {
+              "frame_index": 7,
+              "source_job_id": "7c0469a4-dedb-4e04-bd72-706ac1b4983c",
+              "source_frame_index": 7,
+              "sha256": "3ae7855ca193cce0e045b3f0f8c18772ee2e1b334c0790171ac1d285e4224bc5"
+            },
+            {
+              "frame_index": 8,
+              "source_job_id": "7c0469a4-dedb-4e04-bd72-706ac1b4983c",
+              "source_frame_index": 8,
+              "sha256": "84d0cd1aa59feb867568f7146986676a6c3d574b2226a926758136fc9cc0105d"
+            },
+            {
+              "frame_index": 9,
+              "source_job_id": "b87a717a-5da3-4c61-9000-dcff4cdd2b74",
+              "source_frame_index": 1,
+              "target_pose_index": 9,
+              "source_path": "motion-frame-candidates/aileen/front-flip/clean-pose-9-1/frames/1.png",
+              "sha256": "1ad6d735b8e13f13ae09363815435c37de22ac5a8b891eb63701077834497c5d",
+              "findings": "후보 전체 확인. 선택 프레임은 얼굴·손·구두 외곽이 온전하고 몸 밖 회색 덩어리 없음. 같은 목표 자세 유지."
+            },
+            {
+              "frame_index": 10,
+              "source_job_id": "7c0469a4-dedb-4e04-bd72-706ac1b4983c",
+              "source_frame_index": 10,
+              "sha256": "73d1317437ebcc6f16d6194f898891f06d3eaef7e0aab61b9ee66abd3dc2e830"
+            },
+            {
+              "frame_index": 11,
+              "source_job_id": "7c0469a4-dedb-4e04-bd72-706ac1b4983c",
+              "source_frame_index": 11,
+              "sha256": "f66611c2a7d128b80ad1f1354d47a153b1f44cd8cf8b8aeda952557586adc479"
+            },
+            {
+              "frame_index": 12,
+              "source_job_id": "7c0469a4-dedb-4e04-bd72-706ac1b4983c",
+              "source_frame_index": 12,
+              "sha256": "c28253ce59366fcd0e4611da436ed5dcc2ffedc0f250403ef9dfadc8804c1d55"
+            }
+          ],
+          "method": "select complete same-pose regenerated frames; no pixel editing",
+          "new_user_approval": false,
+          "visual_reviewed": false
+        },
+        "running-slide": {
+          "base_job_id": "da75aa01-b246-4001-93cd-b9d140c961a5",
+          "frame_sources": [
+            {
+              "frame_index": 0,
+              "source_job_id": "da75aa01-b246-4001-93cd-b9d140c961a5",
+              "source_frame_index": 0,
+              "sha256": "91dc7e24fad563f86f8da95b6048782cefbc509a247a773fda8656beda4861c6"
+            },
+            {
+              "frame_index": 1,
+              "source_job_id": "da75aa01-b246-4001-93cd-b9d140c961a5",
+              "source_frame_index": 1,
+              "sha256": "e52af9d832538fa5f4fa8cbed9d5da60c510c4b3bfe9197a37710d9a7eef779a"
+            },
+            {
+              "frame_index": 2,
+              "source_job_id": "2b5bd3b4-f86a-46dc-ab8a-77ba3030ae6e",
+              "source_frame_index": 1,
+              "target_pose_index": 2,
+              "source_path": "motion-frame-candidates/aileen/running-slide/clean-pose-2-1/frames/1.png",
+              "sha256": "e32de5ba33c76c45aec19a2be31acfd63db22c78e87dc8d8a49c2ddd20c20356",
+              "findings": "후보 전체 확인. 선택 프레임은 얼굴·손·구두 외곽이 온전하고 몸 밖 회색 덩어리 없음. 같은 목표 자세 유지."
+            },
+            {
+              "frame_index": 3,
+              "source_job_id": "da75aa01-b246-4001-93cd-b9d140c961a5",
+              "source_frame_index": 3,
+              "sha256": "2b0db8a139539d96830d9b4a04b6671fabe5cd8d9a19942a32ac539acc0e8cd4"
+            },
+            {
+              "frame_index": 4,
+              "source_job_id": "da75aa01-b246-4001-93cd-b9d140c961a5",
+              "source_frame_index": 4,
+              "sha256": "d55a4d77f18509d6eeb87aee72bde6a19f27c8195bc42bf6296503ac817ffc07"
+            },
+            {
+              "frame_index": 5,
+              "source_job_id": "da75aa01-b246-4001-93cd-b9d140c961a5",
+              "source_frame_index": 5,
+              "sha256": "42874821a5537fa2f3761dfc76a8b9720a6a36253e284b649acb64bdeb8dd726"
+            },
+            {
+              "frame_index": 6,
+              "source_job_id": "da75aa01-b246-4001-93cd-b9d140c961a5",
+              "source_frame_index": 6,
+              "sha256": "96bfaac7994961264c3b3fedfa6c81b879cdd15a9653a10867fd6589f149db73"
+            },
+            {
+              "frame_index": 7,
+              "source_job_id": "da75aa01-b246-4001-93cd-b9d140c961a5",
+              "source_frame_index": 7,
+              "sha256": "46bf101b46cd2c7c740849c858173c81b448c400be53bb5e01c80e165a76f8de"
+            }
+          ],
+          "method": "select complete same-pose regenerated frames; no pixel editing",
+          "new_user_approval": false,
+          "visual_reviewed": false
+        },
+        "pushing": {
+          "base_job_id": "26112962-08ae-494b-9f9b-82a398e44e85",
+          "frame_sources": [
+            {
+              "frame_index": 0,
+              "source_job_id": "26112962-08ae-494b-9f9b-82a398e44e85",
+              "source_frame_index": 0,
+              "sha256": "2a38e99ca77fe52a2237162e7ce49f816b16502aeabb6dea878ccdce77673f71"
+            },
+            {
+              "frame_index": 1,
+              "source_job_id": "26112962-08ae-494b-9f9b-82a398e44e85",
+              "source_frame_index": 1,
+              "sha256": "508f64d68abcdc7dcf592b1fb3aeb53e292f4b8bc8df4d550ee47593796c0372"
+            },
+            {
+              "frame_index": 2,
+              "source_job_id": "26112962-08ae-494b-9f9b-82a398e44e85",
+              "source_frame_index": 2,
+              "sha256": "f51f6454feaea34b8597542b12fb22a6db43ba18ed0d18fbdd88e13c4528ed53"
+            },
+            {
+              "frame_index": 3,
+              "source_job_id": "26112962-08ae-494b-9f9b-82a398e44e85",
+              "source_frame_index": 3,
+              "sha256": "cf8cdee3c8329cce8a61c3b0f32455181bc41e35779ad2298f2122fb577ebbf0"
+            },
+            {
+              "frame_index": 4,
+              "source_job_id": "26112962-08ae-494b-9f9b-82a398e44e85",
+              "source_frame_index": 4,
+              "sha256": "26011ea94eab88655bac5780bff37fa8c742ad5ccc97b1171e473a49c26a6652"
+            },
+            {
+              "frame_index": 5,
+              "source_job_id": "d85f8f38-a3bb-4c85-8f81-f73db04ed1d1",
+              "source_frame_index": 2,
+              "target_pose_index": 5,
+              "source_path": "motion-frame-candidates/aileen/pushing/clean-pose-5-1/frames/2.png",
+              "sha256": "5c383a7a8ff6e2c96a32c785320e0f1a0c908de2b86d1e06f4bca5cc168508b2",
+              "findings": "후보 전체 확인. 선택 프레임은 얼굴·손·구두 외곽이 온전하고 몸 밖 회색 덩어리 없음. 같은 목표 자세 유지."
+            },
+            {
+              "frame_index": 6,
+              "source_job_id": "26112962-08ae-494b-9f9b-82a398e44e85",
+              "source_frame_index": 6,
+              "sha256": "c2796e163323984d97f205d5f4fed31cd46d2d857deda24a0f376884d4f6dfd3"
+            },
+            {
+              "frame_index": 7,
+              "source_job_id": "26112962-08ae-494b-9f9b-82a398e44e85",
+              "source_frame_index": 7,
+              "sha256": "afb30ef1b11208fe28b917b5b7e63307a09042126123c3d290a26a806539b305"
+            }
+          ],
+          "method": "select complete same-pose regenerated frames; no pixel editing",
+          "new_user_approval": false,
+          "visual_reviewed": false
+        },
+        "throw-object": {
+          "base_job_id": "bf0f5fe4-7bb1-4c82-b434-8ba602b1254a",
+          "frame_sources": [
+            {
+              "frame_index": 0,
+              "source_job_id": "bf0f5fe4-7bb1-4c82-b434-8ba602b1254a",
+              "source_frame_index": 0,
+              "sha256": "cdfeeeb789e3bcc9ad6d34c0b431cea57f27cf32ef6f1752de9e11a208a26200"
+            },
+            {
+              "frame_index": 1,
+              "source_job_id": "bf0f5fe4-7bb1-4c82-b434-8ba602b1254a",
+              "source_frame_index": 1,
+              "sha256": "a714907b022c117922822ff58ff449112bc7a29bef13cfccc56a2a42f8e55a3a"
+            },
+            {
+              "frame_index": 2,
+              "source_job_id": "bf0f5fe4-7bb1-4c82-b434-8ba602b1254a",
+              "source_frame_index": 2,
+              "sha256": "98b5c5ea9c64dadcabc061ee9a4be09f39e559b7ac45551c321a46fd516a6206"
+            },
+            {
+              "frame_index": 3,
+              "source_job_id": "bf0f5fe4-7bb1-4c82-b434-8ba602b1254a",
+              "source_frame_index": 3,
+              "sha256": "2d09d33bdcca0d3110ffede05751299861be53a26c0ff58568171f301b3a3f2c"
+            },
+            {
+              "frame_index": 4,
+              "source_job_id": "05c75e3e-500e-4668-ae08-4212b5354b57",
+              "source_frame_index": 1,
+              "target_pose_index": 4,
+              "source_path": "motion-frame-candidates/aileen/throw-object/clean-pose-4-1/frames/1.png",
+              "sha256": "eaeb039b25e492931744121e6c9c7da5aa02c4645d4e65ce57ba0eb798b5360a",
+              "findings": "후보 전체 확인. 선택 프레임은 얼굴·손·구두 외곽이 온전하고 몸 밖 회색 덩어리 없음. 같은 목표 자세 유지."
+            },
+            {
+              "frame_index": 5,
+              "source_job_id": "bf0f5fe4-7bb1-4c82-b434-8ba602b1254a",
+              "source_frame_index": 5,
+              "sha256": "fd1e43d4d6d627eabc209123090551eb2aaac5b8ece93b3b9019318377a08f74"
+            },
+            {
+              "frame_index": 6,
+              "source_job_id": "bf0f5fe4-7bb1-4c82-b434-8ba602b1254a",
+              "source_frame_index": 6,
+              "sha256": "3bb82d85be4168615b46b82e381dcf32f7aec7d0079eef86caf1cf089a94a921"
+            },
+            {
+              "frame_index": 7,
+              "source_job_id": "bf0f5fe4-7bb1-4c82-b434-8ba602b1254a",
+              "source_frame_index": 7,
+              "sha256": "6b2ffb6261a0a9832e53c2c31b45ec36cac1e4c10f7675ccf22b83725720d0b4"
+            }
+          ],
+          "method": "select complete same-pose regenerated frames; no pixel editing",
+          "new_user_approval": false,
+          "visual_reviewed": false
+        },
+        "backflip": {
+          "base_job_id": "b80cd50e-079c-4044-bb3e-12098db8accb",
+          "frame_sources": [
+            {
+              "frame_index": 0,
+              "source_job_id": "a096416d-d44e-48a8-ade5-10cdabae0a2d",
+              "source_frame_index": 1,
+              "target_pose_index": 0,
+              "source_path": "motion-frame-candidates/aileen/backflip/clean-pose-0-1/frames/1.png",
+              "sha256": "d3f6a5c1932ce1143a26f2f9dcdab983f747e384044ff9b33edee7c505418838",
+              "findings": "후보 전체 확인 후 목표 회전/준비 자세와 얼굴·정장·구두 외곽이 온전한 1번 선택. 몸 밖 회색 덩어리 없음."
+            },
+            {
+              "frame_index": 1,
+              "source_job_id": "3f341d9c-c1be-4dca-8388-cbda96f23275",
+              "source_frame_index": 1,
+              "target_pose_index": 1,
+              "source_path": "motion-frame-candidates/aileen/backflip/clean-pose-1-1/frames/1.png",
+              "sha256": "a3eee05970e96acc533998d4d2152e92d5666c2e3294e8baee7cd76606f1dac3",
+              "findings": "후보 전체 확인 후 목표 회전/준비 자세와 얼굴·정장·구두 외곽이 온전한 1번 선택. 몸 밖 회색 덩어리 없음."
+            },
+            {
+              "frame_index": 2,
+              "source_job_id": "969b581d-436c-464e-b489-d803e2bcbe3b",
+              "source_frame_index": 1,
+              "target_pose_index": 2,
+              "source_path": "motion-frame-candidates/aileen/backflip/clean-pose-2-1/frames/1.png",
+              "sha256": "02b2f3ebb775a969abcbd7ccb2a38762c56c702a2ca67dbabc6ba4529987f493",
+              "findings": "후보 전체 확인 후 목표 회전/준비 자세와 얼굴·정장·구두 외곽이 온전한 1번 선택. 몸 밖 회색 덩어리 없음."
+            },
+            {
+              "frame_index": 3,
+              "source_job_id": "b80cd50e-079c-4044-bb3e-12098db8accb",
+              "source_frame_index": 3,
+              "sha256": "ecbe1c2dff53c6a33543fd5f30855e6b3ce6aea9a44c020ec8f58ac0e5634f55"
+            },
+            {
+              "frame_index": 4,
+              "source_job_id": "b80cd50e-079c-4044-bb3e-12098db8accb",
+              "source_frame_index": 4,
+              "sha256": "77040121459d6618ac9be310023bdf3d683508eb05c87b2b9f0c02d13a8f2797"
+            },
+            {
+              "frame_index": 5,
+              "source_job_id": "132d4a58-a8b9-4bd4-af33-2c1944e5f289",
+              "source_frame_index": 1,
+              "target_pose_index": 5,
+              "source_path": "motion-frame-candidates/aileen/backflip/clean-pose-5-1/frames/1.png",
+              "sha256": "d7fdbd78db02fb375f767091e07493fefff4ff2c4dbd0635bb9e8660a7aa6eca",
+              "findings": "후보 전체 확인 후 목표 회전/준비 자세와 얼굴·정장·구두 외곽이 온전한 1번 선택. 몸 밖 회색 덩어리 없음."
+            },
+            {
+              "frame_index": 6,
+              "source_job_id": "3d893b9a-8afa-46fc-a9c8-469f0171d734",
+              "source_frame_index": 1,
+              "target_pose_index": 6,
+              "source_path": "motion-frame-candidates/aileen/backflip/clean-pose-6-1/frames/1.png",
+              "sha256": "60b98143ee9b95e9bd24acdf7d9d0ea5c25c36f1cc1f528d33381956e8d3574e",
+              "findings": "후보 전체 확인 후 목표 회전/준비 자세와 얼굴·정장·구두 외곽이 온전한 1번 선택. 몸 밖 회색 덩어리 없음."
+            },
+            {
+              "frame_index": 7,
+              "source_job_id": "b80cd50e-079c-4044-bb3e-12098db8accb",
+              "source_frame_index": 7,
+              "sha256": "5132031dd2f8b6100abce606f702961ab844974a21a12e55c81c4ec318c98348"
+            },
+            {
+              "frame_index": 8,
+              "source_job_id": "a096416d-d44e-48a8-ade5-10cdabae0a2d",
+              "source_frame_index": 1,
+              "target_pose_index": 8,
+              "source_path": "motion-frame-candidates/aileen/backflip/clean-pose-0-1/frames/1.png",
+              "sha256": "d3f6a5c1932ce1143a26f2f9dcdab983f747e384044ff9b33edee7c505418838",
+              "findings": "첫 자세와 마지막 자세의 관절 배열 완전 일치. 검수된 정상 시작 후보 전체PNG를 그대로 재사용, 원본 백업과 출처/해시 보존.",
+              "reused_from_frame_index": 0
+            }
+          ],
+          "method": "select complete same-pose regenerated frames; no pixel editing",
+          "new_user_approval": false,
+          "visual_reviewed": false
+        },
+        "picking-up": {
+          "base_job_id": "5b324971-dbda-45e9-b71d-e482518ee2e7",
+          "frame_sources": [
+            {
+              "frame_index": 0,
+              "source_job_id": "5b324971-dbda-45e9-b71d-e482518ee2e7",
+              "source_frame_index": 0,
+              "sha256": "1dde26fd96744c9ce2f234453aeff3287b39ad1d9d394cd2f368f5b40f745a2c"
+            },
+            {
+              "frame_index": 1,
+              "source_job_id": "5b324971-dbda-45e9-b71d-e482518ee2e7",
+              "source_frame_index": 1,
+              "sha256": "ee46080a8166ada84be009f4b3e967f13ee5a2521c6e324ed20e1cd95e901e34"
+            },
+            {
+              "frame_index": 2,
+              "source_job_id": "5b324971-dbda-45e9-b71d-e482518ee2e7",
+              "source_frame_index": 2,
+              "sha256": "1b4f9fe28b2aacc6b7c1d2668cac2e796f26696426fb886acd2845655cc1f05a"
+            },
+            {
+              "frame_index": 3,
+              "source_job_id": "5b324971-dbda-45e9-b71d-e482518ee2e7",
+              "source_frame_index": 3,
+              "sha256": "61af67b125ffa8af29c916f918c6ecb466b179794d245e89aa875c32466be4d2"
+            },
+            {
+              "frame_index": 4,
+              "source_job_id": "ba502b83-69af-44c6-83ef-8a3a041a0503",
+              "source_frame_index": 1,
+              "target_pose_index": 4,
+              "source_path": "motion-frame-candidates/aileen/picking-up/clean-pose-4-1/frames/1.png",
+              "sha256": "9f6c2a8677de58509987f5368b0a9d34d69bcf0d88f327330c870bc52014f6ac",
+              "findings": "후보 전체 확인. 손이 발 근처로 도달하는 낮은 자세/회복 자세 유지, 얼굴/손 투명 손상과 몸 밖 회색 덩어리 없는 후보 선택."
+            },
+            {
+              "frame_index": 5,
+              "source_job_id": "8363ef06-2b89-4508-b1ce-eff4e51b7871",
+              "source_frame_index": 2,
+              "target_pose_index": 5,
+              "source_path": "motion-frame-candidates/aileen/picking-up/clean-pose-5-1/frames/2.png",
+              "sha256": "4cd0512a9e062d18ff8b25b54c098b70f826e3c2bdc26acd65ca18306c0df0ac",
+              "findings": "후보 전체 확인. 손이 발 근처로 도달하는 낮은 자세/회복 자세 유지, 얼굴/손 투명 손상과 몸 밖 회색 덩어리 없는 후보 선택."
+            },
+            {
+              "frame_index": 6,
+              "source_job_id": "5b324971-dbda-45e9-b71d-e482518ee2e7",
+              "source_frame_index": 6,
+              "sha256": "aa2f58488d4361e8161d8573ee50934065f0d54b72f91f1f5ad668feb4659050"
+            },
+            {
+              "frame_index": 7,
+              "source_job_id": "5b324971-dbda-45e9-b71d-e482518ee2e7",
+              "source_frame_index": 7,
+              "sha256": "d13670a136c3ffe6f2e5af10e12985faafa18c32db117906691013d6356d0811"
+            }
+          ],
+          "method": "select complete same-pose regenerated frames; no pixel editing",
+          "new_user_approval": false,
+          "visual_reviewed": true
         }
       },
       "motion-frame-candidate-lead-jab-bare-fist-1": "cc19aa7c-d9fc-497f-b24d-a1eed324ee82",
@@ -47814,7 +48391,10 @@
       "motion-frame-candidate-picking-up-clean-pose-4-1": "ba502b83-69af-44c6-83ef-8a3a041a0503",
       "motion-frame-candidate-picking-up-clean-pose-5-1": "8363ef06-2b89-4508-b1ce-eff4e51b7871",
       "motion-frame-candidate-crouched-walking-clean-pose-2-2": "c0b29250-2cca-4e00-8c0a-5e67924f75df",
-      "motion-frame-candidate-crouched-walking-clean-pose-3-2": "9486488c-81d9-46af-9dc6-2c39db6a4705"
+      "motion-frame-candidate-crouched-walking-clean-pose-3-2": "9486488c-81d9-46af-9dc6-2c39db6a4705",
+      "motion-frame-candidate-front-flip-clean-pose-4-2": "08cdb028-8b59-4175-89ad-4018de45da49",
+      "motion-frame-candidate-backflip-clean-pose-3-2": "84042bad-5240-4eeb-94f2-bbddc967bf97",
+      "motion-frame-candidate-running-8-frames-clean-pose-7-2": "77f2e27b-6c0b-438b-b5a9-6b258bfcfd1f"
     },
     "gorgodio": {
       "name": "고르고디오",
@@ -73962,9 +74542,96 @@
         "files": 13,
         "production_pack_clips": 20
       }
+    },
+    {
+      "at": "2026-10-24T02:44:02Z",
+      "kind": "submitted",
+      "slug": "aileen",
+      "detail": {
+        "kind": "motion-frame-candidate-front-flip-clean-pose-4-2",
+        "template": null,
+        "job_id": "08cdb028-8b59-4175-89ad-4018de45da49",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "08cdb028-8b59-4175-89ad-4018de45da49",
+          "status": "processing"
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T02:44:03Z",
+      "kind": "submitted",
+      "slug": "aileen",
+      "detail": {
+        "kind": "motion-frame-candidate-backflip-clean-pose-3-2",
+        "template": null,
+        "job_id": "84042bad-5240-4eeb-94f2-bbddc967bf97",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "84042bad-5240-4eeb-94f2-bbddc967bf97",
+          "status": "processing"
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T02:44:04Z",
+      "kind": "submitted",
+      "slug": "aileen",
+      "detail": {
+        "kind": "motion-frame-candidate-running-8-frames-clean-pose-7-2",
+        "template": null,
+        "job_id": "77f2e27b-6c0b-438b-b5a9-6b258bfcfd1f",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "77f2e27b-6c0b-438b-b5a9-6b258bfcfd1f",
+          "status": "processing"
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T02:44:05Z",
+      "kind": "completed",
+      "slug": "aileen",
+      "detail": {
+        "kind": "motion-frame-candidate-crouched-walking-clean-pose-2-2",
+        "template": null,
+        "job_id": "c0b29250-2cca-4e00-8c0a-5e67924f75df",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 2
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T02:44:07Z",
+      "kind": "completed",
+      "slug": "aileen",
+      "detail": {
+        "kind": "motion-frame-candidate-crouched-walking-clean-pose-3-2",
+        "template": null,
+        "job_id": "9486488c-81d9-46af-9dc6-2c39db6a4705",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 2
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T02:44:08Z",
+      "kind": "exported",
+      "slug": "aileen",
+      "detail": {
+        "bytes": 130346,
+        "files": 13,
+        "production_pack_clips": 20
+      }
     }
   ],
-  "updated_at": 1792809456.2836642,
+  "updated_at": 1792809848.4046044,
   "user_stopped_at": 1792778235.6917784,
   "archived_jobs": {
     "304457e9-6577-44f0-af17-97841a9f6720": {
@@ -75283,11 +75950,11 @@
       "saved_frames": 6
     }
   },
-  "last_git_checkpoint": 1792809078.9966478,
+  "last_git_checkpoint": 1792809458.56924,
   "summary": {
     "jobs": {
-      "processing": 2,
-      "completed": 517,
+      "processing": 3,
+      "completed": 519,
       "failed": 9,
       "stalled": 0
     },

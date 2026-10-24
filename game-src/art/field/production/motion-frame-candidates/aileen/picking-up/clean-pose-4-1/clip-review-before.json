@@ -1,0 +1,20 @@
+{
+  "at": 1792809178.3042126,
+  "job_id": "5b324971-dbda-45e9-b71d-e482518ee2e7",
+  "result": "reroll-required",
+  "findings": "깊은 굽힘/손 도달은 개선됐으나 5번째 머리·얼굴·손 투명 손상, 6번째 포니테일 회색 면. 해당 두 자세 수정 필요.",
+  "frame_count": 8,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

@@ -1,8 +1,8 @@
 {
-  "at": 1792808724.8738427,
+  "at": 1792809840.944321,
   "job_id": "b80cd50e-079c-4044-bb3e-12098db8accb",
   "result": "reroll-required",
-  "findings": "포니테일 회색 매트가 다수 프레임에 남고 6·7번째 얼굴 주변 회색 면. 전신 회전은 성립하지만 외곽 실패.",
+  "findings": "정상 후보5자세 교체 및 동일 관절인 마지막 자세 재사용 완료. 4번째 회전 후보가 모두 목표 자세/회색 면 실패, 해당 자세 정상 회전 참조로 재작업.",
   "frame_count": 9,
   "directions": [
     "east"
@@ -16,5 +16,86 @@
     "correct face-visible direction",
     "no gray exterior paint in every frame",
     "pose and foot contact consistency"
-  ]
+  ],
+  "frame_assembly": {
+    "base_job_id": "b80cd50e-079c-4044-bb3e-12098db8accb",
+    "frame_sources": [
+      {
+        "frame_index": 0,
+        "source_job_id": "a096416d-d44e-48a8-ade5-10cdabae0a2d",
+        "source_frame_index": 1,
+        "target_pose_index": 0,
+        "source_path": "motion-frame-candidates/aileen/backflip/clean-pose-0-1/frames/1.png",
+        "sha256": "d3f6a5c1932ce1143a26f2f9dcdab983f747e384044ff9b33edee7c505418838",
+        "findings": "후보 전체 확인 후 목표 회전/준비 자세와 얼굴·정장·구두 외곽이 온전한 1번 선택. 몸 밖 회색 덩어리 없음."
+      },
+      {
+        "frame_index": 1,
+        "source_job_id": "3f341d9c-c1be-4dca-8388-cbda96f23275",
+        "source_frame_index": 1,
+        "target_pose_index": 1,
+        "source_path": "motion-frame-candidates/aileen/backflip/clean-pose-1-1/frames/1.png",
+        "sha256": "a3eee05970e96acc533998d4d2152e92d5666c2e3294e8baee7cd76606f1dac3",
+        "findings": "후보 전체 확인 후 목표 회전/준비 자세와 얼굴·정장·구두 외곽이 온전한 1번 선택. 몸 밖 회색 덩어리 없음."
+      },
+      {
+        "frame_index": 2,
+        "source_job_id": "969b581d-436c-464e-b489-d803e2bcbe3b",
+        "source_frame_index": 1,
+        "target_pose_index": 2,
+        "source_path": "motion-frame-candidates/aileen/backflip/clean-pose-2-1/frames/1.png",
+        "sha256": "02b2f3ebb775a969abcbd7ccb2a38762c56c702a2ca67dbabc6ba4529987f493",
+        "findings": "후보 전체 확인 후 목표 회전/준비 자세와 얼굴·정장·구두 외곽이 온전한 1번 선택. 몸 밖 회색 덩어리 없음."
+      },
+      {
+        "frame_index": 3,
+        "source_job_id": "b80cd50e-079c-4044-bb3e-12098db8accb",
+        "source_frame_index": 3,
+        "sha256": "ecbe1c2dff53c6a33543fd5f30855e6b3ce6aea9a44c020ec8f58ac0e5634f55"
+      },
+      {
+        "frame_index": 4,
+        "source_job_id": "b80cd50e-079c-4044-bb3e-12098db8accb",
+        "source_frame_index": 4,
+        "sha256": "77040121459d6618ac9be310023bdf3d683508eb05c87b2b9f0c02d13a8f2797"
+      },
+      {
+        "frame_index": 5,
+        "source_job_id": "132d4a58-a8b9-4bd4-af33-2c1944e5f289",
+        "source_frame_index": 1,
+        "target_pose_index": 5,
+        "source_path": "motion-frame-candidates/aileen/backflip/clean-pose-5-1/frames/1.png",
+        "sha256": "d7fdbd78db02fb375f767091e07493fefff4ff2c4dbd0635bb9e8660a7aa6eca",
+        "findings": "후보 전체 확인 후 목표 회전/준비 자세와 얼굴·정장·구두 외곽이 온전한 1번 선택. 몸 밖 회색 덩어리 없음."
+      },
+      {
+        "frame_index": 6,
+        "source_job_id": "3d893b9a-8afa-46fc-a9c8-469f0171d734",
+        "source_frame_index": 1,
+        "target_pose_index": 6,
+        "source_path": "motion-frame-candidates/aileen/backflip/clean-pose-6-1/frames/1.png",
+        "sha256": "60b98143ee9b95e9bd24acdf7d9d0ea5c25c36f1cc1f528d33381956e8d3574e",
+        "findings": "후보 전체 확인 후 목표 회전/준비 자세와 얼굴·정장·구두 외곽이 온전한 1번 선택. 몸 밖 회색 덩어리 없음."
+      },
+      {
+        "frame_index": 7,
+        "source_job_id": "b80cd50e-079c-4044-bb3e-12098db8accb",
+        "source_frame_index": 7,
+        "sha256": "5132031dd2f8b6100abce606f702961ab844974a21a12e55c81c4ec318c98348"
+      },
+      {
+        "frame_index": 8,
+        "source_job_id": "a096416d-d44e-48a8-ade5-10cdabae0a2d",
+        "source_frame_index": 1,
+        "target_pose_index": 8,
+        "source_path": "motion-frame-candidates/aileen/backflip/clean-pose-0-1/frames/1.png",
+        "sha256": "d3f6a5c1932ce1143a26f2f9dcdab983f747e384044ff9b33edee7c505418838",
+        "findings": "첫 자세와 마지막 자세의 관절 배열 완전 일치. 검수된 정상 시작 후보 전체PNG를 그대로 재사용, 원본 백업과 출처/해시 보존.",
+        "reused_from_frame_index": 0
+      }
+    ],
+    "method": "select complete same-pose regenerated frames; no pixel editing",
+    "new_user_approval": false,
+    "visual_reviewed": false
+  }
 }

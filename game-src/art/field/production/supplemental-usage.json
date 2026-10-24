@@ -82,5 +82,17 @@
     },
     "receipt": "motion-inputs/aileen/measured-crouch-reference/estimate-response.json",
     "server_job_id": null
+  },
+  {
+    "record_id": "local-sync:aileen-turn-reference-estimate",
+    "slug": "aileen",
+    "slot": "turn-reference",
+    "endpoint": "estimate-skeleton",
+    "usage": {
+      "type": "generations",
+      "generations": 0.1
+    },
+    "receipt": "motion-inputs/aileen/measured-turn-reference/estimate-response.json",
+    "server_job_id": null
   }
 ]
