@@ -1,0 +1,31 @@
+STYLE (most important): match the attached reference image's art style exactly — the same detailed 16-bit-era pixel art: clearly visible square pixels, the same pixel density, dark near-black outlines on every object, rich hand-placed pixel shading with several tone steps and light dithering, textured surfaces, the same slightly-from-above front camera. It must look like it was drawn by the same pixel artist in the same game. Do NOT make it clean vector art, flat UI illustration or smooth digital painting. Only the lighting and colors change: this scene is DAYTIME and BRIGHT (light gray / off-white walls, light gray floor), not dark, not night. Do not copy the reference room's furniture.
+
+SCENE: one continuous very wide side-view background of a modern, tidy Korean government office building corridor on the 2nd floor. No windows. No people.
+
+FRAME (strict): the back (north) wall runs across the image. The line where the back wall meets the floor is ONE perfectly straight horizontal line at exactly 60% of the image height from the top. The top 6% is only a thin ceiling edge (slim molding, small downlight fixtures, two small CCTV domes). The bottom 40% is walkable floor, wide and deep.
+
+CLOSED ENDS: the corridor is fully closed at both ends. At the far left, draw the WEST side wall as a short wall plane angled toward the viewer (a side wall seen in shallow perspective, its bottom edge running from the back-wall corner down to the bottom-left of the image), completely closing the corridor. Set into this west side wall is the stairwell fire door: a dark charcoal-gray steel door with a small narrow glass window and a door-closer arm, a small green running-man exit sign above it, a small square blank plate beside it. Do the same at the far right: an EAST side wall angled toward the viewer that closes the corridor, with a dark charcoal steel emergency-exit door with a push bar and a green running-man sign above it. No stairs anywhere. Nothing is cut off at the image edges.
+
+BACK WALL, left to right (percent of image width):
+- 8%: blank direction signboard (color stripe + arrow pictogram only).
+- 13%: restroom door, blank plate above it, small male/female pictogram plate beside it.
+- 20%: red fire extinguisher cabinet on the wall.
+- 26–33%: wide double glass door of the main office, blank plate with a teal stripe above.
+- 37%: bulletin board.
+- 44–56%: elevator area, FLUSH with the back wall (no recess, no alcove, no side walls around it): a blank floor-plan board, then TWO identical brushed stainless-steel elevator doors side by side with a small gap, each with a small dark blank indicator window above, call-button panel to the right. The floor directly in front of the elevators is open and walkable, with a slightly darker stone-like floor inlay rectangle.
+- 60%: blank direction signboard.
+- 67%: single interview-room door, blank plate above, small blank status plate beside.
+- 73%: one wall clock (no numbers) and one framed abstract picture.
+- 79%: red fire extinguisher cabinet.
+- 84–91%: wide double glass door of the lounge, blank plate with a teal stripe above.
+
+FLOOR OBJECTS (not all against the wall — spread some into the floor depth, leaving clear walking paths and empty floor in front of every door and the elevators):
+- 17%: water dispenser and recycling bin standing a little in front of the wall.
+- 40%: large potted plant on the floor, partway toward the front.
+- 63%: a bench placed in the middle depth of the floor, long side facing the viewer.
+- 76%: small round side table with a potted plant, near the front.
+- 94%: large potted plant near the east side wall.
+
+Floor: smooth matte light-gray tile, no grid lines, no carpet, no reflections; depth shown by brightness. Wall: plain light-gray paint with a thin baseboard, no pillars or panels. Light fixtures switched off, no glow.
+
+FORBIDDEN: people, letters, numbers, readable text or logos, stairs, recessed elevator hall, vanishing-point perspective on the back wall, duplicated or ghosted/blurred objects, smeared areas, dirt or rust, dark navy walls, glow effects.
