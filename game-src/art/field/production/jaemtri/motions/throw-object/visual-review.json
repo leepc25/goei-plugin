@@ -1,0 +1,20 @@
+{
+  "at": 1792804510.4921784,
+  "job_id": "62f4c3b9-4d84-4975-b7b3-22c513a5f2fb",
+  "result": "reroll-required",
+  "findings": "Gray exterior improved but ball reappears after release and remains in hand in frames 6/7/8. Regenerate those three known poses with own empty-hand release frame 5 as reference; preserve windup and identity.",
+  "frame_count": 8,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

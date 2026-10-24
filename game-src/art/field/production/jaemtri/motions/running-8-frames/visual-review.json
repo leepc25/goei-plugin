@@ -1,0 +1,20 @@
+{
+  "at": 1792804563.5562952,
+  "job_id": "85cc46f4-f282-4c85-84a5-8806f0c0dbb8",
+  "result": "reroll-required",
+  "findings": "Only frame 4 has a gray filled patch over the rear hair curl; other seven inspected clean. Regenerate exact frame 4 pose using clean own frame 2 reference.",
+  "frame_count": 8,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

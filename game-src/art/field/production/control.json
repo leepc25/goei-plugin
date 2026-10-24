@@ -273,6 +273,11 @@
       "cross-punch": "game-src/art/field/production/motion-inputs/jaemtri/cross-punch-repair-v1/spec.json",
       "sad-walk": "game-src/art/field/production/motion-inputs/jaemtri/sad-walk-repair-v1/spec.json",
       "pushing": "game-src/art/field/production/motion-inputs/jaemtri/pushing-repair-v1/spec.json"
+    },
+    "aileen": {
+      "jumping-1": "game-src/art/field/production/motion-inputs/aileen/jumping-1-v1/spec.json",
+      "jumping-2": "game-src/art/field/production/motion-inputs/aileen/jumping-2-v1/spec.json",
+      "two-footed-jump": "game-src/art/field/production/motion-inputs/aileen/two-footed-jump-v1/spec.json"
     }
   }
 }

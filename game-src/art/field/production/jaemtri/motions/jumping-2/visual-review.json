@@ -1,0 +1,20 @@
+{
+  "at": 1792804576.922826,
+  "job_id": "3c6c64ce-622e-44c3-8eb2-a043ee45d221",
+  "result": "pass",
+  "findings": "All eight regenerated EAST jump frames viewed: clean airborne reference removed dynamic gray hair masses; own long brown waves, skirt and heels retained through takeoff/tuck/landing, no clipping or missing anatomy.",
+  "frame_count": 8,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

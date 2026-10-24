@@ -1,0 +1,104 @@
+{
+  "slug": "jaemtri",
+  "slot": "throw-object",
+  "base_job_id": "62f4c3b9-4d84-4975-b7b3-22c513a5f2fb",
+  "target_frame_index": 6,
+  "source_spec": "game-src/art/field/production/motion-inputs/jaemtri/throw-object-repair-v1/spec.json",
+  "seed": 2026110503,
+  "pose": [
+    {
+      "label": "NECK",
+      "x": 0.5146897602431096,
+      "y": 0.26392912885986325
+    },
+    {
+      "label": "NOSE",
+      "x": 0.5723148433710922,
+      "y": 0.18119136087793097
+    },
+    {
+      "label": "LEFT ARM",
+      "x": 0.5423289986445986,
+      "y": 0.3628080450649919
+    },
+    {
+      "label": "LEFT EAR",
+      "x": 0.5429038754917157,
+      "y": 0.1543133436178825
+    },
+    {
+      "label": "LEFT EYE",
+      "x": 0.5717148974991936,
+      "y": 0.16210172173891785
+    },
+    {
+      "label": "LEFT HIP",
+      "x": 0.5239219665527344,
+      "y": 0.4549703173407193
+    },
+    {
+      "label": "LEFT LEG",
+      "x": 0.573169628274852,
+      "y": 0.8586897092621902
+    },
+    {
+      "label": "LEFT KNEE",
+      "x": 0.596188752009992,
+      "y": 0.6570171894390641
+    },
+    {
+      "label": "RIGHT ARM",
+      "x": 0.6267629857556574,
+      "y": 0.48294759858230063
+    },
+    {
+      "label": "RIGHT EAR",
+      "x": 0.5360359645192903,
+      "y": 0.15942676619582669
+    },
+    {
+      "label": "RIGHT EYE",
+      "x": 0.5671451679930255,
+      "y": 0.16610675021011062
+    },
+    {
+      "label": "RIGHT HIP",
+      "x": 0.49491119384765625,
+      "y": 0.4661283068426724
+    },
+    {
+      "label": "RIGHT LEG",
+      "x": 0.43262776636584055,
+      "y": 0.8856611031367861
+    },
+    {
+      "label": "LEFT ELBOW",
+      "x": 0.40201842291647494,
+      "y": 0.3385982290706199
+    },
+    {
+      "label": "RIGHT KNEE",
+      "x": 0.5314961664205692,
+      "y": 0.6971685214249265
+    },
+    {
+      "label": "RIGHT ELBOW",
+      "x": 0.5233317945401263,
+      "y": 0.4104810608068653
+    },
+    {
+      "label": "LEFT SHOULDER",
+      "x": 0.5367797547203773,
+      "y": 0.25097773371734794
+    },
+    {
+      "label": "RIGHT SHOULDER",
+      "x": 0.49259976576584197,
+      "y": 0.2768805240023786
+    }
+  ],
+  "new_user_approval": false,
+  "reference_frame_index": 4,
+  "reference_sha256": "3c9cef2f17555bce65a4b5c78b1e50f855401f1676e6705629f99b4830f96c2f",
+  "action": "Empty-handed follow-through after throwing the object outside the canvas. Both hands stay empty."
+}

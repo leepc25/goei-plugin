@@ -2,7 +2,7 @@
   "slug": "aileen",
   "slot": "two-footed-jump",
   "character_id": "558c27ed-873c-4207-9099-171bb64a09b2",
-  "skeleton_visually_reviewed": false,
+  "skeleton_visually_reviewed": true,
   "first_frame_path": "game-src/art/field/production/motion-inputs/aileen/first-frame.png",
   "new_user_approval": false,
   "landmark_source": "current character own east estimated 2d reference",
@@ -844,5 +844,6 @@
     "template_id": "mannequin",
     "seed": 2026110002,
     "no_background": true
-  }
+  },
+  "review_findings": "Own EAST reference and all eight target poses viewed; ponytail clearance and native body proportions retained, compact bent-knee takeoff/landing, no canvas-edge joints. Original AVIF and supplemental lore re-read; preserved management source not resized."
 }
