@@ -1,0 +1,20 @@
+{
+  "at": 1792809073.221228,
+  "job_id": "263743b4-57c2-4659-a2a1-4b6775dc51e9",
+  "result": "pass",
+  "findings": "8프레임 전체 확인. 동쪽 양손을 앞으로 뻗고 가슴 쪽으로 당기는 동작과 체격/정장/포니테일 유지. 이전 분리 회갈색 덩어리 해결, 현재 가닥 사이 투명 간격 정상, 넓은 회색 매트·잘림 없음.",
+  "frame_count": 8,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

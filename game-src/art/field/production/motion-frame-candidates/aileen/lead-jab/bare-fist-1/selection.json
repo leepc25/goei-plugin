@@ -1,0 +1,9 @@
+{
+  "frame_index": 1,
+  "source_job_id": "cc19aa7c-d9fc-497f-b24d-a1eed324ee82",
+  "source_frame_index": 1,
+  "target_pose_index": 1,
+  "source_path": "motion-frame-candidates/aileen/lead-jab/bare-fist-1/frames/1.png",
+  "sha256": "18cc07a139380652ee5a7825c0887bb13bb9957fda1888c0da7059cdfc08e3cf",
+  "findings": "맨주먹 뻗기 자세, 타격 이펙트 없음. 머리카락 가닥·구두 외곽 정상, 회색 바닥 면 없음."
+}

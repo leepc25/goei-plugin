@@ -1,0 +1,20 @@
+{
+  "at": 1792808454.1354532,
+  "job_id": "630cb67c-2386-4e45-96c3-6f3f47c9dbc3",
+  "result": "reroll-required",
+  "findings": "발 사이 회색 면은 해결됐으나 두번째 주먹 앞 흰색/회색 타격 이펙트 발생. 해당 뻗은 자세만 이펙트 없는 정지 후보로 수정.",
+  "frame_count": 3,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

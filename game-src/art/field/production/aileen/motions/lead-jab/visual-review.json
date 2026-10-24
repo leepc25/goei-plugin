@@ -1,8 +1,8 @@
 {
-  "at": 1792808454.1354532,
+  "at": 1792808840.58276,
   "job_id": "630cb67c-2386-4e45-96c3-6f3f47c9dbc3",
   "result": "reroll-required",
-  "findings": "발 사이 회색 면은 해결됐으나 두번째 주먹 앞 흰색/회색 타격 이펙트 발생. 해당 뻗은 자세만 이펙트 없는 정지 후보로 수정.",
+  "findings": "두번째 뻗은 자세는 이펙트 없는 정상 후보로 교체. 전체 재검토에서 마지막 회복 자세 포니테일 끝 회색 매트가 남아 해당 자세 추가 수정.",
   "frame_count": 3,
   "directions": [
     "east"
@@ -16,5 +16,34 @@
     "correct face-visible direction",
     "no gray exterior paint in every frame",
     "pose and foot contact consistency"
-  ]
+  ],
+  "frame_assembly": {
+    "base_job_id": "630cb67c-2386-4e45-96c3-6f3f47c9dbc3",
+    "frame_sources": [
+      {
+        "frame_index": 0,
+        "source_job_id": "630cb67c-2386-4e45-96c3-6f3f47c9dbc3",
+        "source_frame_index": 0,
+        "sha256": "4ae5ea65230c877161e28193f67763fcc1cd9aa1fe8bb579874d2b147eb66f1b"
+      },
+      {
+        "frame_index": 1,
+        "source_job_id": "cc19aa7c-d9fc-497f-b24d-a1eed324ee82",
+        "source_frame_index": 1,
+        "target_pose_index": 1,
+        "source_path": "motion-frame-candidates/aileen/lead-jab/bare-fist-1/frames/1.png",
+        "sha256": "18cc07a139380652ee5a7825c0887bb13bb9957fda1888c0da7059cdfc08e3cf",
+        "findings": "맨주먹 뻗기 자세, 타격 이펙트 없음. 머리카락 가닥·구두 외곽 정상, 회색 바닥 면 없음."
+      },
+      {
+        "frame_index": 2,
+        "source_job_id": "630cb67c-2386-4e45-96c3-6f3f47c9dbc3",
+        "source_frame_index": 2,
+        "sha256": "3495d4c31216118f223940689b128cf514a2a1cd83bcc46a1b332704a2fb535f"
+      }
+    ],
+    "method": "select complete same-pose regenerated frames; no pixel editing",
+    "new_user_approval": false,
+    "visual_reviewed": false
+  }
 }
