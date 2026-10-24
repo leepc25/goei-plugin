@@ -1,0 +1,46 @@
+# 백일몽 여 B · 동작표
+
+- 종류: 백일몽 현장탐사팀 · 전투 성향: 약1·2·3·강, 고양이처럼 낮게 웅크렸다 튀어 할퀴듯 치기 · 원거리: **있음**(권총) · 충전: 없음
+- PixelLab id `80af18c3-1e74-45f1-acfc-ef973cc7d0e2` · 캔버스 128×256
+- **방향: 동(E) / 남동(SE)** — 낮은 포니테일이 뒤로 넘어가 양쪽 다 얼굴·고양이 가면이 다 보임, 둘 다 괜찮아서 동.
+- Subject: `a lean young Korean woman with a low black ponytail, a small gray cat-shaped eye mask, navy business jacket, white shirt, navy necktie and navy trousers`
+- 인상: 젊은 성인, 마른 편, 가운데 가르마 낮은 포니테일, 남색 바지 정장, 고양이 눈가면. 경계심 많고 날렵한 현장 직원. 낮게 숨었다가 튀어나와 치고 빠진다.
+
+| # | 동작 | 방향 | 장 | Starting pose | 프롬프트 | 회수 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 1 | 평상 대기 | SE | 4 | standing upright, arms at the sides | Stands quietly with the shoulders slightly drawn up and the head turning in tiny wary jerks, the ponytail barely moving.<br>（어깨를 조금 끌어올린 채 조용히 서서 경계하듯 고개를 아주 작게 홱홱 돌린다. 포니테일은 거의 안 움직인다.） | 1 |
+| 2 | 개인 대기 | SE | 8 | standing upright, arms at the sides | Lifts both hands and presses the cat mask along its almond-shaped edges with the fingertips, pulls the ponytail tight with one hand behind the neck, then lowers both hands.<br>（두 손을 들어 손끝으로 고양이 가면의 아몬드 모양 가장자리를 눌러 붙이고, 한 손으로 목 뒤 포니테일을 당겨 조인 뒤 두 손을 내린다.） | 1 |
+| 3 | 전투 대기 | E | 4 | low crouched stance, knees deeply bent, hands open and curled like claws at chest height | Crouches low with the knees deeply bent and both hands curled like claws in front, the shoulders rising and falling as if ready to pounce.<br>（무릎을 깊게 굽혀 낮게 웅크리고 두 손을 발톱처럼 오므려 앞에 둔다. 덮칠 듯 어깨가 오르내린다.） | 1 |
+| 4 | 걷기 | E | 8 | — | (견본 walking) | 1 |
+| 5 | 뛰기 | E | 8 | — | (견본 running) | 1 |
+| 6 | 약1 | E | 4 | low crouched stance, clawed hands at chest height | Rakes the lead hand diagonally downward across face height in a fast swipe, then pulls it back into the crouch.<br>（앞손으로 얼굴 높이를 비스듬히 아래로 빠르게 할퀴듯 긁고 웅크린 자세로 거둔다.） | 1 |
+| 7 | 약2 | E | 4 | lead hand just pulled back after a swipe | Rakes the rear hand upward in the opposite diagonal, rising slightly out of the crouch, then sinks back down.<br>（뒷손으로 반대 대각선을 위로 긁어 올리며 조금 일어섰다가 다시 낮게 가라앉는다.） | 1 |
+| 8 | 약3 | E | 8 | sinking back into the crouch after an upward swipe | Springs up and forward, swipes with both hands in quick alternation three times, finishes with a low sweeping kick that drops her back into the crouch.<br>（위 앞으로 튀어 올라 두 손으로 번갈아 빠르게 세 번 할퀴고, 낮게 쓸어 차기로 마무리하며 웅크린 자세로 내려앉는다.） | 1 |
+| 9 | 강 | E | 8 | low crouched stance, clawed hands at chest height | Coils lower, then pounces forward in a long arcing leap with both palms reaching out ahead, slams the palms down at chest height as she lands, and rolls back into the crouch.<br>（더 낮게 웅크렸다가 두 손바닥을 앞으로 뻗은 채 길게 포물선으로 덮쳐 뛰어들고, 착지하며 가슴 높이를 두 손바닥으로 내리친 뒤 굴러 웅크린 자세로.） | 1 |
+| 10 | 돌진 공격 | E | 8 | mid-stride running, body leaning forward | Drops to run almost on all fours for two strides, then springs up with a slashing swipe of the rear hand and lands back in the crouch.<br>（두 걸음 거의 네발로 낮게 달리다 튀어 오르며 뒷손으로 베듯 할퀴고 웅크린 자세로 내려앉는다.） | 1 |
+| 11 | 원거리 공격 | E | 8 | low crouched stance, clawed hands at chest height | Stays low, the right hand pulls a pistol from the right hip and holds it in both hands just above the knee level, fires twice from the crouch, then tucks it back at the hip and curls the hands again.<br>（낮게 웅크린 채 오른손으로 오른쪽 허리에서 권총을 뽑아 무릎 바로 위 높이에 두 손으로 들고 웅크린 자세로 두 번 쏜다. 허리에 넣고 손을 다시 오므린다.） | 1 |
+| 12 | 회피 | E | 4 | low crouched stance, clawed hands at chest height | Hops backward from the crouch on all fours like a startled cat and lands crouched again.<br>（놀란 고양이처럼 웅크린 자세에서 네발로 뒤로 폴짝 뛰어 다시 웅크려 내려앉는다.） | 1 |
+| 13 | 막기 | E | 4 | low crouched stance, clawed hands at chest height | Curls the body small, tucks the chin and raises both forearms in front of the face with the elbows together, holding low.<br>（몸을 작게 말아 턱을 당기고 두 팔뚝을 얼굴 앞에 세워 팔꿈치를 모은 채 낮게 버틴다.） | 1 |
+| 14 | 맞기 | E | 4 | low crouched stance, clawed hands at chest height | Is knocked upright from the crouch by a hit, the ponytail whipping, then drops back down low.<br>（맞아서 웅크린 자세에서 몸이 확 펴지며 포니테일이 휘날리고 다시 낮게 내려앉는다.） | 1 |
+| 15 | 날아가 쓰러지기 | E | 8 | low crouched stance, clawed hands at chest height | Is thrown back tumbling, twists in the air trying to land on the feet but fails, lands on the back and ends still with the knees pulled up and the hands curled near the chest.<br>（뒤로 굴러 날아가며 발로 내려서려고 공중에서 몸을 비틀지만 실패하고, 등으로 떨어져 무릎을 당기고 손을 가슴 가까이 오므린 채 멈춘다.） | 1 |
+| 16 | 일어나기 | E | 8 | lying on the back, knees pulled up, hands curled near the chest | Rocks onto the side, flips onto hands and feet in one twist and rises straight into the low crouch.<br>（옆으로 몸을 흔들어 한 번에 비틀어 손발로 뒤집고 곧장 낮게 웅크린 자세로 일어난다.） | 1 |
+| 17 | 스턴 | SE | 8 | standing upright, arms at the sides | Dazed, she blinks slowly behind the mask, the head swaying in a circle and the knees sagging, one hand pawing weakly at the air.<br>（멍해서 가면 너머로 천천히 눈을 깜빡이고 고개가 원을 그리며 흔들리고 무릎이 처지며, 한 손이 힘없이 허공을 긁는다.） | 1 |
+| 18 | 충전 모으기 | E | 8 | — | — 없음 | 0 |
+| 19 | 충전 방출 | E | 8 | — | — 없음 | 0 |
+| 20 | 응대 | SE | 4 | standing upright, arms at the sides | Turns the head toward the viewer warily, the body following a moment later.<br>（경계하듯 고개만 먼저 보는 사람 쪽으로 돌리고 한 박자 늦게 몸이 따라온다.） | 1 |
+| 21 | 말하며 손짓 | SE | 4 | standing upright, arms at the sides | Speaks quietly with the right hand half raised and the fingers flicking outward once, as if brushing something off.<br>（조용히 말하며 오른손을 반쯤 들어 뭔가 털어 내듯 손가락을 바깥으로 한 번 튕긴다.） | 1 |
+| 22 | 끄덕이기 | SE | 4 | standing upright, arms at the sides | Nods slowly once while the eyes close for a moment behind the mask.<br>（가면 너머로 잠깐 눈을 감으며 천천히 한 번 끄덕인다.） | 1 |
+| 23 | 고개 젓기 | SE | 4 | standing upright, arms at the sides | Shakes the head quickly and pulls the chin back, the shoulders tensing.<br>（고개를 빠르게 젓고 턱을 뒤로 당기며 어깨가 굳는다.） | 1 |
+| 24 | 화내기 | SE | 8 | standing upright, arms at the sides | Hunches the shoulders up, bares the teeth like a hissing cat, the fingers curling into claws at the sides, then slowly relaxes the hands.<br>（어깨를 잔뜩 올리고 하악질하는 고양이처럼 이를 드러내며 옆의 손가락이 발톱처럼 말린 뒤, 천천히 손을 푼다.） | 1 |
+| 25 | 기뻐하기 | SE | 8 | standing upright, arms at the sides | Stretches both arms up overhead and arches the back like a cat waking up, smiling, then lowers the arms.<br>（잠에서 깬 고양이처럼 두 팔을 머리 위로 쭉 뻗고 등을 젖히며 웃은 뒤 팔을 내린다.） | 1 |
+| 26 | 발견 반응 | E | 4 | standing upright facing sideways, arms relaxed | Freezes, then drops quickly into the low crouch facing the threat with the hands curling in front.<br>（얼어붙었다가 위협 쪽을 보며 재빨리 낮게 웅크리고 손을 앞에서 오므린다.） | 1 |
+| 27 | 놀라기 | SE | 4 | standing upright, arms at the sides | Jumps back slightly with the back arching and both hands drawn up to the chest, then settles.<br>（등을 둥글게 세우며 살짝 뒤로 뛰고 두 손이 가슴으로 올라붙었다가 가라앉는다.） | 1 |
+| 28 | 도망 | E | 8 | standing upright facing sideways, startled | Bolts away low and fast, the body nearly horizontal, the arms tucked and the ponytail streaming, never looking back.<br>（몸을 거의 수평으로 낮게 숙이고 팔을 붙인 채 포니테일을 휘날리며 빠르게 내뺀다. 뒤돌아보지 않는다.） | 1 |
+| 29 | 뒷걸음질 | E | 8 | standing upright facing sideways, startled | Creeps backward in a half crouch facing the threat, the hands held up open in front, each step slow and silent.<br>（위협을 마주한 채 반쯤 웅크려 뒤로 살금살금 물러난다. 두 손을 펴 앞에 들고 한 걸음씩 느리고 조용히.） | 1 |
+| 30 | 엎드려 기기 | E | 8 | lying on the back, knees pulled up, hands curled near the chest | Rolls over and slinks forward low on the forearms and knees, the body pressed flat like a stalking cat.<br>（엎드려 굴러 사냥하는 고양이처럼 몸을 바닥에 붙이고 팔뚝과 무릎으로 낮게 살금살금 기어간다.） | 1 |
+| 31 | 네발로 허둥지둥 | E | 8 | sitting on the ground, knees up, both hands flat on the ground in front, trembling | Springs forward onto all fours and scampers away in quick bounding movements.<br>（앞으로 튀어 네발로 엎드려 빠르게 껑충껑충 종종걸음으로 달아난다.） | 1 |
+| 32 | 주저앉기 | SE | 8 | standing upright, arms at the sides | Sits down hard with the knees up and both hands planted flat on the ground in front (frames 1-4), then sits with the shoulders hunched, trembling (frames 5-8).<br>（무릎을 세운 채 털썩 앉으며 두 손을 앞 바닥에 짚는다(1~4장). 어깨를 웅크리고 떤다(5~8장).） | 1 |
+| 33 | 웅크려 떨기 | SE | 8 | standing upright, arms at the sides | Curls up into a ball on the ground on the side, arms wrapped around the head and knees drawn in (frames 1-4), then shivers (frames 5-8).<br>（옆으로 누워 공처럼 말리며 두 팔로 머리를 감싸고 무릎을 당긴다(1~4장). 오들오들 떤다(5~8장).） | 1 |
+
+- **합계: 쓰는 줄 31줄, 31회**(견본 2 포함). 없음: 18·19 충전.
+- 걱정: 3번 깊게 웅크린 전투 대기는 등록 옆 그림(선 자세)과 차이가 커서 첫 장이 튈 수 있음(그러면 조금 덜 웅크리게). 33번 옆으로 누워 말리기는 비스듬(SE) 방향에서 몸이 뭉개질 수 있음.
