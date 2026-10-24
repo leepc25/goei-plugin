@@ -2,7 +2,7 @@
   "slug": "lee-gi-seok",
   "slot": "jumping-1",
   "character_id": "486210c4-4334-42d1-bfd4-329bc16b00a3",
-  "skeleton_visually_reviewed": false,
+  "skeleton_visually_reviewed": true,
   "first_frame_path": "game-src/art/field/production/motion-inputs/lee-gi-seok/first-frame.png",
   "new_user_approval": false,
   "landmark_source": "current character own west estimated 2d reference",
@@ -846,5 +846,6 @@
     "no_background": true
   },
   "motion_displacement_scale": 1.0,
-  "estimate_receipt": "game-src/art/field/production/motion-inputs/lee-gi-seok/measured-west-reference/estimate-response.json"
+  "estimate_receipt": "game-src/art/field/production/motion-inputs/lee-gi-seok/measured-west-reference/estimate-response.json",
+  "skeleton_review_findings": "AVIF/lore re-read: lean wiry body, side-parted black curtain lock, aviators, fitted black suit, human-looking concealed prosthesis. Own WEST rotation estimated landmarks and all eight bounded jump poses reviewed. WEST/SW exception retained; no pixel resizing or invented height."
 }

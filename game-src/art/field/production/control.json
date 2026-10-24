@@ -344,6 +344,21 @@
       "jumping-1": "game-src/art/field/production/motion-inputs/do-pil-heon/jumping-1-v1/spec.json",
       "jumping-2": "game-src/art/field/production/motion-inputs/do-pil-heon/jumping-2-v1/spec.json",
       "two-footed-jump": "game-src/art/field/production/motion-inputs/do-pil-heon/two-footed-jump-v1/spec.json"
+    },
+    "lee-gil-hwan": {
+      "jumping-1": "game-src/art/field/production/motion-inputs/lee-gil-hwan/jumping-1-v1/spec.json",
+      "jumping-2": "game-src/art/field/production/motion-inputs/lee-gil-hwan/jumping-2-v1/spec.json",
+      "two-footed-jump": "game-src/art/field/production/motion-inputs/lee-gil-hwan/two-footed-jump-v1/spec.json"
+    },
+    "lee-gi-seok": {
+      "jumping-1": "game-src/art/field/production/motion-inputs/lee-gi-seok/jumping-1-v1/spec.json",
+      "jumping-2": "game-src/art/field/production/motion-inputs/lee-gi-seok/jumping-2-v1/spec.json",
+      "two-footed-jump": "game-src/art/field/production/motion-inputs/lee-gi-seok/two-footed-jump-v1/spec.json"
+    },
+    "kim-jo-hak": {
+      "jumping-1": "game-src/art/field/production/motion-inputs/kim-jo-hak/jumping-1-v1/spec.json",
+      "jumping-2": "game-src/art/field/production/motion-inputs/kim-jo-hak/jumping-2-v1/spec.json",
+      "two-footed-jump": "game-src/art/field/production/motion-inputs/kim-jo-hak/two-footed-jump-v1/spec.json"
     }
   },
   "required_custom_motion_slots": [

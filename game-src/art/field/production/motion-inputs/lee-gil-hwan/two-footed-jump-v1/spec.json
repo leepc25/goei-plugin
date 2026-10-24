@@ -2,7 +2,7 @@
   "slug": "lee-gil-hwan",
   "slot": "two-footed-jump",
   "character_id": "ce496b33-584e-44be-9e28-9e3eabc9ae8a",
-  "skeleton_visually_reviewed": false,
+  "skeleton_visually_reviewed": true,
   "first_frame_path": "game-src/art/field/production/motion-inputs/lee-gil-hwan/first-frame.png",
   "new_user_approval": false,
   "landmark_source": "current character own east estimated 2d reference",
@@ -844,5 +844,6 @@
     "template_id": "mannequin",
     "seed": 2026110002,
     "no_background": true
-  }
+  },
+  "skeleton_review_findings": "AVIF/lore re-read: stocky belly, round cheeks, bowl haircut, aviators, charcoal suit. Own wide torso landmarks and all eight bounded jump poses viewed; no pixel resizing, provisional ordinary height retained."
 }

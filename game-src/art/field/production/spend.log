@@ -560,11 +560,17 @@ c4f72819-b2db-45a4-90ac-1209b020bd14	aileen	motion-frame-candidate-front-flip-cl
 b2dfe446-8dec-4b33-8fd4-17b0f4defa5b	aileen	motion-frame-candidate-pushing-open-palms-4-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
 7623c45f-a0cd-4fb6-aa5a-c3e1588e394b	aileen	motion-frame-candidate-pushing-open-palms-6-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
 c9252fd3-e258-4abe-a81c-d8bd0f35c0d2	aileen	motion-frame-candidate-pushing-open-palms-7-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
-a15c1f9d-6548-4046-b9f7-9ab6ece13019	aileen	motion-frame-candidate-front-flip-actual-reference-3-1		processing	null
-e6b0dc7e-86ac-489f-a40c-1b98f0b26327	aileen	motion-frame-candidate-pushing-actual-reference-0-1		processing	null
-04a73990-c3a4-4666-ba8c-be56aeec3b9e	aileen	motion-frame-candidate-pushing-actual-reference-1-1		processing	null
-b76f21ad-ee58-4c0a-814e-f48b0f555673	aileen	motion-frame-candidate-pushing-actual-reference-3-1		processing	null
-bd1a632b-9e57-4a31-b7fb-4939212ff37b	aileen	motion-frame-candidate-pushing-actual-reference-6-1		processing	null
+a15c1f9d-6548-4046-b9f7-9ab6ece13019	aileen	motion-frame-candidate-front-flip-actual-reference-3-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+e6b0dc7e-86ac-489f-a40c-1b98f0b26327	aileen	motion-frame-candidate-pushing-actual-reference-0-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+04a73990-c3a4-4666-ba8c-be56aeec3b9e	aileen	motion-frame-candidate-pushing-actual-reference-1-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+b76f21ad-ee58-4c0a-814e-f48b0f555673	aileen	motion-frame-candidate-pushing-actual-reference-3-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+bd1a632b-9e57-4a31-b7fb-4939212ff37b	aileen	motion-frame-candidate-pushing-actual-reference-6-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+4d74ab93-c6fe-4eaf-8aba-fc18ed8333cf	aileen	motion-frame-candidate-pushing-open-palms-1-2		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+1e6ffa48-bd42-454b-9a4f-915c7a2ebfff	aileen	motion-frame-candidate-pushing-open-palms-3-2		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+4ceaf84e-1244-4455-b198-dbff361e6cc7	aileen	motion-frame-candidate-pushing-open-palms-0-2		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+966c65af-a249-4964-a513-9ca5ae95f69c	aileen	motion-frame-candidate-pushing-open-guard-1-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+e5e6bfcd-ef4b-4f7f-9189-01028e27efb6	aileen	motion-frame-candidate-pushing-open-guard-3-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+7c8c082b-8fa9-4b3f-89fb-8779ed3012e9	aileen	motion-frame-candidate-pushing-original-standing-1-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
 local-sync:jyaldi-backflip-v7-estimate	jyaldi	estimate-skeleton	backflip	synchronous-completed	{"type": "generations", "generations": 0.1}
 local-sync:jaemtri-crouch-reference-estimate	jaemtri	estimate-skeleton	motion-reference	synchronous-completed	{"type": "generations", "generations": 0.1}
 local-sync:jaemtri-turn-reference-estimate	jaemtri	estimate-skeleton	backflip	synchronous-completed	{"type": "generations", "generations": 0.1}

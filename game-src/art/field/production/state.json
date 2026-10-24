@@ -49266,7 +49266,7 @@
       "kind": "motion-frame-candidate-pushing-open-guard-3-1",
       "slug": "aileen",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792811570.6226127,
       "receipt": {
         "usage": null,
@@ -49277,29 +49277,65 @@
       "archive_output": "motion-frame-candidates/aileen/pushing/open-guard-3-1/frames",
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 2.0
         },
         "id": "e5e6bfcd-ef4b-4f7f-9189-01028e27efb6",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-24T03:12:50.823671+00:00",
         "last_response": {
-          "type": "message_progress",
-          "action": "generating",
+          "seed": 2026114503,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
           "status": "initializing",
-          "progress": 0.3242236200968994,
+          "progress": 0.98,
           "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 2
+          },
+          "generation_id": "3a6a2de7-0514-4c4a-9cec-fd67146a912b",
           "queue_position": 0,
+          "billing_charged": true,
           "generation_started_at": "2026-10-24T03:13:38.716093+00:00",
           "estimated_wait_seconds": 0
         }
-      }
+      },
+      "observed_end_epoch": 1792811952.826803,
+      "elapsed_observed_seconds": 382.20419049263,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 2
+      },
+      "saved_frames": 3
     },
     "7c8c082b-8fa9-4b3f-89fb-8779ed3012e9": {
       "kind": "motion-frame-candidate-pushing-original-standing-1-1",
       "slug": "aileen",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792811721.7390964,
       "receipt": {
         "usage": null,
@@ -49310,20 +49346,438 @@
       "archive_output": "motion-frame-candidates/aileen/pushing/original-standing-1-1/frames",
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 2.0
         },
         "id": "7c8c082b-8fa9-4b3f-89fb-8779ed3012e9",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-24T03:15:21.971289+00:00",
         "last_response": {
-          "type": "background",
+          "seed": 2026114601,
+          "type": "done",
+          "action": "finalizing",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
           "status": "initializing",
+          "progress": 1.0,
           "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 2
+          },
+          "generation_id": "146dc62f-3684-4c9a-bbba-c45893fe827b",
           "queue_position": 0,
+          "billing_charged": true,
+          "generation_started_at": "2026-10-24T03:16:21.554124+00:00",
           "estimated_wait_seconds": 0
         }
-      }
+      },
+      "observed_end_epoch": 1792811846.1612198,
+      "elapsed_observed_seconds": 124.422123670578,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 2
+      },
+      "saved_frames": 3
+    },
+    "fc885982-749a-43d0-84ee-ae7e2f613dd3": {
+      "kind": "animation",
+      "slug": "gorgodio",
+      "template": "breathing-idle",
+      "status": "processing",
+      "created_epoch": 1792812077.4726999,
+      "receipt": {
+        "background_job_ids": [
+          "fc885982-749a-43d0-84ee-ae7e2f613dd3"
+        ],
+        "directions": [
+          "south-east"
+        ],
+        "animation_group_id": "75279658-3936-42e6-9ade-4ad20e51d5bd",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      },
+      "endpoint": "animate-character"
+    },
+    "1c031fb9-393a-4ce1-af1e-d7f3b51f71a2": {
+      "kind": "animation",
+      "slug": "gorgodio",
+      "template": "walking-8-frames",
+      "status": "processing",
+      "created_epoch": 1792812078.751323,
+      "receipt": {
+        "background_job_ids": [
+          "1c031fb9-393a-4ce1-af1e-d7f3b51f71a2"
+        ],
+        "directions": [
+          "east"
+        ],
+        "animation_group_id": "f9d6cf85-7ba4-4dc5-a632-51ebc2863121",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      },
+      "endpoint": "animate-character"
+    },
+    "80ed3716-3de9-4a16-aee0-eb028f5a474d": {
+      "kind": "animation",
+      "slug": "gorgodio",
+      "template": "running-8-frames",
+      "status": "processing",
+      "created_epoch": 1792812079.8434508,
+      "receipt": {
+        "background_job_ids": [
+          "80ed3716-3de9-4a16-aee0-eb028f5a474d"
+        ],
+        "directions": [
+          "east"
+        ],
+        "animation_group_id": "fb44689f-a7ea-4365-8f5d-085c707b47b9",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      },
+      "endpoint": "animate-character"
+    },
+    "0df049d9-0ac4-4240-ac47-d42b9820f084": {
+      "kind": "animation",
+      "slug": "gorgodio",
+      "template": "running-jump",
+      "status": "processing",
+      "created_epoch": 1792812081.2362115,
+      "receipt": {
+        "background_job_ids": [
+          "0df049d9-0ac4-4240-ac47-d42b9820f084"
+        ],
+        "directions": [
+          "east"
+        ],
+        "animation_group_id": "528aedf2-f847-4364-9c68-8a6a325c7fe5",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      },
+      "endpoint": "animate-character"
+    },
+    "63c65c76-cb1d-4a2c-ac1a-062b4f4500fb": {
+      "kind": "animation",
+      "slug": "gorgodio",
+      "template": "running-slide",
+      "status": "processing",
+      "created_epoch": 1792812081.812953,
+      "receipt": {
+        "background_job_ids": [
+          "63c65c76-cb1d-4a2c-ac1a-062b4f4500fb"
+        ],
+        "directions": [
+          "east"
+        ],
+        "animation_group_id": "af485485-825a-4a46-9e3e-bdca519255be",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      },
+      "endpoint": "animate-character"
+    },
+    "7517bec3-7345-46fc-98b9-a4d78e35b33b": {
+      "kind": "animation",
+      "slug": "gorgodio",
+      "template": "crouched-walking",
+      "status": "processing",
+      "created_epoch": 1792812082.6374078,
+      "receipt": {
+        "background_job_ids": [
+          "7517bec3-7345-46fc-98b9-a4d78e35b33b"
+        ],
+        "directions": [
+          "east"
+        ],
+        "animation_group_id": "c1b07a4c-ade2-462d-8fd4-c95be9579c20",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      },
+      "endpoint": "animate-character"
+    },
+    "bfaf7ccb-a3f0-4310-8d01-bcab1d5d0f41": {
+      "kind": "animation",
+      "slug": "gorgodio",
+      "template": "sad-walk",
+      "status": "processing",
+      "created_epoch": 1792812084.114266,
+      "receipt": {
+        "background_job_ids": [
+          "bfaf7ccb-a3f0-4310-8d01-bcab1d5d0f41"
+        ],
+        "directions": [
+          "east"
+        ],
+        "animation_group_id": "93fe6da3-e9af-4e3b-9a98-2ddfe8f7fc16",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      },
+      "endpoint": "animate-character"
+    },
+    "c8bd5412-38ff-4947-a5d6-b374f27af8b3": {
+      "kind": "animation",
+      "slug": "gorgodio",
+      "template": "front-flip",
+      "status": "processing",
+      "created_epoch": 1792812088.088167,
+      "receipt": {
+        "background_job_ids": [
+          "c8bd5412-38ff-4947-a5d6-b374f27af8b3"
+        ],
+        "directions": [
+          "east"
+        ],
+        "animation_group_id": "3178d174-be51-4442-863b-766624cc3d97",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      },
+      "endpoint": "animate-character"
+    },
+    "749dcbeb-c1ee-4d00-a6fa-4bdff66b8c53": {
+      "kind": "animation",
+      "slug": "gorgodio",
+      "template": "backflip",
+      "status": "processing",
+      "created_epoch": 1792812088.7586353,
+      "receipt": {
+        "background_job_ids": [
+          "749dcbeb-c1ee-4d00-a6fa-4bdff66b8c53"
+        ],
+        "directions": [
+          "east"
+        ],
+        "animation_group_id": "eccaaae2-538e-485f-a302-154dab62eb55",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      },
+      "endpoint": "animate-character"
+    },
+    "bcdfe8d7-dc49-49bb-b4ba-2715f97de193": {
+      "kind": "animation",
+      "slug": "gorgodio",
+      "template": "jumping-1",
+      "status": "processing",
+      "created_epoch": 1792812089.3032377,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "bcdfe8d7-dc49-49bb-b4ba-2715f97de193",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3"
+    },
+    "8ca0dfee-91a4-4107-a351-86b38e32d7c7": {
+      "kind": "animation",
+      "slug": "gorgodio",
+      "template": "jumping-2",
+      "status": "processing",
+      "created_epoch": 1792812089.906517,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "8ca0dfee-91a4-4107-a351-86b38e32d7c7",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3"
+    },
+    "7ea63972-89d0-417a-8425-129ef4f07691": {
+      "kind": "animation",
+      "slug": "gorgodio",
+      "template": "two-footed-jump",
+      "status": "processing",
+      "created_epoch": 1792812091.292544,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "7ea63972-89d0-417a-8425-129ef4f07691",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3"
+    },
+    "79484419-2153-4255-a929-f59ba8a6a0e9": {
+      "kind": "animation",
+      "slug": "gorgodio",
+      "template": "drinking",
+      "status": "processing",
+      "created_epoch": 1792812091.8062363,
+      "receipt": {
+        "background_job_ids": [
+          "79484419-2153-4255-a929-f59ba8a6a0e9"
+        ],
+        "directions": [
+          "south-east"
+        ],
+        "animation_group_id": "7be8e7f4-6667-4bf2-806d-bae2d86dc26d",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      },
+      "endpoint": "animate-character"
+    },
+    "4ffc9815-9d39-4dbd-ad94-a73ad610ccf9": {
+      "kind": "animation",
+      "slug": "gorgodio",
+      "template": "picking-up",
+      "status": "processing",
+      "created_epoch": 1792812092.431425,
+      "receipt": {
+        "background_job_ids": [
+          "4ffc9815-9d39-4dbd-ad94-a73ad610ccf9"
+        ],
+        "directions": [
+          "east"
+        ],
+        "animation_group_id": "42e8955f-2677-4305-98f1-563dfed13f3f",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      },
+      "endpoint": "animate-character"
+    },
+    "a7368f7b-d21f-41a2-9642-769f6ae0c6b4": {
+      "kind": "animation",
+      "slug": "gorgodio",
+      "template": "pushing",
+      "status": "processing",
+      "created_epoch": 1792812093.336923,
+      "receipt": {
+        "background_job_ids": [
+          "a7368f7b-d21f-41a2-9642-769f6ae0c6b4"
+        ],
+        "directions": [
+          "east"
+        ],
+        "animation_group_id": "af76ce49-c48a-4d12-aacc-c6a506f0206c",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      },
+      "endpoint": "animate-character"
+    },
+    "14fc20a0-717a-4eff-98d2-2fad20876c9c": {
+      "kind": "animation",
+      "slug": "gorgodio",
+      "template": "pull-heavy-object",
+      "status": "processing",
+      "created_epoch": 1792812093.8729718,
+      "receipt": {
+        "background_job_ids": [
+          "14fc20a0-717a-4eff-98d2-2fad20876c9c"
+        ],
+        "directions": [
+          "east"
+        ],
+        "animation_group_id": "1dc69ce3-86d1-4845-92ba-0624a1772cc4",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      },
+      "endpoint": "animate-character"
+    },
+    "bcf575dd-3d69-44a4-808c-5b6129e66c6f": {
+      "kind": "animation",
+      "slug": "gorgodio",
+      "template": "throw-object",
+      "status": "processing",
+      "created_epoch": 1792812094.684739,
+      "receipt": {
+        "background_job_ids": [
+          "bcf575dd-3d69-44a4-808c-5b6129e66c6f"
+        ],
+        "directions": [
+          "east"
+        ],
+        "animation_group_id": "f357e971-b897-41dc-9f73-2f5f98401f2f",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      },
+      "endpoint": "animate-character"
+    },
+    "26047ff4-f3de-47cb-a272-f27c5eb4f1f0": {
+      "kind": "animation",
+      "slug": "gorgodio",
+      "template": "fight-stance-idle-8-frames",
+      "status": "processing",
+      "created_epoch": 1792812095.2375727,
+      "receipt": {
+        "background_job_ids": [
+          "26047ff4-f3de-47cb-a272-f27c5eb4f1f0"
+        ],
+        "directions": [
+          "east"
+        ],
+        "animation_group_id": "c51a6e96-46f7-4813-864f-63ee761a4575",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      },
+      "endpoint": "animate-character"
+    },
+    "03931583-76d1-4cf6-a372-6fcb651fefd3": {
+      "kind": "animation",
+      "slug": "gorgodio",
+      "template": "lead-jab",
+      "status": "processing",
+      "created_epoch": 1792812095.7643383,
+      "receipt": {
+        "background_job_ids": [
+          "03931583-76d1-4cf6-a372-6fcb651fefd3"
+        ],
+        "directions": [
+          "east"
+        ],
+        "animation_group_id": "be0f4015-02f7-4ca3-911c-62394ac6aa7d",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      },
+      "endpoint": "animate-character"
+    },
+    "89fa95bd-c08d-4973-9669-c55c9a3e1aac": {
+      "kind": "animation",
+      "slug": "gorgodio",
+      "template": "cross-punch",
+      "status": "processing",
+      "created_epoch": 1792812096.6871502,
+      "receipt": {
+        "background_job_ids": [
+          "89fa95bd-c08d-4973-9669-c55c9a3e1aac"
+        ],
+        "directions": [
+          "east"
+        ],
+        "animation_group_id": "19993446-6561-48ff-b3ec-46c72ea43572",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      },
+      "endpoint": "animate-character"
     }
   },
   "characters": {
@@ -50397,7 +50851,7 @@
       "rotation_count": 8,
       "exported": true,
       "eight_way_visual_reviewed": true,
-      "motions_visual_reviewed": false,
+      "motions_visual_reviewed": true,
       "motion-frame-candidate-jumping-1-crouch-hair-1": "c091877e-1a73-4f0f-a3a3-5b974d3a78e5",
       "motion_assemblies": {
         "jumping-1": {
@@ -51085,12 +51539,12 @@
             },
             {
               "frame_index": 1,
-              "source_job_id": "9e197c33-2796-4686-b512-87fd1659fe40",
+              "source_job_id": "7c8c082b-8fa9-4b3f-89fb-8779ed3012e9",
               "source_frame_index": 0,
               "target_pose_index": 1,
-              "source_path": "motion-frame-candidates/aileen/pushing/clean-pose-1-1/frames/0.png",
-              "sha256": "2ce3a0ed19f786f9109af2d6a7b8683aa6bc08814cab107273d5557d8b457c89",
-              "findings": "Selected intact forward braced pose with separated blonde strands and transparent exterior; rejected alternative candidates with gray or brown background blobs."
+              "source_path": "motion-frame-candidates/aileen/pushing/original-standing-1-1/frames/0.png",
+              "sha256": "8a526aa54fd6466bb82f2991c740eaeb7a332ba2205d36c38822a0f3151043aa",
+              "findings": "Own registered standing source produces clear extended pushing palm and separated bright blonde strands; candidate0 has no broad gray hair-end matte or body-side opaque mass."
             },
             {
               "frame_index": 2,
@@ -51103,12 +51557,12 @@
             },
             {
               "frame_index": 3,
-              "source_job_id": "de57d1ed-2821-4b0a-86d8-766de3462445",
+              "source_job_id": "e5e6bfcd-ef4b-4f7f-9189-01028e27efb6",
               "source_frame_index": 1,
               "target_pose_index": 3,
-              "source_path": "motion-frame-candidates/aileen/pushing/clean-pose-3-1/frames/1.png",
-              "sha256": "6b472259af6eba33e6f63d4c458d84d6ea4c0fc5ca8535784393d2427d3242cc",
-              "findings": "Selected intact forward braced pose with separated blonde strands and transparent exterior; rejected alternative candidates with gray or brown background blobs."
+              "source_path": "motion-frame-candidates/aileen/pushing/open-guard-3-1/frames/1.png",
+              "sha256": "bb09c7a402113020e3e769d2c1f0b7be215f4f0f08623515eabcae09cc42a865",
+              "findings": "Candidate1 has two forward open palms, intact suit/shoes and separated blonde ponytail strands without broad gray exterior patch."
             },
             {
               "frame_index": 4,
@@ -51149,7 +51603,7 @@
           ],
           "method": "select complete same-pose regenerated frames; no pixel editing",
           "new_user_approval": false,
-          "visual_reviewed": false
+          "visual_reviewed": true
         },
         "throw-object": {
           "base_job_id": "bf0f5fe4-7bb1-4c82-b434-8ba602b1254a",
@@ -51444,12 +51898,33 @@
       "character_id": "1d8d12e4-06d5-4df8-8812-0754f77b736b",
       "image": "2f655338-9c44-48da-b55f-0aab08174ead",
       "registration": "3676d347-a999-4fff-93e5-fdef57f7cee7",
-      "motions": {},
+      "motions": {
+        "breathing-idle": "fc885982-749a-43d0-84ee-ae7e2f613dd3",
+        "walking-8-frames": "1c031fb9-393a-4ce1-af1e-d7f3b51f71a2",
+        "running-8-frames": "80ed3716-3de9-4a16-aee0-eb028f5a474d",
+        "running-jump": "0df049d9-0ac4-4240-ac47-d42b9820f084",
+        "running-slide": "63c65c76-cb1d-4a2c-ac1a-062b4f4500fb",
+        "crouched-walking": "7517bec3-7345-46fc-98b9-a4d78e35b33b",
+        "sad-walk": "bfaf7ccb-a3f0-4310-8d01-bcab1d5d0f41",
+        "front-flip": "c8bd5412-38ff-4947-a5d6-b374f27af8b3",
+        "backflip": "749dcbeb-c1ee-4d00-a6fa-4bdff66b8c53",
+        "jumping-1": "bcdfe8d7-dc49-49bb-b4ba-2715f97de193",
+        "jumping-2": "8ca0dfee-91a4-4107-a351-86b38e32d7c7",
+        "two-footed-jump": "7ea63972-89d0-417a-8425-129ef4f07691",
+        "drinking": "79484419-2153-4255-a929-f59ba8a6a0e9",
+        "picking-up": "4ffc9815-9d39-4dbd-ad94-a73ad610ccf9",
+        "pushing": "a7368f7b-d21f-41a2-9642-769f6ae0c6b4",
+        "pull-heavy-object": "14fc20a0-717a-4eff-98d2-2fad20876c9c",
+        "throw-object": "bcf575dd-3d69-44a4-808c-5b6129e66c6f",
+        "fight-stance-idle-8-frames": "26047ff4-f3de-47cb-a272-f27c5eb4f1f0",
+        "lead-jab": "03931583-76d1-4cf6-a372-6fcb651fefd3",
+        "cross-punch": "89fa95bd-c08d-4973-9669-c55c9a3e1aac"
+      },
       "ready": true,
       "image_verified": true,
       "skeleton_joints": 18,
       "rotation_count": 8,
-      "exported": true,
+      "exported": false,
       "eight_way_visual_reviewed": true
     },
     "kyuras": {
@@ -78986,9 +79461,480 @@
         "files": 13,
         "production_pack_clips": 20
       }
+    },
+    {
+      "at": "2026-10-24T03:17:26Z",
+      "kind": "completed",
+      "slug": "aileen",
+      "detail": {
+        "kind": "motion-frame-candidate-pushing-original-standing-1-1",
+        "template": null,
+        "job_id": "7c8c082b-8fa9-4b3f-89fb-8779ed3012e9",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 2
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T03:19:12Z",
+      "kind": "completed",
+      "slug": "aileen",
+      "detail": {
+        "kind": "motion-frame-candidate-pushing-open-guard-3-1",
+        "template": null,
+        "job_id": "e5e6bfcd-ef4b-4f7f-9189-01028e27efb6",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 2
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T03:19:14Z",
+      "kind": "exported",
+      "slug": "aileen",
+      "detail": {
+        "bytes": 130346,
+        "files": 13,
+        "production_pack_clips": 20
+      }
+    },
+    {
+      "at": "2026-10-24T03:20:10Z",
+      "kind": "exported",
+      "slug": "aileen",
+      "detail": {
+        "bytes": 130346,
+        "files": 13,
+        "production_pack_clips": 20
+      }
+    },
+    {
+      "at": "2026-10-24T03:21:18Z",
+      "kind": "submitted",
+      "slug": "gorgodio",
+      "detail": {
+        "kind": "animation",
+        "template": "breathing-idle",
+        "job_id": "fc885982-749a-43d0-84ee-ae7e2f613dd3",
+        "receipt": {
+          "background_job_ids": [
+            "fc885982-749a-43d0-84ee-ae7e2f613dd3"
+          ],
+          "directions": [
+            "south-east"
+          ],
+          "animation_group_id": "75279658-3936-42e6-9ade-4ad20e51d5bd",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T03:21:19Z",
+      "kind": "submitted",
+      "slug": "gorgodio",
+      "detail": {
+        "kind": "animation",
+        "template": "walking-8-frames",
+        "job_id": "1c031fb9-393a-4ce1-af1e-d7f3b51f71a2",
+        "receipt": {
+          "background_job_ids": [
+            "1c031fb9-393a-4ce1-af1e-d7f3b51f71a2"
+          ],
+          "directions": [
+            "east"
+          ],
+          "animation_group_id": "f9d6cf85-7ba4-4dc5-a632-51ebc2863121",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T03:21:21Z",
+      "kind": "submitted",
+      "slug": "gorgodio",
+      "detail": {
+        "kind": "animation",
+        "template": "running-8-frames",
+        "job_id": "80ed3716-3de9-4a16-aee0-eb028f5a474d",
+        "receipt": {
+          "background_job_ids": [
+            "80ed3716-3de9-4a16-aee0-eb028f5a474d"
+          ],
+          "directions": [
+            "east"
+          ],
+          "animation_group_id": "fb44689f-a7ea-4365-8f5d-085c707b47b9",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T03:21:21Z",
+      "kind": "submitted",
+      "slug": "gorgodio",
+      "detail": {
+        "kind": "animation",
+        "template": "running-jump",
+        "job_id": "0df049d9-0ac4-4240-ac47-d42b9820f084",
+        "receipt": {
+          "background_job_ids": [
+            "0df049d9-0ac4-4240-ac47-d42b9820f084"
+          ],
+          "directions": [
+            "east"
+          ],
+          "animation_group_id": "528aedf2-f847-4364-9c68-8a6a325c7fe5",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T03:21:22Z",
+      "kind": "submitted",
+      "slug": "gorgodio",
+      "detail": {
+        "kind": "animation",
+        "template": "running-slide",
+        "job_id": "63c65c76-cb1d-4a2c-ac1a-062b4f4500fb",
+        "receipt": {
+          "background_job_ids": [
+            "63c65c76-cb1d-4a2c-ac1a-062b4f4500fb"
+          ],
+          "directions": [
+            "east"
+          ],
+          "animation_group_id": "af485485-825a-4a46-9e3e-bdca519255be",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T03:21:23Z",
+      "kind": "submitted",
+      "slug": "gorgodio",
+      "detail": {
+        "kind": "animation",
+        "template": "crouched-walking",
+        "job_id": "7517bec3-7345-46fc-98b9-a4d78e35b33b",
+        "receipt": {
+          "background_job_ids": [
+            "7517bec3-7345-46fc-98b9-a4d78e35b33b"
+          ],
+          "directions": [
+            "east"
+          ],
+          "animation_group_id": "c1b07a4c-ade2-462d-8fd4-c95be9579c20",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T03:21:27Z",
+      "kind": "submitted",
+      "slug": "gorgodio",
+      "detail": {
+        "kind": "animation",
+        "template": "sad-walk",
+        "job_id": "bfaf7ccb-a3f0-4310-8d01-bcab1d5d0f41",
+        "receipt": {
+          "background_job_ids": [
+            "bfaf7ccb-a3f0-4310-8d01-bcab1d5d0f41"
+          ],
+          "directions": [
+            "east"
+          ],
+          "animation_group_id": "93fe6da3-e9af-4e3b-9a98-2ddfe8f7fc16",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T03:21:28Z",
+      "kind": "submitted",
+      "slug": "gorgodio",
+      "detail": {
+        "kind": "animation",
+        "template": "front-flip",
+        "job_id": "c8bd5412-38ff-4947-a5d6-b374f27af8b3",
+        "receipt": {
+          "background_job_ids": [
+            "c8bd5412-38ff-4947-a5d6-b374f27af8b3"
+          ],
+          "directions": [
+            "east"
+          ],
+          "animation_group_id": "3178d174-be51-4442-863b-766624cc3d97",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T03:21:29Z",
+      "kind": "submitted",
+      "slug": "gorgodio",
+      "detail": {
+        "kind": "animation",
+        "template": "backflip",
+        "job_id": "749dcbeb-c1ee-4d00-a6fa-4bdff66b8c53",
+        "receipt": {
+          "background_job_ids": [
+            "749dcbeb-c1ee-4d00-a6fa-4bdff66b8c53"
+          ],
+          "directions": [
+            "east"
+          ],
+          "animation_group_id": "eccaaae2-538e-485f-a302-154dab62eb55",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T03:21:29Z",
+      "kind": "submitted",
+      "slug": "gorgodio",
+      "detail": {
+        "kind": "animation",
+        "template": "jumping-1",
+        "job_id": "bcdfe8d7-dc49-49bb-b4ba-2715f97de193",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "bcdfe8d7-dc49-49bb-b4ba-2715f97de193",
+          "status": "processing"
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T03:21:31Z",
+      "kind": "submitted",
+      "slug": "gorgodio",
+      "detail": {
+        "kind": "animation",
+        "template": "jumping-2",
+        "job_id": "8ca0dfee-91a4-4107-a351-86b38e32d7c7",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "8ca0dfee-91a4-4107-a351-86b38e32d7c7",
+          "status": "processing"
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T03:21:31Z",
+      "kind": "submitted",
+      "slug": "gorgodio",
+      "detail": {
+        "kind": "animation",
+        "template": "two-footed-jump",
+        "job_id": "7ea63972-89d0-417a-8425-129ef4f07691",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "7ea63972-89d0-417a-8425-129ef4f07691",
+          "status": "processing"
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T03:21:32Z",
+      "kind": "submitted",
+      "slug": "gorgodio",
+      "detail": {
+        "kind": "animation",
+        "template": "drinking",
+        "job_id": "79484419-2153-4255-a929-f59ba8a6a0e9",
+        "receipt": {
+          "background_job_ids": [
+            "79484419-2153-4255-a929-f59ba8a6a0e9"
+          ],
+          "directions": [
+            "south-east"
+          ],
+          "animation_group_id": "7be8e7f4-6667-4bf2-806d-bae2d86dc26d",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T03:21:33Z",
+      "kind": "submitted",
+      "slug": "gorgodio",
+      "detail": {
+        "kind": "animation",
+        "template": "picking-up",
+        "job_id": "4ffc9815-9d39-4dbd-ad94-a73ad610ccf9",
+        "receipt": {
+          "background_job_ids": [
+            "4ffc9815-9d39-4dbd-ad94-a73ad610ccf9"
+          ],
+          "directions": [
+            "east"
+          ],
+          "animation_group_id": "42e8955f-2677-4305-98f1-563dfed13f3f",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T03:21:33Z",
+      "kind": "submitted",
+      "slug": "gorgodio",
+      "detail": {
+        "kind": "animation",
+        "template": "pushing",
+        "job_id": "a7368f7b-d21f-41a2-9642-769f6ae0c6b4",
+        "receipt": {
+          "background_job_ids": [
+            "a7368f7b-d21f-41a2-9642-769f6ae0c6b4"
+          ],
+          "directions": [
+            "east"
+          ],
+          "animation_group_id": "af76ce49-c48a-4d12-aacc-c6a506f0206c",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T03:21:34Z",
+      "kind": "submitted",
+      "slug": "gorgodio",
+      "detail": {
+        "kind": "animation",
+        "template": "pull-heavy-object",
+        "job_id": "14fc20a0-717a-4eff-98d2-2fad20876c9c",
+        "receipt": {
+          "background_job_ids": [
+            "14fc20a0-717a-4eff-98d2-2fad20876c9c"
+          ],
+          "directions": [
+            "east"
+          ],
+          "animation_group_id": "1dc69ce3-86d1-4845-92ba-0624a1772cc4",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T03:21:35Z",
+      "kind": "submitted",
+      "slug": "gorgodio",
+      "detail": {
+        "kind": "animation",
+        "template": "throw-object",
+        "job_id": "bcf575dd-3d69-44a4-808c-5b6129e66c6f",
+        "receipt": {
+          "background_job_ids": [
+            "bcf575dd-3d69-44a4-808c-5b6129e66c6f"
+          ],
+          "directions": [
+            "east"
+          ],
+          "animation_group_id": "f357e971-b897-41dc-9f73-2f5f98401f2f",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T03:21:35Z",
+      "kind": "submitted",
+      "slug": "gorgodio",
+      "detail": {
+        "kind": "animation",
+        "template": "fight-stance-idle-8-frames",
+        "job_id": "26047ff4-f3de-47cb-a272-f27c5eb4f1f0",
+        "receipt": {
+          "background_job_ids": [
+            "26047ff4-f3de-47cb-a272-f27c5eb4f1f0"
+          ],
+          "directions": [
+            "east"
+          ],
+          "animation_group_id": "c51a6e96-46f7-4813-864f-63ee761a4575",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T03:21:36Z",
+      "kind": "submitted",
+      "slug": "gorgodio",
+      "detail": {
+        "kind": "animation",
+        "template": "lead-jab",
+        "job_id": "03931583-76d1-4cf6-a372-6fcb651fefd3",
+        "receipt": {
+          "background_job_ids": [
+            "03931583-76d1-4cf6-a372-6fcb651fefd3"
+          ],
+          "directions": [
+            "east"
+          ],
+          "animation_group_id": "be0f4015-02f7-4ca3-911c-62394ac6aa7d",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T03:21:37Z",
+      "kind": "submitted",
+      "slug": "gorgodio",
+      "detail": {
+        "kind": "animation",
+        "template": "cross-punch",
+        "job_id": "89fa95bd-c08d-4973-9669-c55c9a3e1aac",
+        "receipt": {
+          "background_job_ids": [
+            "89fa95bd-c08d-4973-9669-c55c9a3e1aac"
+          ],
+          "directions": [
+            "east"
+          ],
+          "animation_group_id": "19993446-6561-48ff-b3ec-46c72ea43572",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
     }
   ],
-  "updated_at": 1792811778.594695,
+  "updated_at": 1792812097.2393682,
   "user_stopped_at": 1792778235.6917784,
   "archived_jobs": {
     "304457e9-6577-44f0-af17-97841a9f6720": {
@@ -80307,11 +81253,11 @@
       "saved_frames": 6
     }
   },
-  "last_git_checkpoint": 1792811396.6341758,
+  "last_git_checkpoint": 1792811780.7912993,
   "summary": {
     "jobs": {
-      "processing": 2,
-      "completed": 559,
+      "processing": 20,
+      "completed": 561,
       "failed": 9,
       "stalled": 0
     },
@@ -80320,8 +81266,8 @@
     "images_format_verified": 55,
     "new_images_visually_reviewed": 43,
     "eight_way_visually_reviewed": 55,
-    "characters_motions_visually_reviewed": 3,
-    "motions_submitted": 80,
+    "characters_motions_visually_reviewed": 4,
+    "motions_submitted": 100,
     "motions_target": 1100
   },
   "applied_repairs": [
