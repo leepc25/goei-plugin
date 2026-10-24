@@ -64,7 +64,7 @@ def lint_file(f):
             if re.search(RETURN, p, re.I): flags.append("돌아오기꼬리")
             face = set(w.lower() for w in re.findall(FACE, p, re.I))
             # 피격·감정 줄은 표정을 쓴다(사용자 결정 2026-10-24)
-            if face and not re.search(r"맞기|쓰러지기|스턴|화내기|놀라기|기뻐하기", name): flags.append("미세표정(" + ",".join(sorted(face)) + ")")
+            if face and not re.search(r"맞기|쓰러지기|스턴|화내기|놀라기|기뻐하기|섭취|말하며", name): flags.append("미세표정(" + ",".join(sorted(face)) + ")")
             st = set(w.lower().strip() for w in re.findall(STATE, p, re.I))
             if st: flags.append("상태부정(" + ",".join(sorted(st)) + ")")
             if re.search(STILL, p, re.I): flags.append("가만히")
