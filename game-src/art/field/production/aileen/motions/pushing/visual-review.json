@@ -1,8 +1,8 @@
 {
-  "at": 1792811125.0313628,
+  "at": 1792811389.286686,
   "job_id": "26112962-08ae-494b-9f9b-82a398e44e85",
   "result": "reroll-required",
-  "findings": "Remaining exterior gray patches require corrected actual first-frame keypoints; no automatic approval.",
+  "findings": "Indices1/3 candidates retain broad gray ponytail mats; change reference to clean open-palm index6. Index0 candidate still processing.",
   "frame_count": 8,
   "directions": [
     "east"
@@ -76,12 +76,12 @@
       },
       {
         "frame_index": 6,
-        "source_job_id": "319991db-7083-4a02-aa24-1a8a8aaba674",
+        "source_job_id": "bd1a632b-9e57-4a31-b7fb-4939212ff37b",
         "source_frame_index": 1,
         "target_pose_index": 6,
-        "source_path": "motion-frame-candidates/aileen/pushing/clean-pose-6-2/frames/1.png",
-        "sha256": "191475a3d1c05f6dd96835af505ce1103501e7faab8a14d38973ef989aa204f4",
-        "findings": "Candidate1 removes candidate0 gray hair-end mass; transparent space around legs and intact black suit."
+        "source_path": "motion-frame-candidates/aileen/pushing/actual-reference-6-1/frames/1.png",
+        "sha256": "1f1bdf531a4f88c229807866c57ec66a64e4923442e866f9c089e2d89b6e59b0",
+        "findings": "Corrected actual reference produces intact open palms and clean separated ponytail end; no broad gray exterior mass."
       },
       {
         "frame_index": 7,

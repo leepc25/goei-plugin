@@ -1,0 +1,9 @@
+{
+  "frame_index": 6,
+  "source_job_id": "bd1a632b-9e57-4a31-b7fb-4939212ff37b",
+  "source_frame_index": 1,
+  "target_pose_index": 6,
+  "source_path": "motion-frame-candidates/aileen/pushing/actual-reference-6-1/frames/1.png",
+  "sha256": "1f1bdf531a4f88c229807866c57ec66a64e4923442e866f9c089e2d89b6e59b0",
+  "findings": "Corrected actual reference produces intact open palms and clean separated ponytail end; no broad gray exterior mass."
+}
