@@ -80,6 +80,9 @@ def frame_ref(ref, r):
     """표의 장 이름 → 그림. None = 그 칸 비움(등록 그림 = API 기본)."""
     ref = ref.replace("*", "").strip()
     if ref.startswith("등록"): return "REG"
+    m6 = re.match(r"(\d+(?:-\d+)?)번 (\d+)번째 장$", ref)
+    if m6:
+        fr = load_frames(m6[1]); return fr[int(m6[2]) - 1]
     m = re.match(r"(\d+(?:-\d+)?(?:_[A-Z]+)?)번? 끝 장$", ref)
     if m:
         fr = load_frames(m[1])
@@ -96,7 +99,7 @@ def plan(r):
     start = frame_ref(a, r)
     loop = "(반복)" in b
     end = None
-    if loop and "같은 자세" in b or (loop and a.split()[0] == b.split()[0]):
+    if loop and "같은 자세" in b or (loop and a.split("(")[0].strip() == b.split("(")[0].strip()):
         end = start                       # 반복 = 시작 장으로 닫음
     elif b.startswith("(") or "끝 장 없음" in b or "이 동작이 만듦" in b:
         end = None                        # 끝 장 비움(이 동작이 만드는 장, 유지 자세, 걷기·뛰기)

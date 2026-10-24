@@ -17,7 +17,7 @@ LIST = [
  ("25","25","E","필살기 증명해"),("26","26","SE","섭취"),("27","27","SE","줍기"),("28","28","SE","응대"),("29","29","SE","말하며 손짓"),
  ("30","30","SE","끄덕이기"),("31","31","SE","고개 젓기"),("32","32","SE","화내기"),("33","33","E","발견 반응"),("34","34","SE","놀라기"),
  ("35","35","SE","기뻐하기"),("36","36","E","도망"),("37","37","E","뒷걸음질"),("37_1","37_1","E","뒷걸음질 반복"),("38","38_SW","SW","엎드려 기기"),("38_1","38_1","SW","엎드려 기기 반복"),("39","39","SE","주저앉기"),
- ("40","40","SE","주저앉아 뒤로 기어나가기"),("41","41","SE","웅크려 떨기"),("42","42_E","E","네발로 기기"),
+ ("40","40","SE","주저앉아 뒤로 기어나가기"),("41","41","SE","웅크려 떨기"),("42","42","E","네발로 기기"),("42_1","42_1","E","네발로 기기 반복"),
  ("W1","W_1","E","무기 대기"),("22_1","22_1","E","고유기술 제압사격"),
 ]
 CLEAN = {}   # (동작, 장): 왼쪽 몇 px 지우기 — 그림 찌꺼기용
@@ -41,6 +41,19 @@ for aid, folder, d, name in LIST:
                 for x in range(im.width):
                     r, g, b_, a = px[x, y]
                     if a > 0 and r > 200 and g > 120 and b_ < 120 and r - b_ > 110: px[x, y] = (0, 0, 0, 0)
+    for im in ims:   # 몸에서 떨어진 작은 점(15px 미만) 지우기 — 무릎 앞 찌꺼기 등
+        px = im.load(); W_, H_ = im.size; seen = set()
+        for y0 in range(H_):
+            for x0 in range(W_):
+                if px[x0, y0][3] > 40 and (x0, y0) not in seen:
+                    comp = []; st = [(x0, y0)]; seen.add((x0, y0))
+                    while st:
+                        x, y = st.pop(); comp.append((x, y))
+                        for nx, ny in ((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1), (x + 1, y + 1), (x - 1, y - 1), (x + 1, y - 1), (x - 1, y + 1)):
+                            if 0 <= nx < W_ and 0 <= ny < H_ and (nx, ny) not in seen and px[nx, ny][3] > 40:
+                                seen.add((nx, ny)); st.append((nx, ny))
+                    if len(comp) < 15:
+                        for x, y in comp: px[x, y] = (0, 0, 0, 0)
     for (cid, fi), xmax in CLEAN.items():   # 그림 가장자리의 떨어진 찌꺼기 지우기
         if cid == aid and fi < len(ims):
             im = ims[fi]; px = im.load()
@@ -68,11 +81,12 @@ for aid, folder, d, name in LIST:
         else:
             foot.append([0, 40, 0, 0])
         if aid in GUN:
-            # 총구 = 가슴~허리 높이 띠에서 가장 앞(오른쪽) 불투명 픽셀
+            # 총구 = 가슴~허리 띠에서 가장 앞(오른쪽)에 있는 어두운 픽셀(총은 검정). 밝은 찌꺼기·불꽃은 안 잡힘
             best = None
-            for y in range(int(h * 0.28), int(h * 0.66)):
+            for y in range(int(h * 0.2), int(h * 0.72)):
                 for x in range(w - 1, -1, -1):
-                    if px[x, y][3] > 40:
+                    c = px[x, y]
+                    if c[3] > 40 and 0.3 * c[0] + 0.59 * c[1] + 0.11 * c[2] < 95:
                         if best is None or x > best[0]: best = (x, y)
                         break
             mz.append([best[0] - w // 2, best[1]] if best else [40, h // 2])
