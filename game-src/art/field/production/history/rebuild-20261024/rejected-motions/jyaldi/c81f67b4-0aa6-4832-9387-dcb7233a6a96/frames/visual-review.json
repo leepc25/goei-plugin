@@ -1,0 +1,20 @@
+{
+  "at": 1792800530.6822553,
+  "job_id": "c81f67b4-0aa6-4832-9387-dcb7233a6a96",
+  "result": "reroll-required",
+  "findings": "Frames 5 and 10 contain severe face/hair transparency holes and scattered pixels; reject.",
+  "frame_count": 13,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "at": 1792800449.8662543,
+  "job_id": "f12abd78-49c6-4558-8a6f-ee68a5e99669",
+  "result": "pass",
+  "findings": "All 13 frames visually inspected: complete forward rotation, face and hair intact, black suit/gloves preserved, no gray exterior patches or clipped body. West-facing takeoff and landing retained.",
+  "frame_count": 13,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

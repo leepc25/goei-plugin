@@ -1,0 +1,20 @@
+{
+  "at": 1792800413.2557788,
+  "job_id": "a22f34bb-be49-41c0-9537-cd17aca48365",
+  "result": "pass",
+  "findings": "All 8 frames inspected, including final face at enlarged magenta background: no gray exterior paint, face holes or detached pixels. Face, black gloves, suit and long straight hair retained; restrained bend-and-reach motion with feet planted, west-facing.",
+  "frame_count": 8,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

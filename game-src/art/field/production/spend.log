@@ -326,6 +326,7 @@ abcd5997-80d8-4545-9c3e-a78739f74f37	jyaldi	animation	cross-punch	completed	{"us
 99276a0e-7f7d-4266-ad3d-3a5826fe8f5a	jyaldi	animation	picking-up	completed	{"usd": 0.0, "type": "generations", "generations": 3}
 b2e2ca3b-ce95-48c7-a05f-1aa1c6bb8deb	jyaldi	animation	throw-object	completed	{"usd": 0.0, "type": "generations", "generations": 3}
 61a3ec4e-de54-499f-a700-7750aa3cac75	jyaldi	animation	backflip	completed	{"usd": 0.0, "type": "generations", "generations": 3}
-f12abd78-49c6-4558-8a6f-ee68a5e99669	jyaldi	animation	front-flip	processing	null
-a22f34bb-be49-41c0-9537-cd17aca48365	jyaldi	animation	picking-up	processing	null
-c81f67b4-0aa6-4832-9387-dcb7233a6a96	jyaldi	animation	backflip	processing	null
+f12abd78-49c6-4558-8a6f-ee68a5e99669	jyaldi	animation	front-flip	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+a22f34bb-be49-41c0-9537-cd17aca48365	jyaldi	animation	picking-up	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+c81f67b4-0aa6-4832-9387-dcb7233a6a96	jyaldi	animation	backflip	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+780a2731-4b41-417e-a89f-a0c77a93dbf5	jyaldi	animation	backflip	processing	null
