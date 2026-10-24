@@ -27,6 +27,20 @@ for aid, folder, d, name in LIST:
     fs = sorted((M / folder).glob("[0-9][0-9].png"))
     if not fs: continue   # 아직 안 뽑은 줄(무기 대기 등)
     ims = [Image.open(f).convert("RGBA") for f in fs]
+    if aid in GUN:   # 그림에 그려진 총구 불꽃 지우기(불꽃은 코드·VFX가 그림): 총구(가장 앞 어두운 픽셀)보다 앞에 있는 밝은 픽셀
+        for im in ims:
+            px = im.load(); y0, y1 = int(im.height * 0.2), int(im.height * 0.72)
+            lum = lambda c: 0.3 * c[0] + 0.59 * c[1] + 0.11 * c[2]
+            dark = [x for y in range(y0, y1) for x in range(im.width) if px[x, y][3] > 40 and lum(px[x, y]) < 95]
+            if not dark: continue
+            mx = max(dark)
+            for y in range(y0, y1):
+                for x in range(mx + 1, im.width):
+                    if px[x, y][3] > 0 and lum(px[x, y]) > 110: px[x, y] = (0, 0, 0, 0)
+            for y in range(im.height):   # 남은 진한 노랑·주황 불꽃 조각
+                for x in range(im.width):
+                    r, g, b_, a = px[x, y]
+                    if a > 0 and r > 200 and g > 120 and b_ < 120 and r - b_ > 110: px[x, y] = (0, 0, 0, 0)
     for (cid, fi), xmax in CLEAN.items():   # 그림 가장자리의 떨어진 찌꺼기 지우기
         if cid == aid and fi < len(ims):
             im = ims[fi]; px = im.load()

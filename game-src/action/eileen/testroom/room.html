@@ -35,7 +35,7 @@ button.cap{border-color:var(--acc);color:var(--acc)}
 <div class="row">캐릭터 크기 <input id="sz" type="range" min="40" max="160" value="100"> <span id="szv">1배</span> <label><input id="ps" type="checkbox" checked> 원근</label></div>
 <div class="row">음악 <select id="song"></select> <label><input id="mute" type="checkbox"> 소리 끄기</label></div>
 <div class="row"><label><input id="fs" type="checkbox"> 필살기 게이지 무시(시험용)</label></div>
-<div class="row"><label><input id="sa" type="checkbox" checked> 슈퍼아머 테두리 보기</label><label><input id="cm" type="checkbox" checked> 캔슬 구간 보기</label></div>
+<div class="row"><label><input id="sa" type="checkbox" checked> 슈퍼아머 테두리 보기</label></div>
 </div>
 <div class="card"><h2>키 바꾸기 <span class="m">(단추를 누르고 새 키 · Esc 취소)</span></h2><div class="binds" id="binds"></div>
 <div class="row"><button id="reset">기본값으로</button></div></div>
@@ -550,7 +550,7 @@ function update(dt) {
   updateFx(dt);
   shake = Math.max(0, shake - 70 * dt); zoom = Math.max(0, zoom - 0.5 * dt); flash = Math.max(0, flash - dt); cut = Math.max(0, cut - dt); dark = Math.max(0, dark - dt);
   P.armorT = Math.max(0, P.armorT - dt);
-  if (P.sp >= 100 && Math.random() < dt * 9) fx.push({ k: 'mote', x: P.x + (Math.random() - 0.5) * 80 * K(P.y), y: P.y - Math.random() * 40, vy: -90 - Math.random() * 120, c: '#ffd34a', t: 0.8, t0: 0.8 });
+  if (P.sp >= 100 && Math.random() < dt * 2.5) fx.push({ k: 'mote', x: P.x + (Math.random() - 0.5) * 80 * K(P.y), y: P.y - Math.random() * 40, vy: -90 - Math.random() * 120, c: '#ffd34a', t: 0.8, t0: 0.8 });
   if (P.hp <= 25 && Math.random() < dt * 3.5) {   // 빈사: 몸에서 핏방울이 떨어져 바닥에 번짐
     const a = A[P.clip ? P.clip.id : '1'], f = curF(), k = K(P.y);
     const top = P.y - P.z - (a.floor - a.top[f]) * k, bot = P.y - P.z;
@@ -571,7 +571,7 @@ function update(dt) {
   switch (P.mode) {
     case 'ground': {
       if (down('flee')) { P.mode = 'flee'; play('36', { fps: 14, loopFrom: 0 }); break; }
-      if (down('back')) { P.mode = 'back'; if (has('37_1')) play('37', { fps: 8, onEnd: () => { if (P.mode === 'back') play('37_1', { fps: 8, loopFrom: 0 }); } }); else play('37', { fps: 8, loopFrom: 0 }); break; }
+      if (down('back')) { P.mode = 'back'; play('37', { fps: 8, onEnd: () => { if (P.mode === 'back') play('4', { seq: S(R(A['4'].n - 1, 0), 1 / 7), loopFrom: 0 }); } }); break; }   // 주춤 → 걷기를 거꾸로 틀어 뒷걸음
       if (dx || dy) {
         if (P.armed) P.armed = false;
         if (dx && dx !== P.face) { P.prevFace = P.face; P.faceT = P.t; P.face = dx; }
@@ -586,7 +586,8 @@ function update(dt) {
         const id = P.armed ? (has('W1') ? 'W1' : 'W') : P.combat ? '3' : '1';
         if (!P.clip || P.clip.id !== id) {
           if (id === 'W') play('W', { seq: [{ f: 3, d: 9 }], loopFrom: 0 });
-          else play(id, { fps: id === 'W1' ? 5 : P.combat ? 7 : P.dying ? 2.2 : 3, loopFrom: 0 });
+          else if (id === '1') play('1', { seq: [{ f: 0, d: P.dying ? 0.45 : 0.6 }, { f: 1, d: P.dying ? 0.45 : 0.6 }], loopFrom: 0 });   // 평상 대기: 앞 두 장만 오감(마지막 장은 가슴이 너무 올라감, 사용자)
+          else play(id, { fps: id === 'W1' ? 5 : P.combat ? 7 : 2, loopFrom: 0 });
         }
         P.idleT += dt;
         if (!P.combat && !P.armed && !P.dying && P.idleT > 9) { P.idleT = 0; emote('2', 7); }
@@ -665,7 +666,10 @@ function drawSprite(id, f, x, y, z, face, alpha = 1, tint = null) {
   const dxp = -Math.round(a.w / 2), dyp = -base;
   if (tint && !tint.noEdge) {
     const s = silhouette(id, f, tint.c);
-    for (const [ox, oy] of [[-2, 0], [2, 0], [0, -2], [0, 2]]) ctx.drawImage(s, dxp + ox, dyp + oy);
+    const offs = tint.glow ? [[-1, 0], [1, 0], [0, -1], [0, 1], [-2, 0], [2, 0], [0, -2], [0, 2], [-2, -2], [2, -2], [-2, 2], [2, 2]] : [[-2, 0], [2, 0], [0, -2], [0, 2]];
+    ctx.globalAlpha = alpha * (tint.ea ?? 1) * (tint.glow ? 0.5 : 1);
+    for (const [ox, oy] of offs) ctx.drawImage(s, dxp + ox, dyp + oy);
+    ctx.globalAlpha = alpha;
   }
   ctx.drawImage(img, f * a.w, 0, a.w, a.h, dxp, dyp, a.w, a.h);
   if (tint && tint.over) { ctx.globalAlpha = alpha * tint.over; ctx.drawImage(silhouette(id, f, tint.c), dxp, dyp); }
@@ -678,11 +682,6 @@ function drawPlayer() {
   const ft = a.foot[f], kk = K(P.y), fx0 = (flip ? -ft[0] : ft[0]) * kk;
   const lift = air ? 0 : (a.floor - a.bot[f]);   // 그림 속에서 뜬 장이면 그림자를 작게
   shadow(P.x + fx0, P.y, P.z + lift * kk, Math.min(80, ft[1]), kk, air ? 0 : (ft[2] || 0), Math.min(10, ft[3] || 0));
-  if (P.sp >= 100) {   // 필살기 준비: 금빛 기운이 은은하게 일렁임
-    const cy = P.y - 100 * kk, r = (86 + Math.sin(P.t * 6) * 6) * kk;
-    const g = ctx.createRadialGradient(P.x, cy, r * 0.35, P.x, cy, r); g.addColorStop(0, 'rgba(255,210,74,0)'); g.addColorStop(0.75, 'rgba(255,210,74,.55)'); g.addColorStop(1, 'rgba(255,210,74,0)');
-    ctx.globalAlpha = 0.35 + 0.15 * Math.sin(P.t * 9); ctx.fillStyle = g; ctx.beginPath(); ctx.ellipse(P.x, cy, r * 0.65, r * 1.3, 0, 0, Math.PI * 2); ctx.fill(); ctx.globalAlpha = 1;
-  }
   if (P.mode === 'charge') {   // 몸 둘레 기운
     const lv = P.charge >= 2 ? 3 : P.charge > 1.3 ? 2 : P.charge > 0.5 ? 1 : 0, cy = P.y - 100 * kk, r = (80 + lv * 14 + Math.sin(P.t * 12) * 6) * kk;
     const g = ctx.createRadialGradient(P.x, cy, r * 0.3, P.x, cy, r); g.addColorStop(0, 'rgba(255,255,255,0)'); g.addColorStop(0.7, CH_COL[lv]); g.addColorStop(1, 'rgba(255,255,255,0)');
@@ -691,6 +690,7 @@ function drawPlayer() {
   let tint = null;
   if (P.armorT > 0) tint = { c: '#ff2a2a', over: 0.35 * (P.armorT / 0.28) };
   else if (armored() && showArmor) tint = { c: 'rgba(255,60,40,.55)', over: 0 };
+  else if (P.sp >= 100) tint = { c: '#ffd34a', over: 0, ea: 0.35 + 0.3 * (0.5 + 0.5 * Math.sin(P.t * 4)), glow: true };   // 필살기 준비: 금빛 외곽선이 은은하게
   else if (P.hp <= 25) tint = { c: '#d0101a', over: 0.42 * (0.5 + 0.5 * Math.sin(P.t * Math.PI * 2 * 1.3)), noEdge: true };
   else if (P.mode === 'charge') { const lv = P.charge >= 2 ? 3 : P.charge > 1.3 ? 2 : P.charge > 0.5 ? 1 : 0; tint = { c: CH_COL[lv], over: 0.1 + 0.12 * Math.sin(P.t * 20) }; }
   drawSprite(id, f, P.x, P.y, P.z, P.face, 1, tint);
@@ -698,8 +698,6 @@ function drawPlayer() {
     const hy = P.y - (a.floor - a.top[f]) * kk - 14;
     for (let i = 0; i < 3; i++) { const t = P.t * 4 + i * 2.09; star(P.x + Math.cos(t) * 26, hy + Math.sin(t) * 7, 7, '#ffe066'); }
   }
-  if (showCancelMark && P.mode === 'act' && P.clip && ['9', '10', '11', '12', '13', '16', '16_1'].includes(P.clip.id) && canCancel()) { ctx.fillStyle = '#7dff9a'; ctx.font = 'bold 15px sans-serif'; ctx.fillText('캔슬 가능', P.x - 30, P.y - 250 * kk); }
-  if (showCancelMark && P.mode === 'chain') { ctx.fillStyle = '#7dff9a'; ctx.font = 'bold 15px sans-serif'; ctx.fillText('이어치기', P.x - 30, P.y - 250 * kk); }
   if (showNo) { ctx.fillStyle = '#fff'; ctx.font = '14px monospace'; ctx.fillText(`${id} · ${f + 1}/${a.n} · ${kk.toFixed(2)}배`, P.x - 60, P.y + 26); }
 }
 function star(x, y, r, c) { ctx.fillStyle = c; ctx.beginPath(); for (let i = 0; i < 10; i++) { const a = i * Math.PI / 5 - Math.PI / 2, rr = i % 2 ? r * 0.45 : r; ctx.lineTo(x + Math.cos(a) * rr, y + Math.sin(a) * rr); } ctx.fill(); }
@@ -909,7 +907,6 @@ document.getElementById('dm').onchange = e => showDummy = e.target.checked;
 document.getElementById('ca').onchange = e => counter = e.target.checked;
 document.getElementById('fs').onchange = e => freeSuper = e.target.checked;
 document.getElementById('sa').onchange = e => showArmor = e.target.checked;
-document.getElementById('cm').onchange = e => showCancelMark = e.target.checked;
 const songSel = document.getElementById('song');
 for (const id of ['', ...((window.GoeiAudio && window.GoeiAudio.SONG_IDS) || [])]) { const o = document.createElement('option'); o.value = id; o.textContent = id || '없음'; if (id === song) o.selected = true; songSel.append(o); }
 songSel.onchange = () => { song = songSel.value; store.set('song', song); if (started && audio) try { audio.music(song || null); } catch {} };

@@ -12,7 +12,7 @@ DOC = OUT.parents[3] / "docs/동작표/1.4_에일린.md"
 LOG = OUT.parent / "spend.log"
 PICKS = OUT / "picks.json"   # {"전투 자세 장": ["3-0", 3], "무기 자세 장": ["W", 3], "5번 한 장": ["5", 2], ...}
 MAXQ = 10
-DIRS = {"E": "east", "SE": "south-east", "SW": "south-west"}
+DIRS = {"E": "east", "SE": "south-east", "SW": "south-west", "S": "south"}
 lock = threading.Lock()
 
 def log(msg):
@@ -85,6 +85,8 @@ def frame_ref(ref, r):
         fr = load_frames(m[1])
         if not fr: raise RuntimeError(f"{m[1]} 결과 없음")
         return fr[-1]
+    if ref.startswith("바주카 키 장"):   # edit-image-pixen으로 만든 정지 장(_keyframes/bazooka_kneel.png)
+        return Image.open(OUT / "_keyframes" / "bazooka_kneel.png").convert("RGBA")
     for name in ("전투 자세 장", "무기 자세 장", "5번 한 장", "7번 꼭대기 장", "7번 하강 장"):
         if ref.startswith(name): return picked(name)
     raise RuntimeError(f"장 이름을 모름: {ref}")
