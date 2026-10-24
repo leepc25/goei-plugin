@@ -1,0 +1,9 @@
+{
+  "frame_index": 9,
+  "source_job_id": "e4a8b8a0-4167-4a16-a9de-857b14e4fdac",
+  "source_frame_index": 1,
+  "target_pose_index": 9,
+  "source_path": "motion-frame-candidates/spangdal/front-flip/rotation-1/frames/1.png",
+  "sha256": "17a3fd4bd1e5cc2cec840f0ec708b40757db5cc3f3aba73385e853320accbdf1",
+  "findings": "Candidate 1 viewed: same tilted recovery pose, continuous face/hair/neck/hands/legs; black skirt and pumps preserved without gray exterior paint. Full thirteen-frame sequence review required."
+}

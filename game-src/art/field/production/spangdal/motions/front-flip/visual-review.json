@@ -1,8 +1,8 @@
 {
-  "at": 1792803329.0264974,
+  "at": 1792803502.603345,
   "job_id": "05ffd49c-1b78-4114-937b-5e4ae1e132f5",
-  "result": "reroll-required",
-  "findings": "Frame 10 has severe missing face, hair, hands and leg pixels; all other frames inspected. Regenerate exact frame 10 pose and recheck full sequence.",
+  "result": "pass",
+  "findings": "All thirteen assembled frames viewed: repaired tilted recovery face and hands intact; complete forward rotation retains own purple bob/skirt/pumps, no gray exterior patches or clipping.",
   "frame_count": 13,
   "directions": [
     "west"
@@ -16,5 +16,94 @@
     "correct face-visible direction",
     "no gray exterior paint in every frame",
     "pose and foot contact consistency"
-  ]
+  ],
+  "frame_assembly": {
+    "base_job_id": "05ffd49c-1b78-4114-937b-5e4ae1e132f5",
+    "frame_sources": [
+      {
+        "frame_index": 0,
+        "source_job_id": "05ffd49c-1b78-4114-937b-5e4ae1e132f5",
+        "source_frame_index": 0,
+        "sha256": "824c853749d0de8a9cbcd8c2f6274dcc45755b067e1d3ce35d558c325d6429e7"
+      },
+      {
+        "frame_index": 1,
+        "source_job_id": "05ffd49c-1b78-4114-937b-5e4ae1e132f5",
+        "source_frame_index": 1,
+        "sha256": "e64011bc6cc2baa9abb48d6de1968e9c0b6640c386f8007ad118036b96bdaf37"
+      },
+      {
+        "frame_index": 2,
+        "source_job_id": "05ffd49c-1b78-4114-937b-5e4ae1e132f5",
+        "source_frame_index": 2,
+        "sha256": "95d21b62e7ff7ff8fc7a8ec6c55a4982fde9759df29944a97869ee3331737ce4"
+      },
+      {
+        "frame_index": 3,
+        "source_job_id": "05ffd49c-1b78-4114-937b-5e4ae1e132f5",
+        "source_frame_index": 3,
+        "sha256": "bb579280ac887ee5d6f7b9cd11ee3ceefbb53e04c0c84da3c8364ecf571ea296"
+      },
+      {
+        "frame_index": 4,
+        "source_job_id": "05ffd49c-1b78-4114-937b-5e4ae1e132f5",
+        "source_frame_index": 4,
+        "sha256": "22ff4048e9828a7adc38a004eb24d88e54a44cb3ea21e3b17010797853949d2e"
+      },
+      {
+        "frame_index": 5,
+        "source_job_id": "05ffd49c-1b78-4114-937b-5e4ae1e132f5",
+        "source_frame_index": 5,
+        "sha256": "a2954f93f919e42c91d9983861719a602662462d0577d37313cd5d6455d8ed2b"
+      },
+      {
+        "frame_index": 6,
+        "source_job_id": "05ffd49c-1b78-4114-937b-5e4ae1e132f5",
+        "source_frame_index": 6,
+        "sha256": "f7710e96d43d6ecd1133946eb8124e98e8a933d038d0ddc2e3d072f32267ab5a"
+      },
+      {
+        "frame_index": 7,
+        "source_job_id": "05ffd49c-1b78-4114-937b-5e4ae1e132f5",
+        "source_frame_index": 7,
+        "sha256": "dfc3356afc1191e63b901ea33c5b0bd5ee5046adba64a66fa1182e5edf7be44e"
+      },
+      {
+        "frame_index": 8,
+        "source_job_id": "05ffd49c-1b78-4114-937b-5e4ae1e132f5",
+        "source_frame_index": 8,
+        "sha256": "5fe58c04cb26b69b7dd20203d98595c312e7601447b3446db8541019628291c6"
+      },
+      {
+        "frame_index": 9,
+        "source_job_id": "e4a8b8a0-4167-4a16-a9de-857b14e4fdac",
+        "source_frame_index": 1,
+        "target_pose_index": 9,
+        "source_path": "motion-frame-candidates/spangdal/front-flip/rotation-1/frames/1.png",
+        "sha256": "17a3fd4bd1e5cc2cec840f0ec708b40757db5cc3f3aba73385e853320accbdf1",
+        "findings": "Candidate 1 viewed: same tilted recovery pose, continuous face/hair/neck/hands/legs; black skirt and pumps preserved without gray exterior paint. Full thirteen-frame sequence review required."
+      },
+      {
+        "frame_index": 10,
+        "source_job_id": "05ffd49c-1b78-4114-937b-5e4ae1e132f5",
+        "source_frame_index": 10,
+        "sha256": "aebaa2f50989f6ad7ced864fa1e8179d90b6ae58e9b4ad24a8573f583ab98a15"
+      },
+      {
+        "frame_index": 11,
+        "source_job_id": "05ffd49c-1b78-4114-937b-5e4ae1e132f5",
+        "source_frame_index": 11,
+        "sha256": "be0952ba4785fe234b281e34d9f0c3383a758239ea1e72e081cf09e6fc07fc57"
+      },
+      {
+        "frame_index": 12,
+        "source_job_id": "05ffd49c-1b78-4114-937b-5e4ae1e132f5",
+        "source_frame_index": 12,
+        "sha256": "7bb7285edd6e39686547ce090e057aec75b1f776cc266f5f93788387f4201515"
+      }
+    ],
+    "method": "select complete same-pose regenerated frames; no pixel editing",
+    "new_user_approval": false,
+    "visual_reviewed": true
+  }
 }

@@ -91,21 +91,11 @@
               "Idle/animations/sad_walk._Preserve_this_character_identity_costume/west/frame_006.png",
               "Idle/animations/sad_walk._Preserve_this_character_identity_costume/west/frame_007.png"
             ]
-          },
-          "drinking._Preserve_this_character_identity_costume": {
-            "south-west": [
-              "Idle/animations/drinking._Preserve_this_character_identity_costume/south-west/frame_000.png",
-              "Idle/animations/drinking._Preserve_this_character_identity_costume/south-west/frame_001.png",
-              "Idle/animations/drinking._Preserve_this_character_identity_costume/south-west/frame_002.png",
-              "Idle/animations/drinking._Preserve_this_character_identity_costume/south-west/frame_003.png",
-              "Idle/animations/drinking._Preserve_this_character_identity_costume/south-west/frame_004.png",
-              "Idle/animations/drinking._Preserve_this_character_identity_costume/south-west/frame_005.png"
-            ]
           }
         }
       }
     }
   ],
   "export_version": "3.1",
-  "export_date": "2026-10-24T00:54:57.938829"
+  "export_date": "2026-10-24T00:59:46.582496"
 }

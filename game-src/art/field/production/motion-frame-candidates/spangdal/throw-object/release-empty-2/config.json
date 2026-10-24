@@ -1,0 +1,104 @@
+{
+  "slug": "spangdal",
+  "slot": "throw-object",
+  "base_job_id": "ddbb44f9-e4c4-409a-9e76-d4a85126b4c0",
+  "target_frame_index": 5,
+  "source_spec": "game-src/art/field/production/motion-inputs/spangdal/throw-object-repair-v1/spec.json",
+  "seed": 2026110105,
+  "pose": [
+    {
+      "label": "NECK",
+      "x": 0.46198627524581026,
+      "y": 0.2675584559619404
+    },
+    {
+      "label": "NOSE",
+      "x": 0.40931503951913184,
+      "y": 0.17063004358292308
+    },
+    {
+      "label": "LEFT ARM",
+      "x": 0.44062263857085127,
+      "y": 0.3756433682747075
+    },
+    {
+      "label": "LEFT EAR",
+      "x": 0.45644456949410345,
+      "y": 0.15234407211474216
+    },
+    {
+      "label": "LEFT EYE",
+      "x": 0.41872179535211196,
+      "y": 0.15144975689206103
+    },
+    {
+      "label": "LEFT HIP",
+      "x": 0.49358367919921875,
+      "y": 0.4730408129762546
+    },
+    {
+      "label": "LEFT LEG",
+      "x": 0.4138894315071293,
+      "y": 0.8790825940212006
+    },
+    {
+      "label": "LEFT KNEE",
+      "x": 0.39272327134023444,
+      "y": 0.666518451489843
+    },
+    {
+      "label": "RIGHT ARM",
+      "x": 0.21961861461019277,
+      "y": 0.3021310068515721
+    },
+    {
+      "label": "RIGHT EAR",
+      "x": 0.44100918900073166,
+      "y": 0.15766869984948623
+    },
+    {
+      "label": "RIGHT EYE",
+      "x": 0.40990974517169565,
+      "y": 0.15558475776743833
+    },
+    {
+      "label": "RIGHT HIP",
+      "x": 0.46234130859375,
+      "y": 0.4641144213746921
+    },
+    {
+      "label": "RIGHT LEG",
+      "x": 0.5757258610467018,
+      "y": 0.8706896107490427
+    },
+    {
+      "label": "LEFT ELBOW",
+      "x": 0.567860993794753,
+      "y": 0.3752570360273046
+    },
+    {
+      "label": "RIGHT KNEE",
+      "x": 0.45769389601024363,
+      "y": 0.6864786885749725
+    },
+    {
+      "label": "RIGHT ELBOW",
+      "x": 0.34157309569405203,
+      "y": 0.36063161693333345
+    },
+    {
+      "label": "LEFT SHOULDER",
+      "x": 0.49012379563735686,
+      "y": 0.2645178150202935
+    },
+    {
+      "label": "RIGHT SHOULDER",
+      "x": 0.43384875485426366,
+      "y": 0.27059909690358736
+    }
+  ],
+  "new_user_approval": false,
+  "reference_frame_index": 6,
+  "reference_sha256": "a082356306f68a585a6ffdc5de82ace54efc9903ba3111558fe3801a44899bad",
+  "action": "Empty hand extended after releasing the object outside the canvas. Both hands empty throughout this pose."
+}

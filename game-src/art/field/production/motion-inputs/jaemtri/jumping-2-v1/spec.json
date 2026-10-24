@@ -2,7 +2,7 @@
   "slug": "jaemtri",
   "slot": "jumping-2",
   "character_id": "f937666b-c116-4408-8864-55e7743850a5",
-  "skeleton_visually_reviewed": false,
+  "skeleton_visually_reviewed": true,
   "first_frame_path": "game-src/art/field/production/motion-inputs/jaemtri/first-frame.png",
   "new_user_approval": false,
   "landmark_source": "current character own east estimated 2d reference",
@@ -844,5 +844,6 @@
     "template_id": "mannequin",
     "seed": 2026110001,
     "no_background": true
-  }
+  },
+  "review_findings": "Own EAST source and all eight poses viewed; native body proportions retained, bent-knee takeoff/tuck/landing, limbs inside canvas, reference landmarks visually aligned."
 }

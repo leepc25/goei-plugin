@@ -256,6 +256,11 @@
       "cross-punch": "game-src/art/field/production/motion-inputs/spangdal/cross-punch-repair-v1/spec.json",
       "crouched-walking": "game-src/art/field/production/motion-inputs/spangdal/crouched-walking-repair-v1/spec.json",
       "drinking": "game-src/art/field/production/motion-inputs/spangdal/drinking-v1/spec.json"
+    },
+    "jaemtri": {
+      "jumping-1": "game-src/art/field/production/motion-inputs/jaemtri/jumping-1-v1/spec.json",
+      "jumping-2": "game-src/art/field/production/motion-inputs/jaemtri/jumping-2-v1/spec.json",
+      "two-footed-jump": "game-src/art/field/production/motion-inputs/jaemtri/two-footed-jump-v1/spec.json"
     }
   }
 }
