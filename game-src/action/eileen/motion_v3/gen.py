@@ -130,7 +130,7 @@ def run(n, dry=False):
         if end is not None: body["end_frame"] = b64(end)
         desc = f"시작={'등록' if start_img is None else '지정'} 끝={'없음' if end is None else '지정'}"
         if dry:
-            log(f"[점검] {n} {r['name']} {r['dir']} {r['frames']}장 {desc}"); return
+            print(f"[점검] {n} {r['name']} {r['dir']} {r['frames']}장 {desc}"); return
         with sem:
             while True:
                 try:
