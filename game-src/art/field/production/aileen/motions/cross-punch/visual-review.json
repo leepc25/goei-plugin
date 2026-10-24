@@ -1,0 +1,20 @@
+{
+  "at": 1792808507.8334641,
+  "job_id": "38030fa5-4b18-4464-b41d-742f35e55b3c",
+  "result": "pass",
+  "findings": "8프레임 전체 확인. 동쪽 스트레이트 뻗기/회복과 얼굴·포니테일·바지 정장 유지. 흰/회색 타격 이펙트·외곽 면·잘림·투명 손상 없음.",
+  "frame_count": 8,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

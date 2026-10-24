@@ -1,0 +1,20 @@
+{
+  "at": 1792808544.014701,
+  "job_id": "fe1de18e-0b68-4fa6-9960-11e631108ab9",
+  "result": "reroll-required",
+  "findings": "2·5번째 포니테일 회색 면과 7번째 엉덩이 뒤 분리된 회갈색 덩어리. 지상 실측 참조로 변경.",
+  "frame_count": 8,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

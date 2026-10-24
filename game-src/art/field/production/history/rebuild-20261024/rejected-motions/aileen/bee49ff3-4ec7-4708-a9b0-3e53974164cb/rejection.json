@@ -1,0 +1,204 @@
+{
+  "reason": "줍기 손 도달 부족. 깊은 굽힘과 내려가는 팔 궤적으로 수정.",
+  "job": {
+    "kind": "animation",
+    "slug": "aileen",
+    "template": "picking-up",
+    "status": "completed",
+    "created_epoch": 1792808050.0692654,
+    "receipt": {
+      "usage": null,
+      "background_job_id": "bee49ff3-4ec7-4708-a9b0-3e53974164cb",
+      "status": "processing"
+    },
+    "endpoint": "animate-with-skeleton-v3",
+    "last_response": {
+      "usage": {
+        "type": "generations",
+        "generations": 3.0
+      },
+      "id": "bee49ff3-4ec7-4708-a9b0-3e53974164cb",
+      "status": "completed",
+      "created_at": "2026-10-24T02:14:10.304619+00:00",
+      "last_response": {
+        "seed": 2026112408,
+        "type": "done",
+        "action": "smoothing frames",
+        "images": [
+          {
+            "type": "base64",
+            "width": 256,
+            "base64": "[image payload omitted]",
+            "height": 256
+          },
+          {
+            "type": "base64",
+            "width": 256,
+            "base64": "[image payload omitted]",
+            "height": 256
+          },
+          {
+            "type": "base64",
+            "width": 256,
+            "base64": "[image payload omitted]",
+            "height": 256
+          },
+          {
+            "type": "base64",
+            "width": 256,
+            "base64": "[image payload omitted]",
+            "height": 256
+          },
+          {
+            "type": "base64",
+            "width": 256,
+            "base64": "[image payload omitted]",
+            "height": 256
+          },
+          {
+            "type": "base64",
+            "width": 256,
+            "base64": "[image payload omitted]",
+            "height": 256
+          },
+          {
+            "type": "base64",
+            "width": 256,
+            "base64": "[image payload omitted]",
+            "height": 256
+          },
+          {
+            "type": "base64",
+            "width": 256,
+            "base64": "[image payload omitted]",
+            "height": 256
+          }
+        ],
+        "status": "initializing",
+        "progress": 1.0,
+        "flow_kind": "animation",
+        "billing_usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "generation_id": "61726301-bbee-49f0-af75-d344c0858a66",
+        "queue_position": 0,
+        "billing_charged": true,
+        "generation_started_at": "2026-10-24T02:15:02.031788+00:00",
+        "estimated_wait_seconds": 0
+      }
+    },
+    "observed_end_epoch": 1792808249.2374527,
+    "elapsed_observed_seconds": 199.16818737983704,
+    "usage": {
+      "usd": 0.0,
+      "type": "generations",
+      "generations": 3
+    },
+    "saved_frames": 8
+  },
+  "at": 1792808590.6331155,
+  "state_before": {
+    "name": "에일린",
+    "group": "management",
+    "character_id": "558c27ed-873c-4207-9099-171bb64a09b2",
+    "image": "95f7fbb1-98fc-4481-a293-236e615fb8b8",
+    "registration": "d95cd572-ed2f-48a9-9835-699c8b3275c5",
+    "motions": {
+      "breathing-idle": "db123cd2-3718-480f-863c-1a528f708a4a",
+      "jumping-1": "5a82b49c-23cd-42e3-9ebb-6d5ad82a2b4b",
+      "jumping-2": "0c838ac4-ea02-4932-84f4-74a6070d3464",
+      "two-footed-jump": "44166189-82df-4f97-9e28-dbdb8b64a266",
+      "running-jump": "c97e3a3f-a57c-4686-83d1-c061b35c4f91",
+      "sad-walk": "1e0a9c2c-3942-48e7-b284-89a703da3c56",
+      "picking-up": "bee49ff3-4ec7-4708-a9b0-3e53974164cb",
+      "cross-punch": "38030fa5-4b18-4464-b41d-742f35e55b3c",
+      "drinking": "d5e5138d-fe85-4ee3-9d85-c711b08b0e93",
+      "lead-jab": "630cb67c-2386-4e45-96c3-6f3f47c9dbc3",
+      "running-8-frames": "4ab2d492-12dc-4192-bdb2-0d529d464617",
+      "crouched-walking": "6699c4cc-6914-4c0d-9cfa-16b8d1ac0971",
+      "backflip": "b80cd50e-079c-4044-bb3e-12098db8accb",
+      "pushing": "26112962-08ae-494b-9f9b-82a398e44e85",
+      "throw-object": "bf0f5fe4-7bb1-4c82-b434-8ba602b1254a",
+      "fight-stance-idle-8-frames": "062a301c-7935-479a-b76a-50ffd0c38ac5",
+      "walking-8-frames": "40dd87bc-564a-44ce-b5d3-f4398f67b6a6",
+      "running-slide": "da75aa01-b246-4001-93cd-b9d140c961a5",
+      "front-flip": "7c0469a4-dedb-4e04-bd72-706ac1b4983c",
+      "pull-heavy-object": "263743b4-57c2-4659-a2a1-4b6775dc51e9"
+    },
+    "ready": true,
+    "repair_id": "aileen-user-rebuild-v4",
+    "visual_review_required": true,
+    "image_verified": true,
+    "skeleton_joints": 18,
+    "rotation_count": 8,
+    "exported": false,
+    "eight_way_visual_reviewed": true,
+    "motions_visual_reviewed": false,
+    "motion-frame-candidate-jumping-1-crouch-hair-1": "c091877e-1a73-4f0f-a3a3-5b974d3a78e5",
+    "motion_assemblies": {
+      "jumping-1": {
+        "base_job_id": "5a82b49c-23cd-42e3-9ebb-6d5ad82a2b4b",
+        "frame_sources": [
+          {
+            "frame_index": 0,
+            "source_job_id": "5a82b49c-23cd-42e3-9ebb-6d5ad82a2b4b",
+            "source_frame_index": 0,
+            "sha256": "dc08e0d432509f47b267595108daed66d36fd8753a9a6e4e5f4e12d4c67db760"
+          },
+          {
+            "frame_index": 1,
+            "source_job_id": "c091877e-1a73-4f0f-a3a3-5b974d3a78e5",
+            "source_frame_index": 1,
+            "target_pose_index": 1,
+            "source_path": "motion-frame-candidates/aileen/jumping-1/crouch-hair-1/frames/1.png",
+            "sha256": "3b18e862715437c020e74c0c70c6c58492c27fe0c52765f7739a0027e1f2e014",
+            "findings": "포니테일 가닥과 얼굴·정장·구두 외곽 정상. 목표 준비 굽힘 자세 일치, 회색 덩어리 없음."
+          },
+          {
+            "frame_index": 2,
+            "source_job_id": "5a82b49c-23cd-42e3-9ebb-6d5ad82a2b4b",
+            "source_frame_index": 2,
+            "sha256": "21705d305cab8bea671adc29176f89fc40da697aac6437c91ec421925b72f596"
+          },
+          {
+            "frame_index": 3,
+            "source_job_id": "5a82b49c-23cd-42e3-9ebb-6d5ad82a2b4b",
+            "source_frame_index": 3,
+            "sha256": "36467226ebc1fe9704ff3c4a90e9d7508f5632bd8fd58199506ec24c6e1851d2"
+          },
+          {
+            "frame_index": 4,
+            "source_job_id": "5a82b49c-23cd-42e3-9ebb-6d5ad82a2b4b",
+            "source_frame_index": 4,
+            "sha256": "dfaa83ca9b3d0b13a3d322c2fe68c48c5f0e52d165427ca143c6555d4d7e7c23"
+          },
+          {
+            "frame_index": 5,
+            "source_job_id": "5a82b49c-23cd-42e3-9ebb-6d5ad82a2b4b",
+            "source_frame_index": 5,
+            "sha256": "7fed413e6f144f3dfd16ff5197d733f5c0e3df8bd80f72743198bd5efcd868c9"
+          },
+          {
+            "frame_index": 6,
+            "source_job_id": "5a82b49c-23cd-42e3-9ebb-6d5ad82a2b4b",
+            "source_frame_index": 6,
+            "sha256": "3d945090631059736fc8c36a31e33434ea6d39800a4f8a19ab01fdf06998f339"
+          },
+          {
+            "frame_index": 7,
+            "source_job_id": "5a82b49c-23cd-42e3-9ebb-6d5ad82a2b4b",
+            "source_frame_index": 7,
+            "sha256": "01ce58f1a2022b0dafb3d0abf95180a3e99d27b487bf6c770aae3b18239e44e8"
+          }
+        ],
+        "method": "select complete same-pose regenerated frames; no pixel editing",
+        "new_user_approval": false,
+        "visual_reviewed": true
+      }
+    },
+    "motion-frame-candidate-lead-jab-bare-fist-1": "cc19aa7c-d9fc-497f-b24d-a1eed324ee82"
+  },
+  "standalone": true
+}

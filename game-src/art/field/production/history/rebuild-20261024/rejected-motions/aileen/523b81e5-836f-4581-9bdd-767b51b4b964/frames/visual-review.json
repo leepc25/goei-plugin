@@ -1,0 +1,20 @@
+{
+  "at": 1792808291.988926,
+  "job_id": "523b81e5-836f-4581-9bdd-767b51b4b964",
+  "result": "reroll-required",
+  "findings": "전 프레임 포니테일이 회색 면/고리로 변형됨. 정상 지상 가드 참조로 교체 필요.",
+  "frame_count": 4,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

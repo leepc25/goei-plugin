@@ -446,26 +446,62 @@ c9da948c-5316-46c0-8564-48412c7653da	jaemtri	motion-frame-candidate-front-flip-a
 6fd95721-122b-47fa-b292-82011a28c054	jaemtri	motion-frame-candidate-backflip-descent-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
 61d04f4c-13af-4cc3-91e7-f7bba623d09b	jaemtri	motion-frame-candidate-backflip-turn-2		completed	{"usd": 0.0, "type": "generations", "generations": 2}
 a2ffabd5-ec0c-4076-85f1-e491aa7d2978	jaemtri	motion-frame-candidate-backflip-turn-3		completed	{"usd": 0.0, "type": "generations", "generations": 2}
-db123cd2-3718-480f-863c-1a528f708a4a	aileen	animation	breathing-idle	processing	null
-58f5bc8d-90fb-4cff-9c65-72967dc983ba	aileen	animation	walking-8-frames	processing	null
-01f17a00-0eee-49e9-8b50-54af4860ff37	aileen	animation	running-8-frames	processing	null
-63f11ca8-0bb6-43a9-b01b-0b45af85765c	aileen	animation	running-jump	processing	null
-f0d9aba3-44bb-47f8-944e-ef511286e384	aileen	animation	running-slide	processing	null
-46cd568a-1485-4a9d-9a13-b30c0bb01051	aileen	animation	crouched-walking	processing	null
-9d222834-64bd-4f65-9961-1a4e5394d69d	aileen	animation	sad-walk	processing	null
-bdd8d878-7689-4e18-bb99-6a11b17ff8e0	aileen	animation	front-flip	processing	null
-490758e4-b763-4f05-a4a7-4d959c421d54	aileen	animation	backflip	processing	null
-b922a7a6-f01a-4dce-a06f-4f213187824b	aileen	animation	jumping-1	processing	null
-f5ec3eae-324f-48a3-97f6-8e9b5f374aaa	aileen	animation	jumping-2	processing	null
-926ed31d-6357-4ff3-a61b-42dd38a09a67	aileen	animation	two-footed-jump	processing	null
-68a1c28c-7789-422e-86af-7c2bf6c00e26	aileen	animation	drinking	processing	null
-1e4ca37b-b652-4121-ad22-271d9c0f7b18	aileen	animation	picking-up	processing	null
-32a66515-c84f-4e4e-a964-1732d1110899	aileen	animation	pushing	processing	null
-f105a00e-1847-4eb7-b741-b12b72fba3f9	aileen	animation	pull-heavy-object	processing	null
-397540b8-892b-4d6e-ab1e-fd52471c681a	aileen	animation	throw-object	processing	null
-6e00595c-7d91-4320-ab72-27424e97ee97	aileen	animation	fight-stance-idle-8-frames	processing	null
-bda03f39-a598-4391-a404-17765206e619	aileen	animation	lead-jab	processing	null
-bc1e737a-2b62-4105-9f15-b9b48a7826bb	aileen	animation	cross-punch	processing	null
+db123cd2-3718-480f-863c-1a528f708a4a	aileen	animation	breathing-idle	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+58f5bc8d-90fb-4cff-9c65-72967dc983ba	aileen	animation	walking-8-frames	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+01f17a00-0eee-49e9-8b50-54af4860ff37	aileen	animation	running-8-frames	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+63f11ca8-0bb6-43a9-b01b-0b45af85765c	aileen	animation	running-jump	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+f0d9aba3-44bb-47f8-944e-ef511286e384	aileen	animation	running-slide	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+46cd568a-1485-4a9d-9a13-b30c0bb01051	aileen	animation	crouched-walking	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+9d222834-64bd-4f65-9961-1a4e5394d69d	aileen	animation	sad-walk	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+bdd8d878-7689-4e18-bb99-6a11b17ff8e0	aileen	animation	front-flip	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+490758e4-b763-4f05-a4a7-4d959c421d54	aileen	animation	backflip	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+b922a7a6-f01a-4dce-a06f-4f213187824b	aileen	animation	jumping-1	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+f5ec3eae-324f-48a3-97f6-8e9b5f374aaa	aileen	animation	jumping-2	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+926ed31d-6357-4ff3-a61b-42dd38a09a67	aileen	animation	two-footed-jump	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+68a1c28c-7789-422e-86af-7c2bf6c00e26	aileen	animation	drinking	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+1e4ca37b-b652-4121-ad22-271d9c0f7b18	aileen	animation	picking-up	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+32a66515-c84f-4e4e-a964-1732d1110899	aileen	animation	pushing	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+f105a00e-1847-4eb7-b741-b12b72fba3f9	aileen	animation	pull-heavy-object	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+397540b8-892b-4d6e-ab1e-fd52471c681a	aileen	animation	throw-object	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+6e00595c-7d91-4320-ab72-27424e97ee97	aileen	animation	fight-stance-idle-8-frames	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+bda03f39-a598-4391-a404-17765206e619	aileen	animation	lead-jab	completed	{"usd": 0.0, "type": "generations", "generations": 2}
+bc1e737a-2b62-4105-9f15-b9b48a7826bb	aileen	animation	cross-punch	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+458e2f1e-151e-4272-b8ee-ecd7c8993c90	aileen	animation	lead-jab	completed	{"usd": 0.0, "type": "generations", "generations": 2}
+5a82b49c-23cd-42e3-9ebb-6d5ad82a2b4b	aileen	animation	jumping-1	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+0c838ac4-ea02-4932-84f4-74a6070d3464	aileen	animation	jumping-2	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+44166189-82df-4f97-9e28-dbdb8b64a266	aileen	animation	two-footed-jump	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+12cfb052-6726-40f9-a2fe-540dc9a49e73	aileen	animation	lead-jab	completed	{"usd": 0.0, "type": "generations", "generations": 2}
+29b37c2d-9481-432d-bd29-cae7e6c972bb	aileen	animation	walking-8-frames	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+f00d15ee-3b58-427d-8133-90e79d287869	aileen	animation	running-8-frames	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+c97e3a3f-a57c-4686-83d1-c061b35c4f91	aileen	animation	running-jump	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+4b74639d-49d6-415c-962e-ad5ed9060923	aileen	animation	running-slide	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+970167c6-8bec-410a-9164-5e405ab367b7	aileen	animation	crouched-walking	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+1e0a9c2c-3942-48e7-b284-89a703da3c56	aileen	animation	sad-walk	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+a3835bd6-79d2-4919-9f4c-bfd75b9f2ade	aileen	animation	front-flip	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+4f5af81e-2821-4551-a8ea-79cdfba35c2f	aileen	animation	backflip	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+bee49ff3-4ec7-4708-a9b0-3e53974164cb	aileen	animation	picking-up	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+5dd63261-e259-416c-892b-d58501ab8e11	aileen	animation	pushing	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+6de06e62-f06e-444b-b4a2-6ba4ce093f9e	aileen	animation	throw-object	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+523b81e5-836f-4581-9bdd-767b51b4b964	aileen	animation	fight-stance-idle-8-frames	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+38030fa5-4b18-4464-b41d-742f35e55b3c	aileen	animation	cross-punch	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+d5e5138d-fe85-4ee3-9d85-c711b08b0e93	aileen	animation	drinking	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+fe1de18e-0b68-4fa6-9960-11e631108ab9	aileen	animation	pull-heavy-object	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+c091877e-1a73-4f0f-a3a3-5b974d3a78e5	aileen	motion-frame-candidate-jumping-1-crouch-hair-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+630cb67c-2386-4e45-96c3-6f3f47c9dbc3	aileen	animation	lead-jab	completed	{"usd": 0.0, "type": "generations", "generations": 2}
+4ab2d492-12dc-4192-bdb2-0d529d464617	aileen	animation	running-8-frames	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+6699c4cc-6914-4c0d-9cfa-16b8d1ac0971	aileen	animation	crouched-walking	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+b80cd50e-079c-4044-bb3e-12098db8accb	aileen	animation	backflip	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+26112962-08ae-494b-9f9b-82a398e44e85	aileen	animation	pushing	processing	null
+bf0f5fe4-7bb1-4c82-b434-8ba602b1254a	aileen	animation	throw-object	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+062a301c-7935-479a-b76a-50ffd0c38ac5	aileen	animation	fight-stance-idle-8-frames	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+40dd87bc-564a-44ce-b5d3-f4398f67b6a6	aileen	animation	walking-8-frames	processing	null
+da75aa01-b246-4001-93cd-b9d140c961a5	aileen	animation	running-slide	processing	null
+7c0469a4-dedb-4e04-bd72-706ac1b4983c	aileen	animation	front-flip	processing	null
+263743b4-57c2-4659-a2a1-4b6775dc51e9	aileen	animation	pull-heavy-object	processing	null
+cc19aa7c-d9fc-497f-b24d-a1eed324ee82	aileen	motion-frame-candidate-lead-jab-bare-fist-1		processing	null
+5b324971-dbda-45e9-b71d-e482518ee2e7	aileen	animation	picking-up	processing	null
 local-sync:jyaldi-backflip-v7-estimate	jyaldi	estimate-skeleton	backflip	synchronous-completed	{"type": "generations", "generations": 0.1}
 local-sync:jaemtri-crouch-reference-estimate	jaemtri	estimate-skeleton	motion-reference	synchronous-completed	{"type": "generations", "generations": 0.1}
 local-sync:jaemtri-turn-reference-estimate	jaemtri	estimate-skeleton	backflip	synchronous-completed	{"type": "generations", "generations": 0.1}
+local-sync:aileen-air-reference-estimate	aileen	estimate-skeleton	motion-reference	synchronous-completed	{"type": "generations", "generations": 0.1}
+local-sync:aileen-guard-reference-estimate	aileen	estimate-skeleton	lead-jab	synchronous-completed	{"type": "generations", "generations": 0.1}

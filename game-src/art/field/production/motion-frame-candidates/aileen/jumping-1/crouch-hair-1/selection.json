@@ -1,0 +1,9 @@
+{
+  "frame_index": 1,
+  "source_job_id": "c091877e-1a73-4f0f-a3a3-5b974d3a78e5",
+  "source_frame_index": 1,
+  "target_pose_index": 1,
+  "source_path": "motion-frame-candidates/aileen/jumping-1/crouch-hair-1/frames/1.png",
+  "sha256": "3b18e862715437c020e74c0c70c6c58492c27fe0c52765f7739a0027e1f2e014",
+  "findings": "포니테일 가닥과 얼굴·정장·구두 외곽 정상. 목표 준비 굽힘 자세 일치, 회색 덩어리 없음."
+}

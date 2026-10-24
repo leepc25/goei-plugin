@@ -1,0 +1,20 @@
+{
+  "at": 1792808496.0744836,
+  "job_id": "a3835bd6-79d2-4919-9f4c-bfd75b9f2ade",
+  "result": "reroll-required",
+  "findings": "3·4·5·11번째 몸 바깥 회색 면, 10번째 얼굴/구두 투명 손상. 본인 정상 실측 참조로 전체 재작업.",
+  "frame_count": 13,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

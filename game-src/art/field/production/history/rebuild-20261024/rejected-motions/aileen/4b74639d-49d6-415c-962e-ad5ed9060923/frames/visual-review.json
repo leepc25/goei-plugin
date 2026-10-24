@@ -1,0 +1,20 @@
+{
+  "at": 1792808484.2434127,
+  "job_id": "4b74639d-49d6-415c-962e-ad5ed9060923",
+  "result": "reroll-required",
+  "findings": "3·4번째 대형 회색 면. 머리카락 끝 일부 회색 잔상도 있어 본인 지상 실측 참조로 전체 재작업.",
+  "frame_count": 8,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

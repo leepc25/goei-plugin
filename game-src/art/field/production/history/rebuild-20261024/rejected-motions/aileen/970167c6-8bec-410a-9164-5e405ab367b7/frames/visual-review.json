@@ -1,0 +1,20 @@
+{
+  "at": 1792808315.908935,
+  "job_id": "970167c6-8bec-410a-9164-5e405ab367b7",
+  "result": "reroll-required",
+  "findings": "7번째 얼굴 앞 대형 회색 면, 여러 프레임 포니테일 회색 평면. 참조를 정상 가드 실측으로 변경해 전체 재작업.",
+  "frame_count": 8,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

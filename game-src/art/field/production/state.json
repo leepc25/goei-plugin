@@ -41778,7 +41778,11 @@
         "type": "generations",
         "generations": 3
       },
-      "saved_frames": 8
+      "saved_frames": 8,
+      "visual_rejection": {
+        "reason": "회색 면/자세 반려. 정상 지상 가드 실측 참조로 변경.",
+        "standalone": true
+      }
     },
     "f00d15ee-3b58-427d-8133-90e79d287869": {
       "kind": "animation",
@@ -41876,7 +41880,11 @@
         "type": "generations",
         "generations": 3
       },
-      "saved_frames": 8
+      "saved_frames": 8,
+      "visual_rejection": {
+        "reason": "회색 면/투명 손상 반려. 정상 지상 가드 실측 참조로 변경.",
+        "standalone": true
+      }
     },
     "c97e3a3f-a57c-4686-83d1-c061b35c4f91": {
       "kind": "animation",
@@ -42072,7 +42080,11 @@
         "type": "generations",
         "generations": 3
       },
-      "saved_frames": 8
+      "saved_frames": 8,
+      "visual_rejection": {
+        "reason": "회색 면/자세 반려. 정상 지상 가드 실측 참조로 변경.",
+        "standalone": true
+      }
     },
     "970167c6-8bec-410a-9164-5e405ab367b7": {
       "kind": "animation",
@@ -42170,7 +42182,11 @@
         "type": "generations",
         "generations": 3
       },
-      "saved_frames": 8
+      "saved_frames": 8,
+      "visual_rejection": {
+        "reason": "회색 면/투명 손상 반려. 정상 지상 가드 실측 참조로 변경.",
+        "standalone": true
+      }
     },
     "1e0a9c2c-3942-48e7-b284-89a703da3c56": {
       "kind": "animation",
@@ -42396,7 +42412,11 @@
         "type": "generations",
         "generations": 3
       },
-      "saved_frames": 13
+      "saved_frames": 13,
+      "visual_rejection": {
+        "reason": "회색 면/자세 반려. 정상 지상 가드 실측 참조로 변경.",
+        "standalone": true
+      }
     },
     "4f5af81e-2821-4551-a8ea-79cdfba35c2f": {
       "kind": "animation",
@@ -42500,7 +42520,11 @@
         "type": "generations",
         "generations": 3
       },
-      "saved_frames": 9
+      "saved_frames": 9,
+      "visual_rejection": {
+        "reason": "회색 면/투명 손상 반려. 정상 지상 가드 실측 참조로 변경.",
+        "standalone": true
+      }
     },
     "bee49ff3-4ec7-4708-a9b0-3e53974164cb": {
       "kind": "animation",
@@ -42598,7 +42622,11 @@
         "type": "generations",
         "generations": 3
       },
-      "saved_frames": 8
+      "saved_frames": 8,
+      "visual_rejection": {
+        "reason": "줍기 손 도달 부족. 깊은 굽힘과 내려가는 팔 궤적으로 수정.",
+        "standalone": true
+      }
     },
     "5dd63261-e259-416c-892b-d58501ab8e11": {
       "kind": "animation",
@@ -42696,7 +42724,11 @@
         "type": "generations",
         "generations": 3
       },
-      "saved_frames": 8
+      "saved_frames": 8,
+      "visual_rejection": {
+        "reason": "회색 면/투명 손상 반려. 정상 지상 가드 실측 참조로 변경.",
+        "standalone": true
+      }
     },
     "6de06e62-f06e-444b-b4a2-6ba4ce093f9e": {
       "kind": "animation",
@@ -42794,7 +42826,11 @@
         "type": "generations",
         "generations": 3
       },
-      "saved_frames": 8
+      "saved_frames": 8,
+      "visual_rejection": {
+        "reason": "회색 면/투명 손상 반려. 정상 지상 가드 실측 참조로 변경.",
+        "standalone": true
+      }
     },
     "523b81e5-836f-4581-9bdd-767b51b4b964": {
       "kind": "animation",
@@ -42868,7 +42904,11 @@
         "type": "generations",
         "generations": 3
       },
-      "saved_frames": 4
+      "saved_frames": 4,
+      "visual_rejection": {
+        "reason": "회색 면/투명 손상 반려. 정상 지상 가드 실측 참조로 변경.",
+        "standalone": true
+      }
     },
     "38030fa5-4b18-4464-b41d-742f35e55b3c": {
       "kind": "animation",
@@ -43150,7 +43190,11 @@
         "type": "generations",
         "generations": 3
       },
-      "saved_frames": 8
+      "saved_frames": 8,
+      "visual_rejection": {
+        "reason": "회색 면/자세 반려. 정상 지상 가드 실측 참조로 변경.",
+        "standalone": true
+      }
     },
     "c091877e-1a73-4f0f-a3a3-5b974d3a78e5": {
       "kind": "motion-frame-candidate-jumping-1-crouch-hair-1",
@@ -43288,6 +43332,671 @@
         "generations": 2
       },
       "saved_frames": 3
+    },
+    "4ab2d492-12dc-4192-bdb2-0d529d464617": {
+      "kind": "animation",
+      "slug": "aileen",
+      "template": "running-8-frames",
+      "status": "completed",
+      "created_epoch": 1792808397.2915945,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "4ab2d492-12dc-4192-bdb2-0d529d464617",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3",
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 3.0
+        },
+        "id": "4ab2d492-12dc-4192-bdb2-0d529d464617",
+        "status": "completed",
+        "created_at": "2026-10-24T02:19:58.069389+00:00",
+        "last_response": {
+          "seed": 2026112800,
+          "type": "message_progress",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "status": "initializing",
+          "progress": 1.0,
+          "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "27fe1b53-c149-464a-95fa-ef611f87baa5",
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_started_at": "2026-10-24T02:20:51.351436+00:00",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792808546.3564517,
+      "elapsed_observed_seconds": 149.06485843658447,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 8
+    },
+    "6699c4cc-6914-4c0d-9cfa-16b8d1ac0971": {
+      "kind": "animation",
+      "slug": "aileen",
+      "template": "crouched-walking",
+      "status": "completed",
+      "created_epoch": 1792808400.3679547,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "6699c4cc-6914-4c0d-9cfa-16b8d1ac0971",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3",
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 3.0
+        },
+        "id": "6699c4cc-6914-4c0d-9cfa-16b8d1ac0971",
+        "status": "completed",
+        "created_at": "2026-10-24T02:20:01.326016+00:00",
+        "last_response": {
+          "seed": 2026112801,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "status": "initializing",
+          "progress": 1.0,
+          "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "f6850432-e8b5-4e1e-b4c2-e8a97daf46f8",
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_started_at": "2026-10-24T02:21:22.42421+00:00",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792808546.3778071,
+      "elapsed_observed_seconds": 146.00985264778137,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 8
+    },
+    "b80cd50e-079c-4044-bb3e-12098db8accb": {
+      "kind": "animation",
+      "slug": "aileen",
+      "template": "backflip",
+      "status": "completed",
+      "created_epoch": 1792808401.8918335,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "b80cd50e-079c-4044-bb3e-12098db8accb",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3",
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 3.0
+        },
+        "id": "b80cd50e-079c-4044-bb3e-12098db8accb",
+        "status": "completed",
+        "created_at": "2026-10-24T02:20:02.232245+00:00",
+        "last_response": {
+          "seed": 2026112805,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "status": "initializing",
+          "progress": 1.0,
+          "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "cd078c90-e23c-4374-9f0f-c0717d191e31",
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_started_at": "2026-10-24T02:21:23.119483+00:00",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792808546.384857,
+      "elapsed_observed_seconds": 144.4930236339569,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 9
+    },
+    "26112962-08ae-494b-9f9b-82a398e44e85": {
+      "kind": "animation",
+      "slug": "aileen",
+      "template": "pushing",
+      "status": "processing",
+      "created_epoch": 1792808402.4756916,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "26112962-08ae-494b-9f9b-82a398e44e85",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3",
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "26112962-08ae-494b-9f9b-82a398e44e85",
+        "status": "processing",
+        "created_at": "2026-10-24T02:20:02.652323+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "action": "generating",
+          "status": "initializing",
+          "progress": 0.29252374639127476,
+          "flow_kind": "animation",
+          "queue_position": 0,
+          "generation_started_at": "2026-10-24T02:20:50.808936+00:00",
+          "estimated_wait_seconds": 0
+        }
+      }
+    },
+    "bf0f5fe4-7bb1-4c82-b434-8ba602b1254a": {
+      "kind": "animation",
+      "slug": "aileen",
+      "template": "throw-object",
+      "status": "completed",
+      "created_epoch": 1792808402.8148324,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "bf0f5fe4-7bb1-4c82-b434-8ba602b1254a",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3",
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 3.0
+        },
+        "id": "bf0f5fe4-7bb1-4c82-b434-8ba602b1254a",
+        "status": "completed",
+        "created_at": "2026-10-24T02:20:02.982939+00:00",
+        "last_response": {
+          "seed": 2026112803,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "status": "initializing",
+          "progress": 1.0,
+          "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "63466bdf-0b25-46af-b47f-bbd3c133d019",
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_started_at": "2026-10-24T02:20:50.809074+00:00",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792808591.1490393,
+      "elapsed_observed_seconds": 188.33420705795288,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 8
+    },
+    "062a301c-7935-479a-b76a-50ffd0c38ac5": {
+      "kind": "animation",
+      "slug": "aileen",
+      "template": "fight-stance-idle-8-frames",
+      "status": "completed",
+      "created_epoch": 1792808403.1561096,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "062a301c-7935-479a-b76a-50ffd0c38ac5",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3",
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 3.0
+        },
+        "id": "062a301c-7935-479a-b76a-50ffd0c38ac5",
+        "status": "completed",
+        "created_at": "2026-10-24T02:20:03.857461+00:00",
+        "last_response": {
+          "seed": 2026112804,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "status": "initializing",
+          "progress": 1.0,
+          "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "198576f2-82ca-45f3-90cc-e3c4b6c86483",
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_started_at": "2026-10-24T02:21:24.617739+00:00",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792808546.390646,
+      "elapsed_observed_seconds": 143.23453664779663,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 4
+    },
+    "40dd87bc-564a-44ce-b5d3-f4398f67b6a6": {
+      "kind": "animation",
+      "slug": "aileen",
+      "template": "walking-8-frames",
+      "status": "processing",
+      "created_epoch": 1792808546.497079,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "40dd87bc-564a-44ce-b5d3-f4398f67b6a6",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3",
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "40dd87bc-564a-44ce-b5d3-f4398f67b6a6",
+        "status": "processing",
+        "created_at": "2026-10-24T02:22:26.704643+00:00",
+        "last_response": {
+          "type": "background",
+          "status": "initializing",
+          "flow_kind": "animation",
+          "queue_position": 0,
+          "estimated_wait_seconds": 0
+        }
+      }
+    },
+    "da75aa01-b246-4001-93cd-b9d140c961a5": {
+      "kind": "animation",
+      "slug": "aileen",
+      "template": "running-slide",
+      "status": "processing",
+      "created_epoch": 1792808546.961842,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "da75aa01-b246-4001-93cd-b9d140c961a5",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3",
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "da75aa01-b246-4001-93cd-b9d140c961a5",
+        "status": "processing",
+        "created_at": "2026-10-24T02:22:27.175335+00:00",
+        "last_response": {
+          "type": "background",
+          "status": "initializing",
+          "flow_kind": "animation",
+          "queue_position": 0,
+          "estimated_wait_seconds": 0
+        }
+      }
+    },
+    "7c0469a4-dedb-4e04-bd72-706ac1b4983c": {
+      "kind": "animation",
+      "slug": "aileen",
+      "template": "front-flip",
+      "status": "processing",
+      "created_epoch": 1792808547.3639455,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "7c0469a4-dedb-4e04-bd72-706ac1b4983c",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3",
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "7c0469a4-dedb-4e04-bd72-706ac1b4983c",
+        "status": "processing",
+        "created_at": "2026-10-24T02:22:27.716927+00:00",
+        "last_response": {
+          "type": "background",
+          "status": "initializing",
+          "flow_kind": "animation",
+          "queue_position": 0,
+          "estimated_wait_seconds": 0
+        }
+      }
+    },
+    "263743b4-57c2-4659-a2a1-4b6775dc51e9": {
+      "kind": "animation",
+      "slug": "aileen",
+      "template": "pull-heavy-object",
+      "status": "processing",
+      "created_epoch": 1792808547.924587,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "263743b4-57c2-4659-a2a1-4b6775dc51e9",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3",
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "263743b4-57c2-4659-a2a1-4b6775dc51e9",
+        "status": "processing",
+        "created_at": "2026-10-24T02:22:28.078275+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "status": "initializing",
+          "progress": 0.1,
+          "flow_kind": "animation",
+          "queue_position": 0,
+          "generation_started_at": "2026-10-24T02:22:36.635474+00:00",
+          "estimated_wait_seconds": 0
+        }
+      }
+    },
+    "cc19aa7c-d9fc-497f-b24d-a1eed324ee82": {
+      "kind": "motion-frame-candidate-lead-jab-bare-fist-1",
+      "slug": "aileen",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792808549.1225786,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "cc19aa7c-d9fc-497f-b24d-a1eed324ee82",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3",
+      "archive_output": "motion-frame-candidates/aileen/lead-jab/bare-fist-1/frames",
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "cc19aa7c-d9fc-497f-b24d-a1eed324ee82",
+        "status": "processing",
+        "created_at": "2026-10-24T02:22:29.405330+00:00",
+        "last_response": {
+          "type": "background",
+          "status": "initializing",
+          "flow_kind": "animation",
+          "queue_position": 0,
+          "estimated_wait_seconds": 0
+        }
+      }
+    },
+    "5b324971-dbda-45e9-b71d-e482518ee2e7": {
+      "kind": "animation",
+      "slug": "aileen",
+      "template": "picking-up",
+      "status": "processing",
+      "created_epoch": 1792808591.3462536,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "5b324971-dbda-45e9-b71d-e482518ee2e7",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3"
     }
   },
   "characters": {
@@ -44336,22 +45045,22 @@
         "jumping-1": "5a82b49c-23cd-42e3-9ebb-6d5ad82a2b4b",
         "jumping-2": "0c838ac4-ea02-4932-84f4-74a6070d3464",
         "two-footed-jump": "44166189-82df-4f97-9e28-dbdb8b64a266",
-        "walking-8-frames": "29b37c2d-9481-432d-bd29-cae7e6c972bb",
-        "running-8-frames": "f00d15ee-3b58-427d-8133-90e79d287869",
         "running-jump": "c97e3a3f-a57c-4686-83d1-c061b35c4f91",
-        "running-slide": "4b74639d-49d6-415c-962e-ad5ed9060923",
-        "crouched-walking": "970167c6-8bec-410a-9164-5e405ab367b7",
         "sad-walk": "1e0a9c2c-3942-48e7-b284-89a703da3c56",
-        "front-flip": "a3835bd6-79d2-4919-9f4c-bfd75b9f2ade",
-        "backflip": "4f5af81e-2821-4551-a8ea-79cdfba35c2f",
-        "picking-up": "bee49ff3-4ec7-4708-a9b0-3e53974164cb",
-        "pushing": "5dd63261-e259-416c-892b-d58501ab8e11",
-        "throw-object": "6de06e62-f06e-444b-b4a2-6ba4ce093f9e",
-        "fight-stance-idle-8-frames": "523b81e5-836f-4581-9bdd-767b51b4b964",
         "cross-punch": "38030fa5-4b18-4464-b41d-742f35e55b3c",
         "drinking": "d5e5138d-fe85-4ee3-9d85-c711b08b0e93",
-        "pull-heavy-object": "fe1de18e-0b68-4fa6-9960-11e631108ab9",
-        "lead-jab": "630cb67c-2386-4e45-96c3-6f3f47c9dbc3"
+        "lead-jab": "630cb67c-2386-4e45-96c3-6f3f47c9dbc3",
+        "running-8-frames": "4ab2d492-12dc-4192-bdb2-0d529d464617",
+        "crouched-walking": "6699c4cc-6914-4c0d-9cfa-16b8d1ac0971",
+        "backflip": "b80cd50e-079c-4044-bb3e-12098db8accb",
+        "pushing": "26112962-08ae-494b-9f9b-82a398e44e85",
+        "throw-object": "bf0f5fe4-7bb1-4c82-b434-8ba602b1254a",
+        "fight-stance-idle-8-frames": "062a301c-7935-479a-b76a-50ffd0c38ac5",
+        "walking-8-frames": "40dd87bc-564a-44ce-b5d3-f4398f67b6a6",
+        "running-slide": "da75aa01-b246-4001-93cd-b9d140c961a5",
+        "front-flip": "7c0469a4-dedb-4e04-bd72-706ac1b4983c",
+        "pull-heavy-object": "263743b4-57c2-4659-a2a1-4b6775dc51e9",
+        "picking-up": "5b324971-dbda-45e9-b71d-e482518ee2e7"
       },
       "ready": true,
       "repair_id": "aileen-user-rebuild-v4",
@@ -44359,10 +45068,72 @@
       "image_verified": true,
       "skeleton_joints": 18,
       "rotation_count": 8,
-      "exported": true,
+      "exported": false,
       "eight_way_visual_reviewed": true,
       "motions_visual_reviewed": false,
-      "motion-frame-candidate-jumping-1-crouch-hair-1": "c091877e-1a73-4f0f-a3a3-5b974d3a78e5"
+      "motion-frame-candidate-jumping-1-crouch-hair-1": "c091877e-1a73-4f0f-a3a3-5b974d3a78e5",
+      "motion_assemblies": {
+        "jumping-1": {
+          "base_job_id": "5a82b49c-23cd-42e3-9ebb-6d5ad82a2b4b",
+          "frame_sources": [
+            {
+              "frame_index": 0,
+              "source_job_id": "5a82b49c-23cd-42e3-9ebb-6d5ad82a2b4b",
+              "source_frame_index": 0,
+              "sha256": "dc08e0d432509f47b267595108daed66d36fd8753a9a6e4e5f4e12d4c67db760"
+            },
+            {
+              "frame_index": 1,
+              "source_job_id": "c091877e-1a73-4f0f-a3a3-5b974d3a78e5",
+              "source_frame_index": 1,
+              "target_pose_index": 1,
+              "source_path": "motion-frame-candidates/aileen/jumping-1/crouch-hair-1/frames/1.png",
+              "sha256": "3b18e862715437c020e74c0c70c6c58492c27fe0c52765f7739a0027e1f2e014",
+              "findings": "포니테일 가닥과 얼굴·정장·구두 외곽 정상. 목표 준비 굽힘 자세 일치, 회색 덩어리 없음."
+            },
+            {
+              "frame_index": 2,
+              "source_job_id": "5a82b49c-23cd-42e3-9ebb-6d5ad82a2b4b",
+              "source_frame_index": 2,
+              "sha256": "21705d305cab8bea671adc29176f89fc40da697aac6437c91ec421925b72f596"
+            },
+            {
+              "frame_index": 3,
+              "source_job_id": "5a82b49c-23cd-42e3-9ebb-6d5ad82a2b4b",
+              "source_frame_index": 3,
+              "sha256": "36467226ebc1fe9704ff3c4a90e9d7508f5632bd8fd58199506ec24c6e1851d2"
+            },
+            {
+              "frame_index": 4,
+              "source_job_id": "5a82b49c-23cd-42e3-9ebb-6d5ad82a2b4b",
+              "source_frame_index": 4,
+              "sha256": "dfaa83ca9b3d0b13a3d322c2fe68c48c5f0e52d165427ca143c6555d4d7e7c23"
+            },
+            {
+              "frame_index": 5,
+              "source_job_id": "5a82b49c-23cd-42e3-9ebb-6d5ad82a2b4b",
+              "source_frame_index": 5,
+              "sha256": "7fed413e6f144f3dfd16ff5197d733f5c0e3df8bd80f72743198bd5efcd868c9"
+            },
+            {
+              "frame_index": 6,
+              "source_job_id": "5a82b49c-23cd-42e3-9ebb-6d5ad82a2b4b",
+              "source_frame_index": 6,
+              "sha256": "3d945090631059736fc8c36a31e33434ea6d39800a4f8a19ab01fdf06998f339"
+            },
+            {
+              "frame_index": 7,
+              "source_job_id": "5a82b49c-23cd-42e3-9ebb-6d5ad82a2b4b",
+              "source_frame_index": 7,
+              "sha256": "01ce58f1a2022b0dafb3d0abf95180a3e99d27b487bf6c770aae3b18239e44e8"
+            }
+          ],
+          "method": "select complete same-pose regenerated frames; no pixel editing",
+          "new_user_approval": false,
+          "visual_reviewed": true
+        }
+      },
+      "motion-frame-candidate-lead-jab-bare-fist-1": "cc19aa7c-d9fc-497f-b24d-a1eed324ee82"
     },
     "gorgodio": {
       "name": "고르고디오",
@@ -69241,9 +70012,269 @@
         "files": 13,
         "production_pack_clips": 20
       }
+    },
+    {
+      "at": "2026-10-24T02:20:00Z",
+      "kind": "submitted",
+      "slug": "aileen",
+      "detail": {
+        "kind": "animation",
+        "template": "running-8-frames",
+        "job_id": "4ab2d492-12dc-4192-bdb2-0d529d464617",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "4ab2d492-12dc-4192-bdb2-0d529d464617",
+          "status": "processing"
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T02:20:01Z",
+      "kind": "submitted",
+      "slug": "aileen",
+      "detail": {
+        "kind": "animation",
+        "template": "crouched-walking",
+        "job_id": "6699c4cc-6914-4c0d-9cfa-16b8d1ac0971",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "6699c4cc-6914-4c0d-9cfa-16b8d1ac0971",
+          "status": "processing"
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T02:20:02Z",
+      "kind": "submitted",
+      "slug": "aileen",
+      "detail": {
+        "kind": "animation",
+        "template": "backflip",
+        "job_id": "b80cd50e-079c-4044-bb3e-12098db8accb",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "b80cd50e-079c-4044-bb3e-12098db8accb",
+          "status": "processing"
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T02:20:02Z",
+      "kind": "submitted",
+      "slug": "aileen",
+      "detail": {
+        "kind": "animation",
+        "template": "pushing",
+        "job_id": "26112962-08ae-494b-9f9b-82a398e44e85",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "26112962-08ae-494b-9f9b-82a398e44e85",
+          "status": "processing"
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T02:20:03Z",
+      "kind": "submitted",
+      "slug": "aileen",
+      "detail": {
+        "kind": "animation",
+        "template": "throw-object",
+        "job_id": "bf0f5fe4-7bb1-4c82-b434-8ba602b1254a",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "bf0f5fe4-7bb1-4c82-b434-8ba602b1254a",
+          "status": "processing"
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T02:20:03Z",
+      "kind": "submitted",
+      "slug": "aileen",
+      "detail": {
+        "kind": "animation",
+        "template": "fight-stance-idle-8-frames",
+        "job_id": "062a301c-7935-479a-b76a-50ffd0c38ac5",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "062a301c-7935-479a-b76a-50ffd0c38ac5",
+          "status": "processing"
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T02:22:26Z",
+      "kind": "completed",
+      "slug": "aileen",
+      "detail": {
+        "kind": "animation",
+        "template": "running-8-frames",
+        "job_id": "4ab2d492-12dc-4192-bdb2-0d529d464617",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T02:22:26Z",
+      "kind": "completed",
+      "slug": "aileen",
+      "detail": {
+        "kind": "animation",
+        "template": "crouched-walking",
+        "job_id": "6699c4cc-6914-4c0d-9cfa-16b8d1ac0971",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T02:22:26Z",
+      "kind": "completed",
+      "slug": "aileen",
+      "detail": {
+        "kind": "animation",
+        "template": "backflip",
+        "job_id": "b80cd50e-079c-4044-bb3e-12098db8accb",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T02:22:26Z",
+      "kind": "completed",
+      "slug": "aileen",
+      "detail": {
+        "kind": "animation",
+        "template": "fight-stance-idle-8-frames",
+        "job_id": "062a301c-7935-479a-b76a-50ffd0c38ac5",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T02:22:26Z",
+      "kind": "submitted",
+      "slug": "aileen",
+      "detail": {
+        "kind": "animation",
+        "template": "walking-8-frames",
+        "job_id": "40dd87bc-564a-44ce-b5d3-f4398f67b6a6",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "40dd87bc-564a-44ce-b5d3-f4398f67b6a6",
+          "status": "processing"
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T02:22:27Z",
+      "kind": "submitted",
+      "slug": "aileen",
+      "detail": {
+        "kind": "animation",
+        "template": "running-slide",
+        "job_id": "da75aa01-b246-4001-93cd-b9d140c961a5",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "da75aa01-b246-4001-93cd-b9d140c961a5",
+          "status": "processing"
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T02:22:27Z",
+      "kind": "submitted",
+      "slug": "aileen",
+      "detail": {
+        "kind": "animation",
+        "template": "front-flip",
+        "job_id": "7c0469a4-dedb-4e04-bd72-706ac1b4983c",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "7c0469a4-dedb-4e04-bd72-706ac1b4983c",
+          "status": "processing"
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T02:22:28Z",
+      "kind": "submitted",
+      "slug": "aileen",
+      "detail": {
+        "kind": "animation",
+        "template": "pull-heavy-object",
+        "job_id": "263743b4-57c2-4659-a2a1-4b6775dc51e9",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "263743b4-57c2-4659-a2a1-4b6775dc51e9",
+          "status": "processing"
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T02:22:29Z",
+      "kind": "submitted",
+      "slug": "aileen",
+      "detail": {
+        "kind": "motion-frame-candidate-lead-jab-bare-fist-1",
+        "template": null,
+        "job_id": "cc19aa7c-d9fc-497f-b24d-a1eed324ee82",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "cc19aa7c-d9fc-497f-b24d-a1eed324ee82",
+          "status": "processing"
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T02:23:11Z",
+      "kind": "completed",
+      "slug": "aileen",
+      "detail": {
+        "kind": "animation",
+        "template": "throw-object",
+        "job_id": "bf0f5fe4-7bb1-4c82-b434-8ba602b1254a",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T02:23:11Z",
+      "kind": "submitted",
+      "slug": "aileen",
+      "detail": {
+        "kind": "animation",
+        "template": "picking-up",
+        "job_id": "5b324971-dbda-45e9-b71d-e482518ee2e7",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "5b324971-dbda-45e9-b71d-e482518ee2e7",
+          "status": "processing"
+        }
+      }
     }
   ],
-  "updated_at": 1792808371.096659,
+  "updated_at": 1792808591.7923303,
   "user_stopped_at": 1792778235.6917784,
   "archived_jobs": {
     "304457e9-6577-44f0-af17-97841a9f6720": {
@@ -70562,11 +71593,11 @@
       "saved_frames": 6
     }
   },
-  "last_git_checkpoint": 1792807995.4493952,
+  "last_git_checkpoint": 1792808374.4480968,
   "summary": {
     "jobs": {
-      "processing": 0,
-      "completed": 478,
+      "processing": 7,
+      "completed": 483,
       "failed": 9,
       "stalled": 0
     },
