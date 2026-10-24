@@ -12,7 +12,7 @@ tok, proj = get_token()
 url = f"https://aiplatform.googleapis.com/v1/projects/{proj}/locations/global/publishers/google/models/{model}:generateContent"
 body = {
     "contents": [{"role": "user", "parts": [
-        *[{"inlineData": {"mimeType": "image/png", "data": base64.b64encode(open(p, "rb").read()).decode()}} for p in ref_path.split(",")],
+        *[{"inlineData": {"mimeType": "image/png", "data": base64.b64encode(open(p, "rb").read()).decode()}} for p in ref_path.split(",") if p],
         {"text": open(prompt_path, encoding="utf-8").read()},
     ]}],
     "generationConfig": {"responseModalities": ["TEXT", "IMAGE"], "imageConfig": {"aspectRatio": aspect, "imageSize": size}},
