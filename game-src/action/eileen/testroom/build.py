@@ -22,6 +22,20 @@ LIST = [
 ]
 CLEAN = {}   # (동작, 장): 왼쪽 몇 px 지우기 — 그림 찌꺼기용
 GUN = {"W", "15", "22", "23", "24", "25", "W1", "22_1", "25_1", "25_2"}
+def main_mask(im):   # 불투명 픽셀 중 가장 큰 8방향 연결 덩어리
+    px = im.load(); W_, H_ = im.size; seen = set(); best = set()
+    for y0 in range(H_):
+        for x0 in range(W_):
+            if px[x0, y0][3] > 40 and (x0, y0) not in seen:
+                comp = set(); st = [(x0, y0)]; seen.add((x0, y0))
+                while st:
+                    x, y = st.pop(); comp.add((x, y))
+                    for nx, ny in ((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1), (x + 1, y + 1), (x - 1, y - 1), (x + 1, y - 1), (x - 1, y + 1)):
+                        if 0 <= nx < W_ and 0 <= ny < H_ and (nx, ny) not in seen and px[nx, ny][3] > 40:
+                            seen.add((nx, ny)); st.append((nx, ny))
+                if len(comp) > len(best): best = comp
+    return best
+
 data = {}
 for aid, folder, d, name in LIST:
     fs = sorted((M / folder).glob("[0-9][0-9].png"))
@@ -58,10 +72,11 @@ for aid, folder, d, name in LIST:
                 for x in range(xmax): px[x, y] = (0, 0, 0, 0)
     w, h = ims[0].size
     sheet = Image.new("RGBA", (w * len(ims), h))
-    bot, reach, top, mz, foot, cx = [], [], [], [], [], []
+    bot, reach, top, mz, foot, cx, flash = [], [], [], [], [], [], []
     for i, im in enumerate(ims):
         sheet.paste(im, (i * w, 0))
         bb = im.getchannel("A").point(lambda v: 255 if v > 40 else 0).getbbox() or (0, 0, w, h)
+        flash.append(sum(1 for y in range(h) for x in range(w // 2, w) if (lambda c: c[3] > 0 and c[0] > 200 and c[1] > 130 and c[2] < 100)(im.getpixel((x, y)))) > 20 if aid in GUN else False)
         bot.append(bb[3]); top.append(bb[1]); reach.append(bb[2] - w // 2); cx.append((bb[0] + bb[2]) // 2 - w // 2)
         px = im.load()
         # 발 = 맨 아래 12줄의 불투명 픽셀 범위(그림자 위치·폭)
@@ -78,17 +93,19 @@ for aid, folder, d, name in LIST:
         else:
             foot.append([0, 40, 0, 0])
         if aid in GUN:
-            # 총구 = 가슴~허리 띠에서 가장 앞(오른쪽)에 있는 어두운 픽셀(총은 검정). 밝은 찌꺼기·불꽃은 안 잡힘
+            # 총구 = 몸과 이어진 가장 큰 덩어리(불꽃 줄기는 떨어져 있어 빠짐) 안에서, 상체 높이 띠의 가장 앞 무채색(검정·회색) 픽셀
+            body = main_mask(im)
+            y0, y1 = bb[1] + int((bb[3] - bb[1]) * 0.12), bb[1] + int((bb[3] - bb[1]) * 0.55)
             best = None
-            for y in range(int(h * 0.2), int(h * 0.8)):
+            for y in range(y0, y1):
                 for x in range(w - 1, -1, -1):
                     c = px[x, y]
-                    if c[3] > 40 and 0.3 * c[0] + 0.59 * c[1] + 0.11 * c[2] < 140 and max(c[:3]) - min(c[:3]) < 40:
+                    if (x, y) in body and 0.3 * c[0] + 0.59 * c[1] + 0.11 * c[2] < 130 and max(c[:3]) - min(c[:3]) < 35:
                         if best is None or x > best[0]: best = (x, y)
                         break
             mz.append([best[0] - w // 2, best[1]] if best else [40, h // 2])
     buf = io.BytesIO(); sheet.save(buf, "PNG", optimize=True)  # WebP는 일부 앱 보기 화면에서 안 나옴
-    data[aid] = dict(name=name, dir=d, n=len(ims), w=w, h=h, bot=bot, top=top, reach=reach, foot=foot, mz=mz, cx=cx, floor=max(bot),
+    data[aid] = dict(name=name, dir=d, n=len(ims), w=w, h=h, bot=bot, top=top, reach=reach, foot=foot, mz=mz, cx=cx, flash=flash, floor=max(bot),
                      src="data:image/png;base64," + base64.b64encode(buf.getvalue()).decode())
 # PixelLab VFX(이펙트 그림): vfx/<이름>.png + .json
 VFX = {}
