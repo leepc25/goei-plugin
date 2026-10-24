@@ -27750,19 +27750,83 @@
       "endpoint": "animate-with-skeleton-v3",
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 3.0
         },
         "id": "f2cae8cb-db71-4bfb-898d-da7c568b4f31",
         "status": "processing",
         "created_at": "2026-10-24T00:25:17.309257+00:00",
         "last_response": {
-          "type": "message_progress",
-          "action": "generating",
+          "seed": 2026102903,
+          "type": "message_done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
           "status": "initializing",
-          "progress": 0.1569631334137765,
+          "progress": 0.99,
           "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "c730dd4c-7876-457d-9b94-9ae8ff91cafc",
           "queue_position": 0,
+          "billing_charged": true,
           "generation_started_at": "2026-10-24T00:26:12.706132+00:00",
           "estimated_wait_seconds": 0
         }
@@ -47429,7 +47493,7 @@
       }
     }
   ],
-  "updated_at": 1792801616.6337383,
+  "updated_at": 1792801660.454844,
   "user_stopped_at": 1792778235.6917784,
   "archived_jobs": {
     "304457e9-6577-44f0-af17-97841a9f6720": {
@@ -48748,7 +48812,7 @@
       "saved_frames": 6
     }
   },
-  "last_git_checkpoint": 1792801290.815947,
+  "last_git_checkpoint": 1792801618.760324,
   "summary": {
     "jobs": {
       "processing": 1,
