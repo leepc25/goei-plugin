@@ -48640,6 +48640,76 @@
         "generations": 2
       },
       "saved_frames": 3
+    },
+    "a15c1f9d-6548-4046-b9f7-9ab6ece13019": {
+      "kind": "motion-frame-candidate-front-flip-actual-reference-3-1",
+      "slug": "aileen",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792811124.544005,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "a15c1f9d-6548-4046-b9f7-9ab6ece13019",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3",
+      "archive_output": "motion-frame-candidates/aileen/front-flip/actual-reference-3-1/frames"
+    },
+    "e6b0dc7e-86ac-489f-a40c-1b98f0b26327": {
+      "kind": "motion-frame-candidate-pushing-actual-reference-0-1",
+      "slug": "aileen",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792811125.3285656,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "e6b0dc7e-86ac-489f-a40c-1b98f0b26327",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3",
+      "archive_output": "motion-frame-candidates/aileen/pushing/actual-reference-0-1/frames"
+    },
+    "04a73990-c3a4-4666-ba8c-be56aeec3b9e": {
+      "kind": "motion-frame-candidate-pushing-actual-reference-1-1",
+      "slug": "aileen",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792811126.0688062,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "04a73990-c3a4-4666-ba8c-be56aeec3b9e",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3",
+      "archive_output": "motion-frame-candidates/aileen/pushing/actual-reference-1-1/frames"
+    },
+    "b76f21ad-ee58-4c0a-814e-f48b0f555673": {
+      "kind": "motion-frame-candidate-pushing-actual-reference-3-1",
+      "slug": "aileen",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792811126.9549954,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "b76f21ad-ee58-4c0a-814e-f48b0f555673",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3",
+      "archive_output": "motion-frame-candidates/aileen/pushing/actual-reference-3-1/frames"
+    },
+    "bd1a632b-9e57-4a31-b7fb-4939212ff37b": {
+      "kind": "motion-frame-candidate-pushing-actual-reference-6-1",
+      "slug": "aileen",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792811127.7476242,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "bd1a632b-9e57-4a31-b7fb-4939212ff37b",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3",
+      "archive_output": "motion-frame-candidates/aileen/pushing/actual-reference-6-1/frames"
     }
   },
   "characters": {
@@ -49711,7 +49781,7 @@
       "image_verified": true,
       "skeleton_joints": 18,
       "rotation_count": 8,
-      "exported": true,
+      "exported": false,
       "eight_way_visual_reviewed": true,
       "motions_visual_reviewed": false,
       "motion-frame-candidate-jumping-1-crouch-hair-1": "c091877e-1a73-4f0f-a3a3-5b974d3a78e5",
@@ -50218,12 +50288,12 @@
             },
             {
               "frame_index": 2,
-              "source_job_id": "6ff4baf9-1e68-42a9-a10d-5a8760ec9c55",
-              "source_frame_index": 0,
+              "source_job_id": "099fb29b-0215-4d13-9148-a99a67da76c8",
+              "source_frame_index": 1,
               "target_pose_index": 2,
-              "source_path": "motion-frame-candidates/aileen/pushing/clean-pose-2-1/frames/0.png",
-              "sha256": "6a06d1bab4075921ddb250d29fa0e1fae9d70e35f428827e8f1c69a63196ba60",
-              "findings": "Selected intact forward braced pose with separated blonde strands and transparent exterior; rejected alternative candidates with gray or brown background blobs."
+              "source_path": "motion-frame-candidates/aileen/pushing/open-palms-2-1/frames/1.png",
+              "sha256": "c56afa6af7b8d7288ff7e1f60a6723ae2608fc291e5088c24e37922dc93997d7",
+              "findings": "Open forward palms consistent with index5; selected separated hair tips without broad exterior gray patch. Full clip review still required."
             },
             {
               "frame_index": 3,
@@ -50236,12 +50306,12 @@
             },
             {
               "frame_index": 4,
-              "source_job_id": "755c1a8d-92b4-4c4a-8bb5-8acb118e9440",
-              "source_frame_index": 1,
+              "source_job_id": "b2dfe446-8dec-4b33-8fd4-17b0f4defa5b",
+              "source_frame_index": 0,
               "target_pose_index": 4,
-              "source_path": "motion-frame-candidates/aileen/pushing/clean-pose-4-1/frames/1.png",
-              "sha256": "e38ed194ec666b97065b050e92877dbf4d17d7a28cacc1b783317948b4629324",
-              "findings": "Selected intact forward braced pose with separated blonde strands and transparent exterior; rejected alternative candidates with gray or brown background blobs."
+              "source_path": "motion-frame-candidates/aileen/pushing/open-palms-4-1/frames/0.png",
+              "sha256": "97fd504c8794e2292737f866dfbf0f8b95ae17312778ebae04fdf7ec66c3805b",
+              "findings": "Open forward palms consistent with index5; selected separated hair tips without broad exterior gray patch. Full clip review still required."
             },
             {
               "frame_index": 5,
@@ -50263,12 +50333,12 @@
             },
             {
               "frame_index": 7,
-              "source_job_id": "832a7f3c-dd38-48e1-b16d-782e9fb84e2a",
-              "source_frame_index": 0,
+              "source_job_id": "c9252fd3-e258-4abe-a81c-d8bd0f35c0d2",
+              "source_frame_index": 1,
               "target_pose_index": 7,
-              "source_path": "motion-frame-candidates/aileen/pushing/clean-pose-7-1/frames/0.png",
-              "sha256": "1a655b19645a6b22690564635ac379b976b80f5d0d6e7ad9c74dda3b0de2b493",
-              "findings": "Selected intact forward braced pose with separated blonde strands and transparent exterior; rejected alternative candidates with gray or brown background blobs."
+              "source_path": "motion-frame-candidates/aileen/pushing/open-palms-7-1/frames/1.png",
+              "sha256": "c8f9bafbcc2cc4e6a9c25b2cd17cb9b6d7e091052caa0ea5ab45dca302d9513a",
+              "findings": "Open forward palms consistent with index5; selected separated hair tips without broad exterior gray patch. Full clip review still required."
             }
           ],
           "method": "select complete same-pose regenerated frames; no pixel editing",
@@ -50549,7 +50619,12 @@
       "motion-frame-candidate-pushing-open-palms-3-1": "265b213a-256b-4532-a1b9-5c963bcc6a96",
       "motion-frame-candidate-pushing-open-palms-4-1": "b2dfe446-8dec-4b33-8fd4-17b0f4defa5b",
       "motion-frame-candidate-pushing-open-palms-6-1": "7623c45f-a0cd-4fb6-aa5a-c3e1588e394b",
-      "motion-frame-candidate-pushing-open-palms-7-1": "c9252fd3-e258-4abe-a81c-d8bd0f35c0d2"
+      "motion-frame-candidate-pushing-open-palms-7-1": "c9252fd3-e258-4abe-a81c-d8bd0f35c0d2",
+      "motion-frame-candidate-front-flip-actual-reference-3-1": "a15c1f9d-6548-4046-b9f7-9ab6ece13019",
+      "motion-frame-candidate-pushing-actual-reference-0-1": "e6b0dc7e-86ac-489f-a40c-1b98f0b26327",
+      "motion-frame-candidate-pushing-actual-reference-1-1": "04a73990-c3a4-4666-ba8c-be56aeec3b9e",
+      "motion-frame-candidate-pushing-actual-reference-3-1": "b76f21ad-ee58-4c0a-814e-f48b0f555673",
+      "motion-frame-candidate-pushing-actual-reference-6-1": "bd1a632b-9e57-4a31-b7fb-4939212ff37b"
     },
     "gorgodio": {
       "name": "고르고디오",
@@ -77750,9 +77825,84 @@
         },
         "detail": null
       }
+    },
+    {
+      "at": "2026-10-24T03:05:24Z",
+      "kind": "submitted",
+      "slug": "aileen",
+      "detail": {
+        "kind": "motion-frame-candidate-front-flip-actual-reference-3-1",
+        "template": null,
+        "job_id": "a15c1f9d-6548-4046-b9f7-9ab6ece13019",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "a15c1f9d-6548-4046-b9f7-9ab6ece13019",
+          "status": "processing"
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T03:05:25Z",
+      "kind": "submitted",
+      "slug": "aileen",
+      "detail": {
+        "kind": "motion-frame-candidate-pushing-actual-reference-0-1",
+        "template": null,
+        "job_id": "e6b0dc7e-86ac-489f-a40c-1b98f0b26327",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "e6b0dc7e-86ac-489f-a40c-1b98f0b26327",
+          "status": "processing"
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T03:05:26Z",
+      "kind": "submitted",
+      "slug": "aileen",
+      "detail": {
+        "kind": "motion-frame-candidate-pushing-actual-reference-1-1",
+        "template": null,
+        "job_id": "04a73990-c3a4-4666-ba8c-be56aeec3b9e",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "04a73990-c3a4-4666-ba8c-be56aeec3b9e",
+          "status": "processing"
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T03:05:27Z",
+      "kind": "submitted",
+      "slug": "aileen",
+      "detail": {
+        "kind": "motion-frame-candidate-pushing-actual-reference-3-1",
+        "template": null,
+        "job_id": "b76f21ad-ee58-4c0a-814e-f48b0f555673",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "b76f21ad-ee58-4c0a-814e-f48b0f555673",
+          "status": "processing"
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T03:05:28Z",
+      "kind": "submitted",
+      "slug": "aileen",
+      "detail": {
+        "kind": "motion-frame-candidate-pushing-actual-reference-6-1",
+        "template": null,
+        "job_id": "bd1a632b-9e57-4a31-b7fb-4939212ff37b",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "bd1a632b-9e57-4a31-b7fb-4939212ff37b",
+          "status": "processing"
+        }
+      }
     }
   ],
-  "updated_at": 1792811011.0406327,
+  "updated_at": 1792811128.2366667,
   "user_stopped_at": 1792778235.6917784,
   "archived_jobs": {
     "304457e9-6577-44f0-af17-97841a9f6720": {
@@ -79071,7 +79221,7 @@
       "saved_frames": 6
     }
   },
-  "last_git_checkpoint": 1792810652.518389,
+  "last_git_checkpoint": 1792811013.8424997,
   "summary": {
     "jobs": {
       "processing": 0,

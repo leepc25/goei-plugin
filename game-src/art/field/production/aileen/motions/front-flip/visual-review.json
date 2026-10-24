@@ -1,0 +1,133 @@
+{
+  "at": 1792811124.2802432,
+  "job_id": "7c0469a4-dedb-4e04-bd72-706ac1b4983c",
+  "result": "reroll-required",
+  "findings": "Remaining exterior gray patches require corrected actual first-frame keypoints; no automatic approval.",
+  "frame_count": 13,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ],
+  "frame_assembly": {
+    "base_job_id": "7c0469a4-dedb-4e04-bd72-706ac1b4983c",
+    "frame_sources": [
+      {
+        "frame_index": 0,
+        "source_job_id": "a096416d-d44e-48a8-ade5-10cdabae0a2d",
+        "source_frame_index": 1,
+        "target_pose_index": 0,
+        "source_path": "motion-frame-candidates/aileen/backflip/clean-pose-0-1/frames/1.png",
+        "sha256": "d3f6a5c1932ce1143a26f2f9dcdab983f747e384044ff9b33edee7c505418838",
+        "findings": "동일 아일린/동쪽/카메라와 관절 배열 완전 일치. 검수된 뒤회전 준비 자세 후보 전체PNG를 앞회전의 같은 자세에 재사용, 출처/해시 보존.",
+        "reused_from_frame_index": 0,
+        "reused_from_slot": "backflip"
+      },
+      {
+        "frame_index": 1,
+        "source_job_id": "3f341d9c-c1be-4dca-8388-cbda96f23275",
+        "source_frame_index": 1,
+        "target_pose_index": 1,
+        "source_path": "motion-frame-candidates/aileen/backflip/clean-pose-1-1/frames/1.png",
+        "sha256": "a3eee05970e96acc533998d4d2152e92d5666c2e3294e8baee7cd76606f1dac3",
+        "findings": "동일 아일린/동쪽/카메라와 관절 배열 완전 일치. 검수된 뒤회전 준비 자세 후보 전체PNG를 앞회전의 같은 자세에 재사용, 출처/해시 보존.",
+        "reused_from_frame_index": 1,
+        "reused_from_slot": "backflip"
+      },
+      {
+        "frame_index": 2,
+        "source_job_id": "bf0ff473-fa16-4884-bb6c-8c8e321f81ca",
+        "source_frame_index": 2,
+        "target_pose_index": 2,
+        "source_path": "motion-frame-candidates/aileen/front-flip/clean-pose-2-1/frames/2.png",
+        "sha256": "c34fcc4f7a2839ff1a6405ccba442ab95910510dfe9f41f23e2c677290373462",
+        "findings": "Only candidate 2 has transparent space behind the torso; candidates 0 and 1 have large gray background masses and are rejected."
+      },
+      {
+        "frame_index": 3,
+        "source_job_id": "7c0469a4-dedb-4e04-bd72-706ac1b4983c",
+        "source_frame_index": 3,
+        "sha256": "07bc6b9b883bf0ec35fcb89f11b4d31d15de8d295b9272a384fae1c1aa2b283d"
+      },
+      {
+        "frame_index": 4,
+        "source_job_id": "08cdb028-8b59-4175-89ad-4018de45da49",
+        "source_frame_index": 1,
+        "target_pose_index": 4,
+        "source_path": "motion-frame-candidates/aileen/front-flip/clean-pose-4-2/frames/1.png",
+        "sha256": "452910033d4ce9d6ab25508cddf1efb6f30ed31d0f30645a17aa3c0dd25d9741",
+        "findings": "Measured inverted reference produces intact tucked body and blonde strands without prior broad gray exterior matte; recheck full flip sequence."
+      },
+      {
+        "frame_index": 5,
+        "source_job_id": "7c0469a4-dedb-4e04-bd72-706ac1b4983c",
+        "source_frame_index": 5,
+        "sha256": "bbd952e4d00a7a7e406817b6f3f8304ab71a822249b82bce78b2f593cbaadb88"
+      },
+      {
+        "frame_index": 6,
+        "source_job_id": "7c0469a4-dedb-4e04-bd72-706ac1b4983c",
+        "source_frame_index": 6,
+        "sha256": "dcd4bfcbe2c991d54660a3c856715a30dda603804f32c22a9c693b94bf4dcbe6"
+      },
+      {
+        "frame_index": 7,
+        "source_job_id": "7c0469a4-dedb-4e04-bd72-706ac1b4983c",
+        "source_frame_index": 7,
+        "sha256": "3ae7855ca193cce0e045b3f0f8c18772ee2e1b334c0790171ac1d285e4224bc5"
+      },
+      {
+        "frame_index": 8,
+        "source_job_id": "7c0469a4-dedb-4e04-bd72-706ac1b4983c",
+        "source_frame_index": 8,
+        "sha256": "84d0cd1aa59feb867568f7146986676a6c3d574b2226a926758136fc9cc0105d"
+      },
+      {
+        "frame_index": 9,
+        "source_job_id": "b87a717a-5da3-4c61-9000-dcff4cdd2b74",
+        "source_frame_index": 1,
+        "target_pose_index": 9,
+        "source_path": "motion-frame-candidates/aileen/front-flip/clean-pose-9-1/frames/1.png",
+        "sha256": "1ad6d735b8e13f13ae09363815435c37de22ac5a8b891eb63701077834497c5d",
+        "findings": "후보 전체 확인. 선택 프레임은 얼굴·손·구두 외곽이 온전하고 몸 밖 회색 덩어리 없음. 같은 목표 자세 유지."
+      },
+      {
+        "frame_index": 10,
+        "source_job_id": "8eae1f21-0440-4210-addc-3bb8335b10f6",
+        "source_frame_index": 2,
+        "target_pose_index": 10,
+        "source_path": "motion-frame-candidates/aileen/front-flip/clean-pose-10-1/frames/2.png",
+        "sha256": "797887469a70a7c781e324c1afd5e0348b2251fda7d6c4344afa8667977b65f6",
+        "findings": "Only candidate2 has transparent exterior and separated blonde ponytail tips; candidates0/1 have large opaque brown masses and are rejected."
+      },
+      {
+        "frame_index": 11,
+        "source_job_id": "3f341d9c-c1be-4dca-8388-cbda96f23275",
+        "source_frame_index": 1,
+        "target_pose_index": 11,
+        "source_path": "motion-frame-candidates/aileen/backflip/clean-pose-1-1/frames/1.png",
+        "sha256": "a3eee05970e96acc533998d4d2152e92d5666c2e3294e8baee7cd76606f1dac3",
+        "findings": "동일 아일린/동쪽/카메라와 관절 배열 완전 일치. 검수된 뒤회전 준비 자세 후보 전체PNG를 앞회전의 같은 자세에 재사용, 출처/해시 보존.",
+        "reused_from_frame_index": 1,
+        "reused_from_slot": "backflip"
+      },
+      {
+        "frame_index": 12,
+        "source_job_id": "7c0469a4-dedb-4e04-bd72-706ac1b4983c",
+        "source_frame_index": 12,
+        "sha256": "c28253ce59366fcd0e4611da436ed5dcc2ffedc0f250403ef9dfadc8804c1d55"
+      }
+    ],
+    "method": "select complete same-pose regenerated frames; no pixel editing",
+    "new_user_approval": false,
+    "visual_reviewed": false
+  }
+}

@@ -310,5 +310,29 @@
     },
     "receipt": "motion-inputs/secriem/measured-east-reference/estimate-response.json",
     "server_job_id": null
+  },
+  {
+    "record_id": "local-sync:aileen-front-tuck-estimate",
+    "slug": "aileen",
+    "slot": "front-flip",
+    "endpoint": "estimate-skeleton",
+    "usage": {
+      "type": "generations",
+      "generations": 0.1
+    },
+    "receipt": "motion-inputs/aileen/measured-front-tuck-reference/estimate-response.json",
+    "server_job_id": null
+  },
+  {
+    "record_id": "local-sync:aileen-open-palms-estimate",
+    "slug": "aileen",
+    "slot": "pushing",
+    "endpoint": "estimate-skeleton",
+    "usage": {
+      "type": "generations",
+      "generations": 0.1
+    },
+    "receipt": "motion-inputs/aileen/measured-open-palms-reference/estimate-response.json",
+    "server_job_id": null
   }
 ]

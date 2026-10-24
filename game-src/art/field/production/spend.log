@@ -548,9 +548,23 @@ dcdd5c18-4609-4256-a14a-5a9b7df01325	aileen	motion-frame-candidate-throw-object-
 2aee428d-9ce5-4e71-bf76-773b4fa42f4f	aileen	motion-frame-candidate-throw-object-clean-pose-7-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
 bf0ff473-fa16-4884-bb6c-8c8e321f81ca	aileen	motion-frame-candidate-front-flip-clean-pose-2-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
 95775bae-0abc-4066-a009-c44a95ab6006	aileen	motion-frame-candidate-front-flip-clean-pose-3-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
-404b3a03-b4df-40ba-891c-9711eadec01c	aileen	motion-frame-candidate-front-flip-clean-pose-3-2		processing	null
-d90d1824-7c56-429b-8f65-28b510ed4d22	aileen	motion-frame-candidate-pushing-clean-pose-0-2		processing	null
-319991db-7083-4a02-aa24-1a8a8aaba674	aileen	motion-frame-candidate-pushing-clean-pose-6-2		processing	null
+404b3a03-b4df-40ba-891c-9711eadec01c	aileen	motion-frame-candidate-front-flip-clean-pose-3-2		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+d90d1824-7c56-429b-8f65-28b510ed4d22	aileen	motion-frame-candidate-pushing-clean-pose-0-2		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+319991db-7083-4a02-aa24-1a8a8aaba674	aileen	motion-frame-candidate-pushing-clean-pose-6-2		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+8eae1f21-0440-4210-addc-3bb8335b10f6	aileen	motion-frame-candidate-front-flip-clean-pose-10-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+c4f72819-b2db-45a4-90ac-1209b020bd14	aileen	motion-frame-candidate-front-flip-clean-pose-3-3		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+9ac9022c-a140-4639-a611-161d856e9431	aileen	motion-frame-candidate-pushing-open-palms-0-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+03aeb39f-99ee-4524-8585-020b686121fa	aileen	motion-frame-candidate-pushing-open-palms-1-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+099fb29b-0215-4d13-9148-a99a67da76c8	aileen	motion-frame-candidate-pushing-open-palms-2-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+265b213a-256b-4532-a1b9-5c963bcc6a96	aileen	motion-frame-candidate-pushing-open-palms-3-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+b2dfe446-8dec-4b33-8fd4-17b0f4defa5b	aileen	motion-frame-candidate-pushing-open-palms-4-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+7623c45f-a0cd-4fb6-aa5a-c3e1588e394b	aileen	motion-frame-candidate-pushing-open-palms-6-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+c9252fd3-e258-4abe-a81c-d8bd0f35c0d2	aileen	motion-frame-candidate-pushing-open-palms-7-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+a15c1f9d-6548-4046-b9f7-9ab6ece13019	aileen	motion-frame-candidate-front-flip-actual-reference-3-1		processing	null
+e6b0dc7e-86ac-489f-a40c-1b98f0b26327	aileen	motion-frame-candidate-pushing-actual-reference-0-1		processing	null
+04a73990-c3a4-4666-ba8c-be56aeec3b9e	aileen	motion-frame-candidate-pushing-actual-reference-1-1		processing	null
+b76f21ad-ee58-4c0a-814e-f48b0f555673	aileen	motion-frame-candidate-pushing-actual-reference-3-1		processing	null
+bd1a632b-9e57-4a31-b7fb-4939212ff37b	aileen	motion-frame-candidate-pushing-actual-reference-6-1		processing	null
 local-sync:jyaldi-backflip-v7-estimate	jyaldi	estimate-skeleton	backflip	synchronous-completed	{"type": "generations", "generations": 0.1}
 local-sync:jaemtri-crouch-reference-estimate	jaemtri	estimate-skeleton	motion-reference	synchronous-completed	{"type": "generations", "generations": 0.1}
 local-sync:jaemtri-turn-reference-estimate	jaemtri	estimate-skeleton	backflip	synchronous-completed	{"type": "generations", "generations": 0.1}
@@ -559,3 +573,23 @@ local-sync:aileen-guard-reference-estimate	aileen	estimate-skeleton	lead-jab	syn
 local-sync:aileen-run-reference-estimate	aileen	estimate-skeleton	running-8-frames	synchronous-completed	{"type": "generations", "generations": 0.1}
 local-sync:aileen-crouch-reference-estimate	aileen	estimate-skeleton	crouched-walking	synchronous-completed	{"type": "generations", "generations": 0.1}
 local-sync:aileen-turn-reference-estimate	aileen	estimate-skeleton	turn-reference	synchronous-completed	{"type": "generations", "generations": 0.1}
+local-sync:lee-gi-seok-west-rotation-estimate	lee-gi-seok	estimate-skeleton	motion-reference	synchronous-completed	{"type": "generations", "generations": 0.1}
+local-sync:kim-seong-jin-east-rotation-estimate	kim-seong-jin	estimate-skeleton	motion-reference	synchronous-completed	{"type": "generations", "generations": 0.1}
+local-sync:jin-na-sol-east-rotation-estimate	jin-na-sol	estimate-skeleton	motion-reference	synchronous-completed	{"type": "generations", "generations": 0.1}
+local-sync:lee-ja-heon-east-rotation-estimate	lee-ja-heon	estimate-skeleton	motion-reference	synchronous-completed	{"type": "generations", "generations": 0.1}
+local-sync:baek-sa-heon-east-rotation-estimate	baek-sa-heon	estimate-skeleton	motion-reference	synchronous-completed	{"type": "generations", "generations": 0.1}
+local-sync:go-young-eun-east-rotation-estimate	go-young-eun	estimate-skeleton	motion-reference	synchronous-completed	{"type": "generations", "generations": 0.1}
+local-sync:kang-i-hak-east-rotation-estimate	kang-i-hak	estimate-skeleton	motion-reference	synchronous-completed	{"type": "generations", "generations": 0.1}
+local-sync:jang-heo-un-east-rotation-estimate	jang-heo-un	estimate-skeleton	motion-reference	synchronous-completed	{"type": "generations", "generations": 0.1}
+local-sync:kwak-je-gang-east-rotation-estimate	kwak-je-gang	estimate-skeleton	motion-reference	synchronous-completed	{"type": "generations", "generations": 0.1}
+local-sync:lee-yeon-hwa-east-rotation-estimate	lee-yeon-hwa	estimate-skeleton	motion-reference	synchronous-completed	{"type": "generations", "generations": 0.1}
+local-sync:ho-yu-won-west-rotation-estimate	ho-yu-won	estimate-skeleton	motion-reference	synchronous-completed	{"type": "generations", "generations": 0.1}
+local-sync:seo-yun-ji-east-rotation-estimate	seo-yun-ji	estimate-skeleton	motion-reference	synchronous-completed	{"type": "generations", "generations": 0.1}
+local-sync:go-yeon-ji-east-rotation-estimate	go-yeon-ji	estimate-skeleton	motion-reference	synchronous-completed	{"type": "generations", "generations": 0.1}
+local-sync:yun-ji-a-east-rotation-estimate	yun-ji-a	estimate-skeleton	motion-reference	synchronous-completed	{"type": "generations", "generations": 0.1}
+local-sync:ma-deok-hee-east-rotation-estimate	ma-deok-hee	estimate-skeleton	motion-reference	synchronous-completed	{"type": "generations", "generations": 0.1}
+local-sync:mun-hye-ran-east-rotation-estimate	mun-hye-ran	estimate-skeleton	motion-reference	synchronous-completed	{"type": "generations", "generations": 0.1}
+local-sync:saladin-east-rotation-estimate	saladin	estimate-skeleton	motion-reference	synchronous-completed	{"type": "generations", "generations": 0.1}
+local-sync:secriem-east-rotation-estimate	secriem	estimate-skeleton	motion-reference	synchronous-completed	{"type": "generations", "generations": 0.1}
+local-sync:aileen-front-tuck-estimate	aileen	estimate-skeleton	front-flip	synchronous-completed	{"type": "generations", "generations": 0.1}
+local-sync:aileen-open-palms-estimate	aileen	estimate-skeleton	pushing	synchronous-completed	{"type": "generations", "generations": 0.1}
