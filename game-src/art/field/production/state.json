@@ -38757,7 +38757,7 @@
       "kind": "motion-frame-candidate-backflip-turn-3",
       "slug": "jaemtri",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792806736.0070627,
       "receipt": {
         "usage": null,
@@ -38765,7 +38765,62 @@
         "status": "processing"
       },
       "endpoint": "animate-with-skeleton-v3",
-      "archive_output": "motion-frame-candidates/jaemtri/backflip/turn-3/frames"
+      "archive_output": "motion-frame-candidates/jaemtri/backflip/turn-3/frames",
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 2.0
+        },
+        "id": "a2ffabd5-ec0c-4076-85f1-e491aa7d2978",
+        "status": "completed",
+        "created_at": "2026-10-24T01:52:18.159643+00:00",
+        "last_response": {
+          "seed": 2026112001,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "status": "initializing",
+          "progress": 1.0,
+          "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 2
+          },
+          "generation_id": "0a2f60e1-8e7b-41c0-af16-cf22c653baf4",
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_started_at": "2026-10-24T01:53:21.106861+00:00",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792806870.4352791,
+      "elapsed_observed_seconds": 134.42821764945984,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 2
+      },
+      "saved_frames": 3
     }
   },
   "characters": {
@@ -63226,9 +63281,25 @@
           "status": "processing"
         }
       }
+    },
+    {
+      "at": "2026-10-24T01:54:30Z",
+      "kind": "completed",
+      "slug": "jaemtri",
+      "detail": {
+        "kind": "motion-frame-candidate-backflip-turn-3",
+        "template": null,
+        "job_id": "a2ffabd5-ec0c-4076-85f1-e491aa7d2978",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 2
+        },
+        "detail": null
+      }
     }
   ],
-  "updated_at": 1792806739.1868587,
+  "updated_at": 1792806870.5401294,
   "user_stopped_at": 1792778235.6917784,
   "archived_jobs": {
     "304457e9-6577-44f0-af17-97841a9f6720": {
@@ -64551,7 +64622,7 @@
   "summary": {
     "jobs": {
       "processing": 0,
-      "completed": 435,
+      "completed": 436,
       "failed": 9,
       "stalled": 0
     },
