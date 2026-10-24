@@ -7,9 +7,11 @@ prompt_path, ref_path, out_path = sys.argv[1:4]
 aspect = sys.argv[4] if len(sys.argv) > 4 else "4:1"
 size = sys.argv[5] if len(sys.argv) > 5 else "2K"
 model = sys.argv[6] if len(sys.argv) > 6 else "gemini-3.1-flash-image"
+import os
+API = os.environ.get("VERTEX_API", "v1")
 
 tok, proj = get_token()
-url = f"https://aiplatform.googleapis.com/v1/projects/{proj}/locations/global/publishers/google/models/{model}:generateContent"
+url = "https://aiplatform.googleapis.com/" + API + f"/projects/{proj}/locations/global/publishers/google/models/{model}:generateContent"
 body = {
     "contents": [{"role": "user", "parts": [
         *[{"inlineData": {"mimeType": "image/png", "data": base64.b64encode(open(p, "rb").read()).decode()}} for p in ref_path.split(",") if p],
