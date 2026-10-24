@@ -20,7 +20,7 @@ LIST = [
  ("40","40","SE","주저앉아 뒤로 기어나가기"),("41","41","SE","웅크려 떨기"),("42","42_E","E","네발로 기기"),
  ("W1","W_1","E","무기 대기"),("22_1","22_1","E","고유기술 제압사격"),("25_1","25_1","E","필살기 RPG"),
 ]
-CLEAN = {("25_1", 10): 80, ("25_1", 11): 80}   # RPG 결과 11·12번째 장 왼쪽 검은 세모
+CLEAN = {}   # (동작, 장): 왼쪽 몇 px 지우기 — 그림 찌꺼기용
 GUN = {"W", "15", "22", "23", "24", "25", "W1", "22_1", "25_1"}
 data = {}
 for aid, folder, d, name in LIST:
@@ -41,8 +41,18 @@ for aid, folder, d, name in LIST:
         bot.append(bb[3]); top.append(bb[1]); reach.append(bb[2] - w // 2)
         px = im.load()
         # 발 = 맨 아래 12줄의 불투명 픽셀 범위(그림자 위치·폭)
-        xs = [x for y in range(max(0, bb[3] - 12), bb[3]) for x in range(w) if px[x, y][3] > 40]
-        foot.append([(min(xs) + max(xs)) // 2 - w // 2, max(xs) - min(xs)] if xs else [0, 40])
+        xs = [x for y in range(max(0, bb[3] - 26), bb[3]) for x in range(w) if px[x, y][3] > 40]
+        if xs:
+            x0, x1 = min(xs), max(xs)
+            # 양쪽 발끝 기둥마다 가장 아래 픽셀 → 두 발이 땅에 닿는 높이(앞발이 화면 위쪽이면 그만큼 올림)
+            def low(c0, c1):
+                ys = [y for x in range(c0, c1 + 1) for y in range(max(0, bb[3] - 26), bb[3]) if px[x, y][3] > 40]
+                return max(ys) if ys else bb[3] - 1
+            span = max(1, x1 - x0)
+            yl, yr = low(x0, x0 + span // 3), low(x1 - span // 3, x1)
+            foot.append([(x0 + x1) // 2 - w // 2, span, bb[3] - (yl + yr) / 2, abs(yl - yr) / 2])
+        else:
+            foot.append([0, 40, 0, 0])
         if aid in GUN:
             # 총구 = 가슴~허리 높이 띠에서 가장 앞(오른쪽) 불투명 픽셀
             best = None
