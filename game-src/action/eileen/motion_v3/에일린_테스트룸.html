@@ -347,22 +347,20 @@ const later = (t, fn) => fx.push({ k: 'timer', t, fn });
 function artillerySuper() {
   if (!spReady()) return;
   ensureArmed(() => {
-    const a = A['22'], marks = [];
-    const paint = i => {
-      const d = [230, 420, 610][i], x = Math.max(60, Math.min(W - 60, P.x + P.face * d)), y = P.y;   // 같은 줄에 일직선
-      const m = { k: 'target', x, y, t: 6 }; marks.push(m); fx.push(m); sfx('ui');
-    };
+    const a = A['22'];
+    // 떨어질 자리를 먼저 정하고, 손가락으로 짚을 때마다 그 자리들에 표적을 찍음 → 포탄은 정확히 표적에 떨어짐
+    const spots = [];
+    for (let k = 0; k < 12; k++) spots.push({ x: 60 + Math.random() * (W - 120), y: FLOOR0 + 30 + Math.random() * (FLOOR1 - FLOOR0 - 30) });
+    if (showDummy) spots.splice(Math.random() * spots.length | 0, 0, { x: D.x, y: D.y });
+    const marks = spots.map(sp => ({ k: 'target', x: sp.x, y: sp.y, t: 8 }));
+    const paint = g => { marks.forEach((m, n) => { if (n % 3 === g) fx.push(m); }); sfx('ui'); };
     const s = [{ f: 0, d: 0.3, ev: 'cut' }];
     for (let f = 1; f < a.n; f++) s.push({ f, d: f === 2 || f === 4 || f === 6 ? 0.28 : 0.1, fn: f === 2 ? () => paint(0) : f === 4 ? () => paint(1) : f === 6 ? () => paint(2) : null });
     act('22', { seq: s, onEnd: () => {
-      // 표적마다 포탄 + 사이사이 추가 포탄. 샌드백이 있으면 그 자리에도 한 발
-      const hits = marks.map(m => [m.x, m.y]);
-      if (showDummy) hits.splice(1, 0, [D.x, D.y]);
-      for (let k = 0; k < 10; k++) hits.push([60 + Math.random() * (W - 120), FLOOR0 + 30 + Math.random() * (FLOOR1 - FLOOR0 - 30)]);   // 화면 전체에 마구
       P.noGain = P.t + 6;   // 필살기 피해로는 게이지가 안 참
-      hits.forEach(([x, y], i) => later(0.2 + i * 0.13 + Math.random() * 0.08, () => {
-        fx.push({ k: 'mortar', x, y, t: 0.32, t0: 0.32 }); sfx('whiff', { strength: 2 });
-        later(0.32, () => { explode(x, y - 10, y, false, 55); for (const m of marks) if (Math.abs(m.x - x) < 5) m.t = 0; });
+      marks.forEach((m, i) => later(0.2 + i * 0.13 + Math.random() * 0.08, () => {
+        fx.push({ k: 'mortar', x: m.x, y: m.y, t: 0.32, t0: 0.32 }); sfx('whiff', { strength: 2 });
+        later(0.32, () => { explode(m.x, m.y - 10, m.y, false, 55); m.t = 0; });
       }));
       afterBuf(toIdle);
     } });
@@ -781,7 +779,13 @@ function drawSheets() {
       const v = VFX.charge_beam, [fx0, fy0, fw, fh] = sheetFrame(v, (e.t0 - e.t) % vfxDur('charge_beam')), sc = e.sy * (0.5 + 0.5 * e.t / e.t0);
       const x2 = e.dir > 0 ? W : 0, len = Math.abs(x2 - e.x);
       ctx.save(); ctx.translate(e.x, e.y); if (e.dir < 0) ctx.scale(-1, 1);
-      for (let x = 0; x < len; x += fw * 2) ctx.drawImage(v.img, fx0, fy0, fw, fh, x, -fh * sc, fw * 2, fh * 2 * sc);
+      // 총구 쪽은 가늘게 시작해 굵어지고(앞 140px), 끝도 살짝 가늘게 — 8px씩 잘라 높이를 바꿔 그림
+      const taper = 140, step = 8;
+      for (let x = 0; x < len; x += step) {
+        const k0 = Math.min(1, 0.12 + (x / taper) ** 0.7 * 0.88) * Math.min(1, (len - x) / 60 + 0.4);
+        const sx = fx0 + ((x / 2) % fw), sw = Math.min(step / 2, fw - (sx - fx0));
+        ctx.drawImage(v.img, sx, fy0, sw, fh, x, -fh * sc * k0, sw * 2, fh * 2 * sc * k0);
+      }
       ctx.restore();
     }
     if (e.k !== 'sheet') continue;
