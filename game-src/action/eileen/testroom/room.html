@@ -333,12 +333,13 @@ function rocketSuper() {
   P.armed = false; P.combat = true;
   const a = A['25_1'];
   // 바주카: 꺼내기(25_1) → 발사(25_2, 첫 반동 장에서 로켓) → 꺼내기를 거꾸로 틀어 등 뒤로 넣기(사용자 제안)
-  const s = [{ f: 0, d: 0.3, ev: 'cut' }, ...S(R(1, a.n - 1), 0.07)];
+  // 컷인이 화면을 덮는 동안 관이 불쑥 생기는 앞 장(2~5장)은 건너뛰고, 어깨에 얹는 6~8장부터 보여 줌
+  const s = [{ f: 0, d: 0.3, ev: 'cut' }, { f: 0, d: 0.5 }, ...S(R(5, a.n - 1), 0.08)];
   if (has('25_2')) { const b = A['25_2']; s.push({ f: a.n - 1, d: 0.25 }); }
   act('25_1', { seq: s, onEnd: () => {
     if (!has('25_2')) return afterBuf(toIdle);
     const b = A['25_2'];
-    act('25_2', { seq: [{ f: 0, d: 0.12 }, { f: Math.min(1, b.n - 1), d: 0.22, ev: 'rocket' }, ...S(R(2, b.n - 1), 0.09), { f: 0, d: 0.45 }], onEnd: () => reverseOut('25_1', R(a.n - 1, 0), 0.06) });
+    act('25_2', { seq: [{ f: 0, d: 0.12 }, { f: Math.min(1, b.n - 1), d: 0.22, ev: 'rocket' }, ...S(R(2, b.n - 1), 0.09), { f: 0, d: 0.45 }], onEnd: () => { flash = 0.12; for (let i = 0; i < 8; i++) fx.push({ k: 'smoke', x: P.x + (Math.random() - 0.5) * 60, y: P.y - 120 + Math.random() * 60, vx: (Math.random() - 0.5) * 40, vy: -30, r: 14, t: 0.6, t0: 0.6, c: 170 }); reverseOut('25_1', [a.n - 1, 5], 0.08, () => { P.combat = true; toIdle(); }); } });   // 넣을 때도 어깨에서 내리는 장까지만, 나머지는 연기로 가림
   } });
 }
 const ROCKET_FIRE = 6;   // 발사 장: 7번째 장(2026-10-24 4차 결과 보고 정함)
