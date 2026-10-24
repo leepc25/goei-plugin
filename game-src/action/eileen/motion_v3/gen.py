@@ -106,6 +106,7 @@ def plan(r):
 
 def save(n, fr):
     d = OUT / n.replace("-", "_"); d.mkdir(exist_ok=True)
+    for old in d.glob("[0-9][0-9].png"): old.unlink()   # 장 수가 줄면 옛 장이 남지 않게
     for i, im in enumerate(fr): im.save(d / f"{i:02d}.png")
     w, h = fr[0].size
     sheet = Image.new("RGBA", (w * len(fr), h))
