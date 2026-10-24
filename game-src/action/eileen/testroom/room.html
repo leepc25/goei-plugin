@@ -50,7 +50,7 @@ const VFX = /*__VFX__*/null || {}; for (const k in VFX) { VFX[k].img = new Image
 // PixelLab 이펙트 그림 재생: 2배 도트로, 기준점(pivot)을 x,y에
 const vfxDur = name => VFX[name].frames.reduce((a, f) => a + f[4], 0) / 1000;
 // PixelLab 이펙트 그림: o.flip(좌우), o.rot(회전), o.anchor('right' = 오른쪽 가운데를 x,y에), o.loop(반복, o.t 동안)
-const vfx = (name, x, y, scale = 2, o = {}) => { if (!VFX[name]) return false; const d = vfxDur(name); fx.push({ k: 'sheet', name, x, y, s: scale, t0: o.t || d, t: o.t || d, dur: d, ...o }); return true; };
+const vfx = (name, x, y, scale = 2, o = {}) => { if (!VFX[name]) return false; const d = vfxDur(name); const T = (o.t || d) + (o.hold || 0); fx.push({ k: 'sheet', name, x, y, s: scale, t0: T, t: T, dur: d, ...o }); return true; };
 const has = id => !!A[id];
 // 땅 동작 기준선: 모든 동작을 캔버스 아래 4px 선에 맞춤(이어지는 동작끼리 높이가 튀지 않게, 2026-10-24)
 const BASE = a => a.h - 4;
@@ -72,11 +72,11 @@ const ACTIONS = [
  ['run','뛰기(누른 채)','ShiftLeft'],['jump','점프 · 공중에서 2단','Space'],
  ['light','약 공격 · 뛰며 = 슬라이딩 · 공중 = 점프 공격','KeyZ'],['heavy','강 공격(콤보 마무리) · 공중 = 강한 점프 공격','KeyX'],
  ['dodge','회피(누른 방향으로)','KeyC'],['block','막기(누른 채)','KeyV'],['shoot','원거리(누른 채 = 연사)','KeyA'],
- ['skill','고유기술 제압사격','KeyS'],['charge','충전(누른 채) → 떼면 방출','KeyD'],['super','필살기 지원 포격','KeyF'],
+ ['skill','고유기술 제압사격','KeyS'],['charge','충전(누른 채) → 떼면 방출','KeyD'],['super','필살기 증명해(난사 → 포격)','KeyF'],
  ['skillOld','옛 고유기술 판독','KeyY'],['superOld','옛 필살기 연사','KeyU'],
  ['combat','전투 자세 켜기/끄기','Tab'],['weapon','무기 꺼내기/넣기','KeyQ'],
  ['hit','맞기(슈퍼아머 중엔 버팀)','Digit1'],['knock','날아가 쓰러지기','Digit2'],['stun','스턴(연타로 빨리 풀림)','Digit3'],['crawl','쓰러진 뒤 엎드려 기기','KeyE'],
- ['dying','빈사 켜기/끄기','KeyP'],
+ ['dying','빈사 켜기/끄기','KeyP'],['heal','회복약 먹기(섭취 + 회복 효과)','KeyB'],['drop','아이템 떨어뜨리기(T로 줍기)','KeyN'],['status','상태이상 바꾸기(독→불→전기→없음)','KeyM'],
  ['respond','응대','Digit4'],['talk','말하며 손짓','Digit5'],['nod','끄덕이기','Digit6'],['shake','고개 젓기','Digit7'],
  ['angry','화내기','Digit8'],['happy','기뻐하기','Digit9'],['surprise','놀라기','Digit0'],
  ['eat','섭취','KeyR'],['pick','줍기','KeyT'],['personal','개인 대기','KeyG'],['notice','발견 반응','KeyH'],
@@ -120,6 +120,7 @@ let charScale = store.get('size', 1), persp = true;
 // 원근: 화면 안쪽(위)일수록 작게, 바깥쪽(아래)일수록 크게
 const K = y => charScale * (persp ? 0.78 + 0.34 * (y - FLOOR0) / (FLOOR1 - FLOOR0) : 1);
 let fx = [];
+const items = [];   // 바닥 아이템(반짝임)
 let audio = null;
 try { audio = window.GoeiAudio.createGameAudio({ load: () => store.get('audio', null), save: v => store.set('audio', v) }); } catch (e) { audio = null; }
 function sfx(type, extra = {}) { if (audio) try { audio.event({ type, x: P.x, ...extra }); } catch {} }
@@ -169,8 +170,8 @@ const steam = (x, y, s = 1) => VFX.steam_wisp ? vfx('steam_wisp', x, y, 1.6) :  
 const ring = (x, y, r, t, c, w = 4, sy = 1) => fx.push({ k: 'ring', x, y, r0: r * 0.2, r, t, t0: t, c, w, sy });
 const num = (x, y, v, big) => fx.push({ k: 'num', x, y, v, t: 0.7, big });
 const dust = (x, y, n, s = 1) => { for (let i = 0; i < n; i++) fx.push({ k: 'dust', x: x + (Math.random() - 0.5) * 30 * s, y, vx: (Math.random() - 0.5) * 160 * s, vy: -Math.random() * 60, r: 6 + Math.random() * 8 * s, t: 0.45, t0: 0.45 }); };
+// 총 쏠 때 불꽃은 그림에 그려진 것만 씀(사용자 2026-10-24) — 코드는 탄피만
 function muzzleFlash(p, big) {
-  if (!vfx('muzzle_flash', p.x, p.y, big ? 2.6 : 2, { flip: P.face < 0 })) fx.push({ k: 'flash', x: p.x, y: p.y, dir: P.face, t: big ? 0.09 : 0.05, big });
   for (let i = 0; i < (big ? 3 : 1); i++) fx.push({ k: 'shell', x: p.x - P.face * 30, y: p.y, vx: -P.face * (80 + Math.random() * 80), vy: -220 - Math.random() * 120, g: P.y, t: 1.2 });
 }
 
@@ -193,7 +194,7 @@ function fireEv(e) {
   const id = P.clip.id, a = A[id], f = e.f;
   if (e.ev === 'hit' || e.ev === 'hitH' || e.ev === 'hitL') {
     const big = e.ev !== 'hit';
-    const p = framePt(id, f, a.reach[f], a.h * 0.42);
+    const p = framePt(id, f, a.reach[f], a.h * (e.hy || 0.42));   // 슬라이딩은 발끝 높이(hy)
     if (inReach(p.x, big ? 75 : 60)) {
       // 맞았을 때만: 살짝 멈춤 + 샌드백 경직
       hitstop = big ? 0.16 : 0.075; shake = big ? 16 : 6; dShake = big ? 9 : 5;
@@ -220,7 +221,7 @@ function fireEv(e) {
     muzzleFlash(p, big || e.ev === 'shotS'); sfx('shot');
     const hitD = showDummy && Math.abs(D.y - P.y) < 60 && (D.x - P.x) * P.face > 0;
     const endX = hitD ? D.x - P.face * 14 : (P.face > 0 ? W + 20 : -20);
-    if (VFX.tracer) { const tt = Math.abs(endX - p.x) / 4200; fx.push({ k: 'bullet', x: p.x, y: p.y, x2: endX, y2: p.y + (Math.random() - 0.5) * 18, t: tt, t0: tt }); if (hitD) later(tt, () => { if (!vfx('bullet_hit_body', endX, p.y, 2)) sparks(endX, p.y, 4, false, '#fff6d0'); }); } else fx.push({ k: 'tracer', x: p.x, y: p.y, x2: endX, t: big ? 0.12 : 0.06, big });
+    if (VFX.tracer) { const tt = Math.abs(endX - p.x) / 4200; if (Math.random() < 0.4) fx.push({ k: 'bullet', x: p.x, y: p.y, x2: endX, y2: p.y + (Math.random() - 0.5) * 18, t: tt, t0: tt }); if (hitD) later(tt, () => { if (!vfx('bullet_hit_body', endX, p.y, 2)) sparks(endX, p.y, 4, false, '#fff6d0'); }); } else fx.push({ k: 'tracer', x: p.x, y: p.y, x2: endX, t: big ? 0.12 : 0.06, big });
     shake = Math.max(shake, big ? 9 : 2.5);
     if (hitD) { sfx('hit', { strength: big ? 2 : 1, kind: 'bullet' }); hurtDummy(big ? 40 : e.ev === 'shotS' ? 9 : 7, big ? 'heavy' : 'light'); sparks(endX, p.y, big ? 16 : 5, big); if (big) hitstop = 0.08; }
   } else if (e.ev === 'beam') {
@@ -228,7 +229,7 @@ function fireEv(e) {
     muzzleFlash(p, true); sfx('shot'); sfx('hit', { strength: 3, kind: 'bullet' });
     // 단계마다 다르게: 1단 = 가는 흰 광선, 2단 = 굵은 푸른 광선 + 충격파, 3단(최대) = 보라 대구경 + 화면 번쩍·띄우기
     const W_ = [0, 10, 24, 40][lv], col = CH_COL[lv];
-    if (VFX.charge_beam) fx.push({ k: 'beamS', x: p.x, y: p.y, dir: P.face, t: 0.22 + lv * 0.1, t0: 0.22 + lv * 0.1, sy: [0, 0.55, 1, 1.6][lv] });
+    if (VFX.charge_beam) fx.push({ k: 'beamS', x: p.x, y: p.y, dir: P.face, t: 0.22 + lv * 0.1, t0: 0.22 + lv * 0.1, sy: [0, 0.35, 0.6, 0.9][lv] });
     else fx.push({ k: 'beam', x: p.x, y: p.y, dir: P.face, t: 0.22 + lv * 0.08, t0: 0.22 + lv * 0.08, w: W_, c: col, lv });
     if (lv >= 3) { flash = 0.2; dust(P.x - P.face * 30, P.y, 10, 1.6); }
     shake = [0, 8, 15, 24][lv];
@@ -237,11 +238,13 @@ function fireEv(e) {
   else if (e.ev === 'scan') { sfx('ability'); fx.push({ k: 'scan', x: P.x, y: P.y - 190, dir: P.face, t: 0.55, t0: 0.55 }); }
   else if (e.ev === 'mark') { if (showDummy) { D.mark = 6; ring(D.x, D.y - 230, 40, 0.3, '#ff5a4a', 3); } }
   else if (e.ev === 'sup') {   // 제압사격: 쓸면서 쏨, 넓은 폭, 약한 경직
-    const p = muzzle(); muzzleFlash(p, false); sfx('shot');
+    const p = muzzle(); sfx('shot');
     P.supT = (P.supT || 0) + 1;
-    const sw = Math.sin(P.supT * 0.55);                       // 앞 근~중거리 바닥을 부채꼴로 위아래 왕복
-    const dist = 140 + (sw * 0.5 + 0.5) * 300 + (Math.random() - 0.5) * 50, gy = P.y + sw * 55 + (Math.random() - 0.5) * 30, gx = P.x + P.face * dist;
-    if (VFX.tracer) { const tt = Math.hypot(gx - p.x, gy - p.y) / 3600; fx.push({ k: 'bullet', x: p.x, y: p.y, x2: gx, y2: gy, t: tt, t0: tt }); later(tt, () => { sparks(gx, gy - 3, 3, false, '#ffe9a0'); if (Math.random() < 0.3) dust(gx, gy, 1, 0.35); }); }
+    const sw = Math.sin(P.supT * 0.55);                       // 앞 근~중거리 바닥을 넓은 부채꼴로 흩뿌림
+    const dist = 100 + Math.random() * 440, gy = P.y + sw * 70 + (Math.random() - 0.5) * 110, gx = P.x + P.face * dist;
+    const ang = Math.atan2(gy - p.y, gx - p.x);
+    for (let i = 0; i < 1; i++) fx.push({ k: 'shell', x: p.x - P.face * 30, y: p.y, vx: -P.face * (80 + Math.random() * 80), vy: -220 - Math.random() * 120, g: P.y, t: 1.2 });
+    if (VFX.tracer) { const tt = Math.hypot(gx - p.x, gy - p.y) / 3600; if (Math.random() < 0.5) fx.push({ k: 'bullet', x: p.x, y: p.y, x2: gx, y2: gy, t: tt, t0: tt }); later(tt, () => { sparks(gx, gy - 3, 3, false, '#ffe9a0'); if (Math.random() < 0.3) dust(gx, gy, 1, 0.35); }); }
     else { fx.push({ k: 'tracer', x: p.x, y: p.y, x2: gx, y2: gy, t: 0.05, big: false }); sparks(gx, gy - 4, 3, false); }
     shake = Math.max(shake, 3);
     if (showDummy && Math.abs(D.x - gx) < 60 && Math.abs(D.y - gy) < 40) { hurtDummy(5, 'light'); sparks(D.x, D.y - 60, 4, false); }
@@ -251,7 +254,7 @@ function fireEv(e) {
     fx.push({ k: 'rocket', x: p.x + P.face * 20, x0: P.x, y: p.y, gy: P.y, dir: P.face, t: 5 });
   }
   else if (e.ev === 'slideHit') {   // 슬라이딩: 발끝이 지나가는 동안 매 장 판정
-    if (!P.slideHit) { const p = framePt(id, f, a.reach[f], a.h * 0.8); if (showDummy && Math.abs(D.y - P.y) < 64 && Math.abs(D.x - p.x) < 70 * K(P.y)) { P.slideHit = true; fireEv({ f, ev: 'hit' }); } }
+    if (!P.slideHit) { const p = framePt(id, f, a.reach[f], a.h * 0.8); if (showDummy && Math.abs(D.y - P.y) < 64 && Math.abs(D.x - p.x) < 70 * K(P.y)) { P.slideHit = true; fireEv({ f, ev: 'hit', hy: 0.88 }); } }
   }
   else if (e.ev === 'dust') { dust(P.x, P.y, 6, 1.2); sfx(P.clip.id === '19' || P.clip.id === '19_1' ? 'down' : 'step'); }
 }
@@ -259,7 +262,7 @@ function fireEv(e) {
 function explode(x, y, gy, hitD, dmg = 140) {
   sfx('hit', { strength: 3, kind: 'super' });
   shake = Math.max(shake, 14); flash = Math.max(flash, dmg >= 140 ? 0.2 : 0.04); if (hitD) hitstop = 0.2;
-  if (VFX['eileen-rpg-explosion']) { vfx('eileen-rpg-explosion', x, gy - 4, 2.4); ring(x, gy, 220, 0.45, 'rgba(255,230,180,.9)', 6, 0.28); fx.push({ k: 'scorch', x, y: gy, r: 90, t: 3.5 }); dust(x, gy, 10, 2); if (showDummy && Math.abs(D.x - x) < 200 && Math.abs(D.y - gy) < 70) hurtDummy(dmg, 'launch'); return; }
+  if (VFX['eileen-rpg-explosion']) { vfx('eileen-rpg-explosion', x, gy - 4, 2.4); ring(x, gy, 220, 0.45, 'rgba(255,230,180,.9)', 6, 0.28); if (!vfx('crater', x, gy, 2.2, { hold: 2.5, under: true })) fx.push({ k: 'scorch', x, y: gy, r: 90, t: 3.5 }); dust(x, gy, 10, 2); if (showDummy && Math.abs(D.x - x) < 200 && Math.abs(D.y - gy) < 70) hurtDummy(dmg, 'launch'); return; }
   for (let i = 0; i < 26; i++) { const a = Math.random() * Math.PI * 2, v = 80 + Math.random() * 380; fx.push({ k: 'fire', x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v * 0.7 - 60, r: 10 + Math.random() * 16, t: 0.5 + Math.random() * 0.4, t0: 0.9 }); }
   for (let i = 0; i < 16; i++) fx.push({ k: 'smoke', x: x + (Math.random() - 0.5) * 80, y: y + (Math.random() - 0.5) * 50, vx: (Math.random() - 0.5) * 60, vy: -40 - Math.random() * 70, r: 16 + Math.random() * 14, t: 1.4 + Math.random() * 0.6, t0: 2 });
   sparks(x, y, 40, true, '#ffb347');
@@ -325,7 +328,9 @@ function dodge() {
   act(fwd ? '16_1' : '16', { seq: S(R(0, 7), 0.04).map((e, i) => i >= 6 ? { ...e, cancel: true } : e), onEnd: () => { P.dodgeV = null; afterBuf(toIdle); } });
 }
 function shoot() {
-  if (P.overT > 0) { sfx('empty'); const p = P.armed ? muzzle() : { x: P.x + P.face * 40, y: P.y - 150 }; for (let i = 0; i < 3; i++) steam(p.x, p.y, 1); return; }
+  if (P.overT > 0) {   // 과열: 총은 올려 겨누고 방아쇠만 철컥(반동 한 틱), 총알은 안 나감
+    return ensureArmed(() => act('15', { seq: [{ f: 0, d: 0.03 }, { f: 1, d: 0.035 }, { f: 2, d: 0.035 }, { f: 3, d: 0.06, fn: () => { sfx('empty'); const p = muzzle(); steam(p.x, p.y, 1); } }, { f: 4, d: 0.04 }, { f: 3, d: 0.25 }, { f: 5, d: 0.05 }, { f: 6, d: 0.05 }, { f: 7, d: 0.05 }] }));
+  }
   ensureArmed(() => {
     const s = [{ f: 0, d: 0.03 }, { f: 1, d: 0.035 }, { f: 2, d: 0.035 }, { f: 3, d: 0.05, ev: 'shot' }, { f: 4, d: 0.06, rep: { key: 'shoot', to: 3 } }, { f: 5, d: 0.05 }, { f: 6, d: 0.05 }, { f: 7, d: 0.05 }];
     act('15', { seq: s });
@@ -342,8 +347,8 @@ function skill() {
 }
 // 필살기 「증명해.」 지원 포격(2026-10-24): 판독 동작으로 손가락이 세 곳을 짚으면 그 자리에 표적 → 포탄이 연달아 떨어져 폭발
 const later = (t, fn) => fx.push({ k: 'timer', t, fn });
-function artillerySuper() {
-  if (!spReady()) return;
+function artillerySuper(chained) {
+  if (!chained && !spReady()) return;
   ensureArmed(() => {
     const a = A['22'];
     // 떨어질 자리를 먼저 정하고, 손가락으로 짚을 때마다 그 자리들에 표적을 찍음 → 포탄은 정확히 표적에 떨어짐
@@ -352,7 +357,7 @@ function artillerySuper() {
     if (showDummy) spots.splice(Math.random() * spots.length | 0, 0, { x: D.x, y: D.y });
     const marks = spots.map(sp => ({ k: 'target', x: sp.x, y: sp.y, t: 8 }));
     const paint = g => { marks.forEach((m, n) => { if (n % 3 === g) fx.push(m); }); sfx('ui'); };
-    const s = [{ f: 0, d: 0.3, ev: 'cut' }];
+    const s = chained ? [{ f: 0, d: 0.08 }] : [{ f: 0, d: 0.3, ev: 'cut' }];
     for (let f = 1; f < a.n; f++) s.push({ f, d: f === 2 || f === 4 || f === 6 ? 0.28 : 0.1, fn: f === 2 ? () => paint(0) : f === 4 ? () => paint(1) : f === 6 ? () => paint(2) : null });
     act('22', { seq: s, onEnd: () => {
       P.noGain = P.t + 6;   // 필살기 피해로는 게이지가 안 참
@@ -394,7 +399,7 @@ function release() {
   const aimF = curF();
   act('23', { seq: [{ f: aimF, d: 0.12, ev: P.chargeLv ? 'beam' : 'shotH' }], onEnd: () => act('24', { seq: S(R(1, A['24'].n - 1), 0.06) }) });   // 광선은 겨눈 장에서, 반동은 그다음
 }
-function superMove(free) {
+function superMove(free, then) {
   if (!free && !spReady()) return;
   ensureArmed(() => {
     const a = A['25'];
@@ -404,9 +409,11 @@ function superMove(free) {
     for (let k = 0; k < 16; k++) s.push({ f: peaks[k % 2], d: 0.055, ev: 'shotS' });   // 난사: 반동 장 두 개를 번갈아
     s.push({ f: peaks[1], d: 0.2, ev: 'shotH' });
     for (let f = peaks[1] + 1; f < a.n; f++) s.push({ f, d: 0.07 });
-    act('25', { seq: s });
+    act('25', { seq: s, onEnd: then || (() => afterBuf(toIdle)) });
   });
 }
+// 필살기 「증명해.」(사용자 2026-10-24): 무릎 쏴 난사(옛 25) → 판독으로 표적 → 포격
+function proveSuper() { if (!spReady()) return; P.noGain = P.t + 12; superMove(true, () => artillerySuper(true)); }
 
 // ── 이동·점프 ──
 function jump() {
@@ -468,6 +475,9 @@ function crouch() { P.mode = 'crouch'; play('41', { seq: [...S(R(0, 3), 0.08), .
 
 function onPress(a) {
   if (a === 'left' || a === 'right') { const now = performance.now(); if (now - (P.lastTap[a] || 0) < 260) P.runLatch = true; P.lastTap[a] = now; }
+  if (a === 'heal' && P.mode === 'ground') { emote('26', 7); later(0.5, () => { P.hp = Math.min(100, P.hp + 40); if (P.hp > 25) P.dying = false; if (!vfx('heal', P.x, P.y, 2.2)) fx.push({ k: 'num', x: P.x, y: P.y - 230, v: '+40', t: 0.8 }); sfx('heal'); }); return; }
+  if (a === 'drop') { items.push({ x: P.x + P.face * 120, y: P.y, t0: P.t }); return; }
+  if (a === 'status') { P.status = [null, 'status_poison', 'status_burn', 'status_shock'][([null, 'status_poison', 'status_burn', 'status_shock'].indexOf(P.status || null) + 1) % 4]; return; }
   if (a === 'dying') { P.dying = !P.dying; P.hp = P.dying ? 18 : 100; if (P.dying) sfx('hp:low'); return; }
   if (a === 'hit' || a === 'knock') { if (P.mode !== 'down' && P.mode !== 'belly') return takeHit(a === 'knock' ? 'knock' : 'hit'); }
   if ((P.mode === 'flee' || P.mode === 'back') && !['left', 'right', 'up', 'down', 'run'].includes(a)) toIdle();
@@ -514,7 +524,7 @@ function onPress(a) {
     case 'shoot': return shoot();
     case 'skill': return skill();
     case 'charge': return charge();
-    case 'super': return artillerySuper();
+    case 'super': return proveSuper();
     case 'skillOld': return skillOld();
     case 'superOld': return superMove(false);
     case 'combat':
@@ -525,19 +535,19 @@ function onPress(a) {
       if (!P.armed) return ensureArmed(toIdle);
       return reverseOut('W', R(3, 0), 0.05, () => { P.armed = false; toIdle(); });
     case 'stun': return stun();
-    case 'respond': return emote('28', 7);
-    case 'talk': return emote('29', 7, { seq: S([...R(0, 3), ...R(0, 3), ...R(0, 3)], 1 / 7) });
+    case 'respond': return emote('28', 7, { seq: [{ f: 0, d: 0.1 }, { f: 1, d: 0.1 }, { f: 2, d: 0.12 }, { f: 3, d: 0.6 }, { f: 2, d: 0.12 }, { f: 1, d: 0.1 }, { f: 0, d: 0.15 }] });
+    case 'talk': return emote('29', 7, { seq: [...S([0, 1, 2], 0.16), { f: 3, d: 0.35 }, ...S([2, 1], 0.16), { f: 0, d: 0.6 }, ...S([1, 2], 0.16), { f: 3, d: 0.35 }, ...S([2, 1, 0], 0.16)] });
     case 'nod': return emote('30', 8, { seq: S([0, 1, 2, 1, 0, 1, 2, 1, 0], 0.15) });   // 천천히 두 번
     // 고개 젓기: 한쪽 끝·반대쪽 끝에서 살짝 머물고 가운데는 빨리 지나감 × 2
-    case 'shake': return emote('31', 9, { seq: S([0, 1, 2, 1, 0, 3, 0, 1, 2, 1, 0, 3, 0], 0.13) });   // 좌우 딱 두 번, 천천히
+    case 'shake': return emote('31', 9, { seq: [{ f: 0, d: 0.1 }, { f: 1, d: 0.06 }, { f: 2, d: 0.22 }, { f: 1, d: 0.05 }, { f: 0, d: 0.04 }, { f: 3, d: 0.22 }, { f: 0, d: 0.04 }, { f: 1, d: 0.05 }, { f: 2, d: 0.22 }, { f: 1, d: 0.05 }, { f: 0, d: 0.04 }, { f: 3, d: 0.22 }, { f: 0, d: 0.15 }] });   // 왼끝·오른끝에서만 머묾, 좌우 두 번
     case 'angry': return emote('32', 9);
     case 'happy': return emote('35', 8);
     case 'surprise': return emote('34', 8, { seq: [...S(R(0, 1), 0.06), { f: 2, d: 0.35 }, ...S(R(3, A['34'].n - 1), 0.12)] });
     case 'eat': return emote('26', 7, { seq: A['26'].n === 8 ? [...S(R(0, 2), 0.12), ...S(R(3, 5), 0.22), ...S(R(6, 7), 0.2)] : undefined });
-    case 'pick': return emote('27', 8);
+    case 'pick': { const it = items.findIndex(it => Math.abs(it.x - P.x) < 110 && Math.abs(it.y - P.y) < 40); if (it >= 0) { items.splice(it, 1); later(0.45, () => { sfx('pickup'); P.hp = Math.min(100, P.hp + 20); vfx('heal', P.x, P.y, 1.8); }); } return emote('27', 8); }
     case 'personal': return emote('2', 7);
     // 발견 반응: 주먹 올리는 뒤 3장(6~8장)은 빼고, 움찔한 뒤 바라보는 장에서 잠깐 머묾
-    case 'notice': fx.push({ k: 'icon', v: '!', t: 1.0 }); return act('33', { seq: [{ f: 0, d: 0.06 }, { f: 1, d: 0.06 }, { f: 2, d: 0.1 }, { f: 3, d: 0.12 }, { f: 4, d: 0.4 }] });
+    case 'notice': fx.push({ k: 'icon', v: '!', t: 1.0 }); return act('33', { seq: [{ f: 0, d: 0.06 }, { f: 1, d: 0.06 }, { f: 2, d: 0.1 }, { f: 3, d: 0.12 }, { f: 4, d: 0.45 }, ...S([3, 2, 1, 0], 0.04)] });   // 바라본 뒤 빠르게 거꾸로
     case 'sit': return sit();
     case 'crouch': return crouch();
   }
@@ -667,7 +677,7 @@ function update(dt) {
     case 'stun': P.stunT -= dt; if (P.stunT <= 0) reverseOut('21', [curF() > 1 ? 1 : curF(), 0], 0.07); break;
     case 'flee': if (!down('flee')) { toIdle(); break; } if (dx) P.face = dx; P.x += P.face * 400 * dt; P.y += dy * 180 * dt; break;
     case 'back': { if (!down('back')) { toIdle(); break; } if (P.clip && P.clip.id === '37_1') P.x -= P.face * 80 * dt; P.y += dy * 60 * dt; break; }   // 손드는 동안(37)은 제자리, 걸음(37_1)부터 뒤로
-    case 'sit': if (P.clip && P.clip.id === '39' && P.clip.i >= 7 && dx && dx === -P.face) { P.mode = 'scoot'; play('40', { fps: 6, loopFrom: 0 }); } break;
+    case 'sit': if (P.clip && P.clip.id === '39' && curF() >= 7 && dx && dx === -P.face) { P.mode = 'scoot'; play('40', { fps: 6, loopFrom: 0 }); } break;
     case 'scoot': if (!(dx && dx === -P.face)) { sitLoop(); break; } P.x -= P.face * 70 * dt; break;
     case 'crouch': if (P.clip && P.clip.i >= 4 && dx) { P.face = dx; P.mode = 'crawl4'; if (has('42_1')) play('42', { seq: S(R(0, 5), 0.08), onEnd: () => { if (P.mode === 'crawl4') play('42_1', { seq: S(R(1, A['42_1'].n - 1), 0.1), loopFrom: 0 }); } }); else play('42', { seq: [...S(R(0, 3), 0.08), ...S(R(4, 11), 0.085)], loopFrom: 4 }); } break;
     case 'crawl4': { const go = dx !== 0, looping = P.clip.id === '42_1' || P.clip.i >= 4; if (go) P.face = dx; P.clip.paused = !go && looping; if (go && looping) P.x += dx * 85 * dt; break; }
@@ -737,6 +747,7 @@ function drawPlayer() {
   else if (P.mode === 'charge') { const lv = P.charge >= 2 ? 3 : P.charge > 1.3 ? 2 : P.charge > 0.5 ? 1 : 0; tint = { c: CH_COL[lv], over: 0.1 + 0.12 * Math.sin(P.t * 20) }; }
   drawSprite(id, f, P.x, P.y, P.z, P.face, 1, tint);
   if (P.mode === 'charge') { const m = muzzle(); drawVfxAt('charge_gather', m.x, m.y, 1.4 + P.charge * 0.7, P.t); }
+  if (P.status) drawVfxAt(P.status, P.x, P.status === 'status_shock' ? P.y - 110 * kk : P.y, 2 * kk, P.t);   // 상태이상
   if (P.mode === 'stun') {   // 머리 위 별
     const hy = P.y - (BASE(a) - a.top[f]) * kk - 14;
     if (!drawVfxAt('stun_stars', P.x, hy, 2.2, P.t)) for (let i = 0; i < 3; i++) { const t = P.t * 4 + i * 2.09; star(P.x + Math.cos(t) * 26, hy + Math.sin(t) * 7, 7, '#ffe066'); }
@@ -767,11 +778,12 @@ function drawVfxAt(name, x, y, sc, el, flip) {   // 캐릭터를 따라다니는
   ctx.save(); ctx.translate(Math.round(x), Math.round(y)); ctx.scale(flip ? -sc : sc, sc); ctx.drawImage(v.img, fx0, fy0, fw, fh, -fw * v.pivot[0], -fh * v.pivot[1], fw, fh); ctx.restore(); return true;
 }
 function sheetFrame(v, el) { el = el * 1000; let i = 0; while (i < v.frames.length - 1 && el >= v.frames[i][4]) { el -= v.frames[i][4]; i++; } return v.frames[i]; }
-function drawSheets() {
+function drawSheets(under = false) {
   for (const e of fx) {
+    if (!!e.under !== under) continue;
     if (e.k === 'bullet' && VFX.tracer && VFX.tracer.img.complete) {   // 예광탄: 총구에서 맞는 자리까지 날아감
       const k = 1 - e.t / e.t0, x = e.x + (e.x2 - e.x) * k, y = e.y + (e.y2 - e.y) * k, [fx0, fy0, fw, fh] = sheetFrame(VFX.tracer, (e.t0 - e.t) % vfxDur('tracer'));
-      ctx.save(); ctx.translate(x, y); ctx.rotate(Math.atan2(e.y2 - e.y, e.x2 - e.x)); ctx.drawImage(VFX.tracer.img, fx0, fy0, fw, fh, -fw * 2, -fh, fw * 2, fh * 2); ctx.restore();
+      ctx.save(); ctx.translate(x, y); ctx.rotate(Math.atan2(e.y2 - e.y, e.x2 - e.x)); ctx.drawImage(VFX.tracer.img, fx0, fy0, fw, fh, -fw * 1.3, -fh * 0.65, fw * 1.3, fh * 1.3); ctx.restore();
     }
     if (e.k === 'beamS' && VFX.charge_beam && VFX.charge_beam.img.complete) {   // 충전 광선: 그림을 가로로 이어 붙임
       const v = VFX.charge_beam, [fx0, fy0, fw, fh] = sheetFrame(v, (e.t0 - e.t) % vfxDur('charge_beam')), sc = e.sy * (0.5 + 0.5 * e.t / e.t0);
@@ -780,7 +792,7 @@ function drawSheets() {
       // 총구 쪽은 가늘게 시작해 굵어지고(앞 140px), 끝도 살짝 가늘게 — 8px씩 잘라 높이를 바꿔 그림
       const taper = 140, step = 8;
       for (let x = 0; x < len; x += step) {
-        const k0 = Math.min(1, 0.12 + (x / taper) ** 0.7 * 0.88) * Math.min(1, (len - x) / 60 + 0.4);
+        const k0 = Math.min(1, 0.12 + (x / taper) ** 0.7 * 0.88);
         const sx = fx0 + ((x / 2) % fw), sw = Math.min(step / 2, fw - (sx - fx0));
         ctx.drawImage(v.img, sx, fy0, sw, fh, x, -fh * sc * k0, sw * 2, fh * 2 * sc * k0);
       }
@@ -795,7 +807,15 @@ function drawSheets() {
     ctx.restore();
   }
 }
+function drawTargets() {   // 필살기 바닥 표적: 캐릭터 밑에 그림
+  for (const e of fx) if (e.k === 'target') {
+    const bl = Math.sin(P.t * 14) > 0, r = 26;
+    ctx.strokeStyle = bl ? 'rgba(255,70,50,.95)' : 'rgba(255,170,60,.8)'; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.ellipse(e.x, e.y, r, r * 0.35, 0, 0, Math.PI * 2); ctx.moveTo(e.x - r - 8, e.y); ctx.lineTo(e.x + r + 8, e.y); ctx.moveTo(e.x, e.y - 12); ctx.lineTo(e.x, e.y + 12); ctx.stroke();
+  }
+}
 function drawFxUnder() {
+  drawTargets();
   for (const e of fx) if (e.k === 'scorch') { ctx.fillStyle = `rgba(20,14,10,${0.55 * Math.min(1, e.t)})`; ctx.beginPath(); ctx.ellipse(e.x, e.y, e.r, e.r * 0.28, 0, 0, Math.PI * 2); ctx.fill(); }
   for (const e of fx) if (e.k === 'dust') { const k = e.t / e.t0; ctx.fillStyle = `rgba(200,190,170,${0.45 * k})`; ctx.beginPath(); ctx.arc(e.x, e.y - 4, e.r * (1.6 - k), 0, Math.PI * 2); ctx.fill(); }
   for (const e of fx) if (e.k === 'ghost') drawSprite(e.id, e.f, e.x, e.y, e.z, e.face, 0.16 * e.t / e.t0, { c: '#a8ccff', over: 0.3, noEdge: true });
@@ -816,7 +836,7 @@ function drawFx(glow) {
       for (const sgn of [-1, 1]) { ctx.beginPath(); ctx.moveTo(e.x + d * 4, e.y); ctx.lineTo(e.x + d * L * 0.35, e.y + sgn * Wd * 1.6 * j); ctx.lineTo(e.x + d * 10, e.y + sgn * 2); ctx.fill(); }
     }
     else if (e.k === 'blood') { ctx.fillStyle = `rgba(150,10,16,${Math.min(1, e.t)})`; if (e.landed) { ctx.beginPath(); ctx.ellipse(e.x, e.y, e.s * 2.2, e.s * 0.8, 0, 0, Math.PI * 2); ctx.fill(); } else ctx.fillRect(e.x - e.s / 2, e.y - e.s / 2, e.s, e.s); }
-    else if (e.k === 'target') {
+    else if (e.k === 'target' && false) {
       const bl = Math.sin(P.t * 14) > 0, r = 26;
       ctx.strokeStyle = bl ? 'rgba(255,70,50,.95)' : 'rgba(255,170,60,.8)'; ctx.lineWidth = 3;
       ctx.beginPath(); ctx.ellipse(e.x, e.y, r, r * 0.35, 0, 0, Math.PI * 2); ctx.moveTo(e.x - r - 8, e.y); ctx.lineTo(e.x + r + 8, e.y); ctx.moveTo(e.x, e.y - 12); ctx.lineTo(e.x, e.y + 12); ctx.stroke();
@@ -915,6 +935,8 @@ function draw() {
   drawBg();
   if (dark) { ctx.fillStyle = `rgba(0,0,0,${Math.min(0.7, dark * 0.9)})`; ctx.fillRect(0, 0, W, H); }
   drawFxUnder();
+  drawSheets(true);   // 바닥에 깔리는 그림 이펙트(크레이터)
+  for (const it of items) { ctx.fillStyle = '#c94a4a'; ctx.fillRect(it.x - 6, it.y - 14, 12, 14); ctx.fillStyle = '#eee'; ctx.fillRect(it.x - 4, it.y - 18, 8, 4); drawVfxAt('item_sparkle', it.x + 6, it.y - 20, 2, P.t - it.t0); }
   if (D.y < P.y) { drawDummy(); drawPlayer(); } else { drawPlayer(); drawDummy(); }
   // 이펙트 층: 일반(연기·탄피·피) / 빛(불꽃·섬광·광선·불) — 1/3 크기로 그려 도트로 키움
   const main = ctx;

@@ -27,20 +27,17 @@ for aid, folder, d, name in LIST:
     fs = sorted((M / folder).glob("[0-9][0-9].png"))
     if not fs: continue   # 아직 안 뽑은 줄(무기 대기 등)
     ims = [Image.open(f).convert("RGBA") for f in fs]
-    if aid in GUN:   # 그림에 그려진 총구 불꽃 지우기(불꽃은 코드·VFX가 그림): 총구(가장 앞 어두운 픽셀)보다 앞에 있는 밝은 픽셀
+    KEEP_FLASH = GUN   # 사용자 2026-10-24: 총 쏠 때는 그림에 그려진 원래 불꽃을 씀(덧붙이는 이펙트 없음) → 지우지 않음
+    if aid in GUN and aid not in KEEP_FLASH:   # 그림에 그려진 총구 불꽃 지우기(불꽃은 코드·VFX가 그림): 노랑·주황·흰 심 색만 지움 — 회색·검정 총구 끝은 남김
         for im in ims:
-            px = im.load(); y0, y1 = int(im.height * 0.2), int(im.height * 0.72)
-            lum = lambda c: 0.3 * c[0] + 0.59 * c[1] + 0.11 * c[2]
-            dark = [x for y in range(y0, y1) for x in range(im.width) if px[x, y][3] > 40 and lum(px[x, y]) < 95]
-            if not dark: continue
-            mx = max(dark)
-            for y in range(y0, y1):
-                for x in range(mx + 1, im.width):
-                    if px[x, y][3] > 0 and lum(px[x, y]) > 110: px[x, y] = (0, 0, 0, 0)
-            for y in range(im.height):   # 남은 진한 노랑·주황 불꽃 조각
+            px = im.load()
+            for y in range(im.height):
                 for x in range(im.width):
                     r, g, b_, a = px[x, y]
-                    if a > 0 and r > 200 and g > 120 and b_ < 120 and r - b_ > 110: px[x, y] = (0, 0, 0, 0)
+                    if a == 0: continue
+                    warm = r > 200 and g > 130 and b_ < 100 and x > im.width * 0.55   # 노랑·주황 불꽃(앞쪽만, 피부·머리는 파랑값이 높아 안 걸림)
+                    core = r > 235 and g > 225 and b_ > 180 and abs(r - b_) < 60 and y < im.height * 0.75 and x > im.width * 0.55   # 흰 불꽃 심(앞쪽)
+                    if warm or core: px[x, y] = (0, 0, 0, 0)
     for im in ims:   # 몸에서 떨어진 작은 점(15px 미만) 지우기 — 무릎 앞 찌꺼기 등
         px = im.load(); W_, H_ = im.size; seen = set()
         for y0 in range(H_):
@@ -83,10 +80,10 @@ for aid, folder, d, name in LIST:
         if aid in GUN:
             # 총구 = 가슴~허리 띠에서 가장 앞(오른쪽)에 있는 어두운 픽셀(총은 검정). 밝은 찌꺼기·불꽃은 안 잡힘
             best = None
-            for y in range(int(h * 0.2), int(h * 0.72)):
+            for y in range(int(h * 0.2), int(h * 0.8)):
                 for x in range(w - 1, -1, -1):
                     c = px[x, y]
-                    if c[3] > 40 and 0.3 * c[0] + 0.59 * c[1] + 0.11 * c[2] < 95:
+                    if c[3] > 40 and 0.3 * c[0] + 0.59 * c[1] + 0.11 * c[2] < 140 and max(c[:3]) - min(c[:3]) < 40:
                         if best is None or x > best[0]: best = (x, y)
                         break
             mz.append([best[0] - w // 2, best[1]] if best else [40, h // 2])
@@ -99,7 +96,7 @@ for js in sorted((HERE.parent / "vfx").glob("*.json")):
     meta = json.loads(js.read_text())
     png = js.with_suffix(".png").read_bytes()
     VFX[js.stem] = dict(frames=[[f["frame"]["x"], f["frame"]["y"], f["frame"]["w"], f["frame"]["h"], f["duration"]] for f in meta["frames"]],
-                        pivot=[meta["frames"][0]["pivot"]["x"], meta["frames"][0]["pivot"]["y"]],
+                        pivot=[(lambda v, n: v / n if v > 1 else v)(meta["frames"][0]["pivot"]["x"], meta["frames"][0]["frame"]["w"]), (lambda v, n: v / n if v > 1 else v)(meta["frames"][0]["pivot"]["y"], meta["frames"][0]["frame"]["h"])],
                         src="data:image/png;base64," + base64.b64encode(png).decode())
 html = (HERE / "room.html").read_text(encoding="utf-8").replace("/*__DATA__*/null", json.dumps(data, ensure_ascii=False)).replace("/*__VFX__*/null", json.dumps(VFX)).replace("/*__AUDIO__*/", (HERE / "audio.js").read_text(encoding="utf-8"))
 out = M / "에일린_테스트룸.html"
