@@ -2,7 +2,7 @@
   "slug": "kyuras",
   "slot": "two-footed-jump",
   "character_id": "7cf2502d-e2e9-4677-bc53-ec1b9d76a11d",
-  "skeleton_visually_reviewed": false,
+  "skeleton_visually_reviewed": true,
   "first_frame_path": "game-src/art/field/production/motion-inputs/kyuras/first-frame.png",
   "new_user_approval": false,
   "landmark_source": "current character own east estimated 2d reference",
@@ -844,5 +844,6 @@
     "template_id": "mannequin",
     "seed": 2026110002,
     "no_background": true
-  }
+  },
+  "review_findings": "AVIF 연녹색 넘긴 머리/녹색 눈/마른 체격/검정 정장, 보충 로어 및 사용자 키180cm 확인. 관리국 유지 대상 원본 픽셀과 own east 18관절 및 전 자세 경계 확인."
 }

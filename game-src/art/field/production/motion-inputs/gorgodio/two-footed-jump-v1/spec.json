@@ -2,7 +2,7 @@
   "slug": "gorgodio",
   "slot": "two-footed-jump",
   "character_id": "1d8d12e4-06d5-4df8-8812-0754f77b736b",
-  "skeleton_visually_reviewed": false,
+  "skeleton_visually_reviewed": true,
   "first_frame_path": "game-src/art/field/production/motion-inputs/gorgodio/first-frame.png",
   "new_user_approval": false,
   "landmark_source": "current character own east estimated 2d reference",
@@ -844,5 +844,6 @@
     "template_id": "mannequin",
     "seed": 2026110002,
     "no_background": true
-  }
+  },
+  "review_findings": "원작 AVIF 민머리/수염/넓은 체격/가죽재킷, 로어 체격 및 사용자 키190cm 확인. 유지 원본 픽셀 무변경. 본인 east 원본 대응 18관절과 모든 점프 자세/캔버스 경계 열람."
 }

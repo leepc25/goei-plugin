@@ -36741,7 +36741,7 @@
       "kind": "motion-frame-candidate-running-8-frames-hair-2",
       "slug": "jaemtri",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792805186.5027175,
       "receipt": {
         "usage": null,
@@ -36752,29 +36752,65 @@
       "archive_output": "motion-frame-candidates/jaemtri/running-8-frames/hair-2/frames",
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 2.0
         },
         "id": "4e77c51b-a338-402b-b35f-dc2e30f3a2ba",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-24T01:26:27.282735+00:00",
         "last_response": {
-          "type": "message_progress",
-          "action": "generating",
+          "seed": 2026110901,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
           "status": "initializing",
-          "progress": 0.13046055366856843,
+          "progress": 1.0,
           "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 2
+          },
+          "generation_id": "5d08d79e-f3a7-4006-a03a-c2116c8c91ac",
           "queue_position": 0,
+          "billing_charged": true,
           "generation_started_at": "2026-10-24T01:27:37.743524+00:00",
           "estimated_wait_seconds": 0
         }
-      }
+      },
+      "observed_end_epoch": 1792805362.5351875,
+      "elapsed_observed_seconds": 176.03247022628784,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 2
+      },
+      "saved_frames": 3
     },
     "a7f35a75-bb05-4c0e-bad4-d6d241bc9d1c": {
       "kind": "motion-frame-candidate-running-slide-low-slide-2",
       "slug": "jaemtri",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792805188.17339,
       "receipt": {
         "usage": null,
@@ -36785,29 +36821,65 @@
       "archive_output": "motion-frame-candidates/jaemtri/running-slide/low-slide-2/frames",
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 2.0
         },
         "id": "a7f35a75-bb05-4c0e-bad4-d6d241bc9d1c",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-24T01:26:30.051401+00:00",
         "last_response": {
-          "type": "message_progress",
-          "action": "generating",
+          "seed": 2026110902,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
           "status": "initializing",
-          "progress": 0.1272128880383402,
+          "progress": 1.0,
           "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 2
+          },
+          "generation_id": "95977abf-a1ae-4152-a8c6-2079caa7eca6",
           "queue_position": 0,
+          "billing_charged": true,
           "generation_started_at": "2026-10-24T01:27:40.516681+00:00",
           "estimated_wait_seconds": 0
         }
-      }
+      },
+      "observed_end_epoch": 1792805369.646949,
+      "elapsed_observed_seconds": 181.47355937957764,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 2
+      },
+      "saved_frames": 3
     },
     "4883f298-4768-4a52-bdd7-ff2f0f017356": {
       "kind": "animation",
       "slug": "jaemtri",
       "template": "front-flip",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792805260.8801625,
       "receipt": {
         "usage": null,
@@ -36817,20 +36889,119 @@
       "endpoint": "animate-with-skeleton-v3",
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 3.0
         },
         "id": "4883f298-4768-4a52-bdd7-ff2f0f017356",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-24T01:27:41.766313+00:00",
         "last_response": {
-          "type": "background",
+          "seed": 2026111000,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
           "status": "initializing",
+          "progress": 1.0,
           "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "d7c5e94f-a192-4b93-872a-afbbd1de0293",
           "queue_position": 0,
+          "billing_charged": true,
+          "generation_started_at": "2026-10-24T01:28:57.385228+00:00",
           "estimated_wait_seconds": 0
         }
-      }
+      },
+      "observed_end_epoch": 1792805518.8037877,
+      "elapsed_observed_seconds": 257.92362570762634,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 13
     },
     "c2c568a0-a488-4c20-87d2-e260728449c1": {
       "kind": "animation",
@@ -36853,10 +37024,13 @@
         "status": "processing",
         "created_at": "2026-10-24T01:27:44.440506+00:00",
         "last_response": {
-          "type": "background",
+          "type": "message_progress",
+          "action": "smoothing frames",
           "status": "initializing",
+          "progress": 0.97,
           "flow_kind": "animation",
           "queue_position": 0,
+          "generation_started_at": "2026-10-24T01:28:55.798827+00:00",
           "estimated_wait_seconds": 0
         }
       }
@@ -36865,14 +37039,165 @@
       "kind": "animation",
       "slug": "jaemtri",
       "template": "running-jump",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792805299.4352233,
       "receipt": {
         "usage": null,
         "background_job_id": "7c53731e-5ac7-411f-a975-9ad2ad339232",
         "status": "processing"
       },
-      "endpoint": "animate-with-skeleton-v3"
+      "endpoint": "animate-with-skeleton-v3",
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 3.0
+        },
+        "id": "7c53731e-5ac7-411f-a975-9ad2ad339232",
+        "status": "completed",
+        "created_at": "2026-10-24T01:28:19.780471+00:00",
+        "last_response": {
+          "seed": 2026111101,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "status": "initializing",
+          "progress": 1.0,
+          "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "e1b3d93f-8848-427b-8d64-d5a65eeb3098",
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_started_at": "2026-10-24T01:29:37.255198+00:00",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792805518.8239527,
+      "elapsed_observed_seconds": 219.38872957229614,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 8
+    },
+    "1894d8b1-e354-4fb6-8dcd-4a0862bbb938": {
+      "kind": "motion-frame-candidate-running-8-frames-hair-3",
+      "slug": "jaemtri",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792805430.921689,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "1894d8b1-e354-4fb6-8dcd-4a0862bbb938",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3",
+      "archive_output": "motion-frame-candidates/jaemtri/running-8-frames/hair-3/frames",
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "1894d8b1-e354-4fb6-8dcd-4a0862bbb938",
+        "status": "processing",
+        "created_at": "2026-10-24T01:30:32.017005+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "action": "generating",
+          "status": "initializing",
+          "progress": 0.13369362671424276,
+          "flow_kind": "animation",
+          "queue_position": 0,
+          "generation_started_at": "2026-10-24T01:31:26.445135+00:00",
+          "estimated_wait_seconds": 0
+        }
+      }
+    },
+    "cc112716-4ac9-4396-aab4-40c4843f133d": {
+      "kind": "motion-frame-candidate-running-slide-low-slide-3",
+      "slug": "jaemtri",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792805432.8310819,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "cc112716-4ac9-4396-aab4-40c4843f133d",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3",
+      "archive_output": "motion-frame-candidates/jaemtri/running-slide/low-slide-3/frames",
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "cc112716-4ac9-4396-aab4-40c4843f133d",
+        "status": "processing",
+        "created_at": "2026-10-24T01:30:33.648932+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "action": "generating",
+          "status": "initializing",
+          "progress": 0.11075335544153263,
+          "flow_kind": "animation",
+          "queue_position": 0,
+          "generation_started_at": "2026-10-24T01:31:43.460905+00:00",
+          "estimated_wait_seconds": 0
+        }
+      }
     }
   },
   "characters": {
@@ -37601,7 +37926,9 @@
       },
       "motion-frame-candidate-front-flip-clean-inverted-1": "8e1dd84c-ea7f-49bf-bc5b-b2c4ffde9dac",
       "motion-frame-candidate-running-8-frames-hair-2": "4e77c51b-a338-402b-b35f-dc2e30f3a2ba",
-      "motion-frame-candidate-running-slide-low-slide-2": "a7f35a75-bb05-4c0e-bad4-d6d241bc9d1c"
+      "motion-frame-candidate-running-slide-low-slide-2": "a7f35a75-bb05-4c0e-bad4-d6d241bc9d1c",
+      "motion-frame-candidate-running-8-frames-hair-3": "1894d8b1-e354-4fb6-8dcd-4a0862bbb938",
+      "motion-frame-candidate-running-slide-low-slide-3": "cc112716-4ac9-4396-aab4-40c4843f133d"
     },
     "aileen": {
       "name": "에일린",
@@ -60284,9 +60611,103 @@
           "status": "processing"
         }
       }
+    },
+    {
+      "at": "2026-10-24T01:29:22Z",
+      "kind": "completed",
+      "slug": "jaemtri",
+      "detail": {
+        "kind": "motion-frame-candidate-running-8-frames-hair-2",
+        "template": null,
+        "job_id": "4e77c51b-a338-402b-b35f-dc2e30f3a2ba",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 2
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T01:29:29Z",
+      "kind": "completed",
+      "slug": "jaemtri",
+      "detail": {
+        "kind": "motion-frame-candidate-running-slide-low-slide-2",
+        "template": null,
+        "job_id": "a7f35a75-bb05-4c0e-bad4-d6d241bc9d1c",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 2
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T01:30:32Z",
+      "kind": "submitted",
+      "slug": "jaemtri",
+      "detail": {
+        "kind": "motion-frame-candidate-running-8-frames-hair-3",
+        "template": null,
+        "job_id": "1894d8b1-e354-4fb6-8dcd-4a0862bbb938",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "1894d8b1-e354-4fb6-8dcd-4a0862bbb938",
+          "status": "processing"
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T01:30:34Z",
+      "kind": "submitted",
+      "slug": "jaemtri",
+      "detail": {
+        "kind": "motion-frame-candidate-running-slide-low-slide-3",
+        "template": null,
+        "job_id": "cc112716-4ac9-4396-aab4-40c4843f133d",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "cc112716-4ac9-4396-aab4-40c4843f133d",
+          "status": "processing"
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T01:31:58Z",
+      "kind": "completed",
+      "slug": "jaemtri",
+      "detail": {
+        "kind": "animation",
+        "template": "front-flip",
+        "job_id": "4883f298-4768-4a52-bdd7-ff2f0f017356",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T01:31:58Z",
+      "kind": "completed",
+      "slug": "jaemtri",
+      "detail": {
+        "kind": "animation",
+        "template": "running-jump",
+        "job_id": "7c53731e-5ac7-411f-a975-9ad2ad339232",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
     }
   ],
-  "updated_at": 1792805299.955636,
+  "updated_at": 1792805518.9249268,
   "user_stopped_at": 1792778235.6917784,
   "archived_jobs": {
     "304457e9-6577-44f0-af17-97841a9f6720": {
@@ -61608,8 +62029,8 @@
   "last_git_checkpoint": 1792805198.3836112,
   "summary": {
     "jobs": {
-      "processing": 5,
-      "completed": 410,
+      "processing": 3,
+      "completed": 414,
       "failed": 9,
       "stalled": 0
     },
