@@ -45,7 +45,7 @@ def lint_file(f):
     out = []
     for line in t.splitlines():
         c = [x.strip() for x in line.strip().strip("|").split("|")]
-        if len(c) < 6 or not re.fullmatch(r"\d+|3-0|W", c[0]):
+        if len(c) < 6 or not re.fullmatch(r"\d+(-\d+)?|W", c[0]):
             continue
         frames = next((int(x) for x in c[2:5] if re.fullmatch(r"\d+", x)), None)
         prompt_cell = next((x for x in c if "<br>" in x or x.startswith("(견본")), "")
@@ -86,7 +86,7 @@ if __name__ == "__main__":
     lines = []
     for f in files:
         res = lint_file(f)
-        rows = sum(1 for l in f.read_text().splitlines() if re.match(r"\| (\d+|3-0|W) \|", l) and ("<br>" in l or "(견본" in l))
+        rows = sum(1 for l in f.read_text().splitlines() if re.match(r"\| (\d+(-\d+)?|W) \|", l) and ("<br>" in l or "(견본" in l))
         total_rows += rows; total_flag += len(res)
         if not rows: continue
         lines.append(f"\n## {f.relative_to(ROOT)} — {len(res)}/{rows}줄 걸림\n")
