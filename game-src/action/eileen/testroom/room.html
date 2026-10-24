@@ -99,7 +99,7 @@ function atkSeq(id, heavy) {
   const a = A[id], imp = impactOf(id), s = [];
   for (let f = 0; f < a.n; f++) {
     if (f < imp) s.push({ f, d: f === 0 ? 0.03 : (heavy ? 0.05 : 0.036) });
-    else if (f === imp) s.push({ f, d: heavy ? 0.12 : 0.08, ev: heavy ? 'hitH' : 'hit' });
+    else if (f === imp) s.push({ f, d: heavy ? 0.1 : 0.055, ev: heavy ? 'hitH' : 'hit' });
     else s.push({ f, d: heavy ? 0.055 : 0.045, cancel: true });
   }
   return s;
@@ -176,7 +176,7 @@ function muzzleFlash(p, big) {
 }
 
 // 맞았는지: 샌드백이 같은 줄에 있고 앞쪽 사정거리 안
-function inReach(hx, pad = 60) { pad *= K(P.y); const hOk = P.mode === 'air' ? Math.abs(D.z - P.z) < 170 : D.z < 160; return showDummy && Math.abs(D.y - P.y) < 64 && (D.x - P.x) * P.face > -20 && Math.abs(D.x - hx) < pad && hOk; }
+function inReach(hx, pad = 60, hh = 100) { pad *= K(P.y); const dk = K(D.y), hOk = hh > D.z - 110 * dk && hh < D.z + 240 * dk; return showDummy && Math.abs(D.y - P.y) < 64 && (D.x - P.x) * P.face > -20 && Math.abs(D.x - hx) < pad && hOk; }
 function hurtDummy(dmg, kind, hx, hy) {
   if (D.mark > 0) dmg = Math.round(dmg * 1.5);
   D.hp = Math.max(0, D.hp - dmg); D.hits++; if (!(P.clip && (P.clip.id === '25' || P.clip.id === '25_1'))) gainSp(dmg * 0.45); D.hitT = 1.0; D.flash = 0.09;
@@ -200,9 +200,9 @@ function fireEv(e) {
   if (e.ev === 'hit' || e.ev === 'hitH' || e.ev === 'hitL') {
     const big = e.ev !== 'hit';
     const p = framePt(id, f, a.reach[f], a.h * (e.hy || 0.42));   // 슬라이딩은 발끝 높이(hy)
-    if (inReach(p.x, big ? 100 : 70)) {
+    if (inReach(p.x, big ? 100 : 70, P.y - p.y)) {   // 때리는 높이 = 바닥에서 타점까지
       // 맞았을 때만: 살짝 멈춤 + 샌드백 경직
-      hitstop = big ? 0.16 : 0.075; shake = big ? 16 : 6; dShake = big ? 9 : 5;
+      hitstop = big ? 0.12 : 0.04; shake = big ? 14 : 5; dShake = big ? 9 : 5;
       hurtDummy(big ? 34 : 12, e.kind || (e.ev === 'hitL' ? 'launch' : big ? 'heavy' : 'light'), p.x, p.y);
       sfx('hit', { strength: big ? 3 : 1, kind: KICK.has(id) ? 'kick' : undefined });
       const cx = D.x - P.face * 18 * K(D.y);
