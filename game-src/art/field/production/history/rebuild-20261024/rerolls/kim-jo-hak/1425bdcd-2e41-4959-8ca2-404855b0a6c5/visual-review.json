@@ -1,0 +1,13 @@
+{
+  "job": "1425bdcd-2e41-4959-8ca2-404855b0a6c5",
+  "decision": "reroll",
+  "reason": "키 약237px 초과, 이마 주름과 나이 표현 부족.",
+  "at": 1792788955.4634326,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

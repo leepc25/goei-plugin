@@ -1,0 +1,20 @@
+{
+  "at": 1792803329.0264974,
+  "job_id": "05ffd49c-1b78-4114-937b-5e4ae1e132f5",
+  "result": "reroll-required",
+  "findings": "Frame 10 has severe missing face, hair, hands and leg pixels; all other frames inspected. Regenerate exact frame 10 pose and recheck full sequence.",
+  "frame_count": 13,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

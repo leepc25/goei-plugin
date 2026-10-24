@@ -1,0 +1,397 @@
+{
+  "release_skeleton_v3_motions": false,
+  "reason": "2026-10-24 user explicitly authorized full fake-bureau rebuild and roster completion. Per-character visual gates remain.",
+  "max_in_flight": 20,
+  "max_character_pipeline_in_flight": 20,
+  "authorized_total_characters": 55,
+  "authorized_clips_per_character": 20,
+  "stop_all": true,
+  "stopped_by_user_at": 1792778185.5597813,
+  "direction_policy": {
+    "reference": "front-facing south",
+    "movement_and_combat": "east",
+    "stationary_noncombat": "south-east",
+    "southeast_templates": [
+      "breathing-idle",
+      "drinking"
+    ]
+  },
+  "motion_allowed_slugs": [
+    "jyaldi",
+    "spangdal",
+    "jaemtri",
+    "aileen",
+    "gorgodio",
+    "kyuras",
+    "deadpole",
+    "geshugan",
+    "rojemon",
+    "konjyuce",
+    "gognija",
+    "dejure",
+    "sa-jang",
+    "do-pil-heon",
+    "lee-gil-hwan",
+    "lee-gi-seok",
+    "kim-jo-hak",
+    "lee-do-hyeong",
+    "go-young-hoon",
+    "no-gi-gyun",
+    "song-ju-ik",
+    "kwak-seong-ju",
+    "cho-seong-choon",
+    "yun-byeong-su",
+    "kim-seong-jin",
+    "song-jin-seob",
+    "baek-seok-ju",
+    "jin-na-sol",
+    "lee-seong-hae",
+    "lee-ja-heon",
+    "eun-ha-je",
+    "park-min-seong",
+    "baek-sa-heon",
+    "go-young-eun",
+    "kang-i-hak",
+    "jang-heo-un",
+    "kwak-je-gang",
+    "lee-yeon-hwa",
+    "lee-byeong-jin",
+    "jay",
+    "ho-yu-won",
+    "cheong-dal-lae",
+    "cha-yeo-jin",
+    "seo-yun-ji",
+    "go-yeon-ji",
+    "yun-ji-a",
+    "ma-deok-hee",
+    "mun-hye-ran",
+    "shin-yuri",
+    "blaret",
+    "saladin",
+    "avensha",
+    "secriem",
+    "brownie",
+    "aestheticism"
+  ],
+  "character_direction_overrides": {
+    "jyaldi": {
+      "movement_and_combat": "west",
+      "stationary_noncombat": "south-west",
+      "reason": "User: asymmetric hair obscures face in east; west and southwest show face."
+    },
+    "spangdal": {
+      "movement_and_combat": "west",
+      "stationary_noncombat": "south-west",
+      "reason": "Actual generated east side face hidden by bob; west and southwest face visibly exposed."
+    },
+    "konjyuce": {
+      "movement_and_combat": "west",
+      "stationary_noncombat": "south-west",
+      "reason": "Both profiles have a visible face; west additionally shows the identifying pink hair streak."
+    },
+    "eun-ha-je": {
+      "movement_and_combat": "west",
+      "stationary_noncombat": "south-west",
+      "reason": "Both profiles show an eye; actual west/southwest better exposes original asymmetric forehead opening and face."
+    },
+    "lee-gi-seok": {
+      "movement_and_combat": "west",
+      "stationary_noncombat": "south-west",
+      "reason": "Actual east fringe hides face; west/southwest exposes sunglasses and cheek."
+    },
+    "ho-yu-won": {
+      "movement_and_combat": "west",
+      "stationary_noncombat": "south-west",
+      "reason": "원작의 갈색 흐트러진 앞머리·주황 눈·밝은 회갈색 열린 정장·느슨한 타이 유지. 동쪽은 앞머리가 눈을 가리고 서쪽·남서쪽은 눈과 얼굴이 더 드러나 서쪽 쌍 선택. 8방향 키 일관, 회색 정장 내부 음영과 외곽 투명 구분 확인."
+    }
+  },
+  "registration_held_slugs": [],
+  "production_priority": "fake-bureau then baekilmong then remainder; all 55 registered and eight-way visually reviewed before any new motion",
+  "after_registration": "roster-order eight-direction visual review and export, then remaining authorized production",
+  "direction_selection_policy": "Compare actual east/west/southeast/southwest rotations per character; select face-visible pair east+southeast or west+southwest. Do not impose one side on all characters.",
+  "registration_failure_policy": "Diagnose and correct source/registration; archive failed results and billing; delete only identified failed character; re-register without duplicating accepted jobs.",
+  "image_approved_slugs": [
+    "sa-jang",
+    "do-pil-heon",
+    "lee-gil-hwan",
+    "lee-gi-seok",
+    "kim-jo-hak",
+    "lee-do-hyeong",
+    "go-young-hoon",
+    "no-gi-gyun",
+    "song-ju-ik",
+    "kwak-seong-ju",
+    "cho-seong-choon",
+    "yun-byeong-su",
+    "kim-seong-jin",
+    "song-jin-seob",
+    "baek-seok-ju",
+    "jin-na-sol",
+    "lee-seong-hae",
+    "lee-ja-heon",
+    "eun-ha-je",
+    "park-min-seong",
+    "baek-sa-heon",
+    "go-young-eun",
+    "kang-i-hak",
+    "jang-heo-un",
+    "kwak-je-gang",
+    "lee-yeon-hwa",
+    "lee-byeong-jin",
+    "jay",
+    "ho-yu-won",
+    "cheong-dal-lae",
+    "cha-yeo-jin",
+    "seo-yun-ji",
+    "go-yeon-ji",
+    "yun-ji-a",
+    "ma-deok-hee",
+    "mun-hye-ran",
+    "shin-yuri",
+    "blaret",
+    "saladin",
+    "avensha",
+    "secriem",
+    "brownie",
+    "aestheticism"
+  ],
+  "registration_approved_slugs": [
+    "lee-gil-hwan",
+    "konjyuce",
+    "do-pil-heon",
+    "kim-seong-jin",
+    "eun-ha-je",
+    "sa-jang",
+    "lee-gi-seok",
+    "kim-jo-hak",
+    "lee-do-hyeong",
+    "go-young-hoon",
+    "song-ju-ik",
+    "kwak-seong-ju",
+    "cho-seong-choon",
+    "yun-byeong-su",
+    "song-jin-seob",
+    "baek-seok-ju",
+    "jin-na-sol",
+    "park-min-seong",
+    "kang-i-hak",
+    "baek-sa-heon",
+    "go-young-eun",
+    "kwak-je-gang",
+    "no-gi-gyun",
+    "lee-ja-heon",
+    "lee-seong-hae",
+    "lee-yeon-hwa",
+    "lee-byeong-jin",
+    "jay",
+    "ho-yu-won",
+    "cheong-dal-lae",
+    "cha-yeo-jin",
+    "yun-ji-a",
+    "mun-hye-ran",
+    "shin-yuri",
+    "saladin",
+    "secriem",
+    "brownie",
+    "jang-heo-un",
+    "go-yeon-ji",
+    "ma-deok-hee",
+    "avensha",
+    "aestheticism",
+    "seo-yun-ji",
+    "blaret"
+  ],
+  "source_priority": "AVIF first for identity/build; lore supplements height; explicit user heights override estimates",
+  "motion_template_overrides": {
+    "jyaldi": {
+      "running-8-frames": "running-4-frames"
+    }
+  },
+  "motion_seed_overrides": {
+    "jyaldi": {
+      "running-8-frames": 2026102400,
+      "running-jump": 2026102401,
+      "running-slide": 2026102402,
+      "front-flip": 2026102403,
+      "backflip": 2026102404,
+      "jumping-2": 2026102405,
+      "two-footed-jump": 2026102406,
+      "picking-up": 2026102407,
+      "throw-object": 2026102408,
+      "fight-stance-idle-8-frames": 2026102409,
+      "lead-jab": 2026102410,
+      "cross-punch": 2026102411,
+      "jumping-1": 2026102499
+    },
+    "spangdal": {
+      "drinking": 2026103110
+    }
+  },
+  "custom_motion_specs": {
+    "jyaldi": {
+      "jumping-2": "game-src/art/field/production/motion-inputs/jyaldi/jumping-2-v1/spec.json",
+      "running-8-frames": "game-src/art/field/production/motion-inputs/jyaldi/running-8-frames-v1/spec.json",
+      "running-jump": "game-src/art/field/production/motion-inputs/jyaldi/running-jump-v1/spec.json",
+      "running-slide": "game-src/art/field/production/motion-inputs/jyaldi/running-slide-v2/spec.json",
+      "front-flip": "game-src/art/field/production/motion-inputs/jyaldi/front-flip-v3/spec.json",
+      "backflip": "game-src/art/field/production/motion-inputs/jyaldi/backflip-v7/spec.json",
+      "two-footed-jump": "game-src/art/field/production/motion-inputs/jyaldi/two-footed-jump-v1/spec.json",
+      "picking-up": "game-src/art/field/production/motion-inputs/jyaldi/picking-up-v3/spec.json",
+      "throw-object": "game-src/art/field/production/motion-inputs/jyaldi/throw-object-v2/spec.json",
+      "cross-punch": "game-src/art/field/production/motion-inputs/jyaldi/cross-punch-v1/spec.json",
+      "jumping-1": "game-src/art/field/production/motion-inputs/jyaldi/jumping-1-v1/spec.json"
+    },
+    "spangdal": {
+      "jumping-1": "game-src/art/field/production/motion-inputs/spangdal/jumping-1-v1/spec.json",
+      "jumping-2": "game-src/art/field/production/motion-inputs/spangdal/jumping-2-v1/spec.json",
+      "two-footed-jump": "game-src/art/field/production/motion-inputs/spangdal/two-footed-jump-v1/spec.json",
+      "lead-jab": "game-src/art/field/production/motion-inputs/spangdal/lead-jab-v1/spec.json",
+      "running-8-frames": "game-src/art/field/production/motion-inputs/spangdal/running-8-frames-repair-v1/spec.json",
+      "running-jump": "game-src/art/field/production/motion-inputs/spangdal/running-jump-repair-v1/spec.json",
+      "running-slide": "game-src/art/field/production/motion-inputs/spangdal/running-slide-repair-v1/spec.json",
+      "front-flip": "game-src/art/field/production/motion-inputs/spangdal/front-flip-repair-v1/spec.json",
+      "backflip": "game-src/art/field/production/motion-inputs/spangdal/backflip-repair-v1/spec.json",
+      "picking-up": "game-src/art/field/production/motion-inputs/spangdal/picking-up-repair-v1/spec.json",
+      "throw-object": "game-src/art/field/production/motion-inputs/spangdal/throw-object-repair-v1/spec.json",
+      "cross-punch": "game-src/art/field/production/motion-inputs/spangdal/cross-punch-repair-v1/spec.json",
+      "crouched-walking": "game-src/art/field/production/motion-inputs/spangdal/crouched-walking-repair-v1/spec.json",
+      "drinking": "game-src/art/field/production/motion-inputs/spangdal/drinking-v1/spec.json"
+    },
+    "jaemtri": {
+      "jumping-1": "game-src/art/field/production/motion-inputs/jaemtri/jumping-1-v2/spec.json",
+      "jumping-2": "game-src/art/field/production/motion-inputs/jaemtri/jumping-2-v2/spec.json",
+      "two-footed-jump": "game-src/art/field/production/motion-inputs/jaemtri/two-footed-jump-v2/spec.json",
+      "lead-jab": "game-src/art/field/production/motion-inputs/jaemtri/lead-jab-repair-v1/spec.json",
+      "picking-up": "game-src/art/field/production/motion-inputs/jaemtri/picking-up-repair-v1/spec.json",
+      "running-8-frames": "game-src/art/field/production/motion-inputs/jaemtri/running-8-frames-arms-v5/spec.json",
+      "running-jump": "game-src/art/field/production/motion-inputs/jaemtri/running-jump-arms-v5/spec.json",
+      "running-slide": "game-src/art/field/production/motion-inputs/jaemtri/running-slide-measured-reference-v3/spec.json",
+      "crouched-walking": "game-src/art/field/production/motion-inputs/jaemtri/crouched-walking-repair-v1/spec.json",
+      "front-flip": "game-src/art/field/production/motion-inputs/jaemtri/front-flip-measured-reference-v4/spec.json",
+      "backflip": "game-src/art/field/production/motion-inputs/jaemtri/backflip-turn-reference-v4/spec.json",
+      "throw-object": "game-src/art/field/production/motion-inputs/jaemtri/throw-object-repair-v1/spec.json",
+      "cross-punch": "game-src/art/field/production/motion-inputs/jaemtri/cross-punch-repair-v1/spec.json",
+      "sad-walk": "game-src/art/field/production/motion-inputs/jaemtri/sad-walk-repair-v1/spec.json",
+      "pushing": "game-src/art/field/production/motion-inputs/jaemtri/pushing-repair-v2/spec.json"
+    },
+    "aileen": {
+      "jumping-1": "game-src/art/field/production/motion-inputs/aileen/jumping-1-measured-air-v2/spec.json",
+      "jumping-2": "game-src/art/field/production/motion-inputs/aileen/jumping-2-measured-air-v2/spec.json",
+      "two-footed-jump": "game-src/art/field/production/motion-inputs/aileen/two-footed-jump-measured-air-v2/spec.json",
+      "lead-jab": "game-src/art/field/production/motion-inputs/aileen/lead-jab-measured-guard-v3/spec.json",
+      "walking-8-frames": "game-src/art/field/production/motion-inputs/aileen/walking-8-frames-measured-guard-v2/spec.json",
+      "running-8-frames": "game-src/art/field/production/motion-inputs/aileen/running-8-frames-measured-guard-v2/spec.json",
+      "running-jump": "game-src/art/field/production/motion-inputs/aileen/running-jump-own-lengths-v1/spec.json",
+      "running-slide": "game-src/art/field/production/motion-inputs/aileen/running-slide-measured-guard-v2/spec.json",
+      "crouched-walking": "game-src/art/field/production/motion-inputs/aileen/crouched-walking-measured-guard-v2/spec.json",
+      "sad-walk": "game-src/art/field/production/motion-inputs/aileen/sad-walk-own-lengths-v1/spec.json",
+      "front-flip": "game-src/art/field/production/motion-inputs/aileen/front-flip-actual-reference-v4/spec.json",
+      "backflip": "game-src/art/field/production/motion-inputs/aileen/backflip-measured-turn-v3/spec.json",
+      "picking-up": "game-src/art/field/production/motion-inputs/aileen/picking-up-deep-v2/spec.json",
+      "pushing": "game-src/art/field/production/motion-inputs/aileen/pushing-original-standing-v6/spec.json",
+      "throw-object": "game-src/art/field/production/motion-inputs/aileen/throw-object-measured-guard-v2/spec.json",
+      "fight-stance-idle-8-frames": "game-src/art/field/production/motion-inputs/aileen/fight-stance-exact-guard-v3/spec.json",
+      "cross-punch": "game-src/art/field/production/motion-inputs/aileen/cross-punch-own-lengths-v1/spec.json",
+      "pull-heavy-object": "game-src/art/field/production/motion-inputs/aileen/pull-heavy-object-measured-guard-v2/spec.json",
+      "drinking": "game-src/art/field/production/motion-inputs/aileen/drinking-own-se-v1/spec.json"
+    },
+    "gorgodio": {
+      "jumping-1": "game-src/art/field/production/motion-inputs/gorgodio/jumping-1-v1/spec.json",
+      "jumping-2": "game-src/art/field/production/motion-inputs/gorgodio/jumping-2-v1/spec.json",
+      "two-footed-jump": "game-src/art/field/production/motion-inputs/gorgodio/two-footed-jump-v1/spec.json",
+      "running-8-frames": "game-src/art/field/production/motion-inputs/gorgodio/running-8-frames-own-lengths-v1/spec.json",
+      "running-jump": "game-src/art/field/production/motion-inputs/gorgodio/running-jump-own-lengths-v1/spec.json",
+      "running-slide": "game-src/art/field/production/motion-inputs/gorgodio/running-slide-own-lengths-v1/spec.json",
+      "crouched-walking": "game-src/art/field/production/motion-inputs/gorgodio/crouched-walking-own-lengths-v1/spec.json",
+      "front-flip": "game-src/art/field/production/motion-inputs/gorgodio/front-flip-own-lengths-v1/spec.json",
+      "backflip": "game-src/art/field/production/motion-inputs/gorgodio/backflip-own-lengths-v1/spec.json",
+      "picking-up": "game-src/art/field/production/motion-inputs/gorgodio/picking-up-own-lengths-v1/spec.json",
+      "pushing": "game-src/art/field/production/motion-inputs/gorgodio/pushing-own-lengths-v1/spec.json",
+      "pull-heavy-object": "game-src/art/field/production/motion-inputs/gorgodio/pull-heavy-object-own-lengths-v1/spec.json",
+      "throw-object": "game-src/art/field/production/motion-inputs/gorgodio/throw-object-own-lengths-v1/spec.json",
+      "fight-stance-idle-8-frames": "game-src/art/field/production/motion-inputs/gorgodio/fight-stance-idle-8-frames-own-lengths-v1/spec.json",
+      "lead-jab": "game-src/art/field/production/motion-inputs/gorgodio/lead-jab-own-lengths-v1/spec.json",
+      "cross-punch": "game-src/art/field/production/motion-inputs/gorgodio/cross-punch-own-lengths-v1/spec.json"
+    },
+    "kyuras": {
+      "jumping-1": "game-src/art/field/production/motion-inputs/kyuras/jumping-1-v1/spec.json",
+      "jumping-2": "game-src/art/field/production/motion-inputs/kyuras/jumping-2-v1/spec.json",
+      "two-footed-jump": "game-src/art/field/production/motion-inputs/kyuras/two-footed-jump-v1/spec.json"
+    },
+    "deadpole": {
+      "jumping-1": "game-src/art/field/production/motion-inputs/deadpole/jumping-1-v1/spec.json",
+      "jumping-2": "game-src/art/field/production/motion-inputs/deadpole/jumping-2-v1/spec.json",
+      "two-footed-jump": "game-src/art/field/production/motion-inputs/deadpole/two-footed-jump-v1/spec.json"
+    },
+    "geshugan": {
+      "jumping-1": "game-src/art/field/production/motion-inputs/geshugan/jumping-1-v1/spec.json",
+      "jumping-2": "game-src/art/field/production/motion-inputs/geshugan/jumping-2-v1/spec.json",
+      "two-footed-jump": "game-src/art/field/production/motion-inputs/geshugan/two-footed-jump-v1/spec.json"
+    },
+    "rojemon": {
+      "jumping-1": "game-src/art/field/production/motion-inputs/rojemon/jumping-1-v1/spec.json",
+      "jumping-2": "game-src/art/field/production/motion-inputs/rojemon/jumping-2-v1/spec.json",
+      "two-footed-jump": "game-src/art/field/production/motion-inputs/rojemon/two-footed-jump-v1/spec.json"
+    },
+    "konjyuce": {
+      "jumping-1": "game-src/art/field/production/motion-inputs/konjyuce/jumping-1-v1/spec.json",
+      "jumping-2": "game-src/art/field/production/motion-inputs/konjyuce/jumping-2-v1/spec.json",
+      "two-footed-jump": "game-src/art/field/production/motion-inputs/konjyuce/two-footed-jump-v1/spec.json"
+    },
+    "gognija": {
+      "jumping-1": "game-src/art/field/production/motion-inputs/gognija/jumping-1-v1/spec.json",
+      "jumping-2": "game-src/art/field/production/motion-inputs/gognija/jumping-2-v1/spec.json",
+      "two-footed-jump": "game-src/art/field/production/motion-inputs/gognija/two-footed-jump-v1/spec.json"
+    },
+    "dejure": {
+      "jumping-1": "game-src/art/field/production/motion-inputs/dejure/jumping-1-v1/spec.json",
+      "jumping-2": "game-src/art/field/production/motion-inputs/dejure/jumping-2-v1/spec.json",
+      "two-footed-jump": "game-src/art/field/production/motion-inputs/dejure/two-footed-jump-v1/spec.json"
+    },
+    "sa-jang": {
+      "jumping-1": "game-src/art/field/production/motion-inputs/sa-jang/jumping-1-v1/spec.json",
+      "jumping-2": "game-src/art/field/production/motion-inputs/sa-jang/jumping-2-v1/spec.json",
+      "two-footed-jump": "game-src/art/field/production/motion-inputs/sa-jang/two-footed-jump-v1/spec.json"
+    },
+    "do-pil-heon": {
+      "jumping-1": "game-src/art/field/production/motion-inputs/do-pil-heon/jumping-1-v1/spec.json",
+      "jumping-2": "game-src/art/field/production/motion-inputs/do-pil-heon/jumping-2-v1/spec.json",
+      "two-footed-jump": "game-src/art/field/production/motion-inputs/do-pil-heon/two-footed-jump-v1/spec.json"
+    },
+    "lee-gil-hwan": {
+      "jumping-1": "game-src/art/field/production/motion-inputs/lee-gil-hwan/jumping-1-v1/spec.json",
+      "jumping-2": "game-src/art/field/production/motion-inputs/lee-gil-hwan/jumping-2-v1/spec.json",
+      "two-footed-jump": "game-src/art/field/production/motion-inputs/lee-gil-hwan/two-footed-jump-v1/spec.json"
+    },
+    "lee-gi-seok": {
+      "jumping-1": "game-src/art/field/production/motion-inputs/lee-gi-seok/jumping-1-v1/spec.json",
+      "jumping-2": "game-src/art/field/production/motion-inputs/lee-gi-seok/jumping-2-v1/spec.json",
+      "two-footed-jump": "game-src/art/field/production/motion-inputs/lee-gi-seok/two-footed-jump-v1/spec.json"
+    },
+    "kim-jo-hak": {
+      "jumping-1": "game-src/art/field/production/motion-inputs/kim-jo-hak/jumping-1-v1/spec.json",
+      "jumping-2": "game-src/art/field/production/motion-inputs/kim-jo-hak/jumping-2-v1/spec.json",
+      "two-footed-jump": "game-src/art/field/production/motion-inputs/kim-jo-hak/two-footed-jump-v1/spec.json"
+    },
+    "lee-do-hyeong": {
+      "jumping-1": "game-src/art/field/production/motion-inputs/lee-do-hyeong/jumping-1-v1/spec.json",
+      "jumping-2": "game-src/art/field/production/motion-inputs/lee-do-hyeong/jumping-2-v1/spec.json",
+      "two-footed-jump": "game-src/art/field/production/motion-inputs/lee-do-hyeong/two-footed-jump-v1/spec.json"
+    },
+    "go-young-hoon": {
+      "jumping-1": "game-src/art/field/production/motion-inputs/go-young-hoon/jumping-1-v1/spec.json",
+      "jumping-2": "game-src/art/field/production/motion-inputs/go-young-hoon/jumping-2-v1/spec.json",
+      "two-footed-jump": "game-src/art/field/production/motion-inputs/go-young-hoon/two-footed-jump-v1/spec.json"
+    }
+  },
+  "required_custom_motion_slots": [
+    "jumping-1",
+    "jumping-2",
+    "two-footed-jump"
+  ],
+  "user_rejection": {
+    "at_epoch": 1792813006.5113328,
+    "scope": "All characters made by assistant",
+    "reason": "User states entire generated character set is wrong; prior assistant visual acceptance withdrawn pending AVIF-first re-review."
+  }
+}

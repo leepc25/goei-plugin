@@ -1,0 +1,14 @@
+{
+  "job": "2b2065a8-fb2f-4791-9f7a-5c31962e142d",
+  "job_status": "completed",
+  "decision": "reroll",
+  "reason": "키180px 미만으로 성인 보통 키 목표보다 작음. 도필헌 정면·스케일 참조로 교체.",
+  "at": 1792790164.0254085,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

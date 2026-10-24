@@ -1,0 +1,13 @@
+{
+  "job": "cdba8a86-2702-4d9f-9902-f9e1faa943e7",
+  "decision": "reroll",
+  "reason": "본체 약199px로 장신 설정보다 작고 상체 근육 과장. 첫 신규 제작본의 키·비율을 유지하며 얼굴과 몸통을 정면으로 교정.",
+  "at": 1792789965.590756,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

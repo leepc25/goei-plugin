@@ -1,0 +1,8 @@
+{
+  "slug": "ho-yu-won",
+  "character_id": "8fdfa656-d124-4442-b153-61a0542175bb",
+  "direction": "west",
+  "image_sha256": "d4172d80d6fcc44f2512115775077b6852c6281b7f32d9e3861230436fb72a80",
+  "started_epoch": 1792810674.211626,
+  "expected_generations": 0.1
+}

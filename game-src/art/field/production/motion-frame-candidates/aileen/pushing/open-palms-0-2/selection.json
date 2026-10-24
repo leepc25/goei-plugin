@@ -1,0 +1,9 @@
+{
+  "frame_index": 0,
+  "source_job_id": "4ceaf84e-1244-4455-b198-dbff361e6cc7",
+  "source_frame_index": 1,
+  "target_pose_index": 0,
+  "source_path": "motion-frame-candidates/aileen/pushing/open-palms-0-2/frames/1.png",
+  "sha256": "72efc8cde2dcdd50aa01590e3e53d63608244c86ecffdc33bccf484536862472",
+  "findings": "Candidate1 has intact open palms and transparent space beside legs; candidates0/2 have detached brown masses and are rejected. Hair ends follow blonde strands without broad flat gray area."
+}

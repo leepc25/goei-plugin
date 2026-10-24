@@ -1,0 +1,14 @@
+{
+  "job": "726695bb-3a3e-483d-b68e-25ee10887393",
+  "job_status": "completed",
+  "decision": "reroll",
+  "reason": "키180px 미만으로 성인 목표보다 작음. 김성진의 슬림한 성인 정면·키 참조로 교체, 은발·검은 모자·흰 의료마스크·경비복 유지.",
+  "at": 1792790948.676978,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

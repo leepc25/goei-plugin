@@ -1,0 +1,12 @@
+{
+  "image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "method": "text",
+  "description": "Change ONLY the healed SCARS around the mouth: a clearly readable dark-brown jagged scar line extends from EACH corner of the closed lips across BOTH cheeks toward ears. Add several short perpendicular stitch-like scar marks crossing each line. These wide old healed Glasgow-smile scars are the identifying feature and must remain readable at native pixel scale. No blood, no moustache, no beard, no fresh wounds. Preserve aviator sunglasses, clean-shaven narrow face, dark swept-back side-part hair, entire suit, exact height and body proportions, front pose and hands. Same pixel style and transparent background; no outer gray halo.",
+  "no_background": true,
+  "use_color_palette_correction": true,
+  "seed": 1792790384
+}

@@ -1,0 +1,36 @@
+{
+  "group_id": "afa58cb6-8c11-45c1-baf6-45cb5f1f63fb",
+  "states": [
+    {
+      "character": {
+        "id": "c3d13941-2145-4e24-ad38-de6e56059ef5",
+        "name": "Idle",
+        "prompt": "송주익 / Song Ju-ik. Young athletic man, wide shoulders, long neck and lean strong torso. Very short dark BUZZ CUT, almost shaved, NOT swept hair. Black aviator sunglasses and thick eyebrows. Exceptionally LARGE long square projecting lower JAW and chin, conspicuously bigger lower face, confident closed mouth. Preserve the oversized angular jaw as his identifying trait without making a giant head. Dark black-brown fitted suit, white shirt, black tie. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
+        "size": {
+          "width": 128,
+          "height": 256
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "low top-down",
+        "created_at": "2026-10-23T21:20:54.720776+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {}
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-10-23T21:43:08.315409"
+}

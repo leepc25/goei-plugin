@@ -1,0 +1,19 @@
+{
+  "at": 1792793745.9102778,
+  "slug": "seo-yun-ji",
+  "reason": "원작의 허리까지 오는 양갈래 땋은 머리가 가슴 아래에서 짧게 끝남. 정면에서 땋은 머리 아래 부분을 연장한 뒤 재등록.",
+  "state_before": {
+    "name": "서윤지",
+    "group": "association",
+    "character_id": "58ad10b4-0d27-488d-8c56-fa4291230abc",
+    "image": "c721800a-1c1a-46f0-90c1-cf2e9c66eae9",
+    "registration": "fbe504f0-84fd-4d97-8056-a2c5a3198d75",
+    "motions": {},
+    "ready": true,
+    "image_verified": true,
+    "image_visually_reviewed": true,
+    "skeleton_joints": 18,
+    "rotation_count": 8,
+    "exported": true
+  }
+}

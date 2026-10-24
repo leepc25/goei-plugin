@@ -1,0 +1,25 @@
+{
+  "character_id": "0d3d950a-c811-4ff9-8f05-f2b802858b95",
+  "result": "pass",
+  "directions_reviewed": [
+    "south",
+    "south-east",
+    "east",
+    "north-east",
+    "north",
+    "north-west",
+    "west",
+    "south-west"
+  ],
+  "findings": "Messy center-part black hair, black aviator sunglasses, youthful slim body, open jacket/collar and loose tie preserved across8 views; scale and clean silhouette consistent.",
+  "movement_direction": "east",
+  "stationary_direction": "south-east",
+  "gray_outer_halo_observed": false,
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF primary",
+    "Lore supplementary height",
+    "All55 before motion",
+    "Gray exterior reroll"
+  ]
+}

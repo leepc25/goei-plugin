@@ -1,0 +1,20 @@
+{
+  "at": 1792805219.49179,
+  "job_id": "88c76584-cfd4-4538-8260-d9b8783e4f6b",
+  "result": "pass",
+  "findings": "전체 8프레임 확인. 손바닥을 펴고 팔을 앞으로 뻗어 밀며 하체로 버티는 동작으로 수정됨. 동향, 머리와 정장 및 하이힐 유지. 회색 외곽 없음.",
+  "frame_count": 8,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

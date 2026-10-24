@@ -1,0 +1,20 @@
+{
+  "at": 1792802601.1927707,
+  "job_id": "476b3574-8365-451e-98f8-1153a158f480",
+  "result": "pass",
+  "findings": "All eight own-rig frames inspected: raised hand compact jump, own face/bob/skirt/pumps, no clipped head, gray patches or body holes.",
+  "frame_count": 8,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

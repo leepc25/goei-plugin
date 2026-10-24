@@ -1,0 +1,32 @@
+{
+  "reason": "AVIF comparison: open collar and loose tie replaced by fully closed collar; darker charcoal brown hair also needed.",
+  "state_before": {
+    "name": "장허운",
+    "group": "baekilmong",
+    "character_id": "bf2fe438-73ff-4721-966a-492e4e30facb",
+    "image": "c1b8d77b-a677-453e-9644-8276cc1f3fe1",
+    "registration": "906f784e-b134-40ea-b0aa-1ba8bedc1b0b",
+    "motions": {},
+    "ready": true,
+    "visual_rejections": [
+      {
+        "job": "805f56ae-ae2b-45f8-9219-9c79ca89f4a0",
+        "decision": "reroll",
+        "reason": "장신·장발 형태는 맞지만 얼굴과 몸이 측면으로 돌아가 SOUTH 기준 실패.",
+        "at": 1792789500.1814444,
+        "rules_rechecked": [
+          "AVIF primary identity",
+          "lore/user height",
+          "south-facing",
+          "transparent edge without gray halo",
+          "no motions before all roster eight-way review"
+        ]
+      }
+    ],
+    "image_verified": true,
+    "image_visually_reviewed": true,
+    "skeleton_joints": 18,
+    "rotation_count": 8,
+    "exported": true
+  }
+}

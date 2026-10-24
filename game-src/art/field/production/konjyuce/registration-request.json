@@ -1,0 +1,14 @@
+{
+  "description": "콘쥬스 / Konjyuce. 17 year old Korean schoolgirl with natural age-appropriate teen proportions with a normally long ribcage, visible abdomen between ribs and pelvis, natural waist at the top of the pelvis, and balanced torso and leg lengths, shoulder length straight black bob with one distinctive pink streak, blue eyes, determined youthful face. Fully clothed navy school uniform blazer with light piping extending to the upper hips, not cropped, white collared shirt, black necktie, gray knee length pleated school skirt sitting at the natural waist, not high-waisted, dark socks and plain black school loafers. No adult glamour styling. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
+  "reference_image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "n_directions": 8,
+  "view": "low top-down",
+  "template_id": "mannequin",
+  "name": "콘쥬스",
+  "seed": 10222027,
+  "no_background": true
+}

@@ -1,0 +1,20 @@
+{
+  "at": 1792804669.3221953,
+  "job_id": "a2d20675-c8f9-4e9a-a44f-df1ec4e7f2f0",
+  "result": "pass",
+  "findings": "All eight EAST straight-cross frames viewed: correct extension/recovery and other hand guarding; own brown waves/skirt/high heels retained, no gray exterior or holes.",
+  "frame_count": 8,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

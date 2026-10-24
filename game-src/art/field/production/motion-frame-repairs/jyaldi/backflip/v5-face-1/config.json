@@ -1,0 +1,26 @@
+{
+  "slug": "jyaldi",
+  "slot": "backflip",
+  "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+  "base_job_id": "7ed684ff-42ce-42b3-9b9c-53bdfbc2e78b",
+  "frame_index": 4,
+  "revision": "v5-face-1",
+  "rectangles": [
+    [
+      86,
+      175,
+      165,
+      241
+    ],
+    [
+      100,
+      105,
+      196,
+      155
+    ]
+  ],
+  "mask_visually_reviewed": true,
+  "seed": 2026102901,
+  "description": "Repair this upside-down woman during the SAME backward tucked somersault pose. Restore the missing opaque face and long straight black hair inside the mask, natural pale skin, small red irises, mature feminine face, black fitted suit and white shirt collar. Keep the exact inverted head angle, hair silhouette continuity, native pixel style and lighting. Fill accidental transparent holes inside face and hair. Transparent outside the clean dark silhouette; no gray paint or gray halo. Do not turn her upright, add limbs, add text, or change pose. Also close the tiny accidental holes in the masked bent knee and black gloved hand, retaining their exact shape and black fabric shading.",
+  "mask_review_findings": "Mask overlaid on actual frame at 3x: covers damaged inverted face/hair and tiny knee/glove holes; feet and unmasked torso stay frozen."
+}

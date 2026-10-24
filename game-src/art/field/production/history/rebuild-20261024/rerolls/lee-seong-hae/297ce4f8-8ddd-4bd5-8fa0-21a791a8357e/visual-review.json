@@ -1,0 +1,13 @@
+{
+  "job": "297ce4f8-8ddd-4bd5-8fa0-21a791a8357e",
+  "decision": "reroll",
+  "reason": "키 약214px로 작은 체구198–201px 범위 초과, 정면 대신 3/4 방향.",
+  "at": 1792789084.7415783,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

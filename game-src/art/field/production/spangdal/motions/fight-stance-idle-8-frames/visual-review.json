@@ -1,0 +1,20 @@
+{
+  "at": 1792802508.20715,
+  "job_id": "9dea4c3b-ea98-465b-b6b4-5b9d5606d6cd",
+  "result": "pass",
+  "findings": "All eight west guard frames inspected: consistent near-hand guard, stable feet, own bob/skirt/pumps, no exterior gray regions or clipped anatomy.",
+  "frame_count": 8,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "fight-stance-idle-8-frames",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

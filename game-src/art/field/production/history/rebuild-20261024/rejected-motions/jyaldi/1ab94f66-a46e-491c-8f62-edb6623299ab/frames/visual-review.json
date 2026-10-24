@@ -1,0 +1,20 @@
+{
+  "at": 1792798102.7271266,
+  "job_id": "d65a2ba8-9a3a-49ef-a737-9e089f899515",
+  "result": "reroll-required",
+  "findings": "3·4프레임 접지 무릎/발 아래 회색 잔상 면과5프레임 다리 주변 흩어진 외곽 픽셀 발견. 사용자 회색 외곽 금지에 따라 반려, 재생성 필요.",
+  "frame_count": 6,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "running-slide",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

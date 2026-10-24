@@ -1,0 +1,14 @@
+{
+  "description": "은하제 / Eun Ha-je. Lean adult woman with pale angular face, tired narrow pale icy blue-gray eyes and flat annoyed mouth. Glossy dark BLUE chin-length BOB with heavy uneven fringe, a small forehead opening to HER LEFT (viewer right), inward-curled ends and one cheek lock. Navy fitted trouser suit, white shirt and dark blue tie. No mask, no glasses. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
+  "reference_image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "n_directions": 8,
+  "view": "low top-down",
+  "template_id": "mannequin",
+  "name": "은하제",
+  "seed": 10222027,
+  "no_background": true
+}

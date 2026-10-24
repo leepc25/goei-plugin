@@ -1,0 +1,13 @@
+{
+  "job": "b73bd52d-98e3-4540-b7d3-2be92f9d1a72",
+  "decision": "reroll",
+  "reason": "키183px로 보통 성인 목표보다 작음. 양 입꼬리 흉터도 부족. 통과한 정면 스타일·스케일로 교체.",
+  "at": 1792789795.8571312,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

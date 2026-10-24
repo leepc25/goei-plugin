@@ -1,0 +1,20 @@
+{
+  "at": 1792798102.9519615,
+  "job_id": "58509341-51b2-4853-936f-c0c46fd92c08",
+  "result": "reroll-required",
+  "findings": "1·3프레임 얼굴 앞에 분리된 살색/회색 조각,2프레임 주먹도 검은 장갑과 불일치. 잽 팔 뻗음이 불명확해 현재 결과 반려.",
+  "frame_count": 3,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "lead-jab",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

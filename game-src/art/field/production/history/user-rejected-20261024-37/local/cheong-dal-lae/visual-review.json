@@ -1,0 +1,14 @@
+{
+  "job": "a1dee1b6-2ba5-4b38-bb12-bcfa1221552f",
+  "job_status": "completed",
+  "decision": "pass",
+  "reason": "원작의 청록빛 검은 중앙 가르마·긴 옆머리·청회색 눈·차분한 얼굴·어두운 정장 확인. 모발 포함208px이며 머리 볼륨 제외 여성 범위. 정면·투명 외곽 정상. 낮은 뒤쪽 번은 8방향 측후면에서 재확인.",
+  "at": 1792792021.3820808,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

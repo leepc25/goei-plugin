@@ -1,0 +1,25 @@
+{
+  "at": 1792794583.1718068,
+  "character_id": "084edf22-121b-4853-a333-bc29f2c3e8ba",
+  "result": "pass",
+  "directions_reviewed": [
+    "south",
+    "south-east",
+    "east",
+    "north-east",
+    "north",
+    "north-west",
+    "west",
+    "south-west"
+  ],
+  "findings": "디폴트 AVIF와 대조해 어깨 아래 갈색 장발·수척한 얼굴과 눈밑 그늘·마른 체형·열린 셔츠 깃·느슨한 넥타이·남색 정장 확인. 이전 잠긴 깃/짧은 머리 결함 해소, 8방향 체격과 높이 일관. 회색 외곽 없음. AVIF 우선·로어 키 보충·전원8방향 장벽 재확인.",
+  "movement_direction": "east",
+  "stationary_direction": "south-east",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF primary",
+    "Lore supplementary height",
+    "All55 before motion",
+    "Gray outer paint reroll"
+  ]
+}

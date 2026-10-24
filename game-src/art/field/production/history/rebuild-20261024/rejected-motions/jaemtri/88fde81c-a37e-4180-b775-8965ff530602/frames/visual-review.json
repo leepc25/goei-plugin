@@ -1,0 +1,20 @@
+{
+  "at": 1792803997.8906937,
+  "job_id": "765a0855-4ec4-4945-8cbc-6e7ebe80d2df",
+  "result": "reroll-required",
+  "findings": "Large gray painted exterior masses around head/body in rotation frames 3/4 and damaged hands/shoes. Regenerate bounded explicit forward-rotation skeleton.",
+  "frame_count": 6,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "front-flip",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

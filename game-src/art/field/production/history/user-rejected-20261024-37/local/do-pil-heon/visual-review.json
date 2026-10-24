@@ -1,0 +1,13 @@
+{
+  "job": "da4072f2-c6e1-4bde-8e9a-5c39fbc70364",
+  "decision": "pass",
+  "reason": "정면·검은 선글라스·뒤로 넘긴 갈색 웨이브·성숙한 각진 얼굴·정장 확인. 머리 포함228px, 모발 볼륨을 제외한 본체 약222px로 보통 키 상단. 투명 외곽 정상.",
+  "at": 1792789696.6109147,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

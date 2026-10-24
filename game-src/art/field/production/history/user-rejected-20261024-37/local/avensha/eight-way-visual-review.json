@@ -1,0 +1,25 @@
+{
+  "at": 1792794736.2566783,
+  "character_id": "e26cb210-17f2-4cc1-ae6a-cf3cee08a6ea",
+  "result": "pass",
+  "directions_reviewed": [
+    "south",
+    "south-east",
+    "east",
+    "north-east",
+    "north",
+    "north-west",
+    "west",
+    "south-west"
+  ],
+  "findings": "AVIF의 청회색 곱슬머리·초록 눈·어두운 자주색 후드 망토·초록 보석 브로치·어두운 정장과 넥타이를 8방향 대조. 과한 파랑/보라 교정 유지, 망토 실루엣과 체형 일관, 회색 외곽 칠 없음. AVIF 우선·로어 키 보충·전원 장벽 재확인.",
+  "movement_direction": "east",
+  "stationary_direction": "south-east",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF primary",
+    "Lore supplementary height",
+    "All55 before motion",
+    "Gray outer paint reroll"
+  ]
+}

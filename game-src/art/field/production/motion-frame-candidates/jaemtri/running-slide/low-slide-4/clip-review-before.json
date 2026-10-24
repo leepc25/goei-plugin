@@ -1,0 +1,20 @@
+{
+  "at": 1792804619.4880726,
+  "job_id": "f0edcb83-0b00-45e5-aef3-53223e4c989a",
+  "result": "reroll-required",
+  "findings": "Frame 5 has severe face/hair/hand/shin/heel transparent breakup; other seven poses inspected. Regenerate exact low slide pose using clean own frame 2 reference.",
+  "frame_count": 8,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "group_id": "0e4a268f-37d3-4ba4-b8ad-ba2514af8ff4",
+  "states": [
+    {
+      "character": {
+        "id": "d8cca93c-3a77-43bc-bc24-61b0b478fe95",
+        "name": "Idle",
+        "prompt": "노기균 / No Gi-gyun. Fit adult man with broad shoulders and tapered waist. Dark brown-black hair swept upward and back with a side part. Black aviator sunglasses. Narrow face and VERY DISTINCT healed jagged Glasgow-smile scars extending from BOTH mouth corners across the cheeks, with short perpendicular stitch-like scar marks. Closed-mouth sinister slight smile. This is scar tissue, not a moustache or beard. Black tailored suit, white shirt, neat black tie. Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches.",
+        "size": {
+          "width": 128,
+          "height": 256
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "low top-down",
+        "created_at": "2026-10-23T21:32:02.571127+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {}
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-10-23T21:52:30.810758"
+}

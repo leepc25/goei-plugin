@@ -1,0 +1,20 @@
+{
+  "at": 1792803293.84594,
+  "job_id": "ddbb44f9-e4c4-409a-9e76-d4a85126b4c0",
+  "result": "reroll-required",
+  "findings": "Frame 6 contains floating gray debris around released ball above extended hand; other frames retain character. Regenerate exact release pose.",
+  "frame_count": 8,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

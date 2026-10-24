@@ -1,0 +1,24 @@
+{
+  "character_id": "87f5d022-f0bf-4747-9b54-a808a927377a",
+  "result": "pass",
+  "directions_reviewed": [
+    "south",
+    "south-east",
+    "east",
+    "north-east",
+    "north",
+    "north-west",
+    "west",
+    "south-west"
+  ],
+  "findings": "가장 큰 근육질 체격, 올린 검은 머리, 양어깨·위팔·상흉부의 금속판 유지. 회색은 의도된 금속 안쪽으로 한정됨. 8방향의 키·외곽 일관성 확인, 회색 외부 칠 없음.",
+  "movement_direction": "east",
+  "stationary_direction": "south-east",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF primary",
+    "Lore supplementary height",
+    "All55 before motion",
+    "Gray outer paint reroll"
+  ]
+}

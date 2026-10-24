@@ -1,0 +1,9 @@
+{
+  "frame_index": 4,
+  "source_job_id": "40c26d95-c80c-468d-bd5f-30bf1465acb6",
+  "source_frame_index": 1,
+  "target_pose_index": 4,
+  "source_path": "motion-frame-candidates/jaemtri/picking-up/low-pose-1/frames/1.png",
+  "sha256": "33fa7a4d4f52a9428a8c1af9bd388dcba0daaa4c216206565dac7a681c11764b",
+  "findings": "Candidate 1 inspected at 2x: continuous face/hair/hands and intact low crouch, own brown waves/skirt/heels, no gray outer paint."
+}

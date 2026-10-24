@@ -1,0 +1,20 @@
+{
+  "at": 1792812672.8217275,
+  "job_id": "03931583-76d1-4cf6-a372-6fcb651fefd3",
+  "result": "reroll-required",
+  "findings": "Rear boot clipped at lower canvas edge throughout; bound planted feet and jab/recover trajectory.",
+  "frame_count": 3,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "lead-jab",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

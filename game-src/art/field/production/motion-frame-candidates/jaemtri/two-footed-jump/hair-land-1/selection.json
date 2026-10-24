@@ -1,0 +1,9 @@
+{
+  "frame_index": 6,
+  "source_job_id": "f9b2c65c-05da-4697-be89-fcb583c6e5c9",
+  "source_frame_index": 1,
+  "target_pose_index": 6,
+  "source_path": "motion-frame-candidates/jaemtri/two-footed-jump/hair-land-1/frames/1.png",
+  "sha256": "9d95be147cd42a533a13faf9c713a345ac69a67360671d2565fcd21b1f05b754",
+  "findings": "Candidate 1 matches bent-knee landing, clean hair edge and complete heels; no gray exterior."
+}

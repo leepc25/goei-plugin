@@ -1,0 +1,20 @@
+{
+  "at": 1792812437.0787494,
+  "job_id": "63c65c76-cb1d-4a2c-ac1a-062b4f4500fb",
+  "result": "reroll-required",
+  "findings": "Middle sliding frames clip hands/legs at bottom edge; rebuild bounded whole-body slide.",
+  "frame_count": 6,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "running-slide",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

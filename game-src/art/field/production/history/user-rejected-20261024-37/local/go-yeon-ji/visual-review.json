@@ -1,0 +1,14 @@
+{
+  "job": "02522c5f-7c65-4dea-9097-d37a7f3eece0",
+  "job_status": "completed",
+  "decision": "pass",
+  "reason": "머리가 원작의 검은 어깨 길이 생머리·끝의 바깥 말림으로 교정됨. 청진기·민트 셔츠·흰 가운·얼굴·키는 마스크 밖 RGBA 그대로. 모발 포함209px, 정면·외곽 정상.65색 보존을 별도 명시.",
+  "at": 1792793530.1338882,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

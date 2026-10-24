@@ -1,0 +1,14 @@
+{
+  "job": "833ae0ce-09fb-4e28-b560-726df7acd16e",
+  "job_status": "completed",
+  "decision": "pass",
+  "reason": "원작의 허리까지 긴 버건디 생머리·일자 앞머리·갈색 눈·밝은 회색 바지정장·어두운 타이 대조. 모발 포함208px이며 머리 볼륨 제외 여성 키 범위, 정면·외곽 정상. 회색 의복과 외부 덧칠을 구분해 확인.",
+  "at": 1792792203.118625,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

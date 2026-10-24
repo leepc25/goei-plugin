@@ -1,0 +1,20 @@
+{
+  "at": 1792803534.6108894,
+  "job_id": "2f422a48-f57e-4298-ba5d-a2544d7f7269",
+  "result": "pass",
+  "findings": "All six frames viewed: SW cup raises to lips and lowers while head stays upright; cup and bare hand remain intact throughout, gold eye/purple bob/skirt preserved, no gray exterior or holes.",
+  "frame_count": 6,
+  "directions": [
+    "south-west"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

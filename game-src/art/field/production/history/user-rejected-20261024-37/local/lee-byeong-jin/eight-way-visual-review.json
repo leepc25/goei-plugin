@@ -1,0 +1,25 @@
+{
+  "at": 1792794262.7792265,
+  "character_id": "de8535c0-fe94-45eb-ae6d-0e4c99bb4f2a",
+  "result": "pass",
+  "directions_reviewed": [
+    "south",
+    "south-east",
+    "east",
+    "north-east",
+    "north",
+    "north-west",
+    "west",
+    "south-west"
+  ],
+  "findings": "AVIF의 살집 있는 중년 체형·둥근 배·짧은 갈색 머리·얇은 안경·흰 셔츠·검은 넥타이를 8방향 확인. 체격 유지, 회색 외곽 칠 없음. AVIF 우선과 로어 보충·전원 완료 장벽 재확인.",
+  "movement_direction": "east",
+  "stationary_direction": "south-east",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF primary",
+    "Lore supplementary height",
+    "All55 before motion",
+    "Gray outer paint reroll"
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "at": 1792803311.788592,
+  "job_id": "ab649897-6863-47bc-bd2c-3b384cea90f1",
+  "result": "pass",
+  "findings": "All eight frames viewed: WEST run into lowered slide and recover; legs and shoes intact throughout, no gray exterior patch or clipping; own skirt and hair preserved.",
+  "frame_count": 8,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

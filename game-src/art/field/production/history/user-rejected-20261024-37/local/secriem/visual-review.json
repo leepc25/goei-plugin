@@ -1,0 +1,14 @@
+{
+  "job": "49f50cbc-3c79-4f23-8835-3cbea51c83a5",
+  "job_status": "completed",
+  "decision": "pass",
+  "reason": "원작의 매우 긴 은백색 생머리·일자 앞머리·붉은 눈·붉은 하이넥 민소매 드레스·마름모 가슴 트임·옆트임과 여성 체형 대조. 모발과 굽 포함208px, 본체 여성 키 범위. 정면·외곽 정상.",
+  "at": 1792792795.3642442,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

@@ -1,0 +1,6 @@
+{
+  "result": "pass",
+  "scope": "Own rotation reference landmarks only; jump sequences remain unreviewed",
+  "findings": "Overlay individually viewed: face, shoulders, elbows, wrists, hips, knees and ankles follow own character; occluded landmarks remain inferred.",
+  "new_user_approval": false
+}

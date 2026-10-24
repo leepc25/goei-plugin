@@ -1,0 +1,9 @@
+{
+  "frame_index": 1,
+  "source_job_id": "62ce07ec-3b83-4dae-b960-50762c788d6a",
+  "source_frame_index": 1,
+  "target_pose_index": 1,
+  "source_path": "motion-frame-candidates/aileen/running-8-frames/clean-pose-1-1/frames/1.png",
+  "sha256": "e2766f714f219d117de374d064c625fb4920288eb340c09ed3eeb61781745d05",
+  "findings": "세 후보 전체 확인 후 머리카락 가닥과 몸/구두 외곽이 깨끗한 1번 선택. 목표 자세 유지, 회색 매트 덩어리 없음."
+}

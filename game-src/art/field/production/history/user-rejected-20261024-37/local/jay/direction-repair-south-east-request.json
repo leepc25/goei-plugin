@@ -1,0 +1,17 @@
+{
+  "image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "mask_image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "description": "Remove the invented sleeve badge/patch in the selected upper-arm rectangle. Replace it with PLAIN continuous dark navy uniform sleeve fabric matching surrounding folds and palette. No outlined shield, no pocket, no badge, no emblem, no insignia, no symbols. Preserve sleeve shape, anatomy, all unmasked pixels and crisp native pixel rendering exactly. Transparent background.",
+  "no_background": true,
+  "output_method": "Modify current layer",
+  "crop_to_mask": true,
+  "seed": 1792794363
+}

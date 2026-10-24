@@ -1,0 +1,338 @@
+[
+  {
+    "record_id": "local-sync:jyaldi-backflip-v7-estimate",
+    "slug": "jyaldi",
+    "slot": "backflip",
+    "endpoint": "estimate-skeleton",
+    "usage": {
+      "type": "generations",
+      "generations": 0.1
+    },
+    "receipt": "motion-inputs/jyaldi/backflip-v7/estimate-response.json",
+    "server_job_id": null
+  },
+  {
+    "record_id": "local-sync:jaemtri-crouch-reference-estimate",
+    "slug": "jaemtri",
+    "slot": "motion-reference",
+    "endpoint": "estimate-skeleton",
+    "usage": {
+      "type": "generations",
+      "generations": 0.1
+    },
+    "receipt": "motion-inputs/jaemtri/measured-crouch-reference/estimate-response.json",
+    "server_job_id": null
+  },
+  {
+    "record_id": "local-sync:jaemtri-turn-reference-estimate",
+    "slug": "jaemtri",
+    "slot": "backflip",
+    "endpoint": "estimate-skeleton",
+    "usage": {
+      "type": "generations",
+      "generations": 0.1
+    },
+    "receipt": "motion-inputs/jaemtri/measured-turn-reference/estimate-response.json",
+    "server_job_id": null
+  },
+  {
+    "record_id": "local-sync:aileen-air-reference-estimate",
+    "slug": "aileen",
+    "slot": "motion-reference",
+    "endpoint": "estimate-skeleton",
+    "usage": {
+      "type": "generations",
+      "generations": 0.1
+    },
+    "receipt": "motion-inputs/aileen/measured-air-reference/estimate-response.json",
+    "server_job_id": null
+  },
+  {
+    "record_id": "local-sync:aileen-guard-reference-estimate",
+    "slug": "aileen",
+    "slot": "lead-jab",
+    "endpoint": "estimate-skeleton",
+    "usage": {
+      "type": "generations",
+      "generations": 0.1
+    },
+    "receipt": "motion-inputs/aileen/measured-guard-reference/estimate-response.json",
+    "server_job_id": null
+  },
+  {
+    "record_id": "local-sync:aileen-run-reference-estimate",
+    "slug": "aileen",
+    "slot": "running-8-frames",
+    "endpoint": "estimate-skeleton",
+    "usage": {
+      "type": "generations",
+      "generations": 0.1
+    },
+    "receipt": "motion-inputs/aileen/measured-run-reference/estimate-response.json",
+    "server_job_id": null
+  },
+  {
+    "record_id": "local-sync:aileen-crouch-reference-estimate",
+    "slug": "aileen",
+    "slot": "crouched-walking",
+    "endpoint": "estimate-skeleton",
+    "usage": {
+      "type": "generations",
+      "generations": 0.1
+    },
+    "receipt": "motion-inputs/aileen/measured-crouch-reference/estimate-response.json",
+    "server_job_id": null
+  },
+  {
+    "record_id": "local-sync:aileen-turn-reference-estimate",
+    "slug": "aileen",
+    "slot": "turn-reference",
+    "endpoint": "estimate-skeleton",
+    "usage": {
+      "type": "generations",
+      "generations": 0.1
+    },
+    "receipt": "motion-inputs/aileen/measured-turn-reference/estimate-response.json",
+    "server_job_id": null
+  },
+  {
+    "record_id": "local-sync:lee-gi-seok-west-rotation-estimate",
+    "slug": "lee-gi-seok",
+    "slot": "motion-reference",
+    "endpoint": "estimate-skeleton",
+    "usage": {
+      "type": "generations",
+      "generations": 0.1
+    },
+    "receipt": "motion-inputs/lee-gi-seok/measured-west-reference/estimate-response.json",
+    "server_job_id": null
+  },
+  {
+    "record_id": "local-sync:kim-seong-jin-east-rotation-estimate",
+    "slug": "kim-seong-jin",
+    "slot": "motion-reference",
+    "endpoint": "estimate-skeleton",
+    "usage": {
+      "type": "generations",
+      "generations": 0.1
+    },
+    "receipt": "motion-inputs/kim-seong-jin/measured-east-reference/estimate-response.json",
+    "server_job_id": null
+  },
+  {
+    "record_id": "local-sync:jin-na-sol-east-rotation-estimate",
+    "slug": "jin-na-sol",
+    "slot": "motion-reference",
+    "endpoint": "estimate-skeleton",
+    "usage": {
+      "type": "generations",
+      "generations": 0.1
+    },
+    "receipt": "motion-inputs/jin-na-sol/measured-east-reference/estimate-response.json",
+    "server_job_id": null
+  },
+  {
+    "record_id": "local-sync:lee-ja-heon-east-rotation-estimate",
+    "slug": "lee-ja-heon",
+    "slot": "motion-reference",
+    "endpoint": "estimate-skeleton",
+    "usage": {
+      "type": "generations",
+      "generations": 0.1
+    },
+    "receipt": "motion-inputs/lee-ja-heon/measured-east-reference/estimate-response.json",
+    "server_job_id": null
+  },
+  {
+    "record_id": "local-sync:baek-sa-heon-east-rotation-estimate",
+    "slug": "baek-sa-heon",
+    "slot": "motion-reference",
+    "endpoint": "estimate-skeleton",
+    "usage": {
+      "type": "generations",
+      "generations": 0.1
+    },
+    "receipt": "motion-inputs/baek-sa-heon/measured-east-reference/estimate-response.json",
+    "server_job_id": null
+  },
+  {
+    "record_id": "local-sync:go-young-eun-east-rotation-estimate",
+    "slug": "go-young-eun",
+    "slot": "motion-reference",
+    "endpoint": "estimate-skeleton",
+    "usage": {
+      "type": "generations",
+      "generations": 0.1
+    },
+    "receipt": "motion-inputs/go-young-eun/measured-east-reference/estimate-response.json",
+    "server_job_id": null
+  },
+  {
+    "record_id": "local-sync:kang-i-hak-east-rotation-estimate",
+    "slug": "kang-i-hak",
+    "slot": "motion-reference",
+    "endpoint": "estimate-skeleton",
+    "usage": {
+      "type": "generations",
+      "generations": 0.1
+    },
+    "receipt": "motion-inputs/kang-i-hak/measured-east-reference/estimate-response.json",
+    "server_job_id": null
+  },
+  {
+    "record_id": "local-sync:jang-heo-un-east-rotation-estimate",
+    "slug": "jang-heo-un",
+    "slot": "motion-reference",
+    "endpoint": "estimate-skeleton",
+    "usage": {
+      "type": "generations",
+      "generations": 0.1
+    },
+    "receipt": "motion-inputs/jang-heo-un/measured-east-reference/estimate-response.json",
+    "server_job_id": null
+  },
+  {
+    "record_id": "local-sync:kwak-je-gang-east-rotation-estimate",
+    "slug": "kwak-je-gang",
+    "slot": "motion-reference",
+    "endpoint": "estimate-skeleton",
+    "usage": {
+      "type": "generations",
+      "generations": 0.1
+    },
+    "receipt": "motion-inputs/kwak-je-gang/measured-east-reference/estimate-response.json",
+    "server_job_id": null
+  },
+  {
+    "record_id": "local-sync:lee-yeon-hwa-east-rotation-estimate",
+    "slug": "lee-yeon-hwa",
+    "slot": "motion-reference",
+    "endpoint": "estimate-skeleton",
+    "usage": {
+      "type": "generations",
+      "generations": 0.1
+    },
+    "receipt": "motion-inputs/lee-yeon-hwa/measured-east-reference/estimate-response.json",
+    "server_job_id": null
+  },
+  {
+    "record_id": "local-sync:ho-yu-won-west-rotation-estimate",
+    "slug": "ho-yu-won",
+    "slot": "motion-reference",
+    "endpoint": "estimate-skeleton",
+    "usage": {
+      "type": "generations",
+      "generations": 0.1
+    },
+    "receipt": "motion-inputs/ho-yu-won/measured-west-reference/estimate-response.json",
+    "server_job_id": null
+  },
+  {
+    "record_id": "local-sync:seo-yun-ji-east-rotation-estimate",
+    "slug": "seo-yun-ji",
+    "slot": "motion-reference",
+    "endpoint": "estimate-skeleton",
+    "usage": {
+      "type": "generations",
+      "generations": 0.1
+    },
+    "receipt": "motion-inputs/seo-yun-ji/measured-east-reference/estimate-response.json",
+    "server_job_id": null
+  },
+  {
+    "record_id": "local-sync:go-yeon-ji-east-rotation-estimate",
+    "slug": "go-yeon-ji",
+    "slot": "motion-reference",
+    "endpoint": "estimate-skeleton",
+    "usage": {
+      "type": "generations",
+      "generations": 0.1
+    },
+    "receipt": "motion-inputs/go-yeon-ji/measured-east-reference/estimate-response.json",
+    "server_job_id": null
+  },
+  {
+    "record_id": "local-sync:yun-ji-a-east-rotation-estimate",
+    "slug": "yun-ji-a",
+    "slot": "motion-reference",
+    "endpoint": "estimate-skeleton",
+    "usage": {
+      "type": "generations",
+      "generations": 0.1
+    },
+    "receipt": "motion-inputs/yun-ji-a/measured-east-reference/estimate-response.json",
+    "server_job_id": null
+  },
+  {
+    "record_id": "local-sync:ma-deok-hee-east-rotation-estimate",
+    "slug": "ma-deok-hee",
+    "slot": "motion-reference",
+    "endpoint": "estimate-skeleton",
+    "usage": {
+      "type": "generations",
+      "generations": 0.1
+    },
+    "receipt": "motion-inputs/ma-deok-hee/measured-east-reference/estimate-response.json",
+    "server_job_id": null
+  },
+  {
+    "record_id": "local-sync:mun-hye-ran-east-rotation-estimate",
+    "slug": "mun-hye-ran",
+    "slot": "motion-reference",
+    "endpoint": "estimate-skeleton",
+    "usage": {
+      "type": "generations",
+      "generations": 0.1
+    },
+    "receipt": "motion-inputs/mun-hye-ran/measured-east-reference/estimate-response.json",
+    "server_job_id": null
+  },
+  {
+    "record_id": "local-sync:saladin-east-rotation-estimate",
+    "slug": "saladin",
+    "slot": "motion-reference",
+    "endpoint": "estimate-skeleton",
+    "usage": {
+      "type": "generations",
+      "generations": 0.1
+    },
+    "receipt": "motion-inputs/saladin/measured-east-reference/estimate-response.json",
+    "server_job_id": null
+  },
+  {
+    "record_id": "local-sync:secriem-east-rotation-estimate",
+    "slug": "secriem",
+    "slot": "motion-reference",
+    "endpoint": "estimate-skeleton",
+    "usage": {
+      "type": "generations",
+      "generations": 0.1
+    },
+    "receipt": "motion-inputs/secriem/measured-east-reference/estimate-response.json",
+    "server_job_id": null
+  },
+  {
+    "record_id": "local-sync:aileen-front-tuck-estimate",
+    "slug": "aileen",
+    "slot": "front-flip",
+    "endpoint": "estimate-skeleton",
+    "usage": {
+      "type": "generations",
+      "generations": 0.1
+    },
+    "receipt": "motion-inputs/aileen/measured-front-tuck-reference/estimate-response.json",
+    "server_job_id": null
+  },
+  {
+    "record_id": "local-sync:aileen-open-palms-estimate",
+    "slug": "aileen",
+    "slot": "pushing",
+    "endpoint": "estimate-skeleton",
+    "usage": {
+      "type": "generations",
+      "generations": 0.1
+    },
+    "receipt": "motion-inputs/aileen/measured-open-palms-reference/estimate-response.json",
+    "server_job_id": null
+  }
+]

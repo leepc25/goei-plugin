@@ -1,0 +1,8 @@
+{
+  "slug": "saladin",
+  "character_id": "9e926b19-797f-4c96-9623-f93b60165828",
+  "direction": "east",
+  "image_sha256": "905e3236f90e741a0f613c8614d529e40bb1a22760ea81138e9a1f386e0b53e0",
+  "started_epoch": 1792810688.8870184,
+  "expected_generations": 0.1
+}

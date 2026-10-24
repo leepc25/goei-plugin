@@ -1,0 +1,20 @@
+{
+  "at": 1792812670.938129,
+  "job_id": "8ca0dfee-91a4-4107-a351-86b38e32d7c7",
+  "result": "pass",
+  "findings": "All eight own bounded jump frames reviewed: intact guard hands, knees and boots, EAST identity and clean exterior.",
+  "frame_count": 8,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

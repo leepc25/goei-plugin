@@ -1,0 +1,13 @@
+{
+  "job": "37ea4f25-334e-433e-807e-348451f23456",
+  "decision": "reroll",
+  "reason": "짧은 앞머리 위 이마 노출 부족, 키 약238px 초과.",
+  "at": 1792788956.1835165,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

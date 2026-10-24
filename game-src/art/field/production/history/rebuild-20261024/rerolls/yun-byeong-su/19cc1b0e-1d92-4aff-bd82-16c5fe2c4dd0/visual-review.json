@@ -1,0 +1,13 @@
+{
+  "job": "19cc1b0e-1d92-4aff-bd82-16c5fe2c4dd0",
+  "decision": "reroll",
+  "reason": "키 약239px로 잠정214–222px 초과, 평평한 표정보다 웃는 인상.",
+  "at": 1792789084.648674,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

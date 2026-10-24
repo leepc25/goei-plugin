@@ -1,0 +1,17 @@
+{
+  "image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "mask_image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "description": "Replace blue short bob with straight natural BLACK shoulder-length hair, charcoal highlights with NO blue hue. Long uneven blunt forehead bangs, sides extending to shoulders at y98 with slightly flipped outward ends. Keep serious face, eyes, white coat, stethoscope and mint collared shirt exactly. Only masked hair changes; crisp native pixels, transparent exterior.",
+  "no_background": true,
+  "output_method": "Modify current layer",
+  "crop_to_mask": true,
+  "seed": 1792792467
+}

@@ -1,0 +1,25 @@
+{
+  "at": 1792795902.3613644,
+  "character_id": "f7e83f56-9a2c-41cb-aa1d-1e27cae0bbed",
+  "result": "pass",
+  "directions_reviewed": [
+    "south",
+    "south-east",
+    "east",
+    "north-east",
+    "north",
+    "north-west",
+    "west",
+    "south-west"
+  ],
+  "findings": "원작의 붉은 긴 머리·회색 정장·넥타이·성인 체형을 8방향 최종 재대조. 서/남서/북서의 원작에 없는 패치 제거 완료. 보존 등록8장 모두 가시RGBA·알파 동일 및18관절 확인, 회색 외곽 없음. AVIF 우선·로어 키 보충·전원 장벽 재확인.",
+  "movement_direction": "east",
+  "stationary_direction": "south-east",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF primary",
+    "Lore supplementary height",
+    "All55 before motion",
+    "Gray outer paint reroll"
+  ]
+}

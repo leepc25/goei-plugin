@@ -1,0 +1,102 @@
+{
+  "slug": "aileen",
+  "slot": "jumping-1",
+  "base_job_id": "5a82b49c-23cd-42e3-9ebb-6d5ad82a2b4b",
+  "target_frame_index": 1,
+  "source_spec": "game-src/art/field/production/motion-inputs/aileen/jumping-1-measured-air-v2/spec.json",
+  "seed": 2026112601,
+  "pose": [
+    {
+      "label": "NECK",
+      "x": 0.49263572692871094,
+      "y": 0.31796460289469064
+    },
+    {
+      "label": "NOSE",
+      "x": 0.5383834838867188,
+      "y": 0.23093228477945626
+    },
+    {
+      "label": "LEFT ARM",
+      "x": 0.5927383351782787,
+      "y": 0.38543281300781873
+    },
+    {
+      "label": "LEFT EAR",
+      "x": 0.5049095153808594,
+      "y": 0.20415310997476876
+    },
+    {
+      "label": "LEFT EYE",
+      "x": 0.5339202880859375,
+      "y": 0.21084790367594064
+    },
+    {
+      "label": "LEFT HIP",
+      "x": 0.5428466796875,
+      "y": 0.5188084139298469
+    },
+    {
+      "label": "LEFT LEG",
+      "x": 0.5113729156109724,
+      "y": 0.8842074399374522
+    },
+    {
+      "label": "LEFT KNEE",
+      "x": 0.6192825899124548,
+      "y": 0.7104635151447695
+    },
+    {
+      "label": "RIGHT ARM",
+      "x": 0.5749675055792864,
+      "y": 0.3871978391500154
+    },
+    {
+      "label": "RIGHT EAR",
+      "x": 0.489288330078125,
+      "y": 0.2063847078751594
+    },
+    {
+      "label": "RIGHT EYE",
+      "x": 0.5272254943847656,
+      "y": 0.21307950157633126
+    },
+    {
+      "label": "RIGHT HIP",
+      "x": 0.49375152587890625,
+      "y": 0.5255032076310188
+    },
+    {
+      "label": "RIGHT LEG",
+      "x": 0.4964350444672158,
+      "y": 0.9238654881971304
+    },
+    {
+      "label": "LEFT ELBOW",
+      "x": 0.48395843091653484,
+      "y": 0.43146606528785564
+    },
+    {
+      "label": "RIGHT KNEE",
+      "x": 0.616437664025006,
+      "y": 0.7189038572388098
+    },
+    {
+      "label": "RIGHT ELBOW",
+      "x": 0.42171470133988426,
+      "y": 0.455421675798165
+    },
+    {
+      "label": "LEFT SHOULDER",
+      "x": 0.5272254943847656,
+      "y": 0.3157330049943
+    },
+    {
+      "label": "RIGHT SHOULDER",
+      "x": 0.45804595947265625,
+      "y": 0.32019620079508126
+    }
+  ],
+  "new_user_approval": false,
+  "action": "Hold the supplied crouched pose completely still. The long platinum blonde ponytail hangs naturally with crisp clean hair strands."
+}

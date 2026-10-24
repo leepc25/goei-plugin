@@ -1,0 +1,20 @@
+{
+  "at": 1792798073.4092817,
+  "job_id": "8c4f0d0e-1cec-44ba-a650-a0f1e699b6da",
+  "result": "pass",
+  "findings": "서쪽 웅크린 보행6프레임 검토. 긴 머리·얼굴·검은 정장·장갑 보존, 무릎 굽힘과 좌우 발 교대 확인. 소매 안쪽 흰 셔츠 끝은 복장 영역이며 외곽 회색 면이나 halo 없음. AVIF 외형·원래 신체 비율 유지.",
+  "frame_count": 6,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "crouched-walking",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

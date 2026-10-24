@@ -1,0 +1,9 @@
+{
+  "frame_index": 5,
+  "source_job_id": "bbb0fb6d-76b3-44b7-8cc7-397bda37b237",
+  "source_frame_index": 1,
+  "target_pose_index": 5,
+  "source_path": "motion-frame-candidates/spangdal/throw-object/release-1/frames/1.png",
+  "sha256": "b6d23e571e3aeceb82c754345faf5ad667ec2a493839780e7c8d4d5c985a5c42",
+  "findings": "Candidate 1 clean full frame: same extended throw arm pose, brown ball at open hand at release, no floating gray debris; own face, bob, skirt, pumps intact. Check next frame with empty hand for release transition."
+}

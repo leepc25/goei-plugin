@@ -1,0 +1,13 @@
+{
+  "job": "9122b278-bc23-44fc-bcb2-e200b53759a7",
+  "decision": "reroll",
+  "reason": "코트·분홍 블라우스·안경은 맞지만 얼굴 측면 및 여성 키 초과.",
+  "at": 1792789500.3086424,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

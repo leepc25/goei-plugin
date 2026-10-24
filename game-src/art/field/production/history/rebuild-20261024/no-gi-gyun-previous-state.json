@@ -1,0 +1,13 @@
+{
+  "name": "노기균",
+  "group": "fake-bureau",
+  "character_id": "c99d8406-4bd5-4897-aaf2-90b00fa9acab",
+  "image": "b5de6715-8544-46ed-b155-a1dc03a01d1d",
+  "registration": "c5256011-99c7-4078-bbbc-a553b395a670",
+  "motions": {},
+  "ready": true,
+  "image_verified": true,
+  "skeleton_joints": 18,
+  "rotation_count": 8,
+  "exported": true
+}

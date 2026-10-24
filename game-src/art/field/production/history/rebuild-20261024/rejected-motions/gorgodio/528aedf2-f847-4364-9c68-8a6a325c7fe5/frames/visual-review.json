@@ -1,0 +1,20 @@
+{
+  "at": 1792812436.9216573,
+  "job_id": "0df049d9-0ac4-4240-ac47-d42b9820f084",
+  "result": "reroll-required",
+  "findings": "Raised hand and forward boot touch or cross top/right canvas edges; rebuild bounded trajectory without resizing character.",
+  "frame_count": 8,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "running-jump",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

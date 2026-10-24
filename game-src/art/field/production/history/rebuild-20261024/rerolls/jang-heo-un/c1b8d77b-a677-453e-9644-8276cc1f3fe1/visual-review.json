@@ -1,0 +1,14 @@
+{
+  "job": "c1b8d77b-a677-453e-9644-8276cc1f3fe1",
+  "job_status": "completed",
+  "decision": "reroll",
+  "reason": "원본 재대조에서 열린 셔츠 깃과 느슨한 넥타이가 잠긴 형태로 변형. 어두운 회갈색 장발 및 피곤한 눈도 강조해 재생성.",
+  "at": 1792791780.7289226,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

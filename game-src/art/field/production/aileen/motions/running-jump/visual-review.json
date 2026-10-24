@@ -1,0 +1,20 @@
+{
+  "at": 1792808302.6344025,
+  "job_id": "c97e3a3f-a57c-4686-83d1-c061b35c4f91",
+  "result": "pass",
+  "findings": "8프레임 전체 확인. 동쪽 작은 달리기에서 도약/착지로 이어짐. 포니테일 가닥과 바지 정장/얼굴 유지, 회색 외곽 면·잘림 없음. 팔과 몸 사이 공간은 정상 투명 간격.",
+  "frame_count": 8,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

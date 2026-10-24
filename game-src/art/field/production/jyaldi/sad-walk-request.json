@@ -3,7 +3,8 @@
   "mode": "skeleton-v3",
   "template_animation_id": "sad-walk",
   "directions": [
-    "east"
+    "west"
   ],
-  "animation_name": "풀죽어 걷기 (동쪽)"
+  "animation_name": "풀죽어 걷기 (서쪽)",
+  "action_description": "sad walk. Preserve this character identity, costume, hair and native proportions. Keep a clean transparent silhouette in every frame. No gray painted patches, gray halo, ground shadow or opaque background around hair, hands, clothes or feet."
 }

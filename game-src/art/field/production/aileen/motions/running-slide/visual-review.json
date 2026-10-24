@@ -1,0 +1,91 @@
+{
+  "at": 1792810508.5338783,
+  "job_id": "da75aa01-b246-4001-93cd-b9d140c961a5",
+  "result": "pass",
+  "findings": "All eight frames reviewed after replacements: backward lean into extended-leg slide and recovery, intact native proportions and EAST direction, no clipping or broad gray exterior matte.",
+  "frame_count": 8,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ],
+  "frame_assembly": {
+    "base_job_id": "da75aa01-b246-4001-93cd-b9d140c961a5",
+    "frame_sources": [
+      {
+        "frame_index": 0,
+        "source_job_id": "da75aa01-b246-4001-93cd-b9d140c961a5",
+        "source_frame_index": 0,
+        "sha256": "91dc7e24fad563f86f8da95b6048782cefbc509a247a773fda8656beda4861c6"
+      },
+      {
+        "frame_index": 1,
+        "source_job_id": "67129b29-cc39-4202-b176-09b5609a6cce",
+        "source_frame_index": 1,
+        "target_pose_index": 1,
+        "source_path": "motion-frame-candidates/aileen/running-slide/clean-pose-1-1/frames/1.png",
+        "sha256": "ce7b14911f68f20354c8622e534583324f1d7d768afd7e11abbdaee7a2cd9fe9",
+        "findings": "Reviewed enlarged on magenta: intact black suit and shoes, blonde strands without broad gray exterior mass; full sequence review required."
+      },
+      {
+        "frame_index": 2,
+        "source_job_id": "2b5bd3b4-f86a-46dc-ab8a-77ba3030ae6e",
+        "source_frame_index": 1,
+        "target_pose_index": 2,
+        "source_path": "motion-frame-candidates/aileen/running-slide/clean-pose-2-1/frames/1.png",
+        "sha256": "e32de5ba33c76c45aec19a2be31acfd63db22c78e87dc8d8a49c2ddd20c20356",
+        "findings": "후보 전체 확인. 선택 프레임은 얼굴·손·구두 외곽이 온전하고 몸 밖 회색 덩어리 없음. 같은 목표 자세 유지."
+      },
+      {
+        "frame_index": 3,
+        "source_job_id": "da75aa01-b246-4001-93cd-b9d140c961a5",
+        "source_frame_index": 3,
+        "sha256": "2b0db8a139539d96830d9b4a04b6671fabe5cd8d9a19942a32ac539acc0e8cd4"
+      },
+      {
+        "frame_index": 4,
+        "source_job_id": "da75aa01-b246-4001-93cd-b9d140c961a5",
+        "source_frame_index": 4,
+        "sha256": "d55a4d77f18509d6eeb87aee72bde6a19f27c8195bc42bf6296503ac817ffc07"
+      },
+      {
+        "frame_index": 5,
+        "source_job_id": "8146b192-8b88-4ce8-952e-0b1c0eb48caf",
+        "source_frame_index": 1,
+        "target_pose_index": 5,
+        "source_path": "motion-frame-candidates/aileen/running-slide/clean-pose-5-1/frames/1.png",
+        "sha256": "90b09c37c3bb4e46b8bd460e9d7bfcfe344b9c23cfc30ff84e5bff5c2daebc2b",
+        "findings": "Reviewed enlarged on magenta: intact black suit and shoes, blonde strands without broad gray exterior mass; full sequence review required."
+      },
+      {
+        "frame_index": 6,
+        "source_job_id": "17bbb2de-b31c-46eb-8fea-22a608cde172",
+        "source_frame_index": 2,
+        "target_pose_index": 6,
+        "source_path": "motion-frame-candidates/aileen/running-slide/clean-pose-6-1/frames/2.png",
+        "sha256": "74c37e9de7539ea0ce60cfd87cdc24d76a2843b04da9426c19ca17cdef67ca4a",
+        "findings": "Reviewed enlarged on magenta: intact black suit and shoes, blonde strands without broad gray exterior mass; full sequence review required."
+      },
+      {
+        "frame_index": 7,
+        "source_job_id": "51b1054d-ee18-4fde-93f8-b77167fe023b",
+        "source_frame_index": 1,
+        "target_pose_index": 7,
+        "source_path": "motion-frame-candidates/aileen/running-slide/clean-pose-7-1/frames/1.png",
+        "sha256": "b70572e8cf389a3206d2d7c33b956f3fcfe21f050ce6716b7d31963513f28382",
+        "findings": "Reviewed enlarged on magenta: intact black suit and shoes, blonde strands without broad gray exterior mass; full sequence review required."
+      }
+    ],
+    "method": "select complete same-pose regenerated frames; no pixel editing",
+    "new_user_approval": false,
+    "visual_reviewed": true
+  }
+}

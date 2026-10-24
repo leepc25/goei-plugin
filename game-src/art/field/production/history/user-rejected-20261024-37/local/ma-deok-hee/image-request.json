@@ -1,0 +1,17 @@
+{
+  "image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "mask_image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "description": "Fill the open triangular forehead hair gap with dense straight BLACK blunt bangs. A continuous horizontal fringe across the entire forehead just ABOVE eyebrows at y62. No center part and no bare triangular forehead. Preserve eyes, face, black chin-length bob, suit and body exactly. Match existing black hair palette, crisp native pixel clusters, transparent background.",
+  "no_background": true,
+  "output_method": "Modify current layer",
+  "crop_to_mask": true,
+  "seed": 1792792467
+}

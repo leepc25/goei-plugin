@@ -1,0 +1,36 @@
+{
+  "at": 1792796055.2951283,
+  "slug": "shin-yuri",
+  "reason": "회전 머리의 땋은 수평 꼬리 및 남은 분리 픽셀 교정 완료. 검수된8방향 보존 등록으로 실패 라이브 등록 교체.",
+  "state_before": {
+    "name": "신유리",
+    "group": "underground",
+    "character_id": "6d890b31-7194-48f6-bf12-e95897095d36",
+    "image": "e464915e-93b8-4980-9732-f5871953ed86",
+    "registration": "fcf1ca24-05e3-4c31-b943-fce1cf62ff6c",
+    "motions": {},
+    "ready": true,
+    "image_verified": true,
+    "image_visually_reviewed": true,
+    "exported": true,
+    "registration_rejections": [
+      {
+        "character_id": "52860cf1-9427-4bd5-affe-d017ee81c2bc",
+        "job": "76fa246d-7c0f-4029-a9dd-b3d202836934",
+        "reason": "측면과 사선의 낮은 포니테일이 뻗친 땋은 머리로 변형. 원작은 풀린 낮은 포니테일. 정면은 유지하고 등 쪽으로 내려오는 땋지 않은 묶음머리로 재등록.",
+        "at": 1792793744.8064396
+      }
+    ],
+    "eight_way_visual_reviewed": false,
+    "skeleton_joints": 18,
+    "rotation_count": 8,
+    "direction-repair-south-east": "8d75c0b8-3f73-45a1-9461-c3600108016c",
+    "direction-repair-east": "4914438a-8ef4-4258-88da-1a7de662d28d",
+    "direction-repair-north-east": "07763be8-6507-4aa2-9414-84f52559175e",
+    "direction-repair-north": "51693c1a-9b7f-452b-9fca-9486eb2ad331",
+    "direction-repair-north-west": "0def0b16-6bca-460b-b16d-b621d6cb8030",
+    "direction-repair-west": "7d19f4cf-e64a-4281-bbdd-924949016b12",
+    "direction-repair-south-west": "3c788037-0100-4941-a61d-ca9d4c6fd1ec",
+    "direction-repair-north-east-remove-old-hair-speck": "818368ba-951c-4b93-8e89-8b66cabd4b29"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "at": 1792804103.848752,
+  "job_id": "0d2894ac-f760-4ec9-88eb-045cba6fecb4",
+  "result": "reroll-required",
+  "findings": "Rear hand stays behind head through windup and frame 5 crossed arms fragment; use direct EAST straight-cross path with both hands guarding and clean extension.",
+  "frame_count": 6,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "cross-punch",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

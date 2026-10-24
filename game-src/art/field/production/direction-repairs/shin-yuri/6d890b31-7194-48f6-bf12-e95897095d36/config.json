@@ -1,0 +1,63 @@
+{
+  "slug": "shin-yuri",
+  "character_id": "6d890b31-7194-48f6-bf12-e95897095d36",
+  "rectangles": {
+    "south-east": [
+      [
+        33,
+        74,
+        60,
+        108
+      ]
+    ],
+    "east": [
+      [
+        24,
+        74,
+        58,
+        104
+      ]
+    ],
+    "north-east": [
+      [
+        36,
+        74,
+        60,
+        110
+      ]
+    ],
+    "north": [
+      [
+        55,
+        74,
+        73,
+        120
+      ]
+    ],
+    "north-west": [
+      [
+        64,
+        74,
+        91,
+        112
+      ]
+    ],
+    "west": [
+      [
+        69,
+        74,
+        103,
+        105
+      ]
+    ],
+    "south-west": [
+      [
+        80,
+        74,
+        99,
+        109
+      ]
+    ]
+  },
+  "description": "Replace ONLY the tied hair behind the nape with a SHORT LOOSE BLACK LOW PONYTAIL. It hangs DOWN naturally close to the neck onto the upper back, with smooth untwisted hair strands and free tapered ends. No braid, no plait, no segmented rope, no rigid horizontal tail. Remove the horizontally protruding braided strands and restore transparent background where they were. Retain exact leather jacket shoulder outline and existing fabric under the hair. Do not change face, front hair, clothes, body, pose, scale or any unmasked pixels. Crisp native pixel art and clean transparent outer edges."
+}

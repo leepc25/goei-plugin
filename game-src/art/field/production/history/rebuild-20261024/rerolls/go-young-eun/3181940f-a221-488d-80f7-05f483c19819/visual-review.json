@@ -1,0 +1,14 @@
+{
+  "job": "3181940f-a221-488d-80f7-05f483c19819",
+  "job_status": "completed",
+  "decision": "reroll",
+  "reason": "작은 캔버스 방식에서 키180px 미만으로 출력. 원작 단발·부드러운 체형을 유지하며 은하제 여성 정면·키 참조로 교체.",
+  "at": 1792790259.0230458,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

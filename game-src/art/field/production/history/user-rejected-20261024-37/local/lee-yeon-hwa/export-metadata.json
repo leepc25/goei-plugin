@@ -1,0 +1,36 @@
+{
+  "group_id": "7eba89cf-def7-448f-8295-3727d8a22fea",
+  "states": [
+    {
+      "character": {
+        "id": "9cdc0864-7418-4623-b687-845da6f66e88",
+        "name": "Idle",
+        "prompt": "이연화 / Lee Yeon-hwa. Adult woman with natural nonathletic build, tired oval face, brown-gray eyes, under-eye shadows and subdued mouth. Black hair center-parted, long straight cheek locks, tied LOW behind neck into a small ponytail. Thin black rectangular clear eyeglasses. OPEN off-white long lab coat over a dusty PINK collared blouse with no tie; dark high-waisted skirt visible below. No mask. Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches.",
+        "size": {
+          "width": 128,
+          "height": 256
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "low top-down",
+        "created_at": "2026-10-23T21:44:17.698750+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {}
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-10-23T22:02:42.306850"
+}

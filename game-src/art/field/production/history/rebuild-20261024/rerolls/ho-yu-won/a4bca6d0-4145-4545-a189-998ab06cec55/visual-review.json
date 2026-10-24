@@ -1,0 +1,13 @@
+{
+  "job": "a4bca6d0-4145-4545-a189-998ab06cec55",
+  "decision": "reroll",
+  "reason": "키 약243px로 보통 키 범위 초과, 정면이 아닌 3/4 얼굴.",
+  "at": 1792789418.378704,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

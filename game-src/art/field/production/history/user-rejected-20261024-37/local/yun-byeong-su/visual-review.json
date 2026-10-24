@@ -1,0 +1,14 @@
+{
+  "job": "f440cd1e-41ed-486f-9293-c7a63d669b52",
+  "job_status": "completed",
+  "decision": "pass",
+  "reason": "짧게 뒤로 넘긴 갈색-검정 머리, 무덤덤한 얼굴·선글라스·긴 소매 정장·보통 단단한 체격 유지. 정면·228px 모발 포함·투명 외곽 확인.",
+  "at": 1792790532.9160323,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

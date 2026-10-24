@@ -1,0 +1,14 @@
+{
+  "description": "백사헌 / Baek Sa-heon. Thin frail young man with narrow shoulders and pale angular face, smug slight smile. Voluminous light ash-brown tightly WAVY/CURLY hair over forehead and ears. Dark navy rectangular medical EYEPATCH over HIS LEFT eye (viewer right), thin diagonal strap crossing bridge of nose; other eye gray-brown and half-lidded. Navy suit, white shirt and dark navy tie. No mask, no sunglasses. Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches.",
+  "reference_image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "n_directions": 8,
+  "view": "low top-down",
+  "template_id": "mannequin",
+  "name": "백사헌",
+  "seed": 10222027,
+  "no_background": true
+}

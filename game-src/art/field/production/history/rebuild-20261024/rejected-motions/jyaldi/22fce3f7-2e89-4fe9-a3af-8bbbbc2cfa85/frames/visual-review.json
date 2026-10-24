@@ -1,0 +1,20 @@
+{
+  "at": 1792799877.1795466,
+  "job_id": "22fce3f7-2e89-4fe9-a3af-8bbbbc2cfa85",
+  "result": "reroll-required",
+  "findings": "새 시드에서도5프레임 얼굴/머리에 투명 구멍이 남고7프레임 발끝 회색 조각. 회전과 여백은 정상이나 외곽/신체 보존 미달.",
+  "frame_count": 12,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

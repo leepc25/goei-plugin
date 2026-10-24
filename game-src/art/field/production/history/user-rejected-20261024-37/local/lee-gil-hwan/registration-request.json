@@ -1,0 +1,14 @@
+{
+  "description": "이길환 / Lee Gil-hwan. Stocky plump middle-aged man with broad rounded torso and visible belly, round full cheeks and soft double chin, mild closed-mouth smile. Smooth dark brown-black BOWL haircut with thick straight rounded fringe touching the sunglasses. Black aviator sunglasses. Charcoal suit fitted over the round belly, white shirt, neat black tie. NOT slim or muscular. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
+  "reference_image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "n_directions": 8,
+  "view": "low top-down",
+  "template_id": "mannequin",
+  "name": "이길환",
+  "seed": 10222027,
+  "no_background": true
+}

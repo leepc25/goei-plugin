@@ -1,0 +1,58 @@
+{
+  "at": 1792792869.5053923,
+  "slug": "lee-seong-hae",
+  "reason": "등록 completed와8방향 이미지 있으나 skeletons:null. 종료된 불완전 등록 백업·삭제 후 이미 검수한 초록 눈·옆머리 정면을 유지하여 재등록.",
+  "state_before": {
+    "name": "이성해",
+    "group": "baekilmong",
+    "character_id": "213e13ae-1f3d-4309-801a-86af862b6a87",
+    "image": "79d54a0f-1b11-4caf-afd2-829ad8052757",
+    "registration": "bfaec31c-775c-44f0-bed5-538a3efcb57d",
+    "motions": {},
+    "ready": false,
+    "visual_rejections": [
+      {
+        "job": "297ce4f8-8ddd-4bd5-8fa0-21a791a8357e",
+        "decision": "reroll",
+        "reason": "키 약214px로 작은 체구198–201px 범위 초과, 정면 대신 3/4 방향.",
+        "at": 1792789084.7415783,
+        "rules_rechecked": [
+          "AVIF primary identity",
+          "lore/user height",
+          "south-facing",
+          "transparent edge without gray halo",
+          "no motions before all roster eight-way review"
+        ]
+      },
+      {
+        "job": "0f63a310-5d2a-4efc-8bde-b29bab7a1eb2",
+        "decision": "reroll",
+        "reason": "원작을 다시 대조: 키202px(모발포함)와 정면은 맞지만 오른쪽 어깨의 느슨한 웨이브 묶음이 땋은 머리처럼 보임. 해당 머리만 교정.",
+        "at": 1792790055.6810653,
+        "rules_rechecked": [
+          "AVIF primary identity",
+          "lore/user height",
+          "south-facing",
+          "transparent edge without gray halo",
+          "no motions before all roster eight-way review"
+        ]
+      },
+      {
+        "job": "48573c0d-7057-4d1a-a39b-1aea4245574d",
+        "job_status": "completed",
+        "decision": "reroll",
+        "reason": "전체 교정 뒤 팔레트11색에서 원작의 초록 홍채가 사라짐. 초록 눈·몸이 맞았던 이번 생성본을 사용해 옆머리만 마스크 교정, 나머지 RGBA 보존 검증.",
+        "at": 1792790749.2992353,
+        "rules_rechecked": [
+          "AVIF primary identity",
+          "lore/user height",
+          "south-facing",
+          "transparent edge without gray halo",
+          "no motions before all roster eight-way review"
+        ]
+      }
+    ],
+    "image_verified": true,
+    "image_visually_reviewed": true
+  }
+}

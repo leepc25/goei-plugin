@@ -1,0 +1,20 @@
+{
+  "at": 1792812671.3784025,
+  "job_id": "c8bd5412-38ff-4947-a5d6-b374f27af8b3",
+  "result": "reroll-required",
+  "findings": "Gray mass behind bent leg, clipped raised hand/boot, and transparent damage to face/hand during landing.",
+  "frame_count": 6,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "front-flip",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

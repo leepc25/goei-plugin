@@ -1,0 +1,25 @@
+{
+  "at": 1792792756.5619328,
+  "character_id": "e3c537b2-0878-497d-bbb4-dab809f19cce",
+  "result": "pass",
+  "directions_reviewed": [
+    "south",
+    "south-east",
+    "east",
+    "north-east",
+    "north",
+    "north-west",
+    "west",
+    "south-west"
+  ],
+  "findings": "원작의 짧은 흰 가르마 머리·붉은 홍채·큰 체격·흰 셔츠 위 네이비 조끼·검은 바지 유지. 얼굴 부분을 별도 확대 비교했고 8방향 장신 비율 일관. 동쪽 얼굴 노출, 외부 회색 칠 없음.",
+  "movement_direction": "east",
+  "stationary_direction": "south-east",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF primary",
+    "Lore supplementary height",
+    "All55 before motion",
+    "Gray outer paint reroll"
+  ]
+}

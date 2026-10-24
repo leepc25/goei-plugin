@@ -1,0 +1,9 @@
+{
+  "frame_index": 1,
+  "source_job_id": "8cd091a5-d6a5-42b3-a042-6a6fdb8685da",
+  "source_frame_index": 1,
+  "target_pose_index": 1,
+  "source_path": "motion-frame-candidates/jaemtri/running-jump/hair-step-1/frames/1.png",
+  "sha256": "a470afd1abcfaca2a2f8186aad469331a13ca3cb65b979fc0651d334aa38bfa7",
+  "findings": "0번 큰 회색 면 반려, 1번은 목표 다리/팔 위상과 갈색 머리 외곽이 온전함."
+}

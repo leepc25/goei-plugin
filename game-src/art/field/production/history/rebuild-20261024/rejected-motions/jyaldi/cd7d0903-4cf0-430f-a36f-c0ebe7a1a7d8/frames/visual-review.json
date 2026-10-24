@@ -1,0 +1,20 @@
+{
+  "at": 1792798210.0822387,
+  "job_id": "b8f6a0ed-f701-407a-815f-8322ce8c17d2",
+  "result": "reroll-required",
+  "findings": "6프레임 머리 끝 회색 면,4·5프레임 뒤팔이 머리 뒤로 올라가는 자세 반복. 6프레임 대체만으로 해결되지 않아 반려.",
+  "frame_count": 6,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "running-6-frames",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

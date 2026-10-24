@@ -1,0 +1,14 @@
+{
+  "job": "22200cfe-c549-401a-88b5-8063d9c6118b",
+  "job_status": "completed",
+  "decision": "pass",
+  "reason": "원작 재대조: 뒤로 넘긴 굵은 검은 웨이브, 눈·코 없는 검은 얼굴과 작은 흰 미소, 넓은 어깨·정장 유지. 정면·머리 포함220px(본체 약215px), 투명 외곽 확인.",
+  "at": 1792790163.7245023,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

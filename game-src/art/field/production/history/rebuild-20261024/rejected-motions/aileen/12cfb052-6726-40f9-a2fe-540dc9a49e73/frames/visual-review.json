@@ -1,0 +1,20 @@
+{
+  "at": 1792808129.503428,
+  "job_id": "12cfb052-6726-40f9-a2fe-540dc9a49e73",
+  "result": "reroll-required",
+  "findings": "새 참조 결과에서 세 프레임 모두 구두 사이 회색 바닥 면 생성, 두번째 머리카락 끝 회색 덩어리. 이전 정상 두 프레임 보존하고 마지막 회복 자세 수정 필요.",
+  "frame_count": 3,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

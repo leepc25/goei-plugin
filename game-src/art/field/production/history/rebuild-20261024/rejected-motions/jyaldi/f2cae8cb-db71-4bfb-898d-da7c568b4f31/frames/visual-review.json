@@ -1,0 +1,20 @@
+{
+  "at": 1792801716.4622848,
+  "job_id": "f2cae8cb-db71-4bfb-898d-da7c568b4f31",
+  "result": "reroll-required",
+  "findings": "Explicit depth/order did not solve transparency: large gray region in frame 3, holes in frame 5, gray hair in frames 6 and 8. Abandon this depth override.",
+  "frame_count": 9,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

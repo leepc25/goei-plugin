@@ -1,0 +1,13 @@
+{
+  "job": "5e401a36-d468-44c5-bb0c-f9c7c21bd32f",
+  "decision": "pass",
+  "reason": "원본의 바가지 머리, 통통한 얼굴·복부, 정장·선글라스 확인. 본체 약216px로 잠정 키 범위 충족, 정면·투명 경계 확인.",
+  "at": 1792788936.6740103,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

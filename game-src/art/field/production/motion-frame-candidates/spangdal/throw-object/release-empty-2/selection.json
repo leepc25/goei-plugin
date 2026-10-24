@@ -1,0 +1,9 @@
+{
+  "frame_index": 5,
+  "source_job_id": "1c31a9a8-6be0-4d79-8896-292cb2417ab9",
+  "source_frame_index": 1,
+  "target_pose_index": 5,
+  "source_path": "motion-frame-candidates/spangdal/throw-object/release-empty-2/frames/1.png",
+  "sha256": "9544f58434925183d70ec33ae757aa6322d2110d8584e2cc0bf2da4e6656e5cc",
+  "findings": "Own clean post-release image reference gives intact empty extended hand; same target pose, no ball reappearance, gray debris, face holes or clothing drift."
+}

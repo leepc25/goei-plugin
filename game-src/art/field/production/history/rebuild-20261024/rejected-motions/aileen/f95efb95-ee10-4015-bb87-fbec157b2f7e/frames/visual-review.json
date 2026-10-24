@@ -1,0 +1,20 @@
+{
+  "at": 1792807351.7821553,
+  "job_id": "bdd8d878-7689-4e18-bb99-6a11b17ff8e0",
+  "result": "reroll-required",
+  "findings": "2번째 손/머리 회색 면,4번째 위쪽 발 경계 잘림과 몸/머리 잔상,6번째 신발 뒤 회색 선. 자체 제한된13자세 회전으로 재작업.",
+  "frame_count": 6,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "front-flip",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

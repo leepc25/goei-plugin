@@ -1,0 +1,14 @@
+{
+  "job": "eff5c63b-1d19-42a8-8569-95340e3ec4fc",
+  "job_status": "completed",
+  "decision": "reroll",
+  "reason": "키180px 미만으로 여성 키 목표보다 작음. 은하제 여성 정면·스케일 참조로 교체.",
+  "at": 1792790163.92912,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

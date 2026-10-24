@@ -1,0 +1,20 @@
+{
+  "at": 1792808355.259789,
+  "job_id": "5dd63261-e259-416c-892b-d58501ab8e11",
+  "result": "reroll-required",
+  "findings": "1번째 손 회색 잔상, 3번째 엉덩이 뒤 큰 회색 면 및 5번째 분리 회색 덩어리. 지상 가드 실측 참조로 변경 필요.",
+  "frame_count": 8,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

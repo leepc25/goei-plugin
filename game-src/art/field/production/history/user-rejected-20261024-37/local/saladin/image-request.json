@@ -1,0 +1,30 @@
+{
+  "description": "Full-body native pixel-art game sprite, STRICTLY FRONT SOUTH view: face, nose, chest, belt and knees directly toward viewer, both ears equally visible. No sideways head or three-quarter turn. IDENTITY: Broad strong adult man with DARK BROWN skin, angular handsome face, pale gray eyes, thick eyebrows, full short BLACK beard and moustache, friendly restrained smile. Large WHITE wrapped TURBAN. BLACK tailored trouser suit, white collared shirt and black tie, black dress shoes. Match unarmed original: no ammunition vest, explosives or carried rifle. Relaxed upright stance, empty hands at sides. Natural adult anatomy, normal torso/pelvis, 7-head proportions. Anatomical crown to soles 212-224px; feet 6px above bottom, hair fully inside frame. Crisp single-pixel clusters, selective dark outlines, restrained game-sprite shading, no antialiasing. Transparent background, no ground shadow, text or weapons. Preserve individual hair, face, stature and clothing. Do not copy any generic character. Anatomical height excludes high hair/headwear. Every outer edge must border transparency directly, never a light gray halo.",
+  "image_size": {
+    "width": 128,
+    "height": 256
+  },
+  "no_background": true,
+  "seed": 1792789084,
+  "target_palette": {
+    "max_colors": 48
+  },
+  "style_options": {
+    "color_palette": false,
+    "outline": true,
+    "detail": true,
+    "shading": true
+  },
+  "style_image": {
+    "image": {
+      "type": "base64",
+      "base64": "[image payload omitted]",
+      "format": "png"
+    },
+    "size": {
+      "width": 128,
+      "height": 256
+    },
+    "usage_description": "Use ONLY native standing scale, crisp pixel rendering and front-facing stance. Do not copy hair, face, sunglasses, clothing colors, armor or identity. Draw target original identity from description."
+  }
+}

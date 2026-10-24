@@ -1,0 +1,20 @@
+{
+  "at": 1792804032.9464507,
+  "job_id": "274e5ad7-0ea5-4815-bde9-cbddb9708422",
+  "result": "reroll-required",
+  "findings": "Frame 2 fist has gray painted extension and moving hair edge carries gray remnants. Regenerate from clean own airborne pose reference, keeping bounded jump geometry.",
+  "frame_count": 8,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

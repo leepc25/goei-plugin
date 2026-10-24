@@ -1,0 +1,9 @@
+{
+  "frame_index": 4,
+  "source_job_id": "4cf1145a-2955-438f-a514-1e99a5cb9e7f",
+  "source_frame_index": 1,
+  "target_pose_index": 4,
+  "source_path": "motion-frame-candidates/spangdal/backflip/inverted-1/frames/1.png",
+  "sha256": "e82d40f9c9d638822bfeaa4e1d76d4e5ebebc91954266620f09317bb5567eabd",
+  "findings": "Candidate 1 viewed at 2x: same tucked inverted target pose, continuous neck and face, purple hair and skirt intact, no gray exterior paint. Candidate 0 malformed and unused."
+}

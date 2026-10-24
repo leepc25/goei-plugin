@@ -1,0 +1,20 @@
+{
+  "at": 1792798144.927996,
+  "job_id": "4109d0e0-2399-4cc7-97a6-896f2fdf2b00",
+  "result": "reroll-required",
+  "findings": "4프레임 위로 든 손 주변 회색 면·잔상,7프레임 얼굴 앞 분리 갈색 물체가 다시 생김. 원본 검은 장갑/투명 외곽 및 던지기 연속성 미달.",
+  "frame_count": 7,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "throw-object",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

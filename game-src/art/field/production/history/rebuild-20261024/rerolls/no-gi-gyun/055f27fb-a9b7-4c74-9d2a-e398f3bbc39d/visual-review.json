@@ -1,0 +1,14 @@
+{
+  "job": "055f27fb-a9b7-4c74-9d2a-e398f3bbc39d",
+  "job_status": "completed",
+  "decision": "reroll",
+  "reason": "키와 정면은 통과 수준이나 원작의 양볼을 가로지르는 봉합형 입꼬리 흉터가 아직 약함. 현재 결과의 입가만 교정.",
+  "at": 1792790384.9403148,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

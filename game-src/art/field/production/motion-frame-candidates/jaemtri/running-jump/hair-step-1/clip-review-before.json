@@ -1,0 +1,20 @@
+{
+  "at": 1792805554.331348,
+  "job_id": "7c53731e-5ac7-411f-a975-9ad2ad339232",
+  "result": "reroll-required",
+  "findings": "2·7·8번째 머리 뒤 회색 루프/도색 잔존. 정상 착지 참조에서 해당 자세 후보를 재생성해 전체 연결 재검토 필요.",
+  "frame_count": 8,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

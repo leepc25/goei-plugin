@@ -1,0 +1,20 @@
+{
+  "at": 1792808965.9943647,
+  "job_id": "40dd87bc-564a-44ce-b5d3-f4398f67b6a6",
+  "result": "reroll-required",
+  "findings": "발 접촉은 해결. 1·4·5·6·7번째 포니테일 끝 회색 매트 잔류. 정상 자세는 보존하고 해당 자세만 정지 후보로 재생성.",
+  "frame_count": 8,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

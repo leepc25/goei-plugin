@@ -1,0 +1,13 @@
+{
+  "name": "곽성주",
+  "group": "fake-bureau",
+  "character_id": "8b308102-0d58-42d4-b73c-10b1aa815d88",
+  "image": "eacc1a24-47d0-4db2-b85b-f4396e250b09",
+  "registration": "4ea02ad2-5c4d-4fde-9d88-1281bd5311d4",
+  "motions": {},
+  "ready": true,
+  "image_verified": true,
+  "skeleton_joints": 18,
+  "rotation_count": 8,
+  "exported": true
+}

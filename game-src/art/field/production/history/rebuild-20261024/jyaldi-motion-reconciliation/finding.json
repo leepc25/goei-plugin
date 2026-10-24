@@ -1,0 +1,7 @@
+{
+  "checked_at": 1792792048.0464108,
+  "uncertain_marker": "uncertain:submitting:1792781884584",
+  "request_timeout_utc": "2026-10-23T18:59:14Z",
+  "finding": "Current character contains no southwest breathing idle. Account-wide active list contains only jobs started after 21:29 UTC; no request from 18:59 remains active. Historical charge unknown; no refund claim. Recheck immediately before a replacement POST after roster gate.",
+  "replacement_submitted": false
+}

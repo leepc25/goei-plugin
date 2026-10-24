@@ -1,0 +1,14 @@
+{
+  "job": "9ae5c48b-d9ea-454c-9c24-270560fb1a3a",
+  "job_status": "completed",
+  "decision": "reroll",
+  "reason": "원작은 검은 어깨 길이 생머리인데 푸른 턱 길이 단발로 출력. 머리 영역만 마스크 교정, 가운·청진기·민트 셔츠·키는 보존.",
+  "at": 1792792467.2470343,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

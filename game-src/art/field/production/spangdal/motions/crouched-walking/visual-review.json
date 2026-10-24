@@ -1,0 +1,20 @@
+{
+  "at": 1792803318.72219,
+  "job_id": "fd7b0005-d7a5-48f7-9de0-c6c7a7392afc",
+  "result": "pass",
+  "findings": "All eight frames viewed: WEST lowered walking cycle, preserved leg lengths and intact pumps; own purple bob and skirt; no gray exterior paint or anatomy holes.",
+  "frame_count": 8,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "job": "8deca375-3192-487b-a642-c7838b493969",
+  "decision": "reroll",
+  "reason": "얼굴이 측면으로 돌아감, 본체 키가 여성200–206px보다 큼.",
+  "at": 1792789418.1042688,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

@@ -1,0 +1,60 @@
+{
+  "reason": "Raised rear arm and separated shorts-like black hems in airborne frames 3-4 depart from the skirt silhouette; use a restrained own-body jump trajectory preserving skirt.",
+  "group": {
+    "animation_type": "running-jump",
+    "display_name": null,
+    "animation_group_id": "6dd41de6-b56b-4e87-a7ef-2080edd74f05",
+    "directions": [
+      {
+        "direction": "west",
+        "frame_count": 8,
+        "frames": [
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/9095375d-b39a-447b-b577-fcb345e78928/animations/c6f4447d-b9b5-428c-9e7b-4b0f808c8787/west/0.png?t=1792802323",
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/9095375d-b39a-447b-b577-fcb345e78928/animations/c6f4447d-b9b5-428c-9e7b-4b0f808c8787/west/1.png?t=1792802323",
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/9095375d-b39a-447b-b577-fcb345e78928/animations/c6f4447d-b9b5-428c-9e7b-4b0f808c8787/west/2.png?t=1792802323",
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/9095375d-b39a-447b-b577-fcb345e78928/animations/c6f4447d-b9b5-428c-9e7b-4b0f808c8787/west/3.png?t=1792802323",
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/9095375d-b39a-447b-b577-fcb345e78928/animations/c6f4447d-b9b5-428c-9e7b-4b0f808c8787/west/4.png?t=1792802323",
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/9095375d-b39a-447b-b577-fcb345e78928/animations/c6f4447d-b9b5-428c-9e7b-4b0f808c8787/west/5.png?t=1792802323",
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/9095375d-b39a-447b-b577-fcb345e78928/animations/c6f4447d-b9b5-428c-9e7b-4b0f808c8787/west/6.png?t=1792802323",
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/9095375d-b39a-447b-b577-fcb345e78928/animations/c6f4447d-b9b5-428c-9e7b-4b0f808c8787/west/7.png?t=1792802323"
+        ]
+      }
+    ]
+  },
+  "at": 1792802771.4810112,
+  "state_before": {
+    "name": "스팡달",
+    "group": "management",
+    "character_id": "9095375d-b39a-447b-b577-fcb345e78928",
+    "image": "e925d6ba-4f8e-41b9-b58d-53327feda5b9",
+    "registration": "8df9126b-f6ce-43bd-be01-027d0588c203",
+    "motions": {
+      "breathing-idle": "628133da-1d7d-4b81-b5d8-a4098921d739",
+      "walking-8-frames": "9812d187-c2e4-47ae-86a2-da18039e4640",
+      "running-jump": "0d5d5df5-a91e-4d87-8633-ecc603538d9c",
+      "running-slide": "6982a605-edfc-4440-8c5f-4b715b3f9729",
+      "crouched-walking": "5261e3f4-30e6-4c1a-88db-0dac3e6a0464",
+      "sad-walk": "7778bc41-67b6-483d-b2af-8844bbcc4775",
+      "front-flip": "643377e4-36a4-4a29-9438-455e82e06c31",
+      "backflip": "1cf96890-1a5c-4d43-bce6-fc4d8f8d875e",
+      "jumping-1": "1c9f81ee-20eb-435b-9a9a-ad8fc62c19e5",
+      "jumping-2": "476b3574-8365-451e-98f8-1153a158f480",
+      "two-footed-jump": "74674eff-c597-48da-a98f-332e065866c9",
+      "drinking": "bf5bfeb6-a2e2-48a5-97d8-da30016c1f87",
+      "picking-up": "e44d35d3-0cb1-4d9d-856d-14098f085508",
+      "pushing": "c9fba02d-31ab-4b7d-a674-7617f35b7e0e",
+      "pull-heavy-object": "6d6586d6-7391-4a07-85a8-57b76ee10eed",
+      "throw-object": "28ca799d-205c-4b19-9b97-79df02d662e5",
+      "fight-stance-idle-8-frames": "9dea4c3b-ea98-465b-b6b4-5b9d5606d6cd",
+      "cross-punch": "438619dc-0ae3-4844-8c27-e4fd7dcfadb5",
+      "lead-jab": "4cf5d376-176e-4f4d-ae08-bb746d2350a7"
+    },
+    "ready": true,
+    "image_verified": true,
+    "skeleton_joints": 18,
+    "rotation_count": 8,
+    "exported": false,
+    "eight_way_visual_reviewed": true,
+    "motions_visual_reviewed": false
+  }
+}

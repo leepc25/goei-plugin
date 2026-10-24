@@ -1,0 +1,36 @@
+{
+  "group_id": "92df830e-2d48-4de9-99da-90f28bc3aebf",
+  "states": [
+    {
+      "character": {
+        "id": "45e40a13-b3a8-4cee-8f7d-08ab09574ad0",
+        "name": "Idle",
+        "prompt": "마덕희 / Ma Deok-hee. Slim sharp adult woman with pale angular face, half-lidded BROWN eyes, thin lips and knowing slight crooked smile. Jet-black angular chin-length BOB with straight thick bangs, sides slightly longer at jaw. BURGUNDY tailored trouser suit over solid BLACK high-neck top. Thin gold bracelet and two plain gold rings. Black loafers. No shirt collar or tie. Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Do not invent patches, badges, logos or markings absent from the supplied image. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches.",
+        "size": {
+          "width": 128,
+          "height": 256
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "low top-down",
+        "created_at": "2026-10-23T22:12:20.299369+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {}
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-10-23T22:28:54.687661"
+}

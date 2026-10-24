@@ -1,0 +1,14 @@
+{
+  "description": "청달래 / Cheong Dal-lae. Adult woman with composed natural slender figure, oval mature face, pale blue-gray eyes and a calm knowing smile. Dark TEAL hair center-parted with LONG STRAIGHT cheek locks down to shoulders, the rest gathered in a low rounded bun behind head. Very dark navy tailored trouser suit, white shirt and dark navy tie. Bare face, no mask or glasses. Do not replace visible pale eyes with black irises from lore. Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches.",
+  "reference_image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "n_directions": 8,
+  "view": "low top-down",
+  "template_id": "mannequin",
+  "name": "청달래",
+  "seed": 10222027,
+  "no_background": true
+}

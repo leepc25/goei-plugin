@@ -1,0 +1,14 @@
+{
+  "job": "63ae0b42-4da6-45b0-8512-2dd2fcb09f04",
+  "job_status": "completed",
+  "decision": "pass",
+  "reason": "짧은 금발 픽시/바가지형 머리와 옆 가르마, 드러난 귀·목, 황갈색 눈·남색 바지정장 유지. 정면·208px 모발 포함·여성 본체 키 목표 부근, 투명 외곽 정상.",
+  "at": 1792790749.0995264,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

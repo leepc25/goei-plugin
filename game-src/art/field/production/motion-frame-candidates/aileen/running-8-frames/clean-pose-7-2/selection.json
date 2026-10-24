@@ -1,0 +1,9 @@
+{
+  "frame_index": 7,
+  "source_job_id": "77f2e27b-6c0b-438b-b5a9-6b258bfcfd1f",
+  "source_frame_index": 2,
+  "target_pose_index": 7,
+  "source_path": "motion-frame-candidates/aileen/running-8-frames/clean-pose-7-2/frames/2.png",
+  "sha256": "2c98327aa31292c68854f872c7b48b292b418e45879cb93fcca40920e4a93d27",
+  "findings": "Candidate 2 has separated blonde ponytail tips without the flat gray end patch visible in earlier candidates; limbs and shoes intact."
+}

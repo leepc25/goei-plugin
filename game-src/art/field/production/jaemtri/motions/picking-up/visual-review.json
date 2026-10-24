@@ -1,0 +1,79 @@
+{
+  "at": 1792804799.5322278,
+  "job_id": "1a8ae1e5-ecae-4bd6-9367-d0c75519e4cc",
+  "result": "pass",
+  "findings": "Full eight-frame assembled EAST pickup viewed: corrected lowest pose has intact face/hair/hands, continuous body and heels; no gray exterior or transparent damage; transitions preserve own identity.",
+  "frame_count": 8,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ],
+  "frame_assembly": {
+    "base_job_id": "1a8ae1e5-ecae-4bd6-9367-d0c75519e4cc",
+    "frame_sources": [
+      {
+        "frame_index": 0,
+        "source_job_id": "1a8ae1e5-ecae-4bd6-9367-d0c75519e4cc",
+        "source_frame_index": 0,
+        "sha256": "c94a5ebbefc692b45e726d2687809ade37fb123db72027b779d83342e0617b4c"
+      },
+      {
+        "frame_index": 1,
+        "source_job_id": "1a8ae1e5-ecae-4bd6-9367-d0c75519e4cc",
+        "source_frame_index": 1,
+        "sha256": "250ac219d049b92b0141f6dee9d3dff8f60377c73e15d4e6d78b9a69216e5fd8"
+      },
+      {
+        "frame_index": 2,
+        "source_job_id": "1a8ae1e5-ecae-4bd6-9367-d0c75519e4cc",
+        "source_frame_index": 2,
+        "sha256": "802d771fe0906e173aadd1b1ed37258ee71596e9f439f8f14c6b6dd263f4ffdc"
+      },
+      {
+        "frame_index": 3,
+        "source_job_id": "1a8ae1e5-ecae-4bd6-9367-d0c75519e4cc",
+        "source_frame_index": 3,
+        "sha256": "95a70fc8bda5ea88f51adcd9ebfc330cba3c4a9ba9ecd72e678137f863548efb"
+      },
+      {
+        "frame_index": 4,
+        "source_job_id": "40c26d95-c80c-468d-bd5f-30bf1465acb6",
+        "source_frame_index": 1,
+        "target_pose_index": 4,
+        "source_path": "motion-frame-candidates/jaemtri/picking-up/low-pose-1/frames/1.png",
+        "sha256": "33fa7a4d4f52a9428a8c1af9bd388dcba0daaa4c216206565dac7a681c11764b",
+        "findings": "Candidate 1 inspected at 2x: continuous face/hair/hands and intact low crouch, own brown waves/skirt/heels, no gray outer paint."
+      },
+      {
+        "frame_index": 5,
+        "source_job_id": "1a8ae1e5-ecae-4bd6-9367-d0c75519e4cc",
+        "source_frame_index": 5,
+        "sha256": "a9fb1d84999cb03acf6fb8a5fd4a22df7679926db0f99ba79fd3683aa18fb7d5"
+      },
+      {
+        "frame_index": 6,
+        "source_job_id": "1a8ae1e5-ecae-4bd6-9367-d0c75519e4cc",
+        "source_frame_index": 6,
+        "sha256": "c840748dc1f7050977c2192e55e1aff165e3418f2a5dfc8e25c9f4db1d44dbbc"
+      },
+      {
+        "frame_index": 7,
+        "source_job_id": "1a8ae1e5-ecae-4bd6-9367-d0c75519e4cc",
+        "source_frame_index": 7,
+        "sha256": "637afce4389badbd3c7859cde724ed4a459a026668b1a7c5ec59757a0df0a0fe"
+      }
+    ],
+    "method": "select complete same-pose regenerated frames; no pixel editing",
+    "new_user_approval": false,
+    "visual_reviewed": true
+  }
+}

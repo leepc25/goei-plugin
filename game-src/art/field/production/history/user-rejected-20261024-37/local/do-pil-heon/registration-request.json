@@ -1,0 +1,14 @@
+{
+  "description": "도필헌 / Do Pil-heon. Mature man with lean ordinary build, narrow angular long face, slight restrained smile and creases beside mouth. Dark brown-black wavy side-parted hair swept back, curved forelock on forehead. Black aviator sunglasses. Dark warm-charcoal single-breasted two-button suit, white shirt and neatly tightened black tie. No armor. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
+  "reference_image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "n_directions": 8,
+  "view": "low top-down",
+  "template_id": "mannequin",
+  "name": "도필헌",
+  "seed": 10222027,
+  "no_background": true
+}

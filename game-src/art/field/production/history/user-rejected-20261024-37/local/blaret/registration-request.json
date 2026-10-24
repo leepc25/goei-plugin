@@ -1,0 +1,51 @@
+{
+  "description": "블라렛 / Blaret. Adult woman with natural slim athletic body, oval pale face, vivid GREEN eyes and playful smile. Long straight sandy BLONDE hair with blunt bangs visible beneath WHITE forehead band and long BLACK nun veil. Fitted BLACK long-sleeved nun habit, WHITE high-neck wimple and white shoulder bib, modest side slit. Several thick dark SILVER chains with large silver cross pendant and small green stone. WOODEN brown prayer beads around both wrists. Black boots. No handheld weapons. The long black veil hangs down to the HIPS, clearly below the waist, never a short shoulder-length veil. The BLACK NUN VEIL is LONG, hanging from the head down behind both arms to hips/upper thighs, below both hands. Preserve this full length in every side and back view; never a short shoulder hood. Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Do not invent patches, badges, logos or markings absent from the supplied image. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches.",
+  "reference_image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "n_directions": 8,
+  "view": "low top-down",
+  "template_id": "mannequin",
+  "name": "블라렛",
+  "seed": 10222027,
+  "no_background": true,
+  "direction_images": {
+    "south-east": {
+      "type": "base64",
+      "base64": "[image payload omitted]",
+      "format": "png"
+    },
+    "east": {
+      "type": "base64",
+      "base64": "[image payload omitted]",
+      "format": "png"
+    },
+    "north-east": {
+      "type": "base64",
+      "base64": "[image payload omitted]",
+      "format": "png"
+    },
+    "north": {
+      "type": "base64",
+      "base64": "[image payload omitted]",
+      "format": "png"
+    },
+    "north-west": {
+      "type": "base64",
+      "base64": "[image payload omitted]",
+      "format": "png"
+    },
+    "west": {
+      "type": "base64",
+      "base64": "[image payload omitted]",
+      "format": "png"
+    },
+    "south-west": {
+      "type": "base64",
+      "base64": "[image payload omitted]",
+      "format": "png"
+    }
+  }
+}

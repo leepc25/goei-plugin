@@ -1,0 +1,14 @@
+{
+  "job": "11ff3fba-e34c-487a-8456-b666e9c44fe8",
+  "job_status": "completed",
+  "decision": "pass",
+  "reason": "원작의 낮은 채도 청회색 웨이브 머리와 어두운 자주색 망토로 교정. 초록 눈·에메랄드 브로치·검은 정장·몸의 키는 마스크 밖 RGBA 보존. 두건 포함214px, 정면·외곽 투명 정상.",
+  "at": 1792793826.619312,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

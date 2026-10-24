@@ -1,0 +1,522 @@
+[
+  {
+    "id": "31336750-c528-4f6d-98fa-ab42f7c54086",
+    "name": "브라우니",
+    "state_name": "Idle",
+    "prompt": "브라우니 / Brownie. Large broad humanoid television host. HEAD is a bulky old rectangular CRT TELEVISION with dark brown-black frame, bottom buttons and sepia static SCREEN showing two white happy curved eyes and a tiny white smiling mouth. No human face or hair. BROWN three-piece suit: open jacket, buttoned brown waistcoat, matching trousers, WHITE dress shirt, dark tie, BLACK gloves with long fingers, black lace-up shoes. Natural humanoid body, television replaces entire head. Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches.",
+    "size": {
+      "width": 128,
+      "height": 256
+    },
+    "directions": 8,
+    "created_at": "2026-10-23T22:04:05.359060+00:00",
+    "updated_at": "2026-10-23T22:20:32.385057+00:00",
+    "animation_count": 0,
+    "template_id": "mannequin",
+    "view": "low top-down",
+    "status": "completed",
+    "preview_url": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/31336750-c528-4f6d-98fa-ab42f7c54086/rotations/south.png?t=1792794032",
+    "tags": [],
+    "group_id": "608f2381-a887-417f-89a4-c1a6843f7a48"
+  },
+  {
+    "id": "758716dc-e7ba-4f48-87ac-d0dbb16aa626",
+    "name": "곽제강",
+    "state_name": "Idle",
+    "prompt": "곽제강 / Kwak Je-gang. Young adult man with ordinary soft slim build, gentle long face, warm brown eyes and friendly small smile. Thick messy WAVY black hair with loose center part and curled forehead strands. Large thin rectangular clear eyeglasses. OPEN long off-white lab coat over pale gray-blue collared shirt, straight black necktie and black trousers. No mask, no held book. Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches.",
+    "size": {
+      "width": 128,
+      "height": 256
+    },
+    "directions": 8,
+    "created_at": "2026-10-23T21:52:27.821393+00:00",
+    "updated_at": "2026-10-23T22:09:23.191696+00:00",
+    "animation_count": 0,
+    "template_id": "mannequin",
+    "view": "low top-down",
+    "status": "completed",
+    "preview_url": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/758716dc-e7ba-4f48-87ac-d0dbb16aa626/rotations/south.png?t=1792793363",
+    "tags": [],
+    "group_id": "bc992003-39a2-421e-a04f-ca191a8c7053"
+  },
+  {
+    "id": "e3c537b2-0878-497d-bbb4-dab809f19cce",
+    "name": "이자헌",
+    "state_name": "Idle",
+    "prompt": "이자헌 / Lee Ja-heon. Tall large solidly built adult man, broad shoulders and thick chest, exceptionally handsome angular long face, stern neutral mouth, RED irises. Short white hair swept BACK in loose waves with two curved forelocks on forehead. Navy-blue buttoned WAISTCOAT over white long-sleeved shirt, navy necktie and dark trousers. NO suit jacket, no mask, no gloves in default appearance. Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches.",
+    "size": {
+      "width": 128,
+      "height": 256
+    },
+    "directions": 8,
+    "created_at": "2026-10-23T21:36:44.794492+00:00",
+    "updated_at": "2026-10-23T21:57:01.243693+00:00",
+    "animation_count": 0,
+    "template_id": "mannequin",
+    "view": "low top-down",
+    "status": "completed",
+    "preview_url": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/e3c537b2-0878-497d-bbb4-dab809f19cce/rotations/south.png?t=1792792621",
+    "tags": [],
+    "group_id": "70895ca1-340f-42b7-a637-38025fb099c7"
+  },
+  {
+    "id": "cd0f714d-0c1a-4868-8d0b-40b87aa073ea",
+    "name": "박민성",
+    "state_name": "Idle",
+    "prompt": "박민성 / Park Min-seong. Large broad athletic young man with thick chest and shoulders, strong natural limbs. Warm fair skin, broad friendly clean-shaven face, thick dark eyebrows, gray-brown eyes and gentle smile. Thick dark brown wavy side-parted hair with long sweeping curved forelock over one forehead side, short other side. Navy suit stretched over broad shoulders, white shirt, blue tie. No mask. Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches.",
+    "size": {
+      "width": 128,
+      "height": 256
+    },
+    "directions": 8,
+    "created_at": "2026-10-23T21:26:53.139419+00:00",
+    "updated_at": "2026-10-23T21:46:12.580181+00:00",
+    "animation_count": 0,
+    "template_id": "mannequin",
+    "view": "low top-down",
+    "status": "completed",
+    "preview_url": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/cd0f714d-0c1a-4868-8d0b-40b87aa073ea/rotations/south.png?t=1792791972",
+    "tags": [],
+    "group_id": "b8140cc1-6258-46a1-9752-8aa36177823b"
+  },
+  {
+    "id": "87f5d022-f0bf-4747-9b54-a808a927377a",
+    "name": "곽성주",
+    "state_name": "Idle",
+    "prompt": "곽성주 / Kwak Seong-ju. Huge heavily muscular mature man, by far broadest largest build in this faction, thick arms and massive torso. Tall spiky BLACK hair with very short shaved sides, thick eyebrows, black aviator sunglasses, square jaw with short dark beard stubble. Black suit and white shirt with black tie. SILVER-GRAY METAL PLATES bolted OVER BOTH shoulders, two long angular upper-chest plates beside lapels, and paired plates on BOTH upper arms. Cloth suit remains visible at torso center, abdomen and forearms. No helmet, no full torso cuirass, no ammunition belts. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
+    "size": {
+      "width": 128,
+      "height": 256
+    },
+    "directions": 8,
+    "created_at": "2026-10-23T21:21:06.384466+00:00",
+    "updated_at": "2026-10-23T21:39:50.820789+00:00",
+    "animation_count": 0,
+    "template_id": "mannequin",
+    "view": "low top-down",
+    "status": "completed",
+    "preview_url": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/87f5d022-f0bf-4747-9b54-a808a927377a/rotations/south.png?t=1792791590",
+    "tags": [],
+    "group_id": "4866ddb4-78ca-4614-aea9-87e315c6d402"
+  },
+  {
+    "id": "30dad544-9ce9-45b9-b684-151819796505",
+    "name": "이도형",
+    "state_name": "Idle",
+    "prompt": "이도형 / Lee Do-hyeong. Tall solid muscular mature man. SILVER-WHITE hair swept back into a visible low PONYTAIL behind neck. Black aviator sunglasses. Rugged angular face with several long parallel diagonal old scars across cheek, light chin stubble and confident smirk. Black suit jacket AND white shirt sleeves ROLLED UP TO BOTH ELBOWS; strong bare forearms and hands covered with many branching old scars. White shirt and black tie. Ponytail, cheek scars, rolled sleeves and forearm scars are essential. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
+    "size": {
+      "width": 128,
+      "height": 256
+    },
+    "directions": 8,
+    "created_at": "2026-10-23T21:18:35.272464+00:00",
+    "updated_at": "2026-10-23T21:31:32.973854+00:00",
+    "animation_count": 0,
+    "template_id": "mannequin",
+    "view": "low top-down",
+    "status": "completed",
+    "preview_url": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/30dad544-9ce9-45b9-b684-151819796505/rotations/south.png?t=1792791092",
+    "tags": [],
+    "group_id": "caf563a6-bab2-4de9-887a-776ea327d8f0"
+  },
+  {
+    "id": "596e5d65-64de-43bb-bc61-ea653f418729",
+    "name": "콘쥬스",
+    "state_name": "Idle",
+    "prompt": "콘쥬스 / Konjyuce. 17 year old Korean schoolgirl with natural age-appropriate teen proportions with a normally long ribcage, visible abdomen between ribs and pelvis, natural waist at the top of the pelvis, and balanced torso and leg lengths, shoulder length straight black bob with one distinctive pink streak, blue eyes, determined youthful face. Fully clothed navy school uniform blazer with light piping extending to the upper hips, not cropped, white collared shirt, black necktie, gray knee length pleated school skirt sitting at the natural waist, not high-waisted, dark socks and plain black school loafers. No adult glamour styling. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
+    "size": {
+      "width": 128,
+      "height": 256
+    },
+    "directions": 8,
+    "created_at": "2026-10-23T20:58:11.003463+00:00",
+    "updated_at": "2026-10-23T21:10:41.663321+00:00",
+    "animation_count": 0,
+    "template_id": "mannequin",
+    "view": "low top-down",
+    "status": "completed",
+    "preview_url": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/596e5d65-64de-43bb-bc61-ea653f418729/rotations/south.png?t=1792789841",
+    "tags": [],
+    "group_id": "6979fc53-a05e-451f-86bb-90c2675a0989"
+  },
+  {
+    "id": "8bc8eb42-95a1-4dea-be57-80429b542d36",
+    "name": "데쥬레",
+    "state_name": "Idle",
+    "prompt": "데쥬레 / Dejure. Adult woman early20s, pink twin ponytails and bangs, pinkish brown eyes, nervous shy expression, short natural adult build, black skirt suit, white collared shirt, black necktie, black low heel shoes, small plain access pass. Do not make chibi. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
+    "size": {
+      "width": 128,
+      "height": 256
+    },
+    "directions": 8,
+    "created_at": "2026-10-23T19:19:17.671019+00:00",
+    "updated_at": "2026-10-23T19:44:44.623191+00:00",
+    "animation_count": 0,
+    "template_id": "mannequin",
+    "view": "low top-down",
+    "status": "completed",
+    "preview_url": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/8bc8eb42-95a1-4dea-be57-80429b542d36/rotations/south.png?t=1792784684",
+    "tags": [],
+    "group_id": "b7782782-19f7-419a-a4c7-322c201b9315"
+  },
+  {
+    "id": "558c27ed-873c-4207-9099-171bb64a09b2",
+    "name": "에일린",
+    "state_name": "Idle",
+    "prompt": "에일린 / Aileen. Adult woman early20s, faded platinum blonde high ponytail and long bangs, dull gray eyes, serious analytical expression. Natural adult build comparable to Jyaldi, normal shoulders and limbs, no bulky muscles. Black tailored business trouser suit, black closed shoes. White shirt under a thin black ballistic vest; the BLACK SUIT JACKET is worn OVER the vest, its open lapels revealing the vest front. No external armor, oversized plates or pouches. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
+    "size": {
+      "width": 128,
+      "height": 256
+    },
+    "directions": 8,
+    "created_at": "2026-10-23T19:18:05.082564+00:00",
+    "updated_at": "2026-10-23T19:36:50.494826+00:00",
+    "animation_count": 1,
+    "template_id": "mannequin",
+    "view": "low top-down",
+    "status": "completed",
+    "preview_url": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/rotations/south.png?t=1792784210",
+    "tags": [],
+    "group_id": "fa1b1cfa-bc3d-45c1-bbf0-7d71aa2e99b7"
+  },
+  {
+    "id": "8b61f17c-abec-4217-bca6-0850c24fe39c",
+    "name": "고그니쟈",
+    "state_name": "Idle",
+    "prompt": "고그니쟈 / Gognija. Adult male researcher mid40s, unruly shoulder length white hair, round dark protective goggles over eyes, manic cheerful grin, ordinary lean middle aged build, long white lab coat over white shirt and black necktie, dark business trousers and black shoes. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
+    "size": {
+      "width": 128,
+      "height": 256
+    },
+    "directions": 8,
+    "created_at": "2026-10-23T19:12:53.610161+00:00",
+    "updated_at": "2026-10-23T19:32:03.111149+00:00",
+    "animation_count": 0,
+    "template_id": "mannequin",
+    "view": "low top-down",
+    "status": "completed",
+    "preview_url": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/8b61f17c-abec-4217-bca6-0850c24fe39c/rotations/south.png?t=1792783923",
+    "tags": [],
+    "group_id": "f57299c7-36a1-4cc4-83af-09fd881384e8"
+  },
+  {
+    "id": "57e9dc0e-913f-443b-bb1f-6be2cdb617cd",
+    "name": "데드폴",
+    "state_name": "Idle",
+    "prompt": "데드폴 / Deadpole. Adult woman early20s, petite natural build, long straight black hair with straight bangs, soft round dark gray eyes, gentle cautious expression, black tailored trouser suit, white shirt, black necktie, black protective gloves and plain black shoes. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
+    "size": {
+      "width": 128,
+      "height": 256
+    },
+    "directions": 8,
+    "created_at": "2026-10-23T18:40:04.640000+00:00",
+    "updated_at": "2026-10-23T19:04:22.005926+00:00",
+    "animation_count": 0,
+    "template_id": "mannequin",
+    "view": "low top-down",
+    "status": "completed",
+    "preview_url": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/57e9dc0e-913f-443b-bb1f-6be2cdb617cd/rotations/south.png?t=1792782262",
+    "tags": [],
+    "group_id": "8aae72c4-b257-467d-abde-205a5cf34ff8"
+  },
+  {
+    "id": "27643078-cb88-455f-abf5-3be5bdb3ff68",
+    "name": "로제몬",
+    "state_name": "Idle",
+    "prompt": "로제몬 / Rojemon. Adult woman early20s, long wavy lavender purple hair and bangs, violet eyes, petite natural adult build and defined waist, mildly annoyed expression, fitted black office skirt suit, white shirt, black necktie and black office pumps. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
+    "size": {
+      "width": 128,
+      "height": 256
+    },
+    "directions": 8,
+    "created_at": "2026-10-23T18:36:31.582948+00:00",
+    "updated_at": "2026-10-23T19:01:13.684841+00:00",
+    "animation_count": 0,
+    "template_id": "mannequin",
+    "view": "low top-down",
+    "status": "completed",
+    "preview_url": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/27643078-cb88-455f-abf5-3be5bdb3ff68/rotations/south.png?t=1792782073",
+    "tags": [],
+    "group_id": "f079361c-a7fe-4c87-aec4-236f2241019e"
+  },
+  {
+    "id": "a3af18df-782b-44d0-9fa6-c05ee03d84ab",
+    "name": "게슈간",
+    "state_name": "Idle",
+    "prompt": "게슈간 / Geshugan. Adult woman mid20s, short snow white blunt bob with bangs, cold clear blue eyes, athletic toned natural build, impassive face, loose white open collar long sleeve shirt with sleeves rolled to elbows, black business trousers and black shoes. No necktie. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
+    "size": {
+      "width": 128,
+      "height": 256
+    },
+    "directions": 8,
+    "created_at": "2026-10-23T18:36:28.448130+00:00",
+    "updated_at": "2026-10-23T18:56:39.306927+00:00",
+    "animation_count": 0,
+    "template_id": "mannequin",
+    "view": "low top-down",
+    "status": "completed",
+    "preview_url": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/a3af18df-782b-44d0-9fa6-c05ee03d84ab/rotations/south.png?t=1792781799",
+    "tags": [],
+    "group_id": "a72918ec-fc7a-4334-98e5-b6134795c24d"
+  },
+  {
+    "id": "7cf2502d-e2e9-4677-bc53-ec1b9d76a11d",
+    "name": "큐라스",
+    "state_name": "Idle",
+    "prompt": "큐라스 / Kyuras. Adult man early30s, thin wiry build, pale green hair swept back, narrow face, gray green eyes, lively confident smile, black tailored trouser suit, white shirt, black necktie and black shoes. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
+    "size": {
+      "width": 128,
+      "height": 256
+    },
+    "directions": 8,
+    "created_at": "2026-10-23T18:36:08.283112+00:00",
+    "updated_at": "2026-10-23T19:02:43.700977+00:00",
+    "animation_count": 0,
+    "template_id": "mannequin",
+    "view": "low top-down",
+    "status": "completed",
+    "preview_url": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/7cf2502d-e2e9-4677-bc53-ec1b9d76a11d/rotations/south.png?t=1792782163",
+    "tags": [],
+    "group_id": "7b415029-4e17-44be-b7c8-3e2c76219959"
+  },
+  {
+    "id": "1d8d12e4-06d5-4df8-8812-0754f77b736b",
+    "name": "고르고디오",
+    "state_name": "Idle",
+    "prompt": "고르고디오 / Gorgodio. Adult man early30s, very tall broad muscular wrestler build, bald head, neatly trimmed black goatee, confident stern face, black leather motorcycle jacket over white shirt and black necktie, black business trousers and heavy black shoes. No summoned armor. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
+    "size": {
+      "width": 128,
+      "height": 256
+    },
+    "directions": 8,
+    "created_at": "2026-10-23T18:16:40.963554+00:00",
+    "updated_at": "2026-10-23T18:30:47.283090+00:00",
+    "animation_count": 4,
+    "template_id": "mannequin",
+    "view": "low top-down",
+    "status": "completed",
+    "preview_url": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/1d8d12e4-06d5-4df8-8812-0754f77b736b/rotations/south.png?t=1792780247",
+    "tags": [],
+    "group_id": "4ba0b708-dc7e-4387-b540-33294457d05c"
+  },
+  {
+    "id": "f937666b-c116-4408-8864-55e7743850a5",
+    "name": "잼트리",
+    "state_name": "Idle",
+    "prompt": "잼트리 / Jaemtri. Adult woman late20s, long chestnut brown wavy hair below shoulders, soft green eyes, warm friendly smile, curvy natural adult build, black tailored office skirt suit, white shirt, black necktie, black high heels. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
+    "size": {
+      "width": 128,
+      "height": 256
+    },
+    "directions": 8,
+    "created_at": "2026-10-23T18:16:18.216960+00:00",
+    "updated_at": "2026-10-23T18:29:47.678045+00:00",
+    "animation_count": 5,
+    "template_id": "mannequin",
+    "view": "low top-down",
+    "status": "completed",
+    "preview_url": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/f937666b-c116-4408-8864-55e7743850a5/rotations/south.png?t=1792780187",
+    "tags": [],
+    "group_id": "dab32d8b-5a1b-4571-b517-feac44ea4ae5"
+  },
+  {
+    "id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+    "name": "쟈알디",
+    "state_name": "Idle",
+    "prompt": "쟈알디 / Jyaldi. Adult Korean woman in her thirties, long loose straight black hair with asymmetric side part, distinct crimson red irises, mature narrow eyes and calm stern expression, tall naturally full-busted adult physique, black tailored blazer and straight black business trousers, white closed collared shirt with BLACK NECKTIE, fitted black gloves and plain black formal shoes with low practical heels. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
+    "size": {
+      "width": 128,
+      "height": 256
+    },
+    "directions": 8,
+    "created_at": "2026-10-23T18:14:46.002054+00:00",
+    "updated_at": "2026-10-23T18:28:53.926711+00:00",
+    "animation_count": 9,
+    "template_id": "mannequin",
+    "view": "low top-down",
+    "status": "completed",
+    "preview_url": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/rotations/south.png?t=1792780133",
+    "tags": [],
+    "group_id": "623a6481-dd7a-4ce9-8770-4b5ab3141c20"
+  },
+  {
+    "id": "9095375d-b39a-447b-b577-fcb345e78928",
+    "name": "스팡달",
+    "state_name": "Idle",
+    "prompt": "스팡달 / Spangdal. Adult woman mid20s, pale skin, short wavy purple bob covering one eye, clearly gold irises, faint unsettling half smile, slender natural adult build, black tailored skirt suit, white closed shirt, black necktie, black pumps. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
+    "size": {
+      "width": 128,
+      "height": 256
+    },
+    "directions": 8,
+    "created_at": "2026-10-23T17:58:07.612884+00:00",
+    "updated_at": "2026-10-23T18:12:35.712025+00:00",
+    "animation_count": 6,
+    "template_id": "mannequin",
+    "view": "low top-down",
+    "status": "completed",
+    "preview_url": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/9095375d-b39a-447b-b577-fcb345e78928/rotations/south.png?t=1792779155",
+    "tags": [],
+    "group_id": "92e9b1a8-c83f-4971-a1c5-37ac068b52e0"
+  },
+  {
+    "id": "d6b69bb6-2544-4c36-a6c7-5a578508521a",
+    "name": "Test man",
+    "state_name": "Idle",
+    "prompt": "One single full-body adult Korean male player persona for a grounded modern supernatural investigation headquarters game. NEW original character. Short neat black hair, black two-piece trouser business suit, white collared shirt, plain black leather formal shoes. No tie, no weapon, no equipment. Natural relaxed standing idle pose: both feet resting on the ground, arms hanging loosely, both bare hands clearly visible OUTSIDE all pockets, fingers relaxed. Body and face turned three-quarter toward screen RIGHT, eye-level side-scrolling camera, NOT top-down. Realistic adult proportions about 7 heads tall, normal-sized head, not chibi. Full head and shoes entirely visible. Figure fills almost the full vertical canvas, target 244px tall on a 128x256 canvas, only 6px top and bottom safety margin, centered. Crisp native pixel art with consistent small 1px clusters, selective dark outlines, controlled detailed pixel shading, no antialiasing. Black cloth uses charcoal and muted blue-gray shadows with subtle warm amber highlights from an overhead-left interior lamp; subdued natural skin; off-white shirt still clearly reads white. Match the supplied headquarters reference ONLY for muted nocturnal palette and warm/cool lighting balance; do not draw any room, furniture or wall art. Transparent background, no floor, no cast shadow, no text, only one static person.",
+    "size": {
+      "width": 128,
+      "height": 256
+    },
+    "directions": 4,
+    "created_at": "2026-10-23T12:36:14.696813+00:00",
+    "updated_at": "2026-10-23T12:40:03.814900+00:00",
+    "animation_count": 0,
+    "template_id": "mannequin",
+    "view": "low top-down",
+    "status": "completed",
+    "preview_url": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/d6b69bb6-2544-4c36-a6c7-5a578508521a/rotations/south.png?t=1792759203",
+    "tags": [],
+    "group_id": "76acf06d-1c08-45de-a11c-b83c51f4c61a"
+  },
+  {
+    "id": "5983a05c-93e6-4c72-aa51-4c13114873f4",
+    "name": "Test woman",
+    "state_name": "Idle",
+    "prompt": "One single full-body adult Korean female player persona for the SAME grounded modern supernatural investigation headquarters game as the style reference. NEW original woman, not a recolor. Neat black chin-length bob haircut, black tailored blazer and knee-length black business skirt suit, white collared shirt, plain black closed-toe formal shoes with low practical heels. No tie, no weapon, no equipment, no handbag. Natural relaxed standing idle pose: both feet resting on the ground, arms hanging loosely beside her body, both bare hands clearly visible OUTSIDE all pockets, fingers relaxed. Body and face turned three-quarter toward screen RIGHT, EXACTLY the same direction and eye-level side-scrolling camera as the male style reference, NOT top-down. Realistic adult proportions about 7 heads tall, normal-sized head, not chibi. Full head and shoes entirely visible. Figure fills almost the full vertical canvas, target 244px tall on a 128x256 canvas, only 6px top and bottom safety margin, centered. Match the reference man's precise native pixel density, selective dark outlines, controlled pixel shading, realistic proportions, contrast and lighting. Crisp native 1px clusters, no antialiasing. Black cloth uses charcoal and muted blue-gray shadows with subtle warm amber highlights from an overhead-left interior lamp; subdued natural skin; off-white shirt still clearly reads white. Transparent background, no floor, no cast shadow, no text, only one static woman.",
+    "size": {
+      "width": 128,
+      "height": 256
+    },
+    "directions": 8,
+    "created_at": "2026-10-23T11:06:57.841167+00:00",
+    "updated_at": "2026-10-23T11:10:12.358390+00:00",
+    "animation_count": 9,
+    "template_id": "mannequin",
+    "view": "side",
+    "status": "completed",
+    "preview_url": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/5983a05c-93e6-4c72-aa51-4c13114873f4/rotations/south.png?t=1792753812",
+    "tags": [],
+    "group_id": "ffc21094-0d26-43ed-b233-00b7581afde3"
+  },
+  {
+    "id": "f8c033de-c6ff-448f-ae9d-dc5c8a4eec62",
+    "name": "warrior woman with orange hair",
+    "state_name": "about to slash, hold",
+    "prompt": "warrior woman with orange hair",
+    "size": {
+      "width": 80,
+      "height": 80
+    },
+    "directions": 8,
+    "created_at": "2026-10-23T10:48:21.532187+00:00",
+    "updated_at": "2026-10-23T10:48:21.532185+00:00",
+    "animation_count": 8,
+    "template_id": "mannequin",
+    "view": "low top-down",
+    "status": "completed",
+    "preview_url": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/f8c033de-c6ff-448f-ae9d-dc5c8a4eec62/rotations/south.png?t=1792752501",
+    "tags": [],
+    "group_id": "879de7dc-deed-482b-858a-682e244dfea0"
+  },
+  {
+    "id": "2b7800f5-9ad0-4cde-b915-d02d8afb819c",
+    "name": "warrior woman with orange hair",
+    "state_name": "hands extended about",
+    "prompt": "warrior woman with orange hair",
+    "size": {
+      "width": 60,
+      "height": 60
+    },
+    "directions": 8,
+    "created_at": "2026-10-23T10:48:21.532186+00:00",
+    "updated_at": "2026-10-23T10:48:21.532185+00:00",
+    "animation_count": 8,
+    "template_id": "mannequin",
+    "view": "low top-down",
+    "status": "completed",
+    "preview_url": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/2b7800f5-9ad0-4cde-b915-d02d8afb819c/rotations/south.png?t=1792752501",
+    "tags": [],
+    "group_id": "879de7dc-deed-482b-858a-682e244dfea0"
+  },
+  {
+    "id": "bedeaa16-015c-486d-9fef-cae04d179b74",
+    "name": "blonde farmer with long hair and a dress",
+    "state_name": "blonde farmer with long hair and a dress",
+    "prompt": "blonde farmer with long hair and a dress",
+    "size": {
+      "width": 48,
+      "height": 48
+    },
+    "directions": 8,
+    "created_at": "2026-10-23T10:48:21.532185+00:00",
+    "updated_at": "2026-10-23T10:48:21.532185+00:00",
+    "animation_count": 16,
+    "template_id": "mannequin",
+    "view": "low top-down",
+    "status": "completed",
+    "preview_url": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/bedeaa16-015c-486d-9fef-cae04d179b74/rotations/south.png?t=1792752501",
+    "tags": [],
+    "group_id": "cb4e698b-855e-4c41-804a-df4f834c5e3c"
+  },
+  {
+    "id": "c1880b9f-781c-4e72-add4-fe5741ef2bc6",
+    "name": "flat shaded light brown bear",
+    "state_name": "flat shaded light brown bear",
+    "prompt": "flat shaded light brown bear",
+    "size": {
+      "width": 96,
+      "height": 96
+    },
+    "directions": 8,
+    "created_at": "2026-10-23T10:48:21.532185+00:00",
+    "updated_at": "2026-10-23T10:48:21.532185+00:00",
+    "animation_count": 32,
+    "template_id": "bear",
+    "view": "low top-down",
+    "status": "completed",
+    "preview_url": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/c1880b9f-781c-4e72-add4-fe5741ef2bc6/rotations/south.png?t=1792752501",
+    "tags": [],
+    "group_id": "f783fa2a-5e4c-4cf2-87f1-1195e21acff5"
+  },
+  {
+    "id": "cf03eac7-8fb0-40f7-a26f-1754ff806e02",
+    "name": "warrior woman with orange hair",
+    "state_name": "warrior woman with orange hair",
+    "prompt": "warrior woman with orange hair",
+    "size": {
+      "width": 64,
+      "height": 64
+    },
+    "directions": 8,
+    "created_at": "2026-10-23T10:48:21.532185+00:00",
+    "updated_at": "2026-10-23T10:48:21.532185+00:00",
+    "animation_count": 32,
+    "template_id": "mannequin",
+    "view": "low top-down",
+    "status": "completed",
+    "preview_url": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/cf03eac7-8fb0-40f7-a26f-1754ff806e02/rotations/south.png?t=1792752501",
+    "tags": [],
+    "group_id": "879de7dc-deed-482b-858a-682e244dfea0"
+  },
+  {
+    "id": "9487c5b8-2179-48f2-ad2f-d57f4544975b",
+    "name": "old man bald",
+    "state_name": "old man bald",
+    "prompt": "old man bald",
+    "size": {
+      "width": 44,
+      "height": 44
+    },
+    "directions": 8,
+    "created_at": "2026-10-23T10:48:21.532185+00:00",
+    "updated_at": "2026-10-23T10:48:21.532185+00:00",
+    "animation_count": 8,
+    "template_id": "mannequin",
+    "view": "low top-down",
+    "status": "completed",
+    "preview_url": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/9487c5b8-2179-48f2-ad2f-d57f4544975b/rotations/south.png?t=1792752501",
+    "tags": [],
+    "group_id": "02ebd939-7233-4e0e-acf2-6d634f04ef7f"
+  }
+]

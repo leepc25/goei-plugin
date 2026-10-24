@@ -1,0 +1,36 @@
+{
+  "id": "c4665bfa-5744-48ae-a1f6-2080cd48c929",
+  "name": "곽제강",
+  "state_name": "Idle",
+  "prompt": "곽제강 / Kwak Je-gang. Young adult man with ordinary soft slim build, gentle long face, warm brown eyes and friendly small smile. Thick messy WAVY black hair with loose center part and curled forehead strands. Large thin rectangular clear eyeglasses. OPEN long off-white lab coat over pale gray-blue collared shirt, straight black necktie and black trousers. No mask, no held book. Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches.",
+  "size": {
+    "width": 128,
+    "height": 256
+  },
+  "directions": 8,
+  "created_at": "2026-10-23T21:30:47.209215+00:00",
+  "updated_at": "2026-10-23T21:50:28.941928+00:00",
+  "animation_count": 0,
+  "template_id": "mannequin",
+  "view": "low top-down",
+  "status": "completed",
+  "rotation_urls": {
+    "south": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/c4665bfa-5744-48ae-a1f6-2080cd48c929/rotations/south.png?t=1792792228",
+    "west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/c4665bfa-5744-48ae-a1f6-2080cd48c929/rotations/west.png?t=1792792228",
+    "east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/c4665bfa-5744-48ae-a1f6-2080cd48c929/rotations/east.png?t=1792792228",
+    "north": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/c4665bfa-5744-48ae-a1f6-2080cd48c929/rotations/north.png?t=1792792228",
+    "south-east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/c4665bfa-5744-48ae-a1f6-2080cd48c929/rotations/south-east.png?t=1792792228",
+    "north-east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/c4665bfa-5744-48ae-a1f6-2080cd48c929/rotations/north-east.png?t=1792792228",
+    "north-west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/c4665bfa-5744-48ae-a1f6-2080cd48c929/rotations/north-west.png?t=1792792228",
+    "south-west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/c4665bfa-5744-48ae-a1f6-2080cd48c929/rotations/south-west.png?t=1792792228"
+  },
+  "style_settings": {
+    "generation_mode": "v3"
+  },
+  "guidance": null,
+  "ai_freedom": null,
+  "tags": [],
+  "group_id": "2d454302-8125-4aae-9f9f-167c19697cf3",
+  "skeletons": null,
+  "animations": []
+}

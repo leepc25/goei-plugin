@@ -1,0 +1,14 @@
+{
+  "job": "334e84ed-d91b-4be7-9e74-d88b5ca1cf80",
+  "job_status": "completed",
+  "decision": "pass",
+  "reason": "이마와 양쪽 뺨의 여러 흉터가 읽히며 정면·선글라스·긴 소매·딱딱한 표정 유지. 모발 포함228px, 보통 성인 스케일, 투명 외곽 정상.",
+  "at": 1792790384.648641,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "mask_image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "description": "Complete the missing VIEWER-RIGHT half of the long black nun veil. Look at the EXISTING VIEWER-LEFT veil beside her left hand: a solid black fabric strip hangs down behind that hand. Add a MATCHING solid BLACK CLOTH PANEL behind the right hand, about SIX pixels wide, filling x96 through x101 from y135 to y164, naturally connected up to existing black veil at right upper arm. Filled black fabric with one subtle dark gray fold, NOT a single vertical outline or line. Hem at same height as left veil. Preserve hands, beads, sleeves, body, face, eyes and every unmasked pixel. Transparent outside the veil.",
+  "no_background": true,
+  "output_method": "Modify current layer",
+  "crop_to_mask": true,
+  "seed": 1792795549,
+  "context_image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "bounding_box": {
+    "x": 0,
+    "y": 0,
+    "width": 128,
+    "height": 256
+  }
+}

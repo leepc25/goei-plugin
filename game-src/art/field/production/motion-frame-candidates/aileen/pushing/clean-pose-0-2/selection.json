@@ -1,0 +1,9 @@
+{
+  "frame_index": 0,
+  "source_job_id": "d90d1824-7c56-429b-8f65-28b510ed4d22",
+  "source_frame_index": 2,
+  "target_pose_index": 0,
+  "source_path": "motion-frame-candidates/aileen/pushing/clean-pose-0-2/frames/2.png",
+  "sha256": "3f19418f001bcbaccbe67acd6721fe8b707d1ec2cf5ac482be013c893e1cb5aa",
+  "findings": "Candidate2 separates hair tips without broad gray end matte present in candidates0/1; intact braced body."
+}

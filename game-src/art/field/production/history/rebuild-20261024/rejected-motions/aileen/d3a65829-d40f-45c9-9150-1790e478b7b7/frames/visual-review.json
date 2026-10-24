@@ -1,0 +1,20 @@
+{
+  "at": 1792807686.0491812,
+  "job_id": "01f17a00-0eee-49e9-8b50-54af4860ff37",
+  "result": "reroll-required",
+  "findings": "포니테일 끝 회색 면 특히 2·3·6·7번째. 달리기 팔 관절 궤적과 실제 참조 정합 수정 필요.",
+  "frame_count": 8,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "running-8-frames",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

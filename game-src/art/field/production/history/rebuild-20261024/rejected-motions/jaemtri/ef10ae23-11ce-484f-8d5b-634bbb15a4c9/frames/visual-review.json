@@ -1,0 +1,20 @@
+{
+  "at": 1792804635.754841,
+  "job_id": "ef10ae23-11ce-484f-8d5b-634bbb15a4c9",
+  "result": "reroll-required",
+  "findings": "Rotation frames 3 through 7 carry gray/broken hair exterior and blurred hands/face, despite bounded skeleton. Need clean own tilted/inverted pose reference before rerolling whole sequence.",
+  "frame_count": 9,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

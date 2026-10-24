@@ -1,0 +1,14 @@
+{
+  "job": "be4b8d4b-01a5-425c-8358-407fa75577ec",
+  "job_status": "completed",
+  "decision": "pass",
+  "reason": "원작의 검갈색 CRT TV 머리·세피아 노이즈 화면과 흰 웃는 눈·갈색 삼피스 정장·검은 긴 장갑 대조. 큰 체격, TV 포함237px로 로어 기반 큰 체구 유지(범위240–246은 비공식 목표). 정면·투명 외곽 정상.",
+  "at": 1792793043.7233815,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

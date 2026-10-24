@@ -1,0 +1,12 @@
+{
+  "image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "method": "text",
+  "description": "Remove ONLY the clear eyeglass/frame-like rectangle around the uncovered eye (HIS RIGHT eye, viewer LEFT). He does NOT wear glasses. Draw a narrow half-lidded gray-brown eye naturally in pale skin with NO eyeglass frame. Keep the navy rectangular medical EYEPATCH over HIS LEFT eye (viewer RIGHT), held by one thin DIAGONAL strap crossing bridge of nose as in a medical eye patch. Preserve curly ash-brown hair, youthful thin face, smug small smile, entire navy suited body, slim build, exact native height, front-facing pose and all clothes. Same crisp pixel style, transparent background, no gray halo.",
+  "no_background": true,
+  "use_color_palette_correction": true,
+  "seed": 1792790163
+}

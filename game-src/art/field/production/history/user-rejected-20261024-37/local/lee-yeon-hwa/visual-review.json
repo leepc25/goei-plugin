@@ -1,0 +1,14 @@
+{
+  "job": "0f784410-ce1f-43e8-85ff-b5431aec8137",
+  "job_status": "completed",
+  "decision": "pass",
+  "reason": "원작의 낮은 검은 묶음머리·사각 안경·피곤한 눈·분홍 블라우스·열린 흰 가운·검은 치마 대조. 모발 포함206px로 여성 키 범위, 정면과 투명 외곽 확인.",
+  "at": 1792791856.0875702,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

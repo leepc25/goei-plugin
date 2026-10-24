@@ -1,0 +1,14 @@
+{
+  "job": "cfe770bf-8f39-4d9a-9827-3fc3d4139221",
+  "job_status": "completed",
+  "decision": "pass",
+  "reason": "원작 재대조: 진한 청남색 일자 앞머리·높은 포니테일 뿌리·길게 내려가는 뒤머리, 날카로운 눈·남색 정장. 정면·모발 포함216px이며 높은 묶음을 제외한 본체 약205px. 긴 꼬리의 뒤쪽 길이는8방향 후면에서 반드시 재검수.",
+  "at": 1792790533.2062342,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "at": 1792798180.647272,
+  "job_id": "d06d1fbd-1d41-4d2f-abb6-f974f3994f7e",
+  "result": "pass",
+  "findings": "서쪽6프레임 전체 검토. 양손 사이의 일정한 세로 손잡이를 잡고 몸을 뒤로 당기는 동작, 장갑·긴 머리·정장 보존. 회색 세로 부분은 손 사이에서 유지되는 소품이며 외곽 배경 칠 없음.",
+  "frame_count": 6,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "pull-heavy-object",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

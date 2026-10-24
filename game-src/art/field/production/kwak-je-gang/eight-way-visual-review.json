@@ -1,0 +1,25 @@
+{
+  "at": 1792793530.440952,
+  "character_id": "758716dc-e7ba-4f48-87ac-d0dbb16aa626",
+  "result": "pass",
+  "directions_reviewed": [
+    "south",
+    "south-east",
+    "east",
+    "north-east",
+    "north",
+    "north-west",
+    "west",
+    "south-west"
+  ],
+  "findings": "새 등록에서18개3D관절 확인. 원작 검은 웨이브 가르마·사각 안경·밝은 셔츠와 검은 타이·열린 흰 가운·보통 체형 유지. 8방향 투명 외곽 정상, 양 측면 안경과 눈 확인.",
+  "movement_direction": "east",
+  "stationary_direction": "south-east",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF primary",
+    "Lore supplementary height",
+    "All55 before motion",
+    "Gray outer paint reroll"
+  ]
+}

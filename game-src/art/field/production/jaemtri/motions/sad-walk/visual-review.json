@@ -1,0 +1,20 @@
+{
+  "at": 1792804477.9747362,
+  "job_id": "dd2dc9ab-c87a-4894-9eb1-4daf3f005733",
+  "result": "pass",
+  "findings": "All eight EAST lowered-head relaxed-arm gait frames viewed; shin/ankle damage resolved, own long brown hair/skirt/heels and stature maintained, no gray exterior.",
+  "frame_count": 8,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

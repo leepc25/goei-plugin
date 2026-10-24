@@ -1,0 +1,14 @@
+{
+  "description": "브라우니 / Brownie. Large broad humanoid television host. HEAD is a bulky old rectangular CRT TELEVISION with dark brown-black frame, bottom buttons and sepia static SCREEN showing two white happy curved eyes and a tiny white smiling mouth. No human face or hair. BROWN three-piece suit: open jacket, buttoned brown waistcoat, matching trousers, WHITE dress shirt, dark tie, BLACK gloves with long fingers, black lace-up shoes. Natural humanoid body, television replaces entire head. Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches.",
+  "reference_image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "n_directions": 8,
+  "view": "low top-down",
+  "template_id": "mannequin",
+  "name": "브라우니",
+  "seed": 10222027,
+  "no_background": true
+}

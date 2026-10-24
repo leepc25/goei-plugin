@@ -1,0 +1,30 @@
+{
+  "description": "Full-body native pixel-art game sprite, STRICTLY FRONT SOUTH view: face, nose, chest, belt and knees directly toward viewer, both ears equally visible. No sideways head or three-quarter turn. IDENTITY: Large broad humanoid television host. HEAD is a bulky old rectangular CRT TELEVISION with dark brown-black frame, bottom buttons and sepia static SCREEN showing two white happy curved eyes and a tiny white smiling mouth. No human face or hair. BROWN three-piece suit: open jacket, buttoned brown waistcoat, matching trousers, WHITE dress shirt, dark tie, BLACK gloves with long fingers, black lace-up shoes. Natural humanoid body, television replaces entire head. Relaxed upright stance, empty hands at sides. Natural adult anatomy, normal torso/pelvis, 7-head proportions. Anatomical crown to soles 240-246px; feet 6px above bottom, hair fully inside frame. Crisp single-pixel clusters, selective dark outlines, restrained game-sprite shading, no antialiasing. Transparent background, no ground shadow, text or weapons. Preserve individual hair, face, stature and clothing. Do not copy any generic character. Anatomical height excludes high hair/headwear. Every outer edge must border transparency directly, never a light gray halo.",
+  "image_size": {
+    "width": 128,
+    "height": 256
+  },
+  "no_background": true,
+  "seed": 1792789084,
+  "target_palette": {
+    "max_colors": 48
+  },
+  "style_options": {
+    "color_palette": false,
+    "outline": true,
+    "detail": true,
+    "shading": true
+  },
+  "style_image": {
+    "image": {
+      "type": "base64",
+      "base64": "[image payload omitted]",
+      "format": "png"
+    },
+    "size": {
+      "width": 128,
+      "height": 256
+    },
+    "usage_description": "Use ONLY native standing scale, crisp pixel rendering and front-facing stance. Do not copy hair, face, sunglasses, clothing colors, armor or identity. Draw target original identity from description."
+  }
+}

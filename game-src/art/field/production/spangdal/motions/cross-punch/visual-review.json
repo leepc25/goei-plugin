@@ -1,0 +1,20 @@
+{
+  "at": 1792803293.716205,
+  "job_id": "68c43543-8768-48bb-82cb-2b52bc2d8435",
+  "result": "pass",
+  "findings": "All eight frames viewed: WEST rear-hand straight cross with other hand guarding, corrected arm path; own bob/skirt/pumps preserved, no gray exterior paint or holes.",
+  "frame_count": 8,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

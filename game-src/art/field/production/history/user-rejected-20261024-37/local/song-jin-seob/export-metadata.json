@@ -1,0 +1,36 @@
+{
+  "group_id": "7816eab8-8b1f-47ec-b71b-dd58887d25dd",
+  "states": [
+    {
+      "character": {
+        "id": "46a8383f-cf68-4920-abbc-9952ce83432e",
+        "name": "Idle",
+        "prompt": "송진섭 / Song Jin-seob. Slim youthful man with soft oval face, small chin, gentle modest closed-mouth smile, NOT rugged. Neat rounded dark brown-black BOWL haircut with SHORT straight fringe well ABOVE eyebrows, visible forehead strip. Large black aviator sunglasses. Narrow natural shoulders and slender arms. Dark brown-charcoal single-breasted suit neatly buttoned, white shirt and tidy black necktie. No scars, beard or muscular bulk. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
+        "size": {
+          "width": 128,
+          "height": 256
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "low top-down",
+        "created_at": "2026-10-23T21:23:05.921511+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {}
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-10-23T21:43:09.912765"
+}

@@ -1,0 +1,14 @@
+{
+  "job": "48573c0d-7057-4d1a-a39b-1aea4245574d",
+  "job_status": "completed",
+  "decision": "reroll",
+  "reason": "전체 교정 뒤 팔레트11색에서 원작의 초록 홍채가 사라짐. 초록 눈·몸이 맞았던 이번 생성본을 사용해 옆머리만 마스크 교정, 나머지 RGBA 보존 검증.",
+  "at": 1792790749.2992353,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

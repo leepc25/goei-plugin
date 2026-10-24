@@ -1,0 +1,58 @@
+{
+  "reason": "회색 외곽/잘림 반려. 본인 실측 공중 참조와 고유 관절 길이 보존 궤적으로 수정.",
+  "group": {
+    "animation_type": "sad-walk",
+    "display_name": null,
+    "animation_group_id": "82caef68-116a-4297-9e86-28bb06b87b70",
+    "directions": [
+      {
+        "direction": "east",
+        "frame_count": 8,
+        "frames": [
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/985eed01-f6dd-4b74-8339-a11666902519/east/0.png?t=1792807147",
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/985eed01-f6dd-4b74-8339-a11666902519/east/1.png?t=1792807147",
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/985eed01-f6dd-4b74-8339-a11666902519/east/2.png?t=1792807147",
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/985eed01-f6dd-4b74-8339-a11666902519/east/3.png?t=1792807147",
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/985eed01-f6dd-4b74-8339-a11666902519/east/4.png?t=1792807147",
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/985eed01-f6dd-4b74-8339-a11666902519/east/5.png?t=1792807147",
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/985eed01-f6dd-4b74-8339-a11666902519/east/6.png?t=1792807147",
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/558c27ed-873c-4207-9099-171bb64a09b2/animations/985eed01-f6dd-4b74-8339-a11666902519/east/7.png?t=1792807147"
+        ]
+      }
+    ]
+  },
+  "at": 1792808030.2413065,
+  "state_before": {
+    "name": "에일린",
+    "group": "management",
+    "character_id": "558c27ed-873c-4207-9099-171bb64a09b2",
+    "image": "95f7fbb1-98fc-4481-a293-236e615fb8b8",
+    "registration": "d95cd572-ed2f-48a9-9835-699c8b3275c5",
+    "motions": {
+      "breathing-idle": "db123cd2-3718-480f-863c-1a528f708a4a",
+      "sad-walk": "9d222834-64bd-4f65-9961-1a4e5394d69d",
+      "front-flip": "bdd8d878-7689-4e18-bb99-6a11b17ff8e0",
+      "backflip": "490758e4-b763-4f05-a4a7-4d959c421d54",
+      "drinking": "68a1c28c-7789-422e-86af-7c2bf6c00e26",
+      "picking-up": "1e4ca37b-b652-4121-ad22-271d9c0f7b18",
+      "pushing": "32a66515-c84f-4e4e-a964-1732d1110899",
+      "pull-heavy-object": "f105a00e-1847-4eb7-b741-b12b72fba3f9",
+      "throw-object": "397540b8-892b-4d6e-ab1e-fd52471c681a",
+      "fight-stance-idle-8-frames": "6e00595c-7d91-4320-ab72-27424e97ee97",
+      "cross-punch": "bc1e737a-2b62-4105-9f15-b9b48a7826bb",
+      "jumping-1": "5a82b49c-23cd-42e3-9ebb-6d5ad82a2b4b",
+      "jumping-2": "0c838ac4-ea02-4932-84f4-74a6070d3464",
+      "two-footed-jump": "44166189-82df-4f97-9e28-dbdb8b64a266",
+      "lead-jab": "12cfb052-6726-40f9-a2fe-540dc9a49e73"
+    },
+    "ready": true,
+    "repair_id": "aileen-user-rebuild-v4",
+    "visual_review_required": true,
+    "image_verified": true,
+    "skeleton_joints": 18,
+    "rotation_count": 8,
+    "exported": false,
+    "eight_way_visual_reviewed": true,
+    "motions_visual_reviewed": false
+  }
+}

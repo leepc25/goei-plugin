@@ -1,0 +1,20 @@
+{
+  "at": 1792798535.5410936,
+  "job_id": "b3b23fc2-8704-4d99-b294-e67ca5bddb1c",
+  "result": "reroll-required",
+  "findings": "새 시드에서도3프레임 갈색 덩어리가 생겼다 사라지며2프레임 발 앞 갈색 조각도 생성. 원본 정장/장갑과 연속성 미달 반복.",
+  "frame_count": 5,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "picking-up",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

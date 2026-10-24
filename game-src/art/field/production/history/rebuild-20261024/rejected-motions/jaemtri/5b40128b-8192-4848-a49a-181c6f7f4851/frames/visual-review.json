@@ -1,0 +1,20 @@
+{
+  "at": 1792803886.7492182,
+  "job_id": "b447e786-642b-4d67-9ecf-ad1f0334ca55",
+  "result": "reroll-required",
+  "findings": "Frame 3 rear arm extends unnaturally above back without a visible hand, while lowering to object. Replace with compact own-proportion crouch pickup; preserve hairstyle, skirt and heels.",
+  "frame_count": 5,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "picking-up",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

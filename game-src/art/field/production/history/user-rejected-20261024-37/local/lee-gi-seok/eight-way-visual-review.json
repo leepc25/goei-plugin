@@ -1,0 +1,24 @@
+{
+  "character_id": "486210c4-4334-42d1-bfd4-329bc16b00a3",
+  "result": "pass",
+  "directions_reviewed": [
+    "south",
+    "south-east",
+    "east",
+    "north-east",
+    "north",
+    "north-west",
+    "west",
+    "south-west"
+  ],
+  "findings": "Asymmetric long side-parted black fringe, lean narrow face, sunglasses and fitted dark suit retained across8 views. EAST fringe hides face, WEST exposes sunglasses and cheek; select west/southwest. Stable standing scale and clean silhouette.",
+  "movement_direction": "west",
+  "stationary_direction": "south-west",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF primary",
+    "Lore supplementary height",
+    "All55 before motion",
+    "Gray outer paint reroll"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "job": "8e59c8fd-27b9-4e1b-979f-7f915108e96a",
+  "decision": "reroll",
+  "reason": "키180px 미만으로 보통 성인 키 목표보다 현저히 작음.",
+  "at": 1792789696.9857712,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

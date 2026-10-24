@@ -1,0 +1,20 @@
+{
+  "at": 1792809039.2698767,
+  "job_id": "7c0469a4-dedb-4e04-bd72-706ac1b4983c",
+  "result": "reroll-required",
+  "findings": "5·10번째 얼굴/머리 투명 파괴, 4번째 뒤쪽 회갈색 덩어리와 일부 포니테일 회색 매트. 실패 자세 후보 보정 필요.",
+  "frame_count": 13,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

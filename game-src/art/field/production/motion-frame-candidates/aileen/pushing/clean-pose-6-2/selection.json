@@ -1,0 +1,9 @@
+{
+  "frame_index": 6,
+  "source_job_id": "319991db-7083-4a02-aa24-1a8a8aaba674",
+  "source_frame_index": 1,
+  "target_pose_index": 6,
+  "source_path": "motion-frame-candidates/aileen/pushing/clean-pose-6-2/frames/1.png",
+  "sha256": "191475a3d1c05f6dd96835af505ce1103501e7faab8a14d38973ef989aa204f4",
+  "findings": "Candidate1 removes candidate0 gray hair-end mass; transparent space around legs and intact black suit."
+}

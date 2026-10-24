@@ -1,0 +1,20 @@
+{
+  "at": 1792812672.4416854,
+  "job_id": "bcf575dd-3d69-44a4-808c-5b6129e66c6f",
+  "result": "reroll-required",
+  "findings": "Forward boot reaches/crosses right frame edge and rear arm contorts overhead. Use bounded own throw trajectory.",
+  "frame_count": 7,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "throw-object",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

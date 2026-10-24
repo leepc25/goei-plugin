@@ -1,0 +1,79 @@
+{
+  "at": 1792806162.5709713,
+  "job_id": "f0edcb83-0b00-45e5-aef3-53223e4c989a",
+  "result": "pass",
+  "findings": "교체한 전체8프레임 재검토. 낮은 미끄러짐→회복 연결, 얼굴/치마/다리/하이힐 정상. 얇은 머리 윤곽선과 불량 회색 면을 구별했으며 외부 회색 도색 덩어리 없음.",
+  "frame_count": 8,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ],
+  "frame_assembly": {
+    "base_job_id": "f0edcb83-0b00-45e5-aef3-53223e4c989a",
+    "frame_sources": [
+      {
+        "frame_index": 0,
+        "source_job_id": "f0edcb83-0b00-45e5-aef3-53223e4c989a",
+        "source_frame_index": 0,
+        "sha256": "b1def8949e97b70b988add86a5016c758223886cb946a4a6d200abb1f21e3386"
+      },
+      {
+        "frame_index": 1,
+        "source_job_id": "f0edcb83-0b00-45e5-aef3-53223e4c989a",
+        "source_frame_index": 1,
+        "sha256": "744618a83e7f88c2bf785e8f1c01ab5ca9f1358a605babe7bb387eb8a32f79fa"
+      },
+      {
+        "frame_index": 2,
+        "source_job_id": "f0edcb83-0b00-45e5-aef3-53223e4c989a",
+        "source_frame_index": 2,
+        "sha256": "710333bffe8d51db72d4fafdf4e4a6e886987cba44ac376676b6e8c8f66f5180"
+      },
+      {
+        "frame_index": 3,
+        "source_job_id": "f0edcb83-0b00-45e5-aef3-53223e4c989a",
+        "source_frame_index": 3,
+        "sha256": "c1799f2dc0c9a5cf5e343c03b9bf12061f2fbe944e4c8b8a5d10a881fdb50452"
+      },
+      {
+        "frame_index": 4,
+        "source_job_id": "5798bb45-4918-4b31-88a1-0026c782d179",
+        "source_frame_index": 1,
+        "target_pose_index": 4,
+        "source_path": "motion-frame-candidates/jaemtri/running-slide/low-slide-4/frames/1.png",
+        "sha256": "75f9b7d01bf7625ca5fa1b52a2255662e8a3c3ca823c6b124817920bc7dde4ef",
+        "findings": "실제 관절 재측정 참조로 머리 외곽 회색 제거. 목표 낮은 미끄러짐 자세 및 다리/하이힐 온전."
+      },
+      {
+        "frame_index": 5,
+        "source_job_id": "f0edcb83-0b00-45e5-aef3-53223e4c989a",
+        "source_frame_index": 5,
+        "sha256": "cd55cd649350367d16b18cc9453623e903252a1f603e13d57b105446146e29b3"
+      },
+      {
+        "frame_index": 6,
+        "source_job_id": "f0edcb83-0b00-45e5-aef3-53223e4c989a",
+        "source_frame_index": 6,
+        "sha256": "9bd9a1dbf26c7a2e7343d4413894dcc1fcfb315ec3657c74af247bd45e78a566"
+      },
+      {
+        "frame_index": 7,
+        "source_job_id": "f0edcb83-0b00-45e5-aef3-53223e4c989a",
+        "source_frame_index": 7,
+        "sha256": "529a768a8850a0d389986cdff073b34a1f850efddf8fd2278fd9869875304477"
+      }
+    ],
+    "method": "select complete same-pose regenerated frames; no pixel editing",
+    "new_user_approval": false,
+    "visual_reviewed": true
+  }
+}

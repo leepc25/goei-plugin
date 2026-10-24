@@ -1,0 +1,36 @@
+{
+  "group_id": "1c65af6d-1a7f-4395-bf5c-418b8dbb5934",
+  "states": [
+    {
+      "character": {
+        "id": "9e926b19-797f-4c96-9623-f93b60165828",
+        "name": "Idle",
+        "prompt": "살라딘 / Saladin. Broad strong adult man with DARK BROWN skin, angular handsome face, pale gray eyes, thick eyebrows, full short BLACK beard and moustache, friendly restrained smile. Large WHITE wrapped TURBAN. BLACK tailored trouser suit, white collared shirt and black tie, black dress shoes. Match unarmed original: no ammunition vest, explosives or carried rifle. Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches.",
+        "size": {
+          "width": 128,
+          "height": 256
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "low top-down",
+        "created_at": "2026-10-23T21:53:52.703472+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {}
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-10-23T22:12:25.624583"
+}

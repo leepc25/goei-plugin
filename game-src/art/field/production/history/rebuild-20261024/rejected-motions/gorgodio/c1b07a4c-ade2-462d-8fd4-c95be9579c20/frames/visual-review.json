@@ -1,0 +1,20 @@
+{
+  "at": 1792812437.2315378,
+  "job_id": "7517bec3-7345-46fc-98b9-a4d78e35b33b",
+  "result": "reroll-required",
+  "findings": "Several crouch frames clip boot/leg at bottom edge; raise/bound trajectory using own proportions.",
+  "frame_count": 6,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "crouched-walking",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

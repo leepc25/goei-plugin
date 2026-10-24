@@ -1,0 +1,17 @@
+{
+  "image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "mask_image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "description": "In the selected shoulder-hair area, replace the braided/plaited white hair with a LOOSE LOW SIDE PONYTAIL made of long flowing WHITE S-shaped WAVES with wispy curled ends. No braid links, no interwoven strands. It drapes over HER RIGHT shoulder (viewer LEFT), tapering over upper chest. Keep the navy suit and white shirt underneath visible naturally. Match the existing crisp native pixel style and existing white/gray hair palette, no antialiasing and no new unrelated colors. Transparent background remains transparent. Preserve every unmasked pixel including green eyes, head, body and shoes exactly.",
+  "no_background": true,
+  "output_method": "Modify current layer",
+  "crop_to_mask": true,
+  "seed": 1792790749
+}

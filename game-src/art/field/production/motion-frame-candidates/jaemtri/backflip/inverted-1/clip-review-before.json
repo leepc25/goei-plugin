@@ -1,0 +1,20 @@
+{
+  "at": 1792806196.3047748,
+  "job_id": "eb443f25-dd14-4633-ab0a-39a595fe2928",
+  "result": "reroll-required",
+  "findings": "재측정 참조로 큰 회색 면/체형 변화 개선. 2번째 떠있는 손 조각,4번째 신발 외곽,6·7번째 머리/신발 회색 잔상은 남아 정확한 자세별 후보 필요.",
+  "frame_count": 9,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

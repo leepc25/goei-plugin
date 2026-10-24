@@ -1,0 +1,20 @@
+{
+  "at": 1792803939.3497021,
+  "job_id": "2f3d540f-6770-442f-a9f4-a2a12320fe11",
+  "result": "pass",
+  "findings": "Eight EAST walk frames inspected: own brown waves, skirt suit, natural body and high heels preserved; alternating stride and arm swing; no gray exterior, clipping or holes.",
+  "frame_count": 8,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "walking-8-frames",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

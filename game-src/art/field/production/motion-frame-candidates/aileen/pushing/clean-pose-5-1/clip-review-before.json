@@ -1,0 +1,20 @@
+{
+  "at": 1792809039.552713,
+  "job_id": "26112962-08ae-494b-9f9b-82a398e44e85",
+  "result": "reroll-required",
+  "findings": "6번째 머리카락 아래 분리 회갈색 덩어리 및 다수 포니테일 끝 회색 잔상. 실패 자세 후보 보정.",
+  "frame_count": 8,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

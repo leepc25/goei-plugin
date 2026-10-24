@@ -1,0 +1,17 @@
+{
+  "image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "mask_image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "description": "Remove the ENTIRE upper-arm sleeve patch including all border and symbol pixels. Replace with PLAIN continuous dark navy sleeve cloth matching surrounding folds. No shield, badge, black rectangle, insignia, sleeve pocket or marking. Preserve exact arm outline, pose, body, hair, uniform and all unmasked pixels. Crisp native pixel rendering, transparent outside.",
+  "no_background": true,
+  "output_method": "Modify current layer",
+  "crop_to_mask": true,
+  "seed": 1792795914
+}

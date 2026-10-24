@@ -1,0 +1,140 @@
+{
+  "reason": "회색 면/투명 손상 반려. 정상 지상 가드 실측 참조로 변경.",
+  "job": {
+    "kind": "animation",
+    "slug": "aileen",
+    "template": "pushing",
+    "status": "completed",
+    "created_epoch": 1792808050.543292,
+    "receipt": {
+      "usage": null,
+      "background_job_id": "5dd63261-e259-416c-892b-d58501ab8e11",
+      "status": "processing"
+    },
+    "endpoint": "animate-with-skeleton-v3",
+    "last_response": {
+      "usage": {
+        "type": "generations",
+        "generations": 3.0
+      },
+      "id": "5dd63261-e259-416c-892b-d58501ab8e11",
+      "status": "completed",
+      "created_at": "2026-10-24T02:14:10.760146+00:00",
+      "last_response": {
+        "seed": 2026112409,
+        "type": "done",
+        "action": "smoothing frames",
+        "images": [
+          {
+            "type": "base64",
+            "width": 256,
+            "base64": "[image payload omitted]",
+            "height": 256
+          },
+          {
+            "type": "base64",
+            "width": 256,
+            "base64": "[image payload omitted]",
+            "height": 256
+          },
+          {
+            "type": "base64",
+            "width": 256,
+            "base64": "[image payload omitted]",
+            "height": 256
+          },
+          {
+            "type": "base64",
+            "width": 256,
+            "base64": "[image payload omitted]",
+            "height": 256
+          },
+          {
+            "type": "base64",
+            "width": 256,
+            "base64": "[image payload omitted]",
+            "height": 256
+          },
+          {
+            "type": "base64",
+            "width": 256,
+            "base64": "[image payload omitted]",
+            "height": 256
+          },
+          {
+            "type": "base64",
+            "width": 256,
+            "base64": "[image payload omitted]",
+            "height": 256
+          },
+          {
+            "type": "base64",
+            "width": 256,
+            "base64": "[image payload omitted]",
+            "height": 256
+          }
+        ],
+        "status": "initializing",
+        "progress": 1.0,
+        "flow_kind": "animation",
+        "billing_usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "generation_id": "f1e505e5-cd13-4a10-943e-bc6a240915a2",
+        "queue_position": 0,
+        "billing_charged": true,
+        "generation_started_at": "2026-10-24T02:15:02.53848+00:00",
+        "estimated_wait_seconds": 0
+      }
+    },
+    "observed_end_epoch": 1792808249.2438047,
+    "elapsed_observed_seconds": 198.70051264762878,
+    "usage": {
+      "usd": 0.0,
+      "type": "generations",
+      "generations": 3
+    },
+    "saved_frames": 8
+  },
+  "at": 1792808396.5627775,
+  "state_before": {
+    "name": "에일린",
+    "group": "management",
+    "character_id": "558c27ed-873c-4207-9099-171bb64a09b2",
+    "image": "95f7fbb1-98fc-4481-a293-236e615fb8b8",
+    "registration": "d95cd572-ed2f-48a9-9835-699c8b3275c5",
+    "motions": {
+      "breathing-idle": "db123cd2-3718-480f-863c-1a528f708a4a",
+      "jumping-1": "5a82b49c-23cd-42e3-9ebb-6d5ad82a2b4b",
+      "jumping-2": "0c838ac4-ea02-4932-84f4-74a6070d3464",
+      "two-footed-jump": "44166189-82df-4f97-9e28-dbdb8b64a266",
+      "walking-8-frames": "29b37c2d-9481-432d-bd29-cae7e6c972bb",
+      "running-jump": "c97e3a3f-a57c-4686-83d1-c061b35c4f91",
+      "running-slide": "4b74639d-49d6-415c-962e-ad5ed9060923",
+      "sad-walk": "1e0a9c2c-3942-48e7-b284-89a703da3c56",
+      "front-flip": "a3835bd6-79d2-4919-9f4c-bfd75b9f2ade",
+      "backflip": "4f5af81e-2821-4551-a8ea-79cdfba35c2f",
+      "picking-up": "bee49ff3-4ec7-4708-a9b0-3e53974164cb",
+      "pushing": "5dd63261-e259-416c-892b-d58501ab8e11",
+      "throw-object": "6de06e62-f06e-444b-b4a2-6ba4ce093f9e",
+      "fight-stance-idle-8-frames": "523b81e5-836f-4581-9bdd-767b51b4b964",
+      "cross-punch": "38030fa5-4b18-4464-b41d-742f35e55b3c",
+      "drinking": "d5e5138d-fe85-4ee3-9d85-c711b08b0e93",
+      "pull-heavy-object": "fe1de18e-0b68-4fa6-9960-11e631108ab9",
+      "lead-jab": "630cb67c-2386-4e45-96c3-6f3f47c9dbc3"
+    },
+    "ready": true,
+    "repair_id": "aileen-user-rebuild-v4",
+    "visual_review_required": true,
+    "image_verified": true,
+    "skeleton_joints": 18,
+    "rotation_count": 8,
+    "exported": false,
+    "eight_way_visual_reviewed": true,
+    "motions_visual_reviewed": false,
+    "motion-frame-candidate-jumping-1-crouch-hair-1": "c091877e-1a73-4f0f-a3a3-5b974d3a78e5"
+  },
+  "standalone": true
+}

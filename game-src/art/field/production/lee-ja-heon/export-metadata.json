@@ -1,0 +1,36 @@
+{
+  "group_id": "70895ca1-340f-42b7-a637-38025fb099c7",
+  "states": [
+    {
+      "character": {
+        "id": "e3c537b2-0878-497d-bbb4-dab809f19cce",
+        "name": "Idle",
+        "prompt": "이자헌 / Lee Ja-heon. Tall large solidly built adult man, broad shoulders and thick chest, exceptionally handsome angular long face, stern neutral mouth, RED irises. Short white hair swept BACK in loose waves with two curved forelocks on forehead. Navy-blue buttoned WAISTCOAT over white long-sleeved shirt, navy necktie and dark trousers. NO suit jacket, no mask, no gloves in default appearance. Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches.",
+        "size": {
+          "width": 128,
+          "height": 256
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "low top-down",
+        "created_at": "2026-10-23T21:36:44.794492+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {}
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-10-23T21:58:16.303468"
+}

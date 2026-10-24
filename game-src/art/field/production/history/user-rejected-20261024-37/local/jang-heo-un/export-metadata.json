@@ -1,0 +1,36 @@
+{
+  "group_id": "aaf76eef-a139-4dd3-8565-a395aff30764",
+  "states": [
+    {
+      "character": {
+        "id": "084edf22-121b-4853-a333-bc29f2c3e8ba",
+        "name": "Idle",
+        "prompt": "장허운 / Jang Heo-un. Tall lean adult man with slightly slouched posture, long narrow pale face, pronounced dark under-eye shadows, tired half-lidded gray-brown eyes, small weary smile. LONG dark BROWN layered hair extending past shoulders, center part, long curved side locks and outward-flipped ends, untied. Navy suit, white shirt and navy tie. No mask. Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Do not invent patches, badges, logos or markings absent from the supplied image. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches.",
+        "size": {
+          "width": 128,
+          "height": 256
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "low top-down",
+        "created_at": "2026-10-23T22:12:19.668891+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {}
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-10-23T22:29:23.750231"
+}

@@ -1,0 +1,13 @@
+{
+  "findings": "7방향의 가로로 뻗은 땋은 머리를 느슨하고 아래로 내려오는 짧은 검은 포니테일로 교정한 결과를 모두 시각 확인. 북동쪽에 남았던 이전 머리3픽셀도 alpha0으로 제거 확인. 원작의 가죽 재킷·짙은 회색 이너·바지·부츠·얼굴·키 유지, 마스크 밖 RGBA 동일. 회색 외곽 없음. AVIF 우선·로어 키 보충·전원 장벽 재확인.",
+  "directions": [
+    "north-east"
+  ],
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF primary",
+    "lore height supplementary",
+    "all55 barrier",
+    "gray exterior rejection"
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "at": 1792812436.5913677,
+  "job_id": "bfaf7ccb-a3f0-4310-8d01-bcab1d5d0f41",
+  "result": "pass",
+  "findings": "Eight EAST slumped head-down walking frames maintain identity and suit with intact feet and no gray exterior fill.",
+  "frame_count": 8,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "sad-walk",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

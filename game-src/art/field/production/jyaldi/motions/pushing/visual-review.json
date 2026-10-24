@@ -1,0 +1,20 @@
+{
+  "at": 1792798144.818156,
+  "job_id": "5685bf60-f5bc-4b6b-874c-41236ed8694c",
+  "result": "pass",
+  "findings": "서쪽6프레임 전체 확인. 몸을 앞으로 기울여 양팔을 내밀고 발을 교대하는 밀기 동작, 장갑·정장·긴 머리 유지. 외곽 회색 칠 및 분리 조각 없음.",
+  "frame_count": 6,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "pushing",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "at": 1792799502.5911243,
+  "job_id": "deb66491-c65e-4c50-a2d8-536a3c2ba0d7",
+  "result": "reroll-required",
+  "findings": "직접 관절로 잘림은 해소됐지만5프레임 허리 옆 회색 면,11프레임 머리 뒤 회색 덩어리,12프레임 얼굴/몸 투명 구멍. 시각 기준 미달로 재시도 필요.",
+  "frame_count": 12,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "frame_index": 7,
+  "source_job_id": "4f969d11-7488-4dcb-9b2a-8d68556f26e5",
+  "source_frame_index": 1,
+  "target_pose_index": 7,
+  "source_path": "motion-frame-candidates/jaemtri/throw-object/empty-rest-1/frames/1.png",
+  "sha256": "3720ff3629550697d1928cffaa162548d56c889bc8f624129e18e3b5c67e10bf",
+  "findings": "Candidate 1 clean empty-handed return posture; no ball reappearance or gray exterior, own hair/skirt/heels retained."
+}

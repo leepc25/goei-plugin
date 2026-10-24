@@ -1,0 +1,25 @@
+{
+  "character_id": "9095375d-b39a-447b-b577-fcb345e78928",
+  "directions_reviewed": [
+    "south",
+    "south-east",
+    "east",
+    "north-east",
+    "north",
+    "north-west",
+    "west",
+    "south-west"
+  ],
+  "identity_findings": "Purple bob with heavy asymmetric fringe, visible gold eye, black skirt suit and heels; west/southwest selected.",
+  "result": "Retain existing management result; user full-rebuild scope is fake bureau. Existing proportions retained, not newly certified against revised pixel-height targets.",
+  "new_user_approval": false,
+  "movement_direction": "west",
+  "stationary_direction": "south-west",
+  "gray_outer_halo_observed": false,
+  "rules_rechecked": [
+    "Original AVIF first",
+    "Lore supplementary",
+    "No motion before all55 directions reviewed",
+    "Reroll gray-outline motion failures"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "name": "조성춘",
+  "group": "fake-bureau",
+  "character_id": "1f2250cb-ca5c-4d1f-9b0d-885f752c5974",
+  "image": "e084a777-c8a1-4db0-bc3c-b87cd6cbb888",
+  "registration": "fd0e0a01-0f88-476d-8a46-0440db3a02ce",
+  "motions": {},
+  "ready": true,
+  "image_verified": true,
+  "skeleton_joints": 18,
+  "rotation_count": 8,
+  "exported": true
+}

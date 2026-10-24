@@ -1,0 +1,23 @@
+{
+  "size": [
+    128,
+    256
+  ],
+  "native_size": [
+    128,
+    236
+  ],
+  "bbox": [
+    33,
+    59,
+    93,
+    227
+  ],
+  "colors": 34,
+  "alpha": [
+    0,
+    255
+  ],
+  "original_pixels_preserved": true,
+  "resampled": false
+}

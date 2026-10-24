@@ -1,0 +1,14 @@
+{
+  "description": "세크리엠 / Secriem. Adult vampire woman with pale porcelain skin, natural curving figure, narrow face and calm confident smile, RED eyes. Very LONG straight WHITE hair below waist with thick blunt bangs. Deep RED fitted sleeveless high-neck long dress with a DIAMOND-shaped upper-chest cutout and side slit, matching red dress shoes. Bare arms, no gloves, no extra jewelry, no wings or cape. Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches.",
+  "reference_image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "n_directions": 8,
+  "view": "low top-down",
+  "template_id": "mannequin",
+  "name": "세크리엠",
+  "seed": 10222027,
+  "no_background": true
+}

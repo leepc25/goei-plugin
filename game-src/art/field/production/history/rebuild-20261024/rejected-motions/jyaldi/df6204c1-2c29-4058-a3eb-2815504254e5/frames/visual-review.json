@@ -1,0 +1,22 @@
+{
+  "at": 1792792136.4736242,
+  "result": "reroll-required",
+  "frames_reviewed": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+  ],
+  "findings": "프레임4·5에서 뒤쪽 팔이 머리 뒤로 과도하게 치켜올라감. 회색 외곽은 보이지 않으나 자연스러운 달리기 팔 동작으로 보기 어려워 반려. 전체55명8방향 완료 후 수정 재시도.",
+  "rules_rechecked": [
+    "AVIF primary",
+    "Lore supplementary height",
+    "All55 before new motion",
+    "Gray outer paint reroll"
+  ],
+  "new_user_approval": false
+}

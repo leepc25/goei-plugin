@@ -27,10 +27,63 @@
           "west": "Idle/rotations/west.png",
           "south-west": "Idle/rotations/south-west.png"
         },
-        "animations": {}
+        "animations": {
+          "breathing_idle._Preserve_this_character_identity_c": {
+            "south-east": [
+              "Idle/animations/breathing_idle._Preserve_this_character_identity_c/south-east/frame_000.png",
+              "Idle/animations/breathing_idle._Preserve_this_character_identity_c/south-east/frame_001.png",
+              "Idle/animations/breathing_idle._Preserve_this_character_identity_c/south-east/frame_002.png",
+              "Idle/animations/breathing_idle._Preserve_this_character_identity_c/south-east/frame_003.png"
+            ]
+          },
+          "fight_stance_idle_8_frames._Preserve_this_characte": {
+            "east": [
+              "Idle/animations/fight_stance_idle_8_frames._Preserve_this_characte/east/frame_000.png",
+              "Idle/animations/fight_stance_idle_8_frames._Preserve_this_characte/east/frame_001.png",
+              "Idle/animations/fight_stance_idle_8_frames._Preserve_this_characte/east/frame_002.png",
+              "Idle/animations/fight_stance_idle_8_frames._Preserve_this_characte/east/frame_003.png",
+              "Idle/animations/fight_stance_idle_8_frames._Preserve_this_characte/east/frame_004.png",
+              "Idle/animations/fight_stance_idle_8_frames._Preserve_this_characte/east/frame_005.png",
+              "Idle/animations/fight_stance_idle_8_frames._Preserve_this_characte/east/frame_006.png",
+              "Idle/animations/fight_stance_idle_8_frames._Preserve_this_characte/east/frame_007.png"
+            ]
+          },
+          "walking_with_light_confident_even_steps_and_a_rela": {
+            "east": [
+              "Idle/animations/walking_with_light_confident_even_steps_and_a_rela/east/frame_000.png",
+              "Idle/animations/walking_with_light_confident_even_steps_and_a_rela/east/frame_001.png",
+              "Idle/animations/walking_with_light_confident_even_steps_and_a_rela/east/frame_002.png",
+              "Idle/animations/walking_with_light_confident_even_steps_and_a_rela/east/frame_003.png",
+              "Idle/animations/walking_with_light_confident_even_steps_and_a_rela/east/frame_004.png",
+              "Idle/animations/walking_with_light_confident_even_steps_and_a_rela/east/frame_005.png",
+              "Idle/animations/walking_with_light_confident_even_steps_and_a_rela/east/frame_006.png",
+              "Idle/animations/walking_with_light_confident_even_steps_and_a_rela/east/frame_007.png"
+            ]
+          },
+          "drinking._Preserve_this_character_identity_costume": {
+            "south-east": [
+              "Idle/animations/drinking._Preserve_this_character_identity_costume/south-east/frame_000.png",
+              "Idle/animations/drinking._Preserve_this_character_identity_costume/south-east/frame_001.png",
+              "Idle/animations/drinking._Preserve_this_character_identity_costume/south-east/frame_002.png",
+              "Idle/animations/drinking._Preserve_this_character_identity_costume/south-east/frame_003.png",
+              "Idle/animations/drinking._Preserve_this_character_identity_costume/south-east/frame_004.png",
+              "Idle/animations/drinking._Preserve_this_character_identity_costume/south-east/frame_005.png"
+            ]
+          },
+          "pull_heavy_object._Preserve_this_character_identit": {
+            "east": [
+              "Idle/animations/pull_heavy_object._Preserve_this_character_identit/east/frame_000.png",
+              "Idle/animations/pull_heavy_object._Preserve_this_character_identit/east/frame_001.png",
+              "Idle/animations/pull_heavy_object._Preserve_this_character_identit/east/frame_002.png",
+              "Idle/animations/pull_heavy_object._Preserve_this_character_identit/east/frame_003.png",
+              "Idle/animations/pull_heavy_object._Preserve_this_character_identit/east/frame_004.png",
+              "Idle/animations/pull_heavy_object._Preserve_this_character_identit/east/frame_005.png"
+            ]
+          }
+        }
       }
     }
   ],
   "export_version": "3.1",
-  "export_date": "2026-10-23T18:34:28.246458"
+  "export_date": "2026-10-24T01:55:32.350146"
 }

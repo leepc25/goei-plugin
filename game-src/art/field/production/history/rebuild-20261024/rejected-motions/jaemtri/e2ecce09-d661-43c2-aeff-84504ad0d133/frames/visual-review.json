@@ -1,0 +1,20 @@
+{
+  "at": 1792804652.0783608,
+  "job_id": "e2ecce09-d661-43c2-aeff-84504ad0d133",
+  "result": "reroll-required",
+  "findings": "Exterior is clean but output holds closed fists like a guard instead of pushing. Extend palms farther forward with forward torso lean and own measured arm lengths; regenerate explicit push cycle.",
+  "frame_count": 8,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

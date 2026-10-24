@@ -1,0 +1,14 @@
+{
+  "job": "6fa8c4eb-2d7b-4deb-87f8-40c37d7e2c98",
+  "job_status": "completed",
+  "decision": "reroll",
+  "reason": "목의 가는 수평 봉합선이 굵은 목걸이처럼 뭉침. 원작의 절제된 무표정에 가깝게 입을 다물고 목 봉합선만 정리. 머리·붉은 눈·마네킹 관절·체격은 마스크 밖 RGBA 보존.",
+  "at": 1792793043.8335228,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

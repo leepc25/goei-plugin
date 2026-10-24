@@ -1,0 +1,534 @@
+{
+  "id": "11b39e21-4716-4def-9ced-54e9f4c38551",
+  "name": "탐미주의",
+  "state_name": "Idle",
+  "prompt": "탐미주의 / Aestheticism. Adult-proportioned female ART MANNEQUIN made of smooth matte ivory plastic. Long messy dark RED layered hair, thick uneven bangs and outward wisps, glowing RED eyes, freckles over cheeks and a faint unsettling smile. Clearly visible horizontal STITCHED SEAM around neck. Articulated round elbow/shoulder/wrist/knee joints, seam around waist and molded hip shell. Smooth featureless mannequin torso and pelvis, NO nipples or genitals, no human skin detail. Narrow waist and natural mannequin limbs. Ivory feet shaped like heels. No clothing or accessories; neutral nonsexual upright display stance. Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Do not invent patches, badges, logos or markings absent from the supplied image. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches.",
+  "size": {
+    "width": 128,
+    "height": 256
+  },
+  "directions": 8,
+  "created_at": "2026-10-23T22:17:08.468371+00:00",
+  "updated_at": "2026-10-23T22:33:04.156413+00:00",
+  "animation_count": 0,
+  "template_id": "mannequin",
+  "view": "low top-down",
+  "status": "completed",
+  "rotation_urls": {
+    "south": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/11b39e21-4716-4def-9ced-54e9f4c38551/rotations/south.png?t=1792794784",
+    "west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/11b39e21-4716-4def-9ced-54e9f4c38551/rotations/west.png?t=1792794784",
+    "east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/11b39e21-4716-4def-9ced-54e9f4c38551/rotations/east.png?t=1792794784",
+    "north": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/11b39e21-4716-4def-9ced-54e9f4c38551/rotations/north.png?t=1792794784",
+    "south-east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/11b39e21-4716-4def-9ced-54e9f4c38551/rotations/south-east.png?t=1792794784",
+    "north-east": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/11b39e21-4716-4def-9ced-54e9f4c38551/rotations/north-east.png?t=1792794784",
+    "north-west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/11b39e21-4716-4def-9ced-54e9f4c38551/rotations/north-west.png?t=1792794784",
+    "south-west": "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/11b39e21-4716-4def-9ced-54e9f4c38551/rotations/south-west.png?t=1792794784"
+  },
+  "style_settings": {
+    "generation_mode": "v3"
+  },
+  "guidance": null,
+  "ai_freedom": null,
+  "tags": [],
+  "group_id": "29bc096e-181d-41ea-8944-f696969362fe",
+  "skeletons": {
+    "3d": {
+      "format": "3d",
+      "keypoints": {
+        "NECK": [
+          0.4917294965059158,
+          0.5038775409500895,
+          0.6811322791948521
+        ],
+        "NOSE": [
+          0.4932737192230764,
+          0.42431989752352417,
+          0.7766575208234062
+        ],
+        "LEFT ARM": [
+          0.7064290559431391,
+          0.45227469172943086,
+          0.44240582943871753
+        ],
+        "LEFT EAR": [
+          0.560879542367218,
+          0.49792942935625595,
+          0.8038829069725107
+        ],
+        "LEFT EYE": [
+          0.5449406116870757,
+          0.4357664607390033,
+          0.8066557892202934
+        ],
+        "LEFT HIP": [
+          0.5514519090578583,
+          0.4568199292405897,
+          0.49670210359643474
+        ],
+        "LEFT LEG": [
+          0.6094609920491906,
+          0.4973406918034188,
+          0.07135367623521106
+        ],
+        "LEFT KNEE": [
+          0.5853642477557038,
+          0.47233600597928327,
+          0.2621476077983125
+        ],
+        "RIGHT ARM": [
+          0.2922895224647809,
+          0.4607903643010193,
+          0.4266972439443711
+        ],
+        "RIGHT EAR": [
+          0.41956539084526995,
+          0.5049662812013465,
+          0.7990414585107731
+        ],
+        "RIGHT EYE": [
+          0.44091121526244215,
+          0.44111940332052146,
+          0.8022867122722015
+        ],
+        "RIGHT HIP": [
+          0.4018621841123464,
+          0.4850726812267314,
+          0.48990316611005347
+        ],
+        "RIGHT LEG": [
+          0.3736875297811827,
+          0.4934993834749057,
+          0.06823549422371221
+        ],
+        "LEFT ELBOW": [
+          0.6570717895107057,
+          0.4830467297818981,
+          0.5642105374829476
+        ],
+        "RIGHT KNEE": [
+          0.3939741021283544,
+          0.4648953538737641,
+          0.26016981847267273
+        ],
+        "RIGHT ELBOW": [
+          0.3330822385852159,
+          0.5104672551907641,
+          0.5499178252393133
+        ],
+        "LEFT SHOULDER": [
+          0.6335922473625676,
+          0.4735950565209693,
+          0.6933770977809539
+        ],
+        "RIGHT SHOULDER": [
+          0.34811372004980734,
+          0.5264694456265366,
+          0.6808474404764585
+        ]
+      }
+    },
+    "2d_reference": {
+      "view": "low top-down",
+      "format": "2d",
+      "source": "estimated",
+      "direction": "south",
+      "keypoints": {
+        "NECK": {
+          "x": 0.48602294921875,
+          "y": 0.3300333023071289
+        },
+        "NOSE": {
+          "x": 0.48602294921875,
+          "y": 0.25035858154296875
+        },
+        "LEFT ARM": {
+          "x": 0.7012481689453125,
+          "y": 0.5690574645996094
+        },
+        "LEFT EAR": {
+          "x": 0.5729408264160156,
+          "y": 0.2193164825439453
+        },
+        "LEFT EYE": {
+          "x": 0.5315513610839844,
+          "y": 0.2317333221435547
+        },
+        "LEFT HIP": {
+          "x": 0.5605239868164062,
+          "y": 0.5111122131347656
+        },
+        "LEFT LEG": {
+          "x": 0.61846923828125,
+          "y": 0.9187984466552734
+        },
+        "LEFT KNEE": {
+          "x": 0.585357666015625,
+          "y": 0.7201290130615234
+        },
+        "RIGHT ARM": {
+          "x": 0.2666587829589844,
+          "y": 0.5690574645996094
+        },
+        "RIGHT EAR": {
+          "x": 0.3991050720214844,
+          "y": 0.2193164825439453
+        },
+        "RIGHT EYE": {
+          "x": 0.4404945373535156,
+          "y": 0.2317333221435547
+        },
+        "RIGHT HIP": {
+          "x": 0.4073829650878906,
+          "y": 0.5111122131347656
+        },
+        "RIGHT LEG": {
+          "x": 0.3494377136230469,
+          "y": 0.9187984466552734
+        },
+        "LEFT ELBOW": {
+          "x": 0.6557197570800781,
+          "y": 0.4448890686035156
+        },
+        "RIGHT KNEE": {
+          "x": 0.386688232421875,
+          "y": 0.7201290130615234
+        },
+        "RIGHT ELBOW": {
+          "x": 0.3163261413574219,
+          "y": 0.4469585418701172
+        },
+        "LEFT SHOULDER": {
+          "x": 0.6308860778808594,
+          "y": 0.3289985656738281
+        },
+        "RIGHT SHOULDER": {
+          "x": 0.3411598205566406,
+          "y": 0.3310680389404297
+        }
+      }
+    },
+    "2d_references": {
+      "east": {
+        "view": "low top-down",
+        "format": "2d",
+        "source": "estimated",
+        "direction": "east",
+        "keypoints": {
+          "NECK": {
+            "x": 0.5104503631591797,
+            "y": 0.322723388671875
+          },
+          "NOSE": {
+            "x": 0.5751953125,
+            "y": 0.23500442504882812
+          },
+          "LEFT ARM": {
+            "x": 0.5626640319824219,
+            "y": 0.5420207977294922
+          },
+          "LEFT EAR": {
+            "x": 0.5208930969238281,
+            "y": 0.21411895751953125
+          },
+          "LEFT EYE": {
+            "x": 0.5751953125,
+            "y": 0.2203845977783203
+          },
+          "LEFT HIP": {
+            "x": 0.5668411254882812,
+            "y": 0.5148696899414062
+          },
+          "LEFT LEG": {
+            "x": 0.5167160034179688,
+            "y": 0.9033393859863281
+          },
+          "LEFT KNEE": {
+            "x": 0.5376014709472656,
+            "y": 0.7195472717285156
+          },
+          "RIGHT ARM": {
+            "x": 0.5208930969238281,
+            "y": 0.5691719055175781
+          },
+          "RIGHT EAR": {
+            "x": 0.4791221618652344,
+            "y": 0.21829605102539062
+          },
+          "RIGHT EYE": {
+            "x": 0.5501327514648438,
+            "y": 0.2203845977783203
+          },
+          "RIGHT HIP": {
+            "x": 0.4958305358886719,
+            "y": 0.5190467834472656
+          },
+          "RIGHT LEG": {
+            "x": 0.48329925537109375,
+            "y": 0.9179592132568359
+          },
+          "LEFT ELBOW": {
+            "x": 0.5459556579589844,
+            "y": 0.43132781982421875
+          },
+          "RIGHT KNEE": {
+            "x": 0.5292472839355469,
+            "y": 0.7258129119873047
+          },
+          "RIGHT ELBOW": {
+            "x": 0.474945068359375,
+            "y": 0.4438591003417969
+          },
+          "LEFT SHOULDER": {
+            "x": 0.5668411254882812,
+            "y": 0.3185462951660156
+          },
+          "RIGHT SHOULDER": {
+            "x": 0.4540596008300781,
+            "y": 0.3269004821777344
+          }
+        }
+      },
+      "south": {
+        "view": "low top-down",
+        "format": "2d",
+        "source": "estimated",
+        "direction": "south",
+        "keypoints": {
+          "NECK": {
+            "x": 0.48602294921875,
+            "y": 0.3300333023071289
+          },
+          "NOSE": {
+            "x": 0.48602294921875,
+            "y": 0.25035858154296875
+          },
+          "LEFT ARM": {
+            "x": 0.7012481689453125,
+            "y": 0.5690574645996094
+          },
+          "LEFT EAR": {
+            "x": 0.5729408264160156,
+            "y": 0.2193164825439453
+          },
+          "LEFT EYE": {
+            "x": 0.5315513610839844,
+            "y": 0.2317333221435547
+          },
+          "LEFT HIP": {
+            "x": 0.5605239868164062,
+            "y": 0.5111122131347656
+          },
+          "LEFT LEG": {
+            "x": 0.61846923828125,
+            "y": 0.9187984466552734
+          },
+          "LEFT KNEE": {
+            "x": 0.585357666015625,
+            "y": 0.7201290130615234
+          },
+          "RIGHT ARM": {
+            "x": 0.2666587829589844,
+            "y": 0.5690574645996094
+          },
+          "RIGHT EAR": {
+            "x": 0.3991050720214844,
+            "y": 0.2193164825439453
+          },
+          "RIGHT EYE": {
+            "x": 0.4404945373535156,
+            "y": 0.2317333221435547
+          },
+          "RIGHT HIP": {
+            "x": 0.4073829650878906,
+            "y": 0.5111122131347656
+          },
+          "RIGHT LEG": {
+            "x": 0.3494377136230469,
+            "y": 0.9187984466552734
+          },
+          "LEFT ELBOW": {
+            "x": 0.6557197570800781,
+            "y": 0.4448890686035156
+          },
+          "RIGHT KNEE": {
+            "x": 0.386688232421875,
+            "y": 0.7201290130615234
+          },
+          "RIGHT ELBOW": {
+            "x": 0.3163261413574219,
+            "y": 0.4469585418701172
+          },
+          "LEFT SHOULDER": {
+            "x": 0.6308860778808594,
+            "y": 0.3289985656738281
+          },
+          "RIGHT SHOULDER": {
+            "x": 0.3411598205566406,
+            "y": 0.3310680389404297
+          }
+        }
+      },
+      "north-west": {
+        "view": "low top-down",
+        "format": "2d",
+        "source": "estimated",
+        "direction": "north-west",
+        "keypoints": {
+          "NECK": {
+            "x": 0.513872782389323,
+            "y": 0.32628631591796875
+          },
+          "NOSE": {
+            "x": 0.4567286173502604,
+            "y": 0.22832489013671875
+          },
+          "LEFT ARM": {
+            "x": 0.2975413004557292,
+            "y": 0.5752716064453125
+          },
+          "LEFT EAR": {
+            "x": 0.4648920694986979,
+            "y": 0.207916259765625
+          },
+          "LEFT EYE": {
+            "x": 0.43631998697916663,
+            "y": 0.21403884887695312
+          },
+          "LEFT HIP": {
+            "x": 0.4404017130533854,
+            "y": 0.501800537109375
+          },
+          "LEFT LEG": {
+            "x": 0.42815653483072913,
+            "y": 0.9181365966796875
+          },
+          "LEFT KNEE": {
+            "x": 0.4077479044596354,
+            "y": 0.7181320190429688
+          },
+          "RIGHT ARM": {
+            "x": 0.6159159342447917,
+            "y": 0.5569038391113281
+          },
+          "RIGHT EAR": {
+            "x": 0.5424448649088542,
+            "y": 0.1997528076171875
+          },
+          "RIGHT EYE": {
+            "x": 0.4812189737955729,
+            "y": 0.20995712280273438
+          },
+          "RIGHT HIP": {
+            "x": 0.5587717692057292,
+            "y": 0.49771881103515625
+          },
+          "RIGHT LEG": {
+            "x": 0.5750986735026042,
+            "y": 0.8956871032714844
+          },
+          "LEFT ELBOW": {
+            "x": 0.37509409586588544,
+            "y": 0.4466972351074219
+          },
+          "RIGHT KNEE": {
+            "x": 0.5424448649088542,
+            "y": 0.7079277038574219
+          },
+          "RIGHT ELBOW": {
+            "x": 0.628161112467448,
+            "y": 0.44057464599609375
+          },
+          "LEFT SHOULDER": {
+            "x": 0.3995844523111979,
+            "y": 0.3283271789550781
+          },
+          "RIGHT SHOULDER": {
+            "x": 0.628161112467448,
+            "y": 0.3242454528808594
+          }
+        }
+      },
+      "south-west": {
+        "view": "low top-down",
+        "format": "2d",
+        "source": "estimated",
+        "direction": "south-west",
+        "keypoints": {
+          "NECK": {
+            "x": 0.5037174224853516,
+            "y": 0.3277311325073242
+          },
+          "NOSE": {
+            "x": 0.4519805908203125,
+            "y": 0.24391746520996094
+          },
+          "LEFT ARM": {
+            "x": 0.6465110778808594,
+            "y": 0.5771026611328125
+          },
+          "LEFT EAR": {
+            "x": 0.5471763610839844,
+            "y": 0.22529220581054688
+          },
+          "LEFT EYE": {
+            "x": 0.49337005615234375,
+            "y": 0.22943115234375
+          },
+          "LEFT HIP": {
+            "x": 0.5223426818847656,
+            "y": 0.5067405700683594
+          },
+          "LEFT LEG": {
+            "x": 0.600982666015625,
+            "y": 0.9227046966552734
+          },
+          "LEFT KNEE": {
+            "x": 0.5513153076171875,
+            "y": 0.7219657897949219
+          },
+          "RIGHT ARM": {
+            "x": 0.2905616760253906,
+            "y": 0.5688247680664062
+          },
+          "RIGHT EAR": {
+            "x": 0.4395637512207031,
+            "y": 0.22529220581054688
+          },
+          "RIGHT EYE": {
+            "x": 0.4188690185546875,
+            "y": 0.23150062561035156
+          },
+          "RIGHT HIP": {
+            "x": 0.3898963928222656,
+            "y": 0.5026016235351562
+          },
+          "RIGHT LEG": {
+            "x": 0.39403533935546875,
+            "y": 0.9040794372558594
+          },
+          "LEFT ELBOW": {
+            "x": 0.6382331848144531,
+            "y": 0.4487953186035156
+          },
+          "RIGHT KNEE": {
+            "x": 0.3816184997558594,
+            "y": 0.7136878967285156
+          },
+          "RIGHT ELBOW": {
+            "x": 0.36920166015625,
+            "y": 0.43637847900390625
+          },
+          "LEFT SHOULDER": {
+            "x": 0.6216773986816406,
+            "y": 0.33704376220703125
+          },
+          "RIGHT SHOULDER": {
+            "x": 0.3857574462890625,
+            "y": 0.3184185028076172
+          }
+        }
+      }
+    }
+  },
+  "animations": []
+}

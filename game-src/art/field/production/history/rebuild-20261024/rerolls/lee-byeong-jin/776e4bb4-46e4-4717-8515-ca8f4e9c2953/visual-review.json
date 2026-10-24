@@ -1,0 +1,14 @@
+{
+  "job": "776e4bb4-46e4-4717-8515-ca8f4e9c2953",
+  "job_status": "completed",
+  "decision": "reroll",
+  "reason": "키180px 미만. 둥근 얼굴과 큰 복부가 맞는 이길환을 스타일·키 참조로 사용하고 흰 셔츠·안경·무재킷 유지.",
+  "at": 1792790385.1513457,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

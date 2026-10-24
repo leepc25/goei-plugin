@@ -1,0 +1,9 @@
+{
+  "frame_index": 2,
+  "source_job_id": "bf0ff473-fa16-4884-bb6c-8c8e321f81ca",
+  "source_frame_index": 2,
+  "target_pose_index": 2,
+  "source_path": "motion-frame-candidates/aileen/front-flip/clean-pose-2-1/frames/2.png",
+  "sha256": "c34fcc4f7a2839ff1a6405ccba442ab95910510dfe9f41f23e2c677290373462",
+  "findings": "Only candidate 2 has transparent space behind the torso; candidates 0 and 1 have large gray background masses and are rejected."
+}

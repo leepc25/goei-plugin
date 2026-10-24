@@ -1,0 +1,17 @@
+{
+  "image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "mask_image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "description": "Extend the lower ends of BOTH existing sage-green braids down to WAIST y147. Two thick long braided pigtails hanging symmetrically over the chest and ending at the waist, small tied ends. Continue existing braid texture and color, no floating gaps or ribbons. Do not shorten to chest length. Preserve face, upper braids, white sleeves, navy vest, skirt and body stature outside white mask exactly.",
+  "no_background": true,
+  "output_method": "Modify current layer",
+  "crop_to_mask": true,
+  "seed": 1792793746
+}

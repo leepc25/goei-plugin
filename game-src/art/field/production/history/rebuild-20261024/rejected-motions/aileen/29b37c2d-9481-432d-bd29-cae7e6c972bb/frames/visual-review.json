@@ -1,0 +1,20 @@
+{
+  "at": 1792808472.3798862,
+  "job_id": "29b37c2d-9481-432d-bd29-cae7e6c972bb",
+  "result": "reroll-required",
+  "findings": "2번째 포니테일 끝 회색 덩어리 및 8번째 걷기 중 양발이 공중으로 뜨는 자세. 해당 두 자세 보정 필요.",
+  "frame_count": 8,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

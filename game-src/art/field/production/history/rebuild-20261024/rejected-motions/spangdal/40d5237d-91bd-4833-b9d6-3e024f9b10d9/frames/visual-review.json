@@ -1,0 +1,20 @@
+{
+  "at": 1792802508.7427006,
+  "job_id": "28ca799d-205c-4b19-9b97-79df02d662e5",
+  "result": "reroll-required",
+  "findings": "Gray painted regions beside lowered hand in frame 3 and large gray patch around overhead arm in frame 4; brown ball itself is a valid prop.",
+  "frame_count": 7,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "throw-object",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "at": 1792798210.2252705,
+  "job_id": "fb002850-cd93-464d-8e62-343c9fbc74fa",
+  "result": "reroll-required",
+  "findings": "5프레임 손 잘림,7·8프레임 팔·다리 사이 및 바깥에 큰 회색 채움 면. 사용자 대표 실패 유형이 반복되어 전체 반려.",
+  "frame_count": 10,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "backflip",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

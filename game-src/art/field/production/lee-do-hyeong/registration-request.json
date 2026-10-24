@@ -1,0 +1,14 @@
+{
+  "description": "이도형 / Lee Do-hyeong. Tall solid muscular mature man. SILVER-WHITE hair swept back into a visible low PONYTAIL behind neck. Black aviator sunglasses. Rugged angular face with several long parallel diagonal old scars across cheek, light chin stubble and confident smirk. Black suit jacket AND white shirt sleeves ROLLED UP TO BOTH ELBOWS; strong bare forearms and hands covered with many branching old scars. White shirt and black tie. Ponytail, cheek scars, rolled sleeves and forearm scars are essential. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
+  "reference_image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "n_directions": 8,
+  "view": "low top-down",
+  "template_id": "mannequin",
+  "name": "이도형",
+  "seed": 10222027,
+  "no_background": true
+}

@@ -1,0 +1,14 @@
+{
+  "description": "장허운 / Jang Heo-un. Tall lean adult man with slightly slouched posture, long narrow pale face, pronounced dark under-eye shadows, tired half-lidded gray-brown eyes, small weary smile. LONG dark BROWN layered hair extending past shoulders, center part, long curved side locks and outward-flipped ends, untied. Navy suit, white shirt and navy tie. No mask. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
+  "reference_image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "n_directions": 8,
+  "view": "low top-down",
+  "template_id": "mannequin",
+  "name": "장허운",
+  "seed": 10222027,
+  "no_background": true
+}

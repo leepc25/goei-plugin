@@ -1,0 +1,20 @@
+{
+  "at": 1792805289.055962,
+  "job_id": "af133d84-0fb7-4ea2-b732-b9588f406c49",
+  "result": "reroll-required",
+  "findings": "확대 마젠타 배경 검토: 1·2·3·6·7번째 머리 뒤 회색 덩어리/루프. 전체 반려, 자체 깨끗한 웅크린 자세로 참조 변경.",
+  "frame_count": 8,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

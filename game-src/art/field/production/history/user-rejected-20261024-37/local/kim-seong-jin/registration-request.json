@@ -1,0 +1,14 @@
+{
+  "description": "김성진 / Kim Seong-jin. Slim young adult man with narrow youthful face, smooth pale skin, small pointed chin and playful slanted smile. Messy medium-length BLACK hair parted near center, long separated curtain strands falling across forehead toward sunglasses, tousled outward wisps at sides. Black aviator sunglasses. OPEN black suit jacket, white shirt OPEN at collar, slightly loosened long black necktie. Narrow natural shoulders and slim limbs, not muscular. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
+  "reference_image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "n_directions": 8,
+  "view": "low top-down",
+  "template_id": "mannequin",
+  "name": "김성진",
+  "seed": 10222027,
+  "no_background": true
+}

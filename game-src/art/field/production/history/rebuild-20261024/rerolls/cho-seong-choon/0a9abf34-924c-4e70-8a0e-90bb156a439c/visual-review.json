@@ -1,0 +1,13 @@
+{
+  "job": "0a9abf34-924c-4e70-8a0e-90bb156a439c",
+  "decision": "reroll",
+  "reason": "소매·열린 칼라·느슨한 넥타이·머리는 맞지만 키191px로 부족. 검수 통과한 도필헌 정면 크기 참조로 교체.",
+  "at": 1792789852.2284286,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

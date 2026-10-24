@@ -1,0 +1,20 @@
+{
+  "at": 1792806162.7305264,
+  "job_id": "85cc46f4-f282-4c85-84a5-8806f0c0dbb8",
+  "result": "reroll-required",
+  "findings": "새 후보의 팔 안쪽 회색 삼각형 잔존. 뒤팔이 위로 꺾이는 기존 목표 팔 자세를 수정해 본인 팔 길이로 아래쪽 팔꿈치/앞쪽 손목 자연스러운 달리기 구성.",
+  "frame_count": 8,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "job": "6f2b5406-9516-49fd-bc48-607065724d79",
+  "job_status": "completed",
+  "decision": "reroll",
+  "reason": "전체 교정 후 팔레트11색으로 붉은 홍채가 사라지고 바지 음영이 과도하게 평면화됨. 검수 통과 박민성 장신 참조로 신규 생성하고 색상 복사 끔.",
+  "at": 1792790749.1955626,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

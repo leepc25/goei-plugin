@@ -1,0 +1,31 @@
+{
+  "at": 1792793278.1115339,
+  "slug": "cheong-dal-lae",
+  "reason": "종료된 등록의 회전8장은 존재하나 skeletons:null. 원작 대조한 정면은 보존하고 불완전 등록만 백업·삭제하여 재등록.",
+  "state_before": {
+    "name": "청달래",
+    "group": "baekilmong",
+    "character_id": "2cbf84e1-7afa-4a30-9b59-a28af323a0a7",
+    "image": "a1dee1b6-2ba5-4b38-bb12-bcfa1221552f",
+    "registration": "23a36d4b-9f08-4165-a6d1-3017475bd16e",
+    "motions": {},
+    "ready": false,
+    "visual_rejections": [
+      {
+        "job": "d6d15ee8-080b-43fe-a5ec-0f5b6e4e980c",
+        "decision": "reroll",
+        "reason": "청록색 로우번은 맞지만 정면이 아닌 얼굴·몸통 및 여성 키 초과.",
+        "at": 1792789500.5086281,
+        "rules_rechecked": [
+          "AVIF primary identity",
+          "lore/user height",
+          "south-facing",
+          "transparent edge without gray halo",
+          "no motions before all roster eight-way review"
+        ]
+      }
+    ],
+    "image_verified": true,
+    "image_visually_reviewed": true
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "job": "fd7a04c0-2c44-423a-bed4-922bd16a8521",
+  "decision": "reroll",
+  "reason": "정면이 아닌 3/4 얼굴, 장신 설정 대비 본체 키 과대.",
+  "at": 1792788956.623139,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

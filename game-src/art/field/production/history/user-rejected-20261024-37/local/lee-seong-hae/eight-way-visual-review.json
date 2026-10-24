@@ -1,0 +1,25 @@
+{
+  "at": 1792795625.795465,
+  "character_id": "3db7b924-b4d0-484f-aac7-b834ebc001c5",
+  "result": "pass",
+  "directions_reviewed": [
+    "south",
+    "south-east",
+    "east",
+    "north-east",
+    "north",
+    "north-west",
+    "west",
+    "south-west"
+  ],
+  "findings": "AVIF의 흰 곱슬 옆포니테일·초록 홍채·남색 정장·운동화·작고 가녀린 체구를 8방향 재대조. 눈 국소 교정4방향 포함8장 모두 보존 등록에서 가시RGBA·알파 동일,18관절 확인. 회색 외곽 없음. AVIF 우선·로어 키 보충·전원 장벽 재확인.",
+  "movement_direction": "east",
+  "stationary_direction": "south-east",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF primary",
+    "Lore supplementary height",
+    "All55 before motion",
+    "Gray outer paint reroll"
+  ]
+}

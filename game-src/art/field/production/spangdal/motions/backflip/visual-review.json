@@ -1,0 +1,85 @@
+{
+  "at": 1792803396.5558076,
+  "job_id": "e589b375-cb78-4b4a-8fed-c43782fc9684",
+  "result": "pass",
+  "findings": "All nine assembled frames viewed together: clean inverted candidate restores continuous face/neck and preserves tuck, skirt, purple bob and WEST back rotation. No gray exterior or clipped limbs; full-frame provenance retained.",
+  "frame_count": 9,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ],
+  "frame_assembly": {
+    "base_job_id": "e589b375-cb78-4b4a-8fed-c43782fc9684",
+    "frame_sources": [
+      {
+        "frame_index": 0,
+        "source_job_id": "e589b375-cb78-4b4a-8fed-c43782fc9684",
+        "source_frame_index": 0,
+        "sha256": "6751c71b1865efaa229dd292ee2b6f40892633eec9eef3b3cfde8fd58de5eb66"
+      },
+      {
+        "frame_index": 1,
+        "source_job_id": "e589b375-cb78-4b4a-8fed-c43782fc9684",
+        "source_frame_index": 1,
+        "sha256": "e7957221de38be0d8903c4c724653cf1f165bb5927ff1b7bf045f65fbfb86e51"
+      },
+      {
+        "frame_index": 2,
+        "source_job_id": "e589b375-cb78-4b4a-8fed-c43782fc9684",
+        "source_frame_index": 2,
+        "sha256": "b746b04e2f97d8a118f7c2e4f34e789dc733b4c51f62696fdf43aaf9e5d05b24"
+      },
+      {
+        "frame_index": 3,
+        "source_job_id": "e589b375-cb78-4b4a-8fed-c43782fc9684",
+        "source_frame_index": 3,
+        "sha256": "9a924cbb749c810b9e3e0af0f26cf8b2c507343723384b73632ad0e6faaf8185"
+      },
+      {
+        "frame_index": 4,
+        "source_job_id": "4cf1145a-2955-438f-a514-1e99a5cb9e7f",
+        "source_frame_index": 1,
+        "target_pose_index": 4,
+        "source_path": "motion-frame-candidates/spangdal/backflip/inverted-1/frames/1.png",
+        "sha256": "e82d40f9c9d638822bfeaa4e1d76d4e5ebebc91954266620f09317bb5567eabd",
+        "findings": "Candidate 1 viewed at 2x: same tucked inverted target pose, continuous neck and face, purple hair and skirt intact, no gray exterior paint. Candidate 0 malformed and unused."
+      },
+      {
+        "frame_index": 5,
+        "source_job_id": "e589b375-cb78-4b4a-8fed-c43782fc9684",
+        "source_frame_index": 5,
+        "sha256": "b01b7d54696c75ce20519ac32e9d406951dc4ec1a504771b387bffa6d8dda79c"
+      },
+      {
+        "frame_index": 6,
+        "source_job_id": "e589b375-cb78-4b4a-8fed-c43782fc9684",
+        "source_frame_index": 6,
+        "sha256": "4e0acd6c6f79b24ffd20f67da01b1eefd8e610c5436910bbe04378c575fc8eeb"
+      },
+      {
+        "frame_index": 7,
+        "source_job_id": "e589b375-cb78-4b4a-8fed-c43782fc9684",
+        "source_frame_index": 7,
+        "sha256": "6d308f450f90e2f5e73b90f1a2b13e67f81e1382a6769a62355551867fa1d5df"
+      },
+      {
+        "frame_index": 8,
+        "source_job_id": "e589b375-cb78-4b4a-8fed-c43782fc9684",
+        "source_frame_index": 8,
+        "sha256": "0495a3c185340b909ac86724d6f010ace4a77dc69e1d54df6b3b49e800d8f29e"
+      }
+    ],
+    "method": "select complete same-pose regenerated frames; no pixel editing",
+    "new_user_approval": false,
+    "visual_reviewed": true
+  }
+}

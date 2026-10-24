@@ -1,0 +1,16 @@
+{
+  "at": 1792793739.6337538,
+  "slug": "mun-hye-ran",
+  "reason": "관절 누락 skeletons:null. 8방향은 원작 낮은 갈색 포니테일·긴 옆머리·갈색 정장·검은 셔츠·왼손목 금시계·키·외곽을 개별 검수해 모두 통과. 같은8장 그대로 가져오는 등록으로 관절 재구성 시도.",
+  "state_before": {
+    "name": "문혜란",
+    "group": "underground",
+    "character_id": "99684006-a13e-4ca1-b55c-5f4ecb1069de",
+    "image": "3c5a9716-28ed-43ea-b88c-75f92a0e1ab6",
+    "registration": "5bba1f28-8f10-409c-8b93-ae523046558f",
+    "motions": {},
+    "ready": false,
+    "image_verified": true,
+    "image_visually_reviewed": true
+  }
+}

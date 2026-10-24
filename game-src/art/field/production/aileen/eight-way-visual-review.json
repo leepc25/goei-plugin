@@ -1,0 +1,25 @@
+{
+  "character_id": "558c27ed-873c-4207-9099-171bb64a09b2",
+  "directions_reviewed": [
+    "south",
+    "south-east",
+    "east",
+    "north-east",
+    "north",
+    "north-west",
+    "west",
+    "south-west"
+  ],
+  "identity_findings": "Blonde high ponytail, bangs and sid locks, black vest over white shirt beneath black trouser suit.",
+  "result": "Retain existing management result; user full-rebuild scope is fake bureau. Existing proportions retained, not newly certified against revised pixel-height targets.",
+  "new_user_approval": false,
+  "movement_direction": "east",
+  "stationary_direction": "south-east",
+  "gray_outer_halo_observed": false,
+  "rules_rechecked": [
+    "Original AVIF first",
+    "Lore supplementary",
+    "No motion before all55 directions reviewed",
+    "Reroll gray-outline motion failures"
+  ]
+}

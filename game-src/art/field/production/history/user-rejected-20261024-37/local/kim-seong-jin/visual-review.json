@@ -1,0 +1,13 @@
+{
+  "job": "55de84a4-57cc-4ed3-9d2d-812fa4f60aaf",
+  "decision": "pass",
+  "reason": "정면, 가운데 가르마의 흐트러진 검은 머리, 젊은 얼굴·슬림한 체형, 열린 재킷·흰 칼라·느슨한 넥타이 확인. 머리 포함223px로 본체 약217px, 외곽 투명 정상.",
+  "at": 1792789909.757011,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

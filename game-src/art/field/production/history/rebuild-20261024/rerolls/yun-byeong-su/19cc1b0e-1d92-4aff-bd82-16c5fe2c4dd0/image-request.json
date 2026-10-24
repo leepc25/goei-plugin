@@ -1,0 +1,30 @@
+{
+  "description": "Single full-body native pixel-art game sprite. IDENTITY MUST MATCH: Adult man with moderately broad shoulders, lean firm torso, long angular clean-shaven face, strong jaw and flat unimpressed mouth. Short dark brown-black hair swept back with a shallow side part and small lifted tufts, short sides. Black aviator sunglasses. Dark charcoal-brown tailored suit, white shirt, correctly tied black tie, sleeves down. No scars, beard, cigarette or handheld device in this default appearance. Black trousers and plain black formal shoes. Relaxed upright stance with empty hands at sides. Front-facing SOUTH, low top-down camera. Natural adult anatomy, about 7 heads tall, normal torso and pelvis. Anatomical crown-to-sole height 214-222 pixels on a 128x256 canvas; hair may extend above crown. Soles at y248; leave unused space ABOVE shorter people, do NOT enlarge to fill frame. Keep individual build and facial features. Match reference ONLY for crisp 1px pixel clusters, selective dark outlines and controlled shading. Keep own hair and costume colors. Transparent background, no ground shadow, no text, no held weapons. Whole hair and shoes within frame.",
+  "image_size": {
+    "width": 128,
+    "height": 256
+  },
+  "no_background": true,
+  "seed": 10222027,
+  "target_palette": {
+    "max_colors": 48
+  },
+  "style_options": {
+    "color_palette": true,
+    "outline": true,
+    "detail": true,
+    "shading": true
+  },
+  "style_image": {
+    "image": {
+      "type": "base64",
+      "base64": "[image payload omitted]",
+      "format": "png"
+    },
+    "size": {
+      "width": 128,
+      "height": 256
+    },
+    "usage_description": "Use ONLY pixel rendering, outline, shading and lighting. Do not copy the reference male height, body shape, shoulder width, outfit or identity. Preserve this character own stature, build, age, hair, irises and original clothing colors and silhouette. FRONT view."
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "frame_index": 7,
+  "source_job_id": "832a7f3c-dd38-48e1-b16d-782e9fb84e2a",
+  "source_frame_index": 0,
+  "target_pose_index": 7,
+  "source_path": "motion-frame-candidates/aileen/pushing/clean-pose-7-1/frames/0.png",
+  "sha256": "1a655b19645a6b22690564635ac379b976b80f5d0d6e7ad9c74dda3b0de2b493",
+  "findings": "Selected intact forward braced pose with separated blonde strands and transparent exterior; rejected alternative candidates with gray or brown background blobs."
+}

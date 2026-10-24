@@ -1,0 +1,14 @@
+{
+  "job": "3c5a9716-28ed-43ea-b88c-75f92a0e1ab6",
+  "job_status": "completed",
+  "decision": "pass",
+  "reason": "원작의 갈색 긴 옆머리와 낮은 묶음·갈색 정장·검은 셔츠·본인 왼손목 금색 시계 대조. 모발과 굽 포함209px, 여성 범위 상단의 긴 팔다리 유지. 정면·외곽 정상.",
+  "at": 1792792429.9129472,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

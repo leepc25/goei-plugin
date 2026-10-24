@@ -1,0 +1,14 @@
+{
+  "job": "c6ccffd6-6fc2-4f40-bc57-12057b533278",
+  "job_status": "completed",
+  "decision": "reroll",
+  "reason": "키180px 미만. 은하제의 여성 정면·크기 참조로 교체하며 분홍 블라우스·흰 코트·안경 유지.",
+  "at": 1792790385.0344284,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

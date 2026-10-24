@@ -1,0 +1,13 @@
+{
+  "name": "이길환",
+  "group": "fake-bureau",
+  "character_id": "5db8f990-b89a-4a20-b003-25b65c7958c1",
+  "image": "0983045b-232d-4880-8691-a5e0bf30353c",
+  "registration": "acc823fc-13b5-45bc-9047-a7aa6fafebb1",
+  "motions": {},
+  "ready": true,
+  "image_verified": true,
+  "skeleton_joints": 18,
+  "rotation_count": 8,
+  "exported": true
+}

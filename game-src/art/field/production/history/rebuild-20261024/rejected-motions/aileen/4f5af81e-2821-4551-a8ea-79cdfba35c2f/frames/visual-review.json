@@ -1,0 +1,20 @@
+{
+  "at": 1792808329.4911175,
+  "job_id": "4f5af81e-2821-4551-a8ea-79cdfba35c2f",
+  "result": "reroll-required",
+  "findings": "2·5번째 얼굴/머리 투명 파괴, 3·6·7번째 머리/손 회색 외곽 덩어리. 정상 참조와 맞춘 재작업 필요.",
+  "frame_count": 9,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

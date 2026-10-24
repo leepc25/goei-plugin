@@ -1,0 +1,20 @@
+{
+  "at": 1792802600.949358,
+  "job_id": "9812d187-c2e4-47ae-86a2-da18039e4640",
+  "result": "pass",
+  "findings": "All eight west frames inspected: consistent bob, face, skirt and pumps; measured walk and clean outer silhouette.",
+  "frame_count": 8,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "walking-8-frames",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

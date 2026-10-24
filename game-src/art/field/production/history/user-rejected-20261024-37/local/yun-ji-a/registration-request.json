@@ -1,0 +1,14 @@
+{
+  "description": "윤지아 / Yun Ji-a. Small soft-built adult woman, round youthful face, large gentle warm BROWN eyes, small kind smile. APRICOT-peach hair in TWO round side BUNS with straight blunt bangs. WHITE short-sleeved nurse tunic and white trousers, pale peach trim on collar/cuffs and front pockets. Beige waist belt and small beige pouch on HER RIGHT hip. Thin dark hairband around HER LEFT wrist. White practical shoes. Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches.",
+  "reference_image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "n_directions": 8,
+  "view": "low top-down",
+  "template_id": "mannequin",
+  "name": "윤지아",
+  "seed": 10222027,
+  "no_background": true
+}

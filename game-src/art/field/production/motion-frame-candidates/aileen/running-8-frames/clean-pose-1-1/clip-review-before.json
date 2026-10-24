@@ -1,0 +1,20 @@
+{
+  "at": 1792808657.2965415,
+  "job_id": "4ab2d492-12dc-4192-bdb2-0d529d464617",
+  "result": "reroll-required",
+  "findings": "확대 확인: 포니테일 끝 따뜻한 머리 음영과 다른 RGB113,113,115 회색 매트가 2·6·7프레임에 남음. 동일 입력 반복 대신 실제 가드 관절 기반 궤적 보정.",
+  "frame_count": 8,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

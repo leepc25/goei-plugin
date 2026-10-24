@@ -1,0 +1,9 @@
+{
+  "frame_index": 5,
+  "source_job_id": "8363ef06-2b89-4508-b1ce-eff4e51b7871",
+  "source_frame_index": 2,
+  "target_pose_index": 5,
+  "source_path": "motion-frame-candidates/aileen/picking-up/clean-pose-5-1/frames/2.png",
+  "sha256": "4cd0512a9e062d18ff8b25b54c098b70f826e3c2bdc26acd65ca18306c0df0ac",
+  "findings": "후보 전체 확인. 손이 발 근처로 도달하는 낮은 자세/회복 자세 유지, 얼굴/손 투명 손상과 몸 밖 회색 덩어리 없는 후보 선택."
+}

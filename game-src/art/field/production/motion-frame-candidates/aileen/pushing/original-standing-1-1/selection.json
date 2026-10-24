@@ -1,0 +1,9 @@
+{
+  "frame_index": 1,
+  "source_job_id": "7c8c082b-8fa9-4b3f-89fb-8779ed3012e9",
+  "source_frame_index": 0,
+  "target_pose_index": 1,
+  "source_path": "motion-frame-candidates/aileen/pushing/original-standing-1-1/frames/0.png",
+  "sha256": "8a526aa54fd6466bb82f2991c740eaeb7a332ba2205d36c38822a0f3151043aa",
+  "findings": "Own registered standing source produces clear extended pushing palm and separated bright blonde strands; candidate0 has no broad gray hair-end matte or body-side opaque mass."
+}

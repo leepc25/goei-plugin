@@ -1,0 +1,25 @@
+{
+  "at": 1792795137.6116645,
+  "character_id": "763e3594-9c92-4d08-82b2-e3fb7d286647",
+  "result": "pass",
+  "directions_reviewed": [
+    "south",
+    "south-east",
+    "east",
+    "north-east",
+    "north",
+    "north-west",
+    "west",
+    "south-west"
+  ],
+  "findings": "AVIF의 녹회색 앞머리와 허리까지 내려오는 두 갈래 땋은 머리·흰 셔츠·남색 조끼/치마·왼손목 시계를 8방향 확인. 이전 짧은 땋은 머리 결함 해소, 머리는 앞쪽 어깨로 내려가는 구조 유지, 키·체격 일관, 회색 외곽 없음. AVIF 우선·로어 키 보충·전원 장벽 재확인.",
+  "movement_direction": "east",
+  "stationary_direction": "south-east",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF primary",
+    "Lore supplementary height",
+    "All55 before motion",
+    "Gray outer paint reroll"
+  ]
+}

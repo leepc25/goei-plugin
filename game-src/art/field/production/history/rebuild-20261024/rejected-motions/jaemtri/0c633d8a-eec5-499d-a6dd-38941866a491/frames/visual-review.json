@@ -1,0 +1,20 @@
+{
+  "at": 1792803990.19689,
+  "job_id": "39dbed40-e030-446e-acb8-7416fcb300fb",
+  "result": "reroll-required",
+  "findings": "Frame 5 shin and ankle have missing pixels and ragged transparent damage; other frames preserve identity. Replace damaged motion with controlled own-proportion sad gait.",
+  "frame_count": 8,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "sad-walk",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

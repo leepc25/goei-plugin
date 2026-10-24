@@ -1,0 +1,46 @@
+{
+  "at": 1792792343.343104,
+  "slug": "kwak-je-gang",
+  "reason": "등록 작업 completed, 회전8장 있으나 skeletons:null. 전체 계정 작업 조회에서도 해당 등록은 종료. 공식 문서에 관절만 복구하는 경로 없어 검수된 정면을 유지하여 재등록.",
+  "state_before": {
+    "name": "곽제강",
+    "group": "baekilmong",
+    "character_id": "c4665bfa-5744-48ae-a1f6-2080cd48c929",
+    "image": "fc6e4d86-f466-4fbb-8aac-f99f6fa9c462",
+    "registration": "16dc7d48-8701-4e5c-9d11-36606a2123f6",
+    "motions": {},
+    "ready": false,
+    "visual_rejections": [
+      {
+        "job": "c5877d53-1b4c-4ecd-b728-57ae99eeb24c",
+        "decision": "reroll",
+        "reason": "머리 포함240px로 보통 키 범위 초과, 안경 식별이 약함.",
+        "at": 1792789418.1948938,
+        "rules_rechecked": [
+          "AVIF primary identity",
+          "lore/user height",
+          "south-facing",
+          "transparent edge without gray halo",
+          "no motions before all roster eight-way review"
+        ]
+      },
+      {
+        "job": "2b2065a8-fb2f-4791-9f7a-5c31962e142d",
+        "job_status": "completed",
+        "decision": "reroll",
+        "reason": "키180px 미만으로 성인 보통 키 목표보다 작음. 도필헌 정면·스케일 참조로 교체.",
+        "at": 1792790164.0254085,
+        "rules_rechecked": [
+          "AVIF primary identity",
+          "lore/user height",
+          "south-facing",
+          "transparent edge without gray halo",
+          "no motions before all roster eight-way review"
+        ],
+        "new_style_source": "do-pil-heon"
+      }
+    ],
+    "image_verified": true,
+    "image_visually_reviewed": true
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "at": 1792798129.503704,
+  "job_id": "a6d0a514-71b8-4d30-954b-cdb49eac9196",
+  "result": "reroll-required",
+  "findings": "4프레임 위쪽 구두 외곽에 회색 면과 잔상 발견. 뒤집힌 자세에서도 검은 구두 실루엣과 투명이 유지되어야 하므로 반려.",
+  "frame_count": 6,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "front-flip",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

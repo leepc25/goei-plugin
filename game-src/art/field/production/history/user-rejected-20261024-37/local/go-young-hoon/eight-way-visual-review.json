@@ -1,0 +1,24 @@
+{
+  "character_id": "a1a6a298-13f9-45c8-85a6-ed9433ae8e75",
+  "result": "pass",
+  "directions_reviewed": [
+    "south",
+    "south-east",
+    "east",
+    "north-east",
+    "north",
+    "north-west",
+    "west",
+    "south-west"
+  ],
+  "findings": "원본의 넘긴 짧은 갈색 머리, 이마와 뺨 흉터, 선글라스, 탄탄한 정장 체형 유지. 8방향 키 일관, 외곽 회색 칠 없음.",
+  "movement_direction": "east",
+  "stationary_direction": "south-east",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF primary",
+    "Lore supplementary height",
+    "All55 before motion",
+    "Gray outer paint reroll"
+  ]
+}

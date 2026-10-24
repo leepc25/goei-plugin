@@ -1,0 +1,17 @@
+{
+  "image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "mask_image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "description": "Only recolor masked hair and cloak, retaining all shapes and existing pixel-art shading. Hair is muted DARK TEAL-BLUE charcoal with desaturated blue-gray highlights, NOT royal blue. Hood and cape are very DARK muted plum-violet, near-black purple shadows, with dusty gray-lavender lining, NOT bright saturated purple. Preserve green eyes, green emerald brooch, pale face, black suit, anatomy, original height and transparent silhouette exactly. No gray exterior halo.",
+  "no_background": true,
+  "output_method": "Modify current layer",
+  "crop_to_mask": true,
+  "seed": 1792792775
+}

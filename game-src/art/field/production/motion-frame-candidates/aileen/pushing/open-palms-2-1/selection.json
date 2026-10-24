@@ -1,0 +1,9 @@
+{
+  "frame_index": 2,
+  "source_job_id": "099fb29b-0215-4d13-9148-a99a67da76c8",
+  "source_frame_index": 1,
+  "target_pose_index": 2,
+  "source_path": "motion-frame-candidates/aileen/pushing/open-palms-2-1/frames/1.png",
+  "sha256": "c56afa6af7b8d7288ff7e1f60a6723ae2608fc291e5088c24e37922dc93997d7",
+  "findings": "Open forward palms consistent with index5; selected separated hair tips without broad exterior gray patch. Full clip review still required."
+}

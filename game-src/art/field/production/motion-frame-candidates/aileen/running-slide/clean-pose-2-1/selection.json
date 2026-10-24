@@ -1,0 +1,9 @@
+{
+  "frame_index": 2,
+  "source_job_id": "2b5bd3b4-f86a-46dc-ab8a-77ba3030ae6e",
+  "source_frame_index": 1,
+  "target_pose_index": 2,
+  "source_path": "motion-frame-candidates/aileen/running-slide/clean-pose-2-1/frames/1.png",
+  "sha256": "e32de5ba33c76c45aec19a2be31acfd63db22c78e87dc8d8a49c2ddd20c20356",
+  "findings": "후보 전체 확인. 선택 프레임은 얼굴·손·구두 외곽이 온전하고 몸 밖 회색 덩어리 없음. 같은 목표 자세 유지."
+}

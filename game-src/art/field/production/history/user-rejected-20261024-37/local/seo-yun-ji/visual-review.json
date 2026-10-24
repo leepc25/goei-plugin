@@ -1,0 +1,14 @@
+{
+  "job": "9ef07c27-af3d-487c-8a05-15c5402a6e3c",
+  "job_status": "completed",
+  "decision": "pass",
+  "reason": "디폴트 AVIF와 대조: 녹회색 앞머리와 허리까지 내려오는 두 갈래 땋은 머리, 흰 셔츠·남색 조끼·치마·왼손목 시계 유지. 수정 마스크 밖 RGBA 동일, 높이 211px 보존, 회색 외곽 없음.",
+  "at": 1792794238.9584439,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

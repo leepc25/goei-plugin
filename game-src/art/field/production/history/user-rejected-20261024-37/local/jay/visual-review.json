@@ -1,0 +1,14 @@
+{
+  "job": "721d1a17-9804-4fa7-8ef8-7069e2588c61",
+  "job_status": "completed",
+  "decision": "pass",
+  "reason": "원작의 검은 야구모자·은백색 흐트러진 앞머리·노란 눈·흰 마스크·네이비 경비복 두 가슴포켓 대조. 마른 체형과 모자 제외 보통 키, 정면·회색 외부 칠 없음. 8방향에서 뒤통수와 목덜미 머리 길이 재확인 필요.",
+  "at": 1792791856.3137236,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

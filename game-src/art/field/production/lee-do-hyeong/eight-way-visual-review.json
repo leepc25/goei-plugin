@@ -1,0 +1,24 @@
+{
+  "character_id": "30dad544-9ce9-45b9-b684-151819796505",
+  "result": "pass",
+  "directions_reviewed": [
+    "south",
+    "south-east",
+    "east",
+    "north-east",
+    "north",
+    "north-west",
+    "west",
+    "south-west"
+  ],
+  "findings": "Silver-white low ponytail preserved in side/back views. Sunglasses, facial scars, sleeves rolled to elbows and branching arm/hand scars remain visible. Tall solid build and native scale consistent; no gray outer halo.",
+  "movement_direction": "east",
+  "stationary_direction": "south-east",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF primary",
+    "Lore supplements stature",
+    "All55 before motions",
+    "Gray outer paint reroll"
+  ]
+}

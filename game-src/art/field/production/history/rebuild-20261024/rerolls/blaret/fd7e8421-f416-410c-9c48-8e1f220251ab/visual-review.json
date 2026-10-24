@@ -1,0 +1,14 @@
+{
+  "job": "fd7e8421-f416-410c-9c48-8e1f220251ab",
+  "job_status": "completed",
+  "decision": "reroll",
+  "reason": "수정 후에도 검은 베일 끝이 팔꿈치 부근에 머물러 AVIF의 엉덩이까지 내려오는 길이에 못 미침. 빈 영역만 마스킹한 방식이 기존 짧은 끝을 고정했으므로 다음에는 베일 끝 자체와 연장 영역을 함께 마스킹.",
+  "at": 1792794301.7582169,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

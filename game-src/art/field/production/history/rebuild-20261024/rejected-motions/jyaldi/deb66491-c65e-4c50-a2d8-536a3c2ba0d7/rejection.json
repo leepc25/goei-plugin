@@ -1,0 +1,164 @@
+{
+  "reason": "직접 관절로 잘림은 해소됐지만5프레임 허리 옆 회색 면,11프레임 머리 뒤 회색 덩어리,12프레임 얼굴/몸 투명 구멍. 시각 기준 미달로 재시도 필요.",
+  "job": {
+    "kind": "animation",
+    "slug": "jyaldi",
+    "template": "front-flip",
+    "status": "completed",
+    "created_epoch": 1792799210.1290953,
+    "receipt": {
+      "usage": null,
+      "background_job_id": "deb66491-c65e-4c50-a2d8-536a3c2ba0d7",
+      "status": "processing"
+    },
+    "endpoint": "animate-with-skeleton-v3",
+    "last_response": {
+      "usage": {
+        "type": "generations",
+        "generations": 3.0
+      },
+      "id": "deb66491-c65e-4c50-a2d8-536a3c2ba0d7",
+      "status": "completed",
+      "created_at": "2026-10-23T23:46:50.615987+00:00",
+      "last_response": {
+        "seed": 2026102603,
+        "type": "done",
+        "action": "smoothing frames",
+        "images": [
+          {
+            "type": "base64",
+            "width": 256,
+            "base64": "[image payload omitted]",
+            "height": 256
+          },
+          {
+            "type": "base64",
+            "width": 256,
+            "base64": "[image payload omitted]",
+            "height": 256
+          },
+          {
+            "type": "base64",
+            "width": 256,
+            "base64": "[image payload omitted]",
+            "height": 256
+          },
+          {
+            "type": "base64",
+            "width": 256,
+            "base64": "[image payload omitted]",
+            "height": 256
+          },
+          {
+            "type": "base64",
+            "width": 256,
+            "base64": "[image payload omitted]",
+            "height": 256
+          },
+          {
+            "type": "base64",
+            "width": 256,
+            "base64": "[image payload omitted]",
+            "height": 256
+          },
+          {
+            "type": "base64",
+            "width": 256,
+            "base64": "[image payload omitted]",
+            "height": 256
+          },
+          {
+            "type": "base64",
+            "width": 256,
+            "base64": "[image payload omitted]",
+            "height": 256
+          },
+          {
+            "type": "base64",
+            "width": 256,
+            "base64": "[image payload omitted]",
+            "height": 256
+          },
+          {
+            "type": "base64",
+            "width": 256,
+            "base64": "[image payload omitted]",
+            "height": 256
+          },
+          {
+            "type": "base64",
+            "width": 256,
+            "base64": "[image payload omitted]",
+            "height": 256
+          },
+          {
+            "type": "base64",
+            "width": 256,
+            "base64": "[image payload omitted]",
+            "height": 256
+          }
+        ],
+        "status": "initializing",
+        "progress": 1.0,
+        "flow_kind": "animation",
+        "billing_usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "generation_id": "fa5debc4-f432-4e9b-b65f-aa0607f39ea1",
+        "queue_position": 0,
+        "billing_charged": true,
+        "generation_started_at": "2026-10-23T23:47:52.793682+00:00",
+        "estimated_wait_seconds": 0
+      }
+    },
+    "observed_end_epoch": 1792799463.5236075,
+    "elapsed_observed_seconds": 253.39451241493225,
+    "usage": {
+      "usd": 0.0,
+      "type": "generations",
+      "generations": 3
+    },
+    "saved_frames": 12
+  },
+  "at": 1792799596.272724,
+  "state_before": {
+    "name": "쟈알디",
+    "group": "management",
+    "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+    "image": "78793c7b-f45f-48a6-ab11-0c1d97f86333",
+    "registration": "1a54d3e6-c143-4b60-9c05-2929c084a4cd",
+    "motions": {
+      "walking-8-frames": "3cddea2e-3a66-4291-a79c-2be803461b07",
+      "breathing-idle": "45bc5aa1-2298-47fe-98f3-6f3981d3fca2",
+      "crouched-walking": "8c4f0d0e-1cec-44ba-a650-a0f1e699b6da",
+      "sad-walk": "c137cbd9-879d-44da-ba60-da04402748bf",
+      "drinking": "9572ea4b-422f-458e-bc0f-336731cc9084",
+      "pushing": "5685bf60-f5bc-4b6b-874c-41236ed8694c",
+      "pull-heavy-object": "d06d1fbd-1d41-4d2f-abb6-f974f3994f7e",
+      "fight-stance-idle-8-frames": "a4b3323c-9576-4a51-ab77-e87a166d025d",
+      "lead-jab": "5745e2b4-2d5c-4e0c-9929-12da32349952",
+      "jumping-2": "8b8ec1b7-5fb0-43cf-8cde-a18586116dc6",
+      "running-8-frames": "c331aff3-ce7c-45ee-92d3-99392449063c",
+      "running-jump": "4ab34876-571f-4240-a369-3f2190a7f73e",
+      "front-flip": "deb66491-c65e-4c50-a2d8-536a3c2ba0d7",
+      "backflip": "e5a7229a-de64-459a-8372-457dfc1927cc",
+      "jumping-1": "78c4596b-d8e7-45c8-9e8f-efba27b0e34a",
+      "two-footed-jump": "4674f370-f7aa-4841-94c7-b7c1fe8adb2f",
+      "picking-up": "8c2c1146-e60e-48f7-aaef-ba389ad31aec",
+      "throw-object": "ca8355e6-7376-485d-9334-3ffbae2087b4",
+      "cross-punch": "abcd5997-80d8-4545-9c3e-a78739f74f37"
+    },
+    "ready": true,
+    "rebuild_after_direction_policy": true,
+    "image_verified": true,
+    "skeleton_joints": 18,
+    "rotation_count": 8,
+    "exported": false,
+    "motion_direction_revision": "west-southwest",
+    "eight_way_visual_reviewed": true,
+    "motions_visual_reviewed": false
+  },
+  "standalone": true
+}

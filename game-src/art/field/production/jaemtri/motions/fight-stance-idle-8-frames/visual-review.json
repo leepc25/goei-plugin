@@ -1,0 +1,20 @@
+{
+  "at": 1792804084.1608758,
+  "job_id": "4e33ccea-e38f-4f32-9cfe-8ded7f02e6dc",
+  "result": "pass",
+  "findings": "Eight EAST guard frames viewed: steady bare hands, own long brown waves, skirt and heels; breathing guard cycle without gray exterior artifacts, clipping or missing anatomy.",
+  "frame_count": 8,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "fight-stance-idle-8-frames",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

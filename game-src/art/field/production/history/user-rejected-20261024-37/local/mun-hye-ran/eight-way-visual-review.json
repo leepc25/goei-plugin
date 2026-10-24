@@ -1,0 +1,25 @@
+{
+  "at": 1792794506.0396926,
+  "character_id": "bf75f6c8-793b-4995-85e9-a6a40dd9121f",
+  "result": "pass",
+  "directions_reviewed": [
+    "south",
+    "south-east",
+    "east",
+    "north-east",
+    "north",
+    "north-west",
+    "west",
+    "south-west"
+  ],
+  "findings": "디폴트 AVIF의 짙은 갈색 낮은 포니테일·긴 옆머리·갈색 정장·검은 이너·왼손 금색 시계·성인 체형을 8방향 대조. 모든 방향 가시RGBA·알파 보존 및 18관절 복구 확인. 회색 외곽 없음. AVIF 우선·로어 키 보충·전원8방향 장벽 재확인.",
+  "movement_direction": "east",
+  "stationary_direction": "south-east",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF primary",
+    "Lore supplementary height",
+    "All55 before motion",
+    "Gray outer paint reroll"
+  ]
+}

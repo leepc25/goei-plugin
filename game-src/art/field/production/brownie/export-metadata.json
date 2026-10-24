@@ -1,0 +1,36 @@
+{
+  "group_id": "608f2381-a887-417f-89a4-c1a6843f7a48",
+  "states": [
+    {
+      "character": {
+        "id": "31336750-c528-4f6d-98fa-ab42f7c54086",
+        "name": "Idle",
+        "prompt": "브라우니 / Brownie. Large broad humanoid television host. HEAD is a bulky old rectangular CRT TELEVISION with dark brown-black frame, bottom buttons and sepia static SCREEN showing two white happy curved eyes and a tiny white smiling mouth. No human face or hair. BROWN three-piece suit: open jacket, buttoned brown waistcoat, matching trousers, WHITE dress shirt, dark tie, BLACK gloves with long fingers, black lace-up shoes. Natural humanoid body, television replaces entire head. Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches.",
+        "size": {
+          "width": 128,
+          "height": 256
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "low top-down",
+        "created_at": "2026-10-23T22:04:05.359060+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {}
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-10-23T22:23:27.032623"
+}

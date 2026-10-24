@@ -1,0 +1,18 @@
+{
+  "size": [
+    128,
+    256
+  ],
+  "bbox": [
+    29,
+    18,
+    95,
+    249
+  ],
+  "colors": 31,
+  "alpha": [
+    0,
+    255
+  ],
+  "original_pixels_preserved": true
+}

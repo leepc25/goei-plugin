@@ -1,0 +1,9 @@
+{
+  "frame_index": 2,
+  "source_job_id": "969b581d-436c-464e-b489-d803e2bcbe3b",
+  "source_frame_index": 1,
+  "target_pose_index": 2,
+  "source_path": "motion-frame-candidates/aileen/backflip/clean-pose-2-1/frames/1.png",
+  "sha256": "02b2f3ebb775a969abcbd7ccb2a38762c56c702a2ca67dbabc6ba4529987f493",
+  "findings": "후보 전체 확인 후 목표 회전/준비 자세와 얼굴·정장·구두 외곽이 온전한 1번 선택. 몸 밖 회색 덩어리 없음."
+}

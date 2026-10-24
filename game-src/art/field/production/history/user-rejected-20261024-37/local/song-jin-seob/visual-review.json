@@ -1,0 +1,14 @@
+{
+  "job": "616dba31-ffe0-4117-b461-e29aa124d5d4",
+  "job_status": "completed",
+  "decision": "pass",
+  "reason": "원작처럼 짧은 바가지 앞머리 아래 이마가 드러나도록 교정됨. 부드러운 어린 얼굴·작은 턱·선글라스·슬림한 갈색 정장 유지, 정면·기존 크기 유지, 회색 외곽 없음.",
+  "at": 1792790533.0182698,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "at": 1792798046.246823,
+  "job_id": "45bc5aa1-2298-47fe-98f3-6f3981d3fca2",
+  "result": "pass",
+  "findings": "남서쪽 4프레임 전부 확인. 얼굴 노출과 긴 생머리·검은 정장·타이·장갑 유지, 제자리 호흡 높이 변화와 접지 정상. 외곽 회색 칠이나 불투명 배경 없음. AVIF 우선 및 원래 키 비율 재확인.",
+  "frame_count": 4,
+  "directions": [
+    "south-west"
+  ],
+  "actual_template": "breathing-idle",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

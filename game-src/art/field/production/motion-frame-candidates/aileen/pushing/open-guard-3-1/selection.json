@@ -1,0 +1,9 @@
+{
+  "frame_index": 3,
+  "source_job_id": "e5e6bfcd-ef4b-4f7f-9189-01028e27efb6",
+  "source_frame_index": 1,
+  "target_pose_index": 3,
+  "source_path": "motion-frame-candidates/aileen/pushing/open-guard-3-1/frames/1.png",
+  "sha256": "bb09c7a402113020e3e769d2c1f0b7be215f4f0f08623515eabcae09cc42a865",
+  "findings": "Candidate1 has two forward open palms, intact suit/shoes and separated blonde ponytail strands without broad gray exterior patch."
+}

@@ -3,16 +3,21 @@
     128,
     256
   ],
-  "bbox": [
-    15,
-    6,
-    110,
-    249
+  "native_size": [
+    128,
+    256
   ],
-  "colors": 48,
+  "bbox": [
+    8,
+    5,
+    110,
+    253
+  ],
+  "colors": 12,
   "alpha": [
     0,
     255
   ],
-  "original_pixels_preserved": true
+  "original_pixels_preserved": true,
+  "resampled": false
 }

@@ -1,0 +1,20 @@
+{
+  "at": 1792799877.0586495,
+  "job_id": "0cc1f03b-baf8-4cba-8b49-7151ad7ace0b",
+  "result": "pass",
+  "findings": "수정8프레임 전부 검토. 앞발과 접은 뒷다리 분리 뒤 기존 종아리 회색 삼각형이 사라짐. 낮게 미끄러지는 자세에서 일어나는 동작, 얼굴·정장·장갑·긴 머리 보존, 외곽 회색 면 없음.",
+  "frame_count": 8,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

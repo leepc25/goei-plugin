@@ -1,0 +1,19 @@
+{
+  "at": 1792793747.7880998,
+  "slug": "blaret",
+  "reason": "원작의 허리·골반까지 내려오는 긴 검은 베일이 어깨뼈 길이로 짧아짐. 베일을 늘린 정면으로 다시 등록 필요.",
+  "state_before": {
+    "name": "블라렛",
+    "group": "religious",
+    "character_id": "a1e68911-325e-4aef-a66c-df643e8832de",
+    "image": "124f2988-2c22-4b10-901a-0cc09cc5f1ed",
+    "registration": "82dc8eed-43b9-433a-aa58-dc4ba39c1a82",
+    "motions": {},
+    "ready": true,
+    "image_verified": true,
+    "image_visually_reviewed": true,
+    "skeleton_joints": 18,
+    "rotation_count": 8,
+    "exported": true
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "at": 1792808657.4475818,
+  "job_id": "062a301c-7935-479a-b76a-50ffd0c38ac5",
+  "result": "reroll-required",
+  "findings": "확대 확인: 포니테일 끝 RGB113,113,115 회색 매트 면. 참조의 실제 가드 자세를 그대로 쓰고 호흡만 작게 움직이는 관절로 변경.",
+  "frame_count": 4,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

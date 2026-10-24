@@ -1,0 +1,24 @@
+{
+  "slug": "jay",
+  "character_id": "08548050-739d-4a8a-848a-2280b7ef0ef4",
+  "revision": "two-back-sleeves",
+  "rectangles": {
+    "north-east": [
+      [
+        76,
+        78,
+        90,
+        100
+      ]
+    ],
+    "north-west": [
+      [
+        42,
+        79,
+        57,
+        101
+      ]
+    ]
+  },
+  "description": "Remove the ENTIRE upper-arm sleeve patch including all border and symbol pixels. Replace with PLAIN continuous dark navy sleeve cloth matching surrounding folds. No shield, badge, black rectangle, insignia, sleeve pocket or marking. Preserve exact arm outline, pose, body, hair, uniform and all unmasked pixels. Crisp native pixel rendering, transparent outside."
+}

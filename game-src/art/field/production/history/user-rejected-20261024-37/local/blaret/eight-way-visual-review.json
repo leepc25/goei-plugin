@@ -1,0 +1,25 @@
+{
+  "at": 1792797576.418968,
+  "character_id": "84db0331-2810-48ce-aefb-a26b3525e628",
+  "result": "pass",
+  "directions_reviewed": [
+    "south",
+    "south-east",
+    "east",
+    "north-east",
+    "north",
+    "north-west",
+    "west",
+    "south-west"
+  ],
+  "findings": "최종 등록8방향을 AVIF와 재대조. 금발·초록 눈·흰 머리띠/빕·십자가·손목 염주·검은 수녀복·체형·키 유지. 옆과 뒤의 짧은 후드/가는 외곽 끈은 엉덩이 부근까지 내려오는 넓은 베일로 교정. 수정8장 가시RGBA/알파 보존 및18관절 확인, 회색 외곽 없음. AVIF 우선·로어 보충·전원 장벽 재확인.",
+  "movement_direction": "east",
+  "stationary_direction": "south-east",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF primary",
+    "Lore supplementary height",
+    "All55 before motion",
+    "Gray outer paint reroll"
+  ]
+}

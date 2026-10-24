@@ -1,0 +1,20 @@
+{
+  "at": 1792812436.7696157,
+  "job_id": "80ed3716-3de9-4a16-aee0-eb028f5a474d",
+  "result": "reroll-required",
+  "findings": "Rear arm repeatedly folds up behind head/neck instead of natural running swing; rebuild bounded own arm trajectory.",
+  "frame_count": 8,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "running-8-frames",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

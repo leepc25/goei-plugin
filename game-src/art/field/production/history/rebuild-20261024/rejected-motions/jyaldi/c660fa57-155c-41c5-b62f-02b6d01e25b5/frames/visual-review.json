@@ -1,0 +1,20 @@
+{
+  "at": 1792798129.679715,
+  "job_id": "b02aaa21-a204-4898-8c46-ad9b2e704756",
+  "result": "reroll-required",
+  "findings": "5·6프레임 머리가 캔버스 위로 잘리고7·8프레임 얼굴 앞/머리 끝에 회색 외곽 잔상. 전체 신체 가시성과 깨끗한 외곽 조건 미달.",
+  "frame_count": 8,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "jumping-2",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

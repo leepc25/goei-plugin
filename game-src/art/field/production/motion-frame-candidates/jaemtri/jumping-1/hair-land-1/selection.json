@@ -1,0 +1,9 @@
+{
+  "frame_index": 5,
+  "source_job_id": "480ee045-dfea-4c9a-aee7-c64e2435a0f2",
+  "source_frame_index": 2,
+  "target_pose_index": 5,
+  "source_path": "motion-frame-candidates/jaemtri/jumping-1/hair-land-1/frames/2.png",
+  "sha256": "f991b80a6adde8acf1d95004867e4cf84297e4160acaedee9ec569bea18eacda",
+  "findings": "Candidate 2 matches airborne descent pose and removes gray curl patch; own brown hair/skirt/heels preserved."
+}

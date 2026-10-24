@@ -1,0 +1,28 @@
+{
+  "image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "mask_image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "context_image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "bounding_box": {
+    "x": 0,
+    "y": 0,
+    "width": 256,
+    "height": 256
+  },
+  "description": "Restore the damaged face and hair of this adult woman in the exact same tucked airborne pose. Draw her complete coherent LEFT-facing profile, pale skin, small red eye, eyebrow, nose, mouth, ear and long straight black hair swept upward by motion. Repair accidental missing transparent holes inside the head, face, hair, black gloved hand and bent knee. Keep the black fitted suit, white collar, body pose, silhouette size, precise native pixel grid and shading. Leave the outside transparent with no gray halo. Regenerate the whole masked head so the face is anatomically intact; do not preserve the broken fragmented face. Do not change body pose or add anything.",
+  "no_background": true,
+  "crop_to_mask": true,
+  "output_method": "Modify current layer",
+  "seed": 2026102902
+}

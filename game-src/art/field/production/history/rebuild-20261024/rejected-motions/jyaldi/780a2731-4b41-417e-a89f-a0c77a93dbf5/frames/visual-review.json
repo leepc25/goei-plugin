@@ -1,0 +1,20 @@
+{
+  "at": 1792800868.3587525,
+  "job_id": "780a2731-4b41-417e-a89f-a0c77a93dbf5",
+  "result": "reroll-required",
+  "findings": "Gray exterior in frames 4,8,9 and severe face/hair holes in frame 10; reject.",
+  "frame_count": 13,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

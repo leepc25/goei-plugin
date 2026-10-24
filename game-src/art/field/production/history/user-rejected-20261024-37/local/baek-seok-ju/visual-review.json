@@ -1,0 +1,14 @@
+{
+  "job": "31eb87bb-3cfe-4197-a140-d70b6d48a7e0",
+  "job_status": "completed",
+  "decision": "pass",
+  "reason": "갈색 가운데 가르마와 긴 옆머리·낮은 뒤묶음·온화한 눈과 표정·남색 바지정장 유지. 정면, 모발 포함208px로 여성 본체 목표 부근, 투명 경계 정상.",
+  "at": 1792790533.112851,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "group_id": "29bc096e-181d-41ea-8944-f696969362fe",
+  "states": [
+    {
+      "character": {
+        "id": "11b39e21-4716-4def-9ced-54e9f4c38551",
+        "name": "Idle",
+        "prompt": "탐미주의 / Aestheticism. Adult-proportioned female ART MANNEQUIN made of smooth matte ivory plastic. Long messy dark RED layered hair, thick uneven bangs and outward wisps, glowing RED eyes, freckles over cheeks and a faint unsettling smile. Clearly visible horizontal STITCHED SEAM around neck. Articulated round elbow/shoulder/wrist/knee joints, seam around waist and molded hip shell. Smooth featureless mannequin torso and pelvis, NO nipples or genitals, no human skin detail. Narrow waist and natural mannequin limbs. Ivory feet shaped like heels. No clothing or accessories; neutral nonsexual upright display stance. Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Do not invent patches, badges, logos or markings absent from the supplied image. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches.",
+        "size": {
+          "width": 128,
+          "height": 256
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "low top-down",
+        "created_at": "2026-10-23T22:17:08.468371+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {}
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-10-23T22:33:12.005956"
+}

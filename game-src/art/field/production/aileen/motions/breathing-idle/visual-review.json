@@ -1,0 +1,20 @@
+{
+  "at": 1792807248.2110043,
+  "job_id": "db123cd2-3718-480f-863c-1a528f708a4a",
+  "result": "pass",
+  "findings": "전체4프레임 확인. 남동향 대기, 높은 금발 포니테일/앞머리와 검정 바지 정장 및 유지 원본 특징 보존. 발 잘림/회색 외곽 도색 없음.",
+  "frame_count": 4,
+  "directions": [
+    "south-east"
+  ],
+  "actual_template": "breathing-idle",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

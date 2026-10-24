@@ -1,0 +1,100 @@
+{
+  "at": 1792812009.11568,
+  "job_id": "26112962-08ae-494b-9f9b-82a398e44e85",
+  "result": "pass",
+  "findings": "All eight frames reviewed after open-palm replacements: forward braced push with alternating feet, all hands open, consistent EAST identity and suit, intact limbs and separated ponytail strands without broad gray exterior masses. Previous fist poses and gray candidates rejected.",
+  "frame_count": 8,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ],
+  "frame_assembly": {
+    "base_job_id": "26112962-08ae-494b-9f9b-82a398e44e85",
+    "frame_sources": [
+      {
+        "frame_index": 0,
+        "source_job_id": "4ceaf84e-1244-4455-b198-dbff361e6cc7",
+        "source_frame_index": 1,
+        "target_pose_index": 0,
+        "source_path": "motion-frame-candidates/aileen/pushing/open-palms-0-2/frames/1.png",
+        "sha256": "72efc8cde2dcdd50aa01590e3e53d63608244c86ecffdc33bccf484536862472",
+        "findings": "Candidate1 has intact open palms and transparent space beside legs; candidates0/2 have detached brown masses and are rejected. Hair ends follow blonde strands without broad flat gray area."
+      },
+      {
+        "frame_index": 1,
+        "source_job_id": "7c8c082b-8fa9-4b3f-89fb-8779ed3012e9",
+        "source_frame_index": 0,
+        "target_pose_index": 1,
+        "source_path": "motion-frame-candidates/aileen/pushing/original-standing-1-1/frames/0.png",
+        "sha256": "8a526aa54fd6466bb82f2991c740eaeb7a332ba2205d36c38822a0f3151043aa",
+        "findings": "Own registered standing source produces clear extended pushing palm and separated bright blonde strands; candidate0 has no broad gray hair-end matte or body-side opaque mass."
+      },
+      {
+        "frame_index": 2,
+        "source_job_id": "099fb29b-0215-4d13-9148-a99a67da76c8",
+        "source_frame_index": 1,
+        "target_pose_index": 2,
+        "source_path": "motion-frame-candidates/aileen/pushing/open-palms-2-1/frames/1.png",
+        "sha256": "c56afa6af7b8d7288ff7e1f60a6723ae2608fc291e5088c24e37922dc93997d7",
+        "findings": "Open forward palms consistent with index5; selected separated hair tips without broad exterior gray patch. Full clip review still required."
+      },
+      {
+        "frame_index": 3,
+        "source_job_id": "e5e6bfcd-ef4b-4f7f-9189-01028e27efb6",
+        "source_frame_index": 1,
+        "target_pose_index": 3,
+        "source_path": "motion-frame-candidates/aileen/pushing/open-guard-3-1/frames/1.png",
+        "sha256": "bb09c7a402113020e3e769d2c1f0b7be215f4f0f08623515eabcae09cc42a865",
+        "findings": "Candidate1 has two forward open palms, intact suit/shoes and separated blonde ponytail strands without broad gray exterior patch."
+      },
+      {
+        "frame_index": 4,
+        "source_job_id": "b2dfe446-8dec-4b33-8fd4-17b0f4defa5b",
+        "source_frame_index": 0,
+        "target_pose_index": 4,
+        "source_path": "motion-frame-candidates/aileen/pushing/open-palms-4-1/frames/0.png",
+        "sha256": "97fd504c8794e2292737f866dfbf0f8b95ae17312778ebae04fdf7ec66c3805b",
+        "findings": "Open forward palms consistent with index5; selected separated hair tips without broad exterior gray patch. Full clip review still required."
+      },
+      {
+        "frame_index": 5,
+        "source_job_id": "d85f8f38-a3bb-4c85-8f81-f73db04ed1d1",
+        "source_frame_index": 2,
+        "target_pose_index": 5,
+        "source_path": "motion-frame-candidates/aileen/pushing/clean-pose-5-1/frames/2.png",
+        "sha256": "5c383a7a8ff6e2c96a32c785320e0f1a0c908de2b86d1e06f4bca5cc168508b2",
+        "findings": "후보 전체 확인. 선택 프레임은 얼굴·손·구두 외곽이 온전하고 몸 밖 회색 덩어리 없음. 같은 목표 자세 유지."
+      },
+      {
+        "frame_index": 6,
+        "source_job_id": "bd1a632b-9e57-4a31-b7fb-4939212ff37b",
+        "source_frame_index": 1,
+        "target_pose_index": 6,
+        "source_path": "motion-frame-candidates/aileen/pushing/actual-reference-6-1/frames/1.png",
+        "sha256": "1f1bdf531a4f88c229807866c57ec66a64e4923442e866f9c089e2d89b6e59b0",
+        "findings": "Corrected actual reference produces intact open palms and clean separated ponytail end; no broad gray exterior mass."
+      },
+      {
+        "frame_index": 7,
+        "source_job_id": "c9252fd3-e258-4abe-a81c-d8bd0f35c0d2",
+        "source_frame_index": 1,
+        "target_pose_index": 7,
+        "source_path": "motion-frame-candidates/aileen/pushing/open-palms-7-1/frames/1.png",
+        "sha256": "c8f9bafbcc2cc4e6a9c25b2cd17cb9b6d7e091052caa0ea5ab45dca302d9513a",
+        "findings": "Open forward palms consistent with index5; selected separated hair tips without broad exterior gray patch. Full clip review still required."
+      }
+    ],
+    "method": "select complete same-pose regenerated frames; no pixel editing",
+    "new_user_approval": false,
+    "visual_reviewed": true
+  }
+}

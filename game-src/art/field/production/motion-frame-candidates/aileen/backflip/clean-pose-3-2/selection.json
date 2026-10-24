@@ -1,0 +1,9 @@
+{
+  "frame_index": 3,
+  "source_job_id": "84042bad-5240-4eeb-94f2-bbddc967bf97",
+  "source_frame_index": 1,
+  "target_pose_index": 3,
+  "source_path": "motion-frame-candidates/aileen/backflip/clean-pose-3-2/frames/1.png",
+  "sha256": "c9479746bee0ba92706615a24c3155667cc6b2cbbe6e6e7c8019656ce98b714c",
+  "findings": "Inverted body orientation now matches target turn pose; intact black suit and hair silhouette without broad gray fill."
+}

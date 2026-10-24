@@ -1,0 +1,17 @@
+{
+  "image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "mask_image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "description": "Erase the ENTIRE rectangular sleeve patch including ALL black border edges and its interior. Reconstruct completely plain dark navy sleeve fabric continuously across this whole upper-arm area. No square outline, no badge, no shield, no pocket, no black rectangle, no insignia. Retain existing arm silhouette and surrounding natural fabric folds. Preserve all unmasked pixels and all character identity exactly. Native crisp pixel art, transparent outside.",
+  "no_background": true,
+  "output_method": "Modify current layer",
+  "crop_to_mask": true,
+  "seed": 1792795057
+}

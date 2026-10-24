@@ -1,0 +1,13 @@
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "content": [
+      {
+        "type": "text",
+        "text": "1 jobs:\n68f0581c-57c2-49c3-8ac8-f6a5d0482358 processing 95%, eta ~60s (v3, 19s old)\nhint: cancel_job(job_id=\"...\") to release a stuck job's concurrency slot"
+      }
+    ],
+    "isError": false
+  }
+}

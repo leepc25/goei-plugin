@@ -1,0 +1,30 @@
+{
+  "description": "Full-body native pixel-art game sprite, STRICTLY FRONT SOUTH view: face, nose, chest, belt and knees directly toward viewer, both ears equally visible. No sideways head or three-quarter turn. IDENTITY: Very pale gaunt young adult man with thin wiry build. Shaggy SILVER-WHITE hair to jaw and nape, long messy bangs partly obscuring tired YELLOW eyes. Black baseball cap, white pleated medical mask covering nose and mouth. Dark charcoal NAVY security uniform with pointed collar, two buttoned flap chest pockets, long sleeves, matching trousers and black belt. No necktie, no suit jacket. Relaxed upright stance, empty hands at sides. Natural adult anatomy, normal torso/pelvis, 7-head proportions. Anatomical crown to soles 212-224px; feet 6px above bottom, hair fully inside frame. Crisp single-pixel clusters, selective dark outlines, restrained game-sprite shading, no antialiasing. Transparent background, no ground shadow, text or weapons. Preserve individual hair, face, stature and clothing. Do not copy any generic character. Anatomical height excludes high hair/headwear. Every outer edge must border transparency directly, never a light gray halo. Use target anatomical height at reference pixel scale. Feet at y250, crown around y32. Do not copy reference identity or body fat.",
+  "image_size": {
+    "width": 128,
+    "height": 256
+  },
+  "no_background": true,
+  "seed": 1792790948,
+  "target_palette": {
+    "max_colors": 48
+  },
+  "style_options": {
+    "color_palette": false,
+    "outline": true,
+    "detail": true,
+    "shading": true
+  },
+  "style_image": {
+    "image": {
+      "type": "base64",
+      "base64": "[image payload omitted]",
+      "format": "png"
+    },
+    "size": {
+      "width": 128,
+      "height": 256
+    },
+    "usage_description": "Use only native pixel rendering, standing scale and FRONT SOUTH pose. Preserve target individual identity, age, hair, face, build and clothes from description."
+  }
+}

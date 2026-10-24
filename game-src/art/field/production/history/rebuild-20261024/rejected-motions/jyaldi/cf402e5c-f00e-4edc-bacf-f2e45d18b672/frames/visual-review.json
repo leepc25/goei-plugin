@@ -1,0 +1,20 @@
+{
+  "at": 1792798129.7938452,
+  "job_id": "f91bc8e4-e06e-4a4d-911f-f953bed08f2f",
+  "result": "reroll-required",
+  "findings": "5프레임 머리와 들어올린 팔이 위쪽 캔버스에서 잘림.4프레임 뒤쪽 발의 회색 외곽도 확인, 점프 전체 동작 재생성 필요.",
+  "frame_count": 7,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "two-footed-jump",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

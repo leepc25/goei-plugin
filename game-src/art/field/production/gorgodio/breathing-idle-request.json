@@ -1,0 +1,10 @@
+{
+  "character_id": "1d8d12e4-06d5-4df8-8812-0754f77b736b",
+  "mode": "skeleton-v3",
+  "template_animation_id": "breathing-idle",
+  "directions": [
+    "south-east"
+  ],
+  "animation_name": "숨쉬기 대기 (남동)",
+  "action_description": "breathing idle. Preserve this character identity, costume, hair and native proportions. Keep a clean transparent silhouette in every frame. No gray painted patches, gray halo, ground shadow or opaque background around hair, hands, clothes or feet."
+}

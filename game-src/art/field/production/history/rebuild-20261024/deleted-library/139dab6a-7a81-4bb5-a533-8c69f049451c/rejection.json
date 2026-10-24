@@ -1,0 +1,19 @@
+{
+  "at": 1792793391.054336,
+  "slug": "cha-yeo-jin",
+  "reason": "서쪽·남서쪽 소매에 원작과 정면에 없는 방패 패치 추가. 다른6방향은 원작 정체성·키·긴 버건디 머리·외곽 검수 통과. 정상6방향 보존하고 문제2방향만 재생성.",
+  "state_before": {
+    "name": "차여진",
+    "group": "association",
+    "character_id": "139dab6a-7a81-4bb5-a533-8c69f049451c",
+    "image": "833ae0ce-09fb-4e28-b560-726df7acd16e",
+    "registration": "8231c302-e2fd-48d8-ab4c-4cfe04785808",
+    "motions": {},
+    "ready": true,
+    "image_verified": true,
+    "image_visually_reviewed": true,
+    "skeleton_joints": 18,
+    "rotation_count": 8,
+    "exported": true
+  }
+}

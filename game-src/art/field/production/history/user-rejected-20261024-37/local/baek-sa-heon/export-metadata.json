@@ -1,0 +1,36 @@
+{
+  "group_id": "44884aa5-085c-4e05-80b0-e9e344704224",
+  "states": [
+    {
+      "character": {
+        "id": "dcd8fbf1-126e-43ea-a83f-fed78e9fd646",
+        "name": "Idle",
+        "prompt": "백사헌 / Baek Sa-heon. Thin frail young man with narrow shoulders and pale angular face, smug slight smile. Voluminous light ash-brown tightly WAVY/CURLY hair over forehead and ears. Dark navy rectangular medical EYEPATCH over HIS LEFT eye (viewer right), thin diagonal strap crossing bridge of nose; other eye gray-brown and half-lidded. Navy suit, white shirt and dark navy tie. No mask, no sunglasses. Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches.",
+        "size": {
+          "width": 128,
+          "height": 256
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "low top-down",
+        "created_at": "2026-10-23T21:29:12.528074+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {}
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-10-23T21:48:59.621472"
+}

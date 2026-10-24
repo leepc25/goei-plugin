@@ -1,0 +1,14 @@
+{
+  "job": "fc6e4d86-f466-4fbb-8aac-f99f6fa9c462",
+  "job_status": "completed",
+  "decision": "pass",
+  "reason": "가운데 가르마의 흐트러진 검은 웨이브, 얇은 사각 안경·부드러운 얼굴, 열린 흰 코트·회청색 셔츠·검은 넥타이 유지. 정면·228px 모발 포함·보통 성인 스케일, 회색 외곽 없음.",
+  "at": 1792790948.5709152,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

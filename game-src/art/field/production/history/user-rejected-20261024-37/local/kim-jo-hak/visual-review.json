@@ -1,0 +1,14 @@
+{
+  "job": "f8268bbe-7e6a-41ca-a92a-e1dc1cf067b5",
+  "job_status": "completed",
+  "decision": "pass",
+  "reason": "넓은 이마의 주름, 후퇴한 짧은 갈색 머리, 중년의 얼굴 주름·선글라스·정장 확인. 정면과 모발 포함228px·보통 성인 스케일 확인. 회색 외곽 없음.",
+  "at": 1792790258.8062775,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

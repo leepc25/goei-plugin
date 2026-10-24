@@ -1,0 +1,20 @@
+{
+  "at": 1792798417.225087,
+  "job_id": "2c93eba5-670d-4a12-92f9-1b729b26c869",
+  "result": "reroll-required",
+  "findings": "3프레임 얼굴 앞 회색 잔상,4·5·6프레임 머리/상반신이 캔버스 위에서 크게 잘림. 특히5프레임 상반신 대부분 소실. 전체 점프 재작업 필요.",
+  "frame_count": 9,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "jumping-1",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

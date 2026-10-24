@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Resumable PixelLab production. Authorized scope: manifest roster, 20 classified-direction clips each.
-Never repeat failed/ambiguous paid submissions. Continue other independent work.
+Never blindly repeat ambiguous paid submissions. Confirmed failures are archived and
+retried with a reviewed correction through field_visual_decision.py.
 Run with PIXELLAB_API_KEY; secrets and image payloads are never written to logs.
 """
 import argparse,shutil,base64,concurrent.futures,fcntl,io,json,os,re,subprocess,time,urllib.request,urllib.error,zipfile
@@ -47,8 +48,9 @@ class Production:
    if f.exists()and not c['image']:
     d=json.loads(f.read_text());jid=d['background_job_id'];self.s['jobs'][jid]={'kind':'image','slug':a['slug'],'status':'processing','created_epoch':time.time(),'receipt':d};c['image']=jid
   self.save()
- def submit(self,kind,slug,path,args,template=None):
+ def submit(self,kind,slug,path,args,template=None,archive_output=None):
   if json.loads((OUT/'control.json').read_text()).get('stop_all')or time.time()<self.s.get('retry_after',0):return False
+  if self.s['characters'][slug].get('status')=='user-rejected-deleted':return False
   c=self.s['characters'][slug];key=template if kind=='animation'else kind;slot=c['motions']if kind=='animation'else c
   if slot.get(key):return False
   # An uncertain POST is deliberately never retried: it may already be billed.
@@ -66,7 +68,8 @@ class Production:
   jid=d.get('background_job_id')or next(iter(d.get('background_job_ids',[])),None)
   if not jid:
    slot[key]='uncertain:'+marker;self.event('submission-unknown-response',slug,public(d));self.save();return False
-  job={'kind':kind,'slug':slug,'template':template,'status':'processing','created_epoch':started,'receipt':d};self.s['jobs'][jid]=job;slot[key]=jid
+  job={'kind':kind,'slug':slug,'template':template,'status':'processing','created_epoch':started,'receipt':d,'endpoint':path};self.s['jobs'][jid]=job;slot[key]=jid
+  if archive_output:job['archive_output']=archive_output
   if kind=='registration':c['character_id']=d['character_id']
   if kind=='animation':c['exported']=False
   atomic(OUT/slug/((template or kind)+'-queue.json'),d);self.event('submitted',slug,{'kind':kind,'template':template,'job_id':jid,'receipt':d});self.save();return True
@@ -87,7 +90,7 @@ class Production:
      j['status']='stalled';self.event('stalled',j['slug'],{'job_id':jid,'action':'skip, do not resubmit'})
   self.save()
  def save_frames(self,j,last):
-  if j['kind']!='animation' or j['status']!='completed':return
+  if (j['kind']!='animation' and not j.get('archive_output')) or j['status']!='completed':return
   frames=last.get('images')or[]
   folder=(OUT/j['archive_output'] if j.get('archive_output') else OUT/j['slug']/'motions'/j['template']);folder.mkdir(parents=True,exist_ok=True)
   sizes=[]
@@ -100,13 +103,30 @@ class Production:
   c=self.s['characters'][slug];jid=c.get('image');j=self.s['jobs'].get(jid,{})
   if j.get('status')!='completed'or c.get('image_verified')or c.get('image_invalid'):return
   try:
-   data=request('/mcp/images/'+jid+'/download')
+   cached=OUT/slug/('.download-'+jid)
+   data=cached.read_bytes() if cached.exists() else request('/mcp/images/'+jid+'/download')
    if data[:2]==b'PK':
     z=zipfile.ZipFile(io.BytesIO(data));pngs=[n for n in z.namelist()if n.endswith('.png')];assert len(pngs)==1;data=z.read(pngs[0])
-   im=Image.open(io.BytesIO(data)).convert('RGBA');im.load();bbox=im.getbbox();colors=len({px for px in im.getdata()if px[3]});alpha=sorted(set(im.getchannel('A').getdata()));checks={'size':list(im.size),'bbox':list(bbox)if bbox else None,'colors':colors,'alpha':alpha,'original_pixels_preserved':True}
+   im=Image.open(io.BytesIO(data)).convert('RGBA');im.load();native_size=im.size
+   if self.by[slug].get('native_height_canvas') and not (self.by[slug].get('image_inpaint_source') or self.by[slug].get('image_edit_source')):
+    expected=self.by[slug]['pixel_request']['image_size'];assert im.size==(expected['width'],expected['height']),'wrong native canvas'
+    (OUT/slug/'native-generation.png').write_bytes(data)
+    assert im.width==128 and im.height<=256
+    padded=Image.new('RGBA',(128,256));padded.paste(im,(0,256-im.height));im=padded
+    buf=io.BytesIO();im.save(buf,format='PNG');data=buf.getvalue()
+   bbox=im.getbbox();colors=len({px for px in im.getdata()if px[3]});alpha=sorted(set(im.getchannel('A').getdata()));checks={'size':list(im.size),'native_size':list(native_size),'bbox':list(bbox)if bbox else None,'colors':colors,'alpha':alpha,'original_pixels_preserved':True,'resampled':False}
+   a=self.by[slug]
+   if a.get('image_inpaint_source'):
+    source=Image.open(ROOT/a['image_inpaint_source']).convert('RGBA');mask=Image.open(ROOT/a['image_inpaint_mask']).convert('RGB')
+    assert source.size==mask.size==im.size,'inpaint canvas changed'
+    assert all(before==after for before,after,mark in zip(source.getdata(),im.getdata(),mask.getdata())if mark==(0,0,0)),'inpaint modified unmasked RGBA'
+    checks['unmasked_rgba_preserved']=True
    (OUT/slug/'reference.png').write_bytes(data);atomic(OUT/slug/'image-verification.json',checks)
-   assert im.size==(128,256),'wrong canvas';assert bbox and bbox[3]-bbox[1]>=180,'figure too small';assert colors<=48,'palette cap exceeded';assert alpha==[0,255],'unexpected alpha'
-   c['image_verified']=True;self.event('image-verified',slug,checks)
+   palette_limit=a.get('image_validation_palette_limit',48);checks['palette_limit']=palette_limit
+   atomic(OUT/slug/'image-verification.json',checks)
+   assert im.size==(128,256),'wrong canvas';assert bbox and bbox[3]-bbox[1]>=180,'figure too small';assert colors<=palette_limit,'palette cap exceeded';assert alpha==[0,255],'unexpected alpha'
+   c['image_verified']=True;self.event('image-format-verified',slug,checks)
+   if cached.exists():cached.unlink()
   except urllib.error.HTTPError as e:
    c['download_error']=str(e) # transient delivery is read-only and can be checked again
   except Exception as e:
@@ -123,16 +143,61 @@ class Production:
   except Exception as e:c['readiness_error']=str(e)
   self.save()
  def image_request(self,a):
-  args=dict(a['pixel_request']);usage=args.pop('style_usage_description');path=ROOT/args.pop('style_reference_local');im=Image.open(path);args['style_image']={'image':{'type':'base64','base64':base64.b64encode(path.read_bytes()).decode(),'format':'png'},'size':{'width':im.width,'height':im.height},'usage_description':usage};return args
+  if a.get('image_inpaint_source'):
+   encoded=lambda path:{'type':'base64','base64':base64.b64encode((ROOT/path).read_bytes()).decode(),'format':'png'}
+   args={'image':encoded(a['image_inpaint_source']),'mask_image':encoded(a['image_inpaint_mask']),'description':a['image_inpaint_description'],'no_background':True,'output_method':'Modify current layer','crop_to_mask':True,'seed':a['pixel_request'].get('seed',0)}
+   if a.get('image_inpaint_context_source'):
+    args['context_image']=encoded(a['image_inpaint_context_source']);args['bounding_box']=a['image_inpaint_context_box']
+   return args
+  if a.get('image_edit_source'):
+   return {'image':{'type':'base64','base64':base64.b64encode((ROOT/a['image_edit_source']).read_bytes()).decode(),'format':'png'},'method':'text','description':a['image_edit_description'],'no_background':True,'use_color_palette_correction':True,'seed':a['pixel_request'].get('seed',0)}
+  args=dict(a['pixel_request']);usage=args.pop('style_usage_description',None);source=args.pop('style_reference_local',None)
+  if source:
+   path=ROOT/source;im=Image.open(path);args['style_image']={'image':{'type':'base64','base64':base64.b64encode(path.read_bytes()).decode(),'format':'png'},'size':{'width':im.width,'height':im.height},'usage_description':usage}
+  return args
+ def custom_motion_request(self,slug,template,spec_path):
+  spec=json.loads((ROOT/spec_path).read_text())
+  assert spec['character_id']==self.s['characters'][slug]['character_id']
+  assert spec['slug']==slug and spec['slot']==template and spec.get('skeleton_visually_reviewed')
+  args=spec['request'];assert args['no_background'] is True
+  with Image.open(ROOT/spec['first_frame_path']) as im:assert max(im.size)<=256
+  assert 3<=len(args['keypoints'])<=15
+  for frame in [args['first_frame_keypoints'],*args['keypoints']]:
+   assert len(frame)==18 and len({p['label'] for p in frame})==18
+   assert all(0<=p['x']<=1 and 0<=p['y']<=1 for p in frame)
+  args['first_frame']={'type':'base64','format':'png','base64':base64.b64encode((ROOT/spec['first_frame_path']).read_bytes()).decode()}
+  return args
  def registration_request(self,a):
-  return{'description':a['name']+' / '+a['english']+'. '+a['appearance']+' Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.','reference_image':{'type':'base64','base64':base64.b64encode((OUT/a['slug']/'reference.png').read_bytes()).decode(),'format':'png'},'n_directions':8,'view':'low top-down','template_id':'mannequin','name':a['name'],'seed':10222027,'no_background':True}
+  args={'description':a['name']+' / '+a['english']+'. '+a['appearance']+' Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Do not invent patches, badges, logos or markings absent from the supplied image. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches.','reference_image':{'type':'base64','base64':base64.b64encode((OUT/a['slug']/'reference.png').read_bytes()).decode(),'format':'png'},'n_directions':8,'view':'low top-down','template_id':'mannequin','name':a['name'],'seed':10222027,'no_background':True}
+  if a.get('registration_import_zip'):
+   assert a.get('registration_import_review'),'Previously generated directions require explicit visual review'
+   path=ROOT/a['registration_import_zip'];meta=json.loads((path.parent/'rejection.json').read_text())
+   assert meta['slug']==a['slug'] and meta['state_before']['image']==self.s['characters'][a['slug']]['image'],'Do not import another identity or an obsolete source'
+   directions=['south','south-east','east','north-east','north','north-west','west','south-west']
+   redo=set(a.get('registration_regenerate_directions',[]));assert redo<=set(directions)-{'south'}
+   with zipfile.ZipFile(path) as z:
+    frames={dr:z.read('Idle/rotations/'+dr+'.png') for dr in directions}
+   assert all(Image.open(io.BytesIO(data)).size==(128,256) for data in frames.values())
+   encode=lambda data:{'type':'base64','base64':base64.b64encode(data).decode(),'format':'png'}
+   args['reference_image']=encode(frames['south'])
+   args['direction_images']={dr:encode(frames[dr])for dr in directions if dr!='south' and dr not in redo}
+  return args
  @staticmethod
  def motion_direction(template):
   return 'south-east'if template in {'breathing-idle','drinking'}else'east'
  def animation_request(self,a,template,label):
-  policy=json.loads((OUT/'control.json').read_text()).get('character_direction_overrides',{}).get(a['slug'],{})
+  control=json.loads((OUT/'control.json').read_text())
+  policy=control.get('character_direction_overrides',{}).get(a['slug'],{})
   direction=policy.get('stationary_noncombat' if template in {'breathing-idle','drinking'} else 'movement_and_combat',self.motion_direction(template))
   args={'character_id':self.s['characters'][a['slug']]['character_id'],'mode':'skeleton-v3','template_animation_id':template,'directions':[direction],'animation_name':label+' ('+{'east':'동쪽','south-east':'남동','west':'서쪽','south-west':'남서'}[direction]+')'}
+  override=control.get('motion_template_overrides',{}).get(a['slug'],{}).get(template)
+  if override:
+   assert template=='running-8-frames' and override in {'running-4-frames','running-6-frames'}
+   args['template_animation_id']=override
+  seed=control.get('motion_seed_overrides',{}).get(a['slug'],{}).get(template)
+  if seed is not None:
+   assert isinstance(seed,int) and seed>=0
+   args['seed']=seed
   if template=='walking-8-frames':
    if any(x in a['appearance']for x in ['broad','muscular','heavy']):gait='walking with grounded measured strides, a stable heavy torso and restrained arm swing'
    elif any(x in a['appearance']for x in ['nervous','shy','worried','weary','exhausted']):gait='walking carefully with short measured steps, slightly restrained shoulders and a gentle arm swing'
@@ -140,6 +205,7 @@ class Production:
    else:gait='walking confidently with an upright steady torso, measured strides and restrained arm swing'
    args['action_description']=gait
   elif template=='running-8-frames':args['action_description']='running decisively with a steady torso, controlled arm swing and firm purposeful strides'
+  args['action_description']=args.get('action_description',template.replace('-',' '))+'. Preserve this character identity, costume, hair and native proportions. Keep a clean transparent silhouette in every frame. No gray painted patches, gray halo, ground shadow or opaque background around hair, hands, clothes or feet.'
   return args
  def apply_repairs(self):
   path=OUT/'repair-queue.json'
@@ -167,6 +233,18 @@ class Production:
   if time.time()<self.s.get('retry_after',0):return
   self.manifest=json.loads((OUT/'manifest.json').read_text());self.by={a['slug']:a for a in self.manifest}
   self.apply_repairs()
+  # Independent read-only downloads run concurrently; state decisions remain serial.
+  pending=[(a['slug'],self.s['characters'][a['slug']].get('image')) for a in self.manifest
+           if not self.s['characters'][a['slug']].get('image_verified')
+           and not self.s['characters'][a['slug']].get('image_invalid')]
+  def download_one(pair):
+   slug,jid=pair
+   if self.s['jobs'].get(jid,{}).get('status')!='completed':return
+   path=OUT/slug/('.download-'+jid)
+   if path.exists():return
+   try:path.write_bytes(request('/mcp/images/'+jid+'/download'))
+   except Exception:return # validate_image records/retries delivery errors serially
+  with concurrent.futures.ThreadPoolExecutor(max_workers=8)as pool:list(pool.map(download_one,pending))
   for a in self.manifest:
    slug=a['slug'];self.validate_image(slug);self.check_ready(slug)
   # Keep room for both production streams; 20 global in-flight requests at most.
@@ -180,29 +258,43 @@ class Production:
    if len(active())>=20:return
    c=self.s['characters'][a['slug']]
    if a.get('pixel_request')and not c.get('image')and a['slug']in json.loads((OUT/'control.json').read_text()).get('image_approved_slugs',[x['slug']for x in self.manifest])and sum(j['kind']in['image','registration']for j in active())<json.loads((OUT/'control.json').read_text()).get('max_character_pipeline_in_flight',6):
-    self.submit('image',a['slug'],'create-image-pro-flash',self.image_request(a))
+    route='inpaint-image-pro-flash' if a.get('image_inpaint_source') else 'edit-image-pro-flash' if a.get('image_edit_source') else 'create-image-pro-flash'
+    self.submit('image',a['slug'],route,self.image_request(a))
   # A visual gate prevents spreading a broken animation route to the whole roster.
   control=json.loads((OUT/'control.json').read_text())
   if not control.get('release_skeleton_v3_motions'):return
+  # User requires every roster member's eight directions before the first new motion.
+  if not all(self.s['characters'][a['slug']].get('ready') and
+             self.s['characters'][a['slug']].get('eight_way_visual_reviewed')
+             for a in self.manifest):return
   # Fill motion slots in roster/faction order without waiting for previous clip completion.
   for a in self.manifest:
    c=self.s['characters'][a['slug']]
    if not c.get('ready')or a['slug']not in control.get('motion_allowed_slugs',[]):continue
+   # Validate the person's mandatory rigs before any paid clip is submitted.
+   # Some registered characters lack the requested direction's 2D landmarks.
+   if not c['motions']:
+    specs=control.get('custom_motion_specs',{}).get(a['slug'],{})
+    required=control.get('required_custom_motion_slots',[])
+    if any(not specs.get(slot) for slot in required):return
+    for slot in required:self.custom_motion_request(a['slug'],slot,specs[slot])
    for template,label in TEMPLATES:
     if len(active())>=20:return
-    if not c['motions'].get(template):self.submit('animation',a['slug'],'animate-character',self.animation_request(a,template,label),template)
+    if not c['motions'].get(template):
+     custom=control.get('custom_motion_specs',{}).get(a['slug'],{}).get(template)
+     path='animate-with-skeleton-v3' if custom else 'animate-character'
+     args=self.custom_motion_request(a['slug'],template,custom) if custom else self.animation_request(a,template,label)
+     self.submit('animation',a['slug'],path,args,template)
+   # Finish and visually review this person before moving to the next one.
+   if not c.get('motions_visual_reviewed'):return
  def overview(self):
-  jobs=list(self.s['jobs'].values());counts={k:sum(j['status']==k for j in jobs)for k in ['processing','completed','failed','stalled']};self.s['summary']={'jobs':counts,'characters_ready':sum(bool(c.get('ready'))for c in self.s['characters'].values()),'characters_total':len(self.manifest),'images_verified':sum(bool(c.get('image_verified'))for c in self.s['characters'].values()),'motions_submitted':sum(len(c['motions'])for c in self.s['characters'].values()),'motions_target':len(self.manifest)*len(TEMPLATES)};self.save();print(json.dumps(self.s['summary'],ensure_ascii=False),flush=True)
+  jobs=list(self.s['jobs'].values());counts={k:sum(j['status']==k for j in jobs)for k in ['processing','completed','failed','stalled']};chars=list(self.s['characters'].values());self.s['summary']={'jobs':counts,'characters_ready':sum(bool(c.get('ready'))for c in chars),'characters_total':len(self.manifest),'images_format_verified':sum(bool(c.get('image_verified'))for c in chars),'new_images_visually_reviewed':sum(bool(c.get('image_visually_reviewed'))for c in chars),'eight_way_visually_reviewed':sum(bool(c.get('eight_way_visual_reviewed'))for c in chars),'characters_motions_visually_reviewed':sum(bool(c.get('motions_visual_reviewed'))for c in chars),'motions_submitted':sum(len(c['motions'])for c in chars),'motions_target':len(self.manifest)*len(TEMPLATES)};self.save();print(json.dumps(self.s['summary'],ensure_ascii=False),flush=True)
  def done(self):
-  control=json.loads((OUT/'control.json').read_text())
   if any(j['status']=='processing'for j in self.s['jobs'].values()):return False
   for a in self.manifest:
    c=self.s['characters'][a['slug']]
-   if c.get('ready'):
-    if control.get('release_skeleton_v3_motions')and a['slug']in control.get('motion_allowed_slugs',[])and any(not c['motions'].get(t)for t,_ in TEMPLATES):return False
-   elif c.get('image_verified')and not c.get('registration')and a['slug']in json.loads((OUT/'control.json').read_text()).get('registration_approved_slugs',[x['slug']for x in self.manifest])and a['slug']not in json.loads((OUT/'control.json').read_text()).get('registration_held_slugs',[]):return False
-   elif not c.get('image')and a.get('pixel_request'):return False
-   elif c.get('registration')in self.s['jobs']and self.s['jobs'][c['registration']]['status']=='completed'and not c.get('skeleton_problem'):return False
+   if not all(c.get(k)for k in ['ready','eight_way_visual_reviewed','motions_visual_reviewed','exported']):return False
+   if any(self.s['jobs'].get(c['motions'].get(t),{}).get('status')!='completed'for t,_ in TEMPLATES):return False
   return True
  def export_ready(self):
   for a in self.manifest:
@@ -211,7 +303,33 @@ class Production:
    if any(self.s['jobs'].get(j,{}).get('status')=='processing'for j in c['motions'].values()):continue
    try:
     data=request('/v2/characters/'+c['character_id']+'/zip');(OUT/slug/'character.zip').write_bytes(data)
-    z=zipfile.ZipFile(io.BytesIO(data));meta=json.loads(z.read('metadata.json'));atomic(OUT/slug/'export-metadata.json',meta);c['exported']=True;self.event('exported',slug,{'bytes':len(data),'files':len(z.namelist())})
+    z=zipfile.ZipFile(io.BytesIO(data));meta=json.loads(z.read('metadata.json'));atomic(OUT/slug/'export-metadata.json',meta)
+    if a.get('registration_import_zip'):
+     preserved={}
+     with zipfile.ZipFile(ROOT/a['registration_import_zip']) as before_zip:
+      for dr in ['south','south-east','east','north-east','north','north-west','west','south-west']:
+       if dr in a.get('registration_regenerate_directions',[]):continue
+       name='Idle/rotations/'+dr+'.png';before=Image.open(io.BytesIO(before_zip.read(name))).convert('RGBA');after=Image.open(io.BytesIO(z.read(name))).convert('RGBA')
+       preserved[dr]=before.size==after.size and all(x[3]==y[3] and (not x[3] or x==y)for x,y in zip(before.getdata(),after.getdata()))
+     atomic(OUT/slug/'import-preservation.json',{'visible_rgba_and_alpha_preserved':preserved,'regenerated_directions':a.get('registration_regenerate_directions',[])})
+     assert all(preserved.values()),'Imported direction pixels changed; inspect before export approval'
+    # Direct skeleton jobs are standalone, so include every selected local clip
+    # in an explicit production pack rather than claiming it is in the service ZIP.
+    pack_meta={'character_id':c['character_id'],'motions_visually_reviewed':bool(c.get('motions_visual_reviewed')),'new_user_approval':False,'clips':{}}
+    with zipfile.ZipFile(OUT/slug/'production-pack.zip','w',zipfile.ZIP_DEFLATED) as pack:
+     for name in z.namelist():
+      if name.startswith('Idle/rotations/') and name.endswith('.png'):pack.writestr(name,z.read(name))
+     for template,jid in c['motions'].items():
+      folder=OUT/slug/'motions'/template;job=self.s['jobs'].get(jid,{})
+      if job.get('status')!='completed':continue
+      files=sorted(folder.glob('*.png'),key=lambda x:int(x.stem))
+      review=json.loads((folder/'visual-review.json').read_text()) if (folder/'visual-review.json').exists() else None
+      pack_meta['clips'][template]={'job_id':jid,'endpoint':job.get('endpoint','animate-character'),'frame_count':len(files),'review':review}
+      assembly=c.get('motion_assemblies',{}).get(template)
+      if assembly and assembly['base_job_id']==jid:pack_meta['clips'][template]['frame_assembly']=assembly
+      for f in files:pack.write(f,'motions/'+template+'/'+f.name)
+     pack.writestr('production-metadata.json',json.dumps(pack_meta,ensure_ascii=False,indent=2))
+    c['exported']=True;self.event('exported',slug,{'bytes':len(data),'files':len(z.namelist()),'production_pack_clips':len(pack_meta['clips'])})
    except Exception as e:c['export_error']=str(e)
   self.save()
  def checkpoint(self):
@@ -242,7 +360,7 @@ def main():
  while True:
   try:
    p.poll();p.schedule();p.export_ready();p.overview();p.checkpoint()
-   if p.done():p.event('all-independent-work-finished','all',p.s['summary']);p.save();break
+   if p.done():p.event('all-production-visually-reviewed','all',p.s['summary']);p.save();break
   except Exception as e:
    p.event('runner-cycle-error','all',str(e));p.save()
   if args.once:break

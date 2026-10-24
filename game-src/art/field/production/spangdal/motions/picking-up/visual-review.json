@@ -1,0 +1,79 @@
+{
+  "at": 1792803414.2428584,
+  "job_id": "1d24245d-d3f3-4764-9912-1f5675743a80",
+  "result": "pass",
+  "findings": "Full eight-frame assembled clip viewed: low pose now has continuous face/neck/hands and retains own skirt and WEST posture; ascent/descent connect; no gray exterior paint or holes.",
+  "frame_count": 8,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ],
+  "frame_assembly": {
+    "base_job_id": "1d24245d-d3f3-4764-9912-1f5675743a80",
+    "frame_sources": [
+      {
+        "frame_index": 0,
+        "source_job_id": "1d24245d-d3f3-4764-9912-1f5675743a80",
+        "source_frame_index": 0,
+        "sha256": "0820cca87187cc0d402806d3f5f020c450a51f1758a5afe2afa1e2d044f79c0c"
+      },
+      {
+        "frame_index": 1,
+        "source_job_id": "1d24245d-d3f3-4764-9912-1f5675743a80",
+        "source_frame_index": 1,
+        "sha256": "c62223d1e6c734fcdc40ef5f2272bd3c3b23cfbee3b0543feca4bab121751d95"
+      },
+      {
+        "frame_index": 2,
+        "source_job_id": "1d24245d-d3f3-4764-9912-1f5675743a80",
+        "source_frame_index": 2,
+        "sha256": "19406f9a7574a58b1371df0d7c4da090f00459df98aea99ef19cbd4d39d34a62"
+      },
+      {
+        "frame_index": 3,
+        "source_job_id": "1d24245d-d3f3-4764-9912-1f5675743a80",
+        "source_frame_index": 3,
+        "sha256": "0d15a2cf659e18a633d8b5fd397733dc8215d362f8491033e2f843f30283e241"
+      },
+      {
+        "frame_index": 4,
+        "source_job_id": "2c303eed-1fe3-484b-bf16-d095744d05c8",
+        "source_frame_index": 1,
+        "target_pose_index": 4,
+        "source_path": "motion-frame-candidates/spangdal/picking-up/low-pose-1/frames/1.png",
+        "sha256": "29811d27a59f67ab3f1891105c3eb3b10d9a6d8eb3feaa6bb4235066c8cd6c9e",
+        "findings": "Candidate 1 matches low pickup target with intact face, neck, hands and legs; own purple bob/skirt/pumps; no gray exterior or transparent holes."
+      },
+      {
+        "frame_index": 5,
+        "source_job_id": "1d24245d-d3f3-4764-9912-1f5675743a80",
+        "source_frame_index": 5,
+        "sha256": "60aaa1d7b6d0216c1fb73f3766b86e9d1f5d40f7c68ad7a3a23f973ccfca12fc"
+      },
+      {
+        "frame_index": 6,
+        "source_job_id": "1d24245d-d3f3-4764-9912-1f5675743a80",
+        "source_frame_index": 6,
+        "sha256": "80b46d39a4f16f4310d829b590bd12c144838d463eb6421041e62656f2600663"
+      },
+      {
+        "frame_index": 7,
+        "source_job_id": "1d24245d-d3f3-4764-9912-1f5675743a80",
+        "source_frame_index": 7,
+        "sha256": "6371679a11197209df73a2fdd74d7dec2bc7fba9c0091462e71b0de21da5cad1"
+      }
+    ],
+    "method": "select complete same-pose regenerated frames; no pixel editing",
+    "new_user_approval": false,
+    "visual_reviewed": true
+  }
+}

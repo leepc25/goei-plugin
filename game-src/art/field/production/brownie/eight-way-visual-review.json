@@ -1,0 +1,25 @@
+{
+  "at": 1792794263.0251386,
+  "character_id": "31336750-c528-4f6d-98fa-ab42f7c54086",
+  "result": "pass",
+  "directions_reviewed": [
+    "south",
+    "south-east",
+    "east",
+    "north-east",
+    "north",
+    "north-west",
+    "west",
+    "south-west"
+  ],
+  "findings": "AVIF의 웃는 CRT TV 머리·갈색 쓰리피스·검은 장갑과 큰 체격을 8방향 대조. TV 옆·뒤 구조 일관, 회색 외곽 없음. 로어의 거대한 체격 보충·전원 장벽 재확인.",
+  "movement_direction": "east",
+  "stationary_direction": "south-east",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF primary",
+    "Lore supplementary height",
+    "All55 before motion",
+    "Gray outer paint reroll"
+  ]
+}

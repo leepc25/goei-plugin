@@ -1,0 +1,30 @@
+{
+  "description": "Full-body native pixel-art game sprite, STRICTLY FRONT SOUTH view: face, nose, chest, belt and knees directly toward viewer, both ears equally visible. No sideways head or three-quarter turn. IDENTITY: Lean ordinary young adult man, slender long neck and narrow jaw, sly sideways smile. Smooth black bowl-like hair with thick long blunt bangs hanging down to aviator sunglasses. Black jacket sleeves and white shirt sleeves ROLLED to elbows, both forearms bare. White shirt collar OPEN revealing upper chest, black necktie very LOOSE with knot low on chest. Black jacket open. Do not button collar or tighten tie. Relaxed upright stance, empty hands at sides. Natural adult anatomy, normal torso/pelvis, 7-head proportions. Anatomical crown to soles 214-222px; feet 6px above bottom, hair fully inside frame. Crisp single-pixel clusters, selective dark outlines, restrained game-sprite shading, no antialiasing. Transparent background, no ground shadow, text or weapons. Preserve individual hair, face, stature and clothing. Do not copy any generic character. Anatomical height excludes high hair/headwear. Every outer edge must border transparency directly, never a light gray halo. Keep the same anatomical native height as reference. Feet at y250, crown around y30. Do not copy reference identity or body fat.",
+  "image_size": {
+    "width": 128,
+    "height": 256
+  },
+  "no_background": true,
+  "seed": 1792789852,
+  "target_palette": {
+    "max_colors": 48
+  },
+  "style_options": {
+    "color_palette": true,
+    "outline": true,
+    "detail": true,
+    "shading": true
+  },
+  "style_image": {
+    "image": {
+      "type": "base64",
+      "base64": "[image payload omitted]",
+      "format": "png"
+    },
+    "size": {
+      "width": 128,
+      "height": 256
+    },
+    "usage_description": "Use only native pixel rendering, standing scale and FRONT SOUTH pose. Preserve target individual identity, age, hair, face, build and clothes from description."
+  }
+}

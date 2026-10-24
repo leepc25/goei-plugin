@@ -1,0 +1,17 @@
+{
+  "image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "mask_image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "description": "Erase the tiny detached BLACK SPECK in this selected otherwise EMPTY BACKGROUND. Remove the three disconnected black pixels completely to transparent empty background. Do not add hair, shading, cloth or any object here. Preserve all unmasked pixels and the nearby ponytail and jacket exactly.",
+  "no_background": true,
+  "output_method": "Modify current layer",
+  "crop_to_mask": true,
+  "seed": 1792795558
+}

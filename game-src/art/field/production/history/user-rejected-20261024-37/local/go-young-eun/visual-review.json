@@ -1,0 +1,14 @@
+{
+  "job": "46eb4795-49b3-48b9-aeb9-375b4d9f1aec",
+  "job_status": "completed",
+  "decision": "pass",
+  "reason": "짙은 갈색 턱단발·굵은 앞머리·노출된 귀·부드러운 얼굴과 체형·남색 바지정장 유지. 정면·208px 모발 포함·여성 본체 키 부근, 투명 외곽 정상.",
+  "at": 1792790948.475795,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

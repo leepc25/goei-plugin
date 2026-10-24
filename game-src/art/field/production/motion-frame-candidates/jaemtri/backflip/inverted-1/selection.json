@@ -1,0 +1,9 @@
+{
+  "frame_index": 3,
+  "source_job_id": "0fc54ecd-45cf-4e51-bd78-ad5d8e717c4a",
+  "source_frame_index": 1,
+  "target_pose_index": 3,
+  "source_path": "motion-frame-candidates/jaemtri/backflip/inverted-1/frames/1.png",
+  "sha256": "7d60f7007249963a41b0b2b2fb425ff35b2d2e9fa7864dcac88f94d8e80c8053",
+  "findings": "역전 단계의 손발/얼굴/머리와 신발 외곽 온전. 0번 흐린 신발 반려,1번 정상 후보 선택."
+}

@@ -1,0 +1,20 @@
+{
+  "at": 1792803280.3920898,
+  "job_id": "4bf1b642-34eb-45e2-a179-23146d96b855",
+  "result": "reroll-required",
+  "findings": "Frame 5 cup collapses into gray fragments beside neck with damaged hand; second template seed did not fix failure. Change to explicit own-source drinking skeleton.",
+  "frame_count": 6,
+  "directions": [
+    "south-west"
+  ],
+  "actual_template": "drinking",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

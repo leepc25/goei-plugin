@@ -1,0 +1,14 @@
+{
+  "job": "ee93e07e-c778-4160-9535-29aaefd70c9c",
+  "job_status": "completed",
+  "decision": "reroll",
+  "reason": "원작의 낮은 채도 청회색 머리와 어두운 자주색 망토가 선명한 파랑·보라로 변함. 해당 색 영역만 마스크 교정해 얼굴·초록 눈·체형·검은 정장 보존.",
+  "at": 1792792775.2408257,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

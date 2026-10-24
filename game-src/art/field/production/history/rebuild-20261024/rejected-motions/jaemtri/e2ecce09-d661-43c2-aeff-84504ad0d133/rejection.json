@@ -1,0 +1,148 @@
+{
+  "reason": "Guard-like result; revise forward lean and palm reach using own arm lengths.",
+  "job": {
+    "kind": "animation",
+    "slug": "jaemtri",
+    "template": "pushing",
+    "status": "completed",
+    "created_epoch": 1792804300.5129943,
+    "receipt": {
+      "usage": null,
+      "background_job_id": "e2ecce09-d661-43c2-aeff-84504ad0d133",
+      "status": "processing"
+    },
+    "endpoint": "animate-with-skeleton-v3",
+    "last_response": {
+      "usage": {
+        "type": "generations",
+        "generations": 3.0
+      },
+      "id": "e2ecce09-d661-43c2-aeff-84504ad0d133",
+      "status": "completed",
+      "created_at": "2026-10-24T01:11:40.658397+00:00",
+      "last_response": {
+        "seed": 2026110409,
+        "type": "done",
+        "action": "smoothing frames",
+        "images": [
+          {
+            "type": "base64",
+            "width": 256,
+            "base64": "[image payload omitted]",
+            "height": 256
+          },
+          {
+            "type": "base64",
+            "width": 256,
+            "base64": "[image payload omitted]",
+            "height": 256
+          },
+          {
+            "type": "base64",
+            "width": 256,
+            "base64": "[image payload omitted]",
+            "height": 256
+          },
+          {
+            "type": "base64",
+            "width": 256,
+            "base64": "[image payload omitted]",
+            "height": 256
+          },
+          {
+            "type": "base64",
+            "width": 256,
+            "base64": "[image payload omitted]",
+            "height": 256
+          },
+          {
+            "type": "base64",
+            "width": 256,
+            "base64": "[image payload omitted]",
+            "height": 256
+          },
+          {
+            "type": "base64",
+            "width": 256,
+            "base64": "[image payload omitted]",
+            "height": 256
+          },
+          {
+            "type": "base64",
+            "width": 256,
+            "base64": "[image payload omitted]",
+            "height": 256
+          }
+        ],
+        "status": "initializing",
+        "progress": 1.0,
+        "flow_kind": "animation",
+        "billing_usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "generation_id": "348f8d58-1aab-4952-82fe-6a30c3bd3f31",
+        "queue_position": 0,
+        "billing_charged": true,
+        "generation_started_at": "2026-10-24T01:12:39.334584+00:00",
+        "estimated_wait_seconds": 0
+      }
+    },
+    "observed_end_epoch": 1792804520.8478734,
+    "elapsed_observed_seconds": 220.33487939834595,
+    "usage": {
+      "usd": 0.0,
+      "type": "generations",
+      "generations": 3
+    },
+    "saved_frames": 8
+  },
+  "at": 1792804742.8760705,
+  "state_before": {
+    "name": "잼트리",
+    "group": "management",
+    "character_id": "f937666b-c116-4408-8864-55e7743850a5",
+    "image": "a32c319b-d494-4fb0-b04e-1576a6243021",
+    "registration": "c39dacdf-7d7e-4648-bceb-6900ea2c8fd8",
+    "motions": {
+      "breathing-idle": "585dd8b2-dab9-49c4-867d-650294089a71",
+      "walking-8-frames": "2f3d540f-6770-442f-a9f4-a2a12320fe11",
+      "drinking": "dc6f89a3-0b61-4e26-bb08-73ecb7852b25",
+      "pull-heavy-object": "df4b0e3c-2074-4bbe-8551-1f693b36c9ad",
+      "fight-stance-idle-8-frames": "4e33ccea-e38f-4f32-9cfe-8ded7f02e6dc",
+      "picking-up": "1a8ae1e5-ecae-4bd6-9367-d0c75519e4cc",
+      "lead-jab": "da3739c8-609a-43a1-9bbd-acb9c7f0d250",
+      "running-8-frames": "85cc46f4-f282-4c85-84a5-8806f0c0dbb8",
+      "running-slide": "f0edcb83-0b00-45e5-aef3-53223e4c989a",
+      "crouched-walking": "8e822486-043a-4c72-ae8c-322e4a2d86d6",
+      "sad-walk": "dd2dc9ab-c87a-4894-9eb1-4daf3f005733",
+      "front-flip": "8f183936-03f3-4f8f-8002-668ee31d5977",
+      "backflip": "ef10ae23-11ce-484f-8d5b-634bbb15a4c9",
+      "jumping-1": "74d1cc71-5cd6-4798-ab81-6884fc25bb29",
+      "jumping-2": "3c6c64ce-622e-44c3-8eb2-a043ee45d221",
+      "two-footed-jump": "2be8354d-3922-4535-8152-cab5ef51f1f9",
+      "pushing": "e2ecce09-d661-43c2-aeff-84504ad0d133",
+      "throw-object": "62f4c3b9-4d84-4975-b7b3-22c513a5f2fb",
+      "cross-punch": "a2d20675-c8f9-4e9a-a44f-df1ec4e7f2f0"
+    },
+    "ready": true,
+    "image_verified": true,
+    "skeleton_joints": 18,
+    "rotation_count": 8,
+    "exported": false,
+    "eight_way_visual_reviewed": true,
+    "motions_visual_reviewed": false,
+    "motion-frame-candidate-picking-up-low-pose-1": "40c26d95-c80c-468d-bd5f-30bf1465acb6",
+    "motion-frame-candidate-throw-object-empty-release-1": "e4f6ccb6-7297-4453-8c16-d976d5558f26",
+    "motion-frame-candidate-throw-object-empty-recover-1": "af91c70f-1c1c-4a87-97ab-da73d7574011",
+    "motion-frame-candidate-throw-object-empty-rest-1": "4f969d11-7488-4dcb-9b2a-8d68556f26e5",
+    "motion-frame-candidate-running-8-frames-hair-1": "bed72780-d7f2-4bce-92b5-af8378b7430c",
+    "motion-frame-candidate-jumping-1-hair-start-1": "b5c5ac54-f9a4-4452-a2ad-1b2a3259cfc7",
+    "motion-frame-candidate-jumping-1-hair-land-1": "480ee045-dfea-4c9a-aee7-c64e2435a0f2",
+    "motion-frame-candidate-two-footed-jump-hair-start-1": "16ccd3fa-5110-4cc2-be0e-1a1544888ddb",
+    "motion-frame-candidate-two-footed-jump-hair-land-1": "f9b2c65c-05da-4697-be89-fcb583c6e5c9",
+    "motion-frame-candidate-running-slide-low-slide-1": "3873b31c-c32e-46e3-9d67-a454897b03ca"
+  },
+  "standalone": true
+}

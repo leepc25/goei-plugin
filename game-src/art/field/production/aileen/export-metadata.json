@@ -27,10 +27,19 @@
           "west": "Idle/rotations/west.png",
           "south-west": "Idle/rotations/south-west.png"
         },
-        "animations": {}
+        "animations": {
+          "breathing_idle._Preserve_this_character_identity_c": {
+            "south-east": [
+              "Idle/animations/breathing_idle._Preserve_this_character_identity_c/south-east/frame_000.png",
+              "Idle/animations/breathing_idle._Preserve_this_character_identity_c/south-east/frame_001.png",
+              "Idle/animations/breathing_idle._Preserve_this_character_identity_c/south-east/frame_002.png",
+              "Idle/animations/breathing_idle._Preserve_this_character_identity_c/south-east/frame_003.png"
+            ]
+          }
+        }
       }
     }
   ],
   "export_version": "3.1",
-  "export_date": "2026-10-23T19:38:11.889446"
+  "export_date": "2026-10-24T03:20:10.441544"
 }

@@ -1,0 +1,62 @@
+{
+  "reason": "재시도6프레임 머리 끝과 중간 사이에 회색 칠이 남음. 동작 자체는 개선됐지만 외곽/머리 투명 공간 결함 미해결.; 직접 관절 지정으로 재작업",
+  "group": {
+    "animation_type": "running-jump",
+    "display_name": null,
+    "animation_group_id": "b9ca3e46-a65b-478f-91ac-ce6ee459672f",
+    "directions": [
+      {
+        "direction": "west",
+        "frame_count": 8,
+        "frames": [
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/4304e69a-e403-4a03-a122-d9bfd027ffdb/west/0.png?t=1792798666",
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/4304e69a-e403-4a03-a122-d9bfd027ffdb/west/1.png?t=1792798666",
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/4304e69a-e403-4a03-a122-d9bfd027ffdb/west/2.png?t=1792798666",
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/4304e69a-e403-4a03-a122-d9bfd027ffdb/west/3.png?t=1792798666",
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/4304e69a-e403-4a03-a122-d9bfd027ffdb/west/4.png?t=1792798666",
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/4304e69a-e403-4a03-a122-d9bfd027ffdb/west/5.png?t=1792798666",
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/4304e69a-e403-4a03-a122-d9bfd027ffdb/west/6.png?t=1792798666",
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4e115078-a350-4b9f-b1d4-a131f8e2ccb6/animations/4304e69a-e403-4a03-a122-d9bfd027ffdb/west/7.png?t=1792798666"
+        ]
+      }
+    ]
+  },
+  "at": 1792799160.093102,
+  "state_before": {
+    "name": "쟈알디",
+    "group": "management",
+    "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+    "image": "78793c7b-f45f-48a6-ab11-0c1d97f86333",
+    "registration": "1a54d3e6-c143-4b60-9c05-2929c084a4cd",
+    "motions": {
+      "walking-8-frames": "3cddea2e-3a66-4291-a79c-2be803461b07",
+      "breathing-idle": "45bc5aa1-2298-47fe-98f3-6f3981d3fca2",
+      "crouched-walking": "8c4f0d0e-1cec-44ba-a650-a0f1e699b6da",
+      "sad-walk": "c137cbd9-879d-44da-ba60-da04402748bf",
+      "drinking": "9572ea4b-422f-458e-bc0f-336731cc9084",
+      "pushing": "5685bf60-f5bc-4b6b-874c-41236ed8694c",
+      "pull-heavy-object": "d06d1fbd-1d41-4d2f-abb6-f974f3994f7e",
+      "running-jump": "9972940b-0952-42a1-87aa-3ddbaa5e0ee7",
+      "running-slide": "e208d558-493e-49d2-a431-cf29054f14c9",
+      "front-flip": "6c3d792a-de83-488b-b92c-fe516e2c35fe",
+      "backflip": "abb9eb95-11be-47ab-be0f-3975065d2d78",
+      "two-footed-jump": "a4cc8130-1878-47ce-9510-c55d1d52023f",
+      "picking-up": "b3b23fc2-8704-4d99-b294-e67ca5bddb1c",
+      "throw-object": "0ec11e25-704e-47de-8469-9e2a68b93cef",
+      "fight-stance-idle-8-frames": "a4b3323c-9576-4a51-ab77-e87a166d025d",
+      "lead-jab": "5745e2b4-2d5c-4e0c-9929-12da32349952",
+      "cross-punch": "ee8251d9-7965-4da1-9fd8-c2fd6c8cc963",
+      "jumping-1": "966dbb7e-2241-435c-82cd-054e43b0b05a",
+      "jumping-2": "8b8ec1b7-5fb0-43cf-8cde-a18586116dc6"
+    },
+    "ready": true,
+    "rebuild_after_direction_policy": true,
+    "image_verified": true,
+    "skeleton_joints": 18,
+    "rotation_count": 8,
+    "exported": false,
+    "motion_direction_revision": "west-southwest",
+    "eight_way_visual_reviewed": true,
+    "motions_visual_reviewed": false
+  }
+}

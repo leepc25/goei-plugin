@@ -1,0 +1,52 @@
+{
+  "reason": "Frames 3-5 wind the rear hand behind the head instead of a controlled straight cross; replace with explicit rear-arm guard-extension-return while retaining west stance.",
+  "group": {
+    "animation_type": "cross-punch",
+    "display_name": null,
+    "animation_group_id": "05c8a721-d57f-40db-b144-0bd90ea05ab4",
+    "directions": [
+      {
+        "direction": "west",
+        "frame_count": 6,
+        "frames": [
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/9095375d-b39a-447b-b577-fcb345e78928/animations/f6f182af-1553-4d0b-9d1e-97ee56f384c2/west/0.png?t=1792802506",
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/9095375d-b39a-447b-b577-fcb345e78928/animations/f6f182af-1553-4d0b-9d1e-97ee56f384c2/west/1.png?t=1792802506",
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/9095375d-b39a-447b-b577-fcb345e78928/animations/f6f182af-1553-4d0b-9d1e-97ee56f384c2/west/2.png?t=1792802506",
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/9095375d-b39a-447b-b577-fcb345e78928/animations/f6f182af-1553-4d0b-9d1e-97ee56f384c2/west/3.png?t=1792802506",
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/9095375d-b39a-447b-b577-fcb345e78928/animations/f6f182af-1553-4d0b-9d1e-97ee56f384c2/west/4.png?t=1792802506",
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/9095375d-b39a-447b-b577-fcb345e78928/animations/f6f182af-1553-4d0b-9d1e-97ee56f384c2/west/5.png?t=1792802506"
+        ]
+      }
+    ]
+  },
+  "at": 1792802850.3539095,
+  "state_before": {
+    "name": "스팡달",
+    "group": "management",
+    "character_id": "9095375d-b39a-447b-b577-fcb345e78928",
+    "image": "e925d6ba-4f8e-41b9-b58d-53327feda5b9",
+    "registration": "8df9126b-f6ce-43bd-be01-027d0588c203",
+    "motions": {
+      "breathing-idle": "628133da-1d7d-4b81-b5d8-a4098921d739",
+      "walking-8-frames": "9812d187-c2e4-47ae-86a2-da18039e4640",
+      "crouched-walking": "5261e3f4-30e6-4c1a-88db-0dac3e6a0464",
+      "sad-walk": "7778bc41-67b6-483d-b2af-8844bbcc4775",
+      "jumping-1": "1c9f81ee-20eb-435b-9a9a-ad8fc62c19e5",
+      "jumping-2": "476b3574-8365-451e-98f8-1153a158f480",
+      "two-footed-jump": "74674eff-c597-48da-a98f-332e065866c9",
+      "drinking": "bf5bfeb6-a2e2-48a5-97d8-da30016c1f87",
+      "pushing": "c9fba02d-31ab-4b7d-a674-7617f35b7e0e",
+      "pull-heavy-object": "6d6586d6-7391-4a07-85a8-57b76ee10eed",
+      "fight-stance-idle-8-frames": "9dea4c3b-ea98-465b-b6b4-5b9d5606d6cd",
+      "cross-punch": "438619dc-0ae3-4844-8c27-e4fd7dcfadb5",
+      "lead-jab": "4cf5d376-176e-4f4d-ae08-bb746d2350a7"
+    },
+    "ready": true,
+    "image_verified": true,
+    "skeleton_joints": 18,
+    "rotation_count": 8,
+    "exported": false,
+    "eight_way_visual_reviewed": true,
+    "motions_visual_reviewed": false
+  }
+}

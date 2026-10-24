@@ -1,0 +1,16 @@
+{
+  "findings": "수정4방향의 초록 홍채를 확대 및 전신으로 확인. 원화의 흰 낮은 옆포니테일·남색 정장·운동화·작은 체격 보존. 눈 외 RGBA 동일, 나머지4방향 기존 검수 유지. 회색 외곽 없음. AVIF 우선·로어 키 보충·전원 장벽 재확인.",
+  "directions": [
+    "south-east",
+    "east",
+    "west",
+    "south-west"
+  ],
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF primary",
+    "lore height supplementary",
+    "all55 barrier",
+    "gray exterior rejection"
+  ]
+}

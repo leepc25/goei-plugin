@@ -1,0 +1,102 @@
+{
+  "slug": "aileen",
+  "slot": "crouched-walking",
+  "base_job_id": "6699c4cc-6914-4c0d-9cfa-16b8d1ac0971",
+  "target_frame_index": 3,
+  "source_spec": "game-src/art/field/production/motion-inputs/aileen/crouched-walking-actual-pose-v3/spec.json",
+  "seed": 2026113313,
+  "pose": [
+    {
+      "label": "LEFT HIP",
+      "x": 0.5414225136213892,
+      "y": 0.5338160508811526
+    },
+    {
+      "label": "RIGHT HIP",
+      "x": 0.49517569194501715,
+      "y": 0.5516032899874496
+    },
+    {
+      "label": "NECK",
+      "x": 0.5225280153550811,
+      "y": 0.33695550999873
+    },
+    {
+      "label": "LEFT SHOULDER",
+      "x": 0.5518510910853404,
+      "y": 0.3184733761508637
+    },
+    {
+      "label": "LEFT ELBOW",
+      "x": 0.4473054868007856,
+      "y": 0.37396246276717604
+    },
+    {
+      "label": "LEFT ARM",
+      "x": 0.5592576731659812,
+      "y": 0.4243239192001543
+    },
+    {
+      "label": "LEFT KNEE",
+      "x": 0.6207125944153385,
+      "y": 0.741229531851541
+    },
+    {
+      "label": "LEFT LEG",
+      "x": 0.45162178169891676,
+      "y": 0.8694197848074531
+    },
+    {
+      "label": "RIGHT SHOULDER",
+      "x": 0.49320493962482176,
+      "y": 0.3554376438465962
+    },
+    {
+      "label": "RIGHT ELBOW",
+      "x": 0.44944510339840826,
+      "y": 0.46780650948739
+    },
+    {
+      "label": "RIGHT ARM",
+      "x": 0.5707752393588814,
+      "y": 0.49567851953452813
+    },
+    {
+      "label": "RIGHT KNEE",
+      "x": 0.6597225442723267,
+      "y": 0.6962816047806591
+    },
+    {
+      "label": "RIGHT LEG",
+      "x": 0.5251704520414631,
+      "y": 0.8910149169099927
+    },
+    {
+      "label": "NOSE",
+      "x": 0.5809020842419603,
+      "y": 0.2578356658078433
+    },
+    {
+      "label": "LEFT EYE",
+      "x": 0.5795251375606081,
+      "y": 0.2373074778969711
+    },
+    {
+      "label": "RIGHT EYE",
+      "x": 0.57257000097977,
+      "y": 0.2385017839851103
+    },
+    {
+      "label": "LEFT EAR",
+      "x": 0.5518591724756846,
+      "y": 0.22630567933642853
+    },
+    {
+      "label": "RIGHT EAR",
+      "x": 0.5360801495625852,
+      "y": 0.22615109809799955
+    }
+  ],
+  "new_user_approval": false,
+  "action": "Hold the supplied skeleton pose completely still. Natural platinum blonde ponytail strands, solid black shoes."
+}

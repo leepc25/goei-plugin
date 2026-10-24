@@ -1,0 +1,20 @@
+{
+  "at": 1792798660.8821707,
+  "job_id": "a4b3323c-9576-4a51-ab77-e87a166d025d",
+  "result": "pass",
+  "findings": "새 시드8프레임 전체 검토. 주먹과 턱 사이 넓은 회색 채움이 사라지고 검은 장갑·흰 셔츠깃·타이 경계가 분리됨. 안정된 서쪽 전투 대기, 얼굴과 긴 검은 머리·정장·키 유지.",
+  "frame_count": 8,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "fight-stance-idle-8-frames",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

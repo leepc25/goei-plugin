@@ -1,0 +1,17 @@
+{
+  "image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "mask_image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "description": "Replace ONLY the tied hair behind the nape with a SHORT LOOSE BLACK LOW PONYTAIL. It hangs DOWN naturally close to the neck onto the upper back, with smooth untwisted hair strands and free tapered ends. No braid, no plait, no segmented rope, no rigid horizontal tail. Remove the horizontally protruding braided strands and restore transparent background where they were. Retain exact leather jacket shoulder outline and existing fabric under the hair. Do not change face, front hair, clothes, body, pose, scale or any unmasked pixels. Crisp native pixel art and clean transparent outer edges.",
+  "no_background": true,
+  "output_method": "Modify current layer",
+  "crop_to_mask": true,
+  "seed": 1792794850
+}

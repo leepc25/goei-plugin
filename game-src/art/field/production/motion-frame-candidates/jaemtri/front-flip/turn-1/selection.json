@@ -1,0 +1,9 @@
+{
+  "frame_index": 3,
+  "source_job_id": "30252226-16d4-4f9f-9069-7e57d73edf60",
+  "source_frame_index": 1,
+  "target_pose_index": 3,
+  "source_path": "motion-frame-candidates/jaemtri/front-flip/turn-1/frames/1.png",
+  "sha256": "3e6d250476ee6600ff43add4f7abd4c7c97c3f83f697fdc32e8c8adf47026b14",
+  "findings": "0번 흐린 신체 반려. 1번은 앞회전 자세와 갈색 머리/얼굴/손발 및 외곽 온전."
+}

@@ -1,0 +1,14 @@
+{
+  "description": "고연지 / Go Yeon-ji. Slim adult woman, pale narrow oval face, cool dark brown-gray eyes, serious neutral mouth. Straight BLACK hair to shoulders with long uneven blunt bangs and ends slightly flipped outward. OPEN white doctor coat over pale mint-blue BUTTONED COLLARED SHIRT, black trousers, stethoscope around neck with silver chestpiece. No navy surgical scrubs in this default outfit, no glasses. Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Do not invent patches, badges, logos or markings absent from the supplied image. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches.",
+  "reference_image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "n_directions": 8,
+  "view": "low top-down",
+  "template_id": "mannequin",
+  "name": "고연지",
+  "seed": 10222027,
+  "no_background": true
+}

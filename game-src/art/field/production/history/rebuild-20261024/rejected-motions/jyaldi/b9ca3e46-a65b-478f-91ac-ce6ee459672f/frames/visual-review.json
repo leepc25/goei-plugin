@@ -1,0 +1,20 @@
+{
+  "at": 1792798801.671978,
+  "job_id": "9972940b-0952-42a1-87aa-3ddbaa5e0ee7",
+  "result": "reroll-required",
+  "findings": "재시도6프레임 머리 끝과 중간 사이에 회색 칠이 남음. 동작 자체는 개선됐지만 외곽/머리 투명 공간 결함 미해결.",
+  "frame_count": 8,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "running-jump",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "name": "김조학",
+  "group": "fake-bureau",
+  "character_id": "da459680-eb0e-48ad-be84-cc8a23d8fc02",
+  "image": "74bb6f61-b7b7-4405-96f8-9cc6759c7dc5",
+  "registration": "38131ffd-13aa-42c6-bd7d-d70030f105a9",
+  "motions": {},
+  "ready": true,
+  "image_verified": true,
+  "skeleton_joints": 18,
+  "rotation_count": 8,
+  "exported": true
+}

@@ -1,0 +1,20 @@
+{
+  "at": 1792798631.8903363,
+  "job_id": "0ec11e25-704e-47de-8469-9e2a68b93cef",
+  "result": "reroll-required",
+  "findings": "갈색 공의 위치 연속성은 개선됐으나4프레임 공과 손 사이 회색 면/잔상,6프레임 앞머리 회색 외곽 남음. 외곽 기준에 따라 반려.",
+  "frame_count": 7,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "throw-object",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

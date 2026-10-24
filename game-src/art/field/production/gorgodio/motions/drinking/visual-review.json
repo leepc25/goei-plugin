@@ -1,0 +1,20 @@
+{
+  "at": 1792812671.1718395,
+  "job_id": "79484419-2153-4255-a929-f59ba8a6a0e9",
+  "result": "pass",
+  "findings": "Six SE frames retain cup continuously from chest to mouth and back; intact bald/goatee/jacket silhouette, no gray exterior fill.",
+  "frame_count": 6,
+  "directions": [
+    "south-east"
+  ],
+  "actual_template": "drinking",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

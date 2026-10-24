@@ -1,0 +1,88 @@
+{
+  "at": 1792810508.6871045,
+  "job_id": "bf0f5fe4-7bb1-4c82-b434-8ba602b1254a",
+  "result": "pass",
+  "findings": "All eight frames reviewed: hand winds back and overhead then moves forward and lowers through recovery; consistent bare hands without reappearing prop, EAST identity, intact suit and ponytail, no broad gray exterior fill.",
+  "frame_count": 8,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ],
+  "frame_assembly": {
+    "base_job_id": "bf0f5fe4-7bb1-4c82-b434-8ba602b1254a",
+    "frame_sources": [
+      {
+        "frame_index": 0,
+        "source_job_id": "bf0f5fe4-7bb1-4c82-b434-8ba602b1254a",
+        "source_frame_index": 0,
+        "sha256": "cdfeeeb789e3bcc9ad6d34c0b431cea57f27cf32ef6f1752de9e11a208a26200"
+      },
+      {
+        "frame_index": 1,
+        "source_job_id": "bf0f5fe4-7bb1-4c82-b434-8ba602b1254a",
+        "source_frame_index": 1,
+        "sha256": "a714907b022c117922822ff58ff449112bc7a29bef13cfccc56a2a42f8e55a3a"
+      },
+      {
+        "frame_index": 2,
+        "source_job_id": "bf0f5fe4-7bb1-4c82-b434-8ba602b1254a",
+        "source_frame_index": 2,
+        "sha256": "98b5c5ea9c64dadcabc061ee9a4be09f39e559b7ac45551c321a46fd516a6206"
+      },
+      {
+        "frame_index": 3,
+        "source_job_id": "bf0f5fe4-7bb1-4c82-b434-8ba602b1254a",
+        "source_frame_index": 3,
+        "sha256": "2d09d33bdcca0d3110ffede05751299861be53a26c0ff58568171f301b3a3f2c"
+      },
+      {
+        "frame_index": 4,
+        "source_job_id": "05c75e3e-500e-4668-ae08-4212b5354b57",
+        "source_frame_index": 1,
+        "target_pose_index": 4,
+        "source_path": "motion-frame-candidates/aileen/throw-object/clean-pose-4-1/frames/1.png",
+        "sha256": "eaeb039b25e492931744121e6c9c7da5aa02c4645d4e65ce57ba0eb798b5360a",
+        "findings": "후보 전체 확인. 선택 프레임은 얼굴·손·구두 외곽이 온전하고 몸 밖 회색 덩어리 없음. 같은 목표 자세 유지."
+      },
+      {
+        "frame_index": 5,
+        "source_job_id": "dcdd5c18-4609-4256-a14a-5a9b7df01325",
+        "source_frame_index": 0,
+        "target_pose_index": 5,
+        "source_path": "motion-frame-candidates/aileen/throw-object/clean-pose-5-1/frames/0.png",
+        "sha256": "b68c0f9f49503979195abe095f360901400fc1b32a931e56cdc7d88be890ce2c",
+        "findings": "Clean recovery silhouette, intact bare hands, suit and shoes; ponytail strands separate from transparent background."
+      },
+      {
+        "frame_index": 6,
+        "source_job_id": "1aa3f7da-1c05-4f30-a389-4c548f3af249",
+        "source_frame_index": 1,
+        "target_pose_index": 6,
+        "source_path": "motion-frame-candidates/aileen/throw-object/clean-pose-6-1/frames/1.png",
+        "sha256": "d43571568b47af5241fc7edf1a1b16602b2bebea6c0fc0c65524681bf464ba46",
+        "findings": "Clean recovery silhouette, intact bare hands, suit and shoes; ponytail strands separate from transparent background."
+      },
+      {
+        "frame_index": 7,
+        "source_job_id": "2aee428d-9ce5-4e71-bf76-773b4fa42f4f",
+        "source_frame_index": 1,
+        "target_pose_index": 7,
+        "source_path": "motion-frame-candidates/aileen/throw-object/clean-pose-7-1/frames/1.png",
+        "sha256": "3ee86185bc58cf8253e00a39b85ef4a6ebae0b7cb6753d4b6b03c06d6cbd2492",
+        "findings": "Clean recovery silhouette, intact bare hands, suit and shoes; ponytail strands separate from transparent background."
+      }
+    ],
+    "method": "select complete same-pose regenerated frames; no pixel editing",
+    "new_user_approval": false,
+    "visual_reviewed": true
+  }
+}

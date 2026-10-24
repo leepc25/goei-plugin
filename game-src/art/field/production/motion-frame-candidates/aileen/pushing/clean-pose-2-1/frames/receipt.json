@@ -1,0 +1,25 @@
+{
+  "job_status": "completed",
+  "frame_count": 3,
+  "sizes": [
+    [
+      256,
+      256
+    ],
+    [
+      256,
+      256
+    ],
+    [
+      256,
+      256
+    ]
+  ],
+  "usage": {
+    "usd": 0.0,
+    "type": "generations",
+    "generations": 2
+  },
+  "elapsed_observed_seconds": 405.1619670391083,
+  "visual_approval": false
+}

@@ -1,0 +1,20 @@
+{
+  "at": 1792804563.6918788,
+  "job_id": "4bb32c3d-07b2-4740-8353-aff4290d93ca",
+  "result": "reroll-required",
+  "findings": "Gray hair edge patches persist across moving-hair frames and hair sweeps over mouth. Replace first reference with own clean airborne frame 4 and preserve reviewed skeleton.",
+  "frame_count": 8,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

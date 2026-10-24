@@ -1,0 +1,14 @@
+{
+  "job": "c8c1ddea-1597-49b4-9f7b-c70ee9104cef",
+  "job_status": "completed",
+  "decision": "pass",
+  "reason": "긴 바가지 앞머리·선글라스·긴 목·열린 칼라와 낮게 풀린 넥타이·양팔 걷은 소매·슬림한 체형 확인. 정면·보통 성인 스케일·투명 외곽 정상.",
+  "at": 1792790425.9909706,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

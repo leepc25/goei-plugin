@@ -1,0 +1,20 @@
+{
+  "at": 1792802692.4374006,
+  "job_id": "438619dc-0ae3-4844-8c27-e4fd7dcfadb5",
+  "result": "reroll-required",
+  "findings": "Frames 3-5 wind the rear hand behind the head instead of a controlled straight cross; replace with explicit rear-arm guard-extension-return while retaining west stance.",
+  "frame_count": 6,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "cross-punch",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

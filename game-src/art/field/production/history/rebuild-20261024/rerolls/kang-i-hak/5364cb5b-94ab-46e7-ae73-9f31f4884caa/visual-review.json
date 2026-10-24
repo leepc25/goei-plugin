@@ -1,0 +1,13 @@
+{
+  "job": "5364cb5b-94ab-46e7-ae73-9f31f4884caa",
+  "decision": "reroll",
+  "reason": "서버 heavy load 오류5000, 청구0 확인. 결과 없음. 다른 재시도와 동일하게 남성 구도 참조를 제거하고 여성 키 원본 캔버스 사용.",
+  "at": 1792789151.9770055,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

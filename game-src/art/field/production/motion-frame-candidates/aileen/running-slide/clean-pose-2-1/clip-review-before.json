@@ -1,0 +1,20 @@
+{
+  "at": 1792809039.4138398,
+  "job_id": "da75aa01-b246-4001-93cd-b9d140c961a5",
+  "result": "reroll-required",
+  "findings": "3번째 대형 회색 면과 일부 포니테일 끝 회색 매트. 실패 자세 후보로 보정.",
+  "frame_count": 8,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

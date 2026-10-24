@@ -1,0 +1,13 @@
+{
+  "job": "2eff4b6f-d77c-4a75-9f44-dd0a92d6207c",
+  "decision": "reroll",
+  "reason": "전면 방향은 개선됐으나 머리 포함216px로 최대 체격 캐릭터의 키240–246px보다 작음.",
+  "at": 1792789697.2245908,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

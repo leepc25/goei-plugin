@@ -1,0 +1,13 @@
+{
+  "job": "ad4858c4-2694-4fba-ab33-7cafffec0bc5",
+  "decision": "reroll",
+  "reason": "식별 특징인 크게 돌출된 사각 아래턱 부족, 키 약241px 초과.",
+  "at": 1792788955.833986,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

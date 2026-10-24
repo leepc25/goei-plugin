@@ -1,0 +1,25 @@
+{
+  "at": 1792793737.804434,
+  "character_id": "72668525-2ddb-4ee7-94b5-350d695bd1d7",
+  "result": "pass",
+  "directions_reviewed": [
+    "south",
+    "south-east",
+    "east",
+    "north-east",
+    "north",
+    "north-west",
+    "west",
+    "south-west"
+  ],
+  "findings": "원작 살구색 양쪽 번·갈색 눈·흰 간호복과 살구 테두리·오른쪽 베이지 허리 주머니·왼손목 밴드 유지. 8방향 여성 키·체형 일관, 동쪽 얼굴 보임. 의복 내부 음영 외에 회색 외곽 칠 없음.",
+  "movement_direction": "east",
+  "stationary_direction": "south-east",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF primary",
+    "Lore supplementary height",
+    "All55 before motion",
+    "Gray outer paint reroll"
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "group_id": "f692cb35-9e14-428a-86c5-0457b7db4002",
+  "states": [
+    {
+      "character": {
+        "id": "c4c1df6c-5df9-400d-b85b-cf84cb8e5034",
+        "name": "Idle",
+        "prompt": "은하제 / Eun Ha-je. Lean adult woman with pale angular face, tired narrow pale icy blue-gray eyes and flat annoyed mouth. Glossy dark BLUE chin-length BOB with heavy uneven fringe, a small forehead opening to HER LEFT (viewer right), inward-curled ends and one cheek lock. Navy fitted trouser suit, white shirt and dark blue tie. No mask, no glasses. Preserve the supplied sprite identity, anatomy, iris color and clothing. Empty hands, relaxed upright stance, no weapons or shadow.",
+        "size": {
+          "width": 128,
+          "height": 256
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "low top-down",
+        "created_at": "2026-10-23T21:12:55.884707+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {}
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-10-23T21:29:14.313302"
+}

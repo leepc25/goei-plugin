@@ -1,0 +1,28 @@
+{
+  "image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "mask_image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "context_image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "bounding_box": {
+    "x": 0,
+    "y": 0,
+    "width": 256,
+    "height": 256
+  },
+  "description": "Repair this upside-down woman during the SAME backward tucked somersault pose. Restore the missing opaque face and long straight black hair inside the mask, natural pale skin, small red irises, mature feminine face, black fitted suit and white shirt collar. Keep the exact inverted head angle, hair silhouette continuity, native pixel style and lighting. Fill accidental transparent holes inside face and hair. Transparent outside the clean dark silhouette; no gray paint or gray halo. Do not turn her upright, add limbs, add text, or change pose. Also close the tiny accidental holes in the masked bent knee and black gloved hand, retaining their exact shape and black fabric shading.",
+  "no_background": true,
+  "crop_to_mask": true,
+  "output_method": "Modify current layer",
+  "seed": 2026102901
+}

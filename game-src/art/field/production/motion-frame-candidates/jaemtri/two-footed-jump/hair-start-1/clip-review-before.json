@@ -1,0 +1,20 @@
+{
+  "at": 1792804602.2172816,
+  "job_id": "2be8354d-3922-4535-8152-cab5ef51f1f9",
+  "result": "reroll-required",
+  "findings": "Frames 3 and 7 still have gray patches at flowing rear hair edge; other six poses clean. Regenerate these two exact poses from own clean airborne frame 4.",
+  "frame_count": 8,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

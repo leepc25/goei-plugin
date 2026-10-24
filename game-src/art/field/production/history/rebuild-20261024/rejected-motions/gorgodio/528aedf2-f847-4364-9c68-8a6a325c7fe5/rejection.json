@@ -1,0 +1,60 @@
+{
+  "reason": "Raised hand and forward boot touch or cross top/right canvas edges; rebuild bounded trajectory without resizing character.",
+  "group": {
+    "animation_type": "running-jump",
+    "display_name": null,
+    "animation_group_id": "528aedf2-f847-4364-9c68-8a6a325c7fe5",
+    "directions": [
+      {
+        "direction": "east",
+        "frame_count": 8,
+        "frames": [
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/1d8d12e4-06d5-4df8-8812-0754f77b736b/animations/4be06378-4aac-4522-bb25-7b2ee2d04caa/east/0.png?t=1792812230",
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/1d8d12e4-06d5-4df8-8812-0754f77b736b/animations/4be06378-4aac-4522-bb25-7b2ee2d04caa/east/1.png?t=1792812230",
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/1d8d12e4-06d5-4df8-8812-0754f77b736b/animations/4be06378-4aac-4522-bb25-7b2ee2d04caa/east/2.png?t=1792812230",
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/1d8d12e4-06d5-4df8-8812-0754f77b736b/animations/4be06378-4aac-4522-bb25-7b2ee2d04caa/east/3.png?t=1792812230",
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/1d8d12e4-06d5-4df8-8812-0754f77b736b/animations/4be06378-4aac-4522-bb25-7b2ee2d04caa/east/4.png?t=1792812230",
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/1d8d12e4-06d5-4df8-8812-0754f77b736b/animations/4be06378-4aac-4522-bb25-7b2ee2d04caa/east/5.png?t=1792812230",
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/1d8d12e4-06d5-4df8-8812-0754f77b736b/animations/4be06378-4aac-4522-bb25-7b2ee2d04caa/east/6.png?t=1792812230",
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/1d8d12e4-06d5-4df8-8812-0754f77b736b/animations/4be06378-4aac-4522-bb25-7b2ee2d04caa/east/7.png?t=1792812230"
+        ]
+      }
+    ]
+  },
+  "at": 1792812936.5475597,
+  "state_before": {
+    "name": "고르고디오",
+    "group": "management",
+    "character_id": "1d8d12e4-06d5-4df8-8812-0754f77b736b",
+    "image": "2f655338-9c44-48da-b55f-0aab08174ead",
+    "registration": "3676d347-a999-4fff-93e5-fdef57f7cee7",
+    "motions": {
+      "breathing-idle": "fc885982-749a-43d0-84ee-ae7e2f613dd3",
+      "walking-8-frames": "1c031fb9-393a-4ce1-af1e-d7f3b51f71a2",
+      "running-jump": "0df049d9-0ac4-4240-ac47-d42b9820f084",
+      "running-slide": "63c65c76-cb1d-4a2c-ac1a-062b4f4500fb",
+      "crouched-walking": "7517bec3-7345-46fc-98b9-a4d78e35b33b",
+      "sad-walk": "bfaf7ccb-a3f0-4310-8d01-bcab1d5d0f41",
+      "front-flip": "c8bd5412-38ff-4947-a5d6-b374f27af8b3",
+      "backflip": "749dcbeb-c1ee-4d00-a6fa-4bdff66b8c53",
+      "jumping-1": "bcdfe8d7-dc49-49bb-b4ba-2715f97de193",
+      "jumping-2": "8ca0dfee-91a4-4107-a351-86b38e32d7c7",
+      "two-footed-jump": "7ea63972-89d0-417a-8425-129ef4f07691",
+      "drinking": "79484419-2153-4255-a929-f59ba8a6a0e9",
+      "picking-up": "4ffc9815-9d39-4dbd-ad94-a73ad610ccf9",
+      "pushing": "a7368f7b-d21f-41a2-9642-769f6ae0c6b4",
+      "pull-heavy-object": "14fc20a0-717a-4eff-98d2-2fad20876c9c",
+      "throw-object": "bcf575dd-3d69-44a4-808c-5b6129e66c6f",
+      "fight-stance-idle-8-frames": "26047ff4-f3de-47cb-a272-f27c5eb4f1f0",
+      "lead-jab": "03931583-76d1-4cf6-a372-6fcb651fefd3",
+      "cross-punch": "89fa95bd-c08d-4973-9669-c55c9a3e1aac"
+    },
+    "ready": true,
+    "image_verified": true,
+    "skeleton_joints": 18,
+    "rotation_count": 8,
+    "exported": false,
+    "eight_way_visual_reviewed": true,
+    "motions_visual_reviewed": false
+  }
+}

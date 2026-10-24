@@ -1,0 +1,9 @@
+{
+  "frame_index": 6,
+  "source_job_id": "af91c70f-1c1c-4a87-97ab-da73d7574011",
+  "source_frame_index": 2,
+  "target_pose_index": 6,
+  "source_path": "motion-frame-candidates/jaemtri/throw-object/empty-recover-1/frames/2.png",
+  "sha256": "8b1e54224b0131785fa60d94c4c5ded9ce69ef310eb1195b11f1ad02af133bd4",
+  "findings": "Candidate 2 clean empty hand and no floating gray object; candidates 0/1 rejected for gray debris. Same recovery pose and own identity."
+}

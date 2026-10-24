@@ -1,0 +1,14 @@
+{
+  "job": "27c36b7a-07cd-4bc2-a762-0289b3314781",
+  "job_status": "completed",
+  "decision": "pass",
+  "reason": "짧은 버즈컷과 넓고 각진 아래턱·굵은 목·넓은 어깨·탄탄한 체형 유지. 정면, 모발 포함227px로 보통 남성 스케일, 회색 외곽 없음.",
+  "at": 1792790384.7458394,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

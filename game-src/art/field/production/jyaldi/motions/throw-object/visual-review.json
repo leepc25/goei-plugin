@@ -1,0 +1,20 @@
+{
+  "at": 1792799826.2815697,
+  "job_id": "b2e2ca3b-ce95-48c7-a05f-1aa1c6bb8deb",
+  "result": "pass",
+  "findings": "수정8프레임 전체 검토. 뒤로 든 팔→머리 위 릴리스→앞팔 뻗기/내리기 궤적 확인. 갈색 부분은3·4프레임 쥔 공과5프레임 분리된 공으로 이어져 장갑 색변화와 구분됨. 검은 장갑·정장·얼굴·긴 머리 유지, 외곽 회색 채움 없음.",
+  "frame_count": 8,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

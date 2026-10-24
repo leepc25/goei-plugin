@@ -1,0 +1,17 @@
+{
+  "image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "mask_image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "description": "Only two tiny repairs to this ivory art mannequin: mouth is a small CLOSED neutral horizontal line, no open pink mouth or happy grin. Neck has one THIN dark horizontal stitched seam with several short perpendicular stitches, directly on smooth ivory plastic. No necklace, collar, beads, knobs or thick band. Preserve red eyes, freckles, hair, ivory mannequin anatomy and body pixel-for-pixel outside white mask. Same crisp native pixel art.",
+  "no_background": true,
+  "output_method": "Modify current layer",
+  "crop_to_mask": true,
+  "seed": 1792793043
+}

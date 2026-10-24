@@ -1,0 +1,102 @@
+{
+  "slug": "aileen",
+  "slot": "throw-object",
+  "base_job_id": "bf0f5fe4-7bb1-4c82-b434-8ba602b1254a",
+  "target_frame_index": 5,
+  "source_spec": "game-src/art/field/production/motion-inputs/aileen/throw-object-measured-guard-v2/spec.json",
+  "seed": 2026113925,
+  "pose": [
+    {
+      "label": "LEFT HIP",
+      "x": 0.5414225136213892,
+      "y": 0.4681903334041639
+    },
+    {
+      "label": "RIGHT HIP",
+      "x": 0.49517569194501715,
+      "y": 0.48597757251046075
+    },
+    {
+      "label": "NECK",
+      "x": 0.5238164295981849,
+      "y": 0.27136030982676695
+    },
+    {
+      "label": "LEFT SHOULDER",
+      "x": 0.5537177571611995,
+      "y": 0.2538291189994939
+    },
+    {
+      "label": "LEFT ELBOW",
+      "x": 0.4544891424081723,
+      "y": 0.3183465904543691
+    },
+    {
+      "label": "LEFT ARM",
+      "x": 0.5754597748019395,
+      "y": 0.339219405890967
+    },
+    {
+      "label": "LEFT KNEE",
+      "x": 0.6162051824263896,
+      "y": 0.6772712303004761
+    },
+    {
+      "label": "LEFT LEG",
+      "x": 0.5921418663420254,
+      "y": 0.8880920089657318
+    },
+    {
+      "label": "RIGHT SHOULDER",
+      "x": 0.4939151020351702,
+      "y": 0.28889150065404007
+    },
+    {
+      "label": "RIGHT ELBOW",
+      "x": 0.5808602895719427,
+      "y": 0.37245117750930784
+    },
+    {
+      "label": "RIGHT ARM",
+      "x": 0.6990792882638139,
+      "y": 0.333436831628004
+    },
+    {
+      "label": "RIGHT KNEE",
+      "x": 0.5294439417985051,
+      "y": 0.7023872960309332
+    },
+    {
+      "label": "RIGHT LEG",
+      "x": 0.4194979368006005,
+      "y": 0.9119993289907897
+    },
+    {
+      "label": "NOSE",
+      "x": 0.5800103284353547,
+      "y": 0.19067742814373442
+    },
+    {
+      "label": "LEFT EYE",
+      "x": 0.5780738710999916,
+      "y": 0.17019444461946026
+    },
+    {
+      "label": "RIGHT EYE",
+      "x": 0.5711539046270757,
+      "y": 0.1715780471288526
+    },
+    {
+      "label": "LEFT EAR",
+      "x": 0.5501180662768309,
+      "y": 0.15995148741285747
+    },
+    {
+      "label": "RIGHT EAR",
+      "x": 0.5343406990326588,
+      "y": 0.16022742634435422
+    }
+  ],
+  "new_user_approval": false,
+  "action": "Hold the supplied recovery pose completely still, empty bare hands after releasing the thrown object. Natural platinum blonde ponytail strands."
+}

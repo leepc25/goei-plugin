@@ -1,0 +1,6 @@
+{
+  "result": "pass",
+  "scope": "Own rotation reference landmarks only; jump sequences remain unreviewed",
+  "findings": "Corrected overlay reviewed: hidden far wrist inferred at near wrist height instead of braid tip; far elbow follows hanging arm. Jump sequences remain unreviewed.",
+  "new_user_approval": false
+}

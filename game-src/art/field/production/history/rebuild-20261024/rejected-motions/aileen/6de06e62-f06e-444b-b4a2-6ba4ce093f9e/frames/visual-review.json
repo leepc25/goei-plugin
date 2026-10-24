@@ -1,0 +1,20 @@
+{
+  "at": 1792808365.2981772,
+  "job_id": "6de06e62-f06e-444b-b4a2-6ba4ce093f9e",
+  "result": "reroll-required",
+  "findings": "2번째 대형 회갈색 면, 5번째 손/팔 투명 파괴 및 포니테일 회색 면. 참조와 팔의 투척 궤적 보정 필요.",
+  "frame_count": 8,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

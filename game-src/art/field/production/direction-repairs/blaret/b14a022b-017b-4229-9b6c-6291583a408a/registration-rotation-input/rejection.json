@@ -1,0 +1,83 @@
+{
+  "slug": "blaret",
+  "state_before": {
+    "name": "블라렛",
+    "group": "religious",
+    "character_id": "b14a022b-017b-4229-9b6c-6291583a408a",
+    "image": "0f18021b-f069-4958-825d-d830176a1892",
+    "registration": "217f749c-ee0b-43c8-88ca-d8d9d3db80bb",
+    "motions": {},
+    "ready": false,
+    "exported": false,
+    "registration_rejections": [
+      {
+        "character_id": "a1e68911-325e-4aef-a66c-df643e8832de",
+        "job": "82dc8eed-43b9-433a-aa58-dc4ba39c1a82",
+        "reason": "원작의 허리·골반까지 내려오는 긴 검은 베일이 어깨뼈 길이로 짧아짐. 베일을 늘린 정면으로 다시 등록 필요.",
+        "at": 1792793748.776734
+      }
+    ],
+    "eight_way_visual_reviewed": false,
+    "visual_rejections": [
+      {
+        "job": "124f2988-2c22-4b10-901a-0cc09cc5f1ed",
+        "job_status": "completed",
+        "decision": "reroll",
+        "reason": "원작의 긴 검은 베일이 지나치게 짧음. 기존 인물 픽셀은 보존하고 팔 뒤·양옆의 투명 영역에 골반까지 내려오는 베일 연장.",
+        "at": 1792793748.89077,
+        "rules_rechecked": [
+          "AVIF primary identity",
+          "lore/user height",
+          "south-facing",
+          "transparent edge without gray halo",
+          "no motions before all roster eight-way review"
+        ]
+      },
+      {
+        "job": "fd7e8421-f416-410c-9c48-8e1f220251ab",
+        "job_status": "completed",
+        "decision": "reroll",
+        "reason": "수정 후에도 검은 베일 끝이 팔꿈치 부근에 머물러 AVIF의 엉덩이까지 내려오는 길이에 못 미침. 빈 영역만 마스킹한 방식이 기존 짧은 끝을 고정했으므로 다음에는 베일 끝 자체와 연장 영역을 함께 마스킹.",
+        "at": 1792794301.7582169,
+        "rules_rechecked": [
+          "AVIF primary identity",
+          "lore/user height",
+          "south-facing",
+          "transparent edge without gray halo",
+          "no motions before all roster eight-way review"
+        ]
+      },
+      {
+        "job": "46cb6f78-2b51-4c55-a94a-fb33cdd7a1e1",
+        "job_status": "completed",
+        "decision": "reroll",
+        "reason": "왼쪽 베일만 손 아래까지 연장됐고 오른쪽은 팔꿈치에서 끝남. 오른쪽 기존 끝이 마스크 경계 밖에 남은 문제 확인. 오른쪽 끝과 연장 영역을 함께 교정하고 왼쪽 및 몸체는 보존.",
+        "at": 1792794908.0499072,
+        "rules_rechecked": [
+          "AVIF primary identity",
+          "lore/user height",
+          "south-facing",
+          "transparent edge without gray halo",
+          "no motions before all roster eight-way review"
+        ]
+      },
+      {
+        "job": "e9653deb-de50-4f8a-87d5-4fd7ce9ea263",
+        "job_status": "completed",
+        "decision": "reroll",
+        "reason": "오른쪽 베일 연장이 천 면 대신 1px 선으로 생성됨. crop_to_mask 부분 확대가 전체 베일 좌우 관계를 놓치는 것으로 판단. 전체 캔버스 문맥을 유지하는 crop_to_mask=false와 연결부를 포함한 마스크로 교정.",
+        "at": 1792795549.7707343,
+        "rules_rechecked": [
+          "AVIF primary identity",
+          "lore/user height",
+          "south-facing",
+          "transparent edge without gray halo",
+          "no motions before all roster eight-way review"
+        ]
+      }
+    ],
+    "image_verified": true,
+    "image_visually_reviewed": true
+  },
+  "reason": "Rotations delivered while skeleton job pending; veil became ribbons or shoulder-length; baseline only, not accepted"
+}

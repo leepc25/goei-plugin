@@ -1,0 +1,17 @@
+{
+  "image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "mask_image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "description": "Remove the invented small sleeve badge/patch in the selected upper-arm rectangle. Replace it with PLAIN continuous gray suit sleeve cloth matching surrounding gray fabric. No symbol, no shield, no emblem, no insignia. Preserve arm contour, hair, body and all unmasked pixels exactly. Crisp native pixel art, transparent outside.",
+  "no_background": true,
+  "output_method": "Modify current layer",
+  "crop_to_mask": true,
+  "seed": 1792794438
+}

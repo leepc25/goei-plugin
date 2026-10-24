@@ -1,0 +1,9 @@
+{
+  "frame_index": 5,
+  "source_job_id": "dcdd5c18-4609-4256-a14a-5a9b7df01325",
+  "source_frame_index": 0,
+  "target_pose_index": 5,
+  "source_path": "motion-frame-candidates/aileen/throw-object/clean-pose-5-1/frames/0.png",
+  "sha256": "b68c0f9f49503979195abe095f360901400fc1b32a931e56cdc7d88be890ce2c",
+  "findings": "Clean recovery silhouette, intact bare hands, suit and shoes; ponytail strands separate from transparent background."
+}

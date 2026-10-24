@@ -1,0 +1,20 @@
+{
+  "at": 1792807640.4453108,
+  "job_id": "68a1c28c-7789-422e-86af-7c2bf6c00e26",
+  "result": "reroll-required",
+  "findings": "잔과 손 둘레 회색 반투명 잔상, 마지막 프레임 손 외곽 회색 면.",
+  "frame_count": 6,
+  "directions": [
+    "south-east"
+  ],
+  "actual_template": "drinking",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

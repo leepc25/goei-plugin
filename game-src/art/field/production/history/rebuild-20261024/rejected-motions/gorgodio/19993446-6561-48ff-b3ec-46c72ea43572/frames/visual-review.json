@@ -1,0 +1,20 @@
+{
+  "at": 1792812673.0353816,
+  "job_id": "89fa95bd-c08d-4973-9669-c55c9a3e1aac",
+  "result": "reroll-required",
+  "findings": "Last boot clipped at bottom and arm trajectory circles overhead instead of clear straight punch; bounded cross required.",
+  "frame_count": 6,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "cross-punch",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

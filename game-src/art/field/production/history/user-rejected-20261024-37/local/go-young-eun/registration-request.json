@@ -1,0 +1,14 @@
+{
+  "description": "고영은 / Go Young-eun. Ordinary soft nonathletic adult woman, oval gentle face, brown-gray eyes and modest smile. Dark BROWN chin-length rounded bob, thick straight bangs above eyes and inward-curled ends; one side tucked behind the visible ear. Navy fitted trouser suit, white shirt and navy tie. No mask or glasses. Preserve visible ear shape from original; do not invent a conspicuous amputated ear on the exposed side. Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches.",
+  "reference_image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "n_directions": 8,
+  "view": "low top-down",
+  "template_id": "mannequin",
+  "name": "고영은",
+  "seed": 10222027,
+  "no_background": true
+}

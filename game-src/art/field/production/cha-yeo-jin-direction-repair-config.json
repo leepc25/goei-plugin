@@ -1,0 +1,16 @@
+{
+  "slug": "cha-yeo-jin",
+  "character_id": "34a102ab-fd2b-4740-b89e-acef126efad1",
+  "rectangles": {
+    "north-west": [
+      [
+        40,
+        88,
+        56,
+        111
+      ]
+    ]
+  },
+  "description": "Remove the COMPLETE sleeve insignia including its upper edge and every black symbol and border. Replace the selected upper arm with completely PLAIN continuous gray suit sleeve fabric matching the surrounding cloth. No small badge, no marks, no black rectangle, no symbol. Keep the exact arm silhouette and hair. Preserve all unmasked pixels. Crisp native pixel art and clean transparent outer edge.",
+  "revision": "complete-badge-outline"
+}

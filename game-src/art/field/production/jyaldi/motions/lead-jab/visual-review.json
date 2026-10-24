@@ -1,0 +1,20 @@
+{
+  "at": 1792798562.0808356,
+  "job_id": "5745e2b4-2d5c-4e0c-9929-12da32349952",
+  "result": "pass",
+  "findings": "새 시드3프레임 전체 확인. 이전 얼굴 앞 분리된 살색 조각이 없어졌고 양손 모두 검은 장갑 유지.3프레임 서쪽으로 앞팔을 뻗는 잽, 얼굴과 긴 머리·정장 보존. 회색 외곽 채움 없음.",
+  "frame_count": 3,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "lead-jab",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "job": "e9653deb-de50-4f8a-87d5-4fd7ce9ea263",
+  "job_status": "completed",
+  "decision": "reroll",
+  "reason": "오른쪽 베일 연장이 천 면 대신 1px 선으로 생성됨. crop_to_mask 부분 확대가 전체 베일 좌우 관계를 놓치는 것으로 판단. 전체 캔버스 문맥을 유지하는 crop_to_mask=false와 연결부를 포함한 마스크로 교정.",
+  "at": 1792795549.7707343,
+  "rules_rechecked": [
+    "AVIF primary identity",
+    "lore/user height",
+    "south-facing",
+    "transparent edge without gray halo",
+    "no motions before all roster eight-way review"
+  ]
+}

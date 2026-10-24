@@ -1,0 +1,9 @@
+{
+  "frame_index": 2,
+  "source_job_id": "16ccd3fa-5110-4cc2-be0e-1a1544888ddb",
+  "source_frame_index": 2,
+  "target_pose_index": 2,
+  "source_path": "motion-frame-candidates/jaemtri/two-footed-jump/hair-start-1/frames/2.png",
+  "sha256": "d3c8f949f22748c8956b0ac737c068ef01d35a6ef9a2e6724d327a9ec74bec45",
+  "findings": "Candidate 2 matches crouched takeoff pose with clean long hair exterior and intact guarded hands."
+}

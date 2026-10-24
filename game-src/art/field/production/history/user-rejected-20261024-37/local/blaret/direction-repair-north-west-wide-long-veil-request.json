@@ -1,0 +1,28 @@
+{
+  "image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "mask_image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "description": "Correct the BLACK NUN VEIL: it must be ONE WIDE CONTINUOUS SHEET OF BLACK CLOTH hanging from the head down the back to HIPS, below both wrists. Fill the selected region with natural solid black veil fabric and subtle dark charcoal vertical folds. Cover the blonde hair on the BACK beneath the veil. Replace all long thin ribbon-like tails with the broad filled veil panel; no strings, ribbons, split tails, exposed blonde back hair, or short shoulder hood. Veil hem at hip level around y165. Preserve visible face, front blonde hair, green eyes, white bib, cross, arms, sleeves, hands, rosary bracelets, dress silhouette and stature; do not invent limbs. Exact unmasked pixels remain unchanged; transparent outside silhouette, crisp pixel edges.",
+  "no_background": true,
+  "output_method": "Modify current layer",
+  "crop_to_mask": true,
+  "seed": 1792796737,
+  "context_image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "bounding_box": {
+    "x": 0,
+    "y": 0,
+    "width": 128,
+    "height": 256
+  }
+}

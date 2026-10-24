@@ -1,0 +1,17 @@
+{
+  "slug": "shin-yuri",
+  "character_id": "6d890b31-7194-48f6-bf12-e95897095d36",
+  "rectangles": {
+    "north-east": [
+      [
+        32,
+        89,
+        36,
+        97
+      ]
+    ]
+  },
+  "description": "Erase the tiny detached BLACK SPECK in this selected otherwise EMPTY BACKGROUND. Remove the three disconnected black pixels completely to transparent empty background. Do not add hair, shading, cloth or any object here. Preserve all unmasked pixels and the nearby ponytail and jacket exactly.",
+  "revision": "remove-old-hair-speck",
+  "base_zip": "game-src/art/field/production/direction-repairs/shin-yuri/6d890b31-7194-48f6-bf12-e95897095d36/partial-repair-input/character.zip"
+}

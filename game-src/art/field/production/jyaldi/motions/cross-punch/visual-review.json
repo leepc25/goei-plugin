@@ -1,0 +1,20 @@
+{
+  "at": 1792799462.6458135,
+  "job_id": "abcd5997-80d8-4545-9c3e-a78739f74f37",
+  "result": "pass",
+  "findings": "직접 관절8프레임 검토.4프레임 서쪽 스트레이트 팔 뻗음과 이후 회수 확인. 이전 머리 밑/주먹 아래 회색 잔상 제거, 양손 검은 장갑·얼굴·정장·긴 머리 보존.",
+  "frame_count": 8,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

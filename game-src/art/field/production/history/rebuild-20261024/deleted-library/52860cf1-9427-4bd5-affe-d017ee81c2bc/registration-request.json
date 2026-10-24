@@ -1,0 +1,14 @@
+{
+  "description": "신유리 / Shin Yuri. Athletic adult woman with firm squared shoulders and lean natural muscles, pale angular face, narrow dark eyes and stern flat mouth. BLACK hair swept back into a low ponytail, exposed forehead with two fine temple wisps as visible in original. BLACK leather biker jacket with silver snaps and diagonal zipper over dark GRAY crew-neck T-shirt, slim BLACK jeans, sturdy black laced boots. No tie, no exaggerated bodybuilder muscles. Preserve supplied native height, scale, blank margins, identity, anatomy, iris color and clothing across every direction. Empty hands, relaxed upright stance, no weapons or shadow. Transparent outside silhouette; no opaque gray halo or painted gray exterior patches.",
+  "reference_image": {
+    "type": "base64",
+    "base64": "[image payload omitted]",
+    "format": "png"
+  },
+  "n_directions": 8,
+  "view": "low top-down",
+  "template_id": "mannequin",
+  "name": "신유리",
+  "seed": 10222027,
+  "no_background": true
+}
