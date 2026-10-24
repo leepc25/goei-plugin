@@ -491,17 +491,71 @@ c091877e-1a73-4f0f-a3a3-5b974d3a78e5	aileen	motion-frame-candidate-jumping-1-cro
 4ab2d492-12dc-4192-bdb2-0d529d464617	aileen	animation	running-8-frames	completed	{"usd": 0.0, "type": "generations", "generations": 3}
 6699c4cc-6914-4c0d-9cfa-16b8d1ac0971	aileen	animation	crouched-walking	completed	{"usd": 0.0, "type": "generations", "generations": 3}
 b80cd50e-079c-4044-bb3e-12098db8accb	aileen	animation	backflip	completed	{"usd": 0.0, "type": "generations", "generations": 3}
-26112962-08ae-494b-9f9b-82a398e44e85	aileen	animation	pushing	processing	null
+26112962-08ae-494b-9f9b-82a398e44e85	aileen	animation	pushing	completed	{"usd": 0.0, "type": "generations", "generations": 3}
 bf0f5fe4-7bb1-4c82-b434-8ba602b1254a	aileen	animation	throw-object	completed	{"usd": 0.0, "type": "generations", "generations": 3}
 062a301c-7935-479a-b76a-50ffd0c38ac5	aileen	animation	fight-stance-idle-8-frames	completed	{"usd": 0.0, "type": "generations", "generations": 3}
-40dd87bc-564a-44ce-b5d3-f4398f67b6a6	aileen	animation	walking-8-frames	processing	null
-da75aa01-b246-4001-93cd-b9d140c961a5	aileen	animation	running-slide	processing	null
-7c0469a4-dedb-4e04-bd72-706ac1b4983c	aileen	animation	front-flip	processing	null
-263743b4-57c2-4659-a2a1-4b6775dc51e9	aileen	animation	pull-heavy-object	processing	null
-cc19aa7c-d9fc-497f-b24d-a1eed324ee82	aileen	motion-frame-candidate-lead-jab-bare-fist-1		processing	null
-5b324971-dbda-45e9-b71d-e482518ee2e7	aileen	animation	picking-up	processing	null
+40dd87bc-564a-44ce-b5d3-f4398f67b6a6	aileen	animation	walking-8-frames	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+da75aa01-b246-4001-93cd-b9d140c961a5	aileen	animation	running-slide	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+7c0469a4-dedb-4e04-bd72-706ac1b4983c	aileen	animation	front-flip	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+263743b4-57c2-4659-a2a1-4b6775dc51e9	aileen	animation	pull-heavy-object	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+cc19aa7c-d9fc-497f-b24d-a1eed324ee82	aileen	motion-frame-candidate-lead-jab-bare-fist-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+5b324971-dbda-45e9-b71d-e482518ee2e7	aileen	animation	picking-up	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+1e854cac-038d-40ea-9a5f-1fc134afae55	aileen	animation	fight-stance-idle-8-frames	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+62ce07ec-3b83-4dae-b960-50762c788d6a	aileen	motion-frame-candidate-running-8-frames-clean-pose-1-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+7f28d40d-ed25-4a6f-b8b9-aa54dadcaf92	aileen	motion-frame-candidate-running-8-frames-clean-pose-5-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+06fa1d78-327a-4a2a-b825-5fc3d863a448	aileen	motion-frame-candidate-running-8-frames-clean-pose-6-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+1ad7de38-189a-4ec7-87fe-ba349eed5e65	aileen	motion-frame-candidate-running-8-frames-clean-pose-7-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+3afee199-257e-438a-a103-7613ac9313a5	aileen	motion-frame-candidate-crouched-walking-clean-pose-2-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+72f1eb24-f70b-4c3a-8742-8c914617dc4b	aileen	motion-frame-candidate-crouched-walking-clean-pose-3-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+0d0cd67b-2185-47b1-9457-6ce630dda6ea	aileen	motion-frame-candidate-crouched-walking-clean-pose-5-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+c20ce2ed-c57f-44d6-bdbb-5cc86bf7acd5	aileen	motion-frame-candidate-walking-8-frames-clean-pose-0-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+87315976-4880-4787-8987-bddb6513b049	aileen	motion-frame-candidate-walking-8-frames-clean-pose-3-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+9ecba54d-36c5-4c6a-b6b9-14be4caba63f	aileen	motion-frame-candidate-walking-8-frames-clean-pose-4-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+134f0c81-ac61-40ae-be63-5a835b8a6e65	aileen	motion-frame-candidate-walking-8-frames-clean-pose-5-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+f0ca365e-b4d0-4989-b1da-c9d89be699f9	aileen	motion-frame-candidate-walking-8-frames-clean-pose-6-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+5bd5cbe5-7393-4461-a381-2479450a0b42	aileen	motion-frame-candidate-lead-jab-clean-pose-2-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+e4766aea-cf0e-4071-a0bc-be40752a7c9c	aileen	motion-frame-candidate-front-flip-clean-pose-4-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+b87a717a-5da3-4c61-9000-dcff4cdd2b74	aileen	motion-frame-candidate-front-flip-clean-pose-9-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+2b5bd3b4-f86a-46dc-ab8a-77ba3030ae6e	aileen	motion-frame-candidate-running-slide-clean-pose-2-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+d85f8f38-a3bb-4c85-8f81-f73db04ed1d1	aileen	motion-frame-candidate-pushing-clean-pose-5-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+05c75e3e-500e-4668-ae08-4212b5354b57	aileen	motion-frame-candidate-throw-object-clean-pose-4-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+a096416d-d44e-48a8-ade5-10cdabae0a2d	aileen	motion-frame-candidate-backflip-clean-pose-0-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+3f341d9c-c1be-4dca-8388-cbda96f23275	aileen	motion-frame-candidate-backflip-clean-pose-1-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+969b581d-436c-464e-b489-d803e2bcbe3b	aileen	motion-frame-candidate-backflip-clean-pose-2-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+25ef5e16-2816-49a9-b73d-a92248857d94	aileen	motion-frame-candidate-backflip-clean-pose-3-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+132d4a58-a8b9-4bd4-af33-2c1944e5f289	aileen	motion-frame-candidate-backflip-clean-pose-5-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+3d893b9a-8afa-46fc-a9c8-469f0171d734	aileen	motion-frame-candidate-backflip-clean-pose-6-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+ba502b83-69af-44c6-83ef-8a3a041a0503	aileen	motion-frame-candidate-picking-up-clean-pose-4-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+8363ef06-2b89-4508-b1ce-eff4e51b7871	aileen	motion-frame-candidate-picking-up-clean-pose-5-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+c0b29250-2cca-4e00-8c0a-5e67924f75df	aileen	motion-frame-candidate-crouched-walking-clean-pose-2-2		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+9486488c-81d9-46af-9dc6-2c39db6a4705	aileen	motion-frame-candidate-crouched-walking-clean-pose-3-2		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+08cdb028-8b59-4175-89ad-4018de45da49	aileen	motion-frame-candidate-front-flip-clean-pose-4-2		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+84042bad-5240-4eeb-94f2-bbddc967bf97	aileen	motion-frame-candidate-backflip-clean-pose-3-2		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+77f2e27b-6c0b-438b-b5a9-6b258bfcfd1f	aileen	motion-frame-candidate-running-8-frames-clean-pose-7-2		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+67129b29-cc39-4202-b176-09b5609a6cce	aileen	motion-frame-candidate-running-slide-clean-pose-1-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+8146b192-8b88-4ce8-952e-0b1c0eb48caf	aileen	motion-frame-candidate-running-slide-clean-pose-5-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+17bbb2de-b31c-46eb-8fea-22a608cde172	aileen	motion-frame-candidate-running-slide-clean-pose-6-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+51b1054d-ee18-4fde-93f8-b77167fe023b	aileen	motion-frame-candidate-running-slide-clean-pose-7-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+a199f99d-ae50-44f4-8805-03863f7f545e	aileen	motion-frame-candidate-pushing-clean-pose-0-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+9e197c33-2796-4686-b512-87fd1659fe40	aileen	motion-frame-candidate-pushing-clean-pose-1-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+6ff4baf9-1e68-42a9-a10d-5a8760ec9c55	aileen	motion-frame-candidate-pushing-clean-pose-2-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+de57d1ed-2821-4b0a-86d8-766de3462445	aileen	motion-frame-candidate-pushing-clean-pose-3-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+755c1a8d-92b4-4c4a-8bb5-8acb118e9440	aileen	motion-frame-candidate-pushing-clean-pose-4-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+9140f6dd-7450-4be0-8059-0c38065dbac0	aileen	motion-frame-candidate-pushing-clean-pose-6-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+832a7f3c-dd38-48e1-b16d-782e9fb84e2a	aileen	motion-frame-candidate-pushing-clean-pose-7-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+dcdd5c18-4609-4256-a14a-5a9b7df01325	aileen	motion-frame-candidate-throw-object-clean-pose-5-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+1aa3f7da-1c05-4f30-a389-4c548f3af249	aileen	motion-frame-candidate-throw-object-clean-pose-6-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+2aee428d-9ce5-4e71-bf76-773b4fa42f4f	aileen	motion-frame-candidate-throw-object-clean-pose-7-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+bf0ff473-fa16-4884-bb6c-8c8e321f81ca	aileen	motion-frame-candidate-front-flip-clean-pose-2-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+95775bae-0abc-4066-a009-c44a95ab6006	aileen	motion-frame-candidate-front-flip-clean-pose-3-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+404b3a03-b4df-40ba-891c-9711eadec01c	aileen	motion-frame-candidate-front-flip-clean-pose-3-2		processing	null
+d90d1824-7c56-429b-8f65-28b510ed4d22	aileen	motion-frame-candidate-pushing-clean-pose-0-2		processing	null
+319991db-7083-4a02-aa24-1a8a8aaba674	aileen	motion-frame-candidate-pushing-clean-pose-6-2		processing	null
 local-sync:jyaldi-backflip-v7-estimate	jyaldi	estimate-skeleton	backflip	synchronous-completed	{"type": "generations", "generations": 0.1}
 local-sync:jaemtri-crouch-reference-estimate	jaemtri	estimate-skeleton	motion-reference	synchronous-completed	{"type": "generations", "generations": 0.1}
 local-sync:jaemtri-turn-reference-estimate	jaemtri	estimate-skeleton	backflip	synchronous-completed	{"type": "generations", "generations": 0.1}
 local-sync:aileen-air-reference-estimate	aileen	estimate-skeleton	motion-reference	synchronous-completed	{"type": "generations", "generations": 0.1}
 local-sync:aileen-guard-reference-estimate	aileen	estimate-skeleton	lead-jab	synchronous-completed	{"type": "generations", "generations": 0.1}
+local-sync:aileen-run-reference-estimate	aileen	estimate-skeleton	running-8-frames	synchronous-completed	{"type": "generations", "generations": 0.1}
+local-sync:aileen-crouch-reference-estimate	aileen	estimate-skeleton	crouched-walking	synchronous-completed	{"type": "generations", "generations": 0.1}
+local-sync:aileen-turn-reference-estimate	aileen	estimate-skeleton	turn-reference	synchronous-completed	{"type": "generations", "generations": 0.1}

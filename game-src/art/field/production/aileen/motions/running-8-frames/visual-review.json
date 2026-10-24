@@ -1,0 +1,88 @@
+{
+  "at": 1792810351.1285732,
+  "job_id": "4ab2d492-12dc-4192-bdb2-0d529d464617",
+  "result": "pass",
+  "findings": "All eight frames reviewed after same-pose replacements: alternating legs and arms, consistent EAST identity and native proportions, intact shoes and separated ponytail strands; no broad gray exterior matte.",
+  "frame_count": 8,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ],
+  "frame_assembly": {
+    "base_job_id": "4ab2d492-12dc-4192-bdb2-0d529d464617",
+    "frame_sources": [
+      {
+        "frame_index": 0,
+        "source_job_id": "4ab2d492-12dc-4192-bdb2-0d529d464617",
+        "source_frame_index": 0,
+        "sha256": "80f147262e2a8ff2190e11ad718de45281f19de990c4c34c9a134bf672e4286f"
+      },
+      {
+        "frame_index": 1,
+        "source_job_id": "62ce07ec-3b83-4dae-b960-50762c788d6a",
+        "source_frame_index": 1,
+        "target_pose_index": 1,
+        "source_path": "motion-frame-candidates/aileen/running-8-frames/clean-pose-1-1/frames/1.png",
+        "sha256": "e2766f714f219d117de374d064c625fb4920288eb340c09ed3eeb61781745d05",
+        "findings": "세 후보 전체 확인 후 머리카락 가닥과 몸/구두 외곽이 깨끗한 1번 선택. 목표 자세 유지, 회색 매트 덩어리 없음."
+      },
+      {
+        "frame_index": 2,
+        "source_job_id": "4ab2d492-12dc-4192-bdb2-0d529d464617",
+        "source_frame_index": 2,
+        "sha256": "e6f88eaa9f467d2a320a3a7fbdf6d6bd0947ad0c85ef1811c6d07d0aa384251b"
+      },
+      {
+        "frame_index": 3,
+        "source_job_id": "4ab2d492-12dc-4192-bdb2-0d529d464617",
+        "source_frame_index": 3,
+        "sha256": "7b69f29154aea1d303fb572c5501a2ad7d829a1d8e67ed336e8f060996a149e8"
+      },
+      {
+        "frame_index": 4,
+        "source_job_id": "4ab2d492-12dc-4192-bdb2-0d529d464617",
+        "source_frame_index": 4,
+        "sha256": "0d4881cd6a7a7bd2f8f271f20fdfc897ae64f3c85fe60dbd2e55b00dbcd92c6b"
+      },
+      {
+        "frame_index": 5,
+        "source_job_id": "7f28d40d-ed25-4a6f-b8b9-aa54dadcaf92",
+        "source_frame_index": 1,
+        "target_pose_index": 5,
+        "source_path": "motion-frame-candidates/aileen/running-8-frames/clean-pose-5-1/frames/1.png",
+        "sha256": "8b4fcbb5a9c6441953ae352d6e5db2de91ac73e7213ad119d2ece53f8e0cdb26",
+        "findings": "세 후보 확대 확인. 선택 프레임은 목표 자세와 포니테일 가닥/구두 유지, 넓은 외곽 회색 매트 없음."
+      },
+      {
+        "frame_index": 6,
+        "source_job_id": "06fa1d78-327a-4a2a-b825-5fc3d863a448",
+        "source_frame_index": 2,
+        "target_pose_index": 6,
+        "source_path": "motion-frame-candidates/aileen/running-8-frames/clean-pose-6-1/frames/2.png",
+        "sha256": "a624139ce1ad7c2edd8dd8f375ee3e595aa04e2081b015003ba6404f65cf9ea7",
+        "findings": "세 후보 확대 확인. 선택 프레임은 목표 자세와 포니테일 가닥/구두 유지, 넓은 외곽 회색 매트 없음."
+      },
+      {
+        "frame_index": 7,
+        "source_job_id": "77f2e27b-6c0b-438b-b5a9-6b258bfcfd1f",
+        "source_frame_index": 2,
+        "target_pose_index": 7,
+        "source_path": "motion-frame-candidates/aileen/running-8-frames/clean-pose-7-2/frames/2.png",
+        "sha256": "2c98327aa31292c68854f872c7b48b292b418e45879cb93fcca40920e4a93d27",
+        "findings": "Candidate 2 has separated blonde ponytail tips without the flat gray end patch visible in earlier candidates; limbs and shoes intact."
+      }
+    ],
+    "method": "select complete same-pose regenerated frames; no pixel editing",
+    "new_user_approval": false,
+    "visual_reviewed": true
+  }
+}

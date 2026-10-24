@@ -1,8 +1,8 @@
 {
-  "at": 1792809911.7870204,
+  "at": 1792810508.6871045,
   "job_id": "bf0f5fe4-7bb1-4c82-b434-8ba602b1254a",
-  "result": "reroll-required",
-  "findings": "5번째 손 손상은 정상 후보로 교체. 6·7·8번째 포니테일 끝 회색 매트 잔류, 회복 자세 후보로 보정.",
+  "result": "pass",
+  "findings": "All eight frames reviewed: hand winds back and overhead then moves forward and lowers through recovery; consistent bare hands without reappearing prop, EAST identity, intact suit and ponytail, no broad gray exterior fill.",
   "frame_count": 8,
   "directions": [
     "east"
@@ -55,25 +55,34 @@
       },
       {
         "frame_index": 5,
-        "source_job_id": "bf0f5fe4-7bb1-4c82-b434-8ba602b1254a",
-        "source_frame_index": 5,
-        "sha256": "fd1e43d4d6d627eabc209123090551eb2aaac5b8ece93b3b9019318377a08f74"
+        "source_job_id": "dcdd5c18-4609-4256-a14a-5a9b7df01325",
+        "source_frame_index": 0,
+        "target_pose_index": 5,
+        "source_path": "motion-frame-candidates/aileen/throw-object/clean-pose-5-1/frames/0.png",
+        "sha256": "b68c0f9f49503979195abe095f360901400fc1b32a931e56cdc7d88be890ce2c",
+        "findings": "Clean recovery silhouette, intact bare hands, suit and shoes; ponytail strands separate from transparent background."
       },
       {
         "frame_index": 6,
-        "source_job_id": "bf0f5fe4-7bb1-4c82-b434-8ba602b1254a",
-        "source_frame_index": 6,
-        "sha256": "3bb82d85be4168615b46b82e381dcf32f7aec7d0079eef86caf1cf089a94a921"
+        "source_job_id": "1aa3f7da-1c05-4f30-a389-4c548f3af249",
+        "source_frame_index": 1,
+        "target_pose_index": 6,
+        "source_path": "motion-frame-candidates/aileen/throw-object/clean-pose-6-1/frames/1.png",
+        "sha256": "d43571568b47af5241fc7edf1a1b16602b2bebea6c0fc0c65524681bf464ba46",
+        "findings": "Clean recovery silhouette, intact bare hands, suit and shoes; ponytail strands separate from transparent background."
       },
       {
         "frame_index": 7,
-        "source_job_id": "bf0f5fe4-7bb1-4c82-b434-8ba602b1254a",
-        "source_frame_index": 7,
-        "sha256": "6b2ffb6261a0a9832e53c2c31b45ec36cac1e4c10f7675ccf22b83725720d0b4"
+        "source_job_id": "2aee428d-9ce5-4e71-bf76-773b4fa42f4f",
+        "source_frame_index": 1,
+        "target_pose_index": 7,
+        "source_path": "motion-frame-candidates/aileen/throw-object/clean-pose-7-1/frames/1.png",
+        "sha256": "3ee86185bc58cf8253e00a39b85ef4a6ebae0b7cb6753d4b6b03c06d6cbd2492",
+        "findings": "Clean recovery silhouette, intact bare hands, suit and shoes; ponytail strands separate from transparent background."
       }
     ],
     "method": "select complete same-pose regenerated frames; no pixel editing",
     "new_user_approval": false,
-    "visual_reviewed": false
+    "visual_reviewed": true
   }
 }

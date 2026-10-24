@@ -1,8 +1,8 @@
 {
-  "at": 1792809911.455867,
+  "at": 1792810508.5338783,
   "job_id": "da75aa01-b246-4001-93cd-b9d140c961a5",
-  "result": "reroll-required",
-  "findings": "3번째 대형 회색 면은 정상 후보로 해결. 2·6·7·8번째 포니테일 끝 회색 매트 잔류, 해당 자세 보정.",
+  "result": "pass",
+  "findings": "All eight frames reviewed after replacements: backward lean into extended-leg slide and recovery, intact native proportions and EAST direction, no clipping or broad gray exterior matte.",
   "frame_count": 8,
   "directions": [
     "east"
@@ -28,9 +28,12 @@
       },
       {
         "frame_index": 1,
-        "source_job_id": "da75aa01-b246-4001-93cd-b9d140c961a5",
+        "source_job_id": "67129b29-cc39-4202-b176-09b5609a6cce",
         "source_frame_index": 1,
-        "sha256": "e52af9d832538fa5f4fa8cbed9d5da60c510c4b3bfe9197a37710d9a7eef779a"
+        "target_pose_index": 1,
+        "source_path": "motion-frame-candidates/aileen/running-slide/clean-pose-1-1/frames/1.png",
+        "sha256": "ce7b14911f68f20354c8622e534583324f1d7d768afd7e11abbdaee7a2cd9fe9",
+        "findings": "Reviewed enlarged on magenta: intact black suit and shoes, blonde strands without broad gray exterior mass; full sequence review required."
       },
       {
         "frame_index": 2,
@@ -55,25 +58,34 @@
       },
       {
         "frame_index": 5,
-        "source_job_id": "da75aa01-b246-4001-93cd-b9d140c961a5",
-        "source_frame_index": 5,
-        "sha256": "42874821a5537fa2f3761dfc76a8b9720a6a36253e284b649acb64bdeb8dd726"
+        "source_job_id": "8146b192-8b88-4ce8-952e-0b1c0eb48caf",
+        "source_frame_index": 1,
+        "target_pose_index": 5,
+        "source_path": "motion-frame-candidates/aileen/running-slide/clean-pose-5-1/frames/1.png",
+        "sha256": "90b09c37c3bb4e46b8bd460e9d7bfcfe344b9c23cfc30ff84e5bff5c2daebc2b",
+        "findings": "Reviewed enlarged on magenta: intact black suit and shoes, blonde strands without broad gray exterior mass; full sequence review required."
       },
       {
         "frame_index": 6,
-        "source_job_id": "da75aa01-b246-4001-93cd-b9d140c961a5",
-        "source_frame_index": 6,
-        "sha256": "96bfaac7994961264c3b3fedfa6c81b879cdd15a9653a10867fd6589f149db73"
+        "source_job_id": "17bbb2de-b31c-46eb-8fea-22a608cde172",
+        "source_frame_index": 2,
+        "target_pose_index": 6,
+        "source_path": "motion-frame-candidates/aileen/running-slide/clean-pose-6-1/frames/2.png",
+        "sha256": "74c37e9de7539ea0ce60cfd87cdc24d76a2843b04da9426c19ca17cdef67ca4a",
+        "findings": "Reviewed enlarged on magenta: intact black suit and shoes, blonde strands without broad gray exterior mass; full sequence review required."
       },
       {
         "frame_index": 7,
-        "source_job_id": "da75aa01-b246-4001-93cd-b9d140c961a5",
-        "source_frame_index": 7,
-        "sha256": "46bf101b46cd2c7c740849c858173c81b448c400be53bb5e01c80e165a76f8de"
+        "source_job_id": "51b1054d-ee18-4fde-93f8-b77167fe023b",
+        "source_frame_index": 1,
+        "target_pose_index": 7,
+        "source_path": "motion-frame-candidates/aileen/running-slide/clean-pose-7-1/frames/1.png",
+        "sha256": "b70572e8cf389a3206d2d7c33b956f3fcfe21f050ce6716b7d31963513f28382",
+        "findings": "Reviewed enlarged on magenta: intact black suit and shoes, blonde strands without broad gray exterior mass; full sequence review required."
       }
     ],
     "method": "select complete same-pose regenerated frames; no pixel editing",
     "new_user_approval": false,
-    "visual_reviewed": false
+    "visual_reviewed": true
   }
 }

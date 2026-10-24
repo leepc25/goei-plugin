@@ -1,8 +1,8 @@
 {
-  "at": 1792809911.6325939,
+  "at": 1792810484.6643567,
   "job_id": "26112962-08ae-494b-9f9b-82a398e44e85",
   "result": "reroll-required",
-  "findings": "6번째 분리 덩어리는 정상 후보로 해결. 나머지7자세 포니테일 회색 잔상이 남아 개별 보정.",
+  "findings": "Remaining frame 6 has exterior gray/brown mass; clean nearby selected pose will be reference for retry.",
   "frame_count": 8,
   "directions": [
     "east"
@@ -28,27 +28,39 @@
       },
       {
         "frame_index": 1,
-        "source_job_id": "26112962-08ae-494b-9f9b-82a398e44e85",
-        "source_frame_index": 1,
-        "sha256": "508f64d68abcdc7dcf592b1fb3aeb53e292f4b8bc8df4d550ee47593796c0372"
+        "source_job_id": "9e197c33-2796-4686-b512-87fd1659fe40",
+        "source_frame_index": 0,
+        "target_pose_index": 1,
+        "source_path": "motion-frame-candidates/aileen/pushing/clean-pose-1-1/frames/0.png",
+        "sha256": "2ce3a0ed19f786f9109af2d6a7b8683aa6bc08814cab107273d5557d8b457c89",
+        "findings": "Selected intact forward braced pose with separated blonde strands and transparent exterior; rejected alternative candidates with gray or brown background blobs."
       },
       {
         "frame_index": 2,
-        "source_job_id": "26112962-08ae-494b-9f9b-82a398e44e85",
-        "source_frame_index": 2,
-        "sha256": "f51f6454feaea34b8597542b12fb22a6db43ba18ed0d18fbdd88e13c4528ed53"
+        "source_job_id": "6ff4baf9-1e68-42a9-a10d-5a8760ec9c55",
+        "source_frame_index": 0,
+        "target_pose_index": 2,
+        "source_path": "motion-frame-candidates/aileen/pushing/clean-pose-2-1/frames/0.png",
+        "sha256": "6a06d1bab4075921ddb250d29fa0e1fae9d70e35f428827e8f1c69a63196ba60",
+        "findings": "Selected intact forward braced pose with separated blonde strands and transparent exterior; rejected alternative candidates with gray or brown background blobs."
       },
       {
         "frame_index": 3,
-        "source_job_id": "26112962-08ae-494b-9f9b-82a398e44e85",
-        "source_frame_index": 3,
-        "sha256": "cf8cdee3c8329cce8a61c3b0f32455181bc41e35779ad2298f2122fb577ebbf0"
+        "source_job_id": "de57d1ed-2821-4b0a-86d8-766de3462445",
+        "source_frame_index": 1,
+        "target_pose_index": 3,
+        "source_path": "motion-frame-candidates/aileen/pushing/clean-pose-3-1/frames/1.png",
+        "sha256": "6b472259af6eba33e6f63d4c458d84d6ea4c0fc5ca8535784393d2427d3242cc",
+        "findings": "Selected intact forward braced pose with separated blonde strands and transparent exterior; rejected alternative candidates with gray or brown background blobs."
       },
       {
         "frame_index": 4,
-        "source_job_id": "26112962-08ae-494b-9f9b-82a398e44e85",
-        "source_frame_index": 4,
-        "sha256": "26011ea94eab88655bac5780bff37fa8c742ad5ccc97b1171e473a49c26a6652"
+        "source_job_id": "755c1a8d-92b4-4c4a-8bb5-8acb118e9440",
+        "source_frame_index": 1,
+        "target_pose_index": 4,
+        "source_path": "motion-frame-candidates/aileen/pushing/clean-pose-4-1/frames/1.png",
+        "sha256": "e38ed194ec666b97065b050e92877dbf4d17d7a28cacc1b783317948b4629324",
+        "findings": "Selected intact forward braced pose with separated blonde strands and transparent exterior; rejected alternative candidates with gray or brown background blobs."
       },
       {
         "frame_index": 5,
@@ -67,9 +79,12 @@
       },
       {
         "frame_index": 7,
-        "source_job_id": "26112962-08ae-494b-9f9b-82a398e44e85",
-        "source_frame_index": 7,
-        "sha256": "afb30ef1b11208fe28b917b5b7e63307a09042126123c3d290a26a806539b305"
+        "source_job_id": "832a7f3c-dd38-48e1-b16d-782e9fb84e2a",
+        "source_frame_index": 0,
+        "target_pose_index": 7,
+        "source_path": "motion-frame-candidates/aileen/pushing/clean-pose-7-1/frames/0.png",
+        "sha256": "1a655b19645a6b22690564635ac379b976b80f5d0d6e7ad9c74dda3b0de2b493",
+        "findings": "Selected intact forward braced pose with separated blonde strands and transparent exterior; rejected alternative candidates with gray or brown background blobs."
       }
     ],
     "method": "select complete same-pose regenerated frames; no pixel editing",

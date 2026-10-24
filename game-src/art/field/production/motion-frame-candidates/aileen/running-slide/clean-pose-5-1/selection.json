@@ -1,0 +1,9 @@
+{
+  "frame_index": 5,
+  "source_job_id": "8146b192-8b88-4ce8-952e-0b1c0eb48caf",
+  "source_frame_index": 1,
+  "target_pose_index": 5,
+  "source_path": "motion-frame-candidates/aileen/running-slide/clean-pose-5-1/frames/1.png",
+  "sha256": "90b09c37c3bb4e46b8bd460e9d7bfcfe344b9c23cfc30ff84e5bff5c2daebc2b",
+  "findings": "Reviewed enlarged on magenta: intact black suit and shoes, blonde strands without broad gray exterior mass; full sequence review required."
+}
