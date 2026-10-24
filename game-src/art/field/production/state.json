@@ -38009,7 +38009,7 @@
       "kind": "motion-frame-candidate-front-flip-ascent-1",
       "slug": "jaemtri",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792805889.5375996,
       "receipt": {
         "usage": null,
@@ -38020,23 +38020,59 @@
       "archive_output": "motion-frame-candidates/jaemtri/front-flip/ascent-1/frames",
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 2.0
         },
         "id": "c9da948c-5316-46c0-8564-48412c7653da",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-24T01:38:09.757992+00:00",
         "last_response": {
-          "type": "message_progress",
-          "action": "generating",
+          "seed": 2026111601,
+          "type": "done",
+          "action": "finalizing",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
           "status": "initializing",
-          "progress": 0.36370402990119477,
+          "progress": 1.0,
           "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 2
+          },
+          "generation_id": "b63c1049-068e-4d12-ac03-81c3e6484d81",
           "queue_position": 0,
+          "billing_charged": true,
           "generation_started_at": "2026-10-24T01:38:55.369581+00:00",
           "estimated_wait_seconds": 0
         }
-      }
+      },
+      "observed_end_epoch": 1792806434.3436105,
+      "elapsed_observed_seconds": 544.8060111999512,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 2
+      },
+      "saved_frames": 3
     },
     "30252226-16d4-4f9f-9069-7e57d73edf60": {
       "kind": "motion-frame-candidate-front-flip-turn-1",
@@ -38180,27 +38216,503 @@
       "kind": "animation",
       "slug": "jaemtri",
       "template": "running-8-frames",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792806181.4270666,
       "receipt": {
         "usage": null,
         "background_job_id": "5416f0c1-1421-4aa2-b300-bf1fde00b699",
         "status": "processing"
       },
-      "endpoint": "animate-with-skeleton-v3"
+      "endpoint": "animate-with-skeleton-v3",
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 3.0
+        },
+        "id": "5416f0c1-1421-4aa2-b300-bf1fde00b699",
+        "status": "completed",
+        "created_at": "2026-10-24T01:43:02.284131+00:00",
+        "last_response": {
+          "seed": 2026111700,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "status": "initializing",
+          "progress": 1.0,
+          "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "bd951b5a-2e38-415c-9ed5-9db465f9145a",
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_started_at": "2026-10-24T01:43:53.857888+00:00",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792806434.3569083,
+      "elapsed_observed_seconds": 252.92984199523926,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 8
     },
     "2d1847a1-15ee-486a-90e9-d0bd0c2a2b5a": {
       "kind": "animation",
       "slug": "jaemtri",
       "template": "running-jump",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792806182.9138002,
       "receipt": {
         "usage": null,
         "background_job_id": "2d1847a1-15ee-486a-90e9-d0bd0c2a2b5a",
         "status": "processing"
       },
-      "endpoint": "animate-with-skeleton-v3"
+      "endpoint": "animate-with-skeleton-v3",
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 3.0
+        },
+        "id": "2d1847a1-15ee-486a-90e9-d0bd0c2a2b5a",
+        "status": "completed",
+        "created_at": "2026-10-24T01:43:03.293564+00:00",
+        "last_response": {
+          "seed": 2026111701,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "status": "initializing",
+          "progress": 1.0,
+          "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "c4cd3521-def9-4842-b298-3a47329e91de",
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_started_at": "2026-10-24T01:43:53.858875+00:00",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792806434.3642242,
+      "elapsed_observed_seconds": 251.45042395591736,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 8
+    },
+    "0e625b9e-9e57-45b9-84b4-83c15f014587": {
+      "kind": "motion-frame-candidate-backflip-prep-1",
+      "slug": "jaemtri",
+      "template": null,
+      "status": "completed",
+      "created_epoch": 1792806209.387555,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "0e625b9e-9e57-45b9-84b4-83c15f014587",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3",
+      "archive_output": "motion-frame-candidates/jaemtri/backflip/prep-1/frames",
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 2.0
+        },
+        "id": "0e625b9e-9e57-45b9-84b4-83c15f014587",
+        "status": "completed",
+        "created_at": "2026-10-24T01:43:34.024551+00:00",
+        "last_response": {
+          "seed": 2026111801,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "status": "initializing",
+          "progress": 1.0,
+          "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 2
+          },
+          "generation_id": "36f34a97-77c0-4102-a5c2-a103d895fb83",
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_started_at": "2026-10-24T01:44:26.036134+00:00",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792806434.370826,
+      "elapsed_observed_seconds": 224.98327112197876,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 2
+      },
+      "saved_frames": 3
+    },
+    "0fc54ecd-45cf-4e51-bd78-ad5d8e717c4a": {
+      "kind": "motion-frame-candidate-backflip-inverted-1",
+      "slug": "jaemtri",
+      "template": null,
+      "status": "completed",
+      "created_epoch": 1792806215.1811013,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "0fc54ecd-45cf-4e51-bd78-ad5d8e717c4a",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3",
+      "archive_output": "motion-frame-candidates/jaemtri/backflip/inverted-1/frames",
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 2.0
+        },
+        "id": "0fc54ecd-45cf-4e51-bd78-ad5d8e717c4a",
+        "status": "completed",
+        "created_at": "2026-10-24T01:43:35.634024+00:00",
+        "last_response": {
+          "seed": 2026111802,
+          "type": "done",
+          "action": "finalizing",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "status": "initializing",
+          "progress": 1.0,
+          "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 2
+          },
+          "generation_id": "ae7072fe-e4ab-4ca1-81dd-7d516d9336f5",
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_started_at": "2026-10-24T01:44:36.533307+00:00",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792806330.1818933,
+      "elapsed_observed_seconds": 115.00079250335693,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 2
+      },
+      "saved_frames": 3
+    },
+    "45a6c73c-5207-4097-8e0a-9de93523f27e": {
+      "kind": "motion-frame-candidate-backflip-turn-1",
+      "slug": "jaemtri",
+      "template": null,
+      "status": "completed",
+      "created_epoch": 1792806216.0778723,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "45a6c73c-5207-4097-8e0a-9de93523f27e",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3",
+      "archive_output": "motion-frame-candidates/jaemtri/backflip/turn-1/frames",
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 2.0
+        },
+        "id": "45a6c73c-5207-4097-8e0a-9de93523f27e",
+        "status": "completed",
+        "created_at": "2026-10-24T01:43:37.652027+00:00",
+        "last_response": {
+          "seed": 2026111803,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "status": "initializing",
+          "progress": 1.0,
+          "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 2
+          },
+          "generation_id": "c05de70d-652e-4f98-ae7f-f09da9e43a24",
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_started_at": "2026-10-24T01:44:28.615753+00:00",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792806434.3732946,
+      "elapsed_observed_seconds": 218.29542231559753,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 2
+      },
+      "saved_frames": 3
+    },
+    "6fd95721-122b-47fa-b292-82011a28c054": {
+      "kind": "motion-frame-candidate-backflip-descent-1",
+      "slug": "jaemtri",
+      "template": null,
+      "status": "completed",
+      "created_epoch": 1792806218.4670234,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "6fd95721-122b-47fa-b292-82011a28c054",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3",
+      "archive_output": "motion-frame-candidates/jaemtri/backflip/descent-1/frames",
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 2.0
+        },
+        "id": "6fd95721-122b-47fa-b292-82011a28c054",
+        "status": "completed",
+        "created_at": "2026-10-24T01:43:39.447037+00:00",
+        "last_response": {
+          "seed": 2026111804,
+          "type": "done",
+          "action": "finalizing",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "status": "initializing",
+          "progress": 1.0,
+          "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 2
+          },
+          "generation_id": "540a803e-d133-4723-89a7-b29619325f59",
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_started_at": "2026-10-24T01:44:31.53143+00:00",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792806330.2010016,
+      "elapsed_observed_seconds": 111.73397850990295,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 2
+      },
+      "saved_frames": 3
+    },
+    "61d04f4c-13af-4cc3-91e7-f7bba623d09b": {
+      "kind": "motion-frame-candidate-backflip-turn-2",
+      "slug": "jaemtri",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792806544.480892,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "61d04f4c-13af-4cc3-91e7-f7bba623d09b",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3",
+      "archive_output": "motion-frame-candidates/jaemtri/backflip/turn-2/frames",
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "61d04f4c-13af-4cc3-91e7-f7bba623d09b",
+        "status": "processing",
+        "created_at": "2026-10-24T01:49:05.159648+00:00",
+        "last_response": {
+          "type": "background",
+          "status": "initializing",
+          "flow_kind": "animation",
+          "queue_position": 0,
+          "estimated_wait_seconds": 0
+        }
+      }
     }
   },
   "characters": {
@@ -38664,7 +39176,7 @@
       "image_verified": true,
       "skeleton_joints": 18,
       "rotation_count": 8,
-      "exported": false,
+      "exported": true,
       "eight_way_visual_reviewed": true,
       "motions_visual_reviewed": false,
       "motion-frame-candidate-picking-up-low-pose-1": "40c26d95-c80c-468d-bd5f-30bf1465acb6",
@@ -39064,9 +39576,12 @@
             },
             {
               "frame_index": 2,
-              "source_job_id": "7a207771-608b-4a7c-8012-e504c6f31919",
-              "source_frame_index": 2,
-              "sha256": "01bd12110c24e7f1c1baf78ef63aec208c2ef30df5340639766da3dbb604cb6f"
+              "source_job_id": "c9da948c-5316-46c0-8564-48412c7653da",
+              "source_frame_index": 1,
+              "target_pose_index": 2,
+              "source_path": "motion-frame-candidates/jaemtri/front-flip/ascent-1/frames/1.png",
+              "sha256": "5bf52087e585e4b82bafde7539cae01c78e6eb3185697b49cbf2bd93ddb9bbcd",
+              "findings": "상승 회전 전 웅크린 자세, 머리/얼굴/손발과 외곽 온전. 기존 회색 머리/다리 잔상 제거."
             },
             {
               "frame_index": 3,
@@ -39109,9 +39624,12 @@
             },
             {
               "frame_index": 9,
-              "source_job_id": "7a207771-608b-4a7c-8012-e504c6f31919",
-              "source_frame_index": 9,
-              "sha256": "a9d8c18ab1120337a6d8628e1c93ee9a268e5aff16a6335cd6811e5888de6df0"
+              "source_job_id": "6ef612eb-3af3-4b11-9199-4b387ff261b1",
+              "source_frame_index": 1,
+              "target_pose_index": 9,
+              "source_path": "motion-frame-candidates/jaemtri/front-flip/descent-1/frames/1.png",
+              "sha256": "23388aa91a0ac0bbb6be6a60f76b1be0bbb2ececbcc9e6357a83de431dcee93c",
+              "findings": "기존10번째 얼굴/다리 손상 제거, 목표 기울어진 착지 전 자세와 신체 및 외곽 정상."
             },
             {
               "frame_index": 10,
@@ -39134,6 +39652,77 @@
           ],
           "method": "select complete same-pose regenerated frames; no pixel editing",
           "new_user_approval": false,
+          "visual_reviewed": true
+        },
+        "backflip": {
+          "base_job_id": "eb443f25-dd14-4633-ab0a-39a595fe2928",
+          "frame_sources": [
+            {
+              "frame_index": 0,
+              "source_job_id": "eb443f25-dd14-4633-ab0a-39a595fe2928",
+              "source_frame_index": 0,
+              "sha256": "d0b40ac7aeab782f63d01ce889238503651c389d93d7716264c993ff608b91d2"
+            },
+            {
+              "frame_index": 1,
+              "source_job_id": "0e625b9e-9e57-45b9-84b4-83c15f014587",
+              "source_frame_index": 1,
+              "target_pose_index": 1,
+              "source_path": "motion-frame-candidates/jaemtri/backflip/prep-1/frames/1.png",
+              "sha256": "91e7eb10c7e35b897613c9a06ac4fd3858222ea3d377265f9c78466adb996ea9",
+              "findings": "준비 자세의 떨어진 손 조각 제거, 얼굴/팔/머리와 외곽 온전."
+            },
+            {
+              "frame_index": 2,
+              "source_job_id": "eb443f25-dd14-4633-ab0a-39a595fe2928",
+              "source_frame_index": 2,
+              "sha256": "3d704f4fb2a17f65c9873627eead906aab37bad1d9c4126fd8f31db4499c6775"
+            },
+            {
+              "frame_index": 3,
+              "source_job_id": "0fc54ecd-45cf-4e51-bd78-ad5d8e717c4a",
+              "source_frame_index": 1,
+              "target_pose_index": 3,
+              "source_path": "motion-frame-candidates/jaemtri/backflip/inverted-1/frames/1.png",
+              "sha256": "7d60f7007249963a41b0b2b2fb425ff35b2d2e9fa7864dcac88f94d8e80c8053",
+              "findings": "역전 단계의 손발/얼굴/머리와 신발 외곽 온전. 0번 흐린 신발 반려,1번 정상 후보 선택."
+            },
+            {
+              "frame_index": 4,
+              "source_job_id": "eb443f25-dd14-4633-ab0a-39a595fe2928",
+              "source_frame_index": 4,
+              "sha256": "13c5ff98e1d3341c84e15eaf54aaa43add44e17911eacc268ac3806c4abb738e"
+            },
+            {
+              "frame_index": 5,
+              "source_job_id": "eb443f25-dd14-4633-ab0a-39a595fe2928",
+              "source_frame_index": 5,
+              "sha256": "2578e370aa0ce648a8b7a09aa806ed99971a02d60af34397798cb5cfa03c69c3"
+            },
+            {
+              "frame_index": 6,
+              "source_job_id": "6fd95721-122b-47fa-b292-82011a28c054",
+              "source_frame_index": 1,
+              "target_pose_index": 6,
+              "source_path": "motion-frame-candidates/jaemtri/backflip/descent-1/frames/1.png",
+              "sha256": "2d5a56e5cd8365c06d733a6ecba1b6cb08c7966b24a7a72e116ec8a75f6f91b4",
+              "findings": "회전 종료 자세의 머리/얼굴/손발 온전, 기존 회색 덩어리 제거. 전체 연결은 별도 검토."
+            },
+            {
+              "frame_index": 7,
+              "source_job_id": "eb443f25-dd14-4633-ab0a-39a595fe2928",
+              "source_frame_index": 7,
+              "sha256": "b97a5d946c18aa82741a64d11ea95a0a5b971b4535e6187b7c618f0ddf7bed3a"
+            },
+            {
+              "frame_index": 8,
+              "source_job_id": "eb443f25-dd14-4633-ab0a-39a595fe2928",
+              "source_frame_index": 8,
+              "sha256": "272673949e9dbb528b14206c65b4904cdbd5627ad0cca1406533b65ed75e70d8"
+            }
+          ],
+          "method": "select complete same-pose regenerated frames; no pixel editing",
+          "new_user_approval": false,
           "visual_reviewed": false
         }
       },
@@ -39150,7 +39739,12 @@
       "motion-frame-candidate-running-jump-hair-recover-2": "0e4d09ee-b593-4c6d-8dca-9fa7b032eb07",
       "motion-frame-candidate-front-flip-ascent-1": "c9da948c-5316-46c0-8564-48412c7653da",
       "motion-frame-candidate-front-flip-turn-1": "30252226-16d4-4f9f-9069-7e57d73edf60",
-      "motion-frame-candidate-front-flip-descent-1": "6ef612eb-3af3-4b11-9199-4b387ff261b1"
+      "motion-frame-candidate-front-flip-descent-1": "6ef612eb-3af3-4b11-9199-4b387ff261b1",
+      "motion-frame-candidate-backflip-prep-1": "0e625b9e-9e57-45b9-84b4-83c15f014587",
+      "motion-frame-candidate-backflip-inverted-1": "0fc54ecd-45cf-4e51-bd78-ad5d8e717c4a",
+      "motion-frame-candidate-backflip-turn-1": "45a6c73c-5207-4097-8e0a-9de93523f27e",
+      "motion-frame-candidate-backflip-descent-1": "6fd95721-122b-47fa-b292-82011a28c054",
+      "motion-frame-candidate-backflip-turn-2": "61d04f4c-13af-4cc3-91e7-f7bba623d09b"
     },
     "aileen": {
       "name": "에일린",
@@ -62340,9 +62934,216 @@
           "status": "processing"
         }
       }
+    },
+    {
+      "at": "2026-10-24T01:43:34Z",
+      "kind": "submitted",
+      "slug": "jaemtri",
+      "detail": {
+        "kind": "motion-frame-candidate-backflip-prep-1",
+        "template": null,
+        "job_id": "0e625b9e-9e57-45b9-84b4-83c15f014587",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "0e625b9e-9e57-45b9-84b4-83c15f014587",
+          "status": "processing"
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T01:43:35Z",
+      "kind": "submitted",
+      "slug": "jaemtri",
+      "detail": {
+        "kind": "motion-frame-candidate-backflip-inverted-1",
+        "template": null,
+        "job_id": "0fc54ecd-45cf-4e51-bd78-ad5d8e717c4a",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "0fc54ecd-45cf-4e51-bd78-ad5d8e717c4a",
+          "status": "processing"
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T01:43:38Z",
+      "kind": "submitted",
+      "slug": "jaemtri",
+      "detail": {
+        "kind": "motion-frame-candidate-backflip-turn-1",
+        "template": null,
+        "job_id": "45a6c73c-5207-4097-8e0a-9de93523f27e",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "45a6c73c-5207-4097-8e0a-9de93523f27e",
+          "status": "processing"
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T01:43:39Z",
+      "kind": "submitted",
+      "slug": "jaemtri",
+      "detail": {
+        "kind": "motion-frame-candidate-backflip-descent-1",
+        "template": null,
+        "job_id": "6fd95721-122b-47fa-b292-82011a28c054",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "6fd95721-122b-47fa-b292-82011a28c054",
+          "status": "processing"
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T01:45:30Z",
+      "kind": "completed",
+      "slug": "jaemtri",
+      "detail": {
+        "kind": "motion-frame-candidate-backflip-inverted-1",
+        "template": null,
+        "job_id": "0fc54ecd-45cf-4e51-bd78-ad5d8e717c4a",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 2
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T01:45:30Z",
+      "kind": "completed",
+      "slug": "jaemtri",
+      "detail": {
+        "kind": "motion-frame-candidate-backflip-descent-1",
+        "template": null,
+        "job_id": "6fd95721-122b-47fa-b292-82011a28c054",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 2
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T01:47:14Z",
+      "kind": "completed",
+      "slug": "jaemtri",
+      "detail": {
+        "kind": "motion-frame-candidate-front-flip-ascent-1",
+        "template": null,
+        "job_id": "c9da948c-5316-46c0-8564-48412c7653da",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 2
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T01:47:14Z",
+      "kind": "completed",
+      "slug": "jaemtri",
+      "detail": {
+        "kind": "animation",
+        "template": "running-8-frames",
+        "job_id": "5416f0c1-1421-4aa2-b300-bf1fde00b699",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T01:47:14Z",
+      "kind": "completed",
+      "slug": "jaemtri",
+      "detail": {
+        "kind": "animation",
+        "template": "running-jump",
+        "job_id": "2d1847a1-15ee-486a-90e9-d0bd0c2a2b5a",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T01:47:14Z",
+      "kind": "completed",
+      "slug": "jaemtri",
+      "detail": {
+        "kind": "motion-frame-candidate-backflip-prep-1",
+        "template": null,
+        "job_id": "0e625b9e-9e57-45b9-84b4-83c15f014587",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 2
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T01:47:14Z",
+      "kind": "completed",
+      "slug": "jaemtri",
+      "detail": {
+        "kind": "motion-frame-candidate-backflip-turn-1",
+        "template": null,
+        "job_id": "45a6c73c-5207-4097-8e0a-9de93523f27e",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 2
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T01:47:16Z",
+      "kind": "exported",
+      "slug": "jaemtri",
+      "detail": {
+        "bytes": 502679,
+        "files": 41,
+        "production_pack_clips": 20
+      }
+    },
+    {
+      "at": "2026-10-24T01:49:05Z",
+      "kind": "submitted",
+      "slug": "jaemtri",
+      "detail": {
+        "kind": "motion-frame-candidate-backflip-turn-2",
+        "template": null,
+        "job_id": "61d04f4c-13af-4cc3-91e7-f7bba623d09b",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "61d04f4c-13af-4cc3-91e7-f7bba623d09b",
+          "status": "processing"
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T01:49:09Z",
+      "kind": "exported",
+      "slug": "jaemtri",
+      "detail": {
+        "bytes": 502679,
+        "files": 41,
+        "production_pack_clips": 20
+      }
     }
   ],
-  "updated_at": 1792806183.5735953,
+  "updated_at": 1792806549.2771313,
   "user_stopped_at": 1792778235.6917784,
   "archived_jobs": {
     "304457e9-6577-44f0-af17-97841a9f6720": {
@@ -63661,11 +64462,11 @@
       "saved_frames": 6
     }
   },
-  "last_git_checkpoint": 1792805837.2752388,
+  "last_git_checkpoint": 1792806185.866297,
   "summary": {
     "jobs": {
-      "processing": 3,
-      "completed": 427,
+      "processing": 1,
+      "completed": 434,
       "failed": 9,
       "stalled": 0
     },

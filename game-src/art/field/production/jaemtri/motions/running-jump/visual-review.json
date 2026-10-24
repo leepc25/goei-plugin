@@ -1,0 +1,20 @@
+{
+  "at": 1792806482.562565,
+  "job_id": "2d1847a1-15ee-486a-90e9-d0bd0c2a2b5a",
+  "result": "pass",
+  "findings": "새 팔 궤적 전체8프레임 확인. 달리기→도약→착지 연결과 동향 유지. 얼굴/갈색 긴 머리/치마/하이힐 정상, 회색 외곽 덩어리 및 팔 안쪽 도색 제거.",
+  "frame_count": 8,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

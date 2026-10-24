@@ -1,0 +1,9 @@
+{
+  "frame_index": 1,
+  "source_job_id": "0e625b9e-9e57-45b9-84b4-83c15f014587",
+  "source_frame_index": 1,
+  "target_pose_index": 1,
+  "source_path": "motion-frame-candidates/jaemtri/backflip/prep-1/frames/1.png",
+  "sha256": "91e7eb10c7e35b897613c9a06ac4fd3858222ea3d377265f9c78466adb996ea9",
+  "findings": "준비 자세의 떨어진 손 조각 제거, 얼굴/팔/머리와 외곽 온전."
+}

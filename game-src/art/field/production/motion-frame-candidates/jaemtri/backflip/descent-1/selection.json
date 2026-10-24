@@ -1,0 +1,9 @@
+{
+  "frame_index": 6,
+  "source_job_id": "6fd95721-122b-47fa-b292-82011a28c054",
+  "source_frame_index": 1,
+  "target_pose_index": 6,
+  "source_path": "motion-frame-candidates/jaemtri/backflip/descent-1/frames/1.png",
+  "sha256": "2d5a56e5cd8365c06d733a6ecba1b6cb08c7966b24a7a72e116ec8a75f6f91b4",
+  "findings": "회전 종료 자세의 머리/얼굴/손발 온전, 기존 회색 덩어리 제거. 전체 연결은 별도 검토."
+}

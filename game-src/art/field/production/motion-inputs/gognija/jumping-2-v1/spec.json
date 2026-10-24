@@ -2,7 +2,7 @@
   "slug": "gognija",
   "slot": "jumping-2",
   "character_id": "8b61f17c-abec-4217-bca6-0850c24fe39c",
-  "skeleton_visually_reviewed": false,
+  "skeleton_visually_reviewed": true,
   "first_frame_path": "game-src/art/field/production/motion-inputs/gognija/first-frame.png",
   "new_user_approval": false,
   "landmark_source": "current character own east estimated 2d reference",
@@ -844,5 +844,6 @@
     "template_id": "mannequin",
     "seed": 2026110001,
     "no_background": true
-  }
+  },
+  "review_findings": "AVIF 흐트러진 흰 머리/둥근 어두운 안경/흰 실험복/흰셔츠와 검정 넥타이, 보충 로어 평범한 중년 체격 및 사용자 키180cm 확인. 유지 원본 무변경. own east 관절/전 자세 경계 열람."
 }

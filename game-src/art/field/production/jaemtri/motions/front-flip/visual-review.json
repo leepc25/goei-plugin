@@ -1,0 +1,115 @@
+{
+  "at": 1792806544.2454205,
+  "job_id": "7a207771-608b-4a7c-8012-e504c6f31919",
+  "result": "pass",
+  "findings": "교체한 전체13프레임 검토. 준비→앞회전→착지 연결, 얼굴/갈색 긴 머리/치마/손발 유지. 회색 도색 덩어리 및 투명 손상 제거.",
+  "frame_count": 13,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ],
+  "frame_assembly": {
+    "base_job_id": "7a207771-608b-4a7c-8012-e504c6f31919",
+    "frame_sources": [
+      {
+        "frame_index": 0,
+        "source_job_id": "7a207771-608b-4a7c-8012-e504c6f31919",
+        "source_frame_index": 0,
+        "sha256": "04653b5c8292c315ef9056242ac5c1b69803578085f654e0d88eeda3d7995924"
+      },
+      {
+        "frame_index": 1,
+        "source_job_id": "7a207771-608b-4a7c-8012-e504c6f31919",
+        "source_frame_index": 1,
+        "sha256": "531219706cdfafa152e80aba9ebe840f121557314c15f0c39bb92ac2ea1d5317"
+      },
+      {
+        "frame_index": 2,
+        "source_job_id": "c9da948c-5316-46c0-8564-48412c7653da",
+        "source_frame_index": 1,
+        "target_pose_index": 2,
+        "source_path": "motion-frame-candidates/jaemtri/front-flip/ascent-1/frames/1.png",
+        "sha256": "5bf52087e585e4b82bafde7539cae01c78e6eb3185697b49cbf2bd93ddb9bbcd",
+        "findings": "상승 회전 전 웅크린 자세, 머리/얼굴/손발과 외곽 온전. 기존 회색 머리/다리 잔상 제거."
+      },
+      {
+        "frame_index": 3,
+        "source_job_id": "30252226-16d4-4f9f-9069-7e57d73edf60",
+        "source_frame_index": 1,
+        "target_pose_index": 3,
+        "source_path": "motion-frame-candidates/jaemtri/front-flip/turn-1/frames/1.png",
+        "sha256": "3e6d250476ee6600ff43add4f7abd4c7c97c3f83f697fdc32e8c8adf47026b14",
+        "findings": "0번 흐린 신체 반려. 1번은 앞회전 자세와 갈색 머리/얼굴/손발 및 외곽 온전."
+      },
+      {
+        "frame_index": 4,
+        "source_job_id": "7a207771-608b-4a7c-8012-e504c6f31919",
+        "source_frame_index": 4,
+        "sha256": "0f1c7b72a16c7691a079649a60e7e67d66130173fafb331dd443c8d7558cce88"
+      },
+      {
+        "frame_index": 5,
+        "source_job_id": "7a207771-608b-4a7c-8012-e504c6f31919",
+        "source_frame_index": 5,
+        "sha256": "814985c4ddbe13141a818d7e06257c9a07c36f6387575715bbc7723ba2216534"
+      },
+      {
+        "frame_index": 6,
+        "source_job_id": "7a207771-608b-4a7c-8012-e504c6f31919",
+        "source_frame_index": 6,
+        "sha256": "21a8350a3f877c1667d633483e0aef17baf36eee21a70018b5a6c4e696117f04"
+      },
+      {
+        "frame_index": 7,
+        "source_job_id": "7a207771-608b-4a7c-8012-e504c6f31919",
+        "source_frame_index": 7,
+        "sha256": "39685e9f0cdd432918b9f1934f270b28e87b5e0911575d6ab4f337d88407f611"
+      },
+      {
+        "frame_index": 8,
+        "source_job_id": "7a207771-608b-4a7c-8012-e504c6f31919",
+        "source_frame_index": 8,
+        "sha256": "1340551b3a42158515766d893f92824bd495e8f9230bb4dcc1d73566e7a7e7e3"
+      },
+      {
+        "frame_index": 9,
+        "source_job_id": "6ef612eb-3af3-4b11-9199-4b387ff261b1",
+        "source_frame_index": 1,
+        "target_pose_index": 9,
+        "source_path": "motion-frame-candidates/jaemtri/front-flip/descent-1/frames/1.png",
+        "sha256": "23388aa91a0ac0bbb6be6a60f76b1be0bbb2ececbcc9e6357a83de431dcee93c",
+        "findings": "기존10번째 얼굴/다리 손상 제거, 목표 기울어진 착지 전 자세와 신체 및 외곽 정상."
+      },
+      {
+        "frame_index": 10,
+        "source_job_id": "7a207771-608b-4a7c-8012-e504c6f31919",
+        "source_frame_index": 10,
+        "sha256": "3b8b26ec2e14104c74bc6f4b3b03cd08d71552525ebea8eea29cbfacb19cdd8b"
+      },
+      {
+        "frame_index": 11,
+        "source_job_id": "7a207771-608b-4a7c-8012-e504c6f31919",
+        "source_frame_index": 11,
+        "sha256": "a917b6826afd870836d9a5613f2370e52549dfc1540b1ef0cc5cd1f5ed1e7693"
+      },
+      {
+        "frame_index": 12,
+        "source_job_id": "7a207771-608b-4a7c-8012-e504c6f31919",
+        "source_frame_index": 12,
+        "sha256": "3a568e2bbc38ef8f62ebf71de00654b4b582458f8fbb862c71684db70a9481d1"
+      }
+    ],
+    "method": "select complete same-pose regenerated frames; no pixel editing",
+    "new_user_approval": false,
+    "visual_reviewed": true
+  }
+}

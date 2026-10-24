@@ -303,6 +303,21 @@
       "jumping-1": "game-src/art/field/production/motion-inputs/rojemon/jumping-1-v1/spec.json",
       "jumping-2": "game-src/art/field/production/motion-inputs/rojemon/jumping-2-v1/spec.json",
       "two-footed-jump": "game-src/art/field/production/motion-inputs/rojemon/two-footed-jump-v1/spec.json"
+    },
+    "konjyuce": {
+      "jumping-1": "game-src/art/field/production/motion-inputs/konjyuce/jumping-1-v1/spec.json",
+      "jumping-2": "game-src/art/field/production/motion-inputs/konjyuce/jumping-2-v1/spec.json",
+      "two-footed-jump": "game-src/art/field/production/motion-inputs/konjyuce/two-footed-jump-v1/spec.json"
+    },
+    "gognija": {
+      "jumping-1": "game-src/art/field/production/motion-inputs/gognija/jumping-1-v1/spec.json",
+      "jumping-2": "game-src/art/field/production/motion-inputs/gognija/jumping-2-v1/spec.json",
+      "two-footed-jump": "game-src/art/field/production/motion-inputs/gognija/two-footed-jump-v1/spec.json"
+    },
+    "dejure": {
+      "jumping-1": "game-src/art/field/production/motion-inputs/dejure/jumping-1-v1/spec.json",
+      "jumping-2": "game-src/art/field/production/motion-inputs/dejure/jumping-2-v1/spec.json",
+      "two-footed-jump": "game-src/art/field/production/motion-inputs/dejure/two-footed-jump-v1/spec.json"
     }
   }
 }

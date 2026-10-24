@@ -1,0 +1,20 @@
+{
+  "at": 1792806471.4009295,
+  "job_id": "5416f0c1-1421-4aa2-b300-bf1fde00b699",
+  "result": "pass",
+  "findings": "새 팔 궤적 전체8프레임 확인. 팔꿈치가 어깨 아래에서 움직이며 과도한 뒤팔 접힘/회색 팔 안쪽 면 제거. 머리/얼굴/치마/하이힐과 동향 달리기 위상 유지.",
+  "frame_count": 8,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

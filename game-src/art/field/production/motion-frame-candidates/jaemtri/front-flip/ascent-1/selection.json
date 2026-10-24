@@ -1,0 +1,9 @@
+{
+  "frame_index": 2,
+  "source_job_id": "c9da948c-5316-46c0-8564-48412c7653da",
+  "source_frame_index": 1,
+  "target_pose_index": 2,
+  "source_path": "motion-frame-candidates/jaemtri/front-flip/ascent-1/frames/1.png",
+  "sha256": "5bf52087e585e4b82bafde7539cae01c78e6eb3185697b49cbf2bd93ddb9bbcd",
+  "findings": "상승 회전 전 웅크린 자세, 머리/얼굴/손발과 외곽 온전. 기존 회색 머리/다리 잔상 제거."
+}

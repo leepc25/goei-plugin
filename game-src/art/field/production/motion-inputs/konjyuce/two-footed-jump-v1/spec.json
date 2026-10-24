@@ -2,7 +2,7 @@
   "slug": "konjyuce",
   "slot": "two-footed-jump",
   "character_id": "596e5d65-64de-43bb-bc61-ea653f418729",
-  "skeleton_visually_reviewed": false,
+  "skeleton_visually_reviewed": true,
   "first_frame_path": "game-src/art/field/production/motion-inputs/konjyuce/first-frame.png",
   "new_user_approval": false,
   "landmark_source": "current character own west estimated 2d reference",
@@ -844,5 +844,6 @@
     "template_id": "mannequin",
     "seed": 2026110002,
     "no_background": true
-  }
+  },
+  "review_findings": "AVIF 검은 단발/분홍 브릿지/푸른 눈/교복, 보충 로어 10대 체격 및 사용자 키155cm 확인. 유지 원본 무변경. 얼굴 특징 보이는 WEST 예외 방위, 본인 관절/전 자세 경계 열람."
 }

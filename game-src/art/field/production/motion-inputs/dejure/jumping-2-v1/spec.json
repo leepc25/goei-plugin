@@ -2,7 +2,7 @@
   "slug": "dejure",
   "slot": "jumping-2",
   "character_id": "8bc8eb42-95a1-4dea-be57-80429b542d36",
-  "skeleton_visually_reviewed": false,
+  "skeleton_visually_reviewed": true,
   "first_frame_path": "game-src/art/field/production/motion-inputs/dejure/first-frame.png",
   "new_user_approval": false,
   "landmark_source": "current character own east estimated 2d reference",
@@ -844,5 +844,6 @@
     "template_id": "mannequin",
     "seed": 2026110001,
     "no_background": true
-  }
+  },
+  "review_findings": "AVIF 분홍 트윈테일/앞머리/분홍 눈/검정 스커트 정장, 보충 로어 작은 체구 및160–165cm 범위 확인. 유지 원본 및 출입증 무변경. own east 참조 관절과 모든 점프 자세 경계 열람."
 }

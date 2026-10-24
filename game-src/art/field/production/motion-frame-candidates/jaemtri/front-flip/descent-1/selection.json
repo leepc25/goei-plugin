@@ -1,0 +1,9 @@
+{
+  "frame_index": 9,
+  "source_job_id": "6ef612eb-3af3-4b11-9199-4b387ff261b1",
+  "source_frame_index": 1,
+  "target_pose_index": 9,
+  "source_path": "motion-frame-candidates/jaemtri/front-flip/descent-1/frames/1.png",
+  "sha256": "23388aa91a0ac0bbb6be6a60f76b1be0bbb2ececbcc9e6357a83de431dcee93c",
+  "findings": "기존10번째 얼굴/다리 손상 제거, 목표 기울어진 착지 전 자세와 신체 및 외곽 정상."
+}
