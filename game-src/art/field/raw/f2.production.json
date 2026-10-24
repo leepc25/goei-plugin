@@ -1,0 +1,185 @@
+{
+  "scene": "f2",
+  "guidelineRef": "main",
+  "guidelineCommit": "a9c6ad3c",
+  "guidelineReadInFull": true,
+  "sourceReusedFromRejectedArtwork": false,
+  "conversionScript": "game-src/art/field/tools/convert-f2.cjs",
+  "validation": {
+    "source": "game-src/art/field/source/f2-generated.png",
+    "sourceDimensions": [
+      2041,
+      771
+    ],
+    "sourceReusedFromRejectedArtwork": false,
+    "normalization": "Uniform horizontal fit and whole-scene vertical registration before pixel conversion; retained all original painted interiors and shading without local warps",
+    "normalizedSceneDimensions": [
+      3700,
+      700
+    ],
+    "workingDimensions": [
+      7400,
+      1400
+    ],
+    "modeOutputDimensions": [
+      3700,
+      700
+    ],
+    "modeBlocksVerified": 2590000,
+    "tieBlocks": 1313247,
+    "tieRule": "first in top-left, top-right, bottom-left, bottom-right order",
+    "reduction": "2x2 modal selection, no averaging or interpolation",
+    "paletteColors": 123,
+    "dither": "FloydSteinberg",
+    "outlineWidthPx": 1,
+    "outlineColor": [
+      0,
+      0,
+      0
+    ],
+    "outlinePixelWrites": 27372,
+    "doorOutlines": [
+      {
+        "x": 53,
+        "y": 110,
+        "w": 186,
+        "h": 310
+      },
+      {
+        "x": 511,
+        "y": 141,
+        "w": 151,
+        "h": 279
+      },
+      {
+        "x": 1064,
+        "y": 117,
+        "w": 268,
+        "h": 303
+      },
+      {
+        "x": 1795,
+        "y": 125,
+        "w": 148,
+        "h": 295
+      },
+      {
+        "x": 1992,
+        "y": 125,
+        "w": 149,
+        "h": 295
+      },
+      {
+        "x": 2609,
+        "y": 143,
+        "w": 147,
+        "h": 277
+      },
+      {
+        "x": 3114,
+        "y": 117,
+        "w": 260,
+        "h": 303
+      },
+      {
+        "x": 3497,
+        "y": 110,
+        "w": 178,
+        "h": 310
+      }
+    ],
+    "fixtureBounds": [
+      {
+        "x": 292,
+        "y": 103,
+        "w": 163,
+        "h": 63
+      },
+      {
+        "x": 524,
+        "y": 104,
+        "w": 123,
+        "h": 31
+      },
+      {
+        "x": 1099,
+        "y": 90,
+        "w": 197,
+        "h": 22
+      },
+      {
+        "x": 1409,
+        "y": 117,
+        "w": 197,
+        "h": 181
+      },
+      {
+        "x": 1666,
+        "y": 125,
+        "w": 92,
+        "h": 196
+      },
+      {
+        "x": 1836,
+        "y": 102,
+        "w": 69,
+        "h": 14
+      },
+      {
+        "x": 2034,
+        "y": 102,
+        "w": 69,
+        "h": 14
+      },
+      {
+        "x": 2331,
+        "y": 103,
+        "w": 162,
+        "h": 63
+      },
+      {
+        "x": 2614,
+        "y": 102,
+        "w": 143,
+        "h": 30
+      },
+      {
+        "x": 3149,
+        "y": 90,
+        "w": 190,
+        "h": 22
+      },
+      {
+        "x": 941,
+        "y": 292,
+        "w": 60,
+        "h": 131
+      },
+      {
+        "x": 2973,
+        "y": 292,
+        "w": 64,
+        "h": 131
+      },
+      {
+        "x": 2939,
+        "y": 149,
+        "w": 94,
+        "h": 114
+      }
+    ],
+    "wallFloorY": 420,
+    "top40": "Only slim crown molding/light ends; no separate ceiling plane, panels or vents",
+    "finalDimensions": [
+      3700,
+      700
+    ],
+    "finalUpscale": false,
+    "previewPolicy": "2x nearest neighbor in memory only; no preview file saved",
+    "pngPixelIdentityVerified": true,
+    "sha256": "f0d48bad0ca55665531f0f814a110fc7d359a86b3950dddc56a80b6155d93289",
+    "previewDisplayedAt2x": true
+  },
+  "userVisualApproval": false,
+  "gameIntegrated": false
+}
