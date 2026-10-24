@@ -1,0 +1,12 @@
+Image 1 is the art style reference: draw in exactly the same pixel art style, as if by the same artist for the same game — same level of detail, texture and shading.
+Image 2 shows the look of this building: copy its bright colors, walls, bright light gray stone floor and side-scrolling front view.
+
+Draw the LEFT END section of this 2nd-floor office corridor, daytime, with lots of open space — objects spaced well apart, not crowded:
+- at the far left, a closed angled side wall with a gray steel stairwell fire door and a green exit sign above it (no stairs visible),
+- then a restroom door with a pictogram plate,
+- a red fire extinguisher cabinet,
+- and near the right edge, a wide glass double door to an office.
+Leave the right edge of the image as plain continuing wall and floor (the corridor continues to the right).
+
+Camera: side-scrolling front view, looking straight at the back wall, wall parallel to the image, floor-wall line horizontal, no vanishing point, floor tile lines only horizontal. Only a thin strip of ceiling at the top.
+No people, no text, letters or numbers anywhere. Clean and new, matte floor without reflections or sun streaks.

@@ -1,0 +1,6 @@
+This image is part of a wide pixel-art game background. The left part is already finished; the white area on the right is empty.
+Fill in the white area by continuing the same corridor to the right, seamlessly: keep the left part exactly as it is, and continue the same wall, the same baseboard and the same wall-floor line at exactly the same height, the same floor tiles, the same ceiling strip, the same pixel art style, colors and scale.
+
+In the new area draw the elevator hall: two identical stainless-steel elevators side by side, flush with the back wall, each with a small dark blank indicator window above, a call-button panel between or beside them, and in front of the elevators on the floor a slightly darker stone floor inlay. Also a large potted plant standing out on the floor. Keep plenty of open space, not crowded.
+Same side-scrolling front view: wall parallel to the image, floor-wall line horizontal, no vanishing point.
+No people, no text, letters or numbers anywhere. Matte floor, no reflections.
