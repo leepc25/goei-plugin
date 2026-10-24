@@ -16,7 +16,7 @@ def fetch(u):
     return Image.open(io.BytesIO(data)).convert("RGBA")
 
 def keep(a):
-    m = re.match(r"v3 (\d+(?:-\d+)?|W) ", a.get("display_name", ""))
+    m = re.match(r"v3 (\d+(?:-\d+)?|W(?:-\d+)?) ", a.get("display_name", ""))
     if not m: return False
     loc = OUT / m[1].replace("-", "_") / "00.png"
     if not loc.exists(): return False

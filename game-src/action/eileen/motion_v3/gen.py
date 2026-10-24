@@ -52,7 +52,7 @@ subject = re.search(r"Subject: `([^`]+)`", text).group(1)
 rows = {}
 for line in text.splitlines():
     c = [x.strip() for x in line.strip().strip("|").split(" | ")]
-    if len(c) >= 8 and re.fullmatch(r"\d+(-\d+)?|W", c[0]) and "<br>" in c[6]:
+    if len(c) >= 8 and re.fullmatch(r"\d+(-\d+)?|W(-\d+)?", c[0]) and "<br>" in c[6]:
         rows[c[0]] = dict(n=c[0], name=c[1], dir=DIRS[c[2]], frames=int(c[3]), span=c[4],
                           pose=c[5], prompt=c[6].split("<br>")[0].strip())
 
