@@ -1,0 +1,20 @@
+{
+  "at": 1792812436.4336452,
+  "job_id": "1c031fb9-393a-4ce1-af1e-d7f3b51f71a2",
+  "result": "pass",
+  "findings": "Eight EAST walking frames maintain alternating stride, bald head/goatee/leather jacket and native scale; intact edges without gray matte.",
+  "frame_count": 8,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "walking-8-frames",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

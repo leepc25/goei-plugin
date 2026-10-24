@@ -1,0 +1,20 @@
+{
+  "at": 1792812672.100636,
+  "job_id": "a7368f7b-d21f-41a2-9642-769f6ae0c6b4",
+  "result": "reroll-required",
+  "findings": "Large gray ground/exterior masses and clipped lower boots; one hand stays fist while other overhead. Require coherent open-palm push.",
+  "frame_count": 6,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "pushing",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

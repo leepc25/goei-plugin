@@ -1,0 +1,20 @@
+{
+  "at": 1792812671.7851512,
+  "job_id": "7ea63972-89d0-417a-8425-129ef4f07691",
+  "result": "reroll-required",
+  "findings": "Index4 has a detached gray patch to right of body; other seven frames visually intact. Reroll only this pose.",
+  "frame_count": 8,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

@@ -2,7 +2,7 @@
   "slug": "lee-do-hyeong",
   "slot": "jumping-2",
   "character_id": "30dad544-9ce9-45b9-b684-151819796505",
-  "skeleton_visually_reviewed": false,
+  "skeleton_visually_reviewed": true,
   "first_frame_path": "game-src/art/field/production/motion-inputs/lee-do-hyeong/first-frame.png",
   "new_user_approval": false,
   "landmark_source": "current character own east estimated 2d reference",
@@ -844,5 +844,6 @@
     "template_id": "mannequin",
     "seed": 2026110001,
     "no_background": true
-  }
+  },
+  "skeleton_review_findings": "AVIF/lore re-read: tall muscular, silver low ponytail, cheek/forearm scars, rolled jacket and shirt sleeves, aviators. Own EAST reference and all eight bounded jump poses reviewed. Native tall scale preserved without resizing or new armor/weapon."
 }

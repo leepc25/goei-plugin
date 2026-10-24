@@ -1,0 +1,20 @@
+{
+  "at": 1792812672.6369455,
+  "job_id": "26047ff4-f3de-47cb-a272-f27c5eb4f1f0",
+  "result": "reroll-required",
+  "findings": "Raised fist clipped at top in guard frames; lower guard to safe own pose.",
+  "frame_count": 8,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "fight-stance-idle-8-frames",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

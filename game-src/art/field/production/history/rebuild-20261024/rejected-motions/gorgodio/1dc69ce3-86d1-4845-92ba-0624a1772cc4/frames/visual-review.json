@@ -1,0 +1,20 @@
+{
+  "at": 1792812672.263249,
+  "job_id": "14fc20a0-717a-4eff-98d2-2fad20876c9c",
+  "result": "reroll-required",
+  "findings": "Looks like small boxing guard steps rather than a clear heavy pull; make reach, lean back and retract hands visibly distinct.",
+  "frame_count": 6,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "pull-heavy-object",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "reason": "Last boot clipped at bottom and arm trajectory circles overhead instead of clear straight punch; bounded cross required.",
+  "group": {
+    "animation_type": "cross-punch",
+    "display_name": null,
+    "animation_group_id": "19993446-6561-48ff-b3ec-46c72ea43572",
+    "directions": [
+      {
+        "direction": "east",
+        "frame_count": 6,
+        "frames": [
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/1d8d12e4-06d5-4df8-8812-0754f77b736b/animations/ae595309-15b1-43ad-aa57-59fd56b43525/east/0.png?t=1792812220",
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/1d8d12e4-06d5-4df8-8812-0754f77b736b/animations/ae595309-15b1-43ad-aa57-59fd56b43525/east/1.png?t=1792812220",
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/1d8d12e4-06d5-4df8-8812-0754f77b736b/animations/ae595309-15b1-43ad-aa57-59fd56b43525/east/2.png?t=1792812220",
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/1d8d12e4-06d5-4df8-8812-0754f77b736b/animations/ae595309-15b1-43ad-aa57-59fd56b43525/east/3.png?t=1792812220",
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/1d8d12e4-06d5-4df8-8812-0754f77b736b/animations/ae595309-15b1-43ad-aa57-59fd56b43525/east/4.png?t=1792812220",
+          "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/1d8d12e4-06d5-4df8-8812-0754f77b736b/animations/ae595309-15b1-43ad-aa57-59fd56b43525/east/5.png?t=1792812220"
+        ]
+      }
+    ]
+  },
+  "at": 1792812998.5983987,
+  "state_before": {
+    "name": "고르고디오",
+    "group": "management",
+    "character_id": "1d8d12e4-06d5-4df8-8812-0754f77b736b",
+    "image": "2f655338-9c44-48da-b55f-0aab08174ead",
+    "registration": "3676d347-a999-4fff-93e5-fdef57f7cee7",
+    "motions": {
+      "breathing-idle": "fc885982-749a-43d0-84ee-ae7e2f613dd3",
+      "walking-8-frames": "1c031fb9-393a-4ce1-af1e-d7f3b51f71a2",
+      "sad-walk": "bfaf7ccb-a3f0-4310-8d01-bcab1d5d0f41",
+      "jumping-1": "bcdfe8d7-dc49-49bb-b4ba-2715f97de193",
+      "jumping-2": "8ca0dfee-91a4-4107-a351-86b38e32d7c7",
+      "two-footed-jump": "7ea63972-89d0-417a-8425-129ef4f07691",
+      "drinking": "79484419-2153-4255-a929-f59ba8a6a0e9",
+      "cross-punch": "89fa95bd-c08d-4973-9669-c55c9a3e1aac"
+    },
+    "ready": true,
+    "image_verified": true,
+    "skeleton_joints": 18,
+    "rotation_count": 8,
+    "exported": false,
+    "eight_way_visual_reviewed": true,
+    "motions_visual_reviewed": false
+  }
+}

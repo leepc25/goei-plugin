@@ -1,0 +1,20 @@
+{
+  "at": 1792812671.613916,
+  "job_id": "749dcbeb-c1ee-4d00-a6fa-4bdff66b8c53",
+  "result": "reroll-required",
+  "findings": "Raised hands/boots clipped at top and large gray mass around inverted arms; bounded rotation required.",
+  "frame_count": 10,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "backflip",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}
