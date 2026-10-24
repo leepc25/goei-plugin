@@ -1,5 +1,5 @@
 """Record explicit full-frame visual findings and gate the next character."""
-import argparse,fcntl,json,time
+import argparse,fcntl,json,time,hashlib
 from field_character_production import OUT,TEMPLATES,atomic
 
 def main():
@@ -10,8 +10,15 @@ def main():
   assert all(x.get('ready') and x.get('eight_way_visual_reviewed') for x in s['characters'].values())
   jid=c['motions'][a.template];job=s['jobs'][jid];assert job['status']=='completed'
   folder=OUT/a.slug/'motions'/a.template;frames=list(folder.glob('*.png'));assert frames
+  repairs=c.get('motion_frame_repairs',{}).get(a.template,{})
+  repairs={i:r for i,r in repairs.items() if r['base_job_id']==jid}
+  for i,r in repairs.items():
+   assert s['jobs'][r['repair_job_id']]['status']=='completed'
+   assert hashlib.sha256((folder/(i+'.png')).read_bytes()).hexdigest()==r['result_sha256']
   reqpath=OUT/a.slug/(a.template+'-request.json');req=json.loads(reqpath.read_text()) if reqpath.exists() else {}
   atomic(folder/'visual-review.json',{'at':time.time(),'job_id':jid,'result':a.result,'findings':a.findings,'frame_count':len(frames),'directions':req.get('directions') or [req.get('direction')],'actual_template':req.get('template_animation_id','custom-skeleton' if 'keypoints' in req else a.template),'new_user_approval':False,'rules_rechecked':['AVIF identity primary','lore stature supplemental','all55 eight-way barrier','correct face-visible direction','no gray exterior paint in every frame','pose and foot contact consistency']})
+  if repairs:
+   path=folder/'visual-review.json';record=json.loads(path.read_text());record['frame_repairs']=repairs;atomic(path,record)
   passed=[]
   for template,_ in TEMPLATES:
    review=OUT/a.slug/'motions'/template/'visual-review.json'

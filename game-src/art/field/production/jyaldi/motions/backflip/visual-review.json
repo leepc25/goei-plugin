@@ -1,0 +1,20 @@
+{
+  "at": 1792801146.4898596,
+  "job_id": "7ed684ff-42ce-42b3-9b9c-53bdfbc2e78b",
+  "result": "reroll-required",
+  "findings": "Frame 5 has face/hair holes; other eight frames clean. Regenerate masked damaged region through documented inpainting, with pixel-exact outside preservation and complete follow-up visual review.",
+  "frame_count": 9,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

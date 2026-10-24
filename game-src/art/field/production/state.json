@@ -27464,7 +27464,7 @@
       "kind": "animation",
       "slug": "jyaldi",
       "template": "backflip",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792800875.6070578,
       "receipt": {
         "usage": null,
@@ -27474,21 +27474,137 @@
       "endpoint": "animate-with-skeleton-v3",
       "last_response": {
         "usage": {
+          "type": "generations",
+          "generations": 3.0
+        },
+        "id": "7ed684ff-42ce-42b3-9b9c-53bdfbc2e78b",
+        "status": "completed",
+        "created_at": "2026-10-24T00:14:35.859600+00:00",
+        "last_response": {
+          "seed": 2026102805,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "status": "initializing",
+          "progress": 1.0,
+          "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "a977f19b-b6b9-466b-b168-0e3250243cb9",
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_started_at": "2026-10-24T00:15:32.199461+00:00",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792801060.0210612,
+      "elapsed_observed_seconds": 184.41400361061096,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 9
+    },
+    "b110c538-e637-4237-9cd3-80a92de3b429": {
+      "kind": "motion-frame-repair-backflip-v5-face-1",
+      "slug": "jyaldi",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792801208.622907,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "b110c538-e637-4237-9cd3-80a92de3b429",
+        "image_id": "6f7f68a6-fa43-5870-906d-3e17bc270bf0",
+        "source_image_id": "6f7f68a6-fa43-5870-906d-3e17bc270bf0",
+        "status": "processing",
+        "output_count": 1,
+        "image_size": {
+          "width": 256,
+          "height": 256
+        },
+        "estimated_generations": 9,
+        "pricing_provisional": true
+      },
+      "endpoint": "inpaint-image-pro-flash",
+      "last_response": {
+        "usage": {
           "type": "usd",
           "usd": 0.0
         },
-        "id": "7ed684ff-42ce-42b3-9b9c-53bdfbc2e78b",
+        "id": "b110c538-e637-4237-9cd3-80a92de3b429",
         "status": "processing",
-        "created_at": "2026-10-24T00:14:35.859600+00:00",
+        "created_at": "2026-10-24T00:20:09.337950+00:00",
         "last_response": {
           "type": "message_progress",
-          "action": "generating",
-          "status": "initializing",
-          "progress": 0.12612707865632466,
-          "flow_kind": "animation",
-          "queue_position": 0,
-          "generation_started_at": "2026-10-24T00:15:32.199461+00:00",
-          "estimated_wait_seconds": 0
+          "model": "inpaint_pro_flash",
+          "width": 256,
+          "action": "Generating image",
+          "height": 256,
+          "prompt": "Repair this upside-down woman during the SAME backward tucked somersault pose. Restore the missing opaque face and long straight black hair inside the mask, natural pale skin, small red irises, mature feminine face, black fitted suit and white shirt collar. Keep the exact inverted head angle, hair silhouette continuity, native pixel style and lighting. Fill accidental transparent holes inside face and hair. Transparent outside the clean dark silhouette; no gray paint or gray halo. Do not turn her upright, add limbs, add text, or change pose. Also close the tiny accidental holes in the masked bent knee and black gloved hand, retaining their exact shape and black fabric shading.",
+          "status": "processing",
+          "image_id": "6f7f68a6-fa43-5870-906d-3e17bc270bf0",
+          "job_kind": "creator-image",
+          "progress": 0.05,
+          "generation_started_at": "2026-10-24T00:20:09.507087+00:00"
         }
       }
     }
@@ -27527,10 +27643,11 @@
       "image_verified": true,
       "skeleton_joints": 18,
       "rotation_count": 8,
-      "exported": false,
+      "exported": true,
       "motion_direction_revision": "west-southwest",
       "eight_way_visual_reviewed": true,
-      "motions_visual_reviewed": false
+      "motions_visual_reviewed": false,
+      "motion-frame-repair-backflip-v5-face-1": "b110c538-e637-4237-9cd3-80a92de3b429"
     },
     "spangdal": {
       "name": "스팡달",
@@ -47008,9 +47125,69 @@
           "status": "processing"
         }
       }
+    },
+    {
+      "at": "2026-10-24T00:17:40Z",
+      "kind": "completed",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "backflip",
+        "job_id": "7ed684ff-42ce-42b3-9b9c-53bdfbc2e78b",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T00:17:42Z",
+      "kind": "exported",
+      "slug": "jyaldi",
+      "detail": {
+        "bytes": 668391,
+        "files": 64,
+        "production_pack_clips": 20
+      }
+    },
+    {
+      "at": "2026-10-24T00:20:09Z",
+      "kind": "submitted",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "motion-frame-repair-backflip-v5-face-1",
+        "template": null,
+        "job_id": "b110c538-e637-4237-9cd3-80a92de3b429",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "b110c538-e637-4237-9cd3-80a92de3b429",
+          "image_id": "6f7f68a6-fa43-5870-906d-3e17bc270bf0",
+          "source_image_id": "6f7f68a6-fa43-5870-906d-3e17bc270bf0",
+          "status": "processing",
+          "output_count": 1,
+          "image_size": {
+            "width": 256,
+            "height": 256
+          },
+          "estimated_generations": 9,
+          "pricing_provisional": true
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T00:20:40Z",
+      "kind": "exported",
+      "slug": "jyaldi",
+      "detail": {
+        "bytes": 668391,
+        "files": 64,
+        "production_pack_clips": 20
+      }
     }
   ],
-  "updated_at": 1792800955.3965895,
+  "updated_at": 1792801240.8854492,
   "user_stopped_at": 1792778235.6917784,
   "archived_jobs": {
     "304457e9-6577-44f0-af17-97841a9f6720": {
@@ -48329,11 +48506,11 @@
       "saved_frames": 6
     }
   },
-  "last_git_checkpoint": 1792800644.0689416,
+  "last_git_checkpoint": 1792800957.7863896,
   "summary": {
     "jobs": {
       "processing": 1,
-      "completed": 320,
+      "completed": 321,
       "failed": 9,
       "stalled": 0
     },
