@@ -389,11 +389,19 @@ function knock() {
   gainSp(20); sfx('hurt', { strength: 2 }); P.combat = true; P.combo = 0; P.armed = false; pushP(-560, 650); shake = 8; P.hp = Math.max(1, P.hp - 18);
   const kid = has('19_1') ? '19_1' : '19';   // 남동판이 있으면 그걸로(사용자 2026-10-24)
   // 남동판 2·3장은 그림에 궤적이 그려져 있어 뺌
-  const kf = kid === '19_1' ? [0, 3, 4, 5, 6, 7] : R(0, 7);
-  act(kid, { seq: S(kf, 0.065).map((e, i) => i === kf.length - 3 ? { ...e, ev: 'dust' } : e), onEnd: () => { P.mode = 'down'; } });
+  if (kid === '19_1' && A['19_1'].n >= 12) {
+    P.mode = 'act';
+    play('19_1', { seq: [...S(R(0, 7), 0.065).map((e, i) => i === 5 ? { ...e, ev: 'dust' } : e), ...S(R(8, 11), 0.16)], loopFrom: 8 });
+    P.knockT = 0.53; return;   // 쓰러지는 장이 끝나면 누운 상태(들썩임은 계속 반복)
+  }
+  act(kid, { seq: S(R(0, 7), 0.065).map((e, i) => i === 5 ? { ...e, ev: 'dust' } : e), onEnd: () => { P.mode = 'down'; } });
 }
 function getUp() { sfx('wakeup'); act('20', { seq: S(R(0, 7), 0.06) }); }
-function belly() { P.mode = 'belly'; play('38', { seq: [...S(R(0, 3), 0.11), ...S(R(4, 11), 0.1)], loopFrom: 4 }); }
+function belly() {
+  P.mode = 'belly';
+  if (has('38_1')) return play('38', { seq: S(R(0, A['38'].n - 1), 0.1), onEnd: () => { if (P.mode === 'belly') play('38_1', { fps: 8, loopFrom: 0 }); } });
+  play('38', { seq: [...S(R(0, 3), 0.11), ...S(R(4, 11), 0.1)], loopFrom: 4 });
+}
 function stun() {
   P.combat = true; P.combo = 0; P.armed = false; P.mode = 'stun'; P.stunT = 2.6;
   play('21', { seq: [{ f: 0, d: 0.05 }, ...S(R(1, 7), 0.1)], loopFrom: 1 });
@@ -551,7 +559,7 @@ function update(dt) {
   switch (P.mode) {
     case 'ground': {
       if (down('flee')) { P.mode = 'flee'; play('36', { fps: 14, loopFrom: 0 }); break; }
-      if (down('back')) { P.mode = 'back'; play('37', { fps: 8, loopFrom: 0 }); break; }
+      if (down('back')) { P.mode = 'back'; if (has('37_1')) play('37', { fps: 8, onEnd: () => { if (P.mode === 'back') play('37_1', { fps: 8, loopFrom: 0 }); } }); else play('37', { fps: 8, loopFrom: 0 }); break; }
       if (dx || dy) {
         if (P.armed) P.armed = false;
         if (dx && dx !== P.face) { P.prevFace = P.face; P.faceT = P.t; P.face = dx; }
@@ -566,13 +574,14 @@ function update(dt) {
         const id = P.armed ? (has('W1') ? 'W1' : 'W') : P.combat ? '3' : '1';
         if (!P.clip || P.clip.id !== id) {
           if (id === 'W') play('W', { seq: [{ f: 3, d: 9 }], loopFrom: 0 });
-          else play(id, { fps: id === 'W1' ? 5 : P.combat ? 7 : P.dying ? 2.5 : 4, loopFrom: 0 });
+          else play(id, { fps: id === 'W1' ? 5 : P.combat ? 7 : P.dying ? 2.2 : 3, loopFrom: 0 });
         }
         P.idleT += dt;
         if (!P.combat && !P.armed && !P.dying && P.idleT > 9) { P.idleT = 0; emote('2', 7); }
       }
       break;
     }
+    case 'act': if (P.knockT > 0) { P.knockT -= dt; if (P.knockT <= 0) P.mode = 'down'; } break;
     case 'chain': P.chainT -= dt; if (P.chainT <= 0) chainExpire(); break;
     case 'air': {
       if (P.takeoff > 0) { P.takeoff -= dt; if (P.takeoff <= 0) { P.vz = 1180; dust(P.x, P.y, 3, 0.7); } else break; }
@@ -595,12 +604,12 @@ function update(dt) {
       if (Math.random() < dt * (8 + lv * 10)) fx.push({ k: 'mote', x: P.x + (Math.random() - 0.5) * 90 * K(P.y), y: P.y, vy: -120 - Math.random() * 160, c: CH_COL[lv], t: 0.7, t0: 0.7 });
       break;
     }
-    case 'belly': { const go = dx !== 0; if (go) P.face = dx; P.clip.paused = !go && P.clip.i >= 4; if (go && P.clip.i >= 4) P.x += dx * 55 * dt; break; }
+    case 'belly': { const go = dx !== 0, looping = P.clip.id === '38_1' || P.clip.i >= 4; if (go) P.face = dx; P.clip.paused = !go && looping; if (go && looping) P.x += dx * 55 * dt; break; }
     case 'stun': P.stunT -= dt; if (P.stunT <= 0) reverseOut('21', [curF() > 1 ? 1 : curF(), 0], 0.07); break;
     case 'flee': if (!down('flee')) { toIdle(); break; } if (dx) P.face = dx; P.x += P.face * 400 * dt; P.y += dy * 180 * dt; break;
     case 'back': if (!down('back')) { toIdle(); break; } P.x -= P.face * 95 * dt; P.y += dy * 60 * dt; break;
     case 'sit': if (P.clip && P.clip.id === '39' && P.clip.i >= 7 && dx && dx === -P.face) { P.mode = 'scoot'; play('40', { fps: 6, loopFrom: 0 }); } break;
-    case 'scoot': if (!(dx && dx === -P.face)) { sitLoop(); break; } P.x -= P.face * 55 * dt; break;
+    case 'scoot': if (!(dx && dx === -P.face)) { sitLoop(); break; } P.x -= P.face * 70 * dt; break;
     case 'crouch': if (P.clip && P.clip.i >= 4 && dx) { P.face = dx; P.mode = 'crawl4'; play('42', { seq: [...S(R(0, 3), 0.08), ...S(R(4, 11), 0.085)], loopFrom: 4 }); } break;
     case 'crawl4': { const go = dx !== 0; if (go) P.face = dx; P.clip.paused = !go && P.clip.i >= 4; if (go && P.clip.i >= 4) P.x += dx * 95 * dt; break; }
   }
