@@ -15,6 +15,7 @@ RULES = {
     "전투자세발없음": "전투 대기/싸움 자세인데 발 위치가 없음",
     "견본한단어": "견본(walking/running) 한 단어뿐",
     "가만히": "거의 안 움직이게 시킴(대기·반응이 정지 그림이 됨)",
+    "추상꾸밈": "그림이 안 되는 꾸밈말(efficient, compact, sharp 등)",
 }
 FACE = r"\b(eyes?|narrow\w*|jaw|mouth|lips?|smil\w*|grin\w*|wink\w*|frown\w*|brows?|sigh\w*|nods?|nodd\w*|glanc\w*|blink\w*|expression\w*|teeth|stare\w*|gaze|squint\w*|corner of the mouth|breath\w*)\b"
 STATE = r"\b(dazed|unfocused|without|barely|nothing else|perfectly still|motionless|calm\w*|confident\w*|function\w*|as if|no \w+|not |never|neither|utterly still|lazily|casually|nervous\w*|proud\w*)\b"
@@ -23,6 +24,7 @@ RETURN = r"\b(returns?|back) (in)?to (the|a|his|her) \w*\s*(stance|pose|guard|po
 TERMS = r"\b(butt|feet-first|charging handle|chambers?|draw-cut|iaido|sheathes?|scabbard|parr\w*|feint\w*|sweep\w*|uppercut|hook punch|jab|haymaker|suplex|clinch|counter\w*)\b"
 PROPS = r"\b(rifle|pistol|guns?|sword|katana|blade|knife|dagger|baton|minigun|flamethrower|shotgun|axe|bat|pipe|spear|scimitar|glaive|cigarette|phone|cup|mug|tablet|notebook)\b"
 FEET = r"\b(feet|foot|legs? apart|step\w* forward|side-on|sideways|lead (leg|foot)|rear (leg|foot)|wide stance|stagger\w*)\b"
+ABSTRACT = r"\b(efficient\w*|economical\w*|compact|sharp\w*|minimal\w*|firm\w*|serious\w*|quick\w*|smooth\w*|elegant\w*|power\w*|precise\w*|controlled|graceful\w*|fluid\w*|crisp\w*|neat\w*|tight\w*|brisk\w*|swift\w*|heav\w*|light\w*|slight\w*|subtle\w*|deliberate\w*|steady|relaxed|tense\w*|explosive\w*|fierce\w*|aggressive\w*|dramatic\w*|elaborate\w*|soft\w*|hard|strong\w*|weak\w*|natural\w*|casual\w*|lazy|lazily|slow\w*|fast)\b"
 SEP = r"(,? then |; |\. (?=[A-Z])|, and then |, before |, after which )"
 
 BODY = {"knees", "arms", "hands", "feet", "legs", "eyes", "hips", "shoulders", "elbows", "fists", "lips", "brows", "this", "is", "was", "as", "its", "his", "always"}
@@ -65,6 +67,8 @@ def lint_file(f):
             st = set(w.lower().strip() for w in re.findall(STATE, p, re.I))
             if st: flags.append("상태부정(" + ",".join(sorted(st)) + ")")
             if re.search(STILL, p, re.I): flags.append("가만히")
+            ab = set(w.lower() for w in re.findall(ABSTRACT, p, re.I))
+            if ab: flags.append("추상꾸밈(" + ",".join(sorted(ab)) + ")")
             props = set(w.lower() for w in re.findall(PROPS, p, re.I)) - set(re.findall(PROPS, subject, re.I))
             if props: flags.append("소품등장(" + ",".join(sorted(props)) + ")")
             terms = set(w.lower() for w in re.findall(TERMS, p, re.I))
