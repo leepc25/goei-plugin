@@ -15,10 +15,21 @@ def main():
   for i,r in repairs.items():
    assert s['jobs'][r['repair_job_id']]['status']=='completed'
    assert hashlib.sha256((folder/(i+'.png')).read_bytes()).hexdigest()==r['result_sha256']
+  assembly=c.get('motion_assemblies',{}).get(a.template)
+  if assembly and assembly['base_job_id']!=jid:assembly=None
+  if assembly:
+   sources=assembly['frame_sources'];assert sorted(x['frame_index'] for x in sources)==list(range(len(frames)))
+   for r in sources:
+    source_job=s['jobs'][r['source_job_id']]
+    assert source_job['status']=='completed' and source_job['slug']==a.slug
+    assert hashlib.sha256((folder/(str(r['frame_index'])+'.png')).read_bytes()).hexdigest()==r['sha256']
   reqpath=OUT/a.slug/(a.template+'-request.json');req=json.loads(reqpath.read_text()) if reqpath.exists() else {}
   atomic(folder/'visual-review.json',{'at':time.time(),'job_id':jid,'result':a.result,'findings':a.findings,'frame_count':len(frames),'directions':req.get('directions') or [req.get('direction')],'actual_template':req.get('template_animation_id','custom-skeleton' if 'keypoints' in req else a.template),'new_user_approval':False,'rules_rechecked':['AVIF identity primary','lore stature supplemental','all55 eight-way barrier','correct face-visible direction','no gray exterior paint in every frame','pose and foot contact consistency']})
   if repairs:
    path=folder/'visual-review.json';record=json.loads(path.read_text());record['frame_repairs']=repairs;atomic(path,record)
+  if assembly:
+   assembly['visual_reviewed']=a.result=='pass'
+   path=folder/'visual-review.json';record=json.loads(path.read_text());record['frame_assembly']=assembly;atomic(path,record)
   passed=[]
   for template,_ in TEMPLATES:
    review=OUT/a.slug/'motions'/template/'visual-review.json'
