@@ -25,7 +25,8 @@ def req(method, path, body=None):
     data = json.dumps(body).encode() if body is not None else None
     r = urllib.request.Request(API + path, data=data, method=method, headers={"Content-Type": "application/json"})
     with urllib.request.urlopen(r, timeout=120) as resp:
-        return json.load(resp)
+        raw = resp.read()
+        return json.loads(raw) if raw.strip() else {}
 
 def balance():
     return req("GET", "/balance")["subscription"]["generations"]
@@ -109,6 +110,14 @@ def save(n, fr):
     for i, im in enumerate(fr): sheet.paste(im, (i * w, 0))
     sheet.save(OUT / f"{n.replace('-', '_')}_sheet.png")
 
+def delete_old(name):
+    """사용자 지시(2026-10-24): 다시 뽑을 때는 PixelLab에 있는 같은 줄의 이전 판을 먼저 지운다."""
+    ch = req("GET", f"/characters/{CID}")
+    for a in ch["animations"]:
+        if a.get("display_name") == name:
+            req("DELETE", f"/characters/{CID}/animations/{a['animation_group_id']}")
+            log(f"이전 판 지움: {name} {a['animation_group_id']}")
+
 sem = threading.Semaphore(MAXQ)
 def run(n, dry=False):
     r = rows[n]
@@ -132,6 +141,7 @@ def run(n, dry=False):
         if dry:
             print(f"[점검] {n} {r['name']} {r['dir']} {r['frames']}장 {desc}"); return
         with sem:
+            delete_old(body["animation_name"])
             while True:
                 try:
                     res = req("POST", "/characters/animations", body); break
