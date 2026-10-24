@@ -48,12 +48,14 @@ const A = /*__DATA__*/null;
 const IMG = {}; for (const k in A) { IMG[k] = new Image(); IMG[k].src = A[k].src; }
 const VFX = /*__VFX__*/null || {}; for (const k in VFX) { VFX[k].img = new Image(); VFX[k].img.src = VFX[k].src; }
 // PixelLab 이펙트 그림 재생: 2배 도트로, 기준점(pivot)을 x,y에
-const vfx = (name, x, y, scale = 2) => { if (VFX[name]) fx.push({ k: 'sheet', name, x, y, s: scale, t0: VFX[name].frames.reduce((a, f) => a + f[4], 0) / 1000, t: VFX[name].frames.reduce((a, f) => a + f[4], 0) / 1000 }); };
+const vfxDur = name => VFX[name].frames.reduce((a, f) => a + f[4], 0) / 1000;
+// PixelLab 이펙트 그림: o.flip(좌우), o.rot(회전), o.anchor('right' = 오른쪽 가운데를 x,y에), o.loop(반복, o.t 동안)
+const vfx = (name, x, y, scale = 2, o = {}) => { if (!VFX[name]) return false; const d = vfxDur(name); fx.push({ k: 'sheet', name, x, y, s: scale, t0: o.t || d, t: o.t || d, dur: d, ...o }); return true; };
 const has = id => !!A[id];
 // 땅 동작 기준선: 모든 동작을 캔버스 아래 4px 선에 맞춤(이어지는 동작끼리 높이가 튀지 않게, 2026-10-24)
 const BASE = a => a.h - 4;
 const KNOCK_ARC = { '19_1': [0, 4, 16, 34, 44, 38, 22, 6, 0, 0, 0, 0] };   // 쓰러지기: 장마다 몸 아랫면을 바닥에 붙이고 뜨는 높이는 코드로
-const ROOT = new Set(['42', '38_1', '40']);   // 기는 동작: 그림 속에서 몸이 앞으로 나가 반복 때 뚝 끊김 → 몸을 늘 제자리에 두고 이동은 코드로
+const ROOT = new Set(['42', '38_1', '40', '37_1']);   // 기는 동작: 그림 속에서 몸이 앞으로 나가 반복 때 뚝 끊김 → 몸을 늘 제자리에 두고 이동은 코드로
 const groundBase = (id, a, f) => KNOCK_ARC[id] ? a.bot[f] : BASE(a);
 const cv = document.getElementById('cv'); let ctx = cv.getContext('2d'); ctx.imageSmoothingEnabled = false;
 // 이펙트는 1/3 크기 층에 그려 도트로 키움(캐릭터 도트와 맞춤). 빛나는 것은 가산 혼합 층
@@ -168,7 +170,7 @@ const ring = (x, y, r, t, c, w = 4, sy = 1) => fx.push({ k: 'ring', x, y, r0: r 
 const num = (x, y, v, big) => fx.push({ k: 'num', x, y, v, t: 0.7, big });
 const dust = (x, y, n, s = 1) => { for (let i = 0; i < n; i++) fx.push({ k: 'dust', x: x + (Math.random() - 0.5) * 30 * s, y, vx: (Math.random() - 0.5) * 160 * s, vy: -Math.random() * 60, r: 6 + Math.random() * 8 * s, t: 0.45, t0: 0.45 }); };
 function muzzleFlash(p, big) {
-  fx.push({ k: 'flash', x: p.x, y: p.y, dir: P.face, t: big ? 0.09 : 0.05, big });
+  if (!vfx('muzzle_flash', p.x, p.y, big ? 2.6 : 2, { flip: P.face > 0, anchor: 'right' })) fx.push({ k: 'flash', x: p.x, y: p.y, dir: P.face, t: big ? 0.09 : 0.05, big });
   for (let i = 0; i < (big ? 3 : 1); i++) fx.push({ k: 'shell', x: p.x - P.face * 30, y: p.y, vx: -P.face * (80 + Math.random() * 80), vy: -220 - Math.random() * 120, g: P.y, t: 1.2 });
 }
 
@@ -199,7 +201,7 @@ function fireEv(e) {
       sfx('hit', { strength: big ? 3 : 1, kind: KICK.has(id) ? 'kick' : undefined });
       const cx = D.x - P.face * 18 * K(D.y);
       // 맞은 자리: 번쩍 + 초승달 타격선 + 불꽃 + 충격 고리
-      fx.push({ k: 'impact', x: cx, y: p.y, dir: P.face, t: big ? 0.16 : 0.1, t0: big ? 0.16 : 0.1, big });
+      if (!vfx(big ? 'hit_heavy' : 'hit_light', cx, p.y, big ? 2 : 2.4, { flip: P.face < 0 })) fx.push({ k: 'impact', x: cx, y: p.y, dir: P.face, t: big ? 0.16 : 0.1, t0: big ? 0.16 : 0.1, big });
       sparks(cx, p.y, big ? 30 : 12, big, Math.random() < 0.5 ? '#ffffff' : '#d6ecff');   // 맨손·발차기 = 불꽃이 아니라 하얀 충격 조각
       ring(cx, p.y, big ? 110 : 50, big ? 0.24 : 0.14, '#ffffff', big ? 7 : 3);
       if (big) {   // 강: 화면 당김(줌) + 집중선 + 바닥 충격파 + 먼지
@@ -218,7 +220,7 @@ function fireEv(e) {
     muzzleFlash(p, big || e.ev === 'shotS'); sfx('shot');
     const hitD = showDummy && Math.abs(D.y - P.y) < 60 && (D.x - P.x) * P.face > 0;
     const endX = hitD ? D.x - P.face * 14 : (P.face > 0 ? W + 20 : -20);
-    fx.push({ k: 'tracer', x: p.x, y: p.y, x2: endX, t: big ? 0.12 : 0.06, big });
+    if (VFX.tracer) { const tt = Math.abs(endX - p.x) / 4200; fx.push({ k: 'bullet', x: p.x, y: p.y, x2: endX, y2: p.y, t: tt, t0: tt }); if (hitD) later(tt, () => vfx('bullet_impact', endX, p.y + 8, 2.2)); } else fx.push({ k: 'tracer', x: p.x, y: p.y, x2: endX, t: big ? 0.12 : 0.06, big });
     shake = Math.max(shake, big ? 9 : 2.5);
     if (hitD) { sfx('hit', { strength: big ? 2 : 1, kind: 'bullet' }); hurtDummy(big ? 40 : e.ev === 'shotS' ? 9 : 7, big ? 'heavy' : 'light'); sparks(endX, p.y, big ? 16 : 5, big); if (big) hitstop = 0.08; }
   } else if (e.ev === 'beam') {
@@ -226,7 +228,8 @@ function fireEv(e) {
     muzzleFlash(p, true); sfx('shot'); sfx('hit', { strength: 3, kind: 'bullet' });
     // 단계마다 다르게: 1단 = 가는 흰 광선, 2단 = 굵은 푸른 광선 + 충격파, 3단(최대) = 보라 대구경 + 화면 번쩍·띄우기
     const W_ = [0, 10, 24, 40][lv], col = CH_COL[lv];
-    fx.push({ k: 'beam', x: p.x, y: p.y, dir: P.face, t: 0.22 + lv * 0.08, t0: 0.22 + lv * 0.08, w: W_, c: col, lv });
+    if (VFX.charge_beam) fx.push({ k: 'beamS', x: p.x, y: p.y, dir: P.face, t: 0.22 + lv * 0.1, t0: 0.22 + lv * 0.1, sy: [0, 0.55, 1, 1.6][lv] });
+    else fx.push({ k: 'beam', x: p.x, y: p.y, dir: P.face, t: 0.22 + lv * 0.08, t0: 0.22 + lv * 0.08, w: W_, c: col, lv });
     ring(p.x, p.y, 60 + lv * 45, 0.25, col, 3 + lv * 2);
     if (lv >= 2) for (let x = p.x; x > 0 && x < W; x += P.face * 140) ring(x, p.y, 30 + lv * 10, 0.3, col, 3, 1.6);
     if (lv >= 3) { flash = 0.2; dust(P.x - P.face * 30, P.y, 10, 1.6); }
@@ -240,8 +243,8 @@ function fireEv(e) {
     P.supT = (P.supT || 0) + 1;
     const sw = Math.sin(P.supT * 0.55);                       // 앞 근~중거리 바닥을 부채꼴로 위아래 왕복
     const dist = 140 + (sw * 0.5 + 0.5) * 300, gy = P.y + sw * 55 + (Math.random() - 0.5) * 14, gx = P.x + P.face * dist;
-    fx.push({ k: 'tracer', x: p.x, y: p.y, x2: gx, y2: gy, t: 0.05, big: false });
-    sparks(gx, gy - 4, 3, false); if (Math.random() < 0.5) dust(gx, gy, 1, 0.5);
+    if (VFX.tracer) { const tt = Math.hypot(gx - p.x, gy - p.y) / 3600; fx.push({ k: 'bullet', x: p.x, y: p.y, x2: gx, y2: gy, t: tt, t0: tt }); later(tt, () => vfx('bullet_impact', gx, gy, 2)); }
+    else { fx.push({ k: 'tracer', x: p.x, y: p.y, x2: gx, y2: gy, t: 0.05, big: false }); sparks(gx, gy - 4, 3, false); }
     shake = Math.max(shake, 3);
     if (showDummy && Math.abs(D.x - gx) < 60 && Math.abs(D.y - gy) < 40) { hurtDummy(5, 'light'); sparks(D.x, D.y - 60, 4, false); }
   }
@@ -415,7 +418,7 @@ function jump() {
 function doubleJump() {
   sfx('jump', { pitch: 1.35 }); P.jumps = 2; P.vz = 1040; P.spin = 0.2; play('7', { seq: S([1, 2, 3], 0.065) });
   // 발밑 공기 터짐
-  fx.push({ k: 'burst', x: P.x, y: P.y - P.z + 4, t: 0.3, t0: 0.3 });
+  if (!vfx('double_jump', P.x, P.y - P.z + 2, 2.2)) fx.push({ k: 'burst', x: P.x, y: P.y - P.z + 4, t: 0.3, t0: 0.3 });
   ring(P.x, P.y - P.z + 4, 70, 0.25, 'rgba(220,240,255,.9)', 4, 0.35);
 }
 function jumpAttack(heavyKind) {
@@ -614,7 +617,7 @@ function update(dt) {
   switch (P.mode) {
     case 'ground': {
       if (down('flee')) { P.mode = 'flee'; play('36', { fps: 14, loopFrom: 0 }); break; }
-      if (down('back')) { P.mode = 'back'; play('37', { fps: 10, onEnd: () => { if (P.mode === 'back') play('37', { seq: [{ f: 2, d: 0.17 }, { f: 3, d: 0.17 }], loopFrom: 0 }); } }); break; }   // 움츠림 → 그 자세로 떨며 주춤주춤
+      if (down('back')) { P.mode = 'back'; play('37', { fps: 10, onEnd: () => { if (P.mode === 'back') (has('37_1') ? play('37_1', { seq: S(R(1, A['37_1'].n - 1), 0.11), loopFrom: 0 }) : play('37', { seq: [{ f: 2, d: 0.17 }, { f: 3, d: 0.17 }], loopFrom: 0 })); } }); break; }   // 움츠림 → 그 자세로 떨며 주춤주춤
       if (dx || dy) {
         if (P.armed) P.armed = false;
         if (dx && dx !== P.face) { P.prevFace = P.face; P.faceT = P.t; P.face = dx; }
@@ -663,7 +666,7 @@ function update(dt) {
     case 'belly': { const go = dx !== 0, looping = P.clip.id === '38_1' || P.clip.i >= 4; if (go) P.face = dx; P.clip.paused = !go && looping; if (go && looping) P.x += dx * 55 * dt; break; }
     case 'stun': P.stunT -= dt; if (P.stunT <= 0) reverseOut('21', [curF() > 1 ? 1 : curF(), 0], 0.07); break;
     case 'flee': if (!down('flee')) { toIdle(); break; } if (dx) P.face = dx; P.x += P.face * 400 * dt; P.y += dy * 180 * dt; break;
-    case 'back': { if (!down('back')) { toIdle(); break; } const ph = (P.t * 2.9) % 1; if (ph < 0.42) P.x -= P.face * 210 * dt; P.y += dy * 60 * dt; break; }   // 끊어서 물러남(주춤주춤)
+    case 'back': { if (!down('back')) { toIdle(); break; } if (P.clip && P.clip.id === '37_1') P.x -= P.face * 85 * dt; else { const ph = (P.t * 2.9) % 1; if (ph < 0.42) P.x -= P.face * 210 * dt; } P.y += dy * 60 * dt; break; }   // 끊어서 물러남(주춤주춤)
     case 'sit': if (P.clip && P.clip.id === '39' && P.clip.i >= 7 && dx && dx === -P.face) { P.mode = 'scoot'; play('40', { fps: 6, loopFrom: 0 }); } break;
     case 'scoot': if (!(dx && dx === -P.face)) { sitLoop(); break; } P.x -= P.face * 70 * dt; break;
     case 'crouch': if (P.clip && P.clip.i >= 4 && dx) { P.face = dx; P.mode = 'crawl4'; play('42', { seq: [...S(R(0, 3), 0.08), ...S(R(4, 11), 0.085)], loopFrom: 4 }); } break;
@@ -762,12 +765,27 @@ function drawDummy() {
   if (D.mark > 0) { const y = hb - 28; ctx.strokeStyle = '#ff5a4a'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(D.x, y, 12 + Math.sin(P.t * 8) * 2, 0, Math.PI * 2); ctx.moveTo(D.x - 20, y); ctx.lineTo(D.x + 20, y); ctx.moveTo(D.x, y - 20); ctx.lineTo(D.x, y + 20); ctx.stroke(); }
   if (D.hits > 1) { ctx.fillStyle = '#ffe08a'; ctx.font = 'bold 30px sans-serif'; ctx.fillText(`${D.hits} HIT`, D.x + 40, hb + 20); }
 }
+function sheetFrame(v, el) { el = el * 1000; let i = 0; while (i < v.frames.length - 1 && el >= v.frames[i][4]) { el -= v.frames[i][4]; i++; } return v.frames[i]; }
 function drawSheets() {
-  for (const e of fx) if (e.k === 'sheet') {
+  for (const e of fx) {
+    if (e.k === 'bullet' && VFX.tracer && VFX.tracer.img.complete) {   // 예광탄: 총구에서 맞는 자리까지 날아감
+      const k = 1 - e.t / e.t0, x = e.x + (e.x2 - e.x) * k, y = e.y + (e.y2 - e.y) * k, [fx0, fy0, fw, fh] = sheetFrame(VFX.tracer, (e.t0 - e.t) % vfxDur('tracer'));
+      ctx.save(); ctx.translate(x, y); ctx.rotate(Math.atan2(e.y2 - e.y, e.x2 - e.x)); ctx.drawImage(VFX.tracer.img, fx0, fy0, fw, fh, -fw * 2, -fh, fw * 2, fh * 2); ctx.restore();
+    }
+    if (e.k === 'beamS' && VFX.charge_beam && VFX.charge_beam.img.complete) {   // 충전 광선: 그림을 가로로 이어 붙임
+      const v = VFX.charge_beam, [fx0, fy0, fw, fh] = sheetFrame(v, (e.t0 - e.t) % vfxDur('charge_beam')), sc = e.sy * (0.5 + 0.5 * e.t / e.t0);
+      const x2 = e.dir > 0 ? W : 0, len = Math.abs(x2 - e.x);
+      ctx.save(); ctx.translate(e.x, e.y); if (e.dir < 0) ctx.scale(-1, 1);
+      for (let x = 0; x < len; x += fw * 2) ctx.drawImage(v.img, fx0, fy0, fw, fh, x, -fh * sc, fw * 2, fh * 2 * sc);
+      ctx.restore();
+    }
+    if (e.k !== 'sheet') continue;
     const v = VFX[e.name]; if (!v.img.complete) continue;
-    let el = (e.t0 - e.t) * 1000, i = 0; while (i < v.frames.length - 1 && el >= v.frames[i][4]) { el -= v.frames[i][4]; i++; }
-    const [fx0, fy0, fw, fh] = v.frames[i];
-    ctx.drawImage(v.img, fx0, fy0, fw, fh, Math.round(e.x - fw * v.pivot[0] * e.s), Math.round(e.y - fh * v.pivot[1] * e.s), fw * e.s, fh * e.s);
+    const [fx0, fy0, fw, fh] = sheetFrame(v, e.loop ? (e.t0 - e.t) % e.dur : e.t0 - e.t);
+    ctx.save(); ctx.translate(Math.round(e.x), Math.round(e.y)); if (e.rot) ctx.rotate(e.rot); ctx.scale(e.flip ? -e.s : e.s, e.s);
+    if (e.anchor === 'right') ctx.drawImage(v.img, fx0, fy0, fw, fh, -fw, -fh / 2, fw, fh);
+    else ctx.drawImage(v.img, fx0, fy0, fw, fh, -fw * v.pivot[0], -fh * v.pivot[1], fw, fh);
+    ctx.restore();
   }
 }
 function drawFxUnder() {

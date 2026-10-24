@@ -1,0 +1,183 @@
+{
+ "frames": [
+  {
+   "filename": "eileen-double-jump 0.png",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 64,
+    "h": 30
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 64,
+    "h": 30
+   },
+   "sourceSize": {
+    "w": 64,
+    "h": 30
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.26666666666666666
+   },
+   "duration": 71
+  },
+  {
+   "filename": "eileen-double-jump 1.png",
+   "frame": {
+    "x": 64,
+    "y": 0,
+    "w": 64,
+    "h": 30
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 64,
+    "h": 30
+   },
+   "sourceSize": {
+    "w": 64,
+    "h": 30
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.26666666666666666
+   },
+   "duration": 71
+  },
+  {
+   "filename": "eileen-double-jump 2.png",
+   "frame": {
+    "x": 128,
+    "y": 0,
+    "w": 64,
+    "h": 30
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 64,
+    "h": 30
+   },
+   "sourceSize": {
+    "w": 64,
+    "h": 30
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.26666666666666666
+   },
+   "duration": 71
+  },
+  {
+   "filename": "eileen-double-jump 3.png",
+   "frame": {
+    "x": 0,
+    "y": 30,
+    "w": 64,
+    "h": 30
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 64,
+    "h": 30
+   },
+   "sourceSize": {
+    "w": 64,
+    "h": 30
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.26666666666666666
+   },
+   "duration": 71
+  },
+  {
+   "filename": "eileen-double-jump 4.png",
+   "frame": {
+    "x": 64,
+    "y": 30,
+    "w": 64,
+    "h": 30
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 64,
+    "h": 30
+   },
+   "sourceSize": {
+    "w": 64,
+    "h": 30
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.26666666666666666
+   },
+   "duration": 71
+  },
+  {
+   "filename": "eileen-double-jump 5.png",
+   "frame": {
+    "x": 128,
+    "y": 30,
+    "w": 64,
+    "h": 30
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 64,
+    "h": 30
+   },
+   "sourceSize": {
+    "w": 64,
+    "h": 30
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.26666666666666666
+   },
+   "duration": 71
+  }
+ ],
+ "meta": {
+  "app": "PixelLab VFX Creator",
+  "image": "eileen-double-jump.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 192,
+   "h": 60
+  },
+  "scale": "1",
+  "anchor": {
+   "kind": "origin",
+   "x": 32,
+   "y": 8
+  },
+  "frameTags": [
+   {
+    "name": "eileen-double-jump",
+    "from": 0,
+    "to": 5,
+    "direction": "forward"
+   }
+  ]
+ }
+}

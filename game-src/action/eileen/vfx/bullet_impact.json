@@ -1,0 +1,157 @@
+{
+ "frames": [
+  {
+   "filename": "eileen-bullet-impact 0.png",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 32
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 32
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 32
+   },
+   "pivot": {
+    "x": 3.96875,
+    "y": 3.53125
+   },
+   "duration": 100
+  },
+  {
+   "filename": "eileen-bullet-impact 1.png",
+   "frame": {
+    "x": 32,
+    "y": 0,
+    "w": 32,
+    "h": 32
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 32
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 32
+   },
+   "pivot": {
+    "x": 3.96875,
+    "y": 3.53125
+   },
+   "duration": 100
+  },
+  {
+   "filename": "eileen-bullet-impact 2.png",
+   "frame": {
+    "x": 64,
+    "y": 0,
+    "w": 32,
+    "h": 32
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 32
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 32
+   },
+   "pivot": {
+    "x": 3.96875,
+    "y": 3.53125
+   },
+   "duration": 100
+  },
+  {
+   "filename": "eileen-bullet-impact 3.png",
+   "frame": {
+    "x": 0,
+    "y": 32,
+    "w": 32,
+    "h": 32
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 32
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 32
+   },
+   "pivot": {
+    "x": 3.96875,
+    "y": 3.53125
+   },
+   "duration": 100
+  },
+  {
+   "filename": "eileen-bullet-impact 4.png",
+   "frame": {
+    "x": 32,
+    "y": 32,
+    "w": 32,
+    "h": 32
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 32
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 32
+   },
+   "pivot": {
+    "x": 3.96875,
+    "y": 3.53125
+   },
+   "duration": 100
+  }
+ ],
+ "meta": {
+  "app": "PixelLab VFX Creator",
+  "image": "eileen-bullet-impact.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 96,
+   "h": 64
+  },
+  "scale": "1",
+  "anchor": {
+   "kind": "origin",
+   "x": 127,
+   "y": 113
+  },
+  "frameTags": [
+   {
+    "name": "eileen-bullet-impact",
+    "from": 0,
+    "to": 4,
+    "direction": "forward"
+   }
+  ]
+ }
+}

@@ -54,7 +54,7 @@ for line in text.splitlines():
     c = [x.strip() for x in line.strip().strip("|").split(" | ")]
     if len(c) >= 8 and re.fullmatch(r"\d+(-\d+)?|W(-\d+)?", c[0]) and "<br>" in c[6]:
         rows[c[0]] = dict(n=c[0], name=c[1], dir=DIRS[c[2]], frames=int(c[3]), span=c[4],
-                          pose=c[5], prompt=c[6].split("<br>")[0].strip())
+                          pose=c[5], prompt=c[6].split("<br>")[0].strip(), memo=c[8] if len(c) > 8 else "")
 
 def load_frames(n):
     d = OUT / n.replace("-", "_")
@@ -137,7 +137,7 @@ def run(n, dry=False):
         body = {"character_id": CID, "mode": "pixminimax", "action_description": r["prompt"],
                 "animation_name": f"v3 {n} {r['name']}", "directions": [r["dir"]],
                 "frame_count": r["frames"], "subject_description": subject, "initial_pose": r["pose"],
-                "keep_first_frame": False, "enhance_prompt": False}
+                "keep_first_frame": "첫 장 유지" in r.get("memo", ""), "enhance_prompt": False}
         if start_img is not None: body["custom_start_frame"] = b64(start_img)
         if end is not None: body["end_frame"] = b64(end)
         desc = f"시작={'등록' if start_img is None else '지정'} 끝={'없음' if end is None else '지정'}"
