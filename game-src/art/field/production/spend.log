@@ -329,4 +329,5 @@ b2e2ca3b-ce95-48c7-a05f-1aa1c6bb8deb	jyaldi	animation	throw-object	completed	{"u
 f12abd78-49c6-4558-8a6f-ee68a5e99669	jyaldi	animation	front-flip	completed	{"usd": 0.0, "type": "generations", "generations": 3}
 a22f34bb-be49-41c0-9537-cd17aca48365	jyaldi	animation	picking-up	completed	{"usd": 0.0, "type": "generations", "generations": 3}
 c81f67b4-0aa6-4832-9387-dcb7233a6a96	jyaldi	animation	backflip	completed	{"usd": 0.0, "type": "generations", "generations": 3}
-780a2731-4b41-417e-a89f-a0c77a93dbf5	jyaldi	animation	backflip	processing	null
+780a2731-4b41-417e-a89f-a0c77a93dbf5	jyaldi	animation	backflip	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+7ed684ff-42ce-42b3-9b9c-53bdfbc2e78b	jyaldi	animation	backflip	processing	null
