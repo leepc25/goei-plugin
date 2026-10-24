@@ -1,0 +1,20 @@
+{
+  "at": 1792807671.4018455,
+  "job_id": "458e2f1e-151e-4272-b8ee-ecd7c8993c90",
+  "result": "reroll-required",
+  "findings": "발 잘림은 해결. 마지막 프레임 포니테일 끝 넓은 회색 면이 남아 있어 반려.",
+  "frame_count": 3,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

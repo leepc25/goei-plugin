@@ -1,0 +1,20 @@
+{
+  "at": 1792807699.956817,
+  "job_id": "f5ec3eae-324f-48a3-97f6-8e9b5f374aaa",
+  "result": "reroll-required",
+  "findings": "5·6번째 머리카락과 얼굴 노이즈/투명 손상, 6번째 포니테일 회색 면.",
+  "frame_count": 8,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

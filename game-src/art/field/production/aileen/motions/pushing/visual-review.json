@@ -1,0 +1,20 @@
+{
+  "at": 1792807708.4918427,
+  "job_id": "32a66515-c84f-4e4e-a964-1732d1110899",
+  "result": "reroll-required",
+  "findings": "5·6번째 포니테일 회색 잔상과 전신 노이즈/투명 손상. 주먹 대신 미는 손과 팔 궤적 수정.",
+  "frame_count": 6,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "pushing",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

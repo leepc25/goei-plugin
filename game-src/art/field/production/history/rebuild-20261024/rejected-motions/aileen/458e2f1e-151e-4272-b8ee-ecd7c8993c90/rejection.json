@@ -1,0 +1,108 @@
+{
+  "reason": "회색 외곽 반려. 본인 정상 공중 프레임과 공식 실제 관절 측정 참조로 변경.",
+  "job": {
+    "kind": "animation",
+    "slug": "aileen",
+    "template": "lead-jab",
+    "status": "completed",
+    "created_epoch": 1792807204.19776,
+    "receipt": {
+      "usage": null,
+      "background_job_id": "458e2f1e-151e-4272-b8ee-ecd7c8993c90",
+      "status": "processing"
+    },
+    "endpoint": "animate-with-skeleton-v3",
+    "last_response": {
+      "usage": {
+        "type": "generations",
+        "generations": 2.0
+      },
+      "id": "458e2f1e-151e-4272-b8ee-ecd7c8993c90",
+      "status": "completed",
+      "created_at": "2026-10-24T02:00:05.913081+00:00",
+      "last_response": {
+        "seed": 2026112201,
+        "type": "done",
+        "action": "smoothing frames",
+        "images": [
+          {
+            "type": "base64",
+            "width": 256,
+            "base64": "[image payload omitted]",
+            "height": 256
+          },
+          {
+            "type": "base64",
+            "width": 256,
+            "base64": "[image payload omitted]",
+            "height": 256
+          },
+          {
+            "type": "base64",
+            "width": 256,
+            "base64": "[image payload omitted]",
+            "height": 256
+          }
+        ],
+        "status": "initializing",
+        "progress": 1.0,
+        "flow_kind": "animation",
+        "billing_usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 2
+        },
+        "generation_id": "0715bd2b-ca97-4afc-92eb-e0e7d04fc8c7",
+        "queue_position": 0,
+        "billing_charged": true,
+        "generation_started_at": "2026-10-24T02:01:11.448521+00:00",
+        "estimated_wait_seconds": 0
+      }
+    },
+    "observed_end_epoch": 1792807627.569705,
+    "elapsed_observed_seconds": 423.371945142746,
+    "usage": {
+      "usd": 0.0,
+      "type": "generations",
+      "generations": 2
+    },
+    "saved_frames": 3
+  },
+  "at": 1792807813.2202384,
+  "state_before": {
+    "name": "에일린",
+    "group": "management",
+    "character_id": "558c27ed-873c-4207-9099-171bb64a09b2",
+    "image": "95f7fbb1-98fc-4481-a293-236e615fb8b8",
+    "registration": "d95cd572-ed2f-48a9-9835-699c8b3275c5",
+    "motions": {
+      "breathing-idle": "db123cd2-3718-480f-863c-1a528f708a4a",
+      "walking-8-frames": "58f5bc8d-90fb-4cff-9c65-72967dc983ba",
+      "running-8-frames": "01f17a00-0eee-49e9-8b50-54af4860ff37",
+      "running-jump": "63f11ca8-0bb6-43a9-b01b-0b45af85765c",
+      "running-slide": "f0d9aba3-44bb-47f8-944e-ef511286e384",
+      "crouched-walking": "46cd568a-1485-4a9d-9a13-b30c0bb01051",
+      "sad-walk": "9d222834-64bd-4f65-9961-1a4e5394d69d",
+      "front-flip": "bdd8d878-7689-4e18-bb99-6a11b17ff8e0",
+      "backflip": "490758e4-b763-4f05-a4a7-4d959c421d54",
+      "drinking": "68a1c28c-7789-422e-86af-7c2bf6c00e26",
+      "picking-up": "1e4ca37b-b652-4121-ad22-271d9c0f7b18",
+      "pushing": "32a66515-c84f-4e4e-a964-1732d1110899",
+      "pull-heavy-object": "f105a00e-1847-4eb7-b741-b12b72fba3f9",
+      "throw-object": "397540b8-892b-4d6e-ab1e-fd52471c681a",
+      "fight-stance-idle-8-frames": "6e00595c-7d91-4320-ab72-27424e97ee97",
+      "cross-punch": "bc1e737a-2b62-4105-9f15-b9b48a7826bb",
+      "lead-jab": "458e2f1e-151e-4272-b8ee-ecd7c8993c90"
+    },
+    "ready": true,
+    "repair_id": "aileen-user-rebuild-v4",
+    "visual_review_required": true,
+    "image_verified": true,
+    "skeleton_joints": 18,
+    "rotation_count": 8,
+    "exported": false,
+    "eight_way_visual_reviewed": true,
+    "motions_visual_reviewed": false
+  },
+  "standalone": true
+}

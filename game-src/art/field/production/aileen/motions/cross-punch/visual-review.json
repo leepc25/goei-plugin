@@ -1,0 +1,20 @@
+{
+  "at": 1792807678.081242,
+  "job_id": "bc1e737a-2b62-4105-9f15-b9b48a7826bb",
+  "result": "reroll-required",
+  "findings": "5번째 가슴과 팔 투명 구멍, 6번째 손에서 회색 이펙트 발생. 회색 포니테일 끝.",
+  "frame_count": 6,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "cross-punch",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

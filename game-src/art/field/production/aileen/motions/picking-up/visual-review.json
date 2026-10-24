@@ -1,0 +1,20 @@
+{
+  "at": 1792807640.5935512,
+  "job_id": "1e4ca37b-b652-4121-ad22-271d9c0f7b18",
+  "result": "reroll-required",
+  "findings": "3번째 포니테일 끝 큰 회색 면 및 손 외곽 잔상. 4번째 전면 신체와 소품 오른쪽 캔버스 잘림.",
+  "frame_count": 5,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "picking-up",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}
