@@ -1,0 +1,20 @@
+{
+  "at": 1792804782.0921698,
+  "job_id": "8f183936-03f3-4f8f-8002-668ee31d5977",
+  "result": "reroll-required",
+  "findings": "Multiple rotation frames have gray hair exterior; enlarged frame 10 also contains gray hair loops, so it is not a clean reference. Generate a clean isolated inverted pose before full flip rerolls.",
+  "frame_count": 13,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

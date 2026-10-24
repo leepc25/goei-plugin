@@ -1,0 +1,9 @@
+{
+  "frame_index": 5,
+  "source_job_id": "e4f6ccb6-7297-4453-8c16-d976d5558f26",
+  "source_frame_index": 1,
+  "target_pose_index": 5,
+  "source_path": "motion-frame-candidates/jaemtri/throw-object/empty-release-1/frames/1.png",
+  "sha256": "1f87705c19116752596ac67590b18844114750b064285b205237bdd38629d5c6",
+  "findings": "Candidate 1: empty extended hand with released brown object flying ahead, no gray debris; own appearance and target pose intact."
+}

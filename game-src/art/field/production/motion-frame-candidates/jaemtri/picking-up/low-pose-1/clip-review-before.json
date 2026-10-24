@@ -1,0 +1,20 @@
+{
+  "at": 1792804321.2227592,
+  "job_id": "1a8ae1e5-ecae-4bd6-9367-d0c75519e4cc",
+  "result": "reroll-required",
+  "findings": "Direct pickup frame 5 has missing face/hair/hand pixels; seven other frames retain identity. Regenerate exact lowest pose as isolated candidates.",
+  "frame_count": 8,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

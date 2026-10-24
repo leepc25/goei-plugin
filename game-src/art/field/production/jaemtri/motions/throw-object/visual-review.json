@@ -1,8 +1,8 @@
 {
-  "at": 1792804510.4921784,
+  "at": 1792804844.963544,
   "job_id": "62f4c3b9-4d84-4975-b7b3-22c513a5f2fb",
-  "result": "reroll-required",
-  "findings": "Gray exterior improved but ball reappears after release and remains in hand in frames 6/7/8. Regenerate those three known poses with own empty-hand release frame 5 as reference; preserve windup and identity.",
+  "result": "pass",
+  "findings": "Full eight-frame assembled EAST throw viewed: brown object released forward in frame 6, hands empty during recovery, no reappearing held object or gray debris; own appearance preserved.",
   "frame_count": 8,
   "directions": [
     "east"
@@ -16,5 +16,70 @@
     "correct face-visible direction",
     "no gray exterior paint in every frame",
     "pose and foot contact consistency"
-  ]
+  ],
+  "frame_assembly": {
+    "base_job_id": "62f4c3b9-4d84-4975-b7b3-22c513a5f2fb",
+    "frame_sources": [
+      {
+        "frame_index": 0,
+        "source_job_id": "62f4c3b9-4d84-4975-b7b3-22c513a5f2fb",
+        "source_frame_index": 0,
+        "sha256": "8bdca59472cd37335eea332d25da6bd001826777640225a5ca8ffa9acfd04786"
+      },
+      {
+        "frame_index": 1,
+        "source_job_id": "62f4c3b9-4d84-4975-b7b3-22c513a5f2fb",
+        "source_frame_index": 1,
+        "sha256": "36bb00b81a5628260915ed7c62003cb7e7d5bc19343238d40e522d59e57980e1"
+      },
+      {
+        "frame_index": 2,
+        "source_job_id": "62f4c3b9-4d84-4975-b7b3-22c513a5f2fb",
+        "source_frame_index": 2,
+        "sha256": "681a1cac40bfbce1277c34c367779409d4a58615f329129c6a41566123d6299b"
+      },
+      {
+        "frame_index": 3,
+        "source_job_id": "62f4c3b9-4d84-4975-b7b3-22c513a5f2fb",
+        "source_frame_index": 3,
+        "sha256": "de2daa4c8452d6be259e23c4d6ce0a677a1edeffc6e6d7949fe47514add5733f"
+      },
+      {
+        "frame_index": 4,
+        "source_job_id": "62f4c3b9-4d84-4975-b7b3-22c513a5f2fb",
+        "source_frame_index": 4,
+        "sha256": "3c9cef2f17555bce65a4b5c78b1e50f855401f1676e6705629f99b4830f96c2f"
+      },
+      {
+        "frame_index": 5,
+        "source_job_id": "e4f6ccb6-7297-4453-8c16-d976d5558f26",
+        "source_frame_index": 1,
+        "target_pose_index": 5,
+        "source_path": "motion-frame-candidates/jaemtri/throw-object/empty-release-1/frames/1.png",
+        "sha256": "1f87705c19116752596ac67590b18844114750b064285b205237bdd38629d5c6",
+        "findings": "Candidate 1: empty extended hand with released brown object flying ahead, no gray debris; own appearance and target pose intact."
+      },
+      {
+        "frame_index": 6,
+        "source_job_id": "af91c70f-1c1c-4a87-97ab-da73d7574011",
+        "source_frame_index": 2,
+        "target_pose_index": 6,
+        "source_path": "motion-frame-candidates/jaemtri/throw-object/empty-recover-1/frames/2.png",
+        "sha256": "8b1e54224b0131785fa60d94c4c5ded9ce69ef310eb1195b11f1ad02af133bd4",
+        "findings": "Candidate 2 clean empty hand and no floating gray object; candidates 0/1 rejected for gray debris. Same recovery pose and own identity."
+      },
+      {
+        "frame_index": 7,
+        "source_job_id": "4f969d11-7488-4dcb-9b2a-8d68556f26e5",
+        "source_frame_index": 1,
+        "target_pose_index": 7,
+        "source_path": "motion-frame-candidates/jaemtri/throw-object/empty-rest-1/frames/1.png",
+        "sha256": "3720ff3629550697d1928cffaa162548d56c889bc8f624129e18e3b5c67e10bf",
+        "findings": "Candidate 1 clean empty-handed return posture; no ball reappearance or gray exterior, own hair/skirt/heels retained."
+      }
+    ],
+    "method": "select complete same-pose regenerated frames; no pixel editing",
+    "new_user_approval": false,
+    "visual_reviewed": true
+  }
 }

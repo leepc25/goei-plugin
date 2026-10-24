@@ -1,0 +1,20 @@
+{
+  "at": 1792804589.377297,
+  "job_id": "74d1cc71-5cd6-4798-ab81-6884fc25bb29",
+  "result": "reroll-required",
+  "findings": "Most gray hair masses resolved, but frames 2 and 6 retain gray filled rear hair curl; frame 2 near hand also loses its clean silhouette. Regenerate only these exact poses from clean own frame 4 reference.",
+  "frame_count": 8,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

@@ -264,7 +264,7 @@
       "lead-jab": "game-src/art/field/production/motion-inputs/jaemtri/lead-jab-repair-v1/spec.json",
       "picking-up": "game-src/art/field/production/motion-inputs/jaemtri/picking-up-repair-v1/spec.json",
       "running-8-frames": "game-src/art/field/production/motion-inputs/jaemtri/running-8-frames-repair-v1/spec.json",
-      "running-jump": "game-src/art/field/production/motion-inputs/jaemtri/running-jump-repair-v1/spec.json",
+      "running-jump": "game-src/art/field/production/motion-inputs/jaemtri/running-jump-repair-v2/spec.json",
       "running-slide": "game-src/art/field/production/motion-inputs/jaemtri/running-slide-repair-v1/spec.json",
       "crouched-walking": "game-src/art/field/production/motion-inputs/jaemtri/crouched-walking-repair-v1/spec.json",
       "front-flip": "game-src/art/field/production/motion-inputs/jaemtri/front-flip-repair-v1/spec.json",
@@ -272,7 +272,7 @@
       "throw-object": "game-src/art/field/production/motion-inputs/jaemtri/throw-object-repair-v1/spec.json",
       "cross-punch": "game-src/art/field/production/motion-inputs/jaemtri/cross-punch-repair-v1/spec.json",
       "sad-walk": "game-src/art/field/production/motion-inputs/jaemtri/sad-walk-repair-v1/spec.json",
-      "pushing": "game-src/art/field/production/motion-inputs/jaemtri/pushing-repair-v1/spec.json"
+      "pushing": "game-src/art/field/production/motion-inputs/jaemtri/pushing-repair-v2/spec.json"
     },
     "aileen": {
       "jumping-1": "game-src/art/field/production/motion-inputs/aileen/jumping-1-v1/spec.json",
