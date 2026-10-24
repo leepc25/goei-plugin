@@ -279,7 +279,7 @@ function afterBuf(fallback) {
   if (b === 'jump') return jump();
   fallback();
 }
-const ARMOR = new Set(['12', '13', '23', '24', '25', '22_1', '25_1']);
+const ARMOR = new Set(['12', '13', '23', '24', '25', '22_1', '25_1', '25_2']);
 // 슈퍼아머: 강 공격·슬라이딩·충전·기술·필살기 중, 그리고 일어나는 동안과 일어난 뒤 0.6초
 const armored = () => P.wakeArmor > 0 || (P.clip && (P.clip.id === '20' || ARMOR.has(P.clip.id)) && (P.mode === 'act' || P.mode === 'charge'));
 
@@ -331,10 +331,15 @@ function rocketSuper() {
   if (!has('25_1')) return superMove(false);
   if (!spReady()) return;
   P.armed = false; P.combat = true;
-  const a = A['25_1'], fire = ROCKET_FIRE ?? (() => { let m = 3; for (let f = 3; f < a.n - 2; f++) if (a.top[f] > a.top[m]) m = f; return m; })();
-  const s = [{ f: 0, d: 0.35, ev: 'cut' }];
-  for (let f = 1; f < a.n; f++) s.push({ f, d: f === fire ? 0.3 : f < fire ? 0.075 : 0.08, ev: f === fire ? 'rocket' : undefined });
-  act('25_1', { seq: s });
+  const a = A['25_1'];
+  // 바주카: 꺼내기(25_1) → 발사(25_2, 첫 반동 장에서 로켓) → 꺼내기를 거꾸로 틀어 등 뒤로 넣기(사용자 제안)
+  const s = [{ f: 0, d: 0.3, ev: 'cut' }, ...S(R(1, a.n - 1), 0.07)];
+  if (has('25_2')) { const b = A['25_2']; s.push({ f: a.n - 1, d: 0.25 }); }
+  act('25_1', { seq: s, onEnd: () => {
+    if (!has('25_2')) return afterBuf(toIdle);
+    const b = A['25_2'];
+    act('25_2', { seq: [{ f: 0, d: 0.12 }, { f: Math.min(1, b.n - 1), d: 0.22, ev: 'rocket' }, ...S(R(2, b.n - 1), 0.09), { f: 0, d: 0.45 }], onEnd: () => reverseOut('25_1', R(a.n - 1, 0), 0.06) });
+  } });
 }
 const ROCKET_FIRE = 6;   // 발사 장: 7번째 장(2026-10-24 4차 결과 보고 정함)
 function skillOld() {
@@ -401,8 +406,9 @@ function knock() {
   // 남동판 2·3장은 그림에 궤적이 그려져 있어 뺌
   if (kid === '19_1' && A['19_1'].n >= 12) {
     P.mode = 'act';
-    play('19_1', { seq: [...S(R(0, 7), 0.065).map((e, i) => i === 5 ? { ...e, ev: 'dust' } : e), ...S(R(8, 11), 0.16)], loopFrom: 8 });
-    P.knockT = 0.53; return;   // 쓰러지는 장이 끝나면 누운 상태(들썩임은 계속 반복)
+    // 누운 숨: 가장 비슷한 두 장(11·12번째, 가슴만 다름)만 천천히 오감 — 팔다리가 들썩이지 않게
+    play('19_1', { seq: [...S(R(0, 9), 0.065).map((e, i) => i === 5 ? { ...e, ev: 'dust' } : e), { f: 10, d: 0.55 }, { f: 11, d: 0.55 }], loopFrom: 10 });
+    P.knockT = 0.65; return;   // 쓰러지는 장이 끝나면 누운 상태(들썩임은 계속 반복)
   }
   act(kid, { seq: S(R(0, 7), 0.065).map((e, i) => i === 5 ? { ...e, ev: 'dust' } : e), onEnd: () => { P.mode = 'down'; } });
 }
@@ -483,9 +489,10 @@ function onPress(a) {
     case 'respond': return emote('28', 7);
     case 'talk': return emote('29', 7, { seq: S([...R(0, 3), ...R(0, 3), ...R(0, 3)], 1 / 7) });
     // 끄덕이기: 내려갈 땐 빠르게, 아래서 잠깐 멈춤, 올라올 땐 조금 느리게 × 2 (두 번째는 살짝 빠르게)
-    case 'nod': return emote('30', 8, { seq: [{ f: 0, d: 0.1 }, { f: 1, d: 0.05 }, { f: 2, d: 0.13 }, { f: 1, d: 0.07 }, { f: 0, d: 0.07 }, { f: 1, d: 0.045 }, { f: 2, d: 0.1 }, { f: 1, d: 0.07 }, { f: 3, d: 0.09 }, { f: 0, d: 0.2 }] });
+    // 끄덕이기: 내려가는 구간은 보통, 아래에서 머무는 구간은 길게, 올라오는 구간은 천천히 — 한 번 약 0.8초 × 2
+    case 'nod': return emote('30', 8, { seq: [{ f: 0, d: 0.2 }, { f: 1, d: 0.14 }, { f: 2, d: 0.32 }, { f: 1, d: 0.2 }, { f: 0, d: 0.18 }, { f: 1, d: 0.13 }, { f: 2, d: 0.28 }, { f: 1, d: 0.2 }, { f: 3, d: 0.2 }, { f: 0, d: 0.4 }] });
     // 고개 젓기: 한쪽 끝·반대쪽 끝에서 살짝 머물고 가운데는 빨리 지나감 × 2
-    case 'shake': return emote('31', 9, { seq: [{ f: 0, d: 0.06 }, { f: 1, d: 0.05 }, { f: 2, d: 0.09 }, { f: 1, d: 0.04 }, { f: 0, d: 0.04 }, { f: 3, d: 0.09 }, { f: 0, d: 0.04 }, { f: 1, d: 0.04 }, { f: 2, d: 0.08 }, { f: 1, d: 0.04 }, { f: 0, d: 0.05 }, { f: 3, d: 0.08 }, { f: 0, d: 0.18 }] });
+    case 'shake': return emote('31', 9, { seq: [{ f: 0, d: 0.14 }, { f: 1, d: 0.11 }, { f: 2, d: 0.2 }, { f: 1, d: 0.11 }, { f: 0, d: 0.1 }, { f: 3, d: 0.2 }, { f: 0, d: 0.12 }, { f: 1, d: 0.11 }, { f: 2, d: 0.18 }, { f: 1, d: 0.11 }, { f: 0, d: 0.1 }, { f: 3, d: 0.18 }, { f: 0, d: 0.32 }] });   // 한 번 왕복 약 0.75초
     case 'angry': return emote('32', 9);
     case 'happy': return emote('35', 8);
     case 'surprise': return emote('34', 8, { seq: [...S(R(0, 1), 0.06), { f: 2, d: 0.35 }, ...S(R(3, A['34'].n - 1), 0.12)] });
