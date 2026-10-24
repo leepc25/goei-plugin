@@ -27562,13 +27562,17 @@
         "type": "generations",
         "generations": 3
       },
-      "saved_frames": 9
+      "saved_frames": 9,
+      "visual_rejection": {
+        "reason": "Inverted frame 5 remains defective after two rejected masked repairs; add explicit near/far joint depth and facial draw order in new whole-clip generation.",
+        "standalone": true
+      }
     },
     "b110c538-e637-4237-9cd3-80a92de3b429": {
       "kind": "motion-frame-repair-backflip-v5-face-1",
       "slug": "jyaldi",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792801208.622907,
       "receipt": {
         "usage": null,
@@ -27587,26 +27591,180 @@
       "endpoint": "inpaint-image-pro-flash",
       "last_response": {
         "usage": {
+          "type": "generations",
+          "generations": 9.0
+        },
+        "id": "b110c538-e637-4237-9cd3-80a92de3b429",
+        "status": "completed",
+        "created_at": "2026-10-24T00:20:09.337950+00:00",
+        "last_response": {
+          "seed": 2026102901,
+          "type": "message_done",
+          "model": "inpaint_pro_flash",
+          "width": 256,
+          "action": "Removing background",
+          "height": 256,
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "prompt": "Repair this upside-down woman during the SAME backward tucked somersault pose. Restore the missing opaque face and long straight black hair inside the mask, natural pale skin, small red irises, mature feminine face, black fitted suit and white shirt collar. Keep the exact inverted head angle, hair silhouette continuity, native pixel style and lighting. Fill accidental transparent holes inside face and hair. Transparent outside the clean dark silhouette; no gray paint or gray halo. Do not turn her upright, add limbs, add text, or change pose. Also close the tiny accidental holes in the masked bent knee and black gloved hand, retaining their exact shape and black fabric shading.",
+          "status": "completed",
+          "paste_x": 0,
+          "paste_y": 0,
+          "asset_id": "6f7f68a6-fa43-5870-906d-3e17bc270bf0",
+          "image_id": "6f7f68a6-fa43-5870-906d-3e17bc270bf0",
+          "job_kind": "creator-image",
+          "progress": 1.0,
+          "image_url": "https://s3.eu-central-003.backblazeb2.com/pixellab-generations/production/creator/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/6f7f68a6-fa43-5870-906d-3e17bc270bf0/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0037e6521c1d7c20000000001%2F20261024%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20261024T002212Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=7067e0727c879ca907c3a6f0cc1b22ce965a3a01ff71a32f2c484edbd9b46340",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 9
+          },
+          "canvas_growth": false,
+          "generation_id": "49d40ffe-e762-4679-8462-5d8a6952e5e9",
+          "output_method": "Modify current layer",
+          "queue_position": 0,
+          "billing_charged": true,
+          "original_images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "source_image_id": "6f7f68a6-fa43-5870-906d-3e17bc270bf0",
+          "creator_image_saved": true,
+          "generation_started_at": "2026-10-24T00:20:09.507087+00:00",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792801337.6568944,
+      "elapsed_observed_seconds": 129.03398776054382,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 9
+      }
+    },
+    "11c733f9-96de-46c4-94b9-019c6975e84e": {
+      "kind": "motion-frame-repair-backflip-v5-face-upright-2",
+      "slug": "jyaldi",
+      "template": null,
+      "status": "completed",
+      "created_epoch": 1792801393.1061807,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "11c733f9-96de-46c4-94b9-019c6975e84e",
+        "image_id": "9cf6125d-7fc7-546f-9705-7e4ffdab37f3",
+        "source_image_id": "9cf6125d-7fc7-546f-9705-7e4ffdab37f3",
+        "status": "processing",
+        "output_count": 1,
+        "image_size": {
+          "width": 256,
+          "height": 256
+        },
+        "estimated_generations": 9,
+        "pricing_provisional": true
+      },
+      "endpoint": "inpaint-image-pro-flash",
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 9.0
+        },
+        "id": "11c733f9-96de-46c4-94b9-019c6975e84e",
+        "status": "completed",
+        "created_at": "2026-10-24T00:23:13.502282+00:00",
+        "last_response": {
+          "seed": 2026102902,
+          "type": "message_done",
+          "model": "inpaint_pro_flash",
+          "width": 256,
+          "action": "Removing background",
+          "height": 256,
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "prompt": "Restore the damaged face and hair of this adult woman in the exact same tucked airborne pose. Draw her complete coherent LEFT-facing profile, pale skin, small red eye, eyebrow, nose, mouth, ear and long straight black hair swept upward by motion. Repair accidental missing transparent holes inside the head, face, hair, black gloved hand and bent knee. Keep the black fitted suit, white collar, body pose, silhouette size, precise native pixel grid and shading. Leave the outside transparent with no gray halo. Regenerate the whole masked head so the face is anatomically intact; do not preserve the broken fragmented face. Do not change body pose or add anything.",
+          "status": "completed",
+          "paste_x": 0,
+          "paste_y": 0,
+          "asset_id": "9cf6125d-7fc7-546f-9705-7e4ffdab37f3",
+          "image_id": "9cf6125d-7fc7-546f-9705-7e4ffdab37f3",
+          "job_kind": "creator-image",
+          "progress": 1.0,
+          "image_url": "https://s3.eu-central-003.backblazeb2.com/pixellab-generations/production/creator/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/9cf6125d-7fc7-546f-9705-7e4ffdab37f3/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0037e6521c1d7c20000000001%2F20261024%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20261024T002403Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=084cc9921421ff6fb87ebbf4b3f30a5cee03ceec3e04fd879c108d53a57681a5",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 9
+          },
+          "canvas_growth": false,
+          "generation_id": "f53c7692-dd73-4fea-9e62-b72df3bbca90",
+          "output_method": "Modify current layer",
+          "billing_charged": true,
+          "original_images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "source_image_id": "9cf6125d-7fc7-546f-9705-7e4ffdab37f3",
+          "creator_image_saved": true,
+          "generation_started_at": "2026-10-24T00:23:13.540578+00:00"
+        }
+      },
+      "observed_end_epoch": 1792801455.1991265,
+      "elapsed_observed_seconds": 62.09294605255127,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 9
+      }
+    },
+    "f2cae8cb-db71-4bfb-898d-da7c568b4f31": {
+      "kind": "animation",
+      "slug": "jyaldi",
+      "template": "backflip",
+      "status": "processing",
+      "created_epoch": 1792801517.01668,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "f2cae8cb-db71-4bfb-898d-da7c568b4f31",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3",
+      "last_response": {
+        "usage": {
           "type": "usd",
           "usd": 0.0
         },
-        "id": "b110c538-e637-4237-9cd3-80a92de3b429",
+        "id": "f2cae8cb-db71-4bfb-898d-da7c568b4f31",
         "status": "processing",
-        "created_at": "2026-10-24T00:20:09.337950+00:00",
+        "created_at": "2026-10-24T00:25:17.309257+00:00",
         "last_response": {
           "type": "message_progress",
-          "model": "inpaint_pro_flash",
-          "width": 256,
-          "action": "Correcting pixels",
-          "height": 256,
-          "prompt": "Repair this upside-down woman during the SAME backward tucked somersault pose. Restore the missing opaque face and long straight black hair inside the mask, natural pale skin, small red irises, mature feminine face, black fitted suit and white shirt collar. Keep the exact inverted head angle, hair silhouette continuity, native pixel style and lighting. Fill accidental transparent holes inside face and hair. Transparent outside the clean dark silhouette; no gray paint or gray halo. Do not turn her upright, add limbs, add text, or change pose. Also close the tiny accidental holes in the masked bent knee and black gloved hand, retaining their exact shape and black fabric shading.",
-          "status": "processing",
-          "image_id": "6f7f68a6-fa43-5870-906d-3e17bc270bf0",
-          "job_kind": "creator-image",
-          "progress": 0.75,
-          "queue_position": 1,
-          "generation_started_at": "2026-10-24T00:20:09.507087+00:00",
-          "estimated_wait_seconds": 77
+          "action": "generating",
+          "status": "initializing",
+          "progress": 0.1569631334137765,
+          "flow_kind": "animation",
+          "queue_position": 0,
+          "generation_started_at": "2026-10-24T00:26:12.706132+00:00",
+          "estimated_wait_seconds": 0
         }
       }
     }
@@ -27638,18 +27796,19 @@
         "throw-object": "b2e2ca3b-ce95-48c7-a05f-1aa1c6bb8deb",
         "front-flip": "f12abd78-49c6-4558-8a6f-ee68a5e99669",
         "picking-up": "a22f34bb-be49-41c0-9537-cd17aca48365",
-        "backflip": "7ed684ff-42ce-42b3-9b9c-53bdfbc2e78b"
+        "backflip": "f2cae8cb-db71-4bfb-898d-da7c568b4f31"
       },
       "ready": true,
       "rebuild_after_direction_policy": true,
       "image_verified": true,
       "skeleton_joints": 18,
       "rotation_count": 8,
-      "exported": true,
+      "exported": false,
       "motion_direction_revision": "west-southwest",
       "eight_way_visual_reviewed": true,
       "motions_visual_reviewed": false,
-      "motion-frame-repair-backflip-v5-face-1": "b110c538-e637-4237-9cd3-80a92de3b429"
+      "motion-frame-repair-backflip-v5-face-1": "b110c538-e637-4237-9cd3-80a92de3b429",
+      "motion-frame-repair-backflip-v5-face-upright-2": "11c733f9-96de-46c4-94b9-019c6975e84e"
     },
     "spangdal": {
       "name": "스팡달",
@@ -47187,9 +47346,90 @@
         "files": 64,
         "production_pack_clips": 20
       }
+    },
+    {
+      "at": "2026-10-24T00:22:17Z",
+      "kind": "completed",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "motion-frame-repair-backflip-v5-face-1",
+        "template": null,
+        "job_id": "b110c538-e637-4237-9cd3-80a92de3b429",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 9
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T00:23:13Z",
+      "kind": "submitted",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "motion-frame-repair-backflip-v5-face-upright-2",
+        "template": null,
+        "job_id": "11c733f9-96de-46c4-94b9-019c6975e84e",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "11c733f9-96de-46c4-94b9-019c6975e84e",
+          "image_id": "9cf6125d-7fc7-546f-9705-7e4ffdab37f3",
+          "source_image_id": "9cf6125d-7fc7-546f-9705-7e4ffdab37f3",
+          "status": "processing",
+          "output_count": 1,
+          "image_size": {
+            "width": 256,
+            "height": 256
+          },
+          "estimated_generations": 9,
+          "pricing_provisional": true
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T00:24:15Z",
+      "kind": "completed",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "motion-frame-repair-backflip-v5-face-upright-2",
+        "template": null,
+        "job_id": "11c733f9-96de-46c4-94b9-019c6975e84e",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 9
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T00:24:17Z",
+      "kind": "exported",
+      "slug": "jyaldi",
+      "detail": {
+        "bytes": 668391,
+        "files": 64,
+        "production_pack_clips": 20
+      }
+    },
+    {
+      "at": "2026-10-24T00:25:17Z",
+      "kind": "submitted",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "backflip",
+        "job_id": "f2cae8cb-db71-4bfb-898d-da7c568b4f31",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "f2cae8cb-db71-4bfb-898d-da7c568b4f31",
+          "status": "processing"
+        }
+      }
     }
   ],
-  "updated_at": 1792801289.0510857,
+  "updated_at": 1792801616.6337383,
   "user_stopped_at": 1792778235.6917784,
   "archived_jobs": {
     "304457e9-6577-44f0-af17-97841a9f6720": {
@@ -48508,11 +48748,11 @@
       "saved_frames": 6
     }
   },
-  "last_git_checkpoint": 1792800957.7863896,
+  "last_git_checkpoint": 1792801290.815947,
   "summary": {
     "jobs": {
       "processing": 1,
-      "completed": 321,
+      "completed": 323,
       "failed": 9,
       "stalled": 0
     },

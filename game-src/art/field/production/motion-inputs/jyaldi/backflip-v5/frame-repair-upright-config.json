@@ -1,0 +1,27 @@
+{
+  "slug": "jyaldi",
+  "slot": "backflip",
+  "character_id": "4e115078-a350-4b9f-b1d4-a131f8e2ccb6",
+  "base_job_id": "7ed684ff-42ce-42b3-9b9c-53bdfbc2e78b",
+  "frame_index": 4,
+  "revision": "v5-face-upright-2",
+  "rectangles": [
+    [
+      86,
+      175,
+      165,
+      241
+    ],
+    [
+      100,
+      105,
+      196,
+      155
+    ]
+  ],
+  "mask_visually_reviewed": true,
+  "seed": 2026102902,
+  "description": "Restore the damaged face and hair of this adult woman in the exact same tucked airborne pose. Draw her complete coherent LEFT-facing profile, pale skin, small red eye, eyebrow, nose, mouth, ear and long straight black hair swept upward by motion. Repair accidental missing transparent holes inside the head, face, hair, black gloved hand and bent knee. Keep the black fitted suit, white collar, body pose, silhouette size, precise native pixel grid and shading. Leave the outside transparent with no gray halo. Regenerate the whole masked head so the face is anatomically intact; do not preserve the broken fragmented face. Do not change body pose or add anything.",
+  "mask_review_findings": "Original mask reviewed; exact 180-degree input transpose inspected at 3x, no resampling. Same masked original regions; normalize output back before byte comparison.",
+  "rotate_180": true
+}
