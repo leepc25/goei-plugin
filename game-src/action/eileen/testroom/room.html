@@ -50,6 +50,8 @@ const VFX = /*__VFX__*/null || {}; for (const k in VFX) { VFX[k].img = new Image
 // PixelLab 이펙트 그림 재생: 2배 도트로, 기준점(pivot)을 x,y에
 const vfx = (name, x, y, scale = 2) => { if (VFX[name]) fx.push({ k: 'sheet', name, x, y, s: scale, t0: VFX[name].frames.reduce((a, f) => a + f[4], 0) / 1000, t: VFX[name].frames.reduce((a, f) => a + f[4], 0) / 1000 }); };
 const has = id => !!A[id];
+// 땅 동작 기준선: 모든 동작을 캔버스 아래 4px 선에 맞춤(이어지는 동작끼리 높이가 튀지 않게, 2026-10-24)
+const BASE = a => a.h - 4;
 const cv = document.getElementById('cv'); let ctx = cv.getContext('2d'); ctx.imageSmoothingEnabled = false;
 // 이펙트는 1/3 크기 층에 그려 도트로 키움(캐릭터 도트와 맞춤). 빛나는 것은 가산 혼합 층
 const FXS = 3, mkLayer = () => { const c = document.createElement('canvas'); c.width = 1280 / FXS; c.height = 720 / FXS; const g = c.getContext('2d'); g.imageSmoothingEnabled = false; return [c, g]; };
@@ -146,7 +148,7 @@ const pushP = (vx, dec, vy = 0) => { P.pvx = vx; P.pvy = vy; P.pdec = dec; };
 function framePt(id, f, px, py) {
   const a = A[id], flip = a.dir === 'SW' ? P.face > 0 : P.face < 0;
   const air = isAir(id);
-  const base = air ? a.bot[f] : a.floor;
+  const base = air ? a.bot[f] : BASE(a);
   const k = K(P.y);
   return { x: P.x + (flip ? -px : px) * k, y: P.y - P.z - (base - py) * k };
 }
@@ -333,13 +335,13 @@ function rocketSuper() {
   P.armed = false; P.combat = true;
   const a = A['25_1'];
   // 바주카: 꺼내기(25_1) → 발사(25_2, 첫 반동 장에서 로켓) → 꺼내기를 거꾸로 틀어 등 뒤로 넣기(사용자 제안)
-  // 컷인이 화면을 덮는 동안 관이 불쑥 생기는 앞 장(2~5장)은 건너뛰고, 어깨에 얹는 6~8장부터 보여 줌
-  const s = [{ f: 0, d: 0.3, ev: 'cut' }, { f: 0, d: 0.5 }, ...S(R(5, a.n - 1), 0.08)];
+  // 앞 바닥에서 집어 들어 어깨에 멤(6차, 2026-10-24) — 집는 장은 조금 천천히, 메는 장은 빠르게
+  const s = [{ f: 0, d: 0.3, ev: 'cut' }, { f: 0, d: 0.35 }, { f: 1, d: 0.1 }, { f: 2, d: 0.12 }, { f: 3, d: 0.1 }, { f: 4, d: 0.08 }, { f: 5, d: 0.08 }, { f: 6, d: 0.08 }, { f: 7, d: 0.1 }];
   if (has('25_2')) { const b = A['25_2']; s.push({ f: a.n - 1, d: 0.25 }); }
   act('25_1', { seq: s, onEnd: () => {
     if (!has('25_2')) return afterBuf(toIdle);
     const b = A['25_2'];
-    act('25_2', { seq: [{ f: 0, d: 0.12 }, { f: Math.min(1, b.n - 1), d: 0.22, ev: 'rocket' }, ...S(R(2, b.n - 1), 0.09), { f: 0, d: 0.45 }], onEnd: () => { flash = 0.12; for (let i = 0; i < 8; i++) fx.push({ k: 'smoke', x: P.x + (Math.random() - 0.5) * 60, y: P.y - 120 + Math.random() * 60, vx: (Math.random() - 0.5) * 40, vy: -30, r: 14, t: 0.6, t0: 0.6, c: 170 }); reverseOut('25_1', [a.n - 1, 5], 0.08, () => { P.combat = true; toIdle(); }); } });   // 넣을 때도 어깨에서 내리는 장까지만, 나머지는 연기로 가림
+    act('25_2', { seq: [{ f: 0, d: 0.12 }, { f: Math.min(1, b.n - 1), d: 0.22, ev: 'rocket' }, ...S(R(2, b.n - 1), 0.09), { f: 0, d: 0.45 }], onEnd: () => reverseOut('25_1', R(a.n - 1, 0), 0.07, () => { P.combat = true; toIdle(); }) });   // 넣을 땐 거꾸로: 어깨에서 내려 바닥에 둠
   } });
 }
 const ROCKET_FIRE = 6;   // 발사 장: 7번째 장(2026-10-24 4차 결과 보고 정함)
@@ -561,7 +563,7 @@ function update(dt) {
   if (P.sp >= 100 && Math.random() < dt * 2.5) fx.push({ k: 'mote', x: P.x + (Math.random() - 0.5) * 80 * K(P.y), y: P.y - Math.random() * 40, vy: -90 - Math.random() * 120, c: '#ffd34a', t: 0.8, t0: 0.8 });
   if (P.hp <= 25 && Math.random() < dt * 3.5) {   // 빈사: 몸에서 핏방울이 떨어져 바닥에 번짐
     const a = A[P.clip ? P.clip.id : '1'], f = curF(), k = K(P.y);
-    const top = P.y - P.z - (a.floor - a.top[f]) * k, bot = P.y - P.z;
+    const top = P.y - P.z - (BASE(a) - a.top[f]) * k, bot = P.y - P.z;
     const y = top + (bot - top) * (0.25 + Math.random() * 0.4);
     for (let i = 0; i < 2 + (Math.random() * 3 | 0); i++) fx.push({ k: 'blood', x: P.x + (Math.random() - 0.5) * 30 * k, y, vx: (Math.random() - 0.5) * 120, vy: -60 - Math.random() * 120, g: P.y + (Math.random() - 0.5) * 6, t: 3, s: 2 + Math.random() * 2.5 });
   }
@@ -666,7 +668,7 @@ function drawSprite(id, f, x, y, z, face, alpha = 1, tint = null) {
   const a = A[id], img = IMG[id]; if (!img.complete || !img.naturalWidth) return;
   const flip = a.dir === 'SW' ? face > 0 : face < 0;
   const air = P.mode === 'air' && (id === '7' || id === '14');
-  const base = air ? a.bot[f] : a.floor;   // 땅 동작은 그 동작에서 가장 낮은 점을 바닥에
+  const base = air ? a.bot[f] : BASE(a);
   let bob = 0;
   if (id === 'W' && P.mode === 'ground' && P.armed) bob = Math.round(Math.sin(P.t * 3) * 1.2);
   const sk = K(y);
@@ -688,8 +690,8 @@ function drawPlayer() {
   const air = P.mode === 'air' && (id === '7' || id === '14');
   const flip = a.dir === 'SW' ? P.face > 0 : P.face < 0;
   const ft = a.foot[f], kk = K(P.y), fx0 = (flip ? -ft[0] : ft[0]) * kk;
-  const lift = air ? 0 : (a.floor - a.bot[f]);   // 그림 속에서 뜬 장이면 그림자를 작게
-  shadow(P.x + fx0, P.y, P.z + lift * kk, Math.min(80, ft[1]), kk, air ? 0 : (ft[2] || 0), Math.min(10, ft[3] || 0));
+  const contact = a.bot[f] - (ft[2] || 0), lift = air ? 0 : Math.max(0, BASE(a) - a.bot[f] - 6);   // 발이 닿는 높이, 그림 속에서 뜬 장이면 그림자를 작게
+  shadow(P.x + fx0, P.y, P.z + lift * kk, Math.min(80, ft[1]), kk, air ? 0 : BASE(a) - contact, Math.min(10, ft[3] || 0));
   if (P.mode === 'charge') {   // 몸 둘레 기운
     const lv = P.charge >= 2 ? 3 : P.charge > 1.3 ? 2 : P.charge > 0.5 ? 1 : 0, cy = P.y - 100 * kk, r = (80 + lv * 14 + Math.sin(P.t * 12) * 6) * kk;
     const g = ctx.createRadialGradient(P.x, cy, r * 0.3, P.x, cy, r); g.addColorStop(0, 'rgba(255,255,255,0)'); g.addColorStop(0.7, CH_COL[lv]); g.addColorStop(1, 'rgba(255,255,255,0)');
@@ -703,7 +705,7 @@ function drawPlayer() {
   else if (P.mode === 'charge') { const lv = P.charge >= 2 ? 3 : P.charge > 1.3 ? 2 : P.charge > 0.5 ? 1 : 0; tint = { c: CH_COL[lv], over: 0.1 + 0.12 * Math.sin(P.t * 20) }; }
   drawSprite(id, f, P.x, P.y, P.z, P.face, 1, tint);
   if (P.mode === 'stun') {   // 머리 위 별
-    const hy = P.y - (a.floor - a.top[f]) * kk - 14;
+    const hy = P.y - (BASE(a) - a.top[f]) * kk - 14;
     for (let i = 0; i < 3; i++) { const t = P.t * 4 + i * 2.09; star(P.x + Math.cos(t) * 26, hy + Math.sin(t) * 7, 7, '#ffe066'); }
   }
   if (showNo) { ctx.fillStyle = '#fff'; ctx.font = '14px monospace'; ctx.fillText(`${id} · ${f + 1}/${a.n} · ${kk.toFixed(2)}배`, P.x - 60, P.y + 26); }
@@ -784,7 +786,7 @@ function drawFx(glow) {
       ctx.strokeStyle = `rgba(255,90,74,${0.8})`; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(e.x, e.y); ctx.lineTo(x, FLOOR0 - 40); ctx.lineTo(x, H); ctx.stroke();
       ctx.fillStyle = 'rgba(255,90,74,.08)'; ctx.fillRect(Math.min(e.x, x), 0, Math.abs(x - e.x), H);
     }
-    else if (e.k === 'icon') { const a = A[P.clip ? P.clip.id : '1']; const y = P.y - (a.floor - a.top[curF()]) * K(P.y) - 40; ctx.fillStyle = '#ff4a3a'; ctx.font = 'bold 44px sans-serif'; ctx.fillText(e.v, P.x - 8, y); }
+    else if (e.k === 'icon') { const a = A[P.clip ? P.clip.id : '1']; const y = P.y - (BASE(a) - a.top[curF()]) * K(P.y) - 40; ctx.fillStyle = '#ff4a3a'; ctx.font = 'bold 44px sans-serif'; ctx.fillText(e.v, P.x - 8, y); }
   }
 }
 function drawHeat() {
