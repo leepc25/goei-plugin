@@ -1,0 +1,402 @@
+{
+  "reason": "여러 프레임 회색 머리 외곽; 자기 웅크린 깨끗한 참조로 전환",
+  "job": {
+    "kind": "animation",
+    "slug": "jaemtri",
+    "template": "running-jump",
+    "status": "completed",
+    "created_epoch": 1792804755.5482266,
+    "receipt": {
+      "usage": null,
+      "background_job_id": "af133d84-0fb7-4ea2-b732-b9588f406c49",
+      "status": "processing"
+    },
+    "endpoint": "animate-with-skeleton-v3",
+    "last_response": {
+      "usage": {
+        "type": "generations",
+        "generations": 3.0
+      },
+      "id": "af133d84-0fb7-4ea2-b732-b9588f406c49",
+      "status": "completed",
+      "created_at": "2026-10-24T01:19:15.876787+00:00",
+      "last_response": {
+        "seed": 2026110701,
+        "type": "done",
+        "action": "smoothing frames",
+        "images": [
+          {
+            "type": "base64",
+            "width": 256,
+            "base64": "[image payload omitted]",
+            "height": 256
+          },
+          {
+            "type": "base64",
+            "width": 256,
+            "base64": "[image payload omitted]",
+            "height": 256
+          },
+          {
+            "type": "base64",
+            "width": 256,
+            "base64": "[image payload omitted]",
+            "height": 256
+          },
+          {
+            "type": "base64",
+            "width": 256,
+            "base64": "[image payload omitted]",
+            "height": 256
+          },
+          {
+            "type": "base64",
+            "width": 256,
+            "base64": "[image payload omitted]",
+            "height": 256
+          },
+          {
+            "type": "base64",
+            "width": 256,
+            "base64": "[image payload omitted]",
+            "height": 256
+          },
+          {
+            "type": "base64",
+            "width": 256,
+            "base64": "[image payload omitted]",
+            "height": 256
+          },
+          {
+            "type": "base64",
+            "width": 256,
+            "base64": "[image payload omitted]",
+            "height": 256
+          }
+        ],
+        "status": "initializing",
+        "progress": 1.0,
+        "flow_kind": "animation",
+        "billing_usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "generation_id": "c5142597-f619-4d66-b5b0-ef0143c7a5b4",
+        "queue_position": 0,
+        "billing_charged": true,
+        "generation_started_at": "2026-10-24T01:20:15.186742+00:00",
+        "estimated_wait_seconds": 0
+      }
+    },
+    "observed_end_epoch": 1792805191.3811288,
+    "elapsed_observed_seconds": 435.83290243148804,
+    "usage": {
+      "usd": 0.0,
+      "type": "generations",
+      "generations": 3
+    },
+    "saved_frames": 8
+  },
+  "at": 1792805298.496097,
+  "state_before": {
+    "name": "잼트리",
+    "group": "management",
+    "character_id": "f937666b-c116-4408-8864-55e7743850a5",
+    "image": "a32c319b-d494-4fb0-b04e-1576a6243021",
+    "registration": "c39dacdf-7d7e-4648-bceb-6900ea2c8fd8",
+    "motions": {
+      "breathing-idle": "585dd8b2-dab9-49c4-867d-650294089a71",
+      "walking-8-frames": "2f3d540f-6770-442f-a9f4-a2a12320fe11",
+      "drinking": "dc6f89a3-0b61-4e26-bb08-73ecb7852b25",
+      "pull-heavy-object": "df4b0e3c-2074-4bbe-8551-1f693b36c9ad",
+      "fight-stance-idle-8-frames": "4e33ccea-e38f-4f32-9cfe-8ded7f02e6dc",
+      "picking-up": "1a8ae1e5-ecae-4bd6-9367-d0c75519e4cc",
+      "lead-jab": "da3739c8-609a-43a1-9bbd-acb9c7f0d250",
+      "running-8-frames": "85cc46f4-f282-4c85-84a5-8806f0c0dbb8",
+      "running-slide": "f0edcb83-0b00-45e5-aef3-53223e4c989a",
+      "crouched-walking": "8e822486-043a-4c72-ae8c-322e4a2d86d6",
+      "sad-walk": "dd2dc9ab-c87a-4894-9eb1-4daf3f005733",
+      "jumping-1": "74d1cc71-5cd6-4798-ab81-6884fc25bb29",
+      "jumping-2": "3c6c64ce-622e-44c3-8eb2-a043ee45d221",
+      "two-footed-jump": "2be8354d-3922-4535-8152-cab5ef51f1f9",
+      "throw-object": "62f4c3b9-4d84-4975-b7b3-22c513a5f2fb",
+      "cross-punch": "a2d20675-c8f9-4e9a-a44f-df1ec4e7f2f0",
+      "running-jump": "af133d84-0fb7-4ea2-b732-b9588f406c49",
+      "pushing": "88c76584-cfd4-4538-8260-d9b8783e4f6b",
+      "front-flip": "4883f298-4768-4a52-bdd7-ff2f0f017356",
+      "backflip": "c2c568a0-a488-4c20-87d2-e260728449c1"
+    },
+    "ready": true,
+    "image_verified": true,
+    "skeleton_joints": 18,
+    "rotation_count": 8,
+    "exported": false,
+    "eight_way_visual_reviewed": true,
+    "motions_visual_reviewed": false,
+    "motion-frame-candidate-picking-up-low-pose-1": "40c26d95-c80c-468d-bd5f-30bf1465acb6",
+    "motion-frame-candidate-throw-object-empty-release-1": "e4f6ccb6-7297-4453-8c16-d976d5558f26",
+    "motion-frame-candidate-throw-object-empty-recover-1": "af91c70f-1c1c-4a87-97ab-da73d7574011",
+    "motion-frame-candidate-throw-object-empty-rest-1": "4f969d11-7488-4dcb-9b2a-8d68556f26e5",
+    "motion-frame-candidate-running-8-frames-hair-1": "bed72780-d7f2-4bce-92b5-af8378b7430c",
+    "motion-frame-candidate-jumping-1-hair-start-1": "b5c5ac54-f9a4-4452-a2ad-1b2a3259cfc7",
+    "motion-frame-candidate-jumping-1-hair-land-1": "480ee045-dfea-4c9a-aee7-c64e2435a0f2",
+    "motion-frame-candidate-two-footed-jump-hair-start-1": "16ccd3fa-5110-4cc2-be0e-1a1544888ddb",
+    "motion-frame-candidate-two-footed-jump-hair-land-1": "f9b2c65c-05da-4697-be89-fcb583c6e5c9",
+    "motion-frame-candidate-running-slide-low-slide-1": "3873b31c-c32e-46e3-9d67-a454897b03ca",
+    "motion_assemblies": {
+      "picking-up": {
+        "base_job_id": "1a8ae1e5-ecae-4bd6-9367-d0c75519e4cc",
+        "frame_sources": [
+          {
+            "frame_index": 0,
+            "source_job_id": "1a8ae1e5-ecae-4bd6-9367-d0c75519e4cc",
+            "source_frame_index": 0,
+            "sha256": "c94a5ebbefc692b45e726d2687809ade37fb123db72027b779d83342e0617b4c"
+          },
+          {
+            "frame_index": 1,
+            "source_job_id": "1a8ae1e5-ecae-4bd6-9367-d0c75519e4cc",
+            "source_frame_index": 1,
+            "sha256": "250ac219d049b92b0141f6dee9d3dff8f60377c73e15d4e6d78b9a69216e5fd8"
+          },
+          {
+            "frame_index": 2,
+            "source_job_id": "1a8ae1e5-ecae-4bd6-9367-d0c75519e4cc",
+            "source_frame_index": 2,
+            "sha256": "802d771fe0906e173aadd1b1ed37258ee71596e9f439f8f14c6b6dd263f4ffdc"
+          },
+          {
+            "frame_index": 3,
+            "source_job_id": "1a8ae1e5-ecae-4bd6-9367-d0c75519e4cc",
+            "source_frame_index": 3,
+            "sha256": "95a70fc8bda5ea88f51adcd9ebfc330cba3c4a9ba9ecd72e678137f863548efb"
+          },
+          {
+            "frame_index": 4,
+            "source_job_id": "40c26d95-c80c-468d-bd5f-30bf1465acb6",
+            "source_frame_index": 1,
+            "target_pose_index": 4,
+            "source_path": "motion-frame-candidates/jaemtri/picking-up/low-pose-1/frames/1.png",
+            "sha256": "33fa7a4d4f52a9428a8c1af9bd388dcba0daaa4c216206565dac7a681c11764b",
+            "findings": "Candidate 1 inspected at 2x: continuous face/hair/hands and intact low crouch, own brown waves/skirt/heels, no gray outer paint."
+          },
+          {
+            "frame_index": 5,
+            "source_job_id": "1a8ae1e5-ecae-4bd6-9367-d0c75519e4cc",
+            "source_frame_index": 5,
+            "sha256": "a9fb1d84999cb03acf6fb8a5fd4a22df7679926db0f99ba79fd3683aa18fb7d5"
+          },
+          {
+            "frame_index": 6,
+            "source_job_id": "1a8ae1e5-ecae-4bd6-9367-d0c75519e4cc",
+            "source_frame_index": 6,
+            "sha256": "c840748dc1f7050977c2192e55e1aff165e3418f2a5dfc8e25c9f4db1d44dbbc"
+          },
+          {
+            "frame_index": 7,
+            "source_job_id": "1a8ae1e5-ecae-4bd6-9367-d0c75519e4cc",
+            "source_frame_index": 7,
+            "sha256": "637afce4389badbd3c7859cde724ed4a459a026668b1a7c5ec59757a0df0a0fe"
+          }
+        ],
+        "method": "select complete same-pose regenerated frames; no pixel editing",
+        "new_user_approval": false,
+        "visual_reviewed": true
+      },
+      "throw-object": {
+        "base_job_id": "62f4c3b9-4d84-4975-b7b3-22c513a5f2fb",
+        "frame_sources": [
+          {
+            "frame_index": 0,
+            "source_job_id": "62f4c3b9-4d84-4975-b7b3-22c513a5f2fb",
+            "source_frame_index": 0,
+            "sha256": "8bdca59472cd37335eea332d25da6bd001826777640225a5ca8ffa9acfd04786"
+          },
+          {
+            "frame_index": 1,
+            "source_job_id": "62f4c3b9-4d84-4975-b7b3-22c513a5f2fb",
+            "source_frame_index": 1,
+            "sha256": "36bb00b81a5628260915ed7c62003cb7e7d5bc19343238d40e522d59e57980e1"
+          },
+          {
+            "frame_index": 2,
+            "source_job_id": "62f4c3b9-4d84-4975-b7b3-22c513a5f2fb",
+            "source_frame_index": 2,
+            "sha256": "681a1cac40bfbce1277c34c367779409d4a58615f329129c6a41566123d6299b"
+          },
+          {
+            "frame_index": 3,
+            "source_job_id": "62f4c3b9-4d84-4975-b7b3-22c513a5f2fb",
+            "source_frame_index": 3,
+            "sha256": "de2daa4c8452d6be259e23c4d6ce0a677a1edeffc6e6d7949fe47514add5733f"
+          },
+          {
+            "frame_index": 4,
+            "source_job_id": "62f4c3b9-4d84-4975-b7b3-22c513a5f2fb",
+            "source_frame_index": 4,
+            "sha256": "3c9cef2f17555bce65a4b5c78b1e50f855401f1676e6705629f99b4830f96c2f"
+          },
+          {
+            "frame_index": 5,
+            "source_job_id": "e4f6ccb6-7297-4453-8c16-d976d5558f26",
+            "source_frame_index": 1,
+            "target_pose_index": 5,
+            "source_path": "motion-frame-candidates/jaemtri/throw-object/empty-release-1/frames/1.png",
+            "sha256": "1f87705c19116752596ac67590b18844114750b064285b205237bdd38629d5c6",
+            "findings": "Candidate 1: empty extended hand with released brown object flying ahead, no gray debris; own appearance and target pose intact."
+          },
+          {
+            "frame_index": 6,
+            "source_job_id": "af91c70f-1c1c-4a87-97ab-da73d7574011",
+            "source_frame_index": 2,
+            "target_pose_index": 6,
+            "source_path": "motion-frame-candidates/jaemtri/throw-object/empty-recover-1/frames/2.png",
+            "sha256": "8b1e54224b0131785fa60d94c4c5ded9ce69ef310eb1195b11f1ad02af133bd4",
+            "findings": "Candidate 2 clean empty hand and no floating gray object; candidates 0/1 rejected for gray debris. Same recovery pose and own identity."
+          },
+          {
+            "frame_index": 7,
+            "source_job_id": "4f969d11-7488-4dcb-9b2a-8d68556f26e5",
+            "source_frame_index": 1,
+            "target_pose_index": 7,
+            "source_path": "motion-frame-candidates/jaemtri/throw-object/empty-rest-1/frames/1.png",
+            "sha256": "3720ff3629550697d1928cffaa162548d56c889bc8f624129e18e3b5c67e10bf",
+            "findings": "Candidate 1 clean empty-handed return posture; no ball reappearance or gray exterior, own hair/skirt/heels retained."
+          }
+        ],
+        "method": "select complete same-pose regenerated frames; no pixel editing",
+        "new_user_approval": false,
+        "visual_reviewed": true
+      },
+      "jumping-1": {
+        "base_job_id": "74d1cc71-5cd6-4798-ab81-6884fc25bb29",
+        "frame_sources": [
+          {
+            "frame_index": 0,
+            "source_job_id": "74d1cc71-5cd6-4798-ab81-6884fc25bb29",
+            "source_frame_index": 0,
+            "sha256": "ea1b0b889a578cc662f88e507a5db8476dea1077db52d56be38d282de68bd17a"
+          },
+          {
+            "frame_index": 1,
+            "source_job_id": "b5c5ac54-f9a4-4452-a2ad-1b2a3259cfc7",
+            "source_frame_index": 2,
+            "target_pose_index": 1,
+            "source_path": "motion-frame-candidates/jaemtri/jumping-1/hair-start-1/frames/2.png",
+            "sha256": "1dacaeb8c598e73a5cc48776e78a1ee2b58c6f957f01128bdf17004c2b323c36",
+            "findings": "Candidate 2 matches bent-knee preparation and has clean hair/hand silhouette; other candidates still show windblown hair. Own identity preserved."
+          },
+          {
+            "frame_index": 2,
+            "source_job_id": "74d1cc71-5cd6-4798-ab81-6884fc25bb29",
+            "source_frame_index": 2,
+            "sha256": "942a61adda1288c88bbc0f2227b68e660746eb6c94ebf425a30cd0a7e99f3f25"
+          },
+          {
+            "frame_index": 3,
+            "source_job_id": "74d1cc71-5cd6-4798-ab81-6884fc25bb29",
+            "source_frame_index": 3,
+            "sha256": "31c98b8ea870ceea026a1f780de887fcb9ff540ba59130fac0b3fe1130323250"
+          },
+          {
+            "frame_index": 4,
+            "source_job_id": "74d1cc71-5cd6-4798-ab81-6884fc25bb29",
+            "source_frame_index": 4,
+            "sha256": "83c8b731e66a02f2a71da9af78b3d5d9f59afd3d41699969ca88333fb1bd9f3b"
+          },
+          {
+            "frame_index": 5,
+            "source_job_id": "480ee045-dfea-4c9a-aee7-c64e2435a0f2",
+            "source_frame_index": 2,
+            "target_pose_index": 5,
+            "source_path": "motion-frame-candidates/jaemtri/jumping-1/hair-land-1/frames/2.png",
+            "sha256": "f991b80a6adde8acf1d95004867e4cf84297e4160acaedee9ec569bea18eacda",
+            "findings": "Candidate 2 matches airborne descent pose and removes gray curl patch; own brown hair/skirt/heels preserved."
+          },
+          {
+            "frame_index": 6,
+            "source_job_id": "74d1cc71-5cd6-4798-ab81-6884fc25bb29",
+            "source_frame_index": 6,
+            "sha256": "c38c2c944003041e753d740e81fa91b90ad56e73059a913c5f28e1e9a0842ef1"
+          },
+          {
+            "frame_index": 7,
+            "source_job_id": "74d1cc71-5cd6-4798-ab81-6884fc25bb29",
+            "source_frame_index": 7,
+            "sha256": "7d225b4856fe19ee5638d66025856afd77deb3de35203958f47b0e58456f29f7"
+          }
+        ],
+        "method": "select complete same-pose regenerated frames; no pixel editing",
+        "new_user_approval": false,
+        "visual_reviewed": true
+      },
+      "two-footed-jump": {
+        "base_job_id": "2be8354d-3922-4535-8152-cab5ef51f1f9",
+        "frame_sources": [
+          {
+            "frame_index": 0,
+            "source_job_id": "2be8354d-3922-4535-8152-cab5ef51f1f9",
+            "source_frame_index": 0,
+            "sha256": "eee2fbebd09c70ca8f5b4470baab20f5504cfa4c869cb476dd559cd637c95027"
+          },
+          {
+            "frame_index": 1,
+            "source_job_id": "2be8354d-3922-4535-8152-cab5ef51f1f9",
+            "source_frame_index": 1,
+            "sha256": "eae0b60ecc06591394fb224e6a915adce319d5a1dd00e844a05cef8a6845a178"
+          },
+          {
+            "frame_index": 2,
+            "source_job_id": "16ccd3fa-5110-4cc2-be0e-1a1544888ddb",
+            "source_frame_index": 2,
+            "target_pose_index": 2,
+            "source_path": "motion-frame-candidates/jaemtri/two-footed-jump/hair-start-1/frames/2.png",
+            "sha256": "d3c8f949f22748c8956b0ac737c068ef01d35a6ef9a2e6724d327a9ec74bec45",
+            "findings": "Candidate 2 matches crouched takeoff pose with clean long hair exterior and intact guarded hands."
+          },
+          {
+            "frame_index": 3,
+            "source_job_id": "2be8354d-3922-4535-8152-cab5ef51f1f9",
+            "source_frame_index": 3,
+            "sha256": "101c5ca47f68b49068f5092a0c8dc86187dce747be58ca9b08f99b8b8f45346b"
+          },
+          {
+            "frame_index": 4,
+            "source_job_id": "2be8354d-3922-4535-8152-cab5ef51f1f9",
+            "source_frame_index": 4,
+            "sha256": "5d55859ae5f694a8b2514a0756765636c5d7d092b95bf78887de0496b88e4071"
+          },
+          {
+            "frame_index": 5,
+            "source_job_id": "2be8354d-3922-4535-8152-cab5ef51f1f9",
+            "source_frame_index": 5,
+            "sha256": "035217c9143db0d37b7f509cddb19bbb49837ae9e2cdf4f5ab4f6d0d85dab038"
+          },
+          {
+            "frame_index": 6,
+            "source_job_id": "f9b2c65c-05da-4697-be89-fcb583c6e5c9",
+            "source_frame_index": 1,
+            "target_pose_index": 6,
+            "source_path": "motion-frame-candidates/jaemtri/two-footed-jump/hair-land-1/frames/1.png",
+            "sha256": "9d95be147cd42a533a13faf9c713a345ac69a67360671d2565fcd21b1f05b754",
+            "findings": "Candidate 1 matches bent-knee landing, clean hair edge and complete heels; no gray exterior."
+          },
+          {
+            "frame_index": 7,
+            "source_job_id": "2be8354d-3922-4535-8152-cab5ef51f1f9",
+            "source_frame_index": 7,
+            "sha256": "82c5a6d28f8b23fbff883dffe17e414ba9b05bf2fd5a57d36b4a91e78c02725b"
+          }
+        ],
+        "method": "select complete same-pose regenerated frames; no pixel editing",
+        "new_user_approval": false,
+        "visual_reviewed": true
+      }
+    },
+    "motion-frame-candidate-front-flip-clean-inverted-1": "8e1dd84c-ea7f-49bf-bc5b-b2c4ffde9dac",
+    "motion-frame-candidate-running-8-frames-hair-2": "4e77c51b-a338-402b-b35f-dc2e30f3a2ba",
+    "motion-frame-candidate-running-slide-low-slide-2": "a7f35a75-bb05-4c0e-bad4-d6d241bc9d1c"
+  },
+  "standalone": true
+}

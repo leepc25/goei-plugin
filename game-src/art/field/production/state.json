@@ -35072,7 +35072,11 @@
         "type": "generations",
         "generations": 3
       },
-      "saved_frames": 13
+      "saved_frames": 13,
+      "visual_rejection": {
+        "reason": "회전 중 여러 프레임 머리 외곽 회색 도색. 깨끗한 자기 역전 자세 참조로 전환.",
+        "standalone": true
+      }
     },
     "ef10ae23-11ce-484f-8d5b-634bbb15a4c9": {
       "kind": "animation",
@@ -35176,7 +35180,11 @@
         "type": "generations",
         "generations": 3
       },
-      "saved_frames": 9
+      "saved_frames": 9,
+      "visual_rejection": {
+        "reason": "회전 중 머리 외곽 회색 및 손 파손. 깨끗한 자기 역전 자세 참조로 전환.",
+        "standalone": true
+      }
     },
     "74d1cc71-5cd6-4798-ab81-6884fc25bb29": {
       "kind": "animation",
@@ -36556,7 +36564,11 @@
         "type": "generations",
         "generations": 3
       },
-      "saved_frames": 8
+      "saved_frames": 8,
+      "visual_rejection": {
+        "reason": "여러 프레임 회색 머리 외곽; 자기 웅크린 깨끗한 참조로 전환",
+        "standalone": true
+      }
     },
     "88c76584-cfd4-4538-8260-d9b8783e4f6b": {
       "kind": "animation",
@@ -36747,10 +36759,13 @@
         "status": "processing",
         "created_at": "2026-10-24T01:26:27.282735+00:00",
         "last_response": {
-          "type": "background",
+          "type": "message_progress",
+          "action": "generating",
           "status": "initializing",
+          "progress": 0.13046055366856843,
           "flow_kind": "animation",
           "queue_position": 0,
+          "generation_started_at": "2026-10-24T01:27:37.743524+00:00",
           "estimated_wait_seconds": 0
         }
       }
@@ -36777,6 +36792,38 @@
         "status": "processing",
         "created_at": "2026-10-24T01:26:30.051401+00:00",
         "last_response": {
+          "type": "message_progress",
+          "action": "generating",
+          "status": "initializing",
+          "progress": 0.1272128880383402,
+          "flow_kind": "animation",
+          "queue_position": 0,
+          "generation_started_at": "2026-10-24T01:27:40.516681+00:00",
+          "estimated_wait_seconds": 0
+        }
+      }
+    },
+    "4883f298-4768-4a52-bdd7-ff2f0f017356": {
+      "kind": "animation",
+      "slug": "jaemtri",
+      "template": "front-flip",
+      "status": "processing",
+      "created_epoch": 1792805260.8801625,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "4883f298-4768-4a52-bdd7-ff2f0f017356",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3",
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "4883f298-4768-4a52-bdd7-ff2f0f017356",
+        "status": "processing",
+        "created_at": "2026-10-24T01:27:41.766313+00:00",
+        "last_response": {
           "type": "background",
           "status": "initializing",
           "flow_kind": "animation",
@@ -36784,6 +36831,48 @@
           "estimated_wait_seconds": 0
         }
       }
+    },
+    "c2c568a0-a488-4c20-87d2-e260728449c1": {
+      "kind": "animation",
+      "slug": "jaemtri",
+      "template": "backflip",
+      "status": "processing",
+      "created_epoch": 1792805262.9927454,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "c2c568a0-a488-4c20-87d2-e260728449c1",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3",
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "c2c568a0-a488-4c20-87d2-e260728449c1",
+        "status": "processing",
+        "created_at": "2026-10-24T01:27:44.440506+00:00",
+        "last_response": {
+          "type": "background",
+          "status": "initializing",
+          "flow_kind": "animation",
+          "queue_position": 0,
+          "estimated_wait_seconds": 0
+        }
+      }
+    },
+    "7c53731e-5ac7-411f-a975-9ad2ad339232": {
+      "kind": "animation",
+      "slug": "jaemtri",
+      "template": "running-jump",
+      "status": "processing",
+      "created_epoch": 1792805299.4352233,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "7c53731e-5ac7-411f-a975-9ad2ad339232",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3"
     }
   },
   "characters": {
@@ -37233,21 +37322,21 @@
         "running-slide": "f0edcb83-0b00-45e5-aef3-53223e4c989a",
         "crouched-walking": "8e822486-043a-4c72-ae8c-322e4a2d86d6",
         "sad-walk": "dd2dc9ab-c87a-4894-9eb1-4daf3f005733",
-        "front-flip": "8f183936-03f3-4f8f-8002-668ee31d5977",
-        "backflip": "ef10ae23-11ce-484f-8d5b-634bbb15a4c9",
         "jumping-1": "74d1cc71-5cd6-4798-ab81-6884fc25bb29",
         "jumping-2": "3c6c64ce-622e-44c3-8eb2-a043ee45d221",
         "two-footed-jump": "2be8354d-3922-4535-8152-cab5ef51f1f9",
         "throw-object": "62f4c3b9-4d84-4975-b7b3-22c513a5f2fb",
         "cross-punch": "a2d20675-c8f9-4e9a-a44f-df1ec4e7f2f0",
-        "running-jump": "af133d84-0fb7-4ea2-b732-b9588f406c49",
-        "pushing": "88c76584-cfd4-4538-8260-d9b8783e4f6b"
+        "pushing": "88c76584-cfd4-4538-8260-d9b8783e4f6b",
+        "front-flip": "4883f298-4768-4a52-bdd7-ff2f0f017356",
+        "backflip": "c2c568a0-a488-4c20-87d2-e260728449c1",
+        "running-jump": "7c53731e-5ac7-411f-a975-9ad2ad339232"
       },
       "ready": true,
       "image_verified": true,
       "skeleton_joints": 18,
       "rotation_count": 8,
-      "exported": true,
+      "exported": false,
       "eight_way_visual_reviewed": true,
       "motions_visual_reviewed": false,
       "motion-frame-candidate-picking-up-low-pose-1": "40c26d95-c80c-468d-bd5f-30bf1465acb6",
@@ -60150,9 +60239,54 @@
         "files": 41,
         "production_pack_clips": 20
       }
+    },
+    {
+      "at": "2026-10-24T01:27:42Z",
+      "kind": "submitted",
+      "slug": "jaemtri",
+      "detail": {
+        "kind": "animation",
+        "template": "front-flip",
+        "job_id": "4883f298-4768-4a52-bdd7-ff2f0f017356",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "4883f298-4768-4a52-bdd7-ff2f0f017356",
+          "status": "processing"
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T01:27:45Z",
+      "kind": "submitted",
+      "slug": "jaemtri",
+      "detail": {
+        "kind": "animation",
+        "template": "backflip",
+        "job_id": "c2c568a0-a488-4c20-87d2-e260728449c1",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "c2c568a0-a488-4c20-87d2-e260728449c1",
+          "status": "processing"
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T01:28:19Z",
+      "kind": "submitted",
+      "slug": "jaemtri",
+      "detail": {
+        "kind": "animation",
+        "template": "running-jump",
+        "job_id": "7c53731e-5ac7-411f-a975-9ad2ad339232",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "7c53731e-5ac7-411f-a975-9ad2ad339232",
+          "status": "processing"
+        }
+      }
     }
   ],
-  "updated_at": 1792805195.5724616,
+  "updated_at": 1792805299.955636,
   "user_stopped_at": 1792778235.6917784,
   "archived_jobs": {
     "304457e9-6577-44f0-af17-97841a9f6720": {
@@ -61471,10 +61605,10 @@
       "saved_frames": 6
     }
   },
-  "last_git_checkpoint": 1792804708.709004,
+  "last_git_checkpoint": 1792805198.3836112,
   "summary": {
     "jobs": {
-      "processing": 2,
+      "processing": 5,
       "completed": 410,
       "failed": 9,
       "stalled": 0

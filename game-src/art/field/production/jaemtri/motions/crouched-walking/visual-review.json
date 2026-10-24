@@ -1,0 +1,20 @@
+{
+  "at": 1792805226.618041,
+  "job_id": "8e822486-043a-4c72-ae8c-322e4a2d86d6",
+  "result": "pass",
+  "findings": "전체 8프레임 검토. 무릎을 낮추고 교대로 걷는 동향 동작, 얼굴과 갈색 긴 머리 및 치마 정장, 하이힐 유지. 회색 외곽 없음.",
+  "frame_count": 8,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}
