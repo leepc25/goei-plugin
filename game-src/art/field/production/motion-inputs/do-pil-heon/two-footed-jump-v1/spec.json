@@ -2,7 +2,7 @@
   "slug": "do-pil-heon",
   "slot": "two-footed-jump",
   "character_id": "c3307c4c-568c-463d-841c-4eff89b4fc4c",
-  "skeleton_visually_reviewed": false,
+  "skeleton_visually_reviewed": true,
   "first_frame_path": "game-src/art/field/production/motion-inputs/do-pil-heon/first-frame.png",
   "new_user_approval": false,
   "landmark_source": "current character own east estimated 2d reference",
@@ -844,5 +844,6 @@
     "template_id": "mannequin",
     "seed": 2026110002,
     "no_background": true
-  }
+  },
+  "skeleton_review_findings": "AVIF/lore re-read: swept wavy dark hair, aviators, mature lean angular face, charcoal suit, no equipment. Own EAST landmarks and eight bounded crouch/takeoff/landing poses viewed. Height remains provisional without lore measurement; native pixels unchanged."
 }

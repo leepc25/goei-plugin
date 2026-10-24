@@ -2,7 +2,7 @@
   "slug": "sa-jang",
   "slot": "jumping-2",
   "character_id": "f34f1d17-eee3-4767-85f5-69cbdfa6ac76",
-  "skeleton_visually_reviewed": false,
+  "skeleton_visually_reviewed": true,
   "first_frame_path": "game-src/art/field/production/motion-inputs/sa-jang/first-frame.png",
   "new_user_approval": false,
   "landmark_source": "current character own east estimated 2d reference",
@@ -844,5 +844,6 @@
     "template_id": "mannequin",
     "seed": 2026110001,
     "no_background": true
-  }
+  },
+  "skeleton_review_findings": "AVIF and lore re-read; opaque shadow face and white smile, black suit, uncertain height remains provisional. Own EAST landmarks and all eight bounded crouch/takeoff/landing poses viewed; native pixels unchanged."
 }

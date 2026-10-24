@@ -1,8 +1,8 @@
 {
-  "at": 1792811389.286686,
+  "at": 1792811721.4646356,
   "job_id": "26112962-08ae-494b-9f9b-82a398e44e85",
   "result": "reroll-required",
-  "findings": "Indices1/3 candidates retain broad gray ponytail mats; change reference to clean open-palm index6. Index0 candidate still processing.",
+  "findings": "Open-guard index1 all gray ponytail ends; use own registered standing source. Index3 existing job still pending, do not duplicate.",
   "frame_count": 8,
   "directions": [
     "east"
@@ -22,12 +22,12 @@
     "frame_sources": [
       {
         "frame_index": 0,
-        "source_job_id": "d90d1824-7c56-429b-8f65-28b510ed4d22",
-        "source_frame_index": 2,
+        "source_job_id": "4ceaf84e-1244-4455-b198-dbff361e6cc7",
+        "source_frame_index": 1,
         "target_pose_index": 0,
-        "source_path": "motion-frame-candidates/aileen/pushing/clean-pose-0-2/frames/2.png",
-        "sha256": "3f19418f001bcbaccbe67acd6721fe8b707d1ec2cf5ac482be013c893e1cb5aa",
-        "findings": "Candidate2 separates hair tips without broad gray end matte present in candidates0/1; intact braced body."
+        "source_path": "motion-frame-candidates/aileen/pushing/open-palms-0-2/frames/1.png",
+        "sha256": "72efc8cde2dcdd50aa01590e3e53d63608244c86ecffdc33bccf484536862472",
+        "findings": "Candidate1 has intact open palms and transparent space beside legs; candidates0/2 have detached brown masses and are rejected. Hair ends follow blonde strands without broad flat gray area."
       },
       {
         "frame_index": 1,

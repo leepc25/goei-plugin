@@ -288,7 +288,7 @@
       "front-flip": "game-src/art/field/production/motion-inputs/aileen/front-flip-actual-reference-v4/spec.json",
       "backflip": "game-src/art/field/production/motion-inputs/aileen/backflip-measured-turn-v3/spec.json",
       "picking-up": "game-src/art/field/production/motion-inputs/aileen/picking-up-deep-v2/spec.json",
-      "pushing": "game-src/art/field/production/motion-inputs/aileen/pushing-actual-reference-v4/spec.json",
+      "pushing": "game-src/art/field/production/motion-inputs/aileen/pushing-original-standing-v6/spec.json",
       "throw-object": "game-src/art/field/production/motion-inputs/aileen/throw-object-measured-guard-v2/spec.json",
       "fight-stance-idle-8-frames": "game-src/art/field/production/motion-inputs/aileen/fight-stance-exact-guard-v3/spec.json",
       "cross-punch": "game-src/art/field/production/motion-inputs/aileen/cross-punch-own-lengths-v1/spec.json",
@@ -334,6 +334,16 @@
       "jumping-1": "game-src/art/field/production/motion-inputs/dejure/jumping-1-v1/spec.json",
       "jumping-2": "game-src/art/field/production/motion-inputs/dejure/jumping-2-v1/spec.json",
       "two-footed-jump": "game-src/art/field/production/motion-inputs/dejure/two-footed-jump-v1/spec.json"
+    },
+    "sa-jang": {
+      "jumping-1": "game-src/art/field/production/motion-inputs/sa-jang/jumping-1-v1/spec.json",
+      "jumping-2": "game-src/art/field/production/motion-inputs/sa-jang/jumping-2-v1/spec.json",
+      "two-footed-jump": "game-src/art/field/production/motion-inputs/sa-jang/two-footed-jump-v1/spec.json"
+    },
+    "do-pil-heon": {
+      "jumping-1": "game-src/art/field/production/motion-inputs/do-pil-heon/jumping-1-v1/spec.json",
+      "jumping-2": "game-src/art/field/production/motion-inputs/do-pil-heon/jumping-2-v1/spec.json",
+      "two-footed-jump": "game-src/art/field/production/motion-inputs/do-pil-heon/two-footed-jump-v1/spec.json"
     }
   },
   "required_custom_motion_slots": [
