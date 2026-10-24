@@ -1,0 +1,10 @@
+{
+  "character_id": "f937666b-c116-4408-8864-55e7743850a5",
+  "mode": "skeleton-v3",
+  "template_animation_id": "picking-up",
+  "directions": [
+    "east"
+  ],
+  "animation_name": "물건 줍기 (동쪽)",
+  "action_description": "picking up. Preserve this character identity, costume, hair and native proportions. Keep a clean transparent silhouette in every frame. No gray painted patches, gray halo, ground shadow or opaque background around hair, hands, clothes or feet."
+}

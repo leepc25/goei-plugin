@@ -31879,6 +31879,385 @@
         "generations": 2
       },
       "saved_frames": 3
+    },
+    "585dd8b2-dab9-49c4-867d-650294089a71": {
+      "kind": "animation",
+      "slug": "jaemtri",
+      "template": "breathing-idle",
+      "status": "processing",
+      "created_epoch": 1792803714.0542347,
+      "receipt": {
+        "background_job_ids": [
+          "585dd8b2-dab9-49c4-867d-650294089a71"
+        ],
+        "directions": [
+          "south-east"
+        ],
+        "animation_group_id": "0bb8b7ad-a2e1-4e98-977c-6ddd61e3d830",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      },
+      "endpoint": "animate-character"
+    },
+    "2f3d540f-6770-442f-a9f4-a2a12320fe11": {
+      "kind": "animation",
+      "slug": "jaemtri",
+      "template": "walking-8-frames",
+      "status": "processing",
+      "created_epoch": 1792803716.291166,
+      "receipt": {
+        "background_job_ids": [
+          "2f3d540f-6770-442f-a9f4-a2a12320fe11"
+        ],
+        "directions": [
+          "east"
+        ],
+        "animation_group_id": "6dd5884d-302f-4f52-a6d7-5b594992aedf",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      },
+      "endpoint": "animate-character"
+    },
+    "10b26ddd-9882-4ce8-a083-988939e93793": {
+      "kind": "animation",
+      "slug": "jaemtri",
+      "template": "running-8-frames",
+      "status": "processing",
+      "created_epoch": 1792803717.629138,
+      "receipt": {
+        "background_job_ids": [
+          "10b26ddd-9882-4ce8-a083-988939e93793"
+        ],
+        "directions": [
+          "east"
+        ],
+        "animation_group_id": "5ffa73ce-ffb5-434f-9df7-2538a478532d",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      },
+      "endpoint": "animate-character"
+    },
+    "19d630c1-dcf5-47d6-b025-67e49b711261": {
+      "kind": "animation",
+      "slug": "jaemtri",
+      "template": "running-jump",
+      "status": "processing",
+      "created_epoch": 1792803718.5912359,
+      "receipt": {
+        "background_job_ids": [
+          "19d630c1-dcf5-47d6-b025-67e49b711261"
+        ],
+        "directions": [
+          "east"
+        ],
+        "animation_group_id": "8377fe95-4be8-45e2-a192-455e9ba9194a",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      },
+      "endpoint": "animate-character"
+    },
+    "f10af28f-db88-4022-9c06-ac7a7d61bbf1": {
+      "kind": "animation",
+      "slug": "jaemtri",
+      "template": "running-slide",
+      "status": "processing",
+      "created_epoch": 1792803719.251689,
+      "receipt": {
+        "background_job_ids": [
+          "f10af28f-db88-4022-9c06-ac7a7d61bbf1"
+        ],
+        "directions": [
+          "east"
+        ],
+        "animation_group_id": "b4ab4199-7a0e-4773-a166-6024a4ff929e",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      },
+      "endpoint": "animate-character"
+    },
+    "49803979-a317-4432-82e5-e978129ce4b9": {
+      "kind": "animation",
+      "slug": "jaemtri",
+      "template": "crouched-walking",
+      "status": "processing",
+      "created_epoch": 1792803720.2918944,
+      "receipt": {
+        "background_job_ids": [
+          "49803979-a317-4432-82e5-e978129ce4b9"
+        ],
+        "directions": [
+          "east"
+        ],
+        "animation_group_id": "1e3a2843-e682-44e0-a77a-9bc2c333297f",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      },
+      "endpoint": "animate-character"
+    },
+    "39dbed40-e030-446e-acb8-7416fcb300fb": {
+      "kind": "animation",
+      "slug": "jaemtri",
+      "template": "sad-walk",
+      "status": "processing",
+      "created_epoch": 1792803721.0972915,
+      "receipt": {
+        "background_job_ids": [
+          "39dbed40-e030-446e-acb8-7416fcb300fb"
+        ],
+        "directions": [
+          "east"
+        ],
+        "animation_group_id": "0c633d8a-eec5-499d-a6dd-38941866a491",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      },
+      "endpoint": "animate-character"
+    },
+    "765a0855-4ec4-4945-8cbc-6e7ebe80d2df": {
+      "kind": "animation",
+      "slug": "jaemtri",
+      "template": "front-flip",
+      "status": "processing",
+      "created_epoch": 1792803721.6439958,
+      "receipt": {
+        "background_job_ids": [
+          "765a0855-4ec4-4945-8cbc-6e7ebe80d2df"
+        ],
+        "directions": [
+          "east"
+        ],
+        "animation_group_id": "88fde81c-a37e-4180-b775-8965ff530602",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      },
+      "endpoint": "animate-character"
+    },
+    "dede7581-a559-42d1-968f-7eba821c32aa": {
+      "kind": "animation",
+      "slug": "jaemtri",
+      "template": "backflip",
+      "status": "processing",
+      "created_epoch": 1792803722.4010198,
+      "receipt": {
+        "background_job_ids": [
+          "dede7581-a559-42d1-968f-7eba821c32aa"
+        ],
+        "directions": [
+          "east"
+        ],
+        "animation_group_id": "9ddbe00e-21c8-431e-8c7e-de58ad560414",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      },
+      "endpoint": "animate-character"
+    },
+    "74dd6cdf-cc38-426f-a41a-6704f87bdf13": {
+      "kind": "animation",
+      "slug": "jaemtri",
+      "template": "jumping-1",
+      "status": "processing",
+      "created_epoch": 1792803732.0410013,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "74dd6cdf-cc38-426f-a41a-6704f87bdf13",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3"
+    },
+    "4f69917a-c032-4a01-8b78-ee5eccd2e952": {
+      "kind": "animation",
+      "slug": "jaemtri",
+      "template": "jumping-2",
+      "status": "processing",
+      "created_epoch": 1792803732.565379,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "4f69917a-c032-4a01-8b78-ee5eccd2e952",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3"
+    },
+    "274e5ad7-0ea5-4815-bde9-cbddb9708422": {
+      "kind": "animation",
+      "slug": "jaemtri",
+      "template": "two-footed-jump",
+      "status": "processing",
+      "created_epoch": 1792803732.938964,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "274e5ad7-0ea5-4815-bde9-cbddb9708422",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3"
+    },
+    "dc6f89a3-0b61-4e26-bb08-73ecb7852b25": {
+      "kind": "animation",
+      "slug": "jaemtri",
+      "template": "drinking",
+      "status": "processing",
+      "created_epoch": 1792803733.2835228,
+      "receipt": {
+        "background_job_ids": [
+          "dc6f89a3-0b61-4e26-bb08-73ecb7852b25"
+        ],
+        "directions": [
+          "south-east"
+        ],
+        "animation_group_id": "aa4728af-5edc-4dd9-9575-3a6ca7a64a93",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      },
+      "endpoint": "animate-character"
+    },
+    "b447e786-642b-4d67-9ecf-ad1f0334ca55": {
+      "kind": "animation",
+      "slug": "jaemtri",
+      "template": "picking-up",
+      "status": "processing",
+      "created_epoch": 1792803733.9636624,
+      "receipt": {
+        "background_job_ids": [
+          "b447e786-642b-4d67-9ecf-ad1f0334ca55"
+        ],
+        "directions": [
+          "east"
+        ],
+        "animation_group_id": "5b40128b-8192-4848-a49a-181c6f7f4851",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      },
+      "endpoint": "animate-character"
+    },
+    "afca63ff-3579-4df3-97d7-b87aa1af9138": {
+      "kind": "animation",
+      "slug": "jaemtri",
+      "template": "pushing",
+      "status": "processing",
+      "created_epoch": 1792803735.0808108,
+      "receipt": {
+        "background_job_ids": [
+          "afca63ff-3579-4df3-97d7-b87aa1af9138"
+        ],
+        "directions": [
+          "east"
+        ],
+        "animation_group_id": "21fab8b6-7633-443b-90cf-a65aaf5ccdce",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      },
+      "endpoint": "animate-character"
+    },
+    "df4b0e3c-2074-4bbe-8551-1f693b36c9ad": {
+      "kind": "animation",
+      "slug": "jaemtri",
+      "template": "pull-heavy-object",
+      "status": "processing",
+      "created_epoch": 1792803735.534685,
+      "receipt": {
+        "background_job_ids": [
+          "df4b0e3c-2074-4bbe-8551-1f693b36c9ad"
+        ],
+        "directions": [
+          "east"
+        ],
+        "animation_group_id": "b3cf80f2-ef9b-4971-9686-92a1d3760cca",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      },
+      "endpoint": "animate-character"
+    },
+    "3903df4e-0994-4ae9-be4b-093312403c31": {
+      "kind": "animation",
+      "slug": "jaemtri",
+      "template": "throw-object",
+      "status": "processing",
+      "created_epoch": 1792803736.0474236,
+      "receipt": {
+        "background_job_ids": [
+          "3903df4e-0994-4ae9-be4b-093312403c31"
+        ],
+        "directions": [
+          "east"
+        ],
+        "animation_group_id": "e1e67467-3482-437e-8378-f95fdab5faf8",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      },
+      "endpoint": "animate-character"
+    },
+    "4e33ccea-e38f-4f32-9cfe-8ded7f02e6dc": {
+      "kind": "animation",
+      "slug": "jaemtri",
+      "template": "fight-stance-idle-8-frames",
+      "status": "processing",
+      "created_epoch": 1792803736.631302,
+      "receipt": {
+        "background_job_ids": [
+          "4e33ccea-e38f-4f32-9cfe-8ded7f02e6dc"
+        ],
+        "directions": [
+          "east"
+        ],
+        "animation_group_id": "4f812b61-9ccc-4d8f-8cfd-dddf24f4f3ca",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      },
+      "endpoint": "animate-character"
+    },
+    "9b27b5bf-cb67-4451-b43b-c65fab1dfd97": {
+      "kind": "animation",
+      "slug": "jaemtri",
+      "template": "lead-jab",
+      "status": "processing",
+      "created_epoch": 1792803738.4562004,
+      "receipt": {
+        "background_job_ids": [
+          "9b27b5bf-cb67-4451-b43b-c65fab1dfd97"
+        ],
+        "directions": [
+          "east"
+        ],
+        "animation_group_id": "9467abb4-0936-4998-97c3-9dd255c86f6e",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      },
+      "endpoint": "animate-character"
+    },
+    "0d2894ac-f760-4ec9-88eb-045cba6fecb4": {
+      "kind": "animation",
+      "slug": "jaemtri",
+      "template": "cross-punch",
+      "status": "processing",
+      "created_epoch": 1792803738.9512043,
+      "receipt": {
+        "background_job_ids": [
+          "0d2894ac-f760-4ec9-88eb-045cba6fecb4"
+        ],
+        "directions": [
+          "east"
+        ],
+        "animation_group_id": "7fa769bb-12df-432e-b357-bf5824ef7f57",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      },
+      "endpoint": "animate-character"
     }
   },
   "characters": {
@@ -32029,7 +32408,7 @@
       "rotation_count": 8,
       "exported": true,
       "eight_way_visual_reviewed": true,
-      "motions_visual_reviewed": false,
+      "motions_visual_reviewed": true,
       "motion-frame-candidate-backflip-inverted-1": "4cf1145a-2955-438f-a514-1e99a5cb9e7f",
       "motion-frame-candidate-picking-up-low-pose-1": "2c303eed-1fe3-484b-bf16-d095744d05c8",
       "motion-frame-candidate-throw-object-release-1": "bbb0fb6d-76b3-44b7-8cc7-397bda37b237",
@@ -32194,12 +32573,12 @@
             },
             {
               "frame_index": 5,
-              "source_job_id": "bbb0fb6d-76b3-44b7-8cc7-397bda37b237",
+              "source_job_id": "1c31a9a8-6be0-4d79-8896-292cb2417ab9",
               "source_frame_index": 1,
               "target_pose_index": 5,
-              "source_path": "motion-frame-candidates/spangdal/throw-object/release-1/frames/1.png",
-              "sha256": "b6d23e571e3aeceb82c754345faf5ad667ec2a493839780e7c8d4d5c985a5c42",
-              "findings": "Candidate 1 clean full frame: same extended throw arm pose, brown ball at open hand at release, no floating gray debris; own face, bob, skirt, pumps intact. Check next frame with empty hand for release transition."
+              "source_path": "motion-frame-candidates/spangdal/throw-object/release-empty-2/frames/1.png",
+              "sha256": "9544f58434925183d70ec33ae757aa6322d2110d8584e2cc0bf2da4e6656e5cc",
+              "findings": "Own clean post-release image reference gives intact empty extended hand; same target pose, no ball reappearance, gray debris, face holes or clothing drift."
             },
             {
               "frame_index": 6,
@@ -32216,7 +32595,7 @@
           ],
           "method": "select complete same-pose regenerated frames; no pixel editing",
           "new_user_approval": false,
-          "visual_reviewed": false
+          "visual_reviewed": true
         },
         "front-flip": {
           "base_job_id": "05ffd49c-1b78-4114-937b-5e4ae1e132f5",
@@ -32316,12 +32695,33 @@
       "character_id": "f937666b-c116-4408-8864-55e7743850a5",
       "image": "a32c319b-d494-4fb0-b04e-1576a6243021",
       "registration": "c39dacdf-7d7e-4648-bceb-6900ea2c8fd8",
-      "motions": {},
+      "motions": {
+        "breathing-idle": "585dd8b2-dab9-49c4-867d-650294089a71",
+        "walking-8-frames": "2f3d540f-6770-442f-a9f4-a2a12320fe11",
+        "running-8-frames": "10b26ddd-9882-4ce8-a083-988939e93793",
+        "running-jump": "19d630c1-dcf5-47d6-b025-67e49b711261",
+        "running-slide": "f10af28f-db88-4022-9c06-ac7a7d61bbf1",
+        "crouched-walking": "49803979-a317-4432-82e5-e978129ce4b9",
+        "sad-walk": "39dbed40-e030-446e-acb8-7416fcb300fb",
+        "front-flip": "765a0855-4ec4-4945-8cbc-6e7ebe80d2df",
+        "backflip": "dede7581-a559-42d1-968f-7eba821c32aa",
+        "jumping-1": "74dd6cdf-cc38-426f-a41a-6704f87bdf13",
+        "jumping-2": "4f69917a-c032-4a01-8b78-ee5eccd2e952",
+        "two-footed-jump": "274e5ad7-0ea5-4815-bde9-cbddb9708422",
+        "drinking": "dc6f89a3-0b61-4e26-bb08-73ecb7852b25",
+        "picking-up": "b447e786-642b-4d67-9ecf-ad1f0334ca55",
+        "pushing": "afca63ff-3579-4df3-97d7-b87aa1af9138",
+        "pull-heavy-object": "df4b0e3c-2074-4bbe-8551-1f693b36c9ad",
+        "throw-object": "3903df4e-0994-4ae9-be4b-093312403c31",
+        "fight-stance-idle-8-frames": "4e33ccea-e38f-4f32-9cfe-8ded7f02e6dc",
+        "lead-jab": "9b27b5bf-cb67-4451-b43b-c65fab1dfd97",
+        "cross-punch": "0d2894ac-f760-4ec9-88eb-045cba6fecb4"
+      },
       "ready": true,
       "image_verified": true,
       "skeleton_joints": 18,
       "rotation_count": 8,
-      "exported": true,
+      "exported": false,
       "eight_way_visual_reviewed": true
     },
     "aileen": {
@@ -53303,9 +53703,438 @@
         },
         "detail": null
       }
+    },
+    {
+      "at": "2026-10-24T01:01:56Z",
+      "kind": "submitted",
+      "slug": "jaemtri",
+      "detail": {
+        "kind": "animation",
+        "template": "breathing-idle",
+        "job_id": "585dd8b2-dab9-49c4-867d-650294089a71",
+        "receipt": {
+          "background_job_ids": [
+            "585dd8b2-dab9-49c4-867d-650294089a71"
+          ],
+          "directions": [
+            "south-east"
+          ],
+          "animation_group_id": "0bb8b7ad-a2e1-4e98-977c-6ddd61e3d830",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T01:01:57Z",
+      "kind": "submitted",
+      "slug": "jaemtri",
+      "detail": {
+        "kind": "animation",
+        "template": "walking-8-frames",
+        "job_id": "2f3d540f-6770-442f-a9f4-a2a12320fe11",
+        "receipt": {
+          "background_job_ids": [
+            "2f3d540f-6770-442f-a9f4-a2a12320fe11"
+          ],
+          "directions": [
+            "east"
+          ],
+          "animation_group_id": "6dd5884d-302f-4f52-a6d7-5b594992aedf",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T01:01:58Z",
+      "kind": "submitted",
+      "slug": "jaemtri",
+      "detail": {
+        "kind": "animation",
+        "template": "running-8-frames",
+        "job_id": "10b26ddd-9882-4ce8-a083-988939e93793",
+        "receipt": {
+          "background_job_ids": [
+            "10b26ddd-9882-4ce8-a083-988939e93793"
+          ],
+          "directions": [
+            "east"
+          ],
+          "animation_group_id": "5ffa73ce-ffb5-434f-9df7-2538a478532d",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T01:01:59Z",
+      "kind": "submitted",
+      "slug": "jaemtri",
+      "detail": {
+        "kind": "animation",
+        "template": "running-jump",
+        "job_id": "19d630c1-dcf5-47d6-b025-67e49b711261",
+        "receipt": {
+          "background_job_ids": [
+            "19d630c1-dcf5-47d6-b025-67e49b711261"
+          ],
+          "directions": [
+            "east"
+          ],
+          "animation_group_id": "8377fe95-4be8-45e2-a192-455e9ba9194a",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T01:02:00Z",
+      "kind": "submitted",
+      "slug": "jaemtri",
+      "detail": {
+        "kind": "animation",
+        "template": "running-slide",
+        "job_id": "f10af28f-db88-4022-9c06-ac7a7d61bbf1",
+        "receipt": {
+          "background_job_ids": [
+            "f10af28f-db88-4022-9c06-ac7a7d61bbf1"
+          ],
+          "directions": [
+            "east"
+          ],
+          "animation_group_id": "b4ab4199-7a0e-4773-a166-6024a4ff929e",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T01:02:01Z",
+      "kind": "submitted",
+      "slug": "jaemtri",
+      "detail": {
+        "kind": "animation",
+        "template": "crouched-walking",
+        "job_id": "49803979-a317-4432-82e5-e978129ce4b9",
+        "receipt": {
+          "background_job_ids": [
+            "49803979-a317-4432-82e5-e978129ce4b9"
+          ],
+          "directions": [
+            "east"
+          ],
+          "animation_group_id": "1e3a2843-e682-44e0-a77a-9bc2c333297f",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T01:02:01Z",
+      "kind": "submitted",
+      "slug": "jaemtri",
+      "detail": {
+        "kind": "animation",
+        "template": "sad-walk",
+        "job_id": "39dbed40-e030-446e-acb8-7416fcb300fb",
+        "receipt": {
+          "background_job_ids": [
+            "39dbed40-e030-446e-acb8-7416fcb300fb"
+          ],
+          "directions": [
+            "east"
+          ],
+          "animation_group_id": "0c633d8a-eec5-499d-a6dd-38941866a491",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T01:02:02Z",
+      "kind": "submitted",
+      "slug": "jaemtri",
+      "detail": {
+        "kind": "animation",
+        "template": "front-flip",
+        "job_id": "765a0855-4ec4-4945-8cbc-6e7ebe80d2df",
+        "receipt": {
+          "background_job_ids": [
+            "765a0855-4ec4-4945-8cbc-6e7ebe80d2df"
+          ],
+          "directions": [
+            "east"
+          ],
+          "animation_group_id": "88fde81c-a37e-4180-b775-8965ff530602",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T01:02:11Z",
+      "kind": "submitted",
+      "slug": "jaemtri",
+      "detail": {
+        "kind": "animation",
+        "template": "backflip",
+        "job_id": "dede7581-a559-42d1-968f-7eba821c32aa",
+        "receipt": {
+          "background_job_ids": [
+            "dede7581-a559-42d1-968f-7eba821c32aa"
+          ],
+          "directions": [
+            "east"
+          ],
+          "animation_group_id": "9ddbe00e-21c8-431e-8c7e-de58ad560414",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T01:02:12Z",
+      "kind": "submitted",
+      "slug": "jaemtri",
+      "detail": {
+        "kind": "animation",
+        "template": "jumping-1",
+        "job_id": "74dd6cdf-cc38-426f-a41a-6704f87bdf13",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "74dd6cdf-cc38-426f-a41a-6704f87bdf13",
+          "status": "processing"
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T01:02:12Z",
+      "kind": "submitted",
+      "slug": "jaemtri",
+      "detail": {
+        "kind": "animation",
+        "template": "jumping-2",
+        "job_id": "4f69917a-c032-4a01-8b78-ee5eccd2e952",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "4f69917a-c032-4a01-8b78-ee5eccd2e952",
+          "status": "processing"
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T01:02:13Z",
+      "kind": "submitted",
+      "slug": "jaemtri",
+      "detail": {
+        "kind": "animation",
+        "template": "two-footed-jump",
+        "job_id": "274e5ad7-0ea5-4815-bde9-cbddb9708422",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "274e5ad7-0ea5-4815-bde9-cbddb9708422",
+          "status": "processing"
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T01:02:13Z",
+      "kind": "submitted",
+      "slug": "jaemtri",
+      "detail": {
+        "kind": "animation",
+        "template": "drinking",
+        "job_id": "dc6f89a3-0b61-4e26-bb08-73ecb7852b25",
+        "receipt": {
+          "background_job_ids": [
+            "dc6f89a3-0b61-4e26-bb08-73ecb7852b25"
+          ],
+          "directions": [
+            "south-east"
+          ],
+          "animation_group_id": "aa4728af-5edc-4dd9-9575-3a6ca7a64a93",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T01:02:14Z",
+      "kind": "submitted",
+      "slug": "jaemtri",
+      "detail": {
+        "kind": "animation",
+        "template": "picking-up",
+        "job_id": "b447e786-642b-4d67-9ecf-ad1f0334ca55",
+        "receipt": {
+          "background_job_ids": [
+            "b447e786-642b-4d67-9ecf-ad1f0334ca55"
+          ],
+          "directions": [
+            "east"
+          ],
+          "animation_group_id": "5b40128b-8192-4848-a49a-181c6f7f4851",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T01:02:15Z",
+      "kind": "submitted",
+      "slug": "jaemtri",
+      "detail": {
+        "kind": "animation",
+        "template": "pushing",
+        "job_id": "afca63ff-3579-4df3-97d7-b87aa1af9138",
+        "receipt": {
+          "background_job_ids": [
+            "afca63ff-3579-4df3-97d7-b87aa1af9138"
+          ],
+          "directions": [
+            "east"
+          ],
+          "animation_group_id": "21fab8b6-7633-443b-90cf-a65aaf5ccdce",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T01:02:15Z",
+      "kind": "submitted",
+      "slug": "jaemtri",
+      "detail": {
+        "kind": "animation",
+        "template": "pull-heavy-object",
+        "job_id": "df4b0e3c-2074-4bbe-8551-1f693b36c9ad",
+        "receipt": {
+          "background_job_ids": [
+            "df4b0e3c-2074-4bbe-8551-1f693b36c9ad"
+          ],
+          "directions": [
+            "east"
+          ],
+          "animation_group_id": "b3cf80f2-ef9b-4971-9686-92a1d3760cca",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T01:02:16Z",
+      "kind": "submitted",
+      "slug": "jaemtri",
+      "detail": {
+        "kind": "animation",
+        "template": "throw-object",
+        "job_id": "3903df4e-0994-4ae9-be4b-093312403c31",
+        "receipt": {
+          "background_job_ids": [
+            "3903df4e-0994-4ae9-be4b-093312403c31"
+          ],
+          "directions": [
+            "east"
+          ],
+          "animation_group_id": "e1e67467-3482-437e-8378-f95fdab5faf8",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T01:02:18Z",
+      "kind": "submitted",
+      "slug": "jaemtri",
+      "detail": {
+        "kind": "animation",
+        "template": "fight-stance-idle-8-frames",
+        "job_id": "4e33ccea-e38f-4f32-9cfe-8ded7f02e6dc",
+        "receipt": {
+          "background_job_ids": [
+            "4e33ccea-e38f-4f32-9cfe-8ded7f02e6dc"
+          ],
+          "directions": [
+            "east"
+          ],
+          "animation_group_id": "4f812b61-9ccc-4d8f-8cfd-dddf24f4f3ca",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T01:02:18Z",
+      "kind": "submitted",
+      "slug": "jaemtri",
+      "detail": {
+        "kind": "animation",
+        "template": "lead-jab",
+        "job_id": "9b27b5bf-cb67-4451-b43b-c65fab1dfd97",
+        "receipt": {
+          "background_job_ids": [
+            "9b27b5bf-cb67-4451-b43b-c65fab1dfd97"
+          ],
+          "directions": [
+            "east"
+          ],
+          "animation_group_id": "9467abb4-0936-4998-97c3-9dd255c86f6e",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T01:02:19Z",
+      "kind": "submitted",
+      "slug": "jaemtri",
+      "detail": {
+        "kind": "animation",
+        "template": "cross-punch",
+        "job_id": "0d2894ac-f760-4ec9-88eb-045cba6fecb4",
+        "receipt": {
+          "background_job_ids": [
+            "0d2894ac-f760-4ec9-88eb-045cba6fecb4"
+          ],
+          "directions": [
+            "east"
+          ],
+          "animation_group_id": "7fa769bb-12df-432e-b357-bf5824ef7f57",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T01:02:21Z",
+      "kind": "exported",
+      "slug": "spangdal",
+      "detail": {
+        "bytes": 469674,
+        "files": 49,
+        "production_pack_clips": 20
+      }
     }
   ],
-  "updated_at": 1792803678.359966,
+  "updated_at": 1792803741.1838229,
   "user_stopped_at": 1792778235.6917784,
   "archived_jobs": {
     "304457e9-6577-44f0-af17-97841a9f6720": {
@@ -54624,10 +55453,10 @@
       "saved_frames": 6
     }
   },
-  "last_git_checkpoint": 1792803300.8335168,
+  "last_git_checkpoint": 1792803681.07426,
   "summary": {
     "jobs": {
-      "processing": 0,
+      "processing": 20,
       "completed": 362,
       "failed": 9,
       "stalled": 0
@@ -54637,8 +55466,8 @@
     "images_format_verified": 55,
     "new_images_visually_reviewed": 43,
     "eight_way_visually_reviewed": 55,
-    "characters_motions_visually_reviewed": 1,
-    "motions_submitted": 40,
+    "characters_motions_visually_reviewed": 2,
+    "motions_submitted": 60,
     "motions_target": 1100
   },
   "applied_repairs": [

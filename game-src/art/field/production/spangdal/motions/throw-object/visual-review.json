@@ -1,8 +1,8 @@
 {
-  "at": 1792803492.6191168,
+  "at": 1792803713.8042345,
   "job_id": "ddbb44f9-e4c4-409a-9e76-d4a85126b4c0",
-  "result": "reroll-required",
-  "findings": "Selected release candidate removes gray debris but full clip reveals ball absent in frame 5 and reappearing in frame 6; prop continuity fails. Need empty-hand release candidate using own clean post-release reference.",
+  "result": "pass",
+  "findings": "All eight assembled frames viewed: overhead windup releases ball by frame 5, frame 6 is empty-handed follow-through and frames 7/8 recover. No gray debris or ball reappearance; own WEST face/bob/skirt/pumps retained. AVIF primary, stature supplement and all55 barrier rechecked.",
   "frame_count": 8,
   "directions": [
     "west"
@@ -52,12 +52,12 @@
       },
       {
         "frame_index": 5,
-        "source_job_id": "bbb0fb6d-76b3-44b7-8cc7-397bda37b237",
+        "source_job_id": "1c31a9a8-6be0-4d79-8896-292cb2417ab9",
         "source_frame_index": 1,
         "target_pose_index": 5,
-        "source_path": "motion-frame-candidates/spangdal/throw-object/release-1/frames/1.png",
-        "sha256": "b6d23e571e3aeceb82c754345faf5ad667ec2a493839780e7c8d4d5c985a5c42",
-        "findings": "Candidate 1 clean full frame: same extended throw arm pose, brown ball at open hand at release, no floating gray debris; own face, bob, skirt, pumps intact. Check next frame with empty hand for release transition."
+        "source_path": "motion-frame-candidates/spangdal/throw-object/release-empty-2/frames/1.png",
+        "sha256": "9544f58434925183d70ec33ae757aa6322d2110d8584e2cc0bf2da4e6656e5cc",
+        "findings": "Own clean post-release image reference gives intact empty extended hand; same target pose, no ball reappearance, gray debris, face holes or clothing drift."
       },
       {
         "frame_index": 6,
@@ -74,6 +74,6 @@
     ],
     "method": "select complete same-pose regenerated frames; no pixel editing",
     "new_user_approval": false,
-    "visual_reviewed": false
+    "visual_reviewed": true
   }
 }

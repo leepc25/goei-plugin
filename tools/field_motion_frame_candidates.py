@@ -1,9 +1,9 @@
 """Reroll one known skeleton pose without touching the other motion frames."""
-import argparse,copy,fcntl,hashlib,json,shutil
+import argparse,base64,copy,fcntl,hashlib,json,shutil
 from field_character_production import OUT,ROOT,Production,atomic
 
 def main():
- p=argparse.ArgumentParser();p.add_argument('slug');p.add_argument('slot');p.add_argument('index',type=int);p.add_argument('revision');p.add_argument('--seed',type=int,required=True);p.add_argument('--submit',action='store_true');p.add_argument('--select',type=int);p.add_argument('--findings');a=p.parse_args()
+ p=argparse.ArgumentParser();p.add_argument('slug');p.add_argument('slot');p.add_argument('index',type=int);p.add_argument('revision');p.add_argument('--seed',type=int,required=True);p.add_argument('--submit',action='store_true');p.add_argument('--select',type=int);p.add_argument('--findings');p.add_argument('--reference-index',type=int);p.add_argument('--action');a=p.parse_args()
  with (OUT/'.runner.lock').open('a') as lock:
   fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
   prod=Production();c=prod.s['characters'][a.slug];base=c['motions'][a.slot];basejob=prod.s['jobs'][base]
@@ -16,6 +16,12 @@ def main():
   assert 0<=a.index<len(request['keypoints'])
   root=OUT/'motion-frame-candidates'/a.slug/a.slot/a.revision;key='motion-frame-candidate-'+a.slot+'-'+a.revision;jid=c.get(key)
   config={'slug':a.slug,'slot':a.slot,'base_job_id':base,'target_frame_index':a.index,'source_spec':specpath,'seed':a.seed,'pose':request['keypoints'][a.index],'new_user_approval':False}
+  reference=None
+  if a.reference_index is not None:
+   assert 0<=a.reference_index<len(request['keypoints']) and a.reference_index!=a.index
+   reference=OUT/a.slug/'motions'/a.slot/f'{a.reference_index}.png';assert reference.exists()
+   config.update(reference_frame_index=a.reference_index,reference_sha256=hashlib.sha256(reference.read_bytes()).hexdigest())
+  if a.action:config['action']=a.action
   if jid:assert json.loads((root/'config.json').read_text())==config,'Candidate revision is immutable'
   atomic(root/'config.json',config)
   if a.submit and not jid:
@@ -23,6 +29,11 @@ def main():
    assert sum(j['status']=='processing' for j in prod.s['jobs'].values())<20
    review=json.loads((OUT/a.slug/'motions'/a.slot/'visual-review.json').read_text());assert review['job_id']==base and review['result']=='reroll-required'
    args=prod.custom_motion_request(a.slug,a.slot,specpath);args['keypoints']=[copy.deepcopy(config['pose']) for _ in range(3)];args['seed']=a.seed
+   if reference:
+    shutil.copy2(reference,root/'reference.png')
+    args['first_frame']={'type':'base64','format':'png','base64':base64.b64encode(reference.read_bytes()).decode()}
+    args['first_frame_keypoints']=copy.deepcopy(request['keypoints'][a.reference_index])
+   if a.action:args['action']=a.action
    prod.submit(key,a.slug,'animate-with-skeleton-v3',args,archive_output=str((root/'frames').relative_to(OUT)))
    return
   if not jid or prod.s['jobs'].get(jid,{}).get('status')!='completed':print('Candidate not completed; no frame changed');return
