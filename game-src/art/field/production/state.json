@@ -26964,7 +26964,11 @@
         "type": "generations",
         "generations": 3
       },
-      "saved_frames": 12
+      "saved_frames": 12,
+      "visual_rejection": {
+        "reason": "Frame 6 gray exterior; replace 8 rotation stages with 9 shifted-angle stages.",
+        "standalone": true
+      }
     },
     "f12abd78-49c6-4558-8a6f-ee68a5e99669": {
       "kind": "animation",
@@ -26977,7 +26981,23 @@
         "background_job_id": "f12abd78-49c6-4558-8a6f-ee68a5e99669",
         "status": "processing"
       },
-      "endpoint": "animate-with-skeleton-v3"
+      "endpoint": "animate-with-skeleton-v3",
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "f12abd78-49c6-4558-8a6f-ee68a5e99669",
+        "status": "processing",
+        "created_at": "2026-10-24T00:03:58.738649+00:00",
+        "last_response": {
+          "type": "background",
+          "status": "initializing",
+          "flow_kind": "animation",
+          "queue_position": 0,
+          "estimated_wait_seconds": 0
+        }
+      }
     },
     "a22f34bb-be49-41c0-9537-cd17aca48365": {
       "kind": "animation",
@@ -26988,6 +27008,35 @@
       "receipt": {
         "usage": null,
         "background_job_id": "a22f34bb-be49-41c0-9537-cd17aca48365",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3",
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "a22f34bb-be49-41c0-9537-cd17aca48365",
+        "status": "processing",
+        "created_at": "2026-10-24T00:03:59.200595+00:00",
+        "last_response": {
+          "type": "background",
+          "status": "initializing",
+          "flow_kind": "animation",
+          "queue_position": 0,
+          "estimated_wait_seconds": 0
+        }
+      }
+    },
+    "c81f67b4-0aa6-4832-9387-dcb7233a6a96": {
+      "kind": "animation",
+      "slug": "jyaldi",
+      "template": "backflip",
+      "status": "processing",
+      "created_epoch": 1792800266.1790287,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "c81f67b4-0aa6-4832-9387-dcb7233a6a96",
         "status": "processing"
       },
       "endpoint": "animate-with-skeleton-v3"
@@ -27018,9 +27067,9 @@
         "cross-punch": "abcd5997-80d8-4545-9c3e-a78739f74f37",
         "running-slide": "0cc1f03b-baf8-4cba-8b49-7151ad7ace0b",
         "throw-object": "b2e2ca3b-ce95-48c7-a05f-1aa1c6bb8deb",
-        "backflip": "61a3ec4e-de54-499f-a700-7750aa3cac75",
         "front-flip": "f12abd78-49c6-4558-8a6f-ee68a5e99669",
-        "picking-up": "a22f34bb-be49-41c0-9537-cd17aca48365"
+        "picking-up": "a22f34bb-be49-41c0-9537-cd17aca48365",
+        "backflip": "c81f67b4-0aa6-4832-9387-dcb7233a6a96"
       },
       "ready": true,
       "rebuild_after_direction_policy": true,
@@ -46379,9 +46428,24 @@
           "status": "processing"
         }
       }
+    },
+    {
+      "at": "2026-10-24T00:04:27Z",
+      "kind": "submitted",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "backflip",
+        "job_id": "c81f67b4-0aa6-4832-9387-dcb7233a6a96",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "c81f67b4-0aa6-4832-9387-dcb7233a6a96",
+          "status": "processing"
+        }
+      }
     }
   ],
-  "updated_at": 1792800239.3518615,
+  "updated_at": 1792800267.5428727,
   "user_stopped_at": 1792778235.6917784,
   "archived_jobs": {
     "304457e9-6577-44f0-af17-97841a9f6720": {
@@ -47700,10 +47764,10 @@
       "saved_frames": 6
     }
   },
-  "last_git_checkpoint": 1792799918.8331583,
+  "last_git_checkpoint": 1792800241.865283,
   "summary": {
     "jobs": {
-      "processing": 2,
+      "processing": 3,
       "completed": 316,
       "failed": 9,
       "stalled": 0
