@@ -155,10 +155,13 @@ def run(n, dry=False):
             log(f"{n} {r['name']} 보냄 {desc} job={job}")
             while True:
                 time.sleep(5)
-                j = req("GET", f"/background-jobs/{job}")
+                try: j = req("GET", f"/background-jobs/{job}")
+                except Exception: continue   # 502 등 일시 오류는 다시 물음
                 if j.get("status") in ("completed", "failed", "error", "cancelled"): break
             if j.get("status") != "completed": raise RuntimeError(f"job {j.get('status')}: {json.dumps(j)[:300]}")
-        ch = req("GET", f"/characters/{CID}")
+        for _ in range(5):
+            try: ch = req("GET", f"/characters/{CID}"); break
+            except Exception: time.sleep(10)
         anim = next(a for a in ch["animations"] if a.get("animation_group_id") == gid or a.get("id") == gid)
         urls = next(d["frames"] for d in anim["directions"] if d["direction"] == r["dir"])
         fr = [fetch_png(u) for u in urls]
