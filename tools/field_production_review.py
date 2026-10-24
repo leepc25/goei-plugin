@@ -24,5 +24,8 @@ page='''<!doctype html><meta charset="utf-8"><title>캐릭터 제작 검수</tit
 (p/'review.html').write_text(page)
 lines=['# API가 반환한 실제 사용량 — 견적과 구분; 과거 작업은 history/ 및 개별 spend.log 참조','job_id\tslug\tkind\ttemplate\tstatus\tactual_usage_json']
 for jid,j in s['jobs'].items():lines.append('\t'.join([jid,j['slug'],j['kind'],str(j.get('template')or''),j['status'],json.dumps(j.get('usage'),ensure_ascii=False)]))
+supplemental=p/'supplemental-usage.json'
+if supplemental.exists():
+ for r in json.loads(supplemental.read_text()):lines.append('\t'.join([r['record_id'],r['slug'],r['endpoint'],r.get('slot',''),'synchronous-completed',json.dumps(r['usage'],ensure_ascii=False)]))
 (p/'spend.log').write_text('\n'.join(lines)+'\n')
 print(f'Review: {len(rows)} characters, {sum(len(r["clips"])for r in rows)} clips. Actual usage ledger refreshed.')

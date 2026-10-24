@@ -333,4 +333,6 @@ c81f67b4-0aa6-4832-9387-dcb7233a6a96	jyaldi	animation	backflip	completed	{"usd":
 7ed684ff-42ce-42b3-9b9c-53bdfbc2e78b	jyaldi	animation	backflip	completed	{"usd": 0.0, "type": "generations", "generations": 3}
 b110c538-e637-4237-9cd3-80a92de3b429	jyaldi	motion-frame-repair-backflip-v5-face-1		completed	{"usd": 0.0, "type": "generations", "generations": 9}
 11c733f9-96de-46c4-94b9-019c6975e84e	jyaldi	motion-frame-repair-backflip-v5-face-upright-2		completed	{"usd": 0.0, "type": "generations", "generations": 9}
-f2cae8cb-db71-4bfb-898d-da7c568b4f31	jyaldi	animation	backflip	processing	null
+f2cae8cb-db71-4bfb-898d-da7c568b4f31	jyaldi	animation	backflip	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+72a09195-9132-42c7-a289-ab3c481c67b4	jyaldi	animation	backflip	processing	null
+local-sync:jyaldi-backflip-v7-estimate	jyaldi	estimate-skeleton	backflip	synchronous-completed	{"type": "generations", "generations": 0.1}

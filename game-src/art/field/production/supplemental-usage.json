@@ -1,0 +1,14 @@
+[
+  {
+    "record_id": "local-sync:jyaldi-backflip-v7-estimate",
+    "slug": "jyaldi",
+    "slot": "backflip",
+    "endpoint": "estimate-skeleton",
+    "usage": {
+      "type": "generations",
+      "generations": 0.1
+    },
+    "receipt": "motion-inputs/jyaldi/backflip-v7/estimate-response.json",
+    "server_job_id": null
+  }
+]

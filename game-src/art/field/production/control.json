@@ -231,7 +231,7 @@
       "running-jump": "game-src/art/field/production/motion-inputs/jyaldi/running-jump-v1/spec.json",
       "running-slide": "game-src/art/field/production/motion-inputs/jyaldi/running-slide-v2/spec.json",
       "front-flip": "game-src/art/field/production/motion-inputs/jyaldi/front-flip-v3/spec.json",
-      "backflip": "game-src/art/field/production/motion-inputs/jyaldi/backflip-v6/spec.json",
+      "backflip": "game-src/art/field/production/motion-inputs/jyaldi/backflip-v7/spec.json",
       "two-footed-jump": "game-src/art/field/production/motion-inputs/jyaldi/two-footed-jump-v1/spec.json",
       "picking-up": "game-src/art/field/production/motion-inputs/jyaldi/picking-up-v3/spec.json",
       "throw-object": "game-src/art/field/production/motion-inputs/jyaldi/throw-object-v2/spec.json",

@@ -27740,7 +27740,7 @@
       "kind": "animation",
       "slug": "jyaldi",
       "template": "backflip",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792801517.01668,
       "receipt": {
         "usage": null,
@@ -27754,11 +27754,11 @@
           "generations": 3.0
         },
         "id": "f2cae8cb-db71-4bfb-898d-da7c568b4f31",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-24T00:25:17.309257+00:00",
         "last_response": {
           "seed": 2026102903,
-          "type": "message_done",
+          "type": "done",
           "action": "smoothing frames",
           "images": [
             {
@@ -27817,7 +27817,7 @@
             }
           ],
           "status": "initializing",
-          "progress": 0.99,
+          "progress": 1.0,
           "flow_kind": "animation",
           "billing_usage": {
             "usd": 0.0,
@@ -27828,6 +27828,50 @@
           "queue_position": 0,
           "billing_charged": true,
           "generation_started_at": "2026-10-24T00:26:12.706132+00:00",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792801699.6082647,
+      "elapsed_observed_seconds": 182.59158492088318,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 9,
+      "visual_rejection": {
+        "reason": "Gray exterior and holes persist; replace standing reference with same character approved inverted front-flip pose and matched estimated landmarks, remove speculative depth overrides.",
+        "standalone": true
+      }
+    },
+    "72a09195-9132-42c7-a289-ab3c481c67b4": {
+      "kind": "animation",
+      "slug": "jyaldi",
+      "template": "backflip",
+      "status": "processing",
+      "created_epoch": 1792801780.5035226,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "72a09195-9132-42c7-a289-ab3c481c67b4",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3",
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "72a09195-9132-42c7-a289-ab3c481c67b4",
+        "status": "processing",
+        "created_at": "2026-10-24T00:29:40.882771+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "action": "generating",
+          "status": "initializing",
+          "progress": 0.11296943207025778,
+          "flow_kind": "animation",
+          "queue_position": 0,
+          "generation_started_at": "2026-10-24T00:30:31.599671+00:00",
           "estimated_wait_seconds": 0
         }
       }
@@ -27860,7 +27904,7 @@
         "throw-object": "b2e2ca3b-ce95-48c7-a05f-1aa1c6bb8deb",
         "front-flip": "f12abd78-49c6-4558-8a6f-ee68a5e99669",
         "picking-up": "a22f34bb-be49-41c0-9537-cd17aca48365",
-        "backflip": "f2cae8cb-db71-4bfb-898d-da7c568b4f31"
+        "backflip": "72a09195-9132-42c7-a289-ab3c481c67b4"
       },
       "ready": true,
       "rebuild_after_direction_policy": true,
@@ -47491,9 +47535,50 @@
           "status": "processing"
         }
       }
+    },
+    {
+      "at": "2026-10-24T00:28:19Z",
+      "kind": "completed",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "backflip",
+        "job_id": "f2cae8cb-db71-4bfb-898d-da7c568b4f31",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T00:28:21Z",
+      "kind": "exported",
+      "slug": "jyaldi",
+      "detail": {
+        "bytes": 668391,
+        "files": 64,
+        "production_pack_clips": 20
+      }
+    },
+    {
+      "at": "2026-10-24T00:29:41Z",
+      "kind": "submitted",
+      "slug": "jyaldi",
+      "detail": {
+        "kind": "animation",
+        "template": "backflip",
+        "job_id": "72a09195-9132-42c7-a289-ab3c481c67b4",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "72a09195-9132-42c7-a289-ab3c481c67b4",
+          "status": "processing"
+        }
+      }
     }
   ],
-  "updated_at": 1792801660.454844,
+  "updated_at": 1792801845.0889645,
   "user_stopped_at": 1792778235.6917784,
   "archived_jobs": {
     "304457e9-6577-44f0-af17-97841a9f6720": {
@@ -48816,7 +48901,7 @@
   "summary": {
     "jobs": {
       "processing": 1,
-      "completed": 323,
+      "completed": 324,
       "failed": 9,
       "stalled": 0
     },
