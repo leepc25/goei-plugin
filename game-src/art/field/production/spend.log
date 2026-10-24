@@ -334,5 +334,25 @@ c81f67b4-0aa6-4832-9387-dcb7233a6a96	jyaldi	animation	backflip	completed	{"usd":
 b110c538-e637-4237-9cd3-80a92de3b429	jyaldi	motion-frame-repair-backflip-v5-face-1		completed	{"usd": 0.0, "type": "generations", "generations": 9}
 11c733f9-96de-46c4-94b9-019c6975e84e	jyaldi	motion-frame-repair-backflip-v5-face-upright-2		completed	{"usd": 0.0, "type": "generations", "generations": 9}
 f2cae8cb-db71-4bfb-898d-da7c568b4f31	jyaldi	animation	backflip	completed	{"usd": 0.0, "type": "generations", "generations": 3}
-72a09195-9132-42c7-a289-ab3c481c67b4	jyaldi	animation	backflip	processing	null
+72a09195-9132-42c7-a289-ab3c481c67b4	jyaldi	animation	backflip	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+628133da-1d7d-4b81-b5d8-a4098921d739	spangdal	animation	breathing-idle	processing	null
+9812d187-c2e4-47ae-86a2-da18039e4640	spangdal	animation	walking-8-frames	processing	null
+3187f398-c14c-4675-a218-c22f4c3b6eb0	spangdal	animation	running-8-frames	processing	null
+0d5d5df5-a91e-4d87-8633-ecc603538d9c	spangdal	animation	running-jump	processing	null
+6982a605-edfc-4440-8c5f-4b715b3f9729	spangdal	animation	running-slide	processing	null
+5261e3f4-30e6-4c1a-88db-0dac3e6a0464	spangdal	animation	crouched-walking	processing	null
+7778bc41-67b6-483d-b2af-8844bbcc4775	spangdal	animation	sad-walk	processing	null
+643377e4-36a4-4a29-9438-455e82e06c31	spangdal	animation	front-flip	processing	null
+1cf96890-1a5c-4d43-bce6-fc4d8f8d875e	spangdal	animation	backflip	processing	null
+1c9f81ee-20eb-435b-9a9a-ad8fc62c19e5	spangdal	animation	jumping-1	processing	null
+476b3574-8365-451e-98f8-1153a158f480	spangdal	animation	jumping-2	processing	null
+74674eff-c597-48da-a98f-332e065866c9	spangdal	animation	two-footed-jump	processing	null
+bf5bfeb6-a2e2-48a5-97d8-da30016c1f87	spangdal	animation	drinking	processing	null
+e44d35d3-0cb1-4d9d-856d-14098f085508	spangdal	animation	picking-up	processing	null
+c9fba02d-31ab-4b7d-a674-7617f35b7e0e	spangdal	animation	pushing	processing	null
+6d6586d6-7391-4a07-85a8-57b76ee10eed	spangdal	animation	pull-heavy-object	processing	null
+28ca799d-205c-4b19-9b97-79df02d662e5	spangdal	animation	throw-object	processing	null
+9dea4c3b-ea98-465b-b6b4-5b9d5606d6cd	spangdal	animation	fight-stance-idle-8-frames	processing	null
+5babfdd3-aac1-416b-bf3f-55eaf4b2bde9	spangdal	animation	lead-jab	processing	null
+438619dc-0ae3-4844-8c27-e4fd7dcfadb5	spangdal	animation	cross-punch	processing	null
 local-sync:jyaldi-backflip-v7-estimate	jyaldi	estimate-skeleton	backflip	synchronous-completed	{"type": "generations", "generations": 0.1}

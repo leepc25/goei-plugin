@@ -1,0 +1,10 @@
+{
+  "character_id": "9095375d-b39a-447b-b577-fcb345e78928",
+  "mode": "skeleton-v3",
+  "template_animation_id": "fight-stance-idle-8-frames",
+  "directions": [
+    "west"
+  ],
+  "animation_name": "전투 대기 (서쪽)",
+  "action_description": "fight stance idle 8 frames. Preserve this character identity, costume, hair and native proportions. Keep a clean transparent silhouette in every frame. No gray painted patches, gray halo, ground shadow or opaque background around hair, hands, clothes or feet."
+}

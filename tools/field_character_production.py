@@ -316,6 +316,8 @@ class Production:
       files=sorted(folder.glob('*.png'),key=lambda x:int(x.stem))
       review=json.loads((folder/'visual-review.json').read_text()) if (folder/'visual-review.json').exists() else None
       pack_meta['clips'][template]={'job_id':jid,'endpoint':job.get('endpoint','animate-character'),'frame_count':len(files),'review':review}
+      assembly=c.get('motion_assemblies',{}).get(template)
+      if assembly and assembly['base_job_id']==jid:pack_meta['clips'][template]['frame_assembly']=assembly
       for f in files:pack.write(f,'motions/'+template+'/'+f.name)
      pack.writestr('production-metadata.json',json.dumps(pack_meta,ensure_ascii=False,indent=2))
     c['exported']=True;self.event('exported',slug,{'bytes':len(data),'files':len(z.namelist()),'production_pack_clips':len(pack_meta['clips'])})
