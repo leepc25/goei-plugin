@@ -226,7 +226,7 @@ function fireEv(e) {
     muzzleFlash(p, big || e.ev === 'shotS'); sfx('shot');
     const hitD = showDummy && Math.abs(D.y - P.y) < 60 && (D.x - P.x) * P.face > 0;
     const endX = hitD ? D.x - P.face * 14 : (P.face > 0 ? W + 20 : -20);
-    if (VFX.tracer) { const tt = Math.abs(endX - p.x) / 4200; if (Math.random() < 0.4) fx.push({ k: 'bullet', x: p.x, y: p.y, x2: endX, y2: p.y + (Math.random() - 0.5) * 18, t: tt, t0: tt }); if (hitD) later(tt, () => { if (!vfx('bullet_hit_body', endX, p.y, 2)) sparks(endX, p.y, 4, false, '#fff6d0'); }); } else fx.push({ k: 'tracer', x: p.x, y: p.y, x2: endX, t: big ? 0.12 : 0.06, big });
+    if (VFX.tracer) { const tt = Math.abs(endX - p.x) / 2600; fx.push({ k: 'bullet', x: p.x, y: p.y, x2: endX, y2: p.y + (Math.random() - 0.5) * 18, t: tt, t0: tt }); if (hitD) later(tt, () => { if (!vfx('bullet_hit_body', endX, p.y, 2)) sparks(endX, p.y, 4, false, '#fff6d0'); }); } else fx.push({ k: 'tracer', x: p.x, y: p.y, x2: endX, t: big ? 0.12 : 0.06, big });
     shake = Math.max(shake, big ? 9 : 2.5);
     if (hitD) { sfx('hit', { strength: big ? 2 : 1, kind: 'bullet' }); hurtDummy(big ? 40 : e.ev === 'shotS' ? 9 : 7, big ? 'heavy' : 'light'); sparks(endX, p.y, big ? 16 : 5, big); if (big) hitstop = 0.08; }
   } else if (e.ev === 'beam') {
@@ -249,7 +249,7 @@ function fireEv(e) {
     const dist = 100 + Math.random() * 440, gy = P.y + sw * 70 + (Math.random() - 0.5) * 110, gx = P.x + P.face * dist;
     const ang = Math.atan2(gy - p.y, gx - p.x);
     for (let i = 0; i < 1; i++) fx.push({ k: 'shell', x: p.x - P.face * 30, y: p.y, vx: -P.face * (80 + Math.random() * 80), vy: -220 - Math.random() * 120, g: P.y, t: 1.2 });
-    if (VFX.tracer) { const tt = Math.hypot(gx - p.x, gy - p.y) / 3600; if (Math.random() < 0.5) fx.push({ k: 'bullet', x: p.x, y: p.y, x2: gx, y2: gy, t: tt, t0: tt }); later(tt, () => { sparks(gx, gy - 3, 3, false, '#ffe9a0'); if (Math.random() < 0.3) dust(gx, gy, 1, 0.35); }); }
+    if (VFX.tracer) { const tt = Math.hypot(gx - p.x, gy - p.y) / 2400; fx.push({ k: 'bullet', x: p.x, y: p.y, x2: gx, y2: gy, t: tt, t0: tt }); later(tt, () => { sparks(gx, gy - 3, 3, false, '#ffe9a0'); if (Math.random() < 0.3) dust(gx, gy, 1, 0.35); }); }
     else { fx.push({ k: 'tracer', x: p.x, y: p.y, x2: gx, y2: gy, t: 0.05, big: false }); sparks(gx, gy - 4, 3, false); }
     shake = Math.max(shake, 3);
     if (showDummy && Math.abs(D.x - gx) < 60 && Math.abs(D.y - gy) < 40) { hurtDummy(5, 'light'); sparks(D.x, D.y - 60, 4, false); }
@@ -802,7 +802,7 @@ function drawSheets(under = false) {
     if (!!e.under !== under) continue;
     if (e.k === 'bullet' && VFX.tracer && VFX.tracer.img.complete) {   // 예광탄: 총구에서 맞는 자리까지 날아감
       const k = 1 - e.t / e.t0, x = e.x + (e.x2 - e.x) * k, y = e.y + (e.y2 - e.y) * k, [fx0, fy0, fw, fh] = sheetFrame(VFX.tracer, (e.t0 - e.t) % vfxDur('tracer'));
-      ctx.save(); ctx.translate(x, y); ctx.rotate(Math.atan2(e.y2 - e.y, e.x2 - e.x)); ctx.drawImage(VFX.tracer.img, fx0, fy0, fw, fh, -fw * 1.3, -fh * 0.65, fw * 1.3, fh * 1.3); ctx.restore();
+      ctx.save(); ctx.translate(x, y); ctx.rotate(Math.atan2(e.y2 - e.y, e.x2 - e.x)); const sx = fx0 + fw * 0.62, sw = fw * 0.38; ctx.drawImage(VFX.tracer.img, sx, fy0, sw, fh, -sw * 2.4, -fh * 1.1, sw * 2.4, fh * 2.2); ctx.restore();   // 그림의 앞쪽(밝은 머리) 38%만 = 짧은 총알 한 발
     }
     if (e.k === 'beamS' && VFX.charge_beam && VFX.charge_beam.img.complete) {   // 충전 광선: 그림을 가로로 이어 붙임
       const v = VFX.charge_beam, [fx0, fy0, fw, fh] = sheetFrame(v, (e.t0 - e.t) % vfxDur('charge_beam')), sc = e.sy * (0.5 + 0.5 * e.t / e.t0);
