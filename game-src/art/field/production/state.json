@@ -34463,7 +34463,26 @@
         "background_job_id": "85cc46f4-f282-4c85-84a5-8806f0c0dbb8",
         "status": "processing"
       },
-      "endpoint": "animate-with-skeleton-v3"
+      "endpoint": "animate-with-skeleton-v3",
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "85cc46f4-f282-4c85-84a5-8806f0c0dbb8",
+        "status": "processing",
+        "created_at": "2026-10-24T01:11:33.605205+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "action": "generating",
+          "status": "initializing",
+          "progress": 0.1538350880737071,
+          "flow_kind": "animation",
+          "queue_position": 0,
+          "generation_started_at": "2026-10-24T01:12:23.673379+00:00",
+          "estimated_wait_seconds": 0
+        }
+      }
     },
     "4bb32c3d-07b2-4740-8353-aff4290d93ca": {
       "kind": "animation",
@@ -34476,7 +34495,26 @@
         "background_job_id": "4bb32c3d-07b2-4740-8353-aff4290d93ca",
         "status": "processing"
       },
-      "endpoint": "animate-with-skeleton-v3"
+      "endpoint": "animate-with-skeleton-v3",
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "4bb32c3d-07b2-4740-8353-aff4290d93ca",
+        "status": "processing",
+        "created_at": "2026-10-24T01:11:34.233265+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "action": "generating",
+          "status": "initializing",
+          "progress": 0.13798180448442768,
+          "flow_kind": "animation",
+          "queue_position": 0,
+          "generation_started_at": "2026-10-24T01:12:48.191014+00:00",
+          "estimated_wait_seconds": 0
+        }
+      }
     },
     "f0edcb83-0b00-45e5-aef3-53223e4c989a": {
       "kind": "animation",
@@ -34489,7 +34527,26 @@
         "background_job_id": "f0edcb83-0b00-45e5-aef3-53223e4c989a",
         "status": "processing"
       },
-      "endpoint": "animate-with-skeleton-v3"
+      "endpoint": "animate-with-skeleton-v3",
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "f0edcb83-0b00-45e5-aef3-53223e4c989a",
+        "status": "processing",
+        "created_at": "2026-10-24T01:11:34.731937+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "action": "generating",
+          "status": "initializing",
+          "progress": 0.14011625703003447,
+          "flow_kind": "animation",
+          "queue_position": 0,
+          "generation_started_at": "2026-10-24T01:12:22.234616+00:00",
+          "estimated_wait_seconds": 0
+        }
+      }
     },
     "8e822486-043a-4c72-ae8c-322e4a2d86d6": {
       "kind": "animation",
@@ -34502,7 +34559,26 @@
         "background_job_id": "8e822486-043a-4c72-ae8c-322e4a2d86d6",
         "status": "processing"
       },
-      "endpoint": "animate-with-skeleton-v3"
+      "endpoint": "animate-with-skeleton-v3",
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "8e822486-043a-4c72-ae8c-322e4a2d86d6",
+        "status": "processing",
+        "created_at": "2026-10-24T01:11:35.226353+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "action": "generating",
+          "status": "initializing",
+          "progress": 0.17645029112954635,
+          "flow_kind": "animation",
+          "queue_position": 0,
+          "generation_started_at": "2026-10-24T01:12:24.614746+00:00",
+          "estimated_wait_seconds": 0
+        }
+      }
     },
     "dd2dc9ab-c87a-4894-9eb1-4daf3f005733": {
       "kind": "animation",
@@ -34515,7 +34591,26 @@
         "background_job_id": "dd2dc9ab-c87a-4894-9eb1-4daf3f005733",
         "status": "processing"
       },
-      "endpoint": "animate-with-skeleton-v3"
+      "endpoint": "animate-with-skeleton-v3",
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "dd2dc9ab-c87a-4894-9eb1-4daf3f005733",
+        "status": "processing",
+        "created_at": "2026-10-24T01:11:36.103649+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "action": "generating",
+          "status": "initializing",
+          "progress": 0.17341020173500157,
+          "flow_kind": "animation",
+          "queue_position": 0,
+          "generation_started_at": "2026-10-24T01:12:26.304613+00:00",
+          "estimated_wait_seconds": 0
+        }
+      }
     },
     "8f183936-03f3-4f8f-8002-668ee31d5977": {
       "kind": "animation",
@@ -34528,7 +34623,26 @@
         "background_job_id": "8f183936-03f3-4f8f-8002-668ee31d5977",
         "status": "processing"
       },
-      "endpoint": "animate-with-skeleton-v3"
+      "endpoint": "animate-with-skeleton-v3",
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "8f183936-03f3-4f8f-8002-668ee31d5977",
+        "status": "processing",
+        "created_at": "2026-10-24T01:11:37.192318+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "action": "generating",
+          "status": "initializing",
+          "progress": 0.14859027318663098,
+          "flow_kind": "animation",
+          "queue_position": 0,
+          "generation_started_at": "2026-10-24T01:12:32.722619+00:00",
+          "estimated_wait_seconds": 0
+        }
+      }
     },
     "ef10ae23-11ce-484f-8d5b-634bbb15a4c9": {
       "kind": "animation",
@@ -34541,7 +34655,26 @@
         "background_job_id": "ef10ae23-11ce-484f-8d5b-634bbb15a4c9",
         "status": "processing"
       },
-      "endpoint": "animate-with-skeleton-v3"
+      "endpoint": "animate-with-skeleton-v3",
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "ef10ae23-11ce-484f-8d5b-634bbb15a4c9",
+        "status": "processing",
+        "created_at": "2026-10-24T01:11:37.902951+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "action": "generating",
+          "status": "initializing",
+          "progress": 0.15069292419518576,
+          "flow_kind": "animation",
+          "queue_position": 0,
+          "generation_started_at": "2026-10-24T01:12:28.014244+00:00",
+          "estimated_wait_seconds": 0
+        }
+      }
     },
     "74d1cc71-5cd6-4798-ab81-6884fc25bb29": {
       "kind": "animation",
@@ -34554,7 +34687,26 @@
         "background_job_id": "74d1cc71-5cd6-4798-ab81-6884fc25bb29",
         "status": "processing"
       },
-      "endpoint": "animate-with-skeleton-v3"
+      "endpoint": "animate-with-skeleton-v3",
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "74d1cc71-5cd6-4798-ab81-6884fc25bb29",
+        "status": "processing",
+        "created_at": "2026-10-24T01:11:38.668538+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "action": "generating",
+          "status": "initializing",
+          "progress": 0.14859027318663098,
+          "flow_kind": "animation",
+          "queue_position": 0,
+          "generation_started_at": "2026-10-24T01:12:33.236061+00:00",
+          "estimated_wait_seconds": 0
+        }
+      }
     },
     "3c6c64ce-622e-44c3-8eb2-a043ee45d221": {
       "kind": "animation",
@@ -34567,7 +34719,26 @@
         "background_job_id": "3c6c64ce-622e-44c3-8eb2-a043ee45d221",
         "status": "processing"
       },
-      "endpoint": "animate-with-skeleton-v3"
+      "endpoint": "animate-with-skeleton-v3",
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "3c6c64ce-622e-44c3-8eb2-a043ee45d221",
+        "status": "processing",
+        "created_at": "2026-10-24T01:11:39.937190+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "action": "generating",
+          "status": "initializing",
+          "progress": 0.14648130000371712,
+          "flow_kind": "animation",
+          "queue_position": 0,
+          "generation_started_at": "2026-10-24T01:12:34.74689+00:00",
+          "estimated_wait_seconds": 0
+        }
+      }
     },
     "2be8354d-3922-4535-8152-cab5ef51f1f9": {
       "kind": "animation",
@@ -34580,7 +34751,26 @@
         "background_job_id": "2be8354d-3922-4535-8152-cab5ef51f1f9",
         "status": "processing"
       },
-      "endpoint": "animate-with-skeleton-v3"
+      "endpoint": "animate-with-skeleton-v3",
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "2be8354d-3922-4535-8152-cab5ef51f1f9",
+        "status": "processing",
+        "created_at": "2026-10-24T01:11:40.347454+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "action": "generating",
+          "status": "initializing",
+          "progress": 0.14542443665870516,
+          "flow_kind": "animation",
+          "queue_position": 0,
+          "generation_started_at": "2026-10-24T01:12:39.334228+00:00",
+          "estimated_wait_seconds": 0
+        }
+      }
     },
     "e2ecce09-d661-43c2-aeff-84504ad0d133": {
       "kind": "animation",
@@ -34593,7 +34783,26 @@
         "background_job_id": "e2ecce09-d661-43c2-aeff-84504ad0d133",
         "status": "processing"
       },
-      "endpoint": "animate-with-skeleton-v3"
+      "endpoint": "animate-with-skeleton-v3",
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "e2ecce09-d661-43c2-aeff-84504ad0d133",
+        "status": "processing",
+        "created_at": "2026-10-24T01:11:40.658397+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "action": "generating",
+          "status": "initializing",
+          "progress": 0.14542443665870516,
+          "flow_kind": "animation",
+          "queue_position": 0,
+          "generation_started_at": "2026-10-24T01:12:39.334584+00:00",
+          "estimated_wait_seconds": 0
+        }
+      }
     },
     "62f4c3b9-4d84-4975-b7b3-22c513a5f2fb": {
       "kind": "animation",
@@ -34606,7 +34815,26 @@
         "background_job_id": "62f4c3b9-4d84-4975-b7b3-22c513a5f2fb",
         "status": "processing"
       },
-      "endpoint": "animate-with-skeleton-v3"
+      "endpoint": "animate-with-skeleton-v3",
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "62f4c3b9-4d84-4975-b7b3-22c513a5f2fb",
+        "status": "processing",
+        "created_at": "2026-10-24T01:11:41.536950+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "action": "generating",
+          "status": "initializing",
+          "progress": 0.14542443665870516,
+          "flow_kind": "animation",
+          "queue_position": 0,
+          "generation_started_at": "2026-10-24T01:12:40.509646+00:00",
+          "estimated_wait_seconds": 0
+        }
+      }
     },
     "a2d20675-c8f9-4e9a-a44f-df1ec4e7f2f0": {
       "kind": "animation",
@@ -34619,7 +34847,26 @@
         "background_job_id": "a2d20675-c8f9-4e9a-a44f-df1ec4e7f2f0",
         "status": "processing"
       },
-      "endpoint": "animate-with-skeleton-v3"
+      "endpoint": "animate-with-skeleton-v3",
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "a2d20675-c8f9-4e9a-a44f-df1ec4e7f2f0",
+        "status": "processing",
+        "created_at": "2026-10-24T01:11:41.875758+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "action": "generating",
+          "status": "initializing",
+          "progress": 0.1206735152704461,
+          "flow_kind": "animation",
+          "queue_position": 0,
+          "generation_started_at": "2026-10-24T01:12:30.146138+00:00",
+          "estimated_wait_seconds": 0
+        }
+      }
     },
     "40c26d95-c80c-468d-bd5f-30bf1465acb6": {
       "kind": "motion-frame-candidate-picking-up-low-pose-1",
@@ -34633,7 +34880,26 @@
         "status": "processing"
       },
       "endpoint": "animate-with-skeleton-v3",
-      "archive_output": "motion-frame-candidates/jaemtri/picking-up/low-pose-1/frames"
+      "archive_output": "motion-frame-candidates/jaemtri/picking-up/low-pose-1/frames",
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "40c26d95-c80c-468d-bd5f-30bf1465acb6",
+        "status": "processing",
+        "created_at": "2026-10-24T01:12:01.841825+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "action": "generating",
+          "status": "initializing",
+          "progress": 0.13584093414476014,
+          "flow_kind": "animation",
+          "queue_position": 0,
+          "generation_started_at": "2026-10-24T01:12:53.144346+00:00",
+          "estimated_wait_seconds": 0
+        }
+      }
     }
   },
   "characters": {
@@ -57104,7 +57370,7 @@
       }
     }
   ],
-  "updated_at": 1792804321.951,
+  "updated_at": 1792804390.5835335,
   "user_stopped_at": 1792778235.6917784,
   "archived_jobs": {
     "304457e9-6577-44f0-af17-97841a9f6720": {
@@ -58426,7 +58692,7 @@
   "last_git_checkpoint": 1792804088.155313,
   "summary": {
     "jobs": {
-      "processing": 13,
+      "processing": 14,
       "completed": 384,
       "failed": 9,
       "stalled": 0
