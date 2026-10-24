@@ -200,8 +200,8 @@ function fireEv(e) {
       const cx = D.x - P.face * 18 * K(D.y);
       // 맞은 자리: 번쩍 + 초승달 타격선 + 불꽃 + 충격 고리
       fx.push({ k: 'impact', x: cx, y: p.y, dir: P.face, t: big ? 0.16 : 0.1, t0: big ? 0.16 : 0.1, big });
-      sparks(cx, p.y, big ? 30 : 12, big);
-      ring(cx, p.y, big ? 110 : 50, big ? 0.24 : 0.14, big ? '#ffe9a8' : '#ffffff', big ? 7 : 3);
+      sparks(cx, p.y, big ? 30 : 12, big, Math.random() < 0.5 ? '#ffffff' : '#d6ecff');   // 맨손·발차기 = 불꽃이 아니라 하얀 충격 조각
+      ring(cx, p.y, big ? 110 : 50, big ? 0.24 : 0.14, '#ffffff', big ? 7 : 3);
       if (big) {   // 강: 화면 당김(줌) + 집중선 + 바닥 충격파 + 먼지
         zoom = 0.06; zx = cx; zy = p.y; flash = 0.07;
         fx.push({ k: 'speed', x: cx, y: p.y, t: 0.2, t0: 0.2 });
@@ -808,7 +808,7 @@ function drawFx(glow) {
     else if (e.k === 'impact') {
       const r = (e.big ? 70 : 42) * (1.2 - k * 0.4);
       star(e.x, e.y, r * 0.8 * k + 6, 'rgba(255,255,255,.95)');
-      ctx.strokeStyle = e.big ? `rgba(255,220,120,${k})` : `rgba(255,255,255,${k})`; ctx.lineWidth = (e.big ? 10 : 6) * k + 1;
+      ctx.strokeStyle = `rgba(255,255,255,${k})`; ctx.lineWidth = (e.big ? 10 : 6) * k + 1;
       ctx.beginPath(); ctx.arc(e.x - e.dir * r * 0.4, e.y, r, -Math.PI / 2.6, Math.PI / 2.6, e.dir < 0); ctx.stroke();
     }
     else if (e.k === 'speed') {
