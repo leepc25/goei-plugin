@@ -1,0 +1,20 @@
+{
+  "at": 1792805744.9331632,
+  "job_id": "c2c568a0-a488-4c20-87d2-e260728449c1",
+  "result": "reroll-required",
+  "findings": "역전 참조 결과 정자세 체형 변화, 2·6·7·8번째 회색 면, 5번째 얼굴 손상으로 전체 반려. 입력 참조의 실제 관절 재측정 후 재작업.",
+  "frame_count": 9,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

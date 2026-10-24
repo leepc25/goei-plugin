@@ -1,0 +1,102 @@
+{
+  "slug": "jaemtri",
+  "slot": "running-jump",
+  "base_job_id": "7c53731e-5ac7-411f-a975-9ad2ad339232",
+  "target_frame_index": 6,
+  "source_spec": "game-src/art/field/production/motion-inputs/jaemtri/running-jump-measured-reference-v4/spec.json",
+  "seed": 2026111501,
+  "pose": [
+    {
+      "label": "NECK",
+      "x": 0.5066230147258605,
+      "y": 0.2697689924889997
+    },
+    {
+      "label": "NOSE",
+      "x": 0.5614628225433035,
+      "y": 0.18548632695642803
+    },
+    {
+      "label": "LEFT ARM",
+      "x": 0.4773634452074506,
+      "y": 0.3948297470207027
+    },
+    {
+      "label": "LEFT EAR",
+      "x": 0.5313807065421031,
+      "y": 0.16010415822138868
+    },
+    {
+      "label": "LEFT EYE",
+      "x": 0.5603026419439657,
+      "y": 0.16678710197881297
+    },
+    {
+      "label": "LEFT HIP",
+      "x": 0.5239219665527344,
+      "y": 0.4614254897545124
+    },
+    {
+      "label": "LEFT LEG",
+      "x": 0.49479917030071396,
+      "y": 0.8537112993753367
+    },
+    {
+      "label": "LEFT KNEE",
+      "x": 0.5620217151961848,
+      "y": 0.6690235441376815
+    },
+    {
+      "label": "RIGHT ARM",
+      "x": 0.48526451005077603,
+      "y": 0.43110985033775195
+    },
+    {
+      "label": "RIGHT EAR",
+      "x": 0.5246089205114778,
+      "y": 0.1642595376842033
+    },
+    {
+      "label": "RIGHT EYE",
+      "x": 0.5557920662481363,
+      "y": 0.17020256545607992
+    },
+    {
+      "label": "RIGHT HIP",
+      "x": 0.49491119384765625,
+      "y": 0.47258347925646554
+    },
+    {
+      "label": "RIGHT LEG",
+      "x": 0.4951600427667026,
+      "y": 0.8854712775710533
+    },
+    {
+      "label": "LEFT ELBOW",
+      "x": 0.36217769097180874,
+      "y": 0.309743173252448
+    },
+    {
+      "label": "RIGHT KNEE",
+      "x": 0.5617211097247676,
+      "y": 0.686410760966683
+    },
+    {
+      "label": "RIGHT ELBOW",
+      "x": 0.37948438999145406,
+      "y": 0.3616444618722316
+    },
+    {
+      "label": "LEFT SHOULDER",
+      "x": 0.5287643988291506,
+      "y": 0.2574182536798487
+    },
+    {
+      "label": "RIGHT SHOULDER",
+      "x": 0.48448163062257027,
+      "y": 0.2821197312981507
+    }
+  ],
+  "new_user_approval": false,
+  "action": "Hold the supplied skeleton pose completely still, with relaxed natural hair."
+}

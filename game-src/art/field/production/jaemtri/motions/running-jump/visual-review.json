@@ -1,0 +1,82 @@
+{
+  "at": 1792805813.2519205,
+  "job_id": "7c53731e-5ac7-411f-a975-9ad2ad339232",
+  "result": "reroll-required",
+  "findings": "2·8번째 정상 후보로 교체했으나 7번째 머리 회색 외곽 잔존. 전체 통과 아님.",
+  "frame_count": 8,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ],
+  "frame_assembly": {
+    "base_job_id": "7c53731e-5ac7-411f-a975-9ad2ad339232",
+    "frame_sources": [
+      {
+        "frame_index": 0,
+        "source_job_id": "7c53731e-5ac7-411f-a975-9ad2ad339232",
+        "source_frame_index": 0,
+        "sha256": "7004299b7ff166cf0171973f8336ceedb4840c909c812a6e3c4045ef5f17517a"
+      },
+      {
+        "frame_index": 1,
+        "source_job_id": "8cd091a5-d6a5-42b3-a042-6a6fdb8685da",
+        "source_frame_index": 1,
+        "target_pose_index": 1,
+        "source_path": "motion-frame-candidates/jaemtri/running-jump/hair-step-1/frames/1.png",
+        "sha256": "a470afd1abcfaca2a2f8186aad469331a13ca3cb65b979fc0651d334aa38bfa7",
+        "findings": "0번 큰 회색 면 반려, 1번은 목표 다리/팔 위상과 갈색 머리 외곽이 온전함."
+      },
+      {
+        "frame_index": 2,
+        "source_job_id": "7c53731e-5ac7-411f-a975-9ad2ad339232",
+        "source_frame_index": 2,
+        "sha256": "25f655650d1ae9dfd46fb15dd1c97dea3ea982d824e697e05c244b6ebedce035"
+      },
+      {
+        "frame_index": 3,
+        "source_job_id": "7c53731e-5ac7-411f-a975-9ad2ad339232",
+        "source_frame_index": 3,
+        "sha256": "ee9b5cae43a9c79f2d92838a36de7ac3b59d37814132e4cab17c0a732798fa12"
+      },
+      {
+        "frame_index": 4,
+        "source_job_id": "7c53731e-5ac7-411f-a975-9ad2ad339232",
+        "source_frame_index": 4,
+        "sha256": "dd5aa691a598ecc7946e1fa5669d8cb2e9ea070548cf2b52aa87f2b00dc303a1"
+      },
+      {
+        "frame_index": 5,
+        "source_job_id": "7c53731e-5ac7-411f-a975-9ad2ad339232",
+        "source_frame_index": 5,
+        "sha256": "bb44ad700b174f8239640088ef1d1ab0e4d210995192f6294da43235c2d8a354"
+      },
+      {
+        "frame_index": 6,
+        "source_job_id": "7c53731e-5ac7-411f-a975-9ad2ad339232",
+        "source_frame_index": 6,
+        "sha256": "d136a7fdd43e4b2f983888602aa789d1449d57a3f98b54f85be0eb4a1839d055"
+      },
+      {
+        "frame_index": 7,
+        "source_job_id": "a48c333f-951a-452f-b8ec-12c617d74ccd",
+        "source_frame_index": 1,
+        "target_pose_index": 7,
+        "source_path": "motion-frame-candidates/jaemtri/running-jump/hair-end-1/frames/1.png",
+        "sha256": "ce9653b82b84bd3351256d3159131291401bd5a95f9c28b90a4ff8ec673f256f",
+        "findings": "빈손 회복 자세와 머리 외곽 정상. 동향 유지."
+      }
+    ],
+    "method": "select complete same-pose regenerated frames; no pixel editing",
+    "new_user_approval": false,
+    "visual_reviewed": false
+  }
+}

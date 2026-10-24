@@ -2,7 +2,7 @@
   "slug": "deadpole",
   "slot": "two-footed-jump",
   "character_id": "57e9dc0e-913f-443b-bb1f-6be2cdb617cd",
-  "skeleton_visually_reviewed": false,
+  "skeleton_visually_reviewed": true,
   "first_frame_path": "game-src/art/field/production/motion-inputs/deadpole/first-frame.png",
   "new_user_approval": false,
   "landmark_source": "current character own east estimated 2d reference",
@@ -844,5 +844,6 @@
     "template_id": "mannequin",
     "seed": 2026110002,
     "no_background": true
-  }
+  },
+  "review_findings": "AVIF 검은 긴 생머리/앞머리/둥근 눈/검은 장갑, 보충 로어 작은 체격/키160–165cm 범위 확인. 유지 대상 원본 픽셀 무변경. 본인 east 참조 대응 18관절과 모든 자세 경계 열람."
 }

@@ -1,0 +1,20 @@
+{
+  "at": 1792805554.1517692,
+  "job_id": "4883f298-4768-4a52-bdd7-ff2f0f017356",
+  "result": "reroll-required",
+  "findings": "역전 참조 사용 후 정자세 체형이 가늘어졌고 3·10·11번째 등에 회색 면/얼굴 손상이 남음. 전체 반려.",
+  "frame_count": 13,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

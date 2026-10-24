@@ -263,12 +263,12 @@
       "two-footed-jump": "game-src/art/field/production/motion-inputs/jaemtri/two-footed-jump-v2/spec.json",
       "lead-jab": "game-src/art/field/production/motion-inputs/jaemtri/lead-jab-repair-v1/spec.json",
       "picking-up": "game-src/art/field/production/motion-inputs/jaemtri/picking-up-repair-v1/spec.json",
-      "running-8-frames": "game-src/art/field/production/motion-inputs/jaemtri/running-8-frames-candidate-reference-v2/spec.json",
-      "running-jump": "game-src/art/field/production/motion-inputs/jaemtri/running-jump-repair-v3/spec.json",
-      "running-slide": "game-src/art/field/production/motion-inputs/jaemtri/running-slide-candidate-reference-v2/spec.json",
+      "running-8-frames": "game-src/art/field/production/motion-inputs/jaemtri/running-8-frames-measured-reference-v3/spec.json",
+      "running-jump": "game-src/art/field/production/motion-inputs/jaemtri/running-jump-measured-reference-v4/spec.json",
+      "running-slide": "game-src/art/field/production/motion-inputs/jaemtri/running-slide-measured-reference-v3/spec.json",
       "crouched-walking": "game-src/art/field/production/motion-inputs/jaemtri/crouched-walking-repair-v1/spec.json",
-      "front-flip": "game-src/art/field/production/motion-inputs/jaemtri/front-flip-repair-v2/spec.json",
-      "backflip": "game-src/art/field/production/motion-inputs/jaemtri/backflip-repair-v2/spec.json",
+      "front-flip": "game-src/art/field/production/motion-inputs/jaemtri/front-flip-repair-v3/spec.json",
+      "backflip": "game-src/art/field/production/motion-inputs/jaemtri/backflip-measured-reference-v3/spec.json",
       "throw-object": "game-src/art/field/production/motion-inputs/jaemtri/throw-object-repair-v1/spec.json",
       "cross-punch": "game-src/art/field/production/motion-inputs/jaemtri/cross-punch-repair-v1/spec.json",
       "sad-walk": "game-src/art/field/production/motion-inputs/jaemtri/sad-walk-repair-v1/spec.json",
@@ -288,6 +288,11 @@
       "jumping-1": "game-src/art/field/production/motion-inputs/kyuras/jumping-1-v1/spec.json",
       "jumping-2": "game-src/art/field/production/motion-inputs/kyuras/jumping-2-v1/spec.json",
       "two-footed-jump": "game-src/art/field/production/motion-inputs/kyuras/two-footed-jump-v1/spec.json"
+    },
+    "deadpole": {
+      "jumping-1": "game-src/art/field/production/motion-inputs/deadpole/jumping-1-v1/spec.json",
+      "jumping-2": "game-src/art/field/production/motion-inputs/deadpole/jumping-2-v1/spec.json",
+      "two-footed-jump": "game-src/art/field/production/motion-inputs/deadpole/two-footed-jump-v1/spec.json"
     }
   }
 }

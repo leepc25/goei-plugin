@@ -1,0 +1,9 @@
+{
+  "frame_index": 7,
+  "source_job_id": "a48c333f-951a-452f-b8ec-12c617d74ccd",
+  "source_frame_index": 1,
+  "target_pose_index": 7,
+  "source_path": "motion-frame-candidates/jaemtri/running-jump/hair-end-1/frames/1.png",
+  "sha256": "ce9653b82b84bd3351256d3159131291401bd5a95f9c28b90a4ff8ec673f256f",
+  "findings": "빈손 회복 자세와 머리 외곽 정상. 동향 유지."
+}
