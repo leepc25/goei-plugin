@@ -26,9 +26,13 @@ if r.status_code != 200:
     print("error", r.status_code, r.text[:800]); sys.exit(1)
 j = r.json()
 saved = False
+imgs = [p for p in j["candidates"][0]["content"]["parts"] if "inlineData" in p]
 for p in j["candidates"][0]["content"]["parts"]:
-    if "inlineData" in p and not saved:
-        open(out_path, "wb").write(base64.b64decode(p["inlineData"]["data"])); saved = True
-    elif "text" in p:
+    if "text" in p:
         print("text:", p["text"][:300])
+# Pro는 생각 단계 시안(thought)을 먼저 보낸다. 최종 그림은 thought가 아닌 마지막 그림.
+final = [p for p in imgs if not p.get("thought")] or imgs
+if final:
+    open(out_path, "wb").write(base64.b64decode(final[-1]["inlineData"]["data"])); saved = True
+print("images", len(imgs), "thought", sum(1 for p in imgs if p.get("thought")))
 print(json.dumps({"seconds": round(dt, 1), "usage": j.get("usageMetadata"), "model": j.get("modelVersion"), "saved": saved}, ensure_ascii=False))
