@@ -8,18 +8,22 @@ API = "https://api.pixellab.ai/v2"
 prompt_path, style_path, out_path, w, h = sys.argv[1], sys.argv[2], sys.argv[3], int(sys.argv[4]), int(sys.argv[5])
 scale = float(sys.argv[6]) if len(sys.argv) > 6 else 0.5
 
-st = Image.open(style_path).convert("RGB")
-st = st.resize((int(st.width * scale), int(st.height * scale)), Image.NEAREST)
-buf = io.BytesIO(); st.save(buf, "PNG")
-style = {"image": {"type": "base64", "base64": base64.b64encode(buf.getvalue()).decode(), "format": "png"},
-         "size": {"width": st.width, "height": st.height}}
+style = None
+if style_path:
+    st = Image.open(style_path).convert("RGB")
+    st = st.resize((int(st.width * scale), int(st.height * scale)), Image.NEAREST)
+    buf = io.BytesIO(); st.save(buf, "PNG")
+    style = {"image": {"type": "base64", "base64": base64.b64encode(buf.getvalue()).decode(), "format": "png"},
+             "size": {"width": st.width, "height": st.height}}
 
 def balance():
     return requests.get(API + "/balance", timeout=30).json()["subscription"]["generations"]
 
 b0 = balance()
 body = {"description": open(prompt_path, encoding="utf-8").read().strip(), "image_size": {"width": w, "height": h},
-        "no_background": False, "style_image": style}
+        "no_background": False}
+if style:
+    body["style_image"] = style
 t0 = time.time()
 r = requests.post(API + "/generate-image-v2", json=body, timeout=60)
 if r.status_code >= 300:
