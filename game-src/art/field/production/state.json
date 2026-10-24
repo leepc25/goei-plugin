@@ -27597,14 +27597,16 @@
           "type": "message_progress",
           "model": "inpaint_pro_flash",
           "width": 256,
-          "action": "Generating image",
+          "action": "Correcting pixels",
           "height": 256,
           "prompt": "Repair this upside-down woman during the SAME backward tucked somersault pose. Restore the missing opaque face and long straight black hair inside the mask, natural pale skin, small red irises, mature feminine face, black fitted suit and white shirt collar. Keep the exact inverted head angle, hair silhouette continuity, native pixel style and lighting. Fill accidental transparent holes inside face and hair. Transparent outside the clean dark silhouette; no gray paint or gray halo. Do not turn her upright, add limbs, add text, or change pose. Also close the tiny accidental holes in the masked bent knee and black gloved hand, retaining their exact shape and black fabric shading.",
           "status": "processing",
           "image_id": "6f7f68a6-fa43-5870-906d-3e17bc270bf0",
           "job_kind": "creator-image",
-          "progress": 0.05,
-          "generation_started_at": "2026-10-24T00:20:09.507087+00:00"
+          "progress": 0.75,
+          "queue_position": 1,
+          "generation_started_at": "2026-10-24T00:20:09.507087+00:00",
+          "estimated_wait_seconds": 77
         }
       }
     }
@@ -47187,7 +47189,7 @@
       }
     }
   ],
-  "updated_at": 1792801240.8854492,
+  "updated_at": 1792801289.0510857,
   "user_stopped_at": 1792778235.6917784,
   "archived_jobs": {
     "304457e9-6577-44f0-af17-97841a9f6720": {
