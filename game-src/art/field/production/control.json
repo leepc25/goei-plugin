@@ -222,6 +222,9 @@
       "lead-jab": 2026102410,
       "cross-punch": 2026102411,
       "jumping-1": 2026102499
+    },
+    "spangdal": {
+      "drinking": 2026103110
     }
   },
   "custom_motion_specs": {
@@ -242,7 +245,16 @@
       "jumping-1": "game-src/art/field/production/motion-inputs/spangdal/jumping-1-v1/spec.json",
       "jumping-2": "game-src/art/field/production/motion-inputs/spangdal/jumping-2-v1/spec.json",
       "two-footed-jump": "game-src/art/field/production/motion-inputs/spangdal/two-footed-jump-v1/spec.json",
-      "lead-jab": "game-src/art/field/production/motion-inputs/spangdal/lead-jab-v1/spec.json"
+      "lead-jab": "game-src/art/field/production/motion-inputs/spangdal/lead-jab-v1/spec.json",
+      "running-8-frames": "game-src/art/field/production/motion-inputs/spangdal/running-8-frames-repair-v1/spec.json",
+      "running-jump": "game-src/art/field/production/motion-inputs/spangdal/running-jump-repair-v1/spec.json",
+      "running-slide": "game-src/art/field/production/motion-inputs/spangdal/running-slide-repair-v1/spec.json",
+      "front-flip": "game-src/art/field/production/motion-inputs/spangdal/front-flip-repair-v1/spec.json",
+      "backflip": "game-src/art/field/production/motion-inputs/spangdal/backflip-repair-v1/spec.json",
+      "picking-up": "game-src/art/field/production/motion-inputs/spangdal/picking-up-repair-v1/spec.json",
+      "throw-object": "game-src/art/field/production/motion-inputs/spangdal/throw-object-repair-v1/spec.json",
+      "cross-punch": "game-src/art/field/production/motion-inputs/spangdal/cross-punch-repair-v1/spec.json",
+      "crouched-walking": "game-src/art/field/production/motion-inputs/spangdal/crouched-walking-repair-v1/spec.json"
     }
   }
 }

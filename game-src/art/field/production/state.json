@@ -28315,7 +28315,11 @@
         "type": "generations",
         "generations": 3
       },
-      "saved_frames": 8
+      "saved_frames": 8,
+      "visual_rejection": {
+        "reason": "Rear elbow rises behind head in frames 4-6 and arm pose jumps unnaturally; use controlled restrained arm cycle from own landmarks.",
+        "group": "58656aa6-d2e5-41eb-b2dc-9ab8d9027c0a"
+      }
     },
     "0d5d5df5-a91e-4d87-8633-ecc603538d9c": {
       "kind": "animation",
@@ -28446,7 +28450,11 @@
         "type": "generations",
         "generations": 3
       },
-      "saved_frames": 8
+      "saved_frames": 8,
+      "visual_rejection": {
+        "reason": "Raised rear arm and separated shorts-like black hems in airborne frames 3-4 depart from the skirt silhouette; use a restrained own-body jump trajectory preserving skirt.",
+        "group": "6dd41de6-b56b-4e87-a7ef-2080edd74f05"
+      }
     },
     "6982a605-edfc-4440-8c5f-4b715b3f9729": {
       "kind": "animation",
@@ -28563,7 +28571,11 @@
         "type": "generations",
         "generations": 3
       },
-      "saved_frames": 6
+      "saved_frames": 6,
+      "visual_rejection": {
+        "reason": "Frame 5 has damaged transparent lower legs; middle frames turn away from intended visible west profile. Replace with controlled side-facing slide.",
+        "group": "e89eb4c8-008e-40e1-8f9f-64f095d1ddd4"
+      }
     },
     "5261e3f4-30e6-4c1a-88db-0dac3e6a0464": {
       "kind": "animation",
@@ -28680,7 +28692,11 @@
         "type": "generations",
         "generations": 3
       },
-      "saved_frames": 6
+      "saved_frames": 6,
+      "visual_rejection": {
+        "reason": "Frame 5 front lower leg and shoe contain missing pixels/transparent damage; reroll using a controlled shallower own-body crouch gait.",
+        "group": "04cd6a8e-11f6-4e65-81b7-3b3969c31dbf"
+      }
     },
     "7778bc41-67b6-483d-b2af-8844bbcc4775": {
       "kind": "animation",
@@ -28928,7 +28944,11 @@
         "type": "generations",
         "generations": 3
       },
-      "saved_frames": 6
+      "saved_frames": 6,
+      "visual_rejection": {
+        "reason": "Frame 5 face and legs disintegrate with missing pixels; airborne poses have excessive extension and unstable skirt. Use compact own-body rotation.",
+        "group": "5611d9ad-9065-4abd-a47e-0ea1e9fb9363"
+      }
     },
     "1cf96890-1a5c-4d43-bce6-fc4d8f8d875e": {
       "kind": "animation",
@@ -29073,7 +29093,11 @@
         "type": "generations",
         "generations": 3
       },
-      "saved_frames": 10
+      "saved_frames": 10,
+      "visual_rejection": {
+        "reason": "Raised hands clip canvas in frame 5, gray painted regions between limbs in frames 6 and 8, and damaged front shin in frame 10; use bounded compact rotation.",
+        "group": "4ad892a6-1e93-4029-9250-a48680548e27"
+      }
     },
     "1c9f81ee-20eb-435b-9a9a-ad8fc62c19e5": {
       "kind": "animation",
@@ -29484,7 +29508,11 @@
         "type": "generations",
         "generations": 3
       },
-      "saved_frames": 6
+      "saved_frames": 6,
+      "visual_rejection": {
+        "reason": "Frame 5 loses facial features and the cup, with broken hand/neck pixels; magnified magenta-background inspection confirms defect.",
+        "group": "b8f0f51a-e734-4633-8326-e7b2ce855310"
+      }
     },
     "e44d35d3-0cb1-4d9d-856d-14098f085508": {
       "kind": "animation",
@@ -29594,7 +29622,11 @@
         "type": "generations",
         "generations": 3
       },
-      "saved_frames": 5
+      "saved_frames": 5,
+      "visual_rejection": {
+        "reason": "Frame 3 contains gray inner-arm exterior and elongated malformed hand; later hand/arm poses are inconsistent. Use shallower head bend and explicit reach.",
+        "group": "b45977bc-b272-43b0-9005-16f042a00085"
+      }
     },
     "c9fba02d-31ab-4b7d-a674-7617f35b7e0e": {
       "kind": "animation",
@@ -29952,7 +29984,11 @@
         "type": "generations",
         "generations": 3
       },
-      "saved_frames": 7
+      "saved_frames": 7,
+      "visual_rejection": {
+        "reason": "Gray painted regions beside lowered hand in frame 3 and large gray patch around overhead arm in frame 4; brown ball itself is a valid prop.",
+        "group": "40d5237d-91bd-4833-b9d6-3e024f9b10d9"
+      }
     },
     "9dea4c3b-ea98-465b-b6b4-5b9d5606d6cd": {
       "kind": "animation",
@@ -30300,7 +30336,11 @@
         "type": "generations",
         "generations": 3
       },
-      "saved_frames": 6
+      "saved_frames": 6,
+      "visual_rejection": {
+        "reason": "Frames 3-5 wind the rear hand behind the head instead of a controlled straight cross; replace with explicit rear-arm guard-extension-return while retaining west stance.",
+        "group": "05c8a721-d57f-40db-b144-0bd90ea05ab4"
+      }
     },
     "4cf5d376-176e-4f4d-ae08-bb746d2350a7": {
       "kind": "animation",
@@ -30369,6 +30409,344 @@
         "generations": 2
       },
       "saved_frames": 3
+    },
+    "eb8485c3-a461-47e3-acd7-c96b1a67daf1": {
+      "kind": "animation",
+      "slug": "spangdal",
+      "template": "running-8-frames",
+      "status": "processing",
+      "created_epoch": 1792802856.1452863,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "eb8485c3-a461-47e3-acd7-c96b1a67daf1",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3",
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "eb8485c3-a461-47e3-acd7-c96b1a67daf1",
+        "status": "processing",
+        "created_at": "2026-10-24T00:47:36.427289+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "action": "finalizing",
+          "status": "initializing",
+          "progress": 0.24173821810032164,
+          "flow_kind": "animation",
+          "queue_position": 0,
+          "generation_started_at": "2026-10-24T00:48:20.340383+00:00",
+          "estimated_wait_seconds": 0
+        }
+      }
+    },
+    "312920e3-9e50-48cb-8cd5-f4338fc30c24": {
+      "kind": "animation",
+      "slug": "spangdal",
+      "template": "running-jump",
+      "status": "processing",
+      "created_epoch": 1792802856.6906114,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "312920e3-9e50-48cb-8cd5-f4338fc30c24",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3",
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "312920e3-9e50-48cb-8cd5-f4338fc30c24",
+        "status": "processing",
+        "created_at": "2026-10-24T00:47:38.616403+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "action": "generating",
+          "status": "initializing",
+          "progress": 0.17645029112954635,
+          "flow_kind": "animation",
+          "queue_position": 0,
+          "generation_started_at": "2026-10-24T00:48:22.421228+00:00",
+          "estimated_wait_seconds": 0
+        }
+      }
+    },
+    "ab649897-6863-47bc-bd2c-3b384cea90f1": {
+      "kind": "animation",
+      "slug": "spangdal",
+      "template": "running-slide",
+      "status": "processing",
+      "created_epoch": 1792802858.8205209,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "ab649897-6863-47bc-bd2c-3b384cea90f1",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3",
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "ab649897-6863-47bc-bd2c-3b384cea90f1",
+        "status": "processing",
+        "created_at": "2026-10-24T00:47:39.121876+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "action": "generating",
+          "status": "initializing",
+          "progress": 0.17645029112954635,
+          "flow_kind": "animation",
+          "queue_position": 0,
+          "generation_started_at": "2026-10-24T00:48:24.42731+00:00",
+          "estimated_wait_seconds": 0
+        }
+      }
+    },
+    "fd7b0005-d7a5-48f7-9de0-c6c7a7392afc": {
+      "kind": "animation",
+      "slug": "spangdal",
+      "template": "crouched-walking",
+      "status": "processing",
+      "created_epoch": 1792802859.3119848,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "fd7b0005-d7a5-48f7-9de0-c6c7a7392afc",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3",
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "fd7b0005-d7a5-48f7-9de0-c6c7a7392afc",
+        "status": "processing",
+        "created_at": "2026-10-24T00:47:39.538232+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "action": "generating",
+          "status": "initializing",
+          "progress": 0.1864856119274319,
+          "flow_kind": "animation",
+          "queue_position": 0,
+          "generation_started_at": "2026-10-24T00:48:23.423763+00:00",
+          "estimated_wait_seconds": 0
+        }
+      }
+    },
+    "05ffd49c-1b78-4114-937b-5e4ae1e132f5": {
+      "kind": "animation",
+      "slug": "spangdal",
+      "template": "front-flip",
+      "status": "processing",
+      "created_epoch": 1792802859.7098358,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "05ffd49c-1b78-4114-937b-5e4ae1e132f5",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3",
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "05ffd49c-1b78-4114-937b-5e4ae1e132f5",
+        "status": "processing",
+        "created_at": "2026-10-24T00:47:40.189211+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "action": "generating",
+          "status": "initializing",
+          "progress": 0.21188325061677163,
+          "flow_kind": "animation",
+          "queue_position": 0,
+          "generation_started_at": "2026-10-24T00:48:30.286072+00:00",
+          "estimated_wait_seconds": 0
+        }
+      }
+    },
+    "e589b375-cb78-4b4a-8fed-c43782fc9684": {
+      "kind": "animation",
+      "slug": "spangdal",
+      "template": "backflip",
+      "status": "processing",
+      "created_epoch": 1792802861.209035,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "e589b375-cb78-4b4a-8fed-c43782fc9684",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3",
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "e589b375-cb78-4b4a-8fed-c43782fc9684",
+        "status": "processing",
+        "created_at": "2026-10-24T00:47:42.529644+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "action": "generating",
+          "status": "initializing",
+          "progress": 0.16317712194619777,
+          "flow_kind": "animation",
+          "queue_position": 0,
+          "generation_started_at": "2026-10-24T00:48:35.111631+00:00",
+          "estimated_wait_seconds": 0
+        }
+      }
+    },
+    "4bf1b642-34eb-45e2-a179-23146d96b855": {
+      "kind": "animation",
+      "slug": "spangdal",
+      "template": "drinking",
+      "status": "processing",
+      "created_epoch": 1792802862.7498655,
+      "receipt": {
+        "background_job_ids": [
+          "4bf1b642-34eb-45e2-a179-23146d96b855"
+        ],
+        "directions": [
+          "south-west"
+        ],
+        "animation_group_id": "e4f6bc00-0874-438e-a56a-3b9ab8d3a986",
+        "status": "processing",
+        "enhanced_prompt": null,
+        "enhance_usage": null
+      },
+      "endpoint": "animate-character",
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "4bf1b642-34eb-45e2-a179-23146d96b855",
+        "status": "processing",
+        "created_at": "2026-10-24T00:47:43.022846+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "action": "generating",
+          "progress": 0.13798180448442768,
+          "direction": "south-west",
+          "character_id": "9095375d-b39a-447b-b577-fcb345e78928",
+          "animation_name": null,
+          "queue_position": 0,
+          "generation_model": "skeleton-v3_template",
+          "animation_group_id": "e4f6bc00-0874-438e-a56a-3b9ab8d3a986",
+          "motion_adjustments": {
+            "stride": 1.0,
+            "posture": 0.0,
+            "arm_swing": 1.0,
+            "leg_extension": 0.0
+          },
+          "animation_description": "drinking. Preserve this character identity, costume, hair and native proportions. Keep a clean transparent silhouette in every frame. No gray painted patches, gray halo, ground shadow or opaque background around hair, hands, clothes or feet.",
+          "generation_started_at": "2026-10-24T00:47:56.425964+00:00",
+          "template_animation_id": "drinking",
+          "estimated_wait_seconds": 0
+        }
+      }
+    },
+    "1d24245d-d3f3-4764-9912-1f5675743a80": {
+      "kind": "animation",
+      "slug": "spangdal",
+      "template": "picking-up",
+      "status": "processing",
+      "created_epoch": 1792802863.3063602,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "1d24245d-d3f3-4764-9912-1f5675743a80",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3",
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "1d24245d-d3f3-4764-9912-1f5675743a80",
+        "status": "processing",
+        "created_at": "2026-10-24T00:47:43.651305+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "action": "generating",
+          "status": "initializing",
+          "progress": 0.15278927198167963,
+          "flow_kind": "animation",
+          "queue_position": 0,
+          "generation_started_at": "2026-10-24T00:48:35.626678+00:00",
+          "estimated_wait_seconds": 0
+        }
+      }
+    },
+    "ddbb44f9-e4c4-409a-9e76-d4a85126b4c0": {
+      "kind": "animation",
+      "slug": "spangdal",
+      "template": "throw-object",
+      "status": "processing",
+      "created_epoch": 1792802863.8181405,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "ddbb44f9-e4c4-409a-9e76-d4a85126b4c0",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3",
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "ddbb44f9-e4c4-409a-9e76-d4a85126b4c0",
+        "status": "processing",
+        "created_at": "2026-10-24T00:47:44.063374+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "action": "generating",
+          "status": "initializing",
+          "progress": 0.17137585620794896,
+          "flow_kind": "animation",
+          "queue_position": 0,
+          "generation_started_at": "2026-10-24T00:48:37.548537+00:00",
+          "estimated_wait_seconds": 0
+        }
+      }
+    },
+    "68c43543-8768-48bb-82cb-2b52bc2d8435": {
+      "kind": "animation",
+      "slug": "spangdal",
+      "template": "cross-punch",
+      "status": "processing",
+      "created_epoch": 1792802864.2191398,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "68c43543-8768-48bb-82cb-2b52bc2d8435",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3",
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "68c43543-8768-48bb-82cb-2b52bc2d8435",
+        "status": "processing",
+        "created_at": "2026-10-24T00:48:02.272724+00:00",
+        "last_response": {
+          "type": "message_progress",
+          "action": "generating",
+          "status": "initializing",
+          "progress": 0.1864856119274319,
+          "flow_kind": "animation",
+          "queue_position": 0,
+          "generation_started_at": "2026-10-24T00:48:49.417147+00:00",
+          "estimated_wait_seconds": 0
+        }
+      }
     }
   },
   "characters": {
@@ -30494,30 +30872,30 @@
       "motions": {
         "breathing-idle": "628133da-1d7d-4b81-b5d8-a4098921d739",
         "walking-8-frames": "9812d187-c2e4-47ae-86a2-da18039e4640",
-        "running-8-frames": "3187f398-c14c-4675-a218-c22f4c3b6eb0",
-        "running-jump": "0d5d5df5-a91e-4d87-8633-ecc603538d9c",
-        "running-slide": "6982a605-edfc-4440-8c5f-4b715b3f9729",
-        "crouched-walking": "5261e3f4-30e6-4c1a-88db-0dac3e6a0464",
         "sad-walk": "7778bc41-67b6-483d-b2af-8844bbcc4775",
-        "front-flip": "643377e4-36a4-4a29-9438-455e82e06c31",
-        "backflip": "1cf96890-1a5c-4d43-bce6-fc4d8f8d875e",
         "jumping-1": "1c9f81ee-20eb-435b-9a9a-ad8fc62c19e5",
         "jumping-2": "476b3574-8365-451e-98f8-1153a158f480",
         "two-footed-jump": "74674eff-c597-48da-a98f-332e065866c9",
-        "drinking": "bf5bfeb6-a2e2-48a5-97d8-da30016c1f87",
-        "picking-up": "e44d35d3-0cb1-4d9d-856d-14098f085508",
         "pushing": "c9fba02d-31ab-4b7d-a674-7617f35b7e0e",
         "pull-heavy-object": "6d6586d6-7391-4a07-85a8-57b76ee10eed",
-        "throw-object": "28ca799d-205c-4b19-9b97-79df02d662e5",
         "fight-stance-idle-8-frames": "9dea4c3b-ea98-465b-b6b4-5b9d5606d6cd",
-        "cross-punch": "438619dc-0ae3-4844-8c27-e4fd7dcfadb5",
-        "lead-jab": "4cf5d376-176e-4f4d-ae08-bb746d2350a7"
+        "lead-jab": "4cf5d376-176e-4f4d-ae08-bb746d2350a7",
+        "running-8-frames": "eb8485c3-a461-47e3-acd7-c96b1a67daf1",
+        "running-jump": "312920e3-9e50-48cb-8cd5-f4338fc30c24",
+        "running-slide": "ab649897-6863-47bc-bd2c-3b384cea90f1",
+        "crouched-walking": "fd7b0005-d7a5-48f7-9de0-c6c7a7392afc",
+        "front-flip": "05ffd49c-1b78-4114-937b-5e4ae1e132f5",
+        "backflip": "e589b375-cb78-4b4a-8fed-c43782fc9684",
+        "drinking": "4bf1b642-34eb-45e2-a179-23146d96b855",
+        "picking-up": "1d24245d-d3f3-4764-9912-1f5675743a80",
+        "throw-object": "ddbb44f9-e4c4-409a-9e76-d4a85126b4c0",
+        "cross-punch": "68c43543-8768-48bb-82cb-2b52bc2d8435"
       },
       "ready": true,
       "image_verified": true,
       "skeleton_joints": 18,
       "rotation_count": 8,
-      "exported": true,
+      "exported": false,
       "eight_way_visual_reviewed": true,
       "motions_visual_reviewed": false
     },
@@ -50981,9 +51359,166 @@
         "files": 117,
         "production_pack_clips": 20
       }
+    },
+    {
+      "at": "2026-10-24T00:47:36Z",
+      "kind": "submitted",
+      "slug": "spangdal",
+      "detail": {
+        "kind": "animation",
+        "template": "running-8-frames",
+        "job_id": "eb8485c3-a461-47e3-acd7-c96b1a67daf1",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "eb8485c3-a461-47e3-acd7-c96b1a67daf1",
+          "status": "processing"
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T00:47:38Z",
+      "kind": "submitted",
+      "slug": "spangdal",
+      "detail": {
+        "kind": "animation",
+        "template": "running-jump",
+        "job_id": "312920e3-9e50-48cb-8cd5-f4338fc30c24",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "312920e3-9e50-48cb-8cd5-f4338fc30c24",
+          "status": "processing"
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T00:47:39Z",
+      "kind": "submitted",
+      "slug": "spangdal",
+      "detail": {
+        "kind": "animation",
+        "template": "running-slide",
+        "job_id": "ab649897-6863-47bc-bd2c-3b384cea90f1",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "ab649897-6863-47bc-bd2c-3b384cea90f1",
+          "status": "processing"
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T00:47:39Z",
+      "kind": "submitted",
+      "slug": "spangdal",
+      "detail": {
+        "kind": "animation",
+        "template": "crouched-walking",
+        "job_id": "fd7b0005-d7a5-48f7-9de0-c6c7a7392afc",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "fd7b0005-d7a5-48f7-9de0-c6c7a7392afc",
+          "status": "processing"
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T00:47:41Z",
+      "kind": "submitted",
+      "slug": "spangdal",
+      "detail": {
+        "kind": "animation",
+        "template": "front-flip",
+        "job_id": "05ffd49c-1b78-4114-937b-5e4ae1e132f5",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "05ffd49c-1b78-4114-937b-5e4ae1e132f5",
+          "status": "processing"
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T00:47:42Z",
+      "kind": "submitted",
+      "slug": "spangdal",
+      "detail": {
+        "kind": "animation",
+        "template": "backflip",
+        "job_id": "e589b375-cb78-4b4a-8fed-c43782fc9684",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "e589b375-cb78-4b4a-8fed-c43782fc9684",
+          "status": "processing"
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T00:47:43Z",
+      "kind": "submitted",
+      "slug": "spangdal",
+      "detail": {
+        "kind": "animation",
+        "template": "drinking",
+        "job_id": "4bf1b642-34eb-45e2-a179-23146d96b855",
+        "receipt": {
+          "background_job_ids": [
+            "4bf1b642-34eb-45e2-a179-23146d96b855"
+          ],
+          "directions": [
+            "south-west"
+          ],
+          "animation_group_id": "e4f6bc00-0874-438e-a56a-3b9ab8d3a986",
+          "status": "processing",
+          "enhanced_prompt": null,
+          "enhance_usage": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T00:47:43Z",
+      "kind": "submitted",
+      "slug": "spangdal",
+      "detail": {
+        "kind": "animation",
+        "template": "picking-up",
+        "job_id": "1d24245d-d3f3-4764-9912-1f5675743a80",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "1d24245d-d3f3-4764-9912-1f5675743a80",
+          "status": "processing"
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T00:47:44Z",
+      "kind": "submitted",
+      "slug": "spangdal",
+      "detail": {
+        "kind": "animation",
+        "template": "throw-object",
+        "job_id": "ddbb44f9-e4c4-409a-9e76-d4a85126b4c0",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "ddbb44f9-e4c4-409a-9e76-d4a85126b4c0",
+          "status": "processing"
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T00:48:02Z",
+      "kind": "submitted",
+      "slug": "spangdal",
+      "detail": {
+        "kind": "animation",
+        "template": "cross-punch",
+        "job_id": "68c43543-8768-48bb-82cb-2b52bc2d8435",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "68c43543-8768-48bb-82cb-2b52bc2d8435",
+          "status": "processing"
+        }
+      }
     }
   ],
-  "updated_at": 1792802616.9949074,
+  "updated_at": 1792802978.8177974,
   "user_stopped_at": 1792778235.6917784,
   "archived_jobs": {
     "304457e9-6577-44f0-af17-97841a9f6720": {
@@ -52302,10 +52837,10 @@
       "saved_frames": 6
     }
   },
-  "last_git_checkpoint": 1792802242.5937402,
+  "last_git_checkpoint": 1792802619.5773513,
   "summary": {
     "jobs": {
-      "processing": 0,
+      "processing": 10,
       "completed": 346,
       "failed": 9,
       "stalled": 0

@@ -48,7 +48,7 @@ class Production:
    if f.exists()and not c['image']:
     d=json.loads(f.read_text());jid=d['background_job_id'];self.s['jobs'][jid]={'kind':'image','slug':a['slug'],'status':'processing','created_epoch':time.time(),'receipt':d};c['image']=jid
   self.save()
- def submit(self,kind,slug,path,args,template=None):
+ def submit(self,kind,slug,path,args,template=None,archive_output=None):
   if json.loads((OUT/'control.json').read_text()).get('stop_all')or time.time()<self.s.get('retry_after',0):return False
   c=self.s['characters'][slug];key=template if kind=='animation'else kind;slot=c['motions']if kind=='animation'else c
   if slot.get(key):return False
@@ -68,6 +68,7 @@ class Production:
   if not jid:
    slot[key]='uncertain:'+marker;self.event('submission-unknown-response',slug,public(d));self.save();return False
   job={'kind':kind,'slug':slug,'template':template,'status':'processing','created_epoch':started,'receipt':d,'endpoint':path};self.s['jobs'][jid]=job;slot[key]=jid
+  if archive_output:job['archive_output']=archive_output
   if kind=='registration':c['character_id']=d['character_id']
   if kind=='animation':c['exported']=False
   atomic(OUT/slug/((template or kind)+'-queue.json'),d);self.event('submitted',slug,{'kind':kind,'template':template,'job_id':jid,'receipt':d});self.save();return True
@@ -88,7 +89,7 @@ class Production:
      j['status']='stalled';self.event('stalled',j['slug'],{'job_id':jid,'action':'skip, do not resubmit'})
   self.save()
  def save_frames(self,j,last):
-  if j['kind']!='animation' or j['status']!='completed':return
+  if (j['kind']!='animation' and not j.get('archive_output')) or j['status']!='completed':return
   frames=last.get('images')or[]
   folder=(OUT/j['archive_output'] if j.get('archive_output') else OUT/j['slug']/'motions'/j['template']);folder.mkdir(parents=True,exist_ok=True)
   sizes=[]

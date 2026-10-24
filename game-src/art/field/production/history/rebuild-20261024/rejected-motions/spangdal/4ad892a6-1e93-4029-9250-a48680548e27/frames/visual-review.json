@@ -1,0 +1,20 @@
+{
+  "at": 1792802622.1440842,
+  "job_id": "1cf96890-1a5c-4d43-bce6-fc4d8f8d875e",
+  "result": "reroll-required",
+  "findings": "Raised hands clip canvas in frame 5, gray painted regions between limbs in frames 6 and 8, and damaged front shin in frame 10; use bounded compact rotation.",
+  "frame_count": 10,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "backflip",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}
