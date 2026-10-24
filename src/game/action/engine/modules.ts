@@ -4,7 +4,7 @@
 //   hq/    본부와 임무 흐름 (createHq)
 // 층(stage/)·적(enemy/)·아이템(items/)·대사(story/)는 들어오는 대로 여기에 잇는다. 없으면 엔진 기본(훈련장·임시 적·기본 지급품).
 import { walkSeconds, clockText, mergeClock, DOOR_S, STAIR_S } from '../../../core/fieldclock';
-import type { GameBridge } from '../../bridge';
+import type { GameAssets, GameBridge } from '../../bridge';
 import { view } from './view';
 import { setPixelScale } from './contract';
 import { mountTalk } from '../../talk';
@@ -29,6 +29,8 @@ import demoPhotos from '../story/demo-photos.json';
 import { whereIs, LANE_TOP, LANE_BOT } from '../hq/map';
 import { hasVisitAgent, visitAgentFaceCanvas } from '../art/visitAgents';
 import { testPlayerFace } from '../art/testPeople';
+import { FieldFx, parseFxList } from '../fx/fieldFx';
+import { SUPER_TEXT } from '../fx/superText';
 import { drawTitleBg, setHudItemIcon } from '../ui';
 import { SUPPLY_CATALOG, drawItemIcon } from '../items';
 import { dummyStage, trainingStage } from './training';
@@ -274,6 +276,39 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     toLocal: bridge?.viewport ? (x, y, el) => bridge.viewport!.toLocal(x, y, el) : undefined,
     field: bridge?.visit ? { onExit: () => bridge.close?.() } : undefined,
   });
+  // 필드 전투 효과 틀 (fx/fieldFx.ts). 히트스톱·필살 컷인 동안은 월드를 멈춘다(mods.frozen)
+  const ffx = new FieldFx();
+  (globalThis as { __goeiFieldFx?: unknown }).__goeiFieldFx = ffx; // 시험용
+  ffx.sfx = (n) => audio.event({ type: n === 'super' ? 'super' : 'hit', kind: n === 'slam' ? 'super' : undefined, strength: 3 } as never);
+  const cutins = new Map<string, HTMLImageElement>();
+  if (bridge?.visit && bridge.assets) void loadFieldFx(bridge.assets, ffx, cutins);
+  const inField = () => !!game?.inHub && !!bridge?.visit && !mods.blocking?.() && !shell.paused;
+  /** 필드 필살 미리 보기 (전투가 아직 없어 피해는 없다): 컷인 → 흰 번쩍·흔들림·파편 */
+  const previewSuper = () => {
+    const w = game?.world;
+    if (!w || ffx.inSuper()) return;
+    const me = hq.visitor();
+    const name = me.name || '방문자';
+    const t = SUPER_TEXT[name] ?? { color: '#C8283C', name: '필살기', sub: '' };
+    const fallback = (me.agentId && visitAgentFaceCanvas(name, 60)) || testPlayerFace(60);
+    void ffx.super_({ ...t, art: cutins.get(name), art2: cutins.get(`${name}_2`), fallback, eye: { x: 0.62, y: 0.42 } }).then(() => {
+      ffx.flash('#fff', 0.1, 0.7);
+      ffx.shake(14, 0.6);
+      const p = w.player;
+      ffx.sparks_(p.x, p.y - 120, 30, t.color, 6);
+      ffx.ring(p.x, p.y, 20, 260, t.color, 0.45);
+      ffx.scorch(p.x, p.y, 160, 3);
+    });
+  };
+  const fieldFxKeys = (e: KeyboardEvent) => {
+    if ((e.code !== 'KeyS' && e.code !== 'KeyW') || e.repeat || !inField()) return;
+    const el = document.activeElement as HTMLElement | null;
+    if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable)) return;
+    previewSuper();
+    e.preventDefault();
+    e.stopImmediatePropagation();
+  };
+  window.addEventListener('keydown', fieldFxKeys, true);
   const stageStore = {
     load: () => {
       if (session.meta) return session.meta as never;
@@ -605,6 +640,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
   ];
   const mods: EngineModules = {
     saveCheckpoint: v => { markSaved(); session.setCheckpoint(v); },
+    frozen: () => ffx.frozen(),
     stages: [elevator, trainingStage, dummyStage, arenaStage, itemStage],
     enemyFactory,
     hq,
@@ -623,6 +659,9 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     },
     onPlay: () => shell.play(),
     frame: (dt) => {
+      ffx.opt = { shake: shell.settings.shake, flash: shell.settings.flash, numbers: shell.settings.numbers };
+      ffx.update(shell.paused ? 0 : dt);
+      { const o = ffx.camera(); shell.canvas.style.translate = o.x || o.y ? `${o.x}px ${o.y}px` : ''; }
       syncVolume();
       audio.setPaused(hiddenNow || (shell.paused && !openingOn));
       audio.setCutscene(story.isVideoPlaying());
@@ -638,6 +677,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       ctx.scale(view.zoom, view.zoom);
       ctx.translate(-Math.round(w.camX) - view.crop, 0);
       shell.fx.drawWorld(ctx);
+      ffx.drawWorld(ctx);
       ctx.restore();
       shell.fx.drawScreen(ctx, w.player.hp / w.player.hpMax);
       const hs = hudState(w, shell);
@@ -655,6 +695,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       if (!game?.inHub) shell.hud.draw(ctx, hs, dt); // 본부에서는 전투 HUD 없음
       else if (hs.message) shell.hud.drawMessage(ctx, hs.message, hs.compact, cardEnd); // 본부 목소리는 아래 자막 한 줄
       if (game?.inHub && hs.navigation) shell.hud.drawNavigation(ctx, hs.navigation, hs.compact, hs.device);
+      ffx.drawScreen(ctx);
       if (shell.paused) mapOpen = false;
       if (!game?.inHub && w.stage === elevator) {
         const m = elevator.mapView();
@@ -764,6 +805,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       window.removeEventListener('pointerdown', titleInput, true);
       if (openingT) clearTimeout(openingT);
       window.removeEventListener('keydown', hqKeys, true);
+      window.removeEventListener('keydown', fieldFxKeys, true);
       window.removeEventListener('keydown', floorKeys, true);
       saveFlags();
       storyRoot.removeEventListener(VIDEO_AUDIO_EVENT, attachVideoAudio);
@@ -830,4 +872,30 @@ function bubbleGap(world: World, gx: number): [number, number] | null {
   const dist = (g: [number, number]) => (gx < g[0] ? g[0] - gx : gx > g[1] ? gx - g[1] : 0);
   gaps.sort((a, b) => dist(a) - dist(b));
   return dist(gaps[0]) < 360 ? gaps[0] : null;
+}
+
+/** 필드 효과 팩 (game-pack/field-fx, 아직 없음): fx/fx_목록.txt + fx/<시트>.png, cutin/<인물>.png(_2). 없으면 코드 효과만 */
+async function loadFieldFx(assets: GameAssets, ffx: FieldFx, cutins: Map<string, HTMLImageElement>) {
+  try {
+    if (!(await assets.ready('field-fx'))) return;
+    const list = await assets.bytes('field-fx', 'fx/fx_목록.txt');
+    const img = async (file: string) => {
+      const u = await assets.url('field-fx', file);
+      if (!u) return null;
+      const im = new Image();
+      im.src = u;
+      await im.decode();
+      return im;
+    };
+    for (const d of list ? parseFxList(new TextDecoder().decode(list)) : []) {
+      const im = await img(`fx/${d.name}.png`).catch(() => null);
+      if (im) ffx.register(d, im);
+    }
+    for (const name of Object.keys(SUPER_TEXT)) {
+      for (const k of [name, `${name}_2`]) {
+        const im = await img(`cutin/${k}.png`).catch(() => null);
+        if (im) cutins.set(k, im);
+      }
+    }
+  } catch { /* 팩이 없거나 깨졌으면 코드 효과만 */ }
 }

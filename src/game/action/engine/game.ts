@@ -20,6 +20,8 @@ export interface EngineModules {
   listeners?: ((e: GameEvent) => void)[];
   /** 대사창이 전투를 멈추고 있는가 */
   blocking?: () => boolean;
+  /** 히트스톱·필살 컷인 동안 true: 월드를 진행하지 않는다 */
+  frozen?: () => boolean;
   /** 엔진 기본 HUD를 그릴지 (ui 모듈이 그리면 false) */
   hud?: boolean;
   /** 남이 준 캔버스 (ui 껍데기). 없으면 엔진이 만든다 */
@@ -353,7 +355,7 @@ export class Game {
           this.hqRoot.hidden = !open;
           if (open) return;
         }
-        if (this.mods.blocking?.()) return;
+        if (this.mods.blocking?.() || this.mods.frozen?.()) return; // frozen = 히트스톱·필살 컷인
         w.step(p);
         if (w.ended) {
           const how = w.ended;
