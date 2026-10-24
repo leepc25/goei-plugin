@@ -1,0 +1,20 @@
+{
+  "at": 1792803256.4022725,
+  "job_id": "312920e3-9e50-48cb-8cd5-f4338fc30c24",
+  "result": "pass",
+  "findings": "All eight frames viewed: WEST running takeoff and landing; continuous skirt hem, own hair and bare hands retained; no exterior gray paint or broken limbs.",
+  "frame_count": 8,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

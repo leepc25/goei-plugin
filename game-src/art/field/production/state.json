@@ -30414,7 +30414,7 @@
       "kind": "animation",
       "slug": "spangdal",
       "template": "running-8-frames",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792802856.1452863,
       "receipt": {
         "usage": null,
@@ -30424,29 +30424,95 @@
       "endpoint": "animate-with-skeleton-v3",
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 3.0
         },
         "id": "eb8485c3-a461-47e3-acd7-c96b1a67daf1",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-24T00:47:36.427289+00:00",
         "last_response": {
-          "type": "message_progress",
-          "action": "finalizing",
+          "seed": 2026103100,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
           "status": "initializing",
-          "progress": 0.24173821810032164,
+          "progress": 1.0,
           "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "4e799b83-f84d-4b73-a3e8-65383e72db78",
           "queue_position": 0,
+          "billing_charged": true,
           "generation_started_at": "2026-10-24T00:48:20.340383+00:00",
           "estimated_wait_seconds": 0
         }
-      }
+      },
+      "observed_end_epoch": 1792803050.5677798,
+      "elapsed_observed_seconds": 194.42249369621277,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 8
     },
     "312920e3-9e50-48cb-8cd5-f4338fc30c24": {
       "kind": "animation",
       "slug": "spangdal",
       "template": "running-jump",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792802856.6906114,
       "receipt": {
         "usage": null,
@@ -30456,29 +30522,95 @@
       "endpoint": "animate-with-skeleton-v3",
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 3.0
         },
         "id": "312920e3-9e50-48cb-8cd5-f4338fc30c24",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-24T00:47:38.616403+00:00",
         "last_response": {
+          "seed": 2026103101,
           "type": "message_progress",
-          "action": "generating",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
           "status": "initializing",
-          "progress": 0.17645029112954635,
+          "progress": 1.0,
           "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "4176720e-0b3e-4b9e-85a0-05b156719c25",
           "queue_position": 0,
+          "billing_charged": true,
           "generation_started_at": "2026-10-24T00:48:22.421228+00:00",
           "estimated_wait_seconds": 0
         }
-      }
+      },
+      "observed_end_epoch": 1792803050.6601853,
+      "elapsed_observed_seconds": 193.96957445144653,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 8
     },
     "ab649897-6863-47bc-bd2c-3b384cea90f1": {
       "kind": "animation",
       "slug": "spangdal",
       "template": "running-slide",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792802858.8205209,
       "receipt": {
         "usage": null,
@@ -30488,29 +30620,95 @@
       "endpoint": "animate-with-skeleton-v3",
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 3.0
         },
         "id": "ab649897-6863-47bc-bd2c-3b384cea90f1",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-24T00:47:39.121876+00:00",
         "last_response": {
-          "type": "message_progress",
-          "action": "generating",
+          "seed": 2026103102,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
           "status": "initializing",
-          "progress": 0.17645029112954635,
+          "progress": 1.0,
           "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "b38d85df-8789-48d7-91af-d86519714a94",
           "queue_position": 0,
+          "billing_charged": true,
           "generation_started_at": "2026-10-24T00:48:24.42731+00:00",
           "estimated_wait_seconds": 0
         }
-      }
+      },
+      "observed_end_epoch": 1792803294.5538752,
+      "elapsed_observed_seconds": 435.7333548069,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 8
     },
     "fd7b0005-d7a5-48f7-9de0-c6c7a7392afc": {
       "kind": "animation",
       "slug": "spangdal",
       "template": "crouched-walking",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792802859.3119848,
       "receipt": {
         "usage": null,
@@ -30520,29 +30718,95 @@
       "endpoint": "animate-with-skeleton-v3",
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 3.0
         },
         "id": "fd7b0005-d7a5-48f7-9de0-c6c7a7392afc",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-24T00:47:39.538232+00:00",
         "last_response": {
-          "type": "message_progress",
-          "action": "generating",
+          "seed": 2026103108,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
           "status": "initializing",
-          "progress": 0.1864856119274319,
+          "progress": 1.0,
           "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "4883e231-b80b-482a-85e2-b7839f92cb29",
           "queue_position": 0,
+          "billing_charged": true,
           "generation_started_at": "2026-10-24T00:48:23.423763+00:00",
           "estimated_wait_seconds": 0
         }
-      }
+      },
+      "observed_end_epoch": 1792803294.6436815,
+      "elapsed_observed_seconds": 435.3316967487335,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 8
     },
     "05ffd49c-1b78-4114-937b-5e4ae1e132f5": {
       "kind": "animation",
       "slug": "spangdal",
       "template": "front-flip",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792802859.7098358,
       "receipt": {
         "usage": null,
@@ -30552,29 +30816,125 @@
       "endpoint": "animate-with-skeleton-v3",
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 3.0
         },
         "id": "05ffd49c-1b78-4114-937b-5e4ae1e132f5",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-24T00:47:40.189211+00:00",
         "last_response": {
-          "type": "message_progress",
-          "action": "generating",
+          "seed": 2026103103,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
           "status": "initializing",
-          "progress": 0.21188325061677163,
+          "progress": 1.0,
           "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "4417b108-ba07-449c-8a16-1422bde692c6",
           "queue_position": 0,
+          "billing_charged": true,
           "generation_started_at": "2026-10-24T00:48:30.286072+00:00",
           "estimated_wait_seconds": 0
         }
-      }
+      },
+      "observed_end_epoch": 1792803294.649197,
+      "elapsed_observed_seconds": 434.93936133384705,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 13
     },
     "e589b375-cb78-4b4a-8fed-c43782fc9684": {
       "kind": "animation",
       "slug": "spangdal",
       "template": "backflip",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792802861.209035,
       "receipt": {
         "usage": null,
@@ -30584,29 +30944,101 @@
       "endpoint": "animate-with-skeleton-v3",
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 3.0
         },
         "id": "e589b375-cb78-4b4a-8fed-c43782fc9684",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-24T00:47:42.529644+00:00",
         "last_response": {
-          "type": "message_progress",
-          "action": "generating",
+          "seed": 2026103104,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
           "status": "initializing",
-          "progress": 0.16317712194619777,
+          "progress": 1.0,
           "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "1805220d-7d42-4422-b43f-7dbe7d555efe",
           "queue_position": 0,
+          "billing_charged": true,
           "generation_started_at": "2026-10-24T00:48:35.111631+00:00",
           "estimated_wait_seconds": 0
         }
-      }
+      },
+      "observed_end_epoch": 1792803056.143599,
+      "elapsed_observed_seconds": 194.93456435203552,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 9
     },
     "4bf1b642-34eb-45e2-a179-23146d96b855": {
       "kind": "animation",
       "slug": "spangdal",
       "template": "drinking",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792802862.7498655,
       "receipt": {
         "background_job_ids": [
@@ -30623,21 +31055,80 @@
       "endpoint": "animate-character",
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 3.0
         },
         "id": "4bf1b642-34eb-45e2-a179-23146d96b855",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-24T00:47:43.022846+00:00",
         "last_response": {
+          "seed": 3784506163,
           "type": "message_progress",
-          "action": "generating",
-          "progress": 0.13798180448442768,
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "progress": 1.0,
           "direction": "south-west",
+          "frame_count": 6,
+          "animation_id": "b4195686-7ef4-4d1d-aba9-3c45a131d2eb",
           "character_id": "9095375d-b39a-447b-b577-fcb345e78928",
+          "storage_urls": {
+            "frames": [
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/9095375d-b39a-447b-b577-fcb345e78928/animations/b4195686-7ef4-4d1d-aba9-3c45a131d2eb/south-west/0.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/9095375d-b39a-447b-b577-fcb345e78928/animations/b4195686-7ef4-4d1d-aba9-3c45a131d2eb/south-west/1.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/9095375d-b39a-447b-b577-fcb345e78928/animations/b4195686-7ef4-4d1d-aba9-3c45a131d2eb/south-west/2.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/9095375d-b39a-447b-b577-fcb345e78928/animations/b4195686-7ef4-4d1d-aba9-3c45a131d2eb/south-west/3.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/9095375d-b39a-447b-b577-fcb345e78928/animations/b4195686-7ef4-4d1d-aba9-3c45a131d2eb/south-west/4.png",
+              "https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/9095375d-b39a-447b-b577-fcb345e78928/animations/b4195686-7ef4-4d1d-aba9-3c45a131d2eb/south-west/5.png"
+            ]
+          },
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "30522460-451a-4f9b-9ef4-484b571023ea",
           "animation_name": null,
           "queue_position": 0,
+          "billing_charged": true,
           "generation_model": "skeleton-v3_template",
+          "saved_to_storage": true,
           "animation_group_id": "e4f6bc00-0874-438e-a56a-3b9ab8d3a986",
           "motion_adjustments": {
             "stride": 1.0,
@@ -30650,13 +31141,21 @@
           "template_animation_id": "drinking",
           "estimated_wait_seconds": 0
         }
-      }
+      },
+      "observed_end_epoch": 1792803056.150379,
+      "elapsed_observed_seconds": 193.40051364898682,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 6
     },
     "1d24245d-d3f3-4764-9912-1f5675743a80": {
       "kind": "animation",
       "slug": "spangdal",
       "template": "picking-up",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792802863.3063602,
       "receipt": {
         "usage": null,
@@ -30666,29 +31165,95 @@
       "endpoint": "animate-with-skeleton-v3",
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 3.0
         },
         "id": "1d24245d-d3f3-4764-9912-1f5675743a80",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-24T00:47:43.651305+00:00",
         "last_response": {
-          "type": "message_progress",
-          "action": "generating",
+          "seed": 2026103105,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
           "status": "initializing",
-          "progress": 0.15278927198167963,
+          "progress": 1.0,
           "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "ffe115ef-6cd2-4a25-b412-9f3a36f3a9a3",
           "queue_position": 0,
+          "billing_charged": true,
           "generation_started_at": "2026-10-24T00:48:35.626678+00:00",
           "estimated_wait_seconds": 0
         }
-      }
+      },
+      "observed_end_epoch": 1792803056.1554327,
+      "elapsed_observed_seconds": 192.84907269477844,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 8
     },
     "ddbb44f9-e4c4-409a-9e76-d4a85126b4c0": {
       "kind": "animation",
       "slug": "spangdal",
       "template": "throw-object",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792802863.8181405,
       "receipt": {
         "usage": null,
@@ -30698,29 +31263,95 @@
       "endpoint": "animate-with-skeleton-v3",
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 3.0
         },
         "id": "ddbb44f9-e4c4-409a-9e76-d4a85126b4c0",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-24T00:47:44.063374+00:00",
         "last_response": {
-          "type": "message_progress",
-          "action": "generating",
+          "seed": 2026103106,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
           "status": "initializing",
-          "progress": 0.17137585620794896,
+          "progress": 1.0,
           "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "c5ac17dd-255c-4fb6-ae5d-5a5141533da8",
           "queue_position": 0,
+          "billing_charged": true,
           "generation_started_at": "2026-10-24T00:48:37.548537+00:00",
           "estimated_wait_seconds": 0
         }
-      }
+      },
+      "observed_end_epoch": 1792803056.1612916,
+      "elapsed_observed_seconds": 192.34315133094788,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 8
     },
     "68c43543-8768-48bb-82cb-2b52bc2d8435": {
       "kind": "animation",
       "slug": "spangdal",
       "template": "cross-punch",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792802864.2191398,
       "receipt": {
         "usage": null,
@@ -30730,20 +31361,146 @@
       "endpoint": "animate-with-skeleton-v3",
       "last_response": {
         "usage": {
+          "type": "generations",
+          "generations": 3.0
+        },
+        "id": "68c43543-8768-48bb-82cb-2b52bc2d8435",
+        "status": "completed",
+        "created_at": "2026-10-24T00:48:02.272724+00:00",
+        "last_response": {
+          "seed": 2026103107,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "status": "initializing",
+          "progress": 1.0,
+          "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "61f881aa-2d19-41cb-855b-228df46de101",
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_started_at": "2026-10-24T00:48:49.417147+00:00",
+          "estimated_wait_seconds": 0
+        }
+      },
+      "observed_end_epoch": 1792803056.1678917,
+      "elapsed_observed_seconds": 191.9487521648407,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 8
+    },
+    "4cf1145a-2955-438f-a514-1e99a5cb9e7f": {
+      "kind": "motion-frame-candidate-backflip-inverted-1",
+      "slug": "spangdal",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792803280.9008627,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "4cf1145a-2955-438f-a514-1e99a5cb9e7f",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3",
+      "archive_output": "motion-frame-candidates/spangdal/backflip/inverted-1/frames",
+      "last_response": {
+        "usage": {
           "type": "usd",
           "usd": 0.0
         },
-        "id": "68c43543-8768-48bb-82cb-2b52bc2d8435",
+        "id": "4cf1145a-2955-438f-a514-1e99a5cb9e7f",
         "status": "processing",
-        "created_at": "2026-10-24T00:48:02.272724+00:00",
+        "created_at": "2026-10-24T00:54:41.647638+00:00",
         "last_response": {
-          "type": "message_progress",
-          "action": "generating",
+          "type": "background",
           "status": "initializing",
-          "progress": 0.1864856119274319,
           "flow_kind": "animation",
           "queue_position": 0,
-          "generation_started_at": "2026-10-24T00:48:49.417147+00:00",
+          "estimated_wait_seconds": 0
+        }
+      }
+    },
+    "2c303eed-1fe3-484b-bf16-d095744d05c8": {
+      "kind": "motion-frame-candidate-picking-up-low-pose-1",
+      "slug": "spangdal",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792803282.0032449,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "2c303eed-1fe3-484b-bf16-d095744d05c8",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3",
+      "archive_output": "motion-frame-candidates/spangdal/picking-up/low-pose-1/frames",
+      "last_response": {
+        "usage": {
+          "type": "usd",
+          "usd": 0.0
+        },
+        "id": "2c303eed-1fe3-484b-bf16-d095744d05c8",
+        "status": "processing",
+        "created_at": "2026-10-24T00:54:42.367640+00:00",
+        "last_response": {
+          "type": "background",
+          "status": "initializing",
+          "flow_kind": "animation",
+          "queue_position": 0,
           "estimated_wait_seconds": 0
         }
       }
@@ -30895,9 +31652,11 @@
       "image_verified": true,
       "skeleton_joints": 18,
       "rotation_count": 8,
-      "exported": false,
+      "exported": true,
       "eight_way_visual_reviewed": true,
-      "motions_visual_reviewed": false
+      "motions_visual_reviewed": false,
+      "motion-frame-candidate-backflip-inverted-1": "4cf1145a-2955-438f-a514-1e99a5cb9e7f",
+      "motion-frame-candidate-picking-up-low-pose-1": "2c303eed-1fe3-484b-bf16-d095744d05c8"
     },
     "jaemtri": {
       "name": "잼트리",
@@ -51516,9 +52275,209 @@
           "status": "processing"
         }
       }
+    },
+    {
+      "at": "2026-10-24T00:50:50Z",
+      "kind": "completed",
+      "slug": "spangdal",
+      "detail": {
+        "kind": "animation",
+        "template": "running-8-frames",
+        "job_id": "eb8485c3-a461-47e3-acd7-c96b1a67daf1",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T00:50:50Z",
+      "kind": "completed",
+      "slug": "spangdal",
+      "detail": {
+        "kind": "animation",
+        "template": "running-jump",
+        "job_id": "312920e3-9e50-48cb-8cd5-f4338fc30c24",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T00:50:56Z",
+      "kind": "completed",
+      "slug": "spangdal",
+      "detail": {
+        "kind": "animation",
+        "template": "backflip",
+        "job_id": "e589b375-cb78-4b4a-8fed-c43782fc9684",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T00:50:56Z",
+      "kind": "completed",
+      "slug": "spangdal",
+      "detail": {
+        "kind": "animation",
+        "template": "drinking",
+        "job_id": "4bf1b642-34eb-45e2-a179-23146d96b855",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T00:50:56Z",
+      "kind": "completed",
+      "slug": "spangdal",
+      "detail": {
+        "kind": "animation",
+        "template": "picking-up",
+        "job_id": "1d24245d-d3f3-4764-9912-1f5675743a80",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T00:50:56Z",
+      "kind": "completed",
+      "slug": "spangdal",
+      "detail": {
+        "kind": "animation",
+        "template": "throw-object",
+        "job_id": "ddbb44f9-e4c4-409a-9e76-d4a85126b4c0",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T00:50:56Z",
+      "kind": "completed",
+      "slug": "spangdal",
+      "detail": {
+        "kind": "animation",
+        "template": "cross-punch",
+        "job_id": "68c43543-8768-48bb-82cb-2b52bc2d8435",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T00:54:41Z",
+      "kind": "submitted",
+      "slug": "spangdal",
+      "detail": {
+        "kind": "motion-frame-candidate-backflip-inverted-1",
+        "template": null,
+        "job_id": "4cf1145a-2955-438f-a514-1e99a5cb9e7f",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "4cf1145a-2955-438f-a514-1e99a5cb9e7f",
+          "status": "processing"
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T00:54:42Z",
+      "kind": "submitted",
+      "slug": "spangdal",
+      "detail": {
+        "kind": "motion-frame-candidate-picking-up-low-pose-1",
+        "template": null,
+        "job_id": "2c303eed-1fe3-484b-bf16-d095744d05c8",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "2c303eed-1fe3-484b-bf16-d095744d05c8",
+          "status": "processing"
+        }
+      }
+    },
+    {
+      "at": "2026-10-24T00:54:54Z",
+      "kind": "completed",
+      "slug": "spangdal",
+      "detail": {
+        "kind": "animation",
+        "template": "running-slide",
+        "job_id": "ab649897-6863-47bc-bd2c-3b384cea90f1",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T00:54:54Z",
+      "kind": "completed",
+      "slug": "spangdal",
+      "detail": {
+        "kind": "animation",
+        "template": "crouched-walking",
+        "job_id": "fd7b0005-d7a5-48f7-9de0-c6c7a7392afc",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T00:54:54Z",
+      "kind": "completed",
+      "slug": "spangdal",
+      "detail": {
+        "kind": "animation",
+        "template": "front-flip",
+        "job_id": "05ffd49c-1b78-4114-937b-5e4ae1e132f5",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T00:54:58Z",
+      "kind": "exported",
+      "slug": "spangdal",
+      "detail": {
+        "bytes": 530427,
+        "files": 55,
+        "production_pack_clips": 20
+      }
     }
   ],
-  "updated_at": 1792802978.8177974,
+  "updated_at": 1792803298.1952953,
   "user_stopped_at": 1792778235.6917784,
   "archived_jobs": {
     "304457e9-6577-44f0-af17-97841a9f6720": {
@@ -52837,11 +53796,11 @@
       "saved_frames": 6
     }
   },
-  "last_git_checkpoint": 1792802619.5773513,
+  "last_git_checkpoint": 1792802981.7144468,
   "summary": {
     "jobs": {
-      "processing": 10,
-      "completed": 346,
+      "processing": 2,
+      "completed": 356,
       "failed": 9,
       "stalled": 0
     },

@@ -1,0 +1,20 @@
+{
+  "at": 1792803280.2584355,
+  "job_id": "1d24245d-d3f3-4764-9912-1f5675743a80",
+  "result": "reroll-required",
+  "findings": "Frame 5 has missing face and neck pixels and jagged hand; other seven frames preserve identity. Regenerate exact low pose and review full clip.",
+  "frame_count": 8,
+  "directions": [
+    "west"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}

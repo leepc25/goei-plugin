@@ -28,26 +28,6 @@
           "south-west": "Idle/rotations/south-west.png"
         },
         "animations": {
-          "crouched_walking._Preserve_this_character_identity": {
-            "west": [
-              "Idle/animations/crouched_walking._Preserve_this_character_identity/west/frame_000.png",
-              "Idle/animations/crouched_walking._Preserve_this_character_identity/west/frame_001.png",
-              "Idle/animations/crouched_walking._Preserve_this_character_identity/west/frame_002.png",
-              "Idle/animations/crouched_walking._Preserve_this_character_identity/west/frame_003.png",
-              "Idle/animations/crouched_walking._Preserve_this_character_identity/west/frame_004.png",
-              "Idle/animations/crouched_walking._Preserve_this_character_identity/west/frame_005.png"
-            ]
-          },
-          "cross_punch._Preserve_this_character_identity_cost": {
-            "west": [
-              "Idle/animations/cross_punch._Preserve_this_character_identity_cost/west/frame_000.png",
-              "Idle/animations/cross_punch._Preserve_this_character_identity_cost/west/frame_001.png",
-              "Idle/animations/cross_punch._Preserve_this_character_identity_cost/west/frame_002.png",
-              "Idle/animations/cross_punch._Preserve_this_character_identity_cost/west/frame_003.png",
-              "Idle/animations/cross_punch._Preserve_this_character_identity_cost/west/frame_004.png",
-              "Idle/animations/cross_punch._Preserve_this_character_identity_cost/west/frame_005.png"
-            ]
-          },
           "pull_heavy_object._Preserve_this_character_identit": {
             "west": [
               "Idle/animations/pull_heavy_object._Preserve_this_character_identit/west/frame_000.png",
@@ -80,53 +60,6 @@
               "Idle/animations/pushing._Preserve_this_character_identity_costume/west/frame_005.png"
             ]
           },
-          "throw_object._Preserve_this_character_identity_cos": {
-            "west": [
-              "Idle/animations/throw_object._Preserve_this_character_identity_cos/west/frame_000.png",
-              "Idle/animations/throw_object._Preserve_this_character_identity_cos/west/frame_001.png",
-              "Idle/animations/throw_object._Preserve_this_character_identity_cos/west/frame_002.png",
-              "Idle/animations/throw_object._Preserve_this_character_identity_cos/west/frame_003.png",
-              "Idle/animations/throw_object._Preserve_this_character_identity_cos/west/frame_004.png",
-              "Idle/animations/throw_object._Preserve_this_character_identity_cos/west/frame_005.png",
-              "Idle/animations/throw_object._Preserve_this_character_identity_cos/west/frame_006.png"
-            ]
-          },
-          "backflip._Preserve_this_character_identity_costume": {
-            "west": [
-              "Idle/animations/backflip._Preserve_this_character_identity_costume/west/frame_000.png",
-              "Idle/animations/backflip._Preserve_this_character_identity_costume/west/frame_001.png",
-              "Idle/animations/backflip._Preserve_this_character_identity_costume/west/frame_002.png",
-              "Idle/animations/backflip._Preserve_this_character_identity_costume/west/frame_003.png",
-              "Idle/animations/backflip._Preserve_this_character_identity_costume/west/frame_004.png",
-              "Idle/animations/backflip._Preserve_this_character_identity_costume/west/frame_005.png",
-              "Idle/animations/backflip._Preserve_this_character_identity_costume/west/frame_006.png",
-              "Idle/animations/backflip._Preserve_this_character_identity_costume/west/frame_007.png",
-              "Idle/animations/backflip._Preserve_this_character_identity_costume/west/frame_008.png",
-              "Idle/animations/backflip._Preserve_this_character_identity_costume/west/frame_009.png"
-            ]
-          },
-          "front_flip._Preserve_this_character_identity_costu": {
-            "west": [
-              "Idle/animations/front_flip._Preserve_this_character_identity_costu/west/frame_000.png",
-              "Idle/animations/front_flip._Preserve_this_character_identity_costu/west/frame_001.png",
-              "Idle/animations/front_flip._Preserve_this_character_identity_costu/west/frame_002.png",
-              "Idle/animations/front_flip._Preserve_this_character_identity_costu/west/frame_003.png",
-              "Idle/animations/front_flip._Preserve_this_character_identity_costu/west/frame_004.png",
-              "Idle/animations/front_flip._Preserve_this_character_identity_costu/west/frame_005.png"
-            ]
-          },
-          "running_decisively_with_a_steady_torso_controlled": {
-            "west": [
-              "Idle/animations/running_decisively_with_a_steady_torso_controlled/west/frame_000.png",
-              "Idle/animations/running_decisively_with_a_steady_torso_controlled/west/frame_001.png",
-              "Idle/animations/running_decisively_with_a_steady_torso_controlled/west/frame_002.png",
-              "Idle/animations/running_decisively_with_a_steady_torso_controlled/west/frame_003.png",
-              "Idle/animations/running_decisively_with_a_steady_torso_controlled/west/frame_004.png",
-              "Idle/animations/running_decisively_with_a_steady_torso_controlled/west/frame_005.png",
-              "Idle/animations/running_decisively_with_a_steady_torso_controlled/west/frame_006.png",
-              "Idle/animations/running_decisively_with_a_steady_torso_controlled/west/frame_007.png"
-            ]
-          },
           "fight_stance_idle_8_frames._Preserve_this_characte": {
             "west": [
               "Idle/animations/fight_stance_idle_8_frames._Preserve_this_characte/west/frame_000.png",
@@ -139,43 +72,12 @@
               "Idle/animations/fight_stance_idle_8_frames._Preserve_this_characte/west/frame_007.png"
             ]
           },
-          "running_jump._Preserve_this_character_identity_cos": {
-            "west": [
-              "Idle/animations/running_jump._Preserve_this_character_identity_cos/west/frame_000.png",
-              "Idle/animations/running_jump._Preserve_this_character_identity_cos/west/frame_001.png",
-              "Idle/animations/running_jump._Preserve_this_character_identity_cos/west/frame_002.png",
-              "Idle/animations/running_jump._Preserve_this_character_identity_cos/west/frame_003.png",
-              "Idle/animations/running_jump._Preserve_this_character_identity_cos/west/frame_004.png",
-              "Idle/animations/running_jump._Preserve_this_character_identity_cos/west/frame_005.png",
-              "Idle/animations/running_jump._Preserve_this_character_identity_cos/west/frame_006.png",
-              "Idle/animations/running_jump._Preserve_this_character_identity_cos/west/frame_007.png"
-            ]
-          },
           "breathing_idle._Preserve_this_character_identity_c": {
             "south-west": [
               "Idle/animations/breathing_idle._Preserve_this_character_identity_c/south-west/frame_000.png",
               "Idle/animations/breathing_idle._Preserve_this_character_identity_c/south-west/frame_001.png",
               "Idle/animations/breathing_idle._Preserve_this_character_identity_c/south-west/frame_002.png",
               "Idle/animations/breathing_idle._Preserve_this_character_identity_c/south-west/frame_003.png"
-            ]
-          },
-          "picking_up._Preserve_this_character_identity_costu": {
-            "west": [
-              "Idle/animations/picking_up._Preserve_this_character_identity_costu/west/frame_000.png",
-              "Idle/animations/picking_up._Preserve_this_character_identity_costu/west/frame_001.png",
-              "Idle/animations/picking_up._Preserve_this_character_identity_costu/west/frame_002.png",
-              "Idle/animations/picking_up._Preserve_this_character_identity_costu/west/frame_003.png",
-              "Idle/animations/picking_up._Preserve_this_character_identity_costu/west/frame_004.png"
-            ]
-          },
-          "drinking._Preserve_this_character_identity_costume": {
-            "south-west": [
-              "Idle/animations/drinking._Preserve_this_character_identity_costume/south-west/frame_000.png",
-              "Idle/animations/drinking._Preserve_this_character_identity_costume/south-west/frame_001.png",
-              "Idle/animations/drinking._Preserve_this_character_identity_costume/south-west/frame_002.png",
-              "Idle/animations/drinking._Preserve_this_character_identity_costume/south-west/frame_003.png",
-              "Idle/animations/drinking._Preserve_this_character_identity_costume/south-west/frame_004.png",
-              "Idle/animations/drinking._Preserve_this_character_identity_costume/south-west/frame_005.png"
             ]
           },
           "sad_walk._Preserve_this_character_identity_costume": {
@@ -190,14 +92,14 @@
               "Idle/animations/sad_walk._Preserve_this_character_identity_costume/west/frame_007.png"
             ]
           },
-          "running_slide._Preserve_this_character_identity_co": {
-            "west": [
-              "Idle/animations/running_slide._Preserve_this_character_identity_co/west/frame_000.png",
-              "Idle/animations/running_slide._Preserve_this_character_identity_co/west/frame_001.png",
-              "Idle/animations/running_slide._Preserve_this_character_identity_co/west/frame_002.png",
-              "Idle/animations/running_slide._Preserve_this_character_identity_co/west/frame_003.png",
-              "Idle/animations/running_slide._Preserve_this_character_identity_co/west/frame_004.png",
-              "Idle/animations/running_slide._Preserve_this_character_identity_co/west/frame_005.png"
+          "drinking._Preserve_this_character_identity_costume": {
+            "south-west": [
+              "Idle/animations/drinking._Preserve_this_character_identity_costume/south-west/frame_000.png",
+              "Idle/animations/drinking._Preserve_this_character_identity_costume/south-west/frame_001.png",
+              "Idle/animations/drinking._Preserve_this_character_identity_costume/south-west/frame_002.png",
+              "Idle/animations/drinking._Preserve_this_character_identity_costume/south-west/frame_003.png",
+              "Idle/animations/drinking._Preserve_this_character_identity_costume/south-west/frame_004.png",
+              "Idle/animations/drinking._Preserve_this_character_identity_costume/south-west/frame_005.png"
             ]
           }
         }
@@ -205,5 +107,5 @@
     }
   ],
   "export_version": "3.1",
-  "export_date": "2026-10-24T00:43:36.564648"
+  "export_date": "2026-10-24T00:54:57.938829"
 }
