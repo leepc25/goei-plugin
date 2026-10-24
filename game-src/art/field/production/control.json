@@ -290,7 +290,7 @@
       "picking-up": "game-src/art/field/production/motion-inputs/aileen/picking-up-deep-v2/spec.json",
       "pushing": "game-src/art/field/production/motion-inputs/aileen/pushing-measured-guard-v2/spec.json",
       "throw-object": "game-src/art/field/production/motion-inputs/aileen/throw-object-measured-guard-v2/spec.json",
-      "fight-stance-idle-8-frames": "game-src/art/field/production/motion-inputs/aileen/fight-stance-idle-8-frames-measured-guard-v2/spec.json",
+      "fight-stance-idle-8-frames": "game-src/art/field/production/motion-inputs/aileen/fight-stance-exact-guard-v3/spec.json",
       "cross-punch": "game-src/art/field/production/motion-inputs/aileen/cross-punch-own-lengths-v1/spec.json",
       "pull-heavy-object": "game-src/art/field/production/motion-inputs/aileen/pull-heavy-object-measured-guard-v2/spec.json",
       "drinking": "game-src/art/field/production/motion-inputs/aileen/drinking-own-se-v1/spec.json"

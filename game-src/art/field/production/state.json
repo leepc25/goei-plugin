@@ -43637,7 +43637,7 @@
       "kind": "animation",
       "slug": "aileen",
       "template": "pushing",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792808402.4756916,
       "receipt": {
         "usage": null,
@@ -43647,23 +43647,89 @@
       "endpoint": "animate-with-skeleton-v3",
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 3.0
         },
         "id": "26112962-08ae-494b-9f9b-82a398e44e85",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-24T02:20:02.652323+00:00",
         "last_response": {
-          "type": "message_progress",
-          "action": "generating",
+          "seed": 2026112802,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
           "status": "initializing",
-          "progress": 0.29252374639127476,
+          "progress": 1.0,
           "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "1ba09e5b-13aa-4828-baf9-601b88937d5e",
           "queue_position": 0,
+          "billing_charged": true,
           "generation_started_at": "2026-10-24T02:20:50.808936+00:00",
           "estimated_wait_seconds": 0
         }
-      }
+      },
+      "observed_end_epoch": 1792808768.521626,
+      "elapsed_observed_seconds": 366.0459349155426,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 8
     },
     "bf0f5fe4-7bb1-4c82-b434-8ba602b1254a": {
       "kind": "animation",
@@ -43835,13 +43901,17 @@
         "type": "generations",
         "generations": 3
       },
-      "saved_frames": 4
+      "saved_frames": 4,
+      "visual_rejection": {
+        "reason": "머리카락 끝 회색 매트. 실제 참조의 동일 가드 자세와 미세호흡 관절로 변경.",
+        "standalone": true
+      }
     },
     "40dd87bc-564a-44ce-b5d3-f4398f67b6a6": {
       "kind": "animation",
       "slug": "aileen",
       "template": "walking-8-frames",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792808546.497079,
       "receipt": {
         "usage": null,
@@ -43851,26 +43921,95 @@
       "endpoint": "animate-with-skeleton-v3",
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 3.0
         },
         "id": "40dd87bc-564a-44ce-b5d3-f4398f67b6a6",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-24T02:22:26.704643+00:00",
         "last_response": {
-          "type": "background",
+          "seed": 2026112900,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
           "status": "initializing",
+          "progress": 1.0,
           "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "be403c1d-f19f-4284-8861-e55a491eb701",
           "queue_position": 0,
+          "billing_charged": true,
+          "generation_started_at": "2026-10-24T02:23:27.394911+00:00",
           "estimated_wait_seconds": 0
         }
-      }
+      },
+      "observed_end_epoch": 1792808768.5357578,
+      "elapsed_observed_seconds": 222.0386791229248,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 8
     },
     "da75aa01-b246-4001-93cd-b9d140c961a5": {
       "kind": "animation",
       "slug": "aileen",
       "template": "running-slide",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792808546.961842,
       "receipt": {
         "usage": null,
@@ -43880,26 +44019,95 @@
       "endpoint": "animate-with-skeleton-v3",
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 3.0
         },
         "id": "da75aa01-b246-4001-93cd-b9d140c961a5",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-24T02:22:27.175335+00:00",
         "last_response": {
-          "type": "background",
+          "seed": 2026112901,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
           "status": "initializing",
+          "progress": 1.0,
           "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "c7da1ce8-b2f4-4574-9899-16c9e0d6fd39",
           "queue_position": 0,
+          "billing_charged": true,
+          "generation_started_at": "2026-10-24T02:23:19.292978+00:00",
           "estimated_wait_seconds": 0
         }
-      }
+      },
+      "observed_end_epoch": 1792808768.5422971,
+      "elapsed_observed_seconds": 221.58045554161072,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 8
     },
     "7c0469a4-dedb-4e04-bd72-706ac1b4983c": {
       "kind": "animation",
       "slug": "aileen",
       "template": "front-flip",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792808547.3639455,
       "receipt": {
         "usage": null,
@@ -43909,26 +44117,125 @@
       "endpoint": "animate-with-skeleton-v3",
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 3.0
         },
         "id": "7c0469a4-dedb-4e04-bd72-706ac1b4983c",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-24T02:22:27.716927+00:00",
         "last_response": {
-          "type": "background",
+          "seed": 2026112902,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
           "status": "initializing",
+          "progress": 1.0,
           "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "134aa108-6117-43a8-ae48-b9e5609ada5f",
           "queue_position": 0,
+          "billing_charged": true,
+          "generation_started_at": "2026-10-24T02:23:12.730042+00:00",
           "estimated_wait_seconds": 0
         }
-      }
+      },
+      "observed_end_epoch": 1792808768.5485208,
+      "elapsed_observed_seconds": 221.18457555770874,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 13
     },
     "263743b4-57c2-4659-a2a1-4b6775dc51e9": {
       "kind": "animation",
       "slug": "aileen",
       "template": "pull-heavy-object",
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792808547.924587,
       "receipt": {
         "usage": null,
@@ -43938,28 +44245,95 @@
       "endpoint": "animate-with-skeleton-v3",
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 3.0
         },
         "id": "263743b4-57c2-4659-a2a1-4b6775dc51e9",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-24T02:22:28.078275+00:00",
         "last_response": {
-          "type": "message_progress",
+          "seed": 2026112903,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
           "status": "initializing",
-          "progress": 0.1,
+          "progress": 1.0,
           "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "9f08ed02-f73e-4184-95fe-494fa1892e9c",
           "queue_position": 0,
+          "billing_charged": true,
           "generation_started_at": "2026-10-24T02:22:36.635474+00:00",
           "estimated_wait_seconds": 0
         }
-      }
+      },
+      "observed_end_epoch": 1792808768.5572298,
+      "elapsed_observed_seconds": 220.63264298439026,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 3
+      },
+      "saved_frames": 8
     },
     "cc19aa7c-d9fc-497f-b24d-a1eed324ee82": {
       "kind": "motion-frame-candidate-lead-jab-bare-fist-1",
       "slug": "aileen",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792808549.1225786,
       "receipt": {
         "usage": null,
@@ -43970,20 +44344,59 @@
       "archive_output": "motion-frame-candidates/aileen/lead-jab/bare-fist-1/frames",
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 2.0
         },
         "id": "cc19aa7c-d9fc-497f-b24d-a1eed324ee82",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-24T02:22:29.405330+00:00",
         "last_response": {
-          "type": "background",
+          "seed": 2026113001,
+          "type": "done",
+          "action": "finalizing",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
           "status": "initializing",
+          "progress": 1.0,
           "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 2
+          },
+          "generation_id": "ba224fb4-f049-4797-95e3-e5446daec6f7",
           "queue_position": 0,
+          "billing_charged": true,
+          "generation_started_at": "2026-10-24T02:23:19.559514+00:00",
           "estimated_wait_seconds": 0
         }
-      }
+      },
+      "observed_end_epoch": 1792808768.5629842,
+      "elapsed_observed_seconds": 219.4404058456421,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 2
+      },
+      "saved_frames": 3
     },
     "5b324971-dbda-45e9-b71d-e482518ee2e7": {
       "kind": "animation",
@@ -43994,6 +44407,96 @@
       "receipt": {
         "usage": null,
         "background_job_id": "5b324971-dbda-45e9-b71d-e482518ee2e7",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3",
+      "last_response": {
+        "usage": {
+          "type": "generations",
+          "generations": 3.0
+        },
+        "id": "5b324971-dbda-45e9-b71d-e482518ee2e7",
+        "status": "processing",
+        "created_at": "2026-10-24T02:23:11.584917+00:00",
+        "last_response": {
+          "seed": 2026113101,
+          "type": "message_done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
+          "status": "initializing",
+          "progress": 0.99,
+          "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "670756fb-8e16-47e1-a88f-036eb033c6a7",
+          "queue_position": 0,
+          "billing_charged": true,
+          "generation_started_at": "2026-10-24T02:23:58.726212+00:00",
+          "estimated_wait_seconds": 0
+        }
+      }
+    },
+    "1e854cac-038d-40ea-9a5f-1fc134afae55": {
+      "kind": "animation",
+      "slug": "aileen",
+      "template": "fight-stance-idle-8-frames",
+      "status": "processing",
+      "created_epoch": 1792808768.6707542,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "1e854cac-038d-40ea-9a5f-1fc134afae55",
         "status": "processing"
       },
       "endpoint": "animate-with-skeleton-v3"
@@ -45055,12 +45558,12 @@
         "backflip": "b80cd50e-079c-4044-bb3e-12098db8accb",
         "pushing": "26112962-08ae-494b-9f9b-82a398e44e85",
         "throw-object": "bf0f5fe4-7bb1-4c82-b434-8ba602b1254a",
-        "fight-stance-idle-8-frames": "062a301c-7935-479a-b76a-50ffd0c38ac5",
         "walking-8-frames": "40dd87bc-564a-44ce-b5d3-f4398f67b6a6",
         "running-slide": "da75aa01-b246-4001-93cd-b9d140c961a5",
         "front-flip": "7c0469a4-dedb-4e04-bd72-706ac1b4983c",
         "pull-heavy-object": "263743b4-57c2-4659-a2a1-4b6775dc51e9",
-        "picking-up": "5b324971-dbda-45e9-b71d-e482518ee2e7"
+        "picking-up": "5b324971-dbda-45e9-b71d-e482518ee2e7",
+        "fight-stance-idle-8-frames": "1e854cac-038d-40ea-9a5f-1fc134afae55"
       },
       "ready": true,
       "repair_id": "aileen-user-rebuild-v4",
@@ -70272,9 +70775,120 @@
           "status": "processing"
         }
       }
+    },
+    {
+      "at": "2026-10-24T02:26:08Z",
+      "kind": "completed",
+      "slug": "aileen",
+      "detail": {
+        "kind": "animation",
+        "template": "pushing",
+        "job_id": "26112962-08ae-494b-9f9b-82a398e44e85",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T02:26:08Z",
+      "kind": "completed",
+      "slug": "aileen",
+      "detail": {
+        "kind": "animation",
+        "template": "walking-8-frames",
+        "job_id": "40dd87bc-564a-44ce-b5d3-f4398f67b6a6",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T02:26:08Z",
+      "kind": "completed",
+      "slug": "aileen",
+      "detail": {
+        "kind": "animation",
+        "template": "running-slide",
+        "job_id": "da75aa01-b246-4001-93cd-b9d140c961a5",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T02:26:08Z",
+      "kind": "completed",
+      "slug": "aileen",
+      "detail": {
+        "kind": "animation",
+        "template": "front-flip",
+        "job_id": "7c0469a4-dedb-4e04-bd72-706ac1b4983c",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T02:26:08Z",
+      "kind": "completed",
+      "slug": "aileen",
+      "detail": {
+        "kind": "animation",
+        "template": "pull-heavy-object",
+        "job_id": "263743b4-57c2-4659-a2a1-4b6775dc51e9",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 3
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T02:26:08Z",
+      "kind": "completed",
+      "slug": "aileen",
+      "detail": {
+        "kind": "motion-frame-candidate-lead-jab-bare-fist-1",
+        "template": null,
+        "job_id": "cc19aa7c-d9fc-497f-b24d-a1eed324ee82",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 2
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T02:26:08Z",
+      "kind": "submitted",
+      "slug": "aileen",
+      "detail": {
+        "kind": "animation",
+        "template": "fight-stance-idle-8-frames",
+        "job_id": "1e854cac-038d-40ea-9a5f-1fc134afae55",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "1e854cac-038d-40ea-9a5f-1fc134afae55",
+          "status": "processing"
+        }
+      }
     }
   ],
-  "updated_at": 1792808591.7923303,
+  "updated_at": 1792808769.0667922,
   "user_stopped_at": 1792778235.6917784,
   "archived_jobs": {
     "304457e9-6577-44f0-af17-97841a9f6720": {
@@ -71596,8 +72210,8 @@
   "last_git_checkpoint": 1792808374.4480968,
   "summary": {
     "jobs": {
-      "processing": 7,
-      "completed": 483,
+      "processing": 2,
+      "completed": 489,
       "failed": 9,
       "stalled": 0
     },

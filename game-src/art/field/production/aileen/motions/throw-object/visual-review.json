@@ -1,0 +1,20 @@
+{
+  "at": 1792808749.950853,
+  "job_id": "bf0f5fe4-7bb1-4c82-b434-8ba602b1254a",
+  "result": "reroll-required",
+  "findings": "5번째 방출 손 형태/불연속 및 6·7·8번째 포니테일 끝 회색 매트. 방출/회복 궤적을 본인 실제 자세에 맞춰 보정 필요.",
+  "frame_count": 8,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ]
+}
