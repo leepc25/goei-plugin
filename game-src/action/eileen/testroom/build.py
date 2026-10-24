@@ -18,22 +18,38 @@ LIST = [
  ("30","30","SE","끄덕이기"),("31","31","SE","고개 젓기"),("32","32","SE","화내기"),("33","33","E","발견 반응"),("34","34","SE","놀라기"),
  ("35","35","SE","기뻐하기"),("36","36","E","도망"),("37","37","E","뒷걸음질"),("38","38_SW","SW","엎드려 기기"),("39","39","SE","주저앉기"),
  ("40","40","SE","주저앉아 뒤로 밀려나기"),("41","41","SE","웅크려 떨기"),("42","42_E","E","네발로 기기"),
+ ("W1","W_1","E","무기 대기"),
 ]
+GUN = {"W", "15", "22", "23", "24", "25", "W1"}
 data = {}
 for aid, folder, d, name in LIST:
     fs = sorted((M / folder).glob("[0-9][0-9].png"))
+    if not fs: continue   # 아직 안 뽑은 줄(무기 대기 등)
     ims = [Image.open(f).convert("RGBA") for f in fs]
     w, h = ims[0].size
     sheet = Image.new("RGBA", (w * len(ims), h))
-    bot, reach, top = [], [], []
+    bot, reach, top, mz, foot = [], [], [], [], []
     for i, im in enumerate(ims):
         sheet.paste(im, (i * w, 0))
         bb = im.getchannel("A").point(lambda v: 255 if v > 40 else 0).getbbox() or (0, 0, w, h)
         bot.append(bb[3]); top.append(bb[1]); reach.append(bb[2] - w // 2)
+        px = im.load()
+        # 발 = 맨 아래 12줄의 불투명 픽셀 범위(그림자 위치·폭)
+        xs = [x for y in range(max(0, bb[3] - 12), bb[3]) for x in range(w) if px[x, y][3] > 40]
+        foot.append([(min(xs) + max(xs)) // 2 - w // 2, max(xs) - min(xs)] if xs else [0, 40])
+        if aid in GUN:
+            # 총구 = 가슴~허리 높이 띠에서 가장 앞(오른쪽) 불투명 픽셀
+            best = None
+            for y in range(int(h * 0.28), int(h * 0.66)):
+                for x in range(w - 1, -1, -1):
+                    if px[x, y][3] > 40:
+                        if best is None or x > best[0]: best = (x, y)
+                        break
+            mz.append([best[0] - w // 2, best[1]] if best else [40, h // 2])
     buf = io.BytesIO(); sheet.save(buf, "PNG", optimize=True)  # WebP는 일부 앱 보기 화면에서 안 나옴
-    data[aid] = dict(name=name, dir=d, n=len(ims), w=w, h=h, bot=bot, top=top, reach=reach,
+    data[aid] = dict(name=name, dir=d, n=len(ims), w=w, h=h, bot=bot, top=top, reach=reach, foot=foot, mz=mz, floor=max(bot),
                      src="data:image/png;base64," + base64.b64encode(buf.getvalue()).decode())
-html = (HERE / "room.html").read_text(encoding="utf-8").replace("/*__DATA__*/null", json.dumps(data, ensure_ascii=False))
+html = (HERE / "room.html").read_text(encoding="utf-8").replace("/*__DATA__*/null", json.dumps(data, ensure_ascii=False)).replace("/*__AUDIO__*/", (HERE / "audio.js").read_text(encoding="utf-8"))
 out = M / "에일린_테스트룸.html"
 out.write_text(html, encoding="utf-8")
 print(out, out.stat().st_size // 1024, "KB")
