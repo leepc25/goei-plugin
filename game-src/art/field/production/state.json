@@ -38688,7 +38688,7 @@
       "kind": "motion-frame-candidate-backflip-turn-2",
       "slug": "jaemtri",
       "template": null,
-      "status": "processing",
+      "status": "completed",
       "created_epoch": 1792806544.480892,
       "receipt": {
         "usage": null,
@@ -38699,20 +38699,73 @@
       "archive_output": "motion-frame-candidates/jaemtri/backflip/turn-2/frames",
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 2.0
         },
         "id": "61d04f4c-13af-4cc3-91e7-f7bba623d09b",
-        "status": "processing",
+        "status": "completed",
         "created_at": "2026-10-24T01:49:05.159648+00:00",
         "last_response": {
-          "type": "background",
+          "seed": 2026111901,
+          "type": "done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
           "status": "initializing",
+          "progress": 0.95,
           "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 2
+          },
+          "generation_id": "46b5debe-5136-4b5f-97b7-61b014405d25",
           "queue_position": 0,
+          "billing_charged": true,
+          "generation_started_at": "2026-10-24T01:49:59.012498+00:00",
           "estimated_wait_seconds": 0
         }
-      }
+      },
+      "observed_end_epoch": 1792806652.3133652,
+      "elapsed_observed_seconds": 107.83247351646423,
+      "usage": {
+        "usd": 0.0,
+        "type": "generations",
+        "generations": 2
+      },
+      "saved_frames": 3
+    },
+    "a2ffabd5-ec0c-4076-85f1-e491aa7d2978": {
+      "kind": "motion-frame-candidate-backflip-turn-3",
+      "slug": "jaemtri",
+      "template": null,
+      "status": "processing",
+      "created_epoch": 1792806736.0070627,
+      "receipt": {
+        "usage": null,
+        "background_job_id": "a2ffabd5-ec0c-4076-85f1-e491aa7d2978",
+        "status": "processing"
+      },
+      "endpoint": "animate-with-skeleton-v3",
+      "archive_output": "motion-frame-candidates/jaemtri/backflip/turn-3/frames"
     }
   },
   "characters": {
@@ -39744,7 +39797,8 @@
       "motion-frame-candidate-backflip-inverted-1": "0fc54ecd-45cf-4e51-bd78-ad5d8e717c4a",
       "motion-frame-candidate-backflip-turn-1": "45a6c73c-5207-4097-8e0a-9de93523f27e",
       "motion-frame-candidate-backflip-descent-1": "6fd95721-122b-47fa-b292-82011a28c054",
-      "motion-frame-candidate-backflip-turn-2": "61d04f4c-13af-4cc3-91e7-f7bba623d09b"
+      "motion-frame-candidate-backflip-turn-2": "61d04f4c-13af-4cc3-91e7-f7bba623d09b",
+      "motion-frame-candidate-backflip-turn-3": "a2ffabd5-ec0c-4076-85f1-e491aa7d2978"
     },
     "aileen": {
       "name": "에일린",
@@ -63141,9 +63195,40 @@
         "files": 41,
         "production_pack_clips": 20
       }
+    },
+    {
+      "at": "2026-10-24T01:50:52Z",
+      "kind": "completed",
+      "slug": "jaemtri",
+      "detail": {
+        "kind": "motion-frame-candidate-backflip-turn-2",
+        "template": null,
+        "job_id": "61d04f4c-13af-4cc3-91e7-f7bba623d09b",
+        "usage": {
+          "usd": 0.0,
+          "type": "generations",
+          "generations": 2
+        },
+        "detail": null
+      }
+    },
+    {
+      "at": "2026-10-24T01:52:19Z",
+      "kind": "submitted",
+      "slug": "jaemtri",
+      "detail": {
+        "kind": "motion-frame-candidate-backflip-turn-3",
+        "template": null,
+        "job_id": "a2ffabd5-ec0c-4076-85f1-e491aa7d2978",
+        "receipt": {
+          "usage": null,
+          "background_job_id": "a2ffabd5-ec0c-4076-85f1-e491aa7d2978",
+          "status": "processing"
+        }
+      }
     }
   ],
-  "updated_at": 1792806549.2771313,
+  "updated_at": 1792806739.1868587,
   "user_stopped_at": 1792778235.6917784,
   "archived_jobs": {
     "304457e9-6577-44f0-af17-97841a9f6720": {
@@ -64462,11 +64547,11 @@
       "saved_frames": 6
     }
   },
-  "last_git_checkpoint": 1792806185.866297,
+  "last_git_checkpoint": 1792806551.7115982,
   "summary": {
     "jobs": {
-      "processing": 1,
-      "completed": 434,
+      "processing": 0,
+      "completed": 435,
       "failed": 9,
       "stalled": 0
     },

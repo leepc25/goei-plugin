@@ -22,5 +22,17 @@
     },
     "receipt": "motion-inputs/jaemtri/measured-crouch-reference/estimate-response.json",
     "server_job_id": null
+  },
+  {
+    "record_id": "local-sync:jaemtri-turn-reference-estimate",
+    "slug": "jaemtri",
+    "slot": "backflip",
+    "endpoint": "estimate-skeleton",
+    "usage": {
+      "type": "generations",
+      "generations": 0.1
+    },
+    "receipt": "motion-inputs/jaemtri/measured-turn-reference/estimate-response.json",
+    "server_job_id": null
   }
 ]

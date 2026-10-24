@@ -270,6 +270,13 @@ class Production:
   for a in self.manifest:
    c=self.s['characters'][a['slug']]
    if not c.get('ready')or a['slug']not in control.get('motion_allowed_slugs',[]):continue
+   # Validate the person's mandatory rigs before any paid clip is submitted.
+   # Some registered characters lack the requested direction's 2D landmarks.
+   if not c['motions']:
+    specs=control.get('custom_motion_specs',{}).get(a['slug'],{})
+    required=control.get('required_custom_motion_slots',[])
+    if any(not specs.get(slot) for slot in required):return
+    for slot in required:self.custom_motion_request(a['slug'],slot,specs[slot])
    for template,label in TEMPLATES:
     if len(active())>=20:return
     if not c['motions'].get(template):

@@ -60,6 +60,10 @@ class SchedulingGuards(unittest.TestCase):
    with patch.object(f,'request',side_effect=AssertionError('Unexpected network request')):
     p.schedule();self.assertEqual(calls,[]);self.assertFalse(p.done())
     p.s['characters']['b']['eight_way_visual_reviewed']=True
+    ctl=f.OUT/'control.json';control=f.json.loads(ctl.read_text())
+    control['required_custom_motion_slots']=['jumping-1'];f.atomic(ctl,control)
+    p.schedule();self.assertEqual(calls,[]) # Missing rig blocks the entire paid batch.
+    control.pop('required_custom_motion_slots');f.atomic(ctl,control)
     p.schedule();self.assertEqual(len(calls),20);self.assertEqual({slug for slug,_ in calls},{'a'})
     for j in p.s['jobs'].values():j['status']='completed'
     p.schedule();self.assertEqual(len(calls),20)

@@ -431,9 +431,21 @@ cc112716-4ac9-4396-aab4-40c4843f133d	jaemtri	motion-frame-candidate-running-slid
 93b03406-feba-4e4c-8ca5-28d0a3eda8d9	jaemtri	motion-frame-candidate-running-jump-hair-recover-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
 a48c333f-951a-452f-b8ec-12c617d74ccd	jaemtri	motion-frame-candidate-running-jump-hair-end-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
 7a207771-608b-4a7c-8012-e504c6f31919	jaemtri	animation	front-flip	completed	{"usd": 0.0, "type": "generations", "generations": 3}
-5849e88b-07e4-4c17-951e-df6524c7e092	jaemtri	motion-frame-candidate-running-8-frames-hair-4		processing	null
-5798bb45-4918-4b31-88a1-0026c782d179	jaemtri	motion-frame-candidate-running-slide-low-slide-4		processing	null
-eb443f25-dd14-4633-ab0a-39a595fe2928	jaemtri	animation	backflip	processing	null
-0e4d09ee-b593-4c6d-8dca-9fa7b032eb07	jaemtri	motion-frame-candidate-running-jump-hair-recover-2		processing	null
+5849e88b-07e4-4c17-951e-df6524c7e092	jaemtri	motion-frame-candidate-running-8-frames-hair-4		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+5798bb45-4918-4b31-88a1-0026c782d179	jaemtri	motion-frame-candidate-running-slide-low-slide-4		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+eb443f25-dd14-4633-ab0a-39a595fe2928	jaemtri	animation	backflip	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+0e4d09ee-b593-4c6d-8dca-9fa7b032eb07	jaemtri	motion-frame-candidate-running-jump-hair-recover-2		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+c9da948c-5316-46c0-8564-48412c7653da	jaemtri	motion-frame-candidate-front-flip-ascent-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+30252226-16d4-4f9f-9069-7e57d73edf60	jaemtri	motion-frame-candidate-front-flip-turn-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+6ef612eb-3af3-4b11-9199-4b387ff261b1	jaemtri	motion-frame-candidate-front-flip-descent-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+5416f0c1-1421-4aa2-b300-bf1fde00b699	jaemtri	animation	running-8-frames	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+2d1847a1-15ee-486a-90e9-d0bd0c2a2b5a	jaemtri	animation	running-jump	completed	{"usd": 0.0, "type": "generations", "generations": 3}
+0e625b9e-9e57-45b9-84b4-83c15f014587	jaemtri	motion-frame-candidate-backflip-prep-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+0fc54ecd-45cf-4e51-bd78-ad5d8e717c4a	jaemtri	motion-frame-candidate-backflip-inverted-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+45a6c73c-5207-4097-8e0a-9de93523f27e	jaemtri	motion-frame-candidate-backflip-turn-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+6fd95721-122b-47fa-b292-82011a28c054	jaemtri	motion-frame-candidate-backflip-descent-1		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+61d04f4c-13af-4cc3-91e7-f7bba623d09b	jaemtri	motion-frame-candidate-backflip-turn-2		completed	{"usd": 0.0, "type": "generations", "generations": 2}
+a2ffabd5-ec0c-4076-85f1-e491aa7d2978	jaemtri	motion-frame-candidate-backflip-turn-3		processing	null
 local-sync:jyaldi-backflip-v7-estimate	jyaldi	estimate-skeleton	backflip	synchronous-completed	{"type": "generations", "generations": 0.1}
 local-sync:jaemtri-crouch-reference-estimate	jaemtri	estimate-skeleton	motion-reference	synchronous-completed	{"type": "generations", "generations": 0.1}
+local-sync:jaemtri-turn-reference-estimate	jaemtri	estimate-skeleton	backflip	synchronous-completed	{"type": "generations", "generations": 0.1}
