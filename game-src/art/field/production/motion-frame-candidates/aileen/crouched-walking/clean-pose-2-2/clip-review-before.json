@@ -1,0 +1,79 @@
+{
+  "at": 1792809435.0545838,
+  "job_id": "6699c4cc-6914-4c0d-9cfa-16b8d1ac0971",
+  "result": "reroll-required",
+  "findings": "6번째 자세 정상 후보로 교체. 3·4번째 후보는 모두 몸 바깥 회색 덩어리라 미선택. 두 자세는 검증된 지상 가드 참조로 재작업 필요.",
+  "frame_count": 8,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ],
+  "frame_assembly": {
+    "base_job_id": "6699c4cc-6914-4c0d-9cfa-16b8d1ac0971",
+    "frame_sources": [
+      {
+        "frame_index": 0,
+        "source_job_id": "6699c4cc-6914-4c0d-9cfa-16b8d1ac0971",
+        "source_frame_index": 0,
+        "sha256": "6d76a77958d77424512a347efca9275a8aa4a20f9b58fc0a10d1f1c2c0b86b6c"
+      },
+      {
+        "frame_index": 1,
+        "source_job_id": "6699c4cc-6914-4c0d-9cfa-16b8d1ac0971",
+        "source_frame_index": 1,
+        "sha256": "f318cb075f8ec99b43fd10ce27995981437e3dbecef60566b79fe5b257824925"
+      },
+      {
+        "frame_index": 2,
+        "source_job_id": "6699c4cc-6914-4c0d-9cfa-16b8d1ac0971",
+        "source_frame_index": 2,
+        "sha256": "a606f12a29aeef0e090d80b51f866060b4d35f149a8c330c5859774e9f2f1cd9"
+      },
+      {
+        "frame_index": 3,
+        "source_job_id": "6699c4cc-6914-4c0d-9cfa-16b8d1ac0971",
+        "source_frame_index": 3,
+        "sha256": "0dbc56495cba1814750b6ba83619797b5d93e97d6139f8d9a982d04ff84c09d6"
+      },
+      {
+        "frame_index": 4,
+        "source_job_id": "6699c4cc-6914-4c0d-9cfa-16b8d1ac0971",
+        "source_frame_index": 4,
+        "sha256": "80e99c0ec3b6e4a855c461749d37050259f8677c0856459279921983b7df8e6a"
+      },
+      {
+        "frame_index": 5,
+        "source_job_id": "0d0cd67b-2185-47b1-9457-6ce630dda6ea",
+        "source_frame_index": 1,
+        "target_pose_index": 5,
+        "source_path": "motion-frame-candidates/aileen/crouched-walking/clean-pose-5-1/frames/1.png",
+        "sha256": "e157432bc883a41013a9c0a3d8580e4c7e458720491804de98726d5d7746ab49",
+        "findings": "세 후보 확대 확인. 선택 프레임은 목표 자세와 포니테일 가닥/구두 유지, 넓은 외곽 회색 매트 없음."
+      },
+      {
+        "frame_index": 6,
+        "source_job_id": "6699c4cc-6914-4c0d-9cfa-16b8d1ac0971",
+        "source_frame_index": 6,
+        "sha256": "87badafa0ef4d2c78f76e36feb77149b6000fb4e7d7205b5c59f71cd493984f8"
+      },
+      {
+        "frame_index": 7,
+        "source_job_id": "6699c4cc-6914-4c0d-9cfa-16b8d1ac0971",
+        "source_frame_index": 7,
+        "sha256": "6ee0968649cd0936c1b3617ba959481715909ac467d7b5536de2f7181da7b9ec"
+      }
+    ],
+    "method": "select complete same-pose regenerated frames; no pixel editing",
+    "new_user_approval": false,
+    "visual_reviewed": false
+  }
+}

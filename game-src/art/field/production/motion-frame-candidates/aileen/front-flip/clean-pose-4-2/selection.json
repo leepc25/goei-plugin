@@ -1,0 +1,9 @@
+{
+  "frame_index": 4,
+  "source_job_id": "08cdb028-8b59-4175-89ad-4018de45da49",
+  "source_frame_index": 1,
+  "target_pose_index": 4,
+  "source_path": "motion-frame-candidates/aileen/front-flip/clean-pose-4-2/frames/1.png",
+  "sha256": "452910033d4ce9d6ab25508cddf1efb6f30ed31d0f30645a17aa3c0dd25d9741",
+  "findings": "Measured inverted reference produces intact tucked body and blonde strands without prior broad gray exterior matte; recheck full flip sequence."
+}

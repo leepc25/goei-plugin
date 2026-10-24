@@ -1,0 +1,79 @@
+{
+  "at": 1792809911.455867,
+  "job_id": "da75aa01-b246-4001-93cd-b9d140c961a5",
+  "result": "reroll-required",
+  "findings": "3번째 대형 회색 면은 정상 후보로 해결. 2·6·7·8번째 포니테일 끝 회색 매트 잔류, 해당 자세 보정.",
+  "frame_count": 8,
+  "directions": [
+    "east"
+  ],
+  "actual_template": "custom-skeleton",
+  "new_user_approval": false,
+  "rules_rechecked": [
+    "AVIF identity primary",
+    "lore stature supplemental",
+    "all55 eight-way barrier",
+    "correct face-visible direction",
+    "no gray exterior paint in every frame",
+    "pose and foot contact consistency"
+  ],
+  "frame_assembly": {
+    "base_job_id": "da75aa01-b246-4001-93cd-b9d140c961a5",
+    "frame_sources": [
+      {
+        "frame_index": 0,
+        "source_job_id": "da75aa01-b246-4001-93cd-b9d140c961a5",
+        "source_frame_index": 0,
+        "sha256": "91dc7e24fad563f86f8da95b6048782cefbc509a247a773fda8656beda4861c6"
+      },
+      {
+        "frame_index": 1,
+        "source_job_id": "da75aa01-b246-4001-93cd-b9d140c961a5",
+        "source_frame_index": 1,
+        "sha256": "e52af9d832538fa5f4fa8cbed9d5da60c510c4b3bfe9197a37710d9a7eef779a"
+      },
+      {
+        "frame_index": 2,
+        "source_job_id": "2b5bd3b4-f86a-46dc-ab8a-77ba3030ae6e",
+        "source_frame_index": 1,
+        "target_pose_index": 2,
+        "source_path": "motion-frame-candidates/aileen/running-slide/clean-pose-2-1/frames/1.png",
+        "sha256": "e32de5ba33c76c45aec19a2be31acfd63db22c78e87dc8d8a49c2ddd20c20356",
+        "findings": "후보 전체 확인. 선택 프레임은 얼굴·손·구두 외곽이 온전하고 몸 밖 회색 덩어리 없음. 같은 목표 자세 유지."
+      },
+      {
+        "frame_index": 3,
+        "source_job_id": "da75aa01-b246-4001-93cd-b9d140c961a5",
+        "source_frame_index": 3,
+        "sha256": "2b0db8a139539d96830d9b4a04b6671fabe5cd8d9a19942a32ac539acc0e8cd4"
+      },
+      {
+        "frame_index": 4,
+        "source_job_id": "da75aa01-b246-4001-93cd-b9d140c961a5",
+        "source_frame_index": 4,
+        "sha256": "d55a4d77f18509d6eeb87aee72bde6a19f27c8195bc42bf6296503ac817ffc07"
+      },
+      {
+        "frame_index": 5,
+        "source_job_id": "da75aa01-b246-4001-93cd-b9d140c961a5",
+        "source_frame_index": 5,
+        "sha256": "42874821a5537fa2f3761dfc76a8b9720a6a36253e284b649acb64bdeb8dd726"
+      },
+      {
+        "frame_index": 6,
+        "source_job_id": "da75aa01-b246-4001-93cd-b9d140c961a5",
+        "source_frame_index": 6,
+        "sha256": "96bfaac7994961264c3b3fedfa6c81b879cdd15a9653a10867fd6589f149db73"
+      },
+      {
+        "frame_index": 7,
+        "source_job_id": "da75aa01-b246-4001-93cd-b9d140c961a5",
+        "source_frame_index": 7,
+        "sha256": "46bf101b46cd2c7c740849c858173c81b448c400be53bb5e01c80e165a76f8de"
+      }
+    ],
+    "method": "select complete same-pose regenerated frames; no pixel editing",
+    "new_user_approval": false,
+    "visual_reviewed": false
+  }
+}

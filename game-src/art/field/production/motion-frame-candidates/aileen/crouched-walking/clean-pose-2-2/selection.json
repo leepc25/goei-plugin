@@ -1,0 +1,9 @@
+{
+  "frame_index": 2,
+  "source_job_id": "c0b29250-2cca-4e00-8c0a-5e67924f75df",
+  "source_frame_index": 1,
+  "target_pose_index": 2,
+  "source_path": "motion-frame-candidates/aileen/crouched-walking/clean-pose-2-2/frames/1.png",
+  "sha256": "9647eafc17f80647121c4083524ee2007010e5beae9724ffba4ed4ced5f2a4d5",
+  "findings": "본인 지상 가드 참조 후보1은 몸 밖 회색 덩어리가 없고 포니테일/얼굴/손/구두 정상. 목표 낮은 보행 자세 유지."
+}

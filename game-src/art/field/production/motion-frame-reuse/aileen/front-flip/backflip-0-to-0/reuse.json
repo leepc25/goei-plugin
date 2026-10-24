@@ -1,0 +1,25 @@
+{
+  "at": 1792809985.4666405,
+  "base_job_id": "7c0469a4-dedb-4e04-bd72-706ac1b4983c",
+  "source": {
+    "frame_index": 0,
+    "source_job_id": "a096416d-d44e-48a8-ade5-10cdabae0a2d",
+    "source_frame_index": 1,
+    "target_pose_index": 0,
+    "source_path": "motion-frame-candidates/aileen/backflip/clean-pose-0-1/frames/1.png",
+    "sha256": "d3f6a5c1932ce1143a26f2f9dcdab983f747e384044ff9b33edee7c505418838",
+    "findings": "후보 전체 확인 후 목표 회전/준비 자세와 얼굴·정장·구두 외곽이 온전한 1번 선택. 몸 밖 회색 덩어리 없음."
+  },
+  "result": {
+    "frame_index": 0,
+    "source_job_id": "a096416d-d44e-48a8-ade5-10cdabae0a2d",
+    "source_frame_index": 1,
+    "target_pose_index": 0,
+    "source_path": "motion-frame-candidates/aileen/backflip/clean-pose-0-1/frames/1.png",
+    "sha256": "d3f6a5c1932ce1143a26f2f9dcdab983f747e384044ff9b33edee7c505418838",
+    "findings": "동일 아일린/동쪽/카메라와 관절 배열 완전 일치. 검수된 뒤회전 준비 자세 후보 전체PNG를 앞회전의 같은 자세에 재사용, 출처/해시 보존.",
+    "reused_from_frame_index": 0,
+    "reused_from_slot": "backflip"
+  },
+  "reason": "Exact matching requested skeleton poses; copy whole PNG without editing pixels"
+}
