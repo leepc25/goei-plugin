@@ -27342,19 +27342,107 @@
       "endpoint": "animate-with-skeleton-v3",
       "last_response": {
         "usage": {
-          "type": "usd",
-          "usd": 0.0
+          "type": "generations",
+          "generations": 3.0
         },
         "id": "780a2731-4b41-417e-a89f-a0c77a93dbf5",
         "status": "processing",
         "created_at": "2026-10-24T00:08:58.418195+00:00",
         "last_response": {
-          "type": "message_progress",
-          "action": "generating",
+          "seed": 2026102804,
+          "type": "message_done",
+          "action": "smoothing frames",
+          "images": [
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            },
+            {
+              "type": "base64",
+              "width": 256,
+              "base64": "[image payload omitted]",
+              "height": 256
+            }
+          ],
           "status": "initializing",
-          "progress": 0.17442508643239907,
+          "progress": 0.9678947368421053,
           "flow_kind": "animation",
+          "billing_usage": {
+            "usd": 0.0,
+            "type": "generations",
+            "generations": 3
+          },
+          "generation_id": "c300944f-ff7a-4d83-b371-635e67f44002",
           "queue_position": 0,
+          "billing_charged": true,
           "generation_started_at": "2026-10-24T00:09:50.787178+00:00",
           "estimated_wait_seconds": 0
         }
@@ -46837,7 +46925,7 @@
       }
     }
   ],
-  "updated_at": 1792800641.3537476,
+  "updated_at": 1792800742.4771898,
   "user_stopped_at": 1792778235.6917784,
   "archived_jobs": {
     "304457e9-6577-44f0-af17-97841a9f6720": {
@@ -48156,7 +48244,7 @@
       "saved_frames": 6
     }
   },
-  "last_git_checkpoint": 1792800241.865283,
+  "last_git_checkpoint": 1792800644.0689416,
   "summary": {
     "jobs": {
       "processing": 1,
