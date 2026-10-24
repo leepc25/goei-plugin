@@ -263,8 +263,8 @@
       "two-footed-jump": "game-src/art/field/production/motion-inputs/jaemtri/two-footed-jump-v2/spec.json",
       "lead-jab": "game-src/art/field/production/motion-inputs/jaemtri/lead-jab-repair-v1/spec.json",
       "picking-up": "game-src/art/field/production/motion-inputs/jaemtri/picking-up-repair-v1/spec.json",
-      "running-8-frames": "game-src/art/field/production/motion-inputs/jaemtri/running-8-frames-measured-reference-v3/spec.json",
-      "running-jump": "game-src/art/field/production/motion-inputs/jaemtri/running-jump-measured-reference-v4/spec.json",
+      "running-8-frames": "game-src/art/field/production/motion-inputs/jaemtri/running-8-frames-arms-v5/spec.json",
+      "running-jump": "game-src/art/field/production/motion-inputs/jaemtri/running-jump-arms-v5/spec.json",
       "running-slide": "game-src/art/field/production/motion-inputs/jaemtri/running-slide-measured-reference-v3/spec.json",
       "crouched-walking": "game-src/art/field/production/motion-inputs/jaemtri/crouched-walking-repair-v1/spec.json",
       "front-flip": "game-src/art/field/production/motion-inputs/jaemtri/front-flip-measured-reference-v4/spec.json",
@@ -298,6 +298,11 @@
       "jumping-1": "game-src/art/field/production/motion-inputs/geshugan/jumping-1-v1/spec.json",
       "jumping-2": "game-src/art/field/production/motion-inputs/geshugan/jumping-2-v1/spec.json",
       "two-footed-jump": "game-src/art/field/production/motion-inputs/geshugan/two-footed-jump-v1/spec.json"
+    },
+    "rojemon": {
+      "jumping-1": "game-src/art/field/production/motion-inputs/rojemon/jumping-1-v1/spec.json",
+      "jumping-2": "game-src/art/field/production/motion-inputs/rojemon/jumping-2-v1/spec.json",
+      "two-footed-jump": "game-src/art/field/production/motion-inputs/rojemon/two-footed-jump-v1/spec.json"
     }
   }
 }

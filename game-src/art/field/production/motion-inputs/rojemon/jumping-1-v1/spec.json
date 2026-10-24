@@ -2,7 +2,7 @@
   "slug": "rojemon",
   "slot": "jumping-1",
   "character_id": "27643078-cb88-455f-abf5-3be5bdb3ff68",
-  "skeleton_visually_reviewed": false,
+  "skeleton_visually_reviewed": true,
   "first_frame_path": "game-src/art/field/production/motion-inputs/rojemon/first-frame.png",
   "new_user_approval": false,
   "landmark_source": "current character own east estimated 2d reference",
@@ -844,5 +844,6 @@
     "template_id": "mannequin",
     "seed": 2026110000,
     "no_background": true
-  }
+  },
+  "review_findings": "AVIF 긴 보라 웨이브/앞머리/보라 눈/스커트 정장, 보충 로어 작은 체격 및 잘록한 허리 확인. 160–165cm 보충 범위, 유지 원본 무변경. own east 관절/전체 자세 경계 열람."
 }

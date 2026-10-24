@@ -1,0 +1,9 @@
+{
+  "frame_index": 4,
+  "source_job_id": "5798bb45-4918-4b31-88a1-0026c782d179",
+  "source_frame_index": 1,
+  "target_pose_index": 4,
+  "source_path": "motion-frame-candidates/jaemtri/running-slide/low-slide-4/frames/1.png",
+  "sha256": "75f9b7d01bf7625ca5fa1b52a2255662e8a3c3ca823c6b124817920bc7dde4ef",
+  "findings": "실제 관절 재측정 참조로 머리 외곽 회색 제거. 목표 낮은 미끄러짐 자세 및 다리/하이힐 온전."
+}
