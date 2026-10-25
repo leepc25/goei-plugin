@@ -260,7 +260,10 @@ def ready(path):
         return True
     except NotReady:
         return False
-    except Exception as e:
+    except Exception as e:   # 표를 쓰는 중이라 잠깐 못 읽는 일이 있어 5번까지 다시 봄
+        j["errn"] = j.get("errn", 0) + 1; j["wait"] = f"준비 오류 {j['errn']}회: {e}"
+        if j["errn"] < 5:
+            path.write_text(json.dumps(j, ensure_ascii=False)); return False
         j.update(status="failed", err=f"준비 오류: {e}", t=time.time())
         (Q / "failed" / path.name).write_text(json.dumps(j, ensure_ascii=False)); path.unlink(); return False
 
