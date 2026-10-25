@@ -218,9 +218,10 @@
  },
  "6.1_가짜관리국검사A": {
   "1": {
-   "tries": 1,
-   "checked": 1792946331.3315296,
-   "result": "멈춤(가장 많이 바뀐 장도 3%)"
+   "tries": 2,
+   "checked": 1792946780.3887906,
+   "result": "기계 실패",
+   "why": "멈춤(가장 많이 바뀐 장도 4%)"
   },
   "10": {
    "tries": 0
@@ -229,34 +230,50 @@
    "tries": 0
   },
   "12": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792946819.1087928,
+   "result": "ok"
   },
   "13": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792946821.1207929,
+   "result": "ok"
   },
   "15": {
    "tries": 0
   },
   "16": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792946787.3249106,
+   "result": "ok"
   },
   "17": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792946771.41679,
+   "result": "ok"
   },
   "18": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792946753.408789,
+   "result": "ok"
   },
   "18_1": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792946748.6407886,
+   "result": "ok"
   },
   "18_2": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792946802.860792,
+   "result": "ok"
   },
   "18_3": {
    "tries": 0
   },
   "19": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792946765.8367896,
+   "result": "ok"
   },
   "2": {
    "tries": 0,
@@ -273,8 +290,8 @@
   },
   "28": {
    "tries": 1,
-   "checked": 1792946385.5087671,
-   "result": "멈춤(가장 많이 바뀐 장도 0%)"
+   "checked": 1792946483.596773,
+   "result": "ok"
   },
   "29": {
    "tries": 0,
@@ -290,9 +307,9 @@
    "result": "ok"
   },
   "31": {
-   "tries": 1,
-   "checked": 1792946429.2607696,
-   "result": "멈춤(가장 많이 바뀐 장도 4%)"
+   "tries": 2,
+   "checked": 1792946779.7687905,
+   "result": "ok"
   },
   "32": {
    "tries": 0,
@@ -300,7 +317,9 @@
    "result": "ok"
   },
   "33": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792946761.8727894,
+   "result": "ok"
   },
   "34": {
    "tries": 0,
@@ -326,7 +345,9 @@
    "tries": 0
   },
   "39": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792946492.0007734,
+   "result": "ok"
   },
   "3_0": {
    "tries": 0,
@@ -339,10 +360,14 @@
    "result": "ok"
   },
   "41": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792946491.8527734,
+   "result": "ok"
   },
   "42": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792946824.1727931,
+   "result": "ok"
   },
   "43": {
    "tries": 0
@@ -359,10 +384,14 @@
    "result": "ok"
   },
   "9": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792946755.8285618,
+   "result": "ok"
   },
   "W": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792946733.1927876,
+   "result": "ok"
   },
   "W_1": {
    "tries": 0
@@ -1561,19 +1590,27 @@
    "tries": 0
   },
   "21": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792946498.6247737,
+   "result": "ok"
   },
   "28": {
-   "tries": 0
+   "tries": 1,
+   "checked": 1792946664.8007836,
+   "result": "멈춤(가장 많이 바뀐 장도 0%)"
   },
   "29": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792946735.7047877,
+   "result": "ok"
   },
   "3": {
    "tries": 0
   },
   "30": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792946679.1927845,
+   "result": "ok"
   },
   "31": {
    "tries": 0,
@@ -1581,28 +1618,40 @@
    "result": "ok"
   },
   "32": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792946523.1007752,
+   "result": "ok"
   },
   "33": {
    "tries": 0
   },
   "34": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792946583.7167788,
+   "result": "ok"
   },
   "35": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792946624.6807814,
+   "result": "ok"
   },
   "36": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792946723.052787,
+   "result": "ok"
   },
   "37": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792946761.4087894,
+   "result": "ok"
   },
   "38": {
    "tries": 0
   },
   "39": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792946719.2927868,
+   "result": "ok"
   },
   "3_0": {
    "tries": 0,
@@ -1610,10 +1659,14 @@
    "result": "ok"
   },
   "4": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792946685.9647849,
+   "result": "ok"
   },
   "41": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792946699.8407857,
+   "result": "ok"
   },
   "42": {
    "tries": 0
@@ -1622,13 +1675,17 @@
    "tries": 0
   },
   "44": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792946726.7887874,
+   "result": "ok"
   },
   "45": {
    "tries": 0
   },
   "5": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792946518.844775,
+   "result": "ok"
   },
   "9": {
    "tries": 0
@@ -3598,7 +3655,9 @@
  },
  "6.3_가짜관리국검사C": {
   "1": {
-   "tries": 0
+   "tries": 1,
+   "checked": 1792946680.9647846,
+   "result": "멈춤(가장 많이 바뀐 장도 2%)"
   },
   "10": {
    "tries": 0
@@ -3637,7 +3696,9 @@
    "tries": 0
   },
   "2": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792946751.8648884,
+   "result": "ok"
   },
   "20": {
    "tries": 0
@@ -3685,10 +3746,14 @@
    "tries": 0
   },
   "3_0": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792946672.880784,
+   "result": "ok"
   },
   "4": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792946721.768787,
+   "result": "ok"
   },
   "41": {
    "tries": 0
