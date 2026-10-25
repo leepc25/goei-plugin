@@ -81,7 +81,7 @@ export function drawTestPlayer(c: CanvasRenderingContext2D, clip: string, frame:
   if (!e) return false;
   const { im, m } = e;
   const f = frameOf(id, m, frame, total);
-  const k = spr(y) * 1.15; // 맨 뒤 줄 키 1.65m = 235px (eileen/player.ts CHAR_K와 같게)
+  const k = spr(y) * 1.28; // 맨 뒤 줄 키 1.65m = 235px (eileen/player.ts CHAR_K와 같게)
   const flip = m.dir === 'SW' ? dir > 0 : dir < 0;
   c.save();
   c.imageSmoothingEnabled = false;
@@ -110,7 +110,7 @@ export function drawTestMan(c: CanvasRenderingContext2D, x: number, y: number, d
 }
 
 /** 발 기준 머리 꼭대기 (화면 px, 음수, 원근 미포함 — 부르는 쪽이 persp를 곱한다) */
-export const testPlayerTop = () => -(252 - 14) * 1.15;
+export const testPlayerTop = () => -(252 - 14) * 1.28;
 export const testManTop = () => -(MAN.fy - MAN.head) * MAN_SCALE;
 
 /** 주인공 얼굴 칸 (네임텍): 얼굴이 잘 보이는 남동쪽 그림(고개 젓기 첫 장, 없으면 평상 대기). flip = 남서(왼쪽 보기)면 좌우 반전 (사용자 2026-10-25) */

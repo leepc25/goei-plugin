@@ -207,6 +207,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
   };
 
   const go = (sceneId: string, x: number, y?: number) => {
+    fieldView.worldH = sceneOf(sceneId).painted ? 700 : SCREEN_H;
     pending = { scene: sceneId, x, y };
     fadeOut = FADE;
   };

@@ -2,7 +2,8 @@
 // 월드 그림만 이만큼 옮기고, HUD는 좁은 캔버스 폭(canvas.width)에 맞춰 그린다.
 // zoom: 필드는 캔버스가 창을 꽉 채우고(세로 720이 아님) 월드를 canvas.height/720 배로 그린다.
 // 사람 그림은 zoom을 되돌려 도트 1칸이 늘 PIXEL 화면 px이 되게 하고, 원근(뒤로 갈수록 작게)을 곱한다.
-export const view = { crop: 0, cropY: 0, zoom: 1, lane: [440, 690] as [number, number] };
+/** worldH: 화면 세로에 꽉 맞출 월드 높이. 관리국 그림 배경은 700(그림 높이), 나머지는 720 (사용자 2026-10-25: 100% = 배경 세로가 창에 꽉) */
+export const view = { crop: 0, cropY: 0, zoom: 1, lane: [440, 690] as [number, number], worldH: 720 };
 
 /** 필드 원근: 줄 맨 뒤 0.85배 ~ 맨 앞 1배 */
 export const FAR = 0.85;
