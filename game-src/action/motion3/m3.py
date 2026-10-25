@@ -291,6 +291,8 @@ def enq(key, rows, dsuf=""):
     pr = order().index(key)
     for n in rows:
         if n not in T["rows"]: print("표에 없음/프롬프트 없음:", n); continue
+        if len(T["rows"][n]["pose"]) > 300 or len(T["subject"]) > 300:
+            print(f"안 넣음 {n}: Starting pose({len(T['rows'][n]['pose'])}자)·Subject({len(T['subject'])}자)는 300자까지"); continue
         f = folder(n, dsuf)
         for s in ("pending", "running"):
             if any(Q.glob(f"{s}/*__{key}__{f}.json")): print("이미 큐에 있음:", f); break
