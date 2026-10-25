@@ -1,6 +1,6 @@
 """에일린 테스트룸(동작 45개를 키로 직접 조종) 한 파일 HTML을 만든다.
 사용: python3 game-src/action/eileen/testroom/build.py → motion_v3/에일린_테스트룸.html"""
-import base64, io, json
+import base64, io, json, math
 from pathlib import Path
 from PIL import Image
 
@@ -72,7 +72,7 @@ for aid, folder, d, name in LIST:
                 for x in range(xmax): px[x, y] = (0, 0, 0, 0)
     w, h = ims[0].size
     sheet = Image.new("RGBA", (w * len(ims), h))
-    bot, reach, top, mz, foot, cx, flash = [], [], [], [], [], [], []
+    bot, reach, top, mz, foot, cx, flash, ang = [], [], [], [], [], [], [], []
     for i, im in enumerate(ims):
         sheet.paste(im, (i * w, 0))
         bb = im.getchannel("A").point(lambda v: 255 if v > 40 else 0).getbbox() or (0, 0, w, h)
@@ -104,8 +104,19 @@ for aid, folder, d, name in LIST:
                         if best is None or x > best[0]: best = (x, y)
                         break
             mz.append([best[0] - w // 2, best[1]] if best else [40, h // 2])
+            pts = []
+            if best:
+                for y in range(max(0, best[1] - 25), min(h, best[1] + 25)):
+                    for x in range(max(0, best[0] - 45), best[0] + 1):
+                        c = px[x, y]
+                        if (x, y) in body and 0.3 * c[0] + 0.59 * c[1] + 0.11 * c[2] < 110 and max(c[:3]) - min(c[:3]) < 35: pts.append((x, y))
+            if len(pts) > 8:   # 기울기 = 공분산/분산
+                mxx = sum(p[0] for p in pts) / len(pts); myy = sum(p[1] for p in pts) / len(pts)
+                vx = sum((p[0] - mxx) ** 2 for p in pts); cv_ = sum((p[0] - mxx) * (p[1] - myy) for p in pts)
+                ang.append(round(math.atan2(cv_ / vx if vx else 0, 1), 3))
+            else: ang.append(0)
     buf = io.BytesIO(); sheet.save(buf, "PNG", optimize=True)  # WebP는 일부 앱 보기 화면에서 안 나옴
-    data[aid] = dict(name=name, dir=d, n=len(ims), w=w, h=h, bot=bot, top=top, reach=reach, foot=foot, mz=mz, cx=cx, flash=flash, floor=max(bot),
+    data[aid] = dict(name=name, dir=d, n=len(ims), w=w, h=h, bot=bot, top=top, reach=reach, foot=foot, mz=mz, cx=cx, flash=flash, ang=ang, floor=max(bot),
                      src="data:image/png;base64," + base64.b64encode(buf.getvalue()).decode())
 # PixelLab VFX(이펙트 그림): vfx/<이름>.png + .json
 VFX = {}
