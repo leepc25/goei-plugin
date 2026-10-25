@@ -98,9 +98,9 @@ function impactOf(id) { const a = A[id]; let imp = 1; for (let f = 1; f < a.n; f
 function atkSeq(id, heavy) {
   const a = A[id], imp = impactOf(id), s = [];
   for (let f = 0; f < a.n; f++) {
-    if (f < imp) s.push({ f, d: f === 0 ? 0.025 : (heavy ? 0.045 : 0.03) });
-    else if (f === imp) s.push({ f, d: heavy ? 0.1 : 0.055, ev: heavy ? 'hitH' : 'hit' });
-    else s.push({ f, d: heavy ? 0.04 : 0.03, cancel: true });
+    if (f < imp) s.push({ f, d: f === 0 ? 0.04 : (heavy ? 0.06 : 0.045) });
+    else if (f === imp) s.push({ f, d: heavy ? 0.13 : 0.08, ev: heavy ? 'hitH' : 'hit' });
+    else s.push({ f, d: heavy ? 0.06 : 0.05, cancel: true });
   }
   return s;
 }
@@ -159,7 +159,9 @@ function framePt(id, f, px, py) {
   return { x: P.x + (flip ? -px : px) * k, y: P.y - P.z - (base - py) * k };
 }
 const isAir = id => P.mode === 'air' && (id === '7' || id === '14');
-function muzzle() { const id = P.clip ? P.clip.id : 'W', f = curF(), a = A[id]; const m = (a.mz && a.mz[f]) || [a.reach[f], a.h * 0.45]; return framePt(id, f, m[0] + 3, m[1]); }
+function muzzle() { const id = P.clip ? P.clip.id : 'W', f = curF(), a = A[id]; const m = (a.mz && a.mz[f]) || [a.reach[f], a.h * 0.45]; return framePt(id, f, m[0] + 1, m[1]); }
+const mzAng = () => { const id = P.clip ? P.clip.id : 'W', a = A[id]; return (a.ang && a.ang[curF()]) || 0; };   // 이 장의 총열 각도(아래가 +)
+const MZ_GAP = 30;   // 총알 그림은 총구에서 이만큼(그림 px × 크기) 띄운 곳부터 나타남
 
 // ── 효과 ──
 function sparks(x, y, n, big, col) {
@@ -181,7 +183,7 @@ function hurtDummy(dmg, kind, hx, hy) {
   if (D.mark > 0) dmg = Math.round(dmg * 1.5);
   D.hp = Math.max(0, D.hp - dmg); D.hits++; if (!(P.clip && (P.clip.id === '25' || P.clip.id === '25_1'))) gainSp(dmg * 0.45); D.hitT = 1.0; D.flash = 0.09;
   const big = kind !== 'light', air = D.z > 0 || D.vz > 0;
-  D.stag = kind === 'launch' ? 0.9 : big ? 0.42 : 0.24;
+  D.stag = kind === 'launch' ? 0.9 : big ? 0.5 : 0.34;
   D.va += P.face * (kind === 'launch' ? 7 : big ? 4.5 : 2);
   if (kind === 'spike' && air) { D.vz = -1100; D.vx = P.face * 120; D.juggle++; }               // 공중 강공격: 바닥에 내리꽂음 → 튕김
   else if (kind === 'launch') { D.vz = air ? Math.max(D.vz, 720) : 980; D.vx = P.face * 90; D.juggle = air ? D.juggle + 1 : 0; D.bounced = false; }   // 약2 → 강: 높이 띄움
@@ -202,7 +204,7 @@ function fireEv(e) {
     const p = framePt(id, f, a.reach[f], a.h * (e.hy || 0.42));   // 슬라이딩은 발끝 높이(hy)
     if (inReach(p.x, big ? 100 : 70, P.y - p.y)) {   // 때리는 높이 = 바닥에서 타점까지
       // 맞았을 때만: 살짝 멈춤 + 샌드백 경직
-      hitstop = big ? 0.12 : 0.04; shake = big ? 14 : 5; dShake = big ? 9 : 5;
+      hitstop = big ? 0.16 : 0.085; shake = big ? 16 : 8; dShake = big ? 11 : 7;
       hurtDummy(big ? 34 : 12, e.kind || (e.ev === 'hitL' ? 'launch' : big ? 'heavy' : 'light'), p.x, p.y);
       sfx('hit', { strength: big ? 3 : 1, kind: KICK.has(id) ? 'kick' : undefined });
       const cx = D.x - P.face * 18 * K(D.y);
@@ -226,7 +228,7 @@ function fireEv(e) {
     muzzleFlash(p, big || e.ev === 'shotS'); sfx('shot');
     const hitD = showDummy && Math.abs(D.y - P.y) < 60 && (D.x - P.x) * P.face > 0;
     const endX = hitD ? D.x - P.face * 14 : (P.face > 0 ? W + 20 : -20);
-    if (VFX.tracer) { const tt = Math.abs(endX - p.x) / 3400; { const dy0 = (Math.random() - 0.5) * 8; fx.push({ k: 'bullet', x: p.x + P.face * 50, y: p.y + dy0, x2: endX, y2: p.y + dy0 * 4 + (Math.random() - 0.5) * 30, t: tt, t0: tt }); } if (hitD) later(tt, () => { if (!vfx('bullet_hit_body', endX, p.y, 2)) sparks(endX, p.y, 4, false, '#fff6d0'); }); } else fx.push({ k: 'tracer', x: p.x, y: p.y, x2: endX, t: big ? 0.12 : 0.06, big });
+    if (VFX.tracer) { const tt = Math.abs(endX - p.x) / 3400; { const g = mzAng(), gp = MZ_GAP * K(P.y), sx = p.x + P.face * Math.cos(g) * gp, sy = p.y + Math.sin(g) * gp; fx.push({ k: 'bullet', x: sx, y: sy, x2: endX, y2: sy + Math.abs(endX - sx) * Math.tan(g) + (Math.random() - 0.5) * 24, t: tt, t0: tt }); } if (hitD) later(tt, () => { if (!vfx('bullet_hit_body', endX, p.y, 2)) sparks(endX, p.y, 4, false, '#fff6d0'); }); } else fx.push({ k: 'tracer', x: p.x, y: p.y, x2: endX, t: big ? 0.12 : 0.06, big });
     shake = Math.max(shake, big ? 9 : 2.5);
     if (hitD) { sfx('hit', { strength: big ? 2 : 1, kind: 'bullet' }); hurtDummy(big ? 40 : e.ev === 'shotS' ? 9 : 7, big ? 'heavy' : 'light'); sparks(endX, p.y, big ? 16 : 5, big); if (big) hitstop = 0.08; }
   } else if (e.ev === 'beam') {
@@ -242,17 +244,14 @@ function fireEv(e) {
   } else if (e.ev === 'cut') { sfx('super'); cut = 1.1; dark = 2.6; flash = 0.15; hitstop = 0.25; }
   else if (e.ev === 'scan') { sfx('ability'); fx.push({ k: 'scan', x: P.x, y: P.y - 190, dir: P.face, t: 0.55, t0: 0.55 }); }
   else if (e.ev === 'mark') { if (showDummy) { D.mark = 6; ring(D.x, D.y - 230, 40, 0.3, '#ff5a4a', 3); } }
-  else if (e.ev === 'sup') {   // 제압사격: 총열 각도 ±15°로 쏟아부음 — 맞으면 밀려나고 경직(못 움직임)
+  else if (e.ev === 'sup') {   // 제압사격: 앞 땅 부채꼴에 쏟아부음 — 맞으면 밀려나고 경직(못 움직임)
     const p = muzzle(); sfx('shot');
-    const okA = (a.ang || []).filter(v => v > 0.1), base = okA.length ? okA.reduce((x, y) => x + y, 0) / okA.length : 0.35;   // 총열이 아래로 향한 각도(장마다 맞춘 값 중 믿을 만한 것의 평균)
-    const spread = (Math.random() - 0.5) * (30 * Math.PI / 180);
-    const ang = base + spread, dir = P.face, cosA = Math.cos(ang), sinA = Math.sin(ang);
-    // 바닥(발 높이)에 닿는 거리, 거의 수평이면 최대 700
-    const drop = P.y - p.y, dist = sinA > 0.05 ? Math.min(700, drop / sinA * cosA) : 700;
-    const gx = p.x + dir * dist, gy = sinA > 0.05 ? Math.min(P.y + 20, p.y + dist * sinA / cosA) : p.y + dist * Math.tan(ang);
+    // 탄착 = 사용자가 그려 준 부채꼴(2026-10-25): 총구에서 앞으로 (총구~발 높이)의 1.25~2.65배 거리 땅에 고르게 촘촘히 — 약 21°~39° 아래
+    const dir = P.face, drop = Math.max(40, P.y - p.y), dist = drop * (1.25 + Math.random() * 1.4);
+    const gx = p.x + dir * dist, gy = P.y + (Math.random() - 0.5) * 18 * K(P.y), ang = Math.atan2(gy - p.y, dist), cosA = Math.cos(ang), sinA = Math.sin(ang);
     fx.push({ k: 'shell', x: p.x - dir * 30, y: p.y, vx: -dir * (80 + Math.random() * 80), vy: -220 - Math.random() * 120, g: P.y, t: 1.2 });
-    const tt = Math.hypot(gx - p.x, gy - p.y) / 3200;
-    if (VFX.tracer) fx.push({ k: 'bullet', x: p.x + dir * cosA * 50, y: p.y + sinA * 50, x2: gx, y2: gy, t: tt, t0: tt });
+    const gp = MZ_GAP * K(P.y), sx = p.x + dir * cosA * gp, sy = p.y + sinA * gp, tt = Math.hypot(gx - sx, gy - sy) / 3200;
+    if (VFX.tracer) fx.push({ k: 'bullet', x: sx, y: sy, x2: gx, y2: gy, t: tt, t0: tt });
     later(tt, () => { sparks(gx, gy - 3, 4, false, '#ffe9a0'); if (Math.random() < 0.4) dust(gx, gy, 1, 0.4); });
     shake = Math.max(shake, 4);
     // 맞음: 샌드백이 총알 줄 위(앞쪽, 같은 줄)에 있으면
@@ -819,7 +818,8 @@ function drawSheets(under = false) {
     if (!!e.under !== under) continue;
     if (e.k === 'bullet' && VFX.tracer && VFX.tracer.img.complete) {   // 예광탄: 총구에서 맞는 자리까지 날아감
       const k = 1 - e.t / e.t0, x = e.x + (e.x2 - e.x) * k, y = e.y + (e.y2 - e.y) * k, [fx0, fy0, fw, fh] = sheetFrame(VFX.tracer, (e.t0 - e.t) % vfxDur('tracer'));
-      ctx.save(); ctx.translate(x, y); ctx.rotate(Math.atan2(e.y2 - e.y, e.x2 - e.x)); const sx = fx0 + fw * 0.62, sw = fw * 0.38; ctx.drawImage(VFX.tracer.img, sx, fy0, sw, fh, -sw * 2.4, -fh * 1.1, sw * 2.4, fh * 2.2); ctx.restore();   // 그림의 앞쪽(밝은 머리) 38%만 = 짧은 총알 한 발
+      const L = fw * 0.38 * 2.4, vis = Math.min(L, Math.hypot(x - e.x, y - e.y) + 4), sw = vis / 2.4;   // 출발점 뒤로는 안 그림(꼬리가 총에 겹치지 않게)
+      ctx.save(); ctx.translate(x, y); ctx.rotate(Math.atan2(e.y2 - e.y, e.x2 - e.x)); ctx.drawImage(VFX.tracer.img, fx0 + fw - sw, fy0, sw, fh, -vis, -fh * 1.1, vis, fh * 2.2); ctx.restore();   // 그림의 앞쪽(밝은 머리) 38%만 = 짧은 총알 한 발
     }
     if (e.k === 'beamS' && VFX.charge_beam && VFX.charge_beam.img.complete) {   // 충전 광선: 그림을 가로로 이어 붙임
       const v = VFX.charge_beam, [fx0, fy0, fw, fh] = sheetFrame(v, (e.t0 - e.t) % vfxDur('charge_beam')), sc = e.sy * (0.5 + 0.5 * e.t / e.t0);

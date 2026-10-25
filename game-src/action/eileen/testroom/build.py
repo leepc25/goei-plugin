@@ -36,6 +36,70 @@ def main_mask(im):   # 불투명 픽셀 중 가장 큰 8방향 연결 덩어리
                 if len(comp) > len(best): best = comp
     return best
 
+def is_dark(c): return c[3] > 40 and max(c[:3]) - min(c[:3]) < 40 and sum(c[:3]) < 330
+def is_flash(c): return c[3] > 40 and ((c[0] > 200 and c[1] > 150 and c[2] < 200) or min(c[:3]) > 230)
+def find_muzzle(im):
+    """총구 끝 (x, 총열 가운데 y)와 총열 각도(라디안, 아래가 +). 총 = 어두운 픽셀이 이어진 큰 덩어리의 가는 앞 끝.
+    그림 불꽃이 있으면 각도는 불꽃 줄기 방향."""
+    px = im.load(); w, h = im.size
+    bb = im.getchannel('A').point(lambda v: 255 if v > 40 else 0).getbbox()
+    y0, y1 = bb[1] + int((bb[3] - bb[1]) * 0.05), bb[1] + int((bb[3] - bb[1]) * 0.48)
+    D = {(x, y) for y in range(y0, y1) for x in range(int(w * 0.3), w) if is_dark(px[x, y])}
+    seen = set(); big = set()
+    for p in D:
+        if p in seen: continue
+        comp = []; st = [p]; seen.add(p)
+        while st:
+            q = st.pop(); comp.append(q)
+            for dx in (-1, 0, 1):
+                for dy in (-1, 0, 1):
+                    n = (q[0] + dx, q[1] + dy)
+                    if n in D and n not in seen: seen.add(n); st.append(n)
+        if len(comp) > 150: big |= set(comp)
+    if not big: return None
+    def run(x, y):   # (x, y)가 든 세로 줄 위·아래 끝
+        a = b = y
+        while (x, a - 1) in big: a -= 1
+        while (x, b + 1) in big: b += 1
+        return a, b
+    def thin(x, y):  # 뒤로 6칸 동안 세로 두께 10 이하 = 총열
+        cy = y
+        for xx in range(x, x - 6, -1):
+            col = [yy for yy in range(int(cy) - 3, int(cy) + 4) if (xx, yy) in big]
+            if not col: return False
+            a, b = run(xx, min(col, key=lambda v: abs(v - cy)))
+            if b - a > 10: return False
+            cy = (a + b) / 2
+        return True
+    tip = max((p for p in big if thin(*p)), key=lambda p: p[0], default=None) or max(big, key=lambda p: p[0])
+    tx = tip[0]
+    a, b = run(tx, tip[1]); a2, b2 = run(tx - 1, int((a + b) / 2)) if (tx - 1, int((a + b) / 2)) in big else (a, b)
+    ty = (a + b + a2 + b2) / 4
+    # 불꽃(노랑) 줄기 방향
+    F = [(x, y) for y in range(max(0, int(ty) - 60), min(h, int(ty) + 60)) for x in range(tx + 6, w)
+         if px[x, y][3] > 40 and px[x, y][0] > 200 and px[x, y][1] > 150 and px[x, y][2] < 140 and abs(y - ty) < (x - tx)]
+    if len(F) > 40:
+        num = sum((x - tx) * (y - ty) for x, y in F); den = sum((x - tx) ** 2 for x, y in F)
+        return tx, ty, math.atan(num / den), True
+    # 총열 윗면을 뒤로 18px 따라가며 맞춤
+    pts = []; cy = ty
+    for x in range(tx, tx - 18, -1):
+        col = [y for y in range(int(cy) - 4, int(cy) + 5) if (x, y) in big]
+        if not col: continue
+        c0 = min(col, key=lambda y: abs(y - cy)); a = bq = c0
+        while (x, a - 1) in big and c0 - a < 4: a -= 1
+        while (x, bq + 1) in big and bq - c0 < 4: bq += 1
+        cy = (a + bq) / 2; pts.append((x, a))
+    k = 0.0
+    if len(pts) > 6:
+        for _ in range(2):
+            mx_ = sum(p[0] for p in pts) / len(pts); my = sum(p[1] for p in pts) / len(pts)
+            vx = sum((p[0] - mx_) ** 2 for p in pts) or 1; k = sum((p[0] - mx_) * (p[1] - my) for p in pts) / vx
+            res = [abs(p[1] - (my + k * (p[0] - mx_))) for p in pts]
+            lim = sorted(res)[int(len(res) * 0.75)] + 0.6
+            pts = [p for p, r in zip(pts, res) if r <= lim]
+    return tx, ty, math.atan(k), False
+
 data = {}
 for aid, folder, d, name in LIST:
     fs = sorted((M / folder).glob("[0-9][0-9].png"))
@@ -73,6 +137,7 @@ for aid, folder, d, name in LIST:
     w, h = ims[0].size
     sheet = Image.new("RGBA", (w * len(ims), h))
     bot, reach, top, mz, foot, cx, flash, ang = [], [], [], [], [], [], [], []
+    mzn, angn, fln = [], [], []
     for i, im in enumerate(ims):
         sheet.paste(im, (i * w, 0))
         bb = im.getchannel("A").point(lambda v: 255 if v > 40 else 0).getbbox() or (0, 0, w, h)
@@ -115,6 +180,12 @@ for aid, folder, d, name in LIST:
                 vx = sum((p[0] - mxx) ** 2 for p in pts); cv_ = sum((p[0] - mxx) * (p[1] - myy) for p in pts)
                 ang.append(round(math.atan2(cv_ / vx if vx else 0, 1), 3))
             else: ang.append(0)
+            r = find_muzzle(im)   # 새 찾기: 총 끝(불꽃과 맞닿은 곳) + 불꽃 줄기 방향
+            if r: mzn.append([r[0] - w // 2, round(r[1], 1)]); angn.append(round(r[2], 3)); fln.append(r[3])
+            else: mzn.append(mz[-1]); angn.append(ang[-1]); fln.append(False)
+    if any(fln):   # 그림 불꽃이 있는 동작(15·22_1·25): 새 총구점, 불꽃 없는 장의 각도는 가까운 불꽃 장 것
+        fi = [i for i, v in enumerate(fln) if v]
+        mz = mzn; ang = [angn[i] if fln[i] else angn[min(fi, key=lambda j: abs(j - i))] for i in range(len(ims))]
     buf = io.BytesIO(); sheet.save(buf, "PNG", optimize=True)  # WebP는 일부 앱 보기 화면에서 안 나옴
     data[aid] = dict(name=name, dir=d, n=len(ims), w=w, h=h, bot=bot, top=top, reach=reach, foot=foot, mz=mz, cx=cx, flash=flash, ang=ang, floor=max(bot),
                      src="data:image/png;base64," + base64.b64encode(buf.getvalue()).decode())
