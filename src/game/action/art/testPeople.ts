@@ -19,8 +19,8 @@ const MAN = { w: 128, h: 256, fx: 66, fy: 249, head: 8 };
 export function prepareTestPeople(urlOf?: (file: string) => Promise<string>, bytesOf?: (file: string) => Promise<Uint8Array | null>) {
   const own = ++revision;
   art = null;
-  const img = async (file: string) => {
-    const src = window.__GOEI_TEST_PEOPLE__?.[file] || (urlOf ? await urlOf(file + '.png') : '');
+  const img = async (file: string, ext = '.png') => {
+    const src = window.__GOEI_TEST_PEOPLE__?.[file] || (urlOf ? await urlOf(file + ext) : '');
     if (!src) throw new Error('no test art');
     const im = new Image(); im.src = src; await im.decode();
     return im;
@@ -32,7 +32,7 @@ export function prepareTestPeople(urlOf?: (file: string) => Promise<string>, byt
       if (b) meta = JSON.parse(new TextDecoder().decode(b));
     }
     if (!meta) throw new Error('no eileen');
-    const rows = await Promise.all(Object.entries(meta).map(async ([id, m]) => [id, { im: await img(`eileen_${id}`), m }] as const));
+    const rows = await Promise.all(Object.entries(meta).map(async ([id, m]) => [id, { im: await img(`eileen_${id}`, '.webp'), m }] as const));
     const man = await img('man');
     if (revision === own) art = { clips: Object.fromEntries(rows), man };
   })().catch(() => { /* 없으면 원래 쟈알디 그림 */ });

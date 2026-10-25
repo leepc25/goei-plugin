@@ -191,7 +191,9 @@ await build({ ...common, entryPoints: ['src/game/action/engine/demo.ts'], format
       const dir = `${bgDir}/${place}/${sub}`;
       if (!existsSync(dir)) continue;
       for (const f of readdirSync(dir).filter((f) => f.endsWith('.png'))) {
-        (bg[place] ??= {})[sub + f.slice(0, -4)] = `data:image/png;base64,${readFileSync(dir + f).toString('base64')}`;
+        // 무손실 WebP 사본(tools/bg_dot_webp.py)이 있으면 그것을 넣는다: 시연판 용량
+        const wp = `game-src/art/bg/dot-webp/${place}/${sub}${f.slice(0, -4)}.webp`;
+        (bg[place] ??= {})[sub + f.slice(0, -4)] = existsSync(wp) ? `data:image/webp;base64,${readFileSync(wp).toString('base64')}` : `data:image/png;base64,${readFileSync(dir + f).toString('base64')}`;
       }
     }
   }
@@ -208,8 +210,8 @@ await build({ ...common, entryPoints: ['src/game/action/engine/demo.ts'], format
     startRoom[key] = `data:image/png;base64,${readFileSync(`game-pack/start-room/${key}.png`).toString('base64')}`;
   }
   const testPeople = {};
-  for (const f of readdirSync('game-pack/test-people').filter((f) => f.endsWith('.png') && !f.startsWith('woman_'))) {
-    testPeople[f.slice(0, -4)] = `data:image/png;base64,${readFileSync(`game-pack/test-people/${f}`).toString('base64')}`;
+  for (const f of readdirSync('game-pack/test-people').filter((f) => /\.(png|webp)$/.test(f) && !f.startsWith('woman_'))) {
+    testPeople[f.replace(/\.(png|webp)$/, '')] = `data:image/${f.endsWith('.webp') ? 'webp' : 'png'};base64,${readFileSync(`game-pack/test-people/${f}`).toString('base64')}`;
   }
   testPeople.eileen = JSON.parse(readFileSync('game-pack/test-people/eileen.json', 'utf8'));
   const hqDoor = {};
