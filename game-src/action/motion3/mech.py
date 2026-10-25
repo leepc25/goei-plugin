@@ -58,7 +58,7 @@ def run(rows):
             if not bad:
                 r["result"] = "ok"; subprocess.run([sys.executable, str(BASE / "m3.py"), "ok", k, f], capture_output=True)
                 print(time.strftime("%H:%M:%S"), k, f, "통과", flush=True)
-            elif r["tries"] < 2:
+            elif r["tries"] < 1:
                 r["tries"] += 1; r["result"] = bad
                 subprocess.run([sys.executable, str(BASE / "m3.py"), "enq", k, f.replace("_", "-")], capture_output=True)
                 print(time.strftime("%H:%M:%S"), k, f, bad, "→ 다시 넣음", r["tries"], flush=True)

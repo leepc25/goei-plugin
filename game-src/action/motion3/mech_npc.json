@@ -310,8 +310,8 @@
   },
   "3": {
    "tries": 1,
-   "checked": 1792946884.3487966,
-   "result": "멈춤(가장 많이 바뀐 장도 0%)"
+   "checked": 1792948243.3208776,
+   "result": "ok"
   },
   "30": {
    "tries": 0,
@@ -1573,7 +1573,9 @@
    "result": "ok"
   },
   "11": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948181.5648737,
+   "result": "ok"
   },
   "12": {
    "tries": 0,
@@ -1601,7 +1603,9 @@
    "result": "ok"
   },
   "18": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948131.4608707,
+   "result": "ok"
   },
   "18_1": {
    "tries": 0,
@@ -1609,7 +1613,9 @@
    "result": "ok"
   },
   "18_2": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948177.9768736,
+   "result": "ok"
   },
   "18_3": {
    "tries": 0,
@@ -3717,16 +3723,19 @@
  "6.3_가짜관리국검사C": {
   "1": {
    "tries": 2,
-   "checked": 1792947937.0768592,
-   "result": "멈춤(가장 많이 바뀐 장도 1%)"
+   "checked": 1792948127.6328707,
+   "result": "기계 실패",
+   "why": "멈춤(가장 많이 바뀐 장도 1%)"
   },
   "10": {
    "tries": 1,
-   "checked": 1792947470.4328315,
-   "result": "멈춤(가장 많이 바뀐 장도 7%)"
+   "checked": 1792948089.0888684,
+   "result": "ok"
   },
   "11": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948268.0528789,
+   "result": "ok"
   },
   "12": {
    "tries": 0,
@@ -3795,8 +3804,8 @@
   },
   "28": {
    "tries": 2,
-   "checked": 1792947895.0688567,
-   "result": "멈춤(가장 많이 바뀐 장도 0%)"
+   "checked": 1792948131.7208707,
+   "result": "ok"
   },
   "29": {
    "tries": 0,
@@ -3805,18 +3814,18 @@
   },
   "3": {
    "tries": 2,
-   "checked": 1792947797.936851,
-   "result": "멈춤(가장 많이 바뀐 장도 4%)"
+   "checked": 1792948145.3248715,
+   "result": "ok"
   },
   "30": {
    "tries": 2,
-   "checked": 1792947789.9568505,
-   "result": "멈춤(가장 많이 바뀐 장도 3%)"
+   "checked": 1792948115.1648698,
+   "result": "ok"
   },
   "31": {
    "tries": 1,
-   "checked": 1792947532.699959,
-   "result": "멈춤(가장 많이 바뀐 장도 4%)"
+   "checked": 1792948060.7735877,
+   "result": "ok"
   },
   "32": {
    "tries": 0,
@@ -3834,7 +3843,9 @@
    "result": "ok"
   },
   "35": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948101.7128692,
+   "result": "ok"
   },
   "36": {
    "tries": 0,
@@ -3872,7 +3883,9 @@
    "result": "ok"
   },
   "42": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948142.6968715,
+   "result": "ok"
   },
   "43": {
    "tries": 0,
@@ -6522,46 +6535,74 @@
    "result": "ok"
   },
   "10": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948277.9168794,
+   "result": "ok"
   },
   "11": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948413.0648875,
+   "result": "ok"
   },
   "12": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948247.2928777,
+   "result": "ok"
   },
   "13": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948241.4848773,
+   "result": "ok"
   },
   "15": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948386.596886,
+   "result": "ok"
   },
   "16": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948254.388878,
+   "result": "ok"
   },
   "17": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948245.9847403,
+   "result": "ok"
   },
   "18": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948249.364878,
+   "result": "ok"
   },
   "18_1": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948278.3688796,
+   "result": "ok"
   },
   "18_2": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948291.1928804,
+   "result": "ok"
   },
   "18_3": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948552.136896,
+   "result": "ok"
   },
   "19": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948315.7968817,
+   "result": "ok"
   },
   "2": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948057.4328663,
+   "result": "ok"
   },
   "20": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948525.7848942,
+   "result": "ok"
   },
   "21": {
    "tries": 0,
@@ -6569,76 +6610,124 @@
    "result": "ok"
   },
   "28": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948108.3768694,
+   "result": "ok"
   },
   "29": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948063.5728667,
+   "result": "ok"
   },
   "3": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948223.3448763,
+   "result": "ok"
   },
   "30": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948067.984867,
+   "result": "ok"
   },
   "31": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948094.6888685,
+   "result": "ok"
   },
   "32": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948139.1688712,
+   "result": "ok"
   },
   "33": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948289.2208803,
+   "result": "ok"
   },
   "34": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948116.94487,
+   "result": "ok"
   },
   "35": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948187.6528742,
+   "result": "ok"
   },
   "36": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948170.6608732,
+   "result": "ok"
   },
   "37": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948292.0608804,
+   "result": "ok"
   },
   "38": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948541.752895,
+   "result": "ok"
   },
   "39": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948233.180877,
+   "result": "ok"
   },
   "3_0": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948078.3167593,
+   "result": "ok"
   },
   "4": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948107.7088695,
+   "result": "ok"
   },
   "41": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948215.964876,
+   "result": "ok"
   },
   "42": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948387.684886,
+   "result": "ok"
   },
   "43": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948502.756893,
+   "result": "ok"
   },
   "44": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948334.604883,
+   "result": "ok"
   },
   "45": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948502.5408928,
+   "result": "ok"
   },
   "5": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948076.7288675,
+   "result": "ok"
   },
   "9": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948189.5928743,
+   "result": "ok"
   },
   "W": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948195.2848747,
+   "result": "ok"
   },
   "W_1": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948401.1728868,
+   "result": "ok"
   }
  },
  "6.15_경찰여1": {
@@ -6988,124 +7077,194 @@
  },
  "6.5_가짜관리국진압B": {
   "1": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948184.8288739,
+   "result": "ok"
   },
   "10": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948491.9408922,
+   "result": "ok"
   },
   "11": {
    "tries": 0
   },
   "12": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948389.488886,
+   "result": "ok"
   },
   "13": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948409.2128873,
+   "result": "ok"
   },
   "15": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948556.832896,
+   "result": "ok"
   },
   "16": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948440.9528892,
+   "result": "ok"
   },
   "17": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948378.4488854,
+   "result": "ok"
   },
   "18": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948377.4088855,
+   "result": "ok"
   },
   "18_1": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948409.9328873,
+   "result": "ok"
   },
   "18_2": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948456.5208902,
+   "result": "ok"
   },
   "18_3": {
    "tries": 0
   },
   "19": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948454.65689,
+   "result": "ok"
   },
   "2": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948203.092875,
+   "result": "ok"
   },
   "20": {
    "tries": 0
   },
   "21": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948275.6646569,
+   "result": "ok"
   },
   "28": {
-   "tries": 0
+   "tries": 1,
+   "checked": 1792948461.5408905,
+   "result": "ok"
   },
   "29": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948312.8688817,
+   "result": "ok"
   },
   "3": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948360.2488844,
+   "result": "ok"
   },
   "30": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948321.596882,
+   "result": "ok"
   },
   "31": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948296.6488807,
+   "result": "ok"
   },
   "32": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948345.8808835,
+   "result": "ok"
   },
   "33": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948434.5408888,
+   "result": "ok"
   },
   "34": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948310.3048813,
+   "result": "ok"
   },
   "35": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948350.272884,
+   "result": "ok"
   },
   "36": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948354.960884,
+   "result": "ok"
   },
   "37": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948364.5928848,
+   "result": "ok"
   },
   "38": {
    "tries": 0
   },
   "39": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948377.5248854,
+   "result": "ok"
   },
   "3_0": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948202.460875,
+   "result": "ok"
   },
   "4": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948236.8888772,
+   "result": "ok"
   },
   "41": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948363.2648847,
+   "result": "ok"
   },
   "42": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948492.9048922,
+   "result": "ok"
   },
   "43": {
    "tries": 0
   },
   "44": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948491.172892,
+   "result": "ok"
   },
   "45": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948601.5248988,
+   "result": "ok"
   },
   "5": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948232.8048768,
+   "result": "ok"
   },
   "9": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948352.492884,
+   "result": "ok"
   },
   "W": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948345.9528835,
+   "result": "ok"
   },
   "W_1": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948459.9808903,
+   "result": "ok"
   }
  },
  "6.16_경찰여2": {
@@ -7440,7 +7599,9 @@
  },
  "6.6_가짜관리국진압C": {
   "1": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948436.1488888,
+   "result": "ok"
   },
   "10": {
    "tries": 0
@@ -7479,58 +7640,87 @@
    "tries": 0
   },
   "2": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948433.0128887,
+   "result": "ok"
   },
   "20": {
    "tries": 0
   },
   "21": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948518.996894,
+   "result": "ok"
   },
   "28": {
-   "tries": 0
+   "tries": 1,
+   "checked": 1792948581.6408975,
+   "result": "기계 실패",
+   "why": "멈춤(가장 많이 바뀐 장도 0%)"
   },
   "29": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948514.2408936,
+   "result": "ok"
   },
   "3": {
    "tries": 0
   },
   "30": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948505.6807022,
+   "result": "ok"
   },
   "31": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948537.836895,
+   "result": "ok"
   },
   "32": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948563.8808966,
+   "result": "ok"
   },
   "33": {
    "tries": 0
   },
   "34": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948515.1008937,
+   "result": "ok"
   },
   "35": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948542.5808952,
+   "result": "ok"
   },
   "36": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948577.1688974,
+   "result": "ok"
   },
   "37": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948602.7128987,
+   "result": "ok"
   },
   "38": {
    "tries": 0
   },
   "39": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948580.9648976,
+   "result": "ok"
   },
   "3_0": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948456.4966877,
+   "result": "ok"
   },
   "4": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948475.0768912,
+   "result": "ok"
   },
   "41": {
    "tries": 0
@@ -7548,7 +7738,9 @@
    "tries": 0
   },
   "5": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948523.704894,
+   "result": "ok"
   },
   "9": {
    "tries": 0
@@ -7788,7 +7980,9 @@
  },
  "6.7_불량배남1": {
   "1": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948552.280896,
+   "result": "ok"
   },
   "10": {
    "tries": 0
@@ -7824,7 +8018,9 @@
    "tries": 0
   },
   "2": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948589.3888981,
+   "result": "ok"
   },
   "20": {
    "tries": 0
@@ -7872,10 +8068,14 @@
    "tries": 0
   },
   "3_0": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948566.6808968,
+   "result": "ok"
   },
   "4": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792948609.1208992,
+   "result": "ok"
   },
   "41": {
    "tries": 0
