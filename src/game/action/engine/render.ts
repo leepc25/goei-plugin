@@ -143,7 +143,7 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
     if (p.ally) sprite(p.ally.clip, p.ally.f, 0, x + (p.ally.x - p.x), y + (p.ally.y - p.y), p.ally.dir);
     const a = p.anim();
     // 필드 시험 캐릭터가 있으면 그 그림 (서기 / 움직이면 달리기)
-    if (drawTestPlayer(ctx, a.clip, x, y - z, p.dir)) return;
+    if (drawTestPlayer(ctx, a.clip, a.frame, p.clipLen(a.clip), x, y - z, p.dir)) return;
     const blink = p.invuln > 0 && w.tick % 4 < 2 ? 0.5 : 1;
     if (!sprite(a.clip, a.frame, a.origin, x, y - z, p.dir, blink)) {
       ctx.fillStyle = '#c0453a';

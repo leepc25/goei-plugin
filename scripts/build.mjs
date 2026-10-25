@@ -208,9 +208,10 @@ await build({ ...common, entryPoints: ['src/game/action/engine/demo.ts'], format
     startRoom[key] = `data:image/png;base64,${readFileSync(`game-pack/start-room/${key}.png`).toString('base64')}`;
   }
   const testPeople = {};
-  for (const key of ['eileen_idle', 'eileen_walk', 'eileen_run', 'man']) {
-    testPeople[key] = `data:image/png;base64,${readFileSync(`game-pack/test-people/${key}.png`).toString('base64')}`;
+  for (const f of readdirSync('game-pack/test-people').filter((f) => f.endsWith('.png') && !f.startsWith('woman_'))) {
+    testPeople[f.slice(0, -4)] = `data:image/png;base64,${readFileSync(`game-pack/test-people/${f}`).toString('base64')}`;
   }
+  testPeople.eileen = JSON.parse(readFileSync('game-pack/test-people/eileen.json', 'utf8'));
   const hqDoor = {};
   for (const key of ['frame', 'aperture', 'leaf-left', 'leaf-right', 'entry-marker']) {
     hqDoor[key] = `data:image/png;base64,${readFileSync(`game-pack/hq-door-round2/${key}.png`).toString('base64')}`;

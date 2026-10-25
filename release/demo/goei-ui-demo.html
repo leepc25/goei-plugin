@@ -3985,6 +3985,7 @@ var DEFAULT_SETTINGS = {
   flash: true,
   bright: 1,
   pixel: true,
+  charSize: 1.15,
   master: 0.8,
   music: 0.7,
   sfx: 0.9,
@@ -4511,6 +4512,9 @@ var TouchPad = class {
   }
 };
 
+// src/game/action/charSize.ts
+var charSize = { k: 1.15 };
+
 // src/game/action/ui/index.ts
 function mountGameShell(box2, o = {}) {
   const stage = mountStage(box2);
@@ -4541,6 +4545,7 @@ function mountGameShell(box2, o = {}) {
     stage.setCrt(settings.crt);
     stage.setBright(settings.bright);
     stage.setPixel(settings.pixel);
+    charSize.k = settings.charSize;
     fx3.opt = { shake: settings.shake, flash: settings.flash, numbers: settings.numbers };
     pad.setRumble(settings.vibrate);
     touch.refresh();
@@ -4590,6 +4595,7 @@ function mountGameShell(box2, o = {}) {
       { type: "toggle", label: "피해 숫자", get: () => s.numbers, set: (v) => s.numbers = v },
       { type: "slider", label: "밝기", get: () => s.bright, set: (v) => s.bright = v, min: 0.7, max: 1.4, step: 0.05, fmt: pct },
       { type: "toggle", label: "도트 선명하게", get: () => s.pixel, set: (v) => s.pixel = v },
+      { type: "slider", label: "캐릭터 크기", get: () => s.charSize, set: (v) => s.charSize = v, min: 0.6, max: 1.6, step: 0.05, fmt: pct },
       ...o.field ? [] : [{ type: "button", label: "전체 화면", sub: "폰은 가로로 고정", act: () => void stage.fullscreen() }],
       { type: "head", label: "소리" },
       { type: "slider", label: "전체", get: () => s.master, set: (v) => s.master = v, min: 0, max: 1, step: 0.1, fmt: pct },

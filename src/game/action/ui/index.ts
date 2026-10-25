@@ -9,6 +9,7 @@ import { Menu, choiceScreen, esc, type MenuItem, type Screen } from './menu';
 import { DEFAULT_SETTINGS, localStore, parseSettings, type SettingsStore, type UiSettings } from './settings';
 import { mountStage, type Stage } from './stage';
 import { TouchPad } from './touch';
+import { charSize } from '../charSize';
 
 export { Fx, Hud, InputHub, Menu, PadReader, TouchPad, choiceScreen };
 export type { FxEvent, TransitionKind } from './fx';
@@ -106,6 +107,7 @@ export function mountGameShell(box: HTMLElement, o: ShellOptions = {}): Shell {
     stage.setCrt(settings.crt);
     stage.setBright(settings.bright);
     stage.setPixel(settings.pixel);
+    charSize.k = settings.charSize;
     fx.opt = { shake: settings.shake, flash: settings.flash, numbers: settings.numbers };
     pad.setRumble(settings.vibrate);
     touch.refresh();
@@ -159,6 +161,7 @@ export function mountGameShell(box: HTMLElement, o: ShellOptions = {}): Shell {
       { type: 'toggle', label: '피해 숫자', get: () => s.numbers, set: (v) => (s.numbers = v) },
       { type: 'slider', label: '밝기', get: () => s.bright, set: (v) => (s.bright = v), min: 0.7, max: 1.4, step: 0.05, fmt: pct },
       { type: 'toggle', label: '도트 선명하게', get: () => s.pixel, set: (v) => (s.pixel = v) },
+      { type: 'slider', label: '캐릭터 크기', get: () => s.charSize, set: (v) => (s.charSize = v), min: 0.6, max: 1.6, step: 0.05, fmt: pct },
       ...(o.field ? [] : [{ type: 'button' as const, label: '전체 화면', sub: '폰은 가로로 고정', act: () => void stage.fullscreen() }]),
       { type: 'head', label: '소리' },
       { type: 'slider', label: '전체', get: () => s.master, set: (v) => (s.master = v), min: 0, max: 1, step: 0.1, fmt: pct },

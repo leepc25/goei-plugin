@@ -1,7 +1,8 @@
 // 관리국 층 배경 그림(game-src/art/field/hq/, 확정 6장)의 좌표 자료. 그림 px = 월드 px (세로 700, 벽·바닥 선 y420).
 // 문: 열리는 그림은 배경에서 문짝 자리를 그대로 떠서 움직인다 (art/hqField.ts). 좌표는 눈으로 잰 값(±3px).
 //  slide2 = 두 짝 미닫이(엘리베이터·자동문), swing = 여닫이 한 짝(hinge 쪽으로 접힌다), swing2 = 양여닫이, shutter = 위로 말린다.
-//  quad = 옆벽 문(원근 사다리꼴: 왼위·오위·오아래·왼아래). behind: dark = 문 안이 어둡다, car = 엘리베이터 칸, see = 유리 너머 그대로.
+//  quad = 옆벽 문(원근 사다리꼴: 왼위·오위·오아래·왼아래). behind: dark = 문 안이 어둡다, car = 엘리베이터 칸,
+//  see = 투명 유리(살짝만 열린다), lit = 젖빛 유리 너머 밝은 방(다 열린다).
 // 조명: down = 천장 다운라이트, sign = 비상구 등, lamp = 작은 등. blink가 있으면 깜빡인다(주기 ms, 켜진 비율, 어긋남).
 // 창: 바깥이 보이는 곳. 시간대(새벽·저녁·밤)에 바깥색이 바뀐다.
 export type DoorAnim = 'slide2' | 'swing' | 'swing2' | 'shutter' | 'none';
@@ -11,7 +12,7 @@ export interface PaintedDoor {
   seam?: number;
   hinge?: 'L' | 'R';
   quad?: [number, number][];
-  behind?: 'dark' | 'car' | 'see';
+  behind?: 'dark' | 'car' | 'see' | 'lit';
 }
 export interface PaintedLamp {
   x: number; y: number;
@@ -103,7 +104,7 @@ export const PAINTED: Record<string, PaintedScene> = {
       interrogation: { x0: 33, x1: 119, y0: 119, y1: 465, anim: 'swing', hinge: 'R', quad: [[33, 119], [119, 135], [119, 444], [33, 465]] },
       isolation: { x0: 385, x1: 725, y0: 122, y1: 410, anim: 'shutter' },
       elev: elev(886, 1091, 126, 432, 990),
-      clinic: { x0: 1230, x1: 1640, y0: 122, y1: 420, seam: 1435, anim: 'slide2', behind: 'see' },
+      clinic: { x0: 1230, x1: 1640, y0: 122, y1: 420, seam: 1435, anim: 'slide2', behind: 'lit' },
       archive: { x0: 1882, x1: 1966, y0: 118, y1: 472, anim: 'swing', hinge: 'L', quad: [[1882, 130], [1966, 118], [1966, 472], [1882, 452]] },
     },
     lamps: [

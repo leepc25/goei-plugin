@@ -197,6 +197,11 @@ export class Player extends Fighter {
     return { hit: hit.map(h => progressionHit(h, this.progression, h.attackId === al?.id || isBlastMove(this.moveKey) ? 'ability' : 'melee')), hurt };
   }
 
+  /** 클립 장 수 (그림 바꿔 그리기용) */
+  clipLen(clip: string): number {
+    return this.clips[clip]?.length || 1;
+  }
+
   /** 지금 보여 줄 클립·장 */
   anim(): AnimRef {
     if (this.seat) return { clip: this.seat.clip, frame: this.seat.frame, origin: 0 };

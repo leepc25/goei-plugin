@@ -64,10 +64,12 @@ function clipDoor(c: CanvasRenderingContext2D, d: PaintedDoor) {
 
 function drawBehind(c: CanvasRenderingContext2D, im: HTMLImageElement, d: PaintedDoor) {
   const w = d.x1 - d.x0, h = d.y1 - d.y0;
-  if (d.behind === 'see') {
-    // 유리 너머: 같은 자리 그림을 조금 밝게 (문짝 틀만 비켜난 것처럼)
+  if (d.behind === 'see' || d.behind === 'lit') {
+    // 유리 너머: 문틀이 겹쳐 보이지 않게 밝은 실내 빛으로 덮는다 (유리문은 살짝만 열려 틈만 보인다)
     c.drawImage(im, d.x0, d.y0, w, h, d.x0, d.y0, w, h);
-    c.fillStyle = 'rgba(255,250,235,0.12)'; c.fillRect(d.x0, d.y0, w, h);
+    const g = c.createLinearGradient(0, d.y0, 0, d.y1);
+    g.addColorStop(0, 'rgba(238,242,244,0.86)'); g.addColorStop(1, 'rgba(196,204,208,0.86)');
+    c.fillStyle = g; c.fillRect(d.x0, d.y0, w, h);
     return;
   }
   if (d.behind === 'car') {
@@ -111,23 +113,43 @@ function drawDoor(c: CanvasRenderingContext2D, im: HTMLImageElement, d: PaintedD
     }
   };
   const e = open * open * (3 - 2 * open); // 부드럽게
+  // 투명 유리문은 다 열면 뒤가 들통나서 살짝만 연다 (사용자 2026-10-25)
+  const glass = d.behind === 'see';
+  /** 여닫이 한 짝: 경첩(hx)을 축으로 안쪽으로 돈다. 폭은 cos로 줄고, 먼 끝은 원근으로 짧아지며 어두워진다.
+   *  dir = 경첩에서 문짝이 뻗는 쪽 (1 오른쪽, -1 왼쪽) */
+  const swingLeaf = (sx: number, sw: number, hx: number, dir: 1 | -1, maxDeg: number) => {
+    const th = (e * maxDeg * Math.PI) / 180;
+    const vw = sw * Math.cos(th), shrink = 0.2 * Math.sin(th), dark = 0.55 * Math.sin(th);
+    const N = Math.max(1, Math.ceil(vw / 2));
+    for (let i = 0; i < N; i++) {
+      const u0 = i / N, u1 = (i + 1) / N, hf = 1 - shrink * (u0 + u1) / 2, dh = h * hf, dy = d.y0 + (h - dh) / 2;
+      const srcX = dir > 0 ? sx + u0 * sw : sx + sw - u1 * sw;
+      const dstX = dir > 0 ? hx + u0 * vw : hx - u1 * vw;
+      c.drawImage(im, srcX, d.y0, sw / N, h, dstX, dy, vw / N + 0.6, dh);
+      if (dark > 0.01) { c.fillStyle = `rgba(8,10,14,${dark * (0.6 + 0.4 * (u0 + u1) / 2)})`; c.fillRect(dstX, dy, vw / N + 0.6, dh); }
+    }
+    // 문짝 두께 (먼 끝)
+    if (e > 0.02) {
+      const fx = hx + dir * vw, dh = h * (1 - shrink), dy = d.y0 + (h - dh) / 2, t = Math.max(2, Math.round(8 * Math.sin(th)));
+      c.fillStyle = 'rgba(24,26,30,0.92)'; c.fillRect(dir > 0 ? fx : fx - t, dy, t, dh);
+    }
+  };
   switch (d.anim) {
     case 'slide2': {
-      const s = d.seam ?? (d.x0 + d.x1) / 2, lw = s - d.x0, rw = d.x1 - s;
-      leaf(d.x0, lw, d.x0 - lw * e, lw, 0, 1);
-      leaf(s, rw, s + rw * e, rw, 0, -1);
+      const s = d.seam ?? (d.x0 + d.x1) / 2, lw = s - d.x0, rw = d.x1 - s, k = glass ? 0.2 : 1;
+      leaf(d.x0, lw, d.x0 - lw * e * k, lw, 0, 1);
+      leaf(s, rw, s + rw * e * k, rw, 0, -1);
       break;
     }
     case 'swing': {
-      // 여닫이: 경첩 쪽으로 접히며(폭이 줄며) 어두워진다
-      const vw = w * (1 - 0.86 * e);
-      leaf(d.x0, w, d.hinge === 'L' ? d.x0 : d.x1 - vw, vw, 0.45 * e, d.hinge === 'L' ? 1 : -1);
+      if (d.hinge === 'L') swingLeaf(d.x0, w, d.x0, 1, glass ? 30 : 78);
+      else swingLeaf(d.x0, w, d.x1, -1, glass ? 30 : 78);
       break;
     }
     case 'swing2': {
       const s = d.seam ?? (d.x0 + d.x1) / 2, lw = s - d.x0, rw = d.x1 - s;
-      leaf(d.x0, lw, d.x0, lw * (1 - 0.86 * e), 0.45 * e, 1);
-      leaf(s, rw, d.x1 - rw * (1 - 0.86 * e), rw * (1 - 0.86 * e), 0.45 * e, -1);
+      swingLeaf(d.x0, lw, d.x0, 1, glass ? 30 : 78);
+      swingLeaf(s, rw, d.x1, -1, glass ? 30 : 78);
       break;
     }
     case 'shutter': {
