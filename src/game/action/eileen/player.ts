@@ -18,7 +18,7 @@ export const CHAR_K = 1.15;
 /** 테스트룸 동작 이름 ↔ 엔진 버튼 */
 const PRESS: [Btn, string][] = [
   ['light', 'light'], ['heavy', 'heavy'], ['dodge', 'dodge'], ['block', 'block'], ['shoot', 'shoot'],
-  ['skill', 'skill'], ['charge', 'charge'], ['super', 'super'], ['jump', 'jump'],
+  ['skill', 'skill'], ['charge', 'charge'], ['super', 'super'], ['jump', 'jump'], ['weapon', 'weapon'],
   ['left', 'left'], ['right', 'right'], ['up', 'up'], ['down', 'down'],
 ];
 /** 테스트룸 맞음 종류 → 게임 반응 */
@@ -44,6 +44,13 @@ export class EileenPlayer extends Player {
   private started = false;
   private lastTickAt = 0;
   private lastFrameAt = 0;
+  /** 방어 게이지 0..100 (사용자 2026-10-25: 방어를 무제한으로 못 하게). 막는 동안 닳고, 막은 공격만큼 더 깎인다.
+   * 바닥나면 가드가 풀리고(맞아서 바닥나면 잠깐 휘청), 40까지 차오를 때까지 다시 못 막는다 */
+  guard = 100;
+  guardBroken = false;
+  /** 마지막으로 게이지가 줄어든 뒤 지난 초 (화면 표시가 이걸 보고 사라진다) */
+  guardIdle = 99;
+  private guardWait = 0;
   private underFn = (ctx: CanvasRenderingContext2D, camX: number) => this.drawUnder(ctx, camX);
 
   constructor(clips: Record<string, FrameInfo[]>) {
@@ -121,6 +128,15 @@ export class EileenPlayer extends Player {
     if (P.mode === 'down' || P.mode === 'belly' || this.phase === 'down') return { kind: 'immune' };
     const front = hit.dir === -P.face;
     if (P.mode === 'block' && front) {
+      this.spendGuard(14 + hit.dmg * 0.6);
+      if (this.guardBroken) {
+        // 가드 브레이크: 막던 자세가 깨지고 잠깐 휘청인다
+        this.core.onRelease('block');
+        this.core.stun();
+        P.stunT = 1.1;
+        world.emit({ type: 'guard', x: this.x });
+        return { kind: 'hit' };
+      }
       this.core.takeHit('hit');
       this.hp = Math.max(1, this.hp - Math.round(hit.dmg * 0.1));
       world.emit({ type: 'guard', x: this.x });
@@ -159,7 +175,9 @@ export class EileenPlayer extends Player {
     names.clear();
     for (const [b, n] of PRESS) if (p.held.has(b)) names.add(n);
     if (p.run) names.add('run');
-    for (const [b, n] of PRESS) if (p.pressed.has(b) && !['left', 'right', 'up', 'down'].includes(n)) this.core.onPress(n);
+    // 방어: 게이지가 다 회복되지 않았거나(깨진 뒤 40 미만) 거의 없으면 들어가지 않는다
+    if (this.guardBroken || this.guard < 8) names.delete('block');
+    for (const [b, n] of PRESS) if (p.pressed.has(b) && !['left', 'right', 'up', 'down'].includes(n) && (n !== 'block' || names.has('block'))) this.core.onPress(n);
     if (p.evade) this.core.onPress('dodge');
     for (const b of ['block', 'charge'] as Btn[]) if (p.released.has(b)) this.core.onRelease(b);
   }
@@ -197,9 +215,31 @@ export class EileenPlayer extends Player {
     this.core.frameView({ x0: w.camX, lane: w.lane });
     this.core.update(dt);
     this.core.tickMarks(dt);
+    this.guardStep(dt);
     const s = this.core.shake;
     if (s > 6) w.shake(2, Math.min(4, s / 6));
     this.sync();
+  }
+
+  private spendGuard(n: number) {
+    this.guard = Math.max(0, this.guard - n);
+    this.guardWait = 0.8;
+    this.guardIdle = 0;
+    if (this.guard <= 0) this.guardBroken = true;
+  }
+
+  /** 막는 동안 초당 12씩 닳고, 안 막으면 0.8초 뒤부터 초당 35씩 찬다 */
+  private guardStep(dt: number) {
+    const P = this.core.P;
+    if (P.mode === 'block') {
+      this.spendGuard(12 * dt);
+      if (this.guardBroken) this.core.onRelease('block');
+      return;
+    }
+    this.guardIdle += dt;
+    if (this.guardWait > 0) { this.guardWait -= dt; return; }
+    this.guard = Math.min(100, this.guard + 35 * dt);
+    if (this.guardBroken && this.guard >= 40) this.guardBroken = false;
   }
 
   private sync() {

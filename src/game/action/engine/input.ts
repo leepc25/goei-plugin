@@ -6,7 +6,7 @@ export type Btn =
   | 'attack' | 'shoot' | 'skill' | 'guard' | 'super' | 'interact' | 'jump' | 'shift' | 'reload'
   | 'chain' | 'wall' | 'ally' | 'item1' | 'item2' | 'item3' | 'item4' | 'map' | 'auto' | 'pause' | 'hitbox'
   // 에일린(테스트룸 조작)
-  | 'light' | 'heavy' | 'dodge' | 'block' | 'charge';
+  | 'light' | 'heavy' | 'dodge' | 'block' | 'charge' | 'weapon';
 
 export const KEYMAP: Record<string, Btn> = {
   ArrowLeft: 'left', ArrowRight: 'right', ArrowUp: 'up', ArrowDown: 'down',
@@ -18,10 +18,10 @@ export const KEYMAP: Record<string, Btn> = {
 };
 
 /** 에일린 테스트룸 키 배치 (사용자 2026-10-25: 테스트룸 전투 그대로).
- * Z 약 · X 강 · C 회피 · V 막기 · A 원거리 · S 고유기술 · D 충전 · F 필살기 · Space 점프 · Shift 뛰기 · E 조사 · 1~4 아이템 · Tab/M 지도 · Esc 메뉴 */
+ * 사용자 2026-10-25 다시 정함: Q 약 · W 강 · C 방어 · A 원거리 · S 충전 · D 기술 · F 필살기 · Tab 무기 꺼내기/넣기 · Space 점프 · Shift 짧게 회피·길게 달리기 · E 조사 · 1~4 아이템 · M 지도 · Esc 메뉴 */
 export function useEileenKeys() {
-  for (const k of ['KeyQ', 'KeyW', 'KeyG', 'KeyR', 'KeyF', 'KeyC', 'KeyZ', 'KeyX', 'KeyA', 'KeyS', 'KeyD']) delete KEYMAP[k];
-  Object.assign(KEYMAP, { KeyZ: 'light', KeyX: 'heavy', KeyC: 'dodge', KeyV: 'block', KeyA: 'shoot', KeyS: 'skill', KeyD: 'charge', KeyF: 'super', KeyM: 'map', KeyO: 'auto' } as Record<string, Btn>);
+  for (const k of ['KeyQ', 'KeyW', 'KeyG', 'KeyR', 'KeyF', 'KeyC', 'KeyZ', 'KeyX', 'KeyV', 'KeyA', 'KeyS', 'KeyD', 'Tab']) delete KEYMAP[k];
+  Object.assign(KEYMAP, { KeyQ: 'light', KeyW: 'heavy', KeyC: 'block', KeyA: 'shoot', KeyS: 'charge', KeyD: 'skill', KeyF: 'super', Tab: 'weapon', KeyM: 'map', KeyO: 'auto' } as Record<string, Btn>);
 }
 
 /** Shift를 이 틱 수 안에 떼면 회피, 넘게 누르면 달리기 (0.15초) */

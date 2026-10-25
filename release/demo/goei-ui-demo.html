@@ -1838,10 +1838,9 @@ function drawPixelCard(c, s, x, y) {
   put(c, pixelText(`${Math.max(0, Math.ceil(s.hp))} / ${Math.ceil(s.maxHp)}`, INK, 11), bx + HUD_ART.hp.inner[2], y + 18, "right");
   let end = Math.max(y + P.h, hy + HUD_ART.hp.h + 14);
   if (s.gauge !== void 0) {
-    const gy = hy + HUD_ART.hp.h + 5, gx = bx + 14, full = s.gauge >= 100;
+    const gy = hy + HUD_ART.hp.h + 5, full = s.gauge >= 100;
     const pulse = full ? 0.5 + 0.5 * Math.sin(s.t * 7) : 0;
-    put(c, pixelText("필살", full ? "#ffe9a0" : "#aeb4b8", 11), gx, gy - 3);
-    const gx2 = gx + 26;
+    const gx2 = bx + 16;
     c.drawImage(gim, gx2, gy);
     fillHollow(c, "gauge", gx2, gy, s.gauge / 100, (row, top) => full ? row === top ? "#fff6d0" : `rgb(255,${205 + 30 * pulse},${90 + 60 * pulse})` : row === top ? "#e8f4ff" : "#9fc6e0");
     if (full && s.superKey) put(c, pixelText(s.superKey, "#ffe9a0", 11), gx2 + HUD_ART.gauge.w + 4, gy - 3);
@@ -2021,12 +2020,12 @@ function drawPixelHotbar(c, slots, x, y, t2) {
     c.fillRect(sx + 2, sy + 2, kw, kh);
     put(c, kt, sx + 2 + kw / 2, sy + 2, "center");
     if (sl2.badge) put(c, pixelText(sl2.badge, sl2.full ? "#ffe9a0" : INK, 11), sx + ix1 - 1, sy + iy1 - 17, "right");
-    put(c, pixelText(sl2.name, ready ? "#cfd3d6" : "#7d848a", 11), sx + S.w / 2, sy + S.h + 1, "center");
+    put(c, pixelText(sl2.name, ready ? INK : "#8a9096", 22), sx + S.w / 2, sy + S.h, "center");
   });
   c.restore();
   return x + slots.length * (S.w + gap) - gap;
 }
-var hotbarSize = (n) => ({ w: n * (HUD_ART.slot.w + 4) - 4, h: HUD_ART.slot.h + 15 });
+var hotbarSize = (n) => ({ w: n * (HUD_ART.slot.w + 4) - 4, h: HUD_ART.slot.h + 24 });
 function drawPixelItems(c, items, x, y, keys, flash, icon2) {
   const S = HUD_ART.item, im = img2("item");
   if (!im) return y;
@@ -2053,12 +2052,14 @@ function drawPixelItems(c, items, x, y, keys, flash, icon2) {
       c.fillStyle = "rgba(4,6,8,0.6)";
       c.fillRect(sx + ix0, y + iy0, iw, Math.round(ih * Math.min(1, it.cd)));
     }
-    const kt = pixelText(keys[i] ?? "", "#101317", 11, null), kw = Math.max(11, kt.width + 2), kh = 13;
-    c.fillStyle = EDGE;
-    c.fillRect(sx + 1, y + 1, kw + 2, kh + 2);
-    c.fillStyle = INK;
-    c.fillRect(sx + 2, y + 2, kw, kh);
-    put(c, kt, sx + 2 + kw / 2, y + 2, "center");
+    if (keys[i]) {
+      const kt = pixelText(keys[i], "#101317", 11, null), kw = Math.max(11, kt.width + 2), kh = 13;
+      c.fillStyle = EDGE;
+      c.fillRect(sx + 1, y + 1, kw + 2, kh + 2);
+      c.fillStyle = INK;
+      c.fillRect(sx + 2, y + 2, kw, kh);
+      put(c, kt, sx + 2 + kw / 2, y + 2, "center");
+    }
   }
   c.restore();
   return y + S.h;
@@ -2819,8 +2820,7 @@ var Hud = class {
    * 터치 화면에서는 터치 버튼이 대신 보여 준다 */
   /** 아이템 칸 넷 (도트, 필살 게이지 아래). 돌려주는 값 = 아래 끝 y */
   pixelItems(c, items, device, x, y) {
-    const keys = device === "pad" ? ["↑", "→", "↓", "←"] : ["1", "2", "3", "4"];
-    return drawPixelItems(c, items, x, y, keys, this.itemFlash, (it, ix, iy, sz) => drawHudItemIcon(c, it, ix, iy, sz));
+    return drawPixelItems(c, items, x, y, [], this.itemFlash, (it, ix, iy, sz) => drawHudItemIcon(c, it, ix, iy, sz));
   }
   items(c, items, device) {
     const n = 4, s = 52, g = 8;

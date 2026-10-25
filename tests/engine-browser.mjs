@@ -43,7 +43,7 @@ try {
   const seen = new Set();
   // 앞 동작이 끝나 이어 칠 수 있을 때(약 → 「이어 치기」 자세, 약3 → 서기) 다음 키를 누른다
   const ready = () => page.waitForFunction(() => { const P = window.__goeiEngine.world.player.core.P; return P.mode === 'chain' || P.mode === 'ground'; }, null, { timeout: 3000 });
-  for (const k of ['KeyZ', 'KeyZ', 'KeyZ', 'KeyX']) { await ready(); await hold(page, k, 40); for (let i = 0; i < 3; i++) { await page.waitForTimeout(40); const c = (await ei(page)).clip; if (c) seen.add(c); } }
+  for (const k of ['KeyQ', 'KeyQ', 'KeyQ', 'KeyW']) { await ready(); await hold(page, k, 40); for (let i = 0; i < 3; i++) { await page.waitForTimeout(40); const c = (await ei(page)).clip; if (c) seen.add(c); } }
   await S(page, 'pc-combo');
   assert.ok(['9', '10', '11', '12'].every((c) => seen.has(c)), `약1·약2·약3·강 동작 (${[...seen]})`);
   assert.ok((await ei(page)).hp < hp0, '허수아비가 맞음');
@@ -57,19 +57,19 @@ try {
   await page.waitForTimeout(250);
   assert.ok((await st(page)).z > 0, '점프');
   await page.waitForTimeout(900);
-  // 회피·막기·기술·충전
-  await page.keyboard.press('KeyC'); await page.waitForTimeout(60);
+  // 회피(Shift 짧게)·방어(C)·기술(D)·충전(S)
+  await page.keyboard.down('ShiftLeft'); await page.waitForTimeout(60); await page.keyboard.up('ShiftLeft'); await page.waitForTimeout(80);
   assert.ok(['16', '16_1'].includes((await ei(page)).clip), '회피');
   await page.waitForTimeout(500);
-  await page.keyboard.down('KeyV'); await page.waitForTimeout(150);
+  await page.keyboard.down('KeyC'); await page.waitForTimeout(150);
   assert.equal((await ei(page)).mode, 'block', '막기');
-  await page.keyboard.up('KeyV'); await page.waitForTimeout(400);
-  await page.keyboard.press('KeyS'); await page.waitForTimeout(450);
+  await page.keyboard.up('KeyC'); await page.waitForTimeout(400);
+  await page.keyboard.press('KeyD'); await page.waitForTimeout(450);
   assert.equal((await ei(page)).clip, '22_1', '고유기술 제압사격');
   await page.waitForTimeout(1500);
-  await page.keyboard.down('KeyD'); await page.waitForTimeout(700);
+  await page.keyboard.down('KeyS'); await page.waitForTimeout(700);
   assert.equal((await ei(page)).mode, 'charge', '충전');
-  await page.keyboard.up('KeyD'); await page.waitForTimeout(250);
+  await page.keyboard.up('KeyS'); await page.waitForTimeout(250);
   await S(page, 'pc-blast');
   // 메뉴 → 타이틀로 → 새로 시작(본부) → 잼트리 → 임무 → 출동
   await page.waitForTimeout(600);

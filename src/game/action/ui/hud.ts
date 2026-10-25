@@ -402,8 +402,7 @@ export class Hud {
    * 터치 화면에서는 터치 버튼이 대신 보여 준다 */
   /** 아이템 칸 넷 (도트, 필살 게이지 아래). 돌려주는 값 = 아래 끝 y */
   private pixelItems(c: CanvasRenderingContext2D, items: HudItem[], device: string | undefined, x: number, y: number): number {
-    const keys = device === 'pad' ? ['↑', '→', '↓', '←'] : ['1', '2', '3', '4'];
-    return drawPixelItems(c, items, x, y, keys, this.itemFlash, (it, ix, iy, sz) => drawHudItemIcon(c, it, ix, iy, sz));
+    return drawPixelItems(c, items, x, y, [], this.itemFlash, (it, ix, iy, sz) => drawHudItemIcon(c, it, ix, iy, sz));
   }
 
   private items(c: CanvasRenderingContext2D, items: HudItem[], device?: string) {

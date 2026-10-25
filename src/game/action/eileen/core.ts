@@ -863,6 +863,6 @@ function drawDying() {
     P, A, onPress, onRelease, takeHit, update, frameView, drawUnder, drawBody, drawFxLayer, drawScreen, armored,
     get hitstop() { return hitstop; }, get shake() { return shake; }, get zoom() { return zoom; },
     tickMarks(dt) { for (const [b, t] of marks) { if (t - dt <= 0) marks.delete(b); else marks.set(b, t - dt); } },
-    knock, hit,
+    knock, hit, stun,
   };
 }

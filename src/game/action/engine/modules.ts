@@ -7,6 +7,8 @@ import { walkSeconds, clockText, mergeClock, DOOR_S, STAIR_S } from '../../../co
 import type { GameAssets, GameBridge } from '../../bridge';
 import { persp, view } from './view';
 import { KEYMAP } from './input';
+import { drawGuardBar } from '../ui/pixelHud';
+import { EileenPlayer } from '../eileen/player';
 import { setPixelScale } from './contract';
 import { mountTalk } from '../../talk';
 import { createGameAudio } from '../audio';
@@ -362,6 +364,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
   });
   // 출동 지도 (Z·Tab·M, 터치 「지도」): 열린 동안 게임이 멈춘다. 구석 미니맵은 늘
   let mapOpen = false;
+  let guardA = 0; // 방어 게이지 불투명도
   const offMapKey = shell.input.on((code, down) => {
     if (!down) return;
     if ((code === 'KeyZ' || code === 'KeyM') && world && world.stage === elevator && !game?.inHub && !shell.paused && !story.isBlocking()) mapOpen = !mapOpen;
@@ -727,15 +730,22 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
           { key: key('light'), icon: 'punch', name: '약공', cd: 0, off, active: ['9', '10', '11'].includes(clip ?? '') },
           { key: key('heavy'), icon: 'kick', name: '강공', cd: 0, off, active: clip === '12' },
           { key: key('shoot'), icon: 'gun', name: '사격', cd: P.overT > 0 ? P.overT / 2.6 : 0, cdText: P.overT > 0 ? P.overT.toFixed(1) : undefined, off, active: clip === '15', bar: P.heat / 100, hot: P.overT > 0 || P.heat > 70 },
-          { key: key('skill'), icon: 'wave', name: '기술', cd: 0, off, active: clip === '22_1' },
           { key: key('charge'), icon: 'bolt', name: '충전', cd: 0, off, active: P.mode === 'charge', bar: P.mode === 'charge' ? P.charge / 2.2 : undefined, badge: P.mode === 'charge' && lv ? ['', '1', '2', 'MAX'][lv] : undefined },
+          { key: key('skill'), icon: 'wave', name: '기술', cd: 0, off, active: clip === '22_1' },
           { key: key('super'), icon: 'star', name: '필살', cd: 0, off: off || P.sp < 100, full: P.sp >= 100, bar: P.sp / 100 },
-          { key: key('dodge'), icon: 'dash', name: '회피', cd: 0, off, active: clip === '16' || clip === '16_1' },
-          { key: key('block'), icon: 'shield', name: '방어', cd: 0, off, active: P.mode === 'block' },
         ] }, dt);
       }
       if (!game?.inHub) shell.hud.draw(ctx, { ...hs, messageLeft: cardEnd }, dt); // 본부에서는 전투 HUD 없음
       else if (hs.message) shell.hud.drawMessage(ctx, hs.message, hs.compact, cardEnd); // 본부 목소리는 아래 자막 한 줄
+      // 방어 게이지: 캐릭터 머리 위, 막는 중·회복 중에만 (가득 차면 천천히 사라진다)
+      const ep = w.player instanceof EileenPlayer ? w.player : null;
+      if (ep && !mods.blocking?.() && !shell.paused) {
+        const show = ep.guard < 99.5 || ep.core.P.mode === 'block';
+        guardA = show ? Math.min(1, guardA + dt * 8) : Math.max(0, guardA - dt * 2.5);
+        const z = view.zoom, head = testPlayerTop() * persp(ep.y);
+        const gx = (ep.x - Math.round(w.camX) - view.crop) * z, gy = (ep.y - ep.z + head * 0.92 - view.cropY) * z - 12;
+        drawGuardBar(ctx, gx + 5, gy, ep.guard / 100, ep.guardBroken, guardA, performance.now() / 1000);
+      }
       // 본부: 위 안내 띠 대신 캐릭터 옆 말풍선 (닿는 문·자리가 있을 때만, 캐릭터와 겹치지 않게 옆에)
       const tg = game?.inHub && !mods.blocking?.() && !shell.paused ? (w.stage as { nearInfo?: () => { text: string; locked: boolean } | null }).nearInfo?.() : null;
       if (tg) {

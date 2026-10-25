@@ -116,10 +116,10 @@ export function drawPixelCard(c: CanvasRenderingContext2D, s: PixelCard, x: numb
   // 필살 게이지: 칸 다섯 개, 다 차면 숨쉬듯 빛나고 키를 띄운다
   let end = Math.max(y + P.h, hy + HUD_ART.hp.h + 14);
   if (s.gauge !== undefined) {
-    const gy = hy + HUD_ART.hp.h + 5, gx = bx + 14, full = s.gauge >= 100;
+    // 글자 없이 게이지만 (사용자 2026-10-25)
+    const gy = hy + HUD_ART.hp.h + 5, full = s.gauge >= 100;
     const pulse = full ? 0.5 + 0.5 * Math.sin(s.t * 7) : 0;
-    put(c, pixelText('필살', full ? '#ffe9a0' : '#aeb4b8', 11), gx, gy - 3);
-    const gx2 = gx + 26;
+    const gx2 = bx + 16;
     c.drawImage(gim, gx2, gy);
     fillHollow(c, 'gauge', gx2, gy, s.gauge / 100, (row, top) => (full ? (row === top ? '#fff6d0' : `rgb(255,${205 + 30 * pulse},${90 + 60 * pulse})`) : row === top ? '#e8f4ff' : '#9fc6e0'));
     if (full && s.superKey) put(c, pixelText(s.superKey, '#ffe9a0', 11), gx2 + HUD_ART.gauge.w + 4, gy - 3);
@@ -296,13 +296,14 @@ export function drawPixelHotbar(c: CanvasRenderingContext2D, slots: PixelSlot[],
     // 단계·% (오른쪽 아래 안쪽)
     if (sl.badge) put(c, pixelText(sl.badge, sl.full ? '#ffe9a0' : INK, 11), sx + ix1 - 1, sy + iy1 - 17, 'right');
     // 이름 (칸 아래)
-    put(c, pixelText(sl.name, ready ? '#cfd3d6' : '#7d848a', 11), sx + S.w / 2, sy + S.h + 1, 'center');
+    // 이름: 22px (11px는 안 읽힌다, 사용자)
+    put(c, pixelText(sl.name, ready ? INK : '#8a9096', 22), sx + S.w / 2, sy + S.h, 'center');
   });
   c.restore();
   return x + slots.length * (S.w + gap) - gap;
 }
 /** 기술 칸 줄 크기 (이름 줄 포함) */
-export const hotbarSize = (n: number) => ({ w: n * (HUD_ART.slot.w + 4) - 4, h: HUD_ART.slot.h + 15 });
+export const hotbarSize = (n: number) => ({ w: n * (HUD_ART.slot.w + 4) - 4, h: HUD_ART.slot.h + 24 });
 
 /** 아이템 칸 넷 (필살 게이지 아래, PixelLab 슬롯14). icon = 칸 안쪽에 아이템 그림을 그리는 함수. 돌려주는 값 = 아래 끝 y */
 export function drawPixelItems(c: CanvasRenderingContext2D, items: { id?: string; label: string; count: number; cd?: number }[], x: number, y: number,
@@ -324,12 +325,43 @@ export function drawPixelItems(c: CanvasRenderingContext2D, items: { id?: string
       put(c, pixelText(`${it.count}`, dim ? '#6a7276' : INK, 11), sx + ix1 - 1, y + iy1 - 13, 'right');
     }
     if (it.cd && it.cd > 0) { c.fillStyle = 'rgba(4,6,8,0.6)'; c.fillRect(sx + ix0, y + iy0, iw, Math.round(ih * Math.min(1, it.cd))); }
-    // 키: 기술 칸처럼 모서리 밝은 칩 (사용자: 숫자가 안 보임)
-    const kt = pixelText(keys[i] ?? '', '#101317', 11, null), kw = Math.max(11, kt.width + 2), kh = 13;
-    c.fillStyle = EDGE; c.fillRect(sx + 1, y + 1, kw + 2, kh + 2);
-    c.fillStyle = INK; c.fillRect(sx + 2, y + 2, kw, kh);
-    put(c, kt, sx + 2 + kw / 2, y + 2, 'center');
+    // 키 표시 (사용자 2026-10-25: 칸 위 숫자는 빼기로. keys가 비면 안 그린다)
+    if (keys[i]) {
+      const kt = pixelText(keys[i], '#101317', 11, null), kw = Math.max(11, kt.width + 2), kh = 13;
+      c.fillStyle = EDGE; c.fillRect(sx + 1, y + 1, kw + 2, kh + 2);
+      c.fillStyle = INK; c.fillRect(sx + 2, y + 2, kw, kh);
+      put(c, kt, sx + 2 + kw / 2, y + 2, 'center');
+    }
   }
   c.restore();
   return y + S.h;
+}
+
+/** 방어 게이지 (캐릭터 머리 위 작은 도트 막대): 막는 중이거나 회복 중일 때만 뜨고, 가득 차면 사라진다.
+ * x,y = 막대 가운데 위 (캔버스 px), a = 불투명도, broken = 깨져서 회복 중 (빨갛게 깜빡) */
+export function drawGuardBar(c: CanvasRenderingContext2D, x: number, y: number, v: number, broken: boolean, a: number, t: number) {
+  if (a <= 0.01) return;
+  const W = 56, H = 8;
+  const x0 = Math.round(x - W / 2), y0 = Math.round(y);
+  c.save();
+  c.globalAlpha = Math.min(1, a);
+  // 방패 표시 + 테
+  const sh = ['#####', '#####', '#####', '.###.', '..#..'];
+  const col = broken ? (Math.sin(t * 14) > 0 ? '#ff5a44' : '#7a2a22') : INK;
+  c.fillStyle = EDGE;
+  c.fillRect(x0 - 10, y0 - 1, 9, 9);
+  sh.forEach((row, j) => { for (let i = 0; i < 5; i++) if (row[i] === '#') { c.fillStyle = col; c.fillRect(x0 - 8 + i, y0 + 1 + j, 1, 1); } });
+  c.fillStyle = EDGE; c.fillRect(x0 - 1, y0 - 1, W + 2, H + 2);
+  c.fillStyle = '#2e353c'; c.fillRect(x0, y0, W, H);
+  c.fillStyle = '#151a1f'; c.fillRect(x0 + 1, y0 + 1, W - 2, H - 2);
+  const fw = Math.round((W - 2) * Math.max(0, Math.min(1, v)));
+  if (fw > 0) {
+    c.fillStyle = broken ? '#c8483a' : v < 0.3 ? '#e8b04a' : '#cfe4f2';
+    c.fillRect(x0 + 1, y0 + 1, fw, H - 2);
+    c.fillStyle = broken ? '#ff8a76' : '#ffffff';
+    c.fillRect(x0 + 1, y0 + 1, fw, 1);
+  }
+  // 깨진 뒤 다시 막을 수 있는 선 (40%)
+  if (broken) { c.fillStyle = INK; c.fillRect(x0 + 1 + Math.round((W - 2) * 0.4), y0, 1, H); }
+  c.restore();
 }
