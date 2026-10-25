@@ -79,29 +79,30 @@ const store = { get(k, d) { try { const v = localStorage.getItem('room3.' + k); 
                 set(k, v) { try { localStorage.setItem('room3.' + k, JSON.stringify(v)); } catch {} } };
 
 // ── 키 ──
-const ACTIONS = [
- ['prevChar','이전 인물','BracketLeft'],['nextChar','다음 인물','BracketRight'],
+const ACTIONS = [   // 사용자 2026-10-25 키 배치(앞으로 쓸 키) + 나머지는 테스트용
  ['left','왼쪽','ArrowLeft'],['right','오른쪽','ArrowRight'],['up','안쪽(위)','ArrowUp'],['down','바깥쪽(아래)','ArrowDown'],
- ['run','뛰기(누른 채)','ShiftLeft'],['jump','점프 · 공중에서 2단','Space'],
- ['light','약 공격 · 뛰며 = 돌진 · 공중 = 점프 공격','KeyZ'],['heavy','강 공격(콤보 마무리) · 공중 = 강한 점프 공격','KeyX'],
- ['dodge','회피(누른 방향으로)','KeyC'],['block','막기(누른 채)','KeyV'],['shoot','원거리(누른 채 = 연사)','KeyA'],
- ['skill','고유기술(짧게) · 길게 누르면 충전 → 떼면 방출','KeyS'],['charge','충전(누른 채) → 떼면 방출','KeyD'],['super','필살기','KeyF'],
- ['skill2','둘째 고유기술(있는 인물만)','KeyY'],
- ['combat','전투 자세 켜기/끄기','Tab'],['weapon','무기 꺼내기/넣기(무기 없으면 겨눈 자세)','KeyQ'],
- ['hit','맞기(슈퍼아머 중엔 버팀)','Digit1'],['knock','날아가 쓰러지기','Digit2'],['stun','스턴(연타로 빨리 풀림)','Digit3'],['crawl','쓰러진 뒤 엎드려 기기','KeyE'],
- ['dying','빈사 켜기/끄기','KeyP'],['heal','회복약 먹기(섭취 + 회복 효과)','KeyB'],['drop','아이템 떨어뜨리기(T로 줍기)','KeyN'],['status','상태이상 바꾸기(독→불→전기→없음)','KeyM'],
- ['respond','응대','Digit4'],['talk','말하며 손짓','Digit5'],['nod','끄덕이기','Digit6'],['shake','고개 젓기','Digit7'],
- ['angry','화내기','Digit8'],['happy','기뻐하기','Digit9'],['surprise','놀라기','Digit0'],
- ['eat','섭취','KeyR'],['pick','줍기','KeyT'],['personal','개인 대기','KeyG'],['notice','발견 반응','KeyH'],
- ['flee','도망(누른 채)','KeyJ'],['back','뒷걸음질(누른 채)','KeyK'],['sit','주저앉기 켜기/끄기(앉아서 뒤쪽 키 = 밀려나기)','KeyL'],
- ['crouch','웅크려 떨기 켜기/끄기(웅크려서 방향키 = 네발로 기기)','Semicolon'],
+ ['light','약 공격 · 뛰며 = 돌진 · 공중 = 점프 공격','KeyQ'],['heavy','강 공격(콤보 마무리) · 뛰며 = 돌진 · 공중 = 강한 점프 공격','KeyW'],['block','방어(누른 채)','KeyC'],
+ ['shoot','원거리(누른 채 = 연사)','KeyA'],['charge','충전(누른 채) → 떼면 방출','KeyS'],['skill','기술','KeyD'],['super','필살기','KeyF'],
+ ['weapon','무기 꺼내기/넣기(무기 없으면 겨눈 자세)','Tab'],['jump','점프 · 공중에서 2단','Space'],
+ ['run','짧게 = 회피(누른 방향, 없으면 뒤) · 길게 = 달리기','ShiftLeft'],['dodge','회피만(따로 쓰고 싶을 때)',''],
+ ['pick','상호작용 · 줍기 · 선택','KeyE'],['map','지도(테스트룸: 조작 요약 보이기/숨기기)','KeyM'],
+ ['combat','전투 자세 켜기/끄기','KeyR'],['sit','주저앉기 켜기/끄기(앉아서 뒤쪽 키 = 뒤로 기어나가기)','KeyZ'],
+ ['crouch','웅크리기 켜기/끄기(웅크려서 방향키 = 네발로 기기)','KeyX'],['flee','도망(누른 채)','KeyV'],['back','뒷걸음질(누른 채)','ControlLeft'],
+ // ── 테스트용 ──
+ ['prevChar','이전 인물','BracketLeft'],['nextChar','다음 인물','BracketRight'],['skill2','둘째 기술(있는 인물만)','KeyG'],
+ ['hit','맞기(슈퍼아머 중엔 버팀)','Digit1'],['knock','날아가 쓰러지기','Digit2'],['stun','스턴(연타로 빨리 풀림)','Digit3'],['crawl','쓰러진 뒤 엎드려 기기','Digit4'],
+ ['dying','빈사 켜기/끄기','Digit5'],['heal','회복약 먹기(섭취 + 회복 효과)','Digit6'],['drop','아이템 떨어뜨리기(E로 줍기)','Digit7'],['status','상태이상 바꾸기(독→불→전기→없음)','Digit8'],
+ ['eat','섭취','Digit9'],['personal','개인 대기','Digit0'],
+ ['respond','응대','KeyY'],['talk','말하며 손짓','KeyU'],['nod','끄덕이기','KeyI'],['shake','고개 젓기','KeyO'],
+ ['angry','화내기','KeyP'],['happy','기뻐하기','KeyH'],['surprise','놀라기','KeyJ'],['notice','발견 반응','KeyK'],
 ];
 const DEF = Object.fromEntries(ACTIONS.map(a => [a[0], a[2]]));
-let binds = Object.assign({}, DEF, store.get('binds', {}));
+let binds = Object.assign({}, DEF, store.get('binds2', {}));
 const held = new Set();
-const down = n => held.has(binds[n]);
+const down = n => n === 'run' ? held.has(binds.run) && performance.now() - (runT || 0) > 180 : held.has(binds[n]);
+let runT = 0;   // Shift 누른 시각: 0.18초 안에 떼면 회피, 넘게 누르면 달리기
 const actOf = code => { for (const k in binds) if (binds[k] === code) return k; return null; };
-const keyName = c => !c ? '—' : c.replace(/^Key/, '').replace(/^Digit/, '').replace('ArrowLeft', '←').replace('ArrowRight', '→').replace('ArrowUp', '↑').replace('ArrowDown', '↓').replace('Space', '스페이스').replace('Semicolon', ';').replace('ShiftLeft', 'Shift').replace('ShiftRight', 'Shift').replace('BracketLeft', '[').replace('BracketRight', ']');
+const keyName = c => !c ? '—' : c.replace(/^Key/, '').replace(/^Digit/, '').replace('ArrowLeft', '←').replace('ArrowRight', '→').replace('ArrowUp', '↑').replace('ArrowDown', '↓').replace('Space', '스페이스').replace('Semicolon', ';').replace('ShiftLeft', 'Shift').replace('ShiftRight', 'Shift').replace('BracketLeft', '[').replace('BracketRight', ']').replace('ControlLeft', 'Ctrl').replace('ControlRight', 'Ctrl');
 
 // ── 장 목록 도우미 ──
 const R = (a, b) => { const r = []; if (a <= b) for (let i = a; i <= b; i++) r.push(i); else for (let i = a; i >= b; i--) r.push(i); return r; };
@@ -193,7 +194,7 @@ const dust = (x, y, n, s = 1) => { for (let i = 0; i < n; i++) fx.push({ k: 'dus
 // 총 쏠 때 불꽃은 그림에 그려진 것만 씀 — 코드는 탄피만
 function muzzleFlash(p, big) { if (!(CH.gun || []).length) return; for (let i = 0; i < (big ? 3 : 1); i++) fx.push({ k: 'shell', x: p.x - P.face * 30, y: p.y, vx: -P.face * (80 + Math.random() * 80), vy: -220 - Math.random() * 120, g: P.y, t: 1.2 }); }
 
-function inReach(hx, pad = 60, hh = 100) { pad *= K(P.y); const dk = K(D.y), hOk = hh > D.z - 110 * dk && hh < D.z + 240 * dk; return showDummy && Math.abs(D.y - P.y) < 64 && (D.x - P.x) * P.face > -20 && Math.abs(D.x - hx) < pad && hOk; }
+function inReach(hx, pad = 60, hh = 100, wide = false) { pad *= K(P.y); const dk = K(D.y), hOk = wide ? hh > D.z - 300 * dk && hh < D.z + 360 * dk : hh > D.z - 110 * dk && hh < D.z + 240 * dk; return showDummy && Math.abs(D.y - P.y) < (wide ? 100 : 64) && (D.x - P.x) * P.face > (wide ? -60 : -20) && Math.abs(D.x - hx) < pad && hOk; }
 function hurtDummy(dmg, kind) {
   if (D.mark > 0) dmg = Math.round(dmg * 1.5);
   D.hp = Math.max(0, D.hp - dmg); D.hits++; if (!P.inSuper) gainSp(dmg * 0.45); D.hitT = 1.0; D.flash = 0.09;
@@ -220,7 +221,8 @@ function fireEv(e) {
   if (e.ev === 'hit' || e.ev === 'hitH') {
     const big = e.ev !== 'hit';
     const p = framePt(id, f, a.reach[f], a.h * (e.hy || 0.42));
-    if (inReach(p.x, big ? 100 : 70, P.y - p.y)) {
+    const wide = id === '14';   // 공중공격은 판정을 넓게(사용자 2026-10-25): 앞뒤 160·위아래·깊이 넓게
+    if (inReach(p.x, wide ? 160 : big ? 100 : 70, P.y - p.y, wide)) {
       hitstop = big ? 0.16 : 0.085; shake = big ? 16 : 8; dShake = big ? 11 : 7;
       hurtDummy(big ? 34 : 12, e.kind || (big ? 'heavy' : 'light'));
       sfx('hit', { strength: big ? 3 : 1, kind: (CH.kick || []).includes(id) ? 'kick' : undefined });
@@ -653,6 +655,8 @@ const crLp = () => LP('41') || R(Math.min(4, nOf('41') - 1), nOf('41') - 1);
 function crouch() { if (!has('41')) return; P.mode = 'crouch'; const lp = crLp(); play('41', { seq: [...S(R(0, lp[0] - 1), 0.08), ...S(lp, 0.11)], loopFrom: lp[0] }); }
 
 function onPress(a) {
+  if (a === 'run') { runT = performance.now(); return; }
+  if (a === 'map') { const h = document.getElementById('help').parentElement; h.style.display = h.style.display === 'none' ? '' : 'none'; return; }
   if (a === 'prevChar' || a === 'nextChar') return stepChar(a === 'nextChar' ? 1 : -1);
   if (!CK) return;
   if (a === 'left' || a === 'right') { const now = performance.now(); if (now - (P.lastTap[a] || 0) < 260) P.runLatch = true; P.lastTap[a] = now; }
@@ -735,8 +739,9 @@ function onPress(a) {
 }
 // 고유기술 키: 짧게 = 고유기술, 길게(0.25초) = 충전
 let skDown = 0;
-function skillPress() { if (!CH.skills.charge) return skill(); skDown = P.t; P.skHold = true; P.skFrom = P.mode; }
+function skillPress() { return skill(); }   // 기술(D)은 누르면 바로. 충전은 S 따로(사용자 2026-10-25 키 배치)
 function onRelease(a) {
+  if (a === 'run' && performance.now() - runT <= 180) return onPress('dodge');
   if (a === 'left' || a === 'right') { if (!down('left') && !down('right')) P.runLatch = false; }
   if (a === 'block' && P.mode === 'block') reverseOut('17', R(curF(), 0), 0.025);
   if ((a === 'charge' || a === 'skill') && P.mode === 'charge') return release();
@@ -1330,19 +1335,19 @@ function renderBinds() {
   }
   const k = id => `<b>${keyName(binds[id])}</b>`;
   document.getElementById('help').innerHTML =
-    `인물 ${k('prevChar')} ${k('nextChar')} 또는 위 목록 · 이동 ${k('left')}${k('right')}${k('up')}${k('down')} · 뛰기 ${k('run')} 또는 방향키 두 번 · 점프 ${k('jump')}(공중에서 한 번 더 = 2단) · ` +
+    `인물 ${k('prevChar')} ${k('nextChar')} 또는 위 목록 · 이동 ${k('left')}${k('right')}${k('up')}${k('down')} · 달리기 ${k('run')} 길게 또는 방향키 두 번 · 점프 ${k('jump')}(공중에서 한 번 더 = 2단) · ` +
     `약 ${k('light')} 연타 = 약1→약2→약3, 강 ${k('heavy')} = 마무리(단독·약1 뒤 스턴 / 약2 뒤 띄우기 / 약3 뒤 날리기) · 뛰며 약 = 돌진 · 공중에서 약/강 = 점프 공격 · ` +
-    `회피 ${k('dodge')}(누른 방향, 없으면 뒤) · 막기 ${k('block')} · 원거리 ${k('shoot')} · 고유기술 ${k('skill')}(길게 = 충전, 떼면 방출) · 충전 ${k('charge')} · 필살기 ${k('super')} · ` +
+    `회피 ${k('run')} 짧게(누른 방향, 없으면 뒤) · 방어 ${k('block')} · 원거리 ${k('shoot')} · 기술 ${k('skill')} · 충전 ${k('charge')}(누른 채, 떼면 방출) · 필살기 ${k('super')} · ` +
     `전투 자세 ${k('combat')} · 무기 ${k('weapon')} · 맞기 ${k('hit')} · 쓰러짐 ${k('knock')}(${k('jump')} 일어나기, ${k('crawl')} 엎드려 기기) · 스턴 ${k('stun')} · 빈사 ${k('dying')} · ` +
-    `감정 ${k('respond')}~${k('surprise')} · 섭취 ${k('eat')} · 줍기 ${k('pick')} · 개인 대기 ${k('personal')} · 발견 ${k('notice')} · ` +
+    `감정 ${k('respond')}~${k('surprise')} · 섭취 ${k('eat')} · 상호작용·줍기 ${k('pick')} · 조작 요약 ${k('map')} · 개인 대기 ${k('personal')} · 발견 ${k('notice')} · ` +
     `도망 ${k('flee')} · 뒷걸음 ${k('back')} · 주저앉기 ${k('sit')} · 웅크리기 ${k('crouch')}`;
   if (CK) renderChar();
 }
 function finishCapture(code) {
-  if (code !== 'Escape') { for (const k in binds) if (binds[k] === code) binds[k] = binds[capture.id]; binds[capture.id] = code; store.set('binds', binds); }
+  if (code !== 'Escape') { for (const k in binds) if (binds[k] === code) binds[k] = binds[capture.id]; binds[capture.id] = code; store.set('binds2', binds); }
   capture = null; renderBinds();
 }
-document.getElementById('reset').onclick = () => { binds = { ...DEF }; store.set('binds', binds); renderBinds(); };
+document.getElementById('reset').onclick = () => { binds = { ...DEF }; store.set('binds2', binds); renderBinds(); };
 const spd = document.getElementById('spd');
 spd.oninput = () => { speed = spd.value / 100; document.getElementById('spdv').textContent = (+speed.toFixed(2)) + '배'; };
 document.getElementById('hb').onchange = e => showNo = e.target.checked;
