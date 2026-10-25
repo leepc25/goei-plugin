@@ -6234,7 +6234,9 @@
    "result": "ok"
   },
   "42": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792952258.797116,
+   "result": "ok"
   },
   "43": {
    "tries": 0,
@@ -6280,40 +6282,64 @@
    "why": "멈춤(가장 많이 바뀐 장도 0%)"
   },
   "10": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792952342.3771212,
+   "result": "ok"
   },
   "11": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792952501.3771305,
+   "result": "ok"
   },
   "12": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792952285.6851177,
+   "result": "ok"
   },
   "13": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792952333.4051206,
+   "result": "ok"
   },
   "15": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792952391.877124,
+   "result": "ok"
   },
   "16": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792952273.597117,
+   "result": "ok"
   },
   "17": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792952292.3371181,
+   "result": "ok"
   },
   "18": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792952299.9451187,
+   "result": "ok"
   },
   "18_1": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792952308.025119,
+   "result": "ok"
   },
   "18_2": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792952323.9773204,
+   "result": "ok"
   },
   "18_3": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792952544.2571332,
+   "result": "ok"
   },
   "19": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792952331.3091204,
+   "result": "ok"
   },
   "2": {
    "tries": 0,
@@ -6321,7 +6347,9 @@
    "result": "ok"
   },
   "20": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792952499.5371304,
+   "result": "ok"
   },
   "21": {
    "tries": 0,
@@ -6359,7 +6387,9 @@
    "result": "ok"
   },
   "33": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792952308.5528445,
+   "result": "ok"
   },
   "34": {
    "tries": 0,
@@ -6382,7 +6412,9 @@
    "result": "ok"
   },
   "38": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792952497.6795943,
+   "result": "ok"
   },
   "39": {
    "tries": 0,
@@ -6405,16 +6437,24 @@
    "result": "ok"
   },
   "42": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792952449.159637,
+   "result": "ok"
   },
   "43": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792952502.5931306,
+   "result": "ok"
   },
   "44": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792952451.9291277,
+   "result": "ok"
   },
   "45": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792952477.2411292,
+   "result": "ok"
   },
   "5": {
    "tries": 0,
@@ -6432,7 +6472,9 @@
    "result": "ok"
   },
   "W_1": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792952335.6208487,
+   "result": "ok"
   }
  },
  "6.24_백일몽여B": {
@@ -6442,40 +6484,64 @@
    "result": "ok"
   },
   "10": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792952402.7171247,
+   "result": "ok"
   },
   "11": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792952552.5411336,
+   "result": "ok"
   },
   "12": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792952346.6251214,
+   "result": "ok"
   },
   "13": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792952470.9491289,
+   "result": "ok"
   },
   "15": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792952493.60113,
+   "result": "ok"
   },
   "16": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792952342.077121,
+   "result": "ok"
   },
   "17": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792952367.9691226,
+   "result": "ok"
   },
   "18": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792952317.7931197,
+   "result": "ok"
   },
   "18_1": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792952422.733126,
+   "result": "ok"
   },
   "18_2": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792952409.337125,
+   "result": "ok"
   },
   "18_3": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792952644.769139,
+   "result": "ok"
   },
   "19": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792952457.993128,
+   "result": "ok"
   },
   "2": {
    "tries": 0,
@@ -6483,43 +6549,446 @@
    "result": "ok"
   },
   "20": {
+   "tries": 0,
+   "checked": 1792952681.8131413,
+   "result": "ok"
+  },
+  "21": {
+   "tries": 0,
+   "checked": 1792952410.5891252,
+   "result": "ok"
+  },
+  "28": {
+   "tries": 0,
+   "checked": 1792952397.4158525,
+   "result": "ok"
+  },
+  "29": {
+   "tries": 0,
+   "checked": 1792952377.6487453,
+   "result": "ok"
+  },
+  "3": {
+   "tries": 0,
+   "checked": 1792952313.9131196,
+   "result": "ok"
+  },
+  "30": {
+   "tries": 0,
+   "checked": 1792952401.6971247,
+   "result": "ok"
+  },
+  "31": {
+   "tries": 0,
+   "checked": 1792952398.4291244,
+   "result": "ok"
+  },
+  "32": {
+   "tries": 0,
+   "checked": 1792952444.3331273,
+   "result": "ok"
+  },
+  "33": {
+   "tries": 0,
+   "checked": 1792952413.4771254,
+   "result": "ok"
+  },
+  "34": {
+   "tries": 0,
+   "checked": 1792952429.5531263,
+   "result": "ok"
+  },
+  "35": {
+   "tries": 0,
+   "checked": 1792952446.6931274,
+   "result": "ok"
+  },
+  "36": {
+   "tries": 0,
+   "checked": 1792952465.6611285,
+   "result": "ok"
+  },
+  "37": {
+   "tries": 0,
+   "checked": 1792952543.205133,
+   "result": "ok"
+  },
+  "38": {
+   "tries": 0,
+   "checked": 1792952634.3677814,
+   "result": "ok"
+  },
+  "39": {
+   "tries": 0,
+   "checked": 1792952499.7611306,
+   "result": "ok"
+  },
+  "3_0": {
+   "tries": 0,
+   "checked": 1792952192.4451122,
+   "result": "ok"
+  },
+  "4": {
+   "tries": 0,
+   "checked": 1792952276.8691173,
+   "result": "ok"
+  },
+  "41": {
+   "tries": 0,
+   "checked": 1792952500.4571304,
+   "result": "ok"
+  },
+  "42": {
+   "tries": 0,
+   "checked": 1792952625.785138,
+   "result": "ok"
+  },
+  "43": {
+   "tries": 0,
+   "checked": 1792952604.0531366,
+   "result": "ok"
+  },
+  "44": {
+   "tries": 0,
+   "checked": 1792952542.449133,
+   "result": "ok"
+  },
+  "45": {
+   "tries": 0,
+   "checked": 1792952599.3171363,
+   "result": "ok"
+  },
+  "5": {
+   "tries": 0,
+   "checked": 1792952314.8731196,
+   "result": "ok"
+  },
+  "9": {
+   "tries": 0,
+   "checked": 1792952294.3371184,
+   "result": "ok"
+  },
+  "W": {
+   "tries": 0,
+   "checked": 1792952277.2611172,
+   "result": "ok"
+  },
+  "W_1": {
+   "tries": 0,
+   "checked": 1792952401.5491247,
+   "result": "ok"
+  }
+ },
+ "6.25_협회남1": {
+  "1": {
+   "tries": 0,
+   "checked": 1792952625.2531378,
+   "result": "ok"
+  },
+  "10": {
+   "tries": 0,
+   "checked": 1792952799.9291484,
+   "result": "ok"
+  },
+  "12": {
+   "tries": 0,
+   "checked": 1792952720.9611437,
+   "result": "ok"
+  },
+  "13": {
+   "tries": 0,
+   "checked": 1792952743.745145,
+   "result": "ok"
+  },
+  "15": {
+   "tries": 0
+  },
+  "16": {
+   "tries": 0,
+   "checked": 1792952707.9411428,
+   "result": "ok"
+  },
+  "17": {
+   "tries": 0,
+   "checked": 1792952669.0651405,
+   "result": "ok"
+  },
+  "18": {
+   "tries": 0,
+   "checked": 1792952700.3571424,
+   "result": "ok"
+  },
+  "18_1": {
+   "tries": 0,
+   "checked": 1792952702.2731426,
+   "result": "ok"
+  },
+  "18_2": {
+   "tries": 0,
+   "checked": 1792952721.0256994,
+   "result": "ok"
+  },
+  "18_3": {
+   "tries": 0
+  },
+  "19": {
+   "tries": 0,
+   "checked": 1792952709.1251428,
+   "result": "ok"
+  },
+  "2": {
+   "tries": 0,
+   "checked": 1792952557.853134,
+   "result": "ok"
+  },
+  "20": {
    "tries": 0
   },
   "21": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792952604.3717813,
+   "result": "ok"
   },
   "28": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792952528.043847,
+   "result": "ok"
   },
   "29": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792952539.465133,
+   "result": "ok"
   },
   "3": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792952765.1571462,
+   "result": "ok"
   },
   "30": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792952540.987762,
+   "result": "ok"
   },
   "31": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792952558.853134,
+   "result": "ok"
   },
   "32": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792952575.089135,
+   "result": "ok"
   },
   "33": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792952710.297143,
+   "result": "ok"
   },
   "34": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792952551.9966302,
+   "result": "ok"
   },
   "35": {
+   "tries": 0,
+   "checked": 1792952605.2051368,
+   "result": "ok"
+  },
+  "36": {
+   "tries": 0,
+   "checked": 1792952588.7531357,
+   "result": "ok"
+  },
+  "37": {
+   "tries": 0,
+   "checked": 1792952615.9971373,
+   "result": "ok"
+  },
+  "38": {
    "tries": 0
+  },
+  "39": {
+   "tries": 0,
+   "checked": 1792952598.5731363,
+   "result": "ok"
+  },
+  "3_0": {
+   "tries": 0,
+   "checked": 1792952565.4451344,
+   "result": "ok"
+  },
+  "4": {
+   "tries": 0,
+   "checked": 1792952539.9046226,
+   "result": "ok"
+  },
+  "41": {
+   "tries": 0,
+   "checked": 1792952648.3171394,
+   "result": "ok"
+  },
+  "42": {
+   "tries": 0,
+   "checked": 1792952800.4131484,
+   "result": "ok"
+  },
+  "43": {
+   "tries": 0,
+   "checked": 1792952862.1051521,
+   "result": "ok"
+  },
+  "44": {
+   "tries": 0,
+   "checked": 1792952704.6171427,
+   "result": "ok"
+  },
+  "45": {
+   "tries": 0,
+   "checked": 1792952854.7931516,
+   "result": "ok"
+  },
+  "5": {
+   "tries": 0,
+   "checked": 1792952594.0651362,
+   "result": "ok"
+  },
+  "9": {
+   "tries": 0,
+   "checked": 1792952672.8291407,
+   "result": "ok"
+  },
+  "W": {
+   "tries": 0,
+   "checked": 1792952715.5971434,
+   "result": "ok"
+  },
+  "W_1": {
+   "tries": 0,
+   "checked": 1792952856.3531518,
+   "result": "ok"
+  }
+ },
+ "6.26_협회남2": {
+  "1": {
+   "tries": 1,
+   "checked": 1792952860.9646182,
+   "result": "기계 실패",
+   "why": "멈춤(가장 많이 바뀐 장도 1%)"
+  },
+  "10": {
+   "tries": 0
+  },
+  "12": {
+   "tries": 0,
+   "checked": 1792952801.8931484,
+   "result": "ok"
+  },
+  "13": {
+   "tries": 0,
+   "checked": 1792952814.7411492,
+   "result": "ok"
+  },
+  "15": {
+   "tries": 0
+  },
+  "16": {
+   "tries": 0,
+   "checked": 1792952736.9331446,
+   "result": "ok"
+  },
+  "17": {
+   "tries": 0,
+   "checked": 1792952763.721146,
+   "result": "ok"
+  },
+  "18": {
+   "tries": 0,
+   "checked": 1792952771.6931467,
+   "result": "ok"
+  },
+  "18_1": {
+   "tries": 0,
+   "checked": 1792952771.9371467,
+   "result": "ok"
+  },
+  "18_2": {
+   "tries": 0,
+   "checked": 1792952823.0451498,
+   "result": "ok"
+  },
+  "18_3": {
+   "tries": 0
+  },
+  "19": {
+   "tries": 0,
+   "checked": 1792952796.609148,
+   "result": "ok"
+  },
+  "2": {
+   "tries": 0,
+   "checked": 1792952613.9044838,
+   "result": "ok"
+  },
+  "20": {
+   "tries": 0
+  },
+  "21": {
+   "tries": 0,
+   "checked": 1792952709.885143,
+   "result": "ok"
+  },
+  "28": {
+   "tries": 1,
+   "checked": 1792952703.1251426,
+   "result": "멈춤(가장 많이 바뀐 장도 0%)"
+  },
+  "29": {
+   "tries": 0,
+   "checked": 1792952691.7999113,
+   "result": "ok"
+  },
+  "3": {
+   "tries": 0,
+   "checked": 1792952725.2171438,
+   "result": "ok"
+  },
+  "30": {
+   "tries": 0,
+   "checked": 1792952769.8571465,
+   "result": "ok"
+  },
+  "31": {
+   "tries": 0,
+   "checked": 1792952773.9491467,
+   "result": "ok"
+  },
+  "32": {
+   "tries": 0,
+   "checked": 1792952781.0211473,
+   "result": "ok"
+  },
+  "33": {
+   "tries": 0,
+   "checked": 1792952856.6851518,
+   "result": "ok"
+  },
+  "34": {
+   "tries": 1,
+   "checked": 1792952780.0211473,
+   "result": "멈춤(가장 많이 바뀐 장도 0%)"
+  },
+  "35": {
+   "tries": 0,
+   "checked": 1792952813.2282872,
+   "result": "ok"
   },
   "36": {
    "tries": 0
   },
   "37": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792952871.1446712,
+   "result": "ok"
   },
   "38": {
    "tries": 0
@@ -6529,11 +6998,13 @@
   },
   "3_0": {
    "tries": 0,
-   "checked": 1792952192.4451122,
+   "checked": 1792952626.625138,
    "result": "ok"
   },
   "4": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792952656.0251398,
+   "result": "ok"
   },
   "41": {
    "tries": 0
@@ -6551,259 +7022,31 @@
    "tries": 0
   },
   "5": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792952674.8011408,
+   "result": "ok"
   },
   "9": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792952720.3811436,
+   "result": "ok"
   },
   "W": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792952728.6918142,
+   "result": "ok"
   },
   "W_1": {
-   "tries": 0
-  }
- },
- "6.25_협회남1": {
-  "1": {
-   "tries": 0
-  },
-  "10": {
-   "tries": 0
-  },
-  "12": {
-   "tries": 0
-  },
-  "13": {
-   "tries": 0
-  },
-  "15": {
-   "tries": 0
-  },
-  "16": {
-   "tries": 0
-  },
-  "17": {
-   "tries": 0
-  },
-  "18": {
-   "tries": 0
-  },
-  "18_1": {
-   "tries": 0
-  },
-  "18_2": {
-   "tries": 0
-  },
-  "18_3": {
-   "tries": 0
-  },
-  "19": {
-   "tries": 0
-  },
-  "2": {
-   "tries": 0
-  },
-  "20": {
-   "tries": 0
-  },
-  "21": {
-   "tries": 0
-  },
-  "28": {
-   "tries": 0
-  },
-  "29": {
-   "tries": 0
-  },
-  "3": {
-   "tries": 0
-  },
-  "30": {
-   "tries": 0
-  },
-  "31": {
-   "tries": 0
-  },
-  "32": {
-   "tries": 0
-  },
-  "33": {
-   "tries": 0
-  },
-  "34": {
-   "tries": 0
-  },
-  "35": {
-   "tries": 0
-  },
-  "36": {
-   "tries": 0
-  },
-  "37": {
-   "tries": 0
-  },
-  "38": {
-   "tries": 0
-  },
-  "39": {
-   "tries": 0
-  },
-  "3_0": {
-   "tries": 0
-  },
-  "4": {
-   "tries": 0
-  },
-  "41": {
-   "tries": 0
-  },
-  "42": {
-   "tries": 0
-  },
-  "43": {
-   "tries": 0
-  },
-  "44": {
-   "tries": 0
-  },
-  "45": {
-   "tries": 0
-  },
-  "5": {
-   "tries": 0
-  },
-  "9": {
-   "tries": 0
-  },
-  "W": {
-   "tries": 0
-  },
-  "W_1": {
-   "tries": 0
-  }
- },
- "6.26_협회남2": {
-  "1": {
-   "tries": 0
-  },
-  "10": {
-   "tries": 0
-  },
-  "12": {
-   "tries": 0
-  },
-  "13": {
-   "tries": 0
-  },
-  "15": {
-   "tries": 0
-  },
-  "16": {
-   "tries": 0
-  },
-  "17": {
-   "tries": 0
-  },
-  "18": {
-   "tries": 0
-  },
-  "18_1": {
-   "tries": 0
-  },
-  "18_2": {
-   "tries": 0
-  },
-  "18_3": {
-   "tries": 0
-  },
-  "19": {
-   "tries": 0
-  },
-  "2": {
-   "tries": 0
-  },
-  "20": {
-   "tries": 0
-  },
-  "21": {
-   "tries": 0
-  },
-  "28": {
-   "tries": 0
-  },
-  "29": {
-   "tries": 0
-  },
-  "3": {
-   "tries": 0
-  },
-  "30": {
-   "tries": 0
-  },
-  "31": {
-   "tries": 0
-  },
-  "32": {
-   "tries": 0
-  },
-  "33": {
-   "tries": 0
-  },
-  "34": {
-   "tries": 0
-  },
-  "35": {
-   "tries": 0
-  },
-  "36": {
-   "tries": 0
-  },
-  "37": {
-   "tries": 0
-  },
-  "38": {
-   "tries": 0
-  },
-  "39": {
-   "tries": 0
-  },
-  "3_0": {
-   "tries": 0
-  },
-  "4": {
-   "tries": 0
-  },
-  "41": {
-   "tries": 0
-  },
-  "42": {
-   "tries": 0
-  },
-  "43": {
-   "tries": 0
-  },
-  "44": {
-   "tries": 0
-  },
-  "45": {
-   "tries": 0
-  },
-  "5": {
-   "tries": 0
-  },
-  "9": {
-   "tries": 0
-  },
-  "W": {
-   "tries": 0
-  },
-  "W_1": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792952858.4651518,
+   "result": "ok"
   }
  },
  "6.27_협회여1": {
   "1": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792952872.5848238,
+   "result": "ok"
   },
   "10": {
    "tries": 0
