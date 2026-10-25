@@ -55,7 +55,7 @@ let A = {}, IMG = {}, CH = { key: '', name: '', color: '#cfc7a6', picks: {}, loo
 const VFX = /*__VFX__*/null || {}; for (const k in VFX) { VFX[k].img = new Image(); VFX[k].img.src = VFX[k].src; }
 const vfxDur = name => VFX[name].frames.reduce((a, f) => a + f[4], 0) / 1000;
 // PixelLab 이펙트 그림: o.flip(좌우), o.rot(회전), o.anchor('right'), o.center(가운데 기준), o.loop, o.under(바닥 층)
-const vfx = (name, x, y, scale = 2, o = {}) => { if (!VFX[name]) return false; const d = vfxDur(name); const T = (o.t || d) + (o.hold || 0); fx.push({ k: 'sheet', name, x, y, s: scale, t0: T, t: T, dur: d, ...o }); return true; };
+const vfx = (name, x, y, scale = 2, o = {}) => { if (!VFX[name]) return false; const d = vfxDur(name); const T = (o.t || d) + (o.hold || 0); const e = { k: 'sheet', name, x, y, s: scale, t0: T, t: T, dur: d, ...o }; o.back ? fx.unshift(e) : fx.push(e); return true; };   // back: 같은 층 맨 아래(다른 이펙트 밑)
 const has = id => !!A[id];
 const nOf = id => A[id] ? A[id].n : 0;
 const cf = (id, f) => Math.max(0, Math.min(nOf(id) - 1, f));
@@ -268,14 +268,15 @@ function strike(h, y) {
   for (let i = 0; i < n; i++) i ? later(i * (h.every || 0.1), () => one(i)) : one(0);
 }
 // 공용 바닥 파괴(전 인물 통일): 땅이 터지고 돌 부스러기가 튄 뒤 갈라진 구덩이가 남았다가 흐려짐. 바닥 층(캐릭터 뒤)
-function craterAt(x, gy, k, hold = 3) { if (!vfx('ground-crater2', x, gy, k, { under: true, hold, fade: 0.6, flip: Math.random() < 0.5 })) fx.push({ k: 'scorch', x, y: gy, r: 50 * k, t: hold }); }
+function craterAt(x, gy, k, hold = 3) { if (!vfx('ground-crater2', x, gy, k, { under: true, back: true, hold, fade: 0.6, flip: Math.random() < 0.5 })) fx.push({ k: 'scorch', x, y: gy, r: 50 * k, t: hold }); }
 const FX = {
   // 캐릭터 그림을 넣어 뽑은 이펙트(캐릭터는 지움): 캐릭터 발 자리·배율로 그려 손·몸 위치가 맞음. under(기본)면 캐릭터 뒤
-  // hits: [{at 초, dx 앞 거리(그림 화소), r 너비, hit, crater 배율}]
+  // hits: [{at 초, dx 앞 거리(그림 화소), r 너비, hit, crater 배율}] · craters: [{at, dx, dy(아래로 +), k}] 그림 속 폭발 밑동마다
   self(s, c) {
     const k = K(P.y) * (s.scale || 1), x0 = P.x, y0 = P.y, f = P.face;
     vfx(s.vfx, x0, y0 - P.z, k, { flip: f < 0, under: s.under !== false });
     sfx('hit', { strength: s.strength || 2, kind: 'super' });
+    for (const g of (s.craters || [])) later(g.at || 0, () => craterAt(x0 + f * g.dx * k, y0 + (g.dy || 0) * k, k * (g.k || 0.6), g.hold || 3));   // 이펙트 그림 속 폭발 자리마다 바닥 파괴(그림 화소 기준)
     for (const h of (s.hits || [{}])) later(h.at || 0, () => {
       const x = x0 + f * (h.dx ?? 150) * k;
       if (h.crater) craterAt(x, y0, k * h.crater, h.hold || 3);
@@ -660,7 +661,7 @@ function getUp() { if (!has('20')) return toIdle(); sfx('wakeup'); P.knockT = 0;
 function belly() {
   if (!has('38')) return;
   P.mode = 'belly';
-  if (has('38_1')) return play('38', { seq: S(R(0, Math.min(4, nOf('38') - 1)), 0.1), onEnd: () => { if (P.mode === 'belly') play('38_1', { seq: S(R(0, nOf('38_1') - 2), 0.12), loopFrom: 0 }); } });   // 38은 배 깐 장(5장)까지, 이어 38_1 포복 반복
+  if (has('38_1')) return play('38', { seq: S(R(0, nOf('38') - 1), 0.1), onEnd: () => { if (P.mode === 'belly') play('38_1', { fps: 8, loopFrom: 0 }); } });
   const lp = LP('38') || R(Math.min(4, nOf('38') - 1), nOf('38') - 1);
   play('38', { seq: [...S(R(0, lp[0] - 1), 0.11), ...S(lp, 0.1)], loopFrom: lp[0] });
 }
