@@ -1,24 +1,20 @@
-// goei-game 0.16.57
+// goei-game 0.16.58
 "use strict";
 (() => {
   // src/game/action/engine/view.ts
-  var view = { crop: 0, zoom: 1, lane: [440, 690] };
+  var view = { crop: 0, cropY: 0, zoom: 1, lane: [440, 690] };
   var FAR = 0.85;
   var persp = (y) => {
-    if (view.zoom === 1) return 1;
     const [a, b] = view.lane;
     const t = b > a ? Math.max(0, Math.min(1, (y - a) / (b - a))) : 1;
     return FAR + (1 - FAR) * t;
   };
-  var spr = (y) => persp(y) / view.zoom;
+  var spr = (y) => persp(y);
   function snapTo(c, x, y) {
     c.translate(x, y);
     const t = c.getTransform();
     c.setTransform(t.a, t.b, t.c, t.d, Math.round(t.e), Math.round(t.f));
   }
-
-  // src/game/action/charSize.ts
-  var charSize = { k: 1.15 };
 
   // src/game/action/art/testPeople.ts
   var MAN_SCALE = 1;
@@ -28,7 +24,8 @@
   function prepareTestPeople(urlOf, bytesOf) {
     const own = ++revision;
     art = null;
-    const img4 = async (file, ext = ".png") => {
+    faces.clear();
+    const img5 = async (file, ext = ".png") => {
       const src = window.__GOEI_TEST_PEOPLE__?.[file] || (urlOf ? await urlOf(file + ext) : "");
       if (!src) throw new Error("no test art");
       const im = new Image();
@@ -43,8 +40,8 @@
         if (b) meta = JSON.parse(new TextDecoder().decode(b));
       }
       if (!meta) throw new Error("no eileen");
-      const rows = await Promise.all(Object.entries(meta).map(async ([id, m]) => [id, { im: await img4(`eileen_${id}`, ".webp"), m }]));
-      const man = await img4("man");
+      const rows = await Promise.all(Object.entries(meta).map(async ([id, m]) => [id, { im: await img5(`eileen_${id}`, ".webp"), m }]));
+      const man = await img5("man");
       let vm = window.__GOEI_TEST_PEOPLE__?.eileen_vfx;
       if (!vm && bytesOf) {
         const b = await bytesOf("eileen_vfx.json").catch(() => null);
@@ -53,7 +50,7 @@
       const vfx = {};
       if (vm) await Promise.all(Object.entries(vm).map(async ([k, v]) => {
         try {
-          vfx[k] = { ...v, img: await img4(`vfx_${k}`, ".webp") };
+          vfx[k] = { ...v, img: await img5(`vfx_${k}`, ".webp") };
         } catch {
         }
       }));
@@ -129,7 +126,7 @@
     if (!e) return false;
     const { im, m } = e;
     const f = frameOf(id, m, frame2, total);
-    const k = spr(y) * charSize.k;
+    const k = spr(y) * 1.15;
     const flip = m.dir === "SW" ? dir > 0 : dir < 0;
     c.save();
     c.imageSmoothingEnabled = false;
@@ -143,7 +140,7 @@
   }
   function drawTestMan(c, x, y, dir) {
     if (!art) return false;
-    const P = MAN_SCALE * spr(y) * charSize.k;
+    const P = MAN_SCALE * spr(y);
     c.save();
     c.imageSmoothingEnabled = false;
     c.fillStyle = "rgba(0,0,0,.28)";
@@ -156,18 +153,24 @@
     c.restore();
     return true;
   }
-  var testPlayerTop = () => -(252 - 14) * charSize.k;
-  var face = null;
-  function testPlayerFace(side = 44) {
-    const e = art?.clips["1"];
+  var testPlayerTop = () => -(252 - 14) * 1.15;
+  var faces = /* @__PURE__ */ new Map();
+  function testPlayerFace(side = 44, flip = false) {
+    const e = art?.clips["31"] ?? art?.clips["1"];
     if (!e) return null;
-    if (face?.width === side) return face;
-    face = document.createElement("canvas");
+    const key2 = `${side}|${flip}`, hit2 = faces.get(key2);
+    if (hit2) return hit2;
+    const face = document.createElement("canvas");
+    faces.set(key2, face);
     face.width = face.height = side;
     const o = face.getContext("2d");
     o.imageSmoothingEnabled = false;
-    const cx = e.m.w / 2 + (e.m.cx[0] ?? 0);
-    o.drawImage(e.im, cx - side / 2, 14 - 4, side, side, 0, 0, side, side);
+    const fx2 = e.m.w / 2 + (e.m.cx[0] ?? 0) + 6;
+    if (flip) {
+      o.translate(side, 0);
+      o.scale(-1, 1);
+    }
+    o.drawImage(e.im, Math.round(fx2 - side / 2), 16, side, side, 0, 0, side, side);
     return face;
   }
   function eileenArt() {
@@ -508,24 +511,24 @@
     };
     switch (d3.anim) {
       case "slide2": {
-        const s2 = d3.seam ?? (d3.x0 + d3.x1) / 2, lw = s2 - d3.x0, rw = d3.x1 - s2, k = glass2 ? 0.2 : 1;
+        const s2 = d3.seam ?? (d3.x0 + d3.x1) / 2, lw = s2 - d3.x0, rw = d3.x1 - s2, k = glass2 ? 0.07 : 1;
         leaf(d3.x0, lw, d3.x0 - lw * e * k, lw, 0, 1);
         leaf(s2, rw, s2 + rw * e * k, rw, 0, -1);
         break;
       }
       case "swing": {
-        if (d3.hinge === "L") swingLeaf(d3.x0, w, d3.x0, 1, glass2 ? 30 : 78);
-        else swingLeaf(d3.x0, w, d3.x1, -1, glass2 ? 30 : 78);
+        if (d3.hinge === "L") swingLeaf(d3.x0, w, d3.x0, 1, glass2 ? 11 : 78);
+        else swingLeaf(d3.x0, w, d3.x1, -1, glass2 ? 11 : 78);
         break;
       }
       case "swing2": {
         const s2 = d3.seam ?? (d3.x0 + d3.x1) / 2, lw = s2 - d3.x0, rw = d3.x1 - s2;
-        swingLeaf(d3.x0, lw, d3.x0, 1, glass2 ? 30 : 78);
-        swingLeaf(s2, rw, d3.x1, -1, glass2 ? 30 : 78);
+        swingLeaf(d3.x0, lw, d3.x0, 1, glass2 ? 11 : 78);
+        swingLeaf(s2, rw, d3.x1, -1, glass2 ? 11 : 78);
         break;
       }
       case "shutter": {
-        c.drawImage(im, d3.x0, d3.y0, w, h, d3.x0, d3.y0 - h * e * (glass2 ? 0.3 : 1), w, h);
+        c.drawImage(im, d3.x0, d3.y0, w, h, d3.x0, d3.y0 - h * e * (glass2 ? 0.1 : 1), w, h);
         break;
       }
       default:
@@ -638,8 +641,8 @@
     c.fillRect(-r, -r, r * 2, r * 2);
     c.restore();
   }
-  function hexA(hex, a) {
-    const n = parseInt(hex.slice(1), 16);
+  function hexA(hex2, a) {
+    const n = parseInt(hex2.slice(1), 16);
     return `rgba(${n >> 16 & 255},${n >> 8 & 255},${n & 255},${Math.max(0, Math.min(1, a))})`;
   }
   var offCache = /* @__PURE__ */ new Map();
@@ -1236,7 +1239,7 @@
     /** 든 것이 있을 때 A·S를 아이템 쪽이 받는다. 돌려준 동작을 재생, null이면 엔진 기본 */
     itemAct = null;
     seat = null;
-    sit(clip, x, y, face2, exit) {
+    sit(clip, x, y, face, exit) {
       if (!this.clips[clip]?.length || this.z > 0 || this.phase !== "free" || this.move && this.moveKey !== "pickup") return false;
       this.cancelMove();
       this.buf = null;
@@ -1247,7 +1250,7 @@
       this.vx = this.vy = this.vz = 0;
       this.x = this.px = x;
       this.y = this.py = y;
-      this.dir = face2;
+      this.dir = face;
       this.resetLocomotion();
       this.seat = { clip, frame: 0, tick: 0, rising: false, exit };
       return true;
@@ -2799,12 +2802,12 @@
         return;
       }
       if (m === "down") {
-        if (a === "crawl") return belly();
+        if (a === "crawl" || a === "left" || a === "right") return belly();
         if (a === "jump" || a === "up" || a === "light") return getUp();
         return;
       }
       if (m === "belly") {
-        if (a === "jump" || a === "crawl") return getUp();
+        if (a === "jump" || a === "crawl" || a === "up") return getUp();
         return;
       }
       if (m === "stun") {
@@ -2812,11 +2815,11 @@
         return;
       }
       if (m === "sit" || m === "scoot") {
-        if (a === "sit") reverseOut("39", R(6, 0), 0.05);
+        if (a === "sit" || a === "up") reverseOut("39", R(6, 0), 0.05);
         return;
       }
       if (m === "crouch" || m === "crawl4") {
-        if (a === "crouch") {
+        if (a === "crouch" || a === "up") {
           if (m === "crawl4") toIdle();
           else reverseOut("41", R(3, 0), 0.06);
         }
@@ -3215,7 +3218,7 @@
           P.takeoff = 0;
           P.spin = 0;
           P.airVX = 230;
-        } else P.z = gz;
+        } else if (P.z >= gz - 10) P.z = gz;
       }
       env.clamp(P);
     }
@@ -3241,10 +3244,10 @@
       ctx.ellipse(x, y - up * s2 - 2 * k, rx, ry, 0, 0, Math.PI * 2);
       ctx.fill();
     }
-    function drawSprite(id, f, x, y, z, face2, alpha = 1, tint2 = null) {
-      const a = A[id], img4 = IMG[id];
-      if (!img4.complete || !img4.naturalWidth) return;
-      const flip = a.dir === "SW" ? face2 > 0 : face2 < 0;
+    function drawSprite(id, f, x, y, z, face, alpha = 1, tint2 = null) {
+      const a = A[id], img5 = IMG[id];
+      if (!img5.complete || !img5.naturalWidth) return;
+      const flip = a.dir === "SW" ? face > 0 : face < 0;
       const air = P.mode === "air" && (id === "7" || id === "14");
       const base2 = air ? a.bot[f] : groundBase(id, a, f);
       if (KNOCK_ARC[id] && alpha === 1) z += KNOCK_ARC[id][f] || 0;
@@ -3263,7 +3266,7 @@
         for (const [ox, oy] of offs) ctx.drawImage(s2, dxp + ox, dyp + oy);
         ctx.globalAlpha = alpha;
       }
-      ctx.drawImage(img4, f * a.w, 0, a.w, a.h, dxp, dyp, a.w, a.h);
+      ctx.drawImage(img5, f * a.w, 0, a.w, a.h, dxp, dyp, a.w, a.h);
       if (tint2 && tint2.over) {
         ctx.globalAlpha = alpha * tint2.over;
         ctx.drawImage(silhouette(id, f, tint2.c), dxp, dyp);
@@ -3779,12 +3782,13 @@
         }
       },
       knock: knock2,
-      hit: hit2
+      hit: hit2,
+      stun
     };
   }
 
   // src/game/action/eileen/player.ts
-  var DT = 1 / 30;
+  var CHAR_K = 1.15;
   var PRESS = [
     ["light", "light"],
     ["heavy", "heavy"],
@@ -3795,6 +3799,12 @@
     ["charge", "charge"],
     ["super", "super"],
     ["jump", "jump"],
+    ["weapon", "weapon"],
+    ["combat", "combat"],
+    ["sit", "sit"],
+    ["crouch", "crouch"],
+    ["flee", "flee"],
+    ["back", "back"],
     ["left", "left"],
     ["right", "right"],
     ["up", "up"],
@@ -3814,6 +3824,17 @@
     core;
     world = null;
     heldNames = /* @__PURE__ */ new Set();
+    synced = { x: 0, y: 0 };
+    started = false;
+    lastTickAt = 0;
+    lastFrameAt = 0;
+    /** 방어 게이지 0..100 (사용자 2026-10-25: 방어를 무제한으로 못 하게). 막아낸 공격만큼만 깎이고, 안 맞으면 다시 찬다
+     * (막고만 있으면 줄지 않는다). 맞아서 바닥나면 가드가 깨져 잠깐 휘청이고, 40까지 차오를 때까지 다시 못 막는다 */
+    guard = 100;
+    guardBroken = false;
+    /** 마지막으로 게이지가 줄어든 뒤 지난 초 (화면 표시가 이걸 보고 사라진다) */
+    guardIdle = 99;
+    guardWait = 0;
     underFn = (ctx, camX) => this.drawUnder(ctx, camX);
     constructor(clips) {
       super(clips);
@@ -3826,12 +3847,16 @@
         IMG: art5.IMG,
         VFX: art5.VFX,
         held: this.heldNames,
-        K: (y) => spr(y) * charSize.k,
+        K: (y) => spr(y) * CHAR_K,
         sfx: (type, extra) => eileenHooks.sfx({ type, ...extra }),
         font: (n) => pfont(n).f,
         targets: () => this.targets(),
-        ground: (x, y) => this.platformAt(x, y)?.h ?? 0,
-        hurt: (t, dmg, kind, face2, hitstop, o) => this.hurtTarget(t.body, dmg, kind, face2, hitstop, o),
+        // 물건 윗면은 이미 그 높이에 있을 때만 땅이다 (아래에서 걸어 들어가면 올라서지 않고 막힌다)
+        ground: (x, y) => {
+          const p = this.platformAt(x, y);
+          return p && this.core.P.z >= p.h - 10 ? p.h : 0;
+        },
+        hurt: (t, dmg, kind, face, hitstop, o) => this.hurtTarget(t.body, dmg, kind, face, hitstop, o),
         clamp: (P) => {
           const w = this.world;
           if (!w) return;
@@ -3857,11 +3882,11 @@
       if (!w) return [];
       return w.bodies.filter((b) => b.alive && b.team === "enemy" && b.hp > 0 && b.kind !== "bullet").map((b) => ({ body: b, x: b.x, y: b.y, z: b.z }));
     }
-    hurtTarget(t, dmg, kind, face2, hitstop, o) {
+    hurtTarget(t, dmg, kind, face, hitstop, o) {
       const w = this.world;
       if (!w || !t.alive) return;
       const r = REACT[kind] ?? REACT.light;
-      const hit2 = { x0: t.x - 1, x1: t.x + 1, z0: 0, z1: 400, y: t.y, dy: 999, attackId: newAttackId(), dmg: dmg * this.dmgMul, react: r.react, dir: face2, push: o.push ?? r.push, lift: r.lift, stop: 0, strength: r.strength };
+      const hit2 = { x0: t.x - 1, x1: t.x + 1, z0: 0, z1: 400, y: t.y, dy: 999, attackId: newAttackId(), dmg: dmg * this.dmgMul, react: r.react, dir: face, push: o.push ?? r.push, lift: r.lift, stop: 0, strength: r.strength };
       const res = t.applyHit(hit2, w);
       if (res.kind === "immune") return;
       t.stop = Math.max(t.stop, Math.round(Math.max(hitstop, kind === "light" ? 0.085 : 0.16) * 30));
@@ -3875,7 +3900,7 @@
     }
     /* ───────── 엔진 쪽 ───────── */
     frame() {
-      const k = spr(this.y) * charSize.k;
+      const k = spr(this.y) * CHAR_K;
       return { hit: [], hurt: this.alive ? [{ x0: this.x - 26 * k, x1: this.x + 26 * k, z0: this.z, z1: this.z + 210 * k, y: this.y, dy: 16 }] : [] };
     }
     applyHit(hit2, world) {
@@ -3887,6 +3912,14 @@
       if (P.mode === "down" || P.mode === "belly" || this.phase === "down") return { kind: "immune" };
       const front = hit2.dir === -P.face;
       if (P.mode === "block" && front) {
+        this.spendGuard(14 + hit2.dmg * 0.6);
+        if (this.guardBroken) {
+          this.core.onRelease("block");
+          this.core.stun();
+          P.stunT = 1.1;
+          world.emit({ type: "guard", x: this.x });
+          return { kind: "hit" };
+        }
         this.core.takeHit("hit");
         this.hp = Math.max(1, this.hp - Math.round(hit2.dmg * 0.1));
         world.emit({ type: "guard", x: this.x });
@@ -3926,7 +3959,9 @@
       names.clear();
       for (const [b, n] of PRESS) if (p.held.has(b)) names.add(n);
       if (p.run) names.add("run");
-      for (const [b, n] of PRESS) if (p.pressed.has(b) && !["left", "right", "up", "down"].includes(n)) this.core.onPress(n);
+      if (this.guardBroken || this.guard < 8) names.delete("block");
+      const lying = ["down", "belly", "sit", "scoot", "crouch", "crawl4"].includes(this.core.P.mode);
+      for (const [b, n] of PRESS) if (p.pressed.has(b) && (lying || !["left", "right", "up", "down"].includes(n)) && (n !== "block" || names.has("block"))) this.core.onPress(n);
       if (p.evade) this.core.onPress("dodge");
       for (const b of ["block", "charge"]) if (p.released.has(b)) this.core.onRelease(b);
     }
@@ -3936,30 +3971,98 @@
       if (!w.underlays.includes(this.underFn)) w.underlays.push(this.underFn);
       if (this.seat) return super.tick(world, p);
       const P = this.core.P;
-      P.x = this.x;
-      P.y = this.y;
+      if (!this.started) {
+        this.started = true;
+        P.x = this.x;
+        P.y = this.y;
+      } else {
+        P.x += this.x - this.synced.x;
+        P.y += this.y - this.synced.y;
+      }
       P.hp = Math.round(this.hp / this.hpMax * 100);
+      this.lastTickAt = performance.now();
       this.wantInteract = p.pressed.has("interact");
       this.wantItem = p.pressed.has("item1") ? 1 : p.pressed.has("item2") ? 2 : p.pressed.has("item3") ? 3 : p.pressed.has("item4") ? 4 : 0;
       if (this.comboClock > 0 && --this.comboClock === 0) this.combo = 0;
-      if (this.phase === "down") {
-        this.core.update(DT);
-        this.sync();
-        return;
-      }
-      this.input(p);
+      if (this.phase !== "down") this.input(p);
       this.core.frameView({ x0: w.camX, lane: w.lane });
-      this.core.update(DT);
-      this.core.tickMarks(DT);
+      this.sync();
+    }
+    /** 그림 장마다 (render.ts): 테스트룸처럼 실제 시간으로 움직이고 동작을 넘긴다.
+     * 엔진 틱(30Hz)에서 1/30초씩 돌리면 0.04초짜리 장이 0.067초로 늘고 움직임이 30장으로 끊긴다 (사용자: 테스트룸보다 프레임이 떨어져 보임) */
+    frameStep() {
+      const now = performance.now();
+      const dt = Math.min(0.05, (now - (this.lastFrameAt || now)) / 1e3);
+      this.lastFrameAt = now;
+      if (!this.world || this.seat || now - this.lastTickAt > 120 || dt <= 0) return;
+      const w = this.world;
+      const P = this.core.P;
+      P.x += this.x - this.synced.x;
+      P.y += this.y - this.synced.y;
+      this.core.frameView({ x0: w.camX, lane: w.lane });
+      this.core.update(dt);
+      this.core.tickMarks(dt);
+      this.guardStep(dt);
+      this.calmStep(dt);
       const s2 = this.core.shake;
       if (s2 > 6) w.shake(2, Math.min(4, s2 / 6));
       this.sync();
+    }
+    /** 전투 자세(무기 꺼냄 포함)로 있다가 가까이(700px) 적이 없고 공격·방어 키를 안 누른 채 5초가 지나면
+     * 평상 대기로 돌아온다: 무기부터 넣고, 1.5초 뒤 자세를 푼다 (사용자 2026-10-25). 걷기는 상관없다 */
+    calmT = 0;
+    calmHold = false;
+    calmStep(dt) {
+      const P = this.core.P;
+      const acting = [...this.heldNames].some((n) => !["left", "right", "up", "down", "run"].includes(n));
+      const near2 = this.targets().some((t) => Math.abs(t.x - this.x) < 700);
+      if (acting || near2 || !(P.combat || P.armed)) {
+        this.calmT = 0;
+        this.calmHold = false;
+        return;
+      }
+      if (P.mode !== "ground") {
+        if (!this.calmHold) this.calmT = 0;
+        return;
+      }
+      this.calmT += dt;
+      if (this.calmT < 5) return;
+      if (P.armed) {
+        this.core.onPress("weapon");
+        this.calmT = 3.5;
+        this.calmHold = true;
+        return;
+      }
+      this.calmT = 0;
+      this.calmHold = false;
+      this.core.onPress("combat");
+    }
+    spendGuard(n) {
+      this.guard = Math.max(0, this.guard - n);
+      this.guardWait = 0.8;
+      this.guardIdle = 0;
+      if (this.guard <= 0) this.guardBroken = true;
+    }
+    /** 마지막으로 막아낸 뒤 0.8초가 지나면 초당 35씩 찬다 (막는 중이어도) */
+    guardStep(dt) {
+      this.guardIdle += dt;
+      if (this.guardWait > 0) {
+        this.guardWait -= dt;
+        return;
+      }
+      this.guard = Math.min(100, this.guard + 35 * dt);
+      if (this.guardBroken && this.guard >= 40) this.guardBroken = false;
     }
     sync() {
       const P = this.core.P;
       this.x = P.x;
       this.y = P.y;
       this.z = P.z;
+      this.px = this.x;
+      this.py = this.y;
+      this.pz = this.z;
+      this.synced.x = this.x;
+      this.synced.y = this.y;
       this.dir = P.face > 0 ? 1 : -1;
       this.gauge = P.sp;
       this.running = this.core.P.mode === "ground" && this.heldNames.has("run");
@@ -4023,8 +4126,8 @@
     KeyH: "hitbox"
   };
   function useEileenKeys() {
-    for (const k of ["KeyQ", "KeyW", "KeyG", "KeyR", "KeyF", "KeyC", "KeyZ", "KeyX", "KeyA", "KeyS", "KeyD"]) delete KEYMAP[k];
-    Object.assign(KEYMAP, { KeyZ: "light", KeyX: "heavy", KeyC: "dodge", KeyV: "block", KeyA: "shoot", KeyS: "skill", KeyD: "charge", KeyF: "super", KeyM: "map", KeyO: "auto" });
+    for (const k of ["KeyQ", "KeyW", "KeyG", "KeyR", "KeyF", "KeyC", "KeyZ", "KeyX", "KeyV", "KeyA", "KeyS", "KeyD", "Tab", "KeyR"]) delete KEYMAP[k];
+    Object.assign(KEYMAP, { KeyQ: "light", KeyW: "heavy", KeyC: "block", KeyA: "shoot", KeyS: "charge", KeyD: "skill", KeyF: "super", Tab: "weapon", KeyR: "combat", KeyZ: "sit", KeyX: "crouch", KeyV: "flee", KeyB: "back", KeyM: "map", KeyO: "auto" });
   }
   var SHIFT_TAP = 5;
   var DOUBLE_TAP = 8;
@@ -4277,23 +4380,23 @@
   var ACTS = Object.keys(CODE);
   var ACT_OF_CODE = Object.fromEntries(ACTS.map((a) => [CODE[a], a]));
   function useEileenControls() {
-    Object.assign(CODE, { attack: "KeyZ", reload: "KeyX", support: "KeyC", guard: "KeyV", shoot: "KeyA", unique: "KeyS", hitbox: "KeyD", ult: "KeyF", map: "KeyM", auto: "KeyO" });
-    Object.assign(KEY_NAME, { attack: "Z", reload: "X", support: "C", guard: "V", shoot: "A", unique: "S", hitbox: "D", ult: "F", map: "M·Tab", auto: "O" });
+    Object.assign(CODE, { attack: "KeyQ", reload: "KeyW", support: "Tab", guard: "KeyC", shoot: "KeyA", unique: "KeyD", hitbox: "KeyS", ult: "KeyF", map: "KeyM", auto: "KeyO" });
+    Object.assign(KEY_NAME, { attack: "Q", reload: "W", support: "Tab", guard: "C", shoot: "A", unique: "D", hitbox: "S", ult: "F", map: "M", auto: "O" });
     Object.assign(LABEL, {
       attack: "약 공격 (연타 3타) · 뛰며 = 슬라이딩 · 공중 = 점프 공격",
       reload: "강 공격 (콤보 마무리)",
-      support: "회피 (누른 방향)",
-      guard: "막기 (누른 채)",
+      support: "무기 꺼내기·넣기",
+      guard: "방어 (누른 채 · 방어 게이지가 닳는다)",
       shoot: "원거리 (누른 채 연사 · 과열 주의)",
-      unique: "고유기술 제압사격",
+      unique: "기술 제압사격",
       hitbox: "충전 (누른 채 → 떼면 광선)",
       ult: "필살기 「증명해.」",
       evade: "짧게 회피 · 누른 채 달리기"
     });
-    ALIAS.Tab = "KeyM";
-    Object.assign(KEY_OF, { KeyV: "v", KeyF: "f", KeyM: "m", KeyO: "o" });
-    Object.assign(PAD_BUTTON, { 2: "KeyZ", 3: "KeyA", 4: "KeyV", 6: "KeyD", 7: "KeyF", 8: "KeyM", 10: "KeyC", 11: "KeyX" });
-    Object.assign(PAD_NAME, { KeyZ: "X", KeyA: "Y", KeyV: "LB", KeyD: "LT", KeyF: "RT", KeyM: "Back", KeyC: "L3", KeyX: "R3", KeyS: "메뉴" });
+    delete ALIAS.Tab;
+    Object.assign(KEY_OF, { KeyF: "f", KeyM: "m", KeyO: "o" });
+    Object.assign(PAD_BUTTON, { 2: "KeyQ", 3: "KeyA", 4: "KeyC", 6: "KeyS", 7: "KeyF", 8: "KeyM", 10: "Tab", 11: "KeyW" });
+    Object.assign(PAD_NAME, { KeyQ: "X", KeyA: "Y", KeyC: "LB", KeyS: "LT", KeyF: "RT", KeyM: "Back", Tab: "L3", KeyW: "R3", KeyD: "메뉴" });
     for (const a of ACTS) ACT_OF_CODE[CODE[a]] = a;
     for (const k of Object.keys(ACT_OF_CODE)) if (CODE[ACT_OF_CODE[k]] !== k) delete ACT_OF_CODE[k];
   }
@@ -4417,7 +4520,7 @@
     c.imageSmoothingEnabled = false;
     c.fillStyle = "rgba(0,0,0,.28)";
     c.beginPath();
-    const P = PIXEL * spr(y) * charSize.k, k = P / PIXEL;
+    const P = PIXEL * spr(y), k = P / PIXEL;
     c.ellipse(x, y, 34 * k, 8 * k, 0, 0, Math.PI * 2);
     c.fill();
     snapTo(c, x, y);
@@ -4429,10 +4532,10 @@
   function visitAgentTop(name) {
     const a = sheet?.agents[name];
     if (!a?.frames.length) return -260;
-    if (typeof a.head === "number") return -a.head * PIXEL * charSize.k;
-    return Math.min(...a.frames.map((f) => f.oy)) * PIXEL * charSize.k;
+    if (typeof a.head === "number") return -a.head * PIXEL;
+    return Math.min(...a.frames.map((f) => f.oy)) * PIXEL;
   }
-  var faces = /* @__PURE__ */ new Map();
+  var faces2 = /* @__PURE__ */ new Map();
   var faceCanvas = /* @__PURE__ */ new Map();
   function visitAgentFaceCanvas(name, side = 34) {
     visitAgentFace(name, side);
@@ -4442,7 +4545,7 @@
     const a = sheet?.agents[name];
     if (!sheet || !a?.frames.length) return "";
     const key2 = `${name}|${side}`;
-    const hit2 = faces.get(key2);
+    const hit2 = faces2.get(key2);
     if (hit2 !== void 0) return hit2;
     const f = a.frames[0];
     const src = document.createElement("canvas");
@@ -4470,7 +4573,7 @@
       faceCanvas.set(key2, out);
     } catch {
     }
-    faces.set(key2, url);
+    faces2.set(key2, url);
     return url;
   }
 
@@ -4509,6 +4612,9 @@
     }
     return EMPTY_ART;
   }
+
+  // src/game/action/charSize.ts
+  var charSize = { k: 1 };
 
   // src/game/action/hq/data.ts
   var PLACES = [
@@ -4832,87 +4938,4 @@
       agent: s2.selected,
       support: s2.support && s2.support !== s2.selected && s2.agents[s2.support].injured === 0 ? s2.support : null,
       goal: { id: m.id, kind: m.kind, title: m.title, depth: m.depth, rules: m.rules, rescue: m.rescue, recover: m.recover },
-      stats: statsFor(s2, s2.selected),
-      mastery: level,
-      moves: movesFor(level),
-      items: s2.loadout.map((x) => x ? { ...x } : null),
-      relics: s2.relics.filter((x) => !!x),
-      coffee: s2.coffee,
-      danger: s2.danger,
-      variant: variantFor(seed).id,
-      knownRules: s2.rulebook.slice(),
-      deepest: s2.deepest
-    };
-    s2.loadout = [null, null, null, null];
-    s2.coffee = null;
-    s2.mission = m.id;
-    s2.active = { runId, mission: m.id, agent: s2.selected, seed };
-    return l;
-  }
-  var survivorId = (id) => SURVIVORS[id] ? id : id.startsWith("missing") ? "worker" : id;
-  var arr = (v) => Array.isArray(v) ? v.filter((x) => typeof x === "string") : [];
-  function normalizeResult(r) {
-    const n = r.notes ?? {};
-    const merge = (values, key2) => [.../* @__PURE__ */ new Set([...values, ...arr(n[key2]), ...arr(n[`stage.${key2}`])])];
-    const sent = merge(r.sent, "sent");
-    const out = {
-      ...r,
-      // 층은 송신하면 found를 비운다. 송신한 줄도 이번 출동에서 확인한 규칙이다.
-      found: [.../* @__PURE__ */ new Set([...merge(r.found, "found"), ...sent])],
-      sent,
-      rescued: [...new Set(merge(r.rescued, "rescued").map(survivorId))],
-      bag: r.bag.map((b) => b ? { ...b } : null),
-      itemsLeft: r.itemsLeft.map((x) => x ? { ...x } : null)
-    };
-    if (typeof n["stage.depth"] === "number") out.depth = Math.max(out.depth, n["stage.depth"]);
-    return out;
-  }
-  function judgeMission(g2, r) {
-    r = normalizeResult(r);
-    if (r.how !== "return" || r.depth < g2.depth) return false;
-    const n = r.notes ?? {};
-    const visited = arr(n["stage.visited"]);
-    const bosses = arr(n.bosses);
-    switch (g2.kind) {
-      case "조사":
-        if (g2.id === "m3") {
-          const cleared = Array.isArray(n["stage.clearedFloors"]) ? n["stage.clearedFloors"] : [];
-          return visited.some((v) => {
-            const match = /^(?:L(\d+)|B-(\d+))\s+.*추격/.exec(v);
-            return !!match && cleared.includes(match[1] ? Number(match[1]) : Number(match[2]) + 3);
-          });
-        }
-        if (g2.id === "m8") return n["stage.trial"] === "success";
-        if (g2.id === "m5") return visited.some((v) => v.includes("재현")) && r.found.filter((id) => id.startsWith("r_")).length >= (g2.rules ?? 1);
-        return r.found.length >= (g2.rules ?? 1);
-      case "구조":
-        return g2.rescue ? r.rescued.includes(survivorId(g2.rescue)) : r.rescued.length > 0;
-      case "진압":
-        if (g2.id === "m6") return n["stage.elderDefeated"] === true || bosses.includes("elder") || bosses.includes("elder_f") && bosses.includes("elder_m");
-        return bosses.includes(g2.id === "m2" ? "guard" : g2.id);
-      case "회수":
-        return !!g2.recover && r.bag.some((b) => b?.id === g2.recover);
-      case "기록":
-        return r.depth >= g2.depth;
-    }
-  }
-  var CASH_RATE = { return: 0.5, withdraw: 0.5, evac: 0 };
-  var MASTERY_GAIN = (r) => 20 + r.floors * 10 + (r.missionDone ? 30 : 0) + Math.min(30, r.kills);
-  function settle(s2, l, raw, rand3) {
-    const id = l.runId;
-    if (!id || raw.runId !== void 0 && raw.runId !== id) return ["출동 id가 다른 결과라 정산하지 않았어요."];
-    if (s2.last?.runId === id) return s2.last.lines;
-    if (!s2.active || s2.active.runId !== id || s2.active.mission !== l.goal.id || s2.active.agent !== l.agent || s2.active.seed !== l.seed) return ["진행 중인 출동과 다른 결과라 정산하지 않았어요."];
-    const lines3 = [];
-    const r0 = normalizeResult(raw);
-    const r = { ...r0, missionDone: judgeMission(l.goal, r0) };
-    const m = MISSION_BY_ID[l.goal.id];
-    const evac = r.how === "evac";
-    const success = r.how === "return" && r.missionDone;
-    const agent = AGENT_BY_ID[l.agent];
-    lines3.push(evac ? `후송: ${josa(agent.name, "이", "가")} 의무실 침대에서 깨어났다.` : success ? `귀환: ${agent.name}, 임무 「${m.title}」 성공.` : r.how === "return" ? `귀환: 임무 「${m.title}」 미달성. 성공 보상은 없다.` : `철수: ${josa(agent.name, "이", "가")} 출동을 포기하고 돌아왔다. 성공 보상은 없다.`);
-    const unsent = r.found.filter((f) => !r.sent.includes(f));
-    const kept = evac ? [...r.sent, ...unsent.filter((_, i) => i % 2 === 0)] : [...r.sent, ...r.found];
-    let added2 = 0;
-    for (const id2 of kept) if (!s2.rulebook.includes(id2)) s2.rulebook.push(id2), added2++;
-    if (added2 || evac && unsent.len
+      stats: s

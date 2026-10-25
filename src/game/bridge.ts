@@ -107,8 +107,10 @@ export interface GameReport {
 }
 
 export interface GameViewport {
-  /** 전체화면을 시도한다. 브라우저 전체화면이 막히면 창 안 전체화면으로 대신한다 */
-  enter(): Promise<void>;
+  /** 전체화면을 시도한다. kind 'browser'(기본) = 브라우저 전체화면, 막히면 창 안으로. 'panel' = 상황창 안 전체(왼쪽 메뉴·오른쪽 신분증 칸까지 덮음) */
+  enter(kind?: 'browser' | 'panel'): Promise<void>;
+  /** 지금 전체화면 종류 (없으면 null). 옛 플러그인은 없다 */
+  readonly mode?: 'browser' | 'panel' | null;
   exit(): Promise<void>;
   readonly full: boolean;
   /** 세로 화면에서 게임을 90도 돌려 가로로 보여 주는 중인가 */
@@ -171,7 +173,15 @@ export interface GameField {
   override?(v: 'inside' | 'outside' | null): void;
 }
 
+/** 게임 안 설정(화면·소리·조작) 저장소: 플러그인이 이 채팅 변수로 둔다 (메인 설정 → 필드에서도 고침) */
+export interface GameUiPrefs {
+  load(): Promise<string | null>;
+  save(text: string): void;
+}
+
 export interface GameBridge {
+  /** 게임 안 설정 저장소. 없으면(옛 플러그인) 게임이 브라우저 저장소에 둔다 */
+  uiPrefs?: GameUiPrefs;
   /** 필드 장부. 없으면 사건을 남기지 않는다 */
   field?: GameField;
   /** 봇 보조 본부 방문. 응답은 시작한 채팅에 즉시 기록된다. */

@@ -43,7 +43,7 @@ export interface ShellOptions {
   /** 일시정지 메뉴 위쪽 한 줄 요약 */
   pauseInfo?: () => string;
   /** 필드(봇 보조): 일시정지는 계속·설정·조작법·나가기만, 설정에서 전체 화면·NPC 대화 칸을 뺀다 (2026-10-23 사용자) */
-  field?: { onExit: () => void };
+  field?: { onExit: () => void; fullscreen?: { enter(kind: 'browser' | 'panel'): Promise<void>; exit(): Promise<void>; mode(): 'browser' | 'panel' | null } };
 }
 
 export interface Shell {
@@ -155,7 +155,7 @@ export function mountGameShell(box: HTMLElement, o: ShellOptions = {}): Shell {
     const pct = (v: number) => `${Math.round(v * 100)}%`;
     return [
       { type: 'head', label: '화면' },
-      { type: 'toggle', label: 'CRT 모니터 (곡면·형광 마스크·주사선)', get: () => s.crt, set: (v) => (s.crt = v) },
+      { type: 'choice', label: 'CRT 모니터', options: [['off', '끄기'], ['screen', '화면 효과'], ['curved', '곡면까지']], get: () => s.crt, set: (v) => (s.crt = v as UiSettings['crt']) },
       { type: 'slider', label: '화면 흔들림', get: () => s.shake, set: (v) => (s.shake = v), min: 0, max: 1, step: 0.25, fmt: pct },
       { type: 'toggle', label: '피격 섬광', get: () => s.flash, set: (v) => (s.flash = v) },
       { type: 'toggle', label: '피해 숫자', get: () => s.numbers, set: (v) => (s.numbers = v) },
@@ -163,6 +163,15 @@ export function mountGameShell(box: HTMLElement, o: ShellOptions = {}): Shell {
       { type: 'toggle', label: '도트 선명하게', get: () => s.pixel, set: (v) => (s.pixel = v) },
       { type: 'slider', label: '화면 확대', get: () => s.charSize, set: (v) => (s.charSize = v), min: 1, max: 1.6, step: 0.05, fmt: pct },
       ...(o.field ? [] : [{ type: 'button' as const, label: '전체 화면', sub: '폰은 가로로 고정', act: () => void stage.fullscreen() }]),
+      // 필드(리스): 전체 화면 두 가지 (2026-10-25 사용자) — 브라우저 전체 · 상황창 안 전체(왼쪽 메뉴·오른쪽 신분증 칸까지)
+      ...(o.field?.fullscreen ? [{
+        type: 'choice' as const, label: '전체 화면', options: [['off', '끄기'], ['panel', '상황창 안'], ['browser', '브라우저']] as [string, string][],
+        get: () => o.field!.fullscreen!.mode() ?? 'off',
+        set: (v: string) => {
+          const f = o.field!.fullscreen!;
+          void (v === 'off' ? f.exit() : f.enter(v as 'browser' | 'panel')).then(() => { if (menu.isOpen) menu.replace(settingsScreen()); });
+        },
+      }] : []),
       { type: 'head', label: '소리' },
       { type: 'slider', label: '전체', get: () => s.master, set: (v) => (s.master = v), min: 0, max: 1, step: 0.1, fmt: pct },
       { type: 'slider', label: '음악', get: () => s.music, set: (v) => (s.music = v), min: 0, max: 1, step: 0.1, fmt: pct },

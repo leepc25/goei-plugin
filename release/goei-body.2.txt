@@ -1,4 +1,5 @@
-d = new Map(previous.posts.map((p) => [p.id, p]));
+evious) {
+    const old = new Map(previous.posts.map((p) => [p.id, p]));
     const run3 = (rows2, prior, side, wanted) => {
       const queue2 = /* @__PURE__ */ new Map();
       for (const r of prior) {
@@ -3677,8 +3678,8 @@ ${after}`);
     }
     const n = userName.trim();
     if (n && agentName && n !== agentName && n.length >= 2 && !/^(?:user|나|유저)$/i.test(n)) {
-      const esc20 = n.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-      const re = new RegExp(/^[A-Za-z]/.test(n) ? `\\b${esc20}\\b` : esc20, "g");
+      const esc21 = n.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const re = new RegExp(/^[A-Za-z]/.test(n) ? `\\b${esc21}\\b` : esc21, "g");
       out = out.map((m) => typeof m?.content === "string" && re.test(m.content) ? { ...m, content: m.content.replace(re, agentName) } : m);
     }
     return out;
@@ -4481,4 +4482,4 @@ The previous response was rejected and nothing was saved. Recreate the complete 
     box.setAttribute("role", "dialog");
     box.innerHTML = `<div class="gx-idpop-card">${html}<button class="gx-agpop-x" aria-label="닫기">✕</button></div>`;
     const theme = document.querySelector(".gx")?.getAttribute("data-theme");
-    if (theme) box.setAttribute("data-t
+    if (theme) bo

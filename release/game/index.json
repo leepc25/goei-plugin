@@ -1,5 +1,5 @@
 {
- "version": "0.16.57",
+ "version": "0.16.58",
  "code": {
   "parts": [
    "goei-game.1.txt",
@@ -14,8 +14,8 @@
    "goei-game.10.txt",
    "goei-game.11.txt"
   ],
-  "length": 2019764,
-  "bytes": 2114199
+  "length": 2045952,
+  "bytes": 2141228
  },
  "packs": [
   {
@@ -58,11 +58,12 @@
   },
   {
    "id": "test-people",
-   "hash": "546c40cb98e460cd",
-   "bytes": 921232,
+   "hash": "c677942e2c209bcc",
+   "bytes": 1228145,
    "parts": [
     "test-people.1.bin",
-    "test-people.2.bin"
+    "test-people.2.bin",
+    "test-people.3.bin"
    ],
    "required": true
   },

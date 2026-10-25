@@ -15,6 +15,7 @@ import { createGameAudio } from '../audio';
 import { VIDEO_AUDIO_EVENT, type VideoTrack } from '../audio/videoTrack';
 import { createHq, idbSaves, setItemIconDrawer, setLineProvider, setSupplyCatalog, type MissionLaunch, type RunResult, type SaveSlots } from '../hq';
 import { mountGameShell, type HudState, type Shell } from '../ui';
+import { localStore, type SettingsStore } from '../ui/settings';
 import { navigationFeedback } from './navigationFeedback';
 import { syncNavigationButton } from '../ui/navigationButton';
 import type { GameEvent, HqModuleLike, RunConfigCore, RunResultCore, StageModule } from './contract';
@@ -191,7 +192,7 @@ function hudState(w: World, shell: Shell): HudState {
   const f = w.floor;
   const d = f.depth ?? 0;
   return {
-    agent: { name: p.label ?? '쟈알디', color: '#c0453a', portrait: (p as { core?: unknown }).core ? testPlayerFace(64) : null },
+    agent: { name: p.label ?? '쟈알디', color: '#c0453a', portrait: (p as { core?: unknown }).core ? testPlayerFace(64, p.dir < 0) : null },
     hp: p.hp,
     maxHp: p.hpMax,
     energy: p.skillCd > 0 ? 75 - p.skillCd : 75,
@@ -251,8 +252,15 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     if (info?.notice) await shell.choose({ title: '알림', lines: [info.notice], options: ['확인'] });
       return true;
   }
+  // 게임 안 설정: 리스에서는 플러그인이 이 채팅 변수로 둔다(메인 설정 → 필드와 같은 값). 아직 없으면 이 기기에 남은 값으로 시작
+  const uiPrefs = bridge?.uiPrefs;
+  const store: SettingsStore | undefined = uiPrefs ? {
+    load: async () => (await uiPrefs.load().catch(() => null)) ?? localStore.load(),
+    save: (t) => { uiPrefs.save(t); localStore.save(t); },
+  } : undefined;
   const shell = mountGameShell(box, {
     synth: true,
+    store,
     title: bridge?.visit ? VISIT_TITLE.title : '차원 승강기',
     sub: bridge?.visit ? VISIT_TITLE.sub : 'ANOMALY SIMULATION · 관리국 액션',
     pauseInfo: () => session.error ?? (game?.inHub ? '본부 자동 저장' : '안전 지점 자동 저장 · 전투 중 중단하면 직전 안전 지점부터'),
@@ -280,7 +288,11 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     onRetreat: () => bridge?.visit ? bridge.close?.() : game?.endRun('withdraw'),
     onTitle: () => game?.toTitle(),
     toLocal: bridge?.viewport ? (x, y, el) => bridge.viewport!.toLocal(x, y, el) : undefined,
-    field: bridge?.visit ? { onExit: () => bridge.close?.() } : undefined,
+    field: bridge?.visit ? {
+      onExit: () => bridge.close?.(),
+      // 옛 플러그인(mode 없음)은 전체 화면 칸을 숨긴다
+      fullscreen: bridge.viewport && 'mode' in bridge.viewport ? { enter: (k) => bridge.viewport!.enter(k), exit: () => bridge.viewport!.exit(), mode: () => bridge.viewport!.mode ?? null } : undefined,
+    } : undefined,
   });
   // 필드 전투 효과 틀 (fx/fieldFx.ts). 히트스톱·필살 컷인 동안은 월드를 멈춘다(mods.frozen)
   const ffx = new FieldFx();
@@ -716,7 +728,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       if (game?.inHub && !mods.blocking?.() && !shell.paused) {
         const me = hq.visitor();
         const name = me.name || (testPlayerFace() ? '에일린' : '방문자');
-        const face = (me.agentId && visitAgentFaceCanvas(name, 34)) || testPlayerFace(64) || visitAgentFaceCanvas('쟈알디', 34);
+        const face = (me.agentId && visitAgentFaceCanvas(name, 34)) || testPlayerFace(64, w.player.dir < 0) || visitAgentFaceCanvas('쟈알디', 34);
         // 좌상단 초상화 상자 (사용자 2026-10-25: 위 목표 띠 대신)
         shell.hud.drawFieldCard(ctx, { name, face, hp: w.player.hp, maxHp: w.player.hpMax, gauge: w.player.gauge, compact: hs.compact, top: true, items: hs.items, device: hs.device }, dt);
       }

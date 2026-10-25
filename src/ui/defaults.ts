@@ -4,14 +4,15 @@ import { loadVarDefaults, saveVarDefaults } from '../host/prefs';
 import { updateChat, type ChatContext } from '../host/risu';
 import { ICONS } from './icons';
 
-export type DefaultsPane = 'ph' | 'gn' | 'wiki';
+export type DefaultsPane = 'ph' | 'gn' | 'wiki' | 'visit';
 
 const PREFIXES: Record<DefaultsPane, string[]> = {
   ph: ['$ph_'],
   gn: ['$lb_cfg_lb-gn.', '$gn_storage_'],
   wiki: ['$nw_'],
+  visit: ['$hq_'],
 };
-const NAME: Record<DefaultsPane, string> = { ph: '괴담톡', gn: '괴담넷', wiki: '위키' };
+const NAME: Record<DefaultsPane, string> = { ph: '괴담톡', gn: '괴담넷', wiki: '위키', visit: '필드' };
 
 export const defaultsAsk = { pane: '' as DefaultsPane | '', what: '' as '' | 'save' | 'load' };
 

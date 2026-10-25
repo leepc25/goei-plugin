@@ -29,7 +29,7 @@ export interface Stage {
   toGame(clientX: number, clientY: number): { x: number; y: number };
   portrait: boolean;
   onResize(fn: () => void): void;
-  setCrt(on: boolean): void;
+  setCrt(mode: 'off' | 'screen' | 'curved'): void;
   setBright(v: number): void;
   setPixel(on: boolean): void;
   fullscreen(): Promise<void>;
@@ -105,10 +105,11 @@ export function mountStage(box: HTMLElement): Stage {
     onResize(fn) {
       fns.push(fn);
     },
-    setCrt(on) {
+    setCrt(mode) {
       // WebGL 브라운관(ui/crt.ts). 안 되면 옛 CSS 줄무늬
+      const on = mode !== 'off';
       crt ??= mountCrt(stageEl, canvas);
-      if (crt) crt.setOn(on);
+      if (crt) crt.setOn(on, mode === 'curved');
       root.classList.toggle('crt', on && !crt);
     },
     setBright(v) {

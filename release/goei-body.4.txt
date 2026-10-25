@@ -1,4 +1,5 @@
-높이에 맞춰 최대한 크게 (v0.11.0) */
+
+/* PC: 지도는 옆 목록을 내려도 따라오고, 창 높이에 맞춰 최대한 크게 (v0.11.0) */
 .gx-field > .gx-mapcol { position: sticky; top: 12px; }
 .gx-mapcol, .gx-sidecol { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
 .gx-sidecol .gx-sec { padding: 0; }
@@ -2211,4 +2212,4 @@ button.mk-go:hover { color: var(--signal); }
 .gx-opview.fx-lost > .gx-oplost { display: grid; animation: gx-lost 1.5s steps(1) both; }
 @keyframes gx-lost { 0% { opacity: 1; } 8% { opacity: .3; } 12% { opacity: 1; } }
 /* 신호가 돌아올 때 (2026-10-21 사용자: 너무 쓱 켜진다, 오싹하게, 숨어 있다 도망가거나 다양하게). 1.3초:
-   검은 화면 가운데 밝은 한 줄 → 세로로 펴지며 음화(반전) → 위아래로 흘러내림 
+   검은 화면 가운데 밝은 한 줄 → 세로

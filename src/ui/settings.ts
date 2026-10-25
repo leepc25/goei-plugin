@@ -38,7 +38,8 @@ export function resetSettings(): void {
 }
 
 import { updateGroup } from './update';
-import { handleVisitSettings, visitSettings } from './visitset';
+import { handleVisitSettings, visitSettings, visitUi } from './visitset';
+import { defaultsButtons, defaultsConfirm } from './defaults';
 import { phoneSettingsPane } from './phone';
 import { gnetSettingsPane } from './gnet';
 import { wikiSettingsPane } from './wiki';
@@ -167,7 +168,7 @@ const BACK = `<button class="ph-tool ph-back" data-action="set-feat-back" aria-l
 /** 기능별 설정을 설정창 안에서 (각 기능의 설정 화면을 그대로 쓰고, 뒤로가기만 설정으로) */
 function featurePage(ctx: ChatContext, page: NonNullable<typeof settingsUi.page>): string {
   let pane = '';
-  if (page === 'visit') pane = `<header class="ph-room-head">${BACK}<div class="ph-room-title"><b>필드 설정</b></div></header>${visitSettings(ctx, ctx.chat.scriptstate)}`;
+  if (page === 'visit') pane = `<header class="ph-room-head">${BACK}<div class="ph-room-title"><b>필드 설정</b></div><span class="ph-act">${defaultsButtons('visit')}</span></header>${defaultsConfirm('visit')}${visitUi.notice ? `<div class="gx-err" role="status">${esc(visitUi.notice)}</div>` : ''}${visitSettings(ctx, ctx.chat.scriptstate)}`;
   else {
     const raw = page === 'phone' ? phoneSettingsPane(ctx) : page === 'gnet' ? gnetSettingsPane(ctx) : wikiSettingsPane(ctx);
     // 첫 머리의 뒤로 단추를 설정으로 돌아가는 단추로 (없으면 넣는다)
@@ -294,7 +295,7 @@ export async function handleSettings(action: string, value: string | undefined, 
     env.render();
     return true;
   }
-  if (action.startsWith('visit-') && (await handleVisitSettings(action, ctx, env.render, env.refresh))) return true;
+  if (action.startsWith('visit-') && (await handleVisitSettings(action, ctx, env.render, env.refresh, v))) return true;
   if (action === 'set-bar') {
     settingsUi.confirm = v === 'save' || v === 'load' ? v : '';
     env.render();

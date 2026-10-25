@@ -1,4 +1,4 @@
-→ 한 번 꺼졌다 켜짐. 형체 연출은 data-back마다 다르다 (ui/cctvfx.ts) */
+로 펴지며 음화(반전) → 위아래로 흘러내림 → 한 번 꺼졌다 켜짐. 형체 연출은 data-back마다 다르다 (ui/cctvfx.ts) */
 .gx-opview.fx-back > .gx-opfeed { transform-origin: 50% 50%; animation: gx-backon 1.3s linear both; }
 @keyframes gx-backon {
   0% { transform: scaleY(.008) scaleX(.7); filter: brightness(6) saturate(0); }
@@ -85,6 +85,9 @@
 .gx-body.gx-fieldhost { position: relative; padding: 0; overflow: hidden; scrollbar-gutter: auto; min-height: 0; }
 .gx-fieldhost .gx-game, .gx-fieldhost .gx-game.gx-full { position: absolute; inset: 0; z-index: auto; }
 .gx-fieldhost .gx-game .gx-head { display: none; }
+/* 필드 전체화면 「창 안」 (2026-10-25 사용자): 상황창 전체(왼쪽 메뉴·오른쪽 신분증 칸까지)를 덮는다. 브라우저 전체화면은 :fullscreen이 맡는다 */
+.gx-panel:has(.gx-game.gx-panelfull) .gx-fieldhost { position: static; }
+.gx-panel .gx-game.gx-panelfull, .gx-fieldhost .gx-game.gx-panelfull { position: absolute; inset: 0; z-index: 60; border-radius: inherit; overflow: hidden; background: #000; }
 `;
 
   // src/ui/mbar.ts
@@ -607,7 +610,7 @@
     }
     return { next, lore: lore.count, scripts: scripts.count, fields: fields3 };
   }
-  var PLUGIN_VERSION = true ? "0.16.57" : "0";
+  var PLUGIN_VERSION = true ? "0.16.58" : "0";
 
   // src/host/game/fetch.ts
   var GAME_BASE = UPDATE_BASE ? `${UPDATE_BASE}/game` : "";
@@ -672,7 +675,7 @@
 
   // src/host/game/code.ts
   var CODE_KEY = "goei:game:code";
-  var VERSION = true ? "0.16.57" : "";
+  var VERSION = true ? "0.16.58" : "";
   var codeVersion = (code) => /^\/\/ goei-game (\S+)/.exec(code)?.[1] ?? null;
   var mod = null;
   var codeStats = { readMs: 0, runMs: 0, bytes: 0, fromNet: false };
@@ -981,6 +984,34 @@
     await saveReports((await pendingReports()).filter((p) => p.at !== at));
   }
 
+  // src/host/game/uiprefs.ts
+  var HQ_UI = "$hq_ui";
+  function createUiPrefs() {
+    const opening = loadContext();
+    let timer3 = null;
+    let pending = null;
+    const flush = async () => {
+      timer3 = null;
+      const text = pending;
+      pending = null;
+      const c = await opening;
+      if (!c || text === null) return;
+      await updateChat(c.charIndex, c.chatIndex, (chat) => chat.scriptstate?.[HQ_UI] === text ? null : { ...chat, scriptstate: { ...chat.scriptstate ?? {}, [HQ_UI]: text } });
+    };
+    return {
+      async load() {
+        const c = await opening;
+        const v = c?.chat.scriptstate?.[HQ_UI];
+        return typeof v === "string" && v ? v : null;
+      },
+      save(text) {
+        pending = text;
+        if (timer3) clearTimeout(timer3);
+        timer3 = setTimeout(() => void flush().catch((e) => console.log(`[goei] 게임 설정을 저장하지 못했어요: ${String(e)}`)), 600);
+      }
+    };
+  }
+
   // src/host/game/talk.ts
   var gameTalk = {
     model: (messages, which) => runModel(messages, which === "aux" ? "aux" : "main"),
@@ -1084,8 +1115,8 @@ ${recentStory.map((m) => m.text).join("\n")}`,
     const lines = s4.split("\n").map((l) => l.trim()).filter(Boolean);
     const quoted = !prose ? [] : lines.flatMap((l) => [...l.matchAll(/[「"“『]([^」"”』]{1,})[」"”』]/g)].map((m) => m[1]));
     s4 = (quoted.length ? quoted : lines).join(" ");
-    const esc20 = speaker.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    s4 = s4.replace(new RegExp(`^\\s*${esc20}\\s*[:：]\\s*`), "").replace(/^[「"“『]|[」"”』]$/g, "");
+    const esc21 = speaker.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    s4 = s4.replace(new RegExp(`^\\s*${esc21}\\s*[:：]\\s*`), "").replace(/^[「"“『]|[」"”』]$/g, "");
     return s4.replace(/\s+/g, " ").trim();
   }
   function clipLine(s4, limit) {
@@ -1353,6 +1384,7 @@ ${recentStory.map((m) => m.text).join("\n")}`,
   function makeBridge(viewport2, slot, close2, onHidden) {
     return {
       api: 1,
+      uiPrefs: createUiPrefs(),
       visit: createVisit(),
       field: createField(),
       slot,
@@ -1376,6 +1408,7 @@ ${recentStory.map((m) => m.text).join("\n")}`,
   var phone2 = () => Math.min(innerWidth, innerHeight) <= 560 || matchMedia("(pointer: coarse)").matches;
   function makeViewport(layer2, opt = {}) {
     let full = false;
+    let mode2 = null;
     let rotated = false;
     let wantRotate = false;
     const subs2 = /* @__PURE__ */ new Set();
@@ -1384,13 +1417,15 @@ ${recentStory.map((m) => m.text).join("\n")}`,
       const rot = !opt.inFrame && wantRotate && full && portrait() && phone2();
       if (rot !== rotated) rotated = rot;
       layer2.classList.toggle("gx-full", full);
+      layer2.classList.toggle("gx-panelfull", mode2 === "panel");
       layer2.classList.toggle("gx-rot", rotated);
       emit();
     };
     const onResize = () => apply();
     const onFs = () => {
-      if (!document.fullscreenElement && full && layer2.dataset.nativeFs === "1") {
-        full = false;
+      if (!document.fullscreenElement && layer2.dataset.nativeFs === "1") {
+        if (mode2 === "browser") mode2 = null;
+        full = opt.inFrame ? full : false;
         wantRotate = false;
         delete layer2.dataset.nativeFs;
         apply();
@@ -1407,13 +1442,25 @@ ${recentStory.map((m) => m.text).join("\n")}`,
       get rotated() {
         return rotated;
       },
-      async enter() {
+      get mode() {
+        return mode2;
+      },
+      async enter(kind = "browser") {
         full = true;
         wantRotate = true;
+        if (kind === "panel") {
+          if (document.fullscreenElement) await document.exitFullscreen().catch(() => {
+          });
+          delete layer2.dataset.nativeFs;
+          mode2 = "panel";
+          return apply();
+        }
+        mode2 = "panel";
         try {
           if (layer2.requestFullscreen && document.fullscreenEnabled) {
             await layer2.requestFullscreen({ navigationUI: "hide" });
             layer2.dataset.nativeFs = "1";
+            mode2 = "browser";
             try {
               await screen.orientation.lock("landscape");
             } catch {
@@ -1430,7 +1477,8 @@ ${recentStory.map((m) => m.text).join("\n")}`,
         apply();
       },
       async exit() {
-        full = false;
+        full = opt.inFrame && mode2 !== null ? full : false;
+        mode2 = null;
         wantRotate = false;
         if (document.fullscreenElement) {
           try {
@@ -2517,7 +2565,7 @@ ${recentStory.map((m) => m.text).join("\n")}`,
   function settingsView3(ctx2) {
     const s4 = wikiSettings(ctx2.chat.scriptstate);
     const req = String(ctx2.chat.scriptstate?.["$nw_writing_request"] ?? "");
-    const line2 = (label, control2, hint = "") => `<div class="ps-row"><div class="ps-label"><b>${label}</b>${hint ? `<small>${hint}</small>` : ""}</div><div class="ps-ctl">${control2}</div></div>`;
+    const line2 = (label, control3, hint = "") => `<div class="ps-row"><div class="ps-label"><b>${label}</b>${hint ? `<small>${hint}</small>` : ""}</div><div class="ps-ctl">${control3}</div></div>`;
     return `<div class="ph-form nw-setpane">${paneHead3(ctx2, "위키 설정", "", defaultsButtons("wiki"))}${defaultsConfirm("wiki")}
     <div class="ph-form-body ps"><section class="ps-group"><h3>문서 작성</h3><div class="ps-rows">
       ${line2("분량", seg3("wiki-length", s4.length, [["short", "짧게"], ["standard", "보통"], ["detailed", "상세"]]))}
@@ -3718,61 +3766,4 @@ ${recentStory.map((m) => m.text).join("\n")}`,
           b.sido = val;
           b.gu = "";
           b.x = 50;
-          b.y = 50;
-        } else if (action === "dir-base-gu" && (!val || SIGUN[b.sido]?.includes(val))) b.gu = val;
-        dirUi.done = "";
-        break;
-      }
-      case "dir-base-xy": {
-        const [x, y, ...rest] = v.split("|");
-        const b = baseOf(rest.join("|"));
-        if (!b) break;
-        b.x = Math.round(Math.min(100, Math.max(0, Number(x))) * 10) / 10;
-        b.y = Math.round(Math.min(100, Math.max(0, Number(y))) * 10) / 10;
-        dirUi.done = "";
-        break;
-      }
-      case "dir-base-rename": {
-        const b = baseOf(dirUi.open);
-        const name = v.trim();
-        if (!b || !name || name === b.name) break;
-        if (baseOf(name)) {
-          dirUi.notice = `「${name}」 거점이 이미 있어요.`;
-          break;
-        }
-        b.name = name;
-        dirUi.open = name;
-        dirUi.notice = "";
-        dirUi.done = "";
-        break;
-      }
-      case "dir-base-del":
-        d.bases = d.bases.filter((b) => b.name !== v);
-        dirUi.open = "";
-        dirUi.done = "";
-        break;
-      case "dir-fac-play":
-      case "dir-fac-hide":
-      case "dir-fac-type": {
-        const at = v.indexOf("|");
-        const arg = v.slice(0, at);
-        const o = d.orgs.find((x) => x.name === v.slice(at + 1));
-        if (!o) break;
-        if (action === "dir-fac-hide") o.spec.hidden = arg === "0";
-        else if (action === "dir-fac-type") o.spec.type = arg;
-        else if (!o.faction) setPlayable(d, o, arg === "1");
-        dirUi.done = "";
-        break;
-      }
-      case "dir-fac-patch": {
-        dirUi.busy = true;
-        env2.render();
-        try {
-          let missing = [];
-          await updateCharacterLore(ctx2.charIndex, (lore) => {
-            const r = withFactionPlaceholders(lore);
-            missing = r.missing;
-            return r.changed ? r.lore : null;
-          });
-          dirUi.notice = missing.length ? `로어북에서 자리를 못 찾은 부분이 있어요: ${missing.join(", ")}` : "";
-          dirUi.done = missing.length ? "" : "🏷️Tag·📜Faction 
+          b.y

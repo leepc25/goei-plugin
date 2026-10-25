@@ -1,4 +1,4 @@
-heme", theme);
+x.setAttribute("data-theme", theme);
     box.addEventListener("click", (e) => {
       if (e.target.closest(".gx-idpop-card") && !e.target.closest(".gx-agpop-x")) return;
       box.remove();
@@ -55,9 +55,10 @@ heme", theme);
   var PREFIXES = {
     ph: ["$ph_"],
     gn: ["$lb_cfg_lb-gn.", "$gn_storage_"],
-    wiki: ["$nw_"]
+    wiki: ["$nw_"],
+    visit: ["$hq_"]
   };
-  var NAME = { ph: "괴담톡", gn: "괴담넷", wiki: "위키" };
+  var NAME = { ph: "괴담톡", gn: "괴담넷", wiki: "위키", visit: "필드" };
   var defaultsAsk = { pane: "", what: "" };
   var defaultsButtons = (pane, off = false) => `<span class="ps-defaults"><button class="st-act save" data-action="${pane}-def-ask" data-value="save" ${off ? "disabled" : ""}>${ICONS.pen}덮어쓰기</button><button class="st-act" data-action="${pane}-def-ask" data-value="load" ${off ? "disabled" : ""}>${ICONS.refresh}불러오기</button></span>`;
   function defaultsConfirm(pane) {
@@ -1116,7 +1117,7 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
   function seg(key2, cur, items) {
     return `<div class="gx-segs gx-segs-sm">${items.map(([v, label]) => `<button class="gx-seg${cur === v ? " on" : ""}" data-action="ph-cfg" data-value="${key2}=${v}" aria-pressed="${cur === v}">${label}</button>`).join("")}</div>`;
   }
-  var row2 = (label, control2, hint = "") => `<div class="ps-row"><div class="ps-label"><b>${label}</b>${hint ? `<small>${hint}</small>` : ""}</div><div class="ps-ctl">${control2}</div></div>`;
+  var row2 = (label, control3, hint = "") => `<div class="ps-row"><div class="ps-label"><b>${label}</b>${hint ? `<small>${hint}</small>` : ""}</div><div class="ps-ctl">${control3}</div></div>`;
   var group = (title2, rows2) => `<section class="ps-group"><h3>${title2}</h3><div class="ps-rows">${rows2}</div></section>`;
   function settingsView(ctx2) {
     const v = (k) => phoneValue(ctx2.chat.scriptstate, k);
@@ -2010,7 +2011,7 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
         <span class="ph-who-bot"><small>${last2.side === "me" ? "나: " : ""}${esc7([...previewText(last2.body)].slice(0, 60).join(""))}</small>${t.unread ? `<span class="ph-badge">${t.unread}</span>` : ""}</span></span></button>${del}${mobile && on2 && gnet.compose?.kind !== "newdm" ? dmPane(st, t.nick, busy5, true) : ""}</li>`;
     }).join("")}</ul>`;
   }
-  var row3 = (label, control2, hint = "") => `<div class="ps-row"><div class="ps-label"><b>${label}</b>${hint ? `<small>${hint}</small>` : ""}</div><div class="ps-ctl">${control2}</div></div>`;
+  var row3 = (label, control3, hint = "") => `<div class="ps-row"><div class="ps-label"><b>${label}</b>${hint ? `<small>${hint}</small>` : ""}</div><div class="ps-ctl">${control3}</div></div>`;
   var group2 = (title2, rows2) => `<section class="ps-group"><h3>${title2}</h3><div class="ps-rows">${rows2}</div></section>`;
   function settingsView2(ctx2, back = true) {
     const v = (k) => String(ctx2.chat.scriptstate?.[CFG(k)] ?? GN_DEFAULTS[k]);
@@ -3603,4 +3604,3 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .gx-tab { white-space: nowrap; flex: none; }
 .gx-tab-end { margin-left: auto; font-size: 14px; }
 .gx-field { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(340px, 1fr); gap: 20px; padding-top: 12px; padding-bottom: 16px; align-items: start; align-content: start; }
-/* PC: 지도는 옆 목록을 내려도 따라오고, 창 

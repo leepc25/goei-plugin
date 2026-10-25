@@ -5,8 +5,8 @@ const VS = `attribute vec2 p; varying vec2 uv; void main(){ uv = p * 0.5 + 0.5; 
 const FS = `precision mediump float;
 varying vec2 uv;
 uniform sampler2D tex; uniform sampler2D prev;
-uniform vec2 res; uniform vec2 src; uniform float time;
-vec2 curve(vec2 u){ u = u * 2.0 - 1.0; vec2 o = abs(u.yx) / vec2(5.2, 4.2); u = u + u * o * o; return u * 0.5 + 0.5; }
+uniform vec2 res; uniform vec2 src; uniform float time; uniform float bend;
+vec2 curve(vec2 u){ if (bend < 0.5) return u; u = u * 2.0 - 1.0; vec2 o = abs(u.yx) / vec2(5.2, 4.2); u = u + u * o * o; return u * 0.5 + 0.5; }
 vec3 sampleRGB(vec2 u, float ca){
   vec2 d = (u - 0.5) * ca;
   return vec3(texture2D(tex, u + d).r, texture2D(tex, u).g, texture2D(tex, u - d).b);
@@ -14,8 +14,8 @@ vec3 sampleRGB(vec2 u, float ca){
 void main(){
   vec2 u = curve(uv);
   if (u.x < 0.0 || u.x > 1.0 || u.y < 0.0 || u.y > 1.0) { gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0); return; }
-  // 둥근 모서리
-  vec2 q = abs(u - 0.5) * 2.0; float corner = smoothstep(1.0, 0.985, length(max(q - vec2(0.93, 0.9), 0.0) / vec2(0.07, 0.1)));
+  // 둥근 모서리 (곡면 모드만)
+  vec2 q = abs(u - 0.5) * 2.0; float corner = bend < 0.5 ? 1.0 : smoothstep(1.0, 0.985, length(max(q - vec2(0.93, 0.9), 0.0) / vec2(0.07, 0.1)));
   float edge = dot(u - 0.5, u - 0.5);
   vec3 col = sampleRGB(u, 0.0012 + edge * 0.006);
   // 빛 번짐: 둘레 8곳을 흐리게 모아 밝은 곳만 더한다
@@ -32,14 +32,14 @@ void main(){
   vec3 mask = m < 1.0 ? vec3(1.0, 0.72, 0.72) : m < 2.0 ? vec3(0.72, 1.0, 0.72) : vec3(0.72, 0.72, 1.0);
   col *= mix(vec3(1.0), mask, 0.32);
   // 비네팅 · 깜빡임 · 잡음 · 밝기 보정
-  col *= 1.0 - edge * 0.95;
+  col *= 1.0 - edge * (bend < 0.5 ? 0.35 : 0.95);
   col *= 1.0 + 0.012 * sin(time * 113.0) + 0.006 * sin(time * 7.0);
   col += (fract(sin(dot(gl_FragCoord.xy + time, vec2(12.9898, 78.233))) * 43758.5453) - 0.5) * 0.025;
   col = pow(col * 1.22, vec3(0.95));
   gl_FragColor = vec4(col * corner, 1.0);
 }`;
 
-export interface Crt { setOn(on: boolean): void; dispose(): void }
+export interface Crt { setOn(on: boolean, curved?: boolean): void; dispose(): void }
 
 export function mountCrt(stageEl: HTMLElement, canvas: HTMLCanvasElement): Crt | null {
   const out = document.createElement('canvas');
@@ -74,9 +74,9 @@ export function mountCrt(stageEl: HTMLElement, canvas: HTMLCanvasElement): Crt |
   mkTex(1);
   gl.uniform1i(gl.getUniformLocation(prog, 'tex'), 0);
   gl.uniform1i(gl.getUniformLocation(prog, 'prev'), 1);
-  const uRes = gl.getUniformLocation(prog, 'res'), uSrc = gl.getUniformLocation(prog, 'src'), uTime = gl.getUniformLocation(prog, 'time');
+  const uRes = gl.getUniformLocation(prog, 'res'), uSrc = gl.getUniformLocation(prog, 'src'), uTime = gl.getUniformLocation(prog, 'time'), uBend = gl.getUniformLocation(prog, 'bend');
   stageEl.insertBefore(out, canvas.nextSibling);
-  let on = false, raf = 0;
+  let on = false, raf = 0, bend = 1;
   const frame = (t: number) => {
     raf = requestAnimationFrame(frame);
     // 화면에 보이는 크기의 실제 픽셀로 그린다 (마스크·주사선이 화면 픽셀에 맞게)
@@ -91,10 +91,12 @@ export function mountCrt(stageEl: HTMLElement, canvas: HTMLCanvasElement): Crt |
     gl.uniform2f(uRes, W, H);
     gl.uniform2f(uSrc, canvas.width, canvas.height);
     gl.uniform1f(uTime, t / 1000);
+    gl.uniform1f(uBend, bend);
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
   };
   return {
-    setOn(v) {
+    setOn(v, curved = true) {
+      bend = curved ? 1 : 0;
       if (v === on) return;
       on = v;
       out.style.display = v ? 'block' : 'none';

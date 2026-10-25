@@ -2623,3 +2623,6 @@ button.mk-go:hover { color: var(--signal); }
 .gx-body.gx-fieldhost { position: relative; padding: 0; overflow: hidden; scrollbar-gutter: auto; min-height: 0; }
 .gx-fieldhost .gx-game, .gx-fieldhost .gx-game.gx-full { position: absolute; inset: 0; z-index: auto; }
 .gx-fieldhost .gx-game .gx-head { display: none; }
+/* 필드 전체화면 「창 안」 (2026-10-25 사용자): 상황창 전체(왼쪽 메뉴·오른쪽 신분증 칸까지)를 덮는다. 브라우저 전체화면은 :fullscreen이 맡는다 */
+.gx-panel:has(.gx-game.gx-panelfull) .gx-fieldhost { position: static; }
+.gx-panel .gx-game.gx-panelfull, .gx-fieldhost .gx-game.gx-panelfull { position: absolute; inset: 0; z-index: 60; border-radius: inherit; overflow: hidden; background: #000; }

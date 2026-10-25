@@ -1,6 +1,8 @@
 // 화면·소리·조작 설정. 저장은 host 가 준 함수(없으면 localStorage)로 한다.
+export type CrtMode = 'off' | 'screen' | 'curved';
 export interface UiSettings {
-  crt: boolean;
+  /** CRT: 끔 · 화면 효과만(주사선·형광 마스크·번짐) · 곡면(둥근 모서리·휘어진 유리까지) (사용자 2026-10-25) */
+  crt: CrtMode;
   /** 화면 흔들림 0~1 */
   shake: number;
   /** 피격 섬광 */
@@ -32,7 +34,7 @@ export interface UiSettings {
 }
 
 export const DEFAULT_SETTINGS: UiSettings = {
-  crt: false,
+  crt: 'off',
   shake: 1,
   flash: true,
   bright: 1,
@@ -79,10 +81,13 @@ export function parseSettings(text: string | null): UiSettings {
   const s = { ...DEFAULT_SETTINGS };
   if (!text) return s;
   try {
-    const o = JSON.parse(text) as Partial<UiSettings>;
+    const o = JSON.parse(text) as Record<string, unknown>;
+    // 옛 켜기/끄기 값
+    if (o.crt === true) o.crt = 'curved';
+    else if (o.crt === false) o.crt = 'off';
     for (const k of Object.keys(s) as (keyof UiSettings)[]) {
       const v = o[k];
-      if (v !== undefined && typeof v === typeof s[k]) (s as Record<string, unknown>)[k] = v;
+      if (v !== undefined && typeof v === typeof s[k]) (s as unknown as Record<string, unknown>)[k] = v;
     }
   } catch {
     /* 깨진 값은 기본값 */

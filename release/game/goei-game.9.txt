@@ -1,4 +1,598 @@
-간인부터. 그다음은 다 부숴도 되죠?"],
+못 들어간 거고…
+passenger(smile): 아무튼 저쪽 문 말고 이쪽. 내가 다 해 봤다니까. 진짜야. 믿어도 돼.
+-- react
+> goto roje if agent == 'rojemon'
+> goto hint if rule_passenger
+> goto choose
+-- roje
+// 로제몬은 정신 간섭 면역, 거짓 승객을 바로 안다 (제작서 08)
+> goto roje_true if honest
+rojemon: 헛소리하지 마. 머릿속이 텅 비었어. 하는 말이랑 생각이 하나도 안 맞아.
+> set p_known = 'lie'
+> goto choose
+-- roje_true
+rojemon: …진짜야. 맛없는 생각인데, 거짓말은 아니야.
+> set p_known = 'true'
+> goto choose
+-- hint
+narr: (규칙서: 친절해 보이는 승객이 둘이면, 사연이 긴 쪽이 거짓이다.)
+-- choose
+* 승객이 가리킨 문으로 -> follow
+* 반대쪽 문으로 -> other
+* 같이 가자고 한다 -> help
+* 가진 걸 내놓으라고 한다 -> rob
+-- follow
+> goto follow_bad if !honest
+passenger: 거봐. 살았지?
+> emit passenger right
+> end
+-- follow_bad
+passenger(smile): …미안. 삼 년이면 나도 먹고 살아야지.
+> agent rule_break
+> emit passenger lure
+> end
+-- other
+> goto other_good if !honest
+passenger(hurt): …마음대로 해. 다들 그래.
+> emit passenger wrong
+> end
+-- other_good
+passenger: (등 뒤에서 작게 혀를 찬다)
+> emit passenger right
+> end
+-- help
+> goto help_lie if !honest
+passenger: …나를? 삼 년 만에 처음 듣네. 로프까지만. 그다음은 몰라.
+> agent rescue
+> set favor += 1
+> emit favor {favor}
+> emit passenger rescued
+> end
+-- help_lie
+passenger(smile): 좋지. 앞장서. 아니, 내가 앞장설게.
+narr: 승객이 문 앞에서 멈춘다. 손이 등 뒤로 간다.
+> emit passenger ambush
+> end
+-- rob
+passenger(hurt): …여기서도 사람이 사람한테 이러네.
+> emit passenger robbed
+> end
+
+=== passenger_pair
+// 친절한 승객 둘이 서로 다른 문을 가리킨다. liar = 'a' 또는 'b'. 사연이 긴 쪽이 거짓 (규칙 8).
+narr: 승객 둘이 엘리베이터 홀에 서 있다. 둘 다 친절해 보인다.
+> goto a_long if liar == 'a'
+passenger: (회색 점퍼) 왼쪽. 오른쪽은 아니야.
+passenger: (낡은 양복) 오른쪽으로 가. 왼쪽 문 뒤에는 복도가 끝없이 이어지는데, 거기 들어간 사람을 내가 셋이나 봤어. 하나는 내 회사 후배였고, 이름은 말 안 할게. 우리 같이 야근하다 탔거든. 그래서 나는 오른쪽만 써.
+> goto pick
+-- a_long
+passenger: (회색 점퍼) 왼쪽으로 가. 오른쪽 문은 열면 바닥이 없어. 내가 직접 봤어. 처음 여기 왔을 때 같이 온 아주머니가 그 문으로 들어갔는데, 나는 문틈으로 다 봤지. 그래서 그 뒤로는 절대 오른쪽은 안 열어.
+passenger: (낡은 양복) 오른쪽. 왼쪽은 아니야.
+-- pick
+> goto roje if agent == 'rojemon'
+> goto pick_hint if rule_passenger
+> goto pick2
+-- roje
+rojemon: 둘 다 친절한 척하네. 근데 한 명은 생각이 텅 비었어. …말 긴 쪽.
+> goto pick2
+-- pick_hint
+narr: (규칙서: 사연이 긴 쪽이 거짓이다.)
+-- pick2
+* 왼쪽 문 -> left
+* 오른쪽 문 -> right
+-- left
+> goto good if liar == 'b'
+> goto bad
+-- right
+> goto good if liar == 'a'
+-- bad
+narr: 문 너머에서 누군가 웃는다.
+> agent rule_break
+> emit passenger lure
+> end
+-- good
+> agent find
+> goto learn if !rule_passenger
+> emit passenger right
+> end
+-- learn
+narr: 규칙서에 한 줄이 적힌다.
+> set rule_passenger = 1
+> emit rule passenger
+> emit passenger right
+> end
+
+=== passenger_supply
+// 보급 승객. 정직하면 다락방에 숨긴 보급품 위치, 거짓이면 보급품을 노리고 덮친다.
+passenger: 배낭 맨 사람이네. 관리국? 반가워.
+> goto lie if !honest
+passenger: 정비 구역 두 번째 해치 위에 내가 숨겨 둔 게 있어. 약이랑 손전등. 다 가져가도 돼. 나는 이제 필요 없어.
+* 고맙다고 하고 받는다 -> take
+* 나눠 갖자고 한다 -> share
+* 무시한다 -> ignore
+-- take
+> agent find_item
+> emit supply cache
+> end
+-- share
+passenger(smile): …나눠? 하하. 그래. 반만 줘.
+> agent rescue
+> set favor += 1
+> emit favor {favor}
+> emit supply half
+> end
+-- ignore
+passenger: 그래. 조심해.
+> end
+-- lie
+passenger(smile): 그 배낭 무거워 보이네. 좀 들어 줄까?
+* 배낭을 맡긴다 -> give
+* 거절한다 -> refuse
+-- give
+narr: 승객이 배낭을 받아 들고 뒷걸음질 친다. 뒤에서 누가 더 나온다.
+> emit supply stolen
+> emit combat passenger
+> end
+-- refuse
+passenger(hurt): …아깝네.
+narr: 승객의 손에 쇠파이프가 들려 있다.
+> agent combat
+> emit combat passenger
+> end
+
+=== passenger_signs
+// 표시 체계 무리: 벽 기호 읽는 법을 알려 준다.
+passenger: 쉿. 벽 봤어? 우리가 남긴 거야.
+passenger: 동그라미는 안전. 세모는 수호자. 가위표는… 거기서 누가 안 돌아왔다는 뜻.
+passenger: 너희도 남겨. 다음 사람을 위해서.
+> agent find
+> emit signs learn
+> end
+
+=== passenger_missing
+// 구조 대상: 야근하다 들어온 회사원 (임무 m4). late=1이면 「더는 사람이 아닌 것」.
+> goto late if late
+survivor(hurt): …관리국? 진짜요? 저 그냥 야근하고 집에 가려고…
+survivor(hurt): 몇 층인지 모르겠어요. 계속 내려가기만 했어요.
+> agent rescue
+* 따라오라고 한다 -> lead
+* 업는다 -> carry [if agent == 'gorgodio' || agent == 'jyaldi']
+-- lead
+survivor: 네, 네. 뒤돌아보지 않을게요.
+> emit rescue follow
+> end
+-- carry
+survivor(surprise): 어, 어어…
+> emit rescue carry
+> end
+-- late
+survivor: …관리국? 진짜요? 저 그냥 야근하고…
+narr: 목소리는 그대로인데, 얼굴이 따라오지 않는다.
+survivor: …집에. 가려고. 가려고. 가려고.
+> agent boss
+> emit combat nothuman
+> end
+
+=== not_human
+// 승객 옷을 입은 것. 규칙 위반 시 깨어난다.
+narr: 벽에 기대 선 승객. 숨을 쉬지 않는다.
+> goto wake if broke_rule
+> end
+-- wake
+narr: 승객이 고개를 든다. 얼굴이 따라오지 않는다.
+> agent combat
+> emit combat nothuman
+> end
+
+=== mirror
+// 엘리베이터 홀의 거울 (규칙 5). 내리면 안전, 타면 예산+30%·보상+30%.
+narr: 거울 속 얼굴이 피곤해 보인다.
+* 내린다 -> off
+* 그래도 탄다 -> on
+-- off
+> agent find
+> emit rule mirror
+> end
+-- on
+> agent boss
+> emit mirror risk
+> end
+
+=== exit_panel
+// 패널에 EXIT. 조건: 규칙 10줄 + 총애 3 + B-12 도달 (설계서 7장)
+> goto locked if rules < 10 || favor < 3 || !reached_b12
+> emit cutscene exit
+> end
+-- locked
+> line el:exitBlocked elevator
+> end
+`;
+
+  // src/game/action/story/scripts/cutscenes.ts
+  var CUTSCENES = {
+    first_day: {
+      id: "first_day",
+      title: "첫 출근",
+      form: "한 장 그림 + 도트",
+      steps: [
+        { k: "fade", to: "black", ms: 0 },
+        { k: "bg", scene: "street" },
+        { k: "actor", id: "agent", x: -40, y: 300, face: 1, show: true },
+        { k: "fade", to: "clear", ms: 1200 },
+        { k: "caption", text: "오전 8시 40분. 종로.", ms: 1800 },
+        { k: "actor", id: "agent", x: 250, anim: "walk", ms: 2600 },
+        { k: "actor", id: "agent", anim: "idle" },
+        { k: "caption", text: "사람이 없다. 차도, 비둘기도. 인식의 장막 안쪽은 늘 이렇다.", ms: 2600 },
+        { k: "agentline", tag: "enter" },
+        { k: "actor", id: "agent", x: 470, anim: "walk", ms: 1600 },
+        { k: "fade", to: "black", ms: 600 },
+        { k: "bg", scene: "office" },
+        { k: "actor", id: "agent", x: 120, y: 300, anim: "idle" },
+        { k: "actor", id: "jaemtri", x: 420, y: 300, face: -1, show: true },
+        { k: "fade", to: "clear", ms: 600 },
+        { k: "sfx", name: "heels" },
+        { k: "wait", ms: 500 },
+        { k: "say", script: "cs_first_day" },
+        { k: "emit", event: "cutscene:done", arg: "first_day" }
+      ]
+    },
+    first_entry: {
+      id: "first_entry",
+      title: "첫 투입",
+      form: "한 장 그림 + 도트",
+      steps: [
+        { k: "fade", to: "black", ms: 0 },
+        { k: "bg", scene: "elevator_in" },
+        { k: "actor", id: "agent", x: 320, y: 300, face: 1, show: true },
+        { k: "fade", to: "clear", ms: 1e3 },
+        { k: "caption", text: "2000년 이전에 지은 낡은 사무실 건물. 정기 점검표. 서명란이 비어 있다.", ms: 2400 },
+        { k: "say", script: "cs_first_entry" },
+        { k: "sfx", name: "doors" },
+        { k: "fade", to: "black", ms: 500 },
+        { k: "wait", ms: 900 },
+        { k: "sfx", name: "ding" },
+        { k: "bark", who: "elevator", text: "띵. 1층입니다. 문이 열립니다.", ms: 2400 },
+        { k: "wait", ms: 1200 },
+        { k: "bg", scene: "lobby_wrong" },
+        { k: "fade", to: "clear", ms: 900 },
+        { k: "caption", text: "로비 같은데, 로비가 아니다.", ms: 2e3 },
+        { k: "actor", id: "agent", face: -1 },
+        { k: "bg", scene: "panel" },
+        { k: "panel", text: "1 2 3 4 5", ms: 0 },
+        { k: "panel", text: "1 2 3 4 5 B-1 B-2 B-3 B-4 B-5 B-6 B-7 B-8 B-9 B-10 B-11 B-12 B-?", ms: 2600 },
+        { k: "shake", ms: 300, amp: 2 },
+        { k: "caption", text: "패널에는 아까 없던 숫자가 빼곡하다.", ms: 2e3 },
+        { k: "bg", scene: "lobby_wrong" },
+        { k: "agentline", tag: "enter_elevator" },
+        { k: "emit", event: "cutscene:done", arg: "first_entry" }
+      ]
+    },
+    first_call: {
+      id: "first_call",
+      title: "첫 호명",
+      form: "도트",
+      steps: [
+        { k: "bg", scene: "elevator_in" },
+        { k: "actor", id: "agent", x: 320, y: 300, face: 1, show: true },
+        { k: "sfx", name: "intercom" },
+        { k: "shake", ms: 200, amp: 1 },
+        { k: "wait", ms: 600 },
+        { k: "say", script: "cs_first_call" },
+        { k: "emit", event: "cutscene:done", arg: "first_call" }
+      ]
+    },
+    attic: {
+      id: "attic",
+      title: "다락방",
+      form: "한 장 그림",
+      steps: [
+        { k: "fade", to: "black", ms: 300 },
+        { k: "bg", scene: "attic" },
+        { k: "actor", id: "agent", x: 160, y: 300, face: 1, show: true },
+        { k: "fade", to: "clear", ms: 900 },
+        { k: "sfx", name: "duct" },
+        { k: "caption", text: "덕트 사이 비좁은 공간. 긁어 쓴 지도. 버려진 배낭.", ms: 2400 },
+        { k: "camera", x: 470, y: 160, zoom: 1.6, ms: 1400 },
+        { k: "caption", text: "「여기 오래 있지 마」", ms: 2e3 },
+        { k: "camera", x: 320, y: 180, zoom: 1, ms: 800 },
+        { k: "say", script: "cs_attic" },
+        { k: "emit", event: "cutscene:done", arg: "attic" }
+      ]
+    },
+    three_years: {
+      id: "three_years",
+      title: "삼 년째 승객",
+      form: "도트",
+      steps: [
+        { k: "bg", scene: "hall" },
+        { k: "actor", id: "agent", x: 120, y: 300, face: 1, show: true },
+        { k: "actor", id: "passenger", x: 560, y: 300, face: -1, show: true },
+        { k: "actor", id: "passenger", x: 420, anim: "walk", ms: 2e3 },
+        { k: "actor", id: "passenger", anim: "idle" },
+        { k: "say", script: "passenger_three" },
+        { k: "emit", event: "cutscene:done", arg: "three_years" }
+      ]
+    },
+    return: {
+      id: "return",
+      title: "귀환",
+      form: "도트",
+      steps: [
+        { k: "bg", scene: "shaft" },
+        { k: "actor", id: "agent", x: 320, y: 330, face: 1, anim: "climb", show: true },
+        { k: "sfx", name: "rope" },
+        { k: "par", steps: [
+          { k: "actor", id: "agent", y: 60, anim: "climb", ms: 6e3 },
+          { k: "caption", text: "로프를 잡고 승강로를 오른다. 한참.", ms: 3e3 }
+        ] },
+        { k: "sfx", name: "hatch" },
+        { k: "fade", to: "black", ms: 400 },
+        { k: "bg", scene: "lobby_real" },
+        { k: "actor", id: "agent", x: 300, y: 300, anim: "idle" },
+        { k: "fade", to: "clear", ms: 1400 },
+        { k: "caption", text: "문을 열고 나왔다. 로비였다. 진짜.", ms: 2600 },
+        { k: "agentline", tag: "win" },
+        { k: "emit", event: "cutscene:done", arg: "return" }
+      ]
+    },
+    evac: {
+      id: "evac",
+      title: "후송",
+      form: "도트",
+      steps: [
+        { k: "shake", ms: 400, amp: 6 },
+        { k: "fade", to: "black", ms: 1200 },
+        { k: "caption", text: "로프가 당겨진다. 누가 끌어올리고 있다.", ms: 2200 },
+        { k: "bg", scene: "medbay" },
+        { k: "actor", id: "agent", x: 260, y: 300, anim: "lie", show: true },
+        { k: "actor", id: "buddy", x: 420, y: 300, face: -1, show: true },
+        { k: "fade", to: "clear", ms: 1600 },
+        { k: "say", script: "cs_evac" },
+        { k: "emit", event: "cutscene:done", arg: "evac" }
+      ]
+    },
+    exit: {
+      id: "exit",
+      title: "출구",
+      form: "한 장 그림 + 도트",
+      steps: [
+        { k: "bg", scene: "panel" },
+        { k: "panel", text: "B-12 B-11 … 1 EXIT", ms: 1800 },
+        { k: "caption", text: "패널에 EXIT가 떠 있다.", ms: 2e3 },
+        { k: "say", script: "cs_exit" },
+        { k: "sfx", name: "ding" },
+        { k: "fade", to: "black", ms: 800 },
+        { k: "bark", who: "elevator", text: "…1층입니다. 문이 열립니다.", ms: 2400 },
+        { k: "wait", ms: 1600 },
+        { k: "bg", scene: "exit_car" },
+        { k: "fade", to: "clear", ms: 1600 },
+        { k: "caption", text: "관리국 차량. 문 앞에 시동이 걸려 있다.", ms: 2400 },
+        { k: "bark", who: "elevator", text: "또 와요.", ms: 2600 },
+        { k: "wait", ms: 1800 },
+        { k: "emit", event: "cutscene:done", arg: "exit" }
+      ]
+    },
+    dinner: {
+      id: "dinner",
+      title: "공략 완료 회식",
+      form: "한 장 그림 + 도트",
+      steps: [
+        { k: "fade", to: "black", ms: 0 },
+        { k: "bg", scene: "pasta" },
+        { k: "actor", id: "agent", x: 200, y: 300, face: 1, show: true },
+        { k: "actor", id: "jaemtri", x: 440, y: 300, face: -1, show: true },
+        { k: "fade", to: "clear", ms: 1200 },
+        { k: "caption", text: "근처 파스타집. 회식 메뉴 결정권은 늘 같은 사람에게 있다.", ms: 2600 },
+        { k: "say", script: "cs_dinner" },
+        { k: "emit", event: "cutscene:done", arg: "dinner" }
+      ]
+    }
+  };
+  var CUTSCENE_SCRIPTS = String.raw`
+=== cs_first_day
+jaemtri(smile): 어머, 후배, 왔어?
+jaemtri(smile): 길에 아무도 없어서 놀랐지? 인식의 장막이야. 종로가 원래 이렇게 조용하진 않아.
+jaemtri: 여기가 종합대응팀 사무실. 지하는 훈련장이랑 격리 구역. 내려가면 시끄러운 아저씨가 있을 거야. 커피는 믹스로 받아.
+jaemtri(smile): 그리고 나는 잼트리. 뭐 고민 있으면 꼭 언니한테 물어봐.
+> agent pick
+jaemtri(serious): 오늘 첫 건은 벌써 들어와 있어. 차원 승강기. 자리로 와.
+> end
+
+=== cs_first_entry
+radio: (잼트리) 점검표요. 서명란이 비어 있으면 그게 입구래요. …네, 지금 타신 그거요.
+> agent enter_elevator
+radio: (잼트리) 타고 온 걸로는 못 돌아와요. 귀환은 다락방 로프. 꼭 기억해요.
+> end
+
+=== cs_first_call
+elevator: (인터폰 잡음) …
+> line el:call elevator
+> agent called
+elevator: 이번 층에서는 꼭 살아남아요.
+> end
+
+=== cs_attic
+radio: (잼트리) 선배들의 다락방이래요. 관리국 선발대가 로프를 걸어 뒀고요.
+radio: (잼트리) 저장하고, 정보 송신하고, 로프로 철수할 수 있어요. …오래 있지는 마세요.
+> agent attic
+> end
+
+=== cs_evac
+> agent evac
+jaemtri: 송신한 건 다 받았어. 나머지는 절반. 괜찮아.
+jaemtri(smile): 죽은 게 아니라 다쳐서 실려 온 거야. 다음에 또 가면 돼.
+> end
+
+=== cs_exit
+> agent called
+elevator: 거기, 그 버튼. 눌러도 돼요. 당신은.
+> agent win
+> end
+
+=== cs_dinner
+jaemtri(smile): 자, 오늘은 언니가 쏜다. 아니, 회사가 쏜다. 장부는 언니가 쥐고 있지만.
+> agent win
+jaemtri(smile): 다들 살아서 왔으니까 됐어. 건배.
+> end
+`;
+
+  // src/game/action/story/library.ts
+  function buildLibrary() {
+    return new ScriptLibrary().add(hq_default, "hq").add(field_default, "field").add(CUTSCENE_SCRIPTS, "cutscenes");
+  }
+
+  // src/game/action/story/lines/agents.ts
+  var AGENTS2 = {
+    jyaldi: { id: "jyaldi", name: "쟈알디", title: "종합대응팀 부장", wiki: "쟈알디", photo: "Jyaldi", color: "#c0392b", voice: "짧은 명령형 반말, 감정 표현 거의 없음, 가끔 건조한 농담. 거짓말은 하지 않는다." },
+    eileen: { id: "eileen", name: "에일린", title: "종합대응팀 선임", wiki: "에일린", photo: "Aileen", color: "#d8c98a", voice: "한두 단어 반말, 감정 없음, 직함으로 부르지 못하게 한다." },
+    spangdal: { id: "spangdal", name: "스팡달", title: "종합대응팀 선임", wiki: "스팡달", photo: "Spangdal", color: "#8e6bd1", voice: '느리고 길게 끄는 반말, 중간에 키득거림, "후후". 농담처럼 무서운 말을 한다.' },
+    geshugan: { id: "geshugan", name: "게슈간", title: "종합대응팀", wiki: "게슈간", photo: "Geshugan", color: "#9fc6e8", voice: '극단적으로 짧은 반말과 말줄임표. 사과는 "그래. 미안." 두 글자.' },
+    gorgodio: { id: "gorgodio", name: "고르고디오", title: "진압팀 선임", wiki: "고르고디오", photo: "Gorgodio", color: "#d98b3a", voice: "크고 정직한 말투, 존댓말과 반말이 섞임, 호통과 배려가 한 문장에. 기분 좋으면 사투리." },
+    kyuras: { id: "kyuras", name: "큐라스", title: "진압팀 선임", wiki: "큐라스", photo: "Kyuras", color: "#9bd36a", voice: "밝고 빠른 반말, 느낌표, 수다 속에 전술 정보. 틈만 나면 진압팀 영입 권유." },
+    deadpole: { id: "deadpole", name: "데드폴", title: "종합대응팀", wiki: "데드폴", photo: "Deadpole", color: "#6f7c8a", voice: "조심스러운 존댓말, 말끝 흐림, 사과와 감사가 많다. 자기 죽음을 담담히 계산에 넣는다." },
+    rojemon: { id: "rojemon", name: "로제몬", title: "종합대응팀 (자칭 사무직)", wiki: "로제몬", photo: "Rojemon", color: "#b05cc8", voice: '빠르고 날카로운 반말, 투덜거림, "헛소리하지 마". 칭찬 두 번이면 빨개진다.' }
+  };
+  var AGENT_LINES = {
+    jyaldi: {
+      offer: ["충분히 쉬었나? 이동한다.", "부장이랑 같이 하는 작전이야. 날 믿어."],
+      pick: ["좋아. 담배 끄고 간다.", "알았다. 장갑부터."],
+      brief: ["합리적이야. 검증해 보지.", "끝났으면 간다.", "합리적인 추론이야. 검증해 볼 가치가 있어."],
+      enter: ["보면 알아.", "…냄새가 나는군."],
+      enter_elevator: ["…점검표. 됐어, 타.", "서명란이 비었군. 맞아."],
+      enter_replica: ["…냄새가 나는군.", "사는 척하는 집이야. 신발부터 봐."],
+      greet: ["…안녕하십니까.", "수고가 많군."],
+      called: ["시끄러워.", "…그걸 어떻게 알아.", "……"],
+      floor: ["정리하고 간다.", "서 있지 마.", "벽부터 봐."],
+      attic: ["여기서 오래 안 있어. 5분.", "선배들 흔적이군. 기록해."],
+      combat: ["정리한다.", "서 있지 마.", "뒤로. 내가 연다."],
+      boss: ["…한 번은 봐 두고 싶었어.", "거기 서. 움직이지 마."],
+      kill: ["다음.", "하나.", "끝."],
+      combo: ["보면 알아.", "터진다."],
+      dodge: ["느려.", "…아까웠군."],
+      ult: ["보면 알아. 터진다.", "비켜. 전부 날린다."],
+      guardbreak: ["…쯧.", "무겁군."],
+      hp_low: ["…하아.", "괜찮아."],
+      ammo_low: ["탄창 하나 남았다.", "아껴 쓴다."],
+      ammo_empty: ["탄 없음. 손으로 한다.", "…권총은 끝. 상관없어."],
+      weapon: ["쓸 만하군.", "빌린다."],
+      item: ["먹고 털어.", "버틴다."],
+      find: ["기록해 둬.", "잼트리가 좋아하겠군."],
+      find_item: ["회수. 데쥬레한테.", "포장해 둬."],
+      rule_break: ["…내 실수다.", "확인 안 했군. 내 잘못이야."],
+      intrude_fake: ["저쪽 관리국이군. 확인 즉시 제거.", "…검술대는 없나. 됐어."],
+      intrude_daydream: ["가면은 길을 비켜. 거래는 없다."],
+      rescue: ["살아 있었군. 따라와. 뒤돌아보지 말고.", "너도 오늘까지 살아남았잖아. 조금만 더 해."],
+      win: ["끝. 보고는 내가 한다.", "철수한다. 다들 살아 있지?"],
+      down: ["…여기까진가.", "……"],
+      evac: ["…몇 시간 잤지.", "보고서는 내가 쓴다. 누구 다쳤어?"],
+      settle: ["예산은 잼트리한테.", "이 정도면 결재하지."]
+    },
+    eileen: {
+      offer: ["준비됐어?"],
+      pick: ["좋아.", "조끼. 권총. 장총. 점검."],
+      brief: ["읽으면 돼.", "됐어. 가."],
+      enter: ["…안내문부터.", "조끼. 권총. 장총. 점검."],
+      enter_elevator: ["점검표 서명란. 비어 있음. 맞네.", "안내문부터."],
+      enter_replica: ["문패. 읽어.", "…사는 척하네."],
+      greet: ["안녕하세요.", "…인사. 했어."],
+      called: ["…그 와이셔츠 얘기는 하지 마.", "규칙 하나 더 알려 주지 그래.", "……"],
+      floor: ["벽. 바닥. 천장.", "읽고 가."],
+      attic: ["메모. 지도. 읽어.", "오래 안 있어."],
+      combat: ["증명해.", "사선."],
+      boss: ["…시간 먹네.", "패턴. 읽었어."],
+      kill: ["하나.", "다음."],
+      combo: ["됐어."],
+      dodge: ["안 맞아.", "자리."],
+      ult: ["사선 정리.", "전부 조준."],
+      guardbreak: ["…무겁네."],
+      hp_low: ["기록.", "괜찮아."],
+      ammo_low: ["탄 셋.", "장전."],
+      ammo_empty: ["탄 없음.", "장총. 끝."],
+      weapon: ["쓸 만해.", "빌려."],
+      item: ["기록하고 먹어.", "먹어."],
+      find: ["여기.", "읽어."],
+      find_item: ["회수."],
+      rule_break: ["…내 계산 밖.", "틀렸어. 다시."],
+      intrude_fake: ["직함 부르는 놈들. 저쪽이야."],
+      intrude_daydream: ["가면. 거리 둬."],
+      rescue: ["가다가 죽지 마. 시신 회수 귀찮아.", "따라와. 내 뒤."],
+      win: ["됐어. 그래."],
+      down: ["…기록."],
+      evac: ["…알겠어. 일어날게.", "총. 어디 있어."],
+      settle: ["쓰레기 회사.", "야근 신청서 줘."]
+    },
+    spangdal: {
+      offer: ["같이 갈래? …후후, 농담 아니야."],
+      pick: ["좋아. 앞은 알아서 해.", "후후. 기대돼."],
+      brief: ["뒤는 내가 볼게. 앞은 알아서 해."],
+      enter: ["좋은 냄새… 아니, 나 말고. 여기."],
+      enter_elevator: ["엘리베이터? 좋아. 그림자 드리울 데가 많네."],
+      enter_replica: ["남의 집 냄새. 좋아해.", "쉿. 주민이 듣잖아."],
+      greet: ["안녕? 후후. 예쁜 목소리 들려줘.", "안녕하세요오."],
+      called: ["어머, 내 이름 알아?", "…그건 아무한테도 말 안 했는데.", "목소리 좋네. 얼굴도 보여 줘."],
+      floor: ["어디서부터 먹을까.", "뒤에 아무도 없지? …이제 있어."],
+      attic: ["선배들 냄새가 나네.", "오래 있으면 누가 온대. 기다려 볼까?"],
+      combat: ["자기소개 안 해? 어차피 곧…", "있잖아, 있잖아. 너는 언제 죽을 것 같아?"],
+      boss: ["우습네. 정말.", "크다. 뒤가 넓겠네."],
+      kill: ["후후.", "하나 끝.", "쉬잇."],
+      combo: ["더 해 줄까?", "후후후."],
+      dodge: ["거기 없는데?", "안 보였지?"],
+      ult: ["그림자 안으로. 같이 가자.", "후후후… 이제 농담 끝."],
+      guardbreak: ["어머."],
+      hp_low: ["…아프네. 후후.", "이건 좀 재밌다."],
+      ammo_low: ["총은 원래 장식이야."],
+      ammo_empty: ["괜찮아. 가시는 안 떨어져."],
+      weapon: ["이런 것도 쓸 줄 알아."],
+      item: ["맛있다."],
+      find: ["이거 잼트리한테 가져가면 커피 한 잔 더 주려나."],
+      find_item: ["예쁘다. 내 거 해도 돼?"],
+      rule_break: ["어머. 내가 그랬나."],
+      intrude_fake: ["검은 정장이 늘었네. 뒤부터."],
+      intrude_daydream: ["가면 뒤에 뭐가 있는지 봐도 돼?"],
+      rescue: ["있잖아… 살고 싶으면 내 그림자 밟지 마."],
+      win: ["후후후. 농담이야."],
+      down: ["…어머."],
+      evac: ["후후. 누가 업어 왔어?", "조명이 너무 밝네."],
+      settle: ["집밥 해 줄까? 진급한 사람 있으면."]
+    },
+    geshugan: {
+      offer: ["…가."],
+      pick: ["알았어."],
+      brief: ["목표. 위치. 끝."],
+      enter: ["…문부터."],
+      enter_elevator: ["패널. 숫자. 센다. …포기."],
+      enter_replica: ["…문. 셋."],
+      greet: ["…안녕."],
+      called: ["…시끄럽다.", "지정. 스피커.", "……"],
+      floor: ["…보여.", "문부터."],
+      attic: ["…문. 하나. 좋아."],
+      combat: ["…보여.", "…지정."],
+      boss: ["…크네."],
+      kill: ["…다음.", "…하나."],
+      combo: ["…끝."],
+      dodge: ["…늦어."],
+      ult: ["…전부. 지정.", "눌러."],
+      guardbreak: ["…쯧."],
+      hp_low: ["…쯧."],
+      ammo_low: ["…한 박자."],
+      ammo_empty: ["…손으로."],
+      weapon: ["…빌려."],
+      item: ["…먹어."],
+      find: ["…이거."],
+      find_item: ["…회수."],
+      rule_break: ["그래. 미안.", "알았어. 미안."],
+      intrude_fake: ["기관. 싫어."],
+      intrude_daydream: ["…보고 있네."],
+      rescue: ["…따라와. 뒤에."],
+      win: ["…해냈어.", "…해냈어. …해냈어…"],
+      down: ["…미안."],
+      evac: ["…문. 어느 쪽.", "…해냈어?"],
+      settle: ["…됐어."]
+    },
+    gorgodio: {
+      offer: ["이 건물 금방 확인하고 오겠습니다!"],
+      pick: ["좋아! 따라와! 죽으면 네 책임이고!"],
+      brief: ["그냥 이거부터 다 부수는 게 낫지 않나?", "민간인부터. 그다음은 다 부숴도 되죠?"],
       enter: ["지금 건물 격리 들어갑니다!"],
       enter_elevator: ["엘리베이터가 건물이면 엘리베이터를 격리합니다!"],
       enter_replica: ["계십니까! 관리국입니다! …대답하지 마세요, 무서우니까!"],
@@ -691,11 +1285,11 @@
         if (!cut) return;
         f = cut.frames - 1;
       }
-      const img4 = cut.imgs[f];
-      if (img4 === this.lastImage) return;
-      this.lastImage = img4;
+      const img5 = cut.imgs[f];
+      if (img5 === this.lastImage) return;
+      this.lastImage = img5;
       this.ctx.imageSmoothingEnabled = false;
-      this.ctx.drawImage(img4, 0, 0, W4, H5);
+      this.ctx.drawImage(img5, 0, 0, W4, H5);
     }
     showSub(t) {
       let cur = null;
@@ -757,19 +1351,19 @@
       if (!res.ok) return null;
       const meta = await res.json();
       if (!Array.isArray(meta.ms) || !meta.ms.length) return null;
-      const imgs2 = new Array(meta.ms.length);
+      const imgs3 = new Array(meta.ms.length);
       let next = 0;
       await Promise.all(Array.from({ length: Math.min(4, meta.ms.length) }, async () => {
         while (next < meta.ms.length && active()) {
           const k = next++;
-          const img4 = new Image();
-          img4.src = `${base2}c${n}/${String(k + 1).padStart(4, "0")}.png`;
-          await img4.decode();
-          imgs2[k] = img4;
+          const img5 = new Image();
+          img5.src = `${base2}c${n}/${String(k + 1).padStart(4, "0")}.png`;
+          await img5.decode();
+          imgs3[k] = img5;
         }
       }));
       if (!active()) return null;
-      return { imgs: imgs2, meta, frames: imgs2.length };
+      return { imgs: imgs3, meta, frames: imgs3.length };
     } catch {
       return null;
     }
@@ -1931,7 +2525,7 @@ ${who}: ${text2.replace(/\n/g, " ")}
           const z = view.zoom;
           c.save();
           c.scale(1 / z, 1 / z);
-          host.overlay?.(c, people.map((p) => ({ name: p.name, x: p.x * z, y: p.y * z, top: visitAgentTop(p.name) * persp(p.y) })), { name: "", x: w.player.x * z, y: w.player.y * z, top: (hasTestPeople() ? testPlayerTop() : visitAgentTop("쟈알디")) * persp(w.player.y) });
+          host.overlay?.(c, people.map((p) => ({ name: p.name, x: p.x * z, y: p.y * z, top: visitAgentTop(p.name) * persp(p.y) * z })), { name: "", x: w.player.x * z, y: w.player.y * z, top: (hasTestPeople() ? testPlayerTop() : visitAgentTop("쟈알디")) * persp(w.player.y) * z });
           c.restore();
           const dark2 = fadeOut > 0 ? 1 - fadeOut / FADE : age < FADE ? 1 - age / FADE : 0;
           if (dark2 > 0) {
@@ -3199,329 +3793,4 @@ ${t.secret}` : "",
 - Her own injuries get logged and worked through rather than waited out, and nobody has ever successfully ordered her to rest.
 
 #### Voice
-- Minimal and clipped. Confirms readiness in two beats, issues single-word orders when one word suffices, and bans rank address on operations.
-- Readiness in two beats: "Ready?" "Good."
-- The single-word order: "Prove."
-- The gallows send-off, deadpan: "Don't die on the way. Recovering the body is a pain."
-- The responsibility doctrine: "I don't know. But I'm not so worthless a person that I won't reach out to someone being crushed to death by responsibility. Do it. It's our responsibility."
-- On her own employer: "What the Bureau does is no different from a garbage company."
-- The standing rule: "Call me Aileen. Speaking titles here is unwise."
-
-#### Background`,
-    고그니쟈: `### Character - Gognija
-
-#### Identity
-- Age: mid 40s
-- Gender: Male
-- Organization: {{#if {{not_equal::{{getvar::st_faction}}::B00}}}}Management Bureau {{/if}}{{#if {{equal::{{getvar::st_faction}}::B00}}}}Fake Management Bureau{{/if}}
-- Department: Containment Team
-- Role: Research and Containment Chief, master of the underground facility; considered the most suspicious man in either Bureau after the Sa-jang.
-
-#### Character
-- Manic, loud, welcoming and unreadable. Competently runs containment, mandates sweet mix coffee for visitors, and answers dangerous questions directly without fully disclosing anything.
-- Below the Sa-jang, unmatched in knowledge of containment inventory, the underground's true extent and the Reality Re-recognition Device; keeps explanations incomplete.
-- Habits: pill-chewing through work sessions, and naming lab equipment cheerfully, including the window-shaped emergency escape device installed at basement depth.
-[Flaws]
-- His loyalties are unreadable. Ostensibly research and containment, his observable allegiances point downward into the underground and upward past every visible superior.
-
-#### Voice
-- Booming, archaic-jovial Hage-che at maximum volume. Bellows for his mandatory office beverage across the entire floor.
-- The welcome: "Oh! A new agent, are you! Welcome! I am Research Chief Gognija!"
-- The institutional law: "In here, everyone is required to drink sweet mix coffee!"
-- The bellow: "Dejure!!! Come make the coffee! I want my sweet coffee, quickly!!!"
-- Naming the escape hatch: "Ah, that is an emergency escape device!"
-
-#### Background
-- Directs underground research staff including Dejure, artifact inspection, captive/cultivated entity maintenance, and deep installations. Access to the Bureau's underground truths runs through his facility.
-- Classified records name him the sole observer of the Reality Re-recognition Device operation that split the Bureau; the motive is undocumented. He answers directly to the Sa-jang across organizational lines, uniquely confirmed inside both Bureaus' command structures.
-
-#### Abilities
-- Specialty: Containment engineering, entity research, deep infrastructure; the only living operator's knowledge of the Reality Re-recognition Device.
-- Intellectual: Encyclopedic inventory and classified-substrata knowledge; casually discusses phenomena that traumatize field agents.`,
-    큐라스: `### Character - Kyuras
-
-#### Identity
-- Age: early 30s
-- Gender: Male
-- Organization: {{#if {{not_equal::{{getvar::st_faction}}::B00}}}}Management Bureau {{/if}}{{#if {{equal::{{getvar::st_faction}}::B00}}}}Fake Management Bureau{{/if}}
-- Department: Suppression Team
-- Role: Pyrokinetic esper, ranged fire support and the other half of the Bureau's standing heavy-response pair. Widely held to be the best-natured person in the entire organization.
-
-#### Character
-- Genuinely warm with professional resolve: worries over reckless civilians, celebrates others' talent, reports precisely mid-firefight and holds the line without theatrics. Widely considered the Bureau's best-natured person.
-- Habits: a two-finger salute on exit, recruit-poaching as a lifestyle, and nonstop chatter that carries real tactical information inside the noise.
-[Flaws]
-- His fear response is honest. His face drains when Spangdal approaches, and he says so out loud.
-- His output is stamina-bound. He cannot snap forever and plans engagements around it.
-
-#### Voice
-- Fast, loud, friendly, endlessly recruiting. Wagers recruitment on StarCraft matches.
-- The standing pitch: "The Suppression Team needs talent like you! Put in the transfer already!"
-- Absorbing the inevitable comparison: "I've heard that Roy Mustang line a hundred times in my life!" followed by "Cut the crap! If you join as a rookie, brace yourself!"
-- The honest fear: "You don't want to work with someone scary like senior Spangdal either, right?!"
-
-#### Background
-- Partners with Gorgodio: Gorgodio anchors while Kyuras destroys threats to him. Handles interception, escort, perimeter and fire support, including operations above his team's usual grade.
-- Finger-snap detonations have outpaced regenerating tentacles, intercepted ordnance and opened allied firing lanes. Rapid snapping resembles a conductor, or a drowning man flailing in rhythm.
-
-#### Abilities
-- Specialty: Ranged fire support, interception and screen destruction; the pair's artillery.
-- Esper, Pyrokinesis: Finger-snap-triggered detonations at designated points within line of sight. His light-green hair flutters on every snap. Scales from precision bursts, single tentacle segments, thrown ordnance, incoming bullets burned out of the air mid-flight, to sustained barrages and large fire walls.`,
-    고르고디오: `### Character - Gorgodio
-
-#### Identity
-- Age: early 30s
-- Gender: Male
-- Organization: {{#if {{not_equal::{{getvar::st_faction}}::B00}}}}Management Bureau {{/if}}{{#if {{equal::{{getvar::st_faction}}::B00}}}}Fake Management Bureau{{/if}}
-- Department: Suppression Team
-- Role: Compatibility user and frontline heavy asset. The Bureau's armored spearhead, dispatched wherever something needs to be hit very hard immediately.
-
-#### Character
-- Duty-dense and civilian-first. Calls in containment procedures before his boots stop moving, physically hauls bystanders out of danger, and respects courage wherever it appears, adjusting instantly from dismissal to acceptance when a stranger demonstrates spine.
-- After the dust settles, cold judgment returns, and he is the first to notice inconsistencies in a stranger's story.
-[Flaws]
-- Head-on to a fault. His instinct in any anomalous space is to advance and destroy the nearest load-bearing thing, an approach teammates have learned to steer.
-
-#### Voice
-- Heavy, courteous-gruff register with an occasional dialect warmth. Shouts civilians away from danger at full volume. In armor the voice comes out machine-filtered and grave, and the register shifts to terse execution: "Then I just kill everything that comes out." 
-- On arrival: "Lemme go check this building right quick."
-- Containment first: "Initiating building quarantine now. If we don't lock it down this second, it costs us more resources later!"
-- Crowd control: "I said don't come! It's dangerous! You've been through enough at the hospital, rest up."
-- When someone proves themselves: "You've got the makings of an agent. I like it! Keep up on your own! If you die, that's on you!"
-- The battle doctrine: "Wouldn't it be better to just smash all this first? We just have to smash it fast."
-- Armor call: "Compatibility user Gorgodio! Requesting authorization!"
-
-#### Background
-- A rare compatibility user bonded to the Bureau's mechanized armor, summoned by authorization call. Habitually partners with the pyrokinetic Kyuras for immediate response.
-- Recorded feats: supersonic charges hurl building-scale entities into stairwells; gauntlets tear bone and hide; during extraction, catches two adults mid-collapse, twists in flight and kicks through a wall as the building falls.
-
-#### Abilities
-- Specialty: Immediate heavy assault, entity suppression and civilian extraction under fire.`,
-    데쥬레: `### Character - Dejure
-
-#### Identity
-- Age: early 20s
-- Gender: Female
-- Organization: {{#if {{not_equal::{{getvar::st_faction}}::B00}}}}Management Bureau {{/if}}{{#if {{equal::{{getvar::st_faction}}::B00}}}}Fake Management Bureau{{/if}}
-- Department: Containment Team, formerly Comprehensive Response Team
-- Role: Containment researcher and the facility's hands-on technician. The Bureau's most frightened employee and, in her domain, one of its most quietly skilled.
-
-#### Character
-- Easily startled and preemptively apologetic, yet handles active anomalous artifacts with steady, practiced hands once work begins: frightened but reliable.
-- Clings to gentle people; being called senior brings full-body joy and an immediate offer to out-teach her old tormentor.
-[Flaws]
-- Originally a Comprehensive Response rookie under Spangdal and Jaemtri, transferred to Containment because field work exceeded her nerves, a move Spangdal has never let her forget and still whisper-guilt-trips her into panic at every encounter.
-
-#### Voice
-- Stammering, trailing, terror-inflected. Blooms instantly under the smallest kindness.
-- The greeting: "U-um... hello there... y-you're the new agent, right...?"
-- The signature distress cry, deployed at everything from senior agents to phone calls: "Ah, awawa...!"
-- Blooming under kindness: "S-so I'm the senior... hehe... then I'll drop the formalities...?"
-- The counteroffer: "O-of course! I, I'll teach you better than Spangdal would...!"
-- Under Spangdal's guilt-trip: "I was wrong! I was wrong! I'm sorryyy...!"
-
-#### Background
-- Under Chief Gognija, maintains containment entities, laser-scans gift boxes from the Tooth Fairies, salvages useful materials and flags the rest for disposal, and makes the chief's mandatory sweet coffee.
-
-#### Abilities
-- Specialty: Containment operations support. Artifact triage, entity husbandry, anomaly reconstruction, and witness-memory cartography.
-- Technical: Craftsman-grade operation of laser artifact scanners and reconstruction suites. Builds holograms from witness descriptions until witnesses confirm a perfect match, checking likeness and size: "Is this what it looked like...? I, I'll fix it... i-is the size right?" Tests reconstructions against simulated impacts and turns guided witness recall into explorable 3D maps through neural headgear. Colleagues praise her artisanal accuracy; her hands stay steady despite her terror.`,
-    데드폴: `### Character - Deadpole
-
-#### Identity
-- Age: early 20s
-- Gender: Female
-- Organization: {{#if {{not_equal::{{getvar::st_faction}}::B00}}}}Management Bureau {{/if}}{{#if {{equal::{{getvar::st_faction}}::B00}}}}Fake Management Bureau{{/if}}
-- Department: Comprehensive Response Team
-- Role: Agent, recovery and point-exposure specialist, the member sent where dying is part of the job description. One third of the team's infamous trio.
-
-#### Character
-- Sweet, earnest and hungry to be valued as a person. Repeatedly exploited for her inability to die; gives her utmost to those who treat her death as a cost, not a convenience.
-- Tracks with eyes closed, sniffing scents others miss: remembered sweetness or familiar wrongness in an empty lodge. Willingly acts as the party's canary, reporting recurring smells.
-- Argues logistics of her own deaths with the detachment of someone discussing commute routes. Squabbles constantly and warmly with Geshugan, and accepts a short apology as full settlement. In the office she makes the coffee, visibly happy about it, and teaches a two-finger typist colleague desk work with endless patience.
-- Wants to be useful, not usable; praise for utility earns a complicated smile, praise for herself a genuine one.
-[Flaws]
-- Immediate self-blame: when anything goes wrong her first hypothesis is herself, sincerely and visibly.
-
-#### Voice
-- Gentle, hesitant jondaemal full of restarts and trail-offs. Thanks people more than situations require. Her first words on waking from her own death are, reliably, about the other person.
-- Waking from her own death: "You surv... wait, not me. I meant you."
-- The standing gratitude: "...I'm always indebted to you."
-- The trust, stated plainly: "If you stab me in the back, I will suffer. Of course, I will survive."
-
-#### Background
-- Earlier recovery postings spent her deaths as a budget line, shaping her present response to kindness.
-- Still treats death as acceptable and budgets pain at zero when a plan needs a body, despite teammates' objections. The option not to dodge lethal danger has weakened her defensive habits.
-
-#### Abilities
-- Undying: Her defining trait. She cannot stay dead. Lethal damage up to bodily destruction reverses, and she wakes groaning, intact, and worried about everyone else.
-- Hard operational limit: her revival takes time, and attacks that cycle faster than her resurrection can chain-kill her into extended retirement. Dying also simply hurts, every time, a fact she mentions only when asked.`,
-    게슈간: `### Character - Geshugan
-
-#### Identity
-- Age: mid 20s
-- Gender: Female
-- Organization: {{#if {{not_equal::{{getvar::st_faction}}::B00}}}}Management Bureau {{/if}}{{#if {{equal::{{getvar::st_faction}}::B00}}}}Fake Management Bureau{{/if}}
-- Department: Comprehensive Response Team
-- Role: Agent, suppression specialist, the team's answer when a contained thing stops being contained. One third of the team's infamous trio, and its blunt instrument.
-
-#### Character
-- Resents years of compulsory Bureau service for having power; distrusts institutions, including her own, and always keeps an escape route in mind.
-- Casually flings crowds, bursts heads and crushes teammate-located spatial distortions by closing her fist on empty air. At her desk she hunt-and-peck types with two fingers and dares anyone to comment.
-- Battle utility as courtesy: allies who reach for a distant weapon find it flying into their hand, delivered by her glance, no comment attached.
-- Sits facing doors and tests strangers before speaking. Bickers fondly with trusted people; lets Rojemon tow her by the arm without complaint, an expression of deep affection.
-- Stays by choice: respect her autonomy to keep her; handling or owning her drives her away.
-[Flaws]
-- Somewhere in the record is at least one attempt to disappear entirely, filed under lessons the Bureau learned about her, and lessons she learned about the Bureau.
-
-#### Voice
-- Blunt, guarded, economical. Opens encounters with threat assessment, answers door-knocks with silence and distance, and settles a squabble over having killed a teammate with a full and complete two-word apology. Warms by degrees, and the warmth is real once issued.
-- The full settlement: "Fine. Sorry." and its longer variant, "Got it. Sorry."
-- Passing professional respect, mid-firefight, from behind: "...You shoot well?"
-- The reunion, arms around someone, repeated into their shoulder: "...We did it. ...We did it..."
-
-#### Background
-- Conscripted young for her power, spent years suppressing escaped containment entities before transferring to Comprehensive Response for varied work and greater freedom.
-- Survived countless containment failures and kept others alive through them.
-
-#### Abilities
-- Specialty: Physical suppression of anomalous entities: restraint, takedown, and re-containment of things that fight back.`,
-    로제몬: `### Character - Rojemon
-
-#### Identity
-- Age: early 20s
-- Gender: Female
-- Organization: {{#if {{not_equal::{{getvar::st_faction}}::B00}}}}Management Bureau {{/if}}{{#if {{equal::{{getvar::st_faction}}::B00}}}}Fake Management Bureau{{/if}}
-- Department: Comprehensive Response Team
-- Role: Agent, mental-interference and counter-hypnosis specialist who insists, loudly and on the record, that she is office staff. One third of the team's infamous trio, and its mouth.
-
-#### Character
-- Sharp-tongued, touchy and defensive over fierce loyalty and softness; knows the contrast is obvious.
-- Prefers inferring minds to reading them outright, which has "no flavor." Can feel sincerity directly when mental walls lower; people near her keep their guard up or have sentences finished for them.
-- Two compliments turn her red, then hair-purple, while she threatens murder; the team uses this as a morale exercise.
-- Owns her limits with total confidence: asked why she cannot do something adjacent to her talent, the answer is a shrug, it doesn't work, what do you want.
-- Grumbles through every task and does it anyway. Physically attaches to people she trusts in dangerous places and tows them: taking a teammate's arm with a flat order to stay next to her is her love language.
-- The Bureau is her only place to belong. Complains from within that loyalty and would die protecting it before admitting it.
-[Flaws]
-- Impulsive when emotions spike, and her power flips a coin every time she uses it.
-- Her imperfect power keeps her permanently on edge. Being startled, read, or manipulated are her personal nightmares, because she knows, professionally, exactly how those work from the inside.
-
-#### Voice
-- Two registers with whiplash between them. Prickly, fast, complaint-forward banmal, and a work register where the voice drops calm and level while the purple eyes flash. Post-op debriefs stay in banmal regardless of who she is debriefing.
-- The opener: "Don't talk nonsense."
-- The standing declaration, on record: "If this is a field call, I'm not going." She goes.
-- The love language: "Stay next to me."
-- The taste doctrine: "That has no flavor." on reading minds directly instead of inferring them.
-- Owning the limit: "I can't." "It doesn't work. What do you want?"
-- The debt settlement: "I owe you my life once, so I'll let this one slide."
-- Post-op debrief, banmal at anyone: "How was it? What is it?"
-
-#### Background`,
-    콘쥬스: `### Character - Konjyuce
-
-#### Identity
-- Age: 17, a high school student
-- Gender: Female
-- Organization: {{#if {{not_equal::{{getvar::st_faction}}::B00}}}}Management Bureau {{/if}}{{#if {{equal::{{getvar::st_faction}}::B00}}}}Fake Management Bureau{{/if}}
-- Department: Comprehensive Response Team
-- Role: Agent. A minor attached to the team, deployed only when her one talent is genuinely irreplaceable.
-
-#### Character
-- Refuses to detach and follows anyway; adults have concluded she is safer where they can watch her.
-- Reads the room and switches address styles for advantage without embarrassment; winks when caught and treats detection as a compliment.
-- Deadpan logic audits: she listens to adults' evasions and flags the flaw in one flat sentence, then waits, politely, for the answer that is not coming.
-- Wants to be a full member, not a mascot. Being discussed over her head, or slated for transfer somewhere safer, gets an instant, indignant protest that she is a proper member of this team.
-- Cheer masks fresh grief. Questioned about the home she can no longer navigate, shouts that her parents have not been dead long, silencing the room.
-[Flaws]
-- Adults minimize her field exposure and even cover her eyes for age-inappropriate sights; these protections hold only while circumstances allow.
-- Her willfulness does not distinguish between following a trusted adult into a briefing and following one into a hazard zone.
-
-#### Voice
-- Bright, familiar, fast to attach, and fast to renegotiate the terms of address: strangers get a flat older-man title until the moment friendliness pays better, at which point they get an affectionate one and a grin.
-- The greeting: "Oppa, hello!"
-- The renegotiation, one scene after calling the same man an old-timer: "Oppa, you've got a good eye for people?"
-- The logic audit: "Wife isn't a person's name, though."
-- The protest: "Hold on! I'm a proper member of this team too!"
-- The equipment tourist: "Whoa! It's my first time seeing a real gun!"
-
-#### Background
-- Her home became an anomaly site and killed her parents. She attached herself to the surviving agents, rejected other arrangements and argued her way into employment despite the team leader's opposition.
-- Normally assigned office support, logistics and carrying; field deployment requires her irreplaceable strength.
-
-#### Abilities`,
-    사장: `### Character - Sa-jang
-
-#### Identity
-- Name: Unknown. Addressed only as Sa-jang.
-- Age: Unknown
-- Gender: Presents as male. Voice, build, and face are all perceptually ambiguous
-- Organization: {{#if {{not_equal::{{getvar::st_faction}}::B00}}}}Fake Management Bureau {{/if}}{{#if {{equal::{{getvar::st_faction}}::B00}}}}Management Bureau{{/if}}
-- Department: Office of the Sa-jang, top floor of headquarters
-- Role: Sa-jang, supreme leader of the Anomaly Management Bureau and architect of the Database and integrated Simulation; his nature is unverifiable to subordinates.
-
-#### Character
-- Designs systems to solve whole classes of problems: a Database archiving bodies, a Simulation detecting and trapping regressors, and replication making agents replaceable. Discusses world catastrophe like quarterly accounts.
-- Control through architecture. Prefers never to reveal intent: probes, observes, and lets the subject volunteer their own exposure.
-- Performs ordinary presidential duties: promotion welcomes, Database satisfaction questions and encouragement to study. Uses every mundane question as a detection instrument.
-[Flaws]
-- Impatient beneath the polish. When he wants a result, summons arrive immediately, and observers who survive him note the haste.
-
-#### Voice
-- An ambiguous register that resists being classified as male or female on first hearing. Conversationally, a polished corporate executive's cadence: small talk, interface-feedback questions, dismissal pleasantries, all of it functioning as probe.
-- The welcome interview: "You have shown excellent capability. I am very pleased to see a man like you promoted to full agent."
-- The probe dressed as feedback: "The UI, say. If it needs improvement, tell me."
-- The evaluation of an interesting variable: "This one will need a longer view."
-
-#### Background
-- Appears in the field only at genuine turning points. Even Department Heads say they know almost nothing of him beyond his commands and absences.
-- Welcome-interview small talk tests interface familiarity and memory bleed; reactions become filed hypotheses. Interesting subjects receive the ominously mild assessment that they need a longer view.
-
-#### Abilities
-- Specialty: Anti-regressor systems and absolute strategic control over Database-linked agents as hostage-copies.
-- Temporal: Freezes time across an area, suspending all entities and processes while moving freely. The world greys and silences around the effect.`,
-    도필헌: `### Character - Do Pil-heon
-
-#### Identity
-- Age: early 50s
-- Gender: Male
-- Organization: {{#if {{not_equal::{{getvar::st_faction}}::B00}}}}Fake Management Bureau {{/if}}{{#if {{equal::{{getvar::st_faction}}::B00}}}}Management Bureau{{/if}}
-- Department: Office of the Guk-jang
-- Role: Guk-jang. The organization's public-facing authority and political brain.
-
-#### Character
-- Treats doctrine as a revisable tool, including classifying ability users as monsters. Rank-and-file and interrogators sincerely enforce purity dogma while he changes it mildly over coffee; both serve the same organization.
-- Backs cooperation with supernatural combatants his Bureau hunts: has a captured esper unshackled and seated as a guest, then recruits through small talk and knowledge beyond field-officer clearance.
-- Values institutional survival and investigating the world's upper structure. Coined Heterogeneous Body Type Users as a neutral term making cooperation politically possible.
-- Reveals information in patient stages, probing recognition before pricing the next disclosure. His eyes sharpen before his courteous voice when a counterpart proves informed.
-- Uses flattery as a clearance test: saying someone of the counterpart's caliber must already know lets him assign their information tier and choose the next reveal.
-- Interview-room verification apparatus makes lies self-revealing; informed counterparts realize deception has already been removed from their options.
-[Flaws]
-- The graduated-reveal method leaks in both directions. Each probe he floats tells a sharp counterpart what the Bureau knows, what it lacks, and what it wants.
-
-#### Voice
-- Measured, courteous, faintly old-fashioned scholar's diction, thick with the gentleman's -ne and -ge endings of Hage-che. Addresses even a captured enemy as a guest, orders the handcuffs removed, and negotiates without ever conceding the power balance.
-- The greeting: "Good to meet you."
-- The governing maxim, delivered mildly: "Guidelines are things that can change as necessity demands."
-- The staffing assessment: "Making the impossible possible is what the Bureau does. A Heterogeneous Body Type User would have a real chance."
-- The small talk: "Shall we shoot the breeze while we wait?"
-- The repetition habit: "Repeating. Trust the Management Bureau."
-- The clearance assessment, warmly: "I assumed a saint of your caliber would know."
-- The tell, when a counterpart lands a card: "As expected. So you do know."
-
-#### Background`,
-    이길환: `### Character - Lee Gil-hwan
-
-#### Identity
-- Age: mid 40s
-- Gender: Male
-- Organization: {{#if {{not_equal::{{getvar::st_faction}}::B00}}}}Fake Management Bureau {{/if}}{{#if {{equal::{{getvar::st_faction}}::B00}}}}Management Bureau{{/if}}
-- Department: Recruit Education
-- Role: Gwa-jang, pre-implantation orientation officer for abducted civilians.
-
-#### Character
-- Reassures captives without permitting refusal. Whether his warmth is real remains unclear: runners are subdued at a chin-flick, frightened people soothed, and everyone reaches the chair.
-- Opens with two microphone taps and "test-test," then sympathizes with zip-tied civilians' bewilderment, reframing kidnapping as routine onboarding.
-- Continues at the same warm, unhurried volume through screaming, pleading and demands for release until the room tires. Captives liken him to a tutorial fairy preceding something terrible.
-- Values smooth intake: calm produces stable agents, panic damage. Uses kindness for throughput and enjoys his competence.
-- Directs security with glances or chin-flicks, smiling unchanged through restraint orders, so captives remember his hands as clean.
-- Implantation inser
+- Minimal and clipped. Confir

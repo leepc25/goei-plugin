@@ -1,4 +1,4 @@
-// goei-body 0.16.57
+// goei-body 0.16.58
 "use strict";
 (() => {
   // src/core/dispatch.ts
@@ -3352,7 +3352,7 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
   var MARK_MAX = 5;
   var DIM_DEFAULT = 50;
   var prefs = { basic: {}, world: {} };
-  var PREF_VAR = /^(\$ph_(model|auto|status|related|context|incoming|incoming_chance|group_invites|group_invite_chance|announcements|announcement_gap|announcement_history|announcement_page_size|all_contacts|anomaly_contacts|storage_(auto|limit)_(dm|group|notice))|\$lb_cfg_lb-gn\.[a-z_]+|\$gn_storage_(auto|limit)_dm|\$nw_(mode|model|length|refresh_previous|writing_request|context)|\$ph_context_(messages|announcements)|\$(ph|nw)_adv_[a-z_]+|\$gen_[a-z_]+)$/;
+  var PREF_VAR = /^(\$ph_(model|auto|status|related|context|incoming|incoming_chance|group_invites|group_invite_chance|announcements|announcement_gap|announcement_history|announcement_page_size|all_contacts|anomaly_contacts|storage_(auto|limit)_(dm|group|notice))|\$lb_cfg_lb-gn\.[a-z_]+|\$gn_storage_(auto|limit)_dm|\$nw_(mode|model|length|refresh_previous|writing_request|context)|\$ph_context_(messages|announcements)|\$(ph|nw)_adv_[a-z_]+|\$hq_(adv_[a-z_]+|ui)|\$gen_[a-z_]+)$/;
   function getPrefs() {
     return prefs;
   }
@@ -4135,18 +4135,18 @@ ${themeVars("[x-goei-fab]")}
   function fields2(line2) {
     const out = [];
     let cur = "";
-    let esc20 = false;
+    let esc21 = false;
     for (const c of line2) {
-      if (esc20) {
+      if (esc21) {
         cur += c === "n" ? "\n" : c === "p" ? "|" : c === "\\" ? "\\" : `\\${c}`;
-        esc20 = false;
-      } else if (c === "\\") esc20 = true;
+        esc21 = false;
+      } else if (c === "\\") esc21 = true;
       else if (c === "|") {
         out.push(cur);
         cur = "";
       } else cur += c;
     }
-    if (esc20) cur += "\\";
+    if (esc21) cur += "\\";
     out.push(cur);
     return out;
   }
@@ -4282,5 +4282,4 @@ ${themeVars("[x-goei-fab]")}
     }
     return false;
   }
-  function reconcileUnread(st, previous) {
-    const ol
+  function reconcileUnread(st, pr

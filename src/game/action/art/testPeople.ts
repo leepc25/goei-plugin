@@ -113,20 +113,22 @@ export function drawTestMan(c: CanvasRenderingContext2D, x: number, y: number, d
 export const testPlayerTop = () => -(252 - 14) * 1.15;
 export const testManTop = () => -(MAN.fy - MAN.head) * MAN_SCALE;
 
-/** 주인공 얼굴 칸: 평상 대기 첫 장의 머리·어깨 side×side (원본 1도트 = 1px) */
-const faces = new Map<number, HTMLCanvasElement>();
-export function testPlayerFace(side = 44): HTMLCanvasElement | null {
-  const e = art?.clips['1'];
+/** 주인공 얼굴 칸 (네임텍): 얼굴이 잘 보이는 남동쪽 그림(고개 젓기 첫 장, 없으면 평상 대기). flip = 남서(왼쪽 보기)면 좌우 반전 (사용자 2026-10-25) */
+const faces = new Map<string, HTMLCanvasElement>();
+export function testPlayerFace(side = 44, flip = false): HTMLCanvasElement | null {
+  const e = art?.clips['31'] ?? art?.clips['1'];
   if (!e) return null;
-  const hit = faces.get(side);
+  const key = `${side}|${flip}`, hit = faces.get(key);
   if (hit) return hit;
   const face = document.createElement('canvas');
-  faces.set(side, face);
+  faces.set(key, face);
   face.width = face.height = side;
   const o = face.getContext('2d')!;
   o.imageSmoothingEnabled = false;
-  const cx = e.m.w / 2 + (e.m.cx[0] ?? 0);
-  o.drawImage(e.im, cx - side / 2 + 8, 14, side, side, 0, 0, side, side); // 얼굴이 가운데 오게 (옆머리 쪽을 덜)
+  // 얼굴 가운데 = 몸 중심에서 오른쪽 6도트, 머리 꼭대기(14)에서 조금 아래부터
+  const fx = e.m.w / 2 + (e.m.cx[0] ?? 0) + 6;
+  if (flip) { o.translate(side, 0); o.scale(-1, 1); }
+  o.drawImage(e.im, Math.round(fx - side / 2), 16, side, side, 0, 0, side, side);
   return face;
 }
 

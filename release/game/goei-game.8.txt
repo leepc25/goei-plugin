@@ -1,4 +1,403 @@
-q) && !boardLike(q) && Math.abs(q.y - p.y) < 90 && Math.abs(q.x - x) < h + artW(q, f.type) / 2 + 12);
+ cell.kind === "support" ? ["v_support", "v_plain"] : cell.kind === "slope" ? ["v_slope", "v_plain"] : cell.kind === "shaft" ? ["v_gapline", "v_plain"] : ["v_plain", "v_gapline", "v_support"];
+          const t = CHUNK_BY_ID[pick3(r, kindPool)] ?? SERVICE_CHUNKS[0];
+          const flip = r() < 0.5;
+          const tr = t.terrain.map((x) => flip ? flipTerrain(x) : x).map((x) => ({ ...x, x0: x.x0 + k * CHUNK_W, x1: x.x1 + k * CHUNK_W }));
+          segs.push({ ref: `chunk:${t.id}`, x: k * CHUNK_W, w: CHUNK_W, flip, terrain: tr });
+          terrain.push(...tr);
+          if (r() < 0.45) cell.things.push(thing("item", k * CHUNK_W + 200 + Math.floor(r() * 240), 40 + Math.floor(r() * 80), "버려진 보급품", { item: pick3(r, ["heal", "light", "ammo", "guard"]) }));
+        }
+      }
+      if (cell.duct.l) segs[0].terrain = segs[0].terrain.filter((t) => t.kind === "low" || t.x0 > 320), segs[0].terrain.push({ kind: "low", x0: 0, x1: 140 });
+      if (cell.duct.r) {
+        const sg = segs[segs.length - 1];
+        sg.terrain = sg.terrain.filter((t) => t.kind === "low" || t.x1 < ROOM_W - 320);
+        sg.terrain.push({ kind: "low", x0: ROOM_W - 140, x1: ROOM_W });
+      }
+      cell.segments = segs;
+      if (cell.open.l) cell.things.push(thing("left", 40, LANE_DEPTH / 2, cell.duct.l ? "← 덕트 (앉아서)" : "← 옆 칸"));
+      if (cell.open.r) cell.things.push(thing("right", ROOM_W - 40, LANE_DEPTH / 2, cell.duct.r ? "덕트 (앉아서) →" : "옆 칸 →"));
+      if (cell.open.u) cell.things.push(thing("ladder_up", 560, 0, "지지대 ↑"));
+      if (cell.open.d) cell.things.push(thing("ladder_down", 720, 0, "지지대 ↓"));
+      if (cell.kind === "entry") cell.things.push(thing("up", 400, 0, "해치 (위층으로)"));
+      if (cell.kind === "down") cell.things.push(thing("down", 880, 0, "아래 점검문 (다음 층)"));
+      if (cell.kind === "shaft") cell.things.push(thing("fall", 920, LANE_DEPTH, "승강로 틈새 (아래가 끝없이 보인다)"));
+      if (r() < 0.2 && cell.kind !== "attic") cell.things.push(thing("symbol", 1e3, 0, "벽 기호", { attic: `${atticCell[0]},${atticCell[1]}` }));
+      if (cell.kind === "attic") {
+        const ar = rng(mix2(ctx.seed, ctx.depth, 8080));
+        cell.things.push(thing("rope", 120, 0, "귀환 로프"));
+        cell.things.push(thing("bed", 300, 100, "낡은 매트 (휴식)"));
+        cell.things.push(thing("intercom", 480, 0, "인터폰 (송신·거래)"));
+        cell.things.push(thing("memo", 820, 0, "벽 메모: 「여기 오래 있지 마」", { rule: "attic", writer: ar() < 0.5 }));
+        cell.things.push(thing("map", 960, 0, "대충 그린 지도"));
+        if (ar() < 0.7) cell.things.push(thing("pack", 1080, 120, "버려진 배낭", { item: pick3(ar, ["heal", "heal", "light", "guard"]) }));
+        if (ar() < 0.5) cell.things.push(thing("gear", 660, 140, "용도 모를 장비"));
+        if (ar() < 0.5) cell.things.push(thing("checklist", 1180, 140, "서명란이 빈 점검표", { rule: "entry" }));
+        if (ar() < 0.3) cell.things.push(thing("merchant", 1180, 40, "중림 상인"));
+      }
+      const pits = cell.segments.flatMap((s2) => s2.terrain).filter((t) => t.kind === "pit" || t.kind === "block");
+      for (const t of cell.things) for (const p of pits) if (t.x > p.x0 - 50 && t.x < p.x1 + 50) t.x = p.x1 + 60 > ROOM_W - 80 ? p.x0 - 60 : p.x1 + 60;
+      const isWay = (t) => !["item", "symbol", "pack", "gear", "checklist", "merchant", "key"].includes(t.kind);
+      cell.things.sort((a, b) => Number(isWay(b)) - Number(isWay(a)));
+      const kept = [];
+      for (const t of cell.things) {
+        let tries = 0;
+        while (kept.some((k) => Math.abs(k.x - t.x) < 70) && tries++ < 12) {
+          if (!isWay(t)) break;
+          t.x += t.x > ROOM_W / 2 ? -75 : 75;
+        }
+        if (kept.some((k) => Math.abs(k.x - t.x) < 70)) continue;
+        kept.push(t);
+      }
+      cell.things = kept;
+      cell.label = labelOf(cell.kind);
+    }
+    const predatorAfter = ctx.flags.includes("attic_short") ? 60 : 90;
+    const dist = /* @__PURE__ */ new Map([[entryCell.join(","), 0]]);
+    const q = [entryCell];
+    while (q.length) {
+      const [c, rw] = q.shift();
+      const cell = cells[idx(c, rw)];
+      const d3 = dist.get(`${c},${rw}`);
+      for (const [k, dc, dr] of [["r", 1, 0], ["l", -1, 0], ["d", 0, 1], ["u", 0, -1]])
+        if (cell.open[k] && !dist.has(`${c + dc},${rw + dr}`)) dist.set(`${c + dc},${rw + dr}`, d3 + 1), q.push([c + dc, rw + dr]);
+    }
+    let keyCell = null;
+    if (ctx.key) {
+      const cands = cells.filter((c) => c.kind !== "attic" && c.kind !== "entry").sort((a, b) => (dist.get(`${b.col},${b.row}`) ?? 0) - (dist.get(`${a.col},${a.row}`) ?? 0) + (r() - 0.5) * 0.6);
+      const kc = cands[0];
+      if (kc) {
+        keyCell = [kc.col, kc.row];
+        const x = [300, 640, 980].find((x2) => !kc.things.some((t) => Math.abs(t.x - x2) < 80) && !kc.segments.flatMap((s2) => s2.terrain).some((t) => (t.kind === "pit" || t.kind === "block") && x2 > t.x0 - 60 && x2 < t.x1 + 60)) ?? 640;
+        kc.things.push(thing("key", x, 80, `정비 열쇠 (${ctx.depth <= 3 ? `L${ctx.depth}` : `B-${ctx.depth - 3}`} 방화셔터)`, { depth: ctx.depth }));
+      }
+    }
+    const fights = {};
+    const fr = rng(mix2(ctx.seed, ctx.depth, ctx.reroll, 9191));
+    const mobs = ctx.depth <= 3 ? ["lurker", "hollow"] : ["crawler", "charger", "shade", "lurker"];
+    for (const c of cells) {
+      if (c.kind === "attic" || c.kind === "entry") continue;
+      if (fr() < Math.min(0.75, 0.35 + ctx.depth * 0.04)) fights[`${c.col},${c.row}`] = Array.from({ length: 1 + Math.floor(fr() * (ctx.depth <= 3 ? 2 : 3)) }, () => pick3(fr, mobs));
+    }
+    return { depth: ctx.depth, seed: ctx.seed, reroll: ctx.reroll, cols, rows, cells, atticCell, entryCell, downCell, shaftCell: shaft ? [shaft.col, shaft.row] : null, predatorAfter, keyCell, fights };
+  }
+  function labelOf(k) {
+    return { entry: "해치 밑", duct: "덕트", support: "지지대 사이", slope: "기울어진 바닥", shaft: "승강로 틈새", attic: "선배들의 다락방", down: "아래 점검문 앞", plain: "배관 통로" }[k];
+  }
+  var cellAt = (z, col, row) => z.cells[row * z.cols + col];
+
+  // src/game/action/stage/gen/side.ts
+  var hashId = (s2) => [...s2].reduce((h, c) => h * 31 + c.charCodeAt(0) | 0, 7);
+  function makeSide(seed, f, door, secret, label3) {
+    const r = rng(mix2(seed, f.depth, hashId(door), secret ? 2 : 1, 6161));
+    const pool = FLOOR_TYPES[f.type].enemies.length ? FLOOR_TYPES[f.type].enemies : FLOOR_TYPES.lobby.enemies;
+    const n = secret ? r() < 0.35 ? 1 : 0 : f.depth <= 1 ? 1 + Math.floor(r() * 2) : 2 + Math.floor(r() * Math.min(3, 1 + f.depth / 3));
+    const fight = Array.from({ length: n }, () => pick3(r, pool).kind);
+    const loot = [{ kind: "chest", x: 1e3 }];
+    if (secret) loot.push({ kind: "gear", x: 720 }, { kind: "item", x: 560, item: pick3(r, ["heal", "guard", "light"]) });
+    else if (r() < 0.5) loot.push({ kind: "item", x: 620, item: pick3(r, ["heal", "ammo", "light"]) });
+    return { depth: f.depth, door, secret, label: secret ? `숨은 방` : label3, loot, fight, elite: secret || f.depth >= 6, palette: f.palette };
+  }
+
+  // src/game/action/stage/upgrades.ts
+  var UPGRADES = [
+    { id: "hp", set: "body", label: "단단한 몸", text: "최대 체력 +30, 바로 30 회복" },
+    { id: "blood", set: "body", label: "피의 맛", text: "적을 쓰러뜨릴 때마다 체력 +5" },
+    { id: "ward", set: "body", label: "부적 두 장", text: "다음 피격 두 번을 막는다" },
+    { id: "power", set: "fist", label: "무거운 주먹", text: "타격 피해 +20%" },
+    { id: "spirit", set: "fist", label: "기합", text: "때릴 때마다 필살 게이지가 더 찬다" },
+    { id: "rush", set: "fist", label: "몰아치기", text: "적을 쓰러뜨린 뒤 3초 동안 피해 +30%" },
+    { id: "quiet", set: "rule", label: "조용한 발", text: "내는 소리 절반 (침묵의 층)" },
+    { id: "battery", set: "rule", label: "여분 배터리", text: "빛이 사그라드는 속도 절반 (어둠의 층)" },
+    { id: "master", set: "rule", label: "만능 열쇠", text: "잠긴 방화셔터 하나를 열쇠 없이 연다" },
+    { id: "scout", set: "rule", label: "선배의 지도", text: "정비 구역 다락방·열쇠 자리가 지도에 보인다" },
+    { id: "rest", set: "rule", label: "깊은 잠", text: "다락방 매트에서 한 번 더 쉴 수 있다" }
+  ];
+  var UPGRADE_BY_ID = Object.fromEntries(UPGRADES.map((u) => [u.id, u]));
+  var SET_LABEL = { body: "몸", fist: "주먹", rule: "규칙" };
+  var SET_BONUS = { body: "계열 완성 · 몸: 최대 체력 +50", fist: "계열 완성 · 주먹: 피해 +15%", rule: "계열 완성 · 규칙: 승강기 총애 +1" };
+  function upgradeChoices(seed, n, taken) {
+    const pool = UPGRADES.filter((u) => !taken.includes(u.id));
+    return shuffle2(rng(mix2(seed, n, 4141)), [...pool]).slice(0, 3);
+  }
+  function setCounts(taken) {
+    const c = { body: 0, fist: 0, rule: 0 };
+    for (const id of taken) if (UPGRADE_BY_ID[id]) c[UPGRADE_BY_ID[id].set]++;
+    return c;
+  }
+  function powerOf(taken) {
+    return 1 + (taken.includes("power") ? 0.2 : 0) + (setCounts(taken).fist >= 3 ? 0.15 : 0);
+  }
+
+  // src/game/action/stage/passengers.ts
+  var PASSENGER_LABEL = {
+    three_years: "삼 년째 승객",
+    markers: "표시 체계 무리",
+    supply: "배낭 멘 승객",
+    nothuman: "승객 옷을 입은 것",
+    missing: "야근하다 들어온 회사원"
+  };
+  function defaultTalk(kind, long, hasFork) {
+    const story = long ? ["나 여기 삼 년째야. 처음엔 회사 엘리베이터였지. 야근하고, 1층 누르고, 띵. 그 뒤로 별걸 다 봤어. 아내 얼굴이 기억이 안 나. 아니, 기억은 나는데…", "그러니까 내 말 들어."] : ["나 여기 오래 있었어. 내 말 들어."];
+    switch (kind) {
+      case "three_years":
+        return [...story, hasFork ? "저쪽 문 말고 이쪽." : "다음 버튼은… 내가 알아."];
+      case "markers":
+        return ["벽에 동그라미 있지? 동그라미 안에 줄 하나면 위험, 비어 있으면 쉼터야.", "우리끼리 남기는 표시야. 너도 남겨."];
+      case "supply":
+        return long ? ["배낭 무겁지? 나도 그랬어. 다락방에 숨겨 둔 게 있는데, 같이 가면 나눠 줄게. 정말이야, 나 혼자 다 못 먹어."] : ["다락방 오른쪽 구석에 하나 숨겨 놨어."];
+      case "nothuman":
+        return ["…………", "(얼굴을 보려 하면 고개가 같이 돈다)"];
+      case "missing":
+        return ["저… 관리국이세요? 야근하다가 1층을 눌렀는데요…", "같이 나가게 해 주세요. 부탁이에요."];
+    }
+  }
+  var CHOICE_LABEL = { help: "돕는다 (E)", ignore: "무시한다 (E)", rob: "뺏는다 (E)" };
+
+  // src/game/action/stage/plan.ts
+  function narrowBack(t, terr = []) {
+    if (t.kind !== "narrow" || t.lane0 <= 0) return null;
+    const H7 = 126;
+    const xs = [];
+    for (let x = t.x0 + 50; x < t.x1 - 20; x += 100) xs.push(x);
+    if (!xs.length) xs.push((t.x0 + t.x1) / 2);
+    let a = xs[0] - H7, b = xs[xs.length - 1] + H7;
+    let clipped = false;
+    for (const o of terr) {
+      if (o === t || o.kind !== "narrow") continue;
+      if (o.x1 <= t.x0 && (o.x1 + t.x0) / 2 > a) a = (o.x1 + t.x0) / 2, clipped = true;
+      else if (o.x0 >= t.x1 && (t.x1 + o.x0) / 2 < b) b = (t.x1 + o.x0) / 2, clipped = true;
+    }
+    const wall = lockerWall.get(t);
+    const open = (xs2) => wall ? xs2.filter((x) => !wall.spans.some(([s0, s1]) => x + wall.half > s0 && x - wall.half < s1)) : xs2;
+    if (!clipped) return { span: [a, b], xs: open(xs) };
+    if (b - a < 2 * H7) return { span: [Math.max(a, t.x0 - 20), Math.min(b, t.x1 + 20)], xs: [] };
+    const fit3 = [];
+    for (let x = a + H7; x <= b - H7; x += 100) fit3.push(x);
+    if (fit3[fit3.length - 1] < b - H7 - 1) fit3.push(b - H7);
+    return { span: [a, b], xs: open(fit3) };
+  }
+  var lockerWall = /* @__PURE__ */ new WeakMap();
+  var narrowBackSpan = (t, terr = []) => narrowBack(t, terr)?.span ?? null;
+  var NOLOCK_TYPES = /* @__PURE__ */ new Set(["chase", "deep"]);
+  var METRO_ART = { childdoor: "door", childkey: "key", upper: "chasedoor", sidedoor: "door", locked: "firegate", wdoor: "door", wup: "hq_stairs_up", wdown: "hq_stairs_down", reward: "pack" };
+  var DEEP_ART = { wup: "rope", wdown: "fall" };
+  function floorPlan(f, id, startX = 240) {
+    const props2 = f.placed.filter((p) => p.kind !== "childkey").map((p) => ({
+      id: `p${p.id}`,
+      kind: (f.type === "deep" ? DEEP_ART[p.kind] : void 0) ?? METRO_ART[p.kind] ?? p.kind,
+      x: p.x,
+      y: laneY(p.lane),
+      w: p.w,
+      h: propH(p.kind),
+      label: p.kind === "item" && p.data.item ? `${p.label}:${p.data.item}` : p.label,
+      // 보급품:ammo → 바닥 그림을 종류대로 (itemsLink drawSupply)
+      solid: p.kind === "shutter" ? !p.data.open : p.kind === "locked" ? true : void 0
+    }));
+    for (const p of props2) if (p.kind === "hatch") p.y = Y_TOP;
+    for (const s2 of f.spawns) {
+      if (s2.role === "passenger") props2.push({ id: `h${s2.id}`, kind: "passenger", x: s2.x, y: laneY(s2.lane), w: 50, h: 150, label: "떠도는 승객" });
+      if (s2.role === "resident") props2.push({ id: `h${s2.id}`, kind: "npc", x: s2.x, y: laneY(s2.lane), w: 50, h: 150, label: "주민 (사는 척)" });
+      if (s2.role === "enemy" && s2.data.harmless) props2.push({ id: `h${s2.id}`, kind: "npc", x: s2.x, y: laneY(s2.lane), w: 50, h: 150, label: "평범한 직원" });
+    }
+    const doorSpans = spreadProps(f, props2, startX);
+    const lockerHalf = (propArtSize("clutter", "사물함")?.w ?? 150) / 2;
+    for (const sg of f.segments) for (const t of sg.terrain) if (t.kind === "narrow") lockerWall.set(t, { spans: doorSpans, half: lockerHalf });
+    const encounters = [];
+    if (!NOLOCK_TYPES.has(f.type)) {
+      const groups = /* @__PURE__ */ new Map();
+      for (const s2 of f.spawns.filter((s3) => s3.role === "enemy" && !s3.data.harmless)) {
+        const seg2 = segAt(f.segments, s2.x);
+        const waves = groups.get(seg2.x) ?? [[], []];
+        waves[Math.min(1, s2.wave)].push({ kind: s2.kind, x: s2.x, y: clearOfProps(props2, s2.x, laneY(s2.lane)), elite: s2.elite || void 0 });
+        groups.set(seg2.x, waves);
+      }
+      for (const [x, waves] of groups) {
+        const lockFrom = Math.max(0, x - 320);
+        encounters.push({ triggerX: x + 120, lockFrom, lockTo: Math.min(f.width, lockFrom + 1280), waves: waves.filter((w) => w.length) });
+      }
+      const g2 = f.spawns.find((s2) => s2.role === "guardian" && !s2.data.onFail && !s2.data.survive && s2.kind !== "elder");
+      if (g2) {
+        const room2 = segAt(f.segments, g2.x);
+        encounters.push({ triggerX: room2.x + 200, lockFrom: room2.x, lockTo: room2.x + room2.w, waves: [[{ kind: g2.kind, x: g2.x, y: laneY(g2.lane), boss: true, elite: g2.elite || void 0 }]] });
+      }
+      encounters.sort((a, b) => a.triggerX - b.triggerX);
+      if (f.room && encounters.length) {
+        const waves = encounters.flatMap((e) => e.waves);
+        encounters.splice(0, encounters.length, { triggerX: 0, lockFrom: 0, lockTo: f.width, waves });
+      }
+    }
+    const plan = {
+      id,
+      title: f.label,
+      type: f.type,
+      depth: f.depth,
+      length: f.width,
+      lane: [Y_TOP, Y_BOTTOM],
+      startX,
+      exitX: Infinity,
+      encounters,
+      props: props2,
+      keepOut: doorSpans,
+      palette: { wall: f.palette.wall, floor: f.palette.floor, accent: f.palette.accent },
+      banner: f.label,
+      stage: { where: "floor", terrain: f.segments.flatMap((s2) => s2.terrain), floor: f, fx: { light: 1, chaseX: -9999, squeeze: 0, noise: 0, red: false } }
+    };
+    plan.drawBackground = (ctx, camX) => drawBack(ctx, camX, f.segments, f.palette, plan);
+    plan.drawForeground = (ctx, camX, world) => drawFront(ctx, camX, world, plan);
+    return plan;
+  }
+  function cellPlan(z, cell, id, startX) {
+    const props2 = cell.things.map((t) => ({ id: `s${t.id}`, kind: t.kind, x: t.x, y: laneY(t.lane), w: 60, h: t.kind === "rope" ? 260 : t.kind.startsWith("ladder") ? 220 : 110, label: t.label }));
+    const pal = { wall: "#4a3a24", floor: "#33291c", trim: "#1e170e", accent: "#f0b860", fog: "rgba(0,0,0,0)" };
+    const fight = z.fights?.[`${cell.col},${cell.row}`];
+    const encounters = fight?.length ? [{ triggerX: 0, lockFrom: 0, lockTo: ROOM_W, waves: [fight.map((kind, i) => ({ kind, x: startX < 640 ? 980 - i * 120 : 300 + i * 120, y: laneY(30 + i * 53 % 110) }))] }] : [];
+    const plan = {
+      id,
+      title: `정비 구역 (${depthLabel(z.depth)} 아래) · ${cell.label}`,
+      type: "service",
+      depth: z.depth,
+      length: cell.width,
+      lane: [Y_TOP, Y_BOTTOM],
+      startX,
+      exitX: Infinity,
+      encounters,
+      props: props2,
+      palette: { wall: pal.wall, floor: pal.floor, accent: pal.accent },
+      banner: cell.kind === "attic" ? "선배들의 다락방" : `정비 구역 · ${cell.label}`,
+      stage: { where: "service", terrain: cell.segments.flatMap((s2) => s2.terrain), cell, zone: z, fx: { light: 1, chaseX: -9999, squeeze: 0, noise: 0, red: false } }
+    };
+    plan.drawBackground = (ctx, camX) => drawBack(ctx, camX, cell.segments, pal, plan);
+    plan.drawForeground = (ctx, camX, world) => drawFront(ctx, camX, world, plan);
+    return plan;
+  }
+  function carPlan(id, buttons, depth) {
+    const props2 = [
+      { id: "getoff", kind: "getoff", x: 90, y: Y_TOP, w: 60, h: 160, label: "내렸다 다시 타기" },
+      { id: "greet", kind: "greet", x: 260, y: Y_TOP, w: 60, h: 110, label: "인사하기 (E)" },
+      { id: "mirror", kind: "mirror", x: 420, y: Y_TOP, w: 70, h: 150, label: "거울" },
+      { id: "close", kind: "close", x: 600, y: Y_TOP, w: 40, h: 60, label: "닫힘 버튼" }
+    ];
+    buttons.forEach(
+      (b, i) => props2.push({ id: `btn${i}`, kind: "button", x: 760 + i * 120, y: Y_TOP, w: 60, h: 60, label: b.exit ? "EXIT" : `${b.label}${b.shown ? ` · ${FLOOR_TYPES[b.type].label}` : " · ?"}` })
+    );
+    const pal = { wall: "#5d5146", floor: "#3a332c", trim: "#221d18", accent: "#ffcf70", fog: "rgba(0,0,0,0)" };
+    const segs = [{ ref: "room:car", x: 0, w: ROOM_W, flip: false, terrain: [] }];
+    const plan = {
+      id,
+      title: `승강기 안 · ${depthLabel(depth)}`,
+      type: "car",
+      depth,
+      length: ROOM_W,
+      lane: [Y_TOP, Y_BOTTOM],
+      startX: 160,
+      exitX: Infinity,
+      encounters: [],
+      props: props2,
+      palette: { wall: pal.wall, floor: pal.floor, accent: pal.accent },
+      banner: "승강기",
+      stage: { where: "car", terrain: [], buttons, fx: { light: 1, chaseX: -9999, squeeze: 0, noise: 0, red: false } }
+    };
+    plan.drawBackground = (ctx, camX) => drawBack(ctx, camX, segs, pal, plan);
+    return plan;
+  }
+  function sidePlan(room2, parent, id) {
+    const props2 = [{ id: "xback", kind: "door", x: 170, y: Y_TOP, w: 90, h: 180, label: "나가는 문 (복도로)" }];
+    for (const l of room2.loot) {
+      if (l.kind === "chest") props2.push({ id: "xchest", kind: "pack", x: l.x, y: laneY(90), w: 60, h: 60, label: "선배가 남긴 배낭 (강화)" });
+      else if (l.kind === "gear") props2.push({ id: "xgear", kind: "gear", x: l.x, y: laneY(130), w: 50, h: 50, label: "용도 모를 장비" });
+      else props2.push({ id: `xitem${l.x}`, kind: "item", x: l.x, y: laneY(120), w: 28, h: 28, label: `보급품:${l.item ?? "heal"}` });
+    }
+    const segs = [
+      { ref: `chunk:side_${room2.door}_a`, x: 0, w: CHUNK_W, flip: false, terrain: [] },
+      { ref: `chunk:side_${room2.door}_b`, x: CHUNK_W, w: CHUNK_W, flip: true, terrain: [] }
+    ];
+    const encounters = room2.fight.length ? [{ triggerX: 330, lockFrom: 0, lockTo: ROOM_W, waves: [room2.fight.map((kind, i) => ({ kind, x: 780 + i * 130, y: laneY(20 + i * 61 % 130), elite: room2.elite && i === 0 || void 0 }))] }] : [];
+    const plan = {
+      id,
+      title: `${parent.label} · ${room2.label}`,
+      type: parent.type,
+      depth: parent.depth,
+      length: ROOM_W,
+      lane: [Y_TOP, Y_BOTTOM],
+      startX: 260,
+      exitX: Infinity,
+      encounters,
+      props: props2,
+      palette: { wall: room2.palette.wall, floor: room2.palette.floor, accent: room2.palette.accent },
+      banner: room2.secret ? `숨은 방 · ${room2.label}` : room2.label,
+      stage: { where: "side", terrain: [], floor: parent, side: room2, fx: { light: 1, chaseX: -9999, squeeze: 0, noise: 0, red: false } }
+    };
+    plan.drawBackground = (ctx, camX) => drawBack(ctx, camX, segs, room2.palette, plan);
+    plan.drawForeground = (ctx, camX, world) => drawFront(ctx, camX, world, plan);
+    return plan;
+  }
+  function endingPlan(id) {
+    const pal = { wall: "#c9c4b4", floor: "#9a9483", trim: "#6b675b", accent: "#ffffff", fog: "rgba(0,0,0,0)" };
+    const segs = [{ ref: "room:exit_hall", x: 0, w: ROOM_W, flip: false, terrain: [] }];
+    const plan = {
+      id,
+      title: "로비 · 진짜",
+      type: "ending",
+      depth: 0,
+      length: ROOM_W,
+      lane: [Y_TOP, Y_BOTTOM],
+      startX: 200,
+      exitX: Infinity,
+      encounters: [],
+      props: [{ id: "van", kind: "van", x: 1e3, y: Y_TOP, w: 220, h: 140, label: "관리국 차량 (귀환)" }],
+      palette: { wall: pal.wall, floor: pal.floor, accent: pal.accent },
+      banner: "문을 열고 나왔다. 로비였다. 진짜.",
+      stage: { where: "ending", terrain: [], fx: { light: 1, chaseX: -9999, squeeze: 0, noise: 0, red: false } }
+    };
+    plan.drawBackground = (ctx, camX) => drawBack(ctx, camX, segs, pal, plan);
+    return plan;
+  }
+  var FIXED_PROPS = /* @__PURE__ */ new Set(["firegate", "hq_stairs_up", "hq_stairs_down", "pack", "crack", "vent", "key", "elevator", "mirror", "panel", "chasedoor", "b12", "goalwall", "switch", "shutter", "door", "servicedoor", "rope", "up", "down", "fall", "ladder_up", "ladder_down", "left", "right", "intercom", "button", "getoff", "close", "greet"]);
+  var BOARD_GAP = 1400;
+  var artW = (p, floorType) => {
+    const base2 = Math.max(p.w, p.kind === "firegate" ? 170 : 0, p.kind === "item" || p.kind === "belonging" || p.kind === "mark" ? 60 : p.kind === "passenger" || p.kind === "npc" ? 80 : 130);
+    if (p.kind === "item" || p.kind === "belonging" || p.kind === "mark" || p.kind === "passenger" || p.kind === "npc") return base2;
+    return Math.max(base2, propArtSize(p.kind, p.label, floorType)?.w ?? 0);
+  };
+  function spreadProps(f, props2, startX) {
+    const wallY = Y_TOP + 40;
+    const keepOut = [];
+    for (const sg of f.segments) keepOut.push(...wallSolidSpans(placeFor("floor", f.type, sg.ref, f.sub, f.depth), sg.x, sg.w, sg.flip));
+    const wallDoors = keepOut.filter(([a, b]) => b - a >= 100);
+    const terr = f.segments.flatMap((sg) => sg.terrain).filter((t) => t.kind === "block" || t.kind === "pit" || t.kind === "narrow" || t.kind === "low");
+    const taken = [];
+    const meaning = new Set(f.placed.filter((q) => q.data.fork !== void 0 || q.data.group !== void 0).map((q) => `p${q.id}`));
+    const ruled = new Set(f.placed.filter((q) => q.data.rule).map((q) => `p${q.id}`));
+    const gateX = f.placed.find((q) => q.kind === "locked")?.x ?? -1;
+    const fixed2 = (p) => FIXED_PROPS.has(p.kind) || meaning.has(p.id) || p.kind !== "hatch" && p.x < startX + 60 && (!f.room || ruled.has(p.id));
+    const boardLike = (p) => isStandBoard(p.kind, p.label, f.type) && !isHighSign(p.kind, p.label);
+    const must = (p) => meaning.has(p.id) || ruled.has(p.id);
+    const kept = props2.filter((p) => boardLike(p) && fixed2(p));
+    const decor = new Set(props2.filter((p) => boardLike(p) && !must(p) && !fixed2(p)));
+    for (const sg of f.segments) keepOut.push(...wallDecoSpans(placeFor("floor", f.type, sg.ref, f.sub, f.depth), sg.x, sg.w, sg.flip));
+    for (const p of props2.filter((q) => q.kind === "servicedoor" || q.kind === "chasedoor" && f.placed.some((z) => `p${z.id}` === q.id && z.kind === "upper") || q.kind === "door" && f.placed.some((z) => `p${z.id}` === q.id && z.kind === "sidedoor") || q.kind === "crack")) {
+      const h = artW(p, f.type) / 2;
+      const gate = gateX >= 0 ? { x: gateX } : null;
+      const side = gate ? Math.sign(p.x - gate.x) : 0;
+      const ok = (x2) => x2 - h >= 40 && x2 + h <= f.width - 40 && (!gate || Math.sign(x2 - gate.x) === side && Math.abs(x2 - gate.x) > h + 120) && !keepOut.some(([a, b]) => x2 + h + 8 > a && x2 - h - 8 < b) && !terr.some((t) => x2 + h > t.x0 - 20 && x2 - h < t.x1 + 20) && !props2.some((q) => q !== p && (q.kind === "shutter" || q.kind === "firegate") && Math.abs(q.x - x2) < h + 120) && !props2.some((q) => q !== p && fixed2(q) && Math.abs(q.y - p.y) < 90 && Math.abs(q.x - x2) < h + artW(q, f.type) / 2 + 16);
+      if (ok(p.x)) continue;
+      let x = null;
+      for (let d3 = 24; d3 <= 1600 && x === null; d3 += 24) x = ok(p.x + d3) ? p.x + d3 : ok(p.x - d3) ? p.x - d3 : null;
+      if (x === null)
+        for (const [a, b] of [...wallDoors].sort((u, v) => Math.abs((u[0] + u[1]) / 2 - p.x) - Math.abs((v[0] + v[1]) / 2 - p.x))) {
+          const c = (a + b) / 2;
+          if (b - a > 2 * h || keepOut.some(([a2, b2]) => (a2 !== a || b2 !== b) && c + h > a2 && c - h < b2)) continue;
+          if (terr.some((t) => c + h > t.x0 - 20 && c - h < t.x1 + 20) || props2.some((q) => q !== p && fixed2(q) && Math.abs(q.y - p.y) < 90 && Math.abs(q.x - c) < h + artW(q, f.type) / 2 + 16)) continue;
+          x = c;
+          break;
+        }
+      if (x !== null) p.x = x;
+    }
+    for (const p of props2.filter((q) => boardLike(q) && meaning.has(q.id))) {
+      const h = artW(p, f.type) / 2;
+      const gate = gateX >= 0 ? { x: gateX } : null;
+      const side = gate ? Math.sign(p.x - gate.x) : 0;
+      const ok = (x) => x - h >= 40 && x + h <= f.width - 40 && (!gate || Math.sign(x - gate.x) === side && Math.abs(x - gate.x) > h + 120) && !keepOut.some(([a, b]) => x + h + 6 > a && x - h - 6 < b) && !props2.some((q) => q !== p && q.solid && Math.abs(q.x - x) < 120) && !props2.some((q) => q !== p && fixed2(q) && !boardLike(q) && Math.abs(q.y - p.y) < 90 && Math.abs(q.x - x) < h + artW(q, f.type) / 2 + 12);
       if (ok(p.x)) continue;
       for (let d3 = 12; d3 <= 360; d3 += 12) {
         if (ok(p.x - d3)) {
@@ -727,7 +1126,7 @@ q) && !boardLike(q) && Math.abs(q.y - p.y) < 90 && Math.abs(q.x - x) < h + artW(
   }
 
   // src/game/action/stage/module.ts
-  var DT2 = 1 / 30;
+  var DT = 1 / 30;
   function createElevatorStage(store2, hooks = {}) {
     let meta = store2.load() ?? newMeta();
     let out = null;
@@ -1089,13 +1488,13 @@ ${RULE[id].variant.text}` : ""}`, 4);
       const f = plan.stage.floor;
       const p = api.world.player;
       const moved = Math.hypot(p.x - r.prevX, p.y - r.prevY) > 0.3;
-      r.stillT = moved || p.airborne ? 0 : r.stillT + DT2;
+      r.stillT = moved || p.airborne ? 0 : r.stillT + DT;
       const tune = f.tuning;
       if (f.type === "silent" || f.type === "deep") {
         if (p.running && moved) r.noise += 0.02 * tune.noiseMul * quietK();
         r.noise = Math.max(0, r.noise - 4e-3);
         api.world.noise = Math.min(1, r.noise);
-        r.summonCd -= DT2;
+        r.summonCd -= DT;
         if (r.noise >= 1 && r.summonCd <= 0) {
           r.summonCd = 20;
           r.noise = 0.4;
@@ -1105,9 +1504,9 @@ ${RULE[id].variant.text}` : ""}`, 4);
         }
       }
       if (f.type === "dark" || f.type === "deep") {
-        if (f.type === "dark") r.light = Math.max(0.12, r.light - DT2 / 9 * tune.lightFade * (out.upgrades.includes("battery") ? 0.5 : 1));
+        if (f.type === "dark") r.light = Math.max(0.12, r.light - DT / 9 * tune.lightFade * (out.upgrades.includes("battery") ? 0.5 : 1));
         api.world.light = r.light;
-        r.stalkCd -= DT2;
+        r.stalkCd -= DT;
         if (r.stillT > 1.5 && r.stalkCd <= 0) {
           r.stalkCd = 6;
           api.spawn({ kind: f.type === "deep" ? "toucher" : "warmth", x: p.x + (r.t % 2 < 1 ? -260 : 260), y: p.y });
@@ -1119,13 +1518,13 @@ ${RULE[id].variant.text}` : ""}`, 4);
       if (f.type === "chase" && r.chaseX > -1e8) {
         const end = f.segments[f.segments.length - 1].x;
         if (p.x < end - 200 && r.t > 1.2) {
-          let v = tune.chaseSpeed * DT2;
-          if (r.chaseSlow > 0) v *= 0.35, r.chaseSlow -= DT2;
-          if (r.surge > 0) v *= 1.6, r.surge -= DT2;
+          let v = tune.chaseSpeed * DT;
+          if (r.chaseSlow > 0) v *= 0.35, r.chaseSlow -= DT;
+          if (r.surge > 0) v *= 1.6, r.surge -= DT;
           if (p.x - r.chaseX > 750) v *= 2.5;
           r.chaseX += v;
         }
-        if (p.dir === -1 && !p.airborne) r.backT += DT2;
+        if (p.dir === -1 && !p.airborne) r.backT += DT;
         else r.backT = 0;
         if (r.backT > 0.6 && r.surge <= 0) {
           r.surge = 2;
@@ -1148,7 +1547,7 @@ ${RULE[id].variant.text}` : ""}`, 4);
           }
       }
       if (f.type === "puzzle") {
-        r.squeeze -= DT2;
+        r.squeeze -= DT;
         plan.stage.fx.squeeze = r.squeeze < 15 ? Math.min(1, (15 - r.squeeze) / 15) : 0;
         if (r.squeeze < 15 && !r.warned.has("sq")) r.warned.add("sq"), foundRule(api, "p_wall", p.x);
         if (r.squeeze <= 0 && r.hurtCd <= 0) r.hurtCd = 1, api.hurtPlayer(6);
@@ -1200,7 +1599,7 @@ ${RULE[id].variant.text}` : ""}`, 4);
           const near2 = Math.abs(p.x - s2.x) < 260;
           const away = s2.x > p.x && p.dir === -1 || s2.x < p.x && p.dir === 1;
           if (near2 && away) {
-            r.backT += DT2;
+            r.backT += DT;
             if (r.backT > 1.4) {
               r.backT = 0;
               foundRule(api, "lobby", p.x);
@@ -1214,14 +1613,14 @@ ${RULE[id].variant.text}` : ""}`, 4);
           api.spawn({ kind: "lurker", x: p.x - 300, y: p.y });
           api.world.say("시계 앞에서 뛰었다. 등 뒤가 서늘하다.", 2.5);
         }
-        r.summonCd -= DT2;
+        r.summonCd -= DT;
       }
       if (r.trial && f.goal) {
         const tr = r.trial;
         const goalX = f.placed.find((x) => x.kind === "goalwall").x;
         if (!tr.on && p.x > goalX) tr.on = true;
         if (tr.on && !tr.done && !tr.failed) {
-          tr.t -= DT2;
+          tr.t -= DT;
           if (f.goal.kind === "nostop") {
             tr.stopT = r.stillT;
             if (tr.stopT > 1.2) fail(api, "멈췄다");
@@ -1275,7 +1674,7 @@ ${RULE[id].variant.text}` : ""}`, 4);
     const serviceRules = (api) => {
       const r = rt;
       const o = out;
-      o.serviceTime += DT2;
+      o.serviceTime += DT;
       api.world.light = r.light;
       const lim = o.service.predatorAfter;
       if (o.serviceTime > lim - 20 && !r.warned.has("pred")) {
@@ -1425,8 +1824,8 @@ ${RULE[id].variant.text}` : ""}`, 4);
           later = [];
           for (const l of now) l.run(api);
         }
-        r.t += DT2;
-        r.hurtCd -= DT2;
+        r.t += DT;
+        r.hurtCd -= DT;
         const where = r.plan.stage.where;
         metroTick(api);
         if (where === "floor" || where === "service") terrain(api, r.plan.stage.terrain);
@@ -1437,7 +1836,7 @@ ${RULE[id].variant.text}` : ""}`, 4);
         }
         if (where === "service") serviceRules(api);
         if (where === "car" && out.stuck > 0) {
-          out.stuck -= DT2;
+          out.stuck -= DT;
           if (out.stuck <= 0) api.world.say("…문이 닫혔어요.", 2);
         }
         r.plan.stage.fx.light = api.world.light;
@@ -2102,7 +2501,7 @@ ${RULE[id].variant.text}` : ""}`, 4);
         e[0] = Math.max(0, Math.min(e[0], p.x - 700));
         e[1] = Math.min(w, Math.max(e[1], p.x + 700));
       }
-      rushT = Math.max(0, rushT - DT2);
+      rushT = Math.max(0, rushT - DT);
       p.dmgMul = powerOf(o.upgrades) * (rushT > 0 ? 1.3 : 1);
     };
     const metroEvent = (api, e) => {
@@ -3633,598 +4032,4 @@ passenger: 저쪽 문 말고 이쪽.
 > goto react
 -- lie_story
 passenger: 처음엔 나도 너희처럼 정장 입은 사람들이랑 같이 왔어. 다섯 명이었지. 첫 층에서 하나, 추격하는 층에서 둘을 잃었어.
-passenger: 그 뒤로는 혼자 다니면서 문을 하나하나 다 열어 봤어. 왼쪽 문은 몇 번이나 죽을 뻔했고, 오른쪽 문도 한 번은 그랬지만 그건 내가 잘못 들어간 거고…
-passenger(smile): 아무튼 저쪽 문 말고 이쪽. 내가 다 해 봤다니까. 진짜야. 믿어도 돼.
--- react
-> goto roje if agent == 'rojemon'
-> goto hint if rule_passenger
-> goto choose
--- roje
-// 로제몬은 정신 간섭 면역, 거짓 승객을 바로 안다 (제작서 08)
-> goto roje_true if honest
-rojemon: 헛소리하지 마. 머릿속이 텅 비었어. 하는 말이랑 생각이 하나도 안 맞아.
-> set p_known = 'lie'
-> goto choose
--- roje_true
-rojemon: …진짜야. 맛없는 생각인데, 거짓말은 아니야.
-> set p_known = 'true'
-> goto choose
--- hint
-narr: (규칙서: 친절해 보이는 승객이 둘이면, 사연이 긴 쪽이 거짓이다.)
--- choose
-* 승객이 가리킨 문으로 -> follow
-* 반대쪽 문으로 -> other
-* 같이 가자고 한다 -> help
-* 가진 걸 내놓으라고 한다 -> rob
--- follow
-> goto follow_bad if !honest
-passenger: 거봐. 살았지?
-> emit passenger right
-> end
--- follow_bad
-passenger(smile): …미안. 삼 년이면 나도 먹고 살아야지.
-> agent rule_break
-> emit passenger lure
-> end
--- other
-> goto other_good if !honest
-passenger(hurt): …마음대로 해. 다들 그래.
-> emit passenger wrong
-> end
--- other_good
-passenger: (등 뒤에서 작게 혀를 찬다)
-> emit passenger right
-> end
--- help
-> goto help_lie if !honest
-passenger: …나를? 삼 년 만에 처음 듣네. 로프까지만. 그다음은 몰라.
-> agent rescue
-> set favor += 1
-> emit favor {favor}
-> emit passenger rescued
-> end
--- help_lie
-passenger(smile): 좋지. 앞장서. 아니, 내가 앞장설게.
-narr: 승객이 문 앞에서 멈춘다. 손이 등 뒤로 간다.
-> emit passenger ambush
-> end
--- rob
-passenger(hurt): …여기서도 사람이 사람한테 이러네.
-> emit passenger robbed
-> end
-
-=== passenger_pair
-// 친절한 승객 둘이 서로 다른 문을 가리킨다. liar = 'a' 또는 'b'. 사연이 긴 쪽이 거짓 (규칙 8).
-narr: 승객 둘이 엘리베이터 홀에 서 있다. 둘 다 친절해 보인다.
-> goto a_long if liar == 'a'
-passenger: (회색 점퍼) 왼쪽. 오른쪽은 아니야.
-passenger: (낡은 양복) 오른쪽으로 가. 왼쪽 문 뒤에는 복도가 끝없이 이어지는데, 거기 들어간 사람을 내가 셋이나 봤어. 하나는 내 회사 후배였고, 이름은 말 안 할게. 우리 같이 야근하다 탔거든. 그래서 나는 오른쪽만 써.
-> goto pick
--- a_long
-passenger: (회색 점퍼) 왼쪽으로 가. 오른쪽 문은 열면 바닥이 없어. 내가 직접 봤어. 처음 여기 왔을 때 같이 온 아주머니가 그 문으로 들어갔는데, 나는 문틈으로 다 봤지. 그래서 그 뒤로는 절대 오른쪽은 안 열어.
-passenger: (낡은 양복) 오른쪽. 왼쪽은 아니야.
--- pick
-> goto roje if agent == 'rojemon'
-> goto pick_hint if rule_passenger
-> goto pick2
--- roje
-rojemon: 둘 다 친절한 척하네. 근데 한 명은 생각이 텅 비었어. …말 긴 쪽.
-> goto pick2
--- pick_hint
-narr: (규칙서: 사연이 긴 쪽이 거짓이다.)
--- pick2
-* 왼쪽 문 -> left
-* 오른쪽 문 -> right
--- left
-> goto good if liar == 'b'
-> goto bad
--- right
-> goto good if liar == 'a'
--- bad
-narr: 문 너머에서 누군가 웃는다.
-> agent rule_break
-> emit passenger lure
-> end
--- good
-> agent find
-> goto learn if !rule_passenger
-> emit passenger right
-> end
--- learn
-narr: 규칙서에 한 줄이 적힌다.
-> set rule_passenger = 1
-> emit rule passenger
-> emit passenger right
-> end
-
-=== passenger_supply
-// 보급 승객. 정직하면 다락방에 숨긴 보급품 위치, 거짓이면 보급품을 노리고 덮친다.
-passenger: 배낭 맨 사람이네. 관리국? 반가워.
-> goto lie if !honest
-passenger: 정비 구역 두 번째 해치 위에 내가 숨겨 둔 게 있어. 약이랑 손전등. 다 가져가도 돼. 나는 이제 필요 없어.
-* 고맙다고 하고 받는다 -> take
-* 나눠 갖자고 한다 -> share
-* 무시한다 -> ignore
--- take
-> agent find_item
-> emit supply cache
-> end
--- share
-passenger(smile): …나눠? 하하. 그래. 반만 줘.
-> agent rescue
-> set favor += 1
-> emit favor {favor}
-> emit supply half
-> end
--- ignore
-passenger: 그래. 조심해.
-> end
--- lie
-passenger(smile): 그 배낭 무거워 보이네. 좀 들어 줄까?
-* 배낭을 맡긴다 -> give
-* 거절한다 -> refuse
--- give
-narr: 승객이 배낭을 받아 들고 뒷걸음질 친다. 뒤에서 누가 더 나온다.
-> emit supply stolen
-> emit combat passenger
-> end
--- refuse
-passenger(hurt): …아깝네.
-narr: 승객의 손에 쇠파이프가 들려 있다.
-> agent combat
-> emit combat passenger
-> end
-
-=== passenger_signs
-// 표시 체계 무리: 벽 기호 읽는 법을 알려 준다.
-passenger: 쉿. 벽 봤어? 우리가 남긴 거야.
-passenger: 동그라미는 안전. 세모는 수호자. 가위표는… 거기서 누가 안 돌아왔다는 뜻.
-passenger: 너희도 남겨. 다음 사람을 위해서.
-> agent find
-> emit signs learn
-> end
-
-=== passenger_missing
-// 구조 대상: 야근하다 들어온 회사원 (임무 m4). late=1이면 「더는 사람이 아닌 것」.
-> goto late if late
-survivor(hurt): …관리국? 진짜요? 저 그냥 야근하고 집에 가려고…
-survivor(hurt): 몇 층인지 모르겠어요. 계속 내려가기만 했어요.
-> agent rescue
-* 따라오라고 한다 -> lead
-* 업는다 -> carry [if agent == 'gorgodio' || agent == 'jyaldi']
--- lead
-survivor: 네, 네. 뒤돌아보지 않을게요.
-> emit rescue follow
-> end
--- carry
-survivor(surprise): 어, 어어…
-> emit rescue carry
-> end
--- late
-survivor: …관리국? 진짜요? 저 그냥 야근하고…
-narr: 목소리는 그대로인데, 얼굴이 따라오지 않는다.
-survivor: …집에. 가려고. 가려고. 가려고.
-> agent boss
-> emit combat nothuman
-> end
-
-=== not_human
-// 승객 옷을 입은 것. 규칙 위반 시 깨어난다.
-narr: 벽에 기대 선 승객. 숨을 쉬지 않는다.
-> goto wake if broke_rule
-> end
--- wake
-narr: 승객이 고개를 든다. 얼굴이 따라오지 않는다.
-> agent combat
-> emit combat nothuman
-> end
-
-=== mirror
-// 엘리베이터 홀의 거울 (규칙 5). 내리면 안전, 타면 예산+30%·보상+30%.
-narr: 거울 속 얼굴이 피곤해 보인다.
-* 내린다 -> off
-* 그래도 탄다 -> on
--- off
-> agent find
-> emit rule mirror
-> end
--- on
-> agent boss
-> emit mirror risk
-> end
-
-=== exit_panel
-// 패널에 EXIT. 조건: 규칙 10줄 + 총애 3 + B-12 도달 (설계서 7장)
-> goto locked if rules < 10 || favor < 3 || !reached_b12
-> emit cutscene exit
-> end
--- locked
-> line el:exitBlocked elevator
-> end
-`;
-
-  // src/game/action/story/scripts/cutscenes.ts
-  var CUTSCENES = {
-    first_day: {
-      id: "first_day",
-      title: "첫 출근",
-      form: "한 장 그림 + 도트",
-      steps: [
-        { k: "fade", to: "black", ms: 0 },
-        { k: "bg", scene: "street" },
-        { k: "actor", id: "agent", x: -40, y: 300, face: 1, show: true },
-        { k: "fade", to: "clear", ms: 1200 },
-        { k: "caption", text: "오전 8시 40분. 종로.", ms: 1800 },
-        { k: "actor", id: "agent", x: 250, anim: "walk", ms: 2600 },
-        { k: "actor", id: "agent", anim: "idle" },
-        { k: "caption", text: "사람이 없다. 차도, 비둘기도. 인식의 장막 안쪽은 늘 이렇다.", ms: 2600 },
-        { k: "agentline", tag: "enter" },
-        { k: "actor", id: "agent", x: 470, anim: "walk", ms: 1600 },
-        { k: "fade", to: "black", ms: 600 },
-        { k: "bg", scene: "office" },
-        { k: "actor", id: "agent", x: 120, y: 300, anim: "idle" },
-        { k: "actor", id: "jaemtri", x: 420, y: 300, face: -1, show: true },
-        { k: "fade", to: "clear", ms: 600 },
-        { k: "sfx", name: "heels" },
-        { k: "wait", ms: 500 },
-        { k: "say", script: "cs_first_day" },
-        { k: "emit", event: "cutscene:done", arg: "first_day" }
-      ]
-    },
-    first_entry: {
-      id: "first_entry",
-      title: "첫 투입",
-      form: "한 장 그림 + 도트",
-      steps: [
-        { k: "fade", to: "black", ms: 0 },
-        { k: "bg", scene: "elevator_in" },
-        { k: "actor", id: "agent", x: 320, y: 300, face: 1, show: true },
-        { k: "fade", to: "clear", ms: 1e3 },
-        { k: "caption", text: "2000년 이전에 지은 낡은 사무실 건물. 정기 점검표. 서명란이 비어 있다.", ms: 2400 },
-        { k: "say", script: "cs_first_entry" },
-        { k: "sfx", name: "doors" },
-        { k: "fade", to: "black", ms: 500 },
-        { k: "wait", ms: 900 },
-        { k: "sfx", name: "ding" },
-        { k: "bark", who: "elevator", text: "띵. 1층입니다. 문이 열립니다.", ms: 2400 },
-        { k: "wait", ms: 1200 },
-        { k: "bg", scene: "lobby_wrong" },
-        { k: "fade", to: "clear", ms: 900 },
-        { k: "caption", text: "로비 같은데, 로비가 아니다.", ms: 2e3 },
-        { k: "actor", id: "agent", face: -1 },
-        { k: "bg", scene: "panel" },
-        { k: "panel", text: "1 2 3 4 5", ms: 0 },
-        { k: "panel", text: "1 2 3 4 5 B-1 B-2 B-3 B-4 B-5 B-6 B-7 B-8 B-9 B-10 B-11 B-12 B-?", ms: 2600 },
-        { k: "shake", ms: 300, amp: 2 },
-        { k: "caption", text: "패널에는 아까 없던 숫자가 빼곡하다.", ms: 2e3 },
-        { k: "bg", scene: "lobby_wrong" },
-        { k: "agentline", tag: "enter_elevator" },
-        { k: "emit", event: "cutscene:done", arg: "first_entry" }
-      ]
-    },
-    first_call: {
-      id: "first_call",
-      title: "첫 호명",
-      form: "도트",
-      steps: [
-        { k: "bg", scene: "elevator_in" },
-        { k: "actor", id: "agent", x: 320, y: 300, face: 1, show: true },
-        { k: "sfx", name: "intercom" },
-        { k: "shake", ms: 200, amp: 1 },
-        { k: "wait", ms: 600 },
-        { k: "say", script: "cs_first_call" },
-        { k: "emit", event: "cutscene:done", arg: "first_call" }
-      ]
-    },
-    attic: {
-      id: "attic",
-      title: "다락방",
-      form: "한 장 그림",
-      steps: [
-        { k: "fade", to: "black", ms: 300 },
-        { k: "bg", scene: "attic" },
-        { k: "actor", id: "agent", x: 160, y: 300, face: 1, show: true },
-        { k: "fade", to: "clear", ms: 900 },
-        { k: "sfx", name: "duct" },
-        { k: "caption", text: "덕트 사이 비좁은 공간. 긁어 쓴 지도. 버려진 배낭.", ms: 2400 },
-        { k: "camera", x: 470, y: 160, zoom: 1.6, ms: 1400 },
-        { k: "caption", text: "「여기 오래 있지 마」", ms: 2e3 },
-        { k: "camera", x: 320, y: 180, zoom: 1, ms: 800 },
-        { k: "say", script: "cs_attic" },
-        { k: "emit", event: "cutscene:done", arg: "attic" }
-      ]
-    },
-    three_years: {
-      id: "three_years",
-      title: "삼 년째 승객",
-      form: "도트",
-      steps: [
-        { k: "bg", scene: "hall" },
-        { k: "actor", id: "agent", x: 120, y: 300, face: 1, show: true },
-        { k: "actor", id: "passenger", x: 560, y: 300, face: -1, show: true },
-        { k: "actor", id: "passenger", x: 420, anim: "walk", ms: 2e3 },
-        { k: "actor", id: "passenger", anim: "idle" },
-        { k: "say", script: "passenger_three" },
-        { k: "emit", event: "cutscene:done", arg: "three_years" }
-      ]
-    },
-    return: {
-      id: "return",
-      title: "귀환",
-      form: "도트",
-      steps: [
-        { k: "bg", scene: "shaft" },
-        { k: "actor", id: "agent", x: 320, y: 330, face: 1, anim: "climb", show: true },
-        { k: "sfx", name: "rope" },
-        { k: "par", steps: [
-          { k: "actor", id: "agent", y: 60, anim: "climb", ms: 6e3 },
-          { k: "caption", text: "로프를 잡고 승강로를 오른다. 한참.", ms: 3e3 }
-        ] },
-        { k: "sfx", name: "hatch" },
-        { k: "fade", to: "black", ms: 400 },
-        { k: "bg", scene: "lobby_real" },
-        { k: "actor", id: "agent", x: 300, y: 300, anim: "idle" },
-        { k: "fade", to: "clear", ms: 1400 },
-        { k: "caption", text: "문을 열고 나왔다. 로비였다. 진짜.", ms: 2600 },
-        { k: "agentline", tag: "win" },
-        { k: "emit", event: "cutscene:done", arg: "return" }
-      ]
-    },
-    evac: {
-      id: "evac",
-      title: "후송",
-      form: "도트",
-      steps: [
-        { k: "shake", ms: 400, amp: 6 },
-        { k: "fade", to: "black", ms: 1200 },
-        { k: "caption", text: "로프가 당겨진다. 누가 끌어올리고 있다.", ms: 2200 },
-        { k: "bg", scene: "medbay" },
-        { k: "actor", id: "agent", x: 260, y: 300, anim: "lie", show: true },
-        { k: "actor", id: "buddy", x: 420, y: 300, face: -1, show: true },
-        { k: "fade", to: "clear", ms: 1600 },
-        { k: "say", script: "cs_evac" },
-        { k: "emit", event: "cutscene:done", arg: "evac" }
-      ]
-    },
-    exit: {
-      id: "exit",
-      title: "출구",
-      form: "한 장 그림 + 도트",
-      steps: [
-        { k: "bg", scene: "panel" },
-        { k: "panel", text: "B-12 B-11 … 1 EXIT", ms: 1800 },
-        { k: "caption", text: "패널에 EXIT가 떠 있다.", ms: 2e3 },
-        { k: "say", script: "cs_exit" },
-        { k: "sfx", name: "ding" },
-        { k: "fade", to: "black", ms: 800 },
-        { k: "bark", who: "elevator", text: "…1층입니다. 문이 열립니다.", ms: 2400 },
-        { k: "wait", ms: 1600 },
-        { k: "bg", scene: "exit_car" },
-        { k: "fade", to: "clear", ms: 1600 },
-        { k: "caption", text: "관리국 차량. 문 앞에 시동이 걸려 있다.", ms: 2400 },
-        { k: "bark", who: "elevator", text: "또 와요.", ms: 2600 },
-        { k: "wait", ms: 1800 },
-        { k: "emit", event: "cutscene:done", arg: "exit" }
-      ]
-    },
-    dinner: {
-      id: "dinner",
-      title: "공략 완료 회식",
-      form: "한 장 그림 + 도트",
-      steps: [
-        { k: "fade", to: "black", ms: 0 },
-        { k: "bg", scene: "pasta" },
-        { k: "actor", id: "agent", x: 200, y: 300, face: 1, show: true },
-        { k: "actor", id: "jaemtri", x: 440, y: 300, face: -1, show: true },
-        { k: "fade", to: "clear", ms: 1200 },
-        { k: "caption", text: "근처 파스타집. 회식 메뉴 결정권은 늘 같은 사람에게 있다.", ms: 2600 },
-        { k: "say", script: "cs_dinner" },
-        { k: "emit", event: "cutscene:done", arg: "dinner" }
-      ]
-    }
-  };
-  var CUTSCENE_SCRIPTS = String.raw`
-=== cs_first_day
-jaemtri(smile): 어머, 후배, 왔어?
-jaemtri(smile): 길에 아무도 없어서 놀랐지? 인식의 장막이야. 종로가 원래 이렇게 조용하진 않아.
-jaemtri: 여기가 종합대응팀 사무실. 지하는 훈련장이랑 격리 구역. 내려가면 시끄러운 아저씨가 있을 거야. 커피는 믹스로 받아.
-jaemtri(smile): 그리고 나는 잼트리. 뭐 고민 있으면 꼭 언니한테 물어봐.
-> agent pick
-jaemtri(serious): 오늘 첫 건은 벌써 들어와 있어. 차원 승강기. 자리로 와.
-> end
-
-=== cs_first_entry
-radio: (잼트리) 점검표요. 서명란이 비어 있으면 그게 입구래요. …네, 지금 타신 그거요.
-> agent enter_elevator
-radio: (잼트리) 타고 온 걸로는 못 돌아와요. 귀환은 다락방 로프. 꼭 기억해요.
-> end
-
-=== cs_first_call
-elevator: (인터폰 잡음) …
-> line el:call elevator
-> agent called
-elevator: 이번 층에서는 꼭 살아남아요.
-> end
-
-=== cs_attic
-radio: (잼트리) 선배들의 다락방이래요. 관리국 선발대가 로프를 걸어 뒀고요.
-radio: (잼트리) 저장하고, 정보 송신하고, 로프로 철수할 수 있어요. …오래 있지는 마세요.
-> agent attic
-> end
-
-=== cs_evac
-> agent evac
-jaemtri: 송신한 건 다 받았어. 나머지는 절반. 괜찮아.
-jaemtri(smile): 죽은 게 아니라 다쳐서 실려 온 거야. 다음에 또 가면 돼.
-> end
-
-=== cs_exit
-> agent called
-elevator: 거기, 그 버튼. 눌러도 돼요. 당신은.
-> agent win
-> end
-
-=== cs_dinner
-jaemtri(smile): 자, 오늘은 언니가 쏜다. 아니, 회사가 쏜다. 장부는 언니가 쥐고 있지만.
-> agent win
-jaemtri(smile): 다들 살아서 왔으니까 됐어. 건배.
-> end
-`;
-
-  // src/game/action/story/library.ts
-  function buildLibrary() {
-    return new ScriptLibrary().add(hq_default, "hq").add(field_default, "field").add(CUTSCENE_SCRIPTS, "cutscenes");
-  }
-
-  // src/game/action/story/lines/agents.ts
-  var AGENTS2 = {
-    jyaldi: { id: "jyaldi", name: "쟈알디", title: "종합대응팀 부장", wiki: "쟈알디", photo: "Jyaldi", color: "#c0392b", voice: "짧은 명령형 반말, 감정 표현 거의 없음, 가끔 건조한 농담. 거짓말은 하지 않는다." },
-    eileen: { id: "eileen", name: "에일린", title: "종합대응팀 선임", wiki: "에일린", photo: "Aileen", color: "#d8c98a", voice: "한두 단어 반말, 감정 없음, 직함으로 부르지 못하게 한다." },
-    spangdal: { id: "spangdal", name: "스팡달", title: "종합대응팀 선임", wiki: "스팡달", photo: "Spangdal", color: "#8e6bd1", voice: '느리고 길게 끄는 반말, 중간에 키득거림, "후후". 농담처럼 무서운 말을 한다.' },
-    geshugan: { id: "geshugan", name: "게슈간", title: "종합대응팀", wiki: "게슈간", photo: "Geshugan", color: "#9fc6e8", voice: '극단적으로 짧은 반말과 말줄임표. 사과는 "그래. 미안." 두 글자.' },
-    gorgodio: { id: "gorgodio", name: "고르고디오", title: "진압팀 선임", wiki: "고르고디오", photo: "Gorgodio", color: "#d98b3a", voice: "크고 정직한 말투, 존댓말과 반말이 섞임, 호통과 배려가 한 문장에. 기분 좋으면 사투리." },
-    kyuras: { id: "kyuras", name: "큐라스", title: "진압팀 선임", wiki: "큐라스", photo: "Kyuras", color: "#9bd36a", voice: "밝고 빠른 반말, 느낌표, 수다 속에 전술 정보. 틈만 나면 진압팀 영입 권유." },
-    deadpole: { id: "deadpole", name: "데드폴", title: "종합대응팀", wiki: "데드폴", photo: "Deadpole", color: "#6f7c8a", voice: "조심스러운 존댓말, 말끝 흐림, 사과와 감사가 많다. 자기 죽음을 담담히 계산에 넣는다." },
-    rojemon: { id: "rojemon", name: "로제몬", title: "종합대응팀 (자칭 사무직)", wiki: "로제몬", photo: "Rojemon", color: "#b05cc8", voice: '빠르고 날카로운 반말, 투덜거림, "헛소리하지 마". 칭찬 두 번이면 빨개진다.' }
-  };
-  var AGENT_LINES = {
-    jyaldi: {
-      offer: ["충분히 쉬었나? 이동한다.", "부장이랑 같이 하는 작전이야. 날 믿어."],
-      pick: ["좋아. 담배 끄고 간다.", "알았다. 장갑부터."],
-      brief: ["합리적이야. 검증해 보지.", "끝났으면 간다.", "합리적인 추론이야. 검증해 볼 가치가 있어."],
-      enter: ["보면 알아.", "…냄새가 나는군."],
-      enter_elevator: ["…점검표. 됐어, 타.", "서명란이 비었군. 맞아."],
-      enter_replica: ["…냄새가 나는군.", "사는 척하는 집이야. 신발부터 봐."],
-      greet: ["…안녕하십니까.", "수고가 많군."],
-      called: ["시끄러워.", "…그걸 어떻게 알아.", "……"],
-      floor: ["정리하고 간다.", "서 있지 마.", "벽부터 봐."],
-      attic: ["여기서 오래 안 있어. 5분.", "선배들 흔적이군. 기록해."],
-      combat: ["정리한다.", "서 있지 마.", "뒤로. 내가 연다."],
-      boss: ["…한 번은 봐 두고 싶었어.", "거기 서. 움직이지 마."],
-      kill: ["다음.", "하나.", "끝."],
-      combo: ["보면 알아.", "터진다."],
-      dodge: ["느려.", "…아까웠군."],
-      ult: ["보면 알아. 터진다.", "비켜. 전부 날린다."],
-      guardbreak: ["…쯧.", "무겁군."],
-      hp_low: ["…하아.", "괜찮아."],
-      ammo_low: ["탄창 하나 남았다.", "아껴 쓴다."],
-      ammo_empty: ["탄 없음. 손으로 한다.", "…권총은 끝. 상관없어."],
-      weapon: ["쓸 만하군.", "빌린다."],
-      item: ["먹고 털어.", "버틴다."],
-      find: ["기록해 둬.", "잼트리가 좋아하겠군."],
-      find_item: ["회수. 데쥬레한테.", "포장해 둬."],
-      rule_break: ["…내 실수다.", "확인 안 했군. 내 잘못이야."],
-      intrude_fake: ["저쪽 관리국이군. 확인 즉시 제거.", "…검술대는 없나. 됐어."],
-      intrude_daydream: ["가면은 길을 비켜. 거래는 없다."],
-      rescue: ["살아 있었군. 따라와. 뒤돌아보지 말고.", "너도 오늘까지 살아남았잖아. 조금만 더 해."],
-      win: ["끝. 보고는 내가 한다.", "철수한다. 다들 살아 있지?"],
-      down: ["…여기까진가.", "……"],
-      evac: ["…몇 시간 잤지.", "보고서는 내가 쓴다. 누구 다쳤어?"],
-      settle: ["예산은 잼트리한테.", "이 정도면 결재하지."]
-    },
-    eileen: {
-      offer: ["준비됐어?"],
-      pick: ["좋아.", "조끼. 권총. 장총. 점검."],
-      brief: ["읽으면 돼.", "됐어. 가."],
-      enter: ["…안내문부터.", "조끼. 권총. 장총. 점검."],
-      enter_elevator: ["점검표 서명란. 비어 있음. 맞네.", "안내문부터."],
-      enter_replica: ["문패. 읽어.", "…사는 척하네."],
-      greet: ["안녕하세요.", "…인사. 했어."],
-      called: ["…그 와이셔츠 얘기는 하지 마.", "규칙 하나 더 알려 주지 그래.", "……"],
-      floor: ["벽. 바닥. 천장.", "읽고 가."],
-      attic: ["메모. 지도. 읽어.", "오래 안 있어."],
-      combat: ["증명해.", "사선."],
-      boss: ["…시간 먹네.", "패턴. 읽었어."],
-      kill: ["하나.", "다음."],
-      combo: ["됐어."],
-      dodge: ["안 맞아.", "자리."],
-      ult: ["사선 정리.", "전부 조준."],
-      guardbreak: ["…무겁네."],
-      hp_low: ["기록.", "괜찮아."],
-      ammo_low: ["탄 셋.", "장전."],
-      ammo_empty: ["탄 없음.", "장총. 끝."],
-      weapon: ["쓸 만해.", "빌려."],
-      item: ["기록하고 먹어.", "먹어."],
-      find: ["여기.", "읽어."],
-      find_item: ["회수."],
-      rule_break: ["…내 계산 밖.", "틀렸어. 다시."],
-      intrude_fake: ["직함 부르는 놈들. 저쪽이야."],
-      intrude_daydream: ["가면. 거리 둬."],
-      rescue: ["가다가 죽지 마. 시신 회수 귀찮아.", "따라와. 내 뒤."],
-      win: ["됐어. 그래."],
-      down: ["…기록."],
-      evac: ["…알겠어. 일어날게.", "총. 어디 있어."],
-      settle: ["쓰레기 회사.", "야근 신청서 줘."]
-    },
-    spangdal: {
-      offer: ["같이 갈래? …후후, 농담 아니야."],
-      pick: ["좋아. 앞은 알아서 해.", "후후. 기대돼."],
-      brief: ["뒤는 내가 볼게. 앞은 알아서 해."],
-      enter: ["좋은 냄새… 아니, 나 말고. 여기."],
-      enter_elevator: ["엘리베이터? 좋아. 그림자 드리울 데가 많네."],
-      enter_replica: ["남의 집 냄새. 좋아해.", "쉿. 주민이 듣잖아."],
-      greet: ["안녕? 후후. 예쁜 목소리 들려줘.", "안녕하세요오."],
-      called: ["어머, 내 이름 알아?", "…그건 아무한테도 말 안 했는데.", "목소리 좋네. 얼굴도 보여 줘."],
-      floor: ["어디서부터 먹을까.", "뒤에 아무도 없지? …이제 있어."],
-      attic: ["선배들 냄새가 나네.", "오래 있으면 누가 온대. 기다려 볼까?"],
-      combat: ["자기소개 안 해? 어차피 곧…", "있잖아, 있잖아. 너는 언제 죽을 것 같아?"],
-      boss: ["우습네. 정말.", "크다. 뒤가 넓겠네."],
-      kill: ["후후.", "하나 끝.", "쉬잇."],
-      combo: ["더 해 줄까?", "후후후."],
-      dodge: ["거기 없는데?", "안 보였지?"],
-      ult: ["그림자 안으로. 같이 가자.", "후후후… 이제 농담 끝."],
-      guardbreak: ["어머."],
-      hp_low: ["…아프네. 후후.", "이건 좀 재밌다."],
-      ammo_low: ["총은 원래 장식이야."],
-      ammo_empty: ["괜찮아. 가시는 안 떨어져."],
-      weapon: ["이런 것도 쓸 줄 알아."],
-      item: ["맛있다."],
-      find: ["이거 잼트리한테 가져가면 커피 한 잔 더 주려나."],
-      find_item: ["예쁘다. 내 거 해도 돼?"],
-      rule_break: ["어머. 내가 그랬나."],
-      intrude_fake: ["검은 정장이 늘었네. 뒤부터."],
-      intrude_daydream: ["가면 뒤에 뭐가 있는지 봐도 돼?"],
-      rescue: ["있잖아… 살고 싶으면 내 그림자 밟지 마."],
-      win: ["후후후. 농담이야."],
-      down: ["…어머."],
-      evac: ["후후. 누가 업어 왔어?", "조명이 너무 밝네."],
-      settle: ["집밥 해 줄까? 진급한 사람 있으면."]
-    },
-    geshugan: {
-      offer: ["…가."],
-      pick: ["알았어."],
-      brief: ["목표. 위치. 끝."],
-      enter: ["…문부터."],
-      enter_elevator: ["패널. 숫자. 센다. …포기."],
-      enter_replica: ["…문. 셋."],
-      greet: ["…안녕."],
-      called: ["…시끄럽다.", "지정. 스피커.", "……"],
-      floor: ["…보여.", "문부터."],
-      attic: ["…문. 하나. 좋아."],
-      combat: ["…보여.", "…지정."],
-      boss: ["…크네."],
-      kill: ["…다음.", "…하나."],
-      combo: ["…끝."],
-      dodge: ["…늦어."],
-      ult: ["…전부. 지정.", "눌러."],
-      guardbreak: ["…쯧."],
-      hp_low: ["…쯧."],
-      ammo_low: ["…한 박자."],
-      ammo_empty: ["…손으로."],
-      weapon: ["…빌려."],
-      item: ["…먹어."],
-      find: ["…이거."],
-      find_item: ["…회수."],
-      rule_break: ["그래. 미안.", "알았어. 미안."],
-      intrude_fake: ["기관. 싫어."],
-      intrude_daydream: ["…보고 있네."],
-      rescue: ["…따라와. 뒤에."],
-      win: ["…해냈어.", "…해냈어. …해냈어…"],
-      down: ["…미안."],
-      evac: ["…문. 어느 쪽.", "…해냈어?"],
-      settle: ["…됐어."]
-    },
-    gorgodio: {
-      offer: ["이 건물 금방 확인하고 오겠습니다!"],
-      pick: ["좋아! 따라와! 죽으면 네 책임이고!"],
-      brief: ["그냥 이거부터 다 부수는 게 낫지 않나?", "민
+passenger: 그 뒤로는 혼자 다니면서 문을 하나하나 다 열어 봤어. 왼쪽 문은 몇 번이나 죽을 뻔했고, 오른쪽 문도 한 번은 그랬지만 그건 내가 잘

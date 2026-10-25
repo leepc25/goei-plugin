@@ -1,4 +1,614 @@
-ht:10px;top:10px;display:flex;gap:8px;pointer-events:auto}
+alk(shell.stage.ui, bridge.visit, bridge.field) : null;
+    const npc = linkNpcTalk({
+      visit: visit ? (name) => {
+        if (name) visit.open(name);
+      } : void 0,
+      layer: shell.stage.ui,
+      bridge,
+      settings: () => shell.settings,
+      agent: () => runAgent,
+      day: () => hq2.state().day,
+      rescued: () => hq2.state().rescued,
+      photo: (k) => bridge?.photo?.(k) || demo_photos_default[k],
+      sfx: (n) => audio.play(n),
+      onOpen: (on) => shell.touch.setVisible(!on && shell.mode === "play")
+    });
+    globalThis.__goeiNpc = npc;
+    globalThis.__goeiStage = shell.stage;
+    setPixelScale(bridge?.visit ? 2.625 : 2.75);
+    globalThis.__goeiSetPixel = setPixelScale;
+    const elevator = createElevatorStage(stageStore, {
+      ...npc.stageHooks(stageHooks()),
+      pickUpgrade: (v, done2) => {
+        void shell.choose({ title: `${v.why} · 강화 하나`, lines: ["이번 출동 동안만 남는다. 같은 계열 셋이면 완성 효과."], options: v.options.map((o) => `[${o.set}] ${o.label} — ${o.text}`), cancel: false }).then((i) => done2(Math.max(0, i)));
+        return true;
+      }
+    });
+    let mapOpen = false;
+    let guardA = 0;
+    const offMapKey = shell.input.on((code, down2) => {
+      if (!down2) return;
+      if ((code === "KeyZ" || code === "KeyM") && world && world.stage === elevator && !game?.inHub && !shell.paused && !story.isBlocking()) mapOpen = !mapOpen;
+    });
+    setLineProvider(hqLines);
+    const itemStage = {
+      id: "itemroom",
+      label: "아이템 진열실",
+      firstFloor: () => ({ id: "itemroom", title: "아이템 진열실", length: 3200, startX: 300, exitX: Infinity, banner: "아이템 진열실 · E 줍기·들기 · A 던지기·휘두르기", encounters: [{ triggerX: 0, lockFrom: 0, lockTo: 3200, waves: [[{ kind: "dummy", x: 1600, y: 560 }, { kind: "dummy", x: 2400, y: 620 }]] }] }),
+      nextFloor: () => null
+    };
+    const unknownKinds = /* @__PURE__ */ new Set();
+    const enemyFactory = (spec, w) => {
+      if (DEF_BY_KIND[spec.kind]) {
+        const sp = spec;
+        return createEnemy(spec.kind, spec.x, spec.y, () => w.rand(), { elite: spec.elite, affixes: sp.affixes });
+      }
+      if (!spec.kind.startsWith("dummy") && !unknownKinds.has(spec.kind)) {
+        unknownKinds.add(spec.kind);
+        console.warn("[goei] 적 모듈에 없는 종류 → 임시 적:", spec.kind);
+      }
+      return fallbackEnemy(spec, w);
+    };
+    let world = null;
+    let runAgent = "jyaldi";
+    let openingOn = false;
+    const storyRoot = document.createElement("div");
+    storyRoot.style.cssText = "position:absolute;inset:0;pointer-events:none;z-index:15";
+    shell.stage.root.appendChild(storyRoot);
+    const attachVideoAudio = (event) => audio.attachMedia(event.detail);
+    storyRoot.addEventListener(VIDEO_AUDIO_EVENT, attachVideoAudio);
+    const unmountItems = mountItemsOverlay(shell.stage.root);
+    const savedFlags = (() => {
+      try {
+        return JSON.parse(localStorage.getItem("goei-game-story") ?? "null") ?? void 0;
+      } catch {
+        return void 0;
+      }
+    })();
+    shell.menu.onSound = (k) => audio.play(k === "move" ? "uiMove" : k === "ok" ? "uiOk" : "uiBack");
+    let vol = "";
+    const syncVolume = () => {
+      const s2 = shell.settings;
+      const key2 = `${s2.master}/${s2.music}/${s2.sfx}`;
+      if (key2 === vol) return;
+      vol = key2;
+      audio.setVolume("master", s2.master);
+      audio.setVolume("music", s2.music);
+      audio.setVolume("sfx", s2.sfx);
+      audio.setVolume("amb", s2.sfx * 0.8);
+      audio.setVolume("ui", s2.sfx * 0.7);
+    };
+    let foot = { x: 0, y: 0, d: 0, w: null };
+    const footsteps = (w) => {
+      const p = w.player;
+      if (foot.w !== w) foot = { x: p.x, y: p.y, d: 0, w };
+      const moved = Math.hypot(p.x - foot.x, (p.y - foot.y) * 1.5);
+      foot.x = p.x;
+      foot.y = p.y;
+      if (p.airborne || moved > 60) return void (foot.d = 0);
+      foot.d += moved;
+      if (foot.d >= (p.running ? 75 : 55)) {
+        foot.d = 0;
+        audio.event({ type: "step", x: p.x, vol: p.running ? 0.9 : 0.6 });
+      }
+    };
+    globalThis.__goeiStoryStart = (id) => CUTSCENES[id] || VIDEOS[id] ? story.cutscene(id) : story.say(id);
+    const story = mountStory(
+      storyRoot,
+      {
+        getAgent: () => runAgent,
+        sfx: (n) => audio.event({ type: "custom", name: n }),
+        shake: (ms, amp) => shell.fx.onGameEvent({ type: "shake", ms, amp }),
+        anchor: (id) => {
+          if (id !== "agent" || !world) return null;
+          const st = shell.canvas.parentElement;
+          const m = /translate\(([-\d.]+)px, ([-\d.]+)px\)/.exec(st.style.transform);
+          const k = shell.stage.scale || 1;
+          const ox = st.offsetLeft + (m ? +m[1] : 0) - storyRoot.offsetLeft, oy = st.offsetTop + (m ? +m[2] : 0) - storyRoot.offsetTop;
+          const p = world.player;
+          const gx = Math.max(200, Math.min(1e3, p.x - world.camX));
+          let maxX;
+          const tp = storyRoot.ownerDocument.querySelector(".tp");
+          if (tp && tp.offsetParent) {
+            let tx = 0;
+            for (let n = tp; n && n !== storyRoot.offsetParent; n = n.offsetParent) tx += n.offsetLeft;
+            for (const b of tp.querySelectorAll(".tp-b:not(.item):not(.top)")) {
+              if (!b.offsetWidth || getComputedStyle(b).display === "none") continue;
+              const left = tx - storyRoot.offsetLeft + new DOMMatrix(getComputedStyle(b).transform).m41;
+              if (left > storyRoot.clientWidth / 2) maxX = Math.min(maxX ?? Infinity, left);
+            }
+          }
+          let lo = ox, hi = Math.min(maxX ?? Infinity, ox + 1280 * k);
+          const gap = bubbleGap(world, gx);
+          if (gap) {
+            lo = Math.max(lo, ox + gap[0] * k);
+            hi = Math.min(hi, ox + gap[1] * k);
+          }
+          return { x: ox + gx * k, y: oy + Math.max(120, p.y - p.z - (world.hintShown ? 362 : 290)) * k, minX: lo, maxX: hi };
+        },
+        emit: (ev, arg) => world?.emit({ type: "custom", name: ev, data: { arg } }),
+        paused: () => shell.paused && !openingOn
+      },
+      { saved: savedFlags }
+    );
+    globalThis.__goeiStory = story;
+    const saveFlags = () => {
+      try {
+        localStorage.setItem("goei-game-story", JSON.stringify(story.flags));
+      } catch {
+      }
+    };
+    const storyKeys = (e) => {
+      if (!story.isBlocking()) return;
+      if (e.code === "Escape") story.skip();
+      else if (/^Digit[1-9]$/.test(e.code)) story.choose(Number(e.code.slice(5)) - 1);
+      else if (["Space", "Enter", "KeyE", "KeyZ", "KeyA"].includes(e.code)) story.advance();
+      else return;
+      e.preventDefault();
+      e.stopImmediatePropagation();
+    };
+    window.addEventListener("keydown", storyKeys, true);
+    const saves = {
+      ...session.hqSaves,
+      restore: async (n) => {
+        const hq3 = await session.hqSaves.restore(n);
+        if (hq3) elevator.reloadMeta();
+        return hq3;
+      }
+    };
+    let floorPick = null;
+    const floorBox = document.createElement("div");
+    floorBox.className = "goei-engine-elev";
+    floorBox.hidden = true;
+    storyRoot.appendChild(floorBox);
+    const closeFloors = (i) => {
+      floorBox.hidden = true;
+      const f = floorPick;
+      floorPick = null;
+      f?.(i);
+    };
+    let floorSel = -1;
+    const floorBtns = () => [...floorBox.querySelectorAll("button")];
+    const markFloor = (i) => {
+      floorSel = i;
+      floorBtns().forEach((b, k) => b.classList.toggle("sel", k === i));
+    };
+    const stepFloor = (d3) => {
+      const bs = floorBtns();
+      for (let k = 1; k <= bs.length; k++) {
+        const j = (floorSel + d3 * k + bs.length * 2) % bs.length;
+        if (!bs[j].disabled) return markFloor(j);
+      }
+    };
+    const chooseFloor = (opts, pick6) => {
+      floorPick = pick6;
+      floorBox.innerHTML = opts.map((o, i) => `<button type="button" data-i="${i}"${o.open && !o.here ? "" : " disabled"}${o.here ? ' class="here"' : ""}>${o.label}</button>`).join("");
+      floorBox.hidden = false;
+      markFloor(floorBtns().findIndex((b) => !b.disabled));
+      audio.play("panelButton");
+    };
+    floorBox.addEventListener("click", (e) => {
+      const b = e.target.closest("button");
+      if (b && !b.disabled) closeFloors(Number(b.dataset.i));
+    });
+    const floorKeys = (e) => {
+      if (floorBox.hidden) return;
+      if (e.code === "Escape") closeFloors(null);
+      else if (e.code === "ArrowUp" || e.code === "ArrowLeft") stepFloor(-1);
+      else if (e.code === "ArrowDown" || e.code === "ArrowRight") stepFloor(1);
+      else if (e.code === "Enter" || e.code === "Space" || e.code === "KeyE") {
+        if (!e.repeat && floorSel >= 0 && !floorBtns()[floorSel]?.disabled) closeFloors(floorSel);
+      } else if (/^Digit[1-9]$/.test(e.code)) {
+        const n = e.code.slice(5);
+        const want = n === "4" ? "B1" : n === "5" ? "B2" : n === "6" ? "B3" : n;
+        const b = [...floorBox.querySelectorAll("button")].find((q) => q.textContent === want);
+        if (b && !b.disabled) closeFloors(Number(b.dataset.i));
+      } else return;
+      e.preventDefault();
+      e.stopImmediatePropagation();
+    };
+    window.addEventListener("keydown", floorKeys, true);
+    const canFilm = () => location.protocol !== "file:";
+    const cutOnce = (id, done2) => {
+      if (!VIDEOS[id] || !canFilm() || story.flags[`cut_${id}`] || story.isBlocking()) return false;
+      story.flags[`cut_${id}`] = 1;
+      saveFlags();
+      story.cutscene(id, done2);
+      return true;
+    };
+    let dinnerDue = false;
+    const hq2 = hqAdapter(saves, bridge, {
+      resuming: () => !!session.checkpoint,
+      chooseFloor,
+      sfx: (n) => audio.play(n),
+      closed: () => {
+        if (dinnerDue) dinnerDue = false, cutOnce("dinner");
+      },
+      overlay: visit ? (c, people, player) => visit.draw(c, people, player) : void 0
+    });
+    const hqKeys = (e) => {
+      if (e.code !== "Escape" || !game?.inHub || !hq2.isOpen?.()) return;
+      hq2.close();
+      e.preventDefault();
+      e.stopImmediatePropagation();
+    };
+    const saveOnHide = () => {
+      game?.checkpoint();
+      void session.flush();
+    };
+    let hiddenNow = false;
+    const offHidden = bridge?.onHidden?.((h) => {
+      hiddenNow = h;
+      if (h) {
+        visit?.close();
+        if (shell.mode === "play" && !shell.paused) shell.openPause();
+        audio.setPaused(true);
+        saveOnHide();
+      }
+    });
+    window.addEventListener("pagehide", saveOnHide);
+    document.addEventListener("visibilitychange", saveOnHide);
+    window.addEventListener("keydown", hqKeys, true);
+    let openingT = null;
+    const cancelStoryForScene = () => {
+      if (openingT) clearTimeout(openingT);
+      openingT = null;
+      story.cancel();
+      openingOn = false;
+      const menuEl = shell.stage.root.querySelector(".gs-ui");
+      if (menuEl) menuEl.style.visibility = "";
+      storyRoot.style.zIndex = "15";
+      storyRoot.style.visibility = shell.paused ? "hidden" : "";
+    };
+    const armOpening = () => {
+      if (openingT) clearTimeout(openingT);
+      openingT = null;
+      if (bridge?.visit || !VIDEOS.opening || !canFilm()) return;
+      openingT = setTimeout(() => {
+        openingT = null;
+        if (shell.mode !== "title" || story.isBlocking()) return armOpening();
+        const menuEl = shell.stage.root.querySelector(".gs-ui");
+        if (menuEl) menuEl.style.visibility = "hidden";
+        storyRoot.style.visibility = "";
+        storyRoot.style.zIndex = "60";
+        openingOn = true;
+        story.cutscene("opening", () => {
+          openingOn = false;
+          if (menuEl) menuEl.style.visibility = "";
+          storyRoot.style.zIndex = "15";
+          if (shell.paused) storyRoot.style.visibility = "hidden";
+          if (shell.mode === "title") armOpening();
+        });
+      }, 2e4);
+    };
+    const titleInput = (e) => {
+      if (openingOn) {
+        story.skip();
+        e.preventDefault();
+        e.stopImmediatePropagation();
+      } else if (openingT && shell.mode === "title") armOpening();
+    };
+    window.addEventListener("keydown", titleInput, true);
+    window.addEventListener("pointerdown", titleInput, true);
+    eileenHooks.sfx = (e) => audio.event(e);
+    const listeners = [
+      (e) => {
+        audio.event(e);
+        if (game?.inHub && (e.type === "enter:floor" || e.type === "custom")) return;
+        shell.fx.onGameEvent(e);
+        story.event(e.type, e);
+        if (e.type === "run:end") saveFlags();
+        if (e.type === "enter:floor" && world) {
+          const f = world.floor;
+          if (f.id.startsWith("ending")) cutOnce("exit");
+          else if ((f.depth ?? 0) >= 2) cutOnce("first_call");
+        }
+      }
+    ];
+    const mods = {
+      saveCheckpoint: (v) => {
+        markSaved();
+        session.setCheckpoint(v);
+      },
+      frozen: () => ffx.frozen(),
+      stages: [elevator, trainingStage, dummyStage, arenaStage, itemStage],
+      enemyFactory,
+      hq: hq2,
+      hud: false,
+      blocking: () => !!visit?.isOpen() || story.isBlocking() || itemsBlocking() || !floorBox.hidden || npc.isOpen() || mapOpen,
+      covered: () => story.isVideoPlaying(),
+      listeners,
+      surface: { canvas: shell.canvas, ctx: shell.ctx },
+      paused: () => shell.paused,
+      openTitle: () => {
+        cancelStoryForScene();
+        world = null;
+        mapOpen = false;
+        shell.openTitle();
+        armOpening();
+      },
+      onPlay: () => shell.play(),
+      frame: (dt) => {
+        ffx.opt = { shake: shell.settings.shake, flash: shell.settings.flash, numbers: shell.settings.numbers };
+        ffx.update(shell.paused ? 0 : dt);
+        {
+          const o = ffx.camera();
+          shell.canvas.style.translate = o.x || o.y ? `${o.x}px ${o.y}px` : "";
+        }
+        syncVolume();
+        audio.setPaused(hiddenNow || shell.paused && !openingOn);
+        audio.setCutscene(story.isVideoPlaying());
+        story.update(dt);
+        shell.frame(dt);
+        shell.input.endFrame();
+      },
+      overlay: (ctx, w, dt) => {
+        if (!w) return;
+        audio.setListener(w.camX + 640, 640);
+        footsteps(w);
+        ctx.save();
+        ctx.scale(view.zoom, view.zoom);
+        ctx.translate(-Math.round(w.camX) - view.crop, -view.cropY);
+        shell.fx.drawWorld(ctx);
+        ffx.drawWorld(ctx);
+        ctx.restore();
+        shell.fx.drawScreen(ctx, w.player.hp / w.player.hpMax);
+        const hs = hudState(w, shell);
+        if (npc.isOpen()) hs.message = void 0;
+        if (mods.blocking?.() || shell.paused) hs.navigation = void 0;
+        let cardEnd = 0;
+        if (game?.inHub && !mods.blocking?.() && !shell.paused) {
+          const me = hq2.visitor();
+          const name = me.name || (testPlayerFace() ? "에일린" : "방문자");
+          const face = me.agentId && visitAgentFaceCanvas(name, 34) || testPlayerFace(64, w.player.dir < 0) || visitAgentFaceCanvas("쟈알디", 34);
+          shell.hud.drawFieldCard(ctx, { name, face, hp: w.player.hp, maxHp: w.player.hpMax, gauge: w.player.gauge, compact: hs.compact, top: true, items: hs.items, device: hs.device }, dt);
+        }
+        const core = w.player.core;
+        if (core && !shell.touchShown && !mods.blocking?.() && !shell.paused) {
+          const P = core.P, clip = P.clip?.id, off2 = ["down", "belly", "stun"].includes(P.mode);
+          const lv = P.charge >= 2 ? 3 : P.charge > 1.3 ? 2 : P.charge > 0.5 ? 1 : 0;
+          const key2 = (b) => {
+            const c = Object.keys(KEYMAP).find((k) => KEYMAP[k] === b);
+            return c ? c.replace(/^Key/, "") : "?";
+          };
+          cardEnd = shell.hud.drawSkillBox(ctx, { compact: hs.compact, slots: [
+            { key: key2("light"), icon: "punch", name: "약공", cd: 0, off: off2, active: ["9", "10", "11"].includes(clip ?? "") },
+            { key: key2("heavy"), icon: "kick", name: "강공", cd: 0, off: off2, active: clip === "12" },
+            { key: key2("shoot"), icon: "gun", name: "사격", cd: P.overT > 0 ? P.overT / 2.6 : 0, cdText: P.overT > 0 ? P.overT.toFixed(1) : void 0, off: off2, active: clip === "15", bar: P.heat / 100, hot: P.overT > 0 || P.heat > 70 },
+            { key: key2("charge"), icon: "bolt", name: "충전", cd: 0, off: off2, active: P.mode === "charge", bar: P.mode === "charge" ? P.charge / 2.2 : void 0, badge: P.mode === "charge" && lv ? ["", "1", "2", "MAX"][lv] : void 0 },
+            { key: key2("skill"), icon: "wave", name: "기술", cd: 0, off: off2, active: clip === "22_1" },
+            { key: key2("super"), icon: "star", name: "필살", cd: 0, off: off2 || P.sp < 100, full: P.sp >= 100, bar: P.sp / 100 }
+          ] }, dt);
+        }
+        if (!game?.inHub) shell.hud.draw(ctx, { ...hs, messageLeft: cardEnd }, dt);
+        else if (hs.message) shell.hud.drawMessage(ctx, hs.message, hs.compact, cardEnd);
+        const ep = w.player instanceof EileenPlayer ? w.player : null;
+        if (ep && !mods.blocking?.() && !shell.paused) {
+          const show = ep.guard < 99.5 || ep.core.P.mode === "block";
+          guardA = show ? Math.min(1, guardA + dt * 8) : Math.max(0, guardA - dt * 2.5);
+          const z = view.zoom, head = testPlayerTop() * persp(ep.y);
+          const gx = (ep.x - Math.round(w.camX) - view.crop) * z, gy = (ep.y - ep.z + head * 0.92 - view.cropY) * z - 12;
+          drawGuardBar(ctx, gx + 5, gy, ep.guard / 100, ep.guardBroken, guardA, performance.now() / 1e3);
+        }
+        const tg = game?.inHub && !mods.blocking?.() && !shell.paused ? w.stage.nearInfo?.() : null;
+        if (tg) {
+          const p = w.player, z = view.zoom;
+          const head = (hasTestPeople() ? testPlayerTop() : -230) * persp(p.y);
+          const sx = (p.x - Math.round(w.camX) - view.crop) * z, sy = (p.y + head * 0.72 - view.cropY) * z;
+          const half = 46 * persp(p.y) * 1.15 * z;
+          const side = sx > ctx.canvas.width - 320 ? -1 : 1;
+          const key2 = hs.device === "pad" ? "B" : hs.device === "touch" || hs.compact ? "조" : "E";
+          shell.hud.drawPrompt(ctx, { x: sx + side * (half + 18), y: sy, side, key: key2, text: tg.locked ? `${tg.text} · 잠김` : tg.text, locked: tg.locked, compact: hs.compact });
+        }
+        ffx.drawScreen(ctx);
+        if (shell.paused) mapOpen = false;
+        if (!game?.inHub && w.stage === elevator) {
+          const m = elevator.mapView();
+          const t = performance.now() / 1e3;
+          const U2 = Math.min(2.2, Math.max(1, 1280 / Math.max(1, shell.canvas.clientWidth || 1280)));
+          if (m && mapOpen) drawRunMap(ctx, m, w.player.x, t, U2);
+          else if (m) drawMiniMap(ctx, m, w.player.x, t, U2);
+        } else mapOpen = false;
+        syncNavigationButton(shell.canvas, hs.navigation);
+        shell.touch.setItems(hs.items);
+        shell.touch.setGauge(w.player.gauge / 100);
+        shell.touch.hint("reload", w.player.ammo <= 2 && w.player.reserve > 0);
+        shell.fx.drawTransition(ctx);
+      },
+      onScene: (name) => {
+        if (name === "title" || name === "hq") audio.floor(name);
+        if (name === "hq") shell.play();
+      },
+      onPause: (p) => {
+        storyRoot.style.visibility = p ? "hidden" : "";
+        if (world) world.paused = p;
+      },
+      onWorld: (w, run) => {
+        if (bridge?.field && run.stageId !== "hq") {
+          const label3 = String(run.stageId ?? "괴이");
+          void bridge.field.record({ kind: "enter_anomaly", text: `작전 투입: ${label3}`, weight: 3, fact: { key: "작전", value: `투입 중 (${label3})` } }).catch(() => {
+          });
+          w.on((e) => {
+            if (e.type !== "run:end") return;
+            const how = e.how;
+            const text2 = `작전 종료 (${how === "evac" ? "후송" : how === "withdraw" ? "철수" : "귀환"}): ${label3}, 처치 ${w.kills}, 부상 ${Math.max(0, Math.round(w.player.hpMax - w.player.hp))}`;
+            void bridge.field.record({ kind: "exit_anomaly", text: text2, weight: 3, fact: { key: "작전", value: `종료 (${how === "evac" ? "후송" : how === "withdraw" ? "철수" : "귀환"})` } }).catch(() => {
+            });
+          });
+        }
+        cancelStoryForScene();
+        world = w;
+        runAgent = run.agent;
+        if (run.stageId !== "hq" && run.launch && !story.flags.told_rope) {
+          story.flags.told_rope = 1;
+          const rope = () => world === w && w.say("(잼트리) 타고 온 걸로는 못 돌아와요. 귀환은 다락방 로프.", 3);
+          if (!cutOnce("first_entry", () => setTimeout(rope, 1200))) setTimeout(rope, 4600);
+        }
+        w.hitFx = false;
+        if (run.stageId === "hq") return void npc.attach(w, { hub: hq2.hub?.() ?? null, hq: true });
+        w.notes.runId = run.launch?.runId;
+        w.on((e) => {
+          if (e.type === "hp:low") w.notes.bigHit = true;
+        });
+        const bossesDown = /* @__PURE__ */ new Set();
+        w.hooks.push(() => {
+          for (const bd of w.bodies) {
+            if (!bd.boss || bossesDown.has(bd.id) || bd.hp > 0) continue;
+            bossesDown.add(bd.id);
+            (w.notes.bosses ??= []).push(bd.kind);
+          }
+        });
+        w.threat = (b) => DEF_BY_KIND[b.kind] ? isThreat(b) : true;
+        bindEnemyInteractions(w);
+        w.on((e) => {
+          if (e.type !== "custom") return;
+          const d3 = e.data ?? {};
+          if (e.name === "evac" && !w.ended) w.ended = "evac";
+          else if (e.name === "hurtPlayer") w.api.hurtPlayer(d3.dmg ?? 10);
+          else if (e.name === "debuff" && d3.text) w.say(d3.text, 1.5);
+        });
+        const items = linkItems(w, run);
+        npc.attach(w, { items, hq: false });
+        if (run.stageId === "itemroom") items.showcase();
+        w.hooks.push(() => items.tick());
+        w.underlays.push((c, camX) => items.draw(c, camX));
+      },
+      toHqResult,
+      afterRun: (how, done2) => {
+        let fired = false;
+        const once = () => fired ? void 0 : (fired = true, done2());
+        if (how === "return" && world?.notes.missionDone !== false) dinnerDue = !story.flags.cut_dinner;
+        if (!cutOnce(how === "evac" ? "evac" : "attic", once)) once();
+      },
+      drawIdle: (name, ctx, t) => {
+        if (name === "title") bridge?.visit ? drawTitleBg(ctx, t, VISIT_TITLE.title, VISIT_TITLE.sub) : drawTitleBg(ctx, t);
+      },
+      boot: (g2) => {
+        void Promise.all([session.ready, hq2.visitReady]).then(() => {
+          elevator.reloadMeta();
+          if (bridge?.visit || !bootFromUrl(g2)) g2.toTitle();
+        });
+        return true;
+      },
+      dispose: () => {
+        window.removeEventListener("pagehide", saveOnHide);
+        document.removeEventListener("visibilitychange", saveOnHide);
+        offHidden?.();
+        npc.dispose();
+        unmountItems();
+        const g2 = globalThis;
+        delete g2.__goeiStory;
+        delete g2.__goeiNpc;
+        delete g2.__goeiStoryStart;
+        world = null;
+        game = null;
+        window.removeEventListener("keydown", storyKeys, true);
+        offMapKey();
+        window.removeEventListener("keydown", titleInput, true);
+        window.removeEventListener("pointerdown", titleInput, true);
+        if (openingT) clearTimeout(openingT);
+        window.removeEventListener("keydown", hqKeys, true);
+        window.removeEventListener("keydown", fieldFxKeys, true);
+        window.removeEventListener("keydown", floorKeys, true);
+        saveFlags();
+        storyRoot.removeEventListener(VIDEO_AUDIO_EVENT, attachVideoAudio);
+        story.dispose();
+        setLineProvider(null);
+        visit?.dispose();
+        setPixelScale(2.75);
+        audio.dispose();
+        shell.dispose();
+      }
+    };
+    return {
+      mods,
+      box: shell.stage.root,
+      bind: (g2) => {
+        game = g2;
+      }
+    };
+  }
+  function bootFromUrl(g2) {
+    let q;
+    try {
+      q = new URLSearchParams(location.search);
+    } catch {
+      return false;
+    }
+    const start = q.get("start");
+    if (!start) return false;
+    const [k, v] = start.split("=");
+    if (k === "hq") g2.start_new();
+    else if (k === "stage") g2.start_new(v || void 0);
+    else if (k === "arena") g2.start_new("arena");
+    else if (k === "items") g2.start_new("itemroom");
+    else if (k === "story") {
+      g2.start_new("dummy");
+      if (v) globalThis.__goeiStoryStart?.(v);
+    } else return false;
+    return true;
+  }
+  function bubbleGap(world, gx) {
+    const cam = world.camX;
+    const solid = (world.floor.keepOut ?? []).filter(([a, b]) => b - a >= 60).map(([a, b]) => [a - cam, b - cam]);
+    for (const pr of world.floor.props ?? []) {
+      if (!/door|elevator|exit|panel|shutter|mirror|goalwall/.test(pr.kind)) continue;
+      const h = Math.max(pr.w, 200) / 2 + 20;
+      solid.push([pr.x - h - cam, pr.x + h - cam]);
+    }
+    solid.sort((a, b) => a[0] - b[0]);
+    const gaps = [];
+    let at2 = Math.max(0, gx - 520);
+    const end = Math.min(1280, gx + 520);
+    for (const [a, b] of solid) {
+      if (b <= at2) continue;
+      if (a >= end) break;
+      if (a - at2 >= 300) gaps.push([at2, a]);
+      at2 = Math.max(at2, b);
+    }
+    if (end - at2 >= 300) gaps.push([at2, end]);
+    if (!gaps.length) return null;
+    const dist = (g2) => gx < g2[0] ? g2[0] - gx : gx > g2[1] ? gx - g2[1] : 0;
+    gaps.sort((a, b) => dist(a) - dist(b));
+    return dist(gaps[0]) < 360 ? gaps[0] : null;
+  }
+  async function loadFieldFx(assets2, ffx, cutins) {
+    try {
+      if (!await assets2.ready("field-fx")) return;
+      const list = await assets2.bytes("field-fx", "fx/fx_목록.txt");
+      const img5 = async (file) => {
+        const u = await assets2.url("field-fx", file);
+        if (!u) return null;
+        const im = new Image();
+        im.src = u;
+        await im.decode();
+        return im;
+      };
+      for (const d3 of list ? parseFxList(new TextDecoder().decode(list)) : []) {
+        const im = await img5(`fx/${d3.name}.png`).catch(() => null);
+        if (im) ffx.register(d3, im);
+      }
+      for (const name of Object.keys(SUPER_TEXT)) {
+        for (const k of [name, `${name}_2`]) {
+          const im = await img5(`cutin/${k}.png`).catch(() => null);
+          if (im) cutins.set(k, im);
+        }
+      }
+    } catch {
+    }
+  }
+
+  // src/game/action/engine/touch.ts
+  var CSS3 = `
+.gt-wrap{position:absolute;inset:0;pointer-events:none;user-select:none;-webkit-user-select:none;touch-action:none;z-index:5}
+.gt-stick{position:absolute;left:0;top:0;bottom:0;width:42%;pointer-events:auto;touch-action:none}
+.gt-ring{position:absolute;width:120px;height:120px;margin:-60px 0 0 -60px;border-radius:50%;border:2px solid rgba(255,255,255,.35);background:rgba(255,255,255,.06);display:none}
+.gt-knob{position:absolute;width:52px;height:52px;margin:-26px 0 0 -26px;border-radius:50%;background:rgba(255,255,255,.4);display:none}
+.gt-btns{position:absolute;right:10px;bottom:10px;display:grid;grid-template-columns:repeat(4,52px);gap:6px;pointer-events:auto}
+.gt-b{width:52px;height:52px;border-radius:12px;background:rgba(20,26,30,.6);border:2px solid rgba(255,255,255,.3);color:#e8eef0;font:600 14px sans-serif;display:flex;align-items:center;justify-content:center;touch-action:none}
+.gt-b.on{background:rgba(255,211,106,.6);color:#111}
+.gt-b.big{background:rgba(180,60,50,.6)}
+.gt-top{position:absolute;right:10px;top:10px;display:flex;gap:8px;pointer-events:auto}
 `;
   var BTNS = [
     ["super", "필살"],
@@ -109,17 +719,17 @@ ht:10px;top:10px;display:flex;gap:8px;pointer-events:auto}
 .goei-engine-hq{position:absolute;inset:0;overflow:auto;z-index:20;background:#0b0f12}
 .goei-engine-hq.goei-engine-hq-panel{background:rgba(5,8,10,.72)}
 .goei-engine-hq-close{position:sticky;top:8px;float:right;margin:8px;z-index:2;padding:8px 14px;border-radius:8px;border:1px solid #5b6a72;background:#1a2226;color:#ece6d4;font:15px sans-serif}
-.goei-engine-elev{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;gap:10px;padding:16px;background:#14181b;pointer-events:auto;z-index:20;box-shadow:0 -4px 0 #14181b,0 4px 0 #14181b,-4px 0 0 #14181b,4px 0 0 #14181b,0 -8px 0 #6d767b,0 8px 0 #6d767b,-8px 0 0 #6d767b,8px 0 0 #6d767b,-4px -4px 0 #6d767b,4px -4px 0 #6d767b,-4px 4px 0 #6d767b,4px 4px 0 #6d767b}
+.goei-engine-elev{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;gap:6px;padding:14px;pointer-events:auto;z-index:20;image-rendering:pixelated;border:16px solid transparent;border-image:var(--goei-btn) 8 fill / 16px stretch}
 .goei-engine-elev[hidden]{display:none}
-.goei-engine-elev button{width:96px;height:64px;border:0;border-radius:0;background:#2c3236;color:#ece6d4;font:700 33px "GoeiPixel","Galmuri11",monospace;cursor:pointer;image-rendering:pixelated;-webkit-font-smoothing:none;box-shadow:inset 0 4px 0 #46505a,inset 0 -4px 0 #1b1f22,0 -4px 0 #9aa6ad,0 4px 0 #9aa6ad,-4px 0 0 #9aa6ad,4px 0 0 #9aa6ad}
-.goei-engine-elev button.here{color:#ffb34a;box-shadow:inset 0 4px 0 #46505a,inset 0 -4px 0 #1b1f22,0 -4px 0 #ffb34a,0 4px 0 #ffb34a,-4px 0 0 #ffb34a,4px 0 0 #ffb34a}
-.goei-engine-elev button:disabled{opacity:.35;cursor:default}
-.goei-engine-elev button.sel{background:#ffb34a;color:#1b1f22;box-shadow:inset 0 4px 0 #ffe2a0,inset 0 -4px 0 #b8741c,0 -4px 0 #fff2c8,0 4px 0 #fff2c8,-4px 0 0 #fff2c8,4px 0 0 #fff2c8}
+.goei-engine-elev button{width:112px;height:72px;border:16px solid transparent;border-radius:0;background:none;border-image:var(--goei-btn) 8 fill / 16px stretch;color:#e6e4dc;font:700 33px "GoeiPixel","Galmuri11",monospace;cursor:pointer;image-rendering:pixelated;-webkit-font-smoothing:none;text-shadow:3px 3px 0 #07090b;padding:0;line-height:1}
+.goei-engine-elev button.here{color:#ffb34a}
+.goei-engine-elev button:disabled{opacity:.4;cursor:default}
+.goei-engine-elev button.sel{filter:brightness(1.45);color:#ffe9a0}
 .goei-engine-loading{color:#8e9aa1;font:16px sans-serif}
 `;
   function mountGame(box2, bridge) {
     const st = document.createElement("style");
-    st.textContent = CSS4;
+    st.textContent = CSS4 + `.goei-engine-elev{--goei-btn:url(${HUD_ART.btn.src})}`;
     const root = document.createElement("div");
     root.className = "goei-engine";
     const stage = document.createElement("div");
@@ -819,10 +1429,10 @@ ht:10px;top:10px;display:flex;gap:8px;pointer-events:auto}
   var H6 = TUNE.sceneH;
   function loadImage(src) {
     return new Promise((ok, fail) => {
-      const img4 = new Image();
-      img4.onload = () => ok(img4);
-      img4.onerror = () => fail(new Error("그림을 불러오지 못했습니다"));
-      img4.src = src;
+      const img5 = new Image();
+      img5.onload = () => ok(img5);
+      img5.onerror = () => fail(new Error("그림을 불러오지 못했습니다"));
+      img5.src = src;
     });
   }
   var Renderer = class {
@@ -951,8 +1561,8 @@ ht:10px;top:10px;display:flex;gap:8px;pointer-events:auto}
     }
     unit(u, cam) {
       const f = this.atlas[u.kind][frameOf2(u)];
-      const img4 = this.sheets.get(u.kind);
-      if (!f || !img4) return;
+      const img5 = this.sheets.get(u.kind);
+      if (!f || !img5) return;
       const [sx, sy, w, h, ax, ay] = f;
       const s2 = this.scaleOf(u);
       const c = this.ctx;
@@ -964,11 +1574,11 @@ ht:10px;top:10px;display:flex;gap:8px;pointer-events:auto}
       if (u.side === "e") {
         c.translate(x, 0);
         c.scale(-1, 1);
-        c.drawImage(img4, sx, sy, w, h, -ax * s2, y - ay * s2, w * s2, h * s2);
-        if (u.flash > 0) this.flashOver(img4, sx, sy, w, h, -ax * s2, y - ay * s2, s2);
+        c.drawImage(img5, sx, sy, w, h, -ax * s2, y - ay * s2, w * s2, h * s2);
+        if (u.flash > 0) this.flashOver(img5, sx, sy, w, h, -ax * s2, y - ay * s2, s2);
       } else {
-        c.drawImage(img4, sx, sy, w, h, x - ax, y - ay, w, h);
-        if (u.flash > 0) this.flashOver(img4, sx, sy, w, h, x - ax, y - ay, 1);
+        c.drawImage(img5, sx, sy, w, h, x - ax, y - ay, w, h);
+        if (u.flash > 0) this.flashOver(img5, sx, sy, w, h, x - ax, y - ay, 1);
       }
       c.restore();
       if (u.side === "e" && !ENEMIES[u.kind].boss && alive(u) && u.hp < u.max) {
@@ -980,11 +1590,11 @@ ht:10px;top:10px;display:flex;gap:8px;pointer-events:auto}
         c.fillRect(x - bw / 2, top, Math.max(1, Math.round(bw * u.hp / u.max)), 2);
       }
     }
-    flashOver(img4, sx, sy, w, h, dx, dy, s2) {
+    flashOver(img5, sx, sy, w, h, dx, dy, s2) {
       const c = this.ctx;
       c.globalCompositeOperation = "lighter";
       c.globalAlpha = 0.55;
-      c.drawImage(img4, sx, sy, w, h, dx, dy, w * s2, h * s2);
+      c.drawImage(img5, sx, sy, w, h, dx, dy, w * s2, h * s2);
       c.globalCompositeOperation = "source-over";
       c.globalAlpha = 1;
     }
@@ -1059,9 +1669,9 @@ ht:10px;top:10px;display:flex;gap:8px;pointer-events:auto}
   var lastRun = null;
   var STEP4 = 1 / 30;
   var esc6 = (s2) => s2.replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
-  var faces2 = "";
+  var faces3 = "";
   function faceStyle(id, size2) {
-    return `background-image:url('${faces2}');background-position:${-agentDef(id).face * size2}px 0`;
+    return `background-image:url('${faces3}');background-position:${-agentDef(id).face * size2}px 0`;
   }
   function mountGame2(box2, host) {
     let disposed = false;
@@ -1211,7 +1821,7 @@ ht:10px;top:10px;display:flex;gap:8px;pointer-events:auto}
     void (async () => {
       try {
         const art5 = await host.art();
-        faces2 = art5.url(FACE_FILE);
+        faces3 = art5.url(FACE_FILE);
         const [raw] = await Promise.all([host.load().catch(() => null), renderer.load(art5)]);
         if (disposed) return;
         meta = readMeta(raw);
@@ -1443,7 +2053,7 @@ ht:10px;top:10px;display:flex;gap:8px;pointer-events:auto}
     } else if (!b.armor) act(b, down2 ? "down" : "hurt", down2 ? 0.9 : 0.23);
     return true;
   }
-  function move2(b, x, y, speed, dt, face2 = true) {
+  function move2(b, x, y, speed, dt, face = true) {
     const len = Math.max(1, Math.hypot(x, y)), ox = b.x, oy = b.y;
     b.x = clamp2(b.x + x / len * speed * dt, 55, WIDTH - 55);
     b.y = clamp2(b.y + y / len * speed * dt, SCENE.floorMin, SCENE.floorMax);
@@ -1451,7 +2061,7 @@ ht:10px;top:10px;display:flex;gap:8px;pointer-events:auto}
     b.speed = Math.min(1200, distance / dt);
     if (b.z === 0 && b.act !== "dash")
       b.stride = (b.stride + distance / (b.act === "run" ? GAIT.run : b.act === "crouchwalk" ? GAIT.crouch : GAIT.walk)) % 1;
-    if (x && face2) b.dir = x > 0 ? 1 : -1;
+    if (x && face) b.dir = x > 0 ? 1 : -1;
   }
   function nearTarget(r) {
     const p = r.player;
@@ -1828,13 +2438,13 @@ ht:10px;top:10px;display:flex;gap:8px;pointer-events:auto}
       this.art = art5;
       await Promise.all(
         ["a-jyaldi-action", "e-corner", "e-watchman", "bg-bureau-action"].map(async (name) => {
-          const img4 = new Image();
+          const img5 = new Image();
           await new Promise((resolve, reject) => {
-            img4.onload = () => resolve();
-            img4.onerror = () => reject(new Error(`그림 읽기 실패: ${name}`));
-            img4.src = art5.url(name);
+            img5.onload = () => resolve();
+            img5.onerror = () => reject(new Error(`그림 읽기 실패: ${name}`));
+            img5.src = art5.url(name);
           });
-          if (!this.disposed) this.images.set(name, img4);
+          if (!this.disposed) this.images.set(name, img5);
         })
       );
     }
@@ -1848,8 +2458,8 @@ ht:10px;top:10px;display:flex;gap:8px;pointer-events:auto}
       this.ctx.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h));
     }
     sprite(b, frame2, scale = b.kind === "jyaldi" ? this.art?.atlas.action?.scale ?? 1 : SCENE.enemyScale, x = b.x, y = b.y - b.z) {
-      const f = (b.kind === "jyaldi" ? this.art?.atlas.action?.frames : this.art?.atlas[b.kind])?.[frame2] ?? null, img4 = this.images.get(b.kind === "jyaldi" ? "a-jyaldi-action" : `e-${b.kind}`);
-      if (!f || !img4) return;
+      const f = (b.kind === "jyaldi" ? this.art?.atlas.action?.frames : this.art?.atlas[b.kind])?.[frame2] ?? null, img5 = this.images.get(b.kind === "jyaldi" ? "a-jyaldi-action" : `e-${b.kind}`);
+      if (!f || !img5) return;
       scale *= depthScale(b.y);
       const [sx, sy, w, h, ax, ay] = f, c = this.ctx;
       c.save();
@@ -1857,7 +2467,7 @@ ht:10px;top:10px;display:flex;gap:8px;pointer-events:auto}
       c.scale(b.dir, 1);
       if (b.flash > 0) c.filter = "brightness(1.8)";
       c.drawImage(
-        img4,
+        img5,
         sx,
         sy,
         w,
@@ -2715,7 +3325,7 @@ ht:10px;top:10px;display:flex;gap:8px;pointer-events:auto}
     }
   }
   var mod = {
-    version: "0.16.57",
+    version: "0.16.58",
     mount: (box2, bridge) => mountPlay(box2, bridge),
     // 이전 시험판: 저장 키와 그림 팩은 예전 그대로 (goei:game · goei:game-action:v1)
     legacy: {
