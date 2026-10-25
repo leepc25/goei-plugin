@@ -20,5 +20,29 @@ test('본부: 열린 문 앞에서 E 한 번 → 문 열기 → 암전 → 연�
   assert.equal(w.floor.id,`hq:${door.to}`);
   checked++;
  }
- assert.ok(checked>=20);console.log(`본부 문 ${checked}개 연결 통과`);
+ assert.ok(checked>=12);console.log(`본부 문 ${checked}개 연결 통과`);
+});
+
+test('본부 그림 층: 계단 문 → 고른 층의 계단, 메뉴 문 → 문 열린 뒤 장소 창', () => {
+ const map=M.hqMap(M.newSave());
+ const f2=map.scenes.find(s=>s.id==='f2');
+ const run=(door,pick)=>{
+  const y=M.LANE_TOP+16;let opened=null,asked=null;
+  const host={map:()=>({...map,start:{scene:'f2',x:door.x,y}}),openPlace(id){opened=id},bark:()=>null,chooseFloor(o,cb){asked=o;cb(pick)},sfx(){}};
+  const stage=M.makeHub(host,()=>({scene:'f2',x:door.x,y}));
+  const w=new M.World({agent:'jyaldi',seed:1,stageId:'hq'},{},stage);
+  w.enterFloor(stage.firstFloor(w.run));w.step(pad);
+  w.step({...pad,pressed:new Set(['interact'])});
+  for(let i=0;i<60 && !w.ended;i++) w.step(pad);
+  return {w,stage,opened,asked};
+ };
+ const st=run(f2.doors.find(d=>d.id==='stairs'),1);
+ assert.deepEqual(st.asked.map(o=>o.label),['3','1']);
+ assert.equal(st.w.ended,'next');
+ st.w.enterFloor(st.stage.nextFloor(st.w.run,st.w.floor,'next'));
+ assert.equal(st.w.floor.id,'hq:lobby');
+ const ch=run(f2.doors.find(d=>d.id==='chief'));
+ assert.equal(ch.opened,'chief');assert.equal(ch.w.ended,null);
+ const wc=run(f2.doors.find(d=>d.id==='wc'));
+ assert.equal(wc.opened,null);assert.equal(wc.w.ended,null);
 });

@@ -1,3 +1,5 @@
+# 로비 안내 데스크를 lobby.png에서 투명 오브젝트로 오린다 (2026-10-25).
+# python3 tools/cut_lobby_desk.py game-src/art/field/hq/lobby.png game-src/art/field/objects/lobby/desk.png
 import sys
 from PIL import Image, ImageDraw, ImageFilter
 import numpy as np

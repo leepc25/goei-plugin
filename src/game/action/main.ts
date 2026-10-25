@@ -2,6 +2,7 @@
 import type { GameBridge } from '../bridge';
 import { prepareTestPeople } from './art/testPeople';
 import { prepareStartRoom } from './art/startRoom';
+import { prepareHqField } from './art/hqField';
 import { prepareHqTextures } from './art/hqTextures';
 import { prepareHqDoorRound2 } from './art/hqDoorRound2';
 import { prepareVisitAgents } from './art/visitAgents';
@@ -41,6 +42,7 @@ export function mountGame(box: HTMLElement, bridge?: Partial<GameBridge>): () =>
   const urlOf = bridge?.assets ? (f: string) => bridge.assets!.url('jyaldi', f) : undefined;
   const releaseHqArt = prepareHqTextures(bridge?.assets ? f => bridge.assets!.url('hq-textures', f) : undefined);
   const releaseDoorArt = prepareHqDoorRound2(bridge?.assets ? f => bridge.assets!.url('hq-door-round2', f) : undefined);
+  const releaseField = prepareHqField(bridge?.assets ? f => bridge.assets!.url('hq-field', f) : undefined);
   const startRoom = prepareStartRoom(bridge?.assets ? f => bridge.assets!.url('start-room', f) : undefined);
   // 필드 시험: 사용자 PixelLab 시험 캐릭터 (임시)
   const testPeople = bridge?.visit || window.__GOEI_TEST_PEOPLE__ ? prepareTestPeople(bridge?.assets ? f => bridge.assets!.url('test-people', f) : undefined) : null;
@@ -65,6 +67,7 @@ export function mountGame(box: HTMLElement, bridge?: Partial<GameBridge>): () =>
   return () => {
     dead = true;
     releaseDoorArt();
+    releaseField();
     releaseHqArt();
     startRoom.dispose();
     visitArt?.dispose();

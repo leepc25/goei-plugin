@@ -11,6 +11,7 @@ import { SCREEN_H, SCREEN_W } from './contract';
 import { HQ_PLACE, drawFloor, drawHqWall, drawPropArt, drawHqTextureWall } from '../art/bg';
 import { drawStartRoom, drawStartRoomFurniture } from '../art/startRoom';
 import { drawHqDoorRound2 } from '../art/hqDoorRound2';
+import { drawHqField, drawHqFieldLight, drawHqFieldObject, hasHqField } from '../art/hqField';
 import { drawVisitAgent, visitAgentTop } from '../art/visitAgents';
 import { drawTestMan, hasTestPeople, testManTop, testPlayerTop } from '../art/testPeople';
 import { persp, view as fieldView } from './view';
@@ -38,15 +39,20 @@ export interface HubHost {
   visitors?(sceneId: string): { name: string; x: number; y: number; face: 1 | -1 }[];
   /** 장면 맨 위에 그리기 (월드 좌표): 이름표·말풍선. people = 이 방 요원, player = 주인공 발 */
   overlay?(c: CanvasRenderingContext2D, people: { name: string; x: number; y: number; top: number }[], player: { name: string; x: number; y: number; top: number }): void;
+  /** 필드 시각 (시, 0~24). 없으면 시간대 조명은 기기 시계 */
+  hour?(): number | null;
 }
 
 const TOP = 440;
 const LANE: [number, number] = [LANE_TOP, LANE_BOT];
 const DOOR_H = 250;
 const FADE = 8;
-/** 문 열리는 그림 길이(틱) */
+/** 문 열리는 그림 길이(틱). 그림 장면은 문마다 다르다 (엘리베이터·셔터는 천천히) */
 const OPEN_T = 9;
-const DOOR_W: Record<Door['kind'], number> = { main: 190, door: 120, glass: 160, steel: 120, security: 120, elevator: 160, stairs_up: 120, stairs_down: 120, shop: 130, slide: 170, cell: 150, exit: 150 };
+const openLen = (sc: Scene | null, d: HqDoor) => (!sc?.painted ? OPEN_T : d.kind === 'elevator' ? 22 : d.kind === 'cell' ? 26 : 12);
+/** 잠긴 문 덜컹 길이(틱) */
+const RATTLE_T = 10;
+const DOOR_W: Record<Door['kind'], number> = { main: 190, door: 120, stairs: 120, glass: 160, steel: 120, security: 120, elevator: 160, stairs_up: 120, stairs_down: 120, shop: 130, slide: 170, cell: 150, exit: 150 };
 
 export type Hub = StageModule & { goto(place: string): void; jump(sceneId: string, x?: number, y?: number): void; sceneIds(): string[]; current(): HqScene | null };
 
@@ -62,7 +68,11 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
   let enterTick = -1;
   let fadeOut = 0;
   let barked: string | null = null;
-  let opening: { id: string; t: number; then: () => void } | null = null;
+  let opening: { id: string; t: number; len: number; then: () => void } | null = null;
+  /** 들어온 문이 뒤에서 닫히는 것·메뉴 문이 다시 닫히는 것 */
+  let closing: { id: string; t: number; len: number } | null = null;
+  let rattle: { id: string; t: number } | null = null;
+  let arriveDoor: string | null = null;
   let near: string | null = null;
   let solids: BlockProp[] = [];
   /** 이 장면에서 걸은 거리 (px). 필드 시계가 쓴다 */
@@ -70,7 +80,9 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
   let lastX: number | null = null;
 
   const sceneOf = (id: string): Scene => view!.scenes.find((s) => s.id === id) ?? view!.scenes[0];
-  const openOf = (id: string) => (opening && opening.id === id ? Math.min(1, opening.t / OPEN_T) : 0);
+  const openOf = (id: string) =>
+    opening && opening.id === id ? Math.min(1, opening.t / opening.len) : closing && closing.id === id ? Math.max(0, 1 - closing.t / closing.len) : 0;
+  const doorFx = (id: string) => ({ open: openOf(id), shake: rattle && rattle.id === id ? (rattle.t % 4 < 2 ? 3 : -3) * (1 - rattle.t / RATTLE_T) : 0 });
 
   const build = (id: string, x: number, y?: number): FloorPlan => {
     view = host.map();
@@ -89,6 +101,11 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
     barked = null;
     enterTick = -1;
     opening = null;
+    rattle = null;
+    // 들어온 문은 열린 채로 시작해 뒤에서 닫힌다 (그림 장면)
+    const inDoor = arriveDoor ? sc.doors.find((d) => d.id === arriveDoor) : undefined;
+    closing = sc.painted && inDoor ? { id: inDoor.id, t: 0, len: openLen(sc, inDoor) } : null;
+    arriveDoor = null;
     near = null;
     // 필드 시험: 사무실에 서 있는 남자 (임시)
     const man = sc.id === 'office' && hasTestPeople() ? { x: 900, y: 560 } : null;
@@ -109,11 +126,13 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
       encounters: [],
       depthLayers: sc.boxes.map((b) => ({ y: sc.id === 'office' && b.kind === 'chair' ? 495 : b.y, occludedSilhouette: sc.id !== 'office', x0: sc.id === 'office' ? 180 : b.x - b.w / 2, x1: sc.id === 'office' ? 560 : b.x + b.w / 2, draw: (c: CanvasRenderingContext2D) => {
         if (sc.id === 'office') { drawStartRoomFurniture(c, b.kind); return; }
+        if (sc.painted && hasHqField(sc.painted)) { drawHqFieldObject(c, sc.painted, b.kind); return; }
         drawBox(c, b, sc.look);
       } })).concat(people.map((p) => ({ y: p.y, x0: p.x - 60, x1: p.x + 60, occludedSilhouette: false, draw: (c: CanvasRenderingContext2D) => { drawVisitAgent(c, p.name, p.x, p.y, p.face, performance.now()); } })))
         .concat(man ? [{ y: man.y, x0: man.x - 60, x1: man.x + 60, occludedSilhouette: false, draw: (c: CanvasRenderingContext2D) => { drawTestMan(c, man.x, man.y, -1); } }] : []),
       drawBackground(c: CanvasRenderingContext2D, camX: number) {
         if (sc.id === 'office' && drawStartRoom(c, openOf('out'))) return;
+        if (sc.painted && drawHqField(c, sc.painted, camX, doorFx)) return;
         if (sc.legacy) {
           const cov = drawHqWall(c, place, sc.id, len, TOP, sc.doors);
           artDoors = cov ?? new Set();
@@ -147,6 +166,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
         if (enterTick < 0) enterTick = now;
         const age = (now - enterTick) / (1000 / 30);
         if (!sc.legacy) for (const d of sc.doors) if (isS(d)) drawExitLintel(c, d, camX);
+        if (sc.painted) drawHqFieldLight(c, sc.painted, camX, host.hour?.() ?? null, now);
         // 주인공 그림은 쟈알디 그림이라 머리 높이도 쟈알디 기준
         // 말풍선·이름표는 화면 px 그대로 (필드 zoom을 되돌려 글자 도트가 고르게). top은 원근까지 곱한 화면 px
         const z = fieldView.zoom;
@@ -173,6 +193,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
     return d ? { x: d.x, y: sceneOf(sceneId).legacy ? undefined : doorY(d, sceneOf(sceneId).lane ?? LANE) } : { x: 200, y: undefined };
   };
   const goDoor = (sceneId: string, doorId?: string) => {
+    arriveDoor = doorId ?? null;
     const t = arriveAt(sceneId, doorId);
     go(sceneId, t.x, t.y);
   };
@@ -235,11 +256,12 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
       }
       if (lastX !== null) { const d = Math.abs(p.x - lastX); if (d < 60) walked += d; }
       lastX = p.x;
-      if (opening && opening.t < OPEN_T && ++opening.t === OPEN_T) {
+      if (opening && opening.t < opening.len && ++opening.t === opening.len) {
         const then = opening.then;
-        opening.t = OPEN_T;
         then();
       }
+      if (closing && ++closing.t >= closing.len) closing = null;
+      if (rattle && ++rattle.t >= RATTLE_T) rattle = null;
       if (solids.length && !(p as Player).seat) blockByProps([p as never], solids, scene?.lane ?? LANE);
       // E가 닿는 것 하나만 엔진 소품으로 (엔진은 x 거리만 보므로 깊이는 여기서 고른다)
       const t = (p as Player).seat ? null : target(p.x, p.y);
@@ -263,6 +285,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
         const s = scene.spots.find((q) => `spot:${q.id}` === prop.id);
         if (!s?.open) return;
         if (s.place) return host.openPlace(s.place);
+        if (s.say) return a.world.say(s.say, 3);
         if (s.seat && s.act?.[0]) {
           const exit = clearSpot(s.x, s.y ?? a.world.player.y, solids, scene.lane ?? LANE);
           (a.world.player as Player).sit(s.act[0], s.seat.x, s.seat.y, s.face ?? 1, exit);
@@ -277,7 +300,33 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
       if (prop.kind !== 'hubdoor') return;
       const d = scene.doors.find((q) => `door:${q.id}` === prop.id);
       if (!d) return;
-      if (!d.open) return host.sfx('knock');
+      if (!d.open) {
+        if (scene.painted) rattle = { id: d.id, t: 0 };
+        if (d.locked) a.world.say('잠겨 있다', 1.5);
+        return host.sfx('knock');
+      }
+      const len = openLen(scene, d);
+      if (d.kind === 'stairs') {
+        // 계단: 위층·아래층 중 고른다 (그 층의 계단 문으로 나온다)
+        const to = [d.up, d.down].filter((q): q is NonNullable<typeof q> => !!q);
+        const label = (id: string) => view!.elevator.find((e) => e.scene === id)?.label ?? id;
+        const go1 = (target: string) => {
+          host.sfx('doorOpen');
+          opening = { id: d.id, t: 0, len, then: () => goDoor(target, 'stairs') };
+        };
+        if (to.length === 1) return go1(to[0]);
+        host.chooseFloor(to.map((q) => ({ label: label(q), open: true, here: false })), (i) => {
+          if (i != null && to[i]) go1(to[i]);
+        });
+        return;
+      }
+      if (d.place) {
+        // 방 그림이 없는 장소: 문이 열리면 메뉴 창, 문은 다시 닫힌다
+        const place = d.place;
+        host.sfx(d.kind === 'cell' ? 'doorSlam' : 'doorOpen');
+        opening = { id: d.id, t: 0, len, then: () => { opening = null; closing = { id: d.id, t: 0, len }; host.openPlace(place); } };
+        return;
+      }
       if (d.kind === 'elevator') {
         const here = scene.id;
         const opts = view!.elevator.map((e) => ({ label: e.label, open: e.open, here: e.scene === here }));
@@ -286,7 +335,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
           const e = view!.elevator[i];
           if (!e?.open || e.scene === here) return;
           host.sfx('ding');
-          opening = { id: d.id, t: 0, then: () => goDoor(e.scene, e.door) };
+          opening = { id: d.id, t: 0, len, then: () => goDoor(e.scene, e.door) };
         });
         return;
       }
@@ -295,7 +344,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
         toDoor = d.toDoor;
       host.sfx(d.kind === 'steel' || d.kind === 'security' || d.kind === 'cell' ? 'doorSlam' : d.kind.startsWith('stairs') ? 'stepConcrete' : 'doorOpen');
       if (scene.legacy) return goDoor(to, toDoor);
-      opening = { id: d.id, t: 0, then: () => goDoor(to, toDoor) };
+      opening = { id: d.id, t: 0, len, then: () => goDoor(to, toDoor) };
     },
     /** 검사·스크린샷용: 장면으로 바로 */
     jump(sceneId: string, x = 400, y?: number) {

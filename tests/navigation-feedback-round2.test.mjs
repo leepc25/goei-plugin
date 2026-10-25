@@ -94,5 +94,5 @@ test('본부 실제 문: 잠긴 시설은 이유 표시, 열린 출구는 E로 �
   w.step({...pad,pressed:new Set(['interact'])});for(let i=0;i<60&&!w.ended;i++)w.step(pad);
   if(!door.open)assert.equal(w.ended,null);else assert.equal(w.ended,'next');
  }
- assert.ok(closed>0&&opened>=20);
+ assert.ok(closed>0&&opened>=12);
 });

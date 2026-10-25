@@ -108,6 +108,7 @@ function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui
         if (fieldClock.sec !== null) void b?.field?.record({ kind: 'move', text: `필드 시각 ${clockText(fieldClock.sec)}`, scene: to.name, weight: 1, fact: { key: '필드 시각', value: clockText(fieldClock.sec) } }).catch(() => {});
       },
       overlay: ui.overlay,
+      hour: () => (fieldClock.sec === null ? null : (fieldClock.sec / 3600) % 24),
       // 본부 대화창이 떠 있으면 머리 위 표시를 숨긴다 (독립 검수: 브리핑 뒤 ↓ 표시)
       busy: () => typeof document !== 'undefined' && !!document.querySelector('.hq-talk, .hq-over:not(:empty)'),
     },
@@ -526,9 +527,9 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     if (floorBox.hidden) return;
     if (e.code === 'Escape') closeFloors(null);
     else if (/^Digit[1-9]$/.test(e.code)) {
-      // 숫자키 = 층 숫자(1·2·3), 지하는 4=B1, 5=B2
+      // 숫자키 = 층 숫자(1·2·3), 지하는 4=B1, 5=B2, 6=B3
       const n = e.code.slice(5);
-      const want = n === '4' ? 'B1' : n === '5' ? 'B2' : n;
+      const want = n === '4' ? 'B1' : n === '5' ? 'B2' : n === '6' ? 'B3' : n;
       const b = [...floorBox.querySelectorAll('button')].find((q) => q.textContent === want) as HTMLButtonElement | undefined;
       if (b && !b.disabled) closeFloors(Number(b.dataset.i));
     } else return;
