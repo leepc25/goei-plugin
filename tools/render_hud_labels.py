@@ -9,7 +9,8 @@ out = {}
 for s in LABELS:
     im = Image.new('L', (80, 24), 0)
     d = ImageDraw.Draw(im); d.fontmode = '1'
-    d.text((2, 2), s, font=f, fill=255)
+    # 중간 굵기: 가는 Galmuri14를 가로로 한 칸 겹쳐 찍는다 (가는 원본과 굵은 Galmuri11 사이, 사용자)
+    d.text((2, 2), s, font=f, fill=255); d.text((3, 2), s, font=f, fill=255)
     im = im.crop(im.getbbox())
     rgba = Image.new('RGBA', im.size, (255, 255, 255, 0)); rgba.putalpha(im.point(lambda v: 255 if v > 127 else 0))
     b = io.BytesIO(); rgba.save(b, 'PNG', optimize=True)

@@ -219,9 +219,27 @@ export class EileenPlayer extends Player {
     this.core.update(dt);
     this.core.tickMarks(dt);
     this.guardStep(dt);
+    this.calmStep(dt);
     const s = this.core.shake;
     if (s > 6) w.shake(2, Math.min(4, s / 6));
     this.sync();
+  }
+
+  /** 전투 자세(무기 꺼냄 포함)로 있다가 가까이(700px) 적이 없고 공격·방어 키를 안 누른 채 5초가 지나면
+   * 평상 대기로 돌아온다: 무기부터 넣고, 1.5초 뒤 자세를 푼다 (사용자 2026-10-25). 걷기는 상관없다 */
+  private calmT = 0;
+  private calmHold = false;
+  private calmStep(dt: number) {
+    const P = this.core.P;
+    const acting = [...this.heldNames].some((n) => !['left', 'right', 'up', 'down', 'run'].includes(n));
+    const near = this.targets().some((t) => Math.abs(t.x - this.x) < 700);
+    if (acting || near || !(P.combat || P.armed)) { this.calmT = 0; this.calmHold = false; return; }
+    if (P.mode !== 'ground') { if (!this.calmHold) this.calmT = 0; return; } // 무기 넣는 동작 중에는 시계를 이어 간다
+    this.calmT += dt;
+    if (this.calmT < 5) return;
+    if (P.armed) { this.core.onPress('weapon'); this.calmT = 3.5; this.calmHold = true; return; }
+    this.calmT = 0; this.calmHold = false;
+    this.core.onPress('combat');
   }
 
   private spendGuard(n: number) {

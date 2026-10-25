@@ -6,14 +6,14 @@
 import base64, io, json, sys
 from pathlib import Path
 from PIL import Image
-# 전투·이동에 쓰는 동작 (테스트룸 번호) + 도망·뒷걸음질·주저앉기·웅크리기·네발 기기(사용자 2026-10-25). 감정 동작은 NPC용이라 뺐다
-CLIPS = ['1', '2', '3_0', '3', 'W', 'W1', '4', '5', '6', '7', '9', '10', '11', '12', '13', '14', '15', '16', '16_1', '17', '18', '19', '19_1', '20', '21', '22', '22_1', '23', '24', '25', '26', '27', '36', '37', '37_1', '38', '38_1', '39', '40', '41', '42', '42_1']
+# 테스트룸 동작 전부 (사용자 2026-10-25: 감정 표현도 키 없이 다 넣는다 — NPC·연출이 core.onPress('nod') 등으로 부른다)
+CLIPS = None
 s = Path(sys.argv[1]).read_text(encoding='utf-8')
 i = s.index('const A = ') + len('const A = ')
 A, _ = json.JSONDecoder().raw_decode(s[i:])
 out = Path('game-pack/test-people')
 meta = {}
-for k in CLIPS:
+for k in (CLIPS or list(A.keys())):
     if k not in A: continue
     a = A[k]
     # 무손실 WebP로 저장 (PNG의 약 30%, 도트 그대로)
