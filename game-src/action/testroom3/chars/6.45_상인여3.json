@@ -1,0 +1,20 @@
+{
+  "key": "6.45_상인여3",
+  "name": "상인여3",
+  "dir": "E",
+  "color": "#cfc7a6",
+  "armed": false,
+  "anims": {
+    "1": {"folder": "1", "mirror": false, "name": "평상 대기"},
+    "2": {"folder": "2", "mirror": false, "name": "개인 대기"},
+    "3_0": {"folder": "3_0", "mirror": false, "name": "전투 자세 잡기"}
+  },
+  "picks": {"combat": 4, "weapon": 4, "apex": 4, "run": 2, "crawl4": 6},
+  "loops": {},
+  "hit": {},
+  "gun": [],
+  "kick": [],
+  "ranged": {"proj": {"t": "proj", "kind": "orb", "hit": {"dmg": 7, "kind": "light"}}, "heat": false},
+  "skills": {},
+  "_note": "자동 생성. 값을 고치면 build가 그대로 씀. 다시 자동으로: build.py --reset 6.45_상인여3"
+}
