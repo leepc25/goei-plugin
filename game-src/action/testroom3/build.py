@@ -410,11 +410,13 @@ def process(frames, aid, gun):
         for f in frames:
             c = Image.new("RGBA", (W_, H_)); c.paste(f, ((W_ - f.size[0]) // 2, H_ - f.size[1])); nf.append(c)
         frames, w, h = nf, W_, H_
-    bot, reach, top, mz, foot, cx, flash, ang = [], [], [], [], [], [], [], []
+    bot, reach, top, mz, foot, cx, flash, ang, mbot = [], [], [], [], [], [], [], [], []
     for im in frames:
         bb = im.getchannel("A").point(lambda v: 255 if v > 40 else 0).getbbox() or (0, 0, w, h)
         bot.append(bb[3]); top.append(bb[1]); reach.append(bb[2] - w // 2); cx.append((bb[0] + bb[2]) // 2 - w // 2)
         arr = np.array(im)[:, :, 3] > 40
+        cb = [int(np.nonzero(arr[:, x])[0].max()) for x in range(w) if arr[:, x].any()]   # 열마다 가장 아래 화소
+        mbot.append(int(np.percentile(cb, 60)) + 1 if cb else bb[3])   # 누운 몸의 바닥 닿는 선(늘어진 손발 끝 말고 몸통 아래)
         lo = max(0, bb[3] - 26)
         xs = np.nonzero(arr[lo:bb[3]].any(axis=0))[0]
         if len(xs):
@@ -446,7 +448,7 @@ def process(frames, aid, gun):
     for i, im in enumerate(frames): sheet.paste(im.crop(U), (i * cw, 0))
     src = encode(sheet)
     return dict(n=len(frames), w=w, h=h, ox=U[0], oy=U[1], cw=cw, ch=chh, bot=bot, top=top, reach=reach, foot=foot, mz=mz, cx=cx,
-                flash=flash, ang=ang, floor=max(bot), src=src)
+                flash=flash, ang=ang, floor=max(bot), mbot=mbot, src=src)
 
 
 def encode(sheet):

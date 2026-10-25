@@ -67,9 +67,10 @@ const BASE = a => a.h - 4;   // 땅 동작 기준선: 캔버스 아래 4px
 const arcOf = id => CH.arc && CH.arc[id];
 const ROOT = new Set(['38_1', '40', '37_1', '42_1']);   // 기는 동작: 몸을 제자리에 두고 이동은 코드로
 // 누운·앉은 동작은 PixelLab이 몸을 캔버스 위쪽에 그려서 떠 보임 → 그 장의 맨 아래 픽셀을 바닥에 맞춤(사용자 2026-10-25)
+const FLAT = new Set(['19', '20', '38', '38_1']);   // 바닥에 몸을 눕히는 줄: 몸통 아래 선으로 맞춤
 const LIE = new Set(['20', '38', '38_1', '39', '40', '41', '42', '42_1']);
 const lieFrom = a => a.bot.indexOf(Math.min(...a.bot)) + 1;   // 날아가 쓰러지기: 가장 높이 뜬 장 다음부터 땅
-const groundBase = (id, a, f) => arcOf(id) ? a.bot[f] : (LIE.has(id) || (id === '19' && f >= lieFrom(a))) ? a.bot[f] + 2 : BASE(a);
+const groundBase = (id, a, f) => arcOf(id) ? a.bot[f] : (LIE.has(id) || (id === '19' && f >= lieFrom(a))) ? (FLAT.has(id) && a.mbot ? a.mbot[f] + 3 : a.bot[f] + 2) : BASE(a);   // 누운 장: 몸통 아래 선을 바닥에(늘어진 손발은 바닥 앞쪽으로 내려감)
 const cv = document.getElementById('cv'); let ctx = cv.getContext('2d'); ctx.imageSmoothingEnabled = false;
 const FXS = 3, mkLayer = () => { const c = document.createElement('canvas'); c.width = 1280 / FXS; c.height = 720 / FXS; const g = c.getContext('2d'); g.imageSmoothingEnabled = false; return [c, g]; };
 const [fxNc, fxN] = mkLayer(), [fxLc, fxL] = mkLayer();
