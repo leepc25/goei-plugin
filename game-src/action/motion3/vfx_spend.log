@@ -1,2 +1,14 @@
 10-25 13:14:10 VFX jyaldi-super-blast 완료 {'h': 240, 'w': 244} 14장 effect_id=d6f4360f-da18-4f8c-98dd-2bb9d235cc52
 10-25 13:14:49 VFX ground-crater 완료 {'h': 45, 'w': 157} 12장 effect_id=807772a6-d6cb-45ce-ba85-f2a7b11d5a67
+10-25 22:59:24 VFX fx-orb 완료 {'h': 25, 'w': 43} 8장 effect_id=2b228bce-d237-443e-856e-9f05ed62023b
+10-25 22:59:25 VFX fx-mark 완료 {'h': 48, 'w': 48} 10장 effect_id=724251d9-bfd8-4fc4-b50c-76dc5e4d730f
+10-25 22:59:41 VFX fx-pillar 완료 {'h': 128, 'w': 64} 10장 effect_id=12364f14-3b35-45d3-bbf7-17fc232b3603
+10-25 23:00:12 VFX fx-buff 완료 {'h': 83, 'w': 25} 10장 effect_id=67aa46f3-0b6c-4624-bfe2-a12e065a5e20
+10-25 23:00:14 VFX fx-bind 완료 {'h': 65, 'w': 54} 10장 effect_id=ba12fa5f-bb70-4804-8338-df1d1bc0186b
+10-25 23:00:15 VFX fx-shockwave 완료 {'h': 45, 'w': 152} 10장 effect_id=60f39ba4-b5e5-4510-b89b-4d0a26266b01
+10-25 23:00:23 VFX fx-slash 완료 {'h': 64, 'w': 120} 8장 effect_id=0437acfe-60e2-494c-9f90-c78ea2934f3f
+10-25 23:00:31 VFX fx-shadow 완료 {'h': 104, 'w': 112} 12장 effect_id=6bf136f1-f4dd-432a-b3e9-5032ad3a3a0d
+10-25 23:00:47 VFX fx-fire 완료 {'h': 106, 'w': 148} 12장 effect_id=e29f9f24-4c72-40dc-a479-f54c04fe9dba
+10-25 23:00:48 VFX fx-vanish 완료 {'h': 53, 'w': 52} 8장 effect_id=b524b5ee-30ad-4945-80b3-9f2f4d6a01e9
+10-25 23:01:04 VFX fx-summon 완료 {'h': 144, 'w': 128} 12장 effect_id=3db2f828-947d-49bc-9c50-024a484173d7
+10-25 23:01:12 VFX fx-scan 완료 {'h': 72, 'w': 120} 10장 effect_id=fa94e37e-c80b-4c26-b4bb-dda70ff6affd

@@ -349,8 +349,9 @@ const FX = {
   // 바닥에서 하늘로 솟는 폭발 기둥(폭발 그림을 위로 쌓음)
   pillar(s, c) {
     const p = posOf({ at: 'target', ...s }, c), sc = (s.scale || 1.5) * p.k;
-    for (let i = 0; i < 4; i++) later(i * 0.06, () => vfx(s.vfx || 'eileen-rpg-explosion', p.x + (Math.random() - 0.5) * 10, p.gy - 4 - i * 70 * sc, sc * (1.2 - i * 0.15)));
-    for (let i = 0; i < 18; i++) fx.push({ k: 'fire', x: p.x + (Math.random() - 0.5) * 30 * sc, y: p.gy - Math.random() * 40, vx: (Math.random() - 0.5) * 60, vy: -500 - Math.random() * 500, r: 8 + Math.random() * 10, t: 0.5 + Math.random() * 0.3, t0: 0.8 });
+    const light = !s.vfx && VFX['fx-pillar'];   // 폭발 기둥이 아닌 인물은 공용 빛기둥(COMMON.pillar)만
+    if (!light) for (let i = 0; i < 4; i++) later(i * 0.06, () => vfx(s.vfx || 'eileen-rpg-explosion', p.x + (Math.random() - 0.5) * 10, p.gy - 4 - i * 70 * sc, sc * (1.2 - i * 0.15)));
+    if (!light) for (let i = 0; i < 18; i++) fx.push({ k: 'fire', x: p.x + (Math.random() - 0.5) * 30 * sc, y: p.gy - Math.random() * 40, vx: (Math.random() - 0.5) * 60, vy: -500 - Math.random() * 500, r: 8 + Math.random() * 10, t: 0.5 + Math.random() * 0.3, t0: 0.8 });
     if (s.scorch !== 0) craterAt(p.x, p.gy, sc * 0.8, s.scorch || 3);
     boomSnd(3, P.x);
     if (near(p.x, p.gy, 90 * sc, 70)) strike(s.hit);
@@ -498,7 +499,31 @@ const FX = {
     }));
   },
 };
-function runFx(list, c = {}) { for (const s of list || []) { const f = FX[s.t]; if (f) try { f(s, c); } catch (e) { console.warn(s, e); } } }
+function runFx(list, c = {}) { for (const s of list || []) { const f = FX[s.t]; if (f) try { const n0 = fx.length; f(s, c); if (COMMON[s.t]) COMMON[s.t](s, c, n0); } catch (e) { console.warn(s, e); } } }
+// ── 공용 스킬 이펙트(PixelLab, 흰색으로 뽑아 인물 색을 입힘). 코드 도형 대신 그림을 쓰고, 그림이 없으면 원래 코드 도형 그대로 ──
+// 사용자 2026-10-25: 스킬마다 이펙트. 목록·구분은 docs/스킬_이펙트_목록.md
+const colOf = s => s.color && !/^rgba?\(/.test(s.color) ? s.color : CH.color;
+const dropNew = (n0, kinds) => { for (let i = fx.length - 1; i >= n0; i--) if (kinds.includes(fx[i].k)) fx.splice(i, 1); };   // 방금 넣은 코드 도형을 그림으로 바꿈
+const COMMON = {
+  slash(s, c, n0) { if (!VFX['fx-slash']) return; const e = fx.slice(n0).find(e => e.k === 'slash' || e.k === 'slashD'); if (!e) return; dropNew(n0, ['slash', 'slashD']); vfx('fx-slash', e.x, e.y, e.r / 40, { center: true, flip: e.dir < 0, tint: s.dark ? '#2a1a3a' : colOf(s), t: 0.32 }); },
+  bind(s) { if (!showDummy || !VFX['fx-bind']) return; const k = K(D.y); vfx('fx-bind', D.x, D.y - D.z, 3.6 * k, { bottom: true, tint: colOf(s), hold: Math.max(0, (s.time || 2) - 0.6), fade: 0.4 }); },
+  tether(s) { COMMON.bind(s); },
+  mark(s) { if (!showDummy || !VFX['fx-mark']) return; dropNew(fx.length - 1, ['ring']); vfx('fx-mark', D.x, D.y - D.z - 240 * K(D.y), 1.8 * K(D.y), { center: true, tint: colOf(s) }); },
+  scan(s, c, n0) { if (!VFX['fx-scan']) return; dropNew(n0, ['scan', 'grid']); vfx('fx-scan', P.x + P.face * 170 * K(P.y), P.y - 130 * K(P.y), 3 * K(P.y), { center: true, flip: P.face < 0, tint: colOf(s) }); },
+  shock(s, c, n0) { if (!VFX['fx-shockwave']) return; const p = posOf({ at: 'front', dx: 60, ...s }, c); dropNew(n0, ['scorch', 'ring']); vfx('fx-shockwave', p.x, p.gy + 10 * p.k, (s.r || 220) * p.k / 70, { bottom: true, under: true, tint: colOf({ color: s.color || '#ffffff' }) }); },
+  ring(s, c, n0) { if (s.air || !VFX['fx-shockwave']) return; const p = posOf({ at: 'self', ...s }, c); dropNew(n0, ['ring']); vfx('fx-shockwave', p.x, p.gy + 10 * p.k, (s.r || 120) * p.k / 70, { bottom: true, under: true, tint: colOf(s) }); },
+  waves(s) { if (!VFX['fx-shockwave']) return; const m = muzzle(); for (let i = 0; i < (s.n || 3); i++) later(i * 0.09, () => vfx('fx-shockwave', m.x + P.face * (40 + i * 40), m.y + 20, 1.2 + i * 0.5, { center: true, tint: colOf(s) })); },
+  summon(s, c, n0) { if (!VFX['fx-summon']) return; const o = fx.slice(n0).find(e => e.k === 'obj'); if (!o || !o.ground) return; vfx('fx-summon', o.x, o.y + 8 * o.s, 1.6 * o.s, { bottom: true, tint: colOf(s) }); },
+  buff(s) { if (!VFX['fx-buff']) return; const k = K(P.y); for (let i = 0; i < 3; i++) later(i * 0.06, () => vfx('fx-buff', P.x + (i - 1) * 34 * k, P.y - 10 * k, 3 * k, { bottom: true, tint: colOf(s) })); },
+  hide(s) { if (VFX['fx-vanish']) vfx('fx-vanish', P.x, P.y - 110 * K(P.y), 3.4 * K(P.y), { center: true, tint: colOf({ color: s.color || '#d8d4e8' }) }); },
+  teleport(s) { if (VFX['fx-vanish']) vfx('fx-vanish', P.x, P.y - 110 * K(P.y), 3.4 * K(P.y), { center: true, tint: colOf({ color: s.color || '#d8d4e8' }) }); },
+  puddle(s, c) { if (!VFX['fx-shadow']) return; const p = posOf({ at: 'self', ...s }, c); vfx('fx-shadow', p.x, p.gy + 8 * p.k, (s.r || 70) * p.k / 40, { bottom: true, under: true }); },
+  spikes(s, c, n0) { if (!VFX['fx-shadow']) return; const p = posOf({ at: 'front', ...s }, c); dropNew(n0, ['spikeG']); for (let i = 0; i < 3; i++) later(i * 0.05, () => vfx('fx-shadow', p.x + (i - 1) * 60 * p.k, p.gy + 8 * p.k, 2.2 * p.k, { bottom: true })); },
+  grid(s, c, n0) { if (!VFX['fx-shadow']) return; const p = posOf({ at: 'front', ...s }, c), w = (s.w || 300) * p.k; for (let i = 0; i < 5; i++) later(i * 0.04, () => vfx('fx-shadow', p.x + (i - 2) * w / 5, p.gy + 8 * p.k, 2 * p.k, { bottom: true })); },
+  firewall(s, c) { if (!VFX['fx-fire']) return; const p = s.at === 'screen' ? { x: W / 2, gy: FLOOR1 - 20, k: 1 } : posOf({ at: 'target', ...s }, c); const w = s.at === 'screen' ? W : (s.w || 160) * p.k, n = Math.max(1, Math.round(w / 220)); for (let i = 0; i < n; i++) vfx('fx-fire', p.x + (i - (n - 1) / 2) * w / n, p.gy + 6, 1.8 * p.k, { bottom: true, t: s.time || 3, loop: true }); },
+  flame(s) { if (!VFX['fx-fire']) return; const m = muzzle(), k = K(P.y); for (let i = 0; i < 3; i++) later(i * 0.12, () => vfx('fx-fire', m.x + P.face * (90 + i * 110) * k, P.y + 4, (1 + i * 0.3) * k, { bottom: true, flip: P.face < 0 })); },
+  pillar(s, c) { if (s.vfx || !VFX['fx-pillar']) return; const p = posOf({ at: 'target', ...s }, c); vfx('fx-pillar', p.x, p.gy + 6 * p.k, 3 * p.k, { bottom: true, tint: colOf(s) }); },
+};
 
 // ── 흐름 ──
 function toIdle() { P.mode = 'ground'; P.clip = null; P.combo = 0; P.idleT = 0; P.inSuper = false; }
@@ -1088,10 +1113,22 @@ function drawDummy() {
   if (D.bindT > 0) { ctx.fillStyle = '#e8d0ff'; ctx.font = 'bold 15px sans-serif'; ctx.fillText(`구속 ${D.bindT.toFixed(1)}`, D.x + 40, hb + 62); }
   if (D.stunT > 0 && !drawVfxAt('stun_stars', D.x, hb - 6, 2, P.t)) for (let i = 0; i < 3; i++) { const t = P.t * 4 + i * 2.09; star(D.x + Math.cos(t) * 22, hb - 6 + Math.sin(t) * 6, 6, '#ffe066'); }
 }
-function drawVfxAt(name, x, y, sc, el, flip) {
+// 공용 이펙트(흰색으로 뽑음)에 인물 색 입히기: 밝은 곳은 그 색, 어두운 곳은 어둡게, 투명은 그대로. 이름+색으로 한 번만 만들어 둠
+const TINT = {};
+function tinted(name, c) {
+  const v = VFX[name], key = name + c; if (!c || !v.img.complete) return v.img;
+  if (TINT[key]) return TINT[key];
+  const cv2 = document.createElement('canvas'); cv2.width = v.img.naturalWidth; cv2.height = v.img.naturalHeight;
+  const g = cv2.getContext('2d'); g.drawImage(v.img, 0, 0);
+  g.globalCompositeOperation = 'multiply'; g.fillStyle = c; g.fillRect(0, 0, cv2.width, cv2.height);
+  g.globalCompositeOperation = 'screen'; g.globalAlpha = 0.35; g.drawImage(v.img, 0, 0);   // 가운데 흰 빛은 조금 남김
+  g.globalAlpha = 1; g.globalCompositeOperation = 'destination-in'; g.drawImage(v.img, 0, 0);
+  return (TINT[key] = cv2);
+}
+function drawVfxAt(name, x, y, sc, el, flip, tint) {
   const v = VFX[name]; if (!v || !v.img.complete) return false;
   const [fx0, fy0, fw, fh] = sheetFrame(v, el % vfxDur(name));
-  ctx.save(); ctx.translate(Math.round(x), Math.round(y)); ctx.scale(flip ? -sc : sc, sc); ctx.drawImage(v.img, fx0, fy0, fw, fh, -fw * v.pivot[0], -fh * v.pivot[1], fw, fh); ctx.restore(); return true;
+  ctx.save(); ctx.translate(Math.round(x), Math.round(y)); ctx.scale(flip ? -sc : sc, sc); ctx.drawImage(tint ? tinted(name, tint) : v.img, fx0, fy0, fw, fh, -fw * v.pivot[0], -fh * v.pivot[1], fw, fh); ctx.restore(); return true;
 }
 function sheetFrame(v, el) { el = el * 1000; let i = 0; while (i < v.frames.length - 1 && el >= v.frames[i][4]) { el -= v.frames[i][4]; i++; } return v.frames[i]; }
 function drawSheets(under = false) {
@@ -1115,12 +1152,13 @@ function drawSheets(under = false) {
       ctx.restore();
     }
     if (e.k !== 'sheet') continue;
-    const v = VFX[e.name]; if (!v.img.complete) continue;
+    const v = VFX[e.name]; if (!v.img.complete) continue; const img = e.tint ? tinted(e.name, e.tint) : v.img;
     const [fx0, fy0, fw, fh] = sheetFrame(v, e.loop ? (e.t0 - e.t) % e.dur : e.t0 - e.t);
     ctx.save(); if (e.fade && e.t < e.fade) ctx.globalAlpha = e.t / e.fade; ctx.translate(Math.round(e.x), Math.round(e.y)); if (e.rot) ctx.rotate(e.rot); ctx.scale(e.flip ? -e.s : e.s, e.s);
-    if (e.anchor === 'right') ctx.drawImage(v.img, fx0, fy0, fw, fh, -fw, -fh / 2, fw, fh);
-    else if (e.center) ctx.drawImage(v.img, fx0, fy0, fw, fh, -fw / 2, -fh / 2, fw, fh);
-    else ctx.drawImage(v.img, fx0, fy0, fw, fh, -fw * v.pivot[0], -fh * v.pivot[1], fw, fh);
+    if (e.anchor === 'right') ctx.drawImage(img, fx0, fy0, fw, fh, -fw, -fh / 2, fw, fh);
+    else if (e.bottom) ctx.drawImage(img, fx0, fy0, fw, fh, -fw / 2, -fh, fw, fh);
+    else if (e.center) ctx.drawImage(img, fx0, fy0, fw, fh, -fw / 2, -fh / 2, fw, fh);
+    else ctx.drawImage(img, fx0, fy0, fw, fh, -fw * v.pivot[0], -fh * v.pivot[1], fw, fh);
     ctx.restore();
   }
 }
@@ -1229,6 +1267,7 @@ function drawMid() {
       ctx.fillStyle = '#0b0710'; ctx.beginPath(); ctx.moveTo(-4, 0); ctx.lineTo(0, -h); ctx.lineTo(4, 0); ctx.fill();
       ctx.restore();
     }
+    else if (e.k === 'proj' && e.kind === 'orb' && VFX['fx-orb']) { drawVfxAt('fx-orb', e.x, e.y, 2.6 * e.size, P.t, e.dir < 0, e.c); }
     else if (e.k === 'proj') {
       const s = e.size, d = e.dir;
       ctx.save(); ctx.translate(e.x, e.y); ctx.scale(d * s, s);

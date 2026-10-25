@@ -1,0 +1,287 @@
+{
+ "frames": [
+  {
+   "filename": "fx-shockwave 0.png",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 152,
+    "h": 45
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 152,
+    "h": 45
+   },
+   "sourceSize": {
+    "w": 152,
+    "h": 45
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.3111111111111111
+   },
+   "duration": 67
+  },
+  {
+   "filename": "fx-shockwave 1.png",
+   "frame": {
+    "x": 152,
+    "y": 0,
+    "w": 152,
+    "h": 45
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 152,
+    "h": 45
+   },
+   "sourceSize": {
+    "w": 152,
+    "h": 45
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.3111111111111111
+   },
+   "duration": 67
+  },
+  {
+   "filename": "fx-shockwave 2.png",
+   "frame": {
+    "x": 304,
+    "y": 0,
+    "w": 152,
+    "h": 45
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 152,
+    "h": 45
+   },
+   "sourceSize": {
+    "w": 152,
+    "h": 45
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.3111111111111111
+   },
+   "duration": 67
+  },
+  {
+   "filename": "fx-shockwave 3.png",
+   "frame": {
+    "x": 456,
+    "y": 0,
+    "w": 152,
+    "h": 45
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 152,
+    "h": 45
+   },
+   "sourceSize": {
+    "w": 152,
+    "h": 45
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.3111111111111111
+   },
+   "duration": 67
+  },
+  {
+   "filename": "fx-shockwave 4.png",
+   "frame": {
+    "x": 0,
+    "y": 45,
+    "w": 152,
+    "h": 45
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 152,
+    "h": 45
+   },
+   "sourceSize": {
+    "w": 152,
+    "h": 45
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.3111111111111111
+   },
+   "duration": 67
+  },
+  {
+   "filename": "fx-shockwave 5.png",
+   "frame": {
+    "x": 152,
+    "y": 45,
+    "w": 152,
+    "h": 45
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 152,
+    "h": 45
+   },
+   "sourceSize": {
+    "w": 152,
+    "h": 45
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.3111111111111111
+   },
+   "duration": 67
+  },
+  {
+   "filename": "fx-shockwave 6.png",
+   "frame": {
+    "x": 304,
+    "y": 45,
+    "w": 152,
+    "h": 45
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 152,
+    "h": 45
+   },
+   "sourceSize": {
+    "w": 152,
+    "h": 45
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.3111111111111111
+   },
+   "duration": 67
+  },
+  {
+   "filename": "fx-shockwave 7.png",
+   "frame": {
+    "x": 456,
+    "y": 45,
+    "w": 152,
+    "h": 45
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 152,
+    "h": 45
+   },
+   "sourceSize": {
+    "w": 152,
+    "h": 45
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.3111111111111111
+   },
+   "duration": 67
+  },
+  {
+   "filename": "fx-shockwave 8.png",
+   "frame": {
+    "x": 0,
+    "y": 90,
+    "w": 152,
+    "h": 45
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 152,
+    "h": 45
+   },
+   "sourceSize": {
+    "w": 152,
+    "h": 45
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.3111111111111111
+   },
+   "duration": 67
+  },
+  {
+   "filename": "fx-shockwave 9.png",
+   "frame": {
+    "x": 152,
+    "y": 90,
+    "w": 152,
+    "h": 45
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 152,
+    "h": 45
+   },
+   "sourceSize": {
+    "w": 152,
+    "h": 45
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.3111111111111111
+   },
+   "duration": 67
+  }
+ ],
+ "meta": {
+  "app": "PixelLab VFX Creator",
+  "image": "fx-shockwave.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 608,
+   "h": 135
+  },
+  "scale": "1",
+  "anchor": {
+   "kind": "origin",
+   "x": 76,
+   "y": 14
+  },
+  "frameTags": [
+   {
+    "name": "fx-shockwave",
+    "from": 0,
+    "to": 9,
+    "direction": "forward"
+   }
+  ]
+ }
+}
