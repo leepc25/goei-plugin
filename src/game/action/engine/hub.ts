@@ -326,7 +326,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
         const to = [d.up, d.down].filter((q): q is NonNullable<typeof q> => !!q);
         const label = (id: string) => view!.elevator.find((e) => e.scene === id)?.label ?? id;
         const go1 = (target: string) => {
-          host.sfx('doorOpen');
+          host.sfx('doorLatch');
           opening = { id: d.id, t: 0, len, then: () => goDoor(target, 'stairs') };
         };
         if (to.length === 1) return go1(to[0]);
@@ -338,7 +338,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
       if (d.place) {
         // 방 그림이 없는 장소: 문이 열리면 메뉴 창, 문은 다시 닫힌다
         const place = d.place;
-        host.sfx(d.kind === 'cell' ? 'doorSlam' : 'doorOpen');
+        host.sfx(scene.painted ? 'doorLatch' : d.kind === 'cell' ? 'doorSlam' : 'doorOpen');
         opening = { id: d.id, t: 0, len, then: () => { opening = null; closing = { id: d.id, t: 0, len }; host.openPlace(place); } };
         return;
       }
@@ -349,7 +349,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
           if (i == null) return;
           const e = view!.elevator[i];
           if (!e?.open || e.scene === here) return;
-          host.sfx('ding');
+          host.sfx(scene?.painted ? 'elevChime' : 'ding');
           opening = { id: d.id, t: 0, len, then: () => goDoor(e.scene, e.door) };
         });
         return;
@@ -357,7 +357,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
       if (!d.to) return;
       const to = d.to,
         toDoor = d.toDoor;
-      host.sfx(d.kind === 'steel' || d.kind === 'security' || d.kind === 'cell' ? 'doorSlam' : d.kind.startsWith('stairs') ? 'stepConcrete' : 'doorOpen');
+      host.sfx(scene.painted ? 'doorLatch' : d.kind === 'steel' || d.kind === 'security' || d.kind === 'cell' ? 'doorSlam' : d.kind.startsWith('stairs') ? 'stepConcrete' : 'doorOpen');
       if (scene.legacy) return goDoor(to, toDoor);
       opening = { id: d.id, t: 0, len, then: () => goDoor(to, toDoor) };
     },

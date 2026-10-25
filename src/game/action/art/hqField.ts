@@ -113,8 +113,8 @@ function drawDoor(c: CanvasRenderingContext2D, im: HTMLImageElement, d: PaintedD
     }
   };
   const e = open * open * (3 - 2 * open); // 부드럽게
-  // 투명 유리문은 다 열면 뒤가 들통나서 살짝만 연다 (사용자 2026-10-25)
-  const glass = d.behind === 'see';
+  // 엘리베이터 말고는 모두 살짝만 연다 (사용자 2026-10-25: 투명 유리는 뒤가 들통나고, 다른 문도 살짝 열리는 느낌만)
+  const glass = d.behind !== 'car';
   /** 여닫이 한 짝: 경첩(hx)을 축으로 안쪽으로 돈다. 폭은 cos로 줄고, 먼 끝은 원근으로 짧아지며 어두워진다.
    *  dir = 경첩에서 문짝이 뻗는 쪽 (1 오른쪽, -1 왼쪽) */
   const swingLeaf = (sx: number, sw: number, hx: number, dir: 1 | -1, maxDeg: number) => {
@@ -154,7 +154,7 @@ function drawDoor(c: CanvasRenderingContext2D, im: HTMLImageElement, d: PaintedD
     }
     case 'shutter': {
       // 셔터: 위로 말려 올라간다
-      c.drawImage(im, d.x0, d.y0, w, h, d.x0, d.y0 - h * e, w, h);
+      c.drawImage(im, d.x0, d.y0, w, h, d.x0, d.y0 - h * e * (glass ? 0.3 : 1), w, h);
       break;
     }
     default:
