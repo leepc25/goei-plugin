@@ -2381,7 +2381,7 @@ var Hud = class {
     c.setTransform(k, 0, 0, k, 0, 0);
     pixelOn = true;
     const fs = 64, bw = 200, bh = 14;
-    const x = 28, y = s.top ? 104 : H3 - fs - 28;
+    const x = 28, y = s.top ? 28 : H3 - fs - 28;
     if (this.lastHp >= 0 && s.hp < this.lastHp) this.hurtT = 0.35, this.trailHold = 0.5;
     if (this.trail < 0 || this.trail < s.hp) this.trail = s.hp;
     else if (this.trailHold > 0) this.trailHold -= dt;
@@ -2432,6 +2432,57 @@ var Hud = class {
     pixelOn = false;
     c.restore();
     return (x + fs + bw + 40) * k;
+  }
+  /** 상호작용 안내: 캐릭터 옆에 뜨는 도트 말풍선 (키 단추 + 짧은 말). x,y = 캐릭터 머리 옆 화면 px(캔버스 px), side = 말풍선이 뻗는 쪽 */
+  drawPrompt(c, p) {
+    c.save();
+    const k = p.compact ? 1.2 : 1;
+    c.setTransform(k, 0, 0, k, 0, 0);
+    pixelOn = true;
+    const U = 2;
+    c.font = font(22);
+    const tw = Math.ceil(c.measureText(p.text).width);
+    const cap = 30, gap = 8, padX = 10, h = 40;
+    const w = padX + cap + gap + tw + padX + (p.locked ? 20 : 0);
+    const bob = Math.round(Math.sin(performance.now() / 260) * 2);
+    let x = Math.round(p.x / k + (p.side > 0 ? 0 : -w)), y = Math.round(p.y / k - h / 2 + bob);
+    const box2 = (bx, by, bw, bh, col) => {
+      c.fillStyle = col;
+      c.fillRect(bx + U, by, bw - 2 * U, bh);
+      c.fillRect(bx, by + U, bw, bh - 2 * U);
+    };
+    box2(x + U, y + U * 2, w, h, "rgba(0,0,0,0.35)");
+    box2(x - U, y - U, w + 2 * U, h + 2 * U, "#0b0f12");
+    box2(x, y, w, h, p.locked ? "#c98a1c" : "#cfc8b4");
+    box2(x + U, y + U, w - 2 * U, h - 2 * U, "#1a2026");
+    const tx = p.side > 0 ? x - U * 3 : x + w + U;
+    c.fillStyle = p.locked ? "#c98a1c" : "#cfc8b4";
+    c.fillRect(tx, y + h / 2 - U, U * 2, U * 2);
+    c.fillRect(p.side > 0 ? tx + U * 2 : tx - U, y + h / 2 - U * 2, U, U * 4);
+    const kx = x + padX, ky = y + (h - cap) / 2;
+    box2(kx, ky + U, cap, cap, "#6e6656");
+    box2(kx, ky, cap, cap - U, p.locked ? "#5a4a2a" : "#f2ead6");
+    c.font = font(22);
+    c.fillStyle = p.locked ? "#c9b48a" : "#1a2026";
+    c.textAlign = "center";
+    c.textBaseline = "middle";
+    c.fillText(p.key, kx + cap / 2, ky + cap / 2);
+    let txx = kx + cap + gap;
+    if (p.locked) {
+      c.fillStyle = "#ffcf6a";
+      c.fillRect(txx + 2, y + 18, 12, 10);
+      c.fillRect(txx + 4, y + 12, 2, 6);
+      c.fillRect(txx + 10, y + 12, 2, 6);
+      c.fillRect(txx + 4, y + 11, 8, 2);
+      c.fillStyle = "#1a2026";
+      c.fillRect(txx + 7, y + 21, 2, 4);
+      txx += 20;
+    }
+    c.textAlign = "left";
+    c.fillStyle = p.locked ? "#ffcf6a" : "#f2ecdc";
+    c.fillText(p.text, txx, y + h / 2 + 1);
+    pixelOn = false;
+    c.restore();
   }
   /** 아래 자막 한 줄만 (본부처럼 전투 HUD가 없는 화면) */
   drawMessage(c, text, compact, left = 0) {

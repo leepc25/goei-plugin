@@ -58,7 +58,7 @@ const openLen = (sc: Scene | null, d: HqDoor) => (!sc?.painted ? OPEN_T : d.kind
 const RATTLE_T = 10;
 const DOOR_W: Record<Door['kind'], number> = { main: 190, door: 120, stairs: 120, glass: 160, steel: 120, security: 120, elevator: 160, stairs_up: 120, stairs_down: 120, shop: 130, slide: 170, cell: 150, exit: 150 };
 
-export type Hub = StageModule & { goto(place: string): void; jump(sceneId: string, x?: number, y?: number): void; sceneIds(): string[]; current(): HqScene | null };
+export type Hub = StageModule & { nearInfo(): { text: string; locked: boolean } | null; goto(place: string): void; jump(sceneId: string, x?: number, y?: number): void; sceneIds(): string[]; current(): HqScene | null };
 
 const isS = (d: HqDoor) => d.side === 'S';
 const doorY = (d: HqDoor, lane: [number, number] = LANE) => (isS(d) ? lane[1] - 14 : lane[0] + 16);
@@ -379,6 +379,18 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
       host.sfx(scene.painted ? 'doorLatch' : d.kind === 'steel' || d.kind === 'security' || d.kind === 'cell' ? 'doorSlam' : d.kind.startsWith('stairs') ? 'stepConcrete' : 'doorOpen');
       if (scene.legacy) return goDoor(to, toDoor);
       opening = { id: d.id, t: 0, len, then: () => goDoor(to, toDoor) };
+    },
+    /** 지금 손이 닿는 문·자리의 짧은 이름 (캐릭터 옆 말풍선) */
+    nearInfo() {
+      if (!scene || !near || opening || fadeOut > 0) return null;
+      if (near.startsWith('spot:')) {
+        const s = scene.spots.find((q) => `spot:${q.id}` === near);
+        return s ? { text: s.verb, locked: !s.open } : null;
+      }
+      const d = scene.doors.find((q) => `door:${q.id}` === near);
+      if (!d) return null;
+      const text = d.label ?? (d.kind === 'elevator' ? '엘리베이터' : d.kind === 'stairs' ? '계단' : d.kind === 'exit' ? '나가기' : '문');
+      return { text, locked: !d.open };
     },
     /** 검사·스크린샷용: 장면으로 바로 */
     jump(sceneId: string, x = 400, y?: number) {

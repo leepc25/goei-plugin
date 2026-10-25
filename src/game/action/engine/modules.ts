@@ -5,7 +5,7 @@
 // 층(stage/)·적(enemy/)·아이템(items/)·대사(story/)는 들어오는 대로 여기에 잇는다. 없으면 엔진 기본(훈련장·임시 적·기본 지급품).
 import { walkSeconds, clockText, mergeClock, DOOR_S, STAIR_S } from '../../../core/fieldclock';
 import type { GameAssets, GameBridge } from '../../bridge';
-import { view } from './view';
+import { persp, view } from './view';
 import { setPixelScale } from './contract';
 import { mountTalk } from '../../talk';
 import { createGameAudio } from '../audio';
@@ -28,7 +28,8 @@ import { linkNpcTalk } from './npcLink';
 import demoPhotos from '../story/demo-photos.json';
 import { whereIs, LANE_TOP, LANE_BOT } from '../hq/map';
 import { hasVisitAgent, visitAgentFaceCanvas } from '../art/visitAgents';
-import { testPlayerFace } from '../art/testPeople';
+import { hasTestPeople, testPlayerFace, testPlayerTop } from '../art/testPeople';
+import { charSize } from '../charSize';
 import { FieldFx, parseFxList } from '../fx/fieldFx';
 import { SUPER_TEXT } from '../fx/superText';
 import { drawTitleBg, setHudItemIcon } from '../ui';
@@ -705,16 +706,26 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       if (mods.blocking?.() || shell.paused) hs.navigation = undefined;
       // 필드(방문): 전투 HUD 대신 주인공 칸 (도트 얼굴·이름·체력·필살 게이지). 대화창·메뉴가 열려 있으면 숨긴다
       let cardEnd = 0;
-      if (game?.inHub && bridge?.visit && !mods.blocking?.() && !shell.paused) {
+      if (game?.inHub && !mods.blocking?.() && !shell.paused) {
         const me = hq.visitor();
-        const name = me.name || '방문자';
+        const name = me.name || (testPlayerFace() ? '에일린' : '방문자');
         const face = (me.agentId && visitAgentFaceCanvas(name, 34)) || testPlayerFace() || visitAgentFaceCanvas('쟈알디', 34);
-        cardEnd = shell.hud.drawFieldCard(ctx, { name, face, hp: w.player.hp, maxHp: w.player.hpMax, gauge: w.player.gauge, compact: hs.compact, top: shell.touchShown || hs.compact }, dt);
-        if (shell.touchShown || hs.compact) cardEnd = 0;
+        // 좌상단 초상화 상자 (사용자 2026-10-25: 위 목표 띠 대신)
+        shell.hud.drawFieldCard(ctx, { name, face, hp: w.player.hp, maxHp: w.player.hpMax, gauge: w.player.gauge, compact: hs.compact, top: true }, dt);
       }
       if (!game?.inHub) shell.hud.draw(ctx, hs, dt); // 본부에서는 전투 HUD 없음
       else if (hs.message) shell.hud.drawMessage(ctx, hs.message, hs.compact, cardEnd); // 본부 목소리는 아래 자막 한 줄
-      if (game?.inHub && hs.navigation) shell.hud.drawNavigation(ctx, hs.navigation, hs.compact, hs.device);
+      // 본부: 위 안내 띠 대신 캐릭터 옆 말풍선 (닿는 문·자리가 있을 때만, 캐릭터와 겹치지 않게 옆에)
+      const tg = game?.inHub && !mods.blocking?.() && !shell.paused ? (w.stage as { nearInfo?: () => { text: string; locked: boolean } | null }).nearInfo?.() : null;
+      if (tg) {
+        const p = w.player, z = view.zoom;
+        const head = (hasTestPeople() ? testPlayerTop() : -230) * persp(p.y);
+        const sx = (p.x - Math.round(w.camX) - view.crop) * z, sy = (p.y + head * 0.72) * z;
+        const half = 46 * persp(p.y) * charSize.k * z;
+        const side: 1 | -1 = sx > ctx.canvas.width - 320 ? -1 : 1;
+        const key = hs.device === 'pad' ? 'B' : hs.device === 'touch' || hs.compact ? '조' : 'E';
+        shell.hud.drawPrompt(ctx, { x: sx + side * (half + 18), y: sy, side, key, text: tg.locked ? `${tg.text} · 잠김` : tg.text, locked: tg.locked, compact: hs.compact });
+      }
       ffx.drawScreen(ctx);
       if (shell.paused) mapOpen = false;
       if (!game?.inHub && w.stage === elevator) {
