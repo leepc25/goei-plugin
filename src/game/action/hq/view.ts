@@ -642,6 +642,9 @@ ${can.ok ? '' : `<p class="hq-warn">${esc(can.why)}</p>`}</div>
         const got = parseSave(await h.load().catch(() => null));
         if (mounting !== mountId) return;
         if (got) s = got;
+        // 걷는 본부(필드)의 주인공은 에일린 (옛 저장·새 저장의 쟈알디 선택은 고친다): 대사·체력·출동 요원이 쟈알디 기준으로 나오던 문제
+        if (!walk && s.selected === 'jyaldi') s.selected = 'eileen';
+        if (s.support === 'eileen') s.support = null;
         loaded = true;
         // 복원 가능 여부는 저장 봉투를 소유한 엔진이 판단한다. 본부 로딩은 active를 소비하지 않는다.
         if (s.active && !h.resuming?.()) {

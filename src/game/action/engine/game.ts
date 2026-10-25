@@ -17,6 +17,8 @@ export interface EngineModules {
   enemyFactory?: EnemyFactory;
   itemUse?: ItemUse;
   hq?: HqModuleLike;
+  /** 본부 메뉴 창을 붙일 곳: 게임 화면(1280×720) 층. 없으면 게임 상자. NPC 대화창과 같은 층이라 같이 커지고 같은 자리에 뜬다 */
+  hqLayer?: () => HTMLElement | null;
   /** 모든 엔진 이벤트를 듣는 곳 (소리·화면 효과·대사) */
   listeners?: ((e: GameEvent) => void)[];
   /** 대사창이 전투를 멈추고 있는가 */
@@ -219,7 +221,7 @@ export class Game {
   start_new(stageId?: string) {
     if (this.mods.hq && !stageId) return this.showHq();
     const stage = this.mods.stages.find((s) => s.id === stageId) ?? this.mods.stages[0];
-    this.deploy({ seed: Math.floor(Math.random() * 1e9), agent: 'jyaldi', stageId: stage.id });
+    this.deploy({ seed: Math.floor(Math.random() * 1e9), agent: 'eileen', stageId: stage.id });
   }
 
   private dead = false;
@@ -234,7 +236,8 @@ export class Game {
     if (!this.hqRoot) {
       this.hqRoot = document.createElement('div');
       this.hqRoot.className = 'goei-engine-hq';
-      this.box.appendChild(this.hqRoot);
+      // 걷는 본부(엔진 장면)면 게임 화면 층에: 큰 창에서 임무 창만 작게 우하단에 붙던 문제 (사용자 2026-10-25)
+      ((hq.hub && this.mods.hqLayer?.()) || this.box).appendChild(this.hqRoot);
       hq.mount(this.hqRoot, {
         deploy: (run) => this.deploy(run),
         stages: () => this.mods.stages.map((s) => ({ id: s.id, label: s.label })),
@@ -244,7 +247,7 @@ export class Game {
     if (hq.hub) {
       // 본부 = 엔진 벨트 장면. 메뉴 창(DOM)은 열렸을 때만 보인다
       const stage = hq.hub();
-      const run: RunConfigCore = { seed: Math.floor(Math.random() * 1e9), agent: 'jyaldi', stageId: stage.id };
+      const run: RunConfigCore = { seed: Math.floor(Math.random() * 1e9), agent: 'eileen', stageId: stage.id };
       this.hqRoot.hidden = !hq.isOpen?.();
       this.hqRoot.classList.add('goei-engine-hq-panel');
       this.canvas.style.visibility = '';

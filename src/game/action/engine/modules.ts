@@ -403,7 +403,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
   };
   // 대사·컷신: 말풍선은 늘, 대화창·컷신이 열리면 전투를 멈춘다
   let world: World | null = null;
-  let runAgent: AgentId = 'jyaldi';
+  let runAgent: AgentId = 'eileen'; // 주인공은 에일린 (쟈알디는 부장 NPC)
   let openingOn = false; // 제목 화면 오프닝 영상이 도는 중 (메뉴가 열려 있어도 영상은 멈추지 않는다)
   const storyRoot = document.createElement('div');
   // 넘치는 창(층 단추 등)이 바깥 틀에 스크롤바를 만들면 틀 크기가 바뀌어 화면을 다시 맞추고, 그게 되풀이되며 화면이 떨렸다 (리스 작은 창)
@@ -560,11 +560,9 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
   const floorKeys = (e: KeyboardEvent) => {
     if (floorBox.hidden) return;
     if (e.code === 'Escape') closeFloors(null);
-    // 두 줄 배치: 위·아래는 한 줄(두 칸)씩, 좌우는 한 칸씩
-    else if (e.code === 'ArrowLeft') stepFloor(-1);
-    else if (e.code === 'ArrowRight') stepFloor(1);
-    else if (e.code === 'ArrowUp') stepFloor(-2);
-    else if (e.code === 'ArrowDown') stepFloor(2);
+    // 한 줄 배치 (사용자 2026-10-25: 두 줄은 헷갈림)
+    else if (e.code === 'ArrowUp' || e.code === 'ArrowLeft') stepFloor(-1);
+    else if (e.code === 'ArrowDown' || e.code === 'ArrowRight') stepFloor(1);
     else if (e.code === 'Enter' || e.code === 'Space' || e.code === 'KeyE') {
       if (!e.repeat && floorSel >= 0 && !floorBtns()[floorSel]?.disabled) closeFloors(floorSel);
     } else if (/^Digit[1-9]$/.test(e.code)) {
@@ -600,9 +598,32 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     overlay: visit ? (c, people, player) => visit.draw(c, people, player) : undefined,
   });
   // 본부 메뉴 창이 열려 있으면 Esc는 창 닫기 (껍데기 일시정지보다 먼저)
+  // 본부 메뉴 창(임무 창구·정비실 등) 키보드 (사용자 2026-10-25: 키보드가 안 먹는다): 방향키로 단추를 고르고 Enter·Space·E로 누른다, Esc 닫기
+  let hqSel: HTMLElement | null = null;
+  const hqButtons = () => [...document.querySelectorAll<HTMLElement>('.goei-engine-hq button:not([disabled]), .goei-engine-hq [data-act]:not(button)')].filter((b) => b.offsetParent && !b.closest('[hidden]'));
+  const markHq = (b: HTMLElement | null) => {
+    hqSel?.classList.remove('hq-kbsel');
+    hqSel = b;
+    b?.classList.add('hq-kbsel');
+    b?.scrollIntoView?.({ block: 'nearest' });
+  };
   const hqKeys = (e: KeyboardEvent) => {
-    if (e.code !== 'Escape' || !game?.inHub || !hq.isOpen?.()) return;
-    hq.close();
+    if (!game?.inHub || !hq.isOpen?.() || npc.isOpen()) return;
+    const t = e.target as HTMLElement | null;
+    if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT')) return;
+    const list = hqButtons();
+    if (hqSel && !list.includes(hqSel)) hqSel = null;
+    const at = hqSel ? list.indexOf(hqSel) : -1;
+    const first = () => list.find((b) => b.classList.contains('primary') || b.classList.contains('on')) ?? list[0] ?? null;
+    if (e.code === 'Escape') hq.close();
+    else if (e.code === 'ArrowDown' || e.code === 'ArrowRight' || e.code === 'Tab') markHq(at < 0 ? first() : list[(at + 1) % list.length]);
+    else if (e.code === 'ArrowUp' || e.code === 'ArrowLeft') markHq(at < 0 ? first() : list[(at - 1 + list.length) % list.length]);
+    else if (e.code === 'Enter' || e.code === 'Space' || e.code === 'KeyE') {
+      if (e.repeat) return e.preventDefault();
+      const b = hqSel ?? first();
+      hqSel = null;
+      b?.click();
+    } else return;
     e.preventDefault();
     e.stopImmediatePropagation();
   };
@@ -688,6 +709,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     stages: [elevator, trainingStage, dummyStage, arenaStage, itemStage],
     enemyFactory,
     hq,
+    hqLayer: () => shell.stage.ui,
     hud: false,
     blocking: () => !!visit?.isOpen() || story.isBlocking() || itemsBlocking() || !floorBox.hidden || npc.isOpen() || mapOpen,
     covered: () => story.isVideoPlaying(),

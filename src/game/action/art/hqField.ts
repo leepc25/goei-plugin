@@ -318,10 +318,19 @@ function outsideMask(scene: string, i: number, poly: [number, number][]) {
     g.drawImage(im, x, y, w, h, 0, 0, w, h);
     const d = g.getImageData(0, 0, w, h), px = d.data;
     const ramp = (v: number, a: number, b: number) => Math.max(0, Math.min(1, (v - a) / (b - a)));
+    const solid = p.outsideSolid;
     for (let j = 0; j < px.length; j += 4) {
       const r = px[j], gg = px[j + 1], b = px[j + 2], lum = 0.3 * r + 0.59 * gg + 0.11 * b;
-      // 밝을수록, 따뜻하지 않을수록(빨강이 파랑보다 많이 크지 않을수록) 바깥으로 본다
-      const v = ramp(lum, 70, 150) * (1 - ramp(r - b, 18, 45));
+      let v: number;
+      if (solid) {
+        // 다각형 전체를 고르게. 앞에 놓인 화분(잎·화분 상자)만 뺀다
+        const X = x + ((j / 4) % w), Y = y + Math.floor(j / 4 / w);
+        const k = solid.keep.find(([a, bb, c, d]) => X >= a && X < c && Y >= bb && Y < d);
+        v = k && (k[4] === 'all' || (gg > b + 12 && gg >= r)) ? 0 : 1;
+      } else {
+        // 밝을수록, 따뜻하지 않을수록(빨강이 파랑보다 많이 크지 않을수록) 바깥으로 본다
+        v = ramp(lum, 70, 150) * (1 - ramp(r - b, 18, 45));
+      }
       px[j] = px[j + 1] = px[j + 2] = 255; px[j + 3] = Math.round(255 * v * (px[j + 3] / 255));
     }
     g.putImageData(d, 0, 0);

@@ -48,6 +48,8 @@ export interface PaintedScene {
   windows: [number, number, number, number][];
   /** 바깥 풍경이 보이는 곳(다각형): 밤에는 실내보다 훨씬 어두워지고 먼 건물 창에 불이 켜진다 (사용자 2026-10-25) */
   outside?: [number, number][][];
+  /** 바깥 풍경을 색으로 고르지 않고 다각형 전체를 고르게 덮는다 (유리 현관처럼 바깥이 통째로 보이는 곳). keep = 앞에 놓인 화분 등은 빼기: 'green'이면 잎(초록) 픽셀만, 'all'이면 상자 전부 */
+  outsideSolid?: { keep: [number, number, number, number, 'green' | 'all'][] };
   objects: PaintedObject[];
 }
 
@@ -71,7 +73,9 @@ export const PAINTED: Record<string, PaintedScene> = {
     lamps: [...downs([861, 1095, 1356, 1671]), sign(2133, 67)],
     windows: [],
     // 왼쪽 유리 현관·유리벽 너머
-    outside: [[[0, 0], [412, 0], [410, 420], [330, 426], [300, 440], [92, 470], [60, 488], [0, 494]]],
+    // 유리 아래 끝선을 따라 (문짝 유리 바닥선이 비스듬하다)
+    outside: [[[0, 0], [412, 0], [412, 405], [330, 420], [295, 420], [210, 437], [180, 442], [98, 460], [62, 470], [60, 488], [40, 490], [0, 492]]],
+    outsideSolid: { keep: [[0, 250, 90, 420, 'green'], [0, 413, 44, 520, 'all'], [325, 200, 445, 372, 'green'], [352, 374, 432, 432, 'all']] },
     objects: [{ id: 'desk', file: 'desk', x: 494, y: 205, w: 644, h: 262, sortY: 463, solid: [{ x0: 494, x1: 1137, y0: 442, y1: 466, h: 140 }, { x0: 1096, x1: 1137, y0: 428, y1: 466, h: 140 }] }],
   },
   f2: {

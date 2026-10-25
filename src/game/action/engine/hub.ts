@@ -230,8 +230,8 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
       if (ok && (!best || d < best.d)) best = { id, kind, x, d };
     };
     // 자리 먼저: 같은 거리면 자리(격리문 앞 전시 등)가 이긴다
+    // 아직 안 열린 자리도 다가가면 「잠김」으로 보인다 (전수검사: 연구·감정·면담 자리가 아무 안내 없이 비어 보였다)
     for (const s of scene.spots) {
-      if (!s.open) continue;
       const ok = Math.abs(s.x - px) < (s.y === undefined ? 60 : 75) && (s.y === undefined || Math.abs(s.y - py) < 55);
       consider(`spot:${s.id}`, 'hubspot', s.x, ok);
     }
@@ -319,7 +319,8 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
       if (!scene || fadeOut > 0 || opening || callWait) return;
       if (prop.kind === 'hubspot') {
         const s = scene.spots.find((q) => `spot:${q.id}` === prop.id);
-        if (!s?.open) return;
+        if (!s) return;
+        if (!s.open) return a.world.say('아직 쓸 수 없다. 본부 일이 더 진행되면 열린다.', 2.5);
         if (s.place) return host.openPlace(s.place);
         if (s.say) return a.world.say(s.say, 3);
         if (s.depart) {
