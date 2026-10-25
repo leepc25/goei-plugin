@@ -1,0 +1,154 @@
+{
+  "key": "3.13_곽제강",
+  "name": "곽제강",
+  "dir": "E",
+  "color": "#B79CF0",
+  "armed": true,
+  "anims": {
+    "1": {"folder": "1", "mirror": false, "name": "평상 대기"},
+    "2": {"folder": "2", "mirror": false, "name": "개인 대기 (턱 문지르며 흥얼)"},
+    "3_0": {"folder": "3_0", "mirror": false, "name": "전투 자세 잡기"},
+    "3": {"folder": "3", "mirror": false, "name": "전투 대기"},
+    "W": {"folder": "W", "mirror": false, "name": "무기 꺼내기 (공책·볼펜)"},
+    "W_1": {"folder": "W_1", "mirror": false, "name": "무기 대기"},
+    "4": {"folder": "4", "mirror": false, "name": "걷기"},
+    "5": {"folder": "5", "mirror": false, "name": "뛰기"},
+    "6": {"folder": "6", "mirror": false, "name": "제자리 점프"},
+    "7": {"folder": "7", "mirror": false, "name": "방향 점프"},
+    "8": {"folder": "8", "mirror": false, "name": "달리다 점프"},
+    "9": {"folder": "9", "mirror": false, "name": "약1 악수 내밀기"},
+    "10": {"folder": "10", "mirror": false, "name": "약2 손 흔들어 내리기"},
+    "11": {"folder": "11", "mirror": false, "name": "약3 손뼉 덮치기"},
+    "12": {"folder": "12", "mirror": false, "name": "강 혼돈 변수 던져 넣기"},
+    "13": {"folder": "13", "mirror": false, "name": "돌진 몸통 태클"},
+    "14": {"folder": "14", "mirror": false, "name": "점프 공격 엉덩방아 찍기"},
+    "15": {"folder": "15", "mirror": false, "name": "원거리 볼펜 던지기"},
+    "16": {"folder": "16", "mirror": false, "name": "뒤 회피 (생각하며 뒤로)"},
+    "16_1": {"folder": "16_1", "mirror": false, "name": "앞 회피 (뒷짐 들여다보기)"},
+    "17": {"folder": "17", "mirror": false, "name": "막기 (가운 자락 가리기)"},
+    "18": {"folder": "18", "mirror": false, "name": "맞기"},
+    "19": {"folder": "19", "mirror": false, "name": "날아가 쓰러지기"},
+    "20": {"folder": "20", "mirror": false, "name": "일어나기"},
+    "21": {"folder": "21", "mirror": false, "name": "스턴"},
+    "22": {"folder": "22", "mirror": false, "name": "고유기술 흥미로운데요"},
+    "23": {"folder": "23", "mirror": false, "name": "충전 모으기 (조 배치)"},
+    "24": {"folder": "24", "mirror": false, "name": "충전 방출 (배치 서류 내밀기)"},
+    "25": {"folder": "25", "mirror": false, "name": "필살기 분기별 기상 특보"},
+    "26": {"folder": "26", "mirror": false, "name": "섭취 (맛보고 판정)"},
+    "27": {"folder": "27", "mirror": false, "name": "줍기 (들여다보기)"},
+    "28": {"folder": "28", "mirror": false, "name": "응대 (악수 손)"},
+    "29": {"folder": "29", "mirror": false, "name": "말하며 손짓 (검지 설명)"},
+    "30": {"folder": "30", "mirror": false, "name": "끄덕이기"},
+    "31": {"folder": "31", "mirror": false, "name": "고개 젓기"},
+    "32": {"folder": "32", "mirror": false, "name": "화내기 (5분만 더요!)"},
+    "33": {"folder": "33", "mirror": false, "name": "발견 반응 (빤히)"},
+    "34": {"folder": "34", "mirror": false, "name": "놀라기"},
+    "35": {"folder": "35", "mirror": false, "name": "기뻐하기 (손 흔들기)"},
+    "36": {"folder": "36", "mirror": false, "name": "도망"},
+    "37": {"folder": "37", "mirror": false, "name": "뒷걸음질 (움츠리기)"},
+    "37_1": {"folder": "37_1", "mirror": false, "name": "뒷걸음질 반복"},
+    "38": {"folder": "38", "mirror": true, "name": "엎드려 기기"},
+    "38_1": {"folder": "38_1", "mirror": true, "name": "엎드려 기기 반복"},
+    "39": {"folder": "39", "mirror": false, "name": "주저앉기"},
+    "40": {"folder": "40", "mirror": false, "name": "주저앉아 뒤로 기어나가기"},
+    "41": {"folder": "41", "mirror": false, "name": "웅크려 떨기"},
+    "42": {"folder": "42", "mirror": false, "name": "네발로 기기"},
+    "42_1": {"folder": "42_1", "mirror": false, "name": "네발로 기기 반복"}
+  },
+  "picks": {"combat": 3, "weapon": 4, "apex": 4, "run": 5, "crawl4": 9},
+  "loops": {
+    "4": [3, 4, 5, 6, 7, 8],
+    "3": [1, 2, 3, 4],
+    "W_1": [1, 2, 3, 4],
+    "21": [2, 3, 4, 5, 6, 7, 8],
+    "19": [9, 10, 11, 12],
+    "23": [5, 6, 7, 8],
+    "39": [7, 8, 9, 10, 11, 12],
+    "41": [3, 4, 5, 6, 7, 8]
+  },
+  "hit": {"9": 7, "10": 6, "11": 3, "12": 4, "13": 3, "14": 3, "15": 4},
+  "gun": ["W", "W_1", "15"],
+  "kick": [],
+  "ranged": {
+    "proj": {"t": "proj", "kind": "pen", "hit": {"dmg": 7, "kind": "light"}, "speed": 1500, "color": "#b8a0e8"},
+    "heat": false,
+    "_note": "볼펜"
+  },
+  "skills": {
+    "skill": {
+      "name": "흥미로운데요",
+      "anim": "22",
+      "fps": 9,
+      "armed": true,
+      "events": [
+        {
+          "f": 3,
+          "fx": [
+            {"t": "ring", "at": "target", "r": 60, "color": "#b8a0e8"},
+            {"t": "mark", "time": 8, "text": "약점 · 받는 피해 +25%", "color": "#b8a0e8"}
+          ]
+        }
+      ]
+    },
+    "charge": {
+      "name": "조 배치",
+      "hold": "23",
+      "release": "24",
+      "armed": true,
+      "levels": [0.5, 1.2],
+      "fire": 2,
+      "lv": {
+        "0": [{"t": "text", "v": "음…"}],
+        "1": [{"t": "text", "v": "재사용 초기화"}],
+        "2": [
+          {
+            "t": "summon",
+            "icon": "decoy",
+            "anim": "3",
+            "at": "front",
+            "dx": -160,
+            "time": 6,
+            "color": "#101014",
+            "alpha": 0.7,
+            "over": 0.9
+          },
+          {
+            "t": "summon",
+            "icon": "decoy",
+            "anim": "3",
+            "at": "front",
+            "dx": 220,
+            "time": 6,
+            "color": "#101014",
+            "alpha": 0.7,
+            "over": 0.9
+          },
+          {"t": "text", "v": "현장탐사 직원 2명"}
+        ]
+      }
+    },
+    "super": {
+      "name": "분기별 기상 특보",
+      "sub": "「아, 이건 꿈결 등급이 높네요!」",
+      "anim": "25",
+      "fps": 8,
+      "armed": true,
+      "events": [
+        {
+          "f": 7,
+          "fx": [
+            {
+              "t": "screen",
+              "spots": 5,
+              "every": 0.1,
+              "each": [{"t": "ring", "r": 60, "color": "#b8a0e8"}, {"t": "text", "v": "채집"}]
+            },
+            {"t": "mark", "time": 6, "text": "연구 중", "color": "#b8a0e8"}
+          ]
+        },
+        {"f": 9, "hold": 0.3, "fx": [{"t": "hit", "hit": {"dmg": 100, "kind": "launch"}}]}
+      ]
+    }
+  },
+  "_note": "손으로 다듬음(표 「테스트룸」 절·fail 목록·기술안 3장). 그림 값은 자동. 다시 자동으로: build.py --reset 3.13_곽제강"
+}

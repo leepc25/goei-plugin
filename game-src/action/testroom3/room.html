@@ -390,6 +390,7 @@ const FX = {
   lob(s, c) { const n = s.n || 1; for (let i = 0; i < n; i++) { const m = muzzle(), k = K(P.y), dist = (s.dist || 300) * k, dy = (i - (n - 1) / 2) * (s.spread || 50); const tx = m.x + P.face * dist, ty = P.y + dy; fx.push({ k: 'lob', x0: m.x, y0: m.y, x1: tx, y1: ty, t: s.time || 0.7, t0: s.time || 0.7, icon: s.icon || 'grenade' }); later((s.time || 0.7) + (s.fuse || 0), () => runFx((s.end || [{ t: 'blast', scale: 1.1 }]).map(e => ({ ...e, at: 'target', hit: near(tx, ty, 120, 60) ? e.hit : null })), { pt: { x: tx, y: ty } })); } },
   // 소리 고리: 손(마이크·입) 앞에서 n겹 퍼짐
   waves(s, c) { for (let i = 0; i < (s.n || 3); i++) later(i * 0.09, () => { const m = muzzle(); ring(m.x + P.face * 20, m.y, (s.r || 70) * (1 + i * 0.4), 0.35, s.color || '#ffcf9a', 4, 1); }); if (s.hit) FX.melee({ range: s.range || 260, hit: s.hit }, c); },
+  hit(s) { if (s.hit) strike(s.hit); },   // 그림 없이 맞음만(화면 전체 기술의 샌드백 자리)
   repeat(s, c) { for (let i = 0; i < (s.n || 3); i++) later(i * (s.every || 0.1), () => runFx(s.fx || [], c)); },
   gray(s) { grayT = Math.max(grayT, s.time || 1); },
   chance(s, c) { const ok = Math.random() < (s.p ?? 0.5); runFx(ok ? s.yes : s.no, c); },
@@ -1056,6 +1057,7 @@ function drawIcon(icon, x, y, s, c, face = 1) {
   else if (icon === 'turret') { R_(-14, -10, 28, 10, '#4a4f58'); R_(-6, -22, 12, 12, '#6b7280'); R_(4, -19, 18, 4, '#2b2f36'); R_(-16, 0, 32, 4, '#2b2f36'); R_(-3, -18, 4, 4, c); }
   else if (icon === 'tube') { ctx.globalAlpha *= 0.55; R_(-30, -150, 60, 150, '#9fd8ff'); ctx.globalAlpha /= 0.55; R_(-34, -154, 68, 8, '#d9eef8'); R_(-34, -6, 68, 8, '#5a6b78'); R_(-30, -146, 4, 140, '#e8f6ff'); R_(22, -146, 3, 140, '#e8f6ff'); }
   else if (icon === 'wall') { for (let i = 0; i < 3; i++) for (let j = 0; j < 2; j++) { R_(-30 + j * 30, -24 - i * 24, 28, 22, '#8a6a42'); R_(-30 + j * 30, -24 - i * 24, 28, 3, '#6b5030'); } R_(-31, -73, 60, 2, c); }
+  else if (icon === 'rift') { R_(-5, -150, 10, 150, '#1a0a24'); R_(-2, -150, 4, 150, '#6a3a9a'); R_(-7, -110, 2, 60, '#b08ae0'); }
   else if (icon === 'coin') { R_(-7, -7, 14, 14, '#e8c35a'); R_(-5, -5, 10, 10, '#ffe08a'); R_(-1, -4, 2, 8, '#b08a2a'); }
   else if (icon === 'card') { R_(-8, -11, 16, 22, '#fff'); R_(-6, -9, 12, 18, c); }
   else { R_(-14, -24, 28, 24, '#8a6a42'); R_(-14, -24, 28, 4, '#6b5030'); R_(-2, -24, 4, 24, c); }
@@ -1140,6 +1142,8 @@ function drawMid() {
       ctx.save(); ctx.translate(e.x, e.y); ctx.scale(d * s, s);
       if (e.kind === 'spike') { ctx.fillStyle = e.c; ctx.beginPath(); ctx.moveTo(-26, -4); ctx.lineTo(16, 0); ctx.lineTo(-26, 4); ctx.fill(); ctx.fillStyle = '#0b0710'; ctx.beginPath(); ctx.moveTo(-24, -2); ctx.lineTo(13, 0); ctx.lineTo(-24, 2); ctx.fill(); }
       else if (e.kind === 'pen') { ctx.fillStyle = '#1d2a4a'; ctx.fillRect(-14, -2, 22, 4); ctx.fillStyle = '#ddd'; ctx.fillRect(8, -1, 5, 2); ctx.fillStyle = e.c; ctx.fillRect(-14, -3, 4, 6); ctx.rotate(0); }
+      else if (e.kind === 'coin') { drawIcon('coin', 0, 0, 1.2, CH.color); }
+      else if (e.kind === 'cuff') { ctx.rotate(P.t * 12); ctx.strokeStyle = '#d8dde6'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(-6, 0, 6, 0, 6.3); ctx.moveTo(12, 0); ctx.arc(6, 0, 6, 0, 6.3); ctx.stroke(); }
       else if (e.kind === 'arm') { ctx.rotate(P.t * 10); ctx.fillStyle = '#1b1b1f'; ctx.fillRect(-14, -4, 20, 8); ctx.fillStyle = '#e8c4a0'; ctx.fillRect(6, -5, 8, 10); }
       else if (e.kind === 'box') { ctx.rotate(P.t * 8); drawIcon('box', 0, 12, 1.4, CH.color); }
       else if (e.kind === 'card') { ctx.fillStyle = '#fff'; ctx.fillRect(-8, -5, 16, 10); ctx.fillStyle = e.c; ctx.fillRect(-6, -3, 12, 6); }

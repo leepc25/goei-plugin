@@ -60,8 +60,6 @@
     "1": [1, 2, 3, 4],
     "3": [1, 2, 3, 4],
     "W_1": [1, 2, 3, 4],
-    "4": [1, 2, 3, 4, 5, 6, 7, 8],
-    "5": [1, 2, 3, 4, 5, 6, 7, 8],
     "36": [2, 3, 4, 5, 6, 7, 8],
     "19": [7, 8, 9, 10, 11, 12],
     "21": [5, 6, 7, 8],
@@ -69,22 +67,42 @@
     "29": [1, 2, 3, 4],
     "39": [7, 8, 9, 10, 11, 12],
     "41": [2, 3, 4, 5, 6, 7, 8],
-    "17": [3, 4, 5, 6, 7, 8],
     "15": [2, 3, 4, 5]
   },
-  "hit": {},
+  "hit": {"9": 6, "10": 7, "11": 4, "12": 5, "13": 6, "14": 2, "15": 2},
   "gun": ["W", "W_1", "15"],
   "kick": ["12", "14"],
-  "ranged": {"proj": {"t": "proj", "kind": "bullet", "hit": {"dmg": 7, "kind": "light"}}, "heat": true},
+  "ranged": {
+    "proj": {"t": "waves", "n": 3, "r": 55, "color": "#E0A43A", "range": 260, "hit": {"dmg": 6, "kind": "light"}},
+    "heat": false,
+    "_note": "통화 소리"
+  },
   "skills": {
     "skill": {
       "name": "확인했어요, ~님",
       "anim": "22",
-      "fps": 11,
+      "fps": 9,
       "events": [
         {
-          "f": 4,
-          "fx": [{"t": "mark", "time": 6}, {"t": "melee", "range": 170, "hit": {"dmg": 30, "kind": "blow"}}]
+          "f": 3,
+          "fx": [
+            {"t": "ring", "at": "target", "r": 40, "color": "#E0A43A", "air": true, "h": 120},
+            {"t": "mark", "time": 6, "text": "특수 공격 봉인", "color": "#E0A43A"}
+          ]
+        },
+        {
+          "f": 5,
+          "fx": [
+            {"t": "ring", "at": "target", "r": 40, "color": "#E0A43A", "air": true, "h": 120},
+            {"t": "text", "v": "경고 1", "at": "target"}
+          ]
+        },
+        {
+          "f": 7,
+          "fx": [
+            {"t": "ring", "at": "target", "r": 40, "color": "#E0A43A", "air": true, "h": 120},
+            {"t": "text", "v": "경고 2", "at": "target"}
+          ]
         }
       ]
     },
@@ -92,32 +110,41 @@
       "name": "아홉 번째 대답",
       "hold": "23",
       "release": "24",
+      "armed": true,
       "levels": [0.5, 1.2],
       "fire": 2,
       "lv": {
-        "1": [{"t": "melee", "range": 170, "hit": {"dmg": 45, "kind": "heavy"}}],
-        "2": [{"t": "melee", "range": 170, "hit": {"dmg": 45, "kind": "heavy"}}]
+        "0": [{"t": "text", "v": "1, 2, 3…"}],
+        "1": [{"t": "text", "v": "5"}, {"t": "pull", "dist": 200}],
+        "2": [
+          {"t": "text", "v": "9", "big": true},
+          {"t": "flash", "v": 0.08},
+          {"t": "bind", "time": 4, "color": "#E0A43A"},
+          {"t": "text", "v": "아홉 꼬리", "at": "target"}
+        ]
       }
     },
     "super": {
       "name": "가장 소중한 것이 만나러 와요",
-      "sub": "「잘 보살펴 드릴게요, ~님.」",
+      "sub": "「가장 소중한 것이 만나러 와요.」",
       "anim": "25",
-      "fps": 9,
+      "fps": 7,
+      "armed": true,
       "events": [
         {
-          "f": 6,
+          "f": 7,
+          "hold": 0.4,
           "fx": [
-            {"t": "flash", "v": 0.1},
-            {
-              "t": "screen",
-              "spots": 6,
-              "each": [{"t": "melee", "range": 170, "hit": {"dmg": 45, "kind": "heavy"}}]
-            }
+            {"t": "text", "v": "빙의", "at": "target", "big": true},
+            {"t": "bind", "time": 6, "color": "#E0A43A"},
+            {"t": "mark", "time": 6, "color": "#E0A43A"},
+            {"t": "repeat", "n": 4, "every": 0.5, "fx": [{"t": "hit", "hit": {"dmg": 30, "kind": "heavy"}}]}
           ]
-        }
+        },
+        {"f": 10, "fx": [{"t": "text", "v": "구두가 예쁘네요~"}]}
       ]
     }
   },
-  "_note": "자동 생성. 값을 고치면 build가 그대로 씀. 다시 자동으로: build.py --reset 3.2_호유원"
+  "_note": "손으로 다듬음(표 「테스트룸」 절·fail 목록·기술안 3장). 그림 값은 자동. 다시 자동으로: build.py --reset 3.2_호유원",
+  "start": {"24": 2, "11": 2}
 }

@@ -54,25 +54,35 @@
     "42_1": {"folder": "42_1", "mirror": false, "name": "네발로 기기 반복"}
   },
   "picks": {"combat": 3, "weapon": 4, "apex": 4, "run": 3, "crawl4": 9},
-  "loops": {"W_1": [1, 2, 3]},
-  "hit": {},
+  "loops": {
+    "1": [1, 2, 3, 4],
+    "3": [1, 2, 3, 4],
+    "W_1": [1, 2, 3],
+    "37_1": [2, 3, 4, 5, 6, 7, 8, 9],
+    "38_1": [1, 2, 3, 4, 5, 6, 7, 8],
+    "42_1": [2, 3, 4, 5, 6, 7, 8, 9],
+    "21": [4, 5, 6, 7, 8],
+    "19": [9, 10, 11, 12],
+    "39": [9, 10, 11, 12],
+    "41": [3, 4, 5, 6, 7, 8],
+    "23": [3, 4, 5, 6, 7, 8]
+  },
+  "hit": {"9": 4, "10": 5, "11": 4, "12": 4, "13": 4, "14": 3, "15": 4},
   "gun": [],
   "kick": [],
-  "ranged": {"proj": {"t": "proj", "kind": "orb", "hit": {"dmg": 7, "kind": "light"}}, "heat": false},
+  "ranged": {
+    "proj": {"t": "waves", "n": 3, "r": 55, "color": "#ffffff", "range": 260, "hit": {"dmg": 8, "kind": "light"}},
+    "heat": false,
+    "_note": "박수 장풍(공기 고리)"
+  },
   "skills": {
     "skill": {
       "name": "너 승진",
       "anim": "22",
-      "fps": 11,
+      "fps": 9,
       "events": [
-        {
-          "f": 4,
-          "fx": [
-            {"t": "mark", "time": 6},
-            {"t": "buff", "time": 4, "label": "강화"},
-            {"t": "melee", "range": 170, "hit": {"dmg": 30, "kind": "heavy"}}
-          ]
-        }
+        {"f": 4, "fx": [{"t": "buff", "time": 8, "label": "내 사람 · 공격 +25%", "color": "#2E8B57"}]},
+        {"f": 7, "fx": [{"t": "text", "v": "짝!"}]}
       ]
     },
     "charge": {
@@ -80,38 +90,31 @@
       "hold": "23",
       "release": "24",
       "levels": [0.5, 1.2],
-      "fire": 2,
+      "fire": 3,
       "lv": {
-        "1": [
-          {"t": "buff", "time": 4, "label": "강화"},
-          {"t": "melee", "range": 170, "hit": {"dmg": 45, "kind": "heavy"}}
-        ],
-        "2": [
-          {"t": "buff", "time": 4, "label": "강화"},
-          {"t": "melee", "range": 170, "hit": {"dmg": 45, "kind": "heavy"}}
-        ]
+        "0": [{"t": "text", "v": "점검…"}],
+        "1": [{"t": "buff", "time": 10, "label": "받는 피해 -15%", "edge": false}],
+        "2": [{"t": "buff", "time": 10, "label": "받는 피해 -25% · 첫 피격 무효", "edge": false}]
       }
     },
     "super": {
       "name": "A조에 온 걸 환영해",
-      "sub": "「환영은 입구까지만.」",
+      "sub": "「A조에 온 걸 환영해.」",
       "anim": "25",
-      "fps": 9,
+      "fps": 8,
       "events": [
+        {"f": 2, "fx": [{"t": "heal", "v": 50}, {"t": "text", "v": "되감기"}]},
+        {"f": 4, "fx": [{"t": "dash", "speed": 1400, "time": 0.3, "hit": null}]},
+        {"f": 5, "fx": [{"t": "melee", "range": 190, "hit": {"dmg": 40, "kind": "heavy"}}]},
+        {"f": 7, "fx": [{"t": "melee", "range": 190, "hit": {"dmg": 40, "kind": "heavy"}}]},
         {
-          "f": 6,
-          "fx": [
-            {"t": "flash", "v": 0.1},
-            {"t": "heal", "on": "self", "v": 30},
-            {
-              "t": "screen",
-              "spots": 6,
-              "each": [{"t": "melee", "range": 170, "hit": {"dmg": 45, "kind": "heavy"}}]
-            }
-          ]
+          "f": 9,
+          "hold": 0.2,
+          "fx": [{"t": "melee", "range": 190, "hit": {"dmg": 70, "kind": "blow", "stop": 0.2, "shake": 14}}]
         }
       ]
     }
   },
-  "_note": "자동 생성. 값을 고치면 build가 그대로 씀. 다시 자동으로: build.py --reset 3.3_백석주"
+  "_note": "손으로 다듬음(표 「테스트룸」 절·fail 목록·기술안 3장). 그림 값은 자동. 다시 자동으로: build.py --reset 3.3_백석주",
+  "start": {"10": 2, "20": 2}
 }

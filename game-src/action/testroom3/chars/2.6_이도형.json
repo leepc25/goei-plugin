@@ -158,17 +158,8 @@
             {"t": "shake", "v": 16},
             {
               "t": "screen",
-              "spots": 5,
-              "every": 0.02,
-              "each": [
-                {
-                  "t": "slash",
-                  "style": "h",
-                  "size": 30,
-                  "color": "#ffffff",
-                  "hit": {"dmg": 200, "kind": "down", "stop": 0.25, "shake": 18}
-                }
-              ]
+              "spots": 0,
+              "each": [{"t": "hit", "hit": {"dmg": 200, "kind": "down", "stop": 0.25, "shake": 18}}]
             }
           ]
         }
