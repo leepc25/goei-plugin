@@ -45,8 +45,8 @@ export class EileenPlayer extends Player {
   private started = false;
   private lastTickAt = 0;
   private lastFrameAt = 0;
-  /** 방어 게이지 0..100 (사용자 2026-10-25: 방어를 무제한으로 못 하게). 막는 동안 닳고, 막은 공격만큼 더 깎인다.
-   * 바닥나면 가드가 풀리고(맞아서 바닥나면 잠깐 휘청), 40까지 차오를 때까지 다시 못 막는다 */
+  /** 방어 게이지 0..100 (사용자 2026-10-25: 방어를 무제한으로 못 하게). 막아낸 공격만큼만 깎이고, 안 맞으면 다시 찬다
+   * (막고만 있으면 줄지 않는다). 맞아서 바닥나면 가드가 깨져 잠깐 휘청이고, 40까지 차오를 때까지 다시 못 막는다 */
   guard = 100;
   guardBroken = false;
   /** 마지막으로 게이지가 줄어든 뒤 지난 초 (화면 표시가 이걸 보고 사라진다) */
@@ -231,14 +231,8 @@ export class EileenPlayer extends Player {
     if (this.guard <= 0) this.guardBroken = true;
   }
 
-  /** 막는 동안 초당 12씩 닳고, 안 막으면 0.8초 뒤부터 초당 35씩 찬다 */
+  /** 마지막으로 막아낸 뒤 0.8초가 지나면 초당 35씩 찬다 (막는 중이어도) */
   private guardStep(dt: number) {
-    const P = this.core.P;
-    if (P.mode === 'block') {
-      this.spendGuard(12 * dt);
-      if (this.guardBroken) this.core.onRelease('block');
-      return;
-    }
     this.guardIdle += dt;
     if (this.guardWait > 0) { this.guardWait -= dt; return; }
     this.guard = Math.min(100, this.guard + 35 * dt);
