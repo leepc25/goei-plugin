@@ -84,7 +84,7 @@ try {
     await page.click('[data-act=deploy]');
   // 출동 준비 → B3 주차장 승합차 앞에서 E (사용자 2026-10-25)
   await page.waitForFunction(() => !document.querySelector('[data-act=deploy]'));
-  await page.evaluate(() => window.__goeiEngine.world.stage.jump('b3', 370, 444));
+  await page.evaluate(() => window.__goeiEngine.world.stage.jump('b3', 370, 470));
   await page.waitForFunction(() => window.__goeiEngine.world?.floor?.id === 'hq:b3' && window.__goeiEngine.world.props.some((q) => q.id === 'spot:van'));
   await page.waitForTimeout(300);
   await page.keyboard.press('KeyE');

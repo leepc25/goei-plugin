@@ -202,7 +202,7 @@ export const HQ_SCENES: HqScene[] = [
   floorHall('b3', '지하 주차장', 'B3', [
     { id: 'supply', kind: 'steel', place: 'supply', label: '보급실' },
     { id: 'elev', kind: 'elevator' },
-  ], { spots: [{ id: 'van', x: 370, y: LANE_TOP + 24, verb: '출동', depart: true }] }),
+  ], { spots: [{ id: 'van', x: 370, y: LANE_TOP + 50, verb: '출동', depart: true }] }),
 ];
 export const SCENE_BY_ID = Object.fromEntries(HQ_SCENES.map((s) => [s.id, s])) as Record<SceneId, HqScene>;
 

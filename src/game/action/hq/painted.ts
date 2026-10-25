@@ -41,6 +41,8 @@ export interface PaintedScene {
   edgeR?: [number, number, number, number];
   /** 앞으로 튀어나온 벽: x0~x1 구간에서는 y가 이 값보다 뒤로 못 간다 */
   fronts?: [number, number, number][];
+  /** 바닥 모양이 비정형인 층: 걷는 바닥 다각형(발 위치). 있으면 옆벽·튀어나온 벽 대신 이걸 쓴다 */
+  floor?: [number, number][];
   doors: Record<string, PaintedDoor>;
   lamps: PaintedLamp[];
   windows: [number, number, number, number][];
@@ -127,7 +129,9 @@ export const PAINTED: Record<string, PaintedScene> = {
     objects: [],
   },
   b3: {
-    file: 'b3', w: 1906, under: true, edgeR: [1600, 445, 1906, 560], fronts: [[1000, 1600, 472]],
+    // 주차장: 차 앞 주차선(y448) 앞, 경비실(보급실) 앞벽(y485) 앞, 엘리베이터 옆벽 바닥선 왼쪽
+    file: 'b3', w: 1906, under: true, lane: [458, 669],
+    floor: [[0, 458], [1000, 458], [1000, 494], [1700, 494], [1906, 594], [1906, 669], [0, 669]],
     doors: {
       supply: { x0: 1405, x1: 1597, y0: 190, y1: 470, anim: 'swing', hinge: 'L' },
       elev: { x0: 1724, x1: 1849, y0: 130, y1: 552, seam: 1784, anim: 'slide2', behind: 'car', quad: [[1724, 165], [1849, 130], [1849, 552], [1724, 510]] },
@@ -155,9 +159,41 @@ export const PAINTED_LANE: [number, number] = [440, 669];
 export function clampPainted(scene: string, x: number, y: number): { x: number; y: number } {
   const p = PAINTED[scene];
   if (!p) return { x, y };
+  if (p.floor) return inPolygon(p.floor, x, y) ? { x, y } : nearestInside(p.floor, x, y);
   for (const [x0, x1, ym] of p.fronts ?? []) if (x >= x0 && x <= x1 && y < ym) y = ym;
   const at = (e: [number, number, number, number]) => (y <= e[1] ? e[0] : y >= e[3] ? e[2] : e[0] + ((y - e[1]) * (e[2] - e[0])) / (e[3] - e[1]));
   if (p.edgeL) x = Math.max(x, at(p.edgeL) + 24);
   if (p.edgeR) x = Math.min(x, at(p.edgeR) - 24);
   return { x, y };
+}
+
+function inPolygon(poly: [number, number][], x: number, y: number): boolean {
+  let inside = false;
+  for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+    const [xi, yi] = poly[i], [xj, yj] = poly[j];
+    if (yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) inside = !inside;
+  }
+  return inside;
+}
+/** 다각형 밖의 점 → 가장 가까운 변 위의 점을 안쪽으로 2px 들여서 */
+function nearestInside(poly: [number, number][], x: number, y: number): { x: number; y: number } {
+  let best = { x, y, d: Infinity };
+  for (let i = 0; i < poly.length; i++) {
+    const [ax, ay] = poly[i], [bx, by] = poly[(i + 1) % poly.length];
+    const dx = bx - ax, dy = by - ay, L = dx * dx + dy * dy || 1;
+    const t = Math.max(0, Math.min(1, ((x - ax) * dx + (y - ay) * dy) / L));
+    const qx = ax + dx * t, qy = ay + dy * t, d = (qx - x) ** 2 + (qy - y) ** 2;
+    if (d < best.d) best = { x: qx, y: qy, d };
+  }
+  // 안쪽으로 조금
+  const cx = poly.reduce((s, p) => s + p[0], 0) / poly.length, cy = poly.reduce((s, p) => s + p[1], 0) / poly.length;
+  const k = 2 / (Math.hypot(cx - best.x, cy - best.y) || 1);
+  return { x: best.x + (cx - best.x) * k, y: best.y + (cy - best.y) * k };
+}
+
+/** 문 앞에서 E가 닿는 깊이 한계(발 y): 문 그림 아래 끝 + 75 (옆벽 문은 사다리꼴 아래 끝) */
+export function doorReachY(scene: string, id: string): number | null {
+  const d = PAINTED[scene]?.doors[id];
+  if (!d) return null;
+  return (d.quad ? Math.max(...d.quad.map((q) => q[1])) : d.y1) + 80;
 }

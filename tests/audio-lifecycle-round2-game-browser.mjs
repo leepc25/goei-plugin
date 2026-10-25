@@ -79,7 +79,7 @@ try {
     await page.locator('[data-act="brief"]').click();
     await page.locator('[data-act="deploy"]').click();
     // 출동 준비 → B3 승합차 (사용자 2026-10-25)
-    await page.evaluate(() => window.__goeiEngine.world.stage.jump('b3', 370, 444));
+    await page.evaluate(() => window.__goeiEngine.world.stage.jump('b3', 370, 470));
     await page.waitForFunction(() => window.__goeiEngine.world?.props.some((q) => q.id === 'spot:van'));
     await page.keyboard.press('KeyE');
     await skipStory();

@@ -15,7 +15,7 @@ import { drawVisitAgent, visitAgentTop } from '../art/visitAgents';
 import { drawTestMan, hasTestPeople, testManTop, testPlayerTop } from '../art/testPeople';
 import { persp, view as fieldView } from './view';
 import { blockByProps, clearSpot, type BlockProp } from './propBlock';
-import { clampPainted } from '../hq/painted';
+import { clampPainted, doorReachY } from '../hq/painted';
 import { LANE_BOT, LANE_TOP, type HqBox, type HqDoor, type HqMapView, type HqScene, type HqSpot } from '../hq/map';
 
 type Door = HqDoor & { open: boolean };
@@ -220,7 +220,8 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
     for (const d of scene.doors) {
       const reach = Math.abs(d.x - px) < (scene.legacy ? 60 : 75);
       const lane = scene.lane ?? LANE;
-      const depth = scene.legacy || (isS(d) ? py > lane[1] - 60 : py < lane[0] + 75);
+      const reachY = scene.painted ? doorReachY(scene.painted, d.id) : null;
+      const depth = scene.legacy || (isS(d) ? py > lane[1] - 60 : py < Math.max(lane[0] + 75, reachY ?? 0));
       consider(`door:${d.id}`, 'hubdoor', d.x, reach && depth);
     }
     return best;
