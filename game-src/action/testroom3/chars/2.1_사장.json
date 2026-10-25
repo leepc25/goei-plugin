@@ -1,220 +1,563 @@
 {
-  "key": "2.1_사장",
-  "name": "사장",
-  "dir": "E",
-  "color": "#8A8A96",
-  "armed": false,
-  "anims": {
-    "1": {"folder": "1", "mirror": false, "name": "평상 대기"},
-    "2": {"folder": "2", "mirror": false, "name": "개인 대기 (넥타이 조이기)"},
-    "3_0": {"folder": "3_0", "mirror": false, "name": "전투 자세 잡기 (뒷짐 손날)"},
-    "3": {"folder": "3", "mirror": false, "name": "전투 대기 (발목에서 흔들림)"},
-    "W_1": {"folder": "W_1", "mirror": false, "name": "원거리 지목 대기"},
-    "4": {"folder": "4", "mirror": false, "name": "걷기 (뒷짐 곧은 다리)"},
-    "5": {"folder": "5", "mirror": false, "name": "뛰기 (조급한 질주)"},
-    "6": {"folder": "6", "mirror": false, "name": "제자리 점프 (T자로 떠오름)"},
-    "7": {"folder": "7", "mirror": false, "name": "방향 점프 (공중 의자)"},
-    "8": {"folder": "8", "mirror": false, "name": "달리다 점프 (넥타이 쥐고 높이뛰기)"},
-    "9": {"folder": "9", "mirror": false, "name": "약1 손날 창 찌르기"},
-    "10": {"folder": "10", "mirror": false, "name": "약2 손날 낮게 내리긋기"},
-    "11": {"folder": "11", "mirror": false, "name": "약3 대각선 올려긋기"},
-    "12": {"folder": "12", "mirror": false, "name": "강 판자 기울기 찌르기"},
-    "13": {"folder": "13", "mirror": false, "name": "돌진 T자 손날 찌르기"},
-    "14": {"folder": "14", "mirror": false, "name": "점프 공격 공중 손날 내리긋기"},
-    "15": {"folder": "15", "mirror": false, "name": "원거리 공격 (지목 후 수평으로 긋기)"},
-    "16": {"folder": "16", "mirror": false, "name": "뒤 회피 (인사하며 물러남)"},
-    "16_1": {"folder": "16_1", "mirror": false, "name": "앞 회피 (차렷 수평 파고들기)"},
-    "17": {"folder": "17", "mirror": false, "name": "막기 (재킷 자락 가림)"},
-    "18": {"folder": "18", "mirror": false, "name": "맞기 (판자째 뒤로 기욺)"},
-    "19": {"folder": "19", "mirror": false, "name": "날아가 쓰러지기 (판자째)"},
-    "20": {"folder": "20", "mirror": false, "name": "일어나기 (판자째 솟아 섬)"},
-    "21": {"folder": "21", "mirror": false, "name": "스턴 (줄 끊긴 듯 처짐)"},
-    "22": {"folder": "22", "mirror": false, "name": "고유기술 「검은 선」"},
-    "23": {"folder": "23", "mirror": false, "name": "충전 「분신」 모으기"},
-    "24": {"folder": "24", "mirror": false, "name": "충전 방출"},
-    "25": {"folder": "25", "mirror": false, "name": "필살기 「정지」"},
-    "26": {"folder": "26", "mirror": false, "name": "섭취"},
-    "27": {"folder": "27", "mirror": false, "name": "줍기 (한 무릎 꿇고)"},
-    "28": {"folder": "28", "mirror": false, "name": "응대 (자리 권하기)"},
-    "29": {"folder": "29", "mirror": false, "name": "말하며 손짓"},
-    "30": {"folder": "30", "mirror": false, "name": "끄덕이기"},
-    "31": {"folder": "31", "mirror": false, "name": "고개 젓기"},
-    "32": {"folder": "32", "mirror": false, "name": "화내기 (손목 두드려 재촉)"},
-    "33": {"folder": "33", "mirror": false, "name": "발견 반응 (목 빼고 들여다봄)"},
-    "34": {"folder": "34", "mirror": false, "name": "놀라기 (곧은 몸이 뒤로 기욺)"},
-    "35": {"folder": "35", "mirror": false, "name": "기뻐하기 (천천히 박수)"},
-    "36": {"folder": "36", "mirror": false, "name": "도망 (넥타이 쥐고 허둥지둥)"},
-    "37": {"folder": "37", "mirror": false, "name": "뒷걸음질 (움츠리기)"},
-    "37_1": {"folder": "37_1", "mirror": false, "name": "뒷걸음질 반복"},
-    "38": {"folder": "38", "mirror": true, "name": "엎드려 기기"},
-    "38_1": {"folder": "38_1", "mirror": true, "name": "엎드려 기기 반복"},
-    "39": {"folder": "39", "mirror": false, "name": "주저앉기"},
-    "40": {"folder": "40", "mirror": false, "name": "주저앉아 뒤로 기어나가기"},
-    "41": {"folder": "41", "mirror": false, "name": "웅크려 떨기"},
-    "42": {"folder": "42", "mirror": false, "name": "네발로 기기"},
-    "42_1": {"folder": "42_1", "mirror": false, "name": "네발로 기기 반복"}
+ "key": "2.1_사장",
+ "name": "사장",
+ "dir": "E",
+ "color": "#8A8A96",
+ "armed": false,
+ "anims": {
+  "1": {
+   "folder": "1",
+   "mirror": false,
+   "name": "평상 대기"
   },
-  "picks": {"combat": 4, "weapon": 4, "apex": 4, "run": 5, "crawl4": 9},
-  "loops": {
-    "1": [1, 2, 3, 4],
-    "3": [1, 2, 3, 4],
-    "W_1": [1, 2, 3, 4],
-    "19": [9, 10, 11, 12],
-    "21": [2, 3, 4, 5, 6, 7, 8],
-    "23": [7, 8],
-    "29": [1, 2, 3, 4],
-    "39": [5, 6, 7, 8, 9, 10, 11, 12],
-    "41": [4, 5, 6, 7, 8],
-    "38": [7, 8, 9, 10, 11, 12],
-    "15": [2, 3, 4]
+  "2": {
+   "folder": "2",
+   "mirror": false,
+   "name": "개인 대기 (넥타이 조이기)"
   },
-  "hit": {"9": 8, "10": 6, "11": 6, "12": 5, "13": 1, "14": 3, "15": 3},
-  "gun": [],
-  "kick": [],
-  "ranged": {
-    "proj": {
-      "t": "slash",
-      "at": "target",
-      "style": "arc",
-      "size": 70,
-      "dark": true,
-      "color": "#141418",
-      "hit": {"dmg": 8, "kind": "light"}
-    },
-    "heat": false,
-    "_note": "검지로 지목한 적 자리에 검은 선"
+  "3_0": {
+   "folder": "3_0",
+   "mirror": false,
+   "name": "전투 자세 잡기 (뒷짐 손날)"
   },
-  "skills": {
-    "skill": {
-      "name": "검은 선",
-      "anim": "22",
-      "fps": 10,
-      "events": [
-        {
-          "f": 3,
-          "fx": [
-            {
-              "t": "slash",
-              "at": "front",
-              "dx": 60,
-              "style": "h",
-              "dark": true,
-              "color": "#141418",
-              "size": 40
-            }
-          ]
-        },
-        {"f": 5, "fx": [{"t": "hide", "mode": "out", "dur": 0.12}]},
-        {
-          "f": 6,
-          "hold": 0.3,
-          "fx": [
-            {"t": "teleport", "to": "behind", "dist": 90, "puddle": false},
-            {
-              "t": "slash",
-              "at": "target",
-              "style": "arc",
-              "size": 120,
-              "dark": true,
-              "color": "#141418",
-              "hit": {"dmg": 35, "kind": "heavy"}
-            }
-          ]
-        },
-        {"f": 7, "fx": [{"t": "hide", "mode": "in", "dur": 0.12}]}
-      ]
-    },
-    "charge": {
-      "name": "분신",
-      "hold": "23",
-      "release": "24",
-      "levels": [0.5, 1.2],
-      "fire": 4,
-      "lv": {
-        "0": [{"t": "text", "v": "……"}],
-        "1": [
-          {
-            "t": "summon",
-            "icon": "decoy",
-            "at": "front",
-            "dx": -110,
-            "time": 8,
-            "color": "#7a7a80",
-            "alpha": 0.75,
-            "over": 0.6
-          }
-        ],
-        "2": [
-          {
-            "t": "summon",
-            "icon": "decoy",
-            "at": "front",
-            "dx": -140,
-            "time": 8,
-            "color": "#7a7a80",
-            "alpha": 0.75,
-            "over": 0.6
-          },
-          {
-            "t": "summon",
-            "icon": "decoy",
-            "at": "front",
-            "dx": 160,
-            "time": 8,
-            "color": "#7a7a80",
-            "alpha": 0.75,
-            "over": 0.6
-          },
-          {
-            "t": "summon",
-            "icon": "decoy",
-            "at": "front",
-            "dx": 330,
-            "time": 8,
-            "color": "#7a7a80",
-            "alpha": 0.75,
-            "over": 0.6
-          }
-        ]
+  "3": {
+   "folder": "3",
+   "mirror": false,
+   "name": "전투 대기 (발목에서 흔들림)"
+  },
+  "W_1": {
+   "folder": "W_1",
+   "mirror": false,
+   "name": "원거리 지목 대기"
+  },
+  "4": {
+   "folder": "4",
+   "mirror": false,
+   "name": "걷기 (뒷짐 곧은 다리)"
+  },
+  "5": {
+   "folder": "5",
+   "mirror": false,
+   "name": "뛰기 (조급한 질주)"
+  },
+  "6": {
+   "folder": "6",
+   "mirror": false,
+   "name": "제자리 점프 (T자로 떠오름)"
+  },
+  "7": {
+   "folder": "7",
+   "mirror": false,
+   "name": "방향 점프 (공중 의자)"
+  },
+  "8": {
+   "folder": "8",
+   "mirror": false,
+   "name": "달리다 점프 (넥타이 쥐고 높이뛰기)"
+  },
+  "9": {
+   "folder": "9",
+   "mirror": false,
+   "name": "약1 손날 창 찌르기"
+  },
+  "10": {
+   "folder": "10",
+   "mirror": false,
+   "name": "약2 손날 낮게 내리긋기"
+  },
+  "11": {
+   "folder": "11",
+   "mirror": false,
+   "name": "약3 대각선 올려긋기"
+  },
+  "12": {
+   "folder": "12",
+   "mirror": false,
+   "name": "강 판자 기울기 찌르기"
+  },
+  "13": {
+   "folder": "13",
+   "mirror": false,
+   "name": "돌진 T자 손날 찌르기"
+  },
+  "14": {
+   "folder": "14",
+   "mirror": false,
+   "name": "점프 공격 공중 손날 내리긋기"
+  },
+  "15": {
+   "folder": "15",
+   "mirror": false,
+   "name": "원거리 공격 (지목 후 수평으로 긋기)"
+  },
+  "16": {
+   "folder": "16",
+   "mirror": false,
+   "name": "뒤 회피 (인사하며 물러남)"
+  },
+  "16_1": {
+   "folder": "16_1",
+   "mirror": false,
+   "name": "앞 회피 (차렷 수평 파고들기)"
+  },
+  "17": {
+   "folder": "17",
+   "mirror": false,
+   "name": "막기 (재킷 자락 가림)"
+  },
+  "18": {
+   "folder": "18",
+   "mirror": false,
+   "name": "맞기 (판자째 뒤로 기욺)"
+  },
+  "19": {
+   "folder": "19",
+   "mirror": false,
+   "name": "날아가 쓰러지기 (판자째)"
+  },
+  "20": {
+   "folder": "20",
+   "mirror": false,
+   "name": "일어나기 (판자째 솟아 섬)"
+  },
+  "21": {
+   "folder": "21",
+   "mirror": false,
+   "name": "스턴 (줄 끊긴 듯 처짐)"
+  },
+  "22": {
+   "folder": "22",
+   "mirror": false,
+   "name": "고유기술 「검은 선」"
+  },
+  "23": {
+   "folder": "23",
+   "mirror": false,
+   "name": "충전 「분신」 모으기"
+  },
+  "24": {
+   "folder": "24",
+   "mirror": false,
+   "name": "충전 방출"
+  },
+  "25": {
+   "folder": "25",
+   "mirror": false,
+   "name": "필살기 「정지」"
+  },
+  "26": {
+   "folder": "26",
+   "mirror": false,
+   "name": "섭취"
+  },
+  "27": {
+   "folder": "27",
+   "mirror": false,
+   "name": "줍기 (한 무릎 꿇고)"
+  },
+  "28": {
+   "folder": "28",
+   "mirror": false,
+   "name": "응대 (자리 권하기)"
+  },
+  "29": {
+   "folder": "29",
+   "mirror": false,
+   "name": "말하며 손짓"
+  },
+  "30": {
+   "folder": "30",
+   "mirror": false,
+   "name": "끄덕이기"
+  },
+  "31": {
+   "folder": "31",
+   "mirror": false,
+   "name": "고개 젓기"
+  },
+  "32": {
+   "folder": "32",
+   "mirror": false,
+   "name": "화내기 (손목 두드려 재촉)"
+  },
+  "33": {
+   "folder": "33",
+   "mirror": false,
+   "name": "발견 반응 (목 빼고 들여다봄)"
+  },
+  "34": {
+   "folder": "34",
+   "mirror": false,
+   "name": "놀라기 (곧은 몸이 뒤로 기욺)"
+  },
+  "35": {
+   "folder": "35",
+   "mirror": false,
+   "name": "기뻐하기 (천천히 박수)"
+  },
+  "36": {
+   "folder": "36",
+   "mirror": false,
+   "name": "도망 (넥타이 쥐고 허둥지둥)"
+  },
+  "37": {
+   "folder": "37",
+   "mirror": false,
+   "name": "뒷걸음질 (움츠리기)"
+  },
+  "37_1": {
+   "folder": "37_1",
+   "mirror": false,
+   "name": "뒷걸음질 반복"
+  },
+  "38": {
+   "folder": "38",
+   "mirror": true,
+   "name": "엎드려 기기"
+  },
+  "38_1": {
+   "folder": "38_1",
+   "mirror": true,
+   "name": "엎드려 기기 반복"
+  },
+  "39": {
+   "folder": "39",
+   "mirror": false,
+   "name": "주저앉기"
+  },
+  "41": {
+   "folder": "41",
+   "mirror": false,
+   "name": "웅크려 떨기"
+  },
+  "42": {
+   "folder": "42",
+   "mirror": false,
+   "name": "네발로 기기"
+  },
+  "42_1": {
+   "folder": "42_1",
+   "mirror": false,
+   "name": "네발로 기기 반복"
+  }
+ },
+ "picks": {
+  "combat": 4,
+  "weapon": 4,
+  "apex": 4,
+  "run": 5,
+  "crawl4": 9
+ },
+ "loops": {
+  "1": [
+   1,
+   2,
+   3,
+   4
+  ],
+  "3": [
+   1,
+   2,
+   3,
+   4
+  ],
+  "W_1": [
+   1,
+   2,
+   3,
+   4
+  ],
+  "19": [
+   9,
+   10,
+   11,
+   12
+  ],
+  "21": [
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8
+  ],
+  "23": [
+   7,
+   8
+  ],
+  "29": [
+   1,
+   2,
+   3,
+   4
+  ],
+  "39": [
+   5,
+   6,
+   7,
+   8,
+   9,
+   10,
+   11,
+   12
+  ],
+  "41": [
+   4,
+   5,
+   6,
+   7,
+   8
+  ],
+  "38": [
+   7,
+   8,
+   9,
+   10,
+   11,
+   12
+  ],
+  "15": [
+   2,
+   3,
+   4
+  ]
+ },
+ "hit": {
+  "9": 8,
+  "10": 6,
+  "11": 6,
+  "12": 5,
+  "13": 1,
+  "14": 3,
+  "15": 3
+ },
+ "gun": [],
+ "kick": [],
+ "ranged": {
+  "proj": {
+   "t": "slash",
+   "at": "target",
+   "style": "arc",
+   "size": 70,
+   "dark": true,
+   "color": "#141418",
+   "hit": {
+    "dmg": 8,
+    "kind": "light"
+   }
+  },
+  "heat": false,
+  "_note": "검지로 지목한 적 자리에 검은 선"
+ },
+ "skills": {
+  "skill": {
+   "name": "검은 선",
+   "anim": "22",
+   "fps": 10,
+   "events": [
+    {
+     "f": 3,
+     "fx": [
+      {
+       "t": "slash",
+       "at": "front",
+       "dx": 60,
+       "style": "h",
+       "dark": true,
+       "color": "#141418",
+       "size": 40
       }
+     ]
     },
-    "super": {
-      "name": "정지",
-      "sub": "「……」",
-      "anim": "25",
-      "fps": 7,
-      "events": [
-        {
-          "f": 5,
-          "hold": 0.3,
-          "fx": [{"t": "gray", "time": 3.2}, {"t": "bind", "time": 3.2, "color": "#888"}, {"t": "text", "v": "딸깍"}]
-        },
-        {
-          "f": 7,
-          "fx": [{"t": "slash", "at": "target", "style": "arc", "size": 110, "dark": true, "color": "#141418"}]
-        },
-        {
-          "f": 9,
-          "fx": [{"t": "slash", "at": "target", "style": "x", "size": 110, "dark": true, "color": "#141418"}]
-        },
-        {
-          "f": 12,
-          "hold": 0.3,
-          "fx": [
-            {
-              "t": "slash",
-              "at": "target",
-              "style": "x",
-              "size": 160,
-              "dark": true,
-              "color": "#141418",
-              "hit": {"dmg": 220, "kind": "down", "n": 3, "mid": "heavy", "stop": 0.25, "shake": 18}
-            },
-            {"t": "text", "at": "target", "v": "쌓인 피해"}
-          ]
-        }
-      ]
+    {
+     "f": 5,
+     "fx": [
+      {
+       "t": "hide",
+       "mode": "out",
+       "dur": 0.12
+      }
+     ]
+    },
+    {
+     "f": 6,
+     "hold": 0.3,
+     "fx": [
+      {
+       "t": "teleport",
+       "to": "behind",
+       "dist": 90,
+       "puddle": false
+      },
+      {
+       "t": "slash",
+       "at": "target",
+       "style": "arc",
+       "size": 120,
+       "dark": true,
+       "color": "#141418",
+       "hit": {
+        "dmg": 35,
+        "kind": "heavy"
+       }
+      }
+     ]
+    },
+    {
+     "f": 7,
+     "fx": [
+      {
+       "t": "hide",
+       "mode": "in",
+       "dur": 0.12
+      }
+     ]
     }
+   ]
   },
-  "_note": "손으로 다듬음(표 「테스트룸」 절·fail 목록·기술안 2장). 그림 값은 자동. 다시 자동으로: build.py --reset 2.1_사장"
+  "charge": {
+   "name": "분신",
+   "hold": "23",
+   "release": "24",
+   "levels": [
+    0.5,
+    1.2
+   ],
+   "fire": 4,
+   "lv": {
+    "0": [
+     {
+      "t": "text",
+      "v": "……"
+     }
+    ],
+    "1": [
+     {
+      "t": "summon",
+      "icon": "decoy",
+      "at": "front",
+      "dx": -110,
+      "time": 8,
+      "color": "#7a7a80",
+      "alpha": 0.75,
+      "over": 0.6
+     }
+    ],
+    "2": [
+     {
+      "t": "summon",
+      "icon": "decoy",
+      "at": "front",
+      "dx": -140,
+      "time": 8,
+      "color": "#7a7a80",
+      "alpha": 0.75,
+      "over": 0.6
+     },
+     {
+      "t": "summon",
+      "icon": "decoy",
+      "at": "front",
+      "dx": 160,
+      "time": 8,
+      "color": "#7a7a80",
+      "alpha": 0.75,
+      "over": 0.6
+     },
+     {
+      "t": "summon",
+      "icon": "decoy",
+      "at": "front",
+      "dx": 330,
+      "time": 8,
+      "color": "#7a7a80",
+      "alpha": 0.75,
+      "over": 0.6
+     }
+    ]
+   }
+  },
+  "super": {
+   "name": "정지",
+   "sub": "「……」",
+   "anim": "25",
+   "fps": 7,
+   "events": [
+    {
+     "f": 5,
+     "hold": 0.3,
+     "fx": [
+      {
+       "t": "gray",
+       "time": 3.2
+      },
+      {
+       "t": "bind",
+       "time": 3.2,
+       "color": "#888"
+      },
+      {
+       "t": "text",
+       "v": "딸깍"
+      }
+     ]
+    },
+    {
+     "f": 7,
+     "fx": [
+      {
+       "t": "slash",
+       "at": "target",
+       "style": "arc",
+       "size": 110,
+       "dark": true,
+       "color": "#141418"
+      }
+     ]
+    },
+    {
+     "f": 9,
+     "fx": [
+      {
+       "t": "slash",
+       "at": "target",
+       "style": "x",
+       "size": 110,
+       "dark": true,
+       "color": "#141418"
+      }
+     ]
+    },
+    {
+     "f": 12,
+     "hold": 0.3,
+     "fx": [
+      {
+       "t": "slash",
+       "at": "target",
+       "style": "x",
+       "size": 160,
+       "dark": true,
+       "color": "#141418",
+       "hit": {
+        "dmg": 220,
+        "kind": "down",
+        "n": 3,
+        "mid": "heavy",
+        "stop": 0.25,
+        "shake": 18
+       }
+      },
+      {
+       "t": "text",
+       "at": "target",
+       "v": "쌓인 피해"
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "_note": "손으로 다듬음(표 「테스트룸」 절·fail 목록·기술안 2장). 그림 값은 자동. 다시 자동으로: build.py --reset 2.1_사장"
 }

@@ -230,11 +230,6 @@
    "mirror": true,
    "name": "주저앉기"
   },
-  "40": {
-   "folder": "40",
-   "mirror": true,
-   "name": "주저앉아 뒤로 기어나가기"
-  },
   "41": {
    "folder": "41",
    "mirror": true,
@@ -603,25 +598,56 @@
      "fx": [
       {
        "t": "flash",
-       "v": 0.12
+       "v": 0.15
       },
       {
        "t": "screen",
-       "spots": 6,
-       "every": 0.09,
+       "spots": 10,
+       "every": 0.05,
        "each": [
         {
          "t": "boom",
          "vfx": "jyaldi-super-blast2",
-         "scale": 0.9,
+         "scaleR": [
+          1.0,
+          1.5
+         ],
          "r": 110,
+         "shake": 10,
          "hit": {
-          "dmg": 120,
-          "kind": "launch",
-          "n": 3,
-          "mid": "heavy",
-          "stop": 0.2,
-          "shake": 16
+          "dmg": 40,
+          "kind": "heavy",
+          "stop": 0.06,
+          "shake": 10
+         }
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "f": 9,
+     "hold": 0.2,
+     "fx": [
+      {
+       "t": "screen",
+       "spots": 12,
+       "every": 0.04,
+       "each": [
+        {
+         "t": "boom",
+         "vfx": "jyaldi-super-blast2",
+         "scaleR": [
+          1.2,
+          1.9
+         ],
+         "r": 110,
+         "shake": 10,
+         "hit": {
+          "dmg": 40,
+          "kind": "heavy",
+          "stop": 0.06,
+          "shake": 10
          }
         }
        ]
@@ -631,6 +657,34 @@
     {
      "f": 10,
      "fx": [
+      {
+       "t": "flash",
+       "v": 0.2
+      },
+      {
+       "t": "screen",
+       "spots": 0,
+       "each": [
+        {
+         "t": "boom",
+         "vfx": "jyaldi-super-blast2",
+         "scaleR": [
+          2.3,
+          2.6
+         ],
+         "r": 110,
+         "shake": 10,
+         "hit": {
+          "dmg": 120,
+          "kind": "launch",
+          "n": 3,
+          "mid": "heavy",
+          "stop": 0.2,
+          "shake": 18
+         }
+        }
+       ]
+      },
       {
        "t": "buff",
        "time": 3,

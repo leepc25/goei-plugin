@@ -86,7 +86,7 @@ const ACTIONS = [   // 사용자 2026-10-25 키 배치(앞으로 쓸 키) + 나�
  ['weapon','무기 꺼내기/넣기(무기 없으면 겨눈 자세)','Tab'],['jump','점프 · 공중에서 2단','Space'],
  ['run','짧게 = 회피(누른 방향, 없으면 뒤) · 길게 = 달리기','ShiftLeft'],['dodge','회피만(따로 쓰고 싶을 때)',''],
  ['pick','상호작용 · 줍기 · 선택','KeyE'],['map','지도(테스트룸: 조작 요약 보이기/숨기기)','KeyM'],
- ['combat','전투 자세 켜기/끄기','KeyR'],['sit','주저앉기 켜기/끄기(앉아서 뒤쪽 키 = 뒤로 기어나가기)','KeyZ'],
+ ['combat','전투 자세 켜기/끄기','KeyR'],['sit','주저앉기 켜기/끄기','KeyZ'],
  ['crouch','웅크리기 켜기/끄기(웅크려서 방향키 = 네발로 기기)','KeyX'],['flee','도망(누른 채)','KeyV'],['back','뒷걸음질(누른 채)','ControlLeft'],
  // ── 테스트용 ──
  ['prevChar','이전 인물','BracketLeft'],['nextChar','다음 인물','BracketRight'],['skill2','둘째 기술(있는 인물만)','KeyG'],
@@ -137,6 +137,36 @@ const items = [];
 let audio = null;
 try { audio = window.GoeiAudio.createGameAudio({ load: () => store.get('audio', null), save: v => store.set('audio', v) }); } catch (e) { audio = null; }
 function sfx(type, extra = {}) { if (audio) try { audio.event({ type, x: P.x, ...extra }); } catch {} }
+// 폭발 소리(기술·충전·필살기): 공용 소리 대신 직접 합성 — 터지는 순간의 굉음(잡음+찌그러짐) + 낮게 꺼지는 울림 + 흩어지는 파편 소리
+let bctx = null, bnoise = null, bmuted = false;
+function boomSnd(strength = 2, x = P.x) {
+  if (bmuted || !started || performance.now() - (boomSnd.last || 0) < 45) return; boomSnd.last = performance.now();   // 한꺼번에 여럿 터지면 겹치지 않게
+  try {
+    if (!bctx) { bctx = new (window.AudioContext || window.webkitAudioContext)(); const n = bctx.sampleRate * 2.5; bnoise = bctx.createBuffer(1, n, bctx.sampleRate); const d = bnoise.getChannelData(0); let b = 0; for (let i = 0; i < n; i++) { b = 0.97 * b + 0.03 * (Math.random() * 2 - 1); d[i] = (Math.random() * 2 - 1) * 0.6 + b * 4; } }
+    if (bctx.state === 'suspended') bctx.resume();
+    const t = bctx.currentTime + 0.005, k = Math.min(1.6, 0.55 + strength * 0.25), len = 0.7 + strength * 0.35;
+    const out = bctx.createGain(); out.gain.value = 0.55 * k;
+    const pan = bctx.createStereoPanner ? bctx.createStereoPanner() : null; if (pan) { pan.pan.value = Math.max(-0.7, Math.min(0.7, (x - cv.width / 2) / cv.width)); out.connect(pan); pan.connect(bctx.destination); } else out.connect(bctx.destination);
+    const comp = bctx.createDynamicsCompressor(); comp.threshold.value = -18; comp.ratio.value = 6; comp.connect(out);
+    const shaper = bctx.createWaveShaper(); const c = new Float32Array(1024); for (let i = 0; i < 1024; i++) { const v = i / 512 - 1; c[i] = Math.tanh(v * 3.5); } shaper.curve = c; shaper.connect(comp);
+    // 1) 굉음: 잡음을 밝게 시작해 어둡게 닫음
+    const n1 = bctx.createBufferSource(); n1.buffer = bnoise; n1.playbackRate.value = 0.8 + Math.random() * 0.3;
+    const lp = bctx.createBiquadFilter(); lp.type = 'lowpass'; lp.Q.value = 0.7; lp.frequency.setValueAtTime(5200, t); lp.frequency.exponentialRampToValueAtTime(900, t + 0.12); lp.frequency.exponentialRampToValueAtTime(140, t + len);
+    const g1 = bctx.createGain(); g1.gain.setValueAtTime(0.0001, t); g1.gain.exponentialRampToValueAtTime(1.0, t + 0.006); g1.gain.exponentialRampToValueAtTime(0.35, t + 0.18); g1.gain.exponentialRampToValueAtTime(0.0001, t + len);
+    n1.connect(lp); lp.connect(g1); g1.connect(shaper); n1.start(t, Math.random() * 0.8); n1.stop(t + len + 0.05);
+    // 2) 몸으로 느끼는 낮은 울림: 높게 때리고 아래로 꺼짐
+    const o = bctx.createOscillator(); o.type = 'sine'; o.frequency.setValueAtTime(120, t); o.frequency.exponentialRampToValueAtTime(38, t + 0.35); o.frequency.exponentialRampToValueAtTime(28, t + len * 0.8);
+    const g2 = bctx.createGain(); g2.gain.setValueAtTime(0.0001, t); g2.gain.exponentialRampToValueAtTime(1.1, t + 0.01); g2.gain.exponentialRampToValueAtTime(0.0001, t + len * 0.8);
+    o.connect(g2); g2.connect(comp); o.start(t); o.stop(t + len);
+    // 3) 흩어지는 파편: 짧은 딱딱 소리 몇 개
+    for (let i = 0; i < 4 + strength * 3; i++) {
+      const tt = t + 0.08 + Math.random() * len * 0.7, s2 = bctx.createBufferSource(); s2.buffer = bnoise;
+      const hp = bctx.createBiquadFilter(); hp.type = 'bandpass'; hp.frequency.value = 1500 + Math.random() * 3500; hp.Q.value = 2;
+      const g3 = bctx.createGain(); g3.gain.setValueAtTime(0.25 * Math.random() + 0.1, tt); g3.gain.exponentialRampToValueAtTime(0.0001, tt + 0.03 + Math.random() * 0.05);
+      s2.connect(hp); hp.connect(g3); g3.connect(comp); s2.start(tt, Math.random() * 2); s2.stop(tt + 0.1);
+    }
+  } catch {}
+}
 let started = false, song = store.get('song', 'chase');
 function startAudio() { if (started || !audio) return; started = true; try { audio.unlock && audio.unlock(); audio.floor('hq'); audio.music(song || null); } catch {} }
 
@@ -275,7 +305,7 @@ const FX = {
   self(s, c) {
     const k = K(P.y) * (s.scale || 1), x0 = P.x, y0 = P.y, f = P.face;
     vfx(s.vfx, x0, y0 - P.z, k, { flip: f < 0, under: s.under !== false });
-    sfx('hit', { strength: s.strength || 2, kind: 'super' });
+    boomSnd(s.strength || 2, P.x);
     for (const g of (s.craters || [])) later(g.at || 0, () => craterAt(x0 + f * g.dx * k, y0 + (g.dy || 0) * k, k * (g.k || 0.6), g.hold || 3));   // 이펙트 그림 속 폭발 자리마다 바닥 파괴(그림 화소 기준)
     for (const h of (s.hits || [{}])) later(h.at || 0, () => {
       const x = x0 + f * (h.dx ?? 150) * k;
@@ -286,11 +316,12 @@ const FX = {
   },
   // 큰 폭발 한 번(바닥에서 솟음) + 공용 바닥 파괴
   boom(s, c) {
-    const p = posOf({ at: 'target', ...s }, c), sc = (s.scale || 1) * p.k;
+    const p = posOf({ at: 'target', ...s }, c), sc = (s.scaleR ? s.scaleR[0] + Math.random() * (s.scaleR[1] - s.scaleR[0]) : s.scale || 1) * p.k;   // scaleR: [최소, 최대] 무작위 크기
     vfx(s.vfx, p.x, p.gy, sc, { flip: Math.random() < 0.5 });
+    if (s.shake) shake = Math.max(shake, s.shake);
     later(0.1, () => { craterAt(p.x, p.gy, sc * 0.9, s.scorch || 3); dust(p.x, p.gy, 8, sc * 1.6); });
-    sfx('hit', { strength: 3, kind: 'super' });
-    if (near(p.x, p.gy, (s.r || 120) * sc, 80)) later(s.at || 0.12, () => strike(s.hit));
+    boomSnd(3, P.x);
+    if (s.hit && near(p.x, p.gy, (s.r || 120) * sc, 80)) later(s.at || 0.12, () => strike(s.hit));
   },
   // 폭발 하나: vfx 그림(기본 RPG 폭발) + 그을음. hand면 손 앞 공중, 아니면 바닥
   blast(s, c) {
@@ -298,7 +329,7 @@ const FX = {
     if (!vfx(s.vfx || 'eileen-rpg-explosion', p.x + (onAir ? P.face * 26 * sc : 0), onAir ? p.hy : p.gy - 4, sc * 1.2, onAir ? { center: true, flip: P.face < 0 } : {})) for (let i = 0; i < 14; i++) { const a = Math.random() * 6.28, v = 80 + Math.random() * 300; fx.push({ k: 'fire', x: p.x, y: onAir ? p.hy : p.gy - 30, vx: Math.cos(a) * v, vy: Math.sin(a) * v * 0.7 - 60, r: 8 + Math.random() * 12, t: 0.6, t0: 0.6 }); }
     if (s.scorch) craterAt(p.x, p.gy, sc * 0.7, s.scorch);
     if (!onAir) dust(p.x, p.gy, 6, sc);
-    sfx('hit', { strength: 2, kind: 'super' });
+    boomSnd(2, P.x);
     if (near(p.x, p.gy, (s.r || 110) * p.k, s.depth || 75)) strike(s.hit, p.hy);
   },
   // 앞으로 일직선 연쇄 폭발
@@ -309,7 +340,7 @@ const FX = {
     ring(p.x, p.gy, r, 0.5, s.color || 'rgba(255,230,180,.9)', 7, 0.3);
     for (let i = 0; i < n; i++) { const a = i / n * Math.PI * 2; later(i * 0.03, () => { const x = p.x + Math.cos(a) * r * 0.8, gy = p.gy + Math.sin(a) * r * 0.24; vfx(s.vfx || 'eileen-rpg-explosion', x, gy - 4, (s.scale || 1.5) * p.k); dust(x, gy, 3, 1.5); }); }
     if (s.center !== false) later(0.12, () => vfx(s.vfx || 'eileen-rpg-explosion', p.x, p.gy - 4, (s.scale || 1.5) * 1.6 * p.k));
-    sfx('hit', { strength: 3, kind: 'super' });
+    boomSnd(3, P.x);
     if (near(p.x, p.gy, r, r * 0.35 + 30)) later(0.08, () => strike(s.hit));
   },
   // 바닥에서 하늘로 솟는 폭발 기둥(폭발 그림을 위로 쌓음)
@@ -318,7 +349,7 @@ const FX = {
     for (let i = 0; i < 4; i++) later(i * 0.06, () => vfx(s.vfx || 'eileen-rpg-explosion', p.x + (Math.random() - 0.5) * 10, p.gy - 4 - i * 70 * sc, sc * (1.2 - i * 0.15)));
     for (let i = 0; i < 18; i++) fx.push({ k: 'fire', x: p.x + (Math.random() - 0.5) * 30 * sc, y: p.gy - Math.random() * 40, vx: (Math.random() - 0.5) * 60, vy: -500 - Math.random() * 500, r: 8 + Math.random() * 10, t: 0.5 + Math.random() * 0.3, t0: 0.8 });
     if (s.scorch !== 0) craterAt(p.x, p.gy, sc * 0.8, s.scorch || 3);
-    sfx('hit', { strength: 3, kind: 'super' });
+    boomSnd(3, P.x);
     if (near(p.x, p.gy, 90 * sc, 70)) strike(s.hit);
   },
   // 화면 전체: 샌드백 + 무작위 자리 spots곳에 each 부품을 차례로
@@ -661,7 +692,7 @@ function getUp() { if (!has('20')) return toIdle(); sfx('wakeup'); P.knockT = 0;
 function belly() {
   if (!has('38')) return;
   P.mode = 'belly';
-  if (has('38_1')) return play('38', { seq: S(R(0, nOf('38') - 1), 0.1), onEnd: () => { if (P.mode === 'belly') play('38_1', { fps: 8, loopFrom: 0 }); } });
+  if (has('38_1')) return play('38', { seq: S(R(0, Math.min(4, nOf('38') - 1)), 0.1), onEnd: () => { if (P.mode === 'belly') play('38_1', { seq: S(R(0, nOf('38_1') - 2), 0.12), loopFrom: 0 }); } });   // 38은 배 깐 장(5장)까지, 이어 38_1 포복 반복(끝 장 = 첫 장이라 뺌)
   const lp = LP('38') || R(Math.min(4, nOf('38') - 1), nOf('38') - 1);
   play('38', { seq: [...S(R(0, lp[0] - 1), 0.11), ...S(lp, 0.1)], loopFrom: lp[0] });
 }
@@ -917,8 +948,7 @@ function update(dt) {
     case 'stun': P.stunT -= dt; if (P.stunT <= 0) reverseOut('21', [curF() > 1 ? 1 : curF(), 0], 0.07); break;
     case 'flee': if (!down('flee')) { toIdle(); break; } if (dx) P.face = dx; P.x += P.face * 400 * dt; P.y += dy * 180 * dt; break;
     case 'back': { if (!down('back')) { toIdle(); break; } if (P.clip && P.clip.id === '37_1') P.x -= P.face * 80 * dt; P.y += dy * 60 * dt; break; }
-    case 'sit': if (P.clip && P.clip.id === '39' && P.clip.i >= Math.min(sitLp()[0], P.clip.seq.length - 1) && dx && dx === -P.face) { P.mode = 'scoot'; if (has('40')) play('40', { fps: 6, loopFrom: 0 }); } break;
-    case 'scoot': if (!(dx && dx === -P.face)) { if (has('40')) sitLoop(); else P.mode = 'sit'; break; } P.x -= P.face * (has('40') ? 70 : 40 * (0.6 + 0.4 * Math.sin(P.t * 9))) * dt; break;   // 40이 없으면 앉아 떠는 장 반복 그대로 조금씩 뒤로
+    case 'sit': break;   // 주저앉아 뒤로 기기(40)는 사용자 2026-10-25 결정으로 전원 삭제 — 앉은 채 뒤로 가지 않음
     case 'crouch': if (P.clip && P.clip.i >= crLp()[0] && dx && has('42')) { P.face = dx; P.mode = 'crawl4'; const c4 = PK('crawl4', '42'); if (has('42_1')) play('42', { seq: S(R(0, c4), 0.08), onEnd: () => { if (P.mode === 'crawl4') { const n = nOf('42_1'), lp = LP('42_1') || R(Math.min(1, n - 1), n - 1); play('42_1', { seq: S(lp, 0.1), loopFrom: 0 }); } } }); else { const lp = LP('42') || R(Math.min(4, nOf('42') - 1), nOf('42') - 1); play('42', { seq: [...S(R(0, lp[0] - 1), 0.08), ...S(lp, 0.085)], loopFrom: lp[0] }); } } break;
     case 'crawl4': { const go = dx !== 0, looping = P.clip.id === '42_1' || P.clip.i >= 4; if (go) P.face = dx; P.clip.paused = !go && looping; if (go && looping) P.x += dx * 85 * dt; break; }
   }
@@ -1382,7 +1412,7 @@ document.getElementById('sa').onchange = e => showArmor = e.target.checked;
 const songSel = document.getElementById('song');
 for (const id of ['', ...((window.GoeiAudio && window.GoeiAudio.SONG_IDS) || [])]) { const o = document.createElement('option'); o.value = id; o.textContent = id || '없음'; if (id === song) o.selected = true; songSel.append(o); }
 songSel.onchange = () => { song = songSel.value; store.set('song', song); if (started && audio) try { audio.music(song || null); } catch {} };
-document.getElementById('mute').onchange = e => { if (audio) try { audio.setMuted(e.target.checked); } catch {} };
+document.getElementById('mute').onchange = e => { bmuted = e.target.checked; if (audio) try { audio.setMuted(e.target.checked); } catch {} };
 const sz = document.getElementById('sz'); sz.value = Math.round(charScale * 100); document.getElementById('szv').textContent = (+charScale.toFixed(2)) + '배';
 sz.oninput = () => { charScale = sz.value / 100; store.set('size', charScale); document.getElementById('szv').textContent = (+charScale.toFixed(2)) + '배'; };
 document.getElementById('ps').onchange = e => persp = e.target.checked;

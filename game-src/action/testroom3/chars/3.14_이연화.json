@@ -1,138 +1,494 @@
 {
-  "key": "3.14_이연화",
-  "name": "이연화",
-  "dir": "E",
-  "color": "#5B5D8F",
-  "armed": true,
-  "anims": {
-    "1": {"folder": "1", "mirror": true, "name": "평상 대기"},
-    "2": {"folder": "2", "mirror": false, "name": "개인 대기 (안경 올리고 눈 비비기)"},
-    "3_0": {"folder": "3_0", "mirror": false, "name": "전투 자세 잡기 (잠깐만요)"},
-    "3": {"folder": "3", "mirror": false, "name": "전투 대기"},
-    "W": {"folder": "W", "mirror": true, "name": "무기 꺼내기 (포션병)"},
-    "W_1": {"folder": "W_1", "mirror": false, "name": "무기 대기"},
-    "4": {"folder": "4", "mirror": false, "name": "걷기 (지친 걸음)"},
-    "5": {"folder": "5", "mirror": false, "name": "뛰기 (사무직 질주)"},
-    "6": {"folder": "6", "mirror": false, "name": "제자리 점프 (치마 점프)"},
-    "7": {"folder": "7", "mirror": false, "name": "방향 점프 (안경 붙잡고)"},
-    "8": {"folder": "8", "mirror": false, "name": "달리다 점프 (허우적)"},
-    "9": {"folder": "9", "mirror": false, "name": "약1 옷깃 낚아채기"},
-    "10": {"folder": "10", "mirror": false, "name": "약2 존댓말 뺨"},
-    "11": {"folder": "11", "mirror": false, "name": "약3 두 손 밀쳐 내기"},
-    "12": {"folder": "12", "mirror": false, "name": "강 구두 굽 내리밟기"},
-    "13": {"folder": "13", "mirror": false, "name": "돌진 넘어지듯 끌어안기"},
-    "14": {"folder": "14", "mirror": false, "name": "점프 공격 (구두 굽 세우기)"},
-    "15": {"folder": "15", "mirror": false, "name": "원거리 포션병 끼얹기"},
-    "16": {"folder": "16", "mirror": false, "name": "뒤 회피 (손바닥 내밀고 펄쩍)"},
-    "16_1": {"folder": "16_1", "mirror": false, "name": "앞 회피 (가운 끌어안고 파고듦)"},
-    "17": {"folder": "17", "mirror": false, "name": "막기 (가운 펼치기)"},
-    "18": {"folder": "18", "mirror": false, "name": "맞기"},
-    "19": {"folder": "19", "mirror": false, "name": "날아가 쓰러지기"},
-    "20": {"folder": "20", "mirror": false, "name": "일어나기"},
-    "21": {"folder": "21", "mirror": false, "name": "스턴 (카페인 떨어짐)"},
-    "22": {"folder": "22", "mirror": false, "name": "고유기술 잠깐만요"},
-    "23": {"folder": "23", "mirror": false, "name": "충전 포션 조제 모으기"},
-    "24": {"folder": "24", "mirror": false, "name": "충전 방출"},
-    "25": {"folder": "25", "mirror": false, "name": "필살기 과장님!"},
-    "26": {"folder": "26", "mirror": false, "name": "섭취 (커피)"},
-    "27": {"folder": "27", "mirror": false, "name": "줍기 (주워 들여다보기)"},
-    "28": {"folder": "28", "mirror": false, "name": "응대"},
-    "29": {"folder": "29", "mirror": false, "name": "말하며 손짓"},
-    "30": {"folder": "30", "mirror": false, "name": "끄덕이기"},
-    "31": {"folder": "31", "mirror": false, "name": "고개 젓기"},
-    "32": {"folder": "32", "mirror": false, "name": "화내기 (과장님!)"},
-    "33": {"folder": "33", "mirror": false, "name": "발견 반응 (움찔 → 들여다보기)"},
-    "34": {"folder": "34", "mirror": false, "name": "놀라기 (입 가리기)"},
-    "35": {"folder": "35", "mirror": false, "name": "기뻐하기 (이게 제일 재밌네)"},
-    "36": {"folder": "36", "mirror": false, "name": "도망 (안경 붙잡고)"},
-    "37": {"folder": "37", "mirror": false, "name": "뒷걸음질 (움츠리기)"},
-    "37_1": {"folder": "37_1", "mirror": false, "name": "뒷걸음질 반복"},
-    "38": {"folder": "38_W", "mirror": true, "name": "엎드려 기기"},
-    "38_1": {"folder": "38_1_W", "mirror": true, "name": "엎드려 기기 반복"},
-    "39": {"folder": "39", "mirror": false, "name": "주저앉기"},
-    "40": {"folder": "40", "mirror": false, "name": "주저앉아 뒤로 기어나가기"},
-    "41": {"folder": "41", "mirror": false, "name": "웅크려 떨기"},
-    "42": {"folder": "42", "mirror": false, "name": "네발로 기기"},
-    "42_1": {"folder": "42_1", "mirror": false, "name": "네발로 기기 반복"}
+ "key": "3.14_이연화",
+ "name": "이연화",
+ "dir": "E",
+ "color": "#5B5D8F",
+ "armed": true,
+ "anims": {
+  "1": {
+   "folder": "1",
+   "mirror": true,
+   "name": "평상 대기"
   },
-  "picks": {"combat": 4, "weapon": 4, "apex": 5, "run": 3, "crawl4": 11},
-  "loops": {
-    "1": [1, 2, 3, 4],
-    "3": [1, 2, 3, 4],
-    "W_1": [1, 2, 3, 4],
-    "21": [3, 4, 5, 6, 7, 8],
-    "29": [1, 2, 3, 4],
-    "37_1": [1, 2, 3, 4, 5, 6, 7, 8, 9],
-    "38_1": [1, 2, 3, 4, 5, 6, 7, 8, 9],
-    "39": [9, 10, 11, 12],
-    "40": [1, 2, 3, 4, 5, 6, 7, 8],
-    "41": [4, 5, 6, 7, 8],
-    "42_1": [1, 2, 3, 4, 5, 6, 7, 8, 9],
-    "19": [10, 11, 12],
-    "15": [4, 5, 6],
-    "23": [3, 4, 5, 6, 7, 8]
+  "2": {
+   "folder": "2",
+   "mirror": false,
+   "name": "개인 대기 (안경 올리고 눈 비비기)"
   },
-  "hit": {"9": 5, "10": 6, "11": 4, "12": 5, "13": 3, "14": 1},
-  "gun": ["W", "W_1", "15"],
-  "kick": [],
-  "ranged": {
-    "proj": {
-      "t": "proj",
-      "kind": "orb",
-      "hit": {"dmg": 7, "kind": "light"},
-      "speed": 1300,
-      "size": 0.7,
-      "color": "#a070e0"
-    },
-    "heat": false,
-    "_note": "병 입구에서 액체"
+  "3_0": {
+   "folder": "3_0",
+   "mirror": false,
+   "name": "전투 자세 잡기 (잠깐만요)"
   },
-  "skills": {
-    "skill": {
-      "name": "잠깐만요",
-      "anim": "22",
-      "fps": 9,
-      "events": [
-        {
-          "f": 4,
-          "fx": [
-            {"t": "text", "v": "잠깐만요!", "big": true},
-            {"t": "ring", "at": "front", "dx": 140, "r": 60, "color": "#ff3a3a"},
-            {"t": "mark", "time": 3, "text": "위험 지점", "color": "#ff3a3a"}
-          ]
-        }
-      ]
-    },
-    "charge": {
-      "name": "포션 조제",
-      "hold": "23",
-      "release": "24",
-      "armed": true,
-      "levels": [0.5, 1.2],
-      "fire": 3,
-      "lv": {
-        "0": [{"t": "text", "v": "…"}],
-        "1": [{"t": "heal", "v": 30}],
-        "2": [{"t": "heal", "v": 15}, {"t": "buff", "time": 15, "label": "위험 면역 포션", "edge": false}]
+  "3": {
+   "folder": "3",
+   "mirror": false,
+   "name": "전투 대기"
+  },
+  "W": {
+   "folder": "W",
+   "mirror": true,
+   "name": "무기 꺼내기 (포션병)"
+  },
+  "W_1": {
+   "folder": "W_1",
+   "mirror": false,
+   "name": "무기 대기"
+  },
+  "4": {
+   "folder": "4",
+   "mirror": false,
+   "name": "걷기 (지친 걸음)"
+  },
+  "5": {
+   "folder": "5",
+   "mirror": false,
+   "name": "뛰기 (사무직 질주)"
+  },
+  "6": {
+   "folder": "6",
+   "mirror": false,
+   "name": "제자리 점프 (치마 점프)"
+  },
+  "7": {
+   "folder": "7",
+   "mirror": false,
+   "name": "방향 점프 (안경 붙잡고)"
+  },
+  "8": {
+   "folder": "8",
+   "mirror": false,
+   "name": "달리다 점프 (허우적)"
+  },
+  "9": {
+   "folder": "9",
+   "mirror": false,
+   "name": "약1 옷깃 낚아채기"
+  },
+  "10": {
+   "folder": "10",
+   "mirror": false,
+   "name": "약2 존댓말 뺨"
+  },
+  "11": {
+   "folder": "11",
+   "mirror": false,
+   "name": "약3 두 손 밀쳐 내기"
+  },
+  "12": {
+   "folder": "12",
+   "mirror": false,
+   "name": "강 구두 굽 내리밟기"
+  },
+  "13": {
+   "folder": "13",
+   "mirror": false,
+   "name": "돌진 넘어지듯 끌어안기"
+  },
+  "14": {
+   "folder": "14",
+   "mirror": false,
+   "name": "점프 공격 (구두 굽 세우기)"
+  },
+  "15": {
+   "folder": "15",
+   "mirror": false,
+   "name": "원거리 포션병 끼얹기"
+  },
+  "16": {
+   "folder": "16",
+   "mirror": false,
+   "name": "뒤 회피 (손바닥 내밀고 펄쩍)"
+  },
+  "16_1": {
+   "folder": "16_1",
+   "mirror": false,
+   "name": "앞 회피 (가운 끌어안고 파고듦)"
+  },
+  "17": {
+   "folder": "17",
+   "mirror": false,
+   "name": "막기 (가운 펼치기)"
+  },
+  "18": {
+   "folder": "18",
+   "mirror": false,
+   "name": "맞기"
+  },
+  "19": {
+   "folder": "19",
+   "mirror": false,
+   "name": "날아가 쓰러지기"
+  },
+  "20": {
+   "folder": "20",
+   "mirror": false,
+   "name": "일어나기"
+  },
+  "21": {
+   "folder": "21",
+   "mirror": false,
+   "name": "스턴 (카페인 떨어짐)"
+  },
+  "22": {
+   "folder": "22",
+   "mirror": false,
+   "name": "고유기술 잠깐만요"
+  },
+  "23": {
+   "folder": "23",
+   "mirror": false,
+   "name": "충전 포션 조제 모으기"
+  },
+  "24": {
+   "folder": "24",
+   "mirror": false,
+   "name": "충전 방출"
+  },
+  "25": {
+   "folder": "25",
+   "mirror": false,
+   "name": "필살기 과장님!"
+  },
+  "26": {
+   "folder": "26",
+   "mirror": false,
+   "name": "섭취 (커피)"
+  },
+  "27": {
+   "folder": "27",
+   "mirror": false,
+   "name": "줍기 (주워 들여다보기)"
+  },
+  "28": {
+   "folder": "28",
+   "mirror": false,
+   "name": "응대"
+  },
+  "29": {
+   "folder": "29",
+   "mirror": false,
+   "name": "말하며 손짓"
+  },
+  "30": {
+   "folder": "30",
+   "mirror": false,
+   "name": "끄덕이기"
+  },
+  "31": {
+   "folder": "31",
+   "mirror": false,
+   "name": "고개 젓기"
+  },
+  "32": {
+   "folder": "32",
+   "mirror": false,
+   "name": "화내기 (과장님!)"
+  },
+  "33": {
+   "folder": "33",
+   "mirror": false,
+   "name": "발견 반응 (움찔 → 들여다보기)"
+  },
+  "34": {
+   "folder": "34",
+   "mirror": false,
+   "name": "놀라기 (입 가리기)"
+  },
+  "35": {
+   "folder": "35",
+   "mirror": false,
+   "name": "기뻐하기 (이게 제일 재밌네)"
+  },
+  "36": {
+   "folder": "36",
+   "mirror": false,
+   "name": "도망 (안경 붙잡고)"
+  },
+  "37": {
+   "folder": "37",
+   "mirror": false,
+   "name": "뒷걸음질 (움츠리기)"
+  },
+  "37_1": {
+   "folder": "37_1",
+   "mirror": false,
+   "name": "뒷걸음질 반복"
+  },
+  "38": {
+   "folder": "38_W",
+   "mirror": true,
+   "name": "엎드려 기기"
+  },
+  "38_1": {
+   "folder": "38_1_W",
+   "mirror": true,
+   "name": "엎드려 기기 반복"
+  },
+  "39": {
+   "folder": "39",
+   "mirror": false,
+   "name": "주저앉기"
+  },
+  "41": {
+   "folder": "41",
+   "mirror": false,
+   "name": "웅크려 떨기"
+  },
+  "42": {
+   "folder": "42",
+   "mirror": false,
+   "name": "네발로 기기"
+  },
+  "42_1": {
+   "folder": "42_1",
+   "mirror": false,
+   "name": "네발로 기기 반복"
+  }
+ },
+ "picks": {
+  "combat": 4,
+  "weapon": 4,
+  "apex": 5,
+  "run": 3,
+  "crawl4": 11
+ },
+ "loops": {
+  "1": [
+   1,
+   2,
+   3,
+   4
+  ],
+  "3": [
+   1,
+   2,
+   3,
+   4
+  ],
+  "W_1": [
+   1,
+   2,
+   3,
+   4
+  ],
+  "21": [
+   3,
+   4,
+   5,
+   6,
+   7,
+   8
+  ],
+  "29": [
+   1,
+   2,
+   3,
+   4
+  ],
+  "37_1": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "38_1": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "39": [
+   9,
+   10,
+   11,
+   12
+  ],
+  "41": [
+   4,
+   5,
+   6,
+   7,
+   8
+  ],
+  "42_1": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "19": [
+   10,
+   11,
+   12
+  ],
+  "15": [
+   4,
+   5,
+   6
+  ],
+  "23": [
+   3,
+   4,
+   5,
+   6,
+   7,
+   8
+  ]
+ },
+ "hit": {
+  "9": 5,
+  "10": 6,
+  "11": 4,
+  "12": 5,
+  "13": 3,
+  "14": 1
+ },
+ "gun": [
+  "W",
+  "W_1",
+  "15"
+ ],
+ "kick": [],
+ "ranged": {
+  "proj": {
+   "t": "proj",
+   "kind": "orb",
+   "hit": {
+    "dmg": 7,
+    "kind": "light"
+   },
+   "speed": 1300,
+   "size": 0.7,
+   "color": "#a070e0"
+  },
+  "heat": false,
+  "_note": "병 입구에서 액체"
+ },
+ "skills": {
+  "skill": {
+   "name": "잠깐만요",
+   "anim": "22",
+   "fps": 9,
+   "events": [
+    {
+     "f": 4,
+     "fx": [
+      {
+       "t": "text",
+       "v": "잠깐만요!",
+       "big": true
+      },
+      {
+       "t": "ring",
+       "at": "front",
+       "dx": 140,
+       "r": 60,
+       "color": "#ff3a3a"
+      },
+      {
+       "t": "mark",
+       "time": 3,
+       "text": "위험 지점",
+       "color": "#ff3a3a"
       }
-    },
-    "super": {
-      "name": "과장님!",
-      "sub": "「과장님!」",
-      "anim": "25",
-      "fps": 8,
-      "armed": true,
-      "events": [
-        {"f": 5, "fx": [{"t": "text", "v": "과장님!", "big": true}]},
-        {
-          "f": 8,
-          "fx": [
-            {"t": "screen", "spots": 4, "every": 0.1, "each": [{"t": "text", "v": "X"}]},
-            {"t": "mark", "time": 12, "text": "작동 원리 재구성", "color": "#b8a0e8"}
-          ]
-        }
-      ]
+     ]
     }
+   ]
   },
-  "_note": "손으로 다듬음(표 「테스트룸」 절·fail 목록·기술안 3장). 그림 값은 자동. 다시 자동으로: build.py --reset 3.14_이연화"
+  "charge": {
+   "name": "포션 조제",
+   "hold": "23",
+   "release": "24",
+   "armed": true,
+   "levels": [
+    0.5,
+    1.2
+   ],
+   "fire": 3,
+   "lv": {
+    "0": [
+     {
+      "t": "text",
+      "v": "…"
+     }
+    ],
+    "1": [
+     {
+      "t": "heal",
+      "v": 30
+     }
+    ],
+    "2": [
+     {
+      "t": "heal",
+      "v": 15
+     },
+     {
+      "t": "buff",
+      "time": 15,
+      "label": "위험 면역 포션",
+      "edge": false
+     }
+    ]
+   }
+  },
+  "super": {
+   "name": "과장님!",
+   "sub": "「과장님!」",
+   "anim": "25",
+   "fps": 8,
+   "armed": true,
+   "events": [
+    {
+     "f": 5,
+     "fx": [
+      {
+       "t": "text",
+       "v": "과장님!",
+       "big": true
+      }
+     ]
+    },
+    {
+     "f": 8,
+     "fx": [
+      {
+       "t": "screen",
+       "spots": 4,
+       "every": 0.1,
+       "each": [
+        {
+         "t": "text",
+         "v": "X"
+        }
+       ]
+      },
+      {
+       "t": "mark",
+       "time": 12,
+       "text": "작동 원리 재구성",
+       "color": "#b8a0e8"
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "_note": "손으로 다듬음(표 「테스트룸」 절·fail 목록·기술안 3장). 그림 값은 자동. 다시 자동으로: build.py --reset 3.14_이연화"
 }
