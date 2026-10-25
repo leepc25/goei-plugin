@@ -572,6 +572,7 @@ def main():
     room = (HERE / "room.html").read_text(encoding="utf-8")
     audio = (EIL / "testroom" / "audio.js").read_text(encoding="utf-8")
     html = room.replace("/*__INDEX__*/null", json.dumps(index, ensure_ascii=False)).replace("/*__VFX__*/null", json.dumps(load_vfx())).replace("/*__AUDIO__*/", audio)
+    if npc: html = html.replace("<title>요원 통합 테스트룸</title>", "<title>NPC 테스트룸</title>", 1)
     (OUT / "index.html").write_text(html, encoding="utf-8")
     print(OUT / "index.html", (OUT / "index.html").stat().st_size // 1024, "KB ·", len(index), "명")
 
