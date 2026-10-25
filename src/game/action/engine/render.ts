@@ -415,6 +415,8 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
     draw(w: World, alpha: number) {
       ctx.imageSmoothingEnabled = false;
       const shake = w.shakeT > 0 ? (w.tick % 2 ? 1 : -1) * w.shakeP * 2 : 0;
+      // 에일린은 그림 장마다 실제 시간으로 움직인다 (테스트룸과 같게)
+      if (w.player instanceof EileenPlayer) w.player.frameStep();
       const camX = Math.round(lerp(w.prevCamX, w.camX, alpha));
       drawCam = camX;
       ctx.save();
@@ -522,7 +524,14 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
       if (w.showBoxes) boxes(w, camX);
       ctx.restore();
       if (w.cutin > 0) cutin(w);
-      if (w.player instanceof EileenPlayer) w.player.drawScreen(ctx);
+      if (w.player instanceof EileenPlayer) {
+        // 컷인·번쩍임·쓰러짐은 화면 기준 (화면 확대·세로 따라가기와 무관)
+        ctx.save();
+        const hz = ctx.canvas.height / SCREEN_H;
+        ctx.setTransform(hz, 0, 0, hz, 0, 0);
+        w.player.drawScreen(ctx);
+        ctx.restore();
+      }
       if (opt.hud) hud(w);
       overlayText(w);
     },

@@ -3,6 +3,7 @@
 // 화면 틀·메뉴·HUD는 ui 모듈(껍데기)이 있으면 그쪽을, 없으면 엔진 기본을 쓴다.
 import { pfont } from './pxfont';
 import { view } from './view';
+import { charSize } from '../charSize';
 import { SCREEN_H, SCREEN_W, TICK_HZ, type GameEvent, type HqModuleLike, type RunConfigCore, type RunResultCore, type StageModule } from './contract';
 import type { Art } from './art';
 import { Input, type Pad } from './input';
@@ -135,7 +136,8 @@ export class Game {
       }
       if (!this.mods.covered?.()) {
         const w = this.world;
-        view.zoom = this.canvas.height / SCREEN_H;
+        // 설정 「화면 확대」: 배경과 사람을 같이 키운다 (기본 100% = 세로 720이 창에 꽉)
+        view.zoom = (this.canvas.height / SCREEN_H) * Math.max(1, charSize.k);
         if (w) view.lane = w.lane;
         const vw = this.canvas.width / view.zoom;
         // 화면 밀기는 그림과 같은 보간 위치로 (틱 위치로 하면 걸을 때 화면이 30Hz로 툭툭 따라가 캐릭터가 떨린다).
@@ -148,9 +150,17 @@ export class Game {
             raw = Math.max(0, Math.min(SCREEN_W - vw, px - cam - vw / 2));
           view.crop = Math.round((cam + raw) * view.zoom) / view.zoom - cam;
         }
+        // 확대해서 세로가 다 안 들어가면 주인공 발이 화면 아래쪽 1/3에 오게 위아래를 자른다
+        view.cropY = 0;
+        const vh = this.canvas.height / view.zoom;
+        if (vh < SCREEN_H && w) {
+          const a = paused ? 1 : this.acc / T, p = w.player as { y: number; py?: number };
+          const py = (p.py ?? p.y) + (p.y - (p.py ?? p.y)) * a;
+          view.cropY = Math.round(Math.max(0, Math.min(SCREEN_H - vh, py - vh * 0.7)) * view.zoom) / view.zoom;
+        }
         this.ctx.save();
         this.ctx.scale(view.zoom, view.zoom);
-        this.ctx.translate(-view.crop, 0);
+        this.ctx.translate(-view.crop, -view.cropY);
         this.scene.draw(paused ? 1 : this.acc / T);
         this.ctx.restore();
         this.mods.overlay?.(this.ctx, this.world, dt);

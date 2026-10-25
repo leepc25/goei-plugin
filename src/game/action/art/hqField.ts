@@ -121,7 +121,8 @@ function drawDoor(c: CanvasRenderingContext2D, im: HTMLImageElement, d: PaintedD
     }
   };
   const e = open * open * (3 - 2 * open); // 부드럽게
-  // 엘리베이터 말고는 모두 살짝만 연다 (사용자 2026-10-25: 투명 유리는 뒤가 들통나고, 다른 문도 살짝 열리는 느낌만)
+  // 엘리베이터 말고는 모두 아주 살짝만 연다 (여닫이 11°, 미닫이 7%, 셔터 10%)
+  // (사용자 2026-10-25: 투명 유리는 뒤가 들통나고, 다른 문도 살짝 열리는 느낌만)
   const glass = d.behind !== 'car';
   /** 여닫이 한 짝: 경첩(hx)을 축으로 안쪽으로 돈다. 폭은 cos로 줄고, 먼 끝은 원근으로 짧아지며 어두워진다.
    *  dir = 경첩에서 문짝이 뻗는 쪽 (1 오른쪽, -1 왼쪽) */
@@ -144,25 +145,25 @@ function drawDoor(c: CanvasRenderingContext2D, im: HTMLImageElement, d: PaintedD
   };
   switch (d.anim) {
     case 'slide2': {
-      const s = d.seam ?? (d.x0 + d.x1) / 2, lw = s - d.x0, rw = d.x1 - s, k = glass ? 0.2 : 1;
+      const s = d.seam ?? (d.x0 + d.x1) / 2, lw = s - d.x0, rw = d.x1 - s, k = glass ? 0.07 : 1;
       leaf(d.x0, lw, d.x0 - lw * e * k, lw, 0, 1);
       leaf(s, rw, s + rw * e * k, rw, 0, -1);
       break;
     }
     case 'swing': {
-      if (d.hinge === 'L') swingLeaf(d.x0, w, d.x0, 1, glass ? 30 : 78);
-      else swingLeaf(d.x0, w, d.x1, -1, glass ? 30 : 78);
+      if (d.hinge === 'L') swingLeaf(d.x0, w, d.x0, 1, glass ? 11 : 78);
+      else swingLeaf(d.x0, w, d.x1, -1, glass ? 11 : 78);
       break;
     }
     case 'swing2': {
       const s = d.seam ?? (d.x0 + d.x1) / 2, lw = s - d.x0, rw = d.x1 - s;
-      swingLeaf(d.x0, lw, d.x0, 1, glass ? 30 : 78);
-      swingLeaf(s, rw, d.x1, -1, glass ? 30 : 78);
+      swingLeaf(d.x0, lw, d.x0, 1, glass ? 11 : 78);
+      swingLeaf(s, rw, d.x1, -1, glass ? 11 : 78);
       break;
     }
     case 'shutter': {
       // 셔터: 위로 말려 올라간다
-      c.drawImage(im, d.x0, d.y0, w, h, d.x0, d.y0 - h * e * (glass ? 0.3 : 1), w, h);
+      c.drawImage(im, d.x0, d.y0, w, h, d.x0, d.y0 - h * e * (glass ? 0.1 : 1), w, h);
       break;
     }
     default:

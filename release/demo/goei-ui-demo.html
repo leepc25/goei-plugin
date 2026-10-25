@@ -1716,6 +1716,354 @@ function nine(c, im, s, x, y, w, h, k = 2) {
   c.restore();
 }
 
+// src/game/action/ui/pixelHudArt.ts
+var HUD_ART = { "btn": { "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAA8klEQVR42u3aMQrCMBQG4D8hmwjewcXBURB6hoyKdxGEQE8jOuYMguDo4OJZ0iUusU0KgryU/19Lw/ua1ywvajZfICagzigAMB/E+XKtUnHY7wIApWtGHE8Oy9UaAIJJH97ujypROkU02w2892ILHqpP922X9Hbqy1drWWtFQ4bqM6UXpbRZ6QObEuL9esr4N1qXPYg0JhJCCCGEEEIIIYQQQgghhBBCCCGEEEIIIYQQQgghhJApQeIIOpvsxMpai6Z1IjClsbn5dQGxrcU5+58yas7uva9mzp7uikmlktsqFxXva4UxR5zExHsASk3l4lkHfyRFUx/wU9AAAAAASUVORK5CYII=", "w": 50, "h": 50, "inner": [8, 8, 42, 42] }, "slot": { "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAACa0lEQVR42u3av0vjYBgH8G/DbSIUhJu7OAjlKiEiiHDTLZ0rjsdVqVJEFwcnBycHF4+jqNz1uLG0cxenghSKITQiOLj4n/SG83nNj/dN3mByyVveZ0zbNJ8876+8T0oLi2UIYoZiRol38IMI0esPuB/s7bdxfzeE8/iSyVWa1QrWNuvC/9jeasx4mBInI0JE1hhCXF91Ir+3vdUIZcZIigCA66sOdg9PYVYr/x0BAEfHJ6Gm782IFIKXmTRCFtG56WK19gkAcHlxzjJDEB/CrFakm03npvtuhOvY0oif38+we3gawpQWFsuhTIwnNjbWLR/MG1l1dNkbRwiKy4tz/qgVRCyvWLmOt3SjxxM7hBB19lAHzBtBo1TcwGIUHUGxvGL5WkqijKgU8wXZ228rC/jzu/sGqZmWkhhCMEi71UQwM3nOFUkQNJGyPkJLDRUy40WMJ7Yf4jy+MF2RMTwEd9RKaxGYZdzfDX0I4fBbMy3lOr6eEDVEQzRkDiCuY+uMFA4SnDl1RjRkjiFRzV1nJI+Q3g7y7mVF/SjvWNusiyG0rV9e+oiv35qFRdCzknfjgUEIAaDQCB6GWo7hTZUKiCCG9hdY01IJwXskN1RFBDF6HlFq9Zu0OJpl9PqDyHqlEbe2KQImDgEI3nyYug+sVlcEjEzlmJWnX4vwAICDnYavBDx1H4QnSOuxWHZ3s91q+mCj2yHwWp6mYwwTdeFBRJovDCTdqiWENyM+jAxkdDvE85ONH7/SaXYHO41EGC+CBwGA2ecv9diT9PqD1J/rN9b/Vc7iMEGECBKJcR0705VAHIaHiIIAir149hc87AtIps5xKwAAAABJRU5ErkJggg==", "w": 50, "h": 50, "inner": [7, 7, 43, 43] }, "item": { "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAABlElEQVR42u1avU7DMBC+s7xVlfoAhaVLh46VKnVhYkEZQTxGlw59hAxZ8hgIRouFqUulSh0AMbDwLGZJJdeNcewaJ7HuW63zfV9s5zv/4GA4ggoS/IAQBhfl58dOnp5fnHt4fLi/hMAZPDlIAECuitjtD84d3dzeBRGxfXv14rBab6AscnkcEdjtD7BczK0dCSEgy7IzAiGh56iDzpWpjU2+hi1BCDTJoXNloZJPprMoMSZwU8P7x6fTtPn5/nJOrsdUP48/14Np+jPb4usSyiI3tjFIBCSEhMQQIoToDXGdK4ttdv9lmslMLRwMRzKVNYKhy4VYUDhj2r/fLo+OiRsLVQDGgokbOTsJISEkhISQEBJCQqhopKKxedE4vrqmrW4XwAHqb4psB8ptwcT15KKnL7CextMBXQtI9oCOhJCQ2EJW600vPOTEEH0CddOcTGfONZoe0+QJh8nvuE9QqEKzLsbXmJkavFzMnY0ohtnVQefKXb+GbkSh9i7q6Pg84eAAgGWRS9/F3fbepXpEgJjKw7NfHsShrBl1hm0AAAAASUVORK5CYII=", "w": 50, "h": 50, "inner": [1, 1, 49, 49] }, "portrait": { "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAABQCAYAAACOEfKtAAAGh0lEQVR42u2dv2siTRjHnw12ISCIVmpjYyExBCGQxspGtrzjStHi7kiTJkUIBISDw8LGJkUKg2VIysXGyiZwIJINKdKkSVJtWPA/2Le4PPM+O+6uM7trLtH5QhAOd3bns9/59YzznLa5lQQiB8JJg8+pyPVN8IVdXl0Ll/Lt65cwD6J9NCgh6uxgPbQ3BzoAAIdHxwsLMAwDdF2HXrcDotdQ4XXLUtjnOTw6ZnWTqIPGAB4eHcP+XgXOzvtw8L0FP34ewMy2AACgWqvDTnmbFXBr3sF4NIRqrQ4vz08Lb5jN5QEAWBm9bgeqtXqs4MajIYNnGIbUtY8P93PgDcOAx4d7l0tPTtvw+1cbbv5MEKIbIADA/l6FNU20NmmqTMlURujhZrYFhWIJsrk8vDw/sTfc63aEyxBRo9liFcd72a+W8PVoFq+mTXnc/JlQF2oJ/iL8wuXVNbtQtln4WT6byzN3RC2T1615By/PTwyel6tkRcF9+/qFsaFK+F18ctqGQrHk6u9kVSiWGCwKEZ0i45AgpdIZVjaFF7W/PTw6hlvzDs7O+77fSQQV4AVPpunarxak0hkwDGMOIv7FKQpvcNGHQrEU+iXNbAt63Q6DKA2QwkumMtBotmB/rwI/fh6wN77IFdgJp9IZGFz0XRDtV4v1W1E1uOiz+yG8VDrD4M1si90bR1u8Pz/gYBk4iOA149FQ3oEUHgAIw6NN2A9ioViSHi0XvSysOMJDcIOLvqv16Lrue+9CsQSDiz40mi0YvJURpATfEdPpCop3nv1qQXm3IlS5bC7P3p5Xc45z/kedN7MtqNbqcGveQXm34vqkAxp2I+Z0wuoXZBKekQvgwfeW50hzctr2hGdOJwvfED9NoBDjFO88nBuKzAGrtTqUdyuuOa2fQ3lGCX4Ks2h+hvDIw4kuzRwKG5tV3CL3EH4uXBTgKO7XlfW6HQDuxSf4uZrIyBUCHn7XEXVsREk/F0Jc1KfzXc9GhHWkFrJi7/G3NOA85I1PHo76l9LmHKj0v0Qn4AqgzyJCdJKfULi8VzYz2xJatioHejTdRrMlHK9UDlQOjF/KgcqB6+FAZ4Um4A7vQFFtBNn48OgYZrbl2p3ChfWqidYplc7AzLZcgVi/ENeGX8Qllc6waCwAzEFcVdFIOg3+Cjmw1+2Arutsd6taq7v2cNcBItaxWquzfRVUNpcHczrxBahRiAB/N2kKxRKY08lKNtug5mxOJyz2iRtg49EQ442abxNG22LYOq6tx88qDPnTXz4s7AMxcKjrutQm0ipqp7wNQcFWNQ+MKAVQAVQAFUAFUEkBVAAVQAVQSQH8oADXfT2sHKgAKoAKoJIC+O8ArntYXxognrkIOqGzLro17wIP2swB5I83xX0c6zND9DrbQgE6yVRmznnj0RDKuxV4p1/XfwjN7L9nYajruLMtjqcD+bNjuJWHBQXt0K+KcP+brzuebPL7lf6csAB6fmRdhHWlBw39DuB4AjSnk7WF5wfRbyayIWppvo9YxX4PwB04WfYPLFfpcE7ouggB1HVdKB3IOkroF6r4i00VFwzpwPJuBRrNllrShXWgOZ24TnQrhXSgUkgHvjw/KQdGcWA2l1cOVA5cHkAWWQiK/yl4c3KYA2mWMol1b5iTSs47VW5pzzUeDV28EgDzGdsWrQGrtTqGeaSB4AtaxpySHJKRfi4MU2G+Ly89Pty7UuC5+kDDMGB/b3E2InoIR1SYFIzCi3tQwtUSppvCnIUyov18Npf3fMk3fyawv1dhEBN0veuVtQgLo/Ewelqn0WyxkA//icdGeec1mq3YE+/QYDBCpC9N1MGonfL23KkkClFqFMbgKj4gTQMVJD94y8ijSjOzRYGIZhJ9wQmZBwz6d79PP3jLODoWBFGqnId7SKYy7NSmNMCZbbl2oqJGpHl4y4pw06SJmMktyr3o9q4fSD8HauPRkKVGjpow9j3gYdn2qxtilJeB8N5mHJrX6B7UhLXxaOjslLdjS0KL8PiMvlFFM/dis6NnncOKg+cNaXMr6dD8y79/tT3THkcR9icID7cK4+4HaQ5AWyD7pKwur67h7LzvyoetbW4lHczWi/MpkTka9o0iE+JUOuPKFMknO0Sw/NwxTF/LQxSdfIukgz85bTNOmGOVJeKmEBc1F5pMW6ZPW4YrgtwuM1Bgk/VKgerF4G1kZ5nMpSCKTG9iXKeGWuSLSrafpPCwD4xjsb+2/x3Gf6CzG+xq0xJOAAAAAElFTkSuQmCC", "w": 80, "h": 80, "inner": [8, 8, 72, 72] }, "hp": { "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPQAAAAVCAYAAABxN8PZAAACLElEQVR42u2bMUvDQBiG34CbCIVC5y4OQmlKKQguTi7+CbGIg4MuDuIguHVwESRowe6lnbt06lIohGJFcHBxFgT/QRxKyuWau0vba0DzPlvotQk9nrzffck5m1s5pEAAQsja2UhD5o93f3Ywfvvkv06IJaqlIgBge6cGAHASJHQAAO1OVzlgOPIjx/d3Dai+E14AIWQ1QolFTEIH7U4XXrOV6ASDfk8pfrVUxMn5DWeBkBWpuOVZaJpK7kgae80WvGYLg35vNmD/4HBO4hCVzLobwmTsc4YIieHouI6XyaudNXQoYSisKLIo8cXlFfZ2a7GJ/PDcVV6QLPLP9xdnkGQSOSQrbhkAlO6o0lkrdJJElRNZXB+rymuKTEi8zCaR5TCNwUkstJjUZ6f1hdfIFJmQ5RJ5MvZjfcnlC3CrNQz6PWfhhF622SWKTIkJRY5KrBNZk8ZO6JM8Ru5yB+KJJ2MfT48eTOtsikzI+hNZlFn5oUroiluea3ax0UXIaiIvKbFR5DihAxtlNUUmFDm5yIbSOrHIotDKN8FMiczSmpApYYPKosgLywxommK6VNYlci5f4OySTCALLK+Pl212rYKVzRlyiUFIlkgi8bpF1go9HPnaTRRutRZpuxOSZUyvZ9pcIxtr9OvbRgBMXydj0hJijzQSee6Hdc+hbWPaiMGmGvnnOGs/gWL7pFWxVSJTYEKR0xFaKbeN7Y6CyA7nmpB0hY6I/dfuWIRkiV+57hhMWXT1tAAAAABJRU5ErkJggg==", "w": 244, "h": 21, "inner": [17, 5, 225, 14], "rows": [[], [], [], [], [], [[34, 225]], [[32, 224]], [[30, 221]], [[27, 219]], [[25, 217]], [[23, 215]], [[21, 213]], [[19, 210]], [[17, 20]], [], [], [], [], [], [], []] }, "gauge": { "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALYAAAAICAYAAABUMAUBAAAA00lEQVR42mPk5hX4n19SwTAKEMDK3GTIuPXYyTOjEYYGJvZ0MLDAOBcuXoJLHNy9bcActXL1Gjg7PDRkYAJmkLlnMLplMLnH3tULzjbQ12NgYGBAJGzkBC0gLEZ3x314+wprCTQQbkF3j5W5CYq76O2mweQWfHE1UO6BpVvkBM402hQYBcMRDMqEPRjajcglz2Bqxw50aT2Q9g75hD0YAKy6HQVDEzBy8wr8t3f1YjDQ10PpQI6CUTDUACwNH9y9jYGRm1eAgYGB4f9osIyC4VRgAwDKTFEYfzeX/QAAAABJRU5ErkJggg==", "w": 182, "h": 8, "inner": [5, 1, 177, 6], "rows": [[], [[5, 36], [39, 72], [75, 107], [110, 143], [146, 177]], [[34, 36], [39, 40], [70, 72], [75, 77], [105, 107], [110, 112], [141, 143], [146, 148]], [[34, 36], [39, 40], [70, 72], [75, 77], [105, 107], [110, 112], [141, 143], [146, 148]], [[34, 36], [39, 40], [71, 72], [75, 77], [105, 107], [110, 111], [142, 143], [146, 148]], [[34, 36], [39, 40], [70, 72], [75, 77], [105, 107], [110, 111], [142, 143], [146, 148]], [], []] } };
+
+// src/game/action/ui/pixelHud.ts
+var imgs = {};
+function img2(k) {
+  let im = imgs[k];
+  if (!im) {
+    im = new Image();
+    im.src = HUD_ART[k].src;
+    imgs[k] = im;
+  }
+  return im.complete && im.naturalWidth ? im : null;
+}
+function pixelHudReady() {
+  return ["slot", "item", "portrait", "hp", "gauge"].every((k) => img2(k));
+}
+var INK = "#e6e4dc";
+var DIM = "#5c6268";
+var EDGE = "#07090b";
+var HOLLOW = "#0f1216";
+var textCache = /* @__PURE__ */ new Map();
+function pixelText(s, color = INK, size2 = 11, edge = EDGE) {
+  const key = `${s}|${color}|${size2}|${edge}`;
+  const hit = textCache.get(key);
+  if (hit) return hit;
+  const f = `700 ${size2}px "${PIXEL_FONT}", monospace`;
+  const cv = document.createElement("canvas");
+  const g0 = cv.getContext("2d");
+  g0.font = f;
+  const tw = Math.ceil(g0.measureText(s).width);
+  cv.width = Math.max(1, tw + 2);
+  cv.height = size2 + 4;
+  const g = cv.getContext("2d");
+  g.font = f;
+  g.textBaseline = "top";
+  g.fillStyle = "#fff";
+  g.fillText(s, 1, 1);
+  const d = g.getImageData(0, 0, cv.width, cv.height), px = d.data;
+  const [r, gg, b] = hex(color), [er, eg, eb] = edge ? hex(edge) : [0, 0, 0];
+  const on = new Uint8Array(cv.width * cv.height);
+  for (let i = 0; i < on.length; i++) on[i] = px[i * 4 + 3] > 110 ? 1 : 0;
+  for (let y = 0; y < cv.height; y++) for (let x = 0; x < cv.width; x++) {
+    const i = y * cv.width + x, o = i * 4;
+    if (on[i]) {
+      px[o] = r;
+      px[o + 1] = gg;
+      px[o + 2] = b;
+      px[o + 3] = 255;
+      continue;
+    }
+    let near = false;
+    if (edge) for (let dy = -1; dy <= 1 && !near; dy++) for (let dx = -1; dx <= 1; dx++) {
+      const nx = x + dx, ny = y + dy;
+      if (nx >= 0 && ny >= 0 && nx < cv.width && ny < cv.height && on[ny * cv.width + nx]) {
+        near = true;
+        break;
+      }
+    }
+    if (near) {
+      px[o] = er;
+      px[o + 1] = eg;
+      px[o + 2] = eb;
+      px[o + 3] = 255;
+    } else px[o + 3] = 0;
+  }
+  g.putImageData(d, 0, 0);
+  if (document.fonts?.check?.(f) !== false) textCache.set(key, cv);
+  return cv;
+}
+function hex(c) {
+  const n = parseInt(c.slice(1), 16);
+  return [n >> 16 & 255, n >> 8 & 255, n & 255];
+}
+function put(c, t2, x, y, align = "left") {
+  const dx = align === "center" ? Math.round(x - t2.width / 2) : align === "right" ? Math.round(x - t2.width) : Math.round(x);
+  c.drawImage(t2, dx, Math.round(y));
+}
+function fillHollow(c, k, x, y, r, color) {
+  const a = HUD_ART[k], [ix0, iy0, ix1, iy1] = a.inner;
+  const lim = ix0 + Math.round((ix1 - ix0) * Math.max(0, Math.min(1, r)));
+  a.rows.forEach((runs, row) => {
+    if (!runs.length) return;
+    c.fillStyle = color(row, iy0, iy1 - 1);
+    for (const [s, e] of runs) {
+      const ee = Math.min(e, lim);
+      if (ee > s) c.fillRect(x + s, y + row, ee - s, 1);
+    }
+  });
+}
+function hpHue(r) {
+  return Math.round(120 * Math.max(0, Math.min(1, (r - 0.12) / 0.68)) / 10) * 10;
+}
+function drawPixelCard(c, s, x, y) {
+  const P = HUD_ART.portrait, pim = img2("portrait"), him = img2("hp"), gim = img2("gauge");
+  if (!pim || !him || !gim) return y;
+  c.save();
+  c.imageSmoothingEnabled = false;
+  x = Math.round(x);
+  y = Math.round(y);
+  const [fx0, fy0, fx1, fy1] = P.inner, fw = fx1 - fx0, fh = fy1 - fy0;
+  c.fillStyle = "rgba(12,15,19,0.6)";
+  c.fillRect(x + fx0, y + fy0, fw, fh);
+  if (s.face) c.drawImage(s.face, x + fx0, y + fy0, fw, fh);
+  else put(c, pixelText(s.name.slice(0, 1) || "?", INK, 33), x + P.w / 2, y + P.h / 2 - 18, "center");
+  if (s.hurtT > 0) {
+    c.fillStyle = `rgba(255,40,40,${Math.min(0.6, s.hurtT * 1.6)})`;
+    c.fillRect(x + fx0, y + fy0, fw, fh);
+  }
+  c.drawImage(pim, x, y);
+  const bx = x + P.w + 4;
+  const nt = pixelText(s.name, INK, 22);
+  put(c, nt, bx + 14, y + 6);
+  if (s.armor) put(c, pixelText("◆".repeat(s.armor), "#cfd3d6", 11), bx + 20 + nt.width, y + 14);
+  const hy = y + 34, r = Math.max(0, s.hp) / s.maxHp, low = r < 0.25;
+  c.drawImage(him, bx, hy);
+  fillHollow(c, "hp", bx, hy, s.trail / s.maxHp, () => "#d8d2c4");
+  const hue = hpHue(r), blink = low && Math.sin(s.t * 10) > 0;
+  fillHollow(c, "hp", bx, hy, r, (row, top, bot) => row === top ? `hsl(${hue},75%,${blink ? 80 : 68}%)` : row >= bot - 1 ? `hsl(${hue},70%,${blink ? 48 : 32}%)` : `hsl(${hue},68%,${blink ? 66 : 48}%)`);
+  put(c, pixelText(`${Math.max(0, Math.ceil(s.hp))} / ${Math.ceil(s.maxHp)}`, INK, 11), bx + HUD_ART.hp.inner[2], y + 18, "right");
+  let end = Math.max(y + P.h, hy + HUD_ART.hp.h + 14);
+  if (s.gauge !== void 0) {
+    const gy = hy + HUD_ART.hp.h + 5, gx = bx + 14, full = s.gauge >= 100;
+    const pulse = full ? 0.5 + 0.5 * Math.sin(s.t * 7) : 0;
+    put(c, pixelText("필살", full ? "#ffe9a0" : "#aeb4b8", 11), gx, gy - 3);
+    const gx2 = gx + 26;
+    c.drawImage(gim, gx2, gy);
+    fillHollow(c, "gauge", gx2, gy, s.gauge / 100, (row, top) => full ? row === top ? "#fff6d0" : `rgb(255,${205 + 30 * pulse},${90 + 60 * pulse})` : row === top ? "#e8f4ff" : "#9fc6e0");
+    if (full && s.superKey) put(c, pixelText(s.superKey, "#ffe9a0", 11), gx2 + HUD_ART.gauge.w + 4, gy - 3);
+    end = Math.max(end, gy + HUD_ART.gauge.h);
+  }
+  c.restore();
+  return end;
+}
+var ICONS = {
+  punch: [
+    "............",
+    "..##.##.##..",
+    ".##########.",
+    ".#o##o##o##.",
+    ".##########.",
+    "###########.",
+    "#oo########.",
+    "###########.",
+    ".##########.",
+    "..########..",
+    "...######...",
+    "............"
+  ],
+  kick: [
+    "............",
+    "......###...",
+    "......###...",
+    "......###...",
+    "......###...",
+    "##....####..",
+    "......######",
+    "###...######",
+    "......######",
+    "##....######",
+    "............",
+    "............"
+  ],
+  gun: [
+    "............",
+    "............",
+    ".##########.",
+    ".###########",
+    ".##########.",
+    ".####o......",
+    ".###oo#.....",
+    ".###.##.....",
+    ".###........",
+    "####........",
+    "###.........",
+    "............"
+  ],
+  wave: [
+    "............",
+    ".#...#...#..",
+    "..#...#...#.",
+    "..##..##..##",
+    "..##..##..##",
+    "..##..##..##",
+    "..##..##..##",
+    "..##..##..##",
+    "..#...#...#.",
+    ".#...#...#..",
+    "............",
+    "............"
+  ],
+  bolt: [
+    ".......####.",
+    "......####..",
+    ".....####...",
+    "....####....",
+    "...########.",
+    ".......###..",
+    "......###...",
+    ".....###....",
+    "....###.....",
+    "...##.......",
+    "..#.........",
+    "............"
+  ],
+  star: [
+    ".....##.....",
+    ".....##.....",
+    "....####....",
+    "############",
+    ".##########.",
+    "..########..",
+    "...######...",
+    "...######...",
+    "..###..###..",
+    "..##....##..",
+    ".##......##.",
+    "............"
+  ],
+  dash: [
+    "............",
+    "......#.....",
+    "......##....",
+    "......###...",
+    "##..#######.",
+    "....########",
+    "##..#######.",
+    "......###...",
+    "......##....",
+    "......#.....",
+    "............",
+    "............"
+  ],
+  shield: [
+    "............",
+    ".##########.",
+    ".#o#######o.",
+    ".##########.",
+    ".##########.",
+    ".##########.",
+    "..########..",
+    "..########..",
+    "...######...",
+    "....####....",
+    ".....##.....",
+    "............"
+  ]
+};
+function icon(c, id, cx, cy, u, col) {
+  const rows = ICONS[id];
+  const x0 = Math.round(cx - 6 * u), y0 = Math.round(cy - 6 * u);
+  c.fillStyle = "#000";
+  rows.forEach((r, j) => {
+    for (let i = 0; i < 12; i++) if (r[i] === "#") c.fillRect(x0 + i * u + u, y0 + j * u + u, u, u);
+  });
+  rows.forEach((r, j) => {
+    for (let i = 0; i < 12; i++) if (r[i] !== ".") {
+      c.fillStyle = r[i] === "o" ? HOLLOW : col;
+      c.fillRect(x0 + i * u, y0 + j * u, u, u);
+    }
+  });
+}
+function drawPixelHotbar(c, slots, x, y, t2) {
+  const S = HUD_ART.slot, sim = img2("slot");
+  if (!sim) return x;
+  const gap = 4, [ix0, iy0, ix1, iy1] = S.inner;
+  c.save();
+  c.imageSmoothingEnabled = false;
+  x = Math.round(x);
+  y = Math.round(y);
+  slots.forEach((sl2, i) => {
+    const sx = x + i * (S.w + gap), sy = y;
+    const ready = sl2.cd <= 0 && !sl2.off;
+    c.drawImage(sim, sx, sy);
+    const iw = ix1 - ix0, ih = iy1 - iy0;
+    if (sl2.active) {
+      c.fillStyle = "#3a4249";
+      c.fillRect(sx + ix0, sy + iy0, iw, ih);
+    }
+    icon(c, sl2.icon, sx + ix0 + iw / 2, sy + iy0 + ih / 2 - (sl2.bar !== void 0 ? 1 : 0), 2, ready ? sl2.full ? "#ffe9a0" : INK : DIM);
+    if (sl2.cd > 0) {
+      c.fillStyle = "rgba(4,6,8,0.7)";
+      c.fillRect(sx + ix0, sy + iy0, iw, Math.round(ih * Math.min(1, sl2.cd)));
+      if (sl2.cdText) put(c, pixelText(sl2.cdText, INK, 11), sx + ix0 + iw / 2, sy + iy0 + ih / 2 - 7, "center");
+    }
+    if (sl2.bar !== void 0) {
+      const bw = iw - 4, v = Math.max(0, Math.min(1, sl2.bar));
+      c.fillStyle = "#000";
+      c.fillRect(sx + ix0 + 2, sy + iy1 - 4, bw, 2);
+      c.fillStyle = sl2.hot ? "#e8553a" : sl2.full ? "#ffe9a0" : INK;
+      c.fillRect(sx + ix0 + 2, sy + iy1 - 4, Math.round(bw * v), 2);
+    }
+    if (sl2.full && Math.sin(t2 * 7) > 0) {
+      c.strokeStyle = "#ffe9a0";
+      c.lineWidth = 1;
+      c.strokeRect(sx + ix0 + 0.5, sy + iy0 + 0.5, iw - 1, ih - 1);
+    }
+    const kt = pixelText(sl2.key, "#101317", 11, null);
+    const kw = Math.max(11, kt.width + 2), kh = 13;
+    c.fillStyle = EDGE;
+    c.fillRect(sx + 1, sy + 1, kw + 2, kh + 2);
+    c.fillStyle = ready ? INK : "#8a9096";
+    c.fillRect(sx + 2, sy + 2, kw, kh);
+    put(c, kt, sx + 2 + kw / 2, sy + 2, "center");
+    if (sl2.badge) put(c, pixelText(sl2.badge, sl2.full ? "#ffe9a0" : INK, 11), sx + ix1 - 1, sy + iy1 - 17, "right");
+    put(c, pixelText(sl2.name, ready ? "#cfd3d6" : "#7d848a", 11), sx + S.w / 2, sy + S.h + 1, "center");
+  });
+  c.restore();
+  return x + slots.length * (S.w + gap) - gap;
+}
+var hotbarSize = (n) => ({ w: n * (HUD_ART.slot.w + 4) - 4, h: HUD_ART.slot.h + 15 });
+function drawPixelItems(c, items, x, y, keys, flash, icon2) {
+  const S = HUD_ART.item, im = img2("item");
+  if (!im) return y;
+  const [ix0, iy0, ix1, iy1] = S.inner, iw = ix1 - ix0, ih = iy1 - iy0, gap = 4;
+  c.save();
+  c.imageSmoothingEnabled = false;
+  x = Math.round(x);
+  y = Math.round(y);
+  for (let i = 0; i < 4; i++) {
+    const it = items[i] ?? { label: "", count: 0 }, sx = x + i * (S.w + gap), dim = it.count <= 0;
+    c.drawImage(im, sx, y);
+    if ((flash[i] ?? 0) > 0) {
+      c.fillStyle = `rgba(255,240,180,${flash[i]})`;
+      c.fillRect(sx + ix0, y + iy0, iw, ih);
+    }
+    if (it.label || it.id) {
+      c.save();
+      c.globalAlpha = dim ? 0.3 : 1;
+      icon2(it, sx + ix0 + 1, y + iy0 + 1, Math.min(iw, ih) - 2);
+      c.restore();
+      put(c, pixelText(`${it.count}`, dim ? "#6a7276" : INK, 11), sx + ix1 - 1, y + iy1 - 13, "right");
+    }
+    if (it.cd && it.cd > 0) {
+      c.fillStyle = "rgba(4,6,8,0.6)";
+      c.fillRect(sx + ix0, y + iy0, iw, Math.round(ih * Math.min(1, it.cd)));
+    }
+    const kt = pixelText(keys[i] ?? "", "#101317", 11, null), kw = Math.max(11, kt.width + 2), kh = 13;
+    c.fillStyle = EDGE;
+    c.fillRect(sx + 1, y + 1, kw + 2, kh + 2);
+    c.fillStyle = INK;
+    c.fillRect(sx + 2, y + 2, kw, kh);
+    put(c, kt, sx + 2 + kw / 2, y + 2, "center");
+  }
+  c.restore();
+  return y + S.h;
+}
+
 // src/game/action/ui/ui.css
 var ui_default = `.gs { position: relative; width: 100%; height: 100%; overflow: hidden; background: #000; outline: none; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; font-family: "Pretendard", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; color: #ece6d4; color-scheme: dark; }
 .gs *, .gs *::before, .gs *::after { box-sizing: border-box; }
@@ -2289,10 +2637,10 @@ var Hud = class {
     this.agent(c, s);
     this.floor(c, s);
     this.rules(c, s);
-    if (!s.compact) this.items(c, s.items, s.device);
+    if (!s.compact && !(s.agent.portrait && pixelHudReady())) this.items(c, s.items, s.device);
     if (s.boss) this.boss(c, s.boss, s.compact);
     this.timer(c, s);
-    if (s.message) this.message(c, s.message, s.compact);
+    if (s.message) this.message(c, s.message, s.compact, (s.messageLeft ?? 0) / k);
     this.navigation(c, s);
     this.drawToasts(c, dt);
     pixelOn = false;
@@ -2331,6 +2679,13 @@ var Hud = class {
   /** 왼쪽 위 한 묶음: 얼굴 + 이름 + 굵은 체력 막대 + 필살 게이지 + 탄. 판 없이 오락실처럼 */
   agent(c, s) {
     const x = s.compact ? 100 : 22, y = 18, fs = 80;
+    if (s.agent.portrait && pixelHudReady()) {
+      const end = drawPixelCard(c, { name: s.agent.name, face: s.agent.portrait, hp: s.hp, maxHp: s.maxHp, trail: this.trail, hurtT: this.hurtT, gauge: s.gauge, superKey: s.device === "pad" ? "RT" : s.device === "touch" ? "" : superKey(), armor: s.armor, t: this.t }, x - 6, y - 4);
+      const iy = s.compact ? end : this.pixelItems(c, s.items, s.device, x + 78, end + 6);
+      if (s.weapon) this.ammo(c, s.weapon, x + 90, iy + 26);
+      this.meterRows(c, s, x, Math.max(y + fs + 52, iy + (s.weapon ? 40 : 10)));
+      return;
+    }
     const g = c.createLinearGradient(0, 0, 460, 0);
     g.addColorStop(0, "rgba(0,0,0,0.5)");
     g.addColorStop(0.75, "rgba(0,0,0,0.25)");
@@ -2397,7 +2752,9 @@ var Hud = class {
       label(c, s.device === "pad" ? "RT" : s.device === "touch" ? "필살" : superKey(), bx + gw + 10, gy + 12, 15, C.gauge, "left", 900);
     }
     if (s.weapon) this.ammo(c, s.weapon, bx, gy + gh + 30);
-    let my = y + fs + 52;
+    this.meterRows(c, s, x, y + fs + 52);
+  }
+  meterRows(c, s, x, my) {
     for (const m of s.meters ?? []) {
       label(c, m.label, x, my + 10, 13, m.color, "left", 800);
       bar(c, x + 40, my + 1, 160, 9, m.v / m.max, m.color, "#000");
@@ -2460,6 +2817,11 @@ var Hud = class {
   }
   /** 아이템: 아이콘만 (글자 없음), 체력 막대 오른쪽 위 천장 띠. 바닥(물건·자막)과 겹치지 않게 (독립 검수: UI 안전영역).
    * 터치 화면에서는 터치 버튼이 대신 보여 준다 */
+  /** 아이템 칸 넷 (도트, 필살 게이지 아래). 돌려주는 값 = 아래 끝 y */
+  pixelItems(c, items, device, x, y) {
+    const keys = device === "pad" ? ["↑", "→", "↓", "←"] : ["1", "2", "3", "4"];
+    return drawPixelItems(c, items, x, y, keys, this.itemFlash, (it, ix, iy, sz) => drawHudItemIcon(c, it, ix, iy, sz));
+  }
   items(c, items, device) {
     const n = 4, s = 52, g = 8;
     const x0 = 482, y = 22;
@@ -2536,6 +2898,14 @@ var Hud = class {
     else this.trail = Math.max(s.hp, this.trail - s.maxHp * dt * 0.6);
     this.lastHp = s.hp;
     this.hurtT = Math.max(0, this.hurtT - dt);
+    if (pixelHudReady()) {
+      const cy = s.top ? 14 : H3 - 170;
+      const end = drawPixelCard(c, { name: s.name, face: s.face, hp: s.hp, maxHp: s.maxHp, trail: this.trail, hurtT: this.hurtT, gauge: s.gauge, superKey: superKey(), t: this.t }, 16, cy);
+      if (s.items && !s.compact) this.pixelItems(c, s.items, s.device, 16 + 84, end + 6);
+      pixelOn = false;
+      c.restore();
+      return (16 + 340) * k;
+    }
     c.fillStyle = "rgba(6,10,14,0.72)";
     c.fillRect(x - 12, y - 12, fs + bw + 52, fs + 24);
     c.fillStyle = "#141b20";
@@ -2632,76 +3002,19 @@ var Hud = class {
     pixelOn = false;
     c.restore();
   }
-  /** 우하단 기술 상자 (도트): 칸마다 아이콘·키·상태. 원거리는 총열 열·과열 쿨다운, 충전은 단계, 필살기는 게이지 */
+  /** 왼쪽 아래 기술 칸 줄 (도트, PixelLab 틀). 돌려주는 값 = 오른쪽 끝 x (캔버스 px) */
   drawSkillBox(c, s, dt = 1 / 60) {
     this.t += dt;
+    if (!pixelHudReady()) return 0;
     c.save();
     const k = s.compact ? 1.2 : 1;
     W3 = c.canvas.width / k;
     H3 = c.canvas.height / k;
     c.setTransform(k, 0, 0, k, 0, 0);
-    pixelOn = true;
-    const U = 2, S = 52, G = 10;
-    const slots = s.slots;
-    const w = slots.length * S + (slots.length - 1) * G + 24, h = S + 44;
-    const x0 = Math.round(W3 - w - 22), y0 = Math.round(H3 - h - 22);
-    const box2 = (bx, by, bw, bh, col) => {
-      c.fillStyle = col;
-      c.fillRect(bx + U, by, bw - 2 * U, bh);
-      c.fillRect(bx, by + U, bw, bh - 2 * U);
-    };
-    box2(x0 + U, y0 + U * 2, w, h, "rgba(0,0,0,0.35)");
-    box2(x0 - U, y0 - U, w + 2 * U, h + 2 * U, "#0a0d10");
-    box2(x0, y0, w, h, "#3a4248");
-    box2(x0 + U, y0 + U, w - 2 * U, h - 2 * U, "#151a1f");
-    c.fillStyle = "rgba(255,255,255,0.07)";
-    c.fillRect(x0 + 2 * U, y0 + 2 * U, w - 4 * U, U);
-    slots.forEach((sl2, i) => {
-      const sx = x0 + 12 + i * (S + G), sy = y0 + 10;
-      const ready = sl2.cd <= 0 && !sl2.off;
-      const glow = sl2.full ? 0.5 + 0.5 * Math.sin(this.t * 6) : 0;
-      box2(sx - U, sy - U, S + 2 * U, S + 2 * U, sl2.full ? `rgb(${200 + 55 * glow},${160 + 50 * glow},60)` : sl2.active ? "#f2ead6" : "#0a0d10");
-      box2(sx, sy, S, S, ready ? "#2c343a" : "#1d2226");
-      c.fillStyle = "rgba(255,255,255,0.08)";
-      c.fillRect(sx + U, sy + U, S - 2 * U, U * 2);
-      drawSkillIcon(c, sl2.icon, sx + S / 2, sy + S / 2 + 1, 4, ready ? sl2.color : "#5c646a");
-      if (sl2.cd > 0) {
-        const hh = Math.round((S - 2 * U) * Math.min(1, sl2.cd) / U) * U;
-        c.fillStyle = "rgba(5,8,10,0.72)";
-        c.fillRect(sx + U, sy + U, S - 2 * U, hh);
-        if (sl2.cdText) {
-          c.font = font(22);
-          c.fillStyle = "#ff9a6a";
-          c.textAlign = "center";
-          c.textBaseline = "middle";
-          c.fillText(sl2.cdText, sx + S / 2, sy + S / 2 + 1);
-        }
-      }
-      if (sl2.bar !== void 0) {
-        const by = sy + S + 6;
-        c.fillStyle = "#0a0d10";
-        c.fillRect(sx, by, S, 8);
-        c.fillStyle = sl2.barColor ?? sl2.color;
-        c.fillRect(sx + U, by + U, Math.round((S - 2 * U) * Math.max(0, Math.min(1, sl2.bar)) / U) * U, 8 - 2 * U);
-      }
-      c.font = font(11);
-      const kw = Math.max(16, Math.ceil(c.measureText(sl2.key).width) + 8);
-      box2(sx - 4, sy - 6, kw, 16, "#0a0d10");
-      box2(sx - 3, sy - 5, kw - 2, 14, "#e8e0c8");
-      c.fillStyle = "#151a1f";
-      c.textAlign = "center";
-      c.textBaseline = "middle";
-      c.fillText(sl2.key, sx - 4 + kw / 2, sy + 2);
-      if (sl2.badge) {
-        c.font = font(11);
-        c.fillStyle = sl2.full ? "#ffe27a" : "#f2ecdc";
-        c.textAlign = "right";
-        c.textBaseline = "alphabetic";
-        c.fillText(sl2.badge, sx + S - 4, sy + S - 4);
-      }
-    });
-    pixelOn = false;
+    const sz = hotbarSize(s.slots.length);
+    const end = drawPixelHotbar(c, s.slots, 16, H3 - sz.h - 10, this.t);
     c.restore();
+    return end * k;
   }
   /** 아래 자막 한 줄만 (본부처럼 전투 HUD가 없는 화면) */
   drawMessage(c, text, compact, left = 0) {
@@ -2878,30 +3191,6 @@ function drawMap(c, m) {
   c.closePath();
   c.fill();
   c.restore();
-}
-var ICONS = {
-  punch: ["........", "..####..", ".######.", ".#+####.", ".######.", "..#####.", "...###..", "........"],
-  kick: ["....##..", "....##..", "...###..", "..###...", ".###....", "####....", "+##.....", "........"],
-  gun: ["........", "########", "#+######", "####....", "###.....", "##......", "##......", "........"],
-  spray: ["#.......", ".#..#...", "..#...#.", "###..#..", "###.#..#", "..#...#.", ".#..#...", "#......."],
-  bolt: ["....##..", "...##...", "..##....", ".#####..", "...##...", "..##....", ".##.....", "#......."],
-  star: ["...#....", "...#....", ".#####..", "..+##...", "..#.#...", ".#...#..", "........", "........"],
-  dash: ["........", "##..##..", ".##..##.", "..##..##", "..##..##", ".##..##.", "##..##..", "........"],
-  shield: [".######.", ".#+####.", ".######.", ".######.", "..####..", "..####..", "...##...", "........"]
-};
-function drawSkillIcon(c, id, cx, cy, u, col) {
-  const rows = ICONS[id];
-  const x0 = Math.round(cx - 4 * u), y0 = Math.round(cy - 4 * u);
-  c.fillStyle = "rgba(0,0,0,0.45)";
-  rows.forEach((r, j) => {
-    for (let i = 0; i < 8; i++) if (r[i] !== ".") c.fillRect(x0 + i * u + u / 2, y0 + j * u + u / 2, u, u);
-  });
-  rows.forEach((r, j) => {
-    for (let i = 0; i < 8; i++) if (r[i] !== ".") {
-      c.fillStyle = r[i] === "+" ? "#ffffff" : col;
-      c.fillRect(x0 + i * u, y0 + j * u, u, u);
-    }
-  });
 }
 function superKey() {
   const code = Object.keys(KEYMAP).find((k) => KEYMAP[k] === "super");
@@ -3330,22 +3619,22 @@ var easeInOut = (k) => k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
 var K = 3;
 var DOOR = { x: 160 + 112 * K, y: 50 * K, w: 100 * K, h: 170 * K };
 var LAMP = { x: 160 + 132 * K, y: 17 * K, w: 48 * K, h: 10 * K };
-var imgs = /* @__PURE__ */ new Map();
+var imgs2 = /* @__PURE__ */ new Map();
 function art(name) {
-  if (!imgs.has(name)) {
+  if (!imgs2.has(name)) {
     const src = typeof window !== "undefined" && window.__GOEI_BG_ART__?.el_hall?.[name] || "";
     let im2 = null;
     if (src) im2 = new Image(), im2.src = src;
-    imgs.set(name, im2);
+    imgs2.set(name, im2);
   }
-  const im = imgs.get(name);
+  const im = imgs2.get(name);
   return im && im.complete && im.naturalWidth ? im : null;
 }
-var textCache = /* @__PURE__ */ new Map();
-function pixelText(text, size2, top, bottom, weight = 900, pixel = false) {
+var textCache2 = /* @__PURE__ */ new Map();
+function pixelText2(text, size2, top, bottom, weight = 900, pixel = false) {
   const ready = pixel && typeof document !== "undefined" && document.fonts?.check(`11px "${PIXEL_FONT}"`);
   const key = `${text}|${size2}|${top}|${bottom}|${weight}|${pixel}|${ready}`;
-  const hit = textCache.get(key);
+  const hit = textCache2.get(key);
   if (hit) return hit;
   const m = document.createElement("canvas").getContext("2d");
   m.font = pixel ? `${size2}px "${PIXEL_FONT}", ${FONT}` : `${weight} ${size2}px ${FONT}`;
@@ -3384,7 +3673,7 @@ function pixelText(text, size2, top, bottom, weight = 900, pixel = false) {
   for (const [dx, dy] of [[0, 3], [1, 3], [2, 3], [0, 2], [2, 2]]) o.drawImage(black, dx, dy);
   for (const [dx, dy] of [[0, 1], [2, 1], [1, 0], [1, 2], [0, 0], [2, 0], [0, 2], [2, 2]]) o.drawImage(black, dx, dy);
   o.drawImage(mask, 1, 1);
-  textCache.set(key, out);
+  textCache2.set(key, out);
   return out;
 }
 function blit(c, im, cx, y, k, alpha = 1) {
@@ -3445,7 +3734,7 @@ function drawTitleBg(c, t2, title = "차원 승강기", sub = "ANOMALY SIMULATIO
   c.fillRect(lp.x, lp.y, lp.w, lp.h);
   const flick = Math.sin(t2 * 13) > 0.9 || Math.sin(t2 * 2.1) > 0.97;
   const floors = ["1", "B1", "B3", "B7", "B12", "??"];
-  const num = pixelText(flick ? floors[Math.floor(t2 * 9) % floors.length] : floors[Math.floor(t2 / 2.5) % floors.length], 9, flick ? "#ff3020" : "#ff7a3a", flick ? "#c01810" : "#e05a20");
+  const num = pixelText2(flick ? floors[Math.floor(t2 * 9) % floors.length] : floors[Math.floor(t2 / 2.5) % floors.length], 9, flick ? "#ff3020" : "#ff7a3a", flick ? "#c01810" : "#e05a20");
   c.save();
   c.shadowColor = "#ff4020";
   c.shadowBlur = 14;
@@ -3462,15 +3751,15 @@ function drawTitleBg(c, t2, title = "차원 승강기", sub = "ANOMALY SIMULATIO
     c.fillRect(Math.round(x / K) * K, Math.round(y / K) * K, K, K);
   }
   const glow = 0.85 + 0.15 * Math.sin(t2 * 3);
-  blit(c, pixelText("관리국 괴이 탐사", 12, "#f0b45a", "#c07a2a", 800), 640, 96, 3);
+  blit(c, pixelText2("관리국 괴이 탐사", 12, "#f0b45a", "#c07a2a", 800), 640, 96, 3);
   c.save();
   c.shadowColor = `rgba(255,90,40,${0.55 * glow})`;
   c.shadowBlur = 30;
-  const logo = pixelText(title, 30, "#fff3d0", "#ffb43a");
+  const logo = pixelText2(title, 30, "#fff3d0", "#ffb43a");
   blit(c, logo, 640, 138, Math.min(5, Math.floor(1180 / logo.width)));
   c.restore();
-  blit(c, pixelText(sub, 10, "#c8d0d4", "#9aa6ab", 700), 640, 362, 2);
-  if (Math.sin(t2 * 3.2) > -0.3) blit(c, pixelText("무료 플레이", 10, "#ffe9a8", "#f0b45a", 800), 1180, 676, 2);
+  blit(c, pixelText2(sub, 10, "#c8d0d4", "#9aa6ab", 700), 640, 362, 2);
+  if (Math.sin(t2 * 3.2) > -0.3) blit(c, pixelText2("무료 플레이", 10, "#ffe9a8", "#f0b45a", 800), 1180, 676, 2);
   c.fillStyle = "rgba(0,0,0,0.16)";
   for (let y = 0; y < 720; y += K) c.fillRect(0, y, 1280, 1);
   c.restore();
@@ -3502,8 +3791,8 @@ function cameraX(run2) {
   const f = currentFloor(run2);
   return Math.max(0, Math.min(f.width - W, run2.player.x - W / 2));
 }
-function shade(hex, k) {
-  const n = parseInt(hex.slice(1), 16);
+function shade(hex2, k) {
+  const n = parseInt(hex2.slice(1), 16);
   const f = (v) => Math.max(0, Math.min(255, Math.round(v * k)));
   return `rgb(${f(n >> 16 & 255)},${f(n >> 8 & 255)},${f(n & 255)})`;
 }
@@ -4283,7 +4572,7 @@ var DEFAULT_SETTINGS = {
   flash: true,
   bright: 1,
   pixel: true,
-  charSize: 1.15,
+  charSize: 1,
   master: 0.8,
   music: 0.7,
   sfx: 0.9,
@@ -4811,7 +5100,7 @@ var TouchPad = class {
 };
 
 // src/game/action/charSize.ts
-var charSize = { k: 1.15 };
+var charSize = { k: 1 };
 
 // src/game/action/ui/index.ts
 function mountGameShell(box2, o = {}) {
@@ -4893,7 +5182,7 @@ function mountGameShell(box2, o = {}) {
       { type: "toggle", label: "피해 숫자", get: () => s.numbers, set: (v) => s.numbers = v },
       { type: "slider", label: "밝기", get: () => s.bright, set: (v) => s.bright = v, min: 0.7, max: 1.4, step: 0.05, fmt: pct },
       { type: "toggle", label: "도트 선명하게", get: () => s.pixel, set: (v) => s.pixel = v },
-      { type: "slider", label: "캐릭터 크기", get: () => s.charSize, set: (v) => s.charSize = v, min: 0.6, max: 1.6, step: 0.05, fmt: pct },
+      { type: "slider", label: "화면 확대", get: () => s.charSize, set: (v) => s.charSize = v, min: 1, max: 1.6, step: 0.05, fmt: pct },
       ...o.field ? [] : [{ type: "button", label: "전체 화면", sub: "폰은 가로로 고정", act: () => void stage.fullscreen() }],
       { type: "head", label: "소리" },
       { type: "slider", label: "전체", get: () => s.master, set: (v) => s.master = v, min: 0, max: 1, step: 0.1, fmt: pct },

@@ -6,14 +6,15 @@ import { Fighter } from '../engine/fighter';
 import { newAttackId } from '../engine/ids';
 import { spr } from '../engine/view';
 import { pfont } from '../engine/pxfont';
-import { charSize } from '../charSize';
 import { eileenArt } from '../art/testPeople';
 import type { Body, Hit, HitResult, React, WBox, WorldView } from '../engine/contract';
 import type { Pad, Btn } from '../engine/input';
 import type { FrameInfo } from '../engine/art';
 import { createEileenCore } from './core';
 
-const DT = 1 / 30;
+/** 테스트룸 동작 이름 ↔ 엔진 버튼 */
+/** 에일린 그림 배율: 맨 뒤 줄에서 키 1.65m = 235px (필드 그림 지침 1m = 142px) */
+export const CHAR_K = 1.15;
 /** 테스트룸 동작 이름 ↔ 엔진 버튼 */
 const PRESS: [Btn, string][] = [
   ['light', 'light'], ['heavy', 'heavy'], ['dodge', 'dodge'], ['block', 'block'], ['shoot', 'shoot'],
@@ -39,6 +40,10 @@ export class EileenPlayer extends Player {
   core: Core;
   private world: WorldView | null = null;
   private heldNames = new Set<string>();
+  private synced = { x: 0, y: 0 };
+  private started = false;
+  private lastTickAt = 0;
+  private lastFrameAt = 0;
   private underFn = (ctx: CanvasRenderingContext2D, camX: number) => this.drawUnder(ctx, camX);
 
   constructor(clips: Record<string, FrameInfo[]>) {
@@ -50,11 +55,12 @@ export class EileenPlayer extends Player {
     this.core = createEileenCore({
       A: art.A, IMG: art.IMG, VFX: art.VFX,
       held: this.heldNames,
-      K: (y: number) => spr(y) * charSize.k,
+      K: (y: number) => spr(y) * CHAR_K,
       sfx: (type: string, extra: Record<string, unknown>) => eileenHooks.sfx({ type, ...extra }),
       font: (n: number) => pfont(n).f,
       targets: () => this.targets(),
-      ground: (x: number, y: number) => this.platformAt(x, y)?.h ?? 0,
+      // 물건 윗면은 이미 그 높이에 있을 때만 땅이다 (아래에서 걸어 들어가면 올라서지 않고 막힌다)
+      ground: (x: number, y: number) => { const p = this.platformAt(x, y); return p && this.core.P.z >= p.h - 10 ? p.h : 0; },
       hurt: (t: { body: Body }, dmg: number, kind: string, face: 1 | -1, hitstop: number, o: { push?: number }) => this.hurtTarget(t.body, dmg, kind, face, hitstop, o),
       clamp: (P: { x: number; y: number }) => {
         const w = this.world;
@@ -105,7 +111,7 @@ export class EileenPlayer extends Player {
   /* ───────── 엔진 쪽 ───────── */
 
   frame(): { hit: Hit[]; hurt: WBox[] } {
-    const k = spr(this.y) * charSize.k;
+    const k = spr(this.y) * CHAR_K;
     return { hit: [], hurt: this.alive ? [{ x0: this.x - 26 * k, x1: this.x + 26 * k, z0: this.z, z1: this.z + 210 * k, y: this.y, dy: 16 }] : [] };
   }
 
@@ -164,17 +170,33 @@ export class EileenPlayer extends Player {
     if (!w.underlays.includes(this.underFn)) w.underlays.push(this.underFn);
     if (this.seat) return super.tick(world, p);
     const P = this.core.P;
-    // 엔진이 옮긴 자리(문 앞 도착·막힘)를 먼저 받는다
-    P.x = this.x; P.y = this.y;
+    // 엔진이 옮긴 만큼(문 앞 도착·막힘·화면 끝)만 받는다: 틱 사이에 그림 장마다 움직인 것은 그대로 둔다
+    if (!this.started) { this.started = true; P.x = this.x; P.y = this.y; }
+    else { P.x += this.x - this.synced.x; P.y += this.y - this.synced.y; }
     P.hp = Math.round((this.hp / this.hpMax) * 100);
+    this.lastTickAt = performance.now();
     this.wantInteract = p.pressed.has('interact');
     this.wantItem = p.pressed.has('item1') ? 1 : p.pressed.has('item2') ? 2 : p.pressed.has('item3') ? 3 : p.pressed.has('item4') ? 4 : 0;
     if (this.comboClock > 0 && --this.comboClock === 0) this.combo = 0;
-    if (this.phase === 'down') { this.core.update(DT); this.sync(); return; } // 쓰러짐: 후송을 기다린다
-    this.input(p);
+    if (this.phase !== 'down') this.input(p); // 쓰러지면 후송을 기다린다
     this.core.frameView({ x0: w.camX, lane: w.lane });
-    this.core.update(DT);
-    this.core.tickMarks(DT);
+    this.sync();
+  }
+
+  /** 그림 장마다 (render.ts): 테스트룸처럼 실제 시간으로 움직이고 동작을 넘긴다.
+   * 엔진 틱(30Hz)에서 1/30초씩 돌리면 0.04초짜리 장이 0.067초로 늘고 움직임이 30장으로 끊긴다 (사용자: 테스트룸보다 프레임이 떨어져 보임) */
+  frameStep() {
+    const now = performance.now();
+    const dt = Math.min(0.05, (now - (this.lastFrameAt || now)) / 1000);
+    this.lastFrameAt = now;
+    // 월드가 멈춰 있으면(메뉴·대화창) 같이 멈춘다
+    if (!this.world || this.seat || now - this.lastTickAt > 120 || dt <= 0) return;
+    const w = this.world as WorldView & { camX: number };
+    const P = this.core.P;
+    P.x += this.x - this.synced.x; P.y += this.y - this.synced.y; // 틱 뒤 막힘·끝 보정
+    this.core.frameView({ x0: w.camX, lane: w.lane });
+    this.core.update(dt);
+    this.core.tickMarks(dt);
     const s = this.core.shake;
     if (s > 6) w.shake(2, Math.min(4, s / 6));
     this.sync();
@@ -183,6 +205,8 @@ export class EileenPlayer extends Player {
   private sync() {
     const P = this.core.P;
     this.x = P.x; this.y = P.y; this.z = P.z;
+    this.px = this.x; this.py = this.y; this.pz = this.z; // 보간 없이 지금 자리 (장마다 움직인다)
+    this.synced.x = this.x; this.synced.y = this.y;
     this.dir = P.face > 0 ? 1 : -1;
     this.gauge = P.sp;
     this.running = this.core.P.mode === 'ground' && this.heldNames.has('run');

@@ -22,18 +22,21 @@ const CSS = `
 .goei-engine-hq{position:absolute;inset:0;overflow:auto;z-index:20;background:#0b0f12}
 .goei-engine-hq.goei-engine-hq-panel{background:rgba(5,8,10,.72)}
 .goei-engine-hq-close{position:sticky;top:8px;float:right;margin:8px;z-index:2;padding:8px 14px;border-radius:8px;border:1px solid #5b6a72;background:#1a2226;color:#ece6d4;font:15px sans-serif}
-.goei-engine-elev{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;gap:10px;padding:16px;background:#14181b;pointer-events:auto;z-index:20;box-shadow:0 -4px 0 #14181b,0 4px 0 #14181b,-4px 0 0 #14181b,4px 0 0 #14181b,0 -8px 0 #6d767b,0 8px 0 #6d767b,-8px 0 0 #6d767b,8px 0 0 #6d767b,-4px -4px 0 #6d767b,4px -4px 0 #6d767b,-4px 4px 0 #6d767b,4px 4px 0 #6d767b}
+.goei-engine-elev{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;gap:6px;padding:14px;pointer-events:auto;z-index:20;image-rendering:pixelated;border:16px solid transparent;border-image:var(--goei-btn) 8 fill / 16px stretch}
 .goei-engine-elev[hidden]{display:none}
-.goei-engine-elev button{width:96px;height:64px;border:0;border-radius:0;background:#2c3236;color:#ece6d4;font:700 33px "GoeiPixel","Galmuri11",monospace;cursor:pointer;image-rendering:pixelated;-webkit-font-smoothing:none;box-shadow:inset 0 4px 0 #46505a,inset 0 -4px 0 #1b1f22,0 -4px 0 #9aa6ad,0 4px 0 #9aa6ad,-4px 0 0 #9aa6ad,4px 0 0 #9aa6ad}
-.goei-engine-elev button.here{color:#ffb34a;box-shadow:inset 0 4px 0 #46505a,inset 0 -4px 0 #1b1f22,0 -4px 0 #ffb34a,0 4px 0 #ffb34a,-4px 0 0 #ffb34a,4px 0 0 #ffb34a}
-.goei-engine-elev button:disabled{opacity:.35;cursor:default}
-.goei-engine-elev button.sel{background:#ffb34a;color:#1b1f22;box-shadow:inset 0 4px 0 #ffe2a0,inset 0 -4px 0 #b8741c,0 -4px 0 #fff2c8,0 4px 0 #fff2c8,-4px 0 0 #fff2c8,4px 0 0 #fff2c8}
+.goei-engine-elev button{width:112px;height:72px;border:16px solid transparent;border-radius:0;background:none;border-image:var(--goei-btn) 8 fill / 16px stretch;color:#e6e4dc;font:700 33px "GoeiPixel","Galmuri11",monospace;cursor:pointer;image-rendering:pixelated;-webkit-font-smoothing:none;text-shadow:3px 3px 0 #07090b;padding:0;line-height:1}
+.goei-engine-elev button.here{color:#ffb34a}
+.goei-engine-elev button:disabled{opacity:.4;cursor:default}
+.goei-engine-elev button.sel{filter:brightness(1.45);color:#ffe9a0}
 .goei-engine-loading{color:#8e9aa1;font:16px sans-serif}
 `;
 
+import { HUD_ART } from './ui/pixelHudArt';
+
 export function mountGame(box: HTMLElement, bridge?: Partial<GameBridge>): () => void {
   const st = document.createElement('style');
-  st.textContent = CSS;
+  // 엘리베이터 층 단추 틀 = PixelLab 슬롯0 (사용자 2026-10-25)
+  st.textContent = CSS + `.goei-engine-elev{--goei-btn:url(${HUD_ART.btn.src})}`;
   const root = document.createElement('div');
   root.className = 'goei-engine';
   const stage = document.createElement('div');

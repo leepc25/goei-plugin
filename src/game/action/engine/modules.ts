@@ -6,6 +6,7 @@
 import { walkSeconds, clockText, mergeClock, DOOR_S, STAIR_S } from '../../../core/fieldclock';
 import type { GameAssets, GameBridge } from '../../bridge';
 import { persp, view } from './view';
+import { KEYMAP } from './input';
 import { setPixelScale } from './contract';
 import { mountTalk } from '../../talk';
 import { createGameAudio } from '../audio';
@@ -29,7 +30,6 @@ import demoPhotos from '../story/demo-photos.json';
 import { whereIs, LANE_TOP, LANE_BOT } from '../hq/map';
 import { hasVisitAgent, visitAgentFaceCanvas } from '../art/visitAgents';
 import { hasTestPeople, testPlayerFace, testPlayerTop } from '../art/testPeople';
-import { charSize } from '../charSize';
 import { eileenHooks } from '../eileen/player';
 import { FieldFx, parseFxList } from '../fx/fieldFx';
 import { SUPER_TEXT } from '../fx/superText';
@@ -700,7 +700,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       footsteps(w);
       ctx.save();
       ctx.scale(view.zoom, view.zoom);
-      ctx.translate(-Math.round(w.camX) - view.crop, 0);
+      ctx.translate(-Math.round(w.camX) - view.crop, -view.cropY);
       shell.fx.drawWorld(ctx);
       ffx.drawWorld(ctx);
       ctx.restore();
@@ -713,35 +713,36 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       if (game?.inHub && !mods.blocking?.() && !shell.paused) {
         const me = hq.visitor();
         const name = me.name || (testPlayerFace() ? '에일린' : '방문자');
-        const face = (me.agentId && visitAgentFaceCanvas(name, 34)) || testPlayerFace() || visitAgentFaceCanvas('쟈알디', 34);
+        const face = (me.agentId && visitAgentFaceCanvas(name, 34)) || testPlayerFace(64) || visitAgentFaceCanvas('쟈알디', 34);
         // 좌상단 초상화 상자 (사용자 2026-10-25: 위 목표 띠 대신)
-        shell.hud.drawFieldCard(ctx, { name, face, hp: w.player.hp, maxHp: w.player.hpMax, gauge: w.player.gauge, compact: hs.compact, top: true }, dt);
+        shell.hud.drawFieldCard(ctx, { name, face, hp: w.player.hp, maxHp: w.player.hpMax, gauge: w.player.gauge, compact: hs.compact, top: true, items: hs.items, device: hs.device }, dt);
       }
-      if (!game?.inHub) shell.hud.draw(ctx, hs, dt); // 본부에서는 전투 HUD 없음
-      else if (hs.message) shell.hud.drawMessage(ctx, hs.message, hs.compact, cardEnd); // 본부 목소리는 아래 자막 한 줄
-      // 우하단 기술 상자 (에일린): 터치 버튼이 있으면 그 자리라 숨긴다
+      // 왼쪽 아래 기술 칸 줄 (에일린): 터치 버튼이 있으면 그 자리라 숨긴다. 자막은 그 오른쪽에
       const core = (w.player as { core?: { P: Record<string, any> } }).core;
       if (core && !shell.touchShown && !mods.blocking?.() && !shell.paused) {
         const P = core.P, clip = P.clip?.id as string | undefined, off = ['down', 'belly', 'stun'].includes(P.mode);
         const lv = P.charge >= 2 ? 3 : P.charge > 1.3 ? 2 : P.charge > 0.5 ? 1 : 0;
-        shell.hud.drawSkillBox(ctx, { compact: hs.compact, slots: [
-          { key: 'Z', icon: 'punch', color: '#f2ecdc', cd: 0, off, active: ['9', '10', '11'].includes(clip ?? '') },
-          { key: 'X', icon: 'kick', color: '#ffb07a', cd: 0, off, active: clip === '12' },
-          { key: 'A', icon: 'gun', color: '#ffd25a', cd: P.overT > 0 ? P.overT / 2.6 : 0, cdText: P.overT > 0 ? P.overT.toFixed(1) : undefined, off, active: clip === '15', bar: P.heat / 100, barColor: P.overT > 0 ? '#ff4a3a' : P.heat > 70 ? '#ff8a2a' : '#f2c14e' },
-          { key: 'S', icon: 'spray', color: '#8fdcff', cd: 0, off, active: clip === '22_1' },
-          { key: 'D', icon: 'bolt', color: '#c89bff', cd: 0, off, active: P.mode === 'charge', bar: P.mode === 'charge' ? P.charge / 2.2 : undefined, badge: P.mode === 'charge' && lv ? ['', '1단', '2단', '최대'][lv] : undefined },
-          { key: 'F', icon: 'star', color: '#ffd34a', cd: 0, off: off || P.sp < 100, full: P.sp >= 100, bar: P.sp / 100, badge: `${Math.floor(P.sp)}%` },
-          { key: 'C', icon: 'dash', color: '#a8ccff', cd: 0, off, active: clip === '16' || clip === '16_1' },
-          { key: 'V', icon: 'shield', color: '#9fd0ff', cd: 0, off, active: P.mode === 'block' },
+        const key = (b: string) => { const c = Object.keys(KEYMAP).find((k) => KEYMAP[k] === b); return c ? c.replace(/^Key/, '') : '?'; };
+        cardEnd = shell.hud.drawSkillBox(ctx, { compact: hs.compact, slots: [
+          { key: key('light'), icon: 'punch', name: '약공', cd: 0, off, active: ['9', '10', '11'].includes(clip ?? '') },
+          { key: key('heavy'), icon: 'kick', name: '강공', cd: 0, off, active: clip === '12' },
+          { key: key('shoot'), icon: 'gun', name: '사격', cd: P.overT > 0 ? P.overT / 2.6 : 0, cdText: P.overT > 0 ? P.overT.toFixed(1) : undefined, off, active: clip === '15', bar: P.heat / 100, hot: P.overT > 0 || P.heat > 70 },
+          { key: key('skill'), icon: 'wave', name: '기술', cd: 0, off, active: clip === '22_1' },
+          { key: key('charge'), icon: 'bolt', name: '충전', cd: 0, off, active: P.mode === 'charge', bar: P.mode === 'charge' ? P.charge / 2.2 : undefined, badge: P.mode === 'charge' && lv ? ['', '1', '2', 'MAX'][lv] : undefined },
+          { key: key('super'), icon: 'star', name: '필살', cd: 0, off: off || P.sp < 100, full: P.sp >= 100, bar: P.sp / 100 },
+          { key: key('dodge'), icon: 'dash', name: '회피', cd: 0, off, active: clip === '16' || clip === '16_1' },
+          { key: key('block'), icon: 'shield', name: '방어', cd: 0, off, active: P.mode === 'block' },
         ] }, dt);
       }
+      if (!game?.inHub) shell.hud.draw(ctx, { ...hs, messageLeft: cardEnd }, dt); // 본부에서는 전투 HUD 없음
+      else if (hs.message) shell.hud.drawMessage(ctx, hs.message, hs.compact, cardEnd); // 본부 목소리는 아래 자막 한 줄
       // 본부: 위 안내 띠 대신 캐릭터 옆 말풍선 (닿는 문·자리가 있을 때만, 캐릭터와 겹치지 않게 옆에)
       const tg = game?.inHub && !mods.blocking?.() && !shell.paused ? (w.stage as { nearInfo?: () => { text: string; locked: boolean } | null }).nearInfo?.() : null;
       if (tg) {
         const p = w.player, z = view.zoom;
         const head = (hasTestPeople() ? testPlayerTop() : -230) * persp(p.y);
-        const sx = (p.x - Math.round(w.camX) - view.crop) * z, sy = (p.y + head * 0.72) * z;
-        const half = 46 * persp(p.y) * charSize.k * z;
+        const sx = (p.x - Math.round(w.camX) - view.crop) * z, sy = (p.y + head * 0.72 - view.cropY) * z;
+        const half = 46 * persp(p.y) * 1.15 * z;
         const side: 1 | -1 = sx > ctx.canvas.width - 320 ? -1 : 1;
         const key = hs.device === 'pad' ? 'B' : hs.device === 'touch' || hs.compact ? '조' : 'E';
         shell.hud.drawPrompt(ctx, { x: sx + side * (half + 18), y: sy, side, key, text: tg.locked ? `${tg.text} · 잠김` : tg.text, locked: tg.locked, compact: hs.compact });

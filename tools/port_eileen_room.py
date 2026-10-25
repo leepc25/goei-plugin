@@ -128,7 +128,7 @@ sub("      if (P.z <= 0 && P.vz < 0) { land(); break; }", "      { const gz = en
 sub("  sfx('land'); P.z = 0; P.vz = 0;", "  sfx('land'); P.z = env.ground(P.x, P.y); P.vz = 0;")
 sub("  P.mode = 'air'; P.z = 0; P.vz = 0; P.jumps = 1;", "  P.mode = 'air'; P.vz = 0; P.jumps = 1;")
 sub("  env.clamp(P);", """  // 물건 위에서 걸어 나가면 떨어진다
-  if (P.mode === 'ground' || P.mode === 'chain') { const gz = env.ground(P.x, P.y); if (P.z > gz + 2) { P.mode = 'air'; P.vz = 0; P.jumps = 1; P.airAtk = false; P.takeoff = 0; P.spin = 0; P.airVX = 230; } else P.z = gz; }
+  if (P.mode === 'ground' || P.mode === 'chain') { const gz = env.ground(P.x, P.y); if (P.z > gz + 2) { P.mode = 'air'; P.vz = 0; P.jumps = 1; P.airAtk = false; P.takeoff = 0; P.spin = 0; P.airVX = 230; } else if (P.z >= gz - 10) P.z = gz; }
   env.clamp(P);""")
 sub("if (!vfx('land_dust', P.x, P.y, 2.2)) dust(P.x, P.y, 5);", "if (!vfx('land_dust', P.x, P.y - P.z, 2.2)) dust(P.x, P.y - P.z, 5);")
 sub("  shadow(P.x + fx0, P.y, P.z + lift * kk,", "  const gz0 = env.ground(P.x, P.y);   // 물건 위면 그림자도 그 윗면에\n  shadow(P.x + fx0, P.y - gz0, P.z - gz0 + lift * kk,")

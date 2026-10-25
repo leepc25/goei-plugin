@@ -608,7 +608,7 @@ function update(dt) {
     case 'crawl4': { const go = dx !== 0, looping = P.clip.id === '42_1' || P.clip.i >= 4; if (go) P.face = dx; P.clip.paused = !go && looping; if (go && looping) P.x += dx * 85 * dt; break; }
   }
   // 물건 위에서 걸어 나가면 떨어진다
-  if (P.mode === 'ground' || P.mode === 'chain') { const gz = env.ground(P.x, P.y); if (P.z > gz + 2) { P.mode = 'air'; P.vz = 0; P.jumps = 1; P.airAtk = false; P.takeoff = 0; P.spin = 0; P.airVX = 230; } else P.z = gz; }
+  if (P.mode === 'ground' || P.mode === 'chain') { const gz = env.ground(P.x, P.y); if (P.z > gz + 2) { P.mode = 'air'; P.vz = 0; P.jumps = 1; P.airAtk = false; P.takeoff = 0; P.spin = 0; P.airVX = 230; } else if (P.z >= gz - 10) P.z = gz; }
   env.clamp(P);
 }
 // ── 그리기 ──

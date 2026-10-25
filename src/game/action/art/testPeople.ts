@@ -3,9 +3,8 @@
 // 재생도 테스트룸 규칙대로(평상 대기는 앞 두 장만 0.6초씩, 걷기 11장/초, 뛰기 15장/초, 발밑 = 그림 높이 - 4, 그림자는 발 범위).
 // 엔진 동작 이름(idle·walk·jab…)은 테스트룸 동작 번호로 바꿔 그린다. 왼쪽은 좌우 뒤집기.
 // 남자 = 사무실에 서 있기만 한다(Test man, 동쪽 그림).
-// 크기: 원본 1도트 = 화면 1px × 원근 × 설정의 캐릭터 크기(charSize).
+// 크기: 원본 1도트 = 월드 1.15px × 원근 (맨 뒤 줄 키 1.65m = 235px). 배경과 같이 커진다.
 import { snapTo, spr } from '../engine/view';
-import { charSize } from '../charSize';
 
 const MAN_SCALE = 1;
 type Meta = { name: string; dir: string; n: number; w: number; h: number; bot: number[]; foot: number[][]; cx: number[] };
@@ -20,6 +19,7 @@ const MAN = { w: 128, h: 256, fx: 66, fy: 249, head: 8 };
 export function prepareTestPeople(urlOf?: (file: string) => Promise<string>, bytesOf?: (file: string) => Promise<Uint8Array | null>) {
   const own = ++revision;
   art = null;
+  faces.clear();
   const img = async (file: string, ext = '.png') => {
     const src = window.__GOEI_TEST_PEOPLE__?.[file] || (urlOf ? await urlOf(file + ext) : '');
     if (!src) throw new Error('no test art');
@@ -81,7 +81,7 @@ export function drawTestPlayer(c: CanvasRenderingContext2D, clip: string, frame:
   if (!e) return false;
   const { im, m } = e;
   const f = frameOf(id, m, frame, total);
-  const k = spr(y) * charSize.k;
+  const k = spr(y) * 1.15; // 맨 뒤 줄 키 1.65m = 235px (eileen/player.ts CHAR_K와 같게)
   const flip = m.dir === 'SW' ? dir > 0 : dir < 0;
   c.save();
   c.imageSmoothingEnabled = false;
@@ -97,7 +97,7 @@ export function drawTestPlayer(c: CanvasRenderingContext2D, clip: string, frame:
 /** 서 있는 남자. dir 1 = 오른쪽 보기(원본) */
 export function drawTestMan(c: CanvasRenderingContext2D, x: number, y: number, dir: 1 | -1): boolean {
   if (!art) return false;
-  const P = MAN_SCALE * spr(y) * charSize.k;
+  const P = MAN_SCALE * spr(y);
   c.save();
   c.imageSmoothingEnabled = false;
   c.fillStyle = 'rgba(0,0,0,.28)';
@@ -110,21 +110,23 @@ export function drawTestMan(c: CanvasRenderingContext2D, x: number, y: number, d
 }
 
 /** 발 기준 머리 꼭대기 (화면 px, 음수, 원근 미포함 — 부르는 쪽이 persp를 곱한다) */
-export const testPlayerTop = () => -(252 - 14) * charSize.k;
-export const testManTop = () => -(MAN.fy - MAN.head) * MAN_SCALE * charSize.k;
+export const testPlayerTop = () => -(252 - 14) * 1.15;
+export const testManTop = () => -(MAN.fy - MAN.head) * MAN_SCALE;
 
 /** 주인공 얼굴 칸: 평상 대기 첫 장의 머리·어깨 side×side (원본 1도트 = 1px) */
-let face: HTMLCanvasElement | null = null;
+const faces = new Map<number, HTMLCanvasElement>();
 export function testPlayerFace(side = 44): HTMLCanvasElement | null {
   const e = art?.clips['1'];
   if (!e) return null;
-  if (face?.width === side) return face;
-  face = document.createElement('canvas');
+  const hit = faces.get(side);
+  if (hit) return hit;
+  const face = document.createElement('canvas');
+  faces.set(side, face);
   face.width = face.height = side;
   const o = face.getContext('2d')!;
   o.imageSmoothingEnabled = false;
   const cx = e.m.w / 2 + (e.m.cx[0] ?? 0);
-  o.drawImage(e.im, cx - side / 2, 14 - 4, side, side, 0, 0, side, side);
+  o.drawImage(e.im, cx - side / 2 + 8, 14, side, side, 0, 0, side, side); // 얼굴이 가운데 오게 (옆머리 쪽을 덜)
   return face;
 }
 

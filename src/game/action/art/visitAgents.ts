@@ -1,7 +1,6 @@
 // 본부 방문: 방에 서 있는 요원 그림 (game-pack/visit-agents, tools/build_visit_agents.py).
 // 각 요원의 기존 대기(idle) 클립만 쓴다. 그림이 없는 요원은 그리지 않고 대화 목록에만 나온다.
 import { PIXEL } from '../engine/contract';
-import { charSize } from '../charSize';
 import { snapTo, spr } from '../engine/view';
 
 type Frame = { sx: number; sy: number; w: number; h: number; ox: number; oy: number };
@@ -43,7 +42,7 @@ export function drawVisitAgent(c: CanvasRenderingContext2D, name: string, x: num
   c.imageSmoothingEnabled = false;
   c.fillStyle = 'rgba(0,0,0,.28)';
   c.beginPath();
-  const P = PIXEL * spr(y) * charSize.k, k = P / PIXEL;
+  const P = PIXEL * spr(y), k = P / PIXEL;
   c.ellipse(x, y, 34 * k, 8 * k, 0, 0, Math.PI * 2);
   c.fill();
   snapTo(c, x, y);
@@ -57,8 +56,8 @@ export function drawVisitAgent(c: CanvasRenderingContext2D, name: string, x: num
 export function visitAgentTop(name: string): number {
   const a = sheet?.agents[name] as ({ head?: number; frames: Frame[] } | undefined);
   if (!a?.frames.length) return -260;
-  if (typeof a.head === 'number') return -a.head * PIXEL * charSize.k;
-  return Math.min(...a.frames.map((f) => f.oy)) * PIXEL * charSize.k;
+  if (typeof a.head === 'number') return -a.head * PIXEL;
+  return Math.min(...a.frames.map((f) => f.oy)) * PIXEL;
 }
 
 /** 대화창·화면 UI 얼굴: 필드 그림(도트) 첫 장의 머리·어깨를 잘라 1도트 = 1px 그림 주소로 (CSS pixelated로 키운다). 그림이 없으면 '' */

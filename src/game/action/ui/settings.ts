@@ -9,7 +9,7 @@ export interface UiSettings {
   bright: number;
   /** 확대할 때 도트를 각지게 */
   pixel: boolean;
-  /** 캐릭터 그림 크기 0.6~1.6 (판정은 그대로). 기본 1.15 = 맨 뒤 줄에서 키 1.65m가 235px (필드 그림 지침) */
+  /** 화면 확대 1~1.6: 배경과 사람을 같이 키운다 (기본 1 = 규격 크기, 세로 720이 창에 꽉) */
   charSize: number;
   master: number;
   music: number;
@@ -37,7 +37,7 @@ export const DEFAULT_SETTINGS: UiSettings = {
   flash: true,
   bright: 1,
   pixel: true,
-  charSize: 1.15,
+  charSize: 1,
   master: 0.8,
   music: 0.7,
   sfx: 0.9,

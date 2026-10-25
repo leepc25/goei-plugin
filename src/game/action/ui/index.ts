@@ -161,7 +161,7 @@ export function mountGameShell(box: HTMLElement, o: ShellOptions = {}): Shell {
       { type: 'toggle', label: '피해 숫자', get: () => s.numbers, set: (v) => (s.numbers = v) },
       { type: 'slider', label: '밝기', get: () => s.bright, set: (v) => (s.bright = v), min: 0.7, max: 1.4, step: 0.05, fmt: pct },
       { type: 'toggle', label: '도트 선명하게', get: () => s.pixel, set: (v) => (s.pixel = v) },
-      { type: 'slider', label: '캐릭터 크기', get: () => s.charSize, set: (v) => (s.charSize = v), min: 0.6, max: 1.6, step: 0.05, fmt: pct },
+      { type: 'slider', label: '화면 확대', get: () => s.charSize, set: (v) => (s.charSize = v), min: 1, max: 1.6, step: 0.05, fmt: pct },
       ...(o.field ? [] : [{ type: 'button' as const, label: '전체 화면', sub: '폰은 가로로 고정', act: () => void stage.fullscreen() }]),
       { type: 'head', label: '소리' },
       { type: 'slider', label: '전체', get: () => s.master, set: (v) => (s.master = v), min: 0, max: 1, step: 0.1, fmt: pct },
