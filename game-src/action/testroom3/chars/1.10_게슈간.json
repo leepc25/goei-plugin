@@ -61,7 +61,10 @@
     "23": [1, 2, 3, 4, 5, 6, 7, 8],
     "39": [9, 10, 11, 12],
     "41": [3, 4, 5, 6, 7, 8],
-    "42": [8, 9, 10, 11, 12]
+    "42": [8, 9, 10, 11, 12],
+    "1": [1, 2, 3, 4],
+    "3": [1, 2, 3, 4],
+    "15": [4, 5, 6, 7]
   },
   "hit": {
     "9": 5,
@@ -79,16 +82,28 @@
   },
   "gun": [],
   "kick": ["11", "13"],
-  "ranged": {"proj": {"t": "proj", "kind": "orb", "hit": {"dmg": 7, "kind": "light"}}, "heat": false},
+  "ranged": {
+    "proj": {
+      "t": "shock",
+      "at": "target",
+      "r": 60,
+      "color": "#5a8cff",
+      "scorch": 0.6,
+      "hit": {"dmg": 7, "kind": "light"}
+    },
+    "heat": false,
+    "_note": "쥐는 순간 대상 자리가 일그러짐"
+  },
   "skills": {
     "skill": {
       "name": "고정",
       "anim": "22",
-      "fps": 11,
+      "fps": 10,
       "events": [
+        {"f": 3, "fx": [{"t": "ring", "at": "target", "r": 60, "color": "#5a8cff"}]},
         {
           "f": 6,
-          "fx": [{"t": "bind", "time": 2.5}, {"t": "melee", "range": 170, "hit": {"dmg": 30, "kind": "heavy"}}]
+          "fx": [{"t": "lift", "h": 130, "time": 1.5, "color": "#5a8cff", "hit": {"dmg": 8, "kind": "light"}}]
         }
       ]
     },
@@ -96,35 +111,76 @@
       "name": "던지기 / 짓뭉개기",
       "hold": "23",
       "release": "24",
+      "releaseLv": {"2": "12"},
+      "fireLv": {"2": 4},
       "levels": [0.5, 1.2],
       "fire": 5,
       "lv": {
+        "0": [{"t": "shock", "at": "target", "r": 60, "color": "#5a8cff", "hit": {"dmg": 10, "kind": "light"}}],
         "1": [
-          {"t": "bind", "time": 2.5},
-          {"t": "proj", "kind": "orb", "speed": 1400, "hit": {"dmg": 45, "kind": "heavy"}}
+          {"t": "launch", "v": 500},
+          {
+            "t": "shock",
+            "at": "target",
+            "r": 90,
+            "color": "#5a8cff",
+            "hit": {"dmg": 45, "kind": "blow", "n": 2, "mid": "heavy"}
+          }
         ],
-        "2": [{"t": "proj", "kind": "orb", "speed": 1400, "hit": {"dmg": 45, "kind": "blow"}}]
+        "2": [
+          {
+            "t": "shock",
+            "at": "target",
+            "r": 120,
+            "color": "#5a8cff",
+            "scorch": 3,
+            "hit": {"dmg": 90, "kind": "down", "stop": 0.2, "shake": 15}
+          }
+        ]
       }
     },
     "super": {
       "name": "가리키고, 보고, 쥐고",
       "sub": "「…끝.」",
       "anim": "25",
-      "fps": 9,
+      "fps": 8,
       "events": [
         {
-          "f": 7,
+          "f": 3,
           "fx": [
-            {"t": "flash", "v": 0.1},
             {
               "t": "screen",
-              "spots": 6,
-              "each": [{"t": "melee", "range": 170, "hit": {"dmg": 45, "kind": "heavy"}}]
+              "spots": 5,
+              "every": 0.06,
+              "each": [
+                {"t": "ring", "r": 60, "color": "#5a8cff"},
+                {"t": "lift", "h": 170, "time": 1.6, "hit": {"dmg": 20, "kind": "light"}}
+              ]
+            }
+          ]
+        },
+        {
+          "f": 7,
+          "hold": 0.3,
+          "fx": [
+            {
+              "t": "screen",
+              "spots": 5,
+              "every": 0.02,
+              "each": [
+                {
+                  "t": "shock",
+                  "r": 120,
+                  "color": "#5a8cff",
+                  "hit": {"dmg": 150, "kind": "spike", "stop": 0.22, "shake": 16}
+                }
+              ]
             }
           ]
         }
       ]
     }
   },
-  "_note": "자동 생성. 값을 고치면 build가 그대로 씀. 다시 자동으로: build.py --reset 1.10_게슈간"
+  "_note": "손으로 다듬음(표 「테스트룸」 절·기술안). 그림 값은 자동. 다시 자동으로: build.py --reset 1.10_게슈간",
+  "clean": {"7": [[3, 40]], "36": [[6, 20]]}
 }

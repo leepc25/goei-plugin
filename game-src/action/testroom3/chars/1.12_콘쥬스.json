@@ -71,16 +71,25 @@
   "hit": {"9": 3, "10": 6, "11": 3, "12": 4, "13": 6, "14": 3, "15": 6},
   "gun": [],
   "kick": [],
-  "ranged": {"proj": {"t": "proj", "kind": "orb", "hit": {"dmg": 7, "kind": "light"}}, "heat": false},
+  "ranged": {
+    "proj": {"t": "proj", "kind": "box", "speed": 1100, "hit": {"dmg": 12, "kind": "heavy"}},
+    "heat": false,
+    "_note": "상자·잔해를 두 손 위치에서 던짐"
+  },
   "skills": {
     "skill": {
       "name": "바리케이드 번쩍",
       "anim": "22",
-      "fps": 11,
+      "fps": 9,
+      "armor": [1, 5],
       "events": [
+        {"f": 4, "fx": [{"t": "summon", "icon": "box", "at": "hand", "dy": -30, "time": 0.3}]},
         {
-          "f": 4,
-          "fx": [{"t": "pull", "dist": 220}, {"t": "melee", "range": 170, "hit": {"dmg": 30, "kind": "heavy"}}]
+          "f": 6,
+          "fx": [
+            {"t": "summon", "icon": "wall", "at": "front", "dx": 110, "time": 6},
+            {"t": "shock", "dx": 120, "r": 90, "hit": {"dmg": 5, "kind": "light"}}
+          ]
         }
       ]
     },
@@ -89,31 +98,24 @@
       "hold": "23",
       "release": "24",
       "levels": [0.5, 1.2],
-      "fire": 2,
+      "fire": 1,
       "lv": {
-        "1": [{"t": "melee", "range": 170, "hit": {"dmg": 45, "kind": "heavy"}}],
-        "2": [{"t": "melee", "range": 170, "hit": {"dmg": 45, "kind": "heavy"}}]
+        "0": [{"t": "text", "v": "아무도 없네…"}],
+        "1": [{"t": "buff", "time": 6, "label": "업음 1명 · 이동 +20%"}],
+        "2": [{"t": "buff", "time": 10, "label": "업음 2명 · 이동 +20%"}]
       }
     },
     "super": {
       "name": "제가 다 치울게요!",
       "sub": "「아저씨들은 뒤에 계세요!」",
       "anim": "25",
-      "fps": 9,
+      "fps": 8,
       "events": [
-        {
-          "f": 6,
-          "fx": [
-            {"t": "flash", "v": 0.1},
-            {
-              "t": "screen",
-              "spots": 6,
-              "each": [{"t": "melee", "range": 170, "hit": {"dmg": 45, "kind": "heavy"}}]
-            }
-          ]
-        }
+        {"f": 4, "fx": [{"t": "wave", "speed": 900, "hit": {"dmg": 20, "kind": "blow", "stop": 0.12}}]},
+        {"f": 9, "hold": 0.3, "fx": [{"t": "text", "v": "제가 다 치울게요!"}]}
       ]
     }
   },
-  "_note": "자동 생성. 값을 고치면 build가 그대로 씀. 다시 자동으로: build.py --reset 1.12_콘쥬스"
+  "_note": "손으로 다듬음(표 「테스트룸」 절·기술안). 그림 값은 자동. 다시 자동으로: build.py --reset 1.12_콘쥬스",
+  "clean": {"36": [[2, 20], [5, 20]]}
 }

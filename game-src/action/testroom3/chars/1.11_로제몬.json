@@ -72,13 +72,41 @@
   "hit": {"9": 6, "10": 4, "11": 3, "12": 5, "13": 2, "14": 4, "15": 4},
   "gun": [],
   "kick": [],
-  "ranged": {"proj": {"t": "proj", "kind": "orb", "hit": {"dmg": 7, "kind": "light"}}, "heat": false},
+  "ranged": {
+    "proj": {
+      "t": "proj",
+      "kind": "orb",
+      "speed": 1800,
+      "size": 0.5,
+      "color": "#9a5ad8",
+      "hit": {"dmg": 6, "kind": "light"}
+    },
+    "heat": false,
+    "_note": "편 손가락 끝에서 실"
+  },
   "skills": {
     "skill": {
       "name": "동전 던지기 최면",
       "anim": "22",
-      "fps": 11,
-      "events": [{"f": 4, "fx": [{"t": "melee", "range": 170, "hit": {"dmg": 30, "kind": "heavy"}}]}]
+      "fps": 9,
+      "events": [
+        {"f": 3, "fx": [{"t": "summon", "icon": "coin", "at": "hand", "dy": -70, "time": 1.0}]},
+        {
+          "f": 6,
+          "hold": 0.2,
+          "fx": [
+            {
+              "t": "chance",
+              "p": 0.5,
+              "yes": [
+                {"t": "mark", "time": 4, "color": "#9a5ad8", "text": "최면 성공"},
+                {"t": "bind", "time": 4, "color": "#9a5ad8"}
+              ],
+              "no": [{"t": "text", "v": "실패…"}, {"t": "shake", "v": 3}]
+            }
+          ]
+        }
+      ]
     },
     "charge": {
       "name": "인형술",
@@ -87,29 +115,49 @@
       "levels": [0.5, 1.2],
       "fire": 2,
       "lv": {
-        "1": [{"t": "melee", "range": 170, "hit": {"dmg": 45, "kind": "heavy"}}],
-        "2": [{"t": "melee", "range": 170, "hit": {"dmg": 45, "kind": "heavy"}}]
+        "0": [{"t": "tether", "time": 0.6, "color": "#9a5ad8"}],
+        "1": [
+          {"t": "tether", "time": 6, "color": "#9a5ad8"},
+          {"t": "bind", "time": 6, "color": "#9a5ad8"},
+          {"t": "text", "at": "target", "v": "인형 6초"}
+        ],
+        "2": [
+          {"t": "tether", "time": 10, "color": "#9a5ad8"},
+          {"t": "bind", "time": 10, "color": "#9a5ad8"},
+          {"t": "text", "at": "target", "v": "인형 10초"}
+        ]
       }
     },
     "super": {
       "name": "앙상블",
       "sub": "「나 사무직이라니까?!」",
       "anim": "25",
-      "fps": 9,
+      "fps": 8,
       "events": [
         {
-          "f": 6,
+          "f": 2,
           "fx": [
-            {"t": "flash", "v": 0.1},
             {
               "t": "screen",
-              "spots": 6,
-              "each": [{"t": "bind", "time": 2.5}, {"t": "melee", "range": 170, "hit": {"dmg": 45, "kind": "blow"}}]
+              "spots": 5,
+              "every": 0.05,
+              "each": [{"t": "tether", "time": 2.4, "color": "#9a5ad8"}]
+            }
+          ]
+        },
+        {
+          "f": 8,
+          "hold": 0.25,
+          "fx": [
+            {
+              "t": "pull",
+              "dist": 220,
+              "hit": {"dmg": 90, "kind": "down", "text": "박치기", "stop": 0.2, "shake": 14}
             }
           ]
         }
       ]
     }
   },
-  "_note": "자동 생성. 값을 고치면 build가 그대로 씀. 다시 자동으로: build.py --reset 1.11_로제몬"
+  "_note": "손으로 다듬음(표 「테스트룸」 절·기술안). 그림 값은 자동. 다시 자동으로: build.py --reset 1.11_로제몬"
 }

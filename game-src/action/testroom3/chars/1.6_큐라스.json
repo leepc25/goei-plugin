@@ -69,16 +69,23 @@
     "38": [5, 6, 7, 8, 9, 10, 11, 12],
     "15": [3, 4, 5, 6]
   },
-  "hit": {},
+  "hit": {"9": 4, "10": 5, "11": 5, "12": 6, "13": 4, "14": 2, "15": 3},
   "gun": [],
   "kick": [],
-  "ranged": {"proj": {"t": "proj", "kind": "orb", "hit": {"dmg": 7, "kind": "light"}}, "heat": false},
+  "ranged": {
+    "proj": {"t": "blast", "at": "target", "scale": 0.5, "hit": {"dmg": 7, "kind": "light"}},
+    "heat": false,
+    "_note": "무기 없음: 손끝 스냅 → 목표 지점 작은 불꽃"
+  },
   "skills": {
     "skill": {
       "name": "요격",
       "anim": "22",
-      "fps": 11,
-      "events": [{"f": 4, "fx": [{"t": "blast", "at": "hand", "dx": 30, "hit": {"dmg": 30, "kind": "heavy"}}]}]
+      "fps": 10,
+      "events": [
+        {"f": 2, "fx": [{"t": "blast", "at": "hand", "scale": 0.35}]},
+        {"f": 5, "fx": [{"t": "blast", "at": "target", "scale": 0.9, "hit": {"dmg": 18, "kind": "light"}}]}
+      ]
     },
     "charge": {
       "name": "지속 포격",
@@ -87,29 +94,91 @@
       "levels": [0.5, 1.2],
       "fire": 2,
       "lv": {
-        "1": [{"t": "blast", "at": "hand", "dx": 30, "hit": {"dmg": 45, "kind": "heavy"}}],
-        "2": [{"t": "melee", "range": 170, "hit": {"dmg": 45, "kind": "heavy"}}]
+        "0": [{"t": "blast", "at": "target", "scale": 0.7, "hit": {"dmg": 10, "kind": "light"}}],
+        "1": [
+          {
+            "t": "barrage",
+            "n": 10,
+            "every": 0.1,
+            "each": [{"t": "blast", "scale": 0.6, "hit": {"dmg": 5, "kind": "light", "stop": 0.03, "shake": 3}}]
+          }
+        ],
+        "2": [
+          {
+            "t": "barrage",
+            "n": 20,
+            "every": 0.1,
+            "each": [{"t": "blast", "scale": 0.6, "hit": {"dmg": 5, "kind": "light", "stop": 0.03, "shake": 3}}]
+          },
+          {"t": "firewall", "at": "target", "w": 180, "time": 3, "hit": {"dmg": 20, "kind": "down"}}
+        ]
       }
     },
     "super": {
       "name": "지휘",
       "sub": "「왼쪽 괜찮아? 형님 괜찮아?」",
       "anim": "25",
-      "fps": 9,
+      "fps": 7,
       "events": [
         {
-          "f": 6,
+          "f": 1,
           "fx": [
-            {"t": "flash", "v": 0.1},
             {
               "t": "screen",
-              "spots": 6,
-              "each": [{"t": "blast", "at": "hand", "dx": 30, "hit": {"dmg": 45, "kind": "heavy"}}]
+              "spots": 5,
+              "every": 0.03,
+              "each": [{"t": "blast", "scale": 1.0, "hit": {"dmg": 25, "kind": "heavy", "stop": 0.06, "shake": 5}}]
+            }
+          ]
+        },
+        {
+          "f": 3,
+          "fx": [
+            {
+              "t": "screen",
+              "spots": 5,
+              "every": 0.03,
+              "each": [{"t": "blast", "scale": 1.0, "hit": {"dmg": 25, "kind": "heavy", "stop": 0.06, "shake": 5}}]
+            }
+          ]
+        },
+        {
+          "f": 5,
+          "fx": [
+            {
+              "t": "screen",
+              "spots": 5,
+              "every": 0.03,
+              "each": [{"t": "blast", "scale": 1.0, "hit": {"dmg": 25, "kind": "heavy", "stop": 0.06, "shake": 5}}]
+            }
+          ]
+        },
+        {
+          "f": 7,
+          "fx": [
+            {
+              "t": "screen",
+              "spots": 5,
+              "every": 0.03,
+              "each": [{"t": "blast", "scale": 1.0, "hit": {"dmg": 25, "kind": "heavy", "stop": 0.06, "shake": 5}}]
+            }
+          ]
+        },
+        {
+          "f": 9,
+          "hold": 0.3,
+          "fx": [
+            {
+              "t": "firewall",
+              "at": "screen",
+              "time": 2,
+              "hit": {"dmg": 70, "kind": "launch", "stop": 0.2, "shake": 14}
             }
           ]
         }
       ]
     }
   },
-  "_note": "자동 생성. 값을 고치면 build가 그대로 씀. 다시 자동으로: build.py --reset 1.6_큐라스"
+  "_note": "손으로 다듬음(표 「테스트룸」 절·기술안). 그림 값은 자동. 다시 자동으로: build.py --reset 1.6_큐라스",
+  "clean": {"8": [[6, 30]], "38_1": [[5, 100], [6, 85]]}
 }

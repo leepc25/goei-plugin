@@ -47,8 +47,8 @@
     "36": {"folder": "36", "mirror": false, "name": "도망"},
     "37": {"folder": "37", "mirror": false, "name": "뒷걸음질 (움츠리기)"},
     "37_1": {"folder": "37_1", "mirror": false, "name": "뒷걸음질 반복"},
-    "38": {"folder": "38", "mirror": false, "name": "엎드려 기기"},
-    "38_1": {"folder": "38_1", "mirror": false, "name": "엎드려 기기 반복"},
+    "38": {"folder": "38", "mirror": true, "name": "엎드려 기기"},
+    "38_1": {"folder": "38_1", "mirror": true, "name": "엎드려 기기 반복"},
     "39": {"folder": "39", "mirror": false, "name": "주저앉기"},
     "40": {"folder": "40", "mirror": false, "name": "주저앉아 뒤로 기어나가기"},
     "41": {"folder": "41", "mirror": false, "name": "웅크려 떨기"},
@@ -63,49 +63,90 @@
     "23": [5, 6, 7, 8],
     "19": [7, 8, 9, 10, 11, 12],
     "39": [7, 8, 9, 10, 11, 12],
-    "41": [4, 5, 6, 7, 8]
+    "41": [4, 5, 6, 7, 8],
+    "1": [1, 2, 3, 4],
+    "37_1": [2, 3, 4, 5, 6, 7, 8, 9],
+    "42_1": [2, 3, 4, 5, 6, 7, 8, 9]
   },
   "hit": {"9": 6, "10": 5, "11": 5, "12": 4, "13": 4, "14": 3, "16_1": 2, "16": 2},
   "gun": ["W", "W_1", "15"],
   "kick": ["14"],
-  "ranged": {"proj": {"t": "proj", "kind": "bullet", "hit": {"dmg": 7, "kind": "light"}}, "heat": true},
+  "ranged": {
+    "proj": {
+      "t": "proj",
+      "kind": "orb",
+      "at": "front",
+      "dx": 0,
+      "h": 250,
+      "speed": 1500,
+      "color": "#ff5a4a",
+      "hit": {"dmg": 7, "kind": "light"}
+    },
+    "heat": false,
+    "_note": "발사는 리모컨 끝이 아니라 천장·벽 설비(머리 위 높이)에서"
+  },
   "skills": {
     "skill": {
       "name": "비상 장치 가동",
       "anim": "22",
-      "fps": 11,
-      "events": [{"f": 4, "fx": [{"t": "melee", "range": 170, "hit": {"dmg": 30, "kind": "heavy"}}]}]
+      "fps": 9,
+      "armed": true,
+      "events": [
+        {
+          "f": 3,
+          "fx": [
+            {"t": "text", "at": "target", "v": "경고!"},
+            {"t": "ring", "at": "target", "r": 70, "color": "#ff3a2a"}
+          ]
+        },
+        {
+          "f": 4,
+          "hold": 0.15,
+          "fx": [
+            {"t": "summon", "icon": "tube", "at": "target", "time": 2},
+            {"t": "bind", "time": 2, "color": "#9fd8ff"},
+            {
+              "t": "later",
+              "in": 2,
+              "fx": [{"t": "shock", "at": "target", "r": 90, "hit": {"dmg": 35, "kind": "down", "text": "패대기"}}]
+            }
+          ]
+        }
+      ]
     },
     "charge": {
       "name": "꽤 깊지!",
       "hold": "23",
       "release": "24",
+      "armed": true,
       "levels": [0.5, 1.2],
-      "fire": 2,
+      "fire": 5,
       "lv": {
-        "1": [{"t": "pull", "dist": 220}, {"t": "melee", "range": 170, "hit": {"dmg": 45, "kind": "heavy"}}],
-        "2": [{"t": "melee", "range": 170, "hit": {"dmg": 45, "kind": "heavy"}}]
+        "0": [{"t": "ring", "at": "front", "dx": 120, "r": 60, "color": "#ff3a2a"}],
+        "1": [
+          {"t": "summon", "icon": "wall", "at": "front", "dx": 100, "time": 5, "color": "#ff3a2a"},
+          {"t": "text", "v": "방벽 5초"}
+        ],
+        "2": [
+          {"t": "puddle", "at": "front", "dx": 300, "r": 300, "time": 1.4, "color": "#ff3a2a"},
+          {"t": "melee", "range": 520, "depth": 110, "hit": {"dmg": 60, "kind": "down", "text": "격리"}}
+        ]
       }
     },
     "super": {
       "name": "오오, 그 녀석은 성질이 좀 있지!",
       "sub": "「자네, 커피는 다 마셨나!」",
       "anim": "25",
-      "fps": 9,
+      "fps": 8,
       "events": [
-        {
-          "f": 6,
-          "fx": [
-            {"t": "flash", "v": 0.1},
-            {
-              "t": "screen",
-              "spots": 6,
-              "each": [{"t": "melee", "range": 170, "hit": {"dmg": 45, "kind": "heavy"}}]
-            }
-          ]
-        }
+        {"f": 2, "fx": [{"t": "dark", "v": 3.2}]},
+        {"f": 4, "fx": [{"t": "sweep", "time": 2.4, "hit": {"dmg": 150, "n": 5, "kind": "launch"}}]},
+        {"f": 6, "to": 11, "rep": 2, "d": 0.1, "fx": []},
+        {"f": 12, "hold": 0.3, "fx": [{"t": "text", "v": "철컹!"}, {"t": "shake", "v": 6}]}
       ]
     }
   },
-  "_note": "자동 생성. 값을 고치면 build가 그대로 씀. 다시 자동으로: build.py --reset 1.5_고그니쟈"
+  "_note": "손으로 다듬음(표 「테스트룸」 절·기술안). 그림 값은 자동. 다시 자동으로: build.py --reset 1.5_고그니쟈",
+  "skip": {"6": [3]},
+  "clean": {"8": [[2, 60], [3, 170]], "38": [[1, 450]]}
 }

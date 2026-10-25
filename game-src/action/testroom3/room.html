@@ -266,7 +266,7 @@ const FX = {
   // 폭발 하나: vfx 그림(기본 RPG 폭발) + 그을음. hand면 손 앞 공중, 아니면 바닥
   blast(s, c) {
     const p = posOf(s, c), sc = (s.scale || 1.6) * p.k, onAir = (s.at || 'hand') === 'hand' || s.air;
-    if (!vfx(s.vfx || 'eileen-rpg-explosion', p.x + (onAir ? P.face * 40 * sc : 0), onAir ? p.hy : p.gy - 4, sc * 1.2, onAir ? { center: true, flip: P.face < 0 } : {})) for (let i = 0; i < 14; i++) { const a = Math.random() * 6.28, v = 80 + Math.random() * 300; fx.push({ k: 'fire', x: p.x, y: onAir ? p.hy : p.gy - 30, vx: Math.cos(a) * v, vy: Math.sin(a) * v * 0.7 - 60, r: 8 + Math.random() * 12, t: 0.6, t0: 0.6 }); }
+    if (!vfx(s.vfx || 'eileen-rpg-explosion', p.x + (onAir ? P.face * 26 * sc : 0), onAir ? p.hy : p.gy - 4, sc * 1.2, onAir ? { center: true, flip: P.face < 0 } : {})) for (let i = 0; i < 14; i++) { const a = Math.random() * 6.28, v = 80 + Math.random() * 300; fx.push({ k: 'fire', x: p.x, y: onAir ? p.hy : p.gy - 30, vx: Math.cos(a) * v, vy: Math.sin(a) * v * 0.7 - 60, r: 8 + Math.random() * 12, t: 0.6, t0: 0.6 }); }
     if (s.scorch) { if (!vfx('crater', p.x, p.gy, 1.6 * sc, { hold: s.scorch, under: true })) fx.push({ k: 'scorch', x: p.x, y: p.gy, r: 50 * sc, t: s.scorch }); }
     if (!onAir) dust(p.x, p.gy, 6, sc);
     sfx('hit', { strength: 2, kind: 'super' });
@@ -349,7 +349,7 @@ const FX = {
   },
   bind(s) { if (!showDummy) return; D.bindT = s.time || 2; D.bindC = s.color || CH.color; D.vx = 0; },
   mark(s) { if (!showDummy) return; D.mark = s.time || 6; D.markC = s.color || '#ff5a4a'; ring(D.x, D.y - 230 * K(D.y), 40, 0.3, D.markC, 3); if (s.text) fx.push({ k: 'num', x: D.x - 30, y: D.y - 260 * K(D.y), v: s.text, t: 1.2 }); },
-  buff(s) { P.buffT = s.time || 4; P.buffC = s.color || CH.color; if (s.label) fx.push({ k: 'num', x: P.x - 40, y: P.y - 250 * K(P.y), v: s.label, t: 1.2 }); sfx('ability'); },
+  buff(s) { P.buffT = s.time || 4; P.buffC = s.color || CH.color; P.buffEdge = s.edge !== false; if (s.label) fx.push({ k: 'num', x: P.x - 40, y: P.y - 250 * K(P.y), v: s.label, t: 1.2 }); sfx('ability'); },
   heal(s) { const v = s.v || 30; P.hp = Math.min(100, P.hp + v); if (P.hp > 25) P.dying = false; vfx('heal', P.x, P.y + 4, 3.4 * K(P.y)); P.healT = 0.8; fx.push({ k: 'num', x: P.x - 20, y: P.y - 240 * K(P.y), v: '+' + v, t: 0.9 }); sfx('heal'); },
   // 소환·설치: 작은 물건(code 그림)을 두고, tick 마다 부품 실행
   summon(s, c) {
@@ -548,7 +548,7 @@ function superMove() {
   sfx('super'); cut = 1.1; dark = 1.6; flash = 0.12; hitstop = 0.9;
   const steps = sp.steps || [sp];
   const run = i => { if (i >= steps.length) { P.inSuper = false; P.inv = 0; return afterBuf(toIdle); } doSkill({ armorAll: true, ...steps[i], armed: steps[i].armed ?? sp.armed }, () => run(i + 1)); };
-  P.inv = 30; later(0.05, () => run(0));
+  P.inv = 30; later(0.85, () => run(0));   // 컷인이 걷힌 뒤 몸동작·효과
 }
 const CH_COL = ['rgba(255,255,255,.8)', '#fff6c0', '#8fdcff', '#c89bff'];
 const chLevels = () => (CH.skills.charge && CH.skills.charge.levels) || [0.5, 1.2];
@@ -948,7 +948,7 @@ function drawPlayer() {
   if (P.armorT > 0) tint = { c: '#ff2a2a', over: 0.35 * (P.armorT / 0.28) };
   else if (armored() && showArmor) tint = { c: 'rgba(255,60,40,.55)', over: 0 };
   else if (P.healT > 0) tint = { c: '#7dff8a', over: 0.35 * P.healT, noEdge: true };
-  else if (P.buffT > 0) tint = { c: P.buffC || CH.color, over: 0, ea: 0.5 + 0.3 * Math.sin(P.t * 8) };   // 버프: 몸 테두리만(둘레 기운 없음)
+  else if (P.buffT > 0 && P.buffEdge) tint = { c: P.buffC || CH.color, over: 0, ea: 0.5 + 0.3 * Math.sin(P.t * 8) };   // 버프: 몸 테두리만(둘레 기운 없음)
   else if (P.sp >= 100) tint = { c: '#ffd34a', over: 0, ea: 0.35 + 0.3 * (0.5 + 0.5 * Math.sin(P.t * 4)), glow: true };
   else if (P.hp <= 25) tint = { c: '#d0101a', over: 0.42 * (0.5 + 0.5 * Math.sin(P.t * Math.PI * 2 * 1.3)), noEdge: true };
   else if (P.mode === 'charge') { const lv = Math.min(3, chLv()); tint = { c: CH_COL[lv], over: 0.08 + 0.08 * Math.sin(P.t * 20), noEdge: true }; }
@@ -1257,7 +1257,7 @@ async function setChar(key) {
     await Promise.all(Object.keys(d.A).map(id => new Promise(r => { const im = new Image(); im.onload = im.onerror = r; im.src = d.A[id].src; imgs[id] = im; })));
     if (loading !== key) return;
     A = d.A; IMG = imgs; CH = Object.assign({ picks: {}, loops: {}, hit: {}, skills: {}, gun: [], kick: [], ranged: {} }, d.cfg); CK = key; silCache = {};
-    const keep = { hp: P.hp, sp: P.sp, dying: P.dying, status: P.status };   // 자리는 처음 자리로
+    const keep = { sp: P.sp, status: P.status };   // 자리는 처음 자리로
     P = Object.assign(P0(), keep); fx = []; hitstop = 0; cut = 0; dark = 0; Object.assign(D, { x: 860, y: 600, vx: 0, z: 0, vz: 0, mark: 0, bindT: 0, stunT: 0 });
     chsel.value = key; store.set('char', key);
     document.getElementById('loadm').textContent = `${Object.keys(A).length}줄 · ${CH.armed ? '무기 있음' : '무기 없음'} · 검수 전`;

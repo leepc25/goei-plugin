@@ -7,10 +7,12 @@
 - 인물 설정: `chars/<키>.json`. 없으면 build가 표의 「테스트룸」 절(반복 구간·타격 장·좌우 반전·W판)과 `picks.json`(고른 장·통과 목록), `docs/요원_기술안.md`(색·기술 이름·필살기 글씨·효과 초안)를 읽어 만든다. 파일에 적힌 값이 늘 이긴다. 자동값으로 되돌리기: `build.py --reset <키>`.
 - 그림 방향: build가 모든 그림을 오른쪽(동·남동)을 보게 뒤집어 둔다. 줄마다 `anims.<줄>.mirror`로 바꿀 수 있다.
 - 장 번호는 설정에서 1부터(동작표와 같음).
+- 그 밖의 칸: `loops`(반복 구간) · `hit`(타격 장) · `start`(첫 장이 앞 줄 끝 장과 어긋날 때 이 장부터 틂, 예 `{"20": 2}`) · `skip`(뺄 장) · `clean`(지울 것: `[장, 픽셀 수]` = 몸에서 떨어진 그만큼 작은 덩어리, `[장, [x0,y0,x1,y1]]` = 그 칸) · `ranged.proj`(원거리 부품) · `picks`(기준 장).
+- 줄이 없으면 대신 씀: 주저앉아 뒤로 기기(40)가 없으면 앉아 떠는 장 반복 + 코드로 뒤로.
 
 ## 기술 설정(`skills`)
 
-`skill`(고유기술, S 짧게), `charge`(S 길게 또는 D, 떼면 방출), `super`(F), `skill2`(Y, 있는 인물만).
+`skill`(고유기술, S 짧게), `charge`(S 길게 또는 D, 떼면 방출), `super`(F), `skill2`(Y, 있는 인물만). `skill.alt`: 버프 중이면 그 이름의 기술로(고르고디오 장갑 → 초음속 돌격). `charge.releaseLv`·`fireLv`: 단계마다 방출 동작·발사 장을 바꿈.
 
 ```json
 "skill": {"name": "근접 폭파", "anim": "22", "fps": 11, "armor": [3, 5],
@@ -21,7 +23,7 @@
 
 이벤트: `f`(장), `to`(여기까지 같은 효과), `rep`(그 장 반복 수), `d`(한 장 시간), `alt`(f와 to를 번갈아), `hold`(그 장에 머무는 시간).
 
-부품(`t`): `blast` 폭발 · `chain` 앞 일직선 연쇄 폭발 · `circle` 둘레 원형 범위 · `pillar` 폭발 기둥 · `screen` 화면 전체(샌드백+무작위 자리에 `each`) · `proj` 투사체(bullet·orb·spike·pen·card·knife) · `beam` 광선 · `melee` 앞 범위 타격 · `spikes` 바닥 가시 · `grid` 가시 격자(+구속) · `puddle` 그림자 웅덩이 · `hide` 몸 가라앉기/드러내기 · `teleport` 등 뒤로 · `bind` 구속 · `mark` 표식 · `buff` 버프 테두리 · `heal` 회복 · `summon` 소환·설치(cup·tablet·turret·box…, `tick`으로 반복 효과) · `pull` 끌어당김 · `launch` 띄우기 · `slash` 베기(x·arc) · `rain` 쏟아짐 · `scan` 훑기(line·grid) · `text` 글씨 · `flash`·`shake`·`dark`·`zoom` · `later` 지연 · `suppress`·`artillery`(에일린).
+부품(`t`): `blast` 폭발 · `chain` 앞 일직선 연쇄 폭발 · `circle` 둘레 원형 범위 · `pillar` 폭발 기둥 · `screen` 화면 전체(샌드백+무작위 자리에 `each`) · `proj` 투사체(bullet·orb·spike·pen·card·knife) · `beam` 광선 · `melee` 앞 범위 타격 · `spikes` 바닥 가시 · `grid` 가시 격자(+구속) · `puddle` 그림자 웅덩이 · `hide` 몸 가라앉기/드러내기 · `teleport` 등 뒤로 · `bind` 구속 · `mark` 표식 · `buff` 버프 테두리 · `heal` 회복 · `summon` 소환·설치(cup·tablet·turret·box…, `tick`으로 반복 효과) · `pull` 끌어당김 · `launch` 띄우기 · `slash` 베기(x·arc) · `rain` 쏟아짐 · `scan` 훑기(line·grid) · `text` 글씨 · `flash`·`shake`·`dark`·`zoom` · `later` 지연 · `dash` 돌진 · `hop` 뒤로 펄쩍 · `lift` 띄워 고정 · `tether` 실 · `shock` 바닥 충격파 · `barrage` 연속 포격 · `firewall` 불 벽 · `sweep` 괴이 그림자 휩쓸기 · `wave` 잔해 파도 · `ring` 고리 · `gray` 흑백 · `chance` 확률 갈림 · `suppress`·`artillery`(에일린).
 
 위치 `at`: `hand`(손·총구, 기본) · `front`(앞 바닥, `dx`) · `self` · `target`. 맞음 `hit`: `dmg`, `kind`(light·heavy·launch·blow·down·stun·spike·pull), `n`(히트 수), `stop`, `shake`, `text`. 멈춤·흔들림은 맞았을 때만 든다.
 

@@ -80,44 +80,70 @@
   "hit": {"9": 6, "10": 7, "11": 4, "12": 5, "13": 2, "14": 2, "24": 3},
   "gun": ["W", "W_1", "15"],
   "kick": [],
-  "ranged": {"proj": {"t": "proj", "kind": "bullet", "hit": {"dmg": 7, "kind": "light"}}, "heat": true},
+  "ranged": {
+    "proj": {
+      "t": "proj",
+      "kind": "orb",
+      "speed": 2600,
+      "size": 0.6,
+      "color": "#ff7ac8",
+      "hit": {"dmg": 6, "kind": "light"}
+    },
+    "heat": false,
+    "_note": "스캐너 앞끝 레이저"
+  },
   "skills": {
     "skill": {
       "name": "죄, 죄송해요!",
       "anim": "22",
-      "fps": 11,
-      "events": [{"f": 4, "fx": [{"t": "melee", "range": 170, "hit": {"dmg": 30, "kind": "heavy"}}]}]
+      "fps": 10,
+      "events": [
+        {"f": 1, "fx": [{"t": "hop", "v": 700, "inv": 1, "text": "힉!"}]},
+        {"f": 6, "fx": [{"t": "buff", "time": 3, "label": "들키지 않은 공격 +30%", "color": "#ff7ac8"}]}
+      ]
     },
     "charge": {
       "name": "증언 재현",
       "hold": "23",
       "release": "24",
+      "armed": true,
       "levels": [0.5, 1.2],
       "fire": 3,
       "lv": {
-        "1": [{"t": "melee", "range": 170, "hit": {"dmg": 45, "kind": "launch"}}],
-        "2": [{"t": "melee", "range": 170, "hit": {"dmg": 45, "kind": "heavy"}}]
+        "0": [{"t": "scan", "style": "line", "color": "#7ad8ff"}],
+        "1": [{"t": "summon", "icon": "decoy", "at": "front", "dx": 130, "time": 4}, {"t": "text", "v": "미끼 4초"}],
+        "2": [
+          {"t": "summon", "icon": "decoy", "at": "front", "dx": 130, "time": 4},
+          {"t": "mark", "time": 8, "color": "#7ad8ff", "text": "약점 +40%"}
+        ]
       }
     },
     "super": {
       "name": "이건 꽝이에요",
       "sub": "「주, 죽는 거 아니죠…?」",
       "anim": "25",
-      "fps": 9,
+      "fps": 8,
+      "armed": true,
       "events": [
+        {"f": 2, "fx": [{"t": "scan", "style": "line", "color": "#ff7ac8", "time": 1.3}]},
+        {"f": 7, "fx": [{"t": "scan", "style": "grid", "color": "#7ad8ff", "time": 1.0}]},
         {
-          "f": 6,
+          "f": 11,
+          "hold": 0.3,
           "fx": [
-            {"t": "flash", "v": 0.1},
             {
               "t": "screen",
-              "spots": 6,
-              "each": [{"t": "melee", "range": 170, "hit": {"dmg": 45, "kind": "heavy"}}]
-            }
+              "spots": 5,
+              "every": 0.12,
+              "each": [{"t": "text", "v": "꽝", "big": true}, {"t": "ring", "r": 50, "color": "#ff3a6a"}]
+            },
+            {"t": "mark", "time": 10, "color": "#ff7ac8", "text": "약점 +60%"}
           ]
         }
       ]
     }
   },
-  "_note": "자동 생성. 값을 고치면 build가 그대로 씀. 다시 자동으로: build.py --reset 1.8_데쥬레"
+  "_note": "손으로 다듬음(표 「테스트룸」 절·기술안). 그림 값은 자동. 다시 자동으로: build.py --reset 1.8_데쥬레",
+  "start": {"20": 2},
+  "clean": {"25": [[11, 45]]}
 }

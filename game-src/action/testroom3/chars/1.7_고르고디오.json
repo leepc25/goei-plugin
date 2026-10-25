@@ -76,34 +76,79 @@
     "42_1": [1, 2, 3, 4, 5, 6, 7, 8, 9],
     "19": [8, 9, 10, 11, 12]
   },
-  "hit": {},
+  "hit": {"9": 4, "10": 6, "11": 4, "12": 4, "13": 3, "14": 3, "15": 6},
   "gun": ["W", "W_1", "15"],
   "kick": [],
-  "ranged": {"proj": {"t": "proj", "kind": "bullet", "hit": {"dmg": 7, "kind": "light"}}, "heat": true},
+  "ranged": {
+    "proj": {
+      "t": "proj",
+      "kind": "orb",
+      "at": "front",
+      "dx": 70,
+      "h": 24,
+      "speed": 1300,
+      "size": 1.8,
+      "color": "#9fd0ff",
+      "hit": {"dmg": 14, "kind": "heavy"}
+    },
+    "heat": false,
+    "_note": "칼을 올려 드는 6장에 바닥을 타는 충격파"
+  },
   "skills": {
     "skill": {
       "name": "승인 요청",
       "anim": "22",
-      "fps": 11,
+      "fps": 9,
+      "alt": "dash",
       "events": [
+        {"f": 1, "fx": [{"t": "text", "v": "승인 요청!"}]},
         {
           "f": 4,
           "fx": [
-            {"t": "buff", "time": 4, "label": "강화"},
-            {"t": "melee", "range": 170, "hit": {"dmg": 30, "kind": "blow"}}
+            {"t": "flash", "v": 0.06},
+            {"t": "shake", "v": 4},
+            {"t": "buff", "time": 12, "label": "장갑 상태(S = 초음속 돌격)", "edge": false, "color": "#5a8cff"}
+          ]
+        }
+      ]
+    },
+    "dash": {
+      "name": "초음속 돌격",
+      "anim": "22_1",
+      "fps": 10,
+      "armorAll": true,
+      "events": [
+        {
+          "f": 4,
+          "hold": 0.5,
+          "fx": [
+            {
+              "t": "dash",
+              "speed": 1700,
+              "time": 0.5,
+              "hit": {"dmg": 60, "kind": "blow", "stop": 0.16, "shake": 14}
+            }
           ]
         }
       ]
     },
     "charge": {
-      "name": "건틀릿 해체",
+      "name": "건틀릿 해체(맨몸 = 내려치기)",
       "hold": "23",
       "release": "24",
+      "armed": true,
       "levels": [0.5, 1.2],
-      "fire": 2,
+      "fire": 4,
       "lv": {
-        "1": [{"t": "melee", "range": 170, "hit": {"dmg": 45, "kind": "heavy"}}],
-        "2": [{"t": "melee", "range": 170, "hit": {"dmg": 45, "kind": "heavy"}}]
+        "0": [{"t": "shock", "r": 140, "hit": {"dmg": 25, "kind": "heavy"}}],
+        "1": [{"t": "shock", "r": 200, "hit": {"dmg": 60, "kind": "down", "stop": 0.16}}],
+        "2": [
+          {
+            "t": "shock",
+            "r": 300,
+            "hit": {"dmg": 90, "kind": "launch", "n": 2, "mid": "heavy", "stop": 0.2, "shake": 14}
+          }
+        ]
       }
     },
     "super": {
@@ -113,22 +158,28 @@
       "fps": 9,
       "events": [
         {
+          "f": 2,
+          "hold": 0.55,
+          "fx": [{"t": "dash", "speed": 1400, "time": 0.55, "hit": {"dmg": 60, "kind": "launch"}}]
+        },
+        {
           "f": 6,
+          "hold": 0.2,
           "fx": [
-            {"t": "flash", "v": 0.1},
             {
-              "t": "screen",
-              "spots": 6,
-              "each": [
-                {"t": "pull", "dist": 220},
-                {"t": "summon", "icon": "box", "dx": 140, "time": 4},
-                {"t": "melee", "range": 170, "hit": {"dmg": 45, "kind": "heavy"}}
-              ]
+              "t": "blast",
+              "at": "front",
+              "dx": 90,
+              "scale": 2.0,
+              "r": 160,
+              "hit": {"dmg": 90, "kind": "blow", "stop": 0.2, "shake": 16}
             }
           ]
-        }
+        },
+        {"f": 12, "hold": 0.5, "fx": [{"t": "text", "v": "꽉 잡아. 벽은 내가 맞을게."}]}
       ]
     }
   },
-  "_note": "자동 생성. 값을 고치면 build가 그대로 씀. 다시 자동으로: build.py --reset 1.7_고르고디오"
+  "_note": "손으로 다듬음(표 「테스트룸」 절·기술안). 그림 값은 자동. 다시 자동으로: build.py --reset 1.7_고르고디오",
+  "clean": {"38_1": [[6, 70]]}
 }

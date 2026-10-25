@@ -72,20 +72,18 @@
   "hit": {"9": 3, "10": 8, "11": 5, "12": 3, "13": 3, "14": 1, "15": 4},
   "gun": ["W", "W_1", "15"],
   "kick": [],
-  "ranged": {"proj": {"t": "proj", "kind": "bullet", "hit": {"dmg": 7, "kind": "light"}}, "heat": true},
+  "ranged": {"proj": {"t": "proj", "kind": "bullet", "hit": {"dmg": 9, "kind": "light"}}, "heat": false},
   "skills": {
     "skill": {
       "name": "되감기",
       "anim": "22",
-      "fps": 11,
+      "fps": 9,
       "events": [
         {
-          "f": 4,
-          "fx": [
-            {"t": "heal", "on": "self", "v": 30},
-            {"t": "melee", "range": 170, "hit": {"dmg": 30, "kind": "heavy"}}
-          ]
-        }
+          "f": 3,
+          "fx": [{"t": "ring", "air": true, "at": "self", "h": 130, "r": 90, "time": 0.8, "color": "#3A4A8A"}]
+        },
+        {"f": 5, "fx": [{"t": "heal", "v": 25}, {"t": "text", "v": "강화 하나 잊음"}]}
       ]
     },
     "charge": {
@@ -93,31 +91,61 @@
       "hold": "23",
       "release": "24",
       "levels": [0.5, 1.2],
-      "fire": 2,
+      "fire": 3,
       "lv": {
-        "1": [{"t": "melee", "range": 170, "hit": {"dmg": 45, "kind": "heavy"}}],
-        "2": [{"t": "melee", "range": 170, "hit": {"dmg": 45, "kind": "heavy"}}]
+        "0": [{"t": "scan", "style": "line", "color": "#c9a46a"}],
+        "1": [
+          {"t": "scan", "style": "line", "color": "#c9a46a", "time": 1.0},
+          {"t": "tether", "time": 2, "color": "#c9a46a"},
+          {"t": "text", "v": "냄새 줄 10초"}
+        ],
+        "2": [
+          {"t": "scan", "style": "line", "color": "#c9a46a", "time": 1.0},
+          {"t": "tether", "time": 2, "color": "#c9a46a"},
+          {"t": "mark", "time": 5, "color": "#c9a46a", "text": "드러남 +30%"}
+        ]
       }
     },
     "super": {
-      "name": "여기서 제가 한 번 죽으면",
+      "name": "한 번 죽으면",
       "sub": "「시간이 벌리니까요.」",
       "anim": "25",
-      "fps": 9,
+      "fps": 7,
       "events": [
         {
-          "f": 6,
+          "f": 3,
+          "fx": [{"t": "text", "v": "여기요!"}, {"t": "buff", "time": 2, "label": "도발", "color": "#ff5a4a"}]
+        },
+        {
+          "f": 8,
+          "hold": 0.4,
           "fx": [
-            {"t": "flash", "v": 0.1},
+            {"t": "gray", "time": 1.4},
+            {"t": "ring", "at": "self", "r": 600, "time": 1.2, "color": "#3A4A8A", "w": 10}
+          ]
+        },
+        {
+          "f": 9,
+          "fx": [
             {
               "t": "screen",
-              "spots": 6,
-              "each": [{"t": "melee", "range": 170, "hit": {"dmg": 45, "kind": "heavy"}}]
+              "spots": 4,
+              "every": 0.1,
+              "each": [
+                {
+                  "t": "shock",
+                  "r": 80,
+                  "color": "#3A4A8A",
+                  "hit": {"dmg": 140, "kind": "launch", "stop": 0.2, "shake": 14}
+                }
+              ]
             }
           ]
-        }
+        },
+        {"f": 11, "fx": [{"t": "heal", "v": 100}]}
       ]
     }
   },
-  "_note": "자동 생성. 값을 고치면 build가 그대로 씀. 다시 자동으로: build.py --reset 1.9_데드폴"
+  "_note": "손으로 다듬음(표 「테스트룸」 절·기술안). 그림 값은 자동. 다시 자동으로: build.py --reset 1.9_데드폴",
+  "start": {"11": 2, "20": 2, "24": 2}
 }

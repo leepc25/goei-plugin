@@ -29,17 +29,18 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
     await page.keyboard.down('ArrowRight'); await sleep(350); await shot(`${tag}_01_걷기`); await page.keyboard.up('ArrowRight');
     await page.keyboard.down('ArrowLeft'); await sleep(300); await shot(`${tag}_02_걷기_왼쪽`); await page.keyboard.up('ArrowLeft');
     await page.keyboard.down('ArrowRight'); await sleep(80); await page.keyboard.up('ArrowRight'); await sleep(300);
-    // 약1~3, 강
+    // 약1~3, 강: 샌드백 가까이
+    await page.evaluate(() => { const P = window.__room.P; P.x = 690; P.y = 600; P.face = 1; }); await sleep(150);
     await tap('KeyZ'); await sleep(120); await shot(`${tag}_03_약1`);
     await tap('KeyZ'); await sleep(140); await shot(`${tag}_04_약2`);
     await tap('KeyZ'); await sleep(150); await shot(`${tag}_05_약3`);
     await sleep(400); await tap('KeyX'); await sleep(230); await shot(`${tag}_06_강`);
     await sleep(700); await tap('KeyC'); await sleep(110); await shot(`${tag}_07_회피`);
     await sleep(600); await tap('KeyA', 30); await sleep(260); await shot(`${tag}_08_원거리`);
-    await sleep(900); await tap('KeyS', 40); await sleep(450); await shot(`${tag}_09_고유기술`);
+    await sleep(900); await page.evaluate(() => { const P = window.__room.P; P.x = 620; P.y = 600; P.face = 1; }); await sleep(100); await tap('KeyS', 40); await sleep(450); await shot(`${tag}_09_고유기술`);
     await sleep(1200);
-    await page.keyboard.down('KeyS'); await sleep(1500); await shot(`${tag}_10_충전`); await page.keyboard.up('KeyS'); await sleep(260); await shot(`${tag}_11_충전방출`);
-    await sleep(1500); await tap('KeyF'); await sleep(500); await shot(`${tag}_12_필살기_컷인`); await sleep(1300); await shot(`${tag}_13_필살기`);
+    await page.evaluate(() => { const P = window.__room.P; P.x = 520; P.y = 600; P.face = 1; }); await page.keyboard.down('KeyS'); await sleep(1500); await shot(`${tag}_10_충전`); await page.keyboard.up('KeyS'); await sleep(260); await shot(`${tag}_11_충전방출`);
+    await sleep(1500); await page.evaluate(() => { const P = window.__room.P; P.x = 520; P.y = 600; P.face = 1; }); await tap('KeyF'); await sleep(500); await shot(`${tag}_12_필살기_컷인`); await sleep(1300); await shot(`${tag}_13_필살기`);
     await sleep(2500); await tap('KeyV', 300); await sleep(100);
     await page.keyboard.down('KeyV'); await sleep(250); await shot(`${tag}_14_막기`); await page.keyboard.up('KeyV'); await sleep(400);
     await tap('Digit1'); await sleep(200); await shot(`${tag}_15_맞기`); await sleep(600);

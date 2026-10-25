@@ -82,9 +82,9 @@
             {
               "t": "blast",
               "at": "hand",
-              "dx": 24,
+              "dx": 0,
               "scale": 1.4,
-              "r": 120,
+              "r": 180,
               "scorch": 3,
               "hit": {"dmg": 40, "kind": "blow", "stop": 0.16, "shake": 12}
             }
