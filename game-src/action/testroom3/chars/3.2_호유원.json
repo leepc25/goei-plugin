@@ -1,0 +1,123 @@
+{
+  "key": "3.2_호유원",
+  "name": "호유원",
+  "dir": "E",
+  "color": "#E0A43A",
+  "armed": true,
+  "anims": {
+    "1": {"folder": "1", "mirror": false, "name": "평상 대기"},
+    "2": {"folder": "2", "mirror": false, "name": "개인 대기 (구두 앞코 닦기)"},
+    "3_0": {"folder": "3_0", "mirror": false, "name": "전투 자세 잡기 (주머니 손)"},
+    "3": {"folder": "3", "mirror": false, "name": "전투 대기 (발끝 통통)"},
+    "W": {"folder": "W", "mirror": false, "name": "무기 꺼내기 (폰을 귀에)"},
+    "W_1": {"folder": "W_1", "mirror": false, "name": "무기 대기 (통화 중)"},
+    "4": {"folder": "4", "mirror": false, "name": "걷기 (주머니 손 여우 걸음)"},
+    "5": {"folder": "5", "mirror": false, "name": "뛰기 (주머니 손 긴 도약)"},
+    "6": {"folder": "6", "mirror": false, "name": "제자리 점프 (무릎 접는 여우 뜀)"},
+    "7": {"folder": "7", "mirror": false, "name": "방향 점프 (무릎 접고 앞으로)"},
+    "8": {"folder": "8", "mirror": false, "name": "달리다 점프 (주머니 손 허들)"},
+    "9": {"folder": "9", "mirror": false, "name": "약1 (구두 앞코 앞차기)"},
+    "10": {"folder": "10", "mirror": false, "name": "약2 (디뎌 다른 발 앞차기)"},
+    "11": {"folder": "11", "mirror": false, "name": "약3 (머리 위 하이킥)"},
+    "12": {"folder": "12", "mirror": false, "name": "강 (공중 이단 앞차기)"},
+    "13": {"folder": "13", "mirror": false, "name": "돌진 (여우 사냥 점프)"},
+    "14": {"folder": "14", "mirror": false, "name": "점프 공격 (두 발 다이브킥)"},
+    "15": {"folder": "15", "mirror": false, "name": "원거리 공격 (폰 화면 내밀기)"},
+    "16": {"folder": "16", "mirror": false, "name": "뒤 회피 (뒤로 젖혀 앉은 듯 날기)"},
+    "16_1": {"folder": "16_1", "mirror": false, "name": "앞 회피 (낮게 스쳐 지나감)"},
+    "17": {"folder": "17", "mirror": false, "name": "막기 (정강이 막기)"},
+    "18": {"folder": "18", "mirror": false, "name": "맞기 (몸이 접혔다가 곧바로 미소)"},
+    "19": {"folder": "19", "mirror": false, "name": "날아가 쓰러지기"},
+    "20": {"folder": "20", "mirror": false, "name": "일어나기 (킥업)"},
+    "21": {"folder": "21", "mirror": false, "name": "스턴 (미소 그대로 늘어짐)"},
+    "22": {"folder": "22", "mirror": false, "name": "고유기술 「확인했어요, ~님」"},
+    "23": {"folder": "23", "mirror": false, "name": "충전 모으기 「아홉 번째 대답」"},
+    "24": {"folder": "24", "mirror": false, "name": "충전 방출 (미소가 꺼짐)"},
+    "25": {"folder": "25", "mirror": false, "name": "필살기 「가장 소중한 것이 만나러 와요」"},
+    "26": {"folder": "26", "mirror": false, "name": "섭취 (사과 한 입)"},
+    "27": {"folder": "27", "mirror": false, "name": "줍기 (집어서 털기)"},
+    "28": {"folder": "28", "mirror": false, "name": "응대 (손 먼저 내밀기)"},
+    "29": {"folder": "29", "mirror": false, "name": "말하며 손짓"},
+    "30": {"folder": "30", "mirror": false, "name": "끄덕이기"},
+    "31": {"folder": "31", "mirror": false, "name": "고개 젓기"},
+    "32": {"folder": "32", "mirror": false, "name": "화내기 (미소가 떨어짐)"},
+    "33": {"folder": "33", "mirror": false, "name": "발견 반응 (목 빼고 들여다봄 → 악수 손)"},
+    "34": {"folder": "34", "mirror": false, "name": "놀라기 (1초 안에 미소)"},
+    "35": {"folder": "35", "mirror": false, "name": "기뻐하기 (지나치게 기쁨)"},
+    "36": {"folder": "36", "mirror": false, "name": "도망 (여우 종종걸음)"},
+    "37": {"folder": "37", "mirror": false, "name": "뒷걸음질 (억지 미소 움츠리기)"},
+    "37_1": {"folder": "37_1", "mirror": false, "name": "뒷걸음질 반복"},
+    "38": {"folder": "38", "mirror": true, "name": "엎드려 기기"},
+    "38_1": {"folder": "38_1", "mirror": true, "name": "엎드려 기기 반복"},
+    "39": {"folder": "39", "mirror": false, "name": "주저앉기 (옆으로 다리 접고)"},
+    "40": {"folder": "40", "mirror": false, "name": "주저앉아 뒤로 기어나가기"},
+    "41": {"folder": "41", "mirror": false, "name": "웅크려 떨기"},
+    "42": {"folder": "42", "mirror": false, "name": "네발로 기기"},
+    "42_1": {"folder": "42_1", "mirror": false, "name": "네발로 기기 반복"}
+  },
+  "picks": {"combat": 4, "weapon": 4, "apex": 5, "run": 2, "crawl4": 9},
+  "loops": {
+    "1": [1, 2, 3, 4],
+    "3": [1, 2, 3, 4],
+    "W_1": [1, 2, 3, 4],
+    "4": [1, 2, 3, 4, 5, 6, 7, 8],
+    "5": [1, 2, 3, 4, 5, 6, 7, 8],
+    "36": [2, 3, 4, 5, 6, 7, 8],
+    "19": [7, 8, 9, 10, 11, 12],
+    "21": [5, 6, 7, 8],
+    "23": [7, 8],
+    "29": [1, 2, 3, 4],
+    "39": [7, 8, 9, 10, 11, 12],
+    "41": [2, 3, 4, 5, 6, 7, 8],
+    "17": [3, 4, 5, 6, 7, 8],
+    "15": [2, 3, 4, 5]
+  },
+  "hit": {},
+  "gun": ["W", "W_1", "15"],
+  "kick": ["12", "14"],
+  "ranged": {"proj": {"t": "proj", "kind": "bullet", "hit": {"dmg": 7, "kind": "light"}}, "heat": true},
+  "skills": {
+    "skill": {
+      "name": "확인했어요, ~님",
+      "anim": "22",
+      "fps": 11,
+      "events": [
+        {
+          "f": 4,
+          "fx": [{"t": "mark", "time": 6}, {"t": "melee", "range": 170, "hit": {"dmg": 30, "kind": "blow"}}]
+        }
+      ]
+    },
+    "charge": {
+      "name": "아홉 번째 대답",
+      "hold": "23",
+      "release": "24",
+      "levels": [0.5, 1.2],
+      "fire": 2,
+      "lv": {
+        "1": [{"t": "melee", "range": 170, "hit": {"dmg": 45, "kind": "heavy"}}],
+        "2": [{"t": "melee", "range": 170, "hit": {"dmg": 45, "kind": "heavy"}}]
+      }
+    },
+    "super": {
+      "name": "가장 소중한 것이 만나러 와요",
+      "sub": "「잘 보살펴 드릴게요, ~님.」",
+      "anim": "25",
+      "fps": 9,
+      "events": [
+        {
+          "f": 6,
+          "fx": [
+            {"t": "flash", "v": 0.1},
+            {
+              "t": "screen",
+              "spots": 6,
+              "each": [{"t": "melee", "range": 170, "hit": {"dmg": 45, "kind": "heavy"}}]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "_note": "자동 생성. 값을 고치면 build가 그대로 씀. 다시 자동으로: build.py --reset 3.2_호유원"
+}

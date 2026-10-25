@@ -59,9 +59,6 @@
     "1": [1, 2, 3, 4],
     "3": [1, 2, 3, 4],
     "W_1": [1, 2, 3, 4],
-    "4": [1, 2, 3, 4, 5, 6, 7, 8],
-    "5": [1, 2, 3, 4, 5, 6, 7, 8],
-    "36": [1, 2, 3, 4, 5, 6, 7, 8],
     "19": [9, 10, 11, 12],
     "21": [2, 3, 4, 5, 6, 7, 8],
     "23": [7, 8],
@@ -71,40 +68,153 @@
     "38": [7, 8, 9, 10, 11, 12],
     "15": [2, 3, 4]
   },
-  "hit": {},
+  "hit": {"9": 8, "10": 6, "11": 6, "12": 5, "13": 1, "14": 3, "15": 3},
   "gun": [],
   "kick": [],
-  "ranged": {"proj": {"t": "proj", "kind": "orb", "hit": {"dmg": 7, "kind": "light"}}, "heat": false},
+  "ranged": {
+    "proj": {
+      "t": "slash",
+      "at": "target",
+      "style": "arc",
+      "size": 70,
+      "dark": true,
+      "color": "#141418",
+      "hit": {"dmg": 8, "kind": "light"}
+    },
+    "heat": false,
+    "_note": "검지로 지목한 적 자리에 검은 선"
+  },
   "skills": {
     "skill": {
       "name": "검은 선",
       "anim": "22",
-      "fps": 11,
-      "events": [{"f": 4, "fx": [{"t": "melee", "range": 170, "hit": {"dmg": 30, "kind": "heavy"}}]}]
+      "fps": 10,
+      "events": [
+        {
+          "f": 3,
+          "fx": [
+            {
+              "t": "slash",
+              "at": "front",
+              "dx": 60,
+              "style": "h",
+              "dark": true,
+              "color": "#141418",
+              "size": 40
+            }
+          ]
+        },
+        {"f": 5, "fx": [{"t": "hide", "mode": "out", "dur": 0.12}]},
+        {
+          "f": 6,
+          "hold": 0.3,
+          "fx": [
+            {"t": "teleport", "to": "behind", "dist": 90, "puddle": false},
+            {
+              "t": "slash",
+              "at": "target",
+              "style": "arc",
+              "size": 120,
+              "dark": true,
+              "color": "#141418",
+              "hit": {"dmg": 35, "kind": "heavy"}
+            }
+          ]
+        },
+        {"f": 7, "fx": [{"t": "hide", "mode": "in", "dur": 0.12}]}
+      ]
     },
     "charge": {
       "name": "분신",
       "hold": "23",
       "release": "24",
       "levels": [0.5, 1.2],
-      "fire": 2,
+      "fire": 4,
       "lv": {
-        "1": [{"t": "melee", "range": 170, "hit": {"dmg": 45, "kind": "heavy"}}],
-        "2": [{"t": "melee", "range": 170, "hit": {"dmg": 45, "kind": "heavy"}}]
+        "0": [{"t": "text", "v": "……"}],
+        "1": [
+          {
+            "t": "summon",
+            "icon": "decoy",
+            "at": "front",
+            "dx": -110,
+            "time": 8,
+            "color": "#7a7a80",
+            "alpha": 0.75,
+            "over": 0.6
+          }
+        ],
+        "2": [
+          {
+            "t": "summon",
+            "icon": "decoy",
+            "at": "front",
+            "dx": -140,
+            "time": 8,
+            "color": "#7a7a80",
+            "alpha": 0.75,
+            "over": 0.6
+          },
+          {
+            "t": "summon",
+            "icon": "decoy",
+            "at": "front",
+            "dx": 160,
+            "time": 8,
+            "color": "#7a7a80",
+            "alpha": 0.75,
+            "over": 0.6
+          },
+          {
+            "t": "summon",
+            "icon": "decoy",
+            "at": "front",
+            "dx": 330,
+            "time": 8,
+            "color": "#7a7a80",
+            "alpha": 0.75,
+            "over": 0.6
+          }
+        ]
       }
     },
     "super": {
       "name": "정지",
       "sub": "「……」",
       "anim": "25",
-      "fps": 9,
+      "fps": 7,
       "events": [
         {
-          "f": 6,
-          "fx": [{"t": "flash", "v": 0.1}, {"t": "melee", "range": 170, "hit": {"dmg": 45, "kind": "blow"}}]
+          "f": 5,
+          "hold": 0.3,
+          "fx": [{"t": "gray", "time": 3.2}, {"t": "bind", "time": 3.2, "color": "#888"}, {"t": "text", "v": "딸깍"}]
+        },
+        {
+          "f": 7,
+          "fx": [{"t": "slash", "at": "target", "style": "arc", "size": 110, "dark": true, "color": "#141418"}]
+        },
+        {
+          "f": 9,
+          "fx": [{"t": "slash", "at": "target", "style": "x", "size": 110, "dark": true, "color": "#141418"}]
+        },
+        {
+          "f": 12,
+          "hold": 0.3,
+          "fx": [
+            {
+              "t": "slash",
+              "at": "target",
+              "style": "x",
+              "size": 160,
+              "dark": true,
+              "color": "#141418",
+              "hit": {"dmg": 220, "kind": "down", "n": 3, "mid": "heavy", "stop": 0.25, "shake": 18}
+            },
+            {"t": "text", "at": "target", "v": "쌓인 피해"}
+          ]
         }
       ]
     }
   },
-  "_note": "자동 생성. 값을 고치면 build가 그대로 씀. 다시 자동으로: build.py --reset 2.1_사장"
+  "_note": "손으로 다듬음(표 「테스트룸」 절·fail 목록·기술안 2장). 그림 값은 자동. 다시 자동으로: build.py --reset 2.1_사장"
 }
