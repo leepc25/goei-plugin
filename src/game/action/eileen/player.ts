@@ -54,6 +54,7 @@ export class EileenPlayer extends Player {
       sfx: (type: string, extra: Record<string, unknown>) => eileenHooks.sfx({ type, ...extra }),
       font: (n: number) => pfont(n).f,
       targets: () => this.targets(),
+      ground: (x: number, y: number) => this.platformAt(x, y)?.h ?? 0,
       hurt: (t: { body: Body }, dmg: number, kind: string, face: 1 | -1, hitstop: number, o: { push?: number }) => this.hurtTarget(t.body, dmg, kind, face, hitstop, o),
       clamp: (P: { x: number; y: number }) => {
         const w = this.world;
@@ -62,6 +63,19 @@ export class EileenPlayer extends Player {
         P.x = Math.max(w.bounds[0] + 30, Math.min(w.bounds[1] - 30, P.x));
       },
     });
+  }
+
+  /** 발 자리 아래 올라설 물건 (데스크 등) */
+  private platformAt(x: number, y: number) {
+    const ps = (this.world?.floor as { platforms?: { x0: number; x1: number; y0: number; y1: number; h: number }[] } | undefined)?.platforms;
+    let best: { x0: number; x1: number; y0: number; y1: number; h: number } | null = null;
+    for (const p of ps ?? []) if (x >= p.x0 && x <= p.x1 && y >= p.y0 - 4 && y <= p.y1 + 4 && (!best || p.h > best.h)) best = p;
+    return best;
+  }
+  /** 그리는 순서용 깊이: 물건 위에 서 있으면 그 물건 앞 모서리보다 앞으로 */
+  get sortY() {
+    const p = this.z > 4 ? this.platformAt(this.x, this.y) : null;
+    return p && this.z >= p.h - 8 ? p.y1 + 2 : this.y;
   }
 
   private targets() {
@@ -152,7 +166,6 @@ export class EileenPlayer extends Player {
     const P = this.core.P;
     // 엔진이 옮긴 자리(문 앞 도착·막힘)를 먼저 받는다
     P.x = this.x; P.y = this.y;
-    if (P.mode !== 'air') P.z = 0;
     P.hp = Math.round((this.hp / this.hpMax) * 100);
     this.wantInteract = p.pressed.has('interact');
     this.wantItem = p.pressed.has('item1') ? 1 : p.pressed.has('item2') ? 2 : p.pressed.has('item3') ? 3 : p.pressed.has('item4') ? 4 : 0;

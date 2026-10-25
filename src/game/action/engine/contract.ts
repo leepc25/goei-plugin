@@ -162,6 +162,8 @@ export interface FloorPlan {
   drawForeground?(ctx: CanvasRenderingContext2D, camX: number, world: WorldView): void;
   /** 몸과 깊이(y) 순서로 섞어 그릴 바닥 위 물건 줄 (월드 좌표). y = 바닥에 닿는 선, x0~x1 = 그림 폭 */
   depthLayers?: { y: number; x0: number; x1: number; occludedSilhouette?: boolean; draw(ctx: CanvasRenderingContext2D): void }[];
+  /** 올라설 수 있는 물건 윗면 (발 자리 상자 + 높이 px). 그보다 높이 뛰면 넘고 위에 선다 */
+  platforms?: { x0: number; x1: number; y0: number; y1: number; h: number }[];
   /** 바닥 물건을 두면 안 되는 x 구간 (벽 그림 속 문·가구 앞 등) */
   keepOut?: [number, number][];
 }

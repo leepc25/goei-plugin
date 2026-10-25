@@ -81,7 +81,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
   let callWait: { t: number; then: () => void } | null = null;
   let callOn = false;
   let near: string | null = null;
-  let solids: BlockProp[] = [];
+  let solids: (BlockProp & { h?: number })[] = [];
   /** 이 장면에서 걸은 거리 (px). 필드 시계가 쓴다 */
   let walked = 0;
   let lastX: number | null = null;
@@ -118,7 +118,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
     near = null;
     // 필드 시험: 사무실에 서 있는 남자 (임시)
     const man = sc.id === 'office' && hasTestPeople() ? { x: 900, y: 560 } : null;
-    solids = [...(man ? [{ x: man.x, y: man.y, w: 70, back: 20, front: 20 }] : []), ...sc.boxes.filter((b) => b.solid).map((b) => ({ x: b.x, y: b.y, w: b.w, back: b.d + 6, front: 8 })), ...people.map((p) => ({ x: p.x, y: p.y, w: 80, back: 24, front: 24 }))];
+    solids = [...(man ? [{ x: man.x, y: man.y, w: 70, back: 20, front: 20 }] : []), ...sc.boxes.filter((b) => b.solid).map((b) => ({ x: b.x, y: b.y, w: b.w, back: b.d + 6, front: 8, h: sc.painted ? b.h : undefined })), ...people.map((p) => ({ x: p.x, y: p.y, w: 80, back: 24, front: 24 }))];
     const len = Math.max(SCREEN_W, sc.length);
     const sx = Math.max(60, Math.min(len - 60, x));
     arrive = { x: sx, y };
@@ -133,6 +133,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
       exitX: Infinity,
       props: [],
       encounters: [],
+      platforms: sc.painted ? sc.boxes.filter((b) => b.solid && b.h > 0 && b.h < 400).map((b) => ({ x0: b.x - b.w / 2, x1: b.x + b.w / 2, y0: b.y - b.d, y1: b.y, h: b.h })) : undefined,
       depthLayers: sc.boxes.map((b) => ({ y: b.y, occludedSilhouette: !sc.painted, x0: b.x - b.w / 2, x1: b.x + b.w / 2, draw: (c: CanvasRenderingContext2D) => {
         if (sc.painted && hasHqField(sc.painted)) { drawHqFieldObject(c, sc.painted, b.kind); return; }
         drawBox(c, b, sc.look);
@@ -279,7 +280,8 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
       if (callWait && --callWait.t <= 0) { const f = callWait.then; callWait = null; f(); }
       if (closing && ++closing.t >= closing.len) closing = null;
       if (rattle && ++rattle.t >= RATTLE_T) rattle = null;
-      if (solids.length && !(p as Player).seat) blockByProps([p as never], solids, scene?.lane ?? LANE);
+      // 물건보다 높이 떠 있으면(점프·올라선 몸) 막지 않는다
+      if (solids.length && !(p as Player).seat) blockByProps([p as never], solids.filter((s) => !(s.h !== undefined && p.z >= s.h - 6)), scene?.lane ?? LANE);
       if (scene?.painted) {
         // 그림 층: 양 끝 옆벽·튀어나온 벽 바깥으로 못 간다
         const q = clampPainted(scene.painted, p.x, p.y);

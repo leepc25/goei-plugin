@@ -471,10 +471,12 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
         back.call(b, ctx);
         ctx.restore();
       }
-      all.sort((a, b) => a.y - b.y);
+      // 깊이 순서: 몸이 따로 정한 깊이(물건 위에 선 에일린)가 있으면 그것
+      const sy = (b: Body) => (b as { sortY?: number }).sortY ?? b.y;
+      all.sort((a, b) => sy(a) - sy(b));
       for (const b of all) {
         const q = pos(b);
-        propsUpTo(q.y);
+        propsUpTo(b === w.player ? sy(b) : q.y);
         const jitter = b.stop > 0 && b !== w.player ? (w.tick % 2 ? 3 : -3) : 0;
         if (b === w.player) drawPlayer(w.player, q.x - camX, q.y, q.z, w);
         else if (b.draw && worldSpace(b)) {

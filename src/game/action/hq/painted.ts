@@ -28,8 +28,8 @@ export interface PaintedObject {
   x: number; y: number; w: number; h: number;
   /** 깊이 순서 기준 (발 y와 비교) */
   sortY: number;
-  /** 막는 바닥 상자 (여럿이면 모두) */
-  solid?: { x0: number; x1: number; y0: number; y1: number }[];
+  /** 막는 바닥 상자 (여럿이면 모두). h = 윗면 높이(px): 이보다 높이 뛰면 넘고, 위에 설 수 있다 */
+  solid?: { x0: number; x1: number; y0: number; y1: number; h?: number }[];
 }
 export interface PaintedScene {
   file: string;
@@ -39,8 +39,8 @@ export interface PaintedScene {
   lane?: [number, number];
   /** 엘리베이터 호출 단추(그림 속 붉게 켜진 단추 가운데). 층을 고르면 초록으로 바뀐다 */
   call?: [number, number];
-  /** 그림 속 화분·벤치 같은 막는 물건 (오브젝트로 오리지 않고 바닥 상자만): x0, x1, 앞 모서리 y */
-  blocks?: [number, number, number][];
+  /** 그림 속 화분·벤치 같은 막는 물건 (오브젝트로 오리지 않고 바닥 상자만): x0, x1, 앞 모서리 y, 윗면 높이 */
+  blocks?: [number, number, number, number?][];
   /** 걷는 바닥 다각형(발 위치): 양 끝 옆벽 바닥선·튀어나온 벽·문턱 안쪽. 몸 폭만큼 들여 잡았다 */
   floor?: [number, number][];
   doors: Record<string, PaintedDoor>;
@@ -58,7 +58,7 @@ export const PAINTED: Record<string, PaintedScene> = {
     // 왼쪽 유리 현관 문턱 앞, 오른쪽 옆벽(계단 문) 바닥선 안쪽
     // 데스크 뒤(왼쪽 빈 곳으로 들어감)는 y428까지 걸을 수 있다
     file: 'lobby', w: 2223, under: false, lane: [428, 669], call: [1800, 280],
-    blocks: [[350, 440, 470], [1158, 1230, 462], [1250, 1498, 458], [1900, 1980, 470]],
+    blocks: [[350, 440, 470, 70], [1158, 1230, 462, 70], [1250, 1498, 458, 46], [1900, 1980, 470, 70]],
     floor: [[0, 478], [330, 452], [470, 452], [470, 428], [1150, 428], [1150, 446], [2010, 446], [2190, 510], [2223, 520], [2223, 669], [0, 669]],
     doors: {
       // 비스듬한 유리벽이라 문짝을 움직이면 선이 안 맞는다: 바깥 빛만 번진다
@@ -68,11 +68,11 @@ export const PAINTED: Record<string, PaintedScene> = {
     },
     lamps: [...downs([861, 1095, 1356, 1671]), sign(2133, 67)],
     windows: [],
-    objects: [{ id: 'desk', file: 'desk', x: 494, y: 205, w: 644, h: 262, sortY: 463, solid: [{ x0: 494, x1: 1137, y0: 448, y1: 466 }, { x0: 1096, x1: 1137, y0: 428, y1: 466 }] }],
+    objects: [{ id: 'desk', file: 'desk', x: 494, y: 205, w: 644, h: 262, sortY: 463, solid: [{ x0: 494, x1: 1137, y0: 442, y1: 466, h: 140 }, { x0: 1096, x1: 1137, y0: 428, y1: 466, h: 140 }] }],
   },
   f2: {
     file: 'f2', w: 2064, under: false, call: [1132, 284],
-    blocks: [[196, 286, 476], [1776, 1858, 476]],
+    blocks: [[196, 286, 476, 70], [1776, 1858, 476, 70]],
     floor: [[0, 480], [92, 446], [1950, 446], [2064, 482], [2064, 669], [0, 669]],
     doors: {
       wc: { x0: 30, x1: 118, y0: 112, y1: 470, anim: 'swing', hinge: 'R', quad: [[30, 112], [118, 128], [118, 446], [30, 470]] },
@@ -88,7 +88,7 @@ export const PAINTED: Record<string, PaintedScene> = {
   },
   f3: {
     file: 'f3', w: 1915, under: false, call: [1051, 291],
-    blocks: [[180, 266, 472], [1648, 1726, 472]],
+    blocks: [[180, 266, 472, 70], [1648, 1726, 472, 70]],
     floor: [[0, 478], [80, 446], [1832, 446], [1915, 478], [1915, 669], [0, 669]],
     doors: {
       wc: { x0: 30, x1: 112, y0: 128, y1: 470, anim: 'swing', hinge: 'R', quad: [[30, 128], [112, 142], [112, 450], [30, 470]] },
@@ -104,7 +104,7 @@ export const PAINTED: Record<string, PaintedScene> = {
   },
   b1: {
     file: 'b1', w: 1940, under: true, call: [1065, 292],
-    blocks: [[186, 272, 472], [1670, 1750, 472]],
+    blocks: [[186, 272, 472, 70], [1670, 1750, 472, 70]],
     floor: [[0, 478], [80, 446], [1852, 446], [1940, 478], [1940, 669], [0, 669]],
     doors: {
       edu: { x0: 30, x1: 112, y0: 125, y1: 470, anim: 'swing', hinge: 'R', quad: [[30, 125], [112, 140], [112, 450], [30, 470]] },

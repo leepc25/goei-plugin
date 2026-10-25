@@ -362,7 +362,7 @@ function proveSuper() { if (!spReady()) return; P.noGain = P.t + 12; superMove(t
 
 // ── 이동·점프 ──
 function jump() {
-  P.mode = 'air'; P.z = 0; P.vz = 0; P.jumps = 1; P.airAtk = false; P.spin = 0;
+  P.mode = 'air'; P.vz = 0; P.jumps = 1; P.airAtk = false; P.spin = 0;
   P.airVX = (down('run') || P.runLatch) ? 430 : 250; P.takeoff = 0.06; sfx('jump');
   play('7', { seq: S([0, 1], 0.03) });
 }
@@ -377,7 +377,7 @@ function jumpAttack(heavyKind) {
   play('14', { seq: atkSeq('14', heavyKind).map((e, i, s) => ({ ...(e.ev ? { ...e, ev: heavyKind ? 'hitH' : 'hit', kind: heavyKind ? 'spike' : undefined } : e), d: i === s.length - 1 ? 9 : e.d })) });
 }
 function land() {
-  sfx('land'); P.z = 0; P.vz = 0; P.airAtk = false; shake = Math.max(shake, 2); if (!vfx('land_dust', P.x, P.y, 2.2)) dust(P.x, P.y, 5);
+  sfx('land'); P.z = env.ground(P.x, P.y); P.vz = 0; P.airAtk = false; shake = Math.max(shake, 2); if (!vfx('land_dust', P.x, P.y - P.z, 2.2)) dust(P.x, P.y - P.z, 5);
   P.mode = 'act';
   play('7', { seq: [{ f: 6, d: 0.045, cancel: true }, { f: 7, d: 0.05, cancel: true }], onEnd: toIdle });
 }
@@ -583,7 +583,7 @@ function update(dt) {
       P.y += dy * 140 * dt;
       P.z += P.vz * dt; P.vz -= 2700 * dt;
       P.spin = Math.max(0, P.spin - dt);
-      if (P.z <= 0 && P.vz < 0) { land(); break; }
+      { const gz = env.ground(P.x, P.y); if (P.z <= gz && P.vz < 0) { P.z = gz; land(); break; } }
       if (!P.airAtk && P.spin <= 0) {
         const f = P.vz > 380 ? 2 : P.vz > -380 ? (P.vz > 0 ? 3 : 4) : 5;
         P.clip = { id: '7', seq: [{ f, d: 9 }], i: 0, t: 0, loopFrom: 0, done: false };
@@ -607,6 +607,8 @@ function update(dt) {
     case 'crouch': if (P.clip && P.clip.i >= 4 && dx) { P.face = dx; P.mode = 'crawl4'; if (has('42_1')) play('42', { seq: S(R(0, 5), 0.08), onEnd: () => { if (P.mode === 'crawl4') play('42_1', { seq: S(R(1, A['42_1'].n - 1), 0.1), loopFrom: 0 }); } }); else play('42', { seq: [...S(R(0, 3), 0.08), ...S(R(4, 11), 0.085)], loopFrom: 4 }); } break;
     case 'crawl4': { const go = dx !== 0, looping = P.clip.id === '42_1' || P.clip.i >= 4; if (go) P.face = dx; P.clip.paused = !go && looping; if (go && looping) P.x += dx * 85 * dt; break; }
   }
+  // 물건 위에서 걸어 나가면 떨어진다
+  if (P.mode === 'ground' || P.mode === 'chain') { const gz = env.ground(P.x, P.y); if (P.z > gz + 2) { P.mode = 'air'; P.vz = 0; P.jumps = 1; P.airAtk = false; P.takeoff = 0; P.spin = 0; P.airVX = 230; } else P.z = gz; }
   env.clamp(P);
 }
 // ── 그리기 ──
@@ -651,7 +653,8 @@ function drawPlayer() {
   const flip = a.dir === 'SW' ? P.face > 0 : P.face < 0;
   const ft = a.foot[f], kk = K(P.y), fx0 = (flip ? -(ft[0] - (ROOT.has(id) && a.cx ? a.cx[f] - a.cx[0] : 0)) : ft[0] - (ROOT.has(id) && a.cx ? a.cx[f] - a.cx[0] : 0)) * kk;
   const contact = a.bot[f] - (ft[2] || 0), lift = air ? 0 : (KNOCK_ARC[id] ? KNOCK_ARC[id][f] || 0 : Math.max(0, BASE(a) - a.bot[f] - 6));   // 발이 닿는 높이, 그림 속에서 뜬 장이면 그림자를 작게
-  shadow(P.x + fx0, P.y, P.z + lift * kk, Math.min(80, ft[1]), kk, air ? 0 : groundBase(id, a, f) - contact, Math.min(10, ft[3] || 0));
+  const gz0 = env.ground(P.x, P.y);   // 물건 위면 그림자도 그 윗면에
+  shadow(P.x + fx0, P.y - gz0, P.z - gz0 + lift * kk, Math.min(80, ft[1]), kk, air ? 0 : groundBase(id, a, f) - contact, Math.min(10, ft[3] || 0));
   let tint = null;
   if (P.armorT > 0) tint = { c: '#ff2a2a', over: 0.35 * (P.armorT / 0.28) };
   else if (armored() && showArmor) tint = { c: 'rgba(255,60,40,.55)', over: 0 };
