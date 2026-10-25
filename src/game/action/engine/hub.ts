@@ -10,7 +10,7 @@ import type { FloorPlan, StageApi, StageModule, WorldView } from './contract';
 import { SCREEN_H, SCREEN_W } from './contract';
 import { HQ_PLACE, drawFloor, drawHqWall, drawPropArt, drawHqTextureWall } from '../art/bg';
 import { drawHqDoorRound2 } from '../art/hqDoorRound2';
-import { drawDepartArrow, drawHqField, drawHqFieldLight, drawHqFieldObject, drawHqSigns, hasHqField } from '../art/hqField';
+import { drawCallLit, drawDepartArrow, drawHqField, drawHqFieldLight, drawHqFieldObject, drawHqSigns, hasHqField } from '../art/hqField';
 import { drawVisitAgent, visitAgentTop } from '../art/visitAgents';
 import { drawTestMan, hasTestPeople, testManTop, testPlayerTop } from '../art/testPeople';
 import { persp, view as fieldView } from './view';
@@ -77,6 +77,9 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
   let closing: { id: string; t: number; len: number } | null = null;
   let rattle: { id: string; t: number } | null = null;
   let arriveDoor: string | null = null;
+  /** 엘리베이터 층을 고른 뒤: 호출 단추가 초록으로 바뀌고 잠깐 뒤 문이 열린다 */
+  let callWait: { t: number; then: () => void } | null = null;
+  let callOn = false;
   let near: string | null = null;
   let solids: BlockProp[] = [];
   /** 이 장면에서 걸은 거리 (px). 필드 시계가 쓴다 */
@@ -106,6 +109,8 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
     enterTick = -1;
     opening = null;
     rattle = null;
+    callWait = null;
+    callOn = false;
     // 들어온 문은 열린 채로 시작해 뒤에서 닫힌다 (그림 장면)
     const inDoor = arriveDoor ? sc.doors.find((d) => d.id === arriveDoor) : undefined;
     closing = sc.painted && inDoor ? { id: inDoor.id, t: 0, len: openLen(sc, inDoor) } : null;
@@ -137,6 +142,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
         if (sc.painted && drawHqField(c, sc.painted, camX, doorFx)) {
           // 표찰은 지상 사무 층(2·3층)만 (사용자 2026-10-25)
           if (sc.floor === '2F' || sc.floor === '3F') drawHqSigns(c, sc.painted, sc.doors);
+          if (callOn) drawCallLit(c, sc.painted, performance.now());
           return;
         }
         if (sc.legacy) {
@@ -270,6 +276,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
         const then = opening.then;
         then();
       }
+      if (callWait && --callWait.t <= 0) { const f = callWait.then; callWait = null; f(); }
       if (closing && ++closing.t >= closing.len) closing = null;
       if (rattle && ++rattle.t >= RATTLE_T) rattle = null;
       if (solids.length && !(p as Player).seat) blockByProps([p as never], solids, scene?.lane ?? LANE);
@@ -295,7 +302,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
       } else if (!sp) barked = null;
     },
     onInteract(a, _floor, prop) {
-      if (!scene || fadeOut > 0 || opening) return;
+      if (!scene || fadeOut > 0 || opening || callWait) return;
       if (prop.kind === 'hubspot') {
         const s = scene.spots.find((q) => `spot:${q.id}` === prop.id);
         if (!s?.open) return;
@@ -354,8 +361,15 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
           if (i == null) return;
           const e = view!.elevator[i];
           if (!e?.open || e.scene === here) return;
-          host.sfx(scene?.painted ? 'elevChime' : 'ding');
-          opening = { id: d.id, t: 0, len, then: () => goDoor(e.scene, e.door) };
+          if (!scene?.painted) {
+            host.sfx('ding');
+            opening = { id: d.id, t: 0, len, then: () => goDoor(e.scene, e.door) };
+            return;
+          }
+          // 단추가 초록으로 바뀌며 딸깍 → 잠깐 뒤 띵 하고 문이 열린다
+          host.sfx('panelButton');
+          callOn = true;
+          callWait = { t: 14, then: () => { host.sfx('elevChime'); opening = { id: d.id, t: 0, len, then: () => goDoor(e.scene, e.door) }; } };
         });
         return;
       }

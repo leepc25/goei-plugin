@@ -92,6 +92,14 @@ function drawDoor(c: CanvasRenderingContext2D, im: HTMLImageElement, d: PaintedD
   const w = d.x1 - d.x0, h = d.y1 - d.y0;
   c.save();
   clipDoor(c, d);
+  if (d.anim === 'glow') {
+    // 문짝은 움직이지 않고 바깥 빛이 유리에 번진다
+    const e = open * open * (3 - 2 * open);
+    if (shake) { c.fillStyle = '#0c0e10'; c.fillRect(d.x0, d.y0, w, h); c.drawImage(im, d.x0, d.y0, w, h, d.x0 + shake, d.y0, w, h); }
+    if (e > 0) { c.fillStyle = `rgba(255,250,232,${0.4 * e})`; c.fillRect(d.x0, d.y0, w, h); }
+    c.restore();
+    return;
+  }
   if (shake && open <= 0) {
     // 잠긴 문 덜컹: 문짝이 몇 px 흔들린다
     c.fillStyle = '#0c0e10'; c.fillRect(d.x0, d.y0, w, h);
@@ -259,7 +267,7 @@ export function drawHqFieldLight(c: CanvasRenderingContext2D, scene: string, cam
   const lampK = Math.max(k.lamp * (p.under ? 0.5 : 1), 0);
   for (const l of p.lamps) {
     if (l.x < camX - 200 || l.x > camX + 1480) continue;
-    if (l.blink) { drawBlink(c, l, now); continue; }
+    if (l.blink) { drawBlink(c, l, now, images?.[p.file]); continue; }
     if (lampK <= 0.01) continue;
     if (l.kind === 'down') glow(c, l.x, l.y + 50, l.r ?? 150, 2.1, `rgba(255,210,140,${0.42 * lampK})`);
     else glow(c, l.x, l.y, l.r ?? 34, 1, hexA(l.color ?? '#ffd27a', 0.5 * lampK));
@@ -279,24 +287,44 @@ function hexA(hex: string, a: number) {
   const n = parseInt(hex.slice(1), 16);
   return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${Math.max(0, Math.min(1, a))})`;
 }
-function drawBlink(c: CanvasRenderingContext2D, l: PaintedScene['lamps'][number], now: number) {
+/** 깜빡이는 등의 「꺼진 그림」: 그림 속 붉게 켜진 픽셀만 골라 어두운 붉은색으로 바꾼 작은 판 (둘레는 건드리지 않는다) */
+const offCache = new Map<string, { cv: HTMLCanvasElement; x: number; y: number } | null>();
+function lampOff(im: HTMLImageElement, l: PaintedScene['lamps'][number]) {
+  const key = `${im.src.length}:${l.x}:${l.y}`;
+  if (offCache.has(key)) return offCache.get(key)!;
+  const R = Math.max(10, Math.round((l.r ?? 30) * 0.45));
+  const x = l.x - R, y = l.y - R, w = R * 2, h = R * 2;
+  let out: { cv: HTMLCanvasElement; x: number; y: number } | null = null;
+  try {
+    const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+    const g = cv.getContext('2d')!;
+    g.drawImage(im, x, y, w, h, 0, 0, w, h);
+    const d = g.getImageData(0, 0, w, h), px = d.data;
+    let n = 0;
+    for (let i = 0; i < px.length; i += 4) {
+      const r = px[i], gg = px[i + 1], b = px[i + 2];
+      // 붉게 켜진 픽셀(빨강이 강하고 초록·파랑이 낮음, 또는 흰 심)
+      const lit = (r > 150 && r > gg * 1.5 && r > b * 1.5) || (r > 235 && gg > 190 && b > 170 && r - b < 70);
+      if (lit) { const k = 0.32; px[i] = Math.round(r * k + 30); px[i + 1] = Math.round(gg * k * 0.5 + 8); px[i + 2] = Math.round(b * k * 0.5 + 8); n++; }
+      else px[i + 3] = 0;
+    }
+    g.putImageData(d, 0, 0);
+    out = n ? { cv, x, y } : null;
+  } catch { out = null; }
+  offCache.set(key, out);
+  return out;
+}
+function drawBlink(c: CanvasRenderingContext2D, l: PaintedScene['lamps'][number], now: number, im?: HTMLImageElement) {
   const b = l.blink!;
   const ph = ((now / b.period + (b.phase ?? 0)) % 1 + 1) % 1;
   const on = b.pulse ? 0.5 - 0.5 * Math.cos(ph * Math.PI * 2) : ph < b.duty ? 1 : 0;
-  const r = l.r ?? 30;
-  if (on > 0.02) {
-    glow(c, l.x, l.y, r, 1, hexA(l.color ?? '#ff3a2a', 0.75 * on));
-    glow(c, l.x, l.y, r * 0.3, 1, `rgba(255,235,220,${0.6 * on})`);
+  const r = (l.r ?? 30) * 0.7;
+  if (on < 0.98 && im) {
+    // 꺼진 동안: 켜진 픽셀만 어두운 붉은색으로
+    const o = lampOff(im, l);
+    if (o) { c.save(); c.globalCompositeOperation = 'source-over'; c.globalAlpha = 1 - on; c.drawImage(o.cv, o.x, o.y); c.restore(); }
   }
-  if (on < 0.98) {
-    // 꺼진 동안: 그림에 켜져 그려진 등을 어둡게
-    c.globalCompositeOperation = 'multiply';
-    const d = Math.round(255 - 150 * (1 - on));
-    c.fillStyle = `rgb(${d},${Math.round(d * 0.8)},${Math.round(d * 0.8)})`;
-    const s = Math.max(10, r * 0.4);
-    c.beginPath(); c.ellipse(l.x, l.y, s, s * 0.8, 0, 0, Math.PI * 2); c.fill();
-    c.globalCompositeOperation = 'lighter';
-  }
+  if (on > 0.02) glow(c, l.x, l.y, r, 1, hexA(l.color ?? '#ff3a2a', 0.45 * on));
 }
 
 /* ───────── 표찰·엘리베이터 앞 안내 (도트 글씨) ───────── */
@@ -413,4 +441,38 @@ export function drawDepartArrow(c: CanvasRenderingContext2D, camX: number, now: 
   c.fillStyle = g; c.fillRect(x - 46, y - 66, 92, 92);
   c.restore();
   pixelArrow(c, x, y, 6, pinned ? Math.PI / 2 : 0);
+}
+
+/* ───────── 엘리베이터 호출 단추: 층을 고르면 초록 ───────── */
+const greenCache = new Map<string, { cv: HTMLCanvasElement; x: number; y: number } | null>();
+export function drawCallLit(c: CanvasRenderingContext2D, scene: string, now: number): void {
+  const p = PAINTED[scene], im = images?.[p?.file ?? ''];
+  if (!p?.call || !im) return;
+  const [cx, cy] = p.call, key = scene;
+  if (!greenCache.has(key)) {
+    const R = 10, x = cx - R, y = cy - R, w = R * 2, h = R * 2;
+    let out: { cv: HTMLCanvasElement; x: number; y: number } | null = null;
+    try {
+      const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+      const g = cv.getContext('2d')!;
+      g.drawImage(im, x, y, w, h, 0, 0, w, h);
+      const d = g.getImageData(0, 0, w, h), px = d.data;
+      for (let i = 0; i < px.length; i += 4) {
+        const r = px[i], gg = px[i + 1], b = px[i + 2];
+        // 붉게·주황으로 켜진 픽셀만 같은 밝기의 초록으로
+        if (r > 170 && r > b * 1.4 && r > gg + 25) { const v = (r + gg) / 2; px[i] = Math.round(v * 0.35); px[i + 1] = Math.min(255, Math.round(v * 1.05 + 20)); px[i + 2] = Math.round(v * 0.45); }
+        else px[i + 3] = 0;
+      }
+      g.putImageData(d, 0, 0);
+      out = { cv, x, y };
+    } catch { out = null; }
+    greenCache.set(key, out);
+  }
+  const o = greenCache.get(key);
+  c.save();
+  c.imageSmoothingEnabled = false;
+  if (o) c.drawImage(o.cv, o.x, o.y);
+  c.globalCompositeOperation = 'lighter';
+  glow(c, cx, cy, 16, 1, `rgba(90,255,130,${0.35 + 0.1 * Math.sin(now / 90)})`);
+  c.restore();
 }
