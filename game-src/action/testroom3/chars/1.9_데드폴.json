@@ -1,0 +1,123 @@
+{
+  "key": "1.9_데드폴",
+  "name": "데드폴",
+  "dir": "E",
+  "color": "#3A4C8C",
+  "armed": true,
+  "anims": {
+    "1": {"folder": "1", "mirror": false, "name": "평상 대기"},
+    "2": {"folder": "2", "mirror": false, "name": "개인 대기"},
+    "3_0": {"folder": "3_0", "mirror": false, "name": "전투 자세 잡기"},
+    "3": {"folder": "3", "mirror": false, "name": "전투 대기"},
+    "W": {"folder": "W", "mirror": false, "name": "무기 꺼내기"},
+    "W_1": {"folder": "W_1", "mirror": false, "name": "무기 대기"},
+    "4": {"folder": "4", "mirror": false, "name": "걷기"},
+    "5": {"folder": "5", "mirror": false, "name": "뛰기"},
+    "6": {"folder": "6", "mirror": false, "name": "제자리 점프"},
+    "7": {"folder": "7", "mirror": false, "name": "방향 점프"},
+    "8": {"folder": "8", "mirror": false, "name": "달리다 점프"},
+    "9": {"folder": "9", "mirror": false, "name": "약1"},
+    "10": {"folder": "10", "mirror": false, "name": "약2"},
+    "11": {"folder": "11", "mirror": false, "name": "약3"},
+    "12": {"folder": "12", "mirror": false, "name": "강"},
+    "13": {"folder": "13", "mirror": false, "name": "돌진 공격"},
+    "14": {"folder": "14", "mirror": false, "name": "점프 공격"},
+    "15": {"folder": "15", "mirror": false, "name": "원거리 공격"},
+    "16": {"folder": "16", "mirror": false, "name": "뒤 회피"},
+    "16_1": {"folder": "16_1", "mirror": false, "name": "앞 회피"},
+    "17": {"folder": "17", "mirror": false, "name": "막기"},
+    "18": {"folder": "18", "mirror": false, "name": "맞기"},
+    "19": {"folder": "19", "mirror": false, "name": "날아가 쓰러지기"},
+    "20": {"folder": "20", "mirror": false, "name": "일어나기"},
+    "21": {"folder": "21", "mirror": false, "name": "스턴"},
+    "22": {"folder": "22", "mirror": false, "name": "고유기술"},
+    "23": {"folder": "23", "mirror": false, "name": "충전 모으기"},
+    "24": {"folder": "24", "mirror": false, "name": "충전 방출"},
+    "25": {"folder": "25", "mirror": false, "name": "필살기"},
+    "26": {"folder": "26", "mirror": false, "name": "섭취"},
+    "27": {"folder": "27", "mirror": false, "name": "줍기"},
+    "28": {"folder": "28", "mirror": false, "name": "응대"},
+    "29": {"folder": "29", "mirror": false, "name": "말하며 손짓"},
+    "30": {"folder": "30", "mirror": false, "name": "끄덕이기"},
+    "31": {"folder": "31", "mirror": false, "name": "고개 젓기"},
+    "32": {"folder": "32", "mirror": false, "name": "화내기"},
+    "33": {"folder": "33", "mirror": false, "name": "발견 반응"},
+    "34": {"folder": "34", "mirror": false, "name": "놀라기"},
+    "35": {"folder": "35", "mirror": false, "name": "기뻐하기"},
+    "36": {"folder": "36", "mirror": false, "name": "도망"},
+    "37": {"folder": "37", "mirror": false, "name": "뒷걸음질 (움츠리기)"},
+    "37_1": {"folder": "37_1", "mirror": false, "name": "뒷걸음질 반복"},
+    "38": {"folder": "38", "mirror": true, "name": "엎드려 기기"},
+    "38_1": {"folder": "38_1", "mirror": true, "name": "엎드려 기기 반복"},
+    "39": {"folder": "39", "mirror": false, "name": "주저앉기"},
+    "40": {"folder": "40", "mirror": false, "name": "주저앉아 뒤로 기어나가기"},
+    "41": {"folder": "41", "mirror": false, "name": "웅크려 떨기"},
+    "42": {"folder": "42", "mirror": false, "name": "네발로 기기"},
+    "42_1": {"folder": "42_1", "mirror": false, "name": "네발로 기기 반복"}
+  },
+  "picks": {"combat": 3, "weapon": 4, "apex": 5, "run": 1, "crawl4": 9},
+  "loops": {
+    "1": [1, 2, 3, 4],
+    "3": [1, 2, 3, 4],
+    "W_1": [1, 2, 3, 4],
+    "4": [1, 2, 3, 4, 5, 6, 7, 8],
+    "5": [1, 2, 3, 4, 5, 6, 7, 8],
+    "36": [1, 2, 3, 4, 5, 6, 7, 8],
+    "21": [4, 5, 6, 7, 8],
+    "23": [4, 5, 6, 7, 8],
+    "19": [9, 10, 11, 12],
+    "39": [7, 8, 9, 10, 11, 12],
+    "41": [4, 5, 6, 7, 8]
+  },
+  "hit": {"9": 3, "10": 8, "11": 5, "12": 3, "13": 3, "14": 1, "15": 4},
+  "gun": ["W", "W_1", "15"],
+  "kick": [],
+  "ranged": {"proj": {"t": "proj", "kind": "bullet", "hit": {"dmg": 7, "kind": "light"}}, "heat": true},
+  "skills": {
+    "skill": {
+      "name": "되감기",
+      "anim": "22",
+      "fps": 11,
+      "events": [
+        {
+          "f": 4,
+          "fx": [
+            {"t": "heal", "on": "self", "v": 30},
+            {"t": "melee", "range": 170, "hit": {"dmg": 30, "kind": "heavy"}}
+          ]
+        }
+      ]
+    },
+    "charge": {
+      "name": "냄새 맡기",
+      "hold": "23",
+      "release": "24",
+      "levels": [0.5, 1.2],
+      "fire": 2,
+      "lv": {
+        "1": [{"t": "melee", "range": 170, "hit": {"dmg": 45, "kind": "heavy"}}],
+        "2": [{"t": "melee", "range": 170, "hit": {"dmg": 45, "kind": "heavy"}}]
+      }
+    },
+    "super": {
+      "name": "여기서 제가 한 번 죽으면",
+      "sub": "「시간이 벌리니까요.」",
+      "anim": "25",
+      "fps": 9,
+      "events": [
+        {
+          "f": 6,
+          "fx": [
+            {"t": "flash", "v": 0.1},
+            {
+              "t": "screen",
+              "spots": 6,
+              "each": [{"t": "melee", "range": 170, "hit": {"dmg": 45, "kind": "heavy"}}]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "_note": "자동 생성. 값을 고치면 build가 그대로 씀. 다시 자동으로: build.py --reset 1.9_데드폴"
+}
