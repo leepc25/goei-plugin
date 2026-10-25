@@ -134,6 +134,11 @@ sub("if (!vfx('land_dust', P.x, P.y, 2.2)) dust(P.x, P.y, 5);", "if (!vfx('land_
 sub("  shadow(P.x + fx0, P.y, P.z + lift * kk,", "  const gz0 = env.ground(P.x, P.y);   // 물건 위면 그림자도 그 윗면에\n  shadow(P.x + fx0, P.y - gz0, P.z - gz0 + lift * kk,")
 # 디버그 표시 줄 없애기
 sub("  if (showNo) { ctx.fillStyle = '#fff'; ctx.font = '14px monospace'; ctx.fillText(`${id} · ${f + 1}/${a.n} · ${kk.toFixed(2)}배`, P.x - 60, P.y + 26); }\n", "")
+# 쓰러짐·웅크림·주저앉음 (사용자 2026-10-25): 쓰러진 뒤 좌우 = 엎드려 기기, 위 = 일어나기. 웅크림·주저앉음도 위 = 일어나기
+sub("  if (m === 'down') { if (a === 'crawl') return belly();", "  if (m === 'down') { if (a === 'crawl' || a === 'left' || a === 'right') return belly();")
+sub("  if (m === 'belly') { if (a === 'jump' || a === 'crawl') return getUp(); return; }", "  if (m === 'belly') { if (a === 'jump' || a === 'crawl' || a === 'up') return getUp(); return; }")
+sub("  if (m === 'sit' || m === 'scoot') { if (a === 'sit') reverseOut(", "  if (m === 'sit' || m === 'scoot') { if (a === 'sit' || a === 'up') reverseOut(")
+sub("  if (m === 'crouch' || m === 'crawl4') { if (a === 'crouch') {", "  if (m === 'crouch' || m === 'crawl4') { if (a === 'crouch' || a === 'up') {")
 if 'D.' in re.sub(r"const D = (tg\[0\]|frontTarget\(60\)|targets\(\)[^\n]*)", '', code):
     for m in re.finditer(r'.{0,60}\bD\.[a-z]+.{0,40}', code):
         pass

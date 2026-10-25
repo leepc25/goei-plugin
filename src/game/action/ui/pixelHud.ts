@@ -3,6 +3,7 @@
 // 글자는 도트 글꼴을 이진화(흐린 가장자리 없음)해 1도트 검은 테를 두른다. 아이콘은 12×12 단색 도트.
 import { HUD_ART } from './pixelHudArt';
 import { PIXEL_FONT } from './kit';
+import { HUD_LABELS } from './hudLabels';
 
 type Key = keyof typeof HUD_ART;
 const imgs: Partial<Record<Key, HTMLImageElement>> = {};
@@ -60,6 +61,29 @@ function hex(c: string): [number, number, number] {
 function put(c: CanvasRenderingContext2D, t: HTMLCanvasElement, x: number, y: number, align: 'left' | 'center' | 'right' = 'left') {
   const dx = align === 'center' ? Math.round(x - t.width / 2) : align === 'right' ? Math.round(x - t.width) : Math.round(x);
   c.drawImage(t, dx, Math.round(y));
+}
+
+/** 기술 칸 이름: Galmuri14로 미리 그린 가는 글자에 4방향 1도트 테 (사용자: 두 배는 너무 두껍다, 1.3배·덜 두껍게) */
+const labelImgs = new Map<string, HTMLImageElement>();
+const labelCache = new Map<string, HTMLCanvasElement>();
+function labelSprite(s: string, color: string): HTMLCanvasElement | null {
+  const src = HUD_LABELS[s];
+  if (!src) return null;
+  const key = `${s}|${color}`, hit = labelCache.get(key);
+  if (hit) return hit;
+  let im = labelImgs.get(s);
+  if (!im) { im = new Image(); im.src = src; labelImgs.set(s, im); }
+  if (!im.complete || !im.naturalWidth) return null;
+  const cv = document.createElement('canvas');
+  cv.width = im.naturalWidth + 2; cv.height = im.naturalHeight + 2;
+  const g = cv.getContext('2d')!;
+  // 테: 위아래좌우로 한 칸씩 찍은 검정 → 가운데 글자색
+  const tint = (col: string) => { const t = document.createElement('canvas'); t.width = im!.naturalWidth; t.height = im!.naturalHeight; const tg = t.getContext('2d')!; tg.drawImage(im!, 0, 0); tg.globalCompositeOperation = 'source-in'; tg.fillStyle = col; tg.fillRect(0, 0, t.width, t.height); return t; };
+  const edge = tint(EDGE), body = tint(color);
+  for (const [dx, dy] of [[0, 1], [2, 1], [1, 0], [1, 2]]) g.drawImage(edge, dx, dy);
+  g.drawImage(body, 1, 1);
+  labelCache.set(key, cv);
+  return cv;
 }
 
 /* ───────── 막대 채우기 (틀 그림의 홈 모양대로) ───────── */
@@ -296,14 +320,15 @@ export function drawPixelHotbar(c: CanvasRenderingContext2D, slots: PixelSlot[],
     // 단계·% (오른쪽 아래 안쪽)
     if (sl.badge) put(c, pixelText(sl.badge, sl.full ? '#ffe9a0' : INK, 11), sx + ix1 - 1, sy + iy1 - 17, 'right');
     // 이름 (칸 아래)
-    // 이름: 22px (11px는 안 읽힌다, 사용자)
-    put(c, pixelText(sl.name, ready ? INK : '#8a9096', 22), sx + S.w / 2, sy + S.h, 'center');
+    // 이름 (칸 아래)
+    const col = ready ? INK : '#8a9096';
+    put(c, labelSprite(sl.name, col) ?? pixelText(sl.name, col, 11), sx + S.w / 2, sy + S.h + 1, 'center');
   });
   c.restore();
   return x + slots.length * (S.w + gap) - gap;
 }
 /** 기술 칸 줄 크기 (이름 줄 포함) */
-export const hotbarSize = (n: number) => ({ w: n * (HUD_ART.slot.w + 4) - 4, h: HUD_ART.slot.h + 24 });
+export const hotbarSize = (n: number) => ({ w: n * (HUD_ART.slot.w + 4) - 4, h: HUD_ART.slot.h + 18 });
 
 /** 아이템 칸 넷 (필살 게이지 아래, PixelLab 슬롯14). icon = 칸 안쪽에 아이템 그림을 그리는 함수. 돌려주는 값 = 아래 끝 y */
 export function drawPixelItems(c: CanvasRenderingContext2D, items: { id?: string; label: string; count: number; cd?: number }[], x: number, y: number,

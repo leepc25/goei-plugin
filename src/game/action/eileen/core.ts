@@ -452,11 +452,11 @@ function onPress(a) {
     }
     return;
   }
-  if (m === 'down') { if (a === 'crawl') return belly(); if (a === 'jump' || a === 'up' || a === 'light') return getUp(); return; }
-  if (m === 'belly') { if (a === 'jump' || a === 'crawl') return getUp(); return; }
+  if (m === 'down') { if (a === 'crawl' || a === 'left' || a === 'right') return belly(); if (a === 'jump' || a === 'up' || a === 'light') return getUp(); return; }
+  if (m === 'belly') { if (a === 'jump' || a === 'crawl' || a === 'up') return getUp(); return; }
   if (m === 'stun') { P.stunT -= 0.18; return; }
-  if (m === 'sit' || m === 'scoot') { if (a === 'sit') reverseOut('39', R(6, 0), 0.05); return; }
-  if (m === 'crouch' || m === 'crawl4') { if (a === 'crouch') { if (m === 'crawl4') toIdle(); else reverseOut('41', R(3, 0), 0.06); } return; }
+  if (m === 'sit' || m === 'scoot') { if (a === 'sit' || a === 'up') reverseOut('39', R(6, 0), 0.05); return; }
+  if (m === 'crouch' || m === 'crawl4') { if (a === 'crouch' || a === 'up') { if (m === 'crawl4') toIdle(); else reverseOut('41', R(3, 0), 0.06); } return; }
   if (m !== 'ground') return;
   const running = down('run') || P.runLatch;
   const moving = down('left') || down('right') || down('up') || down('down');

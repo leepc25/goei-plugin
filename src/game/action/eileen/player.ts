@@ -19,6 +19,7 @@ export const CHAR_K = 1.15;
 const PRESS: [Btn, string][] = [
   ['light', 'light'], ['heavy', 'heavy'], ['dodge', 'dodge'], ['block', 'block'], ['shoot', 'shoot'],
   ['skill', 'skill'], ['charge', 'charge'], ['super', 'super'], ['jump', 'jump'], ['weapon', 'weapon'],
+  ['combat', 'combat'], ['sit', 'sit'], ['crouch', 'crouch'], ['flee', 'flee'], ['back', 'back'],
   ['left', 'left'], ['right', 'right'], ['up', 'up'], ['down', 'down'],
 ];
 /** 테스트룸 맞음 종류 → 게임 반응 */
@@ -177,7 +178,9 @@ export class EileenPlayer extends Player {
     if (p.run) names.add('run');
     // 방어: 게이지가 다 회복되지 않았거나(깨진 뒤 40 미만) 거의 없으면 들어가지 않는다
     if (this.guardBroken || this.guard < 8) names.delete('block');
-    for (const [b, n] of PRESS) if (p.pressed.has(b) && !['left', 'right', 'up', 'down'].includes(n) && (n !== 'block' || names.has('block'))) this.core.onPress(n);
+    // 방향키는 쓰러짐·웅크림·주저앉음일 때만 테스트룸에 넘긴다 (좌우 = 기기, 위 = 일어나기)
+    const lying = ['down', 'belly', 'sit', 'scoot', 'crouch', 'crawl4'].includes(this.core.P.mode);
+    for (const [b, n] of PRESS) if (p.pressed.has(b) && (lying || !['left', 'right', 'up', 'down'].includes(n)) && (n !== 'block' || names.has('block'))) this.core.onPress(n);
     if (p.evade) this.core.onPress('dodge');
     for (const b of ['block', 'charge'] as Btn[]) if (p.released.has(b)) this.core.onRelease(b);
   }
