@@ -419,6 +419,7 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
       if (w.player instanceof EileenPlayer) w.player.frameStep();
       const camX = Math.round(lerp(w.prevCamX, w.camX, alpha));
       drawCam = camX;
+      w.drawCamX = camX;
       ctx.save();
       ctx.translate(shake, w.shakeT > 0 ? (w.tick % 3) - 1 : 0);
       background(w, camX);

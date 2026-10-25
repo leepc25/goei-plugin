@@ -547,6 +547,54 @@ export class Hud {
     return (x + fs + bw + 40) * k;
   }
 
+  /** 말풍선 (본부 대사): x = 말하는 사람 가운데, y = 머리 위(풍선 꼬리 끝), 캔버스 px. who가 있으면 위에 이름 */
+  drawSpeech(c: CanvasRenderingContext2D, p: { x: number; y: number; who: string; text: string; compact?: boolean }) {
+    c.save();
+    const k = p.compact ? 1.2 : 1;
+    c.setTransform(k, 0, 0, k, 0, 0);
+    W = c.canvas.width / k;
+    pixelOn = true;
+    const U = 2;
+    c.font = font(22);
+    const lines = wrapText(c, p.text, 400, 3);
+    const tw = Math.max(...lines.map((l) => Math.ceil(c.measureText(l).width)), p.who ? Math.ceil(c.measureText(p.who).width) * 0.55 : 0);
+    const nameH = p.who ? 18 : 0, lh = 26, padX = 12, padY = 8;
+    const w = tw + padX * 2, h = nameH + lines.length * lh + padY * 2 - 4;
+    const tail = 10;
+    let x = Math.round(p.x / k - w / 2);
+    x = Math.max(8, Math.min(W - w - 8, x));
+    const y = Math.round(Math.max(8, p.y / k - tail - h));
+    const box = (bx: number, by: number, bw: number, bh: number, col: string) => {
+      c.fillStyle = col;
+      c.fillRect(bx + U, by, bw - 2 * U, bh);
+      c.fillRect(bx, by + U, bw, bh - 2 * U);
+    };
+    box(x + U, y + U * 2, w, h, 'rgba(0,0,0,0.35)');
+    box(x - U, y - U, w + 2 * U, h + 2 * U, '#0b0f12');
+    box(x, y, w, h, '#cfc8b4');
+    box(x + U, y + U, w - 2 * U, h - 2 * U, '#1a2026');
+    // 꼬리: 말하는 사람 쪽 (계단 모양)
+    const tx = Math.round(Math.max(x + 10, Math.min(x + w - 18, p.x / k - 4)));
+    for (let i = 0; i < tail / U; i++) {
+      const tw2 = Math.max(U, 10 - i * U * 2);
+      c.fillStyle = '#0b0f12'; c.fillRect(tx + (10 - tw2) / 2 - U, y + h + i * U - U, tw2 + 2 * U, U + U);
+      c.fillStyle = '#cfc8b4'; c.fillRect(tx + (10 - tw2) / 2, y + h + i * U - U, tw2, U);
+    }
+    c.textAlign = 'left'; c.textBaseline = 'middle';
+    let ty = y + padY + 2;
+    if (p.who) {
+      c.font = font(11);
+      c.fillStyle = '#ffcf6a';
+      c.fillText(p.who, x + padX, ty + 6);
+      ty += nameH;
+    }
+    c.font = font(22);
+    c.fillStyle = '#f2ecdc';
+    lines.forEach((l, i) => c.fillText(l, x + padX, ty + lh / 2 + i * lh - 2));
+    pixelOn = false;
+    c.restore();
+  }
+
   /** 상호작용 안내: 캐릭터 옆에 뜨는 도트 말풍선 (키 단추 + 짧은 말). x,y = 캐릭터 머리 옆 화면 px(캔버스 px), side = 말풍선이 뻗는 쪽 */
   drawPrompt(c: CanvasRenderingContext2D, p: { x: number; y: number; side: 1 | -1; key: string; text: string; locked?: boolean; compact?: boolean }) {
     c.save();

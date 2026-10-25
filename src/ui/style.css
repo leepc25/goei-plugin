@@ -2626,3 +2626,5 @@ button.mk-go:hover { color: var(--signal); }
 /* 필드 전체화면 「창 안」 (2026-10-25 사용자): 상황창 전체(왼쪽 메뉴·오른쪽 신분증 칸까지)를 덮는다. 브라우저 전체화면은 :fullscreen이 맡는다 */
 .gx-panel:has(.gx-game.gx-panelfull) .gx-fieldhost { position: static; }
 .gx-panel .gx-game.gx-panelfull, .gx-fieldhost .gx-game.gx-panelfull { position: absolute; inset: 0; z-index: 60; border-radius: inherit; overflow: hidden; background: #000; }
+/* 「브라우저」: 진짜 전체화면이 막히면 리스 플러그인 창(브라우저 창 전체) 끝까지 */
+.gx-game.gx-winfull, .gx-fieldhost .gx-game.gx-winfull, .gx-panel .gx-game.gx-winfull { position: fixed; inset: 0; z-index: 9999; border-radius: 0; overflow: hidden; background: #000; }

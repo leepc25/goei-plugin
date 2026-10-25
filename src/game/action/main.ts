@@ -22,7 +22,7 @@ const CSS = `
 .goei-engine-hq{position:absolute;inset:0;overflow:auto;z-index:20;background:#0b0f12}
 .goei-engine-hq.goei-engine-hq-panel{background:rgba(5,8,10,.72)}
 .goei-engine-hq-close{position:sticky;top:8px;float:right;margin:8px;z-index:2;padding:8px 14px;border-radius:8px;border:1px solid #5b6a72;background:#1a2226;color:#ece6d4;font:15px sans-serif}
-.goei-engine-elev{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;gap:6px;padding:14px;pointer-events:auto;z-index:20;image-rendering:pixelated;border:16px solid transparent;border-image:var(--goei-btn) 8 fill / 16px stretch}
+.goei-engine-elev{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:grid;grid-template-columns:repeat(2,auto);gap:6px;padding:10px;max-height:94%;overflow:hidden;box-sizing:border-box;pointer-events:auto;z-index:20;image-rendering:pixelated;border:16px solid transparent;border-image:var(--goei-btn) 8 fill / 16px stretch}
 .goei-engine-elev[hidden]{display:none}
 .goei-engine-elev button{width:112px;height:72px;border:16px solid transparent;border-radius:0;background:none;border-image:var(--goei-btn) 8 fill / 16px stretch;color:#e6e4dc;font:700 33px "GoeiPixel","Galmuri11",monospace;cursor:pointer;image-rendering:pixelated;-webkit-font-smoothing:none;text-shadow:3px 3px 0 #07090b;padding:0;line-height:1}
 .goei-engine-elev button.here{color:#ffb34a}

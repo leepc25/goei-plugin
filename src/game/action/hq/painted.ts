@@ -46,6 +46,8 @@ export interface PaintedScene {
   doors: Record<string, PaintedDoor>;
   lamps: PaintedLamp[];
   windows: [number, number, number, number][];
+  /** 바깥 풍경이 보이는 곳(다각형): 밤에는 실내보다 훨씬 어두워지고 먼 건물 창에 불이 켜진다 (사용자 2026-10-25) */
+  outside?: [number, number][][];
   objects: PaintedObject[];
 }
 
@@ -68,6 +70,8 @@ export const PAINTED: Record<string, PaintedScene> = {
     },
     lamps: [...downs([861, 1095, 1356, 1671]), sign(2133, 67)],
     windows: [],
+    // 왼쪽 유리 현관·유리벽 너머
+    outside: [[[0, 0], [412, 0], [410, 420], [330, 426], [300, 440], [92, 470], [60, 488], [0, 494]]],
     objects: [{ id: 'desk', file: 'desk', x: 494, y: 205, w: 644, h: 262, sortY: 463, solid: [{ x0: 494, x1: 1137, y0: 442, y1: 466, h: 140 }, { x0: 1096, x1: 1137, y0: 428, y1: 466, h: 140 }] }],
   },
   f2: {
@@ -84,6 +88,8 @@ export const PAINTED: Record<string, PaintedScene> = {
     },
     lamps: [...downs([389, 710, 975, 1275, 1581]), sign(1986, 62)],
     windows: [],
+    // 진압팀 유리문 너머 사무실 창
+    outside: [[[350, 165], [762, 165], [762, 278], [350, 278]]],
     objects: [],
   },
   f3: {
@@ -100,6 +106,8 @@ export const PAINTED: Record<string, PaintedScene> = {
     },
     lamps: [...downs([362, 656, 907, 1184, 1469]), sign(1842, 86)],
     windows: [],
+    // 종합대응팀 유리문 너머 사무실 창
+    outside: [[[1160, 183], [1575, 183], [1575, 282], [1160, 282]]],
     objects: [],
   },
   b1: {
