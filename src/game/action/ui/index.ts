@@ -155,7 +155,7 @@ export function mountGameShell(box: HTMLElement, o: ShellOptions = {}): Shell {
     const pct = (v: number) => `${Math.round(v * 100)}%`;
     return [
       { type: 'head', label: '화면' },
-      { type: 'toggle', label: 'CRT 필터 (주사선·모서리)', get: () => s.crt, set: (v) => (s.crt = v) },
+      { type: 'toggle', label: 'CRT 모니터 (곡면·형광 마스크·주사선)', get: () => s.crt, set: (v) => (s.crt = v) },
       { type: 'slider', label: '화면 흔들림', get: () => s.shake, set: (v) => (s.shake = v), min: 0, max: 1, step: 0.25, fmt: pct },
       { type: 'toggle', label: '피격 섬광', get: () => s.flash, set: (v) => (s.flash = v) },
       { type: 'toggle', label: '피해 숫자', get: () => s.numbers, set: (v) => (s.numbers = v) },

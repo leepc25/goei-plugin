@@ -1,6 +1,7 @@
 // 화면 틀: 1280×720 내부 해상도를 상자 크기에 맞춘다. 채우기(기본)는 가로로 긴 화면에서 캔버스를 옆으로 넓혀 검은 띠를 없앤다.
 // 층: 게임 캔버스 → CRT 덮개 → 메뉴(1280×720 좌표) / 터치 버튼(상자 전체) / 세로 화면 안내
 import css from './ui.css';
+import { mountCrt, type Crt } from './crt';
 import { ensureKit } from './kit';
 
 export const W = 1280,
@@ -60,6 +61,7 @@ export function mountStage(box: HTMLElement): Stage {
   const touch = root.querySelector<HTMLElement>('.gs-touch')!;
   const rotate = root.querySelector<HTMLElement>('.gs-rotate')!;
   const fns: (() => void)[] = [];
+  let crt: Crt | null | undefined;
   let keepPortrait = false;
   // 채우기는 엔진이 넓은 캔버스를 그릴 수 있을 때만 켠다 (setFit('fill'))
   let fill = false,
@@ -104,7 +106,10 @@ export function mountStage(box: HTMLElement): Stage {
       fns.push(fn);
     },
     setCrt(on) {
-      root.classList.toggle('crt', on);
+      // WebGL 브라운관(ui/crt.ts). 안 되면 옛 CSS 줄무늬
+      crt ??= mountCrt(stageEl, canvas);
+      if (crt) crt.setOn(on);
+      root.classList.toggle('crt', on && !crt);
     },
     setBright(v) {
       canvas.style.filter = Math.abs(v - 1) < 0.01 ? '' : `brightness(${v})`;
