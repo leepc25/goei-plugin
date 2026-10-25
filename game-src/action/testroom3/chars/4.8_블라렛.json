@@ -47,7 +47,7 @@
     "36": {"folder": "36", "mirror": true, "name": "도망"},
     "37": {"folder": "37", "mirror": true, "name": "뒷걸음질 (움츠리기)"},
     "37_1": {"folder": "37_1", "mirror": true, "name": "뒷걸음질 반복"},
-    "38": {"folder": "38_E", "mirror": false, "name": "엎드려 기기"},
+    "38": {"folder": "38_E", "mirror": false, "name": "엎드려 기기", "frames": [1, 2, 3, 4, 5, 6, 7, 8, 9]},
     "38_1": {"folder": "38_1_E", "mirror": false, "name": "엎드려 기기 반복"},
     "39": {"folder": "39", "mirror": true, "name": "주저앉기"},
     "40": {"folder": "40", "mirror": true, "name": "주저앉아 뒤로 기어나가기"},
@@ -60,62 +60,149 @@
     "1": [1, 2, 3, 4],
     "3": [1, 2, 3, 4],
     "W_1": [1, 2, 3, 4],
-    "4": [1, 2, 3, 4, 5, 6, 7, 8],
-    "5": [1, 2, 3, 4, 5, 6, 7, 8],
     "15": [2, 3, 4, 5, 6],
     "19": [6, 7, 8, 9, 10, 11, 12],
     "21": [2, 3, 4, 5, 6, 7, 8],
     "23": [3, 4, 5, 6, 7, 8],
     "29": [1, 2, 3, 4],
-    "36": [1, 2, 3, 4, 5, 6, 7, 8],
     "37_1": [1, 2, 3, 4, 5, 6, 7, 8, 9],
-    "38": [1, 2, 3, 4, 5, 6, 7, 8, 9],
+    "38_1": [1, 2, 3, 4, 5, 6, 7, 8, 9],
     "39": [5, 6, 7, 8, 9, 10, 11, 12],
     "40": [1, 2, 3, 4, 5, 6, 7, 8],
     "41": [2, 3, 4, 5, 6, 7, 8],
     "42_1": [1, 2, 3, 4, 5, 6, 7, 8, 9]
   },
-  "hit": {},
-  "gun": ["W", "W_1", "15"],
+  "hit": {"9": 6, "10": 6, "11": 3, "12": 3, "13": 3, "14": 2},
+  "gun": ["W", "W_1", "15", "23", "24"],
   "kick": [],
-  "ranged": {"proj": {"t": "proj", "kind": "bullet", "hit": {"dmg": 7, "kind": "light"}}, "heat": true},
+  "ranged": {
+    "proj": {"t": "proj", "kind": "bullet", "hit": {"dmg": 8, "kind": "light"}, "spread": 0.08},
+    "heat": false,
+    "_note": "은탄 쌍권총"
+  },
   "skills": {
     "skill": {
       "name": "성검 발현",
       "anim": "22",
-      "fps": 11,
-      "events": [{"f": 4, "fx": [{"t": "melee", "range": 170, "hit": {"dmg": 30, "kind": "heavy"}}]}]
+      "fps": 9,
+      "events": [
+        {"f": 3, "fx": [{"t": "flash", "v": 0.05}]},
+        {
+          "f": 5,
+          "fx": [
+            {
+              "t": "slash",
+              "at": "front",
+              "dx": 110,
+              "style": "arc",
+              "size": 150,
+              "color": "#ffffff",
+              "hit": {"dmg": 30, "kind": "heavy"}
+            }
+          ]
+        },
+        {
+          "f": 7,
+          "fx": [
+            {
+              "t": "slash",
+              "at": "front",
+              "dx": 110,
+              "style": "x",
+              "size": 150,
+              "color": "#ffffff",
+              "hit": {"dmg": 30, "kind": "heavy", "text": "화상"}
+            }
+          ]
+        }
+      ]
     },
     "charge": {
       "name": "은탄",
       "hold": "23",
       "release": "24",
+      "armed": true,
       "levels": [0.5, 1.2],
       "fire": 2,
       "lv": {
-        "1": [{"t": "proj", "kind": "orb", "speed": 1400, "hit": {"dmg": 45, "kind": "heavy"}}],
-        "2": [{"t": "melee", "range": 170, "hit": {"dmg": 45, "kind": "heavy"}}]
+        "0": [{"t": "proj", "kind": "bullet", "hit": {"dmg": 10, "kind": "light"}}],
+        "1": [
+          {
+            "t": "repeat",
+            "n": 6,
+            "every": 0.08,
+            "fx": [{"t": "proj", "kind": "bullet", "hit": {"dmg": 10, "kind": "light"}, "spread": 0.05}]
+          }
+        ],
+        "2": [
+          {
+            "t": "repeat",
+            "n": 6,
+            "every": 0.08,
+            "fx": [{"t": "proj", "kind": "bullet", "hit": {"dmg": 10, "kind": "light"}, "spread": 0.05}]
+          },
+          {
+            "t": "later",
+            "in": 0.5,
+            "fx": [{"t": "flame", "time": 0.6, "len": 300, "hit": {"dmg": 40, "n": 4, "kind": "heavy"}}]
+          }
+        ]
       }
     },
     "super": {
       "name": "영원한 십자군",
-      "sub": "「서울은 교회가 많아서 좋아!」",
+      "sub": "「영원한 십자군.」",
       "anim": "25",
-      "fps": 9,
+      "fps": 8,
       "events": [
+        {"f": 5, "fx": [{"t": "dark", "v": 2}, {"t": "flash", "v": 0.15}]},
         {
-          "f": 6,
+          "f": 8,
           "fx": [
-            {"t": "flash", "v": 0.1},
             {
-              "t": "screen",
-              "spots": 6,
-              "each": [{"t": "melee", "range": 170, "hit": {"dmg": 45, "kind": "heavy"}}]
-            }
+              "t": "summon",
+              "icon": "decoy",
+              "anim": "3",
+              "at": "front",
+              "dx": -150,
+              "time": 10,
+              "color": "#c8c0a0",
+              "alpha": 0.8,
+              "over": 0.5
+            },
+            {
+              "t": "summon",
+              "icon": "decoy",
+              "anim": "3",
+              "at": "front",
+              "dx": 150,
+              "time": 10,
+              "color": "#c8c0a0",
+              "alpha": 0.8,
+              "over": 0.5
+            },
+            {
+              "t": "summon",
+              "icon": "decoy",
+              "anim": "3",
+              "at": "front",
+              "dx": 300,
+              "time": 10,
+              "color": "#c8c0a0",
+              "alpha": 0.8,
+              "over": 0.5
+            },
+            {"t": "repeat", "n": 4, "every": 0.4, "fx": [{"t": "hit", "hit": {"dmg": 35, "kind": "heavy"}}]}
           ]
+        },
+        {
+          "f": 11,
+          "hold": 0.3,
+          "fx": [{"t": "flash", "v": 0.2}, {"t": "hit", "hit": {"dmg": 90, "kind": "launch"}}]
         }
       ]
     }
   },
-  "_note": "자동 생성. 값을 고치면 build가 그대로 씀. 다시 자동으로: build.py --reset 4.8_블라렛"
+  "_note": "손으로 다듬음(표 「테스트룸」 절·fail 목록·기술안 4장). 그림 값은 자동. 다시 자동으로: build.py --reset 4.8_블라렛",
+  "start": {"11": 2}
 }

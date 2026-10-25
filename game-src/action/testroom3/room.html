@@ -382,7 +382,7 @@ const FX = {
   // 큰 괴이 그림자가 화면을 휩쓸며 n번 물어뜯음(고그니쟈)
   sweep(s) { const dir = P.face, T = s.time || 2; fx.push({ k: 'sweep', x0: dir > 0 ? -260 : W + 260, x1: dir > 0 ? W + 260 : -260, y: (FLOOR0 + FLOOR1) / 2 + 30, dir, c: s.color || '#140c18', t: T, t0: T }); sfx('super'); if (showDummy && s.hit) { const n = s.hit.n || 5; for (let i = 0; i < n; i++) later(T * (0.3 + 0.4 * i / n), () => strike({ ...s.hit, n: 1, kind: i === n - 1 ? (s.hit.kind || 'launch') : 'heavy' })); } },
   // 잔해 파도(콘쥬스): 상자 더미가 앞으로 밀려가며 샌드백을 쓸어냄
-  wave(s) { fx.push({ k: 'wave', x: P.x + P.face * 60, dir: P.face, v: s.speed || 900, y: P.y, hit: s.hit, done: false, t: 3, t0: 3 }); sfx('whiff', { strength: 3 }); },
+  wave(s) { fx.push({ k: 'wave', style: s.style, c: s.color, x: P.x + P.face * 60, dir: P.face, v: s.speed || 900, y: P.y, hit: s.hit, done: false, t: 3, t0: 3 }); sfx('whiff', { strength: 3 }); },
   ring(s, c) { const p = posOf({ at: 'self', ...s }, c); ring(p.x, s.air ? p.hy : p.gy, (s.r || 120) * p.k, s.time || 0.5, s.color || CH.color, s.w || 5, s.air ? 1 : 0.3); },
   // 화염 방사(윤병수): time초 동안 손·총구에서 앞으로 불을 뿜고, 앞 len 안이면 n번 맞음
   flame(s, c) { const T = s.time || 1.2, len = (s.len || 300) * K(P.y); for (let i = 0; i * 0.03 < T; i++) later(i * 0.03, () => { const m = muzzle(); for (let j = 0; j < 3; j++) fx.push({ k: 'fire', x: m.x + P.face * 10, y: m.y, vx: P.face * (500 + Math.random() * 400), vy: (Math.random() - 0.5) * 140, r: 5 + Math.random() * 6, t: 0.25 + Math.random() * 0.25, t0: 0.5 }); }); if (s.hit && showDummy && (D.x - P.x) * P.face > 0 && Math.abs(D.x - P.x) < len + 40 && Math.abs(D.y - P.y) < 70) { const n = s.hit.n || 6; for (let i = 0; i < n; i++) later(0.1 + i * T / n, () => strike({ ...s.hit, n: 1, kind: i === n - 1 ? (s.hit.kind || 'heavy') : 'light', stop: 0.03, shake: 3 })); } },
@@ -1169,6 +1169,7 @@ function drawMid() {
       ctx.restore(); ctx.globalAlpha = 1;
     }
     else if (e.k === 'lob') { const p = 1 - e.t / e.t0, x = e.x0 + (e.x1 - e.x0) * p, y = e.y0 + (e.y1 - e.y0) * p - Math.sin(p * Math.PI) * 160; ctx.fillStyle = '#3a4a2a'; ctx.fillRect(x - 5, y - 6, 10, 12); ctx.fillStyle = '#9a9a7a'; ctx.fillRect(x - 2, y - 9, 4, 3); }
+    else if (e.k === 'wave' && e.style === 'sand') { ctx.fillStyle = e.c || '#d8b878'; for (let i = 0; i < 7; i++) { ctx.globalAlpha = 0.85; ctx.beginPath(); ctx.ellipse(e.x - e.dir * (i % 3) * 40, e.y - 30 - i * 34, 70 - i * 4, 40, 0, 0, 6.3); ctx.fill(); } ctx.globalAlpha = 1; }
     else if (e.k === 'wave') { for (let i = 0; i < 9; i++) drawIcon(i % 3 ? 'box' : 'wall', e.x - e.dir * (i % 3) * 30, e.y - 120 + i * 30 * 0.9 - (i % 3) * 26, 2.2 * K(e.y), CH.color, e.dir); }
   }
 }
