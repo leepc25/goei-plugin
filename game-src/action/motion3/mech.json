@@ -38,7 +38,9 @@
    "result": "ok"
   },
   "18_2": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944769.376671,
+   "result": "ok"
   },
   "18_3": {
    "tries": 0,
@@ -51,7 +53,9 @@
    "result": "ok"
   },
   "44": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944803.696673,
+   "result": "ok"
   },
   "45": {
    "tries": 0,
@@ -61,13 +65,19 @@
  },
  "1.12_콘쥬스": {
   "18_1": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944773.596671,
+   "result": "ok"
   },
   "18_2": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944840.1846752,
+   "result": "ok"
   },
   "18_3": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944836.2486749,
+   "result": "ok"
   },
   "43": {
    "tries": 0,
@@ -75,7 +85,9 @@
    "result": "ok"
   },
   "44": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944851.7326758,
+   "result": "ok"
   },
   "45": {
    "tries": 0,
@@ -297,7 +309,9 @@
    "result": "ok"
   },
   "44": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944785.676672,
+   "result": "ok"
   },
   "45": {
    "tries": 0,
@@ -439,127 +453,197 @@
  },
  "2.1_사장": {
   "18_1": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944795.1726725,
+   "result": "ok"
   },
   "18_2": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944832.6806748,
+   "result": "ok"
   },
   "18_3": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944845.4646754,
+   "result": "ok"
   },
   "43": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944808.6366732,
+   "result": "ok"
   },
   "44": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944875.9686773,
+   "result": "ok"
   },
   "45": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944847.6046755,
+   "result": "ok"
   }
  },
  "2.2_도필헌": {
   "18_1": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944826.1126742,
+   "result": "ok"
   },
   "18_2": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944922.07268,
+   "result": "ok"
   },
   "18_3": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944884.364678,
+   "result": "ok"
   },
   "43": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944858.6804261,
+   "result": "ok"
   },
   "44": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944951.2646818,
+   "result": "ok"
   },
   "45": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944862.1486764,
+   "result": "ok"
   }
  },
  "2.3_이길환": {
   "18_1": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944871.096677,
+   "result": "ok"
   },
   "18_2": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944892.6566782,
+   "result": "ok"
   },
   "18_3": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944903.004679,
+   "result": "ok"
   },
   "43": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944870.884677,
+   "result": "ok"
   },
   "44": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944955.780682,
+   "result": "ok"
   },
   "45": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944861.7246764,
+   "result": "ok"
   }
  },
  "2.4_이기석": {
   "18_1": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944896.7086785,
+   "result": "ok"
   },
   "18_2": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944949.7566817,
+   "result": "ok"
   },
   "18_3": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944947.9806817,
+   "result": "ok"
   },
   "43": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944910.7166793,
+   "result": "ok"
   },
   "44": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944955.4084551,
+   "result": "ok"
   },
   "45": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944912.7406795,
+   "result": "ok"
   }
  },
  "2.5_김조학": {
   "18_1": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792945008.5366852,
+   "result": "ok"
   },
   "18_2": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944995.6206844,
+   "result": "ok"
   },
   "18_3": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944975.7966833,
+   "result": "ok"
   },
   "43": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944935.8566809,
+   "result": "ok"
   },
   "44": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944993.8766844,
+   "result": "ok"
   },
   "45": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944929.4886806,
+   "result": "ok"
   }
  },
  "2.6_이도형": {
   "18_1": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944980.7486835,
+   "result": "ok"
   },
   "18_2": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792945010.3806853,
+   "result": "ok"
   },
   "18_3": {
    "tries": 0
   },
   "43": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944963.1086824,
+   "result": "ok"
   },
   "44": {
    "tries": 0
   },
   "45": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944966.7446828,
+   "result": "ok"
   }
  },
  "2.7_고영훈": {
   "18_1": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944995.8726845,
+   "result": "ok"
   },
   "18_2": {
    "tries": 0
@@ -568,7 +652,9 @@
    "tries": 0
   },
   "43": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792945010.4006853,
+   "result": "ok"
   },
   "44": {
    "tries": 0
