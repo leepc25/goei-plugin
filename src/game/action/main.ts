@@ -1,7 +1,6 @@
 // 게임 진입점. 플러그인(코드 팩)과 시연판이 모두 이것 하나를 부른다: mountGame(box, bridge) → 정리 함수.
 import type { GameBridge } from '../bridge';
 import { prepareTestPeople } from './art/testPeople';
-import { prepareStartRoom } from './art/startRoom';
 import { prepareHqField } from './art/hqField';
 import { prepareHqTextures } from './art/hqTextures';
 import { prepareHqDoorRound2 } from './art/hqDoorRound2';
@@ -22,6 +21,7 @@ const CSS = `
 .goei-engine-elev[hidden]{display:none}
 .goei-engine-elev button{width:64px;height:52px;border-radius:50%;border:2px solid #9aa6ad;background:#2c3236;color:#ece6d4;font:bold 20px sans-serif;cursor:pointer}
 .goei-engine-elev button.here{border-color:#ffb34a;color:#ffb34a}
+.goei-engine-elev button.sel{background:#ffb34a;border-color:#fff2c8;color:#1b1f22}
 .goei-engine-elev button:disabled{opacity:.35;cursor:default}
 .goei-engine-loading{color:#8e9aa1;font:16px sans-serif}
 `;
@@ -43,11 +43,10 @@ export function mountGame(box: HTMLElement, bridge?: Partial<GameBridge>): () =>
   const releaseHqArt = prepareHqTextures(bridge?.assets ? f => bridge.assets!.url('hq-textures', f) : undefined);
   const releaseDoorArt = prepareHqDoorRound2(bridge?.assets ? f => bridge.assets!.url('hq-door-round2', f) : undefined);
   const releaseField = prepareHqField(bridge?.assets ? f => bridge.assets!.url('hq-field', f) : undefined);
-  const startRoom = prepareStartRoom(bridge?.assets ? f => bridge.assets!.url('start-room', f) : undefined);
   // 필드 시험: 사용자 PixelLab 시험 캐릭터 (임시)
   const testPeople = bridge?.visit || window.__GOEI_TEST_PEOPLE__ ? prepareTestPeople(bridge?.assets ? f => bridge.assets!.url('test-people', f) : undefined, bridge?.assets ? f => bridge.assets!.bytes('test-people', f) : undefined) : null;
   const visitArt = bridge?.visit ? prepareVisitAgents(bridge.assets ? f => bridge.assets!.url('visit-agents', f) : undefined, bridge.assets ? f => bridge.assets!.bytes('visit-agents', f) : undefined) : null;
-  void Promise.all([loadArt(urlOf, bridge?.assets ? f => bridge.assets!.bytes('jyaldi', f) : undefined), startRoom.ready, visitArt?.ready, testPeople?.ready]).then(([art]) => {
+  void Promise.all([loadArt(urlOf, bridge?.assets ? f => bridge.assets!.bytes('jyaldi', f) : undefined), visitArt?.ready, testPeople?.ready]).then(([art]) => {
     if (dead) return;
     stage.remove();
     root.style.display = 'block';
@@ -69,7 +68,6 @@ export function mountGame(box: HTMLElement, bridge?: Partial<GameBridge>): () =>
     releaseDoorArt();
     releaseField();
     releaseHqArt();
-    startRoom.dispose();
     visitArt?.dispose();
     testPeople?.dispose();
     offTouch?.();

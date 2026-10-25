@@ -6,7 +6,7 @@ import type { PlaceId } from './data';
 import type { HqSave } from './state';
 import { placeOpen } from './logic';
 import { ROOMS, mirror, type Room, type RoomFix } from './rooms';
-import { PAINTED, doorX } from './painted';
+import { PAINTED, PAINTED_LANE, doorX } from './painted';
 
 export type SceneId =
   | 'street' | 'pasta' | 'lobby' | 'swat' | 'f2' | 'f3' | 'office' | 'interview' | 'lounge' | 'wc' | 'wc3'
@@ -130,7 +130,7 @@ const exitS = (to: SceneId, toDoor: string, key: string, west = false): HqDoor =
 function floorHall(id: SceneId, name: string, floor: HqScene['floor'], doors: Omit<HqDoor, 'x'>[], extra: Partial<HqScene> = {}): HqScene {
   const p = PAINTED[id];
   return {
-    id, name, floor, look: p.under ? 'labhall' : id === 'lobby' ? 'lobby' : 'hall', painted: id, length: p.w,
+    id, name, floor, look: p.under ? 'labhall' : id === 'lobby' ? 'lobby' : 'hall', painted: id, length: p.w, lane: p.lane ?? PAINTED_LANE,
     doors: doors.map((d) => ({ ...d, x: doorX(id, d.id) })),
     spots: [], fixtures: [], things: [],
     boxes: p.objects.filter((o) => o.solid).map((o) => ({ kind: o.id, x: (o.solid!.x0 + o.solid!.x1) / 2, w: o.solid!.x1 - o.solid!.x0, y: o.solid!.y1, d: o.solid!.y1 - o.solid!.y0, h: o.sortY - o.y, solid: true })),
@@ -178,21 +178,7 @@ export const HQ_SCENES: HqScene[] = [
   ]),
   room({ id: 'wc3', name: '화장실', floor: '3F', look: 'life', doors: [exitS('f3', 'wc', 'wc', true)] }, 'wc', true),
   room({ id: 'lounge', name: '휴게실', floor: '3F', look: 'life', doors: [exitS('f3', 'lounge', 'lounge')] }, 'lounge'),
-  {
-    id: 'office', name: '종합대응팀', floor: '3F', look: 'office', length: 1280, lane: [430, 690],
-    doors: [{ id: 'out', side: 'N', x: 1084, kind: 'door', to: 'f3', toDoor: 'office' }],
-    boxes: [
-      { kind: 'desk', x: 420, y: 520, w: 260, d: 60, h: 140, solid: true },
-      { kind: 'chair', x: 245, y: 512, w: 105, d: 45, h: 190, solid: true },
-    ],
-    fixtures: [], things: [],
-    spots: [
-      { id: 'seat', x: 250, y: 560, verb: '앉기', face: 1, act: ['chairsit'], seat: { x: 275, y: 505 } },
-      { id: 'jaemtri', x: 680, y: 470, place: 'jaemtri', verb: '임무 게시판', face: 1 },
-      { id: 'agents', x: 110, y: 450, place: 'office', verb: '요원' },
-      { id: 'chief', x: 800, y: 470, place: 'chief', verb: '결재' },
-    ],
-  },
+  room({ id: 'office', name: '종합대응팀', floor: '3F', look: 'office', doors: [exitS('f3', 'office', 'office')] }, 'office'),
   floorHall('b1', '지하 1층', 'B1', [
     { id: 'edu', kind: 'door', to: 'edu', toDoor: 'out', label: '교육장' },
     { id: 'training', kind: 'steel', to: 'training', toDoor: 'out', needs: 'training', label: '훈련장' },
@@ -239,8 +225,8 @@ export function whereIs(place: PlaceId): { scene: SceneId; x: number; y?: number
   if (place === 'street') return { scene: 'street', x: 640 };
   return START;
 }
-/** 출근·귀환: 단일 화면 사무실의 빈 보행 공간 */
-const START = { scene: 'office' as SceneId, x: 820, y: 620 };
+/** 출근·귀환: 3층 종합대응팀 사무실 (잼트리 자리 근처 빈 바닥) */
+const START = { scene: 'office' as SceneId, x: M(4), y: LANE_TOP + 170 };
 
 export interface HqMapView {
   scenes: (HqScene & { doors: (HqDoor & { open: boolean })[]; spots: (HqSpot & { open: boolean })[] })[];

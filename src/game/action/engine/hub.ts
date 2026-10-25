@@ -4,18 +4,18 @@
 // 문은 열리는 그림이 나온 뒤 잠깐 암전, 엘리베이터는 층 단추, 자리 앞 E는 본부 메뉴 창 또는 그 자리 동작.
 // 집기는 바닥 위 상자(앞면 + 윗면)로 몸과 깊이 순서로 섞여 그려지고, 몸은 상자를 뚫고 지나가지 못한다.
 // 방 그림(GPT 전체 그림 + 앞 레이어)이 오기 전까지는 같은 자리·크기의 색 상자로 그린다.
-// 화면 글씨: 그림 층의 지상 표찰(2·3층)·엘리베이터 앞 방향 안내·잠긴 문 「잠겨 있다」만 (사용자 2026-10-25). 그 밖의 방 이름·층·잠김 이유는 쓰지 않는다.
+// 화면 글씨: 그림 층의 지상 표찰(2·3층)·잠긴 문 「잠겨 있다」만 (사용자 2026-10-25). 그 밖의 방 이름·층·잠김 이유는 쓰지 않는다.
 import type { Player } from './player';
 import type { FloorPlan, StageApi, StageModule, WorldView } from './contract';
 import { SCREEN_H, SCREEN_W } from './contract';
 import { HQ_PLACE, drawFloor, drawHqWall, drawPropArt, drawHqTextureWall } from '../art/bg';
-import { drawStartRoom, drawStartRoomFurniture } from '../art/startRoom';
 import { drawHqDoorRound2 } from '../art/hqDoorRound2';
-import { drawHqField, drawHqFieldLight, drawHqFieldObject, drawHqGuide, drawHqSigns, hasHqField } from '../art/hqField';
+import { drawHqField, drawHqFieldLight, drawHqFieldObject, drawHqSigns, hasHqField } from '../art/hqField';
 import { drawVisitAgent, visitAgentTop } from '../art/visitAgents';
 import { drawTestMan, hasTestPeople, testManTop, testPlayerTop } from '../art/testPeople';
 import { persp, view as fieldView } from './view';
 import { blockByProps, clearSpot, type BlockProp } from './propBlock';
+import { clampPainted } from '../hq/painted';
 import { LANE_BOT, LANE_TOP, type HqBox, type HqDoor, type HqMapView, type HqScene, type HqSpot } from '../hq/map';
 
 type Door = HqDoor & { open: boolean };
@@ -126,14 +126,12 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
       exitX: Infinity,
       props: [],
       encounters: [],
-      depthLayers: sc.boxes.map((b) => ({ y: sc.id === 'office' && b.kind === 'chair' ? 495 : b.y, occludedSilhouette: sc.id !== 'office', x0: sc.id === 'office' ? 180 : b.x - b.w / 2, x1: sc.id === 'office' ? 560 : b.x + b.w / 2, draw: (c: CanvasRenderingContext2D) => {
-        if (sc.id === 'office') { drawStartRoomFurniture(c, b.kind); return; }
+      depthLayers: sc.boxes.map((b) => ({ y: b.y, occludedSilhouette: true, x0: b.x - b.w / 2, x1: b.x + b.w / 2, draw: (c: CanvasRenderingContext2D) => {
         if (sc.painted && hasHqField(sc.painted)) { drawHqFieldObject(c, sc.painted, b.kind); return; }
         drawBox(c, b, sc.look);
       } })).concat(people.map((p) => ({ y: p.y, x0: p.x - 60, x1: p.x + 60, occludedSilhouette: false, draw: (c: CanvasRenderingContext2D) => { drawVisitAgent(c, p.name, p.x, p.y, p.face, performance.now()); } })))
         .concat(man ? [{ y: man.y, x0: man.x - 60, x1: man.x + 60, occludedSilhouette: false, draw: (c: CanvasRenderingContext2D) => { drawTestMan(c, man.x, man.y, -1); } }] : []),
       drawBackground(c: CanvasRenderingContext2D, camX: number) {
-        if (sc.id === 'office' && drawStartRoom(c, openOf('out'))) return;
         if (sc.painted && drawHqField(c, sc.painted, camX, doorFx)) {
           // 표찰은 지상 사무 층(2·3층)만 (사용자 2026-10-25)
           if (sc.floor === '2F' || sc.floor === '3F') drawHqSigns(c, sc.painted, sc.doors);
@@ -173,7 +171,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
         const age = (now - enterTick) / (1000 / 30);
         if (!sc.legacy) for (const d of sc.doors) if (isS(d)) drawExitLintel(c, d, camX);
         if (sc.painted) drawHqFieldLight(c, sc.painted, camX, host.hour?.() ?? null, now);
-        if (sc.painted) drawHqGuide(c, sc.painted, sc.doors, w.player.x, now);
+        // 엘리베이터 앞 방향 안내(drawHqGuide)는 사용자 지시로 끔 (2026-10-25)
         // 주인공 그림은 쟈알디 그림이라 머리 높이도 쟈알디 기준
         // 말풍선·이름표는 화면 px 그대로 (필드 zoom을 되돌려 글자 도트가 고르게). top은 원근까지 곱한 화면 px
         const z = fieldView.zoom;
@@ -270,6 +268,11 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
       if (closing && ++closing.t >= closing.len) closing = null;
       if (rattle && ++rattle.t >= RATTLE_T) rattle = null;
       if (solids.length && !(p as Player).seat) blockByProps([p as never], solids, scene?.lane ?? LANE);
+      if (scene?.painted) {
+        // 그림 층: 양 끝 옆벽·튀어나온 벽 바깥으로 못 간다
+        const q = clampPainted(scene.painted, p.x, p.y);
+        if (q.x !== p.x || q.y !== p.y) a.movePlayer(q.x, q.y);
+      }
       // E가 닿는 것 하나만 엔진 소품으로 (엔진은 x 거리만 보므로 깊이는 여기서 고른다)
       const t = (p as Player).seat ? null : target(p.x, p.y);
       const id = t?.id ?? null;

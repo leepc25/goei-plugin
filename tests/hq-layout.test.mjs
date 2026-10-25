@@ -27,12 +27,12 @@ test('본부: 문은 서로 이어진다 (A→B 문이면 B에 A로 돌아오는
   }
 });
 
-test('본부: 사무실은 북쪽 출구, 나머지 방은 아래 출구로 복도에 연결', () => {
+test('본부: 방은 아래 출구로 복도에 연결', () => {
   for (const sc of fresh) {
     const isHall = HALLS.includes(sc.id);
     for (const d of sc.doors) {
       if (isHall) assert.ok(d.side !== 'S', `${sc.id}.${d.id} 복도 남쪽 문`);
-      else if (d.to) assert.equal(d.side, sc.id === 'office' ? 'N' : 'S', `${sc.id}.${d.id} 방 출구 방향`);
+      else if (d.to) assert.equal(d.side, 'S', `${sc.id}.${d.id} 방 출구 방향`);
     }
   }
 });

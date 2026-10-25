@@ -179,24 +179,13 @@ await build({ entryPoints: ['src/game/action/graybox/sim.ts'], bundle: true, for
 await build({ ...common, entryPoints: ['src/game/action/engine/demo.ts'], format: 'esm', minify: true, write: true, outfile: 'dist-test/engine-demo.js' });
 {
   const art = {
-    atlas: `data:image/png;base64,${readFileSync('game-pack/jyaldi/atlas.png').toString('base64')}`,
-    cutin: `data:image/png;base64,${readFileSync('game-pack/jyaldi/cutin.png').toString('base64')}`,
+    // 쟈알디 그림(atlas·cutin)은 2026-10-25 사용자 지시로 뺐다. 동작 판정표(frames.json)만 남는다
+    atlas: '',
+    cutin: '',
     frames: JSON.parse(readFileSync('game-pack/jyaldi/frames.json', 'utf8')),
   };
-  // 배경 그림 (tools/bg_pixelize.py → game-src/art/bg/dot/<장소>/*.png). 없으면 단색 대역.
+  // 옛 배경 도트(game-src/art/bg/dot)는 2026-10-25 사용자 지시로 뺐다: 그림이 없는 장소는 단색 대역
   const bg = {};
-  const bgDir = 'game-src/art/bg/dot';
-  for (const place of existsSync(bgDir) ? readdirSync(bgDir) : []) {
-    for (const sub of ['', 'objects/']) {
-      const dir = `${bgDir}/${place}/${sub}`;
-      if (!existsSync(dir)) continue;
-      for (const f of readdirSync(dir).filter((f) => f.endsWith('.png'))) {
-        // 무손실 WebP 사본(tools/bg_dot_webp.py)이 있으면 그것을 넣는다: 시연판 용량
-        const wp = `game-src/art/bg/dot-webp/${place}/${sub}${f.slice(0, -4)}.webp`;
-        (bg[place] ??= {})[sub + f.slice(0, -4)] = existsSync(wp) ? `data:image/webp;base64,${readFileSync(wp).toString('base64')}` : `data:image/png;base64,${readFileSync(dir + f).toString('base64')}`;
-      }
-    }
-  }
   // 아이템·무기 그림 (tools/items_pixelize.py → game-src/art/items/dot + items.json)
   const items = {};
   if (existsSync('game-src/art/items/items.json')) {
@@ -204,10 +193,6 @@ await build({ ...common, entryPoints: ['src/game/action/engine/demo.ts'], format
       const f = `game-src/art/items/${e.file}`;
       if (existsSync(f)) items[id] = { src: `data:image/png;base64,${readFileSync(f).toString('base64')}`, w: e.w, h: e.h, grip: e.grip, foot: e.foot };
     }
-  }
-  const startRoom = {};
-  for (const key of ['room', 'workstation']) {
-    startRoom[key] = `data:image/png;base64,${readFileSync(`game-pack/start-room/${key}.png`).toString('base64')}`;
   }
   const testPeople = {};
   for (const f of readdirSync('game-pack/test-people').filter((f) => /\.(png|webp)$/.test(f) && !f.startsWith('woman_'))) {
@@ -223,7 +208,7 @@ await build({ ...common, entryPoints: ['src/game/action/engine/demo.ts'], format
     hqField[f.slice(0, -5)] = `data:image/webp;base64,${readFileSync(`game-pack/hq-field/${f}`).toString('base64')}`;
   }
   const code = readFileSync('dist-test/engine-demo.js', 'utf8').replace(/<\/script/gi, '<\\/script');
-  const html = `<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>관리국 액션 · 전투 시연</title><style>html,body{margin:0;height:100%;background:#000;overflow:hidden}#box{position:fixed;inset:0}</style><div id="box"></div><script>window.__GOEI_ENGINE_ART__=${JSON.stringify(art)};window.__GOEI_BG_ART__=${JSON.stringify(bg)};window.__GOEI_ITEM_ART__=${JSON.stringify(items)};window.__GOEI_HQ_DOOR_ROUND2__=${JSON.stringify(hqDoor)};window.__GOEI_START_ROOM__=${JSON.stringify(startRoom)};window.__GOEI_HQ_FIELD__=${JSON.stringify(hqField)};window.__GOEI_TEST_PEOPLE__=${JSON.stringify(testPeople)}</script><script type="module">${code}</script></html>`;
+  const html = `<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>관리국 액션 · 전투 시연</title><style>html,body{margin:0;height:100%;background:#000;overflow:hidden}#box{position:fixed;inset:0}</style><div id="box"></div><script>window.__GOEI_ENGINE_ART__=${JSON.stringify(art)};window.__GOEI_BG_ART__=${JSON.stringify(bg)};window.__GOEI_ITEM_ART__=${JSON.stringify(items)};window.__GOEI_HQ_DOOR_ROUND2__=${JSON.stringify(hqDoor)};window.__GOEI_HQ_FIELD__=${JSON.stringify(hqField)};window.__GOEI_TEST_PEOPLE__=${JSON.stringify(testPeople)}</script><script type="module">${code}</script></html>`;
   writeFileSync('dist/goei-action-game.html', html);
   mkdirSync('release/demo', { recursive: true });
   writeFileSync('release/demo/goei-action-game.html', html);

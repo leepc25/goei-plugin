@@ -84,11 +84,9 @@ function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui
     const sc = hq.map().scenes.find((s) => s.id === sceneId);
     if (!sc || !here.length) return [];
     const [top, bot] = sc.lane ?? [LANE_TOP, LANE_BOT];
-    // 사무실(시작 방)은 왼쪽 책상을 피해 오른쪽 바닥에, 다른 방은 가운데 쪽에 고르게
-    const slots = sceneId === 'office'
-      ? [[630, 0.4], [1000, 0.5], [1130, 0.85], [620, 0.9], [900, 0.15], [1180, 0.3]]
-      : [[0.36, 0.55], [0.5, 0.35], [0.62, 0.75], [0.44, 0.9], [0.72, 0.45], [0.28, 0.8]].map(([fx, fy]) => [sc.length * fx, fy]);
-    return here.slice(0, slots.length).map((p, i) => ({ name: p.name, x: slots[i][0], y: top + (bot - top) * slots[i][1], face: (slots[i][0] > (sceneId === 'office' ? 820 : sc.length / 2) ? -1 : 1) as 1 | -1 }));
+    // 방 가운데 쪽에 고르게
+    const slots = [[0.36, 0.55], [0.5, 0.35], [0.62, 0.75], [0.44, 0.9], [0.72, 0.45], [0.28, 0.8]].map(([fx, fy]) => [sc.length * fx, fy]);
+    return here.slice(0, slots.length).map((p, i) => ({ name: p.name, x: slots[i][0], y: top + (bot - top) * slots[i][1], face: (slots[i][0] > sc.length / 2 ? -1 : 1) as 1 | -1 }));
   };
   const hub = makeHub(
     {
@@ -514,10 +512,25 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     floorPick = null;
     f?.(i);
   };
+  // 키보드: 방향키로 고르고 Enter·Space·E로 누른다 (사용자 2026-10-25)
+  let floorSel = -1;
+  const floorBtns = () => [...floorBox.querySelectorAll('button')] as HTMLButtonElement[];
+  const markFloor = (i: number) => {
+    floorSel = i;
+    floorBtns().forEach((b, k) => b.classList.toggle('sel', k === i));
+  };
+  const stepFloor = (d: 1 | -1) => {
+    const bs = floorBtns();
+    for (let k = 1; k <= bs.length; k++) {
+      const j = (floorSel + d * k + bs.length * 2) % bs.length;
+      if (!bs[j].disabled) return markFloor(j);
+    }
+  };
   const chooseFloor: HubHost['chooseFloor'] = (opts, pick) => {
     floorPick = pick;
     floorBox.innerHTML = opts.map((o, i) => `<button type="button" data-i="${i}"${o.open && !o.here ? '' : ' disabled'}${o.here ? ' class="here"' : ''}>${o.label}</button>`).join('');
     floorBox.hidden = false;
+    markFloor(floorBtns().findIndex((b) => !b.disabled));
     audio.play('panelButton' as never);
   };
   floorBox.addEventListener('click', (e) => {
@@ -527,7 +540,11 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
   const floorKeys = (e: KeyboardEvent) => {
     if (floorBox.hidden) return;
     if (e.code === 'Escape') closeFloors(null);
-    else if (/^Digit[1-9]$/.test(e.code)) {
+    else if (e.code === 'ArrowUp' || e.code === 'ArrowLeft') stepFloor(-1);
+    else if (e.code === 'ArrowDown' || e.code === 'ArrowRight') stepFloor(1);
+    else if (e.code === 'Enter' || e.code === 'Space' || e.code === 'KeyE') {
+      if (!e.repeat && floorSel >= 0 && !floorBtns()[floorSel]?.disabled) closeFloors(floorSel);
+    } else if (/^Digit[1-9]$/.test(e.code)) {
       // 숫자키 = 층 숫자(1·2·3), 지하는 4=B1, 5=B2, 6=B3
       const n = e.code.slice(5);
       const want = n === '4' ? 'B1' : n === '5' ? 'B2' : n === '6' ? 'B3' : n;

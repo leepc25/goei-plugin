@@ -34,6 +34,13 @@ export interface PaintedScene {
   file: string;
   w: number;
   under: boolean;
+  /** 걷는 띠 [맨 뒤, 맨 앞]. 맨 뒤는 벽선(y420)보다 조금 앞이라 발이 벽·문 그림을 뚫지 않는다 */
+  lane?: [number, number];
+  /** 양 끝 옆벽 바닥선 (벽 모서리 x,y → 화면 아래쪽 끝 x,y). 이 선 바깥(벽 쪽)으로는 못 간다 */
+  edgeL?: [number, number, number, number];
+  edgeR?: [number, number, number, number];
+  /** 앞으로 튀어나온 벽: x0~x1 구간에서는 y가 이 값보다 뒤로 못 간다 */
+  fronts?: [number, number, number][];
   doors: Record<string, PaintedDoor>;
   lamps: PaintedLamp[];
   windows: [number, number, number, number][];
@@ -46,7 +53,7 @@ const elev = (x0: number, x1: number, y0: number, y1: number, seam: number): Pai
 
 export const PAINTED: Record<string, PaintedScene> = {
   lobby: {
-    file: 'lobby', w: 2223, under: false,
+    file: 'lobby', w: 2223, under: false, edgeR: [1985, 425, 2223, 505], fronts: [[0, 330, 462]],
     doors: {
       main: { x0: 91, x1: 307, y0: 38, y1: 457, seam: 198, anim: 'swing2', behind: 'see' },
       elev: elev(1580, 1765, 117, 415, 1674),
@@ -54,10 +61,10 @@ export const PAINTED: Record<string, PaintedScene> = {
     },
     lamps: [...downs([861, 1095, 1356, 1671]), sign(2133, 67)],
     windows: [[0, 0, 330, 462]],
-    objects: [{ id: 'desk', file: 'desk', x: 494, y: 205, w: 644, h: 262, sortY: 463, solid: { x0: 494, x1: 1137, y0: 420, y1: 466 } }],
+    objects: [{ id: 'desk', file: 'desk', x: 494, y: 205, w: 644, h: 262, sortY: 463, solid: { x0: 494, x1: 1137, y0: 440, y1: 466 } }],
   },
   f2: {
-    file: 'f2', w: 2064, under: false,
+    file: 'f2', w: 2064, under: false, edgeL: [132, 420, 0, 464], edgeR: [1905, 420, 2064, 470],
     doors: {
       wc: { x0: 30, x1: 118, y0: 112, y1: 470, anim: 'swing', hinge: 'R', quad: [[30, 112], [118, 128], [118, 446], [30, 470]] },
       swat: { x0: 335, x1: 770, y0: 90, y1: 432, seam: 554, anim: 'swing2', behind: 'see' },
@@ -71,7 +78,7 @@ export const PAINTED: Record<string, PaintedScene> = {
     objects: [],
   },
   f3: {
-    file: 'f3', w: 1915, under: false,
+    file: 'f3', w: 1915, under: false, edgeL: [122, 420, 0, 462], edgeR: [1790, 420, 1915, 466],
     doors: {
       wc: { x0: 30, x1: 112, y0: 128, y1: 470, anim: 'swing', hinge: 'R', quad: [[30, 128], [112, 142], [112, 450], [30, 470]] },
       pantry: { x0: 315, x1: 470, y0: 118, y1: 425, anim: 'swing', hinge: 'R' },
@@ -85,7 +92,7 @@ export const PAINTED: Record<string, PaintedScene> = {
     objects: [],
   },
   b1: {
-    file: 'b1', w: 1940, under: true,
+    file: 'b1', w: 1940, under: true, edgeL: [122, 420, 0, 462], edgeR: [1810, 420, 1940, 466],
     doors: {
       edu: { x0: 30, x1: 112, y0: 125, y1: 470, anim: 'swing', hinge: 'R', quad: [[30, 125], [112, 140], [112, 450], [30, 470]] },
       training: { x0: 345, x1: 692, y0: 132, y1: 432, seam: 518, anim: 'swing2' },
@@ -99,7 +106,7 @@ export const PAINTED: Record<string, PaintedScene> = {
     objects: [],
   },
   b2: {
-    file: 'b2', w: 2003, under: true,
+    file: 'b2', w: 2003, under: true, edgeL: [132, 424, 0, 470], edgeR: [1870, 420, 2003, 472],
     doors: {
       interrogation: { x0: 33, x1: 119, y0: 119, y1: 465, anim: 'swing', hinge: 'R', quad: [[33, 119], [119, 135], [119, 444], [33, 465]] },
       isolation: { x0: 385, x1: 725, y0: 122, y1: 410, anim: 'shutter' },
@@ -120,7 +127,7 @@ export const PAINTED: Record<string, PaintedScene> = {
     objects: [],
   },
   b3: {
-    file: 'b3', w: 1906, under: true,
+    file: 'b3', w: 1906, under: true, edgeR: [1600, 445, 1906, 560], fronts: [[1000, 1600, 472]],
     doors: {
       supply: { x0: 1405, x1: 1597, y0: 190, y1: 470, anim: 'swing', hinge: 'L' },
       elev: { x0: 1724, x1: 1849, y0: 130, y1: 552, seam: 1784, anim: 'slide2', behind: 'car', quad: [[1724, 165], [1849, 130], [1849, 552], [1724, 510]] },
@@ -140,3 +147,17 @@ export const doorX = (scene: string, id: string) => {
   const d = PAINTED[scene].doors[id];
   return Math.round((d.x0 + d.x1) / 2);
 };
+
+/** 그림 층 기본 걷는 띠 */
+export const PAINTED_LANE: [number, number] = [440, 669];
+
+/** 옆벽·튀어나온 벽 바깥으로 나간 발을 바닥 안으로 되돌린다 */
+export function clampPainted(scene: string, x: number, y: number): { x: number; y: number } {
+  const p = PAINTED[scene];
+  if (!p) return { x, y };
+  for (const [x0, x1, ym] of p.fronts ?? []) if (x >= x0 && x <= x1 && y < ym) y = ym;
+  const at = (e: [number, number, number, number]) => (y <= e[1] ? e[0] : y >= e[3] ? e[2] : e[0] + ((y - e[1]) * (e[2] - e[0])) / (e[3] - e[1]));
+  if (p.edgeL) x = Math.max(x, at(p.edgeL) + 24);
+  if (p.edgeR) x = Math.min(x, at(p.edgeR) - 24);
+  return { x, y };
+}
