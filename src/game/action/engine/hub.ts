@@ -145,7 +145,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
       } })).concat(people.map((p) => ({ y: p.y, x0: p.x - 60, x1: p.x + 60, occludedSilhouette: false, draw: (c: CanvasRenderingContext2D) => { drawVisitAgent(c, p.name, p.x, p.y, p.face, performance.now()); } })))
         .concat(man ? [{ y: man.y, x0: man.x - 60, x1: man.x + 60, occludedSilhouette: false, draw: (c: CanvasRenderingContext2D) => { drawTestMan(c, man.x, man.y, -1); } }] : []),
       drawBackground(c: CanvasRenderingContext2D, camX: number) {
-        if (sc.painted && drawHqField(c, sc.painted, camX, doorFx)) {
+        if (sc.painted && drawHqField(c, sc.painted, camX, doorFx, host.hour?.() ?? null)) {
           // 표찰은 지상 사무 층(2·3층)만 (사용자 2026-10-25)
           if (sc.floor === '2F' || sc.floor === '3F') drawHqSigns(c, sc.painted, sc.doors);
           if (callOn) drawCallLit(c, sc.painted, performance.now());

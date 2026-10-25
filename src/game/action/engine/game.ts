@@ -144,8 +144,10 @@ export class Game {
         // 화면 밀기는 그림과 같은 보간 위치로 (틱 위치로 하면 걸을 때 화면이 30Hz로 툭툭 따라가 캐릭터가 떨린다).
         // 렌더러는 camX를 정수로 반올림하므로, 둘을 합한 이동이 화면 px 정수가 되게 crop을 맞춘다
         view.crop = 0;
+        // 렌더러와 같은 보간값: 층 단추·대화창·본부 창이 떠서 월드가 멈춘 동안 여기만 틱 진행률로 움직이면 화면이 매 장 좌우로 떨린다 (리스 좁은 창)
+        const frozen = paused || !!this.mods.blocking?.() || !!this.mods.hq?.isOpen?.();
         if (vw < SCREEN_W && w) {
-          const a = paused ? 1 : this.acc / T,
+          const a = frozen ? 1 : this.acc / T,
             cam = Math.round(w.prevCamX + (w.camX - w.prevCamX) * a),
             px = (w.player.px ?? w.player.x) + (w.player.x - (w.player.px ?? w.player.x)) * a,
             raw = Math.max(0, Math.min(SCREEN_W - vw, px - cam - vw / 2));
@@ -155,7 +157,7 @@ export class Game {
         view.cropY = 0;
         const vh = this.canvas.height / view.zoom;
         if (vh < H - 0.5 && w) {
-          const a = paused ? 1 : this.acc / T, p = w.player as { y: number; py?: number };
+          const a = frozen ? 1 : this.acc / T, p = w.player as { y: number; py?: number };
           const py = (p.py ?? p.y) + (p.y - (p.py ?? p.y)) * a;
           view.cropY = Math.round(Math.max(0, Math.min(H - vh, py - vh * 0.7)) * view.zoom) / view.zoom;
         }
