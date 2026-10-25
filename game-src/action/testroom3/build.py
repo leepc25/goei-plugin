@@ -314,12 +314,13 @@ def deep_merge(a, b):
 
 
 # ───────────────────────── 그림 처리 ─────────────────────────
-def drop_specks(im, minpx=15):
+def drop_specks(im, minpx=15, keep_main=False):
     a = np.array(im)
     m = a[:, :, 3] > 40
     H, W = m.shape
     seen = np.zeros_like(m)
     ys, xs = np.nonzero(m)
+    comps = []
     for y0, x0 in zip(ys.tolist(), xs.tolist()):
         if seen[y0, x0]: continue
         comp = [(y0, x0)]; seen[y0, x0] = True; i = 0
@@ -330,7 +331,10 @@ def drop_specks(im, minpx=15):
                     ny, nx = y + dy, x + dx
                     if 0 <= ny < H and 0 <= nx < W and m[ny, nx] and not seen[ny, nx]:
                         seen[ny, nx] = True; comp.append((ny, nx))
-        if len(comp) < minpx:
+        comps.append(comp)
+    big = max(comps, key=len) if comps else None
+    for comp in comps:
+        if len(comp) < minpx and comp is not big:
             for y, x in comp: a[y, x] = 0
     return Image.fromarray(a, "RGBA")
 
@@ -497,9 +501,11 @@ def build_char(cfg, force=False):
             ims = [Image.open(f).convert("RGBA") for f in fs]
             if an.get("mirror"): ims = [im.transpose(Image.FLIP_LEFT_RIGHT) for im in ims]
             ims = [drop_specks(im) for im in ims]
-            for fi, box in (cfg.get("clean", {}).get(lid) or []):   # 손으로 지울 칸: [장(1부터), [x0,y0,x1,y1]] (뒤집은 뒤 좌표)
+            # 손으로 지울 것: [장(1부터), 숫자] = 몸에서 떨어진 덩어리 중 그 픽셀 수보다 작은 것 / [장, [x0,y0,x1,y1]] = 그 칸(뒤집은 뒤 좌표)
+            for fi, box in (cfg.get("clean", {}).get(lid) or []):
                 if 1 <= fi <= len(ims):
-                    a = np.array(ims[fi - 1]); a[box[1]:box[3], box[0]:box[2]] = 0; ims[fi - 1] = Image.fromarray(a, "RGBA")
+                    if isinstance(box, (int, float)): ims[fi - 1] = drop_specks(ims[fi - 1], int(box), keep_main=True)
+                    else: a = np.array(ims[fi - 1]); a[box[1]:box[3], box[0]:box[2]] = 0; ims[fi - 1] = Image.fromarray(a, "RGBA")
             A[lid] = dict(name=an.get("name", lid), **process(ims, lid, gun))
         cache.write_text(json.dumps({"sig": sig, "A": A}, ensure_ascii=False))
     for lid, an in cfg["anims"].items():   # 이름은 설정 것을 씀
