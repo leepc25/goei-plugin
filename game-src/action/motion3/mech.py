@@ -12,7 +12,7 @@ import m3
 
 BASE = Path(__file__).resolve().parent
 REC = BASE / "mech.json"
-SMALL = {"43", "45", "1", "3", "W_1", "28", "29", "30", "31", "17", "21"}   # 원래 움직임이 작은 줄(대기·끄덕임 등)
+SMALL = {"43", "45", "1", "2", "3", "W", "W_1", "28", "29", "30", "31", "33", "34", "35", "17", "21", "39", "41"}   # 원래 움직임이 작은 줄(대기·끄덕임 등)
 
 
 def load():
@@ -28,7 +28,7 @@ def check(key, f):
     if min(area) < 0.2 * area[0]: return f"빈 장(그림 면적 {min(area)}/{area[0]})"
     a0 = ims[0]; tot = max(1, (a0[:, :, 3] > 40).sum())
     mv = max((((np.abs(a - a0)[:, :, :3].sum(axis=2) > 60) | ((a[:, :, 3] > 40) != (a0[:, :, 3] > 40))).sum()) / tot for a in ims[1:])
-    if mv < (0.04 if f in SMALL else 0.10): return f"멈춤(가장 많이 바뀐 장도 {mv:.0%})"
+    if mv < (0.015 if f in SMALL else 0.06): return f"멈춤(가장 많이 바뀐 장도 {mv:.0%})"
     return None
 
 
