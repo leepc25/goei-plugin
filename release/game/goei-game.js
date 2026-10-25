@@ -1,4 +1,4 @@
-// goei-game 0.16.58
+// goei-game 0.16.59
 "use strict";
 (() => {
   // src/game/action/engine/view.ts
@@ -37282,7 +37282,7 @@ ${t.secret}` : "",
     }
   }
   var mod = {
-    version: "0.16.58",
+    version: "0.16.59",
     mount: (box2, bridge) => mountPlay(box2, bridge),
     // 이전 시험판: 저장 키와 그림 팩은 예전 그대로 (goei:game · goei:game-action:v1)
     legacy: {

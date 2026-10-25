@@ -1,4 +1,35 @@
- = 50;
+ear = d.bases.find((b) => b.org && b.org === org?.name) ?? d.bases[0];
+        const sido = near?.sido && REGIONS.includes(near.sido) ? near.sido : "02";
+        d.bases.push({ name, label: "", lore: org ? org.name : "", english: "", aliases: [], org: org?.name ?? "", sido, gu: "", x: 50, y: 50, show: true });
+        dirUi.kind = "base";
+        dirUi.open = name;
+        dirUi.q = "";
+        dirUi.adding = false;
+        dirUi.notice = "";
+        dirUi.done = "";
+        break;
+      }
+      case "dir-base-show":
+      case "dir-base-org": {
+        const at = v.indexOf("|");
+        const b = baseOf(v.slice(at + 1));
+        if (!b) break;
+        if (action === "dir-base-show") b.show = v.slice(0, at) === "1";
+        else b.org = d.orgs.some((o) => o.name === v.slice(0, at)) ? v.slice(0, at) : "";
+        dirUi.done = "";
+        break;
+      }
+      case "dir-base-sido":
+      case "dir-base-gu": {
+        const at = v.lastIndexOf("=");
+        const b = baseOf(v.slice(0, at));
+        const val = v.slice(at + 1);
+        if (!b) break;
+        if (action === "dir-base-sido" && REGIONS.includes(val) && val !== b.sido) {
+          b.sido = val;
+          b.gu = "";
+          b.x = 50;
+          b.y = 50;
         } else if (action === "dir-base-gu" && (!val || SIGUN[b.sido]?.includes(val))) b.gu = val;
         dirUi.done = "";
         break;
@@ -3082,5 +3113,5 @@ ${NOTE}`;
   }
 
   // src/body-entry.ts
-  globalThis.__goeiBody = { version: "0.16.58", start: start2 };
+  globalThis.__goeiBody = { version: "0.16.59", start: start2 };
 })();

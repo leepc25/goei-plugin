@@ -610,28 +610,52 @@
     }
     return { next, lore: lore.count, scripts: scripts.count, fields: fields3 };
   }
-  var PLUGIN_VERSION = true ? "0.16.58" : "0";
+  var PLUGIN_VERSION = true ? "0.16.59" : "0";
 
   // src/host/game/fetch.ts
   var GAME_BASE = UPDATE_BASE ? `${UPDATE_BASE}/game` : "";
   var GameFileError = class extends Error {
   };
   var fetchStats = { requests: 0, bytes: 0 };
+  var TIMEOUT_MS = 2e4;
+  var TRIES = 3;
+  function timeout(p, ms, what) {
+    let t;
+    return Promise.race([p, new Promise((_, rej) => t = setTimeout(() => rej(new Error(`${what} ${ms / 1e3}초 응답 없음`)), ms))]).finally(() => clearTimeout(t));
+  }
+  var fetchLog = [];
   async function getBytes(name) {
     if (!GAME_BASE) throw new GameFileError("받을 곳이 정해지지 않았어요. 파일로 넣어 주세요.");
-    const url = `${GAME_BASE}/${name}?t=${Date.now()}`;
-    const legacy = risuai.risuFetch;
-    if (legacy) {
-      try {
-        const r = await legacy(url, { method: "GET", plainFetchForce: true, rawResponse: true, headers: { "Content-Type": "text/plain" } });
-        const b = r?.ok ? toBytes3(r.data) : null;
-        if (b) return count(b);
-      } catch {
+    const why = [];
+    for (let attempt = 1; attempt <= TRIES; attempt++) {
+      const url = `${GAME_BASE}/${name}?t=${Date.now()}`;
+      const legacy = risuai.risuFetch;
+      if (legacy) {
+        try {
+          const r = await timeout(legacy(url, { method: "GET", plainFetchForce: true, rawResponse: true, headers: { "Content-Type": "text/plain" } }), TIMEOUT_MS, "risuFetch");
+          const b = r?.ok ? toBytes3(r.data) : null;
+          if (b?.length) return count(b);
+          why.push(`risuFetch ${r?.ok ? "빈 응답" : `실패(${r?.status ?? "?"})`}`);
+        } catch (e) {
+          why.push(e instanceof Error ? e.message : String(e));
+        }
       }
+      try {
+        const res = await timeout(risuai.nativeFetch(url, { method: "GET" }), TIMEOUT_MS, "nativeFetch");
+        if (res.ok) {
+          const b = new Uint8Array(await timeout(res.arrayBuffer(), TIMEOUT_MS, "nativeFetch 본문"));
+          if (b.length) return count(b);
+          why.push("nativeFetch 빈 응답");
+        } else why.push(`nativeFetch 실패(${res.status})`);
+      } catch (e) {
+        why.push(e instanceof Error ? e.message : String(e));
+      }
+      if (attempt < TRIES) await new Promise((r) => setTimeout(r, 1e3 * attempt));
     }
-    const res = await risuai.nativeFetch(url, { method: "GET" });
-    if (!res.ok) throw new GameFileError(`받지 못했어요 (${res.status}).`);
-    return count(new Uint8Array(await res.arrayBuffer()));
+    const msg = `${name} 받기 실패: ${why.join(" · ")}`;
+    fetchLog.push(msg);
+    console.log(`[goei] ${msg}`);
+    throw new GameFileError(`${name}을(를) ${TRIES}번 시도했지만 받지 못했어요 (${why.slice(-2).join(" · ")}). 다시 받기를 눌러 주세요.`);
   }
   function count(b) {
     fetchStats.requests++;
@@ -675,7 +699,7 @@
 
   // src/host/game/code.ts
   var CODE_KEY = "goei:game:code";
-  var VERSION = true ? "0.16.58" : "";
+  var VERSION = true ? "0.16.59" : "";
   var codeVersion = (code) => /^\/\/ goei-game (\S+)/.exec(code)?.[1] ?? null;
   var mod = null;
   var codeStats = { readMs: 0, runMs: 0, bytes: 0, fromNet: false };
@@ -3735,35 +3759,4 @@ ${recentStory.map((m) => m.text).join("\n")}`,
           break;
         }
         const name = freeBaseName(d, want);
-        const near = d.bases.find((b) => b.org && b.org === org?.name) ?? d.bases[0];
-        const sido = near?.sido && REGIONS.includes(near.sido) ? near.sido : "02";
-        d.bases.push({ name, label: "", lore: org ? org.name : "", english: "", aliases: [], org: org?.name ?? "", sido, gu: "", x: 50, y: 50, show: true });
-        dirUi.kind = "base";
-        dirUi.open = name;
-        dirUi.q = "";
-        dirUi.adding = false;
-        dirUi.notice = "";
-        dirUi.done = "";
-        break;
-      }
-      case "dir-base-show":
-      case "dir-base-org": {
-        const at = v.indexOf("|");
-        const b = baseOf(v.slice(at + 1));
-        if (!b) break;
-        if (action === "dir-base-show") b.show = v.slice(0, at) === "1";
-        else b.org = d.orgs.some((o) => o.name === v.slice(0, at)) ? v.slice(0, at) : "";
-        dirUi.done = "";
-        break;
-      }
-      case "dir-base-sido":
-      case "dir-base-gu": {
-        const at = v.lastIndexOf("=");
-        const b = baseOf(v.slice(0, at));
-        const val = v.slice(at + 1);
-        if (!b) break;
-        if (action === "dir-base-sido" && REGIONS.includes(val) && val !== b.sido) {
-          b.sido = val;
-          b.gu = "";
-          b.x = 50;
-          b.y
+        const n
