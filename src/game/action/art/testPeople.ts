@@ -9,10 +9,11 @@ import { charSize } from '../charSize';
 
 const MAN_SCALE = 1;
 type Meta = { name: string; dir: string; n: number; w: number; h: number; bot: number[]; foot: number[][]; cx: number[] };
-type Art = { clips: Record<string, { im: HTMLImageElement; m: Meta }>; man: HTMLImageElement };
+type Vfx = { frames: number[][]; pivot: number[]; img: HTMLImageElement };
+type Art = { clips: Record<string, { im: HTMLImageElement; m: Meta }>; man: HTMLImageElement; vfx: Record<string, Vfx> };
 let art: Art | null = null;
 let revision = 0;
-declare global { interface Window { __GOEI_TEST_PEOPLE__?: Record<string, string> & { eileen?: Record<string, Meta> } } }
+declare global { interface Window { __GOEI_TEST_PEOPLE__?: Record<string, string> & { eileen?: Record<string, Meta>; eileen_vfx?: Record<string, Omit<Vfx, 'img'>> } } }
 
 const MAN = { w: 128, h: 256, fx: 66, fy: 249, head: 8 };
 
@@ -34,7 +35,12 @@ export function prepareTestPeople(urlOf?: (file: string) => Promise<string>, byt
     if (!meta) throw new Error('no eileen');
     const rows = await Promise.all(Object.entries(meta).map(async ([id, m]) => [id, { im: await img(`eileen_${id}`, '.webp'), m }] as const));
     const man = await img('man');
-    if (revision === own) art = { clips: Object.fromEntries(rows), man };
+    // 테스트룸 PixelLab 이펙트 그림 (없어도 된다: 그림 없는 이펙트는 코드 그림으로)
+    let vm = window.__GOEI_TEST_PEOPLE__?.eileen_vfx as Record<string, Omit<Vfx, 'img'>> | undefined;
+    if (!vm && bytesOf) { const b = await bytesOf('eileen_vfx.json').catch(() => null); if (b) vm = JSON.parse(new TextDecoder().decode(b)); }
+    const vfx: Record<string, Vfx> = {};
+    if (vm) await Promise.all(Object.entries(vm).map(async ([k, v]) => { try { vfx[k] = { ...v, img: await img(`vfx_${k}`, '.webp') }; } catch { /* 이 그림만 없음 */ } }));
+    if (revision === own) art = { clips: Object.fromEntries(rows), man, vfx };
   })().catch(() => { /* 없으면 원래 쟈알디 그림 */ });
   return { ready, dispose: () => { if (revision === own) { revision++; art = null; } } };
 }
@@ -120,4 +126,12 @@ export function testPlayerFace(side = 44): HTMLCanvasElement | null {
   const cx = e.m.w / 2 + (e.m.cx[0] ?? 0);
   o.drawImage(e.im, cx - side / 2, 14 - 4, side, side, 0, 0, side, side);
   return face;
+}
+
+/** 에일린 테스트룸 전투(eileen/core.ts)가 쓰는 그림: 동작 기준점(A)·시트(IMG)·이펙트(VFX) */
+export function eileenArt(): { A: Record<string, Meta & Record<string, unknown>>; IMG: Record<string, HTMLImageElement>; VFX: Record<string, Vfx> } | null {
+  if (!art) return null;
+  const A: Record<string, Meta> = {}, IMG: Record<string, HTMLImageElement> = {};
+  for (const [k, v] of Object.entries(art.clips)) { A[k] = v.m; IMG[k] = v.im; }
+  return { A, IMG, VFX: art.vfx };
 }

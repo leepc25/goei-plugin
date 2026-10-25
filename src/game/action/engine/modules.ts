@@ -30,6 +30,7 @@ import { whereIs, LANE_TOP, LANE_BOT } from '../hq/map';
 import { hasVisitAgent, visitAgentFaceCanvas } from '../art/visitAgents';
 import { hasTestPeople, testPlayerFace, testPlayerTop } from '../art/testPeople';
 import { charSize } from '../charSize';
+import { eileenHooks } from '../eileen/player';
 import { FieldFx, parseFxList } from '../fx/fieldFx';
 import { SUPER_TEXT } from '../fx/superText';
 import { drawTitleBg, setHudItemIcon } from '../ui';
@@ -645,6 +646,8 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
   };
   window.addEventListener('keydown', titleInput, true);
   window.addEventListener('pointerdown', titleInput, true);
+  // 에일린 테스트룸 전투의 소리는 화면 효과 없이 소리만
+  eileenHooks.sfx = (e) => audio.event(e as never);
   const listeners: ((e: GameEvent) => void)[] = [
     (e) => {
       audio.event(e as never);

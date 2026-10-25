@@ -199,6 +199,7 @@ await build({ ...common, entryPoints: ['src/game/action/engine/demo.ts'], format
     testPeople[f.replace(/\.(png|webp)$/, '')] = `data:image/${f.endsWith('.webp') ? 'webp' : 'png'};base64,${readFileSync(`game-pack/test-people/${f}`).toString('base64')}`;
   }
   testPeople.eileen = JSON.parse(readFileSync('game-pack/test-people/eileen.json', 'utf8'));
+  testPeople.eileen_vfx = JSON.parse(readFileSync('game-pack/test-people/eileen_vfx.json', 'utf8'));
   const hqDoor = {};
   for (const key of ['frame', 'aperture', 'leaf-left', 'leaf-right', 'entry-marker']) {
     hqDoor[key] = `data:image/png;base64,${readFileSync(`game-pack/hq-door-round2/${key}.png`).toString('base64')}`;

@@ -2,6 +2,10 @@
 import type { GameBridge } from '../bridge';
 import { prepareTestPeople } from './art/testPeople';
 import { prepareHqField } from './art/hqField';
+import { eileenArt } from './art/testPeople';
+import { EileenPlayer } from './eileen/player';
+import { playerFactory } from './engine/player';
+import { useEileenKeys } from './engine/input';
 import { prepareHqTextures } from './art/hqTextures';
 import { prepareHqDoorRound2 } from './art/hqDoorRound2';
 import { prepareVisitAgents } from './art/visitAgents';
@@ -44,12 +48,15 @@ export function mountGame(box: HTMLElement, bridge?: Partial<GameBridge>): () =>
   const releaseDoorArt = prepareHqDoorRound2(bridge?.assets ? f => bridge.assets!.url('hq-door-round2', f) : undefined);
   const releaseField = prepareHqField(bridge?.assets ? f => bridge.assets!.url('hq-field', f) : undefined);
   // 필드 시험: 사용자 PixelLab 시험 캐릭터 (임시)
-  const testPeople = bridge?.visit || window.__GOEI_TEST_PEOPLE__ ? prepareTestPeople(bridge?.assets ? f => bridge.assets!.url('test-people', f) : undefined, bridge?.assets ? f => bridge.assets!.bytes('test-people', f) : undefined) : null;
+  // 주인공 그림(에일린 테스트룸 완성본): 늘 받는다 (쟈알디 그림은 뺐다, 2026-10-25)
+  const testPeople = prepareTestPeople(bridge?.assets ? f => bridge.assets!.url('test-people', f) : undefined, bridge?.assets ? f => bridge.assets!.bytes('test-people', f) : undefined);
   const visitArt = bridge?.visit ? prepareVisitAgents(bridge.assets ? f => bridge.assets!.url('visit-agents', f) : undefined, bridge.assets ? f => bridge.assets!.bytes('visit-agents', f) : undefined) : null;
   void Promise.all([loadArt(urlOf, bridge?.assets ? f => bridge.assets!.bytes('jyaldi', f) : undefined), visitArt?.ready, testPeople?.ready]).then(([art]) => {
     if (dead) return;
     stage.remove();
     root.style.display = 'block';
+    // 에일린 테스트룸 전투: 그림이 있으면 플레이어와 키 배치를 에일린으로
+    if (eileenArt()) { playerFactory.make = (clips) => new EileenPlayer(clips); useEileenKeys(); }
     const wiring = engineModules(root, bridge);
     game = new Game(wiring.box, art, wiring.mods);
     wiring.bind(game);

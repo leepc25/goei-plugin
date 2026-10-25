@@ -29,6 +29,9 @@ export interface AnimRef {
   origin: number;
 }
 
+/** 월드가 플레이어를 만드는 곳 (에일린이 있으면 main.ts가 에일린 플레이어로 바꾼다) */
+export const playerFactory: { make: (clips: Record<string, FrameInfo[]>) => Player } = { make: (clips) => new Player(clips) };
+
 export class Player extends Fighter {
   readonly team = 'player' as const;
   readonly kind = 'player';
@@ -113,7 +116,7 @@ export class Player extends Fighter {
   wantItem = 0;
   wantSuper = false;
 
-  constructor(private clips: Record<string, FrameInfo[]>) {
+  constructor(protected clips: Record<string, FrameInfo[]>) {
     super();
     this.friction = 0.72;
   }

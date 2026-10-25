@@ -11,6 +11,7 @@ import type { Player } from './player';
 import type { World } from './world';
 import { drawSupply } from './itemsLink';
 import { drawTestPlayer } from '../art/testPeople';
+import { EileenPlayer } from '../eileen/player';
 
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
@@ -139,10 +140,13 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
     for (const h of fr.hurt) ctx.fillRect(h.x0 - ox, h.y - h.z1 - oy, h.x1 - h.x0, h.z1 - h.z0);
   }
 
+  /** 이번 그림의 카메라 x (에일린은 자기 좌표로 그려서 같은 카메라를 써야 한다) */
+  let drawCam = 0;
   function drawPlayer(p: Player, x: number, y: number, z: number, w: World) {
     if (p.ally) sprite(p.ally.clip, p.ally.f, 0, x + (p.ally.x - p.x), y + (p.ally.y - p.y), p.ally.dir);
     const a = p.anim();
     // 필드 시험 캐릭터가 있으면 그 그림 (서기 / 움직이면 달리기)
+    if (p instanceof EileenPlayer && !p.seat) { p.drawSelf(ctx, drawCam); return; }
     if (drawTestPlayer(ctx, a.clip, a.frame, p.clipLen(a.clip), x, y - z, p.dir)) return;
     const blink = p.invuln > 0 && w.tick % 4 < 2 ? 0.5 : 1;
     if (!sprite(a.clip, a.frame, a.origin, x, y - z, p.dir, blink)) {
@@ -412,6 +416,7 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
       ctx.imageSmoothingEnabled = false;
       const shake = w.shakeT > 0 ? (w.tick % 2 ? 1 : -1) * w.shakeP * 2 : 0;
       const camX = Math.round(lerp(w.prevCamX, w.camX, alpha));
+      drawCam = camX;
       ctx.save();
       ctx.translate(shake, w.shakeT > 0 ? (w.tick % 3) - 1 : 0);
       background(w, camX);
@@ -501,6 +506,7 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
       // 실제 조사 대상의 표식. 전투 중에도 잠김 이유는 HUD에서 읽을 수 있다.
       // 표식은 HUD 안내 띠 안에서 그린다. 머리 위 표식과 안내 띠가 겹치지 않게 한다.
       w.hintShown = false;
+      if (w.player instanceof EileenPlayer) w.player.drawFxLayer(ctx, camX);
       drawFx(w, camX);
       if (w.floor.drawForeground) {
         ctx.save();
@@ -514,6 +520,7 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
       if (w.showBoxes) boxes(w, camX);
       ctx.restore();
       if (w.cutin > 0) cutin(w);
+      if (w.player instanceof EileenPlayer) w.player.drawScreen(ctx);
       if (opt.hud) hud(w);
       overlayText(w);
     },

@@ -17,7 +17,7 @@ import { Bullet, Dummy, Thug } from './bodies';
 import { Fighter, overlap } from './fighter';
 import type { Pad } from './input';
 import { newAttackId } from './ids';
-import { Player } from './player';
+import { Player, playerFactory } from './player';
 import { initializeProgression, progressionHit } from './progression';
 import { encodeState, decodeState } from './checkpoint';
 
@@ -147,7 +147,7 @@ export class World implements WorldView {
     enemyFactory?: EnemyFactory,
   ) {
     this.rand = mulberry32(run.seed || 1);
-    this.player = new Player(clips);
+    this.player = playerFactory.make(clips);
     initializeProgression(this.player, run);
     this.enemyFactory = enemyFactory ?? fallbackEnemy;
     const self = this;
