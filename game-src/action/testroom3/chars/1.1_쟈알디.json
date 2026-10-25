@@ -1,156 +1,488 @@
 {
-  "key": "1.1_쟈알디",
-  "name": "쟈알디",
-  "dir": "W",
-  "color": "#C8283C",
-  "armed": true,
-  "anims": {
-    "W": {"folder": "W", "mirror": true, "name": "무기 꺼내기"},
-    "W_1": {"folder": "W_1", "mirror": true, "name": "무기 대기"},
-    "1": {"folder": "1", "mirror": true, "name": "평상 대기"},
-    "2": {"folder": "2", "mirror": true, "name": "개인 대기"},
-    "3": {"folder": "3", "mirror": true, "name": "전투 대기"},
-    "3_0": {"folder": "3_0", "mirror": true, "name": "전투 자세 잡기"},
-    "4": {"folder": "4", "mirror": true, "name": "걷기"},
-    "5": {"folder": "5", "mirror": true, "name": "뛰기"},
-    "6": {"folder": "6", "mirror": true, "name": "제자리 점프"},
-    "7": {"folder": "7", "mirror": true, "name": "방향 점프"},
-    "8": {"folder": "8", "mirror": true, "name": "달리다 점프"},
-    "9": {"folder": "9", "mirror": true, "name": "약1 앞주먹 긴 잽"},
-    "10": {"folder": "10", "mirror": true, "name": "약2 뒷손 어퍼컷"},
-    "11": {"folder": "11", "mirror": true, "name": "약3 내려치기"},
-    "12": {"folder": "12", "mirror": true, "name": "강 내려찍기 발차기"},
-    "13": {"folder": "13", "mirror": true, "name": "돌진 어깨 들이받기"},
-    "14": {"folder": "14", "mirror": true, "name": "점프 공격 내려찍기 주먹"},
-    "15": {"folder": "15", "mirror": true, "name": "원거리 공격 권총"},
-    "16": {"folder": "16", "mirror": true, "name": "뒤 회피"},
-    "16_1": {"folder": "16_1", "mirror": true, "name": "앞 회피"},
-    "17": {"folder": "17", "mirror": true, "name": "막기"},
-    "18": {"folder": "18", "mirror": true, "name": "맞기"},
-    "19": {"folder": "19", "mirror": true, "name": "날아가 쓰러지기"},
-    "20": {"folder": "20", "mirror": true, "name": "일어나기"},
-    "21": {"folder": "21", "mirror": true, "name": "스턴"},
-    "22": {"folder": "22", "mirror": true, "name": "고유기술 「근접 폭파」"},
-    "23": {"folder": "23", "mirror": true, "name": "충전 「구역 정리」 모으기"},
-    "24": {"folder": "24", "mirror": true, "name": "충전 방출"},
-    "25": {"folder": "25", "mirror": true, "name": "필살기 「보면 알아」"},
-    "26": {"folder": "26", "mirror": true, "name": "섭취"},
-    "27": {"folder": "27", "mirror": true, "name": "줍기"},
-    "28": {"folder": "28", "mirror": true, "name": "응대"},
-    "29": {"folder": "29", "mirror": true, "name": "말하며 손짓"},
-    "30": {"folder": "30", "mirror": true, "name": "끄덕이기"},
-    "31": {"folder": "31", "mirror": true, "name": "고개 젓기"},
-    "32": {"folder": "32", "mirror": true, "name": "화내기"},
-    "33": {"folder": "33", "mirror": true, "name": "발견 반응"},
-    "34": {"folder": "34", "mirror": true, "name": "놀라기"},
-    "35": {"folder": "35", "mirror": true, "name": "기뻐하기"},
-    "36": {"folder": "36", "mirror": true, "name": "도망"},
-    "37": {"folder": "37", "mirror": true, "name": "뒷걸음질 (움츠리기)"},
-    "37_1": {"folder": "37_1", "mirror": true, "name": "뒷걸음질 반복"},
-    "38": {"folder": "38", "mirror": false, "name": "엎드려 기기"},
-    "38_1": {"folder": "38_1", "mirror": false, "name": "엎드려 기기 반복"},
-    "39": {"folder": "39", "mirror": true, "name": "주저앉기"},
-    "40": {"folder": "40", "mirror": true, "name": "주저앉아 뒤로 기어나가기"},
-    "41": {"folder": "41", "mirror": true, "name": "웅크려 떨기"},
-    "42": {"folder": "42", "mirror": true, "name": "네발로 기기"},
-    "42_1": {"folder": "42_1", "mirror": true, "name": "네발로 기기 반복"}
+ "key": "1.1_쟈알디",
+ "name": "쟈알디",
+ "dir": "W",
+ "color": "#C8283C",
+ "armed": true,
+ "anims": {
+  "W": {
+   "folder": "W",
+   "mirror": true,
+   "name": "무기 꺼내기"
   },
-  "picks": {"combat": 4, "weapon": 4, "apex": 4, "run": 2, "crawl4": 8},
-  "loops": {
-    "19": [8, 9, 10, 11, 12],
-    "21": [3, 4, 5, 6, 7, 8],
-    "23": [3, 4, 5, 6, 7, 8],
-    "39": [9, 10, 11, 12],
-    "41": [2, 3, 4, 5, 6, 7, 8],
-    "42": [5, 6, 7, 8, 9, 10, 11, 12]
+  "W_1": {
+   "folder": "W_1",
+   "mirror": true,
+   "name": "무기 대기"
   },
-  "hit": {"9": 5, "10": 8, "11": 4, "12": 5, "13": 2, "14": 2, "16_1": 2, "22": 3, "24": 1, "25": 8},
-  "gun": ["W", "W_1", "15"],
-  "kick": ["12"],
-  "ranged": {"proj": {"t": "proj", "kind": "bullet", "hit": {"dmg": 8, "kind": "light"}}, "heat": false},
-  "skills": {
-    "skill": {
-      "name": "근접 폭파",
-      "anim": "22",
-      "fps": 11,
-      "armor": [3, 5],
-      "events": [
-        {
-          "f": 4,
-          "hold": 0.12,
-          "fx": [
-            {
-              "t": "blast",
-              "at": "hand",
-              "dx": 0,
-              "scale": 1.4,
-              "r": 180,
-              "scorch": 3,
-              "hit": {"dmg": 40, "kind": "blow", "stop": 0.16, "shake": 12}
-            }
-          ]
-        }
-      ]
-    },
-    "charge": {
-      "name": "구역 정리",
-      "hold": "23",
-      "release": "24",
-      "levels": [0.5, 1.2],
-      "fire": 1,
-      "lv": {
-        "0": [{"t": "blast", "at": "front", "dx": 70, "scale": 1.0, "r": 90, "hit": {"dmg": 15, "kind": "heavy"}}],
-        "1": [
-          {
-            "t": "chain",
-            "n": 3,
-            "from": 110,
-            "step": 135,
-            "every": 0.12,
-            "scale": 1.2,
-            "hit": {"dmg": 60, "kind": "down", "mid": "light"}
-          }
-        ],
-        "2": [
-          {
-            "t": "circle",
-            "r": 300,
-            "n": 10,
-            "scale": 1.5,
-            "hit": {"dmg": 80, "kind": "launch", "n": 2, "mid": "heavy"}
-          },
-          {"t": "shake", "v": 8}
-        ]
+  "1": {
+   "folder": "1",
+   "mirror": true,
+   "name": "평상 대기"
+  },
+  "2": {
+   "folder": "2",
+   "mirror": true,
+   "name": "개인 대기"
+  },
+  "3": {
+   "folder": "3",
+   "mirror": true,
+   "name": "전투 대기"
+  },
+  "3_0": {
+   "folder": "3_0",
+   "mirror": true,
+   "name": "전투 자세 잡기"
+  },
+  "4": {
+   "folder": "4",
+   "mirror": true,
+   "name": "걷기"
+  },
+  "5": {
+   "folder": "5",
+   "mirror": true,
+   "name": "뛰기"
+  },
+  "6": {
+   "folder": "6",
+   "mirror": true,
+   "name": "제자리 점프"
+  },
+  "7": {
+   "folder": "7",
+   "mirror": true,
+   "name": "방향 점프"
+  },
+  "8": {
+   "folder": "8",
+   "mirror": true,
+   "name": "달리다 점프"
+  },
+  "9": {
+   "folder": "9",
+   "mirror": true,
+   "name": "약1 앞주먹 긴 잽"
+  },
+  "10": {
+   "folder": "10",
+   "mirror": true,
+   "name": "약2 뒷손 어퍼컷"
+  },
+  "11": {
+   "folder": "11",
+   "mirror": true,
+   "name": "약3 내려치기"
+  },
+  "12": {
+   "folder": "12",
+   "mirror": true,
+   "name": "강 내려찍기 발차기"
+  },
+  "13": {
+   "folder": "13",
+   "mirror": true,
+   "name": "돌진 어깨 들이받기"
+  },
+  "14": {
+   "folder": "14",
+   "mirror": true,
+   "name": "점프 공격 내려찍기 주먹"
+  },
+  "15": {
+   "folder": "15",
+   "mirror": true,
+   "name": "원거리 공격 권총"
+  },
+  "16": {
+   "folder": "16",
+   "mirror": true,
+   "name": "뒤 회피"
+  },
+  "16_1": {
+   "folder": "16_1",
+   "mirror": true,
+   "name": "앞 회피"
+  },
+  "17": {
+   "folder": "17",
+   "mirror": true,
+   "name": "막기"
+  },
+  "18": {
+   "folder": "18",
+   "mirror": true,
+   "name": "맞기"
+  },
+  "19": {
+   "folder": "19",
+   "mirror": true,
+   "name": "날아가 쓰러지기"
+  },
+  "20": {
+   "folder": "20",
+   "mirror": true,
+   "name": "일어나기"
+  },
+  "21": {
+   "folder": "21",
+   "mirror": true,
+   "name": "스턴"
+  },
+  "22": {
+   "folder": "22",
+   "mirror": true,
+   "name": "고유기술 「근접 폭파」"
+  },
+  "23": {
+   "folder": "23",
+   "mirror": true,
+   "name": "충전 「구역 정리」 모으기"
+  },
+  "24": {
+   "folder": "24",
+   "mirror": true,
+   "name": "충전 방출"
+  },
+  "25": {
+   "folder": "25",
+   "mirror": true,
+   "name": "필살기 「보면 알아」"
+  },
+  "26": {
+   "folder": "26",
+   "mirror": true,
+   "name": "섭취"
+  },
+  "27": {
+   "folder": "27",
+   "mirror": true,
+   "name": "줍기"
+  },
+  "28": {
+   "folder": "28",
+   "mirror": true,
+   "name": "응대"
+  },
+  "29": {
+   "folder": "29",
+   "mirror": true,
+   "name": "말하며 손짓"
+  },
+  "30": {
+   "folder": "30",
+   "mirror": true,
+   "name": "끄덕이기"
+  },
+  "31": {
+   "folder": "31",
+   "mirror": true,
+   "name": "고개 젓기"
+  },
+  "32": {
+   "folder": "32",
+   "mirror": true,
+   "name": "화내기"
+  },
+  "33": {
+   "folder": "33",
+   "mirror": true,
+   "name": "발견 반응"
+  },
+  "34": {
+   "folder": "34",
+   "mirror": true,
+   "name": "놀라기"
+  },
+  "35": {
+   "folder": "35",
+   "mirror": true,
+   "name": "기뻐하기"
+  },
+  "36": {
+   "folder": "36",
+   "mirror": true,
+   "name": "도망"
+  },
+  "37": {
+   "folder": "37",
+   "mirror": true,
+   "name": "뒷걸음질 (움츠리기)"
+  },
+  "37_1": {
+   "folder": "37_1",
+   "mirror": true,
+   "name": "뒷걸음질 반복"
+  },
+  "38": {
+   "folder": "38",
+   "mirror": false,
+   "name": "엎드려 기기"
+  },
+  "38_1": {
+   "folder": "38_1",
+   "mirror": false,
+   "name": "엎드려 기기 반복"
+  },
+  "39": {
+   "folder": "39",
+   "mirror": true,
+   "name": "주저앉기"
+  },
+  "40": {
+   "folder": "40",
+   "mirror": true,
+   "name": "주저앉아 뒤로 기어나가기"
+  },
+  "41": {
+   "folder": "41",
+   "mirror": true,
+   "name": "웅크려 떨기"
+  },
+  "42": {
+   "folder": "42",
+   "mirror": true,
+   "name": "네발로 기기"
+  },
+  "42_1": {
+   "folder": "42_1",
+   "mirror": true,
+   "name": "네발로 기기 반복"
+  }
+ },
+ "picks": {
+  "combat": 4,
+  "weapon": 4,
+  "apex": 4,
+  "run": 2,
+  "crawl4": 8
+ },
+ "loops": {
+  "19": [
+   8,
+   9,
+   10,
+   11,
+   12
+  ],
+  "21": [
+   3,
+   4,
+   5,
+   6,
+   7,
+   8
+  ],
+  "23": [
+   3,
+   4,
+   5,
+   6,
+   7,
+   8
+  ],
+  "39": [
+   9,
+   10,
+   11,
+   12
+  ],
+  "41": [
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8
+  ],
+  "42": [
+   5,
+   6,
+   7,
+   8,
+   9,
+   10,
+   11,
+   12
+  ]
+ },
+ "hit": {
+  "9": 5,
+  "10": 8,
+  "11": 4,
+  "12": 5,
+  "13": 2,
+  "14": 2,
+  "16_1": 2,
+  "22": 3,
+  "24": 1,
+  "25": 8
+ },
+ "gun": [
+  "W",
+  "W_1",
+  "15"
+ ],
+ "kick": [
+  "12"
+ ],
+ "ranged": {
+  "proj": {
+   "t": "proj",
+   "kind": "bullet",
+   "hit": {
+    "dmg": 8,
+    "kind": "light"
+   }
+  },
+  "heat": false
+ },
+ "skills": {
+  "skill": {
+   "name": "근접 폭파",
+   "anim": "22",
+   "fps": 11,
+   "armor": [
+    3,
+    5
+   ],
+   "events": [
+    {
+     "f": 4,
+     "hold": 0.12,
+     "fx": [
+      {
+       "t": "blast",
+       "at": "hand",
+       "dx": 0,
+       "scale": 1.4,
+       "r": 180,
+       "scorch": 3,
+       "hit": {
+        "dmg": 40,
+        "kind": "blow",
+        "stop": 0.16,
+        "shake": 12
+       },
+       "vfx": "jyaldi-palm-blast"
       }
-    },
-    "super": {
-      "name": "보면 알아",
-      "sub": "「설명하기 어려워. 보면 알아.」",
-      "anim": "25",
-      "fps": 9,
-      "events": [
-        {
-          "f": 8,
-          "hold": 0.25,
-          "fx": [
-            {"t": "flash", "v": 0.12},
-            {
-              "t": "screen",
-              "spots": 6,
-              "every": 0.09,
-              "each": [
-                {
-                  "t": "pillar",
-                  "scale": 1.4,
-                  "hit": {"dmg": 120, "kind": "launch", "n": 3, "mid": "heavy", "stop": 0.2, "shake": 16}
-                }
-              ]
-            }
-          ]
-        },
-        {"f": 10, "fx": [{"t": "buff", "time": 3, "label": "공격력 +30%"}]}
-      ]
+     ]
     }
+   ]
   },
-  "_note": "기술은 손으로 적음(기술안 요약). 그림·장 값은 자동. 다시 자동으로: build.py --reset 1.1_쟈알디"
+  "charge": {
+   "name": "구역 정리",
+   "hold": "23",
+   "release": "24",
+   "levels": [
+    0.5,
+    1.2
+   ],
+   "fire": 1,
+   "lv": {
+    "0": [
+     {
+      "t": "chain",
+      "n": 2,
+      "from": 100,
+      "step": 120,
+      "every": 0.12,
+      "scale": 1.0,
+      "vfx": "jyaldi-chain-blast",
+      "hit": {
+       "dmg": 30,
+       "kind": "heavy",
+       "mid": "light"
+      }
+     }
+    ],
+    "1": [
+     {
+      "t": "chain",
+      "n": 3,
+      "from": 110,
+      "step": 135,
+      "every": 0.12,
+      "scale": 1.2,
+      "hit": {
+       "dmg": 60,
+       "kind": "down",
+       "mid": "light"
+      },
+      "vfx": "jyaldi-chain-blast"
+     }
+    ],
+    "2": [
+     {
+      "t": "circle",
+      "r": 300,
+      "n": 10,
+      "scale": 1.5,
+      "hit": {
+       "dmg": 80,
+       "kind": "launch",
+       "n": 2,
+       "mid": "heavy"
+      },
+      "vfx": "jyaldi-zone-blast"
+     },
+     {
+      "t": "shake",
+      "v": 8
+     }
+    ]
+   }
+  },
+  "super": {
+   "name": "보면 알아",
+   "sub": "「설명하기 어려워. 보면 알아.」",
+   "anim": "25",
+   "fps": 9,
+   "events": [
+    {
+     "f": 8,
+     "hold": 0.25,
+     "fx": [
+      {
+       "t": "flash",
+       "v": 0.12
+      },
+      {
+       "t": "screen",
+       "spots": 6,
+       "every": 0.09,
+       "each": [
+        {
+         "t": "pillar",
+         "scale": 1.4,
+         "hit": {
+          "dmg": 120,
+          "kind": "launch",
+          "n": 3,
+          "mid": "heavy",
+          "stop": 0.2,
+          "shake": 16
+         },
+         "vfx": "jyaldi-pillar"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "f": 10,
+     "fx": [
+      {
+       "t": "buff",
+       "time": 3,
+       "label": "공격력 +30%"
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "_note": "기술은 손으로 적음(기술안 요약). 그림·장 값은 자동. 다시 자동으로: build.py --reset 1.1_쟈알디"
 }

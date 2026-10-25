@@ -1,0 +1,339 @@
+{
+ "frames": [
+  {
+   "filename": "jyaldi-pillar 0.png",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 38,
+    "h": 115
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 38,
+    "h": 115
+   },
+   "sourceSize": {
+    "w": 38,
+    "h": 115
+   },
+   "pivot": {
+    "x": 0.4473684210526316,
+    "y": 0.9391304347826087
+   },
+   "duration": 83
+  },
+  {
+   "filename": "jyaldi-pillar 1.png",
+   "frame": {
+    "x": 38,
+    "y": 0,
+    "w": 38,
+    "h": 115
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 38,
+    "h": 115
+   },
+   "sourceSize": {
+    "w": 38,
+    "h": 115
+   },
+   "pivot": {
+    "x": 0.4473684210526316,
+    "y": 0.9391304347826087
+   },
+   "duration": 83
+  },
+  {
+   "filename": "jyaldi-pillar 2.png",
+   "frame": {
+    "x": 76,
+    "y": 0,
+    "w": 38,
+    "h": 115
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 38,
+    "h": 115
+   },
+   "sourceSize": {
+    "w": 38,
+    "h": 115
+   },
+   "pivot": {
+    "x": 0.4473684210526316,
+    "y": 0.9391304347826087
+   },
+   "duration": 83
+  },
+  {
+   "filename": "jyaldi-pillar 3.png",
+   "frame": {
+    "x": 114,
+    "y": 0,
+    "w": 38,
+    "h": 115
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 38,
+    "h": 115
+   },
+   "sourceSize": {
+    "w": 38,
+    "h": 115
+   },
+   "pivot": {
+    "x": 0.4473684210526316,
+    "y": 0.9391304347826087
+   },
+   "duration": 83
+  },
+  {
+   "filename": "jyaldi-pillar 4.png",
+   "frame": {
+    "x": 0,
+    "y": 115,
+    "w": 38,
+    "h": 115
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 38,
+    "h": 115
+   },
+   "sourceSize": {
+    "w": 38,
+    "h": 115
+   },
+   "pivot": {
+    "x": 0.4473684210526316,
+    "y": 0.9391304347826087
+   },
+   "duration": 83
+  },
+  {
+   "filename": "jyaldi-pillar 5.png",
+   "frame": {
+    "x": 38,
+    "y": 115,
+    "w": 38,
+    "h": 115
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 38,
+    "h": 115
+   },
+   "sourceSize": {
+    "w": 38,
+    "h": 115
+   },
+   "pivot": {
+    "x": 0.4473684210526316,
+    "y": 0.9391304347826087
+   },
+   "duration": 83
+  },
+  {
+   "filename": "jyaldi-pillar 6.png",
+   "frame": {
+    "x": 76,
+    "y": 115,
+    "w": 38,
+    "h": 115
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 38,
+    "h": 115
+   },
+   "sourceSize": {
+    "w": 38,
+    "h": 115
+   },
+   "pivot": {
+    "x": 0.4473684210526316,
+    "y": 0.9391304347826087
+   },
+   "duration": 83
+  },
+  {
+   "filename": "jyaldi-pillar 7.png",
+   "frame": {
+    "x": 114,
+    "y": 115,
+    "w": 38,
+    "h": 115
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 38,
+    "h": 115
+   },
+   "sourceSize": {
+    "w": 38,
+    "h": 115
+   },
+   "pivot": {
+    "x": 0.4473684210526316,
+    "y": 0.9391304347826087
+   },
+   "duration": 83
+  },
+  {
+   "filename": "jyaldi-pillar 8.png",
+   "frame": {
+    "x": 0,
+    "y": 230,
+    "w": 38,
+    "h": 115
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 38,
+    "h": 115
+   },
+   "sourceSize": {
+    "w": 38,
+    "h": 115
+   },
+   "pivot": {
+    "x": 0.4473684210526316,
+    "y": 0.9391304347826087
+   },
+   "duration": 83
+  },
+  {
+   "filename": "jyaldi-pillar 9.png",
+   "frame": {
+    "x": 38,
+    "y": 230,
+    "w": 38,
+    "h": 115
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 38,
+    "h": 115
+   },
+   "sourceSize": {
+    "w": 38,
+    "h": 115
+   },
+   "pivot": {
+    "x": 0.4473684210526316,
+    "y": 0.9391304347826087
+   },
+   "duration": 83
+  },
+  {
+   "filename": "jyaldi-pillar 10.png",
+   "frame": {
+    "x": 76,
+    "y": 230,
+    "w": 38,
+    "h": 115
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 38,
+    "h": 115
+   },
+   "sourceSize": {
+    "w": 38,
+    "h": 115
+   },
+   "pivot": {
+    "x": 0.4473684210526316,
+    "y": 0.9391304347826087
+   },
+   "duration": 83
+  },
+  {
+   "filename": "jyaldi-pillar 11.png",
+   "frame": {
+    "x": 114,
+    "y": 230,
+    "w": 38,
+    "h": 115
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 38,
+    "h": 115
+   },
+   "sourceSize": {
+    "w": 38,
+    "h": 115
+   },
+   "pivot": {
+    "x": 0.4473684210526316,
+    "y": 0.9391304347826087
+   },
+   "duration": 83
+  }
+ ],
+ "meta": {
+  "app": "PixelLab VFX Creator",
+  "image": "jyaldi-pillar.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 152,
+   "h": 345
+  },
+  "scale": "1",
+  "anchor": {
+   "kind": "origin",
+   "x": 17,
+   "y": 108
+  },
+  "frameTags": [
+   {
+    "name": "jyaldi-pillar",
+    "from": 0,
+    "to": 11,
+    "direction": "forward"
+   }
+  ]
+ }
+}
