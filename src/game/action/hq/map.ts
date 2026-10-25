@@ -133,7 +133,8 @@ function floorHall(id: SceneId, name: string, floor: HqScene['floor'], doors: Om
     id, name, floor, look: p.under ? 'labhall' : id === 'lobby' ? 'lobby' : 'hall', painted: id, length: p.w, lane: p.lane ?? PAINTED_LANE,
     doors: doors.map((d) => ({ ...d, x: doorX(id, d.id) })),
     spots: [], fixtures: [], things: [],
-    boxes: p.objects.filter((o) => o.solid).map((o) => ({ kind: o.id, x: (o.solid!.x0 + o.solid!.x1) / 2, w: o.solid!.x1 - o.solid!.x0, y: o.solid!.y1, d: o.solid!.y1 - o.solid!.y0, h: o.sortY - o.y, solid: true })),
+    // 막는 상자는 그림을 그리지 않는다 (오브젝트 그림은 첫 상자 자리에서 한 번만, 깊이 순서는 sortY)
+    boxes: p.objects.flatMap((o) => (o.solid ?? []).map((b, i) => ({ kind: i ? `${o.id}:${i}` : o.id, x: (b.x0 + b.x1) / 2, w: b.x1 - b.x0, y: i ? b.y1 : o.sortY, d: b.y1 - b.y0, h: o.sortY - o.y, solid: true }))),
     ...extra,
   };
 }

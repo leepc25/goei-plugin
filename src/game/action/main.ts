@@ -17,12 +17,12 @@ const CSS = `
 .goei-engine-hq{position:absolute;inset:0;overflow:auto;z-index:20;background:#0b0f12}
 .goei-engine-hq.goei-engine-hq-panel{background:rgba(5,8,10,.72)}
 .goei-engine-hq-close{position:sticky;top:8px;float:right;margin:8px;z-index:2;padding:8px 14px;border-radius:8px;border:1px solid #5b6a72;background:#1a2226;color:#ece6d4;font:15px sans-serif}
-.goei-engine-elev{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;gap:8px;padding:14px;border-radius:14px;background:rgba(20,24,27,.92);border:2px solid #6d767b;pointer-events:auto;z-index:20}
+.goei-engine-elev{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;gap:10px;padding:16px;background:#14181b;pointer-events:auto;z-index:20;box-shadow:0 -4px 0 #14181b,0 4px 0 #14181b,-4px 0 0 #14181b,4px 0 0 #14181b,0 -8px 0 #6d767b,0 8px 0 #6d767b,-8px 0 0 #6d767b,8px 0 0 #6d767b,-4px -4px 0 #6d767b,4px -4px 0 #6d767b,-4px 4px 0 #6d767b,4px 4px 0 #6d767b}
 .goei-engine-elev[hidden]{display:none}
-.goei-engine-elev button{width:64px;height:52px;border-radius:50%;border:2px solid #9aa6ad;background:#2c3236;color:#ece6d4;font:bold 20px sans-serif;cursor:pointer}
-.goei-engine-elev button.here{border-color:#ffb34a;color:#ffb34a}
-.goei-engine-elev button.sel{background:#ffb34a;border-color:#fff2c8;color:#1b1f22}
+.goei-engine-elev button{width:96px;height:64px;border:0;border-radius:0;background:#2c3236;color:#ece6d4;font:700 33px "GoeiPixel","Galmuri11",monospace;cursor:pointer;image-rendering:pixelated;-webkit-font-smoothing:none;box-shadow:inset 0 4px 0 #46505a,inset 0 -4px 0 #1b1f22,0 -4px 0 #9aa6ad,0 4px 0 #9aa6ad,-4px 0 0 #9aa6ad,4px 0 0 #9aa6ad}
+.goei-engine-elev button.here{color:#ffb34a;box-shadow:inset 0 4px 0 #46505a,inset 0 -4px 0 #1b1f22,0 -4px 0 #ffb34a,0 4px 0 #ffb34a,-4px 0 0 #ffb34a,4px 0 0 #ffb34a}
 .goei-engine-elev button:disabled{opacity:.35;cursor:default}
+.goei-engine-elev button.sel{background:#ffb34a;color:#1b1f22;box-shadow:inset 0 4px 0 #ffe2a0,inset 0 -4px 0 #b8741c,0 -4px 0 #fff2c8,0 4px 0 #fff2c8,-4px 0 0 #fff2c8,4px 0 0 #fff2c8}
 .goei-engine-loading{color:#8e9aa1;font:16px sans-serif}
 `;
 

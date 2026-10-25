@@ -10,7 +10,7 @@ import type { FloorPlan, StageApi, StageModule, WorldView } from './contract';
 import { SCREEN_H, SCREEN_W } from './contract';
 import { HQ_PLACE, drawFloor, drawHqWall, drawPropArt, drawHqTextureWall } from '../art/bg';
 import { drawHqDoorRound2 } from '../art/hqDoorRound2';
-import { drawHqField, drawHqFieldLight, drawHqFieldObject, drawHqSigns, hasHqField } from '../art/hqField';
+import { drawDepartArrow, drawHqField, drawHqFieldLight, drawHqFieldObject, drawHqSigns, hasHqField } from '../art/hqField';
 import { drawVisitAgent, visitAgentTop } from '../art/visitAgents';
 import { drawTestMan, hasTestPeople, testManTop, testPlayerTop } from '../art/testPeople';
 import { persp, view as fieldView } from './view';
@@ -43,6 +43,8 @@ export interface HubHost {
   hour?(): number | null;
   /** 출동 차량 앞 E: 출발했으면 null, 아니면 자막 한 줄 */
   depart?(): string | null;
+  /** 출동 준비가 됐나 (B3 승합차 화살표) */
+  armed?(): boolean;
 }
 
 const TOP = 440;
@@ -126,7 +128,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
       exitX: Infinity,
       props: [],
       encounters: [],
-      depthLayers: sc.boxes.map((b) => ({ y: b.y, occludedSilhouette: true, x0: b.x - b.w / 2, x1: b.x + b.w / 2, draw: (c: CanvasRenderingContext2D) => {
+      depthLayers: sc.boxes.map((b) => ({ y: b.y, occludedSilhouette: !sc.painted, // 그림 층 데스크 뒤 사람은 비치지 않게 x0: b.x - b.w / 2, x1: b.x + b.w / 2, draw: (c: CanvasRenderingContext2D) => {
         if (sc.painted && hasHqField(sc.painted)) { drawHqFieldObject(c, sc.painted, b.kind); return; }
         drawBox(c, b, sc.look);
       } })).concat(people.map((p) => ({ y: p.y, x0: p.x - 60, x1: p.x + 60, occludedSilhouette: false, draw: (c: CanvasRenderingContext2D) => { drawVisitAgent(c, p.name, p.x, p.y, p.face, performance.now()); } })))
@@ -172,6 +174,8 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
         if (!sc.legacy) for (const d of sc.doors) if (isS(d)) drawExitLintel(c, d, camX);
         if (sc.painted) drawHqFieldLight(c, sc.painted, camX, host.hour?.() ?? null, now);
         // 엘리베이터 앞 방향 안내(drawHqGuide)는 사용자 지시로 끔 (2026-10-25)
+        // 출동 준비가 됐으면 B3 승합차 위 화살표
+        if (sc.painted === 'b3' && host.armed?.()) drawDepartArrow(c, camX, now);
         // 주인공 그림은 쟈알디 그림이라 머리 높이도 쟈알디 기준
         // 말풍선·이름표는 화면 px 그대로 (필드 zoom을 되돌려 글자 도트가 고르게). top은 원근까지 곱한 화면 px
         const z = fieldView.zoom;

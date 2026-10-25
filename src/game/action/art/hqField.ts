@@ -306,15 +306,18 @@ const pxFont = (n: number) => `700 ${n}px "GoeiPixel", "Galmuri11", monospace`;
 /** 그림에 이미 그려진 표지(화장실 그림 표지·계단 표지)가 있는 문은 표찰을 달지 않는다 */
 const PAINTED_SIGN = new Set(['화장실', '계단', '현관']);
 
-function plate(c: CanvasRenderingContext2D, cx: number, y: number, text: string, n = 22) {
+/** 벽걸이 표찰: 어두운 아크릴 판 + 윗면 빛 한 줄 + 벽에 지는 그림자, 글씨는 도트 글꼴 (사용자 2026-10-25: 촌스럽지 않게) */
+function plate(c: CanvasRenderingContext2D, cx: number, bottom: number, text: string, n = 22) {
   c.font = pxFont(n);
-  const w = Math.ceil(c.measureText(text).width) + 20, h = n + 12;
-  const x = Math.round(cx - w / 2), yy = Math.round(y);
-  c.fillStyle = '#1b1f24'; c.fillRect(x - 2, yy - 2, w + 4, h + 4);
-  c.fillStyle = '#c9c3b4'; c.fillRect(x, yy, w, h);
-  c.fillStyle = '#2d333b'; c.fillRect(x + 2, yy + 2, w - 4, h - 4);
-  c.fillStyle = '#efe9da'; c.textAlign = 'center'; c.textBaseline = 'middle';
-  c.fillText(text, Math.round(cx), yy + Math.round(h / 2) + 1);
+  const w = Math.ceil(c.measureText(text).width) + 28, h = n + 10;
+  const x = Math.round(cx - w / 2), y = Math.round(bottom - h);
+  c.fillStyle = 'rgba(0,0,0,0.22)'; c.fillRect(x + 3, y + 3, w, h); // 벽 그림자
+  c.fillStyle = '#23272c'; c.fillRect(x, y, w, h);
+  c.fillStyle = 'rgba(255,255,255,0.22)'; c.fillRect(x, y, w, 2); // 윗면 빛
+  c.fillStyle = 'rgba(0,0,0,0.35)'; c.fillRect(x, y + h - 2, w, 2);
+  c.fillStyle = '#7c848c'; c.fillRect(x + 6, y + h / 2 - 1, 2, 2); c.fillRect(x + w - 8, y + h / 2 - 1, 2, 2); // 고정 나사
+  c.fillStyle = '#ece6d6'; c.textAlign = 'center'; c.textBaseline = 'middle';
+  c.fillText(text, Math.round(cx), y + Math.round(h / 2) + 1);
 }
 
 /** 지상 층 방문 위 표찰 (배경 다음, 사람 앞). 월드 좌표 */
@@ -325,8 +328,8 @@ export function drawHqSigns(c: CanvasRenderingContext2D, scene: string, doors: L
   for (const d of doors) {
     const pd = p.doors[d.id];
     if (!pd || !d.label || PAINTED_SIGN.has(d.label) || d.kind === 'elevator') continue;
-    // 화면 위 목표 띠(약 y90까지)에 가리지 않게 문 윗부분에 단다
-    plate(c, (pd.x0 + pd.x1) / 2, pd.y0 + 14, d.label);
+    // 문틀(문짝 바깥 테) 위 벽에 단다
+    plate(c, (pd.x0 + pd.x1) / 2, pd.y0 - 18, d.label);
   }
   c.restore();
 }
@@ -370,4 +373,44 @@ export function drawHqGuide(c: CanvasRenderingContext2D, scene: string, doors: L
   row(west, -1);
   row(east, 1);
   c.restore();
+}
+
+/* ───────── 출동 안내 화살표 (B3 승합차 위) ───────── */
+
+/** 도트 화살표 (아래를 가리킴, 한 칸 U px). 테두리 상자 없이 그림자와 함께 떠 있다 */
+function pixelArrow(c: CanvasRenderingContext2D, x: number, y: number, U: number, rot: number) {
+  // 7칸 폭 화살표: 몸통 3칸 × 4줄 + 머리 7·5·3·1칸
+  const rows: [number, number][] = [[-1, 3], [-1, 3], [-1, 3], [-1, 3], [-3, 7], [-2, 5], [-1, 3], [0, 1]];
+  const draw = (col: string, dx: number, dy: number) => {
+    c.fillStyle = col;
+    rows.forEach(([x0, w], i) => c.fillRect(dx + x0 * U, dy + i * U, w * U, U));
+  };
+  c.save();
+  c.translate(Math.round(x), Math.round(y));
+  c.rotate(rot);
+  const ox = 0, oy = -rows.length * U; // 끝(뾰족한 곳)이 (x, y)
+  draw('rgba(0,0,0,0.35)', ox + U, oy + U); // 그림자
+  draw('#c98a1c', ox, oy); // 어두운 바탕 = 외곽
+  c.fillStyle = '#ffd25a';
+  rows.forEach(([x0, w], i) => { if (w > 1) c.fillRect(ox + (x0 + 0.0) * U + U * 0.0, oy + i * U, (w - 1) * U, U); });
+  c.fillStyle = '#fff3c4';
+  c.fillRect(ox - U, oy, U, U * 3); // 밝은 면
+  c.restore();
+}
+
+/** 출동 준비가 됐을 때: 승합차 위에 떠 있는 화살표. 차가 화면 왼쪽 밖이면 화면 왼쪽 끝 허공에 떠서 왼쪽을 가리킨다 */
+export function drawDepartArrow(c: CanvasRenderingContext2D, camX: number, now: number): void {
+  const VAN = { x: 370, y: 128 };
+  const left = camX + 46;
+  const pinned = VAN.x < left;
+  const bob = Math.sin(now / 280) * 5;
+  const glow = 0.5 + 0.5 * Math.sin(now / 280);
+  const x = pinned ? left : VAN.x, y = VAN.y + bob;
+  c.save();
+  c.globalCompositeOperation = 'lighter';
+  const g = c.createRadialGradient(x, y - 20, 0, x, y - 20, 46);
+  g.addColorStop(0, `rgba(255,200,80,${0.25 + 0.15 * glow})`); g.addColorStop(1, 'rgba(255,200,80,0)');
+  c.fillStyle = g; c.fillRect(x - 46, y - 66, 92, 92);
+  c.restore();
+  pixelArrow(c, x, y, 6, pinned ? Math.PI / 2 : 0);
 }

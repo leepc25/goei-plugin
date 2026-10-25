@@ -68,6 +68,8 @@ export interface HqModule {
   bark(place: PlaceId): Line | null;
   /** B3 주차장 승합차 앞 E: 출동 준비가 됐으면 출발하고 null, 아니면 자막 한 줄 */
   depart(): string | null;
+  /** 출동 준비(잼트리 자리에서 고름)가 됐나 */
+  armed(): boolean;
   /** 시험용 */
   readonly state: HqSave;
 }
@@ -670,6 +672,7 @@ ${can.ok ? '' : `<p class="hq-warn">${esc(can.why)}</p>`}</div>
       void save();
       render();
     },
+    armed: () => !!armed,
     depart() {
       if (!loaded) return null;
       if (!armed) return '출동 차량이다. 임무는 3층 종합대응팀 잼트리 자리에서 받는다.';
