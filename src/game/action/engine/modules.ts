@@ -189,14 +189,15 @@ function hudState(w: World, shell: Shell): HudState {
   const f = w.floor;
   const d = f.depth ?? 0;
   return {
-    agent: { name: p.label ?? '쟈알디', color: '#c0453a' },
+    agent: { name: p.label ?? '쟈알디', color: '#c0453a', portrait: (p as { core?: unknown }).core ? testPlayerFace(64) : null },
     hp: p.hp,
     maxHp: p.hpMax,
     energy: p.skillCd > 0 ? 75 - p.skillCd : 75,
     maxEnergy: 75,
     gauge: p.gauge,
     armor: p.armor,
-    weapon: heldWeapon(w) ?? { name: '권총', mag: p.ammo, magMax: p.mag, reserve: p.reserve, reload: p.moveKey === 'reload' ? p.mf / 4 : null },
+    // 에일린은 탄창 대신 우하단 기술 상자에 총열 열을 보인다
+    weapon: heldWeapon(w) ?? ((p as { core?: unknown }).core ? null : { name: '권총', mag: p.ammo, magMax: p.mag, reserve: p.reserve, reload: p.moveKey === 'reload' ? p.mf / 4 : null }),
     items: w.items.map((it) => ({ id: it?.id, label: it?.label ?? '', count: it?.n ?? 0 })),
     field: fieldClock.sec !== null || fieldClock.place ? { clock: fieldClock.sec === null ? undefined : clockText(fieldClock.sec), place: fieldClock.place || undefined } : undefined,
     floor: { depth: d ? (d <= 3 ? `L${d}` : `B-${d - 3}`) : '', name: f.title },
@@ -718,6 +719,22 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       }
       if (!game?.inHub) shell.hud.draw(ctx, hs, dt); // 본부에서는 전투 HUD 없음
       else if (hs.message) shell.hud.drawMessage(ctx, hs.message, hs.compact, cardEnd); // 본부 목소리는 아래 자막 한 줄
+      // 우하단 기술 상자 (에일린): 터치 버튼이 있으면 그 자리라 숨긴다
+      const core = (w.player as { core?: { P: Record<string, any> } }).core;
+      if (core && !shell.touchShown && !mods.blocking?.() && !shell.paused) {
+        const P = core.P, clip = P.clip?.id as string | undefined, off = ['down', 'belly', 'stun'].includes(P.mode);
+        const lv = P.charge >= 2 ? 3 : P.charge > 1.3 ? 2 : P.charge > 0.5 ? 1 : 0;
+        shell.hud.drawSkillBox(ctx, { compact: hs.compact, slots: [
+          { key: 'Z', icon: 'punch', color: '#f2ecdc', cd: 0, off, active: ['9', '10', '11'].includes(clip ?? '') },
+          { key: 'X', icon: 'kick', color: '#ffb07a', cd: 0, off, active: clip === '12' },
+          { key: 'A', icon: 'gun', color: '#ffd25a', cd: P.overT > 0 ? P.overT / 2.6 : 0, cdText: P.overT > 0 ? P.overT.toFixed(1) : undefined, off, active: clip === '15', bar: P.heat / 100, barColor: P.overT > 0 ? '#ff4a3a' : P.heat > 70 ? '#ff8a2a' : '#f2c14e' },
+          { key: 'S', icon: 'spray', color: '#8fdcff', cd: 0, off, active: clip === '22_1' },
+          { key: 'D', icon: 'bolt', color: '#c89bff', cd: 0, off, active: P.mode === 'charge', bar: P.mode === 'charge' ? P.charge / 2.2 : undefined, badge: P.mode === 'charge' && lv ? ['', '1단', '2단', '최대'][lv] : undefined },
+          { key: 'F', icon: 'star', color: '#ffd34a', cd: 0, off: off || P.sp < 100, full: P.sp >= 100, bar: P.sp / 100, badge: `${Math.floor(P.sp)}%` },
+          { key: 'C', icon: 'dash', color: '#a8ccff', cd: 0, off, active: clip === '16' || clip === '16_1' },
+          { key: 'V', icon: 'shield', color: '#9fd0ff', cd: 0, off, active: P.mode === 'block' },
+        ] }, dt);
+      }
       // 본부: 위 안내 띠 대신 캐릭터 옆 말풍선 (닿는 문·자리가 있을 때만, 캐릭터와 겹치지 않게 옆에)
       const tg = game?.inHub && !mods.blocking?.() && !shell.paused ? (w.stage as { nearInfo?: () => { text: string; locked: boolean } | null }).nearInfo?.() : null;
       if (tg) {

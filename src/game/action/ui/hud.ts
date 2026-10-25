@@ -1,4 +1,5 @@
 // 게임 HUD: 1280×720 캔버스 위에 그린다. 엔진은 HudState 만 채운다.
+import { KEYMAP } from '../engine/input';
 // 오락실식: 왼쪽 위 한 묶음(얼굴·체력·필살·탄), 오른쪽 위 구석 층 글자, 왼쪽 아래 아이템 아이콘, 아래 대사.
 // 재화·총애·규칙서 목록은 화면에 늘 띄우지 않는다: 바뀔 때 잠깐 알림, 전체는 일시정지 메뉴(statusHtml).
 // 터치 버튼이 보이면 compact: 아이템은 터치 버튼이 대신 보여 준다.
@@ -313,7 +314,7 @@ export class Hud {
       c.lineWidth = 2;
       c.strokeRect(bx - 2, gy - 2, gw + 4, gh + 4);
       c.restore();
-      label(c, s.device === 'pad' ? 'RT' : s.device === 'touch' ? '필살' : 'W', bx + gw + 10, gy + 12, 15, C.gauge, 'left', 900);
+      label(c, s.device === 'pad' ? 'RT' : s.device === 'touch' ? '필살' : superKey(), bx + gw + 10, gy + 12, 15, C.gauge, 'left', 900);
     }
     // 탄: 총알 그림 + 큰 숫자
     if (s.weapon) this.ammo(c, s.weapon, bx, gy + gh + 30);
@@ -513,7 +514,7 @@ export class Hud {
       c.fillStyle = '#000';
       c.fillRect(bx - 2, gy - 2, gw + 4, gh + 4);
       bar(c, bx, gy, gw, gh, s.gauge / 100, full ? `hsl(${40 + Math.sin(this.t * 8) * 10},95%,${60 + Math.sin(this.t * 8) * 12}%)` : C.gaugeFill, '#10181c');
-      if (full) label(c, '필살 S', bx + gw + 8, gy + 9, 12, C.gauge, 'left', 900);
+      if (full) label(c, `필살 ${superKey()}`, bx + gw + 8, gy + 9, 12, C.gauge, 'left', 900);
     }
     pixelOn = false;
     c.restore();
@@ -568,6 +569,66 @@ export class Hud {
     c.textAlign = 'left';
     c.fillStyle = p.locked ? '#ffcf6a' : '#f2ecdc';
     c.fillText(p.text, txx, y + h / 2 + 1);
+    pixelOn = false;
+    c.restore();
+  }
+
+  /** 우하단 기술 상자 (도트): 칸마다 아이콘·키·상태. 원거리는 총열 열·과열 쿨다운, 충전은 단계, 필살기는 게이지 */
+  drawSkillBox(c: CanvasRenderingContext2D, s: SkillBoxState, dt = 1 / 60) {
+    this.t += dt;
+    c.save();
+    const k = s.compact ? 1.2 : 1;
+    W = c.canvas.width / k;
+    H = c.canvas.height / k;
+    c.setTransform(k, 0, 0, k, 0, 0);
+    pixelOn = true;
+    const U = 2, S = 52, G = 10;
+    const slots = s.slots;
+    const w = slots.length * S + (slots.length - 1) * G + 24, h = S + 44;
+    const x0 = Math.round(W - w - 22), y0 = Math.round(H - h - 22);
+    const box = (bx: number, by: number, bw: number, bh: number, col: string) => {
+      c.fillStyle = col;
+      c.fillRect(bx + U, by, bw - 2 * U, bh);
+      c.fillRect(bx, by + U, bw, bh - 2 * U);
+    };
+    // 판: 어두운 금속 테 + 안쪽 판
+    box(x0 + U, y0 + U * 2, w, h, 'rgba(0,0,0,0.35)');
+    box(x0 - U, y0 - U, w + 2 * U, h + 2 * U, '#0a0d10');
+    box(x0, y0, w, h, '#3a4248');
+    box(x0 + U, y0 + U, w - 2 * U, h - 2 * U, '#151a1f');
+    c.fillStyle = 'rgba(255,255,255,0.07)'; c.fillRect(x0 + 2 * U, y0 + 2 * U, w - 4 * U, U);
+    slots.forEach((sl, i) => {
+      const sx = x0 + 12 + i * (S + G), sy = y0 + 10;
+      const ready = sl.cd <= 0 && !sl.off;
+      // 칸 테: 준비되면 밝게, 필살기 다 차면 금빛이 숨쉰다
+      const glow = sl.full ? 0.5 + 0.5 * Math.sin(this.t * 6) : 0;
+      box(sx - U, sy - U, S + 2 * U, S + 2 * U, sl.full ? `rgb(${200 + 55 * glow},${160 + 50 * glow},60)` : sl.active ? '#f2ead6' : '#0a0d10');
+      box(sx, sy, S, S, ready ? '#2c343a' : '#1d2226');
+      c.fillStyle = 'rgba(255,255,255,0.08)'; c.fillRect(sx + U, sy + U, S - 2 * U, U * 2);
+      // 아이콘 (8×8 도트 그림, 한 칸 4px)
+      drawSkillIcon(c, sl.icon, sx + S / 2, sy + S / 2 + 1, 4, ready ? sl.color : '#5c646a');
+      // 쿨다운: 위에서부터 내려오는 어두운 막 (도트 계단)
+      if (sl.cd > 0) {
+        const hh = Math.round((S - 2 * U) * Math.min(1, sl.cd) / U) * U;
+        c.fillStyle = 'rgba(5,8,10,0.72)'; c.fillRect(sx + U, sy + U, S - 2 * U, hh);
+        if (sl.cdText) { c.font = font(22); c.fillStyle = '#ff9a6a'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(sl.cdText, sx + S / 2, sy + S / 2 + 1); }
+      }
+      // 게이지 막대 (총열 열·충전·필살기)
+      if (sl.bar !== undefined) {
+        const by = sy + S + 6;
+        c.fillStyle = '#0a0d10'; c.fillRect(sx, by, S, 8);
+        c.fillStyle = sl.barColor ?? sl.color; c.fillRect(sx + U, by + U, Math.round((S - 2 * U) * Math.max(0, Math.min(1, sl.bar)) / U) * U, 8 - 2 * U);
+      }
+      // 키 칩 (왼쪽 위)
+      c.font = font(11);
+      const kw = Math.max(16, Math.ceil(c.measureText(sl.key).width) + 8);
+      box(sx - 4, sy - 6, kw, 16, '#0a0d10');
+      box(sx - 3, sy - 5, kw - 2, 14, '#e8e0c8');
+      c.fillStyle = '#151a1f'; c.textAlign = 'center'; c.textBaseline = 'middle';
+      c.fillText(sl.key, sx - 4 + kw / 2, sy + 2);
+      // 단계·숫자 (오른쪽 아래)
+      if (sl.badge) { c.font = font(11); c.fillStyle = sl.full ? '#ffe27a' : '#f2ecdc'; c.textAlign = 'right'; c.textBaseline = 'alphabetic'; c.fillText(sl.badge, sx + S - 4, sy + S - 4); }
+    });
     pixelOn = false;
     c.restore();
   }
@@ -787,4 +848,34 @@ export function drawMap(c: CanvasRenderingContext2D, m: MapState) {
   c.closePath();
   c.fill();
   c.restore();
+}
+
+export interface SkillBoxState {
+  compact?: boolean;
+  slots: { key: string; icon: SkillIcon; color: string; cd: number; cdText?: string; off?: boolean; active?: boolean; full?: boolean; bar?: number; barColor?: string; badge?: string }[];
+}
+export type SkillIcon = 'punch' | 'kick' | 'gun' | 'spray' | 'bolt' | 'star' | 'dash' | 'shield';
+/** 8×8 도트 아이콘 (# = 칠함, + = 밝은 면) */
+const ICONS: Record<SkillIcon, string[]> = {
+  punch: ['........', '..####..', '.######.', '.#+####.', '.######.', '..#####.', '...###..', '........'],
+  kick: ['....##..', '....##..', '...###..', '..###...', '.###....', '####....', '+##.....', '........'],
+  gun: ['........', '########', '#+######', '####....', '###.....', '##......', '##......', '........'],
+  spray: ['#.......', '.#..#...', '..#...#.', '###..#..', '###.#..#', '..#...#.', '.#..#...', '#.......'],
+  bolt: ['....##..', '...##...', '..##....', '.#####..', '...##...', '..##....', '.##.....', '#.......'],
+  star: ['...#....', '...#....', '.#####..', '..+##...', '..#.#...', '.#...#..', '........', '........'],
+  dash: ['........', '##..##..', '.##..##.', '..##..##', '..##..##', '.##..##.', '##..##..', '........'],
+  shield: ['.######.', '.#+####.', '.######.', '.######.', '..####..', '..####..', '...##...', '........'],
+};
+function drawSkillIcon(c: CanvasRenderingContext2D, id: SkillIcon, cx: number, cy: number, u: number, col: string) {
+  const rows = ICONS[id];
+  const x0 = Math.round(cx - 4 * u), y0 = Math.round(cy - 4 * u);
+  c.fillStyle = 'rgba(0,0,0,0.45)';
+  rows.forEach((r, j) => { for (let i = 0; i < 8; i++) if (r[i] !== '.') c.fillRect(x0 + i * u + u / 2, y0 + j * u + u / 2, u, u); });
+  rows.forEach((r, j) => { for (let i = 0; i < 8; i++) if (r[i] !== '.') { c.fillStyle = r[i] === '+' ? '#ffffff' : col; c.fillRect(x0 + i * u, y0 + j * u, u, u); } });
+}
+
+/** 필살기 키 이름: 지금 키 배치(에일린이면 F)에서 찾는다 */
+function superKey(): string {
+  const code = Object.keys(KEYMAP).find((k) => KEYMAP[k] === 'super');
+  return code ? code.replace(/^Key/, '') : 'W';
 }

@@ -144,7 +144,7 @@ export function mountGameShell(box: HTMLElement, o: ShellOptions = {}): Shell {
       .map((a) => {
         const kb = a === 'left' ? '<kbd>←</kbd><kbd>→</kbd><kbd>↑</kbd><kbd>↓</kbd>' : `<kbd>${esc(KEY_NAME[a])}</kbd>`;
         const pd = PAD_NAME[CODE[a]] ?? '';
-        const tc = a === 'left' ? '왼쪽 스틱' : a === 'menu' ? '☰' : a === 'auto' || a === 'hitbox' ? '메뉴' : a.startsWith('item') ? '아래 칸' : a === 'evade' ? '회피 (스틱 끝 = 달리기)' : '버튼';
+        const tc = a === 'left' ? '왼쪽 스틱' : a === 'menu' ? '☰' : a === 'auto' ? '메뉴' : a.startsWith('item') ? '아래 칸' : a === 'evade' ? '회피 (스틱 끝 = 달리기)' : '버튼';
         return `<tr><td>${esc(a === 'left' ? '이동 (좌우 + 안쪽·앞쪽)' : LABEL[a])}</td><td>${kb}</td><td>${esc(pd)}</td><td>${esc(tc)}</td></tr>`;
       })
       .join('');

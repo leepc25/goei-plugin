@@ -6,6 +6,7 @@ import { eileenArt } from './art/testPeople';
 import { EileenPlayer } from './eileen/player';
 import { playerFactory } from './engine/player';
 import { useEileenKeys } from './engine/input';
+import { useEileenControls } from './ui/keys';
 import { prepareHqTextures } from './art/hqTextures';
 import { prepareHqDoorRound2 } from './art/hqDoorRound2';
 import { prepareVisitAgents } from './art/visitAgents';
@@ -56,7 +57,7 @@ export function mountGame(box: HTMLElement, bridge?: Partial<GameBridge>): () =>
     stage.remove();
     root.style.display = 'block';
     // 에일린 테스트룸 전투: 그림이 있으면 플레이어와 키 배치를 에일린으로
-    if (eileenArt()) { playerFactory.make = (clips) => new EileenPlayer(clips); useEileenKeys(); }
+    if (eileenArt()) { playerFactory.make = (clips) => new EileenPlayer(clips); useEileenKeys(); useEileenControls(); }
     const wiring = engineModules(root, bridge);
     game = new Game(wiring.box, art, wiring.mods);
     wiring.bind(game);
