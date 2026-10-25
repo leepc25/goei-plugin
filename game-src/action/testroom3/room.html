@@ -1262,7 +1262,7 @@ const chsel = document.getElementById('chsel');
 for (const c of INDEX) { const o = document.createElement('option'); o.value = c.key; o.textContent = `${c.num} ${c.name}${c.armed ? ' · 무기' : ''}`; chsel.append(o); }
 function fetchChar(key) {
   if (window.__C[key]) return Promise.resolve(window.__C[key]);
-  return new Promise((ok, no) => { const s = document.createElement('script'); s.src = 'chars/' + encodeURIComponent(key) + '.js'; s.onload = () => window.__C[key] ? ok(window.__C[key]) : no(new Error('빈 파일')); s.onerror = () => no(new Error('불러오기 실패: ' + key)); document.head.append(s); });
+  return new Promise((ok, no) => { const s = document.createElement('script'); s.src = 'chars/c' + key.split('_')[0] + '.js'; s.onload = () => window.__C[key] ? ok(window.__C[key]) : no(new Error('빈 파일')); s.onerror = () => no(new Error('불러오기 실패: ' + key)); document.head.append(s); });
 }
 let loading = null;
 async function setChar(key) {

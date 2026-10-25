@@ -482,7 +482,7 @@ def signature(cfg):
 
 def build_char(cfg, force=False):
     key = cfg["key"]
-    js = OUT / "chars" / f"{key}.js"
+    js = OUT / "chars" / f"c{key.split('_')[0]}.js"   # 파일 이름은 ASCII만(Artifact 서버에서 한글 경로가 안 열림)
     cache = HERE / ".cache" / f"{key}.json"
     cache.parent.mkdir(exist_ok=True)
     sig = signature(cfg)
@@ -561,7 +561,7 @@ def main():
         index.append(dict(key=cfg["key"], name=cfg["name"], num=ch["num"], color=cfg.get("color"), dir=cfg["dir"], armed=cfg.get("armed"), kb=size // 1024))
         print(f"{'만듦' if rebuilt else '그대로'} {cfg['key']:<14} 줄 {len(cfg['anims']):>2} · {size / 1024 / 1024:.2f} MB")
     for old in (OUT / "chars").glob("*.js"):   # 목록에서 빠진 인물 파일 정리
-        if old.stem not in {c["key"] for c in index}: old.unlink()
+        if old.stem not in {"c" + c["key"].split("_")[0] for c in index}: old.unlink()
     room = (HERE / "room.html").read_text(encoding="utf-8")
     audio = (EIL / "testroom" / "audio.js").read_text(encoding="utf-8")
     html = room.replace("/*__INDEX__*/null", json.dumps(index, ensure_ascii=False)).replace("/*__VFX__*/null", json.dumps(load_vfx())).replace("/*__AUDIO__*/", audio)
