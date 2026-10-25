@@ -376,7 +376,7 @@
        "t": "proj",
        "kind": "orb",
        "hit": {
-        "dmg": 10,
+        "dmg": 37,
         "kind": "light"
        },
        "speed": 1600,
@@ -401,7 +401,7 @@
        "t": "proj",
        "kind": "orb",
        "hit": {
-        "dmg": 10,
+        "dmg": 37,
         "kind": "light"
        },
        "speed": 1600,
@@ -417,7 +417,7 @@
        "t": "proj",
        "kind": "orb",
        "hit": {
-        "dmg": 10,
+        "dmg": 37,
         "kind": "light"
        },
        "speed": 1600,
@@ -472,7 +472,7 @@
         "scale": 1.0,
         "scorch": 0,
         "hit": {
-         "dmg": 40,
+         "dmg": 64,
          "kind": "launch"
         }
        }
@@ -506,7 +506,7 @@
         "n": 6,
         "scale": 1.0,
         "hit": {
-         "dmg": 60,
+         "dmg": 102,
          "kind": "launch"
         }
        }
@@ -531,7 +531,7 @@
        "color": "#d8b878",
        "speed": 1000,
        "hit": {
-        "dmg": 150,
+        "dmg": 180,
         "kind": "blow",
         "stop": 0.22,
         "shake": 16
@@ -551,5 +551,22 @@
   "11": 2,
   "16_1": 2,
   "22": 2
+ },
+ "bal": {
+  "role": "ranged",
+  "speed": "slow",
+  "gun": "none",
+  "atk": {
+   "9": 16,
+   "10": 15,
+   "11": 17,
+   "12": 25,
+   "13": 17,
+   "14": 15
+  },
+  "cd": {
+   "skill": 7,
+   "charge": 5
+  }
  }
 }

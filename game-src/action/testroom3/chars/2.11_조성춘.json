@@ -417,7 +417,7 @@
        "speed": 1000,
        "time": 0.38,
        "hit": {
-        "dmg": 40,
+        "dmg": 135,
         "kind": "blow",
         "stop": 0.18,
         "shake": 12
@@ -515,7 +515,7 @@
        "t": "melee",
        "range": 190,
        "hit": {
-        "dmg": 15,
+        "dmg": 25,
         "kind": "light"
        }
       }
@@ -528,7 +528,7 @@
        "t": "melee",
        "range": 190,
        "hit": {
-        "dmg": 15,
+        "dmg": 25,
         "kind": "light"
        }
       }
@@ -541,7 +541,7 @@
        "t": "melee",
        "range": 190,
        "hit": {
-        "dmg": 15,
+        "dmg": 25,
         "kind": "light"
        }
       }
@@ -555,7 +555,7 @@
        "t": "melee",
        "range": 200,
        "hit": {
-        "dmg": 40,
+        "dmg": 66,
         "kind": "blow",
         "stop": 0.18,
         "shake": 12
@@ -587,5 +587,22 @@
     20
    ]
   ]
+ },
+ "bal": {
+  "role": "support",
+  "speed": "fast",
+  "gun": "none",
+  "atk": {
+   "9": 10,
+   "10": 10,
+   "11": 13,
+   "12": 17,
+   "13": 12,
+   "14": 11
+  },
+  "cd": {
+   "skill": 9,
+   "charge": 5
+  }
  }
 }

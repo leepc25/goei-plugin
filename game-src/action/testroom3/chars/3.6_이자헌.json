@@ -404,7 +404,7 @@
        "t": "pull",
        "dist": 160,
        "hit": {
-        "dmg": 30,
+        "dmg": 168,
         "kind": "down",
         "text": "끌려 나옴"
        }
@@ -434,7 +434,7 @@
       "t": "melee",
       "range": 190,
       "hit": {
-       "dmg": 20,
+       "dmg": 50,
        "kind": "heavy"
       }
      }
@@ -444,7 +444,7 @@
       "t": "melee",
       "range": 190,
       "hit": {
-       "dmg": 60,
+       "dmg": 84,
        "kind": "blow",
        "stop": 0.18,
        "shake": 14
@@ -456,7 +456,7 @@
       "t": "proj",
       "kind": "box",
       "hit": {
-       "dmg": 70,
+       "dmg": 134,
        "kind": "down"
       },
       "speed": 1100,
@@ -504,7 +504,7 @@
        "t": "melee",
        "range": 190,
        "hit": {
-        "dmg": 30,
+        "dmg": 27,
         "kind": "heavy"
        }
       }
@@ -517,7 +517,7 @@
        "t": "melee",
        "range": 190,
        "hit": {
-        "dmg": 30,
+        "dmg": 27,
         "kind": "heavy"
        }
       }
@@ -530,7 +530,7 @@
        "t": "melee",
        "range": 190,
        "hit": {
-        "dmg": 30,
+        "dmg": 27,
         "kind": "heavy"
        }
       }
@@ -543,7 +543,7 @@
        "t": "melee",
        "range": 190,
        "hit": {
-        "dmg": 30,
+        "dmg": 27,
         "kind": "heavy"
        }
       }
@@ -557,7 +557,7 @@
        "t": "melee",
        "range": 190,
        "hit": {
-        "dmg": 80,
+        "dmg": 72,
         "kind": "blow",
         "stop": 0.22,
         "shake": 16
@@ -571,5 +571,23 @@
  "_note": "손으로 다듬음(표 「테스트룸」 절·fail 목록·기술안 3장). 그림 값은 자동. 다시 자동으로: build.py --reset 3.6_이자헌",
  "start": {
   "10": 2
+ },
+ "bal": {
+  "role": "bruiser",
+  "speed": "slow",
+  "gun": "thrown",
+  "atk": {
+   "9": 20,
+   "10": 20,
+   "11": 23,
+   "12": 33,
+   "13": 22,
+   "14": 17
+  },
+  "cd": {
+   "skill": 8,
+   "charge": 5
+  },
+  "shotDmg": 7
  }
 }

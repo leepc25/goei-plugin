@@ -424,7 +424,7 @@
        "time": 1.5,
        "len": 330,
        "hit": {
-        "dmg": 48,
+        "dmg": 14,
         "n": 8,
         "kind": "heavy"
        }
@@ -462,7 +462,7 @@
         "t": "blast",
         "scale": 0.9,
         "hit": {
-         "dmg": 20,
+         "dmg": 38,
          "kind": "heavy"
         }
        }
@@ -480,7 +480,7 @@
         "t": "blast",
         "scale": 1.2,
         "hit": {
-         "dmg": 45,
+         "dmg": 64,
          "kind": "blow"
         }
        }
@@ -499,7 +499,7 @@
         "t": "blast",
         "scale": 1.2,
         "hit": {
-         "dmg": 40,
+         "dmg": 34,
          "kind": "blow"
         }
        }
@@ -537,7 +537,7 @@
           "speed": 1100,
           "color": "#ff7a2a",
           "hit": {
-           "dmg": 15,
+           "dmg": 90,
            "kind": "heavy"
           }
          }
@@ -563,7 +563,7 @@
           "speed": 1100,
           "color": "#ff7a2a",
           "hit": {
-           "dmg": 15,
+           "dmg": 90,
            "kind": "heavy"
           }
          }
@@ -592,5 +592,24 @@
     90
    ]
   ]
+ },
+ "bal": {
+  "role": "ranged",
+  "speed": "normal",
+  "gun": "rapid",
+  "atk": {
+   "9": 13,
+   "10": 13,
+   "11": 14,
+   "12": 21,
+   "13": 14,
+   "14": 13
+  },
+  "cd": {
+   "skill": 7,
+   "charge": 5
+  },
+  "shotDmg": 7,
+  "heatPer": 9
  }
 }

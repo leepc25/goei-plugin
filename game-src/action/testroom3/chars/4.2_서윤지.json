@@ -402,7 +402,7 @@
        "t": "proj",
        "kind": "card",
        "hit": {
-        "dmg": 5,
+        "dmg": 153,
         "kind": "light"
        },
        "speed": 1500,
@@ -451,7 +451,7 @@
         "t": "proj",
         "kind": "card",
         "hit": {
-         "dmg": 12,
+         "dmg": 23,
          "kind": "heavy"
         },
         "speed": 1600,
@@ -470,7 +470,7 @@
         "t": "proj",
         "kind": "card",
         "hit": {
-         "dmg": 14,
+         "dmg": 22,
          "kind": "heavy"
         },
         "speed": 1600,
@@ -520,7 +520,7 @@
       {
        "t": "hit",
        "hit": {
-        "dmg": 140,
+        "dmg": 160,
         "kind": "down",
         "stop": 0.2
        }
@@ -539,5 +539,23 @@
   "18": 2,
   "W": 2,
   "23": 2
+ },
+ "bal": {
+  "role": "control",
+  "speed": "slow",
+  "gun": "thrown",
+  "atk": {
+   "9": 16,
+   "10": 16,
+   "11": 19,
+   "12": 27,
+   "13": 18,
+   "14": 13
+  },
+  "cd": {
+   "skill": 9,
+   "charge": 5
+  },
+  "shotDmg": 7
  }
 }

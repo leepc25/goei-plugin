@@ -436,7 +436,7 @@
        "t": "melee",
        "range": 190,
        "hit": {
-        "dmg": 30,
+        "dmg": 35,
         "kind": "heavy"
        }
       }
@@ -449,7 +449,7 @@
        "t": "melee",
        "range": 190,
        "hit": {
-        "dmg": 30,
+        "dmg": 35,
         "kind": "heavy"
        }
       }
@@ -463,7 +463,7 @@
        "t": "melee",
        "range": 190,
        "hit": {
-        "dmg": 60,
+        "dmg": 70,
         "kind": "down",
         "stop": 0.2,
         "shake": 14
@@ -477,5 +477,24 @@
  "_note": "손으로 다듬음(표 「테스트룸」 절·fail 목록·기술안 3장). 그림 값은 자동. 다시 자동으로: build.py --reset 3.12_장허운",
  "jitter": {
   "21": 1.5
+ },
+ "bal": {
+  "role": "tank",
+  "speed": "slow",
+  "gun": "heavy",
+  "atk": {
+   "9": 16,
+   "10": 16,
+   "11": 19,
+   "12": 27,
+   "13": 18,
+   "14": 13
+  },
+  "cd": {
+   "shot": 2.5,
+   "skill": 10,
+   "charge": 5
+  },
+  "shotDmg": 30
  }
 }

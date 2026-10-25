@@ -376,7 +376,7 @@
        "t": "melee",
        "range": 320,
        "hit": {
-        "dmg": 25,
+        "dmg": 153,
         "kind": "down",
         "text": "털썩"
        }
@@ -468,7 +468,7 @@
          "t": "pillar",
          "scale": 1.2,
          "hit": {
-          "dmg": 140,
+          "dmg": 80,
           "kind": "launch",
           "n": 2,
           "mid": "heavy"
@@ -497,5 +497,22 @@
  "jitter": {
   "18": 2,
   "21": 2
+ },
+ "bal": {
+  "role": "control",
+  "speed": "normal",
+  "gun": "none",
+  "atk": {
+   "9": 13,
+   "10": 14,
+   "11": 15,
+   "12": 23,
+   "13": 15,
+   "14": 14
+  },
+  "cd": {
+   "skill": 9,
+   "charge": 5
+  }
  }
 }

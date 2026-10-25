@@ -457,7 +457,7 @@
        "t": "melee",
        "range": 190,
        "hit": {
-        "dmg": 40,
+        "dmg": 37,
         "kind": "heavy"
        }
       }
@@ -470,7 +470,7 @@
        "t": "melee",
        "range": 190,
        "hit": {
-        "dmg": 40,
+        "dmg": 37,
         "kind": "heavy"
        }
       }
@@ -484,7 +484,7 @@
        "t": "melee",
        "range": 190,
        "hit": {
-        "dmg": 70,
+        "dmg": 65,
         "kind": "blow",
         "stop": 0.2,
         "shake": 14
@@ -499,5 +499,22 @@
  "start": {
   "10": 2,
   "20": 2
+ },
+ "bal": {
+  "role": "support",
+  "speed": "normal",
+  "gun": "none",
+  "atk": {
+   "9": 12,
+   "10": 12,
+   "11": 14,
+   "12": 20,
+   "13": 13,
+   "14": 10
+  },
+  "cd": {
+   "skill": 9,
+   "charge": 5
+  }
  }
 }

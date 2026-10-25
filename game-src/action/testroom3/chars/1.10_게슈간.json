@@ -374,7 +374,7 @@
        "time": 1.5,
        "color": "#5a8cff",
        "hit": {
-        "dmg": 8,
+        "dmg": 153,
         "kind": "light"
        }
       }
@@ -405,7 +405,7 @@
       "r": 60,
       "color": "#5a8cff",
       "hit": {
-       "dmg": 10,
+       "dmg": 41,
        "kind": "light"
       }
      }
@@ -421,7 +421,7 @@
       "r": 90,
       "color": "#5a8cff",
       "hit": {
-       "dmg": 45,
+       "dmg": 34,
        "kind": "blow",
        "n": 2,
        "mid": "heavy"
@@ -436,7 +436,7 @@
       "color": "#5a8cff",
       "scorch": 3,
       "hit": {
-       "dmg": 90,
+       "dmg": 109,
        "kind": "down",
        "stop": 0.2,
        "shake": 15
@@ -469,11 +469,15 @@
          "h": 170,
          "time": 1.6,
          "hit": {
-          "dmg": 20,
+          "dmg": 19,
           "kind": "light"
          }
         }
        ]
+      },
+      {
+       "t": "big",
+       "vfx": "sup-1.10"
       }
      ]
     },
@@ -491,7 +495,7 @@
          "r": 120,
          "color": "#5a8cff",
          "hit": {
-          "dmg": 150,
+          "dmg": 141,
           "kind": "spike",
           "stop": 0.22,
           "shake": 16
@@ -518,5 +522,22 @@
     20
    ]
   ]
+ },
+ "bal": {
+  "role": "control",
+  "speed": "fast",
+  "gun": "none",
+  "atk": {
+   "9": 12,
+   "10": 12,
+   "11": 14,
+   "12": 20,
+   "13": 13,
+   "14": 10
+  },
+  "cd": {
+   "skill": 9,
+   "charge": 5
+  }
  }
 }

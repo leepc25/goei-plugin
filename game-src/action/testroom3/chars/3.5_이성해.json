@@ -400,7 +400,7 @@
        "t": "melee",
        "range": 190,
        "hit": {
-        "dmg": 30,
+        "dmg": 69,
         "kind": "heavy"
        }
       }
@@ -418,7 +418,7 @@
          "t": "melee",
          "range": 190,
          "hit": {
-          "dmg": 10,
+          "dmg": 23,
           "kind": "light"
          }
         }
@@ -504,7 +504,7 @@
       {
        "t": "hit",
        "hit": {
-        "dmg": 150,
+        "dmg": 180,
         "kind": "down",
         "text": "쾅",
         "stop": 0.2
@@ -528,5 +528,23 @@
  "start": {
   "11": 2,
   "20": 2
+ },
+ "bal": {
+  "role": "striker",
+  "speed": "fast",
+  "gun": "thrown",
+  "atk": {
+   "9": 16,
+   "10": 16,
+   "11": 19,
+   "12": 27,
+   "13": 18,
+   "14": 14
+  },
+  "cd": {
+   "skill": 6,
+   "charge": 5
+  },
+  "shotDmg": 7
  }
 }

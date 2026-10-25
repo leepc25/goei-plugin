@@ -397,7 +397,7 @@
        "t": "proj",
        "kind": "knife",
        "hit": {
-        "dmg": 5,
+        "dmg": 23,
         "kind": "light"
        },
        "speed": 2000,
@@ -417,7 +417,7 @@
        "t": "pull",
        "dist": 160,
        "hit": {
-        "dmg": 25,
+        "dmg": 115,
         "kind": "heavy"
        }
       }
@@ -475,7 +475,7 @@
      {
       "t": "hit",
       "hit": {
-       "dmg": 35,
+       "dmg": 147,
        "kind": "heavy"
       }
      }
@@ -543,5 +543,23 @@
    ]
   }
  },
- "_note": "손으로 다듬음(표 「테스트룸」 절·fail 목록·기술안 3장). 그림 값은 자동. 다시 자동으로: build.py --reset 3.4_진나솔"
+ "_note": "손으로 다듬음(표 「테스트룸」 절·fail 목록·기술안 3장). 그림 값은 자동. 다시 자동으로: build.py --reset 3.4_진나솔",
+ "bal": {
+  "role": "striker",
+  "speed": "fast",
+  "gun": "thrown",
+  "atk": {
+   "9": 16,
+   "10": 16,
+   "11": 19,
+   "12": 27,
+   "13": 18,
+   "14": 14
+  },
+  "cd": {
+   "skill": 6,
+   "charge": 5
+  },
+  "shotDmg": 7
+ }
 }

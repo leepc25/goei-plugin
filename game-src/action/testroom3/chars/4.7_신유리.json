@@ -420,7 +420,7 @@
        "size": 70,
        "color": "#d8dde6",
        "hit": {
-        "dmg": 12,
+        "dmg": 64,
         "kind": "light"
        }
       }
@@ -437,7 +437,7 @@
        "size": 70,
        "color": "#d8dde6",
        "hit": {
-        "dmg": 14,
+        "dmg": 74,
         "kind": "light"
        }
       },
@@ -524,7 +524,7 @@
        "size": 80,
        "color": "#d8dde6",
        "hit": {
-        "dmg": 12,
+        "dmg": 30,
         "kind": "light"
        }
       }
@@ -543,7 +543,7 @@
       {
        "t": "hit",
        "hit": {
-        "dmg": 60,
+        "dmg": 150,
         "kind": "down"
        }
       }
@@ -567,5 +567,23 @@
     290
    ]
   ]
+ },
+ "bal": {
+  "role": "striker",
+  "speed": "fast",
+  "gun": "thrown",
+  "atk": {
+   "9": 17,
+   "10": 18,
+   "11": 19,
+   "12": 27,
+   "13": 18,
+   "14": 14
+  },
+  "cd": {
+   "skill": 6,
+   "charge": 5
+  },
+  "shotDmg": 7
  }
 }

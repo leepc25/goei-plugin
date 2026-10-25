@@ -396,7 +396,7 @@
        "at": "target",
        "scale": 0.9,
        "hit": {
-        "dmg": 18,
+        "dmg": 112,
         "kind": "light"
        }
       }
@@ -420,7 +420,7 @@
       "at": "target",
       "scale": 0.7,
       "hit": {
-       "dmg": 10,
+       "dmg": 38,
        "kind": "light"
       }
      }
@@ -435,7 +435,7 @@
         "t": "blast",
         "scale": 0.6,
         "hit": {
-         "dmg": 5,
+         "dmg": 6,
          "kind": "light",
          "stop": 0.03,
          "shake": 3
@@ -454,7 +454,7 @@
         "t": "blast",
         "scale": 0.6,
         "hit": {
-         "dmg": 5,
+         "dmg": 4,
          "kind": "light",
          "stop": 0.03,
          "shake": 3
@@ -468,7 +468,7 @@
       "w": 180,
       "time": 3,
       "hit": {
-       "dmg": 20,
+       "dmg": 18,
        "kind": "down"
       }
      }
@@ -493,13 +493,17 @@
          "t": "blast",
          "scale": 1.0,
          "hit": {
-          "dmg": 25,
+          "dmg": 26,
           "kind": "heavy",
           "stop": 0.06,
           "shake": 5
          }
         }
        ]
+      },
+      {
+       "t": "big",
+       "vfx": "sup-1.6"
       }
      ]
     },
@@ -515,7 +519,7 @@
          "t": "blast",
          "scale": 1.0,
          "hit": {
-          "dmg": 25,
+          "dmg": 26,
           "kind": "heavy",
           "stop": 0.06,
           "shake": 5
@@ -537,7 +541,7 @@
          "t": "blast",
          "scale": 1.0,
          "hit": {
-          "dmg": 25,
+          "dmg": 26,
           "kind": "heavy",
           "stop": 0.06,
           "shake": 5
@@ -559,7 +563,7 @@
          "t": "blast",
          "scale": 1.0,
          "hit": {
-          "dmg": 25,
+          "dmg": 26,
           "kind": "heavy",
           "stop": 0.06,
           "shake": 5
@@ -578,7 +582,7 @@
        "at": "screen",
        "time": 2,
        "hit": {
-        "dmg": 70,
+        "dmg": 75,
         "kind": "launch",
         "stop": 0.2,
         "shake": 14
@@ -607,5 +611,22 @@
     85
    ]
   ]
+ },
+ "bal": {
+  "role": "ranged",
+  "speed": "fast",
+  "gun": "none",
+  "atk": {
+   "9": 11,
+   "10": 11,
+   "11": 13,
+   "12": 19,
+   "13": 13,
+   "14": 10
+  },
+  "cd": {
+   "skill": 7,
+   "charge": 5
+  }
  }
 }

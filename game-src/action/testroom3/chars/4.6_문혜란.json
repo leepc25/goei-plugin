@@ -391,7 +391,7 @@
        "t": "melee",
        "range": 190,
        "hit": {
-        "dmg": 12,
+        "dmg": 37,
         "kind": "light"
        }
       }
@@ -404,7 +404,7 @@
        "t": "melee",
        "range": 190,
        "hit": {
-        "dmg": 12,
+        "dmg": 37,
         "kind": "light"
        }
       }
@@ -418,7 +418,7 @@
        "t": "melee",
        "range": 190,
        "hit": {
-        "dmg": 25,
+        "dmg": 79,
         "kind": "down",
         "text": "사인부터 하자"
        }
@@ -504,7 +504,7 @@
        "t": "proj",
        "kind": "card",
        "hit": {
-        "dmg": 10,
+        "dmg": 20,
         "kind": "light"
        },
        "speed": 1600,
@@ -528,7 +528,7 @@
        "t": "melee",
        "range": 190,
        "hit": {
-        "dmg": 70,
+        "dmg": 140,
         "kind": "down",
         "stop": 0.2,
         "shake": 14
@@ -547,5 +547,23 @@
   "20": 2,
   "22": 2,
   "25": 2
+ },
+ "bal": {
+  "role": "control",
+  "speed": "normal",
+  "gun": "thrown",
+  "atk": {
+   "9": 13,
+   "10": 14,
+   "11": 16,
+   "12": 23,
+   "13": 16,
+   "14": 11
+  },
+  "cd": {
+   "skill": 9,
+   "charge": 5
+  },
+  "shotDmg": 7
  }
 }

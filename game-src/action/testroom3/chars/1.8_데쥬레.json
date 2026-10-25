@@ -520,6 +520,10 @@
        "style": "line",
        "color": "#ff7ac8",
        "time": 1.3
+      },
+      {
+       "t": "big",
+       "vfx": "sup-1.8"
       }
      ]
     },
@@ -577,5 +581,23 @@
     45
    ]
   ]
+ },
+ "bal": {
+  "role": "control",
+  "speed": "slow",
+  "gun": "single",
+  "atk": {
+   "9": 16,
+   "10": 16,
+   "11": 19,
+   "12": 27,
+   "13": 18,
+   "14": 14
+  },
+  "cd": {
+   "skill": 9,
+   "charge": 5
+  },
+  "shotDmg": 9
  }
 }

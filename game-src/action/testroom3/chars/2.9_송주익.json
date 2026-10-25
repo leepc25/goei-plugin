@@ -405,7 +405,7 @@
        "size": 110,
        "color": "#e8ecf4",
        "hit": {
-        "dmg": 12,
+        "dmg": 38,
         "kind": "light"
        }
       }
@@ -422,7 +422,7 @@
        "size": 110,
        "color": "#e8ecf4",
        "hit": {
-        "dmg": 12,
+        "dmg": 38,
         "kind": "light"
        }
       }
@@ -439,7 +439,7 @@
        "size": 130,
        "color": "#3fe0d0",
        "hit": {
-        "dmg": 20,
+        "dmg": 63,
         "kind": "heavy"
        }
       }
@@ -469,7 +469,7 @@
       "speed": 1600,
       "time": 0.4,
       "hit": {
-       "dmg": 30,
+       "dmg": 92,
        "kind": "heavy"
       }
      },
@@ -491,7 +491,7 @@
       "speed": 1600,
       "time": 0.4,
       "hit": {
-       "dmg": 30,
+       "dmg": 147,
        "kind": "heavy"
       }
      },
@@ -552,7 +552,7 @@
        "color": "#3fe0d0",
        "pierce": true,
        "hit": {
-        "dmg": 160,
+        "dmg": 180,
         "kind": "blow",
         "stop": 0.22,
         "shake": 15
@@ -568,5 +568,22 @@
   "22": [
    3
   ]
+ },
+ "bal": {
+  "role": "striker",
+  "speed": "normal",
+  "gun": "none",
+  "atk": {
+   "9": 18,
+   "10": 18,
+   "11": 21,
+   "12": 30,
+   "13": 21,
+   "14": 16
+  },
+  "cd": {
+   "skill": 6,
+   "charge": 5
+  }
  }
 }

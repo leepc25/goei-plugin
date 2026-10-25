@@ -506,7 +506,7 @@
       "t": "shock",
       "r": 140,
       "hit": {
-       "dmg": 25,
+       "dmg": 50,
        "kind": "heavy"
       }
      }
@@ -516,7 +516,7 @@
       "t": "shock",
       "r": 200,
       "hit": {
-       "dmg": 60,
+       "dmg": 84,
        "kind": "down",
        "stop": 0.16
       }
@@ -527,7 +527,7 @@
       "t": "shock",
       "r": 300,
       "hit": {
-       "dmg": 90,
+       "dmg": 67,
        "kind": "launch",
        "n": 2,
        "mid": "heavy",
@@ -553,9 +553,13 @@
        "speed": 1400,
        "time": 0.55,
        "hit": {
-        "dmg": 60,
+        "dmg": 72,
         "kind": "launch"
        }
+      },
+      {
+       "t": "big",
+       "vfx": "sup-1.7"
       }
      ]
     },
@@ -570,7 +574,7 @@
        "scale": 2.0,
        "r": 160,
        "hit": {
-        "dmg": 90,
+        "dmg": 108,
         "kind": "blow",
         "stop": 0.2,
         "shake": 16
@@ -599,5 +603,24 @@
     70
    ]
   ]
+ },
+ "bal": {
+  "role": "bruiser",
+  "speed": "slow",
+  "gun": "heavy",
+  "atk": {
+   "9": 20,
+   "10": 20,
+   "11": 23,
+   "12": 33,
+   "13": 22,
+   "14": 17
+  },
+  "cd": {
+   "shot": 2.5,
+   "skill": 8,
+   "charge": 5
+  },
+  "shotDmg": 30
  }
 }

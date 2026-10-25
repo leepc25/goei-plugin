@@ -371,7 +371,7 @@
       "t": "proj",
       "kind": "coin",
       "hit": {
-       "dmg": 3,
+       "dmg": 41,
        "kind": "light"
       }
      }
@@ -381,7 +381,7 @@
       "t": "proj",
       "kind": "coin",
       "hit": {
-       "dmg": 3,
+       "dmg": 68,
        "kind": "light"
       }
      },
@@ -401,7 +401,7 @@
       "t": "proj",
       "kind": "coin",
       "hit": {
-       "dmg": 3,
+       "dmg": 109,
        "kind": "light"
       }
      },
@@ -480,5 +480,23 @@
  "start": {
   "11": 2,
   "20": 2
+ },
+ "bal": {
+  "role": "control",
+  "speed": "normal",
+  "gun": "thrown",
+  "atk": {
+   "9": 14,
+   "10": 14,
+   "11": 16,
+   "12": 23,
+   "13": 16,
+   "14": 12
+  },
+  "cd": {
+   "skill": 9,
+   "charge": 5
+  },
+  "shotDmg": 7
  }
 }

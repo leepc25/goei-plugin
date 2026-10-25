@@ -131,6 +131,13 @@ const D = { juggle: 0, bounced: false, stunT: 0, x: 860, y: 600, vx: 0, z: 0, vz
 let zoom = 0, zx = W / 2, zy = H / 2, dShake = 0;
 let hitstop = 0, shake = 0, flash = 0, dark = 0, cut = 0, speed = 1, showNo = false, showDummy = true, counter = false, last = performance.now();
 let freeSuper = false, showArmor = true, grayT = 0;
+// ── 밸런스(사용자 2026-10-25): 인물 설정 bal = { atk: {줄: 피해}, cd: {skill, skill2, charge, shot}, gun: single|rapid|heavy|thrown|none, shotDmg, heatPer }
+// 계산 근거·표: docs/밸런스_설계.md, 값은 game-src/action/testroom3/balance.py 가 넣음
+const BAL = () => CH.bal || {};
+const isHot = () => !!(CH.ranged && CH.ranged.heat) || BAL().gun === 'rapid';
+function cdReady(k) { const t = (P.cd[k] || 0) - P.t; if (t <= 0) return true; sfx('empty'); fx.push({ k: 'num', x: P.x - 40, y: P.y - 250 * K(P.y), v: `쿨타임 ${t.toFixed(1)}초`, t: 0.6 }); return false; }
+function setCd(k) { const v = (BAL().cd || {})[k]; if (v) P.cd[k] = P.t + v; }
+const atkDmg = (id, big) => { const a = BAL().atk || {}; return a[id] ?? (big ? 34 : 12); };
 function gainSp(v) { if (P.noGain > P.t) return; const was = P.sp; P.sp = Math.min(100, P.sp + v); if (was < 100 && P.sp >= 100) { sfx('ability'); flash = 0.06; fx.push({ k: 'num', x: P.x - 50, y: P.y - 260 * K(P.y), v: '필살기 준비', t: 1.0 }); } }
 function spReady() { if (freeSuper || P.sp >= 100) { if (!freeSuper) P.sp = 0; return true; } sfx('empty'); fx.push({ k: 'num', x: P.x - 50, y: P.y - 250 * K(P.y), v: '게이지 부족', t: 0.7 }); return false; }
 let charScale = store.get('size', 1), persp = true;
@@ -257,7 +264,7 @@ function fireEv(e) {
     const wide = id === '14';   // 공중공격은 판정을 넓게(사용자 2026-10-25): 앞뒤 160·위아래·깊이 넓게
     if (inReach(p.x, wide ? 160 : big ? 100 : 70, P.y - p.y, wide)) {
       hitstop = big ? 0.16 : 0.085; shake = big ? 16 : 8; dShake = big ? 11 : 7;
-      hurtDummy(big ? 34 : 12, e.kind || (big ? 'heavy' : 'light'));
+      hurtDummy(atkDmg(id, big), e.kind || (big ? 'heavy' : 'light'));
       sfx('hit', { strength: big ? 3 : 1, kind: (CH.kick || []).includes(id) ? 'kick' : undefined });
       const cx = D.x - P.face * 18 * K(D.y);
       if (!vfx(big ? 'hit_heavy' : 'hit_light', cx, p.y, big ? 2 : 2.4, { flip: P.face < 0 })) fx.push({ k: 'impact', x: cx, y: p.y, dir: P.face, t: big ? 0.16 : 0.1, t0: big ? 0.16 : 0.1, big });
@@ -267,8 +274,9 @@ function fireEv(e) {
     }
   } else if (e.ev === 'shot') {
     const p = muzzle();
-    if (CH.ranged && CH.ranged.heat) { P.heat = Math.min(100, P.heat + 9); P.lastShot = P.t; if (P.heat >= 100) { P.overT = 2.6; sfx('empty'); for (let i = 0; i < 8; i++) steam(p.x, p.y, 1.4); } }
-    runFx([CH.ranged && CH.ranged.proj || { t: 'proj', kind: 'orb' }], { o: p });
+    if (isHot()) { P.heat = Math.min(100, P.heat + (BAL().heatPer || 9)); P.lastShot = P.t; if (P.heat >= 100) { P.overT = 2.6; sfx('empty'); for (let i = 0; i < 8; i++) steam(p.x, p.y, 1.4); } }
+    const pj = CH.ranged && CH.ranged.proj || { t: 'proj', kind: 'orb' };
+    runFx([BAL().shotDmg ? { ...pj, hit: { ...(pj.hit || { kind: 'light' }), dmg: BAL().shotDmg } } : pj], { o: p });
   } else if (e.ev === 'run') runFx(e.list, e.ctx || {});
   else if (e.ev === 'slideHit') {
     if (!P.slideHit) { const p = framePt(id, f, a.reach[f], a.h * 0.6); if (showDummy && Math.abs(D.y - P.y) < 64 && Math.abs(D.x - p.x) < 80 * K(P.y)) { P.slideHit = true; fireEv({ f, ev: 'hit', hy: 0.6 }); } }
@@ -316,6 +324,15 @@ const FX = {
       if (h.dust) dust(x, y0, 6, k * 1.4);
       if (near(x, y0, (h.r || 110) * k, (h.depth || 75) * k)) strike(h.hit || s.hit, y0 - (h.h ?? 110) * k);
     });
+  },
+  // 필살기 전용 큰 이펙트(인물마다 PixelLab, docs/필살기_이펙트_설명.json): 샌드백 자리(없으면 앞쪽)에 화면 높이 절반 넘게
+  big(s, c) {
+    const v = VFX[s.vfx]; if (!v) return;
+    const fh = v.frames[0][3], fw = v.frames[0][2], gx = showDummy ? D.x : P.x + P.face * 380, gy = showDummy ? D.y : P.y;
+    const sc = (s.h || 460) / fh;
+    if (fw * sc > W * 1.1) { vfx(s.vfx, W / 2, (FLOOR0 + FLOOR1) / 2 + 40, W * 1.05 / fw, { bottom: true, flip: P.face < 0 }); }
+    else vfx(s.vfx, gx, gy + 10, sc, { bottom: true, flip: P.face < 0 });
+    flash = Math.max(flash, 0.12); shake = Math.max(shake, 12); boomSnd(3, gx);
   },
   // 큰 폭발 한 번(바닥에서 솟음) + 공용 바닥 파괴
   boom(s, c) {
@@ -589,6 +606,7 @@ function dodge() {
 // 원거리: 반복 구간이 있으면 첫 장 = 발사, 끝 장에서 누르고 있으면 되돌아감. 없으면 그림 불꽃 장(또는 뻗은 장)마다 발사
 function shoot() {
   if (!has('15')) return;
+  if (BAL().gun === 'heavy' || (BAL().cd || {}).shot) { if (!cdReady('shot')) return; setCd('shot'); }   // 강한 한 방은 쿨타임
   const a = A['15'];
   if (P.overT > 0) return ensureArmed(() => act('15', { seq: [...S(R(0, Math.min(3, a.n - 1)), 0.035), { f: Math.min(3, a.n - 1), d: 0.25, fn: () => { sfx('empty'); const p = muzzle(); steam(p.x, p.y, 1); } }, ...S(R(Math.min(4, a.n - 1), a.n - 1), 0.05)] }));
   ensureArmed(() => {
@@ -635,8 +653,8 @@ function doSkill(sp, then) {
   };
   if (sp.armed) ensureArmed(go); else { P.armed = false; go(); }
 }
-function skill() { const sp = CH.skills.skill; if (sp && sp.alt && P.buffT > 0 && CH.skills[sp.alt]) return doSkill(CH.skills[sp.alt]); doSkill(sp); }
-function skill2() { doSkill(CH.skills.skill2); }
+function skill() { if (!cdReady('skill')) return; setCd('skill'); const sp = CH.skills.skill; if (sp && sp.alt && P.buffT > 0 && CH.skills[sp.alt]) return doSkill(CH.skills[sp.alt]); doSkill(sp); }
+function skill2() { if (!CH.skills.skill2 || !cdReady('skill2')) return; setCd('skill2'); doSkill(CH.skills.skill2); }
 function superMove() {
   const sp = CH.skills.super; if (!sp) return;
   if (!spReady()) return;
@@ -651,7 +669,7 @@ const CH_COL = ['rgba(255,255,255,.8)', '#fff6c0', '#8fdcff', '#c89bff'];
 const chLevels = () => (CH.skills.charge && CH.skills.charge.levels) || [0.5, 1.2];
 const chLv = () => chLevels().filter(t => P.charge >= t).length;
 function charge() {
-  const sp = CH.skills.charge; if (!sp) return;
+  const sp = CH.skills.charge; if (!sp || !cdReady('charge')) return; setCd('charge');
   const go = () => {
     P.mode = 'charge'; P.charge = 0; P.chargeShown = 0;
     const id = has(sp.hold) ? sp.hold : idleId(), lp = LP(id) || R(Math.min(3, nOf(id) - 1), nOf(id) - 1), s = [];
@@ -1323,7 +1341,9 @@ function drawHud() {
   ctx.fillStyle = '#000a'; ctx.fillRect(20, H - 40, 300, 14);
   ctx.fillStyle = P.sp >= 100 ? (Math.sin(P.t * 10) > 0 ? '#ffe27a' : '#ffb800') : '#d9a520'; ctx.fillRect(20, H - 40, 300 * P.sp / 100, 14);
   ctx.fillStyle = '#fff'; ctx.font = 'bold 12px sans-serif'; ctx.fillText(P.sp >= 100 ? '필살기 준비!' : `필살기 ${Math.floor(P.sp)}%`, 326, H - 29);
-  if (CH.ranged && CH.ranged.heat) {
+  const cds = [['skill', '기술'], ['skill2', '둘째 기술'], ['charge', '충전'], ['shot', '원거리']].map(([k, n]) => [n, (P.cd[k] || 0) - P.t]).filter(([, t]) => t > 0);
+  if (cds.length) { ctx.font = '11px sans-serif'; cds.forEach(([n, t], i) => { ctx.fillStyle = '#000a'; ctx.fillRect(20 + i * 104, H - 62, 100, 16); ctx.fillStyle = '#9fd8ff'; ctx.fillText(`${n} ${t.toFixed(1)}초`, 26 + i * 104, H - 50); }); }
+  if (isHot()) {
     ctx.fillStyle = '#000a'; ctx.fillRect(20, 40, 160, 9);
     ctx.fillStyle = P.overT > 0 ? (Math.sin(P.t * 16) > 0 ? '#ff3a2a' : '#7a1a10') : P.heat > 70 ? '#ff8a2a' : '#f2c14e'; ctx.fillRect(20, 40, 160 * P.heat / 100, 9);
     ctx.fillStyle = '#fff'; ctx.font = '11px sans-serif'; ctx.fillText(P.overT > 0 ? `과열! ${P.overT.toFixed(1)}초` : '총열 열', 186, 49);

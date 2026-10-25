@@ -430,7 +430,7 @@
        "size": 150,
        "color": "#ffffff",
        "hit": {
-        "dmg": 30,
+        "dmg": 84,
         "kind": "heavy"
        }
       }
@@ -447,7 +447,7 @@
        "size": 150,
        "color": "#ffffff",
        "hit": {
-        "dmg": 30,
+        "dmg": 84,
         "kind": "heavy",
         "text": "화상"
        }
@@ -472,7 +472,7 @@
       "t": "proj",
       "kind": "bullet",
       "hit": {
-       "dmg": 10,
+       "dmg": 50,
        "kind": "light"
       }
      }
@@ -487,7 +487,7 @@
         "t": "proj",
         "kind": "bullet",
         "hit": {
-         "dmg": 10,
+         "dmg": 14,
          "kind": "light"
         },
         "spread": 0.05
@@ -505,7 +505,7 @@
         "t": "proj",
         "kind": "bullet",
         "hit": {
-         "dmg": 10,
+         "dmg": 6,
          "kind": "light"
         },
         "spread": 0.05
@@ -521,7 +521,7 @@
         "time": 0.6,
         "len": 300,
         "hit": {
-         "dmg": 40,
+         "dmg": 24,
          "n": 4,
          "kind": "heavy"
         }
@@ -594,7 +594,7 @@
         {
          "t": "hit",
          "hit": {
-          "dmg": 35,
+          "dmg": 27,
           "kind": "heavy"
          }
         }
@@ -613,7 +613,7 @@
       {
        "t": "hit",
        "hit": {
-        "dmg": 90,
+        "dmg": 71,
         "kind": "launch"
        }
       }
@@ -625,5 +625,23 @@
  "_note": "손으로 다듬음(표 「테스트룸」 절·fail 목록·기술안 4장). 그림 값은 자동. 다시 자동으로: build.py --reset 4.8_블라렛",
  "start": {
   "11": 2
+ },
+ "bal": {
+  "role": "bruiser",
+  "speed": "fast",
+  "gun": "single",
+  "atk": {
+   "9": 15,
+   "10": 15,
+   "11": 17,
+   "12": 24,
+   "13": 17,
+   "14": 13
+  },
+  "cd": {
+   "skill": 8,
+   "charge": 5
+  },
+  "shotDmg": 9
  }
 }

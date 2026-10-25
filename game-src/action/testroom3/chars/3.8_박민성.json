@@ -420,7 +420,7 @@
       "t": "melee",
       "range": 190,
       "hit": {
-       "dmg": 15,
+       "dmg": 41,
        "kind": "heavy"
       }
      }
@@ -431,7 +431,7 @@
       "speed": 900,
       "time": 0.3,
       "hit": {
-       "dmg": 40,
+       "dmg": 68,
        "kind": "blow"
       }
      }
@@ -441,7 +441,7 @@
       "t": "proj",
       "kind": "box",
       "hit": {
-       "dmg": 60,
+       "dmg": 109,
        "kind": "down"
       },
       "speed": 1000,
@@ -465,7 +465,7 @@
        "speed": 1300,
        "time": 1.0,
        "hit": {
-        "dmg": 100,
+        "dmg": 140,
         "kind": "blow",
         "stop": 0.2,
         "shake": 14
@@ -490,5 +490,23 @@
   "10": 2,
   "11": 2,
   "20": 2
+ },
+ "bal": {
+  "role": "tank",
+  "speed": "slow",
+  "gun": "thrown",
+  "atk": {
+   "9": 16,
+   "10": 17,
+   "11": 19,
+   "12": 27,
+   "13": 18,
+   "14": 13
+  },
+  "cd": {
+   "skill": 10,
+   "charge": 5
+  },
+  "shotDmg": 7
  }
 }

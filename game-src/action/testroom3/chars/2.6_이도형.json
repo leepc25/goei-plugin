@@ -405,7 +405,7 @@
        "time": 0.22,
        "delay": 0.4,
        "hit": {
-        "dmg": 45,
+        "dmg": 138,
         "kind": "heavy",
         "stop": 0.2,
         "shake": 12,
@@ -465,7 +465,7 @@
       "size": 140,
       "color": "#e8ecf4",
       "hit": {
-       "dmg": 50,
+       "dmg": 92,
        "kind": "heavy"
       }
      }
@@ -479,7 +479,7 @@
       "size": 150,
       "color": "#e8ecf4",
       "hit": {
-       "dmg": 150,
+       "dmg": 147,
        "kind": "down",
        "text": "죽는 자리",
        "stop": 0.22,
@@ -527,7 +527,7 @@
         {
          "t": "hit",
          "hit": {
-          "dmg": 200,
+          "dmg": 180,
           "kind": "down",
           "stop": 0.25,
           "shake": 18
@@ -540,5 +540,22 @@
    ]
   }
  },
- "_note": "손으로 다듬음(표 「테스트룸」 절·fail 목록·기술안 2장). 그림 값은 자동. 다시 자동으로: build.py --reset 2.6_이도형"
+ "_note": "손으로 다듬음(표 「테스트룸」 절·fail 목록·기술안 2장). 그림 값은 자동. 다시 자동으로: build.py --reset 2.6_이도형",
+ "bal": {
+  "role": "striker",
+  "speed": "fast",
+  "gun": "none",
+  "atk": {
+   "9": 16,
+   "10": 16,
+   "11": 19,
+   "12": 27,
+   "13": 18,
+   "14": 17
+  },
+  "cd": {
+   "skill": 6,
+   "charge": 5
+  }
+ }
 }

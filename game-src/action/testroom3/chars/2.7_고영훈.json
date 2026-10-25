@@ -447,7 +447,7 @@
        "size": 60,
        "color": "#e8ecf4",
        "hit": {
-        "dmg": 14,
+        "dmg": 69,
         "kind": "light"
        }
       }
@@ -463,7 +463,7 @@
        "size": 60,
        "color": "#e8ecf4",
        "hit": {
-        "dmg": 14,
+        "dmg": 69,
         "kind": "light"
        }
       }
@@ -545,7 +545,7 @@
         "size": 70,
         "color": "#e8ecf4",
         "hit": {
-         "dmg": 20,
+         "dmg": 49,
          "kind": "heavy"
         }
        }
@@ -592,7 +592,7 @@
        "size": 90,
        "color": "#e8ecf4",
        "hit": {
-        "dmg": 30,
+        "dmg": 36,
         "kind": "heavy"
        }
       }
@@ -608,7 +608,7 @@
        "size": 90,
        "color": "#e8ecf4",
        "hit": {
-        "dmg": 30,
+        "dmg": 36,
         "kind": "heavy"
        }
       }
@@ -625,7 +625,7 @@
        "size": 120,
        "color": "#e8ecf4",
        "hit": {
-        "dmg": 90,
+        "dmg": 108,
         "kind": "down",
         "stop": 0.22,
         "shake": 15
@@ -640,5 +640,22 @@
    ]
   }
  },
- "_note": "손으로 다듬음(표 「테스트룸」 절·fail 목록·기술안 2장). 그림 값은 자동. 다시 자동으로: build.py --reset 2.7_고영훈"
+ "_note": "손으로 다듬음(표 「테스트룸」 절·fail 목록·기술안 2장). 그림 값은 자동. 다시 자동으로: build.py --reset 2.7_고영훈",
+ "bal": {
+  "role": "striker",
+  "speed": "normal",
+  "gun": "none",
+  "atk": {
+   "9": 19,
+   "10": 18,
+   "11": 21,
+   "12": 30,
+   "13": 21,
+   "14": 16
+  },
+  "cd": {
+   "skill": 6,
+   "charge": 5
+  }
+ }
 }

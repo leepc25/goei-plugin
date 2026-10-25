@@ -474,7 +474,7 @@
       "t": "proj",
       "kind": "bullet",
       "hit": {
-       "dmg": 10,
+       "dmg": 41,
        "kind": "light"
       },
       "big": true
@@ -490,7 +490,7 @@
         "t": "proj",
         "kind": "bullet",
         "hit": {
-         "dmg": 6,
+         "dmg": 3,
          "kind": "light"
         },
         "spread": 0.15
@@ -508,7 +508,7 @@
         "t": "proj",
         "kind": "bullet",
         "hit": {
-         "dmg": 6,
+         "dmg": 2,
          "kind": "light"
         },
         "spread": 0.5
@@ -526,7 +526,7 @@
         "size": 1.4,
         "color": "#ffb347",
         "hit": {
-         "dmg": 50,
+         "dmg": 21,
          "kind": "blow"
         },
         "end": [
@@ -574,7 +574,7 @@
        "t": "proj",
        "kind": "bullet",
        "hit": {
-        "dmg": 6,
+        "dmg": 5,
         "kind": "light"
        },
        "spread": 0.6
@@ -597,7 +597,7 @@
          "size": 1.4,
          "color": "#ffb347",
          "hit": {
-          "dmg": 60,
+          "dmg": 45,
           "kind": "launch"
          },
          "end": [
@@ -620,5 +620,24 @@
  },
  "start": {
   "9": 4
+ },
+ "bal": {
+  "role": "tank",
+  "speed": "slow",
+  "gun": "rapid",
+  "atk": {
+   "9": 16,
+   "10": 16,
+   "11": 19,
+   "12": 27,
+   "13": 18,
+   "14": 16
+  },
+  "cd": {
+   "skill": 10,
+   "charge": 5
+  },
+  "shotDmg": 6,
+  "heatPer": 9
  }
 }

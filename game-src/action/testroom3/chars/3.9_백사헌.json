@@ -479,7 +479,7 @@
        "at": "self",
        "r": 90,
        "hit": {
-        "dmg": 90,
+        "dmg": 180,
         "kind": "down",
         "stop": 0.2,
         "shake": 14
@@ -494,5 +494,23 @@
  "start": {
   "20": 2,
   "41": 2
+ },
+ "bal": {
+  "role": "striker",
+  "speed": "fast",
+  "gun": "thrown",
+  "atk": {
+   "9": 16,
+   "10": 16,
+   "11": 19,
+   "12": 27,
+   "13": 18,
+   "14": 14
+  },
+  "cd": {
+   "skill": 6,
+   "charge": 5
+  },
+  "shotDmg": 7
  }
 }

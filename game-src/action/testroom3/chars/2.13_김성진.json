@@ -377,7 +377,7 @@
        "t": "proj",
        "kind": "bullet",
        "hit": {
-        "dmg": 9,
+        "dmg": 37,
         "kind": "light"
        }
       }
@@ -390,7 +390,7 @@
        "t": "proj",
        "kind": "bullet",
        "hit": {
-        "dmg": 9,
+        "dmg": 37,
         "kind": "light"
        }
       }
@@ -403,7 +403,7 @@
        "t": "proj",
        "kind": "bullet",
        "hit": {
-        "dmg": 9,
+        "dmg": 37,
         "kind": "light"
        }
       }
@@ -497,7 +497,7 @@
        "t": "proj",
        "kind": "bullet",
        "hit": {
-        "dmg": 8,
+        "dmg": 180,
         "kind": "light"
        },
        "spread": 0.1
@@ -514,5 +514,23 @@
  "start": {
   "10": 2,
   "11": 2
+ },
+ "bal": {
+  "role": "ranged",
+  "speed": "normal",
+  "gun": "single",
+  "atk": {
+   "9": 13,
+   "10": 12,
+   "11": 15,
+   "12": 21,
+   "13": 14,
+   "14": 11
+  },
+  "cd": {
+   "skill": 7,
+   "charge": 5
+  },
+  "shotDmg": 11
  }
 }
