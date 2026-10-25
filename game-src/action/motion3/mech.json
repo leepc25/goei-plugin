@@ -1318,10 +1318,14 @@
    "result": "ok"
   },
   "18_2": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792946261.8767598,
+   "result": "ok"
   },
   "18_3": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792946273.6887603,
+   "result": "ok"
   },
   "43": {
    "tries": 0,
@@ -1329,10 +1333,14 @@
    "result": "ok"
   },
   "44": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792946304.0207622,
+   "result": "ok"
   },
   "45": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792946263.7247598,
+   "result": "ok"
   }
  },
  "4.1_차여진": {
@@ -1539,7 +1547,9 @@
    "result": "ok"
   },
   "18_3": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792946380.6847668,
+   "result": "ok"
   },
   "43": {
    "tries": 0,
@@ -1611,7 +1621,9 @@
    "result": "ok"
   },
   "44": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792946267.52476,
+   "result": "ok"
   },
   "45": {
    "tries": 0,
@@ -1621,62 +1633,98 @@
  },
  "5.1_세크리엠": {
   "18_1": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792946303.6127622,
+   "result": "ok"
   },
   "18_2": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792946281.728761,
+   "result": "ok"
   },
   "18_3": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792946290.2207613,
+   "result": "ok"
   },
   "43": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792946257.8482003,
+   "result": "ok"
   },
   "44": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792946336.116764,
+   "result": "ok"
   },
   "45": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792946286.4887612,
+   "result": "ok"
   }
  },
  "5.2_브라우니": {
   "18_1": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792946329.5247638,
+   "result": "ok"
   },
   "18_2": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792946351.7567651,
+   "result": "ok"
   },
   "18_3": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792946362.6767657,
+   "result": "ok"
   },
   "43": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792946315.688763,
+   "result": "ok"
   },
   "44": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792946408.4967685,
+   "result": "ok"
   },
   "45": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792946324.2767634,
+   "result": "ok"
   }
  },
  "5.3_탐미주의": {
   "18_1": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792946318.660763,
+   "result": "ok"
   },
   "18_2": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792946380.5567667,
+   "result": "ok"
   },
   "18_3": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792946376.7767665,
+   "result": "ok"
   },
   "43": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792946404.248768,
+   "result": "ok"
   },
   "44": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792946390.1287673,
+   "result": "ok"
   },
   "45": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792946355.7728956,
+   "result": "ok"
   }
  }
 }
