@@ -1,0 +1,106 @@
+{
+  "key": "4.10_아벤샤",
+  "name": "아벤샤",
+  "dir": "E",
+  "color": "#2FB37A",
+  "armed": false,
+  "anims": {
+    "1": {"folder": "1", "mirror": false, "name": "평상 대기"},
+    "2": {"folder": "2", "mirror": false, "name": "개인 대기 (브로치 닦기)"},
+    "3_0": {"folder": "3_0", "mirror": false, "name": "전투 자세 잡기"},
+    "3": {"folder": "3", "mirror": false, "name": "전투 대기"},
+    "W_1": {"folder": "W_1", "mirror": false, "name": "원거리 공격 자세 대기 (모래 탄환 겨눔)"},
+    "4": {"folder": "4", "mirror": false, "name": "걷기 (산책)"},
+    "5": {"folder": "5", "mirror": false, "name": "뛰기"},
+    "6": {"folder": "6", "mirror": false, "name": "제자리 점프"},
+    "7": {"folder": "7", "mirror": false, "name": "방향 점프 (떠가는 도약)"},
+    "8": {"folder": "8", "mirror": false, "name": "달리다 점프 (걸터앉은 도약)"},
+    "9": {"folder": "9", "mirror": false, "name": "약1 손등 털기"},
+    "10": {"folder": "10", "mirror": false, "name": "약2 손바닥 밀기"},
+    "11": {"folder": "11", "mirror": false, "name": "약3 손바닥 뒤집어 올리기"},
+    "12": {"folder": "12", "mirror": false, "name": "강 망토 내던지기"},
+    "13": {"folder": "13", "mirror": false, "name": "돌진 공격 (낮게 미끄러지는 손 쓸기)"},
+    "14": {"folder": "14", "mirror": false, "name": "점프 공격 (공중 손바닥 내리꽂기)"},
+    "15": {"folder": "15", "mirror": false, "name": "원거리 공격 (손바닥 불기)"},
+    "16": {"folder": "16", "mirror": false, "name": "뒤 회피 (망토 두르고 뒤로 뜀)"},
+    "16_1": {"folder": "16_1", "mirror": false, "name": "앞 회피 (낮게 미끄러지는 앞 도약)"},
+    "17": {"folder": "17", "mirror": false, "name": "막기 (망토 방패)"},
+    "18": {"folder": "18", "mirror": false, "name": "맞기 (브로치 감싸기)"},
+    "19": {"folder": "19", "mirror": false, "name": "날아가 쓰러지기"},
+    "20": {"folder": "20", "mirror": false, "name": "일어나기"},
+    "21": {"folder": "21", "mirror": false, "name": "스턴"},
+    "22": {"folder": "22", "mirror": false, "name": "고유기술 「모래 탄환」"},
+    "23": {"folder": "23", "mirror": false, "name": "충전 「흐르는 모래」 모으기"},
+    "24": {"folder": "24", "mirror": false, "name": "충전 방출 (망토로 감싸 웅크림 → 펼치며 일어섬)"},
+    "25": {"folder": "25", "mirror": false, "name": "필살기 「모래 해일」"},
+    "26": {"folder": "26", "mirror": false, "name": "섭취"},
+    "27": {"folder": "27", "mirror": false, "name": "줍기"},
+    "28": {"folder": "28", "mirror": false, "name": "응대 (마녀식 인사)"},
+    "29": {"folder": "29", "mirror": false, "name": "말하며 손짓"},
+    "30": {"folder": "30", "mirror": false, "name": "끄덕이기"},
+    "32": {"folder": "32", "mirror": false, "name": "화내기 (웃으며 털어 버림)"},
+    "33": {"folder": "33", "mirror": false, "name": "발견 반응"},
+    "34": {"folder": "34", "mirror": false, "name": "놀라기"},
+    "35": {"folder": "35", "mirror": false, "name": "기뻐하기"},
+    "36": {"folder": "36", "mirror": false, "name": "도망"},
+    "37": {"folder": "37", "mirror": false, "name": "뒷걸음질 (움츠리기)"},
+    "37_1": {"folder": "37_1", "mirror": false, "name": "뒷걸음질 반복"},
+    "38": {"folder": "38", "mirror": true, "name": "엎드려 기기"},
+    "38_1": {"folder": "38_1", "mirror": true, "name": "엎드려 기기 반복"},
+    "39": {"folder": "39", "mirror": false, "name": "주저앉기"},
+    "40": {"folder": "40", "mirror": false, "name": "주저앉아 뒤로 기어나가기"},
+    "41": {"folder": "41", "mirror": false, "name": "웅크려 떨기"},
+    "42": {"folder": "42", "mirror": false, "name": "네발로 기기"},
+    "42_1": {"folder": "42_1", "mirror": false, "name": "네발로 기기 반복"}
+  },
+  "picks": {"combat": 4, "weapon": 4, "apex": 4, "run": 3, "crawl4": 8},
+  "loops": {
+    "W_1": [1, 2, 3, 4],
+    "37_1": [1, 2, 3, 4, 5, 6, 7, 8, 9],
+    "38_1": [1, 2, 3, 4, 5, 6, 7, 8],
+    "42_1": [1, 2, 3, 4, 5, 6, 7, 8, 9]
+  },
+  "hit": {"9": 8},
+  "gun": [],
+  "kick": [],
+  "ranged": {"proj": {"t": "proj", "kind": "orb", "hit": {"dmg": 7, "kind": "light"}}, "heat": false},
+  "skills": {
+    "skill": {
+      "name": "모래 탄환",
+      "anim": "22",
+      "fps": 11,
+      "events": [{"f": 4, "fx": [{"t": "proj", "kind": "orb", "speed": 1400, "hit": {"dmg": 30, "kind": "heavy"}}]}]
+    },
+    "charge": {
+      "name": "흐르는 모래",
+      "hold": "23",
+      "release": "24",
+      "levels": [0.5, 1.2],
+      "fire": 2,
+      "lv": {
+        "1": [{"t": "blast", "at": "hand", "dx": 30, "hit": {"dmg": 45, "kind": "heavy"}}],
+        "2": [{"t": "melee", "range": 170, "hit": {"dmg": 45, "kind": "heavy"}}]
+      }
+    },
+    "super": {
+      "name": "모래 해일",
+      "sub": "「어머, 이건 꼭 갖고 싶다!」",
+      "anim": "25",
+      "fps": 9,
+      "events": [
+        {
+          "f": 6,
+          "fx": [
+            {"t": "flash", "v": 0.1},
+            {
+              "t": "screen",
+              "spots": 6,
+              "each": [{"t": "melee", "range": 170, "hit": {"dmg": 45, "kind": "heavy"}}]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "_note": "자동 생성. 값을 고치면 build가 그대로 씀. 다시 자동으로: build.py --reset 4.10_아벤샤"
+}

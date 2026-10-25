@@ -1,0 +1,119 @@
+{
+  "key": "4.1_차여진",
+  "name": "차여진",
+  "dir": "E",
+  "color": "#8C1F2E",
+  "armed": true,
+  "anims": {
+    "1": {"folder": "1", "mirror": false, "name": "평상 대기"},
+    "2": {"folder": "2", "mirror": false, "name": "개인 대기 (휴대전화 확인)"},
+    "3_0": {"folder": "3_0", "mirror": false, "name": "전투 자세 잡기 (다가붙는 영업 자세)"},
+    "3": {"folder": "3", "mirror": false, "name": "전투 대기 (발끝 까딱)"},
+    "W": {"folder": "W", "mirror": false, "name": "무기 꺼내기 (의뢰서 뽑기)"},
+    "W_1": {"folder": "W_1", "mirror": false, "name": "무기 대기 (의뢰서 들고)"},
+    "4": {"folder": "4", "mirror": false, "name": "걷기 (런웨이 걸음)"},
+    "5": {"folder": "5", "mirror": false, "name": "뛰기 (하이힐 질주)"},
+    "6": {"folder": "6", "mirror": false, "name": "제자리 점프 (뒤꿈치 차올림)"},
+    "7": {"folder": "7", "mirror": false, "name": "방향 점프 (큰 걸음 도약)"},
+    "8": {"folder": "8", "mirror": false, "name": "달리다 점프 (무릎 끌어안기)"},
+    "9": {"folder": "9", "mirror": false, "name": "약1 (손바닥 어깨 밀치기)"},
+    "10": {"folder": "10", "mirror": false, "name": "약2 (하이힐 정강이 차기)"},
+    "11": {"folder": "11", "mirror": false, "name": "약3 (두 손 등 떠밀기)"},
+    "12": {"folder": "12", "mirror": false, "name": "강 (하이힐 굽 내리찍기)"},
+    "13": {"folder": "13", "mirror": false, "name": "돌진 공격 (어깨 들이받기)"},
+    "14": {"folder": "14", "mirror": false, "name": "점프 공격 (두 굽 내리 디딤)"},
+    "15": {"folder": "15", "mirror": false, "name": "원거리 공격 (의뢰서 날리기)"},
+    "16": {"folder": "16", "mirror": false, "name": "뒤 회피 (「에이~」 깡총)"},
+    "16_1": {"folder": "16_1", "mirror": false, "name": "앞 회피 (품으로 파고들기)"},
+    "17": {"folder": "17", "mirror": false, "name": "막기 (「워워」 손바닥)"},
+    "18": {"folder": "18", "mirror": false, "name": "맞기 (배 맞고 허리 접힘)"},
+    "19": {"folder": "19", "mirror": false, "name": "날아가 쓰러지기 (머리 펼쳐짐)"},
+    "20": {"folder": "20", "mirror": false, "name": "일어나기 (무릎 짚고 머리 넘기기)"},
+    "22": {"folder": "22", "mirror": false, "name": "고유기술 「팔 수 있을 만큼만」"},
+    "23": {"folder": "23", "mirror": false, "name": "충전 모으기 「규정상」 (수첩 짚기)"},
+    "24": {"folder": "24", "mirror": false, "name": "충전 방출 (「제 몇 조」 검지)"},
+    "25": {"folder": "25", "mirror": false, "name": "필살기 「두 번째 휴대전화」"},
+    "26": {"folder": "26", "mirror": false, "name": "섭취 (머리 넘기고 한 입)"},
+    "27": {"folder": "27", "mirror": false, "name": "줍기 (머리 잡고 줍기)"},
+    "28": {"folder": "28", "mirror": false, "name": "응대 (볼 옆 손 인사)"},
+    "29": {"folder": "29", "mirror": false, "name": "말하며 손짓 (내미는 손)"},
+    "30": {"folder": "30", "mirror": false, "name": "끄덕이기"},
+    "31": {"folder": "31", "mirror": false, "name": "고개 젓기"},
+    "32": {"folder": "32", "mirror": false, "name": "화내기 (굳은 얼굴 손바닥 내리치기)"},
+    "33": {"folder": "33", "mirror": false, "name": "발견 반응 (앞섶 감추기)"},
+    "34": {"folder": "34", "mirror": false, "name": "놀라기 (입 가리기)"},
+    "35": {"folder": "35", "mirror": false, "name": "기뻐하기 (결재 완료 미소)"},
+    "36": {"folder": "36", "mirror": false, "name": "도망 (앞섶 쥐고 허둥지둥)"},
+    "37": {"folder": "37", "mirror": false, "name": "뒷걸음질 (움츠리기)"},
+    "37_1": {"folder": "37_1", "mirror": false, "name": "뒷걸음질 반복"},
+    "38": {"folder": "38_W", "mirror": true, "name": "엎드려 기기"},
+    "38_1": {"folder": "38_1_W", "mirror": true, "name": "엎드려 기기 반복"},
+    "39": {"folder": "39", "mirror": false, "name": "주저앉기"},
+    "40": {"folder": "40", "mirror": false, "name": "주저앉아 뒤로 기어나가기"},
+    "41": {"folder": "41", "mirror": false, "name": "웅크려 떨기"},
+    "42": {"folder": "42", "mirror": false, "name": "네발로 기기"},
+    "42_1": {"folder": "42_1", "mirror": false, "name": "네발로 기기 반복"}
+  },
+  "picks": {"combat": 4, "weapon": 4, "apex": 5, "run": 2, "crawl4": 9},
+  "loops": {
+    "1": [1, 2, 3, 4],
+    "3": [1, 2, 3, 4],
+    "W_1": [1, 2, 3, 4],
+    "4": [1, 2, 3, 4, 5, 6, 7, 8],
+    "5": [1, 2, 3, 4, 5, 6, 7, 8],
+    "29": [1, 2, 3, 4],
+    "36": [1, 2, 3, 4, 5, 6, 7, 8],
+    "37_1": [1, 2, 3, 4, 5, 6, 7, 8, 9],
+    "38": [1, 2, 3, 4, 5, 6, 7, 8],
+    "39": [9, 10, 11, 12],
+    "40": [1, 2, 3, 4, 5, 6, 7, 8],
+    "41": [4, 5, 6, 7, 8],
+    "42_1": [1, 2, 3, 4, 5, 6, 7, 8, 9],
+    "19": [10, 11, 12],
+    "21": [1, 2, 3, 4, 5, 6, 7, 8]
+  },
+  "hit": {},
+  "gun": ["W", "W_1", "15"],
+  "kick": [],
+  "ranged": {"proj": {"t": "proj", "kind": "bullet", "hit": {"dmg": 7, "kind": "light"}}, "heat": true},
+  "skills": {
+    "skill": {
+      "name": "팔 수 있을 만큼만",
+      "anim": "22",
+      "fps": 11,
+      "events": [
+        {
+          "f": 4,
+          "fx": [{"t": "mark", "time": 6}, {"t": "melee", "range": 170, "hit": {"dmg": 30, "kind": "heavy"}}]
+        }
+      ]
+    },
+    "charge": {
+      "name": "규정상",
+      "hold": "23",
+      "release": "24",
+      "levels": [0.5, 1.2],
+      "fire": 2,
+      "lv": {
+        "1": [{"t": "melee", "range": 170, "hit": {"dmg": 45, "kind": "heavy"}}],
+        "2": [
+          {"t": "buff", "time": 4, "label": "강화"},
+          {"t": "melee", "range": 170, "hit": {"dmg": 45, "kind": "heavy"}}
+        ]
+      }
+    },
+    "super": {
+      "name": "두 번째 휴대전화",
+      "sub": "「이건 사적인 용도라서요~」",
+      "anim": "25",
+      "fps": 9,
+      "events": [
+        {
+          "f": 6,
+          "fx": [{"t": "flash", "v": 0.1}, {"t": "melee", "range": 170, "hit": {"dmg": 45, "kind": "heavy"}}]
+        }
+      ]
+    }
+  },
+  "_note": "자동 생성. 값을 고치면 build가 그대로 씀. 다시 자동으로: build.py --reset 4.1_차여진"
+}
