@@ -67,10 +67,12 @@ const BASE = a => a.h - 4;   // 땅 동작 기준선: 캔버스 아래 4px
 const arcOf = id => CH.arc && CH.arc[id];
 const ROOT = new Set(['38_1', '40', '37_1', '42_1']);   // 기는 동작: 몸을 제자리에 두고 이동은 코드로
 // 누운·앉은 동작은 PixelLab이 몸을 캔버스 위쪽에 그려서 떠 보임 → 그 장의 맨 아래 픽셀을 바닥에 맞춤(사용자 2026-10-25)
-const FLAT = new Set(['19', '20', '38', '38_1']);   // 바닥에 몸을 눕히는 줄: 몸통 아래 선으로 맞춤
-const LIE = new Set(['20', '38', '38_1', '39', '40', '41', '42', '42_1']);
+const FLAT = new Set(['19', '20', '38', '38_1', '43', '45']);   // 바닥에 몸을 눕히는 줄: 몸통 아래 선으로 맞춤
+const LIE = new Set(['20', '38', '38_1', '39', '40', '41', '42', '42_1', '43', '45']);
 const lieFrom = a => a.bot.indexOf(Math.min(...a.bot)) + 1;   // 날아가 쓰러지기: 가장 높이 뜬 장 다음부터 땅
-const groundBase = (id, a, f) => arcOf(id) ? a.bot[f] : (LIE.has(id) || (id === '19' && f >= lieFrom(a))) ? (FLAT.has(id) && a.mbot ? a.mbot[f] + 3 : a.bot[f] + 2) : BASE(a);   // 누운 장: 몸통 아래 선을 바닥에(늘어진 손발은 바닥 앞쪽으로 내려감)
+const lyingF = (a, f) => (a.bot[f] - a.top[f]) < 0.55 * (a.bot[0] - a.top[0]) && a.bot[f] >= a.floor - 24;   // 몸이 눕고 바닥 가까이 내려온 장
+const FALLS = new Set(['18_3', '44']);   // 서서 시작해 눕는 줄: 누운 장만 몸통 아랫선으로
+const groundBase = (id, a, f) => arcOf(id) ? a.bot[f] : FALLS.has(id) ? (lyingF(a, f) && a.mbot ? a.mbot[f] + 3 : BASE(a)) : (LIE.has(id) || (id === '19' && f >= lieFrom(a))) ? (FLAT.has(id) && a.mbot ? a.mbot[f] + 3 : a.bot[f] + 2) : BASE(a);   // 누운 장: 몸통 아래 선을 바닥에(늘어진 손발은 바닥 앞쪽으로 내려감)
 const cv = document.getElementById('cv'); let ctx = cv.getContext('2d'); ctx.imageSmoothingEnabled = false;
 const FXS = 3, mkLayer = () => { const c = document.createElement('canvas'); c.width = 1280 / FXS; c.height = 720 / FXS; const g = c.getContext('2d'); g.imageSmoothingEnabled = false; return [c, g]; };
 const [fxNc, fxN] = mkLayer(), [fxLc, fxL] = mkLayer();
@@ -91,7 +93,7 @@ const ACTIONS = [   // 사용자 2026-10-25 키 배치(앞으로 쓸 키) + 나�
  ['crouch','웅크리기 켜기/끄기(웅크려서 방향키 = 네발로 기기)','KeyX'],['flee','도망(누른 채)','KeyV'],['back','뒷걸음질(누른 채)','ControlLeft'],
  // ── 테스트용 ──
  ['prevChar','이전 인물','BracketLeft'],['nextChar','다음 인물','BracketRight'],['skill2','둘째 기술(있는 인물만)','KeyG'],
- ['hit','맞기(슈퍼아머 중엔 버팀)','Digit1'],['knock','날아가 쓰러지기','Digit2'],['stun','스턴(연타로 빨리 풀림)','Digit3'],['crawl','쓰러진 뒤 엎드려 기기','Digit4'],
+ ['hit','맞기 상단(약) · 누워 있으면 움찔','Digit1'],['hitLow','맞기 하단(강)','KeyL'],['push','크게 밀려나기(날리기)','KeyN'],['launch','띄워지기(띄우기)','KeyB'],['die','사망(서 있으면 서서, 누워 있으면 누워서) · 다시 누르면 되살림','KeyT'],['knock','날아가 쓰러지기','Digit2'],['stun','스턴(연타로 빨리 풀림)','Digit3'],['crawl','쓰러진 뒤 엎드려 기기','Digit4'],
  ['dying','빈사 켜기/끄기','Digit5'],['heal','회복약 먹기(섭취 + 회복 효과)','Digit6'],['drop','아이템 떨어뜨리기(E로 줍기)','Digit7'],['status','상태이상 바꾸기(독→불→전기→없음)','Digit8'],
  ['eat','섭취','Digit9'],['personal','개인 대기','Digit0'],
  ['respond','응대','KeyY'],['talk','말하며 손짓','KeyU'],['nod','끄덕이기','KeyI'],['shake','고개 젓기','KeyO'],
@@ -671,12 +673,36 @@ function land() {
 
 // ── 피격·반응 ──
 function takeHit(kind) {
+  if (P.mode === 'dead') return;
   if (P.inv > 0) { fx.push({ k: 'num', x: P.x, y: P.y - 230, v: '회피', t: 0.6 }); return; }
   if (P.mode === 'block') { sfx('guard'); shake = 4; if (!vfx('guard_block', P.x + P.face * 50 * K(P.y), P.y - 140 * K(P.y), 2.2, { flip: P.face < 0 })) sparks(P.x + P.face * 50, P.y - 140, 8, false, '#9fd0ff'); pushP(-200, 1200); P.hp = Math.max(1, P.hp - 1); return; }
   if (armored()) { gainSp(5); sfx('armor'); P.armorT = 0.28; hitstop = 0.06; shake = 6; P.hp = Math.max(1, P.hp - 4); return; }
   if (P.mode === 'charge') P.charge = 0;
   if (kind === 'knock') return knock();
+  if (kind === 'low') return hitAs('18_1', -300, 12, 0.09);
+  if (kind === 'push') return hitAs('18_2', -620, 16, 0.06);
+  if (kind === 'launch') return launched();
   hit();
+}
+// 공격 종류 → 피격 동작(사용자 2026-10-25): 약 = 맞기 상단(18) · 강 = 맞기 하단(18-1) · 날리기 = 크게 밀려나기(18-2) · 띄우기 = 띄워지기(18-3) · 다운 = 쓰러지기(19) · 누운 채 = 움찔(43) · HP 0 = 사망(44 서서 / 45 누워서)
+function hitAs(id, push, dmg, d = 0.055) { if (!has(id)) return hit(); gainSp(10); sfx('hurt', { strength: 2 }); P.combat = true; P.combo = 0; P.armed = false; pushP(push, 1100); flash = 0.05; shake = Math.max(shake, 6); P.hp = Math.max(1, P.hp - dmg); act(id, { seq: [{ f: 0, d: 0.02 }, ...S(R(1, nOf(id) - 1), d)] }); }
+function lieLoop() { const n = nOf('19'), lp = LP('19') || [n - 1]; P.mode = 'down'; play('19', { seq: lp.map(f => ({ f, d: lp.length <= 2 ? 0.6 : 0.3 })), loopFrom: 0 }); }
+function launched() {
+  if (!has('18_3')) return knock();
+  gainSp(20); sfx('hurt', { strength: 2 }); P.combat = true; P.combo = 0; P.armed = false; pushP(-380, 700); shake = 8; P.hp = Math.max(1, P.hp - 18);
+  P.mode = 'act'; P.knockT = 0; play('18_3', { seq: S(R(0, nOf('18_3') - 1), 0.07), onEnd: () => { dust(P.x, P.y, 6, 1.2); sfx('down'); lieLoop(); } });
+}
+function flinch() {   // 누운 채 맞음: 움찔했다 다시 누워 숨쉬기
+  flash = 0.05; shake = Math.max(shake, 4); sfx('hurt'); P.hp = Math.max(1, P.hp - 6);
+  if (!has('43')) return;
+  play('43', { seq: S(R(0, nOf('43') - 1), 0.07), onEnd: () => { if (P.mode === 'down') lieLoop(); } });
+}
+function die() {
+  if (P.mode === 'dead') { P.mode = 'ground'; P.hp = 100; P.dying = false; return toIdle(); }   // 테스트룸: 다시 누르면 되살림
+  const lying = P.mode === 'down' || P.mode === 'belly', id = lying ? '45' : '44';
+  if (!has(id)) return;
+  sfx('hurt', { strength: 3 }); P.hp = 0; P.combat = false; P.armed = false; P.knockT = 0; P.mode = 'dead';
+  play(id, { seq: S(R(0, nOf(id) - 1), lying ? 0.12 : 0.08), onEnd: () => fx.push({ k: 'num', x: P.x - 24, y: P.y - 60, v: '사망', t: 1.5 }) });
 }
 function hit() { if (!has('18')) return; gainSp(10); sfx('hurt'); P.combat = true; P.combo = 0; P.armed = false; pushP(-280, 1400); flash = 0.05; P.hp = Math.max(1, P.hp - 8); act('18', { seq: [{ f: 0, d: 0.02 }, ...S(R(1, A['18'].n - 1), 0.055)] }); }
 // 날아가 쓰러지기(19): 반복 구간(누워 숨) 앞까지 쓰러지고, 누운 채 반복
@@ -720,7 +746,10 @@ function onPress(a) {
   if (a === 'drop') { items.push({ x: P.x + P.face * 120, y: P.y, t0: P.t }); return; }
   if (a === 'status') { P.status = [null, 'status_poison', 'status_burn', 'status_shock'][([null, 'status_poison', 'status_burn', 'status_shock'].indexOf(P.status || null) + 1) % 4]; return; }
   if (a === 'dying') { P.dying = !P.dying; P.hp = P.dying ? 18 : 100; if (P.dying) sfx('hp:low'); return; }
-  if (a === 'hit' || a === 'knock') { if (P.mode !== 'down' && P.mode !== 'belly') return takeHit(a === 'knock' ? 'knock' : 'hit'); }
+  if (a === 'die') return die();
+  if (P.mode === 'dead') return;
+  if (a === 'hit' && P.mode === 'down') return flinch();
+  if (['hit', 'knock', 'hitLow', 'push', 'launch'].includes(a)) { if (P.mode !== 'down' && P.mode !== 'belly') return takeHit({ hit: 'hit', knock: 'knock', hitLow: 'low', push: 'push', launch: 'launch' }[a]); }
   if ((P.mode === 'flee' || P.mode === 'back') && !['left', 'right', 'up', 'down', 'run'].includes(a)) toIdle();
   const m = P.mode;
   if (m === 'air') {
@@ -877,8 +906,8 @@ function update(dt) {
   if (P.vanish) { P.vanish.t += dt; if (P.vanish.mode === 'in' && P.vanish.t >= P.vanish.dur) P.vanish = null; }
   if (!CK) return;
   if (P.status === 'status_poison' && Math.random() < dt * 7) { const a = A[P.clip ? P.clip.id : idleId()] || A[idleId()], k = K(P.y); fx.push({ k: 'bubble', x: P.x + (Math.random() - 0.5) * 26 * k, y: P.y - P.z - (BASE(a) - a.top[curF()]) * k + 6, vy: -40 - Math.random() * 30, r: 2 + Math.random() * 2.5, t: 0.9 + Math.random() * 0.4, t0: 1.3 }); }
-  if (P.hp <= 25 && Math.random() < dt * 0.6) vfx('blood_splat', P.x + (Math.random() - 0.5) * 30, P.y - (60 + Math.random() * 80) * K(P.y), 1.8, { flip: Math.random() < 0.5 });
-  if (P.hp <= 25 && Math.random() < dt * 3.5) {
+  if (P.hp <= 25 && P.mode !== 'dead' && Math.random() < dt * 0.6) vfx('blood_splat', P.x + (Math.random() - 0.5) * 30, P.y - (60 + Math.random() * 80) * K(P.y), 1.8, { flip: Math.random() < 0.5 });
+  if (P.hp <= 25 && P.mode !== 'dead' && Math.random() < dt * 3.5) {
     const a = A[P.clip ? P.clip.id : idleId()] || A[idleId()], f = curF(), k = K(P.y);
     const top = P.y - P.z - (BASE(a) - a.top[Math.min(f, a.n - 1)]) * k, bot = P.y - P.z;
     const y = top + (bot - top) * (0.25 + Math.random() * 0.4);
@@ -1023,7 +1052,7 @@ function drawPlayer() {
   else if (P.healT > 0) tint = { c: '#7dff8a', over: 0.35 * P.healT, noEdge: true };
   else if (P.buffT > 0 && P.buffEdge) tint = { c: P.buffC || CH.color, over: 0, ea: 0.5 + 0.3 * Math.sin(P.t * 8) };   // 버프: 몸 테두리만(둘레 기운 없음)
   else if (P.sp >= 100) tint = { c: '#ffd34a', over: 0, ea: 0.35 + 0.3 * (0.5 + 0.5 * Math.sin(P.t * 4)), glow: true };
-  else if (P.hp <= 25) tint = { c: '#d0101a', over: 0.42 * (0.5 + 0.5 * Math.sin(P.t * Math.PI * 2 * 1.3)), noEdge: true };
+  else if (P.hp <= 25 && P.mode !== 'dead') tint = { c: '#d0101a', over: 0.42 * (0.5 + 0.5 * Math.sin(P.t * Math.PI * 2 * 1.3)), noEdge: true };
   else if (P.mode === 'charge') { const lv = Math.min(3, chLv()); tint = { c: CH_COL[lv], over: 0.08 + 0.08 * Math.sin(P.t * 20), noEdge: true }; }
   drawSprite(id, f, P.x, P.y, P.z, P.face, 1, tint, vis);
   if (P.mode === 'charge') { const m = muzzle(); drawVfxAt('charge_gather', m.x, m.y, 1.2 + Math.min(1, P.charge) * 0.8, P.t); }
@@ -1393,7 +1422,7 @@ function renderBinds() {
     `인물 ${k('prevChar')} ${k('nextChar')} 또는 위 목록 · 이동 ${k('left')}${k('right')}${k('up')}${k('down')} · 달리기 ${k('run')} 길게 또는 방향키 두 번 · 점프 ${k('jump')}(공중에서 한 번 더 = 2단) · ` +
     `약 ${k('light')} 연타 = 약1→약2→약3, 강 ${k('heavy')} = 마무리(단독·약1 뒤 스턴 / 약2 뒤 띄우기 / 약3 뒤 날리기) · 뛰며 약 = 돌진 · 공중에서 약/강 = 점프 공격 · ` +
     `회피 ${k('run')} 짧게(누른 방향, 없으면 뒤) · 방어 ${k('block')} · 원거리 ${k('shoot')} · 기술 ${k('skill')} · 충전 ${k('charge')}(누른 채, 떼면 방출) · 필살기 ${k('super')} · ` +
-    `전투 자세 ${k('combat')} · 무기 ${k('weapon')} · 맞기 ${k('hit')} · 쓰러짐 ${k('knock')}(${k('jump')} 일어나기, ${k('crawl')} 엎드려 기기) · 스턴 ${k('stun')} · 빈사 ${k('dying')} · ` +
+    `전투 자세 ${k('combat')} · 무기 ${k('weapon')} · 맞기 상단 ${k('hit')} · 하단 ${k('hitLow')} · 밀려나기 ${k('push')} · 띄워지기 ${k('launch')} · 사망 ${k('die')} · 쓰러짐 ${k('knock')}(${k('jump')} 일어나기, ${k('crawl')} 엎드려 기기) · 스턴 ${k('stun')} · 빈사 ${k('dying')} · ` +
     `감정 ${k('respond')}~${k('surprise')} · 섭취 ${k('eat')} · 상호작용·줍기 ${k('pick')} · 조작 요약 ${k('map')} · 개인 대기 ${k('personal')} · 발견 ${k('notice')} · ` +
     `도망 ${k('flee')} · 뒷걸음 ${k('back')} · 주저앉기 ${k('sit')} · 웅크리기 ${k('crouch')}`;
   if (CK) renderChar();

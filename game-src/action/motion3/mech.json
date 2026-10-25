@@ -1,42 +1,62 @@
 {
  "1.10_게슈간": {
   "18_1": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944647.680055,
+   "result": "ok"
   },
   "18_2": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944702.004667,
+   "result": "ok"
   },
   "18_3": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944724.4086683,
+   "result": "ok"
   },
   "43": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944673.9526653,
+   "result": "ok"
   },
   "44": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944729.9846687,
+   "result": "ok"
   },
   "45": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944705.9526672,
+   "result": "ok"
   }
  },
  "1.11_로제몬": {
   "18_1": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944767.2525914,
+   "result": "ok"
   },
   "18_2": {
    "tries": 0
   },
   "18_3": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944741.2886693,
+   "result": "ok"
   },
   "43": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944727.2686684,
+   "result": "ok"
   },
   "44": {
    "tries": 0
   },
   "45": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944753.93667,
+   "result": "ok"
   }
  },
  "1.12_콘쥬스": {
@@ -50,173 +70,271 @@
    "tries": 0
   },
   "43": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944754.3203402,
+   "result": "ok"
   },
   "44": {
    "tries": 0
   },
   "45": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944749.9806697,
+   "result": "ok"
   }
  },
  "1.1_쟈알디": {
   "18_1": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944425.6886506,
+   "result": "ok"
   },
   "18_2": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944481.524654,
+   "result": "ok"
   },
   "18_3": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944490.3366544,
+   "result": "ok"
   },
   "43": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944451.3286521,
+   "result": "ok"
   },
   "44": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944504.4525545,
+   "result": "ok"
   },
   "45": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944413.78065,
+   "result": "ok"
   }
  },
  "1.2_스팡달": {
   "18_1": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944445.9046516,
+   "result": "ok"
   },
   "18_2": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944453.4126523,
+   "result": "ok"
   },
   "18_3": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944575.7766595,
+   "result": "ok"
   },
   "43": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944477.4517782,
+   "result": "ok"
   },
   "44": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944489.1046543,
+   "result": "ok"
   },
   "45": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944419.8686502,
+   "result": "ok"
   }
  },
  "1.3_잼트리": {
   "18_1": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944484.808654,
+   "result": "ok"
   },
   "18_2": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944552.980658,
+   "result": "ok"
   },
   "18_3": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944486.9846542,
+   "result": "ok"
   },
   "43": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944466.480653,
+   "result": "ok"
   },
   "44": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944516.248656,
+   "result": "ok"
   },
   "45": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944471.9526532,
+   "result": "ok"
   }
  },
  "1.5_고그니쟈": {
   "18_1": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944502.6774516,
+   "result": "ok"
   },
   "18_2": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944534.688657,
+   "result": "ok"
   },
   "18_3": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944545.5313032,
+   "result": "ok"
   },
   "43": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944525.2926564,
+   "result": "ok"
   },
   "44": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944550.444658,
+   "result": "ok"
   },
   "45": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944534.688657,
+   "result": "ok"
   }
  },
  "1.6_큐라스": {
   "18_1": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944546.0526576,
+   "result": "ok"
   },
   "18_2": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944569.680659,
+   "result": "ok"
   },
   "18_3": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944575.7126594,
+   "result": "ok"
   },
   "43": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944586.31266,
+   "result": "ok"
   },
   "44": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944652.344664,
+   "result": "ok"
   },
   "45": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944622.4279516,
+   "result": "ok"
   }
  },
  "1.7_고르고디오": {
   "18_1": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944568.7126591,
+   "result": "ok"
   },
   "18_2": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944595.7126606,
+   "result": "ok"
   },
   "18_3": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944599.9326608,
+   "result": "ok"
   },
   "43": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944644.8686635,
+   "result": "ok"
   },
   "44": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944658.5846643,
+   "result": "ok"
   },
   "45": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944577.0926595,
+   "result": "ok"
   }
  },
  "1.8_데쥬레": {
   "18_1": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944598.1606607,
+   "result": "ok"
   },
   "18_2": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944662.6286778,
+   "result": "ok"
   },
   "18_3": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944650.556664,
+   "result": "ok"
   },
   "43": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944616.1324854,
+   "result": "ok"
   },
   "44": {
    "tries": 0
   },
   "45": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944623.355584,
+   "result": "ok"
   }
  },
  "1.9_데드폴": {
   "18_1": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944639.800426,
+   "result": "ok"
   },
   "18_2": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944698.2126667,
+   "result": "ok"
   },
   "18_3": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944743.2166693,
+   "result": "ok"
   },
   "43": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944640.4886632,
+   "result": "ok"
   },
   "44": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944706.2646673,
+   "result": "ok"
   },
   "45": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792944644.9406636,
+   "result": "ok"
   }
  },
  "2.10_곽성주": {
