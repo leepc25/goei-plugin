@@ -197,11 +197,13 @@ def run_job(path):
                 size = (max(end.width, base.width), max(end.height, base.height))
                 start_img, end = pad(base, size), pad(end, size)
         name = f"v3 {f} {r['name']}"
-        body = {"character_id": T["cid"], "mode": "pixminimax", "action_description": r["prompt"],
+        mode = "v3" if "엔진 v3" in r["memo"] else "pixminimax"   # 메모 칸에 「엔진 v3」이면 v3 엔진
+        body = {"character_id": T["cid"], "mode": mode, "action_description": r["prompt"],
                 "animation_name": name, "directions": [d], "frame_count": r["frames"],
                 "subject_description": T["subject"], "initial_pose": r["pose"],
                 "keep_first_frame": "첫 장 유지" in r["memo"] or "첫 장 유지" in r["span"],
                 "enhance_prompt": False}
+        if mode == "v3": body.pop("subject_description"); body.pop("initial_pose")   # v3는 두 칸을 안 받음
         if start_img is not None: body["custom_start_frame"] = b64(start_img)
         if end is not None: body["end_frame"] = b64(end)
         ch = req("GET", f"/characters/{T['cid']}")

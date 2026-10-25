@@ -354,19 +354,22 @@
      "hold": 0.12,
      "fx": [
       {
-       "t": "blast",
-       "at": "hand",
-       "dx": 0,
-       "scale": 1.4,
-       "r": 180,
-       "scorch": 3,
-       "hit": {
-        "dmg": 40,
-        "kind": "blow",
-        "stop": 0.16,
-        "shake": 12
-       },
-       "vfx": "jyaldi-palm-blast"
+       "t": "self",
+       "vfx": "jyaldi-palm-blast2",
+       "strength": 2,
+       "hits": [
+        {
+         "at": 0.2,
+         "dx": 170,
+         "r": 120,
+         "hit": {
+          "dmg": 40,
+          "kind": "blow",
+          "stop": 0.16,
+          "shake": 12
+         }
+        }
+       ]
       }
      ]
     }
@@ -384,49 +387,105 @@
    "lv": {
     "0": [
      {
-      "t": "chain",
-      "n": 2,
-      "from": 100,
-      "step": 120,
-      "every": 0.12,
-      "scale": 1.0,
-      "vfx": "jyaldi-chain-blast",
-      "hit": {
-       "dmg": 30,
-       "kind": "heavy",
-       "mid": "light"
-      }
+      "t": "self",
+      "vfx": "jyaldi-chain-blast2",
+      "scale": 0.85,
+      "hits": [
+       {
+        "at": 0,
+        "dx": 140,
+        "r": 60,
+        "hit": {
+         "dmg": 15,
+         "kind": "light"
+        },
+        "dust": 1
+       },
+       {
+        "at": 0.14,
+        "dx": 280,
+        "r": 70,
+        "hit": {
+         "dmg": 30,
+         "kind": "heavy"
+        },
+        "dust": 1
+       }
+      ]
      }
     ],
     "1": [
      {
-      "t": "chain",
-      "n": 3,
-      "from": 110,
-      "step": 135,
-      "every": 0.12,
-      "scale": 1.2,
-      "hit": {
-       "dmg": 60,
-       "kind": "down",
-       "mid": "light"
-      },
-      "vfx": "jyaldi-chain-blast"
+      "t": "self",
+      "vfx": "jyaldi-chain-blast2",
+      "hits": [
+       {
+        "at": 0,
+        "dx": 140,
+        "r": 60,
+        "hit": {
+         "dmg": 15,
+         "kind": "light"
+        },
+        "dust": 1
+       },
+       {
+        "at": 0.14,
+        "dx": 280,
+        "r": 70,
+        "hit": {
+         "dmg": 15,
+         "kind": "light"
+        },
+        "dust": 1
+       },
+       {
+        "at": 0.28,
+        "dx": 455,
+        "r": 80,
+        "hit": {
+         "dmg": 60,
+         "kind": "down"
+        },
+        "crater": 0.8
+       }
+      ]
      }
     ],
     "2": [
      {
-      "t": "circle",
-      "r": 300,
-      "n": 10,
-      "scale": 1.5,
+      "t": "self",
+      "vfx": "jyaldi-zone-blast2",
+      "scale": 1.1,
+      "strength": 3,
+      "hits": [
+       {
+        "at": 0.07,
+        "dx": 190,
+        "r": 110,
+        "depth": 110,
+        "crater": 0.7
+       },
+       {
+        "at": 0.07,
+        "dx": -190,
+        "r": 110,
+        "depth": 110,
+        "crater": 0.7
+       },
+       {
+        "at": 0.07,
+        "dx": 0,
+        "r": 90,
+        "depth": 110
+       }
+      ],
       "hit": {
        "dmg": 80,
        "kind": "launch",
        "n": 2,
        "mid": "heavy"
-      },
-      "vfx": "jyaldi-zone-blast"
+      }
      },
      {
       "t": "shake",
@@ -455,8 +514,10 @@
        "every": 0.09,
        "each": [
         {
-         "t": "pillar",
-         "scale": 1.4,
+         "t": "boom",
+         "vfx": "jyaldi-super-blast2",
+         "scale": 0.9,
+         "r": 110,
          "hit": {
           "dmg": 120,
           "kind": "launch",
@@ -464,8 +525,7 @@
           "mid": "heavy",
           "stop": 0.2,
           "shake": 16
-         },
-         "vfx": "jyaldi-pillar"
+         }
         }
        ]
       }

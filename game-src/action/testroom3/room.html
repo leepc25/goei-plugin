@@ -267,12 +267,35 @@ function strike(h, y) {
   };
   for (let i = 0; i < n; i++) i ? later(i * (h.every || 0.1), () => one(i)) : one(0);
 }
+// 공용 바닥 파괴(전 인물 통일): 땅이 터지고 돌 부스러기가 튄 뒤 갈라진 구덩이가 남았다가 흐려짐. 바닥 층(캐릭터 뒤)
+function craterAt(x, gy, k, hold = 3) { if (!vfx('ground-crater2', x, gy, k, { under: true, hold, fade: 0.6, flip: Math.random() < 0.5 })) fx.push({ k: 'scorch', x, y: gy, r: 50 * k, t: hold }); }
 const FX = {
+  // 캐릭터 그림을 넣어 뽑은 이펙트(캐릭터는 지움): 캐릭터 발 자리·배율로 그려 손·몸 위치가 맞음. under(기본)면 캐릭터 뒤
+  // hits: [{at 초, dx 앞 거리(그림 화소), r 너비, hit, crater 배율}]
+  self(s, c) {
+    const k = K(P.y) * (s.scale || 1), x0 = P.x, y0 = P.y, f = P.face;
+    vfx(s.vfx, x0, y0 - P.z, k, { flip: f < 0, under: s.under !== false });
+    sfx('hit', { strength: s.strength || 2, kind: 'super' });
+    for (const h of (s.hits || [{}])) later(h.at || 0, () => {
+      const x = x0 + f * (h.dx ?? 150) * k;
+      if (h.crater) craterAt(x, y0, k * h.crater, h.hold || 3);
+      if (h.dust) dust(x, y0, 6, k * 1.4);
+      if (near(x, y0, (h.r || 110) * k, (h.depth || 75) * k)) strike(h.hit || s.hit, y0 - (h.h ?? 110) * k);
+    });
+  },
+  // 큰 폭발 한 번(바닥에서 솟음) + 공용 바닥 파괴
+  boom(s, c) {
+    const p = posOf({ at: 'target', ...s }, c), sc = (s.scale || 1) * p.k;
+    vfx(s.vfx, p.x, p.gy, sc, { flip: Math.random() < 0.5 });
+    later(0.1, () => { craterAt(p.x, p.gy, sc * 0.9, s.scorch || 3); dust(p.x, p.gy, 8, sc * 1.6); });
+    sfx('hit', { strength: 3, kind: 'super' });
+    if (near(p.x, p.gy, (s.r || 120) * sc, 80)) later(s.at || 0.12, () => strike(s.hit));
+  },
   // 폭발 하나: vfx 그림(기본 RPG 폭발) + 그을음. hand면 손 앞 공중, 아니면 바닥
   blast(s, c) {
     const p = posOf(s, c), sc = (s.scale || 1.6) * p.k, onAir = (s.at || 'hand') === 'hand' || s.air;
     if (!vfx(s.vfx || 'eileen-rpg-explosion', p.x + (onAir ? P.face * 26 * sc : 0), onAir ? p.hy : p.gy - 4, sc * 1.2, onAir ? { center: true, flip: P.face < 0 } : {})) for (let i = 0; i < 14; i++) { const a = Math.random() * 6.28, v = 80 + Math.random() * 300; fx.push({ k: 'fire', x: p.x, y: onAir ? p.hy : p.gy - 30, vx: Math.cos(a) * v, vy: Math.sin(a) * v * 0.7 - 60, r: 8 + Math.random() * 12, t: 0.6, t0: 0.6 }); }
-    if (s.scorch) { if (!vfx('crater', p.x, p.gy, 1.6 * sc, { hold: s.scorch, under: true })) fx.push({ k: 'scorch', x: p.x, y: p.gy, r: 50 * sc, t: s.scorch }); }
+    if (s.scorch) craterAt(p.x, p.gy, sc * 0.7, s.scorch);
     if (!onAir) dust(p.x, p.gy, 6, sc);
     sfx('hit', { strength: 2, kind: 'super' });
     if (near(p.x, p.gy, (s.r || 110) * p.k, s.depth || 75)) strike(s.hit, p.hy);
@@ -293,7 +316,7 @@ const FX = {
     const p = posOf({ at: 'target', ...s }, c), sc = (s.scale || 1.5) * p.k;
     for (let i = 0; i < 4; i++) later(i * 0.06, () => vfx(s.vfx || 'eileen-rpg-explosion', p.x + (Math.random() - 0.5) * 10, p.gy - 4 - i * 70 * sc, sc * (1.2 - i * 0.15)));
     for (let i = 0; i < 18; i++) fx.push({ k: 'fire', x: p.x + (Math.random() - 0.5) * 30 * sc, y: p.gy - Math.random() * 40, vx: (Math.random() - 0.5) * 60, vy: -500 - Math.random() * 500, r: 8 + Math.random() * 10, t: 0.5 + Math.random() * 0.3, t0: 0.8 });
-    if (s.scorch !== 0) fx.push({ k: 'scorch', x: p.x, y: p.gy, r: 60 * sc, t: s.scorch || 3 });
+    if (s.scorch !== 0) craterAt(p.x, p.gy, sc * 0.8, s.scorch || 3);
     sfx('hit', { strength: 3, kind: 'super' });
     if (near(p.x, p.gy, 90 * sc, 70)) strike(s.hit);
   },
@@ -637,7 +660,7 @@ function getUp() { if (!has('20')) return toIdle(); sfx('wakeup'); P.knockT = 0;
 function belly() {
   if (!has('38')) return;
   P.mode = 'belly';
-  if (has('38_1')) return play('38', { seq: S(R(0, nOf('38') - 1), 0.1), onEnd: () => { if (P.mode === 'belly') play('38_1', { fps: 8, loopFrom: 0 }); } });
+  if (has('38_1')) return play('38', { seq: S(R(0, Math.min(4, nOf('38') - 1)), 0.1), onEnd: () => { if (P.mode === 'belly') play('38_1', { seq: S(R(0, nOf('38_1') - 2), 0.12), loopFrom: 0 }); } });   // 38은 배 깐 장(5장)까지, 이어 38_1 포복 반복
   const lp = LP('38') || R(Math.min(4, nOf('38') - 1), nOf('38') - 1);
   play('38', { seq: [...S(R(0, lp[0] - 1), 0.11), ...S(lp, 0.1)], loopFrom: lp[0] });
 }
@@ -851,9 +874,9 @@ function update(dt) {
         if (dx && dx !== P.face) { P.prevFace = P.face; P.faceT = P.t; P.face = dx; }
         const sp = (running ? 430 : 230) * (P.dying ? 0.6 : 1);
         P.x += dx * sp * dt; P.y += dy * sp * 0.55 * dt;
-        const id = running && !P.dying && has('5') ? '5' : '4';
-        if (!P.clip || P.clip.id !== id) play(id, { fps: id === '5' ? 15 : P.dying ? 7 : 11, loopFrom: 0 });
-        if (id === '5' && Math.random() < dt * 4) { if (!vfx('run_dust', P.x - P.face * 24, P.y, 2, { flip: P.face < 0 })) dust(P.x - P.face * 20, P.y, 1, 0.6); }
+        const id = running && !P.dying && has('5') ? (has('5_1') ? '5_1' : '5') : '4';   // 5_1: 끝 장이 첫 장으로 닫힌 뛰기 반복(끝 장은 첫 장과 같아 뺌)
+        if (!P.clip || P.clip.id !== id) id === '5_1' ? play(id, { seq: S(R(0, nOf(id) - 2), 1 / 15), loopFrom: 0 }) : play(id, { fps: id === '5' ? 15 : P.dying ? 7 : 11, loopFrom: 0 });
+        if (id[0] === '5' && Math.random() < dt * 4) { if (!vfx('run_dust', P.x - P.face * 24, P.y, 2, { flip: P.face < 0 })) dust(P.x - P.face * 20, P.y, 1, 0.6); }
         const sf = curF(), n = nOf(id); if (sf !== P.stepF && (sf === 1 || sf === (n >> 1) + 1)) sfx('step'); P.stepF = sf;
         P.idleT = 0;
       } else {
@@ -1033,7 +1056,7 @@ function drawSheets(under = false) {
     if (e.k !== 'sheet') continue;
     const v = VFX[e.name]; if (!v.img.complete) continue;
     const [fx0, fy0, fw, fh] = sheetFrame(v, e.loop ? (e.t0 - e.t) % e.dur : e.t0 - e.t);
-    ctx.save(); ctx.translate(Math.round(e.x), Math.round(e.y)); if (e.rot) ctx.rotate(e.rot); ctx.scale(e.flip ? -e.s : e.s, e.s);
+    ctx.save(); if (e.fade && e.t < e.fade) ctx.globalAlpha = e.t / e.fade; ctx.translate(Math.round(e.x), Math.round(e.y)); if (e.rot) ctx.rotate(e.rot); ctx.scale(e.flip ? -e.s : e.s, e.s);
     if (e.anchor === 'right') ctx.drawImage(v.img, fx0, fy0, fw, fh, -fw, -fh / 2, fw, fh);
     else if (e.center) ctx.drawImage(v.img, fx0, fy0, fw, fh, -fw / 2, -fh / 2, fw, fh);
     else ctx.drawImage(v.img, fx0, fy0, fw, fh, -fw * v.pivot[0], -fh * v.pivot[1], fw, fh);

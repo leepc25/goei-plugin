@@ -16,9 +16,52 @@ def req(method, path, body=None):
         return json.loads(resp.read() or b"{}")
 
 
-def main(name, desc, key="vfx"):
+def strip(name, sprite, west=True):
+    """캐릭터 그림이 들어간 이펙트에서 캐릭터 화소를 지우고(이펙트만 남김), 서쪽 그림이면 좌우 반전해 동쪽 기준으로 맞춘다.
+    pivot은 캐릭터 발(anchor)이라, 게임에서 캐릭터 발 자리에 캐릭터 배율로 그리면 손 위치가 맞는다."""
+    from PIL import Image, ImageChops
+    js = OUT / f"{name}.json"; meta = json.loads(js.read_text())
+    im = Image.open(OUT / f"{name}.png").convert("RGBA"); sp = Image.open(sprite).convert("RGBA")
+    bb = sp.getbbox(); sc = sp.crop(bb); an = meta["meta"]["anchor"]
+    x0 = an["x"] - (bb[2] - bb[0]) // 2; y0 = an["y"] - (bb[3] - bb[1])
+    def frame(f): r = f["frame"]; return im.crop((r["x"], r["y"], r["x"] + r["w"], r["y"] + r["h"]))
+    best = None
+    for dx in range(-3, 4):
+        for dy in range(-3, 4):
+            c = frame(meta["frames"][-1]).crop((x0 + dx, y0 + dy, x0 + dx + sc.width, y0 + dy + sc.height))
+            d = ImageChops.difference(c, sc).convert("L").point(lambda v: 255 if v else 0).histogram()[255]
+            if best is None or d < best[0]: best = (d, x0 + dx, y0 + dy)
+    _, ox, oy = best
+    from PIL import ImageFilter
+    mask = sc.getchannel("A").point(lambda v: 255 if v else 0).filter(ImageFilter.MaxFilter(3))   # 캐릭터 윤곽(1칸 넓힘): 이펙트 빛을 받은 몸도 지움
+    out = im.copy(); sa = mask.load()
+    for f in meta["frames"]:
+        r = f["frame"]; px = out.load()
+        for y in range(sc.height):
+            for x in range(sc.width):
+                if not sa[x, y]: continue
+                if 0 <= ox + x < r["w"] and 0 <= oy + y < r["h"]: px[r["x"] + ox + x, r["y"] + oy + y] = (0, 0, 0, 0)
+    if west:
+        fl = Image.new("RGBA", out.size)
+        for f in meta["frames"]:
+            r = f["frame"]; fl.paste(frame_of(out, r).transpose(Image.FLIP_LEFT_RIGHT), (r["x"], r["y"]))
+            f["pivot"]["x"] = 1 - f["pivot"]["x"]
+        out = fl; meta["meta"]["anchor"]["x"] = meta["frames"][0]["frame"]["w"] - an["x"]
+    meta["meta"]["stripped"] = True
+    out.save(OUT / f"{name}.png"); js.write_text(json.dumps(meta))
+    print(name, "캐릭터 지움, 맞춤 차이", best[0], "반전" if west else "")
+
+
+def frame_of(im, r): return im.crop((r["x"], r["y"], r["x"] + r["w"], r["y"] + r["h"]))
+
+
+def main(name, desc, key="vfx", sprite=None, artist="lite"):
     OUT.mkdir(parents=True, exist_ok=True)
-    res = req("POST", "/vfx", {"description": desc, "name": name, "artist": "lite"})
+    body = {"description": desc, "name": name, "artist": artist}
+    if sprite:   # 캐릭터 그림을 넣으면 그 크기·톤에 맞춰 이펙트를 만든다
+        import base64
+        body["sprite"] = {"type": "base64", "base64": base64.b64encode(Path(sprite).read_bytes()).decode(), "format": "png"}
+    res = req("POST", "/vfx", body)
     job = res.get("background_job_id")
     print(name, "보냄, 견적", res.get("quoted_generations"), flush=True)
     while True:
@@ -37,7 +80,12 @@ def main(name, desc, key="vfx"):
     print(line)
     log = BASE / key / "spend.log" if (BASE / key).exists() else BASE / "vfx_spend.log"
     with open(log, "a") as f: f.write(line + "\n")
+    if sprite: strip(name, sprite)
 
 
 if __name__ == "__main__":
-    main(*sys.argv[1:])
+    a = sys.argv[1:]; kw = {}
+    if a[0] == "strip": strip(a[1], a[2]); sys.exit()
+    for f in ("--sprite", "--artist"):
+        if f in a: i = a.index(f); kw[f[2:]] = a[i + 1]; a = a[:i] + a[i + 2:]
+    main(*a, **kw)
