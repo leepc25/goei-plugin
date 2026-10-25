@@ -200,7 +200,7 @@ def draft_skills(sd, has, hits, color):
                        "events": [{"f": ev_frame("22", 4), "fx": draft_fx(sd["skill"]["text"], "skill")}]}
     if sd.get("charge"):
         tx = sd["charge"]["text"]
-        lv = re.split(r"2단", tx, 1)
+        lv = re.split(r"2단", tx, maxsplit=1)
         sk["charge"] = {"name": sd["charge"]["name"], "hold": "23" if has("23") else "3", "release": "24" if has("24") else "3",
                         "levels": [0.5, 1.2], "fire": ev_frame("24", 2),
                         "lv": {"1": draft_fx(lv[0], "charge"), "2": draft_fx("2단" + lv[1] if len(lv) > 1 else tx, "charge")}}
@@ -233,7 +233,8 @@ def auto_cfg(ch):
     loops, hits, flips, variants = parse_loops(tr), parse_hits(tr), parse_flips(tr), parse_variant(tr)
     folders = sorted(p.name for p in d.iterdir() if p.is_dir() and not p.name.startswith("_") and any(p.glob("[0-9][0-9].png")))
     anims = {}
-    for lid in sorted({re.sub(r"_(E|W|SE|SW|S|N|NE|NW)$", "", f) for f in folders}, key=lambda s: [int(x) if x.isdigit() else 0 for x in re.split(r"_", s.replace("W", "0"))]):
+    order = list(BASE)
+    for lid in sorted({re.sub(r"_(E|W|SE|SW|S|N|NE|NW)$", "", f) for f in folders}, key=lambda s: (order.index(s) if s in order else 999, s)):
         cands = [f for f in folders if re.sub(r"_(E|W|SE|SW|S|N|NE|NW)$", "", f) == lid]
         good = [f for f in cands if f in ok] if ok else cands
         if not good: continue
@@ -291,6 +292,17 @@ def eileen_cfg(ch):
             "hit": {}, "gun": ["W", "15", "22", "23", "24", "25", "W_1", "22_1"], "kick": ["11", "12", "13", "14"],
             "ranged": {"proj": {"t": "proj", "kind": "bullet", "hit": {"dmg": 7, "kind": "light"}}, "heat": True},
             "skills": {}, "_note": "에일린: motion_v3를 씀. 기술은 손으로 적음."}
+
+
+def dump_cfg(cfg):
+    """사람이 읽고 고치기 쉽게: 숫자·짧은 목록과 작은 사전은 한 줄로"""
+    def enc(v, ind):
+        sp = " " * ind
+        one = json.dumps(v, ensure_ascii=False)
+        if not isinstance(v, (dict, list)) or len(one) + ind < 110: return one
+        if isinstance(v, list): return "[\n" + ",\n".join(sp + "  " + enc(x, ind + 2) for x in v) + "\n" + sp + "]"
+        return "{\n" + ",\n".join(sp + "  " + json.dumps(k, ensure_ascii=False) + ": " + enc(x, ind + 2) for k, x in v.items()) + "\n" + sp + "}"
+    return enc(cfg, 0) + "\n"
 
 
 def deep_merge(a, b):
@@ -455,7 +467,8 @@ def src_dir(cfg):
 
 
 def signature(cfg):
-    h = hashlib.sha1((VERSION + json.dumps(cfg, sort_keys=True, ensure_ascii=False)).encode())
+    """그림 쪽 서명: 그림 파일·뒤집기·총 줄·지울 칸이 같으면 그림 처리를 건너뜀"""
+    h = hashlib.sha1((VERSION + json.dumps([cfg["anims"], cfg.get("gun"), cfg.get("clean")], sort_keys=True, ensure_ascii=False)).encode())
     d = src_dir(cfg)
     for lid, an in sorted(cfg["anims"].items()):
         for f in sorted((d / an["folder"]).glob("[0-9][0-9].png")):
@@ -466,28 +479,35 @@ def signature(cfg):
 def build_char(cfg, force=False):
     key = cfg["key"]
     js = OUT / "chars" / f"{key}.js"
-    sigf = OUT / "chars" / f"{key}.sig"
+    cache = HERE / ".cache" / f"{key}.json"
+    cache.parent.mkdir(exist_ok=True)
     sig = signature(cfg)
-    if not force and js.exists() and sigf.exists() and sigf.read_text() == sig:
-        return js.stat().st_size, False
-    d = src_dir(cfg)
-    A = {}
-    gun = set(cfg.get("gun", []))
-    for lid, an in cfg["anims"].items():
-        fs = sorted((d / an["folder"]).glob("[0-9][0-9].png"))
-        if not fs: continue
-        ims = [Image.open(f).convert("RGBA") for f in fs]
-        if an.get("mirror"): ims = [im.transpose(Image.FLIP_LEFT_RIGHT) for im in ims]
-        ims = [drop_specks(im) for im in ims]
-        for fi, box in (cfg.get("clean", {}).get(lid) or []):   # 손으로 지울 칸: [장(1부터), [x0,y0,x1,y1]] (뒤집은 뒤 좌표)
-            if 1 <= fi <= len(ims):
-                a = np.array(ims[fi - 1]); a[box[1]:box[3], box[0]:box[2]] = 0; ims[fi - 1] = Image.fromarray(a, "RGBA")
-        A[lid] = dict(name=an.get("name", lid), **process(ims, lid, gun))
+    A = None
+    if not force and cache.exists():
+        c = json.loads(cache.read_text())
+        if c.get("sig") == sig: A = c["A"]
+    rebuilt = A is None
+    if rebuilt:
+        d = src_dir(cfg)
+        A = {}
+        gun = set(cfg.get("gun", []))
+        for lid, an in cfg["anims"].items():
+            fs = sorted((d / an["folder"]).glob("[0-9][0-9].png"))
+            if not fs: continue
+            ims = [Image.open(f).convert("RGBA") for f in fs]
+            if an.get("mirror"): ims = [im.transpose(Image.FLIP_LEFT_RIGHT) for im in ims]
+            ims = [drop_specks(im) for im in ims]
+            for fi, box in (cfg.get("clean", {}).get(lid) or []):   # 손으로 지울 칸: [장(1부터), [x0,y0,x1,y1]] (뒤집은 뒤 좌표)
+                if 1 <= fi <= len(ims):
+                    a = np.array(ims[fi - 1]); a[box[1]:box[3], box[0]:box[2]] = 0; ims[fi - 1] = Image.fromarray(a, "RGBA")
+            A[lid] = dict(name=an.get("name", lid), **process(ims, lid, gun))
+        cache.write_text(json.dumps({"sig": sig, "A": A}, ensure_ascii=False))
+    for lid, an in cfg["anims"].items():   # 이름은 설정 것을 씀
+        if lid in A: A[lid]["name"] = an.get("name", lid)
     payload = {k: v for k, v in cfg.items() if k not in ("anims",)}
     js.write_text("(window.__C=window.__C||{})[" + json.dumps(key, ensure_ascii=False) + "]=" +
                   json.dumps({"cfg": payload, "A": A}, ensure_ascii=False, separators=(",", ":")) + ";\n", encoding="utf-8")
-    sigf.write_text(sig)
-    return js.stat().st_size, True
+    return js.stat().st_size, rebuilt
 
 
 def load_vfx():
@@ -518,7 +538,7 @@ def main():
         if not auto["anims"]: continue
         p = CHARS / f"{ch['key']}.json"
         if not p.exists() or ch["key"] in reset:
-            p.write_text(json.dumps(auto, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+            p.write_text(dump_cfg(auto), encoding="utf-8")
             cfg = auto
         else:
             cfg = deep_merge(auto, json.loads(p.read_text(encoding="utf-8")))
@@ -527,7 +547,7 @@ def main():
         index.append(dict(key=cfg["key"], name=cfg["name"], num=ch["num"], color=cfg.get("color"), dir=cfg["dir"], armed=cfg.get("armed"), kb=size // 1024))
         print(f"{'만듦' if rebuilt else '그대로'} {cfg['key']:<14} 줄 {len(cfg['anims']):>2} · {size / 1024 / 1024:.2f} MB")
     for old in (OUT / "chars").glob("*.js"):   # 목록에서 빠진 인물 파일 정리
-        if old.stem not in {c["key"] for c in index}: old.unlink(); (OUT / "chars" / (old.stem + ".sig")).unlink(missing_ok=True)
+        if old.stem not in {c["key"] for c in index}: old.unlink()
     room = (HERE / "room.html").read_text(encoding="utf-8")
     audio = (EIL / "testroom" / "audio.js").read_text(encoding="utf-8")
     html = room.replace("/*__INDEX__*/null", json.dumps(index, ensure_ascii=False)).replace("/*__VFX__*/null", json.dumps(load_vfx())).replace("/*__AUDIO__*/", audio)
