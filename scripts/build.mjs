@@ -208,7 +208,7 @@ await build({ ...common, entryPoints: ['src/game/action/engine/demo.ts'], format
     startRoom[key] = `data:image/png;base64,${readFileSync(`game-pack/start-room/${key}.png`).toString('base64')}`;
   }
   const testPeople = {};
-  for (const key of ['woman_idle', 'woman_run', 'man']) {
+  for (const key of ['eileen_idle', 'eileen_walk', 'eileen_run', 'man']) {
     testPeople[key] = `data:image/png;base64,${readFileSync(`game-pack/test-people/${key}.png`).toString('base64')}`;
   }
   const hqDoor = {};

@@ -66,6 +66,8 @@ export interface HqModule {
   map(): HqMapView;
   /** 자리 주인 목소리 한 줄 (가까이 가면 말풍선). 사람 그림은 아직 없으니 목소리로만 */
   bark(place: PlaceId): Line | null;
+  /** B3 주차장 승합차 앞 E: 출동 준비가 됐으면 출발하고 null, 아니면 자막 한 줄 */
+  depart(): string | null;
   /** 시험용 */
   readonly state: HqSave;
 }
@@ -101,6 +103,8 @@ export function createHq(): HqModule {
   let pending: MissionLaunch | null = null;
   let cards: MissionCard[] = [];
   let selMission: string | null = null;
+  /** 걷는 본부: 잼트리 자리에서 출동 준비 → B3 승합차에서 출발 (사용자 2026-10-25) */
+  let armed: { mission: string; seed: number } | null = null;
   let slotList: { slot: number; title: string; summary: string; savedAt: number }[] = [];
   let pickSlot = 0;
   let walk = true;
@@ -364,7 +368,7 @@ ${can.ok ? '' : `<p class="hq-warn">${esc(can.why)}</p>`}</div>
     const st = statsFor(s, s.selected);
     const kit = `<p class="hq-kit gk-font">${esc(AGENT_BY_ID[s.selected].name)} 체력 ${st.hp}${s.agents[s.selected].fatigue ? ` · 피로 ${s.agents[s.selected].fatigue}` : ''} · ${s.loadout.map((x) => (x ? `${esc(itemName(x.id))}×${x.n}` : '')).filter(Boolean).join(' ') || '아이템 없음'}${s.coffee ? ` · ${esc(COFFEES.find((x) => x.id === s.coffee)?.name ?? '')}` : ''}</p>${can.ok ? '' : `<p class="hq-warn">${esc(can.why)}</p>`}`;
     const j = ls.find((l) => l.who === '잼트리') ?? ls[0];
-    return talkBox(j?.who ?? '잼트리', ls.filter((l) => l.who === (j?.who ?? '잼트리')).map((l) => l.text).join(' ') || m.title, `<button class="gk-btn hq-choice primary on" data-act="deploy" ${can.ok ? '' : 'disabled'}>출동</button><button class="gk-btn hq-choice" data-go="supply">정비실 먼저</button><button class="gk-btn hq-choice" data-act="close">다시 고를게</button>`, kit);
+    return talkBox(j?.who ?? '잼트리', ls.filter((l) => l.who === (j?.who ?? '잼트리')).map((l) => l.text).join(' ') || m.title, `<button class="gk-btn hq-choice primary on" data-act="deploy" ${can.ok ? '' : 'disabled'}>${!walk ? '출동 준비 (B3 승합차)' : '출동'}</button><button class="gk-btn hq-choice" data-go="supply">정비실 먼저</button><button class="gk-btn hq-choice" data-act="close">다시 고를게</button>`, kit);
   };
   // 정산: 본부 장면 위 대화창 (말한 사람 얼굴 + 큰 글씨 결과 몇 줄 + 확인)
   const settleTalk = () => {
@@ -513,6 +517,16 @@ ${can.ok ? '' : `<p class="hq-warn">${esc(can.why)}</p>`}</div>
         notice = '';
         return render();
       case 'deploy': {
+        if (!walk) {
+          const can = canDeploy(s, s.selected);
+          if (!can.ok) return say(can.why);
+          armed = { mission: selMission!, seed: pendingSeed };
+          overlay = null;
+          panel = null;
+          notice = '';
+          render();
+          return closeOne();
+        }
         const l = launch(s, selMission!, pendingSeed);
         if (typeof l === 'string') return say(l);
         pending = l;
@@ -655,6 +669,22 @@ ${can.ok ? '' : `<p class="hq-warn">${esc(can.why)}</p>`}</div>
       s.x = PLACE_BY_ID[id].x + PLACE_BY_ID[id].w / 2;
       void save();
       render();
+    },
+    depart() {
+      if (!loaded) return null;
+      if (!armed) return '출동 차량이다. 임무는 3층 종합대응팀 잼트리 자리에서 받는다.';
+      const l = launch(s, armed.mission, armed.seed);
+      if (typeof l === 'string') return l;
+      armed = null;
+      pending = l;
+      overlay = null;
+      panel = null;
+      void save();
+      render();
+      if (walk) wrap!.hidden = true;
+      evacJust = false;
+      host?.deploy(l);
+      return null;
     },
     openMenu() {
       overlay = 'menu';

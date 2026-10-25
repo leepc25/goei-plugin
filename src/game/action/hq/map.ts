@@ -9,8 +9,8 @@ import { ROOMS, mirror, type Room, type RoomFix } from './rooms';
 import { PAINTED, doorX } from './painted';
 
 export type SceneId =
-  | 'street' | 'pasta' | 'lobby' | 'admin' | 'swat' | 'f2' | 'f3' | 'office' | 'interview' | 'lounge' | 'wc'
-  | 'b1' | 'training' | 'bath' | 'clinic' | 'b2' | 'b3' | 'lab' | 'tooth';
+  | 'street' | 'pasta' | 'lobby' | 'swat' | 'f2' | 'f3' | 'office' | 'interview' | 'lounge' | 'wc' | 'wc3'
+  | 'b1' | 'edu' | 'training' | 'clinic' | 'b2' | 'b3' | 'tooth';
 
 export type DoorKind = 'main' | 'door' | 'glass' | 'steel' | 'security' | 'elevator' | 'stairs_up' | 'stairs_down' | 'stairs' | 'shop' | 'slide' | 'cell' | 'exit';
 export interface HqDoor {
@@ -29,6 +29,8 @@ export interface HqDoor {
   place?: PlaceId;
   /** 늘 잠긴 문 */
   locked?: boolean;
+  /** 방 이름: 지상 표찰·엘리베이터 앞 화살표 안내 */
+  label?: string;
   /** 계단 문: 위층·아래층 장면 (같은 장면의 stairs 문으로 나온다) */
   up?: SceneId;
   down?: SceneId;
@@ -49,6 +51,8 @@ export interface HqSpot {
   seat?: { x: number; y: number };
   /** E를 누르면 자막 한 줄 */
   say?: string;
+  /** 출동 차량: 출동 준비가 됐으면 출발 */
+  depart?: boolean;
 }
 /** 바닥 위 상자 (집기). x = 가운데, y = 앞 모서리(바닥에 닿는 선), d = 뒤로 깊이, h = 높이. 모두 화면 px */
 export interface HqBox {
@@ -147,23 +151,36 @@ export const HQ_SCENES: HqScene[] = [
     spots: [{ id: 'table', x: 680, place: 'pasta', who: '전원', verb: '회식' }],
     things: [{ kind: 'long_table', x: 680, w: 520, h: 90 }, { kind: 'kitchen_window', x: 1050, w: 220, h: 120, wall: true }],
   },
-  // ── 층 복도는 확정 배경 그림 6장 (hq/painted.ts). 문 배치는 그림의 문 순서대로 (서→동) ──
+  // ── 층 복도는 확정 배경 그림 6장 (hq/painted.ts). 문은 그림의 문 순서대로 (서→동). 사용자 배치 2026-10-25 ──
   floorHall('lobby', '1층 로비', '1F', [
-    { id: 'main', kind: 'glass', to: 'street', toDoor: 'main' },
+    { id: 'main', kind: 'glass', to: 'street', toDoor: 'main', label: '현관' },
     { id: 'elev', kind: 'elevator' },
-    { id: 'stairs', kind: 'stairs', up: 'f2', down: 'b1' },
+    { id: 'stairs', kind: 'stairs', up: 'f2', down: 'b1', label: '계단' },
   ]),
   floorHall('f2', '2층', '2F', [
-    { id: 'wc', kind: 'door', locked: true },
-    { id: 'office', kind: 'glass', to: 'office', toDoor: 'out' },
+    { id: 'wc', kind: 'door', to: 'wc', toDoor: 'out', label: '화장실' },
+    { id: 'swat', kind: 'glass', to: 'swat', toDoor: 'out', label: '진압팀' },
     { id: 'elev', kind: 'elevator' },
-    { id: 'chief', kind: 'door', place: 'chief' },
-    { id: 'lounge', kind: 'door', to: 'lounge', toDoor: 'out' },
-    { id: 'stairs', kind: 'stairs', up: 'f3', down: 'lobby' },
+    { id: 'meeting', kind: 'door', locked: true, label: '회의실' },
+    { id: 'interview', kind: 'door', to: 'interview', toDoor: 'out', needs: 'interview', label: '면담실' },
+    { id: 'stairs', kind: 'stairs', up: 'f3', down: 'lobby', label: '계단' },
   ]),
+  room({ id: 'wc', name: '화장실', floor: '2F', look: 'life', doors: [exitS('f2', 'wc', 'wc', true)] }, 'wc', true),
+  room({ id: 'swat', name: '진압팀', floor: '2F', look: 'office', doors: [exitS('f2', 'swat', 'swat', true)] }, 'swat', true),
+  room({ id: 'interview', name: '면담실', floor: '2F', look: 'life', doors: [exitS('f2', 'interview', 'interview')] }, 'interview'),
+  floorHall('f3', '3층', '3F', [
+    { id: 'wc', kind: 'door', to: 'wc3', toDoor: 'out', label: '화장실' },
+    { id: 'pantry', kind: 'door', place: 'pantry', label: '탕비실' },
+    { id: 'lounge', kind: 'door', to: 'lounge', toDoor: 'out', label: '휴게실' },
+    { id: 'elev', kind: 'elevator' },
+    { id: 'office', kind: 'glass', to: 'office', toDoor: 'out', label: '종합대응팀' },
+    { id: 'stairs', kind: 'stairs', down: 'f2', label: '계단' },
+  ]),
+  room({ id: 'wc3', name: '화장실', floor: '3F', look: 'life', doors: [exitS('f3', 'wc', 'wc', true)] }, 'wc', true),
+  room({ id: 'lounge', name: '휴게실', floor: '3F', look: 'life', doors: [exitS('f3', 'lounge', 'lounge')] }, 'lounge'),
   {
-    id: 'office', name: '종합대응팀', floor: '2F', look: 'office', length: 1280, lane: [430, 690],
-    doors: [{ id: 'out', side: 'N', x: 1084, kind: 'door', to: 'f2', toDoor: 'office' }],
+    id: 'office', name: '종합대응팀', floor: '3F', look: 'office', length: 1280, lane: [430, 690],
+    doors: [{ id: 'out', side: 'N', x: 1084, kind: 'door', to: 'f3', toDoor: 'office' }],
     boxes: [
       { kind: 'desk', x: 420, y: 520, w: 260, d: 60, h: 140, solid: true },
       { kind: 'chair', x: 245, y: 512, w: 105, d: 45, h: 190, solid: true },
@@ -176,39 +193,30 @@ export const HQ_SCENES: HqScene[] = [
       { id: 'chief', x: 800, y: 470, place: 'chief', verb: '결재' },
     ],
   },
-  room({ id: 'lounge', name: '휴게실', floor: '2F', look: 'life', doors: [exitS('f2', 'lounge', 'lounge')] }, 'lounge'),
-  floorHall('f3', '3층', '3F', [
-    { id: 'wc', kind: 'door', locked: true },
-    { id: 'interview', kind: 'door', to: 'interview', toDoor: 'out', needs: 'interview' },
-    { id: 'spare', kind: 'door', locked: true },
-    { id: 'elev', kind: 'elevator' },
-    { id: 'supply', kind: 'glass', place: 'supply' },
-    { id: 'stairs', kind: 'stairs', down: 'f2' },
-  ]),
-  room({ id: 'interview', name: '면담실', floor: '3F', look: 'life', doors: [exitS('f3', 'interview', 'interview')] }, 'interview'),
   floorHall('b1', '지하 1층', 'B1', [
-    { id: 'clinic', kind: 'door', to: 'clinic', toDoor: 'out' },
-    { id: 'training', kind: 'steel', to: 'training', toDoor: 'out', needs: 'training' },
+    { id: 'edu', kind: 'door', to: 'edu', toDoor: 'out', label: '교육장' },
+    { id: 'training', kind: 'steel', to: 'training', toDoor: 'out', needs: 'training', label: '훈련장' },
     { id: 'elev', kind: 'elevator' },
-    { id: 'appraisal', kind: 'door', place: 'appraisal' },
-    { id: 'bath', kind: 'door', locked: true },
-    { id: 'stairs', kind: 'stairs', up: 'lobby', down: 'b2' },
+    { id: 'shower_m', kind: 'door', locked: true, label: '샤워실(남)' },
+    { id: 'shower_f', kind: 'door', locked: true, label: '샤워실(여)' },
+    { id: 'stairs', kind: 'stairs', up: 'lobby', label: '계단' },
   ]),
-  room({ id: 'clinic', name: '의무실', floor: 'B1', look: 'lab', doors: [exitS('b1', 'clinic', 'clinic', true)] }, 'clinic', true),
+  room({ id: 'edu', name: '교육장', floor: 'B1', look: 'office', doors: [exitS('b1', 'edu', 'edu', true)] }, 'edu', true),
   room({ id: 'training', name: '훈련장', floor: 'B1', look: 'lab', doors: [exitS('b1', 'training', 'training')] }, 'training'),
   floorHall('b2', '격리 구역', 'B2', [
-    { id: 'tooth', kind: 'steel', to: 'tooth', toDoor: 'out', needs: 'tooth' },
-    { id: 'gallery', kind: 'cell', place: 'gallery' },
+    { id: 'interrogation', kind: 'steel', locked: true, label: '심문실' },
+    { id: 'isolation', kind: 'cell', to: 'tooth', toDoor: 'out', needs: 'tooth', label: '격리실' },
     { id: 'elev', kind: 'elevator' },
-    { id: 'lab', kind: 'slide', to: 'lab', toDoor: 'out' },
-    { id: 'stairs', kind: 'stairs', up: 'b1' },
+    { id: 'clinic', kind: 'slide', to: 'clinic', toDoor: 'out', label: '의무실·연구실' },
+    { id: 'archive', kind: 'steel', locked: true, label: '창고·서고' },
   ]),
-  room({ id: 'lab', name: '격리 실험실', floor: 'B2', look: 'lab', doors: [exitS('b2', 'lab', 'lab', true)] }, 'lab', true),
-  room({ id: 'tooth', name: '이빨 요정 격리실', floor: 'B2', look: 'lab', doors: [exitS('b2', 'tooth', 'tooth')] }, 'tooth'),
+  // 의무실 겸 실험실: 의무실(침대) + 격리 연구실(연구·감정)을 한 방으로. 장비 보급은 B3 보급실로 옮김
+  { ...room({ id: 'clinic', name: '의무실·연구실', floor: 'B2', look: 'lab', doors: [] }, 'medlab'), doors: [exitS('b2', 'clinic', 'medlab')] },
+  room({ id: 'tooth', name: '격리실', floor: 'B2', look: 'lab', doors: [exitS('b2', 'isolation', 'tooth')] }, 'tooth'),
   floorHall('b3', '지하 주차장', 'B3', [
-    { id: 'guard', kind: 'steel', locked: true },
+    { id: 'supply', kind: 'steel', place: 'supply', label: '보급실' },
     { id: 'elev', kind: 'elevator' },
-  ], { spots: [{ id: 'van', x: 370, y: LANE_TOP + 24, verb: '승합차', say: '출동 차량이다. 임무는 2층 사무실 잼트리 자리에서 받는다.' }] }),
+  ], { spots: [{ id: 'van', x: 370, y: LANE_TOP + 24, verb: '출동', depart: true }] }),
 ];
 export const SCENE_BY_ID = Object.fromEntries(HQ_SCENES.map((s) => [s.id, s])) as Record<SceneId, HqScene>;
 

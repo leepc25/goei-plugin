@@ -37,13 +37,13 @@ test('본부: 사무실은 북쪽 출구, 나머지 방은 아래 출구로 복�
   }
 });
 
-test('본부: 층마다 엘리베이터, 계단은 위아래 층의 계단으로 (주차장은 엘리베이터만)', () => {
+test('본부: 층마다 엘리베이터, 계단은 3층~B1 위아래 층의 계단으로 (B2·B3는 엘리베이터만)', () => {
   for (const id of HALLS) {
     const sc = byId[id];
     assert.ok(sc.doors.some((d) => d.kind === 'elevator'), `${id} 엘리베이터`);
     assert.ok(M.ELEVATOR.some((e) => e.scene === id), `${id} 엘리베이터 단추`);
     const st = sc.doors.find((d) => d.kind === 'stairs');
-    if (id === 'b3') { assert.ok(!st, '주차장 계단 없음'); continue; }
+    if (id === 'b2' || id === 'b3') { assert.ok(!st, `${id} 계단 없음`); continue; }
     assert.ok(st, `${id} 계단`);
     for (const to of [st.up, st.down].filter(Boolean)) {
       const back = byId[to].doors.find((d) => d.kind === 'stairs');

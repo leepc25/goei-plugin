@@ -91,18 +91,26 @@ try {
   await page.waitForFunction(() => window.__goeiEngine.inHub && window.__goeiEngine.world);
   await page.waitForTimeout(300);
   await S(page, 'pc-hq');
-  await page.evaluate(() => { const w = window.__goeiEngine.world; const d = w.props.find((q) => q.id === 'spot:jaemtri'); w.player.x = d.x; });
+  // 자리 소품은 손이 닿을 때만 생긴다: 지도의 자리 좌표로 옮긴다
+  await page.evaluate(() => { const w = window.__goeiEngine.world; const sp = w.stage.current().spots.find((q) => q.id === 'jaemtri'); w.player.x = sp.x; w.player.y = sp.y; });
   await page.waitForTimeout(100);
   await page.keyboard.press('KeyE');
   // 자리 주인과 대화창이 먼저 열린다 (NPC 자유 대화). E 한 번 더 = 원래 창구
-  await page.waitForSelector('.gnp:not([hidden])');
-  await page.keyboard.press('KeyE');
+  // (본편 연결이 있으면 자리 주인 대화창이 먼저 뜬다: 그때만 E 한 번 더)
+  await page.waitForSelector('.gnp:not([hidden]), [data-mission]', { state: 'visible' });
+  if (await page.locator('.gnp:not([hidden])').count()) await page.keyboard.press('KeyE');
   await page.waitForSelector('[data-mission]', { state: 'visible' });
   await S(page, 'pc-hq-panel');
   await page.click('[data-mission]');
   await page.click('[data-act=brief]');
   await page.waitForSelector('[data-act=deploy]');
   await page.click('[data-act=deploy]');
+  // 출동 준비 → B3 주차장 승합차 앞에서 E (사용자 2026-10-25)
+  await page.waitForFunction(() => !document.querySelector('[data-act=deploy]'));
+  await page.evaluate(() => window.__goeiEngine.world.stage.jump('b3', 370, 444));
+  await page.waitForFunction(() => window.__goeiEngine.world?.floor?.id === 'hq:b3' && window.__goeiEngine.world.props.some((q) => q.id === 'spot:van'));
+  await page.waitForTimeout(300);
+  await page.keyboard.press('KeyE');
   await page.waitForFunction(() => window.__goeiEngine.world);
   await page.waitForTimeout(300);
   // 자동 진행: 오른쪽으로 걸으며 계속 때림 (훈련장 끝까지)

@@ -1,26 +1,28 @@
 // 필드 시험용 사람 그림 (game-pack/test-people, 사용자가 PixelLab에서 만든 Test woman·Test man 128×256).
-// 주인공 = 여자: 서 있으면 남동(south-east) 그림, 움직이면 남동 달리기 8장(걷기도 달리기로). 왼쪽은 좌우 뒤집기.
+// 주인공 = 에일린(2026-10-25 사용자 지시, agent-motion-set 동작 3판): 대기 남동 4장, 걷기·뛰기 동쪽 8장. 왼쪽은 좌우 뒤집기.
+// (옛 Test woman 그림은 팩에 남아 있지만 쓰지 않는다)
 // 남자 = 사무실에 서 있기만 한다(동쪽 그림, 4방향 캐릭터라 대각선이 없다).
 // 크기: 원본 1도트 = 맨 앞 화면 1.5px, 원근은 다른 요원과 같다.
 import { snapTo, spr } from '../engine/view';
 
 const SCALE = 1.5;
 const RUN_MS = 85;
-type Art = { idle: HTMLImageElement; run: HTMLImageElement; man: HTMLImageElement };
+type Art = { idle: HTMLImageElement; walk: HTMLImageElement; run: HTMLImageElement; man: HTMLImageElement };
 let art: Art | null = null;
 let revision = 0;
 declare global { interface Window { __GOEI_TEST_PEOPLE__?: Record<string, string> } }
 
 /** 그림별 발 기준점(원본 px): 서 있기 128×256 캔버스, 달리기 256×256 캔버스 */
-const IDLE = { w: 128, h: 256, fx: 61, fy: 249, head: 18 };
-const RUN = { w: 256, h: 256, fx: 128, fy: 234 };
+const IDLE = { w: 128, h: 256, fx: 55, fy: 248, head: 14, n: 4, ms: 240 };
+const WALK = { w: 256, h: 256, fx: 117, fy: 248, n: 8, ms: 110 };
+const RUN = { w: 256, h: 256, fx: 120, fy: 248, n: 8, ms: RUN_MS };
 const MAN = { w: 128, h: 256, fx: 66, fy: 249, head: 8 };
 
 export function prepareTestPeople(urlOf?: (file: string) => Promise<string>) {
   const own = ++revision;
   art = null;
-  const ready = Promise.all((['idle', 'run', 'man'] as const).map(async (key) => {
-    const file = key === 'man' ? 'man' : `woman_${key}`;
+  const ready = Promise.all((['idle', 'walk', 'run', 'man'] as const).map(async (key) => {
+    const file = key === 'man' ? 'man' : `eileen_${key}`;
     const src = window.__GOEI_TEST_PEOPLE__?.[file] || (urlOf ? await urlOf(file + '.png') : '');
     if (!src) throw new Error('no test art');
     const im = new Image(); im.src = src; await im.decode();
@@ -38,8 +40,8 @@ function shadow(c: CanvasRenderingContext2D, x: number, y: number, k: number) {
   c.fill();
 }
 
-/** 주인공(여자). moving이면 달리기. x,y = 발 가운데(월드), dir 1 = 오른쪽 */
-export function drawTestPlayer(c: CanvasRenderingContext2D, moving: boolean, x: number, y: number, dir: 1 | -1): boolean {
+/** 주인공(에일린). clip에 run이 있으면 뛰기, walk면 걷기, 아니면 대기. x,y = 발 가운데(월드), dir 1 = 오른쪽 */
+export function drawTestPlayer(c: CanvasRenderingContext2D, clip: string, x: number, y: number, dir: 1 | -1): boolean {
   if (!art) return false;
   const P = SCALE * spr(y);
   c.save();
@@ -47,10 +49,9 @@ export function drawTestPlayer(c: CanvasRenderingContext2D, moving: boolean, x: 
   shadow(c, x, y, P);
   snapTo(c, x, y);
   if (dir < 0) c.scale(-1, 1);
-  if (moving) {
-    const f = Math.floor(performance.now() / RUN_MS) % 8;
-    c.drawImage(art.run, f * RUN.w, 0, RUN.w, RUN.h, -RUN.fx * P, -RUN.fy * P, RUN.w * P, RUN.h * P);
-  } else c.drawImage(art.idle, 0, 0, IDLE.w, IDLE.h, -IDLE.fx * P, -IDLE.fy * P, IDLE.w * P, IDLE.h * P);
+  const [im, S] = /run/.test(clip) ? [art.run, RUN] : /walk/.test(clip) ? [art.walk, WALK] : [art.idle, IDLE];
+  const f = Math.floor(performance.now() / S.ms) % S.n;
+  c.drawImage(im, f * S.w, 0, S.w, S.h, -S.fx * P, -S.fy * P, S.w * P, S.h * P);
   c.restore();
   return true;
 }

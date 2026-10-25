@@ -4,14 +4,14 @@
 // 문은 열리는 그림이 나온 뒤 잠깐 암전, 엘리베이터는 층 단추, 자리 앞 E는 본부 메뉴 창 또는 그 자리 동작.
 // 집기는 바닥 위 상자(앞면 + 윗면)로 몸과 깊이 순서로 섞여 그려지고, 몸은 상자를 뚫고 지나가지 못한다.
 // 방 그림(GPT 전체 그림 + 앞 레이어)이 오기 전까지는 같은 자리·크기의 색 상자로 그린다.
-// 화면에 방 이름·층·잠김 이유 같은 글씨를 쓰지 않는다.
+// 화면 글씨: 그림 층의 지상 표찰(2·3층)·엘리베이터 앞 방향 안내·잠긴 문 「잠겨 있다」만 (사용자 2026-10-25). 그 밖의 방 이름·층·잠김 이유는 쓰지 않는다.
 import type { Player } from './player';
 import type { FloorPlan, StageApi, StageModule, WorldView } from './contract';
 import { SCREEN_H, SCREEN_W } from './contract';
 import { HQ_PLACE, drawFloor, drawHqWall, drawPropArt, drawHqTextureWall } from '../art/bg';
 import { drawStartRoom, drawStartRoomFurniture } from '../art/startRoom';
 import { drawHqDoorRound2 } from '../art/hqDoorRound2';
-import { drawHqField, drawHqFieldLight, drawHqFieldObject, hasHqField } from '../art/hqField';
+import { drawHqField, drawHqFieldLight, drawHqFieldObject, drawHqGuide, drawHqSigns, hasHqField } from '../art/hqField';
 import { drawVisitAgent, visitAgentTop } from '../art/visitAgents';
 import { drawTestMan, hasTestPeople, testManTop, testPlayerTop } from '../art/testPeople';
 import { persp, view as fieldView } from './view';
@@ -41,6 +41,8 @@ export interface HubHost {
   overlay?(c: CanvasRenderingContext2D, people: { name: string; x: number; y: number; top: number }[], player: { name: string; x: number; y: number; top: number }): void;
   /** 필드 시각 (시, 0~24). 없으면 시간대 조명은 기기 시계 */
   hour?(): number | null;
+  /** 출동 차량 앞 E: 출발했으면 null, 아니면 자막 한 줄 */
+  depart?(): string | null;
 }
 
 const TOP = 440;
@@ -132,7 +134,11 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
         .concat(man ? [{ y: man.y, x0: man.x - 60, x1: man.x + 60, occludedSilhouette: false, draw: (c: CanvasRenderingContext2D) => { drawTestMan(c, man.x, man.y, -1); } }] : []),
       drawBackground(c: CanvasRenderingContext2D, camX: number) {
         if (sc.id === 'office' && drawStartRoom(c, openOf('out'))) return;
-        if (sc.painted && drawHqField(c, sc.painted, camX, doorFx)) return;
+        if (sc.painted && drawHqField(c, sc.painted, camX, doorFx)) {
+          // 표찰은 지상 사무 층(2·3층)만 (사용자 2026-10-25)
+          if (sc.floor === '2F' || sc.floor === '3F') drawHqSigns(c, sc.painted, sc.doors);
+          return;
+        }
         if (sc.legacy) {
           const cov = drawHqWall(c, place, sc.id, len, TOP, sc.doors);
           artDoors = cov ?? new Set();
@@ -167,6 +173,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
         const age = (now - enterTick) / (1000 / 30);
         if (!sc.legacy) for (const d of sc.doors) if (isS(d)) drawExitLintel(c, d, camX);
         if (sc.painted) drawHqFieldLight(c, sc.painted, camX, host.hour?.() ?? null, now);
+        if (sc.painted) drawHqGuide(c, sc.painted, sc.doors, w.player.x, now);
         // 주인공 그림은 쟈알디 그림이라 머리 높이도 쟈알디 기준
         // 말풍선·이름표는 화면 px 그대로 (필드 zoom을 되돌려 글자 도트가 고르게). top은 원근까지 곱한 화면 px
         const z = fieldView.zoom;
@@ -286,6 +293,11 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
         if (!s?.open) return;
         if (s.place) return host.openPlace(s.place);
         if (s.say) return a.world.say(s.say, 3);
+        if (s.depart) {
+          const m = host.depart?.();
+          if (m) a.world.say(m, 3);
+          return;
+        }
         if (s.seat && s.act?.[0]) {
           const exit = clearSpot(s.x, s.y ?? a.world.player.y, solids, scene.lane ?? LANE);
           (a.world.player as Player).sit(s.act[0], s.seat.x, s.seat.y, s.face ?? 1, exit);

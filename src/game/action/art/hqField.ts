@@ -98,29 +98,36 @@ function drawDoor(c: CanvasRenderingContext2D, im: HTMLImageElement, d: PaintedD
     return;
   }
   drawBehind(c, im, d);
-  const leaf = (sx: number, sw: number, dx: number, dw: number, shade: number) => {
+  /** edge = 움직이는 쪽 끝(-1 왼쪽, 1 오른쪽): 문짝 두께 선을 그어 열리는 게 보이게 */
+  const leaf = (sx: number, sw: number, dx: number, dw: number, shade: number, edge: -1 | 0 | 1 = 0) => {
     if (dw < 1) return;
     c.drawImage(im, sx, d.y0, sw, h, dx, d.y0, dw, h);
     if (shade > 0) { c.fillStyle = `rgba(10,12,16,${shade})`; c.fillRect(dx, d.y0, dw, h); }
+    if (edge && e > 0.02) {
+      const ex = edge > 0 ? dx + dw : dx;
+      const t = Math.max(2, Math.round(7 * e));
+      c.fillStyle = 'rgba(20,22,26,0.9)'; c.fillRect(edge > 0 ? ex : ex - t, d.y0, t, h);
+      c.fillStyle = 'rgba(220,226,232,0.55)'; c.fillRect(edge > 0 ? ex + t - 1 : ex - t, d.y0, 1, h);
+    }
   };
   const e = open * open * (3 - 2 * open); // 부드럽게
   switch (d.anim) {
     case 'slide2': {
       const s = d.seam ?? (d.x0 + d.x1) / 2, lw = s - d.x0, rw = d.x1 - s;
-      leaf(d.x0, lw, d.x0 - lw * e, lw, 0);
-      leaf(s, rw, s + rw * e, rw, 0);
+      leaf(d.x0, lw, d.x0 - lw * e, lw, 0, 1);
+      leaf(s, rw, s + rw * e, rw, 0, -1);
       break;
     }
     case 'swing': {
       // 여닫이: 경첩 쪽으로 접히며(폭이 줄며) 어두워진다
       const vw = w * (1 - 0.86 * e);
-      leaf(d.x0, w, d.hinge === 'L' ? d.x0 : d.x1 - vw, vw, 0.45 * e);
+      leaf(d.x0, w, d.hinge === 'L' ? d.x0 : d.x1 - vw, vw, 0.45 * e, d.hinge === 'L' ? 1 : -1);
       break;
     }
     case 'swing2': {
       const s = d.seam ?? (d.x0 + d.x1) / 2, lw = s - d.x0, rw = d.x1 - s;
-      leaf(d.x0, lw, d.x0, lw * (1 - 0.86 * e), 0.45 * e);
-      leaf(s, rw, d.x1 - rw * (1 - 0.86 * e), rw * (1 - 0.86 * e), 0.45 * e);
+      leaf(d.x0, lw, d.x0, lw * (1 - 0.86 * e), 0.45 * e, 1);
+      leaf(s, rw, d.x1 - rw * (1 - 0.86 * e), rw * (1 - 0.86 * e), 0.45 * e, -1);
       break;
     }
     case 'shutter': {
@@ -148,15 +155,15 @@ export function drawHqFieldObject(c: CanvasRenderingContext2D, scene: string, id
 
 type Key = { h: number; tint: [number, number, number, number]; win: [number, number, number, number]; lamp: number };
 // tint = 곱하기 색과 세기, win = 창 바깥 덮는 색, lamp = 등 빛 세기
-const NIGHT: Key = { h: 0, tint: [52, 62, 120, 0.5], win: [6, 10, 30, 0.9], lamp: 1 };
+const NIGHT: Key = { h: 0, tint: [40, 52, 110, 0.62], win: [10, 14, 40, 0.92], lamp: 1 };
 const KEYS: Key[] = [
   NIGHT,
   { ...NIGHT, h: 4.5 },
-  { h: 6, tint: [150, 135, 200, 0.32], win: [150, 120, 185, 0.6], lamp: 0.65 }, // 새벽
+  { h: 6, tint: [120, 112, 190, 0.45], win: [120, 100, 175, 0.7], lamp: 0.75 }, // 새벽
   { h: 7.5, tint: [255, 255, 255, 0], win: [0, 0, 0, 0], lamp: 0 },
   { h: 16.5, tint: [255, 255, 255, 0], win: [0, 0, 0, 0], lamp: 0 },
   { h: 18, tint: [255, 150, 95, 0.3], win: [255, 115, 55, 0.5], lamp: 0.45 }, // 저녁 노을
-  { h: 19.5, tint: [70, 70, 125, 0.45], win: [22, 20, 52, 0.82], lamp: 0.9 },
+  { h: 19.5, tint: [62, 62, 120, 0.55], win: [24, 22, 56, 0.86], lamp: 0.95 },
   { ...NIGHT, h: 24 },
 ];
 const TOD_CYCLE: (number | null)[] = [null, 5.8, 12, 18, 23];
@@ -203,8 +210,26 @@ export function drawHqFieldLight(c: CanvasRenderingContext2D, scene: string, cam
     c.fillRect(x0, 0, W, H);
     c.globalCompositeOperation = 'source-over';
     if (!p.under && k.win[3] > 0.005) {
-      c.fillStyle = `rgba(${k.win[0] | 0},${k.win[1] | 0},${k.win[2] | 0},${k.win[3]})`;
+      // 창 바깥: 한 번 더 곱해 하늘색을 바꾼다 (틀·건물 윤곽은 남는다)
+      const wm = (v: number) => Math.round(255 + (v - 255) * k.win[3]);
+      c.globalCompositeOperation = 'multiply';
+      c.fillStyle = `rgb(${wm(k.win[0])},${wm(k.win[1])},${wm(k.win[2])})`;
       for (const [wx0, wy0, wx1, wy1] of p.windows) c.fillRect(wx0, wy0, wx1 - wx0, wy1 - wy0);
+      c.globalCompositeOperation = 'source-over';
+      // 어두우면 바깥 건물 창에 불이 켜진다 (자리 고정, 몇 개는 천천히 깜빡)
+      const lit = Math.max(0, (k.win[3] - 0.5) / 0.4);
+      if (lit > 0) {
+        for (const [wx0, wy0, wx1, wy1] of p.windows) {
+          for (let i = 0; i < (wx1 - wx0) / 9; i++) {
+            const r = Math.sin(i * 127.1 + wx0 * 3.7) * 43758.5453, f = r - Math.floor(r);
+            if (f > 0.42) continue;
+            const x = wx0 + Math.floor(f * 997) % (wx1 - wx0 - 4), y = wy0 + 8 + Math.floor(f * 7919) % Math.max(1, wy1 - wy0 - 16);
+            const on = f < 0.05 ? 0.5 + 0.5 * Math.sin(now / 1700 + i) : 1;
+            c.fillStyle = `rgba(255,${200 + Math.floor(f * 100)},120,${0.75 * lit * on})`;
+            c.fillRect(x, y, 3, 3);
+          }
+        }
+      }
     }
   }
   // 등 빛: 어두울수록 또렷하게 (낮에도 깜빡이는 등은 늘)
@@ -214,7 +239,7 @@ export function drawHqFieldLight(c: CanvasRenderingContext2D, scene: string, cam
     if (l.x < camX - 200 || l.x > camX + 1480) continue;
     if (l.blink) { drawBlink(c, l, now); continue; }
     if (lampK <= 0.01) continue;
-    if (l.kind === 'down') glow(c, l.x, l.y + 40, l.r ?? 130, 1.9, `rgba(255,214,150,${0.32 * lampK})`);
+    if (l.kind === 'down') glow(c, l.x, l.y + 50, l.r ?? 150, 2.1, `rgba(255,210,140,${0.42 * lampK})`);
     else glow(c, l.x, l.y, l.r ?? 34, 1, hexA(l.color ?? '#ffd27a', 0.5 * lampK));
   }
   c.restore();
@@ -250,4 +275,77 @@ function drawBlink(c: CanvasRenderingContext2D, l: PaintedScene['lamps'][number]
     c.beginPath(); c.ellipse(l.x, l.y, s, s * 0.8, 0, 0, Math.PI * 2); c.fill();
     c.globalCompositeOperation = 'lighter';
   }
+}
+
+/* ───────── 표찰·엘리베이터 앞 안내 (도트 글씨) ───────── */
+
+type Labeled = { id: string; x: number; label?: string; kind: string };
+const pxFont = (n: number) => `700 ${n}px "GoeiPixel", "Galmuri11", monospace`;
+/** 그림에 이미 그려진 표지(화장실 그림 표지·계단 표지)가 있는 문은 표찰을 달지 않는다 */
+const PAINTED_SIGN = new Set(['화장실', '계단', '현관']);
+
+function plate(c: CanvasRenderingContext2D, cx: number, y: number, text: string, n = 22) {
+  c.font = pxFont(n);
+  const w = Math.ceil(c.measureText(text).width) + 20, h = n + 12;
+  const x = Math.round(cx - w / 2), yy = Math.round(y);
+  c.fillStyle = '#1b1f24'; c.fillRect(x - 2, yy - 2, w + 4, h + 4);
+  c.fillStyle = '#c9c3b4'; c.fillRect(x, yy, w, h);
+  c.fillStyle = '#2d333b'; c.fillRect(x + 2, yy + 2, w - 4, h - 4);
+  c.fillStyle = '#efe9da'; c.textAlign = 'center'; c.textBaseline = 'middle';
+  c.fillText(text, Math.round(cx), yy + Math.round(h / 2) + 1);
+}
+
+/** 지상 층 방문 위 표찰 (배경 다음, 사람 앞). 월드 좌표 */
+export function drawHqSigns(c: CanvasRenderingContext2D, scene: string, doors: Labeled[]): void {
+  const p = PAINTED[scene];
+  if (!p || !images) return;
+  c.save();
+  for (const d of doors) {
+    const pd = p.doors[d.id];
+    if (!pd || !d.label || PAINTED_SIGN.has(d.label) || d.kind === 'elevator') continue;
+    // 화면 위 목표 띠(약 y90까지)에 가리지 않게 문 윗부분에 단다
+    plate(c, (pd.x0 + pd.x1) / 2, pd.y0 + 14, d.label);
+  }
+  c.restore();
+}
+
+/** 엘리베이터 앞에 서면 양쪽 방향 안내 (← 이쪽 · 이쪽 →). near 0..1 = 나타난 정도 */
+export function drawHqGuide(c: CanvasRenderingContext2D, scene: string, doors: Labeled[], px: number, now: number): void {
+  const p = PAINTED[scene];
+  const elev = doors.find((d) => d.kind === 'elevator');
+  if (!p || !images || !elev) return;
+  const dist = Math.abs(px - elev.x);
+  const near = Math.max(0, Math.min(1, (300 - dist) / 120));
+  if (near <= 0) return;
+  const named = doors.filter((d) => d.label && d.kind !== 'elevator');
+  const west = named.filter((d) => d.x < elev.x).sort((a, b) => b.x - a.x).map((d) => d.label!);
+  const east = named.filter((d) => d.x > elev.x).sort((a, b) => a.x - b.x).map((d) => d.label!);
+  // 엘리베이터 앞 바닥 위 (벽선 바로 아래)
+  const y = 446;
+  const bob = Math.round(Math.sin(now / 260) * 2);
+  c.save();
+  c.globalAlpha = near;
+  c.font = pxFont(22);
+  const U = 3; // 화살표 도트 한 칸
+  const arrow = (tip: number, yy: number, dir: -1 | 1) => {
+    // 도트 화살표: 계단 모양 머리 + 몸통 (tip = 뾰족한 끝 x)
+    c.fillStyle = '#ffd36a';
+    for (let i = 0; i < 5; i++) c.fillRect(tip - dir * i * U - (dir > 0 ? U : 0), yy - i * U, U, (i * 2 + 1) * U);
+    c.fillRect(dir < 0 ? tip + 4 * U : tip - 10 * U, yy - U, 6 * U, 3 * U);
+  };
+  const row = (items: string[], dir: -1 | 1) => {
+    if (!items.length) return;
+    const text = items.join(' · ');
+    const tw = Math.ceil(c.measureText(text).width), w = tw + 70, h = 40;
+    const cx = elev.x + dir * (w / 2 + 70) + dir * bob;
+    const x = Math.round(cx - w / 2);
+    c.fillStyle = 'rgba(12,14,18,0.86)'; c.fillRect(x - 3, y - 3, w + 6, h + 6);
+    c.fillStyle = '#ffd36a'; c.fillRect(x, y, w, 3); c.fillRect(x, y + h - 3, w, 3);
+    c.fillStyle = '#f2ecdc'; c.textAlign = 'center'; c.textBaseline = 'middle';
+    c.fillText(text, Math.round(cx - dir * 22), y + h / 2 + 1);
+    arrow(dir < 0 ? x + 10 : x + w - 10, y + h / 2, dir);
+  };
+  row(west, -1);
+  row(east, 1);
+  c.restore();
 }

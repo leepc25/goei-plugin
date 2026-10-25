@@ -135,6 +135,19 @@ export const ROOMS: Record<string, Room> = {
     ],
     use: [{ id: 'bed', x: 3.4, y: 3.2, verb: '쉬기', place: 'clinic', act: ['bedlie', 'liehold'] }],
   },
+  // 교육장 (B1): 앞벽 화면, 줄지은 책상 (사용자 배치 2026-10-25)
+  edu: {
+    w: 12, d: 5,
+    fix: [{ x: 3, w: 6, k: 'screen' }],
+    items: [
+      { t: 'desk', x: 1.0, y: 0.6, w: 0.8, h: 0.6, H: 110, k: 'lectern' },
+      ...[3.0, 5.4, 7.8].flatMap((x): RoomItem[] => [
+        { t: 'desk', x, y: 2.0, w: 1.6, h: 0.6 }, { t: 'chair', x: x + 0.8, y: 2.9, f: 'N' },
+        { t: 'desk', x, y: 3.6, w: 1.6, h: 0.6 }, { t: 'chair', x: x + 0.8, y: 4.5, f: 'N' },
+      ]),
+    ],
+    use: [{ id: 'lectern', x: 1.4, y: 1.6, verb: '교단', face: 1, act: ['handswork'] }],
+  },
   training: {
     w: 44, d: 6,
     fix: [{ x: 4, w: 8, k: 'screen' }],
@@ -176,6 +189,18 @@ export const ROOMS: Record<string, Room> = {
     use: [{ id: 'slot', x: 3.4, y: 2.6, verb: '이빨', place: 'tooth', face: 1 }],
   },
 };
+
+/** 의무실 겸 실험실 (B2): 의무실(침대) 뒤로 격리 연구실(연구·감정)을 잇는다. 침대 자리가 맨 앞(후송 도착 자리) */
+ROOMS.medlab = (() => {
+  const a = ROOMS.clinic, b = ROOMS.lab, dx = a.w;
+  const sh = <T extends { x: number }>(o: T): T => ({ ...o, x: o.x + dx });
+  return {
+    w: a.w + b.w, d: 5,
+    fix: [...a.fix, ...b.fix.map(sh)],
+    items: [...a.items, ...b.items.map(sh)],
+    use: [...a.use, ...b.use.filter((u) => u.place !== 'supply').map(sh)],
+  };
+})();
 
 /** 좌우 뒤집기: 코어 서쪽 방은 출입문(코어 쪽)이 동쪽 끝에 온다 */
 export function mirror(r: Room): Room {
