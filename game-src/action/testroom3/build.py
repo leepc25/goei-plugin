@@ -542,13 +542,18 @@ def load_vfx():
 
 
 def main():
+    global OUT
     args = sys.argv[1:]
     force = "--all" in args
+    npc = "--npc" in args   # 일반 NPC(6.x)는 따로: out_npc/ (사용자 2026-10-25: 시연 파일 하나가 너무 커서 NPC는 별도)
+    if npc: OUT = HERE / "out_npc"
     reset = set(args[args.index("--reset") + 1:]) if "--reset" in args else set()
     CHARS.mkdir(exist_ok=True); (OUT / "chars").mkdir(parents=True, exist_ok=True)
     index = []
     for ch in roster():
-        if ch["key"] != EILEEN_KEY and not ch["state"].startswith("뽑음") and not ch["state"].startswith("완료"): continue
+        if npc:
+            if not ch["key"].startswith("6."): continue
+        elif ch["key"].startswith("6.") or (ch["key"] != EILEEN_KEY and not ch["state"].startswith("뽑음") and not ch["state"].startswith("완료")): continue
         if ch["key"] != EILEEN_KEY and not (M3 / ch["key"]).exists(): continue
         auto = auto_cfg(ch)
         if not auto["anims"]: continue
