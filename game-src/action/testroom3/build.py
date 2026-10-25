@@ -497,7 +497,14 @@ def build_char(cfg, force=False):
         gun = set(cfg.get("gun", []))
         for lid, an in cfg["anims"].items():
             fs = sorted((d / an["folder"]).glob("[0-9][0-9].png"))
-            if an.get("frames"): fs = [fs[i - 1] for i in an["frames"] if 1 <= i <= len(fs)]   # 고른 장만(1부터, 되풀이 가능)
+            if an.get("frames"):   # 고른 장만(1부터, 되풀이 가능). "3_0:4" = 다른 폴더의 장(끝 장을 전투 자세 장으로 닫을 때)
+                sel = []
+                for i in an["frames"]:
+                    if isinstance(i, str) and ":" in i:
+                        fd, fi = i.split(":"); other = sorted((d / fd).glob("[0-9][0-9].png"))
+                        if 1 <= int(fi) <= len(other): sel.append(other[int(fi) - 1])
+                    elif 1 <= i <= len(fs): sel.append(fs[i - 1])
+                fs = sel
             if not fs: continue
             ims = [Image.open(f).convert("RGBA") for f in fs]
             if an.get("mirror"): ims = [im.transpose(Image.FLIP_LEFT_RIGHT) for im in ims]
