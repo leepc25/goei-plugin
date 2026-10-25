@@ -2970,7 +2970,9 @@
  },
  "6.55_시민남2": {
   "1": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957647.9814365,
+   "result": "ok"
   },
   "13": {
    "tries": 0
@@ -2997,19 +2999,27 @@
    "tries": 0
   },
   "2": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957658.3767767,
+   "result": "ok"
   },
   "20": {
    "tries": 0
   },
   "21": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957650.5534368,
+   "result": "ok"
   },
   "28": {
-   "tries": 0
+   "tries": 1,
+   "checked": 1792957646.324467,
+   "result": "멈춤(가장 많이 바뀐 장도 0%)"
   },
   "29": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957708.1974401,
+   "result": "ok"
   },
   "3": {
    "tries": 0
@@ -3018,7 +3028,9 @@
    "tries": 0
   },
   "31": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957710.8357613,
+   "result": "ok"
   },
   "32": {
    "tries": 0
@@ -3045,7 +3057,9 @@
    "tries": 0
   },
   "3_0": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957672.553438,
+   "result": "ok"
   },
   "4": {
    "tries": 0
@@ -3066,7 +3080,9 @@
    "tries": 0
   },
   "5": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957696.2134395,
+   "result": "ok"
   },
   "9": {
    "tries": 0
@@ -5779,7 +5795,9 @@
    "result": "ok"
   },
   "42": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957143.8254066,
+   "result": "ok"
   },
   "43": {
    "tries": 0,
@@ -5814,7 +5832,9 @@
    "result": "ok"
   },
   "13": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957138.3174062,
+   "result": "ok"
   },
   "16": {
    "tries": 0,
@@ -5837,13 +5857,19 @@
    "result": "ok"
   },
   "18_2": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957143.0534065,
+   "result": "ok"
   },
   "18_3": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957250.2254128,
+   "result": "ok"
   },
   "19": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957159.2654076,
+   "result": "ok"
   },
   "2": {
    "tries": 0,
@@ -5851,7 +5877,9 @@
    "result": "ok"
   },
   "20": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957273.7214143,
+   "result": "ok"
   },
   "21": {
    "tries": 0,
@@ -5889,7 +5917,9 @@
    "result": "ok"
   },
   "33": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957118.353405,
+   "result": "ok"
   },
   "34": {
    "tries": 0,
@@ -5912,7 +5942,9 @@
    "result": "ok"
   },
   "38": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957273.3614142,
+   "result": "ok"
   },
   "39": {
    "tries": 0,
@@ -5935,16 +5967,24 @@
    "result": "ok"
   },
   "42": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957136.201406,
+   "result": "ok"
   },
   "43": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957227.7894115,
+   "result": "ok"
   },
   "44": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957165.2254078,
+   "result": "ok"
   },
   "45": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957235.801412,
+   "result": "ok"
   },
   "5": {
    "tries": 0,
@@ -5964,28 +6004,44 @@
    "result": "ok"
   },
   "13": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957233.849412,
+   "result": "ok"
   },
   "16": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957210.5574105,
+   "result": "ok"
   },
   "17": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957210.3614104,
+   "result": "ok"
   },
   "18": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957206.0694103,
+   "result": "ok"
   },
   "18_1": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957224.0374112,
+   "result": "ok"
   },
   "18_2": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957275.2334144,
+   "result": "ok"
   },
   "18_3": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957402.757422,
+   "result": "ok"
   },
   "19": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957234.649412,
+   "result": "ok"
   },
   "2": {
    "tries": 0,
@@ -5993,7 +6049,9 @@
    "result": "ok"
   },
   "20": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957436.837424,
+   "result": "ok"
   },
   "21": {
    "tries": 0,
@@ -6011,37 +6069,59 @@
    "result": "ok"
   },
   "3": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957203.39341,
+   "result": "ok"
   },
   "30": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957147.4814067,
+   "result": "ok"
   },
   "31": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957129.3334057,
+   "result": "ok"
   },
   "32": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957126.6814055,
+   "result": "ok"
   },
   "33": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957163.5214076,
+   "result": "ok"
   },
   "34": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957119.4000123,
+   "result": "ok"
   },
   "35": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957134.5322866,
+   "result": "ok"
   },
   "36": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957173.5174084,
+   "result": "ok"
   },
   "37": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957195.8894095,
+   "result": "ok"
   },
   "38": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957431.2534237,
+   "result": "ok"
   },
   "39": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957205.0654101,
+   "result": "ok"
   },
   "3_0": {
    "tries": 0,
@@ -6049,22 +6129,34 @@
    "result": "ok"
   },
   "4": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957125.4374053,
+   "result": "ok"
   },
   "41": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957182.2094088,
+   "result": "ok"
   },
   "42": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957358.6374192,
+   "result": "ok"
   },
   "43": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957417.2294228,
+   "result": "ok"
   },
   "44": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957313.9054167,
+   "result": "ok"
   },
   "45": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957385.933421,
+   "result": "ok"
   },
   "5": {
    "tries": 0,
@@ -6072,220 +6164,351 @@
    "result": "ok"
   },
   "9": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957190.1134093,
+   "result": "ok"
   }
  },
  "6.52_학생여1": {
   "1": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957143.3854065,
+   "result": "ok"
   },
   "13": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957435.8374238,
+   "result": "ok"
   },
   "16": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957331.8094177,
+   "result": "ok"
   },
   "17": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957293.216894,
+   "result": "ok"
   },
   "18": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957329.8854177,
+   "result": "ok"
   },
   "18_1": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957341.0048442,
+   "result": "ok"
   },
   "18_2": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957343.5934184,
+   "result": "ok"
   },
   "18_3": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957529.2814295,
+   "result": "ok"
   },
   "19": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957359.2134194,
+   "result": "ok"
   },
   "2": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957165.3607087,
+   "result": "ok"
   },
   "20": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957560.8014314,
+   "result": "ok"
   },
   "21": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957273.5248196,
+   "result": "ok"
   },
   "28": {
-   "tries": 0
+   "tries": 1,
+   "checked": 1792957394.4194777,
+   "result": "ok"
   },
   "29": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957262.420903,
+   "result": "ok"
   },
   "3": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957316.7094169,
+   "result": "ok"
   },
   "30": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957336.0774179,
+   "result": "ok"
   },
   "31": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957262.6494136,
+   "result": "ok"
   },
   "32": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957275.0614142,
+   "result": "ok"
   },
   "33": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957349.2925293,
+   "result": "ok"
   },
   "34": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957257.0494132,
+   "result": "ok"
   },
   "35": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957282.1214147,
+   "result": "ok"
   },
   "36": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957438.541424,
+   "result": "ok"
   },
   "37": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957377.0774205,
+   "result": "ok"
   },
   "38": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957551.785431,
+   "result": "ok"
   },
   "39": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957364.4054196,
+   "result": "ok"
   },
   "3_0": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957214.6734107,
+   "result": "ok"
   },
   "4": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957250.753413,
+   "result": "ok"
   },
   "41": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957382.6694207,
+   "result": "ok"
   },
   "42": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957549.5694306,
+   "result": "ok"
   },
   "43": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957516.2014287,
+   "result": "ok"
   },
   "44": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957423.2574232,
+   "result": "ok"
   },
   "45": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957507.1774282,
+   "result": "ok"
   },
   "5": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957270.9534142,
+   "result": "ok"
   },
   "9": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957295.5214155,
+   "result": "ok"
   }
  },
  "6.53_학생여2": {
   "1": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957346.9716616,
+   "result": "ok"
   },
   "13": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957600.9614336,
+   "result": "ok"
   },
   "16": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957514.0934286,
+   "result": "ok"
   },
   "17": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957589.657433,
+   "result": "ok"
   },
   "18": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957520.673429,
+   "result": "ok"
   },
   "18_1": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957526.7654293,
+   "result": "ok"
   },
   "18_2": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957577.0974324,
+   "result": "ok"
   },
   "18_3": {
    "tries": 0
   },
   "19": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957620.2054348,
+   "result": "ok"
   },
   "2": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957361.4237092,
+   "result": "ok"
   },
   "20": {
    "tries": 0
   },
   "21": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957490.117427,
+   "result": "ok"
   },
   "28": {
-   "tries": 0
+   "tries": 1,
+   "checked": 1792957546.8070555,
+   "result": "기계 실패",
+   "why": "멈춤(가장 많이 바뀐 장도 0%)"
   },
   "29": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957412.3073764,
+   "result": "ok"
   },
   "3": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957514.9934287,
+   "result": "ok"
   },
   "30": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957426.4534233,
+   "result": "ok"
   },
   "31": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957430.9694235,
+   "result": "ok"
   },
   "32": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957445.0814245,
+   "result": "ok"
   },
   "33": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957502.0214279,
+   "result": "ok"
   },
   "34": {
-   "tries": 0
+   "tries": 1,
+   "checked": 1792957560.9281886,
+   "result": "ok"
   },
   "35": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957443.9094243,
+   "result": "ok"
   },
   "36": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957490.0974271,
+   "result": "ok"
   },
   "37": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957489.6134272,
+   "result": "ok"
   },
   "38": {
    "tries": 0
   },
   "39": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957498.0574276,
+   "result": "ok"
   },
   "3_0": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957350.9254189,
+   "result": "ok"
   },
   "4": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957438.669424,
+   "result": "ok"
   },
   "41": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957505.825428,
+   "result": "ok"
   },
   "42": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957643.4974363,
+   "result": "ok"
   },
   "43": {
    "tries": 0
   },
   "44": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957533.2334297,
+   "result": "ok"
   },
   "45": {
    "tries": 0
   },
   "5": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957455.5454252,
+   "result": "ok"
   },
   "9": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957513.6814284,
+   "result": "ok"
   }
  },
  "6.54_시민남1": {
   "1": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957474.4414263,
+   "result": "ok"
   },
   "10": {
    "tries": 0
@@ -6294,16 +6517,24 @@
    "tries": 0
   },
   "16": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957700.3014395,
+   "result": "ok"
   },
   "17": {
-   "tries": 0
+   "tries": 1,
+   "checked": 1792957693.2854393,
+   "result": "멈춤(가장 많이 바뀐 장도 0%)"
   },
   "18": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957697.0134394,
+   "result": "ok"
   },
   "18_1": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957711.4414403,
+   "result": "ok"
   },
   "18_2": {
    "tries": 0
@@ -6315,61 +6546,94 @@
    "tries": 0
   },
   "2": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957587.201433,
+   "result": "ok"
   },
   "20": {
    "tries": 0
   },
   "21": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957619.4974349,
+   "result": "ok"
   },
   "28": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957576.3614323,
+   "result": "ok"
   },
   "29": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957568.3134317,
+   "result": "ok"
   },
   "3": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957707.12144,
+   "result": "ok"
   },
   "30": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957655.685437,
+   "result": "ok"
   },
   "31": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957583.1174326,
+   "result": "ok"
   },
   "32": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957620.585435,
+   "result": "ok"
   },
   "33": {
    "tries": 0
   },
   "34": {
-   "tries": 0
+   "tries": 1,
+   "checked": 1792957707.1657028,
+   "result": "기계 실패",
+   "why": "멈춤(가장 많이 바뀐 장도 0%)"
   },
   "35": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957617.9734347,
+   "result": "ok"
   },
   "36": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957645.5134363,
+   "result": "ok"
   },
   "37": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957665.2854376,
+   "result": "ok"
   },
   "38": {
    "tries": 0
   },
   "39": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957652.5374367,
+   "result": "ok"
   },
   "3_0": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957577.0974324,
+   "result": "ok"
   },
   "4": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957596.3174334,
+   "result": "ok"
   },
   "41": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957688.365439,
+   "result": "ok"
   },
   "42": {
    "tries": 0
@@ -6384,10 +6648,14 @@
    "tries": 0
   },
   "5": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957618.4414349,
+   "result": "ok"
   },
   "9": {
-   "tries": 0
+   "tries": 0,
+   "checked": 1792957670.7894378,
+   "result": "ok"
   }
  },
  "6.14_경찰남2": {
