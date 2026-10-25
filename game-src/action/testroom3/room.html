@@ -700,7 +700,7 @@ function onPress(a) {
   switch (a) {
     case 'jump': return jump();
     case 'light': return running && moving ? slide() : light();
-    case 'heavy': return heavy();
+    case 'heavy': return running && moving ? slide() : heavy();   // 뛰다 강공격도 돌진 공격(사용자 2026-10-25)
     case 'dodge': return dodge();
     case 'block': if (!has('17')) return; P.combat = true; P.armed = false; P.mode = 'block'; return play('17', { seq: S(R(0, nOf('17') - 1), 0.03) });
     case 'shoot': return shoot();
