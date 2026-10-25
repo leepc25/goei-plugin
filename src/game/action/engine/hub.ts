@@ -128,7 +128,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
       exitX: Infinity,
       props: [],
       encounters: [],
-      depthLayers: sc.boxes.map((b) => ({ y: b.y, occludedSilhouette: !sc.painted, // 그림 층 데스크 뒤 사람은 비치지 않게 x0: b.x - b.w / 2, x1: b.x + b.w / 2, draw: (c: CanvasRenderingContext2D) => {
+      depthLayers: sc.boxes.map((b) => ({ y: b.y, occludedSilhouette: !sc.painted, x0: b.x - b.w / 2, x1: b.x + b.w / 2, draw: (c: CanvasRenderingContext2D) => {
         if (sc.painted && hasHqField(sc.painted)) { drawHqFieldObject(c, sc.painted, b.kind); return; }
         drawBox(c, b, sc.look);
       } })).concat(people.map((p) => ({ y: p.y, x0: p.x - 60, x1: p.x + 60, occludedSilhouette: false, draw: (c: CanvasRenderingContext2D) => { drawVisitAgent(c, p.name, p.x, p.y, p.face, performance.now()); } })))
