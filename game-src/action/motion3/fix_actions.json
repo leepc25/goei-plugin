@@ -3,89 +3,27 @@
   "key": "1.1_쟈알디",
   "row": "6",
   "why": [
-   "점프인데 발이 거의 안 뜸 14px"
+   "점프인데 발이 거의 안 뜸 10px"
   ],
   "cond": "A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land.",
   "no_end": true,
   "action": "A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land. A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land. Bend knees deeply with arms pressed to the sides, then spring upward into a vertical posture with legs extended and hair rising. Descend to impact with knees bent to absorb the weight, then return to an upright stance with arms at"
  },
  {
-  "key": "1.2_스팡달",
-  "row": "6",
-  "why": [
-   "점프인데 발이 거의 안 뜸 14px"
-  ],
-  "cond": "A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land.",
-  "no_end": true,
-  "action": "A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land. A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land. Crouch deeply to touch the floor with fingertips, then explode upward into a vertical leap with legs pressed together and hands raised beside the head. Land softly on the balls of the feet, bending knees to absorb impact before re"
- },
- {
-  "key": "1.6_큐라스",
-  "row": "12",
-  "why": [
-   "몸이 커짐 ×2.0",
-   "색이 바뀜(0.51)"
-  ],
-  "cond": "Draw only the character's own body and the weapon it already holds: no motion blur, no slash trails, no smears, no flashes or effects. Keep the exact same outfit, colors, body size and proportions in every frame.",
-  "no_end": false,
-  "action": "Draw only the character's own body and the weapon it already holds: no motion blur, no slash trails, no smears, no flashes or effects. Keep the exact same outfit, colors, body size and proportions in every frame. The body stays side-on facing east (right) the whole time and never turns around. Keep the backswing short; the strike travels forward toward east (right) only, never behind the body. Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside t"
- },
- {
-  "key": "1.8_데쥬레",
-  "row": "22",
-  "why": [
-   "몸이 커짐 ×2.3",
-   "색이 바뀜(0.62)"
-  ],
-  "cond": "Draw only the character's own body and the weapon it already holds: no motion blur, no slash trails, no smears, no flashes or effects. Keep the exact same outfit, colors, body size and proportions in every frame.",
-  "no_end": false,
-  "action": "Draw only the character's own body and the weapon it already holds: no motion blur, no slash trails, no smears, no flashes or effects. Keep the exact same outfit, colors, body size and proportions in every frame. The body stays side-on facing east (right) the whole time and never turns around. Keep the backswing short; the strike travels forward toward east (right) only, never behind the body. Tuck into a tight ball with arms shielding the head, then roll backward along the floor. Momentum carri"
- },
- {
-  "key": "1.8_데쥬레",
-  "row": "33",
-  "why": [
-   "시작·끝 장 발이 뜸 15px"
-  ],
-  "cond": "Both feet stay on the same floor line at the start and at the end.",
-  "no_end": false,
-  "action": "Both feet stay on the same floor line at the start and at the end. Both feet stay on the same floor line at the start and at the end. Hop up and back off both feet with both open hands flying up beside the face and the mouth wide open in a shriek. Land while freezing momentarily with hands raised, then lower the arms to the sides and stand upright."
- },
- {
   "key": "1.8_데쥬레",
   "row": "34",
   "why": [
-   "시작·끝 장 발이 뜸 29px"
+   "시작·끝 장 발이 뜸 32px"
   ],
   "cond": "Both feet stay on the same floor line at the start and at the end.",
   "no_end": false,
   "action": "Both feet stay on the same floor line at the start and at the end. Both feet stay on the same floor line at the start and at the end. Spring upward into a high vertical leap with arms flung overhead and mouth wide open, letting the ponytails flare aloft. Land with knees deeply bent, clutching the chest tightly before relaxing the grip to stand upright with arms at the sides."
  },
  {
-  "key": "1.9_데드폴",
-  "row": "12",
-  "why": [
-   "뒤로 뻗음(앞 0 뒤 42)"
-  ],
-  "cond": "The body stays side-on facing east (right) the whole time and never turns around. Keep the backswing short; the strike travels forward toward east (right) only, never behind the body.",
-  "no_end": false,
-  "action": "The body stays side-on facing east (right) the whole time and never turns around. Keep the backswing short; the strike travels forward toward east (right) only, never behind the body. The body stays side-on facing east (right) the whole time and never turns around. Keep the backswing short; the strike travels forward toward east (right) only, never behind the body. Reach forward with both hands to grab, then drop backward while kicking the front foot high. Roll over the shoulder to land on one k"
- },
- {
-  "key": "1.10_게슈간",
-  "row": "3",
-  "why": [
-   "반복 이음 끊김 66%"
-  ],
-  "cond": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame.",
-  "no_end": false,
-  "action": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. Sink slowly on bent knees to drop the hips while the front hand closes into a tight fist at shoulder height. Rise back to the original height as the hand opens and the hair bounces slightly to settle into the initial pose."
- },
- {
   "key": "1.11_로제몬",
   "row": "34",
   "why": [
-   "시작·끝 장 발이 뜸 65px"
+   "시작·끝 장 발이 뜸 47px"
   ],
   "cond": "Both feet stay on the same floor line at the start and at the end.",
   "no_end": false,
@@ -95,7 +33,7 @@
   "key": "1.12_콘쥬스",
   "row": "11",
   "why": [
-   "뒤로 뻗음(앞 4 뒤 31)"
+   "뒤로 뻗음(앞 7 뒤 43)"
   ],
   "cond": "The body stays side-on facing west (left) the whole time and never turns around. Keep the backswing short; the strike travels forward toward west (left) only, never behind the body.",
   "no_end": false,
@@ -109,7 +47,7 @@
   ],
   "cond": "Both feet stay on the same floor line at the start and at the end.",
   "no_end": false,
-  "action": "Both feet stay on the same floor line at the start and at the end. Both feet stay on the same floor line at the start and at the end. Contract the torso to pull the belly inward while swinging the rear arm overhead. Twist the hips, then hinge the upper body forward over the front knee, lifting the rear heel as the open palm sweeps down to chest height in a firm patting motion."
+  "action": "Both feet stay on the same floor line at the start and at the end. Both feet stay on the same floor line at the start and at the end. Contract the torso to pull the belly inward while swinging the rear arm overhead. Twist the hips, hinge the upper body forward over the front knee, lift the rear heel, and sweep the open palm down to chest height in a firm patting motion."
  },
  {
   "key": "2.3_이길환",
@@ -119,283 +57,63 @@
   ],
   "cond": "Both feet stay on the same floor line at the start and at the end.",
   "no_end": false,
-  "action": "Both feet stay on the same floor line at the start and at the end. Both feet stay on the same floor line at the start and at the end. Retract the forward arm while pulling both hands inward to clasp over the abdomen. Hinge deeply at the waist to drive the head forward, stepping the rear foot up, then straighten the torso to finish with palms hovering over the belly."
+  "action": "Both feet stay on the same floor line at the start and at the end. Both feet stay on the same floor line at the start and at the end. Retract the forward arm while drawing both hands inward to clasp over the abdomen. Hinge deeply at the waist to drive the head forward, step the rear foot up, then straighten the torso to finish with palms hovering over the belly."
  },
  {
   "key": "2.5_김조학",
-  "row": "3",
-  "why": [
-   "반복 이음 끊김 50%"
-  ],
-  "cond": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame.",
-  "no_end": false,
-  "action": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. Sink into a deeper crouch by bending the knees while pushing the head forward, then rise up onto the balls of the feet while pulling the head back to return to the initial upright stance."
- },
- {
-  "key": "2.5_김조학",
-  "row": "6",
-  "why": [
-   "점프인데 발이 거의 안 뜸 8px"
-  ],
-  "cond": "A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land.",
-  "no_end": true,
-  "action": "A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land. A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land. Squat deep with arms held straight at the sides. Spring upward into a vertical leap with legs extended and toes pointed, reaching peak elevation. Land with knees deeply flexed to absorb the impact, then straighten into a standing "
- },
- {
-  "key": "2.7_고영훈",
-  "row": "6",
-  "why": [
-   "점프인데 발이 거의 안 뜸 4px"
-  ],
-  "cond": "A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land.",
-  "no_end": true,
-  "action": "A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land. Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges. Bend both knees deeply while swinging the arms back, then spring upward to snap the body straight like a rod with arms pressed to the sides. Land on both feet, bending the knees deep to absorb impact before rising to a stead"
- },
- {
-  "key": "2.8_노기균",
-  "row": "W-1",
-  "why": [
-   "반복 이음 끊김 42%"
-  ],
-  "cond": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame.",
-  "no_end": false,
-  "action": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. Lower the hips with a slight bend of the knees, causing the katana to bob upward against the shoulder and the open hand to dip downward. Rise back into the initial stance, letting the blade and hand settle into their original positions."
- },
- {
-  "key": "2.8_노기균",
-  "row": "10",
-  "why": [
-   "뒤로 뻗음(앞 4 뒤 25)"
-  ],
-  "cond": "The body stays side-on facing east (right) the whole time and never turns around. Keep the backswing short; the strike travels forward toward east (right) only, never behind the body.",
-  "no_end": false,
-  "action": "The body stays side-on facing east (right) the whole time and never turns around. Keep the backswing short; the strike travels forward toward east (right) only, never behind the body. The body stays side-on facing east (right) the whole time and never turns around. Keep the backswing short; the strike travels forward toward east (right) only, never behind the body. Lift the katana from the knee to the rear hip, tip pointing back. Step the rear foot forward into a deep lunge while twisting the hi"
- },
- {
-  "key": "2.8_노기균",
-  "row": "22",
-  "why": [
-   "색이 바뀜(0.46)"
-  ],
-  "cond": "Draw only the character's own body and the weapon it already holds: no motion blur, no slash trails, no smears, no flashes or effects. Keep the exact same outfit, colors, body size and proportions in every frame.",
-  "no_end": false,
-  "action": "Draw only the character's own body and the weapon it already holds: no motion blur, no slash trails, no smears, no flashes or effects. Keep the exact same outfit, colors, body size and proportions in every frame. The body stays side-on facing east (right) the whole time and never turns around. Keep the backswing short; the strike travels forward toward east (right) only, never behind the body. Bounce forward in three rapid, springy hops with knees snapping high while keeping the blade low behind"
- },
- {
-  "key": "2.10_곽성주",
-  "row": "3",
-  "why": [
-   "반복 이음 끊김 37%"
-  ],
-  "cond": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame.",
-  "no_end": false,
-  "action": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. Deeply bend both knees to sink the torso while rolling the shoulders forward, then explosively push upward to extend the legs and thrust the chest out. Repeat this rhythmic, weighted bounce to settle back into the initial low-stanced position."
- },
- {
-  "key": "2.10_곽성주",
-  "row": "W-1",
-  "why": [
-   "반복 이음 끊김 56%"
-  ],
-  "cond": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame.",
-  "no_end": false,
-  "action": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. Compress the knees deeply to lower the entire frame while maintaining a steady grip on the minigun, then extend the legs forcefully to rebound upward. Repeat this rhythmic vertical bobbing motion to complete the cycle and return to the starting posture."
- },
- {
-  "key": "3.5_이성해",
-  "row": "11",
-  "why": [
-   "뒤로 뻗음(앞 5 뒤 37)"
-  ],
-  "cond": "The body stays side-on facing west (left) the whole time and never turns around. Keep the backswing short; the strike travels forward toward west (left) only, never behind the body.",
-  "no_end": false,
-  "action": "The body stays side-on facing west (left) the whole time and never turns around. Keep the backswing short; the strike travels forward toward west (left) only, never behind the body. The body stays side-on facing west (left) the whole time and never turns around. Keep the backswing short; the strike travels forward toward west (left) only, never behind the body. Bring both hands forward together at chest height to grip the wrists, then twist outward while stepping the rear foot forward into a dee"
- },
- {
-  "key": "3.7_은하제",
-  "row": "3",
-  "why": [
-   "반복 이음 끊김 66%"
-  ],
-  "cond": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame.",
-  "no_end": false,
-  "action": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. Shift weight onto the front knee while dipping the hips and rolling the shoulders forward. Simultaneously rake the fingers of the rear hand back through the fringe, then transition weight back to the rear leg to settle into the starting position."
- },
- {
-  "key": "3.8_박민성",
-  "row": "34",
-  "why": [
-   "시작·끝 장 발이 뜸 14px"
-  ],
-  "cond": "Both feet stay on the same floor line at the start and at the end.",
-  "no_end": false,
-  "action": "Both feet stay on the same floor line at the start and at the end. Both feet stay on the same floor line at the start and at the end. Spring upward into a startled leap, pulling both hands to the chin while hunching the shoulders and opening the mouth wide. Land with knees bent in a brief, fearful brace before relaxing the limbs and standing upright with arms at the sides."
- },
- {
-  "key": "3.10_고영은",
-  "row": "3",
-  "why": [
-   "반복 이음 끊김 46%"
-  ],
-  "cond": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame.",
-  "no_end": false,
-  "action": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. Bend both knees deeply to sink the hips and head, lifting the fingers away from the forehead while keeping the rear arm extended. Push upward in a springy bounce, pressing the fingers firmly back onto the forehead to settle into position."
- },
- {
-  "key": "3.12_장허운",
-  "row": "3",
-  "why": [
-   "반복 이음 끊김 51%"
-  ],
-  "cond": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame.",
-  "no_end": false,
-  "action": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. Drop the hips low into a deep crouch while drawing the shoulders upward, then rise back to the original height. Repeat the rhythmic dip and lift, allowing the hair to sway with the momentum and the chest to heave with heavy breaths."
- },
- {
-  "key": "3.13_곽제강",
-  "row": "3",
-  "why": [
-   "반복 이음 끊김 46%"
-  ],
-  "cond": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame.",
-  "no_end": false,
-  "action": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. Sink the hips down deeply to drop the head a full height while tilting it sharply to the side, then bounce back up to the original lunge height. Allow the coat tails to swing and the hair to bounce throughout the motion."
- },
- {
-  "key": "3.13_곽제강",
-  "row": "W-1",
-  "why": [
-   "반복 이음 끊김 42%"
-  ],
-  "cond": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame.",
-  "no_end": false,
-  "action": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. Sink the hips deeply on bent knees to drop the head a full height while tapping the pen against the notebook, then bounce upward to reset the posture, repeating the rhythmic dip and rise with swaying coat tails."
- },
- {
-  "key": "4.2_서윤지",
-  "row": "3",
-  "why": [
-   "반복 이음 끊김 69%"
-  ],
-  "cond": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame.",
-  "no_end": false,
-  "action": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. Bend both knees to drop the hips and torso, maintaining an upright posture while the front palm lowers slightly. Push back up to the initial height, letting the braids swing upward with the momentum before settling back into the starting position."
- },
- {
-  "key": "4.2_서윤지",
-  "row": "W-1",
-  "why": [
-   "반복 이음 끊김 75%"
-  ],
-  "cond": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame.",
-  "no_end": false,
-  "action": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. Dip the knees to lower the hips significantly while swinging the folder forward to the front of the thigh. Rise back to the original height as the folder returns beside the hip and the braids settle into the starting position."
- },
- {
-  "key": "4.4_윤지아",
-  "row": "3",
-  "why": [
-   "반복 이음 끊김 68%"
-  ],
-  "cond": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame.",
-  "no_end": false,
-  "action": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. Dip both knees downward while slightly lowering the torso and front hand, then spring upward onto the toes to lift the heels. Allow the hair buns and front palm to bob naturally during the rise before settling back into the initial stance."
- },
- {
-  "key": "4.6_문혜란",
   "row": "6",
   "why": [
    "점프인데 발이 거의 안 뜸 14px"
   ],
   "cond": "A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land.",
   "no_end": true,
-  "action": "A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land. A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land. Sink into a deep crouch with arms swung back, spring upward into a full extension with toes pointed and one fist raised, then land with knees bent and rise to a standing position."
+  "action": "A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land. A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land. Squat deeply with arms held straight at the sides. Spring upward into a vertical leap with legs extended, reaching peak elevation. Land with knees deeply flexed to absorb the impact, then straighten into a standing pose."
  },
  {
-  "key": "4.7_신유리",
-  "row": "3",
+  "key": "2.8_노기균",
+  "row": "10",
   "why": [
-   "반복 이음 끊김 44%"
+   "뒤로 뻗음(앞 5 뒤 22)"
   ],
-  "cond": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame.",
+  "cond": "The body stays side-on facing east (right) the whole time and never turns around. Keep the backswing short; the strike travels forward toward east (right) only, never behind the body.",
   "no_end": false,
-  "action": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. Deepen the stance by dropping the hips and bending the knees, then spring upward to lift the heels and bob the shoulders. Allow the ponytail to swing with the momentum before settling back into the initial crouch."
+  "action": "The body stays side-on facing east (right) the whole time and never turns around. Keep the backswing short; the strike travels forward toward east (right) only, never behind the body. The body stays side-on facing east (right) the whole time and never turns around. Keep the backswing short; the strike travels forward toward east (right) only, never behind the body. Pull the katana from the knee to the rear hip. Step the rear foot forward into a deep lunge, twisting the hips to thrust the blade f"
+ },
+ {
+  "key": "3.5_이성해",
+  "row": "11",
+  "why": [
+   "뒤로 뻗음(앞 0 뒤 39)"
+  ],
+  "cond": "The body stays side-on facing west (left) the whole time and never turns around. Keep the backswing short; the strike travels forward toward west (left) only, never behind the body.",
+  "no_end": false,
+  "action": "The body stays side-on facing west (left) the whole time and never turns around. Keep the backswing short; the strike travels forward toward west (left) only, never behind the body. The body stays side-on facing west (left) the whole time and never turns around. Keep the backswing short; the strike travels forward toward west (left) only, never behind the body. Bring both hands together at chest height to grip the wrists, then twist outward while stepping the rear foot forward into a deep stance"
+ },
+ {
+  "key": "3.8_박민성",
+  "row": "34",
+  "why": [
+   "시작·끝 장 발이 뜸 11px"
+  ],
+  "cond": "Both feet stay on the same floor line at the start and at the end.",
+  "no_end": false,
+  "action": "Both feet stay on the same floor line at the start and at the end. Both feet stay on the same floor line at the start and at the end. Spring upward into a startled leap, pulling both hands to the chin while hunching the shoulders and opening the mouth wide. Land with knees bent in a brief, fearful brace before relaxing the limbs and standing upright with arms at the sides."
  },
  {
   "key": "4.7_신유리",
   "row": "6",
   "why": [
-   "점프인데 발이 거의 안 뜸 13px"
+   "점프인데 발이 거의 안 뜸 7px"
   ],
   "cond": "A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land.",
   "no_end": true,
   "action": "A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land. A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land. Dip into a rapid, deep squat with arms pressed firmly against the sides. Spring straight upward, extending the body fully with toes pointed downward. Descend to impact the floor with knees flexing deeply to absorb the weight, then"
  },
  {
-  "key": "4.10_아벤샤",
-  "row": "17",
-  "why": [
-   "색이 바뀜(0.62)"
-  ],
-  "cond": "Draw only the character's own body and the weapon it already holds: no motion blur, no slash trails, no smears, no flashes or effects. Keep the exact same outfit, colors, body size and proportions in every frame.",
-  "no_end": false,
-  "action": "Draw only the character's own body and the weapon it already holds: no motion blur, no slash trails, no smears, no flashes or effects. Keep the exact same outfit, colors, body size and proportions in every frame. Draw only the character's own body and the weapon it already holds: no motion blur, no slash trails, no smears, no flashes or effects. Keep the exact same outfit, colors, body size and proportions in every frame. Grip the cape edge and pull it forward across the torso to face height whi"
- },
- {
-  "key": "4.10_아벤샤",
-  "row": "24",
-  "why": [
-   "색이 바뀜(0.46)"
-  ],
-  "cond": "Draw only the character's own body and the weapon it already holds: no motion blur, no slash trails, no smears, no flashes or effects. Keep the exact same outfit, colors, body size and proportions in every frame.",
-  "no_end": false,
-  "action": "Draw only the character's own body and the weapon it already holds: no motion blur, no slash trails, no smears, no flashes or effects. Keep the exact same outfit, colors, body size and proportions in every frame. Draw only the character's own body and the weapon it already holds: no motion blur, no slash trails, no smears, no flashes or effects. Keep the exact same outfit, colors, body size and proportions in every frame. Spring up from the low crouch, throwing the arms wide to unfurl the cape b"
- },
- {
-  "key": "5.1_세크리엠",
-  "row": "3",
-  "why": [
-   "반복 이음 끊김 70%"
-  ],
-  "cond": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame.",
-  "no_end": false,
-  "action": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. Sink the hips down deeply by bending both knees while the upper body sways forward and the head tilts sharply to one side. Rise back up as the head tilts upright and the clawed fingers curl and spread, letting the hair swing."
- },
- {
-  "key": "5.2_브라우니",
-  "row": "6",
-  "why": [
-   "점프인데 발이 거의 안 뜸 5px"
-  ],
-  "cond": "A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land.",
-  "no_end": true,
-  "action": "A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land. Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges. Drop into a deep squat with arms tucked low, then explode upward to launch into a wide star shape with limbs fully extended. Land softly with knees bent to absorb the impact, then rise steadily to stand tall."
- },
- {
-  "key": "5.2_브라우니",
-  "row": "29",
-  "why": [
-   "반복 이음 끊김 46%"
-  ],
-  "cond": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame.",
-  "no_end": false,
-  "action": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges. Sweep the hand out to the side at chest height with an open palm, then bring it inward to rest against the belly. Simultaneously, bob the head slightly while animating the screen's mouth to suggest speech until settling into the final pose."
- },
- {
-  "key": "5.3_탐미주의",
-  "row": "6",
-  "why": [
-   "점프인데 발이 거의 안 뜸 13px"
-  ],
-  "cond": "A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land.",
-  "no_end": true,
-  "action": "A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land. A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land. Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges. Fold forward at the hips to reach hands toward the shins, then snap upright while springi"
- },
- {
   "key": "5.3_탐미주의",
   "row": "11",
   "why": [
-   "뒤로 뻗음(앞 0 뒤 34)"
+   "뒤로 뻗음(앞 0 뒤 33)"
   ],
   "cond": "The body stays side-on facing east (right) the whole time and never turns around. Keep the backswing short; the strike travels forward toward east (right) only, never behind the body.",
   "no_end": false,
@@ -405,48 +123,18 @@
   "key": "6.3_가짜관리국검사C",
   "row": "6",
   "why": [
-   "점프인데 발이 거의 안 뜸 13px"
+   "점프인데 발이 거의 안 뜸 11px"
   ],
   "cond": "A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land.",
   "no_end": true,
   "action": "A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land. A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land. Dip knees quickly to build tension, then spring straight upward with legs extended and toes pointed. Maintain a vertical posture throughout the ascent, then land softly on the balls of the feet with knees bent, settling into a sta"
  },
  {
-  "key": "6.10_불량배여1",
-  "row": "3",
-  "why": [
-   "반복 이음 끊김 49%"
-  ],
-  "cond": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame.",
-  "no_end": false,
-  "action": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. Bounce quickly on the toes, tucking the chin and rolling the shoulders to create a rhythmic vertical shift. Allow the ponytail to swing with the momentum as the torso pulses, then settle back into the initial stance."
- },
- {
-  "key": "6.14_경찰남2",
-  "row": "1",
-  "why": [
-   "반복 이음 끊김 40%"
-  ],
-  "cond": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame.",
-  "no_end": false,
-  "action": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. Rise onto the toes while shifting weight forward, lifting the chest and slightly swinging the arms outward. Lower back onto the heels with a smooth, controlled descent to return to a firm, upright stance."
- },
- {
-  "key": "6.24_백일몽여B",
-  "row": "13",
-  "why": [
-   "몸이 커짐 ×3.4",
-   "색이 바뀜(0.63)"
-  ],
-  "cond": "Draw only the character's own body and the weapon it already holds: no motion blur, no slash trails, no smears, no flashes or effects. Keep the exact same outfit, colors, body size and proportions in every frame.",
-  "no_end": false,
-  "action": "Draw only the character's own body and the weapon it already holds: no motion blur, no slash trails, no smears, no flashes or effects. Keep the exact same outfit, colors, body size and proportions in every frame. Draw only the character's own body and the weapon it already holds: no motion blur, no slash trails, no smears, no flashes or effects. Keep the exact same outfit, colors, body size and proportions in every frame. Perform the motion in place near the center of the frame: the whole body a"
- },
- {
   "key": "6.24_백일몽여B",
   "row": "18",
   "why": [
-   "떨어진 큰 덩어리 1번 장(2292px)"
+   "몸이 커짐 ×2.6",
+   "색이 바뀜(0.56)"
   ],
   "cond": "Draw only the character's own body and the weapon it already holds: no motion blur, no slash trails, no smears, no flashes or effects. Keep the exact same outfit, colors, body size and proportions in every frame.",
   "no_end": false,
@@ -456,37 +144,17 @@
   "key": "6.26_협회남2",
   "row": "6",
   "why": [
-   "점프인데 발이 거의 안 뜸 10px"
+   "점프인데 발이 거의 안 뜸 12px"
   ],
   "cond": "A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land.",
   "no_end": true,
-  "action": "A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land. A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land. Deeply crouch with knees bent and torso upright, then explode upward to extend the entire body fully into a vertical leap. Descend with stiff legs, absorbing the impact into a deep knee bend before snapping back into an upright st"
- },
- {
-  "key": "6.33_프리랜서남4",
-  "row": "11",
-  "why": [
-   "시작·끝 장 발이 뜸 11px"
-  ],
-  "cond": "Both feet stay on the same floor line at the start and at the end.",
-  "no_end": false,
-  "action": "Both feet stay on the same floor line at the start and at the end. Both feet stay on the same floor line at the start and at the end. Lift the lead knee to chest height and thrust the sole straight forward in a sharp, driving kick to create space. Retract the leg with controlled speed, planting the foot firmly back onto the floor to transition into the defensive stance."
- },
- {
-  "key": "6.35_프리랜서여2",
-  "row": "15",
-  "why": [
-   "색이 바뀜(0.65)"
-  ],
-  "cond": "Draw only the character's own body and the weapon it already holds: no motion blur, no slash trails, no smears, no flashes or effects. Keep the exact same outfit, colors, body size and proportions in every frame.",
-  "no_end": false,
-  "action": "Draw only the character's own body and the weapon it already holds: no motion blur, no slash trails, no smears, no flashes or effects. Keep the exact same outfit, colors, body size and proportions in every frame. Draw only the character's own body and the weapon it already holds: no motion blur, no slash trails, no smears, no flashes or effects. Keep the exact same outfit, colors, body size and proportions in every frame. Recoil twice with sharp, rhythmic kicks of the pistol, allowing the should"
+  "action": "A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land. A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land. Crouch deeply with knees bent and torso upright, then explode upward to extend the body into a vertical leap. Descend with stiff legs, absorbing the impact into a deep knee bend before snapping back into an upright standing pose."
  },
  {
   "key": "6.36_프리랜서여3",
   "row": "6",
   "why": [
-   "점프인데 발이 거의 안 뜸 11px"
+   "점프인데 발이 거의 안 뜸 12px"
   ],
   "cond": "A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land.",
   "no_end": true,
@@ -494,19 +162,9 @@
  },
  {
   "key": "6.56_시민남3",
-  "row": "3",
-  "why": [
-   "반복 이음 끊김 42%"
-  ],
-  "cond": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame.",
-  "no_end": false,
-  "action": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. Drop the hips sharply by bending the knees to create a rhythmic vertical bounce. Keep the hands held steady at chest level while allowing the torso to sway and the midsection to bob naturally before returning to the starting height."
- },
- {
-  "key": "6.56_시민남3",
   "row": "34",
   "why": [
-   "시작·끝 장 발이 뜸 29px"
+   "시작·끝 장 발이 뜸 21px"
   ],
   "cond": "Both feet stay on the same floor line at the start and at the end.",
   "no_end": false,
@@ -516,20 +174,10 @@
   "key": "6.60_시민남7",
   "row": "34",
   "why": [
-   "시작·끝 장 발이 뜸 51px"
+   "시작·끝 장 발이 뜸 75px"
   ],
   "cond": "Both feet stay on the same floor line at the start and at the end.",
   "no_end": false,
   "action": "Both feet stay on the same floor line at the start and at the end. Both feet stay on the same floor line at the start and at the end. Spring upward into a sharp jump, tucking the knees and curling the torso inward while snapping both hands tightly against the chest. Drop back down to the floor, absorbing the landing with a slight bend in the ankles to settle."
- },
- {
-  "key": "6.69_시민여7",
-  "row": "3",
-  "why": [
-   "반복 이음 끊김 43%"
-  ],
-  "cond": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame.",
-  "no_end": false,
-  "action": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. Dip the knees in a steady, fluid rhythm to lower the body by a hand's width, then rise back to the original height while maintaining the raised forearm and extended open hand to settle into the initial pose."
  }
 ]
