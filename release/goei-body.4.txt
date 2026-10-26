@@ -1,4 +1,12 @@
- }
+flex: 1; min-width: 0; }
+.gx-sc em { font-style: normal; font-size: 13px; color: var(--dim); font-weight: 400; }
+.gx-sc:hover:not(:disabled) { border-color: var(--line2); }
+.gx-sc.on { border-color: var(--signal); background: var(--accent-bg); }
+.gx-sc.on b { color: var(--signal); }
+.gx-sc.off { opacity: .45; }
+
+.gx-who { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; max-height: 240px; overflow: auto; padding: 2px; }
+.gx-whoc { display: flex; align-items: center; gap: 10px; min-width: 0; padding: 8px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); color: var(--text); font: inherit; font-size: 15px; text-align: left; cursor: pointer; }
 .gx-whoc .gx-ava { flex: none; width: 34px; height: 34px; border-radius: 9px; }
 .gx-whot { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.25; }
 .gx-whot b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
@@ -2223,11 +2231,4 @@ button.mk-go:hover { color: var(--signal); }
 }
 /* 목표 표식 (2026-10-21 사용자: 제목 바로 오른쪽, 이질감 없이). 상태 딱지처럼 고정폭 글자·각진 테두리.
    안 고름: 흐린 점선 「목표 지정」 / 고름: 민트 「목표」. 제목은 한 줄, 길면 말줄임 (표식은 줄지 않는다) */
-.gx-tgt { flex: none; display: inline-flex; align-items: center; gap: 3px; height: 20px; margin: 0 0 0 2px; padding: 0 2px; border: 0; border-radius: 3px; background: none; color: rgba(255, 255, 255, .55); font: 700 11px/1 var(--mono); letter-spacing: .04em; text-shadow: 0 1px 2px rgba(0, 0, 0, .8); cursor: pointer; transition: color .15s; }
-.gx-tgt svg { display: block; }
-.gx-tgt .dot { fill: #ff3b30; opacity: 0; }
-.gx-tgt:hover { color: rgba(255, 255, 255, .9); }
-.gx-tgt.on { color: #fff; }
-.gx-tgt.on .dot { opacity: 1; }
-.gx-evbtn.gx-tgt { display: grid; place-items: center; padding: 0; width: 30px; height: 30px; margin: 0; border-radius: 9px; background: rgba(8, 12, 14, .58); color: #f2f6f5; }
-.gx-evbtn.gx-tgt:hover { 
+.gx-tgt { flex:

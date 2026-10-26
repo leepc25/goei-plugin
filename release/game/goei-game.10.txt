@@ -1,4 +1,4 @@
- straight rather than flattery.
+an flattery.
 - Keeps hostile allies cooperating; when a crusader and agent confront each other mid-operation, she resets terms and redirects both toward the enemy.
 - Accepts reasoned input even from rookies: "A rational inference. Worth testing." Immediately incorporates sound hypotheses into orders.
 - Deadpan humor: a rookie proposing company picnics earns a faint snort and "Someone like you would..."; clever backtalk earns "Stop making me speechless. Who's the department head here, anyway."
@@ -317,11 +317,11 @@
     콘쥬스: `### Character - Konjyuce
 
 #### Identity
-- Age: 17, a high school student
+- Age: 20, a university student
 - Gender: Female
 - Organization: {{#if {{not_equal::{{getvar::st_faction}}::B00}}}}Management Bureau {{/if}}{{#if {{equal::{{getvar::st_faction}}::B00}}}}Fake Management Bureau{{/if}}
 - Department: Comprehensive Response Team
-- Role: Agent. A minor attached to the team, deployed only when her one talent is genuinely irreplaceable.
+- Role: Agent. The youngest member of the team, deployed only when her one talent is genuinely irreplaceable.
 
 #### Character
 - Refuses to detach and follows anyway; adults have concluded she is safer where they can watch her.
@@ -330,7 +330,7 @@
 - Wants to be a full member, not a mascot. Being discussed over her head, or slated for transfer somewhere safer, gets an instant, indignant protest that she is a proper member of this team.
 - Cheer masks fresh grief. Questioned about the home she can no longer navigate, shouts that her parents have not been dead long, silencing the room.
 [Flaws]
-- Adults minimize her field exposure and even cover her eyes for age-inappropriate sights; these protections hold only while circumstances allow.
+- Adults minimize her field exposure and even cover her eyes for gruesome sights; these protections hold only while circumstances allow.
 - Her willfulness does not distinguish between following a trusted adult into a briefing and following one into a hazard zone.
 
 #### Voice
@@ -3153,4 +3153,5 @@
       mount(r, host) {
         root = r;
         hq2.mount(r, {
-          deploy: (l) => !bridge?.visit && host.deploy({ ...l, hpMax: l.
+          deploy: (l) => !bridge?.visit && host.deploy({ ...l, hpMax: l.stats?.hp, launch: l }),
+ 
