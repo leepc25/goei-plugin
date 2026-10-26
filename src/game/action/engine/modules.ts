@@ -3,7 +3,7 @@
 //   audio/ 효과음·음악 (createGameAudio)
 //   hq/    본부와 임무 흐름 (createHq)
 // 층(stage/)·적(enemy/)·아이템(items/)·대사(story/)는 들어오는 대로 여기에 잇는다. 없으면 엔진 기본(훈련장·임시 적·기본 지급품).
-import { walkSeconds, clockText, mergeClock, DOOR_S, STAIR_S } from '../../../core/fieldclock';
+import { clockText } from '../../../core/fieldclock';
 import type { GameAssets, GameBridge } from '../../bridge';
 import { persp, view } from './view';
 import { KEYMAP } from './input';
@@ -27,12 +27,18 @@ import { drawMiniMap, drawRunMap } from '../stage/runmap';
 import { CUTSCENES, VIDEOS, hqLines, mountStory, stageHooks, type AgentId, type StoryApi } from '../story';
 import type { SpeakerId } from '../story/types';
 import { itemsBlocking, linkItems, mountItemsOverlay } from './itemsLink';
-import { makeHub, type HubHost } from './hub';
+import { makeHub, silhouette, type HubHost, type HubLife } from './hub';
+import { createHqWorld } from '../../world/hq';
+import { DEFAULT_CLOCK } from '../../world/clock';
+import { hashSeed } from '../../world/rng';
+import { observerLines } from '../../world/observer';
+import { FieldClock } from '../../world/clock';
+import type { WorldSim } from '../../world/actors';
 import { linkNpcTalk } from './npcLink';
 import demoPhotos from '../story/demo-photos.json';
 import { whereIs, LANE_TOP, LANE_BOT } from '../hq/map';
 import { hasVisitAgent, visitAgentFaceCanvas } from '../art/visitAgents';
-import { hasTestPeople, testPlayerFace, testPlayerTop } from '../art/testPeople';
+import { drawTestMan, hasTestPeople, testPlayerFace, testPlayerTop } from '../art/testPeople';
 import { eileenHooks } from '../eileen/player';
 import { FieldFx, parseFxList } from '../fx/fieldFx';
 import { SUPER_TEXT } from '../fx/superText';
@@ -80,10 +86,32 @@ function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui
   // 본부 방문: 상태 태그로 정한 방(사무실·휴게실·의무실)에 요원을 세운다. 들어가기 전에 한 번 읽는다
   let present: { name: string; room: string }[] = [];
   let visitor = { agentId: '', name: '' };
-  const visitReady = b?.visit
+  let ready = false;
+  const visitReady = (b?.visit
     ? b.visit.state().then((v) => { visitor = v.visitor; present = v.agents.filter((a) => a.room).map((a) => ({ name: a.name, room: a.room! })); }).catch(() => {})
-    : Promise.resolve();
+    // 시연판(본편 연결 없음): 생태계를 볼 수 있게 요원 몇 명을 세운다
+    : Promise.resolve().then(() => { present = [{ name: '잼트리', room: 'office' }, { name: '쟈알디', room: 'office' }, { name: '큐라스', room: 'lounge' }, { name: '고르고디오', room: 'lounge' }, { name: '데쥬레', room: 'infirmary' }]; })).then(() => { ready = true; });
+  // 필드 시각은 본편 상태줄 시각에서 시작한다 (docs/필드_세계_NPC_설계.md 16-3)
+  void b?.card?.().then((snap) => { if (fieldClock.sec === null && snap?.minute != null) fieldClock.sec = snap.minute * 60; }).catch(() => {});
   const ROOM_SCENE: Record<string, string> = { office: 'office', lounge: 'lounge', infirmary: 'clinic' };
+  // 필드 세계 (src/game/world): 요원은 처음 선 방에서 서성이고 이웃 장면을 오간다, 거리·로비는 몹이 오간다.
+  // 씨앗: 주소 ?seed=숫자 가 있으면 그것 (재현), 없으면 이번 입장마다 새로
+  const seedParam = typeof location !== 'undefined' ? new URLSearchParams(location.search).get('seed') : null;
+  const seed = seedParam ? (Number(seedParam) >>> 0 || hashSeed(seedParam)) : (Date.now() >>> 0);
+  let sim: WorldSim | null = null;
+  let observing = false;
+  if (typeof window !== 'undefined') window.addEventListener('keydown', (e) => { if (e.key === 'F9' || e.key === '`') { observing = !observing; e.preventDefault(); } });
+  const world = () => {
+    if (!sim && ready) sim = createHqWorld(hq.map(), seed, present.filter((p) => ROOM_SCENE[p.room]).map((p) => ({ name: p.name, scene: ROOM_SCENE[p.room] })));
+    return sim;
+  };
+  const clockView = () => { const c = new FieldClock(fieldClock.sec === null ? null : fieldClock.sec / 60); return c; };
+  const life: HubLife = {
+    tick: (dt, at) => world()?.step(dt, { ...at, hour: fieldClock.sec === null ? null : (fieldClock.sec / 3600) % 24 }),
+    actors: (sceneId) => (world()?.inScene(sceneId) ?? []).map((a) => ({ id: a.def.id, name: a.def.name, kind: a.def.kind, x: a.x, y: a.y, face: a.face, look: a.def.look, moving: a.act === 'walk' })),
+    observer: (sceneId) => (observing && sim ? observerLines(sim, clockView(), sceneId, seed) : null),
+    drawMob: (c, a) => { if (!drawTestMan(c, a.x, a.y, a.face)) silhouette(c, a); },
+  };
   const visitors = (sceneId: string) => {
     const here = present.filter((p) => ROOM_SCENE[p.room] === sceneId && hasVisitAgent(p.name));
     const sc = hq.map().scenes.find((s) => s.id === sceneId);
@@ -101,10 +129,13 @@ function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui
       chooseFloor: (o, pick) => ui.chooseFloor(o, pick),
       sfx: (n) => ui.sfx(n),
       visitors,
+      life,
       // 장면을 옮기면 장부에 이동 사건과 지금 위치(확정 사실)를 남긴다
       entered: (to, from, walkedPx) => {
         fieldClock.place = to.name;
-        const sec = walkSeconds(walkedPx) + (to.floor !== from.floor ? STAIR_S : DOOR_S);
+        // 장면 넘어가기 = 10분 (사용자 확정 2026-10-26, 설정에서 조정 예정). 걸은 거리는 시계와 무관
+        void walkedPx;
+        const sec = DEFAULT_CLOCK.scene * 60;
         if (fieldClock.sec !== null) fieldClock.sec += sec;
         const at = fieldClock.sec === null ? '' : ` (${clockText(fieldClock.sec)})`;
         void b?.field?.record({ kind: 'move', text: `${from.name} → ${to.name}${at}`, scene: to.name, weight: 1, fact: { key: '주인공 위치', value: to.name } }).catch(() => {});

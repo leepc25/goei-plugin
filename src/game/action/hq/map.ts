@@ -9,7 +9,7 @@ import { ROOMS, mirror, type Room, type RoomFix } from './rooms';
 import { PAINTED, PAINTED_LANE, doorX } from './painted';
 
 export type SceneId =
-  | 'street' | 'pasta' | 'lobby' | 'swat' | 'f2' | 'f3' | 'office' | 'interview' | 'lounge' | 'wc' | 'wc3'
+  | 'street' | 'jongno' | 'pasta' | 'lobby' | 'swat' | 'f2' | 'f3' | 'office' | 'interview' | 'lounge' | 'wc' | 'wc3'
   | 'b1' | 'edu' | 'training' | 'clinic' | 'b2' | 'b3' | 'tooth';
 
 export type DoorKind = 'main' | 'door' | 'glass' | 'steel' | 'security' | 'elevator' | 'stairs_up' | 'stairs_down' | 'stairs' | 'shop' | 'slide' | 'cell' | 'exit';
@@ -147,8 +147,14 @@ export const HQ_SCENES: HqScene[] = [
   // ── 바깥 (그대로 둠) ──
   {
     id: 'street', name: '종로 뒷골목', floor: 'out', length: 1920, look: 'street', legacy: true, boxes: [], fixtures: [], spots: [],
-    doors: [{ id: 'main', x: 640, kind: 'main', to: 'lobby', toDoor: 'main' }, { id: 'pasta', x: 1500, kind: 'shop', to: 'pasta', toDoor: 'out', needs: 'pasta' }],
+    doors: [{ id: 'main', x: 640, kind: 'main', to: 'lobby', toDoor: 'main' }, { id: 'pasta', x: 1500, kind: 'shop', to: 'pasta', toDoor: 'out', needs: 'pasta' }, { id: 'east', x: 1860, kind: 'door', to: 'jongno', toDoor: 'west', label: '종로 큰길' }],
     things: [{ kind: 'streetlamp', x: 300, w: 30, h: 360 }, { kind: 'streetlamp', x: 1150, w: 30, h: 360 }, { kind: 'bike', x: 860, w: 120, h: 80 }],
+  },
+  // 종로 큰길: 필드 세계 첫 시연 범위(docs/필드_세계_NPC_설계.md 20장). 그림 전까지 회색 거리
+  {
+    id: 'jongno', name: '종로 큰길', floor: 'out', length: 4000, look: 'street', legacy: true, boxes: [], fixtures: [], spots: [],
+    doors: [{ id: 'west', x: 60, kind: 'door', to: 'street', toDoor: 'east', label: '종로 뒷골목' }],
+    things: [{ kind: 'streetlamp', x: 700, w: 30, h: 360 }, { kind: 'streetlamp', x: 1700, w: 30, h: 360 }, { kind: 'streetlamp', x: 2700, w: 30, h: 360 }, { kind: 'streetlamp', x: 3600, w: 30, h: 360 }],
   },
   {
     id: 'pasta', name: '파스타집', floor: 'out', length: 1280, look: 'pasta', legacy: true, boxes: [], fixtures: [],
