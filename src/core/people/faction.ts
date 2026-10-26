@@ -1,5 +1,6 @@
 // 세력 평판 (docs/설계안_세력평판.md): 세력 → 유저 값. 인물 호감 엔진(sumCues)을 그대로 쓰고 who 는 '세력:코드'.
 // 시작값은 조직×조직 표(relations-base orgs), 유저 소속은 상태창 신분. 수배·표적 같은 별도 상태는 없다.
+// 무엇이 평판을 바꾸는지는 갱신기 모델이 판단한다 (공식·집단 제한 없음, 사용자 2026-10-26). 코드는 인용·세력당 1건·메시지당 ±10 만 검사.
 import { factionView } from './affinity';
 import { factionBase } from './base';
 import { factionCodesIn, ORG_NAMES } from './identity';
@@ -43,9 +44,5 @@ export function factionsBlock(list: FactionNow[], user = '{{user}}'): string {
   if (!lines.length) return '';
   return ['## Factions → ' + user + ' (standing of each organization toward ' + user + ', kept by the system; members act accordingly)', ...lines].join('\n');
 }
-
-/** 집단 행위 낱말: 세력 계기는 이 중 하나가 사유·인용에 있어야 (구성원 한 명의 일을 세력 반응으로 착각하지 않게) */
-export const COLLECTIVE_WORDS = /출입\s*금지|금지\s*해제|지시|명령|감사|징계|공문|포상|거래|계약|방송|보복|배제|보호|수색|봉쇄|통보|공식|조직|본부\s*차원|세력|전원|일제히|상부|경영진|이사회|위원회|협회/;
-export const collectiveOk = (text: string): boolean => COLLECTIVE_WORDS.test(text);
 
 export const stageLabel = (id: FactionStage['id']) => FACTION_STAGES[id].label;

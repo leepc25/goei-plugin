@@ -7,7 +7,7 @@ import { findStatusTags } from '../world/status';
 import { addressOf, affinityView, opennessOf, tasteOf } from './affinity';
 import { unknownTo } from './inject';
 import { seedPerson } from './seed';
-import { collectiveOk, factionNow, knownFactionCodes, sceneFactionCodes, userFactionOf, factionName as factionNameOf } from './faction';
+import { factionNow, knownFactionCodes, sceneFactionCodes, userFactionOf, factionName as factionNameOf } from './faction';
 import { factionCode } from './identity';
 import { nameMatcher, scenePeople, entriesOf, type NameEntry } from './select';
 import { changeId, entryId, isAlive, liveChanges, liveEntries, liveness, markRead, messageKey, norm, plain, putChange, putDoc, putEntry, type Liveness } from './store';
@@ -811,7 +811,7 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
     }
   }
 
-  // 6b. 세력 평판 계기: 세력이 집단으로 반응했을 때만. 코드로 바꾸고, 집단 행위 낱말·인용 검사, 세력당 1건
+  // 6b. 세력 평판 계기: 그 세력이 유저를 보는 눈이 바뀔 만한 일인지는 모델이 판단 (사용자 2026-10-26). 코드는 이름→코드, 인용, 세력당 1건, 같은 메시지 중복만 검사
   if (ctx.settings.features.has('faction_rep')) {
     const changes = liveChanges(store, live);
     const seen = new Set<string>();
@@ -830,10 +830,6 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
       const ev = evidence(f.m, f.quote);
       if (typeof ev === 'string') {
         drop('faction', f, ev, code);
-        continue;
-      }
-      if (!collectiveOk(`${str(f.reason)} ${str(f.quote)}`)) {
-        drop('faction', f, '집단 반응 근거 없음 (구성원 한 명의 일은 그 인물 기록으로)', code);
         continue;
       }
       if (seen.has(code)) {

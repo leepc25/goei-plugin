@@ -57,7 +57,7 @@ test('기본 켬: 시작값은 조직×조직 표, 유저 소속 기준. 구간�
   assert.equal(F.factionNow(store, 'B00', S.liveChanges(store, live), 'A00', s).stage.id, 'favorable');
 });
 
-test('갱신기: 장면 세력 자료, 집단 행위만 받고 구성원 한 명의 일은 버림, 이름→코드, 세력당 1건, 끄면 전부 없음', () => {
+test('갱신기: 장면 세력 자료, 판단은 모델(낱말 거르기 없음), 이름→코드, 인용·세력당 1건, 끄면 전부 없음', () => {
   const s = settings();
   const store = T.emptyStore();
   store.people.쟈알디 = person('쟈알디', 'A00');
@@ -71,14 +71,15 @@ test('갱신기: 장면 세력 자료, 집단 행위만 받고 구성원 한 명
     faction_cues: [
       { faction: '관리국', cue: '큰도움', m: 'm4', quote: '공식 포상을 내렸다', reason: '공식 포상' },
       { faction: 'A00', cue: '도움', m: 'm4', quote: '공식 포상을 내렸다', reason: '공식 포상 또' },
-      { faction: 'A00', cue: '작은친절', m: 'm4', quote: '쟈알디가 웃었다', reason: '쟈알디가 웃음' },
+      { faction: 'B00', cue: '작은친절', m: 'm4', quote: '쟈알디가 웃었다', reason: '요원이 웃어 줌 (모델 판단)' },
+      { faction: 'C00', cue: '도움', m: 'm4', quote: '이 글은 원문에 없다', reason: 'x' },
       { faction: '회사 어딘가', cue: '도움', m: 'm4', quote: '공식 포상', reason: '포상' },
     ],
   };
   const rep = U.applyUpdate(store, c, input, r, { settings: s });
-  assert.equal(rep.applied.factions, 1);
+  assert.equal(rep.applied.factions, 2, '관리국 큰도움 + 가짜 관리국 작은친절 (낱말 거르기 없음, 모델 판단)');
   assert.ok(rep.dropped.some((d) => d.reason === '세력당 1건'));
-  assert.ok(rep.dropped.some((d) => /집단 반응 근거 없음/.test(d.reason)));
+  assert.ok(rep.dropped.some((d) => d.reason === '인용이 원문에 없음'));
   assert.ok(rep.dropped.some((d) => d.reason === '모르는 세력 이름'));
   assert.ok(store.factions.A00 && store.factions.A00.name === '관리국');
   const live = S.liveness(c);
