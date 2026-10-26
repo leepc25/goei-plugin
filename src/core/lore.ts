@@ -82,7 +82,7 @@ export interface ManagedEntry {
   groups: string[];
 }
 
-function keyRegex(key: string, en: boolean, person = false): RegExp | null {
+export function keyRegex(key: string, en: boolean, person = false): RegExp | null {
   if (en) {
     const words = key.toLowerCase().split(/[\s\-‐_]+/).filter(Boolean);
     if (!words.length || words.every((w) => EN_STOP.has(w))) return null;

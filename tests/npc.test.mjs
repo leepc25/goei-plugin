@@ -64,14 +64,17 @@ test('판정: 동행은 호감 +1부터 (민간인·승객은 0부터), 동행 �
   assert.equal(B.decide([{ kind: 'join', arg: '' }], ctx('leejaheon', {}, 3)).length, 0);
 });
 
-test('프롬프트: 시트·상황·태그 안내가 들어가고 미성년자 안전 줄이 붙는다', () => {
+test('프롬프트: 시트·상황·태그 안내가 들어가고, minor 인물에만 미성년자 안전 줄이 붙는다', () => {
   const agent = { id: 'jyaldi', name: '쟈알디', title: '부장', voice: '짧고 건조하게' };
+  // 콘쥬스는 2026-10-26부터 20세 (minor 아님)
   const m = B.buildPrompt({ def: B.npcDef('konjyuce'), target: { npc: 'konjyuce', place: '본부 2층', facts: ['본부 3일차'] }, sheet: 'SHEET', agent, rel: rel(1), meta: { events: ['괴이 「X」'] }, text: '안녕' });
   const s = m[0].content;
   assert.match(s, /SHEET/);
   assert.match(s, /본부 2층/);
-  assert.match(s, /미성년자/);
+  assert.doesNotMatch(s, /미성년자/);
   assert.match(s, /괴이 「X」/);
+  const minor = B.buildPrompt({ def: { ...B.npcDef('konjyuce'), minor: true }, target: { npc: 'konjyuce', place: '본부' }, agent, rel: rel(1), text: '안녕' })[0].content;
+  assert.match(minor, /미성년자/);
   assert.equal(m.at(-1).content, '안녕');
   const h = B.buildPrompt({ def: B.npcDef('elevator'), target: { npc: 'elevator', place: '승강기', hints: [{ id: 'a', text: '첫 단서' }], allow: ['hint'] }, agent, rel: rel(), text: '?' })[0].content;
   assert.match(h, /1\) 첫 단서/);
