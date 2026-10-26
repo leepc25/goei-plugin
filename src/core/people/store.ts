@@ -78,7 +78,7 @@ export function anchorPositions(chat: Chat): Map<string, number> {
 }
 
 /** 인용 검사용 정규화: 공백·따옴표·말줄임표 차이를 무시 */
-export const norm = (s: string) => String(s ?? '').replace(/[\s​]+/g, '').replace(/[“”"'‘’「」『』]/g, '').replace(/\.{3}|…/g, '').toLowerCase();
+export const norm = (s: string) => String(s ?? '').replace(/[^\p{L}\p{N}]+/gu, '').toLowerCase();
 
 export interface Liveness {
   at: Map<string, number>;

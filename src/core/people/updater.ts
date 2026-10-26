@@ -1,0 +1,655 @@
+// 기록 갱신기 (리수폿 Writer 의 축소판): 본편 응답을 읽을 요청 자료를 만들고, 보조 모델의 JSON 답을 검사해 기록에 반영한다.
+// 모델은 여기서 부르지 않는다 (host/people.ts). 모든 판정은 결정적이라 시험할 수 있다.
+import type { Chat, ChatMessage } from '../types';
+import { messageText } from '../refs';
+import { scanAgents } from '../world/tags';
+import { findStatusTags } from '../world/status';
+import { addressOf, affinityView } from './affinity';
+import { unknownTo } from './inject';
+import { seedPerson } from './seed';
+import { nameMatcher, scenePeople, entriesOf, type NameEntry } from './select';
+import { changeId, entryId, isAlive, liveChanges, liveEntries, liveness, markRead, messageKey, norm, plain, putChange, putDoc, putEntry, type Liveness } from './store';
+import type { Feature, PeopleSettings } from './settings';
+import { CUES, DOC_TYPES, SLOT_CAP, SLOTS, type Change, type Cue, type DocType, type Entry, type PeopleStore, type Person, type Register, type SlotId } from './types';
+
+const str = (v: unknown) => (typeof v === 'string' ? v : '');
+const msgs = (chat: Chat): ChatMessage[] => (Array.isArray(chat.message) ? chat.message : []);
+
+// ── 묶음 계획 ──
+
+/** 안 읽은 응답들을 6턴 또는 글자 상한 단위로 묶는다 (앞에서부터) */
+export function planBatches(chat: Chat, unread: number[], spanCap: number, maxTurns = 6): number[][] {
+  const list = msgs(chat);
+  const out: number[][] = [];
+  let cur: number[] = [];
+  let chars = 0;
+  for (const i of unread) {
+    const n = str(list[i]?.data).length + str(list[i - 1]?.data).length;
+    if (cur.length && (cur.length >= maxTurns || chars + n > spanCap)) {
+      out.push(cur);
+      cur = [];
+      chars = 0;
+    }
+    cur.push(i);
+    chars += n;
+  }
+  if (cur.length) out.push(cur);
+  return out;
+}
+
+// ── 요청 자료 ──
+
+export interface SpanItem { m: string; role: 'user' | 'assistant'; text: string; confirmed?: true; context_only?: true; index: number }
+export interface Signal { who: string; tag: string; from: string; to: string; note: string }
+
+export interface UpdateInput {
+  system: string;
+  data: Record<string, unknown>;
+  /** 이번에 읽는 응답 위치들 (읽음 표시용) */
+  indexes: number[];
+  /** m 꼬리표 → 메시지 위치 */
+  tags: Map<string, number>;
+  people: string[];
+  /** 확정 메시지 위치 (근거로 쓸 수 있는 것) */
+  confirmed: Set<number>;
+  /** 이름 표 (별명·호칭으로 인물 찾기) */
+  names: NameEntry[];
+}
+
+const CUE_MEANING: Record<Cue, string> = {
+  작은친절: '실제로 전해지고 받아들여진 작은 배려', 도움: '의미 있는 도움, 약속을 지킴', 큰도움: '대가·위험을 감수한 도움, 관계 회복', 헌신: '결정적 헌신·희생·약속 완수',
+  실망: '실제로 생긴 작은 실망', 무시: '분명한 무시·무례, 믿음에 금', 배신: '의미 있는 배신·굴욕', 파탄: '심각한 신뢰·관계 파괴', 중대위반: '설정상 용서받기 어려운 일',
+};
+
+/** 응답 본문 정리: 상태창·상황판 태그·플러그인 표식은 messageText 가 지운다. 길면 중간을 접는다 */
+export function cleanSpan(raw: string, cap: number): string {
+  let t = String(raw ?? '');
+  for (const tag of findStatusTags(t)) t = t.replace(tag.raw, '');
+  t = messageText(t).replace(/\n{3,}/g, '\n\n').trim();
+  if (t.length <= cap) return t;
+  const head = t.slice(0, Math.floor(cap * 0.6));
+  const tail = t.slice(-Math.floor(cap * 0.35));
+  return `${head}\n[…]\n${tail}`;
+}
+
+/** 인물 기록을 자료용으로 (칸별 id·본문, 상한을 넘으면 오래된 history·scene 부터 뺀다) */
+export function personPayload(p: Person, live: Liveness, cap: number, changes: Change[], unknown?: string[]) {
+  const entries: Record<string, { id: string; text: string; target?: string; kind?: string }[]> = {};
+  let size = 0;
+  for (const s of SLOTS) {
+    const list = liveEntries(p.slots[s], live);
+    if (!list.length) continue;
+    entries[s] = list.map((e) => ({ id: e.id, text: e.text, ...(e.target ? { target: e.target } : {}), ...(e.kind ? { kind: e.kind } : {}) }));
+    size += list.reduce((n, e) => n + e.text.length, 0);
+  }
+  for (const s of ['history', 'scene', 'behavior', 'knowledge'] as SlotId[]) {
+    while (size > cap && entries[s]?.length) {
+      const gone = entries[s].shift()!;
+      size -= gone.text.length;
+    }
+    if (entries[s] && !entries[s].length) delete entries[s];
+  }
+  const aff = affinityView(p, changes);
+  const addr = addressOf(p, changes);
+  return {
+    name: p.name,
+    aliases: p.aliases,
+    ...(p.minor ? { minor: true } : {}),
+    affinity_now: `${aff.stage.label}(${aff.stage.max})`,
+    address_now: addr,
+    entries,
+    ...(unknown?.length ? { unknown_to: unknown } : {}),
+  };
+}
+
+export interface BuildOpts {
+  settings: PeopleSettings;
+  /** 설정이 반영된 지침 본문 */
+  system: string;
+  /** 인물별 가치관(relations-base values) */
+  values: Record<string, string>;
+  names: NameEntry[];
+}
+
+/** 이번 묶음의 요청 자료 */
+export function buildUpdate(chat: Chat, store: PeopleStore, batch: number[], o: BuildOpts): UpdateInput {
+  const list = msgs(chat);
+  const live = liveness(chat);
+  const changes = liveChanges(store, live);
+  const first = Math.min(...batch);
+  // 확정 구간: 묶음의 응답들과 각 앞의 유저 입력. 맥락: 그 앞 쌍들
+  const confirmedIdx = new Set<number>();
+  for (const i of batch) {
+    confirmedIdx.add(i);
+    if (list[i - 1]?.role === 'user') confirmedIdx.add(i - 1);
+  }
+  const ctxIdx: number[] = [];
+  let i = Math.min(...confirmedIdx) - 1;
+  let pairs = 0;
+  while (i >= 0 && pairs < o.settings.prevPairs) {
+    ctxIdx.unshift(i);
+    if (list[i].role === 'user') pairs++;
+    i--;
+  }
+  const span: SpanItem[] = [];
+  const tags = new Map<string, number>();
+  const all = [...ctxIdx, ...[...confirmedIdx].sort((a, b) => a - b)];
+  all.forEach((idx, n) => {
+    const m = `m${n + 1}`;
+    tags.set(m, idx);
+    const role = list[idx].role === 'user' ? 'user' : 'assistant';
+    const item: SpanItem = { m, role, text: cleanSpan(str(list[idx].data), o.settings.spanCap), index: idx };
+    if (confirmedIdx.has(idx)) item.confirmed = true;
+    else item.context_only = true;
+    span.push(item);
+  });
+  // 장면 인물: 확정 구간 글에 나온 사람 + 동행 + 태그가 바뀐 사람
+  const match = nameMatcher(o.names);
+  const texts = [...confirmedIdx].sort((a, b) => b - a).map((idx) => messageText(str(list[idx].data)));
+  const people: string[] = [];
+  const push = (n: string) => {
+    if (store.people[n] && !people.includes(n)) people.push(n);
+  };
+  for (const t of texts) for (const n of match(t)) push(n);
+  const scoped = { ...chat, message: list.slice(0, Math.max(...batch) + 1) } as Chat;
+  for (const n of scenePeople(scoped, store, match, { recent: 2 })) push(n);
+  // 태그 신호: 묶음 앞 응답과 묶음 마지막 응답의 요원 태그 비교
+  const signals: Signal[] = [];
+  const prevBot = [...list.slice(0, first)].reverse().find((m) => m.role === 'char');
+  const lastBot = list[Math.max(...batch)];
+  if (lastBot) {
+    const before = new Map(prevBot ? scanAgents(str(prevBot.data)).map((a) => [a.who, a]) : []);
+    for (const a of scanAgents(str(lastBot.data))) {
+      const b = before.get(a.who);
+      if (b && b.state !== a.state && store.people[a.who]) {
+        signals.push({ who: a.who, tag: '상태', from: b.state, to: a.state, note: 'Record how and why in `state`; add one `history` line.' });
+        push(a.who);
+      }
+    }
+  }
+  const chosen = people.slice(0, 6);
+  const already = [
+    ...changes.filter((c) => c.kind === 'cue' && chosen.includes(c.who) && [...confirmedIdx].some((idx) => live.at.get(c.anchor) === idx)).map((c) => ({ who: c.who, kind: 'cue', cue: c.cue })),
+    ...chosen.flatMap((n) => SLOTS.flatMap((s) => liveEntries(store.people[n].slots[s], live).filter((e) => [...confirmedIdx].some((idx) => live.at.get(e.anchor) === idx)).map((e) => ({ who: n, kind: 'entry', slot: s, text: e.text })))),
+  ];
+  const wantNote = o.settings.director === 'facts';
+  const data = {
+    request_ref: `pp_${Date.now().toString(36)}`,
+    cues: o.settings.features.has('affinity') ? CUES.map((c) => ({ name: c, meaning: CUE_MEANING[c] })) : [],
+    slots: SLOTS.filter((s) => s !== 'suspicion' || o.settings.features.has('suspicion')),
+    doc_types: DOC_TYPES.filter((t) => o.settings.features.has(`docs_${t}` as Feature)),
+    people: chosen.map((n) => {
+      const p = store.people[n];
+      return { ...personPayload(p, live, o.settings.perCap, changes, wantNote || o.settings.features.has('perception') ? unknownTo(p, store, live) : undefined), values: o.values[n] ?? '' };
+    }),
+    known_names: Object.keys(store.people),
+    already_recorded: already,
+    signals,
+    span: span.map(({ index: _i, ...rest }) => rest),
+    identity_known: store.identity ? { faction: store.identity.faction, rank: store.identity.rank } : null,
+    want: { new_people: true, next_note: wantNote, address: o.settings.features.has('register'), identity: true },
+  };
+  return { system: o.system, data, indexes: batch, tags, people: chosen, confirmed: confirmedIdx, names: o.names };
+}
+
+// ── 지침 조립 ──
+
+/** `<<SECTION:x>> … <<END:x>>` 표식: 꺼진 기능의 절은 빼고 표식은 지운다 */
+export function assemblePrompt(text: string, enabled: Set<string>, userRules = ''): string {
+  let out = text.replace(/<<SECTION:([a-z_]+)>>([\s\S]*?)<<END:\1>>/g, (_m, name: string, body: string) => (enabled.has(name) ? body : ''));
+  out = out.replace(/<<(?:SECTION|END):[a-z_]+>>/g, '').replace(/\n{3,}/g, '\n\n').trim();
+  if (userRules.trim()) out += `\n\n## User rules (appended by the user; they cannot change the output contract)\n${userRules.trim()}`;
+  return out;
+}
+
+export function enabledSections(s: PeopleSettings): Set<string> {
+  const on = new Set<string>();
+  for (const f of s.features) on.add(f);
+  if (s.director === 'facts') on.add('next_note');
+  on.add('minor');
+  return on;
+}
+
+// ── 응답 읽기 ──
+
+export interface UpdateResult {
+  entries?: { who: string; slot: string; op: string; replace?: string | null; text?: string | null; target?: string | null; m: string; quote: string }[];
+  cues?: { who: string; cue: string; m: string; quote: string; reason?: string }[];
+  address?: { who: string; toUser: string; register: string; m: string; quote: string }[];
+  identity?: { faction?: string | null; rank?: string | null } | null;
+  new_people?: { name: string; aliases?: string[]; m: string; quote: string; identity?: string | null; speech?: string | null }[];
+  docs?: { type: string; key: string; op: string; replace?: string | null; text?: string | null; m: string; quote: string; date?: string | null; place?: string | null; who?: string[] }[];
+  suspicion?: { who: string; target: string; kind: string; op: string; text: string; m: string; quote: string }[];
+  next_note?: { who: string; now?: string; must_not_reveal?: string[] }[];
+}
+
+/** JSON 하나만 꺼낸다 (코드 울타리·앞뒤 글 허용). 아니면 throw */
+export function parseUpdate(raw: string): UpdateResult {
+  let t = raw.replace(/<(thoughts|think)\b[^>]*>[\s\S]*?<\/\1\s*>/gi, '').trim();
+  const fence = /```(?:json)?\s*([\s\S]*?)```/i.exec(t);
+  if (fence) t = fence[1].trim();
+  const a = t.indexOf('{');
+  const b = t.lastIndexOf('}');
+  if (a < 0 || b <= a) throw new Error('JSON 객체가 없어요');
+  const v = JSON.parse(t.slice(a, b + 1)) as unknown;
+  if (!v || typeof v !== 'object' || Array.isArray(v)) throw new Error('JSON 객체가 아니에요');
+  const r = v as UpdateResult;
+  for (const k of ['entries', 'cues', 'address', 'new_people', 'docs', 'suspicion', 'next_note'] as const) {
+    if (r[k] !== undefined && !Array.isArray(r[k])) throw new Error(`${k}는 목록이어야 해요`);
+  }
+  return r;
+}
+
+// ── 반영 ──
+
+export interface Dropped { kind: string; who?: string; reason: string; item: unknown }
+export interface ApplyReport {
+  applied: { entries: number; cues: number; address: number; docs: number; suspicion: number; newPeople: string[]; notes: number; identity: boolean };
+  dropped: Dropped[];
+  /** 「확인 필요」로 보류한 것 */
+  held: Dropped[];
+}
+
+export interface ApplyCtx {
+  settings: PeopleSettings;
+  /** 새 인물의 시트 (로어북에 있으면) */
+  sheetOf?: (name: string) => string | null;
+  /** 새 인물의 시작값 */
+  baseOf?: (name: string) => { faction?: string; affinityBase?: number; express?: 0 | 1 | 2 | 3; minor?: boolean; aliases?: string[] };
+  /** 역할 명사만인 이름 (새 인물 거부) */
+  roleWords?: Set<string>;
+  now?: string;
+}
+
+const ROLE_WORDS = new Set(['택시 기사', '기사', '점원', '경비', '경비원', '간호사', '의사', '행인', '남자', '여자', '아저씨', '아주머니', '학생', '직원', '요원', '사원', '대리', '과장', '부장', '선배', '후배', '언니', '오빠', '형', '누나', '손님', '주인', '사장', '경찰', '시민']);
+const SEXUAL = /섹스|성관계|야한|음란|가슴|엉덩이|키스|애무|벗|침대에서|연인|사귀|고백|데이트/;
+
+/** 두 문장이 거의 같은가 (정규화 뒤 포함 또는 2글자 조각 80% 일치) */
+export function similar(a: string, b: string): boolean {
+  const x = norm(a);
+  const y = norm(b);
+  if (!x || !y) return false;
+  if (x.includes(y) || y.includes(x)) return true;
+  const grams = (s: string) => {
+    const g = new Map<string, number>();
+    for (let i = 0; i < s.length - 1; i++) g.set(s.slice(i, i + 2), (g.get(s.slice(i, i + 2)) ?? 0) + 1);
+    return g;
+  };
+  const ga = grams(x);
+  const gb = grams(y);
+  let hit = 0;
+  for (const [k, n] of ga) hit += Math.min(n, gb.get(k) ?? 0);
+  return (2 * hit) / (x.length - 1 + y.length - 1) >= 0.8;
+}
+
+const REGISTERS: Register[] = ['존댓말', '반말', '혼합'];
+const SUSP_KINDS = new Set(['정체', '배신', '거짓말', '오염', '범행']);
+
+/** 이름·별명·유일한 호칭으로 기록의 인물을 찾는다. 겹치는 호칭(「부장」)은 못 찾음 */
+export function resolveName(who: string, store: PeopleStore, names: NameEntry[] = []): string | null {
+  const w = norm(String(who ?? ''));
+  if (!w) return null;
+  if (store.people[who]) return who;
+  for (const p of Object.values(store.people)) if (norm(p.name) === w || p.aliases.some((a) => norm(a) === w)) return p.name;
+  const owners = new Map<string, Set<string>>();
+  for (const e of names) for (const t of e.titles) (owners.get(norm(t)) ?? owners.set(norm(t), new Set()).get(norm(t))!).add(e.name);
+  for (const e of names) {
+    if (!store.people[e.name]) continue;
+    if (e.aliases.some((a) => norm(a) === w)) return e.name;
+    if (e.titles.some((t) => norm(t) === w) && owners.get(w)?.size === 1) return e.name;
+  }
+  return null;
+}
+
+/** 응답을 검사해 기록에 반영한다. 어긋난 항목만 버리고 이유를 남긴다 */
+export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, r: UpdateResult, ctx: ApplyCtx): ApplyReport {
+  const list = msgs(chat);
+  const live = liveness(chat);
+  const report: ApplyReport = { applied: { entries: 0, cues: 0, address: 0, docs: 0, suspicion: 0, newPeople: [], notes: 0, identity: false }, dropped: [], held: [] };
+  const drop = (kind: string, item: unknown, reason: string, who?: string) => report.dropped.push({ kind, who, reason, item });
+  const roleWords = ctx.roleWords ?? ROLE_WORDS;
+  const seqs = new Map<string, number>();
+  const nextSeq = (anchor: string) => {
+    const n = (seqs.get(anchor) ?? 0) + 1;
+    seqs.set(anchor, n);
+    return n;
+  };
+  /** m 꼬리표 → 확정 메시지. 인용이 그 메시지에 있어야 */
+  const evidence = (m: string, quote: string): { anchor: string; index: number } | string => {
+    const idx = input.tags.get(m);
+    if (idx === undefined || !input.confirmed.has(idx)) return '확정 구간 밖 메시지';
+    const q = norm(quote);
+    if (!q || q.length < 3) return '인용 없음';
+    if (!norm(messageText(str(list[idx].data))).includes(q)) return '인용이 원문에 없음';
+    return { anchor: messageKey(list[idx], idx), index: idx };
+  };
+  const nameOf = (who: string): string | null => resolveName(who, store, input.names);
+  const minorCheck = (who: string, text: string) => !!store.people[who]?.minor && SEXUAL.test(text);
+
+  // 1. 새 인물 먼저 (그래야 아래 항목이 이름을 찾는다)
+  let newCount = 0;
+  for (const n of r.new_people ?? []) {
+    const name = plain(n?.name, 40);
+    if (!name) {
+      drop('new_people', n, '이름 없음');
+      continue;
+    }
+    if (nameOf(name)) {
+      drop('new_people', n, '이미 있는 인물(별명 포함)', name);
+      continue;
+    }
+    if (roleWords.has(name) || /^[가-힣]{1,3}\s?(기사|점원|경비|행인|직원|손님)$/.test(name)) {
+      drop('new_people', n, '역할 명사', name);
+      continue;
+    }
+    const ev = evidence(n.m, n.quote);
+    if (typeof ev === 'string') {
+      drop('new_people', n, ev, name);
+      continue;
+    }
+    if (newCount >= 2) {
+      drop('new_people', n, '턴당 2명 상한', name);
+      continue;
+    }
+    const aliases = Array.isArray(n.aliases) ? n.aliases.map((a) => plain(a, 40)).filter(Boolean) : [];
+    // 2턴 규칙: 처음 본 이름은 대기, 다른 기준 메시지에서 다시 나오면 등록
+    const pend = store.pending[name];
+    if (ctx.settings.twoTurn && !pend) {
+      store.pending[name] = { anchor: ev.anchor, aliases };
+      report.held.push({ kind: 'new_people', who: name, reason: '2턴 규칙: 대기', item: n });
+      continue;
+    }
+    if (ctx.settings.twoTurn && pend && pend.anchor === ev.anchor) {
+      report.held.push({ kind: 'new_people', who: name, reason: '2턴 규칙: 같은 턴', item: n });
+      continue;
+    }
+    if (ctx.settings.newPeople === 'confirm') {
+      store.pending[name] = { anchor: ev.anchor, aliases: [...new Set([...(pend?.aliases ?? []), ...aliases])] };
+      report.held.push({ kind: 'new_people', who: name, reason: '확인 뒤 등록', item: n });
+      continue;
+    }
+    const sheet = ctx.sheetOf?.(name) ?? null;
+    const base = ctx.baseOf?.(name) ?? {};
+    const p = seedPerson(name, sheet, { ...base, aliases: [...new Set([...(base.aliases ?? []), ...(pend?.aliases ?? []), ...aliases])] }, ctx.now);
+    store.people[name] = p;
+    delete store.pending[name];
+    const seq0 = nextSeq(ev.anchor);
+    if (n.identity && !sheet) putEntry(store, name, 'identity', { id: entryId(name, 'identity', ev.anchor, seq0, n.identity), text: n.identity, src: 'story', anchor: ev.anchor, seq: seq0, quote: n.quote });
+    if (n.speech) putEntry(store, name, 'speech', { id: entryId(name, 'speech', ev.anchor, seq0 + 1, n.speech), text: n.speech, src: 'story', anchor: ev.anchor, seq: seq0 + 1, quote: n.quote, target: '@user' });
+    report.applied.newPeople.push(name);
+    newCount++;
+  }
+
+  // 2. 칸 항목
+  const perPerson = new Map<string, number>();
+  for (const e of r.entries ?? []) {
+    const who = nameOf(str(e?.who));
+    if (!who) {
+      drop('entry', e, '명단에 없는 이름', str(e?.who));
+      continue;
+    }
+    const slot = e.slot as SlotId;
+    if (!SLOTS.includes(slot) || (slot === 'suspicion')) {
+      drop('entry', e, '없는 칸', who);
+      continue;
+    }
+    const ev = evidence(e.m, e.quote);
+    if (typeof ev === 'string') {
+      drop('entry', e, ev, who);
+      continue;
+    }
+    const n = (perPerson.get(who) ?? 0) + 1;
+    if (n > 8) {
+      drop('entry', e, '인물당 8개 상한', who);
+      continue;
+    }
+    perPerson.set(who, n);
+    const cur = liveEntries(store.people[who].slots[slot], live);
+    const op = e.op;
+    if (op === 'remove') {
+      const target = cur.find((x) => x.id === e.replace);
+      if (!target) {
+        drop('entry', e, 'replace 가 실제 항목이 아님', who);
+        continue;
+      }
+      if (target.pin) {
+        drop('entry', e, '고정된 항목', who);
+        continue;
+      }
+      if (!/끝|해소|풀|지켰|이행|완료|회복|나았|돌아|밝혀|밝혔|사라|아니었|아님|취소|resolved|done|no longer|healed|revealed/i.test(e.quote + ' ' + (e.text ?? ''))) {
+        report.held.push({ kind: 'entry', who, reason: '삭제 근거가 분명하지 않음', item: e });
+        continue;
+      }
+      // 삭제 = 빈 텍스트로 대체하는 항목 (대체 항목이 죽으면 이전 항목이 돌아온다)
+      const seq = nextSeq(ev.anchor);
+      putEntry(store, who, slot, { id: entryId(who, slot, ev.anchor, seq, `-${target.id}`), text: `(해소) ${target.text}`.slice(0, 200), src: 'story', anchor: ev.anchor, seq, quote: e.quote, replaces: target.id, ...(target.target ? { target: target.target } : {}) });
+      report.applied.entries++;
+      continue;
+    }
+    const text = plain(e.text, 200);
+    if (!text) {
+      drop('entry', e, '본문 없음', who);
+      continue;
+    }
+    if (minorCheck(who, text)) {
+      drop('entry', e, '미성년 인물에 연애·성적 표현', who);
+      continue;
+    }
+    let replaces: string | undefined;
+    if (op === 'upsert') {
+      const target = cur.find((x) => x.id === e.replace);
+      if (!target) {
+        drop('entry', e, 'replace 가 실제 항목이 아님', who);
+        continue;
+      }
+      if (target.pin) {
+        drop('entry', e, '고정된 항목', who);
+        continue;
+      }
+      if (similar(target.text, text)) {
+        drop('entry', e, '바뀐 내용이 없음', who);
+        continue;
+      }
+      replaces = target.id;
+    } else if (op === 'add') {
+      if (cur.some((x) => similar(x.text, text))) {
+        drop('entry', e, '같은 뜻의 항목이 이미 있음', who);
+        continue;
+      }
+      if (cur.length >= SLOT_CAP[slot] && !['history', 'knowledge'].includes(slot)) {
+        // 상한: 가장 오래된 비고정 항목을 대체
+        const old = cur.find((x) => !x.pin);
+        if (old) replaces = old.id;
+      }
+    } else {
+      drop('entry', e, '없는 연산', who);
+      continue;
+    }
+    const seq = nextSeq(ev.anchor);
+    const target = typeof e.target === 'string' && e.target ? (e.target === '@user' ? '@user' : nameOf(e.target) ?? plain(e.target, 40)) : undefined;
+    if (putEntry(store, who, slot, { id: entryId(who, slot, ev.anchor, seq, text), text, src: 'story', anchor: ev.anchor, seq, quote: e.quote, ...(target ? { target } : {}), ...(replaces ? { replaces } : {}) })) report.applied.entries++;
+  }
+
+  // 3. 호감 계기
+  if (ctx.settings.features.has('affinity')) {
+    const perCue = new Map<string, number>();
+    const changes = liveChanges(store, live);
+    for (const c of r.cues ?? []) {
+      const who = nameOf(str(c?.who));
+      if (!who) {
+        drop('cue', c, '명단에 없는 이름', str(c?.who));
+        continue;
+      }
+      if (!CUES.includes(c.cue as Cue)) {
+        drop('cue', c, '표에 없는 계기', who);
+        continue;
+      }
+      const ev = evidence(c.m, c.quote);
+      if (typeof ev === 'string') {
+        drop('cue', c, ev, who);
+        continue;
+      }
+      const n = (perCue.get(who) ?? 0) + 1;
+      if (n > 2) {
+        drop('cue', c, '인물당 2개 상한', who);
+        continue;
+      }
+      perCue.set(who, n);
+      if (changes.some((x) => x.kind === 'cue' && x.who === who && x.anchor === ev.anchor && x.cue === c.cue)) {
+        drop('cue', c, '같은 메시지에 같은 계기가 이미 있음', who);
+        continue;
+      }
+      if (minorCheck(who, str(c.reason))) {
+        drop('cue', c, '미성년 인물에 연애·성적 표현', who);
+        continue;
+      }
+      const seq = nextSeq(ev.anchor);
+      if (putChange(store, { id: changeId(who, 'cue', ev.anchor, seq, c.cue), anchor: ev.anchor, seq, src: 'story', who, kind: 'cue', cue: c.cue as Cue, quote: c.quote, reason: plain(c.reason, 40) || c.cue })) report.applied.cues++;
+    }
+  }
+
+  // 4. 호칭
+  if (ctx.settings.features.has('register')) {
+    for (const a of r.address ?? []) {
+      const who = nameOf(str(a?.who));
+      if (!who) {
+        drop('address', a, '명단에 없는 이름', str(a?.who));
+        continue;
+      }
+      if (store.people[who].address.pin) {
+        drop('address', a, '고정된 호칭', who);
+        continue;
+      }
+      const ev = evidence(a.m, a.quote);
+      if (typeof ev === 'string') {
+        drop('address', a, ev, who);
+        continue;
+      }
+      const toUser = plain(a.toUser, 20);
+      const register = REGISTERS.includes(a.register as Register) ? (a.register as Register) : null;
+      if (!toUser || !register) {
+        drop('address', a, '호칭·존댓말 값이 없음', who);
+        continue;
+      }
+      const seq = nextSeq(ev.anchor);
+      if (putChange(store, { id: changeId(who, 'address', ev.anchor, seq, `${toUser}|${register}`), anchor: ev.anchor, seq, src: 'story', who, kind: 'address', toUser, register, quote: a.quote, reason: `호칭 → ${toUser} (${register})` })) report.applied.address++;
+    }
+  }
+
+  // 5. 문서
+  for (const d of r.docs ?? []) {
+    const type = d?.type as DocType;
+    if (!DOC_TYPES.includes(type) || !ctx.settings.features.has(`docs_${type}` as Feature)) {
+      drop('doc', d, '없는 문서 종류 또는 꺼진 기능');
+      continue;
+    }
+    const key = plain(d.key, 40);
+    const ev = evidence(d.m, d.quote);
+    if (!key || typeof ev === 'string') {
+      drop('doc', d, typeof ev === 'string' ? ev : '이름 없음');
+      continue;
+    }
+    const doc = store.docs[`${type}:${key}`];
+    const cur = doc ? liveEntries(doc.entries, live) : [];
+    const text = plain(d.text, 200);
+    let replaces: string | undefined;
+    if (d.op === 'upsert' || d.op === 'remove') {
+      const target = cur.find((x) => x.id === d.replace);
+      if (!target) {
+        drop('doc', d, 'replace 가 실제 항목이 아님');
+        continue;
+      }
+      if (target.pin) {
+        drop('doc', d, '고정된 항목');
+        continue;
+      }
+      replaces = target.id;
+    }
+    if (d.op !== 'remove' && !text) {
+      drop('doc', d, '본문 없음');
+      continue;
+    }
+    if (d.op === 'add' && cur.some((x) => similar(x.text, text))) {
+      drop('doc', d, '같은 뜻의 항목이 이미 있음');
+      continue;
+    }
+    const seq = nextSeq(ev.anchor);
+    const body = d.op === 'remove' ? `(해소) ${cur.find((x) => x.id === replaces)!.text}`.slice(0, 200) : text;
+    if (putDoc(store, type, key, { id: entryId(`${type}:${key}`, 'doc', ev.anchor, seq, body), text: body, src: 'story', anchor: ev.anchor, seq, quote: d.quote, ...(replaces ? { replaces } : {}), ...(d.date ? { date: plain(d.date, 20) } : {}), ...(d.place ? { place: plain(d.place, 40) } : {}), ...(Array.isArray(d.who) ? { who: d.who.map((w) => plain(w, 30)).filter(Boolean).slice(0, 8) } : {}) })) report.applied.docs++;
+  }
+
+  // 6. 의심 (인물의 suspicion 칸, 대상·종류 있음)
+  if (ctx.settings.features.has('suspicion')) {
+    for (const s of r.suspicion ?? []) {
+      const who = nameOf(str(s?.who));
+      if (!who) {
+        drop('suspicion', s, '명단에 없는 이름', str(s?.who));
+        continue;
+      }
+      if (!SUSP_KINDS.has(str(s.kind))) {
+        drop('suspicion', s, '없는 의심 종류', who);
+        continue;
+      }
+      const ev = evidence(s.m, s.quote);
+      if (typeof ev === 'string') {
+        drop('suspicion', s, ev, who);
+        continue;
+      }
+      const target = s.target === '@user' ? '@user' : nameOf(str(s.target)) ?? plain(s.target, 30);
+      const text = plain(s.text, 200);
+      if (!target || !text) {
+        drop('suspicion', s, '대상 또는 본문 없음', who);
+        continue;
+      }
+      const cur = liveEntries(store.people[who].slots.suspicion, live).filter((x) => x.target === target && x.kind === s.kind);
+      const seq = nextSeq(ev.anchor);
+      const prefix = s.op === 'open' ? '[시작] ' : s.op === 'clue' ? '[단서] ' : s.op === 'respond' ? '[반응] ' : s.op === 'close' ? '[해소] ' : '';
+      if (!prefix) {
+        drop('suspicion', s, '없는 연산', who);
+        continue;
+      }
+      if (cur.some((x) => similar(x.text, prefix + text))) {
+        drop('suspicion', s, '같은 뜻의 항목이 이미 있음', who);
+        continue;
+      }
+      // close 는 그 대상·종류의 살아 있는 항목을 모두 대체 (하나로 접음)
+      const replaces = s.op === 'close' ? cur.at(-1)?.id : cur.length >= SLOT_CAP.suspicion ? cur.find((x) => !x.pin)?.id : undefined;
+      if (putEntry(store, who, 'suspicion', { id: entryId(who, 'suspicion', ev.anchor, seq, prefix + text), text: prefix + text, src: 'story', anchor: ev.anchor, seq, quote: s.quote, target, kind: s.kind, ...(replaces ? { replaces } : {}) })) report.applied.suspicion++;
+    }
+  }
+
+  // 7. 유저 신분 (상태창에 없을 때 참고값)
+  if (r.identity && (r.identity.faction || r.identity.rank) && (!store.identity || store.identity.from !== 'status')) {
+    const anchor = messageKey(list[Math.max(...input.indexes)], Math.max(...input.indexes));
+    store.identity = { faction: plain(r.identity.faction, 20), rank: plain(r.identity.rank, 20), level: null, from: 'scan', anchor };
+    report.applied.identity = true;
+  }
+
+  // 8. 다음 턴 메모 (사실형 Director)
+  if (ctx.settings.director === 'facts') {
+    const anchor = messageKey(list[Math.max(...input.indexes)], Math.max(...input.indexes));
+    for (const n of r.next_note ?? []) {
+      const who = nameOf(str(n?.who));
+      if (!who || !input.people.includes(who)) {
+        drop('note', n, '장면 인물이 아님', str(n?.who));
+        continue;
+      }
+      const now = plain(n.now, 160);
+      const mustNot = Array.isArray(n.must_not_reveal) ? n.must_not_reveal.map((x) => plain(x, 100)).filter(Boolean).slice(0, 5) : [];
+      if (!now && !mustNot.length) continue;
+      const seq = nextSeq(anchor);
+      if (putChange(store, { id: changeId(who, 'note', anchor, seq, now + mustNot.join('|')), anchor, seq, src: 'story', who, kind: 'note', now, mustNot, reason: '다음 턴 메모' })) report.applied.notes++;
+    }
+  }
+
+  markRead(store, chat, input.indexes);
+  return report;
+}
+
+/** 이 인물의 가장 최근 다음 턴 메모 (살아 있는 것) */
+export function latestNote(store: PeopleStore, who: string, live: Liveness): { now?: string; mustNot?: string[] } | null {
+  const n = [...store.log].reverse().find((c) => c.kind === 'note' && c.who === who && isAlive(c, live));
+  return n ? { now: n.now, mustNot: n.mustNot } : null;
+}
+
+export { entriesOf };
