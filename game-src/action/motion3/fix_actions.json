@@ -1,0 +1,1801 @@
+[
+ {
+  "key": "1.1_쟈알디",
+  "row": "6",
+  "why": [
+   "점프인데 발이 거의 안 뜸 7px"
+  ],
+  "cond": "A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land.",
+  "no_end": true,
+  "action": "A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land. Starting from standing upright, bend both knees deeply with the arms pressed straight at the sides, then spring straight up high with the whole body held straight like a pole and the legs straight together, the long hair flying up above the head. Land on both feet, bend the knees deeply to take the landing, and straighten up with the arms at the sides."
+ },
+ {
+  "key": "1.2_스팡달",
+  "row": "6",
+  "why": [
+   "점프인데 발이 거의 안 뜸 14px"
+  ],
+  "cond": "A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land.",
+  "no_end": true,
+  "action": "A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land. Start standing upright. Bend the knees into a crouch with the knees together and the fingertips touching the floor, then spring straight up with the legs pressed together, the toes pointed and both hands raised beside the head. Land on the balls of the feet with the knees bending, then stand up straight with the arms relaxed at the sides."
+ },
+ {
+  "key": "1.2_스팡달",
+  "row": "12",
+  "why": [
+   "뒤로 뻗음(앞 0 뒤 36)"
+  ],
+  "cond": "The body stays side-on facing west (left) the whole time and never turns around. Keep the backswing short; the strike travels forward toward west (left) only, never behind the body.",
+  "no_end": false,
+  "action": "The body stays side-on facing west (left) the whole time and never turns around. Keep the backswing short; the strike travels forward toward west (left) only, never behind the body. Drop into a very deep crouch and slap the front open palm flat on the floor ahead with the fingers spread wide. Spring up tall onto the toes with both arms flung straight up above the head, the whole body stretched in one line. Then bend the knees, bring the hands down in front of the chest and sink back into the sta"
+ },
+ {
+  "key": "1.3_잼트리",
+  "row": "W-1",
+  "why": [
+   "반복 이음 끊김(위치 맞춰도 38%)"
+  ],
+  "cond": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame.",
+  "no_end": false,
+  "action": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. Hold the throwing-ready pose with the rear hand swung back low behind the hip, rocking a little forward and back on the bent knees, the rear hand swinging slightly back and forth with the body."
+ },
+ {
+  "key": "1.3_잼트리",
+  "row": "18-1",
+  "why": [
+   "떨어진 큰 덩어리 2번 장(2084px)"
+  ],
+  "cond": "Draw only the character's own body and the weapon it already holds: no motion blur, no slash trails, no smears, no flashes or effects. Keep the exact same outfit, colors, body size and proportions in every frame.",
+  "no_end": false,
+  "action": "Draw only the character's own body and the weapon it already holds: no motion blur, no slash trails, no smears, no flashes or effects. Keep the exact same outfit, colors, body size and proportions in every frame. Get kicked in the stomach: the warm smile breaks into a pained face, the body folds forward over the waist with both hands pressing the stomach, the knees knocking together on the high heels and the long wavy hair falling forward over the shoulders. Straighten up into the fighting stanc"
+ },
+ {
+  "key": "1.5_고그니쟈",
+  "row": "3",
+  "why": [
+   "반복 이음 끊김(위치 맞춰도 50%)"
+  ],
+  "cond": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame.",
+  "no_end": false,
+  "action": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. Keep the wide stance with the arms spread. Bounce the hips down and up on the bent knees twice, the clawed fingers wiggling and the shoulders bobbing, the coat tails and the white hair bouncing with each dip."
+ },
+ {
+  "key": "1.5_고그니쟈",
+  "row": "W-1",
+  "why": [
+   "반복 이음 끊김(위치 맞춰도 50%)"
+  ],
+  "cond": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame.",
+  "no_end": false,
+  "action": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. Keep the wide stance holding the remote forward. Dip down and up on the bent knees twice, the thumb tapping the remote, the rear hand wiggling its fingers and the coat tails swaying."
+ },
+ {
+  "key": "1.5_고그니쟈",
+  "row": "38",
+  "why": [
+   "캔버스 끝 잘림 1장(15px 이상)"
+  ],
+  "cond": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges.",
+  "no_end": false,
+  "action": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges. Roll over onto the stomach and lie face down flat, the chest, belly and both legs pressed to the floor, the head toward the east. Then slowly pull the body forward along the floor with the forearms, one forearm reaching ahead and dragging, then the other, the legs stretched flat behind and the coat dragging, the head and feet level in one line with the floo"
+ },
+ {
+  "key": "1.6_큐라스",
+  "row": "12",
+  "why": [
+   "캔버스 끝 잘림 1장(15px 이상)",
+   "뒤로 뻗음(앞 0 뒤 24)"
+  ],
+  "cond": "The body stays side-on facing east (right) the whole time and never turns around. Keep the backswing short; the strike travels forward toward east (right) only, never behind the body. Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges.",
+  "no_end": false,
+  "action": "The body stays side-on facing east (right) the whole time and never turns around. Keep the backswing short; the strike travels forward toward east (right) only, never behind the body. Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges. Drop into a deep crouch with the knees wide and both open hands down near the floor in front of the feet. Rise up onto the toes while sweeping both arms up in front of the bod"
+ },
+ {
+  "key": "1.6_큐라스",
+  "row": "15",
+  "why": [
+   "뒤로 뻗음(앞 0 뒤 28)"
+  ],
+  "cond": "The body stays side-on facing east (right) the whole time and never turns around. Keep the backswing short; the strike travels forward toward east (right) only, never behind the body.",
+  "no_end": false,
+  "action": "The body stays side-on facing east (right) the whole time and never turns around. Keep the backswing short; the strike travels forward toward east (right) only, never behind the body. Lean the upper body forward over the bent front knee and shoot the front arm straight forward at head height, pointing with the index finger, the rear hand gripping the front wrist. Snap the fingers twice: each time the front arm kicks up above the head and the shoulders and head jerk back, then the arm drops level"
+ },
+ {
+  "key": "1.7_고르고디오",
+  "row": "W-1",
+  "why": [
+   "반복 이음 끊김(위치 맞춰도 47%)"
+  ],
+  "cond": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame.",
+  "no_end": false,
+  "action": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. Rock the whole heavy body forward until the head is over the front knee, then back until the head is over the rear knee, the knees bending deeper on each side, the cleaver hanging in the rear hand beside the hip swinging a little with it and the front open hand held forward at chest height. Repeat."
+ },
+ {
+  "key": "1.7_고르고디오",
+  "row": "6",
+  "why": [
+   "점프인데 발이 거의 안 뜸 11px"
+  ],
+  "cond": "A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land.",
+  "no_end": true,
+  "action": "A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land. Sink into a deep squat with the knees wide apart and both arms hanging down between the knees, then jump straight up a short way with both arms flung up and out to the sides above the shoulders. Slam down onto both feet wide apart, the knees bending deep and the shoulders dropping with the heavy weight, then stand up with the arms at the sides."
+ },
+ {
+  "key": "1.7_고르고디오",
+  "row": "38-1",
+  "why": [
+   "캔버스 끝 잘림 1장(15px 이상)"
+  ],
+  "cond": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges.",
+  "no_end": false,
+  "action": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges. Crawl forward on the belly toward the east: plant one big forearm ahead and haul the heavy body forward, then the other forearm, two full crawl strokes, the belly and the legs staying flat on the floor, ending in exactly the starting pose."
+ },
+ {
+  "key": "1.8_데쥬레",
+  "row": "3",
+  "why": [
+   "반복 이음 끊김(위치 맞춰도 45%)"
+  ],
+  "cond": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame.",
+  "no_end": false,
+  "action": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. Keeping the timid crouch, bob the whole body quickly down and up from the knees twice, the knees knocking together and the raised open hands trembling in front of the face, the twin ponytails bouncing."
+ },
+ {
+  "key": "1.8_데쥬레",
+  "row": "22",
+  "why": [
+   "뒤로 뻗음(앞 0 뒤 54)"
+  ],
+  "cond": "The body stays side-on facing east (right) the whole time and never turns around. Keep the backswing short; the strike travels forward toward east (right) only, never behind the body.",
+  "no_end": false,
+  "action": "The body stays side-on facing east (right) the whole time and never turns around. Keep the backswing short; the strike travels forward toward east (right) only, never behind the body. Staying in east side view the whole time, flinch and duck the head, tuck straight into a ball with both arms wrapped over the head, and roll backward once along the floor toward the west. Come up crouched low with both arms still wrapped over the head, then rise into the timid crouch, hunched forward with both open"
+ },
+ {
+  "key": "1.8_데쥬레",
+  "row": "33",
+  "why": [
+   "시작·끝 장 발이 뜸 16px"
+  ],
+  "cond": "Both feet stay on the same floor line at the start and at the end.",
+  "no_end": false,
+  "action": "Both feet stay on the same floor line at the start and at the end. Startle hard, staying in east side view the whole time: hop up and back off both feet with both open hands flying up beside the face, the mouth open wide in a shriek and the twin ponytails flying up. Land, freeze for a moment with the hands up, then lower the arms to the sides and stand upright facing east."
+ },
+ {
+  "key": "1.8_데쥬레",
+  "row": "34",
+  "why": [
+   "시작·끝 장 발이 뜸 18px"
+  ],
+  "cond": "Both feet stay on the same floor line at the start and at the end.",
+  "no_end": false,
+  "action": "Both feet stay on the same floor line at the start and at the end. Start standing upright. Jump straight up high in place with both arms flung straight up, the mouth wide open in a shriek and the twin ponytails flaring up. Land with the knees bent and hold for a moment with both hands clutching the chest, then stand upright with the arms at the sides."
+ },
+ {
+  "key": "1.9_데드폴",
+  "row": "12",
+  "why": [
+   "뒤로 뻗음(앞 0 뒤 33)"
+  ],
+  "cond": "The body stays side-on facing east (right) the whole time and never turns around. Keep the backswing short; the strike travels forward toward east (right) only, never behind the body.",
+  "no_end": false,
+  "action": "The body stays side-on facing east (right) the whole time and never turns around. Keep the backswing short; the strike travels forward toward east (right) only, never behind the body. Grab forward at chest height with both gloved hands, then drop straight backward onto the back while pulling both fists over the head, the front foot kicking up into the air above the body. Roll backward over one shoulder onto one knee, the long hair whipping around, and spring up into the stance with both open han"
+ },
+ {
+  "key": "1.10_게슈간",
+  "row": "3",
+  "why": [
+   "반복 이음 끊김(위치 맞춰도 37%)"
+  ],
+  "cond": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame.",
+  "no_end": false,
+  "action": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. Keep the body side-on facing east. Sink slowly on the bent knees so the hips drop about a hand's width and rise again, while the front hand slowly closes into a fist at shoulder height and opens again, the white bob bouncing a little."
+ },
+ {
+  "key": "1.11_로제몬",
+  "row": "34",
+  "why": [
+   "시작·끝 장 발이 뜸 29px"
+  ],
+  "cond": "Both feet stay on the same floor line at the start and at the end.",
+  "no_end": false,
+  "action": "Both feet stay on the same floor line at the start and at the end. Starting from standing, jump in fright so both feet leave the floor, the knees bent and both arms flung up beside the head, the long hair flaring out. Land and freeze with both hands clutching the hair at the sides of the head and the eyes wide, hold that for a moment, then lower the arms to the sides."
+ },
+ {
+  "key": "1.12_콘쥬스",
+  "row": "3",
+  "why": [
+   "반복 이음 끊김(위치 맞춰도 38%)"
+  ],
+  "cond": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame.",
+  "no_end": false,
+  "action": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. Bounce on the balls of the feet with the bent knees pumping, and pump the flexed front arm up and down a hand's width, the fist staying above the head and the rear fist on the hip, the bob hair bouncing."
+ },
+ {
+  "key": "1.12_콘쥬스",
+  "row": "11",
+  "why": [
+   "뒤로 뻗음(앞 6 뒤 32)"
+  ],
+  "cond": "The body stays side-on facing west (left) the whole time and never turns around. Keep the backswing short; the strike travels forward toward west (left) only, never behind the body.",
+  "no_end": false,
+  "action": "The body stays side-on facing west (left) the whole time and never turns around. Keep the backswing short; the strike travels forward toward west (left) only, never behind the body. Step the front foot a long stride forward and bend forward at the waist, swinging both clenched hands from above the head down and forward to knee height, the front knee bending deep and the rear leg straight, opening both hands at the bottom as if throwing down a heavy load. Then rise and settle into the fighting st"
+ },
+ {
+  "key": "1.12_콘쥬스",
+  "row": "13",
+  "why": [
+   "캔버스 끝 잘림 1장(15px 이상)"
+  ],
+  "cond": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges.",
+  "no_end": false,
+  "action": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges. Drop low in one long sliding step, the front knee bending deep and the rear leg straight behind, and sweep both arms down to knee height in front. Then scoop both arms up together from knee height to high above the head while straightening the legs onto the toes, as if hoisting someone up. Lower the arms into the fighting stance with the front arm flexed ab"
+ },
+ {
+  "key": "1.12_콘쥬스",
+  "row": "22",
+  "why": [
+   "뒤로 뻗음(앞 3 뒤 23)"
+  ],
+  "cond": "The body stays side-on facing west (left) the whole time and never turns around. Keep the backswing short; the strike travels forward toward west (left) only, never behind the body.",
+  "no_end": false,
+  "action": "The body stays side-on facing west (left) the whole time and never turns around. Keep the backswing short; the strike travels forward toward west (left) only, never behind the body. Squat down deep with the knees together and grip low in front at the floor with both hands, then straighten the knees and hoist both arms straight up above the head in one easy move, rising onto the toes. Step forward and bring both hands down firmly to waist height in front, then dust the hands together and grin, en"
+ },
+ {
+  "key": "2.1_사장",
+  "row": "6",
+  "why": [
+   "캔버스 끝 잘림 1장(15px 이상)",
+   "점프인데 발이 거의 안 뜸 9px"
+  ],
+  "cond": "A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land. Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges.",
+  "no_end": true,
+  "action": "A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land. Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges. Start standing. Bend both knees deep with the arms hanging, then spring straight up high, spreading both arms straight out to the sides at shoulder height with the palms down, the legs pressed together and straight with the "
+ },
+ {
+  "key": "2.1_사장",
+  "row": "38-1",
+  "why": [
+   "캔버스 끝 잘림 1장(15px 이상)"
+  ],
+  "cond": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges.",
+  "no_end": false,
+  "action": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges. Keep lying flat on the stomach and drag forward toward the west on the forearms, the left forearm reaching ahead and pulling, then the right, the legs dragging flat behind."
+ },
+ {
+  "key": "2.2_도필헌",
+  "row": "3",
+  "why": [
+   "반복 이음 끊김(위치 맞춰도 63%)"
+  ],
+  "cond": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame.",
+  "no_end": false,
+  "action": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. Keep the body side-on facing east the whole time. Bend both knees deeper so the hips sink a hand's width while the rear foot slides half a step back, then rise up onto the balls of the feet as the rear foot slides back in, in a repeating rhythm, the open hands swaying a little forward and back with the body."
+ },
+ {
+  "key": "2.2_도필헌",
+  "row": "13",
+  "why": [
+   "뒤로 뻗음(앞 0 뒤 53)"
+  ],
+  "cond": "The body stays side-on facing east (right) the whole time and never turns around. Keep the backswing short; the strike travels forward toward east (right) only, never behind the body.",
+  "no_end": false,
+  "action": "The body stays side-on facing east (right) the whole time and never turns around. Keep the backswing short; the strike travels forward toward east (right) only, never behind the body. Keep the body side-on facing east the whole time. Drop very low from the run onto the bent rear leg and slide forward with the rear hand flat on the floor beside the hip, stretching the front leg straight ahead along the floor with the toes hooked up at ankle height, the upper body leaning back low. Push off the ha"
+ },
+ {
+  "key": "2.3_이길환",
+  "row": "10",
+  "why": [
+   "시작·끝 장 발이 뜸 15px"
+  ],
+  "cond": "Both feet stay on the same floor line at the start and at the end.",
+  "no_end": false,
+  "action": "Both feet stay on the same floor line at the start and at the end. Pull the belly back in and swing the rear arm up over the head with the palm open, twisting the hips, then bring the open rear palm down in front to shoulder height in a big patting motion, the upper body bending forward over the front knee and the rear heel lifting. Hold the patting hand reaching forward at full stretch."
+ },
+ {
+  "key": "2.3_이길환",
+  "row": "11",
+  "why": [
+   "시작·끝 장 발이 뜸 15px"
+  ],
+  "cond": "Both feet stay on the same floor line at the start and at the end.",
+  "no_end": false,
+  "action": "Both feet stay on the same floor line at the start and at the end. Draw the reaching hand back and fold both hands together over the belly, then bow the upper body deeply forward at the waist so the top of the head drives forward to chest height, stepping the rear foot up. Straighten up and settle into the wide stance with both open hands palms down in front of the belly."
+ },
+ {
+  "key": "2.5_김조학",
+  "row": "3",
+  "why": [
+   "반복 이음 끊김(위치 맞춰도 41%)"
+  ],
+  "cond": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame.",
+  "no_end": false,
+  "action": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. Keep both arms folded across the chest the whole time. Sink down by bending the knees deeper while pushing the head slowly forward, then rise up onto the balls of the feet while pulling the head back. Keep the body side-on facing east."
+ },
+ {
+  "key": "2.5_김조학",
+  "row": "6",
+  "why": [
+   "점프인데 발이 거의 안 뜸 3px"
+  ],
+  "cond": "A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land.",
+  "no_end": true,
+  "action": "A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land. Start standing. Squat down deep with both arms held straight down at the sides. Spring straight up with the legs pressed together and the toes pointing down, both feet high off the ground, the arms still straight at the sides like standing at attention. Land on both feet with the knees bending deep, then stand up."
+ },
+ {
+  "key": "2.7_고영훈",
+  "row": "6",
+  "why": [
+   "캔버스 끝 잘림 3장(15px 이상)"
+  ],
+  "cond": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges.",
+  "no_end": false,
+  "action": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges. Start standing. Bend both knees deep and swing the arms back, then spring straight up high and snap the whole body straight like a rod in the air, the arms pressed flat to the sides and the legs together with the toes pointing down. Land on both feet with the knees bending deep to take it, then stand straight with the arms at the sides."
+ },
+ {
+  "key": "2.7_고영훈",
+  "row": "37",
+  "why": [
+   "멈춤(0%)"
+  ],
+  "cond": "The motion must be clearly visible from frame to frame, with the whole body moving.",
+  "no_end": false,
+  "action": "The motion must be clearly visible from frame to frame, with the whole body moving. Keep the body side-on facing east the whole time. Bend both knees into a half crouch and lean the upper body back, thrusting both arms straight forward at chest height with the open palms facing forward as if holding something off, the head pulled down between the shoulders."
+ },
+ {
+  "key": "2.8_노기균",
+  "row": "W-1",
+  "why": [
+   "반복 이음 끊김(위치 맞춰도 46%)"
+  ],
+  "cond": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame.",
+  "no_end": false,
+  "action": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. Bounce on the knees in a repeating rhythm, lowering the hips a hand's width and rising back up, the katana on the rear shoulder tapping up and down with the body and the open front hand bobbing in front of the chest."
+ },
+ {
+  "key": "2.8_노기균",
+  "row": "10",
+  "why": [
+   "뒤로 뻗음(앞 3 뒤 24)"
+  ],
+  "cond": "The body stays side-on facing east (right) the whole time and never turns around. Keep the backswing short; the strike travels forward toward east (right) only, never behind the body.",
+  "no_end": false,
+  "action": "The body stays side-on facing east (right) the whole time and never turns around. Keep the backswing short; the strike travels forward toward east (right) only, never behind the body. Keep the body side-on facing east the whole time. Lift the katana from the knee to hold it level beside the rear hip, the tip pointing back. Step the rear foot through into a wide stance and twist the hips so the sword arm ends stretched straight forward at waist height, the blade level and pointing forward, the fr"
+ },
+ {
+  "key": "2.8_노기균",
+  "row": "22",
+  "why": [
+   "뒤로 뻗음(앞 0 뒤 26)"
+  ],
+  "cond": "The body stays side-on facing east (right) the whole time and never turns around. Keep the backswing short; the strike travels forward toward east (right) only, never behind the body.",
+  "no_end": false,
+  "action": "The body stays side-on facing east (right) the whole time and never turns around. Keep the backswing short; the strike travels forward toward east (right) only, never behind the body. Bounce forward three times in short springy hops low to the floor, the knees snapping up high with each hop and the katana held low behind the hip. On the last landing swing the blade from below the knee straight up to above the head. Rest the katana back on the rear shoulder, front hand open in front of the chest."
+ },
+ {
+  "key": "2.9_송주익",
+  "row": "23",
+  "why": [
+   "멈춤(4%)"
+  ],
+  "cond": "The motion must be clearly visible from frame to frame, with the whole body moving.",
+  "no_end": false,
+  "action": "The motion must be clearly visible from frame to frame, with the whole body moving. Sink into a low crouch, pulling the katana back low behind the rear hip with one hand, and raise the free hand beside the mouth with the palm cupped as if shouting a report, the mouth opening and closing fast. Hold the low crouch with the mouth moving. Keep the body side-on facing east the whole time."
+ },
+ {
+  "key": "2.10_곽성주",
+  "row": "3",
+  "why": [
+   "반복 이음 끊김(위치 맞춰도 56%)"
+  ],
+  "cond": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame.",
+  "no_end": false,
+  "action": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. Bounce in place: bend both knees so the whole huge body sinks low and the shoulders roll forward, then push back up with the chest out. Repeat once. The fists stay low in front of the belt. Keep the body side-on facing east the whole time."
+ },
+ {
+  "key": "2.10_곽성주",
+  "row": "W-1",
+  "why": [
+   "반복 이음 끊김(위치 맞춰도 56%)"
+  ],
+  "cond": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame.",
+  "no_end": false,
+  "action": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. Bounce heavily at the knees holding the minigun at the hip with both hands, the whole body sinking and rising, the barrels staying pointed east. Repeat once. Keep the body side-on facing east the whole time."
+ },
+ {
+  "key": "2.10_곽성주",
+  "row": "9",
+  "why": [
+   "캔버스 끝 잘림 1장(15px 이상)"
+  ],
+  "cond": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges.",
+  "no_end": false,
+  "action": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges. Start in the wide stance. Pull the front forearm in level across the chest like a bar with the elbow pointing east, and lean back onto the rear leg. Then step the front foot one long stride forward into a deep lunge, the front knee bent deep and the rear leg straight, and shove the level forearm forward to the east with the whole chest behind it. Hold that "
+ },
+ {
+  "key": "2.10_곽성주",
+  "row": "15",
+  "why": [
+   "캔버스 끝 잘림 1장(15px 이상)"
+  ],
+  "cond": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges.",
+  "no_end": false,
+  "action": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges. Brace the feet even wider and lean the chest forward over the minigun at the hip, fire a long burst with the shoulders, arms and upper body shaking hard from the recoil and the barrels staying pointed east, then settle back into the stance holding the gun at the hip. Keep the body side-on facing east the whole time."
+ },
+ {
+  "key": "2.12_윤병수",
+  "row": "22",
+  "why": [
+   "뒤로 뻗음(앞 0 뒤 42)"
+  ],
+  "cond": "The body stays side-on facing east (right) the whole time and never turns around. Keep the backswing short; the strike travels forward toward east (right) only, never behind the body.",
+  "no_end": false,
+  "action": "The body stays side-on facing east (right) the whole time and never turns around. Keep the backswing short; the strike travels forward toward east (right) only, never behind the body. Keep the body side-on in profile facing east. Grab the barrel with the front hand too, stride two long steps forward into a very deep lunge with the upper body leaning far forward, and sweep the barrel slowly from pointing at the ground in front up to chest height, the shoulders jolting back with each beat. Then pu"
+ },
+ {
+  "key": "2.13_김성진",
+  "row": "3",
+  "why": [
+   "반복 이음 끊김(위치 맞춰도 41%)"
+  ],
+  "cond": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame.",
+  "no_end": false,
+  "action": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. Bounce in place on the balls of the feet, keeping the body side-on facing east and the stance wide: drop the hips down a full hand lower with both knees bending deep, then spring up high so both heels leave the ground. The front hand curls its fingers toward himself once as if saying come on, and the chin stays raised."
+ },
+ {
+  "key": "2.13_김성진",
+  "row": "11",
+  "why": [
+   "시작·끝 장 발이 뜸 12px"
+  ],
+  "cond": "Both feet stay on the same floor line at the start and at the end.",
+  "no_end": false,
+  "action": "Both feet stay on the same floor line at the start and at the end. Starting from the leaning hook, pull the upper body back and lift the front knee up to the chest. Thrust the front foot straight out to the east with the sole flat at stomach height, leaning the upper body far back with the arms flung back for balance. Pull the leg back and drop into the fighting stance."
+ },
+ {
+  "key": "2.13_김성진",
+  "row": "15",
+  "why": [
+   "캔버스 끝 잘림 1장(15px 이상)"
+  ],
+  "cond": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges.",
+  "no_end": false,
+  "action": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges. Keep the body side-on facing east the whole time with the feet planted wide. Lower the pistol from beside the cheek and thrust the gun arm straight out to the east at shoulder height, leaning the upper body far forward. Fire three times, the wrist and forearm kicking up high with each recoil and the shoulders jolting back. Then raise the pistol back upright"
+ },
+ {
+  "key": "2.14_송진섭",
+  "row": "24",
+  "why": [
+   "뒤로 뻗음(앞 0 뒤 68)"
+  ],
+  "cond": "The body stays side-on facing east (right) the whole time and never turns around. Keep the backswing short; the strike travels forward toward east (right) only, never behind the body.",
+  "no_end": false,
+  "action": "The body stays side-on facing east (right) the whole time and never turns around. Keep the backswing short; the strike travels forward toward east (right) only, never behind the body. Keep the body side-on facing east the whole time. Keep the device in the rear hand and fling the front arm straight out forward to the east, pointing with the whole arm at shoulder height and the mouth wide open shouting. Then swing that arm up over the head to point back behind to the west. Tuck the device into th"
+ },
+ {
+  "key": "3.1_청달래",
+  "row": "6",
+  "why": [
+   "점프인데 발이 거의 안 뜸 6px"
+  ],
+  "cond": "A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land.",
+  "no_end": true,
+  "action": "A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land. Start standing. Bend the knees deep and lay both hands flat one over the other on the stomach, then spring straight up high with the body perfectly straight like a pole, the legs together, toes pointing down, the ponytail flying up. Land on both feet with the knees bending to take it, and stand with the arms at the sides."
+ },
+ {
+  "key": "3.2_호유원",
+  "row": "3",
+  "why": [
+   "반복 이음 끊김(위치 맞춰도 72%)"
+  ],
+  "cond": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame.",
+  "no_end": false,
+  "action": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. Keep the stance and both hands in the trouser pockets, and bounce lightly on the toes: bend both knees to sink lower, then spring up so both heels lift high off the floor, the jacket tails swinging, repeating."
+ },
+ {
+  "key": "3.4_진나솔",
+  "row": "6",
+  "why": [
+   "점프인데 발이 거의 안 뜸 4px"
+  ],
+  "cond": "A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land.",
+  "no_end": true,
+  "action": "A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land. Start standing. Bend into a deep crouch with both hands swinging down behind the hips, spring straight up high with the whole body stretched in one straight line, legs straight, toes pointed and arms pressed to the sides, the ponytail flying up, then land on the balls of the feet with the knees bent deep and straighten up to standing upright with the arms at the "
+ },
+ {
+  "key": "3.4_진나솔",
+  "row": "12",
+  "why": [
+   "뒤로 뻗음(앞 0 뒤 39)"
+  ],
+  "cond": "The body stays side-on facing east (right) the whole time and never turns around. Keep the backswing short; the strike travels forward toward east (right) only, never behind the body.",
+  "no_end": false,
+  "action": "The body stays side-on facing east (right) the whole time and never turns around. Keep the backswing short; the strike travels forward toward east (right) only, never behind the body. Shift the weight onto the rear leg and raise the straight front leg up in front until the heel is above head height, the upper body leaning back and the front arm reaching back; then drop the heel straight down to the floor in front, sinking into a deep crouch with the front knee bent and the upper body leaning ove"
+ },
+ {
+  "key": "3.5_이성해",
+  "row": "11",
+  "why": [
+   "뒤로 뻗음(앞 0 뒤 36)"
+  ],
+  "cond": "The body stays side-on facing west (left) the whole time and never turns around. Keep the backswing short; the strike travels forward toward west (left) only, never behind the body.",
+  "no_end": false,
+  "action": "The body stays side-on facing west (left) the whole time and never turns around. Keep the backswing short; the strike travels forward toward west (left) only, never behind the body. Bring both hands forward together at chest height and close them as if gripping a wrist, twist both hands outward and step the rear foot forward into a deep low squat, pulling the grip down and forward to the floor in front of the feet; hold that low pose for a moment, then open the hands and rise to settle into the "
+ },
+ {
+  "key": "3.6_이자헌",
+  "row": "6",
+  "why": [
+   "점프인데 발이 거의 안 뜸 5px"
+  ],
+  "cond": "A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land.",
+  "no_end": true,
+  "action": "A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land. Starting from standing, squat deep with the knees bent and both arms pulled straight back, then spring straight up with the whole body held straight like a pillar, both arms pressed straight down at the sides and the feet high off the ground, then land on both feet, absorb with the knees bent deep, and stand upright."
+ },
+ {
+  "key": "3.7_은하제",
+  "row": "3",
+  "why": [
+   "반복 이음 끊김(위치 맞춰도 41%)"
+  ],
+  "cond": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame.",
+  "no_end": false,
+  "action": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. Shift the weight from the back leg onto the front knee and back again, the hips dipping a hand lower on each shift and the shoulders rolling with it, while the fingers of the rear hand rake the fringe back once more. Keep the body side-on facing east the whole time."
+ },
+ {
+  "key": "3.7_은하제",
+  "row": "6",
+  "why": [
+   "점프인데 발이 거의 안 뜸 6px"
+  ],
+  "cond": "A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land.",
+  "no_end": true,
+  "action": "A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land. Start standing. Sink into a deep crouch with both arms hanging back behind the hips, then spring straight up so both feet leave the floor high, stretching the whole body long with both arms reaching high above the head like a full-body stretch. Land on deeply bent knees as the arms come down, then rise to standing with feet together and arms relaxed at the sides."
+ },
+ {
+  "key": "3.8_박민성",
+  "row": "12",
+  "why": [
+   "시작·끝 장 발이 뜸 11px"
+  ],
+  "cond": "Both feet stay on the same floor line at the start and at the end.",
+  "no_end": false,
+  "action": "Both feet stay on the same floor line at the start and at the end. Lift the front foot up to knee height while leaning back and pulling the rear open hand back behind the shoulder, then put the front foot down heavily a long step forward and sink deep, driving the rear open palm straight forward at chest height until the arm is fully stretched and the shoulder follows. Settle into the hunched wide stance with both forearms up in front of the face. Keep the body side-on facing east the whole time"
+ },
+ {
+  "key": "3.8_박민성",
+  "row": "34",
+  "why": [
+   "시작·끝 장 발이 뜸 11px"
+  ],
+  "cond": "Both feet stay on the same floor line at the start and at the end.",
+  "no_end": false,
+  "action": "Both feet stay on the same floor line at the start and at the end. Jump a little off the floor in fright so both feet leave the ground, pull both hands up to the chin and hunch the big shoulders up with the mouth wide open. Land with the knees bent and hold the frightened pose for a moment, then stand upright with the arms at the sides."
+ },
+ {
+  "key": "3.9_백사헌",
+  "row": "8",
+  "why": [
+   "캔버스 끝 잘림 1장(15px 이상)"
+  ],
+  "cond": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges.",
+  "no_end": false,
+  "action": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges. Push off the rear foot and leap forward, stretching the whole thin body out flat and level in the air like sliding into a narrow gap, both arms reaching straight forward and both legs straight back. Swing the feet under the body, land in a deep crouch, and rise into the fighting stance. Keep the body side-on facing west the whole time."
+ },
+ {
+  "key": "3.9_백사헌",
+  "row": "9",
+  "why": [
+   "캔버스 끝 잘림 1장(15px 이상)"
+  ],
+  "cond": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges.",
+  "no_end": false,
+  "action": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges. Starting from the stance, shift the weight back onto the rear leg, then lunge the front foot a long step forward with the front knee bent deep and the rear leg straight, and drive the rear fist out from inside the jacket straight forward to eye height, the arm fully extended and the shoulder thrust in, the front hand pulled back to the chest. Hold the full "
+ },
+ {
+  "key": "3.9_백사헌",
+  "row": "12",
+  "why": [
+   "뒤로 뻗음(앞 2 뒤 32)"
+  ],
+  "cond": "The body stays side-on facing west (left) the whole time and never turns around. Keep the backswing short; the strike travels forward toward west (left) only, never behind the body.",
+  "no_end": false,
+  "action": "The body stays side-on facing west (left) the whole time and never turns around. Keep the backswing short; the strike travels forward toward west (left) only, never behind the body. Starting from the stance, lunge forward and fold the upper body down until the chest is near the front knee, reaching both hands forward to ankle height near the floor and closing the fingers. Then throw the weight back onto the rear leg and drag both closed hands back to the hips, leaning far back. Rise into the fig"
+ },
+ {
+  "key": "3.9_백사헌",
+  "row": "24",
+  "why": [
+   "뒤로 뻗음(앞 0 뒤 38)"
+  ],
+  "cond": "The body stays side-on facing west (left) the whole time and never turns around. Keep the backswing short; the strike travels forward toward west (left) only, never behind the body.",
+  "no_end": false,
+  "action": "The body stays side-on facing west (left) the whole time and never turns around. Keep the backswing short; the strike travels forward toward west (left) only, never behind the body. Drop the eyepatch and sweep the front hand down to the hip, straighten the upper body up tall and tilt the head back with a wide mocking grin and the tongue out, then sink back into the fighting stance. Keep the body side-on facing west the whole time."
+ },
+ {
+  "key": "3.10_고영은",
+  "row": "3",
+  "why": [
+   "반복 이음 끊김(위치 맞춰도 49%)"
+  ],
+  "cond": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame.",
+  "no_end": false,
+  "action": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. Keep the body side-on facing east the whole time. Keep both feet planted. Bend both knees deeper so the hips and head sink a full hand lower, then push up again in a springy bounce; on the way down the fingers lift off the forehead, on the way up they press back on, the rear arm staying stretched back."
+ },
+ {
+  "key": "3.11_강이학",
+  "row": "42",
+  "why": [
+   "바닥 아래로 꺼짐 10px"
+  ],
+  "cond": "Both feet stay on the same floor line at the start and at the end.",
+  "no_end": false,
+  "action": "Both feet stay on the same floor line at the start and at the end. Lean forward and put both hands down on the floor, then turn side-on facing east onto the hands and knees and crawl forward: one hand forward, then the opposite knee, then the other hand, then the other knee, head low. Keep the body side-on facing east the whole time."
+ },
+ {
+  "key": "3.11_강이학",
+  "row": "42-1",
+  "why": [
+   "발이 바닥 아래로 9px"
+  ],
+  "cond": "Both feet stay on the same floor line at the start and at the end.",
+  "no_end": false,
+  "action": "Both feet stay on the same floor line at the start and at the end. Keep crawling on the hands and knees: one hand forward, then the opposite knee, then the other hand, then the other knee, head low. Keep the body side-on facing east the whole time."
+ },
+ {
+  "key": "3.12_장허운",
+  "row": "3",
+  "why": [
+   "반복 이음 끊김(위치 맞춰도 42%)"
+  ],
+  "cond": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame.",
+  "no_end": false,
+  "action": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. Bob down and up on the knees twice in the wide stance, the hips sinking a full head lower each time, the hunched shoulders rising and falling with each heavy breath and the long hair swaying, the raised front fist and the rear arm reaching back staying in place. Keep the body side-on facing west the whole time."
+ },
+ {
+  "key": "3.12_장허운",
+  "row": "6",
+  "why": [
+   "점프인데 발이 거의 안 뜸 14px"
+  ],
+  "cond": "A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land.",
+  "no_end": true,
+  "action": "A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land. Start standing. Swing both arms far back behind the hips and sink into a deep squat, then swing the arms forward and up to head height and jump straight up so both feet leave the ground by a full shin length, the long hair lifting. Land heavily in a deep squat with the fingertips of one hand touching the floor, then stand up with the arms at the sides."
+ },
+ {
+  "key": "3.13_곽제강",
+  "row": "3",
+  "why": [
+   "반복 이음 끊김(위치 맞춰도 43%)"
+  ],
+  "cond": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame.",
+  "no_end": false,
+  "action": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. Keep the wide lunge with the hand at the chin. Sink the hips down deeply on the bent knees so the head drops a full head-height lower, then bounce back up, twice, the head tilting far to one side on the way down and back up on the way up, the coat tails swinging and the hair bouncing."
+ },
+ {
+  "key": "3.13_곽제강",
+  "row": "W-1",
+  "why": [
+   "반복 이음 끊김(위치 맞춰도 66%)"
+  ],
+  "cond": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame.",
+  "no_end": false,
+  "action": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. Keep the lunge holding the notebook and the pen. Sink the hips down deeply on the bent knees so the head drops a full head-height lower, then bounce back up, twice, the pen tapping the page on each dip, the head tilting and the coat tails swinging."
+ },
+ {
+  "key": "3.14_이연화",
+  "row": "3",
+  "why": [
+   "반복 이음 끊김(위치 맞춰도 64%)"
+  ],
+  "cond": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame.",
+  "no_end": false,
+  "action": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. Keep the body side-on facing east the whole time. Keep both feet planted wide. Bend both knees deep so the hips and head drop low, about a forearm lower, then spring back up onto the toes, the coat and ponytail bouncing; on the way up the rear hand pushes the glasses up again, the front palm staying held forward."
+ },
+ {
+  "key": "3.15_이병진",
+  "row": "W-1",
+  "why": [
+   "반복 이음 끊김(위치 맞춰도 58%)"
+  ],
+  "cond": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame.",
+  "no_end": false,
+  "action": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. Keep the body side-on facing east the whole time. Sink the hips down by a full hand's width by bending the knees deeper, the pen arm dropping to belly height, then spring back up with the shoulders jerking and jab the pen forward at chest height with the arm straight. End in the same pose."
+ },
+ {
+  "key": "3.15_이병진",
+  "row": "9",
+  "why": [
+   "캔버스 끝 잘림 5장(15px 이상)"
+  ],
+  "cond": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges.",
+  "no_end": false,
+  "action": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges. Keep the body side-on facing east the whole time, the face in profile. Lean the weight back onto the rear foot, then lunge forward one full stride with the front knee bending deep and the rear leg straight, shoving the front open palm forward at face height until the arm is fully straight, the head ducked behind the shoulder with a scared face. Hold the str"
+ },
+ {
+  "key": "3.15_이병진",
+  "row": "10",
+  "why": [
+   "캔버스 끝 잘림 5장(15px 이상)"
+  ],
+  "cond": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges.",
+  "no_end": false,
+  "action": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges. Keep the body side-on facing east the whole time, the face in profile. Pull the front palm back to the chest. Step the rear foot forward a full stride and swing the rear arm forward from behind the hip up to face height, the back of the hand leading and the arm fully straight, the upper body leaning over the new front knee, the eyes shut. Hold the stretched"
+ },
+ {
+  "key": "3.15_이병진",
+  "row": "13",
+  "why": [
+   "캔버스 끝 잘림 1장(15px 이상)"
+  ],
+  "cond": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges.",
+  "no_end": false,
+  "action": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges. Keep the body side-on facing east the whole time, the face in profile. Leap forward low and drop onto both knees, throwing the upper body forward over the knees and stretching both arms straight forward at shin height to wrap around something, the face desperate. Then push up and stand back into the fighting stance."
+ },
+ {
+  "key": "3.15_이병진",
+  "row": "19",
+  "why": [
+   "캔버스 끝 잘림 4장(15px 이상)"
+  ],
+  "cond": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges.",
+  "no_end": false,
+  "action": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges. Keep the body side-on facing east the whole time. The body is knocked off its feet and flies backward through the air with a pained face, the arms and legs flailing forward. It drops onto the back and lies flat with the head and feet at the same height in a straight line along the ground, slowly, only the round belly rising and falling."
+ },
+ {
+  "key": "3.15_이병진",
+  "row": "18-2",
+  "why": [
+   "캔버스 끝 잘림 1장(15px 이상)"
+  ],
+  "cond": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges.",
+  "no_end": false,
+  "action": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges. The face twists in pain and the heavy body is knocked back: stumble backward two short heavy steps, the big belly bouncing and both arms flapping low at the waist. Plant both feet wide with the knees bent and wobble to a stop, then hunch forward again into the crouch with the open front palm at face height and the rear hand gripping the necktie. Keep both f"
+ },
+ {
+  "key": "3.15_이병진",
+  "row": "18-3",
+  "why": [
+   "캔버스 끝 잘림 2장(15px 이상)"
+  ],
+  "cond": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges.",
+  "no_end": false,
+  "action": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges. The face twists in pain as a blow from below lifts the heavy body off the floor, the round belly pushed up, the back bent backward and the short arms and legs flailing. Drop backward and land flat on the back, ending lying flat along the ground with the round belly up and the arms at the sides."
+ },
+ {
+  "key": "3.15_이병진",
+  "row": "43",
+  "why": [
+   "캔버스 끝 잘림 2장(15px 이상)"
+  ],
+  "cond": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges.",
+  "no_end": false,
+  "action": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges. Lying on the back, flinch: kick both short legs up and cover the glasses with both hands, the round belly jiggling. Then let the legs and arms flop back down, ending lying flat with the round belly up and the arms at the sides. Keep the back on the floor the whole time."
+ },
+ {
+  "key": "3.15_이병진",
+  "row": "44",
+  "why": [
+   "캔버스 끝 잘림 3장(15px 이상)"
+  ],
+  "cond": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges.",
+  "no_end": false,
+  "action": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges. The scared face twists in pain and the heavy body tips backward, both arms flailing. Sit down hard on the floor and roll backward over one shoulder, the round belly and short legs tumbling over the head. Come out of the roll and flop onto the side on the floor at the level of the feet, the glasses crooked and one arm thrown over the belly. Lie still for the"
+ },
+ {
+  "key": "3.15_이병진",
+  "row": "45",
+  "why": [
+   "캔버스 끝 잘림 4장(15px 이상)"
+  ],
+  "cond": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges.",
+  "no_end": false,
+  "action": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges. Lying on the back, the round belly rises once in a big last breath and sinks. The head lolls to one side and the hands slide off the belly and lie open on the floor, ending lying still."
+ },
+ {
+  "key": "4.2_서윤지",
+  "row": "3",
+  "why": [
+   "반복 이음 끊김(위치 맞춰도 57%)"
+  ],
+  "cond": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame.",
+  "no_end": false,
+  "action": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. Bounce on the knees in an even rhythm: bend both knees so the hips drop a full head lower, the back staying perfectly upright, then push back up, the braids swinging up and down with each bounce and the front palm bobbing with the body. Keep the body side-on facing east the whole time."
+ },
+ {
+  "key": "4.2_서윤지",
+  "row": "W-1",
+  "why": [
+   "반복 이음 끊김(위치 맞춰도 59%)"
+  ],
+  "cond": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame.",
+  "no_end": false,
+  "action": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. Bounce on the knees in an even rhythm, the hips dropping a full head lower and rising back with the back upright, and on each dip the rear hand swings the brown folder forward to the front of the thigh and back beside the rear hip, the braids bouncing. Keep the body side-on facing east the whole time."
+ },
+ {
+  "key": "4.3_고연지",
+  "row": "W-1",
+  "why": [
+   "반복 이음 끊김(위치 맞춰도 68%)"
+  ],
+  "cond": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame.",
+  "no_end": false,
+  "action": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. Keep the body side-on facing east the whole time. Bob a little from the knees, the hips dropping a hand's width and rising again, while the hand with the scalpel stays still beside the chin and the front hand stays raised; the coat tails sway."
+ },
+ {
+  "key": "4.3_고연지",
+  "row": "6",
+  "why": [
+   "점프인데 발이 거의 안 뜸 9px"
+  ],
+  "cond": "A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land.",
+  "no_end": true,
+  "action": "A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land. Start standing with both hands kept in the coat pockets. Bend the knees deeply into a low crouch, then spring straight up high with both legs pressed together and straight, the toes pointing down, the coat tails spreading open below. Land on the balls of the feet, bend the knees to absorb, and stand up straight."
+ },
+ {
+  "key": "4.3_고연지",
+  "row": "10",
+  "why": [
+   "뒤로 뻗음(앞 4 뒤 34)"
+  ],
+  "cond": "The body stays side-on facing east (right) the whole time and never turns around. Keep the backswing short; the strike travels forward toward east (right) only, never behind the body.",
+  "no_end": false,
+  "action": "The body stays side-on facing east (right) the whole time and never turns around. Keep the backswing short; the strike travels forward toward east (right) only, never behind the body. Keep the body side-on facing east the whole time, the chest in profile. Pull the front hand back to the chest. Step the rear foot through past the front foot into a new deep lunge, dropping lower, and drive the other hand forward low to rib height with the fingers together and straight, the arm fully extended and t"
+ },
+ {
+  "key": "4.3_고연지",
+  "row": "18-3",
+  "why": [
+   "캔버스 끝 잘림 1장(15px 이상)"
+  ],
+  "cond": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges.",
+  "no_end": false,
+  "action": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges. The cold face winces as a blow from below lifts her off the flat shoes, the back bending backward, the open white coat flaring up and the stethoscope lifting from the neck. Fall backward and land flat on the back, ending lying straight along the floor facing up with both hands resting together on the stomach and the coat spread open."
+ },
+ {
+  "key": "4.4_윤지아",
+  "row": "3",
+  "why": [
+   "반복 이음 끊김(위치 맞춰도 49%)"
+  ],
+  "cond": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame.",
+  "no_end": false,
+  "action": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. Keep the body side-on facing east the whole time. Bounce lightly on the toes: both knees dip down and spring back up so the heels lift, the front open palm bobbing down and up a little at shoulder height, the rear hand staying on the pouch, the hair buns bobbing."
+ },
+ {
+  "key": "4.4_윤지아",
+  "row": "11",
+  "why": [
+   "뒤로 뻗음(앞 4 뒤 35)"
+  ],
+  "cond": "The body stays side-on facing east (right) the whole time and never turns around. Keep the backswing short; the strike travels forward toward east (right) only, never behind the body.",
+  "no_end": false,
+  "action": "The body stays side-on facing east (right) the whole time and never turns around. Keep the backswing short; the strike travels forward toward east (right) only, never behind the body. Keep the body side-on facing east the whole time. Rise up and pull the rear hand back to the pouch, lift the front knee up to the chest, then extend the front leg straight forward at waist height, pushing with the flat sole of the foot, both arms bent back for balance and the upper body leaning back. Hop down onto "
+ },
+ {
+  "key": "4.4_윤지아",
+  "row": "34",
+  "why": [
+   "시작·끝 장 발이 뜸 11px"
+  ],
+  "cond": "Both feet stay on the same floor line at the start and at the end.",
+  "no_end": false,
+  "action": "Both feet stay on the same floor line at the start and at the end. Begin standing upright with the arms at the sides. Hop straight up so both feet leave the floor, both hands grabbing the beige pouch on the right hip, the shoulders jerking up and the hair buns bouncing. Land with the knees bent and hold that pose with wide eyes and an open mouth a moment, then stand upright with the arms at the sides."
+ },
+ {
+  "key": "4.6_문혜란",
+  "row": "6",
+  "why": [
+   "점프인데 발이 거의 안 뜸 5px"
+  ],
+  "cond": "A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land.",
+  "no_end": true,
+  "action": "A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land. Start standing. Sink into a deep crouch with the knees bent and both arms swung back low, then spring straight up with the long legs fully stretched and toes pointed, both feet high off the ground, one fist raised to shoulder height, then land with the knees bent and rise to standing with feet together."
+ },
+ {
+  "key": "4.7_신유리",
+  "row": "3",
+  "why": [
+   "반복 이음 끊김(위치 맞춰도 40%)"
+  ],
+  "cond": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame.",
+  "no_end": false,
+  "action": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. Bounce in place on the balls of the feet, dropping the hips a full hand's width lower with the knees bending deep, then springing back up so the heels lift off the floor, the shoulders and ponytail bobbing with it, the front open hand at chest height and the rear fist behind the hip. Repeat. Keep the body side-on facing east, face in profile, chest toward the east."
+ },
+ {
+  "key": "4.7_신유리",
+  "row": "W-1",
+  "why": [
+   "반복 이음 끊김(위치 맞춰도 82%)"
+  ],
+  "cond": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame.",
+  "no_end": false,
+  "action": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. Shift the weight forward onto the front foot and back onto the rear foot, a short step's distance each way, the knees bending deeper on each side, the knife in the rear hand held at waist height with the blade pointing forward and the front open hand at chest height. Repeat. Keep the body side-on facing east, face in profile, chest toward the east."
+ },
+ {
+  "key": "4.7_신유리",
+  "row": "6",
+  "why": [
+   "점프인데 발이 거의 안 뜸 3px"
+  ],
+  "cond": "A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land.",
+  "no_end": true,
+  "action": "A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land. Start standing. Dip into a quick deep squat with both arms pressed straight down along the sides, then spring straight up very high so both boots rise a full leg-length off the floor, the body stiff and straight like a post, the arms tight to the sides and the toes pointing down. Land on both feet with the knees bending deep to absorb, then stand upright."
+ },
+ {
+  "key": "4.7_신유리",
+  "row": "13",
+  "why": [
+   "떨어진 큰 덩어리 4번 장(1432px)"
+  ],
+  "cond": "Draw only the character's own body and the weapon it already holds: no motion blur, no slash trails, no smears, no flashes or effects. Keep the exact same outfit, colors, body size and proportions in every frame.",
+  "no_end": false,
+  "action": "Draw only the character's own body and the weapon it already holds: no motion blur, no slash trails, no smears, no flashes or effects. Keep the exact same outfit, colors, body size and proportions in every frame. Keep the body side-on facing east the whole time, face in profile, chest toward the east. From the run, leap forward off the rear foot with both feet off the floor and shoot the front leg straight out at stomach height, the boot sole leading, the rear knee tucked and the upper body lean"
+ },
+ {
+  "key": "4.7_신유리",
+  "row": "22",
+  "why": [
+   "뒤로 뻗음(앞 0 뒤 24)"
+  ],
+  "cond": "The body stays side-on facing east (right) the whole time and never turns around. Keep the backswing short; the strike travels forward toward east (right) only, never behind the body.",
+  "no_end": false,
+  "action": "The body stays side-on facing east (right) the whole time and never turns around. Keep the backswing short; the strike travels forward toward east (right) only, never behind the body. Keep the body side-on facing east the whole time, face in profile, chest toward the east, feet planted. Thrust the knife forward high at chest height with the arm fully extended, then pull it back halfway and thrust it forward again low at stomach height, the arm fully extended and the knees bending. Pull it back t"
+ },
+ {
+  "key": "4.9_살라딘",
+  "row": "6",
+  "why": [
+   "캔버스 끝 잘림 1장(15px 이상)",
+   "점프인데 발이 거의 안 뜸 12px"
+  ],
+  "cond": "A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land. Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges.",
+  "no_end": true,
+  "action": "A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land. Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges. Start standing. Sink deep into a crouch with the knees bent low and both fists pulled to the hips, then drive straight up so both feet leave the ground by a full head, the body straight and the fists low, then land heavily o"
+ },
+ {
+  "key": "4.9_살라딘",
+  "row": "11",
+  "why": [
+   "뒤로 뻗음(앞 1 뒤 39)"
+  ],
+  "cond": "The body stays side-on facing east (right) the whole time and never turns around. Keep the backswing short; the strike travels forward toward east (right) only, never behind the body.",
+  "no_end": false,
+  "action": "The body stays side-on facing east (right) the whole time and never turns around. Keep the backswing short; the strike travels forward toward east (right) only, never behind the body. Keep the front arm stretched forward, stamp the front foot one long stride ahead into a very deep lunge with the rear leg straight and the chest leaning over the front knee, carrying the scimitar from shoulder height down to waist height in front with the blade pointing east, hold that low lunge, then draw the rear"
+ },
+ {
+  "key": "4.10_아벤샤",
+  "row": "6",
+  "why": [
+   "점프인데 발이 거의 안 뜸 14px"
+  ],
+  "cond": "A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land.",
+  "no_end": true,
+  "action": "A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land. Starts standing. Bends both knees deeply and gathers the cape close, then springs straight up high with the legs together and the toes pointed, the cape puffing out like a bell. Lands on bent knees with a small curtsy dip and rises to the standing pose."
+ },
+ {
+  "key": "4.10_아벤샤",
+  "row": "16",
+  "why": [
+   "색이 바뀜(0.47)"
+  ],
+  "cond": "Draw only the character's own body and the weapon it already holds: no motion blur, no slash trails, no smears, no flashes or effects. Keep the exact same outfit, colors, body size and proportions in every frame.",
+  "no_end": false,
+  "action": "Draw only the character's own body and the weapon it already holds: no motion blur, no slash trails, no smears, no flashes or effects. Keep the exact same outfit, colors, body size and proportions in every frame. Keep the body side-on facing east, face in profile, chest toward the east. Pulls the cape across the front of the body with the left arm, crouches, and springs backward low and long off both feet, both feet leaving the ground, the hood ducked behind the cape. Lands on the back foot with"
+ },
+ {
+  "key": "4.10_아벤샤",
+  "row": "17",
+  "why": [
+   "색이 바뀜(0.55)"
+  ],
+  "cond": "Draw only the character's own body and the weapon it already holds: no motion blur, no slash trails, no smears, no flashes or effects. Keep the exact same outfit, colors, body size and proportions in every frame.",
+  "no_end": false,
+  "action": "Draw only the character's own body and the weapon it already holds: no motion blur, no slash trails, no smears, no flashes or effects. Keep the exact same outfit, colors, body size and proportions in every frame. Keep the body side-on facing east, face in profile, chest toward the east. Grabs the cape edge with the left hand and pulls it forward across the front of the body up to face height, bending both knees deep and leaning the upper body forward behind the cape, the head ducked. Holds this "
+ },
+ {
+  "key": "4.10_아벤샤",
+  "row": "24",
+  "why": [
+   "색이 바뀜(0.65)"
+  ],
+  "cond": "Draw only the character's own body and the weapon it already holds: no motion blur, no slash trails, no smears, no flashes or effects. Keep the exact same outfit, colors, body size and proportions in every frame.",
+  "no_end": false,
+  "action": "Draw only the character's own body and the weapon it already holds: no motion blur, no slash trails, no smears, no flashes or effects. Keep the exact same outfit, colors, body size and proportions in every frame. Keep the body side-on facing east, face in profile, chest toward the east. Sweeps both arms in to wrap the cape around the whole body and crouches down low inside it, the head tucked. Then springs up throwing the cape wide open behind with both arms and settles into the wide stance with"
+ },
+ {
+  "key": "5.1_세크리엠",
+  "row": "3",
+  "why": [
+   "반복 이음 끊김(위치 맞춰도 91%)"
+  ],
+  "cond": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame.",
+  "no_end": false,
+  "action": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. Keep the body side-on facing east, face in profile, chest toward the east the whole time, the feet planted. Sink the hips down very low by bending both knees deeply while the upper body sways forward and the head tilts sharply to one side, then rise back up as the head tilts back upright, the clawed fingers curling and spreading, the long hair swinging."
+ },
+ {
+  "key": "5.1_세크리엠",
+  "row": "W-1",
+  "why": [
+   "반복 이음 끊김(위치 맞춰도 77%)"
+  ],
+  "cond": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame.",
+  "no_end": false,
+  "action": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. Keep the body side-on facing east, face in profile, chest toward the east the whole time, one clawed hand held back at the rear shoulder and the other at the chest. Bend the knees so the hips sink a hand's length lower and the upper body leans further forward, then rise back up, the head tilting to one side and back, the long hair swaying."
+ },
+ {
+  "key": "5.1_세크리엠",
+  "row": "6",
+  "why": [
+   "점프인데 발이 거의 안 뜸 8px"
+  ],
+  "cond": "A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land.",
+  "no_end": true,
+  "action": "A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land. Starting from standing upright, bend the knees deeply and sink low, then shoot straight up very high with the legs together, the toes pointed down and the arms kept straight down at the sides, as if pulled up by a string, the long white hair and dress hem floating upward. Land softly on the toes, sink the knees low, and rise to standing upright."
+ },
+ {
+  "key": "5.1_세크리엠",
+  "row": "17",
+  "why": [
+   "멈춤(0%)"
+  ],
+  "cond": "The motion must be clearly visible from frame to frame, with the whole body moving.",
+  "no_end": false,
+  "action": "The motion must be clearly visible from frame to frame, with the whole body moving. Keep the body side-on facing east, face in profile, chest toward the east the whole time. Bend both knees deeply so the hips sink lower and lean the upper body forward, push the front hand forward at face height with the palm open toward the east and the clawed fingers spread wide, the rear hand pulled back low by the hip with clawed fingers. Hold this guard with an annoyed face."
+ },
+ {
+  "key": "5.2_브라우니",
+  "row": "1",
+  "why": [
+   "캔버스 끝 잘림 4장(15px 이상)"
+  ],
+  "cond": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges.",
+  "no_end": false,
+  "action": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges. Stand tall like a host waiting for the cue, the chest pushed out. Breathe in so the chest and broad shoulders rise a little and the TV-set head lifts a little, then breathe out so they settle, the arms and feet staying where they are, the screen face smiling."
+ },
+ {
+  "key": "5.2_브라우니",
+  "row": "2",
+  "why": [
+   "캔버스 끝 잘림 6장(15px 이상)"
+  ],
+  "cond": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges.",
+  "no_end": false,
+  "action": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges. Starting from standing upright, raise both gloved hands to the jacket lapels and tug them down to straighten the suit, then lift one hand to the knot of the tie and tighten it with a little shake of the TV-set head, then lower both arms to the sides, the screen face smiling the whole time."
+ },
+ {
+  "key": "5.2_브라우니",
+  "row": "4",
+  "why": [
+   "캔버스 끝 잘림 2장(15px 이상)"
+  ],
+  "cond": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges.",
+  "no_end": false,
+  "action": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges. Keep the body side-on facing east, TV screen in profile, chest toward the east the whole time. Strut in place like a host walking onto a stage: lift each knee to hip height and plant the foot a long step ahead heel first, the shoulders rolling with each step, the near arm swinging wide and loose from the shoulder and the far hand gripping the jacket lapel. "
+ },
+ {
+  "key": "5.2_브라우니",
+  "row": "5",
+  "why": [
+   "캔버스 끝 잘림 1장(15px 이상)"
+  ],
+  "cond": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges.",
+  "no_end": false,
+  "action": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges. Keep the body side-on facing east, TV screen in profile, chest toward the east the whole time. Run in place with huge heavy bounding strides, the upper body leaning forward, both feet leaving the floor between strides, the front knee rising to hip height and the rear foot kicking high behind, both bent arms pumping big at waist height. Two full strides, the"
+ },
+ {
+  "key": "5.2_브라우니",
+  "row": "6",
+  "why": [
+   "캔버스 끝 잘림 3장(15px 이상)"
+  ],
+  "cond": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges.",
+  "no_end": false,
+  "action": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges. Starting from standing upright, sink deep into a squat with both gloved hands low by the knees, then spring up high so both feet leave the floor by a full leg length, and fling the arms out wide at shoulder height and the legs spread apart into a big X star shape with the palms open, the screen face beaming, then land with the knees bent deep and rise to st"
+ },
+ {
+  "key": "5.2_브라우니",
+  "row": "10",
+  "why": [
+   "캔버스 끝 잘림 1장(15px 이상)"
+  ],
+  "cond": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges.",
+  "no_end": false,
+  "action": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges. Keep the body side-on facing east, TV screen in profile, chest toward the east the whole time, the face never turning toward the viewer. Draw the stretched front hand back and bring both open gloved hands together far back beside the rear hip, palms apart, while the rear foot steps forward, then swing both arms forward and clap the palms together in front o"
+ },
+ {
+  "key": "5.2_브라우니",
+  "row": "11",
+  "why": [
+   "캔버스 끝 잘림 1장(15px 이상)"
+  ],
+  "cond": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges.",
+  "no_end": false,
+  "action": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges. Keep the body side-on facing east, TV screen in profile, chest toward the east the whole time. Pull the clapped hands back and grip both sides of the TV-set head, then bend deep at the waist and lunge forward to the east so the front of the TV set rams forward at chest height, the rear leg stretched straight, then straighten up, let go of the TV and settle "
+ },
+ {
+  "key": "5.2_브라우니",
+  "row": "16-1",
+  "why": [
+   "캔버스 끝 잘림 1장(15px 이상)"
+  ],
+  "cond": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges.",
+  "no_end": false,
+  "action": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges. Keep the body side-on facing east, TV screen in profile, chest toward the east the whole time. Bow the upper body down level with the floor at waist height, sweep both arms straight back behind the hips, and leap low and long forward to the east so both feet leave the floor with the legs tucked, then land on the front foot with the knee bent and rise into t"
+ },
+ {
+  "key": "5.2_브라우니",
+  "row": "19",
+  "why": [
+   "캔버스 끝 잘림 1장(15px 이상)"
+  ],
+  "cond": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges.",
+  "no_end": false,
+  "action": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges. Keep the body side-on facing east, TV screen in profile, chest toward the east the whole time. Get thrown back off both feet so the big body flies backward to the west, the arms and legs flung forward and the TV-set head tipping back, then crash flat onto the back with the head and feet at the same height in a straight line along the ground, the TV-set head"
+ },
+ {
+  "key": "5.2_브라우니",
+  "row": "18-3",
+  "why": [
+   "캔버스 끝 잘림 1장(15px 이상)"
+  ],
+  "cond": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges.",
+  "no_end": false,
+  "action": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges. Keep the body side-on facing east, TV screen in profile. Knocked up from below, the big body lifts off both feet and tips back, the TV-set head rocking back and the arms and legs flung forward, the screen face startled. Then crash flat onto the back, head to the west and feet to the east, the TV-set head resting on the floor with the screen up, in a straigh"
+ },
+ {
+  "key": "5.2_브라우니",
+  "row": "26",
+  "why": [
+   "캔버스 끝 잘림 4장(15px 이상)"
+  ],
+  "cond": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges.",
+  "no_end": false,
+  "action": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges. Starting from standing upright, raise one gloved hand holding a small rice ball up to the lower edge of the TV screen and press it against the screen three times, the TV-set head bobbing forward with each bite and the screen face chewing happily, then lower the hand slowly back to the side."
+ },
+ {
+  "key": "5.2_브라우니",
+  "row": "27",
+  "why": [
+   "캔버스 끝 잘림 1장(15px 이상)"
+  ],
+  "cond": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges.",
+  "no_end": false,
+  "action": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges. Starting from standing upright, bend deeply at the waist and knees, the broad back folding over, and reach one gloved hand all the way down to the floor in front of the feet, pinch a small item delicately between the fingertips, then straighten up, bring it to the chest and tuck it into the jacket, then lower the arms to the sides."
+ },
+ {
+  "key": "5.2_브라우니",
+  "row": "28",
+  "why": [
+   "캔버스 끝 잘림 1장(15px 이상)"
+  ],
+  "cond": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges.",
+  "no_end": false,
+  "action": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges. Starting from standing upright, lift one gloved hand forward to chest height with the palm open and up as if offering a seat to a guest, the TV-set head tilting a little to the side with a smiling screen face, then lower it back to the side."
+ },
+ {
+  "key": "5.2_브라우니",
+  "row": "29",
+  "why": [
+   "캔버스 끝 잘림 2장(15px 이상)"
+  ],
+  "cond": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges.",
+  "no_end": false,
+  "action": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges. Sweep one gloved hand out to the side at chest height with the palm open and up and bring it back in front of the belly, the TV-set head bobbing a little and the screen face talking with a moving mouth, the other arm staying at the side."
+ },
+ {
+  "key": "5.2_브라우니",
+  "row": "30",
+  "why": [
+   "캔버스 끝 잘림 2장(15px 이상)"
+  ],
+  "cond": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges.",
+  "no_end": false,
+  "action": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges. Tilt only the TV-set head forward a little and back up twice in small nods, the screen face smiling, the body and arms staying in place."
+ },
+ {
+  "key": "5.2_브라우니",
+  "row": "31",
+  "why": [
+   "캔버스 끝 잘림 4장(15px 이상)"
+  ],
+  "cond": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges.",
+  "no_end": false,
+  "action": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges. Turn only the TV-set head a little to the left and to the right twice in small shakes, the screen face showing a wobbly smile, the shoulders and arms staying in place."
+ },
+ {
+  "key": "5.2_브라우니",
+  "row": "32",
+  "why": [
+   "캔버스 끝 잘림 1장(15px 이상)"
+  ],
+  "cond": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges.",
+  "no_end": false,
+  "action": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges. Starting from standing upright, lean the upper body forward as the screen face turns into an angry frown, raise one gloved fist up to the shoulder and bring it down to hip height while the front foot stamps the floor, hold for a beat, then straighten up to standing with the arms at the sides."
+ },
+ {
+  "key": "5.2_브라우니",
+  "row": "33",
+  "why": [
+   "캔버스 끝 잘림 5장(15px 이상)"
+  ],
+  "cond": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges.",
+  "no_end": false,
+  "action": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges. Keep the body side-on facing east, TV screen in profile, chest toward the east the whole time. Starting from standing upright, flinch hard and hop half a step back to the west so both feet leave the floor, the knees bending, the TV-set head snapping back and both elbows jerking up, the screen face surprised, then step forward and sweep the front gloved hand"
+ },
+ {
+  "key": "5.2_브라우니",
+  "row": "34",
+  "why": [
+   "캔버스 끝 잘림 2장(15px 이상)"
+  ],
+  "cond": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges.",
+  "no_end": false,
+  "action": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges. Starting from standing upright, jump back half a step with both feet leaving the floor, both gloved hands flying up to grip the sides of the TV-set head, the knees bent and the screen face showing a shocked open mouth, hold that pose for a beat, then lower the hands and stand upright."
+ },
+ {
+  "key": "5.2_브라우니",
+  "row": "35",
+  "why": [
+   "캔버스 끝 잘림 1장(15px 이상)"
+  ],
+  "cond": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges.",
+  "no_end": false,
+  "action": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges. Starting from standing upright, lean the upper body back as the screen face bursts into a huge laughing grin, pat one gloved hand on the belly twice with the shoulders shaking, then straighten up to standing with the arms at the sides."
+ },
+ {
+  "key": "5.2_브라우니",
+  "row": "36",
+  "why": [
+   "캔버스 끝 잘림 1장(15px 이상)"
+  ],
+  "cond": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges.",
+  "no_end": false,
+  "action": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges. Keep the body side-on facing east, TV screen in profile, chest toward the east the whole time. Run in place hunched forward with both gloved hands clutching the sides of the TV-set head to hold it steady, the elbows sticking out, the legs taking quick long strides so both feet leave the floor, the knees rising to hip height, the jacket tails flying back."
+ },
+ {
+  "key": "5.2_브라우니",
+  "row": "42",
+  "why": [
+   "캔버스 끝 잘림 1장(15px 이상)"
+  ],
+  "cond": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges.",
+  "no_end": false,
+  "action": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges. Let go of the TV-set head and drop forward onto both gloved hands and both knees, turning the body side-on to face east, the back flat and the TV-set head held low, then crawl toward the east on hands and knees, moving one hand and the opposite knee forward at a time, slowly, gradually."
+ },
+ {
+  "key": "5.2_브라우니",
+  "row": "44",
+  "why": [
+   "캔버스 끝 잘림 2장(15px 이상)"
+  ],
+  "cond": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges.",
+  "no_end": false,
+  "action": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges. Keep the body side-on facing east, TV screen in profile. The screen face goes blank and both arms drop. The heavy knees buckle and the big body pitches forward east, the TV-set head leading. Topple face down so the TV-set head lands screen down on the floor first, the body flat behind it, arms limp at the sides. In the last frames lie still face down on the"
+ },
+ {
+  "key": "5.2_브라우니",
+  "row": "45",
+  "why": [
+   "캔버스 끝 잘림 4장(15px 이상)"
+  ],
+  "cond": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges.",
+  "no_end": false,
+  "action": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges. Lying flat on the back, the broad chest lifts once under the vest and sinks, the TV-set head tips over to the side on the floor with the screen face going blank, and the gloved hands fall open. Then lie completely still."
+ },
+ {
+  "key": "5.3_탐미주의",
+  "row": "W-1",
+  "why": [
+   "반복 이음 끊김(위치 맞춰도 77%)"
+  ],
+  "cond": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame.",
+  "no_end": false,
+  "action": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. Keep the body side-on facing east, face in profile, chest toward the east, the outstretched arm held forward at chest height the whole time. The knees sink low and rise again and the upper body rocks forward and back, the long hair swaying."
+ },
+ {
+  "key": "5.3_탐미주의",
+  "row": "6",
+  "why": [
+   "캔버스 끝 잘림 2장(15px 이상)",
+   "점프인데 발이 거의 안 뜸 2px"
+  ],
+  "cond": "A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land. Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges.",
+  "no_end": true,
+  "action": "A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land. Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges. Starting from standing upright, fold forward at the hips with the legs straight until the hands hang down to the shins. Then spring high straight up so both feet leave the ground far above the floor, the whole body stiff and"
+ },
+ {
+  "key": "5.3_탐미주의",
+  "row": "8",
+  "why": [
+   "점프인데 발이 거의 안 뜸 10px"
+  ],
+  "cond": "A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land.",
+  "no_end": true,
+  "action": "A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land. Keep the body side-on facing east, face in profile, chest toward the east the whole time. Push off the rear foot and leap forward high with both feet off the ground, the whole body going stiff and straight like a thrown mannequin, tilted forward at a slant with the legs held together and both arms pinned straight back along the sides, the long hair streaming behi"
+ },
+ {
+  "key": "5.3_탐미주의",
+  "row": "11",
+  "why": [
+   "뒤로 뻗음(앞 0 뒤 54)"
+  ],
+  "cond": "The body stays side-on facing east (right) the whole time and never turns around. Keep the backswing short; the strike travels forward toward east (right) only, never behind the body.",
+  "no_end": false,
+  "action": "The body stays side-on facing east (right) the whole time and never turns around. Keep the backswing short; the strike travels forward toward east (right) only, never behind the body. Keep the body side-on facing east, face in profile, chest toward the east the whole time. Lower the raised hand and lean the upper body back, lifting the front knee up to the waist. Then thrust the front foot straight forward at waist height with the sole leading and the leg fully stretched, the upper body leaning "
+ },
+ {
+  "key": "5.3_탐미주의",
+  "row": "16",
+  "why": [
+   "캔버스 끝 잘림 1장(15px 이상)"
+  ],
+  "cond": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges.",
+  "no_end": false,
+  "action": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges. Keep the body side-on facing east, face in profile, chest toward the east the whole time. Sink deep on the bent knees, then spring far backward to the west with both feet high off the ground, the upper body bent far back at the waist so the long hair hangs down behind, the arms trailing forward. Land on the toes with the knees deeply bent, bring the upper b"
+ },
+ {
+  "key": "5.3_탐미주의",
+  "row": "19",
+  "why": [
+   "캔버스 끝 잘림 5장(15px 이상)"
+  ],
+  "cond": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges.",
+  "no_end": false,
+  "action": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges. Keep the body side-on facing east, face in profile the whole time. With a pained face the whole body goes stiff and straight like a mannequin, arms locked at the sides, and is thrown up and backward to the west through the air, falling flat on the back without bending at the knees or hips. Lie flat on the back with the head and feet at the same height in a "
+ },
+ {
+  "key": "5.3_탐미주의",
+  "row": "18-3",
+  "why": [
+   "캔버스 끝 잘림 4장(15px 이상)"
+  ],
+  "cond": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges.",
+  "no_end": false,
+  "action": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges. Keep the body side-on facing east, face in profile. Knocked up from below with a pained face, both feet leave the floor and the body rises, the head snapping back at the neck seam and the jointed limbs swinging loose, the crimson hair hanging down. Then fall flat onto the back, head to the west and feet to the east, stiff and straight along the floor, arms "
+ },
+ {
+  "key": "5.3_탐미주의",
+  "row": "36",
+  "why": [
+   "캔버스 끝 잘림 3장(15px 이상)"
+  ],
+  "cond": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges.",
+  "no_end": false,
+  "action": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges. Facing east in side view the whole time, face in profile, chest toward the east. Run in place with stiff upright upper body and the front hand clutching the front of the neck: raise the front knee to hip height while the rear leg pushes off, both feet off the ground, then switch, raising the rear knee while the front leg pushes back. Alternate the legs ever"
+ },
+ {
+  "key": "5.3_탐미주의",
+  "row": "45",
+  "why": [
+   "캔버스 끝 잘림 4장(15px 이상)"
+  ],
+  "cond": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges.",
+  "no_end": false,
+  "action": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges. Lying stiff on the back, the chest lifts once and sinks, the head tips over to the side at the neck seam onto the floor and the wrist joints go slack so the hands flop open. Then lie completely still like a dropped mannequin."
+ },
+ {
+  "key": "6.1_가짜관리국검사A",
+  "row": "12",
+  "why": [
+   "캔버스 끝 잘림 1장(15px 이상)",
+   "몸이 커짐 ×2.1",
+   "색이 바뀜(0.55)"
+  ],
+  "cond": "Draw only the character's own body and the weapon it already holds: no motion blur, no slash trails, no smears, no flashes or effects. Keep the exact same outfit, colors, body size and proportions in every frame. Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges.",
+  "no_end": false,
+  "action": "Draw only the character's own body and the weapon it already holds: no motion blur, no slash trails, no smears, no flashes or effects. Keep the exact same outfit, colors, body size and proportions in every frame. Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges. From the first frame to the last, keep the body side-on facing east (toward screen right), the chest never turning toward the viewer or away from "
+ },
+ {
+  "key": "6.2_가짜관리국검사B",
+  "row": "12",
+  "why": [
+   "캔버스 끝 잘림 1장(15px 이상)",
+   "몸이 커짐 ×2.2",
+   "색이 바뀜(0.57)"
+  ],
+  "cond": "Draw only the character's own body and the weapon it already holds: no motion blur, no slash trails, no smears, no flashes or effects. Keep the exact same outfit, colors, body size and proportions in every frame. Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges.",
+  "no_end": false,
+  "action": "Draw only the character's own body and the weapon it already holds: no motion blur, no slash trails, no smears, no flashes or effects. Keep the exact same outfit, colors, body size and proportions in every frame. Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges. From the first frame to the last, keep the body side-on facing east (toward screen right), the chest never turning toward the viewer or away from "
+ },
+ {
+  "key": "6.3_가짜관리국검사C",
+  "row": "6",
+  "why": [
+   "점프인데 발이 거의 안 뜸 3px"
+  ],
+  "cond": "A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land.",
+  "no_end": true,
+  "action": "A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land. Start standing. Dip the knees quickly, then spring straight up high and light with the legs straight and pressed together and the toes pointing down, the left thumb staying at the sword guard and the right arm straight at the side. Land softly on the balls of the feet with a small knee bend and stand straight."
+ },
+ {
+  "key": "6.3_가짜관리국검사C",
+  "row": "9",
+  "why": [
+   "캔버스 끝 잘림 1장(15px 이상)",
+   "몸이 커짐 ×2.1",
+   "색이 바뀜(0.53)"
+  ],
+  "cond": "Draw only the character's own body and the weapon it already holds: no motion blur, no slash trails, no smears, no flashes or effects. Keep the exact same outfit, colors, body size and proportions in every frame. Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges.",
+  "no_end": false,
+  "action": "Draw only the character's own body and the weapon it already holds: no motion blur, no slash trails, no smears, no flashes or effects. Keep the exact same outfit, colors, body size and proportions in every frame. Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges. From the first frame to the last, keep the body side-on facing east (toward screen right), the chest never turning toward the viewer or away from "
+ },
+ {
+  "key": "6.4_가짜관리국진압A",
+  "row": "13",
+  "why": [
+   "캔버스 끝 잘림 3장(15px 이상)"
+  ],
+  "cond": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges.",
+  "no_end": false,
+  "action": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges. From the first frame to the last, keep the body side-on facing east (toward screen right), the chest never turning toward the viewer or away from the viewer; every attack reaches forward to the east, never swinging backward or behind the back, with only a short wind-up. Lower the rifle and hold it horizontally across the chest in both hands, run forward thr"
+ },
+ {
+  "key": "6.5_가짜관리국진압B",
+  "row": "44",
+  "why": [
+   "떨어진 큰 덩어리 6번 장(1736px)"
+  ],
+  "cond": "Draw only the character's own body and the weapon it already holds: no motion blur, no slash trails, no smears, no flashes or effects. Keep the exact same outfit, colors, body size and proportions in every frame.",
+  "no_end": false,
+  "action": "Draw only the character's own body and the weapon it already holds: no motion blur, no slash trails, no smears, no flashes or effects. Keep the exact same outfit, colors, body size and proportions in every frame. Struck hard on the side of the head, the broad body turns half around on the spot with the heavy arms swinging out and the rifle swinging off the back, the legs tangle and the big frame tips over sideways and lands heavily on the floor, lying on the side with the rifle beside him, motio"
+ },
+ {
+  "key": "6.6_가짜관리국진압C",
+  "row": "44",
+  "why": [
+   "떨어진 큰 덩어리 6번 장(1764px)"
+  ],
+  "cond": "Draw only the character's own body and the weapon it already holds: no motion blur, no slash trails, no smears, no flashes or effects. Keep the exact same outfit, colors, body size and proportions in every frame.",
+  "no_end": false,
+  "action": "Draw only the character's own body and the weapon it already holds: no motion blur, no slash trails, no smears, no flashes or effects. Keep the exact same outfit, colors, body size and proportions in every frame. The strength drains from the slim legs: the guard falls, the knees fold and he sinks straight down onto both knees, the rifle sliding off one shoulder, sways once with the head hanging, then slumps over sideways onto the floor and lies curled on the side, motionless."
+ },
+ {
+  "key": "6.8_불량배남2",
+  "row": "44",
+  "why": [
+   "캔버스 끝 잘림 1장(15px 이상)"
+  ],
+  "cond": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges.",
+  "no_end": false,
+  "action": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges. Caught by a final blow to the jaw, the solid body turns half around on the leather soles with the fists falling open and the charcoal blazer flaring out, then the knees give and he tips over sideways onto the floor, landing heavily on the side with the blazer spread, motionless."
+ },
+ {
+  "key": "6.10_불량배여1",
+  "row": "3",
+  "why": [
+   "반복 이음 끊김(위치 맞춰도 39%)"
+  ],
+  "cond": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame.",
+  "no_end": false,
+  "action": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. Bounces quickly on the toes with both fists up and the chin tucked, shoulders rolling, the ponytail swinging."
+ },
+ {
+  "key": "6.10_불량배여1",
+  "row": "13",
+  "why": [
+   "뒤로 뻗음(앞 0 뒤 23)"
+  ],
+  "cond": "The body stays side-on facing east (right) the whole time and never turns around. Keep the backswing short; the strike travels forward toward east (right) only, never behind the body.",
+  "no_end": false,
+  "action": "The body stays side-on facing east (right) the whole time and never turns around. Keep the backswing short; the strike travels forward toward east (right) only, never behind the body. From the first frame to the last, keep the body side-on facing east (toward screen right), the chest never turning toward the viewer or away from the viewer; every attack reaches forward to the east, never swinging backward or behind the back, with only a short wind-up. Run forward two strides, reach both hands ahe"
+ },
+ {
+  "key": "6.14_경찰남2",
+  "row": "1",
+  "why": [
+   "반복 이음 끊김(위치 맞춰도 43%)"
+  ],
+  "cond": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame.",
+  "no_end": false,
+  "action": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. Rock up onto the toes and back down onto the heels in a slow steady rhythm, the chest rising and the arms swinging a little at the sides, standing straight."
+ },
+ {
+  "key": "6.17_관리국남A",
+  "row": "10",
+  "why": [
+   "뒤로 뻗음(앞 0 뒤 38)"
+  ],
+  "cond": "The body stays side-on facing east (right) the whole time and never turns around. Keep the backswing short; the strike travels forward toward east (right) only, never behind the body.",
+  "no_end": false,
+  "action": "The body stays side-on facing east (right) the whole time and never turns around. Keep the backswing short; the strike travels forward toward east (right) only, never behind the body. From the first frame to the last, keep the body side-on facing east (toward screen right), the chest never turning toward the viewer or away from the viewer; every attack reaches forward to the east, never swinging backward or behind the back, with only a short wind-up. Turn the hips a little and drive the lead fis"
+ },
+ {
+  "key": "6.18_관리국남B",
+  "row": "22",
+  "why": [
+   "뒤로 뻗음(앞 0 뒤 44)"
+  ],
+  "cond": "The body stays side-on facing east (right) the whole time and never turns around. Keep the backswing short; the strike travels forward toward east (right) only, never behind the body.",
+  "no_end": false,
+  "action": "The body stays side-on facing east (right) the whole time and never turns around. Keep the backswing short; the strike travels forward toward east (right) only, never behind the body. Keep the body side-on facing east the whole time, the chest never turning toward the viewer. Catch forward with the open lead hand at chest height, pull it back hard past the hip while the rear palm pushes forward at shoulder height, the body leaning back on the bent rear leg. Then step back into the loose open-han"
+ },
+ {
+  "key": "6.20_관리국여B",
+  "row": "6",
+  "why": [
+   "점프인데 발이 거의 안 뜸 14px"
+  ],
+  "cond": "A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land.",
+  "no_end": true,
+  "action": "A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land. Start standing. Bend the knees, then spring up high with the lead knee raised to the chest and the other leg straight, the ponytail flying up and the fists at the chest. Land on both feet with the knees bending and stand straight."
+ },
+ {
+  "key": "6.21_백일몽남A",
+  "row": "12",
+  "why": [
+   "몸이 커짐 ×2.7",
+   "색이 바뀜(0.79)"
+  ],
+  "cond": "Draw only the character's own body and the weapon it already holds: no motion blur, no slash trails, no smears, no flashes or effects. Keep the exact same outfit, colors, body size and proportions in every frame.",
+  "no_end": false,
+  "action": "Draw only the character's own body and the weapon it already holds: no motion blur, no slash trails, no smears, no flashes or effects. Keep the exact same outfit, colors, body size and proportions in every frame. Drops low, then explodes upward with a huge rear uppercut, the whole body rising onto the toes and the arm finishing above the head, then lands back down into the lean."
+ },
+ {
+  "key": "6.23_백일몽여A",
+  "row": "10",
+  "why": [
+   "캔버스 끝 잘림 1장(15px 이상)",
+   "몸이 커짐 ×2.1",
+   "색이 바뀜(0.46)"
+  ],
+  "cond": "Draw only the character's own body and the weapon it already holds: no motion blur, no slash trails, no smears, no flashes or effects. Keep the exact same outfit, colors, body size and proportions in every frame. Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges.",
+  "no_end": false,
+  "action": "Draw only the character's own body and the weapon it already holds: no motion blur, no slash trails, no smears, no flashes or effects. Keep the exact same outfit, colors, body size and proportions in every frame. Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges. From the first frame to the last, keep the body side-on facing west (toward screen left), the chest never turning toward the viewer or away from t"
+ },
+ {
+  "key": "6.24_백일몽여B",
+  "row": "13",
+  "why": [
+   "캔버스 끝 잘림 1장(15px 이상)",
+   "몸이 커짐 ×4.0",
+   "색이 바뀜(0.66)"
+  ],
+  "cond": "Draw only the character's own body and the weapon it already holds: no motion blur, no slash trails, no smears, no flashes or effects. Keep the exact same outfit, colors, body size and proportions in every frame. Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges.",
+  "no_end": false,
+  "action": "Draw only the character's own body and the weapon it already holds: no motion blur, no slash trails, no smears, no flashes or effects. Keep the exact same outfit, colors, body size and proportions in every frame. Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges. Drops to run almost on all fours for two strides, then springs up with a slashing swipe of the rear hand and lands back in the crouch."
+ },
+ {
+  "key": "6.24_백일몽여B",
+  "row": "18",
+  "why": [
+   "몸이 커짐 ×2.1"
+  ],
+  "cond": "Draw only the character's own body and the weapon it already holds: no motion blur, no slash trails, no smears, no flashes or effects. Keep the exact same outfit, colors, body size and proportions in every frame.",
+  "no_end": false,
+  "action": "Draw only the character's own body and the weapon it already holds: no motion blur, no slash trails, no smears, no flashes or effects. Keep the exact same outfit, colors, body size and proportions in every frame. Is knocked upright from the crouch by a blow to the face, the head tipping back and the ponytail whipping, then drops back down low."
+ },
+ {
+  "key": "6.26_협회남2",
+  "row": "6",
+  "why": [
+   "점프인데 발이 거의 안 뜸 1px"
+  ],
+  "cond": "A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land.",
+  "no_end": true,
+  "action": "A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land. Start standing. Bend the knees evenly, then jump straight up high with the back straight, the legs pressed together and straight and the arms straight at the sides. Land on both feet with an even knee bend and stand very straight with the heels together."
+ },
+ {
+  "key": "6.29_협회여3",
+  "row": "7",
+  "why": [
+   "점프인데 발이 거의 안 뜸 1px"
+  ],
+  "cond": "A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land.",
+  "no_end": true,
+  "action": "A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land. Keep the body side-on facing east the whole time, the chest never turning toward the viewer. Bend the knees together, then spring HIGH forward and up off the floor so that in the middle frames both feet are far above the ground, with a gap of about half her body height between the soles and the floor, the front knee lifted to the waist and the rear leg straight d"
+ },
+ {
+  "key": "6.31_프리랜서남2",
+  "row": "22",
+  "why": [
+   "뒤로 뻗음(앞 0 뒤 40)"
+  ],
+  "cond": "The body stays side-on facing east (right) the whole time and never turns around. Keep the backswing short; the strike travels forward toward east (right) only, never behind the body.",
+  "no_end": false,
+  "action": "The body stays side-on facing east (right) the whole time and never turns around. Keep the backswing short; the strike travels forward toward east (right) only, never behind the body. Keep the body side-on facing east the whole time, the chest never turning toward the viewer. Pull the pistol in tight to the chest with both hands and drive the left elbow forward at face height with a step in, then fire twice from the chest at close range, and push the pistol back out in the locked two-handed grip"
+ },
+ {
+  "key": "6.32_프리랜서남3",
+  "row": "18-3",
+  "why": [
+   "캔버스 끝 잘림 2장(15px 이상)"
+  ],
+  "cond": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges.",
+  "no_end": false,
+  "action": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges. Knocked upward by a blow under the chin, the body lifts off the floor and tips back with the jacket flying open and the boots swinging up, then drops and lands flat on the back, ending lying on the back with the arms out at the sides."
+ },
+ {
+  "key": "6.32_프리랜서남3",
+  "row": "22",
+  "why": [
+   "뒤로 뻗음(앞 0 뒤 24)"
+  ],
+  "cond": "The body stays side-on facing east (right) the whole time and never turns around. Keep the backswing short; the strike travels forward toward east (right) only, never behind the body.",
+  "no_end": false,
+  "action": "The body stays side-on facing east (right) the whole time and never turns around. Keep the backswing short; the strike travels forward toward east (right) only, never behind the body. Keep the body side-on facing east the whole time, the chest never turning toward the viewer. Bring the lead fist around at head height, then the rear fist the same way, stepping in heavily with each so the open jacket flares, then shake the hands out into the loose brawling stance."
+ },
+ {
+  "key": "6.33_프리랜서남4",
+  "row": "11",
+  "why": [
+   "시작·끝 장 발이 뜸 11px"
+  ],
+  "cond": "Both feet stay on the same floor line at the start and at the end.",
+  "no_end": false,
+  "action": "Both feet stay on the same floor line at the start and at the end. From the first frame to the last, keep the body side-on facing east (toward screen right), the chest never turning toward the viewer or away from the viewer; every attack reaches forward to the east, never swinging backward or behind the back, with only a short wind-up. Lift the lead knee and push the sneaker sole straight forward to the east at stomach height, the leg fully extended ahead to create distance, then set it down in "
+ },
+ {
+  "key": "6.34_프리랜서여1",
+  "row": "13",
+  "why": [
+   "뒤로 뻗음(앞 0 뒤 41)"
+  ],
+  "cond": "The body stays side-on facing east (right) the whole time and never turns around. Keep the backswing short; the strike travels forward toward east (right) only, never behind the body.",
+  "no_end": false,
+  "action": "The body stays side-on facing east (right) the whole time and never turns around. Keep the backswing short; the strike travels forward toward east (right) only, never behind the body. From the first frame to the last, keep the body side-on facing east (toward screen right), the chest never turning toward the viewer or away from the viewer; every attack reaches forward to the east, never swinging backward or behind the back, with only a short wind-up. Run forward two strides, reach both hands ahe"
+ },
+ {
+  "key": "6.35_프리랜서여2",
+  "row": "15",
+  "why": [
+   "떨어진 큰 덩어리 1번 장(1292px)"
+  ],
+  "cond": "Draw only the character's own body and the weapon it already holds: no motion blur, no slash trails, no smears, no flashes or effects. Keep the exact same outfit, colors, body size and proportions in every frame.",
+  "no_end": false,
+  "action": "Draw only the character's own body and the weapon it already holds: no motion blur, no slash trails, no smears, no flashes or effects. Keep the exact same outfit, colors, body size and proportions in every frame. Fire twice, the shoulders and planted feet absorbing each recoil with a small dip of the knees, then settle the pistol back low at chest height in the heavy two-handed grip."
+ },
+ {
+  "key": "6.35_프리랜서여2",
+  "row": "16",
+  "why": [
+   "캔버스 끝 잘림 1장(15px 이상)",
+   "몸이 커짐 ×1.9",
+   "떨어진 큰 덩어리 1번 장(8968px)"
+  ],
+  "cond": "Draw only the character's own body and the weapon it already holds: no motion blur, no slash trails, no smears, no flashes or effects. Keep the exact same outfit, colors, body size and proportions in every frame. Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges.",
+  "no_end": false,
+  "action": "Draw only the character's own body and the weapon it already holds: no motion blur, no slash trails, no smears, no flashes or effects. Keep the exact same outfit, colors, body size and proportions in every frame. Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges. Ducks straight down low under a swing with the forearms still up, then rises back."
+ },
+ {
+  "key": "6.36_프리랜서여3",
+  "row": "6",
+  "why": [
+   "점프인데 발이 거의 안 뜸 5px"
+  ],
+  "cond": "A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land.",
+  "no_end": true,
+  "action": "A real jump: both feet clearly leave the floor and rise high, about half the body height of air under the soles at the top, then land. Start standing. Dip the knees, then spring straight up high with the legs pressed together and straight, the open coat flaring. Land lightly with a small knee bend and stand still."
+ },
+ {
+  "key": "6.37_프리랜서여4",
+  "row": "3",
+  "why": [
+   "반복 이음 끊김(위치 맞춰도 48%)"
+  ],
+  "cond": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame.",
+  "no_end": false,
+  "action": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. Stands bladed on the balls of the feet with the lead hand loose and low and the rear hand at the chin, shuffling the feet in tiny quick steps in place."
+ },
+ {
+  "key": "6.41_상인남3",
+  "row": "29",
+  "why": [
+   "반복 이음 끊김(위치 맞춰도 42%)"
+  ],
+  "cond": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame.",
+  "no_end": false,
+  "action": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. Speaks low, leaning in a little, and taps the side of his own nose with the right index finger."
+ },
+ {
+  "key": "6.51_학생남2",
+  "row": "18-3",
+  "why": [
+   "캔버스 끝 잘림 1장(15px 이상)"
+  ],
+  "cond": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges.",
+  "no_end": false,
+  "action": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges. The face twists in pain as a blow from below lifts the lean body off the feet, the long arms and the open hoodie flung upward. Fall backward and land flat on the back at the level of the feet, ending lying with the head to the west, the feet to the east and the arms limp."
+ },
+ {
+  "key": "6.52_학생여1",
+  "row": "38",
+  "why": [
+   "캔버스 끝 잘림 1장(15px 이상)"
+  ],
+  "cond": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges.",
+  "no_end": false,
+  "action": "Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges. Rolls onto the stomach and drags forward on the forearms, knees sliding behind, head kept low."
+ },
+ {
+  "key": "6.56_시민남3",
+  "row": "3",
+  "why": [
+   "반복 이음 끊김(위치 맞춰도 41%)"
+  ],
+  "cond": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame.",
+  "no_end": false,
+  "action": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. Bounce heavily on the knees in a steady rhythm, the whole body dipping a hand's width and the belly bobbing, both open hands staying raised at chest height."
+ },
+ {
+  "key": "6.56_시민남3",
+  "row": "34",
+  "why": [
+   "시작·끝 장 발이 뜸 14px"
+  ],
+  "cond": "Both feet stay on the same floor line at the start and at the end.",
+  "no_end": false,
+  "action": "Both feet stay on the same floor line at the start and at the end. Jumps with a yelp, the belly jiggling, both hands flying up beside the head."
+ },
+ {
+  "key": "6.57_시민남4",
+  "row": "19",
+  "why": [
+   "떨어진 큰 덩어리 1번 장(2752px)"
+  ],
+  "cond": "Draw only the character's own body and the weapon it already holds: no motion blur, no slash trails, no smears, no flashes or effects. Keep the exact same outfit, colors, body size and proportions in every frame.",
+  "no_end": false,
+  "action": "Draw only the character's own body and the weapon it already holds: no motion blur, no slash trails, no smears, no flashes or effects. Keep the exact same outfit, colors, body size and proportions in every frame. Is blasted back off the feet, tucks the chin, lands on the upper back and beats both arms on the ground, ending lying on the back with the arms out at angles."
+ },
+ {
+  "key": "6.60_시민남7",
+  "row": "34",
+  "why": [
+   "시작·끝 장 발이 뜸 17px"
+  ],
+  "cond": "Both feet stay on the same floor line at the start and at the end.",
+  "no_end": false,
+  "action": "Both feet stay on the same floor line at the start and at the end. Yelps and jumps, the whole body curling in and both hands pulling up to the chest."
+ },
+ {
+  "key": "6.63_시민여1",
+  "row": "44",
+  "why": [
+   "캔버스 끝 잘림 1장(15px 이상)",
+   "몸이 커짐 ×2.6",
+   "색이 바뀜(0.55)"
+  ],
+  "cond": "Draw only the character's own body and the weapon it already holds: no motion blur, no slash trails, no smears, no flashes or effects. Keep the exact same outfit, colors, body size and proportions in every frame. Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges.",
+  "no_end": false,
+  "action": "Draw only the character's own body and the weapon it already holds: no motion blur, no slash trails, no smears, no flashes or effects. Keep the exact same outfit, colors, body size and proportions in every frame. Perform the motion in place near the center of the frame: the whole body and weapon stay fully inside the frame, never cut off at the edges. Struck on the side of the head, the light body twists half around on the spot, the arms flung out and the zip jacket swinging, then the legs in th"
+ },
+ {
+  "key": "6.64_시민여2",
+  "row": "21",
+  "why": [
+   "반복 이음 끊김(위치 맞춰도 44%)"
+  ],
+  "cond": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame.",
+  "no_end": false,
+  "action": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. Dizzy: the head droops, she sways gently with one hand pressed to the forehead and the knees wobbling, feet staying in place."
+ },
+ {
+  "key": "6.69_시민여7",
+  "row": "3",
+  "why": [
+   "반복 이음 끊김(위치 맞춰도 40%)"
+  ],
+  "cond": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame.",
+  "no_end": false,
+  "action": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. Bounce on the knees in a steady rhythm, the whole body dipping a hand's width and rising, the rear forearm raised before the face and the front hand open at chest height."
+ },
+ {
+  "key": "6.69_시민여7",
+  "row": "21",
+  "why": [
+   "반복 이음 끊김(위치 맞춰도 44%)"
+  ],
+  "cond": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame.",
+  "no_end": false,
+  "action": "This is a seamless loop: the last frame returns to exactly the same pose and position as the first frame. Dazed: closes the eyes and sways slowly back and forth, one hand pressed to the temple and the other reaching out for balance."
+ },
+ {
+  "key": "6.70_시민여8",
+  "row": "33",
+  "why": [
+   "시작·끝 장 발이 뜸 14px"
+  ],
+  "cond": "Both feet stay on the same floor line at the start and at the end.",
+  "no_end": false,
+  "action": "Both feet stay on the same floor line at the start and at the end. Jumps, turns toward the threat and hunches up with both fists pulled tight under the chin."
+ }
+]

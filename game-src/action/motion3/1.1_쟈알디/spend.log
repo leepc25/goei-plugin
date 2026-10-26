@@ -294,3 +294,5 @@
 10-26 04:24:04 VFX x3-1.1-F-fire-pillar 완료 {'h': 899, 'w': 354} 16장 effect_id=935e6ff8-5db7-48d3-95df-650c3fcbce5b
 10-26 08:38:17 VFX x3-c-ricochet-spark 완료 {'h': 40, 'w': 48} 6장 effect_id=0aae9ed6-b155-43ff-b1bf-4663c550646c
 10-26 08:38:17 VFX x3-c-hit-spark-light 완료 {'h': 32, 'w': 32} 6장 effect_id=3a56522d-8358-48c6-ae48-ee572c941cb0
+10-26 08:58:51 이전 판 지움: v3 6 제자리 점프
+10-26 08:58:54 6 제자리 점프 보냄 south-west 8장 시작=등록 끝=없음 약 1회
