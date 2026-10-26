@@ -168,3 +168,14 @@
 10-25 16:30:04 18_2 크게 밀려나기 완료 8장 (138초)
 10-25 16:30:08 44 사망 (서서) 완료 12장 (131초)
 10-25 16:30:10 43 누운 채 움찔 완료 4장 (133초)
+10-26 04:40:06 VFX x3-o-3.13-sample-vial 완료 {'h': 28, 'w': 28} 4장 effect_id=b032a0ea-31e0-47b3-8834-acf30043bb92
+10-26 04:40:34 VFX x3-o-3.13-flask 완료 {'h': 64, 'w': 64} 6장 effect_id=8cb09180-9d88-4f25-bc85-89610e0f6f3f
+10-26 04:40:41 VFX x3-o-3.13-sample-vial 완료 {'h': 32, 'w': 32} 4장 effect_id=aef8a473-aeb8-45fe-9aa3-e6634a7f88a7
+10-26 04:47:42 VFX x3-3.13-D-ink-dots 완료 {'h': 19, 'w': 25} 6장 effect_id=f1ab575a-dfdd-4d99-b48b-f5505d27c91c
+10-26 04:48:21 VFX x3-3.13-S-foam-burst 완료 {'h': 96, 'w': 104} 8장 effect_id=daa8394e-357e-4211-a420-72e3a40118c0
+10-26 04:48:42 VFX x3-3.13-D-ink-dots 완료 {'h': 256, 'w': 256} 6장 effect_id=c6de26ca-541a-4906-abed-8d5faf1f192d
+10-26 04:49:49 VFX x3-3.13-S2-dream-pillar 완료 {'h': 520, 'w': 600} 12장 effect_id=4b299b64-0ca9-4472-9207-d2a293c59a36
+10-26 04:50:11 VFX x3-3.13-F-vertical-lightning 완료 {'h': 342, 'w': 86} 8장 effect_id=7cb74e21-e4d3-4aec-8c78-bd49531355f8
+10-26 04:50:47 VFX x3-3.13-F-hail 완료 {'h': 285, 'w': 370} 8장 effect_id=12f66c06-feab-42aa-8172-5b91118f3f6d
+10-26 04:51:25 VFX x3-3.13-F-storm-cloud 완료 {'h': 400, 'w': 480} 14장 effect_id=a0146425-e260-4e68-ae32-7e84fa6022a0
+10-26 04:51:26 VFX x3-3.13-F-giant-lightning 완료 {'h': 623, 'w': 614} 16장 effect_id=4ac5db44-31b4-4cc7-b400-ded0961c5faf

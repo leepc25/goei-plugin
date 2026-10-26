@@ -570,5 +570,437 @@
   "try": 1,
   "key": "1.7_고르고디오",
   "row": "파란 판금 조각"
+ },
+ "x3-o-1.12-barricade": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "1.12_콘쥬스",
+  "row": "철제 바리케이드"
+ },
+ "x3-o-2.4-prosthetic-arm": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "2.4_이기석",
+  "row": "회전하는 의수"
+ },
+ "x3-o-3.7-handcuffs": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "3.7_은하제",
+  "row": "은색 수갑"
+ },
+ "x3-2.12-D-flamethrower": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "2.12_윤병수",
+  "row": "화염방사 불길"
+ },
+ "x3-o-2.14-mortar-shell": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "2.14_송진섭",
+  "row": "박격포탄"
+ },
+ "x3-o-3.13-sample-vial": {
+  "ok": false,
+  "why": [
+   "너무 작음 105px"
+  ],
+  "try": 2,
+  "key": "3.13_곽제강",
+  "row": "시료병"
+ },
+ "x3-o-3.14-reagent-bottle": {
+  "ok": false,
+  "why": [
+   "너무 작음 111px"
+  ],
+  "try": 2,
+  "key": "3.14_이연화",
+  "row": "시약 병"
+ },
+ "x3-o-3.13-flask": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "3.13_곽제강",
+  "row": "큰 플라스크"
+ },
+ "x3-o-2.10-panzerfaust": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "2.10_곽성주",
+  "row": "판처파우스트 탄"
+ },
+ "x3-3.2-D-hand-mark": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "3.2_호유원",
+  "row": "손등 표식"
+ },
+ "x3-3.2-S0-foxfire-orb": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "3.2_호유원",
+  "row": "여우불 구슬"
+ },
+ "x3-3.2-D-foxfire-burst": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "3.2_호유원",
+  "row": "여우불 폭발"
+ },
+ "x3-3.1-D-rotten-office": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "3.1_청달래",
+  "row": "썩은 사무실"
+ },
+ "x3-3.2-F-foxfire-crown": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "3.2_호유원",
+  "row": "머리 위 여우불"
+ },
+ "x3-3.3-D-green-palm-print": {
+  "ok": false,
+  "why": [
+   "너무 작음 133px"
+  ],
+  "try": 2,
+  "key": "3.3_백석주",
+  "row": "초록 손바닥 자국"
+ },
+ "x3-3.1-F-sky-eye": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "3.1_청달래",
+  "row": "하늘 눈"
+ },
+ "x3-3.4-S2-star-threads": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "3.4_진나솔",
+  "row": "별 실"
+ },
+ "x3-3.1-S2-fire-seal": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "3.1_청달래",
+  "row": "불 인장"
+ },
+ "x3-3.6-D-space-rift": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "3.6_이자헌",
+  "row": "공간 틈"
+ },
+ "x3-3.1-F-drought-fire": {
+  "ok": false,
+  "why": [
+   "캔버스 끝 잘림 14장"
+  ],
+  "try": 2,
+  "key": "3.1_청달래",
+  "row": "가뭄불"
+ },
+ "x3-3.5-S1-sneaker-prints": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "3.5_이성해",
+  "row": "운동화 발자국"
+ },
+ "x3-3.6-S1-white-shock-pillar": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "3.6_이자헌",
+  "row": "흰 충격 기둥"
+ },
+ "x3-3.2-S1-nine-tails": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "3.2_호유원",
+  "row": "아홉 꼬리"
+ },
+ "x3-3.3-F-rewind-ring": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "3.3_백석주",
+  "row": "되감기 고리"
+ },
+ "x3-3.10-S0-bandage-band": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "3.10_고영은",
+  "row": "압박붕대 띠"
+ },
+ "x3-3.8-D-muffler-hood": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "3.8_박민성",
+  "row": "머플러 두건"
+ },
+ "x3-3.10-D-headlamp-cone": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "3.10_고영은",
+  "row": "헤드램프 빛 원뿔"
+ },
+ "x3-3.10-F-light-pillar": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "3.10_고영은",
+  "row": "천장 빛기둥"
+ },
+ "x3-3.13-D-ink-dots": {
+  "ok": false,
+  "why": [
+   "너무 작음 75px"
+  ],
+  "try": 2,
+  "key": "3.13_곽제강",
+  "row": "연보라 잉크 점"
+ },
+ "x3-3.13-S-foam-burst": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "3.13_곽제강",
+  "row": "연보라 거품 폭발"
+ },
+ "x3-3.7-F-chain-wave": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "3.7_은하제",
+  "row": "화면 사슬 물결"
+ },
+ "x3-3.5-F-isolation-door": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "3.5_이성해",
+  "row": "격리문"
+ },
+ "x3-3.6-F-white-lizard-silhouette": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "3.6_이자헌",
+  "row": "흰 도마뱀 실루엣"
+ },
+ "x3-3.13-S2-dream-pillar": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "3.13_곽제강",
+  "row": "꿈결 기둥"
+ },
+ "x3-3.13-F-vertical-lightning": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "3.13_곽제강",
+  "row": "수직 벼락"
+ },
+ "x3-3.4-F-thread-net": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "3.4_진나솔",
+  "row": "실 그물"
+ },
+ "x3-3.13-F-hail": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "3.13_곽제강",
+  "row": "우박"
+ },
+ "x3-3.14-S2-reagent-rain": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "3.14_이연화",
+  "row": "시약 비"
+ },
+ "x3-3.13-F-storm-cloud": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "3.13_곽제강",
+  "row": "연보라 먹구름"
+ },
+ "x3-3.13-F-giant-lightning": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "3.13_곽제강",
+  "row": "거대 벼락"
+ },
+ "x3-3.10-F-light-cascade": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "3.10_고영은",
+  "row": "흰 빛 막"
+ },
+ "x3-3.16-D-claw-marks": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "3.16_제이",
+  "row": "발톱 자국"
+ },
+ "x3-3.16-S1-shadow-maw": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "3.16_제이",
+  "row": "그림자 입"
+ },
+ "x3-3.16-S0-shadow-band": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "3.16_제이",
+  "row": "그림자 띠"
+ },
+ "x3-3.15-D-red-slash-stroke": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "3.15_이병진",
+  "row": "빨간 사선 획"
+ },
+ "x3-3.16-F-shadow-sea": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "3.16_제이",
+  "row": "그림자 바다"
+ },
+ "x3-3.15-F-red-brush-fragments": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "3.15_이병진",
+  "row": "붉은 한자 획 조각"
+ },
+ "x3-4.1-F-crimson-light-line": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "4.1_차여진",
+  "row": "검붉은 빛 줄"
+ },
+ "x3-3.16-D-shadow-claw-trail": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "3.16_제이",
+  "row": "그림자 발톱 궤적"
+ },
+ "x3-3.16-F-black-fur-band": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "3.16_제이",
+  "row": "검은 털 띠"
+ },
+ "x3-3.16-F-fang-shadow-curtain": {
+  "ok": false,
+  "why": [
+   "캔버스 끝 잘림 13장"
+  ],
+  "try": 1,
+  "key": "3.16_제이",
+  "row": "이빨 그림자 막"
+ },
+ "x3-3.15-F-red-square-seal": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "3.15_이병진",
+  "row": "붉은 네모 낙관"
+ },
+ "x3-4.1-F-offscreen-slash-flash": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "4.1_차여진",
+  "row": "화면 밖 베기 섬광"
+ },
+ "x3-4.2-D-square-reflect-plane": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "4.2_서윤지",
+  "row": "네모 반사 면"
+ },
+ "x3-4.2-S1-bracket-trail": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "4.2_서윤지",
+  "row": "ㄷ자 궤적"
+ },
+ "x3-3.14-F-reagent-explosion": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "3.14_이연화",
+  "row": "시약 폭발"
+ },
+ "x3-4.3-F-surgical-light": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "4.3_고연지",
+  "row": "수술등 빛"
+ },
+ "x3-4.6-F-baton-arc": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "4.6_문혜란",
+  "row": "진압봉 내리찍기 호"
+ },
+ "x3-4.1-F-x-slash-mark": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "4.1_차여진",
+  "row": "화면 X자 베기 자국"
+ },
+ "x3-4.3-D-suture-zigzag": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "4.3_고연지",
+  "row": "봉합실 지그재그"
  }
 }

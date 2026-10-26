@@ -145,3 +145,10 @@
 10-25 16:32:31 18_1 맞기 (하단) 완료 4장 (178초)
 10-25 16:32:38 44 사망 (서서) 완료 12장 (152초)
 10-25 16:32:45 18_2 크게 밀려나기 완료 8장 (192초)
+10-26 04:52:34 VFX x3-3.16-D-claw-marks 완료 {'h': 34, 'w': 54} 6장 effect_id=4e578d04-2ccf-4c1d-807a-11ebe421a661
+10-26 04:53:24 VFX x3-3.16-S1-shadow-maw 완료 {'h': 192, 'w': 464} 12장 effect_id=e7d45821-a798-4d07-ac4a-ee57919fe1f0
+10-26 04:54:05 VFX x3-3.16-S0-shadow-band 완료 {'h': 17, 'w': 312} 8장 effect_id=469040e3-b8b5-4154-8a6c-f55f17e80f4b
+10-26 04:54:40 VFX x3-3.16-F-shadow-sea 완료 {'h': 216, 'w': 1024} 16장 effect_id=14b04734-969c-4f12-a49f-032009ba02d7
+10-26 04:55:38 VFX x3-3.16-D-shadow-claw-trail 완료 {'h': 192, 'w': 128} 8장 effect_id=fcc44f8a-76c6-4916-bb6c-fbd98919c8dc
+10-26 04:55:40 VFX x3-3.16-F-black-fur-band 완료 {'h': 37, 'w': 490} 8장 effect_id=b2372c0d-c132-49df-8ef8-082ba41b0b3a
+10-26 04:55:55 VFX x3-3.16-F-fang-shadow-curtain 완료 {'h': 288, 'w': 1024} 14장 effect_id=7184deea-5aa5-4dd0-8326-cca7c77a9d57

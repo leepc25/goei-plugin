@@ -1,0 +1,391 @@
+{
+ "frames": [
+  {
+   "filename": "x3-3-16-f-fang-shadow-curtain 0.png",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 1024,
+    "h": 288
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 1024,
+    "h": 288
+   },
+   "sourceSize": {
+    "w": 1024,
+    "h": 288
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "duration": 71
+  },
+  {
+   "filename": "x3-3-16-f-fang-shadow-curtain 1.png",
+   "frame": {
+    "x": 1024,
+    "y": 0,
+    "w": 1024,
+    "h": 288
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 1024,
+    "h": 288
+   },
+   "sourceSize": {
+    "w": 1024,
+    "h": 288
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "duration": 71
+  },
+  {
+   "filename": "x3-3-16-f-fang-shadow-curtain 2.png",
+   "frame": {
+    "x": 2048,
+    "y": 0,
+    "w": 1024,
+    "h": 288
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 1024,
+    "h": 288
+   },
+   "sourceSize": {
+    "w": 1024,
+    "h": 288
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "duration": 71
+  },
+  {
+   "filename": "x3-3-16-f-fang-shadow-curtain 3.png",
+   "frame": {
+    "x": 3072,
+    "y": 0,
+    "w": 1024,
+    "h": 288
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 1024,
+    "h": 288
+   },
+   "sourceSize": {
+    "w": 1024,
+    "h": 288
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "duration": 71
+  },
+  {
+   "filename": "x3-3-16-f-fang-shadow-curtain 4.png",
+   "frame": {
+    "x": 0,
+    "y": 288,
+    "w": 1024,
+    "h": 288
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 1024,
+    "h": 288
+   },
+   "sourceSize": {
+    "w": 1024,
+    "h": 288
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "duration": 71
+  },
+  {
+   "filename": "x3-3-16-f-fang-shadow-curtain 5.png",
+   "frame": {
+    "x": 1024,
+    "y": 288,
+    "w": 1024,
+    "h": 288
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 1024,
+    "h": 288
+   },
+   "sourceSize": {
+    "w": 1024,
+    "h": 288
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "duration": 71
+  },
+  {
+   "filename": "x3-3-16-f-fang-shadow-curtain 6.png",
+   "frame": {
+    "x": 2048,
+    "y": 288,
+    "w": 1024,
+    "h": 288
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 1024,
+    "h": 288
+   },
+   "sourceSize": {
+    "w": 1024,
+    "h": 288
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "duration": 71
+  },
+  {
+   "filename": "x3-3-16-f-fang-shadow-curtain 7.png",
+   "frame": {
+    "x": 3072,
+    "y": 288,
+    "w": 1024,
+    "h": 288
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 1024,
+    "h": 288
+   },
+   "sourceSize": {
+    "w": 1024,
+    "h": 288
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "duration": 71
+  },
+  {
+   "filename": "x3-3-16-f-fang-shadow-curtain 8.png",
+   "frame": {
+    "x": 0,
+    "y": 576,
+    "w": 1024,
+    "h": 288
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 1024,
+    "h": 288
+   },
+   "sourceSize": {
+    "w": 1024,
+    "h": 288
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "duration": 71
+  },
+  {
+   "filename": "x3-3-16-f-fang-shadow-curtain 9.png",
+   "frame": {
+    "x": 1024,
+    "y": 576,
+    "w": 1024,
+    "h": 288
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 1024,
+    "h": 288
+   },
+   "sourceSize": {
+    "w": 1024,
+    "h": 288
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "duration": 71
+  },
+  {
+   "filename": "x3-3-16-f-fang-shadow-curtain 10.png",
+   "frame": {
+    "x": 2048,
+    "y": 576,
+    "w": 1024,
+    "h": 288
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 1024,
+    "h": 288
+   },
+   "sourceSize": {
+    "w": 1024,
+    "h": 288
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "duration": 71
+  },
+  {
+   "filename": "x3-3-16-f-fang-shadow-curtain 11.png",
+   "frame": {
+    "x": 3072,
+    "y": 576,
+    "w": 1024,
+    "h": 288
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 1024,
+    "h": 288
+   },
+   "sourceSize": {
+    "w": 1024,
+    "h": 288
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "duration": 71
+  },
+  {
+   "filename": "x3-3-16-f-fang-shadow-curtain 12.png",
+   "frame": {
+    "x": 0,
+    "y": 864,
+    "w": 1024,
+    "h": 288
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 1024,
+    "h": 288
+   },
+   "sourceSize": {
+    "w": 1024,
+    "h": 288
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "duration": 71
+  },
+  {
+   "filename": "x3-3-16-f-fang-shadow-curtain 13.png",
+   "frame": {
+    "x": 1024,
+    "y": 864,
+    "w": 1024,
+    "h": 288
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 1024,
+    "h": 288
+   },
+   "sourceSize": {
+    "w": 1024,
+    "h": 288
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "duration": 71
+  }
+ ],
+ "meta": {
+  "app": "PixelLab VFX Creator",
+  "image": "x3-3-16-f-fang-shadow-curtain.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 4096,
+   "h": 1152
+  },
+  "scale": "1",
+  "anchor": {
+   "kind": "origin",
+   "x": 512,
+   "y": 144
+  },
+  "frameTags": [
+   {
+    "name": "x3-3-16-f-fang-shadow-curtain",
+    "from": 0,
+    "to": 13,
+    "direction": "forward"
+   }
+  ]
+ }
+}

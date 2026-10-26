@@ -1,0 +1,339 @@
+{
+ "frames": [
+  {
+   "filename": "x3-3-13-s2-dream-pillar 0.png",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 600,
+    "h": 520
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 600,
+    "h": 520
+   },
+   "sourceSize": {
+    "w": 600,
+    "h": 520
+   },
+   "pivot": {
+    "x": 0.76,
+    "y": 0.8538461538461538
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-3-13-s2-dream-pillar 1.png",
+   "frame": {
+    "x": 600,
+    "y": 0,
+    "w": 600,
+    "h": 520
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 600,
+    "h": 520
+   },
+   "sourceSize": {
+    "w": 600,
+    "h": 520
+   },
+   "pivot": {
+    "x": 0.76,
+    "y": 0.8538461538461538
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-3-13-s2-dream-pillar 2.png",
+   "frame": {
+    "x": 1200,
+    "y": 0,
+    "w": 600,
+    "h": 520
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 600,
+    "h": 520
+   },
+   "sourceSize": {
+    "w": 600,
+    "h": 520
+   },
+   "pivot": {
+    "x": 0.76,
+    "y": 0.8538461538461538
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-3-13-s2-dream-pillar 3.png",
+   "frame": {
+    "x": 1800,
+    "y": 0,
+    "w": 600,
+    "h": 520
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 600,
+    "h": 520
+   },
+   "sourceSize": {
+    "w": 600,
+    "h": 520
+   },
+   "pivot": {
+    "x": 0.76,
+    "y": 0.8538461538461538
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-3-13-s2-dream-pillar 4.png",
+   "frame": {
+    "x": 0,
+    "y": 520,
+    "w": 600,
+    "h": 520
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 600,
+    "h": 520
+   },
+   "sourceSize": {
+    "w": 600,
+    "h": 520
+   },
+   "pivot": {
+    "x": 0.76,
+    "y": 0.8538461538461538
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-3-13-s2-dream-pillar 5.png",
+   "frame": {
+    "x": 600,
+    "y": 520,
+    "w": 600,
+    "h": 520
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 600,
+    "h": 520
+   },
+   "sourceSize": {
+    "w": 600,
+    "h": 520
+   },
+   "pivot": {
+    "x": 0.76,
+    "y": 0.8538461538461538
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-3-13-s2-dream-pillar 6.png",
+   "frame": {
+    "x": 1200,
+    "y": 520,
+    "w": 600,
+    "h": 520
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 600,
+    "h": 520
+   },
+   "sourceSize": {
+    "w": 600,
+    "h": 520
+   },
+   "pivot": {
+    "x": 0.76,
+    "y": 0.8538461538461538
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-3-13-s2-dream-pillar 7.png",
+   "frame": {
+    "x": 1800,
+    "y": 520,
+    "w": 600,
+    "h": 520
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 600,
+    "h": 520
+   },
+   "sourceSize": {
+    "w": 600,
+    "h": 520
+   },
+   "pivot": {
+    "x": 0.76,
+    "y": 0.8538461538461538
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-3-13-s2-dream-pillar 8.png",
+   "frame": {
+    "x": 0,
+    "y": 1040,
+    "w": 600,
+    "h": 520
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 600,
+    "h": 520
+   },
+   "sourceSize": {
+    "w": 600,
+    "h": 520
+   },
+   "pivot": {
+    "x": 0.76,
+    "y": 0.8538461538461538
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-3-13-s2-dream-pillar 9.png",
+   "frame": {
+    "x": 600,
+    "y": 1040,
+    "w": 600,
+    "h": 520
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 600,
+    "h": 520
+   },
+   "sourceSize": {
+    "w": 600,
+    "h": 520
+   },
+   "pivot": {
+    "x": 0.76,
+    "y": 0.8538461538461538
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-3-13-s2-dream-pillar 10.png",
+   "frame": {
+    "x": 1200,
+    "y": 1040,
+    "w": 600,
+    "h": 520
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 600,
+    "h": 520
+   },
+   "sourceSize": {
+    "w": 600,
+    "h": 520
+   },
+   "pivot": {
+    "x": 0.76,
+    "y": 0.8538461538461538
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-3-13-s2-dream-pillar 11.png",
+   "frame": {
+    "x": 1800,
+    "y": 1040,
+    "w": 600,
+    "h": 520
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 600,
+    "h": 520
+   },
+   "sourceSize": {
+    "w": 600,
+    "h": 520
+   },
+   "pivot": {
+    "x": 0.76,
+    "y": 0.8538461538461538
+   },
+   "duration": 83
+  }
+ ],
+ "meta": {
+  "app": "PixelLab VFX Creator",
+  "image": "x3-3-13-s2-dream-pillar.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 2400,
+   "h": 1560
+  },
+  "scale": "1",
+  "anchor": {
+   "kind": "origin",
+   "x": 456,
+   "y": 444
+  },
+  "frameTags": [
+   {
+    "name": "x3-3-13-s2-dream-pillar",
+    "from": 0,
+    "to": 11,
+    "direction": "forward"
+   }
+  ]
+ }
+}

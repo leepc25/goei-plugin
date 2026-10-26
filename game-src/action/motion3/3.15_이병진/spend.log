@@ -192,3 +192,6 @@
 10-25 16:31:50 45 사망 (누워서) 완료 4장 (140초)
 10-25 16:32:41 44 사망 (서서) 완료 12장 (194초)
 10-25 16:33:19 18_3 띄워지기 완료 8장 (270초)
+10-26 04:54:12 VFX x3-3.15-D-red-slash-stroke 완료 {'h': 256, 'w': 256} 8장 effect_id=fc9b8ef8-d0ff-4b68-b974-f8bd1cffedaf
+10-26 04:55:02 VFX x3-3.15-F-red-brush-fragments 완료 {'h': 370, 'w': 500} 14장 effect_id=0a047f11-29ac-42f8-a89c-db9ef141dda0
+10-26 04:56:18 VFX x3-3.15-F-red-square-seal 완료 {'h': 346, 'w': 432} 16장 effect_id=5e9c5e4b-611e-4a1e-9fc8-cd274c68fcdb

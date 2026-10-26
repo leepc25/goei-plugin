@@ -135,3 +135,8 @@
 10-25 16:23:29 18_3 띄워지기 완료 8장 (123초)
 10-25 16:23:53 18_2 크게 밀려나기 완료 8장 (143초)
 10-25 16:23:57 44 사망 (서서) 완료 12장 (134초)
+10-26 04:41:11 VFX x3-3.2-D-hand-mark 완료 {'h': 48, 'w': 48} 6장 effect_id=3a1be3aa-be0f-4ee2-bc25-b9b13d0aad42
+10-26 04:41:22 VFX x3-3.2-S0-foxfire-orb 완료 {'h': 48, 'w': 48} 6장 effect_id=003f7d2c-6c45-45c3-a25f-7528ec896e63
+10-26 04:41:48 VFX x3-3.2-D-foxfire-burst 완료 {'h': 256, 'w': 340} 8장 effect_id=65dcfaf2-d93b-488a-abac-b029b3f86ad3
+10-26 04:42:13 VFX x3-3.2-F-foxfire-crown 완료 {'h': 96, 'w': 96} 8장 effect_id=28f65889-105a-46b7-b65a-a006c013b000
+10-26 04:45:44 VFX x3-3.2-S1-nine-tails 완료 {'h': 256, 'w': 512} 14장 effect_id=7e9d9be0-6a09-42d3-a515-f0dd4d589b0d
