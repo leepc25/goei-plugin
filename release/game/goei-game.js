@@ -1,8 +1,8 @@
-// goei-game 0.16.59
+// goei-game 0.16.62
 "use strict";
 (() => {
   // src/game/action/engine/view.ts
-  var view = { crop: 0, cropY: 0, zoom: 1, lane: [440, 690] };
+  var view = { crop: 0, cropY: 0, zoom: 1, lane: [440, 690], worldH: 720 };
   var FAR = 0.85;
   var persp = (y) => {
     const [a, b] = view.lane;
@@ -126,7 +126,7 @@
     if (!e) return false;
     const { im, m } = e;
     const f = frameOf(id, m, frame2, total);
-    const k = spr(y) * 1.15;
+    const k = spr(y) * 1.28;
     const flip = m.dir === "SW" ? dir > 0 : dir < 0;
     c.save();
     c.imageSmoothingEnabled = false;
@@ -153,7 +153,7 @@
     c.restore();
     return true;
   }
-  var testPlayerTop = () => -(252 - 14) * 1.15;
+  var testPlayerTop = () => -(252 - 14) * 1.28;
   var faces = /* @__PURE__ */ new Map();
   function testPlayerFace(side = 44, flip = false) {
     const e = art?.clips["31"] ?? art?.clips["1"];
@@ -197,7 +197,7 @@
       lane: [428, 669],
       call: [1800, 280],
       blocks: [[350, 440, 470, 70], [1158, 1230, 462, 70], [1250, 1498, 458, 46], [1900, 1980, 470, 70]],
-      floor: [[0, 478], [330, 452], [470, 452], [470, 428], [1150, 428], [1150, 446], [2010, 446], [2190, 510], [2223, 520], [2223, 669], [0, 669]],
+      floor: [[0, 512], [60, 506], [92, 490], [300, 460], [340, 454], [470, 452], [470, 428], [1150, 428], [1150, 446], [1917, 446], [2223, 518], [2223, 669], [0, 669]],
       doors: {
         // 비스듬한 유리벽이라 문짝을 움직이면 선이 안 맞는다: 바깥 빛만 번진다
         main: { x0: 91, x1: 307, y0: 38, y1: 457, seam: 198, anim: "glow", behind: "see" },
@@ -206,6 +206,10 @@
       },
       lamps: [...downs([861, 1095, 1356, 1671]), sign(2133, 67)],
       windows: [],
+      // 왼쪽 유리 현관·유리벽 너머
+      // 유리 아래 끝선을 따라 (문짝 유리 바닥선이 비스듬하다)
+      outside: [[[0, 0], [412, 0], [412, 405], [330, 420], [295, 420], [210, 437], [180, 442], [98, 460], [62, 470], [60, 488], [40, 490], [0, 492]]],
+      outsideSolid: { keep: [[0, 250, 90, 420, "green"], [0, 413, 44, 520, "all"], [325, 200, 445, 372, "green"], [352, 374, 432, 432, "all"]] },
       objects: [{ id: "desk", file: "desk", x: 494, y: 205, w: 644, h: 262, sortY: 463, solid: [{ x0: 494, x1: 1137, y0: 442, y1: 466, h: 140 }, { x0: 1096, x1: 1137, y0: 428, y1: 466, h: 140 }] }]
     },
     f2: {
@@ -214,7 +218,7 @@
       under: false,
       call: [1132, 284],
       blocks: [[196, 286, 476, 70], [1776, 1858, 476, 70]],
-      floor: [[0, 480], [92, 446], [1950, 446], [2064, 482], [2064, 669], [0, 669]],
+      floor: [[0, 504], [213, 446], [1829, 446], [2064, 515], [2064, 669], [0, 669]],
       doors: {
         wc: { x0: 30, x1: 118, y0: 112, y1: 470, anim: "swing", hinge: "R", quad: [[30, 112], [118, 128], [118, 446], [30, 470]] },
         swat: { x0: 335, x1: 770, y0: 90, y1: 432, seam: 554, anim: "swing2", behind: "see" },
@@ -225,6 +229,8 @@
       },
       lamps: [...downs([389, 710, 975, 1275, 1581]), sign(1986, 62)],
       windows: [],
+      // 진압팀 유리문 너머 사무실 창
+      outside: [[[350, 165], [762, 165], [762, 278], [350, 278]]],
       objects: []
     },
     f3: {
@@ -233,7 +239,7 @@
       under: false,
       call: [1051, 291],
       blocks: [[180, 266, 472, 70], [1648, 1726, 472, 70]],
-      floor: [[0, 478], [80, 446], [1832, 446], [1915, 478], [1915, 669], [0, 669]],
+      floor: [[0, 503], [235, 446], [1653, 446], [1915, 512], [1915, 669], [0, 669]],
       doors: {
         wc: { x0: 30, x1: 112, y0: 128, y1: 470, anim: "swing", hinge: "R", quad: [[30, 128], [112, 142], [112, 450], [30, 470]] },
         pantry: { x0: 315, x1: 470, y0: 118, y1: 425, anim: "swing", hinge: "R" },
@@ -244,6 +250,8 @@
       },
       lamps: [...downs([362, 656, 907, 1184, 1469]), sign(1842, 86)],
       windows: [],
+      // 종합대응팀 유리문 너머 사무실 창
+      outside: [[[1160, 183], [1575, 183], [1575, 282], [1160, 282]]],
       objects: []
     },
     b1: {
@@ -252,7 +260,7 @@
       under: true,
       call: [1065, 292],
       blocks: [[186, 272, 472, 70], [1670, 1750, 472, 70]],
-      floor: [[0, 478], [80, 446], [1852, 446], [1940, 478], [1940, 669], [0, 669]],
+      floor: [[0, 503], [235, 446], [1673, 446], [1940, 511], [1940, 669], [0, 669]],
       doors: {
         edu: { x0: 30, x1: 112, y0: 125, y1: 470, anim: "swing", hinge: "R", quad: [[30, 125], [112, 140], [112, 450], [30, 470]] },
         training: { x0: 345, x1: 692, y0: 132, y1: 432, seam: 518, anim: "swing2" },
@@ -270,7 +278,7 @@
       w: 2003,
       under: true,
       call: [1130, 287],
-      floor: [[0, 486], [100, 446], [1906, 446], [2003, 484], [2003, 669], [0, 669]],
+      floor: [[0, 499], [217, 446], [1748, 446], [2003, 507], [2003, 669], [0, 669]],
       doors: {
         interrogation: { x0: 33, x1: 119, y0: 119, y1: 465, anim: "swing", hinge: "R", quad: [[33, 119], [119, 135], [119, 444], [33, 465]] },
         isolation: { x0: 385, x1: 725, y0: 122, y1: 410, anim: "shutter" },
@@ -297,7 +305,7 @@
       under: true,
       lane: [458, 669],
       call: [1883, 413],
-      floor: [[0, 460], [995, 460], [995, 496], [1690, 496], [1906, 604], [1906, 669], [0, 669]],
+      floor: [[0, 460], [995, 460], [995, 496], [1654, 496], [1906, 622], [1906, 669], [0, 669]],
       doors: {
         supply: { x0: 1405, x1: 1597, y0: 190, y1: 470, anim: "swing", hinge: "L" },
         elev: { x0: 1724, x1: 1849, y0: 130, y1: 552, seam: 1784, anim: "slide2", behind: "car", quad: [[1724, 165], [1849, 130], [1849, 552], [1724, 510]] }
@@ -383,7 +391,7 @@
     };
   }
   var hasHqField = (scene) => !!images && !!PAINTED[scene];
-  function drawHqField(c, scene, camX, fx2) {
+  function drawHqField(c, scene, camX, fx2, clockHour = null) {
     const p = PAINTED[scene];
     const im = images?.[p?.file ?? ""];
     if (!p || !im) return false;
@@ -402,6 +410,12 @@
       drawDoor(c, im, d3, s2.open, s2.shake);
     }
     c.restore();
+    const k = keyAt(hourNow(clockHour));
+    if (!p.under && k.win[3] > 5e-3) {
+      c.save();
+      drawOutsideNight(c, scene, p, k, performance.now());
+      c.restore();
+    }
     return true;
   }
   function clipDoor(c, d3) {
@@ -581,12 +595,47 @@
     }
     return NIGHT;
   }
+  function drawOutsideNight(c, scene, p, k, now) {
+    if (!p.under && k.win[3] > 5e-3) {
+      const wm = (v) => Math.round(255 + (v - 255) * k.win[3]);
+      c.globalCompositeOperation = "multiply";
+      c.fillStyle = `rgb(${wm(k.win[0])},${wm(k.win[1])},${wm(k.win[2])})`;
+      for (const [wx0, wy0, wx1, wy1] of p.windows) c.fillRect(wx0, wy0, wx1 - wx0, wy1 - wy0);
+      const ow = Math.min(0.97, k.win[3] + k.tint[3] * 0.5);
+      const om = (v) => Math.round(255 + (v - 255) * ow);
+      c.fillStyle = `rgb(${om(k.win[0])},${om(k.win[1])},${om(k.win[2])})`;
+      (p.outside ?? []).forEach((poly2, i) => {
+        const m = outsideMask(scene, i, poly2);
+        if (!m) return;
+        const t = tinted(m, `rgb(${om(k.win[0])},${om(k.win[1])},${om(k.win[2])})`);
+        c.drawImage(t, m.x, m.y);
+      });
+      const gm = (v) => Math.round(255 + (v - 255) * k.win[3] * 0.4);
+      c.fillStyle = `rgb(${gm(k.win[0])},${gm(k.win[1])},${gm(k.win[2])})`;
+      for (const d3 of Object.values(p.doors)) if (d3.behind === "see" && d3.anim !== "glow") c.fillRect(d3.x0, d3.y0, d3.x1 - d3.x0, d3.y1 - d3.y0);
+      c.globalCompositeOperation = "source-over";
+      const lit2 = Math.max(0, (k.win[3] - 0.5) / 0.4);
+      if (lit2 > 0) {
+        const boxes = [...p.windows, ...(p.outside ?? []).map((q) => [Math.min(...q.map((v) => v[0])), Math.min(...q.map((v) => v[1])), Math.max(...q.map((v) => v[0])), Math.min(...q.map((v) => v[1])) + (Math.max(...q.map((v) => v[1])) - Math.min(...q.map((v) => v[1]))) * 0.55])];
+        for (const [wx0, wy0, wx1, wy1] of boxes) {
+          for (let i = 0; i < (wx1 - wx0) / 9; i++) {
+            const r = Math.sin(i * 127.1 + wx0 * 3.7) * 43758.5453, f = r - Math.floor(r);
+            if (f > 0.42) continue;
+            const x = wx0 + Math.floor(f * 997) % (wx1 - wx0 - 4), y = wy0 + 8 + Math.floor(f * 7919) % Math.max(1, wy1 - wy0 - 16);
+            const on = f < 0.05 ? 0.5 + 0.5 * Math.sin(now / 1700 + i) : 1;
+            c.fillStyle = `rgba(255,${200 + Math.floor(f * 100)},120,${0.75 * lit2 * on})`;
+            c.fillRect(x, y, 3, 3);
+          }
+        }
+      }
+    }
+  }
   function drawHqFieldLight(c, scene, camX, clockHour, now) {
     const p = PAINTED[scene];
     if (!p || !images) return;
     const k = keyAt(hourNow(clockHour));
     const x0 = camX - 40, W5 = 1280 + 80, H7 = 720;
-    const sc = p.under ? 0.35 : 1;
+    const sc = p.under ? 0.35 : 0.5;
     c.save();
     const a = k.tint[3] * sc;
     if (a > 5e-3) {
@@ -595,26 +644,6 @@
       c.fillStyle = `rgb(${mix3(k.tint[0])},${mix3(k.tint[1])},${mix3(k.tint[2])})`;
       c.fillRect(x0, 0, W5, H7);
       c.globalCompositeOperation = "source-over";
-      if (!p.under && k.win[3] > 5e-3) {
-        const wm = (v) => Math.round(255 + (v - 255) * k.win[3]);
-        c.globalCompositeOperation = "multiply";
-        c.fillStyle = `rgb(${wm(k.win[0])},${wm(k.win[1])},${wm(k.win[2])})`;
-        for (const [wx0, wy0, wx1, wy1] of p.windows) c.fillRect(wx0, wy0, wx1 - wx0, wy1 - wy0);
-        c.globalCompositeOperation = "source-over";
-        const lit2 = Math.max(0, (k.win[3] - 0.5) / 0.4);
-        if (lit2 > 0) {
-          for (const [wx0, wy0, wx1, wy1] of p.windows) {
-            for (let i = 0; i < (wx1 - wx0) / 9; i++) {
-              const r = Math.sin(i * 127.1 + wx0 * 3.7) * 43758.5453, f = r - Math.floor(r);
-              if (f > 0.42) continue;
-              const x = wx0 + Math.floor(f * 997) % (wx1 - wx0 - 4), y = wy0 + 8 + Math.floor(f * 7919) % Math.max(1, wy1 - wy0 - 16);
-              const on = f < 0.05 ? 0.5 + 0.5 * Math.sin(now / 1700 + i) : 1;
-              c.fillStyle = `rgba(255,${200 + Math.floor(f * 100)},120,${0.75 * lit2 * on})`;
-              c.fillRect(x, y, 3, 3);
-            }
-          }
-        }
-      }
     }
     c.globalCompositeOperation = "lighter";
     const lampK = Math.max(k.lamp * (p.under ? 0.5 : 1), 0);
@@ -629,6 +658,72 @@
       else glow(c, l.x, l.y, l.r ?? 34, 1, hexA(l.color ?? "#ffd27a", 0.5 * lampK));
     }
     c.restore();
+  }
+  var maskCache = /* @__PURE__ */ new Map();
+  function outsideMask(scene, i, poly2) {
+    const key2 = `${scene}:${i}`;
+    if (maskCache.has(key2)) return maskCache.get(key2);
+    const p = PAINTED[scene], im = images?.[p?.file ?? ""];
+    if (!im) return null;
+    const x = Math.min(...poly2.map((v) => v[0])), y = Math.min(...poly2.map((v) => v[1]));
+    const w = Math.max(...poly2.map((v) => v[0])) - x, h = Math.max(...poly2.map((v) => v[1])) - y;
+    let out = null;
+    try {
+      const cv = document.createElement("canvas");
+      cv.width = w;
+      cv.height = h;
+      const g2 = cv.getContext("2d");
+      g2.beginPath();
+      poly2.forEach(([px3, py], j) => j ? g2.lineTo(px3 - x, py - y) : g2.moveTo(px3 - x, py - y));
+      g2.closePath();
+      g2.clip();
+      g2.drawImage(im, x, y, w, h, 0, 0, w, h);
+      const d3 = g2.getImageData(0, 0, w, h), px = d3.data;
+      const ramp = (v, a, b) => Math.max(0, Math.min(1, (v - a) / (b - a)));
+      const solid = p.outsideSolid;
+      for (let j = 0; j < px.length; j += 4) {
+        const r = px[j], gg = px[j + 1], b = px[j + 2], lum = 0.3 * r + 0.59 * gg + 0.11 * b;
+        let v;
+        if (solid) {
+          const X = x + j / 4 % w, Y = y + Math.floor(j / 4 / w);
+          const k = solid.keep.find(([a, bb, c, d4]) => X >= a && X < c && Y >= bb && Y < d4);
+          v = k && (k[4] === "all" || gg > b + 12 && gg >= r) ? 0 : 1;
+        } else {
+          v = ramp(lum, 70, 150) * (1 - ramp(r - b, 18, 45));
+        }
+        px[j] = px[j + 1] = px[j + 2] = 255;
+        px[j + 3] = Math.round(255 * v * (px[j + 3] / 255));
+      }
+      g2.putImageData(d3, 0, 0);
+      out = { cv, x, y };
+    } catch {
+      out = null;
+    }
+    maskCache.set(key2, out);
+    return out;
+  }
+  var tintCache = /* @__PURE__ */ new WeakMap();
+  function tinted(m, col) {
+    const hit2 = tintCache.get(m.cv);
+    if (hit2 && hit2.col === col) return hit2.cv;
+    const cv = hit2?.cv ?? document.createElement("canvas");
+    cv.width = m.cv.width;
+    cv.height = m.cv.height;
+    const g2 = cv.getContext("2d");
+    g2.clearRect(0, 0, cv.width, cv.height);
+    g2.fillStyle = "#fff";
+    g2.fillRect(0, 0, cv.width, cv.height);
+    const t = document.createElement("canvas");
+    t.width = cv.width;
+    t.height = cv.height;
+    const tg = t.getContext("2d");
+    tg.drawImage(m.cv, 0, 0);
+    tg.globalCompositeOperation = "source-in";
+    tg.fillStyle = col;
+    tg.fillRect(0, 0, t.width, t.height);
+    g2.drawImage(t, 0, 0);
+    tintCache.set(m.cv, { col, cv });
+    return cv;
   }
   function glow(c, x, y, r, sy, col) {
     c.save();
@@ -3068,7 +3163,7 @@
             P.x += dx * sp * dt;
             P.y += dy * sp * 0.55 * dt;
             const id = running && !P.dying ? "5" : "4";
-            if (!P.clip || P.clip.id !== id) play(id, { fps: id === "5" ? 15 : P.dying ? 7 : 11, loopFrom: 0 });
+            if (!P.clip || P.clip.id !== id) play(id, { fps: id === "5" ? 15 : P.dying ? 7 : 11, loopFrom: id === "5" ? 1 : 0 });
             if (id === "5" && Math.random() < dt * 4) {
               if (!vfx("run_dust", P.x - P.face * 24, P.y, 2, { flip: P.face < 0 })) dust(P.x - P.face * 20, P.y, 1, 0.6);
             }
@@ -3788,7 +3883,7 @@
   }
 
   // src/game/action/eileen/player.ts
-  var CHAR_K = 1.15;
+  var CHAR_K = 1.28;
   var PRESS = [
     ["light", "light"],
     ["heavy", "heavy"],
@@ -7244,10 +7339,9 @@ void main(){
   float m = mod(gl_FragCoord.x, 3.0);
   vec3 mask = m < 1.0 ? vec3(1.0, 0.72, 0.72) : m < 2.0 ? vec3(0.72, 1.0, 0.72) : vec3(0.72, 0.72, 1.0);
   col *= mix(vec3(1.0), mask, 0.32);
-  // 비네팅 · 깜빡임 · 잡음 · 밝기 보정
+  // 비네팅 · 밝기 보정
   col *= 1.0 - edge * (bend < 0.5 ? 0.35 : 0.95);
-  col *= 1.0 + 0.012 * sin(time * 113.0) + 0.006 * sin(time * 7.0);
-  col += (fract(sin(dot(gl_FragCoord.xy + time, vec2(12.9898, 78.233))) * 43758.5453) - 0.5) * 0.025;
+  // 깜빡임·움직이는 잡음은 뺐다 (사용자 2026-10-25: 눈 아픔)
   col = pow(col * 1.22, vec3(0.95));
   gl_FragColor = vec4(col * corner, 1.0);
 }`;
@@ -7966,6 +8060,55 @@ void main(){
       pixelOn = false;
       c.restore();
       return (x + fs + bw + 40) * k;
+    }
+    /** 말풍선 (본부 대사): x = 말하는 사람 가운데, y = 머리 위(풍선 꼬리 끝), 캔버스 px. who가 있으면 위에 이름 */
+    drawSpeech(c, p) {
+      c.save();
+      const k = p.compact ? 1.2 : 1;
+      c.setTransform(k, 0, 0, k, 0, 0);
+      W2 = c.canvas.width / k;
+      pixelOn = true;
+      const U2 = 2;
+      c.font = font(22);
+      const lines3 = wrapText(c, p.text, 400, 3);
+      const tw = Math.max(...lines3.map((l) => Math.ceil(c.measureText(l).width)), p.who ? Math.ceil(c.measureText(p.who).width) * 0.55 : 0);
+      const nameH = p.who ? 18 : 0, lh = 26, padX = 12, padY = 8;
+      const w = tw + padX * 2, h = nameH + lines3.length * lh + padY * 2 - 4;
+      const tail = 10;
+      let x = Math.round(p.x / k - w / 2);
+      x = Math.max(8, Math.min(W2 - w - 8, x));
+      const y = Math.round(Math.max(8, p.y / k - tail - h));
+      const box2 = (bx, by, bw, bh, col) => {
+        c.fillStyle = col;
+        c.fillRect(bx + U2, by, bw - 2 * U2, bh);
+        c.fillRect(bx, by + U2, bw, bh - 2 * U2);
+      };
+      box2(x + U2, y + U2 * 2, w, h, "rgba(0,0,0,0.35)");
+      box2(x - U2, y - U2, w + 2 * U2, h + 2 * U2, "#0b0f12");
+      box2(x, y, w, h, "#cfc8b4");
+      box2(x + U2, y + U2, w - 2 * U2, h - 2 * U2, "#1a2026");
+      const tx = Math.round(Math.max(x + 10, Math.min(x + w - 18, p.x / k - 4)));
+      for (let i = 0; i < tail / U2; i++) {
+        const tw2 = Math.max(U2, 10 - i * U2 * 2);
+        c.fillStyle = "#0b0f12";
+        c.fillRect(tx + (10 - tw2) / 2 - U2, y + h + i * U2 - U2, tw2 + 2 * U2, U2 + U2);
+        c.fillStyle = "#cfc8b4";
+        c.fillRect(tx + (10 - tw2) / 2, y + h + i * U2 - U2, tw2, U2);
+      }
+      c.textAlign = "left";
+      c.textBaseline = "middle";
+      let ty = y + padY + 2;
+      if (p.who) {
+        c.font = font(11);
+        c.fillStyle = "#ffcf6a";
+        c.fillText(p.who, x + padX, ty + 6);
+        ty += nameH;
+      }
+      c.font = font(22);
+      c.fillStyle = "#f2ecdc";
+      lines3.forEach((l, i) => c.fillText(l, x + padX, ty + lh / 2 + i * lh - 2));
+      pixelOn = false;
+      c.restore();
     }
     /** 상호작용 안내: 캐릭터 옆에 뜨는 도트 말풍선 (키 단추 + 짧은 말). x,y = 캐릭터 머리 옆 화면 px(캔버스 px), side = 말풍선이 뻗는 쪽 */
     drawPrompt(c, p) {
@@ -15058,6 +15201,7 @@ void main(){
         if (w.player instanceof EileenPlayer) w.player.frameStep();
         const camX = Math.round(lerp2(w.prevCamX, w.camX, alpha));
         drawCam = camX;
+        w.drawCamX = camX;
         ctx.save();
         ctx.translate(shake, w.shakeT > 0 ? w.tick % 3 - 1 : 0);
         background(w, camX);
@@ -15242,6 +15386,8 @@ void main(){
     fxs = [];
     camX = 0;
     prevCamX = 0;
+    /** 이번 장에 실제로 그린 카메라 (틱 사이 보간·반올림 뒤). 화면 위 표시(말풍선 등)는 이걸 써야 몸과 같이 움직인다 */
+    drawCamX = 0;
     shakeT = 0;
     shakeP = 0;
     subtitle = null;
@@ -15754,20 +15900,22 @@ void main(){
         }
         if (!this.mods.covered?.()) {
           const w = this.world;
-          view.zoom = this.canvas.height / SCREEN_H * Math.max(1, charSize.k);
+          const H7 = this.inHub ? view.worldH : SCREEN_H;
+          view.zoom = this.canvas.height / H7 * Math.max(1, charSize.k);
           if (w) view.lane = w.lane;
           const vw = this.canvas.width / view.zoom;
           view.crop = 0;
+          const frozen = paused || !!this.mods.blocking?.() || !!this.mods.hq?.isOpen?.();
           if (vw < SCREEN_W && w) {
-            const a = paused ? 1 : this.acc / T3, cam = Math.round(w.prevCamX + (w.camX - w.prevCamX) * a), px = (w.player.px ?? w.player.x) + (w.player.x - (w.player.px ?? w.player.x)) * a, raw = Math.max(0, Math.min(SCREEN_W - vw, px - cam - vw / 2));
+            const a = frozen ? 1 : this.acc / T3, cam = Math.round(w.prevCamX + (w.camX - w.prevCamX) * a), px = (w.player.px ?? w.player.x) + (w.player.x - (w.player.px ?? w.player.x)) * a, raw = Math.max(0, Math.min(SCREEN_W - vw, px - cam - vw / 2));
             view.crop = Math.round((cam + raw) * view.zoom) / view.zoom - cam;
           }
           view.cropY = 0;
           const vh = this.canvas.height / view.zoom;
-          if (vh < SCREEN_H && w) {
-            const a = paused ? 1 : this.acc / T3, p = w.player;
+          if (vh < H7 - 0.5 && w) {
+            const a = frozen ? 1 : this.acc / T3, p = w.player;
             const py = (p.py ?? p.y) + (p.y - (p.py ?? p.y)) * a;
-            view.cropY = Math.round(Math.max(0, Math.min(SCREEN_H - vh, py - vh * 0.7)) * view.zoom) / view.zoom;
+            view.cropY = Math.round(Math.max(0, Math.min(H7 - vh, py - vh * 0.7)) * view.zoom) / view.zoom;
           }
           this.ctx.save();
           this.ctx.scale(view.zoom, view.zoom);
@@ -15821,7 +15969,7 @@ void main(){
     start_new(stageId) {
       if (this.mods.hq && !stageId) return this.showHq();
       const stage = this.mods.stages.find((s2) => s2.id === stageId) ?? this.mods.stages[0];
-      this.deploy({ seed: Math.floor(Math.random() * 1e9), agent: "jyaldi", stageId: stage.id });
+      this.deploy({ seed: Math.floor(Math.random() * 1e9), agent: "eileen", stageId: stage.id });
     }
     dead = false;
     /** 본부를 걷는 중인가 (엔진 벨트 장면) */
@@ -15834,7 +15982,7 @@ void main(){
       if (!this.hqRoot) {
         this.hqRoot = document.createElement("div");
         this.hqRoot.className = "goei-engine-hq";
-        this.box.appendChild(this.hqRoot);
+        (hq2.hub && this.mods.hqLayer?.() || this.box).appendChild(this.hqRoot);
         hq2.mount(this.hqRoot, {
           deploy: (run) => this.deploy(run),
           stages: () => this.mods.stages.map((s2) => ({ id: s2.id, label: s2.label }))
@@ -15843,7 +15991,7 @@ void main(){
       this.hqRoot.hidden = false;
       if (hq2.hub) {
         const stage = hq2.hub();
-        const run = { seed: Math.floor(Math.random() * 1e9), agent: "jyaldi", stageId: stage.id };
+        const run = { seed: Math.floor(Math.random() * 1e9), agent: "eileen", stageId: stage.id };
         this.hqRoot.hidden = !hq2.isOpen?.();
         this.hqRoot.classList.add("goei-engine-hq-panel");
         this.canvas.style.visibility = "";
@@ -16355,7 +16503,7 @@ void main(){
         c.font = FONT2(TAG_PX);
         const tw = Math.ceil(c.measureText(p.name).width) + 8;
         const tagBottom = place3(x, tw, 18, Math.round(p.y + p.top));
-        tag(c, p.name, x, tagBottom - 9, near2 || p.name === target || isPlayer);
+        if (!isPlayer) tag(c, p.name, x, tagBottom - 9, near2 || p.name === target);
         const typing = isPlayer && !busy2 && bar2.hasAttribute("data-open") && document.activeElement === input && input.value.trim() !== "";
         const b = bubbles.find((q) => q.who === p.name && (q.from ?? 0) <= now) ?? (typing ? { who: p.name, text: "", until: Infinity, pending: true } : void 0);
         if (b) {
@@ -18970,7 +19118,7 @@ void main(){
   };
 
   // src/game/action/hq/style.css
-  var style_default = ".hq { --bg: #0b0f13; --panel: #141b21; --line: #3a4a54; --text: #e8e2c8; --dim: #9fb2ba; --accent: #ffd080; --warn: #ff9a8a; position: relative; display: flex; flex-direction: column; width: 100%; height: 100%; background: var(--bg); color: var(--text); font: 14px/1.5 system-ui, sans-serif; overflow: hidden; outline: none; color-scheme: dark; }\n.hq * { box-sizing: border-box; }\n.hq button:not(.gk-btn) { font: inherit; color: inherit; background: #1d2a33; border: 1px solid var(--line); border-radius: 6px; padding: 8px 12px; cursor: pointer; touch-action: manipulation; text-align: left; }\n.hq button:disabled { opacity: 0.45; cursor: default; }\n.hq button.sel:not(.gk-btn) { border-color: var(--accent); background: #3a2e14; }\n.hq button.primary:not(.gk-btn) { background: #6a4a14; border-color: var(--accent); font-weight: bold; }\n.hq-head { flex: none; padding: 6px 10px; border-bottom: 1px solid var(--line); }\n.hq-top { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; }\n.hq-top button { margin-left: auto; padding: 4px 10px; }\n.hq-places { display: flex; gap: 6px; overflow-x: auto; padding: 6px 0 2px; scrollbar-width: thin; }\n.hq-places button { flex: none; padding: 5px 10px; font-size: 13px; }\n.hq-view { flex: none; background: #000; display: flex; justify-content: center; }\n.hq-view canvas { width: 100%; max-width: 1280px; aspect-ratio: 1280 / 400; display: block; }\n.hq-move { flex: none; display: none; gap: 8px; padding: 6px 10px; }\n.hq-move button { flex: 1; text-align: center; padding: 12px; font-size: 16px; }\n.hq-pane { flex: 1; min-height: 0; overflow: auto; padding: 10px 16px 20px; }\n.hq-pane h2, .hq-sheet h2 { margin: 4px 0 8px; font-size: 20px; color: var(--accent); }\n.hq h3 { margin: 14px 0 6px; font-size: 15px; color: var(--dim); }\n.hq p { margin: 6px 0; }\n.hq-dim { color: var(--dim); }\n.hq-say { background: #1a2228; border-radius: 8px; padding: 8px 12px; }\n.hq-say b { color: var(--accent); margin-right: 6px; }\n.hq-notice { display: block; margin: 10px 0; padding: 8px 12px; background: #2a2414; border-radius: 6px; color: var(--accent); }\n.hq-warn { color: var(--warn); }\n.hq em { color: var(--warn); font-style: normal; }\n.hq-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }\n.hq-cards, .hq-buy, .hq-agents { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 8px; }\n.hq-agent { display: flex; gap: 10px; align-items: center; }\n.hq-agent img, .hq-agent i { flex: none; width: 56px; height: 56px; border-radius: 10px; object-fit: cover; display: block; }\n.hq-slotrow, .hq-stash { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid #222c33; }\n.hq-slotrow button, .hq-stash button { padding: 4px 10px; font-size: 13px; }\n.hq-icon { width: 28px; height: 28px; vertical-align: middle; image-rendering: pixelated; }\n.hq-buy button span { margin-right: 6px; }\n.hq-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }\n.hq-over, .hq-runmenu { position: absolute; inset: 0; background: #000a; display: flex; align-items: center; justify-content: center; padding: 12px; z-index: 5; }\n.hq-over[hidden] { display: none; }\n.hq-sheet { width: min(900px, 100%); max-height: 100%; overflow: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 18px; }\n.hq-runmenu { font: 14px/1.5 system-ui, sans-serif; color: #e8e2c8; color-scheme: dark; }\n.hq-runmenu .hq-sheet { background: #141b21; border: 1px solid #3a4a54; }\n.hq-runmenu button { font: inherit; color: inherit; background: #1d2a33; border: 1px solid #3a4a54; border-radius: 6px; padding: 8px 12px; cursor: pointer; }\n.hq-runmenu button:disabled { opacity: 0.45; }\n.hq-runmenu h3 { margin: 12px 0 6px; font-size: 15px; color: #9fb2ba; }\n.hq-sheet-head { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }\n.hq-sheet-head button { margin-left: auto; }\n.hq-slots { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }\n.hq-slot { display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; }\n.hq-bag { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }\n.hq-cell { border: 1px solid #3a4a54; border-radius: 6px; padding: 8px 4px; min-height: 52px; font-size: 12px; text-align: center; }\n.hq-cell.empty { color: #5a6a72; }\n@media (max-width: 760px) {\n  .hq-move { display: flex; }\n  .hq-cols { grid-template-columns: 1fr; }\n  .hq-bag { grid-template-columns: repeat(3, 1fr); }\n  .hq-slots { grid-template-columns: repeat(2, 1fr); }\n  .hq-pane { padding: 8px 12px 16px; }\n}\n.hq-run { position: absolute; inset: 0; display: flex; flex-direction: column; background: #05080c; color: #e8e2c8; font: 14px/1.4 system-ui, sans-serif; outline: none; color-scheme: dark; overflow: hidden; }\n.hq-run button { font: inherit; color: inherit; background: #1d2a33; border: 1px solid #3a4a54; border-radius: 6px; padding: 8px 10px; cursor: pointer; touch-action: none; user-select: none; }\n.hq-run button:disabled { opacity: 0.45; }\n.hq-run-top { flex: none; display: flex; align-items: center; gap: 10px; padding: 6px 10px; border-bottom: 1px solid #223; }\n.hq-run-top button { margin-left: auto; }\n.hq-run-view { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; background: #000; }\n.hq-run-view canvas { max-width: 100%; max-height: 100%; aspect-ratio: 16 / 9; display: block; }\n.hq-run-items { flex: none; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding: 6px 10px; }\n.hq-run-items button { display: flex; align-items: center; gap: 4px; padding: 4px 8px; font-size: 13px; }\n.hq-run-items span { margin-left: auto; color: #9fb2ba; font-size: 13px; }\n.hq-run-pad { flex: none; display: none; gap: 10px; padding: 6px 10px 10px; align-items: center; }\n.hq-run-btns { flex: 1; display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }\n.hq-run-btns button { padding: 10px 2px; text-align: center; font-size: 13px; }\n.hq-stick { flex: none; width: 104px; height: 104px; border: 2px solid #567; border-radius: 50%; position: relative; touch-action: none; }\n.hq-stick i { position: absolute; left: 33px; top: 33px; width: 34px; height: 34px; background: #8ab; border-radius: 50%; }\n.hq-run-note { margin: 0; padding: 4px 10px 8px; color: #9fb2ba; font-size: 12px; }\n@media (max-width: 900px), (pointer: coarse) { .hq-run-pad { display: flex; } .hq-run-note { display: none; } }\n.hq[hidden] { display: none; }\n.hq-cell { display: flex; align-items: center; justify-content: center; }\n.hq-run-view { flex-direction: column; }\n.hq-rotate { display: none; margin: 8px; color: #9fb2ba; font-size: 13px; }\n@media (orientation: portrait) and (max-width: 760px) { .hq-rotate { display: block; } }\n/* 가로로 눕힌 폰 (높이가 낮은 화면): 본부 그림은 왼쪽 작게, 장소 창은 오른쪽에 길게 */\n@media (max-height: 520px) {\n  .hq { display: grid; grid-template-columns: minmax(0, 42%) minmax(0, 1fr); grid-template-rows: auto auto 1fr; }\n  .hq-head { grid-column: 1 / -1; padding: 4px 8px; }\n  .hq-top { font-size: 12px; gap: 2px 10px; }\n  .hq-places { padding-top: 4px; }\n  .hq-places button { padding: 4px 8px; font-size: 12px; }\n  .hq-view { grid-column: 1; grid-row: 2; align-self: start; }\n  .hq-move { grid-column: 1; grid-row: 3; display: flex; align-self: start; }\n  .hq-move button { padding: 8px; }\n  .hq-pane { grid-column: 2; grid-row: 2 / 4; padding: 6px 12px 12px; }\n  .hq-pane h2, .hq-sheet h2 { font-size: 17px; margin: 2px 0 6px; }\n  .hq-sheet { padding: 10px 14px; }\n  .hq-cards, .hq-buy, .hq-agents { grid-template-columns: 1fr; }\n}\n@media (pointer: coarse) { .hq-move { display: flex; } }\n/* 엔진 벨트 장면 위의 메뉴 창만 (walk:false). 뒤 캔버스가 보이게 반투명, 캔버스 크기는 건드리지 않는다 */\n.hq.hq-float { position: absolute; inset: 0; display: block; background: transparent; pointer-events: none; overflow: visible; }\n.hq-float .hq-over { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.45); pointer-events: auto; padding: 2%; }\n.hq-float .hq-sheet { width: min(980px, 100%); max-height: 100%; background: rgba(20, 27, 33, 0.94); }\n.hq-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; padding-bottom: 8px; margin-bottom: 6px; border-bottom: 1px solid var(--line); font-size: 13px; color: var(--dim); }\n.hq-bar b { color: var(--text); }\n.hq-bar .hq-x { margin-left: auto; padding: 4px 12px; }\n@media (max-height: 520px) { .hq-float .hq-over { padding: 6px; } .hq-float .hq-sheet { padding: 8px 12px; } .hq-float .hq-cards, .hq-float .hq-buy, .hq-float .hq-agents { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); } }\n/* 잼트리 임무·브리핑 대화창: 게임 화면 아래쪽만 덮는다 (위쪽 게임이 보이게) */\n.hq-float .hq-over.talk { background: linear-gradient(to top, rgba(0, 0, 0, 0.55), transparent 55%); align-items: flex-end; padding: 0 2% 2%; flex-direction: column; justify-content: flex-end; }\n.hq-talk { position: relative; display: flex; gap: 22px; width: min(1100px, 100%); padding: 6px 8px; }\n.hq-face { flex: none; width: 128px; height: 128px; margin: 8px; background: #27685b; }\n.hq-face img { width: 100%; height: 100%; object-fit: cover; display: block; image-rendering: pixelated; }\n.hq-face i { display: flex; width: 100%; height: 100%; align-items: center; justify-content: center; font: bold 54px sans-serif; font-style: normal; color: #fff; }\n.hq-talk-body { flex: 1; min-width: 0; }\n.hq-who { color: #ffe9a8; font-size: 22px; text-shadow: 2px 2px 0 #000; }\n.hq-line { margin: 6px 0 10px; font-size: 22px; line-height: 1.5; text-shadow: 2px 2px 0 #000; word-break: keep-all; }\n.hq-kit { margin: 0 0 8px; color: #dfe4dc; font-size: 22px; line-height: 1.4; word-break: keep-all; }\n.hq-choices { display: flex; flex-direction: column; gap: 6px; }\n.hq-choice-row { display: flex; gap: 6px; flex-wrap: wrap; }\n.hq .hq-choice { padding: 2px 14px 2px 24px; text-align: left; }\n.hq .hq-choice.kb { outline: 2px solid #ffe27a; outline-offset: 1px; }\n.hq .hq-choice:disabled { opacity: 0.45; cursor: default; }\n.hq .hq-talk .hq-x { position: absolute; top: 4px; right: 10px; padding: 0 6px; background: none; border: 0; color: #ffe27a; font-size: 33px; line-height: 1; text-shadow: 2px 2px 0 #000; }\n.hq-talk-notice { width: min(1100px, 100%); }\n@media (max-height: 520px) {\n  .hq-talk { gap: 10px; padding: 8px 12px; }\n  .hq-face { width: 64px; height: 64px; }\n  .hq .hq-choice { font-size: 15px; }\n  .hq-who { font-size: 15px; }\n  .hq-line { font-size: 15px; margin: 2px 0 6px; }\n  .hq .hq-choice { font-size: 14px; padding: 6px 10px; }\n  .hq-choices { flex-direction: row; flex-wrap: wrap; }\n  .hq-kit { font-size: 15px; margin-bottom: 4px; }\n}\n.hq-result { margin: 0 0 10px; padding-left: 22px; font-size: 22px; line-height: 1.5; text-shadow: 2px 2px 0 #000; }\n@media (max-height: 520px) { .hq-result { font-size: 13px; margin-bottom: 4px; line-height: 1.35; } }\n/* 초점은 하나만: 마우스를 올리거나 초점이 간 단추가 있으면 기본 강조(.on)는 끈다 */\n.hq-talk:not(.fresh):has(.gk-btn:hover, .gk-btn:focus-visible) .gk-btn.on:not(:hover):not(:focus-visible) { border-image: none; color: #b8ae96; }\n.hq-talk.fresh .gk-btn:hover:not(.on) { border-image: none; color: #b8ae96; }\n\n/* 한 글자만 다음 줄로 넘어가지 않게 (독립 검수: 「가세/요.」) */\n.hq-talk, .hq-choice { word-break: keep-all; }\n/* 마지막 줄에 한 단어만 남지 않게 (독립 검수: 「나와요.」「가세요.」) */\n.hq-line, .hq-kit, .hq-talk p { text-wrap: pretty; }\n";
+  var style_default = ".hq { --bg: #0b0f13; --panel: #141b21; --line: #3a4a54; --text: #e8e2c8; --dim: #9fb2ba; --accent: #ffd080; --warn: #ff9a8a; position: relative; display: flex; flex-direction: column; width: 100%; height: 100%; background: var(--bg); color: var(--text); font: 14px/1.5 system-ui, sans-serif; overflow: hidden; outline: none; color-scheme: dark; }\n.hq * { box-sizing: border-box; }\n.hq button:not(.gk-btn) { font: inherit; color: inherit; background: #1d2a33; border: 1px solid var(--line); border-radius: 6px; padding: 8px 12px; cursor: pointer; touch-action: manipulation; text-align: left; }\n.hq button:disabled { opacity: 0.45; cursor: default; }\n.hq button.sel:not(.gk-btn) { border-color: var(--accent); background: #3a2e14; }\n.hq button.primary:not(.gk-btn) { background: #6a4a14; border-color: var(--accent); font-weight: bold; }\n.hq-head { flex: none; padding: 6px 10px; border-bottom: 1px solid var(--line); }\n.hq-top { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; }\n.hq-top button { margin-left: auto; padding: 4px 10px; }\n.hq-places { display: flex; gap: 6px; overflow-x: auto; padding: 6px 0 2px; scrollbar-width: thin; }\n.hq-places button { flex: none; padding: 5px 10px; font-size: 13px; }\n.hq-view { flex: none; background: #000; display: flex; justify-content: center; }\n.hq-view canvas { width: 100%; max-width: 1280px; aspect-ratio: 1280 / 400; display: block; }\n.hq-move { flex: none; display: none; gap: 8px; padding: 6px 10px; }\n.hq-move button { flex: 1; text-align: center; padding: 12px; font-size: 16px; }\n.hq-pane { flex: 1; min-height: 0; overflow: auto; padding: 10px 16px 20px; }\n.hq-pane h2, .hq-sheet h2 { margin: 4px 0 8px; font-size: 20px; color: var(--accent); }\n.hq h3 { margin: 14px 0 6px; font-size: 15px; color: var(--dim); }\n.hq p { margin: 6px 0; }\n.hq-dim { color: var(--dim); }\n.hq-say { background: #1a2228; border-radius: 8px; padding: 8px 12px; }\n.hq-say b { color: var(--accent); margin-right: 6px; }\n.hq-notice { display: block; margin: 10px 0; padding: 8px 12px; background: #2a2414; border-radius: 6px; color: var(--accent); }\n.hq-warn { color: var(--warn); }\n.hq em { color: var(--warn); font-style: normal; }\n.hq-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }\n.hq-cards, .hq-buy, .hq-agents { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 8px; }\n.hq-agent { display: flex; gap: 10px; align-items: center; }\n.hq-agent img, .hq-agent i { flex: none; width: 56px; height: 56px; border-radius: 10px; object-fit: cover; display: block; }\n.hq-slotrow, .hq-stash { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid #222c33; }\n.hq-slotrow button, .hq-stash button { padding: 4px 10px; font-size: 13px; }\n.hq-icon { width: 28px; height: 28px; vertical-align: middle; image-rendering: pixelated; }\n.hq-buy button span { margin-right: 6px; }\n.hq-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }\n.hq-over, .hq-runmenu { position: absolute; inset: 0; background: #000a; display: flex; align-items: center; justify-content: center; padding: 12px; z-index: 5; }\n.hq-over[hidden] { display: none; }\n.hq-sheet { width: min(900px, 100%); max-height: 100%; overflow: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 18px; }\n.hq-runmenu { font: 14px/1.5 system-ui, sans-serif; color: #e8e2c8; color-scheme: dark; }\n.hq-runmenu .hq-sheet { background: #141b21; border: 1px solid #3a4a54; }\n.hq-runmenu button { font: inherit; color: inherit; background: #1d2a33; border: 1px solid #3a4a54; border-radius: 6px; padding: 8px 12px; cursor: pointer; }\n.hq-runmenu button:disabled { opacity: 0.45; }\n.hq-runmenu h3 { margin: 12px 0 6px; font-size: 15px; color: #9fb2ba; }\n.hq-sheet-head { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }\n.hq-sheet-head button { margin-left: auto; }\n.hq-slots { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }\n.hq-slot { display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; }\n.hq-bag { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }\n.hq-cell { border: 1px solid #3a4a54; border-radius: 6px; padding: 8px 4px; min-height: 52px; font-size: 12px; text-align: center; }\n.hq-cell.empty { color: #5a6a72; }\n@media (max-width: 760px) {\n  .hq-move { display: flex; }\n  .hq-cols { grid-template-columns: 1fr; }\n  .hq-bag { grid-template-columns: repeat(3, 1fr); }\n  .hq-slots { grid-template-columns: repeat(2, 1fr); }\n  .hq-pane { padding: 8px 12px 16px; }\n}\n.hq-run { position: absolute; inset: 0; display: flex; flex-direction: column; background: #05080c; color: #e8e2c8; font: 14px/1.4 system-ui, sans-serif; outline: none; color-scheme: dark; overflow: hidden; }\n.hq-run button { font: inherit; color: inherit; background: #1d2a33; border: 1px solid #3a4a54; border-radius: 6px; padding: 8px 10px; cursor: pointer; touch-action: none; user-select: none; }\n.hq-run button:disabled { opacity: 0.45; }\n.hq-run-top { flex: none; display: flex; align-items: center; gap: 10px; padding: 6px 10px; border-bottom: 1px solid #223; }\n.hq-run-top button { margin-left: auto; }\n.hq-run-view { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; background: #000; }\n.hq-run-view canvas { max-width: 100%; max-height: 100%; aspect-ratio: 16 / 9; display: block; }\n.hq-run-items { flex: none; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding: 6px 10px; }\n.hq-run-items button { display: flex; align-items: center; gap: 4px; padding: 4px 8px; font-size: 13px; }\n.hq-run-items span { margin-left: auto; color: #9fb2ba; font-size: 13px; }\n.hq-run-pad { flex: none; display: none; gap: 10px; padding: 6px 10px 10px; align-items: center; }\n.hq-run-btns { flex: 1; display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }\n.hq-run-btns button { padding: 10px 2px; text-align: center; font-size: 13px; }\n.hq-stick { flex: none; width: 104px; height: 104px; border: 2px solid #567; border-radius: 50%; position: relative; touch-action: none; }\n.hq-stick i { position: absolute; left: 33px; top: 33px; width: 34px; height: 34px; background: #8ab; border-radius: 50%; }\n.hq-run-note { margin: 0; padding: 4px 10px 8px; color: #9fb2ba; font-size: 12px; }\n@media (max-width: 900px), (pointer: coarse) { .hq-run-pad { display: flex; } .hq-run-note { display: none; } }\n.hq[hidden] { display: none; }\n.hq-cell { display: flex; align-items: center; justify-content: center; }\n.hq-run-view { flex-direction: column; }\n.hq-rotate { display: none; margin: 8px; color: #9fb2ba; font-size: 13px; }\n@media (orientation: portrait) and (max-width: 760px) { .hq-rotate { display: block; } }\n/* 가로로 눕힌 폰 (높이가 낮은 화면): 본부 그림은 왼쪽 작게, 장소 창은 오른쪽에 길게 */\n@media (max-height: 520px) {\n  .hq { display: grid; grid-template-columns: minmax(0, 42%) minmax(0, 1fr); grid-template-rows: auto auto 1fr; }\n  .hq-head { grid-column: 1 / -1; padding: 4px 8px; }\n  .hq-top { font-size: 12px; gap: 2px 10px; }\n  .hq-places { padding-top: 4px; }\n  .hq-places button { padding: 4px 8px; font-size: 12px; }\n  .hq-view { grid-column: 1; grid-row: 2; align-self: start; }\n  .hq-move { grid-column: 1; grid-row: 3; display: flex; align-self: start; }\n  .hq-move button { padding: 8px; }\n  .hq-pane { grid-column: 2; grid-row: 2 / 4; padding: 6px 12px 12px; }\n  .hq-pane h2, .hq-sheet h2 { font-size: 17px; margin: 2px 0 6px; }\n  .hq-sheet { padding: 10px 14px; }\n  .hq-cards, .hq-buy, .hq-agents { grid-template-columns: 1fr; }\n}\n@media (pointer: coarse) { .hq-move { display: flex; } }\n/* 엔진 벨트 장면 위의 메뉴 창만 (walk:false). 뒤 캔버스가 보이게 반투명, 캔버스 크기는 건드리지 않는다 */\n.hq.hq-float { position: absolute; inset: 0; display: block; background: transparent; pointer-events: none; overflow: visible; }\n.hq-float .hq-over { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.45); pointer-events: auto; padding: 2%; }\n.hq-float .hq-sheet { width: min(980px, 100%); max-height: 100%; background: rgba(20, 27, 33, 0.94); }\n.hq-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; padding-bottom: 8px; margin-bottom: 6px; border-bottom: 1px solid var(--line); font-size: 13px; color: var(--dim); }\n.hq-bar b { color: var(--text); }\n.hq-bar .hq-x { margin-left: auto; padding: 4px 12px; }\n@media (max-height: 520px) { .hq-float .hq-over { padding: 6px; } .hq-float .hq-sheet { padding: 8px 12px; } .hq-float .hq-cards, .hq-float .hq-buy, .hq-float .hq-agents { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); } }\n/* 잼트리 임무·브리핑 대화창: 게임 화면 아래쪽만 덮는다 (위쪽 게임이 보이게) */\n.hq-float .hq-over.talk { background: linear-gradient(to top, rgba(0, 0, 0, 0.55), transparent 55%); align-items: center; padding: 0 0 10px; flex-direction: column; justify-content: flex-end; }\n/* NPC 대화창(.gnp)과 같은 자리·크기 */\n.hq-float .hq-over.talk .hq-talk { width: 1120px; max-width: 100%; box-sizing: border-box; }\n.hq-talk { position: relative; display: flex; gap: 22px; width: min(1100px, 100%); padding: 6px 8px; }\n.hq-face { flex: none; width: 128px; height: 128px; margin: 8px; background: #27685b; }\n.hq-face img { width: 100%; height: 100%; object-fit: cover; display: block; image-rendering: pixelated; }\n.hq-face i { display: flex; width: 100%; height: 100%; align-items: center; justify-content: center; font: bold 54px sans-serif; font-style: normal; color: #fff; }\n.hq-talk-body { flex: 1; min-width: 0; }\n.hq-who { color: #ffe9a8; font-size: 22px; text-shadow: 2px 2px 0 #000; }\n.hq-line { margin: 6px 0 10px; font-size: 22px; line-height: 1.5; text-shadow: 2px 2px 0 #000; word-break: keep-all; }\n.hq-kit { margin: 0 0 8px; color: #dfe4dc; font-size: 22px; line-height: 1.4; word-break: keep-all; }\n.hq-choices { display: flex; flex-direction: column; gap: 6px; }\n.hq-choice-row { display: flex; gap: 6px; flex-wrap: wrap; }\n.hq .hq-choice { padding: 2px 14px 2px 24px; text-align: left; }\n.hq .hq-choice.kb { outline: 2px solid #ffe27a; outline-offset: 1px; }\n.hq .hq-choice:disabled { opacity: 0.45; cursor: default; }\n.hq .hq-talk .hq-x { position: absolute; top: 4px; right: 10px; padding: 0 6px; background: none; border: 0; color: #ffe27a; font-size: 33px; line-height: 1; text-shadow: 2px 2px 0 #000; }\n.hq-talk-notice { width: min(1100px, 100%); }\n@media (max-height: 520px) {\n  .hq-talk { gap: 10px; padding: 8px 12px; }\n  .hq-face { width: 64px; height: 64px; }\n  .hq .hq-choice { font-size: 15px; }\n  .hq-who { font-size: 15px; }\n  .hq-line { font-size: 15px; margin: 2px 0 6px; }\n  .hq .hq-choice { font-size: 14px; padding: 6px 10px; }\n  .hq-choices { flex-direction: row; flex-wrap: wrap; }\n  .hq-kit { font-size: 15px; margin-bottom: 4px; }\n}\n.hq-result { margin: 0 0 10px; padding-left: 22px; font-size: 22px; line-height: 1.5; text-shadow: 2px 2px 0 #000; }\n@media (max-height: 520px) { .hq-result { font-size: 13px; margin-bottom: 4px; line-height: 1.35; } }\n/* 초점은 하나만: 마우스를 올리거나 초점이 간 단추가 있으면 기본 강조(.on)는 끈다 */\n.hq-talk:not(.fresh):has(.gk-btn:hover, .gk-btn:focus-visible) .gk-btn.on:not(:hover):not(:focus-visible) { border-image: none; color: #b8ae96; }\n.hq-talk.fresh .gk-btn:hover:not(.on) { border-image: none; color: #b8ae96; }\n\n/* 한 글자만 다음 줄로 넘어가지 않게 (독립 검수: 「가세/요.」) */\n.hq-talk, .hq-choice { word-break: keep-all; }\n/* 마지막 줄에 한 단어만 남지 않게 (독립 검수: 「나와요.」「가세요.」) */\n.hq-line, .hq-kit, .hq-talk p { text-wrap: pretty; }\n\n/* 키보드로 고른 단추 (방향키 · Enter/E) */\n.hq .hq-kbsel { outline: 3px solid #ffe27a; outline-offset: 2px; color: #ffe27a; }\n";
 
   // src/game/action/hq/lines.ts
   var provider = null;
@@ -21364,6 +21512,8 @@ ${can.ok ? "" : `<p class="hq-warn">${esc2(can.why)}</p>`}</div>
           const got = parseSave(await h.load().catch(() => null));
           if (mounting !== mountId) return;
           if (got) s2 = got;
+          if (!walk && s2.selected === "jyaldi") s2.selected = "eileen";
+          if (s2.support === "eileen") s2.support = null;
           loaded2 = true;
           if (s2.active && !h.resuming?.()) {
             notice = "진행 중인 출동이 있어요. 시작 화면에서 이어하기로 돌아가세요.";
@@ -28425,7 +28575,7 @@ jaemtri(smile): 다들 살아서 왔으니까 됐어. 건배.
     },
     konjyuce: {
       name: "콘쥬스",
-      role: "관리국 종합대응팀 요원이자 17세 고등학생. 초인적 괴력. 사무 보조, 물류, 운반, 정비·보급실 담당. 전투 투입은 팀이 막는다.",
+      role: "관리국 종합대응팀 요원이자 20세 대학생. 초인적 괴력. 사무 보조, 물류, 운반, 정비·보급실 담당. 전투 투입은 팀이 막는다.",
       voice: "밝고 고집 센 존댓말. 상대 호칭을 상황에 따라 바꾼다(남자: 아저씨→오빠, 여자: 선배님→언니). 호칭이 바뀌면 부탁이 들어온다(대개 간식).",
       facts: [
         '"잠깐만요! 저도 이 팀 정식 멤버거든요!" 마스코트 취급에 바로 항의한다.',
@@ -29335,6 +29485,8 @@ ${who}: ${text2.replace(/\n/g, " ")}
     let enterTick = -1;
     let fadeOut = 0;
     let barked = null;
+    let speech = null;
+    let curPeople = [];
     let opening = null;
     let closing = null;
     let rattle = null;
@@ -29356,6 +29508,8 @@ ${who}: ${text2.replace(/\n/g, " ")}
         return { ...p, x: at2.x, y: at2.y };
       });
       const sc = { ...base2, spots: [...base2.spots, ...people.map((p) => ({ id: `visit:${p.name}`, x: p.x, y: p.y, who: p.name, verb: "대화", face: p.face, open: true }))] };
+      curPeople = people;
+      speech = null;
       const prev = scene;
       scene = sc;
       if (prev && prev.id !== sc.id) host.entered?.({ id: sc.id, name: sc.name, floor: sc.floor }, { id: prev.id, name: prev.name, floor: prev.floor }, walked);
@@ -29400,7 +29554,7 @@ ${who}: ${text2.replace(/\n/g, " ")}
           drawTestMan(c, man.x, man.y, -1);
         } }] : []),
         drawBackground(c, camX) {
-          if (sc.painted && drawHqField(c, sc.painted, camX, doorFx)) {
+          if (sc.painted && drawHqField(c, sc.painted, camX, doorFx, host.hour?.() ?? null)) {
             if (sc.floor === "2F" || sc.floor === "3F") drawHqSigns(c, sc.painted, sc.doors);
             if (callOn) drawCallLit(c, sc.painted, performance.now());
             return;
@@ -29443,7 +29597,7 @@ ${who}: ${text2.replace(/\n/g, " ")}
           const z = view.zoom;
           c.save();
           c.scale(1 / z, 1 / z);
-          host.overlay?.(c, people.map((p) => ({ name: p.name, x: p.x * z, y: p.y * z, top: visitAgentTop(p.name) * persp(p.y) * z })), { name: "", x: w.player.x * z, y: w.player.y * z, top: (hasTestPeople() ? testPlayerTop() : visitAgentTop("쟈알디")) * persp(w.player.y) * z });
+          host.overlay?.(c, people.map((p) => ({ name: p.name, x: p.x * z, y: p.y * z, top: visitAgentTop(p.name) * persp(p.y) * z })), { name: "", x: w.player.x * z, y: (w.player.y - w.player.z) * z, top: (hasTestPeople() ? testPlayerTop() : visitAgentTop("쟈알디")) * persp(w.player.y) * z });
           c.restore();
           const dark2 = fadeOut > 0 ? 1 - fadeOut / FADE : age < FADE ? 1 - age / FADE : 0;
           if (dark2 > 0) {
@@ -29454,6 +29608,7 @@ ${who}: ${text2.replace(/\n/g, " ")}
       };
     };
     const go = (sceneId, x, y) => {
+      view.worldH = sceneOf(sceneId).painted ? 700 : SCREEN_H;
       pending = { scene: sceneId, x, y };
       fadeOut = FADE;
     };
@@ -29474,7 +29629,6 @@ ${who}: ${text2.replace(/\n/g, " ")}
         if (ok && (!best || d3 < best.d)) best = { id, kind, x, d: d3 };
       };
       for (const s2 of scene.spots) {
-        if (!s2.open) continue;
         const ok = Math.abs(s2.x - px) < (s2.y === void 0 ? 60 : 75) && (s2.y === void 0 || Math.abs(s2.y - py) < 55);
         consider(`spot:${s2.id}`, "hubspot", s2.x, ok);
       }
@@ -29551,14 +29705,19 @@ ${who}: ${text2.replace(/\n/g, " ")}
         if (sp && sp.place !== barked) {
           barked = sp.place;
           const l = host.bark(sp.place);
-          if (l) a.world.say(`${l.who}: ${l.text}`, 3.5);
+          if (l) {
+            const who = curPeople.find((q) => q.name === l.who);
+            const x = who?.x ?? sp.x, y = who?.y ?? sp.y ?? p.y;
+            speech = { who: l.who, text: l.text, x, y, top: (who ? visitAgentTop(l.who) : -200) * persp(y), until: performance.now() + 3800 };
+          }
         } else if (!sp) barked = null;
       },
       onInteract(a, _floor, prop) {
         if (!scene || fadeOut > 0 || opening || callWait) return;
         if (prop.kind === "hubspot") {
           const s2 = scene.spots.find((q) => `spot:${q.id}` === prop.id);
-          if (!s2?.open) return;
+          if (!s2) return;
+          if (!s2.open) return a.world.say("아직 쓸 수 없다. 본부 일이 더 진행되면 열린다.", 2.5);
           if (s2.place) return host.openPlace(s2.place);
           if (s2.say) return a.world.say(s2.say, 3);
           if (s2.depart) {
@@ -29636,6 +29795,10 @@ ${who}: ${text2.replace(/\n/g, " ")}
         opening = { id: d3.id, t: 0, len, then: () => goDoor(to, toDoor) };
       },
       /** 지금 손이 닿는 문·자리의 짧은 이름 (캐릭터 옆 말풍선) */
+      speech() {
+        if (!speech || performance.now() > speech.until || fadeOut > 0) return null;
+        return speech;
+      },
       nearInfo() {
         if (!scene || !near2 || opening || fadeOut > 0) return null;
         if (near2.startsWith("spot:")) {
@@ -30050,7 +30213,7 @@ ${who}: ${text2.replace(/\n/g, " ")}
   }
 
   // src/game/action/npc/style.css
-  var style_default3 = "/* NPC 자유 대화창. 1280×720 놀이판 층(.gs-ui)에 들어가 게임 화면과 같이 커지고 작아진다. 본부 대화창(.hq-talk)과 같은 도트 틀 */\n.gnp{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);width:1120px;height:auto;min-height:170px;max-height:290px;display:flex;gap:22px;padding:6px 10px;box-sizing:border-box;pointer-events:auto;color:#ece6d4;z-index:40;user-select:none;-webkit-user-select:none}\n.gnp[hidden]{display:none}\n.gnp-face[hidden]{display:none}\n.gnp-face{flex:0 0 132px;width:132px;height:132px;margin:14px 4px 0;background:#232d32;display:grid;place-items:center;overflow:visible}\n.gnp-face>canvas{width:100%;height:100%;image-rendering:pixelated;display:block}\n.gnp-face>img{object-fit:cover;object-position:50% 15%;background:#232d32}\n.gnp-face>span{font-size:56px;color:#1b1f22;text-shadow:none}\n.gnp-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px;padding-top:4px}\n.gnp-head{display:flex;align-items:center;gap:14px;min-height:34px}\n.gnp-name{font-size:26px;color:#ffe27a;text-shadow:2px 2px 0 #000;white-space:nowrap}\n.gnp-favor{display:flex;gap:4px;align-items:center}\n.gnp-favor i{width:12px;height:12px;background:#8a7a4a;box-shadow:inset 0 0 0 2px #1b1f22;display:block}\n.gnp-favor i.neg{background:#7a4a44}\n.gnp-favor i.up{background:#ffe27a}\n.gnp-favor i.down{background:#ff6a58}\n.gnp-favor b{width:2px;height:16px;background:#d8cfb6;margin:0 3px}\n.gnp-state{font-size:18px;color:#d8cfb6;text-shadow:2px 2px 0 #000}\n.gnp-x{margin-left:auto;padding:0 6px;background:none;border:0;color:#ffe27a;font-size:33px;line-height:1;text-shadow:2px 2px 0 #000;cursor:pointer}\n.gnp-log{flex:0 1 auto;min-height:0;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-start;gap:6px;user-select:text;-webkit-user-select:text}\n.gnp-log p[hidden]{display:none}\n.gnp-log p{margin:0;flex:none;font-size:22px;line-height:1.45;word-break:keep-all;overflow-wrap:anywhere;text-shadow:2px 2px 0 #000}\n.gnp-log p.me{color:#9fc7b6}\n.gnp-log p.me::before{content:'▶ ';color:#6f9d8a}\n.gnp-log p.sys{font-size:18px;color:#e6c35a}\n.gnp-log p.sys::before{content:'◆ '}\n.gnp-log p.wait{color:#8a8574;animation:gnp-blink 1s steps(2) infinite}\n@keyframes gnp-blink{50%{opacity:.35}}\n.gnp-row{display:flex;flex-wrap:wrap;align-items:center;gap:4px 14px}\n.gnp-acts{display:flex;flex:none;gap:2px 6px}\n.gnp-acts[hidden]{display:none}\n.gnp-acts .gk-btn{font-size:19px;padding:2px 14px 2px 10px}\n.gnp-acts .gk-btn b{color:#8a8574;margin-right:8px;font-weight:400}\n.gnp-say{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center}\n.gnp-in{flex:1;min-width:280px;height:48px;padding:0 14px;box-sizing:border-box;font-size:22px;color:#ece6d4;background:#0d1214;border:3px solid #6b6250;border-radius:0;box-shadow:inset 3px 3px 0 #000;caret-color:#ffe27a;outline:none;-webkit-user-select:text;user-select:text}\n.gnp-in::placeholder{color:#8f8670}\n.gnp .gnp-in:focus,.gnp .gnp-in:focus-visible{outline:none;border-color:#e6c35a}\n.gnp-send{height:48px;padding:0 18px;font-size:20px;font-weight:700;color:#ffe27a;background:#2c383e;border:3px solid #8a7a4a;border-radius:0;box-shadow:inset -3px -3px 0 #1b1f22;text-shadow:2px 2px 0 #000;cursor:pointer;white-space:nowrap}\n.gnp-send:hover,.gnp-send:focus-visible{border-color:#e6c35a;outline:none}\n.gnp-send:disabled{opacity:.45;cursor:default}\n.gnp-chips{display:flex;gap:6px;flex-wrap:wrap}\n.gnp-chips[hidden],.gnp-row:has(>.gnp-chips[hidden]){display:none}\n.gnp-chips button{font-size:19px;font-weight:700;padding:4px 14px;color:#ece6d4;background:#2c383e;border:3px solid #6b6250;border-radius:0;box-shadow:inset -3px -3px 0 #1b1f22;cursor:pointer;text-shadow:2px 2px 0 #000}\n.gnp-chips button:hover,.gnp-chips button:focus-visible{color:#ffe27a;border-color:#8a7a4a}\n.gnp-note{font-size:16px;color:#c98a6a;min-height:0}\n.gnp-note:empty{display:none}\n/* 터치 화면: 폰 가로에서 놀이판이 작게 줄어드므로 글씨를 키운다. 입력칸은 iOS가 확대하지 않게 크게 */\n.gnp.coarse{max-height:330px}\n.gnp.coarse.typing{top:0;bottom:auto;width:1280px;min-height:0;padding:6px 74px}\n.gnp.coarse.typing .gnp-row{display:none}\n.gnp.coarse .gnp-send{height:60px;font-size:24px}\n.gnp.coarse .gnp-log p{font-size:26px}\n.gnp.coarse .gnp-in{height:60px;font-size:30px}\n.gnp.coarse .gk-btn{font-size:24px}\n.gnp.coarse .gnp-chips button{font-size:22px}\n.gnp.coarse .gnp-face{flex-basis:132px;width:132px;height:132px}\n";
+  var style_default3 = "/* NPC 자유 대화창. 1280×720 놀이판 층(.gs-ui)에 들어가 게임 화면과 같이 커지고 작아진다. 본부 대화창(.hq-talk)과 같은 도트 틀 */\n.gnp{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);width:1120px;height:auto;min-height:170px;max-height:290px;display:flex;gap:22px;padding:6px 10px;box-sizing:border-box;pointer-events:auto;color:#ece6d4;z-index:40;user-select:none;-webkit-user-select:none}\n.gnp[hidden]{display:none}\n.gnp-face[hidden]{display:none}\n.gnp-face{flex:0 0 132px;width:132px;height:132px;margin:14px 4px 0;background:#232d32;display:grid;place-items:center;overflow:visible}\n.gnp-face>canvas{width:100%;height:100%;image-rendering:pixelated;display:block}\n.gnp-face>img{object-fit:cover;object-position:50% 15%;background:#232d32}\n.gnp-face>span{font-size:56px;color:#1b1f22;text-shadow:none}\n.gnp-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px;padding-top:4px}\n.gnp-head{display:flex;align-items:center;gap:14px;min-height:34px}\n.gnp-name{font-size:26px;color:#ffe27a;text-shadow:2px 2px 0 #000;white-space:nowrap}\n.gnp-favor{display:flex;gap:4px;align-items:center}\n.gnp-favor i{width:12px;height:12px;background:#8a7a4a;box-shadow:inset 0 0 0 2px #1b1f22;display:block}\n.gnp-favor i.neg{background:#7a4a44}\n.gnp-favor i.up{background:#ffe27a}\n.gnp-favor i.down{background:#ff6a58}\n.gnp-favor b{width:2px;height:16px;background:#d8cfb6;margin:0 3px}\n.gnp-state{font-size:18px;color:#d8cfb6;text-shadow:2px 2px 0 #000}\n.gnp-x{margin-left:auto;padding:0 6px;background:none;border:0;color:#ffe27a;font-size:33px;line-height:1;text-shadow:2px 2px 0 #000;cursor:pointer}\n.gnp-log{flex:0 1 auto;min-height:0;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-start;gap:6px;user-select:text;-webkit-user-select:text}\n.gnp-log p[hidden]{display:none}\n.gnp-log p{margin:0;flex:none;font-size:22px;line-height:1.45;word-break:keep-all;overflow-wrap:anywhere;text-shadow:2px 2px 0 #000}\n.gnp-log p.me{color:#9fc7b6}\n.gnp-log p.me::before{content:'▶ ';color:#6f9d8a}\n.gnp-log p.sys{font-size:18px;color:#e6c35a}\n.gnp-log p.sys::before{content:'◆ '}\n.gnp-log p.wait{color:#8a8574;animation:gnp-blink 1s steps(2) infinite}\n@keyframes gnp-blink{50%{opacity:.35}}\n.gnp-row{display:flex;flex-wrap:wrap;align-items:center;gap:4px 14px}\n.gnp-acts{display:flex;flex:none;gap:2px 6px}\n.gnp-acts[hidden]{display:none}\n.gnp-acts .gk-btn{font-size:19px;padding:2px 14px 2px 10px}\n.gnp-acts .gk-btn b{color:#8a8574;margin-right:8px;font-weight:400}\n.gnp-say{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center}\n.gnp-in{flex:1;min-width:280px;height:48px;padding:0 14px;box-sizing:border-box;font-size:22px;color:#ece6d4;background:#0d1214;border:3px solid #6b6250;border-radius:0;box-shadow:inset 3px 3px 0 #000;caret-color:#ffe27a;outline:none;-webkit-user-select:text;user-select:text}\n.gnp-in::placeholder{color:#8f8670}\n.gnp .gnp-in:focus,.gnp .gnp-in:focus-visible{outline:none;border-color:#e6c35a}\n.gnp-send{height:48px;padding:0 18px;font-size:20px;font-weight:700;color:#ffe27a;background:#2c383e;border:3px solid #8a7a4a;border-radius:0;box-shadow:inset -3px -3px 0 #1b1f22;text-shadow:2px 2px 0 #000;cursor:pointer;white-space:nowrap}\n.gnp-send:hover,.gnp-send:focus-visible{border-color:#e6c35a;outline:none}\n.gnp-send:disabled{opacity:.45;cursor:default}\n.gnp-chips{display:flex;gap:6px;flex-wrap:wrap}\n.gnp-chips[hidden],.gnp-row:has(>.gnp-chips[hidden]){display:none}\n.gnp-chips button{font-size:19px;font-weight:700;padding:4px 14px;color:#ece6d4;background:#2c383e;border:3px solid #6b6250;border-radius:0;box-shadow:inset -3px -3px 0 #1b1f22;cursor:pointer;text-shadow:2px 2px 0 #000}\n.gnp-chips button:hover,.gnp-chips button:focus-visible{color:#ffe27a;border-color:#8a7a4a}\n.gnp-note{font-size:16px;color:#c98a6a;min-height:0}\n.gnp-note:empty{display:none}\n/* 터치 화면: 폰 가로에서 놀이판이 작게 줄어드므로 글씨를 키운다. 입력칸은 iOS가 확대하지 않게 크게 */\n.gnp.coarse{max-height:330px}\n.gnp.coarse.typing{top:0;bottom:auto;width:1280px;min-height:0;padding:6px 74px}\n.gnp.coarse.typing .gnp-row{display:none}\n.gnp.coarse .gnp-send{height:60px;font-size:24px}\n.gnp.coarse .gnp-log p{font-size:26px}\n.gnp.coarse .gnp-in{height:60px;font-size:30px}\n.gnp.coarse .gk-btn{font-size:24px}\n.gnp.coarse .gnp-chips button{font-size:22px}\n.gnp.coarse .gnp-face{flex-basis:132px;width:132px;height:132px}\n\n/* 키보드로 고른 단추 (방향키 · Enter/E) */\n.gnp .gnp-sel{outline:3px solid #ffe27a;outline-offset:1px;color:#ffe27a}\n.gnp .gnp-in.gnp-sel{outline:3px solid #ffe27a}\n";
 
   // src/core/cbs.ts
   var truthy = (v) => v === "1" || v.toLowerCase() === "true";
@@ -30323,7 +30486,7 @@ ${who}: ${text2.replace(/\n/g, " ")}
     jaemtri: d2({ id: "jaemtri", name: "잼트리", sheet: "잼트리", group: "hq", color: "#27685b", photo: "Jaemtri", role: "종합대응팀 내근 선임. 임무 창구, 생존자 면담, 매뉴얼 관리. 탕비실 연유 커피 담당.", speech: "다정하고 장난스러운 반말, 스스로 「언니」. 웃는 얼굴로 절차를 집행(「스톱. 이름 말하지 마.」). 부장(쟈알디)에게만 존댓말.", greet: ["어머, 후배 왔어?", "응, 후배. 무슨 얘기 하고 싶어?"], lines: ["고민 있으면 꼭 언니한테 물어봐.", "응응. 그건 언니가 알아볼게. 대신 진술서 먼저.", "출동 전에 규칙서 한 번만 더 봐. 진짜로.", "연유 커피 남았는데, 마실래?"], rules: [[/이름|본명/, ["스톱. 이름 말하지 마. 응, 그렇지. 착하다."]], [/커피|연유/, ["연유 커피는 언니만 타. 레시피는 묻지 마."]]], never: ["본명을 묻거나 말하지 않는다", "현장에 나가지 않는다"] }),
     gognija: d2({ id: "gognija", name: "고그니쟈", sheet: "고그니쟈", group: "hq", color: "#c9a227", photo: "Gognija", role: "격리팀 연구 책임자. 지하 연구실에서 회수물 연구.", speech: "고풍스러운 하게체(「~하게」「~일세」「~라네」), 최대 음량, 느낌표 많음.", greet: ["오오! 무엇이든 묻게! 대답은 장담 못 하네!", "자료를 가져왔나!!!"], lines: ["좋은 질문일세! 대답은… 연구가 끝나면 알려 주겠네!", "이곳에서는 누구나 달달한 믹스커피를 마셔야 하네!", "데쥬레!!! 커피 좀 타 오게!!!", "아, 그건 비상 탈출 장치라네!"], rules: [[/블랙|아메리카노/, ["블랙이라니! 설탕 두 스푼 추가일세!"]]] }),
     dejure: d2({ id: "dejure", name: "데쥬레", sheet: "데쥬레", group: "hq", color: "#e58fb5", photo: "Dejure", role: "격리팀 연구원. 감정실에서 회수물 분류·감정, 믹스커피 제조.", speech: "더듬고 말끝 흐리는 존댓말(「저, 저기…」), 놀라면 「아, 아와와…!」. 유물 다룰 때만 또렷.", greet: ["네, 네…? 저, 저한테요…?", "아, 안녕하세요…"], lines: ["저, 저기… 다시 한 번만…", "조, 조심히 다녀오세요… 꼭이요…", "황금 비율은… 비, 비밀이에요…", "주시면… 분류할게요. 무섭지만요."], rules: [[/스팡달/, ["아, 아와와…! 제, 제가 잘못했어요…!"]], [/선배/, ["서, 선배요…? 헤헤…"]]] }),
-    konjyuce: d2({ id: "konjyuce", name: "콘쥬스", sheet: "콘쥬스", group: "hq", color: "#e0457b", photo: "Konjyuce", minor: true, role: "17세 고등학생 요원. 괴력. 정비·보급실 담당, 전투 투입은 팀이 막는다.", speech: "밝고 고집 센 존댓말. 호칭을 상황 따라 바꾼다(아저씨→오빠, 선배님→언니). 호칭이 바뀌면 부탁(간식)이 온다.", greet: ["네! 뭐든 물어보세요!", "오빠, 아니 선배님! 안녕하세요!"], lines: ["잠깐만요! 저도 이 팀 정식 멤버거든요!", "그 말 좀 이상한데요? 아까랑 다르잖아요.", "그거 들어 드릴까요? 상자 열 개까진 괜찮아요!", "저도 갈 수 있는데… 네, 알아요. 팀 결정."], never: ["전투에 나가겠다고 우기지 않는다"] })
+    konjyuce: d2({ id: "konjyuce", name: "콘쥬스", sheet: "콘쥬스", group: "hq", color: "#e0457b", photo: "Konjyuce", role: "20세 대학생 요원. 괴력. 정비·보급실 담당, 전투 투입은 팀이 막는다.", speech: "밝고 고집 센 존댓말. 호칭을 상황 따라 바꾼다(아저씨→오빠, 선배님→언니). 호칭이 바뀌면 부탁(간식)이 온다.", greet: ["네! 뭐든 물어보세요!", "오빠, 아니 선배님! 안녕하세요!"], lines: ["잠깐만요! 저도 이 팀 정식 멤버거든요!", "그 말 좀 이상한데요? 아까랑 다르잖아요.", "그거 들어 드릴까요? 상자 열 개까진 괜찮아요!", "저도 갈 수 있는데… 네, 알아요. 팀 결정."], never: ["전투에 나가겠다고 우기지 않는다"] })
   };
   var MERCHANT_NPCS = {
     madeokhee: d2({ id: "madeokhee", name: "마덕희", sheet: "마덕희", group: "merchant", color: "#7d2a3a", photo: "Ma Deok-hee", role: "중림 장물 매입점 「헐값매입」 주인. 출동 중 휴식방에 나타나 회수물을 사고 물건을 판다(현금).", speech: "다정한 척 깎는 존댓말, 상대를 「자기야」. 상대 말을 작게 따라 하고 값을 후려친다(「80. 얘기 끝났어요. 쟁반 열렸습니다.」).", effects: ["favor", "trade", "hint", "leave"], greet: ["어머, 자기야. 뭐 팔 거 있어요?", "현금만 받아요. 관리국 결재는 여기서 안 통하고."], lines: ["자기야, 그런 얘기는 쟁반 위에 뭐 올려놓고 해요.", "흐음. 계속해 봐요.", "80. 얘기 끝났어요. 쟁반 열렸습니다.", "'열 배는 하는 거예요.' 열 배. 음. 그럼 열 배 받으러 가세요."] }),
@@ -30932,11 +31095,11 @@ ${t.secret}` : "",
     콘쥬스: `### Character - Konjyuce
 
 #### Identity
-- Age: 17, a high school student
+- Age: 20, a university student
 - Gender: Female
 - Organization: {{#if {{not_equal::{{getvar::st_faction}}::B00}}}}Management Bureau {{/if}}{{#if {{equal::{{getvar::st_faction}}::B00}}}}Fake Management Bureau{{/if}}
 - Department: Comprehensive Response Team
-- Role: Agent. A minor attached to the team, deployed only when her one talent is genuinely irreplaceable.
+- Role: Agent. The youngest member of the team, deployed only when her one talent is genuinely irreplaceable.
 
 #### Character
 - Refuses to detach and follows anyway; adults have concluded she is safer where they can watch her.
@@ -30945,7 +31108,7 @@ ${t.secret}` : "",
 - Wants to be a full member, not a mascot. Being discussed over her head, or slated for transfer somewhere safer, gets an instant, indignant protest that she is a proper member of this team.
 - Cheer masks fresh grief. Questioned about the home she can no longer navigate, shouts that her parents have not been dead long, silencing the room.
 [Flaws]
-- Adults minimize her field exposure and even cover her eyes for age-inappropriate sights; these protections hold only while circumstances allow.
+- Adults minimize her field exposure and even cover her eyes for gruesome sights; these protections hold only while circumstances allow.
 - Her willfulness does not distinguish between following a trusted adult into a briefing and following one into a hazard zone.
 
 #### Voice
@@ -32348,7 +32511,7 @@ ${t.secret}` : "",
     const el = document.createElement("div");
     el.className = "gnp gk-panel gk-font";
     el.hidden = true;
-    el.innerHTML = `<div class="gnp-face gk-face"></div><div class="gnp-body"><div class="gnp-head"><b class="gnp-name"></b><span class="gnp-favor"></span><span class="gnp-state"></span><button type="button" class="gnp-x" data-x aria-label="닫기">✕</button></div><div class="gnp-log" aria-live="polite"></div><div class="gnp-row"><div class="gnp-chips"></div></div><div class="gnp-say"><div class="gnp-acts"></div><input class="gnp-in gk-font" maxlength="200" placeholder="직접 말하기 (Enter)" enterkeyhint="send" autocomplete="off"><button type="button" class="gnp-send gk-font" data-send>보내기</button></div><div class="gnp-note"></div></div>`;
+    el.innerHTML = `<div class="gnp-face gk-face"></div><div class="gnp-body"><div class="gnp-head"><b class="gnp-name"></b><span class="gnp-favor"></span><span class="gnp-state"></span><button type="button" class="gnp-x" data-x aria-label="닫기">✕</button></div><div class="gnp-log" aria-live="polite"></div><div class="gnp-row"><div class="gnp-chips"></div></div><div class="gnp-say"><div class="gnp-acts"></div><input class="gnp-in gk-font" maxlength="200" placeholder="직접 말하기 (T)" enterkeyhint="send" autocomplete="off"><button type="button" class="gnp-send gk-font" data-send>보내기</button></div><div class="gnp-note"></div></div>`;
     layer.append(el);
     const $ = (s2) => el.querySelector(s2);
     const face = $(".gnp-face");
@@ -32474,6 +32637,7 @@ ${t.secret}` : "",
       const my = token;
       line2("me", text2);
       chips.hidden = true;
+      markSel();
       const wait = line2("wait", "…");
       setBusy(true);
       note.textContent = "";
@@ -32547,13 +32711,28 @@ ${t.secret}` : "",
     input.addEventListener("focus", () => el.classList.contains("coarse") && (el.classList.add("typing"), fitLog()));
     input.addEventListener("blur", () => (el.classList.remove("typing"), fitLog()));
     for (const ev of ["keyup", "pointerdown", "touchstart", "wheel"]) el.addEventListener(ev, (e) => e.stopPropagation(), { passive: true });
+    let sel = 0;
+    const pickables = () => [...chips.hidden ? [] : [...chips.querySelectorAll("button")], ...acts.querySelectorAll("button"), input];
+    const markSel = () => {
+      const list = pickables();
+      sel = Math.max(0, Math.min(list.length - 1, sel));
+      list.forEach((b, i) => b.classList.toggle("gnp-sel", i === sel));
+    };
     function keys2(e) {
       if (!target || document.activeElement === input) return;
       const k = e.code;
+      const list = pickables();
       if (k === "Escape") close();
-      else if (k === "KeyE" || k === "Space") runAct(0);
-      else if (/^Digit[1-9]$/.test(k)) runAct(Number(k.slice(5)) - 1);
-      else if (k === "Enter" || k === "KeyT") input.focus({ preventScroll: true });
+      else if (k === "ArrowLeft" || k === "ArrowUp") sel = (sel - 1 + list.length) % list.length, markSel();
+      else if (k === "ArrowRight" || k === "ArrowDown" || k === "Tab") sel = (sel + 1) % list.length, markSel();
+      else if (k === "KeyE") runAct(0);
+      else if (k === "Enter" || k === "Space") {
+        if (e.repeat) return e.preventDefault();
+        const b = list[sel];
+        if (!b || b === input) input.focus({ preventScroll: true });
+        else b.click();
+      } else if (/^Digit[1-9]$/.test(k)) runAct(Number(k.slice(5)) - 1);
+      else if (k === "KeyT" || k === "Slash") input.focus({ preventScroll: true });
       else return;
       e.preventDefault();
       e.stopImmediatePropagation();
@@ -32570,7 +32749,7 @@ ${t.secret}` : "",
       el.style.setProperty("--who", d3.color);
       const coarse = typeof matchMedia !== "undefined" && matchMedia("(pointer: coarse)").matches;
       el.classList.toggle("coarse", coarse);
-      input.placeholder = coarse ? "직접 말하기" : "직접 말하기 (Enter)";
+      input.placeholder = coarse ? "직접 말하기" : "직접 말하기 (T · 방향키로 고르고 Enter)";
       nameEl.textContent = t.name ?? d3.name;
       face.innerHTML = "";
       face.hidden = true;
@@ -32589,6 +32768,8 @@ ${t.secret}` : "",
       drawActs();
       chips.hidden = false;
       chips.innerHTML = CHIPS[d3.group].map((c) => `<button type="button" class="gk-font" data-chip>${esc5(c)}</button>`).join("");
+      sel = 0;
+      markSel();
       el.hidden = false;
       fitLog();
       window.addEventListener("keydown", keys2, true);
@@ -32700,6 +32881,7 @@ ${t.secret}` : "",
       const sc = hub.current();
       const spot = sc?.spots.find((s2) => `spot:${s2.id}` === prop.id);
       if (!sc || !spot || spot.open === false || !spot.who) return false;
+      if (spot.place && spot.place !== "office" && spot.place !== "interview") return false;
       if (o.visit) {
         o.visit(spot.who);
         return true;
@@ -33210,7 +33392,7 @@ ${t.secret}` : "",
       }
       for (const h of this.ghosts) {
         c.globalAlpha = 0.5 * (1 - h.t / h.life);
-        tinted(c, h.draw, h.color);
+        tinted2(c, h.draw, h.color);
       }
       c.globalAlpha = 1;
       for (const r of this.rings) {
@@ -33228,7 +33410,7 @@ ${t.secret}` : "",
         c.save();
         c.translate(Math.round(p.x), Math.round(p.y));
         if (p.flip) c.scale(-1, 1);
-        if (p.tint) tinted(c, (o) => o.drawImage(p.img, f * p.def.w, 0, p.def.w, p.def.h, -w / 2, -h, w, h), p.tint, 0.5);
+        if (p.tint) tinted2(c, (o) => o.drawImage(p.img, f * p.def.w, 0, p.def.w, p.def.h, -w / 2, -h, w, h), p.tint, 0.5);
         else c.drawImage(p.img, f * p.def.w, 0, p.def.w, p.def.h, -w / 2, -h, w, h);
         c.restore();
       }
@@ -33397,7 +33579,7 @@ ${t.secret}` : "",
     c.drawImage(im, Math.round(x - im.width / 2), Math.round(y - im.height / 2));
   }
   var tintCv = null;
-  function tinted(c, draw, color, a = 1) {
+  function tinted2(c, draw, color, a = 1) {
     const W5 = c.canvas.width, H7 = c.canvas.height;
     if (!tintCv) tintCv = document.createElement("canvas");
     if (tintCv.width !== W5 || tintCv.height !== H7) tintCv.width = W5, tintCv.height = H7;
@@ -34007,10 +34189,10 @@ ${t.secret}` : "",
       return fallbackEnemy(spec, w);
     };
     let world = null;
-    let runAgent = "jyaldi";
+    let runAgent = "eileen";
     let openingOn = false;
     const storyRoot = document.createElement("div");
-    storyRoot.style.cssText = "position:absolute;inset:0;pointer-events:none;z-index:15";
+    storyRoot.style.cssText = "position:absolute;inset:0;pointer-events:none;z-index:15;overflow:hidden";
     shell.stage.root.appendChild(storyRoot);
     const attachVideoAudio = (event) => audio.attachMedia(event.detail);
     storyRoot.addEventListener(VIDEO_AUDIO_EVENT, attachVideoAudio);
@@ -34183,9 +34365,31 @@ ${t.secret}` : "",
       },
       overlay: visit ? (c, people, player) => visit.draw(c, people, player) : void 0
     });
+    let hqSel = null;
+    const hqButtons = () => [...document.querySelectorAll(".goei-engine-hq button:not([disabled]), .goei-engine-hq [data-act]:not(button)")].filter((b) => b.offsetParent && !b.closest("[hidden]"));
+    const markHq = (b) => {
+      hqSel?.classList.remove("hq-kbsel");
+      hqSel = b;
+      b?.classList.add("hq-kbsel");
+      b?.scrollIntoView?.({ block: "nearest" });
+    };
     const hqKeys = (e) => {
-      if (e.code !== "Escape" || !game?.inHub || !hq2.isOpen?.()) return;
-      hq2.close();
+      if (!game?.inHub || !hq2.isOpen?.() || npc.isOpen()) return;
+      const t = e.target;
+      if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.tagName === "SELECT")) return;
+      const list = hqButtons();
+      if (hqSel && !list.includes(hqSel)) hqSel = null;
+      const at2 = hqSel ? list.indexOf(hqSel) : -1;
+      const first = () => list.find((b) => b.classList.contains("primary") || b.classList.contains("on")) ?? list[0] ?? null;
+      if (e.code === "Escape") hq2.close();
+      else if (e.code === "ArrowDown" || e.code === "ArrowRight" || e.code === "Tab") markHq(at2 < 0 ? first() : list[(at2 + 1) % list.length]);
+      else if (e.code === "ArrowUp" || e.code === "ArrowLeft") markHq(at2 < 0 ? first() : list[(at2 - 1 + list.length) % list.length]);
+      else if (e.code === "Enter" || e.code === "Space" || e.code === "KeyE") {
+        if (e.repeat) return e.preventDefault();
+        const b = hqSel ?? first();
+        hqSel = null;
+        b?.click();
+      } else return;
       e.preventDefault();
       e.stopImmediatePropagation();
     };
@@ -34271,6 +34475,7 @@ ${t.secret}` : "",
       stages: [elevator, trainingStage, dummyStage, arenaStage, itemStage],
       enemyFactory,
       hq: hq2,
+      hqLayer: () => shell.stage.ui,
       hud: false,
       blocking: () => !!visit?.isOpen() || story.isBlocking() || itemsBlocking() || !floorBox.hidden || npc.isOpen() || mapOpen,
       covered: () => story.isVideoPlaying(),
@@ -34305,7 +34510,7 @@ ${t.secret}` : "",
         footsteps(w);
         ctx.save();
         ctx.scale(view.zoom, view.zoom);
-        ctx.translate(-Math.round(w.camX) - view.crop, -view.cropY);
+        ctx.translate(-w.drawCamX - view.crop, -view.cropY);
         shell.fx.drawWorld(ctx);
         ffx.drawWorld(ctx);
         ctx.restore();
@@ -34338,20 +34543,28 @@ ${t.secret}` : "",
           ] }, dt);
         }
         if (!game?.inHub) shell.hud.draw(ctx, { ...hs, messageLeft: cardEnd }, dt);
-        else if (hs.message) shell.hud.drawMessage(ctx, hs.message, hs.compact, cardEnd);
+        else if (!mods.blocking?.() && !shell.paused) {
+          const z = view.zoom, toX = (x) => (x - w.drawCamX - view.crop) * z, toY = (y) => (y - view.cropY) * z;
+          const sp = w.stage.speech?.();
+          if (sp) shell.hud.drawSpeech(ctx, { x: toX(sp.x), y: toY(sp.y + sp.top) - 6, who: sp.who, text: sp.text, compact: hs.compact });
+          else if (hs.message) {
+            const p = w.player, head = (hasTestPeople() ? testPlayerTop() : -230) * persp(p.y);
+            shell.hud.drawSpeech(ctx, { x: toX(p.x), y: toY(p.y - p.z + head) - 10, who: "", text: hs.message, compact: hs.compact });
+          }
+        }
         const ep = w.player instanceof EileenPlayer ? w.player : null;
         if (ep && !mods.blocking?.() && !shell.paused) {
           const show = ep.guard < 99.5 || ep.core.P.mode === "block";
           guardA = show ? Math.min(1, guardA + dt * 8) : Math.max(0, guardA - dt * 2.5);
           const z = view.zoom, head = testPlayerTop() * persp(ep.y);
-          const gx = (ep.x - Math.round(w.camX) - view.crop) * z, gy = (ep.y - ep.z + head * 0.92 - view.cropY) * z - 12;
+          const gx = (ep.x - w.drawCamX - view.crop) * z, gy = (ep.y - ep.z + head * 0.92 - view.cropY) * z - 12;
           drawGuardBar(ctx, gx + 5, gy, ep.guard / 100, ep.guardBroken, guardA, performance.now() / 1e3);
         }
         const tg = game?.inHub && !mods.blocking?.() && !shell.paused ? w.stage.nearInfo?.() : null;
         if (tg) {
           const p = w.player, z = view.zoom;
           const head = (hasTestPeople() ? testPlayerTop() : -230) * persp(p.y);
-          const sx = (p.x - Math.round(w.camX) - view.crop) * z, sy = (p.y + head * 0.72 - view.cropY) * z;
+          const sx = (p.x - w.drawCamX - view.crop) * z, sy = (p.y - p.z + head * 0.72 - view.cropY) * z;
           const half = 46 * persp(p.y) * 1.15 * z;
           const side = sx > ctx.canvas.width - 320 ? -1 : 1;
           const key2 = hs.device === "pad" ? "B" : hs.device === "touch" || hs.compact ? "조" : "E";
@@ -34676,9 +34889,9 @@ ${t.secret}` : "",
 .goei-engine-hq{position:absolute;inset:0;overflow:auto;z-index:20;background:#0b0f12}
 .goei-engine-hq.goei-engine-hq-panel{background:rgba(5,8,10,.72)}
 .goei-engine-hq-close{position:sticky;top:8px;float:right;margin:8px;z-index:2;padding:8px 14px;border-radius:8px;border:1px solid #5b6a72;background:#1a2226;color:#ece6d4;font:15px sans-serif}
-.goei-engine-elev{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;gap:6px;padding:14px;pointer-events:auto;z-index:20;image-rendering:pixelated;border:16px solid transparent;border-image:var(--goei-btn) 8 fill / 16px stretch}
+.goei-engine-elev{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;gap:6px;padding:10px;max-height:94%;overflow:hidden;box-sizing:border-box;pointer-events:auto;z-index:20;image-rendering:pixelated;border:16px solid transparent;border-image:var(--goei-btn) 8 fill / 16px stretch}
 .goei-engine-elev[hidden]{display:none}
-.goei-engine-elev button{width:112px;height:72px;border:16px solid transparent;border-radius:0;background:none;border-image:var(--goei-btn) 8 fill / 16px stretch;color:#e6e4dc;font:700 33px "GoeiPixel","Galmuri11",monospace;cursor:pointer;image-rendering:pixelated;-webkit-font-smoothing:none;text-shadow:3px 3px 0 #07090b;padding:0;line-height:1}
+.goei-engine-elev button{width:112px;height:72px;flex:0 1 72px;min-height:40px;border:16px solid transparent;border-radius:0;background:none;border-image:var(--goei-btn) 8 fill / 16px stretch;color:#e6e4dc;font:700 33px "GoeiPixel","Galmuri11",monospace;cursor:pointer;image-rendering:pixelated;-webkit-font-smoothing:none;text-shadow:3px 3px 0 #07090b;padding:0;line-height:1}
 .goei-engine-elev button.here{color:#ffb34a}
 .goei-engine-elev button:disabled{opacity:.4;cursor:default}
 .goei-engine-elev button.sel{filter:brightness(1.45);color:#ffe9a0}
@@ -37282,7 +37495,7 @@ ${t.secret}` : "",
     }
   }
   var mod = {
-    version: "0.16.59",
+    version: "0.16.62",
     mount: (box2, bridge) => mountPlay(box2, bridge),
     // 이전 시험판: 저장 키와 그림 팩은 예전 그대로 (goei:game · goei:game-action:v1)
     legacy: {

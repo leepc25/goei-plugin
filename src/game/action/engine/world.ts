@@ -65,6 +65,8 @@ export class World implements WorldView {
   fxs: Fx[] = [];
   camX = 0;
   prevCamX = 0;
+  /** 이번 장에 실제로 그린 카메라 (틱 사이 보간·반올림 뒤). 화면 위 표시(말풍선 등)는 이걸 써야 몸과 같이 움직인다 */
+  drawCamX = 0;
   shakeT = 0;
   shakeP = 0;
   subtitle: { text: string; t: number } | null = null;

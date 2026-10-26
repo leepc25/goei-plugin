@@ -403,10 +403,11 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
   };
   // 대사·컷신: 말풍선은 늘, 대화창·컷신이 열리면 전투를 멈춘다
   let world: World | null = null;
-  let runAgent: AgentId = 'jyaldi';
+  let runAgent: AgentId = 'eileen'; // 주인공은 에일린 (쟈알디는 부장 NPC)
   let openingOn = false; // 제목 화면 오프닝 영상이 도는 중 (메뉴가 열려 있어도 영상은 멈추지 않는다)
   const storyRoot = document.createElement('div');
-  storyRoot.style.cssText = 'position:absolute;inset:0;pointer-events:none;z-index:15';
+  // 넘치는 창(층 단추 등)이 바깥 틀에 스크롤바를 만들면 틀 크기가 바뀌어 화면을 다시 맞추고, 그게 되풀이되며 화면이 떨렸다 (리스 작은 창)
+  storyRoot.style.cssText = 'position:absolute;inset:0;pointer-events:none;z-index:15;overflow:hidden';
   shell.stage.root.appendChild(storyRoot);
   const attachVideoAudio = (event: Event) => audio.attachMedia((event as CustomEvent<VideoTrack>).detail);
   storyRoot.addEventListener(VIDEO_AUDIO_EVENT, attachVideoAudio);
@@ -538,7 +539,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     floorSel = i;
     floorBtns().forEach((b, k) => b.classList.toggle('sel', k === i));
   };
-  const stepFloor = (d: 1 | -1) => {
+  const stepFloor = (d: number) => {
     const bs = floorBtns();
     for (let k = 1; k <= bs.length; k++) {
       const j = (floorSel + d * k + bs.length * 2) % bs.length;
@@ -559,6 +560,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
   const floorKeys = (e: KeyboardEvent) => {
     if (floorBox.hidden) return;
     if (e.code === 'Escape') closeFloors(null);
+    // 한 줄 배치 (사용자 2026-10-25: 두 줄은 헷갈림)
     else if (e.code === 'ArrowUp' || e.code === 'ArrowLeft') stepFloor(-1);
     else if (e.code === 'ArrowDown' || e.code === 'ArrowRight') stepFloor(1);
     else if (e.code === 'Enter' || e.code === 'Space' || e.code === 'KeyE') {
@@ -596,9 +598,32 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     overlay: visit ? (c, people, player) => visit.draw(c, people, player) : undefined,
   });
   // 본부 메뉴 창이 열려 있으면 Esc는 창 닫기 (껍데기 일시정지보다 먼저)
+  // 본부 메뉴 창(임무 창구·정비실 등) 키보드 (사용자 2026-10-25: 키보드가 안 먹는다): 방향키로 단추를 고르고 Enter·Space·E로 누른다, Esc 닫기
+  let hqSel: HTMLElement | null = null;
+  const hqButtons = () => [...document.querySelectorAll<HTMLElement>('.goei-engine-hq button:not([disabled]), .goei-engine-hq [data-act]:not(button)')].filter((b) => b.offsetParent && !b.closest('[hidden]'));
+  const markHq = (b: HTMLElement | null) => {
+    hqSel?.classList.remove('hq-kbsel');
+    hqSel = b;
+    b?.classList.add('hq-kbsel');
+    b?.scrollIntoView?.({ block: 'nearest' });
+  };
   const hqKeys = (e: KeyboardEvent) => {
-    if (e.code !== 'Escape' || !game?.inHub || !hq.isOpen?.()) return;
-    hq.close();
+    if (!game?.inHub || !hq.isOpen?.() || npc.isOpen()) return;
+    const t = e.target as HTMLElement | null;
+    if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT')) return;
+    const list = hqButtons();
+    if (hqSel && !list.includes(hqSel)) hqSel = null;
+    const at = hqSel ? list.indexOf(hqSel) : -1;
+    const first = () => list.find((b) => b.classList.contains('primary') || b.classList.contains('on')) ?? list[0] ?? null;
+    if (e.code === 'Escape') hq.close();
+    else if (e.code === 'ArrowDown' || e.code === 'ArrowRight' || e.code === 'Tab') markHq(at < 0 ? first() : list[(at + 1) % list.length]);
+    else if (e.code === 'ArrowUp' || e.code === 'ArrowLeft') markHq(at < 0 ? first() : list[(at - 1 + list.length) % list.length]);
+    else if (e.code === 'Enter' || e.code === 'Space' || e.code === 'KeyE') {
+      if (e.repeat) return e.preventDefault();
+      const b = hqSel ?? first();
+      hqSel = null;
+      b?.click();
+    } else return;
     e.preventDefault();
     e.stopImmediatePropagation();
   };
@@ -684,6 +709,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     stages: [elevator, trainingStage, dummyStage, arenaStage, itemStage],
     enemyFactory,
     hq,
+    hqLayer: () => shell.stage.ui,
     hud: false,
     blocking: () => !!visit?.isOpen() || story.isBlocking() || itemsBlocking() || !floorBox.hidden || npc.isOpen() || mapOpen,
     covered: () => story.isVideoPlaying(),
@@ -715,7 +741,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       footsteps(w);
       ctx.save();
       ctx.scale(view.zoom, view.zoom);
-      ctx.translate(-Math.round(w.camX) - view.crop, -view.cropY);
+      ctx.translate(-w.drawCamX - view.crop, -view.cropY);
       shell.fx.drawWorld(ctx);
       ffx.drawWorld(ctx);
       ctx.restore();
@@ -748,14 +774,23 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
         ] }, dt);
       }
       if (!game?.inHub) shell.hud.draw(ctx, { ...hs, messageLeft: cardEnd }, dt); // 본부에서는 전투 HUD 없음
-      else if (hs.message) shell.hud.drawMessage(ctx, hs.message, hs.compact, cardEnd); // 본부 목소리는 아래 자막 한 줄
+      else if (!mods.blocking?.() && !shell.paused) {
+        // 본부: 대사는 말하는 사람 머리 위 말풍선 (사용자 2026-10-25: 아래 검은 자막 상자 대신). 그 밖의 안내 한 줄은 주인공 머리 위
+        const z = view.zoom, toX = (x: number) => (x - w.drawCamX - view.crop) * z, toY = (y: number) => (y - view.cropY) * z;
+        const sp = (w.stage as { speech?: () => { who: string; text: string; x: number; y: number; top: number } | null }).speech?.();
+        if (sp) shell.hud.drawSpeech(ctx, { x: toX(sp.x), y: toY(sp.y + sp.top) - 6, who: sp.who, text: sp.text, compact: hs.compact });
+        else if (hs.message) {
+          const p = w.player, head = (hasTestPeople() ? testPlayerTop() : -230) * persp(p.y);
+          shell.hud.drawSpeech(ctx, { x: toX(p.x), y: toY(p.y - p.z + head) - 10, who: '', text: hs.message, compact: hs.compact });
+        }
+      }
       // 방어 게이지: 캐릭터 머리 위, 막는 중·회복 중에만 (가득 차면 천천히 사라진다)
       const ep = w.player instanceof EileenPlayer ? w.player : null;
       if (ep && !mods.blocking?.() && !shell.paused) {
         const show = ep.guard < 99.5 || ep.core.P.mode === 'block';
         guardA = show ? Math.min(1, guardA + dt * 8) : Math.max(0, guardA - dt * 2.5);
         const z = view.zoom, head = testPlayerTop() * persp(ep.y);
-        const gx = (ep.x - Math.round(w.camX) - view.crop) * z, gy = (ep.y - ep.z + head * 0.92 - view.cropY) * z - 12;
+        const gx = (ep.x - w.drawCamX - view.crop) * z, gy = (ep.y - ep.z + head * 0.92 - view.cropY) * z - 12;
         drawGuardBar(ctx, gx + 5, gy, ep.guard / 100, ep.guardBroken, guardA, performance.now() / 1000);
       }
       // 본부: 위 안내 띠 대신 캐릭터 옆 말풍선 (닿는 문·자리가 있을 때만, 캐릭터와 겹치지 않게 옆에)
@@ -763,7 +798,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       if (tg) {
         const p = w.player, z = view.zoom;
         const head = (hasTestPeople() ? testPlayerTop() : -230) * persp(p.y);
-        const sx = (p.x - Math.round(w.camX) - view.crop) * z, sy = (p.y + head * 0.72 - view.cropY) * z;
+        const sx = (p.x - w.drawCamX - view.crop) * z, sy = (p.y - p.z + head * 0.72 - view.cropY) * z;
         const half = 46 * persp(p.y) * 1.15 * z;
         const side: 1 | -1 = sx > ctx.canvas.width - 320 ? -1 : 1;
         const key = hs.device === 'pad' ? 'B' : hs.device === 'touch' || hs.compact ? '조' : 'E';

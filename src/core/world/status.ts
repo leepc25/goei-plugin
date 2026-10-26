@@ -1,4 +1,4 @@
-// 상태창 [▣|날짜|시각|날씨|기온|위치|목표(|동행|투입)]: 원본은 카드 정규식으로 그려서 칸 하나만 어긋나도 통째로 깨졌다.
+// 상태창 [▣|날짜|시각|날씨|기온|위치|목표(|동행|투입|신분)]: 원본은 카드 정규식으로 그려서 칸 하나만 어긋나도 통째로 깨졌다.
 // 플러그인이 너그럽게 읽는다: 칸이 모자라거나 남아도, 전각 기호·공백이 섞여도, 닫는 괄호가 없어도.
 
 export interface StatusTag {
@@ -15,6 +15,8 @@ export interface StatusTag {
   companions: string[];
   /** 투입 칸: 투입이면 true, 없음이면 false, 칸이 없는 옛 6칸 상태창이면 null */
   deployed: boolean | null;
+  /** 신분 칸 (9칸 상태창, 2026-10-26): 유저의 `조직/직급`. 없으면 빈 문자열 */
+  identity: string;
 }
 
 // 여는 기호: [▣ 【▣ ［▣ (▣ 앞 공백 허용). 닫는 기호가 없으면 줄 끝까지
@@ -28,19 +30,20 @@ export function hasStatusTag(text: string): boolean {
 }
 
 /** 동행·투입 칸 (뒤 두 칸). 비어 있으면 옛 상태창 */
-function extras(x: string[]): { companions: string[]; deployed: boolean | null } {
+function extras(x: string[]): { companions: string[]; deployed: boolean | null; identity: string } {
   const none = (t: string) => !t || t === '없음' || t === '-' || t === '—';
   const companions = none(x[0] ?? '') ? [] : x[0].split(/[,，、]/).map((n) => n.trim()).filter((n) => n && !none(n));
   const d = (x[1] ?? '').trim();
-  return { companions, deployed: x.length < 2 ? null : none(d) ? false : /투입|deployed/i.test(d) };
+  const id = (x[2] ?? '').trim();
+  return { companions, deployed: x.length < 2 ? null : none(d) ? false : /투입|deployed/i.test(d), identity: none(id) ? '' : id };
 }
 
 /** 위치 뒤 칸들: 목표(괴이), 동행, 투입. 칸이 더 많으면 목표에 이어 붙이던 옛 방식 대신 뒤 칸은 버린다 */
-function tail(rest: string[]): { target: string; companions: string[]; deployed: boolean | null } {
+function tail(rest: string[]): { target: string; companions: string[]; deployed: boolean | null; identity: string } {
   const clean = (t: string) => (t === '없음' || t === '-' || t === '—' ? '' : t);
   const after = rest.slice(1);
   if (after.length <= 1) return { target: clean(after[0] ?? ''), ...extras([]) };
-  return { target: clean(after[0]), ...extras(after.slice(1, 3)) };
+  return { target: clean(after[0]), ...extras(after.slice(1, 4)) };
 }
 
 /** 칸을 나눠 이름 붙이기. 여섯 칸이 정확하면 순서대로, 아니면 모양으로 날짜·시각·기온을 먼저 찾는다 */
@@ -51,7 +54,7 @@ function fieldsOf(inner: string): Omit<StatusTag, 'raw'> {
   if (f.length === 6 && DATE_RE.test(f[0]) && TIME_RE.test(f[1])) {
     return { date: f[0], time: f[1], weather: f[2], temp: f[3], place: f[4], target: clean(f[5]), ...extras([]) };
   }
-  if (f.length === 8 && DATE_RE.test(f[0]) && TIME_RE.test(f[1])) {
+  if ((f.length === 8 || f.length === 9) && DATE_RE.test(f[0]) && TIME_RE.test(f[1])) {
     return { date: f[0], time: f[1], weather: f[2], temp: f[3], place: f[4], target: clean(f[5]), ...extras(f.slice(6)) };
   }
   const rest = [...f];

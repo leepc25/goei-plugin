@@ -163,6 +163,8 @@ export function linkNpcTalk(o: NpcLinkOpts): NpcLink {
     const sc = hub.current();
     const spot = sc?.spots.find((s) => `spot:${s.id}` === prop.id) as (HqSpot & { open?: boolean }) | undefined;
     if (!sc || !spot || spot.open === false || !spot.who) return false;
+    // 일하는 자리(임무 창구·정비실 등)는 E = 그 창 (사용자 2026-10-25: 임무 책상에서 대화로 빠져 헷갈림). 말은 사람 앞 「대화」 자리에서
+    if (spot.place && spot.place !== 'office' && spot.place !== 'interview') return false;
     if (o.visit) { o.visit(spot.who); return true; }
     const me = o.agent();
     const place = `관리국 본부 ${sc.floor} ${sc.name}`;

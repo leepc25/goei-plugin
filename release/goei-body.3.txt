@@ -1,4 +1,210 @@
-x.setAttribute("data-theme", theme);
+base(["modules", "enabledModules"]);
+        const on2 = new Set(db?.enabledModules ?? []);
+        const mods = [...db?.modules ?? []].sort((a, b) => Number(on2.has(b.id)) - Number(on2.has(a.id)));
+        rows2 = rows2.concat(mods.flatMap((m) => Array.isArray(m.assets) ? m.assets.filter(isRow) : []));
+      } catch {
+      }
+      const changed = JSON.stringify(rows2) !== JSON.stringify(modRows);
+      if (changed) modRows = rows2, modVer++;
+      return changed;
+    })().finally(() => {
+      modBusy = null;
+    });
+    return modBusy;
+  }
+  var moduleAssetStamp = () => modVer;
+  var modIndex = null;
+  var modIndexVer = -1;
+  function modRow(name) {
+    if (!modIndex || modIndexVer !== modVer) {
+      modIndex = { exact: /* @__PURE__ */ new Map(), lower: /* @__PURE__ */ new Map() };
+      for (const r of modRows) {
+        if (!modIndex.exact.has(r[0])) modIndex.exact.set(r[0], r);
+        if (!modIndex.lower.has(r[0].toLowerCase())) modIndex.lower.set(r[0].toLowerCase(), r);
+      }
+      modIndexVer = modVer;
+    }
+    return modIndex.exact.get(name) ?? modIndex.lower.get(name.toLowerCase());
+  }
+  function modulePicker() {
+    if (!modRows.length) return void 0;
+    return (name) => modRow(name)?.[0] ?? null;
+  }
+  function findRow(char, name) {
+    const lower = name.toLowerCase();
+    const card2 = (char.additionalAssets ?? []).filter(isRow);
+    return card2.find((a) => a[0] === name) ?? card2.find((a) => a[0].toLowerCase() === lower) ?? modRow(name);
+  }
+  function assetNames(char) {
+    const card2 = (char.additionalAssets ?? []).filter(isRow);
+    return [...new Set([...card2, ...modRows].map((r) => r[0]))].filter((n2) => !/^map\d+$/i.test(n2));
+  }
+  var DEFAULT_CROP = "50,16,44";
+  var AGENT_CROPS = {
+    "Aestheticism": "53,18,40",
+    "Aileen": "43,21,46",
+    "Baek Sa-heon": "50,18,44",
+    "Cha Yeo-jin": "54,18,44",
+    "Cho Seong-choon": "48,18,44",
+    "Do Pil-heon": "48,16,44",
+    "Go Young-eun": "46,16,44",
+    "Jang Heo-un": "52,18,44",
+    "Jay": "53,16,44",
+    "Jyaldi": "56,18,44",
+    "Kwak Je-gang": "56,19,44",
+    "Kyuras": "49,19,44",
+    "Lee Do-hyeong": "61,16,44",
+    "Ma Deok-hee": "49,19,44",
+    "Mun Hye-ran": "46,18,44",
+    "Secriem": "54,16,44",
+    "Seo Yun-ji": "46,18,44",
+    "Spangdal": "52,18,44"
+  };
+  var personCrop = (p) => parseCrop(p.crop) ?? parseCrop(!p.photo && AGENT_CROPS[p.english ?? ""] || DEFAULT_CROP);
+  function parseCrop(s4) {
+    const n2 = String(s4 ?? "").split(",").map(Number);
+    if (n2.length !== 3 || n2.some((x) => !Number.isFinite(x))) return null;
+    const c = (x, lo, hi) => Math.min(hi, Math.max(lo, x));
+    return [c(n2[0], 0, 100), c(n2[1], 0, 100), c(n2[2], 5, 100)];
+  }
+  function splitPic(pic) {
+    const at = pic.lastIndexOf("#");
+    const crop = at > 0 ? parseCrop(pic.slice(at + 1)) : null;
+    return crop ? { name: pic.slice(0, at), crop } : { name: pic, crop: null };
+  }
+  function mainPic(char, p) {
+    const en2 = p.english ?? "";
+    if (p.photo) return p.photo;
+    if (en2 && hasAsset(char, `${en2}_default`)) return `${en2}_default`;
+    if (en2 && hasAsset(char, en2)) return en2;
+    return p.shared?.find((n2) => hasAsset(char, n2)) ?? "";
+  }
+  function facePic(char, p, person = false) {
+    if (p.face) return p.face;
+    const en2 = p.english ?? "";
+    if (person && !p.photo && en2 && hasAsset(char, `${en2}_default`)) return `${en2}_default#${personCrop(p).join(",")}`;
+    if (en2 && hasAsset(char, en2)) return en2;
+    const main = mainPic(char, p);
+    const crop = person ? personCrop(p) : parseCrop(p.crop);
+    return main && crop ? `${main}#${crop.join(",")}` : main;
+  }
+  var hasAsset = (char, name) => !!name && !!findRow(char, splitPic(name).name);
+  function assetUrl(char, name) {
+    const row8 = findRow(char, name);
+    if (!row8) return Promise.resolve(null);
+    const key2 = `${String(char.chaId ?? char.name ?? "")}|${row8[1]}`;
+    let hit3 = cache5.get(key2);
+    if (!hit3) {
+      hit3 = load(row8[1], String(row8[2] ?? row8[1].split(".").pop() ?? ""));
+      cache5.set(key2, hit3);
+      void hit3.then((url) => {
+        if (!url) cache5.delete(key2);
+      });
+    }
+    return hit3;
+  }
+
+  // src/ui/images.ts
+  var urls = /* @__PURE__ */ new Map();
+  var redraw = () => {
+  };
+  var queued = false;
+  function forgetImages() {
+    urls.clear();
+    schedule();
+  }
+  function setImageRedraw(fn2) {
+    redraw = fn2;
+  }
+  function schedule() {
+    if (queued) return;
+    queued = true;
+    setTimeout(() => {
+      queued = false;
+      redraw();
+    }, 30);
+  }
+  var MAX_SIDE = 720;
+  var FACE_SIDE = 256;
+  async function shrink(url, crop = null) {
+    try {
+      const im = new Image();
+      im.src = url;
+      await im.decode();
+      const W2 = im.naturalWidth;
+      const H2 = im.naturalHeight;
+      let [sx, sy, sw, sh] = [0, 0, W2, H2];
+      if (crop) {
+        const side = Math.min(W2, H2, crop[2] / 100 * W2);
+        sx = Math.min(W2 - side, Math.max(0, crop[0] / 100 * W2 - side / 2));
+        sy = Math.min(H2 - side, Math.max(0, crop[1] / 100 * H2 - side / 2));
+        sw = sh = side;
+      }
+      const scale = Math.min(1, (crop ? FACE_SIDE : MAX_SIDE) / Math.max(sw, sh));
+      if (!crop && !(scale < 1)) return url;
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.max(1, Math.round(sw * scale));
+      canvas.height = Math.max(1, Math.round(sh * scale));
+      const g = canvas.getContext("2d");
+      if (!g) return url;
+      g.imageSmoothingQuality = "high";
+      g.drawImage(im, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height);
+      const blob = await new Promise((res) => canvas.toBlob(res, "image/webp", 0.88));
+      return blob ? URL.createObjectURL(blob) : url;
+    } catch {
+      return url;
+    }
+  }
+  function imageUrl(char, pic) {
+    if (!pic) return null;
+    const key2 = `${String(char.chaId ?? char.name ?? "")}|${pic}`;
+    const hit3 = urls.get(key2);
+    if (hit3 === void 0) {
+      urls.set(key2, "loading");
+      const { name, crop } = splitPic(pic);
+      void assetUrl(char, name).then(async (raw) => {
+        const url = raw ? await shrink(raw, crop) : null;
+        urls.set(key2, url);
+        if (url) schedule();
+      });
+      return null;
+    }
+    return hit3 === "loading" ? null : hit3;
+  }
+  var escAttr = (s4) => s4.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  function agentFace(char, english) {
+    if (!english) return "";
+    const a = readDirectory(char.globalLore ?? []).agents.find((x) => x.english === english);
+    return facePic(char, a ?? { english }, true);
+  }
+  function factionPic(char, f, slot = "main") {
+    const o = readDirectory(char.globalLore ?? []).orgs.find((x) => x.faction ? x.faction === f.code : x.name === f.affiliation);
+    const src = { photo: o?.spec.photo ?? f.photo, face: o?.spec.face, crop: o?.spec.crop, english: o?.spec.english || f.english, shared: o?.shared };
+    return slot === "face" ? facePic(char, src) : mainPic(char, src);
+  }
+  function picAvatar(char, pic, name, cls = "") {
+    const url = imageUrl(char, pic);
+    const first = escAttr(Array.from(name.trim())[0] ?? "?");
+    return `<span class="gx-ava${cls ? ` ${cls}` : ""}">${url ? `<img src="${escAttr(url)}" alt="" loading="lazy">` : `<span>${first}</span>`}</span>`;
+  }
+  var avatar = (char, english, name, cls = "") => picAvatar(char, agentFace(char, english), name, cls);
+  function prefetchFactions(char) {
+    for (const f of factionList(char.globalLore)) if (!f.hidden) imageUrl(char, factionPic(char, f));
+  }
+  var stLabel = (st) => st === "작전투입" ? "작전" : st;
+  var AGENT_COLOR = { 작전투입: "var(--signal)", 외근: "var(--blue)", 부상: "var(--amber)", 실종: "var(--danger)", 격리: "var(--danger)", 사망: "var(--danger)", 비번: "var(--dim)" };
+  var stChip = (st) => `<em class="gx-st" style="--st:${AGENT_COLOR[st] ?? "var(--dim)"}">${escAttr(stLabel(st))}</em>`;
+  function agentInner(char, p, st, situation = "", act = "") {
+    const role = [p.department, p.rank].filter(Boolean).join(" · ");
+    return `<span class="gx-acard-side">${avatar(char, p.english, p.name, "sq")}${act}</span><span class="gx-acard-txt"><span class="gx-acard-top"><b>${escAttr(p.name)}</b>${stChip(st)}</span>${role ? `<small>${escAttr(role)}</small>` : ""}${situation ? `<span class="gx-acard-sit">${escAttr(situation)}</span>` : ""}</span>`;
+  }
+  function showIdCard(html) {
+    const box = document.createElement("div");
+    box.className = "gx gx-agpop gx-idpop";
+    box.setAttribute("role", "dialog");
+    box.innerHTML = `<div class="gx-idpop-card">${html}<button class="gx-agpop-x" aria-label="닫기">✕</button></div>`;
+    const theme = document.querySelector(".gx")?.getAttribute("data-theme");
+    if (theme) box.setAttribute("data-theme", theme);
     box.addEventListener("click", (e) => {
       if (e.target.closest(".gx-idpop-card") && !e.target.closest(".gx-agpop-x")) return;
       box.remove();
@@ -300,7 +506,7 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
     return ADV[f].map((g, gi) => `<section class="ps-group"><h3>${esc5(g.title)}</h3><div class="ps-rows">${g.chips?.length ? chips(f, g.chips, state) : ""}${g.items.map((i) => row(f, i, state)).join("")}</div>${extra[gi] ?? ""}</section>`).join("");
   }
   function advancedBox(f, state) {
-    const n = advChanged(state, f).length;
+    const n2 = advChanged(state, f).length;
     const groups = ADV[f].map((g, gi) => {
       const body4 = `${g.chips?.length ? chips(f, g.chips, state) : ""}${g.items.map((i) => row(f, i, state)).join("")}`;
       if (g.fold) {
@@ -308,8 +514,8 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
       }
       return `<section class="ps-group"><h3>${esc5(g.title)}</h3><div class="ps-rows">${body4}</div></section>`;
     }).join("");
-    const foot = n ? advUi.confirm === f ? `<div class="st-confirm adv-foot"><p>고급 설정 ${n}개를 모두 기본값으로 돌릴까요?</p><div class="gx-row-btns"><button class="gx-mini danger" data-action="adv-reset-yes" data-value="${f}">되돌리기</button><button class="gx-mini" data-action="adv-reset-no">취소</button></div></div>` : `<div class="adv-foot"><button class="gx-mini" data-action="adv-reset-all" data-value="${f}">${ICONS.refresh}모두 기본값으로</button></div>` : "";
-    return `<details class="ps-adv" data-keep="adv-${f}"${keepOpen(`adv-${f}`)}><summary class="ps-adv-sum"><b>고급 설정</b>${n ? `<span class="adv-count">${n}개 바꿈</span>` : ""}</summary><div class="ps-adv-body">${groups}${foot}</div></details>`;
+    const foot = n2 ? advUi.confirm === f ? `<div class="st-confirm adv-foot"><p>고급 설정 ${n2}개를 모두 기본값으로 돌릴까요?</p><div class="gx-row-btns"><button class="gx-mini danger" data-action="adv-reset-yes" data-value="${f}">되돌리기</button><button class="gx-mini" data-action="adv-reset-no">취소</button></div></div>` : `<div class="adv-foot"><button class="gx-mini" data-action="adv-reset-all" data-value="${f}">${ICONS.refresh}모두 기본값으로</button></div>` : "";
+    return `<details class="ps-adv" data-keep="adv-${f}"${keepOpen(`adv-${f}`)}><summary class="ps-adv-sum"><b>고급 설정</b>${n2 ? `<span class="adv-count">${n2}개 바꿈</span>` : ""}</summary><div class="ps-adv-body">${groups}${foot}</div></details>`;
   }
   var blank2 = (item2) => item2.v ? String(item2.def) : "";
   function parse2(value) {
@@ -320,9 +526,9 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
     if (!item2) return null;
     let v = m[3].trim();
     if (item2.type === "num") {
-      const n = Number(v);
-      if (v === "" || !Number.isFinite(n)) return [f, item2, blank2(item2)];
-      v = String(Math.min(item2.max ?? Infinity, Math.max(item2.min ?? 0, Math.round(n))));
+      const n2 = Number(v);
+      if (v === "" || !Number.isFinite(n2)) return [f, item2, blank2(item2)];
+      v = String(Math.min(item2.max ?? Infinity, Math.max(item2.min ?? 0, Math.round(n2))));
     } else if (item2.type === "bool" ? v !== "0" && v !== "1" : !item2.opts?.some(([o]) => o === v)) return null;
     return [f, item2, v === String(item2.def) ? blank2(item2) : v];
   }
@@ -736,9 +942,9 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
     if (!(env2 ? set2.autoOpen : set2.auto) || phoneBusy(ctx2)) return;
     const data = String(ctx2.chat.message?.[messageIndex]?.data ?? "");
     if (!data.trim()) return;
-    let hash = 7;
-    for (let i = 0; i < data.length; i++) hash = (hash * 131 + data.charCodeAt(i)) % 2147483647;
-    const stamp = `${messageIndex}:${hash}`;
+    let hash2 = 7;
+    for (let i = 0; i < data.length; i++) hash2 = (hash2 * 131 + data.charCodeAt(i)) % 2147483647;
+    const stamp = `${messageIndex}:${hash2}`;
     if (String(ctx2.chat.scriptstate?.[PH_AUTO_LAST] ?? "") === stamp) return;
     const saved = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => ({ ...chat, scriptstate: { ...chat.scriptstate ?? {}, [PH_AUTO_LAST]: stamp } }));
     if (!saved) return;
@@ -850,7 +1056,7 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
     return `${c.name} ${c.english ?? ""} ${fnames[c.group ?? ""] ?? c.group ?? ""} ${c.rank ?? ""} ${c.department ?? ""} ${c.terms.join(" ")}`.toLowerCase().includes(q);
   }
   var tool = (action, icon2, label, extra = "", short = "") => `<button class="ph-tool" data-action="${action}" aria-label="${label}" title="${label}" ${extra}>${icon2}${short ? `<span class="ph-tool-l">${short}</span>` : ""}</button>`;
-  var badge = (n) => n > 0 ? `<span class="ph-badge">${n > 99 ? "99+" : n}</span>` : "";
+  var badge = (n2) => n2 > 0 ? `<span class="ph-badge">${n2 > 99 ? "99+" : n2}</span>` : "";
   function chips2(action, cur, items) {
     return `<div class="ph-tabs" role="tablist">${items.map((t) => `<button class="ph-tab${t.id === cur ? " on" : ""}" data-action="${action}" data-value="${esc6(t.id)}" aria-selected="${t.id === cur}">${esc6(t.label)}${t.count !== void 0 ? `<small>${t.count}</small>` : ""}${badge(t.alert ?? 0)}</button>`).join("")}</div>`;
   }
@@ -866,9 +1072,9 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
   function contactsView(ctx2, d, st) {
     if (!d.tabs.length) return blank3("이 소속에 공개된 연락처 탭이 없어요. 설정에서 「모든 연락처 공개」를 켤 수 있어요.");
     const tab2 = d.tabs.some((t) => t.id === phone.tab) ? phone.tab : d.tabs[0].id;
-    const head = chips2("ph-ctab", tab2, d.tabs.map((t) => ({ id: t.id, label: t.name, count: d.contacts.filter((c) => c.tabs.includes(t.id)).length })));
+    const head2 = chips2("ph-ctab", tab2, d.tabs.map((t) => ({ id: t.id, label: t.name, count: d.contacts.filter((c) => c.tabs.includes(t.id)).length })));
     const rows2 = d.contacts.filter((c) => c.tabs.includes(tab2));
-    return head + (rows2.length ? contactList(ctx2, rows2, st) : blank3("이 탭에는 아직 연락처가 없어요."));
+    return head2 + (rows2.length ? contactList(ctx2, rows2, st) : blank3("이 탭에는 아직 연락처가 없어요."));
   }
   var talking = (room) => room?.messages.some((m) => m.kind === "message") ? `<span class="ph-talk${room.unread ? " new" : ""}" role="img" aria-label="${room.unread ? "안 읽은 대화" : "대화 중"}">${ICONS.phone}</span>` : "";
   function contactList(ctx2, rows2, st) {
@@ -894,12 +1100,12 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
     const all = chatRooms(st, "");
     if (!all.length) return blank3("아직 대화가 없어요.<br>연락처에서 이름을 누르거나 새 메시지 확인을 눌러 보세요.");
     const unread = all.filter((r) => r.unread);
-    const head = chips2("ph-chat-filter", phone.chatFilter, [
+    const head2 = chips2("ph-chat-filter", phone.chatFilter, [
       { id: "all", label: "전체", count: all.length },
-      { id: "unread", label: "안읽음", alert: unread.reduce((n, r) => n + r.unread, 0) }
+      { id: "unread", label: "안읽음", alert: unread.reduce((n2, r) => n2 + r.unread, 0) }
     ]);
     const rows2 = phone.chatFilter === "unread" ? unread : all;
-    return head + (rows2.length ? chatList(ctx2, rows2, d) : blank3("안 읽은 대화가 없어요."));
+    return head2 + (rows2.length ? chatList(ctx2, rows2, d) : blank3("안 읽은 대화가 없어요."));
   }
   function chatList(ctx2, rows2, d) {
     return `<ul class="ph-list ph-chats">${rows2.map((r) => {
@@ -940,9 +1146,9 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
       const unread = me && r.kind === "dm" && r.pending?.message === m.id && !r.messages.some((x) => x.id > m.id && x.sender !== "me" && x.kind === "message");
       const who2 = d.map.get(m.sender) ?? r.people[m.sender];
       const pic = !me ? first ? face(ctx2, who2, name(m.sender), " ph-face") : '<span class="ph-face-gap"></span>' : "";
-      const head = !me && first ? `<b class="ph-name">${esc6(name(m.sender))}</b>` : "";
+      const head2 = !me && first ? `<b class="ph-name">${esc6(name(m.sender))}</b>` : "";
       const meta = last2 || unread ? `<span class="ph-meta-t">${unread ? "<i>1</i>" : ""}${last2 ? esc6(shortTime(m.time)) : ""}</span>` : "";
-      return `${sep}<div class="ph-msg ${me ? "me" : "npc"}${first ? " first" : ""}">${pic}<div class="ph-msg-col">${head}<div class="ph-line"><div class="ph-bubble">${bubbleBody(m.text)}</div>${meta}</div></div></div>`;
+      return `${sep}<div class="ph-msg ${me ? "me" : "npc"}${first ? " first" : ""}">${pic}<div class="ph-msg-col">${head2}<div class="ph-line"><div class="ph-bubble">${bubbleBody(m.text)}</div>${meta}</div></div></div>`;
     }).join("");
     const pending = r.pending ? r.pending.status === "working" || busy5 ? '<div class="ph-msg npc first ph-typing-row"><span class="ph-face-gap"></span><div class="ph-bubble ph-typing" aria-label="입력 중"><i></i><i></i><i></i></div></div>' : `<div class="ph-retry"><span>답장을 받지 못했어요.</span><button class="gx-mini" data-action="ph-retry" data-value="${esc6(r.id)}">다시 시도</button><button class="gx-mini" data-action="ph-skip" data-value="${esc6(r.id)}">건너뛰기</button></div>` : "";
     const who = r.kind === "dm" ? d.map.get(r.members[0]) ?? r.people[r.members[0]] : void 0;
@@ -1038,13 +1244,13 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
     const pages = Math.max(1, Math.ceil(all.length / size));
     const page = Math.min(Math.max(1, phone.noticePage), pages);
     const items = all.slice((page - 1) * size, page * size);
-    const head = `<div class="ph-notice-bar">${chips2("ph-notice-filter", phone.noticeFilter, [
+    const head2 = `<div class="ph-notice-bar">${chips2("ph-notice-filter", phone.noticeFilter, [
       { id: "all", label: "전체", count: every.length },
       { id: "unread", label: "안읽음", alert: unreadN }
     ])}${unreadN ? '<button class="gx-mini" data-action="ph-notice-all">모두 읽음</button>' : ""}</div>` + (factions.length > 1 ? `<div class="ph-notice-facs">${factions.map((f) => `<button class="gx-chip${phone.noticeFaction === f ? " on" : ""}" data-action="ph-notice-faction" data-value="${esc6(f)}" aria-pressed="${phone.noticeFaction === f}">${esc6(label(f, received.find((r) => r.channel === f)?.channelName))}<small>${received.filter((r) => r.channel === f).length}</small></button>`).join("")}</div>` : "");
-    if (!all.length) return head + blank3("안 읽은 공지가 없어요.");
+    if (!all.length) return head2 + blank3("안 읽은 공지가 없어요.");
     const nav = pages > 1 ? `<div class="ph-pager"><button class="gx-mini" data-action="ph-notice-page" data-value="${page - 1}" ${page <= 1 ? "disabled" : ""}>‹ 이전</button><span>${page} / ${pages}</span><button class="gx-mini" data-action="ph-notice-page" data-value="${page + 1}" ${page >= pages ? "disabled" : ""}>다음 ›</button></div>` : "";
-    return `${head}${noticeList(items, label)}${nav}`;
+    return `${head2}${noticeList(items, label)}${nav}`;
   }
   function noticeFactionLabel(names4) {
     return (code, saved) => (code ? noticeLabel(code, names4) : "") || saved || code || "소속 없음";
@@ -1090,7 +1296,7 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
     } catch {
     }
     if (!people.length && !rooms.length && !notes.length) return blank3("검색 결과가 없어요.");
-    const sec = (title2, n, html) => n ? `<h4 class="ph-sec">${title2}<b>${n}</b></h4>${html}` : "";
+    const sec = (title2, n2, html) => n2 ? `<h4 class="ph-sec">${title2}<b>${n2}</b></h4>${html}` : "";
     return sec("연락처", people.length, contactList(ctx2, people, st)) + sec("대화", rooms.length, chatList(ctx2, rooms, d)) + sec("공지", notes.length, noticeList(notes, noticeFactionLabel(names2(ctx2))));
   }
   function callView() {
@@ -1126,8 +1332,8 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
     const num4 = (k, cur, lo, hi, unit) => `<span class="ph-inline"><input class="gx-search ph-pct" type="number" min="${lo}" max="${hi}" data-change="ph-num" data-key="${k}" value="${cur}" aria-label="${k}"><span>${unit}</span></span>`;
     const notices = noticeSettings(ctx2.chat.scriptstate);
     const rest = (k) => {
-      const n = advNum(ctx2.chat.scriptstate, "ph", k);
-      return n ? `받은 뒤 ${n}턴 쉬어요` : "";
+      const n2 = advNum(ctx2.chat.scriptstate, "ph", k);
+      return n2 ? `받은 뒤 ${n2}턴 쉬어요` : "";
     };
     const keep = (k, label) => {
       const st = phoneStorage(ctx2.chat.scriptstate, k);
@@ -1153,7 +1359,7 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
       keep("dm", "1:1 대화 정리"),
       keep("group", "단톡방 정리"),
       keep("notice", "공지 정리"),
-      row2("페이지당 공지", `<div class="gx-segs gx-segs-sm">${NOTICE_PAGE_SIZES.map((n) => `<button class="gx-seg${notices.page === n ? " on" : ""}" data-action="ph-cfg" data-value="announcement_page_size=${n}" aria-pressed="${notices.page === n}">${n}</button>`).join("")}</div>`)
+      row2("페이지당 공지", `<div class="gx-segs gx-segs-sm">${NOTICE_PAGE_SIZES.map((n2) => `<button class="gx-seg${notices.page === n2 ? " on" : ""}" data-action="ph-cfg" data-value="announcement_page_size=${n2}" aria-pressed="${notices.page === n2}">${n2}</button>`).join("")}</div>`)
     ].join(""))}
       ${advancedBox("ph", ctx2.chat.scriptstate)}
     </div></div>`;
@@ -1200,7 +1406,7 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
     const unread = unreadCount(st);
     const subBtn = (id, label, extra = "") => `<button class="ph-sub${phone.sub === id ? " on" : ""}" data-action="ph-sub" data-value="${id}" aria-pressed="${phone.sub === id}">${label}${extra}</button>`;
     const fail3 = phone.failure ? `<details class="nw-fail"><summary>최근 실패 원문</summary><p>${esc6(phone.failure.reason)}</p><textarea class="gx-search" rows="6" readonly>${esc6(phone.failure.raw)}</textarea></details>` : "";
-    const status = job ? `<div class="nw-busy" role="status"><span class="nw-spin"></span>${esc6(job)} 창을 닫아도 계속돼요.</div>` : "";
+    const status2 = job ? `<div class="nw-busy" role="status"><span class="nw-spin"></span>${esc6(job)} 창을 닫아도 계속돼요.</div>` : "";
     const note = toast("ph", phone.notice, (t) => {
       if (phone.notice === t) phone.notice = "";
     });
@@ -1218,12 +1424,12 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
         <div class="ph-subs">${subBtn("contacts", "연락처")}${subBtn("chats", "대화", badge(unread))}${subBtn("notices", "공지", badge(b ? b.items.filter((r) => r.read === false).length : 0))}</div>
         <input class="gx-search ph-search" name="ph-q" data-input="ph-query" value="${esc6(phone.query)}" placeholder="이름·대화·공지 검색" aria-label="연락처·대화·공지 검색">
       </div>
-      ${detail ? "" : status}
+      ${detail ? "" : status2}
       <div class="ph-content">${listHtml(ctx2, st, d)}</div>
       ${fail3}
       ${drawerHtml(tools)}
     </section>
-    <section class="ph-pane">${detail ? status : ""}${paneHtml(ctx2, st, d, busy5)}</section>
+    <section class="ph-pane">${detail ? status2 : ""}${paneHtml(ctx2, st, d, busy5)}</section>
     ${note}
   </main>`;
   }
@@ -1381,9 +1587,9 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
         else Object.assign(phone, { openNotice: id, view: "notice" });
         {
           const b = readBulletins(ctx2.chat);
-          const row7 = b.items.find((x) => x.id === id);
-          if (row7 && row7.read === false) {
-            row7.read = true;
+          const row8 = b.items.find((x) => x.id === id);
+          if (row8 && row8.read === false) {
+            row8.read = true;
             await setVars(ctx2, env2, writeBulletins(b, ctx2.chat.scriptstate));
             return true;
           }
@@ -1397,7 +1603,7 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
       case "ph-notice-all": {
         const b = readBulletins(ctx2.chat);
         if (!b.items.some((x) => x.read === false)) break;
-        for (const row7 of b.items) row7.read = true;
+        for (const row8 of b.items) row8.read = true;
         await setVars(ctx2, env2, writeBulletins(b, ctx2.chat.scriptstate));
         return true;
       }
@@ -1453,8 +1659,8 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
           storage_limit_notice: [1, STORAGE_MAX2]
         };
         const r = range[k];
-        const n = Math.floor(Number(val));
-        if (r && Number.isFinite(n)) await setVars(ctx2, env2, { [PH(k)]: String(Math.max(r[0], Math.min(r[1], n))) });
+        const n2 = Math.floor(Number(val));
+        if (r && Number.isFinite(n2)) await setVars(ctx2, env2, { [PH(k)]: String(Math.max(r[0], Math.min(r[1], n2))) });
         else env2.render();
         return true;
       }
@@ -1722,11 +1928,11 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
         }
         const got = acceptComments(value.comments, p.comments, { postId: postId2, replyTo: 0, total: prompt.total, supplied: prompt.supplied }, nick);
         pushComments(p, got.comments, dateNow(latest));
-        const n = got.comments.length;
-        p.views += n * (5 + Math.floor(Math.random() * 20)) + Math.floor(Math.random() * 10);
-        p.votes += Math.floor(Math.random() * (n + 2));
+        const n2 = got.comments.length;
+        p.views += n2 * (5 + Math.floor(Math.random() * 20)) + Math.floor(Math.random() * 10);
+        p.votes += Math.floor(Math.random() * (n2 + 2));
         const [, skipped2] = applyActivity(cur, value.activity, prompt.activity.snapshots, nick, dateNow(latest));
-        note = n ? "" : "새 댓글이 없어요.";
+        note = n2 ? "" : "새 댓글이 없어요.";
         if (got.dropped) note += ` 형식이 맞지 않는 댓글 ${got.dropped}개는 뺐어요.`;
         if (skipped2) note += ` 다른 글 활동 ${skipped2}건은 형식이 맞지 않아 뺐어요.`;
         return writeGnet(latest, cur, { ack: viewing() });
@@ -1923,8 +2129,8 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
     const out = [];
     const seen2 = /* @__PURE__ */ new Set();
     const target = gnet.compose?.kind === "comment" && gnet.compose.post === p.id ? gnet.compose.parent : 0;
-    const walk = (n, depth) => {
-      for (const k of kids.get(n) ?? []) {
+    const walk = (n2, depth) => {
+      for (const k of kids.get(n2) ?? []) {
         if (seen2.has(k)) continue;
         seen2.add(k);
         const c = p.comments[k - 1];
@@ -1954,13 +2160,13 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
     const right = p.mine ? confirm2 ? `<button class="gx-mini danger" data-action="gn-del-post" data-value="${p.id}">정말 삭제</button>` : tool2("gn-del-post", ICONS.trash, "글 삭제", `data-value="${p.id}"`) : "";
     const again = tool2("gn-post-refresh", ICONS.refresh, "이 글 새로고침", `data-value="${p.id}" ${busy5 ? "disabled" : ""}`);
     const who = p.mine ? "" : `<button class="gn-nick" data-action="gn-dm-from" data-value="${p.id}:0" title="쪽지 보내기">${esc7(p.nick)}</button>`;
-    const head = inline ? "" : `<header class="gn-post-head"><h2 class="gn-post-title">${esc7(p.title)}</h2>
+    const head2 = inline ? "" : `<header class="gn-post-head"><h2 class="gn-post-title">${esc7(p.title)}</h2>
           <div class="gn-post-meta"><span class="gn-post-who">${p.mine ? `<b class="gn-me">${esc7(p.nick)}</b>` : who}</span>
             <span>${esc7(p.date)}</span><span class="gn-post-stat"><span>조회 ${p.views.toLocaleString()}</span><span>추천 ${p.votes.toLocaleString()}</span><span>댓글 ${p.comments.length}</span></span></div></header>`;
     const tail2 = inline ? `<span class="gn-chead-act">${again}${p.mine ? right : `<span class="gn-chead-dm">${ICONS.mail}${who}</span>`}</span>` : "";
     return `<div class="${inline ? "gn-inline" : "ph-room gn-pane"}">${inline ? "" : paneHead2("게시판", `#${p.id}`, again + right)}
     <div class="gn-doc">
-      <article class="gn-post">${head}
+      <article class="gn-post">${head2}
         <div class="gn-post-body">${body2(p.body)}</div>
       </article>
       <section class="gn-csec"><div class="gn-chead"><h3 class="gn-ccount">전체 댓글 <b>${p.comments.length}</b>개</h3>${tail2}</div>
@@ -2065,7 +2271,7 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
     const kind = paneKind(st, mobile);
     const nick = gnet.editNick ? `<div class="gn-nickform"><input class="gx-search" name="gn-nick" data-enter="gn-nick-save" value="${esc7(me === "익명" && !ctx2.chat.scriptstate?.[GN_NICK] ? "" : me)}" placeholder="내 닉네임 (비우면 익명)" maxlength="36" aria-label="내 닉네임"><button class="gx-mini" data-action="gn-nick-save" data-take="gn-nick">저장</button></div>` : "";
     const fail3 = gnet.failure ? `<details class="nw-fail"><summary>최근 실패 원문</summary><p>${esc7(gnet.failure.reason)}</p><textarea class="gx-search" rows="6" readonly>${esc7(gnet.failure.raw)}</textarea></details>` : "";
-    const status = job ? `<div class="nw-busy" role="status"><span class="nw-spin"></span>${esc7(job)} 창을 닫아도 계속돼요.</div>` : "";
+    const status2 = job ? `<div class="nw-busy" role="status"><span class="nw-spin"></span>${esc7(job)} 창을 닫아도 계속돼요.</div>` : "";
     const note = toast("gn", gnet.notice, (t) => {
       if (gnet.notice === t) gnet.notice = "";
     });
@@ -2082,13 +2288,13 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
       <div class="ph-side-head">
         <div class="ph-subs">${subBtn("board", "게시판", boardUnread(st) ? '<span class="gn-dot"></span>' : "")}${subBtn("dm", "쪽지함", unreadDm ? ` <b class="gn-count">${unreadDm}</b>` : dmUnread(st) ? '<span class="gn-dot"></span>' : "")}<span class="gn-mynick" title="내 닉네임"><small>내 닉네임</small><b>${esc7(me)}</b></span></div>
       </div>
-      ${kind ? "" : status}
+      ${kind ? "" : status2}
       <div class="ph-content">${gnet.sub === "board" ? boardList(st, busy5, mobile) : dmList(st, busy5, mobile)}</div>
       ${mobile && !kind ? inlineComposer(st, busy5) : ""}
       ${fail3}
       ${drawerHtml(tools, nick)}
     </section>
-    <section class="ph-pane">${kind ? status : ""}${paneHtml2(ctx2, st, kind, busy5)}</section>
+    <section class="ph-pane">${kind ? status2 : ""}${paneHtml2(ctx2, st, kind, busy5)}</section>
     ${note}
   </main>`;
   }
@@ -2109,9 +2315,9 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
     if (!s4.enabled || !(open3 ? s4.autoOpen : s4.auto) || jobs2.has(chatKey2(ctx2))) return;
     const data = String(ctx2.chat.message?.[messageIndex]?.data ?? "");
     if (!data.trim()) return;
-    let hash = 7;
-    for (let i = 0; i < data.length; i++) hash = (hash * 131 + data.charCodeAt(i)) % 2147483647;
-    const stamp = `${messageIndex}:${hash}`;
+    let hash2 = 7;
+    for (let i = 0; i < data.length; i++) hash2 = (hash2 * 131 + data.charCodeAt(i)) % 2147483647;
+    const stamp = `${messageIndex}:${hash2}`;
     if (String(ctx2.chat.scriptstate?.[AUTO_LAST] ?? "") === stamp) return;
     const saved = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => withVars(chat, { [AUTO_LAST]: stamp }));
     if (!saved) return;
@@ -2344,8 +2550,8 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
         return true;
       }
       case "gn-keep": {
-        const n = Math.floor(Number(v));
-        if (Number.isFinite(n) && n >= 1 && n <= STORAGE_MAX) await setVar(ctx2, env2, GN_STORAGE_LIMIT, String(n));
+        const n2 = Math.floor(Number(v));
+        if (Number.isFinite(n2) && n2 >= 1 && n2 <= STORAGE_MAX) await setVar(ctx2, env2, GN_STORAGE_LIMIT, String(n2));
         else env2.render();
         return true;
       }
@@ -2396,17 +2602,17 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
     const fence = /^```(?:json)?\s*\n([\s\S]*?)\n?```$/i.exec(s4);
     if (fence) s4 = fence[1].trim();
     let i = 0;
-    const n = s4.length;
+    const n2 = s4.length;
     const fail3 = (why) => {
       throw new Error(`통합 응답 형식이 맞지 않아요: ${why}`);
     };
     const space = () => {
-      while (i < n && /\s/.test(s4[i])) i++;
+      while (i < n2 && /\s/.test(s4[i])) i++;
     };
     const quoted = () => {
       if (s4[i] !== '"') fail3("문자열 경계");
       const first = i++;
-      while (i < n) {
+      while (i < n2) {
         if (s4[i] === "\\") i += 2;
         else if (s4[i++] === '"') return s4.slice(first, i);
       }
@@ -2429,7 +2635,7 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
         if (s4[i] !== "{") fail3("결과가 객체가 아님");
         const stack = ["}"];
         i++;
-        while (i < n && stack.length) {
+        while (i < n2 && stack.length) {
           const c2 = s4[i];
           if (c2 === '"') quoted();
           else if (c2 === "{" || c2 === "[") stack.push(c2 === "{" ? "}" : "]"), i++;
@@ -2447,7 +2653,7 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
       if (c !== ",") fail3("결과 구분자");
     }
     space();
-    if (i < n || !("gnet" in parts) || !("phone" in parts)) fail3("결과가 빠졌거나 뒤에 다른 글이 붙음");
+    if (i < n2 || !("gnet" in parts) || !("phone" in parts)) fail3("결과가 빠졌거나 뒤에 다른 글이 붙음");
     return parts;
   }
   var Joint = class {
@@ -2514,9 +2720,9 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
   var IMAGE_BOOK = "Image tag";
   var ASSET_NOTE = "$goei_asset_note";
   function withUser(d, self) {
-    const n = self?.trim() ?? "";
-    if (!n || n.includes("_") || d.characters.includes(n)) return { ...d, allowUser: true };
-    return { ...d, allowUser: true, characters: [...d.characters, n], aliases: new Map(d.aliases).set(n.toLowerCase(), n) };
+    const n2 = self?.trim() ?? "";
+    if (!n2 || n2.includes("_") || d.characters.includes(n2)) return { ...d, allowUser: true };
+    return { ...d, allowUser: true, characters: [...d.characters, n2], aliases: new Map(d.aliases).set(n2.toLowerCase(), n2) };
   }
   var fail2 = (field4, why) => new AssetError(`${IMAGE_BOOK} 이미지 자료 오류 (${field4}): ${why}`);
   function readImageData(lore) {
@@ -2608,7 +2814,7 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
   }
   function assetPrompt(active, paras, d, limit) {
     const first = active[0] ?? "Lee Ha-neul";
-    const n = String(limit);
+    const n2 = String(limit);
     const aliasLines = active.map((name) => {
       const names4 = [...d.aliases].filter(([, t]) => t === name).map(([a]) => a).sort();
       return names4.length ? `- ${name} (${names4.join(", ")})` : "";
@@ -2636,9 +2842,9 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
       "- DO NOT invent character names or keywords. Use only the lists below.",
       "",
       "## HARD LIMIT (per-character, independent count)",
-      `- Each listed character has their OWN independent counter for tags. The limit is ${n} tag${n === "1" ? "" : "s"} PER character, NOT a total for the whole response.`,
-      `- Character A may receive up to ${n} tag(s). Character B may ALSO receive up to ${n} tag(s). They do not share a budget.`,
-      `- If 3 characters appear and each is the focus of separate paragraphs, you may output up to ${limit * 3} tags total (3 characters × ${n} each).`,
+      `- Each listed character has their OWN independent counter for tags. The limit is ${n2} tag${n2 === "1" ? "" : "s"} PER character, NOT a total for the whole response.`,
+      `- Character A may receive up to ${n2} tag(s). Character B may ALSO receive up to ${n2} tag(s). They do not share a budget.`,
+      `- If 3 characters appear and each is the focus of separate paragraphs, you may output up to ${limit * 3} tags total (3 characters × ${n2} each).`,
       "- Per-character priority when over the limit: KEEP the most significant emotion moments, SKIP the rest.",
       "- This per-character limit is absolute — exceeding it for any single character is a hard error. Under-using it (when more legitimate tags exist for that character) wastes the budget.",
       "",
@@ -2824,9 +3030,9 @@ ${job.trailing}` : body4;
     return !a.locked && /내근|대기/.test(a.state) ? "office" : null;
   }
   function anchorOf(chat) {
-    const msgs = Array.isArray(chat.message) ? chat.message : [];
-    const last2 = msgs[msgs.length - 1];
-    return last2?.chatId ? String(last2.chatId) : `#${msgs.length}`;
+    const msgs3 = Array.isArray(chat.message) ? chat.message : [];
+    const last2 = msgs3[msgs3.length - 1];
+    return last2?.chatId ? String(last2.chatId) : `#${msgs3.length}`;
   }
   function visitRecord(chat) {
     const v = chat[VISIT_KEY];
@@ -2852,8 +3058,8 @@ ${job.trailing}` : body4;
     if (!doc) return;
     try {
       const frames = await doc.querySelectorAll("body > iframe");
-      const n = await frames.length();
-      for (let i = 0; i < n; i++) {
+      const n2 = await frames.length();
+      for (let i = 0; i < n2; i++) {
         const f = await frames.at(i);
         if (!f) continue;
         if (await f.getStyle("zIndex") === "1000" && await f.getStyle("display") !== "none") await f.setStyle("zIndex", BELOW_ALERTS);
@@ -2942,8 +3148,8 @@ ${job.trailing}` : body4;
       for (let i = 0; i < N; i++) {
         const u = i / N, v = j / N;
         const w = warp(u, v) - 0.5;
-        const n = main(u + w * 0.35, v + w * 0.2);
-        const d = Math.min(1, Math.max(0, (n - 0.5) / 0.22));
+        const n2 = main(u + w * 0.35, v + w * 0.2);
+        const d = Math.min(1, Math.max(0, (n2 - 0.5) / 0.22));
         const a = d * d * (3 - 2 * d);
         const k = (j * N + i) * 4;
         const tone = 196 + 59 * Math.min(1, a * 1.3);
@@ -2981,9 +3187,9 @@ ${job.trailing}` : body4;
   var KIND = { an: "괴이", in: "사건", ms: "특수" };
   var MARK = { an: "?", in: ICONS.siren, ms: ICONS.spook };
   function peopleChips(char, names4, agents, own = "") {
-    return names4.filter((n, i, all) => n && n !== "없음" && all.indexOf(n) === i).map((n) => {
-      if (agents.has(n)) return `<span class="gx-pchip">${avatar(char, agents.get(n).english, n, "xs")}${esc8(n)}</span>`;
-      return `<span class="gx-badge${own && n === own ? " own" : ""}">${esc8(n)}</span>`;
+    return names4.filter((n2, i, all) => n2 && n2 !== "없음" && all.indexOf(n2) === i).map((n2) => {
+      if (agents.has(n2)) return `<span class="gx-pchip">${avatar(char, agents.get(n2).english, n2, "xs")}${esc8(n2)}</span>`;
+      return `<span class="gx-badge${own && n2 === own ? " own" : ""}">${esc8(n2)}</span>`;
     }).join("");
   }
   function elapsedText(minute, since) {
@@ -3143,9 +3349,9 @@ ${job.trailing}` : body4;
       const sido = c.locCode.split("-")[0];
       const at = NATION_PINS.find((p) => p[0] === sido);
       if (!at) return "";
-      const n = per.get(sido) ?? 0;
-      per.set(sido, n + 1);
-      return `<button class="gx-oppin k-${c.kind}${c.id === sel ? " sel" : ""}" style="left:${at[2]}%;top:${at[3] + n * 4.2}%" data-action="ops-sel" data-value="${esc8(c.id)}" aria-label="${esc8(c.name)}"><i></i><em>${esc8(c.name)}</em></button>`;
+      const n2 = per.get(sido) ?? 0;
+      per.set(sido, n2 + 1);
+      return `<button class="gx-oppin k-${c.kind}${c.id === sel ? " sel" : ""}" style="left:${at[2]}%;top:${at[3] + n2 * 4.2}%" data-action="ops-sel" data-value="${esc8(c.id)}" aria-label="${esc8(c.name)}"><i></i><em>${esc8(c.name)}</em></button>`;
     }).join("");
     const s4 = cards.find((c) => c.id === sel && !c.ended);
     const sAt = s4 ? NATION_PINS.find((p) => p[0] === s4.locCode.split("-")[0]) : void 0;
@@ -3186,18 +3392,18 @@ ${job.trailing}` : body4;
     lastOrg = o.org;
     const list4 = [...items].sort((a, b) => ORDER[a.side] - ORDER[b.side]);
     const op = items.filter((a) => a.side === "op").length;
-    const head = `<h2>${headSeg("agents-view", view3, [["wall", "요원 모니터", ICONS.grid], ["list", "요원 목록", ICONS.list]])}<span class="gx-opcnt"><em class="op">작전<i>${op}</i><u>/${o.total}</u></em></span></h2>`;
+    const head2 = `<h2>${headSeg("agents-view", view3, [["wall", "요원 모니터", ICONS.grid], ["list", "요원 목록", ICONS.list]])}<span class="gx-opcnt"><em class="op">작전<i>${op}</i><u>/${o.total}</u></em></span></h2>`;
     const body4 = !list4.length ? `<p class="gx-none">${esc9(o.empty)}</p>` : view3 === "list" ? `<ul class="gx-agrows">${list4.map(row4).join("")}</ul>` : `<ul class="gx-agwall">${list4.map(tile).join("")}</ul>`;
-    return `<section class="gx-sec gx-agbox ${view3}" id="gx-sec-ag">${head}${o.extra}${body4}</section>`;
+    return `<section class="gx-sec gx-agbox ${view3}" id="gx-sec-ag">${head2}${o.extra}${body4}</section>`;
   }
-  function agentPopup() {
+  function agentPopup(hasRecord) {
     const org = lastOrg;
     const a = last.find((x) => x.id === agUi.pop);
     if (!a) {
       agUi.pop = "";
       return "";
     }
-    const btns = a.wiki !== null ? `<button data-action="agent-talk" data-value="${esc9(a.id)}">${ICONS.phone}괴담톡</button><button data-action="wiki-goto" data-value="${esc9(a.wiki)}">${ICONS.wiki}위키</button>` : "";
+    const btns = (a.wiki !== null ? `<button data-action="agent-talk" data-value="${esc9(a.id)}">${ICONS.phone}괴담톡</button><button data-action="wiki-goto" data-value="${esc9(a.wiki)}">${ICONS.wiki}위키</button>` : "") + (hasRecord?.(a.name) ? `<button data-action="people-goto" data-value="${esc9(a.name)}">${ICONS.group}기록</button>` : "");
     const rows2 = [["소속", a.dept], ["직급", a.rank], ["투입", a.deployed], ["상황", a.situation || "대기 중"]].filter(([, v]) => v).map(([k, v]) => `<dt>${k}</dt><dd${k === "투입" ? ' class="dep"' : ""}>${esc9(v)}</dd>`).join("");
     return `<button class="ev-scrim" data-action="agent-info" data-value="${esc9(a.id)}" aria-label="닫기"></button>
     <div class="gx-agcard ${a.side}" role="dialog" aria-label="${esc9(a.name)}">
@@ -3504,103 +3710,4 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   font-weight: 600;
 }
 .gx-sc b { font-family: var(--mono); color: var(--dim); font-size: 13px; font-weight: 500; }
-.gx-sc span { flex: 1; min-width: 0; }
-.gx-sc em { font-style: normal; font-size: 13px; color: var(--dim); font-weight: 400; }
-.gx-sc:hover:not(:disabled) { border-color: var(--line2); }
-.gx-sc.on { border-color: var(--signal); background: var(--accent-bg); }
-.gx-sc.on b { color: var(--signal); }
-.gx-sc.off { opacity: .45; }
-
-.gx-who { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; max-height: 240px; overflow: auto; padding: 2px; }
-.gx-whoc { display: flex; align-items: center; gap: 10px; min-width: 0; padding: 8px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); color: var(--text); font: inherit; font-size: 15px; text-align: left; cursor: pointer; }
-.gx-whoc .gx-ava { flex: none; width: 34px; height: 34px; border-radius: 9px; }
-.gx-whot { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.25; }
-.gx-whot b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
-.gx-whot small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--dim); font-size: 12px; }
-.gx-whoc:hover { border-color: var(--line2); }
-.gx-whoc.on { border-color: var(--signal); background: var(--accent-bg); }
-.gx-hint { margin-top: 10px; padding: 12px 14px; border-radius: 12px; background: var(--panel); border: 1px solid var(--line); color: var(--sub); font-size: 15px; }
-
-.gx-foot { padding: 12px 20px 18px; border-top: 1px solid var(--panel2); background: var(--void); display: flex; flex-direction: column; gap: 8px; }
-.gx-foot-sum { font-size: 15px; color: var(--dim); }
-.gx-err.info { border-color: var(--accent-line); background: var(--accent-bg); color: var(--text); }
-.gx-err { margin-bottom: 10px; padding: 12px 14px; border-radius: 12px; border: 1px solid color-mix(in srgb, var(--danger) 45%, transparent); background: var(--danger-bg); color: var(--danger); font-size: 15px; }
-.gx-start {
-  width: 100%; min-height: 56px; border: 0; border-radius: 16px;
-  background: var(--signal); color: var(--on-signal); font-size: 18px; font-weight: 700; letter-spacing: .3em;
-}
-.gx-start:hover:not(:disabled) { filter: brightness(1.06); }
-.gx-start:disabled { background: var(--line); color: var(--dim); }
-
-.gx-empty { padding: 28px 20px; color: var(--text); overflow-y: auto; }
-.gx-empty p { margin: 0 0 10px; }
-.gx-muted { color: var(--dim); font-size: 15px; }
-.gx-sum { display: grid; grid-template-columns: max-content 1fr; gap: 8px 16px; margin: 0 0 16px; padding: 16px; border-radius: 16px; background: var(--panel); border: 1px solid var(--line); }
-.gx-sum dt { color: var(--dim); }
-.gx-sum dd { margin: 0; color: var(--text); font-weight: 600; }
-
-/* ── 상황판 ── */
-.gx-board { display: flex; flex-direction: column; gap: 16px; padding-top: 16px; }
-.gx-board > section { padding: 0; }
-/* 칸이 많아 넘칠 때 줄어들어 서로 겹치지 않게 (응답 전 안내 줄이 눌려 글씨가 위로 쏠렸다) */
-.gx-board > * { flex-shrink: 0; }
-.gx-board > .gx-hint { margin: 0; }
-.gx-board > .gx-alert { padding: 14px 16px; }
-.gx-alert { display: flex; flex-direction: column; gap: 10px; padding: 14px 16px; border-radius: 18px; background: var(--danger-bg); border: 1px solid color-mix(in srgb, var(--danger) 35%, transparent); }
-.gx-alert.calm { background: var(--accent-bg); border-color: var(--accent-line); }
-.gx-alert-top { display: flex; align-items: center; gap: 10px; font-weight: 700; color: var(--danger); }
-.gx-alert.calm .gx-alert-top { color: var(--signal); }
-.gx-alert-top small { margin-left: auto; font-family: var(--mono); font-size: 12px; letter-spacing: .12em; opacity: .8; font-weight: 500; }
-.gx-meter { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; }
-.gx-meter i { height: 8px; border-radius: 4px; background: color-mix(in srgb, var(--text) 12%, transparent); }
-.gx-meter i.l1 { background: var(--amber); } .gx-meter i.l2 { background: color-mix(in srgb, var(--amber) 50%, var(--danger)); } .gx-meter i.l3, .gx-meter i.l4, .gx-meter i.l5 { background: var(--danger); }
-.gx-alert p { margin: 0; font-size: 15px; color: var(--sub); }
-/* 깜빡이는 점: box-shadow를 움직이면 매 프레임 다시 칠해서(예전엔 뒤 흐림까지 다시 계산) 창 전체가 버벅였다. 겉 고리를 transform·opacity로만 움직인다 (v0.10.1) */
-.gx-live { position: relative; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
-.gx-live::after { content: ""; position: absolute; inset: -4px; border-radius: 50%; background: currentColor; opacity: .22; animation: gxpulse 1.6s ease-in-out infinite; will-change: transform, opacity; }
-@keyframes gxpulse { 50% { transform: scale(1.5); opacity: 0; } }
-.gx-tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
-.gx-tile { display: flex; flex-direction: column; justify-content: space-between; gap: 4px; min-height: 76px; padding: 10px 12px; border-radius: 16px; border: 1px solid var(--line); background: var(--panel); text-align: left; }
-.gx-tile span { font-size: 14px; color: var(--dim); }
-.gx-tile b { font-family: var(--mono); font-size: 26px; line-height: 1.1; }
-.gx-tile.an b { color: var(--danger); } .gx-tile.in b { color: var(--amber); } .gx-tile.ms b { color: var(--signal); }
-.gx-clock { margin: 0; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--dim); font-family: var(--mono); }
-.gx-sec h2 { display: flex; align-items: baseline; gap: 8px; margin: 0 0 10px; font-size: 18px; color: var(--text); }
-.gx-sec h2 small { color: var(--dim); font-weight: 500; font-size: 14px; }
-.gx-none { margin: 0; color: var(--dim); font-size: 15px; }
-.gx-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
-.gx-list li { background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 14px; }
-.gx-list p { margin: 6px 0 0; font-size: 15px; color: var(--sub); }
-.gx-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-.gx-row b { margin-right: auto; font-size: 17px; }
-.gx-loc { font-size: 14px; color: var(--dim); }
-.gx-ev-card { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 4px 12px; align-items: center; }
-.gx-ev-card .gx-ev-sub { grid-column: 2 / -1; }
-.gx-gmark { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; font-family: var(--mono); font-weight: 700; font-size: 16px; grid-row: span 2; align-self: start; }
-.gx-gmark.an { background: var(--danger-bg); color: var(--danger); }
-.gx-gmark.in { background: var(--amber-bg); color: var(--amber); }
-.gx-gmark.ms { background: var(--accent-bg); color: var(--signal); }
-.gx-gmark.wait { background: var(--panel2); color: var(--dim); }
-.gx-ev-name { font-size: 17px; font-weight: 700; min-width: 0; }
-.gx-faces { display: inline-flex; padding-left: 8px; vertical-align: middle; margin-right: 6px; }
-.gx-faces .gx-ava { width: 28px; height: 28px; margin-left: -8px; border: 2px solid var(--panel); font-size: 12px; }
-.gx-ava { position: relative; flex: none; display: inline-grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; overflow: hidden; background: var(--panel2); color: var(--signal); font-weight: 700; }
-.gx-ava.sq { border-radius: 14px; }
-.gx-ava img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-.gx-badge, .gx-grade { font-size: 13px; line-height: 1; padding: 6px 10px; border-radius: 999px; color: var(--sub); background: var(--panel2); box-shadow: inset 0 0 0 1px var(--line2); font-weight: 600; white-space: nowrap; }
-.gx-badge.wait { background: transparent; box-shadow: none; border: 1px dashed var(--line2); }
-.gx-badge.live { color: var(--signal); background: var(--accent-bg); box-shadow: inset 0 0 0 1px var(--accent-line); }
-.gx-badge.new { color: var(--danger); background: var(--danger-bg); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--danger) 35%, transparent); }
-.gx-badge.hot, .gx-badge.hurt { color: var(--amber); background: var(--amber-bg); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--amber) 35%, transparent); }
-.gx-badge.op, .gx-badge.out { color: var(--blue); background: color-mix(in srgb, var(--blue) 16%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--blue) 35%, transparent); }
-.gx-badge.bad, .gx-badge.dead { color: var(--danger); background: var(--danger-bg); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--danger) 35%, transparent); }
-.gx-badge.dead { text-decoration: line-through; }
-.gx-grade { font-weight: 700; color: var(--text); }
-.gx-grade.gS, .gx-grade.gA { color: var(--danger); }
-.gx-grade.gB { color: var(--amber); }
-
-/* 지도 · 커스텀 임무 */
-.gx-tabs { overflow-x: auto; scrollbar-width: none; }
-.gx-tab { white-space: nowrap; flex: none; }
-.gx-tab-end { margin-left: auto; font-size: 14px; }
-.gx-field { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(340px, 1fr); gap: 20px; padding-top: 12px; padding-bottom: 16px; align-items: start; align-content: start; }
+.gx-sc span { 

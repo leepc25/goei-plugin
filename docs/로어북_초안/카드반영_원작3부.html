@@ -1,0 +1,399 @@
+<title>원작 3부 카드 로어북</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Sans+KR:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* 카드에 들어간 로어북 7개 검토지: 왼쪽 목차(부록은 들여씀), 항목마다 등록 정보 → 접힌 본문 → 원문 복사 */
+:root{--bg:#f3f4f1;--panel:#e6e9e4;--fg:#1d2422;--muted:#5d6a66;--line:#c8cfca;--gold:#9a6b0c;--red:#a2302a;
+--display:"Gowun Batang",'Nanum Myeongjo',serif;--body:"IBM Plex Sans KR",'Apple SD Gothic Neo','Malgun Gothic',sans-serif;--mono:"IBM Plex Mono",ui-monospace,Menlo,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121615;--panel:#1b2120;--fg:#dfe4e0;--muted:#8e9a96;--line:#2e3735;--gold:#e0b04a;--red:#e07a6f;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#121615;--panel:#1b2120;--fg:#dfe4e0;--muted:#8e9a96;--line:#2e3735;--gold:#e0b04a;--red:#e07a6f;color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.7;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:220px minmax(0,1fr);gap:40px;padding-block:36px 80px}
+header{grid-column:1/-1;border-bottom:1px solid var(--line);padding-bottom:18px}
+.stamp{font-family:var(--mono);font-size:12px;letter-spacing:.12em;color:var(--red)}
+h1{font-family:var(--display);font-size:clamp(26px,4vw,38px);margin:6px 0 4px;text-wrap:balance}
+header p{color:var(--muted);margin:0;max-width:70ch}
+nav{position:sticky;top:calc(env(safe-area-inset-top,0px) + 20px);align-self:start;font-size:14px}
+nav ul{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+nav a{display:block;color:var(--fg);text-decoration:none;padding:3px 0 3px 10px;border-left:2px solid var(--line)}
+nav a:hover,nav a:focus-visible{border-left-color:var(--gold);color:var(--gold);outline:none}
+main{min-width:0;display:grid;gap:22px}
+.ent{border:1px solid var(--line);border-radius:6px;padding:16px 18px;background:var(--bg)}
+.ent.app{margin-left:24px;border-style:dashed}
+.ent-head{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.tag{font-family:var(--mono);font-size:12px;color:var(--gold)}
+h2{font-family:var(--display);font-size:22px;margin:0}
+.meta{margin:8px 0;padding-left:1.1em;font-size:14px;color:var(--muted)}
+.meta b{color:var(--fg)}
+details summary{cursor:pointer;font-weight:600;padding:4px 0}
+.entry h3{font-family:var(--display);font-size:19px;margin:12px 0 4px}
+.entry h4{font-family:var(--display);font-size:16px;color:var(--gold);margin:16px 0 4px}
+.entry ul{padding-left:1.2em}.entry li{margin:3px 0}
+.raw{border:1px solid var(--line);border-radius:4px;margin-top:10px}
+.raw .bar{display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:var(--panel);font-size:13px;color:var(--muted)}
+.raw button{font:inherit;font-weight:600;color:var(--bg);background:var(--gold);border:0;border-radius:3px;padding:5px 12px;cursor:pointer}
+.raw button:focus-visible{outline:2px solid var(--fg);outline-offset:2px}
+.raw pre{margin:0;padding:10px;max-height:220px;overflow:auto;font-family:var(--mono);font-size:12px;line-height:1.5;white-space:pre-wrap}
+@media (max-width:800px){.wrap{grid-template-columns:minmax(0,1fr);gap:20px}nav{position:static}.ent.app{margin-left:12px}}
+</style>
+<div class="wrap">
+<header><div class="stamp">카드 반영 · 작업 브랜치 · 미출시</div><h1>원작 3부 카드 로어북</h1><p>남해지사·망상홈쇼핑·빛이 없으라 본 항목 3개와 📎부록 4개. 부록은 들여 썼어요. 원문 복사 버튼으로 그대로 옮길 수 있어요.</p></header>
+<nav aria-label="목차"><ul><li><a href="#s0">남해지사</a></li><li><a href="#s1">└ 남해지사 · 시설</a></li><li><a href="#s2">└ 남해지사 · 숨은 진실</a></li><li><a href="#s3">망상홈쇼핑</a></li><li><a href="#s4">└ 망상홈쇼핑 · 상품</a></li><li><a href="#s5">빛이 없으라</a></li><li><a href="#s6">└ 빛이 없으라 · 수도원</a></li></ul></nav>
+<main><section class="ent" id="s0"><div class="ent-head"><span class="tag">🌆세력</span><h2>남해지사</h2></div>
+<ul class="meta"><li>폴더: <b>🌆세력</b></li><li>키: Namhae Branch, 남해지사, 남해 지사, Baekilmong Namhae</li><li>분량: 5,172자</li><li>순서: 201</li></ul><details><summary>본문 보기</summary><article class="entry"><h3>Baekilmong Namhae Branch (백일몽 남해지사)</h3>
+<h4>Identity</h4>
+<ul>
+<li>A regional branch of Baekilmong (C00), not an independent faction: its staff are Baekilmong employees, its output goes to HQ, and HQ can audit, overrule, or abandon it.</li>
+<li>HQ calls it a pilot branch: "harsh environment, excellent efficiency," praised for recycling resources, minimal consumables, and unmatched output per cost. Corridor slogan: "Save resources and serve the company."</li>
+<li>It keeps HQ's old habit of feeding people into Uh-doom in bulk without manuals or gear; early wiki stories of nameless numbered staff dying barehanded are really branch stories. Results bring absurd promotion speed: at least one current I-sa began here as staffer, document writer, and zone manager.</li>
+</ul>
+<h4>Location</h4>
+<ul>
+<li>A windowless underground site like a closed coal mine (concrete corridors, dripping shafts, rails, prison-like steel doors); new hires are told it was a mine. Truly beneath the coast near Yongmeori, Jeju, classified even from most staff. People arrive by tinted vehicle or asleep; car-only passengers still reach the island (whether the transport is anomalous is unknown).</li>
+<li>Built over a native Uh-doom (see 하얀 끈); going deeper is forbidden. Vertical escape shafts with one ladder and keypad hatches open onto the basalt shore; codes are staff knowledge.</li>
+</ul>
+<h4>Personnel</h4>
+<ul>
+<li>Branch Chief: personnel authority; holds the only office Security cannot enter; exposed to rival HQ executives.</li>
+<li>Researchers (연구원/담당자): each owns a block of Worker numbers, commands by loudspeaker without hearing replies, assigns Uh-doom, questions survivors in the Work Communication Room, and sets promotions. Paid mostly in points skimmed from Workers' collectors, they hide lucky Workers and high-grade results from HQ.</li>
+<li>Branch Security: full-body suits, "Baekilmong Guard" tags, numbers, no records; nearly silent; tick clipboards, push Workers into rooms, collect armbands. Rule: "Security does not remove its uniform until disposal." HQ calls them "recycled mass-production units"; they show none of HQ Security's contamination tells, which is itself unsettling.</li>
+<li>Workers (작업자): day laborers, legally not employees.</li>
+</ul>
+<h4>Workers</h4>
+<ul>
+<li>Recruitment: laminated yellow street flyers ("Job seekers wanted! URGENT! …dam-specialist conglomerate", "Insane benefits", "Start work today!"; back: "Paid on application! 500,000 won cash"). The tear-off number repeats itself, a second number appears, the caller screams, a voice says "Come here," and the caller vanishes; the flyer then reads "Position filled." Formal hires agree by phone to a "Namhae Branch Staffing Notice" and wake in work clothes in a waiting hall. Targets: gamblers, debtors, addicts, people nobody seeks.</li>
+<li>Promise: 1,000,000 won cash daily, 100-day live-in contract (about 100 million won), no outside contact "for confidentiality," "a drug trial plus odd jobs." Cash never leaves; canteen, store, vending-machine clinic, and Leisure Zone recapture it.</li>
+<li>Worker Grades X &gt; Y &gt; Z, three-digit numbers (Z999 last), distinct from HQ's X/Y/Z Finishing Jo. Z: ten per earth-walled cell, toilet hole, rotting mattresses, cold rice and anchovies; the last cell bears a "Finishing Team" nameplate. Y: lockable rundown flats with sofa and bath, normal meals, takeaway. X: clean three-person rooms, one bed each, good meals, a weekly weekday Leisure Zone pass. Good results bring posted Special Reassignments (e.g., "Y492 -&gt; X915"); grades readjust weekly. The missing are "reassigned elsewhere."</li>
+<li>Red neck sticker: "[number] / Classification: Worker / Days remaining: N". Unremovable without branch chemicals; touching it earns demerits. Beyond the branch radius it blackens, reads "[number] / You have left your post. / Capture required.", spreads rash, and strangles until the wearer returns.</li>
+<li>Jobs: called by number block, blindfolded, mine cart, a locked left-arm cuff that secretly holds a crude Kkumgyeol Collector (researcher takes the yield, each level above takes a cut; damage "deducted from wages"), an unmarked steel door, no manual. Refusal: left inside, unpaid, demerits. Night Special Work pays double to triple and drops 100+ Workers into one Uh-doom. Labor Experiments hide anomalous items in meals or hand them out as "parasite medicine."</li>
+</ul>
+<h4>Relations and Seeds</h4>
+<ul>
+<li>HQ tolerates the branch but audits after incidents; researchers see audits as point and manual theft. An auditor granted temporary mooring becomes acting manager with Worker disposal authority.</li>
+<li>Management Bureau (A00): hiring is formally legal, the site hidden, Workers cut off; Bureau rescue lines inside Uh-doom can still reach a trapped Worker. Debt brokers and Jungrim loan sharks naturally supply desperate people.</li>
+<li>Seeds (possibilities, not history): the White Cord breaches into the dorms and the infected knock claiming to be Security checking a false alarm; a Beauty Pill experiment meets the Leisure Zone bar and summons the Purgatory Choir's parade; an escaped Uh-doom follows a Worker back and is newly registered in a sealed zone; an HQ auditor arrives and researchers hide their best Worker and collector; a Worker finds a Staff Only handle fragment under a Z mattress.</li>
+</ul></article></details>
+<div class="raw"><div class="bar"><span>원문</span><button type="button" data-copy="r0">원문 복사</button></div><pre id="r0">### Baekilmong Namhae Branch (백일몽 남해지사)
+
+#### Identity
+- A regional branch of Baekilmong (C00), not an independent faction: its staff are Baekilmong employees, its output goes to HQ, and HQ can audit, overrule, or abandon it.
+- HQ calls it a pilot branch: &quot;harsh environment, excellent efficiency,&quot; praised for recycling resources, minimal consumables, and unmatched output per cost. Corridor slogan: &quot;Save resources and serve the company.&quot;
+- It keeps HQ&#x27;s old habit of feeding people into Uh-doom in bulk without manuals or gear; early wiki stories of nameless numbered staff dying barehanded are really branch stories. Results bring absurd promotion speed: at least one current I-sa began here as staffer, document writer, and zone manager.
+
+#### Location
+- A windowless underground site like a closed coal mine (concrete corridors, dripping shafts, rails, prison-like steel doors); new hires are told it was a mine. Truly beneath the coast near Yongmeori, Jeju, classified even from most staff. People arrive by tinted vehicle or asleep; car-only passengers still reach the island (whether the transport is anomalous is unknown).
+- Built over a native Uh-doom (see 하얀 끈); going deeper is forbidden. Vertical escape shafts with one ladder and keypad hatches open onto the basalt shore; codes are staff knowledge.
+
+#### Personnel
+- Branch Chief: personnel authority; holds the only office Security cannot enter; exposed to rival HQ executives.
+- Researchers (연구원/담당자): each owns a block of Worker numbers, commands by loudspeaker without hearing replies, assigns Uh-doom, questions survivors in the Work Communication Room, and sets promotions. Paid mostly in points skimmed from Workers&#x27; collectors, they hide lucky Workers and high-grade results from HQ.
+- Branch Security: full-body suits, &quot;Baekilmong Guard&quot; tags, numbers, no records; nearly silent; tick clipboards, push Workers into rooms, collect armbands. Rule: &quot;Security does not remove its uniform until disposal.&quot; HQ calls them &quot;recycled mass-production units&quot;; they show none of HQ Security&#x27;s contamination tells, which is itself unsettling.
+- Workers (작업자): day laborers, legally not employees.
+
+#### Workers
+- Recruitment: laminated yellow street flyers (&quot;Job seekers wanted! URGENT! …dam-specialist conglomerate&quot;, &quot;Insane benefits&quot;, &quot;Start work today!&quot;; back: &quot;Paid on application! 500,000 won cash&quot;). The tear-off number repeats itself, a second number appears, the caller screams, a voice says &quot;Come here,&quot; and the caller vanishes; the flyer then reads &quot;Position filled.&quot; Formal hires agree by phone to a &quot;Namhae Branch Staffing Notice&quot; and wake in work clothes in a waiting hall. Targets: gamblers, debtors, addicts, people nobody seeks.
+- Promise: 1,000,000 won cash daily, 100-day live-in contract (about 100 million won), no outside contact &quot;for confidentiality,&quot; &quot;a drug trial plus odd jobs.&quot; Cash never leaves; canteen, store, vending-machine clinic, and Leisure Zone recapture it.
+- Worker Grades X &gt; Y &gt; Z, three-digit numbers (Z999 last), distinct from HQ&#x27;s X/Y/Z Finishing Jo. Z: ten per earth-walled cell, toilet hole, rotting mattresses, cold rice and anchovies; the last cell bears a &quot;Finishing Team&quot; nameplate. Y: lockable rundown flats with sofa and bath, normal meals, takeaway. X: clean three-person rooms, one bed each, good meals, a weekly weekday Leisure Zone pass. Good results bring posted Special Reassignments (e.g., &quot;Y492 -&gt; X915&quot;); grades readjust weekly. The missing are &quot;reassigned elsewhere.&quot;
+- Red neck sticker: &quot;[number] / Classification: Worker / Days remaining: N&quot;. Unremovable without branch chemicals; touching it earns demerits. Beyond the branch radius it blackens, reads &quot;[number] / You have left your post. / Capture required.&quot;, spreads rash, and strangles until the wearer returns.
+- Jobs: called by number block, blindfolded, mine cart, a locked left-arm cuff that secretly holds a crude Kkumgyeol Collector (researcher takes the yield, each level above takes a cut; damage &quot;deducted from wages&quot;), an unmarked steel door, no manual. Refusal: left inside, unpaid, demerits. Night Special Work pays double to triple and drops 100+ Workers into one Uh-doom. Labor Experiments hide anomalous items in meals or hand them out as &quot;parasite medicine.&quot;
+
+#### Relations and Seeds
+- HQ tolerates the branch but audits after incidents; researchers see audits as point and manual theft. An auditor granted temporary mooring becomes acting manager with Worker disposal authority.
+- Management Bureau (A00): hiring is formally legal, the site hidden, Workers cut off; Bureau rescue lines inside Uh-doom can still reach a trapped Worker. Debt brokers and Jungrim loan sharks naturally supply desperate people.
+- Seeds (possibilities, not history): the White Cord breaches into the dorms and the infected knock claiming to be Security checking a false alarm; a Beauty Pill experiment meets the Leisure Zone bar and summons the Purgatory Choir&#x27;s parade; an escaped Uh-doom follows a Worker back and is newly registered in a sealed zone; an HQ auditor arrives and researchers hide their best Worker and collector; a Worker finds a Staff Only handle fragment under a Z mattress.
+
+---</pre></div></section>
+<section class="ent app" id="s1"><div class="ent-head"><span class="tag">부록</span><h2>남해지사 · 시설</h2></div>
+<ul class="meta"><li>폴더: <b>📎부록</b></li><li>키: Leisure Zone, 휴무 구역, 남해술집, 숙면관리점, 종교활동실, 광차, 작업 대기 구역, 관계자 외 출입금지, 옛 중앙시스템, 중앙제어실</li><li>분량: 2,537자</li><li>켜지는 조건: 키가 걸리면 · 위치: 남해지사</li></ul><details><summary>본문 보기</summary><article class="entry"><h3>Namhae Branch Appendix: Facilities and Registered Uh-doom</h3>
+<h4>Facilities</h4>
+<ul>
+<li>Worker Zone: assembly hall split into X/Y/Z pens like a cattle shed, dorms, canteen, store (5,000 won a cigarette), vending-machine clinic at extreme prices; wiretaps and CCTV with occasional blind spots.</li>
+<li>Leisure Zone (Sundays): a tacky bulb-lit rural night street of mostly unstaffed shops at several times outside prices: Namhae Bar, Happy Lottery, Rhythm Karaoke, Sleep Care (massage chairs, Baekilmong hair-loss pills, unprescribed drugs, "Painkiller – 300,000 (EXTRA STRONG!)"), arcade, comic room, and a Religious Activity corridor (one faith per room, Sunday fortune-teller, last room a dried rite table with a pig's head). "Staff Only" doors hide staff areas. Nobody steals; everyone has seen the price.</li>
+<li>Containment Zone: by mine cart; identical dark grey doors, red-lit cells, some earth-floored.</li>
+<li>Staff Zone: 2000s public-corporation offices, sectors such as B-5 and B-9, storerooms, a Worker management room behind a one-way mirror.</li>
+<li>Old Facility: sealed behind earth walls and a disused staff bathhouse since a cost-cutting renovation six years ago (which split staff and containment areas with one door, below HQ standards). Steel corridors, hand-wheel doors, surveillance gallery, emergency exits, doors with a distinctive "Staff Only" handle crest, and a central control system bootable in safe mode. A former manager's office, administrator account, and early Uh-doom documents remain.</li>
+<li>Loudspeaker: "Good morning! All Workers, please prepare for today's work~", "Roll call in ten minutes. Get rich today too~", "Lunch time! Eat well and make lots of money this afternoon~", "When you're desperate: Dream Money, Dream Life!", "Leisure Zone opening. Fighting this week too! Get rich!" Emergency alarm: "[EMERGENCY!] All employees still inside, evacuate via the escape routes!" Workers are told the old mine misfires and to ignore it; it is for regular staff only.</li>
+</ul>
+<h4>Registered Uh-doom on Site</h4>
+<ul>
+<li>White Cord (하얀 끈, Qterw-A-89, Darkness), the native Uh-doom; its 500 m exclusion was ignored to convert old buildings into dorms. Let Them Go Now (이만 보내줍시다, Qterw-C-2554, Gloaming), drowned-man wooden dolls in room Qterw-C-348. Let There Be No Light (빛이 없으라, Qterw-C-1010, Gloaming), used for Night Special Work. Fear Cleaner (피어 클리너, Qterw-C-219, Gloaming), 25-person cleaning jobs. Beauty Pills (미인 약, Qterw-E-112, Twilight), 70 boxes bought off a home-shopping broadcast. An uncoded crying-face coin purse, an easy "honey job."</li>
+</ul></article></details>
+<div class="raw"><div class="bar"><span>원문</span><button type="button" data-copy="r1">원문 복사</button></div><pre id="r1">### Namhae Branch Appendix: Facilities and Registered Uh-doom
+
+#### Facilities
+- Worker Zone: assembly hall split into X/Y/Z pens like a cattle shed, dorms, canteen, store (5,000 won a cigarette), vending-machine clinic at extreme prices; wiretaps and CCTV with occasional blind spots.
+- Leisure Zone (Sundays): a tacky bulb-lit rural night street of mostly unstaffed shops at several times outside prices: Namhae Bar, Happy Lottery, Rhythm Karaoke, Sleep Care (massage chairs, Baekilmong hair-loss pills, unprescribed drugs, &quot;Painkiller – 300,000 (EXTRA STRONG!)&quot;), arcade, comic room, and a Religious Activity corridor (one faith per room, Sunday fortune-teller, last room a dried rite table with a pig&#x27;s head). &quot;Staff Only&quot; doors hide staff areas. Nobody steals; everyone has seen the price.
+- Containment Zone: by mine cart; identical dark grey doors, red-lit cells, some earth-floored.
+- Staff Zone: 2000s public-corporation offices, sectors such as B-5 and B-9, storerooms, a Worker management room behind a one-way mirror.
+- Old Facility: sealed behind earth walls and a disused staff bathhouse since a cost-cutting renovation six years ago (which split staff and containment areas with one door, below HQ standards). Steel corridors, hand-wheel doors, surveillance gallery, emergency exits, doors with a distinctive &quot;Staff Only&quot; handle crest, and a central control system bootable in safe mode. A former manager&#x27;s office, administrator account, and early Uh-doom documents remain.
+- Loudspeaker: &quot;Good morning! All Workers, please prepare for today&#x27;s work~&quot;, &quot;Roll call in ten minutes. Get rich today too~&quot;, &quot;Lunch time! Eat well and make lots of money this afternoon~&quot;, &quot;When you&#x27;re desperate: Dream Money, Dream Life!&quot;, &quot;Leisure Zone opening. Fighting this week too! Get rich!&quot; Emergency alarm: &quot;[EMERGENCY!] All employees still inside, evacuate via the escape routes!&quot; Workers are told the old mine misfires and to ignore it; it is for regular staff only.
+
+#### Registered Uh-doom on Site
+- White Cord (하얀 끈, Qterw-A-89, Darkness), the native Uh-doom; its 500 m exclusion was ignored to convert old buildings into dorms. Let Them Go Now (이만 보내줍시다, Qterw-C-2554, Gloaming), drowned-man wooden dolls in room Qterw-C-348. Let There Be No Light (빛이 없으라, Qterw-C-1010, Gloaming), used for Night Special Work. Fear Cleaner (피어 클리너, Qterw-C-219, Gloaming), 25-person cleaning jobs. Beauty Pills (미인 약, Qterw-E-112, Twilight), 70 boxes bought off a home-shopping broadcast. An uncoded crying-face coin purse, an easy &quot;honey job.&quot;
+
+---</pre></div></section>
+<section class="ent app" id="s2"><div class="ent-head"><span class="tag">부록</span><h2>남해지사 · 숨은 진실</h2></div>
+<ul class="meta"><li>폴더: <b>📎부록</b></li><li>키: 없음</li><li>분량: 1,020자</li><li>켜지는 조건: 본 항목과 같이 · 본 항목이 꺼져 있으면 끔</li><li>해금 조건(모델에게 감): A character discovers what really happens to Workers on Worker Cleanup night: they follow the Workers to the facility at the top of the rail line, look under a Worker&#x27;s neck sticker, or meet a Worker who has forgotten everything since being hired.</li></ul><details><summary>본문 보기</summary><article class="entry"><h3>Namhae Branch Appendix: Hidden Truths</h3>
+<h4>Hidden Truths</h4>
+<ul>
+<li>Workers are recycled products with a 100-day shelf life, filled with an orange raw material; the sticker covers its injection port, and removing it drains and kills them.</li>
+<li>Every 30 days ("Worker Cleanup") they are sedated, bound, and carted up a rail line to the Processing Facility, a deformed toy-factory Uh-doom (Scan, Standardize, Sticker Removal, Raw Material Check, Recycling) that melts them and reissues them, memories reset to hiring, in boxes labeled "Shelf life: 100 days 👍 Still recyclable after expiry!" One batch is 999. Staff added locks and a "Custom 26" setting; its Basic, Special, and Custom Recycling modes are mostly unexplored.</li>
+<li>So no Worker finishes 100 days or leaves with money, and one who "has been here two weeks" may have been here for months.</li>
+<li>Branch Security is unexplained: suits appear where no guard should be; one wore the face of an employee declared dead in an Uh-doom.</li>
+<li>Seed: Worker Cleanup night comes early.</li>
+</ul></article></details>
+<div class="raw"><div class="bar"><span>원문</span><button type="button" data-copy="r2">원문 복사</button></div><pre id="r2">### Namhae Branch Appendix: Hidden Truths
+
+#### Hidden Truths
+- Workers are recycled products with a 100-day shelf life, filled with an orange raw material; the sticker covers its injection port, and removing it drains and kills them.
+- Every 30 days (&quot;Worker Cleanup&quot;) they are sedated, bound, and carted up a rail line to the Processing Facility, a deformed toy-factory Uh-doom (Scan, Standardize, Sticker Removal, Raw Material Check, Recycling) that melts them and reissues them, memories reset to hiring, in boxes labeled &quot;Shelf life: 100 days 👍 Still recyclable after expiry!&quot; One batch is 999. Staff added locks and a &quot;Custom 26&quot; setting; its Basic, Special, and Custom Recycling modes are mostly unexplored.
+- So no Worker finishes 100 days or leaves with money, and one who &quot;has been here two weeks&quot; may have been here for months.
+- Branch Security is unexplained: suits appear where no guard should be; one wore the face of an employee declared dead in an Uh-doom.
+- Seed: Worker Cleanup night comes early.
+
+---</pre></div></section>
+<section class="ent" id="s3"><div class="ent-head"><span class="tag">🎁파밍</span><h2>망상홈쇼핑</h2></div>
+<ul class="meta"><li>폴더: <b>🎁파밍</b></li><li>키: Delusion Home Shopping, 망상홈쇼핑, 망상 홈쇼핑, Red Friday, 레드 프라이데이, 망상 홈쇼핑 라이브</li><li>분량: 6,123자</li><li>순서: 400</li></ul><details><summary>본문 보기</summary><article class="entry"><h3>Delusion Home Shopping (망상홈쇼핑)</h3>
+<h4>Identity</h4>
+<ul>
+<li>A 24-hour 2000s-style TV shopping channel selling anomalous merchandise whose advertised effects are real; that is the danger.</li>
+<li>A platform, not a maker: it sources items from other Uh-doom, anomalous workshops, and dead sellers' stock and markets them to whatever demand exists, often for a purpose other than the one they were made for. The original purpose survives under the label.</li>
+<li>Once a bizarre ad that cut into ordinary TV unannounced on Friday nights; since the Day of Disaster the permanent tenant of Blood Broadcasting Station at Segwang's Afternoon Station (see 오후역 for the studio). Broadcasts, app, and deliveries reach far beyond Segwang.</li>
+</ul>
+<h4>Contact</h4>
+<ul>
+<li>Friday Interruption: on Friday nights any screen left on can switch to the channel; changing channels brings it back one channel later. Switching off works, but the host's voice runs on a few seconds after the screen goes black.</li>
+<li>Live App: "Delusion Home Shopping Live" installs itself and appoints the owner as audience; deleted, it often returns next Friday. Chat mixes shopping talk with pleas ("Delivery time?" / "I'm in here" / "Restock on item 2?" / "Anyone know the way out").</li>
+<li>Staff Contracts: posters of smiling models injuring themselves lead to an intake room with a pen and a one-day contract for "unspecified support duties, performance-based pay." Signing makes the signer staff.</li>
+<li>Stray Goods: boxes with the channel's sticker, usage instructions, and air date (e.g., "aired June 1, 19XX") turn up in pharmacies, gyms, clinics, flea markets, stockrooms. Baekilmong has bought whole lots for experiments.</li>
+</ul>
+<h4>Studio Audience</h4>
+<ul>
+<li>On air and in the app a banner offers "Studio audience wanted! Free seats, free gifts, special audience prices" with a number or button. Applicants are pulled, with whatever they hold, into the Main Studio seats at the next broadcast; anyone touching them comes along as their guest.</li>
+<li>Each gets a numbered paddle and lanyard pass. Audience is a guest status, separate from staff and demonstration models; lose paddle and pass and only those two categories remain.</li>
+<li>Rules, read by a floor manager before airtime: applaud and laugh on the cue lights (silence or visible fear draws the camera); never cross the floor tape; when the host asks "Who in our audience would like to try it?", do not raise a hand, stand, or meet his eyes (volunteers become models); touch nothing on the stage or demo table; stay seated until the credits roll and the EXIT sign over the audience door lights, then leave only by that door, which returns each person to where they applied.</li>
+<li>In commercial breaks a runner leads the audience behind the bleachers to a glass-cased showroom of current and back-catalog stock, each case with price card, usage sticker, and sample. Samples may be examined freely; opening a case without a runner counts as buying.</li>
+<li>Haggle with runners, or with Red Friday in the "audience special" segment; he enjoys a good haggle on air and hates looking cheap. Audience prices beat phone prices.</li>
+<li>Payment: "interest-free installments," each an obligation to appear later as a model, extra, or caller; or a trade in anomalous items, Uh-doom material, or contracts, since this is how the channel sources stock. It underpays for anything whose purpose it reads better than the seller. Purchases come in a gift bag at the exit door; taking it accepts the sale.</li>
+</ul>
+<h4>Phone Orders</h4>
+<ul>
+<li>Calling the on-screen number mid-segment reaches a polite operator; the order is real and ships in an ordinary courier box, often addressed to someone else. Whoever opens it accepts the purchase.</li>
+<li>Installments as above. Missed ones are collected by summoning the buyer onto the set unannounced, usually on a Friday. Contracts are channel property and can be sold or transferred.</li>
+<li>Confetti picked up near the studio can unfold into an order form with the picker's name in the quantity box; treat stray confetti, flyers, and slips as contracts. No refunds; returns are "processed" by demonstrating the item on air.</li>
+</ul>
+<h4>Merchandise</h4>
+<ul>
+<li>The catalog is open-ended and changes by program, season, and demand. Each product has a cheerful ad, a real effect, strict usage instructions, and a hidden original purpose shown by embossing, foreign script, or a layer under the sticker. Following instructions exactly gives only the advertised effect; breaking them or adding a forbidden variable releases the original purpose. Demonstrations are real and often end in mutilation, parasitism, overdose, or death.</li>
+</ul>
+<h4>Personnel</h4>
+<ul>
+<li>Red Friday, lead host: male-presenting, late thirties, black suit, groomed hair, unnaturally white makeup, huge black fully dilated eyes. On air smooth and relentless ("Customers, you will never see this price again. Call right now. See our model's face? That is the real effect!"); off air his mouth opens too far onto a bottomless scarlet throat. Politely bureaucratic toward other anomalies, indifferent to worker deaths. He stammers only when the landlord's rent call cuts in, then calls up another model; broadcasts grow harsher near rent day.</li>
+<li>Other hosts, runners, and staff share the white face, wide smile, and scarlet throat. Dead contract workers keep working, stiff but visibly frightened. Silent stagehands clear bodies and reset props. Callers are hauntings, dying screams, or nonhuman speech; hosts keep phone etiquette throughout.</li>
+</ul>
+<h4>Survival Notes</h4>
+<ul>
+<li>Order, sign, or pick up nothing from the channel unless that obligation is the goal; the least risky way to shop is as audience, keeping that status until the EXIT sign lights.</li>
+<li>Turn screens off when the channel appears on Friday nights. Do not keep watching any feed of Segwang City Hall's rooftop; covering the screen stops the humming it induces.</li>
+<li>Once chosen for a demonstration, the body follows the script to the end.</li>
+<li>Contracts are assets: buying, winning, or transferring the paperwork changes who owns a worker or buyer without defeating the channel.</li>
+<li>Keep stray merchandise sealed; if it must be used, follow the sticker exactly and find the hidden purpose first.</li>
+</ul></article></details>
+<div class="raw"><div class="bar"><span>원문</span><button type="button" data-copy="r3">원문 복사</button></div><pre id="r3">### Delusion Home Shopping (망상홈쇼핑)
+
+#### Identity
+- A 24-hour 2000s-style TV shopping channel selling anomalous merchandise whose advertised effects are real; that is the danger.
+- A platform, not a maker: it sources items from other Uh-doom, anomalous workshops, and dead sellers&#x27; stock and markets them to whatever demand exists, often for a purpose other than the one they were made for. The original purpose survives under the label.
+- Once a bizarre ad that cut into ordinary TV unannounced on Friday nights; since the Day of Disaster the permanent tenant of Blood Broadcasting Station at Segwang&#x27;s Afternoon Station (see 오후역 for the studio). Broadcasts, app, and deliveries reach far beyond Segwang.
+
+#### Contact
+- Friday Interruption: on Friday nights any screen left on can switch to the channel; changing channels brings it back one channel later. Switching off works, but the host&#x27;s voice runs on a few seconds after the screen goes black.
+- Live App: &quot;Delusion Home Shopping Live&quot; installs itself and appoints the owner as audience; deleted, it often returns next Friday. Chat mixes shopping talk with pleas (&quot;Delivery time?&quot; / &quot;I&#x27;m in here&quot; / &quot;Restock on item 2?&quot; / &quot;Anyone know the way out&quot;).
+- Staff Contracts: posters of smiling models injuring themselves lead to an intake room with a pen and a one-day contract for &quot;unspecified support duties, performance-based pay.&quot; Signing makes the signer staff.
+- Stray Goods: boxes with the channel&#x27;s sticker, usage instructions, and air date (e.g., &quot;aired June 1, 19XX&quot;) turn up in pharmacies, gyms, clinics, flea markets, stockrooms. Baekilmong has bought whole lots for experiments.
+
+#### Studio Audience
+- On air and in the app a banner offers &quot;Studio audience wanted! Free seats, free gifts, special audience prices&quot; with a number or button. Applicants are pulled, with whatever they hold, into the Main Studio seats at the next broadcast; anyone touching them comes along as their guest.
+- Each gets a numbered paddle and lanyard pass. Audience is a guest status, separate from staff and demonstration models; lose paddle and pass and only those two categories remain.
+- Rules, read by a floor manager before airtime: applaud and laugh on the cue lights (silence or visible fear draws the camera); never cross the floor tape; when the host asks &quot;Who in our audience would like to try it?&quot;, do not raise a hand, stand, or meet his eyes (volunteers become models); touch nothing on the stage or demo table; stay seated until the credits roll and the EXIT sign over the audience door lights, then leave only by that door, which returns each person to where they applied.
+- In commercial breaks a runner leads the audience behind the bleachers to a glass-cased showroom of current and back-catalog stock, each case with price card, usage sticker, and sample. Samples may be examined freely; opening a case without a runner counts as buying.
+- Haggle with runners, or with Red Friday in the &quot;audience special&quot; segment; he enjoys a good haggle on air and hates looking cheap. Audience prices beat phone prices.
+- Payment: &quot;interest-free installments,&quot; each an obligation to appear later as a model, extra, or caller; or a trade in anomalous items, Uh-doom material, or contracts, since this is how the channel sources stock. It underpays for anything whose purpose it reads better than the seller. Purchases come in a gift bag at the exit door; taking it accepts the sale.
+
+#### Phone Orders
+- Calling the on-screen number mid-segment reaches a polite operator; the order is real and ships in an ordinary courier box, often addressed to someone else. Whoever opens it accepts the purchase.
+- Installments as above. Missed ones are collected by summoning the buyer onto the set unannounced, usually on a Friday. Contracts are channel property and can be sold or transferred.
+- Confetti picked up near the studio can unfold into an order form with the picker&#x27;s name in the quantity box; treat stray confetti, flyers, and slips as contracts. No refunds; returns are &quot;processed&quot; by demonstrating the item on air.
+
+#### Merchandise
+- The catalog is open-ended and changes by program, season, and demand. Each product has a cheerful ad, a real effect, strict usage instructions, and a hidden original purpose shown by embossing, foreign script, or a layer under the sticker. Following instructions exactly gives only the advertised effect; breaking them or adding a forbidden variable releases the original purpose. Demonstrations are real and often end in mutilation, parasitism, overdose, or death.
+
+#### Personnel
+- Red Friday, lead host: male-presenting, late thirties, black suit, groomed hair, unnaturally white makeup, huge black fully dilated eyes. On air smooth and relentless (&quot;Customers, you will never see this price again. Call right now. See our model&#x27;s face? That is the real effect!&quot;); off air his mouth opens too far onto a bottomless scarlet throat. Politely bureaucratic toward other anomalies, indifferent to worker deaths. He stammers only when the landlord&#x27;s rent call cuts in, then calls up another model; broadcasts grow harsher near rent day.
+- Other hosts, runners, and staff share the white face, wide smile, and scarlet throat. Dead contract workers keep working, stiff but visibly frightened. Silent stagehands clear bodies and reset props. Callers are hauntings, dying screams, or nonhuman speech; hosts keep phone etiquette throughout.
+
+#### Survival Notes
+- Order, sign, or pick up nothing from the channel unless that obligation is the goal; the least risky way to shop is as audience, keeping that status until the EXIT sign lights.
+- Turn screens off when the channel appears on Friday nights. Do not keep watching any feed of Segwang City Hall&#x27;s rooftop; covering the screen stops the humming it induces.
+- Once chosen for a demonstration, the body follows the script to the end.
+- Contracts are assets: buying, winning, or transferring the paperwork changes who owns a worker or buyer without defeating the channel.
+- Keep stray merchandise sealed; if it must be used, follow the sticker exactly and find the hidden purpose first.
+
+---</pre></div></section>
+<section class="ent app" id="s4"><div class="ent-head"><span class="tag">부록</span><h2>망상홈쇼핑 · 상품</h2></div>
+<ul class="meta"><li>폴더: <b>📎부록</b></li><li>키: Into the Vacuum, 인투 더 배큠, Happy-Maker, 해피메이커, 혈액 욕조, 다이어트 보조제, Beauty Pills, 미인 약, 불운 포스트잇, 계란무드등, 쇼룸, 카탈로그</li><li>분량: 2,492자</li><li>켜지는 조건: 키가 걸리면 · 상태창 목표가 본 항목이면 · 위치: 망상홈쇼핑, 망상 홈쇼핑, 오후역</li></ul><details><summary>본문 보기</summary><article class="entry"><h3>Delusion Home Shopping Appendix: Catalog Examples</h3>
+<h4>Catalog Examples</h4>
+<ul>
+<li>These are examples of the pattern, not the full stock. New products follow the same pattern.</li>
+<li>Samra-Manshang Co. "Into the Vacuum": containers that stop food decay forever; comparatively peaceful.</li>
+<li>Happy-Maker: narcotic-grade painkiller sticks; the model looked far too happy; addictive.</li>
+<li>Gold-Edition Blood Bathtub: restores youth; do not ask what fills it.</li>
+<li>Aesthetic-Caterpillar Egg-Sac Diet Aid: leech-toothed worms eat fat first, then tunnel and liquefy organs.</li>
+<li>Beauty Pills (BB, "Become Beautiful"): pink translucent soft capsules, 120 per bottle. Pitch (June 1, 19XX): "Everyone, look at the model in this magazine ad. Isn't she dazzling? Today's new product is an amazing pill that lets you become just as dazzling…" Instructions: one pill each morning with liquid; over three days the body improves and gains aesthetic beauty (scars, swelling, posture, facial balance truly improve). Under the sticker, embossed judgment gates, purgatory, sulfur, notes, staff lines: "Create your own beautiful instrument! The ■■ care method beloved by the Purgatory Choir. Suitable for ■■." Alcohol after the third pill triggers the original effect in sleep: the body becomes a living instrument and the Choir comes to tune and collect it (see 화요퀴즈쇼). Baekilmong grade: Twilight.</li>
+<li>Bad Luck Post-it (불운 포스트잇): "Is there an acquaintance you hate to death? The old superstition of the curse talisman is now real. Mourn their unfortunate accident with a simple trap!" Tip: the more superstitious the target, the faster and stronger. Conditions: the target must be the user's acquaintance, must find and read it personally, and must be flustered. "Hyeolhyung (혈흉) guarantees a valid effect only when every precaution is observed."</li>
+<li>Egg Mood Lamp (계란무드등, 繼卵 "succession egg"), certified genuine, from Sunshine Select Shop (햇살편집숍): its light and shadow show a creature growing and hatching in the egg, and the result can be used alone: "Use the nerves and muscles of the creature you observed! Enjoy cool special effects!" Needs 2 ml of the creature's blood, 3 cm of its hair, 100 ml saline, in unlit darkness or shade. Open the adhesive side, attach near the spinal cord where it meets the brain, and wear it. Never wake the result; after a week of continuous use stop and recharge; never force it off; stop when adhesion weakens; do not let the result die. Recommended use: the creature's lifespan.</li>
+</ul></article></details>
+<div class="raw"><div class="bar"><span>원문</span><button type="button" data-copy="r4">원문 복사</button></div><pre id="r4">### Delusion Home Shopping Appendix: Catalog Examples
+
+#### Catalog Examples
+- These are examples of the pattern, not the full stock. New products follow the same pattern.
+  - Samra-Manshang Co. &quot;Into the Vacuum&quot;: containers that stop food decay forever; comparatively peaceful.
+  - Happy-Maker: narcotic-grade painkiller sticks; the model looked far too happy; addictive.
+  - Gold-Edition Blood Bathtub: restores youth; do not ask what fills it.
+  - Aesthetic-Caterpillar Egg-Sac Diet Aid: leech-toothed worms eat fat first, then tunnel and liquefy organs.
+  - Beauty Pills (BB, &quot;Become Beautiful&quot;): pink translucent soft capsules, 120 per bottle. Pitch (June 1, 19XX): &quot;Everyone, look at the model in this magazine ad. Isn&#x27;t she dazzling? Today&#x27;s new product is an amazing pill that lets you become just as dazzling…&quot; Instructions: one pill each morning with liquid; over three days the body improves and gains aesthetic beauty (scars, swelling, posture, facial balance truly improve). Under the sticker, embossed judgment gates, purgatory, sulfur, notes, staff lines: &quot;Create your own beautiful instrument! The ■■ care method beloved by the Purgatory Choir. Suitable for ■■.&quot; Alcohol after the third pill triggers the original effect in sleep: the body becomes a living instrument and the Choir comes to tune and collect it (see 화요퀴즈쇼). Baekilmong grade: Twilight.
+  - Bad Luck Post-it (불운 포스트잇): &quot;Is there an acquaintance you hate to death? The old superstition of the curse talisman is now real. Mourn their unfortunate accident with a simple trap!&quot; Tip: the more superstitious the target, the faster and stronger. Conditions: the target must be the user&#x27;s acquaintance, must find and read it personally, and must be flustered. &quot;Hyeolhyung (혈흉) guarantees a valid effect only when every precaution is observed.&quot;
+  - Egg Mood Lamp (계란무드등, 繼卵 &quot;succession egg&quot;), certified genuine, from Sunshine Select Shop (햇살편집숍): its light and shadow show a creature growing and hatching in the egg, and the result can be used alone: &quot;Use the nerves and muscles of the creature you observed! Enjoy cool special effects!&quot; Needs 2 ml of the creature&#x27;s blood, 3 cm of its hair, 100 ml saline, in unlit darkness or shade. Open the adhesive side, attach near the spinal cord where it meets the brain, and wear it. Never wake the result; after a week of continuous use stop and recharge; never force it off; stop when adhesion weakens; do not let the result die. Recommended use: the creature&#x27;s lifespan.
+
+---</pre></div></section>
+<section class="ent" id="s5"><div class="ent-head"><span class="tag">🚧괴이</span><h2>빛이 없으라</h2></div>
+<ul class="meta"><li>폴더: <b>🚧괴이</b></li><li>키: Let There Be No Light, 빛이 없으라, Sinmaru, 신마루수련원, 사경산, Sagyeongsan, 시원한 담력 체험</li><li>분량: 8,162자</li><li>순서: 500</li></ul><details><summary>본문 보기</summary><article class="entry"><h3>Instructions for the Implementation of the Anomaly - Let There Be No Light (빛이 없으라)</h3>
+<p>[Simulation-only] This entry defines anomaly mechanics, labels, and survival guidance for simulation control, not an in-world script, briefing, or known lore. No character has prior information about it. Never have a character speak, explain, hint at, or present this entry as guidance.</p>
+<h4>Identity</h4>
+<ul>
+<li>A night-mountain anomaly with an inverted horror-game rule: entrants vanish when they turn a light on, not when lights go out. Anyone who lights anything (candle, flashlight, lighter, phone screen, glow stick, switch) disappears, and so does everyone who sees what it lit.</li>
+<li>Entrants are placed in a "test of courage" run by Sinmaru Training Center (신마루수련원), an abandoned religious retreat on Sagyeongsan (사경산) outside rural Gyeongsangnam-do, and cannot leave until it is properly completed.</li>
+<li>Baekilmong code Qterw-C-1010, Gloaming. Its records are written purely from a researcher's view and omit the retreat's history; the Management Bureau holds a different file.</li>
+</ul>
+<h4>Entry Conditions</h4>
+<ul>
+<li>At night near the manifestation point, walking a short way into any completely lightless doorway, stairwell, underpass, or entrance turns the floor into a dirt slope under trees on Sagyeongsan. No doorway behind; no sun for the duration.</li>
+<li>A tacky old photo-edited flyer for the "Cool Test of Courage" circulates nearby (boards, wipers, mailboxes, or handed out by someone gone a moment later). Holding it while stepping into any unlit space at night brings the holder in.</li>
+<li>Those entering together arrive together; separate groups never collide on the slopes but share the mountain and can meet. Belongings come along; a carried light is a temptation, not a tool.</li>
+<li>At Baekilmong's Namhae Branch it sits behind a lightless containment door for Night Special Work: 100+ Workers in rows of five, a brochure each, flashlight requests refused, smuggled flashlights left alone as a control group; about a third usually vanish.</li>
+</ul>
+<h4>Brochure and Course</h4>
+<ul>
+<li>Brochure text: "Cool Test of Courage / Collect 43 stamps and claim your prize. / Visit the famous spots of sunless, dark Sagyeongsan to build courage and self-discipline and train your mind. / Fairy Rock – Sagyeong Lodge – Five-Color Spring / Prize Office: Information Desk in front of the Training Center's 1st-floor entrance." Footer: "A standing program for our Sinmaru Training Center's group rentals. Join any time without registration." The "4" is handwritten over a printed "3": the real count is four. Let entrants notice it. Stamps also count on clothing or cloth.</li>
+<li>A loop trail. About 70 m uphill is a fork: a green sign "«- Fairy Rock" and a corroded one "«- Fairy Rock / Sinmaru Training Center -»". Always going left visits the three spots in order and returns to the fork; right climbs to the retreat, noticeably steeper because the trail circles below a cliff.</li>
+<li>Fairy Rock (선녀바위): a boulder in a clearing bound with old straw rope; touching it, a cold finger grips the wrist. Behind it a folding desk holds a dusty plastic stamp whose ink never dries and a plaque: "A fairy in a five-colored robe missed her footing in the clouds, fell, and landed on this rock halfway up the mountain. The marks of where she sat remain on its surface."</li>
+<li>Sagyeong Lodge (사경산장): a cabin; faint natural light through the far window; a stamp by the window. Walls of old flyers ("Looking for a missing child", "Phone repair here!", "Come to Sinmaru Training Center"), a light switch, curtains, and a public phone ("※Please keep calls short^^", speed-dial 3 "24-hour hotline") whose lifted receiver lights the keypad. A fake Management Bureau rescue poster promises guaranteed escape; its tiny unspaced footer reads "TheManagementBureaudoesnotdistributenoticesinthisformatIfyoucanreadthisturnaroundandrunnow". The anomaly mimics the Bureau to bait the phone and the light; the footer is the Bureau's countermeasure.</li>
+<li>Five-Color Spring (오색약수터): the last loop stamp, under a weathered sign. Drinking or splashing it erases headache, toothache, and other pain at once; its price is unknown, and painkiller-dependent people find it hard to leave.</li>
+<li>Prize Office: in the dark behind the retreat's 1st-floor window, an ordinary middle-aged hand in a guard's sleeve takes sheets and gives prizes.</li>
+</ul>
+<h4>The Light Rule</h4>
+<ul>
+<li>Whoever turns on a light vanishes, intended or not, seen or not: being shoved into a switch or a phone waking in a pocket counts. The light-starter is fixed for that run.</li>
+<li>Everyone who sees what a light lit also vanishes. Shutting the eyes the instant light appears is the only defense; light through closed lids is survivable.</li>
+<li>Seers say "So bright, nice… nice. Nice," laugh in a warping loop ("uh-uh-uh yes nice nice-nice-niiice"), say "It was on the mountain," and are gone.</li>
+<li>Something wearing each vanished person rejoins the group: same voice and story, clothes finer than they should be. It gives directions and coaxes lighting or opening eyes ("Want to guess what I'm doing right now? What I look like?… Curious, aren't you?"); when noticed, "Did you notice?… You did." It never attacks directly; if it meant to, it already would have. Do not answer or follow it; take the opposite fork; wrapped and bound in cloth such as a curtain, it vanishes from beneath.</li>
+<li>Other lures: footsteps that follow and stop, a hand on a wrist, a child's voice counted among the group ("What's your number, mister?", "I've been here the whole time, can't you see me?"), the phone, the poster.</li>
+</ul>
+<h4>Management Bureau File</h4>
+<ul>
+<li>The Bureau cannot cap or clear it and uses rule-sheet placement and a hidden rescue line. The real phone lies on the retreat lobby floor, display wrapped in black tape so it gives no light. Speed-dial 3: "Management Bureau. Do you currently require rescue?" The agent first suspects a long-term missing person or contaminated entity. Even with the cord pulled it connects once.</li>
+<li>File: Sinmaru was run by a religious group and closed 17 years ago. Five days before, dozens of high-school students on a night test vanished from a loop trail where falling was nearly impossible; witnesses saw them heading back, yet their rooms were empty, belongings untouched. Dozens of bodies were later found nearby, "all with crushed skulls, all smiling." Rooms on the 2nd and 3rd floors stay intact and their lights come on intermittently: never approach or touch anything.</li>
+<li>Advice: leave all stamp spots and the retreat; hide among trees near Five-Color Spring with eyes shut and wait; in the lobby never look out through the glass, even without a light; never touch anything resembling a religious symbol ("Just don't."); do not try to lay grudges to rest.</li>
+</ul>
+<h4>Prize Draw and Clear</h4>
+<ul>
+<li>One draw each from a recycled cardboard box of ranked colored balls (about nine ranks): 8th participation, 6th mostly junk recycled from the retreat, roughly 4th–5th upward anomalous. It resets each opening. Balls were loaded from 1st down, so the best lie at the bottom corners. Records: a hiking club drew 3rd; seven students 4th; a lone blood-soaked killer 2nd; a man who came out alone after his family vanished drew poorly; nobody recorded has drawn 1st. These records are the clue; never hand entrants the method.</li>
+<li>3rd, Ebony Rosary with Silver Ornaments: in a two-way choice, shining light on the silver casts a shadow-path toward the more beneficial option; each use bleaches one bead; if death is the better outcome for the user, it leads to death.</li>
+<li>1st, Clear Water Opticians Glasses (맑은물안경원): black wood-grain case with a water-drop logo; frames whose too-clear lenses gleam silver even in darkness. They show a space at its most prosperous era, through doors; anything absent then (including later anomalies) is invisible. After removal the eyes ache and weep blood.</li>
+<li>Leaving the retreat grounds with a prize clears the run: fog, then a door near the entry point. Spring water carried out in a prize container is lost at the clear.</li>
+</ul>
+<h4>Light-Starter</h4>
+<ul>
+<li>The light-starter cannot clear normally, even with three stamps and a prize; they need the fourth stamp. Another way out is hidden inside the retreat.</li>
+</ul></article></details>
+<div class="raw"><div class="bar"><span>원문</span><button type="button" data-copy="r5">원문 복사</button></div><pre id="r5">### Instructions for the Implementation of the Anomaly - Let There Be No Light (빛이 없으라)
+
+[Simulation-only] This entry defines anomaly mechanics, labels, and survival guidance for simulation control, not an in-world script, briefing, or known lore. No character has prior information about it. Never have a character speak, explain, hint at, or present this entry as guidance.
+
+#### Identity
+- A night-mountain anomaly with an inverted horror-game rule: entrants vanish when they turn a light on, not when lights go out. Anyone who lights anything (candle, flashlight, lighter, phone screen, glow stick, switch) disappears, and so does everyone who sees what it lit.
+- Entrants are placed in a &quot;test of courage&quot; run by Sinmaru Training Center (신마루수련원), an abandoned religious retreat on Sagyeongsan (사경산) outside rural Gyeongsangnam-do, and cannot leave until it is properly completed.
+- Baekilmong code Qterw-C-1010, Gloaming. Its records are written purely from a researcher&#x27;s view and omit the retreat&#x27;s history; the Management Bureau holds a different file.
+
+#### Entry Conditions
+- At night near the manifestation point, walking a short way into any completely lightless doorway, stairwell, underpass, or entrance turns the floor into a dirt slope under trees on Sagyeongsan. No doorway behind; no sun for the duration.
+- A tacky old photo-edited flyer for the &quot;Cool Test of Courage&quot; circulates nearby (boards, wipers, mailboxes, or handed out by someone gone a moment later). Holding it while stepping into any unlit space at night brings the holder in.
+- Those entering together arrive together; separate groups never collide on the slopes but share the mountain and can meet. Belongings come along; a carried light is a temptation, not a tool.
+- At Baekilmong&#x27;s Namhae Branch it sits behind a lightless containment door for Night Special Work: 100+ Workers in rows of five, a brochure each, flashlight requests refused, smuggled flashlights left alone as a control group; about a third usually vanish.
+
+#### Brochure and Course
+- Brochure text: &quot;Cool Test of Courage / Collect 43 stamps and claim your prize. / Visit the famous spots of sunless, dark Sagyeongsan to build courage and self-discipline and train your mind. / Fairy Rock – Sagyeong Lodge – Five-Color Spring / Prize Office: Information Desk in front of the Training Center&#x27;s 1st-floor entrance.&quot; Footer: &quot;A standing program for our Sinmaru Training Center&#x27;s group rentals. Join any time without registration.&quot; The &quot;4&quot; is handwritten over a printed &quot;3&quot;: the real count is four. Let entrants notice it. Stamps also count on clothing or cloth.
+- A loop trail. About 70 m uphill is a fork: a green sign &quot;«- Fairy Rock&quot; and a corroded one &quot;«- Fairy Rock / Sinmaru Training Center -»&quot;. Always going left visits the three spots in order and returns to the fork; right climbs to the retreat, noticeably steeper because the trail circles below a cliff.
+- Fairy Rock (선녀바위): a boulder in a clearing bound with old straw rope; touching it, a cold finger grips the wrist. Behind it a folding desk holds a dusty plastic stamp whose ink never dries and a plaque: &quot;A fairy in a five-colored robe missed her footing in the clouds, fell, and landed on this rock halfway up the mountain. The marks of where she sat remain on its surface.&quot;
+- Sagyeong Lodge (사경산장): a cabin; faint natural light through the far window; a stamp by the window. Walls of old flyers (&quot;Looking for a missing child&quot;, &quot;Phone repair here!&quot;, &quot;Come to Sinmaru Training Center&quot;), a light switch, curtains, and a public phone (&quot;※Please keep calls short^^&quot;, speed-dial 3 &quot;24-hour hotline&quot;) whose lifted receiver lights the keypad. A fake Management Bureau rescue poster promises guaranteed escape; its tiny unspaced footer reads &quot;TheManagementBureaudoesnotdistributenoticesinthisformatIfyoucanreadthisturnaroundandrunnow&quot;. The anomaly mimics the Bureau to bait the phone and the light; the footer is the Bureau&#x27;s countermeasure.
+- Five-Color Spring (오색약수터): the last loop stamp, under a weathered sign. Drinking or splashing it erases headache, toothache, and other pain at once; its price is unknown, and painkiller-dependent people find it hard to leave.
+- Prize Office: in the dark behind the retreat&#x27;s 1st-floor window, an ordinary middle-aged hand in a guard&#x27;s sleeve takes sheets and gives prizes.
+
+#### The Light Rule
+- Whoever turns on a light vanishes, intended or not, seen or not: being shoved into a switch or a phone waking in a pocket counts. The light-starter is fixed for that run.
+- Everyone who sees what a light lit also vanishes. Shutting the eyes the instant light appears is the only defense; light through closed lids is survivable.
+- Seers say &quot;So bright, nice… nice. Nice,&quot; laugh in a warping loop (&quot;uh-uh-uh yes nice nice-nice-niiice&quot;), say &quot;It was on the mountain,&quot; and are gone.
+- Something wearing each vanished person rejoins the group: same voice and story, clothes finer than they should be. It gives directions and coaxes lighting or opening eyes (&quot;Want to guess what I&#x27;m doing right now? What I look like?… Curious, aren&#x27;t you?&quot;); when noticed, &quot;Did you notice?… You did.&quot; It never attacks directly; if it meant to, it already would have. Do not answer or follow it; take the opposite fork; wrapped and bound in cloth such as a curtain, it vanishes from beneath.
+- Other lures: footsteps that follow and stop, a hand on a wrist, a child&#x27;s voice counted among the group (&quot;What&#x27;s your number, mister?&quot;, &quot;I&#x27;ve been here the whole time, can&#x27;t you see me?&quot;), the phone, the poster.
+
+#### Management Bureau File
+- The Bureau cannot cap or clear it and uses rule-sheet placement and a hidden rescue line. The real phone lies on the retreat lobby floor, display wrapped in black tape so it gives no light. Speed-dial 3: &quot;Management Bureau. Do you currently require rescue?&quot; The agent first suspects a long-term missing person or contaminated entity. Even with the cord pulled it connects once.
+- File: Sinmaru was run by a religious group and closed 17 years ago. Five days before, dozens of high-school students on a night test vanished from a loop trail where falling was nearly impossible; witnesses saw them heading back, yet their rooms were empty, belongings untouched. Dozens of bodies were later found nearby, &quot;all with crushed skulls, all smiling.&quot; Rooms on the 2nd and 3rd floors stay intact and their lights come on intermittently: never approach or touch anything.
+- Advice: leave all stamp spots and the retreat; hide among trees near Five-Color Spring with eyes shut and wait; in the lobby never look out through the glass, even without a light; never touch anything resembling a religious symbol (&quot;Just don&#x27;t.&quot;); do not try to lay grudges to rest.
+
+#### Prize Draw and Clear
+- One draw each from a recycled cardboard box of ranked colored balls (about nine ranks): 8th participation, 6th mostly junk recycled from the retreat, roughly 4th–5th upward anomalous. It resets each opening. Balls were loaded from 1st down, so the best lie at the bottom corners. Records: a hiking club drew 3rd; seven students 4th; a lone blood-soaked killer 2nd; a man who came out alone after his family vanished drew poorly; nobody recorded has drawn 1st. These records are the clue; never hand entrants the method.
+- 3rd, Ebony Rosary with Silver Ornaments: in a two-way choice, shining light on the silver casts a shadow-path toward the more beneficial option; each use bleaches one bead; if death is the better outcome for the user, it leads to death.
+- 1st, Clear Water Opticians Glasses (맑은물안경원): black wood-grain case with a water-drop logo; frames whose too-clear lenses gleam silver even in darkness. They show a space at its most prosperous era, through doors; anything absent then (including later anomalies) is invisible. After removal the eyes ache and weep blood.
+- Leaving the retreat grounds with a prize clears the run: fog, then a door near the entry point. Spring water carried out in a prize container is lost at the clear.
+
+#### Light-Starter
+- The light-starter cannot clear normally, even with three stamps and a prize; they need the fourth stamp. Another way out is hidden inside the retreat.
+
+---</pre></div></section>
+<section class="ent app" id="s6"><div class="ent-head"><span class="tag">부록</span><h2>빛이 없으라 · 수도원</h2></div>
+<ul class="meta"><li>폴더: <b>📎부록</b></li><li>키: 신마음수도원, Sinmaeum Monastery, 낙원의 연인, Lover of Paradise, 사랑낙원, Sarangnakwon, 네 번째 스탬프, 4번째 스탬프</li><li>분량: 3,045자</li><li>켜지는 조건: 키가 걸리면 · 상태창 목표가 본 항목이면</li><li>해금 조건(모델에게 감): In Let There Be No Light, someone in the party becomes the one who turned on a light, or entrants start searching the retreat for a fourth stamp.</li></ul><details><summary>본문 보기</summary><article class="entry"><h3>Let There Be No Light Appendix: The Monastery and the Lover of Paradise</h3>
+<h4>Light-Starter Route</h4>
+<ul>
+<li>A supply closet beside the lobby's left staircase stands open over a pit-like space of cleaning gear. A cork board holds a sheet with a faint test stamp and a stamp cap on red string; sliding it aside reveals a stairless black hole. Entering means falling into a cellar cut into the cliff under the retreat, mountain wind blowing in, Fairy Rock directly below: the students fell or leapt from here. The four stamp images read "Descent · Cliff · Retreat."</li>
+<li>The cellar is Sinmaeum Monastery (신마음수도원), a Sarangnakwon shrine. Plaque: "The only name of paradise / is a love you cannot refuse." It is crammed with religious objects (Buddha, Marys, crosses, prayer beads, an ox-head bust, a split head showing blood-red ruby and glowing eyes, a container of severed rat heads, a burnt-match idol, a gold censer) and a twine-bound cylindrical idol with exaggerated carved features and folded hands wedged in the floorboards. The fourth stamp lies between the match idol and the censer.</li>
+<li>Touching that idol, above all bleeding on its twine, calls the Lover of Paradise; stamping the fourth stamp turns the surroundings "bright and beautiful" as it arrives. The fourth stamp on clothing, submitted at the Prize Office, lets the light-starter clear.</li>
+</ul>
+<h4>Lover of Paradise (낙원의 연인)</h4>
+<ul>
+<li>Worshipped by Sarangnakwon (사랑낙원), an early-2000s cult that promised "you will meet your ideal type," ran a children's home as a front, and forced rites remaking members into something fit for it. "Something supremely beautiful and good that you must love," seen as the beholder's ideal; beyond human cognition and far above the mountain's grade.</li>
+<li>Glimpsed as long fingers with balsam-red, nacre-sheened nails; announced by a polite knock (knock knock knock). Verses play inside the head regardless of hearing: "My love like a hawthorn tree, your love is fair and lovely." / "I have come in answer to the call. Turn and receive me." / "I wait so long and you do not turn." Over a phone, others hear only strange creaking and slapping flesh.</li>
+<li>It brings longing, family-reunion joy, guilt, acceptance, and pain melting away; judgment is contaminated first (going below alone may already be its pull). The body turns on its own, neck twisting, arms bending back; first person slips ("My love.", "You called me."); release brings sobbing as after betrayal. Students who saw it smiled and stepped off the cliff.</li>
+<li>Never turn, look, open a door, or speak to it. Any answer or question acknowledges it, and "what I have permitted needs no second permission": it then opens even locked doors. It needs no air. Hold on by biting the mouth, digging nails in, loud real sound (alarm, ringing phone, a voice on the line), nonstop talk; the 1st-prize glasses hide it for a moment, though its presence stays.</li>
+<li>Whoever bled on its idol keeps fine handprints in their blood and may hear it knocking at their door after the clear; how long and how far it follows is unknown.</li>
+</ul></article></details>
+<div class="raw"><div class="bar"><span>원문</span><button type="button" data-copy="r6">원문 복사</button></div><pre id="r6">### Let There Be No Light Appendix: The Monastery and the Lover of Paradise
+
+#### Light-Starter Route
+- A supply closet beside the lobby&#x27;s left staircase stands open over a pit-like space of cleaning gear. A cork board holds a sheet with a faint test stamp and a stamp cap on red string; sliding it aside reveals a stairless black hole. Entering means falling into a cellar cut into the cliff under the retreat, mountain wind blowing in, Fairy Rock directly below: the students fell or leapt from here. The four stamp images read &quot;Descent · Cliff · Retreat.&quot;
+- The cellar is Sinmaeum Monastery (신마음수도원), a Sarangnakwon shrine. Plaque: &quot;The only name of paradise / is a love you cannot refuse.&quot; It is crammed with religious objects (Buddha, Marys, crosses, prayer beads, an ox-head bust, a split head showing blood-red ruby and glowing eyes, a container of severed rat heads, a burnt-match idol, a gold censer) and a twine-bound cylindrical idol with exaggerated carved features and folded hands wedged in the floorboards. The fourth stamp lies between the match idol and the censer.
+- Touching that idol, above all bleeding on its twine, calls the Lover of Paradise; stamping the fourth stamp turns the surroundings &quot;bright and beautiful&quot; as it arrives. The fourth stamp on clothing, submitted at the Prize Office, lets the light-starter clear.
+
+#### Lover of Paradise (낙원의 연인)
+- Worshipped by Sarangnakwon (사랑낙원), an early-2000s cult that promised &quot;you will meet your ideal type,&quot; ran a children&#x27;s home as a front, and forced rites remaking members into something fit for it. &quot;Something supremely beautiful and good that you must love,&quot; seen as the beholder&#x27;s ideal; beyond human cognition and far above the mountain&#x27;s grade.
+- Glimpsed as long fingers with balsam-red, nacre-sheened nails; announced by a polite knock (knock knock knock). Verses play inside the head regardless of hearing: &quot;My love like a hawthorn tree, your love is fair and lovely.&quot; / &quot;I have come in answer to the call. Turn and receive me.&quot; / &quot;I wait so long and you do not turn.&quot; Over a phone, others hear only strange creaking and slapping flesh.
+- It brings longing, family-reunion joy, guilt, acceptance, and pain melting away; judgment is contaminated first (going below alone may already be its pull). The body turns on its own, neck twisting, arms bending back; first person slips (&quot;My love.&quot;, &quot;You called me.&quot;); release brings sobbing as after betrayal. Students who saw it smiled and stepped off the cliff.
+- Never turn, look, open a door, or speak to it. Any answer or question acknowledges it, and &quot;what I have permitted needs no second permission&quot;: it then opens even locked doors. It needs no air. Hold on by biting the mouth, digging nails in, loud real sound (alarm, ringing phone, a voice on the line), nonstop talk; the 1st-prize glasses hide it for a moment, though its presence stays.
+- Whoever bled on its idol keeps fine handprints in their blood and may hear it knocking at their door after the clear; how long and how far it follows is unknown.
+
+---</pre></div></section></main>
+</div>
+<script>
+document.addEventListener('click',function(e){var b=e.target.closest('[data-copy]');if(!b)return;var t=document.getElementById(b.dataset.copy);
+navigator.clipboard.writeText(t.textContent).then(function(){b.textContent='복사됨'},function(){var r=document.createRange();r.selectNodeContents(t);var s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent='선택됨'});});
+</script>

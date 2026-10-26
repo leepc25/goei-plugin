@@ -1,6 +1,6 @@
 // CRT 모니터 효과 (설정 「CRT 필터」): 게임 캔버스를 매 장 WebGL로 다시 그린다 (사용자 2026-10-25: 선만 긋는 게 아니라 진짜 브라운관처럼).
 // 곡면 유리(배럴 왜곡) · 둥근 모서리 · 가장자리 색 갈라짐 · 빛 번짐(블룸) · 밝기에 따라 굵어지는 주사선 · RGB 형광 마스크(애퍼처 그릴) ·
-// 비네팅 · 아주 약한 깜빡임과 잡음. WebGL이 없으면 옛 CSS 줄무늬로 대신한다.
+// 비네팅. (깜빡임·잡음은 눈이 아파 뺐다) WebGL이 없으면 옛 CSS 줄무늬로 대신한다.
 const VS = `attribute vec2 p; varying vec2 uv; void main(){ uv = p * 0.5 + 0.5; uv.y = 1.0 - uv.y; gl_Position = vec4(p, 0.0, 1.0); }`;
 const FS = `precision mediump float;
 varying vec2 uv;
@@ -31,10 +31,9 @@ void main(){
   float m = mod(gl_FragCoord.x, 3.0);
   vec3 mask = m < 1.0 ? vec3(1.0, 0.72, 0.72) : m < 2.0 ? vec3(0.72, 1.0, 0.72) : vec3(0.72, 0.72, 1.0);
   col *= mix(vec3(1.0), mask, 0.32);
-  // 비네팅 · 깜빡임 · 잡음 · 밝기 보정
+  // 비네팅 · 밝기 보정
   col *= 1.0 - edge * (bend < 0.5 ? 0.35 : 0.95);
-  col *= 1.0 + 0.012 * sin(time * 113.0) + 0.006 * sin(time * 7.0);
-  col += (fract(sin(dot(gl_FragCoord.xy + time, vec2(12.9898, 78.233))) * 43758.5453) - 0.5) * 0.025;
+  // 깜빡임·움직이는 잡음은 뺐다 (사용자 2026-10-25: 눈 아픔)
   col = pow(col * 1.22, vec3(0.95));
   gl_FragColor = vec4(col * corner, 1.0);
 }`;

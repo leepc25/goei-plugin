@@ -54,3 +54,7 @@
 .gnp.coarse .gk-btn{font-size:24px}
 .gnp.coarse .gnp-chips button{font-size:22px}
 .gnp.coarse .gnp-face{flex-basis:132px;width:132px;height:132px}
+
+/* 키보드로 고른 단추 (방향키 · Enter/E) */
+.gnp .gnp-sel{outline:3px solid #ffe27a;outline-offset:1px;color:#ffe27a}
+.gnp .gnp-in.gnp-sel{outline:3px solid #ffe27a}

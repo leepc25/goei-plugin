@@ -38,11 +38,23 @@ export function statusBlock(line: string): string {
   return `${STATUS_HEAD}\n${line}\n${NOTE}`;
 }
 
+/** 마지막 상태창 줄에 신분 칸이 없으면 플러그인이 아는 신분을 채운다 (모델이 한 번 빼먹어도 다음 턴에 복구되게). 8칸일 때만 */
+export function withIdentity(line: string, identity: string): string {
+  if (!identity) return line;
+  const tags = findStatusTags(line);
+  const t = tags[0];
+  if (!t || t.identity) return line;
+  const cols = line.replace(/^[[【［]\s*▣\s*[|｜]/, '').replace(/[\]】］]\s*$/, '').split(/[|｜]/).length;
+  if (cols !== 8) return line;
+  return line.replace(/[\]】］]\s*$/, `|${identity}]`);
+}
+
 /** 지난 줄을 지우고 마지막 한 줄을 직전 상태 블록으로 넣는다. 상태창이 하나도 없으면 그대로 */
-export function withStatusBlock<M extends PromptMessage>(messages: M[]): M[] {
+export function withStatusBlock<M extends PromptMessage>(messages: M[], identity = ''): M[] {
   if (messages.some((m) => typeof m?.content === 'string' && m.content.startsWith(STATUS_HEAD))) return messages;
-  const line = lastStatusLine(messages);
-  if (!line) return messages;
+  const line0 = lastStatusLine(messages);
+  if (!line0) return messages;
+  const line = withIdentity(line0, identity);
   const out = stripStatusLines(messages);
   const at = out.map((m) => m?.role).lastIndexOf('user');
   const block = { role: 'system', content: statusBlock(line) } as M;

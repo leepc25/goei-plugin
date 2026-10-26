@@ -2,7 +2,7 @@
 // 채팅·사진·에셋·이름은 그대로 두고, 로어북·정규식은 같은 이름끼리만 바꾸며, 사용자가 고친 명부(Directory)는 지킨다.
 // 플러그인 자체는 Risu 설정의 플러그인 탭이 //@update-url로 갱신한다.
 import { DIRECTORY_COMMENT, isDirectory, LEGACY_DATA, manifestEntry, OLD_DIRECTORY, RETIRED } from './lorebooks';
-import { dropOldOutsidePlaces, migrateLore } from './world/directory';
+import { dropOldOutsidePlaces, migrateLore, readDirectoryData, withDirectory } from './world/directory';
 import { dropDefaultAliases } from './world/registry';
 import type { LoreEntry } from './types';
 
@@ -163,6 +163,16 @@ function keepUserKeys(current: LoreEntry[], list: LoreEntry[], shipped: Record<s
   return kept;
 }
 
+/** 명부는 사용자 것을 지키므로, 새 카드 명부에만 있는 부록 조건을 사용자 명부에 옮긴다 */
+function addAppendixDefaults(list: LoreEntry[], incoming: LoreEntry[]): LoreEntry[] {
+  const add = readDirectoryData(incoming)?.부록;
+  const cur = readDirectoryData(list);
+  if (!add || !cur) return list;
+  const have = cur.부록 ?? {};
+  const fresh = Object.entries(add).filter(([k]) => !(k in have));
+  return fresh.length ? withDirectory(list, { ...cur, 부록: { ...have, ...Object.fromEntries(fresh) } }) : list;
+}
+
 /** 지금 캐릭터에 업데이트를 합친 결과 (저장은 하지 않음) */
 export function planUpdate(char: Record<string, unknown>, payload: CardPayload): UpdatePlan {
   const current = renamed((char.globalLore as LoreEntry[]) ?? [], payload.data.globalLore);
@@ -174,6 +184,8 @@ export function planUpdate(char: Record<string, unknown>, payload: CardPayload):
   if (compareVersions(cardVersion(char.globalLore as LoreEntry[]), '0.16.37') < 0) lore.list = dropOldOutsidePlaces(lore.list);
   // 사용자 명부(보호됨)에 남은 원본 기본 별칭 중 규칙에 걸리는 것만 지운다. 사용자가 더한 별칭은 남는다 (2026-10-21)
   lore.list = dropDefaultAliases(lore.list);
+  // 새 카드의 부록 조건: 사용자 명부에 없는 부록만 더한다 (사용자가 고친 부록 조건은 그대로)
+  lore.list = addAppendixDefaults(lore.list, payload.data.globalLore);
   // Risu 캐릭터의 정규식 칸 이름은 customscript (s 없음)
   // 상태창 정규식은 플러그인이 그리게 되어(v0.16.31) 옛 카드에서 뺀다 (새 카드에 같은 이름이 있으면 그대로)
   const incomingNames = new Set(payload.data.customscript.map((r) => r.comment ?? ''));

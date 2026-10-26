@@ -62,7 +62,15 @@ check('card.json 로어북 = 모듈 로어북', [e['comment'] for e in cl['chara
 import subprocess, tempfile
 with tempfile.TemporaryDirectory() as tmp:
     a, b = Path(tmp) / 'a.json', Path(tmp) / 'b.json'
-    a.write_text(json.dumps(ms['lorebook'], ensure_ascii=False), encoding='utf-8')
+    # 원본에 없던 새 로어북(card/extra-lore)과 그에 맞춘 키 정리는 원본 쪽에도 똑같이 넣고 비교한다
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'tools'))
+    import build_lite_card as blc
+    base = blc.add_extra_lore(json.loads(json.dumps(ms['lorebook'])))
+    for e in base:
+        drop = blc.KEY_EDITS.get(e.get('comment'), ([], []))[0] if e.get('comment') == '오후역' else []
+        if drop:
+            e['key'] = ', '.join(k.strip() for k in e['key'].split(',') if k.strip() and k.strip() not in drop)
+    a.write_text(json.dumps(base, ensure_ascii=False), encoding='utf-8')
     b.write_text(json.dumps(ml['lorebook'], ensure_ascii=False), encoding='utf-8')
     cmp = json.loads(subprocess.run(['node', str(Path(__file__).resolve().parents[1] / 'scripts' / 'migrate-lore.mjs'), '--compare', str(a), str(b)], check=True, capture_output=True, text=True).stdout)
 check('플러그인이 읽는 상황판 목록·이름 찾기·요원·조직이 원본과 같음', cmp['catalog'] and cmp['registry'] and cmp['agents'] and cmp['orgs'] and cmp['saved'], cmp)

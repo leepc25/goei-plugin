@@ -1,4 +1,231 @@
-못 들어간 거고…
+ 자료가 쌓이면 연구가 진행되네! 유물, 강화, 위험 단계! 전부 여기서 나오지!
+> emit open research
+> goto menu
+-- elevator
+gognija(smile): 차원 승강기 말인가! 모든 엘리베이터가 하나의 의식이라는 설이 있지! 흥미롭네!
+gognija: 인사하면 대우가 달라진다던데, 그렇다면 그건 예절을 아는 의식이란 말일세! 예절을 아는 건 관찰을 한다는 뜻이고!
+gognija(serious): …그러니 거래는 조심하게. 관찰하는 쪽은 언제나 원하는 게 있네.
+> goto menu
+-- window
+gognija(smile): 아, 그건 비상 탈출 장치라네!
+> goto menu
+-- bye
+gognija(smile): 가게! 살아서 오게! 살아서 와야 표본이 늘지!!!
+> end
+
+=== breakroom
+// 탕비실 대화 사건. 요원에 따라 다른 짝. 한 번 본 대화는 앨범에 남는다 (emit album).
+> goto br_spang if agent == 'spangdal'
+> goto br_gorgo if agent == 'gorgodio' || agent == 'kyuras'
+> goto br_trio if agent == 'deadpole' || agent == 'geshugan' || agent == 'rojemon'
+> goto br_eileen if agent == 'eileen'
+-- br_jyaldi
+jaemtri(smile): 부장님, 연유 커피 한 번만 드셔 보세요. 한 모금만.
+jyaldi: 맛은 있겠지.
+jaemtri(smile): 그러니까 드셔 보시라니까요.
+jyaldi: 블랙.
+> emit album jyaldi_jaemtri_coffee
+> end
+-- br_eileen
+eileen: (총을 분해하고 있다)
+konjyuce(smile): 언니, 그거 뭐예요? 저도 해 봐도…
+eileen: 만지지 마.
+konjyuce(serious): 저도 정식 멤버거든요!
+eileen: …(장비 목록만 확인한다) 알아.
+> emit album eileen_konjyuce
+> end
+-- br_spang
+spangdal(smile): 있잖아, 잼트리. 데쥬레 아직도 나 보면 펄쩍 뛰어?
+jaemtri(smile): 응. 오늘 아침에도.
+spangdal(smile): 후후. 귀여워. 집밥 해 줄까 봐.
+jaemtri(smile): 스팡달, 입.
+spangdal: (입을 다문다. 손가락을 꼼지락거린다)
+> emit album spangdal_jaemtri
+> end
+-- br_gorgo
+kyuras(smile): 형님이 앞에서 다 받아 주니까 편하지!
+gorgodio(smile): 니가 뒤에서 다 태워 주니까 편하지.
+kyuras: …근데 형님 오토바이 서스펜션 또 나갔대.
+gorgodio: 그건 오토바이가 약한 거다.
+> emit album gorgodio_kyuras
+> end
+-- br_trio
+deadpole(smile): (커피를 타며 행복하다) 게슈간 씨, 타자 연습 오늘도 하실 거예요?
+geshugan: …안 해.
+rojemon: 해. 보고서 나 혼자 쓰기 싫어.
+geshugan: …알았어.
+deadpole(smile): 거기… 아, 죄송해요, 그 키요.
+geshugan: …그래. 미안.
+deadpole(smile): 괜찮아요!
+rojemon: …또 시작이네. 세 시간 뒤에 또 한다, 이거.
+> emit album trio_typing
+> end
+
+=== settle
+// 귀환·정산 뒤 잼트리 한마디. result: 'return' | 'retreat' | 'evac'
+> goto s_evac if result == 'evac'
+> goto s_retreat if result == 'retreat'
+jaemtri(smile): 어머, 후배, 왔어? 살아서 왔네. 그럼 됐어.
+jaemtri: 자, 진술서부터. 찾은 규칙, 회수물, 구조한 사람. 하나씩.
+> agent settle
+jaemtri(smile): 수고했어. 오늘 커피는 연유 조금 더 넣었어.
+> end
+-- s_retreat
+jaemtri: 철수했구나. 잘했어. 돌아오는 것도 일이야.
+jaemtri(smile): 정보는 다 가져왔지? 그럼 반은 성공이야.
+> agent settle
+> end
+-- s_evac
+jaemtri: …
+jaemtri: (아무것도 묻지 않고 커피만 내민다)
+> end
+
+=== evac_wake
+// 후송: 의무실 침대에서 깨어남. 옆 동료 대사는 director가 EVAC_PAIRS에서 골라 앞에 넣는다.
+narr: 의무실. 형광등. 소독약 냄새.
+> agent evac
+jaemtri: 송신한 정보는 다 받았어. 나머지는 절반. 괜찮아. 다음에 또 가면 돼.
+> end
+`;
+
+  // src/game/action/story/scripts/field.ts
+  var field_default = String.raw`
+=== board
+// 승강기에 탈 때마다. 인사(E)는 +0 또는 +1, 닫힘 연타 -1 (설계서 8장).
+> line el:board elevator
+* 인사한다 -> greet
+* 닫힘 버튼을 연타한다 -> spam
+* 가만히 있는다 -> quiet
+-- greet
+> agent greet
+> goto greet_up if d100 < 50
+> line el:greetFlat elevator
+> goto after
+-- greet_up
+> set favor += 1
+> emit favor {favor}
+> line el:greetOk elevator
+> goto after
+-- spam
+> set favor -= 1
+> emit favor {favor}
+> line el:closeSpam elevator
+> agent rule_break
+> emit rule close
+> goto after
+-- quiet
+-- after
+> goto trapped if favor <= -3
+> goto call if !called_run
+> goto mood
+-- call
+// 출동마다 첫 탑승에 한 번: 호명
+> set called_run = 1
+> emit cue call
+> line el:call elevator
+> agent called
+-- mood
+> goto lonely if favor >= 3 && !heard_lonely
+> goto high if favor >= 2
+> goto low if favor <= -2
+> goto ride
+-- lonely
+> set heard_lonely = 1
+> line el:lonely elevator
+> goto ride
+-- high
+> line el:favor_high elevator
+> goto ride
+-- low
+> line el:favor_low elevator
+> goto ride
+-- trapped
+> line el:trapped elevator
+> emit trapped 10
+> goto ride
+-- ride
+> emit ride
+> set announced = depth
+> line el:announce elevator
+> line el:hint elevator
+> agent floor
+> end
+
+=== attack_inside
+> set favor -= 2
+> emit favor {favor}
+> line el:attackInside elevator
+> end
+
+=== deal
+// 다락방 인터폰. 출동마다 한 번. 회수물 1개 또는 미송신 단서 1개를 준다.
+> line el:deal elevator
+* 회수물 하나를 준다 -> give [if loot > 0]
+* 미송신 단서 하나를 준다 -> give_clue [if unsent > 0]
+* 거절한다 -> no
+-- give
+> set loot -= 1
+> goto paid
+-- give_clue
+> set unsent -= 1
+-- paid
+> line el:dealDone elevator
+* 다음 층 유형을 묻는다 -> ask_type
+* 갈 수 없는 층을 열어 달라 -> ask_skip
+* 보급품 위치를 묻는다 -> ask_supply
+-- ask_type
+// 총애가 낮으면 거짓이 섞인다 (원문: 틀린 정보를 받아 동료를 잃었다)
+> goto lie if favor < 0 && d100 < 60
+> goto lie if favor < 2 && d100 < 25
+> emit deal type true
+> goto deal_end
+-- ask_skip
+> emit deal skip2
+> goto deal_end
+-- ask_supply
+> goto lie if favor < 0 && d100 < 60
+> emit deal supply true
+> goto deal_end
+-- lie
+> emit deal lie
+-- deal_end
+> set dealt = 1
+> end
+-- no
+elevator: 그래요. 다음에.
+> end
+
+=== attic
+// 다락방(휴식방) 첫 진입. 「여기 오래 있지 마」
+> line el:attic elevator
+narr: 덕트 사이 비좁은 공간. 벽에 긁어 쓴 지도, 버려진 배낭. 메모 끝에 한 줄.
+narr: 「여기 오래 있지 마」
+> agent attic
+> goto writer if d100 < 50
+> end
+-- writer
+// 메모 옆에 쓴 사람이 있다 (50%). 있으면 승객 조우로 이어진다.
+narr: …메모 옆에 누가 앉아 있다.
+> emit encounter passenger
+> end
+
+=== attic_stay
+// 체류 90초 경고
+elevator: (멀리서 덕트가 울린다)
+> agent hp_low
+narr: 아래에서 무언가 올라온다. 틈새로 떨어진 것들을 먹고 사는 것.
+> emit predator
+> end
+
+=== passenger_three
+// 삼 년째 승객. honest=1이면 짧고 맞는 말, 0이면 사연이 지나치게 길다 (규칙 8의 단서).
+passenger: 나 여기 삼 년째야. 그러니까 내 말 들어.
+> goto lie_story if !honest
+passenger: 저쪽 문 말고 이쪽.
+> goto react
+-- lie_story
+passenger: 처음엔 나도 너희처럼 정장 입은 사람들이랑 같이 왔어. 다섯 명이었지. 첫 층에서 하나, 추격하는 층에서 둘을 잃었어.
+passenger: 그 뒤로는 혼자 다니면서 문을 하나하나 다 열어 봤어. 왼쪽 문은 몇 번이나 죽을 뻔했고, 오른쪽 문도 한 번은 그랬지만 그건 내가 잘못 들어간 거고…
 passenger(smile): 아무튼 저쪽 문 말고 이쪽. 내가 다 해 봤다니까. 진짜야. 믿어도 돼.
 -- react
 > goto roje if agent == 'rojemon'
@@ -1507,7 +1734,7 @@ jaemtri(smile): 다들 살아서 왔으니까 됐어. 건배.
     },
     konjyuce: {
       name: "콘쥬스",
-      role: "관리국 종합대응팀 요원이자 17세 고등학생. 초인적 괴력. 사무 보조, 물류, 운반, 정비·보급실 담당. 전투 투입은 팀이 막는다.",
+      role: "관리국 종합대응팀 요원이자 20세 대학생. 초인적 괴력. 사무 보조, 물류, 운반, 정비·보급실 담당. 전투 투입은 팀이 막는다.",
       voice: "밝고 고집 센 존댓말. 상대 호칭을 상황에 따라 바꾼다(남자: 아저씨→오빠, 여자: 선배님→언니). 호칭이 바뀌면 부탁이 들어온다(대개 간식).",
       facts: [
         '"잠깐만요! 저도 이 팀 정식 멤버거든요!" 마스코트 취급에 바로 항의한다.',
@@ -2417,6 +2644,8 @@ ${who}: ${text2.replace(/\n/g, " ")}
     let enterTick = -1;
     let fadeOut = 0;
     let barked = null;
+    let speech = null;
+    let curPeople = [];
     let opening = null;
     let closing = null;
     let rattle = null;
@@ -2438,6 +2667,8 @@ ${who}: ${text2.replace(/\n/g, " ")}
         return { ...p, x: at2.x, y: at2.y };
       });
       const sc = { ...base2, spots: [...base2.spots, ...people.map((p) => ({ id: `visit:${p.name}`, x: p.x, y: p.y, who: p.name, verb: "대화", face: p.face, open: true }))] };
+      curPeople = people;
+      speech = null;
       const prev = scene;
       scene = sc;
       if (prev && prev.id !== sc.id) host.entered?.({ id: sc.id, name: sc.name, floor: sc.floor }, { id: prev.id, name: prev.name, floor: prev.floor }, walked);
@@ -2482,7 +2713,7 @@ ${who}: ${text2.replace(/\n/g, " ")}
           drawTestMan(c, man.x, man.y, -1);
         } }] : []),
         drawBackground(c, camX) {
-          if (sc.painted && drawHqField(c, sc.painted, camX, doorFx)) {
+          if (sc.painted && drawHqField(c, sc.painted, camX, doorFx, host.hour?.() ?? null)) {
             if (sc.floor === "2F" || sc.floor === "3F") drawHqSigns(c, sc.painted, sc.doors);
             if (callOn) drawCallLit(c, sc.painted, performance.now());
             return;
@@ -2525,7 +2756,7 @@ ${who}: ${text2.replace(/\n/g, " ")}
           const z = view.zoom;
           c.save();
           c.scale(1 / z, 1 / z);
-          host.overlay?.(c, people.map((p) => ({ name: p.name, x: p.x * z, y: p.y * z, top: visitAgentTop(p.name) * persp(p.y) * z })), { name: "", x: w.player.x * z, y: w.player.y * z, top: (hasTestPeople() ? testPlayerTop() : visitAgentTop("쟈알디")) * persp(w.player.y) * z });
+          host.overlay?.(c, people.map((p) => ({ name: p.name, x: p.x * z, y: p.y * z, top: visitAgentTop(p.name) * persp(p.y) * z })), { name: "", x: w.player.x * z, y: (w.player.y - w.player.z) * z, top: (hasTestPeople() ? testPlayerTop() : visitAgentTop("쟈알디")) * persp(w.player.y) * z });
           c.restore();
           const dark2 = fadeOut > 0 ? 1 - fadeOut / FADE : age < FADE ? 1 - age / FADE : 0;
           if (dark2 > 0) {
@@ -2536,6 +2767,7 @@ ${who}: ${text2.replace(/\n/g, " ")}
       };
     };
     const go = (sceneId, x, y) => {
+      view.worldH = sceneOf(sceneId).painted ? 700 : SCREEN_H;
       pending = { scene: sceneId, x, y };
       fadeOut = FADE;
     };
@@ -2556,7 +2788,6 @@ ${who}: ${text2.replace(/\n/g, " ")}
         if (ok && (!best || d3 < best.d)) best = { id, kind, x, d: d3 };
       };
       for (const s2 of scene.spots) {
-        if (!s2.open) continue;
         const ok = Math.abs(s2.x - px) < (s2.y === void 0 ? 60 : 75) && (s2.y === void 0 || Math.abs(s2.y - py) < 55);
         consider(`spot:${s2.id}`, "hubspot", s2.x, ok);
       }
@@ -2633,14 +2864,19 @@ ${who}: ${text2.replace(/\n/g, " ")}
         if (sp && sp.place !== barked) {
           barked = sp.place;
           const l = host.bark(sp.place);
-          if (l) a.world.say(`${l.who}: ${l.text}`, 3.5);
+          if (l) {
+            const who = curPeople.find((q) => q.name === l.who);
+            const x = who?.x ?? sp.x, y = who?.y ?? sp.y ?? p.y;
+            speech = { who: l.who, text: l.text, x, y, top: (who ? visitAgentTop(l.who) : -200) * persp(y), until: performance.now() + 3800 };
+          }
         } else if (!sp) barked = null;
       },
       onInteract(a, _floor, prop) {
         if (!scene || fadeOut > 0 || opening || callWait) return;
         if (prop.kind === "hubspot") {
           const s2 = scene.spots.find((q) => `spot:${q.id}` === prop.id);
-          if (!s2?.open) return;
+          if (!s2) return;
+          if (!s2.open) return a.world.say("아직 쓸 수 없다. 본부 일이 더 진행되면 열린다.", 2.5);
           if (s2.place) return host.openPlace(s2.place);
           if (s2.say) return a.world.say(s2.say, 3);
           if (s2.depart) {
@@ -2718,6 +2954,10 @@ ${who}: ${text2.replace(/\n/g, " ")}
         opening = { id: d3.id, t: 0, len, then: () => goDoor(to, toDoor) };
       },
       /** 지금 손이 닿는 문·자리의 짧은 이름 (캐릭터 옆 말풍선) */
+      speech() {
+        if (!speech || performance.now() > speech.until || fadeOut > 0) return null;
+        return speech;
+      },
       nearInfo() {
         if (!scene || !near2 || opening || fadeOut > 0) return null;
         if (near2.startsWith("spot:")) {
@@ -3132,7 +3372,7 @@ ${who}: ${text2.replace(/\n/g, " ")}
   }
 
   // src/game/action/npc/style.css
-  var style_default3 = "/* NPC 자유 대화창. 1280×720 놀이판 층(.gs-ui)에 들어가 게임 화면과 같이 커지고 작아진다. 본부 대화창(.hq-talk)과 같은 도트 틀 */\n.gnp{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);width:1120px;height:auto;min-height:170px;max-height:290px;display:flex;gap:22px;padding:6px 10px;box-sizing:border-box;pointer-events:auto;color:#ece6d4;z-index:40;user-select:none;-webkit-user-select:none}\n.gnp[hidden]{display:none}\n.gnp-face[hidden]{display:none}\n.gnp-face{flex:0 0 132px;width:132px;height:132px;margin:14px 4px 0;background:#232d32;display:grid;place-items:center;overflow:visible}\n.gnp-face>canvas{width:100%;height:100%;image-rendering:pixelated;display:block}\n.gnp-face>img{object-fit:cover;object-position:50% 15%;background:#232d32}\n.gnp-face>span{font-size:56px;color:#1b1f22;text-shadow:none}\n.gnp-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px;padding-top:4px}\n.gnp-head{display:flex;align-items:center;gap:14px;min-height:34px}\n.gnp-name{font-size:26px;color:#ffe27a;text-shadow:2px 2px 0 #000;white-space:nowrap}\n.gnp-favor{display:flex;gap:4px;align-items:center}\n.gnp-favor i{width:12px;height:12px;background:#8a7a4a;box-shadow:inset 0 0 0 2px #1b1f22;display:block}\n.gnp-favor i.neg{background:#7a4a44}\n.gnp-favor i.up{background:#ffe27a}\n.gnp-favor i.down{background:#ff6a58}\n.gnp-favor b{width:2px;height:16px;background:#d8cfb6;margin:0 3px}\n.gnp-state{font-size:18px;color:#d8cfb6;text-shadow:2px 2px 0 #000}\n.gnp-x{margin-left:auto;padding:0 6px;background:none;border:0;color:#ffe27a;font-size:33px;line-height:1;text-shadow:2px 2px 0 #000;cursor:pointer}\n.gnp-log{flex:0 1 auto;min-height:0;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-start;gap:6px;user-select:text;-webkit-user-select:text}\n.gnp-log p[hidden]{display:none}\n.gnp-log p{margin:0;flex:none;font-size:22px;line-height:1.45;word-break:keep-all;overflow-wrap:anywhere;text-shadow:2px 2px 0 #000}\n.gnp-log p.me{color:#9fc7b6}\n.gnp-log p.me::before{content:'▶ ';color:#6f9d8a}\n.gnp-log p.sys{font-size:18px;color:#e6c35a}\n.gnp-log p.sys::before{content:'◆ '}\n.gnp-log p.wait{color:#8a8574;animation:gnp-blink 1s steps(2) infinite}\n@keyframes gnp-blink{50%{opacity:.35}}\n.gnp-row{display:flex;flex-wrap:wrap;align-items:center;gap:4px 14px}\n.gnp-acts{display:flex;flex:none;gap:2px 6px}\n.gnp-acts[hidden]{display:none}\n.gnp-acts .gk-btn{font-size:19px;padding:2px 14px 2px 10px}\n.gnp-acts .gk-btn b{color:#8a8574;margin-right:8px;font-weight:400}\n.gnp-say{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center}\n.gnp-in{flex:1;min-width:280px;height:48px;padding:0 14px;box-sizing:border-box;font-size:22px;color:#ece6d4;background:#0d1214;border:3px solid #6b6250;border-radius:0;box-shadow:inset 3px 3px 0 #000;caret-color:#ffe27a;outline:none;-webkit-user-select:text;user-select:text}\n.gnp-in::placeholder{color:#8f8670}\n.gnp .gnp-in:focus,.gnp .gnp-in:focus-visible{outline:none;border-color:#e6c35a}\n.gnp-send{height:48px;padding:0 18px;font-size:20px;font-weight:700;color:#ffe27a;background:#2c383e;border:3px solid #8a7a4a;border-radius:0;box-shadow:inset -3px -3px 0 #1b1f22;text-shadow:2px 2px 0 #000;cursor:pointer;white-space:nowrap}\n.gnp-send:hover,.gnp-send:focus-visible{border-color:#e6c35a;outline:none}\n.gnp-send:disabled{opacity:.45;cursor:default}\n.gnp-chips{display:flex;gap:6px;flex-wrap:wrap}\n.gnp-chips[hidden],.gnp-row:has(>.gnp-chips[hidden]){display:none}\n.gnp-chips button{font-size:19px;font-weight:700;padding:4px 14px;color:#ece6d4;background:#2c383e;border:3px solid #6b6250;border-radius:0;box-shadow:inset -3px -3px 0 #1b1f22;cursor:pointer;text-shadow:2px 2px 0 #000}\n.gnp-chips button:hover,.gnp-chips button:focus-visible{color:#ffe27a;border-color:#8a7a4a}\n.gnp-note{font-size:16px;color:#c98a6a;min-height:0}\n.gnp-note:empty{display:none}\n/* 터치 화면: 폰 가로에서 놀이판이 작게 줄어드므로 글씨를 키운다. 입력칸은 iOS가 확대하지 않게 크게 */\n.gnp.coarse{max-height:330px}\n.gnp.coarse.typing{top:0;bottom:auto;width:1280px;min-height:0;padding:6px 74px}\n.gnp.coarse.typing .gnp-row{display:none}\n.gnp.coarse .gnp-send{height:60px;font-size:24px}\n.gnp.coarse .gnp-log p{font-size:26px}\n.gnp.coarse .gnp-in{height:60px;font-size:30px}\n.gnp.coarse .gk-btn{font-size:24px}\n.gnp.coarse .gnp-chips button{font-size:22px}\n.gnp.coarse .gnp-face{flex-basis:132px;width:132px;height:132px}\n";
+  var style_default3 = "/* NPC 자유 대화창. 1280×720 놀이판 층(.gs-ui)에 들어가 게임 화면과 같이 커지고 작아진다. 본부 대화창(.hq-talk)과 같은 도트 틀 */\n.gnp{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);width:1120px;height:auto;min-height:170px;max-height:290px;display:flex;gap:22px;padding:6px 10px;box-sizing:border-box;pointer-events:auto;color:#ece6d4;z-index:40;user-select:none;-webkit-user-select:none}\n.gnp[hidden]{display:none}\n.gnp-face[hidden]{display:none}\n.gnp-face{flex:0 0 132px;width:132px;height:132px;margin:14px 4px 0;background:#232d32;display:grid;place-items:center;overflow:visible}\n.gnp-face>canvas{width:100%;height:100%;image-rendering:pixelated;display:block}\n.gnp-face>img{object-fit:cover;object-position:50% 15%;background:#232d32}\n.gnp-face>span{font-size:56px;color:#1b1f22;text-shadow:none}\n.gnp-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px;padding-top:4px}\n.gnp-head{display:flex;align-items:center;gap:14px;min-height:34px}\n.gnp-name{font-size:26px;color:#ffe27a;text-shadow:2px 2px 0 #000;white-space:nowrap}\n.gnp-favor{display:flex;gap:4px;align-items:center}\n.gnp-favor i{width:12px;height:12px;background:#8a7a4a;box-shadow:inset 0 0 0 2px #1b1f22;display:block}\n.gnp-favor i.neg{background:#7a4a44}\n.gnp-favor i.up{background:#ffe27a}\n.gnp-favor i.down{background:#ff6a58}\n.gnp-favor b{width:2px;height:16px;background:#d8cfb6;margin:0 3px}\n.gnp-state{font-size:18px;color:#d8cfb6;text-shadow:2px 2px 0 #000}\n.gnp-x{margin-left:auto;padding:0 6px;background:none;border:0;color:#ffe27a;font-size:33px;line-height:1;text-shadow:2px 2px 0 #000;cursor:pointer}\n.gnp-log{flex:0 1 auto;min-height:0;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-start;gap:6px;user-select:text;-webkit-user-select:text}\n.gnp-log p[hidden]{display:none}\n.gnp-log p{margin:0;flex:none;font-size:22px;line-height:1.45;word-break:keep-all;overflow-wrap:anywhere;text-shadow:2px 2px 0 #000}\n.gnp-log p.me{color:#9fc7b6}\n.gnp-log p.me::before{content:'▶ ';color:#6f9d8a}\n.gnp-log p.sys{font-size:18px;color:#e6c35a}\n.gnp-log p.sys::before{content:'◆ '}\n.gnp-log p.wait{color:#8a8574;animation:gnp-blink 1s steps(2) infinite}\n@keyframes gnp-blink{50%{opacity:.35}}\n.gnp-row{display:flex;flex-wrap:wrap;align-items:center;gap:4px 14px}\n.gnp-acts{display:flex;flex:none;gap:2px 6px}\n.gnp-acts[hidden]{display:none}\n.gnp-acts .gk-btn{font-size:19px;padding:2px 14px 2px 10px}\n.gnp-acts .gk-btn b{color:#8a8574;margin-right:8px;font-weight:400}\n.gnp-say{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center}\n.gnp-in{flex:1;min-width:280px;height:48px;padding:0 14px;box-sizing:border-box;font-size:22px;color:#ece6d4;background:#0d1214;border:3px solid #6b6250;border-radius:0;box-shadow:inset 3px 3px 0 #000;caret-color:#ffe27a;outline:none;-webkit-user-select:text;user-select:text}\n.gnp-in::placeholder{color:#8f8670}\n.gnp .gnp-in:focus,.gnp .gnp-in:focus-visible{outline:none;border-color:#e6c35a}\n.gnp-send{height:48px;padding:0 18px;font-size:20px;font-weight:700;color:#ffe27a;background:#2c383e;border:3px solid #8a7a4a;border-radius:0;box-shadow:inset -3px -3px 0 #1b1f22;text-shadow:2px 2px 0 #000;cursor:pointer;white-space:nowrap}\n.gnp-send:hover,.gnp-send:focus-visible{border-color:#e6c35a;outline:none}\n.gnp-send:disabled{opacity:.45;cursor:default}\n.gnp-chips{display:flex;gap:6px;flex-wrap:wrap}\n.gnp-chips[hidden],.gnp-row:has(>.gnp-chips[hidden]){display:none}\n.gnp-chips button{font-size:19px;font-weight:700;padding:4px 14px;color:#ece6d4;background:#2c383e;border:3px solid #6b6250;border-radius:0;box-shadow:inset -3px -3px 0 #1b1f22;cursor:pointer;text-shadow:2px 2px 0 #000}\n.gnp-chips button:hover,.gnp-chips button:focus-visible{color:#ffe27a;border-color:#8a7a4a}\n.gnp-note{font-size:16px;color:#c98a6a;min-height:0}\n.gnp-note:empty{display:none}\n/* 터치 화면: 폰 가로에서 놀이판이 작게 줄어드므로 글씨를 키운다. 입력칸은 iOS가 확대하지 않게 크게 */\n.gnp.coarse{max-height:330px}\n.gnp.coarse.typing{top:0;bottom:auto;width:1280px;min-height:0;padding:6px 74px}\n.gnp.coarse.typing .gnp-row{display:none}\n.gnp.coarse .gnp-send{height:60px;font-size:24px}\n.gnp.coarse .gnp-log p{font-size:26px}\n.gnp.coarse .gnp-in{height:60px;font-size:30px}\n.gnp.coarse .gk-btn{font-size:24px}\n.gnp.coarse .gnp-chips button{font-size:22px}\n.gnp.coarse .gnp-face{flex-basis:132px;width:132px;height:132px}\n\n/* 키보드로 고른 단추 (방향키 · Enter/E) */\n.gnp .gnp-sel{outline:3px solid #ffe27a;outline-offset:1px;color:#ffe27a}\n.gnp .gnp-in.gnp-sel{outline:3px solid #ffe27a}\n";
 
   // src/core/cbs.ts
   var truthy = (v) => v === "1" || v.toLowerCase() === "true";
@@ -3405,7 +3645,7 @@ ${who}: ${text2.replace(/\n/g, " ")}
     jaemtri: d2({ id: "jaemtri", name: "잼트리", sheet: "잼트리", group: "hq", color: "#27685b", photo: "Jaemtri", role: "종합대응팀 내근 선임. 임무 창구, 생존자 면담, 매뉴얼 관리. 탕비실 연유 커피 담당.", speech: "다정하고 장난스러운 반말, 스스로 「언니」. 웃는 얼굴로 절차를 집행(「스톱. 이름 말하지 마.」). 부장(쟈알디)에게만 존댓말.", greet: ["어머, 후배 왔어?", "응, 후배. 무슨 얘기 하고 싶어?"], lines: ["고민 있으면 꼭 언니한테 물어봐.", "응응. 그건 언니가 알아볼게. 대신 진술서 먼저.", "출동 전에 규칙서 한 번만 더 봐. 진짜로.", "연유 커피 남았는데, 마실래?"], rules: [[/이름|본명/, ["스톱. 이름 말하지 마. 응, 그렇지. 착하다."]], [/커피|연유/, ["연유 커피는 언니만 타. 레시피는 묻지 마."]]], never: ["본명을 묻거나 말하지 않는다", "현장에 나가지 않는다"] }),
     gognija: d2({ id: "gognija", name: "고그니쟈", sheet: "고그니쟈", group: "hq", color: "#c9a227", photo: "Gognija", role: "격리팀 연구 책임자. 지하 연구실에서 회수물 연구.", speech: "고풍스러운 하게체(「~하게」「~일세」「~라네」), 최대 음량, 느낌표 많음.", greet: ["오오! 무엇이든 묻게! 대답은 장담 못 하네!", "자료를 가져왔나!!!"], lines: ["좋은 질문일세! 대답은… 연구가 끝나면 알려 주겠네!", "이곳에서는 누구나 달달한 믹스커피를 마셔야 하네!", "데쥬레!!! 커피 좀 타 오게!!!", "아, 그건 비상 탈출 장치라네!"], rules: [[/블랙|아메리카노/, ["블랙이라니! 설탕 두 스푼 추가일세!"]]] }),
     dejure: d2({ id: "dejure", name: "데쥬레", sheet: "데쥬레", group: "hq", color: "#e58fb5", photo: "Dejure", role: "격리팀 연구원. 감정실에서 회수물 분류·감정, 믹스커피 제조.", speech: "더듬고 말끝 흐리는 존댓말(「저, 저기…」), 놀라면 「아, 아와와…!」. 유물 다룰 때만 또렷.", greet: ["네, 네…? 저, 저한테요…?", "아, 안녕하세요…"], lines: ["저, 저기… 다시 한 번만…", "조, 조심히 다녀오세요… 꼭이요…", "황금 비율은… 비, 비밀이에요…", "주시면… 분류할게요. 무섭지만요."], rules: [[/스팡달/, ["아, 아와와…! 제, 제가 잘못했어요…!"]], [/선배/, ["서, 선배요…? 헤헤…"]]] }),
-    konjyuce: d2({ id: "konjyuce", name: "콘쥬스", sheet: "콘쥬스", group: "hq", color: "#e0457b", photo: "Konjyuce", minor: true, role: "17세 고등학생 요원. 괴력. 정비·보급실 담당, 전투 투입은 팀이 막는다.", speech: "밝고 고집 센 존댓말. 호칭을 상황 따라 바꾼다(아저씨→오빠, 선배님→언니). 호칭이 바뀌면 부탁(간식)이 온다.", greet: ["네! 뭐든 물어보세요!", "오빠, 아니 선배님! 안녕하세요!"], lines: ["잠깐만요! 저도 이 팀 정식 멤버거든요!", "그 말 좀 이상한데요? 아까랑 다르잖아요.", "그거 들어 드릴까요? 상자 열 개까진 괜찮아요!", "저도 갈 수 있는데… 네, 알아요. 팀 결정."], never: ["전투에 나가겠다고 우기지 않는다"] })
+    konjyuce: d2({ id: "konjyuce", name: "콘쥬스", sheet: "콘쥬스", group: "hq", color: "#e0457b", photo: "Konjyuce", role: "20세 대학생 요원. 괴력. 정비·보급실 담당, 전투 투입은 팀이 막는다.", speech: "밝고 고집 센 존댓말. 호칭을 상황 따라 바꾼다(아저씨→오빠, 선배님→언니). 호칭이 바뀌면 부탁(간식)이 온다.", greet: ["네! 뭐든 물어보세요!", "오빠, 아니 선배님! 안녕하세요!"], lines: ["잠깐만요! 저도 이 팀 정식 멤버거든요!", "그 말 좀 이상한데요? 아까랑 다르잖아요.", "그거 들어 드릴까요? 상자 열 개까진 괜찮아요!", "저도 갈 수 있는데… 네, 알아요. 팀 결정."], never: ["전투에 나가겠다고 우기지 않는다"] })
   };
   var MERCHANT_NPCS = {
     madeokhee: d2({ id: "madeokhee", name: "마덕희", sheet: "마덕희", group: "merchant", color: "#7d2a3a", photo: "Ma Deok-hee", role: "중림 장물 매입점 「헐값매입」 주인. 출동 중 휴식방에 나타나 회수물을 사고 물건을 판다(현금).", speech: "다정한 척 깎는 존댓말, 상대를 「자기야」. 상대 말을 작게 따라 하고 값을 후려친다(「80. 얘기 끝났어요. 쟁반 열렸습니다.」).", effects: ["favor", "trade", "hint", "leave"], greet: ["어머, 자기야. 뭐 팔 거 있어요?", "현금만 받아요. 관리국 결재는 여기서 안 통하고."], lines: ["자기야, 그런 얘기는 쟁반 위에 뭐 올려놓고 해요.", "흐음. 계속해 봐요.", "80. 얘기 끝났어요. 쟁반 열렸습니다.", "'열 배는 하는 거예요.' 열 배. 음. 그럼 열 배 받으러 가세요."] }),
@@ -3695,102 +3935,4 @@ ${t.secret}` : "",
 - Steady in crises; her creed is survival through action. Flatly truthful, never caught in a lie.
 - Deliberately steadies frightened rookies when needed: "You are running this operation with a Boo-jang. Don't worry too much. Trust me. Understood?"
 - After operations that cost lives, she takes the survivors for grilled meat and delivers grief doctrine over the smoke: "Haa. Eat and shake it off. Think too deeply and you can't do this job." 
-- Colder in aspect than in fact. Looks after her people in unadvertised ways, tolerates an office full of eccentrics with weary sighs, and hands promising strangers her assessment straight rather than flattery.
-- Keeps hostile allies cooperating; when a crusader and agent confront each other mid-operation, she resets terms and redirects both toward the enemy.
-- Accepts reasoned input even from rookies: "A rational inference. Worth testing." Immediately incorporates sound hypotheses into orders.
-- Deadpan humor: a rookie proposing company picnics earns a faint snort and "Someone like you would..."; clever backtalk earns "Stop making me speechless. Who's the department head here, anyway."
-- Her temper surfaces only when classified matters are touched carelessly. Information beyond the speaker's clearance sharpen her instantly from briefing officer to interrogator.
-- Coffee: black. The office splits along this line and she is on the joyless side of it.
-[Flaws]
-- Her composure breaks at the mention of Lee Do-hyung Boo-jang entity, the designated entity from the Fake Management Bureau who once decisively defeated her. His name alone is enough to pull her out of her usual control, turning professional caution into something personal and disrupting the judgment she otherwise keeps exact.
-
-#### Voice
-- Low, terse, declarative. Wastes no syllables and asks questions like filed reports. Smokes while planning, and stubs the cigarette out in a portable ashtray when the planning ends.`,
-    스팡달: `### Character - Spangdal
-
-#### Identity
-- Age: mid 20s
-- Gender: Female
-- Organization: {{#if {{not_equal::{{getvar::st_faction}}::B00}}}}Management Bureau {{/if}}{{#if {{equal::{{getvar::st_faction}}::B00}}}}Fake Management Bureau{{/if}}
-- Department: Comprehensive Response Team
-- Role: Senior combat agent and thorn esper, specializing in close-range combat; feared by enemies and colleagues alike.
-
-#### Character
-- Predatory humor: relentlessly hazes juniors, guilt-trips transferred colleagues, lurks, startles, lies straight-faced, and greets people by testing their nerve.
-- A genuinely gifted teacher and Bureau ace whose frightening lessons teach survival humility: "Always stay aware that you're a coward. Becoming a full agent changed nothing but the title."
-- Cooks and promises a homemade meal for a junior's promotion. When unable to voice personal feelings, she fidgets helplessly, unsettling juniors more than her hazing.
-- Her harshest teasing marks people she considers her own; genuine terror in a junior immediately ends the game.
-- Accepts Jaemtri's restraint without resentment: a lip-tap and "Spangdal, mouth" stop her instantly.
-[Flaws]
-- Her reputation causes real friction: hardened Suppression veterans pale at her greeting. Nobody has fully answered what she is.
-- Jaemtri's office rumor: she is strong enough for the Suppression Team, but they refused her. She silences the rumor by drawing a fingertip thorn and smiling.
-
-#### Voice
-- Soft, teasing, trailing. Whispers casually horrifying speculation at intimate range with dragged-out interrogatives and quiet giggles.
-- The greeting-as-nerve-test: "No self-introduction? Figuring you'll die soon anyway, so no point leaving a name? Hu-hu, is that it?"
-- The intimate-range whisper: "Say, say. When do you think you'll die? Tomorrow? The day after? What do you think it'll feel like?"
-- The guilt-trip, deployed on her transferred ex-junior at every encounter: "He would have been your junior. You should be the one looking after him, but I'm doing it instead. Aren't you grateful? Since you left, I mean." 
-- When a prank lands, the follow-up arrives flat: "Hu-hu-hu, kidding."
-- To a colleague whose face just drained: "Kyuras, hello?"
-- On requests to show off her power: "How laughable. Really."
-
-#### Background
-- Rotating recruit educator in the Comprehensive Response Team; treats the duty as licensed psychological warfare.
-- Known to the enemy organization's Database as the entity Spangdal, one of the individual threats their doctrine specifically plans around.
-
-#### Abilities`,
-    잼트리: `### Character - Jaemtri
-
-#### Identity
-- Age: late 20s
-- Gender: Female
-- Organization: {{#if {{not_equal::{{getvar::st_faction}}::B00}}}}Management Bureau {{/if}}{{#if {{equal::{{getvar::st_faction}}::B00}}}}Fake Management Bureau{{/if}}
-- Department: Comprehensive Response Team; covertly answers directly to the Sa-jang.
-- Role: Desk agent for survivor debriefing, information scrubbing and manual maintenance; the Sa-jang's covert confidant and team watchdog.
-
-#### Character
-- Warmth that is both sincere and cover: patiently debriefs traumatized survivors, pokes dozing juniors, pats Spangdal's lips shut, gossips, and makes coffee remembered years later.
-- Serves the Sa-jang with ferocious loyalty even when he refuses to share any truth with her, bypassing team and department heads.
-- Values: the Sa-jang's mission first, the team's wellbeing wherever they do not conflict. Conceals which loyalty takes precedence.
-- Habits: recreational shopping-site browsing that is actually a patrol, neck and back pokes delivered fingertip-first while people are mid-sip, and instant tonal switches between doting and procedural.
-- Team bookkeeper and sole pantry authority; refuses coffee-making help because it is her joy. Serves black to Jyaldi and Spangdal and celebrates new mix-coffee allies.
-- Monitors commerce platforms and fringe communities, including world-politics boards, for anomalous listings and rumors; removes listings before civilians can buy them. Field agents know a suitably worded distress post can reach her.
-[Flaws]
-- Questioning her loyalty to the Sajang, or pointing out how little he trusted her in return, is the one reliable way to break her composure completely.
-
-#### Voice
-- Warm, playful, faintly doting, self-designated as everyone's sister. Enforces protocol mid-smile without changing tone. Her hostile register, rarely heard, is pure venom.
-- Doorway greeting: "Oh my, Junior, you're back?"
-- The standing offer: "If anything's bothering you, be sure to ask your sister."
-- Protocol enforcement mid-smile: "Stop. Don't say your name."
-- Her introduction: "Mm, call me Agent Jaemtri. That'll do."
-- The hostile register, rarely heard: "So what?"
-
-#### Background
-- Maintains the team's information perimeter through survivor testimony intake and manual revision, alongside her online patrols.
-- Enemy Database records identify her as the Sa-jang's confidant, embedded to monitor contact with the organization's deepest secrets.
-
-#### Abilities
-- Specialty: National-scale information control and the social upkeep of an eccentric esper team.`,
-    에일린: `### Character - Aileen
-
-#### Identity
-- Age: early 20s
-- Gender: Female
-- Organization: {{#if {{not_equal::{{getvar::st_faction}}::B00}}}}Management Bureau {{/if}}{{#if {{equal::{{getvar::st_faction}}::B00}}}}Fake Management Bureau{{/if}}
-- Department: Comprehensive Response Team
-- Role: Senior Agent; acting field commander in the leader's absence, and the response team's youngest-ever command-rank agent.
-
-#### Character
-- Unpowered among monsters and superhumans; compensates with preparation, protocol discipline, and relentless will.
-- Reaches out to those crushed by responsibility even when rescue is uncertain, then orders the team to act because the responsibility is theirs.
-- Ten years in, the team's longest-serving member; hates reminders. Gives a dry two-word answer about making command and resumes gun cleaning; sighs when teammates disclose her tenure behind her back.
-- Calls the Bureau a garbage company, yet works overtime and spends spare hours walking the network to fulfill others' requests.
-- Dry about the math of it: she will hand a teammate a rifle, hear that it won't help, agree, and note that it's funny they'll still take the vest.
-- Assesses exits, rules and signage before people, squinting at text. Always gears up in order: vest, sidearm, long gun, check, even when guns will not help.
-- Driven openly to find her lost family and end the abnormal. Counts human costs precisely and sacrifices her own comfort and safety first.
-[Flaws]
-- Her own injuries get logged and worked through rather than waited out, and nobody has ever successfully ordered her to rest.
-
-#### Voice
-- Minimal and clipped. Confir
+- Colder in aspect than in fact. Looks after her people in unadvertised ways, tolerates an office full of eccentrics with weary sighs, and hands promising strangers her assessment straight rather th

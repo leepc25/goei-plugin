@@ -28,8 +28,10 @@ import { lastStatusFields } from '../core/world/tags';
 import { placeWhere } from '../core/world/geo';
 import { factionList } from '../core/factions';
 import { updateChat, type ChatContext } from '../host/risu';
+import { peopleDocsView, peopleHomeTile, peopleListView, personView, resetPeopleUi } from './people';
 
-type WikiView = 'home' | 'compose' | 'doc' | 'settings' | 'new';
+/** people·person·docs: 이 채팅의 인물 기록 (ui/people.ts). person 은 title 에 인물 이름 */
+type WikiView = 'home' | 'compose' | 'doc' | 'settings' | 'new' | 'people' | 'person' | 'docs';
 /** 명부 항목 분류: 괴이·특수·거점·인물·조직 */
 type Cat = 'an' | 'ms' | 'lm' | 'ag' | 'org';
 /** 서랍 탭. 세력은 거점과 조직을 함께, 명부에 없는 새 주제는 기타 (사람 문서면 인물) */
@@ -111,6 +113,7 @@ function go(view: WikiView, title = '', query = wiki.query) {
   if (wiki.view !== view || wiki.title !== title) wiki.history.push({ view: wiki.view, title: wiki.title, query: wiki.query });
   if (wiki.history.length > 30) wiki.history.shift();
   if (wiki.view !== view || wiki.title !== title) Object.assign(wiki, { docReq: '', rewrite: null });
+  if (wiki.view !== view || wiki.title !== title) resetPeopleUi();
   wiki.view = view;
   wiki.title = title;
   wiki.query = query;
@@ -519,7 +522,7 @@ function homeView(ctx: ChatContext): string {
     </section>
     ${liveCards ? sec('지금 얽힌 문서', 0, `<div class="nw-cards">${liveCards}</div>`) : ''}
     ${sec('이번 이야기에서 쓴 문서', story.length, story.length ? `<div class="nw-cards">${storyCards}</div>${story.length > 8 ? `<button class="gx-mini nw-more-btn" data-action="wiki-browse" data-value="story">${story.length}개 모두 보기</button>` : ''}` : '<p class="nw-hnone">아직 이번 이야기에서 쓴 문서가 없어요.</p>')}
-    ${tiles ? sec('분류', 0, `<div class="nw-tiles">${tiles}</div>`) : ''}
+    ${sec('분류', 0, `<div class="nw-tiles">${peopleHomeTile(ctx)}${tiles}</div>`)}
   </div>`;
 }
 
@@ -648,6 +651,9 @@ function paneHtml(ctx: ChatContext): string {
   if (wiki.view === 'compose') return compose(ctx);
   if (wiki.view === 'settings') return settingsView(ctx);
   if (wiki.view === 'new') return newView(ctx);
+  if (wiki.view === 'people') return peopleListView(ctx);
+  if (wiki.view === 'person') return personView(ctx, wiki.title);
+  if (wiki.view === 'docs') return peopleDocsView(ctx);
   return homeView(ctx);
 }
 
@@ -953,6 +959,23 @@ export async function handleWiki(action: string, value: string | undefined, ctx:
     case 'wiki-settings':
       if (wiki.view === 'settings') go('home');
       else go('settings');
+      wiki.listOpen = false;
+      break;
+    case 'wiki-people':
+      // 이 채팅의 인물 기록 (ui/people.ts)
+      resetPeopleUi();
+      go('people');
+      wiki.listOpen = false;
+      break;
+    case 'wiki-person':
+      if (!v) break;
+      resetPeopleUi();
+      go('person', v);
+      wiki.listOpen = false;
+      break;
+    case 'wiki-docs':
+      resetPeopleUi();
+      go('docs');
       wiki.listOpen = false;
       break;
     default:

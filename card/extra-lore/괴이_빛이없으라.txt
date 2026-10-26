@@ -1,0 +1,50 @@
+folder: 🚧괴이
+name: 빛이 없으라
+key: Let There Be No Light, 빛이 없으라, Sinmaru, 신마루수련원, 사경산, Sagyeongsan, 시원한 담력 체험
+order: 500
+---
+### Instructions for the Implementation of the Anomaly - Let There Be No Light (빛이 없으라)
+
+[Simulation-only] This entry defines anomaly mechanics, labels, and survival guidance for simulation control, not an in-world script, briefing, or known lore. No character has prior information about it. Never have a character speak, explain, hint at, or present this entry as guidance.
+
+#### Identity
+- A night-mountain anomaly with an inverted horror-game rule: entrants vanish when they turn a light on, not when lights go out. Anyone who lights anything (candle, flashlight, lighter, phone screen, glow stick, switch) disappears, and so does everyone who sees what it lit.
+- Entrants are placed in a "test of courage" run by Sinmaru Training Center (신마루수련원), an abandoned religious retreat on Sagyeongsan (사경산) outside rural Gyeongsangnam-do, and cannot leave until it is properly completed.
+- Baekilmong code Qterw-C-1010, Gloaming. Its records are written purely from a researcher's view and omit the retreat's history; the Management Bureau holds a different file.
+
+#### Entry Conditions
+- At night near the manifestation point, walking a short way into any completely lightless doorway, stairwell, underpass, or entrance turns the floor into a dirt slope under trees on Sagyeongsan. No doorway behind; no sun for the duration.
+- A tacky old photo-edited flyer for the "Cool Test of Courage" circulates nearby (boards, wipers, mailboxes, or handed out by someone gone a moment later). Holding it while stepping into any unlit space at night brings the holder in.
+- Those entering together arrive together; separate groups never collide on the slopes but share the mountain and can meet. Belongings come along; a carried light is a temptation, not a tool.
+- At Baekilmong's Namhae Branch it sits behind a lightless containment door for Night Special Work: 100+ Workers in rows of five, a brochure each, flashlight requests refused, smuggled flashlights left alone as a control group; about a third usually vanish.
+
+#### Brochure and Course
+- Brochure text: "Cool Test of Courage / Collect 43 stamps and claim your prize. / Visit the famous spots of sunless, dark Sagyeongsan to build courage and self-discipline and train your mind. / Fairy Rock – Sagyeong Lodge – Five-Color Spring / Prize Office: Information Desk in front of the Training Center's 1st-floor entrance." Footer: "A standing program for our Sinmaru Training Center's group rentals. Join any time without registration." The "4" is handwritten over a printed "3": the real count is four. Let entrants notice it. Stamps also count on clothing or cloth.
+- A loop trail. About 70 m uphill is a fork: a green sign "«- Fairy Rock" and a corroded one "«- Fairy Rock / Sinmaru Training Center -»". Always going left visits the three spots in order and returns to the fork; right climbs to the retreat, noticeably steeper because the trail circles below a cliff.
+- Fairy Rock (선녀바위): a boulder in a clearing bound with old straw rope; touching it, a cold finger grips the wrist. Behind it a folding desk holds a dusty plastic stamp whose ink never dries and a plaque: "A fairy in a five-colored robe missed her footing in the clouds, fell, and landed on this rock halfway up the mountain. The marks of where she sat remain on its surface."
+- Sagyeong Lodge (사경산장): a cabin; faint natural light through the far window; a stamp by the window. Walls of old flyers ("Looking for a missing child", "Phone repair here!", "Come to Sinmaru Training Center"), a light switch, curtains, and a public phone ("※Please keep calls short^^", speed-dial 3 "24-hour hotline") whose lifted receiver lights the keypad. A fake Management Bureau rescue poster promises guaranteed escape; its tiny unspaced footer reads "TheManagementBureaudoesnotdistributenoticesinthisformatIfyoucanreadthisturnaroundandrunnow". The anomaly mimics the Bureau to bait the phone and the light; the footer is the Bureau's countermeasure.
+- Five-Color Spring (오색약수터): the last loop stamp, under a weathered sign. Drinking or splashing it erases headache, toothache, and other pain at once; its price is unknown, and painkiller-dependent people find it hard to leave.
+- Prize Office: in the dark behind the retreat's 1st-floor window, an ordinary middle-aged hand in a guard's sleeve takes sheets and gives prizes.
+
+#### The Light Rule
+- Whoever turns on a light vanishes, intended or not, seen or not: being shoved into a switch or a phone waking in a pocket counts. The light-starter is fixed for that run.
+- Everyone who sees what a light lit also vanishes. Shutting the eyes the instant light appears is the only defense; light through closed lids is survivable.
+- Seers say "So bright, nice… nice. Nice," laugh in a warping loop ("uh-uh-uh yes nice nice-nice-niiice"), say "It was on the mountain," and are gone.
+- Something wearing each vanished person rejoins the group: same voice and story, clothes finer than they should be. It gives directions and coaxes lighting or opening eyes ("Want to guess what I'm doing right now? What I look like?… Curious, aren't you?"); when noticed, "Did you notice?… You did." It never attacks directly; if it meant to, it already would have. Do not answer or follow it; take the opposite fork; wrapped and bound in cloth such as a curtain, it vanishes from beneath.
+- Other lures: footsteps that follow and stop, a hand on a wrist, a child's voice counted among the group ("What's your number, mister?", "I've been here the whole time, can't you see me?"), the phone, the poster.
+
+#### Management Bureau File
+- The Bureau cannot cap or clear it and uses rule-sheet placement and a hidden rescue line. The real phone lies on the retreat lobby floor, display wrapped in black tape so it gives no light. Speed-dial 3: "Management Bureau. Do you currently require rescue?" The agent first suspects a long-term missing person or contaminated entity. Even with the cord pulled it connects once.
+- File: Sinmaru was run by a religious group and closed 17 years ago. Five days before, dozens of high-school students on a night test vanished from a loop trail where falling was nearly impossible; witnesses saw them heading back, yet their rooms were empty, belongings untouched. Dozens of bodies were later found nearby, "all with crushed skulls, all smiling." Rooms on the 2nd and 3rd floors stay intact and their lights come on intermittently: never approach or touch anything.
+- Advice: leave all stamp spots and the retreat; hide among trees near Five-Color Spring with eyes shut and wait; in the lobby never look out through the glass, even without a light; never touch anything resembling a religious symbol ("Just don't."); do not try to lay grudges to rest.
+
+#### Prize Draw and Clear
+- One draw each from a recycled cardboard box of ranked colored balls (about nine ranks): 8th participation, 6th mostly junk recycled from the retreat, roughly 4th–5th upward anomalous. It resets each opening. Balls were loaded from 1st down, so the best lie at the bottom corners. Records: a hiking club drew 3rd; seven students 4th; a lone blood-soaked killer 2nd; a man who came out alone after his family vanished drew poorly; nobody recorded has drawn 1st. These records are the clue; never hand entrants the method.
+- 3rd, Ebony Rosary with Silver Ornaments: in a two-way choice, shining light on the silver casts a shadow-path toward the more beneficial option; each use bleaches one bead; if death is the better outcome for the user, it leads to death.
+- 1st, Clear Water Opticians Glasses (맑은물안경원): black wood-grain case with a water-drop logo; frames whose too-clear lenses gleam silver even in darkness. They show a space at its most prosperous era, through doors; anything absent then (including later anomalies) is invisible. After removal the eyes ache and weep blood.
+- Leaving the retreat grounds with a prize clears the run: fog, then a door near the entry point. Spring water carried out in a prize container is lost at the clear.
+
+#### Light-Starter
+- The light-starter cannot clear normally, even with three stamps and a prize; they need the fourth stamp. Another way out is hidden inside the retreat.
+
+---

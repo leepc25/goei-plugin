@@ -1,0 +1,147 @@
+<title>남해지사 로어북 초안</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Sans+KR:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* 로어북 항목 검토지: 위에 등록 정보, 아래 본문 렌더, 맨 아래 붙여넣기용 원문 */
+:root{
+  --bg:#f3f4f1;--panel:#e6e9e4;--fg:#1d2422;--muted:#5d6a66;--line:#c8cfca;--gold:#9a6b0c;--red:#a2302a;
+  --display:"Gowun Batang",'Nanum Myeongjo',serif;--body:"IBM Plex Sans KR",'Apple SD Gothic Neo','Malgun Gothic',sans-serif;--mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121615;--panel:#1b2120;--fg:#dfe4e0;--muted:#8e9a96;--line:#2e3735;--gold:#e0b04a;--red:#e07a6f;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#121615;--panel:#1b2120;--fg:#dfe4e0;--muted:#8e9a96;--line:#2e3735;--gold:#e0b04a;--red:#e07a6f;color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.75;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:820px;margin:0 auto;padding-block:40px 80px;display:grid;gap:28px}
+.stamp{font-family:var(--mono);font-size:12px;letter-spacing:.12em;color:var(--red)}
+h1{font-family:var(--display);font-size:clamp(26px,4vw,38px);line-height:1.25;margin:6px 0 0;text-wrap:balance}
+.meta{background:var(--panel);border-left:3px solid var(--gold);padding:12px 16px;font-size:14px}
+.meta ul{margin:0;padding-left:1.2em}.meta li{margin:2px 0}
+.entry{min-width:0}
+.entry h3{font-family:var(--display);font-size:24px;margin:0 0 8px;text-wrap:balance}
+.entry h4{font-family:var(--display);font-size:18px;color:var(--gold);margin:28px 0 6px;padding-top:10px;border-top:1px solid var(--line)}
+.entry ul{padding-left:1.2em}.entry li{margin:4px 0}
+code{font-family:var(--mono);font-size:.88em;background:var(--panel);padding:1px 5px;border-radius:3px;word-break:break-all}
+.raw{border:1px solid var(--line);border-radius:4px}
+.raw .bar{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:8px 12px;background:var(--panel);font-size:13px;color:var(--muted)}
+.raw button{font:inherit;font-weight:600;color:var(--bg);background:var(--gold);border:0;border-radius:3px;padding:6px 14px;cursor:pointer}
+.raw button:focus-visible{outline:2px solid var(--fg);outline-offset:2px}
+.raw pre{margin:0;padding:12px;max-height:360px;overflow:auto;font-family:var(--mono);font-size:12.5px;line-height:1.55;white-space:pre-wrap}
+</style>
+<div class="wrap">
+<header><div class="stamp">로어북 초안 · 카드 미반영</div><h1>로어북 초안 · 🌆세력 · 남해지사</h1></header>
+<section class="meta"><ul>
+<li>폴더: 🌆세력</li>
+<li>이름(comment): 남해지사</li>
+<li>키: <code>Namhae Branch, 남해지사, 남해 지사, Baekilmong Namhae</code></li>
+<li>순서(insertorder): 201</li>
+<li>소속 코드: 없음 (C00 백일몽의 하위 지사. 새 플레이 세력 아님)</li>
+<li>근거: 원작 372~407화. 주인공(김솔음)이 만든 결과는 넣지 않고, 지금도 돌아가는 지사의 운영 방식만 남김.
+  사건 결과(1·2차 격리 실패, 호 이사 실종, 진나솔 몰락 등)는 「Event Seeds」에 '일어날 수 있는 일'로만 둠.</li>
+<li>맞춘 기존 설정: 백일몽 항목의 등급 이름(F Shade ~ S Abyss)·포인트, 호유원 항목의 「Worked in Namhae」 문장.
+  본사의 X/Y/Z 마무리조와 헷갈리지 않게 지사 인력은 「Worker」, 등급은 「Worker Grade X/Y/Z」로 씀.</li>
+</ul></section>
+<article class="entry"><h3>Baekilmong Namhae Branch (백일몽 남해지사)</h3>
+<h4>Identity</h4>
+<ul>
+<li>A regional branch of Baekilmong (C00), not an independent faction: its staff are Baekilmong employees, its output goes to HQ, and HQ can audit, overrule, or abandon it.</li>
+<li>HQ calls it a pilot branch: "harsh environment, excellent efficiency," praised for recycling resources, minimal consumables, and unmatched output per cost. Corridor slogan: "Save resources and serve the company."</li>
+<li>It keeps HQ's old habit of feeding people into Uh-doom in bulk without manuals or gear; early wiki stories of nameless numbered staff dying barehanded are really branch stories. Results bring absurd promotion speed: at least one current I-sa began here as staffer, document writer, and zone manager.</li>
+</ul>
+<h4>Location</h4>
+<ul>
+<li>A windowless underground site like a closed coal mine (concrete corridors, dripping shafts, rails, prison-like steel doors); new hires are told it was a mine. Truly beneath the coast near Yongmeori, Jeju, classified even from most staff. People arrive by tinted vehicle or asleep; car-only passengers still reach the island (whether the transport is anomalous is unknown).</li>
+<li>Built over a native Uh-doom (see 하얀 끈); going deeper is forbidden. Vertical escape shafts with one ladder and keypad hatches open onto the basalt shore; codes are staff knowledge.</li>
+</ul>
+<h4>Personnel</h4>
+<ul>
+<li>Branch Chief: personnel authority; holds the only office Security cannot enter; exposed to rival HQ executives.</li>
+<li>Researchers (연구원/담당자): each owns a block of Worker numbers, commands by loudspeaker without hearing replies, assigns Uh-doom, questions survivors in the Work Communication Room, and sets promotions. Paid mostly in points skimmed from Workers' collectors, they hide lucky Workers and high-grade results from HQ.</li>
+<li>Branch Security: full-body suits, "Baekilmong Guard" tags, numbers, no records; nearly silent; tick clipboards, push Workers into rooms, collect armbands. Rule: "Security does not remove its uniform until disposal." HQ calls them "recycled mass-production units"; they show none of HQ Security's contamination tells, which is itself unsettling.</li>
+<li>Workers (작업자): day laborers, legally not employees.</li>
+</ul>
+<h4>Workers</h4>
+<ul>
+<li>Recruitment: laminated yellow street flyers ("Job seekers wanted! URGENT! …dam-specialist conglomerate", "Insane benefits", "Start work today!"; back: "Paid on application! 500,000 won cash"). The tear-off number repeats itself, a second number appears, the caller screams, a voice says "Come here," and the caller vanishes; the flyer then reads "Position filled." Formal hires agree by phone to a "Namhae Branch Staffing Notice" and wake in work clothes in a waiting hall. Targets: gamblers, debtors, addicts, people nobody seeks.</li>
+<li>Promise: 1,000,000 won cash daily, 100-day live-in contract (about 100 million won), no outside contact "for confidentiality," "a drug trial plus odd jobs." Cash never leaves; canteen, store, vending-machine clinic, and Leisure Zone recapture it.</li>
+<li>Worker Grades X &gt; Y &gt; Z, three-digit numbers (Z999 last), distinct from HQ's X/Y/Z Finishing Jo. Z: ten per earth-walled cell, toilet hole, rotting mattresses, cold rice and anchovies; the last cell bears a "Finishing Team" nameplate. Y: lockable rundown flats with sofa and bath, normal meals, takeaway. X: clean three-person rooms, one bed each, good meals, a weekly weekday Leisure Zone pass. Good results bring posted Special Reassignments (e.g., "Y492 -&gt; X915"); grades readjust weekly. The missing are "reassigned elsewhere."</li>
+<li>Red neck sticker: "[number] / Classification: Worker / Days remaining: N". Unremovable without branch chemicals; touching it earns demerits. Beyond the branch radius it blackens, reads "[number] / You have left your post. / Capture required.", spreads rash, and strangles until the wearer returns.</li>
+<li>Jobs: called by number block, blindfolded, mine cart, a locked left-arm cuff that secretly holds a crude Kkumgyeol Collector (researcher takes the yield, each level above takes a cut; damage "deducted from wages"), an unmarked steel door, no manual. Refusal: left inside, unpaid, demerits. Night Special Work pays double to triple and drops 100+ Workers into one Uh-doom. Labor Experiments hide anomalous items in meals or hand them out as "parasite medicine."</li>
+</ul>
+<h4>Facilities</h4>
+<ul>
+<li>Worker Zone: assembly hall split into X/Y/Z pens like a cattle shed, dorms, canteen, store (5,000 won a cigarette), vending-machine clinic at extreme prices; wiretaps and CCTV with occasional blind spots.</li>
+<li>Leisure Zone (Sundays): a tacky bulb-lit rural night street of mostly unstaffed shops at several times outside prices: Namhae Bar, Happy Lottery, Rhythm Karaoke, Sleep Care (massage chairs, Baekilmong hair-loss pills, unprescribed drugs, "Painkiller – 300,000 (EXTRA STRONG!)"), arcade, comic room, and a Religious Activity corridor (one faith per room, Sunday fortune-teller, last room a dried rite table with a pig's head). "Staff Only" doors hide staff areas. Nobody steals; everyone has seen the price.</li>
+<li>Containment Zone: by mine cart; identical dark grey doors, red-lit cells, some earth-floored.</li>
+<li>Staff Zone: 2000s public-corporation offices, sectors such as B-5 and B-9, storerooms, a Worker management room behind a one-way mirror.</li>
+<li>Old Facility: sealed behind earth walls and a disused staff bathhouse since a cost-cutting renovation six years ago (which split staff and containment areas with one door, below HQ standards). Steel corridors, hand-wheel doors, surveillance gallery, emergency exits, doors with a distinctive "Staff Only" handle crest, and a central control system bootable in safe mode. A former manager's office, administrator account, and early Uh-doom documents remain.</li>
+<li>Loudspeaker: "Good morning! All Workers, please prepare for today's work~", "Roll call in ten minutes. Get rich today too~", "Lunch time! Eat well and make lots of money this afternoon~", "When you're desperate: Dream Money, Dream Life!", "Leisure Zone opening. Fighting this week too! Get rich!" Emergency alarm: "[EMERGENCY!] All employees still inside, evacuate via the escape routes!" Workers are told the old mine misfires and to ignore it; it is for regular staff only.</li>
+</ul>
+<h4>Hidden Truths (GM only)</h4>
+<ul>
+<li>Workers are recycled products with a 100-day shelf life, filled with an orange raw material; the sticker covers its injection port, and removing it drains and kills them.</li>
+<li>Every 30 days ("Worker Cleanup") they are sedated, bound, and carted up a rail line to the Processing Facility, a deformed toy-factory Uh-doom (Scan, Standardize, Sticker Removal, Raw Material Check, Recycling) that melts them and reissues them, memories reset to hiring, in boxes labeled "Shelf life: 100 days 👍 Still recyclable after expiry!" One batch is 999. Staff added locks and a "Custom 26" setting; its Basic, Special, and Custom Recycling modes are mostly unexplored.</li>
+<li>So no Worker finishes 100 days or leaves with money, and one who "has been here two weeks" may have been here for months.</li>
+<li>Branch Security is unexplained: suits appear where no guard should be; one wore the face of an employee declared dead in an Uh-doom.</li>
+</ul>
+<h4>Registered Uh-doom on Site</h4>
+<ul>
+<li>White Cord (하얀 끈, Qterw-A-89, Darkness), the native Uh-doom; its 500 m exclusion was ignored to convert old buildings into dorms. Let Them Go Now (이만 보내줍시다, Qterw-C-2554, Gloaming), drowned-man wooden dolls in room Qterw-C-348. Let There Be No Light (빛이 없으라, Qterw-C-1010, Gloaming), used for Night Special Work. Fear Cleaner (피어 클리너, Qterw-C-219, Gloaming), 25-person cleaning jobs. Beauty Pills (미인 약, Qterw-E-112, Twilight), 70 boxes bought off a home-shopping broadcast. An uncoded crying-face coin purse, an easy "honey job."</li>
+</ul>
+<h4>Relations and Seeds</h4>
+<ul>
+<li>HQ tolerates the branch but audits after incidents; researchers see audits as point and manual theft. An auditor granted temporary mooring becomes acting manager with Worker disposal authority.</li>
+<li>Management Bureau (A00): hiring is formally legal, the site hidden, Workers cut off; Bureau rescue lines inside Uh-doom can still reach a trapped Worker. Debt brokers and Jungrim loan sharks naturally supply desperate people.</li>
+<li>Seeds (possibilities, not history): the White Cord breaches into the dorms and the infected knock claiming to be Security checking a false alarm; a Beauty Pill experiment meets the Leisure Zone bar and summons the Purgatory Choir's parade; an escaped Uh-doom follows a Worker back and is newly registered in a sealed zone; an HQ auditor arrives and researchers hide their best Worker and collector; a Worker finds a Staff Only handle fragment under a Z mattress; Worker Cleanup night comes early.</li>
+</ul>
+<hr /></article>
+<section class="raw"><div class="bar"><span>카드에 붙여 넣을 원문</span><button id="copy" type="button">원문 복사</button></div><pre id="rawtext">### Baekilmong Namhae Branch (백일몽 남해지사)
+
+#### Identity
+- A regional branch of Baekilmong (C00), not an independent faction: its staff are Baekilmong employees, its output goes to HQ, and HQ can audit, overrule, or abandon it.
+- HQ calls it a pilot branch: &quot;harsh environment, excellent efficiency,&quot; praised for recycling resources, minimal consumables, and unmatched output per cost. Corridor slogan: &quot;Save resources and serve the company.&quot;
+- It keeps HQ&#x27;s old habit of feeding people into Uh-doom in bulk without manuals or gear; early wiki stories of nameless numbered staff dying barehanded are really branch stories. Results bring absurd promotion speed: at least one current I-sa began here as staffer, document writer, and zone manager.
+
+#### Location
+- A windowless underground site like a closed coal mine (concrete corridors, dripping shafts, rails, prison-like steel doors); new hires are told it was a mine. Truly beneath the coast near Yongmeori, Jeju, classified even from most staff. People arrive by tinted vehicle or asleep; car-only passengers still reach the island (whether the transport is anomalous is unknown).
+- Built over a native Uh-doom (see 하얀 끈); going deeper is forbidden. Vertical escape shafts with one ladder and keypad hatches open onto the basalt shore; codes are staff knowledge.
+
+#### Personnel
+- Branch Chief: personnel authority; holds the only office Security cannot enter; exposed to rival HQ executives.
+- Researchers (연구원/담당자): each owns a block of Worker numbers, commands by loudspeaker without hearing replies, assigns Uh-doom, questions survivors in the Work Communication Room, and sets promotions. Paid mostly in points skimmed from Workers&#x27; collectors, they hide lucky Workers and high-grade results from HQ.
+- Branch Security: full-body suits, &quot;Baekilmong Guard&quot; tags, numbers, no records; nearly silent; tick clipboards, push Workers into rooms, collect armbands. Rule: &quot;Security does not remove its uniform until disposal.&quot; HQ calls them &quot;recycled mass-production units&quot;; they show none of HQ Security&#x27;s contamination tells, which is itself unsettling.
+- Workers (작업자): day laborers, legally not employees.
+
+#### Workers
+- Recruitment: laminated yellow street flyers (&quot;Job seekers wanted! URGENT! …dam-specialist conglomerate&quot;, &quot;Insane benefits&quot;, &quot;Start work today!&quot;; back: &quot;Paid on application! 500,000 won cash&quot;). The tear-off number repeats itself, a second number appears, the caller screams, a voice says &quot;Come here,&quot; and the caller vanishes; the flyer then reads &quot;Position filled.&quot; Formal hires agree by phone to a &quot;Namhae Branch Staffing Notice&quot; and wake in work clothes in a waiting hall. Targets: gamblers, debtors, addicts, people nobody seeks.
+- Promise: 1,000,000 won cash daily, 100-day live-in contract (about 100 million won), no outside contact &quot;for confidentiality,&quot; &quot;a drug trial plus odd jobs.&quot; Cash never leaves; canteen, store, vending-machine clinic, and Leisure Zone recapture it.
+- Worker Grades X &gt; Y &gt; Z, three-digit numbers (Z999 last), distinct from HQ&#x27;s X/Y/Z Finishing Jo. Z: ten per earth-walled cell, toilet hole, rotting mattresses, cold rice and anchovies; the last cell bears a &quot;Finishing Team&quot; nameplate. Y: lockable rundown flats with sofa and bath, normal meals, takeaway. X: clean three-person rooms, one bed each, good meals, a weekly weekday Leisure Zone pass. Good results bring posted Special Reassignments (e.g., &quot;Y492 -&gt; X915&quot;); grades readjust weekly. The missing are &quot;reassigned elsewhere.&quot;
+- Red neck sticker: &quot;[number] / Classification: Worker / Days remaining: N&quot;. Unremovable without branch chemicals; touching it earns demerits. Beyond the branch radius it blackens, reads &quot;[number] / You have left your post. / Capture required.&quot;, spreads rash, and strangles until the wearer returns.
+- Jobs: called by number block, blindfolded, mine cart, a locked left-arm cuff that secretly holds a crude Kkumgyeol Collector (researcher takes the yield, each level above takes a cut; damage &quot;deducted from wages&quot;), an unmarked steel door, no manual. Refusal: left inside, unpaid, demerits. Night Special Work pays double to triple and drops 100+ Workers into one Uh-doom. Labor Experiments hide anomalous items in meals or hand them out as &quot;parasite medicine.&quot;
+
+#### Facilities
+- Worker Zone: assembly hall split into X/Y/Z pens like a cattle shed, dorms, canteen, store (5,000 won a cigarette), vending-machine clinic at extreme prices; wiretaps and CCTV with occasional blind spots.
+- Leisure Zone (Sundays): a tacky bulb-lit rural night street of mostly unstaffed shops at several times outside prices: Namhae Bar, Happy Lottery, Rhythm Karaoke, Sleep Care (massage chairs, Baekilmong hair-loss pills, unprescribed drugs, &quot;Painkiller – 300,000 (EXTRA STRONG!)&quot;), arcade, comic room, and a Religious Activity corridor (one faith per room, Sunday fortune-teller, last room a dried rite table with a pig&#x27;s head). &quot;Staff Only&quot; doors hide staff areas. Nobody steals; everyone has seen the price.
+- Containment Zone: by mine cart; identical dark grey doors, red-lit cells, some earth-floored.
+- Staff Zone: 2000s public-corporation offices, sectors such as B-5 and B-9, storerooms, a Worker management room behind a one-way mirror.
+- Old Facility: sealed behind earth walls and a disused staff bathhouse since a cost-cutting renovation six years ago (which split staff and containment areas with one door, below HQ standards). Steel corridors, hand-wheel doors, surveillance gallery, emergency exits, doors with a distinctive &quot;Staff Only&quot; handle crest, and a central control system bootable in safe mode. A former manager&#x27;s office, administrator account, and early Uh-doom documents remain.
+- Loudspeaker: &quot;Good morning! All Workers, please prepare for today&#x27;s work~&quot;, &quot;Roll call in ten minutes. Get rich today too~&quot;, &quot;Lunch time! Eat well and make lots of money this afternoon~&quot;, &quot;When you&#x27;re desperate: Dream Money, Dream Life!&quot;, &quot;Leisure Zone opening. Fighting this week too! Get rich!&quot; Emergency alarm: &quot;[EMERGENCY!] All employees still inside, evacuate via the escape routes!&quot; Workers are told the old mine misfires and to ignore it; it is for regular staff only.
+
+#### Hidden Truths (GM only)
+- Workers are recycled products with a 100-day shelf life, filled with an orange raw material; the sticker covers its injection port, and removing it drains and kills them.
+- Every 30 days (&quot;Worker Cleanup&quot;) they are sedated, bound, and carted up a rail line to the Processing Facility, a deformed toy-factory Uh-doom (Scan, Standardize, Sticker Removal, Raw Material Check, Recycling) that melts them and reissues them, memories reset to hiring, in boxes labeled &quot;Shelf life: 100 days 👍 Still recyclable after expiry!&quot; One batch is 999. Staff added locks and a &quot;Custom 26&quot; setting; its Basic, Special, and Custom Recycling modes are mostly unexplored.
+- So no Worker finishes 100 days or leaves with money, and one who &quot;has been here two weeks&quot; may have been here for months.
+- Branch Security is unexplained: suits appear where no guard should be; one wore the face of an employee declared dead in an Uh-doom.
+
+#### Registered Uh-doom on Site
+- White Cord (하얀 끈, Qterw-A-89, Darkness), the native Uh-doom; its 500 m exclusion was ignored to convert old buildings into dorms. Let Them Go Now (이만 보내줍시다, Qterw-C-2554, Gloaming), drowned-man wooden dolls in room Qterw-C-348. Let There Be No Light (빛이 없으라, Qterw-C-1010, Gloaming), used for Night Special Work. Fear Cleaner (피어 클리너, Qterw-C-219, Gloaming), 25-person cleaning jobs. Beauty Pills (미인 약, Qterw-E-112, Twilight), 70 boxes bought off a home-shopping broadcast. An uncoded crying-face coin purse, an easy &quot;honey job.&quot;
+
+#### Relations and Seeds
+- HQ tolerates the branch but audits after incidents; researchers see audits as point and manual theft. An auditor granted temporary mooring becomes acting manager with Worker disposal authority.
+- Management Bureau (A00): hiring is formally legal, the site hidden, Workers cut off; Bureau rescue lines inside Uh-doom can still reach a trapped Worker. Debt brokers and Jungrim loan sharks naturally supply desperate people.
+- Seeds (possibilities, not history): the White Cord breaches into the dorms and the infected knock claiming to be Security checking a false alarm; a Beauty Pill experiment meets the Leisure Zone bar and summons the Purgatory Choir&#x27;s parade; an escaped Uh-doom follows a Worker back and is newly registered in a sealed zone; an HQ auditor arrives and researchers hide their best Worker and collector; a Worker finds a Staff Only handle fragment under a Z mattress; Worker Cleanup night comes early.
+
+---</pre></section>
+</div>
+<script>
+document.getElementById('copy').addEventListener('click',function(){var b=this,t=document.getElementById('rawtext');
+navigator.clipboard.writeText(t.textContent).then(function(){b.textContent='복사됨'},function(){var r=document.createRange();r.selectNodeContents(t);var s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent='선택됨, 복사하세요'});});
+</script>

@@ -1705,7 +1705,17 @@ if (fixture.globalLore.some(packed)) {
   await page.click('[data-action="set-scope"][data-value="card"]');
   await page.waitForSelector('.dir');
   const kinds = await page.textContent('.dir-kinds');
-  assert.ok(/괴이\s*62/.test(kinds) && /요원\s*55/.test(kinds) && /조직\s*16/.test(kinds), kinds);
+  assert.ok(/괴이\s*63/.test(kinds) && /요원\s*55/.test(kinds) && /조직\s*17/.test(kinds) && /부록\s*4/.test(kinds), kinds);
+  // 부록: 본 항목별로 묶이고, 펼치면 본 항목·조건·해금 (해금은 이 채팅에 바로 적는다)
+  await page.click('[data-action="dir-kind"][data-value="appendix"]');
+  await page.waitForSelector('.dir-kinds [data-value="appendix"].on');
+  assert.equal(await page.$$eval('.dir-list .dir-row', (rows) => rows.length), 4);
+  assert.ok(!(await page.textContent('.dir-list')).includes('본 항목 없음'), '모두 본 항목을 찾음');
+  await page.click('[data-action="dir-open"][data-value="남해지사 · 숨은 진실"]');
+  await page.waitForSelector('[data-key="app:unlock|남해지사 · 숨은 진실"]');
+  assert.match(await page.textContent('.dir-panel'), /본 항목과 같은 세력 자리/);
+  if (shots) await page.screenshot({ path: `${shots}/17-directory-appendix.png` });
+  await page.click('[data-action="dir-kind"][data-value="anomaly"]');
   assert.equal(await page.getAttribute('.dir-bar [data-value="save"]', 'disabled'), '', '고친 게 없으면 저장 못 함');
   // 괴이: 명일 아파트를 발생 후보에서 빼기
   // 통합 검색: 탭과 상관없이 다섯 탭을 묶어 보여 주고, 고르면 그 탭으로 가서 펼친다

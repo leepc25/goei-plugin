@@ -1,4 +1,84 @@
-evious) {
+urn decode(chat.scriptstate?.[GN_RAW]);
+  }
+  function snapshotKey(st) {
+    return JSON.stringify([st.seq, st.posts.map((p) => [p.id, p.nick, p.title, p.body, p.date, p.mine, p.views, p.votes, p.comments.map((c) => [c.parent, c.nick, c.body, c.mine])])]);
+  }
+  var postHead = (p) => JSON.stringify([p.id, p.nick, p.title, p.body, p.date, p.mine]);
+  var commentKey = (c) => JSON.stringify([c.parent, c.nick, c.body, c.mine]);
+  function postKey(p) {
+    return p ? JSON.stringify([p.id, p.nick, p.title, p.body, p.date, p.mine, p.comments.map((c) => [c.parent, c.nick, c.body, c.mine])]) : "";
+  }
+  function findPost(st, id) {
+    return st.posts.find((p) => p.id === id);
+  }
+  function dateNow(chat) {
+    const minute = readWorld(chat).minute;
+    const p = (n2) => String(n2).padStart(2, "0");
+    if (minute !== null && minute > 0) {
+      const d = new Date(minute * 6e4);
+      return `${d.getUTCFullYear()}.${p(d.getUTCMonth() + 1)}.${p(d.getUTCDate())} ${p(d.getUTCHours())}:${p(d.getUTCMinutes())}`;
+    }
+    const msgs3 = chat.message ?? [];
+    for (let i = msgs3.length - 1; i >= 0; i--) {
+      const m = msgs3[i];
+      if (m.role !== "char" || typeof m.data !== "string") continue;
+      const t = /\[▣\s*\|\s*(\d{4})\.(\d{2})\.(\d{2})\s*\|\s*(\d{1,2}):(\d{2})\s*([AaPp][Mm])/.exec(m.data);
+      if (t) {
+        let h = Number(t[4]) % 12;
+        if (t[6].toUpperCase() === "PM") h += 12;
+        return `${t[1]}.${t[2]}.${t[3]} ${p(h)}:${t[5]}`;
+      }
+    }
+    return "";
+  }
+  function storyTurns(chat) {
+    return (chat.message ?? []).filter((m) => m.role === "char" && String(m.data ?? "").trim() && !String(m.data).includes("%%")).length;
+  }
+  function postLimit(s4) {
+    return QUANTITY[s4.quantity]?.max ?? 7;
+  }
+  function protectedPost(s4, p) {
+    if (p.mine) return s4.keepOwn;
+    return s4.keepReplied && p.comments.some((c) => c.mine);
+  }
+  function trimBoard(st, s4) {
+    const cap = postLimit(s4);
+    while (st.posts.length > cap) {
+      let idx = -1;
+      for (let i = st.posts.length - 1; i >= 0; i--) {
+        if (!protectedPost(s4, st.posts[i])) {
+          idx = i;
+          break;
+        }
+      }
+      if (idx < 0) break;
+      st.posts.splice(idx, 1);
+    }
+  }
+  function trimDms(st, cap = HISTORY.dmKeep) {
+    const counts = /* @__PURE__ */ new Map();
+    const keep = /* @__PURE__ */ new Set();
+    for (let i = st.dms.length - 1; i >= 0; i--) {
+      const n2 = (counts.get(st.dms[i].nick) ?? 0) + 1;
+      counts.set(st.dms[i].nick, n2);
+      if (n2 <= cap) keep.add(i);
+    }
+    st.dms = st.dms.filter((_, i) => keep.has(i));
+  }
+  function replyForUser(p, c) {
+    if (c.mine) return false;
+    if (p.mine) return true;
+    let parent = c.parent;
+    const seen2 = /* @__PURE__ */ new Set();
+    while (parent && p.comments[parent - 1] && !seen2.has(parent)) {
+      seen2.add(parent);
+      const row8 = p.comments[parent - 1];
+      if (row8.mine) return true;
+      parent = row8.parent;
+    }
+    return false;
+  }
+  function reconcileUnread(st, previous) {
     const old = new Map(previous.posts.map((p) => [p.id, p]));
     const run3 = (rows2, prior, side, wanted) => {
       const queue2 = /* @__PURE__ */ new Map();
@@ -185,8 +265,8 @@ evious) {
   var isObj = (v) => !!v && typeof v === "object" && !Array.isArray(v);
   var str = (v) => typeof v === "string" ? v : typeof v === "number" ? String(v) : "";
   var int2 = (v) => {
-    const n = typeof v === "string" && v.trim() ? Number(v) : v;
-    return typeof n === "number" && Number.isInteger(n) ? n : null;
+    const n2 = typeof v === "string" && v.trim() ? Number(v) : v;
+    return typeof n2 === "number" && Number.isInteger(n2) ? n2 : null;
   };
   function applyBoard(before, current3, value, o) {
     if (snapshotKey(before) !== snapshotKey(current3)) throw new GnetError("생성하는 동안 게시판이 바뀌어서 새로고침 결과를 적용하지 않았어요.");
@@ -241,22 +321,22 @@ evious) {
       }
       const raws = [];
       comments.forEach((c, i) => {
-        const n = i + 1;
-        if (!isObj(c)) return void remap.set(n, false);
+        const n2 = i + 1;
+        if (!isObj(c)) return void remap.set(n2, false);
         const cAuthor = str(c.author).trim();
         const content = stripForged(str(c.content));
         let parent = int2(c.parent) ?? 0;
-        if (parent < 0 || parent >= n) parent = 0;
+        if (parent < 0 || parent >= n2) parent = 0;
         const sig = `${cAuthor}\0${content}`;
-        if (sigs.has(sig)) return void remap.set(n, sigs.get(sig));
+        if (sigs.has(sig)) return void remap.set(n2, sigs.get(sig));
         if (!cAuthor || !content.trim() || c.mine === true || cAuthor === o.nick || remap.get(parent) === false) {
           skippedComments++;
-          return void remap.set(n, false);
+          return void remap.set(n2, false);
         }
         q.comments.push({ nick: cut(cAuthor, 80), body: content, parent: remap.get(parent) ?? 0, mine: false, unread: false });
         raws.push(str(c.time).trim());
         sigs.set(sig, q.comments.length);
-        remap.set(n, q.comments.length);
+        remap.set(n2, q.comments.length);
       });
       stampComments(q, q.comments.length - raws.length, raws, o.date);
       if (!q.title.trim() && !q.body.trim()) continue;
@@ -284,19 +364,19 @@ evious) {
       if (!isObj(c)) return bad();
       const author = str(c.author).trim();
       const content = stripForged(str(c.content)).trim();
-      let n = int2(c.parent);
-      if (n === null || n === 0) n = t.replyTo;
+      let n2 = int2(c.parent);
+      if (n2 === null || n2 === 0) n2 = t.replyTo;
       if (!author || [...author].length > 80 || author === nick || !content) return bad();
-      if (n > t.total) {
-        const m = map.get(n);
+      if (n2 > t.total) {
+        const m = map.get(n2);
         if (m === void 0 || m === false) return bad();
-        n = m;
-      } else if (n < 0 || n > 0 && !t.supplied.has(n) && n !== t.replyTo) return bad();
-      if (t.replyTo > 0 && n !== t.replyTo && n <= t.total) return bad();
+        n2 = m;
+      } else if (n2 < 0 || n2 > 0 && !t.supplied.has(n2) && n2 !== t.replyTo) return bad();
+      if (t.replyTo > 0 && n2 !== t.replyTo && n2 <= t.total) return bad();
       const sig = `${author}\0${content}`;
       if (seen2.has(sig)) return bad();
       seen2.add(sig);
-      out.push({ author: cut(author, 80), content: trimTokens(content, LIMITS.comment_tokens), parent: n, time: str(c.time).trim() });
+      out.push({ author: cut(author, 80), content: trimTokens(content, LIMITS.comment_tokens), parent: n2, time: str(c.time).trim() });
       map.set(own, base + out.length);
     });
     return { comments: out, dropped };
@@ -309,7 +389,7 @@ evious) {
   }
   function minutesStamp(min) {
     const d = new Date(min * 6e4);
-    const p = (n) => String(n).padStart(2, "0");
+    const p = (n2) => String(n2).padStart(2, "0");
     return `${d.getUTCFullYear()}.${p(d.getUTCMonth() + 1)}.${p(d.getUTCDate())} ${p(d.getUTCHours())}:${p(d.getUTCMinutes())}`;
   }
   var hhmm = (stamp) => /(\d\d:\d\d)/.exec(String(stamp ?? ""))?.[1] ?? "";
@@ -397,8 +477,8 @@ evious) {
     if (!hasAttachment(input2)) return draft2;
     const literal = /* @__PURE__ */ new Set();
     for (const p of bodyParts(input2)) if (p.kind === "text") for (const line2 of p.text.split("\n")) literal.add(line2.trim());
-    const plain2 = bodyParts(draft2.content).filter((p) => p.kind === "text").map((p) => p.text).join("").replace(/\[ATTACHMENT A\d+\]/g, "");
-    const kept = plain2.split("\n").filter((line2) => {
+    const plain3 = bodyParts(draft2.content).filter((p) => p.kind === "text").map((p) => p.text).join("").replace(/\[ATTACHMENT A\d+\]/g, "");
+    const kept = plain3.split("\n").filter((line2) => {
       const t = line2.trim();
       const note = /^[(\[](.*)[)\]]$/.exec(t)?.[1];
       const label = note?.replace(/：/g, ":").match(/^\s*(.*?)\s*:/)?.[1]?.toLowerCase();
@@ -414,8 +494,8 @@ evious) {
     const snapshots = /* @__PURE__ */ new Map();
     for (const p of st.posts.slice(0, HISTORY.refresh)) {
       const selected = /* @__PURE__ */ new Set();
-      for (let n = Math.max(1, p.comments.length - HISTORY.comment + 1); n <= p.comments.length; n++) {
-        let k = n;
+      for (let n2 = Math.max(1, p.comments.length - HISTORY.comment + 1); n2 <= p.comments.length; n2++) {
+        let k = n2;
         const visited = /* @__PURE__ */ new Set();
         while (p.comments[k - 1] && !visited.has(k)) {
           visited.add(k);
@@ -456,8 +536,8 @@ evious) {
       }
       done2.add(id);
       const delta = (v) => {
-        const n = int2(v);
-        return n !== null && n >= 0 ? Math.min(n, 1e7) : 0;
+        const n2 = int2(v);
+        return n2 !== null && n2 >= 0 ? Math.min(n2, 1e7) : 0;
       };
       const comments = Array.isArray(u.comments) ? u.comments : [];
       if (!ref.commentsAllowed && comments.length) {
@@ -577,10 +657,10 @@ ${JSON.stringify(body4)}`;
     for (const p of CONTEXT.includePosts ? st.posts : []) {
       if (CONTEXT.ownOnly && !p.mine && !p.comments.some((c) => c.mine)) continue;
       const wanted = /* @__PURE__ */ new Set();
-      const include = (n) => {
-        if (n <= 0 || wanted.has(n) || !p.comments[n - 1]) return;
-        wanted.add(n);
-        include(p.comments[n - 1].parent);
+      const include = (n2) => {
+        if (n2 <= 0 || wanted.has(n2) || !p.comments[n2 - 1]) return;
+        wanted.add(n2);
+        include(p.comments[n2 - 1].parent);
       };
       let selected = 0;
       for (let j = p.comments.length; j >= 1 && selected < CONTEXT.comments; j--) {
@@ -674,10 +754,10 @@ ${JSON.stringify({ feature: "gnet", records })}
   var STORAGE_MAX2 = 2e4;
   var COOLDOWN = { incoming: 1, invitation: 3, announcement: 3 };
   function phoneStorage(state, k) {
-    const n = Number(state?.[PH(`storage_limit_${k}`)]);
+    const n2 = Number(state?.[PH(`storage_limit_${k}`)]);
     return {
       auto: String(state?.[PH(`storage_auto_${k}`)] ?? "") !== "0",
-      limit: Number.isInteger(n) && n >= 1 && n <= STORAGE_MAX2 ? n : STORAGE[k]
+      limit: Number.isInteger(n2) && n2 >= 1 && n2 <= STORAGE_MAX2 ? n2 : STORAGE[k]
     };
   }
   var storageCap = (state, k) => {
@@ -687,8 +767,8 @@ ${JSON.stringify({ feature: "gnet", records })}
   var NOTICE_PAGE_SIZES = [20, 30, 40, 50, 60];
   function noticeSettings(state) {
     const num4 = (k, lo, hi, d) => {
-      const n = Number(state?.[PH(k)]);
-      return Number.isInteger(n) && n >= lo && n <= hi ? n : d;
+      const n2 = Number(state?.[PH(k)]);
+      return Number.isInteger(n2) && n2 >= lo && n2 <= hi ? n2 : d;
     };
     const page = num4("announcement_page_size", 20, 60, 30);
     return { gap: num4("announcement_gap", 1, 100, COOLDOWN.announcement), history: num4("announcement_history", 1, 50, HISTORY2.announcement), page: NOTICE_PAGE_SIZES.includes(page) ? page : 30 };
@@ -702,8 +782,8 @@ ${JSON.stringify({ feature: "gnet", records })}
   function phoneSettings(state) {
     const v = (k) => phoneValue(state, k);
     const pct2 = (k) => {
-      const n = Number(v(k));
-      return Number.isFinite(n) ? Math.max(0, Math.min(100, Math.floor(n))) : 100;
+      const n2 = Number(v(k));
+      return Number.isFinite(n2) ? Math.max(0, Math.min(100, Math.floor(n2))) : 100;
     };
     return {
       model: v("model") === "main" ? "main" : "aux",
@@ -733,8 +813,8 @@ ${JSON.stringify({ feature: "gnet", records })}
     return Number.isFinite(last2) ? Math.max(0, cooldownTurns(chat, k) - (storyTurns(chat) - last2)) : 0;
   }
   var cooldownMark = (chat, k) => ({ [COOLDOWN_KEY(k)]: String(storyTurns(chat)) });
-  function chancePassed(n, rng) {
-    return n >= 100 || n > 0 && Math.floor(rng() * 100) + 1 <= n;
+  function chancePassed(n2, rng) {
+    return n2 >= 100 || n2 > 0 && Math.floor(rng() * 100) + 1 <= n2;
   }
   var hex2 = (s4) => Array.from(new TextEncoder().encode(s4), (b) => b.toString(16).padStart(2, "0")).join("");
   var contactId = (agentId) => `c_${hex2(agentId)}`;
@@ -744,9 +824,9 @@ ${JSON.stringify({ feature: "gnet", records })}
     const data = phoneTabsSection(lore);
     if (!data.tabs.length) throw new PhoneError("괴담톡 탭 설정이 없어요.");
     const entries2 = [];
-    for (const row7 of data.tabs) {
-      if (entries2.some((e) => e.id === row7.id)) continue;
-      entries2.push({ id: row7.id, name: row7.name || row7.id, names: { ...row7.name_by_faction }, visibleFor: new Set(row7.visible_for) });
+    for (const row8 of data.tabs) {
+      if (entries2.some((e) => e.id === row8.id)) continue;
+      entries2.push({ id: row8.id, name: row8.name || row8.id, names: { ...row8.name_by_faction }, visibleFor: new Set(row8.visible_for) });
     }
     const extra = extraFactions(lore).map((f) => f.code);
     if (extra.length) {
@@ -786,29 +866,29 @@ ${JSON.stringify({ feature: "gnet", records })}
     const roster = { characters: rosterOf(readDirectory(books)) };
     const map = /* @__PURE__ */ new Map();
     const contacts = [];
-    for (const row7 of roster.characters ?? []) {
-      const agentId = s3(row7?.id);
-      if (!/^P\d{3,}$/.test(agentId) || !s3(row7.name)) continue;
+    for (const row8 of roster.characters ?? []) {
+      const agentId = s3(row8?.id);
+      if (!/^P\d{3,}$/.test(agentId) || !s3(row8.name)) continue;
       if (agentId === String(chat.scriptstate?.["$st_player"] ?? "")) continue;
-      const english = s3(row7.english);
+      const english = s3(row8.english);
       const c = {
         id: contactId(agentId),
         agentId,
-        name: s3(row7.name),
+        name: s3(row8.name),
         english,
-        lore: s3(row7.lore),
-        group: s3(row7.affiliation),
-        rank: s3(row7.rank),
-        department: s3(row7.department),
-        tabs: list3(row7.phone_tabs),
-        terms: [s3(row7.name), english, s3(row7.lore), ...list3(row7.aliases), ...list3(row7.legacy_english)].filter(Boolean),
+        lore: s3(row8.lore),
+        group: s3(row8.affiliation),
+        rank: s3(row8.rank),
+        department: s3(row8.department),
+        tabs: list3(row8.phone_tabs),
+        terms: [s3(row8.name), english, s3(row8.lore), ...list3(row8.aliases), ...list3(row8.legacy_english)].filter(Boolean),
         visible: false,
         saved: false
       };
       c.visible = c.tabs.some((t) => visible2.has(t));
       map.set(c.id, c);
       if (c.visible) contacts.push(c);
-      for (const name of [english, ...list3(row7.legacy_english)]) if (name) map.set(`c_${hex2(name.toLowerCase())}`, c);
+      for (const name of [english, ...list3(row8.legacy_english)]) if (name) map.set(`c_${hex2(name.toLowerCase())}`, c);
     }
     for (const entry of readCustom(chat).items) {
       let c = map.get(entry.id);
@@ -898,13 +978,13 @@ ${JSON.stringify({ feature: "gnet", records })}
     r.unread = 0;
   }
   var roomUnread = (st) => Object.values(st.rooms).some((r) => r.unread > 0);
-  var unreadCount = (st) => Object.values(st.rooms).reduce((n, r) => n + (r.unread || 0), 0);
+  var unreadCount = (st) => Object.values(st.rooms).reduce((n2, r) => n2 + (r.unread || 0), 0);
   function conversationState(r) {
     let out = { ownerHasSpoken: false, npcMessagesSinceOwner: 0, senders: [], readReceipt: "unknown" };
     let senders = /* @__PURE__ */ new Map();
     if (r.conversationBaseline && typeof r.conversationBaseline === "object") {
       out = JSON.parse(JSON.stringify(r.conversationBaseline));
-      for (const row7 of out.senders ?? []) senders.set(row7.sender, row7);
+      for (const row8 of out.senders ?? []) senders.set(row8.sender, row8);
       out.senders = [];
     }
     for (const m of r.messages) {
@@ -919,18 +999,18 @@ ${JSON.stringify({ feature: "gnet", records })}
         senders = /* @__PURE__ */ new Map();
       } else {
         out.npcMessagesSinceOwner++;
-        const row7 = senders.get(m.sender) ?? { sender: m.sender, messagesSinceOwner: 0, firstMessageTime: m.time || "" };
-        row7.messagesSinceOwner++;
-        row7.lastMessageTime = m.time || "";
-        row7.lastRecordID = m.id;
-        senders.set(m.sender, row7);
+        const row8 = senders.get(m.sender) ?? { sender: m.sender, messagesSinceOwner: 0, firstMessageTime: m.time || "" };
+        row8.messagesSinceOwner++;
+        row8.lastMessageTime = m.time || "";
+        row8.lastRecordID = m.id;
+        senders.set(m.sender, row8);
       }
     }
     const rt = r.readThrough;
     for (const key2 of [...senders.keys()].sort()) {
-      const row7 = senders.get(key2);
-      row7.lastMessageRead = rt !== void 0 && row7.lastRecordID !== void 0 ? row7.lastRecordID <= rt ? "read" : "unread" : "unknown";
-      out.senders.push(row7);
+      const row8 = senders.get(key2);
+      row8.lastMessageRead = rt !== void 0 && row8.lastRecordID !== void 0 ? row8.lastRecordID <= rt ? "read" : "unread" : "unknown";
+      out.senders.push(row8);
     }
     out.readReceipt = rt !== void 0 ? "tracked" : "unknown";
     out.ownerReadThroughRecordID = rt;
@@ -941,11 +1021,11 @@ ${JSON.stringify({ feature: "gnet", records })}
     for (const r of Object.values(st.rooms)) {
       const cap = r.kind === "group" ? caps.group : caps.dm;
       if (r.pending || r.messages.length <= cap) continue;
-      const n = r.messages.length - cap;
-      const removed = r.messages.slice(0, n);
+      const n2 = r.messages.length - cap;
+      const removed = r.messages.slice(0, n2);
       r.conversationBaseline = conversationState({ messages: removed, conversationBaseline: r.conversationBaseline });
-      r.messages = r.messages.slice(n);
-      r.trimmedRecords = (r.trimmedRecords ?? 0) + n;
+      r.messages = r.messages.slice(n2);
+      r.trimmedRecords = (r.trimmedRecords ?? 0) + n2;
       const incoming = r.messages.filter((m) => m.kind === "message" && m.sender !== "me" && m.sender !== "system").length;
       r.unread = Math.min(r.unread, incoming);
     }
@@ -1114,7 +1194,7 @@ ${JSON.stringify({ feature: "gnet", records })}
     try {
       const v = JSON.parse(raw);
       if (v && Array.isArray(v.items)) {
-        for (const row7 of v.items) if (row7.read === void 0) row7.read = true;
+        for (const row8 of v.items) if (row8.read === void 0) row8.read = true;
         return { version: 2, seq: Number(v.seq) || 0, items: v.items, checks: v.checks ?? {}, seen: v.seen ?? {}, lastIssuedTurns: v.lastIssuedTurns };
       }
     } catch {
@@ -1122,12 +1202,12 @@ ${JSON.stringify({ feature: "gnet", records })}
     throw new PhoneError("공지 기록을 읽지 못했어요. 원본 기록은 그대로 둬요.");
   }
   var bulletinUnread = (b) => b.items.some((r) => r.read === false);
-  var signature = (row7) => JSON.stringify([row7.channel, row7.title.trim(), row7.text.trim()]);
+  var signature = (row8) => JSON.stringify([row8.channel, row8.title.trim(), row8.text.trim()]);
   function trimBulletins(b, cap = STORAGE.notice) {
-    const n = Math.max(0, b.items.length - cap);
-    b.items = b.items.slice(n);
+    const n2 = Math.max(0, b.items.length - cap);
+    b.items = b.items.slice(n2);
     b.seen = {};
-    for (const row7 of b.items) b.seen[signature(row7)] = true;
+    for (const row8 of b.items) b.seen[signature(row8)] = true;
   }
   function noticeChannel(chat) {
     const code = String(chat.scriptstate?.["$st_faction"] ?? "");
@@ -1156,31 +1236,31 @@ ${JSON.stringify({ feature: "gnet", records })}
   function validateAnnouncements(rows2, packet, dropped = []) {
     if (rows2 != null && !Array.isArray(rows2)) fail("공지 목록이 배열이 아니에요.");
     const out = [];
-    for (const row7 of rows2 ?? []) {
-      const why = noticeProblem(row7);
+    for (const row8 of rows2 ?? []) {
+      const why = noticeProblem(row8);
       if (why) dropped.push(why);
       else if (out.length >= (packet?.maxNew ?? 0)) dropped.push("한 번에 받을 공지 수를 넘었어요.");
-      else out.push(row7);
+      else out.push(row8);
     }
     return out;
   }
-  function noticeProblem(row7) {
-    if (!row7 || typeof row7.issuer !== "string" || typeof row7.category !== "string" || typeof row7.title !== "string" || typeof row7.text !== "string") return "공지 형식이 잘못됐어요.";
-    if (!CATEGORIES.has(row7.category)) return "공지 분류가 올바르지 않아요.";
-    if (!row7.issuer.trim() || [...row7.issuer].length > LIMITS2.notice_issuer || !row7.title.trim() || [...row7.title].length > LIMITS2.notice_title || !row7.text.trim()) return "공지 발신처·제목·본문을 확인하세요.";
-    if (tokens(row7.text) > LIMITS2.notice_tokens) return `공지 한 개는 ${LIMITS2.notice_tokens}토큰 이내여야 해요.`;
+  function noticeProblem(row8) {
+    if (!row8 || typeof row8.issuer !== "string" || typeof row8.category !== "string" || typeof row8.title !== "string" || typeof row8.text !== "string") return "공지 형식이 잘못됐어요.";
+    if (!CATEGORIES.has(row8.category)) return "공지 분류가 올바르지 않아요.";
+    if (!row8.issuer.trim() || [...row8.issuer].length > LIMITS2.notice_issuer || !row8.title.trim() || [...row8.title].length > LIMITS2.notice_title || !row8.text.trim()) return "공지 발신처·제목·본문을 확인하세요.";
+    if (tokens(row8.text) > LIMITS2.notice_tokens) return `공지 한 개는 ${LIMITS2.notice_tokens}토큰 이내여야 해요.`;
     return null;
   }
   function commitAnnouncements(b, st, rows2, packet, time2) {
     let added = 0;
-    for (const row7 of rows2) {
-      const rec = { channel: packet.channel, title: row7.title.trim(), text: row7.text.trim() };
+    for (const row8 of rows2) {
+      const rec = { channel: packet.channel, title: row8.title.trim(), text: row8.text.trim() };
       const sig = signature(rec);
       if (b.seen[sig]) continue;
       b.seen[sig] = true;
       b.seq += 1;
       st.mid += 1;
-      b.items.push({ id: b.seq, order: st.mid, read: false, channel: packet.channel, channelName: packet.channelName, issuer: row7.issuer.trim(), category: row7.category, title: rec.title, text: rec.text, time: time2 });
+      b.items.push({ id: b.seq, order: st.mid, read: false, channel: packet.channel, channelName: packet.channelName, issuer: row8.issuer.trim(), category: row8.category, title: rec.title, text: rec.text, time: time2 });
       added++;
     }
     if (added && packet.allowed) b.lastIssuedTurns = { ...b.lastIssuedTurns ?? {}, [packet.channel]: packet.turn };
@@ -1201,16 +1281,16 @@ ${JSON.stringify({ feature: "gnet", records })}
     const sig = (m) => [...m].sort().join(",");
     const out = [];
     const fresh = /* @__PURE__ */ new Set();
-    for (const row7 of rows2 ?? []) {
+    for (const row8 of rows2 ?? []) {
       if (out.length >= (packet?.maxNew ?? 0)) {
         dropped.push("한 번에 받을 단톡방 초대 수를 넘었어요.");
         continue;
       }
       try {
-        if (!row7 || typeof row7.inviter !== "string" || !Array.isArray(row7.members) || typeof row7.name !== "string" || !Array.isArray(row7.patch)) fail("단톡방 초대 형식이 잘못됐어요.");
-        const name = row7.name.trim();
+        if (!row8 || typeof row8.inviter !== "string" || !Array.isArray(row8.members) || typeof row8.name !== "string" || !Array.isArray(row8.patch)) fail("단톡방 초대 형식이 잘못됐어요.");
+        const name = row8.name.trim();
         if (!name || [...name].length > LIMITS2.room_name) fail("초대할 단톡방 이름이 길이 제한을 넘었어요.");
-        const members = row7.members;
+        const members = row8.members;
         if (members.length < 2 || members.length > LIMITS2.members) fail("단톡방에는 NPC 2명 이상이 필요하고 최대 인원을 넘을 수 없어요.");
         const people = {};
         for (const cid of members) {
@@ -1218,12 +1298,12 @@ ${JSON.stringify({ feature: "gnet", records })}
           if (typeof cid !== "string" || !allowed.has(cid) || !c || people[cid]) fail("단톡방 초대에 허용되지 않거나 중복된 참여자가 있어요.");
           people[cid] = personOf(c);
         }
-        if (!people[row7.inviter]) fail("초대한 인물은 단톡방 참여자여야 해요.");
+        if (!people[row8.inviter]) fail("초대한 인물은 단톡방 참여자여야 해요.");
         const key2 = `${name}\0${sig(members)}`;
         if (fresh.has(key2)) fail("같은 단톡방 초대가 중복됐어요.");
         for (const r of Object.values(st.rooms)) if (r.kind === "group" && roomLabel(r).trim() === name && sig(r.members) === sig(members)) fail("같은 이름과 참여자의 단톡방이 이미 있어요.");
-        const room = { id: "", kind: "group", name, members: [...members], people, messages: [], draft: "", unread: 0, inviter: row7.inviter };
-        room.events = eventsFromPatch(row7.patch, room, false, dropped).events;
+        const room = { id: "", kind: "group", name, members: [...members], people, messages: [], draft: "", unread: 0, inviter: row8.inviter };
+        room.events = eventsFromPatch(row8.patch, room, false, dropped).events;
         fresh.add(key2);
         out.push(room);
       } catch (error) {
@@ -1360,8 +1440,8 @@ ${body4}
     });
   }
   function validCallTarget(name) {
-    const n = name.trim();
-    return !!n && [...n].length <= 60 && !/[\r\n<>[\]{}]/.test(n);
+    const n2 = name.trim();
+    return !!n2 && [...n2].length <= 60 && !/[\r\n<>[\]{}]/.test(n2);
   }
   function agentStatus(chat, agentId) {
     if (!agentId) return void 0;
@@ -1528,8 +1608,8 @@ ${body4}
     if (!s4 || s4 === "null") return null;
     if (item2.type === "bool") return s4 === "1" || s4 === "0" ? s4 : null;
     if (item2.type === "pick") return item2.opts?.some(([v]) => v === s4) ? s4 : null;
-    const n = Number(s4);
-    return Number.isInteger(n) && n >= (item2.min ?? 0) && n <= (item2.max ?? Infinity) ? String(n) : null;
+    const n2 = Number(s4);
+    return Number.isInteger(n2) && n2 >= (item2.min ?? 0) && n2 <= (item2.max ?? Infinity) ? String(n2) : null;
   }
   function advValue(state, f, key2) {
     const item2 = advItem(f, key2);
@@ -1609,9 +1689,9 @@ ${body4}
     return { charIndex, chatIndex, char, chat };
   }
   var queues = /* @__PURE__ */ new Map();
-  function updateChat(charIndex, chatIndex, mutate3) {
+  function updateChat(charIndex, chatIndex, mutate4) {
     const key2 = `${charIndex}:${chatIndex}`;
-    const run3 = (queues.get(key2) ?? Promise.resolve()).then(() => saveChat(charIndex, chatIndex, mutate3));
+    const run3 = (queues.get(key2) ?? Promise.resolve()).then(() => saveChat(charIndex, chatIndex, mutate4));
     const tail2 = run3.catch(() => {
     });
     queues.set(key2, tail2);
@@ -1620,20 +1700,20 @@ ${body4}
     });
     return run3;
   }
-  async function saveChat(charIndex, chatIndex, mutate3) {
+  async function saveChat(charIndex, chatIndex, mutate4) {
     const latest = await risuai.getChatFromIndex(charIndex, chatIndex);
     if (!latest) throw new Error("채팅을 찾을 수 없어요. 채팅을 다시 열어 주세요.");
     latest.message ??= [];
     applyAdvanced(latest.scriptstate);
-    const next = mutate3(latest);
+    const next = mutate4(latest);
     if (!next) return null;
     await risuai.setChatToIndex(charIndex, chatIndex, next);
     return next;
   }
-  async function updateCharacterLore(charIndex, mutate3) {
+  async function updateCharacterLore(charIndex, mutate4) {
     const latest = await risuai.getCharacterFromIndex(charIndex);
     if (!latest) throw new Error("캐릭터를 찾을 수 없어요.");
-    const next = mutate3(latest.globalLore ?? []);
+    const next = mutate4(latest.globalLore ?? []);
     if (!next) return false;
     await risuai.setCharacterToIndex(charIndex, { ...latest, globalLore: next });
     return true;
@@ -1685,10 +1765,10 @@ ${body4}
       const charIndex = await risuai.getCurrentCharacterIndex();
       const chatIndex = await risuai.getCurrentChatIndex();
       await updateChat(charIndex, chatIndex, (chat) => {
-        const msgs = chat.message ?? [];
-        const last2 = msgs[msgs.length - 1];
+        const msgs3 = chat.message ?? [];
+        const last2 = msgs3[msgs3.length - 1];
         if (!last2 || last2.role !== "user" || typeof last2.data !== "string" || !isUnsent(last2.data)) return null;
-        chat.message = msgs.slice(0, -1);
+        chat.message = msgs3.slice(0, -1);
         return chat;
       });
     } catch (error) {
@@ -1708,23 +1788,23 @@ ${body4}
   var trimPrevious = () => level >= 1;
   var trimSecondary = () => level >= 2;
   var trimRelated = () => level >= 3;
-  function trimTurns(n) {
-    if (n <= 0) return 0;
-    return level < 4 ? n : Math.max(1, Math.floor(n / 2 ** (level - 3)));
+  function trimTurns(n2) {
+    if (n2 <= 0) return 0;
+    return level < 4 ? n2 : Math.max(1, Math.floor(n2 / 2 ** (level - 3)));
   }
   var BudgetError = class extends Error {
   };
   function promptTokens(p) {
-    return p.messages.reduce((n, m) => n + tokens(m.content), 0);
+    return p.messages.reduce((n2, m) => n2 + tokens(m.content), 0);
   }
   function fitPrompt(cap, build) {
     if (!(cap > 0)) return build();
     try {
       for (level = 0; ; level++) {
         const p = build();
-        const n = promptTokens(p);
-        if (n <= cap) return p;
-        if (level >= LAST) throw new BudgetError(`요청이 토큰 상한(${cap.toLocaleString()})을 넘어요. 참고 자료를 줄여도 약 ${n.toLocaleString()}토큰이에요. 고급 설정에서 상한을 올려 주세요.`);
+        const n2 = promptTokens(p);
+        if (n2 <= cap) return p;
+        if (level >= LAST) throw new BudgetError(`요청이 토큰 상한(${cap.toLocaleString()})을 넘어요. 참고 자료를 줄여도 약 ${n2.toLocaleString()}토큰이에요. 고급 설정에서 상한을 올려 주세요.`);
       }
     } finally {
       level = 0;
@@ -1907,8 +1987,8 @@ ${body4}
     }
     return null;
   }
-  function whenCond(head, env2) {
-    const rest = head.replace(/^#when/, "");
+  function whenCond(head2, env2) {
+    const rest = head2.replace(/^#when/, "");
     if (!rest.startsWith("::")) return truthy(evaluate(rest, env2).trim());
     const p = splitTop(rest.slice(2)).map((x) => evaluate(x, env2));
     if (p.length === 1) return truthy(p[0].trim());
@@ -1980,15 +2060,15 @@ ${body4}
         break;
       }
       const raw = text.slice(j + 2, k - 2);
-      const head = raw.trim();
-      if (head.startsWith("#if") || head.startsWith("#when")) {
+      const head2 = raw.trim();
+      if (head2.startsWith("#if") || head2.startsWith("#when")) {
         const b = blockEnd(text, k);
         if (!b) {
           out += text.slice(j, k);
           i = k;
           continue;
         }
-        const yes = head.startsWith("#if") ? truthy(evaluate(head.replace(/^#if(::)?/, ""), env2).trim()) : whenCond(head, env2);
+        const yes = head2.startsWith("#if") ? truthy(evaluate(head2.replace(/^#if(::)?/, ""), env2).trim()) : whenCond(head2, env2);
         const body4 = yes ? text.slice(k, b.else >= 0 ? b.else : b.close) : b.else >= 0 ? text.slice(b.elseEnd, b.close) : "";
         out += evaluate(body4, env2);
         i = b.end;
@@ -2081,9 +2161,9 @@ ${body4}
       seen2.add(key2);
       for (const c of readBook(books, name, env2)) add(kind, name, c);
     };
-    for (const n of o.primaryNames ?? []) pull("primary", n);
+    for (const n2 of o.primaryNames ?? []) pull("primary", n2);
     for (const x of o.extra ?? []) add("active", x.source, x.content);
-    if (o.active !== false) for (const n of ACTIVE_BOOKS) pull("active", n);
+    if (o.active !== false) for (const n2 of ACTIVE_BOOKS) pull("active", n2);
     if (o.related !== false) {
       for (const e of referenceEntries(registry2, o.text)) if (e.lore) pull("direct", e.lore);
     }
@@ -2116,7 +2196,7 @@ ${r.content}`).join("\n\n");
     if (hasWorldTags(t)) t = cleanOutput(t);
     return stripModules(t);
   }
-  function recentTurns(chat, n) {
+  function recentTurns(chat, n2) {
     const turns2 = [];
     for (const m of chat.message ?? []) {
       const text = messageText(m.data);
@@ -2125,7 +2205,7 @@ ${r.content}`).join("\n\n");
       else if (turns2.length) turns2[turns2.length - 1].char.push(text);
       else turns2.push({ user: "", char: [text] });
     }
-    return turns2.slice(-Math.max(1, n));
+    return turns2.slice(-Math.max(1, n2));
   }
   function storyText(turns2) {
     return turns2.flatMap((t) => [...t.user ? [`[user]
@@ -2301,8 +2381,8 @@ ${body4}
     const sec = policySections(src.char.globalLore, "Wiki");
     for (const k of REQUIRED2) if (!sec[k]) throw new WikiError(`Wiki 로어북의 ${k} 섹션이 없어요.`);
     const r = registry2 ?? buildRegistry(src.char.globalLore);
-    const n = trimTurns(s4.chatTurns);
-    const story = n ? storyText(recentTurns(src.chat, n)) : "";
+    const n2 = trimTurns(s4.chatTurns);
+    const story = n2 ? storyText(recentTurns(src.chat, n2)) : "";
     const primary = [req.title, ...hasBook(src, req.title) ? [] : req.inherited];
     const t = refToggles(src.chat.scriptstate, "nw");
     const rows2 = limitRefs(
@@ -2435,9 +2515,9 @@ ${req.docRequest.trim()}`;
       notes.push(t);
       return `<sup class="nw-fn" data-fn="${notes.length}" role="button" tabindex="0">[${notes.length}]</sup>`;
     });
-    const lines = innerBody(body4).split("\n");
+    const lines2 = innerBody(body4).split("\n");
     const blocks = [];
-    for (const line2 of lines) {
+    for (const line2 of lines2) {
       const m = /^\s*\[(\w+)\](.*)$/.exec(line2);
       if (m) blocks.push({ tag: m[1], text: m[2] });
       else if (line2.trim() && blocks.length) blocks[blocks.length - 1].text += `
@@ -2479,9 +2559,9 @@ ${line2}`;
       switch (b.tag) {
         case "Infobox": {
           const fields3 = splitFields(b.text).map(field);
-          const head = fields3.find(([k]) => k === "Title")?.[1] ?? a.doc_title ?? "";
+          const head2 = fields3.find(([k]) => k === "Title")?.[1] ?? a.doc_title ?? "";
           const rows2 = fields3.filter(([k]) => k !== "Title" && k);
-          out.push(`<table class="nw-infobox" style="--nw:${color}"><tr><th colspan="2">${inline(head)}</th></tr>${o.photo ? `<tr><td colspan="2" class="nw-ibphoto"><img src="${esc2(o.photo)}" alt=""></td></tr>` : ""}${rows2.map(([k, v]) => `<tr><td>${inline(k)}</td><td>${inline(v)}</td></tr>`).join("")}</table>`);
+          out.push(`<table class="nw-infobox" style="--nw:${color}"><tr><th colspan="2">${inline(head2)}</th></tr>${o.photo ? `<tr><td colspan="2" class="nw-ibphoto"><img src="${esc2(o.photo)}" alt=""></td></tr>` : ""}${rows2.map(([k, v]) => `<tr><td>${inline(k)}</td><td>${inline(v)}</td></tr>`).join("")}</table>`);
           break;
         }
         case "Toc":
@@ -2508,10 +2588,10 @@ ${line2}`;
           const cap = fields3.find(([k]) => k === "Caption")?.[1];
           const c2 = fields3.find(([k]) => k === "Color")?.[1];
           const tc = /^#[0-9a-fA-F]{3,8}$/.test(c2 ?? "") ? c2 : color;
-          const head = fields3.find(([k]) => k === "Head")?.[1];
+          const head2 = fields3.find(([k]) => k === "Head")?.[1];
           const rows2 = fields3.filter(([k]) => k === "Row" || k === "RowHead");
           const cells = (v, tagName2) => v.split(";;").map((x) => `<${tagName2}>${inline(x.trim())}</${tagName2}>`).join("");
-          out.push(`<table class="nw-table${b.tag === "CategoryTable" ? " cat" : ""}" style="--nw:${tc}">${cap ? `<caption>${inline(cap)}</caption>` : ""}${head ? `<tr>${cells(head, "th")}</tr>` : ""}${rows2.map(([k, v]) => `<tr>${cells(v, k === "RowHead" ? "th" : "td")}</tr>`).join("")}</table>`);
+          out.push(`<table class="nw-table${b.tag === "CategoryTable" ? " cat" : ""}" style="--nw:${tc}">${cap ? `<caption>${inline(cap)}</caption>` : ""}${head2 ? `<tr>${cells(head2, "th")}</tr>` : ""}${rows2.map(([k, v]) => `<tr>${cells(v, k === "RowHead" ? "th" : "td")}</tr>`).join("")}</table>`);
           break;
         }
         default:
@@ -2521,7 +2601,7 @@ ${line2}`;
     }
     flushList();
     closeSpoil();
-    if (notes.length) out.push(`<ol class="nw-notes">${notes.map((n, i) => `<li data-fn="${i + 1}">${hidden.has(i) ? `<details class="nw-spoil fn"><summary>스포일러</summary><span class="nw-fn-t">${n}</span></details>` : n}</li>`).join("")}</ol>`);
+    if (notes.length) out.push(`<ol class="nw-notes">${notes.map((n2, i) => `<li data-fn="${i + 1}">${hidden.has(i) ? `<details class="nw-spoil fn"><summary>스포일러</summary><span class="nw-fn-t">${n2}</span></details>` : n2}</li>`).join("")}</ol>`);
     const links = (keys) => keys.map((k) => a[k]).filter((t) => !!t && validTitle(t)).map((t) => o.canon(t));
     return { html: out.join(""), title: a.doc_title || "", related: links(["related1", "related2", "related3"]), recent: links(["recent1", "recent2", "recent3"]), headings: headings.map((h) => h.title) };
   }
@@ -2733,8 +2813,8 @@ ${SEED_CLOSE}` : "", missing };
   var marker = "";
   var opener = null;
   function greetingMarker(greeting) {
-    const lines = greeting.split("\n").map((l) => l.trim()).filter((l) => l && !/[{}<>[\]]/.test(l));
-    const best = lines.sort((a, b) => b.length - a.length)[0] ?? "";
+    const lines2 = greeting.split("\n").map((l) => l.trim()).filter((l) => l && !/[{}<>[\]]/.test(l));
+    const best = lines2.sort((a, b) => b.length - a.length)[0] ?? "";
     return best.length >= 8 ? best.slice(0, 40) : "";
   }
   function openingStaged(chat, lore) {
@@ -2854,8 +2934,8 @@ ${SEED_CLOSE}` : "", missing };
     }
     if (!name) {
       try {
-        const n = String(await risuai.parseRisuChat("{{user}}") ?? "").trim();
-        if (n && !n.includes("{{")) name = n;
+        const n2 = String(await risuai.parseRisuChat("{{user}}") ?? "").trim();
+        if (n2 && !n2.includes("{{")) name = n2;
       } catch {
       }
     }
@@ -2938,8 +3018,8 @@ ${outro}${attachments ? `
 ${b.read("ATTACHMENTS.READ")}` : ""}`;
   }
   function pack2(src, b, guideline, format, extras2, factionNames2, identity) {
-    const n = trimTurns(HISTORY.turns);
-    const story = n ? storyText(recentTurns(src.chat, n)) : "";
+    const n2 = trimTurns(HISTORY.turns);
+    const story = n2 ? storyText(recentTurns(src.chat, n2)) : "";
     const t = refToggles(src.chat.scriptstate, "gn");
     const rows2 = collectRefs(src, {
       scope: "gnet",
@@ -3047,12 +3127,12 @@ ${commentTimeRule(dateNow(src.chat))}`, extras2, factionNames2), activity };
     for (let i = Math.max(1, total - limit + 1); i <= total; i++) selected.add(i);
     if (replyTo > 0) selected.add(replyTo);
     for (const i of [...selected]) {
-      let n = i;
+      let n2 = i;
       const seen2 = /* @__PURE__ */ new Set();
-      while (p.comments[n - 1] && !seen2.has(n)) {
-        seen2.add(n);
-        selected.add(n);
-        n = p.comments[n - 1].parent;
+      while (p.comments[n2 - 1] && !seen2.has(n2)) {
+        seen2.add(n2);
+        selected.add(n2);
+        n2 = p.comments[n2 - 1].parent;
       }
     }
     const comments = p.comments.map((c, i) => ({ index: i + 1, parent: c.parent, author: c.nick, ...whenField(p, c), content: c.body, mine: c.mine })).filter((c) => selected.has(c.index));
@@ -3080,12 +3160,12 @@ ${commentTimeRule(dateNow(src.chat))}`, extras2, factionNames2), activity, suppl
     for (const { p } of ranked) {
       if (rows2.length >= 8) break;
       const comments = p.comments.slice(-12).map((c, j, arr) => ({ id: p.comments.length - arr.length + j + 1, parent: c.parent, author: c.nick, ...whenField(p, c), content: trimTokens(c.body, LIMITS.quote_tokens) }));
-      const row7 = { id: p.id, title: p.title, author: p.nick, date: p.date, content: trimTokens(p.body, LIMITS.origin_tokens), comments };
-      while (JSON.stringify(row7).length > (cap - used) * 2 && row7.comments.length) row7.comments.shift();
-      const n = Math.ceil(JSON.stringify(row7).length / 2);
-      if (used + n <= cap) {
-        rows2.push(row7);
-        used += n;
+      const row8 = { id: p.id, title: p.title, author: p.nick, date: p.date, content: trimTokens(p.body, LIMITS.origin_tokens), comments };
+      while (JSON.stringify(row8).length > (cap - used) * 2 && row8.comments.length) row8.comments.shift();
+      const n2 = Math.ceil(JSON.stringify(row8).length / 2);
+      if (used + n2 <= cap) {
+        rows2.push(row8);
+        used += n2;
       }
     }
     if (!rows2.length) return null;
@@ -3108,11 +3188,11 @@ ${commentTimeRule(dateNow(src.chat))}`, extras2, factionNames2), activity, suppl
 ${source4.quote}` : ""
       ].join("\n");
     }
-    const lines = [];
-    for (let i = st.dms.length - 1; i >= 0 && lines.length < HISTORY.dmHistory; i--) {
+    const lines2 = [];
+    for (let i = st.dms.length - 1; i >= 0 && lines2.length < HISTORY.dmHistory; i--) {
       const d = st.dms[i];
       if (d.nick !== nick) continue;
-      lines.unshift({
+      lines2.unshift({
         speaker: d.side === "me" ? "user" : "npc_correspondent",
         handle: d.side === "me" ? userHandle : nick,
         date: d.date,
@@ -3120,7 +3200,7 @@ ${source4.quote}` : ""
       });
     }
     let task = `Current story time: ${dateNow(src.chat)}
-${fill2(b.read("DM.REQUEST"), { NICK: nick, ORIGIN: anchor, HISTORY: JSON.stringify(lines) })}`;
+${fill2(b.read("DM.REQUEST"), { NICK: nick, ORIGIN: anchor, HISTORY: JSON.stringify(lines2) })}`;
     const pub = publicBoard(st, `${latest}
 ${anchor}`);
     if (pub) task += `
@@ -3154,13 +3234,13 @@ Only print the corrected data wrapped in the required node, without apologies, e
 
   // src/core/request.ts
   function userTurns(chat) {
-    let n = 0;
+    let n2 = 0;
     let prev = "";
     for (const m of chat.message ?? []) {
-      if (m.role === "user" && prev !== "user") n++;
+      if (m.role === "user" && prev !== "user") n2++;
       prev = m.role;
     }
-    return n;
+    return n2;
   }
   function shouldKeepSeed(chat) {
     return userTurns(chat) < 2;
@@ -3232,6 +3312,7 @@ ${next.content.trim()}`;
   var slotVar = (k) => `$${SLOTS[k].name}`;
   var DONT_ACTIVATE = "@@dont_activate";
   var FOLDER_KIND = { 세력: "org", 조직: "org", 파밍: "site", 괴이: "anomaly", 요원: "agent" };
+  var APPENDIX = "부록";
   var folderWord2 = (name) => name.replace(/[^\p{L}\p{N}]/gu, "");
   var str2 = (v) => typeof v === "string" ? v : "";
   var CONFIRM_KEYS = /* @__PURE__ */ new Set([
@@ -3354,10 +3435,10 @@ ${next.content.trim()}`;
   }
   var hasDontActivate = (content) => content.split("\n").some((l) => l.trim() === DONT_ACTIVATE) && /^\s*@@/.test(content);
   function stripDecorators(content) {
-    const lines = content.split("\n");
+    const lines2 = content.split("\n");
     let i = 0;
-    while (i < lines.length && /^\s*@@/.test(lines[i])) i++;
-    return lines.slice(i).join("\n");
+    while (i < lines2.length && /^\s*@@/.test(lines2[i])) i++;
+    return lines2.slice(i).join("\n");
   }
   var cache4 = /* @__PURE__ */ new WeakMap();
   function hasSlots(lore) {
@@ -3367,33 +3448,38 @@ ${next.content.trim()}`;
   function folderKeys(books) {
     const kinds = /* @__PURE__ */ new Map();
     for (const e of books) {
-      const k = e.mode === "folder" ? FOLDER_KIND[folderWord2(str2(e.comment))] : void 0;
-      if (k && typeof e.key === "string") kinds.set(e.key, k);
+      if (e.mode !== "folder" || typeof e.key !== "string") continue;
+      const w = folderWord2(str2(e.comment));
+      const k = w === APPENDIX ? "appendix" : FOLDER_KIND[w];
+      if (k && !kinds.has(e.key)) kinds.set(e.key, k);
     }
     return kinds;
   }
   var managedHere = (e, kinds) => e.mode !== "folder" && kinds.has(str2(e.folder)) && !!str2(e.key).trim() && !e.alwaysActive;
+  var otherTriggers = (w) => w.withParent || w.target || w.places.length > 0 || w.agents.length > 0;
   function syncDecorators(lore, mode2) {
     const books = lore ?? [];
     if (!hasSlots(books)) return null;
     const kinds = folderKeys(books);
-    let n = 0;
+    const locked = new Set(readDirectory(books).appendices.filter((r) => r.unlock).map((r) => r.lore));
+    let n2 = 0;
     const next = books.map((e) => {
       if (!managedHere(e, kinds)) return e;
       const content = str2(e.content);
       const on2 = hasDontActivate(content);
-      if (mode2 === "plugin" && !on2) {
-        n++;
+      const keep = mode2 === "plugin" || kinds.get(str2(e.folder)) === "appendix" && locked.has(str2(e.comment));
+      if (keep && !on2) {
+        n2++;
         return { ...e, content: `${DONT_ACTIVATE}
 ${content}` };
       }
-      if (mode2 === "risu" && on2) {
-        n++;
+      if (!keep && on2) {
+        n2++;
         return { ...e, content: content.replace(/^\s*@@dont_activate[ \t]*\r?\n?/m, "") };
       }
       return e;
     });
-    return n ? next : null;
+    return n2 ? next : null;
   }
   function managedEntries(lore) {
     const books = lore ?? [];
@@ -3404,14 +3490,40 @@ ${content}` };
       return [];
     }
     const kinds = folderKeys(books);
+    const dir2 = readDirectory(books);
     const groups = /* @__PURE__ */ new Map();
-    for (const a of readDirectory(books).agents) groups.set(a.lore, [a.group, /^[A-Z]\d\d$/.test(a.affiliation) ? "" : a.affiliation].filter(Boolean));
+    for (const a of dir2.agents) groups.set(a.lore, [a.group, /^[A-Z]\d\d$/.test(a.affiliation) ? "" : a.affiliation].filter(Boolean));
+    const apps = new Map(dir2.appendices.map((r) => [r.lore, r]));
+    const parentAt = (name) => books.findIndex((x) => x.mode !== "folder" && str2(x.comment) === name && kinds.has(str2(x.folder)) && kinds.get(str2(x.folder)) !== "appendix");
+    const agentNames = (name) => {
+      const a = dir2.agents.find((x) => x.lore === name || x.name === name || x.aliases.includes(name));
+      return a ? [...new Set([a.name, a.lore, a.english, ...a.aliases].filter(Boolean))] : [name];
+    };
     const out = [];
     books.forEach((e, index2) => {
-      const kind = kinds.get(str2(e.folder));
+      const folderKind = kinds.get(str2(e.folder));
       const content = str2(e.content);
-      if (!kind || !managedHere(e, kinds)) return;
-      const raw = keysOf2(e);
+      if (!folderKind || e.mode === "folder" || e.alwaysActive) return;
+      let kind;
+      let order = Number(e.insertorder ?? 0);
+      let rank2 = index2;
+      let appendix;
+      if (folderKind === "appendix") {
+        const row8 = apps.get(str2(e.comment));
+        if (!row8 || (!str2(e.key).trim() || !row8.keys) && !otherTriggers(row8)) return;
+        const at = row8.parent ? parentAt(row8.parent) : -1;
+        const p = at >= 0 ? books[at] : void 0;
+        kind = p ? kinds.get(str2(p.folder)) : "org";
+        if (p) {
+          order = Number(p.insertorder ?? 0);
+          rank2 = at + 0.5 + index2 / 1e7;
+        }
+        appendix = { parent: p ? row8.parent : "", parentNames: p ? [row8.parent, ...keysOf2(p)] : row8.parent ? [row8.parent] : [], when: row8, agentNames: row8.agents.map(agentNames) };
+      } else {
+        if (!managedHere(e, kinds)) return;
+        kind = folderKind;
+      }
+      const raw = appendix && !appendix.when.keys ? [] : keysOf2(e);
       const longKo = raw.filter((k) => hangul(k) && syllables(k) >= 3);
       const keys = [];
       for (const text of raw) {
@@ -3421,16 +3533,16 @@ ${content}` };
         const alias = kind === "agent" && !en2 && syllables(text) === 2 && longKo.some((l) => l.replace(/\s+/g, "").includes(text));
         keys.push({ text, en: en2, rule: CONFIRM_KEYS.has(text) ? "confirm" : alias ? "alias" : "plain", re });
       }
-      out.push({ kind, name: str2(e.comment), order: Number(e.insertorder ?? 0), index: index2, content, keys, rawKeys: raw, groups: groups.get(str2(e.comment)) ?? [] });
+      out.push({ kind, name: str2(e.comment), order, index: index2, content, keys, rawKeys: raw, groups: groups.get(str2(e.comment)) ?? [], rank: rank2, ...appendix ? { appendix } : {} });
     });
     cache4.set(books, out);
     return out;
   }
   function around(text, start3, end) {
     let a = start3;
-    for (let n = 0; a > 0 && n < 2; ) if (/\s/.test(text[--a])) n++;
+    for (let n2 = 0; a > 0 && n2 < 2; ) if (/\s/.test(text[--a])) n2++;
     let b = end;
-    for (let n = 0; b < text.length && n < 2; b++) if (/\s/.test(text[b])) n++;
+    for (let n2 = 0; b < text.length && n2 < 2; b++) if (/\s/.test(text[b])) n2++;
     return text.slice(a, b).replace(/\s+/g, " ").trim();
   }
   function rightOk(text, end) {
@@ -3466,20 +3578,41 @@ ${content}` };
     });
     return hits.filter((h) => !hits.some((o) => o !== h && o.entry !== h.entry && o.start <= h.start && o.end >= h.end && o.end - o.start > h.end - h.start));
   }
+  var UNLOCK_VAR = "$goei_unlocked";
+  var UNLOCK_TAG = /\[\s*🔓\s*[|｜]\s*([^\]\r\n]+?)\s*\]/gu;
+  function readUnlocked(ss) {
+    try {
+      const v = JSON.parse(String(ss?.[UNLOCK_VAR] ?? "[]"));
+      return Array.isArray(v) ? v.filter((x) => typeof x === "string" && !!x.trim()) : [];
+    } catch {
+      return [];
+    }
+  }
+  var unlockedValue = (names4) => JSON.stringify([...new Set(names4)]);
+  var hasUnlockTag = (text) => typeof text === "string" && text.includes("🔓") && new RegExp(UNLOCK_TAG.source, "u").test(text);
+  function unlockTags(text) {
+    return hasUnlockTag(text) ? [...text.matchAll(UNLOCK_TAG)].map((m) => m[1].trim()) : [];
+  }
+  function stripUnlockTags(text) {
+    if (!hasUnlockTag(text)) return text;
+    return text.replace(new RegExp(`^[ \\t]*${UNLOCK_TAG.source}[ \\t]*\\r?\\n?`, "gmu"), "").replace(UNLOCK_TAG, "").replace(/\n{3,}/g, "\n\n").trimEnd();
+  }
   var DEFAULT_DEPTH = 10;
   function loreState(chat) {
-    const msgs = chat.message ?? [];
+    const msgs3 = chat.message ?? [];
     let target = "";
-    for (let i = msgs.length - 1; i >= 0 && !target; i--) {
-      if (msgs[i].role === "user") continue;
-      const tags = findStatusTags(str2(msgs[i].data));
-      if (tags.length) target = tags[tags.length - 1].target;
+    let place2 = "";
+    let companions = [];
+    for (let i = msgs3.length - 1; i >= 0 && !target; i--) {
+      if (msgs3[i].role === "user") continue;
+      const tags = findStatusTags(str2(msgs3[i].data));
+      if (tags.length) ({ target, place: place2, companions } = tags[tags.length - 1]);
       if (tags.length) break;
     }
     const w = parseWorld(chat.scriptstate?.[WORLD_KEY]);
     const board2 = [...w.an.filter((a) => a.state === "활성").map((a) => a.name), ...w.ms.filter((m) => m.state === "출현").map((m) => m.name)];
-    const deployed = Object.entries(w.agents).filter(([, r]) => r.st === "작전투입" || r.st === "외근").map(([n]) => n);
-    return { target, board: board2, deployed };
+    const deployed = Object.entries(w.agents).filter(([, r]) => r.st === "작전투입" || r.st === "외근").map(([n2]) => n2);
+    return { target, board: board2, deployed, place: place2, companions, unlocked: readUnlocked(chat.scriptstate) };
   }
   var sameName = (a, b) => a.replace(/\s+/g, "").toLowerCase() === b.replace(/\s+/g, "").toLowerCase();
   function names(e, name) {
@@ -3495,7 +3628,7 @@ ${content}` };
       picks.set(i, p);
     };
     entries2.forEach((e, i) => {
-      if (state.target && names(e, state.target)) add(i, "status", state.target, state.target, 100);
+      if (state.target && !e.appendix && names(e, state.target)) add(i, "status", state.target, state.target, 100);
     });
     const pending = [];
     window2.forEach((m, wi) => {
@@ -3509,38 +3642,79 @@ ${content}` };
     for (const { hit: hit3, why, score: score2 } of pending) {
       if (hit3.key.rule === "plain") continue;
       const e = entries2[hit3.entry];
-      const present = state.deployed.some((n) => names(e, n)) || state.board.some((n) => names(e, n));
+      const present = state.deployed.some((n2) => names(e, n2)) || state.board.some((n2) => names(e, n2));
       const ok = hit3.marked || present || picks.has(hit3.entry) || hit3.honor;
       if (ok) add(hit3.entry, picks.has(hit3.entry) || !hit3.marked ? why : "confirmed", hit3.key.text, hit3.snippet, score2);
     }
+    pickAppendices(entries2, picks, state, add);
     let list4 = [...picks.values()];
     if (o.budget > 0) {
       const keep = [];
       let used = 0;
-      for (const p of list4.slice().sort((a, b) => b.score - a.score)) {
-        const n = tokens(p.entry.content);
-        if (used + n > o.budget) continue;
-        used += n;
+      for (const p of list4.slice().sort((a, b) => Number(!!a.entry.appendix) - Number(!!b.entry.appendix) || b.score - a.score)) {
+        const n2 = tokens(p.entry.content);
+        if (used + n2 > o.budget) continue;
+        used += n2;
         keep.push(p);
       }
-      list4 = keep;
+      const on2 = new Set(keep.map((p) => p.entry.name));
+      list4 = keep.filter((p) => !p.entry.appendix?.when.needParent || on2.has(p.entry.appendix.parent));
     }
-    return list4.sort((a, b) => a.entry.order - b.entry.order || a.entry.index - b.entry.index);
+    return sortPicks(list4);
+  }
+  var sortPicks = (list4) => list4.sort((a, b) => a.entry.order - b.entry.order || a.entry.rank - b.entry.rank || a.entry.index - b.entry.index);
+  var squash2 = (t) => t.replace(/\s+/g, "").toLowerCase();
+  function pickAppendices(entries2, picks, state, add) {
+    if (!entries2.some((e) => e.appendix)) return;
+    const place2 = squash2(state.place ?? "");
+    const present = [...state.companions ?? [], ...state.deployed];
+    entries2.forEach((e, i) => {
+      const a = e.appendix;
+      if (!a) return;
+      if (a.when.target && state.target && a.parentNames.some((n2) => sameName(n2, state.target))) add(i, "status", state.target, state.target, 100);
+      const w = place2 ? a.when.places.find((x) => squash2(x) && place2.includes(squash2(x))) : void 0;
+      if (w) add(i, "place", w, state.place ?? "", 40);
+      for (const group6 of a.agentNames) {
+        const who = present.find((p) => group6.some((n2) => sameName(n2, p)));
+        if (who) add(i, "agent", group6[0], who, 20);
+      }
+    });
+    const on2 = new Set([...picks.values()].map((p) => p.entry.name));
+    entries2.forEach((e, i) => {
+      const a = e.appendix;
+      if (a?.when.withParent && a.parent && on2.has(a.parent)) add(i, "parent", a.parent, a.parent, 10);
+    });
+    const parentOn = new Set([...picks.values()].filter((p) => !p.entry.appendix).map((p) => p.entry.name));
+    const unlocked = new Set(state.unlocked ?? []);
+    for (const [i, p] of picks) {
+      const a = p.entry.appendix;
+      if (!a) continue;
+      if (a.when.unlock && !unlocked.has(p.entry.name) || a.when.needParent && !parentOn.has(a.parent)) picks.delete(i);
+    }
+  }
+  function lockedAppendices(entries2, picks, unlocked) {
+    const on2 = new Set(picks.map((p) => p.entry.name));
+    const done2 = new Set(unlocked);
+    return entries2.filter((e) => e.appendix?.when.unlock && !done2.has(e.name) && e.appendix.parent && on2.has(e.appendix.parent));
+  }
+  function unlockHint(e) {
+    return `[Locked appendix: 「${e.name}」] Hidden information about ${e.appendix.parent} that no character knows yet. Unlock it when this happens in the story: ${e.appendix.when.unlock}
+Do not invent, reveal, or hint at the hidden information before it is unlocked. In the one reply where the condition is clearly met, write [🔓|${e.name}] on its own line at the very end.`;
   }
   function pickLoreRisu(entries2, messages, depth) {
-    const squash3 = (s4) => s4.toLowerCase().replace(/\s+/g, "");
-    const window2 = messages.slice(-Math.max(1, depth)).map((m) => ({ m, flat: squash3(m.data) }));
+    const squash5 = (s4) => s4.toLowerCase().replace(/\s+/g, "");
+    const window2 = messages.slice(-Math.max(1, depth)).map((m) => ({ m, flat: squash5(m.data) }));
     const out = [];
     for (const entry of entries2) {
       const reasons = [];
       for (const k of entry.rawKeys) {
-        const key2 = squash3(k);
+        const key2 = squash5(k);
         const at = key2 ? window2.find((w) => w.flat.includes(key2)) : void 0;
         if (at) reasons.push({ why: at.m.role === "user" ? "user" : "char", key: k, snippet: k });
       }
       if (reasons.length) out.push({ entry, score: 0, reasons });
     }
-    return out.sort((a, b) => a.entry.order - b.entry.order || a.entry.index - b.entry.index);
+    return sortPicks(out);
   }
   function slotTexts(picks, env2) {
     const out = { org: [], site: [], anomaly: [], agent: [] };
@@ -3551,17 +3725,19 @@ ${content}` };
     return Object.fromEntries(LORE_KINDS.map((k) => [k, out[k].join("\n\n")]));
   }
   function loreMessages(chat, input2, raw = false) {
-    const msgs = (chat.message ?? []).map((m) => ({ role: m.role === "user" ? "user" : "char", data: raw ? str2(m.data) : messageText(str2(m.data)) }));
-    if (input2 !== void 0) msgs.push({ role: "user", data: raw ? input2 : messageText(input2) });
-    return msgs.filter((m) => m.data);
+    const msgs3 = (chat.message ?? []).map((m) => ({ role: m.role === "user" ? "user" : "char", data: raw ? str2(m.data) : messageText(str2(m.data)) }));
+    if (input2 !== void 0) msgs3.push({ role: "user", data: raw ? input2 : messageText(input2) });
+    return msgs3.filter((m) => m.data);
   }
   function computeLore(lore, chat, o) {
     const entries2 = managedEntries(lore).filter((e) => !o.exclude?.includes(e.name));
     if (!entries2.length) return null;
-    const msgs = loreMessages(chat, o.input, o.mode === "risu");
-    const picks = o.mode === "risu" ? pickLoreRisu(entries2, msgs, o.depth) : pickLore(entries2, msgs, loreState(chat), o, msgs.at(-1)?.role === "user");
+    const msgs3 = loreMessages(chat, o.input, o.mode === "risu");
+    const picks = o.mode === "risu" ? pickLoreRisu(entries2, msgs3, o.depth) : pickLore(entries2, msgs3, loreState(chat), o, msgs3.at(-1)?.role === "user");
     const texts = o.mode === "risu" ? null : slotTexts(picks, o.env);
-    return { picks, vars: Object.fromEntries(LORE_KINDS.map((k) => [slotVar(k), texts?.[k] ?? ""])) };
+    const locked = texts ? lockedAppendices(entries2, picks, readUnlocked(chat.scriptstate)) : [];
+    for (const e of locked) texts[e.kind] = [texts[e.kind], unlockHint(e)].filter(Boolean).join("\n\n");
+    return { picks, vars: Object.fromEntries(LORE_KINDS.map((k) => [slotVar(k), texts?.[k] ?? ""])), locked };
   }
   var sameVars = (ss, vars) => Object.entries(vars).every(([k, v]) => String(ss?.[k] ?? "") === v);
   function loreOptions(char, chat, mode2, user = "") {
@@ -3569,7 +3745,7 @@ ${content}` };
     const depth = Number(ls.scanDepth) > 0 ? Number(ls.scanDepth) : DEFAULT_DEPTH;
     const total = Number(ls.tokenBudget) > 0 ? Number(ls.tokenBudget) : 0;
     const slots = new Set(LORE_KINDS.map((k) => SLOTS[k].comment));
-    const always = (char.globalLore ?? []).filter((e) => e.alwaysActive && e.mode !== "folder" && !slots.has(str2(e.comment))).reduce((n, e) => n + tokens(str2(e.content)), 0);
+    const always = (char.globalLore ?? []).filter((e) => e.alwaysActive && e.mode !== "folder" && !slots.has(str2(e.comment))).reduce((n2, e) => n2 + tokens(str2(e.content)), 0);
     return {
       mode: mode2,
       depth,
@@ -3676,10 +3852,10 @@ ${after}`);
       const add = { role: "system", content: block2 };
       out = at < 0 ? [add, ...out] : [...out.slice(0, at + 1), add, ...out.slice(at + 1)];
     }
-    const n = userName.trim();
-    if (n && agentName && n !== agentName && n.length >= 2 && !/^(?:user|나|유저)$/i.test(n)) {
-      const esc21 = n.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-      const re = new RegExp(/^[A-Za-z]/.test(n) ? `\\b${esc21}\\b` : esc21, "g");
+    const n2 = userName.trim();
+    if (n2 && agentName && n2 !== agentName && n2.length >= 2 && !/^(?:user|나|유저)$/i.test(n2)) {
+      const esc22 = n2.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const re = new RegExp(/^[A-Za-z]/.test(n2) ? `\\b${esc22}\\b` : esc22, "g");
       out = out.map((m) => typeof m?.content === "string" && re.test(m.content) ? { ...m, content: m.content.replace(re, agentName) } : m);
     }
     return out;
@@ -3690,7 +3866,7 @@ ${after}`);
     const re = /^(- Characters \{name\}: )(.*)$/gm;
     return messages.map((m) => {
       if (typeof m?.content !== "string" || !m.content.includes("- Characters {name}: ")) return m;
-      const content = m.content.replace(re, (_, head, list4) => head + list4.split(",").map((s4) => s4.trim()).filter((s4) => s4 && !drop.has(s4)).join(", "));
+      const content = m.content.replace(re, (_, head2, list4) => head2 + list4.split(",").map((s4) => s4.trim()).filter((s4) => s4 && !drop.has(s4)).join(", "));
       return content === m.content ? m : { ...m, content };
     });
   }
@@ -3715,18 +3891,18 @@ ${after}`);
     const p = sections(src);
     const keys = ["COMMON"];
     let direct = false;
-    let group5 = false;
+    let group6 = false;
     for (const r of body4.rooms ?? (body4.room ? [body4.room] : [])) {
       if (r.receiveMessages === false) continue;
-      if (r.kind === "group") group5 = true;
+      if (r.kind === "group") group6 = true;
       else direct = true;
     }
-    if (body4.invitationCheck?.allowed) group5 = true;
+    if (body4.invitationCheck?.allowed) group6 = true;
     const manual = body4.participants.some((x) => x.manuallySavedContact);
-    if (direct || group5) {
+    if (direct || group6) {
       keys.push("CONVERSATION");
       if (direct) keys.push("DIRECT_ROOMS");
-      if (group5) keys.push("GROUP_ROOMS");
+      if (group6) keys.push("GROUP_ROOMS");
       if (body4.publicBoard?.posts?.length) keys.push("PUBLIC_BOARD");
       if (body4.crossRoomMessages?.length || (body4.rooms?.length ?? 0) > 1) keys.push("CROSS_ROOM");
       if (hasAttachment(JSON.stringify(body4))) keys.push("ATTACHMENT_READ");
@@ -3775,16 +3951,16 @@ ${after}`);
       action: r.pending?.action ?? { type: "refresh" }
     };
   }
-  function participant(src, c, related2, status, names4) {
+  function participant(src, c, related2, status2, names4) {
     let lore = "";
     let title2 = "";
     if (related2) {
       const candidates = c.custom ? [c.name] : c.lore ? [c.lore] : [`${c.english} ${c.name}`, `${c.name} ${c.english}`, c.name, c.english ?? ""];
-      for (const n of candidates) {
-        const t = bookText(src, n);
+      for (const n2 of candidates) {
+        const t = bookText(src, n2);
         if (t) {
           lore = t;
-          title2 = n;
+          title2 = n2;
           break;
         }
       }
@@ -3801,7 +3977,7 @@ ${after}`);
       hasCharacterLore: !!lore.trim(),
       manuallySavedContact: !!c.custom,
       contactMemo: c.custom ? c.note ?? "" : void 0,
-      narratorOnlyAgentStatus: status && c.agentId ? agentStatus(src.chat, c.agentId) : void 0
+      narratorOnlyAgentStatus: status2 && c.agentId ? agentStatus(src.chat, c.agentId) : void 0
     };
   }
   function ownerCharacter(src) {
@@ -3810,8 +3986,8 @@ ${after}`);
   }
   function narrator(src, names4, related2, text) {
     applyAdvanced(src.chat.scriptstate);
-    const n = trimTurns(HISTORY2.turns);
-    const turns2 = n ? recentTurns(src.chat, n) : [];
+    const n2 = trimTurns(HISTORY2.turns);
+    const turns2 = n2 ? recentTurns(src.chat, n2) : [];
     const recentStory = [];
     turns2.forEach((t2, i) => {
       if (t2.user) recentStory.push({ role: "user", text: t2.user, turn: i + 1 });
@@ -3868,9 +4044,9 @@ ${recentStory.map((m) => m.text).join("\n")}`,
     for (const e of candidates) {
       const knownBy = [];
       for (const c of e.allowed) {
-        const n = counts.get(c) ?? 0;
-        if (n < HISTORY2.room) {
-          counts.set(c, n + 1);
+        const n2 = counts.get(c) ?? 0;
+        if (n2 < HISTORY2.room) {
+          counts.set(c, n2 + 1);
           knownBy.push(c);
         }
       }
@@ -4032,7 +4208,7 @@ The previous response was rejected and nothing was saved. Recreate the complete 
   var PhotoError = class extends Error {
   };
   function sniffMime(b) {
-    const s4 = (i, n) => String.fromCharCode(...b.slice(i, i + n));
+    const s4 = (i, n2) => String.fromCharCode(...b.slice(i, i + n2));
     if (b[0] === 137 && s4(1, 3) === "PNG") return "image/png";
     if (b[0] === 255 && b[1] === 216) return "image/jpeg";
     if (s4(0, 4) === "RIFF" && s4(8, 4) === "WEBP") return "image/webp";
@@ -4139,9 +4315,9 @@ The previous response was rejected and nothing was saved. Recreate the complete 
     return `<div class="at-editor" data-drop-photo="${prefix}">${rows2}${showMenu ? `<div class="at-menu" role="group" aria-label="첨부 추가">${menu}${full ? `<small class="gx-muted">첨부는 ${ATTACH_MAX}개까지예요.</small>` : ""}</div>` : ""}</div>`;
   }
   function attachInput(items, key2, value) {
-    const row7 = items[Number(key2)];
-    if (!row7) return false;
-    row7.content = value;
+    const row8 = items[Number(key2)];
+    if (!row8) return false;
+    row8.content = value;
     return true;
   }
   function attachAction(items, op, value, kinds) {
@@ -4276,210 +4452,4 @@ The previous response was rejected and nothing was saved. Recreate the complete 
       } catch {
       }
       try {
-        const db = await risuai.getDatabase(["modules", "enabledModules"]);
-        const on2 = new Set(db?.enabledModules ?? []);
-        const mods = [...db?.modules ?? []].sort((a, b) => Number(on2.has(b.id)) - Number(on2.has(a.id)));
-        rows2 = rows2.concat(mods.flatMap((m) => Array.isArray(m.assets) ? m.assets.filter(isRow) : []));
-      } catch {
-      }
-      const changed = JSON.stringify(rows2) !== JSON.stringify(modRows);
-      if (changed) modRows = rows2, modVer++;
-      return changed;
-    })().finally(() => {
-      modBusy = null;
-    });
-    return modBusy;
-  }
-  var moduleAssetStamp = () => modVer;
-  var modIndex = null;
-  var modIndexVer = -1;
-  function modRow(name) {
-    if (!modIndex || modIndexVer !== modVer) {
-      modIndex = { exact: /* @__PURE__ */ new Map(), lower: /* @__PURE__ */ new Map() };
-      for (const r of modRows) {
-        if (!modIndex.exact.has(r[0])) modIndex.exact.set(r[0], r);
-        if (!modIndex.lower.has(r[0].toLowerCase())) modIndex.lower.set(r[0].toLowerCase(), r);
-      }
-      modIndexVer = modVer;
-    }
-    return modIndex.exact.get(name) ?? modIndex.lower.get(name.toLowerCase());
-  }
-  function modulePicker() {
-    if (!modRows.length) return void 0;
-    return (name) => modRow(name)?.[0] ?? null;
-  }
-  function findRow(char, name) {
-    const lower = name.toLowerCase();
-    const card2 = (char.additionalAssets ?? []).filter(isRow);
-    return card2.find((a) => a[0] === name) ?? card2.find((a) => a[0].toLowerCase() === lower) ?? modRow(name);
-  }
-  function assetNames(char) {
-    const card2 = (char.additionalAssets ?? []).filter(isRow);
-    return [...new Set([...card2, ...modRows].map((r) => r[0]))].filter((n) => !/^map\d+$/i.test(n));
-  }
-  var DEFAULT_CROP = "50,16,44";
-  var AGENT_CROPS = {
-    "Aestheticism": "53,18,40",
-    "Aileen": "43,21,46",
-    "Baek Sa-heon": "50,18,44",
-    "Cha Yeo-jin": "54,18,44",
-    "Cho Seong-choon": "48,18,44",
-    "Do Pil-heon": "48,16,44",
-    "Go Young-eun": "46,16,44",
-    "Jang Heo-un": "52,18,44",
-    "Jay": "53,16,44",
-    "Jyaldi": "56,18,44",
-    "Kwak Je-gang": "56,19,44",
-    "Kyuras": "49,19,44",
-    "Lee Do-hyeong": "61,16,44",
-    "Ma Deok-hee": "49,19,44",
-    "Mun Hye-ran": "46,18,44",
-    "Secriem": "54,16,44",
-    "Seo Yun-ji": "46,18,44",
-    "Spangdal": "52,18,44"
-  };
-  var personCrop = (p) => parseCrop(p.crop) ?? parseCrop(!p.photo && AGENT_CROPS[p.english ?? ""] || DEFAULT_CROP);
-  function parseCrop(s4) {
-    const n = String(s4 ?? "").split(",").map(Number);
-    if (n.length !== 3 || n.some((x) => !Number.isFinite(x))) return null;
-    const c = (x, lo, hi) => Math.min(hi, Math.max(lo, x));
-    return [c(n[0], 0, 100), c(n[1], 0, 100), c(n[2], 5, 100)];
-  }
-  function splitPic(pic) {
-    const at = pic.lastIndexOf("#");
-    const crop = at > 0 ? parseCrop(pic.slice(at + 1)) : null;
-    return crop ? { name: pic.slice(0, at), crop } : { name: pic, crop: null };
-  }
-  function mainPic(char, p) {
-    const en2 = p.english ?? "";
-    if (p.photo) return p.photo;
-    if (en2 && hasAsset(char, `${en2}_default`)) return `${en2}_default`;
-    if (en2 && hasAsset(char, en2)) return en2;
-    return p.shared?.find((n) => hasAsset(char, n)) ?? "";
-  }
-  function facePic(char, p, person = false) {
-    if (p.face) return p.face;
-    const en2 = p.english ?? "";
-    if (person && !p.photo && en2 && hasAsset(char, `${en2}_default`)) return `${en2}_default#${personCrop(p).join(",")}`;
-    if (en2 && hasAsset(char, en2)) return en2;
-    const main = mainPic(char, p);
-    const crop = person ? personCrop(p) : parseCrop(p.crop);
-    return main && crop ? `${main}#${crop.join(",")}` : main;
-  }
-  var hasAsset = (char, name) => !!name && !!findRow(char, splitPic(name).name);
-  function assetUrl(char, name) {
-    const row7 = findRow(char, name);
-    if (!row7) return Promise.resolve(null);
-    const key2 = `${String(char.chaId ?? char.name ?? "")}|${row7[1]}`;
-    let hit3 = cache5.get(key2);
-    if (!hit3) {
-      hit3 = load(row7[1], String(row7[2] ?? row7[1].split(".").pop() ?? ""));
-      cache5.set(key2, hit3);
-      void hit3.then((url) => {
-        if (!url) cache5.delete(key2);
-      });
-    }
-    return hit3;
-  }
-
-  // src/ui/images.ts
-  var urls = /* @__PURE__ */ new Map();
-  var redraw = () => {
-  };
-  var queued = false;
-  function forgetImages() {
-    urls.clear();
-    schedule();
-  }
-  function setImageRedraw(fn2) {
-    redraw = fn2;
-  }
-  function schedule() {
-    if (queued) return;
-    queued = true;
-    setTimeout(() => {
-      queued = false;
-      redraw();
-    }, 30);
-  }
-  var MAX_SIDE = 720;
-  var FACE_SIDE = 256;
-  async function shrink(url, crop = null) {
-    try {
-      const im = new Image();
-      im.src = url;
-      await im.decode();
-      const W2 = im.naturalWidth;
-      const H2 = im.naturalHeight;
-      let [sx, sy, sw, sh] = [0, 0, W2, H2];
-      if (crop) {
-        const side = Math.min(W2, H2, crop[2] / 100 * W2);
-        sx = Math.min(W2 - side, Math.max(0, crop[0] / 100 * W2 - side / 2));
-        sy = Math.min(H2 - side, Math.max(0, crop[1] / 100 * H2 - side / 2));
-        sw = sh = side;
-      }
-      const scale = Math.min(1, (crop ? FACE_SIDE : MAX_SIDE) / Math.max(sw, sh));
-      if (!crop && !(scale < 1)) return url;
-      const canvas = document.createElement("canvas");
-      canvas.width = Math.max(1, Math.round(sw * scale));
-      canvas.height = Math.max(1, Math.round(sh * scale));
-      const g = canvas.getContext("2d");
-      if (!g) return url;
-      g.imageSmoothingQuality = "high";
-      g.drawImage(im, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height);
-      const blob = await new Promise((res) => canvas.toBlob(res, "image/webp", 0.88));
-      return blob ? URL.createObjectURL(blob) : url;
-    } catch {
-      return url;
-    }
-  }
-  function imageUrl(char, pic) {
-    if (!pic) return null;
-    const key2 = `${String(char.chaId ?? char.name ?? "")}|${pic}`;
-    const hit3 = urls.get(key2);
-    if (hit3 === void 0) {
-      urls.set(key2, "loading");
-      const { name, crop } = splitPic(pic);
-      void assetUrl(char, name).then(async (raw) => {
-        const url = raw ? await shrink(raw, crop) : null;
-        urls.set(key2, url);
-        if (url) schedule();
-      });
-      return null;
-    }
-    return hit3 === "loading" ? null : hit3;
-  }
-  var escAttr = (s4) => s4.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
-  function agentFace(char, english) {
-    if (!english) return "";
-    const a = readDirectory(char.globalLore ?? []).agents.find((x) => x.english === english);
-    return facePic(char, a ?? { english }, true);
-  }
-  function factionPic(char, f, slot = "main") {
-    const o = readDirectory(char.globalLore ?? []).orgs.find((x) => x.faction ? x.faction === f.code : x.name === f.affiliation);
-    const src = { photo: o?.spec.photo ?? f.photo, face: o?.spec.face, crop: o?.spec.crop, english: o?.spec.english || f.english, shared: o?.shared };
-    return slot === "face" ? facePic(char, src) : mainPic(char, src);
-  }
-  function picAvatar(char, pic, name, cls = "") {
-    const url = imageUrl(char, pic);
-    const first = escAttr(Array.from(name.trim())[0] ?? "?");
-    return `<span class="gx-ava${cls ? ` ${cls}` : ""}">${url ? `<img src="${escAttr(url)}" alt="" loading="lazy">` : `<span>${first}</span>`}</span>`;
-  }
-  var avatar = (char, english, name, cls = "") => picAvatar(char, agentFace(char, english), name, cls);
-  function prefetchFactions(char) {
-    for (const f of factionList(char.globalLore)) if (!f.hidden) imageUrl(char, factionPic(char, f));
-  }
-  var stLabel = (st) => st === "작전투입" ? "작전" : st;
-  var AGENT_COLOR = { 작전투입: "var(--signal)", 외근: "var(--blue)", 부상: "var(--amber)", 실종: "var(--danger)", 격리: "var(--danger)", 사망: "var(--danger)", 비번: "var(--dim)" };
-  var stChip = (st) => `<em class="gx-st" style="--st:${AGENT_COLOR[st] ?? "var(--dim)"}">${escAttr(stLabel(st))}</em>`;
-  function agentInner(char, p, st, situation = "", act = "") {
-    const role = [p.department, p.rank].filter(Boolean).join(" · ");
-    return `<span class="gx-acard-side">${avatar(char, p.english, p.name, "sq")}${act}</span><span class="gx-acard-txt"><span class="gx-acard-top"><b>${escAttr(p.name)}</b>${stChip(st)}</span>${role ? `<small>${escAttr(role)}</small>` : ""}${situation ? `<span class="gx-acard-sit">${escAttr(situation)}</span>` : ""}</span>`;
-  }
-  function showIdCard(html) {
-    const box = document.createElement("div");
-    box.className = "gx gx-agpop gx-idpop";
-    box.setAttribute("role", "dialog");
-    box.innerHTML = `<div class="gx-idpop-card">${html}<button class="gx-agpop-x" aria-label="닫기">✕</button></div>`;
-    const theme = document.querySelector(".gx")?.getAttribute("data-theme");
-    if (theme) bo
+        const db = await risuai.getData
