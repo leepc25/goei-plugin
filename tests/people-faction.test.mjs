@@ -22,6 +22,7 @@ const Fd = await mod('field');
 const R = await mod('request');
 const P = await mod('prompt/index');
 const I = await mod('identity');
+const A = await mod('affinity');
 
 const settings = (over = {}) => ({ ...St.peopleSettings({}), ...over });
 const person = (name, faction = 'A00') => ({ name, faction, seeded: { from: 'none', at: '' }, slots: {}, affinity: { base: 0 }, address: { toUser: '요원', register: '반말' }, express: 1, aliases: [] });
@@ -137,4 +138,22 @@ test('본편 주입: 장면 세력 가운데 중립이 아닌 것만, 주입 끄
   assert.ok(!R.peopleBlockFor(c2, { settings: off, store, sheetOf: () => null }).text.includes('Factions'));
   const block = F.factionsBlock([{ code: 'A00', name: '관리국', value: 0, stage: T.factionStage(0), base: 0 }], '주인공');
   assert.equal(block, '', '중립뿐이면 절 자체가 없음');
+});
+
+test('메시지당 변화 상한 설정: 기본 10, 0 이면 한도 없음, 인물·세력 공용', () => {
+  const s = settings();
+  assert.equal(s.turnCap, 10);
+  const store = T.emptyStore();
+  store.people.쟈알디 = person('쟈알디');
+  const live = S.liveness(c);
+  const who = T.factionWho('B00');
+  store.log = [1, 2, 3].map((i) => ({ id: `f${i}`, anchor: 'c1', seq: i, src: 'story', who, kind: 'cue', cue: '큰도움', reason: 'r' }))
+    .concat([1, 2, 3].map((i) => ({ id: `p${i}`, anchor: 'c1', seq: i + 3, src: 'story', who: '쟈알디', kind: 'cue', cue: '큰도움', reason: 'r' })));
+  const changes = S.liveChanges(store, live);
+  assert.equal(F.factionNow(store, 'B00', changes, 'A00', s).value, -25 + 10, '세 번 +5 → 상한 10');
+  assert.equal(F.factionNow(store, 'B00', changes, 'A00', settings({ turnCap: 0 })).value, -25 + 15, '0 = 한도 없음');
+  assert.equal(F.factionNow(store, 'B00', changes, 'A00', settings({ turnCap: 12 })).value, -25 + 12);
+  assert.equal(A.affinityOf(store.people.쟈알디, changes, 0, { turnCap: 0 }), 15);
+  assert.equal(A.affinityOf(store.people.쟈알디, changes, 0, {}), 10);
+  assert.equal(St.peopleSettings({ $pp_turn_cap: '250' }).turnCap, 100, '범위 0~100');
 });

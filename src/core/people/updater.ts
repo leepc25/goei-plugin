@@ -85,14 +85,14 @@ export function recordChars(p: Person, live: Liveness): number {
   return SLOTS.reduce((n, s) => n + liveEntries(p.slots[s], live).reduce((m, e) => m + e.text.length, 0), 0);
 }
 
-export function personPayload(p: Person, live: Liveness, changes: Change[], unknown?: string[], extra: { taste?: boolean; openness?: boolean } = {}) {
+export function personPayload(p: Person, live: Liveness, changes: Change[], unknown?: string[], extra: { taste?: boolean; openness?: boolean; turnCap?: number } = {}) {
   const entries: Record<string, { id: string; text: string; target?: string; kind?: string }[]> = {};
   for (const s of SLOTS) {
     const list = liveEntries(p.slots[s], live);
     if (!list.length) continue;
     entries[s] = list.map((e) => ({ id: e.id, text: e.text, ...(e.target ? { target: e.target } : {}), ...(e.kind ? { kind: e.kind } : {}) }));
   }
-  const aff = affinityView(p, changes);
+  const aff = affinityView(p, changes, 0, { turnCap: extra.turnCap });
   const addr = addressOf(p, changes);
   return {
     name: p.name,
@@ -216,7 +216,7 @@ export function buildUpdate(chat: Chat, store: PeopleStore, batch: number[], o: 
     doc_types: DOC_TYPES.filter((t) => o.settings.features.has(docFeature(t) as Feature)),
     people: chosen.map((n) => {
       const p = store.people[n];
-      return { ...personPayload(p, live, changes, wantNote || o.settings.features.has('perception') ? unknownTo(p, store, live) : undefined, { taste: o.settings.features.has('taste'), openness: o.settings.features.has('openness') }), values: o.values[n] ?? '' };
+      return { ...personPayload(p, live, changes, wantNote || o.settings.features.has('perception') ? unknownTo(p, store, live) : undefined, { taste: o.settings.features.has('taste'), openness: o.settings.features.has('openness'), turnCap: o.settings.turnCap }), values: o.values[n] ?? '' };
     }),
     known_names: Object.keys(store.people),
     docs_now: DOC_TYPES.some((t) => o.settings.features.has(docFeature(t) as Feature))

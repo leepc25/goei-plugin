@@ -8,6 +8,8 @@ export interface AffinityOpts {
   temper?: Temper;
   /** 설정 「호감 변화 속도」 0.5~2 */
   speed?: number;
+  /** 설정 「메시지당 변화 상한」. 0 = 한도 없음. 없으면 기본 10 */
+  turnCap?: number;
 }
 
 /** 계기 하나의 변화량 (배율 적용, 상한 전) */
@@ -43,7 +45,8 @@ export function sumCues(who: string, base: number, changes: Change[], folded: nu
       if (c.cue && EXCEPTION_CUES.has(c.cue)) extra += d;
       else normal += d;
     }
-    if (!pinned) value = clamp(value + clamp(normal, -TURN_CAP, TURN_CAP) + extra, min, max);
+    const cap = o.turnCap === undefined ? TURN_CAP : o.turnCap;
+    if (!pinned) value = clamp(value + (cap > 0 ? clamp(normal, -cap, cap) : normal) + extra, min, max);
   }
   return Math.round(value * 100) / 100;
 }
@@ -95,12 +98,12 @@ export function opennessOf(person: Person, changes: Change[]): number | null {
 }
 
 /** 세력 → 유저 평판 현재값: 시작값(조직×조직 표) + 살아 있는 계기. 세력 성격 계수는 1, 설정 속도는 적용 */
-export function factionOf(code: string, base: number, changes: Change[], folded = 0, speed = 1): number {
-  return sumCues(factionWho(code), base, changes, folded, FACTION_MIN, FACTION_MAX, { speed });
+export function factionOf(code: string, base: number, changes: Change[], folded = 0, o: AffinityOpts = {}): number {
+  return sumCues(factionWho(code), base, changes, folded, FACTION_MIN, FACTION_MAX, { speed: o.speed, turnCap: o.turnCap });
 }
 
-export function factionView(code: string, base: number, changes: Change[], folded = 0, speed = 1, bounds?: readonly number[]) {
-  const value = factionOf(code, base, changes, folded, speed);
+export function factionView(code: string, base: number, changes: Change[], folded = 0, o: AffinityOpts = {}, bounds?: readonly number[]) {
+  const value = factionOf(code, base, changes, folded, o);
   const stage = factionStage(value, bounds);
   const last = [...changes].reverse().find((c) => c.who === factionWho(code) && c.kind === 'cue' && c.pin === undefined);
   return { value, stage, last };

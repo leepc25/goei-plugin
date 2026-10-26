@@ -189,7 +189,7 @@ function factionName(ctx: ChatContext, code: string): string {
   return factionList(ctx.char.globalLore).find((f) => f.code === code)?.name ?? code;
 }
 
-const affOpts = (ctx: ChatContext, name: string) => ({ temper: temperOf(name), speed: peopleSettings(ctx.chat.scriptstate).speed });
+const affOpts = (ctx: ChatContext, name: string) => ({ temper: temperOf(name), speed: peopleSettings(ctx.chat.scriptstate).speed, turnCap: peopleSettings(ctx.chat.scriptstate).turnCap });
 
 /** 사원증 창의 「기록」 단추: 그 이름의 기록이 있나 */
 export function hasPersonRecord(ctx: ChatContext, name: string): boolean {
@@ -323,6 +323,7 @@ export function peopleSettingsPane(ctx: ChatContext, canChat = true): string {
     row('본편에 넣기', seg('inject', s.inject, [['split', '절 단위 혼합'], ['append', '시트 전체+기록'], ['record', '기록만'], ['off', '안 넣음']]), '절 단위 혼합: 시트의 Identity·Character 절은 기록으로 대신하고 나머지 절은 원문 그대로.'),
     row('Director', seg('director', s.director, [['off', '끔'], ['facts', '사실형(뒤)'], ['scene', '연출형(앞)']]), '사실형은 갱신기에 얹어 다음 턴 메모를 남기고, 연출형은 본편 요청 앞에 짧은 지시를 한 번 더 만들어요.'),
     row('호감 변화 속도', seg('speed', String(s.speed), [['0.5', '0.5'], ['1', '1'], ['1.5', '1.5'], ['2', '2']])),
+    row('메시지당 변화 상한', `<label class="st-range pp-range"><input type="range" min="0" max="100" step="1" value="${s.turnCap}" data-input="pp-cap" data-change="pp-cap" aria-label="메시지당 변화 상한"><output>${s.turnCap === 0 ? '한도 없음' : `±${s.turnCap}`}</output></label>`, '메시지 하나(필드는 장면 하나)에서 호감·세력 평판이 움직일 수 있는 최대. 0이면 한도 없음. 중대위반(−50)은 늘 한도 밖. 리수폿 기본 ±10.'),
   ].join('');
   const features = FEATURES.map((f) => row(FEATURE_HELP[f][0], onoff(f), FEATURE_HELP[f][1])).join('');
   const newPeople = [
@@ -956,6 +957,12 @@ export async function handlePeople(action: string, value: string | undefined, ct
       peopleUi.oldAll.add(v);
       env.render();
       return true;
+    case 'pp-cap': {
+      const n = Math.max(0, Math.min(100, Math.round(Number(v))));
+      if (!Number.isFinite(n)) return true;
+      await setVars(ctx, env, { [PP('turn_cap')]: String(n) });
+      return true;
+    }
     case 'pp-bounds': {
       // 세력 구간 경계: 네 정수 내림차순이면 저장, 아니면 안내
       const ok = /^\s*-?\d+\s*,\s*-?\d+\s*,\s*-?\d+\s*,\s*-?\d+\s*$/.test(v) && (() => { const n = v.split(',').map(Number); return n[0] > n[1] && n[1] > n[2] && n[2] > n[3] && n.every((x) => x >= -100 && x <= 100); })();

@@ -36,7 +36,7 @@ export function buildDirector(chat: Chat, store: PeopleStore, people: string[], 
   const persons = people.map((n) => {
     const p = store.people[n];
     const slot = (k: 'state' | 'threads' | 'knowledge' | 'suspicion') => liveEntries(p.slots[k], live).map((e) => e.text).slice(-6);
-    const aff = affinityView(p, changes, store.folded[n] ?? 0, { speed: s.speed });
+    const aff = affinityView(p, changes, store.folded[n] ?? 0, { speed: s.speed, turnCap: s.turnCap });
     return { name: n, values: values[n] ?? '', affinity: aff.stage.label, address: addressOf(p, changes), express: p.express, state: slot('state'), threads: slot('threads'), knowledge: slot('knowledge'), suspicion: slot('suspicion'), unknown_to: unknownTo(p, store, live) };
   });
   const system = [...SYSTEM_FACTS, ...(s.director === 'scene' ? SYSTEM_SCENE : []), OUTPUT, s.directorRules.trim() ? `## User rules\n${s.directorRules.trim()}` : '']

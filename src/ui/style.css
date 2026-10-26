@@ -2762,3 +2762,7 @@ button.mk-go:hover { color: var(--signal); }
 .pp-mob li b { margin-right: 6px; }
 .nw-ava.k-fac { background: var(--amber-bg); color: var(--amber); }
 .pp-bounds { max-width: 180px; }
+
+.pp-range { display: inline-flex; align-items: center; gap: 10px; }
+.pp-range input[type=range] { width: 180px; max-width: 60vw; }
+.pp-range output { min-width: 64px; font-variant-numeric: tabular-nums; }

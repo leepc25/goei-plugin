@@ -329,6 +329,11 @@ function ensureRoot(): HTMLElement {
       if (out) out.textContent = `${el.value}%`;
       return;
     }
+    if (el?.dataset?.input === 'pp-cap') {
+      const out = el.parentElement?.querySelector('output');
+      if (out) out.textContent = Number(el.value) === 0 ? '한도 없음' : `±${el.value}`;
+      return;
+    }
     if (el?.dataset?.input === 'pct' || el?.dataset?.input === 'count') {
       const out = el.parentElement?.querySelector('output');
       if (out) out.textContent = `${el.value}${el.dataset.input === 'pct' ? '%' : '개'}`;

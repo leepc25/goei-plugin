@@ -25,7 +25,7 @@ export const factionName = (code: string, names: Record<string, string> = {}, st
 /** 세력 하나의 현재값 */
 export function factionNow(store: PeopleStore, code: string, changes: Change[], userFaction: string, settings: PeopleSettings, names: Record<string, string> = {}): FactionNow {
   const base = factionBase(code, userFaction);
-  const v = factionView(code, base, changes, store.folded[factionWho(code)] ?? 0, settings.speed, settings.factionBounds);
+  const v = factionView(code, base, changes, store.folded[factionWho(code)] ?? 0, { speed: settings.speed, turnCap: settings.turnCap }, settings.factionBounds);
   return { code, name: factionName(code, names, store), value: v.value, stage: v.stage, base };
 }
 

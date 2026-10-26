@@ -24,7 +24,7 @@ export function createPeople(): GamePeople {
       const changes = liveChanges(store, live);
       const list = Object.values(store.people).filter((p) => !names || names.includes(p.name));
       return list.map((p): PersonView => {
-        const aff = affinityView(p, changes, store.folded[p.name] ?? 0, { temper: temperOf(p.name), speed: settings.speed });
+        const aff = affinityView(p, changes, store.folded[p.name] ?? 0, { temper: temperOf(p.name), speed: settings.speed, turnCap: settings.turnCap });
         const texts = (k: 'state' | 'knowledge' | 'threads') => liveEntries(p.slots[k], live).map((e) => e.text);
         const note = settings.director === 'facts' ? latestNote(store, p.name, live) : null;
         return {
@@ -52,7 +52,7 @@ export function createPeople(): GamePeople {
       if (!settings.on || !p) return sheet;
       const live = liveness(c.chat);
       const changes = liveChanges(store, live);
-      return personBlock(p, store, live, changes, { sheet, mode: settings.inject === 'off' ? 'split' : settings.inject, unknown: settings.features.has('perception') ? unknownTo(p, store, live) : [], user: '방문자', note: settings.director === 'facts' ? latestNote(store, name, live) : null, temper: temperOf(name), speed: settings.speed });
+      return personBlock(p, store, live, changes, { sheet, mode: settings.inject === 'off' ? 'split' : settings.inject, unknown: settings.features.has('perception') ? unknownTo(p, store, live) : [], user: '방문자', note: settings.director === 'facts' ? latestNote(store, name, live) : null, temper: temperOf(name), speed: settings.speed, turnCap: settings.turnCap });
     },
     async factions() {
       const c = await loadContext().catch(() => null);

@@ -20,6 +20,8 @@ export const PP_DEFAULTS: Record<string, string> = {
   director_timeout: '20',
   director_reuse: '1',
   speed: '1',
+  /** 기준 메시지(또는 필드 장면) 하나 안의 변화 합 상한. 0 = 한도 없음. 인물 호감·세력 평판 공용 (리수폿 10) */
+  turn_cap: '10',
   affinity: '1', register: '1', perception: '1', perception_ext: '1', suspicion: '1',
   docs_event: '1', docs_location: '1', docs_faction: '1', docs_item: '1', npc_emotion: '1',
   /** 리수폿 선택 기능: 취향 띠·음란도·서사 리듬. 기본 끔 */
@@ -61,6 +63,7 @@ export interface PeopleSettings {
   directorTimeout: number;
   directorReuse: boolean;
   speed: number;
+  turnCap: number;
   features: Set<Feature>;
   newPeople: 'auto' | 'confirm';
   twoTurn: boolean;
@@ -100,6 +103,7 @@ export function peopleSettings(state: Record<string, unknown> | undefined): Peop
     directorTimeout: num('director_timeout', 5, 120),
     directorReuse: v('director_reuse') !== '0',
     speed: num('speed', 0.25, 4),
+    turnCap: num('turn_cap', 0, 100),
     features: new Set(FEATURES.filter((f) => v(f) === '1')),
     newPeople: v('newpeople') === 'confirm' ? 'confirm' : 'auto',
     twoTurn: v('twoturn') !== '0',
