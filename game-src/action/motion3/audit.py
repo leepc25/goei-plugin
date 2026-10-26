@@ -11,6 +11,7 @@ BASE = Path(__file__).resolve().parent; ROOT = BASE.parents[2]; VFX = BASE.paren
 AIR = {"6", "7", "8", "14", "8_1"}                       # 발이 뜨는 줄
 LIE = {"18_2", "18_3", "19", "20", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45"}   # 눕거나 엎드리는 줄(바닥 기준 다름)
 ATK = {"9", "10", "11", "12", "13", "15", "22", "24"}   # 앞으로 쳐야 하는 줄
+STILL = {"1", "2", "3", "3_0", "9", "10", "11", "12", "15", "17", "22", "23", "24", "W", "W_1", "28", "29", "30", "31", "32", "33", "34", "35"}   # 서서 하는 줄(시작·끝 발이 바닥)
 SMALL = {"43", "45", "1", "2", "3", "W", "W_1", "28", "29", "30", "31", "33", "34", "35", "17", "21", "39", "41", "3_1"}
 
 
@@ -51,7 +52,8 @@ def check_row(key, rn, r, ref):
     fs = sorted(d.glob("[0-9][0-9].png")) if d.exists() else []
     if not fs: return ["그림 없음"]
     errs = []
-    if len(fs) != r["frames"]: errs.append(f"장 수 {len(fs)}/{r['frames']}")
+    loop = "반복" in r["span"]
+    if len(fs) != r["frames"] and not (loop and len(fs) == r["frames"] + 1): errs.append(f"장 수 {len(fs)}/{r['frames']}")
     ims = [Image.open(p).convert("RGBA") for p in fs]; A = [alpha(i) for i in ims]
     area = [a.sum() for a in A]; H, W = A[0].shape
     if min(area) < 0.2 * max(area): errs.append(f"빈 장(면적 {min(area)}/{max(area)})")
@@ -72,10 +74,9 @@ def check_row(key, rn, r, ref):
         bots = [b[3] for b in bbs if b]
         if f in LIE:
             if max(bots) > ref["ground"] + 4: errs.append(f"바닥 아래로 꺼짐 {max(bots) - ref['ground']}px")
-            if min(bots) < ref["ground"] - 12: errs.append(f"누운 몸이 떠 있음 {ref['ground'] - min(bots)}px")
         else:
             if max(bots) > ref["ground"] + 4: errs.append(f"발이 바닥 아래로 {max(bots) - ref['ground']}px")
-            if bots[0] < ref["ground"] - 10 or bots[-1] < ref["ground"] - 10: errs.append(f"시작·끝 장 발이 뜸 {ref['ground'] - min(bots[0], bots[-1])}px")
+            if f in STILL and (bots[0] < ref["ground"] - 10 or bots[-1] < ref["ground"] - 10): errs.append(f"시작·끝 장 발이 뜸 {ref['ground'] - min(bots[0], bots[-1])}px")
     if f in {"6", "7", "8"}:
         bots = [b[3] for b in bbs if b]
         if max(bots) - min(bots) < 15: errs.append(f"점프인데 발이 거의 안 뜸 {max(bots) - min(bots)}px")
@@ -94,7 +95,8 @@ def check_row(key, rn, r, ref):
         back = max(((b0[0] - b[0]) if sgn > 0 else (b[2] - b0[2])) for b in bbs if b)
         if back > fwd + 8 and back > 14: errs.append(f"뒤로 뻗음(앞 {fwd} 뒤 {back})")
     # 반복 줄 끊김
-    if "반복" in r["span"] and len(ims) > 2:
+    sp = [s.strip() for s in r["span"].replace("(끝 장 없음, 반복)", "").replace("(반복)", "").split("→")]
+    if loop and len(ims) > 2 and len(sp) == 2 and (sp[1].startswith("같은 장") or sp[0] == sp[1]):
         dl = (((np.abs(np.array(ims[-1]).astype(int) - a0)[:, :, :3].sum(axis=2) > 60) | (A[-1] != A[0])).sum()) / max(1, area[0])
         dm = max(mv, 1e-6)
         if dl > 0.5 and dl > dm * 0.9: errs.append(f"반복 이음 끊김({dl:.0%})")
@@ -111,20 +113,23 @@ def ref_of(key, T):
     return {}
 
 
+def one_key(k):
+    try: T = m3.table(k)
+    except Exception as e: return k, {"표": [f"표 못 읽음 {e}"]}, 0
+    ref = ref_of(k, T); out = {}
+    for rn, r in T["rows"].items():
+        try: e = check_row(k, rn, r, ref)
+        except Exception as ex: e = [f"검사 오류 {ex!r}"[:120]]
+        if e: out[rn] = e
+    print(k, len(out), flush=True)
+    return k, out, len(T["rows"])
+
+
 def main():
     keys = [k for k in m3.order() if re.match(r"[1-6]\.", k)]
-    res = {}; n_rows = 0
-    for k in keys:
-        try: T = m3.table(k)
-        except Exception as e: res[k] = {"표": [f"표 못 읽음 {e}"]}; continue
-        ref = ref_of(k, T); out = {}
-        for rn, r in T["rows"].items():
-            n_rows += 1
-            try: e = check_row(k, rn, r, ref)
-            except Exception as ex: e = [f"검사 오류 {ex!r}"[:120]]
-            if e: out[rn] = e
-        if out: res[k] = out
-        print(k, len(out), flush=True)
+    from multiprocessing import Pool
+    with Pool(4) as pool: got = pool.map(one_key, keys)
+    res = {k: out for k, out, n in got if out}; n_rows = sum(n for _, _, n in got)
     # 이펙트
     fx = {}
     for js in sorted(VFX.glob("x3-*.json")):

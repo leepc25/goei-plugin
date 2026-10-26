@@ -240,8 +240,8 @@ def run_job(path):
         urls = next(x["frames"] for x in anim["directions"] if x["direction"] == d)
         fr = [fetch_png(u) for u in urls]
         save(key, f, fr)
-        if f in st["ok"]:
-            st = state(key); st["ok"].remove(f); save_state(key, st)
+        st = state(key)
+        if f in st["ok"]: st["ok"].remove(f); save_state(key, st)
         log(key, f"{f} {r['name']} 완료 {len(fr)}장 ({int(time.time() - t0)}초)")
         j.update(status="done", frames=len(fr), t=time.time()); dest = "done"
     except NotReady as e:
