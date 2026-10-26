@@ -67,7 +67,18 @@ export const CFG = (key: string) => `$lb_cfg_lb-gn.${key}`;
 export const GN_DEFAULTS: Record<string, string> = {
   mode: '2', quantity: '1', subject: '', mood: '', privacy: '1', protagonist: '', sampling: '0',
   keepown: '1', keepreplied: '0', context: '0', incoming: '1', incoming_chance: '100', lazy: '1',
+  /** 게시판 성격: gal 괴담갤(일반 커뮤니티) / net 괴담넷(업계 관계자) / wpf 세정게(세계정치 게시판). 지침의 이용자 구성·기본 말투만 바뀐다 */
+  style: 'net',
 };
+
+export type GnetStyle = 'gal' | 'net' | 'wpf';
+export const GN_STYLE_NAME: Record<GnetStyle, string> = { gal: '괴담갤', net: '괴담넷', wpf: '세정게' };
+export function gnetStyle(state: Record<string, unknown> | undefined): GnetStyle {
+  const v = String(state?.[CFG('style')] ?? '');
+  return v === 'gal' || v === 'wpf' ? v : 'net';
+}
+/** 메뉴·창 머리에 쓰는 게시판 이름 (설정에 따라) */
+export const gnetLabel = (state: Record<string, unknown> | undefined): string => GN_STYLE_NAME[gnetStyle(state)];
 /** 쪽지 보관 (원본 gnet_retention: 자동 정리 켬/끔, 상대별 상한) */
 export const GN_STORAGE_AUTO = '$gn_storage_auto_dm';
 export const GN_STORAGE_LIMIT = '$gn_storage_limit_dm';

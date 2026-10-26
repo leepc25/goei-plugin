@@ -1,4 +1,43 @@
-ne2;
+ctx2.char.globalLore))?.affiliation ?? "", extra: promo, empty: limit === 0 ? "설정에서 요원 표시 인원을 0명으로 해 두었어요." : "이 소속에는 요원 명단이 없어요." })}
+  </main>${boardDrawer()}`;
+  }
+  function boardClock(ctx2) {
+    const st = lastStatusFields((ctx2.chat.message ?? []).filter((m) => m.role === "char").slice(-6).map((m) => m.data));
+    return [st?.date, st?.time].filter(Boolean).join(" ");
+  }
+
+  // src/core/statusctx.ts
+  var STATUS_HEAD = "[Previous status]";
+  var NOTE = "This is the status line of the scene right before the next input; older status lines were removed from the history. Continue from it: advance the time, update the other fields, and output exactly one new [▣] line at the very end of your response.";
+  function lastStatusLine(messages) {
+    for (let i = messages.length - 1; i >= 0; i--) {
+      const m = messages[i];
+      if (m?.role !== "assistant" || typeof m.content !== "string") continue;
+      const tags = findStatusTags(m.content);
+      if (tags.length) return tags[tags.length - 1].raw.trim();
+    }
+    return null;
+  }
+  function stripStatusLines(messages) {
+    return messages.map((m) => {
+      if (m?.role !== "assistant" || typeof m.content !== "string") return m;
+      const tags = findStatusTags(m.content);
+      if (!tags.length) return m;
+      let c = m.content;
+      for (const t of tags) c = c.replace(t.raw, "");
+      return { ...m, content: c.replace(/[ \t]+\n/g, "\n").replace(/\n{3,}/g, "\n\n").trim() };
+    });
+  }
+  function statusBlock(line2) {
+    return `${STATUS_HEAD}
+${line2}
+${NOTE}`;
+  }
+  function withIdentity(line2, identity) {
+    if (!identity) return line2;
+    const tags = findStatusTags(line2);
+    const t = tags[0];
+    if (!t || t.identity) return line2;
     const cols = line2.replace(/^[[【［]\s*▣\s*[|｜]/, "").replace(/[\]】］]\s*$/, "").split(/[|｜]/).length;
     if (cols !== 8) return line2;
     return line2.replace(/[\]】］]\s*$/, `|${identity}]`);
@@ -568,5 +607,5 @@ ne2;
   }
 
   // src/body-entry.ts
-  globalThis.__goeiBody = { version: "0.16.64", start: start2 };
+  globalThis.__goeiBody = { version: "0.16.65", start: start2 };
 })();

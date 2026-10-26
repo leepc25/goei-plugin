@@ -1,4 +1,10 @@
-T_BASE;
+omments.push({ parent: Math.max(0, Math.floor(Number(p[2]) || 0)), nick: cut(p[3], 80), body: p[4], mine: p[5] === "1", unread: p[6] === "1", ...validDate(p[7]) ? { time: validDate(p[7]) } : {} });
+      } else if (p[0] === "D" && p.length >= 4) {
+        st.dms.push({ nick: cut(p[1], 80), side: p[2] === "me" ? "me" : "npc", body: p[3], unread: p[4] === "1", date: validDate(p[5] ?? "") });
+      }
+    }
+    if (st.seq < G_POST_BASE) {
+      for (const post of st.posts) post.id += G_POST_BASE;
       for (const s4 of Object.values(st.sources)) if (s4.postid > 0) s4.postid += G_POST_BASE;
       st.seq += G_POST_BASE;
     }
@@ -4436,14 +4442,4 @@ The previous response was rejected and nothing was saved. Recreate the complete 
   function toBytes3(data) {
     if (data instanceof Uint8Array) return data;
     if (data instanceof ArrayBuffer) return new Uint8Array(data);
-    if (Array.isArray(data)) return new Uint8Array(data);
-    if (data && typeof data === "object") {
-      const values = Object.values(data);
-      if (values.length && values.every((v) => typeof v === "number")) return new Uint8Array(values);
-    }
-    return null;
-  }
-  async function load(path, ext) {
-    try {
-      const data = await risuai.readImage(path);
-      if (typeof data === "string") return data.startsWith("data:") || data.startsWith("blob:") || data.startsWith("http") ? data : nul
+    if (Arra

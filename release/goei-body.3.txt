@@ -1,4 +1,14 @@
-l;
+y.isArray(data)) return new Uint8Array(data);
+    if (data && typeof data === "object") {
+      const values = Object.values(data);
+      if (values.length && values.every((v) => typeof v === "number")) return new Uint8Array(values);
+    }
+    return null;
+  }
+  async function load(path, ext) {
+    try {
+      const data = await risuai.readImage(path);
+      if (typeof data === "string") return data.startsWith("data:") || data.startsWith("blob:") || data.startsWith("http") ? data : null;
       const bytes = toBytes3(data);
       if (!bytes?.length) return null;
       return URL.createObjectURL(new Blob([bytes], { type: MIME2[ext.toLowerCase()] ?? "application/octet-stream" }));
@@ -2250,8 +2260,8 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
     const text = (k, ph) => `<input class="gx-search ps-text" data-change="gn-text" data-key="${k}" value="${esc7(v(k) === "-" ? "" : v(k))}" placeholder="${esc7(ph)}">`;
     const keep = gnetRetention(ctx2.chat.scriptstate);
     const on2 = v("mode") !== "0";
-    const rows2 = on2 ? `${group2("괴담넷", [
-      row3("괴담넷 사용", seg2("power", "1", [["1", "켜기"], ["0", "끄기"]])),
+    const rows2 = on2 ? `${group2(gnetLabel(ctx2.chat.scriptstate), [
+      row3("게시판 사용", seg2("power", "1", [["1", "켜기"], ["0", "끄기"]])),
       row3("모델", seg2("mode", v("mode") === "1" ? "1" : "2", [["1", "메인"], ["2", "보조"]])),
       row3("새로고침", seg2("lazy", ["0", "open"].includes(v("lazy")) ? v("lazy") : "1", [["1", "수동"], ["open", "창을 열 때"], ["0", "매 턴"]]), LAZY_HINT[v("lazy")] ?? LAZY_HINT["1"]),
       row3("채팅에 반영", seg2("context", v("context") === "1" ? "1" : "0", [["0", "포함"], ["1", "빼기"]]), "지금 장면과 관련된 글과 쪽지가 채팅 요청에 참고로 붙어요"),
@@ -2259,6 +2269,7 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
     ].join(""))}
       ${group2("게시판", [
       row3("게시글 수", seg2("quantity", v("quantity"), Object.entries(QUANTITY).map(([k, q]) => [k, q.label]))),
+      row3("성격", seg2("style", ["gal", "wpf"].includes(v("style")) ? v("style") : "net", [["gal", "괴담갤"], ["net", "괴담넷"], ["wpf", "세정게"]]), "괴담갤 = 일반인 괴담 커뮤니티 · 괴담넷 = 업계 관계자들이 가명으로 쓰는 곳 · 세정게 = 세계정치 게시판(음모론 속에 진짜가 섞인 곳). 이용자 구성과 기본 말투만 바뀌고 다음 새로고침부터 적용돼요. 메뉴 이름도 같이 바뀌어요."),
       row3("사생활", seg2("privacy", v("privacy"), [["0", "이목집중"], ["1", "자율"], ["2", "약보호"], ["3", "강보호"], ["4", "언급금지"]])),
       row3("주제", text("subject", "비우면 세계관에 맞는 다양한 주제")),
       row3("분위기·말투", text("mood", "비우면 익명 커뮤니티 말투")),
@@ -2270,15 +2281,15 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
       row3("선쪽지 받기", seg2("incoming", v("incoming") === "0" ? "0" : "1", [["1", "받기"], ["0", "안 받기"]])),
       row3("쪽지 자동 정리", `<span class="ph-inline">${seg2("storage", keep.auto ? "1" : "0", [["1", "켜기"], ["0", "끄기"]])}${keep.auto ? `<input class="gx-search ph-pct" type="number" min="1" max="${STORAGE_MAX}" data-change="gn-keep" value="${keep.limit}" aria-label="상대별 쪽지 보관 상한"><span>통</span>` : ""}</span>`, `상대마다 최근 ${keep.limit}통만 남겨요`)
     ].join(""))}
-      ${advancedBox("gn", ctx2.chat.scriptstate)}` : group2("괴담넷", row3("괴담넷 사용", seg2("power", "0", [["1", "켜기"], ["0", "끄기"]]), "꺼 두면 게시판 생성과 채팅 반영을 멈춰요. 저장된 글과 쪽지는 남아요"));
-    return `<div class="ph-form">${paneHead2("괴담넷 설정", "", defaultsButtons("gn"), back)}${defaultsConfirm("gn")}<div class="ph-form-body ps">${rows2}</div></div>`;
+      ${advancedBox("gn", ctx2.chat.scriptstate)}` : group2(gnetLabel(ctx2.chat.scriptstate), row3("게시판 사용", seg2("power", "0", [["1", "켜기"], ["0", "끄기"]]), "꺼 두면 게시판 생성과 채팅 반영을 멈춰요. 저장된 글과 쪽지는 남아요"));
+    return `<div class="ph-form">${paneHead2(`${gnetLabel(ctx2.chat.scriptstate)} 설정`, "", defaultsButtons("gn"), back)}${defaultsConfirm("gn")}<div class="ph-form-body ps">${rows2}</div></div>`;
   }
   function paneHtml2(ctx2, st, kind, busy5) {
     if (kind === "settings") return settingsView2(ctx2);
     if (kind === "compose" && gnet.compose) return composeView(gnet.compose, busy5);
     if (kind === "post") return postView(findPost(st, gnet.open), busy5);
     if (kind === "dm") return dmPane(st, gnet.openDm, busy5);
-    return `<div class="ph-empty"><span class="ph-empty-ico">${ICONS.gnet}</span><b>괴담넷</b><p>왼쪽에서 글이나 쪽지를 고르세요.</p></div>`;
+    return `<div class="ph-empty"><span class="ph-empty-ico">${ICONS.gnet}</span><b>${gnetLabel(ctx2.chat.scriptstate)}</b><p>왼쪽에서 글이나 쪽지를 고르세요.</p></div>`;
   }
   function gnetTab(ctx2, env2) {
     if (env2) liveEnv2 = env2;
@@ -2306,7 +2317,7 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
       tool2("gn-write", ICONS.pen, "글쓰기", gnet.compose?.kind === "post" ? 'aria-pressed="true"' : "", "글쓰기"),
       tool2("gn-newdm", ICONS.mail, "새 쪽지", gnet.compose?.kind === "newdm" ? 'aria-pressed="true"' : "", "쪽지"),
       tool2("gn-nick", ICONS.idcard, "닉네임 바꾸기", gnet.editNick ? 'aria-pressed="true"' : "", "닉네임"),
-      tool2("gn-settings", ICONS.settings, "괴담넷 설정", gnet.settings ? 'aria-pressed="true"' : "", "설정")
+      tool2("gn-settings", ICONS.settings, `${gnetLabel(ctx2.chat.scriptstate)} 설정`, gnet.settings ? 'aria-pressed="true"' : "", "설정")
     ].join("");
     const subBtn = (id, label, extra = "") => `<button class="ph-sub${gnet.sub === id ? " on" : ""}" data-action="gn-sub" data-value="${id}" aria-pressed="${gnet.sub === id}">${label}${extra}</button>`;
     return `<main class="gx-body ph ph-app gn ${kind ? "is-detail" : "is-list"}">
@@ -3743,15 +3754,4 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .gx-head-act { display: flex; align-items: center; gap: 8px; flex: none; }
 .gx-x { width: 44px; height: 44px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); color: var(--sub); font-size: 18px; flex: none; }
 .gx-x:hover { color: var(--text); border-color: var(--line2); }
-.gx-x.on { color: var(--signal); border-color: var(--accent-line); background: var(--accent-bg); }
-
-/* ── 메뉴: PC는 왼쪽, 모바일은 하단 바 ── */
-.gx-nav { grid-area: nav; display: flex; flex-direction: column; gap: 4px; padding: 16px 12px; border-right: 1px solid var(--panel2); background: var(--void); min-height: 0; overflow-y: auto; }
-.gx-nav-brand { display: flex; flex-direction: column; gap: 14px; padding: 2px 2px 16px; margin-bottom: 6px; border-bottom: 1px solid var(--panel2); }
-.gx-mark { display: flex; align-items: center; gap: 10px; padding: 0 4px; }
-.gx-mark .gx-logo { width: 36px; height: 36px; border-radius: 11px; }
-.gx-mark .gx-logo svg { width: 24px; height: 24px; }
-.gx-mark-txt b { display: block; font-size: 18px; font-weight: 800; letter-spacing: .02em; line-height: 1.15; }
-.gx-mark-txt small { display: block; font-family: var(--mono); font-size: 11px; letter-spacing: .18em; color: var(--signal); opacity: .8; }
-/* 상단바 표지: 영문은 글씨 크기 그대로, 글자 사이를 벌려 한글 제목과 같은 길이 */
-.gx-hmark .gx-mark-txt { display: inlin
+.gx-x.on { color: var(--signal);

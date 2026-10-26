@@ -1,4 +1,12 @@
- conflicting with the explanation; the same rumor from several mouths is not independent |",
+ts content. A vanished clue does not erase a learner's memory. An unidentified target later revealed as a known person → enrich the existing case under the real name, never a new case; unclear sameness → do not merge.",
+    "",
+    "### 10.2 What clues mean",
+    "A clue must connect to the actual target and kind. Ordinary kindness, laughter, lateness, slow replies, privacy, nervousness or an unusual habit are not evidence by themselves. Weights by what newly reached the person:",
+    "| Weight | Evidence |",
+    "|---|---|",
+    "| 약 (+2) | Relevant but ambiguous clue tied to this target and kind: an inconsistency, an unexplained absence, a changed reaction to a name or place, an unfamiliar trace, behavior not fitting the claimed identity or condition |",
+    "| 중 (+5) | A concrete specific question: a concealed meeting or contact seen or credibly reported, a document or object that should not be there, a changed explanation for the same matter, presence where the target should not be, a physical sign consistent with 오염 of unconfirmed cause |",
+    "| 강 (+10) | Independently verified facts contradicting the account or connecting the target to the matter: confirmed sighting, record, schedule, communication or witness conflicting with the explanation; the same rumor from several mouths is not independent |",
     "One disordered detail, a bodily mark, one-sided contact or a suspicious object never confirms; unclear cause → record the question, not the conclusion. Harm suffered by the target is not the target's voluntary wrongdoing. Confirmation needs reliable evidence reaching the person that establishes identity, context, intent or voluntariness, and the actual act or state.",
     "",
     "### 10.3 Trust and affinity",
@@ -1805,8 +1813,8 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
     return `<div class="ph-room nw-pane pp-pane">${head(f.name, `세력 평판 · 시작값 ${f.base}${code === uf ? " · 주인공 소속" : ""}`)}
     <article class="nw-doc pp-doc">
       ${peopleUi.notice ? `<div class="gx-err" role="alert">${esc13(peopleUi.notice)}</div>` : ""}
-      <section class="pp-card"><h4 title="세력이 주인공을 어떻게 보는지 (−100~100). 본편에서는 갱신기 모델이 판단한 일로, 필드에서는 그 소속이 목격한 일로 바뀌어요">평판</h4>${factionBar(f.value, s4.factionBounds)}${edit}</section>
-      <section class="pp-card"><h4 title="필드에서 이 세력의 이름 없는 몹이 주인공을 처음 봤을 때">구간별 몹 반응</h4>${mob}</section>
+      <section class="pp-card"><h4 title="세력이 주인공을 어떻게 보는지 (−100~100). 본편에서는 갱신기 모델이 판단한 일로, 필드에서는 그 소속이 목격한 일로 바뀌어요">평판</h4><div class="pp-card-body">${factionBar(f.value, s4.factionBounds)}${edit}</div></section>
+      <section class="pp-card"><h4 title="필드에서 이 세력의 이름 없는 몹이 주인공을 처음 봤을 때">구간별 몹 반응</h4><div class="pp-card-body">${mob}</div></section>
       <details class="ps-adv-sub pp-log" data-keep="pp-log"${keepOpen("pp-log")}><summary>변경 기록<b>${mine.length}</b></summary>${mine.length ? `<ul class="pp-entries">${mine.map((c) => changeRow(ctx2, c, live)).join("")}</ul>` : '<p class="ps-note">아직 변경 기록이 없어요. 시작값은 조직×조직 표에서 와요.</p>'}</details>
     </article>${toast("pp", peopleUi.info, (t) => {
       if (peopleUi.info === t) peopleUi.info = "";
@@ -1866,7 +1874,7 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
     return `<li class="pp-entry${dead ? " dead" : ""}${e.void ? " void" : ""}${e.pin ? " pinned" : ""}">
     <div class="pp-entry-main">${srcIcon(e.src)}<span class="pp-text">${esc13(e.text)}</span></div>
     <div class="pp-entry-meta">${meta}${stateMark(st)}
-      <span class="pp-entry-btns"><button class="ph-tool sm${e.pin ? " on" : ""}" data-action="pp-pin" data-value="${esc13(key2)}" title="${e.pin ? "고정 풀기" : "고정: 갱신기가 이 항목을 바꾸거나 지우지 못하게"}" aria-label="고정" aria-pressed="${!!e.pin}">${ICONS.pin}</button>${voidBtn("pp-void", key2, !!e.void)}</span></div>
+      <span class="pp-entry-btns"><button class="gx-mini pp-mini${e.pin ? " on" : ""}" data-action="pp-pin" data-value="${esc13(key2)}" title="${e.pin ? "고정 풀기" : "고정: 갱신기가 이 항목을 바꾸거나 지우지 못하게 잠가요"}" aria-pressed="${!!e.pin}">${e.pin ? "고정됨" : "고정"}</button>${voidBtn("pp-void", key2, !!e.void)}</span></div>
     ${evidenceBox(ctx2, live, key2, e.anchor, e.quote)}
   </li>`;
   }
@@ -1875,12 +1883,12 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
     const out = [];
     if (f.has("taste")) {
       const band = tasteOf(p, changes);
-      out.push(`<section class="pp-card"><h4 title="주인공이 이 인물의 취향에 맞는 정도. 호감과 다른 축">취향 띠(첫인상)</h4><p class="pp-extra">${band === null ? '<span class="pp-addr-none">아직 판정 전 — 실제로 마주치면 한 번 정해져요</span>' : `<b>${band > 0 ? "+" : ""}${band}</b> ${esc13(TASTE_STAGES[band]?.ko ?? "")}`}</p></section>`);
+      out.push(`<section class="pp-card"><h4 title="주인공이 이 인물의 취향에 맞는 정도. 호감과 다른 축">취향 띠(첫인상)</h4><div class="pp-card-body"><p class="pp-extra">${band === null ? '<span class="pp-addr-none">아직 판정 전 — 실제로 마주치면 한 번 정해져요</span>' : `<b>${band > 0 ? "+" : ""}${band}</b> ${esc13(TASTE_STAGES[band]?.ko ?? "")}`}</p></div></section>`);
     }
     if (f.has("openness")) {
       const v = opennessOf(p, changes);
       const st = v === null ? null : opennessStage(v);
-      out.push(`<section class="pp-card"><h4 title="성인 인물의 성적 개방도와 피임 태도 (0~300)">음란도</h4><p class="pp-extra">${v === null ? '<span class="pp-addr-none">아직 없음 — 근거가 있을 때만 시작값이 생겨요</span>' : `<b>${st.label}</b> ${Math.round(v)}/300 · 피임: ${esc13(st.contraception)}`}</p></section>`);
+      out.push(`<section class="pp-card"><h4 title="성인 인물의 성적 개방도와 피임 태도 (0~300)">음란도</h4><div class="pp-card-body"><p class="pp-extra">${v === null ? '<span class="pp-addr-none">아직 없음 — 근거가 있을 때만 시작값이 생겨요</span>' : `<b>${st.label}</b> ${Math.round(v)}/300 · 피임: ${esc13(st.contraception)}`}</p></div></section>`);
     }
     return out.join("");
   }
@@ -1931,8 +1939,8 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
     return `<div class="ph-room nw-pane pp-pane">${head(name, sub, tidyBtn)}
     <article class="nw-doc pp-doc">
       ${peopleUi.notice ? `<div class="gx-err" role="alert">${esc13(peopleUi.notice)}</div>` : ""}
-      <section class="pp-card"><h4 title="주인공에 대한 호감. 계기가 쌓여 8단계로 바뀌고, 본편 요청에 단계별 행동 방향으로 들어가요">호감</h4>${affinityBar(aff.value)}${affEdit}</section>${extraCards(ctx2, p, changes)}
-      <section class="pp-card"><h4 title="이 인물이 주인공을 부르는 말과 말투(존댓말·반말…)">호칭</h4>${addrEdit}</section>
+      <section class="pp-card"><h4 title="주인공에 대한 호감. 계기가 쌓여 8단계로 바뀌고, 본편 요청에 단계별 행동 방향으로 들어가요">호감</h4><div class="pp-card-body">${affinityBar(aff.value)}${affEdit}</div></section>${extraCards(ctx2, p, changes)}
+      <section class="pp-card"><h4 title="이 인물이 주인공을 부르는 말과 말투(존댓말·반말…)">호칭</h4><div class="pp-card-body">${addrEdit}</div></section>
       ${slots || '<p class="ps-note">아직 칸에 적힌 항목이 없어요.</p>'}
       ${log}
     </article>${toast("pp", peopleUi.info, (t) => {
@@ -3368,21 +3376,4 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
       return `<div class="dir-photo">
       <span class="dir-pic-img">${url ? `<img src="${esc15(url)}" alt="">` : ICONS.spook}</span>
       <span class="dir-photo-name"><b>${label} · ${esc15(picked || "자동")}</b><small>${why}</small></span>
-      ${picked ? `<button class="gx-mini" data-action="dir-photo-set" data-value="${esc15(`|${slot}>${key2}`)}">자동으로</button>` : ""}${extra}
-      <button class="gx-mini" data-action="dir-photo-pick" data-value="${esc15(`${slot}>${key2}`)}">${picking2 ? "닫기" : "고르기"}</button>
-    </div>`;
-    };
-    const mainWhy = p.photo ? "직접 고름" : main ? `자동: ${esc15(main)}` : "「영문명_default」·「영문명」 이미지가 없어요";
-    const faceWhy = p.face ? "직접 고름" : cut2 ? "대표 사진에서 잘라요" : face3 ? `자동: ${esc15(splitPic(face3).name)}` : "「영문명」 이미지가 없어요";
-    const cropping = cut2 && dirUi.crop === key2;
-    const cropBtn = cut2 ? `<button class="gx-mini" data-action="dir-crop" data-value="${esc15(key2)}">${cropping ? "완료" : "틀 맞추기"}</button>` : "";
-    const picking = dirUi.pick ? pickOf(dirUi.pick) : null;
-    const list4 = picking?.key === key2 ? `<div class="dir-ext"><input class="gx-search" data-input="dir-photo-q" value="${esc15(dirUi.pickQ)}" placeholder="이미지 이름 검색" aria-label="이미지 이름 검색" autocomplete="off"><div class="dir-pics">${directoryPhotoList(ctx2)}</div></div>` : "";
-    return `<div class="dir-in"><span>사진</span>
-    ${line2("main", "대표", main, p.photo, mainWhy)}
-    ${line2("face", "얼굴", face3, p.face, faceWhy, cropBtn)}
-    ${cropping ? cropBox(ctx2, key2, main) : ""}
-    ${list4}
-  </div>`;
-  }
-  function cropBox(ctx2
+      ${picked ? `<button class="gx

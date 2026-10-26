@@ -1,4 +1,4 @@
-// goei-body 0.16.64
+// goei-body 0.16.65
 "use strict";
 (() => {
   // src/core/dispatch.ts
@@ -4112,8 +4112,16 @@ ${themeVars("[x-goei-fab]")}
     context: "0",
     incoming: "1",
     incoming_chance: "100",
-    lazy: "1"
+    lazy: "1",
+    /** 게시판 성격: gal 괴담갤(일반 커뮤니티) / net 괴담넷(업계 관계자) / wpf 세정게(세계정치 게시판). 지침의 이용자 구성·기본 말투만 바뀐다 */
+    style: "net"
   };
+  var GN_STYLE_NAME = { gal: "괴담갤", net: "괴담넷", wpf: "세정게" };
+  function gnetStyle(state) {
+    const v = String(state?.[CFG("style")] ?? "");
+    return v === "gal" || v === "wpf" ? v : "net";
+  }
+  var gnetLabel = (state) => GN_STYLE_NAME[gnetStyle(state)];
   var GN_STORAGE_AUTO = "$gn_storage_auto_dm";
   var GN_STORAGE_LIMIT = "$gn_storage_limit_dm";
   var STORAGE_MAX = 2e4;
@@ -4246,10 +4254,4 @@ ${themeVars("[x-goei-fab]")}
         }
       } else if (p[0] === "C" && p.length >= 6) {
         const post = map.get(Number(p[1]));
-        if (post) post.comments.push({ parent: Math.max(0, Math.floor(Number(p[2]) || 0)), nick: cut(p[3], 80), body: p[4], mine: p[5] === "1", unread: p[6] === "1", ...validDate(p[7]) ? { time: validDate(p[7]) } : {} });
-      } else if (p[0] === "D" && p.length >= 4) {
-        st.dms.push({ nick: cut(p[1], 80), side: p[2] === "me" ? "me" : "npc", body: p[3], unread: p[4] === "1", date: validDate(p[5] ?? "") });
-      }
-    }
-    if (st.seq < G_POST_BASE) {
-      for (const post of st.posts) post.id += G_POS
+        if (post) post.c

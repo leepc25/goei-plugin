@@ -1,4 +1,21 @@
-, key2, main) {
+-mini" data-action="dir-photo-set" data-value="${esc15(`|${slot}>${key2}`)}">자동으로</button>` : ""}${extra}
+      <button class="gx-mini" data-action="dir-photo-pick" data-value="${esc15(`${slot}>${key2}`)}">${picking2 ? "닫기" : "고르기"}</button>
+    </div>`;
+    };
+    const mainWhy = p.photo ? "직접 고름" : main ? `자동: ${esc15(main)}` : "「영문명_default」·「영문명」 이미지가 없어요";
+    const faceWhy = p.face ? "직접 고름" : cut2 ? "대표 사진에서 잘라요" : face3 ? `자동: ${esc15(splitPic(face3).name)}` : "「영문명」 이미지가 없어요";
+    const cropping = cut2 && dirUi.crop === key2;
+    const cropBtn = cut2 ? `<button class="gx-mini" data-action="dir-crop" data-value="${esc15(key2)}">${cropping ? "완료" : "틀 맞추기"}</button>` : "";
+    const picking = dirUi.pick ? pickOf(dirUi.pick) : null;
+    const list4 = picking?.key === key2 ? `<div class="dir-ext"><input class="gx-search" data-input="dir-photo-q" value="${esc15(dirUi.pickQ)}" placeholder="이미지 이름 검색" aria-label="이미지 이름 검색" autocomplete="off"><div class="dir-pics">${directoryPhotoList(ctx2)}</div></div>` : "";
+    return `<div class="dir-in"><span>사진</span>
+    ${line2("main", "대표", main, p.photo, mainWhy)}
+    ${line2("face", "얼굴", face3, p.face, faceWhy, cropBtn)}
+    ${cropping ? cropBox(ctx2, key2, main) : ""}
+    ${list4}
+  </div>`;
+  }
+  function cropBox(ctx2, key2, main) {
     const url = imageUrl(ctx2.char, main);
     const [x, y, w] = cropValue(key2);
     return `<div class="dir-crop">
@@ -2026,7 +2043,7 @@ ${v.trim()}`).join("\n\n") : "";
     return `<main class="gx-body gx-settings">
     ${scopeBar(scope, canChat)}
     ${settingsUi.notice ? `<div class="gx-err" role="alert">${esc21(settingsUi.notice)}</div>` : ""}
-    ${group5("기능별 설정", `<div class="st-feats">${[["gnet", "괴담넷", ICONS.gnet], ["phone", "괴담톡", ICONS.phone], ["wiki", "위키", ICONS.wiki], ["visit", "필드", ICONS.game], ["people", "인물 기록", ICONS.group]].map(([k, label, icon2]) => `<button class="gx-mini st-feat" data-action="feature-set" data-value="${k}" aria-label="${label} 설정">${icon2}${label}</button>`).join("")}</div>`, canChat ? "" : "시작 전에도 각 기능의 설정을 미리 바꿀 수 있어요. 바꾼 값은 이 채팅에 적용돼요.")}
+    ${group5("기능별 설정", `<div class="st-feats">${[["gnet", gnetLabel(ctx2.chat.scriptstate), ICONS.gnet], ["phone", "괴담톡", ICONS.phone], ["wiki", "위키", ICONS.wiki], ["visit", "필드", ICONS.game], ["people", "인물 기록", ICONS.group]].map(([k, label, icon2]) => `<button class="gx-mini st-feat" data-action="feature-set" data-value="${k}" aria-label="${label} 설정">${icon2}${label}</button>`).join("")}</div>`, canChat ? "" : "시작 전에도 각 기능의 설정을 미리 바꿀 수 있어요. 바꾼 값은 이 채팅에 적용돼요.")}
     ${group5("화면", [
       field3("테마", seg5("set-theme", theme, [["light", "라이트"], ["dark", "다크"], ["paper", "페이퍼"]], busy5), "채팅 화면의 캐릭터 이미지 배경과 상태창(「테마」를 골랐을 때) 배색이에요."),
       field3("상태창", seg5("set-status", getPrefs().status ?? "auto", [["auto", "테마"], ["dark", "다크"], ["light", "라이트"], ["paper", "페이퍼"], ["off", "미표시"]], busy5), "채팅 속 상태창의 배색이에요. 「테마」는 위 테마를 따라가요. 미표시를 고르면 상자만 숨기고, 모델은 상태 태그를 계속 써요."),
@@ -2865,6 +2882,7 @@ ${v.trim()}`).join("\n\n") : "";
       case "tab":
         tab = TABS2.includes(value) ? value : "board";
         notice2 = "";
+        if (tab === "wiki" && ["people", "person", "docs", "faction"].includes(wiki.view)) resetWiki();
         field2.confirmEnd = null;
         resetSettings();
         render();
@@ -3053,7 +3071,7 @@ ${v.trim()}`).join("\n\n") : "";
   var gameShown = () => true;
   function startedHeader(ctx2) {
     return `<header class="gx-head">
-    <div class="gx-brand gx-tabhead"><span class="gx-hmark"><span class="gx-logo">${GHOST_ICON}</span><span class="gx-mark-txt"><b aria-label="${BRAND.name}">${brandHtml("var(--text)", "var(--signal)")}</b></span></span><span class="gx-hsep" aria-hidden="true">›</span><span class="gx-tabicon">${tab === "field" ? ICONS.game : ICONS[tab]}</span><div><b>${TAB_TITLE[tab]}</b></div></div>
+    <div class="gx-brand gx-tabhead"><span class="gx-hmark"><span class="gx-logo">${GHOST_ICON}</span><span class="gx-mark-txt"><b aria-label="${BRAND.name}">${brandHtml("var(--text)", "var(--signal)")}</b></span></span><span class="gx-hsep" aria-hidden="true">›</span><span class="gx-tabicon">${tab === "field" ? ICONS.game : ICONS[tab]}</span><div><b>${tab === "gnet" ? gnetLabel(ctx2.chat.scriptstate) : TAB_TITLE[tab]}</b></div></div>
     <div class="gx-head-act">
       ${gameShown() ? `<button class="gx-x gx-fieldbtn${tab === "field" ? " on" : ""}" data-action="tab" data-value="field" aria-label="필드" title="필드">${ICONS.game}</button>` : ""}
       <button class="gx-x gx-idbtn" data-action="id-card" aria-label="내 ID카드">${userInfo().photo ? `<img src="${esc22(userInfo().photo)}" alt="">` : ICONS.idcard}</button>
@@ -3177,7 +3195,7 @@ ${v.trim()}`).join("\n\n") : "";
   function markOf(raw) {
     const s4 = markState(raw);
     const ctx2 = view2.kind === "started" ? view2.ctx : null;
-    let name = TAB_TITLE[s4.tab];
+    let name = s4.tab === "gnet" ? gnetLabel(ctx2?.chat.scriptstate) : TAB_TITLE[s4.tab];
     if (s4.w) name = s4.w.view === "doc" || s4.w.view === "compose" ? s4.w.title || "위키" : s4.w.view === "settings" ? "위키 설정" : s4.w.view === "new" ? "위키 새 문서" : s4.w.view === "people" ? "이 채팅의 인물" : s4.w.view === "person" ? `${s4.w.title} 기록` : s4.w.view === "docs" ? "기록 문서" : s4.w.view === "faction" ? `세력 ${s4.w.title}` : "위키 메인";
     if (s4.p) {
       const r = s4.p.view === "room" && s4.p.room && ctx2 ? readPhone(ctx2.chat).rooms[s4.p.room] : void 0;
@@ -3185,7 +3203,7 @@ ${v.trim()}`).join("\n\n") : "";
     }
     if (s4.g) {
       const post = s4.g.open !== null && ctx2 ? findPost(readGnet(ctx2.chat), s4.g.open) : void 0;
-      name = s4.g.s ? "괴담넷 설정" : post ? post.title || "괴담넷 글" : s4.g.dm ? `${s4.g.dm} 쪽지` : s4.g.sub === "dm" ? "괴담넷 쪽지" : "괴담넷";
+      name = s4.g.s ? `${gnetLabel(ctx2?.chat.scriptstate)} 설정` : post ? post.title || `${gnetLabel(ctx2?.chat.scriptstate)} 글` : s4.g.dm ? `${s4.g.dm} 쪽지` : s4.g.sub === "dm" ? "괴담넷 쪽지" : "괴담넷";
     }
     if (s4.f === "team") name = `${name} 편성`;
     if (s4.tab === "settings" && s4.d) name = "명부";
@@ -3354,7 +3372,7 @@ ${v.trim()}`).join("\n\n") : "";
     ${item2("map", "임무", ICONS.map, "mob")}
     ${item2("mission", "커스텀", ICONS.mission, "desk")}
     ${item2("phone", "괴담톡", ICONS.phone, "", unreadPhone ? '<span class="gx-nbadge dot" aria-label="새 메시지"></span>' : "")}
-    ${GNET_ON ? item2("gnet", "괴담넷", ICONS.gnet) : ""}
+    ${GNET_ON ? item2("gnet", gnetLabel(ctx2?.chat.scriptstate), ICONS.gnet) : ""}
     ${item2("wiki", "위키", ICONS.wiki)}
     ${gameShown() ? item2("field", "필드", ICONS.game, "desk") : ""}
     ${item2("settings", "설정", ICONS.settings, "desk", ctx2 && hasUpdate(ctx2) ? '<span class="gx-nbadge dot" aria-label="새 버전"></span>' : "")}
@@ -3365,7 +3383,7 @@ ${v.trim()}`).join("\n\n") : "";
       item2("map", "임무", ICONS.map, "mob"),
       item2("board", "상황판", ICONS.board, "home"),
       item2("phone", "괴담톡", ICONS.phone, "", unreadPhone ? '<span class="gx-nbadge dot" aria-label="새 메시지"></span>' : ""),
-      ...GNET_ON ? [item2("gnet", "괴담넷", ICONS.gnet)] : []
+      ...GNET_ON ? [item2("gnet", gnetLabel(ctx2?.chat.scriptstate), ICONS.gnet)] : []
     ])}
   </nav>`;
   }
@@ -3478,43 +3496,4 @@ ${v.trim()}`).join("\n\n") : "";
     const clock2 = boardClock(ctx2);
     return `<main class="gx-body gx-board">
     ${opsBoard(cards, { mapUrl: boardMapUrl(ctx2, env), clock: clock2, counts, empty: "지금 발생한 상황이 없어요." })}
-    ${agentPanel(agents, getPrefs().agents ?? "wall", { total: roster.length, org: findFaction(faction, factionList(ctx2.char.globalLore))?.affiliation ?? "", extra: promo, empty: limit === 0 ? "설정에서 요원 표시 인원을 0명으로 해 두었어요." : "이 소속에는 요원 명단이 없어요." })}
-  </main>${boardDrawer()}`;
-  }
-  function boardClock(ctx2) {
-    const st = lastStatusFields((ctx2.chat.message ?? []).filter((m) => m.role === "char").slice(-6).map((m) => m.data));
-    return [st?.date, st?.time].filter(Boolean).join(" ");
-  }
-
-  // src/core/statusctx.ts
-  var STATUS_HEAD = "[Previous status]";
-  var NOTE = "This is the status line of the scene right before the next input; older status lines were removed from the history. Continue from it: advance the time, update the other fields, and output exactly one new [▣] line at the very end of your response.";
-  function lastStatusLine(messages) {
-    for (let i = messages.length - 1; i >= 0; i--) {
-      const m = messages[i];
-      if (m?.role !== "assistant" || typeof m.content !== "string") continue;
-      const tags = findStatusTags(m.content);
-      if (tags.length) return tags[tags.length - 1].raw.trim();
-    }
-    return null;
-  }
-  function stripStatusLines(messages) {
-    return messages.map((m) => {
-      if (m?.role !== "assistant" || typeof m.content !== "string") return m;
-      const tags = findStatusTags(m.content);
-      if (!tags.length) return m;
-      let c = m.content;
-      for (const t of tags) c = c.replace(t.raw, "");
-      return { ...m, content: c.replace(/[ \t]+\n/g, "\n").replace(/\n{3,}/g, "\n\n").trim() };
-    });
-  }
-  function statusBlock(line2) {
-    return `${STATUS_HEAD}
-${line2}
-${NOTE}`;
-  }
-  function withIdentity(line2, identity) {
-    if (!identity) return line2;
-    const tags = findStatusTags(line2);
-    const t = tags[0];
-    if (!t || t.identity) return li
+    ${agentPanel(agents, getPrefs().agents ?? "wall", { total: roster.length, org: findFaction(faction, factionList(

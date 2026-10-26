@@ -17,6 +17,7 @@ import { barButtons, directoryBar, directoryDone, directoryDoneClear, directoryS
 import { drawerBox } from './drawer';
 import { toast } from './toast';
 import { ICONS } from './icons';
+import { gnetLabel } from '../core/gnet';
 import { imgPromptPane } from './imgprompt';
 import { keepOpen } from './panels';
 
@@ -205,7 +206,7 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
   return `<main class="gx-body gx-settings">
     ${scopeBar(scope, canChat)}
     ${settingsUi.notice ? `<div class="gx-err" role="alert">${esc(settingsUi.notice)}</div>` : ''}
-    ${group('기능별 설정', `<div class="st-feats">${[['gnet', '괴담넷', ICONS.gnet], ['phone', '괴담톡', ICONS.phone], ['wiki', '위키', ICONS.wiki], ['visit', '필드', ICONS.game], ['people', '인물 기록', ICONS.group]]
+    ${group('기능별 설정', `<div class="st-feats">${[['gnet', gnetLabel(ctx.chat.scriptstate), ICONS.gnet], ['phone', '괴담톡', ICONS.phone], ['wiki', '위키', ICONS.wiki], ['visit', '필드', ICONS.game], ['people', '인물 기록', ICONS.group]]
       .map(([k, label, icon]) => `<button class="gx-mini st-feat" data-action="feature-set" data-value="${k}" aria-label="${label} 설정">${icon}${label}</button>`)
       .join('')}</div>`, canChat ? '' : '시작 전에도 각 기능의 설정을 미리 바꿀 수 있어요. 바꾼 값은 이 채팅에 적용돼요.')}
     ${group('화면', [

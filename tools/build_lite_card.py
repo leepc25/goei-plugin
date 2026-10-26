@@ -431,6 +431,8 @@ def lore_activation(entries):
 
 # 원본 지침 문장 고치기 (주석 이름, 옛 문장, 새 문장). 옛 문장이 없으면 빌드를 멈춘다
 LORE_PATCHES = [
+    # 괴담넷 성격 전환 (2026-10-26 사용자): 설정 lb_cfg_lb-gn.style = gal 괴담갤(일반) / net 괴담넷(업계, 기본) / wpf 세정게. 큰 틀은 그대로, 소개·기본 말투·기본 주제만 분기. 문안은 card/gnet-style.json
+    *[('GNet', v['old'], v['new']) for v in json.loads((ROOT / 'card' / 'gnet-style.json').read_text(encoding='utf-8')).values()],
     # 콘쥬스 20세 대학생 (2026-10-26 사용자 지시). 위키·게임 시트·대사도 같이 바꿈
     ('콘쥬스', '- Age: 17, a high school student', '- Age: 20, a university student'),
     ('콘쥬스', 'Agent. A minor attached to the team, deployed only when', 'Agent. The youngest member of the team, deployed only when'),

@@ -32,7 +32,7 @@ import { gnet, gnetOpenCheck, gnetTab, handleGnet, resetGnet, type GnetEnv } fro
 import { addPhoto, attachInput, hydratePhotos, zoomPhoto } from './attach';
 import { ATTACH_MAX } from '../core/attach';
 import { readPhone, roomLabel } from '../core/phone';
-import { findPost, readGnet } from '../core/gnet';
+import { findPost, gnetLabel, readGnet } from '../core/gnet';
 import { savePhoto } from '../host/photo';
 import { readPersona, readUser, userInfo } from '../host/user';
 import { applyAdvanced } from '../core/advanced';
@@ -890,7 +890,7 @@ const gameShown = (): boolean => true;
 /** 진행 중 화면의 머리: 지금 탭 이름 (위협도는 기준이 헷갈리기만 해서 아예 뺐다, 사용자 결정) */
 function startedHeader(ctx: ChatContext): string {
   return `<header class="gx-head">
-    <div class="gx-brand gx-tabhead"><span class="gx-hmark"><span class="gx-logo">${GHOST_ICON}</span><span class="gx-mark-txt"><b aria-label="${BRAND.name}">${brandHtml('var(--text)', 'var(--signal)')}</b></span></span><span class="gx-hsep" aria-hidden="true">›</span><span class="gx-tabicon">${tab === 'field' ? ICONS.game : ICONS[tab]}</span><div><b>${TAB_TITLE[tab]}</b></div></div>
+    <div class="gx-brand gx-tabhead"><span class="gx-hmark"><span class="gx-logo">${GHOST_ICON}</span><span class="gx-mark-txt"><b aria-label="${BRAND.name}">${brandHtml('var(--text)', 'var(--signal)')}</b></span></span><span class="gx-hsep" aria-hidden="true">›</span><span class="gx-tabicon">${tab === 'field' ? ICONS.game : ICONS[tab]}</span><div><b>${tab === 'gnet' ? gnetLabel(ctx.chat.scriptstate) : TAB_TITLE[tab]}</b></div></div>
     <div class="gx-head-act">
       ${gameShown() ? `<button class="gx-x gx-fieldbtn${tab === 'field' ? ' on' : ''}" data-action="tab" data-value="field" aria-label="필드" title="필드">${ICONS.game}</button>` : ''}
       <button class="gx-x gx-idbtn" data-action="id-card" aria-label="내 ID카드">${userInfo().photo ? `<img src="${esc(userInfo().photo!)}" alt="">` : ICONS.idcard}</button>
@@ -1058,7 +1058,7 @@ const PH_SUB: Record<string, string> = { contacts: '연락처', chats: '대화',
 function markOf(raw: NavState): Mark {
   const s = markState(raw);
   const ctx = view.kind === 'started' ? view.ctx : null;
-  let name = TAB_TITLE[s.tab];
+  let name = s.tab === 'gnet' ? gnetLabel(ctx?.chat.scriptstate) : TAB_TITLE[s.tab];
   if (s.w) name = s.w.view === 'doc' || s.w.view === 'compose' ? s.w.title || '위키' : s.w.view === 'settings' ? '위키 설정' : s.w.view === 'new' ? '위키 새 문서' : s.w.view === 'people' ? '이 채팅의 인물' : s.w.view === 'person' ? `${s.w.title} 기록` : s.w.view === 'docs' ? '기록 문서' : s.w.view === 'faction' ? `세력 ${s.w.title}` : '위키 메인';
   if (s.p) {
     const r = s.p.view === 'room' && s.p.room && ctx ? readPhone(ctx.chat).rooms[s.p.room] : undefined;
@@ -1066,7 +1066,7 @@ function markOf(raw: NavState): Mark {
   }
   if (s.g) {
     const post = s.g.open !== null && ctx ? findPost(readGnet(ctx.chat), s.g.open) : undefined;
-    name = s.g.s ? '괴담넷 설정' : post ? post.title || '괴담넷 글' : s.g.dm ? `${s.g.dm} 쪽지` : s.g.sub === 'dm' ? '괴담넷 쪽지' : '괴담넷';
+    name = s.g.s ? `${gnetLabel(ctx?.chat.scriptstate)} 설정` : post ? post.title || `${gnetLabel(ctx?.chat.scriptstate)} 글` : s.g.dm ? `${s.g.dm} 쪽지` : s.g.sub === 'dm' ? '괴담넷 쪽지' : '괴담넷';
   }
   if (s.f === 'team') name = `${name} 편성`;
   if (s.tab === 'settings' && s.d) name = '명부';
@@ -1279,7 +1279,7 @@ function tabs(): string {
     ${item('map', '임무', ICONS.map, 'mob')}
     ${item('mission', '커스텀', ICONS.mission, 'desk')}
     ${item('phone', '괴담톡', ICONS.phone, '', unreadPhone ? '<span class="gx-nbadge dot" aria-label="새 메시지"></span>' : '')}
-    ${GNET_ON ? item('gnet', '괴담넷', ICONS.gnet) : ''}
+    ${GNET_ON ? item('gnet', gnetLabel(ctx?.chat.scriptstate), ICONS.gnet) : ''}
     ${item('wiki', '위키', ICONS.wiki)}
     ${gameShown() ? item('field', '필드', ICONS.game, 'desk') : ''}
     ${item('settings', '설정', ICONS.settings, 'desk', ctx && hasUpdate(ctx) ? '<span class="gx-nbadge dot" aria-label="새 버전"></span>' : '')}
@@ -1290,7 +1290,7 @@ function tabs(): string {
       item('map', '임무', ICONS.map, 'mob'),
       item('board', '상황판', ICONS.board, 'home'),
       item('phone', '괴담톡', ICONS.phone, '', unreadPhone ? '<span class="gx-nbadge dot" aria-label="새 메시지"></span>' : ''),
-      ...(GNET_ON ? [item('gnet', '괴담넷', ICONS.gnet)] : []),
+      ...(GNET_ON ? [item('gnet', gnetLabel(ctx?.chat.scriptstate), ICONS.gnet)] : []),
     ])}
   </nav>`;
 }

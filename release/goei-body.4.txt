@@ -1,4 +1,15 @@
-e-grid; }
+ border-color: var(--accent-line); background: var(--accent-bg); }
+
+/* ── 메뉴: PC는 왼쪽, 모바일은 하단 바 ── */
+.gx-nav { grid-area: nav; display: flex; flex-direction: column; gap: 4px; padding: 16px 12px; border-right: 1px solid var(--panel2); background: var(--void); min-height: 0; overflow-y: auto; }
+.gx-nav-brand { display: flex; flex-direction: column; gap: 14px; padding: 2px 2px 16px; margin-bottom: 6px; border-bottom: 1px solid var(--panel2); }
+.gx-mark { display: flex; align-items: center; gap: 10px; padding: 0 4px; }
+.gx-mark .gx-logo { width: 36px; height: 36px; border-radius: 11px; }
+.gx-mark .gx-logo svg { width: 24px; height: 24px; }
+.gx-mark-txt b { display: block; font-size: 18px; font-weight: 800; letter-spacing: .02em; line-height: 1.15; }
+.gx-mark-txt small { display: block; font-family: var(--mono); font-size: 11px; letter-spacing: .18em; color: var(--signal); opacity: .8; }
+/* 상단바 표지: 영문은 글씨 크기 그대로, 글자 사이를 벌려 한글 제목과 같은 길이 */
+.gx-hmark .gx-mark-txt { display: inline-grid; }
 .gx-hmark .gx-mark-txt small { display: flex; justify-content: space-between; letter-spacing: 0; }
 .gx-hmark .gx-mark-txt small i { font-style: normal; }
 /* 띄어쓰기만 3px 좁히고 그만큼 오른쪽 끝을 당긴다 (다른 글자 간격은 그대로) */
@@ -1861,7 +1872,7 @@ button.mk-go:hover { color: var(--signal); }
 .gx-evc.art.wait .gx-evart { filter: saturate(.5) brightness(.78); }
 .gx-evart::after { content: ''; position: absolute; inset: 0; pointer-events: none;
   background: linear-gradient(to top, rgba(6, 10, 12, .9) 0%, rgba(6, 10, 12, .45) 45%, rgba(6, 10, 12, 0) 72%), linear-gradient(to bottom, rgba(6, 10, 12, .5), rgba(6, 10, 12, 0) 36%); }
-.gx-evc.art.open .gx-evart::after { background: linear-gradient(to top, rgba(6, 10, 12, .94) 0%, rgba(6, 10, 12, .78) 34%, rgba(6, 10, 12, 0) 66%), linear-gradient(to bottom, rgba(6, 10, 12, .55), rgba(6, 10, 12, 0) 28%); }
+.gx-evc.art.open .gx-evart::after { background: linear-gradient(to top, rgba(6, 10, 12, .9) 0%, rgba(6, 10, 12, .66) 34%, rgba(6, 10, 12, 0) 66%), linear-gradient(to bottom, rgba(6, 10, 12, .45), rgba(6, 10, 12, 0) 28%); }
 .gx-evart.none.k-an, .gx-mx-art.none.k-an { background: radial-gradient(circle at 72% 45%, #5a1f1b 0%, #1d1213 62%); }
 .gx-evart.none.k-in { background: radial-gradient(circle at 72% 45%, #5a4416 0%, #1e1a10 62%); }
 .gx-evart.none.k-ms, .gx-mx-art.none.k-ms { background: radial-gradient(circle at 72% 45%, #183e55 0%, #0f1a21 62%); }
@@ -1904,7 +1915,7 @@ button.mk-go:hover { color: var(--signal); }
 .gx-mx-art { position: relative; display: block; width: 100%; height: 68px; border: 0; padding: 0; background: #0d1214 center 42% / cover no-repeat; text-align: left; cursor: pointer; color: #fff; }
 .gx-mx.open .gx-mx-art { height: auto; aspect-ratio: 1 / 1; background-position: center; cursor: default; }
 .gx-mx-art::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(to top, rgba(6, 10, 12, .9) 0%, rgba(6, 10, 12, .4) 48%, rgba(6, 10, 12, 0) 75%); }
-.gx-mx.open .gx-mx-art::after { background: linear-gradient(to top, rgba(6, 10, 12, .95) 0%, rgba(6, 10, 12, .8) 40%, rgba(6, 10, 12, 0) 72%), linear-gradient(to bottom, rgba(6, 10, 12, .5), rgba(6, 10, 12, 0) 26%); }
+.gx-mx.open .gx-mx-art::after { background: linear-gradient(to top, rgba(6, 10, 12, .9) 0%, rgba(6, 10, 12, .68) 40%, rgba(6, 10, 12, 0) 72%), linear-gradient(to bottom, rgba(6, 10, 12, .4), rgba(6, 10, 12, 0) 26%); }
 .gx-mx .gx-evart-top { justify-content: flex-start; }
 .gx-mx .gx-evart-cap { max-height: calc(100% - 50px); }
 .gx-mx-art .gx-evc-desc { display: block; font-size: 13px; line-height: 1.55; color: rgba(255, 255, 255, .86); text-shadow: 0 1px 3px rgba(0, 0, 0, .6); }
@@ -2055,10 +2066,10 @@ button.mk-go:hover { color: var(--signal); }
 /* ── 관제실 상황판 (2026-10-20 사용자 시안): 왼쪽 큰 보기(CCTV ↔ 위성 지도) + 오른쪽 상황 일지 ── */
 .gx-ops { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 12px; height: 440px; }
 .gx-opview { position: relative; min-height: 0; border-radius: 14px; overflow: hidden; border: 1px solid color-mix(in srgb, var(--text) 22%, transparent); background: #0d1310; color: #fff; }
-.gx-opview.feed > .gx-opfeed { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 40%; filter: saturate(.5) contrast(1.15) brightness(.85) sepia(.15); }
+.gx-opview.feed > .gx-opfeed { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 40%; filter: saturate(.5) contrast(1.12) brightness(.95) sepia(.15); }
 .gx-opview.feed > .gx-evart-ico { color: rgba(255, 255, 255, .5); }
-.gx-opview.feed::before { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: repeating-linear-gradient(0deg, rgba(0, 0, 0, .22) 0 1px, transparent 1px 3px), radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, .55) 100%); }
-.gx-opview.feed::after { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(to top, rgba(8, 12, 14, .95), rgba(8, 12, 14, .55) 45%, rgba(8, 12, 14, .05) 75%), linear-gradient(rgba(8, 12, 14, .5), transparent 24%); }
+.gx-opview.feed::before { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: repeating-linear-gradient(0deg, rgba(0, 0, 0, .22) 0 1px, transparent 1px 3px), radial-gradient(ellipse at center, transparent 58%, rgba(0, 0, 0, .42) 100%); }
+.gx-opview.feed::after { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(to top, rgba(8, 12, 14, .9), rgba(8, 12, 14, .45) 45%, rgba(8, 12, 14, .04) 75%), linear-gradient(rgba(8, 12, 14, .4), transparent 24%); }
 .gx-opview.feed.k-an::after { box-shadow: inset 0 0 40px rgba(255, 112, 96, .18); }
 .gx-opview.feed.k-in::after { box-shadow: inset 0 0 40px rgba(255, 190, 80, .16); }
 .gx-opview.feed.k-ms::after { box-shadow: inset 0 0 40px rgba(120, 190, 255, .16); }
@@ -2232,15 +2243,4 @@ button.mk-go:hover { color: var(--signal); }
 .gx-agcard-band b { font-family: inherit; font-size: 12.5px; font-weight: 800; letter-spacing: .02em; color: var(--text); }
 .gx-agcard-x { margin-left: auto; width: 28px; height: 28px; border: 0; border-radius: 7px; background: none; color: var(--dim); font-size: 13px; cursor: pointer; }
 .gx-agcard-main { display: grid; grid-template-columns: 132px minmax(0, 1fr); gap: 16px; padding: 16px; }
-.gx-agcard-ph { position: relative; align-self: stretch; min-height: 168px; border-radius: 10px; overflow: hidden; background: var(--panel2); box-shadow: inset 0 0 0 1px var(--line); }
-.gx-agcard-ph > img, .gx-agcard-ph > .gx-ava { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 0; object-fit: cover; object-position: 50% 12%; font-size: 40px; }
-.gx-agcard-ph > .gx-ava img { object-position: 50% 14%; }
-/* 큰 사진은 전신(832×1216)이라 상반신만 보이게 키운다 */
-.gx-agcard-ph > img { transform: scale(1.9); transform-origin: 50% 6%; }
-.gx-agcard-t { min-width: 0; display: flex; flex-direction: column; }
-.gx-agcard-t .nm { font-size: 24px; font-weight: 800; line-height: 1.15; }
-.gx-agcard-t .en { margin-top: 3px; font: 600 11px var(--mono); letter-spacing: .16em; color: var(--dim); text-transform: uppercase; }
-.gx-agcard-t dl { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 6px 12px; margin: 12px 0 0; padding-top: 12px; border-top: 1px solid var(--line); font-size: 13px; line-height: 1.5; }
-.gx-agcard-t dt { padding-top: 1px; font-size: 12px; font-weight: 700; color: var(--dim); }
-.gx-agcard-t dd { margin: 0; }
-.gx-agcard-t dd.dep { color: #e8685a; font-weigh
+.gx-agcard-ph { position: relative; align-self: stretch; min-height: 168px; border-radius: 10px; overflow: hidden; background: var(--panel2); box-shad

@@ -1,4 +1,15 @@
-t: 700; }
+ow: inset 0 0 0 1px var(--line); }
+.gx-agcard-ph > img, .gx-agcard-ph > .gx-ava { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 0; object-fit: cover; object-position: 50% 12%; font-size: 40px; }
+.gx-agcard-ph > .gx-ava img { object-position: 50% 14%; }
+/* 큰 사진은 전신(832×1216)이라 상반신만 보이게 키운다 */
+.gx-agcard-ph > img { transform: scale(1.9); transform-origin: 50% 6%; }
+.gx-agcard-t { min-width: 0; display: flex; flex-direction: column; }
+.gx-agcard-t .nm { font-size: 24px; font-weight: 800; line-height: 1.15; }
+.gx-agcard-t .en { margin-top: 3px; font: 600 11px var(--mono); letter-spacing: .16em; color: var(--dim); text-transform: uppercase; }
+.gx-agcard-t dl { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 6px 12px; margin: 12px 0 0; padding-top: 12px; border-top: 1px solid var(--line); font-size: 13px; line-height: 1.5; }
+.gx-agcard-t dt { padding-top: 1px; font-size: 12px; font-weight: 700; color: var(--dim); }
+.gx-agcard-t dd { margin: 0; }
+.gx-agcard-t dd.dep { color: #e8685a; font-weight: 700; }
 .gx-agcard-foot { display: flex; align-items: center; gap: 8px; padding: 10px 16px; border-top: 1px dashed var(--line); }
 .gx-agcard-foot .code { margin-right: auto; display: flex; align-items: center; gap: 10px; font: 700 11.5px var(--mono); letter-spacing: .14em; color: var(--dim); white-space: nowrap; }
 .gx-agcard-foot .code u { width: 96px; height: 18px; text-decoration: none; opacity: .5; background: repeating-linear-gradient(90deg, var(--text) 0 1px, transparent 1px 3px, var(--text) 3px 5px, transparent 5px 6px, var(--text) 6px 7px, transparent 7px 10px); }
@@ -261,7 +272,8 @@ t: 700; }
 @keyframes pp-spin { to { transform: rotate(360deg); } }
 .pp-upbar .gx-mini { display: inline-flex; align-items: center; gap: 4px; }
 .pp-upbar .gx-mini svg { width: 16px; height: 16px; }
-.pp-card { display: flex; flex-direction: column; gap: 10px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 16px; background: var(--panel); }
+.pp-card { display: flex; flex-direction: column; gap: 6px; }
+.pp-card-body { display: flex; flex-direction: column; gap: 10px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 16px; background: var(--panel); }
 .pp-card h4, .pp-slot h4 { display: flex; align-items: center; gap: 6px; margin: 0; font-size: 13px; font-weight: 700; letter-spacing: .04em; color: var(--dim); }
 .pp-card h4 b, .pp-slot h4 b, .pp-log > summary b { font-size: 12px; font-weight: 600; color: var(--dim); }
 .pp-aff { display: flex; flex-direction: column; gap: 8px; user-select: none; -webkit-user-select: none; }
@@ -396,6 +408,8 @@ t: 700; }
 .ip-extra input { flex: 1; }
 .ip-template { font-family: ui-monospace, monospace; font-size: 12.5px; }
 .ip-preview { margin-top: 8px; padding: 10px; border-radius: 8px; background: var(--panel2); font-size: 12px; white-space: pre-wrap; overflow-wrap: anywhere; max-height: 360px; overflow: auto; }
+
+.pp-mini.on { color: var(--signal); border-color: var(--accent-line); background: var(--accent-bg); }
 `;
 
   // src/ui/mbar.ts
@@ -1148,7 +1162,7 @@ t: 700; }
     }
     return { next, lore: lore.count, scripts: scripts.count, fields: fields3 };
   }
-  var PLUGIN_VERSION = true ? "0.16.64" : "0";
+  var PLUGIN_VERSION = true ? "0.16.65" : "0";
 
   // src/host/game/fetch.ts
   var GAME_BASE = UPDATE_BASE ? `${UPDATE_BASE}/game` : "";
@@ -1237,7 +1251,7 @@ t: 700; }
 
   // src/host/game/code.ts
   var CODE_KEY = "goei:game:code";
-  var VERSION = true ? "0.16.64" : "";
+  var VERSION = true ? "0.16.65" : "";
   var codeVersion = (code) => /^\/\/ goei-game (\S+)/.exec(code)?.[1] ?? null;
   var mod = null;
   var codeStats = { readMs: 0, runMs: 0, bytes: 0, fromNet: false };
@@ -4490,61 +4504,4 @@ ${lines2.join("\n")}`;
         self: "저",
         up: "선생님",
         peer: "그쪽",
-        down: "당신",
-        outsider: "당신"
-      },
-      살라딘: {
-        level: null,
-        register: "하오체",
-        self: "나",
-        up: "형제",
-        peer: "형제",
-        down: "형제",
-        outsider: "그대"
-      },
-      서윤지: {
-        level: null,
-        register: "존댓말",
-        self: "저",
-        up: "선임 조정관님",
-        peer: "조정관님",
-        down: "신입 조정관님",
-        outsider: "방문자님"
-      },
-      송주익: {
-        level: 3,
-        register: "존댓말",
-        self: "",
-        up: "과장님",
-        peer: "선배님",
-        down: "신입",
-        outsider: "너"
-      },
-      송진섭: {
-        level: 1,
-        register: "존댓말",
-        self: "",
-        up: "선배님",
-        peer: "형",
-        down: "후배",
-        outsider: "그쪽"
-      },
-      스팡달: {
-        level: 2,
-        register: "존댓말",
-        self: "",
-        up: "부장님",
-        peer: "동기",
-        down: "신입",
-        outsider: "너"
-      },
-      신유리: {
-        level: null,
-        register: "반말",
-        self: "",
-        up: "사장",
-        peer: "너",
-        down: "너",
-        outsider: "너"
-      },
-      에일
+        down: "당
