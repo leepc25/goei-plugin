@@ -49,12 +49,12 @@ import { fieldRecord } from './core/field';
 import { withStatusBlock } from './core/statusctx';
 import { visitRecord } from './core/visit';
 import { visitContextRules } from './core/visitPrompt';
-import { withPeopleBlock } from './core/people/request';
+import { withPeopleBlock, peopleBlockFor, insertBlock } from './core/people/request';
 import { peopleStore } from './core/people/store';
 import { peopleSettings } from './core/people/settings';
 import { identityText } from './core/people/identity';
 import { extraNames, temperOf } from './core/people/base';
-import { requestPeopleUpdate } from './host/people';
+import { requestPeopleUpdate, directorNoteText } from './host/people';
 import { bookText } from './core/refs';
 
 const PLUGIN_ID = 'goei-plugin';
@@ -193,15 +193,17 @@ async function withPeople<M extends PromptMessage>(messages: M[]): Promise<M[]> 
   if (!char) return messages;
   const me = playerAgent(char.globalLore, chat.scriptstate);
   const lastUser = [...messages].reverse().find((m) => m?.role === 'user');
-  return withPeopleBlock(messages, chat, {
-    settings,
-    store,
-    sheetOf: (name) => bookText({ char, chat }, name) || null,
-    temperOf,
-    extraNames: extraNames(),
-    input: typeof lastUser?.content === 'string' ? lastUser.content : undefined,
-    user: me?.name || userInfo().name || '주인공',
-  });
+  const input = typeof lastUser?.content === 'string' ? lastUser.content : '';
+  const user = me?.name || userInfo().name || '주인공';
+  const opts = { settings, store, sheetOf: (name: string) => bookText({ char, chat }, name) || null, temperOf, extraNames: extraNames(), input, user };
+  let out = withPeopleBlock(messages, chat, opts);
+  // 연출형 Director (선택): 장면 인물에 대해 본편 앞 보조 1회. 실패·지연이면 메모 없이 진행
+  if (settings.director === 'scene') {
+    const { people } = peopleBlockFor(chat, opts);
+    const note = await directorNoteText(chat, store, people, input, settings, user).catch(() => '');
+    if (note) out = insertBlock(out, note);
+  }
+  return out;
 }
 
 /** 본부 막간: 대화가 일어난 메시지 바로 뒤에 끼운다 (core/interlude.ts). 채팅은 바꾸지 않는다 */

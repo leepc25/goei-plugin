@@ -2,7 +2,8 @@
 // 쓰기 규칙: 본편 응답 대기 중이면 보류, 쓰기 직전 같은 채팅인지 확인, 덧붙이기만, 작업은 한 번에 하나.
 import type { Chat } from '../core/types';
 import { bookText } from '../core/refs';
-import { generate, LlmError, type LlmMessage } from './llm';
+import { generate, runModel, LlmError, type LlmMessage } from './llm';
+import { buildDirector, directorBlock, parseDirector, type DirectorNote } from '../core/people/director';
 import { loadContext, updateChat, type ChatContext } from './risu';
 import { isWaiting, onWaiting } from './waiting';
 import { peopleStore, withPeople, unreadIndexes, messageKey, liveness } from '../core/people/store';
@@ -294,6 +295,44 @@ const messageHashOf = (m: { data: unknown }) => {
   }
   return (h >>> 0).toString(36);
 };
+
+// ── 연출형 Director (본편 앞) ──
+
+let directorCache: { key: string; notes: DirectorNote[] } | null = null;
+let directorSlowStreak = 0;
+export const directorPaused = () => directorSlowStreak >= 3;
+
+/** 연출형 메모 글. 시간 제한을 넘거나 실패하면 빈 문자열(본편을 막지 않는다). 입력·기록이 같으면 직전 메모 재사용 */
+export async function directorNoteText(chat: Chat, store: PeopleStore, people: string[], input: string, settings: PeopleSettings, user: string): Promise<string> {
+  if (settings.director !== 'scene' || directorPaused()) return '';
+  const built = buildDirector(chat, store, people, input, settings, Object.fromEntries(people.map((n) => [n, valuesOf(n)])));
+  if (!built) return '';
+  if (settings.directorReuse && directorCache?.key === built.key) return directorBlock(directorCache.notes, user);
+  const t0 = Date.now();
+  const diag: DiagRun = { at: new Date().toISOString(), chat: '', reason: 'director', model: settings.model, people, indexes: [], sizes: { system: built.system.length, data: JSON.stringify(built.data).length, span: 0 }, outChars: 0, ms: 0, ok: false };
+  try {
+    const raw = await Promise.race([
+      runModel([{ role: 'system', content: built.system }, { role: 'user', content: JSON.stringify(built.data) }], settings.model),
+      new Promise<never>((_, reject) => setTimeout(() => reject(new Error(`시간 제한 ${settings.directorTimeout}초`)), settings.directorTimeout * 1000)),
+    ]);
+    diag.raw = raw;
+    diag.outChars = raw.length;
+    const notes = parseDirector(raw, people, true);
+    directorCache = { key: built.key, notes };
+    directorSlowStreak = 0;
+    diag.ok = true;
+    return directorBlock(notes, user);
+  } catch (error) {
+    diag.error = error instanceof Error ? error.message : String(error);
+    diag.stage = /시간 제한/.test(diag.error) ? 'model' : 'parse';
+    if (/시간 제한/.test(diag.error)) directorSlowStreak++;
+    console.log(`[goei] Director 메모 생략: ${diag.error}`);
+    return '';
+  } finally {
+    diag.ms = Date.now() - t0;
+    await pushDiag(diag, settings.keepRaw);
+  }
+}
 
 /** 설정 요약 (화면용) */
 export function describeSettings(s: PeopleSettings): string {
