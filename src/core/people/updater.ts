@@ -8,9 +8,9 @@ import { addressOf, affinityView } from './affinity';
 import { unknownTo } from './inject';
 import { seedPerson } from './seed';
 import { nameMatcher, scenePeople, entriesOf, type NameEntry } from './select';
-import { changeId, entryId, foldSlotEntries, isAlive, liveChanges, liveEntries, liveness, markRead, pruneEntries, messageKey, norm, plain, putChange, putDoc, putEntry, type Liveness } from './store';
+import { changeId, entryId, isAlive, liveChanges, liveEntries, liveness, markRead, messageKey, norm, plain, putChange, putDoc, putEntry, type Liveness } from './store';
 import type { Feature, PeopleSettings } from './settings';
-import { CUES, DOC_TYPES, REGISTERS, SLOT_CAP, SLOTS, type Change, type Cue, type DocType, type Entry, type PeopleStore, type Person, type Register, type SlotId } from './types';
+import { CUES, DOC_TYPES, REGISTERS, SLOTS, type Change, type Cue, type DocType, type Entry, type PeopleStore, type Person, type Register, type SlotId } from './types';
 
 const str = (v: unknown) => (typeof v === 'string' ? v : '');
 const msgs = (chat: Chat): ChatMessage[] => (Array.isArray(chat.message) ? chat.message : []);
@@ -54,6 +54,8 @@ export interface UpdateInput {
   confirmed: Set<number>;
   /** 이름 표 (별명·호칭으로 인물 찾기) */
   names: NameEntry[];
+  /** 저장 상한을 넘긴 인물 (같은 호출에 정리를 얹을 대상) */
+  tidy: string[];
 }
 
 const CUE_MEANING: Record<Cue, string> = {
@@ -73,21 +75,17 @@ export function cleanSpan(raw: string, cap: number): string {
 }
 
 /** 인물 기록을 자료용으로 (칸별 id·본문, 상한을 넘으면 오래된 history·scene 부터 뺀다) */
-export function personPayload(p: Person, live: Liveness, cap: number, changes: Change[], unknown?: string[]) {
+/** 인물의 살아 있는 기록 글자 수 (저장 상한 판정) */
+export function recordChars(p: Person, live: Liveness): number {
+  return SLOTS.reduce((n, s) => n + liveEntries(p.slots[s], live).reduce((m, e) => m + e.text.length, 0), 0);
+}
+
+export function personPayload(p: Person, live: Liveness, changes: Change[], unknown?: string[]) {
   const entries: Record<string, { id: string; text: string; target?: string; kind?: string }[]> = {};
-  let size = 0;
   for (const s of SLOTS) {
     const list = liveEntries(p.slots[s], live);
     if (!list.length) continue;
     entries[s] = list.map((e) => ({ id: e.id, text: e.text, ...(e.target ? { target: e.target } : {}), ...(e.kind ? { kind: e.kind } : {}) }));
-    size += list.reduce((n, e) => n + e.text.length, 0);
-  }
-  for (const s of ['history', 'scene', 'behavior', 'knowledge'] as SlotId[]) {
-    while (size > cap && entries[s]?.length) {
-      const gone = entries[s].shift()!;
-      size -= gone.text.length;
-    }
-    if (entries[s] && !entries[s].length) delete entries[s];
   }
   const aff = affinityView(p, changes);
   const addr = addressOf(p, changes);
@@ -198,6 +196,7 @@ export function buildUpdate(chat: Chat, store: PeopleStore, batch: number[], o: 
     ...chosen.flatMap((n) => SLOTS.flatMap((s) => liveEntries(store.people[n].slots[s], live).filter((e) => [...confirmedIdx].some((idx) => live.at.get(e.anchor) === idx)).map((e) => ({ who: n, kind: 'entry', slot: s, text: e.text })))),
   ];
   const wantNote = o.settings.director === 'facts';
+  const over = chosen.filter((n) => recordChars(store.people[n], live) > o.settings.personCap);
   const data = {
     request_ref: `pp_${Date.now().toString(36)}`,
     cues: o.settings.features.has('affinity') ? CUES.map((c) => ({ name: c, meaning: CUE_MEANING[c] })) : [],
@@ -205,7 +204,7 @@ export function buildUpdate(chat: Chat, store: PeopleStore, batch: number[], o: 
     doc_types: DOC_TYPES.filter((t) => o.settings.features.has(`docs_${t}` as Feature)),
     people: chosen.map((n) => {
       const p = store.people[n];
-      return { ...personPayload(p, live, o.settings.perCap, changes, wantNote || o.settings.features.has('perception') ? unknownTo(p, store, live) : undefined), values: o.values[n] ?? '' };
+      return { ...personPayload(p, live, changes, wantNote || o.settings.features.has('perception') ? unknownTo(p, store, live) : undefined), values: o.values[n] ?? '' };
     }),
     known_names: Object.keys(store.people),
     docs_now: DOC_TYPES.some((t) => o.settings.features.has(`docs_${t}` as Feature))
@@ -213,6 +212,8 @@ export function buildUpdate(chat: Chat, store: PeopleStore, batch: number[], o: 
       : undefined,
     suspicion_now: o.settings.features.has('suspicion') ? chosen.flatMap((n) => suspicionCases(store.people[n], live)) : undefined,
     npc_relations: o.settings.features.has('npc_emotion') ? true : undefined,
+    // 저장 상한을 넘긴 인물: 같은 호출에 정리(merge)를 얹는다 (설정 tidy=same)
+    tidy: o.settings.tidy === 'same' ? over.map((n) => ({ name: n, chars: recordChars(store.people[n], live), target: Math.round(o.settings.personCap * 0.8) })) : undefined,
     next_note: wantNote ? true : undefined,
     already_recorded: already,
     signals,
@@ -220,7 +221,7 @@ export function buildUpdate(chat: Chat, store: PeopleStore, batch: number[], o: 
     identity_known: store.identity ? { faction: store.identity.faction, rank: store.identity.rank } : null,
     want: { new_people: true, next_note: wantNote, address: o.settings.features.has('register'), identity: true },
   };
-  return { system: o.system, data, indexes: batch, tags, people: chosen, confirmed: confirmedIdx, names: o.names };
+  return { system: o.system, data, indexes: batch, tags, people: chosen, confirmed: confirmedIdx, names: o.names, tidy: o.settings.tidy === 'same' ? over : [] };
 }
 
 // ── 지침 조립 ──
@@ -254,7 +255,7 @@ export function enabledSections(s: PeopleSettings): Set<string> {
 
 export interface UpdateResult {
   /** 의심 항목의 선택 필드: weight(단서 무게), stage(반응 단계), result(해소 종류)는 코드가 본문 앞에 붙인다 */
-  entries?: { who: string; slot: string; op: string; replace?: string | null; text?: string | null; target?: string | null; m: string; quote: string }[];
+  entries?: { who: string; slot: string; op: string; replace?: string | null; text?: string | null; target?: string | null; m: string; quote: string; from?: unknown }[];
   cues?: { who: string; cue: string; m: string; quote: string; reason?: string }[];
   address?: { who: string; toUser: string; register: string; m: string; quote: string }[];
   identity?: { faction?: string | null; rank?: string | null } | null;
@@ -447,19 +448,46 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
       drop('entry', e, '없는 칸', who);
       continue;
     }
-    const ev = evidence(e.m, e.quote);
+    // merge(정리)는 인용 없이 기준 메시지만, 그 밖은 인용이 원문에 있어야
+    const ev = e.op === 'merge' ? evidenceLoose(e.m) : evidence(e.m, e.quote);
     if (typeof ev === 'string') {
       drop('entry', e, ev, who);
       continue;
     }
     const n = (perPerson.get(who) ?? 0) + 1;
-    if (n > 8) {
-      drop('entry', e, '인물당 8개 상한', who);
+    if (n > (input.tidy.includes(who) ? 24 : 8)) {
+      drop('entry', e, input.tidy.includes(who) ? '정리 인물당 24개 상한' : '인물당 8개 상한', who);
       continue;
     }
     perPerson.set(who, n);
     const cur = liveEntries(store.people[who].slots[slot], live);
     const op = e.op;
+    if (op === 'merge') {
+      // 합치기 (저장 상한을 넘긴 인물만): 둘 이상의 살아 있는 비고정 항목을 한 줄로. 합친 항목이 죽으면 원본이 되살아난다
+      if (!input.tidy.includes(who)) {
+        drop('entry', e, '정리 대상이 아닌 인물의 merge', who);
+        continue;
+      }
+      const from = Array.isArray(e.from) ? [...new Set(e.from.map((x) => String(x)))] : [];
+      const srcs = from.map((id) => cur.find((x) => x.id === id)).filter((x): x is Entry => !!x);
+      if (srcs.length < 2 || srcs.length !== from.length) {
+        drop('entry', e, 'from 이 이 칸의 살아 있는 항목 2개 이상이 아님', who);
+        continue;
+      }
+      if (srcs.some((x) => x.pin)) {
+        drop('entry', e, '고정된 항목을 합치려 함', who);
+        continue;
+      }
+      const text = plain(e.text, 300);
+      if (!text) {
+        drop('entry', e, '본문 없음', who);
+        continue;
+      }
+      const seq = nextSeq(ev.anchor);
+      const target = srcs[0].target;
+      if (putEntry(store, who, slot, { id: entryId(who, slot, ev.anchor, seq, text), text, src: 'story', anchor: ev.anchor, seq, from, ...(target ? { target } : {}) })) report.applied.entries++;
+      continue;
+    }
     if (op === 'remove') {
       const target = cur.find((x) => x.id === e.replace);
       if (!target) {
@@ -506,7 +534,6 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
         drop('entry', e, '같은 뜻의 항목이 이미 있음', who);
         continue;
       }
-      // 상한은 끝(tidyStore)에서 요약으로 접는다. 여기서 버리지 않는다
     } else {
       drop('entry', e, '없는 연산', who);
       continue;
@@ -657,7 +684,7 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
         continue;
       }
       // close 는 그 대상·종류의 살아 있는 항목을 모두 대체 (하나로 접음)
-      const replaces = s.op === 'close' ? cur.at(-1)?.id : cur.length >= slotCap('suspicion', ctx.settings.capScale) ? cur.find((x) => !x.pin)?.id : undefined;
+      const replaces = s.op === 'close' ? cur.at(-1)?.id : undefined;
       if (putEntry(store, who, 'suspicion', { id: entryId(who, 'suspicion', ev.anchor, seq, prefix + text), text: prefix + text, src: 'story', anchor: ev.anchor, seq, quote: s.quote, target, kind: s.kind, ...(replaces ? { replaces } : {}) })) report.applied.suspicion++;
     }
   }
@@ -686,28 +713,8 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
     }
   }
 
-  // 9. 접기·정리: 상한 없는 칸(지난 일·아는 것)은 넘치면 오래된 것을 요약 하나로, 안 살아 있는 항목은 칸마다 최근 몇 개만 둔다 (저장 크기)
-  tidyStore(store, live, ctx.settings.capScale);
   markRead(store, chat, input.indexes);
   return report;
-}
-
-/** 칸 상한 × 설정 배율 */
-export const slotCap = (slot: SlotId, scale = 1) => Math.max(2, Math.round(SLOT_CAP[slot] * (scale || 1)));
-
-/** 안 살아 있는 항목을 칸마다 몇 개까지 둘지 (대체·접힘·취소·사라짐. 되살리기용) */
-export const OLD_KEEP = 6;
-/** 상한을 넘은 칸은 오래된 항목들을 요약 한 줄로 접고(버리지 않음), 안 살아 있는 항목은 최근 몇 개만 둔다 */
-export function tidyStore(store: PeopleStore, live: Liveness, capScale = 1): void {
-  for (const p of Object.values(store.people)) {
-    for (const slot of SLOTS) {
-      const list = p.slots[slot];
-      if (!list?.length) continue;
-      foldSlotEntries(list, slotCap(slot, capScale), live, p.name, slot);
-      p.slots[slot] = pruneEntries(list, live, OLD_KEEP);
-    }
-  }
-  for (const d of Object.values(store.docs)) d.entries = pruneEntries(d.entries, live, OLD_KEEP);
 }
 
 /** 이 인물의 가장 최근 다음 턴 메모 (살아 있는 것) */

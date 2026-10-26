@@ -6,8 +6,6 @@ export const PEOPLE_KEY = 'goeiPeopleV1';
 /** 인물 기록의 칸. 로어북 시트의 Identity → identity, Character → personality 로 시작값을 넣는다 */
 export type SlotId = 'identity' | 'personality' | 'state' | 'relationship' | 'speech' | 'behavior' | 'knowledge' | 'threads' | 'history' | 'scene' | 'suspicion';
 export const SLOTS: SlotId[] = ['identity', 'personality', 'state', 'relationship', 'speech', 'behavior', 'knowledge', 'threads', 'history', 'scene', 'suspicion'];
-/** 칸마다 둘 수 있는 항목 수. 넘으면 오래된 것을 코드가 한 줄로 합친다 */
-export const SLOT_CAP: Record<SlotId, number> = { identity: 6, personality: 8, state: 6, relationship: 8, speech: 4, behavior: 8, knowledge: 10, threads: 8, history: 12, scene: 3, suspicion: 6 };
 
 /** 호감 계기 → 기본 변화량 (리수폿 변화량 표). 숫자는 모델이 쓰지 않고 코드가 이 표로 정한다 */
 export type Cue = '작은친절' | '도움' | '큰도움' | '헌신' | '실망' | '무시' | '배신' | '파탄' | '중대위반';
@@ -40,7 +38,9 @@ export interface Entry {
   void?: boolean;
   /** 이 항목이 대체한 이전 항목 id (대체 항목이 죽으면 이전 항목이 되살아난다) */
   replaces?: string;
-  /** 상한을 넘어 요약 항목에 합쳐짐 (더는 살아 있지 않음) */
+  /** 이 항목이 합친 이전 항목 id 들 (merge·정리). 이 항목이 살아 있는 동안 그것들은 대체된 것으로 본다 */
+  from?: string[];
+  /** (옛 저장) 요약에 합쳐짐 */
   folded?: boolean;
   /** 사건·장소·세력·물건 문서용 */
   date?: string;

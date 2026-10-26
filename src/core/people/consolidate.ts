@@ -3,11 +3,11 @@
 import type { PeopleSettings } from './settings';
 import { entryId, liveEntries, liveness, plain, type Liveness } from './store';
 import { SLOTS, type Entry, type PeopleStore, type SlotId } from './types';
-import { slotCap } from './updater';
+import { recordChars } from './updater';
 
 export interface ConsolidateInput {
   system: string;
-  data: { name: string; caps: Record<string, number>; slots: Record<string, { id: string; text: string; target?: string }[]> };
+  data: { name: string; chars: number; target: number; slots: Record<string, { id: string; text: string; target?: string }[]> };
   /** 입력에 넣은 항목 id → 항목 */
   ids: Map<string, { slot: SlotId; entry: Entry }>;
 }
@@ -31,7 +31,7 @@ export const CONSOLIDATE_PROMPT = (lang: 'ko' | 'en') => [
   '',
   'Rules:',
   '- Merge entries that describe the same thing; drop nothing that is still true. Keep concrete details (names, numbers, places, dates). When two entries conflict, keep the later one (entries are listed oldest first) and you may note the change.',
-  `- Each slot has a cap (\`caps\`). The result for a slot must have at most that many entries, ideally fewer. Each entry is one statement ≤200 chars${lang === 'en' ? ' in English' : ' in Korean'}. Names, quotes, address terms, Korean labels and prefixes stay as written.`,
+  `- \`chars\` is the record's current size and \`target\` the size to reach (sum of entry texts). Reduce toward target; a result near it is enough; never pad. Each entry is one statement ≤300 chars${lang === 'en' ? ' in English' : ' in Korean'}. Names, quotes, address terms, Korean labels and prefixes stay as written.`,
   '- `state` and `scene` are the present: merge aggressively, keep only what is still true. `history` is a chronological digest: merge adjacent events into one line each. `relationship` and `speech` keep one entry per `target`.',
   '- Give every result entry `from`: the ids of the input entries it came from (one or more). An input entry that you leave out of every `from` is treated as discarded, so only omit an entry when it is stale or fully covered elsewhere.',
   '- Slots you do not return stay as they are.',
@@ -46,7 +46,6 @@ export function buildConsolidate(store: PeopleStore, chat: Parameters<typeof liv
   if (!p) return null;
   const live = liveness(chat);
   const slots: ConsolidateInput['data']['slots'] = {};
-  const caps: Record<string, number> = {};
   const ids = new Map<string, { slot: SlotId; entry: Entry }>();
   for (const slot of SLOTS) {
     const cur = liveEntries(p.slots[slot], live).filter((e) => !e.pin);
@@ -54,11 +53,10 @@ export function buildConsolidate(store: PeopleStore, chat: Parameters<typeof liv
     const pos = (e: Entry) => live.at.get(e.anchor) ?? -1;
     const sorted = [...cur].sort((a, b) => pos(a) - pos(b) || a.seq - b.seq);
     slots[slot] = sorted.map((e) => ({ id: e.id, text: e.text, ...(e.target ? { target: e.target } : {}) }));
-    caps[slot] = slotCap(slot, settings.capScale);
     for (const e of sorted) ids.set(e.id, { slot, entry: e });
   }
   if (!ids.size) return null;
-  return { system: CONSOLIDATE_PROMPT(settings.lang), data: { name: who, caps, slots }, ids };
+  return { system: CONSOLIDATE_PROMPT(settings.lang), data: { name: who, chars: recordChars(p, live), target: Math.round(settings.personCap * 0.8), slots }, ids };
 }
 
 export interface ConsolidateResult { slots?: Record<string, { text?: unknown; target?: unknown; from?: unknown }[]> }
@@ -90,12 +88,11 @@ export function applyConsolidate(store: PeopleStore, who: string, input: Consoli
       report.dropped.push({ slot: slotName, reason: '없는 칸이거나 목록이 아님', item: items });
       continue;
     }
-    const cap = slotCap(slot, settings.capScale);
     const inputIds = new Set(input.data.slots[slot].map((e) => e.id));
     const next: { text: string; target?: string; from: string[] }[] = [];
     let bad = false;
     for (const it of items) {
-      const text = plain(it?.text, 200);
+      const text = plain(it?.text, 300);
       const from = Array.isArray(it?.from) ? it.from.map((x) => String(x)).filter((id) => inputIds.has(id)) : [];
       if (!text || !from.length) {
         report.dropped.push({ slot, reason: !text ? '글 없음' : 'from 에 이 칸의 항목 id 가 없음', item: it });
@@ -105,8 +102,8 @@ export function applyConsolidate(store: PeopleStore, who: string, input: Consoli
       const target = typeof it.target === 'string' && it.target ? plain(it.target, 40) : undefined;
       next.push({ text, ...(target ? { target } : {}), from });
     }
-    if (bad || !next.length || next.length > Math.max(cap, 1) || next.length >= input.data.slots[slot].length) {
-      if (!bad) report.dropped.push({ slot, reason: !next.length ? '결과 항목 없음' : next.length > cap ? '상한보다 많음' : '입력보다 줄지 않음', item: items });
+    if (bad || !next.length || next.length >= input.data.slots[slot].length) {
+      if (!bad) report.dropped.push({ slot, reason: !next.length ? '결과 항목 없음' : '입력보다 줄지 않음', item: items });
       continue;
     }
     const list = (p.slots[slot] ??= []);
@@ -114,13 +111,15 @@ export function applyConsolidate(store: PeopleStore, who: string, input: Consoli
     let seq = list.filter((e) => e.anchor === '#0').length;
     for (const n of next) {
       seq++;
-      const replaces = n.from.length === 1 ? n.from[0] : undefined;
-      list.push({ id: entryId(who, slot, '#0', seq, n.text), text: n.text, src: 'story', anchor: '#0', seq, ...(n.target ? { target: n.target } : {}), ...(replaces ? { replaces } : {}) });
+      list.push({ id: entryId(who, slot, '#0', seq, n.text), text: n.text, src: 'story', anchor: '#0', seq, ...(n.target ? { target: n.target } : {}), ...(n.from.length === 1 ? { replaces: n.from[0] } : { from: n.from }) });
       for (const id of n.from) used.add(id);
     }
-    // 둘 이상에서 합쳐진 원본과 어디에도 안 쓰인 원본은 접는다 (하나에서 온 것은 대체로 처리돼 되살릴 수 있다)
-    const single = new Set(next.filter((n) => n.from.length === 1).map((n) => n.from[0]));
-    for (const e of list) if (inputIds.has(e.id) && !single.has(e.id)) e.folded = true;
+    // 어디에도 안 쓰인 원본은 버린 것: 취소 표시한 빈 대체 항목으로 숨긴다 (정리 항목은 '#0' 기준이라 되살아나지 않는다)
+    for (const e of input.data.slots[slot]) {
+      if (used.has(e.id)) continue;
+      seq++;
+      list.push({ id: entryId(who, slot, '#0', seq, `-${e.id}`), text: `(정리에서 제외) ${e.text}`.slice(0, 300), src: 'story', anchor: '#0', seq, replaces: e.id, void: true, ...(e.target ? { target: e.target } : {}) });
+    }
     report.slots++;
     report.before += input.data.slots[slot].length;
     report.after += next.length;

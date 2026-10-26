@@ -28,9 +28,12 @@ export const PP_DEFAULTS: Record<string, string> = {
   prev_pairs: '1',
   /** 기록 본문 언어 (ko / en). 이름·인용·호칭은 늘 원문 */
   lang: 'ko',
-  /** 칸 상한 배율 (1·2·3). 기본 2 */
-  cap_scale: '2',
-  per_cap: '2000',
+  /** 인물당 저장 상한 (글자). 리수폿 절 상한 합계와 같은 10,000 */
+  person_cap: '10000',
+  /** 본편 요청에 넣는 기록 블록 전체 상한 (글자). 리수폿 Director 참고 상한과 같은 16,000 */
+  block_cap: '16000',
+  /** 저장 상한을 넘긴 인물 정리: same = 같은 갱신 호출에 얹음(기본), separate = 별도 호출 */
+  tidy: 'same',
   span_cap: '20000',
   rules: '',
   director_rules: '',
@@ -56,8 +59,9 @@ export interface PeopleSettings {
   twoTurn: boolean;
   prevPairs: number;
   lang: 'ko' | 'en';
-  capScale: number;
-  perCap: number;
+  personCap: number;
+  blockCap: number;
+  tidy: 'same' | 'separate';
   spanCap: number;
   rules: string;
   directorRules: string;
@@ -91,8 +95,9 @@ export function peopleSettings(state: Record<string, unknown> | undefined): Peop
     twoTurn: v('twoturn') !== '0',
     prevPairs: num('prev_pairs', 0, 3),
     lang: v('lang') === 'en' ? 'en' : 'ko',
-    capScale: num('cap_scale', 1, 4),
-    perCap: num('per_cap', 200, 3000),
+    personCap: num('person_cap', 2000, 40000),
+    blockCap: num('block_cap', 4000, 64000),
+    tidy: v('tidy') === 'separate' ? 'separate' : 'same',
     spanCap: num('span_cap', 3000, 40000),
     rules: v('rules').slice(0, 4000),
     directorRules: v('director_rules').slice(0, 2000),

@@ -9,9 +9,10 @@ import { chatId, clearDiag, consolidatePerson, loadDiag, onPeopleStatus, peopleS
 import { anchorOf, changeId, entryStates, isAlive, liveChanges, liveEntries, liveness, messageKey, peopleStore, plain, putChange, unreadIndexes, withPeople, type EntryState, type Liveness } from '../core/people/store';
 import { addressOf, affinityView } from '../core/people/affinity';
 import { FEATURES, PP, PP_DEFAULTS, peopleSettings, ppValue, type Feature } from '../core/people/settings';
+import { recordChars } from '../core/people/updater';
 import { seedBaseFor, temperOf } from '../core/people/base';
 import { seedPerson } from '../core/people/seed';
-import { AFF_MAX, AFF_MIN, DOC_TYPES, REGISTERS, SLOT_CAP, SLOTS, STAGES, stageOf, type Change, type Doc, type DocType, type Entry, type EntrySrc, type Person, type PeopleStore, type Register, type SlotId } from '../core/people/types';
+import { AFF_MAX, AFF_MIN, DOC_TYPES, REGISTERS, SLOTS, STAGES, stageOf, type Change, type Doc, type DocType, type Entry, type EntrySrc, type Person, type PeopleStore, type Register, type SlotId } from '../core/people/types';
 import { ICONS } from './icons';
 import { keepOpen } from './panels';
 import { toast } from './toast';
@@ -45,6 +46,8 @@ export const peopleUi = {
   diag: null as DiagRun[] | null,
   /** 진단: 모든 채팅 보기 (기본은 이 채팅만) */
   diagAll: false,
+  /** 지난 항목 전부 펼친 칸 열쇠 */
+  oldAll: new Set<string>(),
   diagOpen: new Set<string>(),
   diagShow: '' as '' | `${string}:${'prompt' | 'raw'}`,
   /** 「매 턴」·「메인」 안내는 세션에 한 번 */
@@ -310,7 +313,6 @@ export function peopleSettingsPane(ctx: ChatContext, canChat = true): string {
     row('갱신 모델', seg('model', s.model, [['aux', '보조'], ['main', '메인']])),
     row('지침', seg('prompt', s.prompt, [['detailed', '자세히'], ['compact', '간결']]), '자세히 = 리수폿 원문 규칙+설명. 간결 = 같은 규칙·설명 축약, 토큰 약 1/3.'),
     row('기록 언어', seg('lang', s.lang, [['ko', '한국어'], ['en', '영어']]), '기록 본문(항목·이유·메모)을 쓰는 언어. 이름·인용·호칭은 늘 원문. 영어는 같은 내용이면 토큰이 절반쯤이고, 위키 화면에도 영어로 보여요.'),
-    row('칸 상한 배율', seg('cap_scale', String(s.capScale), [['1', '×1'], ['2', '×2'], ['3', '×3']]), '칸마다 둘 수 있는 항목 수의 배율 (×1: 기본정보 6·성격 8·상태 6·관계 8·말투 4·행동 8·아는 것 10·목표 8·지난 일 12·장면 3·의심 6). 넘치면 오래된 항목을 요약 한 줄로 접어요. 인물 화면의 「정리」로 보조 모델이 더 촘촘히 합칠 수 있어요.'),
     row('본편에 넣기', seg('inject', s.inject, [['split', '절 단위 혼합'], ['append', '시트 전체+기록'], ['record', '기록만'], ['off', '안 넣음']]), '절 단위 혼합: 시트의 Identity·Character 절은 기록으로 대신하고 나머지 절은 원문 그대로.'),
     row('Director', seg('director', s.director, [['off', '끔'], ['facts', '사실형(뒤)'], ['scene', '연출형(앞)']]), '사실형은 갱신기에 얹어 다음 턴 메모를 남기고, 연출형은 본편 요청 앞에 짧은 지시를 한 번 더 만들어요.'),
     row('호감 변화 속도', seg('speed', String(s.speed), [['0.5', '0.5'], ['1', '1'], ['1.5', '1.5'], ['2', '2']])),
@@ -335,7 +337,9 @@ export function peopleSettingsPane(ctx: ChatContext, canChat = true): string {
     </div>`);
   const advanced = fold('pp-adv', '고급', [
     row('직전 쌍 포함', seg('prev_pairs', String(s.prevPairs), [['0', '0'], ['1', '1'], ['2', '2']]), '읽는 구간 앞에 맥락으로 붙이는 유저·봇 쌍 수'),
-    row('인물당 기록 상한', seg('per_cap', String(s.perCap), [['800', '800'], ['1200', '1,200'], ['2000', '2,000'], ['3000', '3,000']]), '글자 수. 넘으면 오래된 주요 행적·현재 장면부터 빼고 보내요. 참고 — 리수폿 기본: 최근 맥락 16,000자·문서 총 16,000자.'),
+    row('인물당 저장 상한', seg('person_cap', String(s.personCap), [['5000', '5,000'], ['10000', '10,000'], ['20000', '20,000']]), '한 인물의 살아 있는 기록 글자 수. 넘으면 정리로 합쳐요 (항목 수 상한은 없어요). 리수폿의 절별 상한 합계가 약 10,000자예요.'),
+    row('본편 기록 예산', seg('block_cap', String(s.blockCap), [['8000', '8,000'], ['16000', '16,000'], ['32000', '32,000']]), '본편 요청에 넣는 기록 블록 전체 글자 수. 장면 인물 수로 나눠 배분하고, 넘치는 인물은 지난 일부터 빼요. 리수폿 Director 참고 상한이 16,000자예요.'),
+    row('정리', seg('tidy', s.tidy, [['same', '같은 호출에 얹기'], ['separate', '별도 호출']]), '저장 상한을 넘긴 인물을 합치는 방법. 같은 호출 = 그 턴의 갱신 요청에 「합쳐라」를 얹음(추가 호출 없음). 별도 = 갱신 뒤 그 인물만 정리 호출 1회.'),
     row('응답 접기 상한', seg('span_cap', String(s.spanCap), [['12000', '12,000'], ['20000', '20,000'], ['40000', '40,000']]), '한 번에 읽는 구간 글자 수. 넘으면 중간을 접어요.'),
     row('다른 보조 호출과 병렬', onoff('parallel'), '끄면 이미지·괴담톡 같은 다른 보조 호출 앞에 차례로 돌아요.'),
     row('원문 보관', onoff('keep_raw'), '진단에 보낸 프롬프트·응답 원문을 남겨요 (이 기기 플러그인 저장소).'),
@@ -484,8 +488,10 @@ function slotList(all: Entry[], live: Liveness, key: string, row: (e: Entry, st:
   const cur = sorted.filter((e) => states.get(e.id) === 'alive');
   const old = sorted.filter((e) => states.get(e.id) !== 'alive');
   const main = cur.length ? `<ul class="pp-entries">${cur.map((e) => row(e, 'alive')).join('')}</ul>` : '<p class="ps-note">살아 있는 항목이 없어요.</p>';
+  const showAll = peopleUi.oldAll.has(key);
+  const shown = showAll ? old : old.slice(0, 20);
   const rest = old.length
-    ? `<details class="pp-oldbox" data-keep="${esc(key)}"${keepOpen(key)}><summary title="새 항목으로 바뀌었거나 요약에 합쳐졌거나 취소된 항목. 칸마다 최근 몇 개만 남겨요">지난 항목<b>${old.length}</b></summary><ul class="pp-entries">${old.map((e) => row(e, states.get(e.id)!)).join('')}</ul></details>`
+    ? `<details class="pp-oldbox" data-keep="${esc(key)}"${keepOpen(key)}><summary title="새 항목으로 바뀌었거나 합쳐졌거나 취소된 항목. 전부 저장돼 있고 되살릴 수 있어요">지난 항목<b>${old.length}</b></summary><ul class="pp-entries">${shown.map((e) => row(e, states.get(e.id)!)).join('')}</ul>${old.length > shown.length ? `<button class="gx-mini nw-more-btn" data-action="pp-old-more" data-value="${esc(key)}">${old.length - shown.length}개 더 보기</button>` : ''}</details>`
     : '';
   return main + rest;
 }
@@ -529,7 +535,9 @@ export function personView(ctx: ChatContext, name: string): string {
   const aff = affinityView(p, changes, store.folded[p.name] ?? 0, affOpts(ctx, p.name));
   const addr = addressOf(p, changes);
   const seededFrom = seededOf(p) === 'lore' ? '로어북 시트' : seededOf(p) === 'dialogue' ? '필드 대사' : '빈 기록(이야기에서 등장)';
-  const sub = [p.faction ? factionName(ctx, p.faction) : '소속 모름', `시작값: ${seededFrom}`].filter(Boolean).join(' · ');
+  const chars = recordChars(p, live);
+  const cap = peopleSettings(ctx.chat.scriptstate).personCap;
+  const sub = [p.faction ? factionName(ctx, p.faction) : '소속 모름', `시작값: ${seededFrom}`, `기록 ${chars.toLocaleString()}자 / 상한 ${cap.toLocaleString()}자${chars > cap ? ' · 정리 필요' : ''}`].filter(Boolean).join(' · ');
   const stageOptions = STAGES.map((s, i) => `<option value="${s.max}" ${peopleUi.affStage === String(s.max) ? 'selected' : ''}>${esc(s.label)} (${i ? STAGES[i - 1].max + 1 : AFF_MIN}~${s.max})</option>`).join('');
   const affEdit = peopleUi.affEdit
     ? `<div class="pp-edit"><div class="pp-edit-row"><label>단계 <select class="gx-select" data-change="pp-aff-stage">${'<option value="">(직접 숫자)</option>'}${stageOptions}</select></label>
@@ -548,7 +556,7 @@ export function personView(ctx: ChatContext, name: string): string {
     const all = p.slots[s] ?? [];
     if (!all.length) return '';
     const aliveN = liveEntries(all, live).length;
-    return `<section class="pp-slot"><h4 title="${esc(SLOT_HELP[s])}">${esc(SLOT_LABEL[s])}<b title="살아 있는 항목 수 (칸 상한 ${SLOT_CAP[s]})">${aliveN}</b></h4>${slotList(all, live, `pp-old:${name}:${s}`, (e, st) => entryRow(ctx, name, s, e, live, st))}</section>`;
+    return `<section class="pp-slot"><h4 title="${esc(SLOT_HELP[s])}">${esc(SLOT_LABEL[s])}<b title="살아 있는 항목 수">${aliveN}</b></h4>${slotList(all, live, `pp-old:${name}:${s}`, (e, st) => entryRow(ctx, name, s, e, live, st))}</section>`;
   }).join('');
   const mine = store.log.filter((c) => c.who === name).map((c) => ({ c, pos: live.at.get(c.anchor) ?? 1e9 })).sort((a, b) => b.pos - a.pos || b.c.seq - a.c.seq).map((x) => x.c);
   const log = `<details class="ps-adv-sub pp-log" data-keep="pp-log"${keepOpen('pp-log')}><summary title="호감 계기·호칭 변경·메모처럼 값을 바꾼 기록. 호감 숫자는 이 기록에서 매번 계산해요">변경 기록<b>${mine.length}</b></summary>${mine.length ? `<ul class="pp-entries">${mine.map((c) => changeRow(ctx, c, live)).join('')}</ul>` : '<p class="ps-note">아직 변경 기록이 없어요.</p>'}</details>`;
@@ -829,6 +837,10 @@ export async function handlePeople(action: string, value: string | undefined, ct
       return true;
     case 'pp-diag-all':
       peopleUi.diagAll = !peopleUi.diagAll;
+      return true;
+    case 'pp-old-more':
+      peopleUi.oldAll.add(v);
+      env.render();
       return true;
     case 'pp-addr-save': {
       const toUser = plain(peopleUi.addrTo, 40);

@@ -107,7 +107,7 @@ export function isAlive(x: { anchor: string; quote?: string; src?: string; void?
 export function liveEntries(list: Entry[] | undefined, live: Liveness): Entry[] {
   if (!list?.length) return [];
   const alive = new Set(list.filter((e) => isAlive(e, live)).map((e) => e.id));
-  const replaced = new Set(list.filter((e) => alive.has(e.id) && e.replaces).map((e) => e.replaces!));
+  const replaced = new Set(list.filter((e) => alive.has(e.id)).flatMap((e) => [...(e.replaces ? [e.replaces] : []), ...(e.from ?? [])]));
   return list.filter((e) => alive.has(e.id) && !replaced.has(e.id));
 }
 
@@ -117,32 +117,9 @@ export function entryStates(list: Entry[] | undefined, live: Liveness): Map<stri
   const out = new Map<string, EntryState>();
   if (!list?.length) return out;
   const alive = new Set(liveEntries(list, live).map((e) => e.id));
-  const replaced = new Set(list.filter((e) => isAlive(e, live) && e.replaces).map((e) => e.replaces!));
+  const replaced = new Set(list.filter((e) => isAlive(e, live)).flatMap((e) => [...(e.replaces ? [e.replaces] : []), ...(e.from ?? [])]));
   for (const e of list) out.set(e.id, alive.has(e.id) ? 'alive' : e.void ? 'void' : e.folded ? 'folded' : replaced.has(e.id) ? 'replaced' : 'gone');
   return out;
-}
-
-/** 칸의 살아 있는 항목이 상한을 넘으면 오래된(비고정) 것들을 요약 항목 하나로 합친다. 합친 원본은 folded 표시 (되돌릴 수 없음) */
-export function foldSlotEntries(list: Entry[], cap: number, live: Liveness, who: string, slot: string): boolean {
-  const cur = liveEntries(list, live).filter((e) => !e.pin);
-  if (cur.length <= cap) return false;
-  const pos = (e: Entry) => live.at.get(e.anchor) ?? -1;
-  const old = [...cur].sort((a, b) => pos(a) - pos(b) || a.seq - b.seq).slice(0, cur.length - Math.floor(cap / 2));
-  if (old.length < 2) return false;
-  for (const e of old) e.folded = true;
-  const text = plain(`(요약) ${old.map((e) => e.text.replace(/^\(요약\)\s*/, '')).join(' / ')}`, 400);
-  const seq = list.filter((e) => e.anchor === '#0').length + 1;
-  list.push({ id: entryId(who, slot, '#0', seq, text), text, src: 'story', anchor: '#0', seq });
-  return true;
-}
-
-/** 안 살아 있는 항목(대체·접힘·취소·사라짐)은 최근 keepOld 개만 둔다. 살아 있는 것과 고정은 모두 둔다 */
-export function pruneEntries(list: Entry[], live: Liveness, keepOld: number): Entry[] {
-  const alive = new Set(liveEntries(list, live).map((e) => e.id));
-  const pos = (e: Entry) => live.at.get(e.anchor) ?? -1;
-  const old = list.filter((e) => !alive.has(e.id) && !e.pin).sort((a, b) => pos(b) - pos(a) || b.seq - a.seq);
-  const drop = new Set(old.slice(keepOld).map((e) => e.id));
-  return drop.size ? list.filter((e) => !drop.has(e.id)) : list;
 }
 
 /** 살아 있는 변경 기록 (기준 메시지 순서 → seq 순서) */
@@ -169,7 +146,7 @@ export function putEntry(store: PeopleStore, who: string, slot: SlotId, entry: E
   if (!p) return false;
   const list = (p.slots[slot] ??= []);
   if (list.some((e) => e.id === entry.id)) return false;
-  list.push({ ...entry, text: plain(entry.text), ...(entry.quote ? { quote: plain(entry.quote, 60) } : {}) });
+  list.push({ ...entry, text: plain(entry.text, 300), ...(entry.quote ? { quote: plain(entry.quote, 60) } : {}) });
   return true;
 }
 

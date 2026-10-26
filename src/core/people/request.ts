@@ -50,11 +50,12 @@ export function peopleBlockFor(chat: Chat, o: RequestOpts): { text: string; peop
         note,
         temper: o.temperOf?.(n),
         speed: o.settings.speed,
-        maxChars: 1600,
+        // 본편 전체 예산을 장면 인물 수로 나눈다 (고정 절 원문은 예산 밖)
+        maxChars: Math.floor(o.settings.blockCap / people.length),
       }),
     );
   }
-  return { text: peopleBlock(blocks), people, sheets };
+  return { text: peopleBlock(blocks, o.settings.blockCap), people, sheets };
 }
 
 const squash = (s: string) => s.replace(/\s+/g, ' ').trim();

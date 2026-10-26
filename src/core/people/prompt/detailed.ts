@@ -7,7 +7,7 @@
 //   user_rules 절의 <<USER_RULES>> 줄은 사용자 추가 지침으로 바꾸고, 비어 있으면 절 전체를 잘라낸다.
 // 데이터 JSON에 이 지침이 기대하는 추가 필드: people[].express, people[].unknown_to, docs_now, suspicion_now, npc_relations, next_note.
 /** 설정에 따라 넣고 빼는 절 이름. 두 지침(자세히·간결)에서 같다. */
-export const UPDATER_SECTIONS = ["affinity", "register", "perception", "perception_ext", "suspicion", "docs_event", "docs_location", "docs_faction", "docs_item", "user_rules"] as const;
+export const UPDATER_SECTIONS = ["tidy", "affinity", "register", "perception", "perception_ext", "suspicion", "docs_event", "docs_location", "docs_faction", "docs_item", "user_rules"] as const;
 export type UpdaterSection = (typeof UPDATER_SECTIONS)[number];
 
 export const UPDATER_DETAILED: string = [
@@ -349,6 +349,14 @@ export const UPDATER_DETAILED: string = [
   "",
   "Certainty of interpretation, for the wording of `knowledge` entries: **known** (direct perception or credible evidence; distinguish that a source spoke from the truth of what it said), **inferred_strong** (independently perceived clues point the same way; write as the person's interpretation, which may still be wrong), **inferred_weak** (sparse evidence or several explanations; write only as speculation, impression or question), **unaware**, **false_belief** (what the person wrongly believes and why). Limited point of view narrates only what the viewpoint person senses; an omniscient narration still does not give the persons knowledge.",
   "<<END:perception_ext>>",
+  "<<SECTION:tidy>>",
+  "## 11. Tidying an oversized record",
+  "",
+  "`tidy` lists persons whose record exceeds the storage budget: `name`, `chars` (current size), `target` (size to reach). For each listed person, besides this turn's changes, reduce the record toward `target` with `merge` items: `{\"who\",\"slot\",\"op\":\"merge\",\"from\":[\"<id>\",\"<id>\"],\"text\":\"<one statement ≤300 chars>\",\"m\":\"<any confirmed m>\",\"quote\":null}`.",
+  "- A merge combines two or more live entries of the same slot into one denser statement that keeps every fact still true (names, numbers, places, dates). Merge what overlaps, repeats, or is superseded; never merge entries that say different things just to shrink the size. Pinned entries cannot be merged.",
+  "- Prefer merging in `history` (adjacent events into one line), `state` and `scene` (keep only what is still true), then `knowledge`, `behavior`, `threads`. `relationship` and `speech` keep one entry per target. Leave `identity` and `personality` unless they repeat.",
+  "- Do not shrink below `target`; a reasonable merge that lands near it is enough. Up to 24 items per tidied person in this response. A person not listed in `tidy` must not receive `merge` items.",
+  "<<END:tidy>>",
   "<<SECTION:suspicion>>",
   "## 10. Suspicion (general)",
   "",
@@ -399,7 +407,7 @@ export const UPDATER_DETAILED: string = [
   "",
   "## 15. Output — exactly one JSON object, no code fence, nothing else",
   "The object has these keys. Every key listed here is present; a key whose section is absent from this instruction is still returned as an empty array (or, for `identity`, with null fields).",
-  "{\"entries\":[{\"who\":\"<name>\",\"slot\":\"<slot>\",\"op\":\"add|upsert|remove\",\"replace\":\"<entry id or null>\",",
+  "{\"entries\":[{\"who\":\"<name>\",\"slot\":\"<slot>\",\"op\":\"add|upsert|remove|merge\",\"replace\":\"<entry id or null>\",",
   "  \"text\":\"<Korean ≤200 chars or null for remove>\",\"target\":\"<name|@user|null>\",\"m\":\"m2\",\"quote\":\"<verbatim>\"}],",
   "<<SECTION:affinity>>",
   " \"cues\":[{\"who\":\"<name>\",\"cue\":\"<cue name>\",\"m\":\"m2\",\"quote\":\"<verbatim>\",\"reason\":\"<Korean ≤40 chars>\"}],",

@@ -7,7 +7,7 @@ import { buildDirector, directorBlock, parseDirector, type DirectorNote } from '
 import { loadContext, updateChat, type ChatContext } from './risu';
 import { isWaiting, onWaiting } from './waiting';
 import { peopleStore, withPeople, unreadIndexes, messageKey, messageHash as messageHashOf, liveness } from '../core/people/store';
-import { applyUpdate, assemblePrompt, buildUpdate, enabledSections, parseUpdate, planBatches, type ApplyReport, type UpdateInput } from '../core/people/updater';
+import { applyUpdate, assemblePrompt, buildUpdate, enabledSections, parseUpdate, planBatches, recordChars, type ApplyReport, type UpdateInput } from '../core/people/updater';
 import { applyConsolidate, buildConsolidate, parseConsolidate, type ConsolidateReport } from '../core/people/consolidate';
 import { peopleSettings, type PeopleSettings } from '../core/people/settings';
 import { seedPerson } from '../core/people/seed';
@@ -231,8 +231,12 @@ async function runOnce(reason: string, o: { manual?: boolean }): Promise<RunResu
         break;
       }
       const curStore = peopleStore(fresh.chat);
-      const system = assemblePrompt(promptFor(settings), enabledSections(settings), settings.rules, settings.lang);
-      const input = buildUpdate(fresh.chat, curStore, batches[b], { settings, system, values: Object.fromEntries(input0Names(curStore).map((n) => [n, valuesOf(n)])), names: allNames(), exclude });
+      const input = buildUpdate(fresh.chat, curStore, batches[b], { settings, system: '', values: Object.fromEntries(input0Names(curStore).map((n) => [n, valuesOf(n)])), names: allNames(), exclude });
+      // 지침은 자료를 본 뒤 조립한다 (저장 상한을 넘긴 인물이 있으면 정리 절을 켠다)
+      const sections = enabledSections(settings);
+      if (input.tidy.length) sections.add('tidy');
+      const system = assemblePrompt(promptFor(settings), sections, settings.rules, settings.lang);
+      input.system = system;
       if (!input.people.length) {
         // 장면 인물이 없으면 모델을 부르지 않고 읽음 표시만
         await updateChat(fresh.charIndex, fresh.chatIndex, (cur) => {
@@ -300,6 +304,19 @@ async function runOnce(reason: string, o: { manual?: boolean }): Promise<RunResu
     }
     if (result.errors.length >= 3) break;
   }
+  // 정리: 별도 호출 설정이면 저장 상한을 넘긴 인물마다 정리 호출 1회
+  if (settings.tidy === 'separate' && result.ran) {
+    const now = await loadContext().catch(() => null);
+    if (now && chatId(now) === id) {
+      const s = peopleStore(now.chat);
+      const live = liveness(now.chat);
+      for (const n of Object.keys(s.people)) {
+        if (recordChars(s.people[n], live) <= settings.personCap) continue;
+        const r = await consolidateInner(now, n, settings).catch((error) => ({ ok: false, message: String(error) }));
+        if (!r.ok) result.skipped.push(`정리(${n}): ${r.message}`);
+      }
+    }
+  }
   const after = await loadContext().catch(() => null);
   setStatus({ busy: false, label: '', unread: after ? unreadIndexes(after.chat, peopleStore(after.chat)).length : 0 });
   return result;
@@ -312,7 +329,10 @@ export async function consolidatePerson(name: string): Promise<{ ok: boolean; me
   if (inflight) return { ok: false, message: '갱신이 돌고 있어요. 끝난 뒤 다시 눌러 주세요.' };
   const ctx = await loadContext().catch(() => null);
   if (!ctx) return { ok: false, message: '채팅을 읽지 못했어요.' };
-  const settings = peopleSettings(ctx.chat.scriptstate);
+  return consolidateInner(ctx, name, peopleSettings(ctx.chat.scriptstate));
+}
+
+async function consolidateInner(ctx: ChatContext, name: string, settings: PeopleSettings): Promise<{ ok: boolean; message: string; report?: ConsolidateReport }> {
   const store = peopleStore(ctx.chat);
   const input = buildConsolidate(store, ctx.chat, name, settings);
   if (!input) return { ok: false, message: '정리할 항목이 없어요.' };

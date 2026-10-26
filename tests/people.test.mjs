@@ -152,7 +152,7 @@ test('기록 블록: 절 단위 혼합, 모르는 것, 단계 문장, 메모', (
   assert.ok(whole.startsWith(Inj.PEOPLE_HEAD));
 });
 
-test('항목 상태: 대체·접힘·취소·사라짐을 구분하고, 상한을 넘으면 요약으로 접고, 지난 항목은 최근 몇 개만 둔다', () => {
+test('항목 상태: 대체·합침·취소·사라짐을 구분하고, 합친 항목(from)이 죽으면 원본이 되살아난다', () => {
   const c = chat(['user', 'a', 'u1'], ['char', '쟈알디가 왔다. 명단을 봤다.', 'c1'], ['user', 'b', 'u2'], ['char', '쟈알디가 떠났다.', 'c2']);
   const live = S.liveness(c);
   const e = (id, text, anchor, extra = {}) => ({ id, text, src: 'story', anchor, seq: 1, ...extra });
@@ -162,18 +162,12 @@ test('항목 상태: 대체·접힘·취소·사라짐을 구분하고, 상한�
   assert.equal(st.get('b'), 'alive');
   assert.equal(st.get('c'), 'gone');
   assert.equal(st.get('d'), 'void');
-  // 접기: 상한 3 에 살아 있는 5개 → 오래된 4개를 요약 하나로 (살아 있는 것 = 최근 1 + 요약 1)
-  const many = [1, 2, 3, 4, 5].map((i) => e(`h${i}`, `일 ${i}`, i <= 2 ? 'c1' : 'c2', { seq: i }));
-  assert.equal(S.foldSlotEntries(many, 3, live, '쟈알디', 'history'), true);
-  const alive = S.liveEntries(many, live);
-  assert.equal(alive.length, 2);
-  assert.ok(alive.some((x) => x.anchor === '#0' && x.text.startsWith('(요약)') && x.text.includes('일 1') && x.text.includes('일 4')));
-  assert.ok(many.filter((x) => x.folded).length === 4);
-  assert.equal(S.entryStates(many, live).get('h1'), 'folded');
-  // 정리: 안 살아 있는 항목은 최근 keepOld 개만
-  const pruned = S.pruneEntries(many, live, 2);
-  assert.equal(pruned.length, 4, '살아 있는 2 + 지난 2');
-  assert.ok(pruned.some((x) => x.pin) === false);
+  // 합치기: from 에 든 원본은 대체된 것. 합친 항목의 기준 메시지가 사라지면 원본이 돌아온다
+  const merged = [e('h1', '일 1', 'c1'), e('h2', '일 2', 'c1'), e('m', '일 1과 2', 'c2', { from: ['h1', 'h2'] })];
+  assert.deepEqual(S.liveEntries(merged, live).map((x) => x.id), ['m']);
+  assert.equal(S.entryStates(merged, live).get('h1'), 'replaced');
+  const cut = chat(['user', 'a', 'u1'], ['char', '쟈알디가 왔다. 명단을 봤다.', 'c1']);
+  assert.deepEqual(S.liveEntries(merged, S.liveness(cut)).map((x) => x.id), ['h1', 'h2']);
 });
 
 test('읽음 해시: 이미지 태그·공백 차이는 바뀐 응답으로 치지 않는다', () => {

@@ -28,10 +28,10 @@ test('정리: 입력은 살아 있는 비고정 항목만, 칸 상한 포함; �
   store.people.쟈알디 = person('쟈알디');
   store.people.쟈알디.slots.state = [e('s1', '본부에 있음'), e('s2', '왼팔 부상'), e('s3', '피곤함'), e('s4', '고정', { pin: true }), e('s5', '취소', { void: true })];
   store.people.쟈알디.slots.history = [e('h1', '명단 사건'), e('h2', '부상')];
-  const settings = { ...St.peopleSettings({}), capScale: 1 };
+  const settings = { ...St.peopleSettings({}) };
   const input = C.buildConsolidate(store, chat, '쟈알디', settings);
   assert.deepEqual(input.data.slots.state.map((x) => x.id), ['s1', 's2', 's3'], '고정·취소는 안 넣음');
-  assert.equal(input.data.caps.state, T.SLOT_CAP.state);
+  assert.equal(input.data.target, Math.round(settings.personCap * 0.8));
   assert.ok(input.system.includes('in Korean'));
   const r = C.parseConsolidate('```json\n{"slots":{"state":[{"text":"본부에서 왼팔을 다친 채 피곤해함","from":["s1","s2","s3"]}],"history":[{"text":"명단 사건 뒤 부상","from":["h1"]},{"text":"x","from":["h2"]}],"scene":[{"text":"없는 칸","from":["z"]}]}}\n```');
   const live = S.liveness(chat);
@@ -39,8 +39,7 @@ test('정리: 입력은 살아 있는 비고정 항목만, 칸 상한 포함; �
   assert.equal(rep.slots, 1, 'state 만 반영 (history 는 입력보다 줄지 않음, scene 은 입력에 없음)');
   const state = S.liveEntries(store.people.쟈알디.slots.state, live);
   assert.deepEqual(state.map((x) => x.text).sort(), ['고정', '본부에서 왼팔을 다친 채 피곤해함'].sort());
-  assert.ok(store.people.쟈알디.slots.state.filter((x) => x.folded).length === 3);
-  assert.equal(S.entryStates(store.people.쟈알디.slots.state, live).get('s1'), 'folded');
+  assert.equal(S.entryStates(store.people.쟈알디.slots.state, live).get('s1'), 'replaced');
   assert.ok(rep.dropped.some((d) => d.slot === 'history') && rep.dropped.some((d) => d.slot === 'scene'));
   // 하나에서 온 결과는 대체 (되살릴 수 있음)
   const store2 = T.emptyStore();
@@ -49,16 +48,17 @@ test('정리: 입력은 살아 있는 비고정 항목만, 칸 상한 포함; �
   const in2 = C.buildConsolidate(store2, chat, '쟈알디', settings);
   C.applyConsolidate(store2, '쟈알디', in2, { slots: { threads: [{ text: '재조사·커피 약속', from: ['t1', 't2'] }, { text: '보고서 제출', from: ['t3'] }] } }, live, settings);
   const st = S.entryStates(store2.people.쟈알디.slots.threads, live);
-  assert.equal(st.get('t1'), 'folded');
+  assert.equal(st.get('t1'), 'replaced');
   assert.equal(st.get('t3'), 'replaced');
   assert.equal(S.liveEntries(store2.people.쟈알디.slots.threads, live).length, 2);
 });
 
-test('설정: 기록 언어 영어면 지침 끝에 언어 규칙, 칸 상한 배율 기본 2', () => {
+test('설정: 기록 언어 영어면 지침 끝에 언어 규칙, 저장 10,000자·본편 16,000자·정리는 같은 호출', () => {
   const s = St.peopleSettings({});
   assert.equal(s.lang, 'ko');
-  assert.equal(s.capScale, 2);
-  assert.equal(U.slotCap('history', 2), 24);
+  assert.equal(s.personCap, 10000);
+  assert.equal(s.blockCap, 16000);
+  assert.equal(s.tidy, 'same');
   const out = U.assemblePrompt('A <<USER_RULES>> B', new Set(), '', 'en');
   assert.ok(out.includes('## Record language') && out.includes('in English'));
   assert.ok(!U.assemblePrompt('A <<USER_RULES>> B', new Set(), '', 'ko').includes('Record language'));

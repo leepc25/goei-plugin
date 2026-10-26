@@ -219,7 +219,6 @@ test('유저가 연기하는 요원은 장면 인물·새 인물에서 빠진다
 test('기본값: 인물끼리 감정 켬, 기록 상한 2000, 접기 상한 20000, 말투 5종', () => {
   const s = St.peopleSettings({});
   assert.ok(s.features.has('npc_emotion'));
-  assert.equal(s.perCap, 2000);
   assert.equal(s.spanCap, 20000);
   assert.deepEqual(T.REGISTERS, ['존댓말', '반말', '혼합', '하게체', '하오체']);
   const st = S.peopleStore({ goeiPeopleV1: { people: { a: { name: 'a', address: { toUser: '자네', register: '하게체' } }, b: { name: 'b', address: { register: '이상' } } } } });
@@ -240,4 +239,34 @@ test('문서: 인용이 없어도 확정 구간 메시지면 받고, 있으면 �
   assert.ok(store.docs['event:명단 사건'] && !store.docs['event:명단 사건'].entries[0].quote);
   assert.ok(rep.dropped.some((d) => d.reason === '인용이 원문에 없음'));
   assert.ok(rep.dropped.some((d) => d.reason === '확정 구간 밖 메시지'));
+});
+
+test('정리 얹기: 저장 상한을 넘긴 인물만 tidy 에 오르고 merge 를 받는다. 합친 항목은 원본을 대체하고 근거는 그 턴', () => {
+  const { c, store } = setup();
+  const big = settings({ personCap: 2000 });
+  store.people.쟈알디.slots.history = Array.from({ length: 12 }, (_, i) => ({ id: `h${i}`, text: `지난 일 ${i} `.repeat(30), src: 'story', anchor: 'c1', seq: i, quote: '커피' }));
+  const input = U.buildUpdate(c, store, [3], { settings: big, system: 'S', values: {}, names });
+  assert.deepEqual(input.tidy, ['쟈알디']);
+  assert.ok(input.data.tidy.some((t) => t.name === '쟈알디' && t.target === 1600));
+  const r = {
+    entries: [
+      { who: '쟈알디', slot: 'history', op: 'merge', from: ['h0', 'h1', 'h2'], text: '지난 일 0~2 요약', m: 'm4', quote: null },
+      { who: '쟈알디', slot: 'history', op: 'merge', from: ['h3'], text: '하나뿐', m: 'm4', quote: null },
+      { who: '데쥬레', slot: 'state', op: 'merge', from: ['e12', 'e07'], text: '대상 아님', m: 'm4', quote: null },
+    ],
+  };
+  const rep = U.applyUpdate(store, c, input, r, { settings: big });
+  assert.equal(rep.applied.entries, 1);
+  assert.ok(rep.dropped.some((d) => /2개 이상/.test(d.reason)) && rep.dropped.some((d) => /정리 대상이 아닌/.test(d.reason)));
+  const live = S.liveness(c);
+  const hist = S.liveEntries(store.people.쟈알디.slots.history, live);
+  assert.equal(hist.length, 10, '3개가 1개로');
+  const m = hist.find((e) => e.from);
+  assert.deepEqual(m.from, ['h0', 'h1', 'h2']);
+  assert.equal(m.anchor, 'c2');
+  // 상한 안이면 tidy 비어 있고 merge 는 거부
+  const small = U.buildUpdate(c, store, [3], { settings: settings({ personCap: 40000 }), system: 'S', values: {}, names });
+  assert.deepEqual(small.tidy, []);
+  const rep2 = U.applyUpdate(store, c, small, { entries: [{ who: '쟈알디', slot: 'history', op: 'merge', from: ['h4', 'h5'], text: 'x', m: 'm4', quote: null }] }, { settings: settings() });
+  assert.equal(rep2.applied.entries, 0);
 });
