@@ -81,3 +81,7 @@
 10-26 09:11:29 이전 판 지움: v3 33 발견 반응
 10-26 09:11:31 33 발견 반응 보냄 east 4장 시작=지정 끝=지정 약 1회
 10-26 09:12:30 33 발견 반응 완료 4장 (58초)
+10-26 16:30:33 57 후면 대기 보냄 north 4장 시작=등록 끝=지정 약 1회
+10-26 16:30:34 50 정면 대기 보냄 south 4장 시작=등록 끝=지정 약 1회
+10-26 16:31:32 57 오류: Command '['curl', '-sSf', '--retry', '3', 'https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/bd0f22e9-d0d6-4079-b273-f04c91b676d4/animations/7bbd30d5-ef69-4af0-9904-36723061f27e/north/2.png?t=1793032285']' returned non-zero exit status 56.
+10-26 16:31:33 50 정면 대기 완료 4장 (59초)
