@@ -1,0 +1,525 @@
+{
+ "x3-c-glass-shatter": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "1.1_쟈알디",
+  "row": "유리 깨짐 파편"
+ },
+ "x3-c-dust-puff": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "1.1_쟈알디",
+  "row": "흙먼지"
+ },
+ "x3-c-air-ring": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "1.1_쟈알디",
+  "row": "공기 충격 고리"
+ },
+ "x3-c-ground-shockwave": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "1.1_쟈알디",
+  "row": "충격파"
+ },
+ "x3-c-shard-burst": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "1.1_쟈알디",
+  "row": "파편(잔해·돌·나무·철·대리석)"
+ },
+ "x3-c-hit-spark-light": {
+  "ok": false,
+  "why": [
+   "빈 장 4/6",
+   "너무 작음 46px"
+  ],
+  "try": 2,
+  "key": "1.1_쟈알디",
+  "row": "타격_약"
+ },
+ "x3-c-dust-cloud-large": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "1.1_쟈알디",
+  "row": "먼지 구름(대)"
+ },
+ "x3-c-debris-rain": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "1.1_쟈알디",
+  "row": "잔해 비"
+ },
+ "x3-c-explosion-small": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "1.1_쟈알디",
+  "row": "폭발_소"
+ },
+ "x3-c-hit-spark-heavy": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "1.1_쟈알디",
+  "row": "타격_강"
+ },
+ "x3-c-vertical-blade-line": {
+  "ok": true,
+  "why": [],
+  "try": 2,
+  "key": "1.1_쟈알디",
+  "row": "세로 칼선"
+ },
+ "x3-c-wall-crack": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "1.1_쟈알디",
+  "row": "벽 금"
+ },
+ "x3-c-smoke": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "1.1_쟈알디",
+  "row": "연기"
+ },
+ "x3-c-bullet-tracer": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "1.1_쟈알디",
+  "row": "탄 줄기"
+ },
+ "x3-c-muzzle-flash": {
+  "ok": false,
+  "why": [
+   "너무 작음 124px"
+  ],
+  "try": 2,
+  "key": "1.1_쟈알디",
+  "row": "총구 불꽃"
+ },
+ "x3-c-paper-scatter": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "1.1_쟈알디",
+  "row": "종이 조각"
+ },
+ "x3-c-ground-crack": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "1.1_쟈알디",
+  "row": "바닥 파괴(균열·꺼짐)"
+ },
+ "x3-c-ricochet-spark": {
+  "ok": false,
+  "why": [
+   "너무 작음 35px"
+  ],
+  "try": 2,
+  "key": "1.1_쟈알디",
+  "row": "튕김 불꽃"
+ },
+ "x3-c-sparkle-dust": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "1.1_쟈알디",
+  "row": "빛가루"
+ },
+ "x3-c-explosion-large": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "1.1_쟈알디",
+  "row": "폭발_대"
+ },
+ "x3-c-slash-arc": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "1.1_쟈알디",
+  "row": "베기"
+ },
+ "x3-c-thread-segment": {
+  "ok": false,
+  "why": [
+   "너무 작음 96px",
+   "캔버스 끝 잘림 6장"
+  ],
+  "try": 2,
+  "key": "1.1_쟈알디",
+  "row": "실"
+ },
+ "x3-1.1-D-scorch-mark": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "1.1_쟈알디",
+  "row": "바닥 그을음 자국"
+ },
+ "x3-1.1-S-chain-blast": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "1.1_쟈알디",
+  "row": "연쇄 폭발"
+ },
+ "x3-1.2-D-shadow-pool": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "1.2_스팡달",
+  "row": "그림자 웅덩이"
+ },
+ "x3-c-liquid-splash": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "1.1_쟈알디",
+  "row": "액체 물보라"
+ },
+ "x3-1.2-S1-spike-lance": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "1.2_스팡달",
+  "row": "가시 창"
+ },
+ "x3-1.5-D-hatch-arc": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "1.5_고그니쟈",
+  "row": "해치 전기 아크"
+ },
+ "x3-1.2-D-needle-burst": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "1.2_스팡달",
+  "row": "검은 바늘 다발"
+ },
+ "x3-1.5-S0-floor-plate": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "1.5_고그니쟈",
+  "row": "튀어 오르는 바닥 판"
+ },
+ "x3-1.2-F-eyes-in-dark": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "1.2_스팡달",
+  "row": "어둠 속 눈들"
+ },
+ "x3-1.1-D-palm-blast": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "1.1_쟈알디",
+  "row": "손바닥 앞 폭파"
+ },
+ "x3-1.2-S2-spike-lattice": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "1.2_스팡달",
+  "row": "가시 격자"
+ },
+ "x3-1.5-F-yellow-eyes": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "1.5_고그니쟈",
+  "row": "문 안 노란 눈"
+ },
+ "x3-1.1-S2-zone-blast": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "1.1_쟈알디",
+  "row": "둘레 원형 대폭발"
+ },
+ "x3-1.1-F-fire-pillar": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "1.1_쟈알디",
+  "row": "하늘로 솟는 불기둥"
+ },
+ "x3-1.5-S1-shutter": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "1.5_고그니쟈",
+  "row": "격리 셔터"
+ },
+ "x3-1.6-D-snap-spark": {
+  "ok": false,
+  "why": [
+   "빈 장 5/6",
+   "너무 작음 22px"
+  ],
+  "try": 2,
+  "key": "1.6_큐라스",
+  "row": "스냅 불티"
+ },
+ "x3-1.2-F-spike-forest": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "1.2_스팡달",
+  "row": "가시 숲"
+ },
+ "x3-1.7-D-back-booster": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "1.7_고르고디오",
+  "row": "등 뒤 부스터 불꽃"
+ },
+ "x3-1.6-S2-fire-wall": {
+  "ok": false,
+  "why": [
+   "캔버스 끝 잘림 8장"
+  ],
+  "try": 2,
+  "key": "1.6_큐라스",
+  "row": "연두 화염벽"
+ },
+ "x3-1.5-F-vault-door": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "1.5_고그니쟈",
+  "row": "격리문"
+ },
+ "x3-1.8-S0-tail-sweep": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "1.8_데쥬레",
+  "row": "꼬리 휩쓸기 궤적"
+ },
+ "x3-1.5-S2-floor-pit": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "1.5_고그니쟈",
+  "row": "열리는 원형 바닥"
+ },
+ "x3-1.8-F-laser-sweep": {
+  "ok": false,
+  "why": [
+   "캔버스 끝 잘림 13장"
+  ],
+  "try": 2,
+  "key": "1.8_데쥬레",
+  "row": "분홍 레이저 막"
+ },
+ "x3-1.8-S1-dash-trail": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "1.8_데쥬레",
+  "row": "돌진 궤적 띠"
+ },
+ "x3-1.7-S1-running-crack": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "1.7_고르고디오",
+  "row": "달리는 균열과 돌판"
+ },
+ "x3-1.7-S2-floor-collapse": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "1.7_고르고디오",
+  "row": "원형으로 꺼지는 바닥"
+ },
+ "x3-1.9-D-clock-ring": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "1.9_데드폴",
+  "row": "남색 시계 고리"
+ },
+ "x3-1.5-F-roar-blast": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "1.5_고그니쟈",
+  "row": "포효 충격 원뿔"
+ },
+ "x3-1.10-D-warp-ring": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "1.10_게슈간",
+  "row": "공간 일그러짐 고리"
+ },
+ "x3-1.10-S1-warp-trail": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "1.10_게슈간",
+  "row": "일그러짐 꼬리"
+ },
+ "x3-1.10-S0-force-drop": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "1.10_게슈간",
+  "row": "떨어지는 힘"
+ },
+ "x3-1.6-F-fire-wall-wide": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "1.6_큐라스",
+  "row": "화면 가로 화염벽"
+ },
+ "x3-1.8-S2-wire-box": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "1.8_데쥬레",
+  "row": "부풀어 터지는 와이어 틀"
+ },
+ "x3-1.8-F-grid-burst": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "1.8_데쥬레",
+  "row": "적 몸 격자 무늬"
+ },
+ "x3-2.1-D-black-rift": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "2.1_사장",
+  "row": "검은 선"
+ },
+ "x3-2.5-D-slam-line": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "2.5_김조학",
+  "row": "「쾅」 충격선"
+ },
+ "x3-2.3-D-howl-wave": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "2.3_이길환",
+  "row": "하울링 음파"
+ },
+ "x3-2.6-F-flash-cut": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "2.6_이도형",
+  "row": "일섬"
+ },
+ "x3-1.10-S2-warp-crush": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "1.10_게슈간",
+  "row": "오므라드는 일그러짐 원"
+ },
+ "x3-2.7-S2-cross-slash": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "2.7_고영훈",
+  "row": "교차 베기"
+ },
+ "x3-2.1-F-clock-hand": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "2.1_사장",
+  "row": "회색 시계 바늘"
+ },
+ "x3-1.9-F-clock-ring-huge": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "1.9_데드폴",
+  "row": "화면 시계 고리"
+ },
+ "x3-2.10-S-bullet-dirt": {
+  "ok": false,
+  "why": [
+   "너무 작음 86px"
+  ],
+  "try": 2,
+  "key": "2.10_곽성주",
+  "row": "탄착 흙 조각"
+ },
+ "x3-1.11-F-clash-flash": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "1.11_로제몬",
+  "row": "충돌 섬광"
+ },
+ "x3-2.11-F-slide-line": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "2.11_조성춘",
+  "row": "미끄러지는 노란 바닥 선"
+ },
+ "x3-2.14-S-pulse-band": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "2.14_송진섭",
+  "row": "하늘색 펄스 호·띠"
+ },
+ "x3-2.8-S2-crescent-wave": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "2.8_노기균",
+  "row": "가로 초승달 검기"
+ },
+ "x3-2.3-F-howl-rings": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "2.3_이길환",
+  "row": "화면 겹고리 음파"
+ },
+ "x3-2.6-S2-lining-absorb": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "2.6_이도형",
+  "row": "햄스터 막기"
+ },
+ "x3-2.10-D-earth-wave": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "2.10_곽성주",
+  "row": "땅 타는 흙 충격파"
+ }
+}

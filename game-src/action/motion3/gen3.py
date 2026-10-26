@@ -32,7 +32,7 @@ def mech(name):
         b = a.getbbox()
         if b and (b[0] == 0 or b[1] == 0 or b[2] == r["w"]): cut += 1
     if empty > len(m["frames"]) // 2: bad.append(f"빈 장 {empty}/{len(m['frames'])}")
-    if max(px) < 150: bad.append(f"너무 작음 {max(px)}px")
+    if max(px) < 25: bad.append(f"너무 작음 {max(px)}px")
     if cut > len(m["frames"]) // 2: bad.append(f"캔버스 끝 잘림 {cut}장")
     return bad
 

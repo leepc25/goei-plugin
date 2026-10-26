@@ -143,3 +143,8 @@
 10-25 16:10:22 45 사망 (누워서) 완료 4장 (135초)
 10-25 16:10:52 44 사망 (서서) 완료 12장 (169초)
 10-25 23:12:02 VFX sup-1.6 완료 {'h': 172, 'w': 257} 16장 effect_id=fcce7a1c-cf0e-4bd9-a742-87f378cc72a3
+10-26 04:24:33 VFX x3-1.6-D-snap-spark 완료 {'h': 30, 'w': 20} 6장 effect_id=18a25e26-d5d4-4664-a163-ded944e518dd
+10-26 04:25:49 VFX x3-1.6-D-snap-spark 완료 {'h': 32, 'w': 36} 6장 effect_id=49d2aa6b-aadc-4a0b-8ae3-c0cb63e48429
+10-26 04:25:53 VFX x3-1.6-S2-fire-wall 완료 {'h': 384, 'w': 64} 10장 effect_id=8d5a4eec-140e-4ff9-aae8-8a7e37f3b008
+10-26 04:27:09 VFX x3-1.6-S2-fire-wall 완료 {'h': 392, 'w': 64} 10장 effect_id=c9b75b7e-2d9f-498d-81a5-bdaca26d16b7
+10-26 04:30:43 VFX x3-1.6-F-fire-wall-wide 완료 {'h': 1024, 'w': 1024} 14장 effect_id=831fd6e5-73ab-4edd-9a0f-125f0754d80e

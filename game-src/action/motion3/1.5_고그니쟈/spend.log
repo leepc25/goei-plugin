@@ -140,3 +140,10 @@
 10-25 16:09:10 44 사망 (서서) 완료 12장 (120초)
 10-25 23:10:54 VFX sup-1.5 완료 {'h': 261, 'w': 200} 16장 effect_id=89e20866-d5c6-4304-bbed-02bbd68844fd
 10-26 01:31:46 VFX test-beast-vfx 완료 {'h': 490, 'w': 1024} 16장 effect_id=d99e2e92-bfde-4596-8d55-a629c8ddc352
+10-26 04:21:15 VFX x3-1.5-D-hatch-arc 완료 {'h': 286, 'w': 112} 8장 effect_id=61f0da2c-da5c-4f6e-a2bf-db8ec56cf7f0
+10-26 04:22:15 VFX x3-1.5-S0-floor-plate 완료 {'h': 115, 'w': 98} 6장 effect_id=4a3a6a45-866d-4473-8f3a-2a5f2c07b04d
+10-26 04:23:50 VFX x3-1.5-F-yellow-eyes 완료 {'h': 192, 'w': 464} 12장 effect_id=51bff61a-fabc-42b5-b103-d2bf2dbfbb12
+10-26 04:24:06 VFX x3-1.5-S1-shutter 완료 {'h': 162, 'w': 408} 8장 effect_id=b80724aa-45c6-423c-b7a7-4977b1b6c251
+10-26 04:26:43 VFX x3-1.5-F-vault-door 완료 {'h': 650, 'w': 660} 14장 effect_id=a2b35b88-d938-4491-8c2e-a5e5ca684881
+10-26 04:27:31 VFX x3-1.5-S2-floor-pit 완료 {'h': 346, 'w': 650} 12장 effect_id=4197eb24-4f83-4434-a50a-3efaedd17614
+10-26 04:30:10 VFX x3-1.5-F-roar-blast 완료 {'h': 376, 'w': 646} 14장 effect_id=b4d3dd6c-5380-4f23-9194-5394114ba817

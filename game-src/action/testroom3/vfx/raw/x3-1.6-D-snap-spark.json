@@ -1,0 +1,183 @@
+{
+ "frames": [
+  {
+   "filename": "x3-1-6-d-snap-spark 0.png",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 36,
+    "h": 32
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 36,
+    "h": 32
+   },
+   "sourceSize": {
+    "w": 36,
+    "h": 32
+   },
+   "pivot": {
+    "x": 0.3333333333333333,
+    "y": 0.65625
+   },
+   "duration": 42
+  },
+  {
+   "filename": "x3-1-6-d-snap-spark 1.png",
+   "frame": {
+    "x": 36,
+    "y": 0,
+    "w": 36,
+    "h": 32
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 36,
+    "h": 32
+   },
+   "sourceSize": {
+    "w": 36,
+    "h": 32
+   },
+   "pivot": {
+    "x": 0.3333333333333333,
+    "y": 0.65625
+   },
+   "duration": 42
+  },
+  {
+   "filename": "x3-1-6-d-snap-spark 2.png",
+   "frame": {
+    "x": 72,
+    "y": 0,
+    "w": 36,
+    "h": 32
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 36,
+    "h": 32
+   },
+   "sourceSize": {
+    "w": 36,
+    "h": 32
+   },
+   "pivot": {
+    "x": 0.3333333333333333,
+    "y": 0.65625
+   },
+   "duration": 42
+  },
+  {
+   "filename": "x3-1-6-d-snap-spark 3.png",
+   "frame": {
+    "x": 0,
+    "y": 32,
+    "w": 36,
+    "h": 32
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 36,
+    "h": 32
+   },
+   "sourceSize": {
+    "w": 36,
+    "h": 32
+   },
+   "pivot": {
+    "x": 0.3333333333333333,
+    "y": 0.65625
+   },
+   "duration": 42
+  },
+  {
+   "filename": "x3-1-6-d-snap-spark 4.png",
+   "frame": {
+    "x": 36,
+    "y": 32,
+    "w": 36,
+    "h": 32
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 36,
+    "h": 32
+   },
+   "sourceSize": {
+    "w": 36,
+    "h": 32
+   },
+   "pivot": {
+    "x": 0.3333333333333333,
+    "y": 0.65625
+   },
+   "duration": 42
+  },
+  {
+   "filename": "x3-1-6-d-snap-spark 5.png",
+   "frame": {
+    "x": 72,
+    "y": 32,
+    "w": 36,
+    "h": 32
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 36,
+    "h": 32
+   },
+   "sourceSize": {
+    "w": 36,
+    "h": 32
+   },
+   "pivot": {
+    "x": 0.3333333333333333,
+    "y": 0.65625
+   },
+   "duration": 42
+  }
+ ],
+ "meta": {
+  "app": "PixelLab VFX Creator",
+  "image": "x3-1-6-d-snap-spark.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 108,
+   "h": 64
+  },
+  "scale": "1",
+  "anchor": {
+   "kind": "origin",
+   "x": 12,
+   "y": 21
+  },
+  "frameTags": [
+   {
+    "name": "x3-1-6-d-snap-spark",
+    "from": 0,
+    "to": 5,
+    "direction": "forward"
+   }
+  ]
+ }
+}
