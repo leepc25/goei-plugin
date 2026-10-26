@@ -438,8 +438,17 @@ function cardStyle(): string {
 }
 
 /** Lite에서만: 응답이 막 들어와 아직 정리되기 전에도 태그가 보이지 않게, 이동 지시문은 카드로 */
-function onDisplay(text: string): string {
+/** 에셋 목록 첫 읽기 (시작 때 건다). 화면 처리기는 태그가 있으면 이것을 한 번 기다린다 */
+let assetsFirst: Promise<unknown> = Promise.resolve();
+
+async function onDisplay(text: string): Promise<string> {
   if (typeof text !== 'string') return text;
+  // 이미지 태그는 에셋 목록이 있어야 그린다. 목록을 아직 못 읽었으면 첫 읽기를 기다린다 (안 기다리면 원문 태그가 남고, 새로고침 전엔 다시 그려지지 않는다)
+  if (hasImgTag(text) && !modulePicker()) await assetsFirst.catch(() => undefined);
+  return displayNow(text);
+}
+
+function displayNow(text: string): string {
   // 플러그인 고유 표식(시작 카드·지시문·전화 카드)은 Lite 판정 전에도 바꾼다.
   // 다른 채팅에 갔다 오면 Risu가 판정(liteNow)보다 먼저 메시지를 다시 그려서 원문이 드러난 채 남았다.
   // 이 표식은 이 봇 메시지에만 있으니 다른 봇에서는 아무것도 바뀌지 않는다.
@@ -553,7 +562,7 @@ export interface BodyHandlers {
 export async function start(): Promise<BodyHandlers> {
   await loadPrefs();
   // 채팅 속 이미지 태그가 쓸 모듈 에셋 이름 (창을 열 때도 다시 읽는다)
-  void loadModuleAssets();
+  assetsFirst = loadModuleAssets();
   setWikiOpener((title) => void openWiki(title));
   setRepickOpener(() => void openApp({ quietIfNotLite: true }));
   let stopWatcher: (() => void) | null = null;

@@ -29,27 +29,31 @@ export function hasImgTag(text: string): boolean {
  *  나중에 「페르소나이름_표정」 에셋을 넣으면 그것이 먼저다 */
 const SELF = '{{source::user}}';
 
-/** 카드 표정 세트 (assets/portraits). 에셋 목록을 아직 못 읽었을 때 이 밖의 표정은 _default 로 (빈 칸이 뜨지 않게) */
+/** 카드 표정 세트 (assets/portraits). 에셋 목록을 못 읽었을 때는 이 세트의 표정만 믿는다 */
 export const EMOTIONS = new Set('default angry annoyed bored confused contemptuous crying curious dumbfounded embarrassed excited exhausted happy laughing lovestruck lustful nervous proud sad scared serious shy smile smirk smug surprised thinking'.split(' '));
 
+/** 태그 → 에셋 이름. 목록에 없는 이름·표정은 null (칸을 그리지 않는다, 기본 그림으로 바꾸지 않는다. 사용자 2026-10-26).
+ *  목록이 없으면 표정이 세트 안일 때만 태그를 믿는다. 페르소나 태그는 유저 사진 */
 const tagName = (who: string, expr: string, pick?: (name: string) => string | null, self?: string) => {
   const name = who.trim();
   const want = `${name}_${expr.trim()}`;
-  const found = pick ? pick(want) ?? pick(`${name}_default`) : EMOTIONS.has(expr.trim().toLowerCase()) ? want : `${name}_default`;
-  return found ?? (self && name === self.trim() ? SELF : null);
+  if (self && name === self.trim()) return pick?.(want) ?? SELF;
+  if (pick) return pick(want);
+  return EMOTIONS.has(expr.trim().toLowerCase()) ? want : null;
 };
 
-/** 태그가 모두 에셋에 있는 이름인지 (괴이봇 판정 전에도 그려도 되는지. 다른 봇의 같은 꼴 태그는 건드리지 않게) */
+/** 태그 가운데 에셋에 있는 이름이 하나라도 있는지 (괴이봇 판정 전에도 그려도 되는지. 다른 봇의 같은 꼴 태그는 건드리지 않게).
+ *  하나라도 알면 그 메시지는 우리 것이고, 모르는 태그는 그릴 때 빠진다 */
 export function imgTagsKnown(text: string, pick?: (name: string) => string | null, self?: string): boolean {
   if (!pick) return false;
   const all = [...text.matchAll(TAG)];
-  return all.length > 0 && all.every((m) => !!tagName(m[1], m[2], pick, self));
+  return all.length > 0 && all.some((m) => !!tagName(m[1], m[2], pick, self));
 }
 
 /**
  * 태그를 그림 칸으로. pick(이름)은 에셋에 있으면 실제 이름(대소문자 맞춤), 없으면 null.
  * pick이 없으면(에셋 목록을 못 읽었으면) 태그 이름을 그대로 쓴다.
- * 그 표정이 없으면 이름_default, 그것도 없으면 칸을 그리지 않는다 (원본과 같음). self(페르소나 이름) 태그는 유저 사진.
+ * 목록에 없는 이름·표정은 칸을 그리지 않는다 (태그만 지운다). self(페르소나 이름) 태그는 유저 사진.
  * 최근 메시지에만 띄우는 조건은 메시지 번호를 아는 Risu CBS에 맡긴다 (화면 처리기는 번호를 모른다). recent 0이면 전부
  */
 export function renderImgTags(text: string, pick?: (name: string) => string | null, recent = IMG_RECENT.def, self?: string): string {
