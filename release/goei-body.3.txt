@@ -1,4 +1,11 @@
-base(["modules", "enabledModules"]);
+ {
+        const idx = await risuai.getCurrentCharacterIndex();
+        const char = Number.isInteger(idx) && idx >= 0 ? await risuai.getCharacterFromIndex(idx) : null;
+        rows2 = (char?.additionalAssets ?? []).filter(isRow);
+      } catch {
+      }
+      try {
+        const db = await risuai.getDatabase(["modules", "enabledModules"]);
         const on2 = new Set(db?.enabledModules ?? []);
         const mods = [...db?.modules ?? []].sort((a, b) => Number(on2.has(b.id)) - Number(on2.has(a.id)));
         rows2 = rows2.concat(mods.flatMap((m) => Array.isArray(m.assets) ? m.assets.filter(isRow) : []));
@@ -262,9 +269,12 @@ base(["modules", "enabledModules"]);
     ph: ["$ph_"],
     gn: ["$lb_cfg_lb-gn.", "$gn_storage_"],
     wiki: ["$nw_"],
-    visit: ["$hq_"]
+    visit: ["$hq_"],
+    /** 인물 기록 (core/people/settings.ts PP). 메인 설정의 「덮어쓰기/불러오기」도 같은 접두어를 함께 다룬다 */
+    pp: ["$pp_"]
   };
-  var NAME = { ph: "괴담톡", gn: "괴담넷", wiki: "위키", visit: "필드" };
+  var MAIN_PREFIXES = ["$gen_", "$hq_adv_", "$pp_"];
+  var NAME = { ph: "괴담톡", gn: "괴담넷", wiki: "위키", visit: "필드", pp: "인물 기록" };
   var defaultsAsk = { pane: "", what: "" };
   var defaultsButtons = (pane, off = false) => `<span class="ps-defaults"><button class="st-act save" data-action="${pane}-def-ask" data-value="save" ${off ? "disabled" : ""}>${ICONS.pen}덮어쓰기</button><button class="st-act" data-action="${pane}-def-ask" data-value="load" ${off ? "disabled" : ""}>${ICONS.refresh}불러오기</button></span>`;
   function defaultsConfirm(pane) {
@@ -3699,15 +3709,3 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 
 .gx-segs { display: inline-flex; gap: 2px; padding: 3px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
 .gx-seg { min-width: 96px; min-height: 40px; padding: 0 16px; border: 0; border-radius: 10px; background: transparent; color: var(--dim); font-weight: 600; }
-.gx-seg:hover { color: var(--text); }
-.gx-seg.on { background: var(--line); color: var(--text); }
-
-.gx-scs { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 8px; }
-.gx-sc {
-  position: relative; display: flex; align-items: center; gap: 10px; text-align: left;
-  min-height: 56px; padding: 8px 14px;
-  border: 1px solid var(--line); border-radius: 14px; background: var(--panel);
-  font-weight: 600;
-}
-.gx-sc b { font-family: var(--mono); color: var(--dim); font-size: 13px; font-weight: 500; }
-.gx-sc span { 

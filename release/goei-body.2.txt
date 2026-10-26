@@ -1,4 +1,9 @@
-urn decode(chat.scriptstate?.[GN_RAW]);
+"T", en(nick), s4.postid || 0, en(s4.title), en(s4.body), en(s4.author), en(s4.quote), en(s4.quoteAuthor)].join("|"));
+    for (const d of st.dms) out.push(["D", en(d.nick), d.side, en(d.body), d.unread ? "1" : "0", en(d.date)].join("|"));
+    return out.join("\n");
+  }
+  function readGnet(chat) {
+    return decode(chat.scriptstate?.[GN_RAW]);
   }
   function snapshotKey(st) {
     return JSON.stringify([st.seq, st.posts.map((p) => [p.id, p.nick, p.title, p.body, p.date, p.mine, p.views, p.votes, p.comments.map((c) => [c.parent, c.nick, c.body, c.mine])])]);
@@ -4445,11 +4450,4 @@ The previous response was rejected and nothing was saved. Recreate the complete 
   function loadModuleAssets() {
     modBusy ??= (async () => {
       let rows2 = [];
-      try {
-        const idx = await risuai.getCurrentCharacterIndex();
-        const char = Number.isInteger(idx) && idx >= 0 ? await risuai.getCharacterFromIndex(idx) : null;
-        rows2 = (char?.additionalAssets ?? []).filter(isRow);
-      } catch {
-      }
-      try {
-        const db = await risuai.getData
+      try

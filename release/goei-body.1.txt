@@ -1,4 +1,4 @@
-// goei-body 0.16.62
+// goei-body 0.16.63
 "use strict";
 (() => {
   // src/core/dispatch.ts
@@ -3304,15 +3304,18 @@ ${body4.slice(at).replace(/^\s+/, "")}
     return text.includes("<img=");
   }
   var SELF = "{{source::user}}";
+  var EMOTIONS = new Set("default angry annoyed bored confused contemptuous crying curious dumbfounded embarrassed excited exhausted happy laughing lovestruck lustful nervous proud sad scared serious shy smile smirk smug surprised thinking".split(" "));
   var tagName = (who, expr, pick3, self) => {
-    const want = `${who.trim()}_${expr.trim()}`;
-    const found = pick3 ? pick3(want) ?? pick3(`${who.trim()}_default`) : want;
-    return found ?? (self && who.trim() === self.trim() ? SELF : null);
+    const name = who.trim();
+    const want = `${name}_${expr.trim()}`;
+    if (self && name === self.trim()) return pick3?.(want) ?? SELF;
+    if (pick3) return pick3(want);
+    return EMOTIONS.has(expr.trim().toLowerCase()) ? want : null;
   };
   function imgTagsKnown(text, pick3, self) {
     if (!pick3) return false;
     const all = [...text.matchAll(TAG)];
-    return all.length > 0 && all.every((m) => !!tagName(m[1], m[2], pick3, self));
+    return all.length > 0 && all.some((m) => !!tagName(m[1], m[2], pick3, self));
   }
   function renderImgTags(text, pick3, recent = IMG_RECENT.def, self) {
     return text.replace(TAG, (_m, who, expr) => {
@@ -3411,7 +3414,7 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
   var MARK_MAX = 5;
   var DIM_DEFAULT = 50;
   var prefs = { basic: {}, world: {} };
-  var PREF_VAR = /^(\$ph_(model|auto|status|related|context|incoming|incoming_chance|group_invites|group_invite_chance|announcements|announcement_gap|announcement_history|announcement_page_size|all_contacts|anomaly_contacts|storage_(auto|limit)_(dm|group|notice))|\$lb_cfg_lb-gn\.[a-z_]+|\$gn_storage_(auto|limit)_dm|\$nw_(mode|model|length|refresh_previous|writing_request|context)|\$ph_context_(messages|announcements)|\$(ph|nw)_adv_[a-z_]+|\$hq_(adv_[a-z_]+|ui)|\$gen_[a-z_]+)$/;
+  var PREF_VAR = /^(\$ph_(model|auto|status|related|context|incoming|incoming_chance|group_invites|group_invite_chance|announcements|announcement_gap|announcement_history|announcement_page_size|all_contacts|anomaly_contacts|storage_(auto|limit)_(dm|group|notice))|\$lb_cfg_lb-gn\.[a-z_]+|\$gn_storage_(auto|limit)_dm|\$nw_(mode|model|length|refresh_previous|writing_request|context)|\$ph_context_(messages|announcements)|\$(ph|nw)_adv_[a-z_]+|\$hq_(adv_[a-z_]+|ui)|\$gen_[a-z_]+|\$pp_[a-z_]+)$/;
   function getPrefs() {
     return prefs;
   }
@@ -4256,9 +4259,4 @@ ${themeVars("[x-goei-fab]")}
       out.push(["P", p.id, en(p.date), en(p.nick), en(p.title), p.views, p.votes, en(p.body), p.mine ? "1" : "0"].join("|"));
       for (const c of p.comments) out.push(["C", p.id, c.parent, en(c.nick), en(c.body), c.mine ? "1" : "0", c.unread ? "1" : "0", en(c.time ?? "")].join("|"));
     }
-    for (const [nick, s4] of Object.entries(st.sources)) out.push(["T", en(nick), s4.postid || 0, en(s4.title), en(s4.body), en(s4.author), en(s4.quote), en(s4.quoteAuthor)].join("|"));
-    for (const d of st.dms) out.push(["D", en(d.nick), d.side, en(d.body), d.unread ? "1" : "0", en(d.date)].join("|"));
-    return out.join("\n");
-  }
-  function readGnet(chat) {
-    ret
+    for (const [nick, s4] of Object.entries(st.sources)) out.push([
