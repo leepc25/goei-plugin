@@ -55,7 +55,7 @@ def strip(name, sprite, west=True):
 def frame_of(im, r): return im.crop((r["x"], r["y"], r["x"] + r["w"], r["y"] + r["h"]))
 
 
-def main(name, desc, key="vfx", sprite=None, artist="lite"):
+def main(name, desc, key="vfx", sprite=None, artist="lite", west=True):
     OUT.mkdir(parents=True, exist_ok=True)
     body = {"description": desc, "name": name, "artist": artist}
     if sprite:   # 캐릭터 그림을 넣으면 그 크기·톤에 맞춰 이펙트를 만든다
@@ -80,7 +80,7 @@ def main(name, desc, key="vfx", sprite=None, artist="lite"):
     print(line)
     log = BASE / key / "spend.log" if (BASE / key).exists() else BASE / "vfx_spend.log"
     with open(log, "a") as f: f.write(line + "\n")
-    if sprite: strip(name, sprite)
+    if sprite: strip(name, sprite, west)
 
 
 if __name__ == "__main__":
@@ -89,3 +89,18 @@ if __name__ == "__main__":
     for f in ("--sprite", "--artist"):
         if f in a: i = a.index(f); kw[f[2:]] = a[i + 1]; a = a[:i] + a[i + 2:]
     main(*a, **kw)
+
+
+def repivot(name, mode="bottom"):
+    """캐릭터를 지운 뒤 이펙트 자체 기준점으로: bottom(바닥 가운데) | center. meta.native=True(1배로 씀)"""
+    from PIL import Image
+    js = OUT / f"{name}.json"; m = json.loads(js.read_text()); im = Image.open(OUT / f"{name}.png")
+    xs, ys, bots = [], [], []
+    for f in m["frames"]:
+        r = f["frame"]; b = im.crop((r["x"], r["y"], r["x"] + r["w"], r["y"] + r["h"])).getbbox()
+        if b: xs += [b[0], b[2]]; ys += [b[1], b[3]]; bots.append(b[3])
+    r = m["frames"][0]["frame"]
+    cx = (min(xs) + max(xs)) / 2; cy = (min(ys) + max(ys)) / 2 if mode == "center" else sorted(bots)[len(bots) // 2]
+    for f in m["frames"]: f["pivot"] = {"x": cx / r["w"], "y": cy / r["h"]}
+    m["meta"]["native"] = True; m["meta"]["box"] = [min(xs), min(ys), max(xs), max(ys)]
+    js.write_text(json.dumps(m))
