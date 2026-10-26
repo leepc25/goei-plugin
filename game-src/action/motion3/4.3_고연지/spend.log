@@ -149,3 +149,5 @@
 10-25 16:34:31 43 누운 채 움찔 완료 4장 (152초)
 10-26 04:57:43 VFX x3-4.3-F-surgical-light 완료 {'h': 344, 'w': 424} 10장 effect_id=89ff7a59-068b-4e8a-9d03-f184d62e2a17
 10-26 04:57:59 VFX x3-4.3-D-suture-zigzag 완료 {'h': 272, 'w': 256} 8장 effect_id=d92884b0-973a-4335-a141-dc93ccddd68a
+10-26 04:59:10 VFX x3-4.3-S2-syringe-droplet 완료 {'h': 16, 'w': 16} 6장 effect_id=e2651b8c-c7e0-4296-8061-bfefa7283719
+10-26 04:59:53 VFX x3-4.3-S2-syringe-droplet 완료 {'h': 256, 'w': 256} 6장 effect_id=023e794b-f3d4-4211-bed2-36003af3e154
