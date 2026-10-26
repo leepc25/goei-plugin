@@ -42,6 +42,12 @@ export const ARCHETYPES: Record<string, Archetype> = {
   경비: { name: '경비', role: 'guard', range: { courage: [0.6, 1], curious: [0.4, 0.9] } },
   경찰: { name: '경찰', role: 'police', range: { courage: [0.6, 1], haste: [0.3, 0.7] } },
   '편의점 점원': { name: '편의점 점원', role: 'staff', range: {} },
+  // 장소 종류별 인구(6-4장)에 쓰는 원형
+  상인: { name: '상인', role: 'worker', range: { social: [0.4, 1], courage: [0.3, 0.8] } },
+  취객: { name: '취객', role: 'civilian', range: { haste: [0.4, 1], courage: [0.4, 1], curious: [0.3, 0.9] }, drinks: true },
+  주민: { name: '주민', role: 'civilian', range: { haste: [0, 0.5] } },
+  산책객: { name: '산책객', role: 'civilian', range: { haste: [0, 0.4], social: [0.3, 0.9] } },
+  승객: { name: '승객', role: 'civilian', range: { haste: [0.4, 1], curious: [0, 0.4] } },
 };
 
 export function rollTemper(r: Rng, a: Archetype | undefined): Temperament {

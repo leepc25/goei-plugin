@@ -9,7 +9,7 @@ import { ROOMS, mirror, type Room, type RoomFix } from './rooms';
 import { PAINTED, PAINTED_LANE, doorX } from './painted';
 
 export type SceneId =
-  | 'street' | 'jongno' | 'pasta' | 'lobby' | 'swat' | 'f2' | 'f3' | 'office' | 'interview' | 'lounge' | 'wc' | 'wc3'
+  | 'street' | 'jongno' | 'pasta' | 'metro' | 'yeongdeungpo' | 'gangnam' | 'mangwon' | 'yeouido' | 'lobby' | 'swat' | 'f2' | 'f3' | 'office' | 'interview' | 'lounge' | 'wc' | 'wc3'
   | 'b1' | 'edu' | 'training' | 'clinic' | 'b2' | 'b3' | 'tooth';
 
 export type DoorKind = 'main' | 'door' | 'glass' | 'steel' | 'security' | 'elevator' | 'stairs_up' | 'stairs_down' | 'stairs' | 'shop' | 'slide' | 'cell' | 'exit';
@@ -153,9 +153,31 @@ export const HQ_SCENES: HqScene[] = [
   // 종로 큰길: 필드 세계 첫 시연 범위(docs/필드_세계_NPC_설계.md 20장). 그림 전까지 회색 거리
   {
     id: 'jongno', name: '종로 큰길', floor: 'out', length: 4000, look: 'street', legacy: true, boxes: [], fixtures: [], spots: [],
-    doors: [{ id: 'west', x: 60, kind: 'door', to: 'street', toDoor: 'east', label: '종로 뒷골목' }],
+    doors: [{ id: 'west', x: 60, kind: 'door', to: 'street', toDoor: 'east', label: '종로 뒷골목' }, { id: 'metro', x: 2200, kind: 'door', to: 'metro', toDoor: 'jonggak', label: '종각역' }],
     things: [{ kind: 'streetlamp', x: 700, w: 30, h: 360 }, { kind: 'streetlamp', x: 1700, w: 30, h: 360 }, { kind: 'streetlamp', x: 2700, w: 30, h: 360 }, { kind: 'streetlamp', x: 3600, w: 30, h: 360 }],
   },
+  // 지하철 승강장 하나에서 각 지역 역으로 내린다 (내린 지역이 바뀌면 시계 「지역 이동」 +30분). 그림 전까지 회색 장면, 좌표 임시
+  {
+    id: 'metro', name: '지하철 승강장', floor: 'out', length: 3200, look: 'corridor', legacy: true, boxes: [], fixtures: [], spots: [],
+    doors: [
+      { id: 'jonggak', x: 300, kind: 'door', to: 'jongno', toDoor: 'metro', label: '종각역 (종로)' },
+      { id: 'yeongdeungpo', x: 1000, kind: 'door', to: 'yeongdeungpo', toDoor: 'metro', label: '영등포시장역' },
+      { id: 'gangnam', x: 1700, kind: 'door', to: 'gangnam', toDoor: 'metro', label: '강남역' },
+      { id: 'mangwon', x: 2400, kind: 'door', to: 'mangwon', toDoor: 'metro', label: '망원역' },
+      { id: 'yeouido', x: 3000, kind: 'door', to: 'yeouido', toDoor: 'metro', label: '여의나루역' },
+    ],
+    things: [],
+  },
+  ...([
+    ['yeongdeungpo', '영등포 시장', 3600, '영등포시장역'],
+    ['gangnam', '강남 번화가', 4000, '강남역'],
+    ['mangwon', '망원 주택가', 3000, '망원역'],
+    ['yeouido', '여의도 한강공원', 4000, '여의나루역'],
+  ] as const).map(([id, name, length, station]): HqScene => ({
+    id, name, floor: 'out', length, look: 'street', legacy: true, boxes: [], fixtures: [], spots: [],
+    doors: [{ id: 'metro', x: 200, kind: 'door', to: 'metro', toDoor: id, label: station }],
+    things: [1, 2, 3].map((i) => ({ kind: 'streetlamp', x: Math.round((length * i) / 4), w: 30, h: 360 })),
+  })),
   {
     id: 'pasta', name: '파스타집', floor: 'out', length: 1280, look: 'pasta', legacy: true, boxes: [], fixtures: [],
     doors: [{ id: 'out', x: 110, kind: 'shop', to: 'street', toDoor: 'pasta' }],

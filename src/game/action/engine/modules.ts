@@ -28,7 +28,8 @@ import { CUTSCENES, VIDEOS, hqLines, mountStory, stageHooks, type AgentId, type 
 import type { SpeakerId } from '../story/types';
 import { itemsBlocking, linkItems, mountItemsOverlay } from './itemsLink';
 import { makeHub, silhouette, type HubHost, type HubLife } from './hub';
-import { createHqWorld } from '../../world/hq';
+import { createHqWorld, hqDistrict } from '../../world/hq';
+import { isRegionMove } from '../../world/districts';
 import { DEFAULT_CLOCK, clockRules, waitOptions, type ClockRules } from '../../world/clock';
 import { hashSeed } from '../../world/rng';
 import { observerLines } from '../../world/observer';
@@ -159,6 +160,8 @@ function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui
     const name = hq.map().scenes.find((s) => s.id === sceneId)?.name ?? sceneId;
     void b?.field?.record({ kind: 'provoke', text: `${name}에서 사람 ${m.n}명을 때렸다`, scene: name, weight: m.n >= 3 ? 2 : 1, visit: visitId, ...(m.witness ? { witness: m.witness } : {}) }).catch(() => {});
   };
+  /** 마지막으로 있던 지역 (승강장은 지역 없음) */
+  let lastDistrict: string | null = null;
   /** 이 장면에서 이미 싸웠나 (싸움 = 장면당 한 번 +10분, 사용자 확정) */
   let foughtHere = false;
   const record = (evs: SimEvent[]) => {
@@ -235,9 +238,12 @@ function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui
       // 장면을 옮기면 장부에 이동 사건과 지금 위치(확정 사실)를 남긴다
       entered: (to, from, walkedPx) => {
         fieldClock.place = to.name;
-        // 장면 넘어가기 = 10분 (사용자 확정 2026-10-26, 설정에서 조정 예정). 걸은 거리는 시계와 무관
+        // 장면 넘어가기 10분, 지하철로 다른 지역에 내리면 지역 이동 30분 (사용자 확정 2026-10-26, 설정 → 필드 시간). 걸은 거리는 시계와 무관
         void walkedPx;
-        const sec = rules().scene * 60;
+        const d = hqDistrict(to.id);
+        const region = isRegionMove(lastDistrict ?? hqDistrict(from.id), d);
+        if (d) lastDistrict = d;
+        const sec = (region ? rules().region : rules().scene) * 60;
         if (fieldClock.sec !== null) fieldClock.sec += sec;
         const at = fieldClock.sec === null ? '' : ` (${clockText(fieldClock.sec)})`;
         void b?.field?.record({ kind: 'move', text: `${from.name} → ${to.name}${at}`, scene: to.name, weight: 1, fact: { key: '주인공 위치', value: to.name } }).catch(() => {});

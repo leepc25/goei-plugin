@@ -4,14 +4,23 @@ import { WorldSim, type SimOptions, type SpawnRule } from './actors';
 import type { Post } from './mobs';
 import { PlaceGraph, type ElevatorStop, type PlaceKind, type PlaceScene } from './places';
 import { mulberry32 } from './rng';
+import { areaSpawns, type AreaKind } from './districts';
 
 export const HQ_KINDS: Record<string, PlaceKind> = {
-  street: 'street', jongno: 'street', pasta: 'shop', lobby: 'lobby', f2: 'corridor', f3: 'corridor', b1: 'corridor', b2: 'corridor', b3: 'garage',
+  street: 'street', jongno: 'street', pasta: 'shop', metro: 'street', yeongdeungpo: 'street', gangnam: 'street', mangwon: 'street', yeouido: 'street', lobby: 'lobby', f2: 'corridor', f3: 'corridor', b1: 'corridor', b2: 'corridor', b3: 'garage',
   office: 'office', swat: 'office', interview: 'room', edu: 'room', lounge: 'lounge', wc: 'restroom', wc3: 'restroom', training: 'training', clinic: 'clinic', tooth: 'cell',
 };
 
+/** 바깥 장면 꼬리표 (6-4장 인구) */
+export const HQ_AREAS: Record<string, AreaKind> = {
+  street: 'alley', jongno: 'downtown', metro: 'subway', yeongdeungpo: 'market', gangnam: 'nightlife', mangwon: 'residential', yeouido: 'park',
+};
+/** 지역: 바뀌면 시계 「지역 이동」. 승강장은 지역 없음(타고 내릴 때 정해진다). 본부 안은 종로 */
+const HQ_DISTRICT: Record<string, string> = { yeongdeungpo: 'yeongdeungpo', gangnam: 'gangnam', mangwon: 'mangwon', yeouido: 'yeouido' };
+export const hqDistrict = (scene: string): string | null => (scene === 'metro' ? null : HQ_DISTRICT[scene] ?? 'jongno');
+
 /** 장면 소속: 본부 안은 관리국(A00), 바깥 거리·가게는 없음 */
-export const hqSceneFaction = (scene: string): string | null => (['street', 'jongno', 'pasta'].includes(scene) ? null : 'A00');
+export const hqSceneFaction = (scene: string): string | null => (scene === 'pasta' || HQ_AREAS[scene] ? null : 'A00');
 
 /** 이름 인물이 오가는 장면: 처음 선 장면(본편 상태로 정한 방) → 범위. 부상은 의무실에 묶인다 */
 export const HQ_ROAM: Record<string, string[]> = {
@@ -23,9 +32,10 @@ export const HQ_ROAM: Record<string, string[]> = {
 /** 몹 보충 (6-2장). 수치는 시연판에서 조정 */
 export function hqSpawns(graph: PlaceGraph): SpawnRule[] {
   const lobbyMain = graph.scene('lobby')?.doors.find((d) => d.id === 'main')?.x;
+  // 바깥은 꼬리표로 (승강장은 타는 곳마다 드나든다)
+  const metroGates = graph.scene('metro')?.doors.map((d) => d.x);
   return [
-    { scene: 'street', target: { day: 4, night: 2 }, refill: [3, 7], gates: [30, 1890], mix: ['행인', '회사원', '배달원', '불량배'] },
-    { scene: 'jongno', target: { day: 8, night: 3 }, refill: [2, 5], mix: ['행인', '회사원', '학생', '관광객', '회사원', '불량배'] },
+    ...areaSpawns(Object.fromEntries(Object.entries(HQ_AREAS).filter(([s]) => graph.scene(s))), { street: [30, 1890], ...(metroGates?.length ? { metro: metroGates } : {}) }),
     ...(lobbyMain !== undefined ? [{ scene: 'lobby', target: { day: 2, night: 0 }, refill: [6, 12], gates: [lobbyMain], mix: ['방문객', '행정 직원'] } as SpawnRule] : []),
   ];
 }

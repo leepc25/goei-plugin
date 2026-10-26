@@ -82,6 +82,8 @@ export interface SpawnRule {
   gates?: number[];
   /** 원형 이름 목록 (뽑기) */
   mix: string[];
+  /** 밤(19:30~05시) 원형 목록. 없으면 mix */
+  nightMix?: string[];
 }
 
 /** 바깥(대사·장부·연출)에 알릴 일 */
@@ -824,7 +826,7 @@ export class WorldSim {
     const others = gates.filter((g) => g !== from);
     const to = pick(this.rng, others.length ? others : gates);
     const [top, bot] = this.graph.lane(r.scene);
-    const name = pick(this.rng, r.mix);
+    const name = pick(this.rng, this.isNight() && r.nightMix?.length ? r.nightMix : r.mix);
     const arch = ARCHETYPES[name];
     const look = arch?.looks?.length ? pick(this.rng, arch.looks) : name;
     const a = this.add({ id: `mob${++serial}`, name, kind: 'mob', brain: 'transit', home: r.scene, archetype: name, look, speed: range(this.rng, 110, 170) }, { scene: r.scene, x: anywhere ? range(this.rng, MARGIN, len - MARGIN) : from, y: range(this.rng, top + 20, bot - 10) });

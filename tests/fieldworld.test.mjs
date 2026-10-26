@@ -6,10 +6,10 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 const dir = await mkdtemp(join(tmpdir(), 'goei-fieldworld-'));
-const names = ['rng', 'clock', 'places', 'actors', 'observer', 'needs', 'mobs', 'lines', 'speech'];
+const names = ['rng', 'clock', 'places', 'actors', 'observer', 'needs', 'mobs', 'lines', 'speech', 'districts', 'hq'];
 await build({ entryPoints: names.map((n) => `src/game/world/${n}.ts`), outdir: dir, outbase: 'src', bundle: true, platform: 'node', format: 'esm', outExtension: { '.js': '.mjs' }, logLevel: 'silent' });
 const imp = (n) => import(pathToFileURL(join(dir, `game/world/${n}.mjs`)));
-const R = await imp('rng'), C = await imp('clock'), P = await imp('places'), A = await imp('actors'), O = await imp('observer'), N = await imp('needs'), M = await imp('mobs'), L = await imp('lines'), SP = await imp('speech');
+const R = await imp('rng'), C = await imp('clock'), P = await imp('places'), A = await imp('actors'), O = await imp('observer'), N = await imp('needs'), M = await imp('mobs'), L = await imp('lines'), SP = await imp('speech'), D = await imp('districts'), H = await imp('hq');
 
 // 본부 지도 축소판: 거리 ─ 로비 ─(계단)─ 3층 복도 ─ 사무실·휴게실, 엘리베이터
 const scenes = [
@@ -314,4 +314,30 @@ test('시간 보내기 선택지: 짧게·길게·다음 시간대·근무 끝�
   assert.deepEqual(night.map((o) => o.label), ['30분', '1시간', '아침까지']);
   assert.equal(night[2].minutes, 6 * 60);
   assert.deepEqual(C.waitOptions(C.clockRules({ waitShort: 0 }), null).map((o) => o.label), ['1시간']);
+});
+
+test('장소 꼬리표 → 인구 규칙, 지역 이동 판정', () => {
+  const rules = D.areaSpawns({ a: 'market', b: 'nightlife' }, { a: [10, 20] });
+  assert.equal(rules.length, 2);
+  assert.deepEqual(rules[0].gates, [10, 20]);
+  assert.ok(rules[0].target.day > rules[0].target.night, '시장은 낮이 붐빈다');
+  assert.ok(rules[1].target.night > rules[1].target.day, '유흥가는 밤이 붐빈다');
+  for (const r of Object.values(D.POPULATION)) for (const n of [...r.mix, ...(r.nightMix ?? [])]) assert.ok(M.ARCHETYPES[n], `원형 ${n}`);
+  for (const n of Object.keys(M.ARCHETYPES)) assert.ok(L.NPC_TYPE[n], `대사 연결 ${n}`);
+  assert.equal(H.hqDistrict('office'), 'jongno');
+  assert.equal(H.hqDistrict('metro'), null);
+  assert.ok(D.isRegionMove('jongno', 'gangnam'));
+  assert.ok(!D.isRegionMove('jongno', 'jongno'));
+  assert.ok(!D.isRegionMove('jongno', null));
+  assert.equal(H.hqSceneFaction('gangnam'), null);
+  assert.equal(H.hqSceneFaction('office'), 'A00');
+});
+
+test('밤 원형: 유흥가 밤에는 nightMix에서만 나온다', () => {
+  const g = new P.PlaceGraph([{ id: 'gn', name: '강남', length: 3000, legacy: true, doors: [] }], [], { gn: 'street' });
+  const sim = new A.WorldSim(g, R.mulberry32(5), { spawns: D.areaSpawns({ gn: 'nightlife' }) });
+  sim.step(0.1, { scene: 'elsewhere', x: 0, y: 0, hour: 23 });
+  const mobs = sim.inScene('gn').filter((a) => a.def.kind === 'mob');
+  assert.equal(mobs.length, D.POPULATION.nightlife.target.night);
+  for (const m of mobs) assert.ok(D.POPULATION.nightlife.nightMix.includes(m.def.archetype), m.def.archetype);
 });
