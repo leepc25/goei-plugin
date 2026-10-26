@@ -36,6 +36,10 @@ def prep():
     for o in L:
         T = m3.table(o["key"]); r = T["rows"].get(o["row"])
         if not r: continue
+        if o.get("cond"):   # 사람이 정한 자세 바꾸기(동작 설명까지 새로)
+            c, no_end = o["cond"], o.get("no_end", False)
+            items.append(dict(key=o["key"], row=o["row"], why=o["why"], cond=c, no_end=no_end, end_same=o.get("end_same", False),
+                              v3=o.get("v3", False), action=(c + " " + o.get("action", r["prompt"]))[:500])); continue
         c, no_end = cond(o["why"], r)
         if not c: continue
         items.append(dict(key=o["key"], row=o["row"], why=o["why"], cond=c, no_end=no_end,
@@ -60,6 +64,9 @@ def apply():
                     c[6] = (it["cond"] + " " + e.strip()).replace("|", "/") + ("<br>" + ko if ko else "")
                     if it["no_end"] and "→" in c[4]:
                         a = c[4].split("→")[0].strip(); c[4] = f"{a} → (끝 장 없음)"
+                    if it.get("end_same") and "→" in c[4]:
+                        a = c[4].split("→")[0].strip(); c[4] = f"{a} → {a}"
+                    if it.get("v3") and "엔진 v3" not in c[-1]: c[-1] = c[-1].rstrip(" |") + " · 엔진 v3 |"
                     c[-1] = c[-1].rstrip(" |") + f" · 기계 검사({'; '.join(it['why'])[:80]}) → 픽셀랩 지침으로 고침(2026-10-26) |"
                     t[i] = " | ".join(c); break
         p.write_text("\n".join(t))
