@@ -49,6 +49,12 @@ import { fieldRecord } from './core/field';
 import { withStatusBlock } from './core/statusctx';
 import { visitRecord } from './core/visit';
 import { visitContextRules } from './core/visitPrompt';
+import { withPeopleBlock } from './core/people/request';
+import { peopleStore } from './core/people/store';
+import { peopleSettings } from './core/people/settings';
+import { extraNames, temperOf } from './core/people/base';
+import { requestPeopleUpdate } from './host/people';
+import { bookText } from './core/refs';
 
 const PLUGIN_ID = 'goei-plugin';
 const WATCH_MS = 1000;
@@ -83,6 +89,8 @@ async function onBeforeRequest<M extends PromptMessage>(messages: M[], type: str
     }
     // 지난 응답의 상태창 줄은 지우고 마지막 한 줄만 직전 상태 블록으로 (core/statusctx.ts)
     messages = withStatusBlock(messages);
+    // 장면 인물의 살아 있는 기록 (core/people). 절 단위 혼합이면 그 인물의 시트 원문은 빼고 기록으로 대신한다
+    messages = await withPeople(messages).catch(() => messages);
   }
   // 시드 표식이 없는 요청은 아무것도 읽지 않고 바로 돌려보낸다 (매 전송마다 드는 비용을 0에 가깝게).
   if (!messages.some((m) => typeof m?.content === 'string' && m.content.includes(SEED_OPEN))) return messages;
@@ -161,6 +169,31 @@ async function withPlayer<M extends PromptMessage>(messages: M[]): Promise<M[]> 
   const env = { vars: chat.scriptstate ?? {}, char: char.name, user: agent.name };
   const out = applyPlayer(messages, playerBlock(char.globalLore, agent, env), await readPersona(), userInfo().name, agent.name);
   return basicSettings(char.globalLore, chat.scriptstate).assetPlayer ? out : hidePlayerTag(out, [agent.english]);
+}
+
+/** 인물 기록 블록: 마지막 사용자 메시지 앞에 (core/people/request.ts). 채팅은 바꾸지 않는다 */
+async function withPeople<M extends PromptMessage>(messages: M[]): Promise<M[]> {
+  const charIndex = await risuai.getCurrentCharacterIndex();
+  const chatIndex = await risuai.getCurrentChatIndex();
+  const chat = (await risuai.getChatFromIndex(charIndex, chatIndex)) as Chat | null;
+  if (!chat) return messages;
+  const settings = peopleSettings(chat.scriptstate);
+  if (!settings.on || settings.inject === 'off') return messages;
+  const store = peopleStore(chat);
+  if (!Object.keys(store.people).length) return messages;
+  const char = (await risuai.getCharacterFromIndex(charIndex)) as LoreChar | null;
+  if (!char) return messages;
+  const me = playerAgent(char.globalLore, chat.scriptstate);
+  const lastUser = [...messages].reverse().find((m) => m?.role === 'user');
+  return withPeopleBlock(messages, chat, {
+    settings,
+    store,
+    sheetOf: (name) => bookText({ char, chat }, name) || null,
+    temperOf,
+    extraNames: extraNames(),
+    input: typeof lastUser?.content === 'string' ? lastUser.content : undefined,
+    user: me?.name || userInfo().name || '주인공',
+  });
 }
 
 /** 본부 막간: 대화가 일어난 메시지 바로 뒤에 끼운다 (core/interlude.ts). 채팅은 바꾸지 않는다 */
@@ -264,6 +297,11 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
     await storeLore(arg.characterIndex, arg.chatIndex).catch(() => {});
     // 막혔던 요청을 사용자가 전송 버튼으로 보냈으면 카드의 「전송을 눌러 주세요」·취소를 없앤다
     if (now.message.some((m) => typeof m.data === 'string' && isUnsent(m.data))) now = (await updateChat(arg.characterIndex, arg.chatIndex, clearUnsent)) ?? now;
+    // 인물 기록 갱신 (core/people): 매 턴 설정이면 보조 모델 1회. 다른 보조 호출 앞에, 병렬 설정이 아니면 끝날 때까지 차례로
+    {
+      const pp = requestPeopleUpdate('turn').catch((error) => console.log(`[goei] 인물 기록 갱신 실패: ${error instanceof Error ? error.message : String(error)}`));
+      if (!peopleSettings(now.scriptstate).parallel) await pp;
+    }
     // 보조모델 이미지 태그 보충 (설정이 보조모델일 때). 끝난 뒤 괴담톡 확인 (보조 모델을 겹쳐 부르지 않게)
     // 상태창 「지난 장면」 목록을 새 응답까지 넣어 다시
     await refreshStatusContext(arg.characterIndex, arg.chatIndex).catch(() => {});
