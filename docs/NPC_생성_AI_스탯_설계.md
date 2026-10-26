@@ -489,16 +489,22 @@ src/game/action/npc/
 
 - 기존 방식(막간이 기준 메시지 자리에 계속 남고, 확정 사실은 매 요청 들어감)은 유지할 수 있다. 단 **극도로 압축**한다.
 - **대사 전문·서술형 문장 금지. 영어로만.** 지금 `interludeText`(대사 전부 + 한국어 서술)는 이 기준에 맞지 않아 새로 짠다.
+- **극도로 키워드화**(2026-10-26 사용자). 문장·조사·형용 없이 `|`로 나눈 키워드만.
 - 형식 초안(확인 대기):
 
 ```
-[FLD 10:42-11:30]
-@HQ/2F-office Jaemtri: talk "overtime complaint" fav+1 promise=coffee
-@HQ moved office>lounge>B1-gym
-@HQ/B1-gym Gorgodio: spar, he down, fav-2
-@Jongno-main brawl lv3, police came
-[FACTS] loc=Jongno-main; follow=Eileen
+FLD|10:42-11:30
+HQ-2F|Jaemtri|talk:overtime|fav+1|promise:coffee
+HQ|move|office>lounge>gym
+HQ-gym|Gorgodio|spar|win|fav-2
+Jongno|riot|kill:12|hurt:5|police|wanted
+Jongno|save:civilian|from:thug
+FACT|loc:Jongno|follow:Eileen|wanted:Jongno
 ```
 
-- 대화 요지(`"overtime complaint"`)는 NPC 대화 응답을 받을 때 같은 호출에서 영어 요지 한 칸을 함께 받는다(추가 호출 없음). 6단어 이하.
-- 몹과의 일상은 넘기지 않는다. 같은 종류 사건은 묶는다(「모브 5명 처치」 → `brawl lv3` 한 줄).
+- 대화 요지(`talk:overtime`)는 NPC 대화 응답과 같은 호출에서 영어 키워드 1~3개로 받는다(추가 호출 없음).
+- **몹 관련도 넘긴다(사용자 정정: 난동이 반영 안 되면 의미 없음).** 몹 개인과의 잡담·스쳐 지나감만 뺀다. 결과가 있는 일은 장면 단위로 묶어 숫자·결과 키워드로 넘긴다:
+  - 폭력: `riot|kill:N|hurt:N`, 결과 `police`·`guards`·`wanted`·`fled`
+  - 범죄·선행: `rob:shop`, `steal`, `save:civilian`, `help:lost-kid`
+  - 소문이 된 일: 목격자가 많은 일은 `witness:many`
+- 결과가 굳는 것(수배, 출입 금지, 평판 단계)은 `FACT`로 올려 계속 남긴다.
