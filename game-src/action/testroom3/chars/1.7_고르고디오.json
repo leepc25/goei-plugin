@@ -618,8 +618,7 @@
   },
   "cd": {
    "shot": 2.5,
-   "skill": 8,
-   "charge": 5
+   "skill": 8
   },
   "shotDmg": 30
  }

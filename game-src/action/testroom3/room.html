@@ -606,7 +606,7 @@ function dodge() {
 // 원거리: 반복 구간이 있으면 첫 장 = 발사, 끝 장에서 누르고 있으면 되돌아감. 없으면 그림 불꽃 장(또는 뻗은 장)마다 발사
 function shoot() {
   if (!has('15')) return;
-  if (BAL().gun === 'heavy' || (BAL().cd || {}).shot) { if (!cdReady('shot')) return; setCd('shot'); }   // 강한 한 방은 쿨타임
+  if ((BAL().cd || {}).shot) { if ((P.cd.shot || 0) > P.t) { if ((BAL().cd.shot) >= 1) cdReady('shot'); return; } setCd('shot'); }   // 연사 무기 말고는 한 발씩 + 간격(1초 이상만 「쿨타임」 표시)
   const a = A['15'];
   if (P.overT > 0) return ensureArmed(() => act('15', { seq: [...S(R(0, Math.min(3, a.n - 1)), 0.035), { f: Math.min(3, a.n - 1), d: 0.25, fn: () => { sfx('empty'); const p = muzzle(); steam(p.x, p.y, 1); } }, ...S(R(Math.min(4, a.n - 1), a.n - 1), 0.05)] }));
   ensureArmed(() => {
@@ -616,7 +616,7 @@ function shoot() {
       for (let f = 0; f < a0; f++) s.push({ f, d: 0.035 });
       const to = s.length;
       for (let f = a0; f <= a1; f++) s.push({ f, d: 0.06, ev: f === a0 ? 'shot' : undefined });
-      s[s.length - 1].rep = { key: 'shoot', to };
+      if (isHot()) s[s.length - 1].rep = { key: 'shoot', to };   // 누른 채 연사는 과열 있는 연사 무기만(사용자 2026-10-26)
       for (let f = a1 + 1; f < a.n; f++) s.push({ f, d: 0.05 });
     } else {
       const fire = a.flash.some(Boolean) ? a.flash.map((v, i) => v ? i : -1).filter(i => i >= 0) : [impactOf('15')];
@@ -669,7 +669,7 @@ const CH_COL = ['rgba(255,255,255,.8)', '#fff6c0', '#8fdcff', '#c89bff'];
 const chLevels = () => (CH.skills.charge && CH.skills.charge.levels) || [0.5, 1.2];
 const chLv = () => chLevels().filter(t => P.charge >= t).length;
 function charge() {
-  const sp = CH.skills.charge; if (!sp || !cdReady('charge')) return; setCd('charge');
+  const sp = CH.skills.charge; if (!sp) return;   // 충전기는 쿨타임 없음(사용자 2026-10-26)
   const go = () => {
     P.mode = 'charge'; P.charge = 0; P.chargeShown = 0;
     const id = has(sp.hold) ? sp.hold : idleId(), lp = LP(id) || R(Math.min(3, nOf(id) - 1), nOf(id) - 1), s = [];
@@ -1341,7 +1341,7 @@ function drawHud() {
   ctx.fillStyle = '#000a'; ctx.fillRect(20, H - 40, 300, 14);
   ctx.fillStyle = P.sp >= 100 ? (Math.sin(P.t * 10) > 0 ? '#ffe27a' : '#ffb800') : '#d9a520'; ctx.fillRect(20, H - 40, 300 * P.sp / 100, 14);
   ctx.fillStyle = '#fff'; ctx.font = 'bold 12px sans-serif'; ctx.fillText(P.sp >= 100 ? '필살기 준비!' : `필살기 ${Math.floor(P.sp)}%`, 326, H - 29);
-  const cds = [['skill', '기술'], ['skill2', '둘째 기술'], ['charge', '충전'], ['shot', '원거리']].map(([k, n]) => [n, (P.cd[k] || 0) - P.t]).filter(([, t]) => t > 0);
+  const cds = [['skill', '기술'], ['skill2', '둘째 기술'], ['shot', '원거리']].map(([k, n]) => [n, (P.cd[k] || 0) - P.t]).filter(([n, t]) => t > 0 && (n !== '원거리' || ((BAL().cd || {}).shot || 0) >= 1));
   if (cds.length) { ctx.font = '11px sans-serif'; cds.forEach(([n, t], i) => { ctx.fillStyle = '#000a'; ctx.fillRect(20 + i * 104, H - 62, 100, 16); ctx.fillStyle = '#9fd8ff'; ctx.fillText(`${n} ${t.toFixed(1)}초`, 26 + i * 104, H - 50); }); }
   if (isHot()) {
     ctx.fillStyle = '#000a'; ctx.fillRect(20, 40, 160, 9);
@@ -1508,6 +1508,6 @@ document.getElementById('ps').onchange = e => persp = e.target.checked;
 renderBinds(); cv.focus(); requestAnimationFrame(loop);
 const want = (location.hash.slice(1) && decodeURIComponent(location.hash.slice(1))) || store.get('char', null);
 setChar(INDEX.some(c => c.key === want) ? want : (INDEX[0] && INDEX[0].key));
-window.__room = { setChar, get CK() { return CK; }, get P() { return P; }, get A() { return A; }, onPress, onRelease, held, binds };
+window.__room = { setChar, get CK() { return CK; }, get P() { return P; }, get A() { return A; }, get D() { return D; }, get fx() { return fx; }, onPress, onRelease, held, binds };
 </script>
 </body></html>

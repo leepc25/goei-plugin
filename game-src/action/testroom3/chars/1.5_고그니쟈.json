@@ -577,8 +577,8 @@
    "14": 13
   },
   "cd": {
-   "skill": 9,
-   "charge": 5
+   "shot": 0.45,
+   "skill": 9
   },
   "shotDmg": 9
  }

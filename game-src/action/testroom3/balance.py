@@ -14,8 +14,9 @@ ROW = {"9": 1.0, "10": 1.0, "11": 1.15, "12": 1.25, "13": 1.1, "14": 1.6}   # �
 CD = {"striker": 6, "bruiser": 8, "tank": 10, "ranged": 7, "support": 9, "control": 9}   # 고유기술 쿨타임(초)
 SUPER = {"striker": 180, "bruiser": 180, "ranged": 180, "control": 160, "tank": 140, "support": 140}
 GUN = {  # 원거리 기본공격: 약한 단발은 쿨타임 없이, 강한 것·연발은 과열이나 쿨타임
-    "single": dict(shotDmg=9), "thrown": dict(shotDmg=7),
-    "rapid": dict(shotDmg=6, heatPer=9), "heavy": dict(shotDmg=30, cd=2.5), "none": {}}
+    # 사용자 2026-10-26: 연속으로 계속 나가면 안 됨 → 연사(rapid)만 누른 채 연사 + 과열, 나머지는 한 번 누르면 한 발 + 최소 간격(쿨)
+    "single": dict(shotDmg=9, cd=0.45), "thrown": dict(shotDmg=7, cd=0.6),
+    "rapid": dict(shotDmg=6, heatPer=9), "heavy": dict(shotDmg=30, cd=2.5), "none": dict(shotDmg=10, cd=1.5)}
 # NPC(6.x): 종류 → (역할, 원거리, 손 빠르기, 피해 배율, 게임 HP)
 NPC = [("가짜관리국진압", "bruiser", "rapid", "normal", 1.1, 140), ("가짜관리국검사", "control", "single", "normal", 1.05, 120),
        ("관리국", "bruiser", "single", "normal", 1.0, 120), ("백일몽", "striker", "single", "fast", 1.0, 110),
@@ -94,7 +95,7 @@ def main():
         if sk.get("skill2"):
             bal["cd"]["skill2"] = CD[role] + 4; info["skill2"] = rescale(sk["skill2"], dps * (CD[role] + 4) * 0.5)
         if sk.get("charge"):
-            bal["cd"]["charge"] = 5
+            # 충전기는 쿨타임 없음(사용자 2026-10-26: 모으는 시간이 곧 대가)
             lv = sk["charge"].get("lv", {})
             for k, f in (("0", 1.2), ("1", 2.0), ("2", 3.2)):
                 if k in lv: info[f"charge{k}"] = rescale(lv[k], dps * f)
@@ -105,7 +106,7 @@ def main():
     # 표
     L = ["# 밸런스 표 (balance.py 가 씀, 2026-10-25)", "", "| 인물 | 역할 | 손 | 원거리 | 약1/약2/약3 | 강 | 돌진 | 점프 | 원거리 한 발 | 원거리 제한 | 기술(쿨) | 충전 0/1/2 (쿨) | 필살기 |", "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |"]
     for key, role, speed, gun, atk, bal, info in rows:
-        lim = "과열(한 발 +%d)" % bal["heatPer"] if bal.get("heatPer") else ("쿨 %.1f초" % bal["cd"]["shot"] if bal["cd"].get("shot") else ("없음" if gun not in ("none",) else "—"))
+        lim = "누른 채 연사 · 과열(한 발 +%d)" % bal["heatPer"] if bal.get("heatPer") else ("한 발씩 · 쿨 %.2g초" % bal["cd"]["shot"] if bal["cd"].get("shot") else "—")
         ch = "/".join(str(info.get(f"charge{k}", "—")) for k in "012")
         L.append(f"| {key} | {role} | {speed} | {gun} | {atk.get('9','—')}/{atk.get('10','—')}/{atk.get('11','—')} | {atk.get('12','—')} | {atk.get('13','—')} | {atk.get('14','—')} | {bal.get('shotDmg','—')} | {lim} | {info.get('skill','—')} ({bal['cd'].get('skill','—')}초) | {ch} ({bal['cd'].get('charge','—')}초) | {info.get('super','—')} |" + ("" if not key.startswith("6.") else f" HP {bal['hp']}"))
     (ROOT / "docs" / "밸런스_표.md").write_text("\n".join(L) + "\n")

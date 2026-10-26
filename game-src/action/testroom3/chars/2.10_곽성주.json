@@ -526,7 +526,7 @@
         "size": 1.4,
         "color": "#ffb347",
         "hit": {
-         "dmg": 21,
+         "dmg": 23,
          "kind": "blow"
         },
         "end": [
@@ -634,8 +634,7 @@
    "14": 16
   },
   "cd": {
-   "skill": 10,
-   "charge": 5
+   "skill": 10
   },
   "shotDmg": 6,
   "heatPer": 9

@@ -538,8 +538,7 @@
   "atk": {},
   "cd": {
    "skill": 7,
-   "skill2": 11,
-   "charge": 5
+   "skill2": 11
   },
   "shotDmg": 7,
   "heatPer": 9
