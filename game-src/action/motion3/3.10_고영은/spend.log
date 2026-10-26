@@ -162,3 +162,12 @@
 10-26 16:19:52 50 정면 대기 완료 4장 (46초)
 10-26 16:20:13 57 후면 대기 완료 4장 (47초)
 10-26 19:58:42 60 정면 앉기 보냄 south 8장 시작=지정 끝=없음 약 1회
+10-26 19:58:46 61 후면 앉기 보냄 north 8장 시작=지정 끝=없음 약 1회
+10-26 19:58:47 96 옆 앉기 보냄 east 8장 시작=등록 끝=없음 약 1회
+10-26 19:58:51 74 정면 서서 컵 준비 보냄 south 8장 시작=지정 끝=지정 약 1회
+10-26 19:58:55 75 눕기 보냄 east 8장 시작=등록 끝=없음 약 1회
+10-26 19:58:59 101 하의 내리고 앉기 보냄 south 8장 시작=지정 끝=없음 약 1회
+10-26 19:59:04 104 오류: HTTP 422 {"detail":[{"type":"value_error","loc":["body"],"msg":"Value error, The frame count must be a multiple of 4 from 4 to 40 for PixMiniMax","input":{"character_id":"b1bf05d5-4a5d-4aa6-85f1-ec2ae577327c","mode":"pixminimax","action_description":"Standing with the back to the viewer (facing north), rub b
+10-26 19:59:07 137 무릎 꿇고 구급 처치 보냄 south 8장 시작=지정 끝=지정 약 1회
+10-26 19:59:12 109 상처 소독 보냄 south 8장 시작=지정 끝=지정 약 1회
+10-26 19:59:14 110 붕대 감기 보냄 south 8장 시작=지정 끝=지정 약 1회
