@@ -2645,7 +2645,8 @@ button.mk-go:hover { color: var(--signal); }
 @keyframes pp-spin { to { transform: rotate(360deg); } }
 .pp-upbar .gx-mini { display: inline-flex; align-items: center; gap: 4px; }
 .pp-upbar .gx-mini svg { width: 16px; height: 16px; }
-.pp-card { display: flex; flex-direction: column; gap: 10px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 16px; background: var(--panel); }
+.pp-card { display: flex; flex-direction: column; gap: 6px; }
+.pp-card-body { display: flex; flex-direction: column; gap: 10px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 16px; background: var(--panel); }
 .pp-card h4, .pp-slot h4 { display: flex; align-items: center; gap: 6px; margin: 0; font-size: 13px; font-weight: 700; letter-spacing: .04em; color: var(--dim); }
 .pp-card h4 b, .pp-slot h4 b, .pp-log > summary b { font-size: 12px; font-weight: 600; color: var(--dim); }
 .pp-aff { display: flex; flex-direction: column; gap: 8px; user-select: none; -webkit-user-select: none; }
@@ -2780,3 +2781,5 @@ button.mk-go:hover { color: var(--signal); }
 .ip-extra input { flex: 1; }
 .ip-template { font-family: ui-monospace, monospace; font-size: 12.5px; }
 .ip-preview { margin-top: 8px; padding: 10px; border-radius: 8px; background: var(--panel2); font-size: 12px; white-space: pre-wrap; overflow-wrap: anywhere; max-height: 360px; overflow: auto; }
+
+.pp-mini.on { color: var(--signal); border-color: var(--accent-line); background: var(--accent-bg); }

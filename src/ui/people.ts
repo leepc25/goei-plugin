@@ -512,8 +512,8 @@ export function factionView(ctx: ChatContext, code: string): string {
   return `<div class="ph-room nw-pane pp-pane">${head(f.name, `세력 평판 · 시작값 ${f.base}${code === uf ? ' · 주인공 소속' : ''}`)}
     <article class="nw-doc pp-doc">
       ${peopleUi.notice ? `<div class="gx-err" role="alert">${esc(peopleUi.notice)}</div>` : ''}
-      <section class="pp-card"><h4 title="세력이 주인공을 어떻게 보는지 (−100~100). 본편에서는 갱신기 모델이 판단한 일로, 필드에서는 그 소속이 목격한 일로 바뀌어요">평판</h4>${factionBar(f.value, s.factionBounds)}${edit}</section>
-      <section class="pp-card"><h4 title="필드에서 이 세력의 이름 없는 몹이 주인공을 처음 봤을 때">구간별 몹 반응</h4>${mob}</section>
+      <section class="pp-card"><h4 title="세력이 주인공을 어떻게 보는지 (−100~100). 본편에서는 갱신기 모델이 판단한 일로, 필드에서는 그 소속이 목격한 일로 바뀌어요">평판</h4><div class="pp-card-body">${factionBar(f.value, s.factionBounds)}${edit}</div></section>
+      <section class="pp-card"><h4 title="필드에서 이 세력의 이름 없는 몹이 주인공을 처음 봤을 때">구간별 몹 반응</h4><div class="pp-card-body">${mob}</div></section>
       <details class="ps-adv-sub pp-log" data-keep="pp-log"${keepOpen('pp-log')}><summary>변경 기록<b>${mine.length}</b></summary>${mine.length ? `<ul class="pp-entries">${mine.map((c) => changeRow(ctx, c, live)).join('')}</ul>` : '<p class="ps-note">아직 변경 기록이 없어요. 시작값은 조직×조직 표에서 와요.</p>'}</details>
     </article>${toast('pp', peopleUi.info, (t) => {
       if (peopleUi.info === t) peopleUi.info = '';
@@ -588,7 +588,7 @@ function entryRow(ctx: ChatContext, who: string, slot: SlotId, e: Entry, live: L
   return `<li class="pp-entry${dead ? ' dead' : ''}${e.void ? ' void' : ''}${e.pin ? ' pinned' : ''}">
     <div class="pp-entry-main">${srcIcon(e.src)}<span class="pp-text">${esc(e.text)}</span></div>
     <div class="pp-entry-meta">${meta}${stateMark(st)}
-      <span class="pp-entry-btns"><button class="ph-tool sm${e.pin ? ' on' : ''}" data-action="pp-pin" data-value="${esc(key)}" title="${e.pin ? '고정 풀기' : '고정: 갱신기가 이 항목을 바꾸거나 지우지 못하게'}" aria-label="고정" aria-pressed="${!!e.pin}">${ICONS.pin}</button>${voidBtn('pp-void', key, !!e.void)}</span></div>
+      <span class="pp-entry-btns"><button class="gx-mini pp-mini${e.pin ? ' on' : ''}" data-action="pp-pin" data-value="${esc(key)}" title="${e.pin ? '고정 풀기' : '고정: 갱신기가 이 항목을 바꾸거나 지우지 못하게 잠가요'}" aria-pressed="${!!e.pin}">${e.pin ? '고정됨' : '고정'}</button>${voidBtn('pp-void', key, !!e.void)}</span></div>
     ${evidenceBox(ctx, live, key, e.anchor, e.quote)}
   </li>`;
 }
@@ -599,12 +599,12 @@ function extraCards(ctx: ChatContext, p: Person, changes: Change[]): string {
   const out: string[] = [];
   if (f.has('taste')) {
     const band = tasteOf(p, changes);
-    out.push(`<section class="pp-card"><h4 title="주인공이 이 인물의 취향에 맞는 정도. 호감과 다른 축">취향 띠(첫인상)</h4><p class="pp-extra">${band === null ? '<span class="pp-addr-none">아직 판정 전 — 실제로 마주치면 한 번 정해져요</span>' : `<b>${band > 0 ? '+' : ''}${band}</b> ${esc(TASTE_STAGES[band]?.ko ?? '')}`}</p></section>`);
+    out.push(`<section class="pp-card"><h4 title="주인공이 이 인물의 취향에 맞는 정도. 호감과 다른 축">취향 띠(첫인상)</h4><div class="pp-card-body"><p class="pp-extra">${band === null ? '<span class="pp-addr-none">아직 판정 전 — 실제로 마주치면 한 번 정해져요</span>' : `<b>${band > 0 ? '+' : ''}${band}</b> ${esc(TASTE_STAGES[band]?.ko ?? '')}`}</p></div></section>`);
   }
   if (f.has('openness')) {
     const v = opennessOf(p, changes);
     const st = v === null ? null : opennessStage(v);
-    out.push(`<section class="pp-card"><h4 title="성인 인물의 성적 개방도와 피임 태도 (0~300)">음란도</h4><p class="pp-extra">${v === null ? '<span class="pp-addr-none">아직 없음 — 근거가 있을 때만 시작값이 생겨요</span>' : `<b>${st!.label}</b> ${Math.round(v)}/300 · 피임: ${esc(st!.contraception)}`}</p></section>`);
+    out.push(`<section class="pp-card"><h4 title="성인 인물의 성적 개방도와 피임 태도 (0~300)">음란도</h4><div class="pp-card-body"><p class="pp-extra">${v === null ? '<span class="pp-addr-none">아직 없음 — 근거가 있을 때만 시작값이 생겨요</span>' : `<b>${st!.label}</b> ${Math.round(v)}/300 · 피임: ${esc(st!.contraception)}`}</p></div></section>`);
   }
   return out.join('');
 }
@@ -662,8 +662,8 @@ export function personView(ctx: ChatContext, name: string): string {
   return `<div class="ph-room nw-pane pp-pane">${head(name, sub, tidyBtn)}
     <article class="nw-doc pp-doc">
       ${peopleUi.notice ? `<div class="gx-err" role="alert">${esc(peopleUi.notice)}</div>` : ''}
-      <section class="pp-card"><h4 title="주인공에 대한 호감. 계기가 쌓여 8단계로 바뀌고, 본편 요청에 단계별 행동 방향으로 들어가요">호감</h4>${affinityBar(aff.value)}${affEdit}</section>${extraCards(ctx, p, changes)}
-      <section class="pp-card"><h4 title="이 인물이 주인공을 부르는 말과 말투(존댓말·반말…)">호칭</h4>${addrEdit}</section>
+      <section class="pp-card"><h4 title="주인공에 대한 호감. 계기가 쌓여 8단계로 바뀌고, 본편 요청에 단계별 행동 방향으로 들어가요">호감</h4><div class="pp-card-body">${affinityBar(aff.value)}${affEdit}</div></section>${extraCards(ctx, p, changes)}
+      <section class="pp-card"><h4 title="이 인물이 주인공을 부르는 말과 말투(존댓말·반말…)">호칭</h4><div class="pp-card-body">${addrEdit}</div></section>
       ${slots || '<p class="ps-note">아직 칸에 적힌 항목이 없어요.</p>'}
       ${log}
     </article>${toast('pp', peopleUi.info, (t) => {

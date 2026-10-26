@@ -680,6 +680,8 @@ async function handle(action: string, value?: string): Promise<void> {
     case 'tab':
       tab = TABS.includes(value as Tab) ? (value as Tab) : 'board';
       notice = '';
+      // 위키 탭: 인물 기록 화면(인물·목록·문서·세력)에 있었으면 위키 홈으로 (사원증 「기록」으로 들어온 뒤 위키를 못 여는 문제, 2026-10-26 사용자)
+      if (tab === 'wiki' && ['people', 'person', 'docs', 'faction'].includes(wiki.view)) resetWiki();
       // 지도·커스텀 임무에서 고른 목표·편성은 다른 탭에 다녀와도 그대로 둔다
       field.confirmEnd = null;
       resetSettings();
