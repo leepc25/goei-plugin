@@ -6,7 +6,7 @@ import { generate, runModel, LlmError, type LlmMessage } from './llm';
 import { buildDirector, directorBlock, parseDirector, type DirectorNote } from '../core/people/director';
 import { loadContext, updateChat, type ChatContext } from './risu';
 import { isWaiting, onWaiting } from './waiting';
-import { peopleStore, withPeople, unreadIndexes, messageKey, liveness } from '../core/people/store';
+import { peopleStore, withPeople, unreadIndexes, messageKey, messageHash as messageHashOf, liveness } from '../core/people/store';
 import { applyUpdate, assemblePrompt, buildUpdate, enabledSections, parseUpdate, planBatches, type ApplyReport, type UpdateInput } from '../core/people/updater';
 import { peopleSettings, type PeopleSettings } from '../core/people/settings';
 import { seedPerson } from '../core/people/seed';
@@ -303,15 +303,6 @@ async function runOnce(reason: string, o: { manual?: boolean }): Promise<RunResu
 }
 
 const input0Names = (s: PeopleStore) => Object.keys(s.people);
-const messageHashOf = (m: { data: unknown }) => {
-  // store.messageHash 와 같은 계산 (여기서 다시 import 하지 않기 위해)
-  let h = 2166136261;
-  for (const ch of String(m.data ?? '')) {
-    h ^= ch.codePointAt(0)!;
-    h = Math.imul(h, 16777619);
-  }
-  return (h >>> 0).toString(36);
-};
 
 // ── 연출형 Director (본편 앞) ──
 

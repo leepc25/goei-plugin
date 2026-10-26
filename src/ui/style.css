@@ -2742,3 +2742,8 @@ button.mk-go:hover { color: var(--signal); }
 }
 /* 「브라우저」: 진짜 전체화면이 막히면 리스 플러그인 창(브라우저 창 전체) 끝까지 */
 .gx-game.gx-winfull, .gx-fieldhost .gx-game.gx-winfull, .gx-panel .gx-game.gx-winfull { position: fixed; inset: 0; z-index: 9999; border-radius: 0; overflow: hidden; background: #000; }
+/* 인물 기록: 지난 항목(대체·요약·취소·사라짐) 접기 */
+.pp-old { color: var(--dim); }
+.pp-oldbox { margin-top: 6px; }
+.pp-oldbox > summary { font-size: 12.5px; color: var(--dim); cursor: pointer; padding: 4px 12px; }
+.pp-oldbox > summary b { margin-left: 6px; font-weight: 600; }

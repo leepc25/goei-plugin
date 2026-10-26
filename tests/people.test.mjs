@@ -151,3 +151,35 @@ test('기록 블록: 절 단위 혼합, 모르는 것, 단계 문장, 메모', (
   const whole = Inj.peopleBlock([block]);
   assert.ok(whole.startsWith(Inj.PEOPLE_HEAD));
 });
+
+test('항목 상태: 대체·접힘·취소·사라짐을 구분하고, 상한을 넘으면 요약으로 접고, 지난 항목은 최근 몇 개만 둔다', () => {
+  const c = chat(['user', 'a', 'u1'], ['char', '쟈알디가 왔다. 명단을 봤다.', 'c1'], ['user', 'b', 'u2'], ['char', '쟈알디가 떠났다.', 'c2']);
+  const live = S.liveness(c);
+  const e = (id, text, anchor, extra = {}) => ({ id, text, src: 'story', anchor, seq: 1, ...extra });
+  const list = [e('a', '왔다', 'c1', { quote: '쟈알디가 왔다' }), e('b', '떠났다', 'c2', { quote: '떠났다', replaces: 'a' }), e('c', '없는 인용', 'c1', { quote: '여기 없는 글' }), e('d', '취소', 'c2', { void: true })];
+  const st = S.entryStates(list, live);
+  assert.equal(st.get('a'), 'replaced');
+  assert.equal(st.get('b'), 'alive');
+  assert.equal(st.get('c'), 'gone');
+  assert.equal(st.get('d'), 'void');
+  // 접기: 상한 3 에 살아 있는 5개 → 오래된 4개를 요약 하나로 (살아 있는 것 = 최근 1 + 요약 1)
+  const many = [1, 2, 3, 4, 5].map((i) => e(`h${i}`, `일 ${i}`, i <= 2 ? 'c1' : 'c2', { seq: i }));
+  assert.equal(S.foldSlotEntries(many, 3, live, '쟈알디', 'history'), true);
+  const alive = S.liveEntries(many, live);
+  assert.equal(alive.length, 2);
+  assert.ok(alive.some((x) => x.anchor === '#0' && x.text.startsWith('(요약)') && x.text.includes('일 1') && x.text.includes('일 4')));
+  assert.ok(many.filter((x) => x.folded).length === 4);
+  assert.equal(S.entryStates(many, live).get('h1'), 'folded');
+  // 정리: 안 살아 있는 항목은 최근 keepOld 개만
+  const pruned = S.pruneEntries(many, live, 2);
+  assert.equal(pruned.length, 4, '살아 있는 2 + 지난 2');
+  assert.ok(pruned.some((x) => x.pin) === false);
+});
+
+test('읽음 해시: 이미지 태그·공백 차이는 바뀐 응답으로 치지 않는다', () => {
+  const a = { role: 'char', data: '쟈알디가 왔다.\n\n문장 둘.' };
+  const b = { role: 'char', data: '쟈알디가 왔다.\n\n<img=Jyaldi_smile>\n\n문장  둘.' };
+  const d = { role: 'char', data: '쟈알디가 갔다.' };
+  assert.equal(S.messageHash(a), S.messageHash(b));
+  assert.notEqual(S.messageHash(a), S.messageHash(d));
+});

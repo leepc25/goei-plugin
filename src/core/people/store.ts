@@ -93,8 +93,8 @@ export function liveness(chat: Chat): Liveness {
 }
 
 /** 항목·변경이 살아 있나: 기준 메시지가 있고, story 인용은 그 메시지에 아직 있어야 */
-export function isAlive(x: { anchor: string; quote?: string; src?: string; void?: boolean }, live: Liveness): boolean {
-  if (x.void) return false;
+export function isAlive(x: { anchor: string; quote?: string; src?: string; void?: boolean; folded?: boolean }, live: Liveness): boolean {
+  if (x.void || x.folded) return false;
   const pos = live.at.get(x.anchor);
   if (pos === undefined) return false;
   if (x.src === 'story' && x.quote) {
@@ -110,6 +110,40 @@ export function liveEntries(list: Entry[] | undefined, live: Liveness): Entry[] 
   const alive = new Set(list.filter((e) => isAlive(e, live)).map((e) => e.id));
   const replaced = new Set(list.filter((e) => alive.has(e.id) && e.replaces).map((e) => e.replaces!));
   return list.filter((e) => alive.has(e.id) && !replaced.has(e.id));
+}
+
+export type EntryState = 'alive' | 'replaced' | 'folded' | 'void' | 'gone';
+/** 항목이 왜 안 살아 있나 (화면용): 새 항목이 대체 / 요약에 합쳐짐 / 사용자가 취소 / 근거 메시지가 사라지거나 고쳐짐 */
+export function entryStates(list: Entry[] | undefined, live: Liveness): Map<string, EntryState> {
+  const out = new Map<string, EntryState>();
+  if (!list?.length) return out;
+  const alive = new Set(liveEntries(list, live).map((e) => e.id));
+  const replaced = new Set(list.filter((e) => isAlive(e, live) && e.replaces).map((e) => e.replaces!));
+  for (const e of list) out.set(e.id, alive.has(e.id) ? 'alive' : e.void ? 'void' : e.folded ? 'folded' : replaced.has(e.id) ? 'replaced' : 'gone');
+  return out;
+}
+
+/** 칸의 살아 있는 항목이 상한을 넘으면 오래된(비고정) 것들을 요약 항목 하나로 합친다. 합친 원본은 folded 표시 (되돌릴 수 없음) */
+export function foldSlotEntries(list: Entry[], cap: number, live: Liveness, who: string, slot: string): boolean {
+  const cur = liveEntries(list, live).filter((e) => !e.pin);
+  if (cur.length <= cap) return false;
+  const pos = (e: Entry) => live.at.get(e.anchor) ?? -1;
+  const old = [...cur].sort((a, b) => pos(a) - pos(b) || a.seq - b.seq).slice(0, cur.length - Math.floor(cap / 2));
+  if (old.length < 2) return false;
+  for (const e of old) e.folded = true;
+  const text = plain(`(요약) ${old.map((e) => e.text.replace(/^\(요약\)\s*/, '')).join(' / ')}`, 400);
+  const seq = list.filter((e) => e.anchor === '#0').length + 1;
+  list.push({ id: entryId(who, slot, '#0', seq, text), text, src: 'story', anchor: '#0', seq });
+  return true;
+}
+
+/** 안 살아 있는 항목(대체·접힘·취소·사라짐)은 최근 keepOld 개만 둔다. 살아 있는 것과 고정은 모두 둔다 */
+export function pruneEntries(list: Entry[], live: Liveness, keepOld: number): Entry[] {
+  const alive = new Set(liveEntries(list, live).map((e) => e.id));
+  const pos = (e: Entry) => live.at.get(e.anchor) ?? -1;
+  const old = list.filter((e) => !alive.has(e.id) && !e.pin).sort((a, b) => pos(b) - pos(a) || b.seq - a.seq);
+  const drop = new Set(old.slice(keepOld).map((e) => e.id));
+  return drop.size ? list.filter((e) => !drop.has(e.id)) : list;
 }
 
 /** 살아 있는 변경 기록 (기준 메시지 순서 → seq 순서) */
@@ -160,7 +194,8 @@ export const messageKey = (m: ChatMessage, index: number) => {
   const id = (m as { chatId?: unknown }).chatId;
   return typeof id === 'string' && id ? id : `#${index + 1}`;
 };
-export const messageHash = (m: ChatMessage) => hash(str(m.data));
+/** 읽음 판정용 내용 해시: 이미지 태그·공백 차이는 무시한다 (갱신기 뒤에 보조 모델이 <img=> 를 끼워도 「바뀐 응답」으로 다시 읽지 않게) */
+export const messageHash = (m: ChatMessage) => hash(messageText(str(m.data)).replace(/<img=.*?>/g, '').replace(/\s+/g, ' ').trim());
 
 /** 아직 읽지 않은(또는 내용이 바뀐) 봇 응답의 위치들 */
 export function unreadIndexes(chat: Chat, store: PeopleStore): number[] {

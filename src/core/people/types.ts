@@ -40,6 +40,8 @@ export interface Entry {
   void?: boolean;
   /** 이 항목이 대체한 이전 항목 id (대체 항목이 죽으면 이전 항목이 되살아난다) */
   replaces?: string;
+  /** 상한을 넘어 요약 항목에 합쳐짐 (더는 살아 있지 않음) */
+  folded?: boolean;
   /** 사건·장소·세력·물건 문서용 */
   date?: string;
   place?: string;

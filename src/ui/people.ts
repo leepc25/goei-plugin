@@ -6,12 +6,12 @@ import { tokens } from '../core/gnet';
 import { factionList } from '../core/factions';
 import { updateChat, type ChatContext } from '../host/risu';
 import { chatId, clearDiag, loadDiag, onPeopleStatus, peopleStatus, requestPeopleUpdate, sheetOf, type DiagRun } from '../host/people';
-import { anchorOf, changeId, isAlive, liveChanges, liveEntries, liveness, messageKey, peopleStore, plain, putChange, unreadIndexes, withPeople, type Liveness } from '../core/people/store';
+import { anchorOf, changeId, entryStates, isAlive, liveChanges, liveEntries, liveness, messageKey, peopleStore, plain, putChange, unreadIndexes, withPeople, type EntryState, type Liveness } from '../core/people/store';
 import { addressOf, affinityView } from '../core/people/affinity';
 import { FEATURES, PP, PP_DEFAULTS, peopleSettings, ppValue, type Feature } from '../core/people/settings';
 import { seedBaseFor, temperOf } from '../core/people/base';
 import { seedPerson } from '../core/people/seed';
-import { AFF_MAX, AFF_MIN, DOC_TYPES, REGISTERS, SLOTS, STAGES, stageOf, type Change, type Doc, type DocType, type Entry, type EntrySrc, type Person, type PeopleStore, type Register, type SlotId } from '../core/people/types';
+import { AFF_MAX, AFF_MIN, DOC_TYPES, REGISTERS, SLOT_CAP, SLOTS, STAGES, stageOf, type Change, type Doc, type DocType, type Entry, type EntrySrc, type Person, type PeopleStore, type Register, type SlotId } from '../core/people/types';
 import { ICONS } from './icons';
 import { keepOpen } from './panels';
 import { toast } from './toast';
@@ -471,18 +471,34 @@ function evidenceBox(ctx: ChatContext, live: Liveness, key: string, anchor: stri
 }
 
 const GONE = '<span class="pp-gone" title="근거 메시지가 지워지거나 고쳐져 더는 기록으로 치지 않아요">메시지가 사라져 빠짐</span>';
+const REPLACED = '<span class="pp-old" title="뒤에 온 항목이 이 항목을 대체했어요. 그 항목이 취소되거나 사라지면 이 항목이 되살아나요">새 항목으로 바뀜</span>';
+const FOLDED = '<span class="pp-old" title="칸 상한을 넘어 오래된 항목들을 요약 한 줄로 합쳤어요 (되돌릴 수 없음)">요약에 합쳐짐</span>';
+const stateMark = (st: EntryState) => (st === 'gone' ? GONE : st === 'replaced' ? REPLACED : st === 'folded' ? FOLDED : st === 'void' ? VOIDED : '');
+/** 칸의 항목 목록: 살아 있는 것은 펼쳐 두고, 지난 항목(대체·요약·취소·사라짐)은 접어 둔다 */
+function slotList(all: Entry[], live: Liveness, key: string, row: (e: Entry, st: EntryState) => string): string {
+  const states = entryStates(all, live);
+  const pos = (e: Entry) => live.at.get(e.anchor) ?? -1;
+  const sorted = [...all].sort((a, b) => pos(b) - pos(a) || b.seq - a.seq);
+  const cur = sorted.filter((e) => states.get(e.id) === 'alive');
+  const old = sorted.filter((e) => states.get(e.id) !== 'alive');
+  const main = cur.length ? `<ul class="pp-entries">${cur.map((e) => row(e, 'alive')).join('')}</ul>` : '<p class="ps-note">살아 있는 항목이 없어요.</p>';
+  const rest = old.length
+    ? `<details class="pp-oldbox" data-keep="${esc(key)}"${keepOpen(key)}><summary title="새 항목으로 바뀌었거나 요약에 합쳐졌거나 취소된 항목. 칸마다 최근 몇 개만 남겨요">지난 항목<b>${old.length}</b></summary><ul class="pp-entries">${old.map((e) => row(e, states.get(e.id)!)).join('')}</ul></details>`
+    : '';
+  return main + rest;
+}
 const VOIDED = '<span class="pp-gone" title="사용자가 취소한 항목. 본편에 넣지 않아요">취소됨</span>';
 const voidBtn = (action: string, value: string, voided: boolean) =>
   `<button class="gx-mini pp-mini${voided ? '' : ' danger'}" data-action="${action}" data-value="${esc(value)}" title="${voided ? '취소를 풀어 다시 기록으로 쳐요' : '이 항목을 기록에서 빼요 (본편에 넣지 않음). 다시 누르면 되살려요'}">${voided ? '되살리기' : '취소'}</button>`;
 
-function entryRow(ctx: ChatContext, who: string, slot: SlotId, e: Entry, live: Liveness, alive: boolean): string {
+function entryRow(ctx: ChatContext, who: string, slot: SlotId, e: Entry, live: Liveness, st: EntryState): string {
   const no = msgNo(e.anchor, live);
-  const dead = !alive && !e.void;
+  const dead = st !== 'alive' && !e.void;
   const key = `${who}|${slot}|${e.id}`;
   const meta = [no ? evidenceButton(key, no) : '', e.quote ? `<q title="근거 메시지에서 따온 인용">${esc(e.quote)}</q>` : '', e.target && e.target !== '@user' ? `<span title="이 항목의 대상 인물">→ ${esc(e.target)}</span>` : '', e.kind ? `<span title="의심의 종류">${esc(e.kind)}</span>` : ''].filter(Boolean).join('');
   return `<li class="pp-entry${dead ? ' dead' : ''}${e.void ? ' void' : ''}${e.pin ? ' pinned' : ''}">
     <div class="pp-entry-main">${srcIcon(e.src)}<span class="pp-text">${esc(e.text)}</span></div>
-    <div class="pp-entry-meta">${meta}${dead ? GONE : ''}${e.void ? VOIDED : ''}
+    <div class="pp-entry-meta">${meta}${stateMark(st)}
       <span class="pp-entry-btns"><button class="ph-tool sm${e.pin ? ' on' : ''}" data-action="pp-pin" data-value="${esc(key)}" title="${e.pin ? '고정 풀기' : '고정: 갱신기가 이 항목을 바꾸거나 지우지 못하게'}" aria-label="고정" aria-pressed="${!!e.pin}">${ICONS.pin}</button>${voidBtn('pp-void', key, !!e.void)}</span></div>
     ${evidenceBox(ctx, live, key, e.anchor, e.quote)}
   </li>`;
@@ -529,10 +545,8 @@ export function personView(ctx: ChatContext, name: string): string {
   const slots = SLOTS.map((s) => {
     const all = p.slots[s] ?? [];
     if (!all.length) return '';
-    const aliveIds = new Set(liveEntries(all, live).map((e) => e.id));
-    // 살아 있는 것 먼저, 그 뒤 사라진·취소된 것 (회색)
-    const sorted = [...all].sort((a, b) => Number(aliveIds.has(b.id)) - Number(aliveIds.has(a.id)));
-    return `<section class="pp-slot"><h4 title="${esc(SLOT_HELP[s])}">${esc(SLOT_LABEL[s])}<b title="살아 있는 항목 수">${aliveIds.size}</b></h4><ul class="pp-entries">${sorted.map((e) => entryRow(ctx, name, s, e, live, aliveIds.has(e.id))).join('')}</ul></section>`;
+    const aliveN = liveEntries(all, live).length;
+    return `<section class="pp-slot"><h4 title="${esc(SLOT_HELP[s])}">${esc(SLOT_LABEL[s])}<b title="살아 있는 항목 수 (칸 상한 ${SLOT_CAP[s]})">${aliveN}</b></h4>${slotList(all, live, `pp-old:${name}:${s}`, (e, st) => entryRow(ctx, name, s, e, live, st))}</section>`;
   }).join('');
   const mine = store.log.filter((c) => c.who === name).map((c) => ({ c, pos: live.at.get(c.anchor) ?? 1e9 })).sort((a, b) => b.pos - a.pos || b.c.seq - a.c.seq).map((x) => x.c);
   const log = `<details class="ps-adv-sub pp-log" data-keep="pp-log"${keepOpen('pp-log')}><summary title="호감 계기·호칭 변경·메모처럼 값을 바꾼 기록. 호감 숫자는 이 기록에서 매번 계산해요">변경 기록<b>${mine.length}</b></summary>${mine.length ? `<ul class="pp-entries">${mine.map((c) => changeRow(ctx, c, live)).join('')}</ul>` : '<p class="ps-note">아직 변경 기록이 없어요.</p>'}</details>`;
@@ -554,18 +568,17 @@ export function peopleDocsView(ctx: ChatContext): string {
   const live = liveness(ctx.chat);
   const byType = new Map<DocType, Doc[]>();
   for (const d of Object.values(store.docs)) (byType.get(d.type) ?? byType.set(d.type, []).get(d.type)!).push(d);
-  const docEntry = (docKey: string, e: Entry, alive: boolean) => {
+  const docEntry = (docKey: string, e: Entry, st: EntryState) => {
     const no = msgNo(e.anchor, live);
     const key = `doc|${docKey}|${e.id}`;
     const meta = [e.date ? `<span title="일시">${esc(e.date)}</span>` : '', e.place ? `<span title="장소">${esc(e.place)}</span>` : '', e.who?.length ? `<span title="관련 인물">${esc(e.who.join(', '))}</span>` : '', no ? evidenceButton(key, no) : '', e.quote ? `<q title="근거 메시지에서 따온 인용">${esc(e.quote)}</q>` : ''].filter(Boolean).join('');
-    return `<li class="pp-entry${!alive && !e.void ? ' dead' : ''}${e.void ? ' void' : ''}"><div class="pp-entry-main">${srcIcon(e.src)}<span class="pp-text">${esc(e.text)}</span></div><div class="pp-entry-meta">${meta}${!alive && !e.void ? GONE : ''}</div>${evidenceBox(ctx, live, key, e.anchor, e.quote)}</li>`;
+    return `<li class="pp-entry${st !== 'alive' && !e.void ? ' dead' : ''}${e.void ? ' void' : ''}"><div class="pp-entry-main">${srcIcon(e.src)}<span class="pp-text">${esc(e.text)}</span></div><div class="pp-entry-meta">${meta}${stateMark(st)}</div>${evidenceBox(ctx, live, key, e.anchor, e.quote)}</li>`;
   };
   const sections = DOC_TYPES.filter((t) => byType.has(t)).map((t) => {
     const docs = byType.get(t)!;
     const inner = docs.map((d) => {
-      const aliveIds = new Set(liveEntries(d.entries, live).map((e) => e.id));
-      const sorted = [...d.entries].sort((a, b) => Number(aliveIds.has(b.id)) - Number(aliveIds.has(a.id)));
-      return `<section class="pp-slot"><h4>${esc(d.key)}<b title="살아 있는 항목 수">${aliveIds.size}</b></h4><ul class="pp-entries">${sorted.map((e) => docEntry(d.key, e, aliveIds.has(e.id))).join('')}</ul></section>`;
+      const aliveN = liveEntries(d.entries, live).length;
+      return `<section class="pp-slot"><h4>${esc(d.key)}<b title="살아 있는 항목 수">${aliveN}</b></h4>${slotList(d.entries, live, `pp-old:doc:${d.type}:${d.key}`, (e, st) => docEntry(d.key, e, st))}</section>`;
     }).join('');
     return `<section class="nw-hsec pp-sec"><h3>${DOC_LABEL[t]}<b>${docs.length}</b></h3>${inner}</section>`;
   }).join('');

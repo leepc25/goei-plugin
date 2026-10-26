@@ -8,7 +8,7 @@ import { addressOf, affinityView } from './affinity';
 import { unknownTo } from './inject';
 import { seedPerson } from './seed';
 import { nameMatcher, scenePeople, entriesOf, type NameEntry } from './select';
-import { changeId, entryId, isAlive, liveChanges, liveEntries, liveness, markRead, messageKey, norm, plain, putChange, putDoc, putEntry, type Liveness } from './store';
+import { changeId, entryId, foldSlotEntries, isAlive, liveChanges, liveEntries, liveness, markRead, pruneEntries, messageKey, norm, plain, putChange, putDoc, putEntry, type Liveness } from './store';
 import type { Feature, PeopleSettings } from './settings';
 import { CUES, DOC_TYPES, REGISTERS, SLOT_CAP, SLOTS, type Change, type Cue, type DocType, type Entry, type PeopleStore, type Person, type Register, type SlotId } from './types';
 
@@ -695,8 +695,24 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
     }
   }
 
+  // 9. 접기·정리: 상한 없는 칸(지난 일·아는 것)은 넘치면 오래된 것을 요약 하나로, 안 살아 있는 항목은 칸마다 최근 몇 개만 둔다 (저장 크기)
+  tidyStore(store, live);
   markRead(store, chat, input.indexes);
   return report;
+}
+
+/** 안 살아 있는 항목을 칸마다 몇 개까지 둘지 (대체·접힘·취소·사라짐. 되살리기용) */
+export const OLD_KEEP = 6;
+export function tidyStore(store: PeopleStore, live: Liveness): void {
+  for (const p of Object.values(store.people)) {
+    for (const slot of SLOTS) {
+      const list = p.slots[slot];
+      if (!list?.length) continue;
+      foldSlotEntries(list, SLOT_CAP[slot], live, p.name, slot);
+      p.slots[slot] = pruneEntries(list, live, OLD_KEEP);
+    }
+  }
+  for (const d of Object.values(store.docs)) d.entries = pruneEntries(d.entries, live, OLD_KEEP);
 }
 
 /** 이 인물의 가장 최근 다음 턴 메모 (살아 있는 것) */
