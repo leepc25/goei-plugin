@@ -52,6 +52,7 @@ import { visitContextRules } from './core/visitPrompt';
 import { withPeopleBlock } from './core/people/request';
 import { peopleStore } from './core/people/store';
 import { peopleSettings } from './core/people/settings';
+import { identityText } from './core/people/identity';
 import { extraNames, temperOf } from './core/people/base';
 import { requestPeopleUpdate } from './host/people';
 import { bookText } from './core/refs';
@@ -87,8 +88,8 @@ async function onBeforeRequest<M extends PromptMessage>(messages: M[], type: str
       const add = ctx.map((c) => ({ role: 'system', content: c }) as M);
       messages = at < 0 ? [...messages, ...add] : [...messages.slice(0, at), ...add, ...messages.slice(at)];
     }
-    // 지난 응답의 상태창 줄은 지우고 마지막 한 줄만 직전 상태 블록으로 (core/statusctx.ts)
-    messages = withStatusBlock(messages);
+    // 지난 응답의 상태창 줄은 지우고 마지막 한 줄만 직전 상태 블록으로 (core/statusctx.ts). 신분 칸이 빠졌으면 아는 값을 채운다
+    messages = withStatusBlock(messages, await knownIdentity().catch(() => ''));
     // 장면 인물의 살아 있는 기록 (core/people). 절 단위 혼합이면 그 인물의 시트 원문은 빼고 기록으로 대신한다
     messages = await withPeople(messages).catch(() => messages);
   }
@@ -169,6 +170,13 @@ async function withPlayer<M extends PromptMessage>(messages: M[]): Promise<M[]> 
   const env = { vars: chat.scriptstate ?? {}, char: char.name, user: agent.name };
   const out = applyPlayer(messages, playerBlock(char.globalLore, agent, env), await readPersona(), userInfo().name, agent.name);
   return basicSettings(char.globalLore, chat.scriptstate).assetPlayer ? out : hidePlayerTag(out, [agent.english]);
+}
+
+/** 플러그인이 마지막으로 알아낸 유저 신분 (`조직/직급`). 없으면 빈 문자열 */
+async function knownIdentity(): Promise<string> {
+  const chat = (await risuai.getChatFromIndex(await risuai.getCurrentCharacterIndex(), await risuai.getCurrentChatIndex())) as Chat | null;
+  if (!chat || !peopleSettings(chat.scriptstate).on) return '';
+  return identityText(peopleStore(chat).identity);
 }
 
 /** 인물 기록 블록: 마지막 사용자 메시지 앞에 (core/people/request.ts). 채팅은 바꾸지 않는다 */

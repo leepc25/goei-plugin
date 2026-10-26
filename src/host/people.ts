@@ -13,6 +13,8 @@ import { nameMatcher } from '../core/people/select';
 import { allNames, basePerson, userAffinityBase, valuesOf } from '../core/people/base';
 import { promptFor } from '../core/people/prompt';
 import { messageText } from '../core/refs';
+import { findStatusTags } from '../core/world/status';
+import { parseIdentity } from '../core/people/identity';
 import type { PeopleStore } from '../core/people/types';
 
 // ── 진단 ──
@@ -118,6 +120,19 @@ export function seedAppearing(store: PeopleStore, chat: Chat, indexes: number[],
   return made;
 }
 
+/** 가장 최근 봇 응답의 상태창 신분 칸 */
+export function statusIdentity(chat: Chat): ReturnType<typeof parseIdentity> {
+  const list = Array.isArray(chat.message) ? chat.message : [];
+  for (let i = list.length - 1; i >= 0; i--) {
+    if (list[i].role !== 'char') continue;
+    const tags = findStatusTags(String(list[i].data ?? ''));
+    const t = tags.at(-1);
+    if (!t) continue;
+    return t.identity ? parseIdentity(t.identity, messageKey(list[i], i)) : null;
+  }
+  return null;
+}
+
 // ── 실행 ──
 
 let inflight: Promise<RunResult> | null = null;
@@ -167,10 +182,14 @@ async function runOnce(reason: string, o: { manual?: boolean }): Promise<RunResu
   if (!unread.length) return result;
   const sheet = sheetOf(ctx);
   const seeded = seedAppearing(store, ctx.chat, unread, sheet);
-  if (seeded.length) {
+  // 상태창 신분 칸 (가장 최근 응답) → 기록. 상태창이 늘 우선
+  const identity = statusIdentity(ctx.chat);
+  const idChanged = !!identity && (!store.identity || store.identity.faction !== identity.faction || store.identity.rank !== identity.rank || store.identity.from !== 'status');
+  if (seeded.length || idChanged) {
     await updateChat(ctx.charIndex, ctx.chatIndex, (cur) => {
       const s = peopleStore(cur);
       for (const n of seeded) if (!s.people[n]) s.people[n] = store.people[n];
+      if (identity && idChanged) s.identity = identity;
       return withPeople(cur, s);
     }).catch(() => null);
   }

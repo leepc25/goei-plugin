@@ -397,6 +397,14 @@ LORE_PATCHES = [
      "- The status line of the previous scene is provided in a `[Previous status]` block just before the latest user input. Continue from it: advance the time and update the other fields. Older responses do not carry their status lines.\n"
      "- Example (no current anomaly):\n[▣|2025.01.01|02:47 AM|☀️|4°C|서울 종로구 거리|없음|없음|없음]\n"
      "- Example (inside an anomaly with two companions):\n[▣|2025.01.01|10:15 PM|🌫️|9°C|명일 아파트 3층 복도|명일 아파트|쟈알디,에일린|투입]"),
+    # 상태창에 신분 칸 (2026-10-26 사용자 결정: 인물 기록이 유저 직급을 알게). 플러그인은 8칸·9칸 모두 읽고, 옛 플러그인은 9칸을 추측 경로로 읽어 신분만 버린다
+    ('🏷️Tag', '[▣|YYYY.MM.DD|HH:MM AM/PM|weather|temperature|location|anomaly|companions|deployed]\n',
+     '[▣|YYYY.MM.DD|HH:MM AM/PM|weather|temperature|location|anomaly|companions|deployed|identity]\n'),
+    ('🏷️Tag', "- The status line of the previous scene is provided in a `[Previous status]` block",
+     "- Identity = {{user}}'s current organization and rank in Korean as `조직/직급` (e.g. `관리국/신입`, `가짜 관리국/대리`, `백일몽/사원`, `프리랜서/5급`, `민간인/-`). Copy it unchanged every turn unless the story actually changes it (promotion, transfer, defection).\n"
+     "- The status line of the previous scene is provided in a `[Previous status]` block"),
+    ('🏷️Tag', "[▣|2025.01.01|02:47 AM|☀️|4°C|서울 종로구 거리|없음|없음|없음]", "[▣|2025.01.01|02:47 AM|☀️|4°C|서울 종로구 거리|없음|없음|없음|관리국/신입]"),
+    ('🏷️Tag', "[▣|2025.01.01|10:15 PM|🌫️|9°C|명일 아파트 3층 복도|명일 아파트|쟈알디,에일린|투입]", "[▣|2025.01.01|10:15 PM|🌫️|9°C|명일 아파트 3층 복도|명일 아파트|쟈알디,에일린|투입|관리국/요원]"),
     # 배치 칸 띄어쓰기 통일 (2026-10-21 점검)
     ('🏷️Tag', '- 배치 : Agent code(s) | External faction name | 없음\n', '- 배치: Agent code(s) | External faction name | 없음\n'),
     # 요원 상태 값만 한국어로 쓰게: 괄호 영어 풀이를 따로 줄로 (모델이 「휴게 (On-duty break)」를 그대로 베끼지 않게)
