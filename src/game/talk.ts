@@ -120,7 +120,11 @@ export function mountTalk(root: HTMLElement, api: GameVisit, field?: GameField) 
       if (!dead) msg.textContent = e instanceof Error ? e.message : String(e);
     }
   }
+  /** 이번 대화창에서 모델과 주고받은 횟수 (닫을 때 1번 이상이면 시계 +대화 분, 필드 세계 16-2) */
+  let exchanged = 0;
   function close() {
+    if (target && exchanged > 0) window.dispatchEvent(new CustomEvent('goei:talk-closed', { detail: { name: target, exchanged } }));
+    exchanged = 0;
     bar.removeAttribute('data-open');
     log.removeAttribute('data-open');
     input.blur();
@@ -161,6 +165,7 @@ export function mountTalk(root: HTMLElement, api: GameVisit, field?: GameField) 
     try {
       state = await api.send(agent.id, text, 'aux', nearby(agent.name));
       if (dead) return;
+      exchanged++;
       follow(agent, text);
       const turn = state.turns.filter((t) => t.agentId === agent.id).at(-1);
       say(agent.name, turn?.reply ?? '');

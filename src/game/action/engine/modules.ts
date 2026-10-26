@@ -32,6 +32,11 @@ import { createHqWorld } from '../../world/hq';
 import { DEFAULT_CLOCK } from '../../world/clock';
 import { hashSeed } from '../../world/rng';
 import { observerLines } from '../../world/observer';
+import { Lines, NPC_TYPE, type DialogueData, type LineCtx } from '../../world/lines';
+import { Chatter } from '../../world/speech';
+import dialogueData from '../../world/dialogue.json';
+import type { Actor, SimEvent } from '../../world/actors';
+import type { FactionView, PersonView } from '../../bridge';
 import { FieldClock } from '../../world/clock';
 import type { WorldSim } from '../../world/actors';
 import { linkNpcTalk } from './npcLink';
@@ -91,8 +96,23 @@ function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui
     ? b.visit.state().then((v) => { visitor = v.visitor; present = v.agents.filter((a) => a.room).map((a) => ({ name: a.name, room: a.room! })); }).catch(() => {})
     // 시연판(본편 연결 없음): 생태계를 볼 수 있게 요원 몇 명을 세운다
     : Promise.resolve().then(() => { present = [{ name: '잼트리', room: 'office' }, { name: '쟈알디', room: 'office' }, { name: '큐라스', room: 'lounge' }, { name: '고르고디오', room: 'lounge' }, { name: '데쥬레', room: 'infirmary' }]; })).then(() => { ready = true; });
-  // 필드 시각은 본편 상태줄 시각에서 시작한다 (docs/필드_세계_NPC_설계.md 16-3)
-  void b?.card?.().then((snap) => { if (fieldClock.sec === null && snap?.minute != null) fieldClock.sec = snap.minute * 60; }).catch(() => {});
+  // 필드 시각은 본편 상태줄 시각에서 시작한다 (docs/필드_세계_NPC_설계.md 16-3). 유저 소속·신분도 같이
+  let me: { faction: string; level: number | null } = { faction: 'A00', level: 1 };
+  void b?.card?.().then((snap) => {
+    if (fieldClock.sec === null && snap?.minute != null) fieldClock.sec = snap.minute * 60;
+    if (snap) me = { faction: snap.identity?.faction || snap.faction || 'A00', level: snap.identity?.level ?? null };
+  }).catch(() => {});
+  // 인물 기록(호감 단계·호칭)과 세력 평판: 대사 칸·몹 반응에 쓴다. 기록이 갱신되면 다시 읽는다
+  const peopleBy = new Map<string, PersonView>();
+  const factionBy = new Map<string, FactionView>();
+  const readPeople = () => {
+    void b?.people?.people().then((l) => { peopleBy.clear(); for (const p of l) peopleBy.set(p.name, p); }).catch(() => {});
+    void b?.people?.factions().then((l) => { factionBy.clear(); for (const f of l) factionBy.set(f.code, f); }).catch(() => {});
+  };
+  readPeople();
+  b?.people?.onChange(readPeople);
+  /** 이번 필드 방문 id (방문마다 호감·평판 상한을 따로 세게) */
+  const visitId = `v${Date.now().toString(36)}`;
   const ROOM_SCENE: Record<string, string> = { office: 'office', lounge: 'lounge', infirmary: 'clinic' };
   // 필드 세계 (src/game/world): 요원은 처음 선 방에서 서성이고 이웃 장면을 오간다, 거리·로비는 몹이 오간다.
   // 씨앗: 주소 ?seed=숫자 가 있으면 그것 (재현), 없으면 이번 입장마다 새로
@@ -100,13 +120,61 @@ function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui
   const seed = seedParam ? (Number(seedParam) >>> 0 || hashSeed(seedParam)) : (Date.now() >>> 0);
   let sim: WorldSim | null = null;
   let observing = false;
+  // 모델 대화 한 번(창을 열고 닫을 때까지) = 시계 +10분 (사용자 확정 2026-10-26)
+  if (typeof window !== 'undefined') window.addEventListener('goei:talk-closed', () => { if (fieldClock.sec !== null) fieldClock.sec += DEFAULT_CLOCK.talk * 60; });
   if (typeof window !== 'undefined') window.addEventListener('keydown', (e) => { if (e.key === 'F9' || e.key === '`') { observing = !observing; e.preventDefault(); } });
   const world = () => {
-    if (!sim && ready) sim = createHqWorld(hq.map(), seed, present.filter((p) => ROOM_SCENE[p.room]).map((p) => ({ name: p.name, scene: ROOM_SCENE[p.room] })), hasVisitClip);
+    if (!sim && ready) {
+      sim = createHqWorld(hq.map(), seed, present.filter((p) => ROOM_SCENE[p.room]).map((p) => ({ name: p.name, scene: ROOM_SCENE[p.room] })), hasVisitClip, { stance: (f) => factionBy.get(f)?.stage ?? null });
+      chatter = new Chatter(sim, new Lines(dialogueData as unknown as DialogueData, sim.rng), lineCtx);
+    }
     // 개발 도구·브라우저 시험: 세계를 들여다본다 (관찰 창과 같은 정보)
     if (sim) (globalThis as { __goeiWorld?: WorldSim }).__goeiWorld = sim;
     return sim;
   };
+  let chatter: Chatter | null = null;
+  /** 말하는 사람 기준 대사 칸: 플레이어 소속·직급, 적으로 보나 (호감 적대 구간·세력 적대·싸움 중) */
+  const lineCtx = (a: Actor): LineCtx => {
+    const hour = fieldClock.sec === null ? null : (fieldClock.sec / 3600) % 24;
+    const named = a.def.kind === 'named' ? peopleBy.get(a.def.name) : undefined;
+    const fac = a.def.kind === 'mob' ? sim?.mobFaction(a) ?? (dialogueData as unknown as DialogueData).npc[NPC_TYPE[a.def.archetype ?? a.def.name] ?? '']?.faction ?? null : named?.faction ?? null;
+    const enemy = a.act === 'argue' || a.plan === 'chase' || named?.affinity.cell === 'hostile' || (!!fac && factionBy.get(fac)?.stage === 'hostile');
+    return { hour, faction: me.faction, level: me.level, enemy };
+  };
+  // 필드 장부: 이름 인물에게 한 일은 그때그때, 몹은 장면마다 묶어서 (몹 개인 잡담·스쳐 지나감은 넘기지 않음, 13장)
+  const mobHits = new Map<string, { n: number; witness?: { faction: string; named: boolean } }>();
+  const flushMobs = (sceneId: string) => {
+    const m = mobHits.get(sceneId);
+    if (!m || !m.n) return;
+    mobHits.delete(sceneId);
+    const name = hq.map().scenes.find((s) => s.id === sceneId)?.name ?? sceneId;
+    void b?.field?.record({ kind: 'provoke', text: `${name}에서 사람 ${m.n}명을 때렸다`, scene: name, weight: m.n >= 3 ? 2 : 1, visit: visitId, ...(m.witness ? { witness: m.witness } : {}) }).catch(() => {});
+  };
+  /** 이 장면에서 이미 싸웠나 (싸움 = 장면당 한 번 +10분, 사용자 확정) */
+  let foughtHere = false;
+  const record = (evs: SimEvent[]) => {
+    for (const e of evs) {
+      if (e.kind !== 'hurt') continue;
+      if (!foughtHere) { foughtHere = true; if (fieldClock.sec !== null) fieldClock.sec += DEFAULT_CLOCK.fight * 60; }
+      const w = sim;
+      if (!w) return;
+      // 목격: 그 장면의 소속 있는 사람 (이름 인물이 보면 named)
+      const here = w.inScene(e.scene);
+      const namedWit = here.find((q) => q.def.kind === 'named' && q.def.name !== e.who && peopleBy.get(q.def.name)?.faction);
+      const mobWit = here.find((q) => w.mobFaction(q));
+      const witness = namedWit ? { faction: peopleBy.get(namedWit.def.name)!.faction, named: true } : mobWit ? { faction: w.mobFaction(mobWit)!, named: false } : undefined;
+      const sceneName = hq.map().scenes.find((s) => s.id === e.scene)?.name ?? e.scene;
+      if (e.named) {
+        void b?.field?.record({ kind: 'hurt', text: `${sceneName}에서 ${e.who}을(를) 때렸다`, scene: sceneName, who: [e.who], weight: 2, visit: visitId, ...(witness ? { witness } : {}) }).catch(() => {});
+      } else {
+        const m = mobHits.get(e.scene) ?? { n: 0 };
+        m.n++;
+        m.witness ??= witness;
+        mobHits.set(e.scene, m);
+      }
+    }
+  };
+  let flushT = 0;
   const clockView = () => { const c = new FieldClock(fieldClock.sec === null ? null : fieldClock.sec / 60); return c; };
   // 필드 행위자를 에일린 공격 표적으로 (전투 몸이 아니므로 가짜 몸을 건넨다. 보이는 장면만)
   let lifeScene = '';
@@ -120,7 +188,17 @@ function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui
     }));
   };
   const life: HubLife = {
-    tick: (dt, at) => { lifeScene = at.scene; world()?.step(dt, { ...at, hour: fieldClock.sec === null ? null : (fieldClock.sec / 3600) % 24 }); },
+    tick: (dt, at) => {
+      if (lifeScene && lifeScene !== at.scene) { flushMobs(lifeScene); foughtHere = false; }
+      lifeScene = at.scene;
+      const w = world();
+      if (!w) return;
+      w.step(dt, { ...at, hour: fieldClock.sec === null ? null : (fieldClock.sec / 3600) % 24 });
+      const evs = w.events.splice(0);
+      record(evs);
+      chatter?.step(dt, at.scene, at.x, evs);
+      if ((flushT += dt) > 20) { flushT = 0; flushMobs(at.scene); }
+    },
     lifeTime: () => sim?.time ?? 0,
     hit: (sceneId, boxes, dir) => world()?.hitBoxes(sceneId, boxes, dir).length ?? 0,
     actors: (sceneId) => (world()?.inScene(sceneId) ?? []).map((a) => ({ id: a.def.id, name: a.def.name, kind: a.def.kind, x: a.x, y: a.y, face: a.face, look: a.def.look, moving: a.act === 'walk', clip: a.clip, since: a.clipAt, icon: a.icon, say: a.say })),

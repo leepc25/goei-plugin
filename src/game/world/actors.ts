@@ -99,6 +99,10 @@ export interface SimOptions {
   posts?: Post[];
   /** 그 인물(그림 열쇠)에게 그 클립이 있나. 없으면 그 활동은 꺼진다 */
   has?: (look: string, clip: string) => boolean;
+  /** 장면의 소속 (거점 장면 = 그 조직 코드, 거리 = null). 경비·직원 몹의 소속이 된다 */
+  sceneFaction?: (scene: string) => string | null;
+  /** 세력 평판 구간 (인물 기록 factions()). 몹의 첫 반응을 정한다 (8-6장) */
+  stance?: (faction: string) => 'friendly' | 'favorable' | 'neutral' | 'wary' | 'hostile' | null;
 }
 
 const WALK = 150;
@@ -125,6 +129,16 @@ export class WorldSim {
     this.spawns = o.spawns ?? [];
     this.posts = o.posts ?? [];
     this.has = o.has ?? (() => false);
+    this.sceneFaction = o.sceneFaction ?? (() => null);
+    this.stance = o.stance ?? (() => null);
+  }
+  private sceneFaction: (scene: string) => string | null;
+  private stance: (faction: string) => 'friendly' | 'favorable' | 'neutral' | 'wary' | 'hostile' | null;
+  /** 몹의 소속: 경비·직원(근무형·staff·guard)은 장면 소속, 나머지는 없음 */
+  mobFaction(a: Actor): string | null {
+    if (a.def.kind !== 'mob') return null;
+    const role = ARCHETYPES[a.def.archetype ?? a.def.name]?.role;
+    return a.post || role === 'guard' || role === 'staff' ? this.sceneFaction(a.scene) : null;
   }
 
   // ── 바깥에서 부르는 것 ──
@@ -554,6 +568,29 @@ export class WorldSim {
     a.think -= dt;
     if (a.think > 0) return;
     a.think = range(this.rng, 0.8, 1.6);
+    // 세력 평판 구간: 그 소속 몹이 주인공을 보면 (8-6장 표)
+    const fac = this.mobFaction(a);
+    const p0 = this.player;
+    if (fac && p0 && p0.scene === a.scene && Math.abs(p0.x - a.x) < 520 && a.plan !== 'chase' && a.act !== 'argue') {
+      const st = this.stance(fac);
+      if (st === 'hostile') {
+        // 적대: 보자마자 막아선다 (실제 공격은 전투 AI)
+        a.run = 1.4;
+        a.post = undefined;
+        this.walkTo(a, { x: p0.x, y: p0.y || a.y }, '주인공을 막아섬', 'chase');
+        this.iconOn(a, '!', 2);
+        return;
+      }
+      if (st === 'wary' && a.act !== 'watch' && this.rng() < 0.3) {
+        a.act = 'watch';
+        a.doing = '주인공을 경계';
+        a.goal = null;
+        a.face = p0.x > a.x ? 1 : -1;
+        a.wait = 2.5;
+        this.iconOn(a, '?', 1.5);
+        return;
+      }
+    }
     if (a.post || a.plan === 'chase' || a.plan === 'steal' || a.plan === 'harass' || a.act === 'argue') return;
     // 소란: 겁 많은 개체는 도망, 호기심 많은 개체는 구경 (근무형·경찰 제외)
     const u = this.uproar.get(a.scene);

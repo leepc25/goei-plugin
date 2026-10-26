@@ -6,10 +6,10 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 const dir = await mkdtemp(join(tmpdir(), 'goei-fieldworld-'));
-const names = ['rng', 'clock', 'places', 'actors', 'observer', 'needs', 'mobs'];
+const names = ['rng', 'clock', 'places', 'actors', 'observer', 'needs', 'mobs', 'lines', 'speech'];
 await build({ entryPoints: names.map((n) => `src/game/world/${n}.ts`), outdir: dir, outbase: 'src', bundle: true, platform: 'node', format: 'esm', outExtension: { '.js': '.mjs' }, logLevel: 'silent' });
 const imp = (n) => import(pathToFileURL(join(dir, `game/world/${n}.mjs`)));
-const R = await imp('rng'), C = await imp('clock'), P = await imp('places'), A = await imp('actors'), O = await imp('observer'), N = await imp('needs'), M = await imp('mobs');
+const R = await imp('rng'), C = await imp('clock'), P = await imp('places'), A = await imp('actors'), O = await imp('observer'), N = await imp('needs'), M = await imp('mobs'), L = await imp('lines'), SP = await imp('speech');
 
 // 본부 지도 축소판: 거리 ─ 로비 ─(계단)─ 3층 복도 ─ 사무실·휴게실, 엘리베이터
 const scenes = [
@@ -257,4 +257,49 @@ test('주인공 공격이 몹에 닿으면: 쓰러지거나 휘청, 소란, 경�
   assert.ok(sim.uproarValue('jongno') > 0);
   assert.ok(sim.actors.some((a) => a.def.name === '경찰'));
   assert.ok(sim.events.some((e) => e.kind === 'hurt' && e.who === '행인'));
+});
+
+// ── 5단계: 대사 ──
+const dlg = {
+  version: 1,
+  characters: {
+    잼트리: { faction: 'A00', level: 2, address: { up: '부장님', peer: '동기', down: '후배', outsider: '손님' },
+      persona: { same: { up: { ally: ['{호칭}, 커피 드세요.'], enemy: ['{호칭}, 못 봐드려요.'] }, peer: { ally: ['동기 왔네.'], enemy: [] }, down: { ally: ['{호칭}이 왔구나.'], enemy: [] } }, B00: { ally: ['가짜 쪽 사람이네.'], enemy: ['{호칭}은 나가요.'] }, etc: { ally: ['어서 와요.'], enemy: [] } },
+      time: { morning: ['출근~'], day: ['점심 뭐 먹지'], evening: ['퇴근!'], night: ['야근이다'] }, situation: {}, eco: { work: ['서류 정리 중~'], chat: ['{상대} 씨, 그거 알아요?'], eat: [] } },
+  },
+  npc: { 시민: { faction: null, persona: { A00: { ally: ['수고하세요.'], enemy: ['저리 가요!'] }, etc: { ally: ['…'], enemy: [] } }, time: { day: ['날씨 좋다.'] }, situation: {}, eco: { victim: ['내 지갑!'], pass: ['바쁘다 바빠.'] } } },
+};
+
+test('대사: {호칭} 채우기와 조사 받침 맞추기', () => {
+  assert.equal(L.fillAddress('{호칭}이 왔구나', '후배'), '후배가 왔구나');
+  assert.equal(L.fillAddress('{호칭}이 왔구나', '손님'), '손님이 왔구나');
+  assert.equal(L.fillAddress('{호칭}은 나가요', '손님'), '손님은 나가요');
+  assert.equal(L.fillAddress('{호칭}를 믿어', '선배님'), '선배님을 믿어');
+  assert.equal(L.fillAddress('{호칭}으로 가요', '서울'), '서울로 가요');
+  assert.equal(L.fillAddress('{호칭}, 안녕', '동기'), '동기, 안녕');
+});
+
+test('대사: 같은 조직은 직급 비교 칸, 다른 조직은 소속 칸, 적이면 enemy', () => {
+  const lines = new L.Lines(dlg, () => 0.1);
+  const up = lines.bark('named', '잼트리', 'idle', { hour: 12, faction: 'A00', level: 3 });
+  assert.equal(up, '부장님, 커피 드세요.');
+  assert.equal(lines.bark('named', '잼트리', 'idle', { hour: 12, faction: 'A00', level: 1 }), '후배가 왔구나.');
+  assert.equal(lines.bark('named', '잼트리', 'idle', { hour: 12, faction: 'B00', level: null, enemy: true }), '손님은 나가요.');
+  assert.equal(lines.bark('named', '잼트리', 'idle', { hour: 12, faction: 'C00', level: null }), '어서 와요.', '표에 없는 소속은 etc');
+  assert.equal(lines.bark('named', '잼트리', 'work', { hour: 12, faction: 'A00', level: 2 }), '서류 정리 중~');
+  assert.equal(lines.bark('named', '잼트리', 'eat', { hour: 12, faction: 'A00', level: 2 }), null, '생태계 대사가 없으면 억지로 안 한다');
+  assert.equal(lines.bark('named', '잼트리', 'chat', { hour: 12, faction: 'A00', level: 2 }, { partner: '큐라스' }), '큐라스 씨, 그거 알아요?');
+  assert.equal(lines.bark('mob', '관광객', 'victim', { hour: 12, faction: 'A00', level: 1 }, { archetype: '관광객' }), '내 지갑!', '원형 → 대사 종류(시민)');
+  assert.equal(L.timeKey(7), 'morning');
+  assert.equal(L.timeKey(22), 'night');
+});
+
+test('대사 연출: 소매치기 사건이 나면 피해자가 말한다, 보이는 장면만', () => {
+  const sim = new A.WorldSim(graph(), R.mulberry32(3));
+  const v = sim.add({ id: 'v', name: '관광객', kind: 'mob', brain: 'transit', home: 'jongno', archetype: '관광객' }, { x: 900, y: 560 });
+  const ch = new SP.Chatter(sim, new L.Lines(dlg, sim.rng), () => ({ hour: 12, faction: 'A00', level: 1 }));
+  ch.step(1 / 30, 'office', 0, [{ kind: 'steal', scene: 'jongno', thief: '불량배', victim: '관광객', x: 900 }]);
+  assert.equal(v.say, undefined, '안 보이는 장면은 말 안 함');
+  ch.step(1 / 30, 'jongno', 800, [{ kind: 'steal', scene: 'jongno', thief: '불량배', victim: '관광객', x: 900 }]);
+  assert.equal(v.say, '내 지갑!');
 });
