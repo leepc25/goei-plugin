@@ -177,3 +177,27 @@
 10-26 16:19:07 57 후면 대기 보냄 north 4장 시작=등록 끝=지정 약 1회
 10-26 16:19:56 50 정면 대기 완료 4장 (53초)
 10-26 16:20:00 57 후면 대기 완료 4장 (53초)
+10-26 19:52:07 60 정면 앉기 보냄 south 8장 시작=지정 끝=없음 약 1회
+10-26 19:52:07 61 후면 앉기 보냄 north 8장 시작=지정 끝=없음 약 1회
+10-26 19:53:03 60 정면 앉기 완료 8장 (55초)
+10-26 19:53:16 61 후면 앉기 완료 8장 (68초)
+10-26 19:57:14 62 정면 앉아 수다 보냄 south 8장 시작=지정 끝=지정 약 1회
+10-26 19:57:20 65 오류: HTTP 422 {"detail":[{"type":"value_error","loc":["body"],"msg":"Value error, The frame count must be a multiple of 4 from 4 to 40 for PixMiniMax","input":{"character_id":"01df548c-79e6-44a0-8876-c2433ca5b057","mode":"pixminimax","action_description":"Seated facing the viewer, raise a paper cup with both hand
+10-26 19:57:21 64 정면 앉아 먹기 보냄 south 8장 시작=지정 끝=지정 약 1회
+10-26 19:57:21 70 후면 앉아 수다 보냄 north 8장 시작=지정 끝=지정 약 1회
+10-26 19:57:25 71 후면 앉아 먹기·마시기 보냄 north 8장 시작=지정 끝=지정 약 1회
+10-26 19:57:39 96 옆 앉기 보냄 west 8장 시작=등록 끝=없음 약 1회
+10-26 19:58:03 63 정면 앉아 타자 보냄 south 8장 시작=지정 끝=지정 약 1회
+10-26 19:58:14 66 정면 앉아 졸기 보냄 south 8장 시작=지정 끝=지정 약 1회
+10-26 19:58:21 69 후면 앉아 타자 보냄 north 8장 시작=지정 끝=지정 약 1회
+10-26 19:58:22 74 정면 서서 컵 준비 보냄 south 8장 시작=지정 끝=지정 약 1회
+10-26 19:58:22 73 정면 기대 쉬기 보냄 south 8장 시작=지정 끝=지정 약 1회
+10-26 19:58:23 75 눕기 보냄 west 8장 시작=등록 끝=없음 약 1회
+10-26 19:58:28 78 오류: HTTP 422 {"detail":[{"type":"value_error","loc":["body"],"msg":"Value error, The frame count must be a multiple of 4 from 4 to 40 for PixMiniMax","input":{"character_id":"01df548c-79e6-44a0-8876-c2433ca5b057","mode":"pixminimax","action_description":"Seated facing the viewer, hold the right forearm out forwa
+10-26 19:58:30 100 남 소변 (서서) 보냄 north 8장 시작=지정 끝=지정 약 1회
+10-26 19:58:34 101 하의 내리고 앉기 보냄 south 8장 시작=지정 끝=없음 약 1회
+10-26 19:58:36 104 오류: HTTP 422 {"detail":[{"type":"value_error","loc":["body"],"msg":"Value error, The frame count must be a multiple of 4 from 4 to 40 for PixMiniMax","input":{"character_id":"01df548c-79e6-44a0-8876-c2433ca5b057","mode":"pixminimax","action_description":"Standing with the back to the viewer (facing north), rub b
+10-26 19:58:37 138 오류: HTTP 422 {"detail":[{"type":"value_error","loc":["body"],"msg":"Value error, The frame count must be a multiple of 4 from 4 to 40 for PixMiniMax","input":{"character_id":"01df548c-79e6-44a0-8876-c2433ca5b057","mode":"pixminimax","action_description":"Standing facing the viewer, hold a stack of papers upright
+10-26 19:58:38 142 서서 커피 마시기 보냄 south 8장 시작=지정 끝=지정 약 1회
+10-26 19:58:40 160 오류: HTTP 422 {"detail":[{"type":"value_error","loc":["body"],"msg":"Value error, The frame count must be a multiple of 4 from 4 to 40 for PixMiniMax","input":{"character_id":"01df548c-79e6-44a0-8876-c2433ca5b057","mode":"pixminimax","action_description":"Standing facing the viewer, toss a small coin up a little 
+10-26 19:58:42 70 후면 앉아 수다 완료 8장 (80초)
