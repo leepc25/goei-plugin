@@ -26,6 +26,10 @@ export const PP_DEFAULTS: Record<string, string> = {
   newpeople: 'auto',
   twoturn: '0',
   prev_pairs: '1',
+  /** 기록 본문 언어 (ko / en). 이름·인용·호칭은 늘 원문 */
+  lang: 'ko',
+  /** 칸 상한 배율 (1·2·3). 기본 2 */
+  cap_scale: '2',
   per_cap: '2000',
   span_cap: '20000',
   rules: '',
@@ -51,6 +55,8 @@ export interface PeopleSettings {
   newPeople: 'auto' | 'confirm';
   twoTurn: boolean;
   prevPairs: number;
+  lang: 'ko' | 'en';
+  capScale: number;
   perCap: number;
   spanCap: number;
   rules: string;
@@ -84,6 +90,8 @@ export function peopleSettings(state: Record<string, unknown> | undefined): Peop
     newPeople: v('newpeople') === 'confirm' ? 'confirm' : 'auto',
     twoTurn: v('twoturn') !== '0',
     prevPairs: num('prev_pairs', 0, 3),
+    lang: v('lang') === 'en' ? 'en' : 'ko',
+    capScale: num('cap_scale', 1, 4),
     perCap: num('per_cap', 200, 3000),
     spanCap: num('span_cap', 3000, 40000),
     rules: v('rules').slice(0, 4000),

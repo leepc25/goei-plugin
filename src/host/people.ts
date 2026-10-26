@@ -8,6 +8,7 @@ import { loadContext, updateChat, type ChatContext } from './risu';
 import { isWaiting, onWaiting } from './waiting';
 import { peopleStore, withPeople, unreadIndexes, messageKey, messageHash as messageHashOf, liveness } from '../core/people/store';
 import { applyUpdate, assemblePrompt, buildUpdate, enabledSections, parseUpdate, planBatches, type ApplyReport, type UpdateInput } from '../core/people/updater';
+import { applyConsolidate, buildConsolidate, parseConsolidate, type ConsolidateReport } from '../core/people/consolidate';
 import { peopleSettings, type PeopleSettings } from '../core/people/settings';
 import { seedPerson } from '../core/people/seed';
 import { nameMatcher } from '../core/people/select';
@@ -35,6 +36,8 @@ export interface DiagRun {
   stage?: 'build' | 'model' | 'parse' | 'save' | 'skip';
   error?: string;
   report?: ApplyReport;
+  /** 「정리」 결과 (reason 'consolidate') */
+  tidy?: ConsolidateReport;
   system?: string;
   data?: string;
   raw?: string;
@@ -228,7 +231,7 @@ async function runOnce(reason: string, o: { manual?: boolean }): Promise<RunResu
         break;
       }
       const curStore = peopleStore(fresh.chat);
-      const system = assemblePrompt(promptFor(settings), enabledSections(settings), settings.rules);
+      const system = assemblePrompt(promptFor(settings), enabledSections(settings), settings.rules, settings.lang);
       const input = buildUpdate(fresh.chat, curStore, batches[b], { settings, system, values: Object.fromEntries(input0Names(curStore).map((n) => [n, valuesOf(n)])), names: allNames(), exclude });
       if (!input.people.length) {
         // 장면 인물이 없으면 모델을 부르지 않고 읽음 표시만
@@ -303,6 +306,57 @@ async function runOnce(reason: string, o: { manual?: boolean }): Promise<RunResu
 }
 
 const input0Names = (s: PeopleStore) => Object.keys(s.people);
+
+/** 인물 기록 「정리」: 보조 모델이 이 인물의 살아 있는 항목을 더 적은 항목으로 다시 쓴다 (사용자가 눌렀을 때만, 1회 호출) */
+export async function consolidatePerson(name: string): Promise<{ ok: boolean; message: string; report?: ConsolidateReport }> {
+  if (inflight) return { ok: false, message: '갱신이 돌고 있어요. 끝난 뒤 다시 눌러 주세요.' };
+  const ctx = await loadContext().catch(() => null);
+  if (!ctx) return { ok: false, message: '채팅을 읽지 못했어요.' };
+  const settings = peopleSettings(ctx.chat.scriptstate);
+  const store = peopleStore(ctx.chat);
+  const input = buildConsolidate(store, ctx.chat, name, settings);
+  if (!input) return { ok: false, message: '정리할 항목이 없어요.' };
+  const id = chatId(ctx);
+  const t0 = Date.now();
+  const diag: DiagRun = { at: new Date().toISOString(), chat: id, reason: 'consolidate', model: settings.model, people: [name], indexes: [], sizes: { system: input.system.length, data: 0, span: 0 }, outChars: 0, ms: 0, ok: false };
+  setStatus({ busy: true, label: `${name} 기록 정리 중…` });
+  try {
+    const dataText = JSON.stringify(input.data);
+    diag.sizes.data = dataText.length;
+    if (settings.keepRaw) (diag.system = input.system), (diag.data = dataText);
+    const messages: LlmMessage[] = [
+      { role: 'system', content: input.system },
+      { role: 'user', content: `Record to tidy:\n${dataText}\n\nReturn the JSON object.` },
+    ];
+    const { raw, value } = await generate(messages, settings.model, parseConsolidate, { retries: 1, retryModel: 'same', state: ctx.chat.scriptstate });
+    diag.raw = raw;
+    diag.outChars = raw.length;
+    await waitNotBusy();
+    const saved = await updateChat(ctx.charIndex, ctx.chatIndex, (cur) => {
+      if (chatId({ ...ctx, chat: cur }) !== id) return null;
+      const s = peopleStore(cur);
+      diag.tidy = applyConsolidate(s, name, input, value, liveness(cur), settings);
+      return withPeople(cur, s);
+    });
+    if (!saved) {
+      diag.stage = 'save';
+      diag.error = '저장 직전에 채팅이 달라져 버림';
+      return { ok: false, message: diag.error };
+    }
+    diag.ok = true;
+    const r = diag.tidy!;
+    const msg = r.slots ? `정리: ${r.slots}칸, 항목 ${r.before} → ${r.after}${r.dropped.length ? ` (${r.dropped.length}칸은 결과가 맞지 않아 그대로)` : ''}` : `바뀐 칸이 없어요${r.dropped.length ? ` (${r.dropped[0].reason})` : ''}`;
+    return { ok: true, message: msg, report: r };
+  } catch (error) {
+    diag.stage = error instanceof LlmError ? 'model' : diag.raw ? 'parse' : 'build';
+    diag.error = error instanceof Error ? error.message : String(error);
+    return { ok: false, message: `정리 실패: ${diag.error}` };
+  } finally {
+    diag.ms = Date.now() - t0;
+    await pushDiag(diag, settings.keepRaw);
+    setStatus({ busy: false, label: '' });
+  }
+}
 
 // ── 연출형 Director (본편 앞) ──
 

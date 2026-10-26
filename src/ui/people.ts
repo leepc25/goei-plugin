@@ -5,7 +5,7 @@ import { messageText } from '../core/refs';
 import { tokens } from '../core/gnet';
 import { factionList } from '../core/factions';
 import { updateChat, type ChatContext } from '../host/risu';
-import { chatId, clearDiag, loadDiag, onPeopleStatus, peopleStatus, requestPeopleUpdate, sheetOf, type DiagRun } from '../host/people';
+import { chatId, clearDiag, consolidatePerson, loadDiag, onPeopleStatus, peopleStatus, requestPeopleUpdate, sheetOf, type DiagRun } from '../host/people';
 import { anchorOf, changeId, entryStates, isAlive, liveChanges, liveEntries, liveness, messageKey, peopleStore, plain, putChange, unreadIndexes, withPeople, type EntryState, type Liveness } from '../core/people/store';
 import { addressOf, affinityView } from '../core/people/affinity';
 import { FEATURES, PP, PP_DEFAULTS, peopleSettings, ppValue, type Feature } from '../core/people/settings';
@@ -309,6 +309,8 @@ export function peopleSettingsPane(ctx: ChatContext, canChat = true): string {
     row('갱신 시점', seg('when', s.when, [['turn', '매 턴'], ['manual', '수동']]), '수동이면 인물 화면의 「지금 갱신」을 눌렀을 때만 읽어요.'),
     row('갱신 모델', seg('model', s.model, [['aux', '보조'], ['main', '메인']])),
     row('지침', seg('prompt', s.prompt, [['detailed', '자세히'], ['compact', '간결']]), '자세히 = 리수폿 원문 규칙+설명. 간결 = 같은 규칙·설명 축약, 토큰 약 1/3.'),
+    row('기록 언어', seg('lang', s.lang, [['ko', '한국어'], ['en', '영어']]), '기록 본문(항목·이유·메모)을 쓰는 언어. 이름·인용·호칭은 늘 원문. 영어는 같은 내용이면 토큰이 절반쯤이고, 위키 화면에도 영어로 보여요.'),
+    row('칸 상한 배율', seg('cap_scale', String(s.capScale), [['1', '×1'], ['2', '×2'], ['3', '×3']]), '칸마다 둘 수 있는 항목 수의 배율 (×1: 기본정보 6·성격 8·상태 6·관계 8·말투 4·행동 8·아는 것 10·목표 8·지난 일 12·장면 3·의심 6). 넘치면 오래된 항목을 요약 한 줄로 접어요. 인물 화면의 「정리」로 보조 모델이 더 촘촘히 합칠 수 있어요.'),
     row('본편에 넣기', seg('inject', s.inject, [['split', '절 단위 혼합'], ['append', '시트 전체+기록'], ['record', '기록만'], ['off', '안 넣음']]), '절 단위 혼합: 시트의 Identity·Character 절은 기록으로 대신하고 나머지 절은 원문 그대로.'),
     row('Director', seg('director', s.director, [['off', '끔'], ['facts', '사실형(뒤)'], ['scene', '연출형(앞)']]), '사실형은 갱신기에 얹어 다음 턴 메모를 남기고, 연출형은 본편 요청 앞에 짧은 지시를 한 번 더 만들어요.'),
     row('호감 변화 속도', seg('speed', String(s.speed), [['0.5', '0.5'], ['1', '1'], ['1.5', '1.5'], ['2', '2']])),
@@ -550,7 +552,8 @@ export function personView(ctx: ChatContext, name: string): string {
   }).join('');
   const mine = store.log.filter((c) => c.who === name).map((c) => ({ c, pos: live.at.get(c.anchor) ?? 1e9 })).sort((a, b) => b.pos - a.pos || b.c.seq - a.c.seq).map((x) => x.c);
   const log = `<details class="ps-adv-sub pp-log" data-keep="pp-log"${keepOpen('pp-log')}><summary title="호감 계기·호칭 변경·메모처럼 값을 바꾼 기록. 호감 숫자는 이 기록에서 매번 계산해요">변경 기록<b>${mine.length}</b></summary>${mine.length ? `<ul class="pp-entries">${mine.map((c) => changeRow(ctx, c, live)).join('')}</ul>` : '<p class="ps-note">아직 변경 기록이 없어요.</p>'}</details>`;
-  return `<div class="ph-room nw-pane pp-pane">${head(name, sub, `<button class="ph-tool" data-action="pp-reread" data-value="${esc(name)}" title="이 인물 다시 읽기 (다음 판)" aria-label="이 인물 다시 읽기">${ICONS.refresh}</button>`)}
+  const tidyBtn = `<button class="gx-mini" data-action="pp-tidy" data-value="${esc(name)}" title="보조 모델이 이 인물의 항목들을 더 적은 수로 합쳐 다시 써요 (보조 호출 1회). 고정 항목은 손대지 않아요" ${peopleUi.busy || peopleStatus().busy ? 'disabled' : ''}>${ICONS.refresh}정리</button>`;
+  return `<div class="ph-room nw-pane pp-pane">${head(name, sub, tidyBtn)}
     <article class="nw-doc pp-doc">
       ${peopleUi.notice ? `<div class="gx-err" role="alert">${esc(peopleUi.notice)}</div>` : ''}
       <section class="pp-card"><h4 title="주인공에 대한 호감. 계기가 쌓여 8단계로 바뀌고, 본편 요청에 단계별 행동 방향으로 들어가요">호감</h4>${affinityBar(aff.value)}${affEdit}</section>
@@ -849,10 +852,24 @@ export async function handlePeople(action: string, value: string | undefined, ct
       env.render();
       return true;
     }
-    case 'pp-reread':
-      peopleUi.info = '「이 인물 다시 읽기」는 다음 판에서 들어와요. 지금은 「지금 갱신」으로 안 읽은 응답을 읽을 수 있어요.';
+    case 'pp-tidy': {
+      // 인물 기록 정리: 보조 모델 1회. 리수폿 「문서 정리」
+      if (!v || peopleUi.busy || peopleStatus().busy) return true;
+      peopleUi.busy = true;
+      peopleUi.notice = '';
       env.render();
+      try {
+        const r = await consolidatePerson(v);
+        if (r.ok) peopleUi.info = r.message;
+        else peopleUi.notice = r.message;
+      } catch (error) {
+        peopleUi.notice = error instanceof Error ? error.message : String(error);
+      }
+      peopleUi.busy = false;
+      peopleUi.diag = null;
+      await env.refresh();
       return true;
+    }
     case 'pp-jump':
       // 「근거 #n」: 그 항목 아래 작은 상자에 인용과 메시지 앞부분을 펼친다 (다시 누르면 닫힘). 채팅 화면은 iframe 밖이라 이동은 못 한다
       if (peopleUi.evOpen.has(v)) peopleUi.evOpen.delete(v);

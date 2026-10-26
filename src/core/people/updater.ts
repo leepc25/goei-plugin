@@ -227,8 +227,15 @@ export function buildUpdate(chat: Chat, store: PeopleStore, batch: number[], o: 
 // ── 지침 조립 ──
 
 /** `<<SECTION:x>> … <<END:x>>` 표식: 꺼진 기능의 절은 빼고 표식은 지운다 */
-export function assemblePrompt(text: string, enabled: Set<string>, userRules = ''): string {
-  const rules = userRules.trim();
+/** 기록 본문을 영어로 쓰게 하는 규칙 (설정 lang=en). 이름·인용·호칭·조직·직급은 원문 그대로 */
+export const LANG_EN_RULE = [
+  '## Record language',
+  'Write every free-text field you produce in English even where this document says Korean: entry `text`, cue `reason`, new person `identity` and `speech`, doc `text`, suspicion text, and `next_note`.',
+  'Keep exactly as the Korean source writes them: `name`, `aliases`, `key`, `target`, address terms and register words (존댓말/반말/혼합/하게체/하오체), `faction`, `rank`, the Korean prefixes [시작]/[단서]/[반응]/[해소] and 첫인상/현재 평가 labels, and every `quote`.',
+].join('\n');
+
+export function assemblePrompt(text: string, enabled: Set<string>, userRules = '', lang: 'ko' | 'en' = 'ko'): string {
+  const rules = (lang === 'en' ? `${LANG_EN_RULE}\n\n${userRules.trim()}` : userRules).trim();
   const on = new Set(enabled);
   if (rules && text.includes('<<USER_RULES>>')) on.add('user_rules');
   let out = text.replace(/<<SECTION:([a-z_]+)>>([\s\S]*?)<<END:\1>>/g, (_m, name: string, body: string) => (on.has(name) ? body : ''));
@@ -507,11 +514,7 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
         drop('entry', e, '같은 뜻의 항목이 이미 있음', who);
         continue;
       }
-      if (cur.length >= SLOT_CAP[slot] && !['history', 'knowledge'].includes(slot)) {
-        // 상한: 가장 오래된 비고정 항목을 대체
-        const old = cur.find((x) => !x.pin);
-        if (old) replaces = old.id;
-      }
+      // 상한은 끝(tidyStore)에서 요약으로 접는다. 여기서 버리지 않는다
     } else {
       drop('entry', e, '없는 연산', who);
       continue;
@@ -666,7 +669,7 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
         continue;
       }
       // close 는 그 대상·종류의 살아 있는 항목을 모두 대체 (하나로 접음)
-      const replaces = s.op === 'close' ? cur.at(-1)?.id : cur.length >= SLOT_CAP.suspicion ? cur.find((x) => !x.pin)?.id : undefined;
+      const replaces = s.op === 'close' ? cur.at(-1)?.id : cur.length >= slotCap('suspicion', ctx.settings.capScale) ? cur.find((x) => !x.pin)?.id : undefined;
       if (putEntry(store, who, 'suspicion', { id: entryId(who, 'suspicion', ev.anchor, seq, prefix + text), text: prefix + text, src: 'story', anchor: ev.anchor, seq, quote: s.quote, target, kind: s.kind, ...(replaces ? { replaces } : {}) })) report.applied.suspicion++;
     }
   }
@@ -696,19 +699,23 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
   }
 
   // 9. 접기·정리: 상한 없는 칸(지난 일·아는 것)은 넘치면 오래된 것을 요약 하나로, 안 살아 있는 항목은 칸마다 최근 몇 개만 둔다 (저장 크기)
-  tidyStore(store, live);
+  tidyStore(store, live, ctx.settings.capScale);
   markRead(store, chat, input.indexes);
   return report;
 }
 
+/** 칸 상한 × 설정 배율 */
+export const slotCap = (slot: SlotId, scale = 1) => Math.max(2, Math.round(SLOT_CAP[slot] * (scale || 1)));
+
 /** 안 살아 있는 항목을 칸마다 몇 개까지 둘지 (대체·접힘·취소·사라짐. 되살리기용) */
 export const OLD_KEEP = 6;
-export function tidyStore(store: PeopleStore, live: Liveness): void {
+/** 상한을 넘은 칸은 오래된 항목들을 요약 한 줄로 접고(버리지 않음), 안 살아 있는 항목은 최근 몇 개만 둔다 */
+export function tidyStore(store: PeopleStore, live: Liveness, capScale = 1): void {
   for (const p of Object.values(store.people)) {
     for (const slot of SLOTS) {
       const list = p.slots[slot];
       if (!list?.length) continue;
-      foldSlotEntries(list, SLOT_CAP[slot], live, p.name, slot);
+      foldSlotEntries(list, slotCap(slot, capScale), live, p.name, slot);
       p.slots[slot] = pruneEntries(list, live, OLD_KEEP);
     }
   }
