@@ -2,6 +2,7 @@
 // 쓰기는 사용자가 누를 때만: 출동 보고서 글(채팅에 「전송 대기」로 놓음)과, 켜면 쓰는 「관리국 훈련 기록」 로어북 한 칸.
 // 게임 결과로 본편 요원 상태(부상 등)를 바꾸지 않는다 (22.3).
 import type { CardAgent, CardEvent, CardSnapshot, GameReport } from '../game/bridge';
+import { peopleStore } from './people/store';
 import { playerId } from './player';
 import type { Chat, LoreEntry } from './types';
 import { activeEvents, agentLocked, parseCatalog, readDirectory, readWorld } from './world';
@@ -49,6 +50,7 @@ export function cardSnapshot(char: { name?: string; globalLore?: LoreEntry[] }, 
     situation: e.report,
   }));
   const place = (r: { lore: string; label: string; english: string }) => ({ lore: r.lore, label: r.label, english: r.english });
+  const identity = peopleStore(chat).identity;
   return {
     card: String(char.name ?? ''),
     faction: String(chat.scriptstate?.['$st_faction'] ?? ''),
@@ -58,6 +60,7 @@ export function cardSnapshot(char: { name?: string; globalLore?: LoreEntry[] }, 
     sites: dir.sites.map(place),
     events,
     minute: world.minute,
+    ...(identity ? { identity: { faction: identity.faction, rank: identity.rank, level: identity.level } } : {}),
   };
 }
 

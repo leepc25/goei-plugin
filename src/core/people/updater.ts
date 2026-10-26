@@ -95,6 +95,7 @@ export function personPayload(p: Person, live: Liveness, cap: number, changes: C
     name: p.name,
     aliases: p.aliases,
     ...(p.minor ? { minor: true } : {}),
+    express: p.express,
     affinity_now: `${aff.stage.label}(${aff.stage.max})`,
     address_now: addr,
     entries,
@@ -109,6 +110,29 @@ export interface BuildOpts {
   /** 인물별 가치관(relations-base values) */
   values: Record<string, string>;
   names: NameEntry[];
+}
+
+const SUSP_WEIGHT: Record<string, number> = { 약: 10, 중: 25, 강: 40, '-약': -10, '-중': -25, '-강': -40 };
+/** 의심 사례 요약: 같은 대상·종류의 살아 있는 항목을 한 사례로. score 는 코드가 단서 무게로 계산 */
+export function suspicionCases(p: Person, live: Liveness) {
+  const list = liveEntries(p.slots.suspicion, live);
+  const by = new Map<string, typeof list>();
+  for (const e of list) (by.get(`${e.target}|${e.kind}`) ?? by.set(`${e.target}|${e.kind}`, []).get(`${e.target}|${e.kind}`)!).push(e);
+  return [...by.entries()].map(([k, es]) => {
+    const [target, kind] = k.split('|');
+    let score = 0;
+    let stage = '';
+    let closed = false;
+    for (const e of es) {
+      const m = /^\[(시작|단서|반응|해소)(?:·([^\]]+))?\]/.exec(e.text);
+      if (!m) continue;
+      if (m[1] === '시작') (score += 10), (closed = false);
+      else if (m[1] === '단서') score += SUSP_WEIGHT[m[2] ?? ''] ?? 10;
+      else if (m[1] === '반응') stage = m[2] ?? stage;
+      else if (m[1] === '해소') closed = true;
+    }
+    return { who: p.name, target, kind, status: closed ? 'closed' : 'open', score: Math.max(0, Math.min(100, score)), stage, text: es.at(-1)?.text ?? '' };
+  });
 }
 
 /** 이번 묶음의 요청 자료 */
@@ -183,6 +207,12 @@ export function buildUpdate(chat: Chat, store: PeopleStore, batch: number[], o: 
       return { ...personPayload(p, live, o.settings.perCap, changes, wantNote || o.settings.features.has('perception') ? unknownTo(p, store, live) : undefined), values: o.values[n] ?? '' };
     }),
     known_names: Object.keys(store.people),
+    docs_now: DOC_TYPES.some((t) => o.settings.features.has(`docs_${t}` as Feature))
+      ? Object.values(store.docs).filter((d) => o.settings.features.has(`docs_${d.type}` as Feature)).flatMap((d) => liveEntries(d.entries, live).map((e) => ({ type: d.type, key: d.key, id: e.id, text: e.text, ...(e.date ? { date: e.date } : {}), ...(e.place ? { place: e.place } : {}), ...(e.who?.length ? { who: e.who } : {}) })))
+      : undefined,
+    suspicion_now: o.settings.features.has('suspicion') ? chosen.flatMap((n) => suspicionCases(store.people[n], live)) : undefined,
+    npc_relations: o.settings.features.has('npc_emotion') ? true : undefined,
+    next_note: wantNote ? true : undefined,
     already_recorded: already,
     signals,
     span: span.map(({ index: _i, ...rest }) => rest),
@@ -196,9 +226,12 @@ export function buildUpdate(chat: Chat, store: PeopleStore, batch: number[], o: 
 
 /** `<<SECTION:x>> … <<END:x>>` 표식: 꺼진 기능의 절은 빼고 표식은 지운다 */
 export function assemblePrompt(text: string, enabled: Set<string>, userRules = ''): string {
-  let out = text.replace(/<<SECTION:([a-z_]+)>>([\s\S]*?)<<END:\1>>/g, (_m, name: string, body: string) => (enabled.has(name) ? body : ''));
-  out = out.replace(/<<(?:SECTION|END):[a-z_]+>>/g, '').replace(/\n{3,}/g, '\n\n').trim();
-  if (userRules.trim()) out += `\n\n## User rules (appended by the user; they cannot change the output contract)\n${userRules.trim()}`;
+  const rules = userRules.trim();
+  const on = new Set(enabled);
+  if (rules && text.includes('<<USER_RULES>>')) on.add('user_rules');
+  let out = text.replace(/<<SECTION:([a-z_]+)>>([\s\S]*?)<<END:\1>>/g, (_m, name: string, body: string) => (on.has(name) ? body : ''));
+  out = out.replace('<<USER_RULES>>', rules).replace(/<<(?:SECTION|END):[a-z_]+>>/g, '').replace(/\n{3,}/g, '\n\n').trim();
+  if (rules && !text.includes('<<USER_RULES>>')) out += `\n\n## User rules (appended by the user; they cannot change the output contract)\n${rules}`;
   return out;
 }
 
@@ -213,13 +246,14 @@ export function enabledSections(s: PeopleSettings): Set<string> {
 // ── 응답 읽기 ──
 
 export interface UpdateResult {
+  /** 의심 항목의 선택 필드: weight(단서 무게), stage(반응 단계), result(해소 종류)는 코드가 본문 앞에 붙인다 */
   entries?: { who: string; slot: string; op: string; replace?: string | null; text?: string | null; target?: string | null; m: string; quote: string }[];
   cues?: { who: string; cue: string; m: string; quote: string; reason?: string }[];
   address?: { who: string; toUser: string; register: string; m: string; quote: string }[];
   identity?: { faction?: string | null; rank?: string | null } | null;
   new_people?: { name: string; aliases?: string[]; m: string; quote: string; identity?: string | null; speech?: string | null }[];
   docs?: { type: string; key: string; op: string; replace?: string | null; text?: string | null; m: string; quote: string; date?: string | null; place?: string | null; who?: string[] }[];
-  suspicion?: { who: string; target: string; kind: string; op: string; text: string; m: string; quote: string }[];
+  suspicion?: { who: string; target: string; kind: string; op: string; text: string; m: string; quote: string; weight?: string | null; stage?: string | null; result?: string | null }[];
   next_note?: { who: string; now?: string; must_not_reveal?: string[] }[];
 }
 
@@ -603,7 +637,8 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
       }
       const cur = liveEntries(store.people[who].slots.suspicion, live).filter((x) => x.target === target && x.kind === s.kind);
       const seq = nextSeq(ev.anchor);
-      const prefix = s.op === 'open' ? '[시작] ' : s.op === 'clue' ? '[단서] ' : s.op === 'respond' ? '[반응] ' : s.op === 'close' ? '[해소] ' : '';
+      const tag = s.op === 'clue' && s.weight && s.weight in SUSP_WEIGHT ? `·${s.weight}` : s.op === 'respond' && s.stage && /^(지켜봄|시험|대면|보고)$/.test(s.stage) ? `·${s.stage}` : s.op === 'close' && s.result && /^(확인|해소|묻음)$/.test(s.result) ? `·${s.result}` : '';
+      const prefix = s.op === 'open' ? '[시작] ' : s.op === 'clue' ? `[단서${tag}] ` : s.op === 'respond' ? `[반응${tag}] ` : s.op === 'close' ? `[해소${tag}] ` : '';
       if (!prefix) {
         drop('suspicion', s, '없는 연산', who);
         continue;
