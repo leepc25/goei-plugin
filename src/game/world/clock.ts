@@ -10,8 +10,11 @@ export interface ClockRules {
   talk: number;
   /** 한 장면에서 싸움이 일어나면 그 장면에서 한 번 */
   fight: number;
+  /** 시간 보내기 선택지: 짧게·길게 (분) */
+  waitShort: number;
+  waitLong: number;
 }
-export const DEFAULT_CLOCK: ClockRules = { scene: 10, region: 30, talk: 10, fight: 10 };
+export const DEFAULT_CLOCK: ClockRules = { scene: 10, region: 30, talk: 10, fight: 10, waitShort: 30, waitLong: 60 };
 
 export type ClockEvent =
   | { kind: 'scene'; to: string }
@@ -31,6 +34,8 @@ export function clockRules(raw?: Partial<Record<keyof ClockRules, unknown>>): Cl
     region: clampMin(raw?.region, DEFAULT_CLOCK.region),
     talk: clampMin(raw?.talk, DEFAULT_CLOCK.talk),
     fight: clampMin(raw?.fight, DEFAULT_CLOCK.fight),
+    waitShort: clampMin(raw?.waitShort, DEFAULT_CLOCK.waitShort),
+    waitLong: clampMin(raw?.waitLong, DEFAULT_CLOCK.waitLong),
   };
 }
 
@@ -78,4 +83,25 @@ export class FieldClock {
     const m = Math.floor(this.minute) % 1440;
     return `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
   }
+}
+
+/** 시간대 시작 (lines.ts timeKey와 같은 경계): 아침 5시·낮 11시·저녁 17시·밤 19시 반 */
+const BANDS = [5, 11, 17, 19.5];
+const BAND_NAME = ['아침', '낮', '저녁', '밤'];
+const hm = (m: number) => (m >= 60 ? `${Math.floor(m / 60)}시간${m % 60 ? ` ${m % 60}분` : ''}` : `${m}분`);
+
+/** 시간 보내기 선택지 (16-2장): 짧게·길게·다음 시간대·근무 끝까지(근무 중일 때만). 0분 항목은 뺀다. 시계를 모르면 짧게·길게만 */
+export function waitOptions(rules: ClockRules, minute: number | null, shift: [number, number] = [9, 18]): { label: string; minutes: number }[] {
+  const out: { label: string; minutes: number }[] = [];
+  if (rules.waitShort > 0) out.push({ label: hm(rules.waitShort), minutes: rules.waitShort });
+  if (rules.waitLong > 0 && rules.waitLong !== rules.waitShort) out.push({ label: hm(rules.waitLong), minutes: rules.waitLong });
+  if (minute === null) return out;
+  const day = ((minute % 1440) + 1440) % 1440;
+  const h = day / 60;
+  const i = BANDS.findIndex((b) => b > h);
+  const nextH = i < 0 ? BANDS[0] + 24 : BANDS[i];
+  const name = BAND_NAME[i < 0 ? 0 : i];
+  out.push({ label: `${name}까지`, minutes: Math.round(nextH * 60 - day) });
+  if (h >= shift[0] && h < shift[1]) out.push({ label: '근무 끝까지', minutes: Math.round(shift[1] * 60 - day) });
+  return out;
 }

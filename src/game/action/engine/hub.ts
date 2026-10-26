@@ -43,6 +43,8 @@ export interface HubHost {
   hour?(): number | null;
   /** 출동 차량 앞 E: 출발했으면 null, 아니면 자막 한 줄 */
   depart?(): string | null;
+  /** 앉기·눕기 자리에 앉았다 (시간 보내기 고르기) */
+  sat?(): void;
   /** 출동 준비가 됐나 (B3 승합차 화살표) */
   armed?(): boolean;
   /** 필드 세계 (src/game/world): 있으면 visitors 대신 움직이는 행위자를 그린다 */
@@ -390,12 +392,15 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
         if (s.seat && s.act?.[0]) {
           const exit = clearSpot(s.x, s.y ?? a.world.player.y, solids, scene.lane ?? LANE);
           (a.world.player as Player).sit(s.act[0], s.seat.x, s.seat.y, s.face ?? 1, exit);
+          host.sat?.();
           return;
         }
         // 자리 동작: 그 자리에 서서 보는 쪽을 맞춘다 (생활 클립 재생은 host.act)
         if (s.y !== undefined) a.movePlayer(s.x, s.y);
         if (s.face) (a.world.player as { dir: 1 | -1 }).dir = s.face;
         if (s.act) host.act?.(s.act, s.face);
+        // 앉기·눕기 자리 = 시간 보내기 (docs/필드_세계_NPC_설계.md 16-2)
+        if (/앉기|눕기/.test(s.verb)) host.sat?.();
         return;
       }
       if (prop.kind !== 'hubdoor') return;

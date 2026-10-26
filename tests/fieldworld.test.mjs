@@ -47,7 +47,7 @@ test('시계: 장면 10·지역 30·대화 10·싸움은 장면당 한 번·시�
   const none = new C.FieldClock(null);
   assert.equal(none.advance({ kind: 'scene', to: 'x' }), 0);
   assert.equal(none.text(), '--:--');
-  assert.deepEqual(C.clockRules({ scene: '15', talk: -3, fight: 'x' }), { scene: 15, region: 30, talk: 10, fight: 10 });
+  assert.deepEqual(C.clockRules({ scene: '15', talk: -3, fight: 'x' }), { scene: 15, region: 30, talk: 10, fight: 10, waitShort: 30, waitLong: 60 });
 });
 
 test('장소: 문·계단·엘리베이터로 길 찾기, 잠긴 문은 길 아님', () => {
@@ -302,4 +302,16 @@ test('대사 연출: 소매치기 사건이 나면 피해자가 말한다, 보�
   assert.equal(v.say, undefined, '안 보이는 장면은 말 안 함');
   ch.step(1 / 30, 'jongno', 800, [{ kind: 'steal', scene: 'jongno', thief: '불량배', victim: '관광객', x: 900 }]);
   assert.equal(v.say, '내 지갑!');
+});
+
+test('시간 보내기 선택지: 짧게·길게·다음 시간대·근무 끝까지', () => {
+  const r = C.clockRules({});
+  const at10 = C.waitOptions(r, 10 * 60);
+  assert.deepEqual(at10.map((o) => o.label), ['30분', '1시간', '낮까지', '근무 끝까지']);
+  assert.equal(at10[2].minutes, 60);
+  assert.equal(at10[3].minutes, 8 * 60);
+  const night = C.waitOptions(r, 23 * 60);
+  assert.deepEqual(night.map((o) => o.label), ['30분', '1시간', '아침까지']);
+  assert.equal(night[2].minutes, 6 * 60);
+  assert.deepEqual(C.waitOptions(C.clockRules({ waitShort: 0 }), null).map((o) => o.label), ['1시간']);
 });

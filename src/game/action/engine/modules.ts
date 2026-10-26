@@ -29,7 +29,7 @@ import type { SpeakerId } from '../story/types';
 import { itemsBlocking, linkItems, mountItemsOverlay } from './itemsLink';
 import { makeHub, silhouette, type HubHost, type HubLife } from './hub';
 import { createHqWorld } from '../../world/hq';
-import { DEFAULT_CLOCK } from '../../world/clock';
+import { DEFAULT_CLOCK, clockRules, waitOptions, type ClockRules } from '../../world/clock';
 import { hashSeed } from '../../world/rng';
 import { observerLines } from '../../world/observer';
 import { Lines, NPC_TYPE, type DialogueData, type LineCtx } from '../../world/lines';
@@ -84,7 +84,7 @@ const hasSaved = () => local(SAVED_KEY).load() === '1';
 const VISIT_TITLE = { title: '괴이 ː ANOMALY', sub: '필드 · 요원들을 만나고 본편 대화를 이어갑니다' };
 const fieldClock: { sec: number | null; place: string } = { sec: null, place: '' };
 
-function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: HubHost['chooseFloor']; sfx: (n: string) => void; closed?: () => void; resuming?: () => boolean; overlay?: HubHost['overlay'] }): HqModuleLike & { close(): void; goto(place: string): void; state(): { day: number; rescued: string[] }; visitReady: Promise<void>; visitor(): { agentId: string; name: string } } {
+function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: HubHost['chooseFloor']; sfx: (n: string) => void; closed?: () => void; resuming?: () => boolean; overlay?: HubHost['overlay']; rules?: () => ClockRules; choose?: (o: { title: string; lines?: string[]; options: string[]; cancel?: boolean }) => Promise<number> }): HqModuleLike & { close(): void; goto(place: string): void; state(): { day: number; rescued: string[] }; visitReady: Promise<void>; visitor(): { agentId: string; name: string } } {
   const hq = createHq();
   const b = bridge as (Partial<GameBridge> & { slot?: number; photo?: (name: string) => string | undefined }) | undefined;
   const slot = b?.slot ?? 0;
@@ -92,6 +92,8 @@ function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui
   let root: HTMLElement | null = null;
   // 본부 방문: 상태 태그로 정한 방(사무실·휴게실·의무실)에 요원을 세운다. 들어가기 전에 한 번 읽는다
   let present: { name: string; room: string }[] = [];
+  // 필드 시계 규칙 (설정 → 필드 시간, 채팅별). 바꾸면 다음 행동부터
+  const rules = () => ui.rules?.() ?? DEFAULT_CLOCK;
   let visitor = { agentId: '', name: '' };
   let ready = false;
   const visitReady = (b?.visit
@@ -100,6 +102,11 @@ function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui
     : Promise.resolve().then(() => { present = [{ name: '잼트리', room: 'office' }, { name: '쟈알디', room: 'office' }, { name: '큐라스', room: 'lounge' }, { name: '고르고디오', room: 'lounge' }, { name: '데쥬레', room: 'infirmary' }]; })).then(() => { ready = true; });
   // 필드 시각은 본편 상태줄 시각에서 시작한다 (docs/필드_세계_NPC_설계.md 16-3). 유저 소속·신분도 같이
   let me: { faction: string; level: number | null } = { faction: 'A00', level: 1 };
+  // 시연판(본편 없음): 시계를 10시에서 시작 (?hour=숫자 로 바꿈) — 근무·시간대·시간 보내기를 볼 수 있게
+  if (!b?.card && fieldClock.sec === null) {
+    const h = Number(typeof location !== 'undefined' ? new URLSearchParams(location.search).get('hour') ?? 10 : 10);
+    fieldClock.sec = (Number.isFinite(h) ? ((h % 24) + 24) % 24 : 10) * 3600;
+  }
   void b?.card?.().then((snap) => {
     if (fieldClock.sec === null && snap?.minute != null) fieldClock.sec = snap.minute * 60;
     if (snap) me = { faction: snap.identity?.faction || snap.faction || 'A00', level: snap.identity?.level ?? null };
@@ -123,7 +130,7 @@ function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui
   let sim: WorldSim | null = null;
   let observing = false;
   // 모델 대화 한 번(창을 열고 닫을 때까지) = 시계 +10분 (사용자 확정 2026-10-26)
-  if (typeof window !== 'undefined') window.addEventListener('goei:talk-closed', () => { if (fieldClock.sec !== null) fieldClock.sec += DEFAULT_CLOCK.talk * 60; });
+  if (typeof window !== 'undefined') window.addEventListener('goei:talk-closed', () => { if (fieldClock.sec !== null) fieldClock.sec += rules().talk * 60; });
   if (typeof window !== 'undefined') window.addEventListener('keydown', (e) => { if (e.key === 'F9' || e.key === '`') { observing = !observing; e.preventDefault(); } });
   const world = () => {
     if (!sim && ready) {
@@ -157,7 +164,7 @@ function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui
   const record = (evs: SimEvent[]) => {
     for (const e of evs) {
       if (e.kind !== 'hurt') continue;
-      if (!foughtHere) { foughtHere = true; if (fieldClock.sec !== null) fieldClock.sec += DEFAULT_CLOCK.fight * 60; }
+      if (!foughtHere) { foughtHere = true; if (fieldClock.sec !== null) fieldClock.sec += rules().fight * 60; }
       const w = sim;
       if (!w) return;
       // 목격: 그 장면의 소속 있는 사람 (이름 인물이 보면 named)
@@ -230,7 +237,7 @@ function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui
         fieldClock.place = to.name;
         // 장면 넘어가기 = 10분 (사용자 확정 2026-10-26, 설정에서 조정 예정). 걸은 거리는 시계와 무관
         void walkedPx;
-        const sec = DEFAULT_CLOCK.scene * 60;
+        const sec = rules().scene * 60;
         if (fieldClock.sec !== null) fieldClock.sec += sec;
         const at = fieldClock.sec === null ? '' : ` (${clockText(fieldClock.sec)})`;
         void b?.field?.record({ kind: 'move', text: `${from.name} → ${to.name}${at}`, scene: to.name, weight: 1, fact: { key: '주인공 위치', value: to.name } }).catch(() => {});
@@ -239,6 +246,19 @@ function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui
       overlay: ui.overlay,
       hour: () => (fieldClock.sec === null ? null : (fieldClock.sec / 3600) % 24),
       depart: () => hq.depart(),
+      // 앉기·눕기 자리: 시간 보내기 (16-2장). 고른 만큼 시계가 간다
+      sat: () => {
+        const opts = waitOptions(rules(), fieldClock.sec === null ? null : fieldClock.sec / 60);
+        if (!opts.length || !ui.choose) return;
+        const now = fieldClock.sec === null ? null : clockText(fieldClock.sec);
+        void ui.choose({ title: '시간 보내기', lines: now ? [`지금 ${now}`] : [], options: [...opts.map((o) => o.label), '그냥 있기'], cancel: true }).then((i) => {
+          const o = i >= 0 ? opts[i] : undefined;
+          if (!o) return;
+          if (fieldClock.sec !== null) fieldClock.sec += o.minutes * 60;
+          const at = fieldClock.sec === null ? '' : clockText(fieldClock.sec);
+          if (at) void b?.field?.record({ kind: 'wait', text: `${fieldClock.place || '필드'}에서 시간을 보냈다 (${at})`, scene: fieldClock.place || undefined, weight: 1, fact: { key: '필드 시각', value: at } }).catch(() => {});
+        }).catch(() => {});
+      },
       armed: () => hq.armed(),
       // 본부 대화창이 떠 있으면 머리 위 표시를 숨긴다 (독립 검수: 브리핑 뒤 ↓ 표시)
       busy: () => typeof document !== 'undefined' && !!document.querySelector('.hq-talk, .hq-over:not(:empty)'),
@@ -746,6 +766,8 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       if (dinnerDue) (dinnerDue = false), cutOnce('dinner');
     },
     overlay: visit ? (c, people, player) => visit.draw(c, people, player) : undefined,
+    choose: (o) => shell.choose(o),
+    rules: () => { const t = shell.settings; return clockRules({ scene: t.tScene, region: t.tRegion, talk: t.tTalk, fight: t.tFight, waitShort: t.tWaitShort, waitLong: t.tWaitLong }); },
   });
   // 본부 메뉴 창이 열려 있으면 Esc는 창 닫기 (껍데기 일시정지보다 먼저)
   // 본부 메뉴 창(임무 창구·정비실 등) 키보드 (사용자 2026-10-25: 키보드가 안 먹는다): 방향키로 단추를 고르고 Enter·Space·E로 누른다, Esc 닫기
