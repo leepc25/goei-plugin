@@ -5,76 +5,76 @@
    "frame": {
     "x": 0,
     "y": 0,
-    "w": 36,
-    "h": 32
+    "w": 256,
+    "h": 256
    },
    "rotated": false,
    "trimmed": false,
    "spriteSourceSize": {
     "x": 0,
     "y": 0,
-    "w": 36,
-    "h": 32
+    "w": 256,
+    "h": 256
    },
    "sourceSize": {
-    "w": 36,
-    "h": 32
+    "w": 256,
+    "h": 256
    },
    "pivot": {
-    "x": 0.3333333333333333,
-    "y": 0.65625
+    "x": 0.6484375,
+    "y": 0.171875
    },
    "duration": 42
   },
   {
    "filename": "x3-1-6-d-snap-spark 1.png",
    "frame": {
-    "x": 36,
+    "x": 256,
     "y": 0,
-    "w": 36,
-    "h": 32
+    "w": 256,
+    "h": 256
    },
    "rotated": false,
    "trimmed": false,
    "spriteSourceSize": {
     "x": 0,
     "y": 0,
-    "w": 36,
-    "h": 32
+    "w": 256,
+    "h": 256
    },
    "sourceSize": {
-    "w": 36,
-    "h": 32
+    "w": 256,
+    "h": 256
    },
    "pivot": {
-    "x": 0.3333333333333333,
-    "y": 0.65625
+    "x": 0.6484375,
+    "y": 0.171875
    },
    "duration": 42
   },
   {
    "filename": "x3-1-6-d-snap-spark 2.png",
    "frame": {
-    "x": 72,
+    "x": 512,
     "y": 0,
-    "w": 36,
-    "h": 32
+    "w": 256,
+    "h": 256
    },
    "rotated": false,
    "trimmed": false,
    "spriteSourceSize": {
     "x": 0,
     "y": 0,
-    "w": 36,
-    "h": 32
+    "w": 256,
+    "h": 256
    },
    "sourceSize": {
-    "w": 36,
-    "h": 32
+    "w": 256,
+    "h": 256
    },
    "pivot": {
-    "x": 0.3333333333333333,
-    "y": 0.65625
+    "x": 0.6484375,
+    "y": 0.171875
    },
    "duration": 42
   },
@@ -82,77 +82,77 @@
    "filename": "x3-1-6-d-snap-spark 3.png",
    "frame": {
     "x": 0,
-    "y": 32,
-    "w": 36,
-    "h": 32
+    "y": 256,
+    "w": 256,
+    "h": 256
    },
    "rotated": false,
    "trimmed": false,
    "spriteSourceSize": {
     "x": 0,
     "y": 0,
-    "w": 36,
-    "h": 32
+    "w": 256,
+    "h": 256
    },
    "sourceSize": {
-    "w": 36,
-    "h": 32
+    "w": 256,
+    "h": 256
    },
    "pivot": {
-    "x": 0.3333333333333333,
-    "y": 0.65625
+    "x": 0.6484375,
+    "y": 0.171875
    },
    "duration": 42
   },
   {
    "filename": "x3-1-6-d-snap-spark 4.png",
    "frame": {
-    "x": 36,
-    "y": 32,
-    "w": 36,
-    "h": 32
+    "x": 256,
+    "y": 256,
+    "w": 256,
+    "h": 256
    },
    "rotated": false,
    "trimmed": false,
    "spriteSourceSize": {
     "x": 0,
     "y": 0,
-    "w": 36,
-    "h": 32
+    "w": 256,
+    "h": 256
    },
    "sourceSize": {
-    "w": 36,
-    "h": 32
+    "w": 256,
+    "h": 256
    },
    "pivot": {
-    "x": 0.3333333333333333,
-    "y": 0.65625
+    "x": 0.6484375,
+    "y": 0.171875
    },
    "duration": 42
   },
   {
    "filename": "x3-1-6-d-snap-spark 5.png",
    "frame": {
-    "x": 72,
-    "y": 32,
-    "w": 36,
-    "h": 32
+    "x": 512,
+    "y": 256,
+    "w": 256,
+    "h": 256
    },
    "rotated": false,
    "trimmed": false,
    "spriteSourceSize": {
     "x": 0,
     "y": 0,
-    "w": 36,
-    "h": 32
+    "w": 256,
+    "h": 256
    },
    "sourceSize": {
-    "w": 36,
-    "h": 32
+    "w": 256,
+    "h": 256
    },
    "pivot": {
-    "x": 0.3333333333333333,
-    "y": 0.65625
+    "x": 0.6484375,
+    "y": 0.171875
    },
    "duration": 42
   }
@@ -162,14 +162,14 @@
   "image": "x3-1-6-d-snap-spark.png",
   "format": "RGBA8888",
   "size": {
-   "w": 108,
-   "h": 64
+   "w": 768,
+   "h": 512
   },
   "scale": "1",
   "anchor": {
    "kind": "origin",
-   "x": 12,
-   "y": 21
+   "x": 166,
+   "y": 44
   },
   "frameTags": [
    {

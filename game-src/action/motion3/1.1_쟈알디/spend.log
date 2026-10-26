@@ -292,3 +292,5 @@
 10-26 04:22:34 VFX x3-1.1-D-palm-blast 완료 {'h': 272, 'w': 282} 8장 effect_id=b6a9ffd0-6a78-4937-85a1-dea4ecea0cac
 10-26 04:24:04 VFX x3-1.1-S2-zone-blast 완료 {'h': 471, 'w': 562} 12장 effect_id=dded1d49-d809-41a6-b0b0-414df9216ff7
 10-26 04:24:04 VFX x3-1.1-F-fire-pillar 완료 {'h': 899, 'w': 354} 16장 effect_id=935e6ff8-5db7-48d3-95df-650c3fcbce5b
+10-26 08:38:17 VFX x3-c-ricochet-spark 완료 {'h': 40, 'w': 48} 6장 effect_id=0aae9ed6-b155-43ff-b1bf-4663c550646c
+10-26 08:38:17 VFX x3-c-hit-spark-light 완료 {'h': 32, 'w': 32} 6장 effect_id=3a56522d-8358-48c6-ae48-ee572c941cb0

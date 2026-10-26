@@ -5,156 +5,156 @@
    "frame": {
     "x": 0,
     "y": 0,
-    "w": 40,
-    "h": 32
+    "w": 48,
+    "h": 40
    },
    "rotated": false,
    "trimmed": false,
    "spriteSourceSize": {
     "x": 0,
     "y": 0,
-    "w": 40,
-    "h": 32
+    "w": 48,
+    "h": 40
    },
    "sourceSize": {
-    "w": 40,
-    "h": 32
+    "w": 48,
+    "h": 40
    },
    "pivot": {
-    "x": 0.725,
-    "y": 0.53125
+    "x": 0.7291666666666666,
+    "y": 0.475
    },
-   "duration": 50
+   "duration": 42
   },
   {
    "filename": "x3-c-ricochet-spark 1.png",
    "frame": {
-    "x": 40,
+    "x": 48,
     "y": 0,
-    "w": 40,
-    "h": 32
+    "w": 48,
+    "h": 40
    },
    "rotated": false,
    "trimmed": false,
    "spriteSourceSize": {
     "x": 0,
     "y": 0,
-    "w": 40,
-    "h": 32
+    "w": 48,
+    "h": 40
    },
    "sourceSize": {
-    "w": 40,
-    "h": 32
+    "w": 48,
+    "h": 40
    },
    "pivot": {
-    "x": 0.725,
-    "y": 0.53125
+    "x": 0.7291666666666666,
+    "y": 0.475
    },
-   "duration": 50
+   "duration": 42
   },
   {
    "filename": "x3-c-ricochet-spark 2.png",
    "frame": {
-    "x": 80,
+    "x": 96,
     "y": 0,
-    "w": 40,
-    "h": 32
+    "w": 48,
+    "h": 40
    },
    "rotated": false,
    "trimmed": false,
    "spriteSourceSize": {
     "x": 0,
     "y": 0,
-    "w": 40,
-    "h": 32
+    "w": 48,
+    "h": 40
    },
    "sourceSize": {
-    "w": 40,
-    "h": 32
+    "w": 48,
+    "h": 40
    },
    "pivot": {
-    "x": 0.725,
-    "y": 0.53125
+    "x": 0.7291666666666666,
+    "y": 0.475
    },
-   "duration": 50
+   "duration": 42
   },
   {
    "filename": "x3-c-ricochet-spark 3.png",
    "frame": {
     "x": 0,
-    "y": 32,
-    "w": 40,
-    "h": 32
+    "y": 40,
+    "w": 48,
+    "h": 40
    },
    "rotated": false,
    "trimmed": false,
    "spriteSourceSize": {
     "x": 0,
     "y": 0,
-    "w": 40,
-    "h": 32
+    "w": 48,
+    "h": 40
    },
    "sourceSize": {
-    "w": 40,
-    "h": 32
+    "w": 48,
+    "h": 40
    },
    "pivot": {
-    "x": 0.725,
-    "y": 0.53125
+    "x": 0.7291666666666666,
+    "y": 0.475
    },
-   "duration": 50
+   "duration": 42
   },
   {
    "filename": "x3-c-ricochet-spark 4.png",
    "frame": {
-    "x": 40,
-    "y": 32,
-    "w": 40,
-    "h": 32
+    "x": 48,
+    "y": 40,
+    "w": 48,
+    "h": 40
    },
    "rotated": false,
    "trimmed": false,
    "spriteSourceSize": {
     "x": 0,
     "y": 0,
-    "w": 40,
-    "h": 32
+    "w": 48,
+    "h": 40
    },
    "sourceSize": {
-    "w": 40,
-    "h": 32
+    "w": 48,
+    "h": 40
    },
    "pivot": {
-    "x": 0.725,
-    "y": 0.53125
+    "x": 0.7291666666666666,
+    "y": 0.475
    },
-   "duration": 50
+   "duration": 42
   },
   {
    "filename": "x3-c-ricochet-spark 5.png",
    "frame": {
-    "x": 80,
-    "y": 32,
-    "w": 40,
-    "h": 32
+    "x": 96,
+    "y": 40,
+    "w": 48,
+    "h": 40
    },
    "rotated": false,
    "trimmed": false,
    "spriteSourceSize": {
     "x": 0,
     "y": 0,
-    "w": 40,
-    "h": 32
+    "w": 48,
+    "h": 40
    },
    "sourceSize": {
-    "w": 40,
-    "h": 32
+    "w": 48,
+    "h": 40
    },
    "pivot": {
-    "x": 0.725,
-    "y": 0.53125
+    "x": 0.7291666666666666,
+    "y": 0.475
    },
-   "duration": 50
+   "duration": 42
   }
  ],
  "meta": {
@@ -162,14 +162,14 @@
   "image": "x3-c-ricochet-spark.png",
   "format": "RGBA8888",
   "size": {
-   "w": 120,
-   "h": 64
+   "w": 144,
+   "h": 80
   },
   "scale": "1",
   "anchor": {
    "kind": "origin",
-   "x": 29,
-   "y": 17
+   "x": 35,
+   "y": 19
   },
   "frameTags": [
    {

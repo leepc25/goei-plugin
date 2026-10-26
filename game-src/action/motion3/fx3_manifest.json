@@ -101,7 +101,7 @@
   "row": "타격_약",
   "kind": "common",
   "mode": "center",
-  "desc": "A small impact spark at the point where a light blow lands: a tiny bright flash with 4 to 6 short sharp spark lines shooting out, a thin ring pop, and a few pixel specks that scatter and vanish. Clean and quick, no star shapes. Small size: about the size of the character's fist to hand. Very fast, 6 frames. Colors: white and light grey monochrome so it can be recolored in code. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers."
+  "desc": "A small impact spark at the point where a light blow lands: a tiny bright flash with 4 to 6 short sharp spark lines shooting out, a thin ring pop, and a few pixel specks that scatter and vanish. Clean and quick, no star shapes. Small size: about the size of the character's fist to hand. Very fast, 6 frames. Colors: white and light grey monochrome so it can be recolored in code. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers. IMPORTANT: the effect must be clearly visible in EVERY frame (no empty frames), bright and solid, at least about one third of the character's head size, with a thick bright core and a dark outline."
  },
  {
   "name": "x3-c-hit-spark-heavy",
@@ -149,7 +149,7 @@
   "row": "튕김 불꽃",
   "kind": "common",
   "mode": "center",
-  "desc": "A ricochet spark when a bullet or blow is deflected off metal or a hard body: a sharp flash at one point and a fan of bright orange-yellow sparks spraying sideways and bouncing away in short arcs, a few glowing dots falling, then gone. Natural colors: white core, yellow and orange sparks. Small size: about the size of a hand. Very fast, 6 frames. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers."
+  "desc": "A ricochet spark when a bullet or blow is deflected off metal or a hard body: a sharp flash at one point and a fan of bright orange-yellow sparks spraying sideways and bouncing away in short arcs, a few glowing dots falling, then gone. Natural colors: white core, yellow and orange sparks. Small size: about the size of a hand. Very fast, 6 frames. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers. IMPORTANT: the effect must be clearly visible in EVERY frame (no empty frames), bright and solid, at least about one third of the character's head size, with a thick bright core and a dark outline."
  },
  {
   "name": "x3-c-paper-scatter",
@@ -333,7 +333,7 @@
   "row": "스냅 불티",
   "kind": "own",
   "mode": "center",
-  "desc": "Tiny sparks from a finger snap at the character's raised fingertip: a sharp little flash and a few bright lime-green and white sparks jumping out in short arcs, one small twinkle, then gone. Colors: lime green, pale yellow-green, white. Small size: about the size of the hand. Very fast, 6 frames. The reference character is only for scale and facing; 'front' means the direction the character faces. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers."
+  "desc": "Tiny sparks from a finger snap at the character's raised fingertip: a sharp little flash and a few bright lime-green and white sparks jumping out in short arcs, one small twinkle, then gone. Colors: lime green, pale yellow-green, white. Small size: about the size of the hand. Very fast, 6 frames. The reference character is only for scale and facing; 'front' means the direction the character faces. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers. IMPORTANT: the effect must be clearly visible in EVERY frame (no empty frames), bright and solid, at least about one third of the character's head size, with a thick bright core and a dark outline."
  },
  {
   "name": "x3-1.6-S2-fire-wall",
@@ -1109,7 +1109,7 @@
   "row": "주사기 물방울",
   "kind": "own",
   "mode": "center",
-  "desc": "A tiny clear droplet at the tip of a syringe, flicked out as the syringe is tapped (small, just a few pixels to finger size). Frame order: a small bead of liquid forms, wobbles, a tiny spray of two or three fine droplets flicks off with a small glint, then it vanishes. Colors: clear pale cyan, white highlight, light blue-grey outline. Only the droplets, no syringe, no hand. About 4-6 frames. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+  "desc": "A tiny clear droplet at the tip of a syringe, flicked out as the syringe is tapped (small, just a few pixels to finger size). Frame order: a small bead of liquid forms, wobbles, a tiny spray of two or three fine droplets flicks off with a small glint, then it vanishes. Colors: clear pale cyan, white highlight, light blue-grey outline. Only the droplets, no syringe, no hand. About 4-6 frames. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers. IMPORTANT: the effect must be clearly visible in EVERY frame (no empty frames), bright and solid, at least about one third of the character's head size, with a thick bright core and a dark outline."
  },
  {
   "name": "x3-4.3-F-surgical-light",
