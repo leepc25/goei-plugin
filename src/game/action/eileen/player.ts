@@ -94,9 +94,21 @@ export class EileenPlayer extends Player {
   }
 
   private targets() {
+    return this.foes().map((b) => ({ body: b, x: b.x, y: b.y, z: b.z })).concat(this.extraFoes());
+  }
+  /** 때릴 상대 (주인공: 적 편 몸 전부. AI 대련 상대(src/game/combat)는 주인공 쪽으로 바꾼다) */
+  protected foes(): Body[] {
     const w = this.world as (WorldView & { bodies: Body[] }) | null;
     if (!w) return [];
-    return w.bodies.filter((b) => b.alive && b.team === 'enemy' && b.hp > 0 && b.kind !== 'bullet').map((b) => ({ body: b, x: b.x, y: b.y, z: b.z })).concat(eileenHooks.extraTargets?.() ?? []);
+    return w.bodies.filter((b) => b.alive && b.team === 'enemy' && b.hp > 0 && b.kind !== 'bullet');
+  }
+  /** 전투 몸이 아닌 필드 행위자 (주인공만) */
+  protected extraFoes(): { body: Body; x: number; y: number; z: number }[] {
+    return eileenHooks.extraTargets?.() ?? [];
+  }
+  /** AI 쪽에서 쓰는 지금 월드 */
+  protected get worldNow(): WorldView | null {
+    return this.world;
   }
 
   private hurtTarget(t: Body, dmg: number, kind: string, face: 1 | -1, hitstop: number, o: { push?: number }) {

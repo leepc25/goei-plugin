@@ -45,6 +45,8 @@ import { whereIs, LANE_TOP, LANE_BOT } from '../hq/map';
 import { hasVisitAgent, hasVisitClip, visitAgentFaceCanvas } from '../art/visitAgents';
 import { drawTestMan, hasTestPeople, testPlayerFace, testPlayerTop } from '../art/testPeople';
 import { eileenHooks } from '../eileen/player';
+import { AiEileen } from '../eileen/aiFighter';
+import { Squad, DIFF, type Difficulty } from '../../combat/brain';
 import { FieldFx, parseFxList } from '../fx/fieldFx';
 import { SUPER_TEXT } from '../fx/superText';
 import { drawTitleBg, setHudItemIcon } from '../ui';
@@ -513,8 +515,32 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     firstFloor: () => ({ id: 'itemroom', title: '아이템 진열실', length: 3200, startX: 300, exitX: Infinity, banner: '아이템 진열실 · E 줍기·들기 · A 던지기·휘두르기', encounters: [{ triggerX: 0, lockFrom: 0, lockTo: 3200, waves: [[{ kind: 'dummy', x: 1600, y: 560 }, { kind: 'dummy', x: 2400, y: 620 }]] }] }),
     nextFloor: () => null,
   };
+  // 대련 방 (전투 AI 시험, docs/전투_AI_설계.md): ?start=stage=spar  ·  난이도 ?ai=easy|normal|hard|nightmare
+  const aiDiff: Difficulty = (() => { try { const v = new URLSearchParams(location.search).get('ai'); return v && v in DIFF ? (v as Difficulty) : 'normal'; } catch { return 'normal'; } })();
+  const sparStage: StageModule = {
+    id: 'spar',
+    label: '대련',
+    firstFloor: () => ({
+      id: 'spar-room', title: '대련', length: 2400, startX: 500, exitX: Infinity,
+      banner: `대련 · 전투 AI (${aiDiff}) · 1:1 뒤 1:2`,
+      encounters: [{ triggerX: 0, lockFrom: 0, lockTo: 2400, waves: [[{ kind: 'ai-eileen', x: 1100, y: 580 }], [{ kind: 'ai-eileen', x: 1300, y: 540 }, { kind: 'ai-eileen', x: 200, y: 640 }]] }],
+    }),
+    nextFloor: () => null,
+  };
+  let squad = new Squad(DIFF[aiDiff].melee);
+  let aiN = 0;
   const unknownKinds = new Set<string>();
   const enemyFactory: EnemyFactory = (spec, w) => {
+    if (spec.kind === 'ai-eileen' && w.player instanceof EileenPlayer) {
+      if (aiN === 0) squad = new Squad(DIFF[aiDiff].melee);
+      const n = ++aiN;
+      // 성향은 상대마다 다르게 (돌격형 / 신중형 / 견제형)
+      const personas = [{ aggression: 0.75, patience: 0.35, zoning: 0.2, courage: 0.9 }, { aggression: 0.35, patience: 0.8, zoning: 0.3, courage: 0.8 }, { aggression: 0.4, patience: 0.5, zoning: 0.85, courage: 0.7 }];
+      const ai = new AiEileen((w.player as unknown as { clips: ConstructorParameters<typeof AiEileen>[0] }).clips, { id: `ai${n}`, grade: 'B', difficulty: aiDiff, persona: personas[(n - 1) % personas.length], seed: 1000 + n, squad, label: `AI 에일린 ${n}` });
+      ai.x = spec.x; ai.y = spec.y;
+      ai.hp = ai.hpMax = 160;
+      return ai as never;
+    }
     if (DEF_BY_KIND[spec.kind]) {
       const sp = spec as typeof spec & { affixes?: never };
       return createEnemy(spec.kind, spec.x, spec.y, () => w.rand(), { elite: spec.elite, affixes: sp.affixes }) as never;
@@ -830,7 +856,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
   const mods: EngineModules = {
     saveCheckpoint: v => { markSaved(); session.setCheckpoint(v); },
     frozen: () => ffx.frozen(),
-    stages: [elevator, trainingStage, dummyStage, arenaStage, itemStage],
+    stages: [elevator, trainingStage, dummyStage, arenaStage, itemStage, sparStage],
     enemyFactory,
     hq,
     hqLayer: () => shell.stage.ui,
