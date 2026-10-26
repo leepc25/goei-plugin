@@ -1,4 +1,71 @@
-사용자): 그림은 칸 폭을 꽉 채우고, 칸 높이는 줄여 위아래는 끌어서 본다.
+t: 700; }
+.gx-agcard-foot { display: flex; align-items: center; gap: 8px; padding: 10px 16px; border-top: 1px dashed var(--line); }
+.gx-agcard-foot .code { margin-right: auto; display: flex; align-items: center; gap: 10px; font: 700 11.5px var(--mono); letter-spacing: .14em; color: var(--dim); white-space: nowrap; }
+.gx-agcard-foot .code u { width: 96px; height: 18px; text-decoration: none; opacity: .5; background: repeating-linear-gradient(90deg, var(--text) 0 1px, transparent 1px 3px, var(--text) 3px 5px, transparent 5px 6px, var(--text) 6px 7px, transparent 7px 10px); }
+.gx-agcard-foot button { display: flex; align-items: center; justify-content: center; gap: 6px; width: 92px; height: 32px; padding: 0; border: 0; border-radius: 9px; background: var(--panel2); color: var(--text); font: inherit; font-size: 12.5px; font-weight: 700; cursor: pointer; }
+.gx-agcard-foot button:hover { color: var(--signal); }
+.gx-agcard-foot button svg { width: 15px; height: 15px; }
+@media (max-width: 760px) {
+  .gx-agwall { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-auto-rows: auto; gap: 6px; padding: 6px; }
+  .gx-agmon { aspect-ratio: 1; }
+  .gx-agmon-cap b { font-size: 13.5px; } .gx-agmon-cap small { font-size: 10px; } .gx-agmon-osd { font-size: 9.5px; }
+  /* 모바일은 화면 전체가 넘어가니 요원 칸 안쪽 스크롤 없음 (2026-10-21 사용자) */
+  .gx-agbox .gx-agwall, .gx-agbox .gx-agrows { flex: none; max-height: none; overflow: visible; }
+  .gx-agrows { grid-template-columns: minmax(0, 1fr); }
+  .gx-agrow:nth-child(odd) { border-right: 0; }
+  .gx-agrow { grid-template-columns: 34px 4.6em auto minmax(0, 1fr) auto; gap: 8px; padding: 0 4px 0 10px; }
+  .gx-agrow-tools { display: none; }
+  .gx-agcard-main { grid-template-columns: 104px minmax(0, 1fr); gap: 12px; padding: 14px; }
+  .gx-agcard-ph { min-height: 136px; }
+  .gx-agcard-t .nm { font-size: 21px; }
+  .gx-agcard-foot { padding: 10px 14px; }
+  .gx-agcard-foot .code u { display: none; }
+  .gx-agcard-foot button { width: 84px; }
+}
+
+/* 잘리는 상황 글: 넘칠 때만 왼쪽으로 흘렀다가 돌아온다 (전광판). 움직임 줄이기 설정이면 말줄임표 그대로 */
+.gx-flow > span { display: inline-block; }
+.gx-flow.on { text-overflow: clip; }
+.gx-flow.on > span { animation: gx-flow var(--ft, 8s) linear var(--fdl, 0s) infinite; will-change: transform; }
+.gx-flow.on > span::after { content: attr(data-t); padding-left: 3em; }
+@keyframes gx-flow { from { transform: translateX(0); } to { transform: translateX(var(--fd, 0)); } }
+@media (prefers-reduced-motion: reduce) { .gx-flow.on { text-overflow: ellipsis; } .gx-flow.on > span { animation: none; display: inline; } .gx-flow.on > span::after { content: none; } }
+.gx-flow.on { -webkit-mask-image: linear-gradient(90deg, transparent, #000 10px, #000 calc(100% - 10px), transparent); mask-image: linear-gradient(90deg, transparent, #000 10px, #000 calc(100% - 10px), transparent); }
+
+/* 큰 보기 화면 표시 (2026-10-21 사용자): 버튼이 빠진 맨 윗줄에 REC·카메라, 그 아래 날짜. 위성도 같은 틀(LIVE·SAT-2) */
+.gx-opbar { align-items: flex-start; }
+.gx-opbar .gx-oposd { position: static; flex: 1 1 auto; min-width: 0; display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 7px 10px; padding: 6px 0 0 4px; }
+/* 날짜는 둘째 줄에서 카메라 이름과 같은 들여쓰기 */
+.gx-oposd .l1 { display: contents; }
+.gx-oposd .ts { grid-column: 2; }
+.gx-oposd .l1 .cam { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gx-oposd .ts { color: rgba(235, 255, 240, .7); }
+.gx-oposd .rec.sat { color: #5fe6c6; } .gx-oposd .rec.sat i { background: #5fe6c6; box-shadow: 0 0 6px #5fe6c6; }
+/* 모바일 설정: 칸 고르기는 한 줄 (상태창 5칸이 두 줄로 밀리던 것, 2026-10-21 사용자) */
+@media (max-width: 760px) {
+  .ps-ctl .gx-segs { flex-wrap: nowrap; max-width: 100%; }
+  .ps-ctl .gx-seg { flex: 0 1 auto; min-width: 0; padding: 0 9px; white-space: nowrap; }
+}
+/* 임무 목록에서 목표로 고른 그림 카드: 가는 녹색 줄이 오류처럼 보여서(2026-10-21 사용자) 또렷한 2px 테두리 + 이름 옆 「목표」 */
+.gx-evc.art.sel { border-color: var(--signal); box-shadow: 0 0 0 1px var(--signal), 0 0 14px color-mix(in srgb, var(--signal) 35%, transparent); }
+.gx-evart-l1 .gx-goaltag { flex: none; }
+.gx-evpick { flex: none; display: flex; align-items: center; gap: 6px; height: 38px; padding: 0 16px 0 12px; border: 0; border-radius: 10px; background: var(--signal); color: var(--on-signal); font: inherit; font-size: 14px; font-weight: 800; box-shadow: 0 4px 14px rgba(0, 0, 0, .45); cursor: pointer; }
+.gx-evpick svg { width: 17px; height: 17px; }
+.gx-evpick.on { background: rgba(8, 12, 14, .72); color: #f2f6f5; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .3); }
+/* 단추가 글줄을 가리지 않게 글 칸 오른쪽을 비운다 */
+/* 커스텀 띠의 위키 (2026-10-21 사용자): 접힌 띠에선 오른쪽 끝, 상태 표시는 그 왼쪽 */
+.gx-mlist li.gx-mx { position: relative; }
+.gx-mx:not(.open) > .gx-mx-wiki { position: absolute; z-index: 2; top: 50%; right: 12px; transform: translateY(-50%); }
+.gx-mx.has-wiki:not(.open) .gx-evart-top { right: 52px; }
+/* 모바일 좌우 쓸기 (2026-10-21 사용자: 단추 위에서 시작하면 안 넘어간다): 가로 끌기는 브라우저가 가져가지 않게 세로 스크롤만 맡긴다.
+   가로로 넘기는 줄·지도는 자기 touch-action이 따로 있다 */
+@media (max-width: 760px) {
+  .gx-content { touch-action: pan-y pinch-zoom; }
+}
+/* 상세 창·CCTV: 상황 글이 먼저 또렷하게, 위키 요약은 그 아래 한 단계 흐리게 (2026-10-21 사용자) */
+:where(.ev-pop, .gx-opcap) .gx-evc-sit { font-weight: 600; color: #fff; }
+:where(.ev-pop, .gx-opcap) .gx-evc-sit + .gx-evc-desc { color: rgba(255, 255, 255, .68); }
+/* PC 임무 탭 지도 (2026-10-21 사용자): 그림은 칸 폭을 꽉 채우고, 칸 높이는 줄여 위아래는 끌어서 본다.
    칸 높이 = 본문 높이 − (지역 줄 36 + 칸 사이 10×2 + 필터·카드 세 줄 342 + 틀 2) */
 @media (min-width: 761px) {
   .gx-map .gx-mapbar .gx-select, .gx-map .gx-mapbar .gx-search { min-height: 36px; }
@@ -311,6 +378,24 @@
 .pp-mob li b { margin-right: 6px; }
 .nw-ava.k-fac { background: var(--amber-bg); color: var(--amber); }
 .pp-bounds { max-width: 180px; }
+
+.pp-range { display: inline-flex; align-items: center; gap: 10px; }
+.pp-range input[type=range] { width: 180px; max-width: 60vw; }
+.pp-range output { min-width: 64px; font-variant-numeric: tabular-nums; }
+
+.pp-backfill { display: inline-flex; align-items: center; gap: 6px; margin-left: 6px; }
+.pp-backfill .gx-select, .pp-reread-sel { min-height: 28px; font-size: 12.5px; }
+.pp-reread-sel { margin-left: 6px; }
+
+/* 이미지 지침 페이지 */
+.ip-names { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 6px; }
+.ip-name { display: flex; align-items: center; gap: 6px; padding: 6px 8px; border: 1px solid var(--line); border-radius: 8px; font-size: 13px; }
+.ip-name.off { color: var(--dim); }
+.ip-name small { color: var(--dim); margin-left: auto; font-size: 11.5px; }
+.ip-extra { display: flex; gap: 6px; margin-top: 8px; }
+.ip-extra input { flex: 1; }
+.ip-template { font-family: ui-monospace, monospace; font-size: 12.5px; }
+.ip-preview { margin-top: 8px; padding: 10px; border-radius: 8px; background: var(--panel2); font-size: 12px; white-space: pre-wrap; overflow-wrap: anywhere; max-height: 360px; overflow: auto; }
 `;
 
   // src/ui/mbar.ts
@@ -1063,7 +1148,7 @@
     }
     return { next, lore: lore.count, scripts: scripts.count, fields: fields3 };
   }
-  var PLUGIN_VERSION = true ? "0.16.63" : "0";
+  var PLUGIN_VERSION = true ? "0.16.64" : "0";
 
   // src/host/game/fetch.ts
   var GAME_BASE = UPDATE_BASE ? `${UPDATE_BASE}/game` : "";
@@ -1152,7 +1237,7 @@
 
   // src/host/game/code.ts
   var CODE_KEY = "goei:game:code";
-  var VERSION = true ? "0.16.63" : "";
+  var VERSION = true ? "0.16.64" : "";
   var codeVersion = (code) => /^\/\/ goei-game (\S+)/.exec(code)?.[1] ?? null;
   var mod = null;
   var codeStats = { readMs: 0, runMs: 0, bytes: 0, fromNet: false };
@@ -1592,8 +1677,8 @@ ${recentStory.map((m) => m.text).join("\n")}`,
     const lines2 = s4.split("\n").map((l) => l.trim()).filter(Boolean);
     const quoted = !prose ? [] : lines2.flatMap((l) => [...l.matchAll(/[「"“『]([^」"”』]{1,})[」"”』]/g)].map((m) => m[1]));
     s4 = (quoted.length ? quoted : lines2).join(" ");
-    const esc22 = speaker.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    s4 = s4.replace(new RegExp(`^\\s*${esc22}\\s*[:：]\\s*`), "").replace(/^[「"“『]|[」"”』]$/g, "");
+    const esc23 = speaker.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    s4 = s4.replace(new RegExp(`^\\s*${esc23}\\s*[:：]\\s*`), "").replace(/^[「"“『]|[」"”』]$/g, "");
     return s4.replace(/\s+/g, " ").trim();
   }
   function clipLine(s4, limit) {
@@ -1776,7 +1861,8 @@ ${recentStory.map((m) => m.text).join("\n")}`,
       scene: ev.scene ? plain2(ev.scene, 60) : void 0,
       who: ev.who?.map((w) => plain2(w, 40)).slice(0, 8),
       fact: ev.fact ? { key: plain2(ev.fact.key, 40), value: plain2(ev.fact.value, 120), ...ev.fact.permanent ? { permanent: true } : {} } : void 0,
-      ...ev.witness ? { witness: { faction: plain2(ev.witness.faction, 12), named: !!ev.witness.named } } : {}
+      ...ev.witness ? { witness: { faction: plain2(ev.witness.faction, 12), named: !!ev.witness.named } } : {},
+      ...ev.visit ? { visit: plain2(ev.visit, 40) } : {}
     };
     return { ...chat, [FIELD_KEY]: { events: [...old, clean3].slice(-MAX_EVENTS) } };
   }
@@ -1838,6 +1924,8 @@ ${recentStory.map((m) => m.text).join("\n")}`,
     director_timeout: "20",
     director_reuse: "1",
     speed: "1",
+    /** 기준 메시지(또는 필드 장면) 하나 안의 변화 합 상한. 0 = 한도 없음. 인물 호감·세력 평판 공용 (리수폿 10) */
+    turn_cap: "10",
     affinity: "1",
     register: "1",
     perception: "1",
@@ -1896,6 +1984,7 @@ ${recentStory.map((m) => m.text).join("\n")}`,
       directorTimeout: num4("director_timeout", 5, 120),
       directorReuse: v("director_reuse") !== "0",
       speed: num4("speed", 0.25, 4),
+      turnCap: num4("turn_cap", 0, 100),
       features: new Set(FEATURES.filter((f) => v(f) === "1")),
       newPeople: v("newpeople") === "confirm" ? "confirm" : "auto",
       twoTurn: v("twoturn") !== "0",
@@ -1998,13 +2087,14 @@ ${recentStory.map((m) => m.text).join("\n")}`,
   function applyFieldEvent(store, chat, ev, player = "주인공", o = {}) {
     let n2 = 0;
     const cue = CUE_OF[ev.kind];
+    const group6 = `${ev.anchor}|${ev.visit ?? ""}|${ev.scene ?? ""}`;
     if (cue && ev.witness?.faction && (ev.witness.named || (o.mobWeight ?? "half") !== "off")) {
       const code = ev.witness.faction;
       const scale = ev.witness.named || o.mobWeight === "full" ? 1 : 0.5;
       const fw = factionWho(code);
       if (!store.factions[code]) store.factions[code] = { code, name: o.factionNames?.[code] || ORG_NAMES[code] || code, seeded: { at: new Date(ev.at || Date.now()).toISOString() } };
       const seq = store.log.filter((c) => c.anchor === ev.anchor).length;
-      if (putChange(store, { id: changeId(fw, "cue", ev.anchor, 0, `${ev.kind}:${ev.id}`), anchor: ev.anchor, seq, src: "field", who: fw, kind: "cue", cue, ...scale !== 1 ? { scale } : {}, reason: `필드(${ev.witness.named ? "명단 인물" : "몹"} 목격): ${ev.text}`.slice(0, 80) })) n2++;
+      if (putChange(store, { id: changeId(fw, "cue", ev.anchor, 0, `${ev.kind}:${ev.id}`), anchor: ev.anchor, seq, src: "field", who: fw, kind: "cue", cue, group: group6, ...scale !== 1 ? { scale } : {}, reason: `필드(${ev.witness.named ? "명단 인물" : "몹"} 목격): ${ev.text}`.slice(0, 80) })) n2++;
     }
     const who = targets(store, ev, player);
     if (!who.length) return n2;
@@ -2012,7 +2102,7 @@ ${recentStory.map((m) => m.text).join("\n")}`,
     for (const name of who) {
       const seq = store.log.filter((c) => c.anchor === ev.anchor).length + (store.people[name].slots.state?.length ?? 0);
       if (cue) {
-        if (putChange(store, { id: changeId(name, "cue", ev.anchor, 0, `${ev.kind}:${ev.id}`), anchor: ev.anchor, seq, src: "field", who: name, kind: "cue", cue, reason: `필드: ${ev.text}`.slice(0, 80) })) n2++;
+        if (putChange(store, { id: changeId(name, "cue", ev.anchor, 0, `${ev.kind}:${ev.id}`), anchor: ev.anchor, seq, src: "field", who: name, kind: "cue", cue, group: group6, reason: `필드: ${ev.text}`.slice(0, 80) })) n2++;
       }
       const state = liveEntries(store.people[name].slots.state, live);
       const put = (text, replaces) => {
@@ -2047,7 +2137,10 @@ ${recentStory.map((m) => m.text).join("\n")}`,
     let pinned = false;
     const mine = changes.filter((c) => c.who === who && c.kind === "cue");
     const groups = /* @__PURE__ */ new Map();
-    for (const c of mine) (groups.get(c.anchor) ?? groups.set(c.anchor, []).get(c.anchor)).push(c);
+    for (const c of mine) {
+      const k = c.group ?? c.anchor;
+      (groups.get(k) ?? groups.set(k, []).get(k)).push(c);
+    }
     for (const [, list4] of groups) {
       let normal = 0;
       let extra = 0;
@@ -2064,7 +2157,8 @@ ${recentStory.map((m) => m.text).join("\n")}`,
         if (c.cue && EXCEPTION_CUES.has(c.cue)) extra += d;
         else normal += d;
       }
-      if (!pinned) value = clamp2(value + clamp2(normal, -TURN_CAP, TURN_CAP) + extra, min, max);
+      const cap = o.turnCap === void 0 ? TURN_CAP : o.turnCap;
+      if (!pinned) value = clamp2(value + (cap > 0 ? clamp2(normal, -cap, cap) : normal) + extra, min, max);
     }
     return Math.round(value * 100) / 100;
   }
@@ -2101,11 +2195,11 @@ ${recentStory.map((m) => m.text).join("\n")}`,
     }
     return value === null ? null : Math.round(value * 100) / 100;
   }
-  function factionOf(code, base, changes, folded = 0, speed = 1) {
-    return sumCues(factionWho(code), base, changes, folded, FACTION_MIN, FACTION_MAX, { speed });
+  function factionOf(code, base, changes, folded = 0, o = {}) {
+    return sumCues(factionWho(code), base, changes, folded, FACTION_MIN, FACTION_MAX, { speed: o.speed, turnCap: o.turnCap });
   }
-  function factionView(code, base, changes, folded = 0, speed = 1, bounds) {
-    const value = factionOf(code, base, changes, folded, speed);
+  function factionView(code, base, changes, folded = 0, o = {}, bounds) {
+    const value = factionOf(code, base, changes, folded, o);
     const stage = factionStage(value, bounds);
     const last2 = [...changes].reverse().find((c) => c.who === factionWho(code) && c.kind === "cue" && c.pin === void 0);
     return { value, stage, last: last2 };
@@ -2306,7 +2400,7 @@ ${body4}`;
     const persons = people.map((n2) => {
       const p = store.people[n2];
       const slot = (k) => liveEntries(p.slots[k], live).map((e) => e.text).slice(-6);
-      const aff = affinityView(p, changes, store.folded[n2] ?? 0, { speed: s4.speed });
+      const aff = affinityView(p, changes, store.folded[n2] ?? 0, { speed: s4.speed, turnCap: s4.turnCap });
       return { name: n2, values: values[n2] ?? "", affinity: aff.stage.label, address: addressOf(p, changes), express: p.express, state: slot("state"), threads: slot("threads"), knowledge: slot("knowledge"), suspicion: slot("suspicion"), unknown_to: unknownTo(p, store, live) };
     });
     const system = [...SYSTEM_FACTS, ...s4.director === "scene" ? SYSTEM_SCENE : [], OUTPUT, s4.directorRules.trim() ? `## User rules
@@ -4453,267 +4547,4 @@ ${lines2.join("\n")}`;
         down: "너",
         outsider: "너"
       },
-      에일린: {
-        level: 2,
-        register: "반말",
-        self: "",
-        up: "부장",
-        peer: "동기",
-        down: "신입",
-        outsider: "너"
-      },
-      윤병수: {
-        level: 3,
-        register: "반말",
-        self: "",
-        up: "과장님",
-        peer: "대리",
-        down: "너",
-        outsider: "너"
-      },
-      윤지아: {
-        level: null,
-        register: "존댓말",
-        self: "저",
-        up: "선생님",
-        peer: "사장님",
-        down: "손님",
-        outsider: "손님"
-      },
-      은하제: {
-        level: 3,
-        register: "혼합",
-        self: "",
-        up: "선배님",
-        peer: "동기",
-        down: "신입",
-        outsider: "댁"
-      },
-      이기석: {
-        level: 4,
-        register: "존댓말",
-        self: "저",
-        up: "차장님",
-        peer: "과장님",
-        down: "요원님",
-        outsider: "손님"
-      },
-      이길환: {
-        level: 4,
-        register: "존댓말",
-        self: "저",
-        up: "부장님",
-        peer: "과장님",
-        down: "요원님",
-        outsider: "선생님"
-      },
-      이도형: {
-        level: 6,
-        register: "반말",
-        self: "나",
-        up: "국장님",
-        peer: "부장",
-        down: "거기",
-        outsider: "너"
-      },
-      이병진: {
-        level: 4,
-        register: "혼합",
-        self: "",
-        up: "부장님",
-        peer: "과장님",
-        down: "자네",
-        outsider: "그쪽 분"
-      },
-      이성해: {
-        level: 2,
-        register: "존댓말",
-        self: "저",
-        up: "선배님",
-        peer: "선배님",
-        down: "신입님",
-        outsider: "손님"
-      },
-      이연화: {
-        level: 3,
-        register: "존댓말",
-        self: "",
-        up: "선배님",
-        peer: "선생님",
-        down: "신입 씨",
-        outsider: "그쪽 분"
-      },
-      이자헌: {
-        level: 4,
-        register: "존댓말",
-        self: "저",
-        up: "부장님",
-        peer: "조장님",
-        down: "신입 님",
-        outsider: "손님"
-      },
-      장허운: {
-        level: 1,
-        register: "존댓말",
-        self: "저",
-        up: "선배님",
-        peer: "동기분",
-        down: "후배님",
-        outsider: "선생님"
-      },
-      잼트리: {
-        level: 2,
-        register: "존댓말",
-        self: "언니",
-        up: "부장님",
-        peer: "동기",
-        down: "후배",
-        outsider: "손님"
-      },
-      쟈알디: {
-        level: 3,
-        register: "반말",
-        self: "나",
-        up: "선배",
-        peer: "자네",
-        down: "요원",
-        outsider: "그쪽"
-      },
-      제이: {
-        level: null,
-        register: "존댓말",
-        self: "저",
-        up: "높으신 분",
-        peer: "직원분",
-        down: "신입분",
-        outsider: "손님"
-      },
-      조성춘: {
-        level: 4,
-        register: "반말",
-        self: "나",
-        up: "부장님",
-        peer: "과장",
-        down: "이 자식아",
-        outsider: "너"
-      },
-      진나솔: {
-        level: 3,
-        register: "혼합",
-        self: "",
-        up: "선배님",
-        peer: "너",
-        down: "신입",
-        outsider: "거기"
-      },
-      차여진: {
-        level: null,
-        register: "반말",
-        self: "나",
-        up: "선배",
-        peer: "자기",
-        down: "신입",
-        outsider: "손님"
-      },
-      청달래: {
-        level: 8,
-        register: "하게체",
-        self: "",
-        up: "자네",
-        peer: "자네",
-        down: "자네",
-        outsider: "자네"
-      },
-      콘쥬스: {
-        level: 1,
-        register: "존댓말",
-        self: "저",
-        up: "선배님",
-        peer: "선배님",
-        down: "신입 선배님",
-        outsider: "아저씨"
-      },
-      큐라스: {
-        level: 2,
-        register: "존댓말",
-        self: "",
-        up: "부장님",
-        peer: "동기",
-        down: "신입",
-        outsider: "너"
-      },
-      호유원: {
-        level: 7,
-        register: "존댓말",
-        self: "저",
-        up: "전무님",
-        peer: "이사님",
-        down: "직원님",
-        outsider: "손님"
-      }
-    }
-  };
-
-  // src/core/people/base.ts
-  var RELATIONS = relations_base_default;
-  var ALIASES = aliases_default;
-  var ADDRESS = address_default;
-  function seedAddress(name, faction, user) {
-    const row8 = ADDRESS.names[name];
-    if (!row8) return void 0;
-    const rel = relativeRank(user, faction, row8.level);
-    const register = REGISTERS.includes(row8.register) ? row8.register : "존댓말";
-    return { toUser: row8[rel] || row8.outsider || "", register };
-  }
-  function seedBaseFor(name, userFaction3, user) {
-    const b = RELATIONS.people[name];
-    const faction = b?.faction ?? "";
-    const alias = ALIASES.names[name];
-    const address = seedAddress(name, faction, user);
-    return {
-      faction,
-      ...b ? { express: b.express } : {},
-      affinityBase: userAffinityBase(faction, userFaction3),
-      aliases: [.../* @__PURE__ */ new Set([...alias?.aliases ?? [], ...b?.english ?? []])],
-      ...address ? { address } : {}
-    };
-  }
-  var valuesOf = (name) => RELATIONS.people[name]?.values ?? "";
-  var temperOf = (name) => RELATIONS.people[name]?.temper;
-  function userAffinityBase(personFaction, userFaction3) {
-    if (!personFaction || !userFaction3 || personFaction === userFaction3) return 0;
-    return RELATIONS.orgs[`${personFaction}>${userFaction3}`] ?? 0;
-  }
-  var factionBase = (code, userFaction3) => userAffinityBase(code, userFaction3);
-  function allNames() {
-    return Object.entries(ALIASES.names).map(([name, v]) => ({ name, aliases: [.../* @__PURE__ */ new Set([...v.aliases ?? [], ...RELATIONS.people[name]?.english ?? []])], titles: v.titles ?? [] }));
-  }
-  var extraNames2 = () => Object.fromEntries(allNames().map((e) => [e.name, { aliases: e.aliases, titles: e.titles }]));
-
-  // src/core/people/faction.ts
-  function userFactionOf(store, chat) {
-    const v = chat.scriptstate?.["$st_faction"] ?? chat.scriptstate?.["st_faction"];
-    return store.identity?.faction || (typeof v === "string" ? v : "");
-  }
-  function knownFactionCodes(store, names4 = {}) {
-    return [.../* @__PURE__ */ new Set([...Object.keys(ORG_NAMES), ...Object.keys(store.factions), ...Object.keys(names4)])];
-  }
-  var factionName = (code, names4 = {}, store) => names4[code] || store?.factions[code]?.name || ORG_NAMES[code] || code;
-  function factionNow(store, code, changes, userFaction3, settings, names4 = {}) {
-    const base = factionBase(code, userFaction3);
-    const v = factionView(code, base, changes, store.folded[factionWho(code)] ?? 0, settings.speed, settings.factionBounds);
-    return { code, name: factionName(code, names4, store), value: v.value, stage: v.stage, base };
-  }
-  function sceneFactionCodes(store, people, texts, names4 = {}) {
-    const out = [];
-    const push2 = (c) => {
-      if (c && !out.includes(c)) out.push(c);
-    };
-    for (const n2 of people) push2(store.people[n2]?.faction ?? "");
-    for (const t of texts) for (const c of factionCodesIn(t, names4)) push2(c);
-    return out;
-  }
-  function factionsBlock(list4, user = "{{user}}") {
-    const lines2 = list4.filter((f) => f.stage.id !== "neutral").map((f) => `- ${f.name} → ${user}: ${f.stage.behavior.replace(/\{\{user\}\}/g, user)}`);
-    if (!lines2.length) return "";
-    return ["## Factions → " + user +
+      에일

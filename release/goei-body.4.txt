@@ -1,3 +1,78 @@
+e-grid; }
+.gx-hmark .gx-mark-txt small { display: flex; justify-content: space-between; letter-spacing: 0; }
+.gx-hmark .gx-mark-txt small i { font-style: normal; }
+/* 띄어쓰기만 3px 좁히고 그만큼 오른쪽 끝을 당긴다 (다른 글자 간격은 그대로) */
+.gx-hmark .gx-mark-txt small { padding-right: 3px; }
+.gx-hmark .gx-mark-txt small i.sp { width: calc(1ch - 3px); overflow: hidden; }
+/* 이번 작전 카드: 소속 사진 위에 소속 이름과 첫 장면 */
+.gx-logo.mob { display: none; }
+/* PC: 본문 첫 줄을 왼쪽 사원증 윗선 높이에 맞춘다 (v0.16.16, 2026-10-20 사원증 위치 18px에 다시 맞춤) */
+@media (min-width: 761px) {
+  .gx-panel.has-nav .gx-head { padding-top: 8px; padding-bottom: 8px; }
+  .gx-panel.has-nav .gx-content > .gx-body, .gx-panel.has-nav .gx-content > .gx-board, .gx-panel.has-nav .gx-content > .gx-field { padding-top: 18px; }
+  .gx-panel.has-nav .gx-content > .gx-body > :first-child:not(:where(.gx-hint, .gx-err, .gx-alert)) { margin-top: 0; padding-top: 0; }
+  .gx-panel.has-nav .gx-content > .gx-body > :first-child:where(.gx-hint, .gx-err, .gx-alert) { margin-top: 0; }
+  .gx-panel.has-nav .gx-field > .gx-mapcol { top: 0; }
+}
+/* 탭 제목: 아이콘 타일 + 제목, 머리 아래 선에 탭 색 한 줄 (v0.16.16: 글자만 달랑 있어 밋밋했다) */
+.gx-head { position: relative; }
+.gx-head:has(.gx-tabhead)::after { content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: linear-gradient(90deg, transparent, var(--signal) 14%, color-mix(in srgb, var(--signal) 70%, transparent) 80%, transparent); }
+.gx-tabicon { display: grid; place-items: center; width: 38px; height: 38px; flex: none; border-radius: 12px; background: var(--accent-bg); border: 1px solid var(--accent-line); color: var(--signal); }
+.gx-tabicon svg { width: 20px; height: 20px; }
+.gx-tabhead b { letter-spacing: .02em; }
+.gx-nav-gap { flex: 1; }
+.gx-nb {
+  position: relative; display: flex; align-items: center; gap: 12px;
+  width: 100%; min-height: 48px; padding: 0 14px;
+  border: 0; border-radius: 12px; background: transparent; color: var(--dim);
+  font-size: 16px; font-weight: 600; text-align: left;
+}
+.gx-nb svg { width: 22px; height: 22px; flex: none; }
+.gx-nb:hover { color: var(--text); background: var(--panel); }
+.gx-nb.on { color: var(--signal); background: var(--accent-bg); }
+.gx-nb .gx-nbadge { margin-left: auto; }
+.gx-nbadge { min-width: 22px; height: 22px; padding: 0 6px; border-radius: 11px; background: var(--danger); color: #2A0B07; font-size: 12px; font-weight: 700; display: inline-grid; place-items: center; }
+.gx-nbadge.dot { min-width: 10px; width: 10px; height: 10px; padding: 0; }
+.gx-nb.mob { display: none; }
+.gx-mbar { display: none; }
+.gx-h2-sub { margin-left: auto; font-size: 14px; font-weight: 500; color: var(--dim); }
+
+/* 스크롤 막대 자리를 늘 비워 둔다: 내용이 길어져 막대가 생기고 없어질 때마다 칸 너비가 바뀌어 화면이 움찔거렸다 (v0.16.18). 막대 10px만큼 오른쪽 여백을 줄여 좌우를 맞춤 */
+.gx-body { padding: 4px 10px 16px 20px; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; }
+.gx-body section { padding: 14px 0 6px; }
+.gx-body h2 { display: flex; align-items: center; gap: 8px; margin: 0 0 10px; font-size: 18px; font-weight: 700; color: var(--text); }
+.gx-body h2 i { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--accent-bg); font-style: normal; font-size: 13px; color: var(--signal); font-family: var(--mono); }
+
+/* ── 시작 화면 ── */
+.gx-facs { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.gx-fac {
+  position: relative; display: flex; flex-direction: column; justify-content: flex-end; text-align: left;
+  min-height: 96px; padding: 0; overflow: hidden;
+  border: 2px solid var(--line); border-radius: 20px; background: var(--panel);
+  /* 테두리·그림자·크기를 서서히 바꾸면 큰 세력 사진까지 매 프레임 다시 칠해서 고를 때 끊겼다 (v0.10.2). 바로 바꾼다 */
+}
+.gx-fac.has-img { min-height: 176px; border-color: transparent; }
+.gx-fac-img { position: absolute; inset: 0; background-size: cover; background-position: center; }
+.gx-fac.has-img::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(11, 18, 21, 0) 30%, rgba(11, 18, 21, .94) 100%); }
+.gx-fac-txt { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 4px; padding: 14px 16px; }
+.gx-fac b { font-size: 22px; font-weight: 700; color: var(--text); }
+.gx-fac-txt span { font-size: 14px; color: var(--sub); line-height: 1.45; }
+.gx-fac.has-img b { color: #F2F7F6; }
+.gx-fac.has-img .gx-fac-txt span { color: #C9D6D3; }
+/* 사진 확대 대신 아래 그늘만 옅게: 큰 사진을 키우는 효과는 매 프레임 다시 그려서 끊겼다 (v0.10.2) */
+.gx-fac.has-img::after { transition: opacity .15s; }
+.gx-fac.has-img:hover::after { opacity: .82; }
+/* 평소엔 어두운 흑백, 마우스를 올리거나 고르면 컬러로 (v0.16.8: 밝아지는 효과가 너무 약했다).
+   사진 위 filter 전환 애니메이션은 매 프레임 사진을 다시 그려 끊겨서(v0.10.2) 바로 바꾼다 */
+/* 마우스가 없는 휴대폰에서는 늘 컬러 */
+@media (hover: hover) {
+  .gx-fac-img { filter: grayscale(1) brightness(.5); }
+  .gx-fac.on .gx-fac-img, .gx-fac.has-img:hover .gx-fac-img { filter: none; }
+}
+.gx-fac.on { border-color: var(--signal); box-shadow: 0 0 0 4px color-mix(in srgb, var(--signal) 22%, transparent); }
+
+.gx-segs { display: inline-flex; gap: 2px; padding: 3px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+.gx-seg { min-width: 96px; min-height: 40px; padding: 0 16px; border: 0; border-radius: 10px; background: transparent; color: var(--dim); font-weight: 600; }
 .gx-seg:hover { color: var(--text); }
 .gx-seg.on { background: var(--line); color: var(--text); }
 
@@ -2168,71 +2243,4 @@ button.mk-go:hover { color: var(--signal); }
 .gx-agcard-t dl { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 6px 12px; margin: 12px 0 0; padding-top: 12px; border-top: 1px solid var(--line); font-size: 13px; line-height: 1.5; }
 .gx-agcard-t dt { padding-top: 1px; font-size: 12px; font-weight: 700; color: var(--dim); }
 .gx-agcard-t dd { margin: 0; }
-.gx-agcard-t dd.dep { color: #e8685a; font-weight: 700; }
-.gx-agcard-foot { display: flex; align-items: center; gap: 8px; padding: 10px 16px; border-top: 1px dashed var(--line); }
-.gx-agcard-foot .code { margin-right: auto; display: flex; align-items: center; gap: 10px; font: 700 11.5px var(--mono); letter-spacing: .14em; color: var(--dim); white-space: nowrap; }
-.gx-agcard-foot .code u { width: 96px; height: 18px; text-decoration: none; opacity: .5; background: repeating-linear-gradient(90deg, var(--text) 0 1px, transparent 1px 3px, var(--text) 3px 5px, transparent 5px 6px, var(--text) 6px 7px, transparent 7px 10px); }
-.gx-agcard-foot button { display: flex; align-items: center; justify-content: center; gap: 6px; width: 92px; height: 32px; padding: 0; border: 0; border-radius: 9px; background: var(--panel2); color: var(--text); font: inherit; font-size: 12.5px; font-weight: 700; cursor: pointer; }
-.gx-agcard-foot button:hover { color: var(--signal); }
-.gx-agcard-foot button svg { width: 15px; height: 15px; }
-@media (max-width: 760px) {
-  .gx-agwall { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-auto-rows: auto; gap: 6px; padding: 6px; }
-  .gx-agmon { aspect-ratio: 1; }
-  .gx-agmon-cap b { font-size: 13.5px; } .gx-agmon-cap small { font-size: 10px; } .gx-agmon-osd { font-size: 9.5px; }
-  /* 모바일은 화면 전체가 넘어가니 요원 칸 안쪽 스크롤 없음 (2026-10-21 사용자) */
-  .gx-agbox .gx-agwall, .gx-agbox .gx-agrows { flex: none; max-height: none; overflow: visible; }
-  .gx-agrows { grid-template-columns: minmax(0, 1fr); }
-  .gx-agrow:nth-child(odd) { border-right: 0; }
-  .gx-agrow { grid-template-columns: 34px 4.6em auto minmax(0, 1fr) auto; gap: 8px; padding: 0 4px 0 10px; }
-  .gx-agrow-tools { display: none; }
-  .gx-agcard-main { grid-template-columns: 104px minmax(0, 1fr); gap: 12px; padding: 14px; }
-  .gx-agcard-ph { min-height: 136px; }
-  .gx-agcard-t .nm { font-size: 21px; }
-  .gx-agcard-foot { padding: 10px 14px; }
-  .gx-agcard-foot .code u { display: none; }
-  .gx-agcard-foot button { width: 84px; }
-}
-
-/* 잘리는 상황 글: 넘칠 때만 왼쪽으로 흘렀다가 돌아온다 (전광판). 움직임 줄이기 설정이면 말줄임표 그대로 */
-.gx-flow > span { display: inline-block; }
-.gx-flow.on { text-overflow: clip; }
-.gx-flow.on > span { animation: gx-flow var(--ft, 8s) linear var(--fdl, 0s) infinite; will-change: transform; }
-.gx-flow.on > span::after { content: attr(data-t); padding-left: 3em; }
-@keyframes gx-flow { from { transform: translateX(0); } to { transform: translateX(var(--fd, 0)); } }
-@media (prefers-reduced-motion: reduce) { .gx-flow.on { text-overflow: ellipsis; } .gx-flow.on > span { animation: none; display: inline; } .gx-flow.on > span::after { content: none; } }
-.gx-flow.on { -webkit-mask-image: linear-gradient(90deg, transparent, #000 10px, #000 calc(100% - 10px), transparent); mask-image: linear-gradient(90deg, transparent, #000 10px, #000 calc(100% - 10px), transparent); }
-
-/* 큰 보기 화면 표시 (2026-10-21 사용자): 버튼이 빠진 맨 윗줄에 REC·카메라, 그 아래 날짜. 위성도 같은 틀(LIVE·SAT-2) */
-.gx-opbar { align-items: flex-start; }
-.gx-opbar .gx-oposd { position: static; flex: 1 1 auto; min-width: 0; display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 7px 10px; padding: 6px 0 0 4px; }
-/* 날짜는 둘째 줄에서 카메라 이름과 같은 들여쓰기 */
-.gx-oposd .l1 { display: contents; }
-.gx-oposd .ts { grid-column: 2; }
-.gx-oposd .l1 .cam { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.gx-oposd .ts { color: rgba(235, 255, 240, .7); }
-.gx-oposd .rec.sat { color: #5fe6c6; } .gx-oposd .rec.sat i { background: #5fe6c6; box-shadow: 0 0 6px #5fe6c6; }
-/* 모바일 설정: 칸 고르기는 한 줄 (상태창 5칸이 두 줄로 밀리던 것, 2026-10-21 사용자) */
-@media (max-width: 760px) {
-  .ps-ctl .gx-segs { flex-wrap: nowrap; max-width: 100%; }
-  .ps-ctl .gx-seg { flex: 0 1 auto; min-width: 0; padding: 0 9px; white-space: nowrap; }
-}
-/* 임무 목록에서 목표로 고른 그림 카드: 가는 녹색 줄이 오류처럼 보여서(2026-10-21 사용자) 또렷한 2px 테두리 + 이름 옆 「목표」 */
-.gx-evc.art.sel { border-color: var(--signal); box-shadow: 0 0 0 1px var(--signal), 0 0 14px color-mix(in srgb, var(--signal) 35%, transparent); }
-.gx-evart-l1 .gx-goaltag { flex: none; }
-.gx-evpick { flex: none; display: flex; align-items: center; gap: 6px; height: 38px; padding: 0 16px 0 12px; border: 0; border-radius: 10px; background: var(--signal); color: var(--on-signal); font: inherit; font-size: 14px; font-weight: 800; box-shadow: 0 4px 14px rgba(0, 0, 0, .45); cursor: pointer; }
-.gx-evpick svg { width: 17px; height: 17px; }
-.gx-evpick.on { background: rgba(8, 12, 14, .72); color: #f2f6f5; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .3); }
-/* 단추가 글줄을 가리지 않게 글 칸 오른쪽을 비운다 */
-/* 커스텀 띠의 위키 (2026-10-21 사용자): 접힌 띠에선 오른쪽 끝, 상태 표시는 그 왼쪽 */
-.gx-mlist li.gx-mx { position: relative; }
-.gx-mx:not(.open) > .gx-mx-wiki { position: absolute; z-index: 2; top: 50%; right: 12px; transform: translateY(-50%); }
-.gx-mx.has-wiki:not(.open) .gx-evart-top { right: 52px; }
-/* 모바일 좌우 쓸기 (2026-10-21 사용자: 단추 위에서 시작하면 안 넘어간다): 가로 끌기는 브라우저가 가져가지 않게 세로 스크롤만 맡긴다.
-   가로로 넘기는 줄·지도는 자기 touch-action이 따로 있다 */
-@media (max-width: 760px) {
-  .gx-content { touch-action: pan-y pinch-zoom; }
-}
-/* 상세 창·CCTV: 상황 글이 먼저 또렷하게, 위키 요약은 그 아래 한 단계 흐리게 (2026-10-21 사용자) */
-:where(.ev-pop, .gx-opcap) .gx-evc-sit { font-weight: 600; color: #fff; }
-:where(.ev-pop, .gx-opcap) .gx-evc-sit + .gx-evc-desc { color: rgba(255, 255, 255, .68); }
-/* PC 임무 탭 지도 (2026-10-21 
+.gx-agcard-t dd.dep { color: #e8685a; font-weigh

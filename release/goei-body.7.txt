@@ -1,4 +1,50 @@
- "openness":[{"who":"<name>","op":"init|event","value":<0|90|150|210|270 or null>,"delta":<1|3|5|10|-2|-4|-5 or null>,"m":"m2","quote":"<verbatim>","reason":"<Korean ≤60 chars>"}],',
+ conflicting with the explanation; the same rumor from several mouths is not independent |",
+    "One disordered detail, a bodily mark, one-sided contact or a suspicious object never confirms; unclear cause → record the question, not the conclusion. Harm suffered by the target is not the target's voluntary wrongdoing. Confirmation needs reliable evidence reaching the person that establishes identity, context, intent or voluntariness, and the actual act or state.",
+    "",
+    "### 10.3 Trust and affinity",
+    "Trust in ability versus trust in one explanation; liking versus suspecting: read trust about this matter separately from affinity. Distrust, relevant betrayal and the explanation's credibility outrank goodwill. A genuinely established trusting relationship (shown in the record, or, with affinity on, stage 끌림 or above toward this target) may mitigate one ambiguous clue once: 「약→0」 (omit the clue) or 「중→약」; never mitigate 강 or confirmation; never twice for one event. Affinity toward a third person is not trust about this target. Never lower affinity because suspicion rose or raise suspicion because affinity is low or zero.",
+    "",
+    "### 10.4 Disproof and closure",
+    "Weakening requires new explanation or counterevidence matching the question to reach the person and the span to show acceptance. A plea to be believed, a gift, closeness, apology, affinity increase or time alone erases nothing. Partial refutation keeps the rest; never drop unfavorable facts to manufacture counterevidence. Decrease weights: 「-약」 (−2: accepts a consistent explanation for a weak question or notices consistent behavior and revises an ambiguous concern); 「-중」 (−5: independent material, testimony or complete context refutes a specific question); 「-강」 (−10: several independent facts refute the main question while another remains). Closing (`op: close`, `result`): 확인 (clear reliable evidence reached the person; program sets score ≥80); 해소 (reliable new evidence refutes the whole allegation and the person changes their mind; score 0); 묻음 (a real fact kept, the person forgives or stops pursuing; score kept). A closed case reopens (`op: open` on it) only on new relevant evidence; the old score is kept. Use close instead of a clue in the same turn; never add a clue for the closing evidence. Learning falsity and changing one's mind differs from accepting truth and forgiving; forgiveness erases no fact. Once convinced, the person is not frozen in suspicion; without new evidence they do not repeat the question indefinitely.",
+    "",
+    "### 10.5 Responses",
+    "What the person actually did about the suspicion (`op: respond`, `stage`): 지켜봄 (watches, says less, remembers answers, attends to a name or schedule); 시험 (asks concrete details, checks a discrepancy, sets a small trap, verifies a record); 대면 (asks for an explanation directly, states boundaries, creates distance, accuses); 보고 (tells a superior, colleague or outsider; requests investigation; uses the knowledge as pressure). Personality shapes it: verification-minded asks about the real discrepancy; watchful waits; insensitive is slow then confused; conflict-avoidant postpones while suspecting. Never force a stage from a high score: a high score is not confirmation; 대면 and 보고 require the act in the span. Distinguish thinking, stating intent, attempting, the recipient receiving, and outcome: 「보고하겠다」 is intent; a report does not make others believe. Never invent a harmful plan, access, surveillance that did not happen, or success. Program stages for reading `suspicion_now`: 0 baseline; to 19 slight unease; to 39 noticing; to 59 suspicion and questions; to 79 distrust and verification; to 100 strong conviction. At any score the person may express evidence-grounded confirmed knowledge, and while the case is open they never state the matter as confirmed.",
+    "",
+    "### 10.6 Recording",
+    "`suspicion` items: `op: open` starts a case (text: what raised it and the person's reading) or reopens a closed one; `op: clue` adds newly received evidence with `weight` (약, 중, 강, -약, -중, -강) and the clue plus interpretation; `op: respond` with `stage`; `op: close` with `result`. One `clue` per case per span: combine several clues into one item at the highest justified weight. Never record the same clue twice for rereading or recall, an unseen clue, or an intent promoted to attempt or success. Treatment changes the suspicion caused go to `relationship` and, if durable, `speech` under ordinary rules; suspicion never rewrites the base register by itself. Add a `threads` entry only while the person actively pursues the case.",
+    "<<END:suspicion>>",
+    "## 12. Evidence citation",
+    "Every entry, cue, address change, new person, document change and suspicion item carries `m` (a confirmed message tag) and `quote`: 5–60 characters copied exactly from that message, showing the fact. No quote, no change. One quote may support several changes; one change cites one quote, the most direct. Never quote context_only text, this instruction or the record; never alter, translate or stitch a quote. A quote proves the text exists, not that your reading is true.",
+    "## 13. User identity",
+    "Fill `identity` only when the confirmed span states the user character's organization or rank plainly (introduction, ID card, a superior naming the rank); otherwise null. Never infer it from address terms.",
+    "",
+    "## 14. Director memo (`next_note`)",
+    "When `next_note` is true, write one factual memo per person appearing in the confirmed span, for the model writing the next reply; a reference, not direction; English, with Korean names, address terms and quotes verbatim.",
+    "- `now` (≤120): present stance toward the user's character and current state from the record after your changes (affinity stage, address, state, open threads that matter now). Facts only.",
+    "- `must_not_reveal` (each ≤80): facts in this person's `unknown_to` still not learned after this span; drop any that reached the person (record those in `knowledge`); absent or empty `unknown_to` → empty array.",
+    "Never propose dialogue, emotion, next actions, plot, staging or outcomes; never decide the user's reaction; silent record → say nothing. Keep each knowledge owner and fact versus belief distinct. Missing record data does not prove ignorance; the span may establish knowledge. `next_note` absent or false → empty array.",
+    "",
+    "## 15. Output — exactly one JSON object, no code fence, nothing else",
+    "Every key below is present; a key whose section is absent is still returned empty (for `identity`, null fields).",
+    '{"entries":[{"who":"<name>","slot":"<slot>","op":"add|upsert|remove|merge","replace":"<entry id or null>",',
+    '  "text":"<Korean ≤200 chars or null for remove>","target":"<name|@user|null>","m":"m2","quote":"<verbatim>"}],',
+    "<<SECTION:affinity>>",
+    ' "cues":[{"who":"<name>","cue":"<cue name>","m":"m2","quote":"<verbatim>","reason":"<Korean ≤40 chars>"}],',
+    "<<END:affinity>>",
+    "<<SECTION:register>>",
+    ' "address":[{"who":"<name>","toUser":"<term>","register":"존댓말|반말|혼합","m":"m2","quote":"<verbatim>"}],',
+    "<<END:register>>",
+    ' "identity":{"faction":"<Korean org name or null>","rank":"<Korean rank or null>"},',
+    ' "new_people":[{"name":"<name>","aliases":["<alias>"],"m":"m2","quote":"<verbatim>","identity":"<Korean ≤200 or 미확인>","speech":"<Korean ≤200 or null>"}],',
+    ' "docs":[{"type":"event|location|faction|item|rhythm","key":"<Korean name>","op":"add|upsert|remove","replace":"<id or null>","text":"<Korean ≤200 or null for remove>","m":"m2","quote":"<verbatim>","date":"<YYYY.MM.DD or null>","place":"<Korean place or null>","who":["<name or @user>"]}],',
+    "<<SECTION:suspicion>>",
+    ' "suspicion":[{"who":"<name>","target":"<name|@user>","kind":"정체|배신|거짓말|오염|범행","op":"open|clue|respond|close","weight":"<약|중|강|-약|-중|-강 for clue, else null>","stage":"<지켜봄|시험|대면|보고 for respond, else null>","result":"<확인|해소|묻음 for close, else null>","text":"<Korean ≤200>","m":"m2","quote":"<verbatim>"}],',
+    "<<END:suspicion>>",
+    "<<SECTION:taste>>",
+    ' "taste":[{"who":"<name>","band":<-3..3>,"m":"m2","quote":"<verbatim>","reason":"<Korean ≤60 chars>"}],',
+    "<<END:taste>>",
+    "<<SECTION:openness>>",
+    ' "openness":[{"who":"<name>","op":"init|event","value":<0|90|150|210|270 or null>,"delta":<1|3|5|10|-2|-4|-5 or null>,"m":"m2","quote":"<verbatim>","reason":"<Korean ≤60 chars>"}],',
     "<<END:openness>>",
     "<<SECTION:rhythm>>",
     ' "rhythm_note":"<English ≤200 chars or null>",',
@@ -150,8 +196,13 @@
     const settings = peopleSettings(ctx2.chat.scriptstate);
     if (!settings.on || settings.when === "manual" && !o.manual) return result;
     const store = peopleStore(ctx2.chat);
-    const unread = unreadIndexes(ctx2.chat, store);
-    setStatus({ unread: unread.length });
+    const allUnread = unreadIndexes(ctx2.chat, store);
+    let unread = allUnread;
+    if (!o.scope?.indexes) {
+      const lastRead = Math.max(-1, ...ctx2.chat.message.map((m, i) => store.read[messageKey(m, i)] !== void 0 ? i : -1));
+      unread = lastRead < 0 ? allUnread.slice(-1) : allUnread.filter((i) => i > lastRead);
+    } else unread = o.scope.indexes.filter((i) => ctx2.chat.message[i]?.role === "char");
+    setStatus({ unread: allUnread.length });
     if (!unread.length) return result;
     const sheet = sheetOf(ctx2);
     const identity = statusIdentity(ctx2.chat);
@@ -183,13 +234,13 @@
           break;
         }
         const curStore = peopleStore(fresh.chat);
-        const input2 = buildUpdate(fresh.chat, curStore, batches[b], { settings, system: "", values: Object.fromEntries(input0Names(curStore).map((n2) => [n2, valuesOf(n2)])), names: allNames(), exclude, factionNames: factionNamesOf2(fresh.char.globalLore) });
+        const input2 = buildUpdate(fresh.chat, curStore, batches[b], { settings, system: "", values: Object.fromEntries(input0Names(curStore).map((n2) => [n2, valuesOf(n2)])), names: allNames(), exclude, factionNames: factionNamesOf2(fresh.char.globalLore), only: o.scope?.only });
         const sections2 = enabledSections(settings);
         if (input2.tidy.length) sections2.add("tidy");
         const system = assemblePrompt(promptFor(settings), sections2, settings.rules, settings.lang);
         input2.system = system;
         if (!input2.people.length) {
-          await updateChat(fresh.charIndex, fresh.chatIndex, (cur) => {
+          if (!o.scope?.only) await updateChat(fresh.charIndex, fresh.chatIndex, (cur) => {
             const s4 = peopleStore(cur);
             for (const i of input2.indexes) {
               const m = cur.message[i];
@@ -227,7 +278,9 @@
             settings,
             sheetOf: sheet,
             baseOf: (name) => seedBaseFor(name, userFaction(cur), s4.identity),
-            exclude
+            exclude,
+            only: o.scope?.only,
+            keepRead: !!o.scope?.only
           });
           diag.report = report;
           return withPeople(cur, s4);
@@ -270,6 +323,35 @@
     return result;
   }
   var input0Names = (s4) => Object.keys(s4.people);
+  async function backfillPeople(turns2) {
+    const ctx2 = await loadContext().catch(() => null);
+    if (!ctx2) return { ran: 0, applied: 0, skipped: ["채팅을 읽지 못했어요"], errors: [] };
+    const store = peopleStore(ctx2.chat);
+    const unread = unreadIndexes(ctx2.chat, store);
+    const bots = ctx2.chat.message.map((m, i) => m.role === "char" ? i : -1).filter((i) => i >= 0);
+    const pick3 = new Set(turns2 > 0 ? bots.slice(-turns2) : bots);
+    const indexes = unread.filter((i) => pick3.has(i));
+    if (!indexes.length) return { ran: 0, applied: 0, skipped: ["그 범위에 안 읽은 응답이 없어요"], errors: [] };
+    return requestPeopleUpdate("backfill", { manual: true, scope: { indexes } });
+  }
+  async function rereadPerson(name, turns2) {
+    if (inflight) return { ran: 0, applied: 0, skipped: ["갱신이 돌고 있어요"], errors: [], cleared: 0 };
+    const ctx2 = await loadContext().catch(() => null);
+    if (!ctx2) return { ran: 0, applied: 0, skipped: ["채팅을 읽지 못했어요"], errors: [], cleared: 0 };
+    const store = peopleStore(ctx2.chat);
+    const p = store.people[name];
+    if (!p) return { ran: 0, applied: 0, skipped: ["기록이 없는 인물"], errors: [], cleared: 0 };
+    const indexes = mentionIndexes(ctx2.chat, name, [...p.aliases, ...allNames().find((n2) => n2.name === name)?.aliases ?? []], turns2);
+    let cleared = 0;
+    await updateChat(ctx2.charIndex, ctx2.chatIndex, (cur) => {
+      const s4 = peopleStore(cur);
+      cleared = clearStoryRecords(s4, name);
+      return withPeople(cur, s4);
+    });
+    if (!indexes.length) return { ran: 0, applied: 0, skipped: ["최근 응답에 이 인물이 나오지 않아요 (기록만 비움)"], errors: [], cleared };
+    const r = await requestPeopleUpdate("reread", { manual: true, scope: { indexes, only: [name] } });
+    return { ...r, cleared };
+  }
   async function consolidatePerson(name) {
     if (inflight) return { ok: false, message: "갱신이 돌고 있어요. 끝난 뒤 다시 눌러 주세요." };
     const ctx2 = await loadContext().catch(() => null);
@@ -386,7 +468,7 @@ Return the JSON object.` }
           const c = await loadContext();
           if (!c || c.charIndex !== origin.charIndex || c.chatIndex !== origin.chatIndex || c.char.chaId !== origin.char.chaId || c.chat.id !== origin.chat.id) return;
           if (!KINDS2.includes(ev.kind)) return;
-          const event = { id: crypto.randomUUID(), at: Date.now(), anchor: anchorOf(c.chat), kind: ev.kind, text: ev.text, scene: ev.scene, who: ev.who, weight: ev.weight, fact: ev.fact, ...ev.witness && typeof ev.witness.faction === "string" ? { witness: { faction: ev.witness.faction, named: !!ev.witness.named } } : {} };
+          const event = { id: crypto.randomUUID(), at: Date.now(), anchor: anchorOf(c.chat), kind: ev.kind, text: ev.text, scene: ev.scene, who: ev.who, weight: ev.weight, fact: ev.fact, ...ev.witness && typeof ev.witness.faction === "string" ? { witness: { faction: ev.witness.faction, named: !!ev.witness.named } } : {}, ...typeof ev.visit === "string" && ev.visit ? { visit: ev.visit } : {} };
           await updateChat(c.charIndex, c.chatIndex, (chat) => {
             if (chat.id !== c.chat.id) return null;
             let next2 = withFieldEvent(chat, event);
@@ -418,7 +500,7 @@ Return the JSON object.` }
         const changes = liveChanges(store, live);
         const list4 = Object.values(store.people).filter((p) => !names4 || names4.includes(p.name));
         return list4.map((p) => {
-          const aff = affinityView(p, changes, store.folded[p.name] ?? 0, { temper: temperOf(p.name), speed: settings.speed });
+          const aff = affinityView(p, changes, store.folded[p.name] ?? 0, { temper: temperOf(p.name), speed: settings.speed, turnCap: settings.turnCap });
           const texts = (k) => liveEntries(p.slots[k], live).map((e) => e.text);
           const note = settings.director === "facts" ? latestNote(store, p.name, live) : null;
           return {
@@ -446,7 +528,7 @@ Return the JSON object.` }
         if (!settings.on || !p) return sheet;
         const live = liveness(c.chat);
         const changes = liveChanges(store, live);
-        return personBlock(p, store, live, changes, { sheet, mode: settings.inject === "off" ? "split" : settings.inject, unknown: settings.features.has("perception") ? unknownTo(p, store, live) : [], user: "방문자", note: settings.director === "facts" ? latestNote(store, name, live) : null, temper: temperOf(name), speed: settings.speed });
+        return personBlock(p, store, live, changes, { sheet, mode: settings.inject === "off" ? "split" : settings.inject, unknown: settings.features.has("perception") ? unknownTo(p, store, live) : [], user: "방문자", note: settings.director === "facts" ? latestNote(store, name, live) : null, temper: temperOf(name), speed: settings.speed, turnCap: settings.turnCap });
       },
       async factions() {
         const c = await loadContext().catch(() => null);
@@ -1316,6 +1398,10 @@ Return the JSON object.` }
     diagAll: false,
     /** 지난 항목 전부 펼친 칸 열쇠 */
     oldAll: /* @__PURE__ */ new Set(),
+    /** 지난 응답 읽기 범위 */
+    backfillTurns: "10",
+    /** 다시 읽기 범위 */
+    rereadTurns: "20",
     diagOpen: /* @__PURE__ */ new Set(),
     diagShow: "",
     /** 「매 턴」·「메인」 안내는 세션에 한 번 */
@@ -1444,7 +1530,7 @@ Return the JSON object.` }
     if (!code) return "";
     return factionList(ctx2.char.globalLore).find((f) => f.code === code)?.name ?? code;
   }
-  var affOpts = (ctx2, name) => ({ temper: temperOf(name), speed: peopleSettings(ctx2.chat.scriptstate).speed });
+  var affOpts = (ctx2, name) => ({ temper: temperOf(name), speed: peopleSettings(ctx2.chat.scriptstate).speed, turnCap: peopleSettings(ctx2.chat.scriptstate).turnCap });
   function hasPersonRecord(ctx2, name) {
     return !!peopleStore(ctx2.chat).people[name];
   }
@@ -1472,7 +1558,7 @@ Return the JSON object.` }
     taste: ["취향 띠(첫인상)", "인물마다 주인공이 자기 취향에 맞는 정도(−3~+3)를 호감과 별개로 기록해요. 오를 땐 한 칸씩, 내릴 땐 여러 칸. 리수폿 첫인상 축"],
     openness: ["음란도", "성인 인물의 성적 개방도(0~300)와 피임 태도를 기록해요. 시작값은 근거가 있을 때만, 그 뒤는 실제 반응마다. 리수폿 음란도. 성인용 기능"],
     rhythm: ["서사 리듬", "장면 국면(준비·절정·여운…)·장(章) 흐름·떡밥 단계를 문서로 두고 Director 메모에 「지금은 긴장을 올릴 때/떡밥 회수」를 넣어요. 카드 지침과 부딪칠 수 있어 기본 끔. 리수폿 리듬"],
-    faction_rep: ["세력 평판", "세력(관리국·가짜 관리국·백일몽·민간·협회…)이 주인공을 어떻게 보는지 −100~100 값으로 둬요. 세력이 집단으로 반응할 때(출입 금지·징계·포상·거래…)만 바뀌고, 구성원 한 명의 감정은 번지지 않아요. 필드 몹의 첫 반응이 이 값의 구간으로 정해져요"],
+    faction_rep: ["세력 평판", "세력(관리국·가짜 관리국·백일몽·민간·협회…)이 주인공을 어떻게 보는지 −100~100 값으로 둬요. 그 세력이 주인공을 보는 눈이 바뀔 만한 일인지는 갱신기 모델이 판단해요(인용 필수, 세력당 응답에 1건, 메시지당 ±10). 구성원 한 명의 사적인 감정은 그 인물 기록에만 남아요. 필드 몹의 첫 반응이 이 값의 구간으로 정해져요"],
     npc_emotion: ["인물끼리 감정", "인물이 다른 인물에게 느끼는 감정·관계도 기록해요 (유저 대상만이 아니라)"]
   };
   var n = (v) => v.toLocaleString();
@@ -1539,7 +1625,9 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
     const store = peopleStore(ctx2.chat);
     const unread = st.busy ? st.unread : unreadIndexes(ctx2.chat, store).length;
     const label = !canChat ? "채팅을 시작한 뒤에 갱신할 수 있어요" : st.busy ? st.label || "갱신 중…" : unread ? `안 읽은 응답 ${unread}개` : "모두 읽었어요";
-    return `<div class="pp-upbar"><span class="pp-upst${st.busy ? " busy" : ""}">${st.busy ? '<i class="pp-spin"></i>' : ""}${esc13(label)}</span><button class="gx-mini ps-save" data-action="pp-update" title="안 읽은 본편 응답을 지금 읽어 기록에 반영해요" ${st.busy || peopleUi.busy || !canChat ? "disabled" : ""}>${ICONS.refresh}지금 갱신</button></div>`;
+    const dis2 = st.busy || peopleUi.busy || !canChat ? "disabled" : "";
+    const back = unread ? `<span class="pp-backfill"><select class="gx-select" data-change="pp-backfill-turns" aria-label="읽을 범위">${[["10", "최근 10개"], ["30", "최근 30개"], ["0", "전부"]].map(([v, l]) => `<option value="${v}" ${peopleUi.backfillTurns === v ? "selected" : ""}>${l}</option>`).join("")}</select><button class="gx-mini" data-action="pp-backfill" title="기능을 중간에 켰거나 끄고 지나간 구간의 응답을 읽어요. 보조 호출이 묶음마다 1회" ${dis2}>지난 응답 읽기</button></span>` : "";
+    return `<div class="pp-upbar"><span class="pp-upst${st.busy ? " busy" : ""}">${st.busy ? '<i class="pp-spin"></i>' : ""}${esc13(label)}</span><button class="gx-mini ps-save" data-action="pp-update" title="마지막으로 읽은 응답 뒤의 안 읽은 응답을 지금 읽어요" ${dis2}>${ICONS.refresh}지금 갱신</button>${back}</div>`;
   }
   function ruleBox(name, label, value, help, max, placeholder, saveAction) {
     return `<div class="pp-rule"><b>${label}</b><textarea class="gx-search nw-reqbox" name="${name}" data-input="${name}" rows="4" maxlength="${max}" placeholder="${esc13(placeholder)}">${esc13(value)}</textarea><small>${help}</small><div class="gx-row-btns"><button class="gx-mini ps-save" data-action="${saveAction}" data-take="${name}">저장</button></div></div>`;
@@ -1558,7 +1646,8 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
       row6("기록 언어", seg3("lang", s4.lang, [["ko", "한국어"], ["en", "영어"]]), "기록 본문(항목·이유·메모)을 쓰는 언어. 이름·인용·호칭은 늘 원문. 영어는 같은 내용이면 토큰이 절반쯤이고, 위키 화면에도 영어로 보여요."),
       row6("본편에 넣기", seg3("inject", s4.inject, [["split", "절 단위 혼합"], ["append", "시트 전체+기록"], ["record", "기록만"], ["off", "안 넣음"]]), "절 단위 혼합: 시트의 Identity·Character 절은 기록으로 대신하고 나머지 절은 원문 그대로."),
       row6("Director", seg3("director", s4.director, [["off", "끔"], ["facts", "사실형(뒤)"], ["scene", "연출형(앞)"]]), "사실형은 갱신기에 얹어 다음 턴 메모를 남기고, 연출형은 본편 요청 앞에 짧은 지시를 한 번 더 만들어요."),
-      row6("호감 변화 속도", seg3("speed", String(s4.speed), [["0.5", "0.5"], ["1", "1"], ["1.5", "1.5"], ["2", "2"]]))
+      row6("호감 변화 속도", seg3("speed", String(s4.speed), [["0.5", "0.5"], ["1", "1"], ["1.5", "1.5"], ["2", "2"]])),
+      row6("메시지당 변화 상한", `<label class="st-range pp-range"><input type="range" min="0" max="100" step="1" value="${s4.turnCap}" data-input="pp-cap" data-change="pp-cap" aria-label="메시지당 변화 상한"><output>${s4.turnCap === 0 ? "한도 없음" : `±${s4.turnCap}`}</output></label>`, "메시지 하나(필드는 장면 하나)에서 호감·세력 평판이 움직일 수 있는 최대. 0이면 한도 없음. 중대위반(−50)은 늘 한도 밖. 리수폿 기본 ±10.")
     ].join("");
     const features = FEATURES.map((f) => row6(FEATURE_HELP[f][0], onoff(f), FEATURE_HELP[f][1])).join("");
     const newPeople = [
@@ -1684,7 +1773,7 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
       <span class="ph-avatar nw-ava k-fac">${esc13(f.name.slice(0, 1))}</span>
       <span class="ph-who"><span class="ph-who-top"><b>${esc13(f.name)}</b><span class="gx-badge fs-${f.stage.id}" title="${esc13(f.stage.mob)}">${esc13(f.stage.label)}</span></span><small>${f.value} · 시작값 ${f.base}${code === uf ? " · 주인공 소속" : ""}${mine ? ` · 기록 ${mine}` : ""}</small></span></button></li>`;
     }).join("");
-    return `<section class="nw-hsec pp-sec"><h3 title="세력이 주인공을 어떻게 보는지. 세력이 집단으로 반응할 때만 바뀌어요">세력 평판<b>${knownFactionCodes(store, names4).length}</b></h3><ul class="ph-list">${rows2}</ul></section>`;
+    return `<section class="nw-hsec pp-sec"><h3 title="세력이 주인공을 어떻게 보는지. 바뀔 만한 일인지는 갱신기 모델이 판단해요">세력 평판<b>${knownFactionCodes(store, names4).length}</b></h3><ul class="ph-list">${rows2}</ul></section>`;
   }
   function factionBar(value, bounds) {
     const ids = ["hostile", "wary", "neutral", "favorable", "friendly"];
@@ -1716,7 +1805,7 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
     return `<div class="ph-room nw-pane pp-pane">${head(f.name, `세력 평판 · 시작값 ${f.base}${code === uf ? " · 주인공 소속" : ""}`)}
     <article class="nw-doc pp-doc">
       ${peopleUi.notice ? `<div class="gx-err" role="alert">${esc13(peopleUi.notice)}</div>` : ""}
-      <section class="pp-card"><h4 title="세력이 주인공을 어떻게 보는지 (−100~100). 세력이 집단으로 반응할 때와 필드에서 그 소속이 목격한 일로만 바뀌어요">평판</h4>${factionBar(f.value, s4.factionBounds)}${edit}</section>
+      <section class="pp-card"><h4 title="세력이 주인공을 어떻게 보는지 (−100~100). 본편에서는 갱신기 모델이 판단한 일로, 필드에서는 그 소속이 목격한 일로 바뀌어요">평판</h4>${factionBar(f.value, s4.factionBounds)}${edit}</section>
       <section class="pp-card"><h4 title="필드에서 이 세력의 이름 없는 몹이 주인공을 처음 봤을 때">구간별 몹 반응</h4>${mob}</section>
       <details class="ps-adv-sub pp-log" data-keep="pp-log"${keepOpen("pp-log")}><summary>변경 기록<b>${mine.length}</b></summary>${mine.length ? `<ul class="pp-entries">${mine.map((c) => changeRow(ctx2, c, live)).join("")}</ul>` : '<p class="ps-note">아직 변경 기록이 없어요. 시작값은 조직×조직 표에서 와요.</p>'}</details>
     </article>${toast("pp", peopleUi.info, (t) => {
@@ -1837,7 +1926,8 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
     }).join("");
     const mine = store.log.filter((c) => c.who === name).map((c) => ({ c, pos: live.at.get(c.anchor) ?? 1e9 })).sort((a, b) => b.pos - a.pos || b.c.seq - a.c.seq).map((x) => x.c);
     const log = `<details class="ps-adv-sub pp-log" data-keep="pp-log"${keepOpen("pp-log")}><summary title="호감 계기·호칭 변경·메모처럼 값을 바꾼 기록. 호감 숫자는 이 기록에서 매번 계산해요">변경 기록<b>${mine.length}</b></summary>${mine.length ? `<ul class="pp-entries">${mine.map((c) => changeRow(ctx2, c, live)).join("")}</ul>` : '<p class="ps-note">아직 변경 기록이 없어요.</p>'}</details>`;
-    const tidyBtn = `<button class="gx-mini" data-action="pp-tidy" data-value="${esc13(name)}" title="보조 모델이 이 인물의 항목들을 더 적은 수로 합쳐 다시 써요 (보조 호출 1회). 고정 항목은 손대지 않아요" ${peopleUi.busy || peopleStatus().busy ? "disabled" : ""}>${ICONS.refresh}정리</button>`;
+    const busyNow = peopleUi.busy || peopleStatus().busy ? "disabled" : "";
+    const tidyBtn = `<button class="gx-mini" data-action="pp-tidy" data-value="${esc13(name)}" title="보조 모델이 이 인물의 항목들을 더 적은 수로 합쳐 다시 써요 (보조 호출 1회). 고정 항목은 손대지 않아요" ${busyNow}>${ICONS.refresh}정리</button><select class="gx-select pp-reread-sel" data-change="pp-reread-turns" aria-label="다시 읽을 범위">${[["10", "최근 10개"], ["20", "최근 20개"], ["50", "최근 50개"], ["0", "전부"]].map(([v, l]) => `<option value="${v}" ${peopleUi.rereadTurns === v ? "selected" : ""}>${l}</option>`).join("")}</select><button class="gx-mini danger" data-action="pp-reread" data-value="${esc13(name)}" title="이 인물의 이야기 기록을 비우고, 이 인물이 나온 응답들을 다시 읽어 새로 써요. 시트 시작값·필드·직접 고친 것은 남아요. 보조 호출이 묶음마다 1회" ${busyNow}>다시 읽기</button>`;
     return `<div class="ph-room nw-pane pp-pane">${head(name, sub, tidyBtn)}
     <article class="nw-doc pp-doc">
       ${peopleUi.notice ? `<div class="gx-err" role="alert">${esc13(peopleUi.notice)}</div>` : ""}
@@ -2129,6 +2219,12 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
         peopleUi.oldAll.add(v);
         env2.render();
         return true;
+      case "pp-cap": {
+        const n2 = Math.max(0, Math.min(100, Math.round(Number(v))));
+        if (!Number.isFinite(n2)) return true;
+        await setVars3(ctx2, env2, { [PP("turn_cap")]: String(n2) });
+        return true;
+      }
       case "pp-bounds": {
         const ok = /^\s*-?\d+\s*,\s*-?\d+\s*,\s*-?\d+\s*,\s*-?\d+\s*$/.test(v) && (() => {
           const n2 = v.split(",").map(Number);
@@ -2161,6 +2257,44 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
         peopleUi.addrEdit = false;
         peopleUi.info = "호칭을 저장했어요.";
         env2.render();
+        return true;
+      }
+      case "pp-backfill-turns":
+        peopleUi.backfillTurns = v;
+        return true;
+      case "pp-reread-turns":
+        peopleUi.rereadTurns = v;
+        return true;
+      case "pp-backfill": {
+        if (peopleUi.busy || peopleStatus().busy) return true;
+        peopleUi.busy = true;
+        peopleUi.notice = "";
+        env2.render();
+        try {
+          const r = await backfillPeople(Number(peopleUi.backfillTurns) || 0);
+          peopleUi.info = r.errors.length ? `읽기 실패: ${r.errors[0]}` : r.ran ? `지난 응답 읽기: 갱신 ${r.ran}회 · 반영 ${r.applied}개` : r.skipped[0] ?? "읽을 응답이 없어요.";
+        } catch (error) {
+          peopleUi.notice = error instanceof Error ? error.message : String(error);
+        }
+        peopleUi.busy = false;
+        peopleUi.diag = null;
+        await env2.refresh();
+        return true;
+      }
+      case "pp-reread": {
+        if (!v || peopleUi.busy || peopleStatus().busy) return true;
+        peopleUi.busy = true;
+        peopleUi.notice = "";
+        env2.render();
+        try {
+          const r = await rereadPerson(v, Number(peopleUi.rereadTurns) || 0);
+          peopleUi.info = r.errors.length ? `다시 읽기 실패: ${r.errors[0]}` : `${v} 다시 읽기: 기록 ${r.cleared}개 비움 · 갱신 ${r.ran}회 · 반영 ${r.applied}개${r.skipped.length ? ` · ${r.skipped[0]}` : ""}`;
+        } catch (error) {
+          peopleUi.notice = error instanceof Error ? error.message : String(error);
+        }
+        peopleUi.busy = false;
+        peopleUi.diag = null;
+        await env2.refresh();
         return true;
       }
       case "pp-tidy": {
@@ -3251,173 +3385,4 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
     ${list4}
   </div>`;
   }
-  function cropBox(ctx2, key2, main) {
-    const url = imageUrl(ctx2.char, main);
-    const [x, y, w] = cropValue(key2);
-    return `<div class="dir-crop">
-    <div class="dir-crop-img" data-crop="${esc15(key2)}">${url ? `<img src="${esc15(url)}" alt="" draggable="false"><span class="dir-crop-frame" style="left:${x}%;top:${y}%;width:${w}%"></span>` : ""}</div>
-    <label class="dir-crop-size"><span>크기</span><input type="range" min="10" max="100" step="1" value="${w}" data-input="dir-crop-size" data-key="${esc15(key2)}" aria-label="얼굴 틀 크기"></label>
-    <button class="gx-mini" data-action="dir-crop-reset" data-value="${esc15(key2)}">기본 틀로</button>
-  </div>`;
-  }
-  function directoryPhotoList(ctx2) {
-    const at = dirUi.pick ? pickOf(dirUi.pick) : null;
-    const p = at && dirUi.draft ? picOf(dirUi.draft, at.key) : null;
-    if (!at || !p) return "";
-    const cur = at.slot === "face" ? p.face : p.photo;
-    const q = dirUi.pickQ.trim().toLowerCase();
-    const near = p.english.toLowerCase();
-    const all = assetNames(ctx2.char);
-    const hits = q ? all.filter((n2) => n2.toLowerCase().includes(q)) : near ? all.filter((n2) => n2.toLowerCase().startsWith(near)) : [];
-    const list4 = [...hits.filter((n2) => near && n2.toLowerCase().startsWith(near)), ...hits.filter((n2) => !near || !n2.toLowerCase().startsWith(near))];
-    if (!list4.length) return `<p class="gx-muted dir-empty">${q ? "찾는 이름의 이미지가 없어요." : `이미지 ${all.length}장 중에서 이름으로 검색해 주세요.`}</p>`;
-    const more = list4.length > 30 ? `<p class="gx-muted dir-empty">${list4.length}장 중 30장만 보여요. 검색어를 더 적어 주세요.</p>` : "";
-    return list4.slice(0, 30).map((n2) => {
-      const url = imageUrl(ctx2.char, n2);
-      return `<button class="dir-pic${cur === n2 ? " on" : ""}" data-action="dir-photo-set" data-value="${esc15(`${n2}|${dirUi.pick}`)}" title="${esc15(n2)}"><span class="dir-pic-img">${url ? `<img src="${esc15(url)}" alt="" loading="lazy">` : ""}</span><small>${esc15(n2)}</small></button>`;
-    }).join("") + more;
-  }
-  function placePanel(p, ctx2) {
-    const k = (f) => `${f}|${p.lore}`;
-    return `<div class="dir-panel">
-    <div class="dir-line"><span>무작위 발생 후보</span><div class="gx-segs gx-segs-sm">
-      <button class="gx-seg${p.preset ? " on" : ""}" data-action="dir-set" data-value="${esc15(`preset|1|${p.lore}`)}">ON</button>
-      <button class="gx-seg${!p.preset ? " on" : ""}" data-action="dir-set" data-value="${esc15(`preset|0|${p.lore}`)}">OFF</button></div></div>
-    <p class="gx-muted">OFF여도 직접 고르거나 대화에 나오면 상황판에 기록돼요.</p>
-    ${input(k("label"), p.label, "표시 이름", "상황판과 지도에 보이는 이름")}
-    ${input(k("english"), p.english, "영문명", "영어 응답에서도 이 이름을 알아봐요")}
-    ${input(k("aliases"), p.aliases.join(", "), "별칭", "쉼표로 나눠 적어요")}
-    ${photoBlock(p.lore, ctx2)}
-    <p class="gx-muted">로어북: ${esc15(p.lore)}${p.inFolder ? "" : " (폴더 밖)"}</p>
-    ${p.inFolder ? "" : `<button class="gx-mini danger" data-action="dir-ext-del" data-value="${esc15(p.lore)}">후보 목록에서 빼기</button>`}
-  </div>`;
-  }
-  function agentPanel2(a, ctx2, d) {
-    const lore = ctx2.char.globalLore ?? [];
-    const names4 = namesOf(d, lore);
-    const tabs2 = tabsOf(d, lore);
-    const k = (f) => `${f}|${a.lore}`;
-    const cur = orgOf(d.orgs, a.affiliation);
-    return `<div class="dir-panel">
-    <div class="dir-line"><span>소속 조직</span><div class="dir-chips">${d.orgs.map((o) => chip2("dir-org-pick", `${o.name}|${a.lore}`, o.name, cur === o)).join("")}${chip2("dir-org-pick", `|${a.lore}`, "미정", !a.affiliation)}</div></div>
-    <p class="gx-muted">조직을 고르면 아래 두 값이 그 조직 기준으로 채워져요. 새 조직은 「조직」 탭에서 만들어요.</p>
-    <div class="dir-line"><span>성별</span><div class="dir-chips">${["F", "M", "X"].map((x) => chip2("dir-gender", `${x}|${a.lore}`, { F: "여", M: "남", X: "미정" }[x], (agentGender(a, lore) || "X") === x)).join("")}</div></div>
-    <div class="dir-line"><span>요원 목록에 보일 세력</span><div class="dir-chips">${codesOf(d).map((f) => chip2("dir-toggle", `rosterFor|${f}|${a.lore}`, names4[f], a.rosterFor.includes(f))).join("")}</div></div>
-    <div class="dir-line"><span>괴담톡 연락처 탭</span><div class="dir-chips">${tabs2.map((t) => chip2("dir-toggle", `phoneTabs|${t.id}|${a.lore}`, t.name || t.id, a.phoneTabs.includes(t.id))).join("")}</div></div>
-    <div class="dir-grid">
-      ${input(k("rank"), a.rank, "직급")}
-      ${input(k("department"), a.department, "부서")}
-    </div>
-    ${input(k("english"), a.english, "영문명", "영어 응답에서도 이 이름을 알아봐요")}
-    ${photoBlock(a.lore, ctx2)}
-    ${input(k("aliases"), a.aliases.join(", "), "별칭", "쉼표로 나눠 적어요")}
-    <p class="gx-muted">로어북: ${esc15(a.lore)} · ID ${esc15(a.id)}${a.inFolder ? "" : " (폴더 밖)"}</p>
-  </div>`;
-  }
-  function factionBlock(o, ctx2) {
-    const lore = ctx2.char.globalLore ?? [];
-    const k = (f) => `org:${f}|${o.name}`;
-    const seg6 = (action, on3, a, b) => `<div class="gx-segs gx-segs-sm"><button class="gx-seg${on3 ? " on" : ""}" data-action="${action}" data-value="${esc15(`1|${o.name}`)}">${a}</button><button class="gx-seg${!on3 ? " on" : ""}" data-action="${action}" data-value="${esc15(`0|${o.name}`)}">${b}</button></div>`;
-    const start3 = `${input(k("title"), o.spec.title ?? "", "시작 화면 이름", o.faction ? "비우면 원래 이름" : "비우면 조직 이름")}
-    ${area(k("blurb"), o.spec.blurb ?? "", "시작 화면 설명")}`;
-    if (o.faction) {
-      return `<div class="dir-fac"><div class="dir-line"><span>시작 화면에 보이기</span>${seg6("dir-fac-hide", !o.spec.hidden, "보임", "숨김")}</div>${start3}${builtinBlock(o.faction, dirUi.draft)}</div>`;
-    }
-    const on2 = !!o.spec.playable;
-    const ready = placeholdersReady(lore);
-    const head2 = `<div class="dir-line"><span>플레이 세력${on2 && o.spec.code ? ` <b class="dir-code">${esc15(o.spec.code)}</b>` : ""}</span>${seg6("dir-fac-play", on2, "ON", "OFF")}</div>`;
-    if (!on2) return `<div class="dir-fac">${head2}<p class="gx-muted">켜면 이 조직으로 시작할 수 있어요. 첫 장면은 직접 입력과 커스텀 임무로 시작해요.</p></div>`;
-    const patch = ready ? "" : `<div class="gx-hint">이 카드의 🏷️Tag 로어북에 새 세력 자리가 없어서 아직 시작 화면에 안 보여요. <button class="gx-mini" data-action="dir-fac-patch">로어북에 자리 넣기</button></div>`;
-    return `<div class="dir-fac">${head2}${patch}
-    <div class="dir-line"><span>유형</span><div class="dir-chips">${FACTION_TYPES.map((x) => chip2("dir-fac-type", `${x.id}|${o.name}`, x.label, (o.spec.type ?? "org") === x.id)).join("")}</div></div>
-    <p class="gx-muted">${esc15(FACTION_TYPES.find((x) => x.id === (o.spec.type ?? "org")).help)}</p>
-    ${start3}
-    ${input(k("gm_name"), o.spec.gm_name ?? "", "모델용 영어 이름", "소속 변경 태그 목록과 세력 설명 제목에 써요. 비우면 조직 이름")}
-    ${area(k("gm_desc"), o.spec.gm_desc ?? "", "모델용 세력 설명", "📜Faction 로어북 끝에 붙어요. 영어로 적으면 다른 세력 설명과 어울려요")}
-    ${input(k("seed"), (o.spec.seed ?? [o.name]).join(", "), "시작 때 함께 넣을 로어북", "쉼표로 나눠 적어요. 첫 응답에 이 로어북들이 꼭 들어가요")}
-    ${input(k("tab"), o.spec.tab ?? "", "괴담톡 전용 탭 이름", `비우면 「${esc15(tabName(o))}」`)}
-  </div>`;
-  }
-  function builtinBlock(code, d) {
-    const viewers = [["none", "기본"], ...BUILTIN.map((f) => [f, `${d.display.none?.[f] || f} 소속`])];
-    const fallback = d.display.none?.[code] ?? "";
-    const names4 = viewers.map(([v, label]) => `<label class="dir-in"><span>${esc15(label)}</span><input data-input="dir" data-key="${esc15(`disp:${v}|${code}`)}" value="${esc15(d.display[v]?.[code] ?? "")}" placeholder="${esc15(fallback)}" autocomplete="off"></label>`).join("");
-    const own = d.phoneTabs.tabs.find((t) => t.visible_for.length === 1 && t.visible_for[0] === code);
-    const tab2 = own ? input(`ptab:${own.id}`, own.name, "괴담톡 전용 탭 이름") : "";
-    const scenes = (SCENARIOS.factions.find((f) => f.code === code)?.scenarios ?? []).map((sc) => input(`seed:${code}-${sc.fm}`, (d.seeds[`${code}-${sc.fm}`] ?? []).join(", "), `${sc.fm}. ${esc15(sc.label)}`)).join("");
-    return `<div class="dir-line"><span>부르는 이름</span></div><div class="dir-grid names">${names4}</div>
-    ${tab2}
-    <div class="dir-line"><span>첫 장면에 함께 넣을 로어북</span></div><div class="dir-grid">${scenes}</div>`;
-  }
-  function orgPanel(o, ctx2, d) {
-    const lore = ctx2.char.globalLore ?? [];
-    const names4 = namesOf(d, lore);
-    const tabs2 = tabsOf(d, lore);
-    const members = d.agents.filter((a) => a.affiliation === orgAffiliation(o));
-    return `<div class="dir-panel">
-    ${input(`org:english|${o.name}`, o.spec.english ?? "", "영문명")}
-    ${photoBlock(`org:${o.name}`, ctx2)}
-    ${factionBlock(o, ctx2)}
-    <div class="dir-line"><span>요원 목록에 보일 세력</span><div class="dir-chips">${codesOf(d).map((f) => chip2("dir-org-toggle", `rosterFor|${f}|${o.name}`, names4[f], o.rosterFor.includes(f))).join("")}</div></div>
-    <div class="dir-line"><span>괴담톡 연락처 탭</span><div class="dir-chips">${tabs2.map((t) => chip2("dir-org-toggle", `phoneTabs|${t.id}|${o.name}`, t.name || t.id, o.phoneTabs.includes(t.id))).join("")}</div></div>
-    <p class="gx-muted">바꾸면 이 조직 요원 ${members.length}명 모두에게 적용돼요. 한 사람만 다르게 하려면 요원 탭에서 바꿔요.</p>
-    ${o.faction ? "" : `<div class="dir-rename"><label class="dir-in"><span>조직 이름</span><input name="dir-org-name" value="${esc15(o.name)}" autocomplete="off" data-enter="dir-org-rename"></label>
-      <button class="gx-mini" data-action="dir-org-rename" data-take="dir-org-name">이름 바꾸기</button>
-      <button class="gx-mini danger" data-action="dir-org-del" data-value="${esc15(o.name)}" ${members.length ? 'disabled title="소속 요원이 있으면 지울 수 없어요"' : ""}>지우기</button></div>`}
-    ${members.length ? `<p class="gx-muted">소속: ${members.map((m) => esc15(m.name)).join(", ")}</p>` : ""}
-    <div class="dir-line"><span>거점</span><div class="dir-chips">${d.bases.filter((b) => b.org === o.name).map((b) => chip2("dir-base-goto", b.name, b.name, false)).join("")}<button class="gx-chip" data-action="dir-base-new" data-value="${esc15(o.name)}">＋ 거점 추가</button></div></div>
-  </div>`;
-  }
-  function orgRow(o, ctx2, d, names4) {
-    const open3 = dirUi.open === o.name;
-    const n2 = d.agents.filter((a) => a.affiliation === orgAffiliation(o)).length;
-    const sub = o.rosterFor.length ? `${o.rosterFor.map((f) => names4[f] ?? f).join("·")} 플레이 때 보임` : "요원 목록에 안 보임";
-    const play2 = o.faction || o.spec.playable && o.spec.code;
-    return `<div class="dir-row${open3 ? " open" : ""}">
-    <button class="dir-head" data-action="dir-open" data-value="${esc15(o.name)}" aria-expanded="${open3}">
-      <span class="dir-name"><b>${esc15(o.name)}</b><small>${esc15(sub)}</small></span>
-      ${play2 ? `<span class="gx-badge live">플레이 ${esc15(o.faction || o.spec.code)}</span>` : ""}${o.spec.hidden ? '<span class="gx-badge">시작 화면 숨김</span>' : ""}<span class="gx-badge">${n2}명</span>
-    </button>${open3 ? orgPanel(o, ctx2, d) : ""}</div>`;
-  }
-  var REGIONS = MAP_CODES.filter((c) => c !== "01");
-  var baseMaps = {};
-  function baseMap(ctx2, code, env2) {
-    const hit3 = baseMaps[code];
-    if (hit3 === void 0 && env2) {
-      baseMaps[code] = "loading";
-      void assetUrl(ctx2.char, `map${code}`).then((url) => {
-        baseMaps[code] = url;
-        env2.render();
-      });
-      return null;
-    }
-    return hit3 === "loading" || hit3 === void 0 ? null : hit3;
-  }
-  var mapEnv = null;
-  var baseWhere = (b) => placeWhere(b.sido, b.gu) || "위치 미정";
-  function basePanel(b, ctx2, d) {
-    const k = (f) => `base:${f}|${b.name}`;
-    const url = baseMap(ctx2, b.sido, mapEnv);
-    const sido = REGIONS.map((c) => `<option value="${c}"${c === b.sido ? " selected" : ""}>${esc15(regionName(c))}</option>`).join("");
-    const gus = `<option value=""${b.gu ? "" : " selected"}>시군구 선택 안 함</option>` + (SIGUN[b.sido] ?? []).map((g) => `<option value="${esc15(g)}"${g === b.gu ? " selected" : ""}>${esc15(g)}</option>`).join("");
-    const map = url ? `<div class="dir-map" data-base-pick="${esc15(b.name)}"><img src="${esc15(url)}" alt="${esc15(regionName(b.sido))} 지도" draggable="false"><span class="dir-mappin" style="left:${b.x}%;top:${b.y}%"></span></div>` : `<div class="dir-map ph">지도 불러오는 중…</div>`;
-    return `<div class="dir-panel">
-    <div class="dir-line"><span>지도에 보이기</span><div class="gx-segs gx-segs-sm">
-      <button class="gx-seg${b.show ? " on" : ""}" data-action="dir-base-show" data-value="${esc15(`1|${b.name}`)}">보임</button>
-      <button class="gx-seg${!b.show ? " on" : ""}" data-action="dir-base-show" data-value="${esc15(`0|${b.name}`)}">숨김</button></div></div>
-    <div class="dir-line"><span>조직</span><div class="dir-chips">${d.orgs.map((o) => chip2("dir-base-org", `${o.name}|${b.name}`, o.name, b.org === o.name)).join("")}${chip2("dir-base-org", `|${b.name}`, "조직 없음", !b.org)}</div></div>
-    <div class="dir-grid">
-      <label class="dir-in"><span>지역</span><select class="gx-select" data-change="dir-base-sido" data-key="${esc15(b.name)}">${sido}</select></label>
-      <label class="dir-in"><span>시군구</span><select class="gx-select" data-change="dir-base-gu" data-key="${esc15(b.name)}">${gus}</select></label>
-    </div>
-    ${map}
-    ${input(k("label"), b.label, "지도 표시명", "비우면 거점 이름")}
-    ${input(k("lore"), b.lore, "위키 로어북", "이 거점을 설명하는 로어북 이름")}
-    ${input(k("english"), b.english, "영문명", "영어 응답에서도 이 이름을 알아봐요")}
-    ${input(k("aliases"), b.aliases.join(", "), "별칭", "쉼표로 나눠 적어요")}
-    <div class="dir-rename"><label class="dir-in"><span>거점 이름</span><input name="dir-base-name" value="${esc15(b.name)}" autocomplete="off" data-enter="dir-base-rename"></label>
-      <button class="gx-mini" data-action="dir-base-rename" data-take="dir-base-name">이름 바꾸기</button>
-      <button class="gx-mini danger" data-action="dir-base-del" data-value="${esc15(b.name)}">지우기</button></div>
-  </div>`;
-  }
-  function baseRow(b, ctx2, d
+  function cropBox(ctx2

@@ -1,4 +1,4 @@
-// goei-body 0.16.63
+// goei-body 0.16.64
 "use strict";
 (() => {
   // src/core/dispatch.ts
@@ -3451,7 +3451,12 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
     const show = imgRecent(o.imgShow);
     const send2 = imgRecent(o.imgSend);
     const marks2 = (Array.isArray(o.marks) ? o.marks : []).filter((m) => !!m && typeof m === "object" && typeof m.name === "string" && !!m.s && typeof m.s.tab === "string").slice(0, MARK_MAX).map((m) => ({ s: m.s, name: m.name.slice(0, 80) }));
-    prefs = { basic, world, ...theme ? { theme } : {}, ...Object.keys(vars).length ? { vars } : {}, ...nav ? { nav } : {}, ...agents ? { agents } : {}, ...dim !== null ? { dim } : {}, ...status2 ? { status: status2 } : {}, ...size !== null ? { imgSize: size } : {}, ...fold3 !== null ? { imgFold: fold3 } : {}, ...show !== null ? { imgShow: show } : {}, ...send2 !== null ? { imgSend: send2 } : {}, ...marks2.length ? { marks: marks2 } : {} };
+    const strList = (v, max, len) => Array.isArray(v) ? v.filter((x) => typeof x === "string" && !!x.trim()).map((x) => x.trim().slice(0, len)).slice(0, max) : [];
+    const imgPrompt = typeof o.imgPrompt === "string" && o.imgPrompt.trim() ? o.imgPrompt.slice(0, 6e3) : void 0;
+    const imgNamesOff = strList(o.imgNamesOff, 200, 40);
+    const imgNamesExtra = strList(o.imgNamesExtra, 60, 40);
+    const imgKeywords = strList(o.imgKeywords, 60, 24);
+    prefs = { basic, world, ...theme ? { theme } : {}, ...imgPrompt ? { imgPrompt } : {}, ...imgNamesOff.length ? { imgNamesOff } : {}, ...imgNamesExtra.length ? { imgNamesExtra } : {}, ...imgKeywords.length ? { imgKeywords } : {}, ...Object.keys(vars).length ? { vars } : {}, ...nav ? { nav } : {}, ...agents ? { agents } : {}, ...dim !== null ? { dim } : {}, ...status2 ? { status: status2 } : {}, ...size !== null ? { imgSize: size } : {}, ...fold3 !== null ? { imgFold: fold3 } : {}, ...show !== null ? { imgShow: show } : {}, ...send2 !== null ? { imgSend: send2 } : {}, ...marks2.length ? { marks: marks2 } : {} };
     return prefs;
   }
   function readSettingsBook(lore) {
@@ -4197,18 +4202,18 @@ ${themeVars("[x-goei-fab]")}
   function fields2(line2) {
     const out = [];
     let cur = "";
-    let esc22 = false;
+    let esc23 = false;
     for (const c of line2) {
-      if (esc22) {
+      if (esc23) {
         cur += c === "n" ? "\n" : c === "p" ? "|" : c === "\\" ? "\\" : `\\${c}`;
-        esc22 = false;
-      } else if (c === "\\") esc22 = true;
+        esc23 = false;
+      } else if (c === "\\") esc23 = true;
       else if (c === "|") {
         out.push(cur);
         cur = "";
       } else cur += c;
     }
-    if (esc22) cur += "\\";
+    if (esc23) cur += "\\";
     out.push(cur);
     return out;
   }
@@ -4247,16 +4252,4 @@ ${themeVars("[x-goei-fab]")}
       }
     }
     if (st.seq < G_POST_BASE) {
-      for (const post of st.posts) post.id += G_POST_BASE;
-      for (const s4 of Object.values(st.sources)) if (s4.postid > 0) s4.postid += G_POST_BASE;
-      st.seq += G_POST_BASE;
-    }
-    return st;
-  }
-  function encode(st) {
-    const out = ["GN1", `Q|${st.seq || G_POST_BASE}`];
-    for (const p of st.posts) {
-      out.push(["P", p.id, en(p.date), en(p.nick), en(p.title), p.views, p.votes, en(p.body), p.mine ? "1" : "0"].join("|"));
-      for (const c of p.comments) out.push(["C", p.id, c.parent, en(c.nick), en(c.body), c.mine ? "1" : "0", c.unread ? "1" : "0", en(c.time ?? "")].join("|"));
-    }
-    for (const [nick, s4] of Object.entries(st.sources)) out.push([
+      for (const post of st.posts) post.id += G_POS

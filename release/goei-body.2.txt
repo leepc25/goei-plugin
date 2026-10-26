@@ -1,4 +1,16 @@
-"T", en(nick), s4.postid || 0, en(s4.title), en(s4.body), en(s4.author), en(s4.quote), en(s4.quoteAuthor)].join("|"));
+T_BASE;
+      for (const s4 of Object.values(st.sources)) if (s4.postid > 0) s4.postid += G_POST_BASE;
+      st.seq += G_POST_BASE;
+    }
+    return st;
+  }
+  function encode(st) {
+    const out = ["GN1", `Q|${st.seq || G_POST_BASE}`];
+    for (const p of st.posts) {
+      out.push(["P", p.id, en(p.date), en(p.nick), en(p.title), p.views, p.votes, en(p.body), p.mine ? "1" : "0"].join("|"));
+      for (const c of p.comments) out.push(["C", p.id, c.parent, en(c.nick), en(c.body), c.mine ? "1" : "0", c.unread ? "1" : "0", en(c.time ?? "")].join("|"));
+    }
+    for (const [nick, s4] of Object.entries(st.sources)) out.push(["T", en(nick), s4.postid || 0, en(s4.title), en(s4.body), en(s4.author), en(s4.quote), en(s4.quoteAuthor)].join("|"));
     for (const d of st.dms) out.push(["D", en(d.nick), d.side, en(d.body), d.unread ? "1" : "0", en(d.date)].join("|"));
     return out.join("\n");
   }
@@ -3859,8 +3871,8 @@ ${after}`);
     }
     const n2 = userName.trim();
     if (n2 && agentName && n2 !== agentName && n2.length >= 2 && !/^(?:user|나|유저)$/i.test(n2)) {
-      const esc22 = n2.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-      const re = new RegExp(/^[A-Za-z]/.test(n2) ? `\\b${esc22}\\b` : esc22, "g");
+      const esc23 = n2.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const re = new RegExp(/^[A-Za-z]/.test(n2) ? `\\b${esc23}\\b` : esc23, "g");
       out = out.map((m) => typeof m?.content === "string" && re.test(m.content) ? { ...m, content: m.content.replace(re, agentName) } : m);
     }
     return out;
@@ -4434,20 +4446,4 @@ The previous response was rejected and nothing was saved. Recreate the complete 
   async function load(path, ext) {
     try {
       const data = await risuai.readImage(path);
-      if (typeof data === "string") return data.startsWith("data:") || data.startsWith("blob:") || data.startsWith("http") ? data : null;
-      const bytes = toBytes3(data);
-      if (!bytes?.length) return null;
-      return URL.createObjectURL(new Blob([bytes], { type: MIME2[ext.toLowerCase()] ?? "application/octet-stream" }));
-    } catch (error) {
-      console.log(`[goei] 이미지를 읽지 못했어요 (${path}): ${error instanceof Error ? error.message : String(error)}`);
-      return null;
-    }
-  }
-  var isRow = (a) => Array.isArray(a) && typeof a[0] === "string" && typeof a[1] === "string";
-  var modRows = [];
-  var modVer = 0;
-  var modBusy = null;
-  function loadModuleAssets() {
-    modBusy ??= (async () => {
-      let rows2 = [];
-      try
+      if (typeof data === "string") return data.startsWith("data:") || data.startsWith("blob:") || data.startsWith("http") ? data : nul

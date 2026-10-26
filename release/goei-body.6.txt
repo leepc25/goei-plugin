@@ -1,7 +1,268 @@
- " (standing of each organization toward " + user + ", kept by the system; members act accordingly)", ...lines2].join("\n");
+린: {
+        level: 2,
+        register: "반말",
+        self: "",
+        up: "부장",
+        peer: "동기",
+        down: "신입",
+        outsider: "너"
+      },
+      윤병수: {
+        level: 3,
+        register: "반말",
+        self: "",
+        up: "과장님",
+        peer: "대리",
+        down: "너",
+        outsider: "너"
+      },
+      윤지아: {
+        level: null,
+        register: "존댓말",
+        self: "저",
+        up: "선생님",
+        peer: "사장님",
+        down: "손님",
+        outsider: "손님"
+      },
+      은하제: {
+        level: 3,
+        register: "혼합",
+        self: "",
+        up: "선배님",
+        peer: "동기",
+        down: "신입",
+        outsider: "댁"
+      },
+      이기석: {
+        level: 4,
+        register: "존댓말",
+        self: "저",
+        up: "차장님",
+        peer: "과장님",
+        down: "요원님",
+        outsider: "손님"
+      },
+      이길환: {
+        level: 4,
+        register: "존댓말",
+        self: "저",
+        up: "부장님",
+        peer: "과장님",
+        down: "요원님",
+        outsider: "선생님"
+      },
+      이도형: {
+        level: 6,
+        register: "반말",
+        self: "나",
+        up: "국장님",
+        peer: "부장",
+        down: "거기",
+        outsider: "너"
+      },
+      이병진: {
+        level: 4,
+        register: "혼합",
+        self: "",
+        up: "부장님",
+        peer: "과장님",
+        down: "자네",
+        outsider: "그쪽 분"
+      },
+      이성해: {
+        level: 2,
+        register: "존댓말",
+        self: "저",
+        up: "선배님",
+        peer: "선배님",
+        down: "신입님",
+        outsider: "손님"
+      },
+      이연화: {
+        level: 3,
+        register: "존댓말",
+        self: "",
+        up: "선배님",
+        peer: "선생님",
+        down: "신입 씨",
+        outsider: "그쪽 분"
+      },
+      이자헌: {
+        level: 4,
+        register: "존댓말",
+        self: "저",
+        up: "부장님",
+        peer: "조장님",
+        down: "신입 님",
+        outsider: "손님"
+      },
+      장허운: {
+        level: 1,
+        register: "존댓말",
+        self: "저",
+        up: "선배님",
+        peer: "동기분",
+        down: "후배님",
+        outsider: "선생님"
+      },
+      잼트리: {
+        level: 2,
+        register: "존댓말",
+        self: "언니",
+        up: "부장님",
+        peer: "동기",
+        down: "후배",
+        outsider: "손님"
+      },
+      쟈알디: {
+        level: 3,
+        register: "반말",
+        self: "나",
+        up: "선배",
+        peer: "자네",
+        down: "요원",
+        outsider: "그쪽"
+      },
+      제이: {
+        level: null,
+        register: "존댓말",
+        self: "저",
+        up: "높으신 분",
+        peer: "직원분",
+        down: "신입분",
+        outsider: "손님"
+      },
+      조성춘: {
+        level: 4,
+        register: "반말",
+        self: "나",
+        up: "부장님",
+        peer: "과장",
+        down: "이 자식아",
+        outsider: "너"
+      },
+      진나솔: {
+        level: 3,
+        register: "혼합",
+        self: "",
+        up: "선배님",
+        peer: "너",
+        down: "신입",
+        outsider: "거기"
+      },
+      차여진: {
+        level: null,
+        register: "반말",
+        self: "나",
+        up: "선배",
+        peer: "자기",
+        down: "신입",
+        outsider: "손님"
+      },
+      청달래: {
+        level: 8,
+        register: "하게체",
+        self: "",
+        up: "자네",
+        peer: "자네",
+        down: "자네",
+        outsider: "자네"
+      },
+      콘쥬스: {
+        level: 1,
+        register: "존댓말",
+        self: "저",
+        up: "선배님",
+        peer: "선배님",
+        down: "신입 선배님",
+        outsider: "아저씨"
+      },
+      큐라스: {
+        level: 2,
+        register: "존댓말",
+        self: "",
+        up: "부장님",
+        peer: "동기",
+        down: "신입",
+        outsider: "너"
+      },
+      호유원: {
+        level: 7,
+        register: "존댓말",
+        self: "저",
+        up: "전무님",
+        peer: "이사님",
+        down: "직원님",
+        outsider: "손님"
+      }
+    }
+  };
+
+  // src/core/people/base.ts
+  var RELATIONS = relations_base_default;
+  var ALIASES = aliases_default;
+  var ADDRESS = address_default;
+  function seedAddress(name, faction, user) {
+    const row8 = ADDRESS.names[name];
+    if (!row8) return void 0;
+    const rel = relativeRank(user, faction, row8.level);
+    const register = REGISTERS.includes(row8.register) ? row8.register : "존댓말";
+    return { toUser: row8[rel] || row8.outsider || "", register };
   }
-  var COLLECTIVE_WORDS = /출입\s*금지|금지\s*해제|지시|명령|감사|징계|공문|포상|거래|계약|방송|보복|배제|보호|수색|봉쇄|통보|공식|조직|본부\s*차원|세력|전원|일제히|상부|경영진|이사회|위원회|협회/;
-  var collectiveOk = (text) => COLLECTIVE_WORDS.test(text);
+  function seedBaseFor(name, userFaction3, user) {
+    const b = RELATIONS.people[name];
+    const faction = b?.faction ?? "";
+    const alias = ALIASES.names[name];
+    const address = seedAddress(name, faction, user);
+    return {
+      faction,
+      ...b ? { express: b.express } : {},
+      affinityBase: userAffinityBase(faction, userFaction3),
+      aliases: [.../* @__PURE__ */ new Set([...alias?.aliases ?? [], ...b?.english ?? []])],
+      ...address ? { address } : {}
+    };
+  }
+  var valuesOf = (name) => RELATIONS.people[name]?.values ?? "";
+  var temperOf = (name) => RELATIONS.people[name]?.temper;
+  function userAffinityBase(personFaction, userFaction3) {
+    if (!personFaction || !userFaction3 || personFaction === userFaction3) return 0;
+    return RELATIONS.orgs[`${personFaction}>${userFaction3}`] ?? 0;
+  }
+  var factionBase = (code, userFaction3) => userAffinityBase(code, userFaction3);
+  function allNames() {
+    return Object.entries(ALIASES.names).map(([name, v]) => ({ name, aliases: [.../* @__PURE__ */ new Set([...v.aliases ?? [], ...RELATIONS.people[name]?.english ?? []])], titles: v.titles ?? [] }));
+  }
+  var extraNames2 = () => Object.fromEntries(allNames().map((e) => [e.name, { aliases: e.aliases, titles: e.titles }]));
+
+  // src/core/people/faction.ts
+  function userFactionOf(store, chat) {
+    const v = chat.scriptstate?.["$st_faction"] ?? chat.scriptstate?.["st_faction"];
+    return store.identity?.faction || (typeof v === "string" ? v : "");
+  }
+  function knownFactionCodes(store, names4 = {}) {
+    return [.../* @__PURE__ */ new Set([...Object.keys(ORG_NAMES), ...Object.keys(store.factions), ...Object.keys(names4)])];
+  }
+  var factionName = (code, names4 = {}, store) => names4[code] || store?.factions[code]?.name || ORG_NAMES[code] || code;
+  function factionNow(store, code, changes, userFaction3, settings, names4 = {}) {
+    const base = factionBase(code, userFaction3);
+    const v = factionView(code, base, changes, store.folded[factionWho(code)] ?? 0, { speed: settings.speed, turnCap: settings.turnCap }, settings.factionBounds);
+    return { code, name: factionName(code, names4, store), value: v.value, stage: v.stage, base };
+  }
+  function sceneFactionCodes(store, people, texts, names4 = {}) {
+    const out = [];
+    const push2 = (c) => {
+      if (c && !out.includes(c)) out.push(c);
+    };
+    for (const n2 of people) push2(store.people[n2]?.faction ?? "");
+    for (const t of texts) for (const c of factionCodesIn(t, names4)) push2(c);
+    return out;
+  }
+  function factionsBlock(list4, user = "{{user}}") {
+    const lines2 = list4.filter((f) => f.stage.id !== "neutral").map((f) => `- ${f.name} → ${user}: ${f.stage.behavior.replace(/\{\{user\}\}/g, user)}`);
+    if (!lines2.length) return "";
+    return ["## Factions → " + user + " (standing of each organization toward " + user + ", kept by the system; members act accordingly)", ...lines2].join("\n");
+  }
 
   // src/core/people/select.ts
   var isEnglish = (s4) => /^[A-Za-z][A-Za-z0-9 .'-]*$/.test(s4);
@@ -102,7 +363,7 @@ ${tail2}`;
       if (!list4.length) continue;
       entries2[s4] = list4.map((e) => ({ id: e.id, text: e.text, ...e.target ? { target: e.target } : {}, ...e.kind ? { kind: e.kind } : {} }));
     }
-    const aff = affinityView(p, changes);
+    const aff = affinityView(p, changes, 0, { turnCap: extra.turnCap });
     const addr = addressOf(p, changes);
     return {
       name: p.name,
@@ -192,7 +453,7 @@ ${tail2}`;
         }
       }
     }
-    const chosen = people.slice(0, 6);
+    const chosen = o.only?.length ? o.only.filter((n2) => store.people[n2]).slice(0, 6) : people.slice(0, 6);
     const already = [
       ...changes.filter((c) => c.kind === "cue" && chosen.includes(c.who) && [...confirmedIdx].some((idx) => live.at.get(c.anchor) === idx)).map((c) => ({ who: c.who, kind: "cue", cue: c.cue })),
       ...chosen.flatMap((n2) => SLOTS2.flatMap((s4) => liveEntries(store.people[n2].slots[s4], live).filter((e) => [...confirmedIdx].some((idx) => live.at.get(e.anchor) === idx)).map((e) => ({ who: n2, kind: "entry", slot: s4, text: e.text }))))
@@ -208,7 +469,7 @@ ${tail2}`;
       doc_types: DOC_TYPES.filter((t) => o.settings.features.has(docFeature(t))),
       people: chosen.map((n2) => {
         const p = store.people[n2];
-        return { ...personPayload(p, live, changes, wantNote || o.settings.features.has("perception") ? unknownTo(p, store, live) : void 0, { taste: o.settings.features.has("taste"), openness: o.settings.features.has("openness") }), values: o.values[n2] ?? "" };
+        return { ...personPayload(p, live, changes, wantNote || o.settings.features.has("perception") ? unknownTo(p, store, live) : void 0, { taste: o.settings.features.has("taste"), openness: o.settings.features.has("openness"), turnCap: o.settings.turnCap }), values: o.values[n2] ?? "" };
       }),
       known_names: Object.keys(store.people),
       docs_now: DOC_TYPES.some((t) => o.settings.features.has(docFeature(t))) ? Object.values(store.docs).filter((d) => o.settings.features.has(docFeature(d.type))).flatMap((d) => liveEntries(d.entries, live).map((e) => ({ type: d.type, key: d.key, id: e.id, text: e.text, ...e.date ? { date: e.date } : {}, ...e.place ? { place: e.place } : {}, ...e.who?.length ? { who: e.who } : {} }))) : void 0,
@@ -327,9 +588,13 @@ ${rules3}`;
       if (idx === void 0 || !input2.confirmed.has(idx)) return "확정 구간 밖 메시지";
       return { anchor: messageKey(list4[idx], idx), index: idx };
     };
-    const nameOf = (who) => resolveName2(who, store, input2.names);
+    const resolveAny = (who) => resolveName2(who, store, input2.names);
+    const nameOf = (who) => {
+      const n2 = resolveAny(who);
+      return n2 && ctx2.only?.length && !ctx2.only.includes(n2) ? null : n2;
+    };
     let newCount = 0;
-    for (const n2 of r.new_people ?? []) {
+    for (const n2 of ctx2.only?.length ? [] : r.new_people ?? []) {
       const name = plain(n2?.name, 40);
       if (!name) {
         drop("new_people", n2, "이름 없음");
@@ -638,7 +903,7 @@ ${rules3}`;
         if (putChange(store, { id: changeId(who, "address", ev.anchor, seq, `${toUser}|${register}`), anchor: ev.anchor, seq, src: "story", who, kind: "address", toUser, register, quote: a.quote, reason: `호칭 → ${toUser} (${register})` })) report.applied.address++;
       }
     }
-    for (const d of r.docs ?? []) {
+    for (const d of ctx2.only?.length ? [] : r.docs ?? []) {
       const type = d?.type;
       if (!DOC_TYPES.includes(type) || !ctx2.settings.features.has(docFeature(type))) {
         drop("doc", d, "없는 문서 종류 또는 꺼진 기능");
@@ -720,7 +985,7 @@ ${rules3}`;
         if (putEntry(store, who, "suspicion", { id: entryId(who, "suspicion", ev.anchor, seq, prefix + text), text: prefix + text, src: "story", anchor: ev.anchor, seq, quote: s4.quote, target, kind: s4.kind, ...replaces ? { replaces } : {} })) report.applied.suspicion++;
       }
     }
-    if (ctx2.settings.features.has("faction_rep")) {
+    if (ctx2.settings.features.has("faction_rep") && !ctx2.only?.length) {
       const changes = liveChanges(store, live);
       const seen2 = /* @__PURE__ */ new Set();
       const known = knownFactionCodes(store, input2.factionNames);
@@ -738,10 +1003,6 @@ ${rules3}`;
         const ev = evidence(f.m, f.quote);
         if (typeof ev === "string") {
           drop("faction", f, ev, code);
-          continue;
-        }
-        if (!collectiveOk(`${str4(f.reason)} ${str4(f.quote)}`)) {
-          drop("faction", f, "집단 반응 근거 없음 (구성원 한 명의 일은 그 인물 기록으로)", code);
           continue;
         }
         if (seen2.has(code)) {
@@ -787,8 +1048,30 @@ ${rules3}`;
         if (putChange(store, { id: changeId("@rhythm", "note", anchor, seq, now), anchor, seq, src: "story", who: "@rhythm", kind: "note", now, reason: "리듬 메모" })) report.applied.notes++;
       }
     }
-    markRead(store, chat, input2.indexes);
+    if (!ctx2.keepRead) markRead(store, chat, input2.indexes);
     return report;
+  }
+  function clearStoryRecords(store, who) {
+    const p = store.people[who];
+    if (!p) return 0;
+    let n2 = 0;
+    for (const slot of SLOTS2) {
+      const list4 = p.slots[slot];
+      if (!list4) continue;
+      const keep = list4.filter((e) => e.src !== "story" || e.pin);
+      n2 += list4.length - keep.length;
+      p.slots[slot] = keep;
+    }
+    const before = store.log.length;
+    store.log = store.log.filter((c) => !(c.who === who && c.src === "story"));
+    n2 += before - store.log.length;
+    return n2;
+  }
+  function mentionIndexes(chat, who, aliases, turns2) {
+    const list4 = msgs2(chat);
+    const match = nameMatcher([{ name: who, aliases, titles: [] }]);
+    const bots = list4.map((m, i) => m.role === "char" ? i : -1).filter((i) => i >= 0).slice(-turns2);
+    return bots.filter((i) => match(messageText(str4(list4[i].data))).length || list4[i - 1] && match(messageText(str4(list4[i - 1].data))).length);
   }
   function rhythmTextOk(key2, text) {
     if (key2 === "scene") {
@@ -1286,9 +1569,9 @@ ${rules3}`;
     "## 15a. Faction standing — how each organization regards the user",
     "",
     "Besides persons, the chat keeps a standing value per organization (관리국, 가짜 관리국, 백일몽, 민간, 프리랜서 협회, and any organization in the roster) toward the user's character: −100…100 in five stages (`faction_stages`). `factions_now` lists the organizations present in this span with their current stage. The program seeds each value from the organization table and recomputes it from cues; you never return a value.",
-    "- Return a `faction_cues` item ONLY when the organization acted or decided **as a body** toward the user in the confirmed span: an entry ban or its lifting, a retaliation or exclusion order, an official audit, reprimand or commendation, a deal or contract concluded with the organization, an announcement, a coordinated attack or protection by its members. The act must come from the organization's authority or its members acting under it.",
-    "- One member's mood, words or conduct is NEVER a faction cue: it belongs to that person's own record and affinity. 「쟈알디가 화냈다」 is not 「관리국이 적대」. A personal favor from a member is that member's cue, not the organization's.",
-    "- Use the same cue names as person affinity (`cues`) with the same meanings, judged at the organization's scale: 큰도움 for a formal commendation or a deal, 파탄 for an entry ban or a retaliation order, 중대위반 for an open declaration of hostility. The `reason` (Korean ≤40) must name the collective act. Cite `m` and a verbatim `quote` of the collective act. At most one item per organization per response.",
+    "- Return a `faction_cues` item when something in the confirmed span would change how THAT organization, as such, regards the user: you judge whether the event reaches the organization's view (its members' shared knowledge, its decisions, its treatment of the user), not just one person's private feeling. A decision or action by the organization or by members acting for it, a deed its members witnessed and would carry back, a deal, a ban, an audit, a public act toward the organization — all can qualify. A purely private exchange that stays between the user and one member, with no reason to reach the organization, does not.",
+    "- Do not record the same event twice: when it already produced a person `cue` for a member and it carries no weight beyond that member, do not also return a faction cue; when it does reach the organization, both may be recorded (the person's feeling and the organization's standing are separate).",
+    "- Use the same cue names as person affinity (`cues`) with the same meanings, judged at the organization's scale. The `reason` (Korean ≤40) names the event. Cite `m` and a verbatim `quote`. At most one item per organization per response.",
     "- Faction documents (`docs` type faction) describe what happened between organizations in prose; `faction_cues` changes only the organization's standing toward the user. The same event may appear in both.",
     "<<END:faction_rep>>",
     "<<SECTION:tidy>>",
@@ -1635,7 +1918,7 @@ ${rules3}`;
     "<<END:rhythm>>",
     "<<SECTION:faction_rep>>",
     "## 15a. Faction standing",
-    "A standing value per organization toward the user (−100…100, stages in `faction_stages`; present ones in `factions_now`). The program seeds and recomputes it; you return only `faction_cues`, and ONLY when the organization acted or decided as a body toward the user in the confirmed span: entry ban or lifting, retaliation or exclusion order, official audit/reprimand/commendation, a deal or contract with the organization, an announcement, coordinated attack or protection by its members under its authority. One member's mood, words or conduct is never a faction cue (that is the person's own record): 「쟈알디가 화냈다」 ≠ 「관리국이 적대」. Same cue names as person affinity, judged at the organization's scale (큰도움 commendation/deal · 파탄 entry ban/retaliation order · 중대위반 open declaration of hostility); `reason` (Korean ≤40) names the collective act; cite `m` and a verbatim `quote`; ≤1 item per organization. Faction `docs` are prose between organizations; `faction_cues` change only standing toward the user.",
+    "A standing value per organization toward the user (−100…100, stages in `faction_stages`; present ones in `factions_now`). The program seeds and recomputes it; you return only `faction_cues`, when something in the confirmed span would change how that organization, as such, regards the user — you judge whether it reaches the organization's view (shared knowledge, decisions, treatment), not one person's private feeling: decisions or actions by the organization or members acting for it, deeds members witnessed and would carry back, deals, bans, audits, public acts toward it. A private exchange that stays between the user and one member does not. Never record one event twice: if it only produced a member's person `cue` and carries no weight beyond that member, no faction cue; if it reaches the organization, both may exist. Same cue names as person affinity, judged at the organization's scale; `reason` (Korean ≤40) names the event; cite `m` and a verbatim `quote`; ≤1 item per organization. Faction `docs` are prose between organizations; `faction_cues` change only standing toward the user.",
     "<<END:faction_rep>>",
     "<<SECTION:tidy>>",
     "## 11. Tidying an oversized record",
@@ -1654,50 +1937,4 @@ ${rules3}`;
     "|---|---|",
     "| 약 (+2) | Relevant but ambiguous clue tied to this target and kind: an inconsistency, an unexplained absence, a changed reaction to a name or place, an unfamiliar trace, behavior not fitting the claimed identity or condition |",
     "| 중 (+5) | A concrete specific question: a concealed meeting or contact seen or credibly reported, a document or object that should not be there, a changed explanation for the same matter, presence where the target should not be, a physical sign consistent with 오염 of unconfirmed cause |",
-    "| 강 (+10) | Independently verified facts contradicting the account or connecting the target to the matter: confirmed sighting, record, schedule, communication or witness conflicting with the explanation; the same rumor from several mouths is not independent |",
-    "One disordered detail, a bodily mark, one-sided contact or a suspicious object never confirms; unclear cause → record the question, not the conclusion. Harm suffered by the target is not the target's voluntary wrongdoing. Confirmation needs reliable evidence reaching the person that establishes identity, context, intent or voluntariness, and the actual act or state.",
-    "",
-    "### 10.3 Trust and affinity",
-    "Trust in ability versus trust in one explanation; liking versus suspecting: read trust about this matter separately from affinity. Distrust, relevant betrayal and the explanation's credibility outrank goodwill. A genuinely established trusting relationship (shown in the record, or, with affinity on, stage 끌림 or above toward this target) may mitigate one ambiguous clue once: 「약→0」 (omit the clue) or 「중→약」; never mitigate 강 or confirmation; never twice for one event. Affinity toward a third person is not trust about this target. Never lower affinity because suspicion rose or raise suspicion because affinity is low or zero.",
-    "",
-    "### 10.4 Disproof and closure",
-    "Weakening requires new explanation or counterevidence matching the question to reach the person and the span to show acceptance. A plea to be believed, a gift, closeness, apology, affinity increase or time alone erases nothing. Partial refutation keeps the rest; never drop unfavorable facts to manufacture counterevidence. Decrease weights: 「-약」 (−2: accepts a consistent explanation for a weak question or notices consistent behavior and revises an ambiguous concern); 「-중」 (−5: independent material, testimony or complete context refutes a specific question); 「-강」 (−10: several independent facts refute the main question while another remains). Closing (`op: close`, `result`): 확인 (clear reliable evidence reached the person; program sets score ≥80); 해소 (reliable new evidence refutes the whole allegation and the person changes their mind; score 0); 묻음 (a real fact kept, the person forgives or stops pursuing; score kept). A closed case reopens (`op: open` on it) only on new relevant evidence; the old score is kept. Use close instead of a clue in the same turn; never add a clue for the closing evidence. Learning falsity and changing one's mind differs from accepting truth and forgiving; forgiveness erases no fact. Once convinced, the person is not frozen in suspicion; without new evidence they do not repeat the question indefinitely.",
-    "",
-    "### 10.5 Responses",
-    "What the person actually did about the suspicion (`op: respond`, `stage`): 지켜봄 (watches, says less, remembers answers, attends to a name or schedule); 시험 (asks concrete details, checks a discrepancy, sets a small trap, verifies a record); 대면 (asks for an explanation directly, states boundaries, creates distance, accuses); 보고 (tells a superior, colleague or outsider; requests investigation; uses the knowledge as pressure). Personality shapes it: verification-minded asks about the real discrepancy; watchful waits; insensitive is slow then confused; conflict-avoidant postpones while suspecting. Never force a stage from a high score: a high score is not confirmation; 대면 and 보고 require the act in the span. Distinguish thinking, stating intent, attempting, the recipient receiving, and outcome: 「보고하겠다」 is intent; a report does not make others believe. Never invent a harmful plan, access, surveillance that did not happen, or success. Program stages for reading `suspicion_now`: 0 baseline; to 19 slight unease; to 39 noticing; to 59 suspicion and questions; to 79 distrust and verification; to 100 strong conviction. At any score the person may express evidence-grounded confirmed knowledge, and while the case is open they never state the matter as confirmed.",
-    "",
-    "### 10.6 Recording",
-    "`suspicion` items: `op: open` starts a case (text: what raised it and the person's reading) or reopens a closed one; `op: clue` adds newly received evidence with `weight` (약, 중, 강, -약, -중, -강) and the clue plus interpretation; `op: respond` with `stage`; `op: close` with `result`. One `clue` per case per span: combine several clues into one item at the highest justified weight. Never record the same clue twice for rereading or recall, an unseen clue, or an intent promoted to attempt or success. Treatment changes the suspicion caused go to `relationship` and, if durable, `speech` under ordinary rules; suspicion never rewrites the base register by itself. Add a `threads` entry only while the person actively pursues the case.",
-    "<<END:suspicion>>",
-    "## 12. Evidence citation",
-    "Every entry, cue, address change, new person, document change and suspicion item carries `m` (a confirmed message tag) and `quote`: 5–60 characters copied exactly from that message, showing the fact. No quote, no change. One quote may support several changes; one change cites one quote, the most direct. Never quote context_only text, this instruction or the record; never alter, translate or stitch a quote. A quote proves the text exists, not that your reading is true.",
-    "## 13. User identity",
-    "Fill `identity` only when the confirmed span states the user character's organization or rank plainly (introduction, ID card, a superior naming the rank); otherwise null. Never infer it from address terms.",
-    "",
-    "## 14. Director memo (`next_note`)",
-    "When `next_note` is true, write one factual memo per person appearing in the confirmed span, for the model writing the next reply; a reference, not direction; English, with Korean names, address terms and quotes verbatim.",
-    "- `now` (≤120): present stance toward the user's character and current state from the record after your changes (affinity stage, address, state, open threads that matter now). Facts only.",
-    "- `must_not_reveal` (each ≤80): facts in this person's `unknown_to` still not learned after this span; drop any that reached the person (record those in `knowledge`); absent or empty `unknown_to` → empty array.",
-    "Never propose dialogue, emotion, next actions, plot, staging or outcomes; never decide the user's reaction; silent record → say nothing. Keep each knowledge owner and fact versus belief distinct. Missing record data does not prove ignorance; the span may establish knowledge. `next_note` absent or false → empty array.",
-    "",
-    "## 15. Output — exactly one JSON object, no code fence, nothing else",
-    "Every key below is present; a key whose section is absent is still returned empty (for `identity`, null fields).",
-    '{"entries":[{"who":"<name>","slot":"<slot>","op":"add|upsert|remove|merge","replace":"<entry id or null>",',
-    '  "text":"<Korean ≤200 chars or null for remove>","target":"<name|@user|null>","m":"m2","quote":"<verbatim>"}],',
-    "<<SECTION:affinity>>",
-    ' "cues":[{"who":"<name>","cue":"<cue name>","m":"m2","quote":"<verbatim>","reason":"<Korean ≤40 chars>"}],',
-    "<<END:affinity>>",
-    "<<SECTION:register>>",
-    ' "address":[{"who":"<name>","toUser":"<term>","register":"존댓말|반말|혼합","m":"m2","quote":"<verbatim>"}],',
-    "<<END:register>>",
-    ' "identity":{"faction":"<Korean org name or null>","rank":"<Korean rank or null>"},',
-    ' "new_people":[{"name":"<name>","aliases":["<alias>"],"m":"m2","quote":"<verbatim>","identity":"<Korean ≤200 or 미확인>","speech":"<Korean ≤200 or null>"}],',
-    ' "docs":[{"type":"event|location|faction|item|rhythm","key":"<Korean name>","op":"add|upsert|remove","replace":"<id or null>","text":"<Korean ≤200 or null for remove>","m":"m2","quote":"<verbatim>","date":"<YYYY.MM.DD or null>","place":"<Korean place or null>","who":["<name or @user>"]}],',
-    "<<SECTION:suspicion>>",
-    ' "suspicion":[{"who":"<name>","target":"<name|@user>","kind":"정체|배신|거짓말|오염|범행","op":"open|clue|respond|close","weight":"<약|중|강|-약|-중|-강 for clue, else null>","stage":"<지켜봄|시험|대면|보고 for respond, else null>","result":"<확인|해소|묻음 for close, else null>","text":"<Korean ≤200>","m":"m2","quote":"<verbatim>"}],',
-    "<<END:suspicion>>",
-    "<<SECTION:taste>>",
-    ' "taste":[{"who":"<name>","band":<-3..3>,"m":"m2","quote":"<verbatim>","reason":"<Korean ≤60 chars>"}],',
-    "<<END:taste>>",
-    "<<SECTION:openness>>",
-    '
+    "| 강 (+10) | Independently verified facts contradicting the account or connecting the target to the matter: confirmed sighting, record, schedule, communication or witness
