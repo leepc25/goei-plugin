@@ -1,4 +1,14 @@
-3 = d.orgs.filter((o) => !q || o.name.toLowerCase().includes(q));
+l}<small>${rows2.length}</small></h3>${rows2.join("")}`).join("");
+  }
+  function directoryList(ctx2) {
+    const d = draftOf(ctx2);
+    const q = dirUi.q.trim().toLowerCase();
+    const names4 = namesOf(d, ctx2.char.globalLore);
+    if (q) return searchAll(ctx2, d, q, names4);
+    if (dirUi.kind === "base") return baseList(ctx2, d, q);
+    if (dirUi.kind === "appendix") return appendixList(ctx2, d, q);
+    if (dirUi.kind === "org") {
+      const rows3 = d.orgs.filter((o) => !q || o.name.toLowerCase().includes(q));
       return `${rows3.map((o) => orgRow(o, ctx2, d, names4)).join("") || '<p class="gx-muted dir-empty">맞는 조직이 없어요.</p>'}`;
     }
     if (dirUi.kind !== "agent") {
@@ -3465,5 +3475,5 @@ ${NOTE}`;
   }
 
   // src/body-entry.ts
-  globalThis.__goeiBody = { version: "0.16.60", start: start2 };
+  globalThis.__goeiBody = { version: "0.16.61", start: start2 };
 })();
