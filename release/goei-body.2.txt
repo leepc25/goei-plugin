@@ -1,4 +1,81 @@
-evious) {
+);
+  }
+  var postHead = (p) => JSON.stringify([p.id, p.nick, p.title, p.body, p.date, p.mine]);
+  var commentKey = (c) => JSON.stringify([c.parent, c.nick, c.body, c.mine]);
+  function postKey(p) {
+    return p ? JSON.stringify([p.id, p.nick, p.title, p.body, p.date, p.mine, p.comments.map((c) => [c.parent, c.nick, c.body, c.mine])]) : "";
+  }
+  function findPost(st, id) {
+    return st.posts.find((p) => p.id === id);
+  }
+  function dateNow(chat) {
+    const minute = readWorld(chat).minute;
+    const p = (n) => String(n).padStart(2, "0");
+    if (minute !== null && minute > 0) {
+      const d = new Date(minute * 6e4);
+      return `${d.getUTCFullYear()}.${p(d.getUTCMonth() + 1)}.${p(d.getUTCDate())} ${p(d.getUTCHours())}:${p(d.getUTCMinutes())}`;
+    }
+    const msgs = chat.message ?? [];
+    for (let i = msgs.length - 1; i >= 0; i--) {
+      const m = msgs[i];
+      if (m.role !== "char" || typeof m.data !== "string") continue;
+      const t = /\[▣\s*\|\s*(\d{4})\.(\d{2})\.(\d{2})\s*\|\s*(\d{1,2}):(\d{2})\s*([AaPp][Mm])/.exec(m.data);
+      if (t) {
+        let h = Number(t[4]) % 12;
+        if (t[6].toUpperCase() === "PM") h += 12;
+        return `${t[1]}.${t[2]}.${t[3]} ${p(h)}:${t[5]}`;
+      }
+    }
+    return "";
+  }
+  function storyTurns(chat) {
+    return (chat.message ?? []).filter((m) => m.role === "char" && String(m.data ?? "").trim() && !String(m.data).includes("%%")).length;
+  }
+  function postLimit(s4) {
+    return QUANTITY[s4.quantity]?.max ?? 7;
+  }
+  function protectedPost(s4, p) {
+    if (p.mine) return s4.keepOwn;
+    return s4.keepReplied && p.comments.some((c) => c.mine);
+  }
+  function trimBoard(st, s4) {
+    const cap = postLimit(s4);
+    while (st.posts.length > cap) {
+      let idx = -1;
+      for (let i = st.posts.length - 1; i >= 0; i--) {
+        if (!protectedPost(s4, st.posts[i])) {
+          idx = i;
+          break;
+        }
+      }
+      if (idx < 0) break;
+      st.posts.splice(idx, 1);
+    }
+  }
+  function trimDms(st, cap = HISTORY.dmKeep) {
+    const counts = /* @__PURE__ */ new Map();
+    const keep = /* @__PURE__ */ new Set();
+    for (let i = st.dms.length - 1; i >= 0; i--) {
+      const n = (counts.get(st.dms[i].nick) ?? 0) + 1;
+      counts.set(st.dms[i].nick, n);
+      if (n <= cap) keep.add(i);
+    }
+    st.dms = st.dms.filter((_, i) => keep.has(i));
+  }
+  function replyForUser(p, c) {
+    if (c.mine) return false;
+    if (p.mine) return true;
+    let parent = c.parent;
+    const seen2 = /* @__PURE__ */ new Set();
+    while (parent && p.comments[parent - 1] && !seen2.has(parent)) {
+      seen2.add(parent);
+      const row7 = p.comments[parent - 1];
+      if (row7.mine) return true;
+      parent = row7.parent;
+    }
+    return false;
+  }
+  function reconcileUnread(st, previous) {
     const old = new Map(previous.posts.map((p) => [p.id, p]));
     const run3 = (rows2, prior, side, wanted) => {
       const queue2 = /* @__PURE__ */ new Map();
@@ -3232,6 +3309,7 @@ ${next.content.trim()}`;
   var slotVar = (k) => `$${SLOTS[k].name}`;
   var DONT_ACTIVATE = "@@dont_activate";
   var FOLDER_KIND = { 세력: "org", 조직: "org", 파밍: "site", 괴이: "anomaly", 요원: "agent" };
+  var APPENDIX = "부록";
   var folderWord2 = (name) => name.replace(/[^\p{L}\p{N}]/gu, "");
   var str2 = (v) => typeof v === "string" ? v : "";
   var CONFIRM_KEYS = /* @__PURE__ */ new Set([
@@ -3367,27 +3445,32 @@ ${next.content.trim()}`;
   function folderKeys(books) {
     const kinds = /* @__PURE__ */ new Map();
     for (const e of books) {
-      const k = e.mode === "folder" ? FOLDER_KIND[folderWord2(str2(e.comment))] : void 0;
-      if (k && typeof e.key === "string") kinds.set(e.key, k);
+      if (e.mode !== "folder" || typeof e.key !== "string") continue;
+      const w = folderWord2(str2(e.comment));
+      const k = w === APPENDIX ? "appendix" : FOLDER_KIND[w];
+      if (k && !kinds.has(e.key)) kinds.set(e.key, k);
     }
     return kinds;
   }
   var managedHere = (e, kinds) => e.mode !== "folder" && kinds.has(str2(e.folder)) && !!str2(e.key).trim() && !e.alwaysActive;
+  var otherTriggers = (w) => w.withParent || w.target || w.places.length > 0 || w.agents.length > 0;
   function syncDecorators(lore, mode2) {
     const books = lore ?? [];
     if (!hasSlots(books)) return null;
     const kinds = folderKeys(books);
+    const locked = new Set(readDirectory(books).appendices.filter((r) => r.unlock).map((r) => r.lore));
     let n = 0;
     const next = books.map((e) => {
       if (!managedHere(e, kinds)) return e;
       const content = str2(e.content);
       const on2 = hasDontActivate(content);
-      if (mode2 === "plugin" && !on2) {
+      const keep = mode2 === "plugin" || kinds.get(str2(e.folder)) === "appendix" && locked.has(str2(e.comment));
+      if (keep && !on2) {
         n++;
         return { ...e, content: `${DONT_ACTIVATE}
 ${content}` };
       }
-      if (mode2 === "risu" && on2) {
+      if (!keep && on2) {
         n++;
         return { ...e, content: content.replace(/^\s*@@dont_activate[ \t]*\r?\n?/m, "") };
       }
@@ -3404,14 +3487,40 @@ ${content}` };
       return [];
     }
     const kinds = folderKeys(books);
+    const dir2 = readDirectory(books);
     const groups = /* @__PURE__ */ new Map();
-    for (const a of readDirectory(books).agents) groups.set(a.lore, [a.group, /^[A-Z]\d\d$/.test(a.affiliation) ? "" : a.affiliation].filter(Boolean));
+    for (const a of dir2.agents) groups.set(a.lore, [a.group, /^[A-Z]\d\d$/.test(a.affiliation) ? "" : a.affiliation].filter(Boolean));
+    const apps = new Map(dir2.appendices.map((r) => [r.lore, r]));
+    const parentAt = (name) => books.findIndex((x) => x.mode !== "folder" && str2(x.comment) === name && kinds.has(str2(x.folder)) && kinds.get(str2(x.folder)) !== "appendix");
+    const agentNames = (name) => {
+      const a = dir2.agents.find((x) => x.lore === name || x.name === name || x.aliases.includes(name));
+      return a ? [...new Set([a.name, a.lore, a.english, ...a.aliases].filter(Boolean))] : [name];
+    };
     const out = [];
     books.forEach((e, index2) => {
-      const kind = kinds.get(str2(e.folder));
+      const folderKind = kinds.get(str2(e.folder));
       const content = str2(e.content);
-      if (!kind || !managedHere(e, kinds)) return;
-      const raw = keysOf2(e);
+      if (!folderKind || e.mode === "folder" || e.alwaysActive) return;
+      let kind;
+      let order = Number(e.insertorder ?? 0);
+      let rank2 = index2;
+      let appendix;
+      if (folderKind === "appendix") {
+        const row7 = apps.get(str2(e.comment));
+        if (!row7 || (!str2(e.key).trim() || !row7.keys) && !otherTriggers(row7)) return;
+        const at = row7.parent ? parentAt(row7.parent) : -1;
+        const p = at >= 0 ? books[at] : void 0;
+        kind = p ? kinds.get(str2(p.folder)) : "org";
+        if (p) {
+          order = Number(p.insertorder ?? 0);
+          rank2 = at + 0.5 + index2 / 1e7;
+        }
+        appendix = { parent: p ? row7.parent : "", parentNames: p ? [row7.parent, ...keysOf2(p)] : row7.parent ? [row7.parent] : [], when: row7, agentNames: row7.agents.map(agentNames) };
+      } else {
+        if (!managedHere(e, kinds)) return;
+        kind = folderKind;
+      }
+      const raw = appendix && !appendix.when.keys ? [] : keysOf2(e);
       const longKo = raw.filter((k) => hangul(k) && syllables(k) >= 3);
       const keys = [];
       for (const text of raw) {
@@ -3421,7 +3530,7 @@ ${content}` };
         const alias = kind === "agent" && !en2 && syllables(text) === 2 && longKo.some((l) => l.replace(/\s+/g, "").includes(text));
         keys.push({ text, en: en2, rule: CONFIRM_KEYS.has(text) ? "confirm" : alias ? "alias" : "plain", re });
       }
-      out.push({ kind, name: str2(e.comment), order: Number(e.insertorder ?? 0), index: index2, content, keys, rawKeys: raw, groups: groups.get(str2(e.comment)) ?? [] });
+      out.push({ kind, name: str2(e.comment), order, index: index2, content, keys, rawKeys: raw, groups: groups.get(str2(e.comment)) ?? [], rank: rank2, ...appendix ? { appendix } : {} });
     });
     cache4.set(books, out);
     return out;
@@ -3466,20 +3575,41 @@ ${content}` };
     });
     return hits.filter((h) => !hits.some((o) => o !== h && o.entry !== h.entry && o.start <= h.start && o.end >= h.end && o.end - o.start > h.end - h.start));
   }
+  var UNLOCK_VAR = "$goei_unlocked";
+  var UNLOCK_TAG = /\[\s*🔓\s*[|｜]\s*([^\]\r\n]+?)\s*\]/gu;
+  function readUnlocked(ss) {
+    try {
+      const v = JSON.parse(String(ss?.[UNLOCK_VAR] ?? "[]"));
+      return Array.isArray(v) ? v.filter((x) => typeof x === "string" && !!x.trim()) : [];
+    } catch {
+      return [];
+    }
+  }
+  var unlockedValue = (names4) => JSON.stringify([...new Set(names4)]);
+  var hasUnlockTag = (text) => typeof text === "string" && text.includes("🔓") && new RegExp(UNLOCK_TAG.source, "u").test(text);
+  function unlockTags(text) {
+    return hasUnlockTag(text) ? [...text.matchAll(UNLOCK_TAG)].map((m) => m[1].trim()) : [];
+  }
+  function stripUnlockTags(text) {
+    if (!hasUnlockTag(text)) return text;
+    return text.replace(new RegExp(`^[ \\t]*${UNLOCK_TAG.source}[ \\t]*\\r?\\n?`, "gmu"), "").replace(UNLOCK_TAG, "").replace(/\n{3,}/g, "\n\n").trimEnd();
+  }
   var DEFAULT_DEPTH = 10;
   function loreState(chat) {
     const msgs = chat.message ?? [];
     let target = "";
+    let place2 = "";
+    let companions = [];
     for (let i = msgs.length - 1; i >= 0 && !target; i--) {
       if (msgs[i].role === "user") continue;
       const tags = findStatusTags(str2(msgs[i].data));
-      if (tags.length) target = tags[tags.length - 1].target;
+      if (tags.length) ({ target, place: place2, companions } = tags[tags.length - 1]);
       if (tags.length) break;
     }
     const w = parseWorld(chat.scriptstate?.[WORLD_KEY]);
     const board2 = [...w.an.filter((a) => a.state === "활성").map((a) => a.name), ...w.ms.filter((m) => m.state === "출현").map((m) => m.name)];
     const deployed = Object.entries(w.agents).filter(([, r]) => r.st === "작전투입" || r.st === "외근").map(([n]) => n);
-    return { target, board: board2, deployed };
+    return { target, board: board2, deployed, place: place2, companions, unlocked: readUnlocked(chat.scriptstate) };
   }
   var sameName = (a, b) => a.replace(/\s+/g, "").toLowerCase() === b.replace(/\s+/g, "").toLowerCase();
   function names(e, name) {
@@ -3495,7 +3625,7 @@ ${content}` };
       picks.set(i, p);
     };
     entries2.forEach((e, i) => {
-      if (state.target && names(e, state.target)) add(i, "status", state.target, state.target, 100);
+      if (state.target && !e.appendix && names(e, state.target)) add(i, "status", state.target, state.target, 100);
     });
     const pending = [];
     window2.forEach((m, wi) => {
@@ -3513,34 +3643,75 @@ ${content}` };
       const ok = hit3.marked || present || picks.has(hit3.entry) || hit3.honor;
       if (ok) add(hit3.entry, picks.has(hit3.entry) || !hit3.marked ? why : "confirmed", hit3.key.text, hit3.snippet, score2);
     }
+    pickAppendices(entries2, picks, state, add);
     let list4 = [...picks.values()];
     if (o.budget > 0) {
       const keep = [];
       let used = 0;
-      for (const p of list4.slice().sort((a, b) => b.score - a.score)) {
+      for (const p of list4.slice().sort((a, b) => Number(!!a.entry.appendix) - Number(!!b.entry.appendix) || b.score - a.score)) {
         const n = tokens(p.entry.content);
         if (used + n > o.budget) continue;
         used += n;
         keep.push(p);
       }
-      list4 = keep;
+      const on2 = new Set(keep.map((p) => p.entry.name));
+      list4 = keep.filter((p) => !p.entry.appendix?.when.needParent || on2.has(p.entry.appendix.parent));
     }
-    return list4.sort((a, b) => a.entry.order - b.entry.order || a.entry.index - b.entry.index);
+    return sortPicks(list4);
+  }
+  var sortPicks = (list4) => list4.sort((a, b) => a.entry.order - b.entry.order || a.entry.rank - b.entry.rank || a.entry.index - b.entry.index);
+  var squash2 = (t) => t.replace(/\s+/g, "").toLowerCase();
+  function pickAppendices(entries2, picks, state, add) {
+    if (!entries2.some((e) => e.appendix)) return;
+    const place2 = squash2(state.place ?? "");
+    const present = [...state.companions ?? [], ...state.deployed];
+    entries2.forEach((e, i) => {
+      const a = e.appendix;
+      if (!a) return;
+      if (a.when.target && state.target && a.parentNames.some((n) => sameName(n, state.target))) add(i, "status", state.target, state.target, 100);
+      const w = place2 ? a.when.places.find((x) => squash2(x) && place2.includes(squash2(x))) : void 0;
+      if (w) add(i, "place", w, state.place ?? "", 40);
+      for (const group5 of a.agentNames) {
+        const who = present.find((p) => group5.some((n) => sameName(n, p)));
+        if (who) add(i, "agent", group5[0], who, 20);
+      }
+    });
+    const on2 = new Set([...picks.values()].map((p) => p.entry.name));
+    entries2.forEach((e, i) => {
+      const a = e.appendix;
+      if (a?.when.withParent && a.parent && on2.has(a.parent)) add(i, "parent", a.parent, a.parent, 10);
+    });
+    const parentOn = new Set([...picks.values()].filter((p) => !p.entry.appendix).map((p) => p.entry.name));
+    const unlocked = new Set(state.unlocked ?? []);
+    for (const [i, p] of picks) {
+      const a = p.entry.appendix;
+      if (!a) continue;
+      if (a.when.unlock && !unlocked.has(p.entry.name) || a.when.needParent && !parentOn.has(a.parent)) picks.delete(i);
+    }
+  }
+  function lockedAppendices(entries2, picks, unlocked) {
+    const on2 = new Set(picks.map((p) => p.entry.name));
+    const done2 = new Set(unlocked);
+    return entries2.filter((e) => e.appendix?.when.unlock && !done2.has(e.name) && e.appendix.parent && on2.has(e.appendix.parent));
+  }
+  function unlockHint(e) {
+    return `[Locked appendix: 「${e.name}」] Hidden information about ${e.appendix.parent} that no character knows yet. Unlock it when this happens in the story: ${e.appendix.when.unlock}
+Do not invent, reveal, or hint at the hidden information before it is unlocked. In the one reply where the condition is clearly met, write [🔓|${e.name}] on its own line at the very end.`;
   }
   function pickLoreRisu(entries2, messages, depth) {
-    const squash3 = (s4) => s4.toLowerCase().replace(/\s+/g, "");
-    const window2 = messages.slice(-Math.max(1, depth)).map((m) => ({ m, flat: squash3(m.data) }));
+    const squash4 = (s4) => s4.toLowerCase().replace(/\s+/g, "");
+    const window2 = messages.slice(-Math.max(1, depth)).map((m) => ({ m, flat: squash4(m.data) }));
     const out = [];
     for (const entry of entries2) {
       const reasons = [];
       for (const k of entry.rawKeys) {
-        const key2 = squash3(k);
+        const key2 = squash4(k);
         const at = key2 ? window2.find((w) => w.flat.includes(key2)) : void 0;
         if (at) reasons.push({ why: at.m.role === "user" ? "user" : "char", key: k, snippet: k });
       }
       if (reasons.length) out.push({ entry, score: 0, reasons });
     }
-    return out.sort((a, b) => a.entry.order - b.entry.order || a.entry.index - b.entry.index);
+    return sortPicks(out);
   }
   function slotTexts(picks, env2) {
     const out = { org: [], site: [], anomaly: [], agent: [] };
@@ -3561,7 +3732,9 @@ ${content}` };
     const msgs = loreMessages(chat, o.input, o.mode === "risu");
     const picks = o.mode === "risu" ? pickLoreRisu(entries2, msgs, o.depth) : pickLore(entries2, msgs, loreState(chat), o, msgs.at(-1)?.role === "user");
     const texts = o.mode === "risu" ? null : slotTexts(picks, o.env);
-    return { picks, vars: Object.fromEntries(LORE_KINDS.map((k) => [slotVar(k), texts?.[k] ?? ""])) };
+    const locked = texts ? lockedAppendices(entries2, picks, readUnlocked(chat.scriptstate)) : [];
+    for (const e of locked) texts[e.kind] = [texts[e.kind], unlockHint(e)].filter(Boolean).join("\n\n");
+    return { picks, vars: Object.fromEntries(LORE_KINDS.map((k) => [slotVar(k), texts?.[k] ?? ""])), locked };
   }
   var sameVars = (ss, vars) => Object.entries(vars).every(([k, v]) => String(ss?.[k] ?? "") === v);
   function loreOptions(char, chat, mode2, user = "") {
@@ -4284,202 +4457,4 @@ The previous response was rejected and nothing was saved. Recreate the complete 
       }
       const changed = JSON.stringify(rows2) !== JSON.stringify(modRows);
       if (changed) modRows = rows2, modVer++;
-      return changed;
-    })().finally(() => {
-      modBusy = null;
-    });
-    return modBusy;
-  }
-  var moduleAssetStamp = () => modVer;
-  var modIndex = null;
-  var modIndexVer = -1;
-  function modRow(name) {
-    if (!modIndex || modIndexVer !== modVer) {
-      modIndex = { exact: /* @__PURE__ */ new Map(), lower: /* @__PURE__ */ new Map() };
-      for (const r of modRows) {
-        if (!modIndex.exact.has(r[0])) modIndex.exact.set(r[0], r);
-        if (!modIndex.lower.has(r[0].toLowerCase())) modIndex.lower.set(r[0].toLowerCase(), r);
-      }
-      modIndexVer = modVer;
-    }
-    return modIndex.exact.get(name) ?? modIndex.lower.get(name.toLowerCase());
-  }
-  function modulePicker() {
-    if (!modRows.length) return void 0;
-    return (name) => modRow(name)?.[0] ?? null;
-  }
-  function findRow(char, name) {
-    const lower = name.toLowerCase();
-    const card2 = (char.additionalAssets ?? []).filter(isRow);
-    return card2.find((a) => a[0] === name) ?? card2.find((a) => a[0].toLowerCase() === lower) ?? modRow(name);
-  }
-  function assetNames(char) {
-    const card2 = (char.additionalAssets ?? []).filter(isRow);
-    return [...new Set([...card2, ...modRows].map((r) => r[0]))].filter((n) => !/^map\d+$/i.test(n));
-  }
-  var DEFAULT_CROP = "50,16,44";
-  var AGENT_CROPS = {
-    "Aestheticism": "53,18,40",
-    "Aileen": "43,21,46",
-    "Baek Sa-heon": "50,18,44",
-    "Cha Yeo-jin": "54,18,44",
-    "Cho Seong-choon": "48,18,44",
-    "Do Pil-heon": "48,16,44",
-    "Go Young-eun": "46,16,44",
-    "Jang Heo-un": "52,18,44",
-    "Jay": "53,16,44",
-    "Jyaldi": "56,18,44",
-    "Kwak Je-gang": "56,19,44",
-    "Kyuras": "49,19,44",
-    "Lee Do-hyeong": "61,16,44",
-    "Ma Deok-hee": "49,19,44",
-    "Mun Hye-ran": "46,18,44",
-    "Secriem": "54,16,44",
-    "Seo Yun-ji": "46,18,44",
-    "Spangdal": "52,18,44"
-  };
-  var personCrop = (p) => parseCrop(p.crop) ?? parseCrop(!p.photo && AGENT_CROPS[p.english ?? ""] || DEFAULT_CROP);
-  function parseCrop(s4) {
-    const n = String(s4 ?? "").split(",").map(Number);
-    if (n.length !== 3 || n.some((x) => !Number.isFinite(x))) return null;
-    const c = (x, lo, hi) => Math.min(hi, Math.max(lo, x));
-    return [c(n[0], 0, 100), c(n[1], 0, 100), c(n[2], 5, 100)];
-  }
-  function splitPic(pic) {
-    const at = pic.lastIndexOf("#");
-    const crop = at > 0 ? parseCrop(pic.slice(at + 1)) : null;
-    return crop ? { name: pic.slice(0, at), crop } : { name: pic, crop: null };
-  }
-  function mainPic(char, p) {
-    const en2 = p.english ?? "";
-    if (p.photo) return p.photo;
-    if (en2 && hasAsset(char, `${en2}_default`)) return `${en2}_default`;
-    if (en2 && hasAsset(char, en2)) return en2;
-    return p.shared?.find((n) => hasAsset(char, n)) ?? "";
-  }
-  function facePic(char, p, person = false) {
-    if (p.face) return p.face;
-    const en2 = p.english ?? "";
-    if (person && !p.photo && en2 && hasAsset(char, `${en2}_default`)) return `${en2}_default#${personCrop(p).join(",")}`;
-    if (en2 && hasAsset(char, en2)) return en2;
-    const main = mainPic(char, p);
-    const crop = person ? personCrop(p) : parseCrop(p.crop);
-    return main && crop ? `${main}#${crop.join(",")}` : main;
-  }
-  var hasAsset = (char, name) => !!name && !!findRow(char, splitPic(name).name);
-  function assetUrl(char, name) {
-    const row7 = findRow(char, name);
-    if (!row7) return Promise.resolve(null);
-    const key2 = `${String(char.chaId ?? char.name ?? "")}|${row7[1]}`;
-    let hit3 = cache5.get(key2);
-    if (!hit3) {
-      hit3 = load(row7[1], String(row7[2] ?? row7[1].split(".").pop() ?? ""));
-      cache5.set(key2, hit3);
-      void hit3.then((url) => {
-        if (!url) cache5.delete(key2);
-      });
-    }
-    return hit3;
-  }
-
-  // src/ui/images.ts
-  var urls = /* @__PURE__ */ new Map();
-  var redraw = () => {
-  };
-  var queued = false;
-  function forgetImages() {
-    urls.clear();
-    schedule();
-  }
-  function setImageRedraw(fn2) {
-    redraw = fn2;
-  }
-  function schedule() {
-    if (queued) return;
-    queued = true;
-    setTimeout(() => {
-      queued = false;
-      redraw();
-    }, 30);
-  }
-  var MAX_SIDE = 720;
-  var FACE_SIDE = 256;
-  async function shrink(url, crop = null) {
-    try {
-      const im = new Image();
-      im.src = url;
-      await im.decode();
-      const W2 = im.naturalWidth;
-      const H2 = im.naturalHeight;
-      let [sx, sy, sw, sh] = [0, 0, W2, H2];
-      if (crop) {
-        const side = Math.min(W2, H2, crop[2] / 100 * W2);
-        sx = Math.min(W2 - side, Math.max(0, crop[0] / 100 * W2 - side / 2));
-        sy = Math.min(H2 - side, Math.max(0, crop[1] / 100 * H2 - side / 2));
-        sw = sh = side;
-      }
-      const scale = Math.min(1, (crop ? FACE_SIDE : MAX_SIDE) / Math.max(sw, sh));
-      if (!crop && !(scale < 1)) return url;
-      const canvas = document.createElement("canvas");
-      canvas.width = Math.max(1, Math.round(sw * scale));
-      canvas.height = Math.max(1, Math.round(sh * scale));
-      const g = canvas.getContext("2d");
-      if (!g) return url;
-      g.imageSmoothingQuality = "high";
-      g.drawImage(im, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height);
-      const blob = await new Promise((res) => canvas.toBlob(res, "image/webp", 0.88));
-      return blob ? URL.createObjectURL(blob) : url;
-    } catch {
-      return url;
-    }
-  }
-  function imageUrl(char, pic) {
-    if (!pic) return null;
-    const key2 = `${String(char.chaId ?? char.name ?? "")}|${pic}`;
-    const hit3 = urls.get(key2);
-    if (hit3 === void 0) {
-      urls.set(key2, "loading");
-      const { name, crop } = splitPic(pic);
-      void assetUrl(char, name).then(async (raw) => {
-        const url = raw ? await shrink(raw, crop) : null;
-        urls.set(key2, url);
-        if (url) schedule();
-      });
-      return null;
-    }
-    return hit3 === "loading" ? null : hit3;
-  }
-  var escAttr = (s4) => s4.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
-  function agentFace(char, english) {
-    if (!english) return "";
-    const a = readDirectory(char.globalLore ?? []).agents.find((x) => x.english === english);
-    return facePic(char, a ?? { english }, true);
-  }
-  function factionPic(char, f, slot = "main") {
-    const o = readDirectory(char.globalLore ?? []).orgs.find((x) => x.faction ? x.faction === f.code : x.name === f.affiliation);
-    const src = { photo: o?.spec.photo ?? f.photo, face: o?.spec.face, crop: o?.spec.crop, english: o?.spec.english || f.english, shared: o?.shared };
-    return slot === "face" ? facePic(char, src) : mainPic(char, src);
-  }
-  function picAvatar(char, pic, name, cls = "") {
-    const url = imageUrl(char, pic);
-    const first = escAttr(Array.from(name.trim())[0] ?? "?");
-    return `<span class="gx-ava${cls ? ` ${cls}` : ""}">${url ? `<img src="${escAttr(url)}" alt="" loading="lazy">` : `<span>${first}</span>`}</span>`;
-  }
-  var avatar = (char, english, name, cls = "") => picAvatar(char, agentFace(char, english), name, cls);
-  function prefetchFactions(char) {
-    for (const f of factionList(char.globalLore)) if (!f.hidden) imageUrl(char, factionPic(char, f));
-  }
-  var stLabel = (st) => st === "작전투입" ? "작전" : st;
-  var AGENT_COLOR = { 작전투입: "var(--signal)", 외근: "var(--blue)", 부상: "var(--amber)", 실종: "var(--danger)", 격리: "var(--danger)", 사망: "var(--danger)", 비번: "var(--dim)" };
-  var stChip = (st) => `<em class="gx-st" style="--st:${AGENT_COLOR[st] ?? "var(--dim)"}">${escAttr(stLabel(st))}</em>`;
-  function agentInner(char, p, st, situation = "", act = "") {
-    const role = [p.department, p.rank].filter(Boolean).join(" · ");
-    return `<span class="gx-acard-side">${avatar(char, p.english, p.name, "sq")}${act}</span><span class="gx-acard-txt"><span class="gx-acard-top"><b>${escAttr(p.name)}</b>${stChip(st)}</span>${role ? `<small>${escAttr(role)}</small>` : ""}${situation ? `<span class="gx-acard-sit">${escAttr(situation)}</span>` : ""}</span>`;
-  }
-  function showIdCard(html) {
-    const box = document.createElement("div");
-    box.className = "gx gx-agpop gx-idpop";
-    box.setAttribute("role", "dialog");
-    box.innerHTML = `<div class="gx-idpop-card">${html}<button class="gx-agpop-x" aria-label="닫기">✕</button></div>`;
-    const theme = document.querySelector(".gx")?.getAttribute("data-theme");
-    if (theme) bo
+      return cha

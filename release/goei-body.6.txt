@@ -1,4 +1,338 @@
-ear = d.bases.find((b) => b.org && b.org === org?.name) ?? d.bases[0];
+3 = d.orgs.filter((o) => !q || o.name.toLowerCase().includes(q));
+      return `${rows3.map((o) => orgRow(o, ctx2, d, names4)).join("") || '<p class="gx-muted dir-empty">맞는 조직이 없어요.</p>'}`;
+    }
+    if (dirUi.kind !== "agent") {
+      const rows3 = (dirUi.kind === "anomaly" ? d.anomalies : d.sites).filter((r) => matches3(r, q));
+      const src = loreSources(ctx2.char.globalLore);
+      const inside2 = rows3.filter((r) => r.inFolder);
+      const outside = rows3.filter((r) => !r.inFolder);
+      const folder = dirUi.kind === "anomaly" ? "🚧괴이" : "🎁파밍";
+      return `${inside2.length ? `<h3 class="dir-group">${folder} 폴더<small>${inside2.length}</small></h3>${inside2.map((r) => placeRow(r, ctx2)).join("")}` : ""}
+      ${outside.length ? `<h3 class="dir-group">다른 폴더에서 온 후보<small>${outside.length}</small></h3><p class="gx-muted dir-group-help">조직·개체처럼 괴이 폴더 밖의 로어북이에요. 「발생 후보」로 두면 괴이처럼 발생해요.</p>${outside.map((r) => placeRow(r, ctx2, src.get(r.lore))).join("")}` : ""}
+      ${!rows3.length ? '<p class="gx-muted dir-empty">맞는 항목이 없어요.</p>' : ""}`;
+    }
+    const rows2 = d.agents.filter((r) => matches3(r, q));
+    if (!rows2.length) return '<p class="gx-muted dir-empty">맞는 사람이 없어요.</p>';
+    const key2 = (a) => a.affiliation ? orgName(d, names4, a.affiliation) : "";
+    const order = ["", ...d.orgs.map((o) => o.name)];
+    const groups = [...new Set(rows2.map(key2))].sort((x, y) => order.indexOf(x) - order.indexOf(y));
+    return groups.map((g) => {
+      const list4 = rows2.filter((r) => key2(r) === g);
+      const body4 = list4.map((r, i) => agentRow(r, ctx2, d, names4, q ? void 0 : { first: i === 0, last: i === list4.length - 1 })).join("");
+      return `<h3 class="dir-group${g ? "" : " warn"}">${esc14(g || "소속 미정")}<small>${list4.length}</small></h3>${body4}`;
+    }).join("");
+  }
+  var directoryDone = () => dirUi.done;
+  var directoryDoneClear = (text) => {
+    if (dirUi.done === text) dirUi.done = "";
+  };
+  var directorySearch = () => `<input class="dir-search" type="search" data-input="dir-q" value="${esc14(dirUi.q)}" placeholder="명부 전체 검색 (괴이·특수·요원·조직·거점·부록)" aria-label="명부 전체 검색" autocomplete="off">`;
+  var barButtons = (off) => `<button class="st-act save" data-action="set-bar" data-value="save" ${off ? "disabled" : ""}>${ICONS.pen}덮어쓰기</button><button class="st-act" data-action="set-bar" data-value="load" ${off ? "disabled" : ""}>${ICONS.refresh}불러오기</button>`;
+  function directoryBar() {
+    return barButtons(!dirty() || dirUi.busy);
+  }
+  function directoryView(ctx2) {
+    const d = draftOf(ctx2);
+    const kinds = [
+      ["anomaly", "괴이", d.anomalies.length],
+      ["site", "특수", d.sites.length],
+      ["agent", "요원", d.agents.length],
+      ["org", "조직", d.orgs.length],
+      ["base", "거점", d.bases.length],
+      ["appendix", "부록", d.appendices.length]
+    ];
+    return `<div class="dir">
+    <div class="gx-segs dir-kinds">${kinds.map(([k, label, n]) => `<button class="gx-seg${dirUi.kind === k ? " on" : ""}" data-action="dir-kind" data-value="${k}" aria-pressed="${dirUi.kind === k}">${label} <small>${n}</small></button>`).join("")}</div>
+    <div class="dir-tools">
+      <div class="dir-qbox">${directorySearch()}</div>
+      ${ADD_LABEL[dirUi.kind] ? `<button class="dir-tool${dirUi.adding ? " on" : ""}" data-action="dir-add-toggle" aria-expanded="${dirUi.adding}">${ICONS.plus}<span>${ADD_LABEL[dirUi.kind]}</span></button>` : ""}
+      <button class="dir-tool icon" data-action="dir-reload" aria-label="로어북 다시 읽기" title="로어북 다시 읽기">${ICONS.refresh}</button>
+      <button class="dir-tool icon${dirUi.help ? " on" : ""}" data-action="dir-help" aria-expanded="${dirUi.help}" aria-label="명부 사용법" title="명부 사용법">?</button>
+    </div>
+    ${dirUi.adding ? addPanel(ctx2) : ""}
+    ${dirUi.help ? `<div class="dir-help">
+      <ul>
+        <li>로어북 폴더 <code>🚧괴이</code> <code>🎁파밍</code> <code>🙂요원</code>에 넣은 항목이 각각 괴이·특수·요원 탭에 자동으로 들어와요.</li>
+        <li>새 요원은 「요원」 탭에서 소속 조직을 골라 주세요.</li>
+        <li>거점은 지도에 찍히는 장소예요. 「거점」 탭에서 추가하고 지도를 눌러 위치를 정해요.</li>
+        <li>긴 로어북의 세부는 <code>📎부록</code> 폴더에 「본 항목 이름 · 설명」으로 따로 넣어요. 본 항목과 같은 자리에 들어가고, 켜지는 조건(키·위치·동행·해금)은 「부록」 탭에서 정해요.</li>
+        <li>고친 값은 위의 「덮어쓰기」를 눌러야 카드에 남아요. 이 카드의 모든 채팅에 바로 적용되고, 카드를 공유하면 같이 가요.</li>
+      </ul>
+      ${d.folders ? "" : '<p class="gx-hint">이 카드에는 명부 폴더가 없어서 옛 목록(World catalog·Agent roster)을 보여 줘요.</p>'}
+    </div>` : ""}
+    ${dirUi.notice ? `<div class="gx-err" role="alert">${esc14(dirUi.notice)}</div>` : ""}
+    ${unassigned(d) ? `<button class="dir-alert" data-action="dir-kind" data-value="agent">소속을 정하지 않은 요원이 ${unassigned(d)}명 있어요</button>` : ""}
+    <div class="dir-list">${directoryList(ctx2)}</div>
+  </div>`;
+  }
+  var ADD_LABEL = { anomaly: "후보 추가", site: "후보 추가", agent: "", org: "조직 추가", base: "거점 추가", appendix: "" };
+  function addPanel(ctx2) {
+    if (dirUi.kind === "org" || dirUi.kind === "base") {
+      const [name, act, hint] = dirUi.kind === "org" ? ["dir-org-new", "dir-org-add", "새 조직 이름"] : ["dir-base-new", "dir-base-new", "새 거점 이름"];
+      return `<div class="dir-ext"><div class="dir-add"><input name="${name}" placeholder="${hint}" aria-label="${hint}" autocomplete="off" data-enter="${act}">
+      <button class="gx-mini" data-action="${act}" data-take="${name}">추가</button></div></div>`;
+    }
+    return `<div class="dir-ext"><input class="gx-search" data-input="dir-ext-q" value="${esc14(dirUi.addQ)}" placeholder="다른 폴더의 로어북 이름·폴더 검색" aria-label="후보로 넣을 로어북 검색" autocomplete="off">
+    <div class="dir-ext-list">${directoryExtList(ctx2)}</div></div>`;
+  }
+  var unassigned = (d) => d.agents.filter((a) => !a.affiliation).length;
+  var splitList = (v) => v.split(",").map((t) => t.trim()).filter(Boolean);
+  function directoryInput(key2, value, bar) {
+    const d = dirUi.draft;
+    if (!d) return;
+    if (key2.startsWith("base:")) {
+      const at2 = key2.indexOf("|");
+      const field5 = key2.slice(5, at2);
+      const b = d.bases.find((x) => x.name === key2.slice(at2 + 1));
+      if (!b) return;
+      if (field5 === "aliases") b.aliases = splitList(value);
+      else if (field5 === "label" || field5 === "lore" || field5 === "english") b[field5] = value.trim();
+      else return;
+      dirUi.done = "";
+      if (bar) bar.innerHTML = directoryBar();
+      return;
+    }
+    if (key2.startsWith("disp:") || key2.startsWith("ptab:") || key2.startsWith("seed:")) {
+      const [kind, rest] = [key2.slice(0, 4), key2.slice(5)];
+      if (kind === "disp") {
+        const [viewer, code] = rest.split("|");
+        const m = d.display[viewer] ??= {};
+        if (value.trim()) m[code] = value.trim();
+        else delete m[code];
+      } else if (kind === "ptab") {
+        const t = d.phoneTabs.tabs.find((x) => x.id === rest);
+        if (t) t.name = value.trim() || t.id;
+      } else {
+        const names4 = splitList(value);
+        if (names4.length) d.seeds[rest] = names4;
+        else delete d.seeds[rest];
+      }
+      dirUi.done = "";
+      if (bar) bar.innerHTML = directoryBar();
+      return;
+    }
+    if (key2.startsWith("app:")) {
+      const at2 = key2.indexOf("|");
+      const field5 = key2.slice(4, at2);
+      const r = d.appendices.find((x) => x.lore === key2.slice(at2 + 1));
+      if (!r) return;
+      if (field5 === "parent") r.parent = value.trim();
+      else if (field5 === "places" || field5 === "agents") r[field5] = splitList(value);
+      else if (field5 === "unlock") r.unlock = value.trim();
+      else return;
+      dirUi.done = "";
+      if (bar) bar.innerHTML = directoryBar();
+      return;
+    }
+    if (key2.startsWith("org:")) {
+      const at2 = key2.indexOf("|");
+      const field5 = key2.slice(4, at2);
+      const o = d.orgs.find((x) => x.name === key2.slice(at2 + 1));
+      if (!o) return;
+      if (field5 === "seed") o.spec.seed = splitList(value);
+      else if (field5 === "title" || field5 === "blurb" || field5 === "photo" || field5 === "english" || field5 === "gm_name" || field5 === "gm_desc" || field5 === "tab") o.spec[field5] = value.trim();
+      else return;
+      dirUi.done = "";
+      if (bar) bar.innerHTML = directoryBar();
+      return;
+    }
+    const at = key2.indexOf("|");
+    const field4 = key2.slice(0, at);
+    const row7 = findRow2(d, key2.slice(at + 1));
+    if (!row7) return;
+    if (field4 === "aliases") row7.aliases = splitList(value);
+    else if (field4 === "label") row7.label = value.trim() || row7.lore;
+    else if (field4 === "english" || field4 === "rank" || field4 === "department" || field4 === "affiliation") row7[field4] = value.trim();
+    else return;
+    dirUi.done = "";
+    if (bar) bar.innerHTML = directoryBar();
+  }
+  function setPlayable(d, o, on2) {
+    if (on2 === !!o.spec.playable) return;
+    if (on2 && !o.spec.code) {
+      const code2 = nextCode([...d.usedCodes, ...d.orgs.map((x) => x.spec.code ?? "")]);
+      if (!code2) {
+        dirUi.notice = "더 줄 수 있는 세력 코드가 없어요 (F00~Z00).";
+        return;
+      }
+      o.spec.code = code2;
+      d.usedCodes = [...d.usedCodes, code2];
+    }
+    const code = o.spec.code;
+    const tab2 = extraTabId(code);
+    o.spec.playable = on2;
+    const edit = (xs, x) => on2 ? xs.includes(x) ? xs : [...xs, x] : xs.filter((y) => y !== x);
+    o.rosterFor = edit(o.rosterFor, code);
+    o.phoneTabs = edit(o.phoneTabs, tab2);
+    for (const a of d.agents) {
+      if (a.affiliation !== orgAffiliation(o)) continue;
+      a.rosterFor = edit(a.rosterFor, code);
+      a.phoneTabs = edit(a.phoneTabs, tab2);
+    }
+    dirUi.notice = "";
+  }
+  async function handleDirectory(action, value, ctx2, env2) {
+    if (!action.startsWith("dir-")) return false;
+    const v = value ?? "";
+    const d = draftOf(ctx2);
+    mapEnv = env2;
+    const baseOf = (name) => d.bases.find((b) => b.name === name);
+    switch (action) {
+      case "dir-kind":
+        if (isKind2(v)) {
+          dirUi.kind = v;
+          dirUi.open = "";
+          dirUi.q = "";
+          dirUi.adding = false;
+        }
+        break;
+      case "dir-open":
+        dirUi.open = dirUi.open === v ? "" : v;
+        break;
+      case "dir-move": {
+        const [how, lore, target] = v.split("|");
+        if ((how === "up" || how === "down" || how === "before" || how === "after") && moveAgent(d, lore ?? "", how, target ?? "")) dirUi.done = "";
+        break;
+      }
+      case "dir-jump": {
+        const cut2 = v.indexOf("|");
+        const kind = v.slice(0, cut2);
+        if (isKind2(kind)) {
+          Object.assign(dirUi, { kind, open: v.slice(cut2 + 1), q: "", adding: false });
+          dirUi.scrollTo = v.slice(cut2 + 1);
+        }
+        break;
+      }
+      case "dir-set":
+      case "dir-toggle": {
+        const [field4, arg] = v.split("|", 2);
+        const row7 = findRow2(d, v.slice(field4.length + arg.length + 2));
+        if (!row7) break;
+        if (field4 === "preset") row7.preset = arg === "1";
+        else if (field4 === "affiliation") row7.affiliation = arg;
+        else if (field4 === "rosterFor" || field4 === "phoneTabs") {
+          const cur = row7[field4];
+          row7[field4] = cur.includes(arg) ? cur.filter((x) => x !== arg) : [...cur, arg];
+        }
+        dirUi.done = "";
+        break;
+      }
+      case "dir-app-toggle": {
+        const at = v.indexOf("|");
+        const field4 = v.slice(0, at);
+        const r = d.appendices.find((x) => x.lore === v.slice(at + 1));
+        if (!r || field4 !== "keys" && field4 !== "withParent" && field4 !== "needParent" && field4 !== "target") break;
+        r[field4] = !r[field4];
+        dirUi.done = "";
+        break;
+      }
+      case "dir-app-place": {
+        const at = v.lastIndexOf("|");
+        const r = d.appendices.find((x) => x.lore === v.slice(at + 1));
+        const name = v.slice(0, at);
+        if (!r || !name || r.places.includes(name)) break;
+        r.places = [...r.places, name];
+        dirUi.done = "";
+        break;
+      }
+      case "dir-app-unlock": {
+        if (!d.appendices.some((x) => x.lore === v)) break;
+        try {
+          await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
+            const cur = readUnlocked(chat.scriptstate);
+            const next = cur.includes(v) ? cur.filter((x) => x !== v) : [...cur, v];
+            return { ...chat, scriptstate: { ...chat.scriptstate ?? {}, [UNLOCK_VAR]: unlockedValue(next) } };
+          });
+          dirUi.done = "이 채팅의 해금 상태를 바꿨어요";
+        } catch (error) {
+          dirUi.notice = `해금 상태를 바꾸지 못했어요: ${error instanceof Error ? error.message : String(error)}`;
+        }
+        await env2.refresh();
+        return true;
+      }
+      case "dir-org-pick": {
+        const at = v.indexOf("|");
+        const row7 = d.agents.find((a) => a.lore === v.slice(at + 1));
+        if (!row7) break;
+        assignOrg(row7, d.orgs.find((o) => o.name === v.slice(0, at)));
+        dirUi.done = "";
+        break;
+      }
+      case "dir-gender": {
+        const at = v.indexOf("|");
+        const row7 = d.agents.find((a) => a.lore === v.slice(at + 1));
+        const g = v.slice(0, at);
+        if (!row7 || g !== "F" && g !== "M" && g !== "X") break;
+        if (g === loreGender(ctx2.char.globalLore ?? [], row7.lore) || g === "X" && !loreGender(ctx2.char.globalLore ?? [], row7.lore)) delete row7.gender;
+        else row7.gender = g;
+        dirUi.done = "";
+        break;
+      }
+      case "dir-org-toggle": {
+        const [field4, arg] = v.split("|", 2);
+        const o = d.orgs.find((x) => x.name === v.slice(field4.length + arg.length + 2));
+        if (!o || field4 !== "rosterFor" && field4 !== "phoneTabs") break;
+        o[field4] = o[field4].includes(arg) ? o[field4].filter((x) => x !== arg) : [...o[field4], arg];
+        for (const a of d.agents) if (a.affiliation === orgAffiliation(o)) a[field4] = [...o[field4]];
+        dirUi.done = "";
+        break;
+      }
+      case "dir-org-add": {
+        const name = v.trim();
+        dirUi.kind = "org";
+        if (!name) break;
+        if (d.orgs.some((o) => o.name === name || o.faction === name)) {
+          dirUi.notice = `「${name}」 조직이 이미 있어요.`;
+          break;
+        }
+        d.orgs.push({ name, faction: "", rosterFor: ["D00", "E00"], phoneTabs: [], spec: {} });
+        dirUi.open = name;
+        dirUi.adding = false;
+        dirUi.notice = "";
+        dirUi.done = "";
+        break;
+      }
+      case "dir-org-rename": {
+        const o = d.orgs.find((x) => x.name === dirUi.open && !x.faction);
+        const name = v.trim();
+        if (!o || !name || name === o.name) break;
+        if (d.orgs.some((x) => x.name === name || x.faction === name)) {
+          dirUi.notice = `「${name}」 조직이 이미 있어요.`;
+          break;
+        }
+        for (const a of d.agents) if (a.affiliation === o.name) a.affiliation = name;
+        for (const b of d.bases) if (b.org === o.name) b.org = name;
+        o.name = name;
+        dirUi.open = name;
+        dirUi.notice = "";
+        dirUi.done = "";
+        break;
+      }
+      case "dir-org-del": {
+        const o = d.orgs.find((x) => x.name === v && !x.faction);
+        if (!o || d.agents.some((a) => a.affiliation === o.name)) break;
+        d.orgs = d.orgs.filter((x) => x !== o);
+        for (const b of d.bases) if (b.org === o.name) b.org = "";
+        dirUi.open = "";
+        dirUi.done = "";
+        break;
+      }
+      case "dir-base-goto":
+        if (!baseOf(v)) break;
+        dirUi.kind = "base";
+        dirUi.open = v;
+        dirUi.q = "";
+        break;
+      case "dir-base-new": {
+        const org = dirUi.kind === "org" ? d.orgs.find((o) => o.name === v) : void 0;
+        const want = org ? `${org.name} 거점` : v.trim();
+        if (!want) break;
+        if (!org && baseOf(want)) {
+          dirUi.notice = `「${want}」 거점이 이미 있어요.`;
+          break;
+        }
+        const name = freeBaseName(d, want);
+        const near = d.bases.find((b) => b.org && b.org === org?.name) ?? d.bases[0];
         const sido = near?.sido && REGIONS.includes(near.sido) ? near.sido : "02";
         d.bases.push({ name, label: "", lore: org ? org.name : "", english: "", aliases: [], org: org?.name ?? "", sido, gu: "", x: 50, y: 50, show: true });
         dirUi.kind = "base";
@@ -861,11 +1195,12 @@ ${note.trim()}` : card2;
 
   // src/ui/lorecheck.ts
   var esc16 = (s4) => String(s4 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
-  var WHY = { status: "상태창", input: "이번 입력", user: "내 글", char: "응답", confirmed: "확증" };
+  var WHY = { status: "상태창", input: "이번 입력", user: "내 글", char: "응답", confirmed: "확증", place: "위치", agent: "동행·투입", parent: "본 항목" };
   function item(p, risu = false) {
     const r = p.reasons[0];
     const why = risu ? `키 「${r.key}」` : `${WHY[r.why]} · 「${r.snippet.trim()}」`;
-    return `<div class="ps-row lc-row"><div class="ps-label"><b>${esc16(p.entry.name)}</b><small>${esc16(why)}</small></div><span class="lc-kind">${SLOTS[p.entry.kind].label}</span></div>`;
+    const kind = `${SLOTS[p.entry.kind].label}${p.entry.appendix ? " 부록" : ""}`;
+    return `<div class="ps-row lc-row"><div class="ps-label"><b>${esc16(p.entry.name)}</b><small>${esc16(why)}</small></div><span class="lc-kind">${kind}</span></div>`;
   }
   function loreCheckBox(ctx2) {
     const mode2 = advValue(ctx2.chat.scriptstate, "gen", "lore_mode");
@@ -885,6 +1220,7 @@ ${note.trim()}` : card2;
     const diff = more || less ? `${more ? `<h4 class="lc-sub">더 켜짐</h4>${more}` : ""}${less ? `<h4 class="lc-sub">안 켜짐</h4>${less}` : ""}` : '<p class="ps-note">달라지는 것이 없어요.</p>';
     return `<details class="ps-adv" data-keep="lore-check"${keepOpen("lore-check")}><summary class="ps-adv-sum"><b>로어북 확인</b><span class="adv-count">${now.picks.length}개 · 약 ${size.toLocaleString()}토큰</span></summary><div class="ps-adv-body">
     <section class="ps-group"><h3>${mode2 === "risu" ? "Risu가 켤 로어북" : "다음 요청에 넣을 로어북"}</h3><div class="ps-rows">${list4}</div></section>
+    ${now.locked.length ? `<section class="ps-group"><h3>해금 전 부록</h3><div class="ps-rows">${now.locked.map((e) => `<div class="ps-row lc-row"><div class="ps-label"><b>${esc16(e.name)}</b><small>${esc16(`해금 조건: ${e.appendix?.when.unlock ?? ""}`)}</small></div><span class="lc-kind">잠김</span></div>`).join("")}</div><p class="ps-note">모델에게는 해금 조건만 알려요. 조건이 맞으면 응답 끝에 해금 표시를 남기고, 다음 요청부터 내용이 들어가요.</p></section>` : ""}
     <section class="ps-group"><h3>${otherIf}</h3><div class="ps-rows">${diff}</div></section>
   </div></details>`;
   }
@@ -2879,8 +3215,22 @@ ${NOTE}`;
     }
   }
   function stripHistoryTags(messages) {
-    if (!messages.some((m) => m?.role === "assistant" && typeof m.content === "string" && hasWorldTags(m.content))) return messages;
-    return messages.map((m) => m?.role === "assistant" && typeof m.content === "string" && hasWorldTags(m.content) ? { ...m, content: cleanOutput(m.content) } : m);
+    const dirty2 = (c) => typeof c === "string" && (hasWorldTags(c) || hasUnlockTag(c));
+    if (!messages.some((m) => m?.role === "assistant" && dirty2(m.content))) return messages;
+    return messages.map((m) => m?.role === "assistant" && dirty2(m.content) ? { ...m, content: stripUnlockTags(hasWorldTags(m.content) ? cleanOutput(m.content) : m.content) } : m);
+  }
+  async function applyUnlocks(char, charIndex, chatIndex, messageIndex) {
+    const lockable = new Set(readDirectory(char.globalLore).appendices.filter((r) => r.unlock).map((r) => r.lore));
+    return updateChat(charIndex, chatIndex, (cur) => {
+      const m = cur.message?.[messageIndex];
+      const text = typeof m?.data === "string" ? m.data : "";
+      if (!m || !hasUnlockTag(text)) return null;
+      const got = unlockTags(text).filter((n) => lockable.has(n));
+      const message = [...cur.message ?? []];
+      message[messageIndex] = { ...m, data: stripUnlockTags(text) };
+      const ss = got.length ? { ...cur.scriptstate ?? {}, [UNLOCK_VAR]: unlockedValue([...readUnlocked(cur.scriptstate), ...got]) } : cur.scriptstate;
+      return { ...cur, message, scriptstate: ss };
+    });
   }
   async function onOutput(arg) {
     setWaiting(false);
@@ -2899,6 +3249,7 @@ ${NOTE}`;
           (cur) => processOutput(cur, arg.messageIndex, raw, catalog, worldSettings(char.globalLore, cur.scriptstate), Math.random)
         );
       }
+      if (hasUnlockTag(raw)) latest = await applyUnlocks(char, arg.characterIndex, arg.chatIndex, arg.messageIndex).catch(() => null) ?? latest;
       let now = latest ?? await risuai.getChatFromIndex(arg.characterIndex, arg.chatIndex);
       if (!now || chatPhase(now) !== "started") return;
       now.message ??= [];
@@ -2996,6 +3347,7 @@ ${NOTE}`;
     if (isLanding(text)) out = landingHtml2();
     else {
       if (liteNow && hasWorldTags(out)) out = cleanOutput(out);
+      if (liteNow && hasUnlockTag(out)) out = stripUnlockTags(out);
       if (hasSceneCard(out)) out = renderSceneCards(out, sceneCardHtml);
       if (hasCall(out)) out = renderCalls(out, callCardHtml);
       if (out.includes(START_MARK)) out = renderStartCards(out, startCardHtml);
@@ -3113,5 +3465,5 @@ ${NOTE}`;
   }
 
   // src/body-entry.ts
-  globalThis.__goeiBody = { version: "0.16.59", start: start2 };
+  globalThis.__goeiBody = { version: "0.16.60", start: start2 };
 })();

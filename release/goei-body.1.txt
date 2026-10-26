@@ -1,4 +1,4 @@
-// goei-body 0.16.59
+// goei-body 0.16.60
 "use strict";
 (() => {
   // src/core/dispatch.ts
@@ -947,6 +947,62 @@ ${body4.slice(at).replace(/^\s+/, "")}
     const pick3 = (k) => k ? lore.filter((e) => !isFolder(e) && e.folder === k && s2(e.comment)) : [];
     return { anomaly: pick3(keys.anomaly), site: pick3(keys.site), agent: pick3(keys.agent) };
   }
+  var APPENDIX_WORD = "부록";
+  var DOT = /\s*[·・ㆍ•]\s*/;
+  function appendixFolder(lore) {
+    const f = lore.find((e) => isFolder(e) && folderWord(s2(e.comment)) === APPENDIX_WORD && typeof e.key === "string");
+    return f ? f.key : "";
+  }
+  function appendixMembers(lore) {
+    const key2 = appendixFolder(lore);
+    return key2 ? lore.filter((e) => !isFolder(e) && e.folder === key2 && s2(e.comment) && !SEPARATOR.test(s2(e.comment))) : [];
+  }
+  function guessParent(name, names4) {
+    const m = DOT.exec(name);
+    if (!m || !m.index) return "";
+    const head = name.slice(0, m.index).trim();
+    return names4.has(head) ? head : "";
+  }
+  var APPENDIX_DEFAULT = { keys: true, withParent: false, needParent: false, target: true, places: [], agents: [], unlock: "" };
+  function buildAppendices(lore, data) {
+    const members = appendixMembers(lore);
+    if (!members.length) return [];
+    const mine = new Set(members);
+    const names4 = new Set(lore.filter((e) => !isFolder(e) && !mine.has(e)).map((e) => s2(e.comment)).filter(Boolean));
+    const saved = obj2(data?.부록);
+    const seen2 = /* @__PURE__ */ new Set();
+    const out = [];
+    for (const e of members) {
+      const lore2 = s2(e.comment);
+      if (seen2.has(lore2)) continue;
+      seen2.add(lore2);
+      const d = obj2(saved[lore2]);
+      const guess = guessParent(lore2, names4);
+      const flag2 = (v, def) => typeof v === "boolean" ? v : def;
+      const parent = typeof d.parent === "string" ? s2(d.parent) : guess;
+      out.push({
+        lore: lore2,
+        guess,
+        parent,
+        keys: flag2(d.keys, APPENDIX_DEFAULT.keys),
+        withParent: flag2(d.with_parent, APPENDIX_DEFAULT.withParent),
+        needParent: flag2(d.need_parent, APPENDIX_DEFAULT.needParent),
+        target: flag2(d.target, APPENDIX_DEFAULT.target),
+        places: Array.isArray(d.places) ? list2(d.places) : [],
+        agents: Array.isArray(d.agents) ? list2(d.agents) : [],
+        unlock: s2(d.unlock)
+      });
+    }
+    return out;
+  }
+  function appendixData(r) {
+    const d = { keys: r.keys, with_parent: r.withParent, need_parent: r.needParent, target: r.target };
+    if (r.parent !== r.guess) d.parent = r.parent;
+    if (r.places.length) d.places = r.places;
+    if (r.agents.length) d.agents = r.agents;
+    if (r.unlock) d.unlock = r.unlock;
+    return d;
+  }
   function keysOf(e) {
     if (!e) return [];
     return [s2(e.key), s2(e.secondkey)].join(",").split(",").map((t) => t.trim()).filter(Boolean);
@@ -1339,7 +1395,8 @@ ${body4.slice(at).replace(/^\s+/, "")}
       usedCodes: list2(data?.codes_used),
       display: displaySection(books),
       phoneTabs: phoneTabsSection(books),
-      seeds: seedSection(books)
+      seeds: seedSection(books),
+      appendices: buildAppendices(books, data)
     };
     cache2.set(books, dir2);
     return dir2;
@@ -1379,6 +1436,7 @@ ${body4.slice(at).replace(/^\s+/, "")}
     if (Object.keys(dir2.display).length) out.호칭 = dir2.display;
     if (dir2.phoneTabs.tabs.length) out["괴담톡 탭"] = dir2.phoneTabs;
     if (Object.keys(dir2.seeds).length) out["시작 로어북"] = dir2.seeds;
+    if (dir2.appendices.length) out.부록 = Object.fromEntries(dir2.appendices.map((r) => [r.lore, appendixData(r)]));
     for (const p of dir2.anomalies) out.괴이[p.lore] = place2(p);
     for (const p of dir2.sites) out["미스틱 사이트"][p.lore] = place2(p);
     for (const a of dir2.agents) {
@@ -1410,9 +1468,9 @@ ${body4.slice(at).replace(/^\s+/, "")}
     }
     return out;
   }
-  var HELP = "괴이: ANOMALY 플러그인이 쓰는 명부입니다. 플러그인 창 「설정 → 카드 명부」에서 고치세요. 괴이는 🚧괴이, 미스틱 사이트는 🎁파밍, 요원은 🙂요원 폴더에 로어북을 넣으면 자동으로 들어옵니다. 요원의 소속은 창에서 조직을 골라 정합니다. 거점은 지도에 찍히는 장소이고 조직에 묶지 않아도 됩니다. 모델에게는 보내지 않습니다.";
+  var HELP = "괴이: ANOMALY 플러그인이 쓰는 명부입니다. 플러그인 창 「설정 → 카드 명부」에서 고치세요. 괴이는 🚧괴이, 미스틱 사이트는 🎁파밍, 요원은 🙂요원 폴더에 로어북을 넣으면 자동으로 들어옵니다. 요원의 소속은 창에서 조직을 골라 정합니다. 거점은 지도에 찍히는 장소이고 조직에 묶지 않아도 됩니다. 📎부록 폴더 항목은 「본 항목 이름 · 설명」으로 지으면 본 항목에 붙고, 켜지는 조건은 부록 탭에서 정합니다. 모델에게는 보내지 않습니다.";
   function directoryContent(data) {
-    return JSON.stringify({ schema: data.schema, _help: HELP, refill: data.refill, 괴이: data.괴이, "미스틱 사이트": data["미스틱 사이트"], 요원: data.요원, 조직: data.조직, ...data.거점 ? { 거점: data.거점 } : {}, ...data.호칭 ? { 호칭: data.호칭 } : {}, ...data["괴담톡 탭"] ? { "괴담톡 탭": data["괴담톡 탭"] } : {}, ...data["시작 로어북"] ? { "시작 로어북": data["시작 로어북"] } : {}, ...data.codes_used?.length ? { codes_used: data.codes_used } : {} }, null, 1);
+    return JSON.stringify({ schema: data.schema, _help: HELP, refill: data.refill, 괴이: data.괴이, "미스틱 사이트": data["미스틱 사이트"], 요원: data.요원, 조직: data.조직, ...data.거점 ? { 거점: data.거점 } : {}, ...data.호칭 ? { 호칭: data.호칭 } : {}, ...data["괴담톡 탭"] ? { "괴담톡 탭": data["괴담톡 탭"] } : {}, ...data["시작 로어북"] ? { "시작 로어북": data["시작 로어북"] } : {}, ...data.부록 && Object.keys(data.부록).length ? { 부록: data.부록 } : {}, ...data.codes_used?.length ? { codes_used: data.codes_used } : {} }, null, 1);
   }
   function withDirectory(lore, data) {
     const content = directoryContent(data);
@@ -4205,81 +4263,4 @@ ${themeVars("[x-goei-fab]")}
     return decode(chat.scriptstate?.[GN_RAW]);
   }
   function snapshotKey(st) {
-    return JSON.stringify([st.seq, st.posts.map((p) => [p.id, p.nick, p.title, p.body, p.date, p.mine, p.views, p.votes, p.comments.map((c) => [c.parent, c.nick, c.body, c.mine])])]);
-  }
-  var postHead = (p) => JSON.stringify([p.id, p.nick, p.title, p.body, p.date, p.mine]);
-  var commentKey = (c) => JSON.stringify([c.parent, c.nick, c.body, c.mine]);
-  function postKey(p) {
-    return p ? JSON.stringify([p.id, p.nick, p.title, p.body, p.date, p.mine, p.comments.map((c) => [c.parent, c.nick, c.body, c.mine])]) : "";
-  }
-  function findPost(st, id) {
-    return st.posts.find((p) => p.id === id);
-  }
-  function dateNow(chat) {
-    const minute = readWorld(chat).minute;
-    const p = (n) => String(n).padStart(2, "0");
-    if (minute !== null && minute > 0) {
-      const d = new Date(minute * 6e4);
-      return `${d.getUTCFullYear()}.${p(d.getUTCMonth() + 1)}.${p(d.getUTCDate())} ${p(d.getUTCHours())}:${p(d.getUTCMinutes())}`;
-    }
-    const msgs = chat.message ?? [];
-    for (let i = msgs.length - 1; i >= 0; i--) {
-      const m = msgs[i];
-      if (m.role !== "char" || typeof m.data !== "string") continue;
-      const t = /\[▣\s*\|\s*(\d{4})\.(\d{2})\.(\d{2})\s*\|\s*(\d{1,2}):(\d{2})\s*([AaPp][Mm])/.exec(m.data);
-      if (t) {
-        let h = Number(t[4]) % 12;
-        if (t[6].toUpperCase() === "PM") h += 12;
-        return `${t[1]}.${t[2]}.${t[3]} ${p(h)}:${t[5]}`;
-      }
-    }
-    return "";
-  }
-  function storyTurns(chat) {
-    return (chat.message ?? []).filter((m) => m.role === "char" && String(m.data ?? "").trim() && !String(m.data).includes("%%")).length;
-  }
-  function postLimit(s4) {
-    return QUANTITY[s4.quantity]?.max ?? 7;
-  }
-  function protectedPost(s4, p) {
-    if (p.mine) return s4.keepOwn;
-    return s4.keepReplied && p.comments.some((c) => c.mine);
-  }
-  function trimBoard(st, s4) {
-    const cap = postLimit(s4);
-    while (st.posts.length > cap) {
-      let idx = -1;
-      for (let i = st.posts.length - 1; i >= 0; i--) {
-        if (!protectedPost(s4, st.posts[i])) {
-          idx = i;
-          break;
-        }
-      }
-      if (idx < 0) break;
-      st.posts.splice(idx, 1);
-    }
-  }
-  function trimDms(st, cap = HISTORY.dmKeep) {
-    const counts = /* @__PURE__ */ new Map();
-    const keep = /* @__PURE__ */ new Set();
-    for (let i = st.dms.length - 1; i >= 0; i--) {
-      const n = (counts.get(st.dms[i].nick) ?? 0) + 1;
-      counts.set(st.dms[i].nick, n);
-      if (n <= cap) keep.add(i);
-    }
-    st.dms = st.dms.filter((_, i) => keep.has(i));
-  }
-  function replyForUser(p, c) {
-    if (c.mine) return false;
-    if (p.mine) return true;
-    let parent = c.parent;
-    const seen2 = /* @__PURE__ */ new Set();
-    while (parent && p.comments[parent - 1] && !seen2.has(parent)) {
-      seen2.add(parent);
-      const row7 = p.comments[parent - 1];
-      if (row7.mine) return true;
-      parent = row7.parent;
-    }
-    return false;
-  }
-  function reconcileUnread(st, pr
+    return JSON.stringify([st.seq, st.posts.map((p) => [p.id, p.nick, p.title, p.body, p.date, p.mine, p.views, p.votes, p.comments.map((c) => [c.parent, c.nick, c.body, c.mine])])]

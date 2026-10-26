@@ -1,4 +1,95 @@
+ }
+.gx-whoc .gx-ava { flex: none; width: 34px; height: 34px; border-radius: 9px; }
+.gx-whot { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.25; }
+.gx-whot b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
+.gx-whot small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--dim); font-size: 12px; }
+.gx-whoc:hover { border-color: var(--line2); }
+.gx-whoc.on { border-color: var(--signal); background: var(--accent-bg); }
+.gx-hint { margin-top: 10px; padding: 12px 14px; border-radius: 12px; background: var(--panel); border: 1px solid var(--line); color: var(--sub); font-size: 15px; }
 
+.gx-foot { padding: 12px 20px 18px; border-top: 1px solid var(--panel2); background: var(--void); display: flex; flex-direction: column; gap: 8px; }
+.gx-foot-sum { font-size: 15px; color: var(--dim); }
+.gx-err.info { border-color: var(--accent-line); background: var(--accent-bg); color: var(--text); }
+.gx-err { margin-bottom: 10px; padding: 12px 14px; border-radius: 12px; border: 1px solid color-mix(in srgb, var(--danger) 45%, transparent); background: var(--danger-bg); color: var(--danger); font-size: 15px; }
+.gx-start {
+  width: 100%; min-height: 56px; border: 0; border-radius: 16px;
+  background: var(--signal); color: var(--on-signal); font-size: 18px; font-weight: 700; letter-spacing: .3em;
+}
+.gx-start:hover:not(:disabled) { filter: brightness(1.06); }
+.gx-start:disabled { background: var(--line); color: var(--dim); }
+
+.gx-empty { padding: 28px 20px; color: var(--text); overflow-y: auto; }
+.gx-empty p { margin: 0 0 10px; }
+.gx-muted { color: var(--dim); font-size: 15px; }
+.gx-sum { display: grid; grid-template-columns: max-content 1fr; gap: 8px 16px; margin: 0 0 16px; padding: 16px; border-radius: 16px; background: var(--panel); border: 1px solid var(--line); }
+.gx-sum dt { color: var(--dim); }
+.gx-sum dd { margin: 0; color: var(--text); font-weight: 600; }
+
+/* ── 상황판 ── */
+.gx-board { display: flex; flex-direction: column; gap: 16px; padding-top: 16px; }
+.gx-board > section { padding: 0; }
+/* 칸이 많아 넘칠 때 줄어들어 서로 겹치지 않게 (응답 전 안내 줄이 눌려 글씨가 위로 쏠렸다) */
+.gx-board > * { flex-shrink: 0; }
+.gx-board > .gx-hint { margin: 0; }
+.gx-board > .gx-alert { padding: 14px 16px; }
+.gx-alert { display: flex; flex-direction: column; gap: 10px; padding: 14px 16px; border-radius: 18px; background: var(--danger-bg); border: 1px solid color-mix(in srgb, var(--danger) 35%, transparent); }
+.gx-alert.calm { background: var(--accent-bg); border-color: var(--accent-line); }
+.gx-alert-top { display: flex; align-items: center; gap: 10px; font-weight: 700; color: var(--danger); }
+.gx-alert.calm .gx-alert-top { color: var(--signal); }
+.gx-alert-top small { margin-left: auto; font-family: var(--mono); font-size: 12px; letter-spacing: .12em; opacity: .8; font-weight: 500; }
+.gx-meter { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; }
+.gx-meter i { height: 8px; border-radius: 4px; background: color-mix(in srgb, var(--text) 12%, transparent); }
+.gx-meter i.l1 { background: var(--amber); } .gx-meter i.l2 { background: color-mix(in srgb, var(--amber) 50%, var(--danger)); } .gx-meter i.l3, .gx-meter i.l4, .gx-meter i.l5 { background: var(--danger); }
+.gx-alert p { margin: 0; font-size: 15px; color: var(--sub); }
+/* 깜빡이는 점: box-shadow를 움직이면 매 프레임 다시 칠해서(예전엔 뒤 흐림까지 다시 계산) 창 전체가 버벅였다. 겉 고리를 transform·opacity로만 움직인다 (v0.10.1) */
+.gx-live { position: relative; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+.gx-live::after { content: ""; position: absolute; inset: -4px; border-radius: 50%; background: currentColor; opacity: .22; animation: gxpulse 1.6s ease-in-out infinite; will-change: transform, opacity; }
+@keyframes gxpulse { 50% { transform: scale(1.5); opacity: 0; } }
+.gx-tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.gx-tile { display: flex; flex-direction: column; justify-content: space-between; gap: 4px; min-height: 76px; padding: 10px 12px; border-radius: 16px; border: 1px solid var(--line); background: var(--panel); text-align: left; }
+.gx-tile span { font-size: 14px; color: var(--dim); }
+.gx-tile b { font-family: var(--mono); font-size: 26px; line-height: 1.1; }
+.gx-tile.an b { color: var(--danger); } .gx-tile.in b { color: var(--amber); } .gx-tile.ms b { color: var(--signal); }
+.gx-clock { margin: 0; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--dim); font-family: var(--mono); }
+.gx-sec h2 { display: flex; align-items: baseline; gap: 8px; margin: 0 0 10px; font-size: 18px; color: var(--text); }
+.gx-sec h2 small { color: var(--dim); font-weight: 500; font-size: 14px; }
+.gx-none { margin: 0; color: var(--dim); font-size: 15px; }
+.gx-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.gx-list li { background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 14px; }
+.gx-list p { margin: 6px 0 0; font-size: 15px; color: var(--sub); }
+.gx-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.gx-row b { margin-right: auto; font-size: 17px; }
+.gx-loc { font-size: 14px; color: var(--dim); }
+.gx-ev-card { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 4px 12px; align-items: center; }
+.gx-ev-card .gx-ev-sub { grid-column: 2 / -1; }
+.gx-gmark { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; font-family: var(--mono); font-weight: 700; font-size: 16px; grid-row: span 2; align-self: start; }
+.gx-gmark.an { background: var(--danger-bg); color: var(--danger); }
+.gx-gmark.in { background: var(--amber-bg); color: var(--amber); }
+.gx-gmark.ms { background: var(--accent-bg); color: var(--signal); }
+.gx-gmark.wait { background: var(--panel2); color: var(--dim); }
+.gx-ev-name { font-size: 17px; font-weight: 700; min-width: 0; }
+.gx-faces { display: inline-flex; padding-left: 8px; vertical-align: middle; margin-right: 6px; }
+.gx-faces .gx-ava { width: 28px; height: 28px; margin-left: -8px; border: 2px solid var(--panel); font-size: 12px; }
+.gx-ava { position: relative; flex: none; display: inline-grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; overflow: hidden; background: var(--panel2); color: var(--signal); font-weight: 700; }
+.gx-ava.sq { border-radius: 14px; }
+.gx-ava img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.gx-badge, .gx-grade { font-size: 13px; line-height: 1; padding: 6px 10px; border-radius: 999px; color: var(--sub); background: var(--panel2); box-shadow: inset 0 0 0 1px var(--line2); font-weight: 600; white-space: nowrap; }
+.gx-badge.wait { background: transparent; box-shadow: none; border: 1px dashed var(--line2); }
+.gx-badge.live { color: var(--signal); background: var(--accent-bg); box-shadow: inset 0 0 0 1px var(--accent-line); }
+.gx-badge.new { color: var(--danger); background: var(--danger-bg); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--danger) 35%, transparent); }
+.gx-badge.hot, .gx-badge.hurt { color: var(--amber); background: var(--amber-bg); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--amber) 35%, transparent); }
+.gx-badge.op, .gx-badge.out { color: var(--blue); background: color-mix(in srgb, var(--blue) 16%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--blue) 35%, transparent); }
+.gx-badge.bad, .gx-badge.dead { color: var(--danger); background: var(--danger-bg); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--danger) 35%, transparent); }
+.gx-badge.dead { text-decoration: line-through; }
+.gx-grade { font-weight: 700; color: var(--text); }
+.gx-grade.gS, .gx-grade.gA { color: var(--danger); }
+.gx-grade.gB { color: var(--amber); }
+
+/* 지도 · 커스텀 임무 */
+.gx-tabs { overflow-x: auto; scrollbar-width: none; }
+.gx-tab { white-space: nowrap; flex: none; }
+.gx-tab-end { margin-left: auto; font-size: 14px; }
+.gx-field { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(340px, 1fr); gap: 20px; padding-top: 12px; padding-bottom: 16px; align-items: start; align-content: start; }
 /* PC: 지도는 옆 목록을 내려도 따라오고, 창 높이에 맞춰 최대한 크게 (v0.11.0) */
 .gx-field > .gx-mapcol { position: sticky; top: 12px; }
 .gx-mapcol, .gx-sidecol { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
@@ -367,6 +458,9 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
   .dir-grid { grid-template-columns: 1fr; }
   .dir-grid.names { grid-template-columns: 1fr 1fr; }
   .dir-kinds .long { display: none; }
+  /* 탭 6개: 모바일은 세 개씩 두 줄 */
+  .dir-kinds { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2px; padding: 2px; }
+  .dir-kinds .gx-seg { min-height: 30px; font-size: 14px; border-radius: 8px; }
   .dir-line > span { min-width: 0; flex-basis: 100%; }
 }
 .dir-group.warn { color: var(--amber); }
@@ -2136,80 +2230,4 @@ button.mk-go:hover { color: var(--signal); }
 .gx-tgt.on { color: #fff; }
 .gx-tgt.on .dot { opacity: 1; }
 .gx-evbtn.gx-tgt { display: grid; place-items: center; padding: 0; width: 30px; height: 30px; margin: 0; border-radius: 9px; background: rgba(8, 12, 14, .58); color: #f2f6f5; }
-.gx-evbtn.gx-tgt:hover { background: rgba(8, 12, 14, .82); }
-.gx-evbtn.gx-tgt svg { width: 17px; height: 17px; }
-.gx-mx.open .gx-evart-name .gx-evart-l1 > b { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.gx-opcap .gx-evart-l1 > b { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.gx-oprow-t .gx-goaltag { margin-left: 6px; padding: 1px 6px; font-size: 10.5px; }
-.gx-evart-l1 > b:has(+ .gx-tgt), .gx-evart-l1 > .gx-tgt { align-self: baseline; }
-.gx-evart-l1 > .gx-tgt { height: auto; font-size: 12px; }
-/* CCTV 잡음·위성 구름 (transform만 움직임) */
-.gx-opfx { position: absolute; inset: 0; z-index: 1; overflow: hidden; pointer-events: none; border-radius: inherit; }
-.gx-opfx > .n { position: absolute; inset: -96px; opacity: .26; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='192' height='192'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 4 -1.75'/%3E%3C/filter%3E%3Crect width='192' height='192' filter='url(%23f)'/%3E%3C/svg%3E"); will-change: transform; animation: gx-opnoise .48s steps(1) infinite; }
-.gx-opfx > .r { position: absolute; left: 0; right: 0; top: 0; height: 26%; background: linear-gradient(transparent, rgba(255, 255, 255, .05) 45%, rgba(255, 255, 255, .09) 52%, transparent); will-change: transform; animation: gx-oproll 7.5s linear infinite; }
-@keyframes gx-opnoise { 0% { transform: translate(0, 0); } 17% { transform: translate(-61px, 23px); } 33% { transform: translate(37px, -71px); } 50% { transform: translate(-19px, 54px); } 67% { transform: translate(72px, 11px); } 83% { transform: translate(-44px, -38px); } }
-@keyframes gx-oproll { 0% { transform: translateY(-110%); } 100% { transform: translateY(420%); } }
-@keyframes gx-opjit { 0%, 91%, 93.5%, 100% { transform: none; } 91.5% { transform: translate(2px, -1px); } 92.5% { transform: translate(-3px, 1px) skewX(-1.5deg); } 93% { transform: translate(1px, 0); } }
-.gx-opview.feed > .gx-opfeed { animation: gx-opjit 6.3s steps(1) infinite; }
-.gx-opview.nosig > .gx-opfx > .n { opacity: .6; }
-.gx-opview.ended > .gx-opfx > .n, .gx-opview.ended > .gx-opfeed { animation: none; }
-.gx-opview.ended > .gx-opfx > .r { display: none; }
-@media (prefers-reduced-motion: reduce) { .gx-opfx > *, .gx-opview > .gx-opfeed { animation: none !important; } }
-.gx-opfx.sky > i { position: absolute; top: 0; left: 0; width: calc(100% + 820px); height: 100%; background-size: 512px 512px; will-change: transform; animation: gx-opsky 64s linear infinite; }
-.gx-opfx.sky > .c0 { background-position: 16px 20px; }
-.gx-opfx.sky > .c1 { opacity: .9; }
-.gx-opfx.sky > .c2 { opacity: .35; background-size: 820px 820px; background-position: 300px 140px; animation: gx-opsky2 120s linear infinite; }
-@keyframes gx-opsky { from { transform: translateX(-512px); } to { transform: translateX(0); } }
-@keyframes gx-opsky2 { from { transform: translateX(-820px); } to { transform: translateX(0); } }
-/* 2026-10-21 사용자: 어둡게는 접힌 띠에만. 펼친 커스텀은 글자 자리(아래)만 살짝 어둡게 */
-.gx-mx.open .gx-mx-art::after { background: linear-gradient(to top, rgba(6, 10, 12, .88) 0%, rgba(6, 10, 12, .5) 24%, rgba(6, 10, 12, 0) 46%), linear-gradient(to bottom, rgba(6, 10, 12, .35), rgba(6, 10, 12, 0) 18%); }
-/* 「선택」 표식이 눈에 띄게 (2026-10-21 사용자: 효과가 약하다): 상자 없이 글자·조준선만. 고르기 전에는 붉게 깜빡이며
-   조준선에서 붉은 고리가 퍼지고, 고르면 붉은 빛으로 고정되고 한 번 「잠김」 번쩍임 */
-.gx-tgt:not(.gx-evbtn) { position: relative; color: #fff; font-size: 12px; letter-spacing: .06em; }
-.gx-tgt:not(.gx-evbtn) svg { position: relative; z-index: 1; }
-.gx-tgt:not(.gx-evbtn):not(.on) { animation: gx-tgt-pulse 1.2s ease-in-out infinite; }
-.gx-tgt:not(.gx-evbtn):not(.on) svg { animation: gx-tgt-spin 1.2s ease-in-out infinite; }
-.gx-tgt:not(.gx-evbtn):not(.on)::before { content: ''; position: absolute; left: 2px; top: 50%; width: 14px; height: 14px; margin-top: -7px; border: 2px solid #ff3b30; border-radius: 50%; box-sizing: border-box; pointer-events: none; animation: gx-tgt-ring 1.2s ease-out infinite; }
-.gx-tgt.on:not(.gx-evbtn) { color: #ff5a4e; text-shadow: 0 0 8px rgba(255, 59, 48, .95), 0 0 2px rgba(255, 120, 110, .9), 0 1px 2px rgba(0, 0, 0, .8); animation: gx-tgt-lock .5s ease-out 1; }
-.gx-tgt.on:not(.gx-evbtn) svg { filter: drop-shadow(0 0 4px rgba(255, 59, 48, 1)); }
-.gx-tgt:not(.gx-evbtn):hover { animation: none; color: #fff; text-shadow: 0 0 10px rgba(255, 70, 60, 1), 0 1px 2px rgba(0, 0, 0, .8); }
-@keyframes gx-tgt-pulse {
-  0%, 100% { color: #fff; text-shadow: 0 1px 2px rgba(0, 0, 0, .8); }
-  50% { color: #ff6a5e; text-shadow: 0 0 10px rgba(255, 59, 48, 1), 0 0 3px rgba(255, 120, 110, 1), 0 1px 2px rgba(0, 0, 0, .8); }
-}
-@keyframes gx-tgt-spin {
-  0%, 100% { transform: scale(1) rotate(0deg); filter: none; }
-  50% { transform: scale(1.3) rotate(90deg); filter: drop-shadow(0 0 4px rgba(255, 59, 48, 1)); }
-}
-@keyframes gx-tgt-ring { 0% { transform: scale(.8); opacity: .95; } 100% { transform: scale(2.6); opacity: 0; } }
-@keyframes gx-tgt-lock { 0% { transform: scale(1.35); filter: brightness(2); } 100% { transform: none; filter: none; } }
-@media (prefers-reduced-motion: reduce) {
-  .gx-tgt:not(.gx-evbtn):not(.on), .gx-tgt:not(.gx-evbtn):not(.on) svg, .gx-tgt.on:not(.gx-evbtn) { animation: none; }
-  .gx-tgt:not(.gx-evbtn):not(.on)::before { content: none; }
-}
-
-/* 편성 요원 카드 (임무·커스텀): 상황이 몇 줄이든 상황 2줄 높이로 고정하고, 사진을 그 높이만큼 키운다 (2026-10-21 사용자) */
-.gx-acard.pick.wide { box-sizing: border-box; height: var(--acard-h, 108px); align-items: stretch; overflow: hidden; }
-.gx-acard.pick.wide .gx-acard-side { align-self: stretch; display: flex; }
-.gx-acard.pick.wide .gx-acard-side > .gx-ava { width: auto; height: 100%; aspect-ratio: 1; }
-.gx-acard.pick.wide .gx-acard-txt { justify-content: center; }
-@media (max-width: 760px) { .gx-acard.pick.wide { --acard-h: 100px; } .gx-acard.pick.wide small { white-space: nowrap; } }
-
-/* 상세 창 = 상황판 CCTV 그대로 (2026-10-21 사용자): 가로 600px, 세로는 PC 상황판 CCTV 비율(534×440) */
-.gx-opview.ev-pop { position: absolute; z-index: 41; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(600px, calc(100% - 32px)); height: auto; aspect-ratio: 534 / 440; max-height: calc(100% - 32px); box-shadow: 0 16px 48px rgba(0, 0, 0, .45); }
-/* CCTV 괴이 효과 (2026-10-21 사용자, ui/cctvfx.ts가 fx-* 클래스를 잠깐 붙인다) */
-.gx-optear, .gx-oplost, .gx-opshade { position: absolute; inset: 0; pointer-events: none; display: none; }
-.gx-optear { z-index: 1; }
-.gx-optear > i { position: absolute; inset: 0; background: var(--pic) center 40% / cover no-repeat; filter: saturate(.5) contrast(1.15) brightness(.85) sepia(.15) drop-shadow(4px 0 rgba(255, 30, 60, .75)) drop-shadow(-4px 0 rgba(0, 230, 255, .6)); }
-.gx-optear > i:first-child { clip-path: inset(22% 0 61% 0); transform: translateX(-28px); }
-.gx-optear > i:last-child { clip-path: inset(58% 0 30% 0); transform: translateX(22px); }
-.gx-opview.fx-tear > .gx-optear { display: block; animation: gx-tear .26s steps(1) both; }
-.gx-opview.fx-tear > .gx-opfeed { animation: gx-tearimg .26s steps(1) both; }
-@keyframes gx-tear { 0% { transform: translateY(0); } 35% { transform: translateY(-9%); } 70% { transform: translateY(12%) scaleX(1.02); } }
-@keyframes gx-tearimg { 0% { transform: translateX(3px); filter: saturate(.3) contrast(1.4) brightness(.7) hue-rotate(-20deg); } 50% { transform: translateX(-5px) skewX(-3deg); filter: saturate(.2) contrast(1.6) brightness(1.1) invert(.08); } }
-.gx-oplost { z-index: 4; place-items: center; background: repeating-linear-gradient(0deg, rgba(255, 255, 255, .04) 0 1px, transparent 1px 3px), #050807; }
-.gx-oplost > b { font: 700 15px/1 var(--mono); letter-spacing: .3em; color: rgba(235, 255, 240, .8); text-shadow: 0 0 6px rgba(235, 255, 240, .5); animation: gx-blink 1s steps(2, jump-none) infinite; }
-.gx-opview.fx-lost > .gx-oplost { display: grid; animation: gx-lost 1.5s steps(1) both; }
-@keyframes gx-lost { 0% { opacity: 1; } 8% { opacity: .3; } 12% { opacity: 1; } }
-/* 신호가 돌아올 때 (2026-10-21 사용자: 너무 쓱 켜진다, 오싹하게, 숨어 있다 도망가거나 다양하게). 1.3초:
-   검은 화면 가운데 밝은 한 줄 → 세로
+.gx-evbtn.gx-tgt:hover { 

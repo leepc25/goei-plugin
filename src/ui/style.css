@@ -692,7 +692,8 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
   .dir-grid.names { grid-template-columns: 1fr 1fr; }
   .dir-kinds .long { display: none; }
   /* 탭 6개: 모바일은 세 개씩 두 줄 */
-  .dir-kinds { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .dir-kinds { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2px; padding: 2px; }
+  .dir-kinds .gx-seg { min-height: 30px; font-size: 14px; border-radius: 8px; }
   .dir-line > span { min-width: 0; flex-basis: 100%; }
 }
 .dir-group.warn { color: var(--amber); }
