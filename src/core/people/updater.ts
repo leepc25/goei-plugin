@@ -4,13 +4,13 @@ import type { Chat, ChatMessage } from '../types';
 import { messageText } from '../refs';
 import { scanAgents } from '../world/tags';
 import { findStatusTags } from '../world/status';
-import { addressOf, affinityView } from './affinity';
+import { addressOf, affinityView, opennessOf, tasteOf } from './affinity';
 import { unknownTo } from './inject';
 import { seedPerson } from './seed';
 import { nameMatcher, scenePeople, entriesOf, type NameEntry } from './select';
 import { changeId, entryId, isAlive, liveChanges, liveEntries, liveness, markRead, messageKey, norm, plain, putChange, putDoc, putEntry, type Liveness } from './store';
 import type { Feature, PeopleSettings } from './settings';
-import { CUES, DOC_TYPES, REGISTERS, SLOTS, type Change, type Cue, type DocType, type Entry, type PeopleStore, type Person, type Register, type SlotId } from './types';
+import { CUES, DOC_TYPES, OPENNESS_BASELINES, OPENNESS_DELTAS, REGISTERS, RHYTHM_ENGAGEMENT, RHYTHM_HOOK_STAGES, RHYTHM_HOOK_TIERS, RHYTHM_PHASES, SLOTS, TASTE_MAX, TASTE_MIN, docFeature, opennessStage, type Change, type Cue, type DocType, type Entry, type PeopleStore, type Person, type Register, type SlotId } from './types';
 
 const str = (v: unknown) => (typeof v === 'string' ? v : '');
 const msgs = (chat: Chat): ChatMessage[] => (Array.isArray(chat.message) ? chat.message : []);
@@ -80,7 +80,7 @@ export function recordChars(p: Person, live: Liveness): number {
   return SLOTS.reduce((n, s) => n + liveEntries(p.slots[s], live).reduce((m, e) => m + e.text.length, 0), 0);
 }
 
-export function personPayload(p: Person, live: Liveness, changes: Change[], unknown?: string[]) {
+export function personPayload(p: Person, live: Liveness, changes: Change[], unknown?: string[], extra: { taste?: boolean; openness?: boolean } = {}) {
   const entries: Record<string, { id: string; text: string; target?: string; kind?: string }[]> = {};
   for (const s of SLOTS) {
     const list = liveEntries(p.slots[s], live);
@@ -95,6 +95,8 @@ export function personPayload(p: Person, live: Liveness, changes: Change[], unkn
     express: p.express,
     affinity_now: `${aff.stage.label}(${aff.stage.max})`,
     address_now: addr,
+    ...(extra.taste ? { taste_now: tasteOf(p, changes) } : {}),
+    ...(extra.openness ? { openness_now: (() => { const v = opennessOf(p, changes); return v === null ? null : { value: v, stage: opennessStage(v).en }; })() } : {}),
     entries,
     ...(unknown?.length ? { unknown_to: unknown } : {}),
   };
@@ -201,14 +203,14 @@ export function buildUpdate(chat: Chat, store: PeopleStore, batch: number[], o: 
     request_ref: `pp_${Date.now().toString(36)}`,
     cues: o.settings.features.has('affinity') ? CUES.map((c) => ({ name: c, meaning: CUE_MEANING[c] })) : [],
     slots: SLOTS.filter((s) => s !== 'suspicion' || o.settings.features.has('suspicion')),
-    doc_types: DOC_TYPES.filter((t) => o.settings.features.has(`docs_${t}` as Feature)),
+    doc_types: DOC_TYPES.filter((t) => o.settings.features.has(docFeature(t) as Feature)),
     people: chosen.map((n) => {
       const p = store.people[n];
-      return { ...personPayload(p, live, changes, wantNote || o.settings.features.has('perception') ? unknownTo(p, store, live) : undefined), values: o.values[n] ?? '' };
+      return { ...personPayload(p, live, changes, wantNote || o.settings.features.has('perception') ? unknownTo(p, store, live) : undefined, { taste: o.settings.features.has('taste'), openness: o.settings.features.has('openness') }), values: o.values[n] ?? '' };
     }),
     known_names: Object.keys(store.people),
-    docs_now: DOC_TYPES.some((t) => o.settings.features.has(`docs_${t}` as Feature))
-      ? Object.values(store.docs).filter((d) => o.settings.features.has(`docs_${d.type}` as Feature)).flatMap((d) => liveEntries(d.entries, live).map((e) => ({ type: d.type, key: d.key, id: e.id, text: e.text, ...(e.date ? { date: e.date } : {}), ...(e.place ? { place: e.place } : {}), ...(e.who?.length ? { who: e.who } : {}) })))
+    docs_now: DOC_TYPES.some((t) => o.settings.features.has(docFeature(t) as Feature))
+      ? Object.values(store.docs).filter((d) => o.settings.features.has(docFeature(d.type) as Feature)).flatMap((d) => liveEntries(d.entries, live).map((e) => ({ type: d.type, key: d.key, id: e.id, text: e.text, ...(e.date ? { date: e.date } : {}), ...(e.place ? { place: e.place } : {}), ...(e.who?.length ? { who: e.who } : {}) })))
       : undefined,
     suspicion_now: o.settings.features.has('suspicion') ? chosen.flatMap((n) => suspicionCases(store.people[n], live)) : undefined,
     npc_relations: o.settings.features.has('npc_emotion') ? true : undefined,
@@ -263,6 +265,12 @@ export interface UpdateResult {
   docs?: { type: string; key: string; op: string; replace?: string | null; text?: string | null; m: string; quote: string; date?: string | null; place?: string | null; who?: string[] }[];
   suspicion?: { who: string; target: string; kind: string; op: string; text: string; m: string; quote: string; weight?: string | null; stage?: string | null; result?: string | null }[];
   next_note?: { who: string; now?: string; must_not_reveal?: string[] }[];
+  /** 취향 띠: 새 띠(절대값) */
+  taste?: { who: string; band: number; m: string; quote: string; reason?: string }[];
+  /** 음란도: 시작값(init) 또는 새 반응(event, delta) */
+  openness?: { who: string; op: string; value?: number | null; delta?: number | null; m: string; quote: string; reason?: string }[];
+  /** 서사 리듬: 다음 턴 메모 (사실형 Director, 장면 전체) */
+  rhythm_note?: string | null;
 }
 
 /** JSON 하나만 꺼낸다 (코드 울타리·앞뒤 글 허용). 아니면 throw */
@@ -276,7 +284,7 @@ export function parseUpdate(raw: string): UpdateResult {
   const v = JSON.parse(t.slice(a, b + 1)) as unknown;
   if (!v || typeof v !== 'object' || Array.isArray(v)) throw new Error('JSON 객체가 아니에요');
   const r = v as UpdateResult;
-  for (const k of ['entries', 'cues', 'address', 'new_people', 'docs', 'suspicion', 'next_note'] as const) {
+  for (const k of ['entries', 'cues', 'address', 'new_people', 'docs', 'suspicion', 'next_note', 'taste', 'openness'] as const) {
     if (r[k] !== undefined && !Array.isArray(r[k])) throw new Error(`${k}는 목록이어야 해요`);
   }
   return r;
@@ -286,7 +294,7 @@ export function parseUpdate(raw: string): UpdateResult {
 
 export interface Dropped { kind: string; who?: string; reason: string; item: unknown }
 export interface ApplyReport {
-  applied: { entries: number; cues: number; address: number; docs: number; suspicion: number; newPeople: string[]; notes: number; identity: boolean };
+  applied: { entries: number; cues: number; address: number; docs: number; suspicion: number; newPeople: string[]; notes: number; identity: boolean; taste: number; openness: number };
   dropped: Dropped[];
   /** 「확인 필요」로 보류한 것 */
   held: Dropped[];
@@ -347,7 +355,7 @@ export function resolveName(who: string, store: PeopleStore, names: NameEntry[] 
 export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, r: UpdateResult, ctx: ApplyCtx): ApplyReport {
   const list = msgs(chat);
   const live = liveness(chat);
-  const report: ApplyReport = { applied: { entries: 0, cues: 0, address: 0, docs: 0, suspicion: 0, newPeople: [], notes: 0, identity: false }, dropped: [], held: [] };
+  const report: ApplyReport = { applied: { entries: 0, cues: 0, address: 0, docs: 0, suspicion: 0, newPeople: [], notes: 0, identity: false, taste: 0, openness: 0 }, dropped: [], held: [] };
   const drop = (kind: string, item: unknown, reason: string, who?: string) => report.dropped.push({ kind, who, reason, item });
   const roleWords = ctx.roleWords ?? ROLE_WORDS;
   const seqs = new Map<string, number>();
@@ -577,6 +585,100 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
     }
   }
 
+  // 3b. 취향 띠: 처음은 어떤 값이든(배경에서 한 번), 그 뒤 오를 땐 한 칸씩, 내릴 땐 여러 칸. 인물당 1개
+  if (ctx.settings.features.has('taste')) {
+    const changes = liveChanges(store, live);
+    const seen = new Set<string>();
+    for (const t of r.taste ?? []) {
+      const who = nameOf(str(t?.who));
+      if (!who) {
+        drop('taste', t, '명단에 없는 이름', str(t?.who));
+        continue;
+      }
+      const band = Number(t.band);
+      if (!Number.isInteger(band) || band < TASTE_MIN || band > TASTE_MAX) {
+        drop('taste', t, '띠는 -3~3 정수', who);
+        continue;
+      }
+      const ev = evidence(t.m, t.quote);
+      if (typeof ev === 'string') {
+        drop('taste', t, ev, who);
+        continue;
+      }
+      if (seen.has(who)) {
+        drop('taste', t, '인물당 1개', who);
+        continue;
+      }
+      const cur = tasteOf(store.people[who], changes);
+      if (cur !== null && band === cur) {
+        drop('taste', t, '바뀐 값이 아님', who);
+        continue;
+      }
+      if (cur !== null && band > cur + 1) {
+        drop('taste', t, '오를 땐 한 번에 한 칸', who);
+        continue;
+      }
+      seen.add(who);
+      const seq = nextSeq(ev.anchor);
+      if (putChange(store, { id: changeId(who, 'taste', ev.anchor, seq, String(band)), anchor: ev.anchor, seq, src: 'story', who, kind: 'taste', band, quote: t.quote, reason: plain(t.reason, 60) || (cur === null ? '첫인상' : `취향 ${cur} → ${band}`) })) report.applied.taste++;
+    }
+  }
+
+  // 3c. 음란도: 시작값은 표의 값 중 하나로 한 번만, 그 뒤는 새 반응마다 표의 변화량. 기준 메시지당 합 -5~+10 은 계산에서
+  if (ctx.settings.features.has('openness')) {
+    const changes = liveChanges(store, live);
+    const perWho = new Map<string, number>();
+    const inited = new Set<string>();
+    for (const x of r.openness ?? []) {
+      const who = nameOf(str(x?.who));
+      if (!who) {
+        drop('openness', x, '명단에 없는 이름', str(x?.who));
+        continue;
+      }
+      const ev = evidence(x.m, x.quote);
+      if (typeof ev === 'string') {
+        drop('openness', x, ev, who);
+        continue;
+      }
+      const cur = opennessOf(store.people[who], changes);
+      const seq = nextSeq(ev.anchor);
+      if (x.op === 'init') {
+        const value = Number(x.value);
+        if (cur !== null || inited.has(who)) {
+          drop('openness', x, '이미 시작값이 있음', who);
+          continue;
+        }
+        if (!OPENNESS_BASELINES.includes(value)) {
+          drop('openness', x, '시작값은 0·90·150·210·270 중 하나', who);
+          continue;
+        }
+        inited.add(who);
+        if (putChange(store, { id: changeId(who, 'openness', ev.anchor, seq, `init${value}`), anchor: ev.anchor, seq, src: 'story', who, kind: 'openness', init: value, quote: x.quote, reason: plain(x.reason, 60) || `시작값 ${value}` })) report.applied.openness++;
+        continue;
+      }
+      if (x.op !== 'event') {
+        drop('openness', x, '없는 연산', who);
+        continue;
+      }
+      const delta = Number(x.delta);
+      if (!OPENNESS_DELTAS.includes(delta)) {
+        drop('openness', x, '변화량은 +1·+3·+5·+10·-2·-4·-5 중 하나', who);
+        continue;
+      }
+      if (cur === null && !inited.has(who)) {
+        drop('openness', x, '시작값이 없는 인물 (먼저 init)', who);
+        continue;
+      }
+      const n = (perWho.get(who) ?? 0) + 1;
+      if (n > 3) {
+        drop('openness', x, '인물당 3개 상한', who);
+        continue;
+      }
+      perWho.set(who, n);
+      if (putChange(store, { id: changeId(who, 'openness', ev.anchor, seq, `d${delta}|${plain(x.reason, 40)}`), anchor: ev.anchor, seq, src: 'story', who, kind: 'openness', delta, quote: x.quote, reason: plain(x.reason, 60) })) report.applied.openness++;
+    }
+  }
+
   // 4. 호칭
   if (ctx.settings.features.has('register')) {
     for (const a of r.address ?? []) {
@@ -608,7 +710,7 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
   // 5. 문서
   for (const d of r.docs ?? []) {
     const type = d?.type as DocType;
-    if (!DOC_TYPES.includes(type) || !ctx.settings.features.has(`docs_${type}` as Feature)) {
+    if (!DOC_TYPES.includes(type) || !ctx.settings.features.has(docFeature(type) as Feature)) {
       drop('doc', d, '없는 문서 종류 또는 꺼진 기능');
       continue;
     }
@@ -622,6 +724,10 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
     const doc = store.docs[`${type}:${key}`];
     const cur = doc ? liveEntries(doc.entries, live) : [];
     const text = plain(d.text, 200);
+    if (type === 'rhythm' && text && !rhythmTextOk(key, text)) {
+      drop('doc', d, '리듬 문서 본문 표식이 없음 ([phase:…] 또는 [hook:…])', key);
+      continue;
+    }
     let replaces: string | undefined;
     if (d.op === 'upsert' || d.op === 'remove') {
       const target = cur.find((x) => x.id === d.replace);
@@ -713,8 +819,31 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
     }
   }
 
+  // 8b. 서사 리듬 메모 (사실형 Director, 장면 전체): 인물이 아니라 '@rhythm' 에 둔다
+  if (ctx.settings.features.has('rhythm') && ctx.settings.director === 'facts') {
+    const now = plain(r.rhythm_note, 200);
+    if (now) {
+      const anchor = messageKey(list[Math.max(...input.indexes)], Math.max(...input.indexes));
+      const seq = nextSeq(anchor);
+      if (putChange(store, { id: changeId('@rhythm', 'note', anchor, seq, now), anchor, seq, src: 'story', who: '@rhythm', kind: 'note', now, reason: '리듬 메모' })) report.applied.notes++;
+    }
+  }
+
   markRead(store, chat, input.indexes);
   return report;
+}
+
+/** 리듬 문서 본문 표식: scene 은 `[phase:build_up][engagement:active]`, hook:* 은 `[stage:seeded][tier:short]` 로 시작해야 */
+export function rhythmTextOk(key: string, text: string): boolean {
+  if (key === 'scene') {
+    const m = /^\[phase:([a-z_]+)\]\s*\[engagement:([a-z_]+)\]/.exec(text);
+    return !!m && (RHYTHM_PHASES as readonly string[]).includes(m[1]) && (RHYTHM_ENGAGEMENT as readonly string[]).includes(m[2]);
+  }
+  if (key.startsWith('hook:')) {
+    const m = /^\[stage:([a-z_]+)\]\s*\[tier:([a-z]+)\]/.exec(text);
+    return !!m && (RHYTHM_HOOK_STAGES as readonly string[]).includes(m[1]) && (RHYTHM_HOOK_TIERS as readonly string[]).includes(m[2]);
+  }
+  return key === 'chapter' || key === 'arc' || key === 'pending';
 }
 
 /** 이 인물의 가장 최근 다음 턴 메모 (살아 있는 것) */

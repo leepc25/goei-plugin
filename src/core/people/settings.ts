@@ -1,8 +1,8 @@
 // 인물 기록 설정 (채팅별, scriptstate 변수 `$pp_*`. 괴담톡 설정과 같은 방식). 기본값은 설계 문서의 추천값.
 export const PP = (key: string) => `$pp_${key}`;
 
-export type Feature = 'affinity' | 'register' | 'perception' | 'perception_ext' | 'suspicion' | 'docs_event' | 'docs_location' | 'docs_faction' | 'docs_item' | 'npc_emotion';
-export const FEATURES: Feature[] = ['affinity', 'register', 'perception', 'perception_ext', 'suspicion', 'docs_event', 'docs_location', 'docs_faction', 'docs_item', 'npc_emotion'];
+export type Feature = 'affinity' | 'register' | 'perception' | 'perception_ext' | 'suspicion' | 'docs_event' | 'docs_location' | 'docs_faction' | 'docs_item' | 'npc_emotion' | 'taste' | 'openness' | 'rhythm';
+export const FEATURES: Feature[] = ['affinity', 'register', 'perception', 'perception_ext', 'suspicion', 'docs_event', 'docs_location', 'docs_faction', 'docs_item', 'npc_emotion', 'taste', 'openness', 'rhythm'];
 
 export const PP_DEFAULTS: Record<string, string> = {
   on: '1',
@@ -22,6 +22,8 @@ export const PP_DEFAULTS: Record<string, string> = {
   speed: '1',
   affinity: '1', register: '1', perception: '1', perception_ext: '1', suspicion: '1',
   docs_event: '1', docs_location: '1', docs_faction: '1', docs_item: '1', npc_emotion: '1',
+  /** 리수폿 선택 기능: 취향 띠·음란도·서사 리듬. 기본 끔 */
+  taste: '0', openness: '0', rhythm: '0',
   /** auto / confirm */
   newpeople: 'auto',
   twoturn: '0',

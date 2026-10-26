@@ -7,12 +7,12 @@ import { factionList } from '../core/factions';
 import { updateChat, type ChatContext } from '../host/risu';
 import { chatId, clearDiag, consolidatePerson, loadDiag, onPeopleStatus, peopleStatus, requestPeopleUpdate, sheetOf, type DiagRun } from '../host/people';
 import { anchorOf, changeId, entryStates, isAlive, liveChanges, liveEntries, liveness, messageKey, peopleStore, plain, putChange, unreadIndexes, withPeople, type EntryState, type Liveness } from '../core/people/store';
-import { addressOf, affinityView } from '../core/people/affinity';
+import { addressOf, affinityView, opennessOf, tasteOf } from '../core/people/affinity';
 import { FEATURES, PP, PP_DEFAULTS, peopleSettings, ppValue, type Feature } from '../core/people/settings';
 import { recordChars } from '../core/people/updater';
 import { seedBaseFor, temperOf } from '../core/people/base';
 import { seedPerson } from '../core/people/seed';
-import { AFF_MAX, AFF_MIN, DOC_TYPES, REGISTERS, SLOTS, STAGES, stageOf, type Change, type Doc, type DocType, type Entry, type EntrySrc, type Person, type PeopleStore, type Register, type SlotId } from '../core/people/types';
+import { AFF_MAX, AFF_MIN, DOC_TYPES, REGISTERS, SLOTS, STAGES, TASTE_STAGES, opennessStage, stageOf, type Change, type Doc, type DocType, type Entry, type EntrySrc, type Person, type PeopleStore, type Register, type SlotId } from '../core/people/types';
 import { ICONS } from './icons';
 import { keepOpen } from './panels';
 import { toast } from './toast';
@@ -134,12 +134,14 @@ const SRC_HELP: Record<EntrySrc, string> = {
   manual: '출처: 수동 — 이 화면에서 직접 고친 것',
 };
 const SRC_ICON: Record<EntrySrc, string> = { seed: ICONS.book, story: ICONS.pen, field: ICONS.game, manual: ICONS.person };
-const DOC_LABEL: Record<DocType, string> = { event: '사건', location: '장소', faction: '세력', item: '물건' };
-const KIND_LABEL: Record<Change['kind'], string> = { cue: '호감', address: '호칭', identity: '신분', note: '메모' };
+const DOC_LABEL: Record<DocType, string> = { event: '사건', location: '장소', faction: '세력', item: '물건', rhythm: '서사 리듬' };
+const KIND_LABEL: Record<Change['kind'], string> = { cue: '호감', address: '호칭', identity: '신분', note: '메모', taste: '취향', openness: '음란도' };
 const KIND_HELP: Record<Change['kind'], string> = {
   cue: '호감 계기: 이 메시지에서 생긴 호감 변화의 이유. 숫자는 코드가 계기 표로 정해요',
   address: '호칭 변경: 이 인물이 주인공을 부르는 말·말투가 바뀐 기록',
   identity: '신분: 주인공의 소속·직급이 바뀐 기록',
+  taste: '취향 띠(첫인상): 주인공이 이 인물의 취향에 맞는 정도 −3~+3. 호감과 다른 축',
+  openness: '음란도: 시작값 또는 새 반응의 변화량. 값·단계·피임 태도는 코드가 계산해요',
   note: '메모: 다음 턴 본편에 끼워 넣을 짧은 메모',
 };
 const SEEDED_LABEL = { lore: '시트', dialogue: '대사', none: '빈 기록' } as const;
@@ -217,6 +219,9 @@ const FEATURE_HELP: Record<Feature, [string, string]> = {
   docs_location: ['장소 문서', '장소마다 바뀐 것'],
   docs_faction: ['세력 문서', '세력마다 바뀐 것'],
   docs_item: ['물건 문서', '물건마다 바뀐 것'],
+  taste: ['취향 띠(첫인상)', '인물마다 주인공이 자기 취향에 맞는 정도(−3~+3)를 호감과 별개로 기록해요. 오를 땐 한 칸씩, 내릴 땐 여러 칸. 리수폿 첫인상 축'],
+  openness: ['음란도', '성인 인물의 성적 개방도(0~300)와 피임 태도를 기록해요. 시작값은 근거가 있을 때만, 그 뒤는 실제 반응마다. 리수폿 음란도. 성인용 기능'],
+  rhythm: ['서사 리듬', '장면 국면(준비·절정·여운…)·장(章) 흐름·떡밥 단계를 문서로 두고 Director 메모에 「지금은 긴장을 올릴 때/떡밥 회수」를 넣어요. 카드 지침과 부딪칠 수 있어 기본 끔. 리수폿 리듬'],
   npc_emotion: ['인물끼리 감정', '인물이 다른 인물에게 느끼는 감정·관계도 기록해요 (유저 대상만이 아니라)'],
 };
 
@@ -250,7 +255,7 @@ function diagTable(ctx: ChatContext, keepRaw: boolean): string {
       ? r.stage === 'skip'
         ? `<span class="gx-badge wait">건너뜀 · ${esc(r.error ?? '')}</span>`
         : rep
-          ? `<span class="gx-badge live">반영 ${rep.applied.entries + rep.applied.cues + rep.applied.address + rep.applied.docs + rep.applied.suspicion}</span>${rep.dropped.length ? `<span class="gx-badge hot">버림 ${rep.dropped.length}</span>` : ''}${rep.held.length ? `<span class="gx-badge wait">보류 ${rep.held.length}</span>` : ''}`
+          ? `<span class="gx-badge live">반영 ${rep.applied.entries + rep.applied.cues + rep.applied.address + rep.applied.docs + rep.applied.suspicion + (rep.applied.taste ?? 0) + (rep.applied.openness ?? 0)}</span>${rep.dropped.length ? `<span class="gx-badge hot">버림 ${rep.dropped.length}</span>` : ''}${rep.held.length ? `<span class="gx-badge wait">보류 ${rep.held.length}</span>` : ''}`
           : '<span class="gx-badge live">반영</span>'
       : `<span class="gx-badge bad">실패 · ${esc(r.stage ?? '')}</span><small class="pp-err">${esc(r.error ?? '')}</small>`;
     const sysText = r.system ?? '';
@@ -512,10 +517,26 @@ function entryRow(ctx: ChatContext, who: string, slot: SlotId, e: Entry, live: L
   </li>`;
 }
 
+/** 선택 기능 카드: 취향 띠·음란도 (켜져 있을 때만) */
+function extraCards(ctx: ChatContext, p: Person, changes: Change[]): string {
+  const f = peopleSettings(ctx.chat.scriptstate).features;
+  const out: string[] = [];
+  if (f.has('taste')) {
+    const band = tasteOf(p, changes);
+    out.push(`<section class="pp-card"><h4 title="주인공이 이 인물의 취향에 맞는 정도. 호감과 다른 축">취향 띠(첫인상)</h4><p class="pp-extra">${band === null ? '<span class="pp-addr-none">아직 판정 전 — 실제로 마주치면 한 번 정해져요</span>' : `<b>${band > 0 ? '+' : ''}${band}</b> ${esc(TASTE_STAGES[band]?.ko ?? '')}`}</p></section>`);
+  }
+  if (f.has('openness')) {
+    const v = opennessOf(p, changes);
+    const st = v === null ? null : opennessStage(v);
+    out.push(`<section class="pp-card"><h4 title="성인 인물의 성적 개방도와 피임 태도 (0~300)">음란도</h4><p class="pp-extra">${v === null ? '<span class="pp-addr-none">아직 없음 — 근거가 있을 때만 시작값이 생겨요</span>' : `<b>${st!.label}</b> ${Math.round(v)}/300 · 피임: ${esc(st!.contraception)}`}</p></section>`);
+  }
+  return out.join('');
+}
+
 function changeRow(ctx: ChatContext, c: Change, live: Liveness): string {
   const alive = isAlive(c, live);
   const no = msgNo(c.anchor, live);
-  const what = c.kind === 'cue' ? (c.pin !== undefined ? `호감 고정 ${c.pin}` : `호감 · ${c.cue ?? ''}`) : c.kind === 'address' ? `호칭 「${c.toUser ?? ''}」${c.register ? ` · ${c.register}` : ''}` : c.kind === 'identity' ? `신분 ${[c.faction, c.rank].filter(Boolean).join(' ')}` : `메모 ${c.now ?? ''}`;
+  const what = c.kind === 'taste' ? `취향 띠 → ${(c.band ?? 0) > 0 ? '+' : ''}${c.band ?? 0}` : c.kind === 'openness' ? (typeof c.init === 'number' ? `음란도 시작값 ${c.init}` : `음란도 ${(c.delta ?? 0) > 0 ? '+' : ''}${c.delta ?? 0}`) : c.kind === 'cue' ? (c.pin !== undefined ? `호감 고정 ${c.pin}` : `호감 · ${c.cue ?? ''}`) : c.kind === 'address' ? `호칭 「${c.toUser ?? ''}」${c.register ? ` · ${c.register}` : ''}` : c.kind === 'identity' ? `신분 ${[c.faction, c.rank].filter(Boolean).join(' ')}` : `메모 ${c.now ?? ''}`;
   const key = `chg|${c.id}`;
   return `<li class="pp-entry${!alive && !c.void ? ' dead' : ''}${c.void ? ' void' : ''}">
     <div class="pp-entry-main">${srcIcon(c.src)}<span class="pp-text"><b title="${esc(KIND_HELP[c.kind])}">${esc(KIND_LABEL[c.kind])}</b> ${esc(what)}${c.reason ? ` <small>— ${esc(c.reason)}</small>` : ''}</span></div>
@@ -564,7 +585,7 @@ export function personView(ctx: ChatContext, name: string): string {
   return `<div class="ph-room nw-pane pp-pane">${head(name, sub, tidyBtn)}
     <article class="nw-doc pp-doc">
       ${peopleUi.notice ? `<div class="gx-err" role="alert">${esc(peopleUi.notice)}</div>` : ''}
-      <section class="pp-card"><h4 title="주인공에 대한 호감. 계기가 쌓여 8단계로 바뀌고, 본편 요청에 단계별 행동 방향으로 들어가요">호감</h4>${affinityBar(aff.value)}${affEdit}</section>
+      <section class="pp-card"><h4 title="주인공에 대한 호감. 계기가 쌓여 8단계로 바뀌고, 본편 요청에 단계별 행동 방향으로 들어가요">호감</h4>${affinityBar(aff.value)}${affEdit}</section>${extraCards(ctx, p, changes)}
       <section class="pp-card"><h4 title="이 인물이 주인공을 부르는 말과 말투(존댓말·반말…)">호칭</h4>${addrEdit}</section>
       ${slots || '<p class="ps-note">아직 칸에 적힌 항목이 없어요.</p>'}
       ${log}

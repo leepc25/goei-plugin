@@ -50,7 +50,7 @@ export interface Entry {
   kind?: string;
 }
 
-export type ChangeKind = 'cue' | 'address' | 'identity' | 'note';
+export type ChangeKind = 'cue' | 'address' | 'identity' | 'note' | 'taste' | 'openness';
 /** 변경 기록 하나 (호감 계기, 호칭 변경, 유저 신분, 다음 턴 메모). 값은 여기서 계산한다 */
 export interface Change {
   id: string;
@@ -75,6 +75,11 @@ export interface Change {
   /** note (사실형 Director): 다음 턴용 메모 */
   now?: string;
   mustNot?: string[];
+  /** taste: 새 취향 띠 (-3~3) */
+  band?: number;
+  /** openness: 시작값(init, 0·90·150·210·270) 또는 변화량(delta) */
+  init?: number;
+  delta?: number;
 }
 export type Register = '존댓말' | '반말' | '혼합' | '하게체' | '하오체';
 export const REGISTERS: Register[] = ['존댓말', '반말', '혼합', '하게체', '하오체'];
@@ -93,9 +98,10 @@ export interface Person {
   aliases: string[];
 }
 
-export type DocType = 'event' | 'location' | 'faction' | 'item';
-export const DOC_TYPES: DocType[] = ['event', 'location', 'faction', 'item'];
-export const DOC_CAP: Record<DocType, number> = { event: 60, location: 8, faction: 8, item: 8 };
+export type DocType = 'event' | 'location' | 'faction' | 'item' | 'rhythm';
+export const DOC_TYPES: DocType[] = ['event', 'location', 'faction', 'item', 'rhythm'];
+/** 문서 종류 → 켜는 기능 이름 (리듬은 기능 rhythm) */
+export const docFeature = (t: DocType): string => (t === 'rhythm' ? 'rhythm' : `docs_${t}`);
 /** 인물 밖 문서: 사건은 건마다, 장소·세력·물건은 이름마다 「바뀐 것」 항목 */
 export interface Doc {
   type: DocType;
@@ -158,3 +164,42 @@ export function stageOf(value: number): Stage {
 /** 성격 계수 (relations-base temper) */
 export interface Temper { open: number; grudge: number }
 export const DEFAULT_TEMPER: Temper = { open: 1, grudge: 1 };
+
+/** 취향 띠 (리수폿 affinity.taste_band): 첫인상 −3~+3. 호감과 다른 축. 올라갈 땐 한 칸씩, 내려갈 땐 여러 칸 */
+export const TASTE_MIN = -3;
+export const TASTE_MAX = 3;
+export const TASTE_STAGES: Record<number, { ko: string; en: string }> = {
+  [-3]: { ko: '강한 거부감으로 접촉을 끝내거나 피하려 함', en: 'strong aversion; ends or avoids contact' },
+  [-2]: { ko: '분명한 비호감으로 마찰과 거리가 늘고 자발적 친절이 줄어듦', en: 'clear dislike; more friction and distance, less voluntary kindness' },
+  [-1]: { ko: '약간 거슬리거나 취향에 맞지 않아 필요한 만큼만 반응함', en: 'slightly grating or not to taste; responds only as needed' },
+  [0]: { ko: '특별한 끌림이나 거부감 없이 기존 관계대로 대함', en: 'no particular pull or aversion; treats as the relationship stands' },
+  [1]: { ko: '약하게 끌려 조금 더 주목하고 기억하거나 대화를 이어가려 함', en: 'weakly drawn; pays a little more attention, remembers, keeps talking' },
+  [2]: { ko: '핵심 취향이 분명히 맞아 먼저 질문하거나 시간과 노력을 더 씀', en: 'core tastes clearly match; asks first, spends more time and effort' },
+  [3]: { ko: '여러 핵심 취향이 강하게 맞아 관심의 우선순위가 달라질 수 있음', en: 'several core tastes strongly match; priorities of attention may shift' },
+};
+
+/** 음란도 (리수폿 openness.score, 화면 이름 음란도): 0~300, 성인 인물. 시작값은 표의 다섯 값 중 하나, 변화는 새 반응마다 표의 값 */
+export const OPENNESS_MIN = 0;
+export const OPENNESS_MAX = 300;
+export const OPENNESS_BASELINES = [0, 90, 150, 210, 270];
+export const OPENNESS_DELTAS = [1, 3, 5, 10, -2, -4, -5];
+/** 기준 메시지 하나 안의 합 범위 */
+export const OPENNESS_TURN: [number, number] = [-5, 10];
+export interface OpennessStage { max: number; label: string; contraception: string; en: string; contraceptionEn: string }
+export const OPENNESS_STAGES: OpennessStage[] = [
+  { max: 60, label: '정숙', contraception: '피임 필수', en: 'Chaste', contraceptionEn: 'must use contraception and says so as a prerequisite' },
+  { max: 120, label: '수줍음', contraception: '주저하지만 피임을 요구', en: 'Shy', contraceptionEn: 'hesitant while still asking for contraception (hesitation is not abandoning the condition)' },
+  { max: 180, label: '개방', contraception: '안전일에는 비피임을 고려 가능', en: 'Open', contraceptionEn: 'believes non-use is acceptable on a "safe day" (an attitude; never compute a real safe date)' },
+  { max: 240, label: '각성', contraception: '피임 여부를 크게 신경 쓰지 않음', en: 'Awakened', contraceptionEn: 'pays little attention to checking or requesting contraception' },
+  { max: 300, label: '탐닉', contraception: '비피임 선호', en: 'Indulgent', contraceptionEn: 'prefers non-use, distinct from mere indifference' },
+];
+export function opennessStage(value: number): OpennessStage {
+  for (const s of OPENNESS_STAGES) if (value <= s.max) return s;
+  return OPENNESS_STAGES[OPENNESS_STAGES.length - 1];
+}
+
+/** 서사 리듬 (리수폿 rhythm): 장면 국면과 떡밥 단계 이름 (문서 종류 rhythm 의 항목 본문 앞에 붙인다) */
+export const RHYTHM_PHASES = ['baseline', 'build_up', 'peak', 'aftermath', 'cooldown'] as const;
+export const RHYTHM_ENGAGEMENT = ['active', 'idle', 'intentional_rest'] as const;
+export const RHYTHM_HOOK_STAGES = ['seeded', 'hinted', 'escalated', 'payoff_ready', 'resolved', 'retired'] as const;
+export const RHYTHM_HOOK_TIERS = ['short', 'mid', 'long'] as const;

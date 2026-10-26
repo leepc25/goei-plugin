@@ -1,9 +1,9 @@
 // 본편 요청에 인물 기록 블록을 끼운다 (beforeRequest). 모델은 부르지 않는다.
 // 절 단위 혼합(split)이면 요원 자리에 들어간 그 인물의 시트 원문을 요청에서 빼고 기록 블록으로 대신한다.
 import type { Chat } from '../types';
-import { peopleBlock, personBlock, unknownTo } from './inject';
+import { peopleBlock, personBlock, rhythmBlock, unknownTo } from './inject';
 import { nameMatcher, scenePeople, entriesOf, type NameEntry } from './select';
-import { liveChanges, liveness, type Liveness } from './store';
+import { liveChanges, liveEntries, liveness, type Liveness } from './store';
 import { latestNote } from './updater';
 import type { PeopleSettings } from './settings';
 import type { PeopleStore, Temper } from './types';
@@ -52,8 +52,17 @@ export function peopleBlockFor(chat: Chat, o: RequestOpts): { text: string; peop
         speed: o.settings.speed,
         // 본편 전체 예산을 장면 인물 수로 나눈다 (고정 절 원문은 예산 밖)
         maxChars: Math.floor(o.settings.blockCap / people.length),
+        taste: o.settings.features.has('taste'),
+        openness: o.settings.features.has('openness'),
       }),
     );
+  }
+  // 서사 리듬 (선택): 장면 전체 기록과 메모를 맨 앞에
+  if (o.settings.features.has('rhythm')) {
+    const docs = Object.values(o.store.docs).filter((d) => d.type === 'rhythm').flatMap((d) => liveEntries(d.entries, live).slice(-1).map((e) => ({ key: d.key, text: e.text })));
+    const note = o.settings.director === 'facts' ? latestNote(o.store, '@rhythm', live)?.now : null;
+    const rb = rhythmBlock(docs, note);
+    if (rb) blocks.unshift(rb);
   }
   return { text: peopleBlock(blocks, o.settings.blockCap), people, sheets };
 }

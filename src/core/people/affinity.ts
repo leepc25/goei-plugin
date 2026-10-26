@@ -1,6 +1,6 @@
 // 호감 계산: 시작값 + 살아 있는 계기의 합. 계기마다 저장된 변화량은 없고 매번 순서대로 다시 계산한다.
 // 규칙(리수폿 수치 체계): 계기 이름 → 기본값, 성격 계수·설정 배율, 기준 메시지 하나 안의 합은 ±10 (예외 계기 제외), 범위 -100~300, 고정은 그 값으로 덮음.
-import { AFF_MAX, AFF_MIN, CUE_VALUE, DEFAULT_TEMPER, EXCEPTION_CUES, TURN_CAP, stageOf, type Change, type Person, type Temper } from './types';
+import { AFF_MAX, AFF_MIN, CUE_VALUE, DEFAULT_TEMPER, EXCEPTION_CUES, OPENNESS_MAX, OPENNESS_MIN, OPENNESS_TURN, TASTE_MAX, TASTE_MIN, TURN_CAP, stageOf, type Change, type Person, type Temper } from './types';
 
 const clamp = (v: number, a: number, b: number) => Math.max(a, Math.min(b, v));
 
@@ -63,4 +63,27 @@ export function addressOf(person: Person, changes: Change[]): { toUser: string; 
   if (person.address.pin) return { toUser: person.address.toUser, register: person.address.register };
   const last = [...changes].reverse().find((c) => c.who === person.name && c.kind === 'address' && c.toUser);
   return last ? { toUser: last.toUser!, register: last.register ?? person.address.register } : { toUser: person.address.toUser, register: person.address.register };
+}
+
+/** 취향 띠 현재값: 마지막 살아 있는 taste 변경의 띠. 아직 판정 전이면 null */
+export function tasteOf(person: Person, changes: Change[]): number | null {
+  const last = [...changes].reverse().find((c) => c.who === person.name && c.kind === 'taste' && typeof c.band === 'number');
+  return last ? clamp(Math.round(last.band!), TASTE_MIN, TASTE_MAX) : null;
+}
+
+/** 음란도 현재값: 시작값(init) + 살아 있는 변화량의 합. 기준 메시지 하나 안의 합은 -5~+10. 시작값이 없으면 null (판정 전) */
+export function opennessOf(person: Person, changes: Change[]): number | null {
+  const mine = changes.filter((c) => c.who === person.name && c.kind === 'openness');
+  let value: number | null = null;
+  const groups = new Map<string, Change[]>();
+  for (const c of mine) (groups.get(c.anchor) ?? groups.set(c.anchor, []).get(c.anchor)!).push(c);
+  for (const [, list] of groups) {
+    let net = 0;
+    for (const c of list) {
+      if (typeof c.init === 'number' && value === null) value = clamp(c.init, OPENNESS_MIN, OPENNESS_MAX);
+      else if (typeof c.delta === 'number' && value !== null) net += c.delta;
+    }
+    if (value !== null) value = clamp(value + clamp(net, OPENNESS_TURN[0], OPENNESS_TURN[1]), OPENNESS_MIN, OPENNESS_MAX);
+  }
+  return value === null ? null : Math.round(value * 100) / 100;
 }

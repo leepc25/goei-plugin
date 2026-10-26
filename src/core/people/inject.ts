@@ -1,12 +1,12 @@
 // 본편 요청에 넣는 인물 기록 블록 (리수폿 Director 의 사실 전달을 코드로). 모델이 쓴 인용·숫자는 넣지 않는다.
 // 절 단위 혼합: 시트의 고정 절(Voice·Background·Abilities·Appearance)은 원문, 나머지는 기록.
-import { addressOf, affinityView, type AffinityOpts } from './affinity';
+import { addressOf, affinityView, opennessOf, tasteOf, type AffinityOpts } from './affinity';
 
 const REGISTER_EN: Record<string, string> = { 존댓말: 'formal (존댓말)', 반말: 'informal (반말)', 혼합: 'mixed formal/informal', 하게체: 'hage-che (archaic, superior-to-junior)', 하오체: 'hao-che (archaic, dignified formal)' };
 import { liveEntries, plain, type Liveness } from './store';
 import { fixedSections } from './seed';
 import { norm } from './store';
-import type { Change, Entry, PeopleStore, Person } from './types';
+import { OPENNESS_MAX, TASTE_STAGES, opennessStage, type Change, type Entry, type PeopleStore, type Person } from './types';
 
 const EXPRESS_TAIL: Record<0 | 1 | 2 | 3, string> = {
   0: 'Expression: almost never shown; appears only through actions and priorities, not words.',
@@ -27,6 +27,9 @@ export interface BlockOpts extends AffinityOpts {
   /** 사실형 Director 메모 (갱신기가 미리 써 둔 것) */
   note?: { now?: string; mustNot?: string[] } | null;
   maxChars?: number;
+  /** 켜진 선택 기능 (taste·openness 줄을 넣을지) */
+  taste?: boolean;
+  openness?: boolean;
 }
 
 const lines = (list: Entry[]) => list.map((e) => `- ${plain(e.text, 300)}`).join('\n');
@@ -65,6 +68,17 @@ export function personBlock(p: Person, store: PeopleStore, live: Liveness, chang
   const addr = addressOf(p, changes);
   const relLine = [`Relationship → ${user}: ${aff.stage.label} (${aff.stage.behavior})`, EXPRESS_TAIL[p.express]].filter(Boolean).join(' ');
   out.push(relLine + (relUser.length ? '\n' + lines(relUser) : ''));
+  if (o.taste) {
+    const band = tasteOf(p, changes);
+    if (band !== null) out.push(`First impression (taste) → ${user}: ${band > 0 ? '+' : ''}${band} — ${TASTE_STAGES[band]?.en ?? ''}. A separate axis from the relationship above; it never grants closeness by itself.`);
+  }
+  if (o.openness) {
+    const v = opennessOf(p, changes);
+    if (v !== null) {
+      const st = opennessStage(v);
+      out.push(`Openness: ${st.en} (${Math.round(v)}/${OPENNESS_MAX}) — contraception attitude: ${st.contraceptionEn}. Applies only inside intimate contexts that actually arise; an explicit current condition or the other participant's choice takes priority.`);
+    }
+  }
   if (relOther.length) out.push('Relationships with others:\n' + relOther.map((e) => `- → ${e.target}: ${plain(e.text, 300)}`).join('\n'));
   if (addr.toUser) out.push(`Address → ${user}: '${addr.toUser}', ${REGISTER_EN[addr.register] ?? 'mixed'}.`);
   const sp = slot('speech').filter((e) => e.target && e.target !== '@user');
@@ -115,4 +129,12 @@ export function peopleBlock(blocks: string[], maxChars = 16000): string {
   let body = blocks.join('\n\n');
   if (body.length > maxChars) body = body.slice(0, maxChars - 1) + '…';
   return `${PEOPLE_HEAD}\n${PEOPLE_RULE}\n\n${body}`;
+}
+
+/** 서사 리듬 블록 (문서 종류 rhythm + '@rhythm' 메모). 기록이 없으면 빈 문자열 */
+export function rhythmBlock(docs: { key: string; text: string }[], note: string | null | undefined): string {
+  if (!docs.length && !note) return '';
+  const order = (k: string) => (k === 'scene' ? 0 : k === 'chapter' ? 1 : k === 'arc' ? 2 : k.startsWith('hook:') ? 3 : 4);
+  const lines = [...docs].sort((a, b) => order(a.key) - order(b.key)).map((d) => `- ${d.key}: ${plain(d.text, 300)}`);
+  return ['## Scene rhythm (kept by the system; guidance, not content to narrate)', ...lines, ...(note ? [`- Direction for this reply: ${plain(note, 200)}`] : [])].join('\n');
 }
