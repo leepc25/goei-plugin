@@ -155,6 +155,23 @@ export interface GameFieldEvent {
   weight?: 1 | 2 | 3;
   /** 지금 확정된 사실 하나 (같은 key는 나중 것이 이긴다) */
   fact?: { key: string; value: string; permanent?: boolean };
+  /** 목격한 소속 (세력 평판): 조직 코드와 「명단 인물이 봤나(named) / 이름 없는 몹이 봤나」. 몹 목격은 계기 값의 절반(설정) */
+  witness?: { faction: string; named: boolean };
+  /** 방문 번호·id. 호감·평판의 메시지당 상한을 방문마다(그리고 장면마다) 따로 세게. 없으면 장면 이름만으로 나눈다 */
+  visit?: string;
+}
+
+/** 세력 평판 (docs/설계안_세력평판.md): 세력 → 유저 값과 구간. 몹의 첫 반응은 stage 로 정한다 */
+export interface FactionView {
+  code: string;
+  name: string;
+  /** −100~100 */
+  value: number;
+  /** friendly 우호 · favorable 호의 · neutral 중립 · wary 경계 · hostile 적대 */
+  stage: 'friendly' | 'favorable' | 'neutral' | 'wary' | 'hostile';
+  stageLabel: string;
+  /** 구간 경계 [우호 하한, 호의 하한, 중립 하한, 경계 하한] (설정) */
+  bounds: [number, number, number, number];
 }
 /** 필드에 들어갈 수 있는지 (본편 주인공이 괴이 안이면 막는다) */
 export interface GameEntry {
@@ -184,9 +201,8 @@ export interface PersonView {
   /** 호감: 값(-100~300)과 8단계 */
   affinity: { value: number; stage: string; cell: 'hostile' | 'base' | 'warm' | 'close' };
   /** 유저를 부르는 말 */
-  address: { toUser: string; register: '존댓말' | '반말' | '혼합' };
+  address: { toUser: string; register: '존댓말' | '반말' | '혼합' | '하게체' | '하오체' };
   express: 0 | 1 | 2 | 3;
-  minor: boolean;
   /** 칸별 살아 있는 항목 본문 */
   state: string[];
   knowledge: string[];
@@ -200,6 +216,8 @@ export interface GamePeople {
   people(names?: string[]): Promise<PersonView[]>;
   /** NPC 대화 입력용 글: 시트 고정 절 + 살아 있는 기록 (없으면 null → 게임은 시트 사본) */
   sheet(name: string): Promise<string | null>;
+  /** 세력 평판 전부 (아는 세력 모두, 장부가 없으면 시작값). 기능이 꺼져 있으면 빈 목록 */
+  factions(): Promise<FactionView[]>;
   /** 기록이 갱신될 때 (갱신기가 끝났을 때) */
   onChange(cb: () => void): () => void;
 }

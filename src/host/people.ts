@@ -6,17 +6,21 @@ import { generate, runModel, LlmError, type LlmMessage } from './llm';
 import { buildDirector, directorBlock, parseDirector, type DirectorNote } from '../core/people/director';
 import { loadContext, updateChat, type ChatContext } from './risu';
 import { isWaiting, onWaiting } from './waiting';
-import { peopleStore, withPeople, unreadIndexes, messageKey, liveness } from '../core/people/store';
-import { applyUpdate, assemblePrompt, buildUpdate, enabledSections, parseUpdate, planBatches, type ApplyReport, type UpdateInput } from '../core/people/updater';
+import { peopleStore, withPeople, unreadIndexes, messageKey, messageHash as messageHashOf, liveness } from '../core/people/store';
+import { applyUpdate, assemblePrompt, buildUpdate, clearStoryRecords, enabledSections, mentionIndexes, parseUpdate, planBatches, recordChars, type ApplyReport, type UpdateInput } from '../core/people/updater';
+import { applyConsolidate, buildConsolidate, parseConsolidate, type ConsolidateReport } from '../core/people/consolidate';
 import { peopleSettings, type PeopleSettings } from '../core/people/settings';
 import { seedPerson } from '../core/people/seed';
 import { nameMatcher } from '../core/people/select';
-import { allNames, basePerson, userAffinityBase, valuesOf } from '../core/people/base';
+import { allNames, seedBaseFor, valuesOf } from '../core/people/base';
+import { playerAgent } from '../core/player';
 import { promptFor } from '../core/people/prompt';
 import { messageText } from '../core/refs';
 import { findStatusTags } from '../core/world/status';
 import { parseIdentity } from '../core/people/identity';
-import type { PeopleStore } from '../core/people/types';
+import type { Identity, PeopleStore } from '../core/people/types';
+import { factionList } from '../core/factions';
+import type { LoreEntry } from '../core/types';
 
 // ── 진단 ──
 
@@ -34,6 +38,8 @@ export interface DiagRun {
   stage?: 'build' | 'model' | 'parse' | 'save' | 'skip';
   error?: string;
   report?: ApplyReport;
+  /** 「정리」 결과 (reason 'consolidate') */
+  tidy?: ConsolidateReport;
   system?: string;
   data?: string;
   raw?: string;
@@ -89,36 +95,59 @@ function setStatus(next: Partial<PeopleStatus>): void {
 
 // ── 시트·시작값 ──
 
-const chatId = (ctx: ChatContext) => `${String(ctx.char.chaId ?? ctx.charIndex)}:${ctx.chatIndex}:${messageKey(ctx.chat.message[0] ?? { role: 'user', data: '' }, 0)}`;
+export const chatId = (ctx: ChatContext) => `${String(ctx.char.chaId ?? ctx.charIndex)}:${ctx.chatIndex}:${messageKey(ctx.chat.message[0] ?? { role: 'user', data: '' }, 0)}`;
 
 export const sheetOf = (ctx: ChatContext) => (name: string): string | null => bookText({ char: ctx.char, chat: ctx.chat }, name) || null;
+
+/** 기록하지 않는 이름: 유저가 연기하는 요원 (캐릭터로 플레이) */
+function excludedNames(ctx: ChatContext): string[] {
+  const me = playerAgent(ctx.char.globalLore, ctx.chat.scriptstate);
+  return me?.name ? [me.name] : [];
+}
+
+/** 명부의 세력 코드 → 이름 (세력 평판 표시·해석용) */
+export function factionNamesOf(lore: LoreEntry[] | undefined): Record<string, string> {
+  try {
+    return Object.fromEntries(factionList(lore).map((f) => [f.code, f.name]));
+  } catch {
+    return {};
+  }
+}
 
 function userFaction(chat: Chat): string {
   const v = chat.scriptstate?.['$st_faction'] ?? chat.scriptstate?.['st_faction'];
   return typeof v === 'string' ? v : '';
 }
 
-/** 처음 등장한 인물의 기록을 만든다 (시트 → 시작값). 확정 구간 글에 이름이 나온, 아직 기록이 없는 사람 */
-export function seedAppearing(store: PeopleStore, chat: Chat, indexes: number[], sheet: (name: string) => string | null): string[] {
+/** 처음 등장한 인물의 기록을 만든다 (시트 → 시작값). 확정 구간 글에 이름이 나온, 아직 기록이 없는 사람.
+ *  유저가 연기하는 요원(exclude)은 기록하지 않는다 (있던 기록은 지운다). 호칭 시작값은 유저 신분(identity)으로 고른다 */
+export function seedAppearing(store: PeopleStore, chat: Chat, indexes: number[], sheet: (name: string) => string | null, o: { exclude?: string[]; identity?: Identity } = {}): string[] {
   const list = Array.isArray(chat.message) ? chat.message : [];
-  const match = nameMatcher(allNames().filter((n) => !store.people[n.name]));
+  const exclude = new Set(o.exclude ?? []);
+  const match = nameMatcher(allNames().filter((n) => !store.people[n.name] && !exclude.has(n.name)));
   const texts = indexes.flatMap((i) => [list[i - 1], list[i]]).filter(Boolean).map((m) => messageText(String(m!.data ?? '')));
   const found = new Set<string>();
   for (const t of texts) for (const n of match(t)) found.add(n);
   const faction = userFaction(chat);
   const made: string[] = [];
   for (const name of found) {
-    const b = basePerson(name);
-    const alias = allNames().find((n) => n.name === name);
-    store.people[name] = seedPerson(name, sheet(name), {
-      faction: b?.faction ?? '',
-      express: b?.express,
-      affinityBase: userAffinityBase(b?.faction ?? '', faction),
-      aliases: alias?.aliases ?? [],
-    });
+    store.people[name] = seedPerson(name, sheet(name), seedBaseFor(name, faction, o.identity ?? store.identity));
     made.push(name);
   }
   return made;
+}
+
+/** 유저가 연기하는 요원의 기록을 지운다 (자기 자신은 기록 대상이 아니다). 지운 이름을 돌려준다 */
+export function dropExcluded(store: PeopleStore, exclude: string[]): string[] {
+  const gone: string[] = [];
+  for (const n of exclude) {
+    if (!store.people[n]) continue;
+    delete store.people[n];
+    store.log = store.log.filter((c) => c.who !== n);
+    delete store.folded[n];
+    gone.push(n);
+  }
+  return gone;
 }
 
 /** 가장 최근 봇 응답의 상태창 신분 칸 */
@@ -142,7 +171,14 @@ let pendingReason: string | null = null;
 export interface RunResult { ran: number; applied: number; skipped: string[]; errors: string[] }
 
 /** 안 읽은 응답을 묶음으로 읽어 기록에 반영한다. 이미 돌고 있으면 끝난 뒤 한 번 더 */
-export function requestPeopleUpdate(reason: string, o: { manual?: boolean } = {}): Promise<RunResult> {
+export interface RunScope {
+  /** 읽을 응답 위치 (없으면 안 읽은 것). backfill·다시 읽기 */
+  indexes?: number[];
+  /** 이 인물만 반영하고 읽음 표시는 그대로 (다시 읽기) */
+  only?: string[];
+}
+
+export function requestPeopleUpdate(reason: string, o: { manual?: boolean; scope?: RunScope } = {}): Promise<RunResult> {
   if (inflight) {
     pendingReason = reason;
     return inflight;
@@ -170,25 +206,35 @@ async function waitNotBusy(): Promise<void> {
   });
 }
 
-async function runOnce(reason: string, o: { manual?: boolean }): Promise<RunResult> {
+async function runOnce(reason: string, o: { manual?: boolean; scope?: RunScope }): Promise<RunResult> {
   const result: RunResult = { ran: 0, applied: 0, skipped: [], errors: [] };
   const ctx = await loadContext().catch(() => null);
   if (!ctx) return result;
   const settings = peopleSettings(ctx.chat.scriptstate);
   if (!settings.on || (settings.when === 'manual' && !o.manual)) return result;
   const store = peopleStore(ctx.chat);
-  // 처음 등장한 인물 시드 (모델 없음) — 안 읽은 구간 전체
-  const unread = unreadIndexes(ctx.chat, store);
-  setStatus({ unread: unread.length });
+  // 읽을 범위: 지정(backfill·다시 읽기)이 없으면 안 읽은 응답 가운데 「마지막으로 읽은 것 뒤」만.
+  // 읽은 적이 없으면(기능을 중간에 켬) 마지막 응답 하나만 — 지난 응답은 「지난 응답 읽기」로 사용자가 고른다
+  const allUnread = unreadIndexes(ctx.chat, store);
+  let unread = allUnread;
+  if (!o.scope?.indexes) {
+    const lastRead = Math.max(-1, ...ctx.chat.message.map((m, i) => (store.read[messageKey(m, i)] !== undefined ? i : -1)));
+    unread = lastRead < 0 ? allUnread.slice(-1) : allUnread.filter((i) => i > lastRead);
+  } else unread = o.scope.indexes.filter((i) => ctx.chat.message[i]?.role === 'char');
+  setStatus({ unread: allUnread.length });
   if (!unread.length) return result;
   const sheet = sheetOf(ctx);
-  const seeded = seedAppearing(store, ctx.chat, unread, sheet);
   // 상태창 신분 칸 (가장 최근 응답) → 기록. 상태창이 늘 우선
   const identity = statusIdentity(ctx.chat);
   const idChanged = !!identity && (!store.identity || store.identity.faction !== identity.faction || store.identity.rank !== identity.rank || store.identity.from !== 'status');
-  if (seeded.length || idChanged) {
+  // 유저가 연기하는 요원은 기록하지 않는다
+  const exclude = excludedNames(ctx);
+  const dropped = dropExcluded(store, exclude);
+  const seeded = seedAppearing(store, ctx.chat, unread, sheet, { exclude, identity: identity ?? store.identity });
+  if (seeded.length || idChanged || dropped.length) {
     await updateChat(ctx.charIndex, ctx.chatIndex, (cur) => {
       const s = peopleStore(cur);
+      dropExcluded(s, exclude);
       for (const n of seeded) if (!s.people[n]) s.people[n] = store.people[n];
       if (identity && idChanged) s.identity = identity;
       return withPeople(cur, s);
@@ -209,11 +255,15 @@ async function runOnce(reason: string, o: { manual?: boolean }): Promise<RunResu
         break;
       }
       const curStore = peopleStore(fresh.chat);
-      const system = assemblePrompt(promptFor(settings), enabledSections(settings), settings.rules);
-      const input = buildUpdate(fresh.chat, curStore, batches[b], { settings, system, values: Object.fromEntries(input0Names(curStore).map((n) => [n, valuesOf(n)])), names: allNames() });
+      const input = buildUpdate(fresh.chat, curStore, batches[b], { settings, system: '', values: Object.fromEntries(input0Names(curStore).map((n) => [n, valuesOf(n)])), names: allNames(), exclude, factionNames: factionNamesOf(fresh.char.globalLore), only: o.scope?.only });
+      // 지침은 자료를 본 뒤 조립한다 (저장 상한을 넘긴 인물이 있으면 정리 절을 켠다)
+      const sections = enabledSections(settings);
+      if (input.tidy.length) sections.add('tidy');
+      const system = assemblePrompt(promptFor(settings), sections, settings.rules, settings.lang);
+      input.system = system;
       if (!input.people.length) {
-        // 장면 인물이 없으면 모델을 부르지 않고 읽음 표시만
-        await updateChat(fresh.charIndex, fresh.chatIndex, (cur) => {
+        // 장면 인물이 없으면 모델을 부르지 않고 읽음 표시만 (다시 읽기는 표시도 안 바꿈)
+        if (!o.scope?.only) await updateChat(fresh.charIndex, fresh.chatIndex, (cur) => {
           const s = peopleStore(cur);
           for (const i of input.indexes) {
             const m = cur.message[i];
@@ -251,10 +301,10 @@ async function runOnce(reason: string, o: { manual?: boolean }): Promise<RunResu
         const report = applyUpdate(s, cur, input, value, {
           settings,
           sheetOf: sheet,
-          baseOf: (name) => {
-            const bp = basePerson(name);
-            return bp ? { faction: bp.faction, express: bp.express, affinityBase: userAffinityBase(bp.faction, userFaction(cur)) } : {};
-          },
+          baseOf: (name) => seedBaseFor(name, userFaction(cur), s.identity),
+          exclude,
+          only: o.scope?.only,
+          keepRead: !!o.scope?.only,
         });
         diag.report = report;
         return withPeople(cur, s);
@@ -280,21 +330,112 @@ async function runOnce(reason: string, o: { manual?: boolean }): Promise<RunResu
     }
     if (result.errors.length >= 3) break;
   }
+  // 정리: 별도 호출 설정이면 저장 상한을 넘긴 인물마다 정리 호출 1회
+  if (settings.tidy === 'separate' && result.ran) {
+    const now = await loadContext().catch(() => null);
+    if (now && chatId(now) === id) {
+      const s = peopleStore(now.chat);
+      const live = liveness(now.chat);
+      for (const n of Object.keys(s.people)) {
+        if (recordChars(s.people[n], live) <= settings.personCap) continue;
+        const r = await consolidateInner(now, n, settings).catch((error) => ({ ok: false, message: String(error) }));
+        if (!r.ok) result.skipped.push(`정리(${n}): ${r.message}`);
+      }
+    }
+  }
   const after = await loadContext().catch(() => null);
   setStatus({ busy: false, label: '', unread: after ? unreadIndexes(after.chat, peopleStore(after.chat)).length : 0 });
   return result;
 }
 
 const input0Names = (s: PeopleStore) => Object.keys(s.people);
-const messageHashOf = (m: { data: unknown }) => {
-  // store.messageHash 와 같은 계산 (여기서 다시 import 하지 않기 위해)
-  let h = 2166136261;
-  for (const ch of String(m.data ?? '')) {
-    h ^= ch.codePointAt(0)!;
-    h = Math.imul(h, 16777619);
+
+/** 지난 응답 읽기: 최근 turns 개 응답(0 = 전부) 가운데 안 읽은 것을 묶음으로 읽는다 (기능을 중간에 켰거나 끄고 지나간 구간) */
+export async function backfillPeople(turns: number): Promise<RunResult> {
+  const ctx = await loadContext().catch(() => null);
+  if (!ctx) return { ran: 0, applied: 0, skipped: ['채팅을 읽지 못했어요'], errors: [] };
+  const store = peopleStore(ctx.chat);
+  const unread = unreadIndexes(ctx.chat, store);
+  const bots = ctx.chat.message.map((m, i) => (m.role === 'char' ? i : -1)).filter((i) => i >= 0);
+  const pick = new Set(turns > 0 ? bots.slice(-turns) : bots);
+  const indexes = unread.filter((i) => pick.has(i));
+  if (!indexes.length) return { ran: 0, applied: 0, skipped: ['그 범위에 안 읽은 응답이 없어요'], errors: [] };
+  return requestPeopleUpdate('backfill', { manual: true, scope: { indexes } });
+}
+
+/** 인물별 다시 읽기: 이 인물의 이야기 기록을 지우고, 그 인물이 나온 최근 turns 개 응답을 이 인물만 대상으로 다시 읽는다. 읽음 표시는 그대로 */
+export async function rereadPerson(name: string, turns: number): Promise<RunResult & { cleared: number }> {
+  if (inflight) return { ran: 0, applied: 0, skipped: ['갱신이 돌고 있어요'], errors: [], cleared: 0 };
+  const ctx = await loadContext().catch(() => null);
+  if (!ctx) return { ran: 0, applied: 0, skipped: ['채팅을 읽지 못했어요'], errors: [], cleared: 0 };
+  const store = peopleStore(ctx.chat);
+  const p = store.people[name];
+  if (!p) return { ran: 0, applied: 0, skipped: ['기록이 없는 인물'], errors: [], cleared: 0 };
+  const indexes = mentionIndexes(ctx.chat, name, [...p.aliases, ...(allNames().find((n) => n.name === name)?.aliases ?? [])], turns);
+  let cleared = 0;
+  await updateChat(ctx.charIndex, ctx.chatIndex, (cur) => {
+    const s = peopleStore(cur);
+    cleared = clearStoryRecords(s, name);
+    return withPeople(cur, s);
+  });
+  if (!indexes.length) return { ran: 0, applied: 0, skipped: ['최근 응답에 이 인물이 나오지 않아요 (기록만 비움)'], errors: [], cleared };
+  const r = await requestPeopleUpdate('reread', { manual: true, scope: { indexes, only: [name] } });
+  return { ...r, cleared };
+}
+
+/** 인물 기록 「정리」: 보조 모델이 이 인물의 살아 있는 항목을 더 적은 항목으로 다시 쓴다 (사용자가 눌렀을 때만, 1회 호출) */
+export async function consolidatePerson(name: string): Promise<{ ok: boolean; message: string; report?: ConsolidateReport }> {
+  if (inflight) return { ok: false, message: '갱신이 돌고 있어요. 끝난 뒤 다시 눌러 주세요.' };
+  const ctx = await loadContext().catch(() => null);
+  if (!ctx) return { ok: false, message: '채팅을 읽지 못했어요.' };
+  return consolidateInner(ctx, name, peopleSettings(ctx.chat.scriptstate));
+}
+
+async function consolidateInner(ctx: ChatContext, name: string, settings: PeopleSettings): Promise<{ ok: boolean; message: string; report?: ConsolidateReport }> {
+  const store = peopleStore(ctx.chat);
+  const input = buildConsolidate(store, ctx.chat, name, settings);
+  if (!input) return { ok: false, message: '정리할 항목이 없어요.' };
+  const id = chatId(ctx);
+  const t0 = Date.now();
+  const diag: DiagRun = { at: new Date().toISOString(), chat: id, reason: 'consolidate', model: settings.model, people: [name], indexes: [], sizes: { system: input.system.length, data: 0, span: 0 }, outChars: 0, ms: 0, ok: false };
+  setStatus({ busy: true, label: `${name} 기록 정리 중…` });
+  try {
+    const dataText = JSON.stringify(input.data);
+    diag.sizes.data = dataText.length;
+    if (settings.keepRaw) (diag.system = input.system), (diag.data = dataText);
+    const messages: LlmMessage[] = [
+      { role: 'system', content: input.system },
+      { role: 'user', content: `Record to tidy:\n${dataText}\n\nReturn the JSON object.` },
+    ];
+    const { raw, value } = await generate(messages, settings.model, parseConsolidate, { retries: 1, retryModel: 'same', state: ctx.chat.scriptstate });
+    diag.raw = raw;
+    diag.outChars = raw.length;
+    await waitNotBusy();
+    const saved = await updateChat(ctx.charIndex, ctx.chatIndex, (cur) => {
+      if (chatId({ ...ctx, chat: cur }) !== id) return null;
+      const s = peopleStore(cur);
+      diag.tidy = applyConsolidate(s, name, input, value, liveness(cur), settings);
+      return withPeople(cur, s);
+    });
+    if (!saved) {
+      diag.stage = 'save';
+      diag.error = '저장 직전에 채팅이 달라져 버림';
+      return { ok: false, message: diag.error };
+    }
+    diag.ok = true;
+    const r = diag.tidy!;
+    const msg = r.slots ? `정리: ${r.slots}칸, 항목 ${r.before} → ${r.after}${r.dropped.length ? ` (${r.dropped.length}칸은 결과가 맞지 않아 그대로)` : ''}` : `바뀐 칸이 없어요${r.dropped.length ? ` (${r.dropped[0].reason})` : ''}`;
+    return { ok: true, message: msg, report: r };
+  } catch (error) {
+    diag.stage = error instanceof LlmError ? 'model' : diag.raw ? 'parse' : 'build';
+    diag.error = error instanceof Error ? error.message : String(error);
+    return { ok: false, message: `정리 실패: ${diag.error}` };
+  } finally {
+    diag.ms = Date.now() - t0;
+    await pushDiag(diag, settings.keepRaw);
+    setStatus({ busy: false, label: '' });
   }
-  return (h >>> 0).toString(36);
-};
+}
 
 // ── 연출형 Director (본편 앞) ──
 

@@ -8,7 +8,6 @@
 - pairs: 키 형식 A>B, A != B, 둘 다 people 에 있음, aff 가 허용 표(0/90/150/210/270/-25/-60/-100) 안, src 비어 있지 않음
 - pairs: 대사 JSON relations 의 close/hostile 쌍이 전부 들어 있고 부호가 맞음(close → 양수, hostile → 음수)
 - orgs: 키 형식 X>Y (X 인물 조직, Y 유저 조직 A00/B00/C00/D00/E00), 값은 0 또는 -25, people 에 나오는 모든 faction 이 다섯 유저 조직 전부에 대해 키를 가짐
-- minor: 전부 people 에 있고 콘쥬스는 없음
 - aliases.names 의 이름이 전부 people 에 있고 그 반대도 성립, aliases/titles 는 문자열 배열, 조사 붙은 꼴(…은/는/이/가/을/를/에게/한테)로 끝나는 별명 없음, 별명이 다른 사람 이름과 겹치지 않음
 - aliases.ambiguous: titles 보유자 목록과 정확히 일치
 
@@ -175,18 +174,9 @@ def main():
             if f'{x}>{y}' not in orgs:
                 bad(f'orgs: {x}>{y} 키가 없음')
 
-    minor = rel.get('minor')
-    if not isinstance(minor, list):
-        bad('relations-base: minor 가 배열이 아님')
-    else:
-        for n in minor:
-            if n not in names:
-                bad(f'minor: {n} 이 people 에 없음')
-        if '콘쥬스' in minor:
-            bad('minor: 콘쥬스는 20세 대학생이라 미성년이 아님')
 
     for k in rel:
-        if k not in ('version', 'people', 'pairs', 'orgs', 'minor'):
+        if k not in ('version', 'people', 'pairs', 'orgs'):
             bad(f'relations-base: 모르는 최상위 키 {k}')
 
     # ---- aliases ----

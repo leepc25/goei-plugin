@@ -503,6 +503,29 @@ def patch_desc(text):
     return text
 
 
+# 첫 메시지(시작 장면)의 표정 태그 중 지금 표정 세트(assets/portraits 27종)에 없는 것 → 가장 가까운 표정 (2026-10-26 사용자 지시)
+EMOTION_FIX = {
+    'acting coy': 'shy', 'admiring': 'lovestruck', 'depressed': 'sad', 'determined': 'serious', 'disgusted': 'contemptuous',
+    'enraged': 'angry', 'evil smiling': 'smug', 'forced smiling': 'nervous', 'happy smile': 'happy', 'indifferent': 'bored',
+    'joyful': 'excited', 'neutral': 'default', 'scared screaming': 'scared', 'seductive smile': 'smirk', 'sniggering': 'laughing',
+    'suspicious': 'thinking', 'tormented': 'exhausted', 'worried': 'nervous',
+}
+EMOTIONS = set('default angry annoyed bored confused contemptuous crying curious dumbfounded embarrassed excited exhausted happy laughing '
+               'lovestruck lustful nervous proud sad scared serious shy smile smirk smug surprised thinking'.split())
+
+
+def fix_emotion_tags(text):
+    """<img=이름_표정> 의 표정을 지금 세트로. 세트에도 표(EMOTION_FIX)에도 없으면 빌드를 멈춘다"""
+    def one(m):
+        name, kw = m.group(1), m.group(2).strip()
+        if kw in EMOTIONS:
+            return m.group(0)
+        if kw not in EMOTION_FIX:
+            raise SystemExit(f'표정 세트에 없는 태그: <img={name}_{kw}>')
+        return f'<img={name}_{EMOTION_FIX[kw]}>'
+    return re.sub(r'<img=([^>_]+)_([^>]+)>', one, text)
+
+
 def patch_lore(entries):
     for comment, old, new in LORE_PATCHES:
         hit = [e for e in entries if e.get('comment') == comment and old in (e.get('content') or '')]
@@ -667,9 +690,10 @@ IMAGE_LORE = ROOT / 'card' / 'image-lore.json'
 
 
 def add_image_lore(lore):
-    """이미지 태그 로어북을 ⚙️설정 폴더에 넣는다. 같은 이름이 카드에 있으면 바꾼다"""
-    books = json.loads(IMAGE_LORE.read_text(encoding='utf-8'))['data']
-    names = {b['comment'] for b in books}
+    """이미지 태그 로어북을 ⚙️설정 폴더에 넣는다. 같은 이름이 카드에 있으면 바꾼다.
+    「Asset」(메인 모델 지침)은 v0.16.64부터 플러그인이 설정으로 조립해 요청에 끼우므로 카드에 넣지 않고, 있던 것도 뺀다 (core/imgprompt.ts)"""
+    books = [b for b in json.loads(IMAGE_LORE.read_text(encoding='utf-8'))['data'] if b['comment'] != 'Asset']
+    names = {b['comment'] for b in books} | {'Asset'}
     settings = next(e for e in lore if e.get('mode') == 'folder' and e.get('comment') == SETTINGS_FOLDER_NAME)
     return [e for e in lore if e.get('comment') not in names] + [{**b, 'folder': settings['key']} for b in books]
 
@@ -746,7 +770,7 @@ def main(src, dst):
     lore = (module or {}).get('lorebook') or (data.get('character_book') or {}).get('entries') or []
     regex = (module or {}).get('regex') or risu.get('customScripts') or []
 
-    greetings, greeting_index = build_openings(data['first_mes'], scenarios)
+    greetings, greeting_index = build_openings(fix_emotion_tags(data['first_mes']), scenarios)
     pkg = json.loads((ROOT / 'package.json').read_text(encoding='utf-8'))
     version = pkg['version']
     min_plugin = pkg.get('goei', {}).get('minPlugin', version)

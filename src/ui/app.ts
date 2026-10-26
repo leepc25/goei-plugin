@@ -48,6 +48,7 @@ import { markUnsent } from '../host/unsent';
 import { startRecord } from '../core/dispatch';
 import { handleSettings, resetSettings, settingsTab, settingsUi, type SettingsEnv } from './settings';
 import { bindPeopleHold, bindPeopleStatus, handlePeople, hasPersonRecord, peopleInput, type PeopleEnv } from './people';
+import { handleImgPrompt, imgInput } from './imgprompt';
 import { cropValue, setCrop, directoryExtList, directoryInput, directoryPhotoList, directoryList, dirUi, handleDirectory, resetDirectory } from './directory';
 import { basicDefaults, basicVars, DIM_DEFAULT, getPrefs, worldDefaults, worldSettings, worldVarsOf, type Mark } from '../core/settings';
 
@@ -329,6 +330,11 @@ function ensureRoot(): HTMLElement {
       if (out) out.textContent = `${el.value}%`;
       return;
     }
+    if (el?.dataset?.input === 'pp-cap') {
+      const out = el.parentElement?.querySelector('output');
+      if (out) out.textContent = Number(el.value) === 0 ? '한도 없음' : `±${el.value}`;
+      return;
+    }
     if (el?.dataset?.input === 'pct' || el?.dataset?.input === 'count') {
       const out = el.parentElement?.querySelector('output');
       if (out) out.textContent = `${el.value}${el.dataset.input === 'pct' ? '%' : '개'}`;
@@ -348,6 +354,7 @@ function ensureRoot(): HTMLElement {
     }
     if (el?.dataset?.input && wikiInput(el.dataset.input, el.value)) return;
     if (el?.dataset?.input && peopleInput(el.dataset.input, el.value)) return;
+    if (el?.dataset?.input && imgInput(el.dataset.input, el.value)) return;
     if (el?.dataset?.input === 'gn-draft') return void (gnet.draft = el.value);
     if (el?.dataset?.input === 'gn-to') return void (gnet.to = el.value);
     if (el?.dataset?.input === 'gn-att') return void attachInput(gnet.attach, el.dataset.key, el.value);
@@ -567,10 +574,18 @@ async function handle(action: string, value?: string): Promise<void> {
     await handleAdvanced(action, value, view.ctx, { render, refresh }, view.kind === 'started' ? 'chat' : 'defaults');
     return;
   }
-  if (view.kind === 'started' && action.startsWith('wiki-') && (await handleWiki(action, value, view.ctx, wikiEnv))) return;
-  if (view.kind === 'started' && action.startsWith('pp-') && (await handlePeople(action, value, view.ctx, peopleEnv))) return;
-  if (view.kind === 'started' && action.startsWith('gn-') && (await handleGnet(action, value, view.ctx, gnetEnv))) return;
-  if (view.kind === 'started' && action.startsWith('ph-') && (await handlePhone(action, value, view.ctx, phoneEnv))) return;
+  // 시작 전(시작 패널 → 설정)에도 기능별 설정 페이지가 열려 있으면 그 기능의 단추를 받는다 (2026-10-26 사용자). chat 객체·scriptstate 는 있다
+  const featCtx = view.kind === 'started' || (view.kind === 'picker' && pickerPrefs && settingsUi.page) ? view.ctx : null;
+  if (action === 'wiki-back' && view.kind === 'started' && !wiki.history.some((h) => h.view !== 'home') && navHist.can(-1)) {
+    // 위키 안에서 옮겨 다닌 길이 없으면 뒤로가기는 무조건 이전 화면 (다른 탭·사원증 창 포함, 사용자 2026-10-26)
+    const run = navStep(-1);
+    return run ? run() : render();
+  }
+  if (featCtx && action.startsWith('wiki-') && (await handleWiki(action, value, featCtx, wikiEnv))) return;
+  if (featCtx && action.startsWith('pp-') && (await handlePeople(action, value, featCtx, peopleEnv))) return;
+  if (action.startsWith('ip-') && (await handleImgPrompt(action, value, { render }))) return;
+  if (featCtx && action.startsWith('gn-') && (await handleGnet(action, value, featCtx, gnetEnv))) return;
+  if (featCtx && action.startsWith('ph-') && (await handlePhone(action, value, featCtx, phoneEnv))) return;
   if (action === 'prefs-open' || action === 'prefs-close') {
     pickerPrefs = action === 'prefs-open';
     resetSettings();
@@ -583,7 +598,7 @@ async function handle(action: string, value?: string): Promise<void> {
     await handleDirectory(action, value, view.ctx, settingsEnv);
     return;
   }
-  if (view.kind === 'picker' && pickerPrefs && action.startsWith('set-')) {
+  if (view.kind === 'picker' && pickerPrefs && (action.startsWith('set-') || action.startsWith('visit-'))) {
     if (settingsUi.busy) return;
     await handleSettings(action, value, view.ctx, settingsEnv, settingsUi.scope === 'chat' ? 'defaults' : settingsUi.scope);
     if (action === 'set-theme' && view.kind === 'picker' && view.staged) await stagedTheme(view.ctx, value);
@@ -701,9 +716,9 @@ async function handle(action: string, value?: string): Promise<void> {
       await removeMarkAt(Number(value));
       return render();
     case 'feature-set':
-      // 메인 설정 「기능별 설정」: 그 기능 탭으로 넘어가지 않고 설정창 안에서 그 기능 설정을 연다 (2026-10-23 사용자)
-      if (view.kind !== 'started') return;
-      if (value === 'phone' || value === 'wiki' || value === 'visit' || value === 'people' || (value === 'gnet' && GNET_ON)) settingsUi.page = value;
+      // 메인 설정 「기능별 설정」: 그 기능 탭으로 넘어가지 않고 설정창 안에서 그 기능 설정을 연다 (2026-10-23 사용자). 시작 전 설정에서도 연다
+      if (!(view.kind === 'started' || (view.kind === 'picker' && pickerPrefs))) return;
+      if (value === 'phone' || value === 'wiki' || value === 'visit' || value === 'people' || value === 'image' || (value === 'gnet' && GNET_ON)) settingsUi.page = value;
       return render();
     case 'ops-sel':
       // 관제실 상황판: 일지 줄·지도 표시 → 왼쪽 큰 보기가 그 상황으로. 보던 화면(CCTV·위성)은 그대로 (2026-10-21 사용자). 모바일은 큰 보기로 올라간다
@@ -911,6 +926,10 @@ function renderPicker(): void {
 }
 
 const INNER_SCROLL = '.gx-acards, .gx-sidecol, .gx-mbox, .gx-sits, .gx-bd-col > .gx-evcs, .nw-groups';
+/** 설정 기능 페이지(인물 기록 설정 등)·위키 문서 칸(인물 상세·기록 문서): .gx-body 가 아니라 이 칸이 실제로 스크롤된다.
+ *  같은 페이지(pageKey)를 다시 그릴 때만 자리를 지킨다 (다른 문서로 넘어가면 맨 위부터) */
+const PAGE_SCROLL = '.st-featpage .ph-form-body, .nw-pane .nw-doc';
+const pageKey = () => `${tab}|${settingsUi.page}|${wiki.view}|${wiki.title}`;
 
 function render(): void {
   if (!root) return;
@@ -920,6 +939,8 @@ function render(): void {
   const keep = scroller && root.dataset.tab === tab ? scroller.scrollTop : 0;
   // 안쪽 스크롤 칸(편성 요원 목록·사이드 칸 등)도 같은 탭이면 자리를 지킨다
   const inner = root.dataset.tab === tab ? [...root.querySelectorAll<HTMLElement>(INNER_SCROLL)].map((el) => el.scrollTop) : [];
+  // 설정 기능 페이지·위키 문서 칸: 진단 행 펼치기·📌·취소처럼 전체를 다시 그려도 그 칸의 자리를 지킨다 (맨 위로 튀던 문제, 2026-10-26)
+  const pageKeep = root.dataset.pk === pageKey() ? [...root.querySelectorAll<HTMLElement>(PAGE_SCROLL)].map((el) => el.scrollTop) : [];
   // 괴담톡 대화: 맨 아래를 보고 있었으면(또는 방을 새로 열면) 다시 그린 뒤에도 맨 아래로
   const log = root.querySelector<HTMLElement>('.ph-log');
   const logRoom = root.dataset.room ?? '';
@@ -960,6 +981,8 @@ function render(): void {
   const next = root.querySelector('.gx-body');
   if (next && keep) next.scrollTop = keep;
   if (inner.length) root.querySelectorAll<HTMLElement>(INNER_SCROLL).forEach((el, i) => inner[i] && (el.scrollTop = inner[i]));
+  root.dataset.pk = pageKey();
+  if (pageKeep.length) root.querySelectorAll<HTMLElement>(PAGE_SCROLL).forEach((el, i) => pageKeep[i] && (el.scrollTop = pageKeep[i]));
   const nlog = root.querySelector<HTMLElement>('.ph-log');
   root.dataset.room = phone.room ?? '';
   if (nlog) {
@@ -1001,6 +1024,8 @@ interface NavState {
   g?: { sub: string; open: number | null; dm: string | null; s: boolean; c: unknown };
   f?: 'goal' | 'team';
   d?: string;
+  /** 상황판 사원증 창 (열려 있으면 요원 이름) */
+  a?: string;
 }
 const navHist = new NavHistory<NavState>();
 
@@ -1012,6 +1037,7 @@ function navState(): NavState {
   if (tab === 'gnet') s.g = { sub: gnet.sub, open: gnet.open, dm: gnet.openDm, s: gnet.settings, c: gnet.compose?.kind === 'post' || gnet.compose?.kind === 'newdm' ? gnet.compose : null };
   if (tab === 'map' || tab === 'mission') s.f = field.step;
   if (tab === 'settings') s.d = dirUi.open;
+  if (tab === 'board' && agUi.pop) s.a = agUi.pop;
   return s;
 }
 
@@ -1031,7 +1057,7 @@ function markOf(raw: NavState): Mark {
   const s = markState(raw);
   const ctx = view.kind === 'started' ? view.ctx : null;
   let name = TAB_TITLE[s.tab];
-  if (s.w) name = s.w.view === 'doc' || s.w.view === 'compose' ? s.w.title || '위키' : s.w.view === 'settings' ? '위키 설정' : s.w.view === 'new' ? '위키 새 문서' : s.w.view === 'people' ? '이 채팅의 인물' : s.w.view === 'person' ? `${s.w.title} 기록` : s.w.view === 'docs' ? '기록 문서' : '위키 메인';
+  if (s.w) name = s.w.view === 'doc' || s.w.view === 'compose' ? s.w.title || '위키' : s.w.view === 'settings' ? '위키 설정' : s.w.view === 'new' ? '위키 새 문서' : s.w.view === 'people' ? '이 채팅의 인물' : s.w.view === 'person' ? `${s.w.title} 기록` : s.w.view === 'docs' ? '기록 문서' : s.w.view === 'faction' ? `세력 ${s.w.title}` : '위키 메인';
   if (s.p) {
     const r = s.p.view === 'room' && s.p.room && ctx ? readPhone(ctx.chat).rooms[s.p.room] : undefined;
     name = r ? roomLabel(r) : s.p.view === 'settings' ? '괴담톡 설정' : `괴담톡 ${PH_SUB[s.p.sub] ?? ''}`.trim();
@@ -1070,6 +1096,7 @@ function applyNav(s: NavState): void {
   if (s.p) Object.assign(phone, { sub: s.p.sub, tab: s.p.tab, view: s.p.view, room: s.p.room, openNotice: s.p.n });
   if (s.g) Object.assign(gnet, { sub: s.g.sub, open: s.g.open, openDm: s.g.dm, settings: s.g.s, compose: s.g.c });
   if (s.d !== undefined) dirUi.open = s.d;
+  agUi.pop = s.a ?? '';
   // 편성 단계는 목표를 골라야 갈 수 있으니 버튼과 같은 길로 (못 가면 목표 단계에 머문다)
   if (s.f && s.f !== field.step) return void handle('field-step', s.f);
   render();

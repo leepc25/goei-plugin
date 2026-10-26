@@ -27,7 +27,7 @@ import { cleanOutput, hasWorldTags, parseCatalog, processOutput, readDirectory }
 import { basicSettings, missingBasicVars, worldSettings } from './core/settings';
 import { staleFactionVars } from './core/factions';
 import { supplementAssets } from './host/asset';
-import { updateCharacterLore, updateChat } from './host/risu';
+import { loadContext, updateCharacterLore, updateChat } from './host/risu';
 import { WatchState, type WatchSnapshot } from './core/watch';
 import { createFab, type Fab } from './host/overlay';
 import { BRAND } from './ui/brand';
@@ -39,13 +39,14 @@ import { openApp, openWiki } from './ui/app';
 import { GHOST_ICON } from './ui/icons';
 import { landingHtml as renderLanding } from './ui/landing';
 import { loadPrefs } from './host/prefs';
-import { setWaiting } from './host/waiting';
+import { isWaiting, setWaiting } from './host/waiting';
 import { syncDecorators, computeLore, hasUnlockTag, loreOptions, patchSlots, readUnlocked, sameVars, stripUnlockTags, trimRoster, unlockedValue, unlockTags, UNLOCK_VAR, type LoreMode } from './core/lore';
 import { advValue } from './core/advanced';
 import { userInfo } from './host/user';
 import { applyPlayer, hidePlayerTag, playerAgent, playerBlock } from './core/player';
 import { withFieldFacts, withInterludes } from './core/interlude';
 import { fieldRecord } from './core/field';
+import { buildImgPrompt, imgCharacters, imgPromptConfig, stripImgLore } from './core/imgprompt';
 import { withStatusBlock } from './core/statusctx';
 import { visitRecord } from './core/visit';
 import { visitContextRules } from './core/visitPrompt';
@@ -54,7 +55,7 @@ import { peopleStore } from './core/people/store';
 import { peopleSettings } from './core/people/settings';
 import { identityText } from './core/people/identity';
 import { extraNames, temperOf } from './core/people/base';
-import { requestPeopleUpdate, directorNoteText } from './host/people';
+import { requestPeopleUpdate, directorNoteText, factionNamesOf } from './host/people';
 import { bookText } from './core/refs';
 
 const PLUGIN_ID = 'goei-plugin';
@@ -92,6 +93,8 @@ async function onBeforeRequest<M extends PromptMessage>(messages: M[], type: str
     messages = withStatusBlock(messages, await knownIdentity().catch(() => ''));
     // 장면 인물의 살아 있는 기록 (core/people). 절 단위 혼합이면 그 인물의 시트 원문은 빼고 기록으로 대신한다
     messages = await withPeople(messages).catch(() => messages);
+    // 이미지 태그 지침 (core/imgprompt): 카드 로어북 「Asset」 대신 설정으로 조립. 옛 카드의 로어북 본문이 남아 있으면 지운다
+    messages = await withImgPrompt(messages).catch(() => messages);
   }
   // 시드 표식이 없는 요청은 아무것도 읽지 않고 바로 돌려보낸다 (매 전송마다 드는 비용을 0에 가깝게).
   if (!messages.some((m) => typeof m?.content === 'string' && m.content.includes(SEED_OPEN))) return messages;
@@ -195,7 +198,7 @@ async function withPeople<M extends PromptMessage>(messages: M[]): Promise<M[]> 
   const lastUser = [...messages].reverse().find((m) => m?.role === 'user');
   const input = typeof lastUser?.content === 'string' ? lastUser.content : '';
   const user = me?.name || userInfo().name || '주인공';
-  const opts = { settings, store, sheetOf: (name: string) => bookText({ char, chat }, name) || null, temperOf, extraNames: extraNames(), input, user };
+  const opts = { settings, store, sheetOf: (name: string) => bookText({ char, chat }, name) || null, temperOf, extraNames: extraNames(), input, user, factionNames: factionNamesOf(char.globalLore) };
   let out = withPeopleBlock(messages, chat, opts);
   // 연출형 Director (선택): 장면 인물에 대해 본편 앞 보조 1회. 실패·지연이면 메모 없이 진행
   if (settings.director === 'scene') {
@@ -204,6 +207,22 @@ async function withPeople<M extends PromptMessage>(messages: M[]): Promise<M[]> 
     if (note) out = insertBlock(out, note);
   }
   return out;
+}
+
+/** 이미지 태그 지침: 에셋 출력 켬 + 메인 모델일 때 요청 맨 끝에 (로어북 Asset 의 @@depth 0 과 같은 자리). 보조 모델이면 지침 없이 옛 블록만 지운다 */
+async function withImgPrompt<M extends PromptMessage>(messages: M[]): Promise<M[]> {
+  const charIndex = await risuai.getCurrentCharacterIndex();
+  const chat = (await risuai.getChatFromIndex(charIndex, await risuai.getCurrentChatIndex())) as Chat | null;
+  const char = (await risuai.getCharacterFromIndex(charIndex)) as LoreChar | null;
+  if (!chat || !char) return messages;
+  const s = basicSettings(char.globalLore, chat.scriptstate);
+  const out = stripImgLore(messages);
+  if (!s.assetOn || s.assetModel !== 'main') return out;
+  const cfg = imgPromptConfig(getPrefs());
+  const me = playerAgent(char.globalLore, chat.scriptstate);
+  const names = imgCharacters(char.globalLore, cfg, { assetPlayer: s.assetPlayer, playerEnglish: me?.english || undefined, userName: userInfo().name });
+  if (!names.length) return out;
+  return [...out, { role: 'system', content: buildImgPrompt(cfg, names, s.assetPlayer) } as M];
 }
 
 /** 본부 막간: 대화가 일어난 메시지 바로 뒤에 끼운다 (core/interlude.ts). 채팅은 바꾸지 않는다 */
@@ -438,8 +457,32 @@ function cardStyle(): string {
 }
 
 /** Lite에서만: 응답이 막 들어와 아직 정리되기 전에도 태그가 보이지 않게, 이동 지시문은 카드로 */
-function onDisplay(text: string): string {
+/** 에셋 목록 첫 읽기 (시작 때 건다). 화면 처리기는 태그가 있으면 이것을 한 번 기다린다 */
+let assetsFirst: Promise<unknown> = Promise.resolve();
+
+async function onDisplay(text: string): Promise<string> {
   if (typeof text !== 'string') return text;
+  // 이미지 태그는 에셋 목록이 있어야 그린다. 목록을 아직 못 읽었으면 첫 읽기를 기다린다 (안 기다리면 원문 태그가 남고, 새로고침 전엔 다시 그려지지 않는다)
+  if (hasImgTag(text) && !modulePicker()) await assetsFirst.catch(() => undefined);
+  return displayNow(text);
+}
+
+/** 플러그인이 뜨기 전에 Risu가 이미 그린 메시지는 다시 그려 주지 않는다 (업데이트·새로고침 직후 태그가 원문대로 남고, 다른 채팅에 갔다 와야 그려짐).
+ *  본체가 뜨고 에셋 목록을 읽은 뒤 한 번, 이미지 태그가 있는 괴이 채팅을 그대로 다시 저장해 Risu가 그 채팅을 다시 그리게 한다 (사용자 2026-10-26) */
+async function redrawAfterLoad(): Promise<void> {
+  try {
+    await assetsFirst;
+    if (isWaiting()) return;
+    const ctx = await loadContext();
+    if (!ctx || !readManifest(ctx.char.globalLore)) return;
+    if (!ctx.chat.message.some((m) => typeof m.data === 'string' && m.data.includes('<img='))) return;
+    await updateChat(ctx.charIndex, ctx.chatIndex, (cur) => ({ ...cur }));
+  } catch {
+    /* 다시 그리지 못해도 그만 (다음 채팅 전환 때 그려진다) */
+  }
+}
+
+function displayNow(text: string): string {
   // 플러그인 고유 표식(시작 카드·지시문·전화 카드)은 Lite 판정 전에도 바꾼다.
   // 다른 채팅에 갔다 오면 Risu가 판정(liteNow)보다 먼저 메시지를 다시 그려서 원문이 드러난 채 남았다.
   // 이 표식은 이 봇 메시지에만 있으니 다른 봇에서는 아무것도 바뀌지 않는다.
@@ -553,7 +596,8 @@ export interface BodyHandlers {
 export async function start(): Promise<BodyHandlers> {
   await loadPrefs();
   // 채팅 속 이미지 태그가 쓸 모듈 에셋 이름 (창을 열 때도 다시 읽는다)
-  void loadModuleAssets();
+  assetsFirst = loadModuleAssets();
+  void redrawAfterLoad();
   setWikiOpener((title) => void openWiki(title));
   setRepickOpener(() => void openApp({ quietIfNotLite: true }));
   let stopWatcher: (() => void) | null = null;

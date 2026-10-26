@@ -1,4 +1,27 @@
-base(["modules", "enabledModules"]);
+l;
+      const bytes = toBytes3(data);
+      if (!bytes?.length) return null;
+      return URL.createObjectURL(new Blob([bytes], { type: MIME2[ext.toLowerCase()] ?? "application/octet-stream" }));
+    } catch (error) {
+      console.log(`[goei] 이미지를 읽지 못했어요 (${path}): ${error instanceof Error ? error.message : String(error)}`);
+      return null;
+    }
+  }
+  var isRow = (a) => Array.isArray(a) && typeof a[0] === "string" && typeof a[1] === "string";
+  var modRows = [];
+  var modVer = 0;
+  var modBusy = null;
+  function loadModuleAssets() {
+    modBusy ??= (async () => {
+      let rows2 = [];
+      try {
+        const idx = await risuai.getCurrentCharacterIndex();
+        const char = Number.isInteger(idx) && idx >= 0 ? await risuai.getCharacterFromIndex(idx) : null;
+        rows2 = (char?.additionalAssets ?? []).filter(isRow);
+      } catch {
+      }
+      try {
+        const db = await risuai.getDatabase(["modules", "enabledModules"]);
         const on2 = new Set(db?.enabledModules ?? []);
         const mods = [...db?.modules ?? []].sort((a, b) => Number(on2.has(b.id)) - Number(on2.has(a.id)));
         rows2 = rows2.concat(mods.flatMap((m) => Array.isArray(m.assets) ? m.assets.filter(isRow) : []));
@@ -262,9 +285,12 @@ base(["modules", "enabledModules"]);
     ph: ["$ph_"],
     gn: ["$lb_cfg_lb-gn.", "$gn_storage_"],
     wiki: ["$nw_"],
-    visit: ["$hq_"]
+    visit: ["$hq_"],
+    /** 인물 기록 (core/people/settings.ts PP). 메인 설정의 「덮어쓰기/불러오기」도 같은 접두어를 함께 다룬다 */
+    pp: ["$pp_"]
   };
-  var NAME = { ph: "괴담톡", gn: "괴담넷", wiki: "위키", visit: "필드" };
+  var MAIN_PREFIXES = ["$gen_", "$hq_adv_", "$pp_"];
+  var NAME = { ph: "괴담톡", gn: "괴담넷", wiki: "위키", visit: "필드", pp: "인물 기록" };
   var defaultsAsk = { pane: "", what: "" };
   var defaultsButtons = (pane, off = false) => `<span class="ps-defaults"><button class="st-act save" data-action="${pane}-def-ask" data-value="save" ${off ? "disabled" : ""}>${ICONS.pen}덮어쓰기</button><button class="st-act" data-action="${pane}-def-ask" data-value="load" ${off ? "disabled" : ""}>${ICONS.refresh}불러오기</button></span>`;
   function defaultsConfirm(pane) {
@@ -2944,6 +2970,107 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
 ${job.trailing}` : body4;
   }
 
+  // src/core/imgprompt.ts
+  var IMG_KEYWORDS_DEFAULT = ["default", "angry", "annoyed", "bored", "confused", "contemptuous", "crying", "curious", "dumbfounded", "embarrassed", "excited", "exhausted", "happy", "laughing", "lovestruck", "lustful", "nervous", "proud", "sad", "scared", "serious", "shy", "smile", "smirk", "smug", "surprised", "thinking"];
+  var IMG_PROMPT_DEFAULT = `## Inserting Character Visual Images
+
+### Objective
+- Generate character image tags only when a defined character is present and performing an action or expressing emotion in that paragraph.
+- Do NOT generate tags for {user_skip}undefined characters.
+
+### Placement Rules
+- Conditional Tagging: Insert an image tag only if a defined character from the lists below is the focus of that paragraph.
+- Skip Rule: If a paragraph focuses solely on {user_skip}narration without characters, or undefined NPCs, do not insert any image tag.
+- Empty Line Buffer: When inserting a tag, place one blank line before and after.
+
+- Example Structure:
+Paragraph Text
+
+<img={name}_{keyword}>
+
+Next Paragraph Text
+
+### Tag Construction Logic
+- Identify the character type and follow the specific string format below.
+{user_rule}
+#### Defined Characters
+- Format: <img={name}_{keyword}>
+- Characters {name}: {characters}
+- Available {keyword}: {keywords}
+
+### Logic Priority
+- If only {user_skip}undefined NPCs, or pure narration: Do NOT insert any tag.
+- Strict Adherence: Do not invent new {name}, or {keyword}. Only use those provided.
+
+---`;
+  var IMG_TEMPLATE_MAX = 6e3;
+  var cleanName = (s4) => String(s4 ?? "").replace(/[<>"{}_\n]/g, "").trim().slice(0, 40);
+  var cleanKeyword = (s4) => String(s4 ?? "").toLowerCase().replace(/[^a-z0-9 -]/g, "").trim().slice(0, 24);
+  function imgPromptConfig(p = {}) {
+    const kw = (p.imgKeywords ?? []).map(cleanKeyword).filter(Boolean);
+    return {
+      template: p.imgPrompt?.trim() ? p.imgPrompt.slice(0, IMG_TEMPLATE_MAX) : IMG_PROMPT_DEFAULT,
+      off: [...new Set((p.imgNamesOff ?? []).map(cleanName).filter(Boolean))],
+      extra: [...new Set((p.imgNamesExtra ?? []).map(cleanName).filter(Boolean))],
+      keywords: kw.length ? [...new Set(kw)] : IMG_KEYWORDS_DEFAULT
+    };
+  }
+  function imageBookNames(lore) {
+    const books = (lore ?? []).filter((e) => e.comment === IMAGE_BOOK && typeof e.content === "string" && e.content.trim());
+    if (!books.length) return [];
+    try {
+      const v = JSON.parse(String(books[books.length - 1].content).replace(/^﻿/, "").trim());
+      return Array.isArray(v.characters) ? v.characters.map(cleanName).filter(Boolean) : [];
+    } catch {
+      return [];
+    }
+  }
+  function imgCandidates(lore, cfg) {
+    const out = [];
+    const seen2 = /* @__PURE__ */ new Set();
+    const push2 = (name, korean, source4) => {
+      const n2 = cleanName(name);
+      if (!n2 || seen2.has(n2.toLowerCase())) return;
+      seen2.add(n2.toLowerCase());
+      out.push({ name: n2, korean, source: source4 });
+    };
+    for (const a of readDirectory(lore).agents) if (a.english) push2(a.english, a.name, "directory");
+    for (const n2 of imageBookNames(lore)) push2(n2, "", "book");
+    for (const n2 of cfg.extra) push2(n2, "", "extra");
+    return out;
+  }
+  function imgCharacters(lore, cfg, po) {
+    const off = new Set(cfg.off.map((n2) => n2.toLowerCase()));
+    let names4 = imgCandidates(lore, cfg).map((c) => c.name).filter((n2) => !off.has(n2.toLowerCase()));
+    if (!po.assetPlayer && po.playerEnglish) names4 = names4.filter((n2) => n2.toLowerCase() !== po.playerEnglish.toLowerCase());
+    if (po.assetPlayer && !po.playerEnglish) {
+      const u = cleanName(po.userName);
+      if (u && !names4.some((n2) => n2.toLowerCase() === u.toLowerCase())) names4.push(u);
+    }
+    return names4;
+  }
+  function buildImgPrompt(cfg, characters, assetPlayer) {
+    const userSkip = assetPlayer ? "" : "{{user}}, ";
+    const userRule = assetPlayer ? "" : "- Do not create tags for {{user}}.";
+    return cfg.template.replace(/\{characters\}/g, characters.join(", ")).replace(/\{keywords\}/g, cfg.keywords.join(", ")).replace(/\{user_skip\}/g, userSkip).replace(/\{user_rule\}\n?/g, userRule ? `${userRule}
+` : "").replace(/\n{3,}/g, "\n\n").trim();
+  }
+  var LORE_BLOCK = /## Inserting Character Visual Images[\s\S]*?Only use those provided\.\s*(?:---\s*)?/g;
+  function stripImgLore(messages) {
+    let changed = false;
+    const out = messages.map((m) => {
+      if (typeof m?.content !== "string" || !m.content.includes("## Inserting Character Visual Images")) return m;
+      changed = true;
+      return { ...m, content: m.content.replace(LORE_BLOCK, "").replace(/\n{3,}/g, "\n\n") };
+    });
+    return changed ? out.filter((m) => !(typeof m?.content === "string" && !m.content.trim())) : messages;
+  }
+  function applyImgConfig(d, characters, keywords) {
+    const aliases = new Map(d.aliases);
+    for (const n2 of characters) if (!aliases.has(n2.toLowerCase())) aliases.set(n2.toLowerCase(), n2);
+    return { ...d, characters, keywords, keywordSet: new Set(keywords), aliases };
+  }
+
   // src/host/asset.ts
   var running = false;
   async function supplementAssets(t) {
@@ -2963,7 +3090,10 @@ ${job.trailing}` : body4;
       }
       const agent = playerAgent(t.lore, t.chat.scriptstate);
       const base = readImageData(entries2);
-      const data = s4.assetPlayer ? withUser(base, agent ? void 0 : userInfo().name) : base;
+      const cfg = imgPromptConfig(getPrefs());
+      const picked = imgCharacters(t.lore, cfg, { assetPlayer: s4.assetPlayer, playerEnglish: agent?.english || void 0, userName: userInfo().name });
+      const tuned = applyImgConfig(base, picked, cfg.keywords);
+      const data = s4.assetPlayer ? withUser(tuned, agent ? void 0 : userInfo().name) : tuned;
       const exclude = agent && !s4.assetPlayer ? [agent.english, data.aliases.get(agent.name.toLowerCase())].filter((v) => typeof v === "string" && !!v) : [];
       const job = planAsset(msg.data, data, s4.assetLimit, exclude);
       if (!job) return;
@@ -3624,90 +3754,4 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .gx-mark-txt b { display: block; font-size: 18px; font-weight: 800; letter-spacing: .02em; line-height: 1.15; }
 .gx-mark-txt small { display: block; font-family: var(--mono); font-size: 11px; letter-spacing: .18em; color: var(--signal); opacity: .8; }
 /* 상단바 표지: 영문은 글씨 크기 그대로, 글자 사이를 벌려 한글 제목과 같은 길이 */
-.gx-hmark .gx-mark-txt { display: inline-grid; }
-.gx-hmark .gx-mark-txt small { display: flex; justify-content: space-between; letter-spacing: 0; }
-.gx-hmark .gx-mark-txt small i { font-style: normal; }
-/* 띄어쓰기만 3px 좁히고 그만큼 오른쪽 끝을 당긴다 (다른 글자 간격은 그대로) */
-.gx-hmark .gx-mark-txt small { padding-right: 3px; }
-.gx-hmark .gx-mark-txt small i.sp { width: calc(1ch - 3px); overflow: hidden; }
-/* 이번 작전 카드: 소속 사진 위에 소속 이름과 첫 장면 */
-.gx-logo.mob { display: none; }
-/* PC: 본문 첫 줄을 왼쪽 사원증 윗선 높이에 맞춘다 (v0.16.16, 2026-10-20 사원증 위치 18px에 다시 맞춤) */
-@media (min-width: 761px) {
-  .gx-panel.has-nav .gx-head { padding-top: 8px; padding-bottom: 8px; }
-  .gx-panel.has-nav .gx-content > .gx-body, .gx-panel.has-nav .gx-content > .gx-board, .gx-panel.has-nav .gx-content > .gx-field { padding-top: 18px; }
-  .gx-panel.has-nav .gx-content > .gx-body > :first-child:not(:where(.gx-hint, .gx-err, .gx-alert)) { margin-top: 0; padding-top: 0; }
-  .gx-panel.has-nav .gx-content > .gx-body > :first-child:where(.gx-hint, .gx-err, .gx-alert) { margin-top: 0; }
-  .gx-panel.has-nav .gx-field > .gx-mapcol { top: 0; }
-}
-/* 탭 제목: 아이콘 타일 + 제목, 머리 아래 선에 탭 색 한 줄 (v0.16.16: 글자만 달랑 있어 밋밋했다) */
-.gx-head { position: relative; }
-.gx-head:has(.gx-tabhead)::after { content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: linear-gradient(90deg, transparent, var(--signal) 14%, color-mix(in srgb, var(--signal) 70%, transparent) 80%, transparent); }
-.gx-tabicon { display: grid; place-items: center; width: 38px; height: 38px; flex: none; border-radius: 12px; background: var(--accent-bg); border: 1px solid var(--accent-line); color: var(--signal); }
-.gx-tabicon svg { width: 20px; height: 20px; }
-.gx-tabhead b { letter-spacing: .02em; }
-.gx-nav-gap { flex: 1; }
-.gx-nb {
-  position: relative; display: flex; align-items: center; gap: 12px;
-  width: 100%; min-height: 48px; padding: 0 14px;
-  border: 0; border-radius: 12px; background: transparent; color: var(--dim);
-  font-size: 16px; font-weight: 600; text-align: left;
-}
-.gx-nb svg { width: 22px; height: 22px; flex: none; }
-.gx-nb:hover { color: var(--text); background: var(--panel); }
-.gx-nb.on { color: var(--signal); background: var(--accent-bg); }
-.gx-nb .gx-nbadge { margin-left: auto; }
-.gx-nbadge { min-width: 22px; height: 22px; padding: 0 6px; border-radius: 11px; background: var(--danger); color: #2A0B07; font-size: 12px; font-weight: 700; display: inline-grid; place-items: center; }
-.gx-nbadge.dot { min-width: 10px; width: 10px; height: 10px; padding: 0; }
-.gx-nb.mob { display: none; }
-.gx-mbar { display: none; }
-.gx-h2-sub { margin-left: auto; font-size: 14px; font-weight: 500; color: var(--dim); }
-
-/* 스크롤 막대 자리를 늘 비워 둔다: 내용이 길어져 막대가 생기고 없어질 때마다 칸 너비가 바뀌어 화면이 움찔거렸다 (v0.16.18). 막대 10px만큼 오른쪽 여백을 줄여 좌우를 맞춤 */
-.gx-body { padding: 4px 10px 16px 20px; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; }
-.gx-body section { padding: 14px 0 6px; }
-.gx-body h2 { display: flex; align-items: center; gap: 8px; margin: 0 0 10px; font-size: 18px; font-weight: 700; color: var(--text); }
-.gx-body h2 i { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--accent-bg); font-style: normal; font-size: 13px; color: var(--signal); font-family: var(--mono); }
-
-/* ── 시작 화면 ── */
-.gx-facs { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
-.gx-fac {
-  position: relative; display: flex; flex-direction: column; justify-content: flex-end; text-align: left;
-  min-height: 96px; padding: 0; overflow: hidden;
-  border: 2px solid var(--line); border-radius: 20px; background: var(--panel);
-  /* 테두리·그림자·크기를 서서히 바꾸면 큰 세력 사진까지 매 프레임 다시 칠해서 고를 때 끊겼다 (v0.10.2). 바로 바꾼다 */
-}
-.gx-fac.has-img { min-height: 176px; border-color: transparent; }
-.gx-fac-img { position: absolute; inset: 0; background-size: cover; background-position: center; }
-.gx-fac.has-img::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(11, 18, 21, 0) 30%, rgba(11, 18, 21, .94) 100%); }
-.gx-fac-txt { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 4px; padding: 14px 16px; }
-.gx-fac b { font-size: 22px; font-weight: 700; color: var(--text); }
-.gx-fac-txt span { font-size: 14px; color: var(--sub); line-height: 1.45; }
-.gx-fac.has-img b { color: #F2F7F6; }
-.gx-fac.has-img .gx-fac-txt span { color: #C9D6D3; }
-/* 사진 확대 대신 아래 그늘만 옅게: 큰 사진을 키우는 효과는 매 프레임 다시 그려서 끊겼다 (v0.10.2) */
-.gx-fac.has-img::after { transition: opacity .15s; }
-.gx-fac.has-img:hover::after { opacity: .82; }
-/* 평소엔 어두운 흑백, 마우스를 올리거나 고르면 컬러로 (v0.16.8: 밝아지는 효과가 너무 약했다).
-   사진 위 filter 전환 애니메이션은 매 프레임 사진을 다시 그려 끊겨서(v0.10.2) 바로 바꾼다 */
-/* 마우스가 없는 휴대폰에서는 늘 컬러 */
-@media (hover: hover) {
-  .gx-fac-img { filter: grayscale(1) brightness(.5); }
-  .gx-fac.on .gx-fac-img, .gx-fac.has-img:hover .gx-fac-img { filter: none; }
-}
-.gx-fac.on { border-color: var(--signal); box-shadow: 0 0 0 4px color-mix(in srgb, var(--signal) 22%, transparent); }
-
-.gx-segs { display: inline-flex; gap: 2px; padding: 3px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
-.gx-seg { min-width: 96px; min-height: 40px; padding: 0 16px; border: 0; border-radius: 10px; background: transparent; color: var(--dim); font-weight: 600; }
-.gx-seg:hover { color: var(--text); }
-.gx-seg.on { background: var(--line); color: var(--text); }
-
-.gx-scs { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 8px; }
-.gx-sc {
-  position: relative; display: flex; align-items: center; gap: 10px; text-align: left;
-  min-height: 56px; padding: 8px 14px;
-  border: 1px solid var(--line); border-radius: 14px; background: var(--panel);
-  font-weight: 600;
-}
-.gx-sc b { font-family: var(--mono); color: var(--dim); font-size: 13px; font-weight: 500; }
-.gx-sc span { 
+.gx-hmark .gx-mark-txt { display: inlin

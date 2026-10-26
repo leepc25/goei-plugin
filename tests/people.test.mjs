@@ -151,3 +151,29 @@ test('기록 블록: 절 단위 혼합, 모르는 것, 단계 문장, 메모', (
   const whole = Inj.peopleBlock([block]);
   assert.ok(whole.startsWith(Inj.PEOPLE_HEAD));
 });
+
+test('항목 상태: 대체·합침·취소·사라짐을 구분하고, 합친 항목(from)이 죽으면 원본이 되살아난다', () => {
+  const c = chat(['user', 'a', 'u1'], ['char', '쟈알디가 왔다. 명단을 봤다.', 'c1'], ['user', 'b', 'u2'], ['char', '쟈알디가 떠났다.', 'c2']);
+  const live = S.liveness(c);
+  const e = (id, text, anchor, extra = {}) => ({ id, text, src: 'story', anchor, seq: 1, ...extra });
+  const list = [e('a', '왔다', 'c1', { quote: '쟈알디가 왔다' }), e('b', '떠났다', 'c2', { quote: '떠났다', replaces: 'a' }), e('c', '없는 인용', 'c1', { quote: '여기 없는 글' }), e('d', '취소', 'c2', { void: true })];
+  const st = S.entryStates(list, live);
+  assert.equal(st.get('a'), 'replaced');
+  assert.equal(st.get('b'), 'alive');
+  assert.equal(st.get('c'), 'gone');
+  assert.equal(st.get('d'), 'void');
+  // 합치기: from 에 든 원본은 대체된 것. 합친 항목의 기준 메시지가 사라지면 원본이 돌아온다
+  const merged = [e('h1', '일 1', 'c1'), e('h2', '일 2', 'c1'), e('m', '일 1과 2', 'c2', { from: ['h1', 'h2'] })];
+  assert.deepEqual(S.liveEntries(merged, live).map((x) => x.id), ['m']);
+  assert.equal(S.entryStates(merged, live).get('h1'), 'replaced');
+  const cut = chat(['user', 'a', 'u1'], ['char', '쟈알디가 왔다. 명단을 봤다.', 'c1']);
+  assert.deepEqual(S.liveEntries(merged, S.liveness(cut)).map((x) => x.id), ['h1', 'h2']);
+});
+
+test('읽음 해시: 이미지 태그·공백 차이는 바뀐 응답으로 치지 않는다', () => {
+  const a = { role: 'char', data: '쟈알디가 왔다.\n\n문장 둘.' };
+  const b = { role: 'char', data: '쟈알디가 왔다.\n\n<img=Jyaldi_smile>\n\n문장  둘.' };
+  const d = { role: 'char', data: '쟈알디가 갔다.' };
+  assert.equal(S.messageHash(a), S.messageHash(b));
+  assert.notEqual(S.messageHash(a), S.messageHash(d));
+});

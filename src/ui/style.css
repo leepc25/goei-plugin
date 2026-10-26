@@ -1910,10 +1910,13 @@ details.gx-gl-card:not([open]) { gap: 0; }
 .st-recent { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 10px 14px; }
 .st-range output { min-width: 3.2em; text-align: right; font-variant-numeric: tabular-nums; color: var(--sub); }
 
-/* 메인 설정 맨 위 「기능별 설정」: 세 기능 설정을 바로 여는 단추 */
-.gx .st-feats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; padding: 10px 12px; }
-.gx .st-feat { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 40px; white-space: nowrap; }
+/* 메인 설정 맨 위 「기능별 설정」: 다섯 기능 설정을 바로 여는 단추. PC 한 줄 다섯 칸, 모바일 세 칸씩 두 줄 (2026-10-26 사용자) */
+.gx .st-feats { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; padding: 10px 12px; }
+.gx .st-feat { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 40px; min-width: 0; padding: 0 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .gx .st-feat svg { width: 16px; height: 16px; flex: none; }
+@media (max-width: 760px) { .gx .st-feats { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+/* 시작 전 기능 설정 페이지 머리 밑 한 줄 안내 */
+.st-featpage .st-prehint { margin: 10px 16px 0; }
 .gx .ps-group > .ps-adv { margin: 10px 0 0; }
 
 /* 위키: 이 문서 지침 칸 (작성 화면·다시 쓰기) */
@@ -2635,15 +2638,18 @@ button.mk-go:hover { color: var(--signal); }
 .pp-aff-top { display: flex; align-items: center; gap: 8px; }
 .pp-aff-top b { font-size: 16px; }
 .pp-aff-num { font-size: 13px; color: var(--sub); font-variant-numeric: tabular-nums; }
+.pp-aff-num small { font-size: 12px; color: var(--dim); }
+/* 호감 8칸: 무관심(4번째 칸)이 기준. 기준에서 지금 단계까지만 채우고(음수 왼쪽 빨강·양수 오른쪽 초록), 지금 단계 칸만 진하게 (2026-10-26 사용자) */
 .pp-cells { position: relative; display: grid; grid-template-columns: repeat(8, 1fr); gap: 3px; height: 12px; }
 .pp-cell { border-radius: 4px; background: var(--panel2); box-shadow: inset 0 0 0 1px var(--line2); }
-.pp-cell.on { background: color-mix(in srgb, var(--signal) 55%, var(--panel2)); }
-.pp-cell.cur { background: var(--signal); }
-.pp-cell.s-0.on, .pp-cell.s-1.on, .pp-cell.s-2.on { background: color-mix(in srgb, var(--danger) 60%, var(--panel2)); }
-.pp-cell.s-0.cur, .pp-cell.s-1.cur, .pp-cell.s-2.cur { background: var(--danger); }
-.pp-cell.s-3.on { background: color-mix(in srgb, var(--sub) 45%, var(--panel2)); }
-.pp-cell.s-3.cur { background: var(--sub); }
-.pp-mark { position: absolute; top: -4px; bottom: -4px; width: 2px; margin-left: -1px; background: var(--text); border-radius: 1px; opacity: .8; }
+.pp-cell.base { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--sub) 70%, transparent); background: color-mix(in srgb, var(--sub) 18%, var(--panel2)); }
+.pp-cell.on.neg { background: color-mix(in srgb, var(--danger) 45%, var(--panel2)); box-shadow: none; }
+.pp-cell.on.pos { background: color-mix(in srgb, var(--signal) 45%, var(--panel2)); box-shadow: none; }
+.pp-cell.cur { background: var(--signal); box-shadow: 0 0 0 2px color-mix(in srgb, var(--signal) 35%, transparent); }
+.pp-cell.cur.neg { background: var(--danger); box-shadow: 0 0 0 2px color-mix(in srgb, var(--danger) 35%, transparent); }
+.pp-cell.cur.base { background: var(--sub); box-shadow: 0 0 0 2px color-mix(in srgb, var(--sub) 35%, transparent); }
+.pp-aff-ends { display: flex; justify-content: space-between; font-size: 11.5px; color: var(--dim); }
+.pp-addr-none { font-size: 13.5px; color: var(--dim); }
 .pp-stage.s-0, .pp-stage.s-1, .pp-stage.s-2 { color: var(--danger); background: var(--danger-bg); }
 .pp-stage.s-4, .pp-stage.s-5, .pp-stage.s-6, .pp-stage.s-7 { color: var(--signal); background: var(--accent-bg); }
 .pp-addr { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
@@ -2672,7 +2678,14 @@ button.mk-go:hover { color: var(--signal); }
 .pp-src.s-field { color: var(--blue); background: color-mix(in srgb, var(--blue) 16%, transparent); }
 .pp-entry-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding-left: 30px; font-size: 12.5px; color: var(--dim); }
 .pp-entry-meta q { quotes: '「' '」'; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
-.pp-no { padding: 1px 7px; border: 1px solid var(--line); border-radius: 999px; background: var(--void); color: var(--sub); font: inherit; font-size: 12px; font-variant-numeric: tabular-nums; }
+.pp-no { padding: 1px 8px; border: 1px solid var(--line); border-radius: 999px; background: var(--void); color: var(--sub); font: inherit; font-size: 12px; font-variant-numeric: tabular-nums; cursor: pointer; }
+.pp-no:hover { border-color: var(--accent-line); color: var(--signal); }
+.pp-no.on { border-color: var(--accent-line); background: var(--accent-bg); color: var(--signal); }
+/* 「근거 #n」을 누르면 그 항목 아래: 인용 + 메시지 앞부분 */
+.pp-evidence { display: flex; flex-direction: column; gap: 4px; margin: 2px 0 0 30px; padding: 8px 10px; border-left: 2px solid var(--accent-line); border-radius: 0 8px 8px 0; background: color-mix(in srgb, var(--panel2) 60%, transparent); font-size: 12.5px; color: var(--sub); line-height: 1.5; }
+.pp-evidence q { quotes: '「' '」'; color: var(--text); }
+.pp-evidence small { font-size: 12.5px; color: var(--dim); overflow-wrap: anywhere; }
+.pp-evidence small b { color: var(--sub); }
 .pp-gone { color: var(--amber); }
 .pp-entry-btns { margin-left: auto; display: inline-flex; align-items: center; gap: 4px; }
 .pp-entry-btns .ph-tool.sm.on { color: var(--signal); background: var(--accent-bg); }
@@ -2681,9 +2694,17 @@ button.mk-go:hover { color: var(--signal); }
 .pp-log > summary { gap: 6px; }
 .pp-log > .pp-entries, .pp-log > .ps-note { border: 0; border-top: 1px solid var(--line); border-radius: 0 0 16px 16px; }
 .pp-log > .ps-note { margin: 0; padding: 12px 14px; }
-.pp-textrow { flex-direction: column; align-items: stretch; }
-.pp-textrow .nw-reqbox { margin-top: 0; }
-.pp-textrow .gx-row-btns { justify-content: flex-end; }
+/* 설정 맨 위 설명 한 문단 */
+.pp-set .pp-intro { margin: 0 4px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); color: var(--sub); }
+.pp-set .pp-intro b { color: var(--text); font-weight: 600; }
+/* 「추가 지침」 두 칸 나란히 (모바일은 한 칸). 입력칸 위 빈 여백이 생기던 ps-label flex-basis 문제는 ps-row 를 쓰지 않아 없음 */
+.pp-rules { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 16px; padding: 12px 14px; }
+.pp-rule { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.pp-rule > b { font-size: 15px; font-weight: 600; }
+.pp-rule > .nw-reqbox { width: 100%; box-sizing: border-box; margin: 0; min-height: 96px; }
+.pp-rule > small { font-size: 13px; color: var(--dim); line-height: 1.45; }
+.pp-rule > .gx-row-btns { justify-content: flex-end; }
+@media (max-width: 760px) { .pp-rules { grid-template-columns: minmax(0, 1fr); padding: 12px; } }
 .pp-diags { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); overflow: hidden; }
 .pp-diag + .pp-diag { border-top: 1px solid var(--panel2); }
 .pp-diag-row { display: flex; flex-direction: column; gap: 4px; width: 100%; padding: 10px 12px; border: 0; background: none; color: var(--text); font: inherit; text-align: left; }
@@ -2701,8 +2722,47 @@ button.mk-go:hover { color: var(--signal); }
 .pp-raw { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 12px; line-height: 1.45; resize: vertical; white-space: pre-wrap; }
 @media (max-width: 760px) {
   .pp-entry-meta { padding-left: 0; }
+  .pp-evidence { margin-left: 0; }
   .pp-entry-btns { margin-left: 0; width: 100%; justify-content: flex-end; }
   .pp-diag-who { flex-basis: 100%; }
 }
 /* 「브라우저」: 진짜 전체화면이 막히면 리스 플러그인 창(브라우저 창 전체) 끝까지 */
 .gx-game.gx-winfull, .gx-fieldhost .gx-game.gx-winfull, .gx-panel .gx-game.gx-winfull { position: fixed; inset: 0; z-index: 9999; border-radius: 0; overflow: hidden; background: #000; }
+/* 인물 기록: 지난 항목(대체·요약·취소·사라짐) 접기 */
+.pp-old { color: var(--dim); }
+.pp-oldbox { margin-top: 6px; }
+.pp-oldbox > summary { font-size: 12.5px; color: var(--dim); cursor: pointer; padding: 4px 12px; }
+.pp-oldbox > summary b { margin-left: 6px; font-weight: 600; }
+
+.pp-extra { margin: 4px 0 0; font-size: 14px; line-height: 1.5; }
+.pp-extra b { font-size: 16px; margin-right: 6px; }
+
+/* 세력 평판 */
+.gx-badge.fs-friendly { color: var(--signal); background: var(--accent-bg); }
+.gx-badge.fs-favorable { color: var(--signal); }
+.gx-badge.fs-wary { color: var(--amber); background: var(--amber-bg); }
+.gx-badge.fs-hostile { color: var(--bad, #c0392b); background: color-mix(in srgb, var(--bad, #c0392b) 14%, transparent); }
+.pp-mob { list-style: none; margin: 6px 0 0; padding: 0; display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--sub); }
+.pp-mob li { padding: 4px 8px; border-radius: 8px; }
+.pp-mob li.cur { background: var(--accent-bg); color: var(--text); }
+.pp-mob li b { margin-right: 6px; }
+.nw-ava.k-fac { background: var(--amber-bg); color: var(--amber); }
+.pp-bounds { max-width: 180px; }
+
+.pp-range { display: inline-flex; align-items: center; gap: 10px; }
+.pp-range input[type=range] { width: 180px; max-width: 60vw; }
+.pp-range output { min-width: 64px; font-variant-numeric: tabular-nums; }
+
+.pp-backfill { display: inline-flex; align-items: center; gap: 6px; margin-left: 6px; }
+.pp-backfill .gx-select, .pp-reread-sel { min-height: 28px; font-size: 12.5px; }
+.pp-reread-sel { margin-left: 6px; }
+
+/* 이미지 지침 페이지 */
+.ip-names { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 6px; }
+.ip-name { display: flex; align-items: center; gap: 6px; padding: 6px 8px; border: 1px solid var(--line); border-radius: 8px; font-size: 13px; }
+.ip-name.off { color: var(--dim); }
+.ip-name small { color: var(--dim); margin-left: auto; font-size: 11.5px; }
+.ip-extra { display: flex; gap: 6px; margin-top: 8px; }
+.ip-extra input { flex: 1; }
+.ip-template { font-family: ui-monospace, monospace; font-size: 12.5px; }
+.ip-preview { margin-top: 8px; padding: 10px; border-radius: 8px; background: var(--panel2); font-size: 12px; white-space: pre-wrap; overflow-wrap: anywhere; max-height: 360px; overflow: auto; }

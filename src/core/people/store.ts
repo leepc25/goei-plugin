@@ -4,7 +4,7 @@
 import type { Chat, ChatMessage } from '../types';
 import { messageText } from '../refs';
 import { anchorOf } from '../visit';
-import { PEOPLE_KEY, SLOTS, DOC_TYPES, emptyStore, type Change, type Doc, type Entry, type PeopleStore, type Person, type SlotId } from './types';
+import { PEOPLE_KEY, SLOTS, DOC_TYPES, REGISTERS, emptyStore, type Change, type Doc, type Entry, type PeopleStore, type Person, type Register, type SlotId } from './types';
 
 export { anchorOf };
 
@@ -39,15 +39,18 @@ export function peopleStore(chat: Chat): PeopleStore {
       seeded: p.seeded && typeof p.seeded === 'object' ? p.seeded : { from: 'none', at: '' },
       slots,
       affinity: { base: Number(p.affinity?.base) || 0 },
-      address: { toUser: str(p.address?.toUser), register: p.address?.register === '존댓말' || p.address?.register === '혼합' ? p.address.register : '반말', ...(p.address?.pin ? { pin: true } : {}) },
+      address: { toUser: str(p.address?.toUser), register: REGISTERS.includes(p.address?.register as Register) ? (p.address!.register as Register) : '존댓말', ...(p.address?.pin ? { pin: true } : {}) },
       express: ([0, 1, 2, 3] as const).includes(p.express as 0) ? (p.express as 0 | 1 | 2 | 3) : 1,
-      ...(p.minor ? { minor: true } : {}),
       aliases: Array.isArray(p.aliases) ? p.aliases.filter((a): a is string => typeof a === 'string') : [],
     };
   }
   for (const [k, d] of Object.entries(raw.docs ?? {})) {
     if (!d || !DOC_TYPES.includes(d.type) || typeof d.key !== 'string') continue;
     out.docs[k] = { type: d.type, key: d.key, entries: Array.isArray(d.entries) ? d.entries.filter(isEntry) : [] };
+  }
+  for (const [k, f] of Object.entries(raw.factions ?? {})) {
+    if (!f || typeof f !== 'object' || typeof f.code !== 'string') continue;
+    out.factions[k] = { code: f.code, name: str(f.name), seeded: f.seeded && typeof f.seeded === 'object' ? f.seeded : { at: '' } };
   }
   out.log = Array.isArray(raw.log) ? raw.log.filter((c): c is Change => !!c && typeof c.id === 'string' && typeof c.anchor === 'string' && typeof c.who === 'string' && typeof c.kind === 'string') : [];
   out.folded = raw.folded && typeof raw.folded === 'object' ? Object.fromEntries(Object.entries(raw.folded).filter(([, v]) => typeof v === 'number')) as Record<string, number> : {};
@@ -93,8 +96,8 @@ export function liveness(chat: Chat): Liveness {
 }
 
 /** 항목·변경이 살아 있나: 기준 메시지가 있고, story 인용은 그 메시지에 아직 있어야 */
-export function isAlive(x: { anchor: string; quote?: string; src?: string; void?: boolean }, live: Liveness): boolean {
-  if (x.void) return false;
+export function isAlive(x: { anchor: string; quote?: string; src?: string; void?: boolean; folded?: boolean }, live: Liveness): boolean {
+  if (x.void || x.folded) return false;
   const pos = live.at.get(x.anchor);
   if (pos === undefined) return false;
   if (x.src === 'story' && x.quote) {
@@ -108,8 +111,19 @@ export function isAlive(x: { anchor: string; quote?: string; src?: string; void?
 export function liveEntries(list: Entry[] | undefined, live: Liveness): Entry[] {
   if (!list?.length) return [];
   const alive = new Set(list.filter((e) => isAlive(e, live)).map((e) => e.id));
-  const replaced = new Set(list.filter((e) => alive.has(e.id) && e.replaces).map((e) => e.replaces!));
+  const replaced = new Set(list.filter((e) => alive.has(e.id)).flatMap((e) => [...(e.replaces ? [e.replaces] : []), ...(e.from ?? [])]));
   return list.filter((e) => alive.has(e.id) && !replaced.has(e.id));
+}
+
+export type EntryState = 'alive' | 'replaced' | 'folded' | 'void' | 'gone';
+/** 항목이 왜 안 살아 있나 (화면용): 새 항목이 대체 / 요약에 합쳐짐 / 사용자가 취소 / 근거 메시지가 사라지거나 고쳐짐 */
+export function entryStates(list: Entry[] | undefined, live: Liveness): Map<string, EntryState> {
+  const out = new Map<string, EntryState>();
+  if (!list?.length) return out;
+  const alive = new Set(liveEntries(list, live).map((e) => e.id));
+  const replaced = new Set(list.filter((e) => isAlive(e, live)).flatMap((e) => [...(e.replaces ? [e.replaces] : []), ...(e.from ?? [])]));
+  for (const e of list) out.set(e.id, alive.has(e.id) ? 'alive' : e.void ? 'void' : e.folded ? 'folded' : replaced.has(e.id) ? 'replaced' : 'gone');
+  return out;
 }
 
 /** 살아 있는 변경 기록 (기준 메시지 순서 → seq 순서) */
@@ -136,7 +150,7 @@ export function putEntry(store: PeopleStore, who: string, slot: SlotId, entry: E
   if (!p) return false;
   const list = (p.slots[slot] ??= []);
   if (list.some((e) => e.id === entry.id)) return false;
-  list.push({ ...entry, text: plain(entry.text), ...(entry.quote ? { quote: plain(entry.quote, 60) } : {}) });
+  list.push({ ...entry, text: plain(entry.text, 300), ...(entry.quote ? { quote: plain(entry.quote, 60) } : {}) });
   return true;
 }
 
@@ -160,7 +174,8 @@ export const messageKey = (m: ChatMessage, index: number) => {
   const id = (m as { chatId?: unknown }).chatId;
   return typeof id === 'string' && id ? id : `#${index + 1}`;
 };
-export const messageHash = (m: ChatMessage) => hash(str(m.data));
+/** 읽음 판정용 내용 해시: 이미지 태그·공백 차이는 무시한다 (갱신기 뒤에 보조 모델이 <img=> 를 끼워도 「바뀐 응답」으로 다시 읽지 않게) */
+export const messageHash = (m: ChatMessage) => hash(messageText(str(m.data)).replace(/<img=.*?>/g, '').replace(/\s+/g, ' ').trim());
 
 /** 아직 읽지 않은(또는 내용이 바뀐) 봇 응답의 위치들 */
 export function unreadIndexes(chat: Chat, store: PeopleStore): number[] {

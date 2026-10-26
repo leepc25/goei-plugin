@@ -28,10 +28,10 @@ import { lastStatusFields } from '../core/world/tags';
 import { placeWhere } from '../core/world/geo';
 import { factionList } from '../core/factions';
 import { updateChat, type ChatContext } from '../host/risu';
-import { peopleDocsView, peopleHomeTile, peopleListView, personView, resetPeopleUi } from './people';
+import { factionView as peopleFactionView, peopleDocsView, peopleHomeTile, peopleListView, personView, resetPeopleUi } from './people';
 
 /** people·person·docs: 이 채팅의 인물 기록 (ui/people.ts). person 은 title 에 인물 이름 */
-type WikiView = 'home' | 'compose' | 'doc' | 'settings' | 'new' | 'people' | 'person' | 'docs';
+type WikiView = 'home' | 'compose' | 'doc' | 'settings' | 'new' | 'people' | 'person' | 'docs' | 'faction';
 /** 명부 항목 분류: 괴이·특수·거점·인물·조직 */
 type Cat = 'an' | 'ms' | 'lm' | 'ag' | 'org';
 /** 서랍 탭. 세력은 거점과 조직을 함께, 명부에 없는 새 주제는 기타 (사람 문서면 인물) */
@@ -520,9 +520,10 @@ function homeView(ctx: ChatContext): string {
       <div class="nw-hero-q"><input class="gx-search" type="search" name="wiki-home-q" data-input="wiki-home-query" data-enter="wiki-search" placeholder="이름·제목 검색" value="${esc(wiki.homeQuery)}" aria-label="위키 검색" autocomplete="off"></div>
       <div class="nw-hero-res">${wikiHomeResults(ctx)}</div>
     </section>
+    ${sec('이 채팅의 기록', 0, `<div class="nw-tiles">${peopleHomeTile(ctx)}</div><p class="nw-hnone">요원이든 아니든 이 채팅에 등장해 기록된 사람은 모두 여기에 있어요. 사원증의 「기록」도 같은 곳이에요.</p>`)}
     ${liveCards ? sec('지금 얽힌 문서', 0, `<div class="nw-cards">${liveCards}</div>`) : ''}
     ${sec('이번 이야기에서 쓴 문서', story.length, story.length ? `<div class="nw-cards">${storyCards}</div>${story.length > 8 ? `<button class="gx-mini nw-more-btn" data-action="wiki-browse" data-value="story">${story.length}개 모두 보기</button>` : ''}` : '<p class="nw-hnone">아직 이번 이야기에서 쓴 문서가 없어요.</p>')}
-    ${sec('분류', 0, `<div class="nw-tiles">${peopleHomeTile(ctx)}${tiles}</div>`)}
+    ${sec('분류', 0, `<div class="nw-tiles">${tiles}</div>`)}
   </div>`;
 }
 
@@ -654,6 +655,7 @@ function paneHtml(ctx: ChatContext): string {
   if (wiki.view === 'people') return peopleListView(ctx);
   if (wiki.view === 'person') return personView(ctx, wiki.title);
   if (wiki.view === 'docs') return peopleDocsView(ctx);
+  if (wiki.view === 'faction') return peopleFactionView(ctx, wiki.title);
   return homeView(ctx);
 }
 
@@ -976,6 +978,13 @@ export async function handleWiki(action: string, value: string | undefined, ctx:
     case 'wiki-docs':
       resetPeopleUi();
       go('docs');
+      wiki.listOpen = false;
+      break;
+    case 'wiki-faction':
+      // 세력 평판 상세 (ui/people.ts factionView). title = 조직 코드
+      if (!v) break;
+      resetPeopleUi();
+      go('faction', v);
       wiki.listOpen = false;
       break;
     default:

@@ -59,7 +59,6 @@ export function bullets(section: string): string[] {
 export interface SeedBase {
   faction?: string;
   express?: 0 | 1 | 2 | 3;
-  minor?: boolean;
   aliases?: string[];
   /** 유저 대상 호감 시작값 (relations-base orgs 로 계산한 것) */
   affinityBase?: number;
@@ -76,7 +75,6 @@ export function seedPerson(name: string, sheet: string | null, base: SeedBase = 
     affinity: { base: base.affinityBase ?? 0 },
     address: base.address ?? { toUser: '', register: '존댓말' },
     express: base.express ?? 1,
-    ...(base.minor ? { minor: true } : {}),
     aliases: base.aliases ?? [],
   };
   if (sheet) {

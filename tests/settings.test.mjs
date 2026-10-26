@@ -116,7 +116,7 @@ test('페르소나 이름 태그는 표정과 상관없이 유저 사진 칸', a
   const pick = (n) => (n === 'Aileen_default' ? 'Aileen_default' : null);
   const out = imgtag.renderImgTags('a\n<img=영지_smile>\nb\n<img=Aileen_smile>', pick, 0, '영지');
   assert.match(out, /url\('\{\{source::user\}\}'\)/);
-  assert.match(out, /url\('\{\{raw::Aileen_default\}\}'\)/);
+  assert.doesNotMatch(out, /Aileen/, '없는 표정은 칸 없음 (기본 그림으로 바꾸지 않음)');
   assert.doesNotMatch(imgtag.renderImgTags('<img=영지_smile>', pick, 0), /gim/);
   assert.equal(imgtag.imgTagsKnown('<img=영지_smile>', pick, '영지'), true);
   // 페르소나 에셋을 넣으면 그것이 먼저

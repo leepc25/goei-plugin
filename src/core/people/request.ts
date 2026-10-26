@@ -1,10 +1,12 @@
 // 본편 요청에 인물 기록 블록을 끼운다 (beforeRequest). 모델은 부르지 않는다.
 // 절 단위 혼합(split)이면 요원 자리에 들어간 그 인물의 시트 원문을 요청에서 빼고 기록 블록으로 대신한다.
 import type { Chat } from '../types';
-import { peopleBlock, personBlock, unknownTo } from './inject';
+import { peopleBlock, personBlock, rhythmBlock, unknownTo } from './inject';
 import { nameMatcher, scenePeople, entriesOf, type NameEntry } from './select';
-import { liveChanges, liveness, type Liveness } from './store';
+import { liveChanges, liveEntries, liveness, type Liveness } from './store';
 import { latestNote } from './updater';
+import { factionNow, factionsBlock, sceneFactionCodes, userFactionOf } from './faction';
+import { messageText } from '../refs';
 import type { PeopleSettings } from './settings';
 import type { PeopleStore, Temper } from './types';
 
@@ -23,6 +25,8 @@ export interface RequestOpts {
   /** 지금 쓰려는 유저 입력 */
   input?: string;
   user?: string;
+  /** 세력 코드 → 이름 (명부) */
+  factionNames?: Record<string, string>;
 }
 
 /** 장면 인물의 기록 블록 (본편용). 대상이 없으면 빈 문자열 */
@@ -50,11 +54,31 @@ export function peopleBlockFor(chat: Chat, o: RequestOpts): { text: string; peop
         note,
         temper: o.temperOf?.(n),
         speed: o.settings.speed,
-        maxChars: 1600,
+        turnCap: o.settings.turnCap,
+        // 본편 전체 예산을 장면 인물 수로 나눈다 (고정 절 원문은 예산 밖)
+        maxChars: Math.floor(o.settings.blockCap / people.length),
+        taste: o.settings.features.has('taste'),
+        openness: o.settings.features.has('openness'),
       }),
     );
   }
-  return { text: peopleBlock(blocks), people, sheets };
+  // 서사 리듬 (선택): 장면 전체 기록과 메모를 맨 앞에
+  if (o.settings.features.has('rhythm')) {
+    const docs = Object.values(o.store.docs).filter((d) => d.type === 'rhythm').flatMap((d) => liveEntries(d.entries, live).slice(-1).map((e) => ({ key: d.key, text: e.text })));
+    const note = o.settings.director === 'facts' ? latestNote(o.store, '@rhythm', live)?.now : null;
+    const rb = rhythmBlock(docs, note);
+    if (rb) blocks.unshift(rb);
+  }
+  // 세력 평판 (기본 켬): 장면 세력(인물 소속 ∪ 최근 글에 나온 세력) 가운데 중립이 아닌 것만 한 줄씩, 맨 뒤에
+  if (o.settings.features.has('faction_rep') && o.settings.factionInject) {
+    const list = Array.isArray(chat.message) ? chat.message : [];
+    const texts = [...(o.input ? [o.input] : []), ...list.slice(-2).map((m) => messageText(String(m.data ?? '')))];
+    const codes = sceneFactionCodes(o.store, people, texts, o.factionNames);
+    const uf = userFactionOf(o.store, chat);
+    const fb = factionsBlock(codes.map((c) => factionNow(o.store, c, changes, uf, o.settings, o.factionNames)), o.user);
+    if (fb) blocks.push(fb);
+  }
+  return { text: peopleBlock(blocks, o.settings.blockCap), people, sheets };
 }
 
 const squash = (s: string) => s.replace(/\s+/g, ' ').trim();

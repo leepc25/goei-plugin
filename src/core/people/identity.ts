@@ -56,7 +56,7 @@ export function parseIdentity(text: string, anchor: string, from: Identity['from
 
 /** 상태창에 넣을 표기 */
 export const identityText = (id: Identity | undefined): string => (id ? `${ORG_NAMES[id.faction] ?? id.faction}/${id.rank || '-'}` : '');
-const ORG_NAMES: Record<string, string> = { A00: '관리국', B00: '가짜 관리국', C00: '백일몽', D00: '민간인', E00: '프리랜서' };
+export const ORG_NAMES: Record<string, string> = { A00: '관리국', B00: '가짜 관리국', C00: '백일몽', D00: '민간인', E00: '프리랜서' };
 
 /** 유저와 인물의 상하: 같은 조직일 때만 비교. up = 유저가 위 */
 export function relativeRank(user: Identity | undefined, personFaction: string, personLevel: number | null): 'up' | 'peer' | 'down' | 'outsider' {
@@ -64,4 +64,18 @@ export function relativeRank(user: Identity | undefined, personFaction: string, 
   const u = user.level ?? 0;
   if (personLevel === null) return 'peer';
   return u > personLevel ? 'up' : u < personLevel ? 'down' : 'peer';
+}
+
+/** 글에 이름이 나온 세력 코드들 (가짜 관리국이 있으면 관리국으로 또 잡히지 않게 긴 것부터) */
+export function factionCodesIn(text: string, extra: Record<string, string> = {}): string[] {
+  const out: string[] = [];
+  let t = text;
+  for (const [re, code] of ORG_CODES) {
+    if (re.test(t)) {
+      out.push(code);
+      t = t.replace(new RegExp(re.source, re.flags.includes('g') ? re.flags : re.flags + 'g'), ' ');
+    }
+  }
+  for (const [code, name] of Object.entries(extra)) if (!out.includes(code) && name && t.includes(name)) out.push(code);
+  return out;
 }
