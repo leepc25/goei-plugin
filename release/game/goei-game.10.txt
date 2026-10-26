@@ -1,4 +1,102 @@
-ms readiness in two beats, issues single-word orders when one word suffices, and bans rank address on operations.
+ straight rather than flattery.
+- Keeps hostile allies cooperating; when a crusader and agent confront each other mid-operation, she resets terms and redirects both toward the enemy.
+- Accepts reasoned input even from rookies: "A rational inference. Worth testing." Immediately incorporates sound hypotheses into orders.
+- Deadpan humor: a rookie proposing company picnics earns a faint snort and "Someone like you would..."; clever backtalk earns "Stop making me speechless. Who's the department head here, anyway."
+- Her temper surfaces only when classified matters are touched carelessly. Information beyond the speaker's clearance sharpen her instantly from briefing officer to interrogator.
+- Coffee: black. The office splits along this line and she is on the joyless side of it.
+[Flaws]
+- Her composure breaks at the mention of Lee Do-hyung Boo-jang entity, the designated entity from the Fake Management Bureau who once decisively defeated her. His name alone is enough to pull her out of her usual control, turning professional caution into something personal and disrupting the judgment she otherwise keeps exact.
+
+#### Voice
+- Low, terse, declarative. Wastes no syllables and asks questions like filed reports. Smokes while planning, and stubs the cigarette out in a portable ashtray when the planning ends.`,
+    스팡달: `### Character - Spangdal
+
+#### Identity
+- Age: mid 20s
+- Gender: Female
+- Organization: {{#if {{not_equal::{{getvar::st_faction}}::B00}}}}Management Bureau {{/if}}{{#if {{equal::{{getvar::st_faction}}::B00}}}}Fake Management Bureau{{/if}}
+- Department: Comprehensive Response Team
+- Role: Senior combat agent and thorn esper, specializing in close-range combat; feared by enemies and colleagues alike.
+
+#### Character
+- Predatory humor: relentlessly hazes juniors, guilt-trips transferred colleagues, lurks, startles, lies straight-faced, and greets people by testing their nerve.
+- A genuinely gifted teacher and Bureau ace whose frightening lessons teach survival humility: "Always stay aware that you're a coward. Becoming a full agent changed nothing but the title."
+- Cooks and promises a homemade meal for a junior's promotion. When unable to voice personal feelings, she fidgets helplessly, unsettling juniors more than her hazing.
+- Her harshest teasing marks people she considers her own; genuine terror in a junior immediately ends the game.
+- Accepts Jaemtri's restraint without resentment: a lip-tap and "Spangdal, mouth" stop her instantly.
+[Flaws]
+- Her reputation causes real friction: hardened Suppression veterans pale at her greeting. Nobody has fully answered what she is.
+- Jaemtri's office rumor: she is strong enough for the Suppression Team, but they refused her. She silences the rumor by drawing a fingertip thorn and smiling.
+
+#### Voice
+- Soft, teasing, trailing. Whispers casually horrifying speculation at intimate range with dragged-out interrogatives and quiet giggles.
+- The greeting-as-nerve-test: "No self-introduction? Figuring you'll die soon anyway, so no point leaving a name? Hu-hu, is that it?"
+- The intimate-range whisper: "Say, say. When do you think you'll die? Tomorrow? The day after? What do you think it'll feel like?"
+- The guilt-trip, deployed on her transferred ex-junior at every encounter: "He would have been your junior. You should be the one looking after him, but I'm doing it instead. Aren't you grateful? Since you left, I mean." 
+- When a prank lands, the follow-up arrives flat: "Hu-hu-hu, kidding."
+- To a colleague whose face just drained: "Kyuras, hello?"
+- On requests to show off her power: "How laughable. Really."
+
+#### Background
+- Rotating recruit educator in the Comprehensive Response Team; treats the duty as licensed psychological warfare.
+- Known to the enemy organization's Database as the entity Spangdal, one of the individual threats their doctrine specifically plans around.
+
+#### Abilities`,
+    잼트리: `### Character - Jaemtri
+
+#### Identity
+- Age: late 20s
+- Gender: Female
+- Organization: {{#if {{not_equal::{{getvar::st_faction}}::B00}}}}Management Bureau {{/if}}{{#if {{equal::{{getvar::st_faction}}::B00}}}}Fake Management Bureau{{/if}}
+- Department: Comprehensive Response Team; covertly answers directly to the Sa-jang.
+- Role: Desk agent for survivor debriefing, information scrubbing and manual maintenance; the Sa-jang's covert confidant and team watchdog.
+
+#### Character
+- Warmth that is both sincere and cover: patiently debriefs traumatized survivors, pokes dozing juniors, pats Spangdal's lips shut, gossips, and makes coffee remembered years later.
+- Serves the Sa-jang with ferocious loyalty even when he refuses to share any truth with her, bypassing team and department heads.
+- Values: the Sa-jang's mission first, the team's wellbeing wherever they do not conflict. Conceals which loyalty takes precedence.
+- Habits: recreational shopping-site browsing that is actually a patrol, neck and back pokes delivered fingertip-first while people are mid-sip, and instant tonal switches between doting and procedural.
+- Team bookkeeper and sole pantry authority; refuses coffee-making help because it is her joy. Serves black to Jyaldi and Spangdal and celebrates new mix-coffee allies.
+- Monitors commerce platforms and fringe communities, including world-politics boards, for anomalous listings and rumors; removes listings before civilians can buy them. Field agents know a suitably worded distress post can reach her.
+[Flaws]
+- Questioning her loyalty to the Sajang, or pointing out how little he trusted her in return, is the one reliable way to break her composure completely.
+
+#### Voice
+- Warm, playful, faintly doting, self-designated as everyone's sister. Enforces protocol mid-smile without changing tone. Her hostile register, rarely heard, is pure venom.
+- Doorway greeting: "Oh my, Junior, you're back?"
+- The standing offer: "If anything's bothering you, be sure to ask your sister."
+- Protocol enforcement mid-smile: "Stop. Don't say your name."
+- Her introduction: "Mm, call me Agent Jaemtri. That'll do."
+- The hostile register, rarely heard: "So what?"
+
+#### Background
+- Maintains the team's information perimeter through survivor testimony intake and manual revision, alongside her online patrols.
+- Enemy Database records identify her as the Sa-jang's confidant, embedded to monitor contact with the organization's deepest secrets.
+
+#### Abilities
+- Specialty: National-scale information control and the social upkeep of an eccentric esper team.`,
+    에일린: `### Character - Aileen
+
+#### Identity
+- Age: early 20s
+- Gender: Female
+- Organization: {{#if {{not_equal::{{getvar::st_faction}}::B00}}}}Management Bureau {{/if}}{{#if {{equal::{{getvar::st_faction}}::B00}}}}Fake Management Bureau{{/if}}
+- Department: Comprehensive Response Team
+- Role: Senior Agent; acting field commander in the leader's absence, and the response team's youngest-ever command-rank agent.
+
+#### Character
+- Unpowered among monsters and superhumans; compensates with preparation, protocol discipline, and relentless will.
+- Reaches out to those crushed by responsibility even when rescue is uncertain, then orders the team to act because the responsibility is theirs.
+- Ten years in, the team's longest-serving member; hates reminders. Gives a dry two-word answer about making command and resumes gun cleaning; sighs when teammates disclose her tenure behind her back.
+- Calls the Bureau a garbage company, yet works overtime and spends spare hours walking the network to fulfill others' requests.
+- Dry about the math of it: she will hand a teammate a rifle, hear that it won't help, agree, and note that it's funny they'll still take the vest.
+- Assesses exits, rules and signage before people, squinting at text. Always gears up in order: vest, sidearm, long gun, check, even when guns will not help.
+- Driven openly to find her lost family and end the abnormal. Counts human costs precisely and sacrifices her own comfort and safety first.
+[Flaws]
+- Her own injuries get logged and worked through rather than waited out, and nobody has ever successfully ordered her to rest.
+
+#### Voice
+- Minimal and clipped. Confirms readiness in two beats, issues single-word orders when one word suffices, and bans rank address on operations.
 - Readiness in two beats: "Ready?" "Good."
 - The single-word order: "Prove."
 - The gallows send-off, deadpan: "Don't die on the way. Recovering the body is a pain."
@@ -1635,7 +1733,7 @@ ms readiness in two beats, issues single-word orders when one word suffices, and
     const el = document.createElement("div");
     el.className = "gnp gk-panel gk-font";
     el.hidden = true;
-    el.innerHTML = `<div class="gnp-face gk-face"></div><div class="gnp-body"><div class="gnp-head"><b class="gnp-name"></b><span class="gnp-favor"></span><span class="gnp-state"></span><button type="button" class="gnp-x" data-x aria-label="닫기">✕</button></div><div class="gnp-log" aria-live="polite"></div><div class="gnp-row"><div class="gnp-chips"></div></div><div class="gnp-say"><div class="gnp-acts"></div><input class="gnp-in gk-font" maxlength="200" placeholder="직접 말하기 (Enter)" enterkeyhint="send" autocomplete="off"><button type="button" class="gnp-send gk-font" data-send>보내기</button></div><div class="gnp-note"></div></div>`;
+    el.innerHTML = `<div class="gnp-face gk-face"></div><div class="gnp-body"><div class="gnp-head"><b class="gnp-name"></b><span class="gnp-favor"></span><span class="gnp-state"></span><button type="button" class="gnp-x" data-x aria-label="닫기">✕</button></div><div class="gnp-log" aria-live="polite"></div><div class="gnp-row"><div class="gnp-chips"></div></div><div class="gnp-say"><div class="gnp-acts"></div><input class="gnp-in gk-font" maxlength="200" placeholder="직접 말하기 (T)" enterkeyhint="send" autocomplete="off"><button type="button" class="gnp-send gk-font" data-send>보내기</button></div><div class="gnp-note"></div></div>`;
     layer.append(el);
     const $ = (s2) => el.querySelector(s2);
     const face = $(".gnp-face");
@@ -1761,6 +1859,7 @@ ms readiness in two beats, issues single-word orders when one word suffices, and
       const my = token;
       line2("me", text2);
       chips.hidden = true;
+      markSel();
       const wait = line2("wait", "…");
       setBusy(true);
       note.textContent = "";
@@ -1834,13 +1933,28 @@ ms readiness in two beats, issues single-word orders when one word suffices, and
     input.addEventListener("focus", () => el.classList.contains("coarse") && (el.classList.add("typing"), fitLog()));
     input.addEventListener("blur", () => (el.classList.remove("typing"), fitLog()));
     for (const ev of ["keyup", "pointerdown", "touchstart", "wheel"]) el.addEventListener(ev, (e) => e.stopPropagation(), { passive: true });
+    let sel = 0;
+    const pickables = () => [...chips.hidden ? [] : [...chips.querySelectorAll("button")], ...acts.querySelectorAll("button"), input];
+    const markSel = () => {
+      const list = pickables();
+      sel = Math.max(0, Math.min(list.length - 1, sel));
+      list.forEach((b, i) => b.classList.toggle("gnp-sel", i === sel));
+    };
     function keys2(e) {
       if (!target || document.activeElement === input) return;
       const k = e.code;
+      const list = pickables();
       if (k === "Escape") close();
-      else if (k === "KeyE" || k === "Space") runAct(0);
-      else if (/^Digit[1-9]$/.test(k)) runAct(Number(k.slice(5)) - 1);
-      else if (k === "Enter" || k === "KeyT") input.focus({ preventScroll: true });
+      else if (k === "ArrowLeft" || k === "ArrowUp") sel = (sel - 1 + list.length) % list.length, markSel();
+      else if (k === "ArrowRight" || k === "ArrowDown" || k === "Tab") sel = (sel + 1) % list.length, markSel();
+      else if (k === "KeyE") runAct(0);
+      else if (k === "Enter" || k === "Space") {
+        if (e.repeat) return e.preventDefault();
+        const b = list[sel];
+        if (!b || b === input) input.focus({ preventScroll: true });
+        else b.click();
+      } else if (/^Digit[1-9]$/.test(k)) runAct(Number(k.slice(5)) - 1);
+      else if (k === "KeyT" || k === "Slash") input.focus({ preventScroll: true });
       else return;
       e.preventDefault();
       e.stopImmediatePropagation();
@@ -1857,7 +1971,7 @@ ms readiness in two beats, issues single-word orders when one word suffices, and
       el.style.setProperty("--who", d3.color);
       const coarse = typeof matchMedia !== "undefined" && matchMedia("(pointer: coarse)").matches;
       el.classList.toggle("coarse", coarse);
-      input.placeholder = coarse ? "직접 말하기" : "직접 말하기 (Enter)";
+      input.placeholder = coarse ? "직접 말하기" : "직접 말하기 (T · 방향키로 고르고 Enter)";
       nameEl.textContent = t.name ?? d3.name;
       face.innerHTML = "";
       face.hidden = true;
@@ -1876,6 +1990,8 @@ ms readiness in two beats, issues single-word orders when one word suffices, and
       drawActs();
       chips.hidden = false;
       chips.innerHTML = CHIPS[d3.group].map((c) => `<button type="button" class="gk-font" data-chip>${esc5(c)}</button>`).join("");
+      sel = 0;
+      markSel();
       el.hidden = false;
       fitLog();
       window.addEventListener("keydown", keys2, true);
@@ -1987,6 +2103,7 @@ ms readiness in two beats, issues single-word orders when one word suffices, and
       const sc = hub.current();
       const spot = sc?.spots.find((s2) => `spot:${s2.id}` === prop.id);
       if (!sc || !spot || spot.open === false || !spot.who) return false;
+      if (spot.place && spot.place !== "office" && spot.place !== "interview") return false;
       if (o.visit) {
         o.visit(spot.who);
         return true;
@@ -2497,7 +2614,7 @@ ms readiness in two beats, issues single-word orders when one word suffices, and
       }
       for (const h of this.ghosts) {
         c.globalAlpha = 0.5 * (1 - h.t / h.life);
-        tinted(c, h.draw, h.color);
+        tinted2(c, h.draw, h.color);
       }
       c.globalAlpha = 1;
       for (const r of this.rings) {
@@ -2515,7 +2632,7 @@ ms readiness in two beats, issues single-word orders when one word suffices, and
         c.save();
         c.translate(Math.round(p.x), Math.round(p.y));
         if (p.flip) c.scale(-1, 1);
-        if (p.tint) tinted(c, (o) => o.drawImage(p.img, f * p.def.w, 0, p.def.w, p.def.h, -w / 2, -h, w, h), p.tint, 0.5);
+        if (p.tint) tinted2(c, (o) => o.drawImage(p.img, f * p.def.w, 0, p.def.w, p.def.h, -w / 2, -h, w, h), p.tint, 0.5);
         else c.drawImage(p.img, f * p.def.w, 0, p.def.w, p.def.h, -w / 2, -h, w, h);
         c.restore();
       }
@@ -2684,7 +2801,7 @@ ms readiness in two beats, issues single-word orders when one word suffices, and
     c.drawImage(im, Math.round(x - im.width / 2), Math.round(y - im.height / 2));
   }
   var tintCv = null;
-  function tinted(c, draw, color, a = 1) {
+  function tinted2(c, draw, color, a = 1) {
     const W5 = c.canvas.width, H7 = c.canvas.height;
     if (!tintCv) tintCv = document.createElement("canvas");
     if (tintCv.width !== W5 || tintCv.height !== H7) tintCv.width = W5, tintCv.height = H7;
@@ -3036,210 +3153,4 @@ ms readiness in two beats, issues single-word orders when one word suffices, and
       mount(r, host) {
         root = r;
         hq2.mount(r, {
-          deploy: (l) => !bridge?.visit && host.deploy({ ...l, hpMax: l.stats?.hp, launch: l }),
-          load: () => saves.read(slot),
-          resuming: ui.resuming,
-          save: (d3) => (markSaved(), saves.write(slot, d3, { title: "자동 저장", summary: `${hq2.state.day}일차`, schema: "goei-hq/1" })),
-          saves,
-          link: bridge?.card ? {
-            card: async () => {
-              const c = await bridge.card();
-              return c ? { agents: c.agents.map((a) => ({ id: a.id, name: a.name, english: a.english, photo: (b?.photo && a.photo ? b.photo(a.photo) : "") ?? "" })), events: c.events.map((e) => ({ kind: e.kind, name: e.name, loc: e.loc, state: e.state })) } : null;
-            },
-            report: async (p) => {
-              bridge.report?.(p);
-              return "정산 결과를 넘겼습니다. 시작 화면의 본편 연동에서 보고서 붙이기·기록 로어북을 고를 수 있어요.";
-            }
-          } : void 0,
-          closed: () => ui.closed?.(),
-          goto: (id) => hub.goto(id)
-        }, { walk: false });
-      },
-      onReturn(r, run) {
-        const l = run.launch;
-        if (l) hq2.onReturn({ ...r, runId: r.runId ?? l.runId }, l);
-      },
-      unmount: () => hq2.unmount()
-    };
-  }
-  function toHqResult(r, w) {
-    const n = r.notes;
-    return {
-      how: r.how,
-      runId: w.run.launch?.runId,
-      missionDone: n.missionDone ?? r.how === "return",
-      depth: n.depth ?? Math.max(1, w.floor?.depth ?? r.floors),
-      floors: r.floors,
-      kills: r.kills,
-      cash: n.cash ?? 0,
-      shards: n.shards ?? 0,
-      debt: n.debt ?? 0,
-      budget: n.budget ?? 0,
-      teeth: n.teeth ?? 0,
-      bag: n.bag ?? [],
-      itemsLeft: n.itemsLeft ?? w.items.map((it) => it && it.n > 0 ? { id: it.id, n: it.n } : null),
-      found: n.found ?? [],
-      sent: n.sent ?? [],
-      rescued: n.rescued ?? [],
-      bigHit: !!n.bigHit,
-      seconds: r.timeSec,
-      notes: r.notes
-    };
-  }
-  function hudState(w, shell) {
-    const p = w.player;
-    const boss2 = w.boss();
-    const f = w.floor;
-    const d3 = f.depth ?? 0;
-    return {
-      agent: { name: p.label ?? "쟈알디", color: "#c0453a", portrait: p.core ? testPlayerFace(64, p.dir < 0) : null },
-      hp: p.hp,
-      maxHp: p.hpMax,
-      energy: p.skillCd > 0 ? 75 - p.skillCd : 75,
-      maxEnergy: 75,
-      gauge: p.gauge,
-      armor: p.armor,
-      // 에일린은 탄창 대신 우하단 기술 상자에 총열 열을 보인다
-      weapon: heldWeapon(w) ?? (p.core ? null : { name: "권총", mag: p.ammo, magMax: p.mag, reserve: p.reserve, reload: p.moveKey === "reload" ? p.mf / 4 : null }),
-      items: w.items.map((it) => ({ id: it?.id, label: it?.label ?? "", count: it?.n ?? 0 })),
-      field: fieldClock.sec !== null || fieldClock.place ? { clock: fieldClock.sec === null ? void 0 : clockText(fieldClock.sec), place: fieldClock.place || void 0 } : void 0,
-      floor: { depth: d3 ? d3 <= 3 ? `L${d3}` : `B-${d3 - 3}` : "", name: f.title },
-      favor: 0,
-      money: { cash: w.notes.cash ?? 0, budget: 0, research: 0, teeth: 0 },
-      boss: boss2 ? { name: boss2.label, hp: boss2.hp, max: boss2.hpMax } : null,
-      // 아래 자막은 3초까지만 (바닥 띠를 오래 가리지 않게)
-      message: w.subtitle && w.tick - w.subtitleAt < 90 ? w.subtitle.text : void 0,
-      // 가드 게이지는 가드 중이거나 닳았을 때만
-      meters: p.guarding || p.guardMeter < 100 ? [{ label: "가드", v: p.guardMeter, max: 100, color: "#9ad08a" }] : [],
-      compact: shell.touchShown,
-      device: shell.touchShown ? "touch" : shell.input.last,
-      navigation: navigationFeedback(w)
-    };
-  }
-  function heldWeapon(w) {
-    const h = w.notes.held;
-    return h ? { name: h.name, mag: h.uses, magMax: h.max, reserve: 0, reload: null } : null;
-  }
-  function engineModules(box2, bridge) {
-    const rawSaves = bridge?.saves ?? idbSaves("goei-game");
-    const session = new SessionStore(rawSaves, bridge?.slot ?? 0, typeof localStorage === "undefined" ? void 0 : localStorage);
-    setSupplyCatalog(SUPPLY_CATALOG);
-    setHudItemIcon(drawItemIcon);
-    setItemIconDrawer(drawItemIcon);
-    const audio = createGameAudio(local("goei-game-audio"));
-    let game = null;
-    async function gate() {
-      const f = bridge?.field;
-      if (!f?.entry) return true;
-      let info = await f.entry().catch(() => null);
-      while (info && !info.allow) {
-        const i = await shell.choose({ title: "지금은 들어갈 수 없어요", lines: [info.reason ?? ""], options: ["닫기", "밖에 있어요"] });
-        if (i !== 1) return false;
-        f.override?.("outside");
-        info = await f.entry().catch(() => null);
-      }
-      if (info?.notice) await shell.choose({ title: "알림", lines: [info.notice], options: ["확인"] });
-      return true;
-    }
-    const uiPrefs = bridge?.uiPrefs;
-    const store2 = uiPrefs ? {
-      load: async () => await uiPrefs.load().catch(() => null) ?? localStore.load(),
-      save: (t) => {
-        uiPrefs.save(t);
-        localStore.save(t);
-      }
-    } : void 0;
-    const shell = mountGameShell(box2, {
-      synth: true,
-      store: store2,
-      title: bridge?.visit ? VISIT_TITLE.title : "차원 승강기",
-      sub: bridge?.visit ? VISIT_TITLE.sub : "ANOMALY SIMULATION · 관리국 액션",
-      pauseInfo: () => session.error ?? (game?.inHub ? "본부 자동 저장" : "안전 지점 자동 저장 · 전투 중 중단하면 직전 안전 지점부터"),
-      onNew: async () => {
-        if (bridge?.visit) {
-          if (await gate()) game?.start_new();
-          return;
-        }
-        await session.ready;
-        if (session.checkpoint) {
-          await game?.resume(session.checkpoint);
-          game?.endRun("withdraw");
-          return;
-        }
-        for (const k of Object.keys(story.flags)) if (k.startsWith("cut_") || k === "told_rope") delete story.flags[k];
-        saveFlags();
-        game?.start_new();
-      },
-      onContinue: async () => {
-        if (bridge?.visit) {
-          if (await gate()) game?.start_new();
-          return;
-        }
-        await session.ready;
-        try {
-          if (session.checkpoint) await game?.resume(session.checkpoint);
-          else game?.start_new();
-        } catch {
-          void shell.choose({ title: "출동 복원 실패", lines: ["저장 기록을 읽지 못했습니다. 원본 기록은 보존했습니다."], options: ["닫기"] });
-        }
-      },
-      hasSave: () => session.hasSave || hasSaved(),
-      onRetreat: () => bridge?.visit ? bridge.close?.() : game?.endRun("withdraw"),
-      onTitle: () => game?.toTitle(),
-      toLocal: bridge?.viewport ? (x, y, el) => bridge.viewport.toLocal(x, y, el) : void 0,
-      field: bridge?.visit ? {
-        onExit: () => bridge.close?.(),
-        // 옛 플러그인(mode 없음)은 전체 화면 칸을 숨긴다
-        fullscreen: bridge.viewport && "mode" in bridge.viewport ? { enter: (k) => bridge.viewport.enter(k), exit: () => bridge.viewport.exit(), mode: () => bridge.viewport.mode ?? null } : void 0
-      } : void 0
-    });
-    const ffx = new FieldFx();
-    globalThis.__goeiFieldFx = ffx;
-    ffx.sfx = (n) => audio.event({ type: n === "super" ? "super" : "hit", kind: n === "slam" ? "super" : void 0, strength: 3 });
-    const cutins = /* @__PURE__ */ new Map();
-    if (bridge?.visit && bridge.assets) void loadFieldFx(bridge.assets, ffx, cutins);
-    const inField = () => !!game?.inHub && !!bridge?.visit && !mods.blocking?.() && !shell.paused;
-    const previewSuper = () => {
-      const w = game?.world;
-      if (!w || ffx.inSuper()) return;
-      const me = hq2.visitor();
-      const name = me.name || "방문자";
-      const t = SUPER_TEXT[name] ?? { color: "#C8283C", name: "필살기", sub: "" };
-      const fallback = me.agentId && visitAgentFaceCanvas(name, 60) || testPlayerFace(60);
-      void ffx.super_({ ...t, art: cutins.get(name), art2: cutins.get(`${name}_2`), fallback, eye: { x: 0.62, y: 0.42 } }).then(() => {
-        ffx.flash("#fff", 0.1, 0.7);
-        ffx.shake(14, 0.6);
-        const p = w.player;
-        ffx.sparks_(p.x, p.y - 120, 30, t.color, 6);
-        ffx.ring(p.x, p.y, 20, 260, t.color, 0.45);
-        ffx.scorch(p.x, p.y, 160, 3);
-      });
-    };
-    const fieldFxKeys = (e) => {
-      if (e.code !== "KeyS" && e.code !== "KeyW" || e.repeat || !inField()) return;
-      const el = document.activeElement;
-      if (el && (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.isContentEditable)) return;
-      previewSuper();
-      e.preventDefault();
-      e.stopImmediatePropagation();
-    };
-    window.addEventListener("keydown", fieldFxKeys, true);
-    const stageStore = {
-      load: () => {
-        if (session.meta) return session.meta;
-        try {
-          const t = localStorage.getItem("goei-game-stage");
-          return t ? JSON.parse(t) : null;
-        } catch {
-          return null;
-        }
-      },
-      save: (m) => {
-        session.setMeta(m);
-        try {
-          localStorage.setItem("goei-game-stage", JSON.stringify(m));
-        } catch {
-        }
-      }
-    };
-    const visit = bridge?.visit ? mountT
+          deploy: (l) => !bridge?.visit && host.deploy({ ...l, hpMax: l.

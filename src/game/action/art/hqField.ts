@@ -34,7 +34,7 @@ export const hasHqField = (scene: string) => !!images && !!PAINTED[scene];
 export type DoorFx = (id: string) => { open: number; shake: number };
 
 /** 배경과 문. 월드 좌표 (호출하는 쪽이 -camX 옮김) */
-export function drawHqField(c: CanvasRenderingContext2D, scene: string, camX: number, fx: DoorFx): boolean {
+export function drawHqField(c: CanvasRenderingContext2D, scene: string, camX: number, fx: DoorFx, clockHour: number | null = null): boolean {
   const p = PAINTED[scene];
   const im = images?.[p?.file ?? ''];
   if (!p || !im) return false;
@@ -52,6 +52,8 @@ export function drawHqField(c: CanvasRenderingContext2D, scene: string, camX: nu
     drawDoor(c, im, d, s.open, s.shake);
   }
   c.restore();
+  const k = keyAt(hourNow(clockHour));
+  if (!p.under && k.win[3] > 0.005) { c.save(); drawOutsideNight(c, scene, p, k, performance.now()); c.restore(); }
   return true;
 }
 
@@ -184,6 +186,8 @@ export function drawHqFieldObject(c: CanvasRenderingContext2D, scene: string, id
 
 /* ───────── 시간대 조명 ───────── */
 
+
+
 type Key = { h: number; tint: [number, number, number, number]; win: [number, number, number, number]; lamp: number };
 // tint = 곱하기 색과 세기, win = 창 바깥 덮는 색, lamp = 등 빛 세기
 const NIGHT: Key = { h: 0, tint: [40, 52, 110, 0.62], win: [10, 14, 40, 0.92], lamp: 1 };
@@ -221,6 +225,48 @@ function keyAt(h: number): Key {
   }
   return NIGHT;
 }
+/** 바깥 풍경(창·유리문 너머)의 밤: 배경을 그린 직후(사람보다 먼저) 곱해서 사람을 덮지 않는다 (사용자 2026-10-25) */
+function drawOutsideNight(c: CanvasRenderingContext2D, scene: string, p: PaintedScene, k: Key, now: number) {
+  if (!p.under && k.win[3] > 0.005) {
+    // 창 바깥: 한 번 더 곱해 하늘색을 바꾼다 (틀·건물 윤곽은 남는다)
+    const wm = (v: number) => Math.round(255 + (v - 255) * k.win[3]);
+    c.globalCompositeOperation = 'multiply';
+    c.fillStyle = `rgb(${wm(k.win[0])},${wm(k.win[1])},${wm(k.win[2])})`;
+    for (const [wx0, wy0, wx1, wy1] of p.windows) c.fillRect(wx0, wy0, wx1 - wx0, wy1 - wy0);
+    // 바깥 풍경: 실내를 덜 어둡게 한 만큼 더해서 곱한다 (하늘·나무·먼 건물이 밤빛으로)
+    const ow = Math.min(0.97, k.win[3] + k.tint[3] * 0.5);
+    const om = (v: number) => Math.round(255 + (v - 255) * ow);
+    c.fillStyle = `rgb(${om(k.win[0])},${om(k.win[1])},${om(k.win[2])})`;
+    (p.outside ?? []).forEach((poly, i) => {
+      const m = outsideMask(scene, i, poly);
+      if (!m) return;
+      // 하늘·먼 건물 픽셀만 (밝고 차가운 색) 골라 밤색을 곱한다: 사각 상자처럼 보이지 않게
+      const t = tinted(m, `rgb(${om(k.win[0])},${om(k.win[1])},${om(k.win[2])})`);
+      c.drawImage(t, m.x, m.y);
+    });
+    // 유리문 너머 사무실: 불은 켜져 있지만 복도보다 어둡게
+    const gm = (v: number) => Math.round(255 + (v - 255) * k.win[3] * 0.4);
+    c.fillStyle = `rgb(${gm(k.win[0])},${gm(k.win[1])},${gm(k.win[2])})`;
+    for (const d of Object.values(p.doors)) if (d.behind === 'see' && d.anim !== 'glow') c.fillRect(d.x0, d.y0, d.x1 - d.x0, d.y1 - d.y0);
+    c.globalCompositeOperation = 'source-over';
+    // 어두우면 바깥 건물 창에 불이 켜진다 (자리 고정, 몇 개는 천천히 깜빡)
+    const lit = Math.max(0, (k.win[3] - 0.5) / 0.4);
+    if (lit > 0) {
+      const boxes: [number, number, number, number][] = [...p.windows, ...(p.outside ?? []).map((q) => [Math.min(...q.map((v) => v[0])), Math.min(...q.map((v) => v[1])), Math.max(...q.map((v) => v[0])), Math.min(...q.map((v) => v[1])) + (Math.max(...q.map((v) => v[1])) - Math.min(...q.map((v) => v[1]))) * 0.55] as [number, number, number, number])]; // 바깥은 위쪽(먼 건물)에만
+      for (const [wx0, wy0, wx1, wy1] of boxes) {
+        for (let i = 0; i < (wx1 - wx0) / 9; i++) {
+          const r = Math.sin(i * 127.1 + wx0 * 3.7) * 43758.5453, f = r - Math.floor(r);
+          if (f > 0.42) continue;
+          const x = wx0 + Math.floor(f * 997) % (wx1 - wx0 - 4), y = wy0 + 8 + Math.floor(f * 7919) % Math.max(1, wy1 - wy0 - 16);
+          const on = f < 0.05 ? 0.5 + 0.5 * Math.sin(now / 1700 + i) : 1;
+          c.fillStyle = `rgba(255,${200 + Math.floor(f * 100)},120,${0.75 * lit * on})`;
+          c.fillRect(x, y, 3, 3);
+        }
+      }
+    }
+  }
+}
+
 /** 지금 시간대 이름 (시험 화면 표시용) */
 export const hqFieldTimeName = (clockHour: number | null) => TOD_NAME(hourNow(clockHour));
 
@@ -230,8 +276,9 @@ export function drawHqFieldLight(c: CanvasRenderingContext2D, scene: string, cam
   if (!p || !images) return;
   const k = keyAt(hourNow(clockHour));
   const x0 = camX - 40, W = 1280 + 80, H = 720;
+  // 실내는 조명이 있어 바깥보다 덜 어둡다 (사용자 2026-10-25): 실내는 약하게 곱하고, 바깥 풍경(outside)·유리문 너머만 세게
   // 지하는 바깥 빛이 없다: 밤에만 절전으로 조금 어둡게
-  const sc = p.under ? 0.35 : 1;
+  const sc = p.under ? 0.35 : 0.5;
   c.save();
   const a = k.tint[3] * sc;
   if (a > 0.005) {
@@ -240,28 +287,6 @@ export function drawHqFieldLight(c: CanvasRenderingContext2D, scene: string, cam
     c.fillStyle = `rgb(${mix(k.tint[0])},${mix(k.tint[1])},${mix(k.tint[2])})`;
     c.fillRect(x0, 0, W, H);
     c.globalCompositeOperation = 'source-over';
-    if (!p.under && k.win[3] > 0.005) {
-      // 창 바깥: 한 번 더 곱해 하늘색을 바꾼다 (틀·건물 윤곽은 남는다)
-      const wm = (v: number) => Math.round(255 + (v - 255) * k.win[3]);
-      c.globalCompositeOperation = 'multiply';
-      c.fillStyle = `rgb(${wm(k.win[0])},${wm(k.win[1])},${wm(k.win[2])})`;
-      for (const [wx0, wy0, wx1, wy1] of p.windows) c.fillRect(wx0, wy0, wx1 - wx0, wy1 - wy0);
-      c.globalCompositeOperation = 'source-over';
-      // 어두우면 바깥 건물 창에 불이 켜진다 (자리 고정, 몇 개는 천천히 깜빡)
-      const lit = Math.max(0, (k.win[3] - 0.5) / 0.4);
-      if (lit > 0) {
-        for (const [wx0, wy0, wx1, wy1] of p.windows) {
-          for (let i = 0; i < (wx1 - wx0) / 9; i++) {
-            const r = Math.sin(i * 127.1 + wx0 * 3.7) * 43758.5453, f = r - Math.floor(r);
-            if (f > 0.42) continue;
-            const x = wx0 + Math.floor(f * 997) % (wx1 - wx0 - 4), y = wy0 + 8 + Math.floor(f * 7919) % Math.max(1, wy1 - wy0 - 16);
-            const on = f < 0.05 ? 0.5 + 0.5 * Math.sin(now / 1700 + i) : 1;
-            c.fillStyle = `rgba(255,${200 + Math.floor(f * 100)},120,${0.75 * lit * on})`;
-            c.fillRect(x, y, 3, 3);
-          }
-        }
-      }
-    }
   }
   // 등 빛: 어두울수록 또렷하게 (낮에도 깜빡이는 등은 늘)
   c.globalCompositeOperation = 'lighter';
@@ -274,6 +299,63 @@ export function drawHqFieldLight(c: CanvasRenderingContext2D, scene: string, cam
     else glow(c, l.x, l.y, l.r ?? 34, 1, hexA(l.color ?? '#ffd27a', 0.5 * lampK));
   }
   c.restore();
+}
+
+/** 바깥 풍경 가림판: 다각형 안에서 밝고 차가운(하늘·건물·먼 나무) 픽셀만 불투명. 틀·실내 물건(어둡거나 따뜻한 색)은 거의 그대로 */
+const maskCache = new Map<string, { cv: HTMLCanvasElement; x: number; y: number } | null>();
+function outsideMask(scene: string, i: number, poly: [number, number][]) {
+  const key = `${scene}:${i}`;
+  if (maskCache.has(key)) return maskCache.get(key)!;
+  const p = PAINTED[scene], im = images?.[p?.file ?? ''];
+  if (!im) return null;
+  const x = Math.min(...poly.map((v) => v[0])), y = Math.min(...poly.map((v) => v[1]));
+  const w = Math.max(...poly.map((v) => v[0])) - x, h = Math.max(...poly.map((v) => v[1])) - y;
+  let out: { cv: HTMLCanvasElement; x: number; y: number } | null = null;
+  try {
+    const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+    const g = cv.getContext('2d')!;
+    g.beginPath(); poly.forEach(([px, py], j) => (j ? g.lineTo(px - x, py - y) : g.moveTo(px - x, py - y))); g.closePath(); g.clip();
+    g.drawImage(im, x, y, w, h, 0, 0, w, h);
+    const d = g.getImageData(0, 0, w, h), px = d.data;
+    const ramp = (v: number, a: number, b: number) => Math.max(0, Math.min(1, (v - a) / (b - a)));
+    const solid = p.outsideSolid;
+    for (let j = 0; j < px.length; j += 4) {
+      const r = px[j], gg = px[j + 1], b = px[j + 2], lum = 0.3 * r + 0.59 * gg + 0.11 * b;
+      let v: number;
+      if (solid) {
+        // 다각형 전체를 고르게. 앞에 놓인 화분(잎·화분 상자)만 뺀다
+        const X = x + ((j / 4) % w), Y = y + Math.floor(j / 4 / w);
+        const k = solid.keep.find(([a, bb, c, d]) => X >= a && X < c && Y >= bb && Y < d);
+        v = k && (k[4] === 'all' || (gg > b + 12 && gg >= r)) ? 0 : 1;
+      } else {
+        // 밝을수록, 따뜻하지 않을수록(빨강이 파랑보다 많이 크지 않을수록) 바깥으로 본다
+        v = ramp(lum, 70, 150) * (1 - ramp(r - b, 18, 45));
+      }
+      px[j] = px[j + 1] = px[j + 2] = 255; px[j + 3] = Math.round(255 * v * (px[j + 3] / 255));
+    }
+    g.putImageData(d, 0, 0);
+    out = { cv, x, y };
+  } catch { out = null; }
+  maskCache.set(key, out);
+  return out;
+}
+/** 가림판 모양대로 색칠한 판 (곱하기로 그린다). 색이 바뀔 때만 다시 */
+const tintCache = new WeakMap<HTMLCanvasElement, { col: string; cv: HTMLCanvasElement }>();
+function tinted(m: { cv: HTMLCanvasElement }, col: string): HTMLCanvasElement {
+  const hit = tintCache.get(m.cv);
+  if (hit && hit.col === col) return hit.cv;
+  const cv = hit?.cv ?? document.createElement('canvas');
+  cv.width = m.cv.width; cv.height = m.cv.height;
+  const g = cv.getContext('2d')!;
+  g.clearRect(0, 0, cv.width, cv.height);
+  // 흰 바탕(곱하면 그대로) 위에 가림판 모양으로 밤색
+  g.fillStyle = '#fff'; g.fillRect(0, 0, cv.width, cv.height);
+  const t = document.createElement('canvas'); t.width = cv.width; t.height = cv.height;
+  const tg = t.getContext('2d')!;
+  tg.drawImage(m.cv, 0, 0); tg.globalCompositeOperation = 'source-in'; tg.fillStyle = col; tg.fillRect(0, 0, t.width, t.height);
+  g.drawImage(t, 0, 0);
+  tintCache.set(m.cv, { col, cv });
+  return cv;
 }
 
 function glow(c: CanvasRenderingContext2D, x: number, y: number, r: number, sy: number, col: string) {

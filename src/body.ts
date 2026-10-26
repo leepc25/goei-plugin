@@ -23,7 +23,7 @@ import { prefetchFactions } from './ui/images';
 import { SEED_OPEN } from './core/seed';
 import { readManifest } from './core/start';
 import type { Chat, LoreEntry } from './core/types';
-import { cleanOutput, hasWorldTags, parseCatalog, processOutput } from './core/world';
+import { cleanOutput, hasWorldTags, parseCatalog, processOutput, readDirectory } from './core/world';
 import { basicSettings, missingBasicVars, worldSettings } from './core/settings';
 import { staleFactionVars } from './core/factions';
 import { supplementAssets } from './host/asset';
@@ -40,7 +40,7 @@ import { GHOST_ICON } from './ui/icons';
 import { landingHtml as renderLanding } from './ui/landing';
 import { loadPrefs } from './host/prefs';
 import { setWaiting } from './host/waiting';
-import { syncDecorators, computeLore, loreOptions, patchSlots, sameVars, trimRoster, type LoreMode } from './core/lore';
+import { syncDecorators, computeLore, hasUnlockTag, loreOptions, patchSlots, readUnlocked, sameVars, stripUnlockTags, trimRoster, unlockedValue, unlockTags, UNLOCK_VAR, type LoreMode } from './core/lore';
 import { advValue } from './core/advanced';
 import { userInfo } from './host/user';
 import { applyPlayer, hidePlayerTag, playerAgent, playerBlock } from './core/player';
@@ -269,8 +269,24 @@ function withCap<T extends Record<K, number>, K extends string>(box: T, key: K, 
 
 /** 혹시 저장 본문에 상황판 태그가 남아 있으면 요청에서만 지운다 (원본 editRequest와 같음) */
 function stripHistoryTags<M extends PromptMessage>(messages: M[]): M[] {
-  if (!messages.some((m) => m?.role === 'assistant' && typeof m.content === 'string' && hasWorldTags(m.content))) return messages;
-  return messages.map((m) => (m?.role === 'assistant' && typeof m.content === 'string' && hasWorldTags(m.content) ? { ...m, content: cleanOutput(m.content) } : m));
+  const dirty = (c: unknown): c is string => typeof c === 'string' && (hasWorldTags(c) || hasUnlockTag(c));
+  if (!messages.some((m) => m?.role === 'assistant' && dirty(m.content))) return messages;
+  return messages.map((m) => (m?.role === 'assistant' && dirty(m.content) ? { ...m, content: stripUnlockTags(hasWorldTags(m.content) ? cleanOutput(m.content) : m.content) } : m));
+}
+
+/** 부록 해금 표시 [🔓|부록 이름]: 이 채팅에 해금을 적고 본문에서 지운다 (core/lore.ts) */
+async function applyUnlocks(char: { globalLore?: LoreEntry[] }, charIndex: number, chatIndex: number, messageIndex: number): Promise<Chat | null> {
+  const lockable = new Set(readDirectory(char.globalLore).appendices.filter((r) => r.unlock).map((r) => r.lore));
+  return updateChat(charIndex, chatIndex, (cur) => {
+    const m = cur.message?.[messageIndex];
+    const text = typeof m?.data === 'string' ? m.data : '';
+    if (!m || !hasUnlockTag(text)) return null;
+    const got = unlockTags(text).filter((n) => lockable.has(n));
+    const message = [...(cur.message ?? [])];
+    message[messageIndex] = { ...m, data: stripUnlockTags(text) };
+    const ss = got.length ? { ...(cur.scriptstate ?? {}), [UNLOCK_VAR]: unlockedValue([...readUnlocked(cur.scriptstate), ...got]) } : cur.scriptstate;
+    return { ...cur, message, scriptstate: ss };
+  });
 }
 
 /** 모델 응답이 채팅에 들어간 뒤: 상황판 태그 반영 + 저장 본문 정리 + 다음 턴 브리핑 */
@@ -289,6 +305,7 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
         processOutput(cur, arg.messageIndex, raw, catalog, worldSettings(char.globalLore, cur.scriptstate), Math.random),
       );
     }
+    if (hasUnlockTag(raw)) latest = (await applyUnlocks(char, arg.characterIndex, arg.chatIndex, arg.messageIndex).catch(() => null)) ?? latest;
     let now = latest ?? ((await risuai.getChatFromIndex(arg.characterIndex, arg.chatIndex)) as Chat | null);
     if (!now || chatPhase(now) !== 'started') return;
     now.message ??= [];
@@ -432,6 +449,7 @@ function onDisplay(text: string): string {
   if (isLanding(text)) out = landingHtml();
   else {
     if (liteNow && hasWorldTags(out)) out = cleanOutput(out);
+    if (liteNow && hasUnlockTag(out)) out = stripUnlockTags(out);
     if (hasSceneCard(out)) out = renderSceneCards(out, sceneCardHtml);
     if (hasCall(out)) out = renderCalls(out, callCardHtml);
     if (out.includes(START_MARK)) out = renderStartCards(out, startCardHtml);

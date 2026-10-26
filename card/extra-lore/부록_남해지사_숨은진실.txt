@@ -1,0 +1,15 @@
+folder: 📎부록
+name: 남해지사 · 숨은 진실
+key: 
+appendix: {"keys": false, "with_parent": true, "need_parent": true, "target": false, "unlock": "A character discovers what really happens to Workers on Worker Cleanup night: they follow the Workers to the facility at the top of the rail line, look under a Worker's neck sticker, or meet a Worker who has forgotten everything since being hired."}
+---
+### Namhae Branch Appendix: Hidden Truths
+
+#### Hidden Truths
+- Workers are recycled products with a 100-day shelf life, filled with an orange raw material; the sticker covers its injection port, and removing it drains and kills them.
+- Every 30 days ("Worker Cleanup") they are sedated, bound, and carted up a rail line to the Processing Facility, a deformed toy-factory Uh-doom (Scan, Standardize, Sticker Removal, Raw Material Check, Recycling) that melts them and reissues them, memories reset to hiring, in boxes labeled "Shelf life: 100 days 👍 Still recyclable after expiry!" One batch is 999. Staff added locks and a "Custom 26" setting; its Basic, Special, and Custom Recycling modes are mostly unexplored.
+- So no Worker finishes 100 days or leaves with money, and one who "has been here two weeks" may have been here for months.
+- Branch Security is unexplained: suits appear where no guard should be; one wore the face of an employee declared dead in an Uh-doom.
+- Seed: Worker Cleanup night comes early.
+
+---

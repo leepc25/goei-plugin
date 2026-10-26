@@ -691,6 +691,9 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
   .dir-grid { grid-template-columns: 1fr; }
   .dir-grid.names { grid-template-columns: 1fr 1fr; }
   .dir-kinds .long { display: none; }
+  /* 탭 6개: 모바일은 세 개씩 두 줄 */
+  .dir-kinds { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2px; padding: 2px; }
+  .dir-kinds .gx-seg { min-height: 30px; font-size: 14px; border-radius: 8px; }
   .dir-line > span { min-width: 0; flex-basis: 100%; }
 }
 .dir-group.warn { color: var(--amber); }
@@ -2715,3 +2718,5 @@ button.mk-go:hover { color: var(--signal); }
   .pp-entry-btns { margin-left: 0; width: 100%; justify-content: flex-end; }
   .pp-diag-who { flex-basis: 100%; }
 }
+/* 「브라우저」: 진짜 전체화면이 막히면 리스 플러그인 창(브라우저 창 전체) 끝까지 */
+.gx-game.gx-winfull, .gx-fieldhost .gx-game.gx-winfull, .gx-panel .gx-game.gx-winfull { position: fixed; inset: 0; z-index: 9999; border-radius: 0; overflow: hidden; background: #000; }

@@ -1,8 +1,8 @@
-// goei-game 0.16.59
+// goei-game 0.16.61
 "use strict";
 (() => {
   // src/game/action/engine/view.ts
-  var view = { crop: 0, cropY: 0, zoom: 1, lane: [440, 690] };
+  var view = { crop: 0, cropY: 0, zoom: 1, lane: [440, 690], worldH: 720 };
   var FAR = 0.85;
   var persp = (y) => {
     const [a, b] = view.lane;
@@ -126,7 +126,7 @@
     if (!e) return false;
     const { im, m } = e;
     const f = frameOf(id, m, frame2, total);
-    const k = spr(y) * 1.15;
+    const k = spr(y) * 1.28;
     const flip = m.dir === "SW" ? dir > 0 : dir < 0;
     c.save();
     c.imageSmoothingEnabled = false;
@@ -153,7 +153,7 @@
     c.restore();
     return true;
   }
-  var testPlayerTop = () => -(252 - 14) * 1.15;
+  var testPlayerTop = () => -(252 - 14) * 1.28;
   var faces = /* @__PURE__ */ new Map();
   function testPlayerFace(side = 44, flip = false) {
     const e = art?.clips["31"] ?? art?.clips["1"];
@@ -197,7 +197,7 @@
       lane: [428, 669],
       call: [1800, 280],
       blocks: [[350, 440, 470, 70], [1158, 1230, 462, 70], [1250, 1498, 458, 46], [1900, 1980, 470, 70]],
-      floor: [[0, 478], [330, 452], [470, 452], [470, 428], [1150, 428], [1150, 446], [2010, 446], [2190, 510], [2223, 520], [2223, 669], [0, 669]],
+      floor: [[0, 512], [60, 506], [92, 490], [300, 460], [340, 454], [470, 452], [470, 428], [1150, 428], [1150, 446], [1917, 446], [2223, 518], [2223, 669], [0, 669]],
       doors: {
         // 비스듬한 유리벽이라 문짝을 움직이면 선이 안 맞는다: 바깥 빛만 번진다
         main: { x0: 91, x1: 307, y0: 38, y1: 457, seam: 198, anim: "glow", behind: "see" },
@@ -206,6 +206,10 @@
       },
       lamps: [...downs([861, 1095, 1356, 1671]), sign(2133, 67)],
       windows: [],
+      // 왼쪽 유리 현관·유리벽 너머
+      // 유리 아래 끝선을 따라 (문짝 유리 바닥선이 비스듬하다)
+      outside: [[[0, 0], [412, 0], [412, 405], [330, 420], [295, 420], [210, 437], [180, 442], [98, 460], [62, 470], [60, 488], [40, 490], [0, 492]]],
+      outsideSolid: { keep: [[0, 250, 90, 420, "green"], [0, 413, 44, 520, "all"], [325, 200, 445, 372, "green"], [352, 374, 432, 432, "all"]] },
       objects: [{ id: "desk", file: "desk", x: 494, y: 205, w: 644, h: 262, sortY: 463, solid: [{ x0: 494, x1: 1137, y0: 442, y1: 466, h: 140 }, { x0: 1096, x1: 1137, y0: 428, y1: 466, h: 140 }] }]
     },
     f2: {
@@ -214,7 +218,7 @@
       under: false,
       call: [1132, 284],
       blocks: [[196, 286, 476, 70], [1776, 1858, 476, 70]],
-      floor: [[0, 480], [92, 446], [1950, 446], [2064, 482], [2064, 669], [0, 669]],
+      floor: [[0, 504], [213, 446], [1829, 446], [2064, 515], [2064, 669], [0, 669]],
       doors: {
         wc: { x0: 30, x1: 118, y0: 112, y1: 470, anim: "swing", hinge: "R", quad: [[30, 112], [118, 128], [118, 446], [30, 470]] },
         swat: { x0: 335, x1: 770, y0: 90, y1: 432, seam: 554, anim: "swing2", behind: "see" },
@@ -225,6 +229,8 @@
       },
       lamps: [...downs([389, 710, 975, 1275, 1581]), sign(1986, 62)],
       windows: [],
+      // 진압팀 유리문 너머 사무실 창
+      outside: [[[350, 165], [762, 165], [762, 278], [350, 278]]],
       objects: []
     },
     f3: {
@@ -233,7 +239,7 @@
       under: false,
       call: [1051, 291],
       blocks: [[180, 266, 472, 70], [1648, 1726, 472, 70]],
-      floor: [[0, 478], [80, 446], [1832, 446], [1915, 478], [1915, 669], [0, 669]],
+      floor: [[0, 503], [235, 446], [1653, 446], [1915, 512], [1915, 669], [0, 669]],
       doors: {
         wc: { x0: 30, x1: 112, y0: 128, y1: 470, anim: "swing", hinge: "R", quad: [[30, 128], [112, 142], [112, 450], [30, 470]] },
         pantry: { x0: 315, x1: 470, y0: 118, y1: 425, anim: "swing", hinge: "R" },
@@ -244,6 +250,8 @@
       },
       lamps: [...downs([362, 656, 907, 1184, 1469]), sign(1842, 86)],
       windows: [],
+      // 종합대응팀 유리문 너머 사무실 창
+      outside: [[[1160, 183], [1575, 183], [1575, 282], [1160, 282]]],
       objects: []
     },
     b1: {
@@ -252,7 +260,7 @@
       under: true,
       call: [1065, 292],
       blocks: [[186, 272, 472, 70], [1670, 1750, 472, 70]],
-      floor: [[0, 478], [80, 446], [1852, 446], [1940, 478], [1940, 669], [0, 669]],
+      floor: [[0, 503], [235, 446], [1673, 446], [1940, 511], [1940, 669], [0, 669]],
       doors: {
         edu: { x0: 30, x1: 112, y0: 125, y1: 470, anim: "swing", hinge: "R", quad: [[30, 125], [112, 140], [112, 450], [30, 470]] },
         training: { x0: 345, x1: 692, y0: 132, y1: 432, seam: 518, anim: "swing2" },
@@ -270,7 +278,7 @@
       w: 2003,
       under: true,
       call: [1130, 287],
-      floor: [[0, 486], [100, 446], [1906, 446], [2003, 484], [2003, 669], [0, 669]],
+      floor: [[0, 499], [217, 446], [1748, 446], [2003, 507], [2003, 669], [0, 669]],
       doors: {
         interrogation: { x0: 33, x1: 119, y0: 119, y1: 465, anim: "swing", hinge: "R", quad: [[33, 119], [119, 135], [119, 444], [33, 465]] },
         isolation: { x0: 385, x1: 725, y0: 122, y1: 410, anim: "shutter" },
@@ -297,7 +305,7 @@
       under: true,
       lane: [458, 669],
       call: [1883, 413],
-      floor: [[0, 460], [995, 460], [995, 496], [1690, 496], [1906, 604], [1906, 669], [0, 669]],
+      floor: [[0, 460], [995, 460], [995, 496], [1654, 496], [1906, 622], [1906, 669], [0, 669]],
       doors: {
         supply: { x0: 1405, x1: 1597, y0: 190, y1: 470, anim: "swing", hinge: "L" },
         elev: { x0: 1724, x1: 1849, y0: 130, y1: 552, seam: 1784, anim: "slide2", behind: "car", quad: [[1724, 165], [1849, 130], [1849, 552], [1724, 510]] }
@@ -383,7 +391,7 @@
     };
   }
   var hasHqField = (scene) => !!images && !!PAINTED[scene];
-  function drawHqField(c, scene, camX, fx2) {
+  function drawHqField(c, scene, camX, fx2, clockHour = null) {
     const p = PAINTED[scene];
     const im = images?.[p?.file ?? ""];
     if (!p || !im) return false;
@@ -402,6 +410,12 @@
       drawDoor(c, im, d3, s2.open, s2.shake);
     }
     c.restore();
+    const k = keyAt(hourNow(clockHour));
+    if (!p.under && k.win[3] > 5e-3) {
+      c.save();
+      drawOutsideNight(c, scene, p, k, performance.now());
+      c.restore();
+    }
     return true;
   }
   function clipDoor(c, d3) {
@@ -581,12 +595,47 @@
     }
     return NIGHT;
   }
+  function drawOutsideNight(c, scene, p, k, now) {
+    if (!p.under && k.win[3] > 5e-3) {
+      const wm = (v) => Math.round(255 + (v - 255) * k.win[3]);
+      c.globalCompositeOperation = "multiply";
+      c.fillStyle = `rgb(${wm(k.win[0])},${wm(k.win[1])},${wm(k.win[2])})`;
+      for (const [wx0, wy0, wx1, wy1] of p.windows) c.fillRect(wx0, wy0, wx1 - wx0, wy1 - wy0);
+      const ow = Math.min(0.97, k.win[3] + k.tint[3] * 0.5);
+      const om = (v) => Math.round(255 + (v - 255) * ow);
+      c.fillStyle = `rgb(${om(k.win[0])},${om(k.win[1])},${om(k.win[2])})`;
+      (p.outside ?? []).forEach((poly2, i) => {
+        const m = outsideMask(scene, i, poly2);
+        if (!m) return;
+        const t = tinted(m, `rgb(${om(k.win[0])},${om(k.win[1])},${om(k.win[2])})`);
+        c.drawImage(t, m.x, m.y);
+      });
+      const gm = (v) => Math.round(255 + (v - 255) * k.win[3] * 0.4);
+      c.fillStyle = `rgb(${gm(k.win[0])},${gm(k.win[1])},${gm(k.win[2])})`;
+      for (const d3 of Object.values(p.doors)) if (d3.behind === "see" && d3.anim !== "glow") c.fillRect(d3.x0, d3.y0, d3.x1 - d3.x0, d3.y1 - d3.y0);
+      c.globalCompositeOperation = "source-over";
+      const lit2 = Math.max(0, (k.win[3] - 0.5) / 0.4);
+      if (lit2 > 0) {
+        const boxes = [...p.windows, ...(p.outside ?? []).map((q) => [Math.min(...q.map((v) => v[0])), Math.min(...q.map((v) => v[1])), Math.max(...q.map((v) => v[0])), Math.min(...q.map((v) => v[1])) + (Math.max(...q.map((v) => v[1])) - Math.min(...q.map((v) => v[1]))) * 0.55])];
+        for (const [wx0, wy0, wx1, wy1] of boxes) {
+          for (let i = 0; i < (wx1 - wx0) / 9; i++) {
+            const r = Math.sin(i * 127.1 + wx0 * 3.7) * 43758.5453, f = r - Math.floor(r);
+            if (f > 0.42) continue;
+            const x = wx0 + Math.floor(f * 997) % (wx1 - wx0 - 4), y = wy0 + 8 + Math.floor(f * 7919) % Math.max(1, wy1 - wy0 - 16);
+            const on = f < 0.05 ? 0.5 + 0.5 * Math.sin(now / 1700 + i) : 1;
+            c.fillStyle = `rgba(255,${200 + Math.floor(f * 100)},120,${0.75 * lit2 * on})`;
+            c.fillRect(x, y, 3, 3);
+          }
+        }
+      }
+    }
+  }
   function drawHqFieldLight(c, scene, camX, clockHour, now) {
     const p = PAINTED[scene];
     if (!p || !images) return;
     const k = keyAt(hourNow(clockHour));
     const x0 = camX - 40, W5 = 1280 + 80, H7 = 720;
-    const sc = p.under ? 0.35 : 1;
+    const sc = p.under ? 0.35 : 0.5;
     c.save();
     const a = k.tint[3] * sc;
     if (a > 5e-3) {
@@ -595,26 +644,6 @@
       c.fillStyle = `rgb(${mix3(k.tint[0])},${mix3(k.tint[1])},${mix3(k.tint[2])})`;
       c.fillRect(x0, 0, W5, H7);
       c.globalCompositeOperation = "source-over";
-      if (!p.under && k.win[3] > 5e-3) {
-        const wm = (v) => Math.round(255 + (v - 255) * k.win[3]);
-        c.globalCompositeOperation = "multiply";
-        c.fillStyle = `rgb(${wm(k.win[0])},${wm(k.win[1])},${wm(k.win[2])})`;
-        for (const [wx0, wy0, wx1, wy1] of p.windows) c.fillRect(wx0, wy0, wx1 - wx0, wy1 - wy0);
-        c.globalCompositeOperation = "source-over";
-        const lit2 = Math.max(0, (k.win[3] - 0.5) / 0.4);
-        if (lit2 > 0) {
-          for (const [wx0, wy0, wx1, wy1] of p.windows) {
-            for (let i = 0; i < (wx1 - wx0) / 9; i++) {
-              const r = Math.sin(i * 127.1 + wx0 * 3.7) * 43758.5453, f = r - Math.floor(r);
-              if (f > 0.42) continue;
-              const x = wx0 + Math.floor(f * 997) % (wx1 - wx0 - 4), y = wy0 + 8 + Math.floor(f * 7919) % Math.max(1, wy1 - wy0 - 16);
-              const on = f < 0.05 ? 0.5 + 0.5 * Math.sin(now / 1700 + i) : 1;
-              c.fillStyle = `rgba(255,${200 + Math.floor(f * 100)},120,${0.75 * lit2 * on})`;
-              c.fillRect(x, y, 3, 3);
-            }
-          }
-        }
-      }
     }
     c.globalCompositeOperation = "lighter";
     const lampK = Math.max(k.lamp * (p.under ? 0.5 : 1), 0);
@@ -629,6 +658,72 @@
       else glow(c, l.x, l.y, l.r ?? 34, 1, hexA(l.color ?? "#ffd27a", 0.5 * lampK));
     }
     c.restore();
+  }
+  var maskCache = /* @__PURE__ */ new Map();
+  function outsideMask(scene, i, poly2) {
+    const key2 = `${scene}:${i}`;
+    if (maskCache.has(key2)) return maskCache.get(key2);
+    const p = PAINTED[scene], im = images?.[p?.file ?? ""];
+    if (!im) return null;
+    const x = Math.min(...poly2.map((v) => v[0])), y = Math.min(...poly2.map((v) => v[1]));
+    const w = Math.max(...poly2.map((v) => v[0])) - x, h = Math.max(...poly2.map((v) => v[1])) - y;
+    let out = null;
+    try {
+      const cv = document.createElement("canvas");
+      cv.width = w;
+      cv.height = h;
+      const g2 = cv.getContext("2d");
+      g2.beginPath();
+      poly2.forEach(([px3, py], j) => j ? g2.lineTo(px3 - x, py - y) : g2.moveTo(px3 - x, py - y));
+      g2.closePath();
+      g2.clip();
+      g2.drawImage(im, x, y, w, h, 0, 0, w, h);
+      const d3 = g2.getImageData(0, 0, w, h), px = d3.data;
+      const ramp = (v, a, b) => Math.max(0, Math.min(1, (v - a) / (b - a)));
+      const solid = p.outsideSolid;
+      for (let j = 0; j < px.length; j += 4) {
+        const r = px[j], gg = px[j + 1], b = px[j + 2], lum = 0.3 * r + 0.59 * gg + 0.11 * b;
+        let v;
+        if (solid) {
+          const X = x + j / 4 % w, Y = y + Math.floor(j / 4 / w);
+          const k = solid.keep.find(([a, bb, c, d4]) => X >= a && X < c && Y >= bb && Y < d4);
+          v = k && (k[4] === "all" || gg > b + 12 && gg >= r) ? 0 : 1;
+        } else {
+          v = ramp(lum, 70, 150) * (1 - ramp(r - b, 18, 45));
+        }
+        px[j] = px[j + 1] = px[j + 2] = 255;
+        px[j + 3] = Math.round(255 * v * (px[j + 3] / 255));
+      }
+      g2.putImageData(d3, 0, 0);
+      out = { cv, x, y };
+    } catch {
+      out = null;
+    }
+    maskCache.set(key2, out);
+    return out;
+  }
+  var tintCache = /* @__PURE__ */ new WeakMap();
+  function tinted(m, col) {
+    const hit2 = tintCache.get(m.cv);
+    if (hit2 && hit2.col === col) return hit2.cv;
+    const cv = hit2?.cv ?? document.createElement("canvas");
+    cv.width = m.cv.width;
+    cv.height = m.cv.height;
+    const g2 = cv.getContext("2d");
+    g2.clearRect(0, 0, cv.width, cv.height);
+    g2.fillStyle = "#fff";
+    g2.fillRect(0, 0, cv.width, cv.height);
+    const t = document.createElement("canvas");
+    t.width = cv.width;
+    t.height = cv.height;
+    const tg = t.getContext("2d");
+    tg.drawImage(m.cv, 0, 0);
+    tg.globalCompositeOperation = "source-in";
+    tg.fillStyle = col;
+    tg.fillRect(0, 0, t.width, t.height);
+    g2.drawImage(t, 0, 0);
+    tintCache.set(m.cv, { col, cv });
+    return cv;
   }
   function glow(c, x, y, r, sy, col) {
     c.save();
@@ -3068,7 +3163,7 @@
             P.x += dx * sp * dt;
             P.y += dy * sp * 0.55 * dt;
             const id = running && !P.dying ? "5" : "4";
-            if (!P.clip || P.clip.id !== id) play(id, { fps: id === "5" ? 15 : P.dying ? 7 : 11, loopFrom: 0 });
+            if (!P.clip || P.clip.id !== id) play(id, { fps: id === "5" ? 15 : P.dying ? 7 : 11, loopFrom: id === "5" ? 1 : 0 });
             if (id === "5" && Math.random() < dt * 4) {
               if (!vfx("run_dust", P.x - P.face * 24, P.y, 2, { flip: P.face < 0 })) dust(P.x - P.face * 20, P.y, 1, 0.6);
             }
@@ -3788,7 +3883,7 @@
   }
 
   // src/game/action/eileen/player.ts
-  var CHAR_K = 1.15;
+  var CHAR_K = 1.28;
   var PRESS = [
     ["light", "light"],
     ["heavy", "heavy"],
@@ -4840,102 +4935,4 @@
     return "하루 쉬었다. 피로가 풀리고 부상 회복에 하루가 지났다. (출동 보상 없음)";
   }
   function appraise(s2) {
-    if (!s2.appraisal.length) return ["감정할 회수물이 없어요."];
-    const lines3 = [];
-    let sum = 0;
-    for (const b of s2.appraisal) {
-      if (!b) continue;
-      const r = b.research ?? 1;
-      sum += r;
-      lines3.push(`${b.name} → 연구 자료 ${r}`);
-    }
-    s2.currencies.research += sum;
-    s2.appraisal = [];
-    s2.flags.firstAppraisal = true;
-    lines3.push(`연구 자료 +${sum}`);
-    return lines3;
-  }
-  function researchOpen(s2) {
-    return RESEARCH.filter((r) => !s2.researchDone.includes(r.id) && (!r.requires || s2.researchDone.includes(r.requires)));
-  }
-  function doResearch(s2, id) {
-    const r = RESEARCH.find((x) => x.id === id);
-    if (!r || s2.researchDone.includes(id)) return "없는 연구예요.";
-    if (r.requires && !s2.researchDone.includes(r.requires)) return "앞 연구가 먼저예요.";
-    if (s2.currencies.research < r.research || s2.currencies.budget < r.budget) return `모자라요 (연구 자료 ${r.research} · 예산 ${r.budget}).`;
-    s2.currencies.research -= r.research;
-    s2.currencies.budget -= r.budget;
-    s2.researchDone.push(id);
-    if (r.gives.startsWith("relic:")) {
-      const rel = r.gives.slice(6);
-      if (!s2.relicsOwned.includes(rel)) s2.relicsOwned.push(rel);
-      return `연구 완료: ${r.name} → 유물 「${RELICS[rel].name}」 (${RELICS[rel].effect})`;
-    }
-    if (r.gives === "danger") return `연구 완료: ${r.name} → 부장실에서 위험 단계를 결재할 수 있어요.`;
-    return `연구 완료: ${r.name} → 보급품 목록 확장`;
-  }
-  var DANGER_COST = (lv) => 300 * lv;
-  function approveDanger(s2) {
-    if (!s2.researchDone.includes("rs_danger")) return "부장: 「기준도 없이 위험 단계를 올리자고?」 (연구실 연구 필요)";
-    if (s2.maxDanger >= 5) return "이미 최고 단계예요.";
-    const cost = DANGER_COST(s2.maxDanger + 1);
-    if (s2.currencies.budget < cost) return `예산이 모자라요 (${cost} 필요).`;
-    s2.currencies.budget -= cost;
-    s2.maxDanger++;
-    return `위험 단계 ${s2.maxDanger} 결재 완료 (예산 -${cost})`;
-  }
-  function setDanger(s2, lv) {
-    s2.danger = Math.max(0, Math.min(s2.maxDanger, lv));
-  }
-  var TOOTH_COST = 3;
-  function openToothBox(s2, rand3) {
-    if (s2.currencies.teeth < TOOTH_COST) return `이빨이 모자라요 (${TOOTH_COST}개 필요).`;
-    s2.currencies.teeth -= TOOTH_COST;
-    const r = rand3();
-    if (r < 0.12 && s2.lostRelics.length) {
-      const back = s2.lostRelics.shift();
-      s2.relicsOwned.push(back);
-      return `상자 안에서 빼앗겼던 유물이 나왔다: 「${RELICS[back].name}」`;
-    }
-    if (r < 0.3) {
-      const pool = supply.filter((d4) => supplyOpen(s2, d4));
-      const d3 = pool[Math.floor(rand3() * pool.length)];
-      s2.stash[d3.id] = (s2.stash[d3.id] ?? 0) + 1;
-      return `선물 상자: ${d3.name} 1개`;
-    }
-    const junk = DECOR[Math.floor(rand3() * DECOR.length)];
-    if (!s2.decor.includes(junk)) s2.decor.push(junk);
-    return `선물 상자: ${junk} (사무실에 놓았다)`;
-  }
-  function interview(s2, who) {
-    const sv = SURVIVORS[who];
-    if (!sv) return "";
-    if (!s2.interviewed.includes(who)) {
-      s2.interviewed.push(who);
-      if (sv.rule && !s2.rulebook.includes(sv.rule)) s2.rulebook.push(sv.rule);
-      return `${sv.name}: ${sv.clue} (규칙서 +1)`;
-    }
-    return `${sv.name}: ${sv.clue}`;
-  }
-  function variantFor(seed) {
-    return VARIANTS[seed % VARIANTS.length];
-  }
-  function launch(s2, missionId, seed) {
-    const m = MISSION_BY_ID[missionId];
-    if (!m) return "임무를 고르세요.";
-    if (m.requires && !s2.missionsDone.includes(m.requires)) return "앞 임무를 먼저 완료해야 해요.";
-    if (s2.failedRescues.includes(m.id)) return "마감이 지난 구조 요청이에요.";
-    if (!m.repeat && s2.missionsDone.includes(m.id)) return "이미 완료한 임무예요. 게시판에서 다음 임무를 골라 주세요.";
-    const can = canDeploy(s2, s2.selected);
-    if (!can.ok) return can.why;
-    if (s2.active) return "이미 출동 중이에요.";
-    const rec = s2.agents[s2.selected];
-    const level = masteryLevel(rec.xp);
-    const runId = `${s2.day}-${s2.runs + 1}-${seed.toString(36)}`;
-    const l = {
-      runId,
-      seed,
-      agent: s2.selected,
-      support: s2.support && s2.support !== s2.selected && s2.agents[s2.support].injured === 0 ? s2.support : null,
-      goal: { id: m.id, kind: m.kind, title: m.title, depth: m.depth, rules: m.rules, rescue: m.rescue, recover: m.recover },
-      stats: s
+    if (!s2.appraisal.length) return ["감정할 회수물이 없어요.

@@ -84,6 +84,34 @@ export interface BaseRow {
   show: boolean;
 }
 
+/** 부록이 켜지는 조건 (📎부록 폴더 항목마다. 명부에 저장) */
+export interface AppendixWhen {
+  /** 부록 자기 키가 걸리면 */
+  keys: boolean;
+  /** 본 항목이 켜지면 같이 */
+  withParent: boolean;
+  /** 본 항목이 꺼져 있으면 다른 조건이 맞아도 끈다 */
+  needParent: boolean;
+  /** 상태창 목표 칸이 본 항목이면 (그 괴이·특수 안에 있을 때) */
+  target: boolean;
+  /** 상태창 위치 칸에 이 말이 들어 있으면 (거점 이름 등) */
+  places: string[];
+  /** 이 요원이 동행·투입 중이면 */
+  agents: string[];
+  /** 해금 조건 (비우면 해금 없이). 해금 전에는 어떤 조건으로도 켜지 않는다 */
+  unlock: string;
+}
+
+/** 📎부록 폴더 항목 하나 */
+export interface AppendixRow extends AppendixWhen {
+  /** 로어북 이름. 명부의 열쇠 */
+  lore: string;
+  /** 본 항목 로어북 이름 (없으면 '') */
+  parent: string;
+  /** 이름 앞부분으로 짐작한 본 항목 (「남해지사 · 시설」 → 남해지사). 없으면 '' */
+  guess: string;
+}
+
 export interface Directory {
   anomalies: PlaceRow[];
   sites: PlaceRow[];
@@ -104,6 +132,8 @@ export interface Directory {
   phoneTabs: PhoneTabsData;
   /** 「A00-1」 같은 시작 조합 → 첫 턴에 실을 로어북 이름 */
   seeds: Record<string, string[]>;
+  /** 📎부록 폴더 항목 */
+  appendices: AppendixRow[];
 }
 
 export interface PhoneTabData {
@@ -154,6 +184,16 @@ export interface BaseData {
   y: number;
   show?: boolean;
 }
+export interface AppendixData {
+  parent?: string;
+  keys?: boolean;
+  with_parent?: boolean;
+  need_parent?: boolean;
+  target?: boolean;
+  places?: string[];
+  agents?: string[];
+  unlock?: string;
+}
 export interface DirectoryData {
   schema: number;
   refill?: number;
@@ -165,6 +205,7 @@ export interface DirectoryData {
   호칭?: Record<string, Record<string, string>>;
   '괴담톡 탭'?: PhoneTabsData;
   '시작 로어북'?: Record<string, string[]>;
+  부록?: Record<string, AppendixData>;
   /** 새 세력에 준 적 있는 코드 */
   codes_used?: string[];
 }
@@ -253,6 +294,76 @@ export function folderMembers(lore: LoreEntry[]): Record<'anomaly' | 'site' | 'a
   if (!keys.anomaly && !keys.site && !keys.agent) return null;
   const pick = (k?: string) => (k ? lore.filter((e) => !isFolder(e) && e.folder === k && s(e.comment)) : []);
   return { anomaly: pick(keys.anomaly), site: pick(keys.site), agent: pick(keys.agent) };
+}
+
+// ── 부록 ──
+// 📎부록 폴더: 긴 로어북의 세부를 따로 둔 항목. 본 항목은 이름 앞부분으로 찾고(「남해지사 · 시설」 → 남해지사), 명부에서 바꿀 수 있다.
+// 켜지는 자리(세력·특수·괴이·요원)는 본 항목 폴더를 따른다 (core/lore.ts). 괴이·특수·요원 목록에는 들어가지 않는다.
+
+const APPENDIX_WORD = '부록';
+/** 이름의 가운뎃점 (· ・ ㆍ •) */
+const DOT = /\s*[·・ㆍ•]\s*/;
+
+/** 📎부록 폴더의 키 (없으면 '') */
+export function appendixFolder(lore: LoreEntry[]): string {
+  const f = lore.find((e) => isFolder(e) && folderWord(s(e.comment)) === APPENDIX_WORD && typeof e.key === 'string');
+  return f ? (f.key as string) : '';
+}
+
+/** 📎부록 폴더 안 항목 (구분선 제외) */
+export function appendixMembers(lore: LoreEntry[]): LoreEntry[] {
+  const key = appendixFolder(lore);
+  return key ? lore.filter((e) => !isFolder(e) && e.folder === key && s(e.comment) && !SEPARATOR.test(s(e.comment))) : [];
+}
+
+/** 이름 앞부분이 다른 로어북 이름과 똑같으면 그 이름 */
+export function guessParent(name: string, names: Set<string>): string {
+  const m = DOT.exec(name);
+  if (!m || !m.index) return '';
+  const head = name.slice(0, m.index).trim();
+  return names.has(head) ? head : '';
+}
+
+export const APPENDIX_DEFAULT: AppendixWhen = { keys: true, withParent: false, needParent: false, target: true, places: [], agents: [], unlock: '' };
+
+function buildAppendices(lore: LoreEntry[], data: DirectoryData | null): AppendixRow[] {
+  const members = appendixMembers(lore);
+  if (!members.length) return [];
+  const mine = new Set(members);
+  const names = new Set(lore.filter((e) => !isFolder(e) && !mine.has(e)).map((e) => s(e.comment)).filter(Boolean));
+  const saved = obj(data?.부록);
+  const seen = new Set<string>();
+  const out: AppendixRow[] = [];
+  for (const e of members) {
+    const lore = s(e.comment);
+    if (seen.has(lore)) continue;
+    seen.add(lore);
+    const d = obj(saved[lore]);
+    const guess = guessParent(lore, names);
+    const flag = (v: unknown, def: boolean) => (typeof v === 'boolean' ? v : def);
+    const parent = typeof d.parent === 'string' ? s(d.parent) : guess;
+    out.push({
+      lore, guess, parent,
+      keys: flag(d.keys, APPENDIX_DEFAULT.keys),
+      withParent: flag(d.with_parent, APPENDIX_DEFAULT.withParent),
+      needParent: flag(d.need_parent, APPENDIX_DEFAULT.needParent),
+      target: flag(d.target, APPENDIX_DEFAULT.target),
+      places: Array.isArray(d.places) ? list(d.places) : [],
+      agents: Array.isArray(d.agents) ? list(d.agents) : [],
+      unlock: s(d.unlock),
+    });
+  }
+  return out;
+}
+
+/** 저장 형식 (본 항목이 짐작과 같으면 적지 않는다: 본 항목 이름을 바꿔도 따라가게) */
+export function appendixData(r: AppendixRow): AppendixData {
+  const d: AppendixData = { keys: r.keys, with_parent: r.withParent, need_parent: r.needParent, target: r.target };
+  if (r.parent !== r.guess) d.parent = r.parent;
+  if (r.places.length) d.places = r.places;
+  if (r.agents.length) d.agents = r.agents;
+  if (r.unlock) d.unlock = r.unlock;
+  return d;
 }
 
 function keysOf(e: LoreEntry | undefined): string[] {
@@ -699,6 +810,7 @@ export function readDirectory(lore: LoreEntry[] | undefined): Directory {
     display: displaySection(books),
     phoneTabs: phoneTabsSection(books),
     seeds: seedSection(books),
+    appendices: buildAppendices(books, data),
   };
   cache.set(books, dir);
   return dir;
@@ -741,6 +853,7 @@ export function directoryData(dir: Directory): DirectoryData {
   if (Object.keys(dir.display).length) out.호칭 = dir.display;
   if (dir.phoneTabs.tabs.length) out['괴담톡 탭'] = dir.phoneTabs;
   if (Object.keys(dir.seeds).length) out['시작 로어북'] = dir.seeds;
+  if (dir.appendices.length) out.부록 = Object.fromEntries(dir.appendices.map((r) => [r.lore, appendixData(r)]));
   for (const p of dir.anomalies) out.괴이![p.lore] = place(p);
   for (const p of dir.sites) out['미스틱 사이트']![p.lore] = place(p);
   for (const a of dir.agents) {
@@ -770,10 +883,10 @@ function cleanSpec(spec: FactionSpec): FactionSpec {
 
 const HELP =
   '괴이: ANOMALY 플러그인이 쓰는 명부입니다. 플러그인 창 「설정 → 카드 명부」에서 고치세요. ' +
-  '괴이는 🚧괴이, 미스틱 사이트는 🎁파밍, 요원은 🙂요원 폴더에 로어북을 넣으면 자동으로 들어옵니다. 요원의 소속은 창에서 조직을 골라 정합니다. 거점은 지도에 찍히는 장소이고 조직에 묶지 않아도 됩니다. 모델에게는 보내지 않습니다.';
+  '괴이는 🚧괴이, 미스틱 사이트는 🎁파밍, 요원은 🙂요원 폴더에 로어북을 넣으면 자동으로 들어옵니다. 요원의 소속은 창에서 조직을 골라 정합니다. 거점은 지도에 찍히는 장소이고 조직에 묶지 않아도 됩니다. 📎부록 폴더 항목은 「본 항목 이름 · 설명」으로 지으면 본 항목에 붙고, 켜지는 조건은 부록 탭에서 정합니다. 모델에게는 보내지 않습니다.';
 
 export function directoryContent(data: DirectoryData): string {
-  return JSON.stringify({ schema: data.schema, _help: HELP, refill: data.refill, 괴이: data.괴이, '미스틱 사이트': data['미스틱 사이트'], 요원: data.요원, 조직: data.조직, ...(data.거점 ? { 거점: data.거점 } : {}), ...(data.호칭 ? { 호칭: data.호칭 } : {}), ...(data['괴담톡 탭'] ? { '괴담톡 탭': data['괴담톡 탭'] } : {}), ...(data['시작 로어북'] ? { '시작 로어북': data['시작 로어북'] } : {}), ...(data.codes_used?.length ? { codes_used: data.codes_used } : {}) }, null, 1);
+  return JSON.stringify({ schema: data.schema, _help: HELP, refill: data.refill, 괴이: data.괴이, '미스틱 사이트': data['미스틱 사이트'], 요원: data.요원, 조직: data.조직, ...(data.거점 ? { 거점: data.거점 } : {}), ...(data.호칭 ? { 호칭: data.호칭 } : {}), ...(data['괴담톡 탭'] ? { '괴담톡 탭': data['괴담톡 탭'] } : {}), ...(data['시작 로어북'] ? { '시작 로어북': data['시작 로어북'] } : {}), ...(data.부록 && Object.keys(data.부록).length ? { 부록: data.부록 } : {}), ...(data.codes_used?.length ? { codes_used: data.codes_used } : {}) }, null, 1);
 }
 
 /** 로어북 목록에 명부를 넣거나 바꾼 새 목록 (원래 목록은 그대로). 설정 폴더가 있으면 그 안에 둔다 */

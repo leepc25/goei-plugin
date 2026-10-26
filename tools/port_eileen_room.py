@@ -139,6 +139,8 @@ sub("  if (m === 'down') { if (a === 'crawl') return belly();", "  if (m === 'do
 sub("  if (m === 'belly') { if (a === 'jump' || a === 'crawl') return getUp(); return; }", "  if (m === 'belly') { if (a === 'jump' || a === 'crawl' || a === 'up') return getUp(); return; }")
 sub("  if (m === 'sit' || m === 'scoot') { if (a === 'sit') reverseOut(", "  if (m === 'sit' || m === 'scoot') { if (a === 'sit' || a === 'up') reverseOut(")
 sub("  if (m === 'crouch' || m === 'crawl4') { if (a === 'crouch') {", "  if (m === 'crouch' || m === 'crawl4') { if (a === 'crouch' || a === 'up') {")
+# 뛰기(5번) 첫 장은 서 있는 자세라 반복마다 끼면 끊겨 보인다 (사용자 2026-10-25): 처음 한 번만 보이고 2번째 장부터 돈다
+sub("play(id, { fps: id === '5' ? 15 : P.dying ? 7 : 11, loopFrom: 0 });", "play(id, { fps: id === '5' ? 15 : P.dying ? 7 : 11, loopFrom: id === '5' ? 1 : 0 });")
 if 'D.' in re.sub(r"const D = (tg\[0\]|frontTarget\(60\)|targets\(\)[^\n]*)", '', code):
     for m in re.finditer(r'.{0,60}\bD\.[a-z]+.{0,40}', code):
         pass

@@ -1,4 +1,102 @@
-tatsFor(s2, s2.selected),
+"];
+    const lines3 = [];
+    let sum = 0;
+    for (const b of s2.appraisal) {
+      if (!b) continue;
+      const r = b.research ?? 1;
+      sum += r;
+      lines3.push(`${b.name} → 연구 자료 ${r}`);
+    }
+    s2.currencies.research += sum;
+    s2.appraisal = [];
+    s2.flags.firstAppraisal = true;
+    lines3.push(`연구 자료 +${sum}`);
+    return lines3;
+  }
+  function researchOpen(s2) {
+    return RESEARCH.filter((r) => !s2.researchDone.includes(r.id) && (!r.requires || s2.researchDone.includes(r.requires)));
+  }
+  function doResearch(s2, id) {
+    const r = RESEARCH.find((x) => x.id === id);
+    if (!r || s2.researchDone.includes(id)) return "없는 연구예요.";
+    if (r.requires && !s2.researchDone.includes(r.requires)) return "앞 연구가 먼저예요.";
+    if (s2.currencies.research < r.research || s2.currencies.budget < r.budget) return `모자라요 (연구 자료 ${r.research} · 예산 ${r.budget}).`;
+    s2.currencies.research -= r.research;
+    s2.currencies.budget -= r.budget;
+    s2.researchDone.push(id);
+    if (r.gives.startsWith("relic:")) {
+      const rel = r.gives.slice(6);
+      if (!s2.relicsOwned.includes(rel)) s2.relicsOwned.push(rel);
+      return `연구 완료: ${r.name} → 유물 「${RELICS[rel].name}」 (${RELICS[rel].effect})`;
+    }
+    if (r.gives === "danger") return `연구 완료: ${r.name} → 부장실에서 위험 단계를 결재할 수 있어요.`;
+    return `연구 완료: ${r.name} → 보급품 목록 확장`;
+  }
+  var DANGER_COST = (lv) => 300 * lv;
+  function approveDanger(s2) {
+    if (!s2.researchDone.includes("rs_danger")) return "부장: 「기준도 없이 위험 단계를 올리자고?」 (연구실 연구 필요)";
+    if (s2.maxDanger >= 5) return "이미 최고 단계예요.";
+    const cost = DANGER_COST(s2.maxDanger + 1);
+    if (s2.currencies.budget < cost) return `예산이 모자라요 (${cost} 필요).`;
+    s2.currencies.budget -= cost;
+    s2.maxDanger++;
+    return `위험 단계 ${s2.maxDanger} 결재 완료 (예산 -${cost})`;
+  }
+  function setDanger(s2, lv) {
+    s2.danger = Math.max(0, Math.min(s2.maxDanger, lv));
+  }
+  var TOOTH_COST = 3;
+  function openToothBox(s2, rand3) {
+    if (s2.currencies.teeth < TOOTH_COST) return `이빨이 모자라요 (${TOOTH_COST}개 필요).`;
+    s2.currencies.teeth -= TOOTH_COST;
+    const r = rand3();
+    if (r < 0.12 && s2.lostRelics.length) {
+      const back = s2.lostRelics.shift();
+      s2.relicsOwned.push(back);
+      return `상자 안에서 빼앗겼던 유물이 나왔다: 「${RELICS[back].name}」`;
+    }
+    if (r < 0.3) {
+      const pool = supply.filter((d4) => supplyOpen(s2, d4));
+      const d3 = pool[Math.floor(rand3() * pool.length)];
+      s2.stash[d3.id] = (s2.stash[d3.id] ?? 0) + 1;
+      return `선물 상자: ${d3.name} 1개`;
+    }
+    const junk = DECOR[Math.floor(rand3() * DECOR.length)];
+    if (!s2.decor.includes(junk)) s2.decor.push(junk);
+    return `선물 상자: ${junk} (사무실에 놓았다)`;
+  }
+  function interview(s2, who) {
+    const sv = SURVIVORS[who];
+    if (!sv) return "";
+    if (!s2.interviewed.includes(who)) {
+      s2.interviewed.push(who);
+      if (sv.rule && !s2.rulebook.includes(sv.rule)) s2.rulebook.push(sv.rule);
+      return `${sv.name}: ${sv.clue} (규칙서 +1)`;
+    }
+    return `${sv.name}: ${sv.clue}`;
+  }
+  function variantFor(seed) {
+    return VARIANTS[seed % VARIANTS.length];
+  }
+  function launch(s2, missionId, seed) {
+    const m = MISSION_BY_ID[missionId];
+    if (!m) return "임무를 고르세요.";
+    if (m.requires && !s2.missionsDone.includes(m.requires)) return "앞 임무를 먼저 완료해야 해요.";
+    if (s2.failedRescues.includes(m.id)) return "마감이 지난 구조 요청이에요.";
+    if (!m.repeat && s2.missionsDone.includes(m.id)) return "이미 완료한 임무예요. 게시판에서 다음 임무를 골라 주세요.";
+    const can = canDeploy(s2, s2.selected);
+    if (!can.ok) return can.why;
+    if (s2.active) return "이미 출동 중이에요.";
+    const rec = s2.agents[s2.selected];
+    const level = masteryLevel(rec.xp);
+    const runId = `${s2.day}-${s2.runs + 1}-${seed.toString(36)}`;
+    const l = {
+      runId,
+      seed,
+      agent: s2.selected,
+      support: s2.support && s2.support !== s2.selected && s2.agents[s2.support].injured === 0 ? s2.support : null,
+      goal: { id: m.id, kind: m.kind, title: m.title, depth: m.depth, rules: m.rules, rescue: m.rescue, recover: m.recover },
+      stats: statsFor(s2, s2.selected),
       mastery: level,
       moves: movesFor(level),
       items: s2.loadout.map((x) => x ? { ...x } : null),
@@ -1631,6 +1729,4 @@ tatsFor(s2, s2.selected),
   };
   var ITEM_IMG = {
     "medkit": "data:image/png;base64,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",
-    "bandage": "data:image/png;base64,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",
-    "antidote": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAD70lEQVR4nLWXX2gcRRzHP7Oze3dJ4eKfwysxZ2wTUv9QzYlomhioPjRNlBJ8V0QRH+xLFSr2QWjUIr4IwScRxRcfYyu2NYXWO+SSF7EpkZpIriW9eMmGSJoD7eX2ZseHTfYSm/Z2Q/zBwjC/2d/3OzPf+c1vBCEtErOoOkqbliTZfC8AdnGZqqMAhKvcUPFEmMGGNHiwNaE/6Ilt6R/KlbGLy6JSdoLHDEPAtOQdfUO5cphQ2yNQD9wuLv9/BAxpAOi7jVnThEbeeaW2TcBFaPnR+5B+wp/xUK68aemLbY/gvvEKaH1XohvNDEx1zVLdT/PpV98yUpghNfr9Jt/c2G/E9rRQDREvOAEhRGU0oy/3HQQgKx0Wx36hWKrQnJ9ivv8lACqjGTAMgRvsOIY6hpimls9348bjABilku+SP4+jeg+gfhqDajVw3MAaiMQs0BrR0c6xkyc4dvKETwTAebEP0dEOWrPzIjRNVO8BLYY/RjUnaz93pXEf3Yd7sAdeeA61sIgYOk6q9X6NGWx36xMwTVIP3ac7hz+E6TxPvXyYrHTISge3cRfsa8N4sqMWMJNj7t13iJgiEIn6eyUlYui4lkWbzKlPABgpzPDZF19DMuGNsZcwDnXT2baXK59/g1pYBEB/d66uGIOsk45FLTZm96x0MA511zimB1BNUSjcQvf3woUxpFJUDYOdIACAtafFb0/GDWS6HQDVFEWt9U+kGiD1OLGp6zjX5wLFDUygMpqBN48CsL+0YValW34zeu4842VBGQh6DkJnQoCrZy9SvjHvacBeQipVc0pZ00aAjBz8LojHGSnMAFBuaPQ0YC8BoKT0vsc6auAAor7GA61A5b8zubmCO53fDGYvwXQeI7UbtxL8NghVD2SldxZiUQuSCe/839PkOZMJSCa83BDCQhckI4UZf0XcK3/AzRUArNcGfDJGJLi0QolwIn8N2vZuCeKczoUJ5VvoFZhINfhtt3GX//kBW5Nb/bYzBNxZexP4ulmDPdsCD00AQK6s3iY0dXlmW+ChCMjdD9QFWU/PYSywCJWUMGsj0+1Ygz3e5bMRfGWV/SWXyXQ76vdrXueOZEKtiQgBf85jDfZwdFneBg74faopCheyHuEAFqweGOzX6/Xfs4e7WR3oZzJu+KCdBe9Cunr2IpXRDG48jlEqoS7lBBvviS2s7hZELIPKmR8Rb70KQFffEVBw5dSXuAuLGKUSi/kp5tLPYA2/h3tj3qsFTp+nHjgErIojMYtKRenUwwlSb79OV98RstLh10vjABj//O3lf3uJlh/OUJj9i4hlBHqkhirLIzELQK89xQFwNWD4UhIRUxDmdfwvUENuCN2pSysAAAAASUVORK5CYII=",
-    "salt": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAG9klEQVR4nLWXb2xT5xXGf9e+drixfWMS4T8lCQlpElCXZJ4SIKxK18AKy7JltGwrHROwrWhNte4P2zo0Dbp9KHxg+VAJVpZplIqxolZd06Gso92UZVuTkopAIhYycAoGinGV4Ti+viTXzrsPTi4JNkVttiNZsl+d9z3Pe87znvMY7mL+fPVuLvMyS7ZFxS6jKjmicXVAuBYWCJtsFTbZiqrk/M8BSHcAIPZ+/xE2tjxIXNO5nnDR//ab7G3/EwDReAJA0ieT8wYgZwlOfW0VAHFNx6nm0d33LuvXrmL92lUAdPedp3XXQdFa6pYOvBedF4A5JVDsMkVFRaJ1SwsAgyNjADTUlfPGW72mX0NdOSsX59N+eXxewTMAJKeEePbHW6iv8rGx5UGqluZBahKnmkduXgG/PvqmCere5UsAhCylPx8XQEYJZpvToYDVDqlJmj5TDcDxPxznak0ZoVgKkUqxvcTNwJSN3tAHIimyc+rDbM4Gm2wVT319HcvKS0iMjRKKjFPscbF46XLqq3xgtfPT3QcIxVIMnQuyIc/CwJSNcCQKwCVjSjKSqXkBYOXifPHlRxvNtf4zQUKxFMWqlU83rODwwZepthgADEzZTL9wJMolY8o8V7HJxPSJjwZgBoRskcRXGz9JoKbMXO/4+7+ZvHqFaoth3lpTFDR9gmqPysrGOupXrQCgp/ckRzv+QTSeuOtTzQAgS2CzycIwkpQssBGZ5ulmn2IGLg58gkCln+2PfRanQ6FnMMzVkaFbpQI6uwbYte/IXUFkAFCVHLHZpwCYAX0eNwDB8QlcCwv44/NP0d13noa6cpOo8diYeYbToRD8QKbjtVdpf+kv6EYS2SJlBZLRij2k63girDEQieHzuNNpj8T4xQ83U+h143QoNNSVpzdY7emgah6QblKdXQN4c8f5weNfpO/1vezbsRG3M1fYZOuHA5Cn83EirKEpCtUelWqLwYmwxsMPVNFQV06xajVv6XQokJq8dXM1j6Y1tTStqcXpUOjsGuAL336O/jNB1q2oQKRSGf3CBDCNTjzkcxDBwroVFSbhfB43O3d8jcGRMQr8HuKaPveUWSDisTF6Todoa3+dXfuOUOh1E4qlCNSUIVkzMyDP3FykUmJ7iXv6tjVcGLpEtSXd8Qr8HpwOhaqlcGO0JOOQ2cGf2P0iQ+eCaPoEvnvuAaBYtRKKjCNbJIzbM6DYZWw2Wcx0NE1RCNSUmbcHWFZ+56CQHlqkJs15cexQG48/uobxG6Nz/AwjCwkNIym2LXYC6WaybkUF/WeCANgXFwKYhJshn9Oh3DphmoRx
+    "bandage": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAGxUlEQVR4nO2We2xT5xnGf+f4wuw4dswCBucilCgml4GUEhzCIKRFXkFp10bq1CXlj0ZMqzIoUUGCwpiqFgZEGpVKmRBTN7QqotVERClUKk1Ds1CV5lJQG5EOR8loEjuE2zl2ju0S+5yzP0wMKTSh7aZp0p7/vnP0fc/zfOd53/PC//EdkePKxGw2AWA0GrBZLFSt8H7v84QHJZXCESbUhL7cW0plhZesTCeB6xJDQyMce/c0gKDEYv8+AVUrvPR81svX8Ql9xbIlLMhy88RjPny+RzAYjACoaoJQKMTV0TFe2Pl7Pum6IExMxH+YAJvFwoSa0M0GI0/9/FEaG+rxFBciCuK3HjI+HkaWZfY0vc7R4+99JxEpATaLJeX2pW3Ps2zZMlQ1QTQaJR6P43A4Us6nE/HrTdvp+az3gT/H3QL0zRvXs7AgD4BiTz5FixahayqCaCAckrBardOKuHnzBldHx1i59pfwgJkQAMxmk15XU83lQJCB/kF+Ny+Do+mzAXhp2/NULP8puqamNmm6RkRRSE+3T3kmCiLDw0M0v3Wcfa8dZmIiPmPIRQDzXa727dpB2obfUFnhpW78Jv07X2bPvlcRRMOdTYKI1Wrl5s0baLqWEqTpGmlpaawqLcHldJDjynzwG3ix8Tm2btmAwWBMkQ199U/O7m4C4Kt8Dzte3IyuqWi6

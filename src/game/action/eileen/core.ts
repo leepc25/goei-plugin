@@ -559,7 +559,7 @@ function update(dt) {
         const sp = (running ? 430 : 230) * (P.dying ? 0.6 : 1);
         P.x += dx * sp * dt; P.y += dy * sp * 0.55 * dt;
         const id = running && !P.dying ? '5' : '4';
-        if (!P.clip || P.clip.id !== id) play(id, { fps: id === '5' ? 15 : P.dying ? 7 : 11, loopFrom: 0 });
+        if (!P.clip || P.clip.id !== id) play(id, { fps: id === '5' ? 15 : P.dying ? 7 : 11, loopFrom: id === '5' ? 1 : 0 });
         if (id === '5' && Math.random() < dt * 4) { if (!vfx('run_dust', P.x - P.face * 24, P.y, 2, { flip: P.face < 0 })) dust(P.x - P.face * 20, P.y, 1, 0.6); }
         const sf = curF(); if (sf !== P.stepF && (sf === 1 || sf === 5)) sfx('step'); P.stepF = sf;
         P.idleT = 0;
