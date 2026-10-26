@@ -2042,7 +2042,7 @@ button.mk-go:hover { color: var(--signal); }
 /* 커스텀 접힘은 상황판보다 낮은 띠 (2026-10-20 사용자: 한 칸일 때 너무 컸다) */
 .gx-mx-art { position: relative; display: block; width: 100%; height: 68px; border: 0; padding: 0; background: #0d1214 center 42% / cover no-repeat; text-align: left; cursor: pointer; color: #fff; }
 .gx-mx.open .gx-mx-art { height: auto; aspect-ratio: 1 / 1; background-position: center; cursor: default; }
-.gx-mx-art::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(to top, rgba(6, 10, 12, .9) 0%, rgba(6, 10, 12, .4) 48%, rgba(6, 10, 12, 0) 75%); }
+.gx-mx-art::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(to top, rgba(6, 10, 12, .86) 0%, rgba(6, 10, 12, .34) 48%, rgba(6, 10, 12, 0) 75%); }
 .gx-mx.open .gx-mx-art::after { background: linear-gradient(to top, rgba(6, 10, 12, .95) 0%, rgba(6, 10, 12, .8) 40%, rgba(6, 10, 12, 0) 72%), linear-gradient(to bottom, rgba(6, 10, 12, .5), rgba(6, 10, 12, 0) 26%); }
 .gx-mx .gx-evart-top { justify-content: flex-start; }
 .gx-mx .gx-evart-cap { max-height: calc(100% - 50px); }
@@ -2058,7 +2058,7 @@ button.mk-go:hover { color: var(--signal); }
 }
 /* 커스텀 접힌 띠 (2026-10-20 사용자: 이름이 잘리고 그림이 날것이라 정신없다 → 너무 어두우니 오른쪽은 밝게).
    그림은 ::before에 채도·밝기를 낮춰 깔고, 왼쪽부터 짙은 그라데이션 위에 이름을 세로 가운데로. 마우스를 올리면 그림이 살아난다 */
-.gx-mx:not(.open) .gx-mx-art::before { content: ''; position: absolute; inset: 0; background: inherit; filter: saturate(.8) brightness(.95); transition: filter .2s ease, transform .3s ease; }
+.gx-mx:not(.open) .gx-mx-art::before { content: ''; position: absolute; inset: 0; background: inherit; filter: saturate(.85) brightness(1.03); transition: filter .2s ease, transform .3s ease; }
 .gx-mx:not(.open) .gx-mx-art::after { background: linear-gradient(90deg, rgba(10, 14, 16, .92) 0%, rgba(10, 14, 16, .7) 28%, rgba(10, 14, 16, .1) 62%, rgba(10, 14, 16, 0) 100%); }
 .gx-mx:not(.open) .gx-evart-cap { top: 50%; bottom: auto; right: 120px; transform: translateY(-50%); max-height: none; overflow: visible; }
 .gx-mx:not(.open) .gx-evart-top { top: 50%; left: auto; right: 12px; transform: translateY(-50%); }
@@ -2100,7 +2100,7 @@ button.mk-go:hover { color: var(--signal); }
 }
 /* 띠 다듬기 (2026-10-20 사용자): 세 줄을 세로 가운데로, 그림은 커스텀 띠처럼 채도를 낮춰 깔고 왼쪽부터 짙은 그라데이션 */
 .gx-evc.art:not(.open) .gx-evart { overflow: hidden; }
-.gx-evc.art:not(.open) .gx-evart::before { content: ''; position: absolute; inset: 0; background: inherit; filter: saturate(.8) brightness(.95); transition: filter .2s ease, transform .3s ease; }
+.gx-evc.art:not(.open) .gx-evart::before { content: ''; position: absolute; inset: 0; background: inherit; filter: saturate(.85) brightness(1.03); transition: filter .2s ease, transform .3s ease; }
 .gx-evc.art:not(.open) .gx-evart::after { background: linear-gradient(90deg, rgba(10, 14, 16, .92) 0%, rgba(10, 14, 16, .72) 34%, rgba(10, 14, 16, .12) 70%, rgba(10, 14, 16, 0) 100%); }
 .gx-evc.art:not(.open) .gx-evart-cap { top: 50%; bottom: auto; transform: translateY(-50%); }
 .gx-evc.art.go:hover .gx-evart, .gx-evc.art.wait.go:hover .gx-evart { filter: none; }
@@ -2194,10 +2194,10 @@ button.mk-go:hover { color: var(--signal); }
 /* ── 관제실 상황판 (2026-10-20 사용자 시안): 왼쪽 큰 보기(CCTV ↔ 위성 지도) + 오른쪽 상황 일지 ── */
 .gx-ops { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 12px; height: 440px; }
 .gx-opview { position: relative; min-height: 0; border-radius: 14px; overflow: hidden; border: 1px solid color-mix(in srgb, var(--text) 22%, transparent); background: #0d1310; color: #fff; }
-.gx-opview.feed > .gx-opfeed { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 40%; filter: saturate(.5) contrast(1.15) brightness(.85) sepia(.15); }
+.gx-opview.feed > .gx-opfeed { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 40%; filter: saturate(.5) contrast(1.12) brightness(.95) sepia(.15); }
 .gx-opview.feed > .gx-evart-ico { color: rgba(255, 255, 255, .5); }
-.gx-opview.feed::before { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: repeating-linear-gradient(0deg, rgba(0, 0, 0, .22) 0 1px, transparent 1px 3px), radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, .55) 100%); }
-.gx-opview.feed::after { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(to top, rgba(8, 12, 14, .95), rgba(8, 12, 14, .55) 45%, rgba(8, 12, 14, .05) 75%), linear-gradient(rgba(8, 12, 14, .5), transparent 24%); }
+.gx-opview.feed::before { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: repeating-linear-gradient(0deg, rgba(0, 0, 0, .22) 0 1px, transparent 1px 3px), radial-gradient(ellipse at center, transparent 58%, rgba(0, 0, 0, .42) 100%); }
+.gx-opview.feed::after { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(to top, rgba(8, 12, 14, .9), rgba(8, 12, 14, .45) 45%, rgba(8, 12, 14, .04) 75%), linear-gradient(rgba(8, 12, 14, .4), transparent 24%); }
 .gx-opview.feed.k-an::after { box-shadow: inset 0 0 40px rgba(255, 112, 96, .18); }
 .gx-opview.feed.k-in::after { box-shadow: inset 0 0 40px rgba(255, 190, 80, .16); }
 .gx-opview.feed.k-ms::after { box-shadow: inset 0 0 40px rgba(120, 190, 255, .16); }
