@@ -1,0 +1,246 @@
+<title>로어북 부록 설계안</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Sans+KR:wght@400;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* 격리 문서 열람기: 왼쪽 목차 레일 + 본문 한 단. 녹슨 갱도 같은 탁한 청록 중성색, 꿈결 황금 하나를 강조색으로 */
+:root{
+  --bg:#f3f4f1; --panel:#e6e9e4; --fg:#1d2422; --muted:#5d6a66; --line:#c8cfca;
+  --gold:#9a6b0c; --red:#a2302a;
+  --display:"Gowun Batang",'Nanum Myeongjo',serif;
+  --body:"IBM Plex Sans KR",'Apple SD Gothic Neo','Malgun Gothic',sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121615;--panel:#1b2120;--fg:#dfe4e0;--muted:#8e9a96;--line:#2e3735;--gold:#e0b04a;--red:#e07a6f;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#121615;--panel:#1b2120;--fg:#dfe4e0;--muted:#8e9a96;--line:#2e3735;--gold:#e0b04a;--red:#e07a6f;color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.75;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:230px minmax(0,1fr);gap:48px;padding-block:40px 80px}
+header.doc{grid-column:1/-1;border-bottom:1px solid var(--line);padding-bottom:24px;display:grid;gap:10px}
+.stamp{font-family:var(--mono);font-size:12px;letter-spacing:.12em;color:var(--red);text-transform:uppercase}
+h1{font-family:var(--display);font-size:clamp(28px,4.5vw,44px);line-height:1.2;margin:0;text-wrap:balance}
+.meta{color:var(--muted);font-size:13.5px;max-width:70ch}
+nav.toc{position:sticky;top:calc(env(safe-area-inset-top,0px) + 24px);align-self:start;font-size:13.5px;max-height:calc(100vh - 48px);overflow:auto}
+nav.toc .lab{font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--muted);margin-bottom:8px}
+nav.toc ul{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+nav.toc a{color:var(--fg);text-decoration:none;display:block;padding:3px 0 3px 10px;border-left:2px solid var(--line)}
+nav.toc a:hover,nav.toc a:focus-visible{border-left-color:var(--gold);color:var(--gold);outline:none}
+main{min-width:0;max-width:78ch}
+main h2{font-family:var(--display);font-size:26px;margin:56px 0 12px;padding-top:12px;border-top:1px solid var(--line);text-wrap:balance}
+main h2:first-child{margin-top:0}
+main h3{font-family:var(--display);font-size:19px;margin:32px 0 8px;color:var(--gold);text-wrap:balance}
+main p,main li{max-width:72ch}
+main ul,main ol{padding-left:1.3em}
+main li{margin:3px 0}
+blockquote{margin:0;padding:8px 14px;background:var(--panel);border-left:3px solid var(--gold)}
+code{font-family:var(--mono);font-size:.88em;background:var(--panel);padding:1px 5px;border-radius:3px;word-break:break-all}
+code.qc{color:var(--red)}
+strong{font-weight:600}
+hr{border:0;border-top:1px solid var(--line);margin:32px 0}
+.tw{overflow-x:auto;margin:14px 0;border:1px solid var(--line);border-radius:4px}
+table{border-collapse:collapse;width:100%;font-size:13.5px;line-height:1.6}
+th,td{text-align:left;vertical-align:top;padding:8px 12px;border-bottom:1px solid var(--line)}
+th{background:var(--panel);font-weight:600;white-space:nowrap}
+tr:last-child td{border-bottom:0}
+td:first-child{font-weight:600;min-width:7em}
+@media (max-width:820px){.wrap{grid-template-columns:minmax(0,1fr);gap:24px}nav.toc{position:static;max-height:none;border:1px solid var(--line);padding:12px}nav.toc ul{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}}
+</style>
+<div class="wrap">
+<header class="doc">
+  <div class="stamp">설계안 · 2026-10-26 · 코드 미반영</div>
+  <h1>로어북 부록 설계안</h1>
+  <p class="meta">길어진 로어북 항목을 본 항목과 부록으로 나누는 방법. 기능, 넣는 법, 코드 변경, 장단점, 정할 것.</p>
+</header>
+<nav class="toc" aria-label="목차"><div class="lab">목차</div><div class="toc">
+<ul>
+<li><a href="#s790405">1. 무엇인가</a></li>
+<li><a href="#s253889">2. 어떻게 넣나</a></li>
+<li><a href="#s493396">3. 어떻게 켜지나</a></li>
+<li><a href="#s887674">4. 코드로 바꿀 것</a></li>
+<li><a href="#s255656">5. 장점</a></li>
+<li><a href="#s209311">6. 단점·문제점</a></li>
+<li><a href="#s289954">7. 다른 방법과 비교</a></li>
+<li><a href="#s187858">8. 정할 것</a></li>
+</ul>
+</div>
+</nav>
+<main><h2 id="s790405">1. 무엇인가</h2>
+<ul>
+<li>길어진 로어북 항목 하나를 <strong>본 항목 + 부록</strong>으로 쪼개고, 부록에는 더 좁은 키를 거는 방식이다.</li>
+<li>본질은 로어북 항목이 하나 더 생기는 것뿐이다. 켜지는 방식은 지금과 같은 키워드 방식이다. 새 호출 방식을 만드는 게 아니다.</li>
+<li>목적은 <strong>토큰 절약</strong>이다. 늘 필요한 핵심은 본 항목에 두고, 장면이 깊이 들어갔을 때만 필요한 세부(시설 목록, 안내 방송, 상품 목록, 숨은 경로 등)는 부록으로 뺀다.</li>
+<li>쓰는 곳: 🌆세력, 🎁파밍, 🚧괴이, 🙂요원 어디든.</li>
+</ul>
+<h2 id="s253889">2. 어떻게 넣나</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>항목</th>
+<th>규칙</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>위치</td>
+<td>본 항목과 <strong>같은 폴더</strong>. 괴이 부록은 🚧괴이, 세력 부록은 🌆세력</td>
+</tr>
+<tr>
+<td>이름</td>
+<td><code>본 항목 이름 · 부록</code>. 여러 개면 <code>· 부록 2</code>, <code>· 부록 3</code></td>
+</tr>
+<tr>
+<td>키</td>
+<td>그 장면 안에서만 나오는 고유 명칭. 본 항목 키는 넣지 않음 (넣으면 늘 같이 켜져서 쪼갠 의미가 없음)</td>
+</tr>
+<tr>
+<td>순서(insertorder)</td>
+<td>본 항목 + 1. 같은 자리에서 본 항목 바로 뒤에 붙음</td>
+</tr>
+<tr>
+<td>첫 줄</td>
+<td>무엇의 부록인지 밝힘. 예: <code>### Namhae Branch Appendix: facilities and Worker system</code> (부록만 켜져도 뜻이 통하게)</td>
+</tr>
+</tbody>
+</table></div>
+<p>예: 남해지사</p>
+<ul>
+<li>본 항목 「남해지사」: 정체, 위치, 인원, 작업자 제도 요약, 관계 / 키 <code>Namhae Branch, 남해지사, 남해 지사, Baekilmong Namhae</code></li>
+<li>부록 「남해지사 · 부록」: 시설 목록, 안내 방송, 숨은 진실, 등록 괴이 목록, 사건 씨앗 / 키 <code>휴무 구역, 남해술집, 특별 재배치, 야간 특별작업, 근로실험, 작업자 정리, 작업자 스티커, 광차, Worker Grade</code></li>
+</ul>
+<h2 id="s493396">3. 어떻게 켜지나</h2>
+<ol>
+<li>대화에 본 항목 키(남해지사)가 나오면 본 항목이 켜진다.</li>
+<li>모델이 본 항목을 보고 고유 명칭(휴무 구역, Z999 등)을 쓰기 시작한다.</li>
+<li>그 말이 최근 메시지에 나오면 부록 키에 걸려 부록도 켜진다.</li>
+<li>일반 장면에선 고유 명칭이 안 나오니 부록도 꺼져 있다.</li>
+</ol>
+<ul>
+<li>플러그인이 고르는 방식(기본)과 Risu가 직접 고르는 방식 둘 다 그대로 동작한다. 부록도 같은 폴더라 <code>@@dont_activate</code> 줄과 예산 관리가 저절로 붙는다.</li>
+</ul>
+<h2 id="s887674">4. 코드로 바꿀 것</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>할 일</th>
+<th>파일</th>
+<th>이유</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>명부가 <code>· 부록</code> 항목을 괴이·특수·요원으로 따로 세지 않기</td>
+<td><code>src/core/world/directory.ts</code></td>
+<td>지금은 🚧괴이·🎁파밍·🙂요원 폴더 항목을 모두 명부에 새 줄로 넣고, 괴이·특수는 무작위 발생 후보로 켠다. 안 막으면 "빛이 없으라 · 부록"이 독립 괴이로 생성됨</td>
+</tr>
+<tr>
+<td>명부 화면에서 본 항목 줄 아래에 부록을 접힌 하위 줄로 표시</td>
+<td><code>src/ui/directory.ts</code></td>
+<td>관리용. 부록 키·분량을 보고, 본 항목이 없는 부록엔 경고</td>
+</tr>
+<tr>
+<td>(선택) 현장 대상이면 부록도 같이 켜기</td>
+<td><code>src/core/lore.ts</code> pickLore</td>
+<td>지금은 상태줄의 현장 대상(탐사 중인 괴이)이 본 항목에만 점수 100을 준다. 괴이 안에 들어가 있는 동안엔 부록도 필요할 가능성이 높음</td>
+</tr>
+<tr>
+<td>이름 비교 때 가운뎃점 변형(· ・ ㆍ) 통일</td>
+<td>위 두 곳</td>
+<td>사람이 직접 입력할 때 다른 점을 쓸 수 있음</td>
+</tr>
+<tr>
+<td>테스트</td>
+<td><code>tests/</code></td>
+<td>명부 제외, 하위 표시, (선택) 현장 대상</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li>🌆세력 폴더는 명부가 보지 않으므로 <strong>세력 부록은 코드 수정 없이도 지금 바로 쓸 수 있다.</strong> 코드가 필요한 건 괴이·파밍·요원 부록부터.</li>
+</ul>
+<h2 id="s255656">5. 장점</h2>
+<ul>
+<li>핵심 정보는 늘 들어가고, 세부는 필요할 때만 들어가서 토큰이 준다.</li>
+<li>정보를 버리지 않고도 기존 항목 분량 기준을 맞출 수 있다.</li>
+<li>새 폴더·새 호출 방식이 없어서 코드 변경이 작다. 켜는 쪽(lore.ts)은 거의 손댈 게 없다.</li>
+<li>슬롯 자리가 폴더로 저절로 정해진다.</li>
+<li>카드 제작자는 로어북에 항목 하나를 더 만들고 이름만 규칙대로 지으면 된다.</li>
+</ul>
+<h2 id="s209311">6. 단점·문제점</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>문제</th>
+<th>영향</th>
+<th>대응</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>모델이 고유 명칭을 안 쓰면 부록이 안 켜짐</td>
+<td>세부 정보가 빠진 채 진행</td>
+<td>RP로 돌려 보고 키를 늘림. (선택) 현장 대상이면 같이 켜기</td>
+</tr>
+<tr>
+<td>부록만 켜지고 본 항목은 안 켜질 수 있음</td>
+<td>드묾. 문맥이 조금 빔</td>
+<td>부록 첫 줄에 무엇의 부록인지 밝힘</td>
+</tr>
+<tr>
+<td>예산이 빠듯하면 점수 낮은 쪽이 잘림</td>
+<td>본 항목이 잘리고 부록만 남을 수도 있음</td>
+<td>드묾. 필요하면 정렬 때 본 항목 우선 규칙 추가</td>
+</tr>
+<tr>
+<td>내용이 두 곳에 나뉨</td>
+<td>고칠 때 둘 다 봐야 함</td>
+<td>명부 하위 줄로 같이 보이게 함</td>
+</tr>
+<tr>
+<td>옛 플러그인 + 새 카드</td>
+<td>옛 플러그인은 괴이·파밍 부록을 독립 괴이로 등록</td>
+<td>괴이·파밍 부록이 든 카드를 낼 때 <code>goei.minPlugin</code>을 그 판으로 올림</td>
+</tr>
+<tr>
+<td>위키 기본 문서·사진</td>
+<td>부록은 위키 문서·사진이 없음</td>
+<td>명부에서 제외되므로 상관없음</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s289954">7. 다른 방법과 비교</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>방법</th>
+<th>내용</th>
+<th>판단</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>그대로 둠</td>
+<td>한 항목에 다 넣음</td>
+<td>정보는 다 있지만 켜질 때마다 전부 들어감</td>
+</tr>
+<tr>
+<td>정보를 덜어 냄</td>
+<td>항목을 줄임</td>
+<td>정보 손실. 사용자 거절</td>
+</tr>
+<tr>
+<td>별도 📎부록 폴더 + 부록 탭</td>
+<td>부록을 한 폴더에 모음</td>
+<td>플러그인이 모르는 폴더라 슬롯 이어받기 코드가 따로 필요. 하위 방식보다 큼</td>
+</tr>
+<tr>
+<td><strong>같은 폴더 + 이름 규칙 + 명부 하위 표시</strong></td>
+<td>이 설계안</td>
+<td>코드가 가장 작고 모든 폴더에 쓸 수 있음. <strong>추천</strong></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s187858">8. 정할 것</h2>
+<ol>
+<li>이 방식(같은 폴더 + 하위 표시)으로 갈지</li>
+<li>현장 대상이면 부록도 같이 켜는 규칙을 넣을지</li>
+<li>첫 적용 대상: 남해지사(코드 없이 가능)부터 할지, 코드 작업과 같이 할지</li>
+</ol></main>
+</div>
