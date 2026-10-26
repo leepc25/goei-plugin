@@ -360,6 +360,12 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
     if (!norm(messageText(str(list[idx].data))).includes(q)) return '인용이 원문에 없음';
     return { anchor: messageKey(list[idx], idx), index: idx };
   };
+  /** 인용 없이 기준 메시지만 (문서용) */
+  const evidenceLoose = (m: unknown): { anchor: string; index: number } | string => {
+    const idx = input.tags.get(str(m));
+    if (idx === undefined || !input.confirmed.has(idx)) return '확정 구간 밖 메시지';
+    return { anchor: messageKey(list[idx], idx), index: idx };
+  };
   const nameOf = (who: string): string | null => resolveName(who, store, input.names);
   const minorCheck = (who: string, text: string) => !!store.people[who]?.minor && SEXUAL.test(text);
 
@@ -589,7 +595,8 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
       continue;
     }
     const key = plain(d.key, 40);
-    const ev = evidence(d.m, d.quote);
+    // 문서는 구간 전체를 요약한 것이라 인용이 없어도 받는다 (기준 메시지만 확정 구간이면). 인용이 있으면 원문에 있어야
+    const ev = norm(str(d?.quote)).length >= 3 ? evidence(d.m, d.quote) : evidenceLoose(d?.m);
     if (!key || typeof ev === 'string') {
       drop('doc', d, typeof ev === 'string' ? ev : '이름 없음');
       continue;
@@ -620,7 +627,7 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
     }
     const seq = nextSeq(ev.anchor);
     const body = d.op === 'remove' ? `(해소) ${cur.find((x) => x.id === replaces)!.text}`.slice(0, 200) : text;
-    if (putDoc(store, type, key, { id: entryId(`${type}:${key}`, 'doc', ev.anchor, seq, body), text: body, src: 'story', anchor: ev.anchor, seq, quote: d.quote, ...(replaces ? { replaces } : {}), ...(d.date ? { date: plain(d.date, 20) } : {}), ...(d.place ? { place: plain(d.place, 40) } : {}), ...(Array.isArray(d.who) ? { who: d.who.map((w) => plain(w, 30)).filter(Boolean).slice(0, 8) } : {}) })) report.applied.docs++;
+    if (putDoc(store, type, key, { id: entryId(`${type}:${key}`, 'doc', ev.anchor, seq, body), text: body, src: 'story', anchor: ev.anchor, seq, ...(norm(str(d.quote)).length >= 3 ? { quote: d.quote } : {}), ...(replaces ? { replaces } : {}), ...(d.date ? { date: plain(d.date, 20) } : {}), ...(d.place ? { place: plain(d.place, 40) } : {}), ...(Array.isArray(d.who) ? { who: d.who.map((w) => plain(w, 30)).filter(Boolean).slice(0, 8) } : {}) })) report.applied.docs++;
   }
 
   // 6. 의심 (인물의 suspicion 칸, 대상·종류 있음)

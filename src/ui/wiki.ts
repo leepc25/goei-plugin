@@ -520,9 +520,10 @@ function homeView(ctx: ChatContext): string {
       <div class="nw-hero-q"><input class="gx-search" type="search" name="wiki-home-q" data-input="wiki-home-query" data-enter="wiki-search" placeholder="이름·제목 검색" value="${esc(wiki.homeQuery)}" aria-label="위키 검색" autocomplete="off"></div>
       <div class="nw-hero-res">${wikiHomeResults(ctx)}</div>
     </section>
+    ${sec('이 채팅의 기록', 0, `<div class="nw-tiles">${peopleHomeTile(ctx)}</div><p class="nw-hnone">요원이든 아니든 이 채팅에 등장해 기록된 사람은 모두 여기에 있어요. 사원증의 「기록」도 같은 곳이에요.</p>`)}
     ${liveCards ? sec('지금 얽힌 문서', 0, `<div class="nw-cards">${liveCards}</div>`) : ''}
     ${sec('이번 이야기에서 쓴 문서', story.length, story.length ? `<div class="nw-cards">${storyCards}</div>${story.length > 8 ? `<button class="gx-mini nw-more-btn" data-action="wiki-browse" data-value="story">${story.length}개 모두 보기</button>` : ''}` : '<p class="nw-hnone">아직 이번 이야기에서 쓴 문서가 없어요.</p>')}
-    ${sec('분류', 0, `<div class="nw-tiles">${peopleHomeTile(ctx)}${tiles}</div>`)}
+    ${sec('분류', 0, `<div class="nw-tiles">${tiles}</div>`)}
   </div>`;
 }
 

@@ -29,10 +29,14 @@ export function hasImgTag(text: string): boolean {
  *  나중에 「페르소나이름_표정」 에셋을 넣으면 그것이 먼저다 */
 const SELF = '{{source::user}}';
 
+/** 카드 표정 세트 (assets/portraits). 에셋 목록을 아직 못 읽었을 때 이 밖의 표정은 _default 로 (빈 칸이 뜨지 않게) */
+export const EMOTIONS = new Set('default angry annoyed bored confused contemptuous crying curious dumbfounded embarrassed excited exhausted happy laughing lovestruck lustful nervous proud sad scared serious shy smile smirk smug surprised thinking'.split(' '));
+
 const tagName = (who: string, expr: string, pick?: (name: string) => string | null, self?: string) => {
-  const want = `${who.trim()}_${expr.trim()}`;
-  const found = pick ? pick(want) ?? pick(`${who.trim()}_default`) : want;
-  return found ?? (self && who.trim() === self.trim() ? SELF : null);
+  const name = who.trim();
+  const want = `${name}_${expr.trim()}`;
+  const found = pick ? pick(want) ?? pick(`${name}_default`) : EMOTIONS.has(expr.trim().toLowerCase()) ? want : `${name}_default`;
+  return found ?? (self && name === self.trim() ? SELF : null);
 };
 
 /** 태그가 모두 에셋에 있는 이름인지 (괴이봇 판정 전에도 그려도 되는지. 다른 봇의 같은 꼴 태그는 건드리지 않게) */

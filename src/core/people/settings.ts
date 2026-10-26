@@ -24,7 +24,7 @@ export const PP_DEFAULTS: Record<string, string> = {
   docs_event: '1', docs_location: '1', docs_faction: '1', docs_item: '1', npc_emotion: '1',
   /** auto / confirm */
   newpeople: 'auto',
-  twoturn: '1',
+  twoturn: '0',
   prev_pairs: '1',
   per_cap: '2000',
   span_cap: '20000',

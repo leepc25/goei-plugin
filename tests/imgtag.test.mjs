@@ -16,9 +16,11 @@ test('imgtag: picks the expression, falls back to _default, drops unknown charac
   assert.ok(out.includes('</div>{{/when}}'));
 });
 
-test('imgtag: without an asset list the tag name is trusted; unsafe names are dropped', () => {
-  assert.ok(renderImgTags('<img=Eileen_cry>').includes('{{raw::Eileen_cry}}'));
-  assert.ok(!renderImgTags("<img=a_b}}{{x>").includes('{{raw'));
+test('imgtag: without an asset list the tag name is trusted when the expression is in the set; others fall back to _default; unsafe names are dropped', () => {
+  assert.ok(renderImgTags('<img=Eileen_sad>').includes('{{raw::Eileen_sad}}'));
+  assert.ok(renderImgTags('<img=Eileen_cry>').includes('{{raw::Eileen_default}}'), '세트 밖 표정은 default (빈 칸 방지)');
+  assert.ok(renderImgTags('<img=Spangdal_seductive smile>').includes('{{raw::Spangdal_default}}'));
+  assert.ok(!renderImgTags("<img=a_b}}{{x>").includes('{{x'), '위험한 글자는 들어가지 않음 (세트 밖이라 default 로)');
 });
 
 test('imgtag: css follows size %, fold % and hidden', () => {

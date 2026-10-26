@@ -39,7 +39,8 @@ export function resetSettings(): void {
 
 import { updateGroup } from './update';
 import { handleVisitSettings, visitSettings, visitUi } from './visitset';
-import { defaultsButtons, defaultsConfirm } from './defaults';
+import { defaultsButtons, defaultsConfirm, MAIN_PREFIXES } from './defaults';
+import { PP, ppValue } from '../core/people/settings';
 import { phoneSettingsPane } from './phone';
 import { gnetSettingsPane } from './gnet';
 import { wikiSettingsPane } from './wiki';
@@ -167,14 +168,16 @@ function scopeBar(scope: SettingsScope, canChat: boolean): string {
 
 const BACK = `<button class="ph-tool ph-back" data-action="set-feat-back" aria-label="설정으로">${ICONS.back}</button>`;
 /** 기능별 설정을 설정창 안에서 (각 기능의 설정 화면을 그대로 쓰고, 뒤로가기만 설정으로) */
-function featurePage(ctx: ChatContext, page: NonNullable<typeof settingsUi.page>): string {
+function featurePage(ctx: ChatContext, page: NonNullable<typeof settingsUi.page>, canChat: boolean): string {
   let pane = '';
   if (page === 'visit') pane = `<header class="ph-room-head">${BACK}<div class="ph-room-title"><b>필드 설정</b></div><span class="ph-act">${defaultsButtons('visit')}</span></header>${defaultsConfirm('visit')}${visitUi.notice ? `<div class="gx-err" role="status">${esc(visitUi.notice)}</div>` : ''}${visitSettings(ctx, ctx.chat.scriptstate)}`;
   else {
-    const raw = page === 'phone' ? phoneSettingsPane(ctx) : page === 'gnet' ? gnetSettingsPane(ctx) : page === 'people' ? peopleSettingsPane(ctx) : wikiSettingsPane(ctx);
+    const raw = page === 'phone' ? phoneSettingsPane(ctx) : page === 'gnet' ? gnetSettingsPane(ctx) : page === 'people' ? peopleSettingsPane(ctx, canChat) : wikiSettingsPane(ctx);
     // 첫 머리의 뒤로 단추를 설정으로 돌아가는 단추로 (없으면 넣는다)
     pane = raw.replace(/<header class="ph-room-head[^"]*">(\s*<button class="ph-tool ph-back"[^>]*>[\s\S]*?<\/button>)?/, `<header class="ph-room-head">${BACK}`);
   }
+  // 시작 전(시작 패널): 설정 값은 이 채팅에 바로 적히고, 갱신·열기 같은 동작은 시작 뒤에 된다
+  if (!canChat) pane = pane.replace(/<\/header>/, '</header><p class="gx-hint st-prehint">채팅을 시작하기 전이에요. 여기서 바꾼 값은 이 채팅에 그대로 적용되고, 갱신·열기 같은 동작은 시작한 뒤에 할 수 있어요.</p>');
   return `<main class="gx-body gx-settings st-featpage">${pane}</main>`;
 }
 
@@ -184,8 +187,11 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
     return `<main class="gx-body gx-settings">${scopeBar(scope, canChat)}${directoryView(ctx)}${toast('dir', directoryDone(), directoryDoneClear)}</main>${drawerBox(directorySearch(), 'gx-dirdrawer')}`;
   }
   // 기능별 설정 → 본부 대화: 괴담톡·괴담넷·위키처럼 따로 된 화면 (2026-10-23 사용자)
-  if (settingsUi.page && scope === 'chat' && canChat) return featurePage(ctx, settingsUi.page);
+  // 시작 전(시작 패널의 「새 채팅 기본 설정」)에도 chat 객체·scriptstate 가 있어 같은 페이지를 연다 (2026-10-26 사용자)
+  if (settingsUi.page) return featurePage(ctx, settingsUi.page, canChat);
   const { basic: s, world, theme } = current(ctx, scope);
+  // 인물 기록 켬/끔: 채팅은 $pp_on, 새 채팅 기본값은 플러그인 저장소의 같은 변수
+  const peopleOn = ppValue(scope === 'chat' ? ctx.chat.scriptstate : getPrefs().vars, 'on') === '1';
   const on = scope === 'chat' ? worldOn(ctx.chat) : s.anomalyOn;
   const busy = settingsUi.busy;
   const anomaly = settingsUi.confirmOff && scope === 'chat'
@@ -197,9 +203,9 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
   return `<main class="gx-body gx-settings">
     ${scopeBar(scope, canChat)}
     ${settingsUi.notice ? `<div class="gx-err" role="alert">${esc(settingsUi.notice)}</div>` : ''}
-    ${scope === 'chat' && canChat ? group('기능별 설정', `<div class="st-feats">${[['gnet', '괴담넷', ICONS.gnet], ['phone', '괴담톡', ICONS.phone], ['wiki', '위키', ICONS.wiki], ['visit', '필드', ICONS.game], ['people', '인물 기록', ICONS.group]]
+    ${group('기능별 설정', `<div class="st-feats">${[['gnet', '괴담넷', ICONS.gnet], ['phone', '괴담톡', ICONS.phone], ['wiki', '위키', ICONS.wiki], ['visit', '필드', ICONS.game], ['people', '인물 기록', ICONS.group]]
       .map(([k, label, icon]) => `<button class="gx-mini st-feat" data-action="feature-set" data-value="${k}" aria-label="${label} 설정">${icon}${label}</button>`)
-      .join('')}</div>`) : ''}
+      .join('')}</div>`, canChat ? '' : '시작 전에도 각 기능의 설정을 미리 바꿀 수 있어요. 바꾼 값은 이 채팅에 적용돼요.')}
     ${group('화면', [
       field('테마', seg('set-theme', theme, [['light', '라이트'], ['dark', '다크'], ['paper', '페이퍼']], busy), '채팅 화면의 캐릭터 이미지 배경과 상태창(「테마」를 골랐을 때) 배색이에요.'),
       field('상태창', seg('set-status', getPrefs().status ?? 'auto', [['auto', '테마'], ['dark', '다크'], ['light', '라이트'], ['paper', '페이퍼'], ['off', '미표시']], busy), '채팅 속 상태창의 배색이에요. 「테마」는 위 테마를 따라가요. 미표시를 고르면 상자만 숨기고, 모델은 상태 태그를 계속 써요.'),
@@ -222,6 +228,7 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
       field('괴이 발생 · 요원 시스템', anomaly, scope === 'chat' ? 'ON이면 괴이·사건·특수가 자동으로 발생하고 응답마다 지도와 요원 상태를 갱신해요. OFF로 바꾸면 현재 상황판을 비워요. 커스텀 임무는 OFF에서도 쓸 수 있어요.' : '새 채팅을 상황판을 켠 채로 시작할지 정해요.'),
       field('요원 표시 인원', stepper('set-agent', 'n', `${s.agentLimit}명`, s.agentLimit > 0, s.agentLimit < AGENT_MAX, '요원 표시 인원', busy), `상황판과 편성에 보일 등록 요원 수 (0~${AGENT_MAX}명, 0이면 숨김)`),
       field('지원 투입', seg('set-support', s.supportOn ? '1' : '0', [['1', 'ON'], ['0', 'OFF']], busy), '편성에서 등록 요원 외의 일반 지원 인원을 더할 수 있어요.'),
+      field('인물 기록', seg('set-people', peopleOn ? '1' : '0', [['1', 'ON'], ['0', 'OFF']], busy), scope === 'chat' ? '응답마다 보조 모델이 한 번 읽어 인물의 상태·관계·호감을 기록하고, 본편 요청이 그 기록을 읽어요. 세부는 「기능별 설정 → 인물 기록」에서.' : '새 채팅을 인물 기록을 켠 채로 시작할지 정해요.'),
     ].join(''))}
     <details class="ps-adv st-world" data-keep="world-gen"${keepOpen('world-gen')}><summary class="ps-adv-sum"><b>괴이 발생</b></summary><div class="ps-adv-body"><p class="ps-note">응답을 처리할 때마다 판정해요. 상한을 0으로 하면 그 종류는 자동으로 생기지 않아요.</p>
       <div class="ps-cards">
@@ -314,14 +321,14 @@ export async function handleSettings(action: string, value: string | undefined, 
       // 지금 채팅의 화면·상황판·괴이 발생·캐릭터 이미지 설정을 새 채팅 기본값으로
       const cur = current(ctx, 'chat');
       await saveDefaults(env, (p) => ({ ...p, basic: { ...cur.basic }, world: { ...cur.world }, theme: cur.theme }));
-      if (!settingsUi.notice) await saveVarDefaults(['$gen_', '$hq_adv_'], ctx.chat.scriptstate).catch((error) => (settingsUi.notice = `기본값을 저장하지 못했어요: ${error instanceof Error ? error.message : String(error)}`));
+      if (!settingsUi.notice) await saveVarDefaults(MAIN_PREFIXES, ctx.chat.scriptstate).catch((error) => (settingsUi.notice = `기본값을 저장하지 못했어요: ${error instanceof Error ? error.message : String(error)}`));
       if (!settingsUi.notice) settingsUi.info = '지금 설정을 새 채팅 기본값으로 저장했어요.';
       env.render();
     } else if (what === 'load') {
       // 새 채팅 기본값을 지금 채팅에. 상황판 켜기·끄기는 상태를 비우거나 새로 만들기 때문에 그대로 둔다
       const d = current(ctx, 'defaults');
       await save(ctx, env, (chat) => {
-        const vars: ScriptState = { ...basicVars(d.basic), [THEME_KEY]: d.theme, ...loadVarDefaults(['$gen_', '$hq_adv_'], chat.scriptstate) };
+        const vars: ScriptState = { ...basicVars(d.basic), [THEME_KEY]: d.theme, ...loadVarDefaults(MAIN_PREFIXES, chat.scriptstate) };
         for (const f of WORLD_SPEC) vars[wgKey(f.key)] = String(d.world[f.key]);
         if (worldOn(chat)) {
           const ss = { ...(chat.scriptstate ?? {}), ...vars };
@@ -378,6 +385,10 @@ export async function handleSettings(action: string, value: string | undefined, 
       case 'set-anomaly':
         if (v === 'on' || v === 'off') await basicPatch(env, { anomalyOn: v === 'on' });
         return true;
+      case 'set-people':
+        // 새 채팅 기본값의 $pp_on (시작할 때 chat.scriptstate 로 들어간다)
+        if (v === '1' || v === '0') await saveDefaults(env, (p) => ({ ...p, vars: { ...(p.vars ?? {}), [PP('on')]: v } }));
+        return true;
       case 'set-agent': {
         const next = Math.min(AGENT_MAX, Math.max(0, d.basic.agentLimit + (v.endsWith('+') ? 1 : -1)));
         if (next !== d.basic.agentLimit) await basicPatch(env, { agentLimit: next });
@@ -417,6 +428,11 @@ export async function handleSettings(action: string, value: string | undefined, 
         const hit = nextWorld(worldSettings(lore, chat.scriptstate), v);
         return hit ? { [wgKey(hit[0])]: String(hit[1]) } : null;
       });
+      return true;
+    case 'set-people':
+      // 인물 기록 켬/끔 (기능 페이지의 같은 줄과 같은 변수, 바로 저장)
+      if (v !== '1' && v !== '0') return true;
+      await save(ctx, env, (chat) => (ppValue(chat.scriptstate, 'on') === v ? null : { [PP('on')]: v }));
       return true;
     case 'set-anomaly':
       if (v === 'off') {

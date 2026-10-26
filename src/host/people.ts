@@ -90,7 +90,7 @@ function setStatus(next: Partial<PeopleStatus>): void {
 
 // ── 시트·시작값 ──
 
-const chatId = (ctx: ChatContext) => `${String(ctx.char.chaId ?? ctx.charIndex)}:${ctx.chatIndex}:${messageKey(ctx.chat.message[0] ?? { role: 'user', data: '' }, 0)}`;
+export const chatId = (ctx: ChatContext) => `${String(ctx.char.chaId ?? ctx.charIndex)}:${ctx.chatIndex}:${messageKey(ctx.chat.message[0] ?? { role: 'user', data: '' }, 0)}`;
 
 export const sheetOf = (ctx: ChatContext) => (name: string): string | null => bookText({ char: ctx.char, chat: ctx.chat }, name) || null;
 

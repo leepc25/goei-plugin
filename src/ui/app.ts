@@ -567,10 +567,12 @@ async function handle(action: string, value?: string): Promise<void> {
     await handleAdvanced(action, value, view.ctx, { render, refresh }, view.kind === 'started' ? 'chat' : 'defaults');
     return;
   }
-  if (view.kind === 'started' && action.startsWith('wiki-') && (await handleWiki(action, value, view.ctx, wikiEnv))) return;
-  if (view.kind === 'started' && action.startsWith('pp-') && (await handlePeople(action, value, view.ctx, peopleEnv))) return;
-  if (view.kind === 'started' && action.startsWith('gn-') && (await handleGnet(action, value, view.ctx, gnetEnv))) return;
-  if (view.kind === 'started' && action.startsWith('ph-') && (await handlePhone(action, value, view.ctx, phoneEnv))) return;
+  // 시작 전(시작 패널 → 설정)에도 기능별 설정 페이지가 열려 있으면 그 기능의 단추를 받는다 (2026-10-26 사용자). chat 객체·scriptstate 는 있다
+  const featCtx = view.kind === 'started' || (view.kind === 'picker' && pickerPrefs && settingsUi.page) ? view.ctx : null;
+  if (featCtx && action.startsWith('wiki-') && (await handleWiki(action, value, featCtx, wikiEnv))) return;
+  if (featCtx && action.startsWith('pp-') && (await handlePeople(action, value, featCtx, peopleEnv))) return;
+  if (featCtx && action.startsWith('gn-') && (await handleGnet(action, value, featCtx, gnetEnv))) return;
+  if (featCtx && action.startsWith('ph-') && (await handlePhone(action, value, featCtx, phoneEnv))) return;
   if (action === 'prefs-open' || action === 'prefs-close') {
     pickerPrefs = action === 'prefs-open';
     resetSettings();
@@ -583,7 +585,7 @@ async function handle(action: string, value?: string): Promise<void> {
     await handleDirectory(action, value, view.ctx, settingsEnv);
     return;
   }
-  if (view.kind === 'picker' && pickerPrefs && action.startsWith('set-')) {
+  if (view.kind === 'picker' && pickerPrefs && (action.startsWith('set-') || action.startsWith('visit-'))) {
     if (settingsUi.busy) return;
     await handleSettings(action, value, view.ctx, settingsEnv, settingsUi.scope === 'chat' ? 'defaults' : settingsUi.scope);
     if (action === 'set-theme' && view.kind === 'picker' && view.staged) await stagedTheme(view.ctx, value);
@@ -701,8 +703,8 @@ async function handle(action: string, value?: string): Promise<void> {
       await removeMarkAt(Number(value));
       return render();
     case 'feature-set':
-      // 메인 설정 「기능별 설정」: 그 기능 탭으로 넘어가지 않고 설정창 안에서 그 기능 설정을 연다 (2026-10-23 사용자)
-      if (view.kind !== 'started') return;
+      // 메인 설정 「기능별 설정」: 그 기능 탭으로 넘어가지 않고 설정창 안에서 그 기능 설정을 연다 (2026-10-23 사용자). 시작 전 설정에서도 연다
+      if (!(view.kind === 'started' || (view.kind === 'picker' && pickerPrefs))) return;
       if (value === 'phone' || value === 'wiki' || value === 'visit' || value === 'people' || (value === 'gnet' && GNET_ON)) settingsUi.page = value;
       return render();
     case 'ops-sel':
@@ -768,6 +770,8 @@ async function handle(action: string, value?: string): Promise<void> {
       phone.view = phone.view === 'room' ? 'room' : 'list';
       resetField();
       await handleWiki('wiki-person', value, view.ctx, wikiEnv);
+      // 뒤로가기는 위키 메인이 아니라 「이 채팅의 인물」 목록으로 (거기서 다시 뒤로가면 위키 메인)
+      wiki.history = [{ view: 'home', title: '', query: '' }, { view: 'people', title: '', query: '' }];
       return;
     case 'repick':
       repick = true;
@@ -911,6 +915,10 @@ function renderPicker(): void {
 }
 
 const INNER_SCROLL = '.gx-acards, .gx-sidecol, .gx-mbox, .gx-sits, .gx-bd-col > .gx-evcs, .nw-groups';
+/** 설정 기능 페이지(인물 기록 설정 등)·위키 문서 칸(인물 상세·기록 문서): .gx-body 가 아니라 이 칸이 실제로 스크롤된다.
+ *  같은 페이지(pageKey)를 다시 그릴 때만 자리를 지킨다 (다른 문서로 넘어가면 맨 위부터) */
+const PAGE_SCROLL = '.st-featpage .ph-form-body, .nw-pane .nw-doc';
+const pageKey = () => `${tab}|${settingsUi.page}|${wiki.view}|${wiki.title}`;
 
 function render(): void {
   if (!root) return;
@@ -920,6 +928,8 @@ function render(): void {
   const keep = scroller && root.dataset.tab === tab ? scroller.scrollTop : 0;
   // 안쪽 스크롤 칸(편성 요원 목록·사이드 칸 등)도 같은 탭이면 자리를 지킨다
   const inner = root.dataset.tab === tab ? [...root.querySelectorAll<HTMLElement>(INNER_SCROLL)].map((el) => el.scrollTop) : [];
+  // 설정 기능 페이지·위키 문서 칸: 진단 행 펼치기·📌·취소처럼 전체를 다시 그려도 그 칸의 자리를 지킨다 (맨 위로 튀던 문제, 2026-10-26)
+  const pageKeep = root.dataset.pk === pageKey() ? [...root.querySelectorAll<HTMLElement>(PAGE_SCROLL)].map((el) => el.scrollTop) : [];
   // 괴담톡 대화: 맨 아래를 보고 있었으면(또는 방을 새로 열면) 다시 그린 뒤에도 맨 아래로
   const log = root.querySelector<HTMLElement>('.ph-log');
   const logRoom = root.dataset.room ?? '';
@@ -960,6 +970,8 @@ function render(): void {
   const next = root.querySelector('.gx-body');
   if (next && keep) next.scrollTop = keep;
   if (inner.length) root.querySelectorAll<HTMLElement>(INNER_SCROLL).forEach((el, i) => inner[i] && (el.scrollTop = inner[i]));
+  root.dataset.pk = pageKey();
+  if (pageKeep.length) root.querySelectorAll<HTMLElement>(PAGE_SCROLL).forEach((el, i) => pageKeep[i] && (el.scrollTop = pageKeep[i]));
   const nlog = root.querySelector<HTMLElement>('.ph-log');
   root.dataset.room = phone.room ?? '';
   if (nlog) {

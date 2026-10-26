@@ -141,7 +141,7 @@ test('반영: 다시 굴려 응답이 바뀌면 그 응답 근거 항목·계기
 test('새 인물: 2턴 규칙·역할 명사·별명 충돌·상한, 확인 모드', () => {
   const { c, store, input } = setup();
   const np = (name, extra = {}) => ({ name, aliases: [], m: 'm4', quote: '감싸 안으며', identity: '관리국 사람', ...extra });
-  let rep = U.applyUpdate(store, c, input, { new_people: [np('김철수'), np('택시 기사'), np('Jyaldi')] }, { settings: settings() });
+  let rep = U.applyUpdate(store, c, input, { new_people: [np('김철수'), np('택시 기사'), np('Jyaldi')] }, { settings: settings({ twoTurn: true }) });
   assert.ok(rep.held.some((h) => h.who === '김철수' && /2턴/.test(h.reason)));
   assert.ok(rep.dropped.some((d) => d.who === '택시 기사' && d.reason === '역할 명사'));
   assert.ok(rep.dropped.some((d) => d.who === 'Jyaldi' && /이미 있는/.test(d.reason)));
@@ -225,4 +225,19 @@ test('기본값: 인물끼리 감정 켬, 기록 상한 2000, 접기 상한 2000
   const st = S.peopleStore({ goeiPeopleV1: { people: { a: { name: 'a', address: { toUser: '자네', register: '하게체' } }, b: { name: 'b', address: { register: '이상' } } } } });
   assert.equal(st.people.a.address.register, '하게체');
   assert.equal(st.people.b.address.register, '존댓말');
+});
+
+test('문서: 인용이 없어도 확정 구간 메시지면 받고, 있으면 원문에 있어야 한다', () => {
+  const { c, store, input } = setup();
+  const rep = U.applyUpdate(store, c, input, {
+    docs: [
+      { type: 'event', key: '명단 사건', op: 'add', text: '유저가 명단을 봤다고 쟈알디에게 말했다', m: 'm4', quote: null },
+      { type: 'event', key: '없는 인용', op: 'add', text: 'x', m: 'm4', quote: '이 글은 원문에 없다' },
+      { type: 'event', key: '맥락 구간', op: 'add', text: 'x', m: 'm1', quote: null },
+    ],
+  }, { settings: settings() });
+  assert.equal(rep.applied.docs, 1);
+  assert.ok(store.docs['event:명단 사건'] && !store.docs['event:명단 사건'].entries[0].quote);
+  assert.ok(rep.dropped.some((d) => d.reason === '인용이 원문에 없음'));
+  assert.ok(rep.dropped.some((d) => d.reason === '확정 구간 밖 메시지'));
 });
