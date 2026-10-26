@@ -382,6 +382,11 @@ def lore_activation(entries):
 
 # 원본 지침 문장 고치기 (주석 이름, 옛 문장, 새 문장). 옛 문장이 없으면 빌드를 멈춘다
 LORE_PATCHES = [
+    # 콘쥬스 20세 대학생 (2026-10-26 사용자 지시). 위키·게임 시트·대사도 같이 바꿈
+    ('콘쥬스', '- Age: 17, a high school student', '- Age: 20, a university student'),
+    ('콘쥬스', 'Agent. A minor attached to the team, deployed only when', 'Agent. The youngest member of the team, deployed only when'),
+    ('콘쥬스', 'cover her eyes for age-inappropriate sights', 'cover her eyes for gruesome sights'),
+    ('콘쥬스', "A teenager's frame that gives no warning", 'A small frame that gives no warning'),
     # 상태창에 동행·투입 칸 (2026-10-23 사용자 승인: 필드가 동행 인물과 괴이 안/밖을 알 수 있게). 플러그인 v0.16.54부터 읽는다. 옛 6칸도 읽힌다
     ('🏷️Tag', '[▣|YYYY.MM.DD|HH:MM AM/PM|weather|temperature|location|anomaly]\n',
      '[▣|YYYY.MM.DD|HH:MM AM/PM|weather|temperature|location|anomaly|companions|deployed]\n'),
