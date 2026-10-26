@@ -74,7 +74,8 @@ export interface Change {
   now?: string;
   mustNot?: string[];
 }
-export type Register = '존댓말' | '반말' | '혼합';
+export type Register = '존댓말' | '반말' | '혼합' | '하게체' | '하오체';
+export const REGISTERS: Register[] = ['존댓말', '반말', '혼합', '하게체', '하오체'];
 
 export interface Person {
   name: string;

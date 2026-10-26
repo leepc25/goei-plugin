@@ -203,3 +203,26 @@ test('유사 문장 판정', () => {
   assert.ok(U.similar('왼팔 부상, 3일차', '왼팔  부상 3일차.'));
   assert.ok(!U.similar('왼팔 부상', '오른다리 골절'));
 });
+
+test('유저가 연기하는 요원은 장면 인물·새 인물에서 빠진다', () => {
+  const { c, store } = setup();
+  store.people.이도형 = person('이도형', { faction: 'B00' });
+  const input = U.buildUpdate(c, store, [3], { settings: settings(), system: 'S', values: {}, names: [...names, { name: '이도형', aliases: [], titles: [] }], exclude: ['이도형'] });
+  assert.ok(!input.people.includes('이도형'), '장면 인물에서 제외');
+  const r = { new_people: [{ name: '이도형', aliases: [], identity: '회사 부장', speech: null, m: 'm4', quote: '쟈알디가 말했다' }] };
+  delete store.people.이도형;
+  const rep = U.applyUpdate(store, c, input, r, { settings: settings({ twoTurn: false }), exclude: ['이도형'] });
+  assert.equal(rep.applied.newPeople.length, 0);
+  assert.ok(rep.dropped.some((d) => d.reason === '유저가 연기하는 요원'));
+});
+
+test('기본값: 인물끼리 감정 켬, 기록 상한 2000, 접기 상한 20000, 말투 5종', () => {
+  const s = St.peopleSettings({});
+  assert.ok(s.features.has('npc_emotion'));
+  assert.equal(s.perCap, 2000);
+  assert.equal(s.spanCap, 20000);
+  assert.deepEqual(T.REGISTERS, ['존댓말', '반말', '혼합', '하게체', '하오체']);
+  const st = S.peopleStore({ goeiPeopleV1: { people: { a: { name: 'a', address: { toUser: '자네', register: '하게체' } }, b: { name: 'b', address: { register: '이상' } } } } });
+  assert.equal(st.people.a.address.register, '하게체');
+  assert.equal(st.people.b.address.register, '존댓말');
+});

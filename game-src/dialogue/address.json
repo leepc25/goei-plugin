@@ -1,0 +1,473 @@
+{
+ "version": 1,
+ "names": {
+  "강이학": {
+   "level": 1,
+   "register": "존댓말",
+   "self": "저",
+   "up": "선배님",
+   "peer": "동기님",
+   "down": "신입님",
+   "outsider": "고객님"
+  },
+  "게슈간": {
+   "level": 1,
+   "register": "반말",
+   "self": "나",
+   "up": "선배",
+   "peer": "너",
+   "down": "신입",
+   "outsider": "너"
+  },
+  "고그니쟈": {
+   "level": 2,
+   "register": "하게체",
+   "self": "나",
+   "up": "부장",
+   "peer": "자네",
+   "down": "신입",
+   "outsider": "손님"
+  },
+  "고르고디오": {
+   "level": 2,
+   "register": "혼합",
+   "self": "",
+   "up": "부장님",
+   "peer": "동기",
+   "down": "막내",
+   "outsider": "거기"
+  },
+  "고연지": {
+   "level": null,
+   "register": "혼합",
+   "self": "",
+   "up": "선생님",
+   "peer": "사장님",
+   "down": "손님",
+   "outsider": "환자분"
+  },
+  "고영은": {
+   "level": 1,
+   "register": "반말",
+   "self": "저",
+   "up": "선배님",
+   "peer": "동기",
+   "down": "신입 씨",
+   "outsider": "그쪽"
+  },
+  "고영훈": {
+   "level": 5,
+   "register": "존댓말",
+   "self": "나",
+   "up": "부장님",
+   "peer": "차장",
+   "down": "대원",
+   "outsider": "외부인"
+  },
+  "곽성주": {
+   "level": 4,
+   "register": "반말",
+   "self": "나",
+   "up": "부장님",
+   "peer": "과장",
+   "down": "이놈아",
+   "outsider": "거기"
+  },
+  "곽제강": {
+   "level": 4,
+   "register": "존댓말",
+   "self": "저",
+   "up": "부장님",
+   "peer": "과장님",
+   "down": "요원님",
+   "outsider": "손님"
+  },
+  "김성진": {
+   "level": 1,
+   "register": "반말",
+   "self": "",
+   "up": "선배님",
+   "peer": "동기",
+   "down": "신입",
+   "outsider": "너"
+  },
+  "김조학": {
+   "level": 4,
+   "register": "반말",
+   "self": "나",
+   "up": "차장님",
+   "peer": "과장",
+   "down": "야",
+   "outsider": "너"
+  },
+  "노기균": {
+   "level": 3,
+   "register": "존댓말",
+   "self": "",
+   "up": "과장님",
+   "peer": "대리",
+   "down": "신입",
+   "outsider": "너"
+  },
+  "데드폴": {
+   "level": 1,
+   "register": "존댓말",
+   "self": "저",
+   "up": "선배님",
+   "peer": "요원님",
+   "down": "신입 요원님",
+   "outsider": "그쪽 분"
+  },
+  "데쥬레": {
+   "level": 1,
+   "register": "존댓말",
+   "self": "저",
+   "up": "선배님",
+   "peer": "요원님",
+   "down": "신입 요원님",
+   "outsider": "외부 분"
+  },
+  "도필헌": {
+   "level": 7,
+   "register": "하게체",
+   "self": "나",
+   "up": "사장님",
+   "peer": "국장",
+   "down": "자네",
+   "outsider": "손님"
+  },
+  "로제몬": {
+   "level": 1,
+   "register": "반말",
+   "self": "나",
+   "up": "선배",
+   "peer": "너",
+   "down": "신입",
+   "outsider": "거기"
+  },
+  "마덕희": {
+   "level": null,
+   "register": "존댓말",
+   "self": "",
+   "up": "사장님",
+   "peer": "자기",
+   "down": "자기",
+   "outsider": "자기"
+  },
+  "문혜란": {
+   "level": null,
+   "register": "반말",
+   "self": "언니",
+   "up": "사장님",
+   "peer": "친구",
+   "down": "친구",
+   "outsider": "친구"
+  },
+  "박민성": {
+   "level": 2,
+   "register": "혼합",
+   "self": "",
+   "up": "선배님",
+   "peer": "동기",
+   "down": "신입",
+   "outsider": "그쪽"
+  },
+  "백사헌": {
+   "level": 1,
+   "register": "혼합",
+   "self": "",
+   "up": "선배님",
+   "peer": "동기님",
+   "down": "신입",
+   "outsider": "그쪽"
+  },
+  "백석주": {
+   "level": 4,
+   "register": "혼합",
+   "self": "",
+   "up": "부장님",
+   "peer": "과장님",
+   "down": "막내",
+   "outsider": "그쪽"
+  },
+  "브라우니": {
+   "level": null,
+   "register": "존댓말",
+   "self": "",
+   "up": "친구",
+   "peer": "친구",
+   "down": "친구",
+   "outsider": "친구"
+  },
+  "블라렛": {
+   "level": null,
+   "register": "존댓말",
+   "self": "저",
+   "up": "신부님",
+   "peer": "자매님",
+   "down": "어린 양",
+   "outsider": "손님"
+  },
+  "사장": {
+   "level": 9,
+   "register": "존댓말",
+   "self": "저",
+   "up": "선생님",
+   "peer": "그쪽",
+   "down": "당신",
+   "outsider": "당신"
+  },
+  "살라딘": {
+   "level": null,
+   "register": "하오체",
+   "self": "나",
+   "up": "형제",
+   "peer": "형제",
+   "down": "형제",
+   "outsider": "그대"
+  },
+  "서윤지": {
+   "level": null,
+   "register": "존댓말",
+   "self": "저",
+   "up": "선임 조정관님",
+   "peer": "조정관님",
+   "down": "신입 조정관님",
+   "outsider": "방문자님"
+  },
+  "송주익": {
+   "level": 3,
+   "register": "존댓말",
+   "self": "",
+   "up": "과장님",
+   "peer": "선배님",
+   "down": "신입",
+   "outsider": "너"
+  },
+  "송진섭": {
+   "level": 1,
+   "register": "존댓말",
+   "self": "",
+   "up": "선배님",
+   "peer": "형",
+   "down": "후배",
+   "outsider": "그쪽"
+  },
+  "스팡달": {
+   "level": 2,
+   "register": "존댓말",
+   "self": "",
+   "up": "부장님",
+   "peer": "동기",
+   "down": "신입",
+   "outsider": "너"
+  },
+  "신유리": {
+   "level": null,
+   "register": "반말",
+   "self": "",
+   "up": "사장",
+   "peer": "너",
+   "down": "너",
+   "outsider": "너"
+  },
+  "에일린": {
+   "level": 2,
+   "register": "반말",
+   "self": "",
+   "up": "부장",
+   "peer": "동기",
+   "down": "신입",
+   "outsider": "너"
+  },
+  "윤병수": {
+   "level": 3,
+   "register": "반말",
+   "self": "",
+   "up": "과장님",
+   "peer": "대리",
+   "down": "너",
+   "outsider": "너"
+  },
+  "윤지아": {
+   "level": null,
+   "register": "존댓말",
+   "self": "저",
+   "up": "선생님",
+   "peer": "사장님",
+   "down": "손님",
+   "outsider": "손님"
+  },
+  "은하제": {
+   "level": 3,
+   "register": "혼합",
+   "self": "",
+   "up": "선배님",
+   "peer": "동기",
+   "down": "신입",
+   "outsider": "댁"
+  },
+  "이기석": {
+   "level": 4,
+   "register": "존댓말",
+   "self": "저",
+   "up": "차장님",
+   "peer": "과장님",
+   "down": "요원님",
+   "outsider": "손님"
+  },
+  "이길환": {
+   "level": 4,
+   "register": "존댓말",
+   "self": "저",
+   "up": "부장님",
+   "peer": "과장님",
+   "down": "요원님",
+   "outsider": "선생님"
+  },
+  "이도형": {
+   "level": 6,
+   "register": "반말",
+   "self": "나",
+   "up": "국장님",
+   "peer": "부장",
+   "down": "거기",
+   "outsider": "너"
+  },
+  "이병진": {
+   "level": 4,
+   "register": "혼합",
+   "self": "",
+   "up": "부장님",
+   "peer": "과장님",
+   "down": "자네",
+   "outsider": "그쪽 분"
+  },
+  "이성해": {
+   "level": 2,
+   "register": "존댓말",
+   "self": "저",
+   "up": "선배님",
+   "peer": "선배님",
+   "down": "신입님",
+   "outsider": "손님"
+  },
+  "이연화": {
+   "level": 3,
+   "register": "존댓말",
+   "self": "",
+   "up": "선배님",
+   "peer": "선생님",
+   "down": "신입 씨",
+   "outsider": "그쪽 분"
+  },
+  "이자헌": {
+   "level": 4,
+   "register": "존댓말",
+   "self": "저",
+   "up": "부장님",
+   "peer": "조장님",
+   "down": "신입 님",
+   "outsider": "손님"
+  },
+  "장허운": {
+   "level": 1,
+   "register": "존댓말",
+   "self": "저",
+   "up": "선배님",
+   "peer": "동기분",
+   "down": "후배님",
+   "outsider": "선생님"
+  },
+  "잼트리": {
+   "level": 2,
+   "register": "존댓말",
+   "self": "언니",
+   "up": "부장님",
+   "peer": "동기",
+   "down": "후배",
+   "outsider": "손님"
+  },
+  "쟈알디": {
+   "level": 3,
+   "register": "반말",
+   "self": "나",
+   "up": "선배",
+   "peer": "자네",
+   "down": "요원",
+   "outsider": "그쪽"
+  },
+  "제이": {
+   "level": null,
+   "register": "존댓말",
+   "self": "저",
+   "up": "높으신 분",
+   "peer": "직원분",
+   "down": "신입분",
+   "outsider": "손님"
+  },
+  "조성춘": {
+   "level": 4,
+   "register": "반말",
+   "self": "나",
+   "up": "부장님",
+   "peer": "과장",
+   "down": "이 자식아",
+   "outsider": "너"
+  },
+  "진나솔": {
+   "level": 3,
+   "register": "혼합",
+   "self": "",
+   "up": "선배님",
+   "peer": "너",
+   "down": "신입",
+   "outsider": "거기"
+  },
+  "차여진": {
+   "level": null,
+   "register": "반말",
+   "self": "나",
+   "up": "선배",
+   "peer": "자기",
+   "down": "신입",
+   "outsider": "손님"
+  },
+  "청달래": {
+   "level": 8,
+   "register": "하게체",
+   "self": "",
+   "up": "자네",
+   "peer": "자네",
+   "down": "자네",
+   "outsider": "자네"
+  },
+  "콘쥬스": {
+   "level": 1,
+   "register": "존댓말",
+   "self": "저",
+   "up": "선배님",
+   "peer": "선배님",
+   "down": "신입 선배님",
+   "outsider": "아저씨"
+  },
+  "큐라스": {
+   "level": 2,
+   "register": "존댓말",
+   "self": "",
+   "up": "부장님",
+   "peer": "동기",
+   "down": "신입",
+   "outsider": "너"
+  },
+  "호유원": {
+   "level": 7,
+   "register": "존댓말",
+   "self": "저",
+   "up": "전무님",
+   "peer": "이사님",
+   "down": "직원님",
+   "outsider": "손님"
+  }
+ }
+}

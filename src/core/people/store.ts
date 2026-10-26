@@ -4,7 +4,7 @@
 import type { Chat, ChatMessage } from '../types';
 import { messageText } from '../refs';
 import { anchorOf } from '../visit';
-import { PEOPLE_KEY, SLOTS, DOC_TYPES, emptyStore, type Change, type Doc, type Entry, type PeopleStore, type Person, type SlotId } from './types';
+import { PEOPLE_KEY, SLOTS, DOC_TYPES, REGISTERS, emptyStore, type Change, type Doc, type Entry, type PeopleStore, type Person, type Register, type SlotId } from './types';
 
 export { anchorOf };
 
@@ -39,7 +39,7 @@ export function peopleStore(chat: Chat): PeopleStore {
       seeded: p.seeded && typeof p.seeded === 'object' ? p.seeded : { from: 'none', at: '' },
       slots,
       affinity: { base: Number(p.affinity?.base) || 0 },
-      address: { toUser: str(p.address?.toUser), register: p.address?.register === '존댓말' || p.address?.register === '혼합' ? p.address.register : '반말', ...(p.address?.pin ? { pin: true } : {}) },
+      address: { toUser: str(p.address?.toUser), register: REGISTERS.includes(p.address?.register as Register) ? (p.address!.register as Register) : '존댓말', ...(p.address?.pin ? { pin: true } : {}) },
       express: ([0, 1, 2, 3] as const).includes(p.express as 0) ? (p.express as 0 | 1 | 2 | 3) : 1,
       ...(p.minor ? { minor: true } : {}),
       aliases: Array.isArray(p.aliases) ? p.aliases.filter((a): a is string => typeof a === 'string') : [],

@@ -1,6 +1,8 @@
 // 본편 요청에 넣는 인물 기록 블록 (리수폿 Director 의 사실 전달을 코드로). 모델이 쓴 인용·숫자는 넣지 않는다.
 // 절 단위 혼합: 시트의 고정 절(Voice·Background·Abilities·Appearance)은 원문, 나머지는 기록.
 import { addressOf, affinityView, type AffinityOpts } from './affinity';
+
+const REGISTER_EN: Record<string, string> = { 존댓말: 'formal (존댓말)', 반말: 'informal (반말)', 혼합: 'mixed formal/informal', 하게체: 'hage-che (archaic, superior-to-junior)', 하오체: 'hao-che (archaic, dignified formal)' };
 import { liveEntries, plain, type Liveness } from './store';
 import { fixedSections } from './seed';
 import { norm } from './store';
@@ -54,7 +56,7 @@ export function personBlock(p: Person, store: PeopleStore, live: Liveness, chang
   const relLine = [`Relationship → ${user}: ${aff.stage.label} (${aff.stage.behavior})`, p.minor ? 'This person is a minor: care and trust only, never romance.' : '', EXPRESS_TAIL[p.express]].filter(Boolean).join(' ');
   out.push(relLine + (relUser.length ? '\n' + lines(relUser, 6) : ''));
   if (relOther.length) out.push('Relationships with others:\n' + relOther.slice(-6).map((e) => `- → ${e.target}: ${plain(e.text, 200)}`).join('\n'));
-  if (addr.toUser) out.push(`Address → ${user}: '${addr.toUser}', ${addr.register === '반말' ? 'informal' : addr.register === '존댓말' ? 'formal' : 'mixed'}.`);
+  if (addr.toUser) out.push(`Address → ${user}: '${addr.toUser}', ${REGISTER_EN[addr.register] ?? 'mixed'}.`);
   const sp = slot('speech').filter((e) => e.target && e.target !== '@user');
   if (sp.length) out.push('Speech toward others:\n' + sp.slice(-4).map((e) => `- → ${e.target}: ${plain(e.text, 200)}`).join('\n'));
   const be = slot('behavior');

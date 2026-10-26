@@ -184,7 +184,7 @@ export interface PersonView {
   /** 호감: 값(-100~300)과 8단계 */
   affinity: { value: number; stage: string; cell: 'hostile' | 'base' | 'warm' | 'close' };
   /** 유저를 부르는 말 */
-  address: { toUser: string; register: '존댓말' | '반말' | '혼합' };
+  address: { toUser: string; register: '존댓말' | '반말' | '혼합' | '하게체' | '하오체' };
   express: 0 | 1 | 2 | 3;
   minor: boolean;
   /** 칸별 살아 있는 항목 본문 */

@@ -11,12 +11,13 @@ import { applyUpdate, assemblePrompt, buildUpdate, enabledSections, parseUpdate,
 import { peopleSettings, type PeopleSettings } from '../core/people/settings';
 import { seedPerson } from '../core/people/seed';
 import { nameMatcher } from '../core/people/select';
-import { allNames, basePerson, userAffinityBase, valuesOf } from '../core/people/base';
+import { allNames, seedBaseFor, valuesOf } from '../core/people/base';
+import { playerAgent } from '../core/player';
 import { promptFor } from '../core/people/prompt';
 import { messageText } from '../core/refs';
 import { findStatusTags } from '../core/world/status';
 import { parseIdentity } from '../core/people/identity';
-import type { PeopleStore } from '../core/people/types';
+import type { Identity, PeopleStore } from '../core/people/types';
 
 // ── 진단 ──
 
@@ -93,32 +94,46 @@ const chatId = (ctx: ChatContext) => `${String(ctx.char.chaId ?? ctx.charIndex)}
 
 export const sheetOf = (ctx: ChatContext) => (name: string): string | null => bookText({ char: ctx.char, chat: ctx.chat }, name) || null;
 
+/** 기록하지 않는 이름: 유저가 연기하는 요원 (캐릭터로 플레이) */
+function excludedNames(ctx: ChatContext): string[] {
+  const me = playerAgent(ctx.char.globalLore, ctx.chat.scriptstate);
+  return me?.name ? [me.name] : [];
+}
+
 function userFaction(chat: Chat): string {
   const v = chat.scriptstate?.['$st_faction'] ?? chat.scriptstate?.['st_faction'];
   return typeof v === 'string' ? v : '';
 }
 
-/** 처음 등장한 인물의 기록을 만든다 (시트 → 시작값). 확정 구간 글에 이름이 나온, 아직 기록이 없는 사람 */
-export function seedAppearing(store: PeopleStore, chat: Chat, indexes: number[], sheet: (name: string) => string | null): string[] {
+/** 처음 등장한 인물의 기록을 만든다 (시트 → 시작값). 확정 구간 글에 이름이 나온, 아직 기록이 없는 사람.
+ *  유저가 연기하는 요원(exclude)은 기록하지 않는다 (있던 기록은 지운다). 호칭 시작값은 유저 신분(identity)으로 고른다 */
+export function seedAppearing(store: PeopleStore, chat: Chat, indexes: number[], sheet: (name: string) => string | null, o: { exclude?: string[]; identity?: Identity } = {}): string[] {
   const list = Array.isArray(chat.message) ? chat.message : [];
-  const match = nameMatcher(allNames().filter((n) => !store.people[n.name]));
+  const exclude = new Set(o.exclude ?? []);
+  const match = nameMatcher(allNames().filter((n) => !store.people[n.name] && !exclude.has(n.name)));
   const texts = indexes.flatMap((i) => [list[i - 1], list[i]]).filter(Boolean).map((m) => messageText(String(m!.data ?? '')));
   const found = new Set<string>();
   for (const t of texts) for (const n of match(t)) found.add(n);
   const faction = userFaction(chat);
   const made: string[] = [];
   for (const name of found) {
-    const b = basePerson(name);
-    const alias = allNames().find((n) => n.name === name);
-    store.people[name] = seedPerson(name, sheet(name), {
-      faction: b?.faction ?? '',
-      express: b?.express,
-      affinityBase: userAffinityBase(b?.faction ?? '', faction),
-      aliases: alias?.aliases ?? [],
-    });
+    store.people[name] = seedPerson(name, sheet(name), seedBaseFor(name, faction, o.identity ?? store.identity));
     made.push(name);
   }
   return made;
+}
+
+/** 유저가 연기하는 요원의 기록을 지운다 (자기 자신은 기록 대상이 아니다). 지운 이름을 돌려준다 */
+export function dropExcluded(store: PeopleStore, exclude: string[]): string[] {
+  const gone: string[] = [];
+  for (const n of exclude) {
+    if (!store.people[n]) continue;
+    delete store.people[n];
+    store.log = store.log.filter((c) => c.who !== n);
+    delete store.folded[n];
+    gone.push(n);
+  }
+  return gone;
 }
 
 /** 가장 최근 봇 응답의 상태창 신분 칸 */
@@ -182,13 +197,17 @@ async function runOnce(reason: string, o: { manual?: boolean }): Promise<RunResu
   setStatus({ unread: unread.length });
   if (!unread.length) return result;
   const sheet = sheetOf(ctx);
-  const seeded = seedAppearing(store, ctx.chat, unread, sheet);
   // 상태창 신분 칸 (가장 최근 응답) → 기록. 상태창이 늘 우선
   const identity = statusIdentity(ctx.chat);
   const idChanged = !!identity && (!store.identity || store.identity.faction !== identity.faction || store.identity.rank !== identity.rank || store.identity.from !== 'status');
-  if (seeded.length || idChanged) {
+  // 유저가 연기하는 요원은 기록하지 않는다
+  const exclude = excludedNames(ctx);
+  const dropped = dropExcluded(store, exclude);
+  const seeded = seedAppearing(store, ctx.chat, unread, sheet, { exclude, identity: identity ?? store.identity });
+  if (seeded.length || idChanged || dropped.length) {
     await updateChat(ctx.charIndex, ctx.chatIndex, (cur) => {
       const s = peopleStore(cur);
+      dropExcluded(s, exclude);
       for (const n of seeded) if (!s.people[n]) s.people[n] = store.people[n];
       if (identity && idChanged) s.identity = identity;
       return withPeople(cur, s);
@@ -210,7 +229,7 @@ async function runOnce(reason: string, o: { manual?: boolean }): Promise<RunResu
       }
       const curStore = peopleStore(fresh.chat);
       const system = assemblePrompt(promptFor(settings), enabledSections(settings), settings.rules);
-      const input = buildUpdate(fresh.chat, curStore, batches[b], { settings, system, values: Object.fromEntries(input0Names(curStore).map((n) => [n, valuesOf(n)])), names: allNames() });
+      const input = buildUpdate(fresh.chat, curStore, batches[b], { settings, system, values: Object.fromEntries(input0Names(curStore).map((n) => [n, valuesOf(n)])), names: allNames(), exclude });
       if (!input.people.length) {
         // 장면 인물이 없으면 모델을 부르지 않고 읽음 표시만
         await updateChat(fresh.charIndex, fresh.chatIndex, (cur) => {
@@ -251,10 +270,8 @@ async function runOnce(reason: string, o: { manual?: boolean }): Promise<RunResu
         const report = applyUpdate(s, cur, input, value, {
           settings,
           sheetOf: sheet,
-          baseOf: (name) => {
-            const bp = basePerson(name);
-            return bp ? { faction: bp.faction, express: bp.express, affinityBase: userAffinityBase(bp.faction, userFaction(cur)) } : {};
-          },
+          baseOf: (name) => seedBaseFor(name, userFaction(cur), s.identity),
+          exclude,
         });
         diag.report = report;
         return withPeople(cur, s);

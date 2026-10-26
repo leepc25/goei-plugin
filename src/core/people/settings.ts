@@ -21,13 +21,13 @@ export const PP_DEFAULTS: Record<string, string> = {
   director_reuse: '1',
   speed: '1',
   affinity: '1', register: '1', perception: '1', perception_ext: '1', suspicion: '1',
-  docs_event: '1', docs_location: '1', docs_faction: '1', docs_item: '1', npc_emotion: '0',
+  docs_event: '1', docs_location: '1', docs_faction: '1', docs_item: '1', npc_emotion: '1',
   /** auto / confirm */
   newpeople: 'auto',
   twoturn: '1',
   prev_pairs: '1',
-  per_cap: '800',
-  span_cap: '12000',
+  per_cap: '2000',
+  span_cap: '20000',
   rules: '',
   director_rules: '',
   /** 다른 보조 호출과 병렬 */

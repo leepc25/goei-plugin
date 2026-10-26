@@ -10,7 +10,7 @@ import { seedPerson } from './seed';
 import { nameMatcher, scenePeople, entriesOf, type NameEntry } from './select';
 import { changeId, entryId, isAlive, liveChanges, liveEntries, liveness, markRead, messageKey, norm, plain, putChange, putDoc, putEntry, type Liveness } from './store';
 import type { Feature, PeopleSettings } from './settings';
-import { CUES, DOC_TYPES, SLOT_CAP, SLOTS, type Change, type Cue, type DocType, type Entry, type PeopleStore, type Person, type Register, type SlotId } from './types';
+import { CUES, DOC_TYPES, REGISTERS, SLOT_CAP, SLOTS, type Change, type Cue, type DocType, type Entry, type PeopleStore, type Person, type Register, type SlotId } from './types';
 
 const str = (v: unknown) => (typeof v === 'string' ? v : '');
 const msgs = (chat: Chat): ChatMessage[] => (Array.isArray(chat.message) ? chat.message : []);
@@ -110,6 +110,8 @@ export interface BuildOpts {
   /** 인물별 가치관(relations-base values) */
   values: Record<string, string>;
   names: NameEntry[];
+  /** 기록하지 않는 이름 (유저가 연기하는 요원) */
+  exclude?: string[];
 }
 
 const SUSP_WEIGHT: Record<string, number> = { 약: 10, 중: 25, 강: 40, '-약': -10, '-중': -25, '-강': -40 };
@@ -172,7 +174,7 @@ export function buildUpdate(chat: Chat, store: PeopleStore, batch: number[], o: 
   const texts = [...confirmedIdx].sort((a, b) => b - a).map((idx) => messageText(str(list[idx].data)));
   const people: string[] = [];
   const push = (n: string) => {
-    if (store.people[n] && !people.includes(n)) people.push(n);
+    if (store.people[n] && !people.includes(n) && !o.exclude?.includes(n)) people.push(n);
   };
   for (const t of texts) for (const n of match(t)) push(n);
   const scoped = { ...chat, message: list.slice(0, Math.max(...batch) + 1) } as Chat;
@@ -293,6 +295,8 @@ export interface ApplyCtx {
   /** 역할 명사만인 이름 (새 인물 거부) */
   roleWords?: Set<string>;
   now?: string;
+  /** 기록하지 않는 이름 (유저가 연기하는 요원): 새 인물로도 받지 않는다 */
+  exclude?: string[];
 }
 
 const ROLE_WORDS = new Set(['택시 기사', '기사', '점원', '경비', '경비원', '간호사', '의사', '행인', '남자', '여자', '아저씨', '아주머니', '학생', '직원', '요원', '사원', '대리', '과장', '부장', '선배', '후배', '언니', '오빠', '형', '누나', '손님', '주인', '사장', '경찰', '시민']);
@@ -316,7 +320,6 @@ export function similar(a: string, b: string): boolean {
   return (2 * hit) / (x.length - 1 + y.length - 1) >= 0.8;
 }
 
-const REGISTERS: Register[] = ['존댓말', '반말', '혼합'];
 const SUSP_KINDS = new Set(['정체', '배신', '거짓말', '오염', '범행']);
 
 /** 이름·별명·유일한 호칭으로 기록의 인물을 찾는다. 겹치는 호칭(「부장」)은 못 찾음 */
@@ -370,6 +373,10 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
     }
     if (nameOf(name)) {
       drop('new_people', n, '이미 있는 인물(별명 포함)', name);
+      continue;
+    }
+    if (ctx.exclude?.some((x) => norm(x) === norm(name) || (Array.isArray(n.aliases) && n.aliases.some((a) => norm(String(a)) === norm(x))))) {
+      drop('new_people', n, '유저가 연기하는 요원', name);
       continue;
     }
     if (store.ignored.includes(name)) {
