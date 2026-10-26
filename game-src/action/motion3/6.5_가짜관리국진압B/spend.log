@@ -145,3 +145,12 @@
 10-26 21:46:08 98 옆 앉아 먹기 보냄 east 8장 시작=지정 끝=지정 약 1회
 10-26 21:46:12 99 옆 앉아 마시기 보냄 east 8장 시작=지정 끝=지정 약 1회
 10-26 21:46:17 63 정면 앉아 타자 보냄 south 8장 시작=지정 끝=지정 약 1회
+10-26 21:46:24 69 후면 앉아 타자 보냄 north 8장 시작=지정 끝=지정 약 1회
+10-26 21:46:28 105 옆 앉아 타자 보냄 east 8장 시작=지정 끝=지정 약 1회
+10-26 21:46:28 73 정면 기대 쉬기 보냄 south 8장 시작=지정 끝=지정 약 1회
+10-26 21:46:29 66 정면 앉아 졸기 보냄 south 8장 시작=지정 끝=지정 약 1회
+10-26 21:46:31 78 오류: HTTP 422 {"detail":[{"type":"value_error","loc":["body"],"msg":"Value error, The frame count must be a multiple of 4 from 4 to 40 for PixMiniMax","input":{"character_id":"95a275a0-70c3-431c-ab5d-bd76dbaa2e6f","mode":"pixminimax","action_description":"Seated facing the viewer, hold the right forearm out forwa
+10-26 21:46:32 76 누워 쉬기·졸기 보냄 east 4장 시작=지정 끝=지정 약 1회
+10-26 21:46:32 77 누워 아파하기 보냄 east 8장 시작=지정 끝=지정 약 1회
+10-26 21:46:33 100 남 소변 (서서) 보냄 north 8장 시작=지정 끝=지정 약 1회
+10-26 21:46:36 101 하의 내리고 앉기 보냄 south 8장 시작=지정 끝=없음 약 1회
