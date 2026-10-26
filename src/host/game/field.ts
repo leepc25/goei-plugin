@@ -40,7 +40,7 @@ export function createField(): GameField {
         const c = await loadContext();
         if (!c || c.charIndex !== origin.charIndex || c.chatIndex !== origin.chatIndex || c.char.chaId !== origin.char.chaId || c.chat.id !== origin.chat.id) return;
         if (!KINDS.includes(ev.kind as FieldKind)) return;
-        const event = { id: crypto.randomUUID(), at: Date.now(), anchor: anchorOf(c.chat), kind: ev.kind as FieldKind, text: ev.text, scene: ev.scene, who: ev.who, weight: ev.weight, fact: ev.fact, ...(ev.witness && typeof ev.witness.faction === 'string' ? { witness: { faction: ev.witness.faction, named: !!ev.witness.named } } : {}) };
+        const event = { id: crypto.randomUUID(), at: Date.now(), anchor: anchorOf(c.chat), kind: ev.kind as FieldKind, text: ev.text, scene: ev.scene, who: ev.who, weight: ev.weight, fact: ev.fact, ...(ev.witness && typeof ev.witness.faction === 'string' ? { witness: { faction: ev.witness.faction, named: !!ev.witness.named } } : {}), ...(typeof ev.visit === 'string' && ev.visit ? { visit: ev.visit } : {}) };
         await updateChat(c.charIndex, c.chatIndex, (chat) => {
           if (chat.id !== c.chat.id) return null;
           let next = withFieldEvent(chat, event);

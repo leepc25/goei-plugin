@@ -28,7 +28,8 @@ export function sumCues(who: string, base: number, changes: Change[], folded: nu
   let pinned = false;
   const mine = changes.filter((c) => c.who === who && c.kind === 'cue');
   const groups = new Map<string, Change[]>();
-  for (const c of mine) (groups.get(c.anchor) ?? groups.set(c.anchor, []).get(c.anchor)!).push(c);
+  // 상한 묶음: 기본은 기준 메시지, 필드 계기는 「메시지|방문|장면」 (방문·장면마다 따로)
+  for (const c of mine) { const k = c.group ?? c.anchor; (groups.get(k) ?? groups.set(k, []).get(k)!).push(c); }
   for (const [, list] of groups) {
     let normal = 0;
     let extra = 0;

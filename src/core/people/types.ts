@@ -68,6 +68,8 @@ export interface Change {
   pin?: number;
   /** 계기 배율 (필드 몹 목격 0.5). 없으면 1 */
   scale?: number;
+  /** 메시지당 상한을 세는 묶음. 없으면 anchor. 필드는 「anchor|방문|장면」 (방문·장면마다 따로) */
+  group?: string;
   /** address */
   toUser?: string;
   register?: Register;

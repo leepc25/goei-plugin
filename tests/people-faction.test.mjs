@@ -157,3 +157,18 @@ test('메시지당 변화 상한 설정: 기본 10, 0 이면 한도 없음, 인�
   assert.equal(A.affinityOf(store.people.쟈알디, changes, 0, {}), 10);
   assert.equal(St.peopleSettings({ $pp_turn_cap: '250' }).turnCap, 100, '범위 0~100');
 });
+
+test('필드 상한 묶음: 같은 메시지 뒤 여러 방문·장면은 상한을 따로 센다', () => {
+  const store = T.emptyStore();
+  store.people.쟈알디 = person('쟈알디');
+  const ev = (id, scene, visit) => ({ id, at: 1, anchor: 'c1', kind: 'quest', text: '도움', who: ['쟈알디'], witness: { faction: 'B00', named: true }, scene, visit });
+  for (let i = 0; i < 4; i++) Fd.applyFieldEvent(store, c, ev(`a${i}`, '로비', 'v1'), '주인공');
+  for (let i = 0; i < 4; i++) Fd.applyFieldEvent(store, c, ev(`b${i}`, '로비', 'v2'), '주인공');
+  for (let i = 0; i < 4; i++) Fd.applyFieldEvent(store, c, ev(`c${i}`, '옥상', 'v2'), '주인공');
+  const live = S.liveness(c);
+  const changes = S.liveChanges(store, live);
+  const s = settings();
+  assert.equal(F.factionNow(store, 'B00', changes, 'A00', s).value, -25 + 30, '묶음 3개 × 상한 10 (각 4×3=12 → 10)');
+  assert.equal(A.affinityOf(store.people.쟈알디, changes, 0, { turnCap: 10 }), 30);
+  assert.ok(store.log.every((x) => x.group && x.group.startsWith('c1|')));
+});

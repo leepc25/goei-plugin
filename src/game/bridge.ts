@@ -157,6 +157,8 @@ export interface GameFieldEvent {
   fact?: { key: string; value: string; permanent?: boolean };
   /** 목격한 소속 (세력 평판): 조직 코드와 「명단 인물이 봤나(named) / 이름 없는 몹이 봤나」. 몹 목격은 계기 값의 절반(설정) */
   witness?: { faction: string; named: boolean };
+  /** 방문 번호·id. 호감·평판의 메시지당 상한을 방문마다(그리고 장면마다) 따로 세게. 없으면 장면 이름만으로 나눈다 */
+  visit?: string;
 }
 
 /** 세력 평판 (docs/설계안_세력평판.md): 세력 → 유저 값과 구간. 몹의 첫 반응은 stage 로 정한다 */

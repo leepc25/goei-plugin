@@ -17,6 +17,8 @@ function targets(store: PeopleStore, ev: FieldEvent, player: string): string[] {
 export function applyFieldEvent(store: PeopleStore, chat: Chat, ev: FieldEvent, player = '주인공', o: { mobWeight?: 'half' | 'full' | 'off'; factionNames?: Record<string, string> } = {}): number {
   let n = 0;
   const cue = CUE_OF[ev.kind];
+  // 상한 묶음: 같은 메시지 뒤라도 방문·장면이 다르면 따로 센다 (채팅을 안 보내고 여러 번 들락날락해도 ±상한에 같이 갇히지 않게)
+  const group = `${ev.anchor}|${ev.visit ?? ''}|${ev.scene ?? ''}`;
   // 세력 평판: 목격한 소속의 장부에 계기. 몹 목격은 절반(소수점 버림, 0 이면 없음), 설정으로 같음·안 씀
   if (cue && ev.witness?.faction && (ev.witness.named || (o.mobWeight ?? 'half') !== 'off')) {
     const code = ev.witness.faction;
@@ -24,7 +26,7 @@ export function applyFieldEvent(store: PeopleStore, chat: Chat, ev: FieldEvent, 
     const fw = factionWho(code);
     if (!store.factions[code]) store.factions[code] = { code, name: o.factionNames?.[code] || ORG_NAMES[code] || code, seeded: { at: new Date(ev.at || Date.now()).toISOString() } };
     const seq = store.log.filter((c) => c.anchor === ev.anchor).length;
-    if (putChange(store, { id: changeId(fw, 'cue', ev.anchor, 0, `${ev.kind}:${ev.id}`), anchor: ev.anchor, seq, src: 'field', who: fw, kind: 'cue', cue, ...(scale !== 1 ? { scale } : {}), reason: `필드(${ev.witness.named ? '명단 인물' : '몹'} 목격): ${ev.text}`.slice(0, 80) })) n++;
+    if (putChange(store, { id: changeId(fw, 'cue', ev.anchor, 0, `${ev.kind}:${ev.id}`), anchor: ev.anchor, seq, src: 'field', who: fw, kind: 'cue', cue, group, ...(scale !== 1 ? { scale } : {}), reason: `필드(${ev.witness.named ? '명단 인물' : '몹'} 목격): ${ev.text}`.slice(0, 80) })) n++;
   }
   const who = targets(store, ev, player);
   if (!who.length) return n;
@@ -32,7 +34,7 @@ export function applyFieldEvent(store: PeopleStore, chat: Chat, ev: FieldEvent, 
   for (const name of who) {
     const seq = store.log.filter((c) => c.anchor === ev.anchor).length + (store.people[name].slots.state?.length ?? 0);
     if (cue) {
-      if (putChange(store, { id: changeId(name, 'cue', ev.anchor, 0, `${ev.kind}:${ev.id}`), anchor: ev.anchor, seq, src: 'field', who: name, kind: 'cue', cue, reason: `필드: ${ev.text}`.slice(0, 80) })) n++;
+      if (putChange(store, { id: changeId(name, 'cue', ev.anchor, 0, `${ev.kind}:${ev.id}`), anchor: ev.anchor, seq, src: 'field', who: name, kind: 'cue', cue, group, reason: `필드: ${ev.text}`.slice(0, 80) })) n++;
     }
     const state = liveEntries(store.people[name].slots.state, live);
     const put = (text: string, replaces?: string) => {
