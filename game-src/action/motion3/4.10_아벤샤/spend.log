@@ -148,3 +148,7 @@
 10-26 05:01:22 VFX x3-4.10-D-sand-bullet 완료 {'h': 24, 'w': 48} 6장 effect_id=02f3bf4c-fee3-43ec-91f9-2404ac19d6ae
 10-26 05:02:05 VFX x3-4.10-D-sand-bullet 완료 {'h': 24, 'w': 48} 6장 effect_id=3535f9aa-5532-45cb-bb75-5ab6fde17ab5
 10-26 05:02:38 VFX x3-4.10-S0-sand-barrier 완료 {'h': 128, 'w': 128} 7장 effect_id=dda35f0f-9303-4ef7-9f15-5509d5cf6237
+10-26 05:11:13 VFX x3-4.10-S1-sand-stream 완료 {'h': 54, 'w': 392} 6장 effect_id=854b617b-bf8f-4dcd-8fa0-e713bc0db649
+10-26 05:11:39 VFX x3-4.10-S2-sand-pillar 완료 {'h': 380, 'w': 480} 8장 effect_id=215fd3e6-2a7e-44d3-a5e8-45840278b631
+10-26 05:13:45 VFX x3-4.10-F-sand-tsunami 완료 {'h': 410, 'w': 1024} 16장 effect_id=277a81b6-146e-494f-8b25-cd47d1831e25
+10-26 05:15:42 VFX x3-4.10-F-sand-tsunami 완료 {'h': 512, 'w': 1024} 16장 effect_id=54cc922d-50a3-481d-9b2f-56f8c13d5e00

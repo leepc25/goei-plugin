@@ -1,0 +1,183 @@
+{
+ "frames": [
+  {
+   "filename": "x3-4-10-s1-sand-stream 0.png",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 392,
+    "h": 54
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 392,
+    "h": 54
+   },
+   "sourceSize": {
+    "w": 392,
+    "h": 54
+   },
+   "pivot": {
+    "x": 0.007653061224489796,
+    "y": 0.7592592592592593
+   },
+   "duration": 100
+  },
+  {
+   "filename": "x3-4-10-s1-sand-stream 1.png",
+   "frame": {
+    "x": 392,
+    "y": 0,
+    "w": 392,
+    "h": 54
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 392,
+    "h": 54
+   },
+   "sourceSize": {
+    "w": 392,
+    "h": 54
+   },
+   "pivot": {
+    "x": 0.007653061224489796,
+    "y": 0.7592592592592593
+   },
+   "duration": 100
+  },
+  {
+   "filename": "x3-4-10-s1-sand-stream 2.png",
+   "frame": {
+    "x": 784,
+    "y": 0,
+    "w": 392,
+    "h": 54
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 392,
+    "h": 54
+   },
+   "sourceSize": {
+    "w": 392,
+    "h": 54
+   },
+   "pivot": {
+    "x": 0.007653061224489796,
+    "y": 0.7592592592592593
+   },
+   "duration": 100
+  },
+  {
+   "filename": "x3-4-10-s1-sand-stream 3.png",
+   "frame": {
+    "x": 0,
+    "y": 54,
+    "w": 392,
+    "h": 54
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 392,
+    "h": 54
+   },
+   "sourceSize": {
+    "w": 392,
+    "h": 54
+   },
+   "pivot": {
+    "x": 0.007653061224489796,
+    "y": 0.7592592592592593
+   },
+   "duration": 100
+  },
+  {
+   "filename": "x3-4-10-s1-sand-stream 4.png",
+   "frame": {
+    "x": 392,
+    "y": 54,
+    "w": 392,
+    "h": 54
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 392,
+    "h": 54
+   },
+   "sourceSize": {
+    "w": 392,
+    "h": 54
+   },
+   "pivot": {
+    "x": 0.007653061224489796,
+    "y": 0.7592592592592593
+   },
+   "duration": 100
+  },
+  {
+   "filename": "x3-4-10-s1-sand-stream 5.png",
+   "frame": {
+    "x": 784,
+    "y": 54,
+    "w": 392,
+    "h": 54
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 392,
+    "h": 54
+   },
+   "sourceSize": {
+    "w": 392,
+    "h": 54
+   },
+   "pivot": {
+    "x": 0.007653061224489796,
+    "y": 0.7592592592592593
+   },
+   "duration": 100
+  }
+ ],
+ "meta": {
+  "app": "PixelLab VFX Creator",
+  "image": "x3-4-10-s1-sand-stream.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 1176,
+   "h": 108
+  },
+  "scale": "1",
+  "anchor": {
+   "kind": "origin",
+   "x": 3,
+   "y": 41
+  },
+  "frameTags": [
+   {
+    "name": "x3-4-10-s1-sand-stream",
+    "from": 0,
+    "to": 5,
+    "direction": "forward"
+   }
+  ]
+ }
+}

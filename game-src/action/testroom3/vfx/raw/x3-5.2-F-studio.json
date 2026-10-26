@@ -6,7 +6,7 @@
     "x": 0,
     "y": 0,
     "w": 1024,
-    "h": 512
+    "h": 410
    },
    "rotated": false,
    "trimmed": false,
@@ -14,17 +14,17 @@
     "x": 0,
     "y": 0,
     "w": 1024,
-    "h": 512
+    "h": 410
    },
    "sourceSize": {
     "w": 1024,
-    "h": 512
+    "h": 410
    },
    "pivot": {
     "x": 0.5,
     "y": 0.5
    },
-   "duration": 83
+   "duration": 100
   },
   {
    "filename": "x3-5-2-f-studio 1.png",
@@ -32,7 +32,7 @@
     "x": 1024,
     "y": 0,
     "w": 1024,
-    "h": 512
+    "h": 410
    },
    "rotated": false,
    "trimmed": false,
@@ -40,17 +40,17 @@
     "x": 0,
     "y": 0,
     "w": 1024,
-    "h": 512
+    "h": 410
    },
    "sourceSize": {
     "w": 1024,
-    "h": 512
+    "h": 410
    },
    "pivot": {
     "x": 0.5,
     "y": 0.5
    },
-   "duration": 83
+   "duration": 100
   },
   {
    "filename": "x3-5-2-f-studio 2.png",
@@ -58,7 +58,7 @@
     "x": 2048,
     "y": 0,
     "w": 1024,
-    "h": 512
+    "h": 410
    },
    "rotated": false,
    "trimmed": false,
@@ -66,17 +66,17 @@
     "x": 0,
     "y": 0,
     "w": 1024,
-    "h": 512
+    "h": 410
    },
    "sourceSize": {
     "w": 1024,
-    "h": 512
+    "h": 410
    },
    "pivot": {
     "x": 0.5,
     "y": 0.5
    },
-   "duration": 83
+   "duration": 100
   },
   {
    "filename": "x3-5-2-f-studio 3.png",
@@ -84,7 +84,7 @@
     "x": 3072,
     "y": 0,
     "w": 1024,
-    "h": 512
+    "h": 410
    },
    "rotated": false,
    "trimmed": false,
@@ -92,25 +92,25 @@
     "x": 0,
     "y": 0,
     "w": 1024,
-    "h": 512
+    "h": 410
    },
    "sourceSize": {
     "w": 1024,
-    "h": 512
+    "h": 410
    },
    "pivot": {
     "x": 0.5,
     "y": 0.5
    },
-   "duration": 83
+   "duration": 100
   },
   {
    "filename": "x3-5-2-f-studio 4.png",
    "frame": {
     "x": 0,
-    "y": 512,
+    "y": 410,
     "w": 1024,
-    "h": 512
+    "h": 410
    },
    "rotated": false,
    "trimmed": false,
@@ -118,25 +118,25 @@
     "x": 0,
     "y": 0,
     "w": 1024,
-    "h": 512
+    "h": 410
    },
    "sourceSize": {
     "w": 1024,
-    "h": 512
+    "h": 410
    },
    "pivot": {
     "x": 0.5,
     "y": 0.5
    },
-   "duration": 83
+   "duration": 100
   },
   {
    "filename": "x3-5-2-f-studio 5.png",
    "frame": {
     "x": 1024,
-    "y": 512,
+    "y": 410,
     "w": 1024,
-    "h": 512
+    "h": 410
    },
    "rotated": false,
    "trimmed": false,
@@ -144,25 +144,25 @@
     "x": 0,
     "y": 0,
     "w": 1024,
-    "h": 512
+    "h": 410
    },
    "sourceSize": {
     "w": 1024,
-    "h": 512
+    "h": 410
    },
    "pivot": {
     "x": 0.5,
     "y": 0.5
    },
-   "duration": 83
+   "duration": 100
   },
   {
    "filename": "x3-5-2-f-studio 6.png",
    "frame": {
     "x": 2048,
-    "y": 512,
+    "y": 410,
     "w": 1024,
-    "h": 512
+    "h": 410
    },
    "rotated": false,
    "trimmed": false,
@@ -170,25 +170,25 @@
     "x": 0,
     "y": 0,
     "w": 1024,
-    "h": 512
+    "h": 410
    },
    "sourceSize": {
     "w": 1024,
-    "h": 512
+    "h": 410
    },
    "pivot": {
     "x": 0.5,
     "y": 0.5
    },
-   "duration": 83
+   "duration": 100
   },
   {
    "filename": "x3-5-2-f-studio 7.png",
    "frame": {
     "x": 3072,
-    "y": 512,
+    "y": 410,
     "w": 1024,
-    "h": 512
+    "h": 410
    },
    "rotated": false,
    "trimmed": false,
@@ -196,25 +196,25 @@
     "x": 0,
     "y": 0,
     "w": 1024,
-    "h": 512
+    "h": 410
    },
    "sourceSize": {
     "w": 1024,
-    "h": 512
+    "h": 410
    },
    "pivot": {
     "x": 0.5,
     "y": 0.5
    },
-   "duration": 83
+   "duration": 100
   },
   {
    "filename": "x3-5-2-f-studio 8.png",
    "frame": {
     "x": 0,
-    "y": 1024,
+    "y": 820,
     "w": 1024,
-    "h": 512
+    "h": 410
    },
    "rotated": false,
    "trimmed": false,
@@ -222,25 +222,25 @@
     "x": 0,
     "y": 0,
     "w": 1024,
-    "h": 512
+    "h": 410
    },
    "sourceSize": {
     "w": 1024,
-    "h": 512
+    "h": 410
    },
    "pivot": {
     "x": 0.5,
     "y": 0.5
    },
-   "duration": 83
+   "duration": 100
   },
   {
    "filename": "x3-5-2-f-studio 9.png",
    "frame": {
     "x": 1024,
-    "y": 1024,
+    "y": 820,
     "w": 1024,
-    "h": 512
+    "h": 410
    },
    "rotated": false,
    "trimmed": false,
@@ -248,25 +248,25 @@
     "x": 0,
     "y": 0,
     "w": 1024,
-    "h": 512
+    "h": 410
    },
    "sourceSize": {
     "w": 1024,
-    "h": 512
+    "h": 410
    },
    "pivot": {
     "x": 0.5,
     "y": 0.5
    },
-   "duration": 83
+   "duration": 100
   },
   {
    "filename": "x3-5-2-f-studio 10.png",
    "frame": {
     "x": 2048,
-    "y": 1024,
+    "y": 820,
     "w": 1024,
-    "h": 512
+    "h": 410
    },
    "rotated": false,
    "trimmed": false,
@@ -274,25 +274,25 @@
     "x": 0,
     "y": 0,
     "w": 1024,
-    "h": 512
+    "h": 410
    },
    "sourceSize": {
     "w": 1024,
-    "h": 512
+    "h": 410
    },
    "pivot": {
     "x": 0.5,
     "y": 0.5
    },
-   "duration": 83
+   "duration": 100
   },
   {
    "filename": "x3-5-2-f-studio 11.png",
    "frame": {
     "x": 3072,
-    "y": 1024,
+    "y": 820,
     "w": 1024,
-    "h": 512
+    "h": 410
    },
    "rotated": false,
    "trimmed": false,
@@ -300,25 +300,25 @@
     "x": 0,
     "y": 0,
     "w": 1024,
-    "h": 512
+    "h": 410
    },
    "sourceSize": {
     "w": 1024,
-    "h": 512
+    "h": 410
    },
    "pivot": {
     "x": 0.5,
     "y": 0.5
    },
-   "duration": 83
+   "duration": 100
   },
   {
    "filename": "x3-5-2-f-studio 12.png",
    "frame": {
     "x": 0,
-    "y": 1536,
+    "y": 1230,
     "w": 1024,
-    "h": 512
+    "h": 410
    },
    "rotated": false,
    "trimmed": false,
@@ -326,25 +326,25 @@
     "x": 0,
     "y": 0,
     "w": 1024,
-    "h": 512
+    "h": 410
    },
    "sourceSize": {
     "w": 1024,
-    "h": 512
+    "h": 410
    },
    "pivot": {
     "x": 0.5,
     "y": 0.5
    },
-   "duration": 83
+   "duration": 100
   },
   {
    "filename": "x3-5-2-f-studio 13.png",
    "frame": {
     "x": 1024,
-    "y": 1536,
+    "y": 1230,
     "w": 1024,
-    "h": 512
+    "h": 410
    },
    "rotated": false,
    "trimmed": false,
@@ -352,25 +352,25 @@
     "x": 0,
     "y": 0,
     "w": 1024,
-    "h": 512
+    "h": 410
    },
    "sourceSize": {
     "w": 1024,
-    "h": 512
+    "h": 410
    },
    "pivot": {
     "x": 0.5,
     "y": 0.5
    },
-   "duration": 83
+   "duration": 100
   },
   {
    "filename": "x3-5-2-f-studio 14.png",
    "frame": {
     "x": 2048,
-    "y": 1536,
+    "y": 1230,
     "w": 1024,
-    "h": 512
+    "h": 410
    },
    "rotated": false,
    "trimmed": false,
@@ -378,25 +378,25 @@
     "x": 0,
     "y": 0,
     "w": 1024,
-    "h": 512
+    "h": 410
    },
    "sourceSize": {
     "w": 1024,
-    "h": 512
+    "h": 410
    },
    "pivot": {
     "x": 0.5,
     "y": 0.5
    },
-   "duration": 83
+   "duration": 100
   },
   {
    "filename": "x3-5-2-f-studio 15.png",
    "frame": {
     "x": 3072,
-    "y": 1536,
+    "y": 1230,
     "w": 1024,
-    "h": 512
+    "h": 410
    },
    "rotated": false,
    "trimmed": false,
@@ -404,17 +404,17 @@
     "x": 0,
     "y": 0,
     "w": 1024,
-    "h": 512
+    "h": 410
    },
    "sourceSize": {
     "w": 1024,
-    "h": 512
+    "h": 410
    },
    "pivot": {
     "x": 0.5,
     "y": 0.5
    },
-   "duration": 83
+   "duration": 100
   }
  ],
  "meta": {
@@ -423,13 +423,13 @@
   "format": "RGBA8888",
   "size": {
    "w": 4096,
-   "h": 2048
+   "h": 1640
   },
   "scale": "1",
   "anchor": {
    "kind": "origin",
    "x": 512,
-   "y": 256
+   "y": 205
   },
   "frameTags": [
    {

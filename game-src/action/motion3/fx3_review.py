@@ -6,7 +6,7 @@ from PIL import Image
 import m3
 
 BASE = Path(__file__).resolve().parent; ROOT = BASE.parents[2]; VFX = BASE.parent / "testroom3" / "vfx"
-OUT = ROOT / "docs" / "이펙트_시험" / "3판"
+OUT = Path("/tmp/fx3_review")   # 확인용 임시 폴더. 게시본은 그림을 넣은 한 파일 docs/이펙트_시험/기술이펙트_3판.html
 DIRS = {f"{a}_{b}": ("W" if "(W)" in d else "E") for a, b, d in re.findall(r"^\| (\d+\.\d+) \| (\S+) \| ([^|]+) \|", (ROOT / "docs/동작표_3판/00_목록.md").read_text(), re.M)}
 
 
@@ -15,6 +15,8 @@ def main():
     man = json.loads((BASE / "fx3_manifest.json").read_text())
     st = json.loads((BASE / "fx3_status.json").read_text()) if (BASE / "fx3_status.json").exists() else {}
     items, sprites = [], {}
+    log = (BASE / "queue" / "gen3.log").read_text() if (BASE / "queue" / "gen3.log").exists() else ""
+    nochar = set(re.findall(r"^(\S+) 캐릭터 없음", log, re.M))   # 이펙트에 캐릭터가 안 그려진 것: 발 기준이 아님
     for it in man:
         n = it["name"]; js = VFX / f"{n}.json"
         if not js.exists(): continue
@@ -27,7 +29,8 @@ def main():
         shutil.copy(VFX / f"{n}.png", OUT / "fx" / f"{n}.png")
         fr = [f["frame"] for f in m["frames"]]
         items.append(dict(n=n, key=key, row=it.get("row", ""), kind=it["kind"], fr=fr, dur=m["frames"][0].get("duration", 70),
-                          ax=m["meta"]["anchor"]["x"], ay=m["meta"]["anchor"]["y"], bad=(st.get(n) or {}).get("why") or []))
+                          ax=m["meta"]["anchor"]["x"], ay=m["meta"]["anchor"]["y"], feet=m["meta"]["anchor"].get("kind") == "feet" and m["meta"].get("stripped") and n not in nochar,
+                          box=m["meta"].get("box"), mode=it.get("mode", "bottom"), bad=(st.get(n) or {}).get("why") or []))
     tpl = (BASE / "fx3_review.tpl").read_text()
     (OUT / "index.html").write_text(tpl.replace("__D__", json.dumps(dict(items=items, sp=sprites), ensure_ascii=False)))
     print(len(items), "개")
