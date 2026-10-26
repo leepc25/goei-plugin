@@ -1,6 +1,11 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>이펙트 시험 비교</title>
-<style>:root{--bg:#1d1f24;--fg:#e8e8e8;--card:#2a2d34}body{margin:0;padding:16px;background:var(--bg);color:var(--fg);font-family:sans-serif}
-h2{font-size:16px;margin:18px 0 6px}p{margin:4px 0;font-size:13px;opacity:.8}.c{background:#6b7a6b;overflow-x:auto;border-radius:6px}canvas{image-rendering:pixelated;display:block}</style></head><body>
+<title>괴물 이펙트 시험</title><meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* 세 줄 재생 칸을 위아래로 쌓음, 한 가지 어두운 화면 */
+:root{--bg:#1b1d22;--fg:#e6e8ec;--muted:#a3a9b3;--stage:#6b7a6b;color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:system-ui,sans-serif;padding-block:16px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h2{font-size:16px;margin:18px 0 6px;text-wrap:balance}p{margin:4px 0 8px;font-size:13px;color:var(--muted)}
+.c{background:var(--stage);border-radius:6px;overflow:hidden}canvas{image-rendering:pixelated;display:block;width:100%;height:auto}
+</style>
 <h2>A. 등장물 방식 — 캐릭터 생성(약 20) + 동작 2줄(뛰쳐나오기 → 짓밟으며 달리기)</h2><p>고그니쟈 옆에서 괴물이 뛰쳐나와 앞으로 달려감</p><div class="c"><canvas id="a" width="1100" height="440"></canvas></div>
 <h2>B. 형체 없는 이펙트 방식 — VFX 1장(약 18)</h2><p>같은 괴물을 VFX로 한 번에. 캐릭터는 지우고 고그니쟈 그림을 겹쳐 그림</p><div class="c"><canvas id="b" width="1100" height="440"></canvas></div>
 <h2>C. 충격파 — 새 방식(그림 참조) / 옛 방식(참조 없음)</h2><p>왼쪽 새것, 오른쪽 옛것. 둘 다 쟈알디 기준</p><div class="c"><canvas id="c" width="1100" height="440"></canvas></div>
@@ -25,4 +30,4 @@ function loop(t){const ms=t-t0;
  const s2=Math.floor(ms/D.shock2.dur)%(S2.length+8);if(s2<S2.length)c.drawImage(S2[s2],100-D.shock2.ax,GY-D.shock2.ay);
  const s1=Math.floor(ms/D.shock1.dur)%(S1.length+8);if(s1<S1.length)c.drawImage(S1[s1],650-D.shock1.ax,GY-D.shock1.ay);
  requestAnimationFrame(loop)}
-requestAnimationFrame(loop);</script></body></html>
+requestAnimationFrame(loop);</script>
