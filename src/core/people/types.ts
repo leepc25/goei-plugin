@@ -90,7 +90,6 @@ export interface Person {
   address: { toUser: string; register: Register; pin?: boolean };
   /** 감정이 겉으로 드러나는 정도 0~3 */
   express: 0 | 1 | 2 | 3;
-  minor?: boolean;
   aliases: string[];
 }
 

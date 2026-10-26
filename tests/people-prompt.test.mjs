@@ -32,7 +32,7 @@ test('지침 두 벌: 절 표식이 같고 짝이 맞고, 조립하면 표식이
   assert.ok(!/User rules/.test(full), '규칙이 없으면 user_rules 절은 빠진다');
   const withRules = U.assemblePrompt(P.promptFor(s), U.enabledSections(s), '한국어 존댓말로만 판정한다');
   assert.match(withRules, /User rules[\s\S]*한국어 존댓말로만/);
-  const off = U.assemblePrompt(P.promptFor(s), new Set(['minor']), '');
+  const off = U.assemblePrompt(P.promptFor(s), new Set(), '');
   assert.ok(off.length < full.length);
   assert.ok(!/<<[A-Z_:a-z]+>>/.test(off));
   // 간결판이 자세히판보다 짧고, 둘 다 출력 계약을 담는다

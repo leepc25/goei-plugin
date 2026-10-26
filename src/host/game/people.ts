@@ -32,7 +32,6 @@ export function createPeople(): GamePeople {
           affinity: { value: aff.value, stage: aff.stage.label, cell: aff.stage.cell },
           address: addressOf(p, changes),
           express: p.express,
-          minor: !!p.minor,
           state: texts('state'),
           knowledge: texts('knowledge'),
           threads: texts('threads'),

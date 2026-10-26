@@ -41,7 +41,6 @@ export function peopleStore(chat: Chat): PeopleStore {
       affinity: { base: Number(p.affinity?.base) || 0 },
       address: { toUser: str(p.address?.toUser), register: REGISTERS.includes(p.address?.register as Register) ? (p.address!.register as Register) : '존댓말', ...(p.address?.pin ? { pin: true } : {}) },
       express: ([0, 1, 2, 3] as const).includes(p.express as 0) ? (p.express as 0 | 1 | 2 | 3) : 1,
-      ...(p.minor ? { minor: true } : {}),
       aliases: Array.isArray(p.aliases) ? p.aliases.filter((a): a is string => typeof a === 'string') : [],
     };
   }

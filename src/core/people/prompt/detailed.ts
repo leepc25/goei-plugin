@@ -7,7 +7,7 @@
 //   user_rules 절의 <<USER_RULES>> 줄은 사용자 추가 지침으로 바꾸고, 비어 있으면 절 전체를 잘라낸다.
 // 데이터 JSON에 이 지침이 기대하는 추가 필드: people[].express, people[].unknown_to, docs_now, suspicion_now, npc_relations, next_note.
 /** 설정에 따라 넣고 빼는 절 이름. 두 지침(자세히·간결)에서 같다. */
-export const UPDATER_SECTIONS = ["affinity", "register", "perception", "perception_ext", "suspicion", "docs_event", "docs_location", "docs_faction", "docs_item", "minor", "user_rules"] as const;
+export const UPDATER_SECTIONS = ["affinity", "register", "perception", "perception_ext", "suspicion", "docs_event", "docs_location", "docs_faction", "docs_item", "user_rules"] as const;
 export type UpdaterSection = (typeof UPDATER_SECTIONS)[number];
 
 export const UPDATER_DETAILED: string = [
@@ -24,7 +24,7 @@ export const UPDATER_DETAILED: string = [
   "  - `request_ref`: echo is not required; it is for the program's diagnostics.",
   "  - `cues`: the cue names you may use for affinity, each with its meaning.",
   "  - `slots`: the slot names currently recorded. A slot that is not listed does not exist for this run: never write to it.",
-  "  - `people`: the persons in the scene. Each has `name` (the canonical key), `aliases`, `minor`, `values` (2–3 lines on what this person values, written at development time and never changed by you), `express` (0–3, how visibly this person shows emotion), `affinity_now` (current stage toward the user's character, as text), `address_now` (how this person currently addresses the user), `entries` (the current record, per slot, each entry with an `id`, `text`, optional `target`, optional `pin`), and, when the Director memo is on, `unknown_to` (facts recorded in this chat that this person has not learned).",
+  "  - `people`: the persons in the scene. Each has `name` (the canonical key), `aliases`, `values` (2–3 lines on what this person values, written at development time and never changed by you), `express` (0–3, how visibly this person shows emotion), `affinity_now` (current stage toward the user's character, as text), `address_now` (how this person currently addresses the user), `entries` (the current record, per slot, each entry with an `id`, `text`, optional `target`, optional `pin`), and, when the Director memo is on, `unknown_to` (facts recorded in this chat that this person has not learned).",
   "  - `already_recorded`: cues, address changes and entries the program has already stored from this same span (including events the field game wrote). Never record them again, even in other words.",
   "  - `signals`: persons whose status-board tag changed in this response (for example 내근 → 부상). A tag is a signal, not a record: find how and why in the span, record it in `state`, and add one `history` line. If the span does not show the cause, record only the new state.",
   "  - `span`: the roleplay text, one message per item with a tag `m`, a `role`, and either `confirmed: true` or `context_only: true`. Status lines, board tags, plugin blocks, image tags and thought blocks were already removed. A fold marked `[…]` means the middle of a long response was cut; do not guess what was there.",
@@ -203,7 +203,7 @@ export const UPDATER_DETAILED: string = [
   "| 파괴 Destruction | Focused on breaking some aspect of the target. |",
   "| 경멸 Contempt | Even help or praise may serve to confirm the person's superiority. |",
   "",
-  "Abusive intent is an intent or attempt; it never guarantees success or legitimacy. Do not invent a path to success, the target's submission, or the user's response. Never make a minor, or a target whose adulthood is unclear, an object of sexual interest, and never newly assign an abusive intent toward a minor. When exploitative or abusive intent exists, preserve both the surface and the purpose, and track continuity in what was attempted, what followed, and who noticed what.",
+  "Abusive intent is an intent or attempt; it never guarantees success or legitimacy. Do not invent a path to success, the target's submission, or the user's response. When exploitative or abusive intent exists, preserve both the surface and the purpose, and track continuity in what was attempted, what followed, and who noticed what.",
   "",
   "### 7.6 Duty, concealment and rationalization",
   "When a constraint applies (marriage, engagement, an oath, professional ethics, rank difference, an existing relationship, orders from the organization), preserve both the constraint and how the person handles it, in 「제약:」:",
@@ -386,10 +386,6 @@ export const UPDATER_DETAILED: string = [
   "### 10.6 Recording",
   "Items in `suspicion`: `op: open` starts a case (text: what raised it and how the person reads it) or reopens a closed one; `op: clue` adds evidence that newly reached the person, with `weight` (약, 중, 강, -약, -중, -강) and text giving the clue and the person's interpretation; `op: respond` records what the person did, with `stage`; `op: close` ends it with `result`. One `clue` per case per span: combine several clues reaching the person in one span into one item with the highest justified weight. Never record the same clue twice because the person reread or recalled it, never record an unseen clue, and never promote a stated intent into an attempt or success. Changes the suspicion caused to how the person treats the target (shorter answers, formal register, avoidance) go to `relationship` and, if durable, `speech` under the ordinary rules; a suspicion never rewrites the base register by itself. The case's existence is also a `threads` entry for the person only when the person is actively pursuing it.",
   "<<END:suspicion>>",
-  "<<SECTION:minor>>",
-  "## 11. Protected persons",
-  "Persons marked `\"minor\": true` are protected. Never write romantic or sexual content about them in any slot, cue reason, document, or memo, and never make a minor the object of romantic, sexual, or abusive intent in another person's entries. Affection-type cues toward a minor (and from a minor) are recorded as care or trust in `reason`. A minor's own attachment is written as trust, reliance, or admiration. Where adulthood is unclear, apply this section.",
-  "<<END:minor>>",
   "## 12. Evidence citation",
   "Every entry, cue, address change, new person, document change and suspicion item carries `m` (the tag of a confirmed message) and `quote`: 5–60 characters copied exactly from that message, showing the fact. No quote, no change. One quote may support several changes; one change may cite only one quote, so pick the most direct. Never quote from a context_only message, from this instruction, or from the record. Never alter, translate, or stitch a quote. A quote shows that the text exists; it does not by itself make your reading of it true.",
   "## 13. User identity",

@@ -72,7 +72,7 @@ test('지침 조립: 꺼진 절은 빼고 표식은 지우고 사용자 규칙�
   assert.doesNotMatch(out, /SUS|<<|>>/);
   assert.match(out, /## User rules[\s\S]*한국어로/);
   const on = U.enabledSections(settings());
-  assert.ok(on.has('affinity') && on.has('next_note') && on.has('minor') && on.has('docs_event'));
+  assert.ok(on.has('affinity') && on.has('next_note') && on.has('docs_event'));
 });
 
 test('응답 읽기: 울타리·앞뒤 글 허용, 객체 아니면 거부', () => {

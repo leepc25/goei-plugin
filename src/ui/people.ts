@@ -529,7 +529,7 @@ export function personView(ctx: ChatContext, name: string): string {
   const aff = affinityView(p, changes, store.folded[p.name] ?? 0, affOpts(ctx, p.name));
   const addr = addressOf(p, changes);
   const seededFrom = seededOf(p) === 'lore' ? '로어북 시트' : seededOf(p) === 'dialogue' ? '필드 대사' : '빈 기록(이야기에서 등장)';
-  const sub = [p.faction ? factionName(ctx, p.faction) : '소속 모름', `시작값: ${seededFrom}`, p.minor ? '미성년' : ''].filter(Boolean).join(' · ');
+  const sub = [p.faction ? factionName(ctx, p.faction) : '소속 모름', `시작값: ${seededFrom}`].filter(Boolean).join(' · ');
   const stageOptions = STAGES.map((s, i) => `<option value="${s.max}" ${peopleUi.affStage === String(s.max) ? 'selected' : ''}>${esc(s.label)} (${i ? STAGES[i - 1].max + 1 : AFF_MIN}~${s.max})</option>`).join('');
   const affEdit = peopleUi.affEdit
     ? `<div class="pp-edit"><div class="pp-edit-row"><label>단계 <select class="gx-select" data-change="pp-aff-stage">${'<option value="">(직접 숫자)</option>'}${stageOptions}</select></label>

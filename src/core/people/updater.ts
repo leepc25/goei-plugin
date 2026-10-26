@@ -94,7 +94,6 @@ export function personPayload(p: Person, live: Liveness, cap: number, changes: C
   return {
     name: p.name,
     aliases: p.aliases,
-    ...(p.minor ? { minor: true } : {}),
     express: p.express,
     affinity_now: `${aff.stage.label}(${aff.stage.max})`,
     address_now: addr,
@@ -248,7 +247,6 @@ export function enabledSections(s: PeopleSettings): Set<string> {
   const on = new Set<string>();
   for (const f of s.features) on.add(f);
   if (s.director === 'facts') on.add('next_note');
-  on.add('minor');
   return on;
 }
 
@@ -298,7 +296,7 @@ export interface ApplyCtx {
   /** 새 인물의 시트 (로어북에 있으면) */
   sheetOf?: (name: string) => string | null;
   /** 새 인물의 시작값 */
-  baseOf?: (name: string) => { faction?: string; affinityBase?: number; express?: 0 | 1 | 2 | 3; minor?: boolean; aliases?: string[] };
+  baseOf?: (name: string) => { faction?: string; affinityBase?: number; express?: 0 | 1 | 2 | 3; aliases?: string[] };
   /** 역할 명사만인 이름 (새 인물 거부) */
   roleWords?: Set<string>;
   now?: string;
@@ -307,7 +305,6 @@ export interface ApplyCtx {
 }
 
 const ROLE_WORDS = new Set(['택시 기사', '기사', '점원', '경비', '경비원', '간호사', '의사', '행인', '남자', '여자', '아저씨', '아주머니', '학생', '직원', '요원', '사원', '대리', '과장', '부장', '선배', '후배', '언니', '오빠', '형', '누나', '손님', '주인', '사장', '경찰', '시민']);
-const SEXUAL = /섹스|성관계|야한|음란|가슴|엉덩이|키스|애무|벗|침대에서|연인|사귀|고백|데이트/;
 
 /** 두 문장이 거의 같은가 (정규화 뒤 포함 또는 2글자 조각 80% 일치) */
 export function similar(a: string, b: string): boolean {
@@ -374,7 +371,6 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
     return { anchor: messageKey(list[idx], idx), index: idx };
   };
   const nameOf = (who: string): string | null => resolveName(who, store, input.names);
-  const minorCheck = (who: string, text: string) => !!store.people[who]?.minor && SEXUAL.test(text);
 
   // 1. 새 인물 먼저 (그래야 아래 항목이 이름을 찾는다)
   let newCount = 0;
@@ -489,10 +485,6 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
       drop('entry', e, '본문 없음', who);
       continue;
     }
-    if (minorCheck(who, text)) {
-      drop('entry', e, '미성년 인물에 연애·성적 표현', who);
-      continue;
-    }
     let replaces: string | undefined;
     if (op === 'upsert') {
       const target = cur.find((x) => x.id === e.replace);
@@ -551,10 +543,6 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
       perCue.set(who, n);
       if (changes.some((x) => x.kind === 'cue' && x.who === who && x.anchor === ev.anchor && x.cue === c.cue)) {
         drop('cue', c, '같은 메시지에 같은 계기가 이미 있음', who);
-        continue;
-      }
-      if (minorCheck(who, str(c.reason))) {
-        drop('cue', c, '미성년 인물에 연애·성적 표현', who);
         continue;
       }
       const seq = nextSeq(ev.anchor);

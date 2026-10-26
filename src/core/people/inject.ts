@@ -53,7 +53,7 @@ export function personBlock(p: Person, store: PeopleStore, live: Liveness, chang
   const relOther = rel.filter((e) => e.target && e.target !== '@user');
   const aff = affinityView(p, changes, store.folded[p.name] ?? 0, o);
   const addr = addressOf(p, changes);
-  const relLine = [`Relationship → ${user}: ${aff.stage.label} (${aff.stage.behavior})`, p.minor ? 'This person is a minor: care and trust only, never romance.' : '', EXPRESS_TAIL[p.express]].filter(Boolean).join(' ');
+  const relLine = [`Relationship → ${user}: ${aff.stage.label} (${aff.stage.behavior})`, EXPRESS_TAIL[p.express]].filter(Boolean).join(' ');
   out.push(relLine + (relUser.length ? '\n' + lines(relUser, 6) : ''));
   if (relOther.length) out.push('Relationships with others:\n' + relOther.slice(-6).map((e) => `- → ${e.target}: ${plain(e.text, 200)}`).join('\n'));
   if (addr.toUser) out.push(`Address → ${user}: '${addr.toUser}', ${REGISTER_EN[addr.register] ?? 'mixed'}.`);

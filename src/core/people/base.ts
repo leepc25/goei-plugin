@@ -9,7 +9,7 @@ import { relativeRank } from './identity';
 import { REGISTERS, type Identity, type Register, type Temper } from './types';
 
 interface BasePerson { faction: string; values: string; express: 0 | 1 | 2 | 3; temper: Temper; english: string[] }
-interface RelationsBase { version: number; people: Record<string, BasePerson>; pairs: Record<string, { aff: number; src: string }>; orgs: Record<string, number>; minor: string[] }
+interface RelationsBase { version: number; people: Record<string, BasePerson>; pairs: Record<string, { aff: number; src: string }>; orgs: Record<string, number> }
 interface AliasesBase { version: number; names: Record<string, { aliases: string[]; titles: string[] }>; ambiguous: Record<string, string[]> }
 /** 호칭 표 (address.json): 그 인물의 직급 단계, 말투, 자기 호칭, 유저가 상급·동급·하급·외부인일 때 부르는 말 */
 interface AddressRow { level: number | null; register: string; self: string; up: string; peer: string; down: string; outsider: string }
