@@ -46,6 +46,7 @@ import { userInfo } from './host/user';
 import { applyPlayer, hidePlayerTag, playerAgent, playerBlock } from './core/player';
 import { withFieldFacts, withInterludes } from './core/interlude';
 import { fieldRecord } from './core/field';
+import { buildImgPrompt, imgCharacters, imgPromptConfig, stripImgLore } from './core/imgprompt';
 import { withStatusBlock } from './core/statusctx';
 import { visitRecord } from './core/visit';
 import { visitContextRules } from './core/visitPrompt';
@@ -92,6 +93,8 @@ async function onBeforeRequest<M extends PromptMessage>(messages: M[], type: str
     messages = withStatusBlock(messages, await knownIdentity().catch(() => ''));
     // 장면 인물의 살아 있는 기록 (core/people). 절 단위 혼합이면 그 인물의 시트 원문은 빼고 기록으로 대신한다
     messages = await withPeople(messages).catch(() => messages);
+    // 이미지 태그 지침 (core/imgprompt): 카드 로어북 「Asset」 대신 설정으로 조립. 옛 카드의 로어북 본문이 남아 있으면 지운다
+    messages = await withImgPrompt(messages).catch(() => messages);
   }
   // 시드 표식이 없는 요청은 아무것도 읽지 않고 바로 돌려보낸다 (매 전송마다 드는 비용을 0에 가깝게).
   if (!messages.some((m) => typeof m?.content === 'string' && m.content.includes(SEED_OPEN))) return messages;
@@ -204,6 +207,22 @@ async function withPeople<M extends PromptMessage>(messages: M[]): Promise<M[]> 
     if (note) out = insertBlock(out, note);
   }
   return out;
+}
+
+/** 이미지 태그 지침: 에셋 출력 켬 + 메인 모델일 때 요청 맨 끝에 (로어북 Asset 의 @@depth 0 과 같은 자리). 보조 모델이면 지침 없이 옛 블록만 지운다 */
+async function withImgPrompt<M extends PromptMessage>(messages: M[]): Promise<M[]> {
+  const charIndex = await risuai.getCurrentCharacterIndex();
+  const chat = (await risuai.getChatFromIndex(charIndex, await risuai.getCurrentChatIndex())) as Chat | null;
+  const char = (await risuai.getCharacterFromIndex(charIndex)) as LoreChar | null;
+  if (!chat || !char) return messages;
+  const s = basicSettings(char.globalLore, chat.scriptstate);
+  const out = stripImgLore(messages);
+  if (!s.assetOn || s.assetModel !== 'main') return out;
+  const cfg = imgPromptConfig(getPrefs());
+  const me = playerAgent(char.globalLore, chat.scriptstate);
+  const names = imgCharacters(char.globalLore, cfg, { assetPlayer: s.assetPlayer, playerEnglish: me?.english || undefined, userName: userInfo().name });
+  if (!names.length) return out;
+  return [...out, { role: 'system', content: buildImgPrompt(cfg, names, s.assetPlayer) } as M];
 }
 
 /** 본부 막간: 대화가 일어난 메시지 바로 뒤에 끼운다 (core/interlude.ts). 채팅은 바꾸지 않는다 */

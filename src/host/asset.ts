@@ -2,7 +2,8 @@
 // 에셋 모듈의 Image tag 로어북은 모듈에 있을 수 있어서 getCurrentLorebookEntries로 읽는다.
 import { ASSET_NOTE, AssetError, finishAsset, planAsset, readImageData, withUser } from '../core/asset';
 import { playerAgent } from '../core/player';
-import { basicSettings } from '../core/settings';
+import { applyImgConfig, imgCharacters, imgPromptConfig } from '../core/imgprompt';
+import { basicSettings, getPrefs } from '../core/settings';
 import type { Chat, LoreEntry } from '../core/types';
 import { runModel } from './llm';
 import { updateChat } from './risu';
@@ -39,7 +40,11 @@ export async function supplementAssets(t: AssetTarget): Promise<void> {
     // 메인모델과 같은 구조: 「주인공 이미지」 ON이면 {{user}} 금지를 빼고, 캐릭터로 플레이하지 않으면 페르소나를 명단에. OFF면 주인공 요원을 명단에서 뺀다
     const agent = playerAgent(t.lore, t.chat.scriptstate);
     const base = readImageData(entries);
-    const data = s.assetPlayer ? withUser(base, agent ? undefined : userInfo().name) : base;
+    // 설정(이미지 지침)의 캐릭터 목록·표정 세트를 입힌다 (메인 모델 지침과 같은 목록)
+    const cfg = imgPromptConfig(getPrefs());
+    const picked = imgCharacters(t.lore, cfg, { assetPlayer: s.assetPlayer, playerEnglish: agent?.english || undefined, userName: userInfo().name });
+    const tuned = applyImgConfig(base, picked, cfg.keywords);
+    const data = s.assetPlayer ? withUser(tuned, agent ? undefined : userInfo().name) : tuned;
     const exclude = agent && !s.assetPlayer ? [agent.english, data.aliases.get(agent.name.toLowerCase())].filter((v): v is string => typeof v === 'string' && !!v) : [];
     const job = planAsset(msg.data, data, s.assetLimit, exclude);
     if (!job) return;

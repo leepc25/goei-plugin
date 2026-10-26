@@ -17,6 +17,7 @@ import { barButtons, directoryBar, directoryDone, directoryDoneClear, directoryS
 import { drawerBox } from './drawer';
 import { toast } from './toast';
 import { ICONS } from './icons';
+import { imgPromptPane } from './imgprompt';
 import { keepOpen } from './panels';
 
 export interface SettingsEnv {
@@ -27,7 +28,7 @@ export interface SettingsEnv {
 /** 원본 테마 변수. 카드 배경 CSS가 이 값으로 갈림 (없으면 라이트) */
 export const THEME_KEY = '$st_fixed_theme';
 
-export const settingsUi = { page: '' as '' | 'visit' | 'phone' | 'gnet' | 'wiki' | 'people', confirmOff: false, busy: false, notice: '', info: '', scope: 'chat' as SettingsScope, confirm: '' as '' | 'save' | 'load' };
+export const settingsUi = { page: '' as '' | 'visit' | 'phone' | 'gnet' | 'wiki' | 'people' | 'image', confirmOff: false, busy: false, notice: '', info: '', scope: 'chat' as SettingsScope, confirm: '' as '' | 'save' | 'load' };
 
 export function resetSettings(): void {
   settingsUi.confirmOff = false;
@@ -171,6 +172,7 @@ const BACK = `<button class="ph-tool ph-back" data-action="set-feat-back" aria-l
 function featurePage(ctx: ChatContext, page: NonNullable<typeof settingsUi.page>, canChat: boolean): string {
   let pane = '';
   if (page === 'visit') pane = `<header class="ph-room-head">${BACK}<div class="ph-room-title"><b>필드 설정</b></div><span class="ph-act">${defaultsButtons('visit')}</span></header>${defaultsConfirm('visit')}${visitUi.notice ? `<div class="gx-err" role="status">${esc(visitUi.notice)}</div>` : ''}${visitSettings(ctx, ctx.chat.scriptstate)}`;
+  else if (page === 'image') pane = `<header class="ph-room-head">${BACK}<div class="ph-room-title"><b>이미지 지침</b><small>이 기기 공통</small></div></header>${imgPromptPane(ctx)}`;
   else {
     const raw = page === 'phone' ? phoneSettingsPane(ctx) : page === 'gnet' ? gnetSettingsPane(ctx) : page === 'people' ? peopleSettingsPane(ctx, canChat) : wikiSettingsPane(ctx);
     // 첫 머리의 뒤로 단추를 설정으로 돌아가는 단추로 (없으면 넣는다)
@@ -220,6 +222,7 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
       s.assetOn ? field('이미지 표시 범위', recentControl('img-show', getPrefs().imgShow, '이미지 표시 메시지 수', busy), '이미지를 띄울 메시지예요. 「최근만」이면 마지막 메시지부터 정한 개수까지만 띄워요(원래 6개). 바꾼 값은 메시지를 다시 그릴 때 반영돼요.') : '',
       s.assetOn ? field('요청 속 이미지 태그', recentControl('img-send', getPrefs().imgSend, '태그를 남길 메시지 수', busy), '모델에 보내는 대화 기록에서 이미지 태그를 남길 메시지예요. 오래된 태그를 빼면 토큰이 줄어요. 최근 태그는 모델이 태그 쓰는 법을 따라 하도록 남겨요(원래 6개).') : '',
       s.assetOn ? field('출력 모델', seg('set-asset-model', s.assetModel, [['main', '메인모델'], ['aux', '보조모델']], busy), '메인모델은 본문과 함께 적고, 보조모델은 응답이 끝난 뒤 한 번 더 불러 태그를 보충해요.') : '',
+      s.assetOn ? field('이미지 지침', `<button class="gx-mini" data-action="feature-set" data-value="image">${ICONS.pen}지침 편집</button>`, '카드 로어북 대신 플러그인이 만드는 이미지 태그 지침이에요. 지침 틀, 출력 대상 캐릭터(명부에서 자동), 표정 세트를 여기서 관리해요.') : '',
       s.assetOn ? field('주인공 이미지', seg('set-asset-player', s.assetPlayer ? '1' : '0', [['1', 'ON'], ['0', 'OFF']], busy), '「캐릭터로 플레이」로 고른 요원(내가 연기하는 주인공)에게도 이미지 태그를 붙일지예요. 끄면 페르소나처럼 주인공 이미지는 띄우지 않아요.') : '',
       s.assetOn && s.assetModel === 'aux' ? field('캐릭터당 이미지 수', seg('set-asset-limit', String(s.assetLimit), [['1', '1'], ['2', '2'], ['3', '3'], ['4', '4']], busy), '보조모델이 한 응답에서 캐릭터 한 명에게 붙일 이미지 태그의 최대 개수') : '',
     ].join(''))}

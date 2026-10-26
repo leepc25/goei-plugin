@@ -690,9 +690,10 @@ IMAGE_LORE = ROOT / 'card' / 'image-lore.json'
 
 
 def add_image_lore(lore):
-    """이미지 태그 로어북을 ⚙️설정 폴더에 넣는다. 같은 이름이 카드에 있으면 바꾼다"""
-    books = json.loads(IMAGE_LORE.read_text(encoding='utf-8'))['data']
-    names = {b['comment'] for b in books}
+    """이미지 태그 로어북을 ⚙️설정 폴더에 넣는다. 같은 이름이 카드에 있으면 바꾼다.
+    「Asset」(메인 모델 지침)은 v0.16.64부터 플러그인이 설정으로 조립해 요청에 끼우므로 카드에 넣지 않고, 있던 것도 뺀다 (core/imgprompt.ts)"""
+    books = [b for b in json.loads(IMAGE_LORE.read_text(encoding='utf-8'))['data'] if b['comment'] != 'Asset']
+    names = {b['comment'] for b in books} | {'Asset'}
     settings = next(e for e in lore if e.get('mode') == 'folder' and e.get('comment') == SETTINGS_FOLDER_NAME)
     return [e for e in lore if e.get('comment') not in names] + [{**b, 'folder': settings['key']} for b in books]
 

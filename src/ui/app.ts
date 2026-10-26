@@ -48,6 +48,7 @@ import { markUnsent } from '../host/unsent';
 import { startRecord } from '../core/dispatch';
 import { handleSettings, resetSettings, settingsTab, settingsUi, type SettingsEnv } from './settings';
 import { bindPeopleHold, bindPeopleStatus, handlePeople, hasPersonRecord, peopleInput, type PeopleEnv } from './people';
+import { handleImgPrompt, imgInput } from './imgprompt';
 import { cropValue, setCrop, directoryExtList, directoryInput, directoryPhotoList, directoryList, dirUi, handleDirectory, resetDirectory } from './directory';
 import { basicDefaults, basicVars, DIM_DEFAULT, getPrefs, worldDefaults, worldSettings, worldVarsOf, type Mark } from '../core/settings';
 
@@ -353,6 +354,7 @@ function ensureRoot(): HTMLElement {
     }
     if (el?.dataset?.input && wikiInput(el.dataset.input, el.value)) return;
     if (el?.dataset?.input && peopleInput(el.dataset.input, el.value)) return;
+    if (el?.dataset?.input && imgInput(el.dataset.input, el.value)) return;
     if (el?.dataset?.input === 'gn-draft') return void (gnet.draft = el.value);
     if (el?.dataset?.input === 'gn-to') return void (gnet.to = el.value);
     if (el?.dataset?.input === 'gn-att') return void attachInput(gnet.attach, el.dataset.key, el.value);
@@ -581,6 +583,7 @@ async function handle(action: string, value?: string): Promise<void> {
   }
   if (featCtx && action.startsWith('wiki-') && (await handleWiki(action, value, featCtx, wikiEnv))) return;
   if (featCtx && action.startsWith('pp-') && (await handlePeople(action, value, featCtx, peopleEnv))) return;
+  if (action.startsWith('ip-') && (await handleImgPrompt(action, value, { render }))) return;
   if (featCtx && action.startsWith('gn-') && (await handleGnet(action, value, featCtx, gnetEnv))) return;
   if (featCtx && action.startsWith('ph-') && (await handlePhone(action, value, featCtx, phoneEnv))) return;
   if (action === 'prefs-open' || action === 'prefs-close') {
@@ -715,7 +718,7 @@ async function handle(action: string, value?: string): Promise<void> {
     case 'feature-set':
       // 메인 설정 「기능별 설정」: 그 기능 탭으로 넘어가지 않고 설정창 안에서 그 기능 설정을 연다 (2026-10-23 사용자). 시작 전 설정에서도 연다
       if (!(view.kind === 'started' || (view.kind === 'picker' && pickerPrefs))) return;
-      if (value === 'phone' || value === 'wiki' || value === 'visit' || value === 'people' || (value === 'gnet' && GNET_ON)) settingsUi.page = value;
+      if (value === 'phone' || value === 'wiki' || value === 'visit' || value === 'people' || value === 'image' || (value === 'gnet' && GNET_ON)) settingsUi.page = value;
       return render();
     case 'ops-sel':
       // 관제실 상황판: 일지 줄·지도 표시 → 왼쪽 큰 보기가 그 상황으로. 보던 화면(CCTV·위성)은 그대로 (2026-10-21 사용자). 모바일은 큰 보기로 올라간다

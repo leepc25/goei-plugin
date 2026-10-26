@@ -110,6 +110,11 @@ export interface Prefs {
   imgSend?: number;
   /** 즐겨찾기 (이 기기·모든 채팅 공통, 최대 MARK_MAX): 창 안 화면 상태와 이름 */
   marks?: Mark[];
+  /** 이미지 태그 지침 (core/imgprompt.ts): 틀, 끈 이름, 임의 추가 이름, 표정 세트. 없으면 기본 */
+  imgPrompt?: string;
+  imgNamesOff?: string[];
+  imgNamesExtra?: string[];
+  imgKeywords?: string[];
 }
 
 /** 즐겨찾기 하나: s는 app.ts가 앞뒤 이동 기록에 쓰는 화면 상태 그대로, name은 저장할 때 붙인 이름 */
@@ -169,7 +174,12 @@ export function setPrefs(raw: unknown): Prefs {
     .filter((m): m is Mark => !!m && typeof m === 'object' && typeof (m as Mark).name === 'string' && !!(m as Mark).s && typeof (m as Mark).s.tab === 'string')
     .slice(0, MARK_MAX)
     .map((m) => ({ s: m.s, name: m.name.slice(0, 80) }));
-  prefs = { basic, world, ...(theme ? { theme } : {}), ...(Object.keys(vars).length ? { vars } : {}), ...(nav ? { nav } : {}), ...(agents ? { agents } : {}), ...(dim !== null ? { dim } : {}), ...(status ? { status } : {}), ...(size !== null ? { imgSize: size } : {}), ...(fold !== null ? { imgFold: fold } : {}), ...(show !== null ? { imgShow: show } : {}), ...(send !== null ? { imgSend: send } : {}), ...(marks.length ? { marks } : {}) };
+  const strList = (v: unknown, max: number, len: number) => (Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string' && !!x.trim()).map((x) => x.trim().slice(0, len)).slice(0, max) : []);
+  const imgPrompt = typeof o.imgPrompt === 'string' && o.imgPrompt.trim() ? o.imgPrompt.slice(0, 6000) : undefined;
+  const imgNamesOff = strList(o.imgNamesOff, 200, 40);
+  const imgNamesExtra = strList(o.imgNamesExtra, 60, 40);
+  const imgKeywords = strList(o.imgKeywords, 60, 24);
+  prefs = { basic, world, ...(theme ? { theme } : {}), ...(imgPrompt ? { imgPrompt } : {}), ...(imgNamesOff.length ? { imgNamesOff } : {}), ...(imgNamesExtra.length ? { imgNamesExtra } : {}), ...(imgKeywords.length ? { imgKeywords } : {}), ...(Object.keys(vars).length ? { vars } : {}), ...(nav ? { nav } : {}), ...(agents ? { agents } : {}), ...(dim !== null ? { dim } : {}), ...(status ? { status } : {}), ...(size !== null ? { imgSize: size } : {}), ...(fold !== null ? { imgFold: fold } : {}), ...(show !== null ? { imgShow: show } : {}), ...(send !== null ? { imgSend: send } : {}), ...(marks.length ? { marks } : {}) };
   return prefs;
 }
 
