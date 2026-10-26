@@ -85,3 +85,32 @@
 10-26 16:27:47 57 후면 대기 보냄 north 4장 시작=등록 끝=지정 약 1회
 10-26 16:28:59 57 후면 대기 완료 4장 (72초)
 10-26 16:29:19 50 정면 대기 완료 4장 (96초)
+10-26 23:36:42 60 정면 앉기 보냄 south 8장 시작=지정 끝=없음 약 1회
+10-26 23:36:46 61 후면 앉기 보냄 north 8장 시작=지정 끝=없음 약 1회
+10-26 23:36:51 96 옆 앉기 보냄 east 8장 시작=등록 끝=없음 약 1회
+10-26 23:36:57 74 정면 서서 컵 준비 보냄 south 8장 시작=지정 끝=지정 약 1회
+10-26 23:36:58 101 하의 내리고 앉기 보냄 south 8장 시작=지정 끝=없음 약 1회
+10-26 23:36:59 75 눕기 보냄 east 8장 시작=등록 끝=없음 약 1회
+10-26 23:37:02 104 오류: HTTP 422 {"detail":[{"type":"value_error","loc":["body"],"msg":"Value error, The frame count must be a multiple of 4 from 4 to 40 for PixMiniMax","input":{"character_id":"28613282-55e4-48d7-9fe9-d0d09eeb3cef","mode":"pixminimax","action_description":"Standing with the back to the viewer (facing north), rub b
+10-26 23:37:04 108 오류: HTTP 422 {"detail":[{"type":"value_error","loc":["body"],"msg":"Value error, The frame count must be a multiple of 4 from 4 to 40 for PixMiniMax","input":{"character_id":"28613282-55e4-48d7-9fe9-d0d09eeb3cef","mode":"pixminimax","action_description":"Standing facing the viewer, place two fingers forward at w
+10-26 23:37:06 109 상처 소독 보냄 south 8장 시작=지정 끝=지정 약 1회
+10-26 23:37:06 110 붕대 감기 보냄 south 8장 시작=지정 끝=지정 약 1회
+10-26 23:37:08 112 오류: HTTP 422 {"detail":[{"type":"value_error","loc":["body"],"msg":"Value error, The frame count must be a multiple of 4 from 4 to 40 for PixMiniMax","input":{"character_id":"28613282-55e4-48d7-9fe9-d0d09eeb3cef","mode":"pixminimax","action_description":"Standing facing the viewer, hold out a small paper pill pa
+10-26 23:37:10 111 주사 보냄 south 8장 시작=지정 끝=지정 약 1회
+10-26 23:37:59 61 후면 앉기 완료 8장 (73초)
+10-26 23:38:01 101 하의 내리고 앉기 완료 8장 (62초)
+10-26 23:38:01 109 상처 소독 완료 8장 (54초)
+10-26 23:38:21 110 붕대 감기 완료 9장 (74초)
+10-26 23:38:23 60 정면 앉기 완료 8장 (100초)
+10-26 23:38:25 96 옆 앉기 완료 8장 (93초)
+10-26 23:38:25 111 주사 완료 8장 (74초)
+10-26 23:38:39 71 후면 앉아 먹기·마시기 보냄 north 8장 시작=지정 끝=지정 약 1회
+10-26 23:38:40 70 후면 앉아 수다 보냄 north 8장 시작=지정 끝=지정 약 1회
+10-26 23:38:41 75 눕기 완료 8장 (102초)
+10-26 23:38:44 74 정면 서서 컵 준비 완료 9장 (107초)
+10-26 23:38:48 97 옆 앉아 수다 보냄 east 8장 시작=지정 끝=지정 약 1회
+10-26 23:38:52 98 옆 앉아 먹기 보냄 east 8장 시작=지정 끝=지정 약 1회
+10-26 23:38:56 99 옆 앉아 마시기 보냄 east 8장 시작=지정 끝=지정 약 1회
+10-26 23:39:18 65 오류: HTTP 422 {"detail":[{"type":"value_error","loc":["body"],"msg":"Value error, The frame count must be a multiple of 4 from 4 to 40 for PixMiniMax","input":{"character_id":"28613282-55e4-48d7-9fe9-d0d09eeb3cef","mode":"pixminimax","action_description":"Seated facing the viewer, raise a paper cup with both hand
+10-26 23:39:20 64 정면 앉아 먹기 보냄 south 8장 시작=지정 끝=지정 약 1회
+10-26 23:39:20 62 정면 앉아 수다 보냄 south 8장 시작=지정 끝=지정 약 1회

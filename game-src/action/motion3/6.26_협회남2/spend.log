@@ -141,3 +141,51 @@
 10-26 22:42:17 143 스트레칭·기지개 보냄 south 8장 시작=지정 끝=지정 약 1회
 10-26 22:43:03 61 후면 앉기 완료 8장 (62초)
 10-26 22:43:10 101 하의 내리고 앉기 완료 8장 (61초)
+10-26 22:43:11 143 스트레칭·기지개 완료 8장 (54초)
+10-26 22:43:22 60 정면 앉기 완료 8장 (81초)
+10-26 22:43:25 71 후면 앉아 먹기·마시기 보냄 north 8장 시작=지정 끝=지정 약 1회
+10-26 22:43:26 70 후면 앉아 수다 보냄 north 8장 시작=지정 끝=지정 약 1회
+10-26 22:43:29 100 남 소변 (서서) 완료 8장 (84초)
+10-26 22:43:29 96 옆 앉기 완료 8장 (88초)
+10-26 22:43:30 74 정면 서서 컵 준비 완료 9장 (88초)
+10-26 22:43:34 97 옆 앉아 수다 보냄 east 8장 시작=지정 끝=지정 약 1회
+10-26 22:43:34 63 정면 앉아 타자 보냄 south 8장 시작=지정 끝=지정 약 1회
+10-26 22:43:34 98 옆 앉아 먹기 보냄 east 8장 시작=지정 끝=지정 약 1회
+10-26 22:43:34 99 옆 앉아 마시기 보냄 east 8장 시작=지정 끝=지정 약 1회
+10-26 22:43:58 75 눕기 완료 8장 (112초)
+10-26 22:44:02 62 정면 앉아 수다 보냄 south 8장 시작=지정 끝=지정 약 1회
+10-26 22:44:16 117 서서 서류 넘겨 보기 완료 9장 (123초)
+10-26 22:44:22 64 정면 앉아 먹기 보냄 south 8장 시작=지정 끝=지정 약 1회
+10-26 22:44:24 65 오류: HTTP 422 {"detail":[{"type":"value_error","loc":["body"],"msg":"Value error, The frame count must be a multiple of 4 from 4 to 40 for PixMiniMax","input":{"character_id":"005806b9-7799-40e9-baad-9c62d8b72891","mode":"pixminimax","action_description":"Seated facing the viewer, raise a paper cup with both hand
+10-26 22:44:26 69 후면 앉아 타자 보냄 north 8장 시작=지정 끝=지정 약 1회
+10-26 22:44:27 105 옆 앉아 타자 보냄 east 8장 시작=지정 끝=지정 약 1회
+10-26 22:44:30 73 정면 기대 쉬기 보냄 south 8장 시작=지정 끝=지정 약 1회
+10-26 22:44:31 70 후면 앉아 수다 완료 8장 (64초)
+10-26 22:44:34 66 정면 앉아 졸기 보냄 south 8장 시작=지정 끝=지정 약 1회
+10-26 22:44:34 71 후면 앉아 먹기·마시기 완료 9장 (68초)
+10-26 22:44:38 76 누워 쉬기·졸기 보냄 east 4장 시작=지정 끝=지정 약 1회
+10-26 22:44:38 77 누워 아파하기 보냄 east 8장 시작=지정 끝=지정 약 1회
+10-26 22:44:40 78 오류: HTTP 422 {"detail":[{"type":"value_error","loc":["body"],"msg":"Value error, The frame count must be a multiple of 4 from 4 to 40 for PixMiniMax","input":{"character_id":"005806b9-7799-40e9-baad-9c62d8b72891","mode":"pixminimax","action_description":"Seated facing the viewer, hold the right forearm out forwa
+10-26 22:44:41 63 정면 앉아 타자 완료 9장 (67초)
+10-26 22:44:45 68 오류: HTTP 422 {"detail":[{"type":"value_error","loc":["body"],"msg":"Value error, The frame count must be a multiple of 4 from 4 to 40 for PixMiniMax","input":{"character_id":"005806b9-7799-40e9-baad-9c62d8b72891","mode":"pixminimax","action_description":"Seated facing the viewer, stop the hands, lift the head to
+10-26 22:44:46 106 정면 앉아 손 작업 (개인) 보냄 south 8장 시작=지정 끝=지정 약 1회
+10-26 22:44:48 72 오류: HTTP 422 {"detail":[{"type":"value_error","loc":["body"],"msg":"Value error, The frame count must be a multiple of 4 from 4 to 40 for PixMiniMax","input":{"character_id":"005806b9-7799-40e9-baad-9c62d8b72891","mode":"pixminimax","action_description":"Seated with the back to the viewer, turn the head and shou
+10-26 22:44:50 102 앉아 볼일 보냄 south 4장 시작=지정 끝=지정 약 1회
+10-26 22:44:50 103 닦고 하의 올리며 일어나기 보냄 south 8장 시작=지정 끝=지정 약 1회
+10-26 22:45:20 98 옆 앉아 먹기 완료 9장 (105초)
+10-26 22:45:22 62 정면 앉아 수다 완료 8장 (80초)
+10-26 22:45:28 69 후면 앉아 타자 완료 9장 (61초)
+10-26 22:45:31 97 옆 앉아 수다 완료 8장 (117초)
+10-26 22:45:38 64 정면 앉아 먹기 완료 9장 (76초)
+10-26 22:45:50 102 앉아 볼일 완료 5장 (59초)
+10-26 22:45:50 73 정면 기대 쉬기 완료 9장 (80초)
+10-26 22:45:58 99 옆 앉아 마시기 완료 8장 (143초)
+10-26 22:46:01 66 정면 앉아 졸기 완료 9장 (87초)
+10-26 22:46:07 105 옆 앉아 타자 완료 9장 (99초)
+10-26 22:46:17 106 오류: Command '['curl', '-sSf', '--retry', '3', 'https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/005806b9-7799-40e9-baad-9c62d8b72891/animations/90240dc8-1293-4d53-a8a7-d4bfc55636d2/south/2.png?t=1793054774']' returned non-zero exit status 56.
+10-26 22:46:17 77 누워 아파하기 완료 8장 (99초)
+10-26 22:46:23 103 닦고 하의 올리며 일어나기 완료 8장 (92초)
+10-26 22:46:42 76 누워 쉬기·졸기 완료 5장 (123초)
+10-26 22:47:01 이전 판 지움: v3 76 누워 쉬기·졸기
+10-26 22:47:03 76 누워 쉬기·졸기 보냄 east 4장 시작=지정 끝=지정 약 1회
+10-26 22:48:15 76 누워 쉬기·졸기 완료 5장 (71초)
