@@ -17,6 +17,8 @@ export interface EngineModules {
   enemyFactory?: EnemyFactory;
   itemUse?: ItemUse;
   hq?: HqModuleLike;
+  /** 본부 메뉴 창을 붙일 곳: 게임 화면(1280×720) 층. 없으면 게임 상자. NPC 대화창과 같은 층이라 같이 커지고 같은 자리에 뜬다 */
+  hqLayer?: () => HTMLElement | null;
   /** 모든 엔진 이벤트를 듣는 곳 (소리·화면 효과·대사) */
   listeners?: ((e: GameEvent) => void)[];
   /** 대사창이 전투를 멈추고 있는가 */
@@ -136,15 +138,18 @@ export class Game {
       }
       if (!this.mods.covered?.()) {
         const w = this.world;
-        // 설정 「화면 확대」: 배경과 사람을 같이 키운다 (기본 100% = 세로 720이 창에 꽉)
-        view.zoom = (this.canvas.height / SCREEN_H) * Math.max(1, charSize.k);
+        // 설정 「화면 확대」: 배경과 사람을 같이 키운다 (기본 100% = 배경 세로가 창에 꽉: 관리국 그림은 700, 그 밖은 720)
+        const H = this.inHub ? view.worldH : SCREEN_H;
+        view.zoom = (this.canvas.height / H) * Math.max(1, charSize.k);
         if (w) view.lane = w.lane;
         const vw = this.canvas.width / view.zoom;
         // 화면 밀기는 그림과 같은 보간 위치로 (틱 위치로 하면 걸을 때 화면이 30Hz로 툭툭 따라가 캐릭터가 떨린다).
         // 렌더러는 camX를 정수로 반올림하므로, 둘을 합한 이동이 화면 px 정수가 되게 crop을 맞춘다
         view.crop = 0;
+        // 렌더러와 같은 보간값: 층 단추·대화창·본부 창이 떠서 월드가 멈춘 동안 여기만 틱 진행률로 움직이면 화면이 매 장 좌우로 떨린다 (리스 좁은 창)
+        const frozen = paused || !!this.mods.blocking?.() || !!this.mods.hq?.isOpen?.();
         if (vw < SCREEN_W && w) {
-          const a = paused ? 1 : this.acc / T,
+          const a = frozen ? 1 : this.acc / T,
             cam = Math.round(w.prevCamX + (w.camX - w.prevCamX) * a),
             px = (w.player.px ?? w.player.x) + (w.player.x - (w.player.px ?? w.player.x)) * a,
             raw = Math.max(0, Math.min(SCREEN_W - vw, px - cam - vw / 2));
@@ -153,10 +158,10 @@ export class Game {
         // 확대해서 세로가 다 안 들어가면 주인공 발이 화면 아래쪽 1/3에 오게 위아래를 자른다
         view.cropY = 0;
         const vh = this.canvas.height / view.zoom;
-        if (vh < SCREEN_H && w) {
-          const a = paused ? 1 : this.acc / T, p = w.player as { y: number; py?: number };
+        if (vh < H - 0.5 && w) {
+          const a = frozen ? 1 : this.acc / T, p = w.player as { y: number; py?: number };
           const py = (p.py ?? p.y) + (p.y - (p.py ?? p.y)) * a;
-          view.cropY = Math.round(Math.max(0, Math.min(SCREEN_H - vh, py - vh * 0.7)) * view.zoom) / view.zoom;
+          view.cropY = Math.round(Math.max(0, Math.min(H - vh, py - vh * 0.7)) * view.zoom) / view.zoom;
         }
         this.ctx.save();
         this.ctx.scale(view.zoom, view.zoom);
@@ -216,7 +221,7 @@ export class Game {
   start_new(stageId?: string) {
     if (this.mods.hq && !stageId) return this.showHq();
     const stage = this.mods.stages.find((s) => s.id === stageId) ?? this.mods.stages[0];
-    this.deploy({ seed: Math.floor(Math.random() * 1e9), agent: 'jyaldi', stageId: stage.id });
+    this.deploy({ seed: Math.floor(Math.random() * 1e9), agent: 'eileen', stageId: stage.id });
   }
 
   private dead = false;
@@ -231,7 +236,8 @@ export class Game {
     if (!this.hqRoot) {
       this.hqRoot = document.createElement('div');
       this.hqRoot.className = 'goei-engine-hq';
-      this.box.appendChild(this.hqRoot);
+      // 걷는 본부(엔진 장면)면 게임 화면 층에: 큰 창에서 임무 창만 작게 우하단에 붙던 문제 (사용자 2026-10-25)
+      ((hq.hub && this.mods.hqLayer?.()) || this.box).appendChild(this.hqRoot);
       hq.mount(this.hqRoot, {
         deploy: (run) => this.deploy(run),
         stages: () => this.mods.stages.map((s) => ({ id: s.id, label: s.label })),
@@ -241,7 +247,7 @@ export class Game {
     if (hq.hub) {
       // 본부 = 엔진 벨트 장면. 메뉴 창(DOM)은 열렸을 때만 보인다
       const stage = hq.hub();
-      const run: RunConfigCore = { seed: Math.floor(Math.random() * 1e9), agent: 'jyaldi', stageId: stage.id };
+      const run: RunConfigCore = { seed: Math.floor(Math.random() * 1e9), agent: 'eileen', stageId: stage.id };
       this.hqRoot.hidden = !hq.isOpen?.();
       this.hqRoot.classList.add('goei-engine-hq-panel');
       this.canvas.style.visibility = '';

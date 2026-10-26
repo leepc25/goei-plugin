@@ -101,7 +101,9 @@
 .hq-bar .hq-x { margin-left: auto; padding: 4px 12px; }
 @media (max-height: 520px) { .hq-float .hq-over { padding: 6px; } .hq-float .hq-sheet { padding: 8px 12px; } .hq-float .hq-cards, .hq-float .hq-buy, .hq-float .hq-agents { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); } }
 /* 잼트리 임무·브리핑 대화창: 게임 화면 아래쪽만 덮는다 (위쪽 게임이 보이게) */
-.hq-float .hq-over.talk { background: linear-gradient(to top, rgba(0, 0, 0, 0.55), transparent 55%); align-items: flex-end; padding: 0 2% 2%; flex-direction: column; justify-content: flex-end; }
+.hq-float .hq-over.talk { background: linear-gradient(to top, rgba(0, 0, 0, 0.55), transparent 55%); align-items: center; padding: 0 0 10px; flex-direction: column; justify-content: flex-end; }
+/* NPC 대화창(.gnp)과 같은 자리·크기 */
+.hq-float .hq-over.talk .hq-talk { width: 1120px; max-width: 100%; box-sizing: border-box; }
 .hq-talk { position: relative; display: flex; gap: 22px; width: min(1100px, 100%); padding: 6px 8px; }
 .hq-face { flex: none; width: 128px; height: 128px; margin: 8px; background: #27685b; }
 .hq-face img { width: 100%; height: 100%; object-fit: cover; display: block; image-rendering: pixelated; }
@@ -137,3 +139,6 @@
 .hq-talk, .hq-choice { word-break: keep-all; }
 /* 마지막 줄에 한 단어만 남지 않게 (독립 검수: 「나와요.」「가세요.」) */
 .hq-line, .hq-kit, .hq-talk p { text-wrap: pretty; }
+
+/* 키보드로 고른 단추 (방향키 · Enter/E) */
+.hq .hq-kbsel { outline: 3px solid #ffe27a; outline-offset: 2px; color: #ffe27a; }

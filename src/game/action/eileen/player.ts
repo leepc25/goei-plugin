@@ -13,8 +13,8 @@ import type { FrameInfo } from '../engine/art';
 import { createEileenCore } from './core';
 
 /** 테스트룸 동작 이름 ↔ 엔진 버튼 */
-/** 에일린 그림 배율: 맨 뒤 줄에서 키 1.65m = 235px (필드 그림 지침 1m = 142px) */
-export const CHAR_K = 1.15;
+/** 에일린 그림 배율 (사용자 2026-10-25: 문에 비해 작다 → 처음 맞춰 본 크기로). 걷는 띠 가운데쯤(y500)에서 약 270px, 맨 뒤 260px · 맨 앞 305px */
+export const CHAR_K = 1.28;
 /** 테스트룸 동작 이름 ↔ 엔진 버튼 */
 const PRESS: [Btn, string][] = [
   ['light', 'light'], ['heavy', 'heavy'], ['dodge', 'dodge'], ['block', 'block'], ['shoot', 'shoot'],

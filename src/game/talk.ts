@@ -233,7 +233,8 @@ export function mountTalk(root: HTMLElement, api: GameVisit, field?: GameField) 
       c.font = FONT(TAG_PX);
       const tw = Math.ceil(c.measureText(p.name).width) + 8;
       const tagBottom = place(x, tw, 18, Math.round(p.y + p.top));
-      tag(c, p.name, x, tagBottom - 9, near || p.name === target || isPlayer);
+      // 지금 조작하는 주인공은 이름표를 달지 않는다 (사용자 2026-10-25). 자리만 잡아 말풍선을 머리 위에 띄운다
+      if (!isPlayer) tag(c, p.name, x, tagBottom - 9, near || p.name === target);
       // 내가 입력하는 동안 내 머리 위에 움직이는 점 (말을 보내면 그 말로 바뀐다)
       const typing = isPlayer && !busy && bar.hasAttribute('data-open') && document.activeElement === input && input.value.trim() !== '';
       const b = bubbles.find((q) => q.who === p.name && (q.from ?? 0) <= now) ?? (typing ? { who: p.name, text: '', until: Infinity, pending: true } : undefined);

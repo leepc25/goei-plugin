@@ -58,7 +58,7 @@ const openLen = (sc: Scene | null, d: HqDoor) => (!sc?.painted ? OPEN_T : d.kind
 const RATTLE_T = 10;
 const DOOR_W: Record<Door['kind'], number> = { main: 190, door: 120, stairs: 120, glass: 160, steel: 120, security: 120, elevator: 160, stairs_up: 120, stairs_down: 120, shop: 130, slide: 170, cell: 150, exit: 150 };
 
-export type Hub = StageModule & { nearInfo(): { text: string; locked: boolean } | null; goto(place: string): void; jump(sceneId: string, x?: number, y?: number): void; sceneIds(): string[]; current(): HqScene | null };
+export type Hub = StageModule & { nearInfo(): { text: string; locked: boolean } | null; speech(): { who: string; text: string; x: number; y: number; top: number } | null; goto(place: string): void; jump(sceneId: string, x?: number, y?: number): void; sceneIds(): string[]; current(): HqScene | null };
 
 const isS = (d: HqDoor) => d.side === 'S';
 const doorY = (d: HqDoor, lane: [number, number] = LANE) => (isS(d) ? lane[1] - 14 : lane[0] + 16);
@@ -72,6 +72,9 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
   let enterTick = -1;
   let fadeOut = 0;
   let barked: string | null = null;
+  /** 자리 주인 목소리 한 줄: 아래 자막 대신 그 사람 머리 위 말풍선 (사용자 2026-10-25) */
+  let speech: { who: string; text: string; x: number; y: number; top: number; until: number } | null = null;
+  let curPeople: { name: string; x: number; y: number }[] = [];
   let opening: { id: string; t: number; len: number; then: () => void } | null = null;
   /** 들어온 문이 뒤에서 닫히는 것·메뉴 문이 다시 닫히는 것 */
   let closing: { id: string; t: number; len: number } | null = null;
@@ -100,6 +103,8 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
       return { ...p, x: at.x, y: at.y };
     });
     const sc: Scene = { ...base, spots: [...base.spots, ...people.map((p) => ({ id: `visit:${p.name}`, x: p.x, y: p.y, who: p.name, verb: '대화', face: p.face, open: true }))] };
+    curPeople = people;
+    speech = null;
     const prev = scene;
     scene = sc;
     if (prev && prev.id !== sc.id) host.entered?.({ id: sc.id, name: sc.name, floor: sc.floor }, { id: prev.id, name: prev.name, floor: prev.floor }, walked);
@@ -140,7 +145,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
       } })).concat(people.map((p) => ({ y: p.y, x0: p.x - 60, x1: p.x + 60, occludedSilhouette: false, draw: (c: CanvasRenderingContext2D) => { drawVisitAgent(c, p.name, p.x, p.y, p.face, performance.now()); } })))
         .concat(man ? [{ y: man.y, x0: man.x - 60, x1: man.x + 60, occludedSilhouette: false, draw: (c: CanvasRenderingContext2D) => { drawTestMan(c, man.x, man.y, -1); } }] : []),
       drawBackground(c: CanvasRenderingContext2D, camX: number) {
-        if (sc.painted && drawHqField(c, sc.painted, camX, doorFx)) {
+        if (sc.painted && drawHqField(c, sc.painted, camX, doorFx, host.hour?.() ?? null)) {
           // 표찰은 지상 사무 층(2·3층)만 (사용자 2026-10-25)
           if (sc.floor === '2F' || sc.floor === '3F') drawHqSigns(c, sc.painted, sc.doors);
           if (callOn) drawCallLit(c, sc.painted, performance.now());
@@ -189,7 +194,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
         c.save();
         c.scale(1 / z, 1 / z);
         // 사람 그림은 월드 배율로 그려지므로(배경과 같이 커짐) 머리 높이도 z를 곱한다
-        host.overlay?.(c, people.map((p) => ({ name: p.name, x: p.x * z, y: p.y * z, top: visitAgentTop(p.name) * persp(p.y) * z })), { name: '', x: w.player.x * z, y: w.player.y * z, top: (hasTestPeople() ? testPlayerTop() : visitAgentTop('쟈알디')) * persp(w.player.y) * z });
+        host.overlay?.(c, people.map((p) => ({ name: p.name, x: p.x * z, y: p.y * z, top: visitAgentTop(p.name) * persp(p.y) * z })), { name: '', x: w.player.x * z, y: (w.player.y - w.player.z) * z, top: (hasTestPeople() ? testPlayerTop() : visitAgentTop('쟈알디')) * persp(w.player.y) * z });
         c.restore();
         // 출입 표식과 잠금 이유는 render.ts / HUD가 같은 조사 대상으로 표시한다.
         const dark = fadeOut > 0 ? 1 - fadeOut / FADE : age < FADE ? 1 - age / FADE : 0;
@@ -202,6 +207,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
   };
 
   const go = (sceneId: string, x: number, y?: number) => {
+    fieldView.worldH = sceneOf(sceneId).painted ? 700 : SCREEN_H;
     pending = { scene: sceneId, x, y };
     fadeOut = FADE;
   };
@@ -224,8 +230,8 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
       if (ok && (!best || d < best.d)) best = { id, kind, x, d };
     };
     // 자리 먼저: 같은 거리면 자리(격리문 앞 전시 등)가 이긴다
+    // 아직 안 열린 자리도 다가가면 「잠김」으로 보인다 (전수검사: 연구·감정·면담 자리가 아무 안내 없이 비어 보였다)
     for (const s of scene.spots) {
-      if (!s.open) continue;
       const ok = Math.abs(s.x - px) < (s.y === undefined ? 60 : 75) && (s.y === undefined || Math.abs(s.y - py) < 55);
       consider(`spot:${s.id}`, 'hubspot', s.x, ok);
     }
@@ -301,14 +307,20 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
       if (sp && sp.place !== barked) {
         barked = sp.place!;
         const l = host.bark(sp.place!);
-        if (l) a.world.say(`${l.who}: ${l.text}`, 3.5);
+        if (l) {
+          // 말하는 사람이 이 방에 서 있으면 그 머리 위, 아니면 그 자리 위
+          const who = curPeople.find((q) => q.name === l.who);
+          const x = who?.x ?? sp.x, y = who?.y ?? sp.y ?? p.y;
+          speech = { who: l.who, text: l.text, x, y, top: (who ? visitAgentTop(l.who) : -200) * persp(y), until: performance.now() + 3800 };
+        }
       } else if (!sp) barked = null;
     },
     onInteract(a, _floor, prop) {
       if (!scene || fadeOut > 0 || opening || callWait) return;
       if (prop.kind === 'hubspot') {
         const s = scene.spots.find((q) => `spot:${q.id}` === prop.id);
-        if (!s?.open) return;
+        if (!s) return;
+        if (!s.open) return a.world.say('아직 쓸 수 없다. 본부 일이 더 진행되면 열린다.', 2.5);
         if (s.place) return host.openPlace(s.place);
         if (s.say) return a.world.say(s.say, 3);
         if (s.depart) {
@@ -384,6 +396,10 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
       opening = { id: d.id, t: 0, len, then: () => goDoor(to, toDoor) };
     },
     /** 지금 손이 닿는 문·자리의 짧은 이름 (캐릭터 옆 말풍선) */
+    speech() {
+      if (!speech || performance.now() > speech.until || fadeOut > 0) return null;
+      return speech;
+    },
     nearInfo() {
       if (!scene || !near || opening || fadeOut > 0) return null;
       if (near.startsWith('spot:')) {
