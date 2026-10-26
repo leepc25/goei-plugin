@@ -521,5 +521,54 @@
   "try": 1,
   "key": "2.10_곽성주",
   "row": "땅 타는 흙 충격파"
+ },
+ "x3-3.1-S0-fire-tongue": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "3.1_청달래",
+  "row": "주황 불 혀"
+ },
+ "x3-3.1-D-heat-haze": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "3.1_청달래",
+  "row": "열기 아지랑이"
+ },
+ "x3-3.1-S1-fire-beam": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "3.1_청달래",
+  "row": "주황 불줄기"
+ },
+ "x3-2.11-S-sound-pressure": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "2.11_조성춘",
+  "row": "노란 음압"
+ },
+ "x3-2.9-F-giant-blade": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "2.9_송주익",
+  "row": "거대 칼 그림자(예카테리나)"
+ },
+ "x3-2.14-S2-radar-sweep": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "2.14_송진섭",
+  "row": "레이더 쓸림"
+ },
+ "x3-o-1.7-armor-plate": {
+  "ok": true,
+  "why": [],
+  "try": 1,
+  "key": "1.7_고르고디오",
+  "row": "파란 판금 조각"
  }
 }

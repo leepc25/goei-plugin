@@ -1,0 +1,183 @@
+{
+ "frames": [
+  {
+   "filename": "x3-3-1-s0-fire-tongue 0.png",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 76,
+    "h": 23
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 76,
+    "h": 23
+   },
+   "sourceSize": {
+    "w": 76,
+    "h": 23
+   },
+   "pivot": {
+    "x": 0.05263157894736842,
+    "y": 0.6956521739130435
+   },
+   "duration": 56
+  },
+  {
+   "filename": "x3-3-1-s0-fire-tongue 1.png",
+   "frame": {
+    "x": 76,
+    "y": 0,
+    "w": 76,
+    "h": 23
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 76,
+    "h": 23
+   },
+   "sourceSize": {
+    "w": 76,
+    "h": 23
+   },
+   "pivot": {
+    "x": 0.05263157894736842,
+    "y": 0.6956521739130435
+   },
+   "duration": 56
+  },
+  {
+   "filename": "x3-3-1-s0-fire-tongue 2.png",
+   "frame": {
+    "x": 152,
+    "y": 0,
+    "w": 76,
+    "h": 23
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 76,
+    "h": 23
+   },
+   "sourceSize": {
+    "w": 76,
+    "h": 23
+   },
+   "pivot": {
+    "x": 0.05263157894736842,
+    "y": 0.6956521739130435
+   },
+   "duration": 56
+  },
+  {
+   "filename": "x3-3-1-s0-fire-tongue 3.png",
+   "frame": {
+    "x": 0,
+    "y": 23,
+    "w": 76,
+    "h": 23
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 76,
+    "h": 23
+   },
+   "sourceSize": {
+    "w": 76,
+    "h": 23
+   },
+   "pivot": {
+    "x": 0.05263157894736842,
+    "y": 0.6956521739130435
+   },
+   "duration": 56
+  },
+  {
+   "filename": "x3-3-1-s0-fire-tongue 4.png",
+   "frame": {
+    "x": 76,
+    "y": 23,
+    "w": 76,
+    "h": 23
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 76,
+    "h": 23
+   },
+   "sourceSize": {
+    "w": 76,
+    "h": 23
+   },
+   "pivot": {
+    "x": 0.05263157894736842,
+    "y": 0.6956521739130435
+   },
+   "duration": 56
+  },
+  {
+   "filename": "x3-3-1-s0-fire-tongue 5.png",
+   "frame": {
+    "x": 152,
+    "y": 23,
+    "w": 76,
+    "h": 23
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 76,
+    "h": 23
+   },
+   "sourceSize": {
+    "w": 76,
+    "h": 23
+   },
+   "pivot": {
+    "x": 0.05263157894736842,
+    "y": 0.6956521739130435
+   },
+   "duration": 56
+  }
+ ],
+ "meta": {
+  "app": "PixelLab VFX Creator",
+  "image": "x3-3-1-s0-fire-tongue.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 228,
+   "h": 46
+  },
+  "scale": "1",
+  "anchor": {
+   "kind": "origin",
+   "x": 4,
+   "y": 16
+  },
+  "frameTags": [
+   {
+    "name": "x3-3-1-s0-fire-tongue",
+    "from": 0,
+    "to": 5,
+    "direction": "forward"
+   }
+  ]
+ }
+}
