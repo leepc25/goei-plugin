@@ -47,6 +47,7 @@ import { noticeClass, sendNow } from '../host/send';
 import { markUnsent } from '../host/unsent';
 import { startRecord } from '../core/dispatch';
 import { handleSettings, resetSettings, settingsTab, settingsUi, type SettingsEnv } from './settings';
+import { bindPeopleHold, bindPeopleStatus, handlePeople, hasPersonRecord, peopleInput, type PeopleEnv } from './people';
 import { cropValue, setCrop, directoryExtList, directoryInput, directoryPhotoList, directoryList, dirUi, handleDirectory, resetDirectory } from './directory';
 import { basicDefaults, basicVars, DIM_DEFAULT, getPrefs, worldDefaults, worldSettings, worldVarsOf, type Mark } from '../core/settings';
 
@@ -112,6 +113,7 @@ const wikiEnv: WikiEnv = {
 
 const gnetEnv: GnetEnv = wikiEnv;
 const settingsEnv: SettingsEnv = { render: () => render(), refresh: () => refresh() };
+const peopleEnv: PeopleEnv = settingsEnv;
 
 /** 창이 떠 있는지 (괴담톡이 받은 말풍선을 바로 읽음 처리할지) */
 let shown = false;
@@ -345,6 +347,7 @@ function ensureRoot(): HTMLElement {
       return;
     }
     if (el?.dataset?.input && wikiInput(el.dataset.input, el.value)) return;
+    if (el?.dataset?.input && peopleInput(el.dataset.input, el.value)) return;
     if (el?.dataset?.input === 'gn-draft') return void (gnet.draft = el.value);
     if (el?.dataset?.input === 'gn-to') return void (gnet.to = el.value);
     if (el?.dataset?.input === 'gn-att') return void attachInput(gnet.attach, el.dataset.key, el.value);
@@ -406,6 +409,11 @@ function ensureRoot(): HTMLElement {
     if (box && (view.kind === 'started' || view.kind === 'opening')) box.innerHTML = missionList(view.ctx, view.kind === 'opening');
   });
   bindAgentTips(root);
+  // 인물 기록: 갱신 중·끝남 알림으로 다시 그리기 (입력 중이면 건너뜀), 호감 막대 길게 누르기
+  bindPeopleStatus(() => {
+    if (shown && view.kind === 'started') render();
+  });
+  bindPeopleHold(root);
   document.addEventListener('keydown', (ev) => {
     if (ev.key !== 'Escape') return;
     // 필드에서 Esc는 게임 일시정지 메뉴 (창을 닫지 않는다, 2026-10-23 사용자)
@@ -560,6 +568,7 @@ async function handle(action: string, value?: string): Promise<void> {
     return;
   }
   if (view.kind === 'started' && action.startsWith('wiki-') && (await handleWiki(action, value, view.ctx, wikiEnv))) return;
+  if (view.kind === 'started' && action.startsWith('pp-') && (await handlePeople(action, value, view.ctx, peopleEnv))) return;
   if (view.kind === 'started' && action.startsWith('gn-') && (await handleGnet(action, value, view.ctx, gnetEnv))) return;
   if (view.kind === 'started' && action.startsWith('ph-') && (await handlePhone(action, value, view.ctx, phoneEnv))) return;
   if (action === 'prefs-open' || action === 'prefs-close') {
@@ -694,7 +703,7 @@ async function handle(action: string, value?: string): Promise<void> {
     case 'feature-set':
       // 메인 설정 「기능별 설정」: 그 기능 탭으로 넘어가지 않고 설정창 안에서 그 기능 설정을 연다 (2026-10-23 사용자)
       if (view.kind !== 'started') return;
-      if (value === 'phone' || value === 'wiki' || value === 'visit' || (value === 'gnet' && GNET_ON)) settingsUi.page = value;
+      if (value === 'phone' || value === 'wiki' || value === 'visit' || value === 'people' || (value === 'gnet' && GNET_ON)) settingsUi.page = value;
       return render();
     case 'ops-sel':
       // 관제실 상황판: 일지 줄·지도 표시 → 왼쪽 큰 보기가 그 상황으로. 보던 화면(CCTV·위성)은 그대로 (2026-10-21 사용자). 모바일은 큰 보기로 올라간다
@@ -749,6 +758,16 @@ async function handle(action: string, value?: string): Promise<void> {
       phone.view = phone.view === 'room' ? 'room' : 'list';
       resetField();
       await handleWiki('wiki-write', value, view.ctx, wikiEnv);
+      return;
+    case 'people-goto':
+      // 사원증 창의 「기록」: 위키 탭의 인물 상세로
+      if (view.kind !== 'started' || !value || !hasPersonRecord(view.ctx, value)) return;
+      tab = 'wiki';
+      resetWiki();
+      gnet.compose = null;
+      phone.view = phone.view === 'room' ? 'room' : 'list';
+      resetField();
+      await handleWiki('wiki-person', value, view.ctx, wikiEnv);
       return;
     case 'repick':
       repick = true;
@@ -1012,7 +1031,7 @@ function markOf(raw: NavState): Mark {
   const s = markState(raw);
   const ctx = view.kind === 'started' ? view.ctx : null;
   let name = TAB_TITLE[s.tab];
-  if (s.w) name = s.w.view === 'doc' || s.w.view === 'compose' ? s.w.title || '위키' : s.w.view === 'settings' ? '위키 설정' : s.w.view === 'new' ? '위키 새 문서' : '위키 메인';
+  if (s.w) name = s.w.view === 'doc' || s.w.view === 'compose' ? s.w.title || '위키' : s.w.view === 'settings' ? '위키 설정' : s.w.view === 'new' ? '위키 새 문서' : s.w.view === 'people' ? '이 채팅의 인물' : s.w.view === 'person' ? `${s.w.title} 기록` : s.w.view === 'docs' ? '기록 문서' : '위키 메인';
   if (s.p) {
     const r = s.p.view === 'room' && s.p.room && ctx ? readPhone(ctx.chat).rooms[s.p.room] : undefined;
     name = r ? roomLabel(r) : s.p.view === 'settings' ? '괴담톡 설정' : `괴담톡 ${PH_SUB[s.p.sub] ?? ''}`.trim();
@@ -1145,7 +1164,7 @@ function body(): string {
       </div>`;
     case 'started':
       evSeenReset();
-      return `${tabs()}${startedHeader(view.ctx)}<div class="gx-content">${tab === 'settings' ? '' : updateBanner(view.ctx)}${notice && tab !== 'map' && tab !== 'mission' ? `<div class="${noticeClass(notice)} gx-notice" role="alert">${esc(notice)}</div>` : ''}${startedBody(view.ctx)}</div>${evPopup(boardClock(view.ctx))}${tab === 'board' ? agentPopup() : ''}${markPop(markOf(navState()), recentMarks())}`;
+      return `${tabs()}${startedHeader(view.ctx)}<div class="gx-content">${tab === 'settings' ? '' : updateBanner(view.ctx)}${notice && tab !== 'map' && tab !== 'mission' ? `<div class="${noticeClass(notice)} gx-notice" role="alert">${esc(notice)}</div>` : ''}${startedBody(view.ctx)}</div>${evPopup(boardClock(view.ctx))}${tab === 'board' ? agentPopup((n) => view.kind === 'started' && hasPersonRecord(view.ctx, n)) : ''}${markPop(markOf(navState()), recentMarks())}`;
     case 'opening':
       return `${header('커스텀 임무 · 첫 장면 고르기', '<button class="gx-x" data-action="repick" aria-label="시작 설정 다시 고르기">' + ICONS.back + '</button>')}<div class="gx-content">${missionTab(view.ctx, true, notice, busy)}</div>`;
     case 'picker':

@@ -53,6 +53,7 @@ export function peopleStore(chat: Chat): PeopleStore {
   out.folded = raw.folded && typeof raw.folded === 'object' ? Object.fromEntries(Object.entries(raw.folded).filter(([, v]) => typeof v === 'number')) as Record<string, number> : {};
   out.read = raw.read && typeof raw.read === 'object' ? Object.fromEntries(Object.entries(raw.read).filter(([, v]) => typeof v === 'string')) as Record<string, string> : {};
   out.pending = raw.pending && typeof raw.pending === 'object' ? (raw.pending as PeopleStore['pending']) : {};
+  out.ignored = Array.isArray(raw.ignored) ? raw.ignored.filter((n): n is string => typeof n === 'string') : [];
   if (raw.identity && typeof raw.identity === 'object') out.identity = raw.identity;
   if (Array.isArray(raw.migrated)) out.migrated = raw.migrated.filter((m): m is string => typeof m === 'string');
   return out;

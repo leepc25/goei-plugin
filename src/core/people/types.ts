@@ -122,10 +122,12 @@ export interface PeopleStore {
   identity?: Identity;
   /** 새 인물 후보 (2턴 규칙·확인 모드): 이름 → 처음 본 기준 메시지 */
   pending: Record<string, { anchor: string; aliases: string[] }>;
+  /** 사용자가 「무시」한 이름: 다시 새 인물로 올리지 않는다 */
+  ignored: string[];
   migrated?: string[];
 }
 
-export const emptyStore = (): PeopleStore => ({ schema: 1, people: {}, docs: {}, log: [], folded: {}, read: {}, pending: {} });
+export const emptyStore = (): PeopleStore => ({ schema: 1, people: {}, docs: {}, log: [], folded: {}, read: {}, pending: {}, ignored: [] });
 
 /** 호감 8단계 (리수폿). 상한은 「이하」 */
 export interface Stage {

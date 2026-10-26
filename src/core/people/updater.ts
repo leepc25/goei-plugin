@@ -372,6 +372,10 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
       drop('new_people', n, '이미 있는 인물(별명 포함)', name);
       continue;
     }
+    if (store.ignored.includes(name)) {
+      drop('new_people', n, '사용자가 무시한 이름', name);
+      continue;
+    }
     if (roleWords.has(name) || /^[가-힣]{1,3}\s?(기사|점원|경비|행인|직원|손님)$/.test(name)) {
       drop('new_people', n, '역할 명사', name);
       continue;

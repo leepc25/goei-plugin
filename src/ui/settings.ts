@@ -27,7 +27,7 @@ export interface SettingsEnv {
 /** 원본 테마 변수. 카드 배경 CSS가 이 값으로 갈림 (없으면 라이트) */
 export const THEME_KEY = '$st_fixed_theme';
 
-export const settingsUi = { page: '' as '' | 'visit' | 'phone' | 'gnet' | 'wiki', confirmOff: false, busy: false, notice: '', info: '', scope: 'chat' as SettingsScope, confirm: '' as '' | 'save' | 'load' };
+export const settingsUi = { page: '' as '' | 'visit' | 'phone' | 'gnet' | 'wiki' | 'people', confirmOff: false, busy: false, notice: '', info: '', scope: 'chat' as SettingsScope, confirm: '' as '' | 'save' | 'load' };
 
 export function resetSettings(): void {
   settingsUi.confirmOff = false;
@@ -43,6 +43,7 @@ import { defaultsButtons, defaultsConfirm } from './defaults';
 import { phoneSettingsPane } from './phone';
 import { gnetSettingsPane } from './gnet';
 import { wikiSettingsPane } from './wiki';
+import { peopleSettingsPane } from './people';
 
 const esc = (s: unknown) =>
   String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
@@ -170,7 +171,7 @@ function featurePage(ctx: ChatContext, page: NonNullable<typeof settingsUi.page>
   let pane = '';
   if (page === 'visit') pane = `<header class="ph-room-head">${BACK}<div class="ph-room-title"><b>필드 설정</b></div><span class="ph-act">${defaultsButtons('visit')}</span></header>${defaultsConfirm('visit')}${visitUi.notice ? `<div class="gx-err" role="status">${esc(visitUi.notice)}</div>` : ''}${visitSettings(ctx, ctx.chat.scriptstate)}`;
   else {
-    const raw = page === 'phone' ? phoneSettingsPane(ctx) : page === 'gnet' ? gnetSettingsPane(ctx) : wikiSettingsPane(ctx);
+    const raw = page === 'phone' ? phoneSettingsPane(ctx) : page === 'gnet' ? gnetSettingsPane(ctx) : page === 'people' ? peopleSettingsPane(ctx) : wikiSettingsPane(ctx);
     // 첫 머리의 뒤로 단추를 설정으로 돌아가는 단추로 (없으면 넣는다)
     pane = raw.replace(/<header class="ph-room-head[^"]*">(\s*<button class="ph-tool ph-back"[^>]*>[\s\S]*?<\/button>)?/, `<header class="ph-room-head">${BACK}`);
   }
@@ -196,7 +197,7 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
   return `<main class="gx-body gx-settings">
     ${scopeBar(scope, canChat)}
     ${settingsUi.notice ? `<div class="gx-err" role="alert">${esc(settingsUi.notice)}</div>` : ''}
-    ${scope === 'chat' && canChat ? group('기능별 설정', `<div class="st-feats">${[['gnet', '괴담넷', ICONS.gnet], ['phone', '괴담톡', ICONS.phone], ['wiki', '위키', ICONS.wiki], ['visit', '필드', ICONS.game]]
+    ${scope === 'chat' && canChat ? group('기능별 설정', `<div class="st-feats">${[['gnet', '괴담넷', ICONS.gnet], ['phone', '괴담톡', ICONS.phone], ['wiki', '위키', ICONS.wiki], ['visit', '필드', ICONS.game], ['people', '인물 기록', ICONS.group]]
       .map(([k, label, icon]) => `<button class="gx-mini st-feat" data-action="feature-set" data-value="${k}" aria-label="${label} 설정">${icon}${label}</button>`)
       .join('')}</div>`) : ''}
     ${group('화면', [
