@@ -27,7 +27,7 @@ import { cleanOutput, hasWorldTags, parseCatalog, processOutput, readDirectory }
 import { basicSettings, missingBasicVars, worldSettings } from './core/settings';
 import { staleFactionVars } from './core/factions';
 import { supplementAssets } from './host/asset';
-import { updateCharacterLore, updateChat } from './host/risu';
+import { loadContext, updateCharacterLore, updateChat } from './host/risu';
 import { WatchState, type WatchSnapshot } from './core/watch';
 import { createFab, type Fab } from './host/overlay';
 import { BRAND } from './ui/brand';
@@ -39,7 +39,7 @@ import { openApp, openWiki } from './ui/app';
 import { GHOST_ICON } from './ui/icons';
 import { landingHtml as renderLanding } from './ui/landing';
 import { loadPrefs } from './host/prefs';
-import { setWaiting } from './host/waiting';
+import { isWaiting, setWaiting } from './host/waiting';
 import { syncDecorators, computeLore, hasUnlockTag, loreOptions, patchSlots, readUnlocked, sameVars, stripUnlockTags, trimRoster, unlockedValue, unlockTags, UNLOCK_VAR, type LoreMode } from './core/lore';
 import { advValue } from './core/advanced';
 import { userInfo } from './host/user';
@@ -448,6 +448,21 @@ async function onDisplay(text: string): Promise<string> {
   return displayNow(text);
 }
 
+/** 플러그인이 뜨기 전에 Risu가 이미 그린 메시지는 다시 그려 주지 않는다 (업데이트·새로고침 직후 태그가 원문대로 남고, 다른 채팅에 갔다 와야 그려짐).
+ *  본체가 뜨고 에셋 목록을 읽은 뒤 한 번, 이미지 태그가 있는 괴이 채팅을 그대로 다시 저장해 Risu가 그 채팅을 다시 그리게 한다 (사용자 2026-10-26) */
+async function redrawAfterLoad(): Promise<void> {
+  try {
+    await assetsFirst;
+    if (isWaiting()) return;
+    const ctx = await loadContext();
+    if (!ctx || !readManifest(ctx.char.globalLore)) return;
+    if (!ctx.chat.message.some((m) => typeof m.data === 'string' && m.data.includes('<img='))) return;
+    await updateChat(ctx.charIndex, ctx.chatIndex, (cur) => ({ ...cur }));
+  } catch {
+    /* 다시 그리지 못해도 그만 (다음 채팅 전환 때 그려진다) */
+  }
+}
+
 function displayNow(text: string): string {
   // 플러그인 고유 표식(시작 카드·지시문·전화 카드)은 Lite 판정 전에도 바꾼다.
   // 다른 채팅에 갔다 오면 Risu가 판정(liteNow)보다 먼저 메시지를 다시 그려서 원문이 드러난 채 남았다.
@@ -563,6 +578,7 @@ export async function start(): Promise<BodyHandlers> {
   await loadPrefs();
   // 채팅 속 이미지 태그가 쓸 모듈 에셋 이름 (창을 열 때도 다시 읽는다)
   assetsFirst = loadModuleAssets();
+  void redrawAfterLoad();
   setWikiOpener((title) => void openWiki(title));
   setRepickOpener(() => void openApp({ quietIfNotLite: true }));
   let stopWatcher: (() => void) | null = null;
