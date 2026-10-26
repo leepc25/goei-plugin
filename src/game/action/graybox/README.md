@@ -2,6 +2,8 @@
 
 작성일: 2026-10-20 / 상태: 그림 없는 규칙 시험판. 시각 품질·캐릭터 통일성과는 무관하다.
 
+> 2026-10-26: 시험판 화면(`index.ts`·`demo.ts`·`loadtest.ts`·`style.css`)과 `goei-graybox.html` 빌드는 지웠다. 남은 것은 `data.ts`(필드 이야기 줄이 `FloorType`을 쓴다)와 `gen.ts`·`sim.ts`·`render.ts`(화면·조작 시연판 `ui/demo.ts`, 본부 시연판 `hq/demo-run.ts`, 이야기 시연판이 쓴다)뿐이다. 아래는 당시 기록이다.
+
 `docs/게임_기본기획서.md` 23장 5단계("회색 상자 + 가짜 팩 부하 시험 + 크기 비교")를 구현한 것이다. 그림은 한 장도 쓰지 않고 상자와 글자만으로 전투·층 생성·정비 구역·승강기·규칙·드랍·강화·본부 순환을 돌려 본다. 시연판은 `release/demo/goei-graybox.html` 하나이며, 코드·CSS를 전부 내장해 파일을 열기만 하면 된다(약 100KB).
 
 ## 1. 들어 있는 것
@@ -35,11 +37,8 @@
 | `gen.ts` | `makeFloor`, `makeService`, `validate`, `pickType`, `rng` |
 | `sim.ts` | 실행 상태(Run/Meta/Player/Ent), `step`, `interact`, `settle`, 직렬화 |
 | `render.ts` | 캔버스 그리기(상자·글자·HUD·소지도·오버레이) |
-| `loadtest.ts` | `runLoadTest`, `DEFAULT_SPEC` |
-| `index.ts` | `mountGraybox(box, host)`: 패널·키·터치·자동 저장·`window.__gb` |
-| `demo.ts` | 단독 HTML 진입점(저장소 `localStorage goei-graybox:v1`) |
 
-빌드는 `npm run build`가 `dist/goei-graybox.html`과 `release/demo/goei-graybox.html`, 시험용 `dist-test/graybox-sim.mjs`를 함께 만든다. 시험은 `node --test tests/graybox.test.mjs`(생성·전투·정비 구역·직렬화 8건)와 `node tests/graybox-browser.mjs`(Playwright 연기 시험, PC·모바일 스크린샷).
+빌드는 `npm run build`가 시험용 `dist-test/graybox-sim.mjs`를 만든다. 시험은 `node --test tests/graybox.test.mjs`(생성·전투·정비 구역·직렬화 8건).
 
 ## 4. 확인한 것과 못 한 것
 

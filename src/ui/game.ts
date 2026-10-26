@@ -1,6 +1,6 @@
 // 게임 창: 머리의 게임 버튼(예전 「관리국 순찰」 자리)으로 연다. 창을 다시 그려도 게임이 끊기지 않게
 // 덮개는 창 그리기(innerHTML)와 따로 들고 있다가 그린 뒤 다시 붙인다.
-// 처음 화면은 시작 화면: 게임 파일 받기 → 저장 칸 고르기 → 본편 연동(읽은 것·넘겨받은 결과 쓰기) → 이전 시험판.
+// 처음 화면은 시작 화면: 게임 파일 받기 → 저장 칸 고르기 → 본편 연동(읽은 것·넘겨받은 결과 쓰기).
 // 게임 코드는 본체에 들지 않고 코드 팩으로 받는다(host/game/code.ts). 쓰는 것은 사용자가 버튼을 누를 때만이다.
 import { SLOT_IDS, type CardSnapshot, type SlotId, type SlotInfo } from '../game/bridge';
 import { RECORD_COMMENT } from '../core/gamelink';
@@ -14,7 +14,7 @@ import { makeViewport, type ViewportCtl } from '../host/game/viewport';
 import { loadContext } from '../host/risu';
 import { ICONS } from './icons';
 
-type View = 'home' | 'play' | 'patrol' | 'action';
+type View = 'home' | 'play';
 
 let layer: HTMLElement | null = null;
 let viewport: ViewportCtl | null = null;
@@ -107,8 +107,6 @@ function statsHtml(): string {
   return row('측정', `게임 코드 ${kb(codeStats.bytes || 0)} · 꺼내기 ${codeStats.readMs}ms · 실행 ${codeStats.runMs}ms${codeStats.fromNet ? ' (방금 받음)' : ''} · 붙이기 ${s.mountMs}ms · 받은 양 ${kb(fetchStats.bytes)}/${fetchStats.requests}번 · 그림 주소 ${liveUrls()}개${s.heapOpen ? ` · 힙 ${kb(s.heapOpen)} → ${kb(heap())}` : ''}`);
 }
 
-const legacyHtml = () => row('이전 시험판', '예전 순찰과 1인 전투 검증판이에요. 저장과 그림은 따로예요.', '<button class="gx-mini" data-g="legacy" data-mode="patrol">관리국 순찰</button><button class="gx-mini" data-g="legacy" data-mode="action">1인 전투 검증판</button>');
-
 async function home(): Promise<void> {
   const box = layer?.querySelector<HTMLElement>('.gx-game-box');
   if (!box || view !== 'home') return;
@@ -126,7 +124,7 @@ async function home(): Promise<void> {
   const open = new Set([...box.querySelectorAll<HTMLDetailsElement>('details[data-keep]')].filter((d) => d.open).map((d) => d.dataset.keep));
   box.innerHTML = `<div class="gx-gl gx-settings">
     ${filesHtml(f)}${startHtml(slots, last, !needFiles(f))}${linkHtml(card, reports, record)}
-    <details class="ps-adv gx-gl-dev" data-keep="game-dev"><summary class="ps-adv-sum"><b>시험용</b></summary><div class="ps-rows">${legacyHtml()}${statsHtml()}</div></details>
+    <details class="ps-adv gx-gl-dev" data-keep="game-dev"><summary class="ps-adv-sum"><b>시험용</b></summary><div class="ps-rows">${statsHtml()}</div></details>
     <input type="file" accept=".js,.pack" multiple hidden data-g-file></div>`;
   box.querySelectorAll<HTMLDetailsElement>('details[data-keep]').forEach((d) => (d.open = open.has(d.dataset.keep)));
 }
@@ -175,7 +173,7 @@ async function putFiles(list: FileList): Promise<void> {
   }
 }
 
-async function play(slot: SlotId | null, mode: View): Promise<void> {
+async function play(slot: SlotId): Promise<void> {
   const box = layer?.querySelector<HTMLElement>('.gx-game-box');
   if (!box || !viewport) return;
   const me = ++generation;
@@ -186,18 +184,17 @@ async function play(slot: SlotId | null, mode: View): Promise<void> {
     const mod = await loadGameCode();
     gameStats.codeMs = Math.round(performance.now() - t0);
     if (me !== generation || !layer) return;
-    view = mode;
+    view = 'play';
     // 게임은 창 전체를 쓴다(통합 규격 3장: 캔버스가 창 면적 80% 이상, 폰 가로는 높이 100%, 폰 세로는 돌려 꽉 채움)
     viewport.fill(true);
     setHead();
     box.innerHTML = '';
-    const bridge = makeBridge(viewport, slot ?? 0, () => (onExit ? onExit() : closeGame()), (cb) => {
+    const bridge = makeBridge(viewport, slot, () => (onExit ? onExit() : closeGame()), (cb) => {
       hiddenSubs.add(cb);
       return () => void hiddenSubs.delete(cb);
     });
     const t1 = performance.now();
-    const legacy = mode === 'play' ? null : mod.legacy?.[mode];
-    unmount = legacy ? legacy(box, bridge) : mod.mount(box, bridge);
+    unmount = mod.mount(box, bridge);
     gameStats.mountMs = Math.round(performance.now() - t1);
     gameStats.openMs = Math.round(performance.now() - t0);
     busy = '';
@@ -232,7 +229,7 @@ function setHead(): void {
   if (!head) return;
   const inGame = view !== 'home';
   layer?.classList.toggle('gx-playing', inGame);
-  head.innerHTML = `<div class="gx-brand gx-tabhead"><span class="gx-tabicon">${ICONS.game}</span><div><b>${view === 'patrol' ? '관리국 순찰' : view === 'action' ? '1인 전투 검증판' : '필드'}</b></div></div>
+  head.innerHTML = `<div class="gx-brand gx-tabhead"><span class="gx-tabicon">${ICONS.game}</span><div><b>필드</b></div></div>
     <div class="gx-head-act">${inGame ? `<button class="gx-x" data-g="home" aria-label="시작 화면">${ICONS.back}</button>` : ''}
     <button class="gx-x" data-action="game-close" aria-label="게임 닫기">${ICONS.close}</button></div>`;
 }
@@ -251,9 +248,7 @@ async function onClick(e: MouseEvent): Promise<void> {
         return layer.querySelector<HTMLInputElement>('[data-g-file]')?.click();
       case 'play':
         notice = '';
-        return void (await play(0, 'play'));
-      case 'legacy':
-        return void (await play(null, t.dataset.mode === 'action' ? 'action' : 'patrol'));
+        return void (await play(0));
       case 'home':
         return toHome();
       case 'full':

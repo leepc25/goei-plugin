@@ -247,6 +247,4 @@ export interface GameBridge {
 export interface GameModule {
   version: string;
   mount(box: HTMLElement, bridge: GameBridge): () => void;
-  /** 이전 시험판 (관리국 순찰·1인 전투 검증판) */
-  legacy?: Record<string, (box: HTMLElement, bridge: GameBridge) => () => void>;
 }
