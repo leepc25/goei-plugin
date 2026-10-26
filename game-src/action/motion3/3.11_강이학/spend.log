@@ -189,3 +189,53 @@
 10-26 20:03:57 96 옆 앉기 완료 8장 (217초)
 10-26 20:53:38 62 정면 앉아 수다 보냄 south 8장 시작=지정 끝=지정 약 1회
 10-26 20:53:38 64 정면 앉아 먹기 보냄 south 8장 시작=지정 끝=지정 약 1회
+10-26 20:54:52 64 정면 앉아 먹기 완료 9장 (73초)
+10-26 20:54:53 65 오류: HTTP 422 {"detail":[{"type":"value_error","loc":["body"],"msg":"Value error, The frame count must be a multiple of 4 from 4 to 40 for PixMiniMax","input":{"character_id":"338997c2-df3d-4a34-867d-2e418579ae6c","mode":"pixminimax","action_description":"Seated facing the viewer, raise a paper cup with both hand
+10-26 20:54:55 63 정면 앉아 타자 보냄 south 8장 시작=지정 끝=지정 약 1회
+10-26 20:54:55 62 정면 앉아 수다 완료 8장 (76초)
+10-26 20:54:57 이전 판 지움: v3 74 정면 서서 컵 준비
+10-26 20:54:59 66 정면 앉아 졸기 보냄 south 8장 시작=지정 끝=지정 약 1회
+10-26 20:54:59 74 정면 서서 컵 준비 보냄 south 8장 시작=지정 끝=지정 약 1회
+10-26 20:54:59 73 정면 기대 쉬기 보냄 south 8장 시작=지정 끝=지정 약 1회
+10-26 20:55:01 이전 판 지움: v3 75 눕기
+10-26 20:55:04 75 눕기 보냄 east 8장 시작=등록 끝=없음 약 1회
+10-26 20:55:05 78 오류: HTTP 422 {"detail":[{"type":"value_error","loc":["body"],"msg":"Value error, The frame count must be a multiple of 4 from 4 to 40 for PixMiniMax","input":{"character_id":"338997c2-df3d-4a34-867d-2e418579ae6c","mode":"pixminimax","action_description":"Seated facing the viewer, hold the right forearm out forwa
+10-26 20:55:07 106 정면 앉아 손 작업 (개인) 보냄 south 8장 시작=지정 끝=지정 약 1회
+10-26 20:55:10 68 오류: HTTP 422 {"detail":[{"type":"value_error","loc":["body"],"msg":"Value error, The frame count must be a multiple of 4 from 4 to 40 for PixMiniMax","input":{"character_id":"338997c2-df3d-4a34-867d-2e418579ae6c","mode":"pixminimax","action_description":"Seated facing the viewer, stop the hands, lift the head to
+10-26 20:55:16 102 앉아 볼일 보냄 south 4장 시작=지정 끝=지정 약 1회
+10-26 20:55:19 103 닦고 하의 올리며 일어나기 보냄 south 8장 시작=지정 끝=지정 약 1회
+10-26 20:55:20 139 계산기 두드리기 보냄 south 8장 시작=지정 끝=지정 약 1회
+10-26 20:55:25 160 오류: HTTP 422 {"detail":[{"type":"value_error","loc":["body"],"msg":"Value error, The frame count must be a multiple of 4 from 4 to 40 for PixMiniMax","input":{"character_id":"338997c2-df3d-4a34-867d-2e418579ae6c","mode":"pixminimax","action_description":"Standing facing the viewer, toss a gold coin up a little f
+10-26 20:55:32 142 서서 커피 마시기 보냄 south 8장 시작=지정 끝=지정 약 1회
+10-26 20:56:11 102 앉아 볼일 완료 5장 (54초)
+10-26 20:56:16 106 정면 앉아 손 작업 (개인) 완료 9장 (69초)
+10-26 20:56:22 139 계산기 두드리기 완료 9장 (62초)
+10-26 20:56:22 63 정면 앉아 타자 완료 9장 (87초)
+10-26 20:56:23 70 후면 앉아 수다 보냄 north 8장 시작=지정 끝=지정 약 1회
+10-26 20:56:25 74 정면 서서 컵 준비 완료 9장 (85초)
+10-26 20:56:26 73 정면 기대 쉬기 완료 9장 (87초)
+10-26 20:56:27 103 닦고 하의 올리며 일어나기 완료 8장 (68초)
+10-26 20:56:27 97 옆 앉아 수다 보냄 east 8장 시작=지정 끝=지정 약 1회
+10-26 20:56:28 98 옆 앉아 먹기 보냄 east 8장 시작=지정 끝=지정 약 1회
+10-26 20:56:28 71 후면 앉아 먹기·마시기 보냄 north 8장 시작=지정 끝=지정 약 1회
+10-26 20:56:31 75 눕기 완료 8장 (87초)
+10-26 20:56:31 69 후면 앉아 타자 보냄 north 8장 시작=지정 끝=지정 약 1회
+10-26 20:56:32 99 옆 앉아 마시기 보냄 east 8장 시작=지정 끝=지정 약 1회
+10-26 20:56:36 105 옆 앉아 타자 보냄 east 8장 시작=지정 끝=지정 약 1회
+10-26 20:56:38 72 오류: HTTP 422 {"detail":[{"type":"value_error","loc":["body"],"msg":"Value error, The frame count must be a multiple of 4 from 4 to 40 for PixMiniMax","input":{"character_id":"338997c2-df3d-4a34-867d-2e418579ae6c","mode":"pixminimax","action_description":"Seated with the back to the viewer, turn the head and shou
+10-26 20:56:39 142 서서 커피 마시기 완료 8장 (66초)
+10-26 20:56:41 66 정면 앉아 졸기 완료 9장 (102초)
+10-26 20:57:00 76 누워 쉬기·졸기 보냄 east 4장 시작=지정 끝=지정 약 1회
+10-26 20:57:04 77 누워 아파하기 보냄 east 8장 시작=지정 끝=지정 약 1회
+10-26 20:57:37 70 후면 앉아 수다 완료 8장 (73초)
+10-26 20:57:51 71 후면 앉아 먹기·마시기 완료 9장 (82초)
+10-26 20:57:59 69 후면 앉아 타자 완료 9장 (87초)
+10-26 20:58:13 76 누워 쉬기·졸기 완료 5장 (72초)
+10-26 20:58:14 105 옆 앉아 타자 완료 9장 (98초)
+10-26 20:58:20 97 옆 앉아 수다 완료 8장 (112초)
+10-26 20:58:25 99 옆 앉아 마시기 완료 8장 (113초)
+10-26 20:58:27 이전 판 지움: v3 76 누워 쉬기·졸기
+10-26 20:58:29 76 누워 쉬기·졸기 보냄 east 4장 시작=지정 끝=지정 약 1회
+10-26 20:58:39 98 옆 앉아 먹기 완료 9장 (131초)
+10-26 20:59:16 77 누워 아파하기 완료 8장 (131초)
+10-26 20:59:55 76 누워 쉬기·졸기 완료 5장 (85초)
