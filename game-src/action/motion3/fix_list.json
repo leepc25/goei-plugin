@@ -1,29 +1,4 @@
 [
- {
-  "key": "1.12_콘쥬스",
-  "row": "11",
-  "why": [
-   "뒤로 침(4번) → 시작 장을 전투 자세로 바꿈"
-  ],
-  "cond": "The body stays side-on facing west (left) the whole time and never turns around; the strike lands in front of the body toward the west.",
-  "action": "From the wide fighting stance, step the front foot forward and drive a heavy straight punch with the rear fist straight forward at chest height, the shoulder turning into it, then pull back into the fighting stance."
- },
- {
-  "key": "5.3_탐미주의",
-  "row": "19",
-  "why": [
-   "위로 잘림(4번) → 높이는 코드가 맡음"
-  ],
-  "cond": "The game moves the body through the air in code, so draw the fall in place and low: the head never rises above its starting height and stays inside the frame.",
-  "action": "Get knocked off the feet: the body tips backward and drops flat onto the back on the floor in place, arms trailing, ending lying on the back."
- },
- {
-  "key": "5.3_탐미주의",
-  "row": "18-3",
-  "why": [
-   "위로 잘림(4번) → 높이는 코드가 맡음"
-  ],
-  "cond": "The game moves the body through the air in code, so draw the launch in place and low: the head never rises above its starting height and stays inside the frame.",
-  "action": "Get launched: the body bends back as if lifted off the feet, curls in the air in place, and falls flat onto the back, ending lying on the back."
- }
+{"key":"5.3_탐미주의","row":"19","why":["누운 몸이 그림판보다 김 → 무릎 굽혀 눕기"],"cond":"The game moves the body through the air in code, so draw the fall in place and low. She is tall: when lying she must lie compact with both knees bent up and the arms folded on the chest, so the whole lying body fits inside the frame with space at both sides.","action":"Get knocked off the feet: the body tips backward and drops onto the back on the floor in place, the knees bending up as she lands, ending lying on the back with the knees bent and the arms on the chest."},
+{"key":"5.3_탐미주의","row":"18-3","why":["누운 몸이 그림판보다 김 → 무릎 굽혀 눕기"],"cond":"The game moves the body through the air in code, so draw the launch in place and low. She is tall: when lying she must lie compact with both knees bent up and the arms folded on the chest, so the whole lying body fits inside the frame with space at both sides.","action":"Get launched: the body bends back as if lifted off the feet, curls in the air in place, and lands on the back with the knees bent up and the arms on the chest."}
 ]

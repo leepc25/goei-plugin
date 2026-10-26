@@ -223,6 +223,17 @@ def folder_dir(folder, rows, cdir):
     return ("SW" if cdir == "W" else "SE") if folder in DIAG else cdir
 
 
+def pingpong(key, anims):
+    """반복 이음이 끝내 안 맞는 대기 줄(네 번 다시 뽑아도 끝 장 ≠ 첫 장): 끝까지 갔다 거꾸로 되돌아오기(사용자 2026-10-26, 비용 없이)"""
+    pp = json.loads((M3 / "pingpong.json").read_text()).get(key, []) if (M3 / "pingpong.json").exists() else []
+    out = {}
+    for lid in pp:
+        if lid not in anims: continue
+        n = len(list((M3 / key / anims[lid]["folder"]).glob("[0-9][0-9].png")))
+        if n > 2: out[lid] = list(range(1, n + 1)) + list(range(n - 1, 1, -1))
+    return out
+
+
 def auto_cfg(ch):
     key = ch["key"]
     if key == EILEEN_KEY: return eileen_cfg(ch)
@@ -257,7 +268,7 @@ def auto_cfg(ch):
         "anims": anims,
         "picks": {"combat": pidx("전투 자세 장", "3_0", 4), "weapon": pidx("무기 자세 장", "W", 4), "apex": pidx("방향 점프 꼭대기 장", "7", 4),
                   "run": pidx("뛰기 한 장", "5", 2), "crawl4": pidx("네발로 기기 한 장", "42", 6)},
-        "loops": {k: v for k, v in loops.items() if v != "all"},
+        "loops": {**{k: v for k, v in loops.items() if v != "all"}, **pingpong(key, anims)},
         "hit": hits,
         "gun": ["W", "W_1", "15"] if has("W") else [],
         "kick": [l for l in ("11", "12", "13", "14") if l in rows and re.search(r"차기|kick|knee|무릎|발", rows[l][0])],
