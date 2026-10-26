@@ -217,6 +217,53 @@ def build_openings(first_mes, scenarios):
 SETTINGS_BOOKS = ('Settings', '통합설정')
 
 
+EXTRA_LORE = ROOT / 'card' / 'extra-lore'
+APPENDIX_FOLDER_KEY = '\uf000folder:3b7e9d10-goei-0000-0000-appendix0001'
+APPENDIX_FOLDER_NAME = '📎부록'
+
+
+def read_extra_lore():
+    """card/extra-lore/*.txt: 원본 카드에 없는 로어북 (머리 줄 folder·name·key·order·appendix, --- 아래 본문)"""
+    out = []
+    for f in sorted(EXTRA_LORE.glob('*.txt')):
+        head, body = f.read_text(encoding='utf-8').split('\n---\n', 1)
+        meta = dict(line.split(': ', 1) if ': ' in line else (line.rstrip(':'), '') for line in head.splitlines() if line.strip())
+        out.append({**meta, 'content': body})
+    return out
+
+
+def add_extra_lore(entries):
+    """원작 3부 등 새 로어북을 폴더에 넣는다. 같은 폴더에 같은 이름이 있으면 바꾼다. 📎부록 폴더가 없으면 만든다"""
+    extra = read_extra_lore()
+    if not extra:
+        return entries
+    if not any(e.get('mode') == 'folder' and _folder_word(e.get('comment')) == '부록' for e in entries):
+        entries.append({'key': APPENDIX_FOLDER_KEY, 'comment': APPENDIX_FOLDER_NAME, 'content': '', 'mode': 'folder', 'insertorder': 100,
+                        'alwaysActive': False, 'secondkey': '', 'selective': False, 'bookVersion': 2})
+    folders = {e.get('comment'): e['key'] for e in entries if e.get('mode') == 'folder'}
+    for x in extra:
+        key = folders.get(x['folder'])
+        if not key:
+            raise SystemExit(f'새 로어북 넣기 실패: {x["folder"]} 폴더가 없어요 ({x["name"]})')
+        entries = [e for e in entries if not (e.get('folder') == key and e.get('comment') == x['name'])]
+        entries.append({'key': x.get('key', ''), 'secondkey': '', 'comment': x['name'], 'content': x['content'], 'mode': 'normal',
+                        'insertorder': int(x.get('order') or 0), 'alwaysActive': False, 'selective': False, 'useRegex': False,
+                        'folder': key, 'bookVersion': 2})
+    return entries
+
+
+def add_appendix_data(entries):
+    """새 로어북 머리의 부록 조건(appendix)을 명부(Directory) 「부록」에 적는다 (migrate_directory 뒤)"""
+    want = {x['name']: json.loads(x['appendix']) for x in read_extra_lore() if x.get('appendix')}
+    if not want:
+        return entries
+    d = next(e for e in entries if e.get('comment') == 'Directory')
+    data = json.loads(d['content'])
+    data['부록'] = {**data.get('부록', {}), **want}
+    d['content'] = json.dumps(data, ensure_ascii=False, indent=1)
+    return entries
+
+
 def migrate_directory(entries):
     """괴이·미스틱 사이트·요원·거점·세력 호칭·괴담톡 탭·첫 턴 로어북을 명부(Directory)로 옮긴다 (플러그인과 같은 코드를 node로 실행, 먼저 npm run build)"""
     with tempfile.TemporaryDirectory() as tmp:
@@ -254,7 +301,7 @@ def add_wiki_base(entries):
 
 # 본편 로어북 고르기 (플러그인 core/lore.ts). 네 폴더 항목은 @@dont_activate로 Risu가 켜지 않고,
 # 플러그인이 고른 글을 자리 항목 4개가 채팅 변수로 읽는다. 키 정리: docs/호출키_검토_1019.md
-MANAGED_FOLDERS = {'세력': 'org', '조직': 'org', '파밍': 'site', '괴이': 'anomaly', '요원': 'agent'}
+MANAGED_FOLDERS = {'세력': 'org', '조직': 'org', '파밍': 'site', '괴이': 'anomaly', '요원': 'agent', '부록': 'appendix'}
 LORE_SLOTS = [  # core/lore.ts SLOTS와 같게
     ('📚Lore slot · Faction', 'goei_lore_org', 200),
     ('📚Lore slot · Mystic', 'goei_lore_site', 400),
@@ -324,6 +371,8 @@ KEY_EDITS = {
     '우주 쇼핑몰': (['우주쇼핑'], []),
     '친절한 씨앗 키트': (['씨앗 키트', 'Seed Kit'], ['친절한 씨앗 키트']),
     '이빨 요정': (['Tooth Fairy', '이빨나무', '이빨요정', '치아 나무', '치아나무', '치아 요정', '치아요정'], []),
+    # 망상홈쇼핑은 따로 🎁파밍 항목이 됐다 (2026-10-26). 오후역은 역·건물주(혈액 방송국) 키만
+    '오후역': (['Delusion Home Shopping', '망상 홈쇼핑', '망상홈쇼핑'], []),
 }
 
 
@@ -416,6 +465,14 @@ LORE_PATCHES = [
      'For conversational pacing only, use type="pause", sender="-", content=a brief pause without external events.',
      'For a time gap only, use type="pause", sender="-", content=a short elapsed-time marker in Korean such as "잠시 후" or "10분 후" (at most 12 characters). '
      'A pause never narrates: no names, actions, emotions, sounds or scene description. Put such things in the NPC\'s own message text or omit them.'),
+    # 미인 약(망상홈쇼핑)으로 불려 나오는 연옥합창단 퍼레이드 (2026-10-26, 원작 395~398화)
+    ('화요퀴즈쇼', 'leaving a persistent risk of future invitations or recruitment.\n',
+     'leaving a persistent risk of future invitations or recruitment.\n\n'
+     '#### Outside Summoning: Purgatory Choir Parade\n'
+     '- The Purgatory Choir can also be drawn out of the studio by people turned into living instruments (for example by Delusion Home Shopping\'s Beauty Pills taken with alcohol). It opens silver arch passages in walls, reliefs of judgment gates, purgatory, sulfur, notes, and staff lines; choristers wear oversized old suits under dead animal heads (a rat with yarn-stitched eyes, a rotting rooster, a fly-covered ox, a balding sheep, a dog).\n'
+     '- It tunes and selects instruments, announces "The performance will begin shortly. Please enter through the open doors and take your seats," and opens every door as a welcome to the audience, turning the whole building into a venue. It takes over local speakers.\n'
+     '- If the instruments do not take their seats, it switches to a Parade that visits every area with signs of life. An Intermission introduces a "distinguished guest" and gives a short window to act.\n'
+     '- Direct listening collapses thought; a completed harmony feels pleasant, which is the luring stage. Earplugs shrivel into treble-clef lumps. Known countermeasures: hide out of sight, break speakers, close doors, use the intermission, wake entranced allies by force, and keep alcohol away from pill-takers. Victims are found headless or with altered skeletons, hands pressed together as if clapping.\n'),
 ]
 
 # 캐릭터 설명 오타 (옛 문장, 새 문장). 옛 문장이 없으면 빌드를 멈춘다
@@ -695,7 +752,7 @@ def main(src, dst):
     data['character_version'] = version
     data['description'] = patch_desc(data.get('description', ''))
     lore = [e for e in lore if e.get('comment') not in (MANIFEST_COMMENT, OLD_MANIFEST)]
-    lore = add_visit_guide(add_image_lore(add_wiki_base(migrate_directory(tidy_guides(patch_lore(drop_settings(lore)))))))
+    lore = add_visit_guide(add_image_lore(add_wiki_base(add_appendix_data(migrate_directory(add_extra_lore(tidy_guides(patch_lore(drop_settings(lore)))))))))
     lore, manifest['keys'] = lore_activation(lore)
     settings = next(e for e in lore if e.get('mode') == 'folder' and e.get('comment') == SETTINGS_FOLDER_NAME)
     lore.append({

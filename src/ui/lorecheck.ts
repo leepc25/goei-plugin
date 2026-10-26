@@ -8,12 +8,13 @@ import { keepOpen } from './panels';
 const esc = (s: unknown) =>
   String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 
-const WHY: Record<LoreReason, string> = { status: '상태창', input: '이번 입력', user: '내 글', char: '응답', confirmed: '확증' };
+const WHY: Record<LoreReason, string> = { status: '상태창', input: '이번 입력', user: '내 글', char: '응답', confirmed: '확증', place: '위치', agent: '동행·투입', parent: '본 항목' };
 
 function item(p: LorePick, risu = false): string {
   const r = p.reasons[0];
   const why = risu ? `키 「${r.key}」` : `${WHY[r.why]} · 「${r.snippet.trim()}」`;
-  return `<div class="ps-row lc-row"><div class="ps-label"><b>${esc(p.entry.name)}</b><small>${esc(why)}</small></div><span class="lc-kind">${SLOTS[p.entry.kind].label}</span></div>`;
+  const kind = `${SLOTS[p.entry.kind].label}${p.entry.appendix ? ' 부록' : ''}`;
+  return `<div class="ps-row lc-row"><div class="ps-label"><b>${esc(p.entry.name)}</b><small>${esc(why)}</small></div><span class="lc-kind">${kind}</span></div>`;
 }
 
 /** 채팅 설정 맨 아래의 접힌 칸. 이 카드에 플러그인이 고르는 로어북이 없으면 비움 */
@@ -37,6 +38,7 @@ export function loreCheckBox(ctx: ChatContext): string {
     : '<p class="ps-note">달라지는 것이 없어요.</p>';
   return `<details class="ps-adv" data-keep="lore-check"${keepOpen('lore-check')}><summary class="ps-adv-sum"><b>로어북 확인</b><span class="adv-count">${now.picks.length}개 · 약 ${size.toLocaleString()}토큰</span></summary><div class="ps-adv-body">
     <section class="ps-group"><h3>${mode === 'risu' ? 'Risu가 켤 로어북' : '다음 요청에 넣을 로어북'}</h3><div class="ps-rows">${list}</div></section>
+    ${now.locked.length ? `<section class="ps-group"><h3>해금 전 부록</h3><div class="ps-rows">${now.locked.map((e) => `<div class="ps-row lc-row"><div class="ps-label"><b>${esc(e.name)}</b><small>${esc(`해금 조건: ${e.appendix?.when.unlock ?? ''}`)}</small></div><span class="lc-kind">잠김</span></div>`).join('')}</div><p class="ps-note">모델에게는 해금 조건만 알려요. 조건이 맞으면 응답 끝에 해금 표시를 남기고, 다음 요청부터 내용이 들어가요.</p></section>` : ''}
     <section class="ps-group"><h3>${otherIf}</h3><div class="ps-rows">${diff}</div></section>
   </div></details>`;
 }
