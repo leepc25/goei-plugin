@@ -97,3 +97,50 @@
 10-26 16:22:55 57 후면 대기 보냄 north 4장 시작=등록 끝=지정 약 1회
 10-26 16:23:42 57 후면 대기 완료 4장 (46초)
 10-26 16:23:44 50 정면 대기 완료 4장 (52초)
+10-26 21:55:57 60 정면 앉기 보냄 south 8장 시작=지정 끝=없음 약 1회
+10-26 21:56:45 61 후면 앉기 보냄 north 8장 시작=지정 끝=없음 약 1회
+10-26 21:56:46 75 눕기 보냄 east 8장 시작=등록 끝=없음 약 1회
+10-26 21:56:46 74 정면 서서 컵 준비 보냄 south 8장 시작=지정 끝=지정 약 1회
+10-26 21:56:47 96 옆 앉기 보냄 east 8장 시작=등록 끝=없음 약 1회
+10-26 21:56:53 101 하의 내리고 앉기 보냄 south 8장 시작=지정 끝=없음 약 1회
+10-26 21:57:00 104 오류: HTTP 422 {"detail":[{"type":"value_error","loc":["body"],"msg":"Value error, The frame count must be a multiple of 4 from 4 to 40 for PixMiniMax","input":{"character_id":"9fbcd632-7af5-482a-ab21-6604ae946daa","mode":"pixminimax","action_description":"Standing with the back to the viewer (facing north), rub b
+10-26 21:57:05 145 정면 흡연 보냄 south 8장 시작=지정 끝=지정 약 1회
+10-26 21:57:05 150 쪼그려 앉기 보냄 south 8장 시작=지정 끝=없음 약 1회
+10-26 21:57:05 147 서서 폰 보기 보냄 south 8장 시작=지정 끝=지정 약 1회
+10-26 21:57:24 60 정면 앉기 완료 8장 (87초)
+10-26 21:57:49 101 하의 내리고 앉기 완료 8장 (55초)
+10-26 21:57:59 61 후면 앉기 완료 8장 (74초)
+10-26 21:57:59 74 정면 서서 컵 준비 완료 9장 (73초)
+10-26 21:58:05 64 정면 앉아 먹기 보냄 south 8장 시작=지정 끝=지정 약 1회
+10-26 21:58:05 62 정면 앉아 수다 보냄 south 8장 시작=지정 끝=지정 약 1회
+10-26 21:58:13 96 옆 앉기 완료 8장 (86초)
+10-26 21:58:14 150 쪼그려 앉기 완료 8장 (68초)
+10-26 21:58:16 65 오류: HTTP 422 {"detail":[{"type":"value_error","loc":["body"],"msg":"Value error, The frame count must be a multiple of 4 from 4 to 40 for PixMiniMax","input":{"character_id":"9fbcd632-7af5-482a-ab21-6604ae946daa","mode":"pixminimax","action_description":"Seated facing the viewer, raise a paper cup with both hand
+10-26 21:58:18 70 후면 앉아 수다 보냄 north 8장 시작=지정 끝=지정 약 1회
+10-26 21:58:21 71 후면 앉아 먹기·마시기 보냄 north 8장 시작=지정 끝=지정 약 1회
+10-26 21:58:25 145 정면 흡연 완료 8장 (79초)
+10-26 21:58:25 63 정면 앉아 타자 보냄 south 8장 시작=지정 끝=지정 약 1회
+10-26 21:58:26 147 서서 폰 보기 완료 9장 (80초)
+10-26 21:58:29 69 후면 앉아 타자 보냄 north 8장 시작=지정 끝=지정 약 1회
+10-26 21:58:29 73 정면 기대 쉬기 보냄 south 8장 시작=지정 끝=지정 약 1회
+10-26 21:58:29 105 옆 앉아 타자 보냄 east 8장 시작=지정 끝=지정 약 1회
+10-26 21:58:33 66 정면 앉아 졸기 보냄 south 8장 시작=지정 끝=지정 약 1회
+10-26 21:58:40 78 오류: HTTP 422 {"detail":[{"type":"value_error","loc":["body"],"msg":"Value error, The frame count must be a multiple of 4 from 4 to 40 for PixMiniMax","input":{"character_id":"9fbcd632-7af5-482a-ab21-6604ae946daa","mode":"pixminimax","action_description":"Seated facing the viewer, hold the right forearm out forwa
+10-26 21:58:41 102 앉아 볼일 보냄 south 4장 시작=지정 끝=지정 약 1회
+10-26 21:58:46 97 옆 앉아 수다 보냄 east 8장 시작=지정 끝=지정 약 1회
+10-26 21:58:50 98 옆 앉아 먹기 보냄 east 8장 시작=지정 끝=지정 약 1회
+10-26 21:58:50 99 옆 앉아 마시기 보냄 east 8장 시작=지정 끝=지정 약 1회
+10-26 21:58:58 103 닦고 하의 올리며 일어나기 보냄 south 8장 시작=지정 끝=지정 약 1회
+10-26 21:59:29 75 눕기 완료 8장 (163초)
+10-26 22:00:12 102 앉아 볼일 완료 5장 (90초)
+10-26 22:00:14 76 누워 쉬기·졸기 보냄 east 4장 시작=지정 끝=지정 약 1회
+10-26 22:00:18 77 누워 아파하기 보냄 east 8장 시작=지정 끝=지정 약 1회
+10-26 22:00:22 70 후면 앉아 수다 완료 8장 (124초)
+10-26 22:00:23 69 후면 앉아 타자 완료 9장 (113초)
+10-26 22:00:24 63 정면 앉아 타자 완료 9장 (118초)
+10-26 22:00:32 71 후면 앉아 먹기·마시기 완료 9장 (130초)
+10-26 22:00:34 62 정면 앉아 수다 완료 8장 (148초)
+10-26 22:00:34 73 정면 기대 쉬기 완료 9장 (125초)
+10-26 22:00:42 64 정면 앉아 먹기 완료 9장 (156초)
+10-26 22:01:06 103 오류: Command '['curl', '-sSf', '--retry', '3', 'https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/9fbcd632-7af5-482a-ab21-6604ae946daa/animations/6bc231f4-9d96-4abb-9131-19be4c7eb892/south/5.png?t=1793052062']' returned non-zero exit status 56.
+10-26 22:01:06 66 오류: Command '['curl', '-sSf', '--retry', '3', 'https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/9fbcd632-7af5-482a-ab21-6604ae946daa/animations/9e930ee4-8356-40e8-85be-6ec5d787e5c0/south/2.png?t=1793052062']' returned non-zero exit status 56.
