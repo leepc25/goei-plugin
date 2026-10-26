@@ -10,6 +10,7 @@ import { siteFor } from '../../core/fieldsites';
 import { peopleStore, withPeople } from '../../core/people/store';
 import { peopleSettings } from '../../core/people/settings';
 import { applyFieldEvent } from '../../core/people/field';
+import { factionNamesOf } from '../people';
 import { playerAgent } from '../../core/player';
 
 const KINDS: FieldKind[] = ['move', 'act', 'hurt', 'down', 'kill', 'flee', 'provoke', 'gift', 'trade', 'quest', 'follow', 'unfollow', 'enter_anomaly', 'exit_anomaly', 'enter_site', 'detected', 'appoint', 'call'];
@@ -39,14 +40,14 @@ export function createField(): GameField {
         const c = await loadContext();
         if (!c || c.charIndex !== origin.charIndex || c.chatIndex !== origin.chatIndex || c.char.chaId !== origin.char.chaId || c.chat.id !== origin.chat.id) return;
         if (!KINDS.includes(ev.kind as FieldKind)) return;
-        const event = { id: crypto.randomUUID(), at: Date.now(), anchor: anchorOf(c.chat), kind: ev.kind as FieldKind, text: ev.text, scene: ev.scene, who: ev.who, weight: ev.weight, fact: ev.fact };
+        const event = { id: crypto.randomUUID(), at: Date.now(), anchor: anchorOf(c.chat), kind: ev.kind as FieldKind, text: ev.text, scene: ev.scene, who: ev.who, weight: ev.weight, fact: ev.fact, ...(ev.witness && typeof ev.witness.faction === 'string' ? { witness: { faction: ev.witness.faction, named: !!ev.witness.named } } : {}) };
         await updateChat(c.charIndex, c.chatIndex, (chat) => {
           if (chat.id !== c.chat.id) return null;
           let next = withFieldEvent(chat, event);
           // 인물 기록에도 (모델 없음): 계기·상태·행적. 기능이 꺼져 있으면 건너뜀
           if (peopleSettings(next.scriptstate).on) {
             const store = peopleStore(next);
-            if (applyFieldEvent(store, next, event, playerAgent(c.char.globalLore, next.scriptstate)?.name ?? '주인공') > 0) next = withPeople(next, store);
+            if (applyFieldEvent(store, next, event, playerAgent(c.char.globalLore, next.scriptstate)?.name ?? '주인공', { mobWeight: peopleSettings(next.scriptstate).mobWeight, factionNames: factionNamesOf(c.char.globalLore) }) > 0) next = withPeople(next, store);
           }
           return next;
         });

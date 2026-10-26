@@ -48,6 +48,10 @@ export function peopleStore(chat: Chat): PeopleStore {
     if (!d || !DOC_TYPES.includes(d.type) || typeof d.key !== 'string') continue;
     out.docs[k] = { type: d.type, key: d.key, entries: Array.isArray(d.entries) ? d.entries.filter(isEntry) : [] };
   }
+  for (const [k, f] of Object.entries(raw.factions ?? {})) {
+    if (!f || typeof f !== 'object' || typeof f.code !== 'string') continue;
+    out.factions[k] = { code: f.code, name: str(f.name), seeded: f.seeded && typeof f.seeded === 'object' ? f.seeded : { at: '' } };
+  }
   out.log = Array.isArray(raw.log) ? raw.log.filter((c): c is Change => !!c && typeof c.id === 'string' && typeof c.anchor === 'string' && typeof c.who === 'string' && typeof c.kind === 'string') : [];
   out.folded = raw.folded && typeof raw.folded === 'object' ? Object.fromEntries(Object.entries(raw.folded).filter(([, v]) => typeof v === 'number')) as Record<string, number> : {};
   out.read = raw.read && typeof raw.read === 'object' ? Object.fromEntries(Object.entries(raw.read).filter(([, v]) => typeof v === 'string')) as Record<string, string> : {};

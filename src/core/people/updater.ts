@@ -7,10 +7,12 @@ import { findStatusTags } from '../world/status';
 import { addressOf, affinityView, opennessOf, tasteOf } from './affinity';
 import { unknownTo } from './inject';
 import { seedPerson } from './seed';
+import { collectiveOk, factionNow, knownFactionCodes, sceneFactionCodes, userFactionOf, factionName as factionNameOf } from './faction';
+import { factionCode } from './identity';
 import { nameMatcher, scenePeople, entriesOf, type NameEntry } from './select';
 import { changeId, entryId, isAlive, liveChanges, liveEntries, liveness, markRead, messageKey, norm, plain, putChange, putDoc, putEntry, type Liveness } from './store';
 import type { Feature, PeopleSettings } from './settings';
-import { CUES, DOC_TYPES, OPENNESS_BASELINES, OPENNESS_DELTAS, REGISTERS, RHYTHM_ENGAGEMENT, RHYTHM_HOOK_STAGES, RHYTHM_HOOK_TIERS, RHYTHM_PHASES, SLOTS, TASTE_MAX, TASTE_MIN, docFeature, opennessStage, type Change, type Cue, type DocType, type Entry, type PeopleStore, type Person, type Register, type SlotId } from './types';
+import { CUES, DOC_TYPES, FACTION_STAGES, OPENNESS_BASELINES, factionWho, OPENNESS_DELTAS, REGISTERS, RHYTHM_ENGAGEMENT, RHYTHM_HOOK_STAGES, RHYTHM_HOOK_TIERS, RHYTHM_PHASES, SLOTS, TASTE_MAX, TASTE_MIN, docFeature, opennessStage, type Change, type Cue, type DocType, type Entry, type PeopleStore, type Person, type Register, type SlotId } from './types';
 
 const str = (v: unknown) => (typeof v === 'string' ? v : '');
 const msgs = (chat: Chat): ChatMessage[] => (Array.isArray(chat.message) ? chat.message : []);
@@ -56,6 +58,9 @@ export interface UpdateInput {
   names: NameEntry[];
   /** 저장 상한을 넘긴 인물 (같은 호출에 정리를 얹을 대상) */
   tidy: string[];
+  /** 장면 세력 코드 (세력 평판 켜짐) */
+  factions: string[];
+  factionNames: Record<string, string>;
 }
 
 const CUE_MEANING: Record<Cue, string> = {
@@ -111,6 +116,8 @@ export interface BuildOpts {
   names: NameEntry[];
   /** 기록하지 않는 이름 (유저가 연기하는 요원) */
   exclude?: string[];
+  /** 세력 코드 → 이름 (명부). 세력 평판 자료용 */
+  factionNames?: Record<string, string>;
 }
 
 const SUSP_WEIGHT: Record<string, number> = { 약: 10, 중: 25, 강: 40, '-약': -10, '-중': -25, '-강': -40 };
@@ -199,6 +206,9 @@ export function buildUpdate(chat: Chat, store: PeopleStore, batch: number[], o: 
   ];
   const wantNote = o.settings.director === 'facts';
   const over = chosen.filter((n) => recordChars(store.people[n], live) > o.settings.personCap);
+  // 세력 평판: 장면 세력(인물 소속 ∪ 글에 나온 세력)의 현재값
+  const factionCodes = o.settings.features.has('faction_rep') ? sceneFactionCodes(store, chosen, texts, o.factionNames) : [];
+  const userFaction = userFactionOf(store, chat);
   const data = {
     request_ref: `pp_${Date.now().toString(36)}`,
     cues: o.settings.features.has('affinity') ? CUES.map((c) => ({ name: c, meaning: CUE_MEANING[c] })) : [],
@@ -214,6 +224,10 @@ export function buildUpdate(chat: Chat, store: PeopleStore, batch: number[], o: 
       : undefined,
     suspicion_now: o.settings.features.has('suspicion') ? chosen.flatMap((n) => suspicionCases(store.people[n], live)) : undefined,
     npc_relations: o.settings.features.has('npc_emotion') ? true : undefined,
+    factions_now: o.settings.features.has('faction_rep')
+      ? factionCodes.map((c) => { const f = factionNow(store, c, changes, userFaction, o.settings, o.factionNames); return { code: f.code, name: f.name, value: f.value, stage: f.stage.label, stage_en: f.stage.id }; })
+      : undefined,
+    faction_stages: o.settings.features.has('faction_rep') ? Object.values(FACTION_STAGES).map((st) => `${st.label} (${st.id})`).join(' · ') : undefined,
     // 저장 상한을 넘긴 인물: 같은 호출에 정리(merge)를 얹는다 (설정 tidy=same)
     tidy: o.settings.tidy === 'same' ? over.map((n) => ({ name: n, chars: recordChars(store.people[n], live), target: Math.round(o.settings.personCap * 0.8) })) : undefined,
     next_note: wantNote ? true : undefined,
@@ -223,7 +237,7 @@ export function buildUpdate(chat: Chat, store: PeopleStore, batch: number[], o: 
     identity_known: store.identity ? { faction: store.identity.faction, rank: store.identity.rank } : null,
     want: { new_people: true, next_note: wantNote, address: o.settings.features.has('register'), identity: true },
   };
-  return { system: o.system, data, indexes: batch, tags, people: chosen, confirmed: confirmedIdx, names: o.names, tidy: o.settings.tidy === 'same' ? over : [] };
+  return { system: o.system, data, indexes: batch, tags, people: chosen, confirmed: confirmedIdx, names: o.names, tidy: o.settings.tidy === 'same' ? over : [], factions: factionCodes, factionNames: o.factionNames ?? {} };
 }
 
 // ── 지침 조립 ──
@@ -271,6 +285,8 @@ export interface UpdateResult {
   openness?: { who: string; op: string; value?: number | null; delta?: number | null; m: string; quote: string; reason?: string }[];
   /** 서사 리듬: 다음 턴 메모 (사실형 Director, 장면 전체) */
   rhythm_note?: string | null;
+  /** 세력 평판 계기 (집단 반응만) */
+  faction_cues?: { faction: string; cue: string; m: string; quote: string; reason?: string }[];
 }
 
 /** JSON 하나만 꺼낸다 (코드 울타리·앞뒤 글 허용). 아니면 throw */
@@ -284,7 +300,7 @@ export function parseUpdate(raw: string): UpdateResult {
   const v = JSON.parse(t.slice(a, b + 1)) as unknown;
   if (!v || typeof v !== 'object' || Array.isArray(v)) throw new Error('JSON 객체가 아니에요');
   const r = v as UpdateResult;
-  for (const k of ['entries', 'cues', 'address', 'new_people', 'docs', 'suspicion', 'next_note', 'taste', 'openness'] as const) {
+  for (const k of ['entries', 'cues', 'address', 'new_people', 'docs', 'suspicion', 'next_note', 'taste', 'openness', 'faction_cues'] as const) {
     if (r[k] !== undefined && !Array.isArray(r[k])) throw new Error(`${k}는 목록이어야 해요`);
   }
   return r;
@@ -294,7 +310,7 @@ export function parseUpdate(raw: string): UpdateResult {
 
 export interface Dropped { kind: string; who?: string; reason: string; item: unknown }
 export interface ApplyReport {
-  applied: { entries: number; cues: number; address: number; docs: number; suspicion: number; newPeople: string[]; notes: number; identity: boolean; taste: number; openness: number };
+  applied: { entries: number; cues: number; address: number; docs: number; suspicion: number; newPeople: string[]; notes: number; identity: boolean; taste: number; openness: number; factions: number };
   dropped: Dropped[];
   /** 「확인 필요」로 보류한 것 */
   held: Dropped[];
@@ -355,7 +371,7 @@ export function resolveName(who: string, store: PeopleStore, names: NameEntry[] 
 export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, r: UpdateResult, ctx: ApplyCtx): ApplyReport {
   const list = msgs(chat);
   const live = liveness(chat);
-  const report: ApplyReport = { applied: { entries: 0, cues: 0, address: 0, docs: 0, suspicion: 0, newPeople: [], notes: 0, identity: false, taste: 0, openness: 0 }, dropped: [], held: [] };
+  const report: ApplyReport = { applied: { entries: 0, cues: 0, address: 0, docs: 0, suspicion: 0, newPeople: [], notes: 0, identity: false, taste: 0, openness: 0, factions: 0 }, dropped: [], held: [] };
   const drop = (kind: string, item: unknown, reason: string, who?: string) => report.dropped.push({ kind, who, reason, item });
   const roleWords = ctx.roleWords ?? ROLE_WORDS;
   const seqs = new Map<string, number>();
@@ -792,6 +808,47 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
       // close 는 그 대상·종류의 살아 있는 항목을 모두 대체 (하나로 접음)
       const replaces = s.op === 'close' ? cur.at(-1)?.id : undefined;
       if (putEntry(store, who, 'suspicion', { id: entryId(who, 'suspicion', ev.anchor, seq, prefix + text), text: prefix + text, src: 'story', anchor: ev.anchor, seq, quote: s.quote, target, kind: s.kind, ...(replaces ? { replaces } : {}) })) report.applied.suspicion++;
+    }
+  }
+
+  // 6b. 세력 평판 계기: 세력이 집단으로 반응했을 때만. 코드로 바꾸고, 집단 행위 낱말·인용 검사, 세력당 1건
+  if (ctx.settings.features.has('faction_rep')) {
+    const changes = liveChanges(store, live);
+    const seen = new Set<string>();
+    const known = knownFactionCodes(store, input.factionNames);
+    for (const f of r.faction_cues ?? []) {
+      const raw = str(f?.faction).trim();
+      const code = known.includes(raw) ? raw : factionCode(raw) || known.find((c) => input.factionNames[c] && raw && input.factionNames[c] === raw) || '';
+      if (!code) {
+        drop('faction', f, '모르는 세력 이름', raw);
+        continue;
+      }
+      if (!CUES.includes(f.cue as Cue)) {
+        drop('faction', f, '표에 없는 계기', code);
+        continue;
+      }
+      const ev = evidence(f.m, f.quote);
+      if (typeof ev === 'string') {
+        drop('faction', f, ev, code);
+        continue;
+      }
+      if (!collectiveOk(`${str(f.reason)} ${str(f.quote)}`)) {
+        drop('faction', f, '집단 반응 근거 없음 (구성원 한 명의 일은 그 인물 기록으로)', code);
+        continue;
+      }
+      if (seen.has(code)) {
+        drop('faction', f, '세력당 1건', code);
+        continue;
+      }
+      const who = factionWho(code);
+      if (changes.some((x) => x.kind === 'cue' && x.who === who && x.anchor === ev.anchor && x.cue === f.cue)) {
+        drop('faction', f, '같은 메시지에 같은 계기가 이미 있음', code);
+        continue;
+      }
+      seen.add(code);
+      if (!store.factions[code]) store.factions[code] = { code, name: factionNameOf(code, input.factionNames, store), seeded: { at: ctx.now ?? new Date().toISOString() } };
+      const seq = nextSeq(ev.anchor);
+      if (putChange(store, { id: changeId(who, 'cue', ev.anchor, seq, f.cue), anchor: ev.anchor, seq, src: 'story', who, kind: 'cue', cue: f.cue as Cue, quote: f.quote, reason: plain(f.reason, 40) })) report.applied.factions++;
     }
   }
 

@@ -8,11 +8,12 @@ import { updateChat, type ChatContext } from '../host/risu';
 import { chatId, clearDiag, consolidatePerson, loadDiag, onPeopleStatus, peopleStatus, requestPeopleUpdate, sheetOf, type DiagRun } from '../host/people';
 import { anchorOf, changeId, entryStates, isAlive, liveChanges, liveEntries, liveness, messageKey, peopleStore, plain, putChange, unreadIndexes, withPeople, type EntryState, type Liveness } from '../core/people/store';
 import { addressOf, affinityView, opennessOf, tasteOf } from '../core/people/affinity';
+import { factionNow, knownFactionCodes, userFactionOf } from '../core/people/faction';
 import { FEATURES, PP, PP_DEFAULTS, peopleSettings, ppValue, type Feature } from '../core/people/settings';
 import { recordChars } from '../core/people/updater';
 import { seedBaseFor, temperOf } from '../core/people/base';
 import { seedPerson } from '../core/people/seed';
-import { AFF_MAX, AFF_MIN, DOC_TYPES, REGISTERS, SLOTS, STAGES, TASTE_STAGES, opennessStage, stageOf, type Change, type Doc, type DocType, type Entry, type EntrySrc, type Person, type PeopleStore, type Register, type SlotId } from '../core/people/types';
+import { AFF_MAX, AFF_MIN, DOC_TYPES, FACTION_MAX, FACTION_MIN, FACTION_STAGES, REGISTERS, SLOTS, STAGES, TASTE_STAGES, factionWho, opennessStage, stageOf, type Change, type Doc, type DocType, type Entry, type EntrySrc, type Person, type PeopleStore, type Register, type SlotId } from '../core/people/types';
 import { ICONS } from './icons';
 import { keepOpen } from './panels';
 import { toast } from './toast';
@@ -222,6 +223,7 @@ const FEATURE_HELP: Record<Feature, [string, string]> = {
   taste: ['취향 띠(첫인상)', '인물마다 주인공이 자기 취향에 맞는 정도(−3~+3)를 호감과 별개로 기록해요. 오를 땐 한 칸씩, 내릴 땐 여러 칸. 리수폿 첫인상 축'],
   openness: ['음란도', '성인 인물의 성적 개방도(0~300)와 피임 태도를 기록해요. 시작값은 근거가 있을 때만, 그 뒤는 실제 반응마다. 리수폿 음란도. 성인용 기능'],
   rhythm: ['서사 리듬', '장면 국면(준비·절정·여운…)·장(章) 흐름·떡밥 단계를 문서로 두고 Director 메모에 「지금은 긴장을 올릴 때/떡밥 회수」를 넣어요. 카드 지침과 부딪칠 수 있어 기본 끔. 리수폿 리듬'],
+  faction_rep: ['세력 평판', '세력(관리국·가짜 관리국·백일몽·민간·협회…)이 주인공을 어떻게 보는지 −100~100 값으로 둬요. 세력이 집단으로 반응할 때(출입 금지·징계·포상·거래…)만 바뀌고, 구성원 한 명의 감정은 번지지 않아요. 필드 몹의 첫 반응이 이 값의 구간으로 정해져요'],
   npc_emotion: ['인물끼리 감정', '인물이 다른 인물에게 느끼는 감정·관계도 기록해요 (유저 대상만이 아니라)'],
 };
 
@@ -345,6 +347,11 @@ export function peopleSettingsPane(ctx: ChatContext, canChat = true): string {
     row('인물당 저장 상한', seg('person_cap', String(s.personCap), [['5000', '5,000'], ['10000', '10,000'], ['20000', '20,000']]), '한 인물의 살아 있는 기록 글자 수. 넘으면 정리로 합쳐요 (항목 수 상한은 없어요). 리수폿의 절별 상한 합계가 약 10,000자예요.'),
     row('본편 기록 예산', seg('block_cap', String(s.blockCap), [['8000', '8,000'], ['16000', '16,000'], ['32000', '32,000']]), '본편 요청에 넣는 기록 블록 전체 글자 수. 장면 인물 수로 나눠 배분하고, 넘치는 인물은 지난 일부터 빼요. 리수폿 Director 참고 상한이 16,000자예요.'),
     row('정리', seg('tidy', s.tidy, [['same', '같은 호출에 얹기'], ['separate', '별도 호출']]), '저장 상한을 넘긴 인물을 합치는 방법. 같은 호출 = 그 턴의 갱신 요청에 「합쳐라」를 얹음(추가 호출 없음). 별도 = 갱신 뒤 그 인물만 정리 호출 1회.'),
+    ...(s.features.has('faction_rep') ? [
+      row('세력 평판 본편 주입', onoff('faction_inject'), '장면에 나온 세력 가운데 중립이 아닌 것만 한 줄씩 본편 요청에 넣어요.'),
+      row('세력 구간 경계', `<input class="gx-search ph-pct pp-bounds" data-change="pp-bounds" name="pp-bounds" value="${esc(v('faction_bounds'))}" placeholder="61,21,-20,-60" maxlength="24" aria-label="세력 구간 경계">`, '우호·호의·중립·경계 하한 네 수(내림차순). 그 아래는 적대. 필드 몹 반응도 같은 구간을 써요. 기본 61,21,-20,-60.'),
+      row('몹 목격 무게', seg('mob_weight', s.mobWeight, [['half', '절반'], ['full', '같음'], ['off', '안 씀']]), '필드에서 이름 없는 몹이 본 일을 세력 계기로 넣을 때의 무게. 절반은 소수점을 버려서 작은 일(작은친절 +1)은 안 쌓여요. 명단 인물이 본 일은 늘 원래 값.'),
+    ] : []),
     row('응답 접기 상한', seg('span_cap', String(s.spanCap), [['12000', '12,000'], ['20000', '20,000'], ['40000', '40,000']]), '한 번에 읽는 구간 글자 수. 넘으면 중간을 접어요.'),
     row('다른 보조 호출과 병렬', onoff('parallel'), '끄면 이미지·괴담톡 같은 다른 보조 호출 앞에 차례로 돌아요.'),
     row('원문 보관', onoff('keep_raw'), '진단에 보낸 프롬프트·응답 원문을 남겨요 (이 기기 플러그인 저장소).'),
@@ -438,7 +445,67 @@ export function peopleListView(ctx: ChatContext): string {
       ${peopleUi.notice ? `<div class="gx-err" role="alert">${esc(peopleUi.notice)}</div>` : ''}
       ${updateBar(ctx)}
       ${pendingHtml}${sections}${empty}
+      ${factionSection(ctx, store, changes)}
       ${docsN ? `<button class="gx-mini nw-more-btn" data-action="wiki-docs">${ICONS.book}사건·장소·세력·물건 기록 ${docsN}개</button>` : ''}
+    </article>${toast('pp', peopleUi.info, (t) => {
+      if (peopleUi.info === t) peopleUi.info = '';
+    })}</div>`;
+}
+
+/** 세력 평판 절 (인물 목록 아래): 아는 세력 전부, 값·구간·시작값 */
+function factionSection(ctx: ChatContext, store: PeopleStore, changes: Change[]): string {
+  const s = peopleSettings(ctx.chat.scriptstate);
+  if (!s.features.has('faction_rep')) return '';
+  const names = Object.fromEntries(factionList(ctx.char.globalLore).map((f) => [f.code, f.name]));
+  const uf = userFactionOf(store, ctx.chat);
+  const rows = knownFactionCodes(store, names).map((code) => {
+    const f = factionNow(store, code, changes, uf, s, names);
+    const mine = store.log.filter((c) => c.who === factionWho(code)).length;
+    return `<li class="ph-row"><button class="ph-main nw-row" data-action="wiki-faction" data-value="${esc(code)}">
+      <span class="ph-avatar nw-ava k-fac">${esc(f.name.slice(0, 1))}</span>
+      <span class="ph-who"><span class="ph-who-top"><b>${esc(f.name)}</b><span class="gx-badge fs-${f.stage.id}" title="${esc(f.stage.mob)}">${esc(f.stage.label)}</span></span><small>${f.value} · 시작값 ${f.base}${code === uf ? ' · 주인공 소속' : ''}${mine ? ` · 기록 ${mine}` : ''}</small></span></button></li>`;
+  }).join('');
+  return `<section class="nw-hsec pp-sec"><h3 title="세력이 주인공을 어떻게 보는지. 세력이 집단으로 반응할 때만 바뀌어요">세력 평판<b>${knownFactionCodes(store, names).length}</b></h3><ul class="ph-list">${rows}</ul></section>`;
+}
+
+/** 세력 평판 막대: 5칸, 중립 기준 */
+function factionBar(value: number, bounds: readonly number[]): string {
+  const ids = ['hostile', 'wary', 'neutral', 'favorable', 'friendly'] as const;
+  const cur = ids.indexOf(factionStageId(value, bounds));
+  const base = 2;
+  const lo = Math.min(cur, base);
+  const hi = Math.max(cur, base);
+  const ranges = [`${FACTION_MIN}~${bounds[3] - 1}`, `${bounds[3]}~${bounds[2] - 1}`, `${bounds[2]}~${bounds[1] - 1}`, `${bounds[1]}~${bounds[0] - 1}`, `${bounds[0]}~${FACTION_MAX}`];
+  const cells = ids.map((id, i) => `<i class="pp-cell${i === base ? ' base' : ''}${i >= lo && i <= hi && i !== base ? (i < base ? ' on neg' : ' on pos') : ''}${i === cur ? ' cur' : ''}" title="${esc(FACTION_STAGES[id].label)} (${ranges[i]}) · ${esc(FACTION_STAGES[id].mob)}"></i>`).join('');
+  return `<div class="pp-aff"><div class="pp-aff-top"><b>${esc(FACTION_STAGES[ids[cur]].label)}</b><span class="pp-aff-num">${value} <small>· 범위 ${FACTION_MIN}~${FACTION_MAX}</small></span></div><div class="pp-cells" role="img" aria-label="세력 평판 ${value}">${cells}</div><div class="pp-aff-ends" aria-hidden="true"><span>적대</span><span>우호</span></div></div>`;
+}
+const factionStageId = (value: number, b: readonly number[]) => (value >= b[0] ? 'friendly' : value >= b[1] ? 'favorable' : value >= b[2] ? 'neutral' : value >= b[3] ? 'wary' : 'hostile');
+
+/** 세력 평판 상세: 막대·몹 반응·변경 기록·직접 고정 */
+export function factionView(ctx: ChatContext, code: string): string {
+  const store = peopleStore(ctx.chat);
+  const s = peopleSettings(ctx.chat.scriptstate);
+  const names = Object.fromEntries(factionList(ctx.char.globalLore).map((f) => [f.code, f.name]));
+  const live = liveness(ctx.chat);
+  const changes = liveChanges(store, live);
+  const uf = userFactionOf(store, ctx.chat);
+  const f = factionNow(store, code, changes, uf, s, names);
+  const who = factionWho(code);
+  const last = [...changes].reverse().find((c) => c.who === who && c.kind === 'cue' && c.pin === undefined);
+  const mine = store.log.filter((c) => c.who === who).map((c) => ({ c, pos: live.at.get(c.anchor) ?? 1e9 })).sort((a, b) => b.pos - a.pos || b.c.seq - a.c.seq).map((x) => x.c);
+  const edit = peopleUi.affEdit
+    ? `<div class="pp-edit"><div class="pp-edit-row"><label>숫자 <input class="gx-search ph-pct" type="number" min="${FACTION_MIN}" max="${FACTION_MAX}" data-input="pp-aff-num" name="pp-aff-num" value="${esc(peopleUi.affNum)}" placeholder="${f.value}"></label></div>
+        <input class="gx-search" data-input="pp-aff-reason" name="pp-aff-reason" maxlength="80" placeholder="이유 (필수)" value="${esc(peopleUi.affReason)}">
+        <p class="ps-note">고정하면 그 값으로 덮고, 이후 자동 계기는 무시해요. 변경 기록에서 취소하면 다시 자동 계산으로 돌아가요.</p>
+        <div class="gx-row-btns"><button class="gx-mini ps-save" data-action="pp-fac-save" data-value="${esc(code)}" ${peopleUi.busy ? 'disabled' : ''}>저장</button><button class="gx-mini" data-action="pp-aff-cancel">취소</button></div></div>`
+    : `<div class="gx-row-btns"><button class="gx-mini" data-action="pp-aff-edit">값 직접 고정</button>${last ? `<small class="ps-note">마지막 계기: ${esc(last.cue ?? '')}${last.reason ? ` — ${esc(last.reason)}` : ''}</small>` : ''}</div>`;
+  const mob = `<ul class="pp-mob">${(['friendly', 'favorable', 'neutral', 'wary', 'hostile'] as const).map((id) => `<li${f.stage.id === id ? ' class="cur"' : ''}><b>${esc(FACTION_STAGES[id].label)}</b> ${esc(FACTION_STAGES[id].mob)}</li>`).join('')}</ul>`;
+  return `<div class="ph-room nw-pane pp-pane">${head(f.name, `세력 평판 · 시작값 ${f.base}${code === uf ? ' · 주인공 소속' : ''}`)}
+    <article class="nw-doc pp-doc">
+      ${peopleUi.notice ? `<div class="gx-err" role="alert">${esc(peopleUi.notice)}</div>` : ''}
+      <section class="pp-card"><h4 title="세력이 주인공을 어떻게 보는지 (−100~100). 세력이 집단으로 반응할 때와 필드에서 그 소속이 목격한 일로만 바뀌어요">평판</h4>${factionBar(f.value, s.factionBounds)}${edit}</section>
+      <section class="pp-card"><h4 title="필드에서 이 세력의 이름 없는 몹이 주인공을 처음 봤을 때">구간별 몹 반응</h4>${mob}</section>
+      <details class="ps-adv-sub pp-log" data-keep="pp-log"${keepOpen('pp-log')}><summary>변경 기록<b>${mine.length}</b></summary>${mine.length ? `<ul class="pp-entries">${mine.map((c) => changeRow(ctx, c, live)).join('')}</ul>` : '<p class="ps-note">아직 변경 기록이 없어요. 시작값은 조직×조직 표에서 와요.</p>'}</details>
     </article>${toast('pp', peopleUi.info, (t) => {
       if (peopleUi.info === t) peopleUi.info = '';
     })}</div>`;
@@ -802,6 +869,32 @@ export async function handlePeople(action: string, value: string | undefined, ct
       Object.assign(peopleUi, { affEdit: true, affStage: '', affNum: '', affReason: '', notice: '' });
       env.render();
       return true;
+    case 'pp-fac-save': {
+      const reason = peopleUi.affReason.trim();
+      const raw = Number(peopleUi.affNum);
+      if (!Number.isFinite(raw) || peopleUi.affNum.trim() === '') {
+        peopleUi.notice = '숫자를 적어 주세요.';
+        env.render();
+        return true;
+      }
+      if (!reason) {
+        peopleUi.notice = '이유를 적어 주세요. 변경 기록에 남아요.';
+        env.render();
+        return true;
+      }
+      const pin = Math.max(FACTION_MIN, Math.min(FACTION_MAX, Math.round(raw)));
+      const who = factionWho(v);
+      await mutate(ctx, env, (store, chat) => {
+        if (!store.factions[v]) store.factions[v] = { code: v, name: factionName(ctx, v), seeded: { at: new Date().toISOString() } };
+        const anchor = anchorOf(chat);
+        const seq = nextSeq(store, anchor);
+        return putChange(store, { id: changeId(who, 'cue', anchor, seq, `pin:${pin}:${reason}`), anchor, seq, src: 'manual', who, kind: 'cue', pin, reason: plain(reason, 80) });
+      });
+      peopleUi.affEdit = false;
+      peopleUi.info = `세력 평판을 ${pin}으로 고정했어요.`;
+      env.render();
+      return true;
+    }
     case 'pp-aff-cancel':
       peopleUi.affEdit = false;
       env.render();
@@ -863,6 +956,17 @@ export async function handlePeople(action: string, value: string | undefined, ct
       peopleUi.oldAll.add(v);
       env.render();
       return true;
+    case 'pp-bounds': {
+      // 세력 구간 경계: 네 정수 내림차순이면 저장, 아니면 안내
+      const ok = /^\s*-?\d+\s*,\s*-?\d+\s*,\s*-?\d+\s*,\s*-?\d+\s*$/.test(v) && (() => { const n = v.split(',').map(Number); return n[0] > n[1] && n[1] > n[2] && n[2] > n[3] && n.every((x) => x >= -100 && x <= 100); })();
+      if (!ok) {
+        peopleUi.notice = '경계는 −100~100 사이 정수 넷을 내림차순으로 적어 주세요 (예: 61,21,-20,-60).';
+        env.render();
+        return true;
+      }
+      await setVars(ctx, env, { [PP('faction_bounds')]: v.replace(/\s+/g, '') });
+      return true;
+    }
     case 'pp-addr-save': {
       const toUser = plain(peopleUi.addrTo, 40);
       const register = peopleUi.addrReg;

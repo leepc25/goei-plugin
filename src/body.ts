@@ -54,7 +54,7 @@ import { peopleStore } from './core/people/store';
 import { peopleSettings } from './core/people/settings';
 import { identityText } from './core/people/identity';
 import { extraNames, temperOf } from './core/people/base';
-import { requestPeopleUpdate, directorNoteText } from './host/people';
+import { requestPeopleUpdate, directorNoteText, factionNamesOf } from './host/people';
 import { bookText } from './core/refs';
 
 const PLUGIN_ID = 'goei-plugin';
@@ -195,7 +195,7 @@ async function withPeople<M extends PromptMessage>(messages: M[]): Promise<M[]> 
   const lastUser = [...messages].reverse().find((m) => m?.role === 'user');
   const input = typeof lastUser?.content === 'string' ? lastUser.content : '';
   const user = me?.name || userInfo().name || '주인공';
-  const opts = { settings, store, sheetOf: (name: string) => bookText({ char, chat }, name) || null, temperOf, extraNames: extraNames(), input, user };
+  const opts = { settings, store, sheetOf: (name: string) => bookText({ char, chat }, name) || null, temperOf, extraNames: extraNames(), input, user, factionNames: factionNamesOf(char.globalLore) };
   let out = withPeopleBlock(messages, chat, opts);
   // 연출형 Director (선택): 장면 인물에 대해 본편 앞 보조 1회. 실패·지연이면 메모 없이 진행
   if (settings.director === 'scene') {

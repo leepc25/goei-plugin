@@ -19,6 +19,8 @@ import { messageText } from '../core/refs';
 import { findStatusTags } from '../core/world/status';
 import { parseIdentity } from '../core/people/identity';
 import type { Identity, PeopleStore } from '../core/people/types';
+import { factionList } from '../core/factions';
+import type { LoreEntry } from '../core/types';
 
 // ── 진단 ──
 
@@ -101,6 +103,15 @@ export const sheetOf = (ctx: ChatContext) => (name: string): string | null => bo
 function excludedNames(ctx: ChatContext): string[] {
   const me = playerAgent(ctx.char.globalLore, ctx.chat.scriptstate);
   return me?.name ? [me.name] : [];
+}
+
+/** 명부의 세력 코드 → 이름 (세력 평판 표시·해석용) */
+export function factionNamesOf(lore: LoreEntry[] | undefined): Record<string, string> {
+  try {
+    return Object.fromEntries(factionList(lore).map((f) => [f.code, f.name]));
+  } catch {
+    return {};
+  }
 }
 
 function userFaction(chat: Chat): string {
@@ -231,7 +242,7 @@ async function runOnce(reason: string, o: { manual?: boolean }): Promise<RunResu
         break;
       }
       const curStore = peopleStore(fresh.chat);
-      const input = buildUpdate(fresh.chat, curStore, batches[b], { settings, system: '', values: Object.fromEntries(input0Names(curStore).map((n) => [n, valuesOf(n)])), names: allNames(), exclude });
+      const input = buildUpdate(fresh.chat, curStore, batches[b], { settings, system: '', values: Object.fromEntries(input0Names(curStore).map((n) => [n, valuesOf(n)])), names: allNames(), exclude, factionNames: factionNamesOf(fresh.char.globalLore) });
       // 지침은 자료를 본 뒤 조립한다 (저장 상한을 넘긴 인물이 있으면 정리 절을 켠다)
       const sections = enabledSections(settings);
       if (input.tidy.length) sections.add('tidy');

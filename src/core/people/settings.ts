@@ -1,8 +1,8 @@
 // 인물 기록 설정 (채팅별, scriptstate 변수 `$pp_*`. 괴담톡 설정과 같은 방식). 기본값은 설계 문서의 추천값.
 export const PP = (key: string) => `$pp_${key}`;
 
-export type Feature = 'affinity' | 'register' | 'perception' | 'perception_ext' | 'suspicion' | 'docs_event' | 'docs_location' | 'docs_faction' | 'docs_item' | 'npc_emotion' | 'taste' | 'openness' | 'rhythm';
-export const FEATURES: Feature[] = ['affinity', 'register', 'perception', 'perception_ext', 'suspicion', 'docs_event', 'docs_location', 'docs_faction', 'docs_item', 'npc_emotion', 'taste', 'openness', 'rhythm'];
+export type Feature = 'affinity' | 'register' | 'perception' | 'perception_ext' | 'suspicion' | 'docs_event' | 'docs_location' | 'docs_faction' | 'docs_item' | 'npc_emotion' | 'taste' | 'openness' | 'rhythm' | 'faction_rep';
+export const FEATURES: Feature[] = ['affinity', 'register', 'perception', 'perception_ext', 'suspicion', 'docs_event', 'docs_location', 'docs_faction', 'docs_item', 'npc_emotion', 'taste', 'openness', 'rhythm', 'faction_rep'];
 
 export const PP_DEFAULTS: Record<string, string> = {
   on: '1',
@@ -24,6 +24,11 @@ export const PP_DEFAULTS: Record<string, string> = {
   docs_event: '1', docs_location: '1', docs_faction: '1', docs_item: '1', npc_emotion: '1',
   /** 리수폿 선택 기능: 취향 띠·음란도·서사 리듬. 기본 끔 */
   taste: '0', openness: '0', rhythm: '0',
+  /** 세력 평판 (docs/설계안_세력평판.md). 기본 켬. 본편 주입 켬. 구간 경계 [우호, 호의, 중립, 경계 하한]. 몹 목격 무게 half/full/off */
+  faction_rep: '1',
+  faction_inject: '1',
+  faction_bounds: '61,21,-20,-60',
+  mob_weight: 'half',
   /** auto / confirm */
   newpeople: 'auto',
   twoturn: '0',
@@ -64,6 +69,9 @@ export interface PeopleSettings {
   personCap: number;
   blockCap: number;
   tidy: 'same' | 'separate';
+  factionInject: boolean;
+  factionBounds: [number, number, number, number];
+  mobWeight: 'half' | 'full' | 'off';
   spanCap: number;
   rules: string;
   directorRules: string;
@@ -100,10 +108,20 @@ export function peopleSettings(state: Record<string, unknown> | undefined): Peop
     personCap: num('person_cap', 2000, 40000),
     blockCap: num('block_cap', 4000, 64000),
     tidy: v('tidy') === 'separate' ? 'separate' : 'same',
+    factionInject: v('faction_inject') !== '0',
+    factionBounds: parseBounds(v('faction_bounds')),
+    mobWeight: one('mob_weight', ['half', 'full', 'off'] as const),
     spanCap: num('span_cap', 3000, 40000),
     rules: v('rules').slice(0, 4000),
     directorRules: v('director_rules').slice(0, 2000),
     parallel: v('parallel') === '1',
     keepRaw: v('keep_raw') !== '0',
   };
+}
+
+/** 구간 경계 「61,21,-20,-60」: 네 정수, 내림차순, −100~100. 아니면 기본값 */
+export function parseBounds(text: string): [number, number, number, number] {
+  const n = String(text ?? '').split(',').map((x) => Number(x.trim()));
+  const ok = n.length === 4 && n.every((x) => Number.isInteger(x) && x >= -100 && x <= 100) && n[0] > n[1] && n[1] > n[2] && n[2] > n[3];
+  return ok ? (n as [number, number, number, number]) : [61, 21, -20, -60];
 }

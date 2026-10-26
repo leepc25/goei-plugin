@@ -2750,3 +2750,15 @@ button.mk-go:hover { color: var(--signal); }
 
 .pp-extra { margin: 4px 0 0; font-size: 14px; line-height: 1.5; }
 .pp-extra b { font-size: 16px; margin-right: 6px; }
+
+/* 세력 평판 */
+.gx-badge.fs-friendly { color: var(--signal); background: var(--accent-bg); }
+.gx-badge.fs-favorable { color: var(--signal); }
+.gx-badge.fs-wary { color: var(--amber); background: var(--amber-bg); }
+.gx-badge.fs-hostile { color: var(--bad, #c0392b); background: color-mix(in srgb, var(--bad, #c0392b) 14%, transparent); }
+.pp-mob { list-style: none; margin: 6px 0 0; padding: 0; display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--sub); }
+.pp-mob li { padding: 4px 8px; border-radius: 8px; }
+.pp-mob li.cur { background: var(--accent-bg); color: var(--text); }
+.pp-mob li b { margin-right: 6px; }
+.nw-ava.k-fac { background: var(--amber-bg); color: var(--amber); }
+.pp-bounds { max-width: 180px; }

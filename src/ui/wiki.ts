@@ -28,10 +28,10 @@ import { lastStatusFields } from '../core/world/tags';
 import { placeWhere } from '../core/world/geo';
 import { factionList } from '../core/factions';
 import { updateChat, type ChatContext } from '../host/risu';
-import { peopleDocsView, peopleHomeTile, peopleListView, personView, resetPeopleUi } from './people';
+import { factionView as peopleFactionView, peopleDocsView, peopleHomeTile, peopleListView, personView, resetPeopleUi } from './people';
 
 /** people·person·docs: 이 채팅의 인물 기록 (ui/people.ts). person 은 title 에 인물 이름 */
-type WikiView = 'home' | 'compose' | 'doc' | 'settings' | 'new' | 'people' | 'person' | 'docs';
+type WikiView = 'home' | 'compose' | 'doc' | 'settings' | 'new' | 'people' | 'person' | 'docs' | 'faction';
 /** 명부 항목 분류: 괴이·특수·거점·인물·조직 */
 type Cat = 'an' | 'ms' | 'lm' | 'ag' | 'org';
 /** 서랍 탭. 세력은 거점과 조직을 함께, 명부에 없는 새 주제는 기타 (사람 문서면 인물) */
@@ -655,6 +655,7 @@ function paneHtml(ctx: ChatContext): string {
   if (wiki.view === 'people') return peopleListView(ctx);
   if (wiki.view === 'person') return personView(ctx, wiki.title);
   if (wiki.view === 'docs') return peopleDocsView(ctx);
+  if (wiki.view === 'faction') return peopleFactionView(ctx, wiki.title);
   return homeView(ctx);
 }
 
@@ -977,6 +978,13 @@ export async function handleWiki(action: string, value: string | undefined, ctx:
     case 'wiki-docs':
       resetPeopleUi();
       go('docs');
+      wiki.listOpen = false;
+      break;
+    case 'wiki-faction':
+      // 세력 평판 상세 (ui/people.ts factionView). title = 조직 코드
+      if (!v) break;
+      resetPeopleUi();
+      go('faction', v);
       wiki.listOpen = false;
       break;
     default:

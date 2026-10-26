@@ -5,6 +5,8 @@ import { peopleBlock, personBlock, rhythmBlock, unknownTo } from './inject';
 import { nameMatcher, scenePeople, entriesOf, type NameEntry } from './select';
 import { liveChanges, liveEntries, liveness, type Liveness } from './store';
 import { latestNote } from './updater';
+import { factionNow, factionsBlock, sceneFactionCodes, userFactionOf } from './faction';
+import { messageText } from '../refs';
 import type { PeopleSettings } from './settings';
 import type { PeopleStore, Temper } from './types';
 
@@ -23,6 +25,8 @@ export interface RequestOpts {
   /** 지금 쓰려는 유저 입력 */
   input?: string;
   user?: string;
+  /** 세력 코드 → 이름 (명부) */
+  factionNames?: Record<string, string>;
 }
 
 /** 장면 인물의 기록 블록 (본편용). 대상이 없으면 빈 문자열 */
@@ -63,6 +67,15 @@ export function peopleBlockFor(chat: Chat, o: RequestOpts): { text: string; peop
     const note = o.settings.director === 'facts' ? latestNote(o.store, '@rhythm', live)?.now : null;
     const rb = rhythmBlock(docs, note);
     if (rb) blocks.unshift(rb);
+  }
+  // 세력 평판 (기본 켬): 장면 세력(인물 소속 ∪ 최근 글에 나온 세력) 가운데 중립이 아닌 것만 한 줄씩, 맨 뒤에
+  if (o.settings.features.has('faction_rep') && o.settings.factionInject) {
+    const list = Array.isArray(chat.message) ? chat.message : [];
+    const texts = [...(o.input ? [o.input] : []), ...list.slice(-2).map((m) => messageText(String(m.data ?? '')))];
+    const codes = sceneFactionCodes(o.store, people, texts, o.factionNames);
+    const uf = userFactionOf(o.store, chat);
+    const fb = factionsBlock(codes.map((c) => factionNow(o.store, c, changes, uf, o.settings, o.factionNames)), o.user);
+    if (fb) blocks.push(fb);
   }
   return { text: peopleBlock(blocks, o.settings.blockCap), people, sheets };
 }

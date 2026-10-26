@@ -7,7 +7,7 @@
 //   user_rules 절의 <<USER_RULES>> 줄은 사용자 추가 지침으로 바꾸고, 비어 있으면 절 전체를 잘라낸다.
 // 데이터 JSON에 이 지침이 기대하는 추가 필드: people[].express, people[].unknown_to, docs_now, suspicion_now, npc_relations, next_note.
 /** 설정에 따라 넣고 빼는 절 이름. 두 지침(자세히·간결)에서 같다. */
-export const UPDATER_SECTIONS = ["tidy", "taste", "openness", "rhythm", "affinity", "register", "perception", "perception_ext", "suspicion", "docs_event", "docs_location", "docs_faction", "docs_item", "user_rules"] as const;
+export const UPDATER_SECTIONS = ["tidy", "taste", "openness", "rhythm", "faction_rep", "affinity", "register", "perception", "perception_ext", "suspicion", "docs_event", "docs_location", "docs_faction", "docs_item", "user_rules"] as const;
 export type UpdaterSection = (typeof UPDATER_SECTIONS)[number];
 
 export const UPDATER_DETAILED: string = [
@@ -30,6 +30,7 @@ export const UPDATER_DETAILED: string = [
   "  - `span`: the roleplay text, one message per item with a tag `m`, a `role`, and either `confirmed: true` or `context_only: true`. Status lines, board tags, plugin blocks, image tags and thought blocks were already removed. A fold marked `[…]` means the middle of a long response was cut; do not guess what was there.",
   "  - `identity_known`: what the program already knows about the user character's organization and rank.",
   "  - `taste_now` (when the taste band is on) and `openness_now` (when openness is on) inside each person: current values or null (see their sections).",
+  "  - `factions_now` and `faction_stages` (when faction standing is on): organizations present in this span with their current stage (see 15a).",
   "  - `docs_now` (when document recording is on): existing event, location, faction and item records of this chat, each with `type`, `key`, `id`, `text`, `date`, `place`, `who`.",
   "  - `suspicion_now` (when suspicion is on): open and closed suspicion cases, each with `who`, `target`, `kind`, `status`, `score` (0–100, program-computed), `stage`, and `text`.",
   "  - `npc_relations` (true or absent): whether `relationship` and `speech` entries may target another named person instead of the user.",
@@ -378,6 +379,15 @@ export const UPDATER_DETAILED: string = [
   "- `pending` (upsert): an unconfirmed next development attached to an already planted hook, kept separate from facts and from a person's confirmed intent; never a future event with a confirmed date or place. When a prior pending development did not occur, never mark it complete.",
   "- `rhythm_note` (when `next_note` is true): one English memo ≤200 chars for the model that writes the next reply — the current phase, whether existing tension is moving or the scene is genuine aftermath, and at most one allowed hook action (what evidence it comes from, what could enter the scene, why now, which choices stay open). Do not repeat the previous staging method; never use delay merely to block the user's choices; never force a hook action every turn; never expose numbers or diagnostics verbatim.",
   "<<END:rhythm>>",
+  "<<SECTION:faction_rep>>",
+  "## 15a. Faction standing — how each organization regards the user",
+  "",
+  "Besides persons, the chat keeps a standing value per organization (관리국, 가짜 관리국, 백일몽, 민간, 프리랜서 협회, and any organization in the roster) toward the user's character: −100…100 in five stages (`faction_stages`). `factions_now` lists the organizations present in this span with their current stage. The program seeds each value from the organization table and recomputes it from cues; you never return a value.",
+  "- Return a `faction_cues` item ONLY when the organization acted or decided **as a body** toward the user in the confirmed span: an entry ban or its lifting, a retaliation or exclusion order, an official audit, reprimand or commendation, a deal or contract concluded with the organization, an announcement, a coordinated attack or protection by its members. The act must come from the organization's authority or its members acting under it.",
+  "- One member's mood, words or conduct is NEVER a faction cue: it belongs to that person's own record and affinity. 「쟈알디가 화냈다」 is not 「관리국이 적대」. A personal favor from a member is that member's cue, not the organization's.",
+  "- Use the same cue names as person affinity (`cues`) with the same meanings, judged at the organization's scale: 큰도움 for a formal commendation or a deal, 파탄 for an entry ban or a retaliation order, 중대위반 for an open declaration of hostility. The `reason` (Korean ≤40) must name the collective act. Cite `m` and a verbatim `quote` of the collective act. At most one item per organization per response.",
+  "- Faction documents (`docs` type faction) describe what happened between organizations in prose; `faction_cues` changes only the organization's standing toward the user. The same event may appear in both.",
+  "<<END:faction_rep>>",
   "<<SECTION:tidy>>",
   "## 11. Tidying an oversized record",
   "",
@@ -459,6 +469,9 @@ export const UPDATER_DETAILED: string = [
   "<<SECTION:rhythm>>",
   " \"rhythm_note\":\"<English ≤200 chars or null>\",",
   "<<END:rhythm>>",
+  "<<SECTION:faction_rep>>",
+  " \"faction_cues\":[{\"faction\":\"<organization code or Korean name>\",\"cue\":\"<cue name>\",\"m\":\"m2\",\"quote\":\"<verbatim>\",\"reason\":\"<Korean ≤40 chars>\"}],",
+  "<<END:faction_rep>>",
   " \"next_note\":[{\"who\":\"<name>\",\"now\":\"<English ≤120 chars>\",\"must_not_reveal\":[\"<≤80 chars>\"]}]",
   "}",
   "Limits: ≤8 entries per person, ≤6 persons, ≤2 cues per person, ≤2 new_people, ≤6 docs, ≤1 clue per suspicion case. Use only names from `people` (canonical `name`, not an alias) or names you gave in `new_people` this response. `docs` types other than those whose sections are present, and `suspicion` when its section is absent, are never returned. Write Korean literally (no \\uXXXX escapes). Empty arrays are fine. Before returning, check every item against the current slots, cue names, kinds, ids, names and quotes, and drop anything that fails: the program discards invalid items and the rest still applies.",

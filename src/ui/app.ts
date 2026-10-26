@@ -1049,7 +1049,7 @@ function markOf(raw: NavState): Mark {
   const s = markState(raw);
   const ctx = view.kind === 'started' ? view.ctx : null;
   let name = TAB_TITLE[s.tab];
-  if (s.w) name = s.w.view === 'doc' || s.w.view === 'compose' ? s.w.title || '위키' : s.w.view === 'settings' ? '위키 설정' : s.w.view === 'new' ? '위키 새 문서' : s.w.view === 'people' ? '이 채팅의 인물' : s.w.view === 'person' ? `${s.w.title} 기록` : s.w.view === 'docs' ? '기록 문서' : '위키 메인';
+  if (s.w) name = s.w.view === 'doc' || s.w.view === 'compose' ? s.w.title || '위키' : s.w.view === 'settings' ? '위키 설정' : s.w.view === 'new' ? '위키 새 문서' : s.w.view === 'people' ? '이 채팅의 인물' : s.w.view === 'person' ? `${s.w.title} 기록` : s.w.view === 'docs' ? '기록 문서' : s.w.view === 'faction' ? `세력 ${s.w.title}` : '위키 메인';
   if (s.p) {
     const r = s.p.view === 'room' && s.p.room && ctx ? readPhone(ctx.chat).rooms[s.p.room] : undefined;
     name = r ? roomLabel(r) : s.p.view === 'settings' ? '괴담톡 설정' : `괴담톡 ${PH_SUB[s.p.sub] ?? ''}`.trim();

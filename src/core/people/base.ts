@@ -53,6 +53,9 @@ export function userAffinityBase(personFaction: string, userFaction: string): nu
   return RELATIONS.orgs[`${personFaction}>${userFaction}`] ?? 0;
 }
 
+/** 세력 → 유저 소속 시작값 (같은 표). 세력 평판 시작값 */
+export const factionBase = (code: string, userFaction: string): number => userAffinityBase(code, userFaction);
+
 /** 인물 → 인물 시작값 (위키 근거 쌍). 없으면 0 */
 export const pairBase = (from: string, to: string): number => RELATIONS.pairs[`${from}>${to}`]?.aff ?? 0;
 

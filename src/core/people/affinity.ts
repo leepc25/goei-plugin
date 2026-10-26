@@ -1,6 +1,6 @@
 // 호감 계산: 시작값 + 살아 있는 계기의 합. 계기마다 저장된 변화량은 없고 매번 순서대로 다시 계산한다.
 // 규칙(리수폿 수치 체계): 계기 이름 → 기본값, 성격 계수·설정 배율, 기준 메시지 하나 안의 합은 ±10 (예외 계기 제외), 범위 -100~300, 고정은 그 값으로 덮음.
-import { AFF_MAX, AFF_MIN, CUE_VALUE, DEFAULT_TEMPER, EXCEPTION_CUES, OPENNESS_MAX, OPENNESS_MIN, OPENNESS_TURN, TASTE_MAX, TASTE_MIN, TURN_CAP, stageOf, type Change, type Person, type Temper } from './types';
+import { AFF_MAX, AFF_MIN, CUE_VALUE, DEFAULT_TEMPER, EXCEPTION_CUES, FACTION_MAX, FACTION_MIN, OPENNESS_MAX, OPENNESS_MIN, OPENNESS_TURN, TASTE_MAX, TASTE_MIN, TURN_CAP, factionStage, factionWho, stageOf, type Change, type Person, type Temper } from './types';
 
 const clamp = (v: number, a: number, b: number) => Math.max(a, Math.min(b, v));
 
@@ -13,20 +13,18 @@ export interface AffinityOpts {
 /** 계기 하나의 변화량 (배율 적용, 상한 전) */
 export function cueDelta(c: Change, o: AffinityOpts = {}): number {
   if (c.kind !== 'cue' || !c.cue) return 0;
-  const base = CUE_VALUE[c.cue] ?? 0;
+  const raw = CUE_VALUE[c.cue] ?? 0;
+  // 배율 (필드 몹 목격 0.5): 소수점 버림. 0 이면 계기 없음
+  const base = typeof c.scale === 'number' && c.scale !== 1 ? Math.trunc(raw * c.scale) : raw;
   const t = o.temper ?? DEFAULT_TEMPER;
   return base * (base >= 0 ? t.open : t.grudge) * (o.speed ?? 1);
 }
 
-/**
- * 인물 → 유저 호감 현재값. changes 는 살아 있는 것만, 기준 메시지 순서로 정렬된 것 (store.liveChanges).
- * manual pin 을 만나면 그 값으로 덮고 그 뒤 자동 계기는 무시한다 (고정 해제 = pin 변경을 void).
- */
-export function affinityOf(person: Person, changes: Change[], folded = 0, o: AffinityOpts = {}): number {
-  let value = clamp(person.affinity.base + folded, AFF_MIN, AFF_MAX);
+/** 계기 합 (호감·세력 공용): 시작값 + 살아 있는 계기, 기준 메시지당 ±10, 고정은 덮음 */
+export function sumCues(who: string, base: number, changes: Change[], folded: number, min: number, max: number, o: AffinityOpts = {}): number {
+  let value = clamp(base + folded, min, max);
   let pinned = false;
-  const mine = changes.filter((c) => c.who === person.name && (c.kind === 'cue'));
-  // 기준 메시지별로 묶어 상한을 건다
+  const mine = changes.filter((c) => c.who === who && c.kind === 'cue');
   const groups = new Map<string, Change[]>();
   for (const c of mine) (groups.get(c.anchor) ?? groups.set(c.anchor, []).get(c.anchor)!).push(c);
   for (const [, list] of groups) {
@@ -34,7 +32,7 @@ export function affinityOf(person: Person, changes: Change[], folded = 0, o: Aff
     let extra = 0;
     for (const c of list) {
       if (c.pin !== undefined) {
-        value = clamp(c.pin, AFF_MIN, AFF_MAX);
+        value = clamp(c.pin, min, max);
         pinned = true;
         normal = 0;
         extra = 0;
@@ -45,9 +43,17 @@ export function affinityOf(person: Person, changes: Change[], folded = 0, o: Aff
       if (c.cue && EXCEPTION_CUES.has(c.cue)) extra += d;
       else normal += d;
     }
-    if (!pinned) value = clamp(value + clamp(normal, -TURN_CAP, TURN_CAP) + extra, AFF_MIN, AFF_MAX);
+    if (!pinned) value = clamp(value + clamp(normal, -TURN_CAP, TURN_CAP) + extra, min, max);
   }
   return Math.round(value * 100) / 100;
+}
+
+/**
+ * 인물 → 유저 호감 현재값. changes 는 살아 있는 것만, 기준 메시지 순서로 정렬된 것 (store.liveChanges).
+ * manual pin 을 만나면 그 값으로 덮고 그 뒤 자동 계기는 무시한다 (고정 해제 = pin 변경을 void).
+ */
+export function affinityOf(person: Person, changes: Change[], folded = 0, o: AffinityOpts = {}): number {
+  return sumCues(person.name, person.affinity.base, changes, folded, AFF_MIN, AFF_MAX, o);
 }
 
 /** 화면·대사용 요약 */
@@ -86,4 +92,16 @@ export function opennessOf(person: Person, changes: Change[]): number | null {
     if (value !== null) value = clamp(value + clamp(net, OPENNESS_TURN[0], OPENNESS_TURN[1]), OPENNESS_MIN, OPENNESS_MAX);
   }
   return value === null ? null : Math.round(value * 100) / 100;
+}
+
+/** 세력 → 유저 평판 현재값: 시작값(조직×조직 표) + 살아 있는 계기. 세력 성격 계수는 1, 설정 속도는 적용 */
+export function factionOf(code: string, base: number, changes: Change[], folded = 0, speed = 1): number {
+  return sumCues(factionWho(code), base, changes, folded, FACTION_MIN, FACTION_MAX, { speed });
+}
+
+export function factionView(code: string, base: number, changes: Change[], folded = 0, speed = 1, bounds?: readonly number[]) {
+  const value = factionOf(code, base, changes, folded, speed);
+  const stage = factionStage(value, bounds);
+  const last = [...changes].reverse().find((c) => c.who === factionWho(code) && c.kind === 'cue' && c.pin === undefined);
+  return { value, stage, last };
 }

@@ -2,7 +2,8 @@
 import type { FieldEvent } from '../field';
 import { changeId, entryId, liveEntries, liveness, putChange, putEntry } from './store';
 import type { Chat } from '../types';
-import type { Cue, PeopleStore } from './types';
+import { factionWho, type Cue, type PeopleStore } from './types';
+import { ORG_NAMES } from './identity';
 
 /** 사건 종류 → 호감 계기 (대상 인물 기준). 없으면 계기 없음 */
 const CUE_OF: Partial<Record<FieldEvent['kind'], Cue>> = { gift: '작은친절', quest: '도움', provoke: '무시', hurt: '파탄', down: '파탄', kill: '중대위반' };
@@ -13,12 +14,21 @@ function targets(store: PeopleStore, ev: FieldEvent, player: string): string[] {
 }
 
 /** 사건 하나를 기록에 반영. 반영한 변경 수 */
-export function applyFieldEvent(store: PeopleStore, chat: Chat, ev: FieldEvent, player = '주인공'): number {
+export function applyFieldEvent(store: PeopleStore, chat: Chat, ev: FieldEvent, player = '주인공', o: { mobWeight?: 'half' | 'full' | 'off'; factionNames?: Record<string, string> } = {}): number {
   let n = 0;
-  const who = targets(store, ev, player);
-  if (!who.length) return 0;
-  const live = liveness(chat);
   const cue = CUE_OF[ev.kind];
+  // 세력 평판: 목격한 소속의 장부에 계기. 몹 목격은 절반(소수점 버림, 0 이면 없음), 설정으로 같음·안 씀
+  if (cue && ev.witness?.faction && (ev.witness.named || (o.mobWeight ?? 'half') !== 'off')) {
+    const code = ev.witness.faction;
+    const scale = ev.witness.named || o.mobWeight === 'full' ? 1 : 0.5;
+    const fw = factionWho(code);
+    if (!store.factions[code]) store.factions[code] = { code, name: o.factionNames?.[code] || ORG_NAMES[code] || code, seeded: { at: new Date(ev.at || Date.now()).toISOString() } };
+    const seq = store.log.filter((c) => c.anchor === ev.anchor).length;
+    if (putChange(store, { id: changeId(fw, 'cue', ev.anchor, 0, `${ev.kind}:${ev.id}`), anchor: ev.anchor, seq, src: 'field', who: fw, kind: 'cue', cue, ...(scale !== 1 ? { scale } : {}), reason: `필드(${ev.witness.named ? '명단 인물' : '몹'} 목격): ${ev.text}`.slice(0, 80) })) n++;
+  }
+  const who = targets(store, ev, player);
+  if (!who.length) return n;
+  const live = liveness(chat);
   for (const name of who) {
     const seq = store.log.filter((c) => c.anchor === ev.anchor).length + (store.people[name].slots.state?.length ?? 0);
     if (cue) {

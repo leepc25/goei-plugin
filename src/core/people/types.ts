@@ -57,7 +57,7 @@ export interface Change {
   anchor: string;
   seq: number;
   src: EntrySrc;
-  /** 감정을 가진 쪽 (인물 이름). identity 는 '@user' */
+  /** 감정을 가진 쪽 (인물 이름). identity 는 '@user', 세력 평판은 '세력:코드' (factionWho) */
   who: string;
   kind: ChangeKind;
   cue?: Cue;
@@ -66,6 +66,8 @@ export interface Change {
   void?: boolean;
   /** manual 고정: 이 값으로 덮고 이후 자동 계기는 무시 */
   pin?: number;
+  /** 계기 배율 (필드 몹 목격 0.5). 없으면 1 */
+  scale?: number;
   /** address */
   toUser?: string;
   register?: Register;
@@ -117,9 +119,18 @@ export interface Identity {
   anchor: string;
 }
 
+/** 세력 장부: 값은 없고(시작값 표 + 변경 기록에서 계산) 이름만 */
+export interface FactionRecord {
+  code: string;
+  name: string;
+  seeded: { at: string };
+}
+
 export interface PeopleStore {
   schema: 1;
   people: Record<string, Person>;
+  /** 열쇠 = 조직 코드 (A00·B00·…). 옛 저장에는 없음 = 시작값 */
+  factions: Record<string, FactionRecord>;
   /** 열쇠 = `${type}:${key}` */
   docs: Record<string, Doc>;
   log: Change[];
@@ -135,7 +146,7 @@ export interface PeopleStore {
   migrated?: string[];
 }
 
-export const emptyStore = (): PeopleStore => ({ schema: 1, people: {}, docs: {}, log: [], folded: {}, read: {}, pending: {}, ignored: [] });
+export const emptyStore = (): PeopleStore => ({ schema: 1, people: {}, factions: {}, docs: {}, log: [], folded: {}, read: {}, pending: {}, ignored: [] });
 
 /** 호감 8단계 (리수폿). 상한은 「이하」 */
 export interface Stage {
@@ -203,3 +214,25 @@ export const RHYTHM_PHASES = ['baseline', 'build_up', 'peak', 'aftermath', 'cool
 export const RHYTHM_ENGAGEMENT = ['active', 'idle', 'intentional_rest'] as const;
 export const RHYTHM_HOOK_STAGES = ['seeded', 'hinted', 'escalated', 'payoff_ready', 'resolved', 'retired'] as const;
 export const RHYTHM_HOOK_TIERS = ['short', 'mid', 'long'] as const;
+
+/** 세력 평판 (docs/설계안_세력평판.md): 세력 → 유저 값 −100~100. 변경 기록의 who 는 '세력:코드' */
+export const FACTION_PREFIX = '세력:';
+export const factionWho = (code: string) => `${FACTION_PREFIX}${code}`;
+export const factionOfWho = (who: string): string | null => (who.startsWith(FACTION_PREFIX) ? who.slice(FACTION_PREFIX.length) : null);
+export const FACTION_MIN = -100;
+export const FACTION_MAX = 100;
+/** 구간 경계 (설정): [우호 하한, 호의 하한, 중립 하한, 경계 하한]. 그 아래는 적대 */
+export const FACTION_BOUNDS_DEFAULT: [number, number, number, number] = [61, 21, -20, -60];
+export type FactionStageId = 'friendly' | 'favorable' | 'neutral' | 'wary' | 'hostile';
+export interface FactionStage { id: FactionStageId; label: string; behavior: string; mob: string }
+export const FACTION_STAGES: Record<FactionStageId, FactionStage> = {
+  friendly: { id: 'friendly', label: '우호', behavior: "Friendly. Members welcome {{user}}, share information freely and take {{user}}'s side in a fight.", mob: '반기고, 싸움에서 편들어 줌' },
+  favorable: { id: 'favorable', label: '호의', behavior: 'Favorable. Members greet {{user}}, make way and extend small favors.', mob: '인사하고 길을 비켜 줌' },
+  neutral: { id: 'neutral', label: '중립', behavior: 'Neutral. Ordinary procedure; members take no special notice.', mob: '무시' },
+  wary: { id: 'wary', label: '경계', behavior: 'Wary. Members watch and verify; on their own ground they warn {{user}} off or expel; elsewhere they only observe.', mob: '지켜봄. 자기 구역에서는 경고·쫓아냄' },
+  hostile: { id: 'hostile', label: '적대', behavior: 'Hostile. Members attack {{user}} on sight, even outside their own ground.', mob: '보자마자 공격' },
+};
+export function factionStage(value: number, bounds: readonly number[] = FACTION_BOUNDS_DEFAULT): FactionStage {
+  const [a, b, c, d] = bounds;
+  return FACTION_STAGES[value >= a ? 'friendly' : value >= b ? 'favorable' : value >= c ? 'neutral' : value >= d ? 'wary' : 'hostile'];
+}
