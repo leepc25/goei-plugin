@@ -114,3 +114,7 @@
 10-26 23:39:18 65 오류: HTTP 422 {"detail":[{"type":"value_error","loc":["body"],"msg":"Value error, The frame count must be a multiple of 4 from 4 to 40 for PixMiniMax","input":{"character_id":"28613282-55e4-48d7-9fe9-d0d09eeb3cef","mode":"pixminimax","action_description":"Seated facing the viewer, raise a paper cup with both hand
 10-26 23:39:20 64 정면 앉아 먹기 보냄 south 8장 시작=지정 끝=지정 약 1회
 10-26 23:39:20 62 정면 앉아 수다 보냄 south 8장 시작=지정 끝=지정 약 1회
+10-26 23:39:23 63 정면 앉아 타자 보냄 south 8장 시작=지정 끝=지정 약 1회
+10-26 23:39:27 69 후면 앉아 타자 보냄 north 8장 시작=지정 끝=지정 약 1회
+10-26 23:39:35 105 옆 앉아 타자 보냄 east 8장 시작=지정 끝=지정 약 1회
+10-26 23:39:43 73 정면 기대 쉬기 보냄 south 8장 시작=지정 끝=지정 약 1회
