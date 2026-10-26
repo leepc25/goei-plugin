@@ -569,6 +569,11 @@ async function handle(action: string, value?: string): Promise<void> {
   }
   // 시작 전(시작 패널 → 설정)에도 기능별 설정 페이지가 열려 있으면 그 기능의 단추를 받는다 (2026-10-26 사용자). chat 객체·scriptstate 는 있다
   const featCtx = view.kind === 'started' || (view.kind === 'picker' && pickerPrefs && settingsUi.page) ? view.ctx : null;
+  if (action === 'wiki-back' && view.kind === 'started' && !wiki.history.some((h) => h.view !== 'home') && navHist.can(-1)) {
+    // 위키 안에서 옮겨 다닌 길이 없으면 뒤로가기는 무조건 이전 화면 (다른 탭·사원증 창 포함, 사용자 2026-10-26)
+    const run = navStep(-1);
+    return run ? run() : render();
+  }
   if (featCtx && action.startsWith('wiki-') && (await handleWiki(action, value, featCtx, wikiEnv))) return;
   if (featCtx && action.startsWith('pp-') && (await handlePeople(action, value, featCtx, peopleEnv))) return;
   if (featCtx && action.startsWith('gn-') && (await handleGnet(action, value, featCtx, gnetEnv))) return;
@@ -770,8 +775,6 @@ async function handle(action: string, value?: string): Promise<void> {
       phone.view = phone.view === 'room' ? 'room' : 'list';
       resetField();
       await handleWiki('wiki-person', value, view.ctx, wikiEnv);
-      // 뒤로가기는 위키 메인이 아니라 「이 채팅의 인물」 목록으로 (거기서 다시 뒤로가면 위키 메인)
-      wiki.history = [{ view: 'home', title: '', query: '' }, { view: 'people', title: '', query: '' }];
       return;
     case 'repick':
       repick = true;
@@ -1013,6 +1016,8 @@ interface NavState {
   g?: { sub: string; open: number | null; dm: string | null; s: boolean; c: unknown };
   f?: 'goal' | 'team';
   d?: string;
+  /** 상황판 사원증 창 (열려 있으면 요원 이름) */
+  a?: string;
 }
 const navHist = new NavHistory<NavState>();
 
@@ -1024,6 +1029,7 @@ function navState(): NavState {
   if (tab === 'gnet') s.g = { sub: gnet.sub, open: gnet.open, dm: gnet.openDm, s: gnet.settings, c: gnet.compose?.kind === 'post' || gnet.compose?.kind === 'newdm' ? gnet.compose : null };
   if (tab === 'map' || tab === 'mission') s.f = field.step;
   if (tab === 'settings') s.d = dirUi.open;
+  if (tab === 'board' && agUi.pop) s.a = agUi.pop;
   return s;
 }
 
@@ -1082,6 +1088,7 @@ function applyNav(s: NavState): void {
   if (s.p) Object.assign(phone, { sub: s.p.sub, tab: s.p.tab, view: s.p.view, room: s.p.room, openNotice: s.p.n });
   if (s.g) Object.assign(gnet, { sub: s.g.sub, open: s.g.open, openDm: s.g.dm, settings: s.g.s, compose: s.g.c });
   if (s.d !== undefined) dirUi.open = s.d;
+  agUi.pop = s.a ?? '';
   // 편성 단계는 목표를 골라야 갈 수 있으니 버튼과 같은 길로 (못 가면 목표 단계에 머문다)
   if (s.f && s.f !== field.step) return void handle('field-step', s.f);
   render();
