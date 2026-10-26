@@ -18,7 +18,7 @@ import { mountGameShell, type HudState, type Shell } from '../ui';
 import { localStore, type SettingsStore } from '../ui/settings';
 import { navigationFeedback } from './navigationFeedback';
 import { syncNavigationButton } from '../ui/navigationButton';
-import type { GameEvent, HqModuleLike, RunConfigCore, RunResultCore, StageModule } from './contract';
+import type { Body, GameEvent, HqModuleLike, RunConfigCore, RunResultCore, StageModule } from './contract';
 import type { EngineModules, Game } from './game';
 import { DEF_BY_KIND, arenaStage, createEnemy, isThreat } from '../enemy';
 import { bindEnemyInteractions } from './enemyInteractions';
@@ -37,7 +37,7 @@ import type { WorldSim } from '../../world/actors';
 import { linkNpcTalk } from './npcLink';
 import demoPhotos from '../story/demo-photos.json';
 import { whereIs, LANE_TOP, LANE_BOT } from '../hq/map';
-import { hasVisitAgent, visitAgentFaceCanvas } from '../art/visitAgents';
+import { hasVisitAgent, hasVisitClip, visitAgentFaceCanvas } from '../art/visitAgents';
 import { drawTestMan, hasTestPeople, testPlayerFace, testPlayerTop } from '../art/testPeople';
 import { eileenHooks } from '../eileen/player';
 import { FieldFx, parseFxList } from '../fx/fieldFx';
@@ -102,13 +102,28 @@ function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui
   let observing = false;
   if (typeof window !== 'undefined') window.addEventListener('keydown', (e) => { if (e.key === 'F9' || e.key === '`') { observing = !observing; e.preventDefault(); } });
   const world = () => {
-    if (!sim && ready) sim = createHqWorld(hq.map(), seed, present.filter((p) => ROOM_SCENE[p.room]).map((p) => ({ name: p.name, scene: ROOM_SCENE[p.room] })));
+    if (!sim && ready) sim = createHqWorld(hq.map(), seed, present.filter((p) => ROOM_SCENE[p.room]).map((p) => ({ name: p.name, scene: ROOM_SCENE[p.room] })), hasVisitClip);
+    // 개발 도구·브라우저 시험: 세계를 들여다본다 (관찰 창과 같은 정보)
+    if (sim) (globalThis as { __goeiWorld?: WorldSim }).__goeiWorld = sim;
     return sim;
   };
   const clockView = () => { const c = new FieldClock(fieldClock.sec === null ? null : fieldClock.sec / 60); return c; };
+  // 필드 행위자를 에일린 공격 표적으로 (전투 몸이 아니므로 가짜 몸을 건넨다. 보이는 장면만)
+  let lifeScene = '';
+  eileenHooks.extraTargets = () => {
+    const w = sim;
+    if (!w || !lifeScene) return [];
+    return w.inScene(lifeScene).filter((a) => a.act !== 'down').map((a) => ({
+      x: a.x, y: a.y, z: 0,
+      body: { id: -1, team: 'enemy', kind: 'npc', x: a.x, y: a.y, z: 0, dir: a.face, hp: 1, hpMax: 1, alive: true, stop: 0, frame: () => ({ hit: [], hurt: [] }), step: () => {},
+        applyHit: (h: { dir: 1 | -1; attackId: number }) => (w.hitActor(a.def.id, h.dir, h.attackId) ? { kind: 'hit' as const } : { kind: 'immune' as const }) } as unknown as Body,
+    }));
+  };
   const life: HubLife = {
-    tick: (dt, at) => world()?.step(dt, { ...at, hour: fieldClock.sec === null ? null : (fieldClock.sec / 3600) % 24 }),
-    actors: (sceneId) => (world()?.inScene(sceneId) ?? []).map((a) => ({ id: a.def.id, name: a.def.name, kind: a.def.kind, x: a.x, y: a.y, face: a.face, look: a.def.look, moving: a.act === 'walk' })),
+    tick: (dt, at) => { lifeScene = at.scene; world()?.step(dt, { ...at, hour: fieldClock.sec === null ? null : (fieldClock.sec / 3600) % 24 }); },
+    lifeTime: () => sim?.time ?? 0,
+    hit: (sceneId, boxes, dir) => world()?.hitBoxes(sceneId, boxes, dir).length ?? 0,
+    actors: (sceneId) => (world()?.inScene(sceneId) ?? []).map((a) => ({ id: a.def.id, name: a.def.name, kind: a.def.kind, x: a.x, y: a.y, face: a.face, look: a.def.look, moving: a.act === 'walk', clip: a.clip, since: a.clipAt, icon: a.icon, say: a.say })),
     observer: (sceneId) => (observing && sim ? observerLines(sim, clockView(), sceneId, seed) : null),
     drawMob: (c, a) => { if (!drawTestMan(c, a.x, a.y, a.face)) silhouette(c, a); },
   };

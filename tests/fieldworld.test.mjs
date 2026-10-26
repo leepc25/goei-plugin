@@ -6,10 +6,10 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 const dir = await mkdtemp(join(tmpdir(), 'goei-fieldworld-'));
-const names = ['rng', 'clock', 'places', 'actors', 'observer'];
+const names = ['rng', 'clock', 'places', 'actors', 'observer', 'needs', 'mobs'];
 await build({ entryPoints: names.map((n) => `src/game/world/${n}.ts`), outdir: dir, outbase: 'src', bundle: true, platform: 'node', format: 'esm', outExtension: { '.js': '.mjs' }, logLevel: 'silent' });
 const imp = (n) => import(pathToFileURL(join(dir, `game/world/${n}.mjs`)));
-const R = await imp('rng'), C = await imp('clock'), P = await imp('places'), A = await imp('actors'), O = await imp('observer');
+const R = await imp('rng'), C = await imp('clock'), P = await imp('places'), A = await imp('actors'), O = await imp('observer'), N = await imp('needs'), M = await imp('mobs');
 
 // 본부 지도 축소판: 거리 ─ 로비 ─(계단)─ 3층 복도 ─ 사무실·휴게실, 엘리베이터
 const scenes = [
@@ -21,7 +21,8 @@ const scenes = [
   { id: 'lounge', name: '휴게실', length: 1280, lane: [470, 680], doors: [{ id: 'out', x: 200, kind: 'exit', side: 'S', to: 'f3', toDoor: 'lounge' }] },
 ];
 const elevator = [{ scene: 'f3', door: 'elev' }, { scene: 'lobby', door: 'elev' }];
-const graph = () => new P.PlaceGraph(scenes, elevator);
+const kinds = { office: 'office', lounge: 'lounge', f3: 'corridor', lobby: 'lobby', street: 'street', jongno: 'street', wc: 'restroom' };
+const graph = () => new P.PlaceGraph(scenes, elevator, kinds);
 
 test('씨앗: 같은 씨앗 = 같은 수열, 다른 씨앗 = 다름', () => {
   const a = R.mulberry32(42), b = R.mulberry32(42), c = R.mulberry32(43);
@@ -118,4 +119,142 @@ test('관찰 창: 시각·씨앗·이 장면 인물·다른 장면 이름 인물
   assert.match(lines[0], /10:00.*99/);
   assert.ok(lines.some((l) => l.includes('잼트리')));
   assert.ok(lines.some((l) => l.includes('에일린') && l.includes('휴게실')));
+});
+
+// ── 3단계: 욕구 AI ──
+const all = () => true;
+
+test('욕구: 클립이 없으면 그 활동은 후보가 아니다 (눈속임 금지)', () => {
+  const needs = { work: 10, hunger: 10, energy: 10, bladder: 10, bowel: 10, social: 10, fun: 10 };
+  const o = { name: '잼트리', needs, scene: 'office', roam: ['office', 'f3', 'lounge'], graph: graph(), duty: true, partnerIn: () => true, rand: () => 0.5 };
+  assert.equal(N.choose({ ...o, has: () => false }), null);
+  const only = N.choose({ ...o, has: (c) => c === 'eat' });
+  assert.equal(only.act.id, 'eat');
+  assert.equal(only.scene, 'lounge');
+});
+
+test('욕구: 근무 중엔 업무가 이기고, 근무 밖엔 업무가 0', () => {
+  const needs = { work: 20, hunger: 70, energy: 90, bladder: 95, bowel: 95, social: 80, fun: 80 };
+  const o = { name: '쟈알디', needs, scene: 'office', roam: ['office', 'f3', 'lounge'], graph: graph(), partnerIn: () => false, rand: () => 0.5, has: all };
+  assert.equal(N.choose({ ...o, duty: true }).act.id, 'work');
+  assert.notEqual(N.choose({ ...o, duty: false })?.act.id, 'work');
+  assert.equal(N.onDuty(10), true);
+  assert.equal(N.onDuty(20), false);
+  assert.equal(N.onDuty(null), true);
+});
+
+test('욕구 AI: 클립이 있으면 활동을 하고 욕구가 찬다, 없으면 서성이기만', () => {
+  const run = (has) => {
+    const sim = new A.WorldSim(graph(), R.mulberry32(9), { has });
+    const a = sim.add({ id: 'j', name: '잼트리', kind: 'named', brain: 'needs', home: 'office', roam: ['office', 'f3', 'lounge'], look: '잼트리' });
+    const acts = new Set();
+    for (let t = 0; t < 30 * 900; t++) { sim.step(1 / 30, { scene: 'street', x: 0, hour: 11 }); if (a.act === 'do') acts.add(a.task.id); }
+    return acts;
+  };
+  assert.equal(run(() => false).size, 0, '클립 없으면 활동 없음');
+  const acts = run((_look, clip) => ['work', 'eat', 'rest'].includes(clip));
+  assert.ok(acts.has('work'), `활동: ${[...acts]}`);
+});
+
+test('욕구 AI: 수다는 상대와 둘이 같이', () => {
+  const sim = new A.WorldSim(graph(), R.mulberry32(4), { has: (_l, c) => c === 'talk' });
+  const a = sim.add({ id: 'a', name: '큐라스', kind: 'named', brain: 'needs', home: 'office', roam: ['office'] });
+  const b = sim.add({ id: 'b', name: '잼트리', kind: 'named', brain: 'needs', home: 'office', roam: ['office'] });
+  a.needs.social = 5;
+  let together = false;
+  for (let t = 0; t < 30 * 300 && !together; t++) { sim.step(1 / 30, { scene: 'street', x: 0, hour: 20 }); together = a.act === 'do' && b.act === 'do' && a.task?.id === 'chat'; }
+  assert.ok(together, '둘 다 수다');
+  assert.equal(a.face, b.x > a.x ? 1 : -1);
+});
+
+test('이름 인물: 주인공이 다가오면 멈춰 바라보고 ! 아이콘', () => {
+  const sim = new A.WorldSim(graph(), R.mulberry32(2));
+  const a = sim.add({ id: 'a', name: '에일린', kind: 'named', brain: 'needs', home: 'office', roam: ['office'] }, { x: 800, y: 560 });
+  sim.step(1 / 30, { scene: 'office', x: 700, y: 560, hour: 10 });
+  assert.equal(a.act, 'notice');
+  assert.equal(a.face, -1);
+  assert.equal(a.icon, '!');
+  assert.ok(sim.events.some((e) => e.kind === 'notice'));
+});
+
+// ── 4단계: 몹 ──
+
+test('몹 성향: 나올 때마다 새로 뽑고, 원형은 범위만 정한다', () => {
+  const r = R.mulberry32(1);
+  const ts = Array.from({ length: 50 }, () => M.rollTemper(r, M.ARCHETYPES['경찰']));
+  assert.ok(ts.every((t) => t.courage >= 0.6 && t.courage <= 1));
+  assert.ok(new Set(ts.map((t) => t.courage.toFixed(3))).size > 40, '개체마다 다름');
+  const st = Array.from({ length: 50 }, () => M.rollTemper(r, M.ARCHETYPES['학생']));
+  assert.ok(st.some((t) => t.courage > 0.5) && st.some((t) => t.courage < 0.1), '학생도 대담한 개체가 섞인다');
+});
+
+test('근무형: 근무 시간에 출근해 자리 지키고, 끝나면 퇴근', () => {
+  const posts = [{ id: 'desk', archetype: '안내 직원', scene: 'lobby', how: 'fixed', spot: 1000, shifts: [[9, 18]], count: 1, gate: 300 }];
+  const sim = new A.WorldSim(graph(), R.mulberry32(3), { posts });
+  for (let t = 0; t < 30 * 20; t++) sim.step(1 / 30, { scene: 'street', x: 0, hour: 10 });
+  const w = sim.actors.find((a) => a.post?.id === 'desk');
+  assert.ok(w, '출근');
+  assert.equal(w.act, 'post');
+  assert.equal(Math.round(w.x), 1000);
+  for (let t = 0; t < 30 * 20; t++) sim.step(1 / 30, { scene: 'street', x: 0, hour: 19 });
+  assert.equal(sim.actors.filter((a) => a.def.brain === 'post').length, 0, '퇴근');
+  for (let t = 0; t < 30 * 5; t++) sim.step(1 / 30, { scene: 'street', x: 0, hour: 3 });
+  assert.equal(sim.actors.length, 0, '근무 밖엔 비어 있다');
+});
+
+test('근무형 순회: 여러 장면을 돈다', () => {
+  const posts = [{ id: 'c', archetype: '청소부', scene: 'lobby', how: 'roam', route: ['lobby', 'f3', 'office'], stay: 3, shifts: [[0, 24]], count: 1, gate: 300 }];
+  const sim = new A.WorldSim(graph(), R.mulberry32(3), { posts });
+  const seen = new Set();
+  for (let t = 0; t < 30 * 200; t++) { sim.step(1 / 30, { scene: 'street', x: 0, hour: 7 }); for (const a of sim.actors) seen.add(a.scene); }
+  assert.ok(seen.has('f3') && seen.has('office'), [...seen].join());
+});
+
+test('소란도: 쌓이면 단계가 오르고 시간이 지나면 식는다, 겁 많은 몹은 도망', () => {
+  const sim = new A.WorldSim(graph(), R.mulberry32(8), { spawns: [{ scene: 'jongno', target: { day: 10, night: 2 }, refill: [9, 9], mix: ['관광객'] }] });
+  sim.step(1 / 30, { scene: 'office', x: 0, hour: 12 });
+  sim.disturb('jongno', 60, 2000);
+  assert.equal(sim.uproarLevel('jongno'), 2);
+  for (let t = 0; t < 30 * 3; t++) sim.step(1 / 30, { scene: 'jongno', x: 2000, hour: 12 });
+  assert.ok(sim.actors.some((a) => a.doing === '도망') || sim.events.some((e) => e.kind === 'flee'), '도망친 몹이 있다');
+  for (let t = 0; t < 30 * 60; t++) sim.step(1 / 30, { scene: 'jongno', x: 2000, hour: 12 });
+  assert.equal(sim.uproarLevel('jongno'), 0);
+});
+
+test('사건: 손버릇 있는 몹이 소매치기를 하고 달아난다 (위에서 굴리지 않고 몹 판단)', () => {
+  const sim = new A.WorldSim(graph(), R.mulberry32(21), { spawns: [{ scene: 'jongno', target: { day: 12, night: 2 }, refill: [1, 2], mix: ['불량배', '행인'] }] });
+  let stole = false;
+  for (let t = 0; t < 30 * 400 && !stole; t++) { sim.step(1 / 30, { scene: 'office', x: 0, hour: 12 }); stole = sim.events.some((e) => e.kind === 'steal'); }
+  assert.ok(stole, '소매치기가 일어난다');
+  const ev = sim.events.find((e) => e.kind === 'steal');
+  const thief = sim.actors.find((a) => a.doing === '훔치고 달아남');
+  if (thief) assert.ok(thief.run > 1.5);
+  assert.ok(ev.thief === '불량배', `도둑 원형 ${ev.thief}`);
+});
+
+test('경찰: 플레이어 범죄에만 나서 플레이어 쪽으로 간다', () => {
+  const sim = new A.WorldSim(graph(), R.mulberry32(5));
+  sim.step(1 / 30, { scene: 'jongno', x: 2000, y: 560, hour: 12 });
+  assert.equal(sim.actors.filter((a) => a.def.name === '경찰').length, 0, '범죄 없으면 경찰 없음');
+  sim.crime('jongno', 2000);
+  const cop = sim.actors.find((a) => a.def.name === '경찰');
+  assert.ok(cop);
+  for (let t = 0; t < 30 * 20; t++) sim.step(1 / 30, { scene: 'jongno', x: 2000, y: 560, hour: 12 });
+  assert.ok(Math.abs(cop.x - 2000) < 200, `경찰 x ${cop.x}`);
+  const lobby = new A.WorldSim(graph(), R.mulberry32(5));
+  lobby.crime('lobby', 900);
+  assert.ok(lobby.actors.some((a) => a.def.name === '경비'), '거점 안은 경비');
+});
+
+test('주인공 공격이 몹에 닿으면: 쓰러지거나 휘청, 소란, 경찰 출동, 한 공격에 한 번', () => {
+  const sim = new A.WorldSim(graph(), R.mulberry32(6));
+  const m = sim.add({ id: 'm', name: '행인', kind: 'mob', brain: 'transit', home: 'jongno', archetype: '행인' }, { x: 1000, y: 560 });
+  sim.step(1 / 30, { scene: 'jongno', x: 940, y: 560, hour: 12 });
+  const box = { x0: 960, x1: 1040, y: 560, z0: 60, z1: 160, attackId: 7 };
+  assert.equal(sim.hitBoxes('jongno', [box], 1).length, 1);
+  assert.equal(m.act, 'down');
+  assert.equal(sim.hitBoxes('jongno', [box], 1).length, 0, '같은 공격은 한 번');
+  assert.ok(sim.uproarValue('jongno') > 0);
+  assert.ok(sim.actors.some((a) => a.def.name === '경찰'));
+  assert.ok(sim.events.some((e) => e.kind === 'hurt' && e.who === '행인'));
 });

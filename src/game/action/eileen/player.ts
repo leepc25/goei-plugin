@@ -33,7 +33,8 @@ const REACT: Record<string, { react: React; push: number; lift: number; strength
 };
 
 /** 다른 모듈이 붙이는 곳: 소리 */
-export const eileenHooks: { sfx: (e: Record<string, unknown>) => void } = { sfx: () => {} };
+/** sfx: 효과음. extraTargets: 전투 몸이 아닌 필드 행위자도 때릴 수 있게 (src/game/world, 엔진 modules가 채운다) */
+export const eileenHooks: { sfx: (e: Record<string, unknown>) => void; extraTargets?: () => { body: Body; x: number; y: number; z: number }[] } = { sfx: () => {} };
 
 type Core = ReturnType<typeof createEileenCore>;
 
@@ -95,7 +96,7 @@ export class EileenPlayer extends Player {
   private targets() {
     const w = this.world as (WorldView & { bodies: Body[] }) | null;
     if (!w) return [];
-    return w.bodies.filter((b) => b.alive && b.team === 'enemy' && b.hp > 0 && b.kind !== 'bullet').map((b) => ({ body: b, x: b.x, y: b.y, z: b.z }));
+    return w.bodies.filter((b) => b.alive && b.team === 'enemy' && b.hp > 0 && b.kind !== 'bullet').map((b) => ({ body: b, x: b.x, y: b.y, z: b.z })).concat(eileenHooks.extraTargets?.() ?? []);
   }
 
   private hurtTarget(t: Body, dmg: number, kind: string, face: 1 | -1, hitstop: number, o: { push?: number }) {
