@@ -139,3 +139,5 @@
 10-26 22:42:11 138 오류: HTTP 422 {"detail":[{"type":"value_error","loc":["body"],"msg":"Value error, The frame count must be a multiple of 4 from 4 to 40 for PixMiniMax","input":{"character_id":"005806b9-7799-40e9-baad-9c62d8b72891","mode":"pixminimax","action_description":"Standing facing the viewer, hold a stack of papers upright
 10-26 22:42:13 117 서서 서류 넘겨 보기 보냄 south 8장 시작=지정 끝=지정 약 1회
 10-26 22:42:17 143 스트레칭·기지개 보냄 south 8장 시작=지정 끝=지정 약 1회
+10-26 22:43:03 61 후면 앉기 완료 8장 (62초)
+10-26 22:43:10 101 하의 내리고 앉기 완료 8장 (61초)
