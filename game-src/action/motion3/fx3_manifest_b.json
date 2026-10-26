@@ -1,0 +1,562 @@
+[
+ {
+  "name": "x3-3.2-D-hand-mark",
+  "key": "3.2_호유원",
+  "row": "손등 표식",
+  "kind": "own",
+  "mode": "center",
+  "desc": "A tiny golden fox-tail sigil that appears floating in front of the character's outstretched right hand, at the height of the back of the hand (small, about the size of a hand, 48x48). Frame order: a few faint gold specks gather, they draw a single curled fox-tail shaped mark of glowing gold lines, the mark flares bright white-gold for two frames, then instantly cracks into sparks and vanishes, leaving nothing behind. It never lingers; it exists only to trigger the burst. Warm gold with a pale yellow core and thin dark amber outline. About 6 frames, fast. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+ },
+ {
+  "name": "x3-3.2-D-foxfire-burst",
+  "key": "3.2_호유원",
+  "row": "여우불 폭발",
+  "kind": "own",
+  "mode": "center",
+  "desc": "A small burst of golden foxfire that erupts from the clasped hands about 1.2 m in front of the character, at hand height (small, roughly 96x96, a bit larger than a hand). Frame order: a bright gold point flickers, it swells into a round ball of golden flame with wispy pointed flame tongues curling outward like tails, it pops with a ring of gold sparks pushed forward, then the flames thin into gold embers and smoke-like wisps that fade. Colors: gold, warm yellow, white-hot core, soft amber edges, no red. Fast hit effect, 6-8 frames. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+ },
+ {
+  "name": "x3-3.2-S0-foxfire-orb",
+  "key": "3.2_호유원",
+  "row": "여우불 구슬",
+  "kind": "own",
+  "mode": "center",
+  "desc": "A single small golden foxfire orb projectile (small, 48x48), fired from the character's fist and flying straight forward about 4 m; the same orb is reused in the super as the 'most precious thing' pulled out of an enemy's chest and flying back to the character. Shape: a round glowing gold sphere with a bright white-yellow core and a short flickering flame tail streaming behind it, a few gold sparks trailing. Animation: seamless flying loop with the flame tail rippling, oriented flying to the right. Colors gold, pale yellow, amber. About 6 frames loop. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+ },
+ {
+  "name": "x3-3.2-S1-nine-tails",
+  "key": "3.2_호유원",
+  "row": "아홉 꼬리",
+  "kind": "own",
+  "mode": "bottom",
+  "desc": "Nine long shadow tails that rise from the shadow on the ground behind the character and fan out a full 360 degrees around him like an opening folding fan, sweeping a circle of radius about 3.5 m (large, 512x256, wider than two to three character heights, filling the lower half of the screen). The tails are shapes of black-violet smoke and shadow with soft fur-like wispy edges and a faint gold rim light, no fox body, no head. Frame order: tails sprout from the ground shadow, unfurl one after another outward, whip around in one full sweep, hold spread for a moment, then dissolve back into the ground shadow. The forward five tails must read clearly on their own (they are cut out for the 5-tail version). 12-14 frames. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+ },
+ {
+  "name": "x3-3.2-F-foxfire-crown",
+  "key": "3.2_호유원",
+  "row": "머리 위 여우불",
+  "kind": "own",
+  "mode": "center",
+  "desc": "A golden foxfire flame burning in the air just above a target's head (small, 96x96). It marks the possessed enemy during the super. Shape: a tall teardrop-shaped golden flame with several pointed flame tongues curling outward like small tails, a white-yellow core, floating free with no wick and no object under it. Frame order: ignites from a spark, grows to full size, then a calm burning loop that sways and flickers, ending frames shrink into gold embers. Colors gold, pale yellow, amber edges. About 8 frames, the middle frames loopable. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+ },
+ {
+  "name": "x3-3.3-D-green-palm-print",
+  "key": "3.3_백석주",
+  "row": "초록 손바닥 자국",
+  "kind": "own",
+  "mode": "center",
+  "desc": "A tiny green palm-print mark in mid-air at shoulder height in front of the character, where he taps an enemy's shoulder twice (small, smaller than a hand). Shape: a simple pixel silhouette of an open palm print stamped flat, made of bright green light with a lighter mint core and a darker green outline. Frame order: first tap stamps a faint print with a small green pulse ring, second tap stamps it brighter, then it glows briefly and fades out by dissolving into green pixels. Only the mark, no actual hand or arm. Very short, 2 to 4 frames per tap, about 6 frames total. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+ },
+ {
+  "name": "x3-3.3-F-rewind-ring",
+  "key": "3.3_백석주",
+  "row": "되감기 고리",
+  "kind": "own",
+  "mode": "bottom",
+  "desc": "A huge green ring that settles flat on the floor in front of the character, diameter about 6 m, covering the front half of the screen floor (large, seen from the side as a wide flattened ellipse, several times a character's height in width). Frame order: a ring-shaped green halo descends from above and lands on the floor with a soft pulse, then bright green light streaks spiral inside it counterclockwise as if time is rewinding, streaks curving back toward the rear rim, the rear rim glows strongest where enemies line up, then the ring flashes once and fades. Colors: emerald and bright green, mint highlights, thin dark green outline, translucent. Rich and grand, 12-14 frames. This is a super move: make it large, bright and spectacular. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+ },
+ {
+  "name": "x3-3.4-S2-star-threads",
+  "key": "3.4_진나솔",
+  "row": "별 실",
+  "kind": "own",
+  "mode": "center",
+  "desc": "Five thin glowing white threads that cross in a five-pointed star pattern in the air at a point about 5 m in front of the character, spanning a circle about 3 m across (medium, about a person's height, 192x192). Frame order: the threads snap taut one by one into a star shape with tiny violet anchor points at the tips, they vibrate, then all five tighten and shrink toward the central crossing point with a bright white pinch flash, and break into fine white fiber sparks. Threads are 1-2 px, white with faint lavender glow. About 6-8 frames. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+ },
+ {
+  "name": "x3-3.4-F-thread-net",
+  "key": "3.4_진나솔",
+  "row": "실 그물",
+  "kind": "own",
+  "mode": "center",
+  "desc": "A screen-wide net of about twenty thin white threads stretched across the whole battlefield (large, 1280x360, full screen width). Frame order: threads shoot out and stretch across the screen in straight lines between anchor points on walls, floor and ceiling, crossing into an irregular net, they hold and quiver, then all at once the net tightens, the threads glow intensely white with a lavender halo, flashing bright, and finally they snap and scatter into sparkling white fibers that fade. Threads 1-2 px, white and pale violet, small violet nail-tip glints at the anchor points. 12-14 frames. This is a super move: make it large, bright and spectacular. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+ },
+ {
+  "name": "x3-3.5-S1-sneaker-prints",
+  "key": "3.5_이성해",
+  "row": "운동화 발자국",
+  "kind": "own",
+  "mode": "bottom",
+  "desc": "A short trail of sky-blue sneaker footprints left on the floor behind the character as he slides forward low (small, a strip about one to two meters long, lying flat on the ground). Shape: simple pixel sole prints with a tread pattern, glowing light sky blue with a white edge, placed in a sliding line. Frame order: prints appear one after another from back to front, glow faintly, then fade out from the oldest one, dissolving into a few light-blue pixels. Ground-level only, flat. About 6 frames. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+ },
+ {
+  "name": "x3-3.5-F-isolation-door",
+  "key": "3.5_이성해",
+  "row": "격리문",
+  "kind": "own",
+  "mode": "bottom",
+  "desc": "A heavy grey steel isolation door that bursts up out of the floor about one step in front of the character (large, 192x320, about two times a person's height, almost the full screen height). Frame order: the floor cracks and the riveted steel door frame rises with dust, the door swings open inward revealing pitch-black darkness, it slams shut with a heavy impact, bright white light flashes out through the door gaps three times, then the door blows apart from the inside, steel panels and debris flying outward, and the remains crumble into dust. Colors: cold grey steel, dark grey shadow, white light leaks. 12-14 frames. This is a super move: make it large, bright and spectacular. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+ },
+ {
+  "name": "x3-3.6-D-space-rift",
+  "key": "3.6_이자헌",
+  "row": "공간 틈",
+  "kind": "own",
+  "mode": "center",
+  "desc": "A vertical rift cut into the air about 1.5 m in front of the character, sliced by a butter knife from head height down to the waist (medium, 64x192, about a person's height). Frame order: a thin bright line is drawn top to bottom, it parts into a narrow lens-shaped opening of deep dark violet space with tiny faint purple specks inside, the edges are perfectly smooth and clean like cut butter, it stays open briefly, then closes smoothly from both ends back into a line and vanishes. Colors: very dark violet and black interior, soft pale violet rim. About 6 frames. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+ },
+ {
+  "name": "x3-3.6-S1-white-shock-pillar",
+  "key": "3.6_이자헌",
+  "row": "흰 충격 기둥",
+  "kind": "own",
+  "mode": "center",
+  "desc": "A white air-shock cone that blasts out from the character's fist and extends about 5 m straight forward at chest height (medium, 256x96). Frame order: a dense white ring of compressed air pops at the fist position, a widening cone of distorted white air shoots forward with layered pressure rings and speed lines, it reaches full length, then thins and disperses into fading white wisps. Colors: white, pale grey, faint light blue edges, semi-transparent. Fast and heavy, about 6 frames. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+ },
+ {
+  "name": "x3-3.6-F-white-lizard-silhouette",
+  "key": "3.6_이자헌",
+  "row": "흰 도마뱀 실루엣",
+  "kind": "own",
+  "mode": "center",
+  "desc": "A huge translucent white silhouette of a lizard-like head that flashes behind the character for only a fraction of a second (large, 256x360, full screen height). It is a ghostly outline made of white mist and light, an abstract shape only, with a single red vertical slit pupil as the only color accent; no body, no limbs, no other details. Frame order: it fades in faintly as white haze, becomes sharp and semi-transparent for one frame with the red slit glowing, then dissolves upward into white mist. Very pale white and grey, transparent, the red pupil glowing. Short, 4-6 frames. This is a super move: make it large, bright and spectacular. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+ },
+ {
+  "name": "x3-3.7-F-chain-wave",
+  "key": "3.7_은하제",
+  "row": "화면 사슬 물결",
+  "kind": "own",
+  "mode": "center",
+  "desc": "A sparkling silver chain line that spans the entire screen width and whips like a lash in a traveling wave (large, full screen width, wave height about one character tall). It is drawn as a line of bright glinting silver links and sparkle dots, not a solid bar. Frame order: the chain appears as a faint dotted line across the screen, it tightens and brightens, then a big wave travels along it from the near end to the far end, the line becoming thicker and brighter at the crest, each dip slamming downward toward the floor with a small glint, then it relaxes, breaks into silver sparkles and fades. Colors silver, white, pale blue glints. 12-14 frames. This is a super move: make it large, bright and spectacular. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+ },
+ {
+  "name": "x3-3.8-D-muffler-hood",
+  "key": "3.8_박민성",
+  "row": "머플러 두건",
+  "kind": "own",
+  "mode": "center",
+  "desc": "A brown knitted muffler wrapped into a hood shape, drawn as an overlay that sits over the character's head and shoulders (medium, sized for a person's head and upper body). Draw only the empty cloth: a thick chunky knitted scarf looped over a head shape and wrapped around the neck with a hanging end, with visible knit texture, no head or body inside it. Frame order: the cloth wraps on, then trembles and shivers in small jitter frames, then loosens. Colors: warm brown, darker brown shadows, light tan highlights. About 6 frames. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+ },
+ {
+  "name": "x3-3.10-S0-bandage-band",
+  "key": "3.10_고영은",
+  "row": "압박붕대 띠",
+  "kind": "own",
+  "mode": "center",
+  "desc": "A white compression bandage band stretched taut horizontally at chest height, pulled between two points in front of the character and snapping forward about 1.5 m (small, 128x24). Frame order: the bandage pulls tight into a straight band with faint crepe texture, it twangs forward in a slight bow with a white snap line and tiny dust motes, then springs back straight. White, light grey shading, faint cream. No hands drawn, only the band. About 4-6 frames. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+ },
+ {
+  "name": "x3-3.10-D-headlamp-cone",
+  "key": "3.10_고영은",
+  "row": "헤드램프 빛 원뿔",
+  "kind": "own",
+  "mode": "center",
+  "desc": "A cone of white headlamp light beaming forward from the character's forehead (medium, 384x160), spreading into a 40 degree fan about 5 m long. Frame order: a bright point clicks on at the apex, the cone of light flashes out to full length almost instantly with a bright core and soft translucent edges, holds for a moment, then dims and fades. The apex is on the left at head height and the cone widens to the right. Colors: pure white, pale warm white, very light grey edges, semi-transparent. About 4-6 frames. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+ },
+ {
+  "name": "x3-3.10-F-light-pillar",
+  "key": "3.10_고영은",
+  "row": "천장 빛기둥",
+  "kind": "own",
+  "mode": "center",
+  "desc": "A narrow pillar of intense white light shooting straight up from the character's forehead to the ceiling (large in height, 64x360, full screen height). Frame order: a bright point at the bottom, the beam shoots upward fast, it becomes a solid white column with a glowing halo and fine light sparks rising along it, it pulses at full power, then thins out. Colors: white, pale warm white, faint light-blue haze around the edges. 10-12 frames. This is a super move: make it large, bright and spectacular. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+ },
+ {
+  "name": "x3-3.10-F-light-cascade",
+  "key": "3.10_고영은",
+  "row": "흰 빛 막",
+  "kind": "own",
+  "mode": "center",
+  "desc": "A curtain of white light that hits the ceiling and pours down over the entire screen like a waterfall (large, 1280x360, full screen). Frame order: a bright splash spreads across the top of the screen from the center, then sheets of white light cascade down in vertical streams and droplets of light, covering the whole width, reaching the floor and splashing softly, then the light thins from the top and fades away. Translucent, layered, white and pale warm white with soft grey edges. 12-14 frames. This is a super move: make it large, bright and spectacular. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+ },
+ {
+  "name": "x3-3.13-D-ink-dots",
+  "key": "3.13_곽제강",
+  "row": "연보라 잉크 점",
+  "kind": "own",
+  "mode": "center",
+  "desc": "Three tiny pale lavender ink dots that spatter from the tip of a ballpoint pen jabbed forward at chest height (small, hand-sized). Frame order: at each jab a small round ink droplet pops out with a tiny splash, three dots in sequence slightly offset, each one wobbles, then they shrink and fade. Colors: pale lavender, light violet, white highlight, dark violet outline. Only the dots, no pen, no hand. Fast, about 6 frames. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+ },
+ {
+  "name": "x3-3.13-S-foam-burst",
+  "key": "3.13_곽제강",
+  "row": "연보라 거품 폭발",
+  "kind": "own",
+  "mode": "bottom",
+  "desc": "A small burst of pale lavender foam that pops up from the floor where a sample bottle shatters (small, a circle about 1 m across, roughly knee to waist high). Frame order: a puff of round bubbles blooms upward from a point on the floor, swells into a cluster of foam bubbles, pops with a soft ring, then bubbles burst one by one and settle as a few drifting lavender droplets. Draw it so it reads well when scaled to three sizes. Colors: pale lavender, light violet, white bubble highlights, soft pink-purple shadows. 6-8 frames. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+ },
+ {
+  "name": "x3-3.13-S2-dream-pillar",
+  "key": "3.13_곽제강",
+  "row": "꿈결 기둥",
+  "kind": "own",
+  "mode": "bottom",
+  "desc": "A tall column of pale lavender dream mist that shoots up from the floor about 4 m in front of the character (medium width, tall: about twice a person's height). Frame order: the floor spot glows lavender, a swirling pillar of mist and bubbles erupts upward fast, it reaches full height with sparkling motes inside, then it collapses downward and splashes outward along the floor in a ring of lavender spray. Colors: pale lavender, light violet, soft pink-violet, white sparkles, translucent. 10-12 frames. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+ },
+ {
+  "name": "x3-3.13-F-storm-cloud",
+  "key": "3.13_곽제강",
+  "row": "연보라 먹구름",
+  "kind": "own",
+  "mode": "center",
+  "desc": "A dark storm-cloud band spreading across the entire top of the screen (large, full screen width, about one quarter of the screen height). Frame order: lavender mist rises and spreads across the top, thickening into rolling, churning storm clouds with dark violet undersides and pale lavender highlights, small inner flickers of lavender lightning, a looping churning section, and final frames where the clouds thin and clear away. Colors: deep violet, dusky purple-grey, pale lavender highlights. 12-14 frames with the middle part loopable. This is a super move: make it large, bright and spectacular. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+ },
+ {
+  "name": "x3-3.13-F-vertical-lightning",
+  "key": "3.13_곽제강",
+  "row": "수직 벼락",
+  "kind": "own",
+  "mode": "bottom",
+  "desc": "A lavender lightning bolt striking straight down from the top of the screen to the floor, full screen height, narrow width (large in height). One bolt is placed on each enemy. Frame order: a faint jagged leader line, then a blinding lavender-white bolt with branching forks, a small impact flash and sparks at the floor, the bolt flickers twice, then fades leaving a thin afterglow line. Colors: white core, bright lavender, violet glow edges. Fast and sharp, 6-8 frames. This is a super move: make it large, bright and spectacular. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+ },
+ {
+  "name": "x3-3.13-F-hail",
+  "key": "3.13_곽제강",
+  "row": "우박",
+  "kind": "own",
+  "mode": "center",
+  "desc": "Pale lavender hailstone particles falling across the screen during the storm (small particles, each a few pixels, drawn as a loose shower sheet). Frame order: small angular icy pellets fall diagonally downward in a loop, some bouncing with tiny lavender sparks, motion streaks behind each pellet. Colors: pale lavender, white highlight, light violet shadow. Seamless loop, about 6-8 frames. This is a super move: make it large, bright and spectacular. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+ },
+ {
+  "name": "x3-3.13-F-giant-lightning",
+  "key": "3.13_곽제강",
+  "row": "거대 벼락",
+  "kind": "own",
+  "mode": "bottom",
+  "desc": "One gigantic lavender lightning bolt striking the center of the screen floor, three times as wide as a character and spanning the full screen height (large, filling the middle of the screen). Frame order: the clouds above flash, a massive thick bolt with heavy branching slams down, an explosive landing impact ring spreads along the floor with violet sparks and flying debris, the bolt flickers and pulses, then fades into a lingering glow and drifting sparks. Colors: blinding white core, bright lavender, deep violet glow. Grand and powerful, 12-16 frames. This is a super move: make it large, bright and spectacular. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+ },
+ {
+  "name": "x3-3.14-S2-reagent-rain",
+  "key": "3.14_이연화",
+  "row": "시약 비",
+  "kind": "own",
+  "mode": "center",
+  "desc": "A rain of indigo-violet reagent pouring down in a wide circle after a thrown bottle bursts in mid-air about 3 m in front of the character (medium, about a person's height tall and twice as wide). Frame order: a small burst splash at the top, droplets spray outward then fall as a curtain of heavy indigo-violet drops over a circular area, splashing on the floor line, and indigo-violet smoke begins to rise from the splash zone, then the rain thins and the smoke lingers and fades. Colors: indigo, blue-violet, light violet highlights, grey-violet smoke. 10-12 frames. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+ },
+ {
+  "name": "x3-3.14-F-reagent-explosion",
+  "key": "3.14_이연화",
+  "row": "시약 폭발",
+  "kind": "own",
+  "mode": "bottom",
+  "desc": "A violent eruption of mixed indigo-violet reagent from the spot where an enemy was slammed onto the floor, bursting forward in a wide 90 degree fan about 6 m long (large, 512x256, filling the front half of the screen). Frame order: the floor spot boils and bubbles, it surges up like violet flame, then explodes forward in a wide fan of boiling liquid, bubbles, droplets and flame-like flares, reaching full spread, then settles into thick drifting indigo-violet vapor. Colors: deep indigo, blue-violet, bright magenta-violet highlights, pale lilac foam. 12-14 frames. This is a super move: make it large, bright and spectacular. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+ },
+ {
+  "name": "x3-3.15-D-red-slash-stroke",
+  "key": "3.15_이병진",
+  "row": "빨간 사선 획",
+  "kind": "own",
+  "mode": "center",
+  "desc": "A thick red marker-pen stroke slashed in the air in front of the character from eye height down to knee height (medium, about a person's height, five times the length of a pen). Frame order: the stroke is drawn fast top to bottom on a slight diagonal, tapering at the start and heavy at the end, a round red ink droplet forms at the tail and drips, the stroke stays for a moment, then it bleeds and blurs like wet ink and fades away. It is a single abstract stroke, not a character or symbol. Colors: bright red, darker crimson edges, small pink highlight. About 6-8 frames. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+ },
+ {
+  "name": "x3-3.15-F-red-brush-fragments",
+  "key": "3.15_이병진",
+  "row": "붉은 한자 획 조각",
+  "kind": "own",
+  "mode": "center",
+  "desc": "Abstract red brush-stroke fragments floating in two horizontal rows across the full width of the top of the screen (large, full screen width), resembling torn pieces of an old ritual script but forming no readable characters or symbols. Frame order: fragments fade in one by one glowing red, the rows hover and tremble, then each row's fragments drop like blades straight down toward the floor with sharp vertical streaks, striking with small red flashes, first row then second row. Colors: blood red, dark crimson, faint warm glow. Strokes are meaningless dashes, hooks and dots. 12-14 frames. This is a super move: make it large, bright and spectacular. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+ },
+ {
+  "name": "x3-3.15-F-red-square-seal",
+  "key": "3.15_이병진",
+  "row": "붉은 네모 낙관",
+  "kind": "own",
+  "mode": "bottom",
+  "desc": "A huge red square seal impression stamped onto the floor at the center of the screen (large, about half the screen height). The remaining red brush fragments gather into a square seal shape with a thick red border and abstract carved-looking blank interior pattern, no readable text. Frame order: fragments spiral together in the air above center, they lock into the square seal, it descends and slams onto the floor, a red shock band spreads along the entire floor width, red sparks and ink splatter, then the seal glows and fades into red ink haze. Colors: vermilion red, dark crimson, pale red glow. 12-16 frames. This is a super move: make it large, bright and spectacular. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+ },
+ {
+  "name": "x3-3.16-D-shadow-claw-trail",
+  "key": "3.16_제이",
+  "row": "그림자 발톱 궤적",
+  "kind": "own",
+  "mode": "center",
+  "desc": "Three black shadow claw trails that drop from above like a guillotine onto the area 1-3 m in front of the character (medium, 128x192, about a person's height). No paw or claw shape is drawn, only the three parallel curved trails left by the claws. Frame order: three black streaks slash down from top to bottom very fast, they hit the bottom with a dark burst, their fur-like wispy edges scatter like smoke, then the trails get sucked back upward as smoke and vanish. Colors: deep black, charcoal grey edges, a faint dark yellow glint at the tips. 6-8 frames. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+ },
+ {
+  "name": "x3-3.16-D-claw-marks",
+  "key": "3.16_제이",
+  "row": "발톱 자국",
+  "kind": "own",
+  "mode": "bottom",
+  "desc": "Three parallel claw gouges left on the floor where the shadow claw trails slammed down (small, about one step wide, lying flat on the ground). Frame order: three dark scratch grooves appear with a small spray of black dust, the edges show broken floor pixels, they linger briefly, then fade like evaporating shadow. Colors: black, dark grey, charcoal smoke. Flat ground decal. About 6 frames. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+ },
+ {
+  "name": "x3-3.16-S0-shadow-band",
+  "key": "3.16_제이",
+  "row": "그림자 띠",
+  "kind": "own",
+  "mode": "bottom",
+  "desc": "A black shadow that stretches from under the character's feet and races forward along the floor (medium, a flat band at ground level, drawn to be cut into a short 2 m version and a long 5 m version). Frame order: a dark pool at the start, then a flat black band surges forward along the ground with flickering fur-like smoky edges, reaches its end with a slightly wider tip, holds, then retracts back toward the start and vanishes. Colors: deep black, charcoal grey wisps. About 8 frames. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+ },
+ {
+  "name": "x3-3.16-S1-shadow-maw",
+  "key": "3.16_제이",
+  "row": "그림자 입",
+  "kind": "own",
+  "mode": "bottom",
+  "desc": "The floor shadow opening like a mouth: a flat black ellipse spreads on the ground (seen from the side, a wide flattened ellipse about 3 m radius, medium, also used smaller), its edge rises like the lips of a mouth opening upward, then it snaps shut and leaves a black stain. No teeth, no face, no creature, only shapeless darkness. Frame order: dark ellipse spreads out from the center, its rim lifts and gapes open into a dark hollow, slams shut with a black splash, a black blot remains on the ground and fades. Colors: black, charcoal, smoky grey edges. 10-12 frames. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+ },
+ {
+  "name": "x3-3.16-F-shadow-sea",
+  "key": "3.16_제이",
+  "row": "그림자 바다",
+  "kind": "own",
+  "mode": "bottom",
+  "desc": "A sea of black shadow that floods out from under the character's feet across the entire screen floor (large, 1280x200, full screen width). Frame order: the shadow spreads out in one rush from a point to cover the whole floor, then a looping section where its surface undulates in waves and its fur-like edges ripple like smoke, then at the end it folds up like paper, sheet over sheet, and rolls back into a single point. Colors: deep black, charcoal grey, faint dim yellow sheen on the wave crests. 14-16 frames, the undulating middle loopable. This is a super move: make it large, bright and spectacular. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+ },
+ {
+  "name": "x3-3.16-F-fang-shadow-curtain",
+  "key": "3.16_제이",
+  "row": "이빨 그림자 막",
+  "kind": "own",
+  "mode": "center",
+  "desc": "Two curtains of black shadow that rise from the top and bottom edges of the screen, each edged with a row of jagged white tooth-like spikes, and slam together in the middle of the screen as if the whole screen is being bitten (large, 1280x360, full screen). Only shapeless darkness with a white jagged edge, no mouth, no face, no creature. Frame order: dark bands creep in from top and bottom, jagged white edges rise, they rush toward the center and clash shut with a shock flash, hold, then dissolve into black smoke. Colors: black, charcoal, bone white edges. 12-14 frames. This is a super move: make it large, bright and spectacular. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+ },
+ {
+  "name": "x3-3.16-F-black-fur-band",
+  "key": "3.16_제이",
+  "row": "검은 털 띠",
+  "kind": "own",
+  "mode": "bottom",
+  "desc": "A trail of black fur-like pixel strands left on the floor where the shadow sea rushed across (large, a long band spanning the screen width at ground level). Frame order: rough black fur tufts and strands appear along the floor as a streak from one side to the other, they flutter slightly, then thin and drift away like smoke. Colors: black, dark grey, charcoal highlights. Flat ground band, about 8 frames. This is a super move: make it large, bright and spectacular. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+ },
+ {
+  "name": "x3-4.1-F-crimson-light-line",
+  "key": "4.1_차여진",
+  "row": "검붉은 빛 줄",
+  "kind": "own",
+  "mode": "center",
+  "desc": "A thin dark-crimson beam of light that shoots out horizontally from a small phone screen glow at hand height in front of the character and extends to the far edge of the screen (large, full screen width, thin). Frame order: a small rectangular glow point, the beam draws outward at speed, it reaches the screen edge and settles into a steady humming crimson line with a brighter core, small flickers along it, then fades. Colors: dark crimson, blood red, bright red-pink core. 8-10 frames. This is a super move: make it large, bright and spectacular. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+ },
+ {
+  "name": "x3-4.1-F-offscreen-slash-flash",
+  "key": "4.1_차여진",
+  "row": "화면 밖 베기 섬광",
+  "kind": "own",
+  "mode": "center",
+  "desc": "A dark-crimson slash flash that flies in diagonally from outside the screen (top-left corner) and exits past the opposite corner (bottom-right), as long as the screen diagonal (large). It is a shapeless streak of light: the leading tip is brightest and sharp, the tail is soft and blurry. Frame order: a bright point enters from the corner, the streak rips across diagonally in a few frames leaving a crimson afterimage, a thin red cut line remains for a moment, then fades. Colors: bright red-white tip, dark crimson body, deep wine-red fading tail. Fast, 6-8 frames. This is a super move: make it large, bright and spectacular. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+ },
+ {
+  "name": "x3-4.1-F-x-slash-mark",
+  "key": "4.1_차여진",
+  "row": "화면 X자 베기 자국",
+  "kind": "own",
+  "mode": "center",
+  "desc": "A huge X-shaped slash scar carved across the whole screen, each stroke as long as the screen diagonal (large, full screen). Frame order: two dark-crimson slashes cross from opposite corners, clashing at the center with a bright flash, the X scar glows and burns in, holds while trembling, then at the end it explodes outward from the intersection with a burst of crimson light shards and fades. Colors: dark crimson, blood red, bright white-pink core along the cuts. 12-14 frames. This is a super move: make it large, bright and spectacular. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+ },
+ {
+  "name": "x3-4.2-D-square-reflect-plane",
+  "key": "4.2_서윤지",
+  "row": "네모 반사 면",
+  "kind": "own",
+  "mode": "center",
+  "desc": "A flat square reflecting plane that briefly stands in the air just in front of the character's held-out folder, at chest height (small, a bit bigger than the folder, also scaled up as a square air shock). Frame order: a crisp square outline snaps into place with perfectly right-angled corners, its surface flashes with a diagonal shine, it pulses once outward (as if bouncing something back), then fades. Colors: muted sage green, pale sage highlight, darker green-grey outline, semi-transparent. Strictly geometric. About 6 frames. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+ },
+ {
+  "name": "x3-4.2-S1-bracket-trail",
+  "key": "4.2_서윤지",
+  "row": "ㄷ자 궤적",
+  "kind": "own",
+  "mode": "center",
+  "desc": "A right-angled hand-strike trail drawn in front of the character in three connected hits: a straight horizontal thrust forward, then a vertical line straight down, then a vertical line straight up, forming an angular bracket shape with sharp 90 degree corners (medium, about a person's height). Frame order: each segment is drawn in turn as a crisp sage-green light line with a small flash at each corner and impact point, the last upward line is brightest, then the whole shape fades. Colors: sage green, pale mint white core, grey-green edges. 8-10 frames. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+ },
+ {
+  "name": "x3-4.2-F-square-shock-ring",
+  "key": "4.2_서윤지",
+  "row": "네모 충격 고리",
+  "kind": "own",
+  "mode": "bottom",
+  "desc": "A flat square shock ring with right-angled corners spreading along the floor from a point where a fist slams down (large, starting small and growing to the full screen floor width, seen from the side as a flat wide rectangle). Frame order: a small square ring pops at the impact point, it expands outward rapidly as a thin flat sage-green ring with crisp square corners, small air distortion and dust along its edge, it reaches the screen width, then thins and fades. Colors: sage green, pale sage-white highlight, grey-green edges. Strictly geometric. 12-14 frames. This is a super move: make it large, bright and spectacular. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+ },
+ {
+  "name": "x3-4.3-D-suture-zigzag",
+  "key": "4.3_고연지",
+  "row": "봉합실 지그재그",
+  "kind": "own",
+  "mode": "center",
+  "desc": "A thin white suture thread line that zigzags upward in front of the character, from waist height to above head height, as a needle passes three times (small, hand-sized width, about upper-body height). Frame order: the thread is stitched in segments going up, zig, zag, zig, with tiny glints at each stitch point, then at the end it is pulled taut into a tight line with a small snap flash, then fades. Colors: white thread, faint silver glint, very light grey shadow. Only the thread, no needle, no hand. About 6-8 frames. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+ },
+ {
+  "name": "x3-4.3-S2-syringe-droplet",
+  "key": "4.3_고연지",
+  "row": "주사기 물방울",
+  "kind": "own",
+  "mode": "center",
+  "desc": "A tiny clear droplet at the tip of a syringe, flicked out as the syringe is tapped (small, just a few pixels to finger size). Frame order: a small bead of liquid forms, wobbles, a tiny spray of two or three fine droplets flicks off with a small glint, then it vanishes. Colors: clear pale cyan, white highlight, light blue-grey outline. Only the droplets, no syringe, no hand. About 4-6 frames. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+ },
+ {
+  "name": "x3-4.3-F-surgical-light",
+  "key": "4.3_고연지",
+  "row": "수술등 빛",
+  "kind": "own",
+  "mode": "center",
+  "desc": "A round white surgical lamp light shining down from above, covering about three quarters of the screen width (large). This is background lighting, a calm steady glow, not a flash. Frame order: a round ring of light switches on at the top, a wide soft cone of white light falls down onto the floor area with a bright circular spot at the bottom, it hums steadily in a gentle loop, then dims out. Colors: cool white, very pale blue-white, soft translucent edges. 8-10 frames, middle loopable. This is a super move: make it large, bright and spectacular. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+ },
+ {
+  "name": "x3-4.6-F-baton-arc",
+  "key": "4.6_문혜란",
+  "row": "진압봉 내리찍기 호",
+  "kind": "own",
+  "mode": "center",
+  "desc": "A thick silver arc trail of a riot baton swung from behind the head down and forward to the floor about 3 m ahead (medium, about a person's height). Only the shapeless trail of motion, no baton, no arms. Frame order: the arc sweeps from above-behind over the top and down to the front low point, very fast, thick and bright at the leading edge with a metallic white sheen, a hard flash at the bottom impact, then the arc fades from its tail. Colors: silver, white, steel grey, faint blue metal glint. 6-8 frames. This is a super move: make it large, bright and spectacular. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+ },
+ {
+  "name": "x3-4.7-F-concrete-walls",
+  "key": "4.7_신유리",
+  "row": "콘크리트 벽",
+  "kind": "own",
+  "mode": "bottom",
+  "desc": "Two bare concrete walls the full height of the screen that slide in from both sides of the screen toward the middle, squeezing the space into a narrow cell (large, full screen height). Walls show rough grey concrete texture, formwork lines and exposed pipes running along them. Frame order: walls rise and slide in from the left and right edges with dust, they grind closer, stop with a heavy jolt, hold, then at the end they crack apart and crumble into falling chunks and dust. Colors: cold concrete grey, dark grey shadows, rusty brown pipes. 12-14 frames. This is a super move: make it large, bright and spectacular. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+ },
+ {
+  "name": "x3-4.7-F-steel-door",
+  "key": "4.7_신유리",
+  "row": "B-7 철문",
+  "kind": "own",
+  "mode": "bottom",
+  "desc": "A heavy steel vault door that slams shut in front, then three deadbolts lock one after another (large, about twice a person's height). Plain metal door with rivets, no text or numbers on it. Frame order: the door swings shut with a heavy impact, the first deadbolt slides into place with a spark and the door shudders forward, then the second, then the third, each with a jolt, then at the end the door crumbles into dust and scrap. Colors: dark steel grey, gunmetal, cold highlights, orange sparks. 12-14 frames. This is a super move: make it large, bright and spectacular. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+ },
+ {
+  "name": "x3-4.8-D-holy-sword",
+  "key": "4.8_블라렛",
+  "row": "성검",
+  "kind": "own",
+  "mode": "center",
+  "desc": "A cross-shaped longsword made of pure white light being drawn out of a small silver cross at chest height (medium, 96x256, about a person's height, vertical). Frame order: a bright gleam at the cross point, beams of light extend upward into a long straight blade with a cross guard, the sword shape solidifies with radiating light rays, it glows steadily, then breaks into scattering light particles. Colors: white, pale gold, soft warm yellow glow. 6-8 frames. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+ },
+ {
+  "name": "x3-4.8-D-holy-sword-slash",
+  "key": "4.8_블라렛",
+  "row": "성검 베기",
+  "kind": "own",
+  "mode": "center",
+  "desc": "A large downward cutting arc of white-gold light in front of the character, from shoulder height behind down to knee height in front, covering about 0.5 to 2.5 m ahead (medium, 256x128). Frame order: the arc sweeps from top to bottom fast, thick and blazing at the leading edge, a burst of light at the bottom where it hits the ground, the arc lingers as a glowing crescent, then scatters into light dust. Colors: white, gold, pale yellow, soft amber outer glow. 6-8 frames. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+ },
+ {
+  "name": "x3-4.8-S2-holy-fire",
+  "key": "4.8_블라렛",
+  "row": "성화",
+  "kind": "own",
+  "mode": "center",
+  "desc": "Holy white-gold fire spraying from an open palm in a 60 degree fan about 4 m forward (medium, 320x160). Frame order: a bright point at the palm, flames gush forward and widen into a fan, rolling and flickering, reaching full spread, the tips becoming transparent, then the flames fade back. Colors: white core, gold, pale yellow, light amber, the outer tips fading to transparent. About 8 frames. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+ },
+ {
+  "name": "x3-4.8-F-cathedral",
+  "key": "4.8_블라렛",
+  "row": "대성당",
+  "kind": "own",
+  "mode": "bottom",
+  "desc": "A translucent gothic cathedral that bursts up through the ground behind the battlefield, its spires reaching beyond the top of the screen (large, 768x512, filling the background). Frame order: the ground cracks with light, pointed spires and arches rise up, flying buttresses and a rose window form, stained-glass windows glow red and blue, the whole building shimmers translucent, then at the end it dissolves into white light dust. Colors: translucent pale white-gold structure, red and blue stained glass glow, soft gold light. 14-16 frames. This is a super move: make it large, bright and spectacular. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+ },
+ {
+  "name": "x3-4.8-F-stained-glass-pillar",
+  "key": "4.8_블라렛",
+  "row": "스테인드글라스 빛기둥",
+  "kind": "own",
+  "mode": "bottom",
+  "desc": "A pillar of colored stained-glass light slamming down from above onto an enemy's position on the floor (large, 128x512, full screen height). Frame order: a thin beam lances down, it widens into a column of red and blue light panels with leaded-glass pattern texture, a bright impact burst at the floor with light shards, the pillar holds, then it fades into colored light dust. Colors: ruby red, cobalt blue, white core, soft gold edges. 8-10 frames. This is a super move: make it large, bright and spectacular. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+ },
+ {
+  "name": "x3-4.8-F-cross-slash",
+  "key": "4.8_블라렛",
+  "row": "화면 십자 베기",
+  "kind": "own",
+  "mode": "center",
+  "desc": "A huge white-gold cross-shaped (+) slash mark carved across the entire screen (large, full screen). Frame order: first a vertical slash cuts top to bottom, then a horizontal slash cuts across, the two lines blaze where they cross, the + mark glows and burns, then it explodes outward from the center in a burst of white-gold light and rays and fades. Shapeless light only. Colors: white, gold, pale yellow, warm amber halo. 12-14 frames. This is a super move: make it large, bright and spectacular. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+ },
+ {
+  "name": "x3-4.10-D-sand-bullet",
+  "key": "4.10_아벤샤",
+  "row": "모래 탄",
+  "kind": "own",
+  "mode": "center",
+  "desc": "A small compressed bullet of golden sand flying straight forward about 8 m (small, 48x24). Shape: a dense oval clump of golden sand grains with a streaming tail of fine sand dust behind it. Animation: flying loop with grains swirling in the tail, oriented flying to the right. On the last frames of the third shot it can puff apart into a small cloud of sand. Colors: gold, sand yellow, light ochre, brown shadow, a few white glints. About 4-6 frames loop. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+ },
+ {
+  "name": "x3-4.10-S0-sand-barrier",
+  "key": "4.10_아벤샤",
+  "row": "모래 방벽",
+  "kind": "own",
+  "mode": "bottom",
+  "desc": "A wall of golden sand that rises from the floor about 1 m in front of the character, about half a person's height (medium, 128x128). Frame order: sand bursts up from the ground and builds into a rough standing wall in three frames, it holds with sand trickling down its face, then it collapses into a spreading pile and dust in three frames. Colors: golden sand, warm ochre, brown shadows, pale highlights. About 6 frames. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+ },
+ {
+  "name": "x3-4.10-S1-sand-stream",
+  "key": "4.10_아벤샤",
+  "row": "모래 줄기",
+  "kind": "own",
+  "mode": "bottom",
+  "desc": "A flowing stream of golden sand gliding along the floor like a low wave, about 5 m long (medium, low and flat at ground level). Frame order: a ripple of sand emerges, flows forward in a rolling looping wave with grains splashing up at the leading edge, then it settles and thins. Enemies along its path are swept off their feet, so the wave front should look strong. Colors: golden sand, warm ochre, brown shadow, light highlights. About 6 frames, loopable flow. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+ },
+ {
+  "name": "x3-4.10-S2-sand-pillar",
+  "key": "4.10_아벤샤",
+  "row": "모래 기둥",
+  "kind": "own",
+  "mode": "bottom",
+  "desc": "An exploding column of golden sand bursting up from the floor (large, 128x320, about twice a person's height). Placed three times in a row ahead of the character. Frame order: the floor bulges, sand erupts upward explosively into a tall pillar with grains spraying out, it reaches full height with a crown of sand spray, then collapses and rains down into dust. Colors: gold, sand yellow, ochre, brown shadow, white glints. About 8 frames. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+ },
+ {
+  "name": "x3-4.10-F-sand-tsunami",
+  "key": "4.10_아벤샤",
+  "row": "모래 해일",
+  "kind": "own",
+  "mode": "bottom",
+  "desc": "A gigantic wave of golden sand rising from the back of the screen higher than the screen top, then crashing forward over the entire battlefield (large, 1280x512, full screen). Frame order: the floor ripples with sand, a huge wave builds up from the rear, its crest curls with sand spray at the top, it towers, then it collapses forward and sweeps across the whole screen, then the sand settles and clears. Colors: brilliant gold, warm sand yellow, ochre, brown shadows, sparkling highlights. 14-16 frames. This is a super move: make it large, bright and spectacular. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+ },
+ {
+  "name": "x3-5.1-D-blood-blades",
+  "key": "5.1_세크리엠",
+  "row": "피 칼날",
+  "kind": "own",
+  "mode": "center",
+  "desc": "Three crimson crescent blades flying forward in a fan from the character's crossed clawing hands (medium, 192x96, also scaled up to screen width for the super). Frame order: three thin crimson crescents slice out together and spread in a narrow 40 degree fan, flying forward, and at the end each blade breaks apart into crimson droplets that scatter and fade. Stylized solid crimson pixel color, not realistic gore. Colors: crimson, deep wine red, bright red highlight. 6-8 frames. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+ },
+ {
+  "name": "x3-5.1-S-blood-mist",
+  "key": "5.1_세크리엠",
+  "row": "핏빛 안개",
+  "kind": "own",
+  "mode": "center",
+  "desc": "A swirling mass of crimson mist made of red particles and blood droplets, moving as one cloud (medium, 384x256). Shapeless, no bats, no creatures. Animation: a looping cloud where crimson particles spiral and flow in a vortex, droplets streaking within, edges curling and fading, plus start frames where it bursts out and end frames where it disperses. Colors: crimson, dark wine red, bright red sparks, faint dark smoke. About 8 frames, middle loopable. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+ },
+ {
+  "name": "x3-5.1-S-blood-gathering",
+  "key": "5.1_세크리엠",
+  "row": "피 모임",
+  "kind": "own",
+  "mode": "bottom",
+  "desc": "Crimson particles streaming in from all sides and gathering into a tall vertical column about a person's height standing on the floor (medium, 128x256), where the character reappears. Do not draw a person; just a dense vertical column of converging particles with no features. Frame order: scattered crimson particles fly inward, they swirl around a vertical axis, packing tighter into a dense column, a final bright red pulse, then the remaining particles fade. Colors: crimson, wine red, bright red highlights. About 6 frames. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+ },
+ {
+  "name": "x3-5.1-F-red-wave",
+  "key": "5.1_세크리엠",
+  "row": "붉은 파동",
+  "kind": "own",
+  "mode": "center",
+  "desc": "Crimson concentric ripples spreading from a point at eye height out across the entire screen (large, 1280x360). Frame order: a bright red pulse at the center, then ring after ring of crimson waves expands outward, distorting the air, each ring thinner and fainter as it reaches the screen edges, then the last ring fades. Colors: crimson, deep red, bright scarlet edges, translucent. 12-14 frames. This is a super move: make it large, bright and spectacular. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+ },
+ {
+  "name": "x3-5.2-S2-broadcast-band",
+  "key": "5.2_브라우니",
+  "row": "송출 전파 띠",
+  "kind": "own",
+  "mode": "center",
+  "desc": "A band of white-noise broadcast signal shooting straight forward from a TV screen glow at chest height (medium, 256x64, stretched in code to 7 m). Shapeless: a horizontal beam made of static noise, flickering scanlines and jagged signal edges. Frame order: a white flash at the start, the static band shoots forward, crackling and jittering with noise, holding, then it breaks into scattered noise pixels and fades. Colors: white, light grey, pale cyan and faint magenta fringe noise. About 6-8 frames. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+ },
+ {
+  "name": "x3-5.2-F-studio",
+  "key": "5.2_브라우니",
+  "row": "스튜디오",
+  "kind": "own",
+  "mode": "center",
+  "desc": "A golden-age TV studio stage set that appears across the upper screen as a backdrop (large, 1280x512, full screen). Includes rows of stage spotlights on rigging bars, a big marquee sign frame bordered by light bulbs with a blank panel and no text, and dark audience seating shadows in the foreground as abstract dark rows without individual figures. Frame order: lights switch on one row at a time, bulbs chase around the sign border, a looping section with spotlights sweeping and bulbs blinking, then the lights turn off one by one and the studio fades. Colors: warm gold, amber bulbs, deep red curtains, dark navy shadows. 14-16 frames. This is a super move: make it large, bright and spectacular. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+ },
+ {
+  "name": "x3-5.3-D-black-paint",
+  "key": "5.3_탐미주의",
+  "row": "검은 물감",
+  "kind": "own",
+  "mode": "bottom",
+  "desc": "A swirl of black paint at neck height above the floor plus a puddle of black paint spreading on the floor beneath it (small, 96x64). Frame order: a thin black paint ribbon spirals into a tight ring in the air, it tightens, drips run down from it, the drips hit the floor and a glossy black puddle spreads out, the swirl dissolves, then the puddle dries and fades. Colors: glossy black, dark grey, small white gloss highlights. No vomit, only paint. About 6 frames. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+ },
+ {
+  "name": "x3-5.3-F-marble-pedestal",
+  "key": "5.3_탐미주의",
+  "row": "대리석 받침대",
+  "kind": "own",
+  "mode": "bottom",
+  "desc": "A white-grey marble display pedestal that rises from the floor under an enemy's feet, with a blank name plaque on its front (small, 96x64). The plaque is empty, no text. Frame order: the floor cracks, the pedestal rises up in three frames with dust, it stands with polished marble veins and a small blank brass plate, then it cracks and crumbles back down into marble chunks and dust in three frames. Colors: white marble, light grey veins, darker grey shadows, dull gold plaque. About 6 frames. This is a super move: make it large, bright and spectacular. Pixel art effect, transparent background, crisp pixel clusters, limited palette, side view. Draw only the effect itself: no people, no monsters, no creatures or animals, no faces, no text, letters or numbers."
+ }
+]

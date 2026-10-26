@@ -32,10 +32,13 @@ def strip(name, sprite, west=True):
             d = ImageChops.difference(c, sc).convert("L").point(lambda v: 255 if v else 0).histogram()[255]
             if best is None or d < best[0]: best = (d, x0 + dx, y0 + dy)
     _, ox, oy = best
+    nsp = sum(1 for v in sc.getchannel("A").getdata() if v)
+    if an.get("kind") != "feet" or best[0] > nsp * 0.2:   # 이펙트 안에 캐릭터가 안 그려졌음 → 지우지 않음(이펙트 화소를 지우면 안 됨)
+        print(name, "캐릭터 없음(맞춤 차이", best[0], ") → 지우기 건너뜀"); ox = None
     from PIL import ImageFilter
     mask = sc.getchannel("A").point(lambda v: 255 if v else 0).filter(ImageFilter.MaxFilter(3))   # 캐릭터 윤곽(1칸 넓힘): 이펙트 빛을 받은 몸도 지움
     out = im.copy(); sa = mask.load()
-    for f in meta["frames"]:
+    for f in (meta["frames"] if ox is not None else []):
         r = f["frame"]; px = out.load()
         for y in range(sc.height):
             for x in range(sc.width):
@@ -63,7 +66,7 @@ def main(name, desc, key="vfx", sprite=None, artist="lite", west=True):
         body["sprite"] = {"type": "base64", "base64": base64.b64encode(Path(sprite).read_bytes()).decode(), "format": "png"}
     res = req("POST", "/vfx", body)
     job = res.get("background_job_id")
-    print(name, "보냄, 견적", res.get("quoted_generations"), flush=True)
+    print(name, "보냄, 견적", res.get("quoted_generations"), "job", job, flush=True)
     while True:
         time.sleep(8)
         try: j = req("GET", f"/background-jobs/{job}")
@@ -80,7 +83,10 @@ def main(name, desc, key="vfx", sprite=None, artist="lite", west=True):
     print(line)
     log = BASE / key / "spend.log" if (BASE / key).exists() else BASE / "vfx_spend.log"
     with open(log, "a") as f: f.write(line + "\n")
-    if sprite: strip(name, sprite, west)
+    if sprite:
+        import shutil; (OUT / "raw").mkdir(exist_ok=True)
+        for ext in (".png", ".json"): shutil.copy(OUT / f"{name}{ext}", OUT / "raw" / f"{name}{ext}")   # 지우기 전 원본
+        strip(name, sprite, west)
 
 
 if __name__ == "__main__":
