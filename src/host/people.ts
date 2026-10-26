@@ -7,7 +7,7 @@ import { buildDirector, directorBlock, parseDirector, type DirectorNote } from '
 import { loadContext, updateChat, type ChatContext } from './risu';
 import { isWaiting, onWaiting } from './waiting';
 import { peopleStore, withPeople, unreadIndexes, messageKey, messageHash as messageHashOf, liveness } from '../core/people/store';
-import { applyUpdate, assemblePrompt, buildUpdate, enabledSections, parseUpdate, planBatches, recordChars, type ApplyReport, type UpdateInput } from '../core/people/updater';
+import { applyUpdate, assemblePrompt, buildUpdate, clearStoryRecords, enabledSections, mentionIndexes, parseUpdate, planBatches, recordChars, type ApplyReport, type UpdateInput } from '../core/people/updater';
 import { applyConsolidate, buildConsolidate, parseConsolidate, type ConsolidateReport } from '../core/people/consolidate';
 import { peopleSettings, type PeopleSettings } from '../core/people/settings';
 import { seedPerson } from '../core/people/seed';
@@ -171,7 +171,14 @@ let pendingReason: string | null = null;
 export interface RunResult { ran: number; applied: number; skipped: string[]; errors: string[] }
 
 /** 안 읽은 응답을 묶음으로 읽어 기록에 반영한다. 이미 돌고 있으면 끝난 뒤 한 번 더 */
-export function requestPeopleUpdate(reason: string, o: { manual?: boolean } = {}): Promise<RunResult> {
+export interface RunScope {
+  /** 읽을 응답 위치 (없으면 안 읽은 것). backfill·다시 읽기 */
+  indexes?: number[];
+  /** 이 인물만 반영하고 읽음 표시는 그대로 (다시 읽기) */
+  only?: string[];
+}
+
+export function requestPeopleUpdate(reason: string, o: { manual?: boolean; scope?: RunScope } = {}): Promise<RunResult> {
   if (inflight) {
     pendingReason = reason;
     return inflight;
@@ -199,16 +206,22 @@ async function waitNotBusy(): Promise<void> {
   });
 }
 
-async function runOnce(reason: string, o: { manual?: boolean }): Promise<RunResult> {
+async function runOnce(reason: string, o: { manual?: boolean; scope?: RunScope }): Promise<RunResult> {
   const result: RunResult = { ran: 0, applied: 0, skipped: [], errors: [] };
   const ctx = await loadContext().catch(() => null);
   if (!ctx) return result;
   const settings = peopleSettings(ctx.chat.scriptstate);
   if (!settings.on || (settings.when === 'manual' && !o.manual)) return result;
   const store = peopleStore(ctx.chat);
-  // 처음 등장한 인물 시드 (모델 없음) — 안 읽은 구간 전체
-  const unread = unreadIndexes(ctx.chat, store);
-  setStatus({ unread: unread.length });
+  // 읽을 범위: 지정(backfill·다시 읽기)이 없으면 안 읽은 응답 가운데 「마지막으로 읽은 것 뒤」만.
+  // 읽은 적이 없으면(기능을 중간에 켬) 마지막 응답 하나만 — 지난 응답은 「지난 응답 읽기」로 사용자가 고른다
+  const allUnread = unreadIndexes(ctx.chat, store);
+  let unread = allUnread;
+  if (!o.scope?.indexes) {
+    const lastRead = Math.max(-1, ...ctx.chat.message.map((m, i) => (store.read[messageKey(m, i)] !== undefined ? i : -1)));
+    unread = lastRead < 0 ? allUnread.slice(-1) : allUnread.filter((i) => i > lastRead);
+  } else unread = o.scope.indexes.filter((i) => ctx.chat.message[i]?.role === 'char');
+  setStatus({ unread: allUnread.length });
   if (!unread.length) return result;
   const sheet = sheetOf(ctx);
   // 상태창 신분 칸 (가장 최근 응답) → 기록. 상태창이 늘 우선
@@ -242,15 +255,15 @@ async function runOnce(reason: string, o: { manual?: boolean }): Promise<RunResu
         break;
       }
       const curStore = peopleStore(fresh.chat);
-      const input = buildUpdate(fresh.chat, curStore, batches[b], { settings, system: '', values: Object.fromEntries(input0Names(curStore).map((n) => [n, valuesOf(n)])), names: allNames(), exclude, factionNames: factionNamesOf(fresh.char.globalLore) });
+      const input = buildUpdate(fresh.chat, curStore, batches[b], { settings, system: '', values: Object.fromEntries(input0Names(curStore).map((n) => [n, valuesOf(n)])), names: allNames(), exclude, factionNames: factionNamesOf(fresh.char.globalLore), only: o.scope?.only });
       // 지침은 자료를 본 뒤 조립한다 (저장 상한을 넘긴 인물이 있으면 정리 절을 켠다)
       const sections = enabledSections(settings);
       if (input.tidy.length) sections.add('tidy');
       const system = assemblePrompt(promptFor(settings), sections, settings.rules, settings.lang);
       input.system = system;
       if (!input.people.length) {
-        // 장면 인물이 없으면 모델을 부르지 않고 읽음 표시만
-        await updateChat(fresh.charIndex, fresh.chatIndex, (cur) => {
+        // 장면 인물이 없으면 모델을 부르지 않고 읽음 표시만 (다시 읽기는 표시도 안 바꿈)
+        if (!o.scope?.only) await updateChat(fresh.charIndex, fresh.chatIndex, (cur) => {
           const s = peopleStore(cur);
           for (const i of input.indexes) {
             const m = cur.message[i];
@@ -290,6 +303,8 @@ async function runOnce(reason: string, o: { manual?: boolean }): Promise<RunResu
           sheetOf: sheet,
           baseOf: (name) => seedBaseFor(name, userFaction(cur), s.identity),
           exclude,
+          only: o.scope?.only,
+          keepRead: !!o.scope?.only,
         });
         diag.report = report;
         return withPeople(cur, s);
@@ -334,6 +349,39 @@ async function runOnce(reason: string, o: { manual?: boolean }): Promise<RunResu
 }
 
 const input0Names = (s: PeopleStore) => Object.keys(s.people);
+
+/** 지난 응답 읽기: 최근 turns 개 응답(0 = 전부) 가운데 안 읽은 것을 묶음으로 읽는다 (기능을 중간에 켰거나 끄고 지나간 구간) */
+export async function backfillPeople(turns: number): Promise<RunResult> {
+  const ctx = await loadContext().catch(() => null);
+  if (!ctx) return { ran: 0, applied: 0, skipped: ['채팅을 읽지 못했어요'], errors: [] };
+  const store = peopleStore(ctx.chat);
+  const unread = unreadIndexes(ctx.chat, store);
+  const bots = ctx.chat.message.map((m, i) => (m.role === 'char' ? i : -1)).filter((i) => i >= 0);
+  const pick = new Set(turns > 0 ? bots.slice(-turns) : bots);
+  const indexes = unread.filter((i) => pick.has(i));
+  if (!indexes.length) return { ran: 0, applied: 0, skipped: ['그 범위에 안 읽은 응답이 없어요'], errors: [] };
+  return requestPeopleUpdate('backfill', { manual: true, scope: { indexes } });
+}
+
+/** 인물별 다시 읽기: 이 인물의 이야기 기록을 지우고, 그 인물이 나온 최근 turns 개 응답을 이 인물만 대상으로 다시 읽는다. 읽음 표시는 그대로 */
+export async function rereadPerson(name: string, turns: number): Promise<RunResult & { cleared: number }> {
+  if (inflight) return { ran: 0, applied: 0, skipped: ['갱신이 돌고 있어요'], errors: [], cleared: 0 };
+  const ctx = await loadContext().catch(() => null);
+  if (!ctx) return { ran: 0, applied: 0, skipped: ['채팅을 읽지 못했어요'], errors: [], cleared: 0 };
+  const store = peopleStore(ctx.chat);
+  const p = store.people[name];
+  if (!p) return { ran: 0, applied: 0, skipped: ['기록이 없는 인물'], errors: [], cleared: 0 };
+  const indexes = mentionIndexes(ctx.chat, name, [...p.aliases, ...(allNames().find((n) => n.name === name)?.aliases ?? [])], turns);
+  let cleared = 0;
+  await updateChat(ctx.charIndex, ctx.chatIndex, (cur) => {
+    const s = peopleStore(cur);
+    cleared = clearStoryRecords(s, name);
+    return withPeople(cur, s);
+  });
+  if (!indexes.length) return { ran: 0, applied: 0, skipped: ['최근 응답에 이 인물이 나오지 않아요 (기록만 비움)'], errors: [], cleared };
+  const r = await requestPeopleUpdate('reread', { manual: true, scope: { indexes, only: [name] } });
+  return { ...r, cleared };
+}
 
 /** 인물 기록 「정리」: 보조 모델이 이 인물의 살아 있는 항목을 더 적은 항목으로 다시 쓴다 (사용자가 눌렀을 때만, 1회 호출) */
 export async function consolidatePerson(name: string): Promise<{ ok: boolean; message: string; report?: ConsolidateReport }> {

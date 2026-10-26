@@ -270,3 +270,30 @@ test('정리 얹기: 저장 상한을 넘긴 인물만 tidy 에 오르고 merge 
   const rep2 = U.applyUpdate(store, c, small, { entries: [{ who: '쟈알디', slot: 'history', op: 'merge', from: ['h4', 'h5'], text: 'x', m: 'm4', quote: null }] }, { settings: settings() });
   assert.equal(rep2.applied.entries, 0);
 });
+
+test('다시 읽기: only 인물만 반영하고 읽음 표시는 그대로; 이야기 기록 비우기; 나온 응답 찾기', () => {
+  const { c, store, input } = setup();
+  store.people.쟈알디.slots.state.push({ id: 'st1', text: '이야기 항목', src: 'story', anchor: 'c1', seq: 2, quote: '커피' });
+  store.people.쟈알디.slots.state.push({ id: 'st2', text: '고정 항목', src: 'story', anchor: 'c1', seq: 3, quote: '커피', pin: true });
+  store.log.push({ id: 'x1', anchor: 'c1', seq: 1, src: 'story', who: '쟈알디', kind: 'cue', cue: '도움', reason: 'r' });
+  store.log.push({ id: 'x2', anchor: 'c1', seq: 2, src: 'field', who: '쟈알디', kind: 'cue', cue: '도움', reason: 'f' });
+  assert.equal(U.clearStoryRecords(store, '쟈알디'), 2, '이야기 항목 1 + 이야기 계기 1 (고정·시드·필드는 남음)');
+  assert.ok(store.people.쟈알디.slots.state.some((e) => e.id === 'st2') && store.people.쟈알디.slots.state.some((e) => e.id === 'e12'));
+  assert.ok(store.log.some((x) => x.id === 'x2') && !store.log.some((x) => x.id === 'x1'));
+  assert.deepEqual(U.mentionIndexes(c, '쟈알디', [], 10), [3], '태그([AG|…])만 있는 응답은 본문 언급이 아님');
+  assert.deepEqual(U.mentionIndexes(c, '데쥬레', [], 10), [3]);
+  const only = U.buildUpdate(c, store, [3], { settings: settings(), system: 'S', values: {}, names, only: ['쟈알디'] });
+  assert.deepEqual(only.people, ['쟈알디']);
+  const r = {
+    entries: [
+      { who: '쟈알디', slot: 'state', op: 'add', text: '팔 부상', m: 'm4', quote: '팔을 다쳤다' },
+      { who: '데쥬레', slot: 'knowledge', op: 'add', text: '금고 비밀번호', m: 'm4', quote: '금고 비밀번호를 알았다' },
+    ],
+    new_people: [{ name: '김철수', aliases: [], m: 'm4', quote: '감싸 안으며', identity: 'x' }],
+  };
+  const rep = U.applyUpdate(store, c, only, r, { settings: settings({ twoTurn: false }), only: ['쟈알디'], keepRead: true });
+  assert.equal(rep.applied.entries, 1);
+  assert.ok(rep.dropped.some((d) => d.who === '데쥬레' && d.reason === '명단에 없는 이름'));
+  assert.equal(rep.applied.newPeople.length, 0);
+  assert.deepEqual(store.read, {}, '읽음 표시 안 바뀜');
+});

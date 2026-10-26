@@ -5,7 +5,7 @@ import { messageText } from '../core/refs';
 import { tokens } from '../core/gnet';
 import { factionList } from '../core/factions';
 import { updateChat, type ChatContext } from '../host/risu';
-import { chatId, clearDiag, consolidatePerson, loadDiag, onPeopleStatus, peopleStatus, requestPeopleUpdate, sheetOf, type DiagRun } from '../host/people';
+import { backfillPeople, chatId, clearDiag, consolidatePerson, loadDiag, rereadPerson, onPeopleStatus, peopleStatus, requestPeopleUpdate, sheetOf, type DiagRun } from '../host/people';
 import { anchorOf, changeId, entryStates, isAlive, liveChanges, liveEntries, liveness, messageKey, peopleStore, plain, putChange, unreadIndexes, withPeople, type EntryState, type Liveness } from '../core/people/store';
 import { addressOf, affinityView, opennessOf, tasteOf } from '../core/people/affinity';
 import { factionNow, knownFactionCodes, userFactionOf } from '../core/people/faction';
@@ -49,6 +49,10 @@ export const peopleUi = {
   diagAll: false,
   /** 지난 항목 전부 펼친 칸 열쇠 */
   oldAll: new Set<string>(),
+  /** 지난 응답 읽기 범위 */
+  backfillTurns: '10',
+  /** 다시 읽기 범위 */
+  rereadTurns: '20',
   diagOpen: new Set<string>(),
   diagShow: '' as '' | `${string}:${'prompt' | 'raw'}`,
   /** 「매 턴」·「메인」 안내는 세션에 한 번 */
@@ -299,7 +303,11 @@ function updateBar(ctx: ChatContext, canChat = true): string {
   const store = peopleStore(ctx.chat);
   const unread = st.busy ? st.unread : unreadIndexes(ctx.chat, store).length;
   const label = !canChat ? '채팅을 시작한 뒤에 갱신할 수 있어요' : st.busy ? st.label || '갱신 중…' : unread ? `안 읽은 응답 ${unread}개` : '모두 읽었어요';
-  return `<div class="pp-upbar"><span class="pp-upst${st.busy ? ' busy' : ''}">${st.busy ? '<i class="pp-spin"></i>' : ''}${esc(label)}</span><button class="gx-mini ps-save" data-action="pp-update" title="안 읽은 본편 응답을 지금 읽어 기록에 반영해요" ${st.busy || peopleUi.busy || !canChat ? 'disabled' : ''}>${ICONS.refresh}지금 갱신</button></div>`;
+  const dis = st.busy || peopleUi.busy || !canChat ? 'disabled' : '';
+  const back = unread
+    ? `<span class="pp-backfill"><select class="gx-select" data-change="pp-backfill-turns" aria-label="읽을 범위">${[['10', '최근 10개'], ['30', '최근 30개'], ['0', '전부']].map(([v, l]) => `<option value="${v}" ${peopleUi.backfillTurns === v ? 'selected' : ''}>${l}</option>`).join('')}</select><button class="gx-mini" data-action="pp-backfill" title="기능을 중간에 켰거나 끄고 지나간 구간의 응답을 읽어요. 보조 호출이 묶음마다 1회" ${dis}>지난 응답 읽기</button></span>`
+    : '';
+  return `<div class="pp-upbar"><span class="pp-upst${st.busy ? ' busy' : ''}">${st.busy ? '<i class="pp-spin"></i>' : ''}${esc(label)}</span><button class="gx-mini ps-save" data-action="pp-update" title="마지막으로 읽은 응답 뒤의 안 읽은 응답을 지금 읽어요" ${dis}>${ICONS.refresh}지금 갱신</button>${back}</div>`;
 }
 
 /** 추가 지침 한 칸: 이름 · 입력칸 · 바로 밑 설명 · 저장 */
@@ -649,7 +657,8 @@ export function personView(ctx: ChatContext, name: string): string {
   }).join('');
   const mine = store.log.filter((c) => c.who === name).map((c) => ({ c, pos: live.at.get(c.anchor) ?? 1e9 })).sort((a, b) => b.pos - a.pos || b.c.seq - a.c.seq).map((x) => x.c);
   const log = `<details class="ps-adv-sub pp-log" data-keep="pp-log"${keepOpen('pp-log')}><summary title="호감 계기·호칭 변경·메모처럼 값을 바꾼 기록. 호감 숫자는 이 기록에서 매번 계산해요">변경 기록<b>${mine.length}</b></summary>${mine.length ? `<ul class="pp-entries">${mine.map((c) => changeRow(ctx, c, live)).join('')}</ul>` : '<p class="ps-note">아직 변경 기록이 없어요.</p>'}</details>`;
-  const tidyBtn = `<button class="gx-mini" data-action="pp-tidy" data-value="${esc(name)}" title="보조 모델이 이 인물의 항목들을 더 적은 수로 합쳐 다시 써요 (보조 호출 1회). 고정 항목은 손대지 않아요" ${peopleUi.busy || peopleStatus().busy ? 'disabled' : ''}>${ICONS.refresh}정리</button>`;
+  const busyNow = peopleUi.busy || peopleStatus().busy ? 'disabled' : '';
+  const tidyBtn = `<button class="gx-mini" data-action="pp-tidy" data-value="${esc(name)}" title="보조 모델이 이 인물의 항목들을 더 적은 수로 합쳐 다시 써요 (보조 호출 1회). 고정 항목은 손대지 않아요" ${busyNow}>${ICONS.refresh}정리</button><select class="gx-select pp-reread-sel" data-change="pp-reread-turns" aria-label="다시 읽을 범위">${[['10', '최근 10개'], ['20', '최근 20개'], ['50', '최근 50개'], ['0', '전부']].map(([v, l]) => `<option value="${v}" ${peopleUi.rereadTurns === v ? 'selected' : ''}>${l}</option>`).join('')}</select><button class="gx-mini danger" data-action="pp-reread" data-value="${esc(name)}" title="이 인물의 이야기 기록을 비우고, 이 인물이 나온 응답들을 다시 읽어 새로 써요. 시트 시작값·필드·직접 고친 것은 남아요. 보조 호출이 묶음마다 1회" ${busyNow}>다시 읽기</button>`;
   return `<div class="ph-room nw-pane pp-pane">${head(name, sub, tidyBtn)}
     <article class="nw-doc pp-doc">
       ${peopleUi.notice ? `<div class="gx-err" role="alert">${esc(peopleUi.notice)}</div>` : ''}
@@ -994,6 +1003,44 @@ export async function handlePeople(action: string, value: string | undefined, ct
       peopleUi.addrEdit = false;
       peopleUi.info = '호칭을 저장했어요.';
       env.render();
+      return true;
+    }
+    case 'pp-backfill-turns':
+      peopleUi.backfillTurns = v;
+      return true;
+    case 'pp-reread-turns':
+      peopleUi.rereadTurns = v;
+      return true;
+    case 'pp-backfill': {
+      if (peopleUi.busy || peopleStatus().busy) return true;
+      peopleUi.busy = true;
+      peopleUi.notice = '';
+      env.render();
+      try {
+        const r = await backfillPeople(Number(peopleUi.backfillTurns) || 0);
+        peopleUi.info = r.errors.length ? `읽기 실패: ${r.errors[0]}` : r.ran ? `지난 응답 읽기: 갱신 ${r.ran}회 · 반영 ${r.applied}개` : r.skipped[0] ?? '읽을 응답이 없어요.';
+      } catch (error) {
+        peopleUi.notice = error instanceof Error ? error.message : String(error);
+      }
+      peopleUi.busy = false;
+      peopleUi.diag = null;
+      await env.refresh();
+      return true;
+    }
+    case 'pp-reread': {
+      if (!v || peopleUi.busy || peopleStatus().busy) return true;
+      peopleUi.busy = true;
+      peopleUi.notice = '';
+      env.render();
+      try {
+        const r = await rereadPerson(v, Number(peopleUi.rereadTurns) || 0);
+        peopleUi.info = r.errors.length ? `다시 읽기 실패: ${r.errors[0]}` : `${v} 다시 읽기: 기록 ${r.cleared}개 비움 · 갱신 ${r.ran}회 · 반영 ${r.applied}개${r.skipped.length ? ` · ${r.skipped[0]}` : ''}`;
+      } catch (error) {
+        peopleUi.notice = error instanceof Error ? error.message : String(error);
+      }
+      peopleUi.busy = false;
+      peopleUi.diag = null;
+      await env.refresh();
       return true;
     }
     case 'pp-tidy': {

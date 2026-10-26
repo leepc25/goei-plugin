@@ -118,6 +118,8 @@ export interface BuildOpts {
   exclude?: string[];
   /** 세력 코드 → 이름 (명부). 세력 평판 자료용 */
   factionNames?: Record<string, string>;
+  /** 이 인물들만 (인물별 「다시 읽기」) */
+  only?: string[];
 }
 
 const SUSP_WEIGHT: Record<string, number> = { 약: 10, 중: 25, 강: 40, '-약': -10, '-중': -25, '-강': -40 };
@@ -199,7 +201,7 @@ export function buildUpdate(chat: Chat, store: PeopleStore, batch: number[], o: 
       }
     }
   }
-  const chosen = people.slice(0, 6);
+  const chosen = o.only?.length ? o.only.filter((n) => store.people[n]).slice(0, 6) : people.slice(0, 6);
   const already = [
     ...changes.filter((c) => c.kind === 'cue' && chosen.includes(c.who) && [...confirmedIdx].some((idx) => live.at.get(c.anchor) === idx)).map((c) => ({ who: c.who, kind: 'cue', cue: c.cue })),
     ...chosen.flatMap((n) => SLOTS.flatMap((s) => liveEntries(store.people[n].slots[s], live).filter((e) => [...confirmedIdx].some((idx) => live.at.get(e.anchor) === idx)).map((e) => ({ who: n, kind: 'entry', slot: s, text: e.text })))),
@@ -327,6 +329,10 @@ export interface ApplyCtx {
   now?: string;
   /** 기록하지 않는 이름 (유저가 연기하는 요원): 새 인물로도 받지 않는다 */
   exclude?: string[];
+  /** 이 인물들만 반영 (인물별 「다시 읽기」): 다른 인물 항목·계기·호칭·새 인물·문서·의심·세력은 버린다 */
+  only?: string[];
+  /** 읽음 표시를 바꾸지 않는다 (다시 읽기) */
+  keepRead?: boolean;
 }
 
 const ROLE_WORDS = new Set(['택시 기사', '기사', '점원', '경비', '경비원', '간호사', '의사', '행인', '남자', '여자', '아저씨', '아주머니', '학생', '직원', '요원', '사원', '대리', '과장', '부장', '선배', '후배', '언니', '오빠', '형', '누나', '손님', '주인', '사장', '경찰', '시민']);
@@ -395,11 +401,16 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
     if (idx === undefined || !input.confirmed.has(idx)) return '확정 구간 밖 메시지';
     return { anchor: messageKey(list[idx], idx), index: idx };
   };
-  const nameOf = (who: string): string | null => resolveName(who, store, input.names);
+  const resolveAny = (who: string): string | null => resolveName(who, store, input.names);
+  /** only 가 있으면 그 인물만 (다른 인물은 「다시 읽기 대상 아님」으로 버려짐) */
+  const nameOf = (who: string): string | null => {
+    const n = resolveAny(who);
+    return n && ctx.only?.length && !ctx.only.includes(n) ? null : n;
+  };
 
-  // 1. 새 인물 먼저 (그래야 아래 항목이 이름을 찾는다)
+  // 1. 새 인물 먼저 (그래야 아래 항목이 이름을 찾는다). 다시 읽기(only)에서는 받지 않는다
   let newCount = 0;
-  for (const n of r.new_people ?? []) {
+  for (const n of ctx.only?.length ? [] : r.new_people ?? []) {
     const name = plain(n?.name, 40);
     if (!name) {
       drop('new_people', n, '이름 없음');
@@ -723,8 +734,8 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
     }
   }
 
-  // 5. 문서
-  for (const d of r.docs ?? []) {
+  // 5. 문서 (다시 읽기에서는 건너뜀)
+  for (const d of ctx.only?.length ? [] : r.docs ?? []) {
     const type = d?.type as DocType;
     if (!DOC_TYPES.includes(type) || !ctx.settings.features.has(docFeature(type) as Feature)) {
       drop('doc', d, '없는 문서 종류 또는 꺼진 기능');
@@ -812,7 +823,7 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
   }
 
   // 6b. 세력 평판 계기: 그 세력이 유저를 보는 눈이 바뀔 만한 일인지는 모델이 판단 (사용자 2026-10-26). 코드는 이름→코드, 인용, 세력당 1건, 같은 메시지 중복만 검사
-  if (ctx.settings.features.has('faction_rep')) {
+  if (ctx.settings.features.has('faction_rep') && !ctx.only?.length) {
     const changes = liveChanges(store, live);
     const seen = new Set<string>();
     const known = knownFactionCodes(store, input.factionNames);
@@ -882,8 +893,34 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
     }
   }
 
-  markRead(store, chat, input.indexes);
+  if (!ctx.keepRead) markRead(store, chat, input.indexes);
   return report;
+}
+
+/** 다시 읽기 준비: 이 인물의 이야기 기록(항목·계기·호칭·취향·음란도·메모)을 지운다. 시트 시작값·필드·직접 고친 것은 남긴다. 지운 수 */
+export function clearStoryRecords(store: PeopleStore, who: string): number {
+  const p = store.people[who];
+  if (!p) return 0;
+  let n = 0;
+  for (const slot of SLOTS) {
+    const list = p.slots[slot];
+    if (!list) continue;
+    const keep = list.filter((e) => e.src !== 'story' || e.pin);
+    n += list.length - keep.length;
+    p.slots[slot] = keep;
+  }
+  const before = store.log.length;
+  store.log = store.log.filter((c) => !(c.who === who && c.src === 'story'));
+  n += before - store.log.length;
+  return n;
+}
+
+/** 이 인물이 나온 봇 응답 위치들 (최근 turns 개 응답 안에서) */
+export function mentionIndexes(chat: Chat, who: string, aliases: string[], turns: number): number[] {
+  const list = msgs(chat);
+  const match = nameMatcher([{ name: who, aliases, titles: [] }]);
+  const bots = list.map((m, i) => (m.role === 'char' ? i : -1)).filter((i) => i >= 0).slice(-turns);
+  return bots.filter((i) => match(messageText(str(list[i].data))).length || (list[i - 1] && match(messageText(str(list[i - 1].data))).length));
 }
 
 /** 리듬 문서 본문 표식: scene 은 `[phase:build_up][engagement:active]`, hook:* 은 `[stage:seeded][tier:short]` 로 시작해야 */

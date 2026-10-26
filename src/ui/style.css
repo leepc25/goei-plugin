@@ -2766,3 +2766,7 @@ button.mk-go:hover { color: var(--signal); }
 .pp-range { display: inline-flex; align-items: center; gap: 10px; }
 .pp-range input[type=range] { width: 180px; max-width: 60vw; }
 .pp-range output { min-width: 64px; font-variant-numeric: tabular-nums; }
+
+.pp-backfill { display: inline-flex; align-items: center; gap: 6px; margin-left: 6px; }
+.pp-backfill .gx-select, .pp-reread-sel { min-height: 28px; font-size: 12.5px; }
+.pp-reread-sel { margin-left: 6px; }
