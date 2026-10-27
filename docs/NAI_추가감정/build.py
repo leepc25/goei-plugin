@@ -11,7 +11,7 @@ EMO = ['suspicious', 'worried', 'relieved', 'disgusted', 'determined', 'jealous'
 HAND = re.compile(r'^(hand|hands|own hands|crossed arms|arms? |adjusting|holding|pointing|beckoning|palm|outstretched|reaching|'
                   r'shrugging|scratching|facepalm|head rest|clenched hands?$|steepled|interlocked|covering|waving|salute|thumbs|'
                   r'index finger|finger|fist|wiping|tucking|twirling|playing with|cupping|clapping|v$|peace sign|spread arms|'
-                  r'arm |arms behind|arms up|cracking|snapping|stretching|x arms)')
+                  r'arm |arms behind|arms up|cracking|snapping|stretching|x arms|money gesture|claw pose|ok sign|shushing|salute|heart hands|arm up|stroking)')
 PROP = re.compile(r'^(holding (?!own arm$).*|cigarette|smoke|smoking|mouth hold|chewing|monocle|blood on face|against wall|walkie-talkie|hamster|cup|phone)$')
 OPEN = {'grin', 'teeth', 'open mouth', 'tongue out', 'clenched teeth', 'gritted teeth', 'parted lips'}
 prompts = {}

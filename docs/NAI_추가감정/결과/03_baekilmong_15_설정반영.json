@@ -5,7 +5,7 @@
     {
       "id": "1792316457994",
       "name": "Baek Seok-ju_suspicious",
-      "scenePrompt": "narrowed eyes, smile, closed mouth, looking at viewer, hand on own chin, ring,",
+      "scenePrompt": "narrowed eyes, smile, closed mouth, looking at viewer, head tilt, hand on own chin, ring,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316457994
@@ -13,7 +13,7 @@
     {
       "id": "1792316457995",
       "name": "Baek Seok-ju_worried",
-      "scenePrompt": "worried, furrowed brow, closed mouth, looking to the side, own hands clasped, ring,",
+      "scenePrompt": "1.15::worried::, furrowed brow, closed mouth, looking back, own hands clasped, ring,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316457995
@@ -21,7 +21,7 @@
     {
       "id": "1792316457996",
       "name": "Baek Seok-ju_relieved",
-      "scenePrompt": "smile, closed eyes, sigh, hand on own chest, ring,",
+      "scenePrompt": "smile, closed eyes, open mouth, sigh, head back, hand on own chest, ring,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316457996
@@ -29,7 +29,7 @@
     {
       "id": "1792316457997",
       "name": "Baek Seok-ju_disgusted",
-      "scenePrompt": "disdain, half-closed eyes, light smile, closed mouth, looking at viewer, crossed arms, ring,",
+      "scenePrompt": "disdain, half-closed eyes, light smile, closed mouth, looking down, leaning back, crossed arms, ring,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316457997
@@ -37,7 +37,7 @@
     {
       "id": "1792316457998",
       "name": "Baek Seok-ju_determined",
-      "scenePrompt": "smile, confident, closed mouth, looking at viewer, ring,",
+      "scenePrompt": "smile, confident, open mouth, looking at viewer, leaning forward, index finger raised, ring,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316457998
@@ -45,7 +45,7 @@
     {
       "id": "1792316457999",
       "name": "Baek Seok-ju_jealous",
-      "scenePrompt": "smug, raised eyebrow, smile, sideways glance, hand on own hip, ring,",
+      "scenePrompt": "smug, raised eyebrow, smile, sideways glance, upper body turned, hand on own hip, ring,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316457999
@@ -53,7 +53,7 @@
     {
       "id": "1792316458000",
       "name": "Baek Seok-ju_pleading",
-      "scenePrompt": "raised inner eyebrows, open mouth, sweat, tired, reaching towards viewer, ring,",
+      "scenePrompt": "raised inner eyebrows, open mouth, sweat, tired, leaning forward, 1.15::reaching towards viewer::, ring,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458000
@@ -61,7 +61,7 @@
     {
       "id": "1792316458001",
       "name": "Baek Seok-ju_forced smiling",
-      "scenePrompt": "forced smile, sweatdrop, looking away, scratching cheek, ring,",
+      "scenePrompt": "forced smile, sweatdrop, looking away, head tilt, hand on own cheek, ring,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458001
@@ -69,7 +69,7 @@
     {
       "id": "1792745536966",
       "name": "Baek Seok-ju_indifferent",
-      "scenePrompt": "smile, half-closed eyes, closed mouth, looking away, waving, ring,",
+      "scenePrompt": "smile, half-closed eyes, closed mouth, looking away, upper body turned, 1.15::waving::, ring,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745536966
@@ -77,7 +77,7 @@
     {
       "id": "1792745536967",
       "name": "Baek Seok-ju_guilty",
-      "scenePrompt": "sad smile, shaded face, closed mouth, looking at hand, ring,",
+      "scenePrompt": "sad smile, shaded face, closed mouth, looking down, head down, hand on own face, ring,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745536967
@@ -85,7 +85,7 @@
     {
       "id": "1792745536968",
       "name": "Baek Seok-ju_pouting",
-      "scenePrompt": "annoyed, frown, closed mouth, looking at viewer, hands on own hips, ring,",
+      "scenePrompt": "annoyed, frown, open mouth, looking at viewer, leaning forward, hands on own hips, ring,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745536968
@@ -93,7 +93,7 @@
     {
       "id": "1792745536969",
       "name": "Baek Seok-ju_angry smile",
-      "scenePrompt": "smile, bloodshot eyes, glaring, closed mouth, shaded face, clenched hand, ring,",
+      "scenePrompt": "smile, 1.2::bloodshot eyes::, glaring, closed mouth, shaded face, leaning forward, clenched hand, ring,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745536969
@@ -101,7 +101,7 @@
     {
       "id": "1792745536970",
       "name": "Baek Seok-ju_expressionless",
-      "scenePrompt": "expressionless, half-closed eyes, closed mouth, looking at viewer, crossed arms, ring,",
+      "scenePrompt": "1.15::expressionless::, half-closed eyes, closed mouth, looking at viewer, crossed arms, ring,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745536970
@@ -109,7 +109,7 @@
     {
       "id": "1792745536971",
       "name": "Baek Seok-ju_tormented",
-      "scenePrompt": "empty eyes, parted lips, tired, shaded face, sweat, looking up, ring,",
+      "scenePrompt": "empty eyes, parted lips, tired, shaded face, sweat, looking up, head back, hand on own forehead, ring,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745536971
@@ -117,7 +117,7 @@
     {
       "id": "1792745536972",
       "name": "Baek Seok-ju_crazy smile",
-      "scenePrompt": "crazy smile, constricted pupils, open mouth, looking at viewer, clapping, ring,",
+      "scenePrompt": "crazy smile, constricted pupils, open mouth, looking at viewer, leaning forward, 1.15::clapping::, ring,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745536972
@@ -125,7 +125,7 @@
     {
       "id": "1792316458002",
       "name": "Jin Na-sol_suspicious",
-      "scenePrompt": "narrowed eyes, expressionless, closed mouth, adjusting eyewear, nail art,",
+      "scenePrompt": "narrowed eyes, expressionless, closed mouth, looking at viewer, leaning forward, hand on own chin, nail art,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458002
@@ -133,7 +133,7 @@
     {
       "id": "1792316458003",
       "name": "Jin Na-sol_worried",
-      "scenePrompt": "furrowed brow, annoyed, closed mouth, looking down, wristwatch, nail art,",
+      "scenePrompt": "furrowed brow, annoyed, closed mouth, anger vein, head down, hand on own forehead, nail art,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458003
@@ -141,7 +141,7 @@
     {
       "id": "1792316458004",
       "name": "Jin Na-sol_relieved",
-      "scenePrompt": "light smile, half-closed eyes, closed mouth, looking to the side, hand in pocket, nail art,",
+      "scenePrompt": "light smile, half-closed eyes, closed mouth, looking to the side, leaning back, hand in pocket, nail art,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458004
@@ -149,7 +149,7 @@
     {
       "id": "1792316458005",
       "name": "Jin Na-sol_disgusted",
-      "scenePrompt": "disdain, half-closed eyes, closed mouth, looking at viewer, crossed arms, nail art,",
+      "scenePrompt": "disdain, half-closed eyes, closed mouth, looking down, leaning back, crossed arms, nail art,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458005
@@ -157,7 +157,7 @@
     {
       "id": "1792316458006",
       "name": "Jin Na-sol_determined",
-      "scenePrompt": "serious, narrowed eyes, closed mouth, looking at viewer, hand on own hip, nail art,",
+      "scenePrompt": "serious, narrowed eyes, closed mouth, looking at viewer, leaning forward, pointing at viewer, nail art,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458006
@@ -165,7 +165,7 @@
     {
       "id": "1792316458007",
       "name": "Jin Na-sol_jealous",
-      "scenePrompt": "annoyed, sideways glance, closed mouth, raised eyebrow, hand on own hip, nail art,",
+      "scenePrompt": "annoyed, raised eyebrow, closed mouth, sideways glance, looking back, hand on own hip, nail art,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458007
@@ -173,7 +173,7 @@
     {
       "id": "1792316458008",
       "name": "Jin Na-sol_pleading",
-      "scenePrompt": "serious, half-closed eyes, sweat, closed mouth, anger vein, looking at viewer, hand on own forehead, nail art,",
+      "scenePrompt": "serious, half-closed eyes, sweat, anger vein, looking at viewer, 1.15::outstretched hand::, nail art,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458008
@@ -181,7 +181,7 @@
     {
       "id": "1792316458009",
       "name": "Jin Na-sol_forced smiling",
-      "scenePrompt": "forced smile, half-closed eyes, anger vein, looking away, nail art,",
+      "scenePrompt": "1.15::forced smile::, half-closed eyes, anger vein, looking away, head tilt, hand on own shoulder, nail art,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458009
@@ -189,7 +189,7 @@
     {
       "id": "1792745536973",
       "name": "Jin Na-sol_indifferent",
-      "scenePrompt": "bored, half-closed eyes, closed mouth, looking at hand, nail art,",
+      "scenePrompt": "bored, closed eyes, closed mouth, leaning back, crossed arms, nail art,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745536973
@@ -197,7 +197,7 @@
     {
       "id": "1792745536974",
       "name": "Jin Na-sol_guilty",
-      "scenePrompt": "frown, averting eyes, closed mouth, guilt, nail art,",
+      "scenePrompt": "guilt, frown, averting eyes, closed mouth, head down, hand on own arm, nail art,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745536974
@@ -205,7 +205,7 @@
     {
       "id": "1792745536975",
       "name": "Jin Na-sol_pouting",
-      "scenePrompt": "annoyed, frown, closed eyes, closed mouth, crossed arms, nail art,",
+      "scenePrompt": "annoyed, frown, closed mouth, looking at hand, head down, own hands together, nail art,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745536975
@@ -213,7 +213,7 @@
     {
       "id": "1792745536976",
       "name": "Jin Na-sol_angry smile",
-      "scenePrompt": "light smile, empty eyes, shaded face, closed mouth, looking at viewer, nail art,",
+      "scenePrompt": "1.15::light smile::, empty eyes, shaded face, closed mouth, looking at viewer, leaning forward, hand on own hip, nail art,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745536976
@@ -221,7 +221,7 @@
     {
       "id": "1792745536977",
       "name": "Jin Na-sol_expressionless",
-      "scenePrompt": "expressionless, staring, closed mouth, shaded face, looking at viewer, nail art,",
+      "scenePrompt": "expressionless, staring, closed mouth, shaded face, looking at viewer, crossed arms, nail art,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745536977
@@ -229,7 +229,7 @@
     {
       "id": "1792745536978",
       "name": "Jin Na-sol_tormented",
-      "scenePrompt": "clenched teeth, furrowed brow, one eye closed, sweat, anger vein, hand on own head, nail art,",
+      "scenePrompt": "clenched teeth, furrowed brow, one eye closed, sweat, anger vein, hunched over, hands on own head, nail art,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745536978
@@ -237,7 +237,7 @@
     {
       "id": "1792745536979",
       "name": "Jin Na-sol_crazy smile",
-      "scenePrompt": "grin, constricted pupils, shaded face, looking at viewer, nail art,",
+      "scenePrompt": "1.15::grin::, constricted pupils, shaded face, looking at viewer, leaning forward, clenched hand, nail art,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745536979
@@ -245,7 +245,7 @@
     {
       "id": "1792316458010",
       "name": "Lee Seong-hae_suspicious",
-      "scenePrompt": "smile, half-closed eyes, closed mouth, looking at viewer, head tilt, leaning forward,",
+      "scenePrompt": "smile, half-closed eyes, closed mouth, looking at viewer, leaning forward, arms behind back,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458010
@@ -253,7 +253,7 @@
     {
       "id": "1792316458011",
       "name": "Lee Seong-hae_worried",
-      "scenePrompt": "smile, raised inner eyebrows, open mouth, leaning forward, reaching towards viewer,",
+      "scenePrompt": "smile, raised inner eyebrows, open mouth, leaning forward, 1.15::reaching towards viewer::,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458011
@@ -261,7 +261,7 @@
     {
       "id": "1792316458012",
       "name": "Lee Seong-hae_relieved",
-      "scenePrompt": "smile, closed eyes, open mouth, hand on own chest,",
+      "scenePrompt": "smile, closed eyes, open mouth, head back, hand on own chest,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458012
@@ -269,7 +269,7 @@
     {
       "id": "1792316458013",
       "name": "Lee Seong-hae_disgusted",
-      "scenePrompt": "smile, half-closed eyes, shaded face, closed mouth, looking down, arms behind back,",
+      "scenePrompt": "smile, half-closed eyes, shaded face, closed mouth, looking down, upper body turned, pointing,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458013
@@ -277,7 +277,7 @@
     {
       "id": "1792316458014",
       "name": "Lee Seong-hae_determined",
-      "scenePrompt": "smile, closed eyes, open mouth, salute,",
+      "scenePrompt": "smile, closed eyes, open mouth, head tilt, 1.15::salute::,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458014
@@ -285,7 +285,7 @@
     {
       "id": "1792316458015",
       "name": "Lee Seong-hae_jealous",
-      "scenePrompt": "smile, sideways glance, closed mouth, blush, arms behind back,",
+      "scenePrompt": "smile, sideways glance, closed mouth, blush, looking back, hand on own cheek,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458015
@@ -293,7 +293,7 @@
     {
       "id": "1792316458016",
       "name": "Lee Seong-hae_pleading",
-      "scenePrompt": "smile, raised inner eyebrows, open mouth, looking at viewer, own hands together, head tilt,",
+      "scenePrompt": "smile, raised inner eyebrows, open mouth, looking at viewer, head tilt, own hands together,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458016
@@ -301,7 +301,7 @@
     {
       "id": "1792316458017",
       "name": "Lee Seong-hae_forced smiling",
-      "scenePrompt": "smile, closed eyes, sweatdrop, closed mouth, own hands together,",
+      "scenePrompt": "smile, closed eyes, sweatdrop, closed mouth, head down, own hands clasped,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458017
@@ -309,7 +309,7 @@
     {
       "id": "1792745536980",
       "name": "Lee Seong-hae_indifferent",
-      "scenePrompt": "light smile, empty eyes, closed mouth, looking away,",
+      "scenePrompt": "light smile, empty eyes, closed mouth, looking away, upper body turned, arms behind back,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745536980
@@ -317,7 +317,7 @@
     {
       "id": "1792745536981",
       "name": "Lee Seong-hae_guilty",
-      "scenePrompt": "smile, closed eyes, sweatdrop, open mouth, bowing,",
+      "scenePrompt": "smile, closed eyes, sweatdrop, open mouth, 1.15::bowing::, own hands together,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745536981
@@ -325,7 +325,7 @@
     {
       "id": "1792745536982",
       "name": "Lee Seong-hae_pouting",
-      "scenePrompt": "pout, puffy cheeks, blush, looking at viewer, head tilt,",
+      "scenePrompt": "1.15::pout, puffy cheeks::, blush, looking at viewer, head tilt, hands on own hips,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745536982
@@ -333,7 +333,7 @@
     {
       "id": "1792745536983",
       "name": "Lee Seong-hae_angry smile",
-      "scenePrompt": "smile, glowing eyes, shaded face, closed mouth, looking at viewer, head tilt,",
+      "scenePrompt": "smile, glowing eyes, shaded face, closed mouth, looking at viewer, leaning forward, index finger raised,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745536983
@@ -341,7 +341,7 @@
     {
       "id": "1792745536984",
       "name": "Lee Seong-hae_expressionless",
-      "scenePrompt": "light smile, staring, closed mouth, looking at viewer,",
+      "scenePrompt": "light smile, staring, closed mouth, looking at viewer, own hands clasped,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745536984
@@ -349,7 +349,7 @@
     {
       "id": "1792745536985",
       "name": "Lee Seong-hae_tormented",
-      "scenePrompt": "smile, tired, shaded face, closed mouth, sweat, looking down,",
+      "scenePrompt": "smile, tired, shaded face, closed mouth, sweat, looking down, hunched over, hand on own arm,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745536985
@@ -357,7 +357,7 @@
     {
       "id": "1792745536986",
       "name": "Lee Seong-hae_crazy smile",
-      "scenePrompt": "smile, closed eyes, shaded face, open mouth, waving,",
+      "scenePrompt": "smile, closed eyes, shaded face, open mouth, head tilt, 1.2::waving::,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745536986
@@ -365,7 +365,7 @@
     {
       "id": "1792316458018",
       "name": "Lee Ja-heon_suspicious",
-      "scenePrompt": "expressionless, narrowed eyes, closed mouth, looking at viewer, crossed arms,",
+      "scenePrompt": "expressionless, narrowed eyes, closed mouth, looking down, head tilt, crossed arms,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458018
@@ -373,7 +373,7 @@
     {
       "id": "1792316458019",
       "name": "Lee Ja-heon_worried",
-      "scenePrompt": "expressionless, serious, closed mouth, looking back,",
+      "scenePrompt": "expressionless, serious, closed mouth, looking back, upper body turned, outstretched arm,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458019
@@ -381,7 +381,7 @@
     {
       "id": "1792316458020",
       "name": "Lee Ja-heon_relieved",
-      "scenePrompt": "expressionless, half-closed eyes, closed mouth, looking down, own hands together,",
+      "scenePrompt": "expressionless, half-closed eyes, closed mouth, bowing, hand on own chest,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458020
@@ -389,7 +389,7 @@
     {
       "id": "1792316458021",
       "name": "Lee Ja-heon_disgusted",
-      "scenePrompt": "expressionless, frown, closed mouth, looking at viewer, arms at sides,",
+      "scenePrompt": "expressionless, frown, closed mouth, looking at viewer, leaning back, outstretched hand,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458021
@@ -397,7 +397,7 @@
     {
       "id": "1792316458022",
       "name": "Lee Ja-heon_determined",
-      "scenePrompt": "expressionless, serious, closed mouth, looking at viewer, adjusting gloves,",
+      "scenePrompt": "expressionless, serious, closed mouth, looking at viewer, 1.15::cracking knuckles::,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458022
@@ -405,7 +405,7 @@
     {
       "id": "1792316458023",
       "name": "Lee Ja-heon_jealous",
-      "scenePrompt": "expressionless, sideways glance, closed mouth, crossed arms,",
+      "scenePrompt": "expressionless, sideways glance, closed mouth, looking back, crossed arms,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458023
@@ -413,7 +413,7 @@
     {
       "id": "1792316458024",
       "name": "Lee Ja-heon_pleading",
-      "scenePrompt": "expressionless, raised inner eyebrows, closed mouth, pale skin, looking at viewer,",
+      "scenePrompt": "expressionless, raised inner eyebrows, closed mouth, pale skin, looking at viewer, head down, hand on own arm,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458024
@@ -421,7 +421,7 @@
     {
       "id": "1792316458025",
       "name": "Lee Ja-heon_forced smiling",
-      "scenePrompt": "light smile, empty eyes, closed mouth, looking at viewer, hand on own chest,",
+      "scenePrompt": "1.2::light smile::, empty eyes, closed mouth, looking at viewer, head tilt, hand on own chest,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458025
@@ -437,7 +437,7 @@
     {
       "id": "1792745536988",
       "name": "Lee Ja-heon_guilty",
-      "scenePrompt": "expressionless, shaded face, closed mouth, looking down,",
+      "scenePrompt": "expressionless, shaded face, closed mouth, looking down, head down, interlocked fingers,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745536988
@@ -453,7 +453,7 @@
     {
       "id": "1792745536990",
       "name": "Lee Ja-heon_angry smile",
-      "scenePrompt": "light smile, glaring, shaded face, closed mouth, clenched hand,",
+      "scenePrompt": "1.15::light smile::, glaring, shaded face, closed mouth, leaning forward, clenched hand,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745536990
@@ -461,7 +461,7 @@
     {
       "id": "1792745536991",
       "name": "Lee Ja-heon_expressionless",
-      "scenePrompt": "expressionless, staring, closed mouth, looking at viewer,",
+      "scenePrompt": "expressionless, staring, closed mouth, looking at viewer, adjusting necktie,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745536991
@@ -469,7 +469,7 @@
     {
       "id": "1792745536992",
       "name": "Lee Ja-heon_tormented",
-      "scenePrompt": "expressionless, sweat, shaded face, closed mouth, looking at hand, clenched hand,",
+      "scenePrompt": "expressionless, sweat, shaded face, closed mouth, looking at hand, head down, clenched hand,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745536992
@@ -477,7 +477,7 @@
     {
       "id": "1792745536993",
       "name": "Lee Ja-heon_crazy smile",
-      "scenePrompt": "smile, slit pupils, empty eyes, closed mouth, shaded face, looking at viewer,",
+      "scenePrompt": "1.2::smile::, slit pupils, empty eyes, closed mouth, shaded face, looking at viewer, head tilt, outstretched hand,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745536993
@@ -485,7 +485,7 @@
     {
       "id": "1792316458026",
       "name": "Eun Ha-je_suspicious",
-      "scenePrompt": "narrowed eyes, skeptical, closed mouth, looking at viewer, crossed arms,",
+      "scenePrompt": "narrowed eyes, skeptical, closed mouth, looking at viewer, leaning back, crossed arms,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458026
@@ -493,7 +493,7 @@
     {
       "id": "1792316458027",
       "name": "Eun Ha-je_worried",
-      "scenePrompt": "expressionless, sweat, half-closed eyes, looking to the side,",
+      "scenePrompt": "expressionless, sweat, half-closed eyes, looking to the side, head down, hand in pocket,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458027
@@ -501,7 +501,7 @@
     {
       "id": "1792316458028",
       "name": "Eun Ha-je_relieved",
-      "scenePrompt": "light smile, tired, half-closed eyes, sigh, hand in pocket,",
+      "scenePrompt": "light smile, tired, half-closed eyes, sigh, stretching,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458028
@@ -509,7 +509,7 @@
     {
       "id": "1792316458029",
       "name": "Eun Ha-je_disgusted",
-      "scenePrompt": "disgust, narrowed eyes, frown, shaded face, looking away,",
+      "scenePrompt": "disgust, narrowed eyes, frown, shaded face, looking away, upper body turned, hand in own hair,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458029
@@ -517,7 +517,7 @@
     {
       "id": "1792316458030",
       "name": "Eun Ha-je_determined",
-      "scenePrompt": "serious, narrowed eyes, closed mouth, looking down,",
+      "scenePrompt": "serious, narrowed eyes, closed mouth, looking at viewer, leaning forward, pointing,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458030
@@ -525,7 +525,7 @@
     {
       "id": "1792316458031",
       "name": "Eun Ha-je_jealous",
-      "scenePrompt": "smirk, half-closed eyes, sideways glance, crossed arms,",
+      "scenePrompt": "smirk, half-closed eyes, sideways glance, looking back, crossed arms,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458031
@@ -533,7 +533,7 @@
     {
       "id": "1792316458032",
       "name": "Eun Ha-je_pleading",
-      "scenePrompt": "tired, raised inner eyebrows, closed mouth, looking at viewer, hand in pocket,",
+      "scenePrompt": "tired, raised inner eyebrows, closed mouth, looking at viewer, head tilt, palm up,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458032
@@ -541,7 +541,7 @@
     {
       "id": "1792316458033",
       "name": "Eun Ha-je_forced smiling",
-      "scenePrompt": "forced smile, half-closed eyes, looking away,",
+      "scenePrompt": "forced smile, half-closed eyes, looking away, head tilt, hand on own neck,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458033
@@ -549,7 +549,7 @@
     {
       "id": "1792745536994",
       "name": "Eun Ha-je_indifferent",
-      "scenePrompt": "expressionless, half-closed eyes, closed mouth, looking away, hands in pockets,",
+      "scenePrompt": "expressionless, half-closed eyes, closed mouth, looking away, slouching, hands in pockets,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745536994
@@ -557,7 +557,7 @@
     {
       "id": "1792745536995",
       "name": "Eun Ha-je_guilty",
-      "scenePrompt": "empty eyes, shaded face, closed mouth, looking down,",
+      "scenePrompt": "empty eyes, shaded face, closed mouth, looking down, head down, hand in pocket,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745536995
@@ -565,7 +565,7 @@
     {
       "id": "1792745536996",
       "name": "Eun Ha-je_pouting",
-      "scenePrompt": "annoyed, frown, half-closed eyes, sigh, hand in own hair,",
+      "scenePrompt": "annoyed, frown, half-closed eyes, sigh, head back, hand on own forehead,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745536996
@@ -573,7 +573,7 @@
     {
       "id": "1792745536997",
       "name": "Eun Ha-je_angry smile",
-      "scenePrompt": "smirk, glaring, shaded face, closed mouth, looking at viewer, index finger raised,",
+      "scenePrompt": "smirk, glaring, shaded face, closed mouth, looking at viewer, leaning forward, 1.15::index finger raised::,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745536997
@@ -581,7 +581,7 @@
     {
       "id": "1792745536998",
       "name": "Eun Ha-je_expressionless",
-      "scenePrompt": "expressionless, tired, half-closed eyes, closed mouth, looking at viewer,",
+      "scenePrompt": "expressionless, tired, half-closed eyes, closed mouth, looking at viewer, slouching, hand on own hip,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745536998
@@ -589,7 +589,7 @@
     {
       "id": "1792745536999",
       "name": "Eun Ha-je_tormented",
-      "scenePrompt": "clenched teeth, wide-eyed, shaded face, sweat, looking down, clenched hand,",
+      "scenePrompt": "clenched teeth, wide-eyed, shaded face, sweat, looking down, hunched over, clenched hand,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745536999
@@ -597,7 +597,7 @@
     {
       "id": "1792745537000",
       "name": "Eun Ha-je_crazy smile",
-      "scenePrompt": "smirk, glowing eyes, narrowed eyes, shaded face, looking at viewer,",
+      "scenePrompt": "smirk, glowing eyes, narrowed eyes, shaded face, looking at viewer, head tilt, hand in own hair,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537000
@@ -605,7 +605,7 @@
     {
       "id": "1792316458034",
       "name": "Park Min-seong_suspicious",
-      "scenePrompt": "narrowed eyes, sweat, frown, sideways glance, hand on own chin,",
+      "scenePrompt": "narrowed eyes, sweat, frown, sideways glance, leaning back, hand on own chin,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458034
@@ -613,7 +613,7 @@
     {
       "id": "1792316458035",
       "name": "Park Min-seong_worried",
-      "scenePrompt": "worried, raised inner eyebrows, sweat, closed mouth, looking down, own hands clasped,",
+      "scenePrompt": "worried, raised inner eyebrows, sweat, closed mouth, looking down, head down, own hands clasped,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458035
@@ -621,7 +621,7 @@
     {
       "id": "1792316458036",
       "name": "Park Min-seong_relieved",
-      "scenePrompt": "smile, tears, closed eyes, open mouth, hand on own chest,",
+      "scenePrompt": "smile, tears, closed eyes, open mouth, head back, spread arms,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458036
@@ -629,7 +629,7 @@
     {
       "id": "1792316458037",
       "name": "Park Min-seong_disgusted",
-      "scenePrompt": "disgust, sweat, wavy mouth, looking away, trembling,",
+      "scenePrompt": "disgust, sweat, wavy mouth, looking away, leaning back, hands up,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458037
@@ -645,7 +645,7 @@
     {
       "id": "1792316458039",
       "name": "Park Min-seong_jealous",
-      "scenePrompt": "pout, sideways glance, blush, scratching cheek,",
+      "scenePrompt": "pout, sideways glance, blush, looking back, scratching cheek,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458039
@@ -653,7 +653,7 @@
     {
       "id": "1792316458040",
       "name": "Park Min-seong_pleading",
-      "scenePrompt": "raised inner eyebrows, tearing up, open mouth, sweat, looking at viewer, own hands together,",
+      "scenePrompt": "raised inner eyebrows, tearing up, open mouth, sweat, looking at viewer, leaning forward, own hands together,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458040
@@ -661,7 +661,7 @@
     {
       "id": "1792316458041",
       "name": "Park Min-seong_forced smiling",
-      "scenePrompt": "forced smile, sweat, nervous, looking to the side,",
+      "scenePrompt": "forced smile, sweat, nervous, looking to the side, hunched over, hand on own neck,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458041
@@ -669,7 +669,7 @@
     {
       "id": "1792745537001",
       "name": "Park Min-seong_indifferent",
-      "scenePrompt": "light smile, closed eyes, sweatdrop, waving,",
+      "scenePrompt": "light smile, closed eyes, sweatdrop, head tilt, waving,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537001
@@ -677,7 +677,7 @@
     {
       "id": "1792745537002",
       "name": "Park Min-seong_guilty",
-      "scenePrompt": "guilt, sweat, wavy mouth, looking down, scratching head,",
+      "scenePrompt": "guilt, sweat, wavy mouth, looking down, head down, scratching head,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537002
@@ -685,7 +685,7 @@
     {
       "id": "1792745537003",
       "name": "Park Min-seong_pouting",
-      "scenePrompt": "pout, sulking, sweatdrop, looking to the side,",
+      "scenePrompt": "pout, sulking, sweatdrop, looking to the side, slouching, hand on own cheek,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537003
@@ -693,7 +693,7 @@
     {
       "id": "1792745537004",
       "name": "Park Min-seong_angry smile",
-      "scenePrompt": "smile, furrowed brow, clenched teeth, sweat, clenched hands,",
+      "scenePrompt": "smile, furrowed brow, clenched teeth, sweat, leaning forward, clenched hands,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537004
@@ -701,7 +701,7 @@
     {
       "id": "1792745537005",
       "name": "Park Min-seong_expressionless",
-      "scenePrompt": "expressionless, closed mouth, looking down,",
+      "scenePrompt": "expressionless, closed mouth, looking down, head down, hand on own chest,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537005
@@ -709,7 +709,7 @@
     {
       "id": "1792745537006",
       "name": "Park Min-seong_tormented",
-      "scenePrompt": "streaming tears, clenched teeth, furrowed brow, sweat, head down, clenched hands,",
+      "scenePrompt": "streaming tears, clenched teeth, furrowed brow, sweat, hunched over, hands on own head,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537006
@@ -717,7 +717,7 @@
     {
       "id": "1792745537007",
       "name": "Park Min-seong_crazy smile",
-      "scenePrompt": "grin, wide-eyed, nervous sweating, constricted pupils, trembling,",
+      "scenePrompt": "grin, wide-eyed, nervous sweating, constricted pupils, trembling, thumbs up,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537007
@@ -725,7 +725,7 @@
     {
       "id": "1792316458042",
       "name": "Baek Sa-heon_suspicious",
-      "scenePrompt": "narrowed eyes, frown, closed mouth, looking to the side, hand on own face, eyepatch,",
+      "scenePrompt": "narrowed eyes, frown, closed mouth, looking to the side, leaning forward, 1.15::hand on own face::, eyepatch,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458042
@@ -733,7 +733,7 @@
     {
       "id": "1792316458043",
       "name": "Baek Sa-heon_worried",
-      "scenePrompt": "nervous sweating, raised inner eyebrows, wavy mouth, pale skin, sideways glance, eyepatch,",
+      "scenePrompt": "nervous sweating, raised inner eyebrows, wavy mouth, pale skin, sideways glance, hunched over, hand on own neck, eyepatch,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458043
@@ -741,7 +741,7 @@
     {
       "id": "1792316458044",
       "name": "Baek Sa-heon_relieved",
-      "scenePrompt": "smirk, half-closed eyes, sweat, looking at viewer, palm up, eyepatch,",
+      "scenePrompt": "smirk, half-closed eyes, sweat, looking at viewer, head tilt, palm up, eyepatch,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458044
@@ -749,7 +749,7 @@
     {
       "id": "1792316458045",
       "name": "Baek Sa-heon_disgusted",
-      "scenePrompt": "disdain, smirk, half-closed eyes, looking down, eyepatch,",
+      "scenePrompt": "disdain, smirk, half-closed eyes, looking down, leaning back, hand on own hip, eyepatch,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458045
@@ -757,7 +757,7 @@
     {
       "id": "1792316458046",
       "name": "Baek Sa-heon_determined",
-      "scenePrompt": "clenched teeth, glaring, furrowed brow, blush, pointing at viewer, eyepatch,",
+      "scenePrompt": "clenched teeth, glaring, furrowed brow, blush, leaning forward, pointing at viewer, eyepatch,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458046
@@ -765,7 +765,7 @@
     {
       "id": "1792316458047",
       "name": "Baek Sa-heon_jealous",
-      "scenePrompt": "smirk, narrowed eyes, sideways glance, hand on own chin, eyepatch,",
+      "scenePrompt": "smirk, narrowed eyes, sideways glance, head tilt, hand on own chin, eyepatch,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458047
@@ -773,7 +773,7 @@
     {
       "id": "1792316458048",
       "name": "Baek Sa-heon_pleading",
-      "scenePrompt": "forced smile, nervous sweating, pale skin, head tilt, own hands together, eyepatch,",
+      "scenePrompt": "forced smile, nervous sweating, pale skin, bowing, own hands together, eyepatch,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458048
@@ -781,7 +781,7 @@
     {
       "id": "1792316458049",
       "name": "Baek Sa-heon_forced smiling",
-      "scenePrompt": "forced smile, clenched teeth, sweat, shaded face, clenched hands, eyepatch,",
+      "scenePrompt": "forced smile, clenched teeth, sweat, shaded face, head down, clenched hands, eyepatch,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458049
@@ -789,7 +789,7 @@
     {
       "id": "1792745537008",
       "name": "Baek Sa-heon_indifferent",
-      "scenePrompt": "expressionless, half-closed eyes, closed mouth, looking away, hands in pockets, eyepatch,",
+      "scenePrompt": "expressionless, half-closed eyes, closed mouth, looking away, slouching, hands in pockets, eyepatch,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537008
@@ -797,7 +797,7 @@
     {
       "id": "1792745537009",
       "name": "Baek Sa-heon_guilty",
-      "scenePrompt": "blush, wavy mouth, averting eyes, sweatdrop, scratching cheek, eyepatch,",
+      "scenePrompt": "blush, wavy mouth, averting eyes, sweatdrop, upper body turned, scratching cheek, eyepatch,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537009
@@ -813,7 +813,7 @@
     {
       "id": "1792745537011",
       "name": "Baek Sa-heon_angry smile",
-      "scenePrompt": "smile, constricted pupils, glaring, shaded face, anger vein, head tilt, eyepatch,",
+      "scenePrompt": "smile, constricted pupils, glaring, shaded face, anger vein, head tilt, index finger raised, eyepatch,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537011
@@ -821,7 +821,7 @@
     {
       "id": "1792745537012",
       "name": "Baek Sa-heon_expressionless",
-      "scenePrompt": "expressionless, staring, looking to the side, hand over own mouth, eyepatch,",
+      "scenePrompt": "expressionless, staring, looking to the side, hunched over, hand over own mouth, eyepatch,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537012
@@ -829,7 +829,7 @@
     {
       "id": "1792745537013",
       "name": "Baek Sa-heon_tormented",
-      "scenePrompt": "scared, constricted pupils, nervous sweating, clenched teeth, pale skin, trembling, eyepatch,",
+      "scenePrompt": "scared, constricted pupils, nervous sweating, clenched teeth, pale skin, trembling, hands up, eyepatch,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537013
@@ -837,7 +837,7 @@
     {
       "id": "1792745537014",
       "name": "Baek Sa-heon_crazy smile",
-      "scenePrompt": "crazy smile, wide-eyed, shaded face, looking at viewer, eyepatch,",
+      "scenePrompt": "crazy smile, wide-eyed, shaded face, looking at viewer, head back, spread arms, eyepatch,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537014
@@ -845,7 +845,7 @@
     {
       "id": "1792316458050",
       "name": "Go Young-eun_suspicious",
-      "scenePrompt": "furrowed brow, narrowed eyes, closed mouth, looking to the side, hand on own chin,",
+      "scenePrompt": "furrowed brow, narrowed eyes, closed mouth, looking to the side, head tilt, hand on own chin,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458050
@@ -853,7 +853,7 @@
     {
       "id": "1792316458051",
       "name": "Go Young-eun_worried",
-      "scenePrompt": "worried, raised inner eyebrows, open mouth, leaning forward, reaching towards viewer,",
+      "scenePrompt": "worried, raised inner eyebrows, open mouth, leaning forward, 1.15::reaching towards viewer::,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458051
@@ -861,7 +861,7 @@
     {
       "id": "1792316458052",
       "name": "Go Young-eun_relieved",
-      "scenePrompt": "smile, tearing up, tired, half-closed eyes, hand on own chest,",
+      "scenePrompt": "smile, tearing up, tired, half-closed eyes, head tilt, hand on own chest,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458052
@@ -869,7 +869,7 @@
     {
       "id": "1792316458053",
       "name": "Go Young-eun_disgusted",
-      "scenePrompt": "disgust, glaring, frown, shaded face, outstretched hand,",
+      "scenePrompt": "disgust, glaring, frown, shaded face, upper body turned, outstretched hand,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458053
@@ -877,7 +877,7 @@
     {
       "id": "1792316458054",
       "name": "Go Young-eun_determined",
-      "scenePrompt": "serious, v-shaped eyebrows, open mouth, looking at viewer, pointing at viewer,",
+      "scenePrompt": "serious, v-shaped eyebrows, open mouth, looking at viewer, leaning forward, pointing at viewer,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458054
@@ -885,7 +885,7 @@
     {
       "id": "1792316458055",
       "name": "Go Young-eun_jealous",
-      "scenePrompt": "pout, blush, looking to the side, hand on own arm,",
+      "scenePrompt": "pout, blush, looking to the side, hunched over, hand on own arm,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458055
@@ -893,7 +893,7 @@
     {
       "id": "1792316458056",
       "name": "Go Young-eun_pleading",
-      "scenePrompt": "raised inner eyebrows, tearing up, open mouth, looking at viewer, own hands clasped,",
+      "scenePrompt": "raised inner eyebrows, tearing up, open mouth, looking at viewer, leaning forward, own hands clasped,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458056
@@ -901,7 +901,7 @@
     {
       "id": "1792316458057",
       "name": "Go Young-eun_forced smiling",
-      "scenePrompt": "forced smile, sweatdrop, looking away, scratching cheek,",
+      "scenePrompt": "forced smile, sweatdrop, looking away, head tilt, scratching cheek,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458057
@@ -909,7 +909,7 @@
     {
       "id": "1792745537015",
       "name": "Go Young-eun_indifferent",
-      "scenePrompt": "half-closed eyes, sigh, tired, closed mouth, looking away,",
+      "scenePrompt": "half-closed eyes, sigh, tired, closed mouth, looking away, shrugging,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537015
@@ -917,7 +917,7 @@
     {
       "id": "1792745537016",
       "name": "Go Young-eun_guilty",
-      "scenePrompt": "guilt, tearing up, looking down, hand over own mouth,",
+      "scenePrompt": "guilt, tearing up, looking down, head down, hand over own mouth,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537016
@@ -925,7 +925,7 @@
     {
       "id": "1792745537017",
       "name": "Go Young-eun_pouting",
-      "scenePrompt": "pout, annoyed, half-closed eyes, sideways glance, crossed arms,",
+      "scenePrompt": "pout, annoyed, half-closed eyes, sideways glance, leaning back, crossed arms,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537017
@@ -933,7 +933,7 @@
     {
       "id": "1792745537018",
       "name": "Go Young-eun_angry smile",
-      "scenePrompt": "smile, half-closed eyes, shaded face, closed mouth,",
+      "scenePrompt": "smile, half-closed eyes, shaded face, closed mouth, bowing, own hands together,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537018
@@ -941,7 +941,7 @@
     {
       "id": "1792745537019",
       "name": "Go Young-eun_expressionless",
-      "scenePrompt": "expressionless, serious, closed mouth, looking down, tucking hair,",
+      "scenePrompt": "expressionless, serious, closed mouth, looking down, head down, 1.15::tucking hair::,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537019
@@ -949,7 +949,7 @@
     {
       "id": "1792745537020",
       "name": "Go Young-eun_tormented",
-      "scenePrompt": "tears, clenched teeth, furrowed brow, shaded face, looking down, clenched hands,",
+      "scenePrompt": "tears, clenched teeth, furrowed brow, shaded face, looking down, hunched over, clenched hands,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537020
@@ -957,7 +957,7 @@
     {
       "id": "1792745537021",
       "name": "Go Young-eun_crazy smile",
-      "scenePrompt": "crazy smile, tired, empty eyes, sweat, hand on own forehead,",
+      "scenePrompt": "crazy smile, tired, empty eyes, sweat, head back, hand on own forehead,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537021
@@ -965,7 +965,7 @@
     {
       "id": "1792316458058",
       "name": "Kang I-hak_suspicious",
-      "scenePrompt": "smile, narrowed eyes, closed mouth, head tilt, hand on own chin,",
+      "scenePrompt": "smile, narrowed eyes, closed mouth, looking at viewer, leaning forward, hand on own chin,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458058
@@ -973,7 +973,7 @@
     {
       "id": "1792316458059",
       "name": "Kang I-hak_worried",
-      "scenePrompt": "forced smile, sweatdrop, raised inner eyebrows, looking up, finger to cheek,",
+      "scenePrompt": "forced smile, sweatdrop, raised inner eyebrows, looking up, head tilt, hand on own cheek,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458059
@@ -981,7 +981,7 @@
     {
       "id": "1792316458060",
       "name": "Kang I-hak_relieved",
-      "scenePrompt": "open mouth, smile, closed eyes, blush, hand on own chest,",
+      "scenePrompt": "smile, closed eyes, open mouth, blush, head back, hand on own chest,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458060
@@ -989,7 +989,7 @@
     {
       "id": "1792316458061",
       "name": "Kang I-hak_disgusted",
-      "scenePrompt": "smile, half-closed eyes, disdain, closed mouth, head tilt, looking at viewer,",
+      "scenePrompt": "smile, half-closed eyes, disdain, closed mouth, looking down, leaning back, waving,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458061
@@ -997,7 +997,7 @@
     {
       "id": "1792316458062",
       "name": "Kang I-hak_determined",
-      "scenePrompt": "smile, v-shaped eyebrows, confident, looking at viewer, money gesture,",
+      "scenePrompt": "grin, v-shaped eyebrows, confident, looking at viewer, leaning forward, arm up,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458062
@@ -1005,7 +1005,7 @@
     {
       "id": "1792316458063",
       "name": "Kang I-hak_jealous",
-      "scenePrompt": "smile, sideways glance, narrowed eyes, closed mouth, jealous, money gesture,",
+      "scenePrompt": "smile, sideways glance, narrowed eyes, closed mouth, jealous, looking back, crossed arms,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458063
@@ -1013,7 +1013,7 @@
     {
       "id": "1792316458064",
       "name": "Kang I-hak_pleading",
-      "scenePrompt": "smile, sparkling eyes, raised eyebrows, blush, leaning forward, own hands clasped,",
+      "scenePrompt": "smile, sparkling eyes, raised eyebrows, blush, leaning forward, own hands together,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458064
@@ -1021,7 +1021,7 @@
     {
       "id": "1792316458065",
       "name": "Kang I-hak_forced smiling",
-      "scenePrompt": "forced smile, sweatdrop, closed eyes, head tilt, own hands together,",
+      "scenePrompt": "forced smile, sweatdrop, closed eyes, head tilt, scratching cheek,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458065
@@ -1029,7 +1029,7 @@
     {
       "id": "1792745537022",
       "name": "Kang I-hak_indifferent",
-      "scenePrompt": "smile, half-closed eyes, closed mouth, looking at viewer, thumbs up,",
+      "scenePrompt": "smile, half-closed eyes, closed mouth, looking at viewer, leaning back, 1.15::thumbs up::,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537022
@@ -1037,7 +1037,7 @@
     {
       "id": "1792745537023",
       "name": "Kang I-hak_guilty",
-      "scenePrompt": "open mouth, smile, closed eyes, sweatdrop, bowing,",
+      "scenePrompt": "open mouth, smile, closed eyes, sweatdrop, 1.15::bowing::, arms at sides,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537023
@@ -1045,7 +1045,7 @@
     {
       "id": "1792745537024",
       "name": "Kang I-hak_pouting",
-      "scenePrompt": "pout, puffy cheeks, looking to the side, crossed arms,",
+      "scenePrompt": "pout, puffy cheeks, looking to the side, upper body turned, crossed arms,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537024
@@ -1053,7 +1053,7 @@
     {
       "id": "1792745537025",
       "name": "Kang I-hak_angry smile",
-      "scenePrompt": "smile, glaring, shaded face, closed mouth, looking at viewer, index finger raised,",
+      "scenePrompt": "smile, glaring, shaded face, closed mouth, looking at viewer, leaning forward, pointing at viewer,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537025
@@ -1061,7 +1061,7 @@
     {
       "id": "1792745537026",
       "name": "Kang I-hak_expressionless",
-      "scenePrompt": "expressionless, staring, closed mouth, looking at viewer,",
+      "scenePrompt": "1.15::expressionless::, staring, closed mouth, looking down, head down, palm up,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537026
@@ -1069,7 +1069,7 @@
     {
       "id": "1792745537027",
       "name": "Kang I-hak_tormented",
-      "scenePrompt": "forced smile, wide-eyed, sweat, constricted pupils, trembling, hand on own forehead,",
+      "scenePrompt": "forced smile, wide-eyed, sweat, constricted pupils, trembling, hunched over, hand on own forehead,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537027
@@ -1077,7 +1077,7 @@
     {
       "id": "1792745537028",
       "name": "Kang I-hak_crazy smile",
-      "scenePrompt": "grin, sparkling eyes, crazy eyes, blush, leaning forward, money gesture,",
+      "scenePrompt": "grin, sparkling eyes, crazy eyes, blush, leaning forward, reaching towards viewer,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537028
@@ -1085,7 +1085,7 @@
     {
       "id": "1792316458066",
       "name": "Jang Heo-un_suspicious",
-      "scenePrompt": "narrowed eyes, furrowed brow, closed mouth, looking at viewer, slouching,",
+      "scenePrompt": "narrowed eyes, furrowed brow, closed mouth, looking at viewer, slouching, crossed arms,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458066
@@ -1093,7 +1093,7 @@
     {
       "id": "1792316458067",
       "name": "Jang Heo-un_worried",
-      "scenePrompt": "worried, furrowed brow, raised inner eyebrows, closed mouth, looking down, own hands clasped,",
+      "scenePrompt": "worried, furrowed brow, raised inner eyebrows, closed mouth, looking down, head down, own hands clasped,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458067
@@ -1101,7 +1101,7 @@
     {
       "id": "1792316458068",
       "name": "Jang Heo-un_relieved",
-      "scenePrompt": "light smile, half-closed eyes, tired, closed mouth, looking down, hand on own chest,",
+      "scenePrompt": "light smile, half-closed eyes, tired, closed mouth, head back, hand on own chest,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458068
@@ -1109,7 +1109,7 @@
     {
       "id": "1792316458069",
       "name": "Jang Heo-un_disgusted",
-      "scenePrompt": "clenched teeth, shaded face, half-closed eyes, looking away, clenched hand,",
+      "scenePrompt": "clenched teeth, shaded face, half-closed eyes, looking away, upper body turned, clenched hand,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458069
@@ -1117,7 +1117,7 @@
     {
       "id": "1792316458070",
       "name": "Jang Heo-un_determined",
-      "scenePrompt": "serious, furrowed brow, closed mouth, looking at viewer, clenched hand,",
+      "scenePrompt": "serious, furrowed brow, closed mouth, looking at viewer, clenched hands,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458070
@@ -1125,7 +1125,7 @@
     {
       "id": "1792316458071",
       "name": "Jang Heo-un_jealous",
-      "scenePrompt": "sad smile, half-closed eyes, closed mouth, looking to the side, crossed arms,",
+      "scenePrompt": "sad smile, half-closed eyes, closed mouth, looking to the side, slouching, hand on own arm,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458071
@@ -1133,7 +1133,7 @@
     {
       "id": "1792316458072",
       "name": "Jang Heo-un_pleading",
-      "scenePrompt": "raised inner eyebrows, parted lips, tearing up, looking at viewer, own hands clasped,",
+      "scenePrompt": "raised inner eyebrows, parted lips, tearing up, looking at viewer, leaning forward, arm up,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458072
@@ -1141,7 +1141,7 @@
     {
       "id": "1792316458073",
       "name": "Jang Heo-un_forced smiling",
-      "scenePrompt": "forced smile, tired, half-closed eyes, looking down, hand on own neck,",
+      "scenePrompt": "1.1::forced smile::, tired, half-closed eyes, looking down, head tilt, hand on own neck,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458073
@@ -1149,7 +1149,7 @@
     {
       "id": "1792745537029",
       "name": "Jang Heo-un_indifferent",
-      "scenePrompt": "expressionless, half-closed eyes, empty eyes, closed mouth, looking away,",
+      "scenePrompt": "expressionless, half-closed eyes, empty eyes, closed mouth, looking away, slouching, arms at sides,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537029
@@ -1157,7 +1157,7 @@
     {
       "id": "1792745537030",
       "name": "Jang Heo-un_guilty",
-      "scenePrompt": "guilt, furrowed brow, looking down, closed mouth, bowing,",
+      "scenePrompt": "guilt, furrowed brow, closed mouth, looking down, 1.2::bowing::, arms at sides,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537030
@@ -1165,7 +1165,7 @@
     {
       "id": "1792745537031",
       "name": "Jang Heo-un_pouting",
-      "scenePrompt": "frown, half-closed eyes, closed mouth, looking away, crossed arms,",
+      "scenePrompt": "frown, half-closed eyes, closed mouth, looking away, head down, crossed arms,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537031
@@ -1173,7 +1173,7 @@
     {
       "id": "1792745537032",
       "name": "Jang Heo-un_angry smile",
-      "scenePrompt": "light smile, glaring, shaded face, looking down, clenched hand,",
+      "scenePrompt": "light smile, glaring, shaded face, looking down, hunched over, clenched hand,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537032
@@ -1181,7 +1181,7 @@
     {
       "id": "1792745537033",
       "name": "Jang Heo-un_expressionless",
-      "scenePrompt": "expressionless, half-closed eyes, closed mouth, shaded face, looking down,",
+      "scenePrompt": "expressionless, half-closed eyes, closed mouth, shaded face, looking down, head down, own hands together,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537033
@@ -1189,7 +1189,7 @@
     {
       "id": "1792745537034",
       "name": "Jang Heo-un_tormented",
-      "scenePrompt": "wide-eyed, clenched teeth, turn pale, sweat, arm up,",
+      "scenePrompt": "wide-eyed, clenched teeth, turn pale, sweat, trembling, 1.2::arm up::,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537034
@@ -1197,7 +1197,7 @@
     {
       "id": "1792745537035",
       "name": "Jang Heo-un_crazy smile",
-      "scenePrompt": "smile, wide-eyed, tears, constricted pupils, shaded face, looking at viewer,",
+      "scenePrompt": "1.1::smile::, wide-eyed, tears, constricted pupils, shaded face, leaning forward, reaching towards viewer,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537035
@@ -1205,7 +1205,7 @@
     {
       "id": "1792316458074",
       "name": "Kwak Je-gang_suspicious",
-      "scenePrompt": "smile, narrowed eyes, head tilt, looking at viewer, hand on own chin, glasses,",
+      "scenePrompt": "smile, narrowed eyes, looking at viewer, head tilt, hand on own chin, glasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458074
@@ -1213,7 +1213,7 @@
     {
       "id": "1792316458075",
       "name": "Kwak Je-gang_worried",
-      "scenePrompt": "furrowed brow, parted lips, raised inner eyebrows, looking down, glasses,",
+      "scenePrompt": "furrowed brow, parted lips, raised inner eyebrows, looking down, head down, hand on own forehead, glasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458075
@@ -1221,7 +1221,7 @@
     {
       "id": "1792316458076",
       "name": "Kwak Je-gang_relieved",
-      "scenePrompt": "smile, half-closed eyes, sweat, open mouth, hand on own chest, glasses,",
+      "scenePrompt": "smile, half-closed eyes, sweat, open mouth, head back, hand on own chest, glasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458076
@@ -1229,7 +1229,7 @@
     {
       "id": "1792316458077",
       "name": "Kwak Je-gang_disgusted",
-      "scenePrompt": "disdain, half-closed eyes, smirk, looking away, shrugging, glasses,",
+      "scenePrompt": "disdain, half-closed eyes, smirk, looking away, leaning back, shrugging, glasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458077
@@ -1237,7 +1237,7 @@
     {
       "id": "1792316458078",
       "name": "Kwak Je-gang_determined",
-      "scenePrompt": "v-shaped eyebrows, open mouth, sparkling eyes, looking at viewer, clenched hand, glasses,",
+      "scenePrompt": "v-shaped eyebrows, open mouth, sparkling eyes, looking at viewer, leaning forward, clenched hand, glasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458078
@@ -1245,7 +1245,7 @@
     {
       "id": "1792316458079",
       "name": "Kwak Je-gang_jealous",
-      "scenePrompt": "pout, sideways glance, narrowed eyes, glasses,",
+      "scenePrompt": "pout, sideways glance, narrowed eyes, looking back, crossed arms, glasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458079
@@ -1253,7 +1253,7 @@
     {
       "id": "1792316458080",
       "name": "Kwak Je-gang_pleading",
-      "scenePrompt": "open mouth, smile, raised eyebrows, sweatdrop, own hands together, glasses,",
+      "scenePrompt": "open mouth, smile, raised eyebrows, sweatdrop, leaning forward, own hands together, glasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458080
@@ -1261,7 +1261,7 @@
     {
       "id": "1792316458081",
       "name": "Kwak Je-gang_forced smiling",
-      "scenePrompt": "forced smile, sweatdrop, closed eyes, head tilt, glasses,",
+      "scenePrompt": "forced smile, sweatdrop, closed eyes, head tilt, scratching head, glasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458081
@@ -1269,7 +1269,7 @@
     {
       "id": "1792745537036",
       "name": "Kwak Je-gang_indifferent",
-      "scenePrompt": "light smile, half-closed eyes, closed mouth, looking to the side, hand in pocket, glasses,",
+      "scenePrompt": "light smile, half-closed eyes, closed mouth, looking to the side, leaning back, hands in pockets, glasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537036
@@ -1277,7 +1277,7 @@
     {
       "id": "1792745537037",
       "name": "Kwak Je-gang_guilty",
-      "scenePrompt": "light smile, looking down, sweatdrop, scratching head, glasses,",
+      "scenePrompt": "light smile, looking down, sweatdrop, head down, hand on own neck, glasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537037
@@ -1285,7 +1285,7 @@
     {
       "id": "1792745537038",
       "name": "Kwak Je-gang_pouting",
-      "scenePrompt": "pout, annoyed, looking to the side, crossed arms, glasses,",
+      "scenePrompt": "pout, annoyed, looking to the side, upper body turned, crossed arms, glasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537038
@@ -1293,7 +1293,7 @@
     {
       "id": "1792745537039",
       "name": "Kwak Je-gang_angry smile",
-      "scenePrompt": "smile, shaded face, half-closed eyes, closed mouth, looking at viewer, glasses,",
+      "scenePrompt": "smile, shaded face, half-closed eyes, closed mouth, looking at viewer, leaning forward, steepled fingers, glasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537039
@@ -1301,7 +1301,7 @@
     {
       "id": "1792745537040",
       "name": "Kwak Je-gang_expressionless",
-      "scenePrompt": "expressionless, staring, closed mouth, looking at viewer, glasses,",
+      "scenePrompt": "1.15::expressionless::, staring, closed mouth, looking at viewer, head tilt, hand on own chin, glasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537040
@@ -1309,7 +1309,7 @@
     {
       "id": "1792745537041",
       "name": "Kwak Je-gang_tormented",
-      "scenePrompt": "tearing up, raised eyebrows, trembling, blush, covering own mouth, glasses,",
+      "scenePrompt": "tearing up, raised eyebrows, trembling, blush, hunched over, 1.15::covering own mouth::, glasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537041
@@ -1317,7 +1317,7 @@
     {
       "id": "1792745537042",
       "name": "Kwak Je-gang_crazy smile",
-      "scenePrompt": "crazy smile, crazy eyes, blush, open mouth, arms up, glasses,",
+      "scenePrompt": "crazy smile, crazy eyes, blush, open mouth, head back, arms up, glasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537042
@@ -1325,7 +1325,7 @@
     {
       "id": "1792316458082",
       "name": "Lee Yeon-hwa_suspicious",
-      "scenePrompt": "narrowed eyes, skeptical, closed mouth, looking at viewer, hand on own chin, glasses,",
+      "scenePrompt": "narrowed eyes, skeptical, closed mouth, looking at viewer, head tilt, hand on own chin, glasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458082
@@ -1333,7 +1333,7 @@
     {
       "id": "1792316458083",
       "name": "Lee Yeon-hwa_worried",
-      "scenePrompt": "worried, lip biting, raised inner eyebrows, looking down, own hands together, glasses,",
+      "scenePrompt": "worried, lip biting, raised inner eyebrows, looking down, head down, own hands together, glasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458083
@@ -1341,7 +1341,7 @@
     {
       "id": "1792316458084",
       "name": "Lee Yeon-hwa_relieved",
-      "scenePrompt": "sigh, half-closed eyes, light smile, tired, glasses,",
+      "scenePrompt": "sigh, half-closed eyes, light smile, tired, head back, hand on own chest, glasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458084
@@ -1349,7 +1349,7 @@
     {
       "id": "1792316458085",
       "name": "Lee Yeon-hwa_disgusted",
-      "scenePrompt": "disgust, wide-eyed, furrowed brow, shaded face, covering own mouth, glasses,",
+      "scenePrompt": "disgust, wide-eyed, furrowed brow, shaded face, leaning back, 1.15::covering own mouth::, glasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458085
@@ -1357,7 +1357,7 @@
     {
       "id": "1792316458086",
       "name": "Lee Yeon-hwa_determined",
-      "scenePrompt": "serious, furrowed brow, staring, closed mouth, looking at viewer, outstretched arm, glasses,",
+      "scenePrompt": "serious, furrowed brow, staring, closed mouth, looking at viewer, spread arms, glasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458086
@@ -1365,7 +1365,7 @@
     {
       "id": "1792316458087",
       "name": "Lee Yeon-hwa_jealous",
-      "scenePrompt": "half-closed eyes, sideways glance, tired, closed mouth, glasses,",
+      "scenePrompt": "half-closed eyes, sideways glance, tired, closed mouth, looking back, crossed arms, glasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458087
@@ -1373,7 +1373,7 @@
     {
       "id": "1792316458088",
       "name": "Lee Yeon-hwa_pleading",
-      "scenePrompt": "raised inner eyebrows, parted lips, worried, looking at viewer, outstretched hand, glasses,",
+      "scenePrompt": "raised inner eyebrows, parted lips, worried, looking at viewer, leaning forward, 1.15::reaching towards viewer::, glasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458088
@@ -1381,7 +1381,7 @@
     {
       "id": "1792316458089",
       "name": "Lee Yeon-hwa_forced smiling",
-      "scenePrompt": "forced smile, tired, half-closed eyes, sweatdrop, own hands together, glasses,",
+      "scenePrompt": "1.1::forced smile::, tired, half-closed eyes, sweatdrop, head tilt, hand on own cheek, glasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458089
@@ -1389,7 +1389,7 @@
     {
       "id": "1792745537043",
       "name": "Lee Yeon-hwa_indifferent",
-      "scenePrompt": "expressionless, half-closed eyes, tired, looking away, glasses,",
+      "scenePrompt": "expressionless, half-closed eyes, tired, looking away, slouching, hand on own neck, glasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537043
@@ -1397,7 +1397,7 @@
     {
       "id": "1792745537044",
       "name": "Lee Yeon-hwa_guilty",
-      "scenePrompt": "guilt, looking down, lip biting, shaded face, holding own arm, glasses,",
+      "scenePrompt": "guilt, looking down, lip biting, shaded face, head down, hand on own arm, glasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537044
@@ -1405,7 +1405,7 @@
     {
       "id": "1792745537045",
       "name": "Lee Yeon-hwa_pouting",
-      "scenePrompt": "annoyed, open mouth, furrowed brow, looking at viewer, hands on own hips, glasses,",
+      "scenePrompt": "annoyed, open mouth, furrowed brow, looking at viewer, leaning forward, hands on own hips, glasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537045
@@ -1413,7 +1413,7 @@
     {
       "id": "1792745537046",
       "name": "Lee Yeon-hwa_angry smile",
-      "scenePrompt": "light smile, narrowed eyes, shaded face, closed mouth, looking at viewer, crossed arms, glasses,",
+      "scenePrompt": "light smile, narrowed eyes, shaded face, closed mouth, looking at viewer, head tilt, crossed arms, glasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537046
@@ -1421,7 +1421,7 @@
     {
       "id": "1792745537047",
       "name": "Lee Yeon-hwa_expressionless",
-      "scenePrompt": "expressionless, half-closed eyes, tired, closed mouth, looking at viewer, glasses,",
+      "scenePrompt": "expressionless, half-closed eyes, tired, closed mouth, looking at viewer, own hands together, glasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537047
@@ -1429,7 +1429,7 @@
     {
       "id": "1792745537048",
       "name": "Lee Yeon-hwa_tormented",
-      "scenePrompt": "clenched teeth, furrowed brow, tearing up, shaded face, looking down, clenched hand, glasses,",
+      "scenePrompt": "clenched teeth, furrowed brow, tearing up, shaded face, looking down, hunched over, clenched hands, glasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537048
@@ -1437,7 +1437,7 @@
     {
       "id": "1792745537049",
       "name": "Lee Yeon-hwa_crazy smile",
-      "scenePrompt": "grin, sparkling eyes, shaded face, sweat, tired, glasses,",
+      "scenePrompt": "1.15::grin::, sparkling eyes, shaded face, sweat, tired, leaning forward, hand on own chin, glasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537049
@@ -1445,7 +1445,7 @@
     {
       "id": "1792316458090",
       "name": "Lee Byeong-jin_suspicious",
-      "scenePrompt": "narrowed eyes, frown, sweat, looking at viewer, adjusting eyewear, glasses,",
+      "scenePrompt": "narrowed eyes, frown, sweat, looking at viewer, leaning forward, adjusting eyewear, glasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458090
@@ -1453,7 +1453,7 @@
     {
       "id": "1792316458091",
       "name": "Lee Byeong-jin_worried",
-      "scenePrompt": "worried, sweat, raised inner eyebrows, wavy mouth, adjusting necktie, glasses,",
+      "scenePrompt": "worried, sweat, raised inner eyebrows, wavy mouth, head down, adjusting necktie, glasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458091
@@ -1461,7 +1461,7 @@
     {
       "id": "1792316458092",
       "name": "Lee Byeong-jin_relieved",
-      "scenePrompt": "streaming tears, open mouth, smile, snot, looking up, glasses,",
+      "scenePrompt": "streaming tears, open mouth, smile, snot, looking up, head back, spread arms, glasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458092
@@ -1469,7 +1469,7 @@
     {
       "id": "1792316458093",
       "name": "Lee Byeong-jin_disgusted",
-      "scenePrompt": "disgust, furrowed brow, sweat, wavy mouth, leaning back, glasses,",
+      "scenePrompt": "disgust, furrowed brow, sweat, wavy mouth, leaning back, hands up, glasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458093
@@ -1477,7 +1477,7 @@
     {
       "id": "1792316458094",
       "name": "Lee Byeong-jin_determined",
-      "scenePrompt": "serious, furrowed brow, clenched teeth, nervous sweating, glasses,",
+      "scenePrompt": "serious, furrowed brow, clenched teeth, nervous sweating, looking at viewer, 1.15::cracking knuckles::, glasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458094
@@ -1485,7 +1485,7 @@
     {
       "id": "1792316458095",
       "name": "Lee Byeong-jin_jealous",
-      "scenePrompt": "jealous, sideways glance, frown, sweat, crossed arms, glasses,",
+      "scenePrompt": "jealous, sideways glance, frown, sweat, looking back, crossed arms, glasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458095
@@ -1493,7 +1493,7 @@
     {
       "id": "1792316458096",
       "name": "Lee Byeong-jin_pleading",
-      "scenePrompt": "tears, raised inner eyebrows, open mouth, nervous sweating, own hands together, glasses,",
+      "scenePrompt": "tears, raised inner eyebrows, open mouth, nervous sweating, bowing, own hands together, glasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458096
@@ -1501,7 +1501,7 @@
     {
       "id": "1792316458097",
       "name": "Lee Byeong-jin_forced smiling",
-      "scenePrompt": "forced smile, nervous sweating, sweatdrop, looking to the side, interlocked fingers, glasses,",
+      "scenePrompt": "forced smile, nervous sweating, sweatdrop, looking to the side, head tilt, scratching head, glasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458097
@@ -1509,7 +1509,7 @@
     {
       "id": "1792745537050",
       "name": "Lee Byeong-jin_indifferent",
-      "scenePrompt": "half-closed eyes, bored, closed mouth, looking away, hand in pocket, glasses,",
+      "scenePrompt": "half-closed eyes, bored, closed mouth, looking away, leaning back, hand in pocket, glasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537050
@@ -1517,7 +1517,7 @@
     {
       "id": "1792745537051",
       "name": "Lee Byeong-jin_guilty",
-      "scenePrompt": "guilt, full-face blush, looking down, sweat, wavy mouth, hand on own neck, glasses,",
+      "scenePrompt": "guilt, full-face blush, looking down, sweat, wavy mouth, head down, hand on own neck, glasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537051
@@ -1525,7 +1525,7 @@
     {
       "id": "1792745537052",
       "name": "Lee Byeong-jin_pouting",
-      "scenePrompt": "pout, annoyed, furrowed brow, looking to the side, crossed arms, glasses,",
+      "scenePrompt": "pout, annoyed, furrowed brow, looking to the side, upper body turned, crossed arms, glasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537052
@@ -1533,7 +1533,7 @@
     {
       "id": "1792745537053",
       "name": "Lee Byeong-jin_angry smile",
-      "scenePrompt": "smirk, half-closed eyes, shaded face, looking at viewer, pointing at viewer, glasses,",
+      "scenePrompt": "smirk, half-closed eyes, shaded face, looking at viewer, leaning forward, pointing at viewer, glasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537053
@@ -1541,7 +1541,7 @@
     {
       "id": "1792745537054",
       "name": "Lee Byeong-jin_expressionless",
-      "scenePrompt": "expressionless, serious, closed mouth, looking at viewer, glasses,",
+      "scenePrompt": "1.15::expressionless::, serious, closed mouth, looking at viewer, outstretched hand, glasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537054
@@ -1549,7 +1549,7 @@
     {
       "id": "1792745537055",
       "name": "Lee Byeong-jin_tormented",
-      "scenePrompt": "closed eyes, clenched teeth, tears, nervous sweating, trembling, own hands clasped, glasses,",
+      "scenePrompt": "closed eyes, clenched teeth, tears, nervous sweating, trembling, hunched over, own hands clasped, glasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537055
@@ -1557,7 +1557,7 @@
     {
       "id": "1792745537056",
       "name": "Lee Byeong-jin_crazy smile",
-      "scenePrompt": "crazy smile, wide-eyed, sweat, blush, adjusting eyewear, glasses,",
+      "scenePrompt": "crazy smile, wide-eyed, sweat, blush, leaning forward, adjusting eyewear, glasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537056
@@ -1565,7 +1565,7 @@
     {
       "id": "1792316458098",
       "name": "Jay_suspicious",
-      "scenePrompt": "narrowed eyes, staring, looking at viewer, head tilt, baseball cap, mouth mask,",
+      "scenePrompt": "narrowed eyes, sniffing, looking at viewer, leaning forward, hands in pockets, baseball cap, mouth mask,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458098
@@ -1573,7 +1573,7 @@
     {
       "id": "1792316458099",
       "name": "Jay_worried",
-      "scenePrompt": "worried, raised inner eyebrows, half-closed eyes, looking to the side, baseball cap, mouth mask,",
+      "scenePrompt": "worried, raised inner eyebrows, half-closed eyes, looking to the side, head tilt, hand on own neck, baseball cap, mouth mask,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458099
@@ -1581,7 +1581,7 @@
     {
       "id": "1792316458100",
       "name": "Jay_relieved",
-      "scenePrompt": "closed eyes, blush, sigh, baseball cap, mouth mask,",
+      "scenePrompt": "closed eyes, blush, sigh, head down, hand on own chest, baseball cap, mouth mask,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458100
@@ -1589,7 +1589,7 @@
     {
       "id": "1792316458101",
       "name": "Jay_disgusted",
-      "scenePrompt": "disgust, half-closed eyes, shaded face, looking at viewer, baseball cap, mouth mask,",
+      "scenePrompt": "disgust, half-closed eyes, shaded face, looking at viewer, leaning back, hand over own mouth, baseball cap, mouth mask,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458101
@@ -1597,7 +1597,7 @@
     {
       "id": "1792316458102",
       "name": "Jay_determined",
-      "scenePrompt": "glowing eyes, serious, narrowed eyes, looking at viewer, adjusting headwear, baseball cap, mouth mask,",
+      "scenePrompt": "glowing eyes, serious, narrowed eyes, looking at viewer, head down, 1.2::adjusting headwear::, baseball cap, mouth mask,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458102
@@ -1605,7 +1605,7 @@
     {
       "id": "1792316458103",
       "name": "Jay_jealous",
-      "scenePrompt": "half-closed eyes, sideways glance, raised inner eyebrows, shaded face, baseball cap, mouth mask,",
+      "scenePrompt": "half-closed eyes, sideways glance, raised inner eyebrows, shaded face, looking back, hand on own arm, baseball cap, mouth mask,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458103
@@ -1613,7 +1613,7 @@
     {
       "id": "1792316458104",
       "name": "Jay_pleading",
-      "scenePrompt": "raised inner eyebrows, half-closed eyes, looking at viewer, baseball cap, mouth mask,",
+      "scenePrompt": "raised inner eyebrows, half-closed eyes, looking at viewer, leaning forward, 1.15::reaching towards viewer::, baseball cap, mouth mask,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458104
@@ -1621,7 +1621,7 @@
     {
       "id": "1792316458105",
       "name": "Jay_forced smiling",
-      "scenePrompt": "half-closed eyes, tired, sweatdrop, head tilt, adjusting headwear, baseball cap, mouth mask,",
+      "scenePrompt": "closed eyes, tired, sweatdrop, head tilt, adjusting headwear, baseball cap, mouth mask,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458105
@@ -1629,7 +1629,7 @@
     {
       "id": "1792745537057",
       "name": "Jay_indifferent",
-      "scenePrompt": "expressionless, half-closed eyes, bored, shrugging, baseball cap, mouth mask,",
+      "scenePrompt": "expressionless, half-closed eyes, bored, slouching, shrugging, baseball cap, mouth mask,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537057
@@ -1637,7 +1637,7 @@
     {
       "id": "1792745537058",
       "name": "Jay_guilty",
-      "scenePrompt": "looking down, shaded face, half-closed eyes, adjusting headwear, baseball cap, mouth mask,",
+      "scenePrompt": "looking down, shaded face, half-closed eyes, head down, 1.15::adjusting headwear::, baseball cap, mouth mask,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537058
@@ -1645,7 +1645,7 @@
     {
       "id": "1792745537059",
       "name": "Jay_pouting",
-      "scenePrompt": "sulking, half-closed eyes, looking down, holding own arm, baseball cap, mouth mask,",
+      "scenePrompt": "sulking, half-closed eyes, looking down, slouching, hand on own arm, baseball cap, mouth mask,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537059
@@ -1653,7 +1653,7 @@
     {
       "id": "1792745537060",
       "name": "Jay_angry smile",
-      "scenePrompt": "glowing eyes, half-closed eyes, shaded face, looking at viewer, head tilt, baseball cap, mouth mask,",
+      "scenePrompt": "glowing eyes, half-closed eyes, shaded face, looking at viewer, head tilt, hands in pockets, baseball cap, mouth mask,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537060
@@ -1661,7 +1661,7 @@
     {
       "id": "1792745537061",
       "name": "Jay_expressionless",
-      "scenePrompt": "expressionless, empty eyes, half-closed eyes, looking at viewer, baseball cap, mouth mask,",
+      "scenePrompt": "expressionless, empty eyes, half-closed eyes, looking at viewer, slouching, arms at sides, baseball cap, mouth mask,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537061
@@ -1669,7 +1669,7 @@
     {
       "id": "1792745537062",
       "name": "Jay_tormented",
-      "scenePrompt": "glowing eyes, constricted pupils, furrowed brow, sweat, trembling, hand on own face, baseball cap, mouth mask,",
+      "scenePrompt": "glowing eyes, constricted pupils, furrowed brow, sweat, trembling, hunched over, hand on own face, baseball cap, mouth mask,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537062
@@ -1677,7 +1677,7 @@
     {
       "id": "1792745537063",
       "name": "Jay_crazy smile",
-      "scenePrompt": "glowing eyes, constricted pupils, wide-eyed, shaded face, looking at viewer, claw pose, baseball cap, mouth mask,",
+      "scenePrompt": "glowing eyes, constricted pupils, wide-eyed, shaded face, leaning forward, outstretched hand, claw pose, baseball cap, mouth mask,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537063
@@ -1685,7 +1685,7 @@
     {
       "id": "1792316458106",
       "name": "Ho Yu-won_suspicious",
-      "scenePrompt": "light smile, narrowed eyes, closed mouth, head tilt, looking at viewer, hands in pockets,",
+      "scenePrompt": "light smile, narrowed eyes, closed mouth, looking at viewer, head tilt, hand on own chin,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458106
@@ -1693,7 +1693,7 @@
     {
       "id": "1792316458107",
       "name": "Ho Yu-won_worried",
-      "scenePrompt": "worried, raised inner eyebrows, light smile, looking at viewer, hand on own chest,",
+      "scenePrompt": "worried, raised inner eyebrows, light smile, looking at viewer, leaning forward, hand on own chest,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458107
@@ -1701,7 +1701,7 @@
     {
       "id": "1792316458108",
       "name": "Ho Yu-won_relieved",
-      "scenePrompt": "smile, closed eyes, open mouth, blush, own hands together,",
+      "scenePrompt": "smile, closed eyes, open mouth, blush, head tilt, clapping,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458108
@@ -1709,7 +1709,7 @@
     {
       "id": "1792316458109",
       "name": "Ho Yu-won_disgusted",
-      "scenePrompt": "disdain, light smile, half-closed eyes, shaded face, looking to the side, hands in pockets,",
+      "scenePrompt": "disdain, light smile, half-closed eyes, shaded face, looking to the side, upper body turned, hands in pockets,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458109
@@ -1717,7 +1717,7 @@
     {
       "id": "1792316458110",
       "name": "Ho Yu-won_determined",
-      "scenePrompt": "serious, half-closed eyes, closed mouth, looking afar, hands in pockets,",
+      "scenePrompt": "1.1::serious::, half-closed eyes, closed mouth, looking afar, hands in pockets,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458110
@@ -1725,7 +1725,7 @@
     {
       "id": "1792316458111",
       "name": "Ho Yu-won_jealous",
-      "scenePrompt": "smile, glaring, sideways glance, shaded face, closed mouth,",
+      "scenePrompt": "smile, glaring, sideways glance, shaded face, closed mouth, looking back, crossed arms,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458111
@@ -1733,7 +1733,7 @@
     {
       "id": "1792316458112",
       "name": "Ho Yu-won_pleading",
-      "scenePrompt": "wide-eyed, parted lips, raised inner eyebrows, sweat, leaning forward, own hands clasped,",
+      "scenePrompt": "1.15::wide-eyed, parted lips::, raised inner eyebrows, sweat, leaning forward, own hands clasped,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458112
@@ -1741,7 +1741,7 @@
     {
       "id": "1792316458113",
       "name": "Ho Yu-won_forced smiling",
-      "scenePrompt": "forced smile, wide-eyed, sweatdrop, looking at viewer,",
+      "scenePrompt": "forced smile, wide-eyed, sweatdrop, looking at viewer, leaning back, hand on own cheek,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458113
@@ -1749,7 +1749,7 @@
     {
       "id": "1792745537064",
       "name": "Ho Yu-won_indifferent",
-      "scenePrompt": "light smile, half-closed eyes, closed mouth, looking down,",
+      "scenePrompt": "light smile, half-closed eyes, closed mouth, looking down, head down, hand on own hip,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537064
@@ -1757,7 +1757,7 @@
     {
       "id": "1792745537065",
       "name": "Ho Yu-won_guilty",
-      "scenePrompt": "sad smile, raised inner eyebrows, closed mouth, looking down, own hands together,",
+      "scenePrompt": "sad smile, raised inner eyebrows, closed mouth, looking down, bowing, hand on own chest,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537065
@@ -1773,7 +1773,7 @@
     {
       "id": "1792745537067",
       "name": "Ho Yu-won_angry smile",
-      "scenePrompt": "smile, half-closed eyes, shaded face, closed mouth, looking at viewer, outstretched hand,",
+      "scenePrompt": "smile, half-closed eyes, shaded face, closed mouth, looking at viewer, leaning forward, 1.15::outstretched hand::,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537067
@@ -1781,7 +1781,7 @@
     {
       "id": "1792745537068",
       "name": "Ho Yu-won_expressionless",
-      "scenePrompt": "expressionless, empty eyes, closed mouth, shaded face, looking at viewer,",
+      "scenePrompt": "1.2::expressionless, empty eyes::, closed mouth, shaded face, looking at viewer, hands in pockets,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537068
@@ -1789,7 +1789,7 @@
     {
       "id": "1792745537069",
       "name": "Ho Yu-won_tormented",
-      "scenePrompt": "clenched teeth, wide-eyed, constricted pupils, sweat, shaded face, hand on own face,",
+      "scenePrompt": "clenched teeth, wide-eyed, constricted pupils, sweat, shaded face, hunched over, hand on own face,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537069
@@ -1797,7 +1797,7 @@
     {
       "id": "1792745537070",
       "name": "Ho Yu-won_crazy smile",
-      "scenePrompt": "smile, constricted pupils, wide-eyed, blush, leaning forward, outstretched hand,",
+      "scenePrompt": "smile, constricted pupils, wide-eyed, blush, leaning forward, reaching towards viewer,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537070
@@ -1805,7 +1805,7 @@
     {
       "id": "1792316458114",
       "name": "Cheong Dal-lae_suspicious",
-      "scenePrompt": "narrowed eyes, light smile, closed mouth, sideways glance, crossed arms,",
+      "scenePrompt": "narrowed eyes, light smile, closed mouth, sideways glance, head tilt, crossed arms,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458114
@@ -1813,7 +1813,7 @@
     {
       "id": "1792316458115",
       "name": "Cheong Dal-lae_worried",
-      "scenePrompt": "furrowed brow, half-closed eyes, serious, closed mouth, looking down, hand on own chin,",
+      "scenePrompt": "furrowed brow, half-closed eyes, serious, closed mouth, looking down, head down, hand on own chin,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458115
@@ -1821,7 +1821,7 @@
     {
       "id": "1792316458116",
       "name": "Cheong Dal-lae_relieved",
-      "scenePrompt": "light smile, closed eyes, closed mouth, adjusting necktie,",
+      "scenePrompt": "light smile, closed eyes, closed mouth, head back, 1.15::adjusting necktie::,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458116
@@ -1829,7 +1829,7 @@
     {
       "id": "1792316458117",
       "name": "Cheong Dal-lae_disgusted",
-      "scenePrompt": "disdain, half-closed eyes, closed mouth, looking down, crossed arms,",
+      "scenePrompt": "disdain, half-closed eyes, closed mouth, looking down, leaning back, crossed arms,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458117
@@ -1837,7 +1837,7 @@
     {
       "id": "1792316458118",
       "name": "Cheong Dal-lae_determined",
-      "scenePrompt": "serious, light smile, staring, looking at viewer,",
+      "scenePrompt": "serious, light smile, staring, looking at viewer, leaning forward, palm up,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458118
@@ -1845,7 +1845,7 @@
     {
       "id": "1792316458119",
       "name": "Cheong Dal-lae_jealous",
-      "scenePrompt": "narrowed eyes, light smile, shaded face, closed mouth, sideways glance,",
+      "scenePrompt": "narrowed eyes, light smile, shaded face, closed mouth, sideways glance, looking back, hand on own hip,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458119
@@ -1853,7 +1853,7 @@
     {
       "id": "1792316458120",
       "name": "Cheong Dal-lae_pleading",
-      "scenePrompt": "smile, half-closed eyes, head tilt, looking at viewer, outstretched hand,",
+      "scenePrompt": "smile, half-closed eyes, head tilt, looking at viewer, 1.15::beckoning::,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458120
@@ -1861,7 +1861,7 @@
     {
       "id": "1792316458121",
       "name": "Cheong Dal-lae_forced smiling",
-      "scenePrompt": "forced smile, half-closed eyes, closed mouth, looking to the side, crossed arms,",
+      "scenePrompt": "forced smile, half-closed eyes, closed mouth, looking to the side, upper body turned, crossed arms,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316458121
@@ -1869,7 +1869,7 @@
     {
       "id": "1792745537071",
       "name": "Cheong Dal-lae_indifferent",
-      "scenePrompt": "expressionless, half-closed eyes, closed mouth, looking down,",
+      "scenePrompt": "expressionless, half-closed eyes, closed mouth, looking down, head tilt, 1.15::index finger raised::,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537071
@@ -1877,7 +1877,7 @@
     {
       "id": "1792745537072",
       "name": "Cheong Dal-lae_guilty",
-      "scenePrompt": "closed eyes, serious, closed mouth, head down,",
+      "scenePrompt": "closed eyes, serious, closed mouth, head down, arms behind back,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537072
@@ -1885,7 +1885,7 @@
     {
       "id": "1792745537073",
       "name": "Cheong Dal-lae_pouting",
-      "scenePrompt": "annoyed, half-closed eyes, closed mouth, looking away, hand on own hip,",
+      "scenePrompt": "annoyed, half-closed eyes, closed mouth, looking away, upper body turned, hand on own hip,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537073
@@ -1893,7 +1893,7 @@
     {
       "id": "1792745537074",
       "name": "Cheong Dal-lae_angry smile",
-      "scenePrompt": "smile, glaring, shaded face, closed mouth, looking at viewer, outstretched hand,",
+      "scenePrompt": "smile, glaring, shaded face, closed mouth, looking at viewer, leaning forward, 1.15::outstretched hand::,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537074
@@ -1901,7 +1901,7 @@
     {
       "id": "1792745537075",
       "name": "Cheong Dal-lae_expressionless",
-      "scenePrompt": "expressionless, staring, closed mouth, looking at viewer,",
+      "scenePrompt": "1.1::expressionless::, staring, closed mouth, looking at viewer, arms behind back,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537075
@@ -1909,7 +1909,7 @@
     {
       "id": "1792745537076",
       "name": "Cheong Dal-lae_tormented",
-      "scenePrompt": "clenched teeth, glaring, shaded face, furrowed brow, clenched hand,",
+      "scenePrompt": "clenched teeth, glaring, shaded face, furrowed brow, head down, clenched hand,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537076
@@ -1917,7 +1917,7 @@
     {
       "id": "1792745537077",
       "name": "Cheong Dal-lae_crazy smile",
-      "scenePrompt": "smile, constricted pupils, half-closed eyes, shaded face, looking at viewer, beckoning,",
+      "scenePrompt": "smile, constricted pupils, half-closed eyes, shaded face, looking at viewer, leaning forward, reaching towards viewer,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537077
