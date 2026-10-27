@@ -377,6 +377,8 @@ export interface LoreOptions {
 }
 
 export const DEFAULT_DEPTH = 10;
+/** 카드에 토큰 예산이 없을 때 (깡통봇 등) 기본값 (사용자 2026-10-27: 깊이 10 · 예산 99999) */
+export const DEFAULT_BUDGET = 99999;
 
 /** 채팅에서 상태 신호를 읽는다 */
 export function loreState(chat: Chat): LoreState {
@@ -565,7 +567,7 @@ export const sameVars = (ss: Record<string, unknown> | undefined, vars: Record<s
 export function loreOptions(char: { name?: string; globalLore?: LoreEntry[]; loreSettings?: unknown }, chat: Chat, mode: LoreMode, user = ''): LoreOptions & { mode: LoreMode } {
   const ls = (char.loreSettings ?? {}) as { scanDepth?: unknown; tokenBudget?: unknown };
   const depth = Number(ls.scanDepth) > 0 ? Number(ls.scanDepth) : DEFAULT_DEPTH;
-  const total = Number(ls.tokenBudget) > 0 ? Number(ls.tokenBudget) : 0;
+  const total = Number(ls.tokenBudget) > 0 ? Number(ls.tokenBudget) : DEFAULT_BUDGET;
   const slots = new Set(LORE_KINDS.map((k) => SLOTS[k].comment));
   const always = (char.globalLore ?? []).filter((e) => e.alwaysActive && e.mode !== 'folder' && !slots.has(str(e.comment))).reduce((n, e) => n + tokens(str(e.content)), 0);
   return {
