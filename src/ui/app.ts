@@ -654,6 +654,9 @@ async function handle(action: string, value?: string): Promise<void> {
     await savePrefs((p) => ({ ...p, editorWidth: Math.max(50, Math.min(100, Number(value) || 90)) }));
     return render();
   }
+  // 어디서 「설정」을 누르든 설정 창 하나 (2026-10-27 사용자): 괴담넷·괴담톡·위키 판의 설정 단추는 그 기능 페이지로
+  const FEAT_SET: Record<string, string> = { 'gn-settings': 'set:gnet', 'ph-settings': 'set:phone', 'wiki-settings': 'set:wiki' };
+  if (FEAT_SET[action]) return handle('ed-open', FEAT_SET[action]);
   if (action === 'prefs-open' || action === 'prefs-close') {
     // 시작 전 「새 채팅 기본 설정」: 설정 창을 연다 (패널 안 설정 탭은 없앴다)
     resetSettings();

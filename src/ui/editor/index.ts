@@ -181,7 +181,7 @@ function ensureRoot(): HTMLElement {
   root.addEventListener('change', (ev) => {
     const el = ev.target as HTMLSelectElement;
     if (el?.dataset?.input === 'dir-crop-size') return render();
-    if (el?.dataset?.change) return void handle(el.dataset.change, el.value);
+    if (el?.dataset?.change?.startsWith('ed-')) return void handle(el.dataset.change, el.value);
     host?.change?.(el);
   });
   root.addEventListener('submit', (ev) => {
@@ -358,9 +358,8 @@ export function render(): void {
     <header class="gw-top">
       <button class="gx-x gw-menu" data-action="ed-drawer" aria-label="메뉴">${ICONS.list}</button>
       <b>설정</b>
-      ${(isSetNode(edUi.node) || edUi.node === 'install') && !anyDirty() ? '' : saveBar()}
       ${edUi.notice ? `<span class="gw-notice err">${esc(edUi.notice)}</span>` : edUi.info ? `<span class="gw-notice">${esc(edUi.info)}</span>` : ''}
-      <button class="gx-x" data-action="ed-close" aria-label="닫기">${ICONS.close}</button>
+      <div class="gw-top-right">${(isSetNode(edUi.node) || edUi.node === 'install') && !anyDirty() ? '' : saveBar()}<button class="gx-x" data-action="ed-close" aria-label="닫기">${ICONS.close}</button></div>
     </header>
     <nav class="gw-tree">${tree(ctx)}</nav>
     <main class="gw-body">${ctx ? body(ctx) : '<p class="gx-err">채팅 정보를 읽지 못했어요. 창을 닫고 다시 열어 주세요.</p>'}</main>

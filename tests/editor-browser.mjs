@@ -120,20 +120,20 @@ await page.waitForSelector('.gw-map');
 assert.ok((await page.textContent('.gw-map')).includes('성격'));
 await page.click('[data-action="ed-import-apply"]');
 await page.waitForFunction(() => document.querySelector('textarea[data-key="agent|쟈알디|character"]')?.value.includes('장난스럽다'));
-// 세력 관계 격자
+// 세력 관계: 왼쪽 조직 목록 → 오른쪽에 「고른 조직 → 다른 조직」 줄마다 단계 (2026-10-27 새 레이아웃)
 await page.click('[data-action="ed-node"][data-value="relations"]');
-await page.waitForSelector('.gw-grid');
-const cells = await page.locator('.gw-grid td.st-hostile').count();
-assert.ok(cells >= 2, '적대 칸이 있다');
-await page.click('.gw-grid td[data-value="극단>병원"]');
-await page.waitForSelector('.gw-rel-memo');
-// 같은 칸을 다시 누르면 한 단계 순환 (중립 → 호의), 단계 단추로 바로 고르기
-await page.click('.gw-grid td[data-value="극단>병원"]');
-await page.waitForFunction(() => document.querySelector('.gw-grid td[data-value="극단>병원"]')?.className.includes('st-favorable'));
-await page.click('.gw-rel-memo [data-action="ed-rel-stage"][data-value="hostile"]');
-await page.waitForFunction(() => document.querySelector('.gw-grid td[data-value="극단>병원"]')?.className.includes('st-hostile'));
-assert.ok(await page.$('.gw-grid td[data-value="병원>극단"].st-hostile'), '대칭이면 반대 칸도');
-await page.fill('.gw-rel-memo textarea', '피의 원수');
+await page.waitForSelector('.gw-rel-rows');
+await page.click('[data-action="ed-rel-pick"][data-value="극단"]');
+await page.waitForFunction(() => document.querySelector('.gw-head h2')?.textContent?.startsWith('극단'));
+assert.ok((await page.locator('.gw-rel-rows .gx-seg.on').count()) >= 2, '단계 줄이 있다');
+await page.click('[data-action="ed-rel-set"][data-value="극단>병원:favorable"]');
+await page.waitForFunction(() => document.querySelector('[data-action="ed-rel-set"][data-value="극단>병원:favorable"]')?.classList.contains('on'));
+await page.click('[data-action="ed-rel-set"][data-value="극단>병원:hostile"]');
+await page.waitForFunction(() => document.querySelector('[data-action="ed-rel-set"][data-value="극단>병원:hostile"]')?.classList.contains('on'));
+await page.click('[data-action="ed-rel-pick"][data-value="병원"]');
+await page.waitForFunction(() => document.querySelector('[data-action="ed-rel-set"][data-value="병원>극단:hostile"]')?.classList.contains('on'), null, { timeout: 5000 });
+await page.click('[data-action="ed-rel-pick"][data-value="극단"]');
+await page.fill('input[data-input="ed-rel-memo"][data-key="극단>병원"]', '피의 원수');
 if (shots) await page.screenshot({ path: `${shots}/ed-3-relations.png` });
 // 지침
 // 지침은 그 기능의 설정 페이지 아래 (2026-10-27): RP·Directive 는 「본편 지침」

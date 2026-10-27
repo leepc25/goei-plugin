@@ -172,7 +172,9 @@ export function worldRelations(overrides?: WorldOverrides): Relations {
 }
 
 /** 세력 관계도에서 뺀 조직 이름들 */
-export const excludedOrgs = (orgs: Map<string, WorldRecord>): Set<string> => new Set([...orgs.entries()].filter(([, r]) => r.relOff).map(([n]) => n));
+/** 명부가 소속 없는 요원에게 붙이는 자리 조직 (directory.ts). 세력이 아니라 관계 표·Faction 요약에 넣지 않는다 */
+export const PLACEHOLDER_ORGS: ReadonlySet<string> = new Set(['미분류']);
+export const excludedOrgs = (orgs: Map<string, WorldRecord>): Set<string> => new Set([...[...orgs.entries()].filter(([, r]) => r.relOff).map(([n]) => n), ...PLACEHOLDER_ORGS]);
 
 /** 뺀 조직이 낀 쌍을 지운 관계 (격자·Faction 목록·평판 시작값이 쓴다) */
 export function filterRelations(rel: Relations, excluded: Set<string>): Relations {
