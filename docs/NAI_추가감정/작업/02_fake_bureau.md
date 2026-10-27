@@ -1,5 +1,7 @@
 # 가짜 관리국 · 추가 감정 15종
 
+> 2026-10-27 수정: 가중치(`1.15::`)와 손에 든 소품(담배·컵·서류·휴대폰·마이크·동물 등)을 전부 뺐다. 아래 「읽은 방식」에 소품 얘기가 남아 있으면 옛 설명이고, 프롬프트 칸이 현재 값이다.
+
 2026-10-27 · 기준: `../규칙.md`. 선글라스 인물은 눈 태그를 쓰지 않고 입·보이는 눈썹·고개·손으로 감정을 냈다.
 
 ## Lee Do-hyeong (이도형)
@@ -8,21 +10,21 @@
 
 | 감정 | 프롬프트 | 읽은 방식 |
 | --- | --- | --- |
-| suspicious | `1.15::smirk, raised eyebrow::, closed mouth, looking at viewer, head tilt, hand in pocket, sunglasses,` | 의심 대신 「간파」 — 어디를 베면 죽는지 재는 눈 |
-| worried | `1.15::serious, frown::, closed mouth, looking to the side, sunglasses,` | 걱정할 사람이 아님 → 사장 얘기만 나오면 말수가 줄어드는 얼굴 |
-| relieved | `1.15::smile, sigh::, smoking, cigarette, smoke, head tilt, sunglasses,` | 「오늘 많이 벴다」 뒤 담배 한 모금 |
-| disgusted | `1.15::disdain, frown::, closed mouth, looking down, sunglasses,` | 「나머지는 다 엑스트라」 내려다보기 |
-| determined | `1.15::grin, teeth::, confident, looking at viewer, holding cigarette, sunglasses,` | 꽁초 튕기기 직전 「들어가.」 |
-| jealous | `1.15::annoyed, frown::, closed mouth, looking to the side, hand on own hip, sunglasses,` | 질투 대신 남이 먼저 벤 사냥감에 대한 못마땅함 |
-| pleading | `1.15::grin, raised eyebrows::, looking at viewer, beckoning, sunglasses,` | 애원 대신 「한 번 맞대 보자」 대련 권유 |
-| forced smiling | `1.15::forced smile, sweatdrop::, looking away, scratching head, sunglasses,` | 회식 빠진 걸 들켰을 때의 얼버무림 |
-| indifferent | `1.15::bored, closed mouth::, looking away, cigarette, mouth hold, hand in pocket, sunglasses,` | 평가·정치에 관심 없음, 담배 문 채 시큰둥 |
-| guilty | `1.15::wavy mouth, sweatdrop::, looking away, hand on own neck, sunglasses,` | 죄책감 대신 부하 이름을 또 틀린 걸 지적받은 순간 |
-| pouting | `1.15::frown, annoyed::, closed mouth, crossed arms, looking away, sunglasses,` | 사냥 못 나가는 날, 몸이 근질근질 |
-| angry smile | `1.15::grin, teeth, shaded face::, looking at viewer, clenched hand, sunglasses,` | 베면서 웃는 얼굴 그대로의 분노 |
-| expressionless | `1.15::expressionless, closed mouth::, looking at viewer, hands in pockets, sunglasses,` | 사열 때 선글라스 쓰고 선 얼굴 |
-| tormented | `1.15::gritted teeth, furrowed brow, sweat::, shaded face, looking down, clenched hand, sunglasses,` | 무너짐 대신 강적 앞에서 이를 악문 흥분 |
-| crazy smile | `1.15::crazy smile, open mouth, teeth::, shaded face, looking at viewer, head tilt, sunglasses,` | 생존자들이 괴이보다 무서웠다는 그 웃음 |
+| suspicious | `smirk, raised eyebrow, closed mouth, looking at viewer, head tilt, hand in pocket, sunglasses,` | 의심 대신 「간파」 — 어디를 베면 죽는지 재는 눈 |
+| worried | `serious, frown, closed mouth, looking to the side, sunglasses,` | 걱정할 사람이 아님 → 사장 얘기만 나오면 말수가 줄어드는 얼굴 |
+| relieved | `smile, sigh, head tilt, sunglasses,` | 「오늘 많이 벴다」 뒤 담배 한 모금 |
+| disgusted | `disdain, frown, closed mouth, looking down, sunglasses,` | 「나머지는 다 엑스트라」 내려다보기 |
+| determined | `grin, teeth, confident, looking at viewer, sunglasses,` | 꽁초 튕기기 직전 「들어가.」 |
+| jealous | `annoyed, frown, closed mouth, looking to the side, hand on own hip, sunglasses,` | 질투 대신 남이 먼저 벤 사냥감에 대한 못마땅함 |
+| pleading | `grin, raised eyebrows, looking at viewer, beckoning, sunglasses,` | 애원 대신 「한 번 맞대 보자」 대련 권유 |
+| forced smiling | `forced smile, sweatdrop, looking away, scratching head, sunglasses,` | 회식 빠진 걸 들켰을 때의 얼버무림 |
+| indifferent | `bored, closed mouth, looking away, hand in pocket, sunglasses,` | 평가·정치에 관심 없음, 담배 문 채 시큰둥 |
+| guilty | `wavy mouth, sweatdrop, looking away, hand on own neck, sunglasses,` | 죄책감 대신 부하 이름을 또 틀린 걸 지적받은 순간 |
+| pouting | `frown, annoyed, closed mouth, crossed arms, looking away, sunglasses,` | 사냥 못 나가는 날, 몸이 근질근질 |
+| angry smile | `grin, teeth, shaded face, looking at viewer, clenched hand, sunglasses,` | 베면서 웃는 얼굴 그대로의 분노 |
+| expressionless | `expressionless, closed mouth, looking at viewer, hands in pockets, sunglasses,` | 사열 때 선글라스 쓰고 선 얼굴 |
+| tormented | `gritted teeth, furrowed brow, sweat, shaded face, looking down, clenched hand, sunglasses,` | 무너짐 대신 강적 앞에서 이를 악문 흥분 |
+| crazy smile | `crazy smile, open mouth, teeth, shaded face, looking at viewer, head tilt, sunglasses,` | 생존자들이 괴이보다 무서웠다는 그 웃음 |
 
 ## Go Young-hoon (고영훈)
 
@@ -30,21 +32,21 @@
 
 | 감정 | 프롬프트 | 읽은 방식 |
 | --- | --- | --- |
-| suspicious | `1.15::serious, closed mouth::, looking at viewer, head tilt, sunglasses,` | 「선글라스가 이쪽을 향했을 뿐」 |
-| worried | `1.15::serious, frown::, closed mouth, looking down, hand on own chin, sunglasses,` | 걱정 대신 작전 산수 — 데이터베이스 사건 번호 검토 |
-| relieved | `1.15::closed mouth, expressionless::, looking down, sunglasses,` | 「양호. 계속.」 고개만 숙인 결재 |
-| disgusted | `1.15::disdain, frown::, closed mouth, looking down, sunglasses,` | 진압부대 불평에도 아무 일도 안 일어남 |
-| determined | `1.15::serious, closed mouth::, looking at viewer, pointing forward, sunglasses,` | 「허가한다.」 진형 배정 |
-| jealous | `1.15::expressionless, closed mouth::, looking to the side, arms behind back, sunglasses,` | 질투 없음 — 단체 사진 맨 끝에 선 자세 |
-| pleading | `1.15::serious, parted lips::, looking at viewer, own hands clasped, sunglasses,` | 부탁도 명령문 — 「전원, 조용.」 |
-| forced smiling | `1.15::expressionless, closed mouth::, looking at viewer, clapping, sunglasses,` | 억지 웃음 대신 정확히 세 번 박수 |
-| indifferent | `1.15::expressionless, closed mouth::, looking to the side, sunglasses,` | 「해산.」 |
-| guilty | `1.15::expressionless, closed mouth, shaded face::, looking back, sunglasses,` | 「좋은 사람이었다.」 쓰러진 상관을 한 번 돌아봄 |
-| pouting | `1.15::frown, closed mouth::, looking at viewer, crossed arms, sunglasses,` | 「허가하지 않는다.」 노래 시키려던 신입 |
-| angry smile | `1.15::expressionless, closed mouth, shaded face::, looking at viewer, own hands clasped, sunglasses,` | 웃음 없음 — 말 한마디 없이 조성춘을 조용하게 만든 얼굴 |
-| expressionless | `1.15::expressionless, closed mouth::, looking at viewer, own hands clasped, sunglasses,` | 기본값 그대로 |
-| tormented | `1.15::clenched teeth, frown::, shaded face, sweat, looking down, clenched hand, sunglasses,` | 나중으로 미뤄 둔 슬픔이 잠깐 새는 순간 |
-| crazy smile | `1.15::light smile, shaded face::, closed mouth, head tilt, looking at viewer, sunglasses,` | 도시 전설의 미소 — 무생존자 지침을 훈련 일정처럼 읽을 때 |
+| suspicious | `serious, closed mouth, looking at viewer, head tilt, sunglasses,` | 「선글라스가 이쪽을 향했을 뿐」 |
+| worried | `serious, frown, closed mouth, looking down, hand on own chin, sunglasses,` | 걱정 대신 작전 산수 — 데이터베이스 사건 번호 검토 |
+| relieved | `closed mouth, expressionless, looking down, sunglasses,` | 「양호. 계속.」 고개만 숙인 결재 |
+| disgusted | `disdain, frown, closed mouth, looking down, sunglasses,` | 진압부대 불평에도 아무 일도 안 일어남 |
+| determined | `serious, closed mouth, looking at viewer, pointing forward, sunglasses,` | 「허가한다.」 진형 배정 |
+| jealous | `expressionless, closed mouth, looking to the side, arms behind back, sunglasses,` | 질투 없음 — 단체 사진 맨 끝에 선 자세 |
+| pleading | `serious, parted lips, looking at viewer, own hands clasped, sunglasses,` | 부탁도 명령문 — 「전원, 조용.」 |
+| forced smiling | `expressionless, closed mouth, looking at viewer, clapping, sunglasses,` | 억지 웃음 대신 정확히 세 번 박수 |
+| indifferent | `expressionless, closed mouth, looking to the side, sunglasses,` | 「해산.」 |
+| guilty | `expressionless, closed mouth, shaded face, looking back, sunglasses,` | 「좋은 사람이었다.」 쓰러진 상관을 한 번 돌아봄 |
+| pouting | `frown, closed mouth, looking at viewer, crossed arms, sunglasses,` | 「허가하지 않는다.」 노래 시키려던 신입 |
+| angry smile | `expressionless, closed mouth, shaded face, looking at viewer, own hands clasped, sunglasses,` | 웃음 없음 — 말 한마디 없이 조성춘을 조용하게 만든 얼굴 |
+| expressionless | `expressionless, closed mouth, looking at viewer, own hands clasped, sunglasses,` | 기본값 그대로 |
+| tormented | `clenched teeth, frown, shaded face, sweat, looking down, clenched hand, sunglasses,` | 나중으로 미뤄 둔 슬픔이 잠깐 새는 순간 |
+| crazy smile | `light smile, shaded face, closed mouth, head tilt, looking at viewer, sunglasses,` | 도시 전설의 미소 — 무생존자 지침을 훈련 일정처럼 읽을 때 |
 
 ## No Gi-gyun (노기균)
 
@@ -52,21 +54,21 @@
 
 | 감정 | 프롬프트 | 읽은 방식 |
 | --- | --- | --- |
-| suspicious | `1.15::smirk, raised eyebrow::, closed mouth, head tilt, hand on own chin, sunglasses,` | 신입이 칼 쥐는 모습만 보고 그릇을 재는 눈 |
-| worried | `1.15::sad smile, furrowed brow::, looking down, holding popsicle, sunglasses,` | 다친 부하 병문안, 메로나 한 봉지 |
-| relieved | `1.15::grin, teeth, sigh::, looking up, holding popsicle, sunglasses,` | 「허가한다.」 듣고 신입보다 더 기뻐함 |
-| disgusted | `1.15::disgust, frown::, open mouth, pointing at viewer, sunglasses,` | 검증 대련 「저건 아니지!」 |
-| determined | `1.15::serious, smirk::, closed mouth, looking at viewer, clenched hand, sunglasses,` | 웃음 그대로 짧고 끊어지는 지휘 어조 |
-| jealous | `1.15::pout, jealous::, looking to the side, crossed arms, sunglasses,` | 신입이 딴 사람 손을 잡았을 때의 큰형 삐짐 |
-| pleading | `1.15::grin, open mouth, teeth::, looking at viewer, outstretched hand, sunglasses,` | 「검의 세계로 떠나자! 내 손을 잡아라!」 |
-| forced smiling | `1.15::forced smile, blush, sweat::, looking away, scratching head, sunglasses,` | 이름 칭찬에 태연한 척 「그래, 내 이름이 좀 멋있긴 하지!」 |
-| indifferent | `1.15::light smile, closed mouth::, looking away, hand in pocket, sunglasses,` | 무관심 대신 흉터 사연 대충 넘기기, 힘 뺀 자세 |
-| guilty | `1.15::guilt, sad smile::, sweatdrop, looking down, hand on own neck, sunglasses,` | 대련에서 막내를 너무 세게 쓰러뜨렸을 때 |
-| pouting | `1.15::pout, frown::, looking to the side, hands on own hips, sunglasses,` | 의무실에서 「소음 주의」로 쫓겨나며 |
-| angry smile | `1.15::grin, teeth, shaded face::, looking at viewer, beckoning, sunglasses,` | 「웃음이 칼보다 먼저 도착한다」 |
-| expressionless | `1.15::expressionless, closed mouth::, looking at viewer, hands on own hips, sunglasses,` | 웃기 전의 무서운 3초 |
-| tormented | `1.15::clenched teeth, furrowed brow::, shaded face, sweat, looking down, clenched hand, sunglasses,` | 형제애의 사람이 부하를 잃었을 때 |
-| crazy smile | `1.15::crazy smile, open mouth, teeth::, shaded face, head tilt, sunglasses,` | 흉터째 올라가는 거대한 웃음 |
+| suspicious | `smirk, raised eyebrow, closed mouth, head tilt, hand on own chin, sunglasses,` | 신입이 칼 쥐는 모습만 보고 그릇을 재는 눈 |
+| worried | `sad smile, furrowed brow, looking down, sunglasses,` | 다친 부하 병문안, 메로나 한 봉지 |
+| relieved | `grin, teeth, sigh, looking up, sunglasses,` | 「허가한다.」 듣고 신입보다 더 기뻐함 |
+| disgusted | `disgust, frown, open mouth, pointing at viewer, sunglasses,` | 검증 대련 「저건 아니지!」 |
+| determined | `serious, smirk, closed mouth, looking at viewer, clenched hand, sunglasses,` | 웃음 그대로 짧고 끊어지는 지휘 어조 |
+| jealous | `pout, jealous, looking to the side, crossed arms, sunglasses,` | 신입이 딴 사람 손을 잡았을 때의 큰형 삐짐 |
+| pleading | `grin, open mouth, teeth, looking at viewer, outstretched hand, sunglasses,` | 「검의 세계로 떠나자! 내 손을 잡아라!」 |
+| forced smiling | `forced smile, blush, sweat, looking away, scratching head, sunglasses,` | 이름 칭찬에 태연한 척 「그래, 내 이름이 좀 멋있긴 하지!」 |
+| indifferent | `light smile, closed mouth, looking away, hand in pocket, sunglasses,` | 무관심 대신 흉터 사연 대충 넘기기, 힘 뺀 자세 |
+| guilty | `guilt, sad smile, sweatdrop, looking down, hand on own neck, sunglasses,` | 대련에서 막내를 너무 세게 쓰러뜨렸을 때 |
+| pouting | `pout, frown, looking to the side, hands on own hips, sunglasses,` | 의무실에서 「소음 주의」로 쫓겨나며 |
+| angry smile | `grin, teeth, shaded face, looking at viewer, beckoning, sunglasses,` | 「웃음이 칼보다 먼저 도착한다」 |
+| expressionless | `expressionless, closed mouth, looking at viewer, hands on own hips, sunglasses,` | 웃기 전의 무서운 3초 |
+| tormented | `clenched teeth, furrowed brow, shaded face, sweat, looking down, clenched hand, sunglasses,` | 형제애의 사람이 부하를 잃었을 때 |
+| crazy smile | `crazy smile, open mouth, teeth, shaded face, head tilt, sunglasses,` | 흉터째 올라가는 거대한 웃음 |
 
 ## Song Ju-ik (송주익)
 
@@ -74,21 +76,21 @@
 
 | 감정 | 프롬프트 | 읽은 방식 |
 | --- | --- | --- |
-| suspicious | `1.15::frown, raised eyebrow::, closed mouth, looking at viewer, crossed arms, sunglasses,` | 신입이 웃음 참는 걸 의심 — 강의 15분 전 |
-| worried | `1.15::worried, raised inner eyebrows, sweat::, looking down, holding animal, hamster, sunglasses,` | 햄스터 하나가 살쪘다는 말 |
-| relieved | `1.15::smile, sigh::, looking up, holding popsicle, sunglasses,` | 작전 후 반드시 메로나 |
-| disgusted | `1.15::disgust, frown, furrowed brow::, closed mouth, looking down, sunglasses,` | 「잔인하고 역겹다」고 솔직하게 말하는 얼굴 |
-| determined | `1.15::serious, v-shaped eyebrows::, closed mouth, looking at viewer, salute, sunglasses,` | 「인류를 위해 죽이는 것과 죽는 것은 같은 뜻」 |
-| jealous | `1.15::jealous, pout, furrowed brow::, looking to the side, clenched hand, sunglasses,` | 고영훈 박수 세 번을 다른 사람이 받았을 때 |
-| pleading | `1.15::raised inner eyebrows, open mouth, blush::, looking at viewer, holding animal, hamster, sunglasses,` | 햄스터 계승식, 목이 멘 「이제 너에게 물려준다!」 |
-| forced smiling | `1.15::forced smile, sweat, blush::, looking away, scratching head, sunglasses,` | 「신입이 눈치가 좋은 거예요!」 하며 결국 본인이 상 차림 |
-| indifferent | `1.15::expressionless, closed mouth::, looking to the side, hand on own chin, sunglasses,` | 턱 농담엔 담담 — 「네, 턱입니다」 |
-| guilty | `1.15::blush, clenched teeth, furrowed brow::, looking down, bowing, sunglasses,` | 「부끄럽지만 압도적으로 졌습니다...」 빨간 얼굴로 패배 보고 |
-| pouting | `1.15::pout, frown, furrowed brow::, closed mouth, crossed arms, sunglasses,` | 메로나 없는 편의점에서 굳은 얼굴 |
-| angry smile | `1.15::smile, anger vein, clenched teeth::, looking at viewer, clenched hand, sunglasses,` | 햄스터 농담 — 웃으며 진지하게 화남 |
-| expressionless | `1.15::expressionless, serious::, closed mouth, looking at viewer, own hands clasped, sunglasses,` | 신조 얘기에서 웃음기가 빠진 얼굴 |
-| tormented | `1.15::clenched teeth, raised inner eyebrows, sweat::, shaded face, looking down, hand on own head, sunglasses,` | 이도형의 「이거 뭐냐?」 — 그날 밤 못 잠 |
-| crazy smile | `1.15::crazy smile, open mouth, v-shaped eyebrows::, looking at viewer, pointing at viewer, sunglasses,` | 과하게 진지한 부대 교리 강의 |
+| suspicious | `frown, raised eyebrow, closed mouth, looking at viewer, crossed arms, sunglasses,` | 신입이 웃음 참는 걸 의심 — 강의 15분 전 |
+| worried | `worried, raised inner eyebrows, sweat, looking down, sunglasses,` | 햄스터 하나가 살쪘다는 말 |
+| relieved | `smile, sigh, looking up, sunglasses,` | 작전 후 반드시 메로나 |
+| disgusted | `disgust, frown, furrowed brow, closed mouth, looking down, sunglasses,` | 「잔인하고 역겹다」고 솔직하게 말하는 얼굴 |
+| determined | `serious, v-shaped eyebrows, closed mouth, looking at viewer, salute, sunglasses,` | 「인류를 위해 죽이는 것과 죽는 것은 같은 뜻」 |
+| jealous | `jealous, pout, furrowed brow, looking to the side, clenched hand, sunglasses,` | 고영훈 박수 세 번을 다른 사람이 받았을 때 |
+| pleading | `raised inner eyebrows, open mouth, blush, looking at viewer, sunglasses,` | 햄스터 계승식, 목이 멘 「이제 너에게 물려준다!」 |
+| forced smiling | `forced smile, sweat, blush, looking away, scratching head, sunglasses,` | 「신입이 눈치가 좋은 거예요!」 하며 결국 본인이 상 차림 |
+| indifferent | `expressionless, closed mouth, looking to the side, hand on own chin, sunglasses,` | 턱 농담엔 담담 — 「네, 턱입니다」 |
+| guilty | `blush, clenched teeth, furrowed brow, looking down, bowing, sunglasses,` | 「부끄럽지만 압도적으로 졌습니다...」 빨간 얼굴로 패배 보고 |
+| pouting | `pout, frown, furrowed brow, closed mouth, crossed arms, sunglasses,` | 메로나 없는 편의점에서 굳은 얼굴 |
+| angry smile | `smile, anger vein, clenched teeth, looking at viewer, clenched hand, sunglasses,` | 햄스터 농담 — 웃으며 진지하게 화남 |
+| expressionless | `expressionless, serious, closed mouth, looking at viewer, own hands clasped, sunglasses,` | 신조 얘기에서 웃음기가 빠진 얼굴 |
+| tormented | `clenched teeth, raised inner eyebrows, sweat, shaded face, looking down, hand on own head, sunglasses,` | 이도형의 「이거 뭐냐?」 — 그날 밤 못 잠 |
+| crazy smile | `crazy smile, open mouth, v-shaped eyebrows, looking at viewer, pointing at viewer, sunglasses,` | 과하게 진지한 부대 교리 강의 |
 
 ## Kwak Seong-ju (곽성주)
 
@@ -96,21 +98,21 @@
 
 | 감정 | 프롬프트 | 읽은 방식 |
 | --- | --- | --- |
-| suspicious | `1.15::frown, raised eyebrow::, closed mouth, looking down, hand on own chin, sunglasses,` | 상급자보다 먼저 젓가락 댄 놈 |
-| worried | `1.15::frown, furrowed brow::, closed mouth, looking up, hand on own chin, sunglasses,` | 거대 구조물 괴이를 올려다보며 — 미니건 두 정의 한계 |
-| relieved | `1.15::grin, open mouth, sigh::, sweat, hands on own hips, sunglasses,` | 전선을 지킨 뒤, 판금에 박힌 탄두 |
-| disgusted | `1.15::disgust, frown, clenched teeth::, looking down, clenched hand, sunglasses,` | 대놓고 편견 덩어리 — 외국 종교 세력 |
-| determined | `1.15::serious, clenched teeth, v-shaped eyebrows::, looking at viewer, clenched hands, sunglasses,` | 「전원 내 뒤로.」 |
-| jealous | `1.15::jealous, pout, frown::, looking to the side, crossed arms, sunglasses,` | 미사일이 딴 데로 갔다는 소식 |
-| pleading | `1.15::raised inner eyebrows, open mouth::, looking at viewer, index finger raised, sunglasses,` | 국장실 앞 「미사일 한 발만, 한 발만」 |
-| forced smiling | `1.15::forced smile, sweatdrop::, looking away, scratching head, sunglasses,` | 「내 등이 그렇게 좁냐!」 귀찮은 척 뿌듯함 |
-| indifferent | `1.15::bored, closed mouth::, looking away, hands on own hips, sunglasses,` | 「질문?」 「없지?」 |
-| guilty | `1.15::frown, clenched teeth::, shaded face, looking down, hand on own face, sunglasses,` | 부하를 방패로 다 못 받아 낸 날 |
-| pouting | `1.15::pout, frown, annoyed::, looking to the side, crossed arms, sunglasses,` | 조성춘과 고기 서열 대결, 결국 한 점씩 |
-| angry smile | `1.15::grin, teeth, anger vein::, looking at viewer, pointing at viewer, sunglasses,` | 「시끄러, 이놈아! 후퇴는 없다!」 |
-| expressionless | `1.15::expressionless, closed mouth::, looking at viewer, sunglasses,` | 꿈쩍 않는 방벽 |
-| tormented | `1.15::clenched teeth, sweat, furrowed brow::, shaded face, looking up, clenched hands, sunglasses,` | 집중 사격 속을 버티며 걸어 들어감 |
-| crazy smile | `1.15::crazy smile, open mouth, teeth::, sweat, looking up, clenched hand, sunglasses,` | 「난 이미 여기서 죽기로 마음먹었다!」 |
+| suspicious | `frown, raised eyebrow, closed mouth, looking down, hand on own chin, sunglasses,` | 상급자보다 먼저 젓가락 댄 놈 |
+| worried | `frown, furrowed brow, closed mouth, looking up, hand on own chin, sunglasses,` | 거대 구조물 괴이를 올려다보며 — 미니건 두 정의 한계 |
+| relieved | `grin, open mouth, sigh, sweat, hands on own hips, sunglasses,` | 전선을 지킨 뒤, 판금에 박힌 탄두 |
+| disgusted | `disgust, frown, clenched teeth, looking down, clenched hand, sunglasses,` | 대놓고 편견 덩어리 — 외국 종교 세력 |
+| determined | `serious, clenched teeth, v-shaped eyebrows, looking at viewer, clenched hands, sunglasses,` | 「전원 내 뒤로.」 |
+| jealous | `jealous, pout, frown, looking to the side, crossed arms, sunglasses,` | 미사일이 딴 데로 갔다는 소식 |
+| pleading | `raised inner eyebrows, open mouth, looking at viewer, index finger raised, sunglasses,` | 국장실 앞 「미사일 한 발만, 한 발만」 |
+| forced smiling | `forced smile, sweatdrop, looking away, scratching head, sunglasses,` | 「내 등이 그렇게 좁냐!」 귀찮은 척 뿌듯함 |
+| indifferent | `bored, closed mouth, looking away, hands on own hips, sunglasses,` | 「질문?」 「없지?」 |
+| guilty | `frown, clenched teeth, shaded face, looking down, hand on own face, sunglasses,` | 부하를 방패로 다 못 받아 낸 날 |
+| pouting | `pout, frown, annoyed, looking to the side, crossed arms, sunglasses,` | 조성춘과 고기 서열 대결, 결국 한 점씩 |
+| angry smile | `grin, teeth, anger vein, looking at viewer, pointing at viewer, sunglasses,` | 「시끄러, 이놈아! 후퇴는 없다!」 |
+| expressionless | `expressionless, closed mouth, looking at viewer, sunglasses,` | 꿈쩍 않는 방벽 |
+| tormented | `clenched teeth, sweat, furrowed brow, shaded face, looking up, clenched hands, sunglasses,` | 집중 사격 속을 버티며 걸어 들어감 |
+| crazy smile | `crazy smile, open mouth, teeth, sweat, looking up, clenched hand, sunglasses,` | 「난 이미 여기서 죽기로 마음먹었다!」 |
 
 ## Cho Seong-choon (조성춘)
 
@@ -118,21 +120,21 @@
 
 | 감정 | 프롬프트 | 읽은 방식 |
 | --- | --- | --- |
-| suspicious | `1.15::frown, open mouth, furrowed brow::, looking at viewer, pointing at viewer, sunglasses, loose necktie,` | 「너! 그 카드! 그거 어디서 났어!」 |
-| worried | `1.15::frown, sweat, clenched teeth::, looking to the side, adjusting eyewear, sunglasses, loose necktie,` | 땀이 나서 선글라스가 미끄러짐 = 상황이 진짜 위험 |
-| relieved | `1.15::sigh, sweat, light smile::, looking up, hand on own neck, sunglasses, loose necktie,` | 작전 끝, 땀범벅 한숨 |
-| disgusted | `1.15::disgust, frown, clenched teeth::, looking to the side, hand in pocket, sunglasses, loose necktie,` | 관리국 = 괴물 집단 경멸 |
-| determined | `1.15::clenched teeth, v-shaped eyebrows, sweat::, looking at viewer, adjusting necktie, sunglasses, loose necktie,` | 넥타이를 잡아 뜯듯 풀기 = 돌격 |
-| jealous | `1.15::jealous, frown, pout::, looking to the side, crossed arms, sunglasses, loose necktie,` | 「칼잡이 놈들은 폼 나는 일만 한다」 |
-| pleading | `1.15::frown, open mouth, raised inner eyebrows::, sweat, outstretched hand, sunglasses, loose necktie,` | 욕 섞인 「죽지 마」 / 「끝까지 포기하지 마!」 |
-| forced smiling | `1.15::forced smile, frown, sweatdrop::, looking away, scratching head, sunglasses, loose necktie,` | 검사부대원과 눈 마주치고 「칭찬이야!」 |
-| indifferent | `1.15::closed mouth, frown::, looking away, hand on own chin, sunglasses, loose necktie,` | 「흠... 그런가. 그래. 알았다.」 금방 수긍 |
-| guilty | `1.15::wavy mouth, sweatdrop, frown::, looking away, hand on own neck, sunglasses, loose necktie,` | 무용담 괴이 숫자가 또 늘어난 걸 들킴 |
-| pouting | `1.15::pout, frown::, closed mouth, looking down, hands in pockets, sunglasses, loose necktie,` | 고영훈 앞에서 칼잡이 소리를 꿀꺽 삼킴 |
-| angry smile | `1.15::grin, frown, teeth::, sweat, looking at viewer, clenched hand, sunglasses, loose necktie,` | 「나도 무서워, 이 자식아!」 직후 함성 |
-| expressionless | `1.15::expressionless, closed mouth::, sweat, shaded face, looking down, sunglasses, loose necktie,` | 조용해지는 순간이 진짜 위기 |
-| tormented | `1.15::scared, gritted teeth, sweat::, furrowed brow, looking at viewer, clenched hand, sunglasses, loose necktie,` | 겁은 남보다 많이 느끼는데 그대로 달려듦 |
-| crazy smile | `1.15::crazy smile, open mouth, teeth::, sweat, looking up, hands in pockets, sunglasses, loose necktie,` | 「진공작전」 — 이 단어만 나오면 |
+| suspicious | `frown, open mouth, furrowed brow, looking at viewer, pointing at viewer, sunglasses, loose necktie,` | 「너! 그 카드! 그거 어디서 났어!」 |
+| worried | `frown, sweat, clenched teeth, looking to the side, adjusting eyewear, sunglasses, loose necktie,` | 땀이 나서 선글라스가 미끄러짐 = 상황이 진짜 위험 |
+| relieved | `sigh, sweat, light smile, looking up, hand on own neck, sunglasses, loose necktie,` | 작전 끝, 땀범벅 한숨 |
+| disgusted | `disgust, frown, clenched teeth, looking to the side, hand in pocket, sunglasses, loose necktie,` | 관리국 = 괴물 집단 경멸 |
+| determined | `clenched teeth, v-shaped eyebrows, sweat, looking at viewer, adjusting necktie, sunglasses, loose necktie,` | 넥타이를 잡아 뜯듯 풀기 = 돌격 |
+| jealous | `jealous, frown, pout, looking to the side, crossed arms, sunglasses, loose necktie,` | 「칼잡이 놈들은 폼 나는 일만 한다」 |
+| pleading | `frown, open mouth, raised inner eyebrows, sweat, outstretched hand, sunglasses, loose necktie,` | 욕 섞인 「죽지 마」 / 「끝까지 포기하지 마!」 |
+| forced smiling | `forced smile, frown, sweatdrop, looking away, scratching head, sunglasses, loose necktie,` | 검사부대원과 눈 마주치고 「칭찬이야!」 |
+| indifferent | `closed mouth, frown, looking away, hand on own chin, sunglasses, loose necktie,` | 「흠... 그런가. 그래. 알았다.」 금방 수긍 |
+| guilty | `wavy mouth, sweatdrop, frown, looking away, hand on own neck, sunglasses, loose necktie,` | 무용담 괴이 숫자가 또 늘어난 걸 들킴 |
+| pouting | `pout, frown, closed mouth, looking down, hands in pockets, sunglasses, loose necktie,` | 고영훈 앞에서 칼잡이 소리를 꿀꺽 삼킴 |
+| angry smile | `grin, frown, teeth, sweat, looking at viewer, clenched hand, sunglasses, loose necktie,` | 「나도 무서워, 이 자식아!」 직후 함성 |
+| expressionless | `expressionless, closed mouth, sweat, shaded face, looking down, sunglasses, loose necktie,` | 조용해지는 순간이 진짜 위기 |
+| tormented | `scared, gritted teeth, sweat, furrowed brow, looking at viewer, clenched hand, sunglasses, loose necktie,` | 겁은 남보다 많이 느끼는데 그대로 달려듦 |
+| crazy smile | `crazy smile, open mouth, teeth, sweat, looking up, hands in pockets, sunglasses, loose necktie,` | 「진공작전」 — 이 단어만 나오면 |
 
 ## Yun Byeong-su (윤병수)
 
@@ -140,21 +142,21 @@
 
 | 감정 | 프롬프트 | 읽은 방식 |
 | --- | --- | --- |
-| suspicious | `1.15::frown, closed mouth::, looking at viewer, crossed arms, sunglasses,` | 거짓말을 정확히 짚어 내는 채점 시선 |
-| worried | `1.15::serious, closed mouth::, looking down, holding cigarette, smoke, sunglasses,` | 영웅적으로 죽으려는 신입 — 「죽는 건 임무가 아니다」 |
-| relieved | `1.15::sigh, closed mouth::, smoking, cigarette, looking up, sunglasses,` | 불 뿜고 다 타면 그 불로 담배 |
-| disgusted | `1.15::disdain, frown::, closed mouth, looking down, hands in pockets, sunglasses,` | 기수 전체가 기대 이하일 때 |
-| determined | `1.15::serious, open mouth::, looking at viewer, pointing forward, sunglasses,` | 「모퉁이 도는 순간, 뭐가 있든 쏴!」 |
-| jealous | `1.15::expressionless, closed mouth::, looking to the side, holding own arm, sunglasses,` | 질투 대신 고른 인재를 노기균에게 보낼 때 — 아쉬운지 후련한지 모름 |
-| pleading | `1.15::serious, parted lips, furrowed brow::, looking at viewer, sunglasses,` | 애원 없음, 짧은 경고 |
-| forced smiling | `1.15::light smile, closed mouth::, head tilt, crossed arms, sunglasses,` | 「좋아. 이제야 기계 같네.」 |
-| indifferent | `1.15::expressionless, closed mouth::, cigarette, mouth hold, looking away, hands in pockets, sunglasses,` | 담배 문 무심한 대리 |
-| guilty | `1.15::expressionless, shaded face::, closed mouth, looking down, hand in pocket, sunglasses,` | 이상한 신입을 데리고 어딘가로 — 표정 변화 없음 |
-| pouting | `1.15::annoyed, frown::, closed mouth, looking to the side, holding own arm, sunglasses,` | 김성진이 자기 말투 흉내 내는 걸 목격 |
-| angry smile | `1.15::smirk, anger vein::, shaded face, looking at viewer, crossed arms, sunglasses,` | 계산된 폭발 — 「윤 대리님 날씨」 |
-| expressionless | `1.15::expressionless, closed mouth::, looking at viewer, sunglasses,` | 「왔냐. ...할 말 있어?」 |
-| tormented | `1.15::clenched teeth, furrowed brow::, shaded face, looking down, hand on own face, sunglasses,` | 팀원이 눈앞에서 죽은 날 |
-| crazy smile | `1.15::smirk, shaded face::, closed mouth, head tilt, looking at viewer, sunglasses,` | 「파충류인에 대해 어떻게 생각하냐?」 |
+| suspicious | `frown, closed mouth, looking at viewer, crossed arms, sunglasses,` | 거짓말을 정확히 짚어 내는 채점 시선 |
+| worried | `serious, closed mouth, looking down, sunglasses,` | 영웅적으로 죽으려는 신입 — 「죽는 건 임무가 아니다」 |
+| relieved | `sigh, closed mouth, looking up, sunglasses,` | 불 뿜고 다 타면 그 불로 담배 |
+| disgusted | `disdain, frown, closed mouth, looking down, hands in pockets, sunglasses,` | 기수 전체가 기대 이하일 때 |
+| determined | `serious, open mouth, looking at viewer, pointing forward, sunglasses,` | 「모퉁이 도는 순간, 뭐가 있든 쏴!」 |
+| jealous | `expressionless, closed mouth, looking to the side, holding own arm, sunglasses,` | 질투 대신 고른 인재를 노기균에게 보낼 때 — 아쉬운지 후련한지 모름 |
+| pleading | `serious, parted lips, furrowed brow, looking at viewer, sunglasses,` | 애원 없음, 짧은 경고 |
+| forced smiling | `light smile, closed mouth, head tilt, crossed arms, sunglasses,` | 「좋아. 이제야 기계 같네.」 |
+| indifferent | `expressionless, closed mouth, looking away, hands in pockets, sunglasses,` | 담배 문 무심한 대리 |
+| guilty | `expressionless, shaded face, closed mouth, looking down, hand in pocket, sunglasses,` | 이상한 신입을 데리고 어딘가로 — 표정 변화 없음 |
+| pouting | `annoyed, frown, closed mouth, looking to the side, holding own arm, sunglasses,` | 김성진이 자기 말투 흉내 내는 걸 목격 |
+| angry smile | `smirk, anger vein, shaded face, looking at viewer, crossed arms, sunglasses,` | 계산된 폭발 — 「윤 대리님 날씨」 |
+| expressionless | `expressionless, closed mouth, looking at viewer, sunglasses,` | 「왔냐. ...할 말 있어?」 |
+| tormented | `clenched teeth, furrowed brow, shaded face, looking down, hand on own face, sunglasses,` | 팀원이 눈앞에서 죽은 날 |
+| crazy smile | `smirk, shaded face, closed mouth, head tilt, looking at viewer, sunglasses,` | 「파충류인에 대해 어떻게 생각하냐?」 |
 
 ## Kim Seong-jin (김성진)
 
@@ -162,21 +164,21 @@
 
 | 감정 | 프롬프트 | 읽은 방식 |
 | --- | --- | --- |
-| suspicious | `1.15::smirk, raised eyebrow::, looking to the side, adjusting eyewear, sunglasses,` | 바쁜 눈 — 보급·경비 교대 시간 체크 |
-| worried | `1.15::worried, parted lips, sweat::, looking down, holding phone, sunglasses,` | 엄마 관련 연락 |
-| relieved | `1.15::grin, teeth, sweat::, sigh, looking up, hands in pockets, sunglasses,` | 다 빠져나온 뒤 「봤지? 최강이라니까」 |
-| disgusted | `1.15::disgust, smirk::, looking at viewer, pointing at viewer, sunglasses,` | 「졸았냐? 눈곱 봐.」 채점 |
-| determined | `1.15::serious, closed mouth::, looking to the side, adjusting eyewear, sunglasses,` | 생존 정보 모드 — 장난기가 쏙 빠짐 |
-| jealous | `1.15::pout, jealous, frown::, looking to the side, crossed arms, sunglasses,` | 「얘는 너 말은 잘 듣는데 왜 나한테만 이러냐」 |
-| pleading | `1.15::grin, raised eyebrows, open mouth::, looking at viewer, thumbs up, sunglasses,` | 「우리 콤비가 최강이야. 그치?」 대답 없음 |
-| forced smiling | `1.15::forced smile, sweatdrop, teeth::, looking away, scratching head, sunglasses,` | 점검관에게 제일 먼저 지적받고도 낄낄 |
-| indifferent | `1.15::bored, closed mouth::, looking away, hands in pockets, sunglasses,` | 점검관 말 흘려듣기 |
-| guilty | `1.15::wavy mouth, sweatdrop::, looking away, holding phone, sunglasses,` | 셀카 배경에 기밀 문서 |
-| pouting | `1.15::pout, annoyed::, looking to the side, hand on own hip, sunglasses,` | 송진섭 대답이 또 침묵 |
-| angry smile | `1.15::grin, teeth, anger vein::, shaded face, looking at viewer, clenched hand, sunglasses,` | 놀리는 웃음에 날이 섬 |
-| expressionless | `1.15::expressionless, closed mouth::, shaded face, looking down, sunglasses,` | 한설인육공장 얘기 — 시끄러운 사람이 조용해짐 |
-| tormented | `1.15::clenched teeth, sweat, furrowed brow::, shaded face, looking down, hands on own head, sunglasses,` | 엄마에게 무슨 일이 생김 |
-| crazy smile | `1.15::crazy smile, open mouth, teeth::, laughing, adjusting eyewear, sunglasses,` | 「그 영상 올린 게 인생 최고의 선택」 |
+| suspicious | `smirk, raised eyebrow, looking to the side, adjusting eyewear, sunglasses,` | 바쁜 눈 — 보급·경비 교대 시간 체크 |
+| worried | `worried, parted lips, sweat, looking down, sunglasses,` | 엄마 관련 연락 |
+| relieved | `grin, teeth, sweat, sigh, looking up, hands in pockets, sunglasses,` | 다 빠져나온 뒤 「봤지? 최강이라니까」 |
+| disgusted | `disgust, smirk, looking at viewer, pointing at viewer, sunglasses,` | 「졸았냐? 눈곱 봐.」 채점 |
+| determined | `serious, closed mouth, looking to the side, adjusting eyewear, sunglasses,` | 생존 정보 모드 — 장난기가 쏙 빠짐 |
+| jealous | `pout, jealous, frown, looking to the side, crossed arms, sunglasses,` | 「얘는 너 말은 잘 듣는데 왜 나한테만 이러냐」 |
+| pleading | `grin, raised eyebrows, open mouth, looking at viewer, thumbs up, sunglasses,` | 「우리 콤비가 최강이야. 그치?」 대답 없음 |
+| forced smiling | `forced smile, sweatdrop, teeth, looking away, scratching head, sunglasses,` | 점검관에게 제일 먼저 지적받고도 낄낄 |
+| indifferent | `bored, closed mouth, looking away, hands in pockets, sunglasses,` | 점검관 말 흘려듣기 |
+| guilty | `wavy mouth, sweatdrop, looking away, sunglasses,` | 셀카 배경에 기밀 문서 |
+| pouting | `pout, annoyed, looking to the side, hand on own hip, sunglasses,` | 송진섭 대답이 또 침묵 |
+| angry smile | `grin, teeth, anger vein, shaded face, looking at viewer, clenched hand, sunglasses,` | 놀리는 웃음에 날이 섬 |
+| expressionless | `expressionless, closed mouth, shaded face, looking down, sunglasses,` | 한설인육공장 얘기 — 시끄러운 사람이 조용해짐 |
+| tormented | `clenched teeth, sweat, furrowed brow, shaded face, looking down, hands on own head, sunglasses,` | 엄마에게 무슨 일이 생김 |
+| crazy smile | `crazy smile, open mouth, teeth, laughing, adjusting eyewear, sunglasses,` | 「그 영상 올린 게 인생 최고의 선택」 |
 
 ## Song Jin-seob (송진섭)
 
@@ -184,21 +186,21 @@
 
 | 감정 | 프롬프트 | 읽은 방식 |
 | --- | --- | --- |
-| suspicious | `1.15::pout, raised eyebrow::, closed mouth, pointing at viewer, sunglasses,` | 「선배님, 지금 거짓말하신 거죠?」 |
-| worried | `1.15::worried, raised inner eyebrows, wavy mouth::, sweat, own hands together, sunglasses,` | 레이더 쥐듯 두 손 모으고 떨기 |
-| relieved | `1.15::smile, open mouth, sigh::, looking at viewer, hand on own chest, sunglasses,` | 「형! 딱 맞춰 왔네요!」 |
-| disgusted | `1.15::disgust, frown, wavy mouth::, sweat, looking down, sunglasses,` | 정장 얼룩 (피, 진흙, 기타 알 수 없는 것) |
-| determined | `1.15::v-shaped eyebrows, open mouth, serious::, looking at viewer, clenched hands, sunglasses,` | 각 잡힌 「닥쳐라! 감히 네놈 따위가!」 |
-| jealous | `1.15::pout, jealous, puffy cheeks::, looking to the side, holding own arm, sunglasses,` | 김성진이 치킨 다리를 다 가져감 |
-| pleading | `1.15::raised inner eyebrows, wavy mouth, sweat::, looking at viewer, own hands clasped, sunglasses,` | 「혼자 기다리라고 하시면, 솔직히, 무서운데요...」 |
-| forced smiling | `1.15::forced smile, sweatdrop::, looking down, adjusting necktie, sunglasses,` | 김성진이 일부러 비뚤게 맨 넥타이 |
-| indifferent | `1.15::expressionless, closed mouth, sigh::, looking away, sunglasses,` | 「우리 콤비가 최강」에 대답 대신 한숨 |
-| guilty | `1.15::sweatdrop, blush, raised inner eyebrows::, looking to the side, covering own mouth, sunglasses,` | 거짓말 지적했다가 분위기가 싸해짐 |
-| pouting | `1.15::pout, puffy cheeks, frown::, looking to the side, crossed arms, sunglasses,` | 김성진의 놀림 |
-| angry smile | `1.15::smile, anger vein, clenched teeth::, looking at viewer, clenched hand, sunglasses,` | 말다툼에서 진 게 쏜 것보다 더 억울 |
-| expressionless | `1.15::expressionless, closed mouth, sweat::, looking down, own hands together, sunglasses,` | 투덜대지 않고 조용 = 진짜 겁먹음 |
-| tormented | `1.15::scared, clenched teeth, sweat::, trembling, hands on own head, sunglasses,` | 작전 전날 밤, 천장 얼룩 세기 |
-| crazy smile | `1.15::crazy smile, open mouth, sweat::, trembling, looking at viewer, clenched hands, sunglasses,` | 겁이 넘쳐 나오는 웃음 — 「저 이제 요원이거든요!」 |
+| suspicious | `pout, raised eyebrow, closed mouth, pointing at viewer, sunglasses,` | 「선배님, 지금 거짓말하신 거죠?」 |
+| worried | `worried, raised inner eyebrows, wavy mouth, sweat, own hands together, sunglasses,` | 레이더 쥐듯 두 손 모으고 떨기 |
+| relieved | `smile, open mouth, sigh, looking at viewer, hand on own chest, sunglasses,` | 「형! 딱 맞춰 왔네요!」 |
+| disgusted | `disgust, frown, wavy mouth, sweat, looking down, sunglasses,` | 정장 얼룩 (피, 진흙, 기타 알 수 없는 것) |
+| determined | `v-shaped eyebrows, open mouth, serious, looking at viewer, clenched hands, sunglasses,` | 각 잡힌 「닥쳐라! 감히 네놈 따위가!」 |
+| jealous | `pout, jealous, puffy cheeks, looking to the side, holding own arm, sunglasses,` | 김성진이 치킨 다리를 다 가져감 |
+| pleading | `raised inner eyebrows, wavy mouth, sweat, looking at viewer, own hands clasped, sunglasses,` | 「혼자 기다리라고 하시면, 솔직히, 무서운데요...」 |
+| forced smiling | `forced smile, sweatdrop, looking down, adjusting necktie, sunglasses,` | 김성진이 일부러 비뚤게 맨 넥타이 |
+| indifferent | `expressionless, closed mouth, sigh, looking away, sunglasses,` | 「우리 콤비가 최강」에 대답 대신 한숨 |
+| guilty | `sweatdrop, blush, raised inner eyebrows, looking to the side, covering own mouth, sunglasses,` | 거짓말 지적했다가 분위기가 싸해짐 |
+| pouting | `pout, puffy cheeks, frown, looking to the side, crossed arms, sunglasses,` | 김성진의 놀림 |
+| angry smile | `smile, anger vein, clenched teeth, looking at viewer, clenched hand, sunglasses,` | 말다툼에서 진 게 쏜 것보다 더 억울 |
+| expressionless | `expressionless, closed mouth, sweat, looking down, own hands together, sunglasses,` | 투덜대지 않고 조용 = 진짜 겁먹음 |
+| tormented | `scared, clenched teeth, sweat, trembling, hands on own head, sunglasses,` | 작전 전날 밤, 천장 얼룩 세기 |
+| crazy smile | `crazy smile, open mouth, sweat, trembling, looking at viewer, clenched hands, sunglasses,` | 겁이 넘쳐 나오는 웃음 — 「저 이제 요원이거든요!」 |
 
 ## Lee Gil-hwan (이길환)
 
@@ -206,21 +208,21 @@
 
 | 감정 | 프롬프트 | 읽은 방식 |
 | --- | --- | --- |
-| suspicious | `1.15::smile, closed mouth::, head tilt, looking to the side, hands in pockets, sunglasses,` | 방을 한 번 둘러보고 누가 도망칠지 앎 |
-| worried | `1.15::sad smile, raised inner eyebrows::, closed mouth, head tilt, own hands together, sunglasses,` | 「당황스러우신지 충분히 이해합니다」 |
-| relieved | `1.15::smile, closed mouth, sigh::, looking at viewer, holding microphone, sunglasses,` | 방 안이 먼저 지쳐 조용해짐 |
-| disgusted | `1.15::smile, closed mouth, shaded face::, looking down, sunglasses,` | 협상하려는 사람 — 미소는 그대로 |
-| determined | `1.15::smile, open mouth::, looking at viewer, holding microphone, sunglasses,` | 「아, 아. 테스트, 테스트.」 |
-| jealous | `1.15::smile, closed mouth, sweatdrop::, looking to the side, own hands together, sunglasses,` | 이기석 콘서트 함성이 벽 너머로 |
-| pleading | `1.15::smile, closed mouth, raised inner eyebrows::, bowing, own hands clasped, sunglasses,` | 「양해 부탁드립니다」 목례 |
-| forced smiling | `1.15::forced smile, closed mouth::, looking at viewer, palm up, sunglasses,` | 연습된 미소 그 자체, 콜센터 상담원 |
-| indifferent | `1.15::light smile, closed mouth::, looking away, hands in pockets, sunglasses,` | 비명에도 같은 음량, 같은 속도 |
-| guilty | `1.15::sad smile, closed mouth::, looking down, outstretched hand, sunglasses,` | 우는 사람에게 휴지 건네기 — 진심인지 연기인지 |
-| pouting | `1.15::smile, closed mouth, sweatdrop::, head tilt, hand on own cheek, sunglasses,` | 삐짐 대신 「튜토리얼 요정」 별명을 들은 곤란한 미소 |
-| angry smile | `1.15::smile, closed mouth, shaded face::, looking down, hands in pockets, sunglasses,` | 웃는 얼굴 그대로 턱을 살짝 듦 = 제압 |
-| expressionless | `1.15::light smile, closed mouth::, looking at viewer, own hands together, sunglasses,` | 기본값이 미소 |
-| tormented | `1.15::smile, closed mouth, sweat::, looking down, hand on own neck, sunglasses,` | 끝없는 체력전 끝, 목은 쉬어도 미소는 그대로 |
-| crazy smile | `1.15::smile, parted lips, shaded face::, head tilt, palm up, sunglasses,` | 「정신 교육을 받으시게 될 겁니다. 걱정하지 마세요.」 |
+| suspicious | `smile, closed mouth, head tilt, looking to the side, hands in pockets, sunglasses,` | 방을 한 번 둘러보고 누가 도망칠지 앎 |
+| worried | `sad smile, raised inner eyebrows, closed mouth, head tilt, own hands together, sunglasses,` | 「당황스러우신지 충분히 이해합니다」 |
+| relieved | `smile, closed mouth, sigh, looking at viewer, sunglasses,` | 방 안이 먼저 지쳐 조용해짐 |
+| disgusted | `smile, closed mouth, shaded face, looking down, sunglasses,` | 협상하려는 사람 — 미소는 그대로 |
+| determined | `smile, open mouth, looking at viewer, sunglasses,` | 「아, 아. 테스트, 테스트.」 |
+| jealous | `smile, closed mouth, sweatdrop, looking to the side, own hands together, sunglasses,` | 이기석 콘서트 함성이 벽 너머로 |
+| pleading | `smile, closed mouth, raised inner eyebrows, bowing, own hands clasped, sunglasses,` | 「양해 부탁드립니다」 목례 |
+| forced smiling | `forced smile, closed mouth, looking at viewer, palm up, sunglasses,` | 연습된 미소 그 자체, 콜센터 상담원 |
+| indifferent | `light smile, closed mouth, looking away, hands in pockets, sunglasses,` | 비명에도 같은 음량, 같은 속도 |
+| guilty | `sad smile, closed mouth, looking down, outstretched hand, sunglasses,` | 우는 사람에게 휴지 건네기 — 진심인지 연기인지 |
+| pouting | `smile, closed mouth, sweatdrop, head tilt, hand on own cheek, sunglasses,` | 삐짐 대신 「튜토리얼 요정」 별명을 들은 곤란한 미소 |
+| angry smile | `smile, closed mouth, shaded face, looking down, hands in pockets, sunglasses,` | 웃는 얼굴 그대로 턱을 살짝 듦 = 제압 |
+| expressionless | `light smile, closed mouth, looking at viewer, own hands together, sunglasses,` | 기본값이 미소 |
+| tormented | `smile, closed mouth, sweat, looking down, hand on own neck, sunglasses,` | 끝없는 체력전 끝, 목은 쉬어도 미소는 그대로 |
+| crazy smile | `smile, parted lips, shaded face, head tilt, palm up, sunglasses,` | 「정신 교육을 받으시게 될 겁니다. 걱정하지 마세요.」 |
 
 ## Lee Gi-seok (이기석)
 
@@ -228,21 +230,21 @@
 
 | 감정 | 프롬프트 | 읽은 방식 |
 | --- | --- | --- |
-| suspicious | `1.15::smirk, closed mouth::, head tilt, hand on own chin, sunglasses,` | 첫 함성 크기를 재는 사회자 |
-| worried | `1.15::frown, closed mouth::, looking down, holding own arm, sunglasses,` | 의수가 「떨어지기 딱 좋은 상태」인지 점검 |
-| relieved | `1.15::grin, sigh, sweat::, looking up, holding microphone, sunglasses,` | 세 번째 함성에 강당이 흔들림 |
-| disgusted | `1.15::disgust, frown::, closed mouth, looking down, crossed arms, sunglasses,` | 함성이 시들한 객석 |
-| determined | `1.15::grin, open mouth, v-shaped eyebrows::, looking at viewer, holding microphone, sunglasses,` | 「여러분은 인류의 방패입니다!」 |
-| jealous | `1.15::pout, jealous::, looking to the side, hand on own hip, sunglasses,` | 건배사를 다른 사람이 함 |
-| pleading | `1.15::open mouth, raised eyebrows::, looking at viewer, hand on own ear, sunglasses,` | 「안 들립니다!」 — 애원 대신 함성 요구 |
-| forced smiling | `1.15::forced smile, sweatdrop::, looking down, holding own arm, sunglasses,` | 의수가 예정보다 일찍 떨어짐 → 「보셨습니까」 애드리브 |
-| indifferent | `1.15::expressionless, closed mouth::, looking away, hand in pocket, sunglasses,` | 행사 전날, 목 아끼느라 말 안 함 |
-| guilty | `1.15::wavy mouth, sweatdrop::, looking up, scratching head, sunglasses,` | 흔들린 천장 조명, 시설팀 |
-| pouting | `1.15::pout, annoyed::, looking to the side, crossed arms, sunglasses,` | 「콘서트」 소리 대신 잔소리를 들은 날 |
-| angry smile | `1.15::grin, teeth, furrowed brow::, looking at viewer, pointing at viewer, sunglasses,` | 객석 한 명을 콕 집어 대답 요구 |
-| expressionless | `1.15::expressionless, closed mouth::, looking at viewer, sunglasses,` | 팔이 떨어진 뒤 침묵이 무르익기를 기다림 |
-| tormented | `1.15::clenched teeth, furrowed brow::, shaded face, looking down, holding own arm, sunglasses,` | 「괴이와 싸우다 잃었습니다」의 진짜 기억 |
-| crazy smile | `1.15::crazy smile, open mouth::, looking at viewer, holding cup, sunglasses,` | 「이 커피가 인류를 지킵니다!」 |
+| suspicious | `smirk, closed mouth, head tilt, hand on own chin, sunglasses,` | 첫 함성 크기를 재는 사회자 |
+| worried | `frown, closed mouth, looking down, holding own arm, sunglasses,` | 의수가 「떨어지기 딱 좋은 상태」인지 점검 |
+| relieved | `grin, sigh, sweat, looking up, sunglasses,` | 세 번째 함성에 강당이 흔들림 |
+| disgusted | `disgust, frown, closed mouth, looking down, crossed arms, sunglasses,` | 함성이 시들한 객석 |
+| determined | `grin, open mouth, v-shaped eyebrows, looking at viewer, sunglasses,` | 「여러분은 인류의 방패입니다!」 |
+| jealous | `pout, jealous, looking to the side, hand on own hip, sunglasses,` | 건배사를 다른 사람이 함 |
+| pleading | `open mouth, raised eyebrows, looking at viewer, hand on own ear, sunglasses,` | 「안 들립니다!」 — 애원 대신 함성 요구 |
+| forced smiling | `forced smile, sweatdrop, looking down, holding own arm, sunglasses,` | 의수가 예정보다 일찍 떨어짐 → 「보셨습니까」 애드리브 |
+| indifferent | `expressionless, closed mouth, looking away, hand in pocket, sunglasses,` | 행사 전날, 목 아끼느라 말 안 함 |
+| guilty | `wavy mouth, sweatdrop, looking up, scratching head, sunglasses,` | 흔들린 천장 조명, 시설팀 |
+| pouting | `pout, annoyed, looking to the side, crossed arms, sunglasses,` | 「콘서트」 소리 대신 잔소리를 들은 날 |
+| angry smile | `grin, teeth, furrowed brow, looking at viewer, pointing at viewer, sunglasses,` | 객석 한 명을 콕 집어 대답 요구 |
+| expressionless | `expressionless, closed mouth, looking at viewer, sunglasses,` | 팔이 떨어진 뒤 침묵이 무르익기를 기다림 |
+| tormented | `clenched teeth, furrowed brow, shaded face, looking down, holding own arm, sunglasses,` | 「괴이와 싸우다 잃었습니다」의 진짜 기억 |
+| crazy smile | `crazy smile, open mouth, looking at viewer, sunglasses,` | 「이 커피가 인류를 지킵니다!」 |
 
 ## Kim Jo-hak (김조학)
 
@@ -250,21 +252,21 @@
 
 | 감정 | 프롬프트 | 읽은 방식 |
 | --- | --- | --- |
-| suspicious | `1.15::frown, closed mouth::, looking at viewer, adjusting eyewear, sunglasses,` | 선글라스를 내리는 심문 전환점 |
-| worried | `1.15::serious, frown::, closed mouth, looking down, hand on own chin, sunglasses,` | 은폐에 금이 갈까 서류철 재검토 |
-| relieved | `1.15::light smile, sigh::, looking at viewer, holding cup, sunglasses,` | 아이스커피 = 압력 빼는 밸브 |
-| disgusted | `1.15::disgust, disdain, frown::, looking down, pointing at viewer, sunglasses,` | 「그냥 이상한 힘 가진 이상한 놈이야」 |
-| determined | `1.15::serious, closed mouth::, looking at viewer, crossed arms, sunglasses,` | 확신범 — 정당한 보안 요원이라 믿음 |
-| jealous | `1.15::annoyed, frown::, closed mouth, looking to the side, crossed arms, sunglasses,` | 국장이 들어와 수갑을 풀어 주는 순서 |
-| pleading | `1.15::smile, raised eyebrows, open mouth::, head tilt, palm up, sunglasses,` | 영업 사원 모드 — 월급, 부모님 노후 |
-| forced smiling | `1.15::forced smile, teeth::, looking at viewer, palm up, sunglasses,` | 세 번째 얼굴 「영업 사원의 따뜻함」이 제일 무섭다 |
-| indifferent | `1.15::bored, closed mouth::, looking away, head rest, sunglasses,` | 서류 처리하는 공무원의 지루함 |
-| guilty | `1.15::expressionless, closed mouth, shaded face::, looking down, sunglasses,` | 처분 결재 중 표정이 하나도 안 바뀜 |
-| pouting | `1.15::annoyed, frown::, closed mouth, looking away, holding cup, sunglasses,` | 「따뜻한 거? 여기 그런 거 없어」 |
-| angry smile | `1.15::grin, teeth, anger vein::, looking at viewer, hands on own hips, sunglasses,` | 고함 직후 1초 만에 커피 주문 |
-| expressionless | `1.15::expressionless, closed mouth::, looking at viewer, crossed arms, sunglasses,` | 팔짱 끼고 몇 분이고 침묵 |
-| tormented | `1.15::clenched teeth, furrowed brow, anger vein::, shaded face, clenched hand, sunglasses,` | 「네가 그 영상 하나로 몇 명을 죽일 뻔했는지 아냐」 진짜 분노 |
-| crazy smile | `1.15::smirk, shaded face::, closed mouth, head tilt, looking at viewer, sunglasses,` | 「어이, 나 김조학 과장이야.」 노트북 상영회 |
+| suspicious | `frown, closed mouth, looking at viewer, adjusting eyewear, sunglasses,` | 선글라스를 내리는 심문 전환점 |
+| worried | `serious, frown, closed mouth, looking down, hand on own chin, sunglasses,` | 은폐에 금이 갈까 서류철 재검토 |
+| relieved | `light smile, sigh, looking at viewer, sunglasses,` | 아이스커피 = 압력 빼는 밸브 |
+| disgusted | `disgust, disdain, frown, looking down, pointing at viewer, sunglasses,` | 「그냥 이상한 힘 가진 이상한 놈이야」 |
+| determined | `serious, closed mouth, looking at viewer, crossed arms, sunglasses,` | 확신범 — 정당한 보안 요원이라 믿음 |
+| jealous | `annoyed, frown, closed mouth, looking to the side, crossed arms, sunglasses,` | 국장이 들어와 수갑을 풀어 주는 순서 |
+| pleading | `smile, raised eyebrows, open mouth, head tilt, palm up, sunglasses,` | 영업 사원 모드 — 월급, 부모님 노후 |
+| forced smiling | `forced smile, teeth, looking at viewer, palm up, sunglasses,` | 세 번째 얼굴 「영업 사원의 따뜻함」이 제일 무섭다 |
+| indifferent | `bored, closed mouth, looking away, head rest, sunglasses,` | 서류 처리하는 공무원의 지루함 |
+| guilty | `expressionless, closed mouth, shaded face, looking down, sunglasses,` | 처분 결재 중 표정이 하나도 안 바뀜 |
+| pouting | `annoyed, frown, closed mouth, looking away, sunglasses,` | 「따뜻한 거? 여기 그런 거 없어」 |
+| angry smile | `grin, teeth, anger vein, looking at viewer, hands on own hips, sunglasses,` | 고함 직후 1초 만에 커피 주문 |
+| expressionless | `expressionless, closed mouth, looking at viewer, crossed arms, sunglasses,` | 팔짱 끼고 몇 분이고 침묵 |
+| tormented | `clenched teeth, furrowed brow, anger vein, shaded face, clenched hand, sunglasses,` | 「네가 그 영상 하나로 몇 명을 죽일 뻔했는지 아냐」 진짜 분노 |
+| crazy smile | `smirk, shaded face, closed mouth, head tilt, looking at viewer, sunglasses,` | 「어이, 나 김조학 과장이야.」 노트북 상영회 |
 
 ## Do Pil-heon (도필헌)
 
@@ -272,21 +274,21 @@
 
 | 감정 | 프롬프트 | 읽은 방식 |
 | --- | --- | --- |
-| suspicious | `1.15::light smile, closed mouth::, head tilt, steepled fingers, sunglasses,` | 미끼 질문을 하나 던지고 반응을 봄 |
-| worried | `1.15::serious, closed mouth::, looking down, hand on own chin, sunglasses,` | 질문이 곧 자백 — 빈칸이 드러났나 |
-| relieved | `1.15::smile, closed mouth::, looking at viewer, own hands clasped, sunglasses,` | 「역시. 알고 있었군.」 |
-| disgusted | `1.15::disdain, closed mouth::, shaded face, looking down, sunglasses,` | 저쪽 관리국 요원이 면담실에 앉았을 때 |
-| determined | `1.15::serious, parted lips::, looking at viewer, index finger raised, sunglasses,` | 「반복하겠네. 관리국을 믿게.」 |
-| jealous | `1.15::closed mouth, frown::, looking to the side, own hands clasped, sunglasses,` | 쓸 만한 패가 다른 쪽으로 넘어갔을 때 |
-| pleading | `1.15::smile, parted lips::, head tilt, palm up, sunglasses,` | 「기다리는 동안 담소나 나누겠나?」 의자 권하기 |
-| forced smiling | `1.15::forced smile, closed mouth::, looking away, palm up, sunglasses,` | 날씨와 서울 집값 담소 |
-| indifferent | `1.15::expressionless, closed mouth::, looking away, own hands clasped, sunglasses,` | 교리 문구 수정은 사소한 행정 처리 |
-| guilty | `1.15::serious, closed mouth::, looking down, holding cup, sunglasses,` | 「그럼 저번에 죽은 제 동료는요?」 → 대답 대신 커피 한 모금 |
-| pouting | `1.15::frown, closed mouth::, looking to the side, hand on own chin, sunglasses,` | 「나도 꽤 털었다」 — 털린 쪽의 못마땅함 |
-| angry smile | `1.15::smile, closed mouth, shaded face::, looking at viewer, steepled fingers, sunglasses,` | 선택지로 위협한다 |
-| expressionless | `1.15::expressionless, closed mouth::, looking at viewer, sunglasses,` | 가만히 앉아 방을 장악 |
-| tormented | `1.15::frown, clenched teeth::, shaded face, sweat, looking down, hand on own forehead, sunglasses,` | 기관의 존속이 흔들릴 때 |
-| crazy smile | `1.15::smile, parted lips, shaded face::, looking at viewer, outstretched hand, sunglasses,` | 「불가능을 가능하게 하는 것이 관리국의 일일세」 영입 |
+| suspicious | `light smile, closed mouth, head tilt, steepled fingers, sunglasses,` | 미끼 질문을 하나 던지고 반응을 봄 |
+| worried | `serious, closed mouth, looking down, hand on own chin, sunglasses,` | 질문이 곧 자백 — 빈칸이 드러났나 |
+| relieved | `smile, closed mouth, looking at viewer, own hands clasped, sunglasses,` | 「역시. 알고 있었군.」 |
+| disgusted | `disdain, closed mouth, shaded face, looking down, sunglasses,` | 저쪽 관리국 요원이 면담실에 앉았을 때 |
+| determined | `serious, parted lips, looking at viewer, index finger raised, sunglasses,` | 「반복하겠네. 관리국을 믿게.」 |
+| jealous | `closed mouth, frown, looking to the side, own hands clasped, sunglasses,` | 쓸 만한 패가 다른 쪽으로 넘어갔을 때 |
+| pleading | `smile, parted lips, head tilt, palm up, sunglasses,` | 「기다리는 동안 담소나 나누겠나?」 의자 권하기 |
+| forced smiling | `forced smile, closed mouth, looking away, palm up, sunglasses,` | 날씨와 서울 집값 담소 |
+| indifferent | `expressionless, closed mouth, looking away, own hands clasped, sunglasses,` | 교리 문구 수정은 사소한 행정 처리 |
+| guilty | `serious, closed mouth, looking down, sunglasses,` | 「그럼 저번에 죽은 제 동료는요?」 → 대답 대신 커피 한 모금 |
+| pouting | `frown, closed mouth, looking to the side, hand on own chin, sunglasses,` | 「나도 꽤 털었다」 — 털린 쪽의 못마땅함 |
+| angry smile | `smile, closed mouth, shaded face, looking at viewer, steepled fingers, sunglasses,` | 선택지로 위협한다 |
+| expressionless | `expressionless, closed mouth, looking at viewer, sunglasses,` | 가만히 앉아 방을 장악 |
+| tormented | `frown, clenched teeth, shaded face, sweat, looking down, hand on own forehead, sunglasses,` | 기관의 존속이 흔들릴 때 |
+| crazy smile | `smile, parted lips, shaded face, looking at viewer, outstretched hand, sunglasses,` | 「불가능을 가능하게 하는 것이 관리국의 일일세」 영입 |
 
 ## Sa-jang (사장)
 
@@ -294,18 +296,18 @@
 
 | 감정 | 프롬프트 | 읽은 방식 |
 | --- | --- | --- |
-| suspicious | `1.15::light smile, closed mouth::, head tilt, hand on own chin, no eyes, shaded face,` | 「사장이 고개를 아주 조금 기울였다」 — 머뭇거림 포착 |
-| worried | `1.15::frown, closed mouth::, looking down, steepled fingers, no eyes, shaded face,` | 걱정 대신 결과를 빨리 보고 싶은 조급함 |
-| relieved | `1.15::smile, closed mouth::, looking at viewer, clapping, no eyes, shaded face,` | 「아주 훌륭한 역량을 보여 주셨습니다」 |
-| disgusted | `1.15::disdain, closed mouth::, looking down, arms behind back, no eyes, shaded face,` | 쓸모가 다한 대상을 내려다봄 |
-| determined | `1.15::light smile, closed mouth::, looking at viewer, beckoning, no eyes, shaded face,` | 즉시 호출 — 하던 일 두고 최상층으로 |
-| jealous | `1.15::closed mouth, light smile::, looking to the side, arms behind back, no eyes, shaded face,` | 질투 없음 — 국장이 먼저 만난 「흥미로운 변수」를 곁눈 |
-| pleading | `1.15::smile, parted lips::, head tilt, palm up, no eyes, shaded face,` | 「UI 말입니다. 개선할 점이 있으면 말씀해 주세요.」 |
-| forced smiling | `1.15::forced smile::, looking at viewer, outstretched hand, no eyes, shaded face,` | 책상 너머에서 일어나 악수를 청함 |
-| indifferent | `1.15::expressionless, closed mouth::, looking away, arms behind back, no eyes, shaded face,` | 세계 재난을 분기 실적처럼 |
-| guilty | `1.15::frown, closed mouth::, looking away, hand on own chin, no eyes, shaded face,` | 죄책감 대신 서두름이 새어 나온 실수 |
-| pouting | `1.15::frown, closed mouth::, head tilt, crossed arms, no eyes, shaded face,` | 보고서 말고 입으로 직접 듣고 싶음 |
-| angry smile | `1.15::smile, teeth::, looking down, steepled fingers, no eyes, shaded face,` | 끝까지 친절한 임원처럼 속을 다 긁어 감 |
-| expressionless | `1.15::expressionless, closed mouth::, looking at viewer, no eyes, shaded face,` | 소리가 멎은 방 |
-| tormented | `1.15::gritted teeth, frown::, looking down, hand on own face, no eyes, shaded face,` | 초월자 같다가도 결과에 안달하는 기색 |
-| crazy smile | `1.15::crazy smile, teeth::, head tilt, looking at viewer, no eyes, shaded face,` | 「이쪽은 좀 더 길게 봐야겠군요.」 |
+| suspicious | `light smile, closed mouth, head tilt, hand on own chin, no eyes, shaded face,` | 「사장이 고개를 아주 조금 기울였다」 — 머뭇거림 포착 |
+| worried | `frown, closed mouth, looking down, steepled fingers, no eyes, shaded face,` | 걱정 대신 결과를 빨리 보고 싶은 조급함 |
+| relieved | `smile, closed mouth, looking at viewer, clapping, no eyes, shaded face,` | 「아주 훌륭한 역량을 보여 주셨습니다」 |
+| disgusted | `disdain, closed mouth, looking down, arms behind back, no eyes, shaded face,` | 쓸모가 다한 대상을 내려다봄 |
+| determined | `light smile, closed mouth, looking at viewer, beckoning, no eyes, shaded face,` | 즉시 호출 — 하던 일 두고 최상층으로 |
+| jealous | `closed mouth, light smile, looking to the side, arms behind back, no eyes, shaded face,` | 질투 없음 — 국장이 먼저 만난 「흥미로운 변수」를 곁눈 |
+| pleading | `smile, parted lips, head tilt, palm up, no eyes, shaded face,` | 「UI 말입니다. 개선할 점이 있으면 말씀해 주세요.」 |
+| forced smiling | `forced smile, looking at viewer, outstretched hand, no eyes, shaded face,` | 책상 너머에서 일어나 악수를 청함 |
+| indifferent | `expressionless, closed mouth, looking away, arms behind back, no eyes, shaded face,` | 세계 재난을 분기 실적처럼 |
+| guilty | `frown, closed mouth, looking away, hand on own chin, no eyes, shaded face,` | 죄책감 대신 서두름이 새어 나온 실수 |
+| pouting | `frown, closed mouth, head tilt, crossed arms, no eyes, shaded face,` | 보고서 말고 입으로 직접 듣고 싶음 |
+| angry smile | `smile, teeth, looking down, steepled fingers, no eyes, shaded face,` | 끝까지 친절한 임원처럼 속을 다 긁어 감 |
+| expressionless | `expressionless, closed mouth, looking at viewer, no eyes, shaded face,` | 소리가 멎은 방 |
+| tormented | `gritted teeth, frown, looking down, hand on own face, no eyes, shaded face,` | 초월자 같다가도 결과에 안달하는 기색 |
+| crazy smile | `crazy smile, teeth, head tilt, looking at viewer, no eyes, shaded face,` | 「이쪽은 좀 더 길게 봐야겠군요.」 |

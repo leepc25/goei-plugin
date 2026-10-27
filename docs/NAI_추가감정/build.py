@@ -12,6 +12,7 @@ HAND = re.compile(r'^(hand|hands|own hands|crossed arms|arms? |adjusting|holding
                   r'shrugging|scratching|facepalm|head rest|clenched hands?$|steepled|interlocked|covering|waving|salute|thumbs|'
                   r'index finger|finger|fist|wiping|tucking|twirling|playing with|cupping|clapping|v$|peace sign|spread arms|'
                   r'arm |arms behind|arms up|cigarette$|smoking$)')
+PROP = re.compile(r'^(holding (?!own arm$).*|cigarette|smoke|smoking|mouth hold|chewing|monocle|blood on face|against wall|walkie-talkie|hamster|cup|phone)$')
 OPEN = {'grin', 'teeth', 'open mouth', 'tongue out', 'clenched teeth', 'gritted teeth', 'parted lips'}
 prompts = {}
 for f in sorted(glob.glob(os.path.join(D, '작업', '*.json'))):
@@ -31,18 +32,16 @@ for out, src in SRC.items():
         s['scenePrompt'] = p
         s['id'] = s['createdAt'] = str(int(s['id']) + 1000000)  # 옛 장면과 id 안 겹치게
         s['createdAt'] = int(s['createdAt'])
-        m = re.fullmatch(r'1\.15::([^:]+)::,(.*)', p)
-        if not m or not p.endswith(','): probs.append(f'형식 {s["name"]}: {p}'); continue
-        face = [t.strip() for t in m.group(1).split(',') if t.strip()]
-        rest = [t.strip() for t in m.group(2).split(',') if t.strip()]
-        tags = face + rest
+        if '::' in p or not p.endswith(','): probs.append(f'형식 {s["name"]}: {p}'); continue
+        rest = [t.strip() for t in p.split(',') if t.strip()]
+        tags = rest
+        if [t for t in tags if PROP.match(t)]: probs.append(f'소품 {s["name"]}: {p}')
         tagcount.update(tags)
         if len(set(tags)) != len(tags): probs.append(f'중복태그 {s["name"]}')
         hands = [t for t in rest if HAND.match(t) and t not in ('holding cigarette',)]
         if len([t for t in hands if t not in ('cigarette', 'smoking')]) > 1: probs.append(f'손 {len(hands)}개 {s["name"]}: {hands}')
         if 'closed mouth' in tags and OPEN & set(tags): probs.append(f'입 모순 {s["name"]}: {OPEN & set(tags)}')
-        if not 1 <= len(face) <= 4: probs.append(f'강조 {len(face)}개 {s["name"]}')
-        if not 4 <= len(tags) <= 10: probs.append(f'태그 {len(tags)}개 {s["name"]}')
+        if not 3 <= len(tags) <= 10: probs.append(f'태그 {len(tags)}개 {s["name"]}')
     json.dump(d, open(os.path.join(D, '결과', f'{out}_15_설정반영.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=2)
 # 고정 특징: 캐릭터 15장 공통 마지막 태그 vs 일부에만 있는 태그
 for who, em in prompts.items():

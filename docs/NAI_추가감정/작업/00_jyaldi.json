@@ -1,19 +1,19 @@
 {
   "Jyaldi": {
-    "suspicious": "1.15::narrowed eyes, expressionless::, closed mouth, looking at viewer, crossed arms, black gloves,",
-    "worried": "1.15::furrowed brow, serious::, closed mouth, looking down, holding cigarette, smoke, black gloves,",
-    "relieved": "1.15::half-closed eyes, sigh::, closed mouth, smoking, cigarette, black gloves,",
-    "disgusted": "1.15::disdain, half-closed eyes::, closed mouth, shaded face, looking at viewer, black gloves,",
-    "determined": "1.15::serious, narrowed eyes::, closed mouth, looking at viewer, adjusting gloves, black gloves,",
-    "jealous": "1.15::annoyed, narrowed eyes::, closed mouth, sideways glance, crossed arms, black gloves,",
-    "pleading": "1.15::serious, raised inner eyebrows::, parted lips, looking at viewer, reaching towards viewer, black gloves,",
-    "forced smiling": "1.15::forced smile, half-closed eyes, tired::, looking to the side, hand on own hip, black gloves,",
-    "indifferent": "1.15::expressionless, half-closed eyes::, looking away, cigarette, mouth hold, black gloves,",
-    "guilty": "1.15::looking down, shaded face::, closed mouth, furrowed brow, hand in pocket, black gloves,",
-    "pouting": "1.15::annoyed, frown, half-closed eyes::, closed mouth, hand on own forehead, black gloves,",
-    "angry smile": "1.15::light smile, glaring, shaded face::, closed mouth, looking at viewer, clenched hand, black gloves,",
-    "expressionless": "1.15::expressionless::, closed mouth, looking at viewer, crossed arms, black gloves,",
-    "tormented": "1.15::clenched teeth, glaring, furrowed brow::, shaded face, sweat, looking down, clenched hand, black gloves,",
-    "crazy smile": "1.15::smirk, glowing eyes, constricted pupils::, shaded face, looking at viewer, black gloves,"
+    "suspicious": "narrowed eyes, expressionless, closed mouth, looking at viewer, crossed arms, black gloves,",
+    "worried": "furrowed brow, serious, closed mouth, looking down, black gloves,",
+    "relieved": "half-closed eyes, sigh, closed mouth, black gloves,",
+    "disgusted": "disdain, half-closed eyes, closed mouth, shaded face, looking at viewer, black gloves,",
+    "determined": "serious, narrowed eyes, closed mouth, looking at viewer, adjusting gloves, black gloves,",
+    "jealous": "annoyed, narrowed eyes, closed mouth, sideways glance, crossed arms, black gloves,",
+    "pleading": "serious, raised inner eyebrows, parted lips, looking at viewer, reaching towards viewer, black gloves,",
+    "forced smiling": "forced smile, half-closed eyes, tired, looking to the side, hand on own hip, black gloves,",
+    "indifferent": "expressionless, half-closed eyes, looking away, black gloves,",
+    "guilty": "looking down, shaded face, closed mouth, furrowed brow, hand in pocket, black gloves,",
+    "pouting": "annoyed, frown, half-closed eyes, closed mouth, hand on own forehead, black gloves,",
+    "angry smile": "light smile, glaring, shaded face, closed mouth, looking at viewer, clenched hand, black gloves,",
+    "expressionless": "expressionless, closed mouth, looking at viewer, crossed arms, black gloves,",
+    "tormented": "clenched teeth, glaring, furrowed brow, shaded face, sweat, looking down, clenched hand, black gloves,",
+    "crazy smile": "smirk, glowing eyes, constricted pupils, shaded face, looking at viewer, black gloves,"
   }
 }
