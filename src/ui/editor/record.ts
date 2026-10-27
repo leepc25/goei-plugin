@@ -31,8 +31,24 @@ export const recUi = {
   },
 };
 
+/** 지금 기록 수 (지운 것 제외) — 왼쪽 메뉴 */
+export function recordCount(ctx: ChatContext, kind: WorldKind, over: WorldOverrides): number {
+  return rowsOf(ctx, kind, over).filter((r) => r.state !== 'deleted').length;
+}
+
+/** 괴이·파밍: 무작위 발생 후보인지 (명부 preset). 아니면 null */
+function presetOf(d: Directory, kind: WorldKind, name: string): boolean | null {
+  if (kind !== 'anomaly' && kind !== 'site') return null;
+  const p = (kind === 'anomaly' ? d.anomalies : d.sites).find((x) => x.lore === name);
+  return p ? !!p.preset : null;
+}
+
+/** 발생 후보 ON/OFF 토글 (목록 줄·제목 옆). 명부 preset 을 바꾼다 (저장은 창의 저장 단추) */
+const presetToggle = (kind: WorldKind, name: string, on: boolean | null) =>
+  on === null ? '' : `<button class="gw-pre${on ? ' on' : ''}" data-action="dir-set" data-value="${esc(`preset|${on ? 0 : 1}|${name}`)}" title="무작위 발생 후보 ${on ? 'ON → OFF' : 'OFF → ON'}" aria-pressed="${on}">${on ? '발생 ON' : '발생 OFF'}</button>`;
+
 /** 종류별 기록 이름·부제 (목록용) */
-function rowsOf(ctx: ChatContext, kind: WorldKind, over: WorldOverrides): { name: string; sub: string; state: 'default' | 'edited' | 'new' | 'deleted' }[] {
+function rowsOf(ctx: ChatContext, kind: WorldKind, over: WorldOverrides): { name: string; sub: string; state: 'default' | 'edited' | 'new' | 'deleted'; preset: boolean | null }[] {
   const d = directoryDraft(ctx);
   const recs = worldRecords(kind, over);
   const bucket = (over[kind] ?? {}) as Record<string, Partial<WorldRecord> & { deleted?: boolean }>;
@@ -49,7 +65,7 @@ function rowsOf(ctx: ChatContext, kind: WorldKind, over: WorldOverrides): { name
     const sub =
       kind === 'agent' ? d.agents.find((a) => a.lore === name)?.english ?? '' : kind === 'org' ? d.orgs.find((o) => o.name === name)?.spec.english ?? '' : (d.anomalies.find((p) => p.lore === name) ?? d.sites.find((p) => p.lore === name))?.english ?? '';
     const state = bucket[name]?.deleted ? 'deleted' : !isDefaultRecord(kind, name) ? 'new' : bucket[name] ? 'edited' : 'default';
-    return { name, sub: sub || (rec ? '' : '로어 칸 없음'), state };
+    return { name, sub: sub || (rec ? '' : '로어 칸 없음'), state, preset: presetOf(d, kind, name) };
   });
 }
 
@@ -58,7 +74,7 @@ export function recordList(ctx: ChatContext, kind: WorldKind, over: WorldOverrid
   const sel = edUi.sel[kind] ?? '';
   const badge: Record<string, string> = { default: '', edited: '<i class="gw-badge">고침</i>', new: '<i class="gw-badge new">추가</i>', deleted: '<i class="gw-badge del">지움</i>' };
   return rows.length
-    ? rows.map((r) => `<button class="gw-row${r.name === sel ? ' on' : ''}${r.state === 'deleted' ? ' deleted' : ''}" data-action="ed-sel" data-value="${esc(r.name)}"><b>${esc(r.name)}</b>${r.sub ? `<small>${esc(r.sub)}</small>` : ''}${badge[r.state]}</button>`).join('')
+    ? rows.map((r) => `<div class="gw-rowbox${r.name === sel ? ' on' : ''}${r.state === 'deleted' ? ' deleted' : ''}"><button class="gw-row" data-action="ed-sel" data-value="${esc(r.name)}"><b>${esc(r.name)}</b>${r.sub ? `<small>${esc(r.sub)}</small>` : ''}${badge[r.state]}</button>${presetToggle(kind, r.name, r.preset)}</div>`).join('')
     : '<p class="gx-muted">맞는 기록이 없어요.</p>';
 }
 
@@ -153,7 +169,7 @@ export function recordPage(ctx: ChatContext, kind: WorldKind, over: WorldOverrid
       return a ? `<p class="gw-ro">id ${esc(a.id)}${a.legacyEnglish.length ? ` · 옛 영문명 ${esc(a.legacyEnglish.join(', '))}` : ''} · 검색 키 ${esc(rec.keys || '(이름·영문명·별칭)')}</p>` : '';
     })() : `<p class="gw-ro">검색 키 ${esc(rec.keys || '(이름·영문명·별칭)')}${rec.title ? ` · 제목 ${esc(rec.title)}` : ''}</p>`;
     detail = `<div class="gw-detail">
-      <header class="gw-head"><h2>${esc(sel)}<small>${isDefault ? (edited ? '기본 세계 · 고침' : '기본 세계') : '카드에만 있음'}</small></h2>
+      <header class="gw-head"><h2>${esc(sel)}<small>${isDefault ? (edited ? '기본 세계 · 고침' : '기본 세계') : '카드에만 있음'}</small>${presetToggle(kind, sel, presetOf(d, kind, sel))}</h2>
         <div class="gw-head-act">${recUi.tokensHtml(ctx, kind, over)}
           <button class="gx-mini${recUi.preview ? ' on' : ''}" data-action="ed-preview">${ICONS.book}조립 글 보기</button>
           <button class="gx-mini${recUi.importOpen ? ' on' : ''}" data-action="ed-import-toggle">${ICONS.plus}글로 가져오기</button>
@@ -162,7 +178,7 @@ export function recordPage(ctx: ChatContext, kind: WorldKind, over: WorldOverrid
       ${kind === 'agent' ? `<p class="gw-roster"><button class="gx-chip${rec.rosterOff ? '' : ' on'}" data-action="ed-roster-toggle" aria-pressed="${!rec.rosterOff}">🙂Roster 지침에 포함</button><small>${rec.rosterOff ? '이 요원은 명부 지침(🙂Roster)에 들어가지 않아요. 로어 칸은 그대로 모델에게 가요.' : '명부 지침에 소개 한 줄로 들어가요. 기본은 전원 포함.'}</small></p>` : ''}
       ${recUi.preview ? `<pre class="gw-preview">${esc(text)}</pre>` : ''}
       ${recUi.importOpen ? importPane(kind) : ''}
-      <details class="gw-sec" open><summary>기본 정보 <small>명부</small></summary>${basicPanel(ctx, kind, sel, d) || '<p class="gx-muted">명부 줄이 없어요. 저장하면 생겨요.</p>'}</details>
+      <section class="gw-sec gw-basic">${basicPanel(ctx, kind, sel, d) || '<p class="gx-muted">명부 줄이 없어요. 저장하면 생겨요.</p>'}</section>
       <section class="gw-sec"><h3>로어 칸 ${variantBar}</h3>
         <div class="gw-fields">${rows.join('')}</div>
         ${lines ? `<h4 class="gw-sub">한 줄 추가 항목</h4><div class="gw-fields">${lines}</div>` : ''}

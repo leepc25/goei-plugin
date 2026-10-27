@@ -13,12 +13,12 @@ import { cropValue, directoryDraft, directoryExtList, directoryInput, directoryP
 import { handleImgPrompt, imgInput, imgPromptPane } from '../imgprompt';
 import { ICONS } from '../icons';
 import editorCss from './style.css';
-import { recordList, recordPage, recordAction, recordInput, recUi } from './record';
+import { recordCount, recordList, recordPage, recordAction, recordInput, recUi } from './record';
 import { relationsPage, relationsAction, relationsInput } from './relations';
 import { guidePage, guideAction, guideInput, guideUi } from './guides';
 import { installAction, installPage, instUi, refreshInstall } from './install';
 
-export type EditorNode = WorldKind | 'directory' | 'relations' | 'rules' | `guide:${GuideName}` | 'guide:Image' | 'install';
+export type EditorNode = WorldKind | 'base' | 'relations' | `guide:${GuideName}` | 'guide:Image' | 'install';
 
 export interface EditorHost {
   ctx: () => ChatContext | null;
@@ -97,6 +97,16 @@ function ensureRoot(): HTMLElement {
   root.addEventListener('click', (ev) => {
     const t = ev.target as HTMLElement;
     if (t === root) return void handle('ed-close');
+    // 거점: 지역 지도를 누른 자리가 거점 위치 (%) — 패널(app.ts)과 같은 처리
+    const pickMap = t.closest<HTMLElement>('[data-base-pick]');
+    if (pickMap) {
+      const img = pickMap.querySelector('img')?.getBoundingClientRect();
+      if (!img || !img.width || !img.height) return;
+      const x = ((ev as MouseEvent).clientX - img.left) / img.width * 100;
+      const y = ((ev as MouseEvent).clientY - img.top) / img.height * 100;
+      if (x < 0 || x > 100 || y < 0 || y > 100) return;
+      return void handle('dir-base-xy', `${x.toFixed(1)}|${y.toFixed(1)}|${pickMap.dataset.basePick}`);
+    }
     const el = t.closest<HTMLElement>('[data-action]');
     if (!el || el.hasAttribute('disabled')) return;
     const take = el.dataset.take ? root?.querySelector<HTMLInputElement | HTMLTextAreaElement>(`[name="${el.dataset.take}"]`)?.value : undefined;
@@ -193,8 +203,8 @@ function touched(): void {
 export const isKind = (n: string): n is WorldKind => ['agent', 'org', 'anomaly', 'site', 'appendix'].includes(n);
 
 const TREE: { title: string; items: [EditorNode, string, string][] }[] = [
-  { title: '기록', items: [['agent', '요원', ICONS.person], ['org', '조직', ICONS.org], ['anomaly', '괴이', ICONS.spook], ['site', '파밍', ICONS.star], ['appendix', '부록', ICONS.book], ['directory', '명부 · 거점 · 호칭 · 탭', ICONS.list]] },
-  { title: '세력', items: [['relations', '세력 관계', ICONS.grid], ['rules', '공통 규칙', ICONS.pen]] },
+  { title: '기록', items: [['agent', '요원', ICONS.person], ['org', '조직', ICONS.org], ['anomaly', '괴이', ICONS.spook], ['site', '파밍', ICONS.star], ['appendix', '부록', ICONS.book], ['base', '거점', ICONS.pin]] },
+  { title: '세력', items: [['relations', '세력 관계 · 공통 규칙', ICONS.grid]] },
   { title: '지침', items: [...GUIDE_NAMES.map((g) => [`guide:${g}`, GUIDE_LABEL[g], ICONS.book] as [EditorNode, string, string]), ['guide:Image', '이미지', ICONS.cctv]] },
   { title: '설치', items: [['install', '설치 · 점검', ICONS.refresh]] },
 ];
@@ -215,10 +225,21 @@ function saveBar(): string {
   </div>`;
 }
 
-function tree(): string {
+/** 왼쪽 메뉴의 개수: 기록 종류마다 지금 기록 수(지운 것 제외), 거점 수 */
+function treeCounts(ctx: ChatContext | null): Partial<Record<EditorNode, number>> {
+  if (!ctx) return {};
+  const over = overridesOf(ctx);
+  const out: Partial<Record<EditorNode, number>> = {};
+  for (const k of ['agent', 'org', 'anomaly', 'site', 'appendix'] as WorldKind[]) out[k] = recordCount(ctx, k, over);
+  out.base = directoryDraft(ctx).bases.length;
+  return out;
+}
+
+function tree(ctx: ChatContext | null): string {
+  const counts = treeCounts(ctx);
   return TREE.map(
     (g) => `<div class="gw-tree-group"><h4>${g.title}</h4>${g.items
-      .map(([id, label, icon]) => `<button class="gw-tree-item${edUi.node === id ? ' on' : ''}" data-action="ed-node" data-value="${id}">${icon}<span>${esc(label)}</span></button>`)
+      .map(([id, label, icon]) => `<button class="gw-tree-item${edUi.node === id ? ' on' : ''}" data-action="ed-node" data-value="${id}">${icon}<span>${esc(label)}</span>${counts[id] !== undefined ? `<em>${counts[id]}</em>` : ''}</button>`)
       .join('')}</div>`,
   ).join('');
 }
@@ -226,8 +247,12 @@ function tree(): string {
 function body(ctx: ChatContext): string {
   const n = edUi.node;
   if (isKind(n)) return recordPage(ctx, n, overridesOf(ctx), edUi.q, edUi.sel[n] ?? '');
-  if (n === 'directory') return `<div class="gw-page"><header class="gw-head"><h2>명부 · 거점 · 호칭 · 괴담톡 탭</h2><p class="gx-muted">예전 「설정 → 명부」 화면 그대로예요. 요원·괴이·파밍·조직의 로어 칸은 왼쪽 「기록」에서 고쳐요.</p></header>${directoryView(ctx)}</div>`;
-  if (n === 'relations' || n === 'rules') return relationsPage(ctx, overridesOf(ctx), n === 'rules');
+  if (n === 'base') {
+    // 거점: 지도에 찍히는 장소. 명부 패널의 거점 탭을 그대로 (종류 탭·사용법은 CSS 로 숨김). 호칭·괴담톡 탭은 조직 기록의 기본 정보에
+    dirUi.kind = 'base';
+    return `<div class="gw-page gw-basepage"><header class="gw-head"><h2>거점</h2><p class="gx-muted">지도에 찍히는 장소예요. 조직마다 거점을 두고 지도를 눌러 위치를 정해요. 조직의 호칭·괴담톡 탭은 조직 기록의 「기본 정보」에서 고쳐요.</p></header>${directoryView(ctx)}</div>`;
+  }
+  if (n === 'relations') return relationsPage(ctx, overridesOf(ctx), false);
   if (n === 'guide:Image') return `<div class="gw-page"><header class="gw-head"><h2>이미지 지침</h2><p class="gx-muted">이 기기 공통. 설정 → 캐릭터 이미지의 「지침 편집」과 같은 화면이에요.</p></header>${imgPromptPane(ctx)}</div>`;
   if (n.startsWith('guide:')) return guidePage(n.slice(6) as GuideName);
   // 설치 · 점검: 이 캐릭터를 아직 점검하지 않았으면 점검하고 다시 그린다 (어느 길로 열어도)
@@ -261,7 +286,7 @@ export function render(): void {
       ${edUi.notice ? `<span class="gw-notice err">${esc(edUi.notice)}</span>` : edUi.info ? `<span class="gw-notice">${esc(edUi.info)}</span>` : ''}
       <button class="gx-x" data-action="ed-close" aria-label="닫기">${ICONS.close}</button>
     </header>
-    <nav class="gw-tree">${tree()}</nav>
+    <nav class="gw-tree">${tree(ctx)}</nav>
     <main class="gw-body">${ctx ? body(ctx) : '<p class="gx-err">채팅 정보를 읽지 못했어요. 창을 닫고 다시 열어 주세요.</p>'}</main>
     ${confirm}
   </div>`;
@@ -326,7 +351,7 @@ export async function handle(action: string, value?: string): Promise<void> {
       edUi.q = '';
       edUi.drawer = false;
       edUi.notice = '';
-      if (edUi.node === 'directory') resetDirectory();
+      if (edUi.node === 'base') resetDirectory();
       if (edUi.node === 'install') {
         instUi.notice = '';
         instUi.info = '';

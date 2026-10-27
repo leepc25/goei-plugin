@@ -39,11 +39,10 @@ export function relationsPage(ctx: ChatContext, over: WorldOverrides, rulesOnly:
   const orgs = d.orgs.map((o) => o.name);
   const player = String(ctx.chat.scriptstate?.['$st_faction'] ?? '');
   const playerOrg = player ? d.orgs.find((o) => o.faction === player)?.name ?? '' : '';
-  if (rulesOnly) {
-    return `<div class="gw-page"><header class="gw-head"><h2>세력 공통 규칙</h2><p class="gx-muted">쌍 관계가 아닌 세력 전체 규칙 (각 세력은 유저와 무관하게 움직인다, 적대·협력의 형태 등). Faction 지침 끝에 그대로 들어가요. {A00} 같은 자리표는 그 코드 조직의 이름으로 바뀌어요.</p></header>
-      <textarea class="gw-rules" data-input="ed-rules" rows="18">${esc(rel.common)}</textarea>
-      <div class="gx-row-btns"><span class="gw-tokens">약 ${tokens(rel.common).toLocaleString()}토큰</span><button class="gx-mini" data-action="ed-rules-reset" ${over.relations?.common === undefined ? 'disabled' : ''}>기본으로</button></div></div>`;
-  }
+  void rulesOnly; // 2026-10-27: 세력 관계와 공통 규칙은 한 화면 (아래)
+  const rulesBox = `<section class="gw-sec gw-rules-sec"><h3>공통 규칙 <small>쌍 관계가 아닌 세력 전체 규칙. Faction 지침 끝에 그대로 들어가요. {A00} 같은 자리표는 그 코드 조직의 이름으로 바뀌어요.</small></h3>
+      <textarea class="gw-rules" data-input="ed-rules" rows="14">${esc(rel.common)}</textarea>
+      <div class="gx-row-btns"><span class="gw-tokens">약 ${tokens(rel.common).toLocaleString()}토큰</span><button class="gx-mini" data-action="ed-rules-reset" ${over.relations?.common === undefined ? 'disabled' : ''}>기본으로</button></div></section>`;
   const stageOf = (a: string, b: string) => rel.pairs[`${a}>${b}`]?.stage ?? 'neutral';
   const head = `<tr><th class="corner"><span>보는 쪽 ↓ 대상 →</span></th>${orgs.map((o) => `<th class="col${o === playerOrg ? ' me' : ''}"><span>${esc(o)}</span></th>`).join('')}</tr>`;
   const rows = orgs
@@ -53,7 +52,7 @@ export function relationsPage(ctx: ChatContext, over: WorldOverrides, rulesOnly:
         const key = `${a}>${b}`;
         const st = stageOf(a, b);
         const memo = rel.pairs[key]?.memo?.trim();
-        return `<td class="st-${st}${relUi.cell === key ? ' sel' : ''}${a === playerOrg || b === playerOrg ? ' me' : ''}" data-action="ed-rel-cell" data-value="${esc(key)}" title="${esc(a)} → ${esc(b)}: ${RELATION_LABEL[st]}"><i></i><span>${SHORT[st]}</span>${memo ? '<em>·</em>' : ''}</td>`;
+        return `<td class="st-${st}${relUi.cell === key ? ' sel' : ''}${a === playerOrg || b === playerOrg ? ' me' : ''}" data-action="ed-rel-cell" data-value="${esc(key)}" title="${esc(a)} → ${esc(b)}: ${RELATION_LABEL[st]}">${SHORT[st] ? `<span>${SHORT[st]}</span>` : ''}${memo ? '<em></em>' : ''}</td>`;
       })
       .join('')}</tr>`)
     .join('');
@@ -70,11 +69,12 @@ export function relationsPage(ctx: ChatContext, over: WorldOverrides, rulesOnly:
   return `<div class="gw-page"><header class="gw-head"><h2>세력 관계</h2>
       <div class="gw-head-act"><label class="gw-toggle"><input type="checkbox" data-action="ed-rel-sym" ${sym() ? 'checked' : ''}> 대칭 (반대 칸도 같이)</label>
         <button class="gx-mini${relUi.preview ? ' on' : ''}" data-action="ed-rel-preview">Faction 지침 보기</button><span class="gw-tokens">Faction 약 ${tokens(fac).toLocaleString()}토큰</span></div>
-      <p class="gx-muted">행이 보는 쪽, 열이 대상이에요. 단계는 세력 평판 5단계와 같고 평판 시작값이 돼요. 중립은 빈 칸. ${playerOrg ? `지금 플레이 세력(${esc(playerOrg)}) 행·열은 테두리로 표시했어요.` : ''}</p></header>
-    <div class="gw-legend">${RELATION_STAGES.map((s) => `<span class="st-${s}"><i></i>${RELATION_LABEL[s]}</span>`).join('')}</div>
+      <p class="gx-muted">행이 보는 쪽, 열이 대상이에요. 단계는 세력 평판 5단계와 같고 평판 시작값이 돼요. 중립은 빈 칸. ${playerOrg ? `지금 플레이 세력(${esc(playerOrg)}) 행·열은 옅게 칠했어요.` : ''}</p></header>
+    <div class="gw-legend">${RELATION_STAGES.filter((s) => s !== 'neutral').map((s) => `<span class="st-${s}"><i></i>${RELATION_LABEL[s]}</span>`).join('')}<span><i class="none"></i>중립 (빈 칸)</span></div>
     <div class="gw-grid-wrap"><table class="gw-grid"><thead>${head}</thead><tbody>${rows}</tbody></table></div>
     ${memoBox}
     ${relUi.preview ? `<pre class="gw-preview">${esc(fac)}</pre>` : ''}
+    ${rulesBox}
   </div>`;
 }
 

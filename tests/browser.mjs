@@ -137,7 +137,7 @@ async function pickCustom(page, row = '.gx-mlist li.gx-mx') {
   await page.click('[data-action="prefs-open"]');
   await page.waitForSelector('.gx-settings');
   assert.equal(await page.$('[data-action="set-scope"][data-value="chat"]'), null, '시작 전에는 「이 채팅」 없음');
-  assert.ok(await page.$('[data-action="ed-open"][data-value="directory"]'), '시작 전에도 세계 편집(명부) 버튼 (3단계: 명부 탭은 편집 창으로)');
+  assert.ok(await page.$('[data-action="ed-open"][data-value="agent"]'), '시작 전에도 세계 편집 버튼 (3단계: 명부 탭은 편집 창으로)');
   // 4단계: 상태창 칸 표 (새 채팅 기본값) — 잠긴 칸은 끌 수 없고, 끈 칸은 표시 조작이 잠긴다
   if (await page.$('.st-colsbox summary')) {
   await page.click('.st-colsbox summary');
