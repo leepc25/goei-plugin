@@ -325,9 +325,12 @@ async function pickCustom(page, row = '.gx-mlist li.gx-mx') {
   await page.waitForTimeout(300);
   assert.equal(await page.evaluate(() => window.__calls.show.length), 0);
   assert.equal(await page.$('.gx-panel'), null);
-  assert.equal(await page.evaluate(() => window.__button), undefined, '채팅 메뉴 항목 없음');
+  // 5단계(2026-10-27): 다른 봇에는 햄버거 메뉴의 「설치·점검」 단추 하나만 (본체는 꺼내지 않음)
+  const btn = await page.evaluate(() => window.__button);
+  assert.equal(btn?.arg?.id, 'goei-plugin-install', '설치·점검 단추만');
+  assert.equal(btn?.arg?.location, 'hamburger');
   assert.deepEqual(errors, []);
-  console.log('PASS 다른 봇 → 아무것도 표시하지 않음');
+  console.log('PASS 다른 봇 → 설치 단추 말고는 아무것도 표시하지 않음');
   await page.close();
 }
 
