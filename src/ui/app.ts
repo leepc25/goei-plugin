@@ -500,6 +500,8 @@ export async function openApp(opts: { quietIfNotLite?: boolean } = {}): Promise<
 /** 설치 · 점검 (설계안 9절): 괴이 카드가 아닌 봇에서도 연다. 편집 창이 채팅 정보를 직접 읽는다 */
 let installCtx: ChatContext | null = null;
 export async function openInstall(): Promise<void> {
+  // 플러그인 칸(iframe)이 안 떠 있으면 패널부터 띄운다: 편집 창도 같은 칸 안에 그려져서, 안 띄우면 눌러도 아무것도 안 보인다 (2026-10-27 깡통봇)
+  if (!shown) await openApp();
   installCtx = await loadContext().catch(() => null);
   if (!installCtx) {
     ensureRoot();
