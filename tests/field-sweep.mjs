@@ -10,7 +10,7 @@ const scenes = await ev(() => window.__goeiEngine.world.stage.sceneIds());
 const report = [];
 const closeAll = async () => {
   for (let i = 0; i < 4; i++) {
-    const open = await ev(() => !!document.querySelector('.mn.on') || !!document.querySelector('.gnp:not([hidden])') || !document.querySelector('.goei-engine-hq')?.hidden || !document.querySelector('.goei-engine-elev')?.hidden);
+    const open = await ev(() => !!document.querySelector('.mn.on') || !!document.querySelector('.gf-shop:not([hidden])') || !!document.querySelector('.gnp:not([hidden])') || !document.querySelector('.goei-engine-hq')?.hidden || !document.querySelector('.goei-engine-elev')?.hidden);
     if (!open) return;
     await page.keyboard.press('Escape'); await page.waitForTimeout(250);
   }
@@ -45,8 +45,8 @@ for (const id of scenes) {
     await page.waitForTimeout(300);
     const near = await ev(() => window.__goeiEngine.world.stage.nearInfo());
     await page.keyboard.press('KeyE'); await page.waitForTimeout(900);
-    const got = await ev(() => ({ choose: document.querySelector('.mn.on')?.textContent?.includes('시간 보내기') ?? false, gnp: !!document.querySelector('.gnp:not([hidden])'), talk: !!document.querySelector('.gtalk[data-open], [data-open].gk-talk'), hq: !document.querySelector('.goei-engine-hq')?.hidden, scene: window.__goeiEngine.world?.stage.current()?.id, say: window.__goeiEngine.world?.subtitle?.text ?? null }));
-    report.push(`${id} 자리 ${s.id}(${s.verb}) 안내=${near ? near.text : '없음!'} E→ ${got.choose ? '시간 보내기 ' : ''}${got.gnp ? '대화창 ' : ''}${got.hq ? '메뉴창 ' : ''}${got.say ? `「${got.say}」 ` : ''}${got.scene !== id ? `장면 ${got.scene}` : ''}`);
+    const got = await ev(() => ({ shop: !!document.querySelector('.gf-shop:not([hidden])'), choose: document.querySelector('.mn.on')?.textContent?.includes('시간 보내기') ?? false, gnp: !!document.querySelector('.gnp:not([hidden])'), talk: !!document.querySelector('.gtalk[data-open], [data-open].gk-talk'), hq: !document.querySelector('.goei-engine-hq')?.hidden, scene: window.__goeiEngine.world?.stage.current()?.id, say: window.__goeiEngine.world?.subtitle?.text ?? null }));
+    report.push(`${id} 자리 ${s.id}(${s.verb}) 안내=${near ? near.text : '없음!'} E→ ${got.shop ? '가게 창 ' : ''}${got.choose ? '시간 보내기 ' : ''}${got.gnp ? '대화창 ' : ''}${got.hq ? '메뉴창 ' : ''}${got.say ? `「${got.say}」 ` : ''}${got.scene !== id ? `장면 ${got.scene}` : ''}`);
     if (shots && (got.gnp || got.hq)) await page.screenshot({ path: `${shots}/${id}-${s.id}.png` });
     await closeAll();
   }
