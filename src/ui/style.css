@@ -2849,3 +2849,7 @@ button.mk-go:hover { color: var(--signal); }
 .gx-switch[aria-checked="true"] { background: var(--signal); border-color: var(--signal); }
 .gx-switch[aria-checked="true"] i { transform: translateX(16px); background: var(--on-signal, #fff); }
 .gx-switch:disabled { opacity: .4; cursor: default; }
+.gx-switch-wrap { display: inline-flex; align-items: center; gap: 8px; }
+.gx-switch-wrap small { font-size: 11.5px; color: var(--dim); white-space: nowrap; }
+/* 범위 배지: 이 줄의 값이 어디에 저장되나 (이 기기 공통) */
+.gx-scope { display: inline-block; margin-left: 6px; padding: 1px 6px; border-radius: 5px; font-style: normal; font-size: 10.5px; font-weight: 500; color: var(--dim); background: var(--panel2); vertical-align: middle; }

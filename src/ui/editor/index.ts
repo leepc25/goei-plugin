@@ -319,9 +319,9 @@ function settingsPage(ctx: ChatContext, page: SetPage): string {
     case 'update': body = sec('update'); break;
   }
   // 머리는 모든 페이지가 같다: 제목 왼쪽, 오른쪽에 범위(이 채팅/새 채팅 기본값) 또는 그 기능의 단추(덮어쓰기·불러오기). 시작 전이면 같은 글귀
-  const showScope = ['screen', 'image', 'board', 'adv'].includes(page);
-  const right = showScope ? scopeSeg : `${canChat ? '' : '<span class="gw-tokens">새 채팅 기본값 (시작 전)</span>'}${act}`;
-  const crumb = page === 'update' ? '관리' : `설정 / ${canChat ? (scope === 'chat' ? '이 채팅' : '새 채팅 기본값') : '새 채팅 기본값 · 시작 전'}`;
+  const showScope = ['image', 'board', 'adv'].includes(page);
+  const right = page === 'screen' ? '<span class="gw-tokens">이 기기 공통</span>' : showScope ? scopeSeg : `${canChat ? '' : '<span class="gw-tokens">새 채팅 기본값 (시작 전)</span>'}${act}`;
+  const crumb = page === 'update' ? '관리' : page === 'screen' ? '설정 / 이 기기 공통' : `설정 / ${canChat ? (scope === 'chat' ? '이 채팅' : '새 채팅 기본값') : '새 채팅 기본값 · 시작 전'}`;
   return `<div class="gw-page gw-set"><header class="gw-head"><div class="gw-crumb">${esc(crumb)}</div><h2>${esc(title)}</h2>${right ? `<div class="gw-head-act">${right}</div>` : ''}</header>
     ${settingsNotices()}
     <div class="gx-settings gw-setbody">${body}</div></div>`;

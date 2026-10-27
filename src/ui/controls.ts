@@ -6,7 +6,7 @@ export const isOnOff = (items: [string, string][]): boolean => items.length === 
 
 /** 스위치: 누르면 data-value(반대 값)로 data-action 이 간다. 켜짐은 aria-checked */
 export function switchHtml(o: { action: string; value: string; on: boolean; disabled?: boolean; label?: string }): string {
-  return `<button class="gx-switch" role="switch" aria-checked="${o.on}" data-action="${esc(o.action)}" data-value="${esc(o.value)}" ${o.disabled ? 'disabled' : ''}${o.label ? ` aria-label="${esc(o.label)}"` : ''}><i></i></button>`;
+  return `<span class="gx-switch-wrap"><small>${o.disabled ? '비활성' : o.on ? '켬' : '끔'}</small><button class="gx-switch" role="switch" aria-checked="${o.on}" data-action="${esc(o.action)}" data-value="${esc(o.value)}" ${o.disabled ? 'disabled' : ''}${o.label ? ` aria-label="${esc(o.label)}"` : ''}><i></i></button></span>`;
 }
 
 /** seg 도우미용: ON/OFF 쌍이면 스위치 HTML, 아니면 null. valueOf 는 data-value 를 만드는 규칙 */
