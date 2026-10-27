@@ -40,7 +40,9 @@ import { cardPalette as themedCardPalette, currentTheme, onThemeChange, repaintT
 import { hasImgTag, IMG_RECENT, imgTagsKnown, renderImgTags, setImgHidden, stripOldImgTags } from './core/imgtag';
 import { loadModuleAssets, modulePicker } from './host/assets';
 import { getPrefs } from './core/settings';
-import { openApp, openWiki } from './ui/app';
+import { openApp, openInstall, openWiki } from './ui/app';
+import { isGoeiLore } from './core/install';
+import { loadStoredWikiPack } from './host/install';
 import { GHOST_ICON } from './ui/icons';
 import { landingHtml as renderLanding } from './ui/landing';
 import { loadPrefs } from './host/prefs';
@@ -133,7 +135,7 @@ function loreFor(char: LoreChar, chat: Chat, input?: string) {
 /** 고른 로어북을 자리 항목이 읽는 채팅 변수에 적는다 (요청 전이라 Risu가 세고 넘치면 오래된 채팅을 지운다) */
 async function storeLore(charIndex: number, chatIndex: number, input?: string): Promise<void> {
   let char = await getChar<LoreChar>(charIndex);
-  if (!char || !readManifest(char.globalLore)) return;
+  if (!char || !isGoeiLore(char.globalLore)) return;
   // 이 채팅의 보내는 방식에 맞게 네 폴더 항목 첫 줄(@@dont_activate)을 맞춘다. 사용자가 새로 넣은 항목도 같이
   const cur0 = (await risuai.getChatFromIndex(charIndex, chatIndex)) as Chat | null;
   const mode = advValue(cur0?.scriptstate, 'gen', 'lore_mode') as LoreMode;
@@ -355,7 +357,7 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
   try {
     const raw0 = arg.char as { globalLore?: LoreEntry[] } | null;
     const chat = arg.chat as Chat | null;
-    if (!raw0 || !chat || !readManifest(raw0.globalLore)) return; // 다른 봇: 아무것도 안 함
+    if (!raw0 || !chat || !isGoeiLore(raw0.globalLore)) return; // 다른 봇: 아무것도 안 함
     // 이벤트의 캐릭터는 카드 그대로라 세계 데이터(가상 로어북)가 없다. 경량 카드는 명부 폴더가 가상이라 이걸 빼면 상황판 처리가 통째로 건너뛰어진다 (2026-10-27)
     const char = { ...raw0, globalLore: withWorldLore(raw0.globalLore) };
     const raw = chat.message?.[arg.messageIndex]?.data;
@@ -517,7 +519,7 @@ async function redrawAfterLoad(): Promise<void> {
     await assetsFirst;
     if (isWaiting()) return;
     const ctx = await loadContext();
-    if (!ctx || !readManifest(ctx.char.globalLore)) return;
+    if (!ctx || !isGoeiLore(ctx.char.globalLore)) return;
     if (!ctx.chat.message.some((m) => typeof m.data === 'string' && m.data.includes('<img='))) return;
     await updateChat(ctx.charIndex, ctx.chatIndex, (cur) => ({ ...cur }));
   } catch {
@@ -573,7 +575,7 @@ async function isLiteCharacter(charIndex: number): Promise<boolean> {
   if (charIndex < 0) return false;
   try {
     const char = await getChar<{ globalLore?: LoreEntry[] }>(charIndex);
-    const lite = !!readManifest(char?.globalLore);
+    const lite = isGoeiLore(char?.globalLore);
     if (lite && char) prefetchFactions(char as never); // 시작 화면을 열 때 사진이 하나씩 늦게 뜨지 않게
     return lite;
   } catch {
@@ -633,12 +635,15 @@ export interface BodyHandlers {
   input: typeof onInput;
   output: typeof onOutput;
   display: typeof onDisplay;
+  /** 깡통봇 설치·점검 화면 (시작기의 햄버거 단추) */
+  install: () => Promise<void>;
   unload: () => Promise<void>;
 }
 
 /** 본체 시작: 설정을 읽고 플로팅 버튼·채팅 감시를 켠다. Risu에 거는 처리기는 시작기(main.ts)가 대신 걸고 여기로 넘긴다 */
 export async function start(): Promise<BodyHandlers> {
   await loadPrefs();
+  await loadStoredWikiPack();
   // 채팅 속 이미지 태그가 쓸 모듈 에셋 이름 (창을 열 때도 다시 읽는다)
   assetsFirst = loadModuleAssets();
   void redrawAfterLoad();
@@ -665,6 +670,7 @@ export async function start(): Promise<BodyHandlers> {
     input: onInput,
     output: onOutput,
     display: onDisplay,
+    install: () => openInstall(),
     unload: async () => {
       stopWatcher?.();
       await fab?.remove().catch(() => {});

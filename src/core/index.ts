@@ -32,5 +32,6 @@ export * from './gamelink';
 export * as imgtag from './imgtag';
 export * as imgprompt from './imgprompt';
 export * from './statusctx';
+export * from './install';
 export * from './wallet';
 export * from './field';

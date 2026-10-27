@@ -5,6 +5,8 @@ import { factionList } from '../core/factions';
 import { setOpeningHint } from '../host/openinghint';
 import { NavHistory } from '../core/navhist';
 import { applyStart, chatPhase, currentChoice, planStart, readManifest, StartError } from '../core/start';
+import { isGoeiLore } from '../core/install';
+import { refreshInstall } from './editor/install';
 import type { FactionCode, LangCode, LoreEntry, Manifest } from '../core/types';
 import {
   activeEvents, type Catalog, endedShown, codesToNames, factionNames, lastStatusFields, locName, parseCatalog, readWorld, rosterFor, startWorldVars, agentLocked, readDirectory, type WorldState, worldOn,
@@ -71,7 +73,7 @@ interface Draft {
 type View =
   | { kind: 'loading' }
   | { kind: 'error'; message: string }
-  | { kind: 'not-lite'; name: string }
+  | { kind: 'not-lite'; name: string; goei?: boolean }
   | { kind: 'started'; ctx: ChatContext }
   /** 커스텀 임무로 시작을 골랐고 첫 지시문을 아직 안 보냄 */
   | { kind: 'opening'; ctx: ChatContext }
@@ -474,7 +476,7 @@ export async function openApp(opts: { quietIfNotLite?: boolean } = {}): Promise<
   ensureRoot();
   if (opts.quietIfNotLite) {
     const ctx = await loadContext().catch(() => null);
-    if (!ctx || !readManifest(ctx.char.globalLore)) return;
+    if (!ctx || !isGoeiLore(ctx.char.globalLore)) return;
   }
   view = { kind: 'loading' };
   notice = '';
@@ -495,6 +497,30 @@ export async function openApp(opts: { quietIfNotLite?: boolean } = {}): Promise<
 }
 
 /** 채팅 속 상태창의 위키 이름을 눌렀을 때: 창을 그 위키 문서로 연다 */
+/** 설치 · 점검 (설계안 9절): 괴이 카드가 아닌 봇에서도 연다. 편집 창이 채팅 정보를 직접 읽는다 */
+let installCtx: ChatContext | null = null;
+export async function openInstall(): Promise<void> {
+  installCtx = await loadContext().catch(() => null);
+  if (!installCtx) {
+    ensureRoot();
+    view = { kind: 'error', message: '선택된 채팅이 없어요. 설치할 봇의 채팅을 연 뒤 다시 눌러 주세요.' };
+    render();
+    shown = true;
+    await showWindow();
+    return;
+  }
+  const host = {
+    ctx: () => installCtx,
+    refresh: async () => {
+      installCtx = (await loadContext().catch(() => null)) ?? installCtx;
+      if (shown) await refresh();
+    },
+    theme: () => root?.dataset.theme ?? getPrefs().theme ?? 'dark',
+  };
+  await refreshInstall(installCtx);
+  openEditor(host, 'install');
+}
+
 export async function openWiki(title: string): Promise<void> {
   await openApp({ quietIfNotLite: true });
   if (view.kind === 'started') await handle('wiki-goto', title);
@@ -529,7 +555,7 @@ async function refresh(): Promise<void> {
       const cur = currentChoice(ctx.chat);
       const facs = factionList(ctx.char.globalLore);
       const presetStaged = phase === 'staged' && !!cur.faction && !!cur.fm && findScenario(cur.faction, cur.fm, facs)?.kind === 'preset';
-      if (!manifest) view = { kind: 'not-lite', name: String(ctx.char.name ?? '') };
+      if (!manifest) view = { kind: 'not-lite', name: String(ctx.char.name ?? ''), goei: isGoeiLore(ctx.char.globalLore) };
       else if (phase === 'started') view = { kind: 'started', ctx };
       else if (presetStaged && !repick) view = { kind: 'opening', ctx };
       else {
@@ -596,6 +622,10 @@ async function handle(action: string, value?: string): Promise<void> {
     // 세계 편집 창 (별도 창). 시작 전(설정 패널)에도 열 수 있다: ctx 가 있으면
     if (!(view.kind === 'started' || view.kind === 'picker')) return;
     openEditor({ ctx: () => (view.kind === 'started' || view.kind === 'picker' ? view.ctx : null), refresh: () => refresh(), theme: () => root?.dataset.theme ?? 'dark' }, (value as EditorNode) || undefined);
+    return;
+  }
+  if (action === 'install-open') {
+    await openInstall();
     return;
   }
   if (action === 'set-editor-width') {
@@ -1233,8 +1263,9 @@ function body(): string {
       return `${header('오류')}<div class="gx-empty">${esc(view.message)}</div>`;
     case 'not-lite':
       return `${header('연결 안 됨')}<div class="gx-empty">
-        <p><b>${esc(view.name || '이 캐릭터')}</b>는 ${BRAND.name} 카드가 아니에요.</p>
-        <p>플러그인은 ${BRAND.name} 전용 카드(${CARD_FILE})에서만 동작해요. 원본 괴이봇 카드는 기존 Lua로 그대로 돌아가요.</p>
+        <p><b>${esc(view.name || '이 캐릭터')}</b>는 ${view.goei ? `${BRAND.name} 카드지만 Plugin manifest 가 없어요.` : `${BRAND.name} 카드가 아니에요.`}</p>
+        <p>${view.goei ? '설치 · 점검에서 매니페스트와 인사말을 다시 심으면 시작 화면이 열려요.' : `이 봇에 ${BRAND.name}를 설치하면(설정 폴더·명부·인사말·사진·아이콘을 심어요) 여기서 바로 쓸 수 있어요. 기존 로어북·인사말·에셋은 그대로 둬요.`}</p>
+        <button class="gx-start" data-action="install-open">${view.goei ? '설치 · 점검 열기' : `이 봇에 ${BRAND.name} 설치`}</button>
       </div>`;
     case 'started':
       evSeenReset();

@@ -16,6 +16,7 @@ import editorCss from './style.css';
 import { recordList, recordPage, recordAction, recordInput, recUi } from './record';
 import { relationsPage, relationsAction, relationsInput } from './relations';
 import { guidePage, guideAction, guideInput, guideUi } from './guides';
+import { installAction, installPage, instUi, refreshInstall } from './install';
 
 export type EditorNode = WorldKind | 'directory' | 'relations' | 'rules' | `guide:${GuideName}` | 'guide:Image' | 'install';
 
@@ -208,7 +209,15 @@ function body(ctx: ChatContext): string {
   if (n === 'relations' || n === 'rules') return relationsPage(ctx, overridesOf(ctx), n === 'rules');
   if (n === 'guide:Image') return `<div class="gw-page"><header class="gw-head"><h2>이미지 지침</h2><p class="gx-muted">이 기기 공통. 설정 → 캐릭터 이미지의 「지침 편집」과 같은 화면이에요.</p></header>${imgPromptPane(ctx)}</div>`;
   if (n.startsWith('guide:')) return guidePage(n.slice(6) as GuideName);
-  return `<div class="gw-page"><header class="gw-head"><h2>설치 · 점검</h2></header><p class="gx-hint">깡통봇 설치(폴더·매니페스트·명부 심기, 그림 받기, 인사말 심기)와 점검은 다음 단계(5단계)에서 들어와요.</p></div>`;
+  // 설치 · 점검: 이 캐릭터를 아직 점검하지 않았으면 점검하고 다시 그린다 (어느 길로 열어도)
+  if (instUi.forChar !== ctx.charIndex && !instUi.pending) {
+    instUi.pending = true;
+    void refreshInstall(ctx).finally(() => {
+      instUi.pending = false;
+      render();
+    });
+  }
+  return installPage(ctx);
 }
 
 export function render(): void {
@@ -297,6 +306,11 @@ export async function handle(action: string, value?: string): Promise<void> {
       edUi.drawer = false;
       edUi.notice = '';
       if (edUi.node === 'directory') resetDirectory();
+      if (edUi.node === 'install') {
+        instUi.notice = '';
+        instUi.info = '';
+        instUi.forChar = -1; // 열 때마다 다시 점검
+      }
       return render();
     case 'ed-width': {
       const w = Math.max(50, Math.min(100, Number(value) || 90));
@@ -321,6 +335,7 @@ export async function handle(action: string, value?: string): Promise<void> {
     if (await guideAction(action, value)) render();
     return;
   }
+  if (await installAction(action, ctx, env)) return;
   if (isKind(edUi.node) && (await recordAction(action, value, ctx, edUi.node))) render();
 }
 

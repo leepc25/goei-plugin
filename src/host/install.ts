@@ -1,0 +1,186 @@
+// 깡통봇 설치·점검의 받기·저장 (core/install.ts 가 계산, 여기서 Risu 에 쓴다).
+// 로어북·인사말은 캐릭터에, 사진은 에셋 저장소(release/pic), 아이콘은 release/icon.png 를 받아 메인 아이콘으로,
+// 위키 기본 문서 묶음은 release/wiki-base.N.txt 를 받아 플러그인 저장소에 둔다.
+import { installCheck, installLore, INSTALL_ICON, plantGreetings, type InstallState } from '../core/install';
+import { UPDATE_BASE } from '../core/update';
+import { setStoredWikiPack, storedWikiPack, WIKI_PACK_HEAD } from '../core/wiki';
+import type { LoreEntry } from '../core/types';
+import { fetchPictures } from './picpack';
+import { toBytes } from './assets';
+import { forgetImages } from '../ui/images';
+
+const WIKI_KEY = 'goei:wikibase';
+const ICON_KEY = 'goei:icon';
+
+type RisuFetch = (url: string, arg: Record<string, unknown>) => Promise<{ ok: boolean; data: unknown; status: number }>;
+
+async function getText(name: string): Promise<string> {
+  const url = `${UPDATE_BASE}/${name}?t=${Date.now()}`;
+  const legacy = (risuai as unknown as { risuFetch?: RisuFetch }).risuFetch;
+  if (legacy) {
+    try {
+      const r = await legacy(url, { method: 'GET', plainFetchForce: true, rawResponse: true, headers: { 'Content-Type': 'text/plain' } });
+      if (r?.ok && r.data instanceof Uint8Array) return new TextDecoder().decode(r.data);
+    } catch {
+      // 아래에서 다시
+    }
+  }
+  const res = await risuai.nativeFetch(url, { method: 'GET' });
+  if (!res.ok) throw new Error(`${name}을 받지 못했어요 (${res.status}).`);
+  return String((await res.text()) ?? '');
+}
+
+async function getBytes(name: string): Promise<Uint8Array> {
+  const url = `${UPDATE_BASE}/${name}?t=${Date.now()}`;
+  const legacy = (risuai as unknown as { risuFetch?: RisuFetch }).risuFetch;
+  if (legacy) {
+    try {
+      const r = await legacy(url, { method: 'GET', plainFetchForce: true, rawResponse: true, headers: { 'Content-Type': 'text/plain' } });
+      const b = r?.ok ? toBytes(r.data) : null;
+      if (b?.length) return b;
+    } catch {
+      // 아래에서 다시
+    }
+  }
+  const res = await risuai.nativeFetch(url, { method: 'GET' });
+  if (!res.ok) throw new Error(`${name}을 받지 못했어요 (${res.status}).`);
+  return new Uint8Array(await res.arrayBuffer());
+}
+
+/** 저장소의 위키 묶음을 읽어 core/wiki 에 알린다 (본체 시작 때 한 번) */
+export async function loadStoredWikiPack(): Promise<void> {
+  try {
+    const raw: unknown = await risuai.pluginStorage.getItem(WIKI_KEY);
+    setStoredWikiPack(typeof raw === 'string' && raw.startsWith(WIKI_PACK_HEAD) ? raw : null);
+  } catch {
+    setStoredWikiPack(null);
+  }
+}
+
+/** 아이콘 기록: 캐릭터 id → { ours: 우리 아이콘 경로, prev: 설치 전 아이콘 } */
+interface IconNote {
+  ours: string;
+  prev: string;
+}
+async function iconNotes(): Promise<Record<string, IconNote>> {
+  try {
+    const raw: unknown = await risuai.pluginStorage.getItem(ICON_KEY);
+    const o = typeof raw === 'string' ? JSON.parse(raw) : raw;
+    return o && typeof o === 'object' ? (o as Record<string, IconNote>) : {};
+  } catch {
+    return {};
+  }
+}
+
+const charId = (char: Record<string, unknown>) => String(char.chaId ?? char.name ?? '');
+
+/** 지금 캐릭터의 설치 상태 */
+export async function checkInstall(charIndex: number): Promise<{ state: InstallState; iconPrev: string }> {
+  const char = ((await risuai.getCharacterFromIndex(charIndex)) ?? {}) as Record<string, unknown>;
+  const notes = await iconNotes();
+  const note = notes[charId(char)];
+  const lore = char.globalLore as LoreEntry[] | undefined;
+  const packInLore = (lore ?? []).some((e) => typeof e.content === 'string' && e.content.startsWith(WIKI_PACK_HEAD));
+  const state = installCheck({
+    lore,
+    alternateGreetings: char.alternateGreetings,
+    assets: char.additionalAssets,
+    iconOurs: !!note && note.ours === String(char.image ?? ''),
+    wikiPack: packInLore || !!storedWikiPack(),
+  });
+  return { state, iconPrev: note?.prev ?? '' };
+}
+
+export type InstallStep = 'lore' | 'pictures' | 'icon' | 'wiki';
+export type Progress = (text: string) => void;
+
+/** 로어북·인사말 심기 (없는 것만). 캐릭터를 저장한다 */
+export async function installLoreAndGreetings(charIndex: number): Promise<void> {
+  const char = (await risuai.getCharacterFromIndex(charIndex)) as Record<string, unknown> | null;
+  if (!char) throw new Error('캐릭터를 찾을 수 없어요.');
+  const planted = plantGreetings(char.alternateGreetings);
+  const lore = installLore(char.globalLore as LoreEntry[] | undefined, planted.index);
+  await risuai.setCharacterToIndex(charIndex, { ...char, globalLore: lore, alternateGreetings: planted.greetings });
+}
+
+/** 없는 카드 사진을 release/pic 에서 받아 에셋 저장소에 넣는다 */
+export async function installPictures(charIndex: number, progress: Progress): Promise<number> {
+  const char = (await risuai.getCharacterFromIndex(charIndex)) as Record<string, unknown> | null;
+  if (!char) throw new Error('캐릭터를 찾을 수 없어요.');
+  const { state } = await checkInstall(charIndex);
+  const get = state.pictures.missing;
+  if (!get.length) return 0;
+  let last = 0;
+  const rows = await fetchPictures(char.additionalAssets, { get, replaced: 0, added: get.length, bytes: state.pictures.bytes }, (n, phase) => {
+    if (n - last >= 10 || n === 0 || n === get.length) {
+      last = n;
+      progress(`사진 ${phase === 'get' ? '받는' : '저장'} 중 ${n}/${get.length}`);
+    }
+  });
+  const fresh = ((await risuai.getCharacterFromIndex(charIndex)) ?? char) as Record<string, unknown>;
+  await risuai.setCharacterToIndex(charIndex, { ...fresh, additionalAssets: rows });
+  forgetImages();
+  return get.length;
+}
+
+/** 아이콘: release/icon.png 를 받아 저장하고 메인 아이콘으로. 설치 전 아이콘은 기록해 둔다 (「이전 아이콘으로」) */
+export async function installIcon(charIndex: number, progress: Progress): Promise<void> {
+  if (!INSTALL_ICON.file) throw new Error('이 판에는 아이콘 정보가 없어요.');
+  const char = (await risuai.getCharacterFromIndex(charIndex)) as Record<string, unknown> | null;
+  if (!char) throw new Error('캐릭터를 찾을 수 없어요.');
+  progress('아이콘 받는 중…');
+  const bytes = await getBytes(INSTALL_ICON.file);
+  if (INSTALL_ICON.bytes && bytes.length !== INSTALL_ICON.bytes) throw new Error('아이콘을 끝까지 받지 못했어요.');
+  const path = await risuai.saveAsset(bytes);
+  if (typeof path !== 'string' || !path) throw new Error('아이콘을 저장하지 못했어요.');
+  const notes = await iconNotes();
+  const id = charId(char);
+  const prev = String(char.image ?? '');
+  notes[id] = { ours: path, prev: notes[id]?.ours === prev ? notes[id].prev : prev };
+  await risuai.pluginStorage.setItem(ICON_KEY, JSON.stringify(notes));
+  await risuai.setCharacterToIndex(charIndex, { ...char, image: path });
+}
+
+/** 설치 전 아이콘으로 되돌린다 */
+export async function restoreIcon(charIndex: number): Promise<boolean> {
+  const char = (await risuai.getCharacterFromIndex(charIndex)) as Record<string, unknown> | null;
+  if (!char) return false;
+  const notes = await iconNotes();
+  const note = notes[charId(char)];
+  if (!note?.prev) return false;
+  await risuai.setCharacterToIndex(charIndex, { ...char, image: note.prev });
+  delete notes[charId(char)];
+  await risuai.pluginStorage.setItem(ICON_KEY, JSON.stringify(notes));
+  return true;
+}
+
+/** 위키 기본 문서 묶음: release/wiki-base.N.txt 를 받아 저장소에 */
+export async function installWikiPack(progress: Progress): Promise<number> {
+  if (!UPDATE_BASE) throw new Error('받을 곳이 정해지지 않은 빌드예요.');
+  progress('위키 기본 문서 목록 받는 중…');
+  let index: { parts?: unknown; length?: unknown } | null = null;
+  try {
+    index = JSON.parse((await getText('wiki-base.json')).replace(/^﻿/, ''));
+  } catch {
+    throw new Error('위키 기본 문서 목록을 받지 못했어요.');
+  }
+  if (!index || !Array.isArray(index.parts)) throw new Error('위키 기본 문서 목록 형식이 달라요.');
+  let text = '';
+  let n = 0;
+  for (const name of index.parts) {
+    if (typeof name !== 'string' || !/^wiki-base\.\d+\.txt$/.test(name)) throw new Error('위키 기본 문서 목록 형식이 달라요.');
+    text += await getText(name);
+    progress(`위키 기본 문서 받는 중 ${++n}/${index.parts.length}`);
+  }
+  if (typeof index.length === 'number' && text.length !== index.length) throw new Error(`위키 기본 문서를 끝까지 받지 못했어요. (${text.length}/${index.length}자)`);
+  if (!text.startsWith(WIKI_PACK_HEAD)) throw new Error('위키 기본 문서 묶음 형식이 달라요.');
+  await risuai.pluginStorage.setItem(WIKI_KEY, text);
+  setStoredWikiPack(text);
+  return text.length;
+}
+
+/** 저장소의 위키 묶음을 지운다 (카드에 묶음이 들어 있는 옛 카드면 그걸 쓴다) */
+export async function dropWikiPack(): Promise<void> {
+  await risuai.pluginStorage.removeItem(WIKI_KEY).catch(() => {});
+  setStoredWikiPack(null);
+}
