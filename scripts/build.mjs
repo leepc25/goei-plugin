@@ -10,7 +10,7 @@ if (process.env.GOEI_BUILD_VERSION) pkg.version = process.env.GOEI_BUILD_VERSION
 const updateBase = String(process.env.GOEI_UPDATE_BASE ?? pkg.goei?.updateBase ?? '').replace(/\/+$/, '');
 const header = [
   '//@name goei-plugin',
-  '//@display-name 괴이: ANOMALY',
+  `//@display-name 괴이: ANOMALY v${pkg.version}`,
   '//@api 3.0',
   `//@version ${pkg.version}`,
   ...(updateBase ? [`//@update-url ${updateBase}/goei-plugin.js`] : []),
