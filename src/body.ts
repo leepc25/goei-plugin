@@ -502,7 +502,8 @@ function displayNow(text: string): string {
     if (hasImgTag(out)) {
       const pick = modulePicker();
       const self = userInfo().name;
-      if (liteNow || imgTagsKnown(out, pick, self)) out = renderImgTags(out, pick, getPrefs().imgShow ?? IMG_RECENT.def, self);
+      // 우리 메시지(판정 뒤이거나 상태창 같은 표식이 있는 글)면 늘 그린다. 그래야 표시 범위 밖 메시지에서 태그 글자가 남지 않는다
+      if (ours || imgTagsKnown(out, pick, self)) out = renderImgTags(out, pick, getPrefs().imgShow ?? IMG_RECENT.def, self);
     }
     if (out.includes(UNSENT_MARK)) out = renderUnsentMark(out, unsentMarkHtml());
     if (wantsOpeningHint(text)) out += openingHintHtml();

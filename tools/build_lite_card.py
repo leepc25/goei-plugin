@@ -687,15 +687,16 @@ def add_wiki_assets(data, others):
     return added
 
 
-# 이미지 태그 로어북 2개 (사용자 2026-10-22, 예전 에셋 모듈에서 옮김): Asset = 메인 모델 출력 지침(언제나 켬), Image tag = 보조 모델 자료(core/asset.ts)
+# 이미지 태그 로어북 원문 보관 (사용자 2026-10-22, 예전 에셋 모듈에서 옮김). v0.16.66부터 카드에는 넣지 않는다: Asset(메인 모델 지침)은 설정으로 조립(core/imgprompt.ts), Image tag(보조 모델 자료)는 명부에서 조립(core/asset.ts imageDataFrom)
 IMAGE_LORE = ROOT / 'card' / 'image-lore.json'
 
 
 def add_image_lore(lore):
     """이미지 태그 로어북을 ⚙️설정 폴더에 넣는다. 같은 이름이 카드에 있으면 바꾼다.
     「Asset」(메인 모델 지침)은 v0.16.64부터 플러그인이 설정으로 조립해 요청에 끼우므로 카드에 넣지 않고, 있던 것도 뺀다 (core/imgprompt.ts)"""
-    books = [b for b in json.loads(IMAGE_LORE.read_text(encoding='utf-8'))['data'] if b['comment'] != 'Asset']
-    names = {b['comment'] for b in books} | {'Asset'}
+    # v0.16.66: 「Image tag」(보조 모델 자료)도 명부(한글 이름·영문명·별칭)+설정으로 조립하므로 카드에서 뺀다 (사용자 2026-10-27). 둘 다 있던 것도 지운다
+    books = [b for b in json.loads(IMAGE_LORE.read_text(encoding='utf-8'))['data'] if b['comment'] not in ('Asset', 'Image tag')]
+    names = {b['comment'] for b in books} | {'Asset', 'Image tag'}
     settings = next(e for e in lore if e.get('mode') == 'folder' and e.get('comment') == SETTINGS_FOLDER_NAME)
     return [e for e in lore if e.get('comment') not in names] + [{**b, 'folder': settings['key']} for b in books]
 

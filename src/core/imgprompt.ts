@@ -2,7 +2,6 @@
 // 지침 본문(틀)·출력 대상 캐릭터(명부 영문명에서 고름 + 임의 추가)·표정 세트를 설정에서 관리한다. 보조 모델 경로(core/asset.ts)도 같은 목록을 쓴다.
 import type { LoreEntry } from './types';
 import { readDirectory } from './world/directory';
-import { IMAGE_BOOK } from './asset';
 
 /** 표정 세트 기본 (카드 그림 assets/portraits 27종) */
 export const IMG_KEYWORDS_DEFAULT = ['default', 'angry', 'annoyed', 'bored', 'confused', 'contemptuous', 'crying', 'curious', 'dumbfounded', 'embarrassed', 'excited', 'exhausted', 'happy', 'laughing', 'lovestruck', 'lustful', 'nervous', 'proud', 'sad', 'scared', 'serious', 'shy', 'smile', 'smirk', 'smug', 'surprised', 'thinking'];
@@ -29,6 +28,7 @@ Next Paragraph Text
 ### Tag Construction Logic
 - Identify the character type and follow the specific string format below.
 {user_rule}
+
 #### Defined Characters
 - Format: <img={name}_{keyword}>
 - Characters {name}: {characters}
@@ -42,7 +42,7 @@ Next Paragraph Text
 
 export interface ImgPromptConfig {
   template: string;
-  /** 끈 이름 (명부·Image tag 목록에서 뺌) */
+  /** 끈 이름 (명부 목록에서 뺌) */
   off: string[];
   /** 임의 추가 이름 */
   extra: string[];
@@ -64,30 +64,17 @@ export function imgPromptConfig(p: { imgPrompt?: string; imgNamesOff?: string[];
   };
 }
 
-/** Image tag 로어북(보조 모델 자료)의 characters 목록 (없거나 깨졌으면 빈 목록) */
-export function imageBookNames(lore: LoreEntry[] | undefined): string[] {
-  const books = (lore ?? []).filter((e) => e.comment === IMAGE_BOOK && typeof e.content === 'string' && e.content.trim());
-  if (!books.length) return [];
-  try {
-    const v = JSON.parse(String(books[books.length - 1].content).replace(/^﻿/, '').trim()) as { characters?: unknown };
-    return Array.isArray(v.characters) ? v.characters.map(cleanName).filter(Boolean) : [];
-  } catch {
-    return [];
-  }
-}
-
-/** 출력 대상 후보 전부: 명부 요원 영문명 + Image tag 목록 + 임의 추가 (순서 유지, 중복 제거) */
-export function imgCandidates(lore: LoreEntry[] | undefined, cfg: ImgPromptConfig): { name: string; korean: string; source: 'directory' | 'book' | 'extra' }[] {
-  const out: { name: string; korean: string; source: 'directory' | 'book' | 'extra' }[] = [];
+/** 출력 대상 후보 전부: 명부 요원 영문명 + 임의 추가 (순서 유지, 중복 제거). 로어북 「Image tag」「Asset」은 더 쓰지 않는다 (사용자 2026-10-27) */
+export function imgCandidates(lore: LoreEntry[] | undefined, cfg: ImgPromptConfig): { name: string; korean: string; source: 'directory' | 'extra' }[] {
+  const out: { name: string; korean: string; source: 'directory' | 'extra' }[] = [];
   const seen = new Set<string>();
-  const push = (name: string, korean: string, source: 'directory' | 'book' | 'extra') => {
+  const push = (name: string, korean: string, source: 'directory' | 'extra') => {
     const n = cleanName(name);
     if (!n || seen.has(n.toLowerCase())) return;
     seen.add(n.toLowerCase());
     out.push({ name: n, korean, source });
   };
   for (const a of readDirectory(lore).agents) if (a.english) push(a.english, a.name, 'directory');
-  for (const n of imageBookNames(lore)) push(n, '', 'book');
   for (const n of cfg.extra) push(n, '', 'extra');
   return out;
 }
