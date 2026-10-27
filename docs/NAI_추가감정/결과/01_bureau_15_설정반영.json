@@ -685,7 +685,7 @@
     {
       "id": "1792745536821",
       "name": "Kyuras_pouting",
-      "scenePrompt": "pout, half-closed eyes, looking back, salute, 1.15::two-finger salute::,",
+      "scenePrompt": "pout, sulking, half-closed eyes, looking back, 1.15::two-finger salute::,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745536821

@@ -110,7 +110,7 @@
 | forced smiling | `forced smile, turn pale, nervous sweating, looking at viewer, leaning back, hands up,` | 스팡달 「큐라스, 여보세요?」 — 질려서 물러나며 웃으려 애씀 |
 | indifferent | `half-closed eyes, tired, closed mouth, looking away, slouching, hands in pockets,` | 무관심 대신 드문 침묵 = 체력 아끼는 중 |
 | guilty | `guilt, open mouth, raised inner eyebrows, sweat, bowing, own hands together,` | 생존자를 울려서 비는 손으로 사과 열두 번 |
-| pouting | `pout, half-closed eyes, looking back, salute, 1.15::two-finger salute::,` | 영입 실패하고 나가는 두 손가락 경례. 흔한 경례로 뭉개지기 쉬워 가중치 |
+| pouting | `pout, sulking, half-closed eyes, looking back, 1.15::two-finger salute::,` | 영입 실패하고 나가는 두 손가락 경례. 흔한 경례로 뭉개지기 쉬워 가중치 |
 | angry smile | `grin, glaring, shaded face, looking at viewer, leaning forward, snapping fingers,` | 형님 이음새 노린 사수 — 웃는 얼굴로 딱 |
 | expressionless | `1.2::expressionless::, serious, closed mouth, looking at viewer, crossed arms,` | 「큐라스가 안 웃으면 철수 준비」. 웃는 기본값과 반대라 가중치 |
 | tormented | `clenched teeth, furrowed brow, sweat, exhausted, looking down, hunched over, holding own arm,` | 출력은 체력에 묶임 — 백 번 넘게 튕긴 팔을 붙잡음 |

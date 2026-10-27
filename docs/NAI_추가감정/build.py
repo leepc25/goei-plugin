@@ -11,7 +11,7 @@ EMO = ['suspicious', 'worried', 'relieved', 'disgusted', 'determined', 'jealous'
 HAND = re.compile(r'^(hand|hands|own hands|crossed arms|arms? |adjusting|holding|pointing|beckoning|palm|outstretched|reaching|'
                   r'shrugging|scratching|facepalm|head rest|clenched hands?$|steepled|interlocked|covering|waving|salute|thumbs|'
                   r'index finger|finger|fist|wiping|tucking|twirling|playing with|cupping|clapping|v$|peace sign|spread arms|'
-                  r'arm |arms behind|arms up|cracking|snapping|stretching|x arms|money gesture|claw pose|ok sign|shushing|salute|heart hands|arm up|stroking)')
+                  r'arm |arms behind|arms up|cracking|snapping|stretching|x arms|money gesture|claw pose|ok sign|shushing|salute|heart hands|arm up|stroking|two-finger|finger gun|clapping)')
 PROP = re.compile(r'^(holding (?!own arm$).*|cigarette|smoke|smoking|mouth hold|chewing|monocle|blood on face|against wall|walkie-talkie|hamster|cup|phone)$')
 OPEN = {'grin', 'teeth', 'open mouth', 'tongue out', 'clenched teeth', 'gritted teeth', 'parted lips'}
 prompts = {}
@@ -44,6 +44,7 @@ for out, src in SRC.items():
         tagcount.update(tags)
         if len(set(tags)) != len(tags): probs.append(f'중복태그 {s["name"]}')
         hands = [t for t in rest if HAND.match(t) and t not in ('holding cigarette',)]
+        if 'claw pose' in hands and len(hands) > 1: hands.remove('claw pose')  # 손 모양 수식
         if len(hands) > 1: probs.append(f'손 {len(hands)}개 {s["name"]}: {hands}')
         if 'closed mouth' in tags and OPEN & set(tags): probs.append(f'입 모순 {s["name"]}: {OPEN & set(tags)}')
         if not 5 <= len(tags) <= 11: probs.append(f'태그 {len(tags)}개 {s["name"]}')
