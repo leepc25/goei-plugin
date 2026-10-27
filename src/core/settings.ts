@@ -98,6 +98,8 @@ export interface Prefs {
   vars?: Record<string, string>;
   /** 창 모양 (이 기기·모든 채팅 공통): 메뉴 위치, 창 바깥 어둡기(%) */
   nav?: 'left' | 'right';
+  /** 위키 목록 서랍 쪽 (PC, 이 기기 공통, 2026-10-27 사용자). 없으면 왼쪽. 모바일은 늘 오른쪽 책갈피 */
+  wikiSide?: 'right';
   /** 상황판 요원 칸 모양 (이 기기 공통): 모니터 벽(기본) 또는 목록 */
   agents?: 'wall' | 'list';
   dim?: number;
@@ -174,6 +176,7 @@ export function setPrefs(raw: unknown): Prefs {
     for (const [k, v] of Object.entries(o.vars as Record<string, unknown>)) if (PREF_VAR.test(k) && typeof v === 'string') vars[k] = v;
   }
   const nav = o.nav === 'right' ? 'right' : undefined;
+  const wikiSide = o.wikiSide === 'right' ? 'right' : undefined;
   const agents = o.agents === 'list' ? 'list' : undefined;
   const dim = int(o.dim, 0, 100);
   const status = o.status === 'off' || o.status === 'light' || o.status === 'dark' || o.status === 'paper' ? o.status : undefined;
@@ -199,7 +202,7 @@ export function setPrefs(raw: unknown): Prefs {
   for (const k of GUIDE_NAMES) setGuideOverride(k, guides[k]);
   const relationsSym = o.relationsSym === false ? false : undefined;
   const walletStart = int(o.walletStart, 0, 1_000_000_000_000);
-  prefs = { basic, world, ...(walletStart !== null ? { walletStart } : {}), ...(editorWidth !== null ? { editorWidth } : {}), ...(Object.keys(guides).length ? { guides } : {}), ...(relationsSym === false ? { relationsSym } : {}), ...(theme ? { theme } : {}), ...(imgPrompt ? { imgPrompt } : {}), ...(imgNamesOff.length ? { imgNamesOff } : {}), ...(imgNamesExtra.length ? { imgNamesExtra } : {}), ...(imgKeywords.length ? { imgKeywords } : {}), ...(Object.keys(vars).length ? { vars } : {}), ...(nav ? { nav } : {}), ...(agents ? { agents } : {}), ...(dim !== null ? { dim } : {}), ...(status ? { status } : {}), ...(size !== null ? { imgSize: size } : {}), ...(fold !== null ? { imgFold: fold } : {}), ...(imgFoldOn === false ? { imgFoldOn } : {}), ...(show !== null ? { imgShow: show } : {}), ...(send !== null ? { imgSend: send } : {}), ...(marks.length ? { marks } : {}) };
+  prefs = { basic, world, ...(walletStart !== null ? { walletStart } : {}), ...(editorWidth !== null ? { editorWidth } : {}), ...(Object.keys(guides).length ? { guides } : {}), ...(relationsSym === false ? { relationsSym } : {}), ...(theme ? { theme } : {}), ...(imgPrompt ? { imgPrompt } : {}), ...(imgNamesOff.length ? { imgNamesOff } : {}), ...(imgNamesExtra.length ? { imgNamesExtra } : {}), ...(imgKeywords.length ? { imgKeywords } : {}), ...(Object.keys(vars).length ? { vars } : {}), ...(nav ? { nav } : {}), ...(wikiSide ? { wikiSide } : {}), ...(agents ? { agents } : {}), ...(dim !== null ? { dim } : {}), ...(status ? { status } : {}), ...(size !== null ? { imgSize: size } : {}), ...(fold !== null ? { imgFold: fold } : {}), ...(imgFoldOn === false ? { imgFoldOn } : {}), ...(show !== null ? { imgShow: show } : {}), ...(send !== null ? { imgSend: send } : {}), ...(marks.length ? { marks } : {}) };
   return prefs;
 }
 

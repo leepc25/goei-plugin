@@ -1636,6 +1636,17 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .nw-grab-ico.flip svg { transform: scaleX(-1); }
 .nw-panel { position: absolute; z-index: 3; top: 0; bottom: 0; left: 60px; width: 320px; max-width: calc(100% - 100px); border-right: 1px solid var(--panel2); background: var(--void); box-shadow: 10px 0 28px rgba(0, 0, 0, .32); transform: translateX(calc(-100% - 60px)); visibility: hidden; transition: transform .22s ease, visibility 0s linear .22s; }
 .list-open .nw-panel { transform: none; visibility: visible; transition: transform .22s ease; }
+/* 위키 목록 오른쪽 (설정 → 화면 → 위키 목록 위치, PC만): 세로바를 오른쪽에 두고 서랍도 오른쪽에서 */
+@media (min-width: 761px) {
+  .gx[data-wiki-side="right"] .gx-body.nw-app { grid-template-columns: minmax(0, 1fr) 60px; }
+  .gx[data-wiki-side="right"] .nw-rail { grid-column: 2; grid-row: 1; border-right: 0; border-left: 1px solid var(--panel2); }
+  .gx[data-wiki-side="right"] .nw-main { grid-column: 1; grid-row: 1; }
+  .gx[data-wiki-side="right"] .nw-grab-ico svg { transform: scaleX(-1); }
+  .gx[data-wiki-side="right"] .nw-grab-ico.flip svg { transform: none; }
+  .gx[data-wiki-side="right"] .nw-panel { left: auto; right: 60px; border-right: 0; border-left: 1px solid var(--panel2); box-shadow: -10px 0 28px rgba(0, 0, 0, .32); transform: translateX(calc(100% + 60px)); }
+  .gx[data-wiki-side="right"] .list-open .nw-panel { transform: none; }
+  .gx[data-wiki-side="right"] .list-open .nw-scrim { inset: 0 60px 0 0; }
+}
 .nw-pin { display: flex; flex-direction: column; gap: 8px; height: 100%; padding: 12px 12px 0; }
 .nw-pin .nw-search { flex: none; }
 .nw-pin .nw-list { flex: 1; min-height: 0; position: relative; display: flex; flex-direction: column; gap: 6px; overflow: hidden; margin: 0 -12px; padding: 0; }

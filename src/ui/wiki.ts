@@ -769,8 +769,10 @@ export function bindWikiSide(root: HTMLElement, act: (value: string) => void): v
     x0 = null;
     if (Math.abs(dx) < 30) return;
     dragged = true;
-    if (dx > 0 && !wiki.listOpen) act('open');
-    else if (dx < 0 && wiki.listOpen) act('close');
+    // 세로바가 오른쪽이면(설정) 왼쪽으로 끌어 연다
+    const d = root.closest<HTMLElement>('[data-wiki-side]')?.dataset.wikiSide === 'right' ? -dx : dx;
+    if (d > 0 && !wiki.listOpen) act('open');
+    else if (d < 0 && wiki.listOpen) act('close');
   };
   bar.addEventListener('pointerdown', (e) => {
     x0 = e.clientX;
@@ -810,8 +812,9 @@ export function bindWikiSide(root: HTMLElement, act: (value: string) => void): v
     const dx = (e.changedTouches[0]?.clientX ?? t0.x) - t0.x;
     const dy = (e.changedTouches[0]?.clientY ?? t0.y) - t0.y;
     t0 = null;
-    // PC는 왼쪽에서, 모바일은 오른쪽에서 열리므로 접는 방향도 반대
-    const out = wide() ? dx < -36 : dx > 36;
+    // PC는 설정한 쪽(기본 왼쪽)에서, 모바일은 오른쪽에서 열리므로 접는 방향도 그쪽으로
+    const fromLeft = wide() && root.closest<HTMLElement>('[data-wiki-side]')?.dataset.wikiSide !== 'right';
+    const out = fromLeft ? dx < -36 : dx > 36;
     if (out && Math.abs(dx) > Math.abs(dy) * 1.5 && wiki.listOpen) act('close');
   }, { passive: true });
   // 모바일 책갈피를 왼쪽으로 끌어도 열린다

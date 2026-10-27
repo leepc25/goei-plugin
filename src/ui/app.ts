@@ -1083,6 +1083,7 @@ function render(): void {
   // 창 모양 (설정 → 화면): 메뉴 위치, 창 바깥 어둡기
   const pf = getPrefs();
   root.dataset.nav = pf.nav ?? 'left';
+  root.dataset.wikiSide = pf.wikiSide ?? 'left';
   // --dim은 글자색 변수라 겹치면 안 된다. 테마별 막 색에 투명도만 바꿔 바로 칠함
   paintVeil(root, pf.dim ?? DIM_DEFAULT);
   // 시작 전(고르기·첫 장면) 화면은 PC에서 설정 화면 폭만큼만 (너무 넓으면 가운데만 차고 양옆이 빈다)
