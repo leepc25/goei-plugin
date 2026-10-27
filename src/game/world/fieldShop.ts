@@ -77,6 +77,8 @@ export const SHOPS: Record<string, ShopDef> = {
 /** 채팅별 필드 상태 (가방·가게 재고·흥정 기록) */
 export interface FieldState {
   bag: Record<string, number>;
+  /** 이름 인물에게 마지막으로 선물한 필드 날짜 (하루 한 번만 호감에 셈) */
+  gifts?: Record<string, number>;
   shops: Record<string, { stock: Record<string, number>; at: number | null; haggleFail?: number; haggleDay?: number }>;
 }
 export const BAG_SLOTS = 8;
@@ -90,7 +92,9 @@ export function parseState(text: string | null | undefined): FieldState {
     for (const [k, v] of Object.entries(o.bag ?? {})) if (FIELD_ITEMS[k] && Number.isInteger(v) && v > 0) bag[k] = Math.min(99, v);
     const shops: FieldState['shops'] = {};
     for (const [k, v] of Object.entries(o.shops ?? {})) if (SHOPS[k] && v && typeof v === 'object') shops[k] = { stock: { ...(v.stock ?? {}) }, at: typeof v.at === 'number' ? v.at : null, haggleFail: v.haggleFail, haggleDay: v.haggleDay };
-    return { bag, shops };
+    const gifts: Record<string, number> = {};
+    for (const [k, v] of Object.entries(o.gifts ?? {})) if (typeof v === 'number') gifts[k] = v;
+    return { bag, shops, ...(Object.keys(gifts).length ? { gifts } : {}) };
   } catch {
     return emptyState();
   }
@@ -109,6 +113,17 @@ export function takeBag(s: FieldState, id: string, n = 1): boolean {
   s.bag[id] -= n;
   if (s.bag[id] <= 0) delete s.bag[id];
   return true;
+}
+
+/** 선물이 되는 물건 */
+export const giftable = (it: FieldItemDef) => it.kind === 'gift' || it.kind === 'food' || it.kind === 'drink';
+/** 선물: 가방에서 빼고, 오늘 이 사람에게 처음이면 true (호감 계기로 넘길지) */
+export function give(s: FieldState, id: string, who: string, day: number): { ok: boolean; counts: boolean } {
+  if (!FIELD_ITEMS[id] || !giftable(FIELD_ITEMS[id]) || !takeBag(s, id)) return { ok: false, counts: false };
+  const g = s.gifts ?? (s.gifts = {});
+  const counts = g[who] !== day;
+  g[who] = day;
+  return { ok: true, counts };
 }
 
 export const isOpen = (shop: ShopDef, hour: number | null) => {

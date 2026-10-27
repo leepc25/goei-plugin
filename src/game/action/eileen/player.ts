@@ -47,6 +47,8 @@ export class EileenPlayer extends Player {
   private started = false;
   private lastTickAt = 0;
   private lastFrameAt = 0;
+  /** 「조준경 덮개」 유물: 이번 출동 첫 사격을 썼나 */
+  private firstShotUsed = false;
   /** 마지막으로 코어에서 받아 온 게이지 (바깥에서 바뀌었는지 보려고) */
   private gaugeSeen = 0;
   /** 방어 게이지 0..100 (사용자 2026-10-25: 방어를 무제한으로 못 하게). 막아낸 공격만큼만 깎이고, 안 맞으면 다시 찬다
@@ -135,7 +137,13 @@ export class EileenPlayer extends Player {
     const r = REACT[kind] ?? REACT.light;
     // 근접·기술은 힘, 원거리(사격·충전탄·제압사격)는 사격 배율 (폭발은 배율 없음: 엔진 progressionHit 'ability'와 같음)
     const st = this.progression?.stats;
-    const scale = (o.src === 'ranged' ? st?.aim : o.src === 'blast' ? 1 : st?.power) ?? 1;
+    let scale = (o.src === 'ranged' ? st?.aim : o.src === 'blast' ? 1 : st?.power) ?? 1;
+    // 에일린 전용 유물 「조준경 덮개」(숙련 8): 출동마다 첫 사격 명중은 치명 ×2
+    if (o.src === 'ranged' && !this.firstShotUsed && this.progression?.relics.includes('own_eileen')) {
+      this.firstShotUsed = true;
+      scale *= 2;
+      w.say('치명!', 0.8);
+    }
     const hit: Hit = { x0: t.x - 1, x1: t.x + 1, z0: 0, z1: 400, y: t.y, dy: 999, attackId: newAttackId(), dmg: dmg * this.dmgMul * scale, react: r.react, dir: face, push: o.push ?? r.push, lift: r.lift, stop: 0, strength: r.strength };
     const res = t.applyHit(hit, w);
     if (res.kind === 'immune') return;

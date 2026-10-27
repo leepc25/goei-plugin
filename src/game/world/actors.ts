@@ -3,7 +3,7 @@
 // 몹: 나올 때마다 성향을 뽑고(mobs.ts), 지나가다 자기 판단으로 사건을 일으킨다(소매치기·시비). 근무형은 근무시간에 자리를 지킨다.
 // 소란도는 장면 단위. 경찰·경비는 플레이어 범죄에만 나선다(crime). 화면 밖 장면도 같은 규칙으로 돈다. 생활은 실시간, 시계와 무관.
 import { ACTIVITIES, TEMPER, choose, decayNeeds, fullNeeds, onDuty, type Activity, type Needs } from './needs';
-import { ARCHETYPES, inShift, rollTemper, type Post, type Temperament } from './mobs';
+import { ARCHETYPES, DROPS, GRADE_HP, POCKET, gradeOf, inShift, rollTemper, type Post, type Temperament } from './mobs';
 import type { Hop, PlaceGraph } from './places';
 import { pick, range, type Rng } from './rng';
 
@@ -68,6 +68,13 @@ export interface Actor {
   think: number;
   /** 맞은 공격 id (한 공격에 한 번) */
   hitBy?: number;
+  /** 몹 몸 (등급 체력, 설계 2-3). 0이 되면 기절 → 일어나 떠난다 */
+  hp?: number;
+  hpMax?: number;
+  /** 주머니 돈 (원) */
+  pocket?: number;
+  /** 그중 훔친 돈 */
+  stolen?: number;
 }
 
 /** 엔진 공격 판정 상자 (contract Hit의 모양만) */
@@ -94,7 +101,9 @@ export type SimEvent =
   | { kind: 'notice'; scene: string; who: string }
   | { kind: 'police'; scene: string; n: number }
   | { kind: 'shift'; scene: string; who: string; on: boolean }
-  | { kind: 'hurt'; scene: string; who: string; named: boolean; faction?: string; x: number; down: boolean };
+  | { kind: 'hurt'; scene: string; who: string; named: boolean; faction?: string; x: number; down: boolean }
+  /** 기절한 몹이 떨어뜨린 돈 (불량배·취객·소매치기) */
+  | { kind: 'drop'; scene: string; who: string; amount: number; stolen: number; x: number };
 
 export interface SimOptions {
   spawns?: SpawnRule[];
@@ -157,6 +166,10 @@ export class WorldSim {
       const arch = ARCHETYPES[def.archetype ?? def.name];
       a.temper = rollTemper(this.rng, arch);
       a.drunk = !!arch?.drinks && this.isNight() && this.rng() < 0.35;
+      // 몸: 등급 체력 ±10%, 주머니 돈 (백 원 단위)
+      a.hpMax = a.hp = Math.round(GRADE_HP[gradeOf(def.archetype ?? def.name)] * (0.9 + this.rng() * 0.2));
+      const pk = POCKET[def.archetype ?? def.name];
+      a.pocket = pk ? Math.round(range(this.rng, pk[0], pk[1]) / 100) * 100 : 0;
     }
     this.actors.push(a);
     return a;
@@ -220,10 +233,13 @@ export class WorldSim {
     return out;
   }
   /** 행위자 하나를 맞힘 (에일린 코어 표적 경로). 같은 틱 여러 번은 hitBy로 거른다 */
-  hitActor(id: string, dir: 1 | -1, attackId: number): boolean {
+  hitActor(id: string, dir: 1 | -1, attackId: number, dmg = 12): boolean {
     const a = this.actors.find((q) => q.def.id === id);
     if (!a || a.act === 'gone' || a.act === 'door' || a.hitBy === attackId) return false;
+    // 이미 기절해 쓰러진 몹은 더 때려도 반응하지 않는다
+    if (a.def.kind === 'mob' && (a.hp ?? 1) <= 0) return false;
     a.hitBy = attackId;
+    if (a.def.kind === 'mob' && a.hp !== undefined) a.hp = Math.max(0, a.hp - dmg);
     this.struck(a, dir);
     this.crime(a.scene, a.x, 15);
     return true;
@@ -233,7 +249,13 @@ export class WorldSim {
     a.face = (-dir) as 1 | -1;
     a.goal = null;
     a.route = [];
-    const down = a.def.kind === 'mob' && this.rng() < 0.5;
+    // 몹: 체력이 바닥나면 기절(쓰러져 오래 누움), 아니면 휘청
+    const down = a.def.kind === 'mob' && (a.hp ?? 1) <= 0;
+    if (down && a.pocket && (DROPS.has(a.def.archetype ?? '') || a.stolen)) {
+      this.events.push({ kind: 'drop', scene: a.scene, who: a.def.name, amount: a.pocket, stolen: a.stolen ?? 0, x: a.x });
+      a.pocket = 0;
+      a.stolen = 0;
+    }
     this.events.push({ kind: 'hurt', scene: a.scene, who: a.def.name, named: a.def.kind === 'named', x: a.x, down });
     if (a.def.kind === 'named') {
       a.act = 'argue';
@@ -244,8 +266,8 @@ export class WorldSim {
       return;
     }
     a.act = 'down';
-    a.doing = down ? '쓰러짐' : '휘청';
-    a.wait = down ? 1.8 : 0.6;
+    a.doing = down ? '기절' : '휘청';
+    a.wait = down ? 6 : 0.6;
     this.setClip(a, down && this.canClip(a, 'down') ? 'down' : 'idle');
     this.iconOn(a, '!', 1.5);
   }
@@ -339,6 +361,12 @@ export class WorldSim {
       case 'down':
         a.wait -= dt;
         if (a.wait > 0) return;
+        // 기절에서 깨면 체력 조금 돌아오고 (근무형이 아니면) 무조건 자리를 뜬다
+        if (a.def.kind === 'mob' && (a.hp ?? 1) <= 0) {
+          a.hp = Math.round((a.hpMax ?? 50) * 0.3);
+          if (!a.post) return this.flee(a, this.player?.x ?? a.x);
+          return this.resume(a);
+        }
         // 일어나서: 겁 많으면 도망, 배짱 있으면 맞선다 (실제 싸움은 전투 AI)
         if (a.def.kind === 'mob' && a.temper && !a.post) {
           if (a.temper.courage > 0.75 && ARCHETYPES[a.def.archetype ?? '']?.role === 'thug') {
@@ -674,6 +702,11 @@ export class WorldSim {
     const v = this.actors.find((q) => q.def.id === a.target);
     a.target = undefined;
     if (!v || v.scene !== a.scene) return this.resume(a);
+    // 실제로 옮긴다: 피해자 주머니에서 절반쯤 (잡으면 도둑이 떨어뜨린다)
+    const take = Math.round(((v.pocket ?? 0) * (0.3 + this.rng() * 0.5)) / 100) * 100;
+    v.pocket = (v.pocket ?? 0) - take;
+    a.pocket = (a.pocket ?? 0) + take;
+    a.stolen = (a.stolen ?? 0) + take;
     this.events.push({ kind: 'steal', scene: a.scene, thief: a.def.name, victim: v.def.name, x: v.x });
     this.disturb(a.scene, 12, v.x);
     // 도둑: 반대쪽 출입구로 뛴다

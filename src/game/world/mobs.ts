@@ -26,6 +26,19 @@ export interface Archetype {
   drinks?: boolean;
 }
 
+/** 몸 등급 (docs/게임_성장_경제_설계.md 2-3, 기본값): 체력과 주머니 돈 범위. 원형 역할로 정한다 */
+export type MobGrade = 'F' | 'E' | 'D' | 'C';
+export const GRADE_HP: Record<MobGrade, number> = { F: 50, E: 80, D: 120, C: 170 };
+const ROLE_GRADE: Record<MobRole, MobGrade> = { civilian: 'F', student: 'F', worker: 'E', staff: 'E', thug: 'D', guard: 'D', police: 'C' };
+export const gradeOf = (archetype: string | undefined): MobGrade => ROLE_GRADE[ARCHETYPES[archetype ?? '']?.role ?? 'civilian'];
+/** 주머니 돈 (원): 소매치기가 옮기고, 기절한 불량배·취객은 떨어뜨린다. 행인을 때려 돈 버는 구조는 막는다(떨어뜨리는 원형만) */
+export const POCKET: Partial<Record<string, [number, number]>> = {
+  행인: [0, 30000], 회사원: [5000, 50000], 관광객: [10000, 80000], 학생: [0, 10000], 주민: [0, 20000], 산책객: [0, 10000], 승객: [0, 20000], 상인: [20000, 100000],
+  불량배: [3000, 40000], 취객: [5000, 60000],
+};
+/** 기절하면 주머니를 떨어뜨리는 원형 (설계 8장: 경찰·경비·행인은 안 떨굼) */
+export const DROPS = new Set(['불량배', '취객']);
+
 const BASE: Record<keyof Temperament, [number, number]> = { courage: [0.1, 0.8], social: [0.1, 0.8], haste: [0.1, 0.7], curious: [0.1, 0.8], sly: [0, 0.05] };
 
 export const ARCHETYPES: Record<string, Archetype> = {

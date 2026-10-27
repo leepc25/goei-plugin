@@ -1,6 +1,6 @@
 // 필드 가게·가방 창 (docs/게임_성장_경제_설계.md 4·5장). 자료·계산은 src/game/world/fieldShop.ts, 돈은 가계부(bridge.wallet), 가방·재고는 bridge.fieldState.
 // 창이 열려 있는 동안 게임은 멈춘다(blocking). 마우스·터치로 고르고 Esc로 닫는다.
-import { BAG_SLOTS, FIELD_ITEMS, SHOPS, addBag, bagUsed, canAdd, emptyState, haggle, isOpen, parseState, priceOf, sellPriceOf, stockOf, takeBag, type FieldItemDef, type FieldState, type ShopDef } from '../../world/fieldShop';
+import { BAG_SLOTS, FIELD_ITEMS, SHOPS, addBag, bagUsed, canAdd, emptyState, give, giftable, haggle, isOpen, parseState, priceOf, sellPriceOf, stockOf, takeBag, type FieldItemDef, type FieldState, type ShopDef } from '../../world/fieldShop';
 import type { GameFieldState } from '../../bridge';
 
 const CSS = `
@@ -56,6 +56,10 @@ export interface FieldShopHost {
   record(text: string): void;
   /** 흥정 운 (가게 주인 성향이 들어갈 자리) */
   rng(): number;
+  /** 가까이 있는 이름 인물 (선물 상대). 없으면 null */
+  nearPerson?(): string | null;
+  /** 선물 사건: counts = 오늘 이 사람에게 처음 (인물 기록 호감 계기) */
+  gift?(who: string, item: string, counts: boolean): void;
 }
 
 export interface FieldShop {
@@ -101,8 +105,10 @@ export function createFieldShop(h: FieldShopHost): FieldShop {
     const p = sellPriceOf(it, shop!, { hour: hour() });
     return `<button class="row" data-sell="${it.id}"${p === null || busy ? ' disabled' : ''}><span class="ic ${it.kind}">${KIND_MARK[it.kind]}</span><span class="t"><b>${esc(it.name)} ×${n}</b><small>${esc(it.desc)}</small></span><span class="p">${p === null ? '안 삼' : esc(won(p))}</span></button>`;
   };
-  const rowBag = (it: FieldItemDef, n: number): string =>
-    `<div class="row" style="cursor:default"><span class="ic ${it.kind}">${KIND_MARK[it.kind]}</span><span class="t"><b>${esc(it.name)} ×${n}</b><small>${esc(it.desc)}</small></span><span class="acts">${it.heal || it.verb ? `<button data-use="${it.id}">${it.kind === 'food' ? '먹기' : it.kind === 'drink' ? '마시기' : '쓰기'}</button>` : ''}<button data-drop="${it.id}">버리기</button></span></div>`;
+  const rowBag = (it: FieldItemDef, n: number): string => {
+    const who = giftable(it) ? h.nearPerson?.() ?? null : null;
+    return `<div class="row" style="cursor:default"><span class="ic ${it.kind}">${KIND_MARK[it.kind]}</span><span class="t"><b>${esc(it.name)} ×${n}</b><small>${esc(it.desc)}</small></span><span class="acts">${who ? `<button data-give="${it.id}" data-who="${esc(who)}">${esc(who)}에게 주기</button>` : ''}${it.heal || it.verb ? `<button data-use="${it.id}">${it.kind === 'food' ? '먹기' : it.kind === 'drink' ? '마시기' : '쓰기'}</button>` : ''}<button data-drop="${it.id}">버리기</button></span></div>`;
+  };
 
   function render() {
     const bal = h.balance();
@@ -171,13 +177,21 @@ export function createFieldShop(h: FieldShopHost): FieldShop {
   el.addEventListener('click', (e) => {
     const t = e.target as HTMLElement;
     if (t === el || t.closest('[data-close]')) return close();
-    const b = t.closest<HTMLElement>('[data-buy],[data-sell],[data-use],[data-drop],[data-tab],[data-haggle]');
+    const b = t.closest<HTMLElement>('[data-buy],[data-sell],[data-use],[data-drop],[data-give],[data-tab],[data-haggle]');
     if (!b || (b as HTMLButtonElement).disabled) return;
     if (b.dataset.tab) return ((tab = b.dataset.tab as typeof tab), (msg = ''), render());
     if (b.dataset.buy) return void buyOne(b.dataset.buy);
     if (b.dataset.sell) return void sellOne(b.dataset.sell);
     if (b.dataset.use) return useOne(b.dataset.use);
     if (b.dataset.drop) { takeBag(st, b.dataset.drop); save(); return say('버렸어요.'); }
+    if (b.dataset.give && b.dataset.who) {
+      const it = FIELD_ITEMS[b.dataset.give];
+      const r = give(st, b.dataset.give, b.dataset.who, day());
+      if (!r.ok || !it) return;
+      save();
+      h.gift?.(b.dataset.who, it.name, r.counts);
+      return say(r.counts ? `${b.dataset.who}에게 ${eul(it.name)} 건넸다.` : `${b.dataset.who}에게 ${eul(it.name)} 건넸다. (오늘은 이미 선물해서 호감엔 안 셈)`);
+    }
     if (b.hasAttribute('data-haggle') && shop) {
       const d = haggle(st, shop, day(), h.rng);
       save();

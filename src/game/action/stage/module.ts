@@ -1621,6 +1621,14 @@ export function createElevatorStage(store: StageStore, hooks: StageHooks = {}): 
     }
     rushT = Math.max(0, rushT - DT);
     (p as unknown as { dmgMul?: number }).dmgMul = powerOf(o.upgrades) * (rushT > 0 ? 1.3 : 1);
+    // 이상 파편 → 출동 레벨 (출동이 끝나면 처음부터, 본부로는 안 가져감)
+    const shards = Number((api.world as unknown as { notes?: Record<string, unknown> }).notes?.shards ?? 0);
+    const lv = o.runLevel ?? 1;
+    if (lv < 10 && shards >= RUN_LEVEL_SHARDS[lv - 1]) {
+      o.runLevel = lv + 1;
+      api.note('stage.runLevel', o.runLevel);
+      offerUpgrade(api, `출동 레벨 ${o.runLevel}`);
+    }
   };
 
   /** 싸움 기억·강화 시점·금 간 벽 타격 */
@@ -1895,6 +1903,9 @@ export function createElevatorStage(store: StageStore, hooks: StageHooks = {}): 
     rt!.guardianRewarded = true;
     offerUpgrade(api, '수호자를 쓰러뜨렸다');
   };
+
+  /** 출동 레벨 2~10이 되는 이상 파편 누적 (설계 기본값) */
+  const RUN_LEVEL_SHARDS = [3, 6, 10, 15, 21, 28, 36, 45, 55];
 
   /** 강화 셋 중 하나 (기본기획서 15.2) */
   const offerUpgrade = (api: StageApi, why: string) => {

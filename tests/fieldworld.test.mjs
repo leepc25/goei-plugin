@@ -370,3 +370,36 @@ test('필드 가게: 값·떨이·평판 거부·재고 회복·가방 칸·흥�
   assert.equal(F.haggle(s, mk, 1, () => 0), 0, '하루 두 번 실패하면 그날은 안 깎음');
   assert.ok(F.haggle(s, mk, 2, () => 0) > 0, '다음 날은 다시');
 });
+
+test('몹 몸: 등급 체력만큼 맞아야 기절, 기절한 불량배는 주머니를 떨어뜨림, 행인은 안 떨굼', () => {
+  const sim = new A.WorldSim(graph(), R.mulberry32(8));
+  const thug = sim.add({ id: 't1', name: '불량배', kind: 'mob', brain: 'transit', home: 'jongno', archetype: '불량배' }, { scene: 'jongno', x: 1000, y: 560 });
+  const walker = sim.add({ id: 'w1', name: '행인', kind: 'mob', brain: 'transit', home: 'jongno', archetype: '행인' }, { scene: 'jongno', x: 1500, y: 560 });
+  assert.ok(thug.hpMax >= 108 && thug.hpMax <= 132, `불량배 D등급 ${thug.hpMax}`);
+  assert.ok(walker.hpMax <= 55, `행인 F등급 ${walker.hpMax}`);
+  thug.pocket = 20000;
+  let id = 1;
+  while (thug.hp > 0) assert.ok(sim.hitActor('t1', 1, id++, 30));
+  assert.equal(thug.doing, '기절');
+  assert.equal(sim.hitActor('t1', 1, id++, 30), false, '기절한 몹은 더 안 맞음');
+  const drop = sim.events.find((e) => e.kind === 'drop');
+  assert.equal(drop?.amount, 20000);
+  walker.pocket = 9000;
+  while (walker.hp > 0) sim.hitActor('w1', 1, id++, 30);
+  assert.equal(sim.events.filter((e) => e.kind === 'drop').length, 1, '행인은 안 떨굼');
+});
+
+test('소매치기: 피해자 주머니에서 실제로 옮기고, 잡아 기절시키면 훔친 돈이 떨어짐', () => {
+  const sim = new A.WorldSim(graph(), R.mulberry32(21), { spawns: [{ scene: 'jongno', target: { day: 12, night: 2 }, refill: [1, 2], mix: ['불량배', '행인'] }] });
+  const total = () => sim.actors.reduce((n, a) => n + (a.pocket ?? 0), 0);
+  let stole = false;
+  for (let t = 0; t < 30 * 400 && !stole; t++) { sim.step(1 / 30, { scene: 'office', x: 0, hour: 12 }); stole = sim.events.some((e) => e.kind === 'steal'); }
+  const thief = sim.actors.find((a) => (a.stolen ?? 0) > 0);
+  assert.ok(thief, '훔친 돈을 가진 도둑');
+  const sum = total();
+  let id = 100;
+  while (thief.hp > 0) sim.hitActor(thief.def.id, 1, id++, 50);
+  const drop = sim.events.find((e) => e.kind === 'drop');
+  assert.ok(drop && drop.stolen > 0 && drop.amount >= drop.stolen);
+  assert.equal(total(), sum - drop.amount, '떨어뜨린 만큼 주머니에서 빠짐');
+});

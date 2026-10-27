@@ -92,7 +92,7 @@ const fieldWallet: { won: number | null } = { won: null };
 let observing = false;
 const observerOn = () => observing;
 /** 필드 가게 창이 쓰는 돈·장부 (hqAdapter 안에서 채운다: 가계부 다리·방문 id가 거기 있다) */
-const fieldLink: { pay?: (amount: number, memo: string) => Promise<number | null>; record?: (text: string) => void } = {};
+const fieldLink: { pay?: (amount: number, memo: string) => Promise<number | null>; record?: (text: string) => void; nearPerson?: () => string | null; gift?: (who: string, item: string, counts: boolean) => void } = {};
 const wonText = (n: number) => `${n < 0 ? '−' : ''}₩ ${Math.abs(Math.trunc(n)).toLocaleString('en-US')}`;
 
 function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: HubHost['chooseFloor']; sfx: (n: string) => void; closed?: () => void; resuming?: () => boolean; overlay?: HubHost['overlay']; rules?: () => ClockRules; shop?: (id: string) => string | null; choose?: (o: { title: string; lines?: string[]; options: string[]; cancel?: boolean }) => Promise<number> }): HqModuleLike & { close(): void; goto(place: string): void; state(): { day: number; rescued: string[] }; visitReady: Promise<void>; visitor(): { agentId: string; name: string } } {
@@ -193,6 +193,14 @@ function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui
   let foughtHere = false;
   const record = (evs: SimEvent[]) => {
     for (const e of evs) {
+      // 기절한 불량배·취객·소매치기가 떨어뜨린 돈: 줍는다 (가계부에 필드 수입). 훔친 돈이 섞였으면 그렇게 적는다
+      if (e.kind === 'drop' && e.amount > 0) {
+        const c = e.who.charCodeAt(e.who.length - 1) - 0xac00;
+        const memo = e.stolen ? '소매치기에게서 되찾은 돈' : `${e.who}${c >= 0 && c <= 11171 && c % 28 !== 0 ? '이' : '가'} 떨어뜨린 돈`;
+        void fieldLink.pay?.(e.amount, memo);
+        (globalThis as { __goeiEngine?: { world?: { say(t: string, s: number): void } } }).__goeiEngine?.world?.say(`${e.amount.toLocaleString('en-US')}원을 주웠다`, 2);
+        continue;
+      }
       if (e.kind !== 'hurt') continue;
       if (!foughtHere) { foughtHere = true; if (fieldClock.sec !== null) fieldClock.sec += rules().fight * 60; }
       const w = sim;
@@ -222,12 +230,28 @@ function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui
     if (!w || !lifeScene) return [];
     return w.inScene(lifeScene).filter((a) => a.act !== 'down').map((a) => ({
       x: a.x, y: a.y, z: 0,
-      body: { id: -1, team: 'enemy', kind: 'npc', x: a.x, y: a.y, z: 0, dir: a.face, hp: 1, hpMax: 1, alive: true, stop: 0, frame: () => ({ hit: [], hurt: [] }), step: () => {},
-        applyHit: (h: { dir: 1 | -1; attackId: number }) => (w.hitActor(a.def.id, h.dir, h.attackId) ? { kind: 'hit' as const } : { kind: 'immune' as const }) } as unknown as Body,
+      body: { id: -1, team: 'enemy', kind: 'npc', x: a.x, y: a.y, z: 0, dir: a.face, hp: Math.max(1, a.hp ?? 1), hpMax: a.hpMax ?? 1, alive: true, stop: 0, frame: () => ({ hit: [], hurt: [] }), step: () => {},
+        // 몹은 등급 체력이 있다 (설계 2-3): 에일린 피해가 그대로 깎인다
+        applyHit: (h: { dir: 1 | -1; attackId: number; dmg?: number }) => (w.hitActor(a.def.id, h.dir, h.attackId, h.dmg ?? 12) ? { kind: 'hit' as const } : { kind: 'immune' as const }) } as unknown as Body,
     }));
+  };
+  // 선물 상대: 지금 장면에서 주인공과 가까운 이름 인물
+  let lastAt = { x: 0, y: 0 };
+  fieldLink.nearPerson = () => {
+    const w = sim;
+    if (!w || !lifeScene) return null;
+    const near = w.inScene(lifeScene).filter((a) => a.def.kind === 'named' && a.act !== 'gone' && Math.abs(a.x - lastAt.x) < 180).sort((p, q) => Math.abs(p.x - lastAt.x) - Math.abs(q.x - lastAt.x))[0];
+    return near?.def.name ?? null;
+  };
+  // 선물 사건: 오늘 처음이면 gift(인물 기록이 「작은친절」 호감 계기로), 아니면 그냥 행동
+  fieldLink.gift = (who, item, counts) => {
+    const c = item.charCodeAt(item.length - 1) - 0xac00;
+    const text = `${who}에게 ${item}${c >= 0 && c <= 11171 && c % 28 !== 0 ? '을' : '를'} 선물했다`;
+    void b?.field?.record({ kind: counts ? 'gift' : 'act', text, scene: fieldClock.place || undefined, who: [who], weight: 1, visit: visitId }).catch(() => {});
   };
   const life: HubLife = {
     tick: (dt, at) => {
+      lastAt = { x: at.x, y: (at as { y?: number }).y ?? 0 };
       if (lifeScene && lifeScene !== at.scene) { flushMobs(lifeScene); foughtHere = false; }
       lifeScene = at.scene;
       const w = world();
@@ -792,6 +816,8 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     heal: (ratio) => { const p = game?.world?.player; if (p) p.hp = Math.min(p.hpMax, p.hp + p.hpMax * ratio); },
     record: (text) => fieldLink.record?.(text),
     rng: Math.random,
+    nearPerson: () => fieldLink.nearPerson?.() ?? null,
+    gift: (who, item, counts) => fieldLink.gift?.(who, item, counts),
   });
   // 본부 메뉴 창이 열려 있으면 Esc는 창 닫기 (껍데기 일시정지보다 먼저)
   // 본부 메뉴 창(임무 창구·정비실 등) 키보드 (사용자 2026-10-25: 키보드가 안 먹는다): 방향키로 단추를 고르고 Enter·Space·E로 누른다, Esc 닫기

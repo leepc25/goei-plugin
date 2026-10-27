@@ -128,6 +128,8 @@ export interface Outing {
   upgradeN: number;
   /** 싸움 이긴 수 (세 판마다 강화) */
   fightsWon: number;
+  /** 출동 레벨 1~10 (기본기획서 16.2): 이상 파편이 모이면 오르고 오를 때마다 강화 하나. 옛 저장엔 없음 → 1 */
+  runLevel?: number;
   // ── 층 = 방 격자 세상 (gen/world.ts)
   /** 지금 방 [col,row] */
   room: [number, number];
