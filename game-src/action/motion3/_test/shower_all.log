@@ -170,3 +170,35 @@ alledProcessError: Command '['curl', '-sSf', '--retry', '3', 'https://backblaze.
 6.39_상인남1 [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
 6.40_상인남2 ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
 6.40_상인남2 [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+6.41_상인남3 ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+6.41_상인남3 [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+6.42_상인남4 ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+6.42_상인남4 [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+6.43_상인여1 ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+6.43_상인여1 [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+6.44_상인여2 ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+6.44_상인여2 [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+6.45_상인여3 ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+6.45_상인여3 [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+6.46_의사1 ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+6.46_의사1 [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+6.47_간호사1 ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+6.47_간호사1 [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+6.48_청소부남1 ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+6.48_청소부남1 [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+6.49_청소부여1 ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+6.49_청소부여1 [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+6.54_시민남1 ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+6.54_시민남1 [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+6.55_시민남2 ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+6.55_시민남2 [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+6.56_시민남3 ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+6.56_시민남3 [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+6.57_시민남4 ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+6.57_시민남4 [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+6.58_시민남5 ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+6.58_시민남5 [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+6.59_시민남6 ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+6.59_시민남6 [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+6.60_시민남7 ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+6.60_시민남7 [('B', '실패 {"usage": {"type": "usd", "usd": 0.0}, "id": "5db8ad0a-cc4f-4263-bd3a-221eeb7adc6f", "status": "failed", "created_at": "2026-10-27T18:28:39.556450+00:00", "last_response": {"code": 500, "type": "error", "error": "Generation failed", "trace": null, "action": "Walking seen from the side facing east in'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
