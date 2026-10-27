@@ -125,14 +125,14 @@ await page.click('[data-action="ed-node"][data-value="relations"]');
 await page.waitForSelector('.gw-grid');
 const cells = await page.locator('.gw-grid td.st-hostile').count();
 assert.ok(cells >= 2, '적대 칸이 있다');
-await page.click('.gw-grid td[data-value="교황청>흡혈귀"]');
+await page.click('.gw-grid td[data-value="극단>병원"]');
 await page.waitForSelector('.gw-rel-memo');
 // 같은 칸을 다시 누르면 한 단계 순환 (중립 → 호의), 단계 단추로 바로 고르기
-await page.click('.gw-grid td[data-value="교황청>흡혈귀"]');
-await page.waitForFunction(() => document.querySelector('.gw-grid td[data-value="교황청>흡혈귀"]')?.className.includes('st-favorable'));
+await page.click('.gw-grid td[data-value="극단>병원"]');
+await page.waitForFunction(() => document.querySelector('.gw-grid td[data-value="극단>병원"]')?.className.includes('st-favorable'));
 await page.click('.gw-rel-memo [data-action="ed-rel-stage"][data-value="hostile"]');
-await page.waitForFunction(() => document.querySelector('.gw-grid td[data-value="교황청>흡혈귀"]')?.className.includes('st-hostile'));
-assert.ok(await page.$('.gw-grid td[data-value="흡혈귀>교황청"].st-hostile'), '대칭이면 반대 칸도');
+await page.waitForFunction(() => document.querySelector('.gw-grid td[data-value="극단>병원"]')?.className.includes('st-hostile'));
+assert.ok(await page.$('.gw-grid td[data-value="병원>극단"].st-hostile'), '대칭이면 반대 칸도');
 await page.fill('.gw-rel-memo textarea', '피의 원수');
 if (shots) await page.screenshot({ path: `${shots}/ed-3-relations.png` });
 // 지침
@@ -159,8 +159,8 @@ const dir = await page.evaluate(() => JSON.parse(window.__char.globalLore.find((
 assert.equal(dir.세계.agent['쟈알디'].fields.voice, '- 낮고 짧게.');
 assert.ok(dir.세계.agent['쟈알디'].fields.character.includes('장난스럽다'));
 assert.ok(dir.세계.agent['쟈알디'].extra.some((e) => e.name === '취미') && dir.세계.agent['쟈알디'].extra.some((e) => e.name === 'Weapons'));
-assert.equal(dir.세계.relations.pairs['교황청>흡혈귀'].stage, 'hostile');
-assert.equal(dir.세계.relations.pairs['교황청>흡혈귀'].memo, '피의 원수');
+assert.equal(dir.세계.relations.pairs['극단>병원'].stage, 'hostile');
+assert.equal(dir.세계.relations.pairs['극단>병원'].memo, '피의 원수');
 await page.waitForFunction(() => !document.querySelector('.gw-save')?.classList.contains('dirty'));
 // 다시 읽어도 가상 로어북에 고친 글이 들어간다
 const voice = await page.evaluate(async () => {

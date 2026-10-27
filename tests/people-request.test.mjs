@@ -47,7 +47,8 @@ test('미리 만든 자료: 52명, 조직 시작값, 별명 표', () => {
   assert.equal(Object.keys(Base.RELATIONS.people).length, 52);
   assert.equal(Base.userAffinityBase('A00', 'A00'), 0);
   assert.ok(Base.userAffinityBase('A00', 'B00') < 0);
-  assert.equal(Base.userAffinityBase('A00', 'E00'), 0);
+  assert.ok(Base.userAffinityBase('A00', 'E00') < 0, '기본 표(2026-10-27 채움): 관리국 → 프리랜서 경계');
+  assert.equal(Base.userAffinityBase('C00', 'E00'), 0, '표에 없는 쌍은 중립');
   const names = Base.allNames();
   const j = names.find((n) => n.name === '쟈알디');
   assert.ok(j.aliases.includes('Jyaldi') && j.titles.includes('부장'));

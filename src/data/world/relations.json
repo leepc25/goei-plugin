@@ -47,6 +47,278 @@
   "특수재난대응협회>가짜 관리국": {
    "stage": "wary",
    "memo": ""
+  },
+  "관리국>프리랜서": {
+   "stage": "wary",
+   "memo": "Licensed outsiders: watched, pressured and used when convenient, never accepted as an authority over the abnormal."
+  },
+  "관리국>특수재난대응협회": {
+   "stage": "wary",
+   "memo": "A tolerated civilian channel that keeps a liaison line with the Bureau; monitored and pressured, never treated as an equal."
+  },
+  "관리국>중림 지하상가": {
+   "stage": "wary",
+   "memo": "Fences move stolen and confiscated Bureau equipment; the Bureau watches the market, raids when needed, and quietly uses its fixers."
+  },
+  "관리국>교황청": {
+   "stage": "wary",
+   "memo": "Officially classified as a hostile organization, but field-level pragmatic cooperation occurs when a shared threat outranks doctrine."
+  },
+  "관리국>이슬람": {
+   "stage": "wary",
+   "memo": "Classified untouchable: standing orders to flee on sight of its champion."
+  },
+  "관리국>발푸르기스": {
+   "stage": "hostile",
+   "memo": "Classified as a hostile grouping; sorcerers are hunted on identification."
+  },
+  "관리국>흡혈귀": {
+   "stage": "wary",
+   "memo": "Monitored; a True Ancestor-level manifestation is treated as a regional catastrophe in progress."
+  },
+  "관리국>무명찬란교": {
+   "stage": "hostile",
+   "memo": "A doomsday faith that discovers, cultivates and feeds anomalies; its sects are suppressed wherever found."
+  },
+  "관리국>병원": {
+   "stage": "hostile",
+   "memo": "An anomalous order whose facilities stand at real addresses; the standing countermeasure is escape manuals, not demolition."
+  },
+  "관리국>극단": {
+   "stage": "hostile",
+   "memo": "Every large-scale performance anomaly is compared against the known Troupe sequence; confirmed progression means the FINAL PLAY is closer."
+  },
+  "관리국>세계정치 게시판": {
+   "stage": "wary",
+   "memo": "Monitored as an early-warning source; users who post or search carelessly are made to disappear."
+  },
+  "관리국>남해지사": {
+   "stage": "wary",
+   "memo": "A Baekilmong branch: when the Bureau finds a terminable Uh-doom under its management, it forces entry and ENDS it."
+  },
+  "가짜 관리국>특수재난대응협회": {
+   "stage": "hostile",
+   "memo": "A group that knows of and exploits the hidden world: subject to abduction, brainwashing and elimination."
+  },
+  "가짜 관리국>중림 지하상가": {
+   "stage": "hostile",
+   "memo": "A market that trades in the hidden world: subject to abduction, brainwashing and elimination."
+  },
+  "가짜 관리국>교황청": {
+   "stage": "hostile",
+   "memo": "Classified as I-mul; no coexistence with outside supernatural factions."
+  },
+  "가짜 관리국>이슬람": {
+   "stage": "hostile",
+   "memo": "Classified as I-mul; no coexistence, though its champion is beyond what the Bureau can suppress."
+  },
+  "가짜 관리국>발푸르기스": {
+   "stage": "hostile",
+   "memo": "Classified as I-mul; sorcerers are targets for suppression and extermination."
+  },
+  "가짜 관리국>흡혈귀": {
+   "stage": "hostile",
+   "memo": "Classified as I-mul; targets for extermination."
+  },
+  "가짜 관리국>무명찬란교": {
+   "stage": "hostile",
+   "memo": "Classified as I-mul; a cult that feeds anomalies is eradicated on sight."
+  },
+  "가짜 관리국>병원": {
+   "stage": "hostile",
+   "memo": "Classified as I-mul; an anomalous order to be eradicated."
+  },
+  "가짜 관리국>극단": {
+   "stage": "hostile",
+   "memo": "Classified as I-mul; an anomalous order to be eradicated."
+  },
+  "가짜 관리국>세계정치 게시판": {
+   "stage": "wary",
+   "memo": "Monitored; careless posters are abducted or disappear."
+  },
+  "가짜 관리국>남해지사": {
+   "stage": "hostile",
+   "memo": "A Baekilmong branch that exploits the hidden world: subject to abduction, brainwashing and elimination."
+  },
+  "중림 지하상가>가짜 관리국": {
+   "stage": "wary",
+   "memo": "Open involvement is avoided; contact risks abduction, brainwashing or death."
+  },
+  "교황청>가짜 관리국": {
+   "stage": "wary",
+   "memo": "An organization of monsters wearing the Bureau's face; engaged only when it stands in the way."
+  },
+  "이슬람>가짜 관리국": {
+   "stage": "wary",
+   "memo": "Kept at a distance; the Fake Bureau is treated as one more monster faction."
+  },
+  "발푸르기스>가짜 관리국": {
+   "stage": "wary",
+   "memo": "Evaded through concealment tradecraft; capture means brainwashing."
+  },
+  "흡혈귀>가짜 관리국": {
+   "stage": "wary",
+   "memo": "Evaded; the Fake Bureau exterminates on identification."
+  },
+  "무명찬란교>가짜 관리국": {
+   "stage": "hostile",
+   "memo": "Those who eradicate anomalies are enemies of the tale itself."
+  },
+  "병원>가짜 관리국": {
+   "stage": "hostile",
+   "memo": "Its agents who enter and fail to leave are admitted as material."
+  },
+  "극단>가짜 관리국": {
+   "stage": "hostile",
+   "memo": "Its agents who touch a production are absorbed into the company."
+  },
+  "세계정치 게시판>가짜 관리국": {
+   "stage": "wary",
+   "memo": "Survivors warn each other about the black-suited men; careless posting means disappearing."
+  },
+  "남해지사>가짜 관리국": {
+   "stage": "hostile",
+   "memo": "Same stance as Baekilmong HQ: open involvement is avoided, contact risks abduction, brainwashing or death."
+  },
+  "특수재난대응협회>관리국": {
+   "stage": "favorable",
+   "memo": "Keeps a liaison line with the Bureau through its Support Office and defers to it to protect its licensing monopoly."
+  },
+  "중림 지하상가>관리국": {
+   "stage": "wary",
+   "memo": "Bureau raids and confiscations are a business risk; Bureau equipment is still accepted as payment."
+  },
+  "교황청>관리국": {
+   "stage": "wary",
+   "memo": "Operates outside the institutional order; cooperates only when a shared threat outranks doctrine."
+  },
+  "발푸르기스>관리국": {
+   "stage": "wary",
+   "memo": "Evaded through concealment and tradecraft; the Bureau hunts sorcerers on identification."
+  },
+  "흡혈귀>관리국": {
+   "stage": "wary",
+   "memo": "Monitored by the Bureau; elders avoid drawing its attention until their power base is built."
+  },
+  "무명찬란교>관리국": {
+   "stage": "hostile",
+   "memo": "Those who cap and clear anomalies are enemies of devotion."
+  },
+  "병원>관리국": {
+   "stage": "hostile",
+   "memo": "Bureau agents who enter and fail to leave are admitted as material, and in time as staff."
+  },
+  "극단>관리국": {
+   "stage": "hostile",
+   "memo": "Bureau agents who touch a production are absorbed into the company."
+  },
+  "세계정치 게시판>관리국": {
+   "stage": "wary",
+   "memo": "Survivors warn each other about the black-suited men; careless posting means disappearing."
+  },
+  "남해지사>관리국": {
+   "stage": "wary",
+   "memo": "Same stance as Baekilmong HQ: the Bureau is the true disaster that wrecks the raw-material supply."
+  },
+  "백일몽>중림 지하상가": {
+   "stage": "wary",
+   "memo": "Fences distribute unauthorized Baekilmong products; tolerated as a channel, treated as a risk."
+  },
+  "백일몽>병원": {
+   "stage": "wary",
+   "memo": "An anomalous order that consumes personnel: a hostile business risk unless accommodation pays."
+  },
+  "백일몽>극단": {
+   "stage": "wary",
+   "memo": "An anomalous order that absorbs personnel: a hostile business risk unless accommodation pays."
+  },
+  "백일몽>남해지사": {
+   "stage": "friendly",
+   "memo": "Its own regional branch: staff are Baekilmong employees, output goes to HQ, and HQ can audit, overrule or abandon it."
+  },
+  "남해지사>백일몽": {
+   "stage": "friendly",
+   "memo": "Head office: the branch answers to HQ and copies its old habit of feeding people into Uh-doom in bulk."
+  },
+  "프리랜서>특수재난대응협회": {
+   "stage": "wary",
+   "memo": "Pays exploitative commissions; the license is a legal necessity, not loyalty."
+  },
+  "특수재난대응협회>프리랜서": {
+   "stage": "favorable",
+   "memo": "Its registered contractors and revenue source; nominal protection, slow and limited in practice."
+  },
+  "프리랜서>중림 지하상가": {
+   "stage": "favorable",
+   "memo": "The standard off-book source of gear, treatment and side jobs through its fixers."
+  },
+  "중림 지하상가>프리랜서": {
+   "stage": "favorable",
+   "memo": "Steady customers for fixers, fences and backalley doctors; payment comes first."
+  },
+  "교황청>흡혈귀": {
+   "stage": "hostile",
+   "memo": "A standing mandate: battle nuns and paladins hunt vampires with blessed relics and crosses."
+  },
+  "흡혈귀>교황청": {
+   "stage": "hostile",
+   "memo": "The Vatican hunts them; its relics and banes hold in full."
+  },
+  "교황청>이슬람": {
+   "stage": "hostile",
+   "memo": "A standing blood-feud; their elites cannot share a room without hands drifting to weapons, and only third-party mediation keeps joint operations functional."
+  },
+  "이슬람>교황청": {
+   "stage": "hostile",
+   "memo": "A standing blood-feud; joint operations survive only under third-party mediation."
+  },
+  "교황청>발푸르기스": {
+   "stage": "hostile",
+   "memo": "Sorcerers are hunted on identification; a witch treats a slain paladin's relics as trophies of the highest grade."
+  },
+  "발푸르기스>교황청": {
+   "stage": "hostile",
+   "memo": "Sorcerers regard Vatican paladins with genuine dread; the priesthoods hard-counter magecraft."
+  },
+  "이슬람>발푸르기스": {
+   "stage": "hostile",
+   "memo": "Its clergy hard-counter sorcerers; the mage world's failure to rise is attributed to the priesthoods."
+  },
+  "발푸르기스>이슬람": {
+   "stage": "hostile",
+   "memo": "The priesthoods hard-counter magecraft; sorcerers survive by concealment and evasion."
+  },
+  "이슬람>흡혈귀": {
+   "stage": "hostile",
+   "memo": "Vampires are supernatural threats; its crusaders are fielded against them."
+  },
+  "흡혈귀>이슬람": {
+   "stage": "wary",
+   "memo": "Avoided; a champion who can summon enemies to Mecca for judgment is beyond a vampire's banes."
+  },
+  "교황청>무명찬란교": {
+   "stage": "hostile",
+   "memo": "A heresy: a doomsday faith that feeds anomalies as devotion."
+  },
+  "무명찬란교>교황청": {
+   "stage": "hostile",
+   "memo": "Exorcists who destroy sacred tales are enemies of Ireum-nim."
+  },
+  "이슬람>무명찬란교": {
+   "stage": "hostile",
+   "memo": "A heresy that feeds anomalies; its champions are fielded against it."
+  },
+  "무명찬란교>이슬람": {
+   "stage": "hostile",
+   "memo": "Crusaders who destroy sacred tales are enemies of Ireum-nim."
+  },
+  "무명찬란교>극단": {
+   "stage": "favorable",
+   "memo": "The Troupe's works are sacred tales to be discovered, cultivated and fed."
+  },
+  "무명찬란교>병원": {
+   "stage": "favorable",
+   "memo": "The Hospital's diseases are sacred tales to be discovered, cultivated and fed."
   }
  },
  "common": "### Mutual Perception\n- Regardless of the reference labels above, members of each Bureau call their own organization the “Management Bureau” and their counterpart the “Fake Management Bureau.”\n- Civilian [D00] generally knows neither the hidden world nor the true nature of its factions.\n\n### External Doctrine\n- {A00} [A00] pursues exclusive control and secrecy over the hidden world, monitoring and restricting outside factions. It avoids indiscriminate abduction and slaughter, but may temporarily cooperate with outside factions or even anomalies when its objectives require it. The opposing Bureau is the sole categorical exception: a target for elimination, never cooperation.\n- {B00} [B00] classifies all supernatural factions outside itself as “I-mul.” Its doctrine centers on strict secrecy, control, and eradication of the hidden world. Anomalies, psychics, and other superhumans are targets for suppression and extermination; groups that know of or exploit the hidden world are also subject to abduction, brainwashing, and elimination. It rejects coexistence with these groups.\n\n### Independent Operations and Cooperation\n- Factions and anomalous forces pursue their own operations and objectives independently of {{user}}. Overlapping activity may produce unexpected encounters, competing objectives, interference, or confrontation.\n- Hostility includes direct combat, covert infiltration, compromised personnel, planted assets, manipulated information, and concealed influence.\n- Cooperation may involve joint operations, intelligence exchanges, shared access, negotiated boundaries, or temporary division of responsibility, within the limits of each faction's doctrine and established relationships.\n- These conflicts and alliances shape faction decisions, drive events, and influence the course and outcome of operations."
