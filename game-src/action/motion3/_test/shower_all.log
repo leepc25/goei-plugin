@@ -142,3 +142,31 @@ alledProcessError: Command '['curl', '-sSf', '--retry', '3', 'https://backblaze.
 6.25_협회남1 [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
 6.26_협회남2 ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
 6.26_협회남2 [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+6.27_협회여1 ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+6.27_협회여1 [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+6.28_협회여2 ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+6.28_협회여2 [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+6.29_협회여3 ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+6.29_협회여3 [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+6.30_프리랜서남1 ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+6.30_프리랜서남1 [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+6.31_프리랜서남2 ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+6.31_프리랜서남2 [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+6.32_프리랜서남3 ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+6.32_프리랜서남3 [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+6.33_프리랜서남4 ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+6.33_프리랜서남4 [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+6.34_프리랜서여1 ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+6.34_프리랜서여1 [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+6.35_프리랜서여2 ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+6.35_프리랜서여2 [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+6.36_프리랜서여3 ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+6.36_프리랜서여3 [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+6.37_프리랜서여4 ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+6.37_프리랜서여4 [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+6.38_프리랜서여5 ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+6.38_프리랜서여5 [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+6.39_상인남1 ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+6.39_상인남1 [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+6.40_상인남2 ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+6.40_상인남2 [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
