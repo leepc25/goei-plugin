@@ -5,7 +5,7 @@
     {
       "id": "1792316457786",
       "name": "Jyaldi_suspicious",
-      "scenePrompt": "narrowed eyes, expressionless, closed mouth, looking at viewer, crossed arms, black gloves,",
+      "scenePrompt": "narrowed eyes, expressionless, closed mouth, looking at viewer, leaning back, crossed arms, black gloves,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316457786
@@ -13,7 +13,7 @@
     {
       "id": "1792316457787",
       "name": "Jyaldi_worried",
-      "scenePrompt": "furrowed brow, serious, closed mouth, looking down, black gloves,",
+      "scenePrompt": "furrowed brow, serious, closed mouth, looking down, head down, hand on own chin, black gloves,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316457787
@@ -21,7 +21,7 @@
     {
       "id": "1792316457788",
       "name": "Jyaldi_relieved",
-      "scenePrompt": "half-closed eyes, sigh, closed mouth, black gloves,",
+      "scenePrompt": "half-closed eyes, sigh, closed mouth, head back, hand on own neck, black gloves,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316457788
@@ -29,7 +29,7 @@
     {
       "id": "1792316457789",
       "name": "Jyaldi_disgusted",
-      "scenePrompt": "disdain, half-closed eyes, closed mouth, shaded face, looking at viewer, black gloves,",
+      "scenePrompt": "disdain, half-closed eyes, closed mouth, shaded face, looking down, leaning back, hand in pocket, black gloves,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316457789
@@ -37,7 +37,7 @@
     {
       "id": "1792316457790",
       "name": "Jyaldi_determined",
-      "scenePrompt": "serious, narrowed eyes, closed mouth, looking at viewer, adjusting gloves, black gloves,",
+      "scenePrompt": "serious, narrowed eyes, closed mouth, looking at viewer, 1.2::adjusting gloves::, black gloves,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316457790
@@ -45,7 +45,7 @@
     {
       "id": "1792316457791",
       "name": "Jyaldi_jealous",
-      "scenePrompt": "annoyed, narrowed eyes, closed mouth, sideways glance, crossed arms, black gloves,",
+      "scenePrompt": "annoyed, narrowed eyes, closed mouth, sideways glance, looking back, crossed arms, black gloves,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316457791
@@ -53,7 +53,7 @@
     {
       "id": "1792316457792",
       "name": "Jyaldi_pleading",
-      "scenePrompt": "serious, raised inner eyebrows, parted lips, looking at viewer, reaching towards viewer, black gloves,",
+      "scenePrompt": "serious, raised inner eyebrows, parted lips, looking at viewer, leaning forward, 1.15::reaching towards viewer::, black gloves,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316457792
@@ -61,7 +61,7 @@
     {
       "id": "1792316457793",
       "name": "Jyaldi_forced smiling",
-      "scenePrompt": "forced smile, half-closed eyes, tired, looking to the side, hand on own hip, black gloves,",
+      "scenePrompt": "1.1::forced smile::, half-closed eyes, tired, looking to the side, head tilt, hand on own hip, black gloves,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792316457793
@@ -69,7 +69,7 @@
     {
       "id": "1792745536784",
       "name": "Jyaldi_indifferent",
-      "scenePrompt": "expressionless, half-closed eyes, looking away, black gloves,",
+      "scenePrompt": "expressionless, half-closed eyes, looking away, leaning back, hands in pockets, black gloves,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745536784
@@ -77,7 +77,7 @@
     {
       "id": "1792745536785",
       "name": "Jyaldi_guilty",
-      "scenePrompt": "looking down, shaded face, closed mouth, furrowed brow, hand in pocket, black gloves,",
+      "scenePrompt": "looking down, shaded face, closed mouth, furrowed brow, head down, hand on own face, black gloves,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745536785
@@ -85,7 +85,7 @@
     {
       "id": "1792745536786",
       "name": "Jyaldi_pouting",
-      "scenePrompt": "annoyed, frown, half-closed eyes, closed mouth, hand on own forehead, black gloves,",
+      "scenePrompt": "annoyed, frown, half-closed eyes, closed mouth, looking away, hand on own forehead, black gloves,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745536786
@@ -93,7 +93,7 @@
     {
       "id": "1792745536787",
       "name": "Jyaldi_angry smile",
-      "scenePrompt": "light smile, glaring, shaded face, closed mouth, looking at viewer, clenched hand, black gloves,",
+      "scenePrompt": "1.15::light smile::, glaring, shaded face, closed mouth, looking at viewer, leaning forward, clenched hand, black gloves,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745536787
@@ -109,7 +109,7 @@
     {
       "id": "1792745536789",
       "name": "Jyaldi_tormented",
-      "scenePrompt": "clenched teeth, glaring, furrowed brow, shaded face, sweat, looking down, clenched hand, black gloves,",
+      "scenePrompt": "clenched teeth, glaring, furrowed brow, shaded face, sweat, head down, clenched hands, trembling, black gloves,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745536789
@@ -117,7 +117,7 @@
     {
       "id": "1792745536790",
       "name": "Jyaldi_crazy smile",
-      "scenePrompt": "smirk, glowing eyes, constricted pupils, shaded face, looking at viewer, black gloves,",
+      "scenePrompt": "1.15::smirk::, glowing eyes, constricted pupils, shaded face, looking at viewer, leaning forward, cracking knuckles, black gloves,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745536790
