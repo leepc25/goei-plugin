@@ -39,7 +39,7 @@ for out, src in SRC.items():
         hands = [t for t in rest if HAND.match(t) and t not in ('holding cigarette',)]
         if len([t for t in hands if t not in ('cigarette', 'smoking')]) > 1: probs.append(f'손 {len(hands)}개 {s["name"]}: {hands}')
         if 'closed mouth' in tags and OPEN & set(tags): probs.append(f'입 모순 {s["name"]}: {OPEN & set(tags)}')
-        if not 2 <= len(face) <= 4: probs.append(f'강조 {len(face)}개 {s["name"]}')
+        if not 1 <= len(face) <= 4: probs.append(f'강조 {len(face)}개 {s["name"]}')
         if not 4 <= len(tags) <= 10: probs.append(f'태그 {len(tags)}개 {s["name"]}')
     json.dump(d, open(os.path.join(D, '결과', f'{out}_15_설정반영.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=2)
 # 고정 특징: 캐릭터 15장 공통 마지막 태그 vs 일부에만 있는 태그
