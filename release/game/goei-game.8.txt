@@ -1,4 +1,4 @@
-eturn x;
+turn x;
           }
       const fallbackXs = Array.from({ length: Math.max(0, Math.floor(hi) - Math.ceil(lo) + 1) }, (_, i) => Math.ceil(lo) + i).sort((a, b) => Math.abs(a - want) - Math.abs(b - want) || a - b);
       for (const gap of [d3, 80])
@@ -3930,4 +3930,4 @@ gognija(smile): 블랙? 방문객 명부에 「블랙 요청」 칸이 있네! �
 * 저 창문은 뭐예요 -> window
 * 나가기 -> bye
 -- research
-gognija: 감정한
+gognija: 감정한 

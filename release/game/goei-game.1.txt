@@ -1,4 +1,4 @@
-// goei-game 0.16.65
+// goei-game 0.17.0
 "use strict";
 (() => {
   // src/game/action/engine/view.ts
@@ -4935,4 +4935,4 @@
     return "하루 쉬었다. 피로가 풀리고 부상 회복에 하루가 지났다. (출동 보상 없음)";
   }
   function appraise(s2) {
-    if (!s2.appraisal.length) return ["감정할 회수물이 없어요.
+    if (!s2.appraisal.length) return ["감정할 회수물이 없어요."

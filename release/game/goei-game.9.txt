@@ -1,4 +1,4 @@
- 자료가 쌓이면 연구가 진행되네! 유물, 강화, 위험 단계! 전부 여기서 나오지!
+자료가 쌓이면 연구가 진행되네! 유물, 강화, 위험 단계! 전부 여기서 나오지!
 > emit open research
 > goto menu
 -- elevator
@@ -3935,4 +3935,4 @@ ${t.secret}` : "",
 - Steady in crises; her creed is survival through action. Flatly truthful, never caught in a lie.
 - Deliberately steadies frightened rookies when needed: "You are running this operation with a Boo-jang. Don't worry too much. Trust me. Understood?"
 - After operations that cost lives, she takes the survivors for grilled meat and delivers grief doctrine over the smoke: "Haa. Eat and shake it off. Think too deeply and you can't do this job." 
-- Colder in aspect than in fact. Looks after her people in unadvertised ways, tolerates an office full of eccentrics with weary sighs, and hands promising strangers her assessment straight rather th
+- Colder in aspect than in fact. Looks after her people in unadvertised ways, tolerates an office full of eccentrics with weary sighs, and hands promising strangers her assessment straight rather tha
