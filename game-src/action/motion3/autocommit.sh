@@ -7,7 +7,7 @@ while true; do
     git commit -qm "동작표 3판: 생성 결과·표 자동 저장
 
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
-Claude-Session: https://claude.ai/code/session_016obrnqJRF39tTAFcLTkmj8" && \
+Claude-Session: https://claude.ai/code/session_01JodrzgnPidmc1YCHQefHgW" && \
     for i in 1 2 3 4; do git push -q origin claude/agent-motion-set && break; sleep $((2**i)); done
   fi
   sleep 600
