@@ -87,31 +87,31 @@
    "title": "Baekilmong corporation (백일몽 주식회사)",
    "roster_notes": [
     {
-     "department": "Field Exploration Team",
+     "department": "현장탐사팀 A조",
      "label": "A Jo (Elite Jo)"
     },
     {
-     "department": "Field Exploration Team",
+     "department": "현장탐사팀 B조",
      "label": "B Jo (Elite Jo)"
     },
     {
-     "department": "Field Exploration Team",
+     "department": "현장탐사팀 D조",
      "label": "D Jo"
     },
     {
-     "department": "Field Exploration Team",
+     "department": "현장탐사팀 F조",
      "label": "F Jo"
     },
     {
-     "department": "Field Exploration Team",
+     "department": "현장탐사팀 I조",
      "label": "I Jo"
     },
     {
-     "department": "Field Exploration Team",
+     "department": "현장탐사팀 R조",
      "label": "R Jo"
     },
     {
-     "department": "Field Exploration Team",
+     "department": "현장탐사팀 Y조",
      "label": "Y Jo (Finishing Jo)"
     }
    ],
@@ -259,7 +259,8 @@
      "kind": "block"
     }
    ],
-   "title": "Baekilmong Namhae Branch (백일몽 남해지사)"
+   "title": "Baekilmong Namhae Branch (백일몽 남해지사)",
+   "noSummary": true
   },
   "민간인": {
    "keys": "",

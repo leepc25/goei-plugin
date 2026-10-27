@@ -4,8 +4,20 @@
 import type { LoreEntry } from '../types';
 import { readDirectory, readDirectoryData, type Directory } from './directory';
 import { assembleAgent, assembleAnomaly, assembleAppendix, assembleOrg, assembleSite } from './assemble';
-import { worldRecords, type WorldOverrides, type WorldRecord } from './records';
+import { assembleFaction, assembleRoster } from './faction';
+import { worldRecords, worldRelations, type WorldOverrides, type WorldRecord } from './records';
 import type { WorldKind } from './schema';
+import { guideText } from '../guides';
+import { FACTION_BOOK, TAG_BOOK } from '../factions';
+
+export const ROSTER_BOOK = '🙂Roster';
+/** 상시 지침 가상 항목: 카드에 같은 이름의 진짜 항목이 없을 때만 (Risu 순서 100·101·102) */
+export const ALWAYS_BOOKS: { name: string; order: number; kind: 'tag' | 'faction' | 'roster' }[] = [
+  { name: TAG_BOOK, order: 100, kind: 'tag' },
+  { name: FACTION_BOOK, order: 101, kind: 'faction' },
+  { name: ROSTER_BOOK, order: 102, kind: 'roster' },
+];
+const WORLD_FOLDER_KEY = '\uf000folder:goei-world-0000-0000-0000-world0000001';
 
 export const VIRTUAL = 'goeiVirtual';
 export const isVirtual = (e: LoreEntry) => (e as Record<string, unknown>)[VIRTUAL] === true;
@@ -89,7 +101,8 @@ export function withWorldLore(lore: LoreEntry[] | undefined): LoreEntry[] {
     if (!isVirtual(e) || e.mode === 'folder') continue;
     const kind = (e as { goeiKind?: WorldKind }).goeiKind!;
     const name = s(e.comment);
-    const rec = recs[kind].get(name)!;
+    const rec = recs[kind]?.get(name);
+    if (!rec) continue;
     let content = '';
     let keys = '';
     if (kind === 'agent') {
@@ -115,6 +128,18 @@ export function withWorldLore(lore: LoreEntry[] | undefined): LoreEntry[] {
     }
     e.key = keys;
     e.content = `@@dont_activate\n${content}\n\n---`;
+  }
+  // 상시 지침(🏷️Tag·📜Faction·🙂Roster): 카드에 없으면 가상으로. 요청에는 플러그인이 직접 끼운다 (core/lore.ts insertLoreBlock)
+  const missingAlways = ALWAYS_BOOKS.filter((b) => !existing.has(b.name));
+  if (missingAlways.length) {
+    const wf = base.find((e) => e.mode === 'folder' && typeof e.key === 'string' && folderWord(s(e.comment)) === '세계');
+    const wkey = (wf?.key as string | undefined) ?? WORLD_FOLDER_KEY;
+    if (!wf) out.push({ key: WORLD_FOLDER_KEY, comment: '🌐세계', content: '', mode: 'folder', insertorder: 100, alwaysActive: false, secondkey: '', selective: false, bookVersion: 2, [VIRTUAL]: true });
+    const rel = worldRelations(overrides);
+    for (const b of missingAlways) {
+      const content = b.kind === 'tag' ? guideText('Tag') : b.kind === 'faction' ? assembleFaction(dir, recs.org, rel) : assembleRoster(dir, recs.agent, recs.org);
+      out.push({ key: '', secondkey: '', comment: b.name, content, mode: 'normal', insertorder: b.order, alwaysActive: true, selective: false, useRegex: false, bookVersion: 2, folder: wkey, [VIRTUAL]: true, goeiKind: b.kind });
+    }
   }
   // 조립하지 못한 가상 항목(명부에 안 들어온 이름)은 뺀다
   const result = out.filter((e) => !isVirtual(e) || e.mode === 'folder' || s(e.content) !== '@@dont_activate\n\n\n---');

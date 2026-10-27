@@ -406,24 +406,27 @@ def swap_cbs_to_codes(text):
 # ── Roster ──
 def parse_roster(content):
     text = CBS_B00.sub(lambda m: m.group(1).strip(), content.replace('\r', ''))
-    intros, dept_en, group_notes = {}, {}, {}
-    org, dept = '', ''
+    intros, group_notes = {}, {}
+    org, dept, sub = '', '', ''
     for line in text.split('\n'):
         if line.startswith('### '):
             org = ROSTER_HEAD[line[4:].strip()]
-            dept = ''
+            dept = sub = ''
             continue
         if line.startswith('#### '):
             dept = line[5:].strip()
+            sub = ''
             continue
         if line.startswith('- ') and org:
             m = re.match(r'^- (.+?) (\(.*)$', line)
             if not m:
                 raise SystemExit(f'Roster 줄을 못 읽음: {line!r}')
-            intros[m.group(1).strip()] = (m.group(2).strip(), org, dept)
+            intros[m.group(1).strip()] = (m.group(2).strip(), org, dept, sub)
             continue
         s = line.strip()
         if s and not s.startswith('##') and not s.startswith('- ') and org:
+            if re.match(r'^[A-Z] Jo\b', s):
+                sub = s  # 조 꼬리표: 다음 요원들의 묶음 제목
             group_notes.setdefault(org, []).append((dept, s))
     return intros, group_notes
 
@@ -448,6 +451,7 @@ def main():
     # 요원
     agents = {}
     roster_intros, roster_notes = parse_roster(by_name('🌐세계')['🙂Roster']['content'])
+    roster_intros_all = dict(roster_intros)
     dir_agents = directory['요원']
     for e in by_folder['🙂요원']:
         name = e['comment']
@@ -485,6 +489,9 @@ def main():
         if t and t != default_title:
             rec['title'] = t  # 「Baekilmong Namhae Branch (백일몽 남해지사)」처럼 영문명과 다른 제목만 저장
         orgs[name] = rec
+    for org in orgs:
+        if org not in faction_intro:
+            orgs[org]['noSummary'] = True  # Faction 요약에 없던 조직(남해지사)은 세력 상세 로어만
     for org, v in faction_intro.items():
         if org not in orgs:
             # 세력 로어북이 없는 조직(민간인·프리랜서·탐미주의): Faction 요약에만 쓰고 세력 상세 로어는 만들지 않는다
@@ -503,7 +510,10 @@ def main():
         lines, sub = [], []
         for dept, text in notes:
             if re.match(r'^[A-Z] Jo\b', text):
-                sub.append({'department': dept, 'label': text})
+                # 꼬리표 아래 첫 요원의 명부 부서(현장탐사팀 A조)로 묶는다
+                eng = next((e for e, v in roster_intros_all.items() if v[1] == org and v[3] == text), None)
+                nm = next((n for n, d in dir_agents.items() if d['english'] == eng), None) if eng else None
+                sub.append({'department': dir_agents[nm]['department'] if nm else dept, 'label': text})
             else:
                 lines.append(text if not dept else f'{dept}: {text}')
         if lines:
@@ -516,7 +526,7 @@ def main():
         org = next((o for o, od in directory['조직'].items() if od.get('code') == d['affiliation']), d['affiliation'])
         ri = roster_intros_by_dept = None
     dept_map = {}
-    for eng, (_intro, org, dept) in parse_roster(by_name('🌐세계')['🙂Roster']['content'])[0].items():
+    for eng, (_intro, org, dept, _sub) in roster_intros_all.items():
         name = next((n for n, d in dir_agents.items() if d['english'] == eng), None)
         if name and dept:
             dept_map.setdefault(org, {})[dir_agents[name]['department']] = dept

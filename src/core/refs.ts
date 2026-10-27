@@ -1,6 +1,7 @@
 // 참고 자료 모으기 (원본 REFERENCE_CORE). 위키·괴담넷·괴담톡이 같이 쓴다.
 // 봇 설명, 작가 노트, 제목과 같은 이름의 로어북, 글에 이름이 나온 로어북, 상시 참고(📜Faction·🙂Roster),
 // 그 로어북들 속 이름으로 한 번 더 찾은 2차 참조를 모아 "[종류: 출처]\n내용" 블록으로 만든다.
+import { guideText, isGuideName } from './guides';
 import { evaluate, type CbsEnv } from './cbs';
 import { readScene, stripSceneCard, stripStartCard, stripUnsentMark } from './dispatch';
 import { hasCall, stripCall } from './phone';
@@ -197,9 +198,9 @@ export function factionCodesToNames(text: string, names: Record<string, string>)
   return text.replace(/(?<![\w])([A-Z]00)(?![\w])/g, (code) => names[code] ?? code);
 }
 
-/** 로어북의 @@SECTION 이름\n…\n@@END 블록들 */
+/** 지침의 @@SECTION 이름\n…\n@@END 블록들. GNet·Phone·Wiki·Visit 는 플러그인 내장 지침(core/guides.ts)에서, 그 밖은 로어북에서 */
 export function policySections(lore: LoreEntry[] | undefined, comment: string): Record<string, string> {
-  const raw = (lore ?? []).find((e) => e.comment === comment)?.content;
+  const raw = isGuideName(comment) ? guideText(comment) : (lore ?? []).find((e) => e.comment === comment)?.content;
   const out: Record<string, string> = {};
   if (typeof raw !== 'string') return out;
   for (const m of raw.matchAll(/@@SECTION ([^\n]+)\n([\s\S]*?)\n@@END/g)) out[m[1].trim()] = m[2];

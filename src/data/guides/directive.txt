@@ -1,0 +1,30 @@
+===COMMON===
+Use the selected subject and companions to develop a scene. Prioritize the stated Situation when composing the scene; if none is provided, choose a fitting development from context. Selection alone does not dictate an assignment, briefing, departure, arrival, or new manifestation. Respect established lore, access, relationships, and knowledge. Keep hidden rules and solutions discoverable through play; do not invent reports or manuals that expose them. Leave the protagonist's unprovided dialogue and decisions to the user.
+
+===OPENING===
+Create an opening grounded in concrete activity and meaningful interaction. Vary the setting and circumstances instead of defaulting to scenery, an arriving NPC, and orders. Companions need not start assembled; stop where the user can respond.
+
+===CONTINUATION===
+Continue naturally within the current scene, preserving its location and ongoing actions and conversations. Do not relocate the protagonist or skip ahead in time unless the user explicitly requests it.
+
+===CONTEXT===
+Subject: [[DEST]]
+Companions: [[PARTY]]
+
+===FORMAT===
+{
+  "destination": {
+    "name": "[[NAME]]",
+    "located": "[[LOCATION]] [[NAME]]"
+  },
+  "party": {
+    "solo": "No additional companions selected; retain established companions.",
+    "group": "[[MEMBERS]] (in-person companions)",
+    "support_one": "one support person (an extra, not on the roster)",
+    "support_many": "[[COUNT]] support personnel (extras, not on the roster)",
+    "separator": ", ",
+    "pair_separator": " and ",
+    "last_separator": ", and "
+  },
+  "user_input": "Situation:\n[[INPUT]]"
+}

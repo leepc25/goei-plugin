@@ -417,15 +417,11 @@ def lore_activation(entries):
         if not e.get('content', '').lstrip().startswith(DONT_ACTIVATE):
             e['content'] = DONT_ACTIVATE + '\n' + e.get('content', '')
         prints[name] = sorted({before, key_print(e['key'])})
-    if edits:
+    if edits and any(kinds.values()):
         raise SystemExit(f'키 정리 실패: 로어북을 찾지 못했어요 {sorted(edits)}')
-    settings = next(e for e in entries if e.get('mode') == 'folder' and e.get('comment') == SETTINGS_FOLDER_NAME)
+    # 자리 항목(📚Lore slot)은 더 넣지 않는다 (2026-10-27): 플러그인이 요청에 직접 끼운다 (core/lore.ts insertLoreBlock)
     names = {c for c, _, _ in LORE_SLOTS}
     entries = [e for e in entries if e.get('comment') not in names]
-    for comment, var, order in LORE_SLOTS:
-        entries.append({'key': '', 'secondkey': '', 'comment': comment, 'content': '{{getvar::' + var + '}}', 'mode': 'normal',
-                        'insertorder': order, 'alwaysActive': True, 'selective': False, 'useRegex': False,
-                        'folder': settings['key'], 'bookVersion': 2})
     return entries, prints
 
 
@@ -590,6 +586,27 @@ def to_ccv3(e):
 def drop_settings(entries):
     """설정값은 플러그인 창·저장소로 옮겼으므로 Settings 로어북은 Lite 카드에 넣지 않는다"""
     return [e for e in entries if e.get('comment') not in SETTINGS_BOOKS]
+
+
+# 플러그인이 들고 가는 로어북 (docs/설계안_세계편집.md, 2026-10-27 사용자 결정): 지침·상시 지침·자리 항목·시드 통로·세계 폴더 전부.
+# 명부(Directory)로 옮기는 일(migrate_directory·add_appendix_data)은 이 함수 전에 끝나야 한다 (폴더 항목을 보고 명부 행을 만든다)
+PLUGIN_BOOKS = ('GNet', 'Phone', 'Wiki', 'Directive', 'Visit', 'LB Backend', '🏷️Tag', '📜Faction', '🙂Roster', '📕Start Lore', 'Asset', 'Image tag')
+PLUGIN_FOLDERS = ('세계', '세력', '조직', '요원', '괴이', '파밍', '부록')
+
+
+def drop_plugin_lore(entries):
+    """플러그인에 내장한 지침·세계 로어북과 그 폴더를 카드에서 뺀다. 남는 것: ⚙️설정(Directory·매니페스트)·📖위키 폴더"""
+    folders = {e['key'] for e in entries if e.get('mode') == 'folder' and _folder_word(e.get('comment')) in PLUGIN_FOLDERS}
+    out = []
+    for e in entries:
+        if e.get('mode') == 'folder' and e.get('key') in folders:
+            continue
+        if e.get('folder') in folders:
+            continue
+        if e.get('comment') in PLUGIN_BOOKS or str(e.get('comment', '')).startswith('📚Lore slot'):
+            continue
+        out.append(e)
+    return out
 
 
 UPDATE_FILE = 'card-update.json'
@@ -792,7 +809,8 @@ def main(src, dst):
     data['character_version'] = version
     data['description'] = patch_desc(data.get('description', ''))
     lore = [e for e in lore if e.get('comment') not in (MANIFEST_COMMENT, OLD_MANIFEST)]
-    lore = add_visit_guide(add_image_lore(add_wiki_base(add_appendix_data(migrate_directory(add_extra_lore(tidy_guides(patch_lore(drop_settings(lore)))))))))
+    # 지침·세계 로어북은 플러그인 내장(2026-10-27): 명부로 옮기는 일까지 끝낸 뒤 카드에서 뺀다. 카드에 남는 글 로어북은 Directory·매니페스트·위키 기본 문서
+    lore = drop_plugin_lore(add_wiki_base(add_appendix_data(migrate_directory(add_extra_lore(patch_lore(drop_settings(lore)))))))
     lore, manifest['keys'] = lore_activation(lore)
     settings = next(e for e in lore if e.get('mode') == 'folder' and e.get('comment') == SETTINGS_FOLDER_NAME)
     lore.append({
@@ -808,8 +826,10 @@ def main(src, dst):
     data['name'] = CARD_NAME
     data['first_mes'] = LANDING
     data['alternate_greetings'] = greetings
-    data['creator_notes'] = creator_notes(data.get('creator_notes'))
-    risu['backgroundHTML'] = status_css(risu.get('backgroundHTML'))
+    # 2026-10-27 사용자: 제작 노트는 비우고, RP 지침(description)은 플러그인이 요청에 끼우고(core/guides.ts RP), 옛 상태창 CSS 는 쓰는 곳이 없어 비운다
+    data['creator_notes'] = ''
+    data['description'] = ''
+    risu['backgroundHTML'] = ''
     risu['lowLevelAccess'] = False
     risu['virtualscript'] = ''
     risu.pop('triggerscript', None)

@@ -34,6 +34,10 @@ export interface WorldRecord {
   departments?: Record<string, string>;
   /** 조직: 명부 조직이 아닌 Faction 요약 전용 (탐미주의) */
   summaryOnly?: boolean;
+  /** 조직: Faction 요약에 넣지 않음 (세력 상세 로어만. 남해지사) */
+  noSummary?: boolean;
+  /** 조직: Roster 에서 부서 안 묶음 꼬리표 (「A Jo (Elite Jo)」). department 가 같은 요원들 앞에 한 줄 */
+  roster_notes?: { department: string; label: string }[];
   /** 덧쓰기에서: 기본 기록을 지움 */
   deleted?: boolean;
 }
@@ -122,6 +126,9 @@ export function mergeRecord(base: WorldRecord | undefined, over: Partial<WorldRe
   const departments = over?.departments ?? base?.departments;
   if (departments && Object.keys(departments).length) out.departments = { ...departments };
   if (over?.summaryOnly ?? base?.summaryOnly) out.summaryOnly = true;
+  if (over?.noSummary ?? base?.noSummary) out.noSummary = true;
+  const notes = over?.roster_notes ?? base?.roster_notes;
+  if (Array.isArray(notes) && notes.length) out.roster_notes = notes.map((n) => ({ department: String(n.department ?? ''), label: String(n.label ?? '') }));
   return out;
 }
 

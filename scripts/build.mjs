@@ -30,7 +30,7 @@ const common = {
   charset: 'utf8',
   minify: false,
   legalComments: 'none',
-  loader: { '.css': 'text' },
+  loader: { '.css': 'text', '.txt': 'text' },
   write: false,
 };
 
@@ -118,6 +118,7 @@ await build({
   format: 'esm',
   target: 'es2022',
   charset: 'utf8',
+  loader: { '.txt': 'text' },
   outfile: 'dist-test/core.mjs',
 });
 

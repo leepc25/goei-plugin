@@ -48,9 +48,9 @@ const slots = ['Faction', 'Mystic', 'Anomaly', 'Agent'].map((n) => ({ comment: `
 
 test('가상 로어북: 빈 카드에도 기본 세계가 폴더 항목으로 붙고, 저장 때는 빠진다', () => {
   const out = withWorldLore([...slots]);
-  const virt = out.filter((e) => isVirtual(e) && e.mode !== 'folder');
+  const virt = out.filter((e) => isVirtual(e) && e.mode !== 'folder' && !e.alwaysActive);
   assert.equal(virt.length, 55 + 14 + 63 + 11 + 4, '요약 전용 조직 3개는 세력 로어를 만들지 않음');
-  assert.equal(out.filter((e) => isVirtual(e) && e.mode === 'folder').length, 5);
+  assert.equal(out.filter((e) => isVirtual(e) && e.mode === 'folder').length, 6, '다섯 폴더 + 🌐세계(상시 지침)');
   const j = virt.find((e) => e.comment === '쟈알디');
   assert.equal(j.key, 'Jyaldi, 쟈알디', '검색 키는 원문 그대로');
   assert.match(j.content, /^@@dont_activate\n### Character - Jyaldi\n\n#### Identity\n- Age: 30s\n- Gender: Female\n/);

@@ -7,7 +7,11 @@ import { readPersona, USER_MARK } from './host/user';
 import { hasSceneCard, renderSceneCards } from './core/dispatch';
 import { CONTEXT as GN_CONTEXT, GN_RAW, gnetSettings, mainContext, readGnet, userNick } from './core/gnet';
 import { mainContextRules } from './core/gnetPrompt';
-import { withWorldLore } from './core/world/virtual';
+import { ALWAYS_BOOKS, isVirtual, stripVirtual, withWorldLore } from './core/world/virtual';
+import { guideText, RP_HEAD } from './core/guides';
+import { evaluate } from './core/cbs';
+import { shouldKeepSeed } from './core/request';
+import { messageText } from './core/refs';
 import { processRequest, unwrapCalls, unwrapScenes, type PromptMessage } from './core/request';
 import { HISTORY as PH_HISTORY, hasCall, mainContext as phoneMainContext, phoneSettings, PH_STATE, PH_BULLETINS, readBulletins, readPhone, renderCalls } from './core/phone';
 import { mainContextRules as phoneRules } from './core/phonePrompt';
@@ -41,7 +45,7 @@ import { GHOST_ICON } from './ui/icons';
 import { landingHtml as renderLanding } from './ui/landing';
 import { loadPrefs } from './host/prefs';
 import { isWaiting, setWaiting } from './host/waiting';
-import { syncDecorators, computeLore, hasUnlockTag, loreOptions, patchSlots, readUnlocked, sameVars, stripUnlockTags, trimRoster, unlockedValue, unlockTags, UNLOCK_VAR, type LoreMode } from './core/lore';
+import { syncDecorators, computeLore, hasUnlockTag, loreOptions, patchSlots, readUnlocked, sameVars, stripUnlockTags, trimRoster, unlockedValue, unlockTags, UNLOCK_VAR, type LoreMode, hasSlots, insertLoreBlock, joinLoreBlock, LORE_KINDS, slotParts, slotVar, type LoreBlockPart, type LoreKind } from './core/lore';
 import { advValue } from './core/advanced';
 import { userInfo } from './host/user';
 import { applyPlayer, hidePlayerTag, playerAgent, playerBlock } from './core/player';
@@ -153,15 +157,35 @@ async function onInput(text: string): Promise<string> {
   return text;
 }
 
-/** 요청 직전: 다시 굴리기·자동 전송처럼 입력을 거치지 않았으면 지금 채팅으로 다시 골라 요청 속 글을 바꾼다 */
+/**
+ * 요청 직전 로어: 자리 로어북이 있는 옛 카드는 Risu 가 자리 항목으로 끼우므로 다시 골라 요청 속 글만 바꾼다(patchSlots).
+ * 자리 로어북이 없는 카드(2026-10-27: 자리 항목·Start Lore·Tag·Faction·Roster 를 카드에서 뺌)는 플러그인이 한 덩어리로 직접 끼운다:
+ * RP 지침(카드 description 에 없을 때) → 🏷️Tag 100 → 📜Faction 101 → 🙂Roster 102 → 세력 200 → 시드 399(첫 전송) → 특수 400 → 괴이 500 → 요원 600
+ */
 async function fixLore<M extends PromptMessage>(messages: M[]): Promise<M[]> {
   const charIndex = await risuai.getCurrentCharacterIndex();
   const char = await getChar<LoreChar>(charIndex);
   const chat = (await risuai.getChatFromIndex(charIndex, await risuai.getCurrentChatIndex())) as Chat | null;
   if (!char || !chat) return messages;
   const got = loreFor(char, chat);
-  if (!got || sameVars(chat.scriptstate, got.vars)) return messages;
-  return patchSlots(messages, chat.scriptstate, got.vars).messages;
+  const real = stripVirtual(char.globalLore ?? []);
+  if (hasSlots(real)) {
+    if (!got || sameVars(chat.scriptstate, got.vars)) return messages;
+    return patchSlots(messages, chat.scriptstate, got.vars).messages;
+  }
+  const parts: LoreBlockPart[] = [];
+  const env = { vars: chat.scriptstate ?? {}, char: char.name, user: userInfo().name };
+  for (const b of ALWAYS_BOOKS) {
+    const e = (char.globalLore ?? []).find((x) => isVirtual(x) && x.comment === b.name);
+    if (e && typeof e.content === 'string') parts.push({ order: b.order, text: evaluate(e.content, env) });
+  }
+  if (got) parts.push(...slotParts(Object.fromEntries(LORE_KINDS.map((k) => [k, got.vars[slotVar(k)] ?? ''])) as Record<LoreKind, string>));
+  // 시드(첫 장면 강제 로어): 카드에 📕Start Lore 가 없으면 플러그인이. 수명은 processRequest 가 표식으로 다룬다
+  const seed = String(chat.scriptstate?.['$seed_lore'] ?? '');
+  if (seed && shouldKeepSeed(chat) && !real.some((e) => e.comment === '📕Start Lore')) parts.push({ order: 399, text: seed });
+  if (!messages.some((m) => typeof m?.content === 'string' && m.content.includes(RP_HEAD))) parts.push({ order: 0, text: guideText('RP') });
+  const first = chat.message?.find((m) => typeof m.data === 'string' && m.data.trim())?.data;
+  return insertLoreBlock(messages, joinLoreBlock(parts), first ? messageText(first) : undefined);
 }
 
 /** 캐릭터로 플레이: 페르소나 자리에 그 요원 로어북과 틀 지침, 페르소나 이름은 요원 이름으로 */

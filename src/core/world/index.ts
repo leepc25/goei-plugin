@@ -11,3 +11,4 @@ export * from './schema';
 export * from './records';
 export * from './assemble';
 export * from './virtual';
+export * from './faction';

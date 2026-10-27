@@ -8,6 +8,7 @@ export * from './world';
 export * from './dispatch';
 export * from './cbs';
 export * from './refs';
+export * from './guides';
 export * from './wiki';
 export * from './gnet';
 export * from './gnetPrompt';
