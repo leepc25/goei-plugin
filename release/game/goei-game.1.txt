@@ -1,4 +1,4 @@
-// goei-game 0.17.3
+// goei-game 0.17.4
 "use strict";
 (() => {
   // src/game/action/engine/view.ts

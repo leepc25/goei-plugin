@@ -81,7 +81,7 @@ export function relationsPage(ctx: ChatContext, over: WorldOverrides, rulesOnly:
       <div class="ps-row gw-rel-foot"><span class="gw-tokens">${tokenizerName() ? '' : '약 '}${tokens(rel.common).toLocaleString()}토큰</span><button class="gx-mini" data-action="ed-rules-reset" ${over.relations?.common === undefined ? 'disabled' : ''}>기본으로</button></div>
     </div></section>`;
   return `<div class="gw-page split">
-    <div class="gw-list-pane"><div class="gw-list-tools"><span class="gw-list-title">조직 ${included.length}${all.length > included.length ? ` <small>· 제외 ${all.length - included.length}</small>` : ''}</span></div><div class="gw-list gw-rel-list">${list}</div></div>
+    <div class="gw-list-pane"><div class="gw-list-tools"><select class="gw-list-pick" data-change="ed-rel-pick" aria-label="조직 고르기">${all.map((o) => `<option value="${esc(o.name)}"${o.name === sel ? ' selected' : ''}>${esc(o.name)}${excluded.has(o.name) ? ' (제외)' : ''}</option>`).join('')}</select><span class="gw-list-title">조직 ${included.length}${all.length > included.length ? ` <small>· 제외 ${all.length - included.length}</small>` : ''}</span></div><div class="gw-list gw-rel-list">${list}</div></div>
     <div class="gw-detail">
       <header class="gw-head"><h2>${esc(sel)}</h2>
         <div class="gw-head-act"><span class="gw-tokens">Faction ${tokenizerName() ? '' : '약 '}${tokens(fac).toLocaleString()}토큰</span>

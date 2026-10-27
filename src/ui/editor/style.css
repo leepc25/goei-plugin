@@ -243,6 +243,7 @@
 .gw-list-pane { display: flex; flex-direction: column; min-height: 0; border-right: 1px solid var(--line); background: var(--sunk); }
 .gw-list-tools { display: flex; align-items: center; gap: var(--gap); padding: 10px 10px 8px; }
 .gw-list-tools .dir-search { flex: 1; min-width: 0; width: auto; }
+.gw-list-pick { display: none; }
 .gw-list-title { display: flex; align-items: center; gap: 6px; height: var(--h); padding: 0 4px; font-size: 13px; font-weight: 700; color: var(--sub); }
 .gw-list-title small { font-weight: 500; color: var(--dim); }
 .gw-add { display: flex; flex-wrap: wrap; gap: var(--gap); padding: 0 10px 8px; }
@@ -304,7 +305,13 @@
   .gw-tree { position: absolute; top: 52px; left: 0; bottom: 0; width: 260px; transform: translateX(-100%); transition: transform .18s; z-index: 3; box-shadow: var(--shadow); }
   .gw-win.drawer .gw-tree { transform: none; }
   .gw-page.split { grid-template-columns: minmax(0, 1fr); height: auto; }
-  .gw-list-pane { border-right: 0; border-bottom: 1px solid var(--line); max-height: 40vh; }
+  /* 폰: 목록 대신 드롭다운 한 줄 (목록·검색·제목은 숨김) */
+  .gw-list-pane { border-right: 0; border-bottom: 1px solid var(--line); max-height: none; }
+  .gw-list-pane .gw-list, .gw-list-pane .dir-search, .gw-list-pane .gw-list-title { display: none; }
+  .gw-list-pane .gw-list-pick { display: block; flex: 1; min-width: 0; }
+  .gw-list-tools { padding: 10px 14px; }
+  .gw-list-pane .gw-add { padding: 0 14px 10px; }
+  .gw-list-pane > .gw-anote { margin: 0 14px 10px; }
   .gw-page, .gw-detail { padding: 14px 14px 60px; }
   .gw-save-state, .gw-where { display: none; }
   .gw .ps-row, .gw .dir-line, .gw .dir-in, .gw .st-col-row { grid-template-columns: minmax(0, 1fr); grid-template-areas: 'label' 'ctl' 'hint'; }

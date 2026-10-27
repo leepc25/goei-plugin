@@ -1,4 +1,72 @@
-() && !String(m.data).includes("%%")).length;
+floor(Number(p[6]) || 0)),
+            body: p[7],
+            mine: p[8] === "1",
+            comments: []
+          };
+          st.posts.push(post);
+          map.set(id, post);
+          st.seq = Math.max(st.seq, id);
+        }
+      } else if (p[0] === "C" && p.length >= 6) {
+        const post = map.get(Number(p[1]));
+        if (post) post.comments.push({ parent: Math.max(0, Math.floor(Number(p[2]) || 0)), nick: cut(p[3], 80), body: p[4], mine: p[5] === "1", unread: p[6] === "1", ...validDate(p[7]) ? { time: validDate(p[7]) } : {} });
+      } else if (p[0] === "D" && p.length >= 4) {
+        st.dms.push({ nick: cut(p[1], 80), side: p[2] === "me" ? "me" : "npc", body: p[3], unread: p[4] === "1", date: validDate(p[5] ?? "") });
+      }
+    }
+    if (st.seq < G_POST_BASE) {
+      for (const post of st.posts) post.id += G_POST_BASE;
+      for (const s5 of Object.values(st.sources)) if (s5.postid > 0) s5.postid += G_POST_BASE;
+      st.seq += G_POST_BASE;
+    }
+    return st;
+  }
+  function encode(st) {
+    const out = ["GN1", `Q|${st.seq || G_POST_BASE}`];
+    for (const p of st.posts) {
+      out.push(["P", p.id, en(p.date), en(p.nick), en(p.title), p.views, p.votes, en(p.body), p.mine ? "1" : "0"].join("|"));
+      for (const c of p.comments) out.push(["C", p.id, c.parent, en(c.nick), en(c.body), c.mine ? "1" : "0", c.unread ? "1" : "0", en(c.time ?? "")].join("|"));
+    }
+    for (const [nick, s5] of Object.entries(st.sources)) out.push(["T", en(nick), s5.postid || 0, en(s5.title), en(s5.body), en(s5.author), en(s5.quote), en(s5.quoteAuthor)].join("|"));
+    for (const d of st.dms) out.push(["D", en(d.nick), d.side, en(d.body), d.unread ? "1" : "0", en(d.date)].join("|"));
+    return out.join("\n");
+  }
+  function readGnet(chat) {
+    return decode(chat.scriptstate?.[GN_RAW]);
+  }
+  function snapshotKey(st) {
+    return JSON.stringify([st.seq, st.posts.map((p) => [p.id, p.nick, p.title, p.body, p.date, p.mine, p.views, p.votes, p.comments.map((c) => [c.parent, c.nick, c.body, c.mine])])]);
+  }
+  var postHead = (p) => JSON.stringify([p.id, p.nick, p.title, p.body, p.date, p.mine]);
+  var commentKey = (c) => JSON.stringify([c.parent, c.nick, c.body, c.mine]);
+  function postKey(p) {
+    return p ? JSON.stringify([p.id, p.nick, p.title, p.body, p.date, p.mine, p.comments.map((c) => [c.parent, c.nick, c.body, c.mine])]) : "";
+  }
+  function findPost(st, id) {
+    return st.posts.find((p) => p.id === id);
+  }
+  function dateNow(chat) {
+    const minute = readWorld(chat).minute;
+    const p = (n2) => String(n2).padStart(2, "0");
+    if (minute !== null && minute > 0) {
+      const d = new Date(minute * 6e4);
+      return `${d.getUTCFullYear()}.${p(d.getUTCMonth() + 1)}.${p(d.getUTCDate())} ${p(d.getUTCHours())}:${p(d.getUTCMinutes())}`;
+    }
+    const msgs3 = chat.message ?? [];
+    for (let i = msgs3.length - 1; i >= 0; i--) {
+      const m = msgs3[i];
+      if (m.role !== "char" || typeof m.data !== "string") continue;
+      const t = /\[▣\s*\|\s*(\d{4})\.(\d{2})\.(\d{2})\s*\|\s*(\d{1,2}):(\d{2})\s*([AaPp][Mm])/.exec(m.data);
+      if (t) {
+        let h = Number(t[4]) % 12;
+        if (t[6].toUpperCase() === "PM") h += 12;
+        return `${t[1]}.${t[2]}.${t[3]} ${p(h)}:${t[5]}`;
+      }
+    }
+    return "";
+  }
+  function storyTurns(chat) {
+    return (chat.message ?? []).filter((m) => m.role === "char" && String(m.data ?? "").trim() && !String(m.data).includes("%%")).length;
   }
   function postLimit(s5) {
     return QUANTITY[s5.quantity]?.max ?? 7;
@@ -38,9 +106,9 @@
     const seen2 = /* @__PURE__ */ new Set();
     while (parent && p.comments[parent - 1] && !seen2.has(parent)) {
       seen2.add(parent);
-      const row8 = p.comments[parent - 1];
-      if (row8.mine) return true;
-      parent = row8.parent;
+      const row9 = p.comments[parent - 1];
+      if (row9.mine) return true;
+      parent = row9.parent;
     }
     return false;
   }
@@ -375,18 +443,18 @@
       const known = cands.filter((x) => x !== null);
       return known.length ? Math.max(...known) : null;
     };
-    const pending = [];
+    const pending2 = [];
     const settle = (upto) => {
-      if (!pending.length) return;
-      const lo = floorOf(pending[0]);
+      if (!pending2.length) return;
+      const lo = floorOf(pending2[0]);
       const hi = upto ?? nowMin ?? lo;
-      if (lo === null || hi === null) return void (pending.length = 0);
+      if (lo === null || hi === null) return void (pending2.length = 0);
       const span = Math.max(0, hi - lo);
-      pending.forEach((idx, k) => {
-        const min = Math.max(floorOf(idx) ?? lo, lo + Math.round(span * (k + 1) / (pending.length + 1)));
+      pending2.forEach((idx, k) => {
+        const min = Math.max(floorOf(idx) ?? lo, lo + Math.round(span * (k + 1) / (pending2.length + 1)));
         p.comments[idx].time = minutesStamp(nowMin !== null ? Math.min(min, Math.max(nowMin, lo)) : min);
       });
-      pending.length = 0;
+      pending2.length = 0;
     };
     for (let i = from; i < p.comments.length; i++) {
       const c = p.comments[i];
@@ -394,7 +462,7 @@
       const lo = floorOf(i);
       const clock2 = raw ? clockMinutes(raw) : null;
       if (clock2 === null || lo === null && nowMin === null) {
-        pending.push(i);
+        pending2.push(i);
         continue;
       }
       const hi = nowMin ?? Number.POSITIVE_INFINITY;
@@ -1040,8 +1108,8 @@ ${body5}` : `##### ${sec.title}`);
     }
     return null;
   }
-  function whenCond(head2, env3) {
-    const rest = head2.replace(/^#when/, "");
+  function whenCond(head3, env3) {
+    const rest = head3.replace(/^#when/, "");
     if (!rest.startsWith("::")) return truthy(evaluate(rest, env3).trim());
     const p = splitTop(rest.slice(2)).map((x) => evaluate(x, env3));
     if (p.length === 1) return truthy(p[0].trim());
@@ -1113,15 +1181,15 @@ ${body5}` : `##### ${sec.title}`);
         break;
       }
       const raw = text.slice(j + 2, k - 2);
-      const head2 = raw.trim();
-      if (head2.startsWith("#if") || head2.startsWith("#when")) {
+      const head3 = raw.trim();
+      if (head3.startsWith("#if") || head3.startsWith("#when")) {
         const b = blockEnd(text, k);
         if (!b) {
           out += text.slice(j, k);
           i = k;
           continue;
         }
-        const yes = head2.startsWith("#if") ? truthy(evaluate(head2.replace(/^#if(::)?/, ""), env3).trim()) : whenCond(head2, env3);
+        const yes = head3.startsWith("#if") ? truthy(evaluate(head3.replace(/^#if(::)?/, ""), env3).trim()) : whenCond(head3, env3);
         const body5 = yes ? text.slice(k, b.else >= 0 ? b.else : b.close) : b.else >= 0 ? text.slice(b.elseEnd, b.close) : "";
         out += evaluate(body5, env3);
         i = b.end;
@@ -1254,9 +1322,9 @@ ${body5}` : `##### ${sec.title}`);
     const data = phoneTabsSection(lore);
     if (!data.tabs.length) throw new PhoneError("괴담톡 탭 설정이 없어요.");
     const entries2 = [];
-    for (const row8 of data.tabs) {
-      if (entries2.some((e) => e.id === row8.id)) continue;
-      entries2.push({ id: row8.id, name: row8.name || row8.id, names: { ...row8.name_by_faction }, visibleFor: new Set(row8.visible_for) });
+    for (const row9 of data.tabs) {
+      if (entries2.some((e) => e.id === row9.id)) continue;
+      entries2.push({ id: row9.id, name: row9.name || row9.id, names: { ...row9.name_by_faction }, visibleFor: new Set(row9.visible_for) });
     }
     const extra = extraFactions(lore).map((f) => f.code);
     if (extra.length) {
@@ -1296,29 +1364,29 @@ ${body5}` : `##### ${sec.title}`);
     const roster = { characters: rosterOf(readDirectory(books)) };
     const map = /* @__PURE__ */ new Map();
     const contacts = [];
-    for (const row8 of roster.characters ?? []) {
-      const agentId = s4(row8?.id);
-      if (!/^P\d{3,}$/.test(agentId) || !s4(row8.name)) continue;
+    for (const row9 of roster.characters ?? []) {
+      const agentId = s4(row9?.id);
+      if (!/^P\d{3,}$/.test(agentId) || !s4(row9.name)) continue;
       if (agentId === String(chat.scriptstate?.["$st_player"] ?? "")) continue;
-      const english = s4(row8.english);
+      const english = s4(row9.english);
       const c = {
         id: contactId(agentId),
         agentId,
-        name: s4(row8.name),
+        name: s4(row9.name),
         english,
-        lore: s4(row8.lore),
-        group: s4(row8.affiliation),
-        rank: s4(row8.rank),
-        department: s4(row8.department),
-        tabs: list3(row8.phone_tabs),
-        terms: [s4(row8.name), english, s4(row8.lore), ...list3(row8.aliases), ...list3(row8.legacy_english)].filter(Boolean),
+        lore: s4(row9.lore),
+        group: s4(row9.affiliation),
+        rank: s4(row9.rank),
+        department: s4(row9.department),
+        tabs: list3(row9.phone_tabs),
+        terms: [s4(row9.name), english, s4(row9.lore), ...list3(row9.aliases), ...list3(row9.legacy_english)].filter(Boolean),
         visible: false,
         saved: false
       };
       c.visible = c.tabs.some((t) => visible2.has(t));
       map.set(c.id, c);
       if (c.visible) contacts.push(c);
-      for (const name of [english, ...list3(row8.legacy_english)]) if (name) map.set(`c_${hex2(name.toLowerCase())}`, c);
+      for (const name of [english, ...list3(row9.legacy_english)]) if (name) map.set(`c_${hex2(name.toLowerCase())}`, c);
     }
     for (const entry3 of readCustom(chat).items) {
       let c = map.get(entry3.id);
@@ -1414,7 +1482,7 @@ ${body5}` : `##### ${sec.title}`);
     let senders = /* @__PURE__ */ new Map();
     if (r.conversationBaseline && typeof r.conversationBaseline === "object") {
       out = JSON.parse(JSON.stringify(r.conversationBaseline));
-      for (const row8 of out.senders ?? []) senders.set(row8.sender, row8);
+      for (const row9 of out.senders ?? []) senders.set(row9.sender, row9);
       out.senders = [];
     }
     for (const m of r.messages) {
@@ -1429,18 +1497,18 @@ ${body5}` : `##### ${sec.title}`);
         senders = /* @__PURE__ */ new Map();
       } else {
         out.npcMessagesSinceOwner++;
-        const row8 = senders.get(m.sender) ?? { sender: m.sender, messagesSinceOwner: 0, firstMessageTime: m.time || "" };
-        row8.messagesSinceOwner++;
-        row8.lastMessageTime = m.time || "";
-        row8.lastRecordID = m.id;
-        senders.set(m.sender, row8);
+        const row9 = senders.get(m.sender) ?? { sender: m.sender, messagesSinceOwner: 0, firstMessageTime: m.time || "" };
+        row9.messagesSinceOwner++;
+        row9.lastMessageTime = m.time || "";
+        row9.lastRecordID = m.id;
+        senders.set(m.sender, row9);
       }
     }
     const rt = r.readThrough;
     for (const key2 of [...senders.keys()].sort()) {
-      const row8 = senders.get(key2);
-      row8.lastMessageRead = rt !== void 0 && row8.lastRecordID !== void 0 ? row8.lastRecordID <= rt ? "read" : "unread" : "unknown";
-      out.senders.push(row8);
+      const row9 = senders.get(key2);
+      row9.lastMessageRead = rt !== void 0 && row9.lastRecordID !== void 0 ? row9.lastRecordID <= rt ? "read" : "unread" : "unknown";
+      out.senders.push(row9);
     }
     out.readReceipt = rt !== void 0 ? "tracked" : "unknown";
     out.ownerReadThroughRecordID = rt;
@@ -1624,7 +1692,7 @@ ${body5}` : `##### ${sec.title}`);
     try {
       const v = JSON.parse(raw);
       if (v && Array.isArray(v.items)) {
-        for (const row8 of v.items) if (row8.read === void 0) row8.read = true;
+        for (const row9 of v.items) if (row9.read === void 0) row9.read = true;
         return { version: 2, seq: Number(v.seq) || 0, items: v.items, checks: v.checks ?? {}, seen: v.seen ?? {}, lastIssuedTurns: v.lastIssuedTurns };
       }
     } catch {
@@ -1632,12 +1700,12 @@ ${body5}` : `##### ${sec.title}`);
     throw new PhoneError("공지 기록을 읽지 못했어요. 원본 기록은 그대로 둬요.");
   }
   var bulletinUnread = (b) => b.items.some((r) => r.read === false);
-  var signature = (row8) => JSON.stringify([row8.channel, row8.title.trim(), row8.text.trim()]);
+  var signature = (row9) => JSON.stringify([row9.channel, row9.title.trim(), row9.text.trim()]);
   function trimBulletins(b, cap = STORAGE.notice) {
     const n2 = Math.max(0, b.items.length - cap);
     b.items = b.items.slice(n2);
     b.seen = {};
-    for (const row8 of b.items) b.seen[signature(row8)] = true;
+    for (const row9 of b.items) b.seen[signature(row9)] = true;
   }
   function noticeChannel(chat) {
     const code2 = String(chat.scriptstate?.["$st_faction"] ?? "");
@@ -1666,31 +1734,31 @@ ${body5}` : `##### ${sec.title}`);
   function validateAnnouncements(rows2, packet, dropped = []) {
     if (rows2 != null && !Array.isArray(rows2)) fail("공지 목록이 배열이 아니에요.");
     const out = [];
-    for (const row8 of rows2 ?? []) {
-      const why = noticeProblem(row8);
+    for (const row9 of rows2 ?? []) {
+      const why = noticeProblem(row9);
       if (why) dropped.push(why);
       else if (out.length >= (packet?.maxNew ?? 0)) dropped.push("한 번에 받을 공지 수를 넘었어요.");
-      else out.push(row8);
+      else out.push(row9);
     }
     return out;
   }
-  function noticeProblem(row8) {
-    if (!row8 || typeof row8.issuer !== "string" || typeof row8.category !== "string" || typeof row8.title !== "string" || typeof row8.text !== "string") return "공지 형식이 잘못됐어요.";
-    if (!CATEGORIES.has(row8.category)) return "공지 분류가 올바르지 않아요.";
-    if (!row8.issuer.trim() || [...row8.issuer].length > LIMITS2.notice_issuer || !row8.title.trim() || [...row8.title].length > LIMITS2.notice_title || !row8.text.trim()) return "공지 발신처·제목·본문을 확인하세요.";
-    if (tokens(row8.text) > LIMITS2.notice_tokens) return `공지 한 개는 ${LIMITS2.notice_tokens}토큰 이내여야 해요.`;
+  function noticeProblem(row9) {
+    if (!row9 || typeof row9.issuer !== "string" || typeof row9.category !== "string" || typeof row9.title !== "string" || typeof row9.text !== "string") return "공지 형식이 잘못됐어요.";
+    if (!CATEGORIES.has(row9.category)) return "공지 분류가 올바르지 않아요.";
+    if (!row9.issuer.trim() || [...row9.issuer].length > LIMITS2.notice_issuer || !row9.title.trim() || [...row9.title].length > LIMITS2.notice_title || !row9.text.trim()) return "공지 발신처·제목·본문을 확인하세요.";
+    if (tokens(row9.text) > LIMITS2.notice_tokens) return `공지 한 개는 ${LIMITS2.notice_tokens}토큰 이내여야 해요.`;
     return null;
   }
   function commitAnnouncements(b, st, rows2, packet, time2) {
     let added = 0;
-    for (const row8 of rows2) {
-      const rec = { channel: packet.channel, title: row8.title.trim(), text: row8.text.trim() };
+    for (const row9 of rows2) {
+      const rec = { channel: packet.channel, title: row9.title.trim(), text: row9.text.trim() };
       const sig = signature(rec);
       if (b.seen[sig]) continue;
       b.seen[sig] = true;
       b.seq += 1;
       st.mid += 1;
-      b.items.push({ id: b.seq, order: st.mid, read: false, channel: packet.channel, channelName: packet.channelName, issuer: row8.issuer.trim(), category: row8.category, title: rec.title, text: rec.text, time: time2 });
+      b.items.push({ id: b.seq, order: st.mid, read: false, channel: packet.channel, channelName: packet.channelName, issuer: row9.issuer.trim(), category: row9.category, title: rec.title, text: rec.text, time: time2 });
       added++;
     }
     if (added && packet.allowed) b.lastIssuedTurns = { ...b.lastIssuedTurns ?? {}, [packet.channel]: packet.turn };
@@ -1711,16 +1779,16 @@ ${body5}` : `##### ${sec.title}`);
     const sig = (m) => [...m].sort().join(",");
     const out = [];
     const fresh = /* @__PURE__ */ new Set();
-    for (const row8 of rows2 ?? []) {
+    for (const row9 of rows2 ?? []) {
       if (out.length >= (packet?.maxNew ?? 0)) {
         dropped.push("한 번에 받을 단톡방 초대 수를 넘었어요.");
         continue;
       }
       try {
-        if (!row8 || typeof row8.inviter !== "string" || !Array.isArray(row8.members) || typeof row8.name !== "string" || !Array.isArray(row8.patch)) fail("단톡방 초대 형식이 잘못됐어요.");
-        const name = row8.name.trim();
+        if (!row9 || typeof row9.inviter !== "string" || !Array.isArray(row9.members) || typeof row9.name !== "string" || !Array.isArray(row9.patch)) fail("단톡방 초대 형식이 잘못됐어요.");
+        const name = row9.name.trim();
         if (!name || [...name].length > LIMITS2.room_name) fail("초대할 단톡방 이름이 길이 제한을 넘었어요.");
-        const members = row8.members;
+        const members = row9.members;
         if (members.length < 2 || members.length > LIMITS2.members) fail("단톡방에는 NPC 2명 이상이 필요하고 최대 인원을 넘을 수 없어요.");
         const people = {};
         for (const cid of members) {
@@ -1728,12 +1796,12 @@ ${body5}` : `##### ${sec.title}`);
           if (typeof cid !== "string" || !allowed.has(cid) || !c || people[cid]) fail("단톡방 초대에 허용되지 않거나 중복된 참여자가 있어요.");
           people[cid] = personOf(c);
         }
-        if (!people[row8.inviter]) fail("초대한 인물은 단톡방 참여자여야 해요.");
+        if (!people[row9.inviter]) fail("초대한 인물은 단톡방 참여자여야 해요.");
         const key2 = `${name}\0${sig(members)}`;
         if (fresh.has(key2)) fail("같은 단톡방 초대가 중복됐어요.");
         for (const r of Object.values(st.rooms)) if (r.kind === "group" && roomLabel(r).trim() === name && sig(r.members) === sig(members)) fail("같은 이름과 참여자의 단톡방이 이미 있어요.");
-        const room = { id: "", kind: "group", name, members: [...members], people, messages: [], draft: "", unread: 0, inviter: row8.inviter };
-        room.events = eventsFromPatch(row8.patch, room, false, dropped).events;
+        const room = { id: "", kind: "group", name, members: [...members], people, messages: [], draft: "", unread: 0, inviter: row9.inviter };
+        room.events = eventsFromPatch(row9.patch, room, false, dropped).events;
         fresh.add(key2);
         out.push(room);
       } catch (error) {
@@ -2025,7 +2093,7 @@ ${c}`)]).join("\n\n");
     return text.replace(/(?<![\w])([A-Z]00)(?![\w])/g, (code2) => names4[code2] ?? code2);
   }
   function policySections(lore, comment) {
-    const raw = isGuideName(comment) ? guideText(comment) : (lore ?? []).find((e) => e.comment === comment)?.content;
+    const raw = isGuideName(comment) ? guidePrompt(comment) : (lore ?? []).find((e) => e.comment === comment)?.content;
     const out = {};
     if (typeof raw !== "string") return out;
     for (const m of raw.matchAll(/@@SECTION ([^\n]+)\n([\s\S]*?)\n@@END/g)) out[m[1].trim()] = m[2];
@@ -2642,9 +2710,19 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
       for (const [k, v] of Object.entries(o.guides)) if (isGuideName(k) && typeof v === "string" && v.trim()) guides[k] = v.slice(0, 12e4);
     }
     for (const k of GUIDE_NAMES) setGuideOverride(k, guides[k]);
+    const rules3 = [];
+    if (Array.isArray(o.rules)) {
+      for (const r of o.rules) {
+        if (!r || typeof r !== "object" || typeof r.id !== "string") continue;
+        const to = (Array.isArray(r.to) ? r.to : []).filter((t) => RULE_TARGETS.includes(String(t)));
+        rules3.push({ id: r.id.slice(0, 40), title: String(r.title ?? "").slice(0, 80), text: String(r.text ?? "").slice(0, 2e4), to, on: r.on !== false });
+        if (rules3.length >= 100) break;
+      }
+    }
+    setUserRules(rules3);
     const relationsSym = o.relationsSym === false ? false : void 0;
     const walletStart = int2(o.walletStart, 0, 1e12);
-    prefs = { basic, world, ...walletStart !== null ? { walletStart } : {}, ...editorWidth !== null ? { editorWidth } : {}, ...Object.keys(guides).length ? { guides } : {}, ...relationsSym === false ? { relationsSym } : {}, ...theme ? { theme } : {}, ...imgPrompt ? { imgPrompt } : {}, ...imgNamesOff.length ? { imgNamesOff } : {}, ...imgNamesExtra.length ? { imgNamesExtra } : {}, ...imgKeywords.length ? { imgKeywords } : {}, ...Object.keys(vars).length ? { vars } : {}, ...nav ? { nav } : {}, ...agents ? { agents } : {}, ...dim !== null ? { dim } : {}, ...status2 ? { status: status2 } : {}, ...size !== null ? { imgSize: size } : {}, ...fold3 !== null ? { imgFold: fold3 } : {}, ...imgFoldOn === false ? { imgFoldOn } : {}, ...show !== null ? { imgShow: show } : {}, ...send2 !== null ? { imgSend: send2 } : {}, ...marks2.length ? { marks: marks2 } : {} };
+    prefs = { basic, world, ...walletStart !== null ? { walletStart } : {}, ...editorWidth !== null ? { editorWidth } : {}, ...Object.keys(guides).length ? { guides } : {}, ...rules3.length ? { rules: rules3 } : {}, ...relationsSym === false ? { relationsSym } : {}, ...theme ? { theme } : {}, ...imgPrompt ? { imgPrompt } : {}, ...imgNamesOff.length ? { imgNamesOff } : {}, ...imgNamesExtra.length ? { imgNamesExtra } : {}, ...imgKeywords.length ? { imgKeywords } : {}, ...Object.keys(vars).length ? { vars } : {}, ...nav ? { nav } : {}, ...agents ? { agents } : {}, ...dim !== null ? { dim } : {}, ...status2 ? { status: status2 } : {}, ...size !== null ? { imgSize: size } : {}, ...fold3 !== null ? { imgFold: fold3 } : {}, ...imgFoldOn === false ? { imgFoldOn } : {}, ...show !== null ? { imgShow: show } : {}, ...send2 !== null ? { imgSend: send2 } : {}, ...marks2.length ? { marks: marks2 } : {} };
     return prefs;
   }
   function readSettingsBook(lore) {
@@ -2916,7 +2994,7 @@ ${themeVars("[x-goei-fab]")}
     };
     let drag = null;
     let moved = false;
-    let pending = null;
+    let pending2 = null;
     let loop = null;
     const rect = async () => visible2 ? await button.getBoundingClientRect() : null;
     const viewport2 = async () => {
@@ -2931,10 +3009,10 @@ ${themeVars("[x-goei-fab]")}
     };
     const runDrag = async () => {
       try {
-        while (pending && drag) {
+        while (pending2 && drag) {
           const d = drag;
-          const p = pending;
-          pending = null;
+          const p = pending2;
+          pending2 = null;
           const hit3 = await d.hit;
           if (drag !== d) continue;
           if (!hit3) {
@@ -2959,7 +3037,7 @@ ${themeVars("[x-goei-fab]")}
     };
     const onDown = (ev) => {
       drag = null;
-      pending = null;
+      pending2 = null;
       moved = false;
       if (!visible2 || typeof ev.clientX !== "number" || typeof ev.clientY !== "number") return;
       if ((ev.buttons ?? 1) !== 1 && (ev.button ?? 0) !== 0) return;
@@ -2982,7 +3060,7 @@ ${themeVars("[x-goei-fab]")}
         drag = null;
         return;
       }
-      pending = { x: ev.clientX, y: ev.clientY };
+      pending2 = { x: ev.clientX, y: ev.clientY };
       loop ??= runDrag();
     };
     const onUp = () => {
@@ -3032,7 +3110,7 @@ ${themeVars("[x-goei-fab]")}
         visible2 = next;
         if (!next) {
           drag = null;
-          pending = null;
+          pending2 = null;
         } else {
           const { vw, vh } = await viewport2();
           pos = clampPos(pos, vw, vh);
@@ -3058,7 +3136,7 @@ ${themeVars("[x-goei-fab]")}
       async remove() {
         visible2 = false;
         drag = null;
-        pending = null;
+        pending2 = null;
         await host2.remove();
         await unbind();
       }
@@ -3821,9 +3899,9 @@ ${line2}`;
       switch (b.tag) {
         case "Infobox": {
           const fields3 = splitFields(b.text).map(field);
-          const head2 = fields3.find(([k]) => k === "Title")?.[1] ?? a.doc_title ?? "";
+          const head3 = fields3.find(([k]) => k === "Title")?.[1] ?? a.doc_title ?? "";
           const rows2 = fields3.filter(([k]) => k !== "Title" && k);
-          out.push(`<table class="nw-infobox" style="--nw:${color}"><tr><th colspan="2">${inline(head2)}</th></tr>${o.photo ? `<tr><td colspan="2" class="nw-ibphoto"><img src="${esc2(o.photo)}" alt=""></td></tr>` : ""}${rows2.map(([k, v]) => `<tr><td>${inline(k)}</td><td>${inline(v)}</td></tr>`).join("")}</table>`);
+          out.push(`<table class="nw-infobox" style="--nw:${color}"><tr><th colspan="2">${inline(head3)}</th></tr>${o.photo ? `<tr><td colspan="2" class="nw-ibphoto"><img src="${esc2(o.photo)}" alt=""></td></tr>` : ""}${rows2.map(([k, v]) => `<tr><td>${inline(k)}</td><td>${inline(v)}</td></tr>`).join("")}</table>`);
           break;
         }
         case "Toc":
@@ -3850,10 +3928,10 @@ ${line2}`;
           const cap = fields3.find(([k]) => k === "Caption")?.[1];
           const c2 = fields3.find(([k]) => k === "Color")?.[1];
           const tc = /^#[0-9a-fA-F]{3,8}$/.test(c2 ?? "") ? c2 : color;
-          const head2 = fields3.find(([k]) => k === "Head")?.[1];
+          const head3 = fields3.find(([k]) => k === "Head")?.[1];
           const rows2 = fields3.filter(([k]) => k === "Row" || k === "RowHead");
           const cells = (v, tagName2) => v.split(";;").map((x) => `<${tagName2}>${inline(x.trim())}</${tagName2}>`).join("");
-          out.push(`<table class="nw-table${b.tag === "CategoryTable" ? " cat" : ""}" style="--nw:${tc}">${cap ? `<caption>${inline(cap)}</caption>` : ""}${head2 ? `<tr>${cells(head2, "th")}</tr>` : ""}${rows2.map(([k, v]) => `<tr>${cells(v, k === "RowHead" ? "th" : "td")}</tr>`).join("")}</table>`);
+          out.push(`<table class="nw-table${b.tag === "CategoryTable" ? " cat" : ""}" style="--nw:${tc}">${cap ? `<caption>${inline(cap)}</caption>` : ""}${head3 ? `<tr>${cells(head3, "th")}</tr>` : ""}${rows2.map(([k, v]) => `<tr>${cells(v, k === "RowHead" ? "th" : "td")}</tr>`).join("")}</table>`);
           break;
         }
         default:
@@ -4173,106 +4251,4 @@ ${SEED_CLOSE}` : "", missing };
     try {
       const doc2 = await risuai.getRootDocument();
       const box = await doc2.querySelector("[data-goei-user]");
-      const html = box ? await box.getInnerHTML() : "";
-      const shownName2 = unescape(html.match(/<b[^>]*data-goei-uname[^>]*>([^<]*)<\/b>/)?.[1] ?? "").trim();
-      if (shownName2 && shownName2 !== "{{user}}") {
-        if (shownName2 !== name) await risuai.pluginStorage.setItem(NAME_KEY, shownName2).catch(() => {
-        });
-        name = shownName2;
-      }
-      let src = unescape(html.match(/src="([^"]*)"/)?.[1] ?? "");
-      if (!src) src = String(await risuai.pluginStorage.getItem(SRC_KEY).catch(() => "") ?? "");
-      else if (!src.startsWith("data:")) await risuai.pluginStorage.setItem(SRC_KEY, src).catch(() => {
-      });
-      if (src && src !== lastSrc) {
-        const next = await photoFrom(src);
-        if (next) {
-          if (photo?.startsWith("blob:")) URL.revokeObjectURL(photo);
-          photo = next;
-          lastSrc = src;
-        }
-      }
-    } catch (error) {
-      console.log(`[goei] 유저 사진을 읽지 못했어요: ${error instanceof Error ? error.message : String(error)}`);
-    }
-    if (!name) {
-      try {
-        const n2 = String(await risuai.parseRisuChat("{{user}}") ?? "").trim();
-        if (n2 && !n2.includes("{{")) name = n2;
-      } catch {
-      }
-    }
-    if (!name) name = String(await risuai.pluginStorage.getItem(NAME_KEY).catch(() => "") ?? "");
-    cached = { name, photo };
-    return cached;
-  }
-  var userInfo = () => cached;
-  var persona = "";
-  async function readPersona() {
-    try {
-      const t = String(await risuai.parseRisuChat("{{persona}}") ?? "").trim();
-      persona = /\{\{\s*persona/i.test(t) ? "" : t;
-    } catch {
-    }
-    return persona;
-  }
-  var personaText = () => persona;
-
-  // src/core/gnetPrompt.ts
-  var REQUIRED_GNET = [
-    "LB",
-    "LB.EXTRA",
-    "EXTENSION.REQUEST",
-    "ACTION.REFRESH",
-    "AUTO.GUIDELINE",
-    "AUTO.FORMAT",
-    "REACT.GUIDELINE",
-    "DM.GUIDELINE",
-    "DM.FORMAT",
-    "INCOMING.GUIDELINE",
-    "DM.REQUEST",
-    "DM.NO-ORIGIN",
-    "TITLE.GUIDELINE",
-    "MAIN_CONTEXT",
-    "PUBLIC.GUIDELINE",
-    "PUBLIC.REACT_FORMAT",
-    "PUBLIC.POST_FORMAT",
-    "ACTIVITY.GUIDELINE",
-    "BOARD.GUIDELINE",
-    "ATTACHMENTS",
-    "INCOMING.COMBINED",
-    "INCOMING.DISABLED",
-    "ACTIVITY.DISABLED"
-  ];
-  var REQUIRED_LB = ["SYSTEM", "OUTPUT", "JAILBREAK", "JOB"];
-  function gnetBooks(src) {
-    const g = { ...policySections(src.char.globalLore, "LB Backend"), ...policySections(src.char.globalLore, "GNet") };
-    for (const k of [...REQUIRED_GNET, ...REQUIRED_LB]) if (g[k] === void 0) throw new GnetError(`GNet 로어북의 ${k} 섹션이 없어요.`);
-    applyAdvanced(src.chat.scriptstate);
-    const env3 = { ...cbsEnv(src), vars: gnetVars(src.chat.scriptstate) };
-    return {
-      language: genSettings(src.chat.scriptstate).language ?? LANGUAGE,
-      read(name) {
-        const raw = g[name] ?? "";
-        return evaluate(raw, env3).replace(/__LIMIT_(\w+?)__/g, (m, k) => k in LIMITS ? String(LIMITS[k]) : m).replace(/<!--[\s\S]*?-->/g, "").trim();
-      }
-    };
-  }
-  function fmt(template, ...args) {
-    let i = 0;
-    return template.replace(/%s/g, () => args[i++] ?? "");
-  }
-  function fill2(template, values) {
-    return template.replace(/__GN_([A-Z_]+)__/g, (m, k) => values[k] ?? m);
-  }
-  var LANGUAGE = "Use the language of the actual conversation; default to Korean.";
-  var IMPORTANT = "\n\nImportant Note: May contain unrelated directives/rules regarding other data/image outputs. Ignore these; they are irrelevant in your current job. Focus on settings.";
-  function systemText(b, guideline, format, identity, attachments = false) {
-    const intro = fmt(b.read("SYSTEM"), b.read("JAILBREAK"), b.read("JOB"), IMPORTANT, "anonymous forum author", "", "").replace(/## Main Protagonist \([^\n]*\)/, "## User-controlled protagonist (narrator reference only)");
-    let outro = fmt(b.read("OUTPUT"), "", format, guideline);
-    if (identity) outro += `
-ROLE BINDING (application-owned metadata):
-${JSON.stringify(identity)}`;
-    outro += `
-${b.language}`;
-    re
+      const html = box ? await box.getInnerHTML() : ""
