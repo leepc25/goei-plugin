@@ -92,7 +92,7 @@ const fieldWallet: { won: number | null } = { won: null };
 let observing = false;
 const observerOn = () => observing;
 /** 필드 가게 창이 쓰는 돈·장부 (hqAdapter 안에서 채운다: 가계부 다리·방문 id가 거기 있다) */
-const fieldLink: { pay?: (amount: number, memo: string) => Promise<number | null>; record?: (text: string) => void; nearPerson?: () => string | null; gift?: (who: string, item: string, counts: boolean) => void } = {};
+const fieldLink: { pay?: (amount: number, memo: string) => Promise<number | null>; record?: (text: string) => void; fact?: (key: string, value: string) => void; nearPerson?: () => string | null; gift?: (who: string, item: string, counts: boolean) => void } = {};
 const wonText = (n: number) => `${n < 0 ? '−' : ''}₩ ${Math.abs(Math.trunc(n)).toLocaleString('en-US')}`;
 
 function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: HubHost['chooseFloor']; sfx: (n: string) => void; closed?: () => void; resuming?: () => boolean; overlay?: HubHost['overlay']; rules?: () => ClockRules; shop?: (id: string) => string | null; choose?: (o: { title: string; lines?: string[]; options: string[]; cancel?: boolean }) => Promise<number> }): HqModuleLike & { close(): void; goto(place: string): void; state(): { day: number; rescued: string[] }; visitReady: Promise<void>; visitor(): { agentId: string; name: string } } {
@@ -147,6 +147,7 @@ function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui
   if (!b?.wallet) fieldWallet.won = 140_000;
   fieldLink.pay = (amount, memo) => (b?.wallet ? pay(amount, memo) : Promise.resolve((fieldWallet.won = (fieldWallet.won ?? 0) + amount)));
   fieldLink.record = (text) => void b?.field?.record({ kind: 'act', text, scene: fieldClock.place || undefined, weight: 1, visit: visitId }).catch(() => {});
+  fieldLink.fact = (key, value) => void b?.field?.record({ kind: 'act', text: `${key}: ${value}`, scene: fieldClock.place || undefined, weight: 1, fact: { key, value }, visit: visitId }).catch(() => {});
   // 개발 도구·브라우저 시험
   (globalThis as { __goeiWallet?: unknown }).__goeiWallet = { pay, balance: () => fieldWallet.won };
   /** 이번 필드 방문 id (방문마다 호감·평판 상한을 따로 세게) */
@@ -817,6 +818,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     record: (text) => fieldLink.record?.(text),
     rng: Math.random,
     nearPerson: () => fieldLink.nearPerson?.() ?? null,
+    fact: (key, value) => fieldLink.fact?.(key, value),
     gift: (who, item, counts) => fieldLink.gift?.(who, item, counts),
   });
   // 본부 메뉴 창이 열려 있으면 Esc는 창 닫기 (껍데기 일시정지보다 먼저)
