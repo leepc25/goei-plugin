@@ -1,4 +1,27 @@
-rep.applied.cues + rep.applied.address + rep.applied.docs + rep.applied.suspicion + (rep.applied.taste ?? 0) + (rep.applied.openness ?? 0)}</span>${rep.dropped.length ? `<span class="gx-badge hot">버림 ${rep.dropped.length}</span>` : ""}${rep.held.length ? `<span class="gx-badge wait">보류 ${rep.held.length}</span>` : ""}` : '<span class="gx-badge live">반영</span>' : `<span class="gx-badge bad">실패 · ${esc20(r.stage ?? "")}</span><small class="pp-err">${esc20(r.error ?? "")}</small>`;
+r when2 = (iso) => {
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return iso;
+    const p = (x) => String(x).padStart(2, "0");
+    return `${p(d.getMonth() + 1)}.${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
+  };
+  function diagTable(ctx2, keepRaw) {
+    const list4 = peopleUi.diag;
+    if (list4 === null) {
+      void loadDiag().then((d) => {
+        peopleUi.diag = d;
+        safeRender();
+      });
+      return '<p class="ps-note">진단을 읽는 중…</p>';
+    }
+    const here = chatId(ctx2);
+    const mine = (peopleUi.diagAll ? list4 : list4.filter((r) => r.chat === here)).slice(-40).reverse();
+    const toggle = `<label class="pp-check"><input type="checkbox" data-change="pp-diag-all" ${peopleUi.diagAll ? "checked" : ""}> 모든 채팅 보기 (${list4.length}건 중 이 채팅 ${list4.filter((r) => r.chat === here).length}건)</label>`;
+    if (!mine.length) return `${toggle}<p class="ps-note">${peopleUi.diagAll ? "아직 갱신 기록이 없어요." : "이 채팅의 갱신 기록이 아직 없어요."}</p>`;
+    const rows2 = mine.map((r) => {
+      const id = `${r.at}|${r.indexes.join(",")}`;
+      const open3 = peopleUi.diagOpen.has(id);
+      const rep = r.report;
+      const result = r.ok ? r.stage === "skip" ? `<span class="gx-badge wait">건너뜀 · ${esc20(r.error ?? "")}</span>` : rep ? `<span class="gx-badge live">반영 ${rep.applied.entries + rep.applied.cues + rep.applied.address + rep.applied.docs + rep.applied.suspicion + (rep.applied.taste ?? 0) + (rep.applied.openness ?? 0)}</span>${rep.dropped.length ? `<span class="gx-badge hot">버림 ${rep.dropped.length}</span>` : ""}${rep.held.length ? `<span class="gx-badge wait">보류 ${rep.held.length}</span>` : ""}` : '<span class="gx-badge live">반영</span>' : `<span class="gx-badge bad">실패 · ${esc20(r.stage ?? "")}</span><small class="pp-err">${esc20(r.error ?? "")}</small>`;
       const sysText = r.system ?? "";
       const dataText = r.data ?? "";
       const sizes = `지침 ${r.sizes.system ? tok(r.sizes.system, sysText || void 0) : "-"} / 자료 ${r.sizes.data ? tok(r.sizes.data, dataText || void 0) : "-"} / 구간 ${r.sizes.span ? tok(r.sizes.span) : "-"}`;
@@ -3183,38 +3206,4 @@ ${v.trim()}`).join("\n\n") : "";
         const w = cropValue(key2)[2];
         const half = w / 100 * r.width / 2;
         const px = Math.max(Math.min(half, r.width / 2), Math.min(r.width - half, e.clientX - r.left));
-        const py = Math.max(Math.min(half, r.height / 2), Math.min(r.height - half, e.clientY - r.top));
-        const c = [px / r.width * 100, py / r.height * 100, w];
-        setCrop(key2, c);
-        if (frame) Object.assign(frame.style, { left: `${c[0]}%`, top: `${c[1]}%` });
-      };
-      move(ev);
-      box.setPointerCapture?.(ev.pointerId);
-      const up = () => {
-        box.removeEventListener("pointermove", move);
-        box.removeEventListener("pointerup", up);
-        box.removeEventListener("pointercancel", up);
-        render2();
-      };
-      box.addEventListener("pointermove", move);
-      box.addEventListener("pointerup", up);
-      box.addEventListener("pointercancel", up);
-    });
-    root2.addEventListener("pointerdown", (ev) => {
-      const grip = ev.target.closest?.("[data-drag-agent]");
-      const row8 = grip?.closest("[data-agent-row]");
-      if (!grip || !row8 || !root2) return;
-      ev.preventDefault();
-      const box = root2;
-      const group6 = row8.dataset.agentGroup ?? "";
-      const rows2 = [...box.querySelectorAll("[data-agent-row]")].filter((r) => r !== row8 && r.dataset.agentGroup === group6);
-      let drop = null;
-      const mark2 = (next) => {
-        drop?.el.classList.remove("drop-before", "drop-after");
-        drop = next;
-        drop?.el.classList.add(drop.after ? "drop-after" : "drop-before");
-      };
-      const move = (e) => {
-        let best = null;
-        let gap = Infinity;
-     
+        const py = Math.max(Math.min(half, r.h

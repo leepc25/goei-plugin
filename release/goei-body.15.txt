@@ -1,4 +1,15 @@
-ed and through what conduct they show. Concealing well does not mean feeling little. `express` (0–3) is the single baseline for how readily emotion becomes visible; it describes visibility, not intensity. Lower values yield fewer and subtler cues, higher values clearer and more immediate ones.",
+.",
+    "",
+    "Keep these elements of a profile distinct when you reason and when you write `personality` or `relationship` entries:",
+    "- **Scope of interest**: who can be an object of romantic or sexual interest at all. Having no such targets is valid. Being outside the scope does not remove friendship, respect, aesthetic appreciation or camaraderie.",
+    "- **Attractive elements**: observable traits with testable evidence (「다른 사람을 위해 손해를 감수한 사람」), not labels (「착한 사람」).",
+    "- **Repellent elements**: never the automatic opposite of attractive ones. A person who likes strength may dislike someone who pretends to be strong more than someone who is weak.",
+    "- **Primary tastes**: what matters most; do not change it from scene to scene without evidence.",
+    "- **Values**: the order in which the person evaluates people and what they consider irrelevant.",
+    "- **Observation criteria**: which visible surfaces this person actually examines (clothing, equipment, speech, conduct, skill).",
+    "- **Biases**: the person's own logic for reading those surfaces. Distinguish a general bias from a judgment about one target.",
+    "- **Form of feeling**: the direction the feeling takes: appreciation, romantic attachment, protection, possession, competition, physical interest.",
+    "- **Restraint and approach style**: how strongly feelings are concealed and through what conduct they show. Concealing well does not mean feeling little. `express` (0–3) is the single baseline for how readily emotion becomes visible; it describes visibility, not intensity. Lower values yield fewer and subtler cues, higher values clearer and more immediate ones.",
     "",
     "Ground taste in appearance, attitude and speech, directly observed ability, known status and reputation, actual sensory information and relationship context. An ability supports direct observation only after it is displayed; a report about an ability is transmitted reputation. When the person is not close enough or lacks the relevant sensory channel, never use scent, touch or minute expressions as evidence.",
     "",
@@ -2103,27 +2114,4 @@ Return the JSON object.` }
   };
   var n = (v) => v.toLocaleString();
   var tok = (s5, text) => text ? `${n(s5)}자 · 약 ${n(tokens(text))}tok` : `${n(s5)}자 · 약 ${n(Math.ceil(s5 * 0.6))}tok`;
-  var when2 = (iso) => {
-    const d = new Date(iso);
-    if (Number.isNaN(d.getTime())) return iso;
-    const p = (x) => String(x).padStart(2, "0");
-    return `${p(d.getMonth() + 1)}.${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
-  };
-  function diagTable(ctx2, keepRaw) {
-    const list4 = peopleUi.diag;
-    if (list4 === null) {
-      void loadDiag().then((d) => {
-        peopleUi.diag = d;
-        safeRender();
-      });
-      return '<p class="ps-note">진단을 읽는 중…</p>';
-    }
-    const here = chatId(ctx2);
-    const mine = (peopleUi.diagAll ? list4 : list4.filter((r) => r.chat === here)).slice(-40).reverse();
-    const toggle = `<label class="pp-check"><input type="checkbox" data-change="pp-diag-all" ${peopleUi.diagAll ? "checked" : ""}> 모든 채팅 보기 (${list4.length}건 중 이 채팅 ${list4.filter((r) => r.chat === here).length}건)</label>`;
-    if (!mine.length) return `${toggle}<p class="ps-note">${peopleUi.diagAll ? "아직 갱신 기록이 없어요." : "이 채팅의 갱신 기록이 아직 없어요."}</p>`;
-    const rows2 = mine.map((r) => {
-      const id = `${r.at}|${r.indexes.join(",")}`;
-      const open3 = peopleUi.diagOpen.has(id);
-      const rep = r.report;
-      const result = r.ok ? r.stage === "skip" ? `<span class="gx-badge wait">건너뜀 · ${esc20(r.error ?? "")}</span>` : rep ? `<span class="gx-badge live">반영 ${rep.applied.entries + 
+  va

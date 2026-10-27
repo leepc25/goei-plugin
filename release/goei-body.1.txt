@@ -1,4 +1,4 @@
-// goei-body 0.17.1
+// goei-body 0.17.2
 "use strict";
 (() => {
   // src/data/guides/gnet.txt

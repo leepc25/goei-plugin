@@ -1,4 +1,46 @@
-e));
+de2);
+    }
+    const t1 = performance.now();
+    mod = runGameCode(code2);
+    codeStats.readMs = Math.round(t1 - t0);
+    codeStats.runMs = Math.round(performance.now() - t1);
+    codeStats.bytes = code2.length;
+    return mod;
+  }
+
+  // src/host/game/packs.ts
+  var KEY2 = (id) => `goei:game:pack:${id}`;
+  var MIME3 = {
+    png: "image/png",
+    webp: "image/webp",
+    avif: "image/avif",
+    gif: "image/gif",
+    jpg: "image/jpeg",
+    ogg: "audio/ogg",
+    mp3: "audio/mpeg",
+    m4a: "audio/mp4",
+    wav: "audio/wav",
+    opus: "audio/ogg",
+    json: "application/json",
+    txt: "text/plain"
+  };
+  function parseGamePack(b) {
+    if (b.length < 12 || new TextDecoder().decode(b.subarray(0, 8)) !== "GOEIPACK") return null;
+    const len = b[8] | b[9] << 8 | b[10] << 16 | b[11] << 24;
+    let head2;
+    try {
+      head2 = JSON.parse(new TextDecoder().decode(b.subarray(12, 12 + len)));
+    } catch {
+      return null;
+    }
+    if (typeof head2.id !== "string" || !Array.isArray(head2.files)) return null;
+    const at = 12 + len;
+    const files2 = /* @__PURE__ */ new Map();
+    for (const row8 of head2.files) {
+      if (!Array.isArray(row8)) return null;
+      const [name, start3, size] = row8;
+      if (typeof name !== "string" || typeof start3 !== "number" || typeof size !== "number" || at + start3 + size > b.length) return null;
+      files2.set(name, b.subarray(at + start3, at + start3 + size));
     }
     return { id: head2.id, hash: typeof head2.hash === "string" ? head2.hash : "", atlas: head2.atlas ?? null, files: files2 };
   }
@@ -4565,15 +4607,4 @@ ${rules3}`;
     "How well someone matches a person's taste, the personal affinity accumulated through experience, and the conduct the actual relationship permits are separate. A stranger may catch someone's attention without gaining trust or permission to approach. A long-cherished colleague may not fit someone's romantic taste. A person may feel drawn to someone while resenting or distrusting them. Never use one axis as a substitute for another. Read the person's base personality, social role, current circumstances and established relationships first; apply personal affinity, taste, intent and approach style on top of them. A person without special affinity may still be polite, make small talk, and cooperate at work. Curt behavior and personal hostility are different things.",
     "",
     "### 7.2 The person's profile (`values`, `personality`)",
-    "`values` is the stable judgment profile written at development time: what the person values, in what order, what they consider irrelevant, and how they show feeling. Judge every cue by it. You never change `values`; durable changes shown in the chat go to `personality`. If `values` is thin, judge in this order: explicit settings in the record, reactions actually depicted in this chat, then a provisional reading of personality and background, and mark the provisional reading as such. Never invent a taste to suit the current target, never add a preference because it might be useful in a future scene, and never build a profile for a background figure.",
-    "",
-    "Keep these elements of a profile distinct when you reason and when you write `personality` or `relationship` entries:",
-    "- **Scope of interest**: who can be an object of romantic or sexual interest at all. Having no such targets is valid. Being outside the scope does not remove friendship, respect, aesthetic appreciation or camaraderie.",
-    "- **Attractive elements**: observable traits with testable evidence (「다른 사람을 위해 손해를 감수한 사람」), not labels (「착한 사람」).",
-    "- **Repellent elements**: never the automatic opposite of attractive ones. A person who likes strength may dislike someone who pretends to be strong more than someone who is weak.",
-    "- **Primary tastes**: what matters most; do not change it from scene to scene without evidence.",
-    "- **Values**: the order in which the person evaluates people and what they consider irrelevant.",
-    "- **Observation criteria**: which visible surfaces this person actually examines (clothing, equipment, speech, conduct, skill).",
-    "- **Biases**: the person's own logic for reading those surfaces. Distinguish a general bias from a judgment about one target.",
-    "- **Form of feeling**: the direction the feeling takes: appreciation, romantic attachment, protection, possession, competition, physical interest.",
-    "- **Restraint and approach style**: how strongly feelings are conceal
+    "`values` is the stable judgment profile written at development time: what the person values, in what order, what they consider irrelevant, and how they show feeling. Judge every cue by it. You never change `values`; durable changes shown in the chat go to `personality`. If `values` is thin, judge in this order: explicit settings in the record, reactions actually depicted in this chat, then a provisional reading of personality and background, and mark the provisional reading as such. Never invent a taste to suit the current target, never add a preference because it might be useful in a future scene, and never build a profile for a background figure

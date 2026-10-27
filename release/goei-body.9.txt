@@ -249,6 +249,10 @@ Next Paragraph Text
     needsCharacterCheck(s5) {
       return s5.charIndex !== this.charIndex;
     }
+    /** 이 캐릭터를 다시 판정하게 한다 (설치로 로어북이 바뀌었을 때: 같은 캐릭터라 그냥 두면 「괴이 카드 아님」이 남는다) */
+    forget() {
+      this.charIndex = -2;
+    }
     /**
      * lite: 이번 캐릭터가 괴이봇 Lite인지 (needsCharacterCheck가 false면 생략, 이전 값 유지).
      * intro: 괴이봇 Lite 채팅 화면에 새로 들어온 순간마다 true (다른 봇·설정 화면에서 돌아올 때 포함).
@@ -3114,10 +3118,4 @@ And now, the turn had come to {{user}}.`, '피시방에서 나온 참이었다.\
 
 <img=Song Ju-ik_scared>
 
-"스, 스팡달이 출현…! 알겠습니다!"
-
-교신을 받던 송주익 대리의 표정이 굳었다.
-
-"고위험 개체가 출현했다! 가짜 관리국의 스팡달은 알고 있겠지!"
-
-{{user}}의 대답은 훈련에서 교육받았다는 것
+"스, 스팡달이 출현…! 알

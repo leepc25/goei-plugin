@@ -1,4 +1,27 @@
-us: 12px; background: none; color: var(--signal); font: inherit; font-size: 14px; font-weight: 600; }
+-step { gap: 8px; }
+.ps-row .st-step b { min-width: 3.4em; }
+.ps-row .st-confirm { max-width: 360px; }
+/* 괴담넷: 넓은 PC 화면에서 글 목록이 끝까지 퍼지지 않게 */
+.gx-body.gn:not(.ph) > * { max-width: 1000px; margin-left: auto; margin-right: auto; }
+
+/* 좁은 칸에서 버튼 글자가 두 줄로 쪼개지지 않게 (v0.12.0) */
+.gx-seg, .gx-mini, .gx-chip, .gx-badge, .gx-st, .ph-sub, .ph-tab, .at-add, .gx-start { white-space: nowrap; }
+@media (max-width: 760px) {
+  .ps-row { padding: 12px; }
+  .ps-label { flex-basis: 180px; }
+}
+@media (max-width: 760px) {
+  /* 편성 요원: 모바일은 한 줄에 한 명. 두 칸이면 상태·상황이 안 보이고 부서·직급이 잘렸다 (v0.14.0) */
+  .gx-acards.pick { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+  .gx-acard.pick { gap: 10px; padding: 8px 36px 8px 8px; align-items: center; }
+  .gx-acard.pick .gx-ava { width: 44px; height: 44px; border-radius: 12px; }
+  .gx-acard.pick .gx-acard-top b { font-size: 15px; }
+  .gx-acard.pick small { white-space: normal; }
+  .gx-acard.pick .gx-acard-check { top: 50%; right: 10px; transform: translateY(-50%); width: 20px; height: 20px; font-size: 12px; }
+}
+/* 명부: 다른 폴더에서 온 발생 후보 (v0.12.0) */
+.dir-group-help { margin: -4px 2px 8px; font-size: 13px; }
+.dir-ext-open { width: 100%; min-height: 44px; margin-top: 10px; border: 1px dashed var(--line2); border-radius: 12px; background: none; color: var(--signal); font: inherit; font-size: 14px; font-weight: 600; }
 .dir-ext-open:hover { border-color: var(--accent-line); background: var(--accent-bg); }
 .dir-ext { margin-top: 10px; padding: 12px; border: 1px solid var(--accent-line); border-radius: 14px; background: var(--panel); display: flex; flex-direction: column; gap: 8px; }
 .dir-ext-head { display: flex; gap: 6px; }
@@ -2326,7 +2349,7 @@ button.mk-go:hover { color: var(--signal); }
 
   // src/host/game/code.ts
   var CODE_KEY = "goei:game:code";
-  var VERSION = true ? "0.17.1" : "";
+  var VERSION = true ? "0.17.2" : "";
   var codeVersion = (code2) => /^\/\/ goei-game (\S+)/.exec(code2)?.[1] ?? null;
   var mod = null;
   var codeStats = { readMs: 0, runMs: 0, bytes: 0, fromNet: false };
@@ -2379,46 +2402,4 @@ button.mk-go:hover { color: var(--signal); }
     codeStats.fromNet = !code2;
     if (!code2) {
       code2 = await downloadGameCode(onPart);
-      await risuai.pluginStorage.setItem(CODE_KEY, code2);
-    }
-    const t1 = performance.now();
-    mod = runGameCode(code2);
-    codeStats.readMs = Math.round(t1 - t0);
-    codeStats.runMs = Math.round(performance.now() - t1);
-    codeStats.bytes = code2.length;
-    return mod;
-  }
-
-  // src/host/game/packs.ts
-  var KEY2 = (id) => `goei:game:pack:${id}`;
-  var MIME3 = {
-    png: "image/png",
-    webp: "image/webp",
-    avif: "image/avif",
-    gif: "image/gif",
-    jpg: "image/jpeg",
-    ogg: "audio/ogg",
-    mp3: "audio/mpeg",
-    m4a: "audio/mp4",
-    wav: "audio/wav",
-    opus: "audio/ogg",
-    json: "application/json",
-    txt: "text/plain"
-  };
-  function parseGamePack(b) {
-    if (b.length < 12 || new TextDecoder().decode(b.subarray(0, 8)) !== "GOEIPACK") return null;
-    const len = b[8] | b[9] << 8 | b[10] << 16 | b[11] << 24;
-    let head2;
-    try {
-      head2 = JSON.parse(new TextDecoder().decode(b.subarray(12, 12 + len)));
-    } catch {
-      return null;
-    }
-    if (typeof head2.id !== "string" || !Array.isArray(head2.files)) return null;
-    const at = 12 + len;
-    const files2 = /* @__PURE__ */ new Map();
-    for (const row8 of head2.files) {
-      if (!Array.isArray(row8)) return null;
-      const [name, start3, size] = row8;
-      if (typeof name !== "string" || typeof start3 !== "number" || typeof size !== "number" || at + start3 + size > b.length) return null;
-      files2.set(name, b.subarray(at + start3, at + start3 + siz
+      await risuai.pluginStorage.setItem(CODE_KEY, co

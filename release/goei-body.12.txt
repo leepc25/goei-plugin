@@ -1,4 +1,22 @@
-n class="gx-badge">숨김</span>'}
+{esc9(b.name)}">${sido}</select></label>
+      <label class="dir-in"><span>시군구</span><select class="gx-select" data-change="dir-base-gu" data-key="${esc9(b.name)}">${gus}</select></label>
+    </div>
+    ${map}
+    ${input(k("label"), b.label, "지도 표시명", "비우면 거점 이름")}
+    ${input(k("lore"), b.lore, "위키 로어북", "이 거점을 설명하는 로어북 이름")}
+    ${input(k("english"), b.english, "영문명", "영어 응답에서도 이 이름을 알아봐요")}
+    ${input(k("aliases"), b.aliases.join(", "), "별칭", "쉼표로 나눠 적어요")}
+    <div class="dir-rename"><label class="dir-in"><span>거점 이름</span><input name="dir-base-name" value="${esc9(b.name)}" autocomplete="off" data-enter="dir-base-rename"></label>
+      <button class="gx-mini" data-action="dir-base-rename" data-take="dir-base-name">이름 바꾸기</button>
+      <button class="gx-mini danger" data-action="dir-base-del" data-value="${esc9(b.name)}">지우기</button></div>
+  </div>`;
+  }
+  function baseRow(b, ctx2, d) {
+    const open3 = dirUi.open === b.name;
+    return `<div class="dir-row${open3 ? " open" : ""}">
+    <button class="dir-head" data-action="dir-open" data-value="${esc9(b.name)}" aria-expanded="${open3}">
+      <span class="dir-name"><b>${esc9(b.name)}</b><small>${esc9([b.org || "조직 없음", baseWhere(b)].join(" · "))}</small></span>
+      ${b.show ? "" : '<span class="gx-badge">숨김</span>'}
     </button>${open3 ? basePanel(b, ctx2, d) : ""}</div>`;
   }
   function baseList(ctx2, d, q) {
@@ -2889,27 +2907,4 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .ps-card .ps-row { padding: 9px 12px; }
 .ps-card .ps-label { flex-basis: 90px; }
 .ps-card .ps-label b { font-size: 14px; font-weight: 500; }
-.ps-row .st-step { gap: 8px; }
-.ps-row .st-step b { min-width: 3.4em; }
-.ps-row .st-confirm { max-width: 360px; }
-/* 괴담넷: 넓은 PC 화면에서 글 목록이 끝까지 퍼지지 않게 */
-.gx-body.gn:not(.ph) > * { max-width: 1000px; margin-left: auto; margin-right: auto; }
-
-/* 좁은 칸에서 버튼 글자가 두 줄로 쪼개지지 않게 (v0.12.0) */
-.gx-seg, .gx-mini, .gx-chip, .gx-badge, .gx-st, .ph-sub, .ph-tab, .at-add, .gx-start { white-space: nowrap; }
-@media (max-width: 760px) {
-  .ps-row { padding: 12px; }
-  .ps-label { flex-basis: 180px; }
-}
-@media (max-width: 760px) {
-  /* 편성 요원: 모바일은 한 줄에 한 명. 두 칸이면 상태·상황이 안 보이고 부서·직급이 잘렸다 (v0.14.0) */
-  .gx-acards.pick { grid-template-columns: minmax(0, 1fr); gap: 6px; }
-  .gx-acard.pick { gap: 10px; padding: 8px 36px 8px 8px; align-items: center; }
-  .gx-acard.pick .gx-ava { width: 44px; height: 44px; border-radius: 12px; }
-  .gx-acard.pick .gx-acard-top b { font-size: 15px; }
-  .gx-acard.pick small { white-space: normal; }
-  .gx-acard.pick .gx-acard-check { top: 50%; right: 10px; transform: translateY(-50%); width: 20px; height: 20px; font-size: 12px; }
-}
-/* 명부: 다른 폴더에서 온 발생 후보 (v0.12.0) */
-.dir-group-help { margin: -4px 2px 8px; font-size: 13px; }
-.dir-ext-open { width: 100%; min-height: 44px; margin-top: 10px; border: 1px dashed var(--line2); border-radi
+.ps-row .st

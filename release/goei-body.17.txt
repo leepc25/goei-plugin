@@ -1,4 +1,38 @@
-   for (const r of rows2) {
+eight / 2), Math.min(r.height - half, e.clientY - r.top));
+        const c = [px / r.width * 100, py / r.height * 100, w];
+        setCrop(key2, c);
+        if (frame) Object.assign(frame.style, { left: `${c[0]}%`, top: `${c[1]}%` });
+      };
+      move(ev);
+      box.setPointerCapture?.(ev.pointerId);
+      const up = () => {
+        box.removeEventListener("pointermove", move);
+        box.removeEventListener("pointerup", up);
+        box.removeEventListener("pointercancel", up);
+        render2();
+      };
+      box.addEventListener("pointermove", move);
+      box.addEventListener("pointerup", up);
+      box.addEventListener("pointercancel", up);
+    });
+    root2.addEventListener("pointerdown", (ev) => {
+      const grip = ev.target.closest?.("[data-drag-agent]");
+      const row8 = grip?.closest("[data-agent-row]");
+      if (!grip || !row8 || !root2) return;
+      ev.preventDefault();
+      const box = root2;
+      const group6 = row8.dataset.agentGroup ?? "";
+      const rows2 = [...box.querySelectorAll("[data-agent-row]")].filter((r) => r !== row8 && r.dataset.agentGroup === group6);
+      let drop = null;
+      const mark2 = (next) => {
+        drop?.el.classList.remove("drop-before", "drop-after");
+        drop = next;
+        drop?.el.classList.add(drop.after ? "drop-after" : "drop-before");
+      };
+      const move = (e) => {
+        let best = null;
+        let gap = Infinity;
+        for (const r of rows2) {
           const b = r.getBoundingClientRect();
           const d = Math.abs(e.clientY - (b.top + b.height / 2));
           if (d < gap) [gap, best] = [d, { el: r, after: e.clientY > b.top + b.height / 2 }];
@@ -1691,6 +1725,7 @@ ${fields3}${NOTE}`;
   }
   function startWatcher(fab) {
     const state = new WatchState();
+    setInstalledHook(() => state.forget());
     let stopped = false;
     let timer3;
     const tick3 = async () => {
@@ -1720,6 +1755,7 @@ ${fields3}${NOTE}`;
     void tick3();
     return () => {
       stopped = true;
+      setInstalledHook(null);
       clearTimeout(timer3);
     };
   }
@@ -1761,5 +1797,5 @@ ${fields3}${NOTE}`;
   }
 
   // src/body-entry.ts
-  globalThis.__goeiBody = { version: "0.17.1", start: start2 };
+  globalThis.__goeiBody = { version: "0.17.2", start: start2 };
 })();
