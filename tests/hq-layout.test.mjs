@@ -8,7 +8,7 @@ const out = await build({ stdin: { contents: `export * from './src/game/action/h
 const M = await import(`data:text/javascript;base64,${Buffer.from(out.outputFiles[0].text).toString('base64')}`);
 const byId = M.SCENE_BY_ID;
 const fresh = M.HQ_SCENES.filter((s) => !s.legacy && !s.id.startsWith('jr_'));
-const JR = ['jr_entry', 'jr_b1', 'jr_alley', 'jr_b2'];
+const JR = ['jr_entry', 'jr_b1', 'jr_alley', 'jr_b2', 'jr_daebak', 'jr_heolgap', 'jr_youngchang', 'jr_songil', 'jr_jinryo', 'jr_op'];
 const solid = (sc) => sc.boxes.filter((b) => b.solid).map((b) => ({ x: b.x, y: b.y, w: b.w, back: b.d + 6, front: 8 }));
 
 const HALLS = ['lobby', 'f2', 'f3', 'b1', 'b2', 'b3'];
@@ -59,7 +59,7 @@ test('중림: 그림 4장, 문은 그림 문 자리에 있고 서로 이어진�
     assert.equal(sc.painted, id, `${id} 그림`);
     for (const d of sc.doors) {
       assert.ok(M.PAINTED_DOORS(id)[d.id], `${id}.${d.id} 그림 문 없음`);
-      assert.ok(d.to, `${id}.${d.id} 갈 곳 없음`);
+      assert.ok(d.to || d.locked, `${id}.${d.id} 갈 곳 없음`);
     }
   }
   assert.ok(byId.street.doors.some((d) => d.to === 'jr_entry'), '종로 → 중림 임시 연결');

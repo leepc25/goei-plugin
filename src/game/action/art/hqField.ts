@@ -3,9 +3,10 @@
 // 문 열림은 배경에서 문짝 자리를 그대로 떠서 움직이고, 그 뒤는 코드로 칠한다(어두운 문 안·엘리베이터 칸·유리 너머).
 import { PAINTED, type PaintedDoor, type PaintedScene } from '../hq/painted';
 import { view } from '../engine/view';
+import { JR_ROOM_FILES } from '../hq/jrRooms.gen';
 
 const FILES = ['lobby', 'f2', 'f3', 'b1', 'b2', 'b3', 'desk'];
-const JR_FILES = ['jr_entry', 'jr_b1', 'jr_alley', 'jr_b2'];
+const JR_FILES = ['jr_entry', 'jr_b1', 'jr_alley', 'jr_b2', ...JR_ROOM_FILES];
 let images: Record<string, HTMLImageElement> | null = null;
 let revision = 0;
 declare global { interface Window { __GOEI_HQ_FIELD__?: Record<string, string> } }

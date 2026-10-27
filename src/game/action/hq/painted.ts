@@ -55,6 +55,8 @@ export interface PaintedScene {
   objects: PaintedObject[];
 }
 
+import { JR_ROOMS } from './jrRooms.gen';
+
 const downs = (xs: number[], y = 18): PaintedLamp[] => xs.map((x) => ({ x, y, kind: 'down' as const }));
 const sign = (x: number, y: number): PaintedLamp => ({ x, y, kind: 'sign', color: '#3cff8a', r: 34 });
 const elev = (x0: number, x1: number, y0: number, y1: number, seam: number): PaintedDoor => ({ x0, x1, y0, y1, seam, anim: 'slide2', behind: 'car' });
@@ -189,6 +191,8 @@ export const PAINTED: Record<string, PaintedScene> = {
     ],
     doors: {
       up: { x0: 40, x1: 320, y0: 100, y1: 420, anim: 'none', behind: 'dark' },
+      daebak: { x0: 2970, x1: 3120, y0: 130, y1: 410, anim: 'none', behind: 'dark' },
+      songil: { x0: 5700, x1: 5840, y0: 130, y1: 400, anim: 'none', behind: 'dark' },
       alley: { x0: 3390, x1: 3530, y0: 140, y1: 420, anim: 'none', behind: 'dark' },
       down: { x0: 6170, x1: 6425, y0: 240, y1: 470, anim: 'none', behind: 'dark' },
     },
@@ -202,6 +206,7 @@ export const PAINTED: Record<string, PaintedScene> = {
     ],
     doors: {
       b1: { x0: 2800, x1: 3070, y0: 130, y1: 420, anim: 'none', behind: 'dark' },
+      heolgap: { x0: 355, x1: 460, y0: 125, y1: 400, anim: 'none', behind: 'dark' },
     },
     lamps: [], windows: [], objects: [],
   },
@@ -215,9 +220,12 @@ export const PAINTED: Record<string, PaintedScene> = {
     ],
     doors: {
       up: { x0: 5400, x1: 5590, y0: 0, y1: 420, anim: 'none', behind: 'dark' },
+      youngchang: { x0: 390, x1: 580, y0: 70, y1: 395, anim: 'none', behind: 'dark' },
     },
     lamps: [], windows: [], objects: [],
   },
+  // 중림 가게 안 방 6개 (tools/jr/rooms.py → jrRooms.gen.ts)
+  ...JR_ROOMS,
 };
 
 /** 문 가운데 x */

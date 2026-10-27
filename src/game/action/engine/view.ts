@@ -4,7 +4,7 @@
 // 사람 그림은 zoom을 되돌려 도트 1칸이 늘 PIXEL 화면 px이 되게 하고, 원근(뒤로 갈수록 작게)을 곱한다.
 /** worldH: 장면 세로(월드 px). 관리국 그림 배경은 700, 나머지는 720. 필드(PC) 확대는 장면과 상관없이 고정(game.ts BASE_ZOOM), 폰은 이 높이를 창에 꽉 맞춘다 */
 /** w: 화면에 보이는 월드 폭. 기본 1280, 필드 무확대에서 창이 넓으면 그만큼 넓다 (카메라·그리는 범위가 이걸 따른다) */
-export const view = { crop: 0, cropY: 0, zoom: 1, lane: [440, 690] as [number, number], worldH: 720, w: 1280 };
+export const view = { crop: 0, cropY: 0, zoom: 1, lane: [440, 690] as [number, number], worldH: 720, w: 1280, hub: false };
 
 /** 필드 원근: 줄 맨 뒤 0.85배 ~ 맨 앞 1배 */
 export const FAR = 0.85;
