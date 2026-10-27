@@ -1,5 +1,6 @@
 // 세력 관계 (2026-10-27 새 레이아웃): 격자 대신 왼쪽에 조직 목록, 오른쪽에 「고른 조직 → 다른 조직」 한 줄씩 단계 고르기.
 // 다른 설정 페이지와 같은 줄 모양(이름 · 조작 · 설명). 「대칭」이 켜져 있으면 반대 방향도 같이. 메모는 기본이 비어 있고 쓴 것만 Faction 표 아래 Notes 로.
+import { switchHtml } from '../controls';
 import { excludedOrgs, filterRelations, PLACEHOLDER_ORGS, RELATION_LABEL, RELATION_STAGES, worldRecord, worldRecords, worldRelations, type RelationCell, type RelationStage, type WorldOverrides } from '../../core/world/records';
 import { tokenizerName } from '../../core/tokenizer';
 import { assembleFaction } from '../../core/world/faction';
@@ -70,7 +71,7 @@ export function relationsPage(ctx: ChatContext, over: WorldOverrides, rulesOnly:
     .join('');
   const basic = `<section class="ps-group"><h3>기본</h3><div class="ps-rows">
       <div class="ps-row"><div class="ps-label"><b>세력 관계도에 포함</b><small>${selOff ? '관계 표·Faction 표·평판 시작값에서 빠져요 (민간인처럼 세력이 아닌 조직).' : 'Faction 지침의 관계 표에 들어가요. 조직 기록에서도 켜고 끌 수 있어요.'}</small></div>
-        <div class="ps-ctl"><div class="gx-segs gx-segs-sm"><button class="gx-seg${selOff ? '' : ' on'}" data-action="ed-rel-org" data-value="${esc(sel)}" ${selOff ? '' : 'disabled'}>ON</button><button class="gx-seg${selOff ? ' on' : ''}" data-action="ed-rel-org" data-value="${esc(sel)}" ${selOff ? 'disabled' : ''}>OFF</button></div></div></div>
+        <div class="ps-ctl">${switchHtml({ action: 'ed-rel-org', value: sel, on: !selOff })}</div></div>
     </div></section>`;
   const stages = selOff
     ? ''
@@ -82,7 +83,7 @@ export function relationsPage(ctx: ChatContext, over: WorldOverrides, rulesOnly:
   return `<div class="gw-page split">
     <div class="gw-list-pane"><div class="gw-list-tools"><span class="gw-list-title">조직 ${included.length}${all.length > included.length ? ` <small>· 제외 ${all.length - included.length}</small>` : ''}</span></div><div class="gw-list gw-rel-list">${list}</div></div>
     <div class="gw-detail">
-      <header class="gw-head"><h2>${esc(sel)}<small>세력 관계</small></h2>
+      <header class="gw-head"><div class="gw-crumb">세계 / 세력 관계</div><h2>${esc(sel)}</h2>
         <div class="gw-head-act"><span class="gw-tokens">Faction ${tokenizerName() ? '' : '약 '}${tokens(fac).toLocaleString()}토큰</span>
           <button class="gx-chip${sym() ? ' on' : ''}" data-action="ed-rel-sym" aria-pressed="${sym()}">대칭</button>
           <button class="gx-mini${relUi.preview ? ' on' : ''}" data-action="ed-rel-preview">${ICONS.book}Faction 지침 보기</button></div>

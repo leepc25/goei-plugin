@@ -1,4 +1,5 @@
 // 공통 기록 편집기: 목록 → 상세. 기본 칸(종류별 schema) + 추가 칸 + 순서 + 글로 가져오기 + 칸별 토큰·합계 + 조립 글 보기 + 읽기 전용.
+import { switchHtml } from '../controls';
 import type { Directory } from '../../core/world/directory';
 import { tokenizerName } from '../../core/tokenizer';
 import { emptyRecord, moveField, moveFieldTo, parseImport, putRecord, recordText, removeRecord, resetRecord, type ImportResult } from '../../core/world/draft';
@@ -127,7 +128,7 @@ function extraRow(kind: WorldKind, rec: WorldRecord, e: ExtraField, i: number, n
 /** 기본 정보 카드: 명부 판(directory.ts)을 설정 페이지와 같은 줄 모양으로. 요원 Roster 포함·조직 관계도 포함 토글은 첫 줄 (2026-10-27 사용자: 상자 속 상자 없애기) */
 function basicCard(ctx: ChatContext, kind: WorldKind, sel: string, d: Directory, rec: WorldRecord | null): string {
   const panel = basicPanel(ctx, kind, sel, d);
-  const onoff = (action: string, on: boolean) => `<div class="gx-segs gx-segs-sm"><button class="gx-seg${on ? ' on' : ''}" data-action="${action}" aria-pressed="${on}" ${on ? 'disabled' : ''}>ON</button><button class="gx-seg${on ? '' : ' on'}" data-action="${action}" aria-pressed="${!on}" ${on ? '' : 'disabled'}>OFF</button></div>`;
+  const onoff = (action: string, on: boolean) => switchHtml({ action, value: '', on });
   let first = '';
   if (rec && kind === 'agent') first = `<div class="dir-line"><span>Roster 지침에 포함</span>${onoff('ed-roster-toggle', !rec.rosterOff)}<small>${rec.rosterOff ? '명부 지침(🙂Roster)에 들어가지 않아요. 로어 칸은 그대로 모델에게 가요.' : '명부 지침에 소개 한 줄로 들어가요. 기본은 전원 포함.'}</small></div>`;
   if (rec && kind === 'org') first = `<div class="dir-line"><span>세력 관계도에 포함</span>${onoff('ed-rel-member-toggle', !rec.relOff)}<small>${rec.relOff ? '관계 표·Faction 표·평판 시작값에서 빠져요 (민간인처럼 세력이 아닌 조직).' : 'Faction 지침의 관계 표에 들어가요. 세력 관계 화면에서도 켜고 끌 수 있어요.'}</small></div>`;
@@ -148,8 +149,8 @@ export function recordPage(ctx: ChatContext, kind: WorldKind, over: WorldOverrid
   const bucket = (over[kind] ?? {}) as Record<string, Partial<WorldRecord> & { deleted?: boolean }>;
   let detail: string;
   if (!sel) detail = `<div class="gw-detail empty"><p class="gx-muted">왼쪽에서 ${WORLD_KIND_LABEL[kind]}을(를) 고르세요.</p></div>`;
-  else if (bucket[sel]?.deleted) detail = `<div class="gw-detail"><header class="gw-head"><h2>${esc(sel)}</h2><p class="gx-muted">기본 세계의 이 기록을 지웠어요. 모델에게 가지 않아요.</p></header><button class="gx-mini" data-action="ed-restore">되살리기</button></div>`;
-  else if (!rec) detail = `<div class="gw-detail"><header class="gw-head"><h2>${esc(sel)}<small>명부에만 있음</small></h2><div class="gw-head-act"><button class="gx-mini" data-action="ed-make-rec">${ICONS.plus}로어 칸 만들기</button></div><p class="gx-muted">이 기록에는 로어 칸이 없어요. 명부 줄(이름·사진·소속 같은 것)만 있어요.</p></header>${basicCard(ctx, kind, sel, d, null)}</div>`;
+  else if (bucket[sel]?.deleted) detail = `<div class="gw-detail"><header class="gw-head"><div class="gw-crumb">세계 / ${esc(WORLD_KIND_LABEL[kind])}</div><h2>${esc(sel)}</h2><p class="gx-muted">기본 세계의 이 기록을 지웠어요. 모델에게 가지 않아요.</p></header><button class="gx-mini" data-action="ed-restore">되살리기</button></div>`;
+  else if (!rec) detail = `<div class="gw-detail"><header class="gw-head"><div class="gw-crumb">세계 / ${esc(WORLD_KIND_LABEL[kind])}</div><h2>${esc(sel)}<small>명부에만 있음</small></h2><div class="gw-head-act"><button class="gx-mini" data-action="ed-make-rec">${ICONS.plus}로어 칸 만들기</button></div><p class="gx-muted">이 기록에는 로어 칸이 없어요. 명부 줄(이름·사진·소속 같은 것)만 있어요.</p></header>${basicCard(ctx, kind, sel, d, null)}</div>`;
   else {
     const order = fieldOrder(kind, rec);
     const defs = FIELDS[kind];
@@ -181,7 +182,7 @@ export function recordPage(ctx: ChatContext, kind: WorldKind, over: WorldOverrid
       return a ? `<p class="gw-ro">id ${esc(a.id)}${a.legacyEnglish.length ? ` · 옛 영문명 ${esc(a.legacyEnglish.join(', '))}` : ''} · 검색 키 ${esc(rec.keys || '(이름·영문명·별칭)')}</p>` : '';
     })() : `<p class="gw-ro">검색 키 ${esc(rec.keys || '(이름·영문명·별칭)')}${rec.title ? ` · 제목 ${esc(rec.title)}` : ''}</p>`;
     detail = `<div class="gw-detail">
-      <header class="gw-head"><h2>${esc(sel)}<small>${isDefault ? (edited ? '기본 세계 · 고침' : '기본 세계') : '카드에만 있음'}</small>${presetToggle(kind, sel, presetOf(d, kind, sel))}</h2>
+      <header class="gw-head"><div class="gw-crumb">세계 / ${esc(WORLD_KIND_LABEL[kind])}</div><h2>${esc(sel)}<small>${isDefault ? (edited ? '기본 세계 · 고침' : '기본 세계') : '카드에만 있음'}</small>${presetToggle(kind, sel, presetOf(d, kind, sel))}</h2>
         <div class="gw-head-act">${recUi.tokensHtml(ctx, kind, over)}
           <button class="gx-mini${recUi.preview ? ' on' : ''}" data-action="ed-preview">${ICONS.book}조립 글 보기</button>
           <button class="gx-mini${recUi.importOpen ? ' on' : ''}" data-action="ed-import-toggle">${ICONS.plus}글로 가져오기</button>

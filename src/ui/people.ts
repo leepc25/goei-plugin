@@ -1,5 +1,6 @@
 // 「살아 있는 인물 기록」 화면 (docs/인물기록_호감_통합설계_3판.md 6-2·6-3): 설정 → 기능별 설정 「인물 기록」 페이지,
 // 위키 탭의 「이 채팅의 인물」(목록·인물 상세·문서) 하위 뷰. 저장은 모두 updateChat 으로, 값(호감·호칭)은 기록에서 매번 계산한다.
+import { onOffSwitch } from './controls';
 import type { Chat } from '../core/types';
 import { messageText } from '../core/refs';
 import { tokens } from '../core/gnet';
@@ -154,6 +155,8 @@ const SEEDED_HELP = { lore: '시작값: 로어북 시트(Identity·Character 절
 const seededOf = (p: Person) => (p.seeded.from === 'lore' ? 'lore' : p.seeded.from === 'dialogue' ? 'dialogue' : 'none');
 
 function seg(key: string, cur: string, items: [string, string][], action = 'pp-set'): string {
+  const sw = onOffSwitch(items, cur, action, (v) => `${key}=${v}`);
+  if (sw) return sw;
   return `<div class="gx-segs gx-segs-sm">${items
     .map(([v, label]) => `<button class="gx-seg${cur === v ? ' on' : ''}" data-action="${action}" data-value="${esc(`${key}=${v}`)}" aria-pressed="${cur === v}">${label}</button>`)
     .join('')}</div>`;

@@ -251,3 +251,75 @@
 .gw .gw-rel-n { grid-area: badge; font-family: var(--mono); font-size: 11px; color: var(--dim); }
 .gw .gw-rel-memo { width: 240px; max-width: 100%; }
 .gw .gw-rel-foot { display: flex; justify-content: flex-end; align-items: center; gap: 10px; }
+
+/* ===== 리수폿식 평면 설정 (2026-10-27 사용자: 리수폿 설정 창 구성대로) =====
+   카드 상자 없이: 묶음은 위 가는 선 + 「# 제목」, 줄은 가는 선으로만 나뉨. 이름·설명 왼쪽, 조작 오른쪽. 글자는 작고 차분하게(제목 17/500, 줄 이름 13/500, 설명 11.5, 단추 12) */
+.gw { --row-label: auto; }
+.gw .gw-crumb { flex-basis: 100%; font-size: 11px; color: var(--dim); letter-spacing: .02em; margin-bottom: -4px; }
+.gw .gw-head { margin-bottom: 18px; row-gap: 6px; }
+.gw .gw-head h2 { font-size: 17px; font-weight: 500; letter-spacing: -.3px; }
+.gw .gw-head h2 small { font-size: 11px; }
+.gw .gw-head .gx-muted, .gw .gw-head > p { font-size: 12px; }
+.gw .gw-tokens { font-size: 11px; }
+.gw .gw-tree-item { min-height: 34px; font-size: 13px; font-weight: 500; border-radius: 8px; }
+.gw .gw-tree-group h4 { font-size: 11px; letter-spacing: .06em; }
+/* 묶음 */
+.gw .ps-group, .gw .gw-sec { margin: 0; padding: 14px 0 6px; border-top: 1px solid var(--line); }
+.gw .ps-group:first-child, .gw .gw-sec:first-child, .gw .gw-setbody > .ps-group:first-child, .gw .gw-detail > .ps-group:first-child, .gw .gw-detail > .gw-sec:first-child { border-top: 0; padding-top: 0; }
+.gw .ps-group h3, .gw .gw-sec > h3, .gw .gw-sec > summary { margin: 0 0 4px; font-size: 14px; font-weight: 500; letter-spacing: 0; color: var(--text); }
+.gw .ps-group h3::before, .gw .gw-sec > h3::before { content: '#'; margin-right: 6px; color: var(--dim); font-weight: 400; }
+.gw .ps-group h3 small, .gw .gw-sec > h3 small { display: block; margin: 2px 0 0; font-size: 11.5px; font-weight: 400; color: var(--dim); }
+.gw .ps-note { margin: 0 0 6px; font-size: 11.5px; }
+/* 카드 → 평면 */
+.gw .ps-rows, .gw .gw-basic .dir-panel, .gw .gw-fields, .gw .gw-guide-secs { border: 0; border-radius: 0; background: transparent; overflow: visible; }
+/* 줄: 이름·설명 왼쪽, 조작 오른쪽, 가는 선 */
+.gw .ps-row, .gw .gw-basic .dir-line, .gw .gw-basic .dir-in, .gw .gw-basic .dir-rename, .gw .st-col-row { display: flex; flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 18px; padding: 13px 0; border-top: 1px solid var(--panel2); }
+.gw .ps-rows > :first-child, .gw .gw-basic .dir-panel > :first-child, .gw .gw-fields > :first-child, .gw .st-cols > :first-child, .gw .gw-guide-secs > :first-child { border-top: 0; }
+.gw .ps-row .ps-label { display: flex; flex-direction: column; gap: 3px; flex: 1 1 260px; min-width: 0; max-width: 62%; }
+.gw .ps-row .ps-label b, .gw .gw-basic .dir-line > span, .gw .gw-basic .dir-in > span, .gw .gw-basic .dir-rename > .dir-in > span, .gw .st-col-name b { font-size: 13px; font-weight: 500; }
+.gw .ps-row .ps-label small, .gw .gw-basic .dir-line > small, .gw .gw-basic .dir-in > small, .gw .st-col-name small { font-size: 11.5px; line-height: 1.45; }
+.gw .ps-row .ps-ctl, .gw .gw-basic .dir-line > :not(span):not(small), .gw .gw-basic .dir-in > :not(span):not(small):not(textarea) { flex: 0 1 auto; justify-content: flex-end; max-width: 100%; }
+.gw .gw-basic .dir-line > span, .gw .gw-basic .dir-in > span { flex: 1 1 200px; }
+.gw .gw-basic .dir-line > small, .gw .gw-basic .dir-in > small { flex-basis: 100%; order: 3; margin-top: -4px; }
+.gw .ps-row > textarea, .gw .ps-row > .nw-reqbox, .gw .gw-basic .dir-in > textarea { flex-basis: 100%; }
+.gw .gw-basic .dir-in > input, .gw .gw-basic .dir-in > select { width: min(100%, 340px); }
+.gw .gw-basic .dir-in > .dir-photo { flex: 1 1 100%; justify-content: flex-start; }
+.gw .gw-basic .dir-in:has(> .dir-photo) > span { flex-basis: 100%; }
+.gw .gw-basic .dir-rename { justify-content: flex-start; }
+.gw .gw-basic .dir-rename > .dir-in > span { flex: 1 1 200px; }
+.gw .gw-basic .dir-rename > .dir-in > input { width: 240px; }
+.gw .gw-basic .dir-panel > p.gx-muted, .gw .gw-basic .dir-fac > p.gx-muted, .gw .gw-basic .dir-panel > p.gx-hint, .gw .ps-rows > .ps-note { padding: 0 0 10px; margin-top: -6px; font-size: 11.5px; }
+.gw .gw-basic .dir-grid { padding: 12px 0; }
+.gw .st-col-row { justify-content: flex-start; }
+.gw .st-col-row > .st-col-name { flex: 1 1 200px; }
+.gw .ps-card h4 { font-size: 13px; font-weight: 500; color: var(--text); }
+.gw .ps-card .ps-row { padding: 9px 0; }
+/* 글칸 줄 */
+.gw .gw-field { padding: 12px 0; border-top: 1px solid var(--panel2); }
+.gw .gw-field-head b { font-size: 13px; font-weight: 500; }
+.gw textarea { font-size: 12px; line-height: 1.7; border-radius: 8px; }
+/* 조작 글자 */
+.gw .gx-mini, .gw .gx-chip, .gw .gx-select, .gw input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([type="hidden"]), .gw select { font-size: 12px; }
+.gw .gx-seg { font-size: 12px; padding: 0 12px; }
+.gw .gx-segs { background: var(--sunk); }
+.gw .gx-seg.on { background: var(--panel); box-shadow: 0 1px 2px rgba(0,0,0,.12); }
+/* 접는 고급 설정 */
+.gw .ps-adv { border: 0; border-top: 1px solid var(--line); border-radius: 0; background: transparent; margin: 0; }
+.gw .ps-adv-sum { padding: 12px 0; min-height: 0; }
+.gw .ps-adv-sum b { font-size: 14px; font-weight: 500; }
+.gw .ps-adv-sum b::before { content: '#'; margin-right: 6px; color: var(--dim); font-weight: 400; }
+.gw .ps-adv-body { border-top: 0; }
+.gw .ps-adv-body .ps-group h3 { padding: 0; }
+.gw .ps-adv-sub > summary { padding: 10px 0; }
+/* 설치·점검 점검표의 ✓ ✗ */
+.gw .gw-inst-ok, .gw .gw-inst-no { font-size: 12px; }
+@media (max-width: 760px) {
+  .gw .ps-row .ps-label { max-width: 100%; }
+}
+.gw .gw-basic .dir-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 16px; }
+.gw .gw-basic .dir-grid.names { grid-template-columns: repeat(3, 1fr); }
+.gw .gw-basic .dir-grid > .dir-in { display: flex; flex-direction: column; align-items: stretch; justify-content: flex-start; gap: 4px; padding: 0; border: 0; }
+.gw .gw-basic .dir-grid > .dir-in > span { flex: none; font-size: 11.5px; color: var(--dim); font-weight: 500; }
+.gw .gw-basic .dir-grid > .dir-in > input { width: 100%; }
+.gw .gw-basic .dir-panel > p.gx-muted, .gw .gw-basic .dir-fac > p.gx-muted, .gw .gw-basic .dir-panel > p.gx-hint { margin-top: 0; padding: 0 0 12px; }
+.gw .gw-basic .dir-line:has(+ p.gx-muted), .gw .gw-basic .dir-in:has(+ p.gx-muted) { padding-bottom: 6px; }

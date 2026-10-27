@@ -281,7 +281,8 @@ function settingsPage(ctx: ChatContext, page: SetPage): string {
   // 머리는 모든 페이지가 같다: 제목 왼쪽, 오른쪽에 범위(이 채팅/새 채팅 기본값) 또는 그 기능의 단추(덮어쓰기·불러오기). 시작 전이면 같은 글귀
   const showScope = ['screen', 'image', 'board', 'adv'].includes(page);
   const right = showScope ? scopeSeg : `${canChat ? '' : '<span class="gw-tokens">새 채팅 기본값 (시작 전)</span>'}${act}`;
-  return `<div class="gw-page gw-set"><header class="gw-head"><h2>${esc(title)}</h2>${right ? `<div class="gw-head-act">${right}</div>` : ''}</header>
+  const crumb = page === 'guides' ? '설정 / 본편' : `설정 / ${canChat ? (scope === 'chat' ? '이 채팅' : '새 채팅 기본값') : '새 채팅 기본값 · 시작 전'}`;
+  return `<div class="gw-page gw-set"><header class="gw-head"><div class="gw-crumb">${esc(crumb)}</div><h2>${esc(title)}</h2>${right ? `<div class="gw-head-act">${right}</div>` : ''}</header>
     ${settingsNotices()}
     <div class="gx-settings gw-setbody">${body}</div></div>`;
 }
@@ -327,7 +328,7 @@ function body(ctx: ChatContext): string {
   if (n === 'base') {
     // 거점: 지도에 찍히는 장소. 명부 패널의 거점 탭을 그대로 (종류 탭·사용법은 CSS 로 숨김). 호칭·괴담톡 탭은 조직 기록의 기본 정보에
     dirUi.kind = 'base';
-    return `<div class="gw-page gw-basepage"><header class="gw-head"><h2>거점</h2><p class="gx-muted">지도에 찍히는 장소예요. 조직마다 거점을 두고 지도를 눌러 위치를 정해요. 조직의 호칭·괴담톡 탭은 조직 기록의 「기본 정보」에서 고쳐요.</p></header>${directoryView(ctx)}</div>`;
+    return `<div class="gw-page gw-basepage"><header class="gw-head"><div class="gw-crumb">세계 / 부록</div><h2>거점</h2><p class="gx-muted">지도에 찍히는 장소예요. 조직마다 거점을 두고 지도를 눌러 위치를 정해요. 조직의 호칭·괴담톡 탭은 조직 기록의 「기본 정보」에서 고쳐요.</p></header>${directoryView(ctx)}</div>`;
   }
   if (n === 'relations') return relationsPage(ctx, overridesOf(ctx), false);
   if (isSetNode(n)) return settingsPage(ctx, n.slice(4) as SetPage);

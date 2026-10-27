@@ -73,7 +73,7 @@ export function installPage(ctx: ChatContext): string {
     : allDone
       ? `<button class="gx-mini" data-action="ed-inst-all">다시 점검·맞추기</button>`
       : `<button class="gx-mini primary" data-action="ed-inst-all">${s.goei ? '빠진 것 전부 채우기' : `${esc(BRAND.name)} 설치`}</button>`;
-  return `<div class="gw-page gw-set gw-install"><header class="gw-head"><h2>설치 · 점검</h2><div class="gw-head-act">${main}</div>
+  return `<div class="gw-page gw-set gw-install"><header class="gw-head"><div class="gw-crumb">카드</div><h2>설치 · 점검</h2><div class="gw-head-act">${main}</div>
       <p class="gx-muted">${head} 기존 로어북·인사말·에셋은 그대로 두고 덧붙여요. 사진은 받다 끊겨도 받은 만큼 저장되니 다시 누르면 이어서 받아요.</p></header>
     ${instUi.notice ? `<div class="gx-err" role="alert">${esc(instUi.notice)}</div>` : ''}
     ${instUi.info ? `<p class="gx-hint">${esc(instUi.info)}</p>` : ''}
