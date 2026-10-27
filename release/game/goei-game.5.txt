@@ -1,4 +1,76 @@
-")];
+n-left:auto;color:#e6d36a;font-weight:700}
+.gi-shop .say{color:#cfd6da;margin:10px 0}
+.gi-shop h4{margin:14px 0 6px;color:#8a969c;font-size:13px}
+.gi-shop .row{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:#232d32;border:1px solid #33404a;border-radius:10px;color:inherit;font:inherit;padding:8px 10px;margin:0 0 6px;cursor:pointer}
+.gi-shop .row:disabled{opacity:.45;cursor:default}
+.gi-shop .row.sel{border-color:#e6d36a}
+.gi-shop .t{display:flex;flex-direction:column;flex:1;min-width:0}
+.gi-shop .t small{color:#8a969c;font-size:12px}
+.gi-shop .p{display:flex;flex-direction:column;align-items:flex-end;color:#e6d36a;font-weight:700;white-space:nowrap}
+.gi-shop .p small{color:#8a969c;font-weight:400;font-size:11px}
+.gi-shop .msg{min-height:20px;color:#9fd9a6;margin:8px 0}
+.gi-shop footer{display:flex;justify-content:flex-end}
+.gi-shop footer button{font:inherit;padding:8px 16px;border-radius:8px;border:1px solid #4a565d;background:#2c383e;color:#e8ecee;cursor:pointer}
+`;
+  var WHY = { cash: "현금이 모자라", stock: "품절", full: "1~4칸이 가득", ammoFull: "탄이 가득", loan: "빚부터 갚아" };
+  function createShopPanel(root) {
+    if (!document.getElementById("gi-shop-css")) {
+      const s2 = document.createElement("style");
+      s2.id = "gi-shop-css";
+      s2.textContent = CSS;
+      document.head.appendChild(s2);
+    }
+    const box2 = document.createElement("div");
+    box2.className = "gi-shop";
+    box2.hidden = true;
+    root.appendChild(box2);
+    let cur = null;
+    let sel = 0;
+    let msg = "";
+    const render = () => {
+      if (!cur) return;
+      const { shop, run } = cur;
+      const v = VENDORS[shop.vendor];
+      const icon2 = (o) => o.kind === "ammo" ? "ammo-" + o.ref : o.kind === "clinic" ? "backalley" : o.kind === "loan" ? "shinyuri" : o.kind === "gamble" ? "vending" : o.ref;
+      const rows = shop.offers.map(
+        (o) => `<button class="row" data-k="${o.key}" ${o.stock <= 0 ? "disabled" : ""}><canvas width="40" height="40" data-icon="${icon2(o)}"></canvas>
+        <span class="t"><b>${o.name}</b><small>${o.desc}</small></span>
+        <span class="p">${o.kind === "loan" ? "빌리기" : o.hpCost ? "체력 20%" : o.price + "원"}<small>${o.stock <= 0 ? "품절" : o.kind === "loan" ? "" : "남음 " + o.stock}</small></span></button>`
+      ).join("");
+      const bag = shop.buys ? `<h4>회수물 팔기</h4>${run.bag.map((b, i) => b ? `<button class="row" data-sell="${i}"><canvas width="40" height="40" data-icon="${b.id}"></canvas><span class="t"><b>${b.name}</b></span><span class="p">${sellPrice(shop, b.value)}원</span></button>` : "").join("") || '<p class="say">가방이 비었다</p>'}` : "";
+      box2.innerHTML = `<div class="panel"><header><canvas width="44" height="44" data-icon="${shop.vendor}"></canvas><div><b>${v.name}</b><small>${v.title}</small></div><span class="cash">현금 ${run.cash}${run.debt ? ` · 빚 ${run.debt}` : ""}</span></header>
+      <p class="say">「${shop.greet}」</p>${rows}${bag}<p class="msg">${msg}</p><footer><button data-close>나가기</button></footer></div>`;
+      box2.querySelectorAll("canvas[data-icon]").forEach((c) => drawItemIcon(c.getContext("2d"), c.dataset.icon, 0, 0, c.width));
+      const list = [...box2.querySelectorAll(".row")];
+      sel = Math.max(0, Math.min(sel, list.length - 1));
+      list[sel]?.classList.add("sel");
+    };
+    const press = (b) => {
+      if (!cur) return;
+      if (b.dataset.close !== void 0) return close();
+      if (b.dataset.sell !== void 0) {
+        msg = `${sell(cur.shop, cur.run, +b.dataset.sell)}원 받음`;
+        return render();
+      }
+      const k = b.dataset.k;
+      if (!k) return;
+      const r = buy2(cur.shop, cur.run, k, cur.context?.());
+      if (r.ok) {
+        cur.onBuy(r);
+        msg = `받음: ${r.got}`;
+      } else msg = r.message ?? (r.currency === "hp" ? "체력이 모자라거나 체력 거래를 사용할 수 없다" : WHY[r.why]);
+      render();
+    };
+    box2.addEventListener("click", (e) => {
+      const b = e.target.closest("button");
+      if (b) press(b);
+    });
+    const onKey = (e) => {
+      if (!cur) return;
+      e.stopImmediatePropagation();
+      e.preventDefault();
+      if (e.repeat) return;
+      const list = [...box2.querySelectorAll(".row")];
       if (e.code === "Escape" || e.code === "KeyQ") close();
       else if (e.code === "ArrowDown" || e.code === "ArrowUp") {
         sel = (sel + (e.code === "ArrowDown" ? 1 : list.length - 1)) % Math.max(1, list.length);
@@ -4837,107 +4909,4 @@
             ctx.strokeStyle = `rgba(255,240,200,${1 - k})`;
             ctx.lineWidth = s2 >= 3 ? 8 : 4;
             ctx.beginPath();
-            ctx.ellipse(sx, sy, (s2 >= 3 ? 150 : 80) * k + 10, (s2 >= 3 ? 90 : 50) * k + 6, 0, 0, Math.PI * 2);
-            ctx.stroke();
-            break;
-          }
-          case "boom": {
-            const D3 = 8;
-            const r = 30 + 110 * Math.min(1, k * 2.2);
-            const fade = 1 - k;
-            const cols = k < 0.15 ? ["#ffffff", "#fff3b0", "#ffd24a"] : k < 0.5 ? ["#fff0a0", "#ffb43c", "#e0601e"] : ["#ff9a3c", "#b8401a", "#4a2a22"];
-            const rnd3 = (i) => {
-              const v = Math.sin(f.seed * 12.9898 + i * 78.233) * 43758.5453;
-              return v - Math.floor(v);
-            };
-            ctx.globalAlpha = Math.min(1, fade * 1.6);
-            for (let gy = -r; gy <= r; gy += D3)
-              for (let gx = -r; gx <= r; gx += D3) {
-                const an = Math.atan2(gy, gx);
-                const edge2 = r * (0.72 + 0.28 * Math.sin(an * 5 + f.seed) * Math.cos(an * 3 - f.seed * 0.7));
-                const d3 = Math.hypot(gx, gy * 1.25);
-                if (d3 > edge2) continue;
-                const t = d3 / edge2;
-                ctx.fillStyle = t < 0.4 ? cols[0] : t < 0.75 ? cols[1] : cols[2];
-                ctx.fillRect(Math.round((sx + gx) / D3) * D3, Math.round((sy + gy) / D3) * D3, D3, D3);
-              }
-            ctx.fillStyle = k < 0.4 ? "#ffd24a" : "#6a3a28";
-            for (let i = 0; i < 14; i++) {
-              const an = rnd3(i) * Math.PI * 2;
-              const dist = r * (0.9 + rnd3(i + 40) * 0.9) * Math.min(1, k * 1.6 + 0.2);
-              const sz = D3 * (rnd3(i + 80) < 0.5 ? 1 : 0.5);
-              ctx.fillRect(Math.round(sx + Math.cos(an) * dist), Math.round(sy + Math.sin(an) * dist * 0.7 + 60 * k * k), sz, sz);
-            }
-            break;
-          }
-          case "dust":
-            ctx.fillStyle = `rgba(200,200,190,${0.5 * (1 - k)})`;
-            for (let i = -1; i <= 1; i += 2) {
-              ctx.beginPath();
-              ctx.ellipse(sx + i * (20 + 50 * k), sy - 6, 22 * (1 - k * 0.5), 10, 0, 0, Math.PI * 2);
-              ctx.fill();
-            }
-            break;
-          case "flash":
-            ctx.fillStyle = "#fff6c8";
-            ctx.beginPath();
-            ctx.arc(sx, sy, 22 * (1 - k), 0, Math.PI * 2);
-            ctx.fill();
-            break;
-          case "text":
-            ctx.globalAlpha = 1 - k;
-            ctx.fillStyle = "#fff";
-            ctx.font = pfont(26).f;
-            ctx.textAlign = "center";
-            ctx.fillText(f.text ?? "", sx, sy - 30 * k);
-            break;
-        }
-        ctx.restore();
-      }
-    }
-    function boxes(w, camX) {
-      const all = [w.player, ...w.bodies];
-      const rect2 = (b, col) => {
-        ctx.strokeStyle = col;
-        ctx.lineWidth = 2;
-        ctx.strokeRect(b.x0 - camX, b.y - b.z1, b.x1 - b.x0, b.z1 - b.z0);
-        ctx.beginPath();
-        ctx.moveTo(b.x0 - camX, b.y);
-        ctx.lineTo(b.x1 - camX, b.y);
-        ctx.stroke();
-      };
-      for (const b of all) {
-        const f = b.frame();
-        for (const h of f.hurt) rect2(h, "#3dff7a");
-        for (const h of f.hit) rect2(h, h.grab ? "#ffe03d" : "#ff3d3d");
-        ctx.fillStyle = "#fff";
-        ctx.fillRect(b.x - camX - 3, b.y - 3, 6, 6);
-      }
-      ctx.fillStyle = "#ffffffcc";
-      ctx.font = "16px monospace";
-      const p = w.player;
-      ctx.fillText(`판정 보기 · ${p.state} 장 ${p.mf} · x ${p.x.toFixed(0)} y ${p.y.toFixed(0)} z ${p.z.toFixed(0)} · 틱 ${w.tick}`, 20, SCREEN_H - 16);
-    }
-    function hud(w) {
-      const p = w.player;
-      ctx.fillStyle = "rgba(0,0,0,0.55)";
-      ctx.fillRect(20, 20, 420, 92);
-      ctx.fillStyle = "#e8eef0";
-      ctx.font = pfont(20).f;
-      ctx.fillText("쟈알디", 34, 46);
-      ctx.fillStyle = "#3a2224";
-      ctx.fillRect(120, 30, 300, 18);
-      ctx.fillStyle = p.hp < p.hpMax * 0.3 ? "#ff5148" : "#e2b23c";
-      ctx.fillRect(120, 30, 300 * p.hp / p.hpMax, 18);
-      ctx.fillStyle = "#222b30";
-      ctx.fillRect(120, 54, 300, 8);
-      ctx.fillStyle = p.gauge >= 100 ? w.tick % 10 < 5 ? "#ffffff" : "#6ad0ff" : "#3f9fd6";
-      ctx.fillRect(120, 54, 3 * p.gauge, 8);
-      ctx.fillStyle = "#222b30";
-      ctx.fillRect(120, 66, 300, 5);
-      ctx.fillStyle = "#9ad08a";
-      ctx.fillRect(120, 66, 3 * p.guardMeter, 5);
-      ctx.font = pfont(16).f;
-      ctx.fillStyle = "#c9d3d8";
-      ctx.fillText("탄", 34, 98);
-      f
+            ctx.ellipse(sx, sy, (s2 >= 3 ? 150 : 80) * k + 

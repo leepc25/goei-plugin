@@ -1,4 +1,4 @@
-// goei-game 0.17.3
+// goei-game 0.17.4
 "use strict";
 (() => {
   // src/game/action/engine/view.ts
@@ -318,6 +318,98 @@
       ],
       windows: [],
       objects: []
+    },
+    // ── 중림 지하상가 (game-pack/jr-field, assets/gpt/중림지하상가를 tools/fit_bg700.py로 세로 700에 맞춤, 2026-10-27) ──
+    // 문은 그림 속 계단·통로 자리(문짝 없음). 막는 상자는 바닥에 튀어나온 매대·의자·상자 앞 모서리
+    jr_entry: {
+      file: "jr_entry",
+      w: 5521,
+      under: false,
+      lane: [428, 669],
+      blocks: [[80, 620, 505], [605, 665, 446], [2860, 3060, 442], [4500, 4660, 442], [5e3, 5521, 528]],
+      doors: {
+        down: { x0: 4880, x1: 5e3, y0: 300, y1: 505, anim: "none", behind: "dark" },
+        west: { x0: 0, x1: 60, y0: 420, y1: 669, anim: "none" }
+      },
+      lamps: [],
+      windows: [],
+      objects: []
+    },
+    jr_b1: {
+      file: "jr_b1",
+      w: 6425,
+      under: true,
+      lane: [428, 669],
+      blocks: [
+        [345, 485, 442],
+        [580, 870, 490],
+        [1690, 1950, 462],
+        [2240, 2460, 446],
+        [2650, 3020, 452],
+        [3740, 4110, 462],
+        [4320, 4810, 462],
+        [4830, 5e3, 442],
+        [5340, 5720, 452],
+        [6e3, 6160, 475]
+      ],
+      doors: {
+        up: { x0: 40, x1: 320, y0: 100, y1: 420, anim: "none", behind: "dark" },
+        alley: { x0: 3390, x1: 3530, y0: 140, y1: 420, anim: "none", behind: "dark" },
+        down: { x0: 6170, x1: 6425, y0: 240, y1: 470, anim: "none", behind: "dark" }
+      },
+      lamps: [],
+      windows: [],
+      objects: []
+    },
+    jr_alley: {
+      file: "jr_alley",
+      w: 6059,
+      under: true,
+      lane: [428, 669],
+      blocks: [
+        [80, 250, 440],
+        [535, 625, 448],
+        [1335, 1760, 470],
+        [1780, 1860, 442],
+        [1890, 2140, 446],
+        [3490, 3910, 455],
+        [4270, 4850, 452],
+        [5090, 5530, 442],
+        [5490, 6059, 472]
+      ],
+      doors: {
+        b1: { x0: 2800, x1: 3070, y0: 130, y1: 420, anim: "none", behind: "dark" }
+      },
+      lamps: [],
+      windows: [],
+      objects: []
+    },
+    jr_b2: {
+      // 왼쪽 끝 앞쪽에 큰 상자가 화면 앞까지 나와 있어 발을 x180부터
+      file: "jr_b2",
+      w: 5705,
+      under: true,
+      lane: [428, 669],
+      floor: [[180, 428], [5705, 428], [5705, 669], [180, 669]],
+      blocks: [
+        [180, 370, 448],
+        [615, 725, 445],
+        [920, 1190, 432],
+        [1315, 1700, 436],
+        [1780, 2030, 445],
+        [2130, 2710, 442],
+        [2960, 3270, 434],
+        [3330, 3510, 438],
+        [3700, 4140, 445],
+        [5120, 5335, 435],
+        [5590, 5705, 435]
+      ],
+      doors: {
+        up: { x0: 5400, x1: 5590, y0: 0, y1: 420, anim: "none", behind: "dark" }
+      },
+      lamps: [],
+      windows: [],
+      objects: []
     }
   };
   var doorX = (scene, id) => {
@@ -360,22 +452,25 @@
 
   // src/game/action/art/hqField.ts
   var FILES = ["lobby", "f2", "f3", "b1", "b2", "b3", "desk"];
+  var JR_FILES = ["jr_entry", "jr_b1", "jr_alley", "jr_b2"];
   var images = null;
   var revision2 = 0;
   function prepareHqField(urlOf) {
     const own = ++revision2;
     images = null;
-    void Promise.all(FILES.map(async (key2) => {
-      const src = window.__GOEI_HQ_FIELD__?.[key2] || (urlOf ? await urlOf(key2 + ".webp") : "");
-      if (!src) throw new Error("HQ field art unavailable");
+    const load = (pack2, keys3) => Promise.all(keys3.map(async (key2) => {
+      const src = window.__GOEI_HQ_FIELD__?.[key2] || (urlOf ? await urlOf(pack2, key2 + ".webp") : "");
+      if (!src) throw new Error("field art unavailable");
       const im = new Image();
       im.src = src;
       await im.decode();
       return [key2, im];
     })).then((rows) => {
-      if (revision2 === own) images = Object.fromEntries(rows);
+      if (revision2 === own) images = { ...images, ...Object.fromEntries(rows) };
     }).catch(() => {
     });
+    void load("hq-field", FILES);
+    void load("jr-field", JR_FILES);
     const keys2 = (e) => {
       const t = e.target;
       if (e.code !== "KeyT" || e.repeat || t?.closest?.('input, textarea, [contenteditable="true"]')) return;
@@ -390,7 +485,7 @@
       }
     };
   }
-  var hasHqField = (scene) => !!images && !!PAINTED[scene];
+  var hasHqField = (scene) => !!PAINTED[scene] && !!images?.[PAINTED[scene].file];
   function drawHqField(c, scene, camX, fx2, clockHour = null) {
     const p = PAINTED[scene];
     const im = images?.[p?.file ?? ""];
@@ -5502,7 +5597,7 @@
       id,
       name,
       floor,
-      look: p.under ? "labhall" : id === "lobby" ? "lobby" : "hall",
+      look: id.startsWith("jr_") ? "jr" : p.under ? "labhall" : id === "lobby" ? "lobby" : "hall",
       painted: id,
       length: p.w,
       lane: p.lane ?? PAINTED_LANE,
@@ -5531,7 +5626,12 @@
       boxes: [],
       fixtures: [],
       spots: [],
-      doors: [{ id: "main", x: 640, kind: "main", to: "lobby", toDoor: "main" }, { id: "pasta", x: 1500, kind: "shop", to: "pasta", toDoor: "out", needs: "pasta" }],
+      doors: [
+        { id: "main", x: 640, kind: "main", to: "lobby", toDoor: "main" },
+        { id: "pasta", x: 1500, kind: "shop", to: "pasta", toDoor: "out", needs: "pasta" },
+        // 임시 연결: 이동수단(노선표)이 생기기 전까지 거리 동쪽 끝에서 중림으로 바로 간다
+        { id: "jr", x: 1840, kind: "exit", side: "S", to: "jr_entry", toDoor: "west", label: "중림 지하상가 (임시)" }
+      ],
       things: [{ kind: "streetlamp", x: 300, w: 30, h: 360 }, { kind: "streetlamp", x: 1150, w: 30, h: 360 }, { kind: "bike", x: 860, w: 120, h: 80 }]
     },
     {
@@ -5598,7 +5698,23 @@
     floorHall("b3", "지하 주차장", "B3", [
       { id: "supply", kind: "steel", place: "supply", label: "보급실" },
       { id: "elev", kind: "elevator" }
-    ], { spots: [{ id: "van", x: 370, y: LANE_TOP + 50, verb: "출동", depart: true }] })
+    ], { spots: [{ id: "van", x: 370, y: LANE_TOP + 50, verb: "출동", depart: true }] }),
+    // ── 중림 지하상가 (중립지역, 그림 4장). 지상 입구 → 지하 1층 앞골목 → (가운데 통로) 뒷골목 / (동쪽 계단) 지하 2층 ──
+    floorHall("jr_entry", "중림 지하상가 입구", "out", [
+      { id: "west", kind: "exit", side: "S", to: "street", toDoor: "jr", label: "종로로 (임시)" },
+      { id: "down", kind: "door", to: "jr_b1", toDoor: "up", label: "지하상가로 내려가기" }
+    ]),
+    floorHall("jr_b1", "중림 지하상가 지하 1층", "B1", [
+      { id: "up", kind: "door", to: "jr_entry", toDoor: "down", label: "지상으로" },
+      { id: "alley", kind: "door", to: "jr_alley", toDoor: "b1", label: "뒷골목" },
+      { id: "down", kind: "door", to: "jr_b2", toDoor: "up", label: "지하 2층으로" }
+    ]),
+    floorHall("jr_alley", "중림 뒷골목", "B1", [
+      { id: "b1", kind: "door", to: "jr_b1", toDoor: "alley", label: "앞골목" }
+    ]),
+    floorHall("jr_b2", "중림 지하상가 지하 2층", "B2", [
+      { id: "up", kind: "door", to: "jr_b1", toDoor: "down", label: "지하 1층으로" }
+    ])
   ];
   var SCENE_BY_ID = Object.fromEntries(HQ_SCENES.map((s2) => [s2.id, s2]));
   var ELEVATOR = [
@@ -15829,6 +15945,7 @@ void main(){
   };
 
   // src/game/action/engine/game.ts
+  var BASE_ZOOM = 1.5;
   var Game = class {
     constructor(box2, art5, mods) {
       this.box = box2;
@@ -15901,7 +16018,9 @@ void main(){
         if (!this.mods.covered?.()) {
           const w = this.world;
           const H7 = this.inHub ? view.worldH : SCREEN_H;
-          view.zoom = this.canvas.height / H7 * Math.max(1, charSize.k);
+          const cssH = this.canvas.getBoundingClientRect().height;
+          const fixed2 = this.inHub && cssH >= 600;
+          view.zoom = (fixed2 ? BASE_ZOOM * (this.canvas.height / cssH) : this.canvas.height / H7) * Math.max(1, charSize.k);
           if (w) view.lane = w.lane;
           const vw = this.canvas.width / view.zoom;
           view.crop = 0;
@@ -15912,7 +16031,11 @@ void main(){
           }
           view.cropY = 0;
           const vh = this.canvas.height / view.zoom;
-          if (vh < H7 - 0.5 && w) {
+          if (vh > H7 + 0.5) {
+            view.cropY = -Math.round((vh - H7) / 2 * view.zoom) / view.zoom;
+            this.ctx.fillStyle = "#000";
+            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+          } else if (vh < H7 - 0.5 && w) {
             const a = frozen ? 1 : this.acc / T3, p = w.player;
             const py = (p.py ?? p.y) + (p.y - (p.py ?? p.y)) * a;
             view.cropY = Math.round(Math.max(0, Math.min(H7 - vh, py - vh * 0.7)) * view.zoom) / view.zoom;
@@ -34094,31 +34217,6 @@ ${t.secret}` : "",
     const cutins = /* @__PURE__ */ new Map();
     if (bridge?.visit && bridge.assets) void loadFieldFx(bridge.assets, ffx, cutins);
     const inField = () => !!game?.inHub && !!bridge?.visit && !mods.blocking?.() && !shell.paused;
-    const previewSuper = () => {
-      const w = game?.world;
-      if (!w || ffx.inSuper()) return;
-      const me = hq2.visitor();
-      const name = me.name || "방문자";
-      const t = SUPER_TEXT[name] ?? { color: "#C8283C", name: "필살기", sub: "" };
-      const fallback = me.agentId && visitAgentFaceCanvas(name, 60) || testPlayerFace(60);
-      void ffx.super_({ ...t, art: cutins.get(name), art2: cutins.get(`${name}_2`), fallback, eye: { x: 0.62, y: 0.42 } }).then(() => {
-        ffx.flash("#fff", 0.1, 0.7);
-        ffx.shake(14, 0.6);
-        const p = w.player;
-        ffx.sparks_(p.x, p.y - 120, 30, t.color, 6);
-        ffx.ring(p.x, p.y, 20, 260, t.color, 0.45);
-        ffx.scorch(p.x, p.y, 160, 3);
-      });
-    };
-    const fieldFxKeys = (e) => {
-      if (e.code !== "KeyS" && e.code !== "KeyW" || e.repeat || !inField()) return;
-      const el = document.activeElement;
-      if (el && (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.isContentEditable)) return;
-      previewSuper();
-      e.preventDefault();
-      e.stopImmediatePropagation();
-    };
-    window.addEventListener("keydown", fieldFxKeys, true);
     const stageStore = {
       load: () => {
         if (session.meta) return session.meta;
@@ -34678,7 +34776,6 @@ ${t.secret}` : "",
         window.removeEventListener("pointerdown", titleInput, true);
         if (openingT) clearTimeout(openingT);
         window.removeEventListener("keydown", hqKeys, true);
-        window.removeEventListener("keydown", fieldFxKeys, true);
         window.removeEventListener("keydown", floorKeys, true);
         saveFlags();
         storyRoot.removeEventListener(VIDEO_AUDIO_EVENT, attachVideoAudio);
@@ -34913,7 +35010,7 @@ ${t.secret}` : "",
     const urlOf = bridge?.assets ? (f) => bridge.assets.url("jyaldi", f) : void 0;
     const releaseHqArt = prepareHqTextures(bridge?.assets ? (f) => bridge.assets.url("hq-textures", f) : void 0);
     const releaseDoorArt = prepareHqDoorRound2(bridge?.assets ? (f) => bridge.assets.url("hq-door-round2", f) : void 0);
-    const releaseField = prepareHqField(bridge?.assets ? (f) => bridge.assets.url("hq-field", f) : void 0);
+    const releaseField = prepareHqField(bridge?.assets ? (pack2, f) => bridge.assets.url(pack2, f) : void 0);
     const testPeople = prepareTestPeople(bridge?.assets ? (f) => bridge.assets.url("test-people", f) : void 0, bridge?.assets ? (f) => bridge.assets.bytes("test-people", f) : void 0);
     const visitArt = bridge?.visit ? prepareVisitAgents(bridge.assets ? (f) => bridge.assets.url("visit-agents", f) : void 0, bridge.assets ? (f) => bridge.assets.bytes("visit-agents", f) : void 0) : null;
     void Promise.all([loadArt(urlOf, bridge?.assets ? (f) => bridge.assets.bytes("jyaldi", f) : void 0), visitArt?.ready, testPeople?.ready]).then(([art5]) => {
@@ -37495,7 +37592,7 @@ ${t.secret}` : "",
     }
   }
   var mod = {
-    version: "0.17.3",
+    version: "0.17.4",
     mount: (box2, bridge) => mountPlay(box2, bridge),
     // 이전 시험판: 저장 키와 그림 팩은 예전 그대로 (goei:game · goei:game-action:v1)
     legacy: {

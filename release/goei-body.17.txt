@@ -2504,5 +2504,5 @@ ${texts.anomaly}`;
   }
 
   // src/body-entry.ts
-  globalThis.__goeiBody = { version: "0.17.3", start: start2 };
+  globalThis.__goeiBody = { version: "0.17.4", start: start2 };
 })();

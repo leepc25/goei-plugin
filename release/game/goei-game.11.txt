@@ -1,4 +1,116 @@
-        load: () => saves.read(slot),
+setMeta(meta) {
+      this.value.meta = JSON.parse(JSON.stringify(meta));
+    }
+    setCheckpoint(checkpoint) {
+      this.value.checkpoint = checkpoint;
+      this.persist();
+    }
+    persist() {
+      this.value.revision = Math.max(Date.now(), this.value.revision + 1);
+      const text2 = JSON.stringify(this.value);
+      try {
+        this.journal?.setItem(this.key, text2);
+      } catch {
+        this.error = "기기 복구 기록을 쓰지 못했습니다.";
+      }
+      this.queue = this.queue.catch(() => {
+      }).then(() => this.saves.write(this.slot, text2, {
+        title: this.value.checkpoint ? "출동 중 · 안전 지점" : "자동 저장",
+        summary: "본부 · 규칙서 · 출동 기록",
+        schema: "goei-session/1"
+      })).catch(() => {
+        this.error = "자동 저장에 실패했습니다. 기기 복구 기록을 유지합니다.";
+      });
+    }
+    flush() {
+      return this.queue;
+    }
+  };
+
+  // src/game/action/engine/modules.ts
+  var local = (key2) => ({
+    load: () => {
+      try {
+        return localStorage.getItem(key2);
+      } catch {
+        return null;
+      }
+    },
+    save: (v) => {
+      try {
+        localStorage.setItem(key2, v);
+      } catch {
+      }
+    }
+  });
+  var SAVED_KEY = "goei-game-saved";
+  var markSaved = () => local(SAVED_KEY).save("1");
+  var hasSaved = () => local(SAVED_KEY).load() === "1";
+  var VISIT_TITLE = { title: "괴이 ː ANOMALY", sub: "필드 · 요원들을 만나고 본편 대화를 이어갑니다" };
+  var fieldClock = { sec: null, place: "" };
+  function hqAdapter(saves, bridge, ui) {
+    const hq2 = createHq();
+    const b = bridge;
+    const slot = b?.slot ?? 0;
+    let root = null;
+    let present = [];
+    let visitor = { agentId: "", name: "" };
+    const visitReady = b?.visit ? b.visit.state().then((v) => {
+      visitor = v.visitor;
+      present = v.agents.filter((a) => a.room).map((a) => ({ name: a.name, room: a.room }));
+    }).catch(() => {
+    }) : Promise.resolve();
+    const ROOM_SCENE = { office: "office", lounge: "lounge", infirmary: "clinic" };
+    const visitors = (sceneId) => {
+      const here = present.filter((p) => ROOM_SCENE[p.room] === sceneId && hasVisitAgent(p.name));
+      const sc = hq2.map().scenes.find((s2) => s2.id === sceneId);
+      if (!sc || !here.length) return [];
+      const [top, bot] = sc.lane ?? [LANE_TOP, LANE_BOT];
+      const slots = [[0.36, 0.55], [0.5, 0.35], [0.62, 0.75], [0.44, 0.9], [0.72, 0.45], [0.28, 0.8]].map(([fx2, fy]) => [sc.length * fx2, fy]);
+      return here.slice(0, slots.length).map((p, i) => ({ name: p.name, x: slots[i][0], y: top + (bot - top) * slots[i][1], face: slots[i][0] > sc.length / 2 ? -1 : 1 }));
+    };
+    const hub = makeHub(
+      {
+        map: () => hq2.map(),
+        openPlace: (id) => hq2.openPlace(id),
+        bark: (place3) => hq2.bark(place3),
+        chooseFloor: (o, pick6) => ui.chooseFloor(o, pick6),
+        sfx: (n) => ui.sfx(n),
+        visitors,
+        // 장면을 옮기면 장부에 이동 사건과 지금 위치(확정 사실)를 남긴다
+        entered: (to, from, walkedPx) => {
+          fieldClock.place = to.name;
+          const sec = walkSeconds(walkedPx) + (to.floor !== from.floor ? STAIR_S : DOOR_S);
+          if (fieldClock.sec !== null) fieldClock.sec += sec;
+          const at2 = fieldClock.sec === null ? "" : ` (${clockText(fieldClock.sec)})`;
+          void b?.field?.record({ kind: "move", text: `${from.name} → ${to.name}${at2}`, scene: to.name, weight: 1, fact: { key: "주인공 위치", value: to.name } }).catch(() => {
+          });
+          if (fieldClock.sec !== null) void b?.field?.record({ kind: "move", text: `필드 시각 ${clockText(fieldClock.sec)}`, scene: to.name, weight: 1, fact: { key: "필드 시각", value: clockText(fieldClock.sec) } }).catch(() => {
+          });
+        },
+        overlay: ui.overlay,
+        hour: () => fieldClock.sec === null ? null : fieldClock.sec / 3600 % 24,
+        depart: () => hq2.depart(),
+        armed: () => hq2.armed(),
+        // 본부 대화창이 떠 있으면 머리 위 표시를 숨긴다 (독립 검수: 브리핑 뒤 ↓ 표시)
+        busy: () => typeof document !== "undefined" && !!document.querySelector(".hq-talk, .hq-over:not(:empty)")
+      },
+      (place3) => whereIs(place3)
+    );
+    return {
+      ready: () => hq2.ready(),
+      visitReady,
+      visitor: () => visitor,
+      hub: () => hub,
+      state: () => hq2.state,
+      goto: (place3) => hub.goto(place3),
+      isOpen: () => hq2.isOpen(),
+      close: () => hq2.close(),
+      mount(r, host) {
+        root = r;
+        hq2.mount(r, {
+          deploy: (l) => !bridge?.visit && host.deploy({ ...l, hpMax: l.stats?.hp, launch: l }),
+          load: () => saves.read(slot),
           resuming: ui.resuming,
           save: (d3) => (markSaved(), saves.write(slot, d3, { title: "자동 저장", summary: `${hq2.state.day}일차`, schema: "goei-hq/1" })),
           saves,
@@ -160,31 +272,6 @@
     const cutins = /* @__PURE__ */ new Map();
     if (bridge?.visit && bridge.assets) void loadFieldFx(bridge.assets, ffx, cutins);
     const inField = () => !!game?.inHub && !!bridge?.visit && !mods.blocking?.() && !shell.paused;
-    const previewSuper = () => {
-      const w = game?.world;
-      if (!w || ffx.inSuper()) return;
-      const me = hq2.visitor();
-      const name = me.name || "방문자";
-      const t = SUPER_TEXT[name] ?? { color: "#C8283C", name: "필살기", sub: "" };
-      const fallback = me.agentId && visitAgentFaceCanvas(name, 60) || testPlayerFace(60);
-      void ffx.super_({ ...t, art: cutins.get(name), art2: cutins.get(`${name}_2`), fallback, eye: { x: 0.62, y: 0.42 } }).then(() => {
-        ffx.flash("#fff", 0.1, 0.7);
-        ffx.shake(14, 0.6);
-        const p = w.player;
-        ffx.sparks_(p.x, p.y - 120, 30, t.color, 6);
-        ffx.ring(p.x, p.y, 20, 260, t.color, 0.45);
-        ffx.scorch(p.x, p.y, 160, 3);
-      });
-    };
-    const fieldFxKeys = (e) => {
-      if (e.code !== "KeyS" && e.code !== "KeyW" || e.repeat || !inField()) return;
-      const el = document.activeElement;
-      if (el && (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.isContentEditable)) return;
-      previewSuper();
-      e.preventDefault();
-      e.stopImmediatePropagation();
-    };
-    window.addEventListener("keydown", fieldFxKeys, true);
     const stageStore = {
       load: () => {
         if (session.meta) return session.meta;
@@ -744,7 +831,6 @@
         window.removeEventListener("pointerdown", titleInput, true);
         if (openingT) clearTimeout(openingT);
         window.removeEventListener("keydown", hqKeys, true);
-        window.removeEventListener("keydown", fieldFxKeys, true);
         window.removeEventListener("keydown", floorKeys, true);
         saveFlags();
         storyRoot.removeEventListener(VIDEO_AUDIO_EVENT, attachVideoAudio);
@@ -979,7 +1065,7 @@
     const urlOf = bridge?.assets ? (f) => bridge.assets.url("jyaldi", f) : void 0;
     const releaseHqArt = prepareHqTextures(bridge?.assets ? (f) => bridge.assets.url("hq-textures", f) : void 0);
     const releaseDoorArt = prepareHqDoorRound2(bridge?.assets ? (f) => bridge.assets.url("hq-door-round2", f) : void 0);
-    const releaseField = prepareHqField(bridge?.assets ? (f) => bridge.assets.url("hq-field", f) : void 0);
+    const releaseField = prepareHqField(bridge?.assets ? (pack2, f) => bridge.assets.url(pack2, f) : void 0);
     const testPeople = prepareTestPeople(bridge?.assets ? (f) => bridge.assets.url("test-people", f) : void 0, bridge?.assets ? (f) => bridge.assets.bytes("test-people", f) : void 0);
     const visitArt = bridge?.visit ? prepareVisitAgents(bridge.assets ? (f) => bridge.assets.url("visit-agents", f) : void 0, bridge.assets ? (f) => bridge.assets.bytes("visit-agents", f) : void 0) : null;
     void Promise.all([loadArt(urlOf, bridge?.assets ? (f) => bridge.assets.bytes("jyaldi", f) : void 0), visitArt?.ready, testPeople?.ready]).then(([art5]) => {
@@ -3561,7 +3647,7 @@
     }
   }
   var mod = {
-    version: "0.17.3",
+    version: "0.17.4",
     mount: (box2, bridge) => mountPlay(box2, bridge),
     // 이전 시험판: 저장 키와 그림 팩은 예전 그대로 (goei:game · goei:game-action:v1)
     legacy: {
