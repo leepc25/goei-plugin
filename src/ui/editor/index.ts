@@ -17,6 +17,7 @@ import { recordCount, recordList, recordPage, recordAction, recordInput, recUi }
 import { relationsPage, relationsAction, relationsInput } from './relations';
 import { guidePage, guideAction, guideInput, guideUi } from './guides';
 import { isRuleNode, ruleAction, ruleInput, rulePage, ruleTreeItems } from './rules';
+import { ensureManage, isManageNode, manageAction, manageInput, managePage, type ManageNode } from './manage';
 import { installAction, installPage, instUi, refreshInstall } from './install';
 import { featurePane, settingsNotices, settingsSection, settingsUi, type SettingsSection } from '../settings';
 import { CFG, GN_DEFAULTS, gnetLabel } from '../../core/gnet';
@@ -28,7 +29,6 @@ import { PLUGIN_VERSION } from '../../core/update';
 /** 설정 페이지 (2026-10-27: 모든 설정은 이 창 하나로. 지침은 그 기능 페이지 아래에) */
 export type SetPage = 'screen' | 'image' | 'board' | 'gnet' | 'phone' | 'wiki' | 'visit' | 'people' | 'adv' | 'update';
 export type GuideNode = `guide:${GuideName | 'Image'}`;
-export type ManageNode = 'manage:backup' | 'manage:diag' | 'manage:log';
 export type EditorNode = WorldKind | 'base' | 'relations' | `set:${SetPage}` | 'install' | GuideNode | ManageNode | `rule:${string}`;
 const SET_PAGES: SetPage[] = ['screen', 'image', 'board', 'gnet', 'phone', 'wiki', 'visit', 'people', 'adv', 'update'];
 export const isSetNode = (n: string): n is `set:${SetPage}` => n.startsWith('set:') && SET_PAGES.includes(n.slice(4) as SetPage);
@@ -192,6 +192,7 @@ function ensureRoot(): HTMLElement {
     if (ctx && relationsInput(name, el.dataset.key ?? '', el.value, ctx)) return void touched();
     if (guideInput(name, el.dataset.key ?? '', el.value)) return void touched();
     if (ruleInput(name, el.dataset.key ?? '', el.value)) return;
+    if (manageInput(name, el.value)) return;
     // 설정 페이지의 입력(슬라이더·검색·규칙 글칸 등)은 패널과 같은 처리기로
     host?.input?.(el as HTMLInputElement);
   });
@@ -276,7 +277,7 @@ function treeOf(tab: Tab): { title: string; items: TreeItem[] }[] {
       { title: '기본 지침', items: (['RP', 'Directive', 'Tag'] as GuideName[]).map(guideItem) },
       { title: '기능별 지침', items: (['GNet', 'Phone', 'Wiki', 'Visit', 'Image'] as (GuideName | 'Image')[]).map(guideItem) },
     ];
-    case 'manage': return [{ title: '관리', items: [['install', '설치 · 점검', ICONS.refresh], setItem('update')] }];
+    case 'manage': return [{ title: '관리', items: [['install', '설치 · 점검', ICONS.refresh], setItem('update'), ['manage:backup', '백업 · 저장', ICONS.pen], ['manage:diag', '진단', ICONS.list], ['manage:log', '실행 기록', ICONS.book]] }];
   }
 }
 const firstOf = (tab: Tab): EditorNode => (tab === 'guide' ? 'guide:RP' : treeOf(tab)[0].items[0][0]);
@@ -405,6 +406,10 @@ function body(ctx: ChatContext): string {
   if (n === 'relations') return relationsPage(ctx, overridesOf(ctx), false);
   if (isGuideNode(n)) return guideNodePage(ctx, n);
   if (isRuleNode(n)) return rulePage(n);
+  if (isManageNode(n)) {
+    ensureManage(render);
+    return managePage(ctx, n, host?.canChat?.() ?? true);
+  }
   if (isSetNode(n)) return settingsPage(ctx, n.slice(4) as SetPage);
   // 설치 · 점검: 이 캐릭터를 아직 점검하지 않았으면 점검하고 다시 그린다 (어느 길로 열어도)
   if (instUi.forChar !== ctx.charIndex && !instUi.pending) {
@@ -546,6 +551,10 @@ export async function handle(action: string, value?: string): Promise<void> {
   }
   if (action.startsWith('ed-guide-')) {
     if (await guideAction(action, value)) render();
+    return;
+  }
+  if (action.startsWith('man-')) {
+    if (await manageAction(action, root)) render();
     return;
   }
   if (action.startsWith('ed-rule-')) {

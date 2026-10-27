@@ -1,6 +1,6 @@
 // 세계 편집 창 「설치 · 점검」 (설계안 9절): 깡통봇에 플러그인 카드 요소를 심고, 없어진 것을 알려 주고 다시 만든다.
 import { installSummary, type InstallState } from '../../core/install';
-import { checkInstall, dropTokenizer, dropWikiPack, installIcon, installLoreAndGreetings, installPictures, installTokenizer, installWikiPack, restoreIcon } from '../../host/install';
+import { checkInstall, installIcon, installLoreAndGreetings, installPictures, installTokenizer, installWikiPack, restoreIcon } from '../../host/install';
 import type { ChatContext } from '../../host/risu';
 import { notifyInstalled } from '../../host/hooks';
 import { BRAND } from '../brand';
@@ -8,7 +8,7 @@ import { BRAND } from '../brand';
 const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 const mb = (n: number) => (n >= 1e6 ? `${(n / 1e6).toFixed(1)}MB` : `${Math.max(1, Math.round(n / 1e3))}KB`);
 
-type Step = '' | 'all' | 'icon-back' | 'wiki-drop' | 'tok-drop';
+type Step = '' | 'all' | 'icon-back';
 
 export const instUi = {
   state: null as InstallState | null,
@@ -82,10 +82,8 @@ export function installPage(ctx: ChatContext): string {
     <section class="ps-group"><h3>세부 선택</h3><div class="ps-rows">
       <div class="ps-row"><div class="ps-label"><b>봇 이름</b><small>설치할 때 봇 이름을 「${esc(BRAND.name)}」로 바꿀지. 지금 이름: ${esc(name)}</small></div><div class="ps-ctl"><div class="gx-segs gx-segs-sm"><button class="gx-seg${instUi.setName ? ' on' : ''}" data-action="ed-inst-name" aria-pressed="${instUi.setName}" ${busy || instUi.setName ? 'disabled' : ''}>바꿈</button><button class="gx-seg${instUi.setName ? '' : ' on'}" data-action="ed-inst-name" aria-pressed="${!instUi.setName}" ${busy || !instUi.setName ? 'disabled' : ''}>그대로</button></div></div></div>
       ${instUi.iconPrev ? `<div class="ps-row"><div class="ps-label"><b>이전 아이콘</b><small>설치 전 아이콘으로 되돌려요 (아이콘 목록에는 둘 다 남아요).</small></div><div class="ps-ctl"><button class="gx-mini" data-action="ed-inst-icon-back" ${busy ? 'disabled' : ''}>이전 아이콘으로</button></div></div>` : ''}
-      ${s.wikiPack ? `<div class="ps-row"><div class="ps-label"><b>위키 기본 문서</b><small>이 기기 저장소에서 지워요. 다시 받으려면 위 단추.</small></div><div class="ps-ctl"><button class="gx-mini" data-action="ed-inst-wiki-drop" ${busy ? 'disabled' : ''}>저장소에서 지우기</button></div></div>` : ''}
-      ${s.tokenizer ? `<div class="ps-row"><div class="ps-label"><b>토크나이저</b><small>이 기기 저장소에서 지워요 (토큰 수는 어림값으로).</small></div><div class="ps-ctl"><button class="gx-mini" data-action="ed-inst-tok-drop" ${busy ? 'disabled' : ''}>저장소에서 지우기</button></div></div>` : ''}
     </div></section>
-    <p class="ps-note">설치 뒤 새 채팅을 열면 시작 화면이 떠요.</p>
+    <p class="ps-note">설치 뒤 새 채팅을 열면 시작 화면이 떠요. 받은 위키 문서·토크나이저는 「관리 → 백업 · 저장」에서 지울 수 있어요.</p>
     </div>
   </div>`;
 }
@@ -102,7 +100,7 @@ export async function installAction(action: string, ctx: ChatContext, env: Env):
     return true;
   }
   const step = action.slice(8) as Step;
-  if (step !== 'all' && step !== 'icon-back' && step !== 'wiki-drop' && step !== 'tok-drop') return true;
+  if (step !== 'all' && step !== 'icon-back') return true;
   instUi.busy = step;
   instUi.notice = '';
   instUi.info = '';
@@ -140,10 +138,6 @@ export async function installAction(action: string, ctx: ChatContext, env: Env):
     if (!s?.tokenizer) await run('토크나이저', async () => (await installTokenizer(progress), '토크나이저'));
   } else if (step === 'icon-back') {
     await run('이전 아이콘', async () => ((await restoreIcon(ctx.charIndex)) ? '이전 아이콘' : null));
-  } else if (step === 'wiki-drop') {
-    await run('위키 기본 문서', async () => (await dropWikiPack(), '위키 기본 문서 지움'));
-  } else if (step === 'tok-drop') {
-    await run('토크나이저', async () => (await dropTokenizer(), '토크나이저 지움'));
   }
   if (done.length) instUi.info = `${done.join(' · ')} — 끝났어요.`;
   else if (!failed.length) instUi.info = '바꿀 것이 없었어요.';

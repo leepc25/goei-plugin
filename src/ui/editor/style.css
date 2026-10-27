@@ -355,3 +355,5 @@
 .gw .gw-base-row p { margin: 0; }
 .gw .gw-base-label { font-size: 11px; font-weight: 600; color: var(--dim); letter-spacing: .04em; padding-top: 1px; }
 .gw .gw-off-note { max-width: 960px; margin: -6px 0 14px; font-size: 12px; color: var(--amber); }
+.gw .gw-state.bad { color: var(--danger); background: var(--danger-bg, transparent); border: 1px solid var(--danger); }
+.gw .ps-row > textarea[readonly] { opacity: .85; }
