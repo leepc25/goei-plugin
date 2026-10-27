@@ -16,7 +16,8 @@ END = {18: "5"}
 DIR[20] = "east"
 DIR[21] = "south"
 DIR[30] = "east"
-DIR[31] = "east"   # 끝 장 지정: 18 = 14를 돌아서기 끝 장(수건 두른 옆모습)으로 끝나게 다시
+DIR[31] = "east"
+for _n in (32, 33, 34): DIR[_n] = "east"   # 끝 장 지정: 18 = 14를 돌아서기 끝 장(수건 두른 옆모습)으로 끝나게 다시
 POSE_SIDE = "standing upright seen from the side, facing east"
 STEPS = {
  1: ("57", "Standing with the back to the viewer in front of a locker. First she wraps a large plain white bath towel around her body under the arms and holds it closed. Then, keeping the towel wrapped the whole time, she takes off the jacket, vest, shirt, trousers and shoes underneath it and lets them drop out of the frame. The towel always covers her from the armpits to the middle of the thighs. Last frame: standing with the back to the viewer, barefoot, wrapped in the white towel from the armpits to mid-thigh, bare shoulders, arms and lower legs, ponytail unchanged."),
@@ -39,6 +40,11 @@ def last(name):
 def b64(im):
     b = io.BytesIO(); im.save(b, "PNG"); return {"type": "base64", "base64": base64.b64encode(b.getvalue()).decode(), "format": "png"}
 STEPS[18] = STEPS[14]
+STEPS[32] = ("REG_E", "Standing still seen from the side facing east, relaxed, arms at the sides. Her clothes and shoes simply disappear from her body little by little without any effect, sparkle, smoke or flash, until she stands bare, barefoot, no clothes. She does not move. Last frame: standing seen from the side facing east, barefoot, no clothes, ponytail unchanged. Draw only the woman, nothing else.")   # 옷이 그냥 사라지기
+STEPS[33] = ("REG_E", "Standing seen from the side facing east, getting undressed for a shower. She takes off the jacket, then the vest, then the shirt, then the shoes, then the trousers, one piece at a time, each piece clearly sliding off the body and dropping out of the frame, until she stands bare, relaxed, arms at the sides. No towel. Last frame: standing seen from the side facing east, barefoot, no clothes, ponytail unchanged. Draw only the woman, no locker, furniture, shower or wall.")   # 12장 옷 벗기
+STEPS[34] = STEPS[33]   # 16장 옷 벗기
+FRAMES = {33: 12, 34: 16}
+
 STEPS[31] = ("REG_E", "Standing seen from the side facing east in front of a locker, getting undressed for a shower. She takes off the jacket, vest, shirt, trousers and shoes one by one and drops them out of the frame, until she stands bare, relaxed, arms at the sides. No towel. Last frame: standing seen from the side facing east, barefoot, no clothes, ponytail unchanged.")   # 수건 없이 바로 옷 벗기 시험
 STEPS[30] = ("REG_E", "Standing seen from the side facing east in front of a locker. First she wraps a large plain white bath towel around her body under the arms and holds it closed. Then, keeping the towel wrapped the whole time, she takes off the jacket, vest, shirt, trousers and shoes underneath it and lets them drop out of the frame. The towel always covers her from the armpits to the middle of the thighs. Last frame: standing seen from the side facing east, barefoot, wrapped in the white towel from the armpits to mid-thigh, bare shoulders, arms and lower legs, ponytail unchanged.")   # 옆모습 옷 벗기
 STEPS[21] = ("5", "Wrapped in the white towel and barefoot, she turns in place from facing right to facing straight toward the viewer. Then she unwraps the towel and pulls it off to the side; the towel vanishes as it comes off, nothing falls to the floor. She stands bare facing the viewer with no towel and no soap, relaxed, arms at the sides. Last frame: standing facing the viewer (south), barefoot, no towel, no soap foam, ponytail unchanged. Draw only the woman, no shower head, wall, water or towel.")   # 앞모습 거품 없이 시험
@@ -46,7 +52,7 @@ STEPS[20] = ("5", "Standing under a shower seen from the side facing east, wrapp
 n = int(sys.argv[1]); src, prompt = STEPS[n]
 start = last(src)
 body = {"character_id": CID, "mode": "pixminimax", "action_description": prompt, "animation_name": f"test 샤워이음 {n}",
-        "directions": [DIR.get(n, "north")], "frame_count": 8, "subject_description": SUB, "initial_pose": POSE_SIDE if DIR.get(n) == "east" and n != 5 else ("standing upright seen from the side, facing east" if n == 21 else POSE),
+        "directions": [DIR.get(n, "north")], "frame_count": FRAMES.get(n, 8), "subject_description": SUB, "initial_pose": POSE_SIDE if DIR.get(n) == "east" and n != 5 else ("standing upright seen from the side, facing east" if n == 21 else POSE),
         "keep_first_frame": False, "enhance_prompt": False, "custom_start_frame": b64(start)}
 if n in (3, 6, 7, 13, 17): body["end_frame"] = b64(start)
 if n in END: body["end_frame"] = b64(last(END[n]))
