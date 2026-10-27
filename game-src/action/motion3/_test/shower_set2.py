@@ -20,11 +20,19 @@ C = {  # 키: (옆 방향, 성별, 몸 묘사(옷 없이), 벗는 순서)
  "1.10_게슈간": ("east", "woman", "an athletic woman in her mid twenties with a chin-length snow-white bob with bangs, cold blue eyes, an impassive face",
    "she unbuttons the loose white shirt down the front with her fingers, opens it, slides it off her shoulders, pulls her arms out and drops it, then unhooks the bra and drops it. She bends forward, unbuttons the high-waisted trousers, pushes them down with the underwear to the ankles, then lifts one foot and then the other to step out of them, taking the shoes off with them"),
 }
-key = sys.argv[1]; D, g, SUB, SEQ = C[key]
+key = sys.argv[1]
+if key in C: D, g, SUB, SEQ = C[key]
+else:   # 목록 전원: shower_targets.json(옷 뺀 몸 묘사) + 일반 벗는 순서
+    _t = json.load(open(Path(__file__).resolve().parent / "shower_targets.json"))[key]
+    D, g, SUB = _t["dir"], _t["g"], _t["body"]
+    _p = "he" if g == "man" else "she"; _P = _p.capitalize(); _h = "his" if g == "man" else "her"
+    SEQ = (f"{_p} takes off the clothes one piece at a time with clear hand movements: first any outer layer such as a jacket, coat, cardigan or vest, pushing it back off {_h} shoulders, pulling the arms out of the sleeves and dropping it; then any necktie, scarf or accessory on the body; then the top, unbuttoning it or pulling it off over the head and dropping it"
+           + (", then unhooks the bra and drops it" if g == "woman" else "")
+           + f". {_P} bends forward, pushes the trousers or skirt down together with the underwear to the ankles, then lifts one foot and then the other to step out of them, taking the shoes or socks off with them")
 T = m3.table(key); CID = T["cid"]
 OUT = Path(__file__).resolve().parent / key; OUT.mkdir(exist_ok=True)
 side = f"seen from the side facing {D}"
-pro = "he" if g == "man" else "she"; Pro = pro.capitalize()
+pro = "he" if g == "man" else ("it" if g == "creature" else "she"); Pro = pro.capitalize()
 DRAW = f"Draw only the {g}, no locker, furniture, shower head, wall or water."
 REL = "hands stay in front of the body or at the head and face, elbows never go behind the back"
 STEPS = {
@@ -82,5 +90,9 @@ def run(n):
     for i, im in enumerate(fr): im.save(o / f"{i:02d}.png")
     m3.sheet(fr, OUT / f"샤워2_{n}_sheet.png")
     return n, f"완료 {len(fr)}장 {json.dumps(j.get('usage'))}"
+if g == "creature":   # 옷이 없는 괴물: 옷 벗기 없이 등록 옆모습에서 씻기만
+    STEPS["D"] = ("REG",) + STEPS["D"][1:]; STEPS["E"] = ("REG",) + STEPS["E"][1:]
+    with ThreadPoolExecutor(2) as ex: print(key, list(ex.map(run, ["D", "E"])), flush=True)
+    sys.exit()
 print(key, run("A"), flush=True)
 with ThreadPoolExecutor(3) as ex: print(key, list(ex.map(run, ["B", "D", "E"])), flush=True)

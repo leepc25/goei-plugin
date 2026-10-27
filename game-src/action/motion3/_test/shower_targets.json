@@ -1,0 +1,686 @@
+{
+ "1.1_쟈알디": {
+  "dir": "west",
+  "g": "woman",
+  "body": "a tall Korean woman in her thirties with long straight black hair down to the waist, crimson eyes",
+  "full": "a tall Korean woman in her thirties with long straight black hair down to the waist, crimson eyes, black pant suit with a buttoned jacket, white shirt, black necktie, black gloves and black shoes"
+ },
+ "1.2_스팡달": {
+  "dir": "west",
+  "g": "woman",
+  "body": "a slender pale woman in her mid twenties with a short wavy dark purple bob covering one eye, gold eyes, faint half smile",
+  "full": "a slender pale woman in her mid twenties with a short wavy dark purple bob covering one eye, gold eyes, faint half smile, black skirt suit with a fitted jacket and knee-length pencil skirt, white shirt, black necktie, bare legs and black high-heeled pumps"
+ },
+ "1.4_에일린": {
+  "dir": "east",
+  "g": "woman",
+  "body": "a short woman in her early twenties with a faded platinum blonde high ponytail and long bangs, dull gray eyes",
+  "full": "a short woman in her early twenties with a faded platinum blonde high ponytail and long bangs, dull gray eyes, black trouser suit with the jacket open over a thin black ballistic vest and white shirt, black shoes"
+ },
+ "1.5_고그니쟈": {
+  "dir": "east",
+  "g": "man",
+  "body": "a lean man in his mid forties with wild spiky shoulder-length white hair, round dark goggles over the eyes and a wide grin",
+  "full": "a lean man in his mid forties with wild spiky shoulder-length white hair, round dark goggles over the eyes and a wide grin, long knee-length white lab coat over a white shirt and black necktie, black trousers and black shoes"
+ },
+ "1.7_고르고디오": {
+  "dir": "east",
+  "g": "man",
+  "body": "a huge bald man in his early thirties about two meters tall with a wrestler's build and a neatly trimmed dark beard",
+  "full": "a huge bald man in his early thirties about two meters tall with a wrestler's build and a neatly trimmed dark beard, black leather biker jacket over a white shirt and black necktie, black trousers and black shoes"
+ },
+ "1.8_데쥬레": {
+  "dir": "east",
+  "g": "woman",
+  "body": "a short young woman in her early twenties with pink twin ponytails reaching the chest and straight bangs, a shy nervous face",
+  "full": "a short young woman in her early twenties with pink twin ponytails reaching the chest and straight bangs, a shy nervous face, black skirt suit with a fitted jacket and knee-length pencil skirt, white shirt, black necktie, bare legs and black low-heeled pumps"
+ },
+ "1.9_데드폴": {
+  "dir": "east",
+  "g": "woman",
+  "body": "a petite young woman with long straight black hair down to the back and straight bangs, round dark eyes",
+  "full": "a petite young woman with long straight black hair down to the back and straight bangs, round dark eyes, black suit jacket buttoned over a white shirt, black necktie, black trousers, black gloves and black shoes"
+ },
+ "1.11_로제몬": {
+  "dir": "west",
+  "g": "woman",
+  "body": "a petite young woman in her early twenties with long wavy lavender purple hair down to the waist and bangs, violet eyes",
+  "full": "a petite young woman in her early twenties with long wavy lavender purple hair down to the waist and bangs, violet eyes, black skirt suit with a buttoned fitted jacket and knee-length pencil skirt, white shirt, black necktie, bare legs and black pumps"
+ },
+ "2.1_사장": {
+  "dir": "east",
+  "g": "man",
+  "body": "a tall slim man with short tousled black hair, the whole face hidden in flat pitch-black shadow with only a thin white smile line",
+  "full": "a tall slim man with short tousled black hair, the whole face hidden in flat pitch-black shadow with only a thin white smile line, plain black two-button suit buttoned over a white shirt and slim black necktie, black trousers, black dress shoes, pale bare hands"
+ },
+ "2.2_도필헌": {
+  "dir": "east",
+  "g": "man",
+  "body": "a lean middle-aged man with dark wavy side-parted hair swept back, black sunglasses",
+  "full": "a lean middle-aged man with dark wavy side-parted hair swept back, black sunglasses, dark brown two-button suit, white shirt, black necktie, black dress shoes, bare hands"
+ },
+ "2.3_이길환": {
+  "dir": "east",
+  "g": "man",
+  "body": "a plump middle-aged man with a round face and full cheeks, dark brown bowl haircut, black sunglasses, small closed-mouth smile",
+  "full": "a plump middle-aged man with a round face and full cheeks, dark brown bowl haircut, black sunglasses, small closed-mouth smile, black suit with the jacket buttoned over a round belly, white shirt, black necktie, black trousers and black shoes"
+ },
+ "2.4_이기석": {
+  "dir": "east",
+  "g": "man",
+  "body": "a very lean wiry middle-aged man with glossy black side-parted hair and a lock falling over the forehead, black sunglasses, a crooked smile",
+  "full": "a very lean wiry middle-aged man with glossy black side-parted hair and a lock falling over the forehead, black sunglasses, a crooked smile, fitted black two-piece suit, white shirt, narrow black tie, black dress shoes"
+ },
+ "2.5_김조학": {
+  "dir": "east",
+  "g": "man",
+  "body": "a middle-aged man of ordinary build with short dark brown hair combed back, black sunglasses, a plain forgettable face",
+  "full": "a middle-aged man of ordinary build with short dark brown hair combed back, black sunglasses, a plain forgettable face, black two-button suit, white shirt, thin black necktie, black dress shoes, bare hands"
+ },
+ "2.6_이도형": {
+  "dir": "east",
+  "g": "man",
+  "body": "a tall muscular man in his late forties with silver-white hair slicked back into a long low ponytail, black sunglasses, scarred face",
+  "full": "a tall muscular man in his late forties with silver-white hair slicked back into a long low ponytail, black sunglasses, scarred face, black suit with jacket sleeves pushed up to the elbows showing white shirt cuffs and scarred forearms, white shirt, black tie, black shoes"
+ },
+ "2.7_고영훈": {
+  "dir": "east",
+  "g": "man",
+  "body": "a lean hard-bodied middle-aged man with squared shoulders, short dark hair swept back, black sunglasses, faint old scars on the face, flat expressionless face",
+  "full": "a lean hard-bodied middle-aged man with squared shoulders, short dark hair swept back, black sunglasses, faint old scars on the face, flat expressionless face, dark brown-black two-button suit, white shirt, black necktie, black trousers, black dress shoes"
+ },
+ "2.8_노기균": {
+  "dir": "east",
+  "g": "man",
+  "body": "a fit broad-shouldered man with short dark brown hair swept back with a side part, black sunglasses, thin red scars running from both mouth corners across the cheeks, a wide grin",
+  "full": "a fit broad-shouldered man with short dark brown hair swept back with a side part, black sunglasses, thin red scars running from both mouth corners across the cheeks, a wide grin, black tailored suit jacket, white shirt, black tie, black trousers and black shoes"
+ },
+ "2.9_송주익": {
+  "dir": "east",
+  "g": "man",
+  "body": "a young athletic man in his late twenties with wide shoulders and a long neck, very short dark hair, thick eyebrows, black sunglasses, a large square jutting jaw",
+  "full": "a young athletic man in his late twenties with wide shoulders and a long neck, very short dark hair, thick eyebrows, black sunglasses, a large square jutting jaw, dark black-brown fitted two-button suit, white shirt, black tie, black trousers and black dress shoes"
+ },
+ "2.10_곽성주": {
+  "dir": "east",
+  "g": "man",
+  "body": "a huge broad muscular man with a thick neck, spiky black hair with shaved sides, black sunglasses, stubble",
+  "full": "a huge broad muscular man with a thick neck, spiky black hair with shaved sides, black sunglasses, stubble, black suit with silver-gray bolted metal plates on both shoulders and upper arms, white shirt, black tie, black trousers and black shoes"
+ },
+ "2.11_조성춘": {
+  "dir": "east",
+  "g": "man",
+  "body": "a lean man with short messy black hair and bangs, black sunglasses, a frowning face",
+  "full": "a lean man with short messy black hair and bangs, black sunglasses, a frowning face, open black suit jacket with white shirt cuffs folded back over the sleeves, white shirt with open collar, a loose black necktie hanging low, black trousers and black shoes"
+ },
+ "2.12_윤병수": {
+  "dir": "east",
+  "g": "man",
+  "body": "a lean firm man with moderately broad shoulders, short dark hair swept back with shaved sides, black sunglasses, a long angular clean-shaven face with a flat unimpressed mouth",
+  "full": "a lean firm man with moderately broad shoulders, short dark hair swept back with shaved sides, black sunglasses, a long angular clean-shaven face with a flat unimpressed mouth, dark brown suit, white shirt, black tie, dark brown trousers and black shoes"
+ },
+ "2.13_김성진": {
+  "dir": "east",
+  "g": "man",
+  "body": "a slim young man with messy medium-length black hair falling over black aviator sunglasses, a playful grin",
+  "full": "a slim young man with messy medium-length black hair falling over black aviator sunglasses, a playful grin, open black suit jacket, white shirt open at the collar, a loose thin black necktie, black trousers and black shoes"
+ },
+ "2.14_송진섭": {
+  "dir": "east",
+  "g": "man",
+  "body": "a slim youthful young man with a soft boyish face, short neat black hair with straight bangs, black sunglasses, a slightly startled look",
+  "full": "a slim youthful young man with a soft boyish face, short neat black hair with straight bangs, black sunglasses, a slightly startled look, a slightly oversized dark brown suit with long sleeves, white shirt, black tie, dark brown trousers and black shoes"
+ },
+ "3.1_청달래": {
+  "dir": "east",
+  "g": "woman",
+  "body": "a slender woman in her thirties with dark teal hair tied back in a short ponytail and long side locks framing the face",
+  "full": "a slender woman in her thirties with dark teal hair tied back in a short ponytail and long side locks framing the face, pale skin, very dark navy tailored suit jacket and trousers, white shirt, black necktie, black leather dress shoes"
+ },
+ "3.3_백석주": {
+  "dir": "east",
+  "g": "woman",
+  "body": "a slender Korean woman in her late thirties with long wavy dark brown hair tied back in a high ponytail",
+  "full": "a slender Korean woman in her late thirties with long wavy dark brown hair tied back in a high ponytail, a confident smile, navy blue fitted trouser suit jacket and trousers, white shirt, dark navy tie and black shoes"
+ },
+ "3.4_진나솔": {
+  "dir": "east",
+  "g": "woman",
+  "body": "a tall slender Korean woman in her late twenties with a very high long straight blue-black ponytail reaching the waist and thick blunt bangs, bored sharp face",
+  "full": "a tall slender Korean woman in her late twenties with a very high long straight blue-black ponytail reaching the waist and thick blunt bangs, bored sharp face, fitted black-navy trouser suit, white shirt, dark tie, long dark nails and black shoes"
+ },
+ "3.5_이성해": {
+  "dir": "west",
+  "g": "woman",
+  "body": "a slender young Korean woman with long wavy white hair tied low and draped over one shoulder, straight white bangs, green eyes and a sweet smile",
+  "full": "a slender young Korean woman with long wavy white hair tied low and draped over one shoulder, straight white bangs, green eyes and a sweet smile, dark navy trouser suit, white shirt, dark navy tie and dark navy sneakers"
+ },
+ "3.6_이자헌": {
+  "dir": "east",
+  "g": "man",
+  "body": "a tall broad-shouldered Korean man in his thirties with swept-back white hair and an expressionless handsome face",
+  "full": "a tall broad-shouldered Korean man in his thirties with swept-back white hair and an expressionless handsome face, buttoned dark navy waistcoat over a white long-sleeved shirt, navy tie, black trousers and black formal shoes"
+ },
+ "3.7_은하제": {
+  "dir": "east",
+  "g": "woman",
+  "body": "a lean Korean woman in her early thirties with a glossy dark navy-blue chin-length bob and heavy fringe, pale tired face with a flat mouth",
+  "full": "a lean Korean woman in her early thirties with a glossy dark navy-blue chin-length bob and heavy fringe, pale tired face with a flat mouth, dark navy trouser suit with buttoned jacket, white shirt, navy tie and low black heels"
+ },
+ "3.8_박민성": {
+  "dir": "east",
+  "g": "man",
+  "body": "a big broad-shouldered muscular young Korean man with short dark brown side-parted hair and a broad friendly face",
+  "full": "a big broad-shouldered muscular young Korean man with short dark brown side-parted hair and a broad friendly face, dark navy suit stretched tight over the shoulders and chest, white shirt, navy tie and black shoes"
+ },
+ "3.9_백사헌": {
+  "dir": "west",
+  "g": "man",
+  "body": "a thin frail young Korean man with wavy ash-brown hair, a black medical eyepatch over his left eye",
+  "full": "a thin frail young Korean man with wavy ash-brown hair, a black medical eyepatch over his left eye, slim dark navy suit, white shirt, dark navy tie and black shoes"
+ },
+ "3.10_고영은": {
+  "dir": "east",
+  "g": "woman",
+  "body": "an ordinary soft Korean woman in her late twenties with a dark brown chin-length bob with bangs",
+  "full": "an ordinary soft Korean woman in her late twenties with a dark brown chin-length bob with bangs, navy trouser suit, white shirt, navy tie and low black pumps"
+ },
+ "3.11_강이학": {
+  "dir": "east",
+  "g": "woman",
+  "body": "a slim Korean woman in her late twenties with short tousled sandy blonde hair",
+  "full": "a slim Korean woman in her late twenties with short tousled sandy blonde hair, navy trouser suit jacket buttoned, white shirt, navy tie and black flat shoes"
+ },
+ "3.12_장허운": {
+  "dir": "west",
+  "g": "man",
+  "body": "a tall lean slightly slouched Korean man in his late twenties with long messy dark brown hair past the shoulders",
+  "full": "a tall lean slightly slouched Korean man in his late twenties with long messy dark brown hair past the shoulders, buttoned dark navy suit jacket and trousers, white shirt, dark navy tie, black shoes"
+ },
+ "3.13_곽제강": {
+  "dir": "east",
+  "g": "man",
+  "body": "a slim young Korean man with messy black hair, thin rectangular glasses",
+  "full": "a slim young Korean man with messy black hair, thin rectangular glasses, a long open off-white knee-length lab coat over a light gray shirt and black necktie, black trousers and black shoes"
+ },
+ "3.14_이연화": {
+  "dir": "east",
+  "g": "woman",
+  "body": "a tired Korean woman with black hair tied in a low ponytail",
+  "full": "a tired Korean woman with black hair tied in a low ponytail, thin rectangular glasses, an open off-white long lab coat over a dusty pink blouse, a dark knee-length pencil skirt and black heels"
+ },
+ "3.15_이병진": {
+  "dir": "east",
+  "g": "man",
+  "body": "an overweight middle-aged Korean office man with a big round belly, short side-parted dark brown hair, dark rectangular glasses",
+  "full": "an overweight middle-aged Korean office man with a big round belly, short side-parted dark brown hair, dark rectangular glasses, a white long-sleeved shirt tucked in, a thin black necktie, a black belt, black trousers and black shoes"
+ },
+ "3.16_제이": {
+  "dir": "east",
+  "g": "man",
+  "body": "a pale gaunt young man with shaggy silver-white hair under a black baseball cap",
+  "full": "a pale gaunt young man with shaggy silver-white hair under a black baseball cap, a white medical mask over the nose and mouth, a black long-sleeved security uniform shirt with chest pockets, black trousers, a black belt and black boots"
+ },
+ "4.1_차여진": {
+  "dir": "east",
+  "g": "woman",
+  "body": "a slim Korean woman in her late twenties with very long straight dark burgundy hair to the waist and bangs, sharp upturned eyes and a sly small smile",
+  "full": "a slim Korean woman in her late twenties with very long straight dark burgundy hair to the waist and bangs, sharp upturned eyes and a sly small smile, warm gray slim trouser suit, white shirt, dark charcoal necktie and black high heels"
+ },
+ "4.2_서윤지": {
+  "dir": "east",
+  "g": "woman",
+  "body": "a slender Korean woman in her mid twenties with muted sage-green hair in two long braids to the waist and bangs",
+  "full": "a slender Korean woman in her mid twenties with muted sage-green hair in two long braids to the waist and bangs, white blouse with sleeves rolled to the elbows, navy buttoned waistcoat, navy knee-length pencil skirt, dark sheer tights, black low heels and a black wristwatch"
+ },
+ "4.3_고연지": {
+  "dir": "east",
+  "g": "woman",
+  "body": "a slim Korean woman in her early thirties with straight black shoulder-length hair and uneven bangs, a cold neutral face",
+  "full": "a slim Korean woman in her early thirties with straight black shoulder-length hair and uneven bangs, a cold neutral face, open white doctor coat to the knees over a pale mint striped collared shirt, black trousers, black flat shoes, stethoscope around the neck"
+ },
+ "4.4_윤지아": {
+  "dir": "east",
+  "g": "woman",
+  "body": "a short, softly rounded young Korean woman with apricot-peach hair in two round side buns and blunt bangs, gentle brown eyes",
+  "full": "a short, softly rounded young Korean woman with apricot-peach hair in two round side buns and blunt bangs, gentle brown eyes, white short-sleeved nurse tunic with peach trim, white trousers, beige belt with a pouch on her right hip, black hair tie on her left wrist, white shoes"
+ },
+ "4.5_마덕희": {
+  "dir": "west",
+  "g": "woman",
+  "body": "a slim Korean woman in her mid thirties with a jet-black chin-length bob with blunt bangs",
+  "full": "a slim Korean woman in her mid thirties with a jet-black chin-length bob with blunt bangs, burgundy trouser suit with a buttoned fitted jacket over a black high-neck top, black loafers"
+ },
+ "4.6_문혜란": {
+  "dir": "east",
+  "g": "woman",
+  "body": "a tall long-limbed Korean woman in her late thirties with dark brown hair in a low ponytail and side-swept bangs",
+  "full": "a tall long-limbed Korean woman in her late thirties with dark brown hair in a low ponytail and side-swept bangs, wine-colored lips, dark brown single-breasted suit jacket and matching trousers over a black collared shirt, gold watch on her left wrist, black pointed shoes"
+ },
+ "4.7_신유리": {
+  "dir": "east",
+  "g": "woman",
+  "body": "an athletic Korean woman in her early thirties with squared shoulders, long black hair slicked back into a ponytail with no bangs, narrow dark eyes",
+  "full": "an athletic Korean woman in her early thirties with squared shoulders, long black hair slicked back into a ponytail with no bangs, narrow dark eyes, a black leather biker jacket over a dark gray T-shirt, a black belt, slim black pants and black laced steel-toe boots"
+ },
+ "4.8_블라렛": {
+  "dir": "west",
+  "g": "woman",
+  "body": "a slim athletic nun with long straight sandy blonde hair and blunt bangs, green eyes",
+  "full": "a slim athletic nun with long straight sandy blonde hair and blunt bangs, green eyes, black veil to the hips with a white forehead band, long black habit with a high side slit and white collar, silver cross pendant on a chain, brown prayer beads on both wrists, black boots"
+ },
+ "4.9_살라딘": {
+  "dir": "east",
+  "g": "man",
+  "body": "a tall broad muscular bearded man with brown skin and a full short black beard, a large white wrapped turban",
+  "full": "a tall broad muscular bearded man with brown skin and a full short black beard, a large white wrapped turban, black two-button suit, white shirt, thin black tie, black dress shoes"
+ },
+ "4.10_아벤샤": {
+  "dir": "east",
+  "g": "woman",
+  "body": "a curvy woman with long wavy dark teal hair falling from under a raised hood",
+  "full": "a curvy woman with long wavy dark teal hair falling from under a raised hood, ankle-length dark plum purple hooded cape fastened at the throat with a green emerald brooch, black suit jacket and trousers, white shirt, black tie, black shoes"
+ },
+ "5.1_세크리엠": {
+  "dir": "east",
+  "g": "woman",
+  "body": "a tall pale vampire woman with very long straight platinum white hair falling to the knees and blunt bangs, red eyes",
+  "full": "a tall pale vampire woman with very long straight platinum white hair falling to the knees and blunt bangs, red eyes, a long fitted deep red sleeveless halter-neck dress to the ankles, red high heels"
+ },
+ "8.1_격리개체": {
+  "dir": "east",
+  "g": "creature",
+  "body": "a huge hunched black hairless containment monster with long clawed arms, small glowing yellow eyes, a wide mouth of white teeth and torn yellow-and-black hazard tape strips hanging from its shoulders",
+  "full": "a huge hunched black hairless containment monster with long clawed arms, small glowing yellow eyes, a wide mouth of white teeth and torn yellow-and-black hazard tape strips hanging from its shoulders"
+ },
+ "9.1_진압A": {
+  "dir": "east",
+  "g": "man",
+  "body": "a Korean man in his twenties with a short black crew cut, black sunglasses",
+  "full": "a Korean man in his twenties with a short black crew cut, black sunglasses, black business suit, white shirt, black necktie and a black rifle slung across his back"
+ },
+ "6.1_가짜관리국검사A": {
+  "dir": "east",
+  "g": "man",
+  "body": "a Korean man in his twenties with slicked-back black hair, black sunglasses",
+  "full": "a Korean man in his twenties with slicked-back black hair, black sunglasses, black business suit, white shirt, black necktie and a sheathed katana at the left hip"
+ },
+ "6.2_가짜관리국검사B": {
+  "dir": "east",
+  "g": "man",
+  "body": "a Korean man in his twenties with neat side-parted black hair and a diagonal fringe, black sunglasses",
+  "full": "a Korean man in his twenties with neat side-parted black hair and a diagonal fringe, black sunglasses, black business suit, white shirt, black necktie and a sheathed katana at the left hip"
+ },
+ "6.3_가짜관리국검사C": {
+  "dir": "east",
+  "g": "man",
+  "body": "a lean Korean man in his twenties with short center-parted black hair, black sunglasses",
+  "full": "a lean Korean man in his twenties with short center-parted black hair, black sunglasses, black business suit, white shirt, black necktie and a sheathed katana at the left hip"
+ },
+ "6.4_가짜관리국진압A": {
+  "dir": "east",
+  "g": "man",
+  "body": "a Korean man in his twenties with a short black crew cut, black sunglasses",
+  "full": "a Korean man in his twenties with a short black crew cut, black sunglasses, black business suit, white shirt, black necktie and a black rifle slung across his back"
+ },
+ "6.5_가짜관리국진압B": {
+  "dir": "east",
+  "g": "man",
+  "body": "a broad-shouldered Korean man in his twenties with a black buzz cut, black sunglasses",
+  "full": "a broad-shouldered Korean man in his twenties with a black buzz cut, black sunglasses, black business suit, white shirt, black necktie and a black rifle slung across his back"
+ },
+ "6.6_가짜관리국진압C": {
+  "dir": "east",
+  "g": "man",
+  "body": "a slim Korean man in his twenties with a short black crop cut and straight fringe, black sunglasses",
+  "full": "a slim Korean man in his twenties with a short black crop cut and straight fringe, black sunglasses, black business suit, white shirt, black necktie and a black rifle slung across his back"
+ },
+ "6.8_불량배남2": {
+  "dir": "east",
+  "g": "man",
+  "body": "a solidly built Korean man in his early thirties with short slicked-back black hair",
+  "full": "a solidly built Korean man in his early thirties with short slicked-back black hair, open rumpled charcoal blazer over a black crew-neck shirt, dark slacks and black leather shoes"
+ },
+ "6.10_불량배여1": {
+  "dir": "east",
+  "g": "woman",
+  "body": "a Korean woman in her early twenties with a high dark-brown ponytail and loose forehead strands",
+  "full": "a Korean woman in her early twenties with a high dark-brown ponytail and loose forehead strands, washed denim jacket over a burgundy sweatshirt, loose black jeans and white sneakers"
+ },
+ "6.12_불량배여3": {
+  "dir": "west",
+  "g": "woman",
+  "body": "a Korean woman in her late twenties with a straight black jaw-length bob tucked behind one ear",
+  "full": "a Korean woman in her late twenties with a straight black jaw-length bob tucked behind one ear, black leather zip jacket over a dark gray top, straight black jeans and black ankle boots"
+ },
+ "6.13_경찰남1": {
+  "dir": "east",
+  "g": "man",
+  "body": "a sturdy Korean policeman in his early thirties with short side-parted black hair",
+  "full": "a sturdy Korean policeman in his early thirties with short side-parted black hair, pale blue uniform shirt, navy trousers and a black duty belt"
+ },
+ "6.14_경찰남2": {
+  "dir": "east",
+  "g": "man",
+  "body": "a young Korean policeman in his late twenties with a short black crew cut",
+  "full": "a young Korean policeman in his late twenties with a short black crew cut, pale blue uniform shirt, navy trousers and a black duty belt"
+ },
+ "6.15_경찰여1": {
+  "dir": "east",
+  "g": "woman",
+  "body": "a Korean policewoman in her late twenties with black hair in a low bun",
+  "full": "a Korean policewoman in her late twenties with black hair in a low bun, pale blue uniform shirt, navy trousers and a black duty belt"
+ },
+ "6.16_경찰여2": {
+  "dir": "west",
+  "g": "woman",
+  "body": "a lean Korean policewoman in her early thirties with a short black bob tucked behind the ears",
+  "full": "a lean Korean policewoman in her early thirties with a short black bob tucked behind the ears, pale blue uniform shirt, navy trousers and a black duty belt"
+ },
+ "6.17_관리국남A": {
+  "dir": "east",
+  "g": "man",
+  "body": "a young Korean man agent with a short black crew cut, black sunglasses",
+  "full": "a young Korean man agent with a short black crew cut, black sunglasses, black business suit, white shirt and black necktie"
+ },
+ "6.18_관리국남B": {
+  "dir": "east",
+  "g": "man",
+  "body": "a lean young Korean man agent with short side-parted black hair and a diagonal fringe, black sunglasses",
+  "full": "a lean young Korean man agent with short side-parted black hair and a diagonal fringe, black sunglasses, black business suit, white shirt and black necktie"
+ },
+ "6.19_관리국여A": {
+  "dir": "west",
+  "g": "woman",
+  "body": "a young Korean woman agent with a chin-length black bob, black sunglasses",
+  "full": "a young Korean woman agent with a chin-length black bob, black sunglasses, black business jacket, white shirt, black necktie and a black knee-length skirt"
+ },
+ "6.20_관리국여B": {
+  "dir": "east",
+  "g": "woman",
+  "body": "a lean young Korean woman agent with a low black ponytail, black sunglasses",
+  "full": "a lean young Korean woman agent with a low black ponytail, black sunglasses, black business jacket, white shirt, black necktie and black trousers"
+ },
+ "6.21_백일몽남A": {
+  "dir": "east",
+  "g": "man",
+  "body": "a young Korean man with a short black crew cut",
+  "full": "a young Korean man with a short black crew cut, a small gray wolf-shaped eye mask, navy business suit, white shirt and navy necktie"
+ },
+ "6.22_백일몽남B": {
+  "dir": "east",
+  "g": "man",
+  "body": "a broad-shouldered young Korean man with short side-parted black hair",
+  "full": "a broad-shouldered young Korean man with short side-parted black hair, a small gray bear-shaped eye mask, navy business suit, white shirt and navy necktie"
+ },
+ "6.23_백일몽여A": {
+  "dir": "west",
+  "g": "woman",
+  "body": "a young Korean woman with a chin-length black bob",
+  "full": "a young Korean woman with a chin-length black bob, a small gray fox-shaped eye mask, navy business jacket, white shirt, navy necktie and a navy knee-length skirt"
+ },
+ "6.24_백일몽여B": {
+  "dir": "east",
+  "g": "woman",
+  "body": "a lean young Korean woman with a low black ponytail",
+  "full": "a lean young Korean woman with a low black ponytail, a small gray cat-shaped eye mask, navy business jacket, white shirt, navy necktie and navy trousers"
+ },
+ "6.25_협회남1": {
+  "dir": "east",
+  "g": "man",
+  "body": "a man in his late twenties with short untidy side-parted black hair",
+  "full": "a man in his late twenties with short untidy side-parted black hair, pale blue office shirt tucked in, loosened dark gray necktie, charcoal trousers and black office shoes"
+ },
+ "6.26_협회남2": {
+  "dir": "east",
+  "g": "man",
+  "body": "a lean man in his late twenties with neat short center-parted black hair",
+  "full": "a lean man in his late twenties with neat short center-parted black hair, light gray collared shirt under a muted navy cardigan with a small clipped staff card, charcoal trousers and black office shoes"
+ },
+ "6.27_협회여1": {
+  "dir": "east",
+  "g": "woman",
+  "body": "a young woman with a straight dark-brown chin-length bob",
+  "full": "a young woman with a straight dark-brown chin-length bob, muted beige short casual jacket, dark teal top and charcoal straight trousers"
+ },
+ "6.28_협회여2": {
+  "dir": "east",
+  "g": "woman",
+  "body": "a young woman with a short dark-brown pixie cut",
+  "full": "a young woman with a short dark-brown pixie cut, muted burgundy cardigan over an off-white top, dark charcoal below-knee skirt, dark tights and black flat ankle boots"
+ },
+ "6.29_협회여3": {
+  "dir": "east",
+  "g": "woman",
+  "body": "a woman in her late twenties with dark-brown hair in a low ponytail",
+  "full": "a woman in her late twenties with dark-brown hair in a low ponytail, cream blouse under a muted sage cardigan with a small clipped access card, dark charcoal knee-length straight skirt, dark hosiery and black flats"
+ },
+ "6.30_프리랜서남1": {
+  "dir": "east",
+  "g": "man",
+  "body": "a lean young man with neat short dark-brown side-parted hair and a diagonal fringe",
+  "full": "a lean young man with neat short dark-brown side-parted hair and a diagonal fringe, sand-brown utility jacket with flat patch pockets over a black high-neck layer, slate-gray reinforced-knee work trousers, dark walking boots, a small pouch at the right hip and a short tool clipped at the left belt"
+ },
+ "6.31_프리랜서남2": {
+  "dir": "east",
+  "g": "man",
+  "body": "a young man with short black crew-cut hair",
+  "full": "a young man with short black crew-cut hair, charcoal stand-collar tactical field shirt with olive elbow panels, dark cargo trousers, equipment belt with a small detector and pouch, thin work gloves and worn black combat boots"
+ },
+ "6.32_프리랜서남3": {
+  "dir": "east",
+  "g": "man",
+  "body": "a young man with short black crew-cut hair",
+  "full": "a young man with short black crew-cut hair, unbranded muted olive lightweight field jacket worn open over a charcoal T-shirt, dark gray straight work trousers and brown practical boots"
+ },
+ "6.33_프리랜서남4": {
+  "dir": "east",
+  "g": "man",
+  "body": "a lean young man with tidy short dark-brown side-parted hair and a small diagonal fringe",
+  "full": "a lean young man with tidy short dark-brown side-parted hair and a small diagonal fringe, plain dark navy zip-front jacket over a muted gray top, faded dark blue straight jeans and dark sneakers"
+ },
+ "6.34_프리랜서여1": {
+  "dir": "east",
+  "g": "woman",
+  "body": "a young woman with black hair in a high ponytail",
+  "full": "a young woman with black hair in a high ponytail, slate-blue work shirt with sleeves rolled below the elbows, dark charcoal cargo trousers, narrow work belt with a small pouch, thin work gloves and black lace-up boots"
+ },
+ "6.35_프리랜서여2": {
+  "dir": "east",
+  "g": "woman",
+  "body": "a sturdy young woman with a short dark-brown pixie cut",
+  "full": "a sturdy young woman with a short dark-brown pixie cut, faded brown-green field jacket with stitched repairs over a dark burgundy knit, gray neck gaiter below the chin, weathered dark olive trousers and brown field boots"
+ },
+ "6.36_프리랜서여3": {
+  "dir": "east",
+  "g": "woman",
+  "body": "a lean young woman with a straight black chin-length bob",
+  "full": "a lean young woman with a straight black chin-length bob, unfastened dark gray hip-length canvas work coat over a muted olive shirt, dark brown work trousers, reinforced black work boots and thin gray work gloves"
+ },
+ "6.37_프리랜서여4": {
+  "dir": "east",
+  "g": "woman",
+  "body": "a lean young woman with black hair in a neat low ponytail",
+  "full": "a lean young woman with black hair in a neat low ponytail, muted slate-blue lightweight outdoor jacket over a light gray shirt, dark olive straight utility trousers and dark walking shoes"
+ },
+ "6.38_프리랜서여5": {
+  "dir": "east",
+  "g": "woman",
+  "body": "a woman in her early thirties with a short straight dark-brown bob with blunt bangs",
+  "full": "a woman in her early thirties with a short straight dark-brown bob with blunt bangs, muted khaki canvas work jacket over a gray base layer, dark brown reinforced-knee work trousers, thin work gloves and dark work boots"
+ },
+ "6.39_상인남1": {
+  "dir": "east",
+  "g": "man",
+  "body": "a slightly stocky Korean man in his late thirties with a short dark-brown crew cut",
+  "full": "a slightly stocky Korean man in his late thirties with a short dark-brown crew cut, brown zip jacket over a green polo shirt and dark gray trousers"
+ },
+ "6.40_상인남2": {
+  "dir": "east",
+  "g": "man",
+  "body": "a solidly built Korean man in his early thirties with a short black buzz cut",
+  "full": "a solidly built Korean man in his early thirties with a short black buzz cut, slate work shirt with rolled sleeves, dark brown waist apron with a tool pouch and black work boots"
+ },
+ "6.41_상인남3": {
+  "dir": "east",
+  "g": "man",
+  "body": "a lean Korean man in his early thirties with a short dark-brown forward crop",
+  "full": "a lean Korean man in his early thirties with a short dark-brown forward crop, faded olive utility vest over a navy work shirt, charcoal work trousers and brown boots"
+ },
+ "6.42_상인남4": {
+  "dir": "east",
+  "g": "man",
+  "body": "a Korean man in his late thirties with short black side-parted hair",
+  "full": "a Korean man in his late thirties with short black side-parted hair, brown cardigan over a pale gray shirt, short charcoal shop apron with a pencil in the pocket and dark trousers"
+ },
+ "6.43_상인여1": {
+  "dir": "east",
+  "g": "woman",
+  "body": "a fuller-figured Korean woman in her late thirties with a low black bun",
+  "full": "a fuller-figured Korean woman in her late thirties with a low black bun, burgundy long-sleeved top, beige full-length kitchen apron and dark trousers"
+ },
+ "6.44_상인여2": {
+  "dir": "east",
+  "g": "woman",
+  "body": "a slender Korean woman in her early forties with a neat dark-brown chin-length bob",
+  "full": "a slender Korean woman in her early forties with a neat dark-brown chin-length bob, plum cardigan over a cream high-neck blouse, charcoal calf-length skirt and a small pouch at the waist"
+ },
+ "6.45_상인여3": {
+  "dir": "east",
+  "g": "woman",
+  "body": "a Korean woman in her early thirties with a short dark-brown pixie cut",
+  "full": "a Korean woman in her early thirties with a short dark-brown pixie cut, dark denim jacket over a rust knit top, straight black trousers and gray sneakers"
+ },
+ "6.46_의사1": {
+  "dir": "east",
+  "g": "man",
+  "body": "a Korean man in his early thirties with a short dark-brown crew cut",
+  "full": "a Korean man in his early thirties with a short dark-brown crew cut, open knee-length off-white medical coat over blue-gray scrubs and white shoes"
+ },
+ "6.47_간호사1": {
+  "dir": "east",
+  "g": "woman",
+  "body": "a Korean woman in her late twenties with black hair in a low bun",
+  "full": "a Korean woman in her late twenties with black hair in a low bun, teal scrubs with a small clipped ID card and white medical shoes"
+ },
+ "6.48_청소부남1": {
+  "dir": "east",
+  "g": "man",
+  "body": "a Korean male cleaning worker in his forties with short dark hair graying at the temples",
+  "full": "a Korean male cleaning worker in his forties with short dark hair graying at the temples, blue-gray sleeveless work vest over a light-gray shirt, gray rubber gloves, a cloth hanging at the waist and dark work trousers"
+ },
+ "6.49_청소부여1": {
+  "dir": "east",
+  "g": "woman",
+  "body": "a softly rounded Korean cleaning worker in her forties with a short wavy dark-brown bob",
+  "full": "a softly rounded Korean cleaning worker in her forties with a short wavy dark-brown bob, teal sleeveless work vest over a beige shirt, gray rubber gloves, small waist apron and charcoal work trousers"
+ },
+ "6.54_시민남1": {
+  "dir": "east",
+  "g": "man",
+  "body": "an ordinary Korean man in his mid-twenties with a short black forward crop, slightly stocky build, olive sweatshirt",
+  "full": "an ordinary Korean man in his mid-twenties with a short black forward crop, slightly stocky build, olive sweatshirt, dark gray jogger trousers and white-and-gray sneakers"
+ },
+ "6.55_시민남2": {
+  "dir": "east",
+  "g": "man",
+  "body": "an ordinary Korean man in his late sixties with short thinning gray hair",
+  "full": "an ordinary Korean man in his late sixties with short thinning gray hair, navy zip-front jacket over a pale collared shirt, charcoal trousers and black walking shoes"
+ },
+ "6.56_시민남3": {
+  "dir": "east",
+  "g": "man",
+  "body": "an ordinary Korean man in his mid-forties with short dark-brown hair and an off-center part, mildly fuller build",
+  "full": "an ordinary Korean man in his mid-forties with short dark-brown hair and an off-center part, mildly fuller build, brown zip jacket over a dark collared knit shirt, beige cotton trousers and dark walking shoes"
+ },
+ "6.57_시민남4": {
+  "dir": "east",
+  "g": "man",
+  "body": "an ordinary Korean man in his late twenties with a short black crew cut and a broad face",
+  "full": "an ordinary Korean man in his late twenties with a short black crew cut and a broad face, slate-blue nylon windbreaker, khaki cotton trousers and gray sneakers"
+ },
+ "6.58_시민남5": {
+  "dir": "east",
+  "g": "man",
+  "body": "an ordinary Korean man in his early thirties with neat short black side-parted hair, an angular clean-shaven face",
+  "full": "an ordinary Korean man in his early thirties with neat short black side-parted hair, an angular clean-shaven face, unstructured charcoal casual blazer over an off-white T-shirt, dark gray semi-wide slacks and black loafers"
+ },
+ "6.59_시민남6": {
+  "dir": "east",
+  "g": "man",
+  "body": "an ordinary Korean man in his early twenties with short black center-parted hair, lean build",
+  "full": "an ordinary Korean man in his early twenties with short black center-parted hair, lean build, gray hoodie worn unzipped over a white T-shirt with the hood down, wide-leg blue jeans and low-profile sneakers"
+ },
+ "6.60_시민남7": {
+  "dir": "east",
+  "g": "man",
+  "body": "an ordinary Korean man in his early twenties with slightly wavy short black hair and a modest fringe, lean build, muted blue pullover hooded sweatshirt with the hood down",
+  "full": "an ordinary Korean man in his early twenties with slightly wavy short black hair and a modest fringe, lean build, muted blue pullover hooded sweatshirt with the hood down, faded dark jeans and gray sneakers"
+ },
+ "6.61_시민남8": {
+  "dir": "east",
+  "g": "man",
+  "body": "an ordinary Korean man in his late fifties with short salt-and-pepper side-parted hair",
+  "full": "an ordinary Korean man in his late fifties with short salt-and-pepper side-parted hair, brown casual zip jacket over a beige knit top, charcoal straight trousers and black walking shoes"
+ },
+ "6.62_시민남9": {
+  "dir": "east",
+  "g": "man",
+  "body": "an ordinary Korean young man with broader shoulders and a short black forward-brushed crop",
+  "full": "an ordinary Korean young man with broader shoulders and a short black forward-brushed crop, brown work overshirt with sleeves rolled below the elbows over an off-white T-shirt, charcoal work trousers and worn black work shoes"
+ },
+ "6.63_시민여1": {
+  "dir": "east",
+  "g": "woman",
+  "body": "an ordinary Korean woman in her mid-twenties with a short dark-brown pixie cut",
+  "full": "an ordinary Korean woman in her mid-twenties with a short dark-brown pixie cut, charcoal zip jacket over a white T-shirt, wide-leg black trousers and dark sneakers"
+ },
+ "6.64_시민여2": {
+  "dir": "east",
+  "g": "woman",
+  "body": "an ordinary Korean woman in her late sixties with a short softly waved gray bob",
+  "full": "an ordinary Korean woman in her late sixties with a short softly waved gray bob, plum quilted vest over a cream knit top, dark trousers and black walking shoes"
+ },
+ "6.65_시민여3": {
+  "dir": "east",
+  "g": "woman",
+  "body": "an ordinary Korean woman in her mid-forties with a short softly waved dark-brown bob",
+  "full": "an ordinary Korean woman in her mid-forties with a short softly waved dark-brown bob, sage knit top, dark straight-leg trousers and neutral walking shoes"
+ },
+ "6.66_시민여4": {
+  "dir": "east",
+  "g": "woman",
+  "body": "an ordinary Korean woman in her late twenties with straight black hair past the shoulders and a center part",
+  "full": "an ordinary Korean woman in her late twenties with straight black hair past the shoulders and a center part, medium-blue denim jacket over a light-gray top, dark charcoal ankle-length skirt and white sneakers"
+ },
+ "6.67_시민여5": {
+  "dir": "east",
+  "g": "woman",
+  "body": "an ordinary Korean woman in her late twenties with a neat dark-brown chin-length bob",
+  "full": "an ordinary Korean woman in her late twenties with a neat dark-brown chin-length bob, beige cardigan over a cream top, charcoal straight slacks and black loafers"
+ },
+ "6.68_시민여6": {
+  "dir": "east",
+  "g": "woman",
+  "body": "an ordinary Korean woman in her early twenties with dark-brown hair in a low ponytail and light bangs",
+  "full": "an ordinary Korean woman in her early twenties with dark-brown hair in a low ponytail and light bangs, navy crew-neck sweatshirt, wide-leg blue jeans and white sneakers"
+ },
+ "6.69_시민여7": {
+  "dir": "east",
+  "g": "woman",
+  "body": "an ordinary Korean woman in her late fifties with a short softly waved salt-and-pepper bob",
+  "full": "an ordinary Korean woman in her late fifties with a short softly waved salt-and-pepper bob, olive cardigan over a cream top, dark gray straight trousers and black flat shoes"
+ },
+ "6.70_시민여8": {
+  "dir": "east",
+  "g": "woman",
+  "body": "an ordinary Korean woman in her early twenties with straight dark-brown hair just past the shoulders and a center part, dusty-pink sweatshirt",
+  "full": "an ordinary Korean woman in her early twenties with straight dark-brown hair just past the shoulders and a center part, dusty-pink sweatshirt, dark blue straight jeans and white sneakers"
+ },
+ "6.71_시민여9": {
+  "dir": "east",
+  "g": "woman",
+  "body": "an ordinary Korean woman in her late twenties with straight black shoulder-length hair and a center part",
+  "full": "an ordinary Korean woman in her late twenties with straight black shoulder-length hair and a center part, gray-blue blouse, charcoal ankle-length trousers, black low-heeled office shoes and a small handbag at the left hip on a narrow shoulder strap"
+ }
+}
