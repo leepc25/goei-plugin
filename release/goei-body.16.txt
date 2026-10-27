@@ -1,4 +1,47 @@
-1.08); transform: translateY(-1px); }
+h-msg.npc { align-self: flex-start; }
+.ph-msg-col { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.ph-msg.me .ph-msg-col { align-items: flex-end; }
+.ph-face, .ph-face-gap { flex: none; width: 38px; height: 38px; border-radius: 13px; font-size: 14px; }
+.ph-name { font-size: 13px; font-weight: 600; color: var(--sub); margin-left: 2px; }
+.ph-line { display: flex; align-items: flex-end; gap: 6px; min-width: 0; }
+.ph-msg.me .ph-line { flex-direction: row-reverse; }
+.ph-bubble { min-width: 0; padding: 8px 13px; border-radius: 18px; background: var(--panel2); color: var(--text); font-size: 15px; line-height: 1.55; overflow-wrap: anywhere; }
+.ph-msg.npc.first .ph-bubble { border-top-left-radius: 6px; }
+/* 상대 말풍선: 대화 배경(--sunk)과 확실히 구분되게 카드 면 + 테두리 (v0.16.22) */
+.ph-msg.npc .ph-bubble { background: var(--panel2); border: 1px solid var(--line2); box-shadow: 0 1px 2px rgba(0, 0, 0, .08); }
+.gx[data-theme="light"] .ph-msg.npc .ph-bubble, .gx[data-theme="paper"] .ph-msg.npc .ph-bubble { background: var(--panel); }
+.ph-msg.me .ph-bubble { background: color-mix(in srgb, var(--signal) 22%, var(--panel)); color: var(--text); border: 1px solid color-mix(in srgb, var(--signal) 40%, transparent); }
+.ph-msg.me.first .ph-bubble { border-top-right-radius: 6px; }
+.ph-bubble p { margin: 0; }
+.ph-bubble p + p { margin-top: 4px; }
+.ph-bubble .at-card { margin: 4px 0; background: color-mix(in srgb, var(--void) 55%, transparent); border-color: transparent; color: var(--text); }
+.ph-msg.me .ph-bubble .at-card { background: color-mix(in srgb, var(--text) 8%, transparent); color: var(--text); }
+.ph-msg.me .ph-bubble .at-card small, .ph-msg.me .ph-bubble .at-ico { color: var(--sub); }
+.ph-bubble:has(> .at-card-image:only-child) { padding: 0; background: none; }
+.ph-bubble > .at-card-image:only-child { margin: 0; border-radius: 16px; }
+.ph-meta-t { flex: none; display: flex; flex-direction: column; align-items: flex-end; font-size: 11px; color: var(--dim); white-space: nowrap; line-height: 1.3; }
+.ph-msg.npc .ph-meta-t { align-items: flex-start; }
+.ph-meta-t i { font-style: normal; font-weight: 800; color: var(--amber); }
+.ph-sys { align-self: center; max-width: 90%; margin: 6px 0; padding: 4px 12px; border-radius: 999px; background: var(--panel); border: 1px solid var(--line); color: var(--sub); font-size: 13px; text-align: center; }
+.ph-sys.pause { font-style: italic; background: none; border-color: transparent; }
+.ph-typing { display: inline-flex; gap: 4px; align-items: center; padding: 12px 14px; }
+.ph-typing i { width: 7px; height: 7px; border-radius: 50%; background: var(--dim); animation: ph-dot 1.2s infinite ease-in-out; }
+.ph-typing i:nth-child(2) { animation-delay: .15s; }
+.ph-typing i:nth-child(3) { animation-delay: .3s; }
+@keyframes ph-dot { 0%, 60%, 100% { transform: translateY(0); opacity: .45; } 30% { transform: translateY(-4px); opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .ph-typing i { animation: none; } }
+.ph-retry { align-self: center; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; justify-content: center; margin: 8px 0; font-size: 13px; color: var(--amber); }
+/* 입력창: 늘 대화 아래 */
+.ph-composer { flex: none; display: flex; flex-direction: column; gap: 8px; padding: 10px 12px calc(10px + env(safe-area-inset-bottom)); border-top: 1px solid var(--panel2); background: var(--void); }
+.ph-composer .at-editor { gap: 8px; }
+.ph-compose { display: flex; align-items: flex-end; gap: 6px; }
+.ph-input { flex: 1; min-width: 0; min-height: 44px; max-height: 140px; padding: 10px 14px; border: 1px solid var(--line); border-radius: 21px; background: var(--panel); color: var(--text); font: inherit; font-size: 15px; line-height: 1.45; resize: none; field-sizing: content; }
+.ph-input:focus { outline: none; border-color: var(--accent-line); }
+.ph-plus { width: 42px; height: 42px; border-radius: 50%; }
+.ph-plus.on svg { transform: rotate(45deg); }
+.ph-send { display: grid; place-items: center; width: 44px; height: 44px; flex: none; padding: 0; border: 0; border-radius: 15px; background: var(--signal); color: var(--on-signal); box-shadow: 0 4px 12px -6px color-mix(in srgb, var(--signal) 70%, transparent); transition: transform .12s ease, filter .12s ease; }
+.ph-send svg { width: 22px; height: 22px; }
+.ph-send:hover:not(:disabled) { filter: brightness(1.08); transform: translateY(-1px); }
 .ph-send:active:not(:disabled) { transform: scale(.94); }
 .ph-back2 { display: none; }
 @media (max-width: 760px) { .ph-compose .ph-back2 { display: inline-grid; width: 44px; height: 44px; border-radius: 15px; background: var(--panel2); color: var(--text); } .ph-compose .ph-back2 svg { width: 22px; height: 22px; } }
@@ -752,6 +795,17 @@
 .nw-grab-ico.flip svg { transform: scaleX(-1); }
 .nw-panel { position: absolute; z-index: 3; top: 0; bottom: 0; left: 60px; width: 320px; max-width: calc(100% - 100px); border-right: 1px solid var(--panel2); background: var(--void); box-shadow: 10px 0 28px rgba(0, 0, 0, .32); transform: translateX(calc(-100% - 60px)); visibility: hidden; transition: transform .22s ease, visibility 0s linear .22s; }
 .list-open .nw-panel { transform: none; visibility: visible; transition: transform .22s ease; }
+/* 위키 목록 오른쪽 (설정 → 화면 → 위키 목록 위치, PC만): 세로바를 오른쪽에 두고 서랍도 오른쪽에서 */
+@media (min-width: 761px) {
+  .gx[data-wiki-side="right"] .gx-body.nw-app { grid-template-columns: minmax(0, 1fr) 60px; }
+  .gx[data-wiki-side="right"] .nw-rail { grid-column: 2; grid-row: 1; border-right: 0; border-left: 1px solid var(--panel2); }
+  .gx[data-wiki-side="right"] .nw-main { grid-column: 1; grid-row: 1; }
+  .gx[data-wiki-side="right"] .nw-grab-ico svg { transform: scaleX(-1); }
+  .gx[data-wiki-side="right"] .nw-grab-ico.flip svg { transform: none; }
+  .gx[data-wiki-side="right"] .nw-panel { left: auto; right: 60px; border-right: 0; border-left: 1px solid var(--panel2); box-shadow: -10px 0 28px rgba(0, 0, 0, .32); transform: translateX(calc(100% + 60px)); }
+  .gx[data-wiki-side="right"] .list-open .nw-panel { transform: none; }
+  .gx[data-wiki-side="right"] .list-open .nw-scrim { inset: 0 60px 0 0; }
+}
 .nw-pin { display: flex; flex-direction: column; gap: 8px; height: 100%; padding: 12px 12px 0; }
 .nw-pin .nw-search { flex: none; }
 .nw-pin .nw-list { flex: 1; min-height: 0; position: relative; display: flex; flex-direction: column; gap: 6px; overflow: hidden; margin: 0 -12px; padding: 0; }
@@ -931,25 +985,11 @@
 .dir-pic small { font-size: 11px; color: var(--dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: center; }
 @media (max-width: 760px) { .dir-pics { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 
-/* 관찰형 게임 「관리국 순찰」: 창 전체를 덮는다 (ui/game.ts) */
+/* 게임 창: 창 전체를 덮는다 (ui/game.ts) */
 .gx-panel { position: relative; }
 .gx-game { position: absolute; inset: 0; z-index: 30; display: flex; flex-direction: column; background: var(--void); }
 .gx-game .gx-head { flex: none; }
 .gx-game-box { flex: 1; min-height: 0; display: flex; }
-.gx-gp { flex: 1; display: flex; align-items: center; justify-content: center; padding: 16px; margin: 0; min-height: 0; }
-.gx-gp-card { display: flex; flex-direction: column; gap: 10px; width: min(420px, 100%); padding: 20px; margin: 0; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); box-sizing: border-box; }
-.gx-gp-card b { font-size: 16px; }
-.gx-gp-card p { margin: 0; color: var(--dim); }
-.gx-gp-card .gx-gp-msg { color: var(--text); padding: 8px 12px; border-radius: 8px; background: var(--panel2); }
-.gx-gp-act { display: flex; gap: 8px; margin-top: 6px; }
-.gx-gp-btn { flex: 1; min-height: 42px; padding: 0 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel2); color: var(--text); font: inherit; font-weight: 700; cursor: pointer; }
-.gx-gp-btn.primary { border-color: var(--signal); background: var(--accent-bg); color: var(--signal); }
-.gx-gp-btn[disabled] { opacity: .5; cursor: default; }
-@media (max-width: 760px) {
-  .gx-gp { align-items: stretch; }
-  .gx-gp-card { width: 100%; }
-  .gx-gp-act { margin-top: auto; flex-direction: column; }
-}
 
 /* 명부 위 한 줄 도구 (검색 · 추가 · 사용법). 추가 칸·사용법은 누를 때만 펼친다 */
 .dir-tools { display: flex; gap: 8px; align-items: stretch; }
@@ -1916,24 +1956,9 @@ button.mk-go:hover { color: var(--signal); }
 .gx-wallet { width: 100%; padding: 0; border: 0; background: none; color: var(--text); font: inherit; cursor: pointer; font-variant-numeric: tabular-nums; }
 .gx-wallet em { font-weight: 700; }
 .gx-wallet:hover em { color: var(--signal); }
-.gx-walpop { position: absolute; z-index: 41; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(420px, calc(100% - 24px)); max-height: calc(100% - 24px); overflow-y: auto; box-sizing: border-box; padding: 14px 16px 16px; border: 1px solid var(--line); border-radius: 16px; background: var(--panel); color: var(--text); display: flex; flex-direction: column; gap: 10px; }
-.gx-walpop-head { display: flex; align-items: center; gap: 10px; }
-.gx-walpop-head b { font-size: 15px; }
-.gx-walpop-head > span { margin-left: auto; font-weight: 800; font-variant-numeric: tabular-nums; }
-.gx-walpop .gx-muted { margin: 0; font-size: 12px; }
-.gx-wl { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
-.gx-wl li { display: grid; grid-template-columns: 1fr auto auto; gap: 8px; align-items: center; padding: 6px 0; border-bottom: 1px solid color-mix(in srgb, var(--line) 60%, transparent); font-size: 13px; }
-.gx-wl li:last-child { border-bottom: 0; }
-.gx-wl-memo { display: flex; flex-direction: column; min-width: 0; }
-.gx-wl-memo small { font-size: 11px; color: var(--dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.gx-wl b { font-variant-numeric: tabular-nums; }
-.gx-wl b.in { color: var(--signal); }
-.gx-wl b.out { color: var(--danger, #e0656a); }
 .gx-wl-x { border: 0; background: none; color: var(--dim); cursor: pointer; font-size: 12px; padding: 2px 4px; }
 .gx-wl-x:hover { color: var(--text); }
 .gx-wl-empty { color: var(--dim); }
-.gx-wl-adj { display: flex; gap: 6px; }
-.gx-wl-adj input { flex: 1; min-width: 0; padding: 6px 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel2); color: var(--text); font: inherit; font-size: 13px; }
 
 /* ── 조작 모양 통일 (2026-10-27 사용자: 단추·칩·선택 상자가 제각각이면 안 된다) ──
    높이 32 · 모서리 8 · 글자 13 · 아이콘 15 · 테두리 1 — 어느 화면이든 같은 모양 */
@@ -1969,6 +1994,67 @@ button.mk-go:hover { color: var(--signal); }
 .gx-switch-wrap small { font-size: 11.5px; color: var(--dim); white-space: nowrap; }
 /* 범위 배지: 이 줄의 값이 어디에 저장되나 (이 기기 공통) */
 .gx-scope { display: inline-block; margin-left: 6px; padding: 1px 6px; border-radius: 5px; font-style: normal; font-size: 10.5px; font-weight: 500; color: var(--dim); background: var(--panel2); vertical-align: middle; }
+
+/* 가계부 탭 (src/ui/wallet.ts) */
+.gx-hwallet { display: none; align-self: center; height: 34px; padding: 0 10px; border: 1px solid var(--line); border-radius: 11px; background: var(--panel2); color: var(--text); font: inherit; font-size: 13px; font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; cursor: pointer; }
+@media (max-width: 760px) { .gx-hwallet { display: inline-flex; align-items: center; } }
+.gx-wallettab { display: flex; flex-direction: column; gap: 14px; }
+.gx-wallettab section { padding: 0; }
+.gx-wt-day + .gx-wt-day { margin-top: 10px; }
+.gx-wallettab .in { color: var(--signal); }
+.gx-wallettab .out { color: var(--danger); }
+.gx-wt-tiles { display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; gap: 12px; }
+.gx-wallettab .gx-wt-tile { position: relative; display: flex; flex-direction: column; gap: 4px; min-width: 0; padding: 14px 16px; border: 1px solid var(--line); border-radius: 16px; background: var(--panel); }
+.gx-wt-tile small { font-size: 12.5px; font-weight: 700; color: var(--dim); }
+.gx-wt-tile > b, .gx-wt-balrow b { font-size: 22px; font-weight: 900; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.gx-wt-sub { font-size: 12.5px; color: var(--dim); }
+.gx-wallettab .gx-wt-tile.bal { background: linear-gradient(135deg, color-mix(in srgb, var(--signal) 18%, var(--panel)), var(--panel) 75%); border-color: color-mix(in srgb, var(--signal) 40%, var(--line)); }
+.gx-wt-balrow { display: flex; align-items: center; gap: 6px; }
+.gx-wt-balrow b { font-size: 30px; }
+.gx-wt-pen { display: grid; place-items: center; width: 32px; height: 32px; padding: 0; border: 0; border-radius: 9px; background: transparent; color: var(--dim); cursor: pointer; }
+.gx-wt-pen:hover { background: var(--panel2); color: var(--text); }
+.gx-wt-pen svg { width: 18px; height: 18px; }
+.gx-wt-edit { display: flex; gap: 6px; }
+.gx-wt-edit input { flex: 1; min-width: 0; height: 34px; padding: 0 10px; border: 1px solid var(--line); border-radius: 9px; background: var(--panel); color: var(--text); font: inherit; font-size: 14px; }
+.gx-wt-tools { display: flex; align-items: center; gap: 8px; }
+.gx-wt-chips { display: flex; gap: 6px; }
+.gx-wt-chip { padding: 7px 14px; border: 1px solid var(--line); border-radius: 999px; background: var(--panel); color: var(--dim); font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
+.gx-wt-chip.on { border-color: var(--text); background: var(--text); color: var(--void); }
+.gx-wt-q { flex: 1; max-width: 320px; min-width: 0; height: 36px; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); color: var(--text); font: inherit; font-size: 13.5px; }
+.gx-wt-list { display: flex; flex-direction: column; gap: 4px; }
+.gx-wt-empty { margin: 8px 4px; color: var(--dim); font-size: 13.5px; }
+.gx-wt-day h3 { display: flex; justify-content: space-between; margin: 4px 4px 6px; font-size: 13px; font-weight: 800; color: var(--dim); }
+.gx-wt-day h3 em { font-style: normal; font-variant-numeric: tabular-nums; }
+.gx-wt-day ul { list-style: none; margin: 0; padding: 0; overflow: hidden; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+.gx-wt-row { display: grid; grid-template-columns: minmax(0, 1fr) 36px; align-items: center; border-bottom: 1px solid color-mix(in srgb, var(--line) 55%, transparent); }
+.gx-wt-row:last-child { border-bottom: 0; }
+.gx-wt-main { display: grid; grid-template-columns: 36px minmax(0, 1fr) auto; align-items: center; gap: 14px; min-width: 0; padding: 11px 6px 11px 16px; border: 0; background: none; color: var(--text); font: inherit; text-align: left; cursor: pointer; }
+.gx-wt-ic { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 10px; background: var(--panel2); color: var(--dim); }
+.gx-wt-ic svg { width: 18px; height: 18px; }
+.gx-wt-ic.field { background: var(--accent-bg); color: var(--signal); }
+.gx-wt-ic.manual { background: var(--amber-bg, var(--panel2)); color: var(--amber, var(--dim)); }
+.gx-wt-memo { display: flex; flex-direction: column; min-width: 0; }
+.gx-wt-memo b { font-size: 15px; font-weight: 700; }
+.gx-wt-memo small { overflow: hidden; font-size: 12.5px; color: var(--dim); white-space: nowrap; text-overflow: ellipsis; }
+.gx-wt-row.open .gx-wt-memo small { white-space: normal; }
+.gx-wt-amt { display: flex; flex-direction: column; align-items: flex-end; font-variant-numeric: tabular-nums; }
+.gx-wt-amt b { font-size: 15.5px; font-weight: 800; white-space: nowrap; }
+.gx-wt-amt small { font-size: 12px; color: var(--dim); }
+.gx-wt-del { visibility: hidden; display: grid; place-items: center; width: 28px; height: 28px; padding: 0; border: 0; border-radius: 8px; background: var(--danger-bg, var(--panel2)); color: var(--danger); font-size: 12px; cursor: pointer; }
+.gx-wt-row:hover .gx-wt-del, .gx-wt-row.open .gx-wt-del, .gx-wt-del:focus-visible { visibility: visible; }
+.gx-wt-row:hover, .gx-wt-row.open { background: color-mix(in srgb, var(--signal) 5%, var(--panel)); }
+@media (max-width: 760px) {
+  .gx-wt-tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .gx-wallettab .gx-wt-tile.bal { grid-column: 1 / -1; }
+  .gx-wallettab .gx-wt-tile { padding: 12px; }
+  .gx-wt-tile > b { font-size: 17px; }
+  .gx-wt-balrow b { font-size: 28px; }
+  .gx-wt-tools { flex-wrap: wrap; }
+  .gx-wt-q { flex-basis: 100%; max-width: none; }
+  .gx-wt-main { gap: 12px; padding-left: 12px; }
+  .gx-wt-row:hover .gx-wt-del { visibility: hidden; }
+  .gx-wt-row.open .gx-wt-del { visibility: visible; }
+}
 `;
 
   // src/ui/mbar.ts
@@ -2162,179 +2248,4 @@ button.mk-go:hover { color: var(--signal); }
   var views = /* @__PURE__ */ new Map();
   function mapZoomControls(nation = false) {
     return `<div class="gx-zoom" aria-label="지도 확대">
-      <button class="gx-zbtn reset" data-zoom="reset" aria-label="원래 크기"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
-      <button class="gx-zbtn" data-zoom="in" aria-label="확대">+</button>
-      <button class="gx-zbtn" data-zoom="out" aria-label="축소">−</button>
-      ${nation ? '<button class="gx-zbtn txt" data-action="map-region" data-value="01" aria-label="전국 지도">전국</button>' : ""}
-    </div>`;
-  }
-  function clamp2(v, cw, ch, lw, lh) {
-    const z = Math.min(MAX, Math.max(1, v.z));
-    const fit = (p, c, l) => l * z <= c ? (c - l * z) / 2 : Math.min(0, Math.max(c - l * z, p));
-    return { z, x: fit(v.x, cw, lw), y: fit(v.y, ch, lh) };
-  }
-  function bindMapZoom(root3) {
-    const canvas = root3.querySelector(".gx-canvas[data-map]");
-    const layer2 = canvas?.querySelector(".gx-mapzoom");
-    if (!canvas || !layer2) return;
-    const key2 = canvas.dataset.map ?? "";
-    let v = views.get(key2) ?? { z: 1, x: 0, y: Number.NaN };
-    const canPan = () => layer2.offsetWidth * v.z > canvas.clientWidth + 1 || layer2.offsetHeight * v.z > canvas.clientHeight + 1;
-    const apply = () => {
-      if (Number.isNaN(v.y)) v = { ...v, y: (canvas.clientHeight - layer2.offsetHeight) / 2 };
-      v = clamp2(v, canvas.clientWidth, canvas.clientHeight, layer2.offsetWidth, layer2.offsetHeight);
-      views.set(key2, v);
-      layer2.style.transform = v.z === 1 && !v.x && !v.y ? "" : `translate(${v.x}px, ${v.y}px) scale(${v.z})`;
-      layer2.style.setProperty("--pz", String(Math.pow(v.z, 0.25) / v.z));
-      canvas.classList.toggle("zoomed", v.z > 1);
-      canvas.classList.toggle("pan", canPan());
-    };
-    const zoomAt = (z, cx, cy) => {
-      const nz = Math.min(MAX, Math.max(1, z));
-      v = { z: nz, x: cx - (cx - v.x) / v.z * nz, y: cy - (cy - v.y) / v.z * nz };
-      apply();
-    };
-    const local = (px, py) => {
-      const r = canvas.getBoundingClientRect();
-      return [px - r.left - canvas.clientLeft, py - r.top - canvas.clientTop];
-    };
-    const img = canvas.querySelector(".gx-mapimg");
-    if (img && !img.complete) img.addEventListener("load", apply, { once: true });
-    apply();
-    canvas.querySelector(".gx-zoom")?.addEventListener("click", (e) => {
-      const b = e.target.closest("[data-zoom]");
-      if (!b) return;
-      e.stopPropagation();
-      const w = canvas.clientWidth / 2, h = canvas.clientHeight / 2;
-      if (b.dataset.zoom === "reset") v = { z: 1, x: 0, y: Number.NaN }, apply();
-      else zoomAt(v.z * (b.dataset.zoom === "in" ? 1.6 : 1 / 1.6), w, h);
-    });
-    let dragged = false;
-    canvas.addEventListener("click", (e) => {
-      if (dragged && !e.target.closest(".gx-zoom")) e.stopPropagation(), e.preventDefault();
-      dragged = false;
-    }, true);
-    let start3 = null;
-    const dist = (t) => Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
-    canvas.addEventListener("touchstart", (e) => {
-      const t = e.touches;
-      dragged = false;
-      if (e.target.closest(".gx-zoom")) return start3 = null;
-      if (t.length === 2) {
-        const [mx, my] = local((t[0].clientX + t[1].clientX) / 2, (t[0].clientY + t[1].clientY) / 2);
-        start3 = { d: dist(t), mx, my, v: { ...v }, x: t[0].clientX, y: t[0].clientY };
-      } else if (t.length === 1) start3 = { d: 0, mx: 0, my: 0, v: { ...v }, x: t[0].clientX, y: t[0].clientY };
-    }, { passive: true });
-    canvas.addEventListener("touchmove", (e) => {
-      const t = e.touches;
-      if (!start3) return;
-      if (t.length === 2 && start3.d) {
-        e.preventDefault();
-        dragged = true;
-        const [mx, my] = local((t[0].clientX + t[1].clientX) / 2, (t[0].clientY + t[1].clientY) / 2);
-        const nz = Math.min(MAX, Math.max(1, start3.v.z * dist(t) / start3.d));
-        v = { z: nz, x: mx - (start3.mx - start3.v.x) / start3.v.z * nz, y: my - (start3.my - start3.v.y) / start3.v.z * nz };
-        apply();
-      } else if (t.length === 1 && canPan() && !start3.d) {
-        e.preventDefault();
-        const dx = t[0].clientX - start3.x, dy = t[0].clientY - start3.y;
-        if (Math.hypot(dx, dy) > MOVE) dragged = true;
-        v = { ...start3.v, x: start3.v.x + dx, y: start3.v.y + dy };
-        apply();
-      }
-    }, { passive: false });
-    canvas.addEventListener("touchend", (e) => {
-      const t = e.touches;
-      start3 = t.length === 1 ? { d: 0, mx: 0, my: 0, v: { ...v }, x: t[0].clientX, y: t[0].clientY } : null;
-    }, { passive: true });
-    canvas.addEventListener("wheel", (e) => {
-      if (!e.ctrlKey) return;
-      e.preventDefault();
-      const [cx, cy] = local(e.clientX, e.clientY);
-      zoomAt(v.z * Math.exp(-e.deltaY / 200), cx, cy);
-    }, { passive: false });
-    canvas.addEventListener("pointerdown", (e) => {
-      if (e.pointerType !== "mouse" || e.button !== 0 || !canPan() || e.target.closest(".gx-zoom")) return;
-      const sx = e.clientX, sy = e.clientY, sv = { ...v };
-      dragged = false;
-      const move = (m) => {
-        const dx = m.clientX - sx, dy = m.clientY - sy;
-        if (Math.hypot(dx, dy) > MOVE) dragged = true;
-        if (dragged) v = { ...sv, x: sv.x + dx, y: sv.y + dy }, apply();
-      };
-      const up = () => (window.removeEventListener("pointermove", move), window.removeEventListener("pointerup", up));
-      window.addEventListener("pointermove", move);
-      window.addEventListener("pointerup", up);
-    });
-  }
-
-  // src/host/game/fetch.ts
-  var GAME_BASE = UPDATE_BASE ? `${UPDATE_BASE}/game` : "";
-  var GameFileError = class extends Error {
-  };
-  var fetchStats = { requests: 0, bytes: 0 };
-  var TIMEOUT_MS = 2e4;
-  var TRIES = 3;
-  function timeout(p, ms, what) {
-    let t;
-    return Promise.race([p, new Promise((_, rej) => t = setTimeout(() => rej(new Error(`${what} ${ms / 1e3}초 응답 없음`)), ms))]).finally(() => clearTimeout(t));
-  }
-  var fetchLog = [];
-  async function getBytes2(name) {
-    if (!GAME_BASE) throw new GameFileError("받을 곳이 정해지지 않았어요. 파일로 넣어 주세요.");
-    const why = [];
-    for (let attempt = 1; attempt <= TRIES; attempt++) {
-      const url = `${GAME_BASE}/${name}?t=${Date.now()}`;
-      const legacy = risuai.risuFetch;
-      if (legacy) {
-        try {
-          const r = await timeout(legacy(url, { method: "GET", plainFetchForce: true, rawResponse: true, headers: { "Content-Type": "text/plain" } }), TIMEOUT_MS, "risuFetch");
-          const b = r?.ok ? toBytes3(r.data) : null;
-          if (b?.length) return count(b);
-          why.push(`risuFetch ${r?.ok ? "빈 응답" : `실패(${r?.status ?? "?"})`}`);
-        } catch (e) {
-          why.push(e instanceof Error ? e.message : String(e));
-        }
-      }
-      try {
-        const res = await timeout(risuai.nativeFetch(url, { method: "GET" }), TIMEOUT_MS, "nativeFetch");
-        if (res.ok) {
-          const b = new Uint8Array(await timeout(res.arrayBuffer(), TIMEOUT_MS, "nativeFetch 본문"));
-          if (b.length) return count(b);
-          why.push("nativeFetch 빈 응답");
-        } else why.push(`nativeFetch 실패(${res.status})`);
-      } catch (e) {
-        why.push(e instanceof Error ? e.message : String(e));
-      }
-      if (attempt < TRIES) await new Promise((r) => setTimeout(r, 1e3 * attempt));
-    }
-    const msg = `${name} 받기 실패: ${why.join(" · ")}`;
-    fetchLog.push(msg);
-    console.log(`[goei] ${msg}`);
-    throw new GameFileError(`${name}을(를) ${TRIES}번 시도했지만 받지 못했어요 (${why.slice(-2).join(" · ")}). 다시 받기를 눌러 주세요.`);
-  }
-  function count(b) {
-    fetchStats.requests++;
-    fetchStats.bytes += b.length;
-    return b;
-  }
-  var getText3 = async (name) => new TextDecoder().decode(await getBytes2(name)).replace(/^﻿/, "");
-  async function getParts(parts, onPart) {
-    const bufs = [];
-    for (const [i, p] of parts.entries()) {
-      bufs.push(await getBytes2(p));
-      onPart?.(i + 1, parts.length);
-    }
-    const out = new Uint8Array(bufs.reduce((n2, b) => n2 + b.length, 0));
-    let at = 0;
-    for (const b of bufs) out.set(b, at), at += b.length;
-    return out;
-  }
-  var index = null;
-  function gameIndex() {
-    index ??= (async () => {
-      let v;
-      try {
-        v = JSON.parse(await getText3("index.json"));
-      } catch {
-        throw new GameFileError("게임 파일 목록을 받지 못
+      <button class="gx-zbtn reset" data-zoom="reset" aria-label="원래 크기"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5

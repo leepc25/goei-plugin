@@ -9,6 +9,7 @@ import { gameTalk } from './talk';
 import { createVisit } from './visit';
 import { createField } from './field';
 import { createPeople } from './people';
+import { createWallet } from './wallet';
 import type { ViewportCtl } from './viewport';
 
 export function makeBridge(viewport: ViewportCtl, slot: SlotId, close: () => void, onHidden?: GameBridge['onHidden']): GameBridge {
@@ -18,6 +19,7 @@ export function makeBridge(viewport: ViewportCtl, slot: SlotId, close: () => voi
     visit: createVisit(),
     field: createField(),
     people: createPeople(),
+    wallet: createWallet(),
     slot,
     saves: gameSaves,
     assets: gameAssets,

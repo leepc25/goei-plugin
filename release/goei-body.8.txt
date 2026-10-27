@@ -1,4 +1,25 @@
-;
+.replace(/\\/g, "/").match(/(?:^|\/)assets\/([^/?#]+)$/);
+    return m ? `assets/${m[1]}` : null;
+  }
+  async function photoFrom(src) {
+    if (!src) return null;
+    if (src.startsWith("data:")) return src;
+    const path = assetPathOf(src);
+    if (!path) return null;
+    const data = await risuai.readImage(path);
+    if (typeof data === "string") return data.startsWith("data:") ? data : null;
+    const bytes = toBytes(data);
+    if (!bytes?.length) return null;
+    const ext = path.split(".").pop()?.toLowerCase() ?? "";
+    return URL.createObjectURL(new Blob([bytes], { type: MIME[ext] ?? "image/png" }));
+  }
+  async function readUser() {
+    let name = cached.name;
+    let photo = cached.photo;
+    try {
+      const doc2 = await risuai.getRootDocument();
+      const box = await doc2.querySelector("[data-goei-user]");
+      const html = box ? await box.getInnerHTML() : "";
       const shownName2 = unescape(html.match(/<b[^>]*data-goei-uname[^>]*>([^<]*)<\/b>/)?.[1] ?? "").trim();
       if (shownName2 && shownName2 !== "{{user}}") {
         if (shownName2 !== name) await risuai.pluginStorage.setItem(NAME_KEY, shownName2).catch(() => {
@@ -554,14 +575,14 @@ ${next.content.trim()}`;
     const next = books.map((e) => {
       if (!managedHere(e, kinds) || isVirtual(e)) return e;
       const content = str4(e.content);
-      const on2 = hasDontActivate(content);
+      const on3 = hasDontActivate(content);
       const keep = mode2 === "plugin" || kinds.get(str4(e.folder)) === "appendix" && locked.has(str4(e.comment));
-      if (keep && !on2) {
+      if (keep && !on3) {
         n2++;
         return { ...e, content: `${DONT_ACTIVATE}
 ${content}` };
       }
-      if (!keep && on2) {
+      if (!keep && on3) {
         n2++;
         return { ...e, content: content.replace(/^\s*@@dont_activate[ \t]*\r?\n?/m, "") };
       }
@@ -626,8 +647,8 @@ ${content}` };
     cache6.set(books, out);
     return out;
   }
-  function around(text, start3, end) {
-    let a = start3;
+  function around(text, start4, end) {
+    let a = start4;
     for (let n2 = 0; a > 0 && n2 < 2; ) if (/\s/.test(text[--a])) n2++;
     let b = end;
     for (let n2 = 0; b < text.length && n2 < 2; b++) if (/\s/.test(text[b])) n2++;
@@ -652,15 +673,15 @@ ${content}` };
       for (const key2 of e.keys) {
         key2.re.lastIndex = 0;
         for (const m of lower.matchAll(key2.re)) {
-          const start3 = m.index ?? 0;
-          const end = start3 + m[0].length;
-          const r = key2.en ? { ok: true, honor: EN_TITLE.test(lower.slice(Math.max(0, start3 - 16), start3)) } : rightOk(lower, end);
+          const start4 = m.index ?? 0;
+          const end = start4 + m[0].length;
+          const r = key2.en ? { ok: true, honor: EN_TITLE.test(lower.slice(Math.max(0, start4 - 16), start4)) } : rightOk(lower, end);
           if (!r.ok) continue;
           const tail2 = lower.slice(end).replace(/^\s+/, "");
-          const quoted = OPEN.includes(lower[start3 - 1] ?? "") && CLOSE.includes(lower[end] ?? "");
-          const before = lower.slice(Math.max(0, start3 - 20), start3).trimEnd();
+          const quoted = OPEN.includes(lower[start4 - 1] ?? "") && CLOSE.includes(lower[end] ?? "");
+          const before = lower.slice(Math.max(0, start4 - 20), start4).trimEnd();
           const marked = quoted || MARKERS2.some((w) => tail2.startsWith(w)) || e.groups.some((g) => g && before.endsWith(g.toLowerCase()));
-          hits.push({ entry: ei, key: key2, start: start3, end, marked, honor: r.honor, snippet: around(text, start3, end) });
+          hits.push({ entry: ei, key: key2, start: start4, end, marked, honor: r.honor, snippet: around(text, start4, end) });
         }
       }
     });
@@ -746,8 +767,8 @@ ${content}` };
         used += n2;
         keep.push(p);
       }
-      const on2 = new Set(keep.map((p) => p.entry.name));
-      list4 = keep.filter((p) => !p.entry.appendix?.when.needParent || on2.has(p.entry.appendix.parent));
+      const on3 = new Set(keep.map((p) => p.entry.name));
+      list4 = keep.filter((p) => !p.entry.appendix?.when.needParent || on3.has(p.entry.appendix.parent));
     }
     return sortPicks(list4);
   }
@@ -768,10 +789,10 @@ ${content}` };
         if (who) add(i, "agent", group6[0], who, 20);
       }
     });
-    const on2 = new Set([...picks.values()].map((p) => p.entry.name));
+    const on3 = new Set([...picks.values()].map((p) => p.entry.name));
     entries2.forEach((e, i) => {
       const a = e.appendix;
-      if (a?.when.withParent && a.parent && on2.has(a.parent)) add(i, "parent", a.parent, a.parent, 10);
+      if (a?.when.withParent && a.parent && on3.has(a.parent)) add(i, "parent", a.parent, a.parent, 10);
     });
     const parentOn = new Set([...picks.values()].filter((p) => !p.entry.appendix).map((p) => p.entry.name));
     const unlocked = new Set(state.unlocked ?? []);
@@ -782,9 +803,9 @@ ${content}` };
     }
   }
   function lockedAppendices(entries2, picks, unlocked) {
-    const on2 = new Set(picks.map((p) => p.entry.name));
+    const on3 = new Set(picks.map((p) => p.entry.name));
     const done2 = new Set(unlocked);
-    return entries2.filter((e) => e.appendix?.when.unlock && !done2.has(e.name) && e.appendix.parent && on2.has(e.appendix.parent));
+    return entries2.filter((e) => e.appendix?.when.unlock && !done2.has(e.name) && e.appendix.parent && on3.has(e.appendix.parent));
   }
   function unlockHint(e) {
     return `[Locked appendix: 「${e.name}」] Hidden information about ${e.appendix.parent} that no character knows yet. Unlock it when this happens in the story: ${e.appendix.when.unlock}
@@ -959,8 +980,8 @@ ${block2.trim()}` };
     }
     const n2 = userName.trim();
     if (n2 && agentName && n2 !== agentName && n2.length >= 2 && !/^(?:user|나|유저)$/i.test(n2)) {
-      const esc31 = n2.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-      const re = new RegExp(/^[A-Za-z]/.test(n2) ? `\\b${esc31}\\b` : esc31, "g");
+      const esc32 = n2.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const re = new RegExp(/^[A-Za-z]/.test(n2) ? `\\b${esc32}\\b` : esc32, "g");
       out = out.map((m) => typeof m?.content === "string" && re.test(m.content) ? { ...m, content: m.content.replace(re, agentName) } : m);
     }
     return out;
@@ -1317,8 +1338,8 @@ The previous response was rejected and nothing was saved. Recreate the complete 
     if (!isOnOff(items)) return null;
     const onV = items.find(([, l]) => l === "ON")[0];
     const offV = items.find(([, l]) => l === "OFF")[0];
-    const on2 = cur === onV;
-    return switchHtml({ action, value: valueOf(on2 ? offV : onV), on: on2, disabled });
+    const on3 = cur === onV;
+    return switchHtml({ action, value: valueOf(on3 ? offV : onV), on: on3, disabled });
   }
 
   // src/host/photo.ts
@@ -1572,8 +1593,8 @@ The previous response was rejected and nothing was saved. Recreate the complete 
       }
       try {
         const db = await risuai.getDatabase(["modules", "enabledModules"]);
-        const on2 = new Set(db?.enabledModules ?? []);
-        const mods = [...db?.modules ?? []].sort((a, b) => Number(on2.has(b.id)) - Number(on2.has(a.id)));
+        const on3 = new Set(db?.enabledModules ?? []);
+        const mods = [...db?.modules ?? []].sort((a, b) => Number(on3.has(b.id)) - Number(on3.has(a.id)));
         rows2 = rows2.concat(mods.flatMap((m) => Array.isArray(m.assets) ? m.assets.filter(isRow) : []));
       } catch {
       }
@@ -1771,7 +1792,7 @@ The previous response was rejected and nothing was saved. Recreate the complete 
     const role = [p.department, p.rank].filter(Boolean).join(" · ");
     return `<span class="gx-acard-side">${avatar(char, p.english, p.name, "sq")}${act}</span><span class="gx-acard-txt"><span class="gx-acard-top"><b>${escAttr(p.name)}</b>${stChip(st)}</span>${role ? `<small>${escAttr(role)}</small>` : ""}${situation ? `<span class="gx-acard-sit">${escAttr(situation)}</span>` : ""}</span>`;
   }
-  function showIdCard(html) {
+  function showIdCard(html, act) {
     const box = document.createElement("div");
     box.className = "gx gx-agpop gx-idpop";
     box.setAttribute("role", "dialog");
@@ -1779,6 +1800,12 @@ The previous response was rejected and nothing was saved. Recreate the complete 
     const theme = document.querySelector(".gx")?.getAttribute("data-theme");
     if (theme) box.setAttribute("data-theme", theme);
     box.addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-action]");
+      if (btn && act && box.contains(btn)) {
+        box.remove();
+        act(btn.dataset.action, btn.dataset.value);
+        return;
+      }
       if (e.target.closest(".gx-idpop-card") && !e.target.closest(".gx-agpop-x")) return;
       box.remove();
     });
@@ -1914,12 +1941,12 @@ The previous response was rejected and nothing was saved. Recreate the complete 
   function closeDrawer() {
     open = false;
   }
-  function set(box, on2) {
-    open = on2;
-    box.classList.toggle("open", on2);
+  function set(box, on3) {
+    open = on3;
+    box.classList.toggle("open", on3);
     const grip = box.querySelector(".ph-grip");
-    grip?.setAttribute("aria-expanded", String(on2));
-    grip?.setAttribute("aria-label", on2 ? "도구 접기" : "도구 펼치기");
+    grip?.setAttribute("aria-expanded", String(on3));
+    grip?.setAttribute("aria-label", on3 ? "도구 접기" : "도구 펼치기");
   }
   function bindDrawer(root3, onSide) {
     const box = root3.querySelector(".ph-drawer");
@@ -2082,8 +2109,8 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
   }
   function chips(f, items, state) {
     return `<div class="ps-row adv-chips"><div class="gx-chips">${items.map((i) => {
-      const on2 = advValue(state, f, i.key) === "1";
-      return `<button class="gx-chip${on2 ? " on" : ""}" data-action="adv-set" data-value="${f}:${i.key}=${on2 ? "0" : "1"}" aria-pressed="${on2}">${esc6(i.label)}</button>`;
+      const on3 = advValue(state, f, i.key) === "1";
+      return `<button class="gx-chip${on3 ? " on" : ""}" data-action="adv-set" data-value="${f}:${i.key}=${on3 ? "0" : "1"}" aria-pressed="${on3}">${esc6(i.label)}</button>`;
     }).join("")}</div></div>`;
   }
   function advSections(f, state, extra = {}) {
@@ -2667,8 +2694,8 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
     return `<ul class="ph-list ph-contacts">${rows2.map((c) => {
       const room = st.rooms[`dm_${c.id}`];
       const confirm2 = phone.confirm === `contact:${c.id}`;
-      const on2 = phone.view === "room" && phone.room === `dm_${c.id}`;
-      return `<li class="ph-row"><button class="ph-main${on2 ? " on" : ""}" data-action="ph-dm" data-value="${c.id}">${face(ctx2, c, c.name)}
+      const on3 = phone.view === "room" && phone.room === `dm_${c.id}`;
+      return `<li class="ph-row"><button class="ph-main${on3 ? " on" : ""}" data-action="ph-dm" data-value="${c.id}">${face(ctx2, c, c.name)}
             <span class="ph-who"><span class="ph-who-name"><b>${esc7(c.name)}</b>${c.agentId && states[c.agentId] ? stChip(states[c.agentId]) : ""}${talking(room)}</span><small>${esc7(contactDetails(c) || (c.custom ? c.note || "직접 추가한 연락처" : fnames[c.group ?? ""] ?? ""))}</small></span>
             ${badge(room?.unread ?? 0)}</button>
             <span class="ph-act"><button class="ph-tool sm" data-action="ph-call" data-value="${esc7(c.name)}" title="전화" aria-label="${esc7(c.name)}에게 전화">${ICONS.call}</button>
@@ -2696,8 +2723,8 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
       const last2 = [...r.messages].reverse().find((m) => m.kind === "message") ?? r.messages[r.messages.length - 1];
       const who = r.kind === "dm" ? d.map.get(r.members[0]) ?? r.people[r.members[0]] : null;
       const preview = r.pending ? "답장을 기다리는 중…" : last2 ? last2.kind === "message" ? `${last2.sender === "me" ? "나: " : ""}${previewText(last2.text)}` : last2.text : "";
-      const on2 = phone.view === "room" && phone.room === r.id;
-      return `<li class="ph-row"><button class="ph-main${on2 ? " on" : ""}" data-action="ph-room" data-value="${esc7(r.id)}">${r.kind === "group" ? `<span class="ph-avatar group">${ICONS.group}<i>${r.members.length + 1}</i></span>` : face(ctx2, who ?? void 0, roomLabel(r))}
+      const on3 = phone.view === "room" && phone.room === r.id;
+      return `<li class="ph-row"><button class="ph-main${on3 ? " on" : ""}" data-action="ph-room" data-value="${esc7(r.id)}">${r.kind === "group" ? `<span class="ph-avatar group">${ICONS.group}<i>${r.members.length + 1}</i></span>` : face(ctx2, who ?? void 0, roomLabel(r))}
         <span class="ph-who"><span class="ph-who-top"><b>${esc7(roomLabel(r))}</b>${last2 ? `<small class="ph-time">${esc7(shortTime(last2.time))}</small>` : ""}</span>
         <span class="ph-who-bot"><small class="${r.pending ? "ph-wait" : ""}">${esc7([...preview].slice(0, 60).join(""))}</small>${badge(r.unread)}</span></span></button>${roomDel(r.id, !!r.pending, roomLabel(r))}</li>`;
     }).join("")}</ul>`;
@@ -2841,11 +2868,11 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
   }
   function noticeList(items, label2) {
     return `<ul class="ph-list ph-notices">${items.map((r) => {
-      const on2 = phone.view === "notice" && phone.openNotice === r.id;
+      const on3 = phone.view === "notice" && phone.openNotice === r.id;
       const confirm2 = phone.confirm === `notice:${r.id}`;
       const del = confirm2 ? `<button class="gx-mini danger ph-ndel" data-action="ph-notice-del" data-value="${r.id}">정말 삭제</button>` : `<button class="ph-tool sm ph-ndel" data-action="ph-notice-del" data-value="${r.id}" title="삭제" aria-label="${esc7(r.title)} 삭제">${ICONS.trash}</button>`;
       const open3 = phone.openNotice === r.id;
-      return `<li class="ph-notice${on2 ? " on" : ""}${open3 ? " open" : ""}${r.read === false ? " new" : ""}"><button class="ph-ncard" data-action="ph-notice" data-value="${r.id}" aria-pressed="${on2}" aria-expanded="${open3}">
+      return `<li class="ph-notice${on3 ? " on" : ""}${open3 ? " open" : ""}${r.read === false ? " new" : ""}"><button class="ph-ncard" data-action="ph-notice" data-value="${r.id}" aria-pressed="${on3}" aria-expanded="${open3}">
         <span class="ph-ncard-top"><span class="gx-badge">${esc7(r.category)}</span><span class="ph-nfac">${esc7(label2(r.channel, r.channelName))}</span><small>${esc7(r.issuer)}${r.time ? ` · ${esc7(r.time)}` : ""}</small></span>
         <span class="ph-ncard-title"><b>${esc7(r.title)}</b>${r.read === false ? '<span class="gn-dot" aria-label="안 읽음"></span>' : ""}</span>
 </button>${del}
@@ -3784,25 +3811,25 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
   function boardList(st, busy5, mobile) {
     if (!st.posts.length) return '<div class="ph-blank"><p>게시글이 없어요.<br>새로고침을 눌러 불러오세요.</p></div>';
     return `<ul class="ph-list gn-list">${st.posts.map((p) => {
-      const on2 = gnet.open === p.id && !gnet.settings;
-      return `<li class="gn-row${on2 ? " on" : ""}${p.mine ? " mine" : ""}"><button class="gn-row-main" data-action="gn-open" data-value="${p.id}" aria-pressed="${on2}">
+      const on3 = gnet.open === p.id && !gnet.settings;
+      return `<li class="gn-row${on3 ? " on" : ""}${p.mine ? " mine" : ""}"><button class="gn-row-main" data-action="gn-open" data-value="${p.id}" aria-pressed="${on3}">
         <span class="gn-title"><b>${esc8(p.title)}</b>${p.comments.length ? `<em>${p.comments.length}</em>` : ""}${postUnread(p) ? '<span class="gn-dot" aria-label="새 댓글"></span>' : ""}</span>
         <span class="gn-row-meta"><span class="gn-row-nick">${esc8(p.nick)}</span><span>${esc8(time(p.date))}</span><span>조회 ${p.views.toLocaleString()}</span><span>추천 ${p.votes.toLocaleString()}</span></span>
-      </button>${mobile && on2 && !gnet.compose?.kind.match(/post|newdm/) ? postView(p, busy5, true) : ""}</li>`;
+      </button>${mobile && on3 && !gnet.compose?.kind.match(/post|newdm/) ? postView(p, busy5, true) : ""}</li>`;
     }).join("")}</ul>`;
   }
   function dmList(st, busy5, mobile) {
     const threads = dmThreads(st);
     if (!threads.length) return '<div class="ph-blank"><p>주고받은 쪽지가 없어요.<br>게시판에서 닉네임을 누르거나 쪽지를 눌러 보내 보세요.</p></div>';
     return `<ul class="ph-list gn-list">${threads.map((t) => {
-      const on2 = gnet.openDm === t.nick && !gnet.settings;
+      const on3 = gnet.openDm === t.nick && !gnet.settings;
       const last2 = t.rows[t.rows.length - 1];
       const confirm2 = gnet.confirm === `d:${t.nick}`;
       const del = confirm2 ? `<button class="gx-mini danger ph-rdel" data-action="gn-del-thread" data-value="${esc8(t.nick)}">정말 삭제</button>` : `<button class="ph-tool sm ph-rdel" data-action="gn-del-thread" data-value="${esc8(t.nick)}" aria-label="${esc8(t.nick)} 쪽지 삭제" title="삭제">${ICONS.trash}</button>`;
-      return `<li class="ph-row"><button class="ph-main gn-dmrow${on2 ? " on" : ""}" data-action="gn-open-dm" data-value="${esc8(t.nick)}" aria-pressed="${on2}">
+      return `<li class="ph-row"><button class="ph-main gn-dmrow${on3 ? " on" : ""}" data-action="gn-open-dm" data-value="${esc8(t.nick)}" aria-pressed="${on3}">
         <span class="ph-avatar gn-ava">${ICONS.mail}</span>
         <span class="ph-who"><span class="ph-who-top"><b>${esc8(t.nick)}</b>${t.lastDate ? `<small class="ph-time">${esc8(time(t.lastDate) || t.lastDate)}</small>` : ""}</span>
-        <span class="ph-who-bot"><small>${last2.side === "me" ? "나: " : ""}${esc8([...previewText(last2.body)].slice(0, 60).join(""))}</small>${t.unread ? `<span class="ph-badge">${t.unread}</span>` : ""}</span></span></button>${del}${mobile && on2 && gnet.compose?.kind !== "newdm" ? dmPane(st, t.nick, busy5, true) : ""}</li>`;
+        <span class="ph-who-bot"><small>${last2.side === "me" ? "나: " : ""}${esc8([...previewText(last2.body)].slice(0, 60).join(""))}</small>${t.unread ? `<span class="ph-badge">${t.unread}</span>` : ""}</span></span></button>${del}${mobile && on3 && gnet.compose?.kind !== "newdm" ? dmPane(st, t.nick, busy5, true) : ""}</li>`;
     }).join("")}</ul>`;
   }
   var row3 = (label2, control3, hint = "") => `<div class="ps-row"><div class="ps-label"><b>${label2}</b>${hint ? `<small>${hint}</small>` : ""}</div><div class="ps-ctl">${control3}</div></div>`;
@@ -3811,8 +3838,8 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
     const v = (k) => String(ctx2.chat.scriptstate?.[CFG(k)] ?? GN_DEFAULTS[k]);
     const text = (k, ph) => `<input class="gx-search ps-text" data-change="gn-text" data-key="${k}" value="${esc8(v(k) === "-" ? "" : v(k))}" placeholder="${esc8(ph)}">`;
     const keep = gnetRetention(ctx2.chat.scriptstate);
-    const on2 = v("mode") !== "0";
-    const rows2 = on2 ? `${group2(gnetLabel(ctx2.chat.scriptstate), [
+    const on3 = v("mode") !== "0";
+    const rows2 = on3 ? `${group2(gnetLabel(ctx2.chat.scriptstate), [
       row3("게시판 사용", seg2("power", "1", [["1", "ON"], ["0", "OFF"]])),
       row3("모델", seg2("mode", v("mode") === "1" ? "1" : "2", [["1", "메인"], ["2", "보조"]])),
       row3("새로고침", seg2("lazy", ["0", "open"].includes(v("lazy")) ? v("lazy") : "1", [["1", "수동"], ["open", "창을 열 때"], ["0", "매 턴"]]), LAZY_HINT[v("lazy")] ?? LAZY_HINT["1"]),
@@ -3871,24 +3898,4 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
       tool2("gn-nick", ICONS.idcard, "닉네임 바꾸기", gnet.editNick ? 'aria-pressed="true"' : "", "닉네임"),
       tool2("gn-settings", ICONS.settings, `${gnetLabel(ctx2.chat.scriptstate)} 설정`, gnet.settings ? 'aria-pressed="true"' : "", "설정")
     ].join("");
-    const subBtn = (id, label2, extra = "") => `<button class="ph-sub${gnet.sub === id ? " on" : ""}" data-action="gn-sub" data-value="${id}" aria-pressed="${gnet.sub === id}">${label2}${extra}</button>`;
-    return `<main class="gx-body ph ph-app gn ${kind ? "is-detail" : "is-list"}">
-    <section class="ph-side" aria-label="괴담넷 목록">
-      <div class="ph-side-head">
-        <div class="ph-subs">${subBtn("board", "게시판", boardUnread(st) ? '<span class="gn-dot"></span>' : "")}${subBtn("dm", "쪽지함", unreadDm ? ` <b class="gn-count">${unreadDm}</b>` : dmUnread(st) ? '<span class="gn-dot"></span>' : "")}<span class="gn-mynick" title="내 닉네임"><small>내 닉네임</small><b>${esc8(me)}</b></span></div>
-      </div>
-      ${kind ? "" : status2}
-      <div class="ph-content">${gnet.sub === "board" ? boardList(st, busy5, mobile) : dmList(st, busy5, mobile)}</div>
-      ${mobile && !kind ? inlineComposer(st, busy5) : ""}
-      ${fail3}
-      ${drawerHtml(tools, nick)}
-    </section>
-    <section class="ph-pane">${kind ? status2 : ""}${paneHtml2(ctx2, st, kind, busy5)}</section>
-    ${note}
-  </main>`;
-  }
-  var AUTO_LAST = "$gn_auto_last";
-  var quietEnv2 = { render: () => {
-  }, refresh: async () => {
-  }, current: () => null };
-  var li
+    const subBtn = (id, label2, extra = "") => `<button class="ph-sub${gnet.sub === id ? " on" : ""}" data-action="gn-sub" data-value="${id}" aria-pressed="${gnet.sub === id}">${label2}${

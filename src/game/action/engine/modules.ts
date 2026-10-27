@@ -3,7 +3,7 @@
 //   audio/ 효과음·음악 (createGameAudio)
 //   hq/    본부와 임무 흐름 (createHq)
 // 층(stage/)·적(enemy/)·아이템(items/)·대사(story/)는 들어오는 대로 여기에 잇는다. 없으면 엔진 기본(훈련장·임시 적·기본 지급품).
-import { walkSeconds, clockText, mergeClock, DOOR_S, STAIR_S } from '../../../core/fieldclock';
+import { clockText } from '../../../core/fieldclock';
 import type { GameAssets, GameBridge } from '../../bridge';
 import { persp, view } from './view';
 import { KEYMAP } from './input';
@@ -18,7 +18,7 @@ import { mountGameShell, type HudState, type Shell } from '../ui';
 import { localStore, type SettingsStore } from '../ui/settings';
 import { navigationFeedback } from './navigationFeedback';
 import { syncNavigationButton } from '../ui/navigationButton';
-import type { GameEvent, HqModuleLike, RunConfigCore, RunResultCore, StageModule } from './contract';
+import type { Body, GameEvent, HqModuleLike, RunConfigCore, RunResultCore, StageModule } from './contract';
 import type { EngineModules, Game } from './game';
 import { DEF_BY_KIND, arenaStage, createEnemy, isThreat } from '../enemy';
 import { bindEnemyInteractions } from './enemyInteractions';
@@ -27,13 +27,27 @@ import { drawMiniMap, drawRunMap } from '../stage/runmap';
 import { CUTSCENES, VIDEOS, hqLines, mountStory, stageHooks, type AgentId, type StoryApi } from '../story';
 import type { SpeakerId } from '../story/types';
 import { itemsBlocking, linkItems, mountItemsOverlay } from './itemsLink';
-import { makeHub, type HubHost } from './hub';
+import { makeHub, silhouette, type HubHost, type HubLife } from './hub';
+import { createHqWorld, hqDistrict } from '../../world/hq';
+import { isRegionMove } from '../../world/districts';
+import { DEFAULT_CLOCK, clockRules, waitOptions, type ClockRules } from '../../world/clock';
+import { hashSeed } from '../../world/rng';
+import { observerLines } from '../../world/observer';
+import { Lines, NPC_TYPE, type DialogueData, type LineCtx } from '../../world/lines';
+import { Chatter } from '../../world/speech';
+import dialogueData from '../../world/dialogue.json';
+import type { Actor, SimEvent } from '../../world/actors';
+import type { FactionView, PersonView } from '../../bridge';
+import { FieldClock } from '../../world/clock';
+import type { WorldSim } from '../../world/actors';
 import { linkNpcTalk } from './npcLink';
 import demoPhotos from '../story/demo-photos.json';
 import { whereIs, LANE_TOP, LANE_BOT } from '../hq/map';
-import { hasVisitAgent, visitAgentFaceCanvas } from '../art/visitAgents';
-import { hasTestPeople, testPlayerFace, testPlayerTop } from '../art/testPeople';
+import { hasVisitAgent, hasVisitClip, visitAgentFaceCanvas } from '../art/visitAgents';
+import { drawTestMan, hasTestPeople, testPlayerFace, testPlayerTop } from '../art/testPeople';
 import { eileenHooks } from '../eileen/player';
+import { AiEileen } from '../eileen/aiFighter';
+import { Squad, DIFF, type Difficulty } from '../../combat/brain';
 import { FieldFx, parseFxList } from '../fx/fieldFx';
 import { SUPER_TEXT } from '../fx/superText';
 import { drawTitleBg, setHudItemIcon } from '../ui';
@@ -70,8 +84,14 @@ const hasSaved = () => local(SAVED_KEY).load() === '1';
 /** 필드 제목 화면 글자 (이름 「괴이 ː ANOMALY」) */
 const VISIT_TITLE = { title: '괴이 ː ANOMALY', sub: '필드 · 요원들을 만나고 본편 대화를 이어갑니다' };
 const fieldClock: { sec: number | null; place: string } = { sec: null, place: '' };
+/** 가계부 잔고 (본편 상태창 잔고와 같은 장부, bridge.wallet). 모르거나 잔고 칸을 끈 채팅이면 null */
+const fieldWallet: { won: number | null } = { won: null };
+/** 관찰 창(F9) 켜짐: 오른쪽 위 자리를 같이 쓴다 */
+let observing = false;
+const observerOn = () => observing;
+const wonText = (n: number) => `${n < 0 ? '−' : ''}₩ ${Math.abs(Math.trunc(n)).toLocaleString('en-US')}`;
 
-function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: HubHost['chooseFloor']; sfx: (n: string) => void; closed?: () => void; resuming?: () => boolean; overlay?: HubHost['overlay'] }): HqModuleLike & { close(): void; goto(place: string): void; state(): { day: number; rescued: string[] }; visitReady: Promise<void>; visitor(): { agentId: string; name: string } } {
+function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: HubHost['chooseFloor']; sfx: (n: string) => void; closed?: () => void; resuming?: () => boolean; overlay?: HubHost['overlay']; rules?: () => ClockRules; choose?: (o: { title: string; lines?: string[]; options: string[]; cancel?: boolean }) => Promise<number> }): HqModuleLike & { close(): void; goto(place: string): void; state(): { day: number; rescued: string[] }; visitReady: Promise<void>; visitor(): { agentId: string; name: string } } {
   const hq = createHq();
   const b = bridge as (Partial<GameBridge> & { slot?: number; photo?: (name: string) => string | undefined }) | undefined;
   const slot = b?.slot ?? 0;
@@ -79,11 +99,143 @@ function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui
   let root: HTMLElement | null = null;
   // 본부 방문: 상태 태그로 정한 방(사무실·휴게실·의무실)에 요원을 세운다. 들어가기 전에 한 번 읽는다
   let present: { name: string; room: string }[] = [];
+  // 필드 시계 규칙 (설정 → 필드 시간, 채팅별). 바꾸면 다음 행동부터
+  const rules = () => ui.rules?.() ?? DEFAULT_CLOCK;
   let visitor = { agentId: '', name: '' };
-  const visitReady = b?.visit
+  let ready = false;
+  const visitReady = (b?.visit
     ? b.visit.state().then((v) => { visitor = v.visitor; present = v.agents.filter((a) => a.room).map((a) => ({ name: a.name, room: a.room! })); }).catch(() => {})
-    : Promise.resolve();
+    // 시연판(본편 연결 없음): 생태계를 볼 수 있게 요원 몇 명을 세운다
+    : Promise.resolve().then(() => { present = [{ name: '잼트리', room: 'office' }, { name: '쟈알디', room: 'office' }, { name: '큐라스', room: 'lounge' }, { name: '고르고디오', room: 'lounge' }, { name: '데쥬레', room: 'infirmary' }]; })).then(() => { ready = true; });
+  // 필드 시각은 본편 상태줄 시각에서 시작한다 (docs/필드_세계_NPC_설계.md 16-3). 유저 소속·신분도 같이
+  let me: { faction: string; level: number | null } = { faction: 'A00', level: 1 };
+  // 시연판(본편 없음): 시계를 10시에서 시작 (?hour=숫자 로 바꿈) — 근무·시간대·시간 보내기를 볼 수 있게
+  if (!b?.card && fieldClock.sec === null) {
+    const h = Number(typeof location !== 'undefined' ? new URLSearchParams(location.search).get('hour') ?? 10 : 10);
+    fieldClock.sec = (Number.isFinite(h) ? ((h % 24) + 24) % 24 : 10) * 3600;
+  }
+  void b?.card?.().then((snap) => {
+    if (fieldClock.sec === null && snap?.minute != null) fieldClock.sec = snap.minute * 60;
+    if (snap) me = { faction: snap.identity?.faction || snap.faction || 'A00', level: snap.identity?.level ?? null };
+  }).catch(() => {});
+  // 인물 기록(호감 단계·호칭)과 세력 평판: 대사 칸·몹 반응에 쓴다. 기록이 갱신되면 다시 읽는다
+  const peopleBy = new Map<string, PersonView>();
+  const factionBy = new Map<string, FactionView>();
+  const readPeople = () => {
+    void b?.people?.people().then((l) => { peopleBy.clear(); for (const p of l) peopleBy.set(p.name, p); }).catch(() => {});
+    void b?.people?.factions().then((l) => { factionBy.clear(); for (const f of l) factionBy.set(f.code, f); }).catch(() => {});
+  };
+  // 잔고: 들어갈 때, 본편 갱신기가 끝날 때(거래를 적었을 수 있음) 다시 읽는다
+  const readWallet = () => void b?.wallet?.balance().then((n) => { fieldWallet.won = n; }).catch(() => {});
+  readPeople();
+  readWallet();
+  b?.people?.onChange(() => { readPeople(); readWallet(); });
+  /** 필드 거래: 같은 장부에 출처 「필드」로 적는다 (+ 들어옴, − 나감). 가게·거래 화면이 이걸 부른다 */
+  const pay = async (amount: number, memo: string): Promise<number | null> => {
+    const after = (await b?.wallet?.add(amount, memo, { place: fieldClock.place || undefined, time: fieldClock.sec === null ? undefined : clockText(fieldClock.sec) }).catch(() => null)) ?? null;
+    if (after !== null) {
+      fieldWallet.won = after;
+      void b?.field?.record({ kind: 'trade', text: `${memo} ${amount < 0 ? '−' : '+'}${Math.abs(amount).toLocaleString('en-US')}원`, scene: fieldClock.place || undefined, weight: 1, visit: visitId }).catch(() => {});
+    }
+    return after;
+  };
+  // 개발 도구·브라우저 시험
+  (globalThis as { __goeiWallet?: unknown }).__goeiWallet = { pay, balance: () => fieldWallet.won };
+  /** 이번 필드 방문 id (방문마다 호감·평판 상한을 따로 세게) */
+  const visitId = `v${Date.now().toString(36)}`;
   const ROOM_SCENE: Record<string, string> = { office: 'office', lounge: 'lounge', infirmary: 'clinic' };
+  // 필드 세계 (src/game/world): 요원은 처음 선 방에서 서성이고 이웃 장면을 오간다, 거리·로비는 몹이 오간다.
+  // 씨앗: 주소 ?seed=숫자 가 있으면 그것 (재현), 없으면 이번 입장마다 새로
+  const seedParam = typeof location !== 'undefined' ? new URLSearchParams(location.search).get('seed') : null;
+  const seed = seedParam ? (Number(seedParam) >>> 0 || hashSeed(seedParam)) : (Date.now() >>> 0);
+  let sim: WorldSim | null = null;
+  // 모델 대화 한 번(창을 열고 닫을 때까지) = 시계 +10분 (사용자 확정 2026-10-26)
+  if (typeof window !== 'undefined') window.addEventListener('goei:talk-closed', () => { if (fieldClock.sec !== null) fieldClock.sec += rules().talk * 60; });
+  if (typeof window !== 'undefined') window.addEventListener('keydown', (e) => { if (e.key === 'F9' || e.key === '`') { observing = !observing; e.preventDefault(); } });
+  const world = () => {
+    if (!sim && ready) {
+      sim = createHqWorld(hq.map(), seed, present.filter((p) => ROOM_SCENE[p.room]).map((p) => ({ name: p.name, scene: ROOM_SCENE[p.room] })), hasVisitClip, { stance: (f) => factionBy.get(f)?.stage ?? null });
+      chatter = new Chatter(sim, new Lines(dialogueData as unknown as DialogueData, sim.rng), lineCtx);
+    }
+    // 개발 도구·브라우저 시험: 세계를 들여다본다 (관찰 창과 같은 정보)
+    if (sim) (globalThis as { __goeiWorld?: WorldSim }).__goeiWorld = sim;
+    return sim;
+  };
+  let chatter: Chatter | null = null;
+  /** 말하는 사람 기준 대사 칸: 플레이어 소속·직급, 적으로 보나 (호감 적대 구간·세력 적대·싸움 중) */
+  const lineCtx = (a: Actor): LineCtx => {
+    const hour = fieldClock.sec === null ? null : (fieldClock.sec / 3600) % 24;
+    const named = a.def.kind === 'named' ? peopleBy.get(a.def.name) : undefined;
+    const fac = a.def.kind === 'mob' ? sim?.mobFaction(a) ?? (dialogueData as unknown as DialogueData).npc[NPC_TYPE[a.def.archetype ?? a.def.name] ?? '']?.faction ?? null : named?.faction ?? null;
+    const enemy = a.act === 'argue' || a.plan === 'chase' || named?.affinity.cell === 'hostile' || (!!fac && factionBy.get(fac)?.stage === 'hostile');
+    return { hour, faction: me.faction, level: me.level, enemy };
+  };
+  // 필드 장부: 이름 인물에게 한 일은 그때그때, 몹은 장면마다 묶어서 (몹 개인 잡담·스쳐 지나감은 넘기지 않음, 13장)
+  const mobHits = new Map<string, { n: number; witness?: { faction: string; named: boolean } }>();
+  const flushMobs = (sceneId: string) => {
+    const m = mobHits.get(sceneId);
+    if (!m || !m.n) return;
+    mobHits.delete(sceneId);
+    const name = hq.map().scenes.find((s) => s.id === sceneId)?.name ?? sceneId;
+    void b?.field?.record({ kind: 'provoke', text: `${name}에서 사람 ${m.n}명을 때렸다`, scene: name, weight: m.n >= 3 ? 2 : 1, visit: visitId, ...(m.witness ? { witness: m.witness } : {}) }).catch(() => {});
+  };
+  /** 마지막으로 있던 지역 (승강장은 지역 없음) */
+  let lastDistrict: string | null = null;
+  /** 이 장면에서 이미 싸웠나 (싸움 = 장면당 한 번 +10분, 사용자 확정) */
+  let foughtHere = false;
+  const record = (evs: SimEvent[]) => {
+    for (const e of evs) {
+      if (e.kind !== 'hurt') continue;
+      if (!foughtHere) { foughtHere = true; if (fieldClock.sec !== null) fieldClock.sec += rules().fight * 60; }
+      const w = sim;
+      if (!w) return;
+      // 목격: 그 장면의 소속 있는 사람 (이름 인물이 보면 named)
+      const here = w.inScene(e.scene);
+      const namedWit = here.find((q) => q.def.kind === 'named' && q.def.name !== e.who && peopleBy.get(q.def.name)?.faction);
+      const mobWit = here.find((q) => w.mobFaction(q));
+      const witness = namedWit ? { faction: peopleBy.get(namedWit.def.name)!.faction, named: true } : mobWit ? { faction: w.mobFaction(mobWit)!, named: false } : undefined;
+      const sceneName = hq.map().scenes.find((s) => s.id === e.scene)?.name ?? e.scene;
+      if (e.named) {
+        void b?.field?.record({ kind: 'hurt', text: `${sceneName}에서 ${e.who}을(를) 때렸다`, scene: sceneName, who: [e.who], weight: 2, visit: visitId, ...(witness ? { witness } : {}) }).catch(() => {});
+      } else {
+        const m = mobHits.get(e.scene) ?? { n: 0 };
+        m.n++;
+        m.witness ??= witness;
+        mobHits.set(e.scene, m);
+      }
+    }
+  };
+  let flushT = 0;
+  const clockView = () => { const c = new FieldClock(fieldClock.sec === null ? null : fieldClock.sec / 60); return c; };
+  // 필드 행위자를 에일린 공격 표적으로 (전투 몸이 아니므로 가짜 몸을 건넨다. 보이는 장면만)
+  let lifeScene = '';
+  eileenHooks.extraTargets = () => {
+    const w = sim;
+    if (!w || !lifeScene) return [];
+    return w.inScene(lifeScene).filter((a) => a.act !== 'down').map((a) => ({
+      x: a.x, y: a.y, z: 0,
+      body: { id: -1, team: 'enemy', kind: 'npc', x: a.x, y: a.y, z: 0, dir: a.face, hp: 1, hpMax: 1, alive: true, stop: 0, frame: () => ({ hit: [], hurt: [] }), step: () => {},
+        applyHit: (h: { dir: 1 | -1; attackId: number }) => (w.hitActor(a.def.id, h.dir, h.attackId) ? { kind: 'hit' as const } : { kind: 'immune' as const }) } as unknown as Body,
+    }));
+  };
+  const life: HubLife = {
+    tick: (dt, at) => {
+      if (lifeScene && lifeScene !== at.scene) { flushMobs(lifeScene); foughtHere = false; }
+      lifeScene = at.scene;
+      const w = world();
+      if (!w) return;
+      w.step(dt, { ...at, hour: fieldClock.sec === null ? null : (fieldClock.sec / 3600) % 24 });
+      const evs = w.events.splice(0);
+      record(evs);
+      chatter?.step(dt, at.scene, at.x, evs);
+      if ((flushT += dt) > 20) { flushT = 0; flushMobs(at.scene); }
+    },
+    lifeTime: () => sim?.time ?? 0,
+    hit: (sceneId, boxes, dir) => world()?.hitBoxes(sceneId, boxes, dir).length ?? 0,
+    actors: (sceneId) => (world()?.inScene(sceneId) ?? []).map((a) => ({ id: a.def.id, name: a.def.name, kind: a.def.kind, x: a.x, y: a.y, face: a.face, look: a.def.look, moving: a.act === 'walk', clip: a.clip, since: a.clipAt, icon: a.icon, say: a.say })),
+    observer: (sceneId) => (observing && sim ? observerLines(sim, clockView(), sceneId, seed) : null),
+    drawMob: (c, a) => { if (!drawTestMan(c, a.x, a.y, a.face)) silhouette(c, a); },
+  };
   const visitors = (sceneId: string) => {
     const here = present.filter((p) => ROOM_SCENE[p.room] === sceneId && hasVisitAgent(p.name));
     const sc = hq.map().scenes.find((s) => s.id === sceneId);
@@ -101,10 +253,16 @@ function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui
       chooseFloor: (o, pick) => ui.chooseFloor(o, pick),
       sfx: (n) => ui.sfx(n),
       visitors,
+      life,
       // 장면을 옮기면 장부에 이동 사건과 지금 위치(확정 사실)를 남긴다
       entered: (to, from, walkedPx) => {
         fieldClock.place = to.name;
-        const sec = walkSeconds(walkedPx) + (to.floor !== from.floor ? STAIR_S : DOOR_S);
+        // 장면 넘어가기 10분, 지하철로 다른 지역에 내리면 지역 이동 30분 (사용자 확정 2026-10-26, 설정 → 필드 시간). 걸은 거리는 시계와 무관
+        void walkedPx;
+        const d = hqDistrict(to.id);
+        const region = isRegionMove(lastDistrict ?? hqDistrict(from.id), d);
+        if (d) lastDistrict = d;
+        const sec = (region ? rules().region : rules().scene) * 60;
         if (fieldClock.sec !== null) fieldClock.sec += sec;
         const at = fieldClock.sec === null ? '' : ` (${clockText(fieldClock.sec)})`;
         void b?.field?.record({ kind: 'move', text: `${from.name} → ${to.name}${at}`, scene: to.name, weight: 1, fact: { key: '주인공 위치', value: to.name } }).catch(() => {});
@@ -113,6 +271,19 @@ function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui
       overlay: ui.overlay,
       hour: () => (fieldClock.sec === null ? null : (fieldClock.sec / 3600) % 24),
       depart: () => hq.depart(),
+      // 앉기·눕기 자리: 시간 보내기 (16-2장). 고른 만큼 시계가 간다
+      sat: () => {
+        const opts = waitOptions(rules(), fieldClock.sec === null ? null : fieldClock.sec / 60);
+        if (!opts.length || !ui.choose) return;
+        const now = fieldClock.sec === null ? null : clockText(fieldClock.sec);
+        void ui.choose({ title: '시간 보내기', lines: now ? [`지금 ${now}`] : [], options: [...opts.map((o) => o.label), '그냥 있기'], cancel: true }).then((i) => {
+          const o = i >= 0 ? opts[i] : undefined;
+          if (!o) return;
+          if (fieldClock.sec !== null) fieldClock.sec += o.minutes * 60;
+          const at = fieldClock.sec === null ? '' : clockText(fieldClock.sec);
+          if (at) void b?.field?.record({ kind: 'wait', text: `${fieldClock.place || '필드'}에서 시간을 보냈다 (${at})`, scene: fieldClock.place || undefined, weight: 1, fact: { key: '필드 시각', value: at } }).catch(() => {});
+        }).catch(() => {});
+      },
       armed: () => hq.armed(),
       // 본부 대화창이 떠 있으면 머리 위 표시를 숨긴다 (독립 검수: 브리핑 뒤 ↓ 표시)
       busy: () => typeof document !== 'undefined' && !!document.querySelector('.hq-talk, .hq-over:not(:empty)'),
@@ -202,7 +373,7 @@ function hudState(w: World, shell: Shell): HudState {
     // 에일린은 탄창 대신 우하단 기술 상자에 총열 열을 보인다
     weapon: heldWeapon(w) ?? ((p as { core?: unknown }).core ? null : { name: '권총', mag: p.ammo, magMax: p.mag, reserve: p.reserve, reload: p.moveKey === 'reload' ? p.mf / 4 : null }),
     items: w.items.map((it) => ({ id: it?.id, label: it?.label ?? '', count: it?.n ?? 0 })),
-    field: fieldClock.sec !== null || fieldClock.place ? { clock: fieldClock.sec === null ? undefined : clockText(fieldClock.sec), place: fieldClock.place || undefined } : undefined,
+    field: fieldClock.sec !== null || fieldClock.place || (w.stage?.id === 'hq' && fieldWallet.won !== null) ? { clock: fieldClock.sec === null ? undefined : clockText(fieldClock.sec), place: fieldClock.place || undefined, wallet: fieldWallet.won === null ? undefined : wonText(fieldWallet.won) } : undefined,
     floor: { depth: d ? (d <= 3 ? `L${d}` : `B-${d - 3}`) : '', name: f.title },
     favor: 0,
     money: { cash: (w.notes.cash as number | undefined) ?? 0, budget: 0, research: 0, teeth: 0 },
@@ -363,8 +534,32 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     firstFloor: () => ({ id: 'itemroom', title: '아이템 진열실', length: 3200, startX: 300, exitX: Infinity, banner: '아이템 진열실 · E 줍기·들기 · A 던지기·휘두르기', encounters: [{ triggerX: 0, lockFrom: 0, lockTo: 3200, waves: [[{ kind: 'dummy', x: 1600, y: 560 }, { kind: 'dummy', x: 2400, y: 620 }]] }] }),
     nextFloor: () => null,
   };
+  // 대련 방 (전투 AI 시험, docs/전투_AI_설계.md): ?start=stage=spar  ·  난이도 ?ai=easy|normal|hard|nightmare
+  const aiDiff: Difficulty = (() => { try { const v = new URLSearchParams(location.search).get('ai'); return v && v in DIFF ? (v as Difficulty) : 'normal'; } catch { return 'normal'; } })();
+  const sparStage: StageModule = {
+    id: 'spar',
+    label: '대련',
+    firstFloor: () => ({
+      id: 'spar-room', title: '대련', length: 2400, startX: 500, exitX: Infinity,
+      banner: `대련 · 전투 AI (${aiDiff}) · 1:1 뒤 1:2`,
+      encounters: [{ triggerX: 0, lockFrom: 0, lockTo: 2400, waves: [[{ kind: 'ai-eileen', x: 1100, y: 580 }], [{ kind: 'ai-eileen', x: 1300, y: 540 }, { kind: 'ai-eileen', x: 200, y: 640 }]] }],
+    }),
+    nextFloor: () => null,
+  };
+  let squad = new Squad(DIFF[aiDiff].melee);
+  let aiN = 0;
   const unknownKinds = new Set<string>();
   const enemyFactory: EnemyFactory = (spec, w) => {
+    if (spec.kind === 'ai-eileen' && w.player instanceof EileenPlayer) {
+      if (aiN === 0) squad = new Squad(DIFF[aiDiff].melee);
+      const n = ++aiN;
+      // 성향은 상대마다 다르게 (돌격형 / 신중형 / 견제형)
+      const personas = [{ aggression: 0.75, patience: 0.35, zoning: 0.2, courage: 0.9 }, { aggression: 0.35, patience: 0.8, zoning: 0.3, courage: 0.8 }, { aggression: 0.4, patience: 0.5, zoning: 0.85, courage: 0.7 }];
+      const ai = new AiEileen((w.player as unknown as { clips: ConstructorParameters<typeof AiEileen>[0] }).clips, { id: `ai${n}`, grade: 'B', difficulty: aiDiff, persona: personas[(n - 1) % personas.length], seed: 1000 + n, squad, label: `AI 에일린 ${n}` });
+      ai.x = spec.x; ai.y = spec.y;
+      ai.hp = ai.hpMax = 160;
+      return ai as never;
+    }
     if (DEF_BY_KIND[spec.kind]) {
       const sp = spec as typeof spec & { affixes?: never };
       return createEnemy(spec.kind, spec.x, spec.y, () => w.rand(), { elite: spec.elite, affixes: sp.affixes }) as never;
@@ -570,6 +765,8 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       if (dinnerDue) (dinnerDue = false), cutOnce('dinner');
     },
     overlay: visit ? (c, people, player) => visit.draw(c, people, player) : undefined,
+    choose: (o) => shell.choose(o),
+    rules: () => { const t = shell.settings; return clockRules({ scene: t.tScene, region: t.tRegion, talk: t.tTalk, fight: t.tFight, waitShort: t.tWaitShort, waitLong: t.tWaitLong }); },
   });
   // 본부 메뉴 창이 열려 있으면 Esc는 창 닫기 (껍데기 일시정지보다 먼저)
   // 본부 메뉴 창(임무 창구·정비실 등) 키보드 (사용자 2026-10-25: 키보드가 안 먹는다): 방향키로 단추를 고르고 Enter·Space·E로 누른다, Esc 닫기
@@ -680,7 +877,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
   const mods: EngineModules = {
     saveCheckpoint: v => { markSaved(); session.setCheckpoint(v); },
     frozen: () => ffx.frozen(),
-    stages: [elevator, trainingStage, dummyStage, arenaStage, itemStage],
+    stages: [elevator, trainingStage, dummyStage, arenaStage, itemStage, sparStage],
     enemyFactory,
     hq,
     hqLayer: () => shell.stage.ui,
@@ -731,6 +928,8 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
         const face = (me.agentId && visitAgentFaceCanvas(name, 34)) || testPlayerFace(64, w.player.dir < 0) || visitAgentFaceCanvas('쟈알디', 34);
         // 좌상단 초상화 상자 (사용자 2026-10-25: 위 목표 띠 대신)
         shell.hud.drawFieldCard(ctx, { name, face, hp: w.player.hp, maxHp: w.player.hpMax, gauge: w.player.gauge, compact: hs.compact, top: true, items: hs.items, device: hs.device }, dt);
+        // 오른쪽 위 필드 시각·장소·잔고 (관찰 창이 켜져 있으면 그 자리라 숨김)
+        if (!observerOn()) shell.hud.drawFieldCorner(ctx, hs.field, hs.compact);
       }
       // 왼쪽 아래 기술 칸 줄 (에일린): 터치 버튼이 있으면 그 자리라 숨긴다. 자막은 그 오른쪽에
       const core = (w.player as { core?: { P: Record<string, any> } }).core;

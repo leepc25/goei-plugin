@@ -2222,7 +2222,7 @@ if (fixture.globalLore.some(packed)) {
 }
 
 // 게임 창 (ui/game.ts): 머리 게임 버튼 → 시작 화면. 게임 파일(코드 팩)이 없으면 받기, 받은 뒤 저장 칸에서 시작.
-// 정산 결과는 쌓아 두고 버튼을 눌러야만 채팅(전송 대기)과 기록 로어북에 쓴다. 이전 시험판(순찰)도 그대로 열린다.
+// 정산 결과는 쌓아 두고 버튼을 눌러야만 채팅(전송 대기)과 기록 로어북에 쓴다.
 {
   const { page, errors } = await boot(fixture, { message: [], scriptstate: {} });
   await startedWithReply(page);
@@ -2302,22 +2302,9 @@ if (fixture.globalLore.some(packed)) {
   await page.waitForSelector('.gx-game.gx-full.gx-rot');
   await page.setViewportSize({ width: 1100, height: 900 });
   await page.waitForSelector('.gx-game.gx-full:not(.gx-rot)');
-  // 이전 시험판: 순찰은 예전처럼 그림 팩 받기
-  await page.click('[data-g="home"]');
-  await page.click('details[data-keep="game-legacy"] > summary');
-  await page.click('[data-g="legacy"][data-mode="patrol"]');
-  await page.waitForSelector('.gx-gp');
-  const pack = readFileSync(new URL('../dist/goei-game-patrol.pack', import.meta.url)).toString('base64');
-  await page.evaluate((b64) => {
-    const bytes = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
-    window.__fetch = (u) => (u.includes('goei-game-patrol.pack') ? bytes : null);
-  }, pack);
-  await page.click('[data-gp="get"]');
-  await page.waitForSelector('.goei-game canvas');
-  assert.equal(await page.evaluate(() => Object.keys(JSON.parse(window.__store['p:goei:game-pack:patrol']).files).length), 19, '그림 19장 저장');
   await page.click('[data-action="game-close"]');
   assert.deepEqual(errors, []);
-  console.log('PASS 게임 창: 파일 받기 실패 안내 → 받기(코드·쟈알디 팩) → 통합 엔진 시작 → 결과는 버튼으로만 채팅·로어북 → 다시 열면 이어하기 → 돌려 보기 → 이전 순찰');
+  console.log('PASS 게임 창: 파일 받기 실패 안내 → 받기(코드·쟈알디 팩) → 통합 엔진 시작 → 결과는 버튼으로만 채팅·로어북 → 다시 열면 이어하기 → 돌려 보기');
   await page.close();
 }
 

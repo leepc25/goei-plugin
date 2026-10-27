@@ -1,4 +1,7 @@
-floor(Number(p[6]) || 0)),
+ 80),
+            title: p[4],
+            views: Math.max(0, Math.floor(Number(p[5]) || 0)),
+            votes: Math.max(0, Math.floor(Number(p[6]) || 0)),
             body: p[7],
             mine: p[8] === "1",
             comments: []
@@ -2354,6 +2357,9 @@ ${c}`)]).join("\n\n");
   var WALLET_VAR = "$st_wallet";
   var WALLET_START_DEFAULT = 14e4;
   var WALLET_MAX = 1e12;
+  var WALLET_EDIT_VAR = "$st_wallet_edit";
+  var walletEditable = (vars) => vars?.[WALLET_EDIT_VAR] === "1";
+  var walletStarted = (chat) => (chat.message ?? []).some((m) => m.role === "user");
   var isEntry2 = (e) => {
     const x = e;
     return !!x && typeof x === "object" && typeof x.id === "string" && typeof x.anchor === "string" && Number.isSafeInteger(x.amount) && typeof x.memo === "string" && (x.src === "story" || x.src === "manual" || x.src === "field");
@@ -2394,6 +2400,11 @@ ${c}`)]).join("\n\n");
     const id = e.id ?? walletEntryId(e.anchor, e.amount, e.memo);
     if (w.log.some((x) => x.id === id)) return w;
     return { ...w, log: [...w.log, { ...e, id, memo: e.memo.slice(0, 30), at: e.at ?? (/* @__PURE__ */ new Date()).toISOString() }].slice(-400) };
+  }
+  function withFieldTrade(w, anchor, amount, memo2, id, where = {}) {
+    const place2 = typeof where.place === "string" ? where.place.trim().slice(0, 30) : "";
+    const time2 = typeof where.time === "string" ? where.time.trim().slice(0, 10) : "";
+    return addWalletEntry(w, { anchor, amount: Math.trunc(amount), memo: memo2.trim() || "필드 거래", src: "field", id, ...place2 ? { place: place2 } : {}, ...time2 ? { time: time2 } : {} });
   }
   function removeWalletEntry(w, id) {
     return { ...w, log: w.log.filter((e) => e.id !== id) };
@@ -2467,10 +2478,10 @@ ${c}`)]).join("\n\n");
     const known = tl?.prev.get(tag.raw.trim());
     const prev = known ?? (tl?.last && !tl.seen.has(tag.raw.trim()) ? tl.last.minute : void 0);
     if (now !== null && prev !== void 0) rows2.push(["지난 장면", sceneLabel(prev, now)], ["흐른 시간", elapsedLabel(prev, now)]);
-    const start3 = ctx2.timeline?.start;
-    if (now !== null && start3 !== null && start3 !== void 0 && now >= start3) {
-      const s5 = new Date(start3 * 6e4);
-      rows2.push(["시작부터", `${storyDay(start3, now)}일째 · ${s5.getUTCMonth() + 1}월 ${s5.getUTCDate()}일 시작`]);
+    const start4 = ctx2.timeline?.start;
+    if (now !== null && start4 !== null && start4 !== void 0 && now >= start4) {
+      const s5 = new Date(start4 * 6e4);
+      rows2.push(["시작부터", `${storyDay(start4, now)}일째 · ${s5.getUTCMonth() + 1}월 ${s5.getUTCDate()}일 시작`]);
     }
     const clock2 = tag.time && !hid("time") ? `<span class="gst-clock"${rows2.length ? ' data-gst-tip="1"' : ""}>${esc(tag.time)}${rows2.length ? kv(rows2) : ""}</span>` : "";
     let date = "";
@@ -2661,7 +2672,7 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
   var MARK_MAX = 5;
   var DIM_DEFAULT = 50;
   var prefs = { basic: {}, world: {} };
-  var PREF_VAR = /^(\$ph_(model|auto|status|related|context|incoming|incoming_chance|group_invites|group_invite_chance|announcements|announcement_gap|announcement_history|announcement_page_size|all_contacts|anomaly_contacts|storage_(auto|limit)_(dm|group|notice))|\$lb_cfg_lb-gn\.[a-z_]+|\$gn_storage_(auto|limit)_dm|\$nw_(mode|model|length|refresh_previous|writing_request|context)|\$ph_context_(messages|announcements)|\$(ph|nw)_adv_[a-z_]+|\$hq_(adv_[a-z_]+|ui)|\$gen_[a-z_]+|\$pp_[a-z_]+|\$st_col_[a-z]+)$/;
+  var PREF_VAR = /^(\$ph_(model|auto|status|related|context|incoming|incoming_chance|group_invites|group_invite_chance|announcements|announcement_gap|announcement_history|announcement_page_size|all_contacts|anomaly_contacts|storage_(auto|limit)_(dm|group|notice))|\$lb_cfg_lb-gn\.[a-z_]+|\$gn_storage_(auto|limit)_dm|\$nw_(mode|model|length|refresh_previous|writing_request|context)|\$ph_context_(messages|announcements)|\$(ph|nw)_adv_[a-z_]+|\$hq_(adv_[a-z_]+|ui)|\$gen_[a-z_]+|\$pp_[a-z_]+|\$st_col_[a-z]+|\$st_wallet_edit)$/;
   function getPrefs() {
     return prefs;
   }
@@ -2690,6 +2701,7 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
       for (const [k, v] of Object.entries(o.vars)) if (PREF_VAR.test(k) && typeof v === "string") vars[k] = v;
     }
     const nav = o.nav === "right" ? "right" : void 0;
+    const wikiSide = o.wikiSide === "right" ? "right" : void 0;
     const agents = o.agents === "list" ? "list" : void 0;
     const dim = int2(o.dim, 0, 100);
     const status2 = o.status === "off" || o.status === "light" || o.status === "dark" || o.status === "paper" ? o.status : void 0;
@@ -2722,7 +2734,7 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
     setUserRules(rules3);
     const relationsSym = o.relationsSym === false ? false : void 0;
     const walletStart = int2(o.walletStart, 0, 1e12);
-    prefs = { basic, world, ...walletStart !== null ? { walletStart } : {}, ...editorWidth !== null ? { editorWidth } : {}, ...Object.keys(guides).length ? { guides } : {}, ...rules3.length ? { rules: rules3 } : {}, ...relationsSym === false ? { relationsSym } : {}, ...theme ? { theme } : {}, ...imgPrompt ? { imgPrompt } : {}, ...imgNamesOff.length ? { imgNamesOff } : {}, ...imgNamesExtra.length ? { imgNamesExtra } : {}, ...imgKeywords.length ? { imgKeywords } : {}, ...Object.keys(vars).length ? { vars } : {}, ...nav ? { nav } : {}, ...agents ? { agents } : {}, ...dim !== null ? { dim } : {}, ...status2 ? { status: status2 } : {}, ...size !== null ? { imgSize: size } : {}, ...fold3 !== null ? { imgFold: fold3 } : {}, ...imgFoldOn === false ? { imgFoldOn } : {}, ...show !== null ? { imgShow: show } : {}, ...send2 !== null ? { imgSend: send2 } : {}, ...marks2.length ? { marks: marks2 } : {} };
+    prefs = { basic, world, ...walletStart !== null ? { walletStart } : {}, ...editorWidth !== null ? { editorWidth } : {}, ...Object.keys(guides).length ? { guides } : {}, ...rules3.length ? { rules: rules3 } : {}, ...relationsSym === false ? { relationsSym } : {}, ...theme ? { theme } : {}, ...imgPrompt ? { imgPrompt } : {}, ...imgNamesOff.length ? { imgNamesOff } : {}, ...imgNamesExtra.length ? { imgNamesExtra } : {}, ...imgKeywords.length ? { imgKeywords } : {}, ...Object.keys(vars).length ? { vars } : {}, ...nav ? { nav } : {}, ...wikiSide ? { wikiSide } : {}, ...agents ? { agents } : {}, ...dim !== null ? { dim } : {}, ...status2 ? { status: status2 } : {}, ...size !== null ? { imgSize: size } : {}, ...fold3 !== null ? { imgFold: fold3 } : {}, ...imgFoldOn === false ? { imgFoldOn } : {}, ...show !== null ? { imgShow: show } : {}, ...send2 !== null ? { imgSend: send2 } : {}, ...marks2.length ? { marks: marks2 } : {} };
     return prefs;
   }
   function readSettingsBook(lore) {
@@ -3348,14 +3360,14 @@ ${themeVars("[x-goei-fab]")}
     return Object.fromEntries(advItems(f).map((i) => [advVar(f, i), i.v ? String(i.def) : ""]));
   }
   function refToggles(state, f) {
-    const on2 = (k, d) => advItem(f, k) ? advOn(state, f, k) : d;
+    const on3 = (k, d) => advItem(f, k) ? advOn(state, f, k) : d;
     return {
-      description: on2("desc", true),
-      authors: on2("authors", true),
-      persona: on2("persona", true),
-      active: on2("active", true),
-      related: on2("related", false),
-      secondary: on2("secondary", false)
+      description: on3("desc", true),
+      authors: on3("authors", true),
+      persona: on3("persona", true),
+      active: on3("active", true),
+      related: on3("related", false),
+      secondary: on3("secondary", false)
     };
   }
   function budgetFor(state, f) {
@@ -3487,9 +3499,9 @@ ${themeVars("[x-goei-fab]")}
     if (busy) return false;
     const list4 = await elements(_doc, "[data-goei-cancel]");
     if (!list4.length) return "idle";
-    let on2 = false;
-    for (const el of list4) if (await hit2(el, x, y)) on2 = true;
-    if (!on2 || isWaiting()) return false;
+    let on3 = false;
+    for (const el of list4) if (await hit2(el, x, y)) on3 = true;
+    if (!on3 || isWaiting()) return false;
     busy = true;
     try {
       const charIndex = await risuai.getCurrentCharacterIndex();
@@ -4014,13 +4026,13 @@ ${JSON.stringify({ feature: "wiki", records: kept })}
     const tips = await elements(doc2, "[data-gst-tip]");
     let hitTip = false;
     for (const el of tips) {
-      const on2 = inside2 && await hit2(el, x, y);
+      const on3 = inside2 && await hit2(el, x, y);
       const open3 = await el.hasClass("open").catch(() => false);
-      if (on2 && !open3) {
+      if (on3 && !open3) {
         await el.addClass("open");
         hitTip = true;
       } else if (open3) await el.removeClass("open");
-      if (on2) hitTip = true;
+      if (on3) hitTip = true;
     }
     if (hitTip || !inside2) return hitTip;
     for (const el of await elements(doc2, "[data-goei-wiki]")) {
@@ -4183,9 +4195,9 @@ ${SEED_CLOSE}` : "", missing };
   onChatClick("opening", async (doc2, x, y) => {
     const list4 = await elements(doc2, "[data-goei-repick]");
     if (!list4.length) return "idle";
-    let on2 = false;
-    for (const el of list4) if (await hit2(el, x, y)) on2 = true;
-    if (!on2 || busy2) return false;
+    let on3 = false;
+    for (const el of list4) if (await hit2(el, x, y)) on3 = true;
+    if (!on3 || busy2) return false;
     busy2 = true;
     try {
       opener?.();
@@ -4230,25 +4242,4 @@ ${SEED_CLOSE}` : "", missing };
       s5 = decodeURIComponent(src);
     } catch {
     }
-    const m = s5.replace(/\\/g, "/").match(/(?:^|\/)assets\/([^/?#]+)$/);
-    return m ? `assets/${m[1]}` : null;
-  }
-  async function photoFrom(src) {
-    if (!src) return null;
-    if (src.startsWith("data:")) return src;
-    const path = assetPathOf(src);
-    if (!path) return null;
-    const data = await risuai.readImage(path);
-    if (typeof data === "string") return data.startsWith("data:") ? data : null;
-    const bytes = toBytes(data);
-    if (!bytes?.length) return null;
-    const ext = path.split(".").pop()?.toLowerCase() ?? "";
-    return URL.createObjectURL(new Blob([bytes], { type: MIME[ext] ?? "image/png" }));
-  }
-  async function readUser() {
-    let name = cached.name;
-    let photo = cached.photo;
-    try {
-      const doc2 = await risuai.getRootDocument();
-      const box = await doc2.querySelector("[data-goei-user]");
-      const html = box ? await box.getInnerHTML() : ""
+    const m = s5

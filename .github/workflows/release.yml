@@ -37,7 +37,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ steps.v.outputs.tag }}
         run: |
-          files=("out/goei-anomaly-${TAG}.zip#괴이_ANOMALY_${TAG}.zip (플러그인+카드)" "out/goei-plugin.js#goei-plugin.js (플러그인)" "out/goei-body.js#goei-body.js (본체, 못 받을 때 파일로 넣기)" "dist/goei-game-patrol.pack#goei-game-patrol.pack (순찰 게임 그림)" "out/goei-anomaly.charx#괴이_ANOMALY.charx (카드)")
+          files=("out/goei-anomaly-${TAG}.zip#괴이_ANOMALY_${TAG}.zip (플러그인+카드)" "out/goei-plugin.js#goei-plugin.js (플러그인)" "out/goei-body.js#goei-body.js (본체, 못 받을 때 파일로 넣기)" "out/goei-anomaly.charx#괴이_ANOMALY.charx (카드)")
           if gh release view "$TAG" >/dev/null 2>&1; then
             for a in $(gh release view "$TAG" --json assets -q '.assets[].name'); do gh release delete-asset "$TAG" "$a" -y; done
             gh release upload "$TAG" "${files[@]}" --clobber

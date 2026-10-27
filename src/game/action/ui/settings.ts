@@ -31,6 +31,14 @@ export interface UiSettings {
   talkModel: 'main' | 'aux';
   /** NPC 대화에 본편 최근 채팅 두 줄을 같이 보낸다 */
   talkRecent: boolean;
+  /** 필드 시계 (분, 0 = 시간 안 감). docs/필드_세계_NPC_설계.md 16-2. 채팅별 ($hq_ui) */
+  tScene: number;
+  tRegion: number;
+  tTalk: number;
+  tFight: number;
+  /** 시간 보내기 선택지 짧게·길게 (분) */
+  tWaitShort: number;
+  tWaitLong: number;
 }
 
 export const DEFAULT_SETTINGS: UiSettings = {
@@ -52,6 +60,12 @@ export const DEFAULT_SETTINGS: UiSettings = {
   numbers: true,
   talkModel: 'main',
   talkRecent: false,
+  tScene: 10,
+  tRegion: 30,
+  tTalk: 10,
+  tFight: 10,
+  tWaitShort: 30,
+  tWaitLong: 60,
 };
 
 export interface SettingsStore {

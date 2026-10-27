@@ -98,6 +98,8 @@ export interface Prefs {
   vars?: Record<string, string>;
   /** 창 모양 (이 기기·모든 채팅 공통): 메뉴 위치, 창 바깥 어둡기(%) */
   nav?: 'left' | 'right';
+  /** 위키 목록 서랍 쪽 (PC, 이 기기 공통, 2026-10-27 사용자). 없으면 왼쪽. 모바일은 늘 오른쪽 책갈피 */
+  wikiSide?: 'right';
   /** 상황판 요원 칸 모양 (이 기기 공통): 모니터 벽(기본) 또는 목록 */
   agents?: 'wall' | 'list';
   dim?: number;
@@ -144,7 +146,7 @@ export const DIM_STEPS = [0, 25, 50, 75, 100];
 let prefs: Prefs = { basic: {}, world: {} };
 
 /** 기능 설정으로 기본값에 담을 수 있는 채팅 변수 (상태·기록 변수는 빼고 설정만) */
-export const PREF_VAR = /^(\$ph_(model|auto|status|related|context|incoming|incoming_chance|group_invites|group_invite_chance|announcements|announcement_gap|announcement_history|announcement_page_size|all_contacts|anomaly_contacts|storage_(auto|limit)_(dm|group|notice))|\$lb_cfg_lb-gn\.[a-z_]+|\$gn_storage_(auto|limit)_dm|\$nw_(mode|model|length|refresh_previous|writing_request|context)|\$ph_context_(messages|announcements)|\$(ph|nw)_adv_[a-z_]+|\$hq_(adv_[a-z_]+|ui)|\$gen_[a-z_]+|\$pp_[a-z_]+|\$st_col_[a-z]+)$/;
+export const PREF_VAR = /^(\$ph_(model|auto|status|related|context|incoming|incoming_chance|group_invites|group_invite_chance|announcements|announcement_gap|announcement_history|announcement_page_size|all_contacts|anomaly_contacts|storage_(auto|limit)_(dm|group|notice))|\$lb_cfg_lb-gn\.[a-z_]+|\$gn_storage_(auto|limit)_dm|\$nw_(mode|model|length|refresh_previous|writing_request|context)|\$ph_context_(messages|announcements)|\$(ph|nw)_adv_[a-z_]+|\$hq_(adv_[a-z_]+|ui)|\$gen_[a-z_]+|\$pp_[a-z_]+|\$st_col_[a-z]+|\$st_wallet_edit)$/;
 
 export function getPrefs(): Prefs {
   return prefs;
@@ -176,6 +178,7 @@ export function setPrefs(raw: unknown): Prefs {
     for (const [k, v] of Object.entries(o.vars as Record<string, unknown>)) if (PREF_VAR.test(k) && typeof v === 'string') vars[k] = v;
   }
   const nav = o.nav === 'right' ? 'right' : undefined;
+  const wikiSide = o.wikiSide === 'right' ? 'right' : undefined;
   const agents = o.agents === 'list' ? 'list' : undefined;
   const dim = int(o.dim, 0, 100);
   const status = o.status === 'off' || o.status === 'light' || o.status === 'dark' || o.status === 'paper' ? o.status : undefined;
@@ -211,7 +214,7 @@ export function setPrefs(raw: unknown): Prefs {
   setUserRules(rules);
   const relationsSym = o.relationsSym === false ? false : undefined;
   const walletStart = int(o.walletStart, 0, 1_000_000_000_000);
-  prefs = { basic, world, ...(walletStart !== null ? { walletStart } : {}), ...(editorWidth !== null ? { editorWidth } : {}), ...(Object.keys(guides).length ? { guides } : {}), ...(rules.length ? { rules } : {}), ...(relationsSym === false ? { relationsSym } : {}), ...(theme ? { theme } : {}), ...(imgPrompt ? { imgPrompt } : {}), ...(imgNamesOff.length ? { imgNamesOff } : {}), ...(imgNamesExtra.length ? { imgNamesExtra } : {}), ...(imgKeywords.length ? { imgKeywords } : {}), ...(Object.keys(vars).length ? { vars } : {}), ...(nav ? { nav } : {}), ...(agents ? { agents } : {}), ...(dim !== null ? { dim } : {}), ...(status ? { status } : {}), ...(size !== null ? { imgSize: size } : {}), ...(fold !== null ? { imgFold: fold } : {}), ...(imgFoldOn === false ? { imgFoldOn } : {}), ...(show !== null ? { imgShow: show } : {}), ...(send !== null ? { imgSend: send } : {}), ...(marks.length ? { marks } : {}) };
+  prefs = { basic, world, ...(walletStart !== null ? { walletStart } : {}), ...(editorWidth !== null ? { editorWidth } : {}), ...(Object.keys(guides).length ? { guides } : {}), ...(rules.length ? { rules } : {}), ...(relationsSym === false ? { relationsSym } : {}), ...(theme ? { theme } : {}), ...(imgPrompt ? { imgPrompt } : {}), ...(imgNamesOff.length ? { imgNamesOff } : {}), ...(imgNamesExtra.length ? { imgNamesExtra } : {}), ...(imgKeywords.length ? { imgKeywords } : {}), ...(Object.keys(vars).length ? { vars } : {}), ...(nav ? { nav } : {}), ...(wikiSide ? { wikiSide } : {}), ...(agents ? { agents } : {}), ...(dim !== null ? { dim } : {}), ...(status ? { status } : {}), ...(size !== null ? { imgSize: size } : {}), ...(fold !== null ? { imgFold: fold } : {}), ...(imgFoldOn === false ? { imgFoldOn } : {}), ...(show !== null ? { imgShow: show } : {}), ...(send !== null ? { imgSend: send } : {}), ...(marks.length ? { marks } : {}) };
   return prefs;
 }
 

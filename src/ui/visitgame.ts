@@ -10,7 +10,8 @@ const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '
 type Item =
   | { key: keyof UiSettings; label: string; type: 'pick'; opts: [string, string][] }
   | { key: keyof UiSettings; label: string; type: 'on' }
-  | { key: keyof UiSettings; label: string; type: 'pct'; min: number; max: number; step: number };
+  | { key: keyof UiSettings; label: string; type: 'pct'; min: number; max: number; step: number }
+  | { key: keyof UiSettings; label: string; type: 'min'; min: number; max: number; step: number };
 
 const GROUPS: [string, Item[]][] = [
   ['화면', [
@@ -35,6 +36,15 @@ const GROUPS: [string, Item[]][] = [
     { key: 'lefty', label: '왼손 배치', type: 'on' },
     { key: 'vibrate', label: '진동', type: 'on' },
   ]],
+  // 필드 시계 (docs/필드_세계_NPC_설계.md 16-2, 사용자 확정 2026-10-26): 0분 = 그 행동으로는 시간이 안 감
+  ['필드 시간', [
+    { key: 'tScene', label: '장면 넘어가기', type: 'min', min: 0, max: 60, step: 5 },
+    { key: 'tRegion', label: '지역 이동', type: 'min', min: 0, max: 180, step: 5 },
+    { key: 'tTalk', label: '대화 한 번', type: 'min', min: 0, max: 60, step: 5 },
+    { key: 'tFight', label: '싸움 (장면당 한 번)', type: 'min', min: 0, max: 60, step: 5 },
+    { key: 'tWaitShort', label: '시간 보내기 · 짧게', type: 'min', min: 0, max: 240, step: 5 },
+    { key: 'tWaitLong', label: '시간 보내기 · 길게', type: 'min', min: 0, max: 480, step: 5 },
+  ]],
 ];
 const ITEMS = GROUPS.flatMap(([, g]) => g);
 
@@ -48,6 +58,7 @@ function control(it: Item, s: UiSettings): string {
   const seg = (v: string, label: string, on: boolean) => `<button class="gx-seg${on ? ' on' : ''}" data-action="visit-ui" data-value="${it.key}=${v}" aria-pressed="${on}">${esc(label)}</button>`;
   if (it.type === 'pick') return `<div class="gx-segs gx-segs-sm">${it.opts.map(([v, l]) => seg(v, l, cur === v)).join('')}</div>`;
   if (it.type === 'on') return switchHtml({ action: 'visit-ui', value: `${it.key}=${cur === true ? '0' : '1'}`, on: cur === true, label: it.label });
+  if (it.type === 'min') return `<span class="adv-num"><input class="gx-search" type="number" inputmode="numeric" min="${it.min}" max="${it.max}" step="${it.step}" data-change="visit-ui" data-key="${it.key}" value="${Math.round(Number(cur))}" aria-label="${esc(it.label)}"><span>분</span></span>`;
   return `<span class="adv-num"><input class="gx-search" type="number" inputmode="numeric" min="${Math.round(it.min * 100)}" max="${Math.round(it.max * 100)}" step="${Math.round(it.step * 100)}" data-change="visit-ui" data-key="${it.key}" value="${Math.round(Number(cur) * 100)}" aria-label="${esc(it.label)}"><span>%</span></span>`;
 }
 
@@ -56,7 +67,7 @@ export function gameUiSections(state: Record<string, unknown> | undefined): stri
   return GROUPS.map(([title, items]) => `<section class="ps-group"><h3>게임 ${esc(title)}</h3><div class="ps-rows">${items
     .map((it) => {
       const changed = s[it.key] !== DEFAULT_SETTINGS[it.key];
-      return `<div class="ps-row adv-row${it.type === 'pct' ? ' adv-numrow' : ''}${changed ? ' changed' : ''}"><div class="ps-label"><b>${esc(it.label)}</b></div><div class="ps-ctl">${control(it, s)}</div></div>`;
+      return `<div class="ps-row adv-row${it.type === 'pct' || it.type === 'min' ? ' adv-numrow' : ''}${changed ? ' changed' : ''}"><div class="ps-label"><b>${esc(it.label)}</b></div><div class="ps-ctl">${control(it, s)}</div></div>`;
     })
     .join('')}</div></section>`).join('')
     + `<section class="ps-group"><p class="ps-note">게임 안 설정(Esc → 설정)과 같은 값이에요. 게임을 열어 둔 채 바꿨다면 다시 들어가면 적용돼요.</p></section>`;
@@ -71,7 +82,11 @@ export async function setGameUi(ctx: ChatContext, value: string): Promise<boolea
   const s = gameUiOf(ctx.chat.scriptstate) as unknown as Record<string, unknown>;
   if (it.type === 'pick') { if (!it.opts.some(([v]) => v === raw)) return false; s[key] = raw; }
   else if (it.type === 'on') s[key] = raw === '1';
-  else {
+  else if (it.type === 'min') {
+    const n = Number(raw);
+    if (!Number.isFinite(n)) return false;
+    s[key] = Math.min(it.max, Math.max(it.min, Math.round(n)));
+  } else {
     const n = Number(raw);
     if (!Number.isFinite(n)) return false;
     s[key] = Math.min(it.max, Math.max(it.min, Math.round(n / (it.step * 100)) * it.step));

@@ -1,7 +1,7 @@
 import { build } from 'esbuild';
 import { readFileSync, writeFileSync, mkdirSync, readdirSync, unlinkSync, existsSync } from 'node:fs';
 import { createHash } from 'node:crypto';
-import { buildGamePack, buildPack } from './game-pack.mjs';
+import { buildGamePack } from './game-pack.mjs';
 import { rmSync } from 'node:fs';
 
 const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url)));
@@ -122,59 +122,8 @@ await build({
   outfile: 'dist-test/core.mjs',
 });
 
-// 관찰형 게임 시험 페이지용 (tests/game/demo.html)
-await build({
-  entryPoints: ['src/game/demo.ts'],
-  bundle: true,
-  format: 'esm',
-  target: 'es2022',
-  charset: 'utf8',
-  loader: { '.css': 'text' },
-  outfile: 'dist-test/game-demo.js',
-});
-await build({
-  entryPoints: ['src/game/sim.ts'],
-  bundle: true,
-  format: 'esm',
-  target: 'es2022',
-  charset: 'utf8',
-  outfile: 'dist-test/game-sim.mjs',
-});
-
-// 1인 액션 검증판과 순수 전투 로직 시험용.
-await build({
-  ...common,
-  entryPoints: ['src/game/action/demo.ts'],
-  format: 'esm',
-  write: true,
-  outfile: 'dist-test/action-demo.js',
-});
-await build({
-  entryPoints: ['src/game/action/sim.ts'],
-  bundle: true,
-  format: 'esm',
-  target: 'es2022',
-  outfile: 'dist-test/action-sim.mjs',
-});
-
-await build({
-  ...common,
-  entryPoints: ['src/ui/game.ts'],
-  format: 'esm',
-  write: true,
-  outfile: 'dist-test/action-ui.js',
-});
-
-// 회색 상자 시험판 (그림 없음): 시험 페이지용 번들, 순수 시뮬레이션, 단일 HTML.
-await build({ ...common, entryPoints: ['src/game/action/graybox/demo.ts'], format: 'esm', write: true, outfile: 'dist-test/graybox-demo.js' });
+// 회색 상자 순수 시뮬레이션 (화면·조작 시연판·본부 시연판이 아직 쓴다). 시험: tests/graybox.test.mjs
 await build({ entryPoints: ['src/game/action/graybox/sim.ts'], bundle: true, format: 'esm', target: 'es2022', outfile: 'dist-test/graybox-sim.mjs' });
-{
-  const code = readFileSync('dist-test/graybox-demo.js', 'utf8').replace(/<\/script/gi, '<\\/script');
-  const html = `<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>회색 상자 시험판 · 차원 승강기</title><style>body{margin:0;background:#02070c;display:flex;justify-content:center}#box{position:relative;max-width:100vw;height:100dvh}</style><div id="box"></div><script type="module">${code}</script></html>`;
-  writeFileSync('dist/goei-graybox.html', html);
-  mkdirSync('release/demo', { recursive: true });
-  writeFileSync('release/demo/goei-graybox.html', html);
-}
 
 // 게임 엔진 시연판 (전투·조작·장면 관리). 쟈알디 그림 묶음(game-pack/jyaldi)을 내장한 단일 HTML.
 await build({ ...common, entryPoints: ['src/game/action/engine/demo.ts'], format: 'esm', minify: true, write: true, outfile: 'dist-test/engine-demo.js' });
@@ -228,71 +177,6 @@ await build({ ...common, entryPoints: ['src/game/action/engine/demo.ts'], format
 }
 await build({ entryPoints: ['src/game/action/audio/music.ts', 'src/game/action/audio/songs.ts', 'src/game/action/audio/index.ts'], bundle: true, format: 'esm', target: 'es2022', outdir: 'dist-test/audio' });
 
-await build({
-  ...common,
-  entryPoints: ['src/game/action/motion-demo.ts'],
-  format: 'esm',
-  write: true,
-  outfile: 'dist-test/motion-demo.js',
-});
-
-// 새 액션 그림 팩은 구형 순찰 팩과 분리한다.
-const actionPack = buildPack('game-pack/action', 'action', 4, [
-  'a-jyaldi-action',
-  'bg-bureau-action',
-  'e-corner',
-  'e-watchman',
-]);
-writeFileSync('dist/goei-game-action.pack', actionPack);
-mkdirSync('dist-test', { recursive: true });
-writeFileSync('dist-test/goei-game-action.pack', actionPack);
-const actionReviewed = JSON.parse(readFileSync('game-src/action/layout.json', 'utf8')).releaseReady === true;
-if (actionReviewed) writeFileSync('release/goei-game-action-normal-v4.pack', actionPack);
-
-// 설치 없이 여는 단일 HTML 검증판. 필요한 새 액션 그림만 포함한다.
-const actionArt = {
-  atlas: JSON.parse(readFileSync('game-pack/action/atlas.json', 'utf8')),
-  files: Object.fromEntries(
-    ['a-jyaldi-action', 'e-corner', 'e-watchman', 'bg-bureau-action'].map((name) => [
-      name,
-      `data:image/png;base64,${readFileSync(`game-pack/action/${name}.png`).toString('base64')}`,
-    ]),
-  ),
-};
-const actionCode = readFileSync('dist-test/action-demo.js', 'utf8').replace(/<\/script/gi, '<\\/script');
-writeFileSync(
-  'dist/goei-action-demo.html',
-  `<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>관리국 1인 전투 검증판</title><style>body{margin:0;background:#02070c;display:flex;justify-content:center}#box{position:relative;max-width:100vw;height:100dvh}</style><div id="box"></div><script>window.__GOEI_ACTION_ART__=${JSON.stringify(actionArt)}</script><script type="module">${actionCode}</script></html>`,
-);
-
-const motionCode = readFileSync('dist-test/motion-demo.js', 'utf8').replace(/<\/script/gi, '<\\/script');
-writeFileSync(
-  'dist/goei-jyaldi-motions.html',
-  `<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>쟈알디 동작 확인</title><body><script>window.__GOEI_ACTION_ART__=${JSON.stringify(actionArt)}</script><script type="module">${motionCode}</script></body></html>`,
-);
-
-// 검토한 그림만 공유용 시연판으로 승격한다. 진행 중 자료는 dist에만 둔다.
-if (actionReviewed) {
-  mkdirSync('release/demo', { recursive: true });
-  const playable = readFileSync('dist/goei-action-demo.html');
-  writeFileSync('release/demo/goei-action-demo.html', playable);
-  const actionProfile = actionArt.atlas.action?.profile;
-  writeFileSync(
-    actionProfile?.startsWith('normal-')
-      ? 'release/demo/goei-jyaldi-normal.html'
-      : 'release/demo/goei-jyaldi-slender.html',
-    playable,
-  );
-  if (actionProfile === 'normal-v4') writeFileSync('release/demo/goei-jyaldi-action-v4.html', playable);
-  writeFileSync('release/demo/goei-jyaldi-motions.html', readFileSync('dist/goei-jyaldi-motions.html'));
-}
-
-// 게임 그림 팩: 플러그인과 따로, 원하는 사람만 게임 창에서 받는다 (release/ 폴더에서 바로 받거나 파일로 넣기).
-// 그림이 그대로면 바이트도 같아서 매번 써도 바뀐 것으로 잡히지 않는다
-const PACK_VERSION = Number(/PACK_VERSION = (\d+)/.exec(readFileSync('src/game/assets.ts', 'utf8'))[1]);
-const pack = buildPack('game-pack/patrol', 'patrol', PACK_VERSION);
-writeFileSync('dist/goei-game-patrol.pack', pack);
-
 // 토크나이저 순위표 (o200k_base, js-tiktoken MIT): 플러그인이 설치·점검에서 받아 저장소에 둔다 (core/tokenizer.ts). 200KB 조각 + 목록
 {
   const ranks = (await import('js-tiktoken/ranks/o200k_base')).default;
@@ -317,11 +201,6 @@ writeFileSync('dist/goei-game-patrol.pack', pack);
   writeFileSync('dist/tok-o200k.json', JSON.stringify({ name: 'o200k_base', parts: names, length: text.length, digest: createHash('sha1').update(text).digest('hex').slice(0, 12) }));
   console.log({ tokenizer: 'o200k_base', parts: names.length, chars: text.length });
 }
-mkdirSync('release', { recursive: true });
-writeFileSync('release/goei-game-patrol.pack', pack);
-mkdirSync('dist-test', { recursive: true });
-writeFileSync('dist-test/goei-game-patrol.pack', pack);
-
 const info = {
   version: pkg.version,
   bytes: Buffer.byteLength(code),

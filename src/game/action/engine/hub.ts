@@ -43,9 +43,31 @@ export interface HubHost {
   hour?(): number | null;
   /** 출동 차량 앞 E: 출발했으면 null, 아니면 자막 한 줄 */
   depart?(): string | null;
+  /** 앉기·눕기 자리에 앉았다 (시간 보내기 고르기) */
+  sat?(): void;
   /** 출동 준비가 됐나 (B3 승합차 화살표) */
   armed?(): boolean;
+  /** 필드 세계 (src/game/world): 있으면 visitors 대신 움직이는 행위자를 그린다 */
+  life?: HubLife;
 }
+
+/** 보이는 장면의 행위자 하나 (월드 좌표, 발 기준) */
+export interface LiveActor { id: string; name: string; kind: 'named' | 'mob'; x: number; y: number; face: 1 | -1; look?: string; moving: boolean; clip?: string; since?: number; icon?: string; say?: string }
+export interface HubLife {
+  /** 생활 시간 진행 (실시간 초). at = 보이는 장면과 주인공 발 */
+  tick(dt: number, at: { scene: string; x: number; y?: number }): void;
+  actors(sceneId: string): LiveActor[];
+  /** 관찰 창이 켜져 있으면 글 줄, 꺼져 있으면 null */
+  observer(sceneId: string): string[] | null;
+  /** 몹 그림. 없으면 회색 실루엣 */
+  drawMob?(c: CanvasRenderingContext2D, a: LiveActor): void;
+  /** 생활 시각(초): 클립 재생 기준 */
+  lifeTime?(): number;
+  /** 주인공 공격 판정 → 맞은 행위자 수 */
+  hit?(sceneId: string, boxes: { x0: number; x1: number; y: number; dy?: number; z0: number; z1: number; attackId: number }[], dir: 1 | -1): number;
+}
+/** 행위자 깊이 층 자리 수 (한 화면 상한보다 넉넉히) */
+const LIFE_SLOTS = 24;
 
 const TOP = 440;
 const LANE: [number, number] = [LANE_TOP, LANE_BOT];
@@ -75,6 +97,8 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
   /** 자리 주인 목소리 한 줄: 아래 자막 대신 그 사람 머리 위 말풍선 (사용자 2026-10-25) */
   let speech: { who: string; text: string; x: number; y: number; top: number; until: number } | null = null;
   let curPeople: { name: string; x: number; y: number }[] = [];
+  /** 보이는 장면의 행위자 (host.life) */
+  let live: LiveActor[] = [];
   let opening: { id: string; t: number; len: number; then: () => void } | null = null;
   /** 들어온 문이 뒤에서 닫히는 것·메뉴 문이 다시 닫히는 것 */
   let closing: { id: string; t: number; len: number } | null = null;
@@ -98,7 +122,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
     view = host.map();
     const base = sceneOf(id);
     // 방문 요원은 그 방의 자리(대화 상대)로 붙인다: E → 대화창 (npcLink hubTalk → visit)
-    const people = (host.visitors?.(base.id) ?? []).map((p) => {
+    const people = (host.life ? [] : host.visitors?.(base.id) ?? []).map((p) => {
       const at = clearSpot(p.x, p.y, base.boxes.filter((b) => b.solid).map((b) => ({ x: b.x, y: b.y, w: b.w, back: b.d + 6, front: 8 })), base.lane ?? LANE);
       return { ...p, x: at.x, y: at.y };
     });
@@ -143,6 +167,14 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
         if (sc.painted && hasHqField(sc.painted)) { drawHqFieldObject(c, sc.painted, b.kind); return; }
         drawBox(c, b, sc.look);
       } })).concat(people.map((p) => ({ y: p.y, x0: p.x - 60, x1: p.x + 60, occludedSilhouette: false, draw: (c: CanvasRenderingContext2D) => { drawVisitAgent(c, p.name, p.x, p.y, p.face, performance.now()); } })))
+        // 움직이는 행위자: 자리 수만큼 층을 두고 매 프레임 지금 목록의 i번째를 읽는다 (깊이 정렬은 y 게터로)
+        .concat(host.life ? Array.from({ length: LIFE_SLOTS }, (_, i) => ({
+          get y() { return live[i]?.y ?? -1e9; },
+          get x0() { return (live[i]?.x ?? -1e9) - 60; },
+          get x1() { return (live[i]?.x ?? -1e9) + 60; },
+          occludedSilhouette: false,
+          draw: (c: CanvasRenderingContext2D) => { const a = live[i]; if (a) drawLiveActor(c, a, host.life!); },
+        })) : [])
         .concat(man ? [{ y: man.y, x0: man.x - 60, x1: man.x + 60, occludedSilhouette: false, draw: (c: CanvasRenderingContext2D) => { drawTestMan(c, man.x, man.y, -1); } }] : []),
       drawBackground(c: CanvasRenderingContext2D, camX: number) {
         if (sc.painted && drawHqField(c, sc.painted, camX, doorFx, host.hour?.() ?? null)) {
@@ -194,8 +226,23 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
         c.save();
         c.scale(1 / z, 1 / z);
         // 사람 그림은 월드 배율로 그려지므로(배경과 같이 커짐) 머리 높이도 z를 곱한다
-        host.overlay?.(c, people.map((p) => ({ name: p.name, x: p.x * z, y: p.y * z, top: visitAgentTop(p.name) * persp(p.y) * z })), { name: '', x: w.player.x * z, y: (w.player.y - w.player.z) * z, top: (hasTestPeople() ? testPlayerTop() : visitAgentTop('쟈알디')) * persp(w.player.y) * z });
+        const shown = host.life ? live.filter((a) => a.kind === 'named') : people;
+        host.overlay?.(c, shown.map((p) => ({ name: p.name, x: p.x * z, y: p.y * z, top: visitAgentTop(p.name) * persp(p.y) * z })), { name: '', x: w.player.x * z, y: (w.player.y - w.player.z) * z, top: (hasTestPeople() ? testPlayerTop() : visitAgentTop('쟈알디')) * persp(w.player.y) * z });
         c.restore();
+        // 행위자 머리 위 아이콘·말풍선 (화면 px)
+        if (host.life) {
+          c.save();
+          c.scale(1 / z, 1 / z);
+          for (const a of live) {
+            if (!a.icon && !a.say) continue;
+            const top = (a.kind === 'named' ? visitAgentTop(a.name) : hasTestPeople() ? testManTop() : -230) * persp(a.y);
+            drawHeadBubble(c, a.x * z, (a.y + top) * z - 8, a.say ?? a.icon!, !!a.say);
+          }
+          c.restore();
+        }
+        // 세계 관찰 창 (개발 도구): 화면 왼쪽 위, 화면 px 그대로
+        const obs = host.life?.observer(sc.id);
+        if (obs) drawObserver(c, obs);
         // 출입 표식과 잠금 이유는 render.ts / HUD가 같은 조사 대상으로 표시한다.
         const dark = fadeOut > 0 ? 1 - fadeOut / FADE : age < FADE ? 1 - age / FADE : 0;
         if (dark > 0) {
@@ -262,6 +309,20 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
       return build(s.scene, s.x, s.y);
     },
     tick(a: StageApi) {
+      if (host.life && scene) {
+        host.life.tick(1 / 30, { scene: scene.id, x: a.world.player.x, y: a.world.player.y });
+        // 주인공 공격이 행위자에게 닿았나 (필드 행위자는 전투 몸이 아니라 따로 본다)
+        const boxes = a.world.player.frame().hit;
+        if (boxes.length && host.life.hit) {
+          const n = host.life.hit(scene.id, boxes, a.world.player.dir);
+          if (n) a.world.emit({ type: 'hit', strength: 1, x: boxes[0].x0, y: boxes[0].y, z: 120, dmg: 0, react: 'flinch', target: 'npc', combo: 0 });
+        }
+        live = host.life.actors(scene.id);
+        // 이름 인물 대화 자리(visit:이름)를 지금 서 있는 곳으로 옮긴다 (E → npcLink 대화)
+        const named = live.filter((q) => q.kind === 'named');
+        scene.spots = scene.spots.filter((q) => !q.id.startsWith('visit:')).concat(named.map((q) => ({ id: `visit:${q.name}`, x: q.x, y: q.y, who: q.name, verb: '대화', face: q.face, open: true })));
+        curPeople = named;
+      }
       if (fadeOut > 0 && --fadeOut === 0 && pending) {
         if (pending.scene === scene?.id) {
           arrive = { x: pending.x, y: pending.y };
@@ -331,12 +392,15 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
         if (s.seat && s.act?.[0]) {
           const exit = clearSpot(s.x, s.y ?? a.world.player.y, solids, scene.lane ?? LANE);
           (a.world.player as Player).sit(s.act[0], s.seat.x, s.seat.y, s.face ?? 1, exit);
+          host.sat?.();
           return;
         }
         // 자리 동작: 그 자리에 서서 보는 쪽을 맞춘다 (생활 클립 재생은 host.act)
         if (s.y !== undefined) a.movePlayer(s.x, s.y);
         if (s.face) (a.world.player as { dir: 1 | -1 }).dir = s.face;
         if (s.act) host.act?.(s.act, s.face);
+        // 앉기·눕기 자리 = 시간 보내기 (docs/필드_세계_NPC_설계.md 16-2)
+        if (/앉기|눕기/.test(s.verb)) host.sat?.();
         return;
       }
       if (prop.kind !== 'hubdoor') return;
@@ -824,4 +888,61 @@ function legacyDoor(c: CanvasRenderingContext2D, d: Door, camX: number) {
     c.fillStyle = 'rgba(0,0,0,0.35)';
     c.fillRect(x, y, w, DOOR_H);
   }
+}
+
+/** 행위자 그리기: 이름 인물은 방문 요원 그림(없으면 실루엣), 몹은 host가 주는 그림(없으면 실루엣) */
+function drawLiveActor(c: CanvasRenderingContext2D, a: LiveActor, life: HubLife): void {
+  const t = (life.lifeTime?.() ?? performance.now() / 1000) * 1000;
+  if (a.kind === 'named' && drawVisitAgent(c, a.name, a.x, a.y, a.face, t, a.clip, (a.since ?? 0) * 1000)) return;
+  if (a.kind === 'mob' && life.drawMob) return life.drawMob(c, a);
+  silhouette(c, a);
+}
+/** 그림이 없을 때 대역: 바닥 그림자 + 회색 몸 (검수 전 표시) */
+export function silhouette(c: CanvasRenderingContext2D, a: { x: number; y: number; kind: 'named' | 'mob' }): void {
+  const k = persp(a.y);
+  const h = 230 * k, w = 64 * k;
+  c.save();
+  c.fillStyle = 'rgba(0,0,0,0.28)';
+  c.beginPath();
+  c.ellipse(a.x, a.y, w * 0.6, 9 * k, 0, 0, Math.PI * 2);
+  c.fill();
+  c.fillStyle = a.kind === 'named' ? '#6d7f94' : '#7b7f86';
+  c.fillRect(a.x - w / 2, a.y - h, w, h * 0.78);
+  c.beginPath();
+  c.arc(a.x, a.y - h - w * 0.05, w * 0.36, 0, Math.PI * 2);
+  c.fill();
+  c.restore();
+}
+function drawObserver(c: CanvasRenderingContext2D, lines: string[]): void {
+  c.save();
+  c.setTransform(1, 0, 0, 1, 0, 0);
+  c.font = '13px monospace';
+  const w = Math.min(c.canvas.width - 16, Math.max(260, ...lines.map((l) => c.measureText(l).width + 20)));
+  const h = Math.min(c.canvas.height - 16, lines.length * 17 + 12);
+  // 오른쪽 위 (왼쪽 위는 HUD 초상화·체력)
+  const x0 = c.canvas.width - w - 8;
+  c.fillStyle = 'rgba(8,12,18,0.82)';
+  c.fillRect(x0, 8, w, h);
+  c.fillStyle = '#d7e3ef';
+  lines.forEach((l, i) => { if (16 + 17 * (i + 1) < h + 8) c.fillText(l, x0 + 8, 8 + 17 * (i + 1)); });
+  c.restore();
+}
+/** 머리 위 작은 말풍선: 아이콘 한 글자(! ? ♪ … #) 또는 대사 한 줄 */
+function drawHeadBubble(c: CanvasRenderingContext2D, x: number, y: number, text: string, line: boolean): void {
+  c.save();
+  c.font = line ? '14px Galmuri11, sans-serif' : 'bold 16px Galmuri11, sans-serif';
+  const w = Math.min(320, c.measureText(text).width + (line ? 16 : 12));
+  const h = line ? 22 : 22;
+  const bx = Math.round(x - w / 2), by = Math.round(y - h);
+  c.fillStyle = text === '#' ? '#f2d0cc' : '#f4f1e8';
+  c.strokeStyle = '#1b1f24';
+  c.lineWidth = 2;
+  c.fillRect(bx, by, w, h);
+  c.strokeRect(bx, by, w, h);
+  c.fillRect(Math.round(x) - 3, by + h, 6, 4);
+  c.fillStyle = '#1b1f24';
+  c.textAlign = 'center';
+  c.textBaseline = 'middle';
+  c.fillText(text, Math.round(x), by + h / 2 + 1, w - 8);
+  c.restore();
 }

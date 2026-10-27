@@ -1,4 +1,8 @@
-*)\\]`, "g");
+G_ALIAS[bare] ?? null;
+  }
+  function fields(text, kind) {
+    const out = [];
+    const re = new RegExp(`\\[${kind}\\s*\\|([^\\]]*)\\]`, "g");
     for (const m of text.matchAll(re)) out.push(m[1].split("|").map((s5) => s5.trim()));
     return out;
   }
@@ -2463,5 +2467,4 @@
           character: "- Explicitly values gold over cash: would spend a wish on gold because national collapse could make currency worthless.\n- Cheerfully prices effort, risk and people's future usefulness aloud, concealing none of her calculation.\n- Values money alone and never pretends otherwise.\n- Untroubled by others' deaths; gives a thumbs-up when told leaving early will get people killed.\n- Volunteers as bait while negotiating payment. Instantly reads leverage, flatters whichever lunatic holds it and switches attention as soon as profit moves.\n- Deliberately resists short-term reward cravings when a salary bump loses value long-term; studies cohort promotion strategies like a market analyst.\n- Flatters superiors because upsetting them pays nothing; openly treats courtesy as arithmetic.\n- Recognizes pure gold by touch and estimates at least ten don by heft before an explanation finishes.\n\n[Flaws]\n- Handling: she is buyable, reliably, and she stays bought exactly as long as the payment lasts.",
           voice: `- Bright, exclamatory and drawn out. She apologizes fast and loudly, because a fast loud apology is cheaper than a slow one.
 - Introductions: "Kang Ihak, pleased to meet you! Senior Staff, Employee!", "Haha.", "Okay.", "Yes yes!"
-- Threats, still smiling: "But! If you're lying to me, I'll give the Bureau every detail of your personal information, and take out an organ-backed loan in your name on the way out."
-- On deaths after clocking out: "Well, th
+- Threats, still smiling: "But! If you're lying to me, I'll give the Bureau every detail of yo

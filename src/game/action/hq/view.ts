@@ -112,8 +112,6 @@ export function createHq(): HqModule {
   let walk = true;
   const rand = () => (host?.rand ?? Math.random)();
   const keys = new Set<string>();
-  // 쉬는 요원 위치 (사무실·탕비실을 오간다)
-  const idlers: Record<string, { x: number; to: number; wait: number }> = {};
 
   const ctx = (): LineCtx => ({ agent: s.selected, agentName: AGENT_BY_ID[s.selected].name, fatigue: s.agents[s.selected].fatigue, day: s.day, rand });
   const save = () => loaded ? host?.save(saveText(s)).catch(() => {}) : undefined;
@@ -169,24 +167,6 @@ export function createHq(): HqModule {
     c.fillStyle = '#9ab';
     c.font = '12px sans-serif';
     c.fillText('계단 ↓ 지하', PLACE_BY_ID.training.x - 30, FLOOR_Y - 208);
-    // 쉬는 요원들
-    for (const a of AGENTS) {
-      if (a.id === s.selected) continue;
-      const it = (idlers[a.id] ??= { x: PLACE_BY_ID.office.x + 260, to: PLACE_BY_ID.office.x + 260, wait: 2 });
-      it.wait -= dt;
-      if (it.wait <= 0 && Math.abs(it.x - it.to) < 2) {
-        const spots = [PLACE_BY_ID.office.x + 80, PLACE_BY_ID.office.x + 300, PLACE_BY_ID.pantry.x + 120];
-        it.to = spots[Math.floor(rand() * spots.length)];
-        it.wait = 4 + rand() * 6;
-      }
-      it.x += Math.sign(it.to - it.x) * Math.min(Math.abs(it.to - it.x), 60 * dt);
-      const rec = s.agents[a.id];
-      c.fillStyle = a.color + (rec.injured ? '66' : 'aa');
-      c.fillRect(it.x - 20, FLOOR_Y - 104, 40, 104);
-      c.fillStyle = '#ddd';
-      c.font = '13px sans-serif';
-      c.fillText(`${a.name}${rec.injured ? ' (부상)' : rec.fatigue >= 2 ? ' (피곤)' : ''}`, it.x, FLOOR_Y - 112);
-    }
     // 나
     const me = AGENT_BY_ID[s.selected];
     c.fillStyle = me.color;

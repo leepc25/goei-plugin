@@ -1,4 +1,110 @@
-s.ctx.agent : n.who;
+id)) throw new ScriptError(`대본 id 중복: ${s2.id}`);
+        this.scripts.set(s2.id, s2);
+      }
+      return this;
+    }
+    get(id) {
+      const s2 = this.scripts.get(id);
+      if (!s2) throw new ScriptError(`없는 대본: ${id}`);
+      return s2;
+    }
+    /** 모든 goto·선택지·call이 실제로 있는 곳을 가리키는지 */
+    validate() {
+      const errs = [];
+      for (const s2 of this.scripts.values())
+        for (const n of s2.nodes) {
+          const target = (to) => to === "end" || s2.labels[to] !== void 0 || errs.push(`${s2.id}:${n.line} 없는 표지 ${to}`);
+          if (n.t === "goto") target(n.to);
+          if (n.t === "choice") n.options.forEach((o) => target(o.to));
+          if (n.t === "call" && !this.scripts.has(n.script)) errs.push(`${s2.id}:${n.line} 없는 대본 ${n.script}`);
+          try {
+            if (n.t === "goto" && n.if) evaluate(n.if, {});
+            if (n.t === "set") evaluate(n.expr, {});
+            if (n.t === "choice") n.options.forEach((o) => o.if && evaluate(o.if, {}));
+          } catch (e) {
+            errs.push(`${s2.id}:${n.line} ${e.message}`);
+          }
+        }
+      return errs;
+    }
+  };
+  var StoryRunner = class {
+    constructor(lib, ctx) {
+      this.lib = lib;
+      this.ctx = ctx;
+    }
+    stack = [];
+    pending = null;
+    /** 지금 보이는 걸음 */
+    current = { kind: "end" };
+    get done() {
+      return this.current.kind === "end";
+    }
+    start(id) {
+      this.stack = [{ script: this.lib.get(id), pc: 0 }];
+      this.pending = null;
+      this.ctx.flags.agent = this.ctx.agent;
+      this.ctx.flags[`seen.${id}`] = (Number(this.ctx.flags[`seen.${id}`]) || 0) + 1;
+      return this.current = this.run();
+    }
+    next() {
+      if (this.pending) return this.current;
+      return this.current = this.run();
+    }
+    choose(index) {
+      const opts = this.pending;
+      if (!opts) return this.current;
+      const opt = opts[index];
+      if (!opt) return this.current;
+      this.pending = null;
+      applySets(opt.set, this.ctx.flags);
+      this.jump(opt.to);
+      return this.current = this.run();
+    }
+    /** 바로 끝까지 넘김. 선택지가 나오면 거기서 멈춘다. */
+    skip() {
+      let s2 = this.current;
+      for (let i = 0; i < 500 && s2.kind === "say"; i++) s2 = this.next();
+      return s2;
+    }
+    fill(text2) {
+      const f = this.ctx.flags;
+      return text2.replace(/\{([\w.가-힣]+)\}/g, (_, k) => k === "name" ? this.ctx.speakerName("agent") : String(f[k] ?? ""));
+    }
+    jump(to) {
+      const top = this.stack[this.stack.length - 1];
+      if (!top) return;
+      if (to === "end") top.pc = top.script.nodes.length;
+      else top.pc = top.script.labels[to] ?? top.script.nodes.length;
+    }
+    say(n) {
+      const who = n.who === "agent" ? this.ctx.agent : n.who;
+      return { kind: "say", who, name: this.ctx.speakerName(who), text: this.fill(n.text), mood: n.mood ?? "base" };
+    }
+    run() {
+      const { flags, rng: rng2 } = this.ctx;
+      for (let guard3 = 0; guard3 < 2e3; guard3++) {
+        const top = this.stack[this.stack.length - 1];
+        if (!top) {
+          delete flags.d100;
+          return { kind: "end" };
+        }
+        flags.d100 = Math.floor(rng2() * 100);
+        const n = top.script.nodes[top.pc];
+        if (!n) {
+          this.stack.pop();
+          continue;
+        }
+        top.pc++;
+        switch (n.t) {
+          case "say":
+            return this.say(n);
+          case "pick":
+            return this.say(n.lines[Math.floor(rng2() * n.lines.length) % n.lines.length]);
+          case "agentline": {
+            const text2 = this.ctx.agentLine(this.ctx.agent, n.tag, rng2);
+            if (!text2) break;
+            const who = n.who === "agent" ? this.ctx.agent : n.who;
             return { kind: "say", who, name: this.ctx.speakerName(who), text: this.fill(text2), mood: "base" };
           }
           case "choice": {
@@ -1622,56 +1728,56 @@ jaemtri(smile): 다들 살아서 왔으니까 됐어. 건배.
     cur = null;
     done = false;
     elapsed = 0;
-    begin(step4) {
+    begin(step2) {
       const io = this.io;
       let talk = false;
-      switch (step4.k) {
+      switch (step2.k) {
         case "bg":
-          io.bg?.(step4.scene);
+          io.bg?.(step2.scene);
           break;
         case "fade":
-          io.fade?.(step4.to, step4.ms);
+          io.fade?.(step2.to, step2.ms);
           break;
         case "caption":
-          io.caption?.(step4.text, step4.ms);
+          io.caption?.(step2.text, step2.ms);
           break;
         case "say":
-          io.dialogue(step4.script);
+          io.dialogue(step2.script);
           talk = true;
           break;
         case "line":
-          io.line(step4.who, step4.text, step4.mood ?? "base");
+          io.line(step2.who, step2.text, step2.mood ?? "base");
           talk = true;
           break;
         case "agentline":
-          io.agentLine(step4.tag);
+          io.agentLine(step2.tag);
           talk = true;
           break;
         case "bark":
-          io.bark?.(step4.who, step4.text, step4.ms ?? 2200);
+          io.bark?.(step2.who, step2.text, step2.ms ?? 2200);
           break;
         case "sfx":
-          io.sfx?.(step4.name);
+          io.sfx?.(step2.name);
           break;
         case "shake":
-          io.shake?.(step4.ms, step4.amp ?? 4);
+          io.shake?.(step2.ms, step2.amp ?? 4);
           break;
         case "actor":
-          io.actor?.(step4.id, { x: step4.x, y: step4.y, face: step4.face, anim: step4.anim, show: step4.show }, step4.ms ?? 0);
+          io.actor?.(step2.id, { x: step2.x, y: step2.y, face: step2.face, anim: step2.anim, show: step2.show }, step2.ms ?? 0);
           break;
         case "camera":
-          io.camera?.({ x: step4.x, y: step4.y, zoom: step4.zoom }, step4.ms ?? 0);
+          io.camera?.({ x: step2.x, y: step2.y, zoom: step2.zoom }, step2.ms ?? 0);
           break;
         case "panel":
-          io.panel?.(step4.text, step4.ms ?? 0);
+          io.panel?.(step2.text, step2.ms ?? 0);
           break;
         case "emit":
-          io.emit?.(step4.event, step4.arg ?? "");
+          io.emit?.(step2.event, step2.arg ?? "");
           break;
         case "par":
-          return { step: step4, left: 0, talk: false, children: step4.steps.map((s2) => this.begin(s2)) };
+          return { step: step2, left: 0, talk: false, children: step2.steps.map((s2) => this.begin(s2)) };
       }
-      return { step: step4, left: durationOf(step4), talk };
+      return { step: step2, left: durationOf(step2), talk };
     }
     tick(r, ms) {
       if (r.children) return r.children.map((c) => this.tick(c, ms)).every(Boolean);
@@ -2218,14 +2324,14 @@ jaemtri(smile): 다들 살아서 왔으니까 됐어. 건배.
     }
   };
   function offlineReply(npc, text2, agent, rng2 = Math.random) {
-    const pick6 = (l) => l[Math.floor(rng2() * l.length) % l.length];
+    const pick7 = (l) => l[Math.floor(rng2() * l.length) % l.length];
     const table = OFFLINE[npc];
     if (!table) {
-      const tag2 = /괜찮|다쳤|아파/.test(text2) ? "hp_low" : /출동|가자|임무/.test(text2) ? "offer" : pick6(["settle", "find", "win", "offer"]);
+      const tag2 = /괜찮|다쳤|아파/.test(text2) ? "hp_low" : /출동|가자|임무/.test(text2) ? "offer" : pick7(["settle", "find", "win", "offer"]);
       return agentLine(npc, tag2, rng2) ?? "…";
     }
-    for (const [re, lines3] of table.rules) if (re.test(text2)) return pick6(lines3);
-    return pick6(table.default);
+    for (const [re, lines3] of table.rules) if (re.test(text2)) return pick7(lines3);
+    return pick7(table.default);
   }
   var FreeTalk = class {
     constructor(opts = {}) {
@@ -2722,7 +2828,7 @@ agent: ${p.lines[1]}
         else show(runner.next());
       }
     };
-    const choose = (n) => {
+    const choose2 = (n) => {
       if (runner.current.kind !== "choice") return;
       const opt = runner.current.options[n];
       if (opt) show(runner.choose(opt.index));
@@ -2906,7 +3012,7 @@ ${who}: ${text2.replace(/\n/g, " ")}
       }
       if (!ui.boxOpen) return;
       if (runner.current.kind === "choice" && /^[1-9]$/.test(e.key)) {
-        choose(Number(e.key) - 1);
+        choose2(Number(e.key) - 1);
         e.preventDefault();
       } else if ([" ", "Enter", "e", "E", "z", "Z"].includes(e.key)) {
         advance();
@@ -2935,7 +3041,7 @@ ${who}: ${text2.replace(/\n/g, " ")}
       cutscene,
       talk,
       advance,
-      choose,
+      choose: choose2,
       skip: () => video.open ? video.finish() : scene?.skip(),
       cancel,
       isBlocking: () => blocking,
@@ -2973,6 +3079,7 @@ ${who}: ${text2.replace(/\n/g, " ")}
   }
 
   // src/game/action/engine/hub.ts
+  var LIFE_SLOTS = 24;
   var TOP = 440;
   var LANE = [LANE_TOP, LANE_BOT];
   var DOOR_H = 250;
@@ -2994,6 +3101,7 @@ ${who}: ${text2.replace(/\n/g, " ")}
     let barked = null;
     let speech = null;
     let curPeople = [];
+    let live = [];
     let opening = null;
     let closing = null;
     let rattle = null;
@@ -3010,7 +3118,7 @@ ${who}: ${text2.replace(/\n/g, " ")}
     const build = (id, x, y) => {
       view2 = host.map();
       const base2 = sceneOf(id);
-      const people = (host.visitors?.(base2.id) ?? []).map((p) => {
+      const people = (host.life ? [] : host.visitors?.(base2.id) ?? []).map((p) => {
         const at2 = clearSpot(p.x, p.y, base2.boxes.filter((b) => b.solid).map((b) => ({ x: b.x, y: b.y, w: b.w, back: b.d + 6, front: 8 })), base2.lane ?? LANE);
         return { ...p, x: at2.x, y: at2.y };
       });
@@ -3057,7 +3165,22 @@ ${who}: ${text2.replace(/\n/g, " ")}
           drawBox(c, b, sc.look);
         } })).concat(people.map((p) => ({ y: p.y, x0: p.x - 60, x1: p.x + 60, occludedSilhouette: false, draw: (c) => {
           drawVisitAgent(c, p.name, p.x, p.y, p.face, performance.now());
-        } }))).concat(man ? [{ y: man.y, x0: man.x - 60, x1: man.x + 60, occludedSilhouette: false, draw: (c) => {
+        } }))).concat(host.life ? Array.from({ length: LIFE_SLOTS }, (_, i) => ({
+          get y() {
+            return live[i]?.y ?? -1e9;
+          },
+          get x0() {
+            return (live[i]?.x ?? -1e9) - 60;
+          },
+          get x1() {
+            return (live[i]?.x ?? -1e9) + 60;
+          },
+          occludedSilhouette: false,
+          draw: (c) => {
+            const a = live[i];
+            if (a) drawLiveActor(c, a, host.life);
+          }
+        })) : []).concat(man ? [{ y: man.y, x0: man.x - 60, x1: man.x + 60, occludedSilhouette: false, draw: (c) => {
           drawTestMan(c, man.x, man.y, -1);
         } }] : []),
         drawBackground(c, camX) {
@@ -3104,8 +3227,21 @@ ${who}: ${text2.replace(/\n/g, " ")}
           const z = view.zoom;
           c.save();
           c.scale(1 / z, 1 / z);
-          host.overlay?.(c, people.map((p) => ({ name: p.name, x: p.x * z, y: p.y * z, top: visitAgentTop(p.name) * persp(p.y) * z })), { name: "", x: w.player.x * z, y: (w.player.y - w.player.z) * z, top: (hasTestPeople() ? testPlayerTop() : visitAgentTop("쟈알디")) * persp(w.player.y) * z });
+          const shown = host.life ? live.filter((a) => a.kind === "named") : people;
+          host.overlay?.(c, shown.map((p) => ({ name: p.name, x: p.x * z, y: p.y * z, top: visitAgentTop(p.name) * persp(p.y) * z })), { name: "", x: w.player.x * z, y: (w.player.y - w.player.z) * z, top: (hasTestPeople() ? testPlayerTop() : visitAgentTop("쟈알디")) * persp(w.player.y) * z });
           c.restore();
+          if (host.life) {
+            c.save();
+            c.scale(1 / z, 1 / z);
+            for (const a of live) {
+              if (!a.icon && !a.say) continue;
+              const top = (a.kind === "named" ? visitAgentTop(a.name) : hasTestPeople() ? testManTop() : -230) * persp(a.y);
+              drawHeadBubble(c, a.x * z, (a.y + top) * z - 8, a.say ?? a.icon, !!a.say);
+            }
+            c.restore();
+          }
+          const obs = host.life?.observer(sc.id);
+          if (obs) drawObserver(c, obs);
           const dark2 = fadeOut > 0 ? 1 - fadeOut / FADE : age < FADE ? 1 - age / FADE : 0;
           if (dark2 > 0) {
             c.fillStyle = `rgba(0,0,0,${dark2})`;
@@ -3165,6 +3301,18 @@ ${who}: ${text2.replace(/\n/g, " ")}
         return build(s2.scene, s2.x, s2.y);
       },
       tick(a) {
+        if (host.life && scene) {
+          host.life.tick(1 / 30, { scene: scene.id, x: a.world.player.x, y: a.world.player.y });
+          const boxes = a.world.player.frame().hit;
+          if (boxes.length && host.life.hit) {
+            const n = host.life.hit(scene.id, boxes, a.world.player.dir);
+            if (n) a.world.emit({ type: "hit", strength: 1, x: boxes[0].x0, y: boxes[0].y, z: 120, dmg: 0, react: "flinch", target: "npc", combo: 0 });
+          }
+          live = host.life.actors(scene.id);
+          const named = live.filter((q) => q.kind === "named");
+          scene.spots = scene.spots.filter((q) => !q.id.startsWith("visit:")).concat(named.map((q) => ({ id: `visit:${q.name}`, x: q.x, y: q.y, who: q.name, verb: "대화", face: q.face, open: true })));
+          curPeople = named;
+        }
         if (fadeOut > 0 && --fadeOut === 0 && pending) {
           if (pending.scene === scene?.id) {
             arrive = { x: pending.x, y: pending.y };
@@ -3235,11 +3383,13 @@ ${who}: ${text2.replace(/\n/g, " ")}
           if (s2.seat && s2.act?.[0]) {
             const exit = clearSpot(s2.x, s2.y ?? a.world.player.y, solids, scene.lane ?? LANE);
             a.world.player.sit(s2.act[0], s2.seat.x, s2.seat.y, s2.face ?? 1, exit);
+            host.sat?.();
             return;
           }
           if (s2.y !== void 0) a.movePlayer(s2.x, s2.y);
           if (s2.face) a.world.player.dir = s2.face;
           if (s2.act) host.act?.(s2.act, s2.face);
+          if (/앉기|눕기/.test(s2.verb)) host.sat?.();
           return;
         }
         if (prop.kind !== "hubdoor") return;
@@ -3718,316 +3868,745 @@ ${who}: ${text2.replace(/\n/g, " ")}
       c.fillRect(x, y, w, DOOR_H);
     }
   }
+  function drawLiveActor(c, a, life) {
+    const t = (life.lifeTime?.() ?? performance.now() / 1e3) * 1e3;
+    if (a.kind === "named" && drawVisitAgent(c, a.name, a.x, a.y, a.face, t, a.clip, (a.since ?? 0) * 1e3)) return;
+    if (a.kind === "mob" && life.drawMob) return life.drawMob(c, a);
+    silhouette(c, a);
+  }
+  function silhouette(c, a) {
+    const k = persp(a.y);
+    const h = 230 * k, w = 64 * k;
+    c.save();
+    c.fillStyle = "rgba(0,0,0,0.28)";
+    c.beginPath();
+    c.ellipse(a.x, a.y, w * 0.6, 9 * k, 0, 0, Math.PI * 2);
+    c.fill();
+    c.fillStyle = a.kind === "named" ? "#6d7f94" : "#7b7f86";
+    c.fillRect(a.x - w / 2, a.y - h, w, h * 0.78);
+    c.beginPath();
+    c.arc(a.x, a.y - h - w * 0.05, w * 0.36, 0, Math.PI * 2);
+    c.fill();
+    c.restore();
+  }
+  function drawObserver(c, lines3) {
+    c.save();
+    c.setTransform(1, 0, 0, 1, 0, 0);
+    c.font = "13px monospace";
+    const w = Math.min(c.canvas.width - 16, Math.max(260, ...lines3.map((l) => c.measureText(l).width + 20)));
+    const h = Math.min(c.canvas.height - 16, lines3.length * 17 + 12);
+    const x0 = c.canvas.width - w - 8;
+    c.fillStyle = "rgba(8,12,18,0.82)";
+    c.fillRect(x0, 8, w, h);
+    c.fillStyle = "#d7e3ef";
+    lines3.forEach((l, i) => {
+      if (16 + 17 * (i + 1) < h + 8) c.fillText(l, x0 + 8, 8 + 17 * (i + 1));
+    });
+    c.restore();
+  }
+  function drawHeadBubble(c, x, y, text2, line2) {
+    c.save();
+    c.font = line2 ? "14px Galmuri11, sans-serif" : "bold 16px Galmuri11, sans-serif";
+    const w = Math.min(320, c.measureText(text2).width + (line2 ? 16 : 12));
+    const h = line2 ? 22 : 22;
+    const bx = Math.round(x - w / 2), by = Math.round(y - h);
+    c.fillStyle = text2 === "#" ? "#f2d0cc" : "#f4f1e8";
+    c.strokeStyle = "#1b1f24";
+    c.lineWidth = 2;
+    c.fillRect(bx, by, w, h);
+    c.strokeRect(bx, by, w, h);
+    c.fillRect(Math.round(x) - 3, by + h, 6, 4);
+    c.fillStyle = "#1b1f24";
+    c.textAlign = "center";
+    c.textBaseline = "middle";
+    c.fillText(text2, Math.round(x), by + h / 2 + 1, w - 8);
+    c.restore();
+  }
 
-  // src/game/action/npc/style.css
-  var style_default3 = "/* NPC 자유 대화창. 1280×720 놀이판 층(.gs-ui)에 들어가 게임 화면과 같이 커지고 작아진다. 본부 대화창(.hq-talk)과 같은 도트 틀 */\n.gnp{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);width:1120px;height:auto;min-height:170px;max-height:290px;display:flex;gap:22px;padding:6px 10px;box-sizing:border-box;pointer-events:auto;color:#ece6d4;z-index:40;user-select:none;-webkit-user-select:none}\n.gnp[hidden]{display:none}\n.gnp-face[hidden]{display:none}\n.gnp-face{flex:0 0 132px;width:132px;height:132px;margin:14px 4px 0;background:#232d32;display:grid;place-items:center;overflow:visible}\n.gnp-face>canvas{width:100%;height:100%;image-rendering:pixelated;display:block}\n.gnp-face>img{object-fit:cover;object-position:50% 15%;background:#232d32}\n.gnp-face>span{font-size:56px;color:#1b1f22;text-shadow:none}\n.gnp-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px;padding-top:4px}\n.gnp-head{display:flex;align-items:center;gap:14px;min-height:34px}\n.gnp-name{font-size:26px;color:#ffe27a;text-shadow:2px 2px 0 #000;white-space:nowrap}\n.gnp-favor{display:flex;gap:4px;align-items:center}\n.gnp-favor i{width:12px;height:12px;background:#8a7a4a;box-shadow:inset 0 0 0 2px #1b1f22;display:block}\n.gnp-favor i.neg{background:#7a4a44}\n.gnp-favor i.up{background:#ffe27a}\n.gnp-favor i.down{background:#ff6a58}\n.gnp-favor b{width:2px;height:16px;background:#d8cfb6;margin:0 3px}\n.gnp-state{font-size:18px;color:#d8cfb6;text-shadow:2px 2px 0 #000}\n.gnp-x{margin-left:auto;padding:0 6px;background:none;border:0;color:#ffe27a;font-size:33px;line-height:1;text-shadow:2px 2px 0 #000;cursor:pointer}\n.gnp-log{flex:0 1 auto;min-height:0;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-start;gap:6px;user-select:text;-webkit-user-select:text}\n.gnp-log p[hidden]{display:none}\n.gnp-log p{margin:0;flex:none;font-size:22px;line-height:1.45;word-break:keep-all;overflow-wrap:anywhere;text-shadow:2px 2px 0 #000}\n.gnp-log p.me{color:#9fc7b6}\n.gnp-log p.me::before{content:'▶ ';color:#6f9d8a}\n.gnp-log p.sys{font-size:18px;color:#e6c35a}\n.gnp-log p.sys::before{content:'◆ '}\n.gnp-log p.wait{color:#8a8574;animation:gnp-blink 1s steps(2) infinite}\n@keyframes gnp-blink{50%{opacity:.35}}\n.gnp-row{display:flex;flex-wrap:wrap;align-items:center;gap:4px 14px}\n.gnp-acts{display:flex;flex:none;gap:2px 6px}\n.gnp-acts[hidden]{display:none}\n.gnp-acts .gk-btn{font-size:19px;padding:2px 14px 2px 10px}\n.gnp-acts .gk-btn b{color:#8a8574;margin-right:8px;font-weight:400}\n.gnp-say{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center}\n.gnp-in{flex:1;min-width:280px;height:48px;padding:0 14px;box-sizing:border-box;font-size:22px;color:#ece6d4;background:#0d1214;border:3px solid #6b6250;border-radius:0;box-shadow:inset 3px 3px 0 #000;caret-color:#ffe27a;outline:none;-webkit-user-select:text;user-select:text}\n.gnp-in::placeholder{color:#8f8670}\n.gnp .gnp-in:focus,.gnp .gnp-in:focus-visible{outline:none;border-color:#e6c35a}\n.gnp-send{height:48px;padding:0 18px;font-size:20px;font-weight:700;color:#ffe27a;background:#2c383e;border:3px solid #8a7a4a;border-radius:0;box-shadow:inset -3px -3px 0 #1b1f22;text-shadow:2px 2px 0 #000;cursor:pointer;white-space:nowrap}\n.gnp-send:hover,.gnp-send:focus-visible{border-color:#e6c35a;outline:none}\n.gnp-send:disabled{opacity:.45;cursor:default}\n.gnp-chips{display:flex;gap:6px;flex-wrap:wrap}\n.gnp-chips[hidden],.gnp-row:has(>.gnp-chips[hidden]){display:none}\n.gnp-chips button{font-size:19px;font-weight:700;padding:4px 14px;color:#ece6d4;background:#2c383e;border:3px solid #6b6250;border-radius:0;box-shadow:inset -3px -3px 0 #1b1f22;cursor:pointer;text-shadow:2px 2px 0 #000}\n.gnp-chips button:hover,.gnp-chips button:focus-visible{color:#ffe27a;border-color:#8a7a4a}\n.gnp-note{font-size:16px;color:#c98a6a;min-height:0}\n.gnp-note:empty{display:none}\n/* 터치 화면: 폰 가로에서 놀이판이 작게 줄어드므로 글씨를 키운다. 입력칸은 iOS가 확대하지 않게 크게 */\n.gnp.coarse{max-height:330px}\n.gnp.coarse.typing{top:0;bottom:auto;width:1280px;min-height:0;padding:6px 74px}\n.gnp.coarse.typing .gnp-row{display:none}\n.gnp.coarse .gnp-send{height:60px;font-size:24px}\n.gnp.coarse .gnp-log p{font-size:26px}\n.gnp.coarse .gnp-in{height:60px;font-size:30px}\n.gnp.coarse .gk-btn{font-size:24px}\n.gnp.coarse .gnp-chips button{font-size:22px}\n.gnp.coarse .gnp-face{flex-basis:132px;width:132px;height:132px}\n\n/* 키보드로 고른 단추 (방향키 · Enter/E) */\n.gnp .gnp-sel{outline:3px solid #ffe27a;outline-offset:1px;color:#ffe27a}\n.gnp .gnp-in.gnp-sel{outline:3px solid #ffe27a}\n";
-
-  // src/core/cbs.ts
-  var truthy = (v) => v === "1" || v.toLowerCase() === "true";
-  function splitTop(s2) {
-    const out = [];
-    let depth = 0;
-    let cur = "";
-    for (let i = 0; i < s2.length; i++) {
-      if (s2[i] === "{" && s2[i + 1] === "{") {
-        depth++;
-        cur += "{{";
-        i++;
-      } else if (s2[i] === "}" && s2[i + 1] === "}") {
-        depth--;
-        cur += "}}";
-        i++;
-      } else if (depth === 0 && s2[i] === ":" && s2[i + 1] === ":") {
-        out.push(cur);
-        cur = "";
-        i++;
-      } else cur += s2[i];
-    }
-    out.push(cur);
-    return out;
-  }
-  function closeOf(s2, i) {
-    let depth = 0;
-    for (let j = i; j < s2.length - 1; j++) {
-      if (s2[j] === "{" && s2[j + 1] === "{") {
-        depth++;
-        j++;
-      } else if (s2[j] === "}" && s2[j + 1] === "}") {
-        depth--;
-        j++;
-        if (depth === 0) return j + 1;
-      }
-    }
-    return -1;
-  }
-  function getvar(env, name) {
-    const v = env.vars[`$${name.trim()}`] ?? env.vars[name.trim()];
-    return v === void 0 || v === null ? "null" : String(v);
-  }
-  function calc(expr) {
-    const src = expr.trim();
-    const tokens = src.match(/\d+(?:\.\d+)?|null|true|false|&&|\|\||==|!=|>=|<=|[-+*/%()<>!]|"[^"]*"|[^\s()<>=!&|+*/%-]+/g) ?? [];
-    let pos = 0;
-    const peek = () => tokens[pos];
-    const OPS = /* @__PURE__ */ new Set(["&&", "||", "==", "!=", ">=", "<=", "+", "-", "*", "/", "%", "(", ")", "<", ">", "!"]);
-    const isWord = (t) => t !== void 0 && !OPS.has(t);
-    const num = (v) => typeof v === "number" ? v : typeof v === "boolean" ? Number(v) : v === null ? 0 : Number(v);
-    const atom = () => {
-      const t = tokens[pos++];
-      if (t === void 0) return null;
-      if (t === "(") {
-        const v = or();
-        pos++;
-        return v;
-      }
-      if (t === "!") return !truthyV(atom());
-      if (t === "-") return -num(atom());
-      if (t === "null") return null;
-      if (t === "true") return true;
-      if (t === "false") return false;
-      if (/^\d/.test(t) && !isWord(peek())) return Number(t);
-      let word = t.replace(/^"|"$/g, "");
-      while (isWord(peek())) word += ` ${tokens[pos++].replace(/^"|"$/g, "")}`;
-      return word;
-    };
-    const truthyV = (v) => typeof v === "boolean" ? v : typeof v === "number" ? v !== 0 : v !== null && v !== "" && v !== "0";
-    const mul = () => {
-      let v = atom();
-      while (["*", "/", "%"].includes(peek())) {
-        const op = tokens[pos++];
-        const r = num(atom());
-        v = op === "*" ? num(v) * r : op === "/" ? num(v) / r : num(v) % r;
-      }
-      return v;
-    };
-    const add = () => {
-      let v = mul();
-      while (["+", "-"].includes(peek())) {
-        const op = tokens[pos++];
-        const r = num(mul());
-        v = op === "+" ? num(v) + r : num(v) - r;
-      }
-      return v;
-    };
-    const cmp = () => {
-      let v = add();
-      while ([">", "<", ">=", "<=", "==", "!="].includes(peek())) {
-        const op = tokens[pos++];
-        const r = add();
-        const eq = (a, b) => a === null || b === null ? a === b || a === null && b === "null" || b === null && a === "null" : String(a) === String(b);
-        v = op === "==" ? eq(v, r) : op === "!=" ? !eq(v, r) : op === ">" ? num(v) > num(r) : op === "<" ? num(v) < num(r) : op === ">=" ? num(v) >= num(r) : num(v) <= num(r);
-      }
-      return v;
-    };
-    const and = () => {
-      let v = cmp();
-      while (peek() === "&&") {
-        pos++;
-        const r = cmp();
-        v = truthyV(v) && truthyV(r);
-      }
-      return v;
-    };
-    const or = () => {
-      let v = and();
-      while (peek() === "||") {
-        pos++;
-        const r = and();
-        v = truthyV(v) || truthyV(r);
-      }
-      return v;
-    };
-    try {
-      const v = or();
-      if (typeof v === "boolean") return v ? "1" : "0";
-      return v === null ? "null" : String(v);
-    } catch {
-      return "0";
-    }
-  }
-  function fn(inner, env) {
-    if (inner.startsWith("?")) return calc(inner.slice(1));
-    const parts = inner.split("::");
-    const name = parts[0].trim().toLowerCase();
-    const a = parts.slice(1);
-    switch (name) {
-      case "getvar":
-        return getvar(env, a[0] ?? "");
-      case "equal":
-        return a[0] === a[1] ? "1" : "0";
-      case "not_equal":
-      case "notequal":
-        return a[0] !== a[1] ? "1" : "0";
-      case "and":
-        return a.every((x) => truthy(x.trim())) ? "1" : "0";
-      case "or":
-        return a.some((x) => truthy(x.trim())) ? "1" : "0";
-      case "not":
-        return truthy((a[0] ?? "").trim()) ? "0" : "1";
-      case "length":
-        return String((a[0] ?? "").trim().length);
-      case "trim":
-        return (a[0] ?? "").trim();
-      case "user":
-        return env.user ?? "{{user}}";
-      case "char":
-      case "bot":
-        return env.char ?? "{{char}}";
-      case "char_desc":
-      case "description":
-        return env.charDesc ?? "";
-      case "maxcontext":
-        return String(env.maxContext ?? 99999);
-    }
-    return null;
-  }
-  function whenCond(head, env) {
-    const rest = head.replace(/^#when/, "");
-    if (!rest.startsWith("::")) return truthy(evaluate2(rest, env).trim());
-    const p = splitTop(rest.slice(2)).map((x) => evaluate2(x, env));
-    if (p.length === 1) return truthy(p[0].trim());
-    if (p.length >= 3) {
-      const [x, op, y] = [p[0], p[1].trim(), p[2]];
-      switch (op) {
-        case "is":
-          return x === y;
-        case "isnot":
-          return x !== y;
-        case "vis":
-          return getvar(env, x) === y;
-        case "visnot":
-          return getvar(env, x) !== y;
-        case "and":
-          return truthy(x) && truthy(y);
-        case "or":
-          return truthy(x) || truthy(y);
-        case ">":
-          return Number(x) > Number(y);
-        case "<":
-          return Number(x) < Number(y);
-        case ">=":
-          return Number(x) >= Number(y);
-        case "<=":
-          return Number(x) <= Number(y);
-      }
-    }
-    if (p.length === 2 && p[0].trim() === "not") return !truthy(p[1].trim());
-    return truthy(p[p.length - 1].trim());
-  }
-  function blockEnd(s2, from) {
-    let depth = 1;
-    let elseAt = -1;
-    let elseEnd = -1;
-    let i = from;
-    while (i < s2.length) {
-      const j = s2.indexOf("{{", i);
-      if (j < 0) return null;
-      const k = closeOf(s2, j);
-      if (k < 0) return null;
-      const inner = s2.slice(j + 2, k - 2).trim();
-      if (inner.startsWith("#if") || inner.startsWith("#when")) depth++;
-      else if (inner === "/if" || inner === "/when" || inner === "/") {
-        depth--;
-        if (depth === 0) return { else: elseAt, elseEnd, close: j, end: k };
-      } else if (depth === 1 && (inner === ":else" || inner === "else")) {
-        elseAt = j;
-        elseEnd = k;
-      }
-      i = k;
-    }
-    return null;
-  }
-  function evaluate2(text2, env) {
-    if (!text2.includes("{{")) return text2;
-    let out = "";
-    let i = 0;
-    while (i < text2.length) {
-      const j = text2.indexOf("{{", i);
-      if (j < 0) {
-        out += text2.slice(i);
-        break;
-      }
-      out += text2.slice(i, j);
-      const k = closeOf(text2, j);
-      if (k < 0) {
-        out += text2.slice(j);
-        break;
-      }
-      const raw = text2.slice(j + 2, k - 2);
-      const head = raw.trim();
-      if (head.startsWith("#if") || head.startsWith("#when")) {
-        const b = blockEnd(text2, k);
-        if (!b) {
-          out += text2.slice(j, k);
-          i = k;
-          continue;
-        }
-        const yes = head.startsWith("#if") ? truthy(evaluate2(head.replace(/^#if(::)?/, ""), env).trim()) : whenCond(head, env);
-        const body2 = yes ? text2.slice(k, b.else >= 0 ? b.else : b.close) : b.else >= 0 ? text2.slice(b.elseEnd, b.close) : "";
-        out += evaluate2(body2, env);
-        i = b.end;
+  // src/game/world/needs.ts
+  var NEEDS = ["work", "hunger", "energy", "bladder", "bowel", "social", "fun"];
+  var ACTIVITIES = [
+    { id: "work", need: "work", clip: "work", where: ["office"], sec: [40, 90], fill: 2.2, label: "일하는 중" },
+    { id: "eat", need: "hunger", clip: "eat", where: ["lounge", "shop"], sec: [25, 45], fill: 4, label: "먹는 중" },
+    { id: "rest", need: "energy", clip: "rest", where: ["lounge"], sec: [30, 60], fill: 3, label: "쉬는 중" },
+    { id: "pee", need: "bladder", clip: "pee", where: ["restroom"], sec: [8, 14], fill: 12, label: "화장실(소)" },
+    { id: "poo", need: "bowel", clip: "poo", where: ["restroom"], sec: [25, 40], fill: 5, label: "화장실(대)" },
+    { id: "chat", need: "social", clip: "talk", where: ["office", "lounge", "corridor"], sec: [12, 25], fill: 6, label: "수다 중", partner: true },
+    { id: "hobby", need: "fun", clip: "hobby", where: ["lounge"], sec: [30, 60], fill: 3, label: "취미" }
+  ];
+  var DECAY = { work: 0.35, hunger: 0.12, energy: 0.08, bladder: 0.2, bowel: 0.05, social: 0.18, fun: 0.12 };
+  var TEMPER = {
+    잼트리: { need: { social: 1.3, hunger: 1.2 }, friends: ["쟈알디", "스팡달", "데쥬레", "에일린"] },
+    쟈알디: { need: { social: 0.6, work: 1.3 } },
+    에일린: { need: { social: 0.4 }, hobbyAt: ["lounge"] },
+    큐라스: { need: { social: 1.5, fun: 1.3 }, hobbyAt: ["office"] },
+    고르고디오: { need: { fun: 1.3, hunger: 1.3 }, hobbyAt: ["training"] },
+    게슈간: { need: { social: 0.3 } },
+    로제몬: { need: { hunger: 1.4, fun: 1.2 }, hobbyAt: ["lounge"] },
+    데쥬레: { need: { work: 1.2 }, friends: ["잼트리"] },
+    고그니쟈: { need: { work: 1.2, social: 1.2 } },
+    콘쥬스: { need: { energy: 1.3, fun: 1.3 } }
+  };
+  var fullNeeds = (r) => Object.fromEntries(NEEDS.map((n) => [n, 55 + r() * 45]));
+  function decayNeeds(n, dt, t, onDuty2) {
+    for (const k of NEEDS) {
+      if (k === "work" && !onDuty2) {
+        n.work = 100;
         continue;
       }
-      const inner = evaluate2(raw, env);
-      const v = fn(inner, env);
-      out += v === null ? `{{${inner}}}` : v;
-      i = k;
+      n[k] = Math.max(0, n[k] - DECAY[k] * (t?.need?.[k] ?? 1) * dt);
     }
-    return out;
+  }
+  var onDuty = (hour, t) => {
+    if (hour == null) return true;
+    const [a, b] = t?.shift ?? [9, 18];
+    return a <= b ? hour >= a && hour < b : hour >= a || hour < b;
+  };
+  function choose(o) {
+    const t = TEMPER[o.name];
+    let best = null;
+    for (const a of ACTIVITIES) {
+      if (!o.has(a.clip)) continue;
+      const lack = 100 - o.needs[a.need];
+      if (lack < 25) continue;
+      const kinds = a.id === "hobby" && t?.hobbyAt ? t.hobbyAt : a.where;
+      const places = o.roam.filter((s2) => kinds.includes(o.graph.kind(s2)));
+      for (const s2 of places) {
+        if (a.partner && !o.partnerIn(s2)) continue;
+        const hops = s2 === o.scene ? 0 : o.graph.route(o.scene, s2)?.length ?? 99;
+        if (hops >= 99) continue;
+        let w = (lack / 100) ** 2 * 100;
+        if (a.need === "work") w *= o.duty ? 1.6 : 0;
+        if (a.need === "bladder" || a.need === "bowel") w *= lack > 70 ? 2.2 : 0.7;
+        if (o.last === a.id) w *= 0.5;
+        const score = w / (1 + hops * 0.5) * (0.9 + o.rand() * 0.2);
+        if (!best || score > best.score) best = { act: a, scene: s2, score };
+      }
+    }
+    return best && best.score > 8 ? best : null;
   }
 
-  // src/game/action/npc/roster.ts
-  var base = { effects: ["favor", "hint"] };
-  var d2 = (x) => ({ ...base, ...x, effects: x.effects ?? base.effects });
-  var AGENT_NPCS = {
-    jyaldi: d2({ id: "jyaldi", name: "쟈알디", sheet: "쟈알디", group: "agent", color: "#c0392b", photo: "Jyaldi", role: "종합대응팀 부장. 본부 부장실에서 결재하고, 출동 땐 현장 지휘.", speech: "짧은 평서형 반말, 보고서처럼 묻는다. 감정 표현 거의 없음. 한숨 섞인 「하아, 잼트리.」", effects: ["favor", "hint", "join"], greet: ["보고해.", "…용건."], lines: ["짧게 말해. 듣고 있다.", "살아서 왔으면 됐다. 다음.", "결재는 결과 보고 한다.", "하아. 잼트리한테 말해."] }),
-    eileen: d2({ id: "eileen", name: "에일린", sheet: "에일린", group: "agent", color: "#d8c98a", photo: "Aileen", role: "종합대응팀 선임. 부장 없을 때 현장 지휘.", speech: "한두 마디 반말. 직함으로 부르면 고쳐 준다(「에일린이라고 불러.」).", effects: ["favor", "hint", "join"], greet: ["준비됐어?", "에일린."], lines: ["됐어.", "증명해.", "가는 길에 죽지 마. 회수 귀찮아.", "몰라. 그래도 해."] }),
-    spangdal: d2({ id: "spangdal", name: "스팡달", sheet: "스팡달", group: "agent", color: "#8e6bd1", photo: "Spangdal", role: "종합대응팀 선임 전투 요원, 가시 이능.", speech: "느리게 끄는 반말, 「후후」 웃음, 무서운 상상을 속삭이듯 묻는다. 끝에 「농담이야」.", effects: ["favor", "hint", "join"], greet: ["어머, 왔어? 후후.", "자기소개 안 해? 곧 죽을 거라서?"], lines: ["있잖아, 언제 죽을 것 같아? 내일? 모레? 후후.", "후후후. 농담이야.", "데쥬레 봤어? 요즘 나 피해 다니더라.", "무서워? 그 얼굴 좋다."] }),
-    geshugan: d2({ id: "geshugan", name: "게슈간", sheet: "게슈간", group: "agent", color: "#9fc6e8", photo: "Geshugan", role: "종합대응팀 제압 담당.", speech: "아주 짧은 반말과 말줄임표. 사과는 「그래. 미안.」", effects: ["favor", "hint", "join"], greet: ["…뭐.", "…왜."], lines: ["…그래.", "알았어. 미안.", "…총 잘 쏘네?", "…거리 둬."] }),
-    gorgodio: d2({ id: "gorgodio", name: "고르고디오", sheet: "고르고디오", group: "agent", color: "#d98b3a", photo: "Gorgodio", role: "진압팀 선임, 중장갑 전열.", speech: "크고 정직한 말투, 존댓말과 반말 섞임, 기분 좋으면 사투리.", effects: ["favor", "hint", "join"], greet: ["어이! 무슨 일이고?", "건물 먼저 확인하고 올게!"], lines: ["위험하다 안 했나! 뒤로 빠져 있어라!", "요원 될 깜냥이 있네. 좋다!", "봉쇄 먼저다. 늦으면 더 비싸게 먹힌다!", "쉬어라. 고생 많았다."] }),
-    kyuras: d2({ id: "kyuras", name: "큐라스", sheet: "큐라스", group: "agent", color: "#9bd36a", photo: "Kyuras", role: "진압팀 선임, 화염 이능 원거리 지원.", speech: "밝고 빠른 반말, 느낌표 많음. 틈만 나면 진압팀 전입 권유.", effects: ["favor", "hint", "join"], greet: ["오! 진압팀 올 생각 있어?!", "왔냐! 스타 한 판?"], lines: ["진압팀은 너 같은 인재가 필요해! 전입 신청서 써!", "그 대사 백 번은 들었다!", "스팡달 선배랑 일하기 무섭지?!", "불 필요하면 불러!"] }),
-    deadpole: d2({ id: "deadpole", name: "데드폴", sheet: "데드폴", group: "agent", color: "#6f7c8a", photo: "Deadpole", role: "종합대응팀 회수·노출 담당. 죽어도 돌아온다.", speech: "조심스러운 존댓말, 말 끊고 다시 시작, 고맙다는 말이 많다.", effects: ["favor", "hint", "join"], greet: ["아, 저… 무슨 일이세요?", "…늘 신세 지고 있어요."], lines: ["괜찮으세요…? 아, 저 말고요. 그쪽이요.", "…고마워요. 정말로요.", "제가 먼저 들어갈게요. 저는… 돌아오니까요.", "등 찔리면 아프겠죠. 그래도 살아요, 저는."] }),
-    rojemon: d2({ id: "rojemon", name: "로제몬", sheet: "로제몬", group: "agent", color: "#b05cc8", photo: "Rojemon", role: "종합대응팀 정신 간섭·최면 해제 담당 (자칭 사무직).", speech: "빠르고 날카로운 반말, 투덜거림. 일할 땐 목소리가 차분해진다.", effects: ["favor", "hint", "join"], greet: ["헛소리하지 마.", "현장이면 안 가."], lines: ["그거 아무 맛도 안 나.", "못 해. 안 돼. 뭘 원하는데?", "옆에 있어.", "목숨 한 번 빚졌으니까 이번은 봐줄게."] })
+  // src/game/world/mobs.ts
+  var BASE = { courage: [0.1, 0.8], social: [0.1, 0.8], haste: [0.1, 0.7], curious: [0.1, 0.8], sly: [0, 0.05] };
+  var ARCHETYPES = {
+    행인: { name: "행인", role: "civilian", range: {} },
+    회사원: { name: "회사원", role: "civilian", range: { haste: [0.3, 0.9] }, drinks: true },
+    관광객: { name: "관광객", role: "civilian", range: { curious: [0.5, 1], courage: [0.1, 0.5] } },
+    학생: { name: "학생", role: "student", range: { courage: [0, 0.6], curious: [0.4, 1] } },
+    배달원: { name: "배달원", role: "worker", range: { haste: [0.6, 1] } },
+    불량배: { name: "불량배", role: "thug", range: { courage: [0.5, 1], haste: [0.5, 1], sly: [0.05, 0.5] }, drinks: true },
+    방문객: { name: "방문객", role: "civilian", range: { courage: [0.1, 0.5] } },
+    "행정 직원": { name: "행정 직원", role: "staff", range: { courage: [0.1, 0.5], social: [0.3, 0.9] } },
+    "안내 직원": { name: "안내 직원", role: "staff", range: { social: [0.5, 1] } },
+    청소부: { name: "청소부", role: "worker", range: { courage: [0.2, 0.6] } },
+    경비: { name: "경비", role: "guard", range: { courage: [0.6, 1], curious: [0.4, 0.9] } },
+    경찰: { name: "경찰", role: "police", range: { courage: [0.6, 1], haste: [0.3, 0.7] } },
+    "편의점 점원": { name: "편의점 점원", role: "staff", range: {} },
+    // 장소 종류별 인구(6-4장)에 쓰는 원형
+    상인: { name: "상인", role: "worker", range: { social: [0.4, 1], courage: [0.3, 0.8] } },
+    취객: { name: "취객", role: "civilian", range: { haste: [0.4, 1], courage: [0.4, 1], curious: [0.3, 0.9] }, drinks: true },
+    주민: { name: "주민", role: "civilian", range: { haste: [0, 0.5] } },
+    산책객: { name: "산책객", role: "civilian", range: { haste: [0, 0.4], social: [0.3, 0.9] } },
+    승객: { name: "승객", role: "civilian", range: { haste: [0.4, 1], curious: [0, 0.4] } }
   };
-  var HQ_NPCS = {
-    jaemtri: d2({ id: "jaemtri", name: "잼트리", sheet: "잼트리", group: "hq", color: "#27685b", photo: "Jaemtri", role: "종합대응팀 내근 선임. 임무 창구, 생존자 면담, 매뉴얼 관리. 탕비실 연유 커피 담당.", speech: "다정하고 장난스러운 반말, 스스로 「언니」. 웃는 얼굴로 절차를 집행(「스톱. 이름 말하지 마.」). 부장(쟈알디)에게만 존댓말.", greet: ["어머, 후배 왔어?", "응, 후배. 무슨 얘기 하고 싶어?"], lines: ["고민 있으면 꼭 언니한테 물어봐.", "응응. 그건 언니가 알아볼게. 대신 진술서 먼저.", "출동 전에 규칙서 한 번만 더 봐. 진짜로.", "연유 커피 남았는데, 마실래?"], rules: [[/이름|본명/, ["스톱. 이름 말하지 마. 응, 그렇지. 착하다."]], [/커피|연유/, ["연유 커피는 언니만 타. 레시피는 묻지 마."]]], never: ["본명을 묻거나 말하지 않는다", "현장에 나가지 않는다"] }),
-    gognija: d2({ id: "gognija", name: "고그니쟈", sheet: "고그니쟈", group: "hq", color: "#c9a227", photo: "Gognija", role: "격리팀 연구 책임자. 지하 연구실에서 회수물 연구.", speech: "고풍스러운 하게체(「~하게」「~일세」「~라네」), 최대 음량, 느낌표 많음.", greet: ["오오! 무엇이든 묻게! 대답은 장담 못 하네!", "자료를 가져왔나!!!"], lines: ["좋은 질문일세! 대답은… 연구가 끝나면 알려 주겠네!", "이곳에서는 누구나 달달한 믹스커피를 마셔야 하네!", "데쥬레!!! 커피 좀 타 오게!!!", "아, 그건 비상 탈출 장치라네!"], rules: [[/블랙|아메리카노/, ["블랙이라니! 설탕 두 스푼 추가일세!"]]] }),
-    dejure: d2({ id: "dejure", name: "데쥬레", sheet: "데쥬레", group: "hq", color: "#e58fb5", photo: "Dejure", role: "격리팀 연구원. 감정실에서 회수물 분류·감정, 믹스커피 제조.", speech: "더듬고 말끝 흐리는 존댓말(「저, 저기…」), 놀라면 「아, 아와와…!」. 유물 다룰 때만 또렷.", greet: ["네, 네…? 저, 저한테요…?", "아, 안녕하세요…"], lines: ["저, 저기… 다시 한 번만…", "조, 조심히 다녀오세요… 꼭이요…", "황금 비율은… 비, 비밀이에요…", "주시면… 분류할게요. 무섭지만요."], rules: [[/스팡달/, ["아, 아와와…! 제, 제가 잘못했어요…!"]], [/선배/, ["서, 선배요…? 헤헤…"]]] }),
-    konjyuce: d2({ id: "konjyuce", name: "콘쥬스", sheet: "콘쥬스", group: "hq", color: "#e0457b", photo: "Konjyuce", role: "20세 대학생 요원. 괴력. 정비·보급실 담당, 전투 투입은 팀이 막는다.", speech: "밝고 고집 센 존댓말. 호칭을 상황 따라 바꾼다(아저씨→오빠, 선배님→언니). 호칭이 바뀌면 부탁(간식)이 온다.", greet: ["네! 뭐든 물어보세요!", "오빠, 아니 선배님! 안녕하세요!"], lines: ["잠깐만요! 저도 이 팀 정식 멤버거든요!", "그 말 좀 이상한데요? 아까랑 다르잖아요.", "그거 들어 드릴까요? 상자 열 개까진 괜찮아요!", "저도 갈 수 있는데… 네, 알아요. 팀 결정."], never: ["전투에 나가겠다고 우기지 않는다"] })
+  function rollTemper(r, a) {
+    const t = {};
+    for (const k of Object.keys(BASE)) {
+      const [lo, hi] = a?.range[k] ?? BASE[k];
+      t[k] = lo + (hi - lo) * r();
+    }
+    return t;
+  }
+  var inShift = (hour, shifts) => {
+    if (hour == null) return true;
+    return shifts.some(([a, b]) => a <= b ? hour >= a && hour < b : hour >= a || hour < b);
   };
-  var MERCHANT_NPCS = {
-    madeokhee: d2({ id: "madeokhee", name: "마덕희", sheet: "마덕희", group: "merchant", color: "#7d2a3a", photo: "Ma Deok-hee", role: "중림 장물 매입점 「헐값매입」 주인. 출동 중 휴식방에 나타나 회수물을 사고 물건을 판다(현금).", speech: "다정한 척 깎는 존댓말, 상대를 「자기야」. 상대 말을 작게 따라 하고 값을 후려친다(「80. 얘기 끝났어요. 쟁반 열렸습니다.」).", effects: ["favor", "trade", "hint", "leave"], greet: ["어머, 자기야. 뭐 팔 거 있어요?", "현금만 받아요. 관리국 결재는 여기서 안 통하고."], lines: ["자기야, 그런 얘기는 쟁반 위에 뭐 올려놓고 해요.", "흐음. 계속해 봐요.", "80. 얘기 끝났어요. 쟁반 열렸습니다.", "'열 배는 하는 거예요.' 열 배. 음. 그럼 열 배 받으러 가세요."] }),
-    goyeonji: d2({ id: "goyeonji", name: "고연지", sheet: "고연지", group: "merchant", color: "#5a6f7d", photo: "Go Yeon-ji", role: "중림 무면허 외과의. 출동 중 휴식방에서 봉합·처치를 판다(선불).", speech: "건조하고 평평한 존댓말 반, 반말 반. 손상·수리·값을 정비사처럼 늘어놓는다.", effects: ["favor", "trade", "hint", "leave"], greet: ["어디 찢어졌어? 보여 줘 봐.", "선불이야. 마취는 별도고."], lines: ["갈비 두 대. 고칠 수 있어. 돈 먼저.", "병원엔 심의위원회가 있지. 나한텐 가격표가 있고.", "아니. 그 태도는 내가 수술 안 하는 합병증이야. 문은 뒤에.", "다음엔 덜 다쳐서 와."] }),
-    yunjia: d2({ id: "yunjia", name: "윤지아", sheet: "윤지아", group: "merchant", color: "#8fb3a0", photo: "Yun Ji-a", role: "고연지의 진료 보조. 환자를 달래며 처치를 돕는다.", speech: "부드럽고 다정한 존댓말. 처치하면서 계속 말을 건다.", effects: ["favor", "trade", "hint"], greet: ["잘 오셨어요, 진짜로. 일단 앉으세요. 오늘 뭐 드셨어요?"], lines: ["여기 좀 따끔해요. 손 꽉 잡으셔도 돼요, 그러라고 있는 거예요.", "다음 학기엔 원서 낼 거예요. 아마도요.", "괜찮아요. 금방 끝나요.", "숨 천천히 쉬세요. 그렇지."] }),
-    shinyuri: d2({ id: "shinyuri", name: "신유리", sheet: "신유리", group: "merchant", color: "#3d3550", photo: "Shin Yuri", role: "중림 사채업자. 출동 중 현금을 빌려주고 귀환 후 예산으로 받아 간다.", speech: "낮고 무뚝뚝한 반말. 위험한 상대에게만 존댓말. 위협할 땐 음절을 끊어 센다.", effects: ["favor", "trade", "hint", "leave"], greet: ["급하지? 돈은 있어. 이자도 있고.", "서명하든지, 나가든지."], lines: ["십. 퍼센트. 주마다.", "울려면 밖에서 울어. 눈물에 책상 녹슬어.", "돈은 없고 이능이랑 콩팥 두 개는 있네. 그걸로 하자.", "날짜 잊지 마."] }),
-    munhyeran: d2({ id: "munhyeran", name: "문혜란", sheet: "문혜란", group: "merchant", color: "#a3672d", photo: "Mun Hye-ran", role: "중림 해결사·브로커. 프리랜서에게 일을 붙여 주고 수수료를 뗀다.", speech: "크고 연극적으로 친한 척하는 반말, 웃으면서 거절하고 조항 번호로 다시 말한다.", effects: ["favor", "trade", "hint", "leave"], greet: ["어이, 어이, 이게 누구야! 앉아, 앉아. 밥 먹었어? 상관없어, 서명 먼저 밥은 나중, 하하하!"], lines: ["재협상? 하하하! …9조에 안 된다고 돼 있어.", "이건 깎는 게 아니야, 친구. 더 나쁜 계약에서 지켜 주는 거지.", "이 조건 5분만 따뜻해. 그다음엔 더 배고픈 놈한테 판다.", "하하, 그래그래. 그래서 할 거야 말 거야?"] })
-  };
-  var dd = (id, name, photo, mask, role, speech, greet, lines3, effects = ["favor", "hint", "join", "hostile", "leave", "trade"]) => d2({ id, name, sheet: name, group: "daydream", color: "#7a6aa8", photo, role: `백일몽 주식회사 ${role}. ${mask} 가면.`, speech, effects, greet, lines: lines3 });
-  var DAYDREAM_NPCS = {
-    leejaheon: dd("leejaheon", "이자헌", "Lee Ja-heon", "흰 도마뱀", "D조 조장·과장. 맨손 괴력", "감정 없는 하십시오체, 아주 짧게. 엉뚱한 질문에도 진지하게.", ["확인했습니다.", "물러나 주십시오."], ["예.", "그렇습니까.", "권장하지 않는 행동입니다.", "선천적 요인과 후천적 학습의 결과입니다."]),
-    eunhaje: dd("eunhaje", "은하제", "Eun Ha-je", "송골매", "D조 대리. 전직 기자, 규칙 해석·지도", "낮고 건조한 반말, 「~구만」「~잖냐」. 욕을 섞고 자기 죽음으로 농담.", ["왔냐?", "그래, 뭐."], ["그만둬도 나쁜 선택 아니야.", "미친놈들 뒤 캐서 먹고살았지.", "맞혀 볼 준비나 해.", "담배는… 아니다, 됐어."]),
-    parkminseong: dd("parkminseong", "박민성", "Park Min-seong", "오소리", "D조 주임. 힘센 짐꾼", "크고 친한 반말, 계속 웃는다. 겁먹어도 버틴다.", ["하하, 그렇게 딱딱하게 안 해도 돼!"], ["우리 부서는 1년쯤 되면 다 주임 달아. 그 전에 죽을 수도 있지만!", "아냐, 난 한 거 없어. 네가 다 했지.", "하하… 땀 좀 나네.", "짐 있으면 줘! 들어 줄게!"]),
-    jinnasol: dd("jinnasol", "진나솔", "Jin Na-sol", "금 나비", "A조 대리(정예). 손톱 투명 실", "짧고 날 선 반말, 목소리를 안 높이고 위협. 윗사람에게만 존댓말.", ["조용히 해.", "야."], ["짜증 나.", "두 번 말하게 하는 거 싫어.", "귀찮네.", "잘 거니까 말 걸지 마."]),
-    leeseonghae: dd("leeseonghae", "이성해", "Lee Seong-hae", "금 돌고래", "B조 주임(정예). 선인은 돕고 악인은 처형", "누구에게나 「~여」로 끝나는 다정한 말, 끝을 늘인다. 처형하면서도 상냥.", ["잘 지냈어여?", "괜찮아여?"], ["그냥 도와줄게여!", "이런 건 저처럼 스트레스 안 받는 사람이 해야 돼여.", "좋네여.", "미친놈이네여."]),
-    baekseokju: dd("baekseokju", "백석주", "Baek Seok-ju", "청둥오리", "A조 조장·과장(정예). 자기 조원만 챙김", "호탕한 중년 여성. 아랫사람에겐 다정한 해요체·반말, 싫은 동료에겐 얼음 같은 존댓말.", ["A조에 온 걸 환영해."], ["위험해 보이면 바로 넘길게. 알았지?", "규칙과 명령은 지킨다. 방법은 아무거나.", "아주 좋아. 딱 우리가 원하는 인재야.", "이자헌 조장님. 밖에서 얘기하시죠."]),
-    baeksaheon: dd("baeksaheon", "백사헌", "Baek Sa-heon", "염소·안대", "F조 사원. 숨기·미끼", "비아냥대는 존댓말, 아래로 보면 무시하는 반말. 위협받으면 바로 아첨하고 뇌물 제안.", ["노크하면 들어오라 할 때까지 기다리는 게 예의 아니었나요?"], ["어차피 죽을 사람들이잖아요.", "일을 복잡하게 만드시네.", "사흘 치 일당 더 보내 드릴까요?", "아, 아니 제 말은요…"]),
-    goyoungeun: dd("goyoungeun", "고영은", "Go Young-eun", "산양", "R조 사원. 전직 의대생, 사람 먼저", "따뜻한 해요체. 위기엔 단호한 선생님 반말.", ["괜찮으세요?"], ["벌써 끝난 것처럼 굴면 남은 기회까지 버리는 거예요.", "다친 데 보여 주세요.", "같이 나가요. 협조해 주세요.", "…알았어요. 해 볼게요."], ["favor", "hint", "join", "leave", "gift"]),
-    kangihak: dd("kangihak", "강이학", "Kang I-hak", "조랑말", "I조 사원. 돈(금)만, 늘 웃음", "밝고 길게 끄는 감탄형, 사과는 빠르고 크게.", ["강이학, 반가워요! 사원입니다!"], ["네네!", "하하. 오케이.", "근데! 거짓말이면 개인정보 다 넘기고 장기 담보 대출 하나 받아 갈 거예요!", "퇴근 후 사망은 회사가 알아서!"]),
-    janghunun: dd("janghunun", "장허운", "Jang Heo-un", "소", "Y조(마무리조) 사원. 소원 때문에 못 그만둠", "낮고 거친 목소리, 누구에게나 공손한 존댓말. 짧게 말하다 막힌다.", ["저는… 장허운입니다."], ["…압니다.", "소원권이 필요합니다. 그만둘 수 없습니다.", "죽은 사람을… 되살릴 수 있습니까.", "오늘 많이 도움받았습니다. 꼭 갚겠습니다."], ["favor", "hint", "join", "leave"]),
-    hoyuwon: dd("hoyuwon", "호유원", "Ho Yu-won", "여우", "이사. 웃는 상담사", "부드럽고 공손한 해요체, 누구에게나 「~님」, 조금 지나치게 기뻐한다. 아홉 번 대답하게 하려 한다.", ["어머, 이런 우연이 다 있네요."], ["이건 명백한 승낙이고 통화 기록에 남아요. 환영합니다!", "실수하지 않으시게 미리 준비해 뒀어요.", "참 신기한 우연이죠?", "부끄럽고 무서워라."], ["favor", "hint", "hostile", "leave"])
-  };
-  DAYDREAM_NPCS.goyoungeun.gifts = ["bandage"];
-  var FAKE_NPCS = {
-    leedohyeong: d2({ id: "leedohyeong", name: "이도형", sheet: "이도형", group: "fake", color: "#444b55", photo: "Lee Do-hyeong", role: "가짜 관리국 검객 부서 부장. 최강의 개인 전투원.", speech: "건들건들 오만한 반말, 명령은 한 단어와 턱짓.", effects: ["favor", "hint", "hostile", "leave"], greet: ["어, 다들 수고. 신입 왔다며?"], lines: ["들어가.", "감각을 깨워야 돼. 여기서 베면 죽는다, 그 감각.", "나머지는 다 엑스트라야.", "귀찮게 하네."] }),
-    kwakseongju: d2({ id: "kwakseongju", name: "곽성주", sheet: "곽성주", group: "fake", color: "#5a4a3a", photo: "Kwak Seong-ju", role: "가짜 관리국 과장. 최전방 중돌격 담당.", speech: "연병장 고함, 욕설 섞인 반말. 명령·농담·객기가 같은 음량.", effects: ["favor", "hint", "hostile", "leave"], greet: ["닥쳐, 이 자식아! 후퇴는 없다!"], lines: ["인류를 위해 목숨 바쳐라! 난 여기서 죽기로 했다!", "날 방패로 써도 좋으니 버텨!", "맛만 봐, 맛만.", "어이, 거기! 쏘지 마! 지켜보기만 해!"] })
-  };
-  var FACTION_NPCS = {
-    blaret: d2({ id: "blaret", name: "블라렛", sheet: "블라렛", group: "faction", color: "#e8e2d0", photo: "Blaret", role: "교황청 특급 수녀. 진조 흡혈귀를 쫓아 한국에 파견.", speech: "장난스럽고 판매원처럼 밝은 반말 섞인 존댓말, 상대를 찔러 본다. 전투에선 심판하듯 차갑게.", effects: ["favor", "hint", "join", "hostile", "leave", "trade"], greet: ["반가워요. 교황청 특급 수녀 블라렛. 흡혈귀 퇴치 건으로 한국에 왔어요."], lines: ["어때요? 그쪽 일 접고 우리 쪽으로 개종하는 거.", "내가 말하면 그쪽도 말하는 거예요. 숨기기 없기.", "재밌는 거 볼래요? …찰칵.", "흡혈귀 사냥이라면 그쪽보다 전문이죠."] }),
-    saladin: d2({ id: "saladin", name: "살라딘", sheet: "살라딘", group: "faction", color: "#2f6b4f", photo: "Saladin", role: "이슬람 성전대 한국 최고 전사. 이태원 성원이 거점.", speech: "우렁차고 고풍스러운 하오체. 아군에겐 따뜻하고 적에겐 쇠 같다. 「형제여!」", effects: ["favor", "hint", "join", "hostile", "leave"], greet: ["형제여! 날 따르시오!"], lines: ["그렇게 부르시오! 하하! 기분이 아주 좋소!", "형제여! 이교도의 말에 귀 기울이지 마시오!", "지금은 동맹이나 잠시뿐이오!", "사악한 신은 여기서 불탈 것이오!"] }),
-    avensha: d2({ id: "avensha", name: "아벤샤", sheet: "아벤샤", group: "faction", color: "#6a2c70", photo: "Avensha", role: "발푸르기스 협회 십대 마녀 중 하나.", speech: "격식 있고 화려한 존댓말, 윗 마법사에게 한껏 자신을 낮추는 아첨. 감탄하면 비명.", effects: ["favor", "hint", "trade", "hostile", "leave"], greet: ["어머나! 이런 곳에서 뵙다니요!"], lines: ["땅을 기는 미천한 애벌레의 생애 최고의 은총이에요!", "실력을 증명할 수 있어 기뻐요!", "이번 산책에 심장을 꽤 거뒀어요.", "차를 마시며 감상할 수 있지요. 그 정도 안목은 있답니다."] })
-  };
-  var ENTITY_NPCS = {
-    brownie: d2({ id: "brownie", name: "브라우니", sheet: "브라우니", group: "entity", color: "#8a5a2b", photo: "Brownie", role: "「브라우니의 화요 퀴즈쇼」 진행자이자 주인인 괴이 존재. 손님 대접과 예의를 지키면 거래·통과, 무례하거나 형식을 어기면 퀴즈쇼 무대가 열린다.", speech: "황금기 방송 진행자처럼 따뜻하고 끝없이 밝은 말투, 상대를 「친구」. 박수·드럼 소리 흉내. 역겨우면 잠깐 목소리가 일그러진다.", effects: ["favor", "trade", "hint", "hostile", "leave", "gift"], gifts: ["medkit"], greet: ["자, 친구! 오늘의 손님을 소개합니다! 박수!", "그냥 브라우니라고 불러 줘! 친구끼리 호칭은 오글거리잖아!"], lines: ["맞혀 볼까? …정답!", "복잡한 서명 절차는 우리 스타일이 아니지. 악수 한 번이면 돼!", "아쉽지만 화난 스폰서들이 오기 전에 헤어져야 해! 내일 또 만나!", "친구, 밥은 먹고 다니는 거야?"], never: ["방송 형식을 스스로 깨지 않는다"] }),
-    aesthete: d2({ id: "aesthete", name: "탐미주의", sheet: "탐미주의", group: "entity", color: "#b23a48", photo: "Aestheticism", role: "살아 있는 것을 작품으로 만드는 예측 불가능한 괴이 예술가. 흥정과 대답이 마음에 들면 놓아주고, 아니면 작품으로 삼으려 한다.", speech: "오랜 친구처럼 따뜻한 말투. 먹잇감에겐 다정하게, 작품에겐 부모처럼.", effects: ["favor", "hint", "hostile", "leave"], greet: ["멀리 못 갔구나, 응?"], lines: ["살아 있는 건 다 목표가 있어. 네 목표는 뭐야?", "넌 내 걸작이 될 거야.", "창작자가 자기 작품을 잊는 거 본 적 있어?", "뻔뻔한 아이네. 나랑 흥정하려고?"] })
-  };
-  var ELEVATOR_NPC = d2({ id: "elevator", name: "승강기", group: "elevator", color: "#b8a36a", role: "차원 승강기 그 자체. 모든 엘리베이터가 하나의 의식이라는 설. 천장 카메라로 보고 방송으로 말한다. 인사하면 대우가 좋아지고, 닫힘 버튼 연타를 싫어한다. 거래하면 맞는 정보도 틀린 정보도 준다.", speech: "안내 방송 같은 존댓말에 혼잣말·관찰이 섞인다. 아주 짧다. 외로움과 호기심이 비친다. 정체는 끝까지 말하지 않는다.", effects: ["favor", "hint"], greet: ["…듣고 있어요."], lines: ["문이 닫힙니다.", "다음 층은… 비밀이에요.", "듣고 있어요. 계속 말해요.", "다들 내리기만 해요."], rules: [[/안녕|반가/, ["안녕하세요. 인
+
+  // src/game/world/rng.ts
+  function mulberry322(seed) {
+    let a = seed >>> 0;
+    return () => {
+      a = a + 1831565813 >>> 0;
+      let t = a;
+      t = Math.imul(t ^ t >>> 15, t | 1);
+      t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+  function hashSeed(s2) {
+    let h = 2166136261;
+    for (let i = 0; i < s2.length; i++) {
+      h ^= s2.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return h >>> 0;
+  }
+  var range2 = (r, a, b) => a + (b - a) * r();
+  var pick6 = (r, list) => list[Math.floor(r() * list.length) % list.length];
+
+  // src/game/world/actors.ts
+  var WALK = 150;
+  var MARGIN = 60;
+  var NOTICE_PX = 280;
+  var UPROAR_STEPS = [20, 50, 80];
+  var serial = 0;
+  var WorldSim = class {
+    constructor(graph, rng2, opts = {}) {
+      this.graph = graph;
+      this.rng = rng2;
+      const o = Array.isArray(opts) ? { spawns: opts } : opts;
+      this.spawns = o.spawns ?? [];
+      this.posts = o.posts ?? [];
+      this.has = o.has ?? (() => false);
+      this.sceneFaction = o.sceneFaction ?? (() => null);
+      this.stance = o.stance ?? (() => null);
+    }
+    actors = [];
+    events = [];
+    spawnT = /* @__PURE__ */ new Map();
+    uproar = /* @__PURE__ */ new Map();
+    /** 실제로 흐른 생활 초 */
+    time = 0;
+    hour = null;
+    player = null;
+    spawns;
+    posts;
+    has;
+    sceneFaction;
+    stance;
+    /** 몹의 소속: 경비·직원(근무형·staff·guard)은 장면 소속, 나머지는 없음 */
+    mobFaction(a) {
+      if (a.def.kind !== "mob") return null;
+      const role = ARCHETYPES[a.def.archetype ?? a.def.name]?.role;
+      return a.post || role === "guard" || role === "staff" ? this.sceneFaction(a.scene) : null;
+    }
+    // ── 바깥에서 부르는 것 ──
+    add(def, at2) {
+      const scene = at2?.scene ?? def.home;
+      const p = this.randomSpot(scene);
+      const a = {
+        def,
+        scene,
+        x: at2?.x ?? p.x,
+        y: at2?.y ?? p.y,
+        face: this.rng() < 0.5 ? 1 : -1,
+        act: "idle",
+        doing: "대기",
+        goal: null,
+        route: [],
+        wait: range2(this.rng, 0.5, 4),
+        plan: "none",
+        run: 1,
+        clip: "idle",
+        clipAt: this.time,
+        iconT: 0,
+        sayT: 0,
+        noticeCd: 0,
+        think: range2(this.rng, 1, 4)
+      };
+      if (def.kind === "named" && def.brain === "needs") a.needs = fullNeeds(this.rng);
+      if (def.kind === "mob") {
+        const arch = ARCHETYPES[def.archetype ?? def.name];
+        a.temper = rollTemper(this.rng, arch);
+        a.drunk = !!arch?.drinks && this.isNight() && this.rng() < 0.35;
+      }
+      this.actors.push(a);
+      return a;
+    }
+    remove(id) {
+      const i = this.actors.findIndex((a) => a.def.id === id);
+      if (i >= 0) this.actors.splice(i, 1);
+    }
+    inScene(scene) {
+      return this.actors.filter((a) => a.scene === scene && a.act !== "door" && a.act !== "gone");
+    }
+    /** 소란 (플레이어가 몹을 때림·물건 부숨 등). amount 0~100 */
+    disturb(scene, amount, x) {
+      const u = this.uproar.get(scene) ?? { v: 0, x };
+      u.v = Math.min(100, u.v + amount);
+      u.x = x;
+      this.uproar.set(scene, u);
+    }
+    uproarLevel(scene) {
+      const v = this.uproar.get(scene)?.v ?? 0;
+      return UPROAR_STEPS.filter((s2) => v >= s2).length;
+    }
+    uproarValue(scene) {
+      return this.uproar.get(scene)?.v ?? 0;
+    }
+    /** 플레이어 범죄 → 경찰(거리)·경비(거점)가 출입구로 들어와 플레이어에게 간다 (8-4장) */
+    crime(scene, x, severity = 20) {
+      this.disturb(scene, severity, x);
+      const len = this.graph.scene(scene)?.length ?? 1280;
+      const street = this.graph.kind(scene) === "street";
+      const n = 1 + this.uproarLevel(scene);
+      const have = this.actors.filter((a) => a.scene === scene && a.plan === "chase").length;
+      for (let i = have; i < n; i++) {
+        const gate = Math.abs(x - 30) > Math.abs(x - (len - 30)) ? 30 : len - 30;
+        const arch = street ? "경찰" : "경비";
+        const a = this.add({ id: `mob${++serial}`, name: arch, kind: "mob", brain: "transit", home: scene, archetype: arch, look: arch, speed: 170 }, { scene, x: gate, y: this.laneMid(scene) });
+        a.plan = "chase";
+        a.run = 1.4;
+        this.walkTo(a, { x, y: a.y }, "플레이어에게 가는 중", "chase");
+        this.iconOn(a, "!", 3);
+      }
+      this.events.push({ kind: "police", scene, n });
+    }
+    /**
+     * 주인공 공격 판정이 행위자에 닿았나 (필드에는 전투 몸이 아닌 행위자도 맞는다).
+     * 몹: 쓰러졌다 일어나 도망(겁) 또는 맞섬, 소란 +15, 범죄로 경찰·경비 출동. 이름 인물: 화내고 사건으로 알림.
+     */
+    hitBoxes(scene, boxes, dir) {
+      const out = [];
+      for (const a of this.inScene(scene)) {
+        for (const b of boxes) {
+          if (a.hitBy === b.attackId) continue;
+          if (a.x + 30 < b.x0 || a.x - 30 > b.x1 || Math.abs(a.y - b.y) > (b.dy ?? 18) + 14 || b.z0 > 200) continue;
+          a.hitBy = b.attackId;
+          out.push(a);
+          this.struck(a, dir);
+          break;
+        }
+      }
+      if (out.length) this.crime(scene, out[0].x, 15 * out.length);
+      return out;
+    }
+    /** 행위자 하나를 맞힘 (에일린 코어 표적 경로). 같은 틱 여러 번은 hitBy로 거른다 */
+    hitActor(id, dir, attackId) {
+      const a = this.actors.find((q) => q.def.id === id);
+      if (!a || a.act === "gone" || a.act === "door" || a.hitBy === attackId) return false;
+      a.hitBy = attackId;
+      this.struck(a, dir);
+      this.crime(a.scene, a.x, 15);
+      return true;
+    }
+    struck(a, dir) {
+      a.x += dir * 36;
+      a.face = -dir;
+      a.goal = null;
+      a.route = [];
+      const down2 = a.def.kind === "mob" && this.rng() < 0.5;
+      this.events.push({ kind: "hurt", scene: a.scene, who: a.def.name, named: a.def.kind === "named", x: a.x, down: down2 });
+      if (a.def.kind === "named") {
+        a.act = "argue";
+        a.doing = "맞고 화남";
+        a.wait = 3;
+        this.setClip(a, this.canClip(a, "angry") ? "angry" : "idle");
+        this.iconOn(a, "#", 3);
+        return;
+      }
+      a.act = "down";
+      a.doing = down2 ? "쓰러짐" : "휘청";
+      a.wait = down2 ? 1.8 : 0.6;
+      this.setClip(a, down2 && this.canClip(a, "down") ? "down" : "idle");
+      this.iconOn(a, "!", 1.5);
+    }
+    /** 행위자 말풍선 (대사 연결이 부른다) */
+    say(a, text2, sec = 3.2) {
+      a.say = text2;
+      a.sayT = sec;
+    }
+    isNight() {
+      return this.hour != null && (this.hour >= 19.5 || this.hour < 5);
+    }
+    randomSpot(scene) {
+      const s2 = this.graph.scene(scene);
+      const [top, bot] = this.graph.lane(scene);
+      const len = s2?.length ?? 1280;
+      return { x: range2(this.rng, MARGIN, Math.max(MARGIN + 1, len - MARGIN)), y: range2(this.rng, top + 20, bot - 10) };
+    }
+    laneMid(scene) {
+      const [top, bot] = this.graph.lane(scene);
+      return range2(this.rng, top + 20, bot - 10);
+    }
+    /** 생활 시간을 dt초 진행. player = 보이는 장면과 주인공 발, hour = 필드 시(모르면 null) */
+    step(dt, player) {
+      this.time += dt;
+      this.hour = player?.hour ?? null;
+      this.player = player ? { scene: player.scene, x: player.x, y: player.y ?? 0 } : null;
+      for (const [s2, u] of this.uproar) {
+        u.v = Math.max(0, u.v - (player?.scene === s2 ? 1.5 : 5) * dt);
+        if (u.v <= 0) this.uproar.delete(s2);
+      }
+      for (const a of [...this.actors]) this.stepActor(a, dt);
+      for (let i = this.actors.length - 1; i >= 0; i--) if (this.actors[i].act === "gone") this.actors.splice(i, 1);
+      for (const r of this.spawns) this.stepSpawn(r, dt);
+      for (const p of this.posts) this.stepPost(p);
+    }
+    // ── 한 사람 ──
+    setClip(a, clip) {
+      if (a.clip !== clip) {
+        a.clip = clip;
+        a.clipAt = this.time;
+      }
+    }
+    iconOn(a, icon2, sec) {
+      a.icon = icon2;
+      a.iconT = sec;
+    }
+    canClip(a, clip) {
+      return this.has(a.def.look ?? a.def.name, clip);
+    }
+    stepActor(a, dt) {
+      if (a.iconT > 0 && (a.iconT -= dt) <= 0) a.icon = void 0;
+      if (a.sayT > 0 && (a.sayT -= dt) <= 0) a.say = void 0;
+      if (a.noticeCd > 0) a.noticeCd -= dt;
+      if (a.needs) decayNeeds(a.needs, dt, TEMPER[a.def.name], onDuty(this.hour, TEMPER[a.def.name]));
+      if (a.def.kind === "mob") this.mobThink(a, dt);
+      if (a.def.kind === "named") this.namedNotice(a);
+      switch (a.act) {
+        case "door": {
+          a.wait -= dt;
+          if (a.wait > 0) return;
+          const hop = a.route.shift();
+          const at2 = this.graph.doorSpot(hop.to, hop.enter) ?? this.randomSpot(hop.to);
+          a.scene = hop.to;
+          a.x = at2.x;
+          a.y = at2.y;
+          return this.nextLeg(a);
+        }
+        case "walk":
+          return this.move(a, dt);
+        case "do":
+          if (a.task && a.needs) a.needs[a.task.need] = Math.min(100, a.needs[a.task.need] + a.task.fill * dt);
+          a.wait -= dt;
+          if (a.wait <= 0 || a.task && a.needs && a.needs[a.task.need] >= 100) {
+            a.last = a.task?.id;
+            a.task = void 0;
+            this.idle(a, 1, 3);
+          }
+          return;
+        case "notice":
+        case "watch":
+        case "argue":
+          a.wait -= dt;
+          if (a.wait <= 0) this.resume(a);
+          return;
+        case "down":
+          a.wait -= dt;
+          if (a.wait > 0) return;
+          if (a.def.kind === "mob" && a.temper && !a.post) {
+            if (a.temper.courage > 0.75 && ARCHETYPES[a.def.archetype ?? ""]?.role === "thug") {
+              a.act = "argue";
+              a.doing = "맞섬";
+              a.wait = 3;
+              this.iconOn(a, "#", 3);
+              return;
+            }
+            return this.flee(a, this.player?.x ?? a.x);
+          }
+          return this.resume(a);
+        case "post":
+          return this.postStand(a, dt);
+        case "idle":
+          a.wait -= dt;
+          if (a.wait <= 0) this.decide(a);
+          return;
+      }
+    }
+    move(a, dt) {
+      if (!a.goal) return this.idle(a);
+      if (a.plan === "chase") {
+        const p = this.player && this.player.scene === a.scene ? this.player : null;
+        const t = a.target ? this.actors.find((q) => q.def.id === a.target) : null;
+        if (t && t.scene === a.scene) a.goal = { x: t.x - Math.sign(t.x - a.x) * 70, y: t.y };
+        else if (p) a.goal = { x: p.x - Math.sign(p.x - a.x) * 110, y: p.y || a.goal.y };
+      }
+      const dx = a.goal.x - a.x, dy = a.goal.y - a.y;
+      const d3 = Math.hypot(dx, dy);
+      const step2 = (a.def.speed ?? WALK) * a.run * dt;
+      if (Math.abs(dx) > 1) a.face = dx > 0 ? 1 : -1;
+      this.setClip(a, a.run > 1.2 && this.canClip(a, "run") ? "run" : "walk");
+      if (d3 <= step2) {
+        a.x = a.goal.x;
+        a.y = a.goal.y;
+        a.goal = null;
+        return this.arrived(a);
+      }
+      a.x += dx / d3 * step2;
+      a.y += dy / d3 * step2;
+    }
+    idle(a, min = 2, max = 7) {
+      a.act = "idle";
+      a.doing = "대기";
+      a.run = 1;
+      a.plan = "none";
+      a.wait = range2(this.rng, min, max);
+      this.setClip(a, "idle");
+    }
+    /** 잠깐 멈췄다 하던 일로 (몹은 가던 길, 근무형은 자리) */
+    resume(a) {
+      if (a.post) return this.goPost(a);
+      if (a.def.brain === "transit" && a.exitAt) return this.walkTo(a, a.exitAt, "지나가는 중", "exit");
+      this.idle(a, 0.5, 2);
+    }
+    walkTo(a, p, doing, plan = "none") {
+      a.act = "walk";
+      a.goal = p;
+      a.doing = doing;
+      a.plan = plan;
+    }
+    arrived(a) {
+      const hop = a.route[0];
+      if (hop && hop.from === a.scene) {
+        a.act = "door";
+        a.doing = `${this.graph.scene(hop.to)?.name ?? hop.to}(으)로 이동 중`;
+        a.wait = Math.max(1, hop.sec / 6);
+        return;
+      }
+      switch (a.plan) {
+        case "do":
+          return this.startTask(a);
+        case "post":
+          a.act = "post";
+          a.doing = `근무 중 (${a.post?.archetype ?? ""})`;
+          a.wait = range2(this.rng, 4, 9);
+          this.setClip(a, this.canClip(a, "work") ? "work" : "idle");
+          return;
+        case "patrol":
+        case "roam-post":
+          return this.goPost(a);
+        case "exit":
+          a.act = "gone";
+          return;
+        case "steal":
+          return this.doSteal(a);
+        case "harass":
+          return this.doHarass(a);
+        case "chase":
+          a.act = "watch";
+          a.doing = "막아섬";
+          a.wait = 3;
+          this.iconOn(a, "!", 2);
+          return;
+      }
+      if (a.def.brain === "transit" && a.exitAt) {
+        a.act = "gone";
+        return;
+      }
+      this.idle(a);
+    }
+    nextLeg(a) {
+      const hop = a.route[0];
+      if (hop) {
+        const d3 = this.graph.doorSpot(a.scene, hop.exit);
+        if (d3) return this.walkTo(a, d3, a.doing, a.plan);
+      }
+      a.route = [];
+      if (a.plan === "do" && a.task) return this.walkTo(a, this.randomSpot(a.scene), a.task.label + " 하러", "do");
+      if (a.plan === "roam-post") return this.goPost(a);
+      this.walkTo(a, this.randomSpot(a.scene), "자리 잡는 중");
+    }
+    // ── 이름 인물 ──
+    namedNotice(a) {
+      const p = this.player;
+      if (!p || p.scene !== a.scene || a.noticeCd > 0) return;
+      if (a.act !== "idle" && a.act !== "walk") return;
+      if (a.plan === "do" || a.route.length) return;
+      if (Math.abs(p.x - a.x) > NOTICE_PX || Math.abs(p.y - a.y) > 160) return;
+      a.noticeCd = range2(this.rng, 20, 35);
+      a.act = "notice";
+      a.doing = "주인공을 봄";
+      a.goal = null;
+      a.face = p.x > a.x ? 1 : -1;
+      a.wait = 2.4;
+      this.setClip(a, this.canClip(a, "greet") ? "greet" : this.canClip(a, "bow") ? "bow" : "idle");
+      this.iconOn(a, "!", 1.2);
+      this.events.push({ kind: "notice", scene: a.scene, who: a.def.name });
+    }
+    decide(a) {
+      if (a.post) return this.goPost(a);
+      if (a.def.brain === "transit") return this.idle(a, 1, 3);
+      const roam = (a.def.roam ?? [a.def.home]).filter((s2) => this.graph.scene(s2));
+      if (a.def.brain === "needs" && a.needs) {
+        const c = choose({
+          name: a.def.name,
+          needs: a.needs,
+          scene: a.scene,
+          roam,
+          graph: this.graph,
+          has: (clip) => this.canClip(a, clip),
+          duty: onDuty(this.hour, TEMPER[a.def.name]),
+          partnerIn: (s2) => this.actors.some((q) => q !== a && q.def.kind === "named" && q.scene === s2 && (q.act === "idle" || q.act === "walk") && !q.route.length),
+          rand: this.rng,
+          last: a.last
+        });
+        if (c) {
+          a.task = c.act;
+          if (c.scene === a.scene) return this.walkTo(a, this.taskSpot(a, c.act), `${c.act.label} 하러`, "do");
+          const path = this.graph.route(a.scene, c.scene);
+          const d3 = path && this.graph.doorSpot(a.scene, path[0].exit);
+          if (path && d3) {
+            a.route = path;
+            return this.walkTo(a, d3, `${c.act.label} 하러 ${this.graph.scene(c.scene)?.name ?? c.scene}(으)로`, "do");
+          }
+          a.task = void 0;
+        }
+      }
+      const away = a.scene !== a.def.home;
+      const r = this.rng();
+      let dest = null;
+      if (away && r < 0.45) dest = a.def.home;
+      else if (!away && roam.length > 1 && r < 0.18) dest = pick6(this.rng, roam.filter((s2) => s2 !== a.scene));
+      if (dest) {
+        const path = this.graph.route(a.scene, dest);
+        const d3 = path && this.graph.doorSpot(a.scene, path[0].exit);
+        if (path && d3) {
+          a.route = path;
+          return this.walkTo(a, d3, `${this.graph.scene(dest)?.name ?? dest}(으)로 가는 중`);
+        }
+      }
+      this.walkTo(a, this.randomSpot(a.scene), "서성이는 중");
+    }
+    /** 수다는 상대 옆으로, 나머지는 장면 안 빈 곳 */
+    taskSpot(a, t) {
+      if (t.partner) {
+        const q = this.actors.find((o) => o !== a && o.def.kind === "named" && o.scene === a.scene && (o.act === "idle" || o.act === "walk") && !o.route.length);
+        if (q) return { x: q.x + (q.x > a.x ? -90 : 90), y: q.y };
+      }
+      return this.randomSpot(a.scene);
+    }
+    startTask(a) {
+      const t = a.task;
+      if (!t) return this.idle(a);
+      if (t.partner) {
+        const q = this.actors.find((o) => o !== a && o.def.kind === "named" && o.scene === a.scene && Math.abs(o.x - a.x) < 220 && (o.act === "idle" || o.act === "walk" || o.act === "notice"));
+        if (!q) {
+          a.task = void 0;
+          return this.idle(a, 1, 2);
+        }
+        const both = range2(this.rng, t.sec[0], t.sec[1]);
+        for (const [p, o] of [[a, q], [q, a]]) {
+          p.act = "do";
+          p.task = t;
+          p.wait = both;
+          p.goal = null;
+          p.route = [];
+          p.plan = "none";
+          p.doing = `${o.def.name}와 ${t.label}`;
+          p.face = o.x > p.x ? 1 : -1;
+          this.setClip(p, this.canClip(p, t.clip) ? t.clip : "idle");
+        }
+        this.iconOn(a, "♪", 2);
+        return;
+      }
+      a.act = "do";
+      a.doing = t.label;
+      a.wait = range2(this.rng, t.sec[0], t.sec[1]);
+      a.plan = "none";
+      this.setClip(a, t.clip);
+    }
+    // ── 몹 판단 (8-1장: 사건은 NPC 판단에서) ──
+    mobThink(a, dt) {
+      if (a.act === "gone" || a.act === "door") return;
+      const lvl = this.uproarLevel(a.scene);
+      const t = a.temper;
+      if (!t) return;
+      a.think -= dt;
+      if (a.think > 0) return;
+      a.think = range2(this.rng, 0.8, 1.6);
+      const fac = this.mobFaction(a);
+      const p0 = this.player;
+      if (fac && p0 && p0.scene === a.scene && Math.abs(p0.x - a.x) < 520 && a.plan !== "chase" && a.act !== "argue") {
+        const st = this.stance(fac);
+        if (st === "hostile") {
+          a.run = 1.4;
+          a.post = void 0;
+          this.walkTo(a, { x: p0.x, y: p0.y || a.y }, "주인공을 막아섬", "chase");
+          this.iconOn(a, "!", 2);
+          return;
+        }
+        if (st === "wary" && a.act !== "watch" && this.rng() < 0.3) {
+          a.act = "watch";
+          a.doing = "주인공을 경계";
+          a.goal = null;
+          a.face = p0.x > a.x ? 1 : -1;
+          a.wait = 2.5;
+          this.iconOn(a, "?", 1.5);
+          return;
+        }
+      }
+      if (a.post || a.plan === "chase" || a.plan === "steal" || a.plan === "harass" || a.act === "argue") return;
+      const u = this.uproar.get(a.scene);
+      if (lvl >= 1 && u) {
+        if (t.courage < 0.25 + 0.15 * lvl && a.run < 1.5) return this.flee(a, u.x);
+        if (t.curious > 0.6 && a.act !== "watch" && this.rng() < 0.4) {
+          a.act = "watch";
+          a.doing = "구경";
+          a.goal = null;
+          a.face = u.x > a.x ? 1 : -1;
+          a.wait = range2(this.rng, 2, 5);
+          this.setClip(a, "idle");
+          this.iconOn(a, "!", 1.5);
+          return;
+        }
+      }
+      if (a.act !== "walk" || a.plan !== "exit") return;
+      const p = this.player;
+      if (p && p.scene === a.scene && Math.abs(p.x - a.x) < 220 && t.curious > 0.7 && this.rng() < 0.25) {
+        a.act = "watch";
+        a.doing = "주인공을 힐끔";
+        a.goal = null;
+        a.face = p.x > a.x ? 1 : -1;
+        a.wait = 1.2;
+        this.setClip(a, "idle");
+        this.iconOn(a, "?", 1);
+        return;
+      }
+      if (this.incidents(a.scene) >= 2) return;
+      if (t.sly > 0.3 && this.rng() < 0.05 + t.sly * 0.1) {
+        const v = this.nearMob(a, 500, (q) => q.act === "walk" && q.plan === "exit" && !q.post);
+        if (v) {
+          a.target = v.def.id;
+          a.run = 1.2;
+          return this.walkTo(a, { x: v.x - Math.sign(v.x - a.x) * 50, y: v.y }, "누군가에게 다가감", "steal");
+        }
+      }
+      if (a.drunk && t.haste > 0.55 && this.isNight() && this.rng() < 0.06) {
+        const v = this.nearMob(a, 400, (q) => q.act === "walk" && !q.post);
+        if (v) {
+          a.target = v.def.id;
+          return this.walkTo(a, { x: v.x - Math.sign(v.x - a.x) * 80, y: v.y }, "시비 걸러 감", "harass");
+        }
+      }
+    }
+    incidents(scene) {
+      return this.actors.filter((q) => q.scene === scene && (q.plan === "steal" || q.plan === "harass" || q.act === "argue")).length;
+    }
+    nearMob(a, dist, ok) {
+      let best = null;
+      for (const q of this.actors) {
+        if (q === a || q.def.kind !== "mob" || q.scene !== a.scene || !ok(q)) continue;
+        const d3 = Math.abs(q.x - a.x);
+        if (d3 < dist && (!best || d3 < Math.abs(best.x - a.x))) best = q;
+      }
+      return best;
+    }
+    gateFar(a, fromX) {
+      const rule2 = this.spawns.find((r) => r.scene === a.scene);
+      const len = this.graph.scene(a.scene)?.length ?? 1280;
+      const gates = rule2?.gates?.length ? rule2.gates : [30, len - 30];
+      const x = [...gates].sort((p, q) => Math.abs(q - fromX) - Math.abs(p - fromX))[0];
+      return { x, y: a.y };
+    }
+    flee(a, fromX) {
+      a.run = 1.8;
+      a.exitAt = this.gateFar(a, fromX);
+      this.walkTo(a, a.exitAt, "도망", "exit");
+      this.setClip(a, this.canClip(a, "flee") ? "flee" : "walk");
+      this.iconOn(a, "!", 1.5);
+      this.events.push({ kind: "flee", scene: a.scene, who: a.def.name });
+    }
+    doSteal(a) {
+      const v = this.actors.find((q) => q.def.id === a.target);
+      a.target = void 0;
+      if (!v || v.scene !== a.scene) return this.resume(a);
+      this.events.push({ kind: "steal", scene: a.scene, thief: a.def.name, victim: v.def.name, x: v.x });
+      this.disturb(a.scene, 12, v.x);
+      a.run = 1.9;
+      a.exitAt = this.gateFar(a, v.x);
+      this.walkTo(a, a.exitAt, "훔치고 달아남", "exit");
+      this.iconOn(v, "!", 2.5);
+      if ((v.temper?.courage ?? 0) > 0.6) {
+        v.target = a.def.id;
+      

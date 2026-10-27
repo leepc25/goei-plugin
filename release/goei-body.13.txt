@@ -1,4 +1,47 @@
-": 0,
+음. 추정"
+      },
+      "윤지아>고연지": {
+        aff: 90,
+        src: "위키 윤지아 「고연지」: 원장이 서운할 거라 생각해 짠해함, 질문 안 하는 조수로 신뢰받음"
+      }
+    },
+    orgs: {
+      "A00>A00": 0,
+      "A00>B00": -25,
+      "A00>C00": -25,
+      "A00>D00": 0,
+      "A00>E00": 0,
+      "B00>A00": -25,
+      "B00>B00": 0,
+      "B00>C00": -25,
+      "B00>D00": 0,
+      "B00>E00": -25,
+      "C00>A00": -25,
+      "C00>B00": -25,
+      "C00>C00": 0,
+      "C00>D00": 0,
+      "C00>E00": 0,
+      "협회>A00": 0,
+      "협회>B00": -25,
+      "협회>C00": 0,
+      "협회>D00": 0,
+      "협회>E00": 0,
+      "지하상가>A00": 0,
+      "지하상가>B00": 0,
+      "지하상가>C00": 0,
+      "지하상가>D00": 0,
+      "지하상가>E00": 0,
+      "교황청>A00": 0,
+      "교황청>B00": 0,
+      "교황청>C00": 0,
+      "교황청>D00": 0,
+      "교황청>E00": 0,
+      "십자군>A00": 0,
+      "십자군>B00": 0,
+      "십자군>C00": 0,
+      "십자군>D00": 0,
+      "십자군>E00": 0,
+      "독립>A00": 0,
       "독립>B00": 0,
       "독립>C00": 0,
       "독립>D00": 0,
@@ -1635,9 +1678,9 @@ ${tail2}`;
     const rules3 = (lang === "en" ? `${LANG_EN_RULE}
 
 ${userRules2.trim()}` : userRules2).trim();
-    const on2 = new Set(enabled);
-    if (rules3 && text.includes("<<USER_RULES>>")) on2.add("user_rules");
-    let out = text.replace(/<<SECTION:([a-z_]+)>>([\s\S]*?)<<END:\1>>/g, (_m, name, body5) => on2.has(name) ? body5 : "");
+    const on3 = new Set(enabled);
+    if (rules3 && text.includes("<<USER_RULES>>")) on3.add("user_rules");
+    let out = text.replace(/<<SECTION:([a-z_]+)>>([\s\S]*?)<<END:\1>>/g, (_m, name, body5) => on3.has(name) ? body5 : "");
     out = out.replace("<<USER_RULES>>", rules3).replace(/<<(?:SECTION|END):[a-z_]+>>/g, "").replace(/\n{3,}/g, "\n\n").trim();
     if (rules3 && !text.includes("<<USER_RULES>>")) out += `
 
@@ -1646,10 +1689,10 @@ ${rules3}`;
     return out;
   }
   function enabledSections(s5) {
-    const on2 = /* @__PURE__ */ new Set();
-    for (const f of s5.features) on2.add(f);
-    if (s5.director === "facts") on2.add("next_note");
-    return on2;
+    const on3 = /* @__PURE__ */ new Set();
+    for (const f of s5.features) on3.add(f);
+    if (s5.director === "facts") on3.add("next_note");
+    return on3;
   }
   function parseUpdate(raw) {
     let t = raw.replace(/<(thoughts|think)\b[^>]*>[\s\S]*?<\/\1\s*>/gi, "").trim();
@@ -3063,13 +3106,4 @@ ${rules3}`;
     "- 「의도:」 primary and, if needed, secondary intent from 7.5. Nonromantic versus romantic or sexual interest; strong affinity does not make a romantic candidate; a change of nature needs a real catalyst.",
     "- 「태도:」 stance: current interpretation and treatment as separate elements, with evidence of the latest change.",
     "- 「제약:」 duty and its handling (7.6).",
-    "- 「속마음:」 unexpressed feeling, limits on expression, actual leaks (gaze, interrupted sentences, delays) and who perceived them; never transfer into another person's `knowledge` unless that person actually read the cue.",
-    "- 「접근:」 last actual approach, the target's actual response, confirmed boundaries, currently permitted range. Silence, no response and no resistance are not acceptance.",
-    "- 「겉과 속:」 for exploitative or abusive intent: the surface, the purpose, attempts, results, who noticed; never keep only the kindness until it becomes goodwill.",
-    "Never move target-specific material into `personality`; values and biases are separate from one target's interpretation. Never record a reaction or approach that existed only in a plan or memo.",
-    "",
-    "### 7.5 Relationship intents",
-    "Same interest, different behavior by intent. Playfulness (adult teasing, can withdraw) is not courtship; appreciation may be relaxed because approach was never intended; renunciation may leak; protection differs from possession by accepting the target's independence.",
-    "| Intent | Core reaction |",
-    "|---|---|",
-    "| 존중 Respect | Seeks recognition; may keep distance and caution.
+    "- 「속마음:」 unexpressed feeling, limits on expression, actual leaks (gaze, interrupted sentences, delays) and who perceived them; never tra
