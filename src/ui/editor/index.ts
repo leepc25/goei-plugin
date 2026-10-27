@@ -290,7 +290,18 @@ function featureState(ctx: ChatContext | null): Partial<Record<EditorNode, boole
   };
 }
 
-/** 설정 페이지: 패널 설정의 묶음을 그대로 + 그 기능의 지침 */
+/* 기능 페이지 머리 (2026-10-27 리수폿식): 설명 한 줄 · 켬/끔 배지 · 「기본」 예시 · 끄면 빠지는 것 */
+const FEATURE_INFO: Partial<Record<SetPage, { desc: string; example: string; off?: string }>> = {
+  board: { desc: '응답마다 괴이·사건·특수 발생을 판정하고 지도와 요원 상태를 갱신해요. 상태 태그는 응답 끝에 붙어요.', example: '응답 끝의 상태 태그 「[▣|2025.05.10 17:38|맑음 19℃|서울 서대문구 기독교 상점 내부|…]」가 상황판·지도·요원 칸으로 풀려요.', off: '끄면 괴이가 자동으로 생기지 않고 상황판이 비어요. 커스텀 임무는 계속 쓸 수 있어요.' },
+  image: { desc: '본문에 등장한 캐릭터의 등록 이미지를 태그로 적어 채팅 속에 띄워요. 이미지와 태그 목록은 봇 카드에 있어요.', example: '응답 속 「쟈알디 · 미소」 태그 → 채팅에 그 표정 이미지가 접힌 채로 뜨고, 누르면 펼쳐져요.', off: '끄면 이미지 태그를 적지 않고 이미지 지침도 요청에 넣지 않아요.' },
+  gnet: { desc: '괴담넷 게시판 글·댓글·쪽지를 보조 모델이 만들어요. 아래 값은 이 채팅에 저장돼요.', example: '「[목격담] 중림 지하상가 3번 출구에서 또 봤음 · 댓글 7」 — 게시판 글 한 줄. 장면과 관련된 글은 본편 요청에 참고로 붙어요.', off: '끄면 게시판 생성과 채팅 반영을 멈춰요. 저장된 글과 쪽지는 남아요.' },
+  phone: { desc: '괴담톡 연락처와 문자방의 답장·선톡·단톡방 초대를 보조 모델이 만들어요. 아래 값은 이 채팅에 저장돼요.', example: '「스팡달: 부장님 지금 어디세요? 본부 4층 비었어요」 — 장면과 관련된 대화는 본편 요청에 참고로 붙어요.' },
+  wiki: { desc: '위키 문서를 생성·갱신해요. 채팅에 나온 문서는 본편 요청에 참고로 붙일 수 있어요.', example: '「미술관」 문서: 소재 · 접근 · 규칙 · 목격 기록 — 분량·작성 모드대로 써요.' },
+  visit: { desc: '본부 방문(필드)에서 만난 사람과 나눈 말이 다음 본편 요청에 막간으로 들어가요. 게임 화면·소리·조작도 여기서.', example: '「막간: 로비에서 큐라스와 — 어젯밤 순찰 얘기」 — 대화한 자리(마지막 답 바로 뒤)에 끼워져요.' },
+  people: { desc: '본편 응답이 끝날 때마다 보조 모델이 한 번 읽어 인물별 기록(기본정보·성격·현재 상태·인간관계·호감·호칭)을 쌓고, 다음 본편 요청과 필드가 그 기록을 읽어요.', example: '「쟈알디 · 호감 +8 → 신뢰 — 함께 임무를 치른 뒤」 — 기록이 이야기에 따라 바뀌어요.', off: '끄면 응답을 읽지 않고, 본편에도 기록을 넣지 않아요.' },
+};
+
+/** 설정 페이지: 패널 설정의 묶음을 그대로 (지침은 지침 탭) */
 function settingsPage(ctx: ChatContext, page: SetPage): string {
   const canChat = host?.canChat?.() ?? true;
   const scope = canChat ? (settingsUi.scope === 'defaults' ? 'defaults' : 'chat') : 'defaults';
@@ -322,7 +333,16 @@ function settingsPage(ctx: ChatContext, page: SetPage): string {
   const showScope = ['image', 'board', 'adv'].includes(page);
   const right = page === 'screen' ? '<span class="gw-tokens">이 기기 공통</span>' : showScope ? scopeSeg : `${canChat ? '' : '<span class="gw-tokens">새 채팅 기본값 (시작 전)</span>'}${act}`;
   const crumb = page === 'update' ? '관리' : page === 'screen' ? '설정 / 이 기기 공통' : `설정 / ${canChat ? (scope === 'chat' ? '이 채팅' : '새 채팅 기본값') : '새 채팅 기본값 · 시작 전'}`;
-  return `<div class="gw-page gw-set"><header class="gw-head"><div class="gw-crumb">${esc(crumb)}</div><h2>${esc(title)}</h2>${right ? `<div class="gw-head-act">${right}</div>` : ''}</header>
+  const info = FEATURE_INFO[page];
+  const on = featureState(ctx)[`set:${page}`];
+  const badge = on === undefined ? '' : `<span class="gw-state${on ? '' : ' off'}">${on ? '켬' : '끔'}</span>`;
+  // 기능 판 안의 머리 설명은 여기 설명과 겹치니 뺀다 (인물 기록 소개, 필드 안내)
+  if (info) body = body.replace(/<p class="ps-note">본편 응답이 끝날 때마다[\s\S]*?<\/p>/, '').replace(/<section class="ps-group"><p class="ps-note">필드에서 만난 사람과[\s\S]*?<\/section>/, '');
+  const lead = info
+    ? `<p class="gx-muted">${esc(info.desc)}</p></header>
+      <div class="gw-base-row"><span class="gw-base-label">기본</span><p>${esc(info.example)}</p></div>${on === false && info.off ? `<p class="gw-off-note">${esc(info.off)}</p>` : ''}`
+    : '</header>';
+  return `<div class="gw-page gw-set"><header class="gw-head"><div class="gw-crumb">${esc(crumb)}</div><h2>${esc(title)}${badge}</h2>${right ? `<div class="gw-head-act">${right}</div>` : ''}${lead}
     ${settingsNotices()}
     <div class="gx-settings gw-setbody">${body}</div></div>`;
 }

@@ -348,3 +348,10 @@
   .gw .gw-tab { padding: 0 9px; font-size: 12px; }
   .gw .gw-scope { display: none; }
 }
+/* 기능 페이지 머리: 상태 배지 · 기본 예시 · 끄면 */
+.gw .gw-state { margin-left: 8px; padding: 2px 7px; border-radius: 5px; font-size: 11px; font-weight: 500; color: var(--signal); background: var(--accent-bg); vertical-align: middle; }
+.gw .gw-state.off { color: var(--dim); background: var(--panel); border: 1px solid var(--line); }
+.gw .gw-base-row { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 9px; max-width: 960px; margin: -6px 0 14px; padding: 10px 12px; border-radius: 8px; background: var(--sunk); font-size: 12px; color: var(--sub); line-height: 1.5; }
+.gw .gw-base-row p { margin: 0; }
+.gw .gw-base-label { font-size: 11px; font-weight: 600; color: var(--dim); letter-spacing: .04em; padding-top: 1px; }
+.gw .gw-off-note { max-width: 960px; margin: -6px 0 14px; font-size: 12px; color: var(--amber); }
