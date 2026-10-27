@@ -1,4 +1,310 @@
-        load: () => saves.read(slot),
+lor: "#5E7C8C", name: "영상 올리기 전에", sub: "뭘 올렸는지는 다 압니다." },
+    "이도형": { color: "#E9EEF2", name: "건물 가르기", sub: "연필심만 남아도 충분해." },
+    "고영훈": { color: "#4F5D70", name: "킹", sub: "요점." },
+    "노기균": { color: "#D2453C", name: "수고하십시오!", sub: "이 녀석은 된다!" },
+    "송주익": { color: "#2E9C9A", name: "예카테리나", sub: "예카테리나니까요." },
+    "곽성주": { color: "#7D8793", name: "후퇴는 없다", sub: "전원 내 뒤로!" },
+    "조성춘": { color: "#D9A82E", name: "진공작전", sub: "……조용히. 지금부터 진짜다." },
+    "윤병수": { color: "#F07A22", name: "채점 중", sub: "칭찬은 끝까지 듣고 해." },
+    "김성진": { color: "#6BD45A", name: "생환 기록", sub: "나 방금 멋있지 않았냐?" },
+    "송진섭": { color: "#4FA6E6", name: "우리 팀 눈", sub: "지도 왼쪽이요, 지도 왼쪽!" },
+    "청달래": { color: "#1F6E6A", name: "무슨 소란인가", sub: "참으로 지저분한 꼴이군." },
+    "호유원": { color: "#E0A43A", name: "소중한 것이 만나러 와요", sub: "잘 보살펴 드릴게요, ~님." },
+    "백석주": { color: "#2E8B57", name: "A조에 온 걸 환영해", sub: "환영은 입구까지만." },
+    "진나솔": { color: "#8E5CC9", name: "퇴근", sub: "그럴 시간에 퇴근해." },
+    "이성해": { color: "#5EC4D6", name: "다들 데리고 나왔어여", sub: "늦어서 죄송해여!" },
+    "이자헌": { color: "#E6E2D3", name: "물리 퇴마", sub: "괴담입니다. 그런데 됩니다." },
+    "은하제": { color: "#3D6FD9", name: "통화 연결", sub: "응, 그래. 됐고. 빨리 와." },
+    "박민성": { color: "#8A6A4A", name: "다시는 안 해", sub: "……다음 주에 또 함." },
+    "백사헌": { color: "#9B4DD6", name: "추가 지급", sub: "어차피 죽을 사람들인데요." },
+    "고영은": { color: "#F2F0D8", name: "R조의 양심", sub: "그냥 조명이에요." },
+    "강이학": { color: "#F2C230", name: "매뉴얼만 지키면요", sub: "평사원 둘이어도 괜찮아요!" },
+    "장허운": { color: "#7A5233", name: "사람으로 대할 것", sub: "…도망, 안 갑니다." },
+    "곽제강": { color: "#B79CF0", name: "분기별 기상 특보", sub: "와, 이거 정말 흥미로운데요!" },
+    "이연화": { color: "#5B5D8F", name: "과장님!", sub: "……잠깐만요. 여기 멈추세요." },
+    "이병진": { color: "#D23C3C", name: "처음으로 쓸모 있어진 순간", sub: "……이건 내가 읽지." },
+    "제이": { color: "#E2C23A", name: "완전 발현", sub: "…냄새가 달라요……" },
+    "차여진": { color: "#8C1F2E", name: "두 번째 휴대전화", sub: "이건 사적인 용도라서요~" },
+    "서윤지": { color: "#9CB89A", name: "수정 요청 없음", sub: "적힌 것은 하나도 봐주지 않습니다." },
+    "고연지": { color: "#2C3E66", name: "수술 여섯 시간째", sub: "네, 그래서 견적이 이 정도입니다." },
+    "윤지아": { color: "#F4A97A", name: "시술 준비 끝", sub: "사탕 하나 드실래요?" },
+    "마덕희": { color: "#7A1E34", name: "헐값매입", sub: "자기 얼굴에 다 쓰여 있어요~" },
+    "문혜란": { color: "#6B1F3A", name: "대박알선 뒷방", sub: "친구, 사인부터 하자." },
+    "신유리": { color: "#B8BEC6", name: "사전 통보 없음", sub: "친구 아니야. 채무자지." },
+    "블라렛": { color: "#FFF4D6", name: "영원한 십자군", sub: "서울은 교회가 많아서 좋아!" },
+    "살라딘": { color: "#3A8FE0", name: "메카의 군세", sub: "형제여! 바다의 물고기처럼 끝이 없다!" },
+    "아벤샤": { color: "#2FB37A", name: "모래 해일", sub: "어머, 이건 꼭 갖고 싶다!" },
+    "세크리엠": { color: "#B0102A", name: "붉은 눈", sub: "눈을 마주쳤구나." },
+    "브라우니": { color: "#7FE0A0", name: "화요퀴즈쇼", sub: "친구! 다음 문제 나갑니다!" },
+    "탐미주의": { color: "#E0402A", name: "예술은 조각이다", sub: "가만히 있어. 지금 너는 작품이야." }
+  };
+
+  // src/game/action/engine/training.ts
+  function trainingFloor() {
+    const L = 4200;
+    return {
+      id: "training-1",
+      title: "관리국 지하 훈련장",
+      type: "lobby",
+      depth: 0,
+      length: L,
+      lane: [440, 690],
+      startX: 200,
+      exitX: L - 120,
+      banner: "관리국 지하 훈련장 · 조작 연습",
+      palette: { wall: "#2b343a", floor: "#3c4549", accent: "#6c7b83" },
+      props: [
+        { id: "sign1", kind: "sign", x: 420, y: 445, w: 140, h: 60, label: "A 연타 · ↓↓ 앉기 · Shift 회피/달리기" }
+      ],
+      encounters: [
+        { triggerX: 500, lockFrom: 0, lockTo: 1400, waves: [[{ kind: "dummy-once", x: 1e3, y: 590 }], [{ kind: "thug", x: 1300, y: 560 }, { kind: "thug", x: 1350, y: 650 }]] },
+        { triggerX: 1800, lockFrom: 1500, lockTo: 2800, waves: [[{ kind: "thug", x: 2700, y: 540 }, { kind: "thug", x: 2750, y: 620 }, { kind: "thug", x: 1520, y: 670 }], [{ kind: "thug", x: 2750, y: 560, elite: true }, { kind: "thug", x: 1530, y: 600 }]] },
+        { triggerX: 3e3, lockFrom: 2900, lockTo: 4200, waves: [[{ kind: "thug", x: 4100, y: 590, boss: true }, { kind: "thug", x: 2950, y: 560 }, { kind: "thug", x: 4150, y: 660 }]] }
+      ]
+    };
+  }
+  var trainingStage = {
+    id: "training",
+    label: "훈련장",
+    firstFloor: () => trainingFloor(),
+    nextFloor: () => null
+  };
+  var dummyStage = {
+    id: "dummy",
+    label: "허수아비 연습",
+    firstFloor: () => ({
+      id: "dummy-room",
+      title: "허수아비 연습",
+      length: 1280,
+      startX: 360,
+      exitX: Infinity,
+      banner: "허수아비 연습 · H 판정 보기 · Esc 메뉴",
+      encounters: [{ triggerX: 0, lockFrom: 0, lockTo: 1280, waves: [[{ kind: "dummy", x: 760, y: 565 }, { kind: "dummy", x: 980, y: 540 }], [{ kind: "dummy", x: 900, y: 590 }]] }]
+    }),
+    nextFloor: () => null
+  };
+
+  // src/game/action/engine/sessionStore.ts
+  var empty = () => ({ schema: "goei-session/1", revision: 0, hq: null, meta: null, checkpoint: null });
+  var parse = (raw) => {
+    if (!raw) return empty();
+    const value = JSON.parse(raw);
+    if (value?.schema === "goei-session/1") {
+      if (!Number.isFinite(value.revision) || value.revision < 0 || value.hq !== null && typeof value.hq !== "string") throw new Error("손상된 저장 봉투");
+      return { ...empty(), ...value };
+    }
+    if (!parseSave(raw)) throw new Error("지원하지 않는 저장");
+    return { ...empty(), hq: raw };
+  };
+  var SessionStore = class {
+    constructor(saves, slot, journal) {
+      this.saves = saves;
+      this.slot = slot;
+      this.journal = journal;
+      let cached = null;
+      try {
+        const raw = journal?.getItem(this.key);
+        if (raw) cached = parse(raw);
+      } catch {
+      }
+      if (cached) this.value = cached;
+      this.ready = saves.read(slot).then((raw) => {
+        const remote = parse(raw);
+        if (!cached || remote.revision > cached.revision) this.value = remote;
+        if (cached && cached.revision > remote.revision) this.persist();
+      }).catch(() => {
+        this.error = "저장 칸을 읽지 못했습니다. 이 기기의 복구 기록을 사용합니다.";
+      }).then(() => {
+        this.loaded = true;
+      });
+      this.hqSaves = {
+        list: () => saves.list(),
+        read: async (n) => {
+          await this.ready;
+          return n === slot ? this.value.hq : parse(await saves.read(n)).hq;
+        },
+        write: async (n, hq2, info) => {
+          if (!this.loaded) await this.ready;
+          if (n !== slot) {
+            let oldRevision = 0;
+            try {
+              oldRevision = parse(await saves.read(n)).revision;
+            } catch {
+            }
+            try {
+              oldRevision = Math.max(oldRevision, parse(this.journal?.getItem(this.keyFor(n)) ?? null).revision);
+            } catch {
+            }
+            const snapshot = { ...this.value, hq: hq2, revision: Math.max(Date.now(), this.value.revision + 1, oldRevision + 1) };
+            const text2 = JSON.stringify(snapshot);
+            try {
+              this.journal?.setItem(this.keyFor(n), text2);
+            } catch {
+            }
+            return saves.write(n, text2, { ...info, schema: "goei-session/1" });
+          }
+          this.value.hq = hq2;
+          const completed = parseSave(hq2);
+          const run = this.value.checkpoint?.run;
+          if (!completed?.active && completed?.last && completed.last.runId === (run?.launch?.runId ?? run?.runId)) this.value.checkpoint = null;
+          this.persist();
+          await this.flush();
+        },
+        restore: async (n) => {
+          await this.ready;
+          await this.flush();
+          let remote = null, cached2 = null;
+          try {
+            remote = parse(await saves.read(n));
+          } catch {
+          }
+          try {
+            cached2 = parse(this.journal?.getItem(this.keyFor(n)) ?? null);
+          } catch {
+          }
+          const next = cached2 && (!remote || cached2.revision > remote.revision) ? cached2 : remote;
+          if (!next?.hq || !parseSave(next.hq)) return null;
+          this.value = { ...next, revision: Math.max(next.revision, this.value.revision) };
+          this.persist();
+          await this.flush();
+          return this.value.hq;
+        }
+      };
+    }
+    value = empty();
+    queue = Promise.resolve();
+    loaded = false;
+    ready;
+    error = null;
+    hqSaves;
+    keyFor(slot) {
+      return `goei-session-journal:${slot}`;
+    }
+    get key() {
+      return this.keyFor(this.slot);
+    }
+    get checkpoint() {
+      return this.value.checkpoint;
+    }
+    get meta() {
+      return this.value.meta;
+    }
+    get hasSave() {
+      return !!(this.value.hq || this.value.checkpoint);
+    }
+    setMeta(meta) {
+      this.value.meta = JSON.parse(JSON.stringify(meta));
+    }
+    setCheckpoint(checkpoint) {
+      this.value.checkpoint = checkpoint;
+      this.persist();
+    }
+    persist() {
+      this.value.revision = Math.max(Date.now(), this.value.revision + 1);
+      const text2 = JSON.stringify(this.value);
+      try {
+        this.journal?.setItem(this.key, text2);
+      } catch {
+        this.error = "기기 복구 기록을 쓰지 못했습니다.";
+      }
+      this.queue = this.queue.catch(() => {
+      }).then(() => this.saves.write(this.slot, text2, {
+        title: this.value.checkpoint ? "출동 중 · 안전 지점" : "자동 저장",
+        summary: "본부 · 규칙서 · 출동 기록",
+        schema: "goei-session/1"
+      })).catch(() => {
+        this.error = "자동 저장에 실패했습니다. 기기 복구 기록을 유지합니다.";
+      });
+    }
+    flush() {
+      return this.queue;
+    }
+  };
+
+  // src/game/action/engine/modules.ts
+  var local = (key2) => ({
+    load: () => {
+      try {
+        return localStorage.getItem(key2);
+      } catch {
+        return null;
+      }
+    },
+    save: (v) => {
+      try {
+        localStorage.setItem(key2, v);
+      } catch {
+      }
+    }
+  });
+  var SAVED_KEY = "goei-game-saved";
+  var markSaved = () => local(SAVED_KEY).save("1");
+  var hasSaved = () => local(SAVED_KEY).load() === "1";
+  var VISIT_TITLE = { title: "괴이 ː ANOMALY", sub: "필드 · 요원들을 만나고 본편 대화를 이어갑니다" };
+  var fieldClock = { sec: null, place: "" };
+  function hqAdapter(saves, bridge, ui) {
+    const hq2 = createHq();
+    const b = bridge;
+    const slot = b?.slot ?? 0;
+    let root = null;
+    let present = [];
+    let visitor = { agentId: "", name: "" };
+    const visitReady = b?.visit ? b.visit.state().then((v) => {
+      visitor = v.visitor;
+      present = v.agents.filter((a) => a.room).map((a) => ({ name: a.name, room: a.room }));
+    }).catch(() => {
+    }) : Promise.resolve();
+    const ROOM_SCENE = { office: "office", lounge: "lounge", infirmary: "clinic" };
+    const visitors = (sceneId) => {
+      const here = present.filter((p) => ROOM_SCENE[p.room] === sceneId && hasVisitAgent(p.name));
+      const sc = hq2.map().scenes.find((s2) => s2.id === sceneId);
+      if (!sc || !here.length) return [];
+      const [top, bot] = sc.lane ?? [LANE_TOP, LANE_BOT];
+      const slots = [[0.36, 0.55], [0.5, 0.35], [0.62, 0.75], [0.44, 0.9], [0.72, 0.45], [0.28, 0.8]].map(([fx2, fy]) => [sc.length * fx2, fy]);
+      return here.slice(0, slots.length).map((p, i) => ({ name: p.name, x: slots[i][0], y: top + (bot - top) * slots[i][1], face: slots[i][0] > sc.length / 2 ? -1 : 1 }));
+    };
+    const hub = makeHub(
+      {
+        map: () => hq2.map(),
+        openPlace: (id) => hq2.openPlace(id),
+        bark: (place3) => hq2.bark(place3),
+        chooseFloor: (o, pick6) => ui.chooseFloor(o, pick6),
+        sfx: (n) => ui.sfx(n),
+        visitors,
+        // 장면을 옮기면 장부에 이동 사건과 지금 위치(확정 사실)를 남긴다
+        entered: (to, from, walkedPx) => {
+          fieldClock.place = to.name;
+          const sec = walkSeconds(walkedPx) + (to.floor !== from.floor ? STAIR_S : DOOR_S);
+          if (fieldClock.sec !== null) fieldClock.sec += sec;
+          const at2 = fieldClock.sec === null ? "" : ` (${clockText(fieldClock.sec)})`;
+          void b?.field?.record({ kind: "move", text: `${from.name} → ${to.name}${at2}`, scene: to.name, weight: 1, fact: { key: "주인공 위치", value: to.name } }).catch(() => {
+          });
+          if (fieldClock.sec !== null) void b?.field?.record({ kind: "move", text: `필드 시각 ${clockText(fieldClock.sec)}`, scene: to.name, weight: 1, fact: { key: "필드 시각", value: clockText(fieldClock.sec) } }).catch(() => {
+          });
+        },
+        overlay: ui.overlay,
+        hour: () => fieldClock.sec === null ? null : fieldClock.sec / 3600 % 24,
+        depart: () => hq2.depart(),
+        armed: () => hq2.armed(),
+        // 본부 대화창이 떠 있으면 머리 위 표시를 숨긴다 (독립 검수: 브리핑 뒤 ↓ 표시)
+        busy: () => typeof document !== "undefined" && !!document.querySelector(".hq-talk, .hq-over:not(:empty)")
+      },
+      (place3) => whereIs(place3)
+    );
+    return {
+      ready: () => hq2.ready(),
+      visitReady,
+      visitor: () => visitor,
+      hub: () => hub,
+      state: () => hq2.state,
+      goto: (place3) => hub.goto(place3),
+      isOpen: () => hq2.isOpen(),
+      close: () => hq2.close(),
+      mount(r, host) {
+        root = r;
+        hq2.mount(r, {
+          deploy: (l) => !bridge?.visit && host.deploy({ ...l, hpMax: l.stats?.hp, launch: l }),
+          load: () => saves.read(slot),
           resuming: ui.resuming,
           save: (d3) => (markSaved(), saves.write(slot, d3, { title: "자동 저장", summary: `${hq2.state.day}일차`, schema: "goei-hq/1" })),
           saves,
@@ -160,31 +466,6 @@
     const cutins = /* @__PURE__ */ new Map();
     if (bridge?.visit && bridge.assets) void loadFieldFx(bridge.assets, ffx, cutins);
     const inField = () => !!game?.inHub && !!bridge?.visit && !mods.blocking?.() && !shell.paused;
-    const previewSuper = () => {
-      const w = game?.world;
-      if (!w || ffx.inSuper()) return;
-      const me = hq2.visitor();
-      const name = me.name || "방문자";
-      const t = SUPER_TEXT[name] ?? { color: "#C8283C", name: "필살기", sub: "" };
-      const fallback = me.agentId && visitAgentFaceCanvas(name, 60) || testPlayerFace(60);
-      void ffx.super_({ ...t, art: cutins.get(name), art2: cutins.get(`${name}_2`), fallback, eye: { x: 0.62, y: 0.42 } }).then(() => {
-        ffx.flash("#fff", 0.1, 0.7);
-        ffx.shake(14, 0.6);
-        const p = w.player;
-        ffx.sparks_(p.x, p.y - 120, 30, t.color, 6);
-        ffx.ring(p.x, p.y, 20, 260, t.color, 0.45);
-        ffx.scorch(p.x, p.y, 160, 3);
-      });
-    };
-    const fieldFxKeys = (e) => {
-      if (e.code !== "KeyS" && e.code !== "KeyW" || e.repeat || !inField()) return;
-      const el = document.activeElement;
-      if (el && (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.isContentEditable)) return;
-      previewSuper();
-      e.preventDefault();
-      e.stopImmediatePropagation();
-    };
-    window.addEventListener("keydown", fieldFxKeys, true);
     const stageStore = {
       load: () => {
         if (session.meta) return session.meta;
@@ -744,7 +1025,6 @@
         window.removeEventListener("pointerdown", titleInput, true);
         if (openingT) clearTimeout(openingT);
         window.removeEventListener("keydown", hqKeys, true);
-        window.removeEventListener("keydown", fieldFxKeys, true);
         window.removeEventListener("keydown", floorKeys, true);
         saveFlags();
         storyRoot.removeEventListener(VIDEO_AUDIO_EVENT, attachVideoAudio);
@@ -979,7 +1259,7 @@
     const urlOf = bridge?.assets ? (f) => bridge.assets.url("jyaldi", f) : void 0;
     const releaseHqArt = prepareHqTextures(bridge?.assets ? (f) => bridge.assets.url("hq-textures", f) : void 0);
     const releaseDoorArt = prepareHqDoorRound2(bridge?.assets ? (f) => bridge.assets.url("hq-door-round2", f) : void 0);
-    const releaseField = prepareHqField(bridge?.assets ? (f) => bridge.assets.url("hq-field", f) : void 0);
+    const releaseField = prepareHqField(bridge?.assets ? (pack2, f) => bridge.assets.url(pack2, f) : void 0);
     const testPeople = prepareTestPeople(bridge?.assets ? (f) => bridge.assets.url("test-people", f) : void 0, bridge?.assets ? (f) => bridge.assets.bytes("test-people", f) : void 0);
     const visitArt = bridge?.visit ? prepareVisitAgents(bridge.assets ? (f) => bridge.assets.url("visit-agents", f) : void 0, bridge.assets ? (f) => bridge.assets.bytes("visit-agents", f) : void 0) : null;
     void Promise.all([loadArt(urlOf, bridge?.assets ? (f) => bridge.assets.bytes("jyaldi", f) : void 0), visitArt?.ready, testPeople?.ready]).then(([art5]) => {
@@ -3561,7 +3841,7 @@
     }
   }
   var mod = {
-    version: "0.17.3",
+    version: "0.17.6",
     mount: (box2, bridge) => mountPlay(box2, bridge),
     // 이전 시험판: 저장 키와 그림 팩은 예전 그대로 (goei:game · goei:game-action:v1)
     legacy: {

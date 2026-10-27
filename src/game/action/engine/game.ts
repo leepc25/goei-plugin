@@ -4,6 +4,9 @@
 import { pfont } from './pxfont';
 import { view } from './view';
 import { charSize } from '../charSize';
+
+/** 필드 화면 확대 100%: 무확대(월드 1px = 화면 CSS 1px, 사용자 2026-10-27). 화면 확대 슬라이더로 최대 250% */
+export const BASE_ZOOM = 1;
 import { SCREEN_H, SCREEN_W, TICK_HZ, type GameEvent, type HqModuleLike, type RunConfigCore, type RunResultCore, type StageModule } from './contract';
 import type { Art } from './art';
 import { Input, type Pad } from './input';
@@ -138,11 +141,18 @@ export class Game {
       }
       if (!this.mods.covered?.()) {
         const w = this.world;
-        // 설정 「화면 확대」: 배경과 사람을 같이 키운다 (기본 100% = 배경 세로가 창에 꽉: 관리국 그림은 700, 그 밖은 720)
+        // 설정 「화면 확대」: 배경과 사람을 같이 키운다.
+        // 필드(PC): 100% = 월드 1px를 화면 BASE_ZOOM px로 고정 (사용자 2026-10-27: 그림·창 높이에 따라 확대율이 바뀌면 방마다 사람 크기가 달라진다).
+        //   창이 크면 더 넓게 보이고, 장면이 화면보다 짧으면 위아래는 검게, 길면 주인공을 따라 위아래로 움직인다.
+        // 폰처럼 낮은 창(CSS 600px 미만)과 필드 밖은 예전처럼 장면 세로가 창에 꽉 (그림 700, 그 밖 720)
         const H = this.inHub ? view.worldH : SCREEN_H;
-        view.zoom = (this.canvas.height / H) * Math.max(1, charSize.k);
+        const cssH = this.canvas.getBoundingClientRect().height;
+        const fixed = this.inHub && cssH >= 600;
+        view.zoom = (fixed ? BASE_ZOOM * (this.canvas.height / cssH) : this.canvas.height / H) * Math.max(1, charSize.k);
         if (w) view.lane = w.lane;
         const vw = this.canvas.width / view.zoom;
+        view.w = this.inHub ? Math.max(SCREEN_W, vw) : SCREEN_W;
+        view.hub = this.inHub;
         // 화면 밀기는 그림과 같은 보간 위치로 (틱 위치로 하면 걸을 때 화면이 30Hz로 툭툭 따라가 캐릭터가 떨린다).
         // 렌더러는 camX를 정수로 반올림하므로, 둘을 합한 이동이 화면 px 정수가 되게 crop을 맞춘다
         view.crop = 0;
@@ -158,7 +168,15 @@ export class Game {
         // 확대해서 세로가 다 안 들어가면 주인공 발이 화면 아래쪽 1/3에 오게 위아래를 자른다
         view.cropY = 0;
         const vh = this.canvas.height / view.zoom;
-        if (vh < H - 0.5 && w) {
+        if (this.inHub) {
+          // 장면 밖(짧거나 좁은 장면의 남는 곳)은 검게
+          this.ctx.fillStyle = '#000';
+          this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        }
+        if (vh > H + 0.5) {
+          // 장면이 화면보다 짧다: 가운데 두고 위아래는 검게
+          view.cropY = -Math.round(((vh - H) / 2) * view.zoom) / view.zoom;
+        } else if (vh < H - 0.5 && w) {
           const a = frozen ? 1 : this.acc / T, p = w.player as { y: number; py?: number };
           const py = (p.py ?? p.y) + (p.y - (p.py ?? p.y)) * a;
           view.cropY = Math.round(Math.max(0, Math.min(H - vh, py - vh * 0.7)) * view.zoom) / view.zoom;

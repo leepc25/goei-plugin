@@ -1,4 +1,106 @@
-turn `${intro}
+;
+      const shownName2 = unescape(html.match(/<b[^>]*data-goei-uname[^>]*>([^<]*)<\/b>/)?.[1] ?? "").trim();
+      if (shownName2 && shownName2 !== "{{user}}") {
+        if (shownName2 !== name) await risuai.pluginStorage.setItem(NAME_KEY, shownName2).catch(() => {
+        });
+        name = shownName2;
+      }
+      let src = unescape(html.match(/src="([^"]*)"/)?.[1] ?? "");
+      if (!src) src = String(await risuai.pluginStorage.getItem(SRC_KEY).catch(() => "") ?? "");
+      else if (!src.startsWith("data:")) await risuai.pluginStorage.setItem(SRC_KEY, src).catch(() => {
+      });
+      if (src && src !== lastSrc) {
+        const next = await photoFrom(src);
+        if (next) {
+          if (photo?.startsWith("blob:")) URL.revokeObjectURL(photo);
+          photo = next;
+          lastSrc = src;
+        }
+      }
+    } catch (error) {
+      console.log(`[goei] 유저 사진을 읽지 못했어요: ${error instanceof Error ? error.message : String(error)}`);
+    }
+    if (!name) {
+      try {
+        const n2 = String(await risuai.parseRisuChat("{{user}}") ?? "").trim();
+        if (n2 && !n2.includes("{{")) name = n2;
+      } catch {
+      }
+    }
+    if (!name) name = String(await risuai.pluginStorage.getItem(NAME_KEY).catch(() => "") ?? "");
+    cached = { name, photo };
+    return cached;
+  }
+  var userInfo = () => cached;
+  var persona = "";
+  async function readPersona() {
+    try {
+      const t = String(await risuai.parseRisuChat("{{persona}}") ?? "").trim();
+      persona = /\{\{\s*persona/i.test(t) ? "" : t;
+    } catch {
+    }
+    return persona;
+  }
+  var personaText = () => persona;
+
+  // src/core/gnetPrompt.ts
+  var REQUIRED_GNET = [
+    "LB",
+    "LB.EXTRA",
+    "EXTENSION.REQUEST",
+    "ACTION.REFRESH",
+    "AUTO.GUIDELINE",
+    "AUTO.FORMAT",
+    "REACT.GUIDELINE",
+    "DM.GUIDELINE",
+    "DM.FORMAT",
+    "INCOMING.GUIDELINE",
+    "DM.REQUEST",
+    "DM.NO-ORIGIN",
+    "TITLE.GUIDELINE",
+    "MAIN_CONTEXT",
+    "PUBLIC.GUIDELINE",
+    "PUBLIC.REACT_FORMAT",
+    "PUBLIC.POST_FORMAT",
+    "ACTIVITY.GUIDELINE",
+    "BOARD.GUIDELINE",
+    "ATTACHMENTS",
+    "INCOMING.COMBINED",
+    "INCOMING.DISABLED",
+    "ACTIVITY.DISABLED"
+  ];
+  var REQUIRED_LB = ["SYSTEM", "OUTPUT", "JAILBREAK", "JOB"];
+  function gnetBooks(src) {
+    const g = { ...policySections(src.char.globalLore, "LB Backend"), ...policySections(src.char.globalLore, "GNet") };
+    for (const k of [...REQUIRED_GNET, ...REQUIRED_LB]) if (g[k] === void 0) throw new GnetError(`GNet 로어북의 ${k} 섹션이 없어요.`);
+    applyAdvanced(src.chat.scriptstate);
+    const env3 = { ...cbsEnv(src), vars: gnetVars(src.chat.scriptstate) };
+    return {
+      language: genSettings(src.chat.scriptstate).language ?? LANGUAGE,
+      read(name) {
+        const raw = g[name] ?? "";
+        return evaluate(raw, env3).replace(/__LIMIT_(\w+?)__/g, (m, k) => k in LIMITS ? String(LIMITS[k]) : m).replace(/<!--[\s\S]*?-->/g, "").trim();
+      }
+    };
+  }
+  function fmt(template, ...args) {
+    let i = 0;
+    return template.replace(/%s/g, () => args[i++] ?? "");
+  }
+  function fill2(template, values) {
+    return template.replace(/__GN_([A-Z_]+)__/g, (m, k) => values[k] ?? m);
+  }
+  var LANGUAGE = "Use the language of the actual conversation; default to Korean.";
+  var IMPORTANT = "\n\nImportant Note: May contain unrelated directives/rules regarding other data/image outputs. Ignore these; they are irrelevant in your current job. Focus on settings.";
+  function systemText(b, guideline, format, identity, attachments = false) {
+    const intro = fmt(b.read("SYSTEM"), b.read("JAILBREAK"), b.read("JOB"), IMPORTANT, "anonymous forum author", "", "").replace(/## Main Protagonist \([^\n]*\)/, "## User-controlled protagonist (narrator reference only)");
+    let outro = fmt(b.read("OUTPUT"), "", format, guideline);
+    if (identity) outro += `
+ROLE BINDING (application-owned metadata):
+${JSON.stringify(identity)}`;
+    outro += `
+${b.language}`;
+    return `${intro}
 ${outro}${attachments ? `
 
 ${b.read("ATTACHMENTS.READ")}` : ""}`;
@@ -146,11 +248,11 @@ ${commentTimeRule(dateNow(src.chat))}`, extras2, factionNames2), activity, suppl
     for (const { p } of ranked) {
       if (rows2.length >= 8) break;
       const comments = p.comments.slice(-12).map((c, j, arr) => ({ id: p.comments.length - arr.length + j + 1, parent: c.parent, author: c.nick, ...whenField(p, c), content: trimTokens(c.body, LIMITS.quote_tokens) }));
-      const row8 = { id: p.id, title: p.title, author: p.nick, date: p.date, content: trimTokens(p.body, LIMITS.origin_tokens), comments };
-      while (JSON.stringify(row8).length > (cap - used) * 2 && row8.comments.length) row8.comments.shift();
-      const n2 = Math.ceil(JSON.stringify(row8).length / 2);
+      const row9 = { id: p.id, title: p.title, author: p.nick, date: p.date, content: trimTokens(p.body, LIMITS.origin_tokens), comments };
+      while (JSON.stringify(row9).length > (cap - used) * 2 && row9.comments.length) row9.comments.shift();
+      const n2 = Math.ceil(JSON.stringify(row9).length / 2);
       if (used + n2 <= cap) {
-        rows2.push(row8);
+        rows2.push(row9);
         used += n2;
       }
     }
@@ -495,16 +597,16 @@ ${content}` };
       let rank2 = index2;
       let appendix;
       if (folderKind === "appendix") {
-        const row8 = apps.get(str4(e.comment));
-        if (!row8 || (!str4(e.key).trim() || !row8.keys) && !otherTriggers(row8)) return;
-        const at = row8.parent ? parentAt(row8.parent) : -1;
+        const row9 = apps.get(str4(e.comment));
+        if (!row9 || (!str4(e.key).trim() || !row9.keys) && !otherTriggers(row9)) return;
+        const at = row9.parent ? parentAt(row9.parent) : -1;
         const p = at >= 0 ? books[at] : void 0;
         kind = p ? kinds.get(str4(p.folder)) : "org";
         if (p) {
           order = Number(p.insertorder ?? 0);
           rank2 = at + 0.5 + index2 / 1e7;
         }
-        appendix = { parent: p ? row8.parent : "", parentNames: p ? [row8.parent, ...keysOf3(p)] : row8.parent ? [row8.parent] : [], when: row8, agentNames: row8.agents.map(agentNames) };
+        appendix = { parent: p ? row9.parent : "", parentNames: p ? [row9.parent, ...keysOf3(p)] : row9.parent ? [row9.parent] : [], when: row9, agentNames: row9.agents.map(agentNames) };
       } else {
         if (!managedHere(e, kinds)) return;
         kind = folderKind;
@@ -617,16 +719,16 @@ ${content}` };
     entries2.forEach((e, i) => {
       if (state.target && !e.appendix && names(e, state.target)) add(i, "status", state.target, state.target, 100);
     });
-    const pending = [];
+    const pending2 = [];
     window2.forEach((m, wi) => {
       const age2 = window2.length - 1 - wi;
       const isInput = inputLast && wi === window2.length - 1;
       const why = isInput ? "input" : m.role === "user" ? "user" : "char";
       const score2 = (isInput ? 30 : 0) + (m.role === "user" ? 3 : 1) * 0.8 ** age2;
-      for (const hit3 of findHits(m.data, entries2)) pending.push({ hit: hit3, why, score: score2 });
+      for (const hit3 of findHits(m.data, entries2)) pending2.push({ hit: hit3, why, score: score2 });
     });
-    for (const { hit: hit3, why, score: score2 } of pending) if (hit3.key.rule === "plain") add(hit3.entry, why, hit3.key.text, hit3.snippet, score2);
-    for (const { hit: hit3, why, score: score2 } of pending) {
+    for (const { hit: hit3, why, score: score2 } of pending2) if (hit3.key.rule === "plain") add(hit3.entry, why, hit3.key.text, hit3.snippet, score2);
+    for (const { hit: hit3, why, score: score2 } of pending2) {
       if (hit3.key.rule === "plain") continue;
       const e = entries2[hit3.entry];
       const present = state.deployed.some((n2) => names(e, n2)) || state.board.some((n2) => names(e, n2));
@@ -857,8 +959,8 @@ ${block2.trim()}` };
     }
     const n2 = userName.trim();
     if (n2 && agentName && n2 !== agentName && n2.length >= 2 && !/^(?:user|나|유저)$/i.test(n2)) {
-      const esc28 = n2.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-      const re = new RegExp(/^[A-Za-z]/.test(n2) ? `\\b${esc28}\\b` : esc28, "g");
+      const esc31 = n2.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const re = new RegExp(/^[A-Za-z]/.test(n2) ? `\\b${esc31}\\b` : esc31, "g");
       out = out.map((m) => typeof m?.content === "string" && re.test(m.content) ? { ...m, content: m.content.replace(re, agentName) } : m);
     }
     return out;
@@ -869,7 +971,7 @@ ${block2.trim()}` };
     const re = /^(- Characters \{name\}: )(.*)$/gm;
     return messages.map((m) => {
       if (typeof m?.content !== "string" || !m.content.includes("- Characters {name}: ")) return m;
-      const content = m.content.replace(re, (_, head2, list4) => head2 + list4.split(",").map((s5) => s5.trim()).filter((s5) => s5 && !drop.has(s5)).join(", "));
+      const content = m.content.replace(re, (_, head3, list4) => head3 + list4.split(",").map((s5) => s5.trim()).filter((s5) => s5 && !drop.has(s5)).join(", "));
       return content === m.content ? m : { ...m, content };
     });
   }
@@ -1205,6 +1307,20 @@ The previous response was rejected and nothing was saved. Recreate the complete 
     ];
   }
 
+  // src/ui/controls.ts
+  var esc3 = (s5) => String(s5 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  var isOnOff = (items) => items.length === 2 && items.every(([, l]) => l === "ON" || l === "OFF");
+  function switchHtml(o) {
+    return `<span class="gx-switch-wrap"><small>${o.disabled ? "비활성" : o.on ? "켬" : "끔"}</small><button class="gx-switch" role="switch" aria-checked="${o.on}" data-action="${esc3(o.action)}" data-value="${esc3(o.value)}" ${o.disabled ? "disabled" : ""}${o.label ? ` aria-label="${esc3(o.label)}"` : ""}><i></i></button></span>`;
+  }
+  function onOffSwitch(items, cur, action, valueOf, disabled = false) {
+    if (!isOnOff(items)) return null;
+    const onV = items.find(([, l]) => l === "ON")[0];
+    const offV = items.find(([, l]) => l === "OFF")[0];
+    const on2 = cur === onV;
+    return switchHtml({ action, value: valueOf(on2 ? offV : onV), on: on2, disabled });
+  }
+
   // src/host/photo.ts
   var UPLOAD_SIDE = 1280;
   var MAX_FILE = 20 * 1024 * 1024;
@@ -1290,7 +1406,7 @@ The previous response was rejected and nothing was saved. Recreate the complete 
   }
 
   // src/ui/attach.ts
-  var esc3 = (s5) => String(s5 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  var esc4 = (s5) => String(s5 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   var svg = (d) => `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
   var ICON = {
     image: svg('<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m21 17-5-5-9 8"/>'),
@@ -1302,8 +1418,8 @@ The previous response was rejected and nothing was saved. Recreate the complete 
   };
   function attachEditor(prefix, items, kinds, disabled = false, giftNote = "", showMenu = true) {
     const rows2 = items.map(
-      (a, i) => `<div class="at-item${a.kind === "image" ? " at-item-image" : ""}">${a.kind === "image" ? `<img class="at-thumb" src="${esc3(a.preview ?? "")}" data-asset="${a.preview ? "" : esc3(a.asset ?? "")}" alt="보낼 사진">` : `<span class="at-kind">${ICON[a.kind]}${ATTACH_LABELS[a.kind]}</span>`}
-      <input class="gx-search" data-input="${prefix}-att" data-key="${i}" value="${esc3(a.content)}" placeholder="${esc3(ATTACH_HINTS[a.kind])}" maxlength="2000" aria-label="${ATTACH_LABELS[a.kind]} 내용" ${disabled ? "disabled" : ""}>
+      (a, i) => `<div class="at-item${a.kind === "image" ? " at-item-image" : ""}">${a.kind === "image" ? `<img class="at-thumb" src="${esc4(a.preview ?? "")}" data-asset="${a.preview ? "" : esc4(a.asset ?? "")}" alt="보낼 사진">` : `<span class="at-kind">${ICON[a.kind]}${ATTACH_LABELS[a.kind]}</span>`}
+      <input class="gx-search" data-input="${prefix}-att" data-key="${i}" value="${esc4(a.content)}" placeholder="${esc4(ATTACH_HINTS[a.kind])}" maxlength="2000" aria-label="${ATTACH_LABELS[a.kind]} 내용" ${disabled ? "disabled" : ""}>
       <button class="gx-mini" data-action="${prefix}-att-del" data-value="${i}" aria-label="${ATTACH_LABELS[a.kind]} 첨부 빼기" ${disabled ? "disabled" : ""}>✕</button></div>`
     ).join("");
     const full = items.length >= ATTACH_MAX;
@@ -1312,15 +1428,15 @@ The previous response was rejected and nothing was saved. Recreate the complete 
       const blocked2 = !kinds.includes(k);
       if (k === "image") return `<button class="at-add at-add-image" data-pick-photo="${prefix}" ${disabled || full ? "disabled" : ""} title="붙여넣기(Ctrl+V)나 끌어놓기로도 올릴 수 있어요">${ICON.image}<span>사진 올리기</span></button>`;
       const label2 = k === "photo" && kinds.includes("image") ? "사진 묘사" : ATTACH_LABELS[k];
-      return `<button class="at-add" data-action="${prefix}-att-add" data-value="${k}" ${disabled || full || blocked2 ? "disabled" : ""}${blocked2 ? ` title="${esc3(giftNote)}"` : ""}>${ICON[k]}<span>${label2}</span></button>`;
+      return `<button class="at-add" data-action="${prefix}-att-add" data-value="${k}" ${disabled || full || blocked2 ? "disabled" : ""}${blocked2 ? ` title="${esc4(giftNote)}"` : ""}>${ICON[k]}<span>${label2}</span></button>`;
     }).join("");
     if (!rows2 && !showMenu) return "";
     return `<div class="at-editor" data-drop-photo="${prefix}">${rows2}${showMenu ? `<div class="at-menu" role="group" aria-label="첨부 추가">${menu}${full ? `<small class="gx-muted">첨부는 ${ATTACH_MAX}개까지예요.</small>` : ""}</div>` : ""}</div>`;
   }
   function attachInput(items, key2, value) {
-    const row8 = items[Number(key2)];
-    if (!row8) return false;
-    row8.content = value;
+    const row9 = items[Number(key2)];
+    if (!row9) return false;
+    row9.content = value;
     return true;
   }
   function attachAction(items, op, value, kinds) {
@@ -1372,7 +1488,7 @@ The previous response was rejected and nothing was saved. Recreate the complete 
     box.className = "gx at-zoom";
     box.setAttribute("role", "dialog");
     box.setAttribute("aria-label", "사진 크게 보기");
-    box.innerHTML = `<img src="${esc3(src)}" alt="${esc3(alt)}"><button class="at-zoom-x" aria-label="닫기">✕</button>`;
+    box.innerHTML = `<img src="${esc4(src)}" alt="${esc4(alt)}"><button class="at-zoom-x" aria-label="닫기">✕</button>`;
     const close2 = () => {
       box.remove();
       document.removeEventListener("keydown", key2, true);
@@ -1390,25 +1506,25 @@ The previous response was rejected and nothing was saved. Recreate the complete 
     const label2 = ATTACH_LABELS[kind];
     if (kind === "image") {
       const src = asset ? photos.get(asset) : null;
-      return `<figure class="at-card at-card-image${asset && photos.get(asset) === null ? " broken" : ""}"><button class="at-photo" data-zoom-photo aria-label="사진 크게 보기"><img src="${esc3(src ?? "")}" data-asset="${esc3(asset ?? "")}" alt="${esc3(text || label2)}" loading="lazy"></button>
-      <span class="at-broken">${ICON.image}<small>사진을 불러오지 못했어요</small></span>${text.trim() ? `<figcaption>${esc3(text)}</figcaption>` : ""}</figure>`;
+      return `<figure class="at-card at-card-image${asset && photos.get(asset) === null ? " broken" : ""}"><button class="at-photo" data-zoom-photo aria-label="사진 크게 보기"><img src="${esc4(src ?? "")}" data-asset="${esc4(asset ?? "")}" alt="${esc4(text || label2)}" loading="lazy"></button>
+      <span class="at-broken">${ICON.image}<small>사진을 불러오지 못했어요</small></span>${text.trim() ? `<figcaption>${esc4(text)}</figcaption>` : ""}</figure>`;
     }
     if (kind === "file") {
-      return `<div class="at-card at-card-file"><span class="at-ico">${ICON.file}</span><div class="at-copy"><b>${esc3(text)}</b><small class="at-save">저장 · 다른 이름으로 저장</small></div></div>`;
+      return `<div class="at-card at-card-file"><span class="at-ico">${ICON.file}</span><div class="at-copy"><b>${esc4(text)}</b><small class="at-save">저장 · 다른 이름으로 저장</small></div></div>`;
     }
     if (kind === "link") {
       const url = attachUrl(text);
-      const go2 = url ? `<a class="at-go" href="${esc3(url)}" target="_blank" rel="noopener noreferrer">여기를 눌러 링크를 확인하세요.</a>` : "<small>여기를 눌러 링크를 확인하세요.</small>";
-      return `<div class="at-card at-card-link"><span class="at-ico">${ICON.link}</span><div class="at-copy"><b>${esc3(text)}</b>${go2}</div></div>`;
+      const go2 = url ? `<a class="at-go" href="${esc4(url)}" target="_blank" rel="noopener noreferrer">여기를 눌러 링크를 확인하세요.</a>` : "<small>여기를 눌러 링크를 확인하세요.</small>";
+      return `<div class="at-card at-card-link"><span class="at-ico">${ICON.link}</span><div class="at-copy"><b>${esc4(text)}</b>${go2}</div></div>`;
     }
-    if (kind === "gift") return `<div class="at-card at-card-gift"><span class="at-ico">${ICON.gift}</span><div class="at-copy"><b>${esc3(text)}</b><small>선물이 도착했습니다</small></div></div>`;
-    return `<div class="at-card at-card-${kind}"><span class="at-ico">${ICON[kind]}</span><div class="at-copy"><small>${label2}</small><span>${esc3(text).replace(/\n/g, "<br>")}</span></div></div>`;
+    if (kind === "gift") return `<div class="at-card at-card-gift"><span class="at-ico">${ICON.gift}</span><div class="at-copy"><b>${esc4(text)}</b><small>선물이 도착했습니다</small></div></div>`;
+    return `<div class="at-card at-card-${kind}"><span class="at-ico">${ICON[kind]}</span><div class="at-copy"><small>${label2}</small><span>${esc4(text).replace(/\n/g, "<br>")}</span></div></div>`;
   }
   function attachBody(text, board2 = false) {
     const out = [];
     const files2 = [];
     for (const p of bodyParts(text)) {
-      if (p.kind === "text") out.push(`<p>${esc3(p.text.trim()).replace(/\n/g, "<br>")}</p>`);
+      if (p.kind === "text") out.push(`<p>${esc4(p.text.trim()).replace(/\n/g, "<br>")}</p>`);
       else if (board2 && (p.kind === "file" || p.kind === "link")) files2.push(card(p.kind, p.text));
       else out.push(card(p.kind, p.text, p.asset));
     }
@@ -1547,12 +1663,12 @@ The previous response was rejected and nothing was saved. Recreate the complete 
   }
   var hasAsset = (char, name) => !!name && !!findRow(char, splitPic(name).name);
   function assetUrl(char, name) {
-    const row8 = findRow(char, name);
-    if (!row8) return Promise.resolve(null);
-    const key2 = `${String(char.chaId ?? char.name ?? "")}|${row8[1]}`;
+    const row9 = findRow(char, name);
+    if (!row9) return Promise.resolve(null);
+    const key2 = `${String(char.chaId ?? char.name ?? "")}|${row9[1]}`;
     let hit3 = cache7.get(key2);
     if (!hit3) {
-      hit3 = load(row8[1], String(row8[2] ?? row8[1].split(".").pop() ?? ""));
+      hit3 = load(row9[1], String(row9[2] ?? row9[1].split(".").pop() ?? ""));
       cache7.set(key2, hit3);
       void hit3.then((url) => {
         if (!url) cache7.delete(key2);
@@ -1733,7 +1849,7 @@ The previous response was rejected and nothing was saved. Recreate the complete 
     const text = save3 ? `지금 ${NAME[pane]} 설정으로 새 채팅 기본값을 덮어쓸까요?` : `저장해 둔 ${NAME[pane]} 기본값을 지금 채팅에 불러올까요?`;
     return `<div class="st-confirm st-barconfirm ps-defconfirm"><p>${text}</p><div class="gx-row-btns"><button class="gx-mini${save3 ? " ps-save" : " danger"}" data-action="${pane}-def-yes">${save3 ? "덮어쓰기" : "불러오기"}</button><button class="gx-mini" data-action="${pane}-def-no">취소</button></div></div>`;
   }
-  async function defaultsAction(pane, action, value, ctx2, refresh2) {
+  async function defaultsAction(pane, action, value, ctx2, refresh3) {
     const sub = action.slice(pane.length + 1);
     if (sub === "def-ask") {
       defaultsAsk.pane = pane;
@@ -1755,14 +1871,14 @@ The previous response was rejected and nothing was saved. Recreate the complete 
     }
     if (what === "load") {
       await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => ({ ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...loadVarDefaults(PREFIXES[pane], chat.scriptstate) } }));
-      await refresh2();
+      await refresh3();
       return `새 채팅 기본값을 지금 ${NAME[pane]}에 불러왔어요.`;
     }
     return "";
   }
 
   // src/ui/toast.ts
-  var esc4 = (s5) => s5.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  var esc5 = (s5) => s5.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   var timers = /* @__PURE__ */ new Map();
   function toast(key2, text, clear) {
     if (!text) return "";
@@ -1780,7 +1896,7 @@ The previous response was rejected and nothing was saved. Recreate the complete 
       }, ms);
       timers.set(key2, { text, id });
     }
-    return `<div class="gx-toast gn-notice" data-toast="${key2}" role="status">${esc4(text)}</div>`;
+    return `<div class="gx-toast gn-notice" data-toast="${key2}" role="status">${esc5(text)}</div>`;
   }
 
   // src/ui/drawer.ts
@@ -1940,39 +2056,47 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
   }
 
   // src/ui/advanced.ts
-  var esc5 = (s5) => String(s5 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  var esc6 = (s5) => String(s5 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   var advUi = { confirm: "" };
   function control(f, item2, cur) {
     const id = `${f}:${item2.key}`;
     if (item2.type === "pick") {
-      return `<div class="gx-segs gx-segs-sm">${(item2.opts ?? []).map(([v, label2]) => `<button class="gx-seg${cur === v ? " on" : ""}" data-action="adv-set" data-value="${id}=${v}" aria-pressed="${cur === v}">${esc5(label2)}</button>`).join("")}</div>`;
+      return `<div class="gx-segs gx-segs-sm">${(item2.opts ?? []).map(([v, label2]) => `<button class="gx-seg${cur === v ? " on" : ""}" data-action="adv-set" data-value="${id}=${v}" aria-pressed="${cur === v}">${esc6(label2)}</button>`).join("")}</div>`;
     }
-    const zero = cur === "0" && item2.zero;
-    return `<span class="adv-num"><input class="gx-search" type="number" inputmode="numeric" min="${item2.min ?? 0}" max="${item2.max ?? ""}" step="1" data-change="adv-set" data-key="${id}" value="${zero ? "" : esc5(cur)}"${item2.zero ? ` placeholder="${esc5(item2.zero)}"` : ""} aria-label="${esc5(item2.label)}"><span>${esc5(item2.unit ?? "")}</span></span>`;
+    const min = item2.min ?? 0;
+    const max = item2.max ?? Number.MAX_SAFE_INTEGER;
+    const step = max >= 1e4 ? 500 : 1;
+    const n2 = Math.min(max, Math.max(min, Number(cur) || 0));
+    const zero = n2 === 0 && item2.zero;
+    const down = Math.max(min, n2 - step);
+    const up = Math.min(max, n2 + step);
+    return `<div class="st-step adv-step"><button class="gx-step" data-action="adv-set" data-value="${id}=${down}" ${n2 <= min ? "disabled" : ""} aria-label="${esc6(item2.label)} 줄이기">−</button>
+    <input class="adv-val" type="number" inputmode="numeric" min="${min}" max="${item2.max ?? ""}" step="${step}" data-change="adv-set" data-key="${id}" value="${zero ? "" : n2}"${item2.zero ? ` placeholder="${esc6(item2.zero)}"` : ""} aria-label="${esc6(item2.label)}">${item2.unit ? `<span>${esc6(item2.unit)}</span>` : ""}
+    <button class="gx-step" data-action="adv-set" data-value="${id}=${up}" ${n2 >= max ? "disabled" : ""} aria-label="${esc6(item2.label)} 늘리기">+</button></div>`;
   }
   function row(f, item2, state) {
     const cur = advValue(state, f, item2.key);
     const changed = cur !== String(item2.def);
-    const reset = changed ? `<button class="ph-tool sm adv-reset" data-action="adv-reset" data-value="${f}:${item2.key}" aria-label="${esc5(item2.label)} 기본값으로" title="기본값 ${esc5(item2.def)}">${ICONS.refresh}</button>` : '<span class="adv-reset" aria-hidden="true"></span>';
-    return `<div class="ps-row adv-row${item2.type === "num" ? " adv-numrow" : ""}${changed ? " changed" : ""}"><div class="ps-label"><b>${esc5(item2.label)}</b>${item2.hint ? `<small>${esc5(item2.hint)}</small>` : ""}</div><div class="ps-ctl">${control(f, item2, cur)}${reset}</div></div>`;
+    const reset = changed ? `<button class="ph-tool sm adv-reset" data-action="adv-reset" data-value="${f}:${item2.key}" aria-label="${esc6(item2.label)} 기본값으로" title="기본값 ${esc6(item2.def)}">${ICONS.refresh}</button>` : '<span class="adv-reset" aria-hidden="true"></span>';
+    return `<div class="ps-row adv-row${item2.type === "num" ? " adv-numrow" : ""}${changed ? " changed" : ""}"><div class="ps-label"><b>${esc6(item2.label)}</b>${item2.hint ? `<small>${esc6(item2.hint)}</small>` : ""}</div><div class="ps-ctl">${control(f, item2, cur)}${reset}</div></div>`;
   }
   function chips(f, items, state) {
     return `<div class="ps-row adv-chips"><div class="gx-chips">${items.map((i) => {
       const on2 = advValue(state, f, i.key) === "1";
-      return `<button class="gx-chip${on2 ? " on" : ""}" data-action="adv-set" data-value="${f}:${i.key}=${on2 ? "0" : "1"}" aria-pressed="${on2}">${esc5(i.label)}</button>`;
+      return `<button class="gx-chip${on2 ? " on" : ""}" data-action="adv-set" data-value="${f}:${i.key}=${on2 ? "0" : "1"}" aria-pressed="${on2}">${esc6(i.label)}</button>`;
     }).join("")}</div></div>`;
   }
   function advSections(f, state, extra = {}) {
-    return ADV[f].map((g, gi) => `<section class="ps-group"><h3>${esc5(g.title)}</h3><div class="ps-rows">${g.chips?.length ? chips(f, g.chips, state) : ""}${g.items.map((i) => row(f, i, state)).join("")}</div>${extra[gi] ?? ""}</section>`).join("");
+    return ADV[f].map((g, gi) => `<section class="ps-group"><h3>${esc6(g.title)}</h3><div class="ps-rows">${g.chips?.length ? chips(f, g.chips, state) : ""}${g.items.map((i) => row(f, i, state)).join("")}</div>${extra[gi] ?? ""}</section>`).join("");
   }
   function advancedBox(f, state) {
     const n2 = advChanged(state, f).length;
     const groups = ADV[f].map((g, gi) => {
       const body5 = `${g.chips?.length ? chips(f, g.chips, state) : ""}${g.items.map((i) => row(f, i, state)).join("")}`;
       if (g.fold) {
-        return `<details class="ps-adv-sub" data-keep="adv-${f}-${gi}"${keepOpen(`adv-${f}-${gi}`)}><summary>${esc5(g.title)}</summary><div class="ps-rows">${body5}</div></details>`;
+        return `<details class="ps-adv-sub" data-keep="adv-${f}-${gi}"${keepOpen(`adv-${f}-${gi}`)}><summary>${esc6(g.title)}</summary><div class="ps-rows">${body5}</div></details>`;
       }
-      return `<section class="ps-group"><h3>${esc5(g.title)}</h3><div class="ps-rows">${body5}</div></section>`;
+      return `<section class="ps-group"><h3>${esc6(g.title)}</h3><div class="ps-rows">${body5}</div></section>`;
     }).join("");
     const foot = n2 ? advUi.confirm === f ? `<div class="st-confirm adv-foot"><p>고급 설정 ${n2}개를 모두 기본값으로 돌릴까요?</p><div class="gx-row-btns"><button class="gx-mini danger" data-action="adv-reset-yes" data-value="${f}">되돌리기</button><button class="gx-mini" data-action="adv-reset-no">취소</button></div></div>` : `<div class="adv-foot"><button class="gx-mini" data-action="adv-reset-all" data-value="${f}">${ICONS.refresh}모두 기본값으로</button></div>` : "";
     return `<details class="ps-adv" data-keep="adv-${f}"${keepOpen(`adv-${f}`)}><summary class="ps-adv-sum"><b>고급 설정</b>${n2 ? `<span class="adv-count">${n2}개 바꿈</span>` : ""}</summary><div class="ps-adv-body">${groups}${foot}</div></details>`;
@@ -2106,7 +2230,7 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
   var jobs = /* @__PURE__ */ new Map();
   var chatKey = (ctx2) => `${ctx2.charIndex}:${ctx2.chatIndex}`;
   var phoneBusy = (ctx2) => jobs.has(chatKey(ctx2));
-  var esc6 = (s5) => String(s5 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  var esc7 = (s5) => String(s5 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   var source = (ctx2, chat = ctx2.chat) => playerSource({ char: ctx2.char, chat, persona: personaText() });
   function names2(ctx2) {
     try {
@@ -2506,10 +2630,10 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
   }
   var bubbleBody = (text) => attachBody(text);
   var phKinds = (r) => r.kind === "dm" ? ["image", "photo", "video", "file", "link", "gift"] : ["image", "photo", "video", "file", "link"];
-  var initial = (name) => esc6([...name][0] ?? "톡");
+  var initial = (name) => esc7([...name][0] ?? "톡");
   function face(ctx2, who, label2, cls = "") {
     const url = who && !who.custom ? imageUrl(ctx2.char, agentFace(ctx2.char, who.english)) : null;
-    return `<span class="ph-avatar${cls}">${url ? `<img src="${esc6(url)}" alt="" loading="lazy">` : initial(label2)}</span>`;
+    return `<span class="ph-avatar${cls}">${url ? `<img src="${esc7(url)}" alt="" loading="lazy">` : initial(label2)}</span>`;
   }
   var shortTime = (t) => /(\d\d:\d\d)/.exec(t)?.[1] ?? "";
   function matches(c, q, fnames) {
@@ -2518,7 +2642,7 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
   var tool = (action, icon2, label2, extra = "", short = "") => `<button class="ph-tool" data-action="${action}" aria-label="${label2}" title="${label2}" ${extra}>${icon2}${short ? `<span class="ph-tool-l">${short}</span>` : ""}</button>`;
   var badge = (n2) => n2 > 0 ? `<span class="ph-badge">${n2 > 99 ? "99+" : n2}</span>` : "";
   function chips2(action, cur, items) {
-    return `<div class="ph-tabs" role="tablist">${items.map((t) => `<button class="ph-tab${t.id === cur ? " on" : ""}" data-action="${action}" data-value="${esc6(t.id)}" aria-selected="${t.id === cur}">${esc6(t.label)}${t.count !== void 0 ? `<small>${t.count}</small>` : ""}${badge(t.alert ?? 0)}</button>`).join("")}</div>`;
+    return `<div class="ph-tabs" role="tablist">${items.map((t) => `<button class="ph-tab${t.id === cur ? " on" : ""}" data-action="${action}" data-value="${esc7(t.id)}" aria-selected="${t.id === cur}">${esc7(t.label)}${t.count !== void 0 ? `<small>${t.count}</small>` : ""}${badge(t.alert ?? 0)}</button>`).join("")}</div>`;
   }
   var blank3 = (text) => `<div class="ph-blank"><p>${text}</p></div>`;
   function agentStates(ctx2) {
@@ -2532,9 +2656,9 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
   function contactsView(ctx2, d, st) {
     if (!d.tabs.length) return blank3("이 소속에 공개된 연락처 탭이 없어요. 설정에서 「모든 연락처 공개」를 켤 수 있어요.");
     const tab2 = d.tabs.some((t) => t.id === phone.tab) ? phone.tab : d.tabs[0].id;
-    const head2 = chips2("ph-ctab", tab2, d.tabs.map((t) => ({ id: t.id, label: t.name, count: d.contacts.filter((c) => c.tabs.includes(t.id)).length })));
+    const head3 = chips2("ph-ctab", tab2, d.tabs.map((t) => ({ id: t.id, label: t.name, count: d.contacts.filter((c) => c.tabs.includes(t.id)).length })));
     const rows2 = d.contacts.filter((c) => c.tabs.includes(tab2));
-    return head2 + (rows2.length ? contactList(ctx2, rows2, st) : blank3("이 탭에는 아직 연락처가 없어요."));
+    return head3 + (rows2.length ? contactList(ctx2, rows2, st) : blank3("이 탭에는 아직 연락처가 없어요."));
   }
   var talking = (room) => room?.messages.some((m) => m.kind === "message") ? `<span class="ph-talk${room.unread ? " new" : ""}" role="img" aria-label="${room.unread ? "안 읽은 대화" : "대화 중"}">${ICONS.phone}</span>` : "";
   function contactList(ctx2, rows2, st) {
@@ -2545,10 +2669,10 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
       const confirm2 = phone.confirm === `contact:${c.id}`;
       const on2 = phone.view === "room" && phone.room === `dm_${c.id}`;
       return `<li class="ph-row"><button class="ph-main${on2 ? " on" : ""}" data-action="ph-dm" data-value="${c.id}">${face(ctx2, c, c.name)}
-            <span class="ph-who"><span class="ph-who-name"><b>${esc6(c.name)}</b>${c.agentId && states[c.agentId] ? stChip(states[c.agentId]) : ""}${talking(room)}</span><small>${esc6(contactDetails(c) || (c.custom ? c.note || "직접 추가한 연락처" : fnames[c.group ?? ""] ?? ""))}</small></span>
+            <span class="ph-who"><span class="ph-who-name"><b>${esc7(c.name)}</b>${c.agentId && states[c.agentId] ? stChip(states[c.agentId]) : ""}${talking(room)}</span><small>${esc7(contactDetails(c) || (c.custom ? c.note || "직접 추가한 연락처" : fnames[c.group ?? ""] ?? ""))}</small></span>
             ${badge(room?.unread ?? 0)}</button>
-            <span class="ph-act"><button class="ph-tool sm" data-action="ph-call" data-value="${esc6(c.name)}" title="전화" aria-label="${esc6(c.name)}에게 전화">${ICONS.call}</button>
-            ${c.custom ? "" : `<button class="ph-tool sm" data-action="wiki-goto" data-value="${esc6(c.lore || c.name)}" title="위키" aria-label="${esc6(c.name)} 위키">${ICONS.book}</button>`}
+            <span class="ph-act"><button class="ph-tool sm" data-action="ph-call" data-value="${esc7(c.name)}" title="전화" aria-label="${esc7(c.name)}에게 전화">${ICONS.call}</button>
+            ${c.custom ? "" : `<button class="ph-tool sm" data-action="wiki-goto" data-value="${esc7(c.lore || c.name)}" title="위키" aria-label="${esc7(c.name)} 위키">${ICONS.book}</button>`}
             ${c.saved && c.custom ? `<button class="gx-mini${confirm2 ? " danger" : ""}" data-action="ph-contact-del" data-value="${c.id}">${confirm2 ? "정말 삭제" : "삭제"}</button>` : ""}</span></li>`;
     }).join("")}</ul>`;
   }
@@ -2560,12 +2684,12 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
     const all = chatRooms(st, "");
     if (!all.length) return blank3("아직 대화가 없어요.<br>연락처에서 이름을 누르거나 새 메시지 확인을 눌러 보세요.");
     const unread = all.filter((r) => r.unread);
-    const head2 = chips2("ph-chat-filter", phone.chatFilter, [
+    const head3 = chips2("ph-chat-filter", phone.chatFilter, [
       { id: "all", label: "전체", count: all.length },
       { id: "unread", label: "안읽음", alert: unread.reduce((n2, r) => n2 + r.unread, 0) }
     ]);
     const rows2 = phone.chatFilter === "unread" ? unread : all;
-    return head2 + (rows2.length ? chatList(ctx2, rows2, d) : blank3("안 읽은 대화가 없어요."));
+    return head3 + (rows2.length ? chatList(ctx2, rows2, d) : blank3("안 읽은 대화가 없어요."));
   }
   function chatList(ctx2, rows2, d) {
     return `<ul class="ph-list ph-chats">${rows2.map((r) => {
@@ -2573,13 +2697,13 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
       const who = r.kind === "dm" ? d.map.get(r.members[0]) ?? r.people[r.members[0]] : null;
       const preview = r.pending ? "답장을 기다리는 중…" : last2 ? last2.kind === "message" ? `${last2.sender === "me" ? "나: " : ""}${previewText(last2.text)}` : last2.text : "";
       const on2 = phone.view === "room" && phone.room === r.id;
-      return `<li class="ph-row"><button class="ph-main${on2 ? " on" : ""}" data-action="ph-room" data-value="${esc6(r.id)}">${r.kind === "group" ? `<span class="ph-avatar group">${ICONS.group}<i>${r.members.length + 1}</i></span>` : face(ctx2, who ?? void 0, roomLabel(r))}
-        <span class="ph-who"><span class="ph-who-top"><b>${esc6(roomLabel(r))}</b>${last2 ? `<small class="ph-time">${esc6(shortTime(last2.time))}</small>` : ""}</span>
-        <span class="ph-who-bot"><small class="${r.pending ? "ph-wait" : ""}">${esc6([...preview].slice(0, 60).join(""))}</small>${badge(r.unread)}</span></span></button>${roomDel(r.id, !!r.pending, roomLabel(r))}</li>`;
+      return `<li class="ph-row"><button class="ph-main${on2 ? " on" : ""}" data-action="ph-room" data-value="${esc7(r.id)}">${r.kind === "group" ? `<span class="ph-avatar group">${ICONS.group}<i>${r.members.length + 1}</i></span>` : face(ctx2, who ?? void 0, roomLabel(r))}
+        <span class="ph-who"><span class="ph-who-top"><b>${esc7(roomLabel(r))}</b>${last2 ? `<small class="ph-time">${esc7(shortTime(last2.time))}</small>` : ""}</span>
+        <span class="ph-who-bot"><small class="${r.pending ? "ph-wait" : ""}">${esc7([...preview].slice(0, 60).join(""))}</small>${badge(r.unread)}</span></span></button>${roomDel(r.id, !!r.pending, roomLabel(r))}</li>`;
     }).join("")}</ul>`;
   }
-  function roomDel(id, pending, label2) {
-    return phone.confirm === `room:${id}` ? `<button class="gx-mini danger ph-rdel" data-action="ph-room-del" data-value="${esc6(id)}">정말 삭제</button>` : `<button class="ph-tool sm ph-rdel" data-action="ph-room-del" data-value="${esc6(id)}" title="삭제" aria-label="${esc6(label2)} 삭제" ${pending ? "disabled" : ""}>${ICONS.trash}</button>`;
+  function roomDel(id, pending2, label2) {
+    return phone.confirm === `room:${id}` ? `<button class="gx-mini danger ph-rdel" data-action="ph-room-del" data-value="${esc7(id)}">정말 삭제</button>` : `<button class="ph-tool sm ph-rdel" data-action="ph-room-del" data-value="${esc7(id)}" title="삭제" aria-label="${esc7(label2)} 삭제" ${pending2 ? "disabled" : ""}>${ICONS.trash}</button>`;
   }
   var dayOf = (t) => /^(\d{4})\.(\d\d)\.(\d\d)/.exec(t);
   function roomView(ctx2, st, d, busy5) {
@@ -2597,7 +2721,7 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
       const day = dm ? `${dm[1]}년 ${Number(dm[2])}월 ${Number(dm[3])}일` : "";
       const sep = day && day !== lastDay ? `<div class="ph-day"><span>${day}</span></div>` : "";
       if (day) lastDay = day;
-      if (!isMsg(m)) return `${sep}<div class="ph-sys${m.kind === "pause" ? " pause" : ""}">${esc6(m.text)}</div>`;
+      if (!isMsg(m)) return `${sep}<div class="ph-sys${m.kind === "pause" ? " pause" : ""}">${esc7(m.text)}</div>`;
       const prev = shown2[i - 1];
       const next = shown2[i + 1];
       const me = m.sender === "me";
@@ -2606,11 +2730,11 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
       const unread = me && r.kind === "dm" && r.pending?.message === m.id && !r.messages.some((x) => x.id > m.id && x.sender !== "me" && x.kind === "message");
       const who2 = d.map.get(m.sender) ?? r.people[m.sender];
       const pic = !me ? first ? face(ctx2, who2, name(m.sender), " ph-face") : '<span class="ph-face-gap"></span>' : "";
-      const head2 = !me && first ? `<b class="ph-name">${esc6(name(m.sender))}</b>` : "";
-      const meta = last2 || unread ? `<span class="ph-meta-t">${unread ? "<i>1</i>" : ""}${last2 ? esc6(shortTime(m.time)) : ""}</span>` : "";
-      return `${sep}<div class="ph-msg ${me ? "me" : "npc"}${first ? " first" : ""}">${pic}<div class="ph-msg-col">${head2}<div class="ph-line"><div class="ph-bubble">${bubbleBody(m.text)}</div>${meta}</div></div></div>`;
+      const head3 = !me && first ? `<b class="ph-name">${esc7(name(m.sender))}</b>` : "";
+      const meta = last2 || unread ? `<span class="ph-meta-t">${unread ? "<i>1</i>" : ""}${last2 ? esc7(shortTime(m.time)) : ""}</span>` : "";
+      return `${sep}<div class="ph-msg ${me ? "me" : "npc"}${first ? " first" : ""}">${pic}<div class="ph-msg-col">${head3}<div class="ph-line"><div class="ph-bubble">${bubbleBody(m.text)}</div>${meta}</div></div></div>`;
     }).join("");
-    const pending = r.pending ? r.pending.status === "working" || busy5 ? '<div class="ph-msg npc first ph-typing-row"><span class="ph-face-gap"></span><div class="ph-bubble ph-typing" aria-label="입력 중"><i></i><i></i><i></i></div></div>' : `<div class="ph-retry"><span>답장을 받지 못했어요.</span><button class="gx-mini" data-action="ph-retry" data-value="${esc6(r.id)}">다시 시도</button><button class="gx-mini" data-action="ph-skip" data-value="${esc6(r.id)}">건너뛰기</button></div>` : "";
+    const pending2 = r.pending ? r.pending.status === "working" || busy5 ? '<div class="ph-msg npc first ph-typing-row"><span class="ph-face-gap"></span><div class="ph-bubble ph-typing" aria-label="입력 중"><i></i><i></i><i></i></div></div>' : `<div class="ph-retry"><span>답장을 받지 못했어요.</span><button class="gx-mini" data-action="ph-retry" data-value="${esc7(r.id)}">다시 시도</button><button class="gx-mini" data-action="ph-skip" data-value="${esc7(r.id)}">건너뛰기</button></div>` : "";
     const who = r.kind === "dm" ? d.map.get(r.members[0]) ?? r.people[r.members[0]] : void 0;
     const sub = r.kind === "dm" ? contactDetails(who) : `${r.members.length + 1}명${r.topic ? ` · ${r.topic}` : ""}`;
     const off = !r.members.length;
@@ -2618,21 +2742,21 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
     return `<div class="ph-room">
     <header class="ph-room-head"><button class="ph-tool ph-back" data-action="ph-back" aria-label="목록으로">${ICONS.back}</button>
       ${r.kind === "group" ? `<span class="ph-avatar group sm">${ICONS.group}</span>` : face(ctx2, who, roomLabel(r), " sm")}
-      <div class="ph-room-title"><b>${esc6(roomLabel(r))}</b>${sub ? `<small>${esc6(sub)}</small>` : ""}</div>
+      <div class="ph-room-title"><b>${esc7(roomLabel(r))}</b>${sub ? `<small>${esc7(sub)}</small>` : ""}</div>
       <span class="ph-act">
-        ${tool("ph-room-refresh", ICONS.refresh, "이 방 새로고침", `data-value="${esc6(r.id)}" ${busy5 || off ? "disabled" : ""}`)}
-        ${r.kind === "dm" ? tool("ph-call", ICONS.call, "전화", `data-value="${esc6(roomLabel(r))}"`) : ""}
-        ${tool("ph-invite", ICONS.addUser, "초대", `data-value="${esc6(r.id)}" ${busy5 || r.pending ? "disabled" : ""}`)}
-        ${confirm2 ? `<button class="gx-mini danger" data-action="ph-room-del" data-value="${esc6(r.id)}">정말 삭제</button>` : tool("ph-room-del", ICONS.trash, "방 삭제", `data-value="${esc6(r.id)}" ${r.pending ? "disabled" : ""}`)}
+        ${tool("ph-room-refresh", ICONS.refresh, "이 방 새로고침", `data-value="${esc7(r.id)}" ${busy5 || off ? "disabled" : ""}`)}
+        ${r.kind === "dm" ? tool("ph-call", ICONS.call, "전화", `data-value="${esc7(roomLabel(r))}"`) : ""}
+        ${tool("ph-invite", ICONS.addUser, "초대", `data-value="${esc7(r.id)}" ${busy5 || r.pending ? "disabled" : ""}`)}
+        ${confirm2 ? `<button class="gx-mini danger" data-action="ph-room-del" data-value="${esc7(r.id)}">정말 삭제</button>` : tool("ph-room-del", ICONS.trash, "방 삭제", `data-value="${esc7(r.id)}" ${r.pending ? "disabled" : ""}`)}
       </span></header>
-    ${r.kind === "group" ? `<p class="ph-members">참여자: 나, ${esc6(r.members.map(name).join(", "))}</p>` : ""}
-    <div class="ph-log">${more ? `<button class="gx-mini ph-more" data-action="ph-more">이전 대화 더 보기</button>` : ""}${r.trimmedRecords && !more ? `<div class="ph-sys">오래된 기록 ${r.trimmedRecords}개는 보관 상한으로 정리됐어요.</div>` : ""}${bubbles || '<div class="ph-sys">아직 대화가 없어요. 첫 메시지를 보내 보세요.</div>'}${pending}</div>
+    ${r.kind === "group" ? `<p class="ph-members">참여자: 나, ${esc7(r.members.map(name).join(", "))}</p>` : ""}
+    <div class="ph-log">${more ? `<button class="gx-mini ph-more" data-action="ph-more">이전 대화 더 보기</button>` : ""}${r.trimmedRecords && !more ? `<div class="ph-sys">오래된 기록 ${r.trimmedRecords}개는 보관 상한으로 정리됐어요.</div>` : ""}${bubbles || '<div class="ph-sys">아직 대화가 없어요. 첫 메시지를 보내 보세요.</div>'}${pending2}</div>
     <div class="ph-composer">
       ${off ? "" : attachEditor("ph", phone.attach, phKinds(r), !!r.pending, r.kind === "dm" ? "" : "선물은 1:1 대화에서만 보낼 수 있어요.", phone.attachMenu)}
       <div class="ph-compose">
         <button class="ph-tool ph-plus${phone.attachMenu ? " on" : ""}" data-action="ph-att-menu" aria-label="첨부" aria-expanded="${phone.attachMenu}" title="사진·파일·선물 첨부 (사진은 붙여넣기도 돼요)" ${locked ? "disabled" : ""}>${ICONS.plus}</button>
-        <textarea class="ph-input" data-input="ph-draft" rows="1" placeholder="${off ? "참여자가 없어요" : phone.attach.length ? "함께 보낼 메시지 (선택)" : "메시지 입력"}" ${locked ? "disabled" : ""}>${esc6(phone.draft)}</textarea>
-        <button class="ph-send" data-action="ph-send" data-value="${esc6(r.id)}" aria-label="보내기" title="보내기" ${busy5 || locked ? "disabled" : ""}>${ICONS.send}</button>
+        <textarea class="ph-input" data-input="ph-draft" rows="1" placeholder="${off ? "참여자가 없어요" : phone.attach.length ? "함께 보낼 메시지 (선택)" : "메시지 입력"}" ${locked ? "disabled" : ""}>${esc7(phone.draft)}</textarea>
+        <button class="ph-send" data-action="ph-send" data-value="${esc7(r.id)}" aria-label="보내기" title="보내기" ${busy5 || locked ? "disabled" : ""}>${ICONS.send}</button>
         <button class="ph-tool ph-back2" data-action="ph-back" aria-label="목록으로" title="목록으로">${ICONS.back}</button>
       </div>
     </div>
@@ -2645,7 +2769,7 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
       st = readPhone(ctx2.chat);
       d = dir(ctx2);
     } catch (error) {
-      return `<p class="gx-none">${esc6(error instanceof Error ? error.message : String(error))}</p>`;
+      return `<p class="gx-none">${esc7(error instanceof Error ? error.message : String(error))}</p>`;
     }
     const room = phone.invite ? st.rooms[phone.invite] : void 0;
     const existing = new Set(room?.members ?? []);
@@ -2656,7 +2780,7 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
     const picked = new Set(phone.picked);
     if (!rows2.length) return '<p class="gx-none">고를 수 있는 연락처가 없어요.</p>';
     return rows2.map((c) => `<li class="ph-row"><button class="ph-main${picked.has(c.id) ? " on" : ""}" data-action="ph-pick" data-value="${c.id}" aria-pressed="${picked.has(c.id)}">
-        <span class="ph-check">${picked.has(c.id) ? "✓" : ""}</span>${face(ctx2, c, c.name)}<span class="ph-who"><b>${esc6(c.name)}</b><small>${esc6(contactDetails(c))}</small></span></button></li>`).join("");
+        <span class="ph-check">${picked.has(c.id) ? "✓" : ""}</span>${face(ctx2, c, c.name)}<span class="ph-who"><b>${esc7(c.name)}</b><small>${esc7(contactDetails(c))}</small></span></button></li>`).join("");
   }
   function pickTabOf(d) {
     const cur = phone.pickTab;
@@ -2672,13 +2796,13 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
     const tabs2 = d.tabs.length > 1 ? chips2("ph-pick-tab", pickTabOf(d), d.tabs.map((t) => ({ id: t.id, label: t.name, count: d.contacts.filter((c) => c.tabs.includes(t.id) && !existing.has(c.id)).length }))) : "";
     return `<div class="ph-form">
     ${paneHead(
-      room ? `「${esc6(roomLabel(room))}」에 초대` : "단톡방 만들기",
+      room ? `「${esc7(roomLabel(room))}」에 초대` : "단톡방 만들기",
       `${picked}명 선택 · 상대 최대 ${LIMITS2.members}명`,
-      `<input class="gx-search ph-head-q" data-input="ph-pick-q" value="${esc6(phone.pickQuery)}" placeholder="이름·소속 검색" aria-label="초대할 사람 검색">`
+      `<input class="gx-search ph-head-q" data-input="ph-pick-q" value="${esc7(phone.pickQuery)}" placeholder="이름·소속 검색" aria-label="초대할 사람 검색">`
     )}
     <div class="ph-form-body ph-gbody">
-      ${room ? "" : `<input class="gx-search ph-gname" data-input="ph-gname" value="${esc6(phone.gname)}" maxlength="${LIMITS2.room_name}" placeholder="단톡방 이름 (선택, 비우면 참여자 이름)" aria-label="단톡방 이름">`}
-      ${room ? "" : `<textarea class="gx-search ph-topic${phone.topic.trim() ? " filled" : ""}" data-input="ph-topic" rows="1" placeholder="주제·상황 (선택, 비우면 지금 상황에 맞춰 시작)" aria-label="주제·상황">${esc6(phone.topic)}</textarea>`}
+      ${room ? "" : `<input class="gx-search ph-gname" data-input="ph-gname" value="${esc7(phone.gname)}" maxlength="${LIMITS2.room_name}" placeholder="단톡방 이름 (선택, 비우면 참여자 이름)" aria-label="단톡방 이름">`}
+      ${room ? "" : `<textarea class="gx-search ph-topic${phone.topic.trim() ? " filled" : ""}" data-input="ph-topic" rows="1" placeholder="주제·상황 (선택, 비우면 지금 상황에 맞춰 시작)" aria-label="주제·상황">${esc7(phone.topic)}</textarea>`}
       ${tabs2}
       <ul class="ph-list ph-pick">${phonePickList(ctx2)}</ul>
     </div>
@@ -2690,7 +2814,7 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
     try {
       b = readBulletins(ctx2.chat);
     } catch (error) {
-      return `<p class="gx-none">${esc6(error.message)}</p>`;
+      return `<p class="gx-none">${esc7(error.message)}</p>`;
     }
     const received = [...b.items].reverse();
     if (!received.length) return blank3("아직 받은 공지가 없어요.<br>새 메시지 확인 때 소속 공지가 올 수 있어요.");
@@ -2704,13 +2828,13 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
     const pages = Math.max(1, Math.ceil(all.length / size));
     const page = Math.min(Math.max(1, phone.noticePage), pages);
     const items = all.slice((page - 1) * size, page * size);
-    const head2 = `<div class="ph-notice-bar">${chips2("ph-notice-filter", phone.noticeFilter, [
+    const head3 = `<div class="ph-notice-bar">${chips2("ph-notice-filter", phone.noticeFilter, [
       { id: "all", label: "전체", count: every.length },
       { id: "unread", label: "안읽음", alert: unreadN }
-    ])}${unreadN ? '<button class="gx-mini" data-action="ph-notice-all">모두 읽음</button>' : ""}</div>` + (factions.length > 1 ? `<div class="ph-notice-facs">${factions.map((f) => `<button class="gx-chip${phone.noticeFaction === f ? " on" : ""}" data-action="ph-notice-faction" data-value="${esc6(f)}" aria-pressed="${phone.noticeFaction === f}">${esc6(label2(f, received.find((r) => r.channel === f)?.channelName))}<small>${received.filter((r) => r.channel === f).length}</small></button>`).join("")}</div>` : "");
-    if (!all.length) return head2 + blank3("안 읽은 공지가 없어요.");
+    ])}${unreadN ? '<button class="gx-mini" data-action="ph-notice-all">모두 읽음</button>' : ""}</div>` + (factions.length > 1 ? `<div class="ph-notice-facs">${factions.map((f) => `<button class="gx-chip${phone.noticeFaction === f ? " on" : ""}" data-action="ph-notice-faction" data-value="${esc7(f)}" aria-pressed="${phone.noticeFaction === f}">${esc7(label2(f, received.find((r) => r.channel === f)?.channelName))}<small>${received.filter((r) => r.channel === f).length}</small></button>`).join("")}</div>` : "");
+    if (!all.length) return head3 + blank3("안 읽은 공지가 없어요.");
     const nav = pages > 1 ? `<div class="ph-pager"><button class="gx-mini" data-action="ph-notice-page" data-value="${page - 1}" ${page <= 1 ? "disabled" : ""}>‹ 이전</button><span>${page} / ${pages}</span><button class="gx-mini" data-action="ph-notice-page" data-value="${page + 1}" ${page >= pages ? "disabled" : ""}>다음 ›</button></div>` : "";
-    return `${head2}${noticeList(items, label2)}${nav}`;
+    return `${head3}${noticeList(items, label2)}${nav}`;
   }
   function noticeFactionLabel(names4) {
     return (code2, saved) => (code2 ? noticeLabel(code2, names4) : "") || saved || code2 || "소속 없음";
@@ -2719,13 +2843,13 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
     return `<ul class="ph-list ph-notices">${items.map((r) => {
       const on2 = phone.view === "notice" && phone.openNotice === r.id;
       const confirm2 = phone.confirm === `notice:${r.id}`;
-      const del = confirm2 ? `<button class="gx-mini danger ph-ndel" data-action="ph-notice-del" data-value="${r.id}">정말 삭제</button>` : `<button class="ph-tool sm ph-ndel" data-action="ph-notice-del" data-value="${r.id}" title="삭제" aria-label="${esc6(r.title)} 삭제">${ICONS.trash}</button>`;
+      const del = confirm2 ? `<button class="gx-mini danger ph-ndel" data-action="ph-notice-del" data-value="${r.id}">정말 삭제</button>` : `<button class="ph-tool sm ph-ndel" data-action="ph-notice-del" data-value="${r.id}" title="삭제" aria-label="${esc7(r.title)} 삭제">${ICONS.trash}</button>`;
       const open3 = phone.openNotice === r.id;
       return `<li class="ph-notice${on2 ? " on" : ""}${open3 ? " open" : ""}${r.read === false ? " new" : ""}"><button class="ph-ncard" data-action="ph-notice" data-value="${r.id}" aria-pressed="${on2}" aria-expanded="${open3}">
-        <span class="ph-ncard-top"><span class="gx-badge">${esc6(r.category)}</span><span class="ph-nfac">${esc6(label2(r.channel, r.channelName))}</span><small>${esc6(r.issuer)}${r.time ? ` · ${esc6(r.time)}` : ""}</small></span>
-        <span class="ph-ncard-title"><b>${esc6(r.title)}</b>${r.read === false ? '<span class="gn-dot" aria-label="안 읽음"></span>' : ""}</span>
+        <span class="ph-ncard-top"><span class="gx-badge">${esc7(r.category)}</span><span class="ph-nfac">${esc7(label2(r.channel, r.channelName))}</span><small>${esc7(r.issuer)}${r.time ? ` · ${esc7(r.time)}` : ""}</small></span>
+        <span class="ph-ncard-title"><b>${esc7(r.title)}</b>${r.read === false ? '<span class="gn-dot" aria-label="안 읽음"></span>' : ""}</span>
 </button>${del}
-        ${open3 ? `<div class="ph-notice-body">${esc6(r.text).replace(/\n/g, "<br>")}</div>` : ""}</li>`;
+        ${open3 ? `<div class="ph-notice-body">${esc7(r.text).replace(/\n/g, "<br>")}</div>` : ""}</li>`;
     }).join("")}</ul>`;
   }
   function noticeDetail(ctx2) {
@@ -2740,9 +2864,9 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
     const del = confirm2 ? `<button class="gx-mini danger" data-action="ph-notice-del" data-value="${r.id}">정말 삭제</button>` : tool("ph-notice-del", ICONS.trash, "공지 삭제", `data-value="${r.id}"`);
     return `<div class="ph-form ph-ndoc">${paneHead("공지", "", `<span class="ph-act">${del}</span>`)}
     <article class="ph-ndoc-body">
-      <header class="ph-ndoc-head"><span class="gx-badge">${esc6(r.category)}</span><h3>${esc6(r.title)}</h3>
-        <div class="ph-ndoc-meta"><b>${esc6(r.issuer)}</b>${r.time ? `<span>${esc6(r.time)}</span>` : ""}</div></header>
-      <div class="ph-ndoc-text">${esc6(r.text).replace(/\n/g, "<br>")}</div>
+      <header class="ph-ndoc-head"><span class="gx-badge">${esc7(r.category)}</span><h3>${esc7(r.title)}</h3>
+        <div class="ph-ndoc-meta"><b>${esc7(r.issuer)}</b>${r.time ? `<span>${esc7(r.time)}</span>` : ""}</div></header>
+      <div class="ph-ndoc-text">${esc7(r.text).replace(/\n/g, "<br>")}</div>
     </article></div>`;
   }
   function searchView(ctx2, st, d) {
@@ -2762,16 +2886,16 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
   function callView() {
     return `<div class="ph-form">${paneHead("전화 걸기", "기록을 남기고 창을 닫아요. 채팅에서 전송을 누르면 통화 장면이 이어져요.")}
     <div class="ph-form-body">
-      <label class="ph-label">상대</label><input class="gx-search" data-input="ph-call-to" value="${esc6(phone.call)}" placeholder="상대 이름" maxlength="60">
-      <label class="ph-label">할 말·용건 (선택)<small>채팅 입력창에 덧붙여 보내도 돼요</small></label><textarea class="gx-search" data-input="ph-call-text" rows="3" placeholder="예: 방금 본 걸 보고하려고">${esc6(phone.callText)}</textarea>
+      <label class="ph-label">상대</label><input class="gx-search" data-input="ph-call-to" value="${esc7(phone.call)}" placeholder="상대 이름" maxlength="60">
+      <label class="ph-label">할 말·용건 (선택)<small>채팅 입력창에 덧붙여 보내도 돼요</small></label><textarea class="gx-search" data-input="ph-call-text" rows="3" placeholder="예: 방금 본 걸 보고하려고">${esc7(phone.callText)}</textarea>
     </div>
     <div class="ph-form-foot"><button class="gx-start" data-action="ph-call-place">${ICONS.call} 전화 걸기</button></div></div>`;
   }
   function addView() {
     return `<div class="ph-form">${paneHead("연락처 추가", "「기타」 탭에 들어가요. 명부에 있는 이름이면 그 인물로 추가돼요.")}
     <div class="ph-form-body">
-      <label class="ph-label">이름</label><input class="gx-search" data-input="ph-add-name" value="${esc6(phone.addName)}" maxlength="60" placeholder="이름">
-      <label class="ph-label">인물 메모 (선택)<small>어떤 사람인지, 어떻게 아는 사이인지</small></label><textarea class="gx-search" data-input="ph-add-note" rows="3">${esc6(phone.addNote)}</textarea>
+      <label class="ph-label">이름</label><input class="gx-search" data-input="ph-add-name" value="${esc7(phone.addName)}" maxlength="60" placeholder="이름">
+      <label class="ph-label">인물 메모 (선택)<small>어떤 사람인지, 어떻게 아는 사이인지</small></label><textarea class="gx-search" data-input="ph-add-note" rows="3">${esc7(phone.addNote)}</textarea>
     </div>
     <div class="ph-form-foot"><button class="gx-start" data-action="ph-add-save">추가</button></div></div>`;
   }
@@ -2781,6 +2905,8 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
     "1": "채팅 응답이 끝날 때마다 모델을 한 번 더 불러요"
   };
   function seg(key2, cur, items) {
+    const sw = onOffSwitch(items, cur, "ph-cfg", (v) => `${key2}=${v}`);
+    if (sw) return sw;
     return `<div class="gx-segs gx-segs-sm">${items.map(([v, label2]) => `<button class="gx-seg${cur === v ? " on" : ""}" data-action="ph-cfg" data-value="${key2}=${v}" aria-pressed="${cur === v}">${label2}</button>`).join("")}</div>`;
   }
   var row2 = (label2, control3, hint = "") => `<div class="ps-row"><div class="ps-label"><b>${label2}</b>${hint ? `<small>${hint}</small>` : ""}</div><div class="ps-ctl">${control3}</div></div>`;
@@ -2788,7 +2914,7 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
   function settingsView(ctx2) {
     const v = (k) => phoneValue(ctx2.chat.scriptstate, k);
     const onoff = (k) => seg(k, v(k) === "1" ? "1" : "0", [["1", "ON"], ["0", "OFF"]]);
-    const pct2 = (k) => `<span class="ph-inline"><input class="gx-search ph-pct" type="number" min="0" max="100" data-change="ph-num" data-key="${k}" value="${esc6(v(k))}" aria-label="확률"><span>%</span></span>`;
+    const pct2 = (k) => `<span class="ph-inline"><input class="gx-search ph-pct" type="number" min="0" max="100" data-change="ph-num" data-key="${k}" value="${esc7(v(k))}" aria-label="확률"><span>%</span></span>`;
     const num4 = (k, cur, lo, hi, unit) => `<span class="ph-inline"><input class="gx-search ph-pct" type="number" min="${lo}" max="${hi}" data-change="ph-num" data-key="${k}" value="${cur}" aria-label="${k}"><span>${unit}</span></span>`;
     const notices = noticeSettings(ctx2.chat.scriptstate);
     const rest = (k) => {
@@ -2842,7 +2968,7 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
     try {
       return listHtml(ctx2, readPhone(ctx2.chat), dir(ctx2));
     } catch (error) {
-      return `<p class="gx-none">${esc6(error instanceof Error ? error.message : String(error))}</p>`;
+      return `<p class="gx-none">${esc7(error instanceof Error ? error.message : String(error))}</p>`;
     }
   }
   function phoneTab(ctx2, env3) {
@@ -2853,7 +2979,7 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
       st = readPhone(ctx2.chat);
       d = dir(ctx2);
     } catch (error) {
-      return `<main class="gx-body"><div class="gx-empty">${esc6(error instanceof Error ? error.message : String(error))}</div></main>`;
+      return `<main class="gx-body"><div class="gx-empty">${esc7(error instanceof Error ? error.message : String(error))}</div></main>`;
     }
     const job = jobs.get(chatKey(ctx2));
     const busy5 = !!job;
@@ -2865,8 +2991,8 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
     }
     const unread = unreadCount(st);
     const subBtn = (id, label2, extra = "") => `<button class="ph-sub${phone.sub === id ? " on" : ""}" data-action="ph-sub" data-value="${id}" aria-pressed="${phone.sub === id}">${label2}${extra}</button>`;
-    const fail3 = phone.failure ? `<details class="nw-fail"><summary>최근 실패 원문</summary><p>${esc6(phone.failure.reason)}</p><textarea class="gx-search" rows="6" readonly>${esc6(phone.failure.raw)}</textarea></details>` : "";
-    const status2 = job ? `<div class="nw-busy" role="status"><span class="nw-spin"></span>${esc6(job)} 창을 닫아도 계속돼요.</div>` : "";
+    const fail3 = phone.failure ? `<details class="nw-fail"><summary>최근 실패 원문</summary><p>${esc7(phone.failure.reason)}</p><textarea class="gx-search" rows="6" readonly>${esc7(phone.failure.raw)}</textarea></details>` : "";
+    const status2 = job ? `<div class="nw-busy" role="status"><span class="nw-spin"></span>${esc7(job)} 창을 닫아도 계속돼요.</div>` : "";
     const note = toast("ph", phone.notice, (t) => {
       if (phone.notice === t) phone.notice = "";
     });
@@ -2882,7 +3008,7 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
     <section class="ph-side" aria-label="괴담톡 목록">
       <div class="ph-side-head">
         <div class="ph-subs">${subBtn("contacts", "연락처")}${subBtn("chats", "대화", badge(unread))}${subBtn("notices", "공지", badge(b ? b.items.filter((r) => r.read === false).length : 0))}</div>
-        <input class="gx-search ph-search" name="ph-q" data-input="ph-query" value="${esc6(phone.query)}" placeholder="이름·대화·공지 검색" aria-label="연락처·대화·공지 검색">
+        <input class="gx-search ph-search" name="ph-q" data-input="ph-query" value="${esc7(phone.query)}" placeholder="이름·대화·공지 검색" aria-label="연락처·대화·공지 검색">
       </div>
       ${detail ? "" : status2}
       <div class="ph-content">${listHtml(ctx2, st, d)}</div>
@@ -3047,9 +3173,9 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
         else Object.assign(phone, { openNotice: id, view: "notice" });
         {
           const b = readBulletins(ctx2.chat);
-          const row8 = b.items.find((x) => x.id === id);
-          if (row8 && row8.read === false) {
-            row8.read = true;
+          const row9 = b.items.find((x) => x.id === id);
+          if (row9 && row9.read === false) {
+            row9.read = true;
             await setVars(ctx2, env3, writeBulletins(b, ctx2.chat.scriptstate));
             return true;
           }
@@ -3063,7 +3189,7 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
       case "ph-notice-all": {
         const b = readBulletins(ctx2.chat);
         if (!b.items.some((x) => x.read === false)) break;
-        for (const row8 of b.items) row8.read = true;
+        for (const row9 of b.items) row9.read = true;
         await setVars(ctx2, env3, writeBulletins(b, ctx2.chat.scriptstate));
         return true;
       }
@@ -3241,7 +3367,7 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
   }
   var jobs2 = /* @__PURE__ */ new Map();
   var chatKey2 = (ctx2) => `${ctx2.charIndex}:${ctx2.chatIndex}`;
-  var esc7 = (s5) => String(s5 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  var esc8 = (s5) => String(s5 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   var retry = (chat) => ({ ...genSettings(chat.scriptstate), state: chat.scriptstate });
   var source2 = (ctx2, chat = ctx2.chat) => playerSource({ char: ctx2.char, chat, persona: personaText() });
   function names3(ctx2) {
@@ -3520,6 +3646,8 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
   }
   var MODE_PREV = "$gn_mode_prev";
   function seg2(key2, cur, items) {
+    const sw = onOffSwitch(items, cur, "gn-cfg", (v) => `${key2}=${v}`);
+    if (sw) return sw;
     return `<div class="gx-segs gx-segs-sm">${items.map(([v, label2]) => `<button class="gx-seg${cur === v ? " on" : ""}" data-action="gn-cfg" data-value="${key2}=${v}" aria-pressed="${cur === v}">${label2}</button>`).join("")}</div>`;
   }
   var body2 = (text) => attachBody(text, true);
@@ -3559,7 +3687,7 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
     ${attachEditor("gn", gnet.attach, GN_KINDS, busy5, "", gnet.attachMenu)}
     <div class="ph-compose">
       <button class="ph-tool ph-plus${gnet.attachMenu ? " on" : ""}" data-action="gn-att-menu" aria-label="첨부" aria-expanded="${gnet.attachMenu}" title="첨부">${ICONS.plus}</button>
-      <textarea class="ph-input" data-input="gn-draft" rows="1" placeholder="${esc7(placeholder)}" ${busy5 ? "disabled" : ""}>${esc7(gnet.draft)}</textarea>
+      <textarea class="ph-input" data-input="gn-draft" rows="1" placeholder="${esc8(placeholder)}" ${busy5 ? "disabled" : ""}>${esc8(gnet.draft)}</textarea>
       <button class="ph-send" data-action="gn-send" aria-label="등록" title="등록" ${busy5 ? "disabled" : ""}>${ICONS.send}</button>
       <button class="ph-tool ph-back2" data-action="gn-back" aria-label="목록으로" title="목록으로">${ICONS.back}</button>
     </div>
@@ -3567,17 +3695,17 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
   }
   function composeView(c, busy5) {
     const post = c.kind === "post";
-    const to = c.kind === "newdm" ? `<input class="gx-search" data-input="gn-to" placeholder="받는 사람 닉네임" value="${esc7(gnet.to)}" aria-label="받는 사람">` : c.kind === "dm" ? `<p class="gn-to">받는 사람 <b>${esc7(c.nick)}</b></p>` : "";
+    const to = c.kind === "newdm" ? `<input class="gx-search" data-input="gn-to" placeholder="받는 사람 닉네임" value="${esc8(gnet.to)}" aria-label="받는 사람">` : c.kind === "dm" ? `<p class="gn-to">받는 사람 <b>${esc8(c.nick)}</b></p>` : "";
     const ph = post ? "올릴 글이나 쓰고 싶은 내용 (제목과 본문은 다듬어서 올려요)" : gnet.attach.length ? "함께 보낼 글 (선택)" : "쪽지 내용";
-    return `<div class="ph-form gn-cpane">${paneHead2(post ? "새 글" : "새 쪽지", c.kind === "dm" ? esc7(c.label) : "")}
+    return `<div class="ph-form gn-cpane">${paneHead2(post ? "새 글" : "새 쪽지", c.kind === "dm" ? esc8(c.label) : "")}
     <div class="ph-form-body">${to}
-      <textarea class="gx-search gn-text" data-input="gn-draft" rows="${post ? 8 : 5}" placeholder="${esc7(ph)}" aria-label="내용">${esc7(gnet.draft)}</textarea>
+      <textarea class="gx-search gn-text" data-input="gn-draft" rows="${post ? 8 : 5}" placeholder="${esc8(ph)}" aria-label="내용">${esc8(gnet.draft)}</textarea>
       ${attachEditor("gn", gnet.attach, GN_KINDS, busy5)}
     </div>
     <div class="ph-form-foot"><button class="gx-start" data-action="gn-send" ${busy5 ? "disabled" : ""}>${post ? "올리기" : "보내기"}</button></div></div>`;
   }
   function replyBox(label2, busy5, depth) {
-    const chip3 = `<div class="gn-replyto"><span>${esc7(label2)}</span><button class="ph-tool sm" data-action="gn-cancel" aria-label="답글 취소" title="취소">${ICONS.close}</button></div>`;
+    const chip3 = `<div class="gn-replyto"><span>${esc8(label2)}</span><button class="ph-tool sm" data-action="gn-cancel" aria-label="답글 취소" title="취소">${ICONS.close}</button></div>`;
     return `<li class="gn-c-compose" style="--gn-depth:${Math.min(depth, 3)}">${composer(busy5, "답글 입력", chip3)}</li>`;
   }
   function commentTree(p, busy5) {
@@ -3595,7 +3723,7 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
         seen2.add(k);
         const c = p.comments[k - 1];
         const confirm2 = gnet.confirm === `c:${p.id}:${k}`;
-        const author = c.mine ? `<b class="gn-me">${esc7(c.nick)}</b>` : `<button class="gn-nick" data-action="gn-dm-from" data-value="${p.id}:${k}" title="쪽지 보내기">${esc7(c.nick)}</button>`;
+        const author = c.mine ? `<b class="gn-me">${esc8(c.nick)}</b>` : `<button class="gn-nick" data-action="gn-dm-from" data-value="${p.id}:${k}" title="쪽지 보내기">${esc8(c.nick)}</button>`;
         const del = c.mine ? confirm2 ? `<button class="gx-mini danger" data-action="gn-del-comment" data-value="${p.id}:${k}">정말 삭제</button>` : `<button class="ph-tool sm gn-cdel" data-action="gn-del-comment" data-value="${p.id}:${k}" aria-label="댓글 삭제" title="삭제">${ICONS.trash}</button>` : "";
         out.push(`<li class="gn-c${depth ? " re" : ""}${c.unread ? " unread" : ""}${target === k ? " target" : ""}" style="--gn-depth:${Math.min(depth, 3)}">
         <div class="gn-c-who">${depth ? '<span class="gn-re" aria-hidden="true">↳</span>' : ""}${author}${c.unread ? '<span class="gn-dot" aria-label="새 답글"></span>' : ""}</div>
@@ -3611,7 +3739,7 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
   function commentClock(p, c) {
     if (!c.time) return "";
     const same2 = c.time.slice(0, 10) === String(p.date).slice(0, 10);
-    return `<time class="gn-c-time">${esc7(same2 ? hhmm(c.time) : `${c.time.slice(5, 10)} ${hhmm(c.time)}`)}</time>`;
+    return `<time class="gn-c-time">${esc8(same2 ? hhmm(c.time) : `${c.time.slice(5, 10)} ${hhmm(c.time)}`)}</time>`;
   }
   function postView(p, busy5, inline = false) {
     const c = gnet.compose;
@@ -3619,14 +3747,14 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
     const confirm2 = gnet.confirm === `p:${p.id}`;
     const right = p.mine ? confirm2 ? `<button class="gx-mini danger" data-action="gn-del-post" data-value="${p.id}">정말 삭제</button>` : tool2("gn-del-post", ICONS.trash, "글 삭제", `data-value="${p.id}"`) : "";
     const again = tool2("gn-post-refresh", ICONS.refresh, "이 글 새로고침", `data-value="${p.id}" ${busy5 ? "disabled" : ""}`);
-    const who = p.mine ? "" : `<button class="gn-nick" data-action="gn-dm-from" data-value="${p.id}:0" title="쪽지 보내기">${esc7(p.nick)}</button>`;
-    const head2 = inline ? "" : `<header class="gn-post-head"><h2 class="gn-post-title">${esc7(p.title)}</h2>
-          <div class="gn-post-meta"><span class="gn-post-who">${p.mine ? `<b class="gn-me">${esc7(p.nick)}</b>` : who}</span>
-            <span>${esc7(p.date)}</span><span class="gn-post-stat"><span>조회 ${p.views.toLocaleString()}</span><span>추천 ${p.votes.toLocaleString()}</span><span>댓글 ${p.comments.length}</span></span></div></header>`;
+    const who = p.mine ? "" : `<button class="gn-nick" data-action="gn-dm-from" data-value="${p.id}:0" title="쪽지 보내기">${esc8(p.nick)}</button>`;
+    const head3 = inline ? "" : `<header class="gn-post-head"><h2 class="gn-post-title">${esc8(p.title)}</h2>
+          <div class="gn-post-meta"><span class="gn-post-who">${p.mine ? `<b class="gn-me">${esc8(p.nick)}</b>` : who}</span>
+            <span>${esc8(p.date)}</span><span class="gn-post-stat"><span>조회 ${p.views.toLocaleString()}</span><span>추천 ${p.votes.toLocaleString()}</span><span>댓글 ${p.comments.length}</span></span></div></header>`;
     const tail2 = inline ? `<span class="gn-chead-act">${again}${p.mine ? right : `<span class="gn-chead-dm">${ICONS.mail}${who}</span>`}</span>` : "";
     return `<div class="${inline ? "gn-inline" : "ph-room gn-pane"}">${inline ? "" : paneHead2("게시판", `#${p.id}`, again + right)}
     <div class="gn-doc">
-      <article class="gn-post">${head2}
+      <article class="gn-post">${head3}
         <div class="gn-post-body">${body2(p.body)}</div>
       </article>
       <section class="gn-csec"><div class="gn-chead"><h3 class="gn-ccount">전체 댓글 <b>${p.comments.length}</b>개</h3>${tail2}</div>
@@ -3639,15 +3767,15 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
     const t = dmThreads(st).find((x) => x.nick === nick);
     if (!t) return "";
     const confirm2 = gnet.confirm === `d:${nick}`;
-    const right = confirm2 ? `<button class="gx-mini danger" data-action="gn-del-thread" data-value="${esc7(nick)}">정말 삭제</button>` : tool2("gn-del-thread", ICONS.trash, "쪽지 삭제", `data-value="${esc7(nick)}"`);
+    const right = confirm2 ? `<button class="gx-mini danger" data-action="gn-del-thread" data-value="${esc8(nick)}">정말 삭제</button>` : tool2("gn-del-thread", ICONS.trash, "쪽지 삭제", `data-value="${esc8(nick)}"`);
     const src = st.sources[nick];
     const c = gnet.compose;
     const ph = c?.kind === "dm" && c.nick === nick && c.source ? `「${c.source.title}」 보고 보내는 쪽지` : "쪽지 입력";
-    return `<div class="${inline ? "gn-inline gn-dm-inline" : "ph-room gn-pane"}">${inline ? "" : paneHead2(esc7(nick), `${t.rows.length}통`, right)}
-    <div class="ph-log">${src ? `<div class="ph-sys">처음 이어진 글 「${esc7(src.title)}」</div>` : ""}
+    return `<div class="${inline ? "gn-inline gn-dm-inline" : "ph-room gn-pane"}">${inline ? "" : paneHead2(esc8(nick), `${t.rows.length}통`, right)}
+    <div class="ph-log">${src ? `<div class="ph-sys">처음 이어진 글 「${esc8(src.title)}」</div>` : ""}
       ${t.rows.map((d, i) => {
       const first = i === 0 || t.rows[i - 1].side !== d.side;
-      return `<div class="ph-msg ${d.side === "me" ? "me" : "npc"}${first ? " first" : ""}"><div class="ph-msg-col"><div class="ph-bubble">${body2(d.body)}</div>${d.date ? `<small class="gn-dm-t">${esc7(d.date)}</small>` : ""}</div></div>`;
+      return `<div class="ph-msg ${d.side === "me" ? "me" : "npc"}${first ? " first" : ""}"><div class="ph-msg-col"><div class="ph-bubble">${body2(d.body)}</div>${d.date ? `<small class="gn-dm-t">${esc8(d.date)}</small>` : ""}</div></div>`;
     }).join("")}
     </div>
     ${inline ? "" : composer(busy5, ph)}
@@ -3658,8 +3786,8 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
     return `<ul class="ph-list gn-list">${st.posts.map((p) => {
       const on2 = gnet.open === p.id && !gnet.settings;
       return `<li class="gn-row${on2 ? " on" : ""}${p.mine ? " mine" : ""}"><button class="gn-row-main" data-action="gn-open" data-value="${p.id}" aria-pressed="${on2}">
-        <span class="gn-title"><b>${esc7(p.title)}</b>${p.comments.length ? `<em>${p.comments.length}</em>` : ""}${postUnread(p) ? '<span class="gn-dot" aria-label="새 댓글"></span>' : ""}</span>
-        <span class="gn-row-meta"><span class="gn-row-nick">${esc7(p.nick)}</span><span>${esc7(time(p.date))}</span><span>조회 ${p.views.toLocaleString()}</span><span>추천 ${p.votes.toLocaleString()}</span></span>
+        <span class="gn-title"><b>${esc8(p.title)}</b>${p.comments.length ? `<em>${p.comments.length}</em>` : ""}${postUnread(p) ? '<span class="gn-dot" aria-label="새 댓글"></span>' : ""}</span>
+        <span class="gn-row-meta"><span class="gn-row-nick">${esc8(p.nick)}</span><span>${esc8(time(p.date))}</span><span>조회 ${p.views.toLocaleString()}</span><span>추천 ${p.votes.toLocaleString()}</span></span>
       </button>${mobile && on2 && !gnet.compose?.kind.match(/post|newdm/) ? postView(p, busy5, true) : ""}</li>`;
     }).join("")}</ul>`;
   }
@@ -3670,18 +3798,18 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
       const on2 = gnet.openDm === t.nick && !gnet.settings;
       const last2 = t.rows[t.rows.length - 1];
       const confirm2 = gnet.confirm === `d:${t.nick}`;
-      const del = confirm2 ? `<button class="gx-mini danger ph-rdel" data-action="gn-del-thread" data-value="${esc7(t.nick)}">정말 삭제</button>` : `<button class="ph-tool sm ph-rdel" data-action="gn-del-thread" data-value="${esc7(t.nick)}" aria-label="${esc7(t.nick)} 쪽지 삭제" title="삭제">${ICONS.trash}</button>`;
-      return `<li class="ph-row"><button class="ph-main gn-dmrow${on2 ? " on" : ""}" data-action="gn-open-dm" data-value="${esc7(t.nick)}" aria-pressed="${on2}">
+      const del = confirm2 ? `<button class="gx-mini danger ph-rdel" data-action="gn-del-thread" data-value="${esc8(t.nick)}">정말 삭제</button>` : `<button class="ph-tool sm ph-rdel" data-action="gn-del-thread" data-value="${esc8(t.nick)}" aria-label="${esc8(t.nick)} 쪽지 삭제" title="삭제">${ICONS.trash}</button>`;
+      return `<li class="ph-row"><button class="ph-main gn-dmrow${on2 ? " on" : ""}" data-action="gn-open-dm" data-value="${esc8(t.nick)}" aria-pressed="${on2}">
         <span class="ph-avatar gn-ava">${ICONS.mail}</span>
-        <span class="ph-who"><span class="ph-who-top"><b>${esc7(t.nick)}</b>${t.lastDate ? `<small class="ph-time">${esc7(time(t.lastDate) || t.lastDate)}</small>` : ""}</span>
-        <span class="ph-who-bot"><small>${last2.side === "me" ? "나: " : ""}${esc7([...previewText(last2.body)].slice(0, 60).join(""))}</small>${t.unread ? `<span class="ph-badge">${t.unread}</span>` : ""}</span></span></button>${del}${mobile && on2 && gnet.compose?.kind !== "newdm" ? dmPane(st, t.nick, busy5, true) : ""}</li>`;
+        <span class="ph-who"><span class="ph-who-top"><b>${esc8(t.nick)}</b>${t.lastDate ? `<small class="ph-time">${esc8(time(t.lastDate) || t.lastDate)}</small>` : ""}</span>
+        <span class="ph-who-bot"><small>${last2.side === "me" ? "나: " : ""}${esc8([...previewText(last2.body)].slice(0, 60).join(""))}</small>${t.unread ? `<span class="ph-badge">${t.unread}</span>` : ""}</span></span></button>${del}${mobile && on2 && gnet.compose?.kind !== "newdm" ? dmPane(st, t.nick, busy5, true) : ""}</li>`;
     }).join("")}</ul>`;
   }
   var row3 = (label2, control3, hint = "") => `<div class="ps-row"><div class="ps-label"><b>${label2}</b>${hint ? `<small>${hint}</small>` : ""}</div><div class="ps-ctl">${control3}</div></div>`;
   var group2 = (title2, rows2) => `<section class="ps-group"><h3>${title2}</h3><div class="ps-rows">${rows2}</div></section>`;
   function settingsView2(ctx2, back = true) {
     const v = (k) => String(ctx2.chat.scriptstate?.[CFG(k)] ?? GN_DEFAULTS[k]);
-    const text = (k, ph) => `<input class="gx-search ps-text" data-change="gn-text" data-key="${k}" value="${esc7(v(k) === "-" ? "" : v(k))}" placeholder="${esc7(ph)}">`;
+    const text = (k, ph) => `<input class="gx-search ps-text" data-change="gn-text" data-key="${k}" value="${esc8(v(k) === "-" ? "" : v(k))}" placeholder="${esc8(ph)}">`;
     const keep = gnetRetention(ctx2.chat.scriptstate);
     const on2 = v("mode") !== "0";
     const rows2 = on2 ? `${group2(gnetLabel(ctx2.chat.scriptstate), [
@@ -3730,9 +3858,9 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
     const unreadDm = st.dms.filter((d) => d.unread).length;
     const mobile = narrow();
     const kind = paneKind(st, mobile);
-    const nick = gnet.editNick ? `<div class="gn-nickform"><input class="gx-search" name="gn-nick" data-enter="gn-nick-save" value="${esc7(me === "익명" && !ctx2.chat.scriptstate?.[GN_NICK] ? "" : me)}" placeholder="내 닉네임 (비우면 익명)" maxlength="36" aria-label="내 닉네임"><button class="gx-mini" data-action="gn-nick-save" data-take="gn-nick">저장</button></div>` : "";
-    const fail3 = gnet.failure ? `<details class="nw-fail"><summary>최근 실패 원문</summary><p>${esc7(gnet.failure.reason)}</p><textarea class="gx-search" rows="6" readonly>${esc7(gnet.failure.raw)}</textarea></details>` : "";
-    const status2 = job ? `<div class="nw-busy" role="status"><span class="nw-spin"></span>${esc7(job)} 창을 닫아도 계속돼요.</div>` : "";
+    const nick = gnet.editNick ? `<div class="gn-nickform"><input class="gx-search" name="gn-nick" data-enter="gn-nick-save" value="${esc8(me === "익명" && !ctx2.chat.scriptstate?.[GN_NICK] ? "" : me)}" placeholder="내 닉네임 (비우면 익명)" maxlength="36" aria-label="내 닉네임"><button class="gx-mini" data-action="gn-nick-save" data-take="gn-nick">저장</button></div>` : "";
+    const fail3 = gnet.failure ? `<details class="nw-fail"><summary>최근 실패 원문</summary><p>${esc8(gnet.failure.reason)}</p><textarea class="gx-search" rows="6" readonly>${esc8(gnet.failure.raw)}</textarea></details>` : "";
+    const status2 = job ? `<div class="nw-busy" role="status"><span class="nw-spin"></span>${esc8(job)} 창을 닫아도 계속돼요.</div>` : "";
     const note = toast("gn", gnet.notice, (t) => {
       if (gnet.notice === t) gnet.notice = "";
     });
@@ -3747,7 +3875,7 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
     return `<main class="gx-body ph ph-app gn ${kind ? "is-detail" : "is-list"}">
     <section class="ph-side" aria-label="괴담넷 목록">
       <div class="ph-side-head">
-        <div class="ph-subs">${subBtn("board", "게시판", boardUnread(st) ? '<span class="gn-dot"></span>' : "")}${subBtn("dm", "쪽지함", unreadDm ? ` <b class="gn-count">${unreadDm}</b>` : dmUnread(st) ? '<span class="gn-dot"></span>' : "")}<span class="gn-mynick" title="내 닉네임"><small>내 닉네임</small><b>${esc7(me)}</b></span></div>
+        <div class="ph-subs">${subBtn("board", "게시판", boardUnread(st) ? '<span class="gn-dot"></span>' : "")}${subBtn("dm", "쪽지함", unreadDm ? ` <b class="gn-count">${unreadDm}</b>` : dmUnread(st) ? '<span class="gn-dot"></span>' : "")}<span class="gn-mynick" title="내 닉네임"><small>내 닉네임</small><b>${esc8(me)}</b></span></div>
       </div>
       ${kind ? "" : status2}
       <div class="ph-content">${gnet.sub === "board" ? boardList(st, busy5, mobile) : dmList(st, busy5, mobile)}</div>
@@ -3763,138 +3891,4 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
   var quietEnv2 = { render: () => {
   }, refresh: async () => {
   }, current: () => null };
-  var liveEnv2 = null;
-  async function currentChat(ctx2) {
-    try {
-      return await risuai.getChatFromIndex(ctx2.charIndex, ctx2.chatIndex);
-    } catch {
-      return null;
-    }
-  }
-  async function autoRefreshGnet(ctx2, messageIndex, open3 = false, joint) {
-    const s5 = gnetSettings(ctx2.chat.scriptstate);
-    if (!s5.enabled || !(open3 ? s5.autoOpen : s5.auto) || jobs2.has(chatKey2(ctx2))) return;
-    const data = String(ctx2.chat.message?.[messageIndex]?.data ?? "");
-    if (!data.trim()) return;
-    let hash3 = 7;
-    for (let i = 0; i < data.length; i++) hash3 = (hash3 * 131 + data.charCodeAt(i)) % 2147483647;
-    const stamp = `${messageIndex}:${hash3}`;
-    if (String(ctx2.chat.scriptstate?.[AUTO_LAST] ?? "") === stamp) return;
-    const saved = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => withVars(chat, { [AUTO_LAST]: stamp }));
-    if (!saved) return;
-    const env3 = liveEnv2 ?? quietEnv2;
-    const showing = env3.current();
-    const target = showing && chatKey2(showing) === chatKey2(ctx2) ? env3 : { ...quietEnv2 };
-    const notice3 = gnet.notice;
-    await refreshBoard({ ...ctx2, chat: saved }, target, true, joint);
-    if (target !== env3) gnet.notice = notice3;
-  }
-  function gnetOpenCheck(ctx2, env3) {
-    liveEnv2 = env3;
-    if (!gnetSettings(ctx2.chat.scriptstate).autoOpen) return;
-    const at = lastReply(ctx2.chat);
-    if (at < 0) return;
-    void autoRefreshGnet(ctx2, at, true).catch((error) => console.log(`[goei] 괴담넷 새로고침 실패: ${error instanceof Error ? error.message : String(error)}`));
-  }
-  var LAZY_HINT = {
-    "1": "새로고침 버튼을 누를 때만 불러요",
-    open: "채팅이 진행된 뒤 괴담넷을 열면 한 번 불러요",
-    "0": "채팅 응답이 끝날 때마다 모델을 한 번 더 불러요"
-  };
-  async function handleGnet(action, value, ctx2, env3) {
-    liveEnv2 = env3;
-    const v = value ?? "";
-    const [a, b] = v.split(":").map(Number);
-    const st = () => readGnet(ctx2.chat);
-    if (!action.startsWith("gn-")) return false;
-    if (action !== "gn-del-post" && action !== "gn-del-comment" && action !== "gn-del-thread") gnet.confirm = null;
-    if (action.startsWith("gn-def-")) {
-      try {
-        const msg = await defaultsAction("gn", action, v, ctx2, env3.refresh);
-        if (msg) gnet.notice = msg;
-      } catch (error) {
-        gnet.notice = `기본값을 처리하지 못했어요: ${error instanceof Error ? error.message : String(error)}`;
-      }
-      env3.render();
-      return true;
-    }
-    switch (action) {
-      case "gn-sub":
-        gnet.sub = v === "dm" ? "dm" : "board";
-        if (gnet.compose?.kind === "comment" || gnet.compose?.kind === "dm") gnet.compose = null;
-        break;
-      case "gn-back":
-        if (gnet.settings) gnet.settings = false;
-        else if (gnet.compose && (gnet.compose.kind === "post" || gnet.compose.kind === "newdm" || gnet.compose.kind === "dm" && !st().dms.some((d) => d.nick === gnet.compose.nick))) gnet.compose = null;
-        else if (gnet.sub === "board") gnet.open = null;
-        else gnet.openDm = null;
-        if (gnet.compose?.kind === "comment" || gnet.compose?.kind === "dm") gnet.compose = null;
-        gnet.attachMenu = false;
-        break;
-      case "gn-settings":
-        gnet.settings = !gnet.settings;
-        break;
-      case "gn-att-menu":
-        gnet.attachMenu = !gnet.attachMenu;
-        break;
-      case "gn-open": {
-        gnet.open = gnet.open === a && !gnet.settings && !(gnet.compose && gnet.compose.kind !== "comment") ? null : a;
-        gnet.settings = false;
-        if (gnet.compose && gnet.compose.kind !== "post") gnet.compose = null;
-        if (gnet.compose?.kind === "post") gnet.compose = null;
-        const p = gnet.open !== null ? findPost(st(), gnet.open) : void 0;
-        if (p && postUnread(p)) {
-          const id = p.id;
-          await mutate2(ctx2, env3, (s5) => acknowledge(s5, id), {}, false);
-          return true;
-        }
-        break;
-      }
-      case "gn-open-dm": {
-        gnet.openDm = gnet.openDm === v && !gnet.settings && !gnet.compose ? null : v;
-        gnet.settings = false;
-        gnet.compose = null;
-        if (gnet.openDm && st().dms.some((d) => d.nick === v && d.unread)) {
-          await mutate2(ctx2, env3, (s5) => acknowledge(s5, void 0, v), {}, false);
-          return true;
-        }
-        break;
-      }
-      case "gn-refresh":
-        void refreshBoard(ctx2, env3);
-        return true;
-      case "gn-write":
-        gnet.settings = false;
-        gnet.sub = "board";
-        gnet.compose = { kind: "post" };
-        gnet.draft = "";
-        gnet.attach = [];
-        break;
-      case "gn-newdm":
-        gnet.settings = false;
-        gnet.sub = "dm";
-        gnet.compose = { kind: "newdm" };
-        gnet.draft = "";
-        gnet.attach = [];
-        break;
-      case "gn-comment": {
-        gnet.compose = { kind: "comment", post: a, parent: 0, label: "댓글" };
-        gnet.attach = [];
-        env3.render();
-        const box = document.querySelector('.gn-composer [data-input="gn-draft"]');
-        box?.scrollIntoView({ block: "center", behavior: "smooth" });
-        box?.focus({ preventScroll: true });
-        return true;
-      }
-      case "gn-reply": {
-        const c = findPost(st(), a)?.comments[b - 1];
-        if (!c) break;
-        gnet.draft = "";
-        gnet.attach = [];
-        if (gnet.compose?.kind === "comment" && gnet.compose.post === a && gnet.compose.parent === b) {
-          gnet.compose = null;
-          break;
-        }
-        gnet.compose = { kind: "comment", post: a, parent: b, label: `${c.nick}에게 답글` };
-        env3.render();
-        const box = document.querySelector('.gn-c-compose [data-input="gn-draft"
+  var li

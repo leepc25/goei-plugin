@@ -1,23 +1,29 @@
 // 관리국 층 배경 그림(확정 6장) 그리기: 배경 · 문 열림 · 오린 오브젝트(로비 데스크) · 시간대 조명 · 깜빡이는 등.
-// 좌표 자료는 hq/painted.ts. 그림은 game-pack/hq-field (단독 시연판은 window.__GOEI_HQ_FIELD__).
+// 좌표 자료는 hq/painted.ts. 그림은 game-pack/hq-field·jr-field (단독 시연판은 window.__GOEI_HQ_FIELD__).
 // 문 열림은 배경에서 문짝 자리를 그대로 떠서 움직이고, 그 뒤는 코드로 칠한다(어두운 문 안·엘리베이터 칸·유리 너머).
 import { PAINTED, type PaintedDoor, type PaintedScene } from '../hq/painted';
+import { view } from '../engine/view';
+import { JR_ROOM_FILES } from '../hq/jrRooms.gen';
 
 const FILES = ['lobby', 'f2', 'f3', 'b1', 'b2', 'b3', 'desk'];
+const JR_FILES = ['jr_entry', 'jr_b1', 'jr_alley', 'jr_b2', ...JR_ROOM_FILES];
 let images: Record<string, HTMLImageElement> | null = null;
 let revision = 0;
 declare global { interface Window { __GOEI_HQ_FIELD__?: Record<string, string> } }
 
-export function prepareHqField(urlOf?: (file: string) => Promise<string>): () => void {
+export function prepareHqField(urlOf?: (pack: string, file: string) => Promise<string>): () => void {
   const own = ++revision;
   images = null;
-  void Promise.all(FILES.map(async (key) => {
-    const src = window.__GOEI_HQ_FIELD__?.[key] || (urlOf ? await urlOf(key + '.webp') : '');
-    if (!src) throw new Error('HQ field art unavailable');
+  // 팩마다 따로 받는다: 중림 팩이 없어도 본부 그림은 뜬다
+  const load = (pack: string, keys: string[]) => Promise.all(keys.map(async (key) => {
+    const src = window.__GOEI_HQ_FIELD__?.[key] || (urlOf ? await urlOf(pack, key + '.webp') : '');
+    if (!src) throw new Error('field art unavailable');
     const im = new Image(); im.src = src; await im.decode();
     return [key, im] as const;
-  })).then((rows) => { if (revision === own) images = Object.fromEntries(rows); })
+  })).then((rows) => { if (revision === own) images = { ...images, ...Object.fromEntries(rows) }; })
     .catch(() => { /* 그림이 없으면 기존 색 상자 장면 */ });
+  void load('hq-field', FILES);
+  void load('jr-field', JR_FILES);
   const keys = (e: KeyboardEvent) => {
     // 시험용: T = 시간대 돌리기 (자동 → 새벽 → 낮 → 저녁 → 밤)
     const t = e.target as HTMLElement | null;
@@ -28,7 +34,7 @@ export function prepareHqField(urlOf?: (file: string) => Promise<string>): () =>
   return () => { window.removeEventListener('keydown', keys); if (revision === own) { revision++; images = null; } };
 }
 
-export const hasHqField = (scene: string) => !!images && !!PAINTED[scene];
+export const hasHqField = (scene: string) => !!PAINTED[scene] && !!images?.[PAINTED[scene].file];
 
 /** 문 상태: open 0..1 (열린 정도), shake = 잠긴 문 덜컹 (px) */
 export type DoorFx = (id: string) => { open: number; shake: number };
@@ -40,15 +46,15 @@ export function drawHqField(c: CanvasRenderingContext2D, scene: string, camX: nu
   if (!p || !im) return false;
   c.save();
   c.imageSmoothingEnabled = true; c.imageSmoothingQuality = 'high';
-  const sx = Math.max(0, Math.floor(camX - 40)), sw = Math.min(p.w - sx, 1280 + 80);
+  const sx = Math.max(0, Math.floor(camX - 40)), sw = Math.min(p.w - sx, view.w + 80), H = p.h ?? 700;
   if (sw > 0) {
-    c.drawImage(im, sx, 0, sw, 700, sx, 0, sw, 700);
-    c.drawImage(im, sx, 696, sw, 4, sx, 700, sw, 24); // 화면 아래 20px: 맨 아래 바닥을 늘려 채움
+    c.drawImage(im, sx, 0, sw, H, sx, 0, sw, H);
+    if (H === 700) c.drawImage(im, sx, 696, sw, 4, sx, 700, sw, 24); // 화면 아래 20px: 맨 아래 바닥을 늘려 채움 (세로 700 장면)
   }
   for (const [id, d] of Object.entries(p.doors)) {
     const s = fx(id);
     if (s.open <= 0 && !s.shake) continue;
-    if (d.x1 < camX - 40 || d.x0 > camX + 1320) continue;
+    if (d.x1 < camX - 40 || d.x0 > camX + view.w + 40) continue;
     drawDoor(c, im, d, s.open, s.shake);
   }
   c.restore();
@@ -275,7 +281,7 @@ export function drawHqFieldLight(c: CanvasRenderingContext2D, scene: string, cam
   const p = PAINTED[scene];
   if (!p || !images) return;
   const k = keyAt(hourNow(clockHour));
-  const x0 = camX - 40, W = 1280 + 80, H = 720;
+  const x0 = camX - 40, W = view.w + 80, H = Math.max(720, p.h ?? 700);
   // 실내는 조명이 있어 바깥보다 덜 어둡다 (사용자 2026-10-25): 실내는 약하게 곱하고, 바깥 풍경(outside)·유리문 너머만 세게
   // 지하는 바깥 빛이 없다: 밤에만 절전으로 조금 어둡게
   const sc = p.under ? 0.35 : 0.5;

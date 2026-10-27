@@ -19,8 +19,8 @@ export const HQ_AREAS: Record<string, AreaKind> = {
 const HQ_DISTRICT: Record<string, string> = { yeongdeungpo: 'yeongdeungpo', gangnam: 'gangnam', mangwon: 'mangwon', yeouido: 'yeouido' };
 export const hqDistrict = (scene: string): string | null => (scene === 'metro' ? null : HQ_DISTRICT[scene] ?? 'jongno');
 
-/** 장면 소속: 본부 안은 관리국(A00), 바깥 거리·가게는 없음 */
-export const hqSceneFaction = (scene: string): string | null => (scene === 'pasta' || HQ_AREAS[scene] ? null : 'A00');
+/** 장면 소속: 본부 안은 관리국(A00). 바깥 거리·가게·중림 지하상가(jr_*, 민간 상가)는 없음 */
+export const hqSceneFaction = (scene: string): string | null => (scene === 'pasta' || scene.startsWith('jr_') || HQ_AREAS[scene] ? null : 'A00');
 
 /** 이름 인물이 오가는 장면: 처음 선 장면(본편 상태로 정한 방) → 범위. 부상은 의무실에 묶인다 */
 export const HQ_ROAM: Record<string, string[]> = {

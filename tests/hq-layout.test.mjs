@@ -7,7 +7,8 @@ import { build } from 'esbuild';
 const out = await build({ stdin: { contents: `export * from './src/game/action/hq/map'; export { insideProp } from './src/game/action/engine/propBlock'; import { PAINTED } from './src/game/action/hq/painted'; export const PAINTED_DOORS = (id) => PAINTED[id].doors;`, resolveDir: '.', loader: 'ts' }, bundle: true, format: 'esm', target: 'es2022', write: false });
 const M = await import(`data:text/javascript;base64,${Buffer.from(out.outputFiles[0].text).toString('base64')}`);
 const byId = M.SCENE_BY_ID;
-const fresh = M.HQ_SCENES.filter((s) => !s.legacy);
+const fresh = M.HQ_SCENES.filter((s) => !s.legacy && !s.id.startsWith('jr_'));
+const JR = ['jr_entry', 'jr_b1', 'jr_alley', 'jr_b2', 'jr_daebak', 'jr_heolgap', 'jr_youngchang', 'jr_songil', 'jr_jinryo', 'jr_op'];
 const solid = (sc) => sc.boxes.filter((b) => b.solid).map((b) => ({ x: b.x, y: b.y, w: b.w, back: b.d + 6, front: 8 }));
 
 const HALLS = ['lobby', 'f2', 'f3', 'b1', 'b2', 'b3'];
@@ -50,6 +51,18 @@ test('본부: 층마다 엘리베이터, 계단은 3층~B1 위아래 층의 계�
       assert.ok(back && (back.up === id || back.down === id), `${id} 계단 → ${to} 돌아오지 않음`);
     }
   }
+});
+
+test('중림: 그림 4장, 문은 그림 문 자리에 있고 서로 이어진다', () => {
+  for (const id of JR) {
+    const sc = byId[id];
+    assert.equal(sc.painted, id, `${id} 그림`);
+    for (const d of sc.doors) {
+      assert.ok(M.PAINTED_DOORS(id)[d.id], `${id}.${d.id} 그림 문 없음`);
+      assert.ok(d.to || d.locked, `${id}.${d.id} 갈 곳 없음`);
+    }
+  }
+  assert.ok(byId.street.doors.some((d) => d.to === 'jr_entry'), '종로 → 중림 임시 연결');
 });
 
 test('본부: 그림 문 좌표 안에 문이 있다', () => {

@@ -1,8 +1,8 @@
-// goei-game 0.17.3
+// goei-game 0.17.6
 "use strict";
 (() => {
   // src/game/action/engine/view.ts
-  var view = { crop: 0, cropY: 0, zoom: 1, lane: [440, 690], worldH: 720 };
+  var view = { crop: 0, cropY: 0, zoom: 1, lane: [440, 690], worldH: 720, w: 1280, hub: false };
   var FAR = 0.85;
   var persp = (y) => {
     const [a, b] = view.lane;
@@ -183,6 +183,10 @@
     return { A, IMG, VFX: art.vfx };
   }
 
+  // src/game/action/hq/jrRooms.gen.ts
+  var JR_ROOMS = { "jr_songil": { "file": "jr_songil", "w": 1998, "h": 666, "under": true, "lane": [415, 646], "floor": [[0, 469], [217, 416], [1799, 416], [1998, 520], [1998, 666], [0, 666]], "blocks": [[391, 460, 416, 120]], "doors": { "out": { "x0": 18, "x1": 184, "y0": 69, "y1": 460, "anim": "none", "quad": [[18, 69], [184, 83], [184, 428], [18, 460]], "behind": "dark" }, "jinryo": { "x0": 1145, "x1": 1288, "y0": 101, "y1": 400, "anim": "swing", "behind": "dark", "hinge": "R" }, "wc": { "x0": 1355, "x1": 1497, "y0": 101, "y1": 400, "anim": "swing", "behind": "dark", "hinge": "R" }, "store": { "x0": 1569, "x1": 1707, "y0": 101, "y1": 400, "anim": "swing", "behind": "dark", "hinge": "R" }, "op": { "x0": 1826, "x1": 1927, "y0": 115, "y1": 497, "anim": "none", "quad": [[1826, 133], [1927, 115], [1927, 497], [1826, 442]], "behind": "dark" } }, "lamps": [], "windows": [], "objects": [{ "id": "o0", "file": "jo_songil_0", "x": 651, "y": 331, "w": 355, "h": 129, "sortY": 460, "solid": [{ "x0": 655, "x1": 1001, "y0": 400, "y1": 460, "h": 163 }] }, { "id": "o1", "file": "jo_songil_1", "x": 781, "y": 304, "w": 94, "h": 127, "sortY": 431, "solid": [{ "x0": 785, "x1": 871, "y0": 389, "y1": 431, "h": 145 }] }, { "id": "o2", "file": "jo_songil_2", "x": 254, "y": 417, "w": 265, "h": 117, "sortY": 534, "solid": [{ "x0": 258, "x1": 514, "y0": 489, "y1": 534, "h": 125 }] }, { "id": "o3", "file": "jo_songil_3", "x": 512, "y": 404, "w": 265, "h": 130, "sortY": 534, "solid": [{ "x0": 516, "x1": 772, "y0": 489, "y1": 534, "h": 125 }] }] }, "jr_jinryo": { "file": "jr_jinryo", "w": 1429, "h": 636, "under": true, "lane": [420, 616], "floor": [[0, 502], [213, 420], [1208, 420], [1429, 494], [1429, 636], [0, 636]], "blocks": [[760, 1045, 426, 160], [1064, 1163, 426, 300], [1208, 1391, 494, 999]], "doors": { "out": { "x0": 30, "x1": 152, "y0": 46, "y1": 486, "anim": "none", "quad": [[30, 46], [152, 87], [152, 441], [30, 486]], "behind": "dark" } }, "lamps": [], "windows": [], "objects": [{ "id": "o0", "file": "jo_jinryo_0", "x": 321, "y": 387, "w": 211, "h": 92, "sortY": 479, "solid": [{ "x0": 325, "x1": 527, "y0": 418, "y1": 479, "h": 113 }] }, { "id": "o1", "file": "jo_jinryo_1", "x": 379, "y": 420, "w": 94, "h": 112, "sortY": 532, "solid": [{ "x0": 383, "x1": 469, "y0": 487, "y1": 532, "h": 157 }] }, { "id": "o2", "file": "jo_jinryo_2", "x": 203, "y": 387, "w": 97, "h": 130, "sortY": 517, "solid": [{ "x0": 207, "x1": 295, "y0": 472, "y1": 517, "h": 132 }] }, { "id": "o3", "file": "jo_jinryo_3", "x": 743, "y": 453, "w": 309, "h": 125, "sortY": 578, "solid": [{ "x0": 747, "x1": 1047, "y0": 512, "y1": 578, "h": 114 }] }] }, "jr_op": { "file": "jr_op", "w": 1392, "h": 653, "under": true, "lane": [390, 633], "floor": [[0, 471], [228, 388], [1376, 388], [1392, 395], [1392, 653], [0, 653]], "blocks": [[293, 524, 391, 200], [524, 942, 471, 130], [315, 524, 490, 120], [961, 1136, 490, 120], [821, 893, 407, 300], [923, 1376, 395, 300]], "doors": { "out": { "x0": 34, "x1": 163, "y0": 55, "y1": 448, "anim": "none", "quad": [[34, 55], [163, 76], [163, 401], [34, 448]], "behind": "dark" } }, "lamps": [], "windows": [], "objects": [{ "id": "o0", "file": "jo_op_0", "x": 809, "y": 460, "w": 71, "h": 72, "sortY": 532, "solid": [{ "x0": 813, "x1": 875, "y0": 491, "y1": 532, "h": 94 }] }] }, "jr_youngchang": { "file": "jr_youngchang", "w": 1267, "h": 680, "under": true, "lane": [402, 660], "floor": [[0, 451], [274, 406], [370, 398], [1267, 398], [1267, 680], [0, 680]], "blocks": [[999, 1267, 433, 999]], "doors": { "out": { "x0": 44, "x1": 270, "y0": 37, "y1": 429, "anim": "none", "quad": [[44, 37], [270, 52], [270, 403], [44, 429]], "behind": "dark" } }, "lamps": [], "windows": [], "objects": [{ "id": "o0", "file": "jo_youngchang_0", "x": 614, "y": 355, "w": 105, "h": 119, "sortY": 474, "solid": [{ "x0": 618, "x1": 714, "y0": 422, "y1": 474, "h": 165 }] }, { "id": "o1", "file": "jo_youngchang_1", "x": 550, "y": 403, "w": 233, "h": 130, "sortY": 533, "solid": [{ "x0": 554, "x1": 778, "y0": 466, "y1": 533, "h": 121 }] }, { "id": "o2", "file": "jo_youngchang_2", "x": 626, "y": 482, "w": 81, "h": 117, "sortY": 599, "solid": [{ "x0": 630, "x1": 702, "y0": 552, "y1": 599, "h": 146 }] }] }, "jr_daebak": { "file": "jr_daebak", "w": 2324, "h": 775, "under": true, "lane": [414, 755], "floor": [[0, 519], [225, 482], [647, 411], [2324, 411], [2324, 775], [0, 775]], "blocks": [[1263, 1562, 540, 999], [2258, 2324, 642, 999], [257, 321, 439, 200], [642, 802, 407, 200], [792, 1017, 411, 120]], "doors": { "out": { "x0": 27, "x1": 219, "y0": 37, "y1": 508, "anim": "none", "quad": [[27, 37], [219, 59], [219, 471], [27, 508]], "behind": "dark" } }, "lamps": [], "windows": [], "objects": [{ "id": "o0", "file": "jo_daebak_0", "x": 347, "y": 359, "w": 313, "h": 144, "sortY": 503, "solid": [{ "x0": 351, "x1": 655, "y0": 425, "y1": 503, "h": 127 }] }, { "id": "o1", "file": "jo_daebak_1", "x": 410, "y": 532, "w": 187, "h": 67, "sortY": 599, "solid": [{ "x0": 414, "x1": 592, "y0": 545, "y1": 599, "h": 70 }] }, { "id": "o2", "file": "jo_daebak_2", "x": 915, "y": 356, "w": 96, "h": 126, "sortY": 482, "solid": [{ "x0": 919, "x1": 1007, "y0": 431, "y1": 482, "h": 162 }] }, { "id": "o3", "file": "jo_daebak_3", "x": 778, "y": 443, "w": 371, "h": 135, "sortY": 578, "solid": [{ "x0": 782, "x1": 1144, "y0": 515, "y1": 578, "h": 162 }] }, { "id": "o4", "file": "jo_daebak_4", "x": 1869, "y": 467, "w": 92, "h": 89, "sortY": 556, "solid": [{ "x0": 1873, "x1": 1957, "y0": 503, "y1": 556, "h": 153 }] }, { "id": "o5", "file": "jo_daebak_5", "x": 1609, "y": 513, "w": 120, "h": 140, "sortY": 653, "solid": [{ "x0": 1613, "x1": 1725, "y0": 598, "y1": 653, "h": 160 }] }, { "id": "o6", "file": "jo_daebak_6", "x": 2112, "y": 488, "w": 120, "h": 165, "sortY": 653, "solid": [{ "x0": 2116, "x1": 2228, "y0": 598, "y1": 653, "h": 160 }] }, { "id": "o7", "file": "jo_daebak_7", "x": 1755, "y": 521, "w": 320, "h": 132, "sortY": 653, "solid": [{ "x0": 1759, "x1": 2071, "y0": 551, "y1": 653, "h": 128 }] }, { "id": "o8", "file": "jo_daebak_8", "x": 1865, "y": 649, "w": 100, "h": 100, "sortY": 749, "solid": [{ "x0": 1869, "x1": 1961, "y0": 691, "y1": 749, "h": 167 }] }] }, "jr_heolgap": { "file": "jr_heolgap", "w": 1660, "h": 684, "under": true, "lane": [388, 664], "floor": [[0, 527], [255, 384], [1660, 384], [1660, 684], [0, 684]], "blocks": [[425, 1075, 557, 160], [1326, 1660, 612, 999], [268, 463, 455, 999], [1194, 1360, 421, 999]], "doors": { "out": { "x0": 26, "x1": 191, "y0": 34, "y1": 510, "anim": "none", "quad": [[26, 34], [191, 64], [191, 459], [26, 510]], "behind": "dark" } }, "lamps": [], "windows": [], "objects": [{ "id": "o0", "file": "jo_heolgap_0", "x": 477, "y": 533, "w": 92, "h": 121, "sortY": 654, "solid": [{ "x0": 481, "x1": 565, "y0": 606, "y1": 654, "h": 167 }] }, { "id": "o1", "file": "jo_heolgap_1", "x": 995, "y": 533, "w": 92, "h": 121, "sortY": 654, "solid": [{ "x0": 999, "x1": 1083, "y0": 606, "y1": 654, "h": 167 }] }] } };
+  var JR_ROOM_FILES = ["jr_daebak", "jr_heolgap", "jr_jinryo", "jr_op", "jr_songil", "jr_youngchang", "jo_daebak_0", "jo_daebak_1", "jo_daebak_2", "jo_daebak_3", "jo_daebak_4", "jo_daebak_5", "jo_daebak_6", "jo_daebak_7", "jo_daebak_8", "jo_heolgap_0", "jo_heolgap_1", "jo_jinryo_0", "jo_jinryo_1", "jo_jinryo_2", "jo_jinryo_3", "jo_op_0", "jo_songil_0", "jo_songil_1", "jo_songil_2", "jo_songil_3", "jo_youngchang_0", "jo_youngchang_1", "jo_youngchang_2"];
+
   // src/game/action/hq/painted.ts
   var downs = (xs, y = 18) => xs.map((x) => ({ x, y, kind: "down" }));
   var sign = (x, y) => ({ x, y, kind: "sign", color: "#3cff8a", r: 34 });
@@ -318,7 +322,105 @@
       ],
       windows: [],
       objects: []
-    }
+    },
+    // ── 중림 지하상가 (game-pack/jr-field, assets/gpt/중림지하상가를 tools/fit_bg700.py로 세로 700에 맞춤, 2026-10-27) ──
+    // 문은 그림 속 계단·통로 자리(문짝 없음). 막는 상자는 바닥에 튀어나온 매대·의자·상자 앞 모서리
+    jr_entry: {
+      file: "jr_entry",
+      w: 5521,
+      under: false,
+      lane: [428, 669],
+      blocks: [[80, 620, 505], [605, 665, 446], [2860, 3060, 442], [4500, 4660, 442], [5e3, 5521, 528]],
+      doors: {
+        down: { x0: 4880, x1: 5e3, y0: 300, y1: 505, anim: "none", behind: "dark" },
+        west: { x0: 0, x1: 60, y0: 420, y1: 669, anim: "none" }
+      },
+      lamps: [],
+      windows: [],
+      objects: []
+    },
+    jr_b1: {
+      file: "jr_b1",
+      w: 6425,
+      under: true,
+      lane: [428, 669],
+      blocks: [
+        [345, 485, 442],
+        [580, 870, 490],
+        [1690, 1950, 462],
+        [2240, 2460, 446],
+        [2650, 3020, 452],
+        [3740, 4110, 462],
+        [4320, 4810, 462],
+        [4830, 5e3, 442],
+        [5340, 5720, 452],
+        [6e3, 6160, 475]
+      ],
+      doors: {
+        up: { x0: 40, x1: 320, y0: 100, y1: 420, anim: "none", behind: "dark" },
+        daebak: { x0: 2970, x1: 3120, y0: 130, y1: 410, anim: "none", behind: "dark" },
+        songil: { x0: 5700, x1: 5840, y0: 130, y1: 400, anim: "none", behind: "dark" },
+        alley: { x0: 3390, x1: 3530, y0: 140, y1: 420, anim: "none", behind: "dark" },
+        down: { x0: 6170, x1: 6425, y0: 240, y1: 470, anim: "none", behind: "dark" }
+      },
+      lamps: [],
+      windows: [],
+      objects: []
+    },
+    jr_alley: {
+      file: "jr_alley",
+      w: 6059,
+      under: true,
+      lane: [428, 669],
+      blocks: [
+        [80, 250, 440],
+        [535, 625, 448],
+        [1335, 1760, 470],
+        [1780, 1860, 442],
+        [1890, 2140, 446],
+        [3490, 3910, 455],
+        [4270, 4850, 452],
+        [5090, 5530, 442],
+        [5490, 6059, 472]
+      ],
+      doors: {
+        b1: { x0: 2800, x1: 3070, y0: 130, y1: 420, anim: "none", behind: "dark" },
+        heolgap: { x0: 355, x1: 460, y0: 125, y1: 400, anim: "none", behind: "dark" }
+      },
+      lamps: [],
+      windows: [],
+      objects: []
+    },
+    jr_b2: {
+      // 왼쪽 끝 앞쪽에 큰 상자가 화면 앞까지 나와 있어 발을 x180부터
+      file: "jr_b2",
+      w: 5705,
+      under: true,
+      lane: [428, 669],
+      floor: [[180, 428], [5705, 428], [5705, 669], [180, 669]],
+      blocks: [
+        [180, 370, 448],
+        [615, 725, 445],
+        [920, 1190, 432],
+        [1315, 1700, 436],
+        [1780, 2030, 445],
+        [2130, 2710, 442],
+        [2960, 3270, 434],
+        [3330, 3510, 438],
+        [3700, 4140, 445],
+        [5120, 5335, 435],
+        [5590, 5705, 435]
+      ],
+      doors: {
+        up: { x0: 5400, x1: 5590, y0: 0, y1: 420, anim: "none", behind: "dark" },
+        youngchang: { x0: 390, x1: 580, y0: 70, y1: 395, anim: "none", behind: "dark" }
+      },
+      lamps: [],
+      windows: [],
+      objects: []
+    },
+    // 중림 가게 안 방 6개 (tools/jr/rooms.py → jrRooms.gen.ts)
+    ...JR_ROOMS
   };
   var doorX = (scene, id) => {
     const d3 = PAINTED[scene].doors[id];
@@ -360,22 +462,25 @@
 
   // src/game/action/art/hqField.ts
   var FILES = ["lobby", "f2", "f3", "b1", "b2", "b3", "desk"];
+  var JR_FILES = ["jr_entry", "jr_b1", "jr_alley", "jr_b2", ...JR_ROOM_FILES];
   var images = null;
   var revision2 = 0;
   function prepareHqField(urlOf) {
     const own = ++revision2;
     images = null;
-    void Promise.all(FILES.map(async (key2) => {
-      const src = window.__GOEI_HQ_FIELD__?.[key2] || (urlOf ? await urlOf(key2 + ".webp") : "");
-      if (!src) throw new Error("HQ field art unavailable");
+    const load = (pack2, keys3) => Promise.all(keys3.map(async (key2) => {
+      const src = window.__GOEI_HQ_FIELD__?.[key2] || (urlOf ? await urlOf(pack2, key2 + ".webp") : "");
+      if (!src) throw new Error("field art unavailable");
       const im = new Image();
       im.src = src;
       await im.decode();
       return [key2, im];
     })).then((rows) => {
-      if (revision2 === own) images = Object.fromEntries(rows);
+      if (revision2 === own) images = { ...images, ...Object.fromEntries(rows) };
     }).catch(() => {
     });
+    void load("hq-field", FILES);
+    void load("jr-field", JR_FILES);
     const keys2 = (e) => {
       const t = e.target;
       if (e.code !== "KeyT" || e.repeat || t?.closest?.('input, textarea, [contenteditable="true"]')) return;
@@ -390,7 +495,7 @@
       }
     };
   }
-  var hasHqField = (scene) => !!images && !!PAINTED[scene];
+  var hasHqField = (scene) => !!PAINTED[scene] && !!images?.[PAINTED[scene].file];
   function drawHqField(c, scene, camX, fx2, clockHour = null) {
     const p = PAINTED[scene];
     const im = images?.[p?.file ?? ""];
@@ -398,15 +503,15 @@
     c.save();
     c.imageSmoothingEnabled = true;
     c.imageSmoothingQuality = "high";
-    const sx = Math.max(0, Math.floor(camX - 40)), sw = Math.min(p.w - sx, 1280 + 80);
+    const sx = Math.max(0, Math.floor(camX - 40)), sw = Math.min(p.w - sx, view.w + 80), H7 = p.h ?? 700;
     if (sw > 0) {
-      c.drawImage(im, sx, 0, sw, 700, sx, 0, sw, 700);
-      c.drawImage(im, sx, 696, sw, 4, sx, 700, sw, 24);
+      c.drawImage(im, sx, 0, sw, H7, sx, 0, sw, H7);
+      if (H7 === 700) c.drawImage(im, sx, 696, sw, 4, sx, 700, sw, 24);
     }
     for (const [id, d3] of Object.entries(p.doors)) {
       const s2 = fx2(id);
       if (s2.open <= 0 && !s2.shake) continue;
-      if (d3.x1 < camX - 40 || d3.x0 > camX + 1320) continue;
+      if (d3.x1 < camX - 40 || d3.x0 > camX + view.w + 40) continue;
       drawDoor(c, im, d3, s2.open, s2.shake);
     }
     c.restore();
@@ -634,7 +739,7 @@
     const p = PAINTED[scene];
     if (!p || !images) return;
     const k = keyAt(hourNow(clockHour));
-    const x0 = camX - 40, W5 = 1280 + 80, H7 = 720;
+    const x0 = camX - 40, W5 = view.w + 80, H7 = Math.max(720, p.h ?? 700);
     const sc = p.under ? 0.35 : 0.5;
     c.save();
     const a = k.tint[3] * sc;
@@ -4742,197 +4847,4 @@
     { id: "m4", short: "야근 회사원 구조", kind: "구조", title: "야근하다 들어온 회사원을 다락방까지", depth: 5, depthLabel: "B-1~B-2", rescue: "worker", reward: { budget: 300, teeth: 5, research: 0 }, requires: "m3", deadline: 2 },
     { id: "m5", short: "아파트 규칙 조사", kind: "조사", title: "재현의 층 「아파트」 규칙 3개", depth: 5, depthLabel: "B-2", rules: 3, reward: { budget: 150, teeth: 2, research: 2 }, requires: "m3" },
     { id: "m6", short: "405호 노부부", kind: "진압", title: "405호 노부부 (재현)", depth: 5, depthLabel: "B-2", reward: { budget: 400, teeth: 4, research: 1 }, requires: "m5" },
-    { id: "m7", short: "빈 점검표 회수", kind: "회수", title: "서명란이 빈 점검표", depth: 3, depthLabel: "정비 구역", recover: "checklist", reward: { budget: 100, teeth: 1, research: 3 }, requires: "m2" },
-    { id: "m8", short: "시험 층 돌파", kind: "조사", title: "시험 층 목표 달성", depth: 6, depthLabel: "B-3", reward: { budget: 500, teeth: 3, research: 1 }, requires: "m6" },
-    { id: "m9", short: "B-5 도달", kind: "기록", title: "B-5 도달", depth: 8, depthLabel: "B-5", reward: { budget: 600, teeth: 5, research: 2 }, requires: "m8" }
-  ];
-  var MISSION_BY_ID = Object.fromEntries(MISSIONS.map((m) => [m.id, m]));
-  var VARIANTS = [
-    { id: "greet3", text: "오늘 승강기는 인사한 사람만 버튼을 3개 보여 준다.", hint: "오늘은 승강기가 인사한 사람한테만 버튼을 다 보여 준대요." },
-    { id: "polite", text: "오늘 재현의 층 주민은 존댓말에만 반응한다.", hint: "아파트 주민들이 오늘은 존댓말에만 대답한대요." },
-    { id: "attic_half", text: "오늘 다락방 체류 제한이 절반이다.", hint: "다락방에 오래 있지 마세요. 오늘은 그게 빨리 온대요." },
-    { id: "liars", text: "오늘 승객은 전부 거짓말을 한다.", hint: "승객 말은 오늘 거꾸로 들으세요." },
-    { id: "b12", text: "오늘 패널에 깊은 층 버튼이 처음부터 떠 있다.", hint: "패널에 처음 보는 숫자가 떠 있대요. 누르지 마세요. …아마도." }
-  ];
-  var MASTERY_XP = [0, 80, 200, 360, 560, 800, 1080, 1400, 1760, 2160];
-  var MASTERY_UNLOCKS = {
-    2: { id: "pool", label: "요원 강화 후보 추가" },
-    3: { id: "unique_a", label: "고유기 변형 A (새 동작)", move: true },
-    5: { id: "ult2", label: "필살기 2단계" },
-    6: { id: "unique_b", label: "고유기 변형 B (새 동작)", move: true },
-    8: { id: "relic_own", label: "전용 유물" },
-    10: { id: "palette", label: "숙련 의상 색" }
-  };
-  var COFFEES = [
-    { id: "black", name: "블랙", effect: "필살 충전 +20%", who: "" },
-    { id: "mix", name: "믹스커피", effect: "체력 +10%", who: "데쥬레·고그니쟈 추천" },
-    { id: "condensed", name: "연유 커피", effect: "아이템 효과 +20%", who: "잼트리 특기" },
-    { id: "americano", name: "편의점 아메리카노", effect: "속도 +10%", who: "" }
-  ];
-  var RELICS = {
-    first_guard: { name: "휴대용 재떨이", effect: "출동마다 첫 피격 무효" },
-    forgive: { name: "구겨진 사과문", effect: "규칙 위반 1회 용서" },
-    gauge: { name: "고장 난 초시계", effect: "필살 게이지 +25% 빠르게" },
-    own_jyaldi: { name: "쟈알디의 라이터", effect: "폭파 범위 +20% (쟈알디 숙련 8)" },
-    own_eileen: { name: "에일린의 조준경 덮개", effect: "첫 사격 치명 (에일린 숙련 8)" }
-  };
-  var RESEARCH = [
-    { id: "rs_relic1", name: "재떨이 속 재 분석", research: 3, budget: 100, gives: "relic:first_guard" },
-    { id: "rs_supply", name: "진압 장비 보급 승인", research: 4, budget: 100, gives: "supply" },
-    { id: "rs_relic2", name: "사과문 문장 해독", research: 5, budget: 150, gives: "relic:forgive", requires: "rs_relic1" },
-    { id: "rs_danger", name: "위험 단계 기준 수립", research: 6, budget: 200, gives: "danger" },
-    { id: "rs_relic3", name: "멈춘 시간 측정", research: 8, budget: 250, gives: "relic:gauge", requires: "rs_relic2" }
-  ];
-  var LOCKED_SUPPLY = /* @__PURE__ */ new Set(["antidote", "smoke", "charm"]);
-  var SUPPLY_FALLBACK = [
-    { id: "medkit", name: "회복약", price: 30, kind: "heal", max: 3, desc: "체력 35% 회복" },
-    { id: "bandage", name: "압박 붕대", price: 18, kind: "cure", max: 3, desc: "출혈을 멈추고 체력 10% 회복" },
-    { id: "antidote", name: "정화제", price: 40, kind: "cure", max: 2, desc: "오염 한 단계 제거" },
-    { id: "salt", name: "소금", price: 25, kind: "special", max: 3, desc: "발밑에 소금 원. 괴이가 6초 동안 들어오지 못한다" },
-    { id: "flash", name: "섬광탄", price: 35, kind: "throw", max: 3, desc: "주변 적 2초 기절" },
-    { id: "smoke", name: "연막탄", price: 28, kind: "throw", max: 2, desc: "연기 속 적 40% 둔화, 5초" },
-    { id: "charm", name: "관리국 부적", price: 60, kind: "special", max: 1, desc: "다음 피격 1회 무효" },
-    { id: "energy", name: "에너지 음료", price: 22, kind: "special", max: 2, desc: "능력 자원 40 회복" }
-  ];
-  var OLD_ITEM_IDS = { heal: "medkit", guard: "bandage", torch: "flash" };
-  var DECOR = ["녹슨 사원증", "이 빠진 머그컵", "「여기 오래 있지 마」 쪽지", "402호 리모컨", "엘리베이터 점검 스티커", "누군가의 어금니", "접힌 우산", "반쯤 탄 향초"];
-  var SURVIVORS = {
-    worker: { name: "야근하던 회사원", clue: "「인사를 안 했더니 버튼이 두 개밖에 안 보였어요.」", rule: "greet" },
-    student: { name: "길 잃은 학생", clue: "「거울을 봤는데 제 얼굴이 엄청 피곤해 보였어요. 그래서 내렸어요.」", rule: "mirror" }
-  };
-
-  // src/game/action/hq/logic.ts
-  var supply = SUPPLY_FALLBACK;
-  function setSupplyCatalog(list) {
-    if (list.length) supply = list.map((d3) => ({ ...d3, locked: d3.locked ?? LOCKED_SUPPLY.has(d3.id) }));
-  }
-  var supplyCatalog = () => supply;
-  var supplyDef = (id) => supply.find((s2) => s2.id === id);
-  var itemName = (id) => supplyDef(id)?.name ?? id;
-  function placeOpen(s2, id) {
-    switch (id) {
-      case "interview":
-        return s2.flags.firstRescue;
-      case "training":
-        return s2.flags.firstRun;
-      case "appraisal":
-        return s2.flags.firstRecovery;
-      case "lab":
-        return s2.flags.firstAppraisal;
-      case "tooth":
-      case "gallery":
-      case "pasta":
-        return s2.flags.firstSuppress;
-      default:
-        return true;
-    }
-  }
-  function masteryLevel(xp) {
-    let lv = 1;
-    for (let i = 1; i < MASTERY_XP.length; i++) if (xp >= MASTERY_XP[i]) lv = i + 1;
-    return lv;
-  }
-  function masteryNext(xp) {
-    const lv = masteryLevel(xp);
-    return lv >= 10 ? null : MASTERY_XP[lv];
-  }
-  function unlocksAt(level) {
-    return Object.entries(MASTERY_UNLOCKS).filter(([lv]) => Number(lv) <= level).map(([, u]) => u.id);
-  }
-  var movesFor = (level) => unlocksAt(level);
-  function rulebookRatio(s2) {
-    return Math.min(1, s2.rulebook.length / 12);
-  }
-  function statsFor(s2, agent) {
-    const a = AGENT_BY_ID[agent];
-    const rec = s2.agents[agent];
-    const st = { ...a.base };
-    st.hp = Math.round(st.hp * (1 - 0.06 * rec.fatigue));
-    if (s2.coffee === "mix") st.hp = Math.round(st.hp * 1.1);
-    if (s2.coffee === "americano") st.speed = +(st.speed * 1.1).toFixed(2);
-    if (s2.coffee === "black") st.charge = +(st.charge * 1.2).toFixed(2);
-    if (rulebookRatio(s2) >= 0.5) st.hp = Math.round(st.hp * 1.1);
-    if (s2.relics.includes("gauge")) st.charge = +(st.charge * 1.25).toFixed(2);
-    return st;
-  }
-  function canDeploy(s2, agent) {
-    const rec = s2.agents[agent];
-    if (rec.injured > 0) return { ok: false, why: `부상: ${rec.injured}일 더 쉬어야 함 (의무실에서 예산으로 바로 치료 가능)` };
-    return { ok: true, why: rec.fatigue ? `피로 ${rec.fatigue}: 시작 체력 -${rec.fatigue * 6}%` : "" };
-  }
-  function missionBoard(s2, boardNames2 = []) {
-    const open = MISSIONS.filter((m) => !m.requires || s2.missionsDone.includes(m.requires));
-    const fresh = open.filter((m) => !s2.missionsDone.includes(m.id) && !s2.failedRescues.includes(m.id));
-    const cards = fresh.slice(0, 3).map((def) => ({ def, done: false, left: def.deadline ? Math.max(0, (s2.deadlines[def.id] ?? s2.runs + def.deadline) - s2.runs) : void 0 }));
-    for (const def of open) {
-      if (cards.length >= 3) break;
-      if (def.repeat && !cards.some((c) => c.def.id === def.id)) cards.push({ def, done: s2.missionsDone.includes(def.id) });
-    }
-    if (!cards.length) cards.push({ def: MISSIONS[0], done: true });
-    const link = boardNames2.find((n) => /승강기|엘리베이터/.test(n));
-    if (link) cards[0] = { ...cards[0], linked: link };
-    return cards;
-  }
-  function noteDeadlines(s2, cards) {
-    for (const c of cards) if (c.def.deadline && s2.deadlines[c.def.id] === void 0) s2.deadlines[c.def.id] = s2.runs + c.def.deadline;
-  }
-  function supplyOpen(s2, d3) {
-    return !(d3.locked ?? LOCKED_SUPPLY.has(d3.id)) || s2.researchDone.includes("rs_supply");
-  }
-  function buy(s2, id) {
-    const d3 = supplyDef(id);
-    if (!d3 || !supplyOpen(s2, d3)) return "살 수 없는 물건이에요.";
-    if (s2.currencies.budget < d3.price) return `예산이 모자라요 (${d3.price} 필요).`;
-    s2.currencies.budget -= d3.price;
-    s2.stash[id] = (s2.stash[id] ?? 0) + 1;
-    return `${d3.name} 1개 구입 (예산 -${d3.price})`;
-  }
-  function equip(s2, slot, id) {
-    const d3 = supplyDef(id);
-    if (!d3 || !(s2.stash[id] > 0)) return "보관함에 없어요.";
-    const cur = s2.loadout[slot];
-    if (cur && cur.id !== id) unequip(s2, slot);
-    const now = s2.loadout[slot];
-    if (now && now.n >= d3.max) return `${d3.name}은 한 칸에 ${d3.max}개까지.`;
-    s2.stash[id]--;
-    s2.loadout[slot] = now ? { id, n: now.n + 1 } : { id, n: 1 };
-    return `${slot + 1}번 칸: ${d3.name} ×${s2.loadout[slot].n}`;
-  }
-  function unequip(s2, slot) {
-    const cur = s2.loadout[slot];
-    if (!cur) return;
-    s2.stash[cur.id] = (s2.stash[cur.id] ?? 0) + cur.n;
-    s2.loadout[slot] = null;
-  }
-  function equipRelic(s2, slot, id) {
-    if (id && !s2.relicsOwned.includes(id)) return "없는 유물이에요.";
-    if (id && s2.relics.includes(id)) s2.relics[s2.relics.indexOf(id)] = null;
-    s2.relics[slot] = id;
-    return id ? `유물 ${slot + 1}: ${RELICS[id]?.name}` : `유물 ${slot + 1} 비움`;
-  }
-  function pickCoffee(s2, id) {
-    s2.coffee = id;
-    const c = COFFEES.find((x) => x.id === id);
-    return c ? `${c.name}: 다음 출동 ${c.effect}` : "커피 안 마심";
-  }
-  var TREAT_COST = 150;
-  function treat(s2, agent) {
-    const rec = s2.agents[agent];
-    if (!rec.injured) return "다친 데 없어요.";
-    if (s2.currencies.budget < TREAT_COST) return `예산이 모자라요 (${TREAT_COST} 필요).`;
-    s2.currencies.budget -= TREAT_COST;
-    rec.injured = 0;
-    return `${AGENT_BY_ID[agent].name} 치료 완료 (예산 -${TREAT_COST})`;
-  }
-  function restDay(s2) {
-    if (s2.active) return "출동 중에는 본부에서 휴식할 수 없어요.";
-    if (!AGENTS.some((a) => s2.agents[a.id].injured > 0 || s2.agents[a.id].fatigue > 0)) return "모두 충분히 쉬었어요.";
-    for (const a of AGENTS) {
-      s2.agents[a.id].fatigue = 0;
-      s2.agents[a.id].injured = Math.max(0, s2.agents[a.id].injured - 1);
-    }
-    s2.day++;
-    return "하루 쉬었다. 피로가 풀리고 부상 회복에 하루가 지났다. (출동 보상 없음)";
-  }
-  function appraise(s2) {
-    if (!s2.appraisal.length) return ["감정할 회수물이 없어요."
+    { id: "m7", short: "빈 점검표 회수", kind: "회수", title: "서명란이 빈 점검표", depth: 3, depthLabel: "정비 구역", recover: "checklist", reward: { budg

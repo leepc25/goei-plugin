@@ -1,4 +1,4 @@
-// goei-body 0.17.3
+// goei-body 0.17.6
 "use strict";
 (() => {
   var __create = Object.create;
@@ -729,13 +729,84 @@ ${visit_guide_default.replace(/\r/g, "").trim()}
   var guideText = (name) => overrides.get(name) ?? DEFAULTS[name];
   var guideOverridden = (name) => overrides.has(name);
   var RP_HEAD = "## RP Guidance";
+  function splitBy(text, re, headOf) {
+    const hits = [...text.matchAll(re)];
+    if (!hits.length) return [{ title: "전체", head: "", body: text.replace(/\s+$/, ""), tail: text.match(/\s+$/)?.[0] ?? "" }];
+    const out = [];
+    const pre2 = text.slice(0, hits[0].index);
+    if (pre2.trim()) out.push({ title: "머리", head: "", body: pre2.replace(/\s+$/, ""), tail: pre2.match(/\s+$/)?.[0] ?? "" });
+    else if (pre2) out.push({ title: "머리", head: pre2, body: "", tail: "" });
+    hits.forEach((m, i) => {
+      const start3 = m.index + m[0].length;
+      const end = i + 1 < hits.length ? hits[i + 1].index : text.length;
+      const raw = text.slice(start3, end);
+      const tail2 = raw.match(/\s+$/)?.[0] ?? "";
+      out.push({ ...headOf(m), body: raw.slice(0, raw.length - tail2.length), tail: tail2 });
+    });
+    return out;
+  }
+  function splitGuide(text) {
+    if (text.includes("@@SECTION")) {
+      const re = /@@SECTION ([^\n]+)\n([\s\S]*?)\n@@END/g;
+      const hits = [...text.matchAll(re)];
+      const out = [];
+      const pre2 = text.slice(0, hits[0]?.index ?? 0);
+      if (pre2.trim()) out.push({ title: "머리", head: "", body: pre2.replace(/\s+$/, ""), tail: pre2.match(/\s+$/)?.[0] ?? "" });
+      else if (pre2) out.push({ title: "머리", head: pre2, body: "", tail: "" });
+      hits.forEach((m, i) => {
+        const end = m.index + m[0].length;
+        const gap = text.slice(end, i + 1 < hits.length ? hits[i + 1].index : text.length);
+        out.push({ title: m[1].trim(), head: `@@SECTION ${m[1]}
+`, body: m[2], tail: `
+@@END${gap}` });
+      });
+      return out;
+    }
+    if (/^===[^=\n]+===$/m.test(text)) return splitBy(text, /^===([^=\n]+)===\n/gm, (m) => ({ title: m[1].trim(), head: m[0] }));
+    if (/^#{2,3} /m.test(text)) return splitBy(text, /^#{2,3} ([^\n]*)\n/gm, (m) => ({ title: m[1].trim(), head: m[0] }));
+    return splitBy(text, /$^/g, () => ({ title: "전체", head: "" }));
+  }
+  var joinGuide = (parts) => parts.map((p) => p.head + p.body + p.tail).join("");
+  var RULE_TARGETS = ["RP", "Directive", "GNet", "Phone", "Wiki", "Visit"];
+  var RULE_TARGET_LABEL = { RP: "본편", Directive: "이동·임무", GNet: "괴담넷", Phone: "괴담톡", Wiki: "위키", Visit: "필드" };
+  var RULE_SECTION = { RP: null, Directive: "COMMON", GNet: "LB", Phone: "COMMON", Wiki: "NW.GUIDE", Visit: "COMMON" };
+  var userRules = [];
+  function setUserRules(rules3) {
+    userRules = Array.isArray(rules3) ? rules3.filter((r) => r && typeof r.id === "string") : [];
+  }
+  var getUserRules = () => userRules;
+  function rulesFor(name) {
+    if (!RULE_TARGETS.includes(name)) return "";
+    const hit3 = userRules.filter((r) => r.on && r.text.trim() && r.to.includes(name));
+    if (!hit3.length) return "";
+    return `## User Rules
+${hit3.map((r) => `### ${r.title.trim() || "규칙"}
+${r.text.trim()}`).join("\n\n")}`;
+  }
+  function guidePrompt(name) {
+    const base = guideText(name);
+    const rules3 = rulesFor(name);
+    if (!rules3) return base;
+    const at = RULE_SECTION[name];
+    if (!at) return `${base.replace(/\s+$/, "")}
+
+${rules3}
+`;
+    const parts = splitGuide(base);
+    const i = parts.findIndex((p) => p.title === at);
+    if (i < 0) return base;
+    parts[i] = { ...parts[i], body: `${parts[i].body}
+
+${rules3}` };
+    return joinGuide(parts);
+  }
 
   // src/core/dispatch.ts
   var DirectiveError = class extends Error {
   };
   var REQUIRED = ["COMMON", "OPENING", "CONTINUATION", "CONTEXT"];
   function parseDirective(_lore) {
-    const raw = guideText("Directive");
+    const raw = guidePrompt("Directive");
     if (typeof raw !== "string" || !raw.trim()) throw new DirectiveError("Directive 지침을 읽지 못했어요.");
     const sections3 = {};
     const heads = [...raw.matchAll(/===([A-Z][A-Z0-9_]*)===/g)];
@@ -1586,10 +1657,10 @@ ${body5.slice(at).replace(/^\s+/, "")}
     return [...hits, "Shared Base Hideout", "Shared Base Office"].map((k) => k.startsWith("Shared") ? k : `Shared Base ${k}`);
   }
   function orgShared(name, type = "org", text = "") {
-    const head2 = type === "civilian" ? ["Civilian"] : type === "freelancer" ? ["Freelancer"] : [];
+    const head3 = type === "civilian" ? ["Civilian"] : type === "freelancer" ? ["Freelancer"] : [];
     const hay = clean(`${name} ${text}`);
     const hits = rank(KINDS_ORG, name, text, name).filter((key2) => KINDS_ORG.find(([k]) => k === key2)[1].some((w) => hit(hay, w)));
-    return [...head2, ...hits.map((k) => `Shared Org ${k}`), "Shared Org Office"];
+    return [...head3, ...hits.map((k) => `Shared Org ${k}`), "Shared Org Office"];
   }
   var three = (prefix, seed) => {
     const n2 = pick(seed, 3);
@@ -1688,8 +1759,8 @@ ${body5.slice(at).replace(/^\s+/, "")}
   function guessParent(name, names4) {
     const m = DOT.exec(name);
     if (!m || !m.index) return "";
-    const head2 = name.slice(0, m.index).trim();
-    return names4.has(head2) ? head2 : "";
+    const head3 = name.slice(0, m.index).trim();
+    return names4.has(head3) ? head3 : "";
   }
   var APPENDIX_DEFAULT = { keys: true, withParent: false, needParent: false, target: true, places: [], agents: [], unlock: "" };
   function buildAppendices(lore, data) {
@@ -2076,9 +2147,9 @@ ${body5.slice(at).replace(/^\s+/, "")}
         let base;
         if (old) base = { ...old, lore: name, group: group6, inFolder: true };
         else base = { lore: name, id: "", name, english: guessEnglish(e), aliases: [], legacyEnglish: [], affiliation: "", rosterFor: [], phoneTabs: [], rank: "", department: "", group: group6, inFolder: true };
-        const row8 = merge(base, obj2(saved[name]));
-        if (!old && !saved[name]) fresh.add(row8);
-        out.push(row8);
+        const row9 = merge(base, obj2(saved[name]));
+        if (!old && !saved[name]) fresh.add(row9);
+        out.push(row9);
       }
       for (const [name, d] of Object.entries(saved)) {
         if (seen2.has(name) || !exists.has(name)) continue;
@@ -2268,9 +2339,9 @@ ${body5.slice(at).replace(/^\s+/, "")}
     }
     const to = d.agents.findIndex((a) => a.lore === target);
     if (to < 0 || to === from || agentGroup(d.agents[to]) !== g) return false;
-    const [row8] = d.agents.splice(from, 1);
+    const [row9] = d.agents.splice(from, 1);
     const at = (to > from ? to - 1 : to) + (how === "after" ? 1 : 0);
-    d.agents.splice(at, 0, row8);
+    d.agents.splice(at, 0, row9);
     return true;
   }
   function loreGender(lore, name) {
@@ -2684,72 +2755,4 @@ ${body5.slice(at).replace(/^\s+/, "")}
   }
   function fields(text, kind) {
     const out = [];
-    const re = new RegExp(`\\[${kind}\\s*\\|([^\\]]*)\\]`, "g");
-    for (const m of text.matchAll(re)) out.push(m[1].split("|").map((s5) => s5.trim()));
-    return out;
-  }
-  function scanAnomalies(text) {
-    return fields(text, "AN").flatMap((f) => {
-      const slot = /^\d+$/.test(f[0] ?? "") && f.length >= 6 ? 1 : 0;
-      const region = f[slot] ?? "";
-      const r = f.slice(slot + 1);
-      if (r.length < 4 || !region) return [];
-      return [{ region, name: stripLabel(r[0]), state: normAnState(r[1]), grade: normGrade(r[2]), deploy: stripLabel(r[3]), situation: stripLabel(r.slice(4).join(" ")) }];
-    });
-  }
-  function scanSites(text, kind, states) {
-    return fields(text, kind).flatMap((f) => {
-      const bare = (v) => stripLabel(v).replace(/\s*[(（][^)）]*[)）]\s*/g, "").trim();
-      const i = f.findIndex((v, k) => k >= 2 && states.includes(bare(v)));
-      if (i < 0) return [];
-      let region = f[0] ?? "";
-      if (/^\d+$/.test(region) && i >= 3) region = f[1] ?? "";
-      return [{ region, name: stripLabel(f[i - 1]), state: bare(f[i]), rest: f.slice(i + 1).map(stripLabel) }];
-    });
-  }
-  var DEPLOY_ONLY = /^(?:없음|none|-|[A-Z]\d{3}(?:\s*[,/·]\s*[A-Z]\d{3})*)$/i;
-  function scanIncidents(text) {
-    return scanSites(text, "IN", ["진행", "종료"]).map(({ rest, ...t }) => rest.length >= 2 ? { ...t, deploy: rest[0], situation: rest.slice(1).join(" ") } : DEPLOY_ONLY.test(rest[0] ?? "") ? { ...t, deploy: rest[0], situation: "" } : { ...t, deploy: "", situation: rest.join(" ") });
-  }
-  function scanMysticSites(text) {
-    return scanSites(text, "MS", ["출현", "소실"]).map(({ rest, ...t }) => ({ ...t, visitors: rest[0] ?? "", situation: rest.slice(1).join(" ") }));
-  }
-  function scanAgents(text) {
-    return fields(text, "AG").flatMap((f) => {
-      const state = normAgState(f[1]);
-      return f[0] && state ? [{ who: f[0], state, situation: f[2] ?? "" }] : [];
-    });
-  }
-  function scanAffiliation(text) {
-    const m = /\[AC\s*\|\s*(\w+)\s*\]/.exec(text);
-    return m ? m[1].toUpperCase() : null;
-  }
-  function scanStatus(text) {
-    const tags = findStatusTags(text);
-    const first = tags[0];
-    const minute = first ? statusMinute(first.date, first.time) : null;
-    const target = tags.length === 1 && (first.target || /\|\s*없음\s*[\]】］]?\s*$/.test(first.raw)) ? first.target : null;
-    return { minute, target };
-  }
-  function lastStatusFields(texts) {
-    for (let i = texts.length - 1; i >= 0; i--) {
-      const all = findStatusTags(texts[i] ?? "");
-      if (!all.length) continue;
-      const t = all[all.length - 1];
-      return { date: t.date, time: t.time, weather: t.weather, temp: t.temp, place: t.place, target: t.target, companions: t.companions, deployed: t.deployed };
-    }
-    return null;
-  }
-  function hasWorldTags(text) {
-    return /\[(?:AN|IN|MS|AG)\s*\||\[AC\s*\|/.test(text);
-  }
-  var AGE_META = /\{\s*\d+\s*시간\s+\d+\s*분\s*전\s*\}/;
-  var MARKERS = ["USER 관여 상태", "RP 시간 제한", "USER 관여 상태 규칙", "USER 탐험 상태 규칙", "탐험 추적", "자동 종료"];
-  function cleanOutput(text) {
-    const lines3 = text.split("\n");
-    const keep = [];
-    let prev = null;
-    let prevHadTag = false;
-    const ageOnly = (l) => l !== null && new RegExp(`^\\s*${AGE_META.source}\\s*$`).test(l);
-    for (const raw of lines3) {
-      let line2 = ra
+    const re = new RegExp(`\\[${kind}\\s*\\|([^\\]]

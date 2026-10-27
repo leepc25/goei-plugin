@@ -1,5 +1,6 @@
 // 「설정」 탭: 원본 설정 창의 동작·요원창·캐릭터 이미지 항목. 값은 이 채팅의 $st_* 변수에 두고,
 // 범위: 이 채팅($st_*·$wg_*) / 새 채팅 기본값(플러그인 저장소) / 카드 명부(directory.ts, 카드 로어북).
+import { onOffSwitch } from './controls';
 import { repaintTheme } from './theme';
 import {
   AGENT_MAX, basicDefaults, DIM_DEFAULT, basicSettings, basicVars, type BasicSettings, getPrefs, type Prefs, type StatusStyle, type Theme, WORLD_SPEC, type WorldField, wgKey, worldDefaults, worldSettings,
@@ -54,14 +55,17 @@ const esc = (s: unknown) =>
   String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 
 function seg(action: string, cur: string, items: [string, string][], disabled = false): string {
+  const sw = onOffSwitch(items, cur, action, (v) => v, disabled);
+  if (sw) return sw;
   return `<div class="gx-segs gx-segs-sm">${items
     .map(([v, label]) => `<button class="gx-seg${cur === v ? ' on' : ''}" data-action="${action}" data-value="${v}" aria-pressed="${cur === v}" ${disabled ? 'disabled' : ''}>${label}</button>`)
     .join('')}</div>`;
 }
 
 /** 설정 한 줄: 왼쪽 이름·설명, 오른쪽 조작 (괴담톡 설정과 같은 모양) */
-function field(label: string, control: string, help: string): string {
-  return `<div class="ps-row"><div class="ps-label"><b>${label}</b>${help ? `<small>${help}</small>` : ''}</div><div class="ps-ctl">${control}</div></div>`;
+/** scope 'device' = 이 기기 공통 값(채팅·기본값 구분 없음). 줄 이름 옆에 배지로 보인다 (2026-10-27 리수폿식 범위 표시) */
+function field(label: string, control: string, help: string, scope?: 'device'): string {
+  return `<div class="ps-row"><div class="ps-label"><b>${label}${scope === 'device' ? '<i class="gx-scope">이 기기</i>' : ''}</b>${help ? `<small>${help}</small>` : ''}</div><div class="ps-ctl">${control}</div></div>`;
 }
 
 /** 0–100% 막대. 끄는 동안은 창 바깥만 바로 바꾸고(app.ts), 놓으면 저장 */
@@ -264,21 +268,21 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
   const startLocked = scope === 'chat' && !walletEdit && walletStarted(ctx.chat);
   const S: Record<SettingsSection, string> = {
     screen: `${group('화면', [
-      field('테마', seg('set-theme', theme, [['light', '라이트'], ['dark', '다크'], ['paper', '페이퍼']], busy), '채팅 화면의 캐릭터 이미지 배경과 상태창(「테마」를 골랐을 때) 배색이에요.'),
-      field('상태창', seg('set-status', getPrefs().status ?? 'auto', [['auto', '테마'], ['dark', '다크'], ['light', '라이트'], ['paper', '페이퍼'], ['off', '미표시']], busy), '채팅 속 상태창의 배색이에요. 「테마」는 위 테마를 따라가요. 미표시를 고르면 상자만 숨기고, 모델은 상태 태그를 계속 써요.'),
-      field('메뉴 위치', seg('set-nav', getPrefs().nav ?? 'left', [['left', '왼쪽'], ['right', '오른쪽']], busy), 'PC 창에서 메뉴 목록을 놓을 쪽이에요. 이 기기의 모든 채팅에 같이 적용돼요.'),
-      field('위키 목록 위치', seg('set-wiki-side', getPrefs().wikiSide ?? 'left', [['left', '왼쪽'], ['right', '오른쪽']], busy), 'PC 창에서 위키의 세로바와 숨은 목록 서랍을 놓을 쪽이에요. 모바일은 늘 오른쪽 아래 「목록」 책갈피예요. 이 기기의 모든 채팅에 같이 적용돼요.'),
-      field('요원 칸', seg('set-agents', getPrefs().agents ?? 'wall', [['wall', '모니터'], ['list', '목록']], busy), '상황판 요원 칸 모양이에요. 이 기기의 모든 채팅에 같이 적용돼요.'),
-      field('창 바깥 불투명도', dimSlider(getPrefs().dim ?? DIM_DEFAULT, busy), '창 뒤 채팅 화면을 가리는 정도예요. 0%면 그대로 보이고 100%면 다 가려요.'),
-      field('설정 창 폭', seg('set-editor-width', String(getPrefs().editorWidth ?? 90), [['60', '60%'], ['70', '70%'], ['80', '80%'], ['90', '90%'], ['100', '100%']], busy), '이 설정 창이 화면 가로의 몇 %를 쓸지예요. 높이는 늘 화면의 92%. 폰에서는 늘 전체 화면이에요.'),
+      field('테마', seg('set-theme', theme, [['light', '라이트'], ['dark', '다크'], ['paper', '페이퍼']], busy), '채팅 화면의 캐릭터 이미지 배경과 상태창(「테마」를 골랐을 때) 배색이에요.', 'device'),
+      field('상태창', seg('set-status', getPrefs().status ?? 'auto', [['auto', '테마'], ['dark', '다크'], ['light', '라이트'], ['paper', '페이퍼'], ['off', '미표시']], busy), '채팅 속 상태창의 배색이에요. 「테마」는 위 테마를 따라가요. 미표시를 고르면 상자만 숨기고, 모델은 상태 태그를 계속 써요.', 'device'),
+      field('메뉴 위치', seg('set-nav', getPrefs().nav ?? 'left', [['left', '왼쪽'], ['right', '오른쪽']], busy), 'PC 창에서 메뉴 목록을 놓을 쪽이에요.', 'device'),
+      field('위키 목록 위치', seg('set-wiki-side', getPrefs().wikiSide ?? 'left', [['left', '왼쪽'], ['right', '오른쪽']], busy), 'PC 창에서 위키의 세로바와 숨은 목록 서랍을 놓을 쪽이에요. 모바일은 늘 오른쪽 아래 「목록」 책갈피예요.', 'device'),
+      field('요원 칸', seg('set-agents', getPrefs().agents ?? 'wall', [['wall', '모니터'], ['list', '목록']], busy), '상황판 요원 칸 모양이에요.', 'device'),
+      field('창 바깥 불투명도', dimSlider(getPrefs().dim ?? DIM_DEFAULT, busy), '창 뒤 채팅 화면을 가리는 정도예요. 0%면 그대로 보이고 100%면 다 가려요.', 'device'),
+      field('설정 창 폭', seg('set-editor-width', String(getPrefs().editorWidth ?? 90), [['60', '60%'], ['70', '70%'], ['80', '80%'], ['90', '90%'], ['100', '100%']], busy), '이 설정 창이 화면 가로의 몇 %를 쓸지예요. 높이는 늘 화면의 92%. 폰에서는 늘 전체 화면이에요.', 'device'),
     ].join(''))}`,
     image: `${group('캐릭터 이미지', [
       field('에셋 출력', seg('set-asset', s.assetOn ? '1' : '0', [['1', 'ON'], ['0', 'OFF']], busy), '본문에 등장하는 캐릭터의 등록 이미지를 표시하도록 이미지 태그를 적어요. 이미지와 태그 목록은 봇 카드에 들어 있어요.'),
-      s.assetOn ? field('이미지 크기', pctSlider('set-img-size', getPrefs().imgSize ?? IMG_SIZE.def, IMG_SIZE, '이미지 크기', busy), '채팅 속 캐릭터 이미지 칸의 크기예요. 100%가 원래 크기이고, 채팅 폭보다 커지지는 않아요. 이 기기의 모든 채팅에 같이 적용돼요.') : '',
-      s.assetOn ? field('이미지 접기', seg('set-img-foldon', getPrefs().imgFoldOn === false ? '0' : '1', [['1', '접기'], ['0', '펼침']], busy), '이미지를 위쪽만 보이게 접어 두고 누르거나 마우스를 올리면 펼칠지, 늘 펼쳐 둘지예요.') : '',
-      s.assetOn && getPrefs().imgFoldOn !== false ? field('접힌 높이', pctSlider('set-img-fold', getPrefs().imgFold ?? IMG_FOLD.def, IMG_FOLD, '접힌 높이', busy), '접혔을 때 그림 높이의 몇 %를 보여 줄지예요. 원래는 68%(정사각형)예요.') : '',
-      s.assetOn ? field('이미지 표시 범위', recentControl('img-show', getPrefs().imgShow, '이미지 표시 메시지 수', busy), '이미지를 띄울 메시지예요. 「최근만」이면 마지막 메시지부터 정한 개수까지만 띄워요(원래 6개). 바꾼 값은 메시지를 다시 그릴 때 반영돼요.') : '',
-      s.assetOn ? field('요청 속 이미지 태그', recentControl('img-send', getPrefs().imgSend, '태그를 남길 메시지 수', busy), '모델에 보내는 대화 기록에서 이미지 태그를 남길 메시지예요. 오래된 태그를 빼면 토큰이 줄어요. 최근 태그는 모델이 태그 쓰는 법을 따라 하도록 남겨요(원래 6개).') : '',
+      s.assetOn ? field('이미지 크기', pctSlider('set-img-size', getPrefs().imgSize ?? IMG_SIZE.def, IMG_SIZE, '이미지 크기', busy), '채팅 속 캐릭터 이미지 칸의 크기예요. 100%가 원래 크기이고, 채팅 폭보다 커지지는 않아요.', 'device') : '',
+      s.assetOn ? field('이미지 접기', seg('set-img-foldon', getPrefs().imgFoldOn === false ? '0' : '1', [['1', '접기'], ['0', '펼침']], busy), '이미지를 위쪽만 보이게 접어 두고 누르거나 마우스를 올리면 펼칠지, 늘 펼쳐 둘지예요.', 'device') : '',
+      s.assetOn && getPrefs().imgFoldOn !== false ? field('접힌 높이', pctSlider('set-img-fold', getPrefs().imgFold ?? IMG_FOLD.def, IMG_FOLD, '접힌 높이', busy), '접혔을 때 그림 높이의 몇 %를 보여 줄지예요. 원래는 68%(정사각형)예요.', 'device') : '',
+      s.assetOn ? field('이미지 표시 범위', recentControl('img-show', getPrefs().imgShow, '이미지 표시 메시지 수', busy), '이미지를 띄울 메시지예요. 「최근만」이면 마지막 메시지부터 정한 개수까지만 띄워요(원래 6개). 바꾼 값은 메시지를 다시 그릴 때 반영돼요.', 'device') : '',
+      s.assetOn ? field('요청 속 이미지 태그', recentControl('img-send', getPrefs().imgSend, '태그를 남길 메시지 수', busy), '모델에 보내는 대화 기록에서 이미지 태그를 남길 메시지예요. 오래된 태그를 빼면 토큰이 줄어요. 최근 태그는 모델이 태그 쓰는 법을 따라 하도록 남겨요(원래 6개).', 'device') : '',
       s.assetOn ? field('출력 모델', seg('set-asset-model', s.assetModel, [['main', '메인모델'], ['aux', '보조모델']], busy), '메인모델은 본문과 함께 적고, 보조모델은 응답이 끝난 뒤 한 번 더 불러 태그를 보충해요.') : '',
       s.assetOn ? field('이미지 지침', `<button class="gx-mini" data-action="ed-open" data-value="guide:Image">${ICONS.pen}지침 편집</button>`, '카드 로어북 대신 플러그인이 만드는 이미지 태그 지침이에요. 지침 틀, 출력 대상 캐릭터(명부에서 자동), 표정 세트를 여기서 관리해요.') : '',
       s.assetOn ? field('주인공 이미지', seg('set-asset-player', s.assetPlayer ? '1' : '0', [['1', 'ON'], ['0', 'OFF']], busy), '「캐릭터로 플레이」로 고른 요원(내가 연기하는 주인공)에게도 이미지 태그를 붙일지예요. 끄면 페르소나처럼 주인공 이미지는 띄우지 않아요.') : '',

@@ -472,32 +472,6 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
   const cutins = new Map<string, HTMLImageElement>();
   if (bridge?.visit && bridge.assets) void loadFieldFx(bridge.assets, ffx, cutins);
   const inField = () => !!game?.inHub && !!bridge?.visit && !mods.blocking?.() && !shell.paused;
-  /** 필드 필살 미리 보기 (전투가 아직 없어 피해는 없다): 컷인 → 흰 번쩍·흔들림·파편 */
-  const previewSuper = () => {
-    const w = game?.world;
-    if (!w || ffx.inSuper()) return;
-    const me = hq.visitor();
-    const name = me.name || '방문자';
-    const t = SUPER_TEXT[name] ?? { color: '#C8283C', name: '필살기', sub: '' };
-    const fallback = (me.agentId && visitAgentFaceCanvas(name, 60)) || testPlayerFace(60);
-    void ffx.super_({ ...t, art: cutins.get(name), art2: cutins.get(`${name}_2`), fallback, eye: { x: 0.62, y: 0.42 } }).then(() => {
-      ffx.flash('#fff', 0.1, 0.7);
-      ffx.shake(14, 0.6);
-      const p = w.player;
-      ffx.sparks_(p.x, p.y - 120, 30, t.color, 6);
-      ffx.ring(p.x, p.y, 20, 260, t.color, 0.45);
-      ffx.scorch(p.x, p.y, 160, 3);
-    });
-  };
-  const fieldFxKeys = (e: KeyboardEvent) => {
-    if ((e.code !== 'KeyS' && e.code !== 'KeyW') || e.repeat || !inField()) return;
-    const el = document.activeElement as HTMLElement | null;
-    if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable)) return;
-    previewSuper();
-    e.preventDefault();
-    e.stopImmediatePropagation();
-  };
-  window.addEventListener('keydown', fieldFxKeys, true);
   const stageStore = {
     load: () => {
       if (session.meta) return session.meta as never;
@@ -1113,7 +1087,6 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       window.removeEventListener('pointerdown', titleInput, true);
       if (openingT) clearTimeout(openingT);
       window.removeEventListener('keydown', hqKeys, true);
-      window.removeEventListener('keydown', fieldFxKeys, true);
       window.removeEventListener('keydown', floorKeys, true);
       saveFlags();
       storyRoot.removeEventListener(VIDEO_AUDIO_EVENT, attachVideoAudio);

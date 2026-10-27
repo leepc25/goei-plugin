@@ -1,4 +1,346 @@
-")];
+wood, 3, 13, 26, 5);
+      rect(g2, C2.wood, 6, 18, 3, 8);
+      rect(g2, C2.wood, 23, 18, 3, 8);
+    },
+    bin: (g2) => {
+      poly(g2, C2.metal, [8, 9, 24, 9, 22, 29, 10, 29]);
+      rect(g2, C2.dark, 7, 6, 18, 3);
+    },
+    crate: (g2) => {
+      rect(g2, C2.wood, 5, 6, 22, 22);
+      line(g2, "#7a5a3a", 2, [5, 6, 27, 28]);
+      line(g2, "#7a5a3a", 2, [27, 6, 5, 28]);
+    },
+    drawer: (g2) => {
+      rect(g2, C2.wood, 6, 4, 20, 25);
+      for (const y of [7, 15, 23]) rect(g2, "#7a5a3a", 8, y, 16, 5);
+    },
+    mailbox: (g2) => {
+      rect(g2, C2.metal, 5, 5, 22, 22);
+      for (const x of [7, 17]) for (const y of [7, 16]) rect(g2, C2.dark, x, y, 8, 3);
+    },
+    barrel: (g2) => {
+      rect(g2, C2.red, 9, 5, 14, 23);
+      rect(g2, C2.dark, 9, 10, 14, 2);
+      rect(g2, C2.dark, 9, 21, 14, 2);
+      poly(g2, C2.cash, [16, 13, 19, 19, 13, 19]);
+    },
+    locker: (g2) => {
+      rect(g2, "#5d7a6b", 8, 3, 16, 26);
+      rect(g2, C2.white, 12, 7, 8, 4);
+      rect(g2, C2.dark, 20, 15, 2, 5);
+    },
+    crackedwall: (g2) => {
+      rect(g2, "#6e6a64", 3, 3, 26, 26);
+      line(g2, "#2b2a28", 2, [16, 3, 13, 12, 18, 17, 14, 29]);
+      line(g2, "#2b2a28", 1, [13, 12, 7, 15]);
+    },
+    // 상인
+    madeokhee: (g2) => {
+      rect(g2, C2.cash, 6, 12, 20, 14);
+      circ(g2, C2.dark, 16, 19, 3);
+      rect(g2, C2.dark, 12, 7, 8, 5);
+    },
+    backalley: (g2) => {
+      rect(g2, C2.white, 6, 6, 20, 20);
+      rect(g2, C2.red, 14, 9, 4, 14);
+      rect(g2, C2.red, 9, 14, 14, 4);
+    },
+    shinyuri: (g2) => {
+      rect(g2, "#7aa35a", 5, 9, 22, 14);
+      rect(g2, "#5b8040", 5, 13, 22, 3);
+      circ(g2, C2.white, 16, 16, 3);
+    },
+    vending: (g2) => {
+      rect(g2, "#4b6c8f", 7, 3, 18, 26);
+      rect(g2, "#9fc1df", 9, 6, 10, 14);
+      rect(g2, C2.dark, 21, 8, 2, 6);
+      rect(g2, C2.dark, 10, 23, 12, 3);
+    }
+  };
+  var thinImgs = /* @__PURE__ */ new Map();
+  function drawItemIcon(ctx, id, x, y, size2) {
+    const all = typeof window !== "undefined" ? window.__GOEI_ITEM_ART__ : void 0;
+    const a = all?.[id];
+    if (a && a.w > a.h * 2.2 && size2 <= 72 && a.src) {
+      const src = a.src;
+      let im = thinImgs.get(src);
+      if (!im) thinImgs.set(src, im = Object.assign(new Image(), { src }));
+      if (!im.complete || !im.naturalWidth) {
+        im.addEventListener("load", () => drawItemIcon(ctx, id, x, y, size2), { once: true });
+        return;
+      }
+      const k = size2 * 1.3 / a.w;
+      ctx.save();
+      ctx.imageSmoothingEnabled = false;
+      ctx.translate(x + size2 / 2, y + size2 / 2);
+      ctx.rotate(-Math.PI / 4);
+      ctx.drawImage(im, -a.w * k / 2, -a.h * k / 2, a.w * k, a.h * k);
+      ctx.restore();
+      return;
+    }
+    if (drawItemArt(ctx, id, x, y, size2)) return;
+    if (a) {
+      const src = a.src;
+      if (src) {
+        const im = new Image();
+        im.onload = () => drawItemIcon(ctx, id, x, y, size2);
+        im.src = src;
+      }
+      return;
+    }
+    const d3 = ICONS2[id];
+    if (!d3) return;
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(size2 / 32, size2 / 32);
+    d3(ctx);
+    ctx.restore();
+  }
+
+  // src/game/action/items/engine.ts
+  var TICK = 30;
+  var react = (knockdown, kb) => knockdown ? "down" : kb >= 140 ? "stagger" : "flinch";
+  function itemHit(e, sourceX) {
+    return {
+      attackId: newAttackId(),
+      x0: e.x,
+      x1: e.x,
+      z0: 0,
+      z1: 0,
+      y: e.y,
+      dmg: e.damage,
+      react: react(e.knockdown, e.knockback),
+      dir: e.x < sourceX ? -1 : 1,
+      push: e.knockback / TICK,
+      armorBreak: e.armorBreak
+    };
+  }
+  function toGameEvents(events, x, ammo = 0) {
+    const out = [];
+    for (const e of events) {
+      switch (e.t) {
+        case "pickup":
+          out.push({ type: e.kind === "heal" ? "heal" : "pickup", x: e.x, id: e.ref ?? e.kind });
+          break;
+        case "equip":
+          out.push({ type: "pickup", x, id: e.weapon });
+          break;
+        case "lift":
+          out.push({ type: "pickup", x, id: e.prop });
+          break;
+        case "use":
+          out.push({ type: e.effect.type === "heal" || e.effect.type === "cure" ? "heal" : "item", x, id: e.id });
+          break;
+        case "shot":
+          out.push({ type: "shot", x: e.x, ammo });
+          break;
+        case "dry":
+          out.push({ type: "empty", x });
+          break;
+        case "reload":
+          out.push({ type: "reload", x });
+          break;
+        case "throw":
+          out.push({ type: "whiff", x });
+          break;
+        case "break":
+        case "burst":
+        case "weaponBreak":
+        case "full":
+        case "drop":
+          out.push({ type: "custom", name: "item:" + e.t, data: e });
+          break;
+      }
+    }
+    return out;
+  }
+
+  // src/game/action/items/link.ts
+  var ENEMY_WEAPONS = {
+    fb_smg: { p: 0.3, pool: ["smg"] },
+    fb_sword: { p: 0.5, pool: ["katana"] },
+    fb_chief: { p: 0.35, pool: ["servicepistol", "shotgun"] },
+    fb_shield: { p: 0.2, pool: ["pipe"] },
+    dd_member: { p: 0.1, pool: ["kitchenknife"] }
+  };
+  var COMMON_RELICS = ["scrap", "oddcoin", "tooth", "photo"];
+  function spawnEnemyDrops(field, run, drops, x, y, kind = "") {
+    const ev = [];
+    const put3 = (k, ref, amount = 1) => {
+      spawnPickup(field, k, x, y, ref, amount);
+      ev.push({ t: "drop", kind: k, ref, x, y });
+    };
+    for (const d3 of drops) {
+      if (!Number.isSafeInteger(d3.n) || d3.n <= 0) continue;
+      switch (d3.item) {
+        case "cash": {
+          const parts = Math.min(4, Math.max(1, Math.ceil(d3.n / 10)));
+          let left = d3.n;
+          for (let i = 0; i < parts; i++) {
+            const k = i === parts - 1 ? left : Math.ceil(d3.n / parts);
+            left -= k;
+            if (k > 0) put3("cash", void 0, k);
+          }
+          break;
+        }
+        case "shard":
+          for (let i = 0; i < d3.n; i++) put3("shard");
+          break;
+        case "heal":
+          for (let i = 0; i < d3.n; i++) put3("heal");
+          break;
+        case "ammo":
+          if (usesAmmo(run)) for (let i = 0; i < d3.n; i++) put3("ammo");
+          else put3("cash", void 0, 4 * d3.n);
+          break;
+        case "relic":
+          for (let i = 0; i < d3.n; i++) put3("relic", COMMON_RELICS[Math.floor(rand(field) * COMMON_RELICS.length)]);
+          break;
+        case "dream":
+          for (let i = 0; i < d3.n; i++) put3("relic", "dreamcatcher");
+          break;
+        case "key":
+          for (let i = 0; i < d3.n; i++) put3("relic", "rustkey");
+          break;
+      }
+    }
+    if (usesAmmo(run) && run.mag + run.reserve < 8 && rand(field) < 0.25) put3("ammo");
+    const w = ENEMY_WEAPONS[kind];
+    if (w && rand(field) < w.p) put3("weapon", w.pool[Math.floor(rand(field) * w.pool.length)]);
+    return ev;
+  }
+  function strikeProps(field, run, hits, seen2, targets = []) {
+    const ev = [];
+    if (!hits.length) return ev;
+    for (const e of field.ents.slice()) {
+      if (e.type !== "prop" || !field.ents.includes(e)) continue;
+      const d3 = PROPS[e.prop];
+      if (d3.use === "throw") continue;
+      for (const h of hits) {
+        const key2 = h.attackId + ":" + e.id;
+        if (seen2.has(key2)) continue;
+        if (h.x1 < e.x - d3.w / 2 || h.x0 > e.x + d3.w / 2 || h.z0 > d3.h + 110 || h.z1 < 0 || Math.abs(h.y - e.y) > (h.dy ?? 18) + 24) continue;
+        seen2.add(key2);
+        ev.push(...damageProp(field, run, e, Math.max(6, h.dmg), targets));
+        break;
+      }
+    }
+    if (seen2.size > 400) seen2.clear();
+    return ev;
+  }
+  function furnishFloor(field, floor, lane, r = () => rand(field)) {
+    const pick6 = (a) => a[Math.floor(r() * a.length)];
+    const end = Number.isFinite(floor.exitX) ? floor.exitX : floor.length - 80;
+    const x0 = (floor.startX ?? 200) + 260, x1 = Math.max(x0 + 200, Math.min(end, floor.length - 80) - 160);
+    const taken = (floor.props ?? []).map((p) => [p.x - (p.w ?? 40) / 2 - 60, p.x + (p.w ?? 40) / 2 + 60]);
+    const spot = () => {
+      for (let i = 0; i < 12; i++) {
+        const x = x0 + r() * (x1 - x0);
+        if (!taken.some(([a, b]) => x > a && x < b)) {
+          taken.push([x - 90, x + 90]);
+          return x;
+        }
+      }
+      return null;
+    };
+    const front = lane[1] - 20, back = lane[0] + 10;
+    const put3 = (id, y) => {
+      const x = spot();
+      if (x !== null) placeProp(field, id, x, y);
+    };
+    put3(pick6(["chair", "bin", "pot"]), front - r() * 40);
+    put3(pick6(["tv", "extinguisher", "table", "chair"]), front - 20 - r() * 40);
+    put3(pick6(["crate", "crate", "drawer", "mailbox"]), back);
+    put3(pick6(["barrel", "locker", "crate"]), back + r() * 20);
+    const wx = spot();
+    if (wx !== null) {
+      const p = spawnPickup(field, "weapon", wx, (lane[0] + lane[1]) / 2, pick6(Object.keys(WEAPONS).filter((id) => id !== "katana" && id !== "smg")));
+      Object.assign(p, { vx: 0, vy: 0, vz: 0, z: 0 });
+    }
+  }
+
+  // src/game/action/items/shopPanel.ts
+  var CSS = `
+.gi-shop{position:absolute;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;z-index:30;padding:12px;box-sizing:border-box;pointer-events:auto;font-family:system-ui,-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;color:#e8ecee}
+.gi-shop[hidden]{display:none}
+.gi-shop .panel{background:#1b2226;border:1px solid #3a464d;border-radius:14px;width:min(560px,100%);max-height:100%;overflow:auto;padding:14px 16px;box-sizing:border-box}
+.gi-shop header{display:flex;align-items:center;gap:10px}
+.gi-shop header div{display:flex;flex-direction:column}
+.gi-shop header small{color:#8a969c}
+.gi-shop .cash{margin-left:auto;color:#e6d36a;font-weight:700}
+.gi-shop .say{color:#cfd6da;margin:10px 0}
+.gi-shop h4{margin:14px 0 6px;color:#8a969c;font-size:13px}
+.gi-shop .row{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:#232d32;border:1px solid #33404a;border-radius:10px;color:inherit;font:inherit;padding:8px 10px;margin:0 0 6px;cursor:pointer}
+.gi-shop .row:disabled{opacity:.45;cursor:default}
+.gi-shop .row.sel{border-color:#e6d36a}
+.gi-shop .t{display:flex;flex-direction:column;flex:1;min-width:0}
+.gi-shop .t small{color:#8a969c;font-size:12px}
+.gi-shop .p{display:flex;flex-direction:column;align-items:flex-end;color:#e6d36a;font-weight:700;white-space:nowrap}
+.gi-shop .p small{color:#8a969c;font-weight:400;font-size:11px}
+.gi-shop .msg{min-height:20px;color:#9fd9a6;margin:8px 0}
+.gi-shop footer{display:flex;justify-content:flex-end}
+.gi-shop footer button{font:inherit;padding:8px 16px;border-radius:8px;border:1px solid #4a565d;background:#2c383e;color:#e8ecee;cursor:pointer}
+`;
+  var WHY = { cash: "현금이 모자라", stock: "품절", full: "1~4칸이 가득", ammoFull: "탄이 가득", loan: "빚부터 갚아" };
+  function createShopPanel(root) {
+    if (!document.getElementById("gi-shop-css")) {
+      const s2 = document.createElement("style");
+      s2.id = "gi-shop-css";
+      s2.textContent = CSS;
+      document.head.appendChild(s2);
+    }
+    const box2 = document.createElement("div");
+    box2.className = "gi-shop";
+    box2.hidden = true;
+    root.appendChild(box2);
+    let cur = null;
+    let sel = 0;
+    let msg = "";
+    const render = () => {
+      if (!cur) return;
+      const { shop, run } = cur;
+      const v = VENDORS[shop.vendor];
+      const icon2 = (o) => o.kind === "ammo" ? "ammo-" + o.ref : o.kind === "clinic" ? "backalley" : o.kind === "loan" ? "shinyuri" : o.kind === "gamble" ? "vending" : o.ref;
+      const rows = shop.offers.map(
+        (o) => `<button class="row" data-k="${o.key}" ${o.stock <= 0 ? "disabled" : ""}><canvas width="40" height="40" data-icon="${icon2(o)}"></canvas>
+        <span class="t"><b>${o.name}</b><small>${o.desc}</small></span>
+        <span class="p">${o.kind === "loan" ? "빌리기" : o.hpCost ? "체력 20%" : o.price + "원"}<small>${o.stock <= 0 ? "품절" : o.kind === "loan" ? "" : "남음 " + o.stock}</small></span></button>`
+      ).join("");
+      const bag = shop.buys ? `<h4>회수물 팔기</h4>${run.bag.map((b, i) => b ? `<button class="row" data-sell="${i}"><canvas width="40" height="40" data-icon="${b.id}"></canvas><span class="t"><b>${b.name}</b></span><span class="p">${sellPrice(shop, b.value)}원</span></button>` : "").join("") || '<p class="say">가방이 비었다</p>'}` : "";
+      box2.innerHTML = `<div class="panel"><header><canvas width="44" height="44" data-icon="${shop.vendor}"></canvas><div><b>${v.name}</b><small>${v.title}</small></div><span class="cash">현금 ${run.cash}${run.debt ? ` · 빚 ${run.debt}` : ""}</span></header>
+      <p class="say">「${shop.greet}」</p>${rows}${bag}<p class="msg">${msg}</p><footer><button data-close>나가기</button></footer></div>`;
+      box2.querySelectorAll("canvas[data-icon]").forEach((c) => drawItemIcon(c.getContext("2d"), c.dataset.icon, 0, 0, c.width));
+      const list = [...box2.querySelectorAll(".row")];
+      sel = Math.max(0, Math.min(sel, list.length - 1));
+      list[sel]?.classList.add("sel");
+    };
+    const press = (b) => {
+      if (!cur) return;
+      if (b.dataset.close !== void 0) return close();
+      if (b.dataset.sell !== void 0) {
+        msg = `${sell(cur.shop, cur.run, +b.dataset.sell)}원 받음`;
+        return render();
+      }
+      const k = b.dataset.k;
+      if (!k) return;
+      const r = buy2(cur.shop, cur.run, k, cur.context?.());
+      if (r.ok) {
+        cur.onBuy(r);
+        msg = `받음: ${r.got}`;
+      } else msg = r.message ?? (r.currency === "hp" ? "체력이 모자라거나 체력 거래를 사용할 수 없다" : WHY[r.why]);
+      render();
+    };
+    box2.addEventListener("click", (e) => {
+      const b = e.target.closest("button");
+      if (b) press(b);
+    });
+    const onKey = (e) => {
+      if (!cur) return;
+      e.stopImmediatePropagation();
+      e.preventDefault();
+      if (e.repeat) return;
+      const list = [...box2.querySelectorAll(".row")];
       if (e.code === "Escape" || e.code === "KeyQ") close();
       else if (e.code === "ArrowDown" || e.code === "ArrowUp") {
         sel = (sel + (e.code === "ArrowDown" ? 1 : list.length - 1)) % Math.max(1, list.length);
@@ -4606,338 +4948,4 @@
         const fixed2 = floorSolids();
         if (solids.length || fixed2.length) {
           const bodies = [p, ...w.bodies].filter((b) => b.alive && b.kind !== "bullet" && b.kind !== "item" && b.team !== "neutral" && !b.kind.startsWith("proj"));
-          const views = bodies.map((b) => ({ x: b.x, y: b.y, z: b.z, px: b === p ? p.px : lastX.get(b) }));
-          const stuck = blockByProps(views, [...solids, ...fixed2], w.lane);
-          bodies.forEach((b, i) => {
-            b.x = views[i].x;
-            b.y = views[i].y;
-            lastX.set(b, b.x);
-          });
-          ents.forEach((e, i) => {
-            const n = stuck.has(i) ? (overlapT.get(e) ?? 0) + 1 : 0;
-            overlapT.set(e, n);
-            if (n > TICK_HZ / 2) nudgeProp(solids[i], bodies, solids, 40, (w.floor?.length ?? 99999) - 40), e.x = solids[i].x, overlapT.set(e, 0);
-          });
-        }
-        syncCarry();
-        recordInventory();
-        w.notes.held = ir.held ? { name: WEAPONS[ir.held.id].name, uses: ir.held.uses, max: WEAPONS[ir.held.id].uses } : null;
-      },
-      draw(c, camX) {
-        for (const e of field.ents) {
-          if (e.type === "prop") {
-            const d3 = PROPS[e.prop];
-            const s2 = Math.max(d3?.w ?? 60, d3?.h ?? 60);
-            c.fillStyle = "rgba(0,0,0,0.3)";
-            c.beginPath();
-            c.ellipse(e.x - camX, e.y, s2 * 0.4, 6, 0, 0, Math.PI * 2);
-            c.fill();
-            if (e.flash > 0) c.globalAlpha = 0.6;
-            if (!drawPropArt(c, `item_${e.prop}`, d3?.name, e.x - camX, e.y) && !drawPropSized(c, e.prop, e.x - camX, e.y)) drawItemIcon(c, e.prop, e.x - camX - s2 / 2, e.y - s2, s2);
-            c.globalAlpha = 1;
-            continue;
-          }
-          if (e.type !== "pickup") continue;
-          const x = e.x - camX;
-          const y = e.y - e.z;
-          c.fillStyle = "rgba(0,0,0,0.3)";
-          c.beginPath();
-          c.ellipse(x, e.y, 14, 5, 0, 0, Math.PI * 2);
-          c.fill();
-          const bob = Math.sin((w.tick + e.id * 7) / 6) * 3;
-          const id = e.ref ?? e.kind;
-          if (!drawFloorArt(c, id, x, y - 4 + bob)) drawItemIcon(c, id, x - 14, y - 34 + bob, 28);
-        }
-        for (const pj of field.projs) {
-          c.fillStyle = "#d8e0e4";
-          if (pj.kind === "prop" && pj.ref) {
-            if (!drawPropSized(c, pj.ref, pj.x - camX, pj.y - pj.z + (PROPS[pj.ref]?.h ?? 56) / 2)) drawItemIcon(c, pj.ref, pj.x - camX - 28, pj.y - pj.z - 28, 56);
-          } else c.fillRect(pj.x - camX - 5, pj.y - pj.z - 5, 10, 10);
-        }
-        for (const z of field.zones) {
-          c.strokeStyle = z.kind === "salt" ? "rgba(240,240,240,0.6)" : "rgba(160,170,180,0.5)";
-          c.lineWidth = 3;
-          c.beginPath();
-          c.ellipse(z.x - camX, z.y, z.r, z.r * 0.35, 0, 0, Math.PI * 2);
-          c.stroke();
-        }
-      },
-      bodiesHit(_b) {
-      }
-    };
-  }
-
-  // src/game/action/engine/render.ts
-  var lerp2 = (a, b, t) => a + (b - a) * t;
-  function makeRenderer(ctx, art5, opt) {
-    const ghosts = [];
-    function background(w, camX) {
-      const f = w.floor;
-      const pal = f.palette ?? { wall: "#2b343a", floor: "#3a4247", accent: "#5b6a72" };
-      const [top] = w.lane;
-      ctx.fillStyle = "#0d1114";
-      ctx.fillRect(0, 0, SCREEN_W, SCREEN_H);
-      if (f.drawBackground) {
-        ctx.save();
-        ctx.translate(-camX, 0);
-        f.drawBackground(ctx, camX);
-        ctx.restore();
-        return;
-      }
-      const wallTop = 110;
-      ctx.fillStyle = pal.wall;
-      ctx.fillRect(0, wallTop, SCREEN_W, top - wallTop - 20);
-      const step4 = 320;
-      for (let x = Math.floor(camX / step4) * step4; x < camX + SCREEN_W + step4; x += step4) {
-        const sx = x - camX;
-        ctx.fillStyle = "rgba(0,0,0,0.22)";
-        ctx.fillRect(sx, wallTop, 26, top - wallTop - 20);
-        ctx.fillStyle = pal.accent;
-        ctx.globalAlpha = 0.35;
-        ctx.fillRect(sx + 70, wallTop + 70, 150, 90);
-        ctx.globalAlpha = 1;
-        ctx.fillStyle = "rgba(255,255,255,0.05)";
-        ctx.fillRect(sx + 26, wallTop, 6, top - wallTop - 20);
-      }
-      ctx.fillStyle = "rgba(0,0,0,0.35)";
-      ctx.fillRect(0, top - 34, SCREEN_W, 14);
-      const g2 = ctx.createLinearGradient(0, top - 20, 0, SCREEN_H);
-      g2.addColorStop(0, pal.floor);
-      g2.addColorStop(1, "#1a1f22");
-      ctx.fillStyle = g2;
-      ctx.fillRect(0, top - 20, SCREEN_W, SCREEN_H - top + 20);
-      ctx.strokeStyle = "rgba(255,255,255,0.05)";
-      ctx.lineWidth = 2;
-      for (let x = Math.floor(camX / 160) * 160; x < camX + SCREEN_W + 400; x += 160) {
-        const sx = x - camX;
-        ctx.beginPath();
-        ctx.moveTo(sx, top - 20);
-        ctx.lineTo(sx - (SCREEN_W / 2 - sx) * 0.35, SCREEN_H);
-        ctx.stroke();
-      }
-      for (const y of [top + 30, top + 90, top + 160]) {
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(SCREEN_W, y);
-        ctx.stroke();
-      }
-      const ex = (f.exitX ?? f.length - 80) - camX;
-      if (Number.isFinite(ex) && ex > -100 && ex < SCREEN_W + 100) {
-        ctx.fillStyle = "rgba(80,200,120,0.18)";
-        ctx.fillRect(ex, wallTop + 120, 90, top - wallTop - 140);
-        ctx.fillStyle = "#7fe0a0";
-        ctx.font = pfont(22).f;
-        ctx.fillText("출구", ex + 22, wallTop + 110);
-      }
-    }
-    function drawProps(w, camX, list = w.props) {
-      for (const p of list) {
-        const sx = p.x - camX;
-        if (sx < -p.w - 200 || sx > SCREEN_W + p.w + 200) continue;
-        if (p.kind === "hubdoor" || p.kind === "hubspot") continue;
-        if (p.actor) {
-          const a = p.actor;
-          const list2 = art5.clips[a.clip ?? "idle"];
-          const fr = list2 ? Math.floor(w.tick / 5) % list2.length : 0;
-          ctx.save();
-          if (a.hue) ctx.filter = `hue-rotate(${a.hue}deg) saturate(1.3)`;
-          const ok = sprite(a.clip ?? "idle", fr, 0, sx, p.y, a.face ?? -1);
-          ctx.restore();
-          if (!ok) {
-            ctx.fillStyle = "#59636a";
-            ctx.fillRect(sx - 20, p.y - 200, 40, 200);
-          }
-          continue;
-        }
-        if (p.kind === "item" && drawSupply(ctx, p.label, sx, p.y, w.tick)) continue;
-        if (!drawPropArt(ctx, p.kind, p.label, sx, p.y, w.floor.type) && w.showBoxes) {
-          ctx.fillStyle = p.kind === "door" || p.kind === "elevator" ? "#4d5b63" : p.kind === "pickup" ? "#c9a640" : "#59636a";
-          ctx.fillRect(sx - p.w / 2, p.y - p.h, p.w, p.h);
-          ctx.strokeStyle = "rgba(0,0,0,0.5)";
-          ctx.strokeRect(sx - p.w / 2, p.y - p.h, p.w, p.h);
-        }
-      }
-    }
-    let ghostK = 1;
-    function sprite(clip, frame2, origin, x, y, dir, alpha = 1) {
-      const list = art5.clips[clip];
-      const fi = list?.[Math.min(frame2, list.length - 1)];
-      if (!fi || !art5.atlas) return false;
-      ctx.save();
-      ctx.globalAlpha = alpha * ghostK;
-      snapTo(ctx, x, y);
-      if (dir < 0) ctx.scale(-1, 1);
-      const P = PIXEL * spr(y);
-      ctx.drawImage(art5.atlas, fi.sx, fi.sy, fi.w, fi.h, (fi.ox - origin) * P, fi.oy * P, fi.w * P, fi.h * P);
-      ctx.restore();
-      return true;
-    }
-    function grayBody(b, ox, oy) {
-      const fr = b.frame();
-      ctx.fillStyle = b.team === "enemy" ? "#7a848b" : "#9aa6ad";
-      for (const h of fr.hurt) ctx.fillRect(h.x0 - ox, h.y - h.z1 - oy, h.x1 - h.x0, h.z1 - h.z0);
-    }
-    let drawCam = 0;
-    function drawPlayer(p, x, y, z, w) {
-      if (p.ally) sprite(p.ally.clip, p.ally.f, 0, x + (p.ally.x - p.x), y + (p.ally.y - p.y), p.ally.dir);
-      const a = p.anim();
-      if (p instanceof EileenPlayer && !p.seat) {
-        p.drawSelf(ctx, drawCam);
-        return;
-      }
-      if (drawTestPlayer(ctx, a.clip, a.frame, p.clipLen(a.clip), x, y - z, p.dir)) return;
-      const blink = p.invuln > 0 && w.tick % 4 < 2 ? 0.5 : 1;
-      if (!sprite(a.clip, a.frame, a.origin, x, y - z, p.dir, blink)) {
-        ctx.fillStyle = "#c0453a";
-        ctx.fillRect(x - 20, y - z - 190, 40, 190);
-      }
-      const held = p.heldAt();
-      if (held && p.carry && w.drawHeld) w.drawHeld(ctx, p.carry, x + p.dir * held.dx, y - z - held.dz, held.deg, p.dir);
-      if (p.moveKey === "evade" || p.moveKey === "dash" || p.running && w.tick % 3 === 0) {
-        if (w.tick % 2 === 0) ghosts.push({ x: p.x, y: p.y - p.z, clip: a.clip, frame: a.frame, origin: a.origin, dir: p.dir, t: 8 });
-      }
-    }
-    function drawFx(w, camX) {
-      for (const f of w.fxs) {
-        const k = f.t / f.life;
-        const sx = f.x - camX;
-        const sy = f.y - f.z;
-        ctx.save();
-        switch (f.kind) {
-          case "spark":
-          case "spark-big": {
-            const big = f.kind === "spark-big";
-            const n = big ? 12 : 8;
-            const r = (big ? 150 : 90) * (0.45 + k);
-            if (k < 0.6) {
-              ctx.fillStyle = `rgba(255,255,255,${0.95 - k * 1.5})`;
-              ctx.beginPath();
-              ctx.arc(sx, sy, (big ? 64 : 40) * (1 - k * 0.8), 0, Math.PI * 2);
-              ctx.fill();
-            }
-            ctx.strokeStyle = k < 0.3 ? "#ffffff" : "#ffd36a";
-            ctx.lineWidth = big ? 11 : 8;
-            for (let i = 0; i < n; i++) {
-              const an = i / n * Math.PI * 2 + f.seed % 10;
-              ctx.beginPath();
-              ctx.moveTo(sx + Math.cos(an) * r * 0.3, sy + Math.sin(an) * r * 0.3);
-              ctx.lineTo(sx + Math.cos(an) * r, sy + Math.sin(an) * r);
-              ctx.stroke();
-            }
-            if (k < 0.35) {
-              ctx.fillStyle = "#ffffff";
-              ctx.beginPath();
-              ctx.arc(sx, sy, f.kind === "spark" ? 14 : 26, 0, Math.PI * 2);
-              ctx.fill();
-            }
-            break;
-          }
-          case "ring": {
-            const s2 = Number(f.text ?? 2);
-            ctx.strokeStyle = `rgba(255,240,200,${1 - k})`;
-            ctx.lineWidth = s2 >= 3 ? 8 : 4;
-            ctx.beginPath();
-            ctx.ellipse(sx, sy, (s2 >= 3 ? 150 : 80) * k + 10, (s2 >= 3 ? 90 : 50) * k + 6, 0, 0, Math.PI * 2);
-            ctx.stroke();
-            break;
-          }
-          case "boom": {
-            const D3 = 8;
-            const r = 30 + 110 * Math.min(1, k * 2.2);
-            const fade = 1 - k;
-            const cols = k < 0.15 ? ["#ffffff", "#fff3b0", "#ffd24a"] : k < 0.5 ? ["#fff0a0", "#ffb43c", "#e0601e"] : ["#ff9a3c", "#b8401a", "#4a2a22"];
-            const rnd3 = (i) => {
-              const v = Math.sin(f.seed * 12.9898 + i * 78.233) * 43758.5453;
-              return v - Math.floor(v);
-            };
-            ctx.globalAlpha = Math.min(1, fade * 1.6);
-            for (let gy = -r; gy <= r; gy += D3)
-              for (let gx = -r; gx <= r; gx += D3) {
-                const an = Math.atan2(gy, gx);
-                const edge2 = r * (0.72 + 0.28 * Math.sin(an * 5 + f.seed) * Math.cos(an * 3 - f.seed * 0.7));
-                const d3 = Math.hypot(gx, gy * 1.25);
-                if (d3 > edge2) continue;
-                const t = d3 / edge2;
-                ctx.fillStyle = t < 0.4 ? cols[0] : t < 0.75 ? cols[1] : cols[2];
-                ctx.fillRect(Math.round((sx + gx) / D3) * D3, Math.round((sy + gy) / D3) * D3, D3, D3);
-              }
-            ctx.fillStyle = k < 0.4 ? "#ffd24a" : "#6a3a28";
-            for (let i = 0; i < 14; i++) {
-              const an = rnd3(i) * Math.PI * 2;
-              const dist = r * (0.9 + rnd3(i + 40) * 0.9) * Math.min(1, k * 1.6 + 0.2);
-              const sz = D3 * (rnd3(i + 80) < 0.5 ? 1 : 0.5);
-              ctx.fillRect(Math.round(sx + Math.cos(an) * dist), Math.round(sy + Math.sin(an) * dist * 0.7 + 60 * k * k), sz, sz);
-            }
-            break;
-          }
-          case "dust":
-            ctx.fillStyle = `rgba(200,200,190,${0.5 * (1 - k)})`;
-            for (let i = -1; i <= 1; i += 2) {
-              ctx.beginPath();
-              ctx.ellipse(sx + i * (20 + 50 * k), sy - 6, 22 * (1 - k * 0.5), 10, 0, 0, Math.PI * 2);
-              ctx.fill();
-            }
-            break;
-          case "flash":
-            ctx.fillStyle = "#fff6c8";
-            ctx.beginPath();
-            ctx.arc(sx, sy, 22 * (1 - k), 0, Math.PI * 2);
-            ctx.fill();
-            break;
-          case "text":
-            ctx.globalAlpha = 1 - k;
-            ctx.fillStyle = "#fff";
-            ctx.font = pfont(26).f;
-            ctx.textAlign = "center";
-            ctx.fillText(f.text ?? "", sx, sy - 30 * k);
-            break;
-        }
-        ctx.restore();
-      }
-    }
-    function boxes(w, camX) {
-      const all = [w.player, ...w.bodies];
-      const rect2 = (b, col) => {
-        ctx.strokeStyle = col;
-        ctx.lineWidth = 2;
-        ctx.strokeRect(b.x0 - camX, b.y - b.z1, b.x1 - b.x0, b.z1 - b.z0);
-        ctx.beginPath();
-        ctx.moveTo(b.x0 - camX, b.y);
-        ctx.lineTo(b.x1 - camX, b.y);
-        ctx.stroke();
-      };
-      for (const b of all) {
-        const f = b.frame();
-        for (const h of f.hurt) rect2(h, "#3dff7a");
-        for (const h of f.hit) rect2(h, h.grab ? "#ffe03d" : "#ff3d3d");
-        ctx.fillStyle = "#fff";
-        ctx.fillRect(b.x - camX - 3, b.y - 3, 6, 6);
-      }
-      ctx.fillStyle = "#ffffffcc";
-      ctx.font = "16px monospace";
-      const p = w.player;
-      ctx.fillText(`판정 보기 · ${p.state} 장 ${p.mf} · x ${p.x.toFixed(0)} y ${p.y.toFixed(0)} z ${p.z.toFixed(0)} · 틱 ${w.tick}`, 20, SCREEN_H - 16);
-    }
-    function hud(w) {
-      const p = w.player;
-      ctx.fillStyle = "rgba(0,0,0,0.55)";
-      ctx.fillRect(20, 20, 420, 92);
-      ctx.fillStyle = "#e8eef0";
-      ctx.font = pfont(20).f;
-      ctx.fillText("쟈알디", 34, 46);
-      ctx.fillStyle = "#3a2224";
-      ctx.fillRect(120, 30, 300, 18);
-      ctx.fillStyle = p.hp < p.hpMax * 0.3 ? "#ff5148" : "#e2b23c";
-      ctx.fillRect(120, 30, 300 * p.hp / p.hpMax, 18);
-      ctx.fillStyle = "#222b30";
-      ctx.fillRect(120, 54, 300, 8);
-      ctx.fillStyle = p.gauge >= 100 ? w.tick % 10 < 5 ? "#ffffff" : "#6ad0ff" : "#3f9fd6";
-      ctx.fillRect(120, 54, 3 * p.gauge, 8);
-      ctx.fillStyle = "#222b30";
-      ctx.fillRect(120, 66, 300, 5);
-      ctx.fillStyle = "#9ad08a";
-      ctx.fillRect(120, 66, 3 * p.guardMeter, 5);
-      ctx.font = pfont(16).f;
-      ctx.fillStyle = "#c9d3d8";
-      ctx.fillText("탄", 34, 98);
-      f
+          const views = bodies.map((b) => ({ x: b.x, y: b.y, z: b.z, px: b === p ? p.px : lastX

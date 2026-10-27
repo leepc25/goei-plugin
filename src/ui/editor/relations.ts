@@ -1,6 +1,7 @@
-// 세력 관계 격자 (docs/설계안_세계편집.md 2장): 행 = 보는 쪽, 열 = 대상. 칸 34px, 색 칸 + 두 글자, 첫 행·열 고정.
-// 칸을 누르면 단계 순환(적대→경계→중립→호의→우호), 아래에 메모. 「대칭」이 켜져 있으면 반대 칸도 같이. 공통 규칙은 글칸 하나.
-import { excludedOrgs, filterRelations, RELATION_LABEL, RELATION_STAGES, worldRecord, worldRecords, worldRelations, type RelationCell, type RelationStage, type WorldOverrides } from '../../core/world/records';
+// 세력 관계 (2026-10-27 새 레이아웃): 격자 대신 왼쪽에 조직 목록, 오른쪽에 「고른 조직 → 다른 조직」 한 줄씩 단계 고르기.
+// 다른 설정 페이지와 같은 줄 모양(이름 · 조작 · 설명). 「대칭」이 켜져 있으면 반대 방향도 같이. 메모는 기본이 비어 있고 쓴 것만 Faction 표 아래 Notes 로.
+import { switchHtml } from '../controls';
+import { excludedOrgs, filterRelations, PLACEHOLDER_ORGS, RELATION_LABEL, RELATION_STAGES, worldRecord, worldRecords, worldRelations, type RelationCell, type RelationStage, type WorldOverrides } from '../../core/world/records';
 import { tokenizerName } from '../../core/tokenizer';
 import { assembleFaction } from '../../core/world/faction';
 import { emptyRecord, putRecord } from '../../core/world/draft';
@@ -9,12 +10,12 @@ import { getPrefs } from '../../core/settings';
 import { savePrefs } from '../../host/prefs';
 import type { ChatContext } from '../../host/risu';
 import { directoryDraft } from '../directory';
+import { ICONS } from '../icons';
 import { edUi, setOverrides } from './index';
 
 const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 
-export const relUi = { cell: '' as string, preview: false };
-const SHORT: Record<RelationStage, string> = { hostile: '적대', wary: '경계', neutral: '', favorable: '호의', friendly: '우호' };
+export const relUi = { org: '', preview: false };
 
 const sym = () => getPrefs().relationsSym !== false;
 
@@ -34,60 +35,69 @@ function setCell(over: WorldOverrides, key: string, cell: RelationCell | null): 
   return next;
 }
 
+const seg = (key: string, cur: RelationStage) =>
+  `<div class="gx-segs gx-segs-sm">${RELATION_STAGES.map((s) => `<button class="gx-seg${cur === s ? ' on' : ''}" data-action="ed-rel-set" data-value="${esc(`${key}:${s}`)}" aria-pressed="${cur === s}">${RELATION_LABEL[s]}</button>`).join('')}</div>`;
+
 export function relationsPage(ctx: ChatContext, over: WorldOverrides, rulesOnly: boolean): string {
+  void rulesOnly;
   const d = directoryDraft(ctx);
   const recs = worldRecords('org', over);
   const excluded = excludedOrgs(recs);
   const rel = filterRelations(worldRelations(over), excluded);
-  const orgs = d.orgs.map((o) => o.name).filter((n) => !excluded.has(n));
-  // 관계도에 넣을 조직 (사용자 2026-10-27): 뺀 조직만 칩으로(누르면 다시 넣기), 빼기는 고르기 하나. 뺀 조직은 격자·Faction 관계 목록·평판 시작값에서 빠진다
-  const out = d.orgs.filter((o) => excluded.has(o.name));
-  const members = `<div class="gw-rel-members"><span>관계도에서 뺀 조직</span>${
-    out.length ? out.map((o) => `<button class="gx-chip" data-action="ed-rel-org" data-value="${esc(o.name)}" title="다시 넣기">${esc(o.name)} ✕</button>`).join('') : '<small class="gx-muted">없음</small>'
-  }<select class="gx-select" data-change="ed-rel-org" aria-label="관계도에서 뺄 조직"><option value="">빼기…</option>${orgs.map((o) => `<option value="${esc(o)}">${esc(o)}</option>`).join('')}</select></div>`;
-  const player = String(ctx.chat.scriptstate?.['$st_faction'] ?? '');
-  const playerOrg = player ? d.orgs.find((o) => o.faction === player)?.name ?? '' : '';
-  void rulesOnly; // 2026-10-27: 세력 관계와 공통 규칙은 한 화면 (아래)
-  const rulesBox = `<section class="gw-sec gw-rules-sec"><h3>공통 규칙 <small>쌍 관계가 아닌 세력 전체 규칙. Faction 지침 끝에 그대로 들어가요. {A00} 같은 자리표는 그 코드 조직의 이름으로 바뀌어요.</small></h3>
-      <textarea class="gw-rules" data-input="ed-rules" rows="14">${esc(rel.common)}</textarea>
-      <div class="gx-row-btns"><span class="gw-tokens">${tokenizerName() ? '' : '약 '}${tokens(rel.common).toLocaleString()}토큰</span><button class="gx-mini" data-action="ed-rules-reset" ${over.relations?.common === undefined ? 'disabled' : ''}>기본으로</button></div></section>`;
-  const stageOf = (a: string, b: string) => rel.pairs[`${a}>${b}`]?.stage ?? 'neutral';
-  const head = `<tr><th class="corner"><span>보는 쪽 ↓ 대상 →</span></th>${orgs.map((o) => `<th class="col${o === playerOrg ? ' me' : ''}"><span>${esc(o)}</span></th>`).join('')}</tr>`;
-  const rows = orgs
-    .map((a) => `<tr><th class="row${a === playerOrg ? ' me' : ''}">${esc(a)}</th>${orgs
-      .map((b) => {
-        if (a === b) return '<td class="self"></td>';
-        const key = `${a}>${b}`;
-        const st = stageOf(a, b);
-        const memo = rel.pairs[key]?.memo?.trim();
-        return `<td class="st-${st}${relUi.cell === key ? ' sel' : ''}${a === playerOrg || b === playerOrg ? ' me' : ''}" data-action="ed-rel-cell" data-value="${esc(key)}" title="${esc(a)} → ${esc(b)}: ${RELATION_LABEL[st]}">${SHORT[st] ? `<span>${SHORT[st]}</span>` : ''}${memo ? '<em></em>' : ''}</td>`;
-      })
-      .join('')}</tr>`)
-    .join('');
-  const sel = relUi.cell;
-  const [sa, sb] = sel.split('>');
-  const cell = sel ? rel.pairs[sel] : undefined;
-  const memoBox = sel
-    ? `<div class="gw-rel-memo"><div class="gw-rel-memo-head"><b>${esc(sa)} → ${esc(sb)}</b>
-        <div class="gx-segs gx-segs-sm">${RELATION_STAGES.map((s) => `<button class="gx-seg${(cell?.stage ?? 'neutral') === s ? ' on' : ''}" data-action="ed-rel-stage" data-value="${s}">${RELATION_LABEL[s]}</button>`).join('')}</div>
-        <button class="gx-mini" data-action="ed-rel-clear">중립으로</button></div>
-        <textarea data-input="ed-rel-memo" data-key="${esc(sel)}" rows="4" placeholder="메모 (선택). 쓰면 표 아래에 「1 → 2: 메모」 한 줄로 모델에 들어가요. 단계만으로 안 되는 것만">${esc(cell?.memo ?? '')}</textarea></div>`
-    : '<p class="gx-muted">칸을 누르면 단계가 한 단계 바뀌고, 아래에 메모 칸이 열려요.</p>';
+  const all = d.orgs.map((o) => o).filter((o) => !PLACEHOLDER_ORGS.has(o.name));
+  const included = all.filter((o) => !excluded.has(o.name));
+  if (!relUi.org || !all.some((o) => o.name === relUi.org)) relUi.org = included[0]?.name ?? all[0]?.name ?? '';
+  const sel = relUi.org;
+  const selOff = excluded.has(sel);
+  const stageOf = (a: string, b: string): RelationStage => rel.pairs[`${a}>${b}`]?.stage ?? 'neutral';
   const fac = assembleFaction(d, recs, rel);
-  return `<div class="gw-page"><header class="gw-head"><h2>세력 관계</h2>
-      <div class="gw-head-act"><label class="gw-toggle"><input type="checkbox" data-action="ed-rel-sym" ${sym() ? 'checked' : ''}> 대칭 (반대 칸도 같이)</label>
-        <button class="gx-mini${relUi.preview ? ' on' : ''}" data-action="ed-rel-preview">Faction 지침 보기</button><span class="gw-tokens">Faction ${tokenizerName() ? '' : '약 '}${tokens(fac).toLocaleString()}토큰</span></div>
-      <p class="gx-muted">행이 보는 쪽, 열이 대상이에요. 이 표 하나가 Faction 지침에 그대로 들어가고, 단계는 세력 평판 5단계와 같아 평판 시작값이 돼요. 중립은 빈 칸. ${playerOrg ? `지금 플레이 세력(${esc(playerOrg)}) 행·열은 옅게 칠했어요.` : ''}</p></header>
-    ${members}
-    <div class="gw-legend">${RELATION_STAGES.filter((s) => s !== 'neutral').map((s) => `<span class="st-${s}"><i></i>${RELATION_LABEL[s]}</span>`).join('')}<span><i class="none"></i>중립 (빈 칸)</span></div>
-    <div class="gw-grid-wrap"><table class="gw-grid"><thead>${head}</thead><tbody>${rows}</tbody></table></div>
-    ${memoBox}
-    ${relUi.preview ? `<pre class="gw-preview">${esc(fac)}</pre>` : ''}
-    ${rulesBox}
+
+  const list = all
+    .map((o) => {
+      const off = excluded.has(o.name);
+      const n = off ? 0 : included.filter((x) => x.name !== o.name && stageOf(o.name, x.name) !== 'neutral').length;
+      return `<div class="gw-rowbox${sel === o.name ? ' on' : ''}"><button class="gw-row" data-action="ed-rel-pick" data-value="${esc(o.name)}"><b>${esc(o.name)}</b><small>${esc(o.spec.english || '')}</small>${off ? '<span class="gw-badge">제외</span>' : n ? `<span class="gw-rel-n">${n}</span>` : ''}</button></div>`;
+    })
+    .join('');
+  const rows = included
+    .filter((o) => o.name !== sel)
+    .map((o) => {
+      const key = `${sel}>${o.name}`;
+      const back = stageOf(o.name, sel);
+      const memo = rel.pairs[key]?.memo ?? '';
+      return `<div class="ps-row"><div class="ps-label"><b>${esc(o.name)}</b><small>${esc(o.name)} → ${esc(sel)}: ${RELATION_LABEL[back]}</small></div>
+        <div class="ps-ctl">${seg(key, stageOf(sel, o.name))}<input class="gw-rel-memo" data-input="ed-rel-memo" data-key="${esc(key)}" value="${esc(memo)}" placeholder="메모 (선택)" autocomplete="off"></div></div>`;
+    })
+    .join('');
+  const basic = `<section class="ps-group"><h3>기본</h3><div class="ps-rows">
+      <div class="ps-row"><div class="ps-label"><b>세력 관계도에 포함</b><small>${selOff ? '관계 표·Faction 표·평판 시작값에서 빠져요 (민간인처럼 세력이 아닌 조직).' : 'Faction 지침의 관계 표에 들어가요. 조직 기록에서도 켜고 끌 수 있어요.'}</small></div>
+        <div class="ps-ctl">${switchHtml({ action: 'ed-rel-org', value: sel, on: !selOff })}</div></div>
+    </div></section>`;
+  const stages = selOff
+    ? ''
+    : `<section class="ps-group"><h3>${esc(sel)} → 다른 조직 <small>단계는 세력 평판 5단계와 같고 평판 시작값이 돼요. 설명 줄은 반대 방향.</small></h3><div class="ps-rows gw-rel-rows">${rows || '<p class="ps-note">관계도에 든 다른 조직이 없어요.</p>'}</div></section>`;
+  const rules = `<section class="ps-group"><h3>공통 규칙 <small>쌍 관계가 아닌 세력 전체 규칙. Faction 지침 끝에 그대로. {A00} 같은 자리표는 그 코드 조직의 이름으로.</small></h3><div class="ps-rows">
+      <div class="ps-row"><textarea class="gw-rules" data-input="ed-rules" rows="8">${esc(rel.common)}</textarea></div>
+      <div class="ps-row gw-rel-foot"><span class="gw-tokens">${tokenizerName() ? '' : '약 '}${tokens(rel.common).toLocaleString()}토큰</span><button class="gx-mini" data-action="ed-rules-reset" ${over.relations?.common === undefined ? 'disabled' : ''}>기본으로</button></div>
+    </div></section>`;
+  return `<div class="gw-page split">
+    <div class="gw-list-pane"><div class="gw-list-tools"><select class="gw-list-pick" data-change="ed-rel-pick" aria-label="조직 고르기">${all.map((o) => `<option value="${esc(o.name)}"${o.name === sel ? ' selected' : ''}>${esc(o.name)}${excluded.has(o.name) ? ' (제외)' : ''}</option>`).join('')}</select><span class="gw-list-title">조직 ${included.length}${all.length > included.length ? ` <small>· 제외 ${all.length - included.length}</small>` : ''}</span></div><div class="gw-list gw-rel-list">${list}</div></div>
+    <div class="gw-detail">
+      <header class="gw-head"><h2>${esc(sel)}</h2>
+        <div class="gw-head-act"><span class="gw-tokens">Faction ${tokenizerName() ? '' : '약 '}${tokens(fac).toLocaleString()}토큰</span>
+          <button class="gx-chip${sym() ? ' on' : ''}" data-action="ed-rel-sym" aria-pressed="${sym()}">대칭</button>
+          <button class="gx-mini${relUi.preview ? ' on' : ''}" data-action="ed-rel-preview">${ICONS.book}Faction 지침 보기</button></div>
+        <p class="gx-muted">고른 조직이 다른 조직을 어떻게 보는지 한 줄씩 정해요. 「대칭」이 켜져 있으면 반대 방향도 같이 바뀌어요. 표 하나가 Faction 지침에 들어가고, 메모를 쓴 줄만 표 아래 한 줄로 붙어요.</p></header>
+      ${relUi.preview ? `<pre class="gw-preview">${esc(fac)}</pre>` : ''}
+      ${basic}
+      ${stages}
+      ${rules}
+    </div>
   </div>`;
 }
 
 export function relationsInput(name: string, key: string, value: string, ctx: ChatContext): boolean {
+  void ctx;
   const over = edUi.over;
   if (name === 'ed-rules') {
     const base = worldRelations().common;
@@ -101,37 +111,29 @@ export function relationsInput(name: string, key: string, value: string, ctx: Ch
   }
   if (name === 'ed-rel-memo') {
     const rel = worldRelations(over);
-    const cur = rel.pairs[key];
-    const stage = cur?.stage ?? 'neutral';
+    const stage = rel.pairs[key]?.stage ?? 'neutral';
     const cell: RelationCell | null = stage === 'neutral' && !value.trim() ? null : { stage, ...(value.trim() ? { memo: value } : {}) };
     setOverrides(setCell(over, key, cell));
-    void ctx;
     return true;
   }
   return false;
 }
 
 export async function relationsAction(action: string, value: string | undefined, ctx: ChatContext): Promise<boolean> {
+  void ctx;
   const over = edUi.over;
-  const rel = worldRelations(over);
   switch (action) {
-    case 'ed-rel-cell': {
-      const key = value ?? '';
-      if (relUi.cell !== key) {
-        relUi.cell = key;
-        return true;
-      }
-      // 같은 칸을 다시 누르면 단계 순환
-      const cur = rel.pairs[key]?.stage ?? 'neutral';
-      const next = RELATION_STAGES[(RELATION_STAGES.indexOf(cur) + 1) % RELATION_STAGES.length];
-      return setStage(over, key, next, rel);
-    }
-    case 'ed-rel-stage':
-      if (!relUi.cell || !RELATION_STAGES.includes(value as RelationStage)) return true;
-      return setStage(over, relUi.cell, value as RelationStage, rel);
-    case 'ed-rel-clear':
-      if (relUi.cell) return setStage(over, relUi.cell, 'neutral', rel, true);
+    case 'ed-rel-pick':
+      relUi.org = value ?? '';
       return true;
+    case 'ed-rel-set': {
+      const at = (value ?? '').lastIndexOf(':');
+      if (at < 0) return true;
+      const key = value!.slice(0, at);
+      const stage = value!.slice(at + 1) as RelationStage;
+      if (!key.includes('>') || !RELATION_STAGES.includes(stage)) return true;
+      return setStage(over, key, stage, worldRelations(over));
+    }
     case 'ed-rel-sym':
       await savePrefs((p) => ({ ...p, relationsSym: sym() ? false : undefined }));
       return true;
@@ -139,12 +141,11 @@ export async function relationsAction(action: string, value: string | undefined,
       relUi.preview = !relUi.preview;
       return true;
     case 'ed-rel-org': {
-      // 조직을 관계도에 넣거나 뺀다 (조직 기록의 relOff). 격자에서 빠진 조직의 칸은 그대로 두되 쓰지 않는다
-      const name = value ?? '';
+      // 조직을 관계도에 넣거나 뺀다 (조직 기록의 relOff). 뺀 조직의 쌍은 그대로 두되 쓰지 않는다
+      const name = value || relUi.org;
       if (!name) return false;
       const rec = worldRecord('org', name, over) ?? emptyRecord();
       setOverrides(putRecord(over, 'org', name, { ...rec, relOff: !rec.relOff }));
-      if (relUi.cell.split('>').includes(name)) relUi.cell = '';
       return true;
     }
     case 'ed-rules-reset': {
@@ -156,13 +157,12 @@ export async function relationsAction(action: string, value: string | undefined,
       return true;
     }
   }
-  void ctx;
   return false;
 }
 
-function setStage(over: WorldOverrides, key: string, stage: RelationStage, rel: ReturnType<typeof worldRelations>, clearMemo = false): boolean {
+function setStage(over: WorldOverrides, key: string, stage: RelationStage, rel: ReturnType<typeof worldRelations>): boolean {
   const apply = (o: WorldOverrides, k: string): WorldOverrides => {
-    const memo = clearMemo ? '' : rel.pairs[k]?.memo ?? '';
+    const memo = rel.pairs[k]?.memo ?? '';
     const cell: RelationCell | null = stage === 'neutral' && !memo ? null : { stage, ...(memo ? { memo } : {}) };
     return setCell(o, k, cell);
   };

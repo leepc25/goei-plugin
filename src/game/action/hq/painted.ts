@@ -34,6 +34,8 @@ export interface PaintedObject {
 export interface PaintedScene {
   file: string;
   w: number;
+  /** 그림 세로. 없으면 700 (방 그림은 축척만 맞추고 세로는 그대로) */
+  h?: number;
   under: boolean;
   /** 걷는 띠 [맨 뒤, 맨 앞]. 맨 뒤는 벽선(y420)보다 조금 앞이라 발이 벽·문 그림을 뚫지 않는다 */
   lane?: [number, number];
@@ -52,6 +54,8 @@ export interface PaintedScene {
   outsideSolid?: { keep: [number, number, number, number, 'green' | 'all'][] };
   objects: PaintedObject[];
 }
+
+import { JR_ROOMS } from './jrRooms.gen';
 
 const downs = (xs: number[], y = 18): PaintedLamp[] => xs.map((x) => ({ x, y, kind: 'down' as const }));
 const sign = (x: number, y: number): PaintedLamp => ({ x, y, kind: 'sign', color: '#3cff8a', r: 34 });
@@ -168,6 +172,60 @@ export const PAINTED: Record<string, PaintedScene> = {
     windows: [],
     objects: [],
   },
+  // ── 중림 지하상가 (game-pack/jr-field, assets/gpt/중림지하상가를 tools/fit_bg700.py로 세로 700에 맞춤, 2026-10-27) ──
+  // 문은 그림 속 계단·통로 자리(문짝 없음). 막는 상자는 바닥에 튀어나온 매대·의자·상자 앞 모서리
+  jr_entry: {
+    file: 'jr_entry', w: 5521, under: false, lane: [428, 669],
+    blocks: [[80, 620, 505], [605, 665, 446], [2860, 3060, 442], [4500, 4660, 442], [5000, 5521, 528]],
+    doors: {
+      down: { x0: 4880, x1: 5000, y0: 300, y1: 505, anim: 'none', behind: 'dark' },
+      west: { x0: 0, x1: 60, y0: 420, y1: 669, anim: 'none' },
+    },
+    lamps: [], windows: [], objects: [],
+  },
+  jr_b1: {
+    file: 'jr_b1', w: 6425, under: true, lane: [428, 669],
+    blocks: [
+      [345, 485, 442], [580, 870, 490], [1690, 1950, 462], [2240, 2460, 446], [2650, 3020, 452],
+      [3740, 4110, 462], [4320, 4810, 462], [4830, 5000, 442], [5340, 5720, 452], [6000, 6160, 475],
+    ],
+    doors: {
+      up: { x0: 40, x1: 320, y0: 100, y1: 420, anim: 'none', behind: 'dark' },
+      daebak: { x0: 2970, x1: 3120, y0: 130, y1: 410, anim: 'none', behind: 'dark' },
+      songil: { x0: 5700, x1: 5840, y0: 130, y1: 400, anim: 'none', behind: 'dark' },
+      alley: { x0: 3390, x1: 3530, y0: 140, y1: 420, anim: 'none', behind: 'dark' },
+      down: { x0: 6170, x1: 6425, y0: 240, y1: 470, anim: 'none', behind: 'dark' },
+    },
+    lamps: [], windows: [], objects: [],
+  },
+  jr_alley: {
+    file: 'jr_alley', w: 6059, under: true, lane: [428, 669],
+    blocks: [
+      [80, 250, 440], [535, 625, 448], [1335, 1760, 470], [1780, 1860, 442], [1890, 2140, 446],
+      [3490, 3910, 455], [4270, 4850, 452], [5090, 5530, 442], [5490, 6059, 472],
+    ],
+    doors: {
+      b1: { x0: 2800, x1: 3070, y0: 130, y1: 420, anim: 'none', behind: 'dark' },
+      heolgap: { x0: 355, x1: 460, y0: 125, y1: 400, anim: 'none', behind: 'dark' },
+    },
+    lamps: [], windows: [], objects: [],
+  },
+  jr_b2: {
+    // 왼쪽 끝 앞쪽에 큰 상자가 화면 앞까지 나와 있어 발을 x180부터
+    file: 'jr_b2', w: 5705, under: true, lane: [428, 669],
+    floor: [[180, 428], [5705, 428], [5705, 669], [180, 669]],
+    blocks: [
+      [180, 370, 448], [615, 725, 445], [920, 1190, 432], [1315, 1700, 436], [1780, 2030, 445],
+      [2130, 2710, 442], [2960, 3270, 434], [3330, 3510, 438], [3700, 4140, 445], [5120, 5335, 435], [5590, 5705, 435],
+    ],
+    doors: {
+      up: { x0: 5400, x1: 5590, y0: 0, y1: 420, anim: 'none', behind: 'dark' },
+      youngchang: { x0: 390, x1: 580, y0: 70, y1: 395, anim: 'none', behind: 'dark' },
+    },
+    lamps: [], windows: [], objects: [],
+  },
+  // 중림 가게 안 방 6개 (tools/jr/rooms.py → jrRooms.gen.ts)
+  ...JR_ROOMS,
 };
 
 /** 문 가운데 x */

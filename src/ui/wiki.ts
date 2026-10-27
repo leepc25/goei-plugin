@@ -1,5 +1,6 @@
 // 「위키」 탭: 목록·검색·작성 화면·문서 보기. 생성은 "위키 작성 시작"·"새로고침"을 눌렀을 때만 한 번 부른다.
 // 생성은 창을 닫아도 계속되고, 끝나면 원래 채팅의 로어북에 저장한다.
+import { onOffSwitch } from './controls';
 import { factionNames, parseCatalog } from '../core/world/catalog';
 import { buildRegistry, searchRegistry, type Registry } from '../core/world/registry';
 import { hasBook, type RefSource } from '../core/refs';
@@ -335,6 +336,8 @@ function face(ctx: ChatContext, e: Entry | undefined, cls = ''): string {
 }
 
 function seg(action: string, cur: string, items: [string, string][]): string {
+  const sw = onOffSwitch(items, cur, action, (v) => v);
+  if (sw) return sw;
   return `<div class="gx-segs gx-segs-sm">${items.map(([v, label]) => `<button class="gx-seg${cur === v ? ' on' : ''}" data-action="${action}" data-value="${v}" aria-pressed="${cur === v}">${label}</button>`).join('')}</div>`;
 }
 

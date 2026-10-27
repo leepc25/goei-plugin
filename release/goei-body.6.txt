@@ -1,4 +1,9 @@
-ined carpet of unidentifiable original color, and flickering fluorescent lights buzzing with electrical interference. Layout subtly changes between visits to the same floor.
+but wrong: dust where cleaning should occur, decor frozen in an uncertain past decade, and faded, water-damaged laundry, Wi-Fi, and communal-kitchen posters.\n- On or shortly after arrival, residents find the printed Saetbyeol Goshiwon Usage Guidelines on bulletin boards, under doors, or on beds. The small-print disclaimer disclaims management responsibility for permanent physical or mental harm from noncompliance. Obtain and memorize the full document immediately upon recognizing entrapment; apparently arbitrary or contradictory rules have internal logic requiring observation.",
+          rules: "##### Recovered Usage Guidelines\n1. After 7 PM, please minimize noise to avoid disturbing other residents.\n2. There is no elevator in this goshiwon. If you discover one, immediately prostrate yourself and bow three times. This signals that the occupant in Rule 10 is in transit; he will proceed to Room 203.\n2-1. He enters Room 203 immediately after leaving the elevator. Resume normal activity afterward. Under no circumstances disturb his mood.\n4. Do not close hallway windows. Leave any open window open; closing what was open makes others uncomfortable, and disturbing residents is inadvisable.\n5. The goshiwon has five floors, no sixth floor and no basement level. Please note this for your reference.\n6. After 9 PM, do not knock on any surface, including walls or doors. An unexpected guest may answer.\n7. If singing comes from the communal bathroom after midnight, do not investigate. Return to your room and wait until morning.\n8. The third-floor vending machine sometimes dispenses unlisted items. Consume them at your own discretion.\n10. Do not approach Room 203. Its occupant is extremely sensitive and beyond management's control. If conflict occurs, run. Good luck.\n11. Do not damage shared goshiwon facilities; vandalism makes everyone angry.\n12. Spontaneous flames mean you have violated a rule. Leave the building as quickly as possible. The fire spreads slowly, but it will consume you.",
+          survival: "##### Punishment and Confirmed Escape\n- Rule violations ignite spontaneous immolation after a variable delay of seconds to several minutes. The fire spreads slowly and relentlessly, allowing recognition of the mistake. It is punishment, not conventional fire, and cannot be extinguished.\n- Severity appears to scale with the violation: minor infractions cause localized burns that can heal after survival; moderate ones cause partial immolation, sometimes survivable with rapid treatment; major ones consume the victim within minutes, with no recorded survivors.\n- The only confirmed escape is one complete cycle of 7 internal days obeying every rule without exception. At completion, the entrance unlocks normally around dawn for an estimated 10–15 minutes. Missing it restarts the cycle; multi-cycle survivors report increasing hostility each iteration.\n- Keep absolute silence during restricted hours. When Room 203 becomes audible, remain motionless until its sounds stop. Do not establish eye contact with Residents. Previous victims' belongings may contain useful information; the goshiwon wants occupants to stay, and its lure must be resisted.",
+          space: `##### Rooms and Shared Spaces
+###### Hallways and Residential Rooms
+- Narrow halls have peeling, decades-old floral wallpaper, stained carpet of unidentifiable original color, and flickering fluorescent lights buzzing with electrical interference. Layout subtly changes between visits to the same floor.
 - Each floor's functional communal bathroom sits at the corridor's end, unsettlingly clean as if recently used despite the apparent abandonment. The midnight singing rule applies here.
 - Coffin-like 2–3 pyeong rooms contain a thin mattress on a raised platform, cramped desk, inadequate desk lamp, and excessively humming mini-fridge. A single window may not open onto the exterior; thin walls transmit neighbors' breathing, movement, and mattress-spring creaks. Abandoned rooms retain victims' possessions.
 
@@ -1097,7 +1102,8 @@ ined carpet of unidentifiable original color, and flickering fluorescent lights 
     }
     return { pairs, common: overrides2?.relations?.common ?? DEFAULT_RELATIONS.common };
   }
-  var excludedOrgs = (orgs) => new Set([...orgs.entries()].filter(([, r]) => r.relOff).map(([n2]) => n2));
+  var PLACEHOLDER_ORGS = /* @__PURE__ */ new Set(["미분류"]);
+  var excludedOrgs = (orgs) => /* @__PURE__ */ new Set([...[...orgs.entries()].filter(([, r]) => r.relOff).map(([n2]) => n2), ...PLACEHOLDER_ORGS]);
   function filterRelations(rel, excluded) {
     if (!excluded.size) return rel;
     const pairs = {};
@@ -1209,8 +1215,8 @@ ${t}`);
   }
   function assembleAnomaly(rec, p, faction) {
     const title2 = rec.title || `${p.english || p.label} (${p.label})`;
-    const head2 = rec.titleRaw ? `### Instructions for the Implementation of ${title2}` : `### Instructions for the Implementation of the Anomaly - ${title2}`;
-    return [head2, ...sections(rec, ANOMALY_FIELDS, faction)].join("\n\n");
+    const head3 = rec.titleRaw ? `### Instructions for the Implementation of ${title2}` : `### Instructions for the Implementation of the Anomaly - ${title2}`;
+    return [head3, ...sections(rec, ANOMALY_FIELDS, faction)].join("\n\n");
   }
   function assembleSite(rec, p, faction) {
     const title2 = rec.title || p.english || p.label;
@@ -1218,10 +1224,10 @@ ${t}`);
   }
   function assembleOrg(rec, org, dir2, faction) {
     const title2 = rec.title || `${orgNameCbs(dir2, org)} (${org.name})`;
-    const head2 = org.faction ? `### ${title2}
+    const head3 = org.faction ? `### ${title2}
 
 [Affiliation code: ${org.faction}]` : `### ${title2}`;
-    return [head2, ...sections(rec, ORG_FIELDS, faction)].join("\n\n");
+    return [head3, ...sections(rec, ORG_FIELDS, faction)].join("\n\n");
   }
   function assembleAppendix(rec, r, faction) {
     const title2 = fieldValue(rec, "title", faction) || r.lore;
@@ -1233,7 +1239,7 @@ ${t}`);
   var VAR2 = "{{getvar::st_faction}}";
   var FACTION_INTRO = "This reference describes the world to the GM. Public labels, hidden affiliations, doctrine, and internal information are known to an NPC only through that NPC's actual access.";
   var ROSTER_INTRO = "- Purpose: GM reference for consistent character introductions before individual lore is active.\n- Detail: Use active character lore for fuller characterization.";
-  var STAGE_MARK = { hostile: "H", wary: "W", neutral: "·", favorable: "F", friendly: "A" };
+  var STAGE_MARK = { hostile: "H", wary: "W", neutral: "N", favorable: "F", friendly: "A" };
   var firstParagraph = (t) => t.trim().split(/\n\s*\n/)[0]?.trim() ?? "";
   function variantText(rec, id, pick3 = (t) => t) {
     const base = pick3(fieldValue(rec, id));
@@ -1271,7 +1277,7 @@ ${desc}`);
       if (intro) parts.push(`### ${rec.title || name}
 ${intro}`);
     }
-    const excluded = new Set([...orgs.entries()].filter(([, r]) => r.relOff).map(([n2]) => n2));
+    const excluded = excludedOrgs(orgs);
     const members = dir2.orgs.filter((o) => !excluded.has(o.name)).map((o) => o.name);
     const stageOf2 = (a, b) => {
       const c = rel.pairs[`${a}>${b}`];
@@ -1280,14 +1286,14 @@ ${intro}`);
     if (members.length > 1 && members.some((a) => members.some((b) => a !== b && stageOf2(a, b) !== "neutral"))) {
       const no = new Map(members.map((n2, i) => [n2, i + 1]));
       const legend = members.map((n2) => `${no.get(n2)} ${named2(n2)}`).join(" · ");
-      const head2 = `| viewer \\ target | ${members.map((n2) => no.get(n2)).join(" | ")} |`;
+      const head3 = `| viewer \\ target | ${members.map((n2) => no.get(n2)).join(" | ")} |`;
       const sep = `|---|${members.map(() => "---").join("|")}|`;
-      const rows2 = members.map((a) => `| ${no.get(a)} ${named2(a)} | ${members.map((b) => a === b ? "—" : STAGE_MARK[stageOf2(a, b)]).join(" | ")} |`);
+      const rows2 = members.map((a) => `| ${no.get(a)} ${named2(a)} | ${members.map((b) => a === b ? "-" : STAGE_MARK[stageOf2(a, b)]).join(" | ")} |`);
       const notes = members.flatMap((a) => members.filter((b) => a !== b && rel.pairs[`${a}>${b}`]?.memo?.trim()).map((b) => `- ${no.get(a)} → ${no.get(b)}: ${fillCodes(rel.pairs[`${a}>${b}`].memo.trim().replace(/\n+/g, " "), dir2)}`));
       parts.push(`## Faction Relations
-How the row faction regards the column faction. H hostile · W wary · · neutral · F favorable · A allied. Factions not in the table regard each other neutrally.
+How the row faction regards the column faction: H hostile, W wary, N neutral, F favorable, A allied, - self. Factions not in the table regard each other neutrally.
 Factions: ${legend}
-${head2}
+${head3}
 ${sep}
 ${rows2.join("\n")}${notes.length ? `
 Notes:
@@ -1470,7 +1476,7 @@ ${content}
       if (!wf) out.push({ key: WORLD_FOLDER_KEY, comment: "🌐세계", content: "", mode: "folder", insertorder: 100, alwaysActive: false, secondkey: "", selective: false, bookVersion: 2, [VIRTUAL]: true });
       const rel = filterRelations(worldRelations(overrides2), excludedOrgs(recs.org));
       for (const b of missingAlways) {
-        const content = b.kind === "tag" ? guideText("Tag") : b.kind === "faction" ? assembleFaction(dir2, recs.org, rel) : assembleRoster(dir2, recs.agent, recs.org);
+        const content = b.kind === "tag" ? guidePrompt("Tag") : b.kind === "faction" ? assembleFaction(dir2, recs.org, rel) : assembleRoster(dir2, recs.agent, recs.org);
         out.push({ key: "", secondkey: "", comment: b.name, content, mode: "normal", insertorder: b.order, alwaysActive: true, selective: false, useRegex: false, bookVersion: 2, folder: wkey, [VIRTUAL]: true, goeiKind: b.kind });
       }
     }
@@ -1971,18 +1977,18 @@ ${content}
   function fields2(line2) {
     const out = [];
     let cur = "";
-    let esc28 = false;
+    let esc31 = false;
     for (const c of line2) {
-      if (esc28) {
+      if (esc31) {
         cur += c === "n" ? "\n" : c === "p" ? "|" : c === "\\" ? "\\" : `\\${c}`;
-        esc28 = false;
-      } else if (c === "\\") esc28 = true;
+        esc31 = false;
+      } else if (c === "\\") esc31 = true;
       else if (c === "|") {
         out.push(cur);
         cur = "";
       } else cur += c;
     }
-    if (esc28) cur += "\\";
+    if (esc31) cur += "\\";
     out.push(cur);
     return out;
   }
@@ -2004,72 +2010,4 @@ ${content}
             nick: cut(p[3], 80),
             title: p[4],
             views: Math.max(0, Math.floor(Number(p[5]) || 0)),
-            votes: Math.max(0, Math.floor(Number(p[6]) || 0)),
-            body: p[7],
-            mine: p[8] === "1",
-            comments: []
-          };
-          st.posts.push(post);
-          map.set(id, post);
-          st.seq = Math.max(st.seq, id);
-        }
-      } else if (p[0] === "C" && p.length >= 6) {
-        const post = map.get(Number(p[1]));
-        if (post) post.comments.push({ parent: Math.max(0, Math.floor(Number(p[2]) || 0)), nick: cut(p[3], 80), body: p[4], mine: p[5] === "1", unread: p[6] === "1", ...validDate(p[7]) ? { time: validDate(p[7]) } : {} });
-      } else if (p[0] === "D" && p.length >= 4) {
-        st.dms.push({ nick: cut(p[1], 80), side: p[2] === "me" ? "me" : "npc", body: p[3], unread: p[4] === "1", date: validDate(p[5] ?? "") });
-      }
-    }
-    if (st.seq < G_POST_BASE) {
-      for (const post of st.posts) post.id += G_POST_BASE;
-      for (const s5 of Object.values(st.sources)) if (s5.postid > 0) s5.postid += G_POST_BASE;
-      st.seq += G_POST_BASE;
-    }
-    return st;
-  }
-  function encode(st) {
-    const out = ["GN1", `Q|${st.seq || G_POST_BASE}`];
-    for (const p of st.posts) {
-      out.push(["P", p.id, en(p.date), en(p.nick), en(p.title), p.views, p.votes, en(p.body), p.mine ? "1" : "0"].join("|"));
-      for (const c of p.comments) out.push(["C", p.id, c.parent, en(c.nick), en(c.body), c.mine ? "1" : "0", c.unread ? "1" : "0", en(c.time ?? "")].join("|"));
-    }
-    for (const [nick, s5] of Object.entries(st.sources)) out.push(["T", en(nick), s5.postid || 0, en(s5.title), en(s5.body), en(s5.author), en(s5.quote), en(s5.quoteAuthor)].join("|"));
-    for (const d of st.dms) out.push(["D", en(d.nick), d.side, en(d.body), d.unread ? "1" : "0", en(d.date)].join("|"));
-    return out.join("\n");
-  }
-  function readGnet(chat) {
-    return decode(chat.scriptstate?.[GN_RAW]);
-  }
-  function snapshotKey(st) {
-    return JSON.stringify([st.seq, st.posts.map((p) => [p.id, p.nick, p.title, p.body, p.date, p.mine, p.views, p.votes, p.comments.map((c) => [c.parent, c.nick, c.body, c.mine])])]);
-  }
-  var postHead = (p) => JSON.stringify([p.id, p.nick, p.title, p.body, p.date, p.mine]);
-  var commentKey = (c) => JSON.stringify([c.parent, c.nick, c.body, c.mine]);
-  function postKey(p) {
-    return p ? JSON.stringify([p.id, p.nick, p.title, p.body, p.date, p.mine, p.comments.map((c) => [c.parent, c.nick, c.body, c.mine])]) : "";
-  }
-  function findPost(st, id) {
-    return st.posts.find((p) => p.id === id);
-  }
-  function dateNow(chat) {
-    const minute = readWorld(chat).minute;
-    const p = (n2) => String(n2).padStart(2, "0");
-    if (minute !== null && minute > 0) {
-      const d = new Date(minute * 6e4);
-      return `${d.getUTCFullYear()}.${p(d.getUTCMonth() + 1)}.${p(d.getUTCDate())} ${p(d.getUTCHours())}:${p(d.getUTCMinutes())}`;
-    }
-    const msgs3 = chat.message ?? [];
-    for (let i = msgs3.length - 1; i >= 0; i--) {
-      const m = msgs3[i];
-      if (m.role !== "char" || typeof m.data !== "string") continue;
-      const t = /\[▣\s*\|\s*(\d{4})\.(\d{2})\.(\d{2})\s*\|\s*(\d{1,2}):(\d{2})\s*([AaPp][Mm])/.exec(m.data);
-      if (t) {
-        let h = Number(t[4]) % 12;
-        if (t[6].toUpperCase() === "PM") h += 12;
-        return `${t[1]}.${t[2]}.${t[3]} ${p(h)}:${t[5]}`;
-      }
-    }
-    return "";
-  }
-  function storyTurns(chat) {
-    return (chat.message ?? []).filter((m) => m.role === "char" && String(m.data ?? "").trim
+            votes: Math.max(0, Math.

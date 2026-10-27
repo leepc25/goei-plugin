@@ -1,8 +1,8 @@
-// goei-game 0.17.3
+// goei-game 0.17.6
 "use strict";
 (() => {
   // src/game/action/engine/view.ts
-  var view = { crop: 0, cropY: 0, zoom: 1, lane: [440, 690], worldH: 720 };
+  var view = { crop: 0, cropY: 0, zoom: 1, lane: [440, 690], worldH: 720, w: 1280, hub: false };
   var FAR = 0.85;
   var persp = (y) => {
     const [a, b] = view.lane;
@@ -183,6 +183,10 @@
     return { A, IMG, VFX: art.vfx };
   }
 
+  // src/game/action/hq/jrRooms.gen.ts
+  var JR_ROOMS = { "jr_songil": { "file": "jr_songil", "w": 1998, "h": 666, "under": true, "lane": [415, 646], "floor": [[0, 469], [217, 416], [1799, 416], [1998, 520], [1998, 666], [0, 666]], "blocks": [[391, 460, 416, 120]], "doors": { "out": { "x0": 18, "x1": 184, "y0": 69, "y1": 460, "anim": "none", "quad": [[18, 69], [184, 83], [184, 428], [18, 460]], "behind": "dark" }, "jinryo": { "x0": 1145, "x1": 1288, "y0": 101, "y1": 400, "anim": "swing", "behind": "dark", "hinge": "R" }, "wc": { "x0": 1355, "x1": 1497, "y0": 101, "y1": 400, "anim": "swing", "behind": "dark", "hinge": "R" }, "store": { "x0": 1569, "x1": 1707, "y0": 101, "y1": 400, "anim": "swing", "behind": "dark", "hinge": "R" }, "op": { "x0": 1826, "x1": 1927, "y0": 115, "y1": 497, "anim": "none", "quad": [[1826, 133], [1927, 115], [1927, 497], [1826, 442]], "behind": "dark" } }, "lamps": [], "windows": [], "objects": [{ "id": "o0", "file": "jo_songil_0", "x": 651, "y": 331, "w": 355, "h": 129, "sortY": 460, "solid": [{ "x0": 655, "x1": 1001, "y0": 400, "y1": 460, "h": 163 }] }, { "id": "o1", "file": "jo_songil_1", "x": 781, "y": 304, "w": 94, "h": 127, "sortY": 431, "solid": [{ "x0": 785, "x1": 871, "y0": 389, "y1": 431, "h": 145 }] }, { "id": "o2", "file": "jo_songil_2", "x": 254, "y": 417, "w": 265, "h": 117, "sortY": 534, "solid": [{ "x0": 258, "x1": 514, "y0": 489, "y1": 534, "h": 125 }] }, { "id": "o3", "file": "jo_songil_3", "x": 512, "y": 404, "w": 265, "h": 130, "sortY": 534, "solid": [{ "x0": 516, "x1": 772, "y0": 489, "y1": 534, "h": 125 }] }] }, "jr_jinryo": { "file": "jr_jinryo", "w": 1429, "h": 636, "under": true, "lane": [420, 616], "floor": [[0, 502], [213, 420], [1208, 420], [1429, 494], [1429, 636], [0, 636]], "blocks": [[760, 1045, 426, 160], [1064, 1163, 426, 300], [1208, 1391, 494, 999]], "doors": { "out": { "x0": 30, "x1": 152, "y0": 46, "y1": 486, "anim": "none", "quad": [[30, 46], [152, 87], [152, 441], [30, 486]], "behind": "dark" } }, "lamps": [], "windows": [], "objects": [{ "id": "o0", "file": "jo_jinryo_0", "x": 321, "y": 387, "w": 211, "h": 92, "sortY": 479, "solid": [{ "x0": 325, "x1": 527, "y0": 418, "y1": 479, "h": 113 }] }, { "id": "o1", "file": "jo_jinryo_1", "x": 379, "y": 420, "w": 94, "h": 112, "sortY": 532, "solid": [{ "x0": 383, "x1": 469, "y0": 487, "y1": 532, "h": 157 }] }, { "id": "o2", "file": "jo_jinryo_2", "x": 203, "y": 387, "w": 97, "h": 130, "sortY": 517, "solid": [{ "x0": 207, "x1": 295, "y0": 472, "y1": 517, "h": 132 }] }, { "id": "o3", "file": "jo_jinryo_3", "x": 743, "y": 453, "w": 309, "h": 125, "sortY": 578, "solid": [{ "x0": 747, "x1": 1047, "y0": 512, "y1": 578, "h": 114 }] }] }, "jr_op": { "file": "jr_op", "w": 1392, "h": 653, "under": true, "lane": [390, 633], "floor": [[0, 471], [228, 388], [1376, 388], [1392, 395], [1392, 653], [0, 653]], "blocks": [[293, 524, 391, 200], [524, 942, 471, 130], [315, 524, 490, 120], [961, 1136, 490, 120], [821, 893, 407, 300], [923, 1376, 395, 300]], "doors": { "out": { "x0": 34, "x1": 163, "y0": 55, "y1": 448, "anim": "none", "quad": [[34, 55], [163, 76], [163, 401], [34, 448]], "behind": "dark" } }, "lamps": [], "windows": [], "objects": [{ "id": "o0", "file": "jo_op_0", "x": 809, "y": 460, "w": 71, "h": 72, "sortY": 532, "solid": [{ "x0": 813, "x1": 875, "y0": 491, "y1": 532, "h": 94 }] }] }, "jr_youngchang": { "file": "jr_youngchang", "w": 1267, "h": 680, "under": true, "lane": [402, 660], "floor": [[0, 451], [274, 406], [370, 398], [1267, 398], [1267, 680], [0, 680]], "blocks": [[999, 1267, 433, 999]], "doors": { "out": { "x0": 44, "x1": 270, "y0": 37, "y1": 429, "anim": "none", "quad": [[44, 37], [270, 52], [270, 403], [44, 429]], "behind": "dark" } }, "lamps": [], "windows": [], "objects": [{ "id": "o0", "file": "jo_youngchang_0", "x": 614, "y": 355, "w": 105, "h": 119, "sortY": 474, "solid": [{ "x0": 618, "x1": 714, "y0": 422, "y1": 474, "h": 165 }] }, { "id": "o1", "file": "jo_youngchang_1", "x": 550, "y": 403, "w": 233, "h": 130, "sortY": 533, "solid": [{ "x0": 554, "x1": 778, "y0": 466, "y1": 533, "h": 121 }] }, { "id": "o2", "file": "jo_youngchang_2", "x": 626, "y": 482, "w": 81, "h": 117, "sortY": 599, "solid": [{ "x0": 630, "x1": 702, "y0": 552, "y1": 599, "h": 146 }] }] }, "jr_daebak": { "file": "jr_daebak", "w": 2324, "h": 775, "under": true, "lane": [414, 755], "floor": [[0, 519], [225, 482], [647, 411], [2324, 411], [2324, 775], [0, 775]], "blocks": [[1263, 1562, 540, 999], [2258, 2324, 642, 999], [257, 321, 439, 200], [642, 802, 407, 200], [792, 1017, 411, 120]], "doors": { "out": { "x0": 27, "x1": 219, "y0": 37, "y1": 508, "anim": "none", "quad": [[27, 37], [219, 59], [219, 471], [27, 508]], "behind": "dark" } }, "lamps": [], "windows": [], "objects": [{ "id": "o0", "file": "jo_daebak_0", "x": 347, "y": 359, "w": 313, "h": 144, "sortY": 503, "solid": [{ "x0": 351, "x1": 655, "y0": 425, "y1": 503, "h": 127 }] }, { "id": "o1", "file": "jo_daebak_1", "x": 410, "y": 532, "w": 187, "h": 67, "sortY": 599, "solid": [{ "x0": 414, "x1": 592, "y0": 545, "y1": 599, "h": 70 }] }, { "id": "o2", "file": "jo_daebak_2", "x": 915, "y": 356, "w": 96, "h": 126, "sortY": 482, "solid": [{ "x0": 919, "x1": 1007, "y0": 431, "y1": 482, "h": 162 }] }, { "id": "o3", "file": "jo_daebak_3", "x": 778, "y": 443, "w": 371, "h": 135, "sortY": 578, "solid": [{ "x0": 782, "x1": 1144, "y0": 515, "y1": 578, "h": 162 }] }, { "id": "o4", "file": "jo_daebak_4", "x": 1869, "y": 467, "w": 92, "h": 89, "sortY": 556, "solid": [{ "x0": 1873, "x1": 1957, "y0": 503, "y1": 556, "h": 153 }] }, { "id": "o5", "file": "jo_daebak_5", "x": 1609, "y": 513, "w": 120, "h": 140, "sortY": 653, "solid": [{ "x0": 1613, "x1": 1725, "y0": 598, "y1": 653, "h": 160 }] }, { "id": "o6", "file": "jo_daebak_6", "x": 2112, "y": 488, "w": 120, "h": 165, "sortY": 653, "solid": [{ "x0": 2116, "x1": 2228, "y0": 598, "y1": 653, "h": 160 }] }, { "id": "o7", "file": "jo_daebak_7", "x": 1755, "y": 521, "w": 320, "h": 132, "sortY": 653, "solid": [{ "x0": 1759, "x1": 2071, "y0": 551, "y1": 653, "h": 128 }] }, { "id": "o8", "file": "jo_daebak_8", "x": 1865, "y": 649, "w": 100, "h": 100, "sortY": 749, "solid": [{ "x0": 1869, "x1": 1961, "y0": 691, "y1": 749, "h": 167 }] }] }, "jr_heolgap": { "file": "jr_heolgap", "w": 1660, "h": 684, "under": true, "lane": [388, 664], "floor": [[0, 527], [255, 384], [1660, 384], [1660, 684], [0, 684]], "blocks": [[425, 1075, 557, 160], [1326, 1660, 612, 999], [268, 463, 455, 999], [1194, 1360, 421, 999]], "doors": { "out": { "x0": 26, "x1": 191, "y0": 34, "y1": 510, "anim": "none", "quad": [[26, 34], [191, 64], [191, 459], [26, 510]], "behind": "dark" } }, "lamps": [], "windows": [], "objects": [{ "id": "o0", "file": "jo_heolgap_0", "x": 477, "y": 533, "w": 92, "h": 121, "sortY": 654, "solid": [{ "x0": 481, "x1": 565, "y0": 606, "y1": 654, "h": 167 }] }, { "id": "o1", "file": "jo_heolgap_1", "x": 995, "y": 533, "w": 92, "h": 121, "sortY": 654, "solid": [{ "x0": 999, "x1": 1083, "y0": 606, "y1": 654, "h": 167 }] }] } };
+  var JR_ROOM_FILES = ["jr_daebak", "jr_heolgap", "jr_jinryo", "jr_op", "jr_songil", "jr_youngchang", "jo_daebak_0", "jo_daebak_1", "jo_daebak_2", "jo_daebak_3", "jo_daebak_4", "jo_daebak_5", "jo_daebak_6", "jo_daebak_7", "jo_daebak_8", "jo_heolgap_0", "jo_heolgap_1", "jo_jinryo_0", "jo_jinryo_1", "jo_jinryo_2", "jo_jinryo_3", "jo_op_0", "jo_songil_0", "jo_songil_1", "jo_songil_2", "jo_songil_3", "jo_youngchang_0", "jo_youngchang_1", "jo_youngchang_2"];
+
   // src/game/action/hq/painted.ts
   var downs = (xs, y = 18) => xs.map((x) => ({ x, y, kind: "down" }));
   var sign = (x, y) => ({ x, y, kind: "sign", color: "#3cff8a", r: 34 });
@@ -318,7 +322,105 @@
       ],
       windows: [],
       objects: []
-    }
+    },
+    // ── 중림 지하상가 (game-pack/jr-field, assets/gpt/중림지하상가를 tools/fit_bg700.py로 세로 700에 맞춤, 2026-10-27) ──
+    // 문은 그림 속 계단·통로 자리(문짝 없음). 막는 상자는 바닥에 튀어나온 매대·의자·상자 앞 모서리
+    jr_entry: {
+      file: "jr_entry",
+      w: 5521,
+      under: false,
+      lane: [428, 669],
+      blocks: [[80, 620, 505], [605, 665, 446], [2860, 3060, 442], [4500, 4660, 442], [5e3, 5521, 528]],
+      doors: {
+        down: { x0: 4880, x1: 5e3, y0: 300, y1: 505, anim: "none", behind: "dark" },
+        west: { x0: 0, x1: 60, y0: 420, y1: 669, anim: "none" }
+      },
+      lamps: [],
+      windows: [],
+      objects: []
+    },
+    jr_b1: {
+      file: "jr_b1",
+      w: 6425,
+      under: true,
+      lane: [428, 669],
+      blocks: [
+        [345, 485, 442],
+        [580, 870, 490],
+        [1690, 1950, 462],
+        [2240, 2460, 446],
+        [2650, 3020, 452],
+        [3740, 4110, 462],
+        [4320, 4810, 462],
+        [4830, 5e3, 442],
+        [5340, 5720, 452],
+        [6e3, 6160, 475]
+      ],
+      doors: {
+        up: { x0: 40, x1: 320, y0: 100, y1: 420, anim: "none", behind: "dark" },
+        daebak: { x0: 2970, x1: 3120, y0: 130, y1: 410, anim: "none", behind: "dark" },
+        songil: { x0: 5700, x1: 5840, y0: 130, y1: 400, anim: "none", behind: "dark" },
+        alley: { x0: 3390, x1: 3530, y0: 140, y1: 420, anim: "none", behind: "dark" },
+        down: { x0: 6170, x1: 6425, y0: 240, y1: 470, anim: "none", behind: "dark" }
+      },
+      lamps: [],
+      windows: [],
+      objects: []
+    },
+    jr_alley: {
+      file: "jr_alley",
+      w: 6059,
+      under: true,
+      lane: [428, 669],
+      blocks: [
+        [80, 250, 440],
+        [535, 625, 448],
+        [1335, 1760, 470],
+        [1780, 1860, 442],
+        [1890, 2140, 446],
+        [3490, 3910, 455],
+        [4270, 4850, 452],
+        [5090, 5530, 442],
+        [5490, 6059, 472]
+      ],
+      doors: {
+        b1: { x0: 2800, x1: 3070, y0: 130, y1: 420, anim: "none", behind: "dark" },
+        heolgap: { x0: 355, x1: 460, y0: 125, y1: 400, anim: "none", behind: "dark" }
+      },
+      lamps: [],
+      windows: [],
+      objects: []
+    },
+    jr_b2: {
+      // 왼쪽 끝 앞쪽에 큰 상자가 화면 앞까지 나와 있어 발을 x180부터
+      file: "jr_b2",
+      w: 5705,
+      under: true,
+      lane: [428, 669],
+      floor: [[180, 428], [5705, 428], [5705, 669], [180, 669]],
+      blocks: [
+        [180, 370, 448],
+        [615, 725, 445],
+        [920, 1190, 432],
+        [1315, 1700, 436],
+        [1780, 2030, 445],
+        [2130, 2710, 442],
+        [2960, 3270, 434],
+        [3330, 3510, 438],
+        [3700, 4140, 445],
+        [5120, 5335, 435],
+        [5590, 5705, 435]
+      ],
+      doors: {
+        up: { x0: 5400, x1: 5590, y0: 0, y1: 420, anim: "none", behind: "dark" },
+        youngchang: { x0: 390, x1: 580, y0: 70, y1: 395, anim: "none", behind: "dark" }
+      },
+      lamps: [],
+      windows: [],
+      objects: []
+    },
+    // 중림 가게 안 방 6개 (tools/jr/rooms.py → jrRooms.gen.ts)
+    ...JR_ROOMS
   };
   var doorX = (scene, id) => {
     const d3 = PAINTED[scene].doors[id];
@@ -360,22 +462,25 @@
 
   // src/game/action/art/hqField.ts
   var FILES = ["lobby", "f2", "f3", "b1", "b2", "b3", "desk"];
+  var JR_FILES = ["jr_entry", "jr_b1", "jr_alley", "jr_b2", ...JR_ROOM_FILES];
   var images = null;
   var revision2 = 0;
   function prepareHqField(urlOf) {
     const own = ++revision2;
     images = null;
-    void Promise.all(FILES.map(async (key2) => {
-      const src = window.__GOEI_HQ_FIELD__?.[key2] || (urlOf ? await urlOf(key2 + ".webp") : "");
-      if (!src) throw new Error("HQ field art unavailable");
+    const load = (pack2, keys3) => Promise.all(keys3.map(async (key2) => {
+      const src = window.__GOEI_HQ_FIELD__?.[key2] || (urlOf ? await urlOf(pack2, key2 + ".webp") : "");
+      if (!src) throw new Error("field art unavailable");
       const im = new Image();
       im.src = src;
       await im.decode();
       return [key2, im];
     })).then((rows) => {
-      if (revision2 === own) images = Object.fromEntries(rows);
+      if (revision2 === own) images = { ...images, ...Object.fromEntries(rows) };
     }).catch(() => {
     });
+    void load("hq-field", FILES);
+    void load("jr-field", JR_FILES);
     const keys2 = (e) => {
       const t = e.target;
       if (e.code !== "KeyT" || e.repeat || t?.closest?.('input, textarea, [contenteditable="true"]')) return;
@@ -390,7 +495,7 @@
       }
     };
   }
-  var hasHqField = (scene) => !!images && !!PAINTED[scene];
+  var hasHqField = (scene) => !!PAINTED[scene] && !!images?.[PAINTED[scene].file];
   function drawHqField(c, scene, camX, fx2, clockHour = null) {
     const p = PAINTED[scene];
     const im = images?.[p?.file ?? ""];
@@ -398,15 +503,15 @@
     c.save();
     c.imageSmoothingEnabled = true;
     c.imageSmoothingQuality = "high";
-    const sx = Math.max(0, Math.floor(camX - 40)), sw = Math.min(p.w - sx, 1280 + 80);
+    const sx = Math.max(0, Math.floor(camX - 40)), sw = Math.min(p.w - sx, view.w + 80), H7 = p.h ?? 700;
     if (sw > 0) {
-      c.drawImage(im, sx, 0, sw, 700, sx, 0, sw, 700);
-      c.drawImage(im, sx, 696, sw, 4, sx, 700, sw, 24);
+      c.drawImage(im, sx, 0, sw, H7, sx, 0, sw, H7);
+      if (H7 === 700) c.drawImage(im, sx, 696, sw, 4, sx, 700, sw, 24);
     }
     for (const [id, d3] of Object.entries(p.doors)) {
       const s2 = fx2(id);
       if (s2.open <= 0 && !s2.shake) continue;
-      if (d3.x1 < camX - 40 || d3.x0 > camX + 1320) continue;
+      if (d3.x1 < camX - 40 || d3.x0 > camX + view.w + 40) continue;
       drawDoor(c, im, d3, s2.open, s2.shake);
     }
     c.restore();
@@ -634,7 +739,7 @@
     const p = PAINTED[scene];
     if (!p || !images) return;
     const k = keyAt(hourNow(clockHour));
-    const x0 = camX - 40, W5 = 1280 + 80, H7 = 720;
+    const x0 = camX - 40, W5 = view.w + 80, H7 = Math.max(720, p.h ?? 700);
     const sc = p.under ? 0.35 : 0.5;
     c.save();
     const a = k.tint[3] * sc;
@@ -5502,7 +5607,7 @@
       id,
       name,
       floor,
-      look: p.under ? "labhall" : id === "lobby" ? "lobby" : "hall",
+      look: id.startsWith("jr_") ? "jr" : p.under ? "labhall" : id === "lobby" ? "lobby" : "hall",
       painted: id,
       length: p.w,
       lane: p.lane ?? PAINTED_LANE,
@@ -5531,7 +5636,12 @@
       boxes: [],
       fixtures: [],
       spots: [],
-      doors: [{ id: "main", x: 640, kind: "main", to: "lobby", toDoor: "main" }, { id: "pasta", x: 1500, kind: "shop", to: "pasta", toDoor: "out", needs: "pasta" }],
+      doors: [
+        { id: "main", x: 640, kind: "main", to: "lobby", toDoor: "main" },
+        { id: "pasta", x: 1500, kind: "shop", to: "pasta", toDoor: "out", needs: "pasta" },
+        // 임시 연결: 이동수단(노선표)이 생기기 전까지 거리 동쪽 끝에서 중림으로 바로 간다
+        { id: "jr", x: 1840, kind: "exit", side: "S", to: "jr_entry", toDoor: "west", label: "중림 지하상가 (임시)" }
+      ],
       things: [{ kind: "streetlamp", x: 300, w: 30, h: 360 }, { kind: "streetlamp", x: 1150, w: 30, h: 360 }, { kind: "bike", x: 860, w: 120, h: 80 }]
     },
     {
@@ -5598,7 +5708,40 @@
     floorHall("b3", "지하 주차장", "B3", [
       { id: "supply", kind: "steel", place: "supply", label: "보급실" },
       { id: "elev", kind: "elevator" }
-    ], { spots: [{ id: "van", x: 370, y: LANE_TOP + 50, verb: "출동", depart: true }] })
+    ], { spots: [{ id: "van", x: 370, y: LANE_TOP + 50, verb: "출동", depart: true }] }),
+    // ── 중림 지하상가 (중립지역, 그림 4장). 지상 입구 → 지하 1층 앞골목 → (가운데 통로) 뒷골목 / (동쪽 계단) 지하 2층 ──
+    floorHall("jr_entry", "중림 지하상가 입구", "out", [
+      { id: "west", kind: "exit", side: "S", to: "street", toDoor: "jr", label: "종로로 (임시)" },
+      { id: "down", kind: "door", to: "jr_b1", toDoor: "up", label: "지하상가로 내려가기" }
+    ]),
+    floorHall("jr_b1", "중림 지하상가 지하 1층", "B1", [
+      { id: "up", kind: "door", to: "jr_entry", toDoor: "down", label: "지상으로" },
+      { id: "daebak", kind: "glass", to: "jr_daebak", toDoor: "out", label: "대박 알선" },
+      { id: "songil", kind: "glass", to: "jr_songil", toDoor: "out", label: "손길 의원" },
+      { id: "alley", kind: "door", to: "jr_alley", toDoor: "b1", label: "뒷골목" },
+      { id: "down", kind: "door", to: "jr_b2", toDoor: "up", label: "지하 2층으로" }
+    ]),
+    floorHall("jr_alley", "중림 뒷골목", "B1", [
+      { id: "b1", kind: "door", to: "jr_b1", toDoor: "alley", label: "앞골목" },
+      { id: "heolgap", kind: "door", to: "jr_heolgap", toDoor: "out", label: "헐값 매입" }
+    ]),
+    floorHall("jr_b2", "중림 지하상가 지하 2층", "B2", [
+      { id: "up", kind: "door", to: "jr_b1", toDoor: "down", label: "지하 1층으로" },
+      { id: "youngchang", kind: "steel", to: "jr_youngchang", toDoor: "out", label: "창고 B-7 (영창 컨설팅)" }
+    ]),
+    // 가게 안 (GPT 빈 방 + GPT 가구, tools/jr/rooms.py)
+    floorHall("jr_daebak", "대박 알선", "B1", [{ id: "out", kind: "glass", to: "jr_b1", toDoor: "daebak", label: "나가기" }]),
+    floorHall("jr_heolgap", "헐값 매입", "B1", [{ id: "out", kind: "door", to: "jr_alley", toDoor: "heolgap", label: "나가기" }]),
+    floorHall("jr_youngchang", "영창 컨설팅", "B2", [{ id: "out", kind: "steel", to: "jr_b2", toDoor: "youngchang", label: "나가기" }]),
+    floorHall("jr_songil", "손길 의원", "B1", [
+      { id: "out", kind: "glass", to: "jr_b1", toDoor: "songil", label: "나가기" },
+      { id: "jinryo", kind: "door", to: "jr_jinryo", toDoor: "out", label: "진료실" },
+      { id: "wc", kind: "door", locked: true, label: "화장실" },
+      { id: "store", kind: "door", locked: true, label: "창고" },
+      { id: "op", kind: "door", to: "jr_op", toDoor: "out", label: "수술실" }
+    ]),
+    floorHall("jr_jinryo", "진료실", "B1", [{ id: "out", kind: "door", to: "jr_songil", toDoor: "jinryo", label: "대기실로" }]),
+    floorHall("jr_op", "수술실", "B1", [{ id: "out", kind: "door", to: "jr_songil", toDoor: "op", label: "대기실로" }])
   ];
   var SCENE_BY_ID = Object.fromEntries(HQ_SCENES.map((s2) => [s2.id, s2]));
   var ELEVATOR = [
@@ -14836,8 +14979,10 @@ void main(){
       const f = w.floor;
       const pal = f.palette ?? { wall: "#2b343a", floor: "#3a4247", accent: "#5b6a72" };
       const [top] = w.lane;
-      ctx.fillStyle = "#0d1114";
-      ctx.fillRect(0, 0, SCREEN_W, SCREEN_H);
+      if (!view.hub) {
+        ctx.fillStyle = "#0d1114";
+        ctx.fillRect(0, 0, SCREEN_W, SCREEN_H);
+      }
       if (f.drawBackground) {
         ctx.save();
         ctx.translate(-camX, 0);
@@ -14849,7 +14994,7 @@ void main(){
       ctx.fillStyle = pal.wall;
       ctx.fillRect(0, wallTop, SCREEN_W, top - wallTop - 20);
       const step4 = 320;
-      for (let x = Math.floor(camX / step4) * step4; x < camX + SCREEN_W + step4; x += step4) {
+      for (let x = Math.floor(camX / step4) * step4; x < camX + view.w + step4; x += step4) {
         const sx = x - camX;
         ctx.fillStyle = "rgba(0,0,0,0.22)";
         ctx.fillRect(sx, wallTop, 26, top - wallTop - 20);
@@ -14869,7 +15014,7 @@ void main(){
       ctx.fillRect(0, top - 20, SCREEN_W, SCREEN_H - top + 20);
       ctx.strokeStyle = "rgba(255,255,255,0.05)";
       ctx.lineWidth = 2;
-      for (let x = Math.floor(camX / 160) * 160; x < camX + SCREEN_W + 400; x += 160) {
+      for (let x = Math.floor(camX / 160) * 160; x < camX + view.w + 400; x += 160) {
         const sx = x - camX;
         ctx.beginPath();
         ctx.moveTo(sx, top - 20);
@@ -14894,7 +15039,7 @@ void main(){
     function drawProps(w, camX, list = w.props) {
       for (const p of list) {
         const sx = p.x - camX;
-        if (sx < -p.w - 200 || sx > SCREEN_W + p.w + 200) continue;
+        if (sx < -p.w - 200 || sx > view.w + p.w + 200) continue;
         if (p.kind === "hubdoor" || p.kind === "hubspot") continue;
         if (p.actor) {
           const a = p.actor;
@@ -15545,7 +15690,7 @@ void main(){
       p.stop = 0;
       p.resetLocomotion();
       p.dir = 1;
-      this.camX = Math.max(0, Math.min(f.length - SCREEN_W, p.x - SCREEN_W / 2));
+      this.camX = f.length <= view.w ? -(view.w - f.length) / 2 : Math.max(0, Math.min(f.length - view.w, p.x - view.w / 2));
       this.prevCamX = this.camX;
       this.banner = { text: f.banner ?? f.title, t: 70 };
       this.subtitle = null;
@@ -15814,12 +15959,17 @@ void main(){
     camera() {
       const p = this.player;
       const [b0, b1] = this.bounds;
-      const target = p.x - SCREEN_W / 2 + p.dir * 90;
+      const W5 = view.w;
+      if (this.floor.length <= W5) {
+        this.camX = -(W5 - this.floor.length) / 2;
+        return;
+      }
+      const target = p.x - W5 / 2 + p.dir * 90;
       let cx = this.camX + (target - this.camX) * 0.14;
-      cx = Math.max(b0, Math.min(b1 - SCREEN_W, cx));
-      cx = Math.max(0, Math.min(this.floor.length - SCREEN_W, cx));
+      cx = Math.max(b0, Math.min(b1 - W5, cx));
+      cx = Math.max(0, Math.min(this.floor.length - W5, cx));
       this.camX = cx;
-      if (this.encActive >= 0) p.x = Math.max(cx + 90, Math.min(cx + SCREEN_W - 90, p.x));
+      if (this.encActive >= 0) p.x = Math.max(cx + 90, Math.min(cx + W5 - 90, p.x));
     }
     /** 보스 체력 막대용 */
     boss() {
@@ -15829,6 +15979,7 @@ void main(){
   };
 
   // src/game/action/engine/game.ts
+  var BASE_ZOOM = 1;
   var Game = class {
     constructor(box2, art5, mods) {
       this.box = box2;
@@ -15901,9 +16052,13 @@ void main(){
         if (!this.mods.covered?.()) {
           const w = this.world;
           const H7 = this.inHub ? view.worldH : SCREEN_H;
-          view.zoom = this.canvas.height / H7 * Math.max(1, charSize.k);
+          const cssH = this.canvas.getBoundingClientRect().height;
+          const fixed2 = this.inHub && cssH >= 600;
+          view.zoom = (fixed2 ? BASE_ZOOM * (this.canvas.height / cssH) : this.canvas.height / H7) * Math.max(1, charSize.k);
           if (w) view.lane = w.lane;
           const vw = this.canvas.width / view.zoom;
+          view.w = this.inHub ? Math.max(SCREEN_W, vw) : SCREEN_W;
+          view.hub = this.inHub;
           view.crop = 0;
           const frozen = paused || !!this.mods.blocking?.() || !!this.mods.hq?.isOpen?.();
           if (vw < SCREEN_W && w) {
@@ -15912,7 +16067,13 @@ void main(){
           }
           view.cropY = 0;
           const vh = this.canvas.height / view.zoom;
-          if (vh < H7 - 0.5 && w) {
+          if (this.inHub) {
+            this.ctx.fillStyle = "#000";
+            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+          }
+          if (vh > H7 + 0.5) {
+            view.cropY = -Math.round((vh - H7) / 2 * view.zoom) / view.zoom;
+          } else if (vh < H7 - 0.5 && w) {
             const a = frozen ? 1 : this.acc / T3, p = w.player;
             const py = (p.py ?? p.y) + (p.y - (p.py ?? p.y)) * a;
             view.cropY = Math.round(Math.max(0, Math.min(H7 - vh, py - vh * 0.7)) * view.zoom) / view.zoom;
@@ -20715,7 +20876,7 @@ void main(){
         { type: "toggle", label: "피해 숫자", get: () => s2.numbers, set: (v) => s2.numbers = v },
         { type: "slider", label: "밝기", get: () => s2.bright, set: (v) => s2.bright = v, min: 0.7, max: 1.4, step: 0.05, fmt: pct },
         { type: "toggle", label: "도트 선명하게", get: () => s2.pixel, set: (v) => s2.pixel = v },
-        { type: "slider", label: "화면 확대", get: () => s2.charSize, set: (v) => s2.charSize = v, min: 1, max: 1.6, step: 0.05, fmt: pct },
+        { type: "slider", label: "화면 확대", get: () => s2.charSize, set: (v) => s2.charSize = v, min: 1, max: 2.5, step: 0.05, fmt: pct },
         ...o.field ? [] : [{ type: "button", label: "전체 화면", sub: "폰은 가로로 고정", act: () => void stage.fullscreen() }],
         // 필드(리스): 전체 화면 두 가지 (2026-10-25 사용자) — 브라우저 전체 · 상황창 안 전체(왼쪽 메뉴·오른쪽 신분증 칸까지)
         ...o.field?.fullscreen ? [{
@@ -29563,10 +29724,10 @@ ${who}: ${text2.replace(/\n/g, " ")}
             const cov = drawHqWall(c, place3, sc.id, len, TOP, sc.doors);
             artDoors = cov ?? /* @__PURE__ */ new Set();
             c.fillStyle = "rgba(0,0,0,0.35)";
-            c.fillRect(camX - 40, TOP - 14, SCREEN_W + 80, 14);
-            if (!drawFloor(c, place3, camX - 40, camX + SCREEN_W + 40, TOP, SCREEN_H)) {
+            c.fillRect(camX - 40, TOP - 14, view.w + 80, 14);
+            if (!drawFloor(c, place3, camX - 40, camX + view.w + 40, TOP, SCREEN_H)) {
               c.fillStyle = "#2b3135";
-              c.fillRect(camX - 40, TOP, SCREEN_W + 80, SCREEN_H - TOP);
+              c.fillRect(camX - 40, TOP, view.w + 80, SCREEN_H - TOP);
             }
             for (const t of sc.things) if (t.wall) legacyThing(c, t, camX);
             for (const d3 of sc.doors) if (!artDoors.has(d3.id)) legacyDoor(c, d3, camX);
@@ -29575,7 +29736,7 @@ ${who}: ${text2.replace(/\n/g, " ")}
           }
           drawRoomShell(c, sc, camX);
           const textured = (sc.id === "office" || sc.id === "f2") && drawHqTextureWall(c, place3, len, camX, sc.doors.filter((d3) => !isS(d3)).map((d3) => ({ x: d3.x, width: d3.kind === "glass" ? 192 : DOOR_W[d3.kind] + 24 })));
-          if (sc.id === "office" || sc.id === "f2") drawFloor(c, place3, camX - 40, camX + SCREEN_W + 40, TOP, SCREEN_H);
+          if (sc.id === "office" || sc.id === "f2") drawFloor(c, place3, camX - 40, camX + view.w + 40, TOP, SCREEN_H);
           for (const f of sc.fixtures) {
             if (!textured || f.kind === "directory") drawFixture(c, f, sc.look, camX);
           }
@@ -29602,13 +29763,13 @@ ${who}: ${text2.replace(/\n/g, " ")}
           const dark2 = fadeOut > 0 ? 1 - fadeOut / FADE : age < FADE ? 1 - age / FADE : 0;
           if (dark2 > 0) {
             c.fillStyle = `rgba(0,0,0,${dark2})`;
-            c.fillRect(camX - 40, 0, SCREEN_W + 80, SCREEN_H);
+            c.fillRect(camX - 40, 0, view.w + 80, SCREEN_H);
           }
         }
       };
     };
     const go = (sceneId, x, y) => {
-      view.worldH = sceneOf(sceneId).painted ? 700 : SCREEN_H;
+      view.worldH = sceneOf(sceneId).painted ? PAINTED[sceneOf(sceneId).painted]?.h ?? 700 : SCREEN_H;
       pending = { scene: sceneId, x, y };
       fadeOut = FADE;
     };
@@ -29836,7 +29997,7 @@ ${who}: ${text2.replace(/\n/g, " ")}
   };
   function drawRoomShell(c, sc, camX) {
     const L = LOOKS2[sc.look] ?? LOOKS2.office;
-    const x0 = camX - 40, w = SCREEN_W + 80;
+    const x0 = camX - 40, w = view.w + 80;
     const g2 = c.createLinearGradient(0, 0, 0, TOP);
     g2.addColorStop(0, L.wallTop);
     g2.addColorStop(1, L.wallBot);
@@ -29893,7 +30054,7 @@ ${who}: ${text2.replace(/\n/g, " ")}
   }
   function drawFixture(c, f, look, camX) {
     const x = f.x - f.w / 2;
-    if (x > camX + SCREEN_W + 40 || x + f.w < camX - 40) return;
+    if (x > camX + view.w + 40 || x + f.w < camX - 40) return;
     switch (f.kind) {
       case "window": {
         const y = 70, h = TOP - 150;
@@ -30006,7 +30167,7 @@ ${who}: ${text2.replace(/\n/g, " ")}
   function drawDoorN(c, d3, look, open, camX) {
     const w = DOOR_W[d3.kind];
     const x = d3.x - w / 2, y = TOP - DOOR_H;
-    if (x > camX + SCREEN_W + 40 || x + w < camX - 40) return;
+    if (x > camX + view.w + 40 || x + w < camX - 40) return;
     c.fillStyle = "#12161b";
     c.fillRect(x - 10, y - 12, w + 20, DOOR_H + 12);
     c.fillStyle = "#05070a";
@@ -30069,7 +30230,7 @@ ${who}: ${text2.replace(/\n/g, " ")}
   }
   function drawFloorExit(c, d3, open, camX) {
     const w = DOOR_W.exit;
-    if (d3.x + w < camX - 40 || d3.x - w > camX + SCREEN_W + 40) return;
+    if (d3.x + w < camX - 40 || d3.x - w > camX + view.w + 40) return;
     const col = d3.kind === "cell" ? "#7d4a3a" : d3.open ? "#3cc596" : "#6b7480";
     c.fillStyle = "rgba(0,0,0,0.3)";
     c.fillRect(d3.x - w / 2 - 10, SCREEN_H - 36, w + 20, 36);
@@ -30080,7 +30241,7 @@ ${who}: ${text2.replace(/\n/g, " ")}
   }
   function drawExitLintel(c, d3, camX) {
     if (d3.kind === "cell") return;
-    if (d3.x < camX - 200 || d3.x > camX + SCREEN_W + 200) return;
+    if (d3.x < camX - 200 || d3.x > camX + view.w + 200) return;
     const col = d3.open ? "#3cc596" : "#6b7480";
     const y = SCREEN_H - 30;
     c.fillStyle = col;
@@ -30190,7 +30351,7 @@ ${who}: ${text2.replace(/\n/g, " ")}
   }
   function legacyThing(c, t, camX) {
     const sx = t.x - camX;
-    if (sx < -t.w - 100 || sx > SCREEN_W + t.w + 100) return;
+    if (sx < -t.w - 100 || sx > view.w + t.w + 100) return;
     const base2 = t.wall ? TOP - 70 : TOP + 26;
     if (drawPropArt(c, t.kind, void 0, t.x, base2)) return;
     c.fillStyle = "#4a4f55";
@@ -30199,7 +30360,7 @@ ${who}: ${text2.replace(/\n/g, " ")}
   function legacyDoor(c, d3, camX) {
     const w = DOOR_W[d3.kind];
     const sx = d3.x - camX;
-    if (sx < -w - 40 || sx > SCREEN_W + w + 40) return;
+    if (sx < -w - 40 || sx > view.w + w + 40) return;
     if (drawPropArt(c, `hq_${d3.kind}`, void 0, d3.x, TOP)) return;
     const x = d3.x - w / 2, y = TOP - DOOR_H;
     c.fillStyle = "#1b2023";
@@ -34094,31 +34255,6 @@ ${t.secret}` : "",
     const cutins = /* @__PURE__ */ new Map();
     if (bridge?.visit && bridge.assets) void loadFieldFx(bridge.assets, ffx, cutins);
     const inField = () => !!game?.inHub && !!bridge?.visit && !mods.blocking?.() && !shell.paused;
-    const previewSuper = () => {
-      const w = game?.world;
-      if (!w || ffx.inSuper()) return;
-      const me = hq2.visitor();
-      const name = me.name || "방문자";
-      const t = SUPER_TEXT[name] ?? { color: "#C8283C", name: "필살기", sub: "" };
-      const fallback = me.agentId && visitAgentFaceCanvas(name, 60) || testPlayerFace(60);
-      void ffx.super_({ ...t, art: cutins.get(name), art2: cutins.get(`${name}_2`), fallback, eye: { x: 0.62, y: 0.42 } }).then(() => {
-        ffx.flash("#fff", 0.1, 0.7);
-        ffx.shake(14, 0.6);
-        const p = w.player;
-        ffx.sparks_(p.x, p.y - 120, 30, t.color, 6);
-        ffx.ring(p.x, p.y, 20, 260, t.color, 0.45);
-        ffx.scorch(p.x, p.y, 160, 3);
-      });
-    };
-    const fieldFxKeys = (e) => {
-      if (e.code !== "KeyS" && e.code !== "KeyW" || e.repeat || !inField()) return;
-      const el = document.activeElement;
-      if (el && (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.isContentEditable)) return;
-      previewSuper();
-      e.preventDefault();
-      e.stopImmediatePropagation();
-    };
-    window.addEventListener("keydown", fieldFxKeys, true);
     const stageStore = {
       load: () => {
         if (session.meta) return session.meta;
@@ -34678,7 +34814,6 @@ ${t.secret}` : "",
         window.removeEventListener("pointerdown", titleInput, true);
         if (openingT) clearTimeout(openingT);
         window.removeEventListener("keydown", hqKeys, true);
-        window.removeEventListener("keydown", fieldFxKeys, true);
         window.removeEventListener("keydown", floorKeys, true);
         saveFlags();
         storyRoot.removeEventListener(VIDEO_AUDIO_EVENT, attachVideoAudio);
@@ -34913,7 +35048,7 @@ ${t.secret}` : "",
     const urlOf = bridge?.assets ? (f) => bridge.assets.url("jyaldi", f) : void 0;
     const releaseHqArt = prepareHqTextures(bridge?.assets ? (f) => bridge.assets.url("hq-textures", f) : void 0);
     const releaseDoorArt = prepareHqDoorRound2(bridge?.assets ? (f) => bridge.assets.url("hq-door-round2", f) : void 0);
-    const releaseField = prepareHqField(bridge?.assets ? (f) => bridge.assets.url("hq-field", f) : void 0);
+    const releaseField = prepareHqField(bridge?.assets ? (pack2, f) => bridge.assets.url(pack2, f) : void 0);
     const testPeople = prepareTestPeople(bridge?.assets ? (f) => bridge.assets.url("test-people", f) : void 0, bridge?.assets ? (f) => bridge.assets.bytes("test-people", f) : void 0);
     const visitArt = bridge?.visit ? prepareVisitAgents(bridge.assets ? (f) => bridge.assets.url("visit-agents", f) : void 0, bridge.assets ? (f) => bridge.assets.bytes("visit-agents", f) : void 0) : null;
     void Promise.all([loadArt(urlOf, bridge?.assets ? (f) => bridge.assets.bytes("jyaldi", f) : void 0), visitArt?.ready, testPeople?.ready]).then(([art5]) => {
@@ -37495,7 +37630,7 @@ ${t.secret}` : "",
     }
   }
   var mod = {
-    version: "0.17.3",
+    version: "0.17.6",
     mount: (box2, bridge) => mountPlay(box2, bridge),
     // 이전 시험판: 저장 키와 그림 팩은 예전 그대로 (goei:game · goei:game-action:v1)
     legacy: {
