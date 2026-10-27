@@ -1,4 +1,5 @@
 import { stripVirtual, withWorldLore } from '../core/world/virtual';
+import { setStatusColumns } from '../core/world/statuscols';
 import type { Chat, LoreEntry } from '../core/types';
 import { applyAdvanced } from '../core/advanced';
 
@@ -28,6 +29,8 @@ export async function loadContext(): Promise<ChatContext | null> {
   // 세계 데이터(기본 + 카드 덧쓰기)를 가상 로어북으로 붙인다. 저장할 때는 updateCharacterLore 가 뺀다
   char.globalLore = withWorldLore(char.globalLore);
   chat.message ??= [];
+  // 상태창 파서에 이 채팅의 칸 구성을 알린다 (core/world/statuscols.ts)
+  setStatusColumns(chat.scriptstate);
   return { charIndex, chatIndex, char, chat };
 }
 

@@ -52,6 +52,11 @@ import { bindPeopleHold, bindPeopleStatus, handlePeople, hasPersonRecord, people
 import { handleImgPrompt, imgInput } from './imgprompt';
 import { cropValue, setCrop, directoryExtList, directoryInput, directoryPhotoList, directoryList, dirUi, handleDirectory, resetDirectory } from './directory';
 import { basicDefaults, basicVars, DIM_DEFAULT, getPrefs, worldDefaults, worldSettings, worldVarsOf, type Mark } from '../core/settings';
+import { colConfig } from '../core/world/statuscols';
+import { adjustWallet, aliveAnchors, formatDelta, formatWon, liveWallet, parseWon, readWallet, removeWalletEntry, walletBalance, walletVars, type WalletEntry } from '../core/wallet';
+
+/** ID카드 잔고 칩 → 장부 창 (열림·입력 알림) */
+const walletUi = { open: false, notice: '' };
 
 interface Draft {
   faction?: FactionCode;
@@ -759,6 +764,35 @@ async function handle(action: string, value?: string): Promise<void> {
       showIdCard(idCard(view.ctx));
       return;
     }
+    case 'wallet-pop':
+      // ID카드 잔고 칩 ↔ 장부 창
+      walletUi.open = !walletUi.open;
+      walletUi.notice = '';
+      return render();
+    case 'wallet-del': {
+      if (view.kind !== 'started' || !value) return;
+      const ctx = view.ctx;
+      await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
+        const w = readWallet(chat.scriptstate, getPrefs().walletStart ?? 0);
+        return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...walletVars(removeWalletEntry(w, value ?? '')) } };
+      });
+      return refresh();
+    }
+    case 'wallet-adj': {
+      if (view.kind !== 'started') return;
+      const n = parseWon(value ?? '');
+      if (n === null) {
+        walletUi.notice = '금액을 읽을 수 없어요. 숫자 또는 「120만」처럼 적어 주세요.';
+        return render();
+      }
+      const ctx = view.ctx;
+      await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
+        const w = readWallet(chat.scriptstate, getPrefs().walletStart ?? 0);
+        return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...walletVars(adjustWallet(w, aliveAnchors(chat), n)) } };
+      });
+      walletUi.notice = '';
+      return refresh();
+    }
     case 'agents-view':
       // 상황판 요원 칸 제목줄의 모니터·목록 아이콘 (설정 「요원 칸」과 같은 기기 공통 값)
       if (value !== 'wall' && value !== 'list') return;
@@ -1204,7 +1238,7 @@ function body(): string {
       </div>`;
     case 'started':
       evSeenReset();
-      return `${tabs()}${startedHeader(view.ctx)}<div class="gx-content">${tab === 'settings' ? '' : updateBanner(view.ctx)}${notice && tab !== 'map' && tab !== 'mission' ? `<div class="${noticeClass(notice)} gx-notice" role="alert">${esc(notice)}</div>` : ''}${startedBody(view.ctx)}</div>${evPopup(boardClock(view.ctx))}${tab === 'board' ? agentPopup((n) => view.kind === 'started' && hasPersonRecord(view.ctx, n)) : ''}${markPop(markOf(navState()), recentMarks())}`;
+      return `${tabs()}${startedHeader(view.ctx)}<div class="gx-content">${tab === 'settings' ? '' : updateBanner(view.ctx)}${notice && tab !== 'map' && tab !== 'mission' ? `<div class="${noticeClass(notice)} gx-notice" role="alert">${esc(notice)}</div>` : ''}${startedBody(view.ctx)}</div>${evPopup(boardClock(view.ctx))}${tab === 'board' ? agentPopup((n) => view.kind === 'started' && hasPersonRecord(view.ctx, n)) : ''}${walletPop(view.ctx)}${markPop(markOf(navState()), recentMarks())}`;
     case 'opening':
       return `${header('커스텀 임무 · 첫 장면 고르기', '<button class="gx-x" data-action="repick" aria-label="시작 설정 다시 고르기">' + ICONS.back + '</button>')}<div class="gx-content">${missionTab(view.ctx, true, notice, busy)}</div>`;
     case 'picker':
@@ -1340,8 +1374,33 @@ function idCard(ctx: ChatContext): string {
     : `<span class="gx-id-photo none">${ICONS.idcard}</span>`;
   return `<div class="gx-id">${img ? `<span class="gx-id-bg" style="background-image:url('${esc(img)}')"></span>` : ''}
       ${photo}
-      <span class="gx-id-who"><b>${esc(name)}</b><small>${esc([f ? selfName(ctx, f.code, f.name) : '소속 없음', pa?.rank ?? ''].filter(Boolean).join(' · '))}</small></span>
+      <span class="gx-id-who"><b>${esc(name)}</b><small>${esc([f ? selfName(ctx, f.code, f.name) : '소속 없음', pa?.rank ?? ''].filter(Boolean).join(' · '))}</small>${walletChip(ctx)}</span>
       ${status ? `<span class="gx-op-st">${status}</span>` : ''}
+    </div>`;
+}
+
+/** 잔고 칩 (상태창 잔고 칸을 쓸 때): 장부 잔고. 누르면 장부 창 */
+function walletChip(ctx: ChatContext): string {
+  if (colConfig(ctx.chat.scriptstate).wallet === 'off') return '';
+  const w = readWallet(ctx.chat.scriptstate, getPrefs().walletStart ?? 0);
+  return `<button class="gx-wallet" data-action="wallet-pop" aria-label="잔고·가계부" title="가계부">${esc(formatWon(walletBalance(w, aliveAnchors(ctx.chat))))}</button>`;
+}
+
+/** 장부 창: 최근 거래(살아 있는 것), 잔고 수정, 거래 지우기 */
+function walletPop(ctx: ChatContext): string {
+  if (!walletUi.open) return '';
+  const w = readWallet(ctx.chat.scriptstate, getPrefs().walletStart ?? 0);
+  const alive = aliveAnchors(ctx.chat);
+  const live = liveWallet(w, alive);
+  const src = (e: WalletEntry) => (e.src === 'story' ? '본문' : e.src === 'field' ? '필드' : '수정');
+  const rows = live.slice(-30).reverse().map((e) => `<li><span class="gx-wl-memo">${esc(e.memo)}<small>${src(e)}${e.quote ? ` · ${esc(e.quote.slice(0, 40))}` : ''}</small></span><b class="${e.amount < 0 ? 'out' : 'in'}">${esc(formatDelta(e.amount))}</b><button class="gx-wl-x" data-action="wallet-del" data-value="${esc(e.id)}" aria-label="지우기">✕</button></li>`).join('');
+  return `<button class="ev-scrim" data-action="wallet-pop" aria-label="닫기"></button>
+    <div class="gx-walpop" role="dialog" aria-label="가계부">
+      <div class="gx-walpop-head"><b>가계부</b><span>${esc(formatWon(walletBalance(w, alive)))}</span><button class="gx-x" data-action="wallet-pop" aria-label="닫기">${ICONS.close}</button></div>
+      <p class="gx-muted">시작 ${esc(formatWon(w.start))} · 거래 ${live.length}건. 본문에 금액이 적힌 거래만 인물 기록 갱신기가 적어요. 지운 메시지의 거래는 자동으로 빠져요.</p>
+      ${walletUi.notice ? `<div class="gx-err" role="alert">${esc(walletUi.notice)}</div>` : ''}
+      <ul class="gx-wl">${rows || '<li class="gx-wl-empty">거래가 없어요.</li>'}</ul>
+      <form class="gx-wl-adj" data-submit="wallet-adj"><input type="text" inputmode="numeric" placeholder="잔고를 이 값으로 (예: 1,200,000 또는 120만)" aria-label="잔고 수정"><button type="submit" class="gx-mini">잔고 수정</button></form>
     </div>`;
 }
 

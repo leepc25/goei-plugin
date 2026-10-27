@@ -9,6 +9,7 @@ import { unknownTo } from './inject';
 import { seedPerson } from './seed';
 import { factionNow, knownFactionCodes, sceneFactionCodes, userFactionOf, factionName as factionNameOf } from './faction';
 import { factionCode } from './identity';
+import { mentionsAmount, parseWon } from '../wallet';
 import { nameMatcher, scenePeople, entriesOf, type NameEntry } from './select';
 import { changeId, entryId, isAlive, liveChanges, liveEntries, liveness, markRead, messageKey, norm, plain, putChange, putDoc, putEntry, type Liveness } from './store';
 import type { Feature, PeopleSettings } from './settings';
@@ -61,6 +62,8 @@ export interface UpdateInput {
   /** 장면 세력 코드 (세력 평판 켜짐) */
   factions: string[];
   factionNames: Record<string, string>;
+  /** 가계부 켜짐 (상태창 잔고 칸 사용): 거래 절을 읽는다 */
+  wallet: boolean;
 }
 
 const CUE_MEANING: Record<Cue, string> = {
@@ -120,6 +123,8 @@ export interface BuildOpts {
   factionNames?: Record<string, string>;
   /** 이 인물들만 (인물별 「다시 읽기」) */
   only?: string[];
+  /** 장부 잔고 (원). 잔고 칸을 쓰지 않으면 null/없음 → 거래 절 없음 */
+  wallet?: number | null;
 }
 
 const SUSP_WEIGHT: Record<string, number> = { 약: 10, 중: 25, 강: 40, '-약': -10, '-중': -25, '-강': -40 };
@@ -237,9 +242,10 @@ export function buildUpdate(chat: Chat, store: PeopleStore, batch: number[], o: 
     signals,
     span: span.map(({ index: _i, ...rest }) => rest),
     identity_known: store.identity ? { faction: store.identity.faction, rank: store.identity.rank } : null,
-    want: { new_people: true, next_note: wantNote, address: o.settings.features.has('register'), identity: true },
+    wallet_now: typeof o.wallet === 'number' ? { balance: o.wallet, unit: 'KRW' } : undefined,
+    want: { new_people: true, next_note: wantNote, address: o.settings.features.has('register'), identity: true, transactions: typeof o.wallet === 'number' },
   };
-  return { system: o.system, data, indexes: batch, tags, people: chosen, confirmed: confirmedIdx, names: o.names, tidy: o.settings.tidy === 'same' ? over : [], factions: factionCodes, factionNames: o.factionNames ?? {} };
+  return { system: o.system, data, indexes: batch, tags, people: chosen, confirmed: confirmedIdx, names: o.names, tidy: o.settings.tidy === 'same' ? over : [], factions: factionCodes, factionNames: o.factionNames ?? {}, wallet: typeof o.wallet === 'number' };
 }
 
 // ── 지침 조립 ──
@@ -289,6 +295,8 @@ export interface UpdateResult {
   rhythm_note?: string | null;
   /** 세력 평판 계기 (집단 반응만) */
   faction_cues?: { faction: string; cue: string; m: string; quote: string; reason?: string }[];
+  /** 가계부: 금액이 적힌 거래만 (원, 나가면 −) */
+  transactions?: { amount: number | string; memo?: string | null; m: string; quote: string }[];
 }
 
 /** JSON 하나만 꺼낸다 (코드 울타리·앞뒤 글 허용). 아니면 throw */
@@ -302,7 +310,7 @@ export function parseUpdate(raw: string): UpdateResult {
   const v = JSON.parse(t.slice(a, b + 1)) as unknown;
   if (!v || typeof v !== 'object' || Array.isArray(v)) throw new Error('JSON 객체가 아니에요');
   const r = v as UpdateResult;
-  for (const k of ['entries', 'cues', 'address', 'new_people', 'docs', 'suspicion', 'next_note', 'taste', 'openness', 'faction_cues'] as const) {
+  for (const k of ['entries', 'cues', 'address', 'new_people', 'docs', 'suspicion', 'next_note', 'taste', 'openness', 'faction_cues', 'transactions'] as const) {
     if (r[k] !== undefined && !Array.isArray(r[k])) throw new Error(`${k}는 목록이어야 해요`);
   }
   return r;
@@ -312,10 +320,12 @@ export function parseUpdate(raw: string): UpdateResult {
 
 export interface Dropped { kind: string; who?: string; reason: string; item: unknown }
 export interface ApplyReport {
-  applied: { entries: number; cues: number; address: number; docs: number; suspicion: number; newPeople: string[]; notes: number; identity: boolean; taste: number; openness: number; factions: number };
+  applied: { entries: number; cues: number; address: number; docs: number; suspicion: number; newPeople: string[]; notes: number; identity: boolean; taste: number; openness: number; factions: number; transactions: number };
   dropped: Dropped[];
   /** 「확인 필요」로 보류한 것 */
   held: Dropped[];
+  /** 받아들인 거래 (호출한 쪽이 장부 `$st_wallet` 에 적는다) */
+  wallet: { anchor: string; amount: number; memo: string; quote: string }[];
 }
 
 export interface ApplyCtx {
@@ -333,6 +343,8 @@ export interface ApplyCtx {
   only?: string[];
   /** 읽음 표시를 바꾸지 않는다 (다시 읽기) */
   keepRead?: boolean;
+  /** 가계부 켜짐: 거래를 받아 report.wallet 에 담는다 */
+  wallet?: boolean;
 }
 
 const ROLE_WORDS = new Set(['택시 기사', '기사', '점원', '경비', '경비원', '간호사', '의사', '행인', '남자', '여자', '아저씨', '아주머니', '학생', '직원', '요원', '사원', '대리', '과장', '부장', '선배', '후배', '언니', '오빠', '형', '누나', '손님', '주인', '사장', '경찰', '시민']);
@@ -377,7 +389,7 @@ export function resolveName(who: string, store: PeopleStore, names: NameEntry[] 
 export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, r: UpdateResult, ctx: ApplyCtx): ApplyReport {
   const list = msgs(chat);
   const live = liveness(chat);
-  const report: ApplyReport = { applied: { entries: 0, cues: 0, address: 0, docs: 0, suspicion: 0, newPeople: [], notes: 0, identity: false, taste: 0, openness: 0, factions: 0 }, dropped: [], held: [] };
+  const report: ApplyReport = { applied: { entries: 0, cues: 0, address: 0, docs: 0, suspicion: 0, newPeople: [], notes: 0, identity: false, taste: 0, openness: 0, factions: 0, transactions: 0 }, dropped: [], held: [], wallet: [] };
   const drop = (kind: string, item: unknown, reason: string, who?: string) => report.dropped.push({ kind, who, reason, item });
   const roleWords = ctx.roleWords ?? ROLE_WORDS;
   const seqs = new Map<string, number>();
@@ -856,6 +868,36 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
       if (!store.factions[code]) store.factions[code] = { code, name: factionNameOf(code, input.factionNames, store), seeded: { at: ctx.now ?? new Date().toISOString() } };
       const seq = nextSeq(ev.anchor);
       if (putChange(store, { id: changeId(who, 'cue', ev.anchor, seq, f.cue), anchor: ev.anchor, seq, src: 'story', who, kind: 'cue', cue: f.cue as Cue, quote: f.quote, reason: plain(f.reason, 40) })) report.applied.factions++;
+    }
+  }
+
+  // 6c. 가계부 거래 (2026-10-27): 금액이 글에 적힌 거래만. 금액은 모델이 적은 숫자(또는 「3만 원」)를 읽고, 인용에 금액 표기가 있어야 한다
+  if (ctx.wallet && input.wallet && !ctx.only?.length) {
+    const seen = new Set<string>();
+    for (const t of (r.transactions ?? []).slice(0, 6)) {
+      const amount = typeof t?.amount === 'number' ? Math.trunc(t.amount) : parseWon(str(t?.amount));
+      if (amount === null || !Number.isSafeInteger(amount) || amount === 0) {
+        drop('wallet', t, '금액을 읽을 수 없음');
+        continue;
+      }
+      const ev = evidence(str(t.m), str(t.quote));
+      if (typeof ev === 'string') {
+        drop('wallet', t, ev);
+        continue;
+      }
+      if (!mentionsAmount(str(t.quote)) && !/\d/.test(str(t.quote))) {
+        drop('wallet', t, '인용에 금액이 없음');
+        continue;
+      }
+      const memo = plain(t.memo, 30) || (amount < 0 ? '지출' : '수입');
+      const key = `${ev.anchor}|${amount}|${memo}`;
+      if (seen.has(key)) {
+        drop('wallet', t, '같은 거래 중복');
+        continue;
+      }
+      seen.add(key);
+      report.wallet.push({ anchor: ev.anchor, amount, memo, quote: str(t.quote).slice(0, 120) });
+      report.applied.transactions++;
     }
   }
 

@@ -1,13 +1,13 @@
 // 채팅 속 상태창: 태그를 상자로 그리고(display), 시각·요일을 누르면 말풍선, 위키 이름을 누르면 창의 위키 문서로.
 // 「지난 장면」·위키 이름은 채팅을 바꿀 때와 응답이 들어올 때 미리 모아 둔다 (display는 기다릴 수 없다).
-import { buildRegistry, findStatusTags, statusTimeline } from '../core/world';
+import { buildRegistry, colConfig, findStatusTags, hiddenCols, setStatusColumns, statusTimeline } from '../core/world';
 import { listDocs, prepareBaseDocs } from '../core/wiki';
 import type { Chat, LoreEntry } from '../core/types';
 import { statusHtml, type StatusContext } from '../ui/status';
 import { armChatClick, elements, hit, onChatClick } from './chatclicks';
 import { getChar } from './risu';
 
-let ctx: StatusContext = { timeline: null, terms: [] };
+let ctx: StatusContext = { timeline: null, terms: [], hide: new Set() };
 /** 위키 이름을 누르면 (app.ts가 채운다) */
 let openWiki: ((title: string) => void) | null = null;
 
@@ -27,7 +27,9 @@ export async function refreshStatusContext(charIndex: number, chatIndex: number)
   for (const e of buildRegistry(char?.globalLore).entries) for (const t of e.terms) if (t.length >= 2 && !titles.has(t)) titles.set(t, e.name);
   for (const d of listDocs(chat, char?.globalLore)) if (d.title.length >= 2 && !titles.has(d.title)) titles.set(d.title, d.title);
   const terms = [...titles].map(([term, title]) => ({ term, title })).sort((a, b) => b.term.length - a.term.length);
-  ctx = { timeline: statusTimeline(texts), terms };
+  // 칸 구성: 파서에 알리고(칸 수로 모양 찾기), 상자에서 숨길 칸을 정한다
+  setStatusColumns(chat.scriptstate);
+  ctx = { timeline: statusTimeline(texts), terms, hide: hiddenCols(colConfig(chat.scriptstate)) };
 }
 
 /** display: 상태창 태그 → 상자 */

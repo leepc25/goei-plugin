@@ -52,7 +52,9 @@ import { applyPlayer, hidePlayerTag, playerAgent, playerBlock } from './core/pla
 import { withFieldFacts, withInterludes } from './core/interlude';
 import { fieldRecord } from './core/field';
 import { buildImgPrompt, imgCharacters, imgPromptConfig, stripImgLore } from './core/imgprompt';
-import { withStatusBlock } from './core/statusctx';
+import { withStatusBlock, type StatusShape } from './core/statusctx';
+import { colConfig, fillStatusSection, setStatusColumns, usedCols } from './core/world/statuscols';
+import { aliveAnchors, readWallet, walletBalance } from './core/wallet';
 import { visitRecord } from './core/visit';
 import { visitContextRules } from './core/visitPrompt';
 import { withPeopleBlock, peopleBlockFor, insertBlock } from './core/people/request';
@@ -95,7 +97,8 @@ async function onBeforeRequest<M extends PromptMessage>(messages: M[], type: str
       messages = at < 0 ? [...messages, ...add] : [...messages.slice(0, at), ...add, ...messages.slice(at)];
     }
     // 지난 응답의 상태창 줄은 지우고 마지막 한 줄만 직전 상태 블록으로 (core/statusctx.ts). 신분 칸이 빠졌으면 아는 값을 채운다
-    messages = withStatusBlock(messages, await knownIdentity().catch(() => ''));
+    // 칸 구성(설정)대로 다시 만들고 잔고 칸은 장부 값으로 (core/world/statuscols.ts · core/wallet.ts)
+    messages = withStatusBlock(messages, await knownIdentity().catch(() => ''), await statusShape().catch(() => undefined));
     // 장면 인물의 살아 있는 기록 (core/people). 절 단위 혼합이면 그 인물의 시트 원문은 빼고 기록으로 대신한다
     messages = await withPeople(messages).catch(() => messages);
     // 이미지 태그 지침 (core/imgprompt): 카드 로어북 「Asset」 대신 설정으로 조립. 옛 카드의 로어북 본문이 남아 있으면 지운다
@@ -169,15 +172,18 @@ async function fixLore<M extends PromptMessage>(messages: M[]): Promise<M[]> {
   if (!char || !chat) return messages;
   const got = loreFor(char, chat);
   const real = stripVirtual(char.globalLore ?? []);
+  setStatusColumns(chat.scriptstate);
   if (hasSlots(real)) {
     if (!got || sameVars(chat.scriptstate, got.vars)) return messages;
     return patchSlots(messages, chat.scriptstate, got.vars).messages;
   }
   const parts: LoreBlockPart[] = [];
   const env = { vars: chat.scriptstate ?? {}, char: char.name, user: userInfo().name };
+  // 🏷️Tag 의 상태창 절은 이 채팅의 칸 구성에서 만든다 (`{status_section}` 자리)
+  const cols = usedCols(colConfig(chat.scriptstate));
   for (const b of ALWAYS_BOOKS) {
     const e = (char.globalLore ?? []).find((x) => isVirtual(x) && x.comment === b.name);
-    if (e && typeof e.content === 'string') parts.push({ order: b.order, text: evaluate(e.content, env) });
+    if (e && typeof e.content === 'string') parts.push({ order: b.order, text: evaluate(b.kind === 'tag' ? fillStatusSection(e.content, cols) : e.content, env) });
   }
   if (got) parts.push(...slotParts(Object.fromEntries(LORE_KINDS.map((k) => [k, got.vars[slotVar(k)] ?? ''])) as Record<LoreKind, string>));
   // 시드(첫 장면 강제 로어): 카드에 📕Start Lore 가 없으면 플러그인이. 수명은 processRequest 가 표식으로 다룬다
@@ -198,6 +204,16 @@ async function withPlayer<M extends PromptMessage>(messages: M[]): Promise<M[]> 
   const env = { vars: chat.scriptstate ?? {}, char: char.name, user: agent.name };
   const out = applyPlayer(messages, playerBlock(char.globalLore, agent, env), await readPersona(), userInfo().name, agent.name);
   return basicSettings(char.globalLore, chat.scriptstate).assetPlayer ? out : hidePlayerTag(out, [agent.english]);
+}
+
+/** 이 채팅의 상태창 모양: 사용하는 칸과 장부 잔고 (잔고 칸을 쓸 때만). 파서에도 칸 구성을 알린다 */
+async function statusShape(): Promise<StatusShape> {
+  const chat = (await risuai.getChatFromIndex(await risuai.getCurrentCharacterIndex(), await risuai.getCurrentChatIndex())) as Chat | null;
+  const vars = chat?.scriptstate ?? {};
+  setStatusColumns(vars);
+  const cfg = colConfig(vars);
+  const wallet = chat && cfg.wallet !== 'off' ? walletBalance(readWallet(vars, getPrefs().walletStart ?? 0), aliveAnchors(chat)) : null;
+  return { cols: usedCols(cfg), wallet };
 }
 
 /** 플러그인이 마지막으로 알아낸 유저 신분 (`조직/직급`). 없으면 빈 문자열 */
@@ -337,9 +353,11 @@ async function applyUnlocks(char: { globalLore?: LoreEntry[] }, charIndex: numbe
 async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: number; chatIndex: number; messageIndex: number }): Promise<void> {
   setWaiting(false);
   try {
-    const char = arg.char as { globalLore?: LoreEntry[] } | null;
+    const raw0 = arg.char as { globalLore?: LoreEntry[] } | null;
     const chat = arg.chat as Chat | null;
-    if (!char || !chat || !readManifest(char.globalLore)) return; // 다른 봇: 아무것도 안 함
+    if (!raw0 || !chat || !readManifest(raw0.globalLore)) return; // 다른 봇: 아무것도 안 함
+    // 이벤트의 캐릭터는 카드 그대로라 세계 데이터(가상 로어북)가 없다. 경량 카드는 명부 폴더가 가상이라 이걸 빼면 상황판 처리가 통째로 건너뛰어진다 (2026-10-27)
+    const char = { ...raw0, globalLore: withWorldLore(raw0.globalLore) };
     const raw = chat.message?.[arg.messageIndex]?.data;
     if (typeof raw !== 'string') return;
     let latest: Chat | null = null;

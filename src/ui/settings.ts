@@ -12,6 +12,8 @@ import { ASSET_NOTE } from '../core/asset';
 import { IMG_FOLD, IMG_RECENT, IMG_SIZE, imgFold, imgRecent, imgSize, setImgHidden } from '../core/imgtag';
 import type { Chat, ScriptState } from '../core/types';
 import { parseCatalog, readWorld, startWorldVars, WORLD_KEY, worldOn, worldVars } from '../core/world';
+import { COL_LOG_VAR, colConfig, colVar, STATUS_COLS, usedCols, withColLog, type ColConfig, type ColId, type ColMode } from '../core/world/statuscols';
+import { aliveAnchors, formatWon, parseWon, readWallet, WALLET_MAX, walletBalance, walletVars } from '../core/wallet';
 import { updateChat, type ChatContext } from '../host/risu';
 import { barButtons, directoryBar, directoryDone, directoryDoneClear, directorySearch, directoryView } from './directory';
 import { drawerBox } from './drawer';
@@ -81,6 +83,22 @@ function recentControl(key: string, v: number | undefined, label: string, busy: 
 
 const group = (title: string, body: string, note = '') =>
   `<section class="ps-group"><h3>${title}</h3>${note ? `<p class="ps-note">${note}</p>` : ''}<div class="ps-rows">${body}</div></section>`;
+
+/** 상태창 칸 표 (설계안 7절): 칸마다 사용·표시. 날짜·시각·위치는 사용을 끌 수 없다. 플러그인이 쓰는 칸은 끄면 그 기능도 꺼진다고 알린다 */
+function statusColsTable(cfg: ColConfig, busy: boolean): string {
+  const rows = STATUS_COLS.map((c) => {
+    const m = cfg[c.id];
+    const use = seg('set-col', m === 'off' ? '0' : '1', [['1', '사용'], ['0', '안 씀']], busy || c.locked).replace(/data-value="(\d)"/g, `data-value="${c.id}:use:$1"`);
+    const show = seg('set-col', m === 'on' ? '1' : '0', [['1', '표시'], ['0', '숨김']], busy || m === 'off').replace(/data-value="(\d)"/g, `data-value="${c.id}:show:$1"`);
+    const hint = c.locked ? '늘 사용' : c.feature ? `끄면 ${c.feature}도 꺼져요` : '';
+    return `<div class="st-col-row${m === 'off' ? ' off' : ''}"><div class="st-col-name"><b>${c.label}</b>${hint ? `<small>${hint}</small>` : ''}</div>${use}${show}</div>`;
+  });
+  return `<div class="st-cols">${rows.join('')}</div>`;
+}
+
+/** 시작 잔고 입력 (원). 숫자 또는 「120만 원」 */
+const wonInput = (n: number, busy: boolean) =>
+  `<input class="st-won" type="text" inputmode="numeric" value="${n.toLocaleString('en-US')}" data-change="set-wallet-start" aria-label="시작 잔고"${busy ? ' disabled' : ''}>`;
 
 /** 상황판을 끈다: 상태와 보고를 비운다 (원본 clearIntegratedControlState. 다시 켜도 복원하지 않음) */
 function worldOffVars(): ScriptState {
@@ -204,6 +222,11 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
         <button class="gx-mini" data-action="set-anomaly" data-value="off-no">취소</button></div></div>`
     : seg('set-anomaly', on ? 'on' : 'off', [['on', 'ON'], ['off', 'OFF']], busy);
   const note = String(ctx.chat.scriptstate?.[ASSET_NOTE] ?? '');
+  // 상태창 칸 구성·시작 잔고 (채팅 변수 또는 새 채팅 기본값)
+  const colCfg = colConfig(scope === 'chat' ? ctx.chat.scriptstate : getPrefs().vars);
+  const wallet = readWallet(scope === 'chat' ? ctx.chat.scriptstate : undefined, getPrefs().walletStart ?? 0);
+  const walletStart = wallet.start;
+  const walletNow = scope === 'chat' ? walletBalance(wallet, aliveAnchors(ctx.chat)) : walletStart;
   return `<main class="gx-body gx-settings">
     ${scopeBar(scope, canChat)}
     ${settingsUi.notice ? `<div class="gx-err" role="alert">${esc(settingsUi.notice)}</div>` : ''}
@@ -237,6 +260,11 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
       field('지원 투입', seg('set-support', s.supportOn ? '1' : '0', [['1', 'ON'], ['0', 'OFF']], busy), '편성에서 등록 요원 외의 일반 지원 인원을 더할 수 있어요.'),
       field('인물 기록', seg('set-people', peopleOn ? '1' : '0', [['1', 'ON'], ['0', 'OFF']], busy), scope === 'chat' ? '응답마다 보조 모델이 한 번 읽어 인물의 상태·관계·호감을 기록하고, 본편 요청이 그 기록을 읽어요. 세부는 「기능별 설정 → 인물 기록」에서.' : '새 채팅을 인물 기록을 켠 채로 시작할지 정해요.'),
     ].join(''))}
+    <details class="ps-adv st-colsbox" data-keep="status-cols"${keepOpen('status-cols')}><summary class="ps-adv-sum"><b>상태창 칸</b><small>${usedCols(colCfg).length}칸 사용</small></summary><div class="ps-adv-body">
+      <p class="ps-note">응답 끝의 상태 태그 <code>[▣|…]</code>에 들어가는 칸이에요. 「안 씀」으로 하면 태그에서 그 칸이 빠지고(모델에 모양을 알려 줘요), 「숨김」은 태그에는 두고 채팅 속 상태창 상자에서만 가려요.${scope === 'chat' ? ' 바꾼 구성은 이 채팅에 바로 적용되고 바뀐 시점이 기록돼요.' : ' 새 채팅의 기본 구성이에요.'}</p>
+      ${statusColsTable(colCfg, busy)}
+      ${colCfg.wallet !== 'off' ? field('시작 잔고', wonInput(walletStart, busy), scope === 'chat' ? `이 채팅 장부의 시작 잔고예요. 지금 잔고 ${esc(formatWon(walletNow))}. 거래 내역과 수정은 ID카드의 잔고 칩에서.` : '새 채팅 장부의 시작 잔고예요. 거래는 인물 기록 갱신기가 본문에서 금액이 적힌 것만 뽑아 더하고 빼요.') : ''}
+    </div></details>
     <details class="ps-adv st-world" data-keep="world-gen"${keepOpen('world-gen')}><summary class="ps-adv-sum"><b>괴이 발생</b></summary><div class="ps-adv-body"><p class="ps-note">응답을 처리할 때마다 판정해요. 상한을 0으로 하면 그 종류는 자동으로 생기지 않아요.</p>
       <div class="ps-cards">
         ${worldKind(world, 'preset', '프리셋 괴이', busy)}${worldKind(world, 'random', '랜덤 괴이', busy)}
@@ -288,6 +316,18 @@ async function saveDefaults(env: SettingsEnv, change: (p: Prefs) => Prefs): Prom
 }
 
 const basicPatch = (env: SettingsEnv, patch: Partial<BasicSettings>) => saveDefaults(env, (p) => ({ ...p, basic: { ...p.basic, ...patch } }));
+
+/** "칸:use:1|0" / "칸:show:1|0" → [칸, 새 모드]. 바뀌는 게 없거나 잠긴 칸을 끄려 하면 null */
+function nextColMode(cfg: ColConfig, v: string): [ColId, ColMode] | null {
+  const [id, what, val] = v.split(':');
+  const def = STATUS_COLS.find((c) => c.id === id);
+  if (!def || (what !== 'use' && what !== 'show') || (val !== '1' && val !== '0')) return null;
+  const cur = cfg[def.id];
+  let next: ColMode = cur;
+  if (what === 'use') next = val === '1' ? (cur === 'off' ? 'on' : cur) : def.locked ? cur : 'off';
+  else next = cur === 'off' ? cur : val === '1' ? 'on' : 'hide';
+  return next === cur ? null : [def.id, next];
+}
 
 /** "키:+" / "키:-" / "키:값" → 새 값 (범위 밖이면 null) */
 function nextWorld(w: WorldSettings, v: string): [WorldField['key'], number] | null {
@@ -396,6 +436,18 @@ export async function handleSettings(action: string, value: string | undefined, 
         // 새 채팅 기본값의 $pp_on (시작할 때 chat.scriptstate 로 들어간다)
         if (v === '1' || v === '0') await saveDefaults(env, (p) => ({ ...p, vars: { ...(p.vars ?? {}), [PP('on')]: v } }));
         return true;
+      case 'set-col': {
+        // 새 채팅 기본값의 상태창 칸 구성 ($st_col_<id>)
+        const hit = nextColMode(colConfig(getPrefs().vars), v);
+        if (hit) await saveDefaults(env, (p) => ({ ...p, vars: { ...(p.vars ?? {}), [colVar(hit[0])]: hit[1] } }));
+        return true;
+      }
+      case 'set-wallet-start': {
+        const n = parseWon(v);
+        if (n !== null && n >= 0 && n <= WALLET_MAX) await saveDefaults(env, (p) => ({ ...p, walletStart: n || undefined }));
+        else env.render();
+        return true;
+      }
       case 'set-agent': {
         const next = Math.min(AGENT_MAX, Math.max(0, d.basic.agentLimit + (v.endsWith('+') ? 1 : -1)));
         if (next !== d.basic.agentLimit) await basicPatch(env, { agentLimit: next });
@@ -441,6 +493,28 @@ export async function handleSettings(action: string, value: string | undefined, 
       if (v !== '1' && v !== '0') return true;
       await save(ctx, env, (chat) => (ppValue(chat.scriptstate, 'on') === v ? null : { [PP('on')]: v }));
       return true;
+    case 'set-col':
+      // 상태창 칸 사용·표시: 채팅 변수 + 바뀐 시점 기록 (파서가 옛 응답을 옛 구성으로 읽게)
+      await save(ctx, env, (chat) => {
+        const cfg = colConfig(chat.scriptstate);
+        const hit = nextColMode(cfg, v);
+        if (!hit) return null;
+        const next = { ...cfg, [hit[0]]: hit[1] };
+        return { [colVar(hit[0])]: hit[1], [COL_LOG_VAR]: withColLog(chat.scriptstate, (chat.message ?? []).length, usedCols(next)) };
+      });
+      return true;
+    case 'set-wallet-start': {
+      const n = parseWon(v);
+      if (n === null || n < 0 || n > WALLET_MAX) {
+        env.render();
+        return true;
+      }
+      await save(ctx, env, (chat) => {
+        const w = readWallet(chat.scriptstate, getPrefs().walletStart ?? 0);
+        return w.start === n ? null : walletVars({ ...w, start: n });
+      });
+      return true;
+    }
     case 'set-anomaly':
       if (v === 'off') {
         if (!worldOn(ctx.chat)) return true;

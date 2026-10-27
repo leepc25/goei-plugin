@@ -1,17 +1,21 @@
 // 채팅 속 상태창 (v0.16.31, 사용자 설계 시안 12): 시각·날짜·요일·날씨 한 줄, 위치, 목표.
 // 색은 본 화면에 붙인 style이 정한다 (설정 「상태창」: 테마 따름·다크·라이트·페이퍼·미표시). 그래서 설정을 바꾸면 그린 상자도 바로 바뀐다.
-import { dayInfo, elapsedLabel, sceneLabel, statusMinute, storyDay, type StatusTag, type StatusTimeline } from '../core/world';
+import { dayInfo, elapsedLabel, sceneLabel, statusMinute, storyDay, type ColId, type StatusTag, type StatusTimeline } from '../core/world';
+import { formatDelta, formatWon } from '../core/wallet';
 import type { StatusStyle, Theme } from '../core/settings';
 
 const esc = (s: string) => s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 
 const PIN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-12a7 7 0 0 1 14 0c0 5.8-7 12-7 12z"/><circle cx="12" cy="9" r="2.5"/></svg>';
 const AIM = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.2"/></svg>';
+const CASH = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/><path d="M7 12h.01M17 12h.01"/></svg>';
 
 export interface StatusContext {
   timeline: StatusTimeline | null;
   /** 위키에 있는 이름 → 문서 제목 (긴 이름 먼저) */
   terms: { term: string; title: string }[];
+  /** 상자에서 숨기는 칸 (설정 「표시」 끔). 없으면 모두 표시 */
+  hide?: Set<ColId>;
 }
 
 /** 글 속에서 위키 이름만 점선 밑줄로 (겹치면 긴 이름) */
@@ -42,8 +46,9 @@ export function linkTerms(text: string, terms: StatusContext['terms']): string {
 const kv = (rows: [string, string][]) => `<span class="gst-tip"><span class="gst-kv">${rows.map(([k, v]) => `<i>${esc(k)}</i><em>${esc(v)}</em>`).join('')}</span></span>`;
 
 export function statusHtml(tag: StatusTag, ctx: StatusContext): string {
+  const hid = (id: ColId) => !!ctx.hide?.has(id);
   const now = statusMinute(tag.date, tag.time);
-  const day = dayInfo(tag.date);
+  const day = hid('date') ? null : dayInfo(tag.date);
   // 시각: 지난 장면·흐른 시간·시작부터 (아는 것만)
   const rows: [string, string][] = [];
   // 모아 둔 목록에 없는 태그는 방금 들어온 응답: 마지막으로 본 장면이 지난 장면
@@ -56,19 +61,27 @@ export function statusHtml(tag: StatusTag, ctx: StatusContext): string {
     const s = new Date(start * 60000);
     rows.push(['시작부터', `${storyDay(start, now)}일째 · ${s.getUTCMonth() + 1}월 ${s.getUTCDate()}일 시작`]);
   }
-  const clock = tag.time ? `<span class="gst-clock"${rows.length ? ' data-gst-tip="1"' : ''}>${esc(tag.time)}${rows.length ? kv(rows) : ''}</span>` : '';
+  const clock = tag.time && !hid('time') ? `<span class="gst-clock"${rows.length ? ' data-gst-tip="1"' : ''}>${esc(tag.time)}${rows.length ? kv(rows) : ''}</span>` : '';
   let date = '';
   if (day) {
     const cls = day.saturday ? ' sat' : day.weekday === '일' ? ' sun' : '';
     const tip = [['음력', day.lunar], ...(day.holiday ? day.holiday.split('·').map((h) => ['공휴일', h] as [string, string]) : [])].filter(([, v]) => v) as [string, string][];
     date = `<span class="gst-date${day.holiday ? ' hol' : ''}"><span class="gst-dd">${esc(day.date)}</span>`
       + `<span class="gst-wd${cls}"${tip.length ? ' data-gst-tip="1"' : ''}>${day.weekday}${tip.length ? kv(tip) : ''}</span></span>`;
-  } else if (tag.date) date = `<span class="gst-date"><span class="gst-dd">${esc(tag.date)}</span></span>`;
-  const wx = [tag.weather, tag.temp].filter(Boolean).join(' ');
+  } else if (tag.date && !hid('date')) date = `<span class="gst-date"><span class="gst-dd">${esc(tag.date)}</span></span>`;
+  const wx = [hid('weather') ? '' : tag.weather, hid('temp') ? '' : tag.temp].filter(Boolean).join(' ');
   const top = clock || date || wx ? `<div class="gst-top">${clock}${date}${wx ? `<span class="gst-wx">${esc(wx)}</span>` : ''}</div>` : '';
-  const place = tag.place ? `<div class="gst-ln gst-loc">${PIN}<span>${linkTerms(tag.place, ctx.terms)}</span></div>` : '';
-  const target = tag.target ? `<div class="gst-ln gst-tgt">${AIM}<span>${linkTerms(tag.target, ctx.terms)}</span></div>` : '';
-  return `<div class="gst" data-goei-status="1">${top}${place}${target}</div>`;
+  const place = tag.place && !hid('place') ? `<div class="gst-ln gst-loc">${PIN}<span>${linkTerms(tag.place, ctx.terms)}</span></div>` : '';
+  const target = tag.target && !hid('target') ? `<div class="gst-ln gst-tgt">${AIM}<span>${linkTerms(tag.target, ctx.terms)}</span></div>` : '';
+  // 잔고 줄 (10번째 칸): 모델이 적은 값과 지난 상태창과의 차이. 「표시」를 끄면 숨김
+  let cash = '';
+  if (tag.wallet && !hid('wallet')) {
+    const n = Number(tag.wallet);
+    const pw = tl?.prevWallet.get(tag.raw.trim()) ?? (tl?.lastWallet !== null && tl?.lastWallet !== undefined && !tl.seen.has(tag.raw.trim()) ? tl.lastWallet : undefined);
+    const delta = pw === undefined ? 0 : n - pw;
+    cash = `<div class="gst-ln gst-cash">${CASH}<span>${esc(formatWon(n))}${delta ? `<small class="${delta > 0 ? 'gst-up' : 'gst-down'}">${esc(formatDelta(delta))}</small>` : ''}</span></div>`;
+  }
+  return `<div class="gst" data-goei-status="1">${top}${place}${target}${cash}</div>`;
 }
 
 const VARS: Record<Theme, Record<string, string>> = {
@@ -114,6 +127,8 @@ const STATUS_CSS = `
 .gst-ln>span{min-width:0;word-break:keep-all;overflow-wrap:anywhere}
 .gst-loc{font-weight:700}.gst-loc svg{color:var(--gs-pin)}
 .gst-tgt{font-weight:600;color:var(--gs-tgt)}
+.gst-cash{font-weight:600;color:var(--gs-sub);font-variant-numeric:tabular-nums}.gst-cash svg{color:var(--gs-sub)}
+.gst-cash small{margin-left:7px;font-size:12px;font-weight:700}.gst-up{color:var(--gs-blue)}.gst-down{color:var(--gs-red)}
 .gst-link{cursor:pointer;text-decoration:underline dotted;text-decoration-color:color-mix(in srgb,currentColor 50%,transparent);text-underline-offset:3px}
 [data-gst-tip]{cursor:pointer}
 .gst-tip{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);z-index:5;padding:6px 10px;border-radius:9px;background:var(--gs-text);color:var(--gs-panel);font-size:12px;font-weight:600;line-height:1.4;letter-spacing:0;white-space:nowrap;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .12s}

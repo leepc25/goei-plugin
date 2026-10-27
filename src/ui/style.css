@@ -2783,3 +2783,35 @@ button.mk-go:hover { color: var(--signal); }
 .ip-preview { margin-top: 8px; padding: 10px; border-radius: 8px; background: var(--panel2); font-size: 12px; white-space: pre-wrap; overflow-wrap: anywhere; max-height: 360px; overflow: auto; }
 
 .pp-mini.on { color: var(--signal); border-color: var(--accent-line); background: var(--accent-bg); }
+
+/* 상태창 칸 표 (설정 상황판 → 상태창 칸) */
+.st-colsbox .ps-adv-sum small { margin-left: 8px; font-size: 12px; color: var(--dim); }
+.st-cols { display: flex; flex-direction: column; gap: 4px; }
+.st-col-row { display: grid; grid-template-columns: 1fr auto auto; gap: 8px; align-items: center; padding: 6px 0; border-bottom: 1px solid color-mix(in srgb, var(--line) 60%, transparent); }
+.st-col-row:last-child { border-bottom: 0; }
+.st-col-row.off .st-col-name b { color: var(--dim); }
+.st-col-name { display: flex; flex-direction: column; min-width: 0; }
+.st-col-name b { font-size: 13px; }
+.st-col-name small { font-size: 11px; color: var(--dim); }
+.st-won { width: 150px; padding: 6px 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel2); color: var(--text); font: inherit; font-size: 13px; text-align: right; font-variant-numeric: tabular-nums; }
+/* ID카드 잔고 칩 + 장부 창 */
+.gx-wallet { align-self: flex-start; margin-top: 4px; padding: 2px 9px; border: 1px solid var(--line); border-radius: 999px; background: var(--panel2); color: var(--text); font: inherit; font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; cursor: pointer; }
+.gx-wallet:hover { border-color: var(--signal); }
+.gx-walpop { position: absolute; z-index: 41; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(420px, calc(100% - 24px)); max-height: calc(100% - 24px); overflow-y: auto; box-sizing: border-box; padding: 14px 16px 16px; border: 1px solid var(--line); border-radius: 16px; background: var(--panel); color: var(--text); display: flex; flex-direction: column; gap: 10px; }
+.gx-walpop-head { display: flex; align-items: center; gap: 10px; }
+.gx-walpop-head b { font-size: 15px; }
+.gx-walpop-head > span { margin-left: auto; font-weight: 800; font-variant-numeric: tabular-nums; }
+.gx-walpop .gx-muted { margin: 0; font-size: 12px; }
+.gx-wl { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.gx-wl li { display: grid; grid-template-columns: 1fr auto auto; gap: 8px; align-items: center; padding: 6px 0; border-bottom: 1px solid color-mix(in srgb, var(--line) 60%, transparent); font-size: 13px; }
+.gx-wl li:last-child { border-bottom: 0; }
+.gx-wl-memo { display: flex; flex-direction: column; min-width: 0; }
+.gx-wl-memo small { font-size: 11px; color: var(--dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gx-wl b { font-variant-numeric: tabular-nums; }
+.gx-wl b.in { color: var(--signal); }
+.gx-wl b.out { color: var(--danger, #e0656a); }
+.gx-wl-x { border: 0; background: none; color: var(--dim); cursor: pointer; font-size: 12px; padding: 2px 4px; }
+.gx-wl-x:hover { color: var(--text); }
+.gx-wl-empty { color: var(--dim); }
+.gx-wl-adj { display: flex; gap: 6px; }
+.gx-wl-adj input { flex: 1; min-width: 0; padding: 6px 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel2); color: var(--text); font: inherit; font-size: 13px; }
