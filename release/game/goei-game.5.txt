@@ -1,3 +1,212 @@
+run, e, Math.max(p.damage, 8), targets));
+              done2 = true;
+              break;
+            }
+        }
+        if (p.kind === "prop" && (done2 || p.z <= 0)) {
+          done2 = true;
+          const def = PROPS[p.ref];
+          ev.push({ t: "break", prop: p.ref, x: p.x, y: p.y });
+          if (def.burst) ev.push(...explode(field, run, def.burst, p.x, p.y, def.id, targets, def.knockdown));
+          else ev.push(burst(field, "blast", p.x, p.y, 40, 0.25));
+        }
+      }
+      if (done2) field.projs.splice(field.projs.indexOf(p), 1);
+    }
+    for (const z of field.zones.slice()) {
+      z.t += dt;
+      if (z.t >= z.life) field.zones.splice(field.zones.indexOf(z), 1);
+    }
+    return ev;
+  }
+
+  // src/game/action/items/shop.ts
+  function openShop(vendor, run, depth, seed) {
+    const st = { seed: seed | 0 || 7 };
+    const v = VENDORS[vendor];
+    const offers = [];
+    const greet = v.greet[Math.floor(rand(st) * v.greet.length)];
+    if (vendor === "madeokhee") {
+      const pool = ["medkit", "bandage", "antidote", "salt", "flash", "smoke", "charm", "energy", "adrenaline"];
+      const picks = ["medkit"];
+      while (picks.length < 4) {
+        const id = pool[Math.floor(rand(st) * pool.length)];
+        if (!picks.includes(id)) picks.push(id);
+      }
+      for (const id of picks) {
+        const d3 = ITEMS[id];
+        offers.push({ key: "i:" + id, kind: "item", ref: id, name: d3.name, desc: d3.desc, price: priceAt(d3.price, depth), stock: id === "medkit" ? 3 : 2 });
+      }
+      const sig = SIGNATURES[run.agent];
+      if (sig && sig.ammo !== "none") {
+        const a = AMMO_PICKUP[sig.ammo];
+        offers.push({ key: "ammo", kind: "ammo", ref: sig.ammo, name: a.name, desc: `${sig.ranged} 예비 +${a.amount}`, price: priceAt(sig.ammo === "rifle" ? 30 : 15, depth), stock: 4 });
+      }
+      if (rand(st) < 0.6) {
+        const ws = ["pipe", "kitchenknife", "servicepistol", "shotgun", "smg"];
+        const id = ws[Math.floor(rand(st) * ws.length)];
+        const w = WEAPONS[id];
+        offers.push({ key: "w:" + id, kind: "weapon", ref: id, name: w.name, desc: `${w.cls === "gun" ? "총" : "한 손 근접"} · ${w.cls === "gun" ? "탄" : "내구"} ${w.uses} · ${w.desc}`, price: priceAt(w.cls === "gun" ? 55 : 30, depth), stock: 1 });
+      }
+    } else if (vendor === "backalley") {
+      for (const c of CLINIC) offers.push({ key: "c:" + c.id, kind: "clinic", ref: c.id, name: c.name, desc: c.desc, price: priceAt(c.price, depth), stock: 1 });
+    } else if (vendor === "shinyuri") {
+      LOANS.forEach(
+        (l, i) => offers.push({ key: "l:" + i, kind: "loan", ref: String(i), name: `현금 ${l.cash}`, desc: `귀환 후 예산 ${l.debt} 상환. 못 갚으면 유물 압류`, price: 0, stock: 1, debt: l.debt })
+      );
+    } else {
+      offers.push({ key: "g:cash", kind: "gamble", ref: "cash", name: "동전 넣기", desc: "무작위 아이템 하나", price: priceAt(25, depth), stock: 3 });
+      offers.push({ key: "g:hp", kind: "gamble", ref: "hp", name: "다른 것을 넣기", desc: "체력 20%를 내고 무작위 아이템 하나", price: 0, stock: 2, hpCost: 0.2 });
+    }
+    return { vendor, depth, seed: st.seed, offers, buys: vendor === "madeokhee", greet };
+  }
+  function buy2(shop, run, key2, ctx) {
+    const o = shop.offers.find((x) => x.key === key2);
+    if (!o || o.stock <= 0) return { ok: false, why: "stock" };
+    if (run.cash < o.price) return { ok: false, why: "cash" };
+    if (o.hpCost && (!ctx || !Number.isFinite(ctx.hp) || !Number.isFinite(ctx.max) || ctx.max <= 0 || ctx.hp - ctx.max * o.hpCost < 1))
+      return { ok: false, why: "cash", currency: "hp" };
+    let res;
+    switch (o.kind) {
+      case "item":
+        if (!canAddItem(run, o.ref)) return { ok: false, why: "full" };
+        addItem(run, o.ref);
+        res = { ok: true, got: o.name };
+        break;
+      case "ammo":
+        if (!addAmmo(run)) return { ok: false, why: "ammoFull" };
+        res = { ok: true, got: o.name };
+        break;
+      case "weapon":
+        equip2(run, o.ref);
+        res = { ok: true, got: o.name };
+        break;
+      case "clinic": {
+        const c = CLINIC.find((x) => x.id === o.ref);
+        const heal2 = ctx && Number.isFinite(ctx.hp) && Number.isFinite(ctx.max) && ctx.hp > 0 && ctx.hp < ctx.max ? c.heal : 0;
+        const cure = c.cure.filter((status) => ctx?.curable?.includes(status));
+        if (!heal2 && !cure.length) return { ok: false, why: "stock", message: "지금은 받을 수 있는 치료가 없다" };
+        res = { ok: true, got: o.name, heal: heal2, cure };
+        break;
+      }
+      case "loan": {
+        if (run.debt > 0) return { ok: false, why: "loan" };
+        const l = LOANS[+o.ref];
+        run.cash += l.cash;
+        run.debt += l.debt;
+        for (const x of shop.offers) if (x.kind === "loan") x.stock = 0;
+        return { ok: true, got: o.name };
+      }
+      case "gamble": {
+        const st = { seed: shop.seed };
+        const ids = Object.keys(ITEMS).filter((id2) => canAddItem(run, id2));
+        if (!ids.length) return { ok: false, why: "full" };
+        const id = ids[Math.floor(rand(st) * ids.length)];
+        shop.seed = st.seed;
+        addItem(run, id);
+        res = { ok: true, got: ITEMS[id].name, hpCost: o.hpCost };
+        break;
+      }
+    }
+    run.cash -= o.price;
+    o.stock--;
+    return res;
+  }
+  function sell(shop, run, bagIndex) {
+    const b = run.bag[bagIndex];
+    if (!shop.buys || !b) return 0;
+    const price = sellPrice(shop, b.value);
+    run.bag[bagIndex] = null;
+    run.cash += price;
+    return price;
+  }
+  var sellPrice = (shop, value) => Math.round(value * (1 + shop.depth * 0.03));
+
+  // src/game/action/items/icons.ts
+  var C2 = {
+    heal: "#5fbf6a",
+    cure: "#4fb3b3",
+    throw: "#e08a3c",
+    special: "#9a7fd1",
+    metal: "#9aa4ab",
+    dark: "#4a5258",
+    wood: "#a07850",
+    gold: "#d6b64a",
+    cash: "#e6d36a",
+    red: "#d65a5a",
+    white: "#e8ecee",
+    shard: "#c77dff"
+  };
+  var rect = (g2, c, x, y, w, h) => {
+    g2.fillStyle = c;
+    g2.fillRect(x, y, w, h);
+  };
+  var circ = (g2, c, x, y, r) => {
+    g2.fillStyle = c;
+    g2.beginPath();
+    g2.arc(x, y, r, 0, Math.PI * 2);
+    g2.fill();
+  };
+  var poly = (g2, c, pts) => {
+    g2.fillStyle = c;
+    g2.beginPath();
+    g2.moveTo(pts[0], pts[1]);
+    for (let i = 2; i < pts.length; i += 2) g2.lineTo(pts[i], pts[i + 1]);
+    g2.closePath();
+    g2.fill();
+  };
+  var line = (g2, c, w, pts) => {
+    g2.strokeStyle = c;
+    g2.lineWidth = w;
+    g2.lineCap = "round";
+    g2.beginPath();
+    g2.moveTo(pts[0], pts[1]);
+    for (let i = 2; i < pts.length; i += 2) g2.lineTo(pts[i], pts[i + 1]);
+    g2.stroke();
+  };
+  var bottle = (c, mark) => (g2) => {
+    rect(g2, C2.dark, 13, 3, 6, 4);
+    rect(g2, c, 9, 7, 14, 21);
+    rect(g2, C2.white, 11, 13, 10, 8);
+    rect(g2, mark, 15, 14, 2, 6);
+    rect(g2, mark, 13, 16, 6, 2);
+  };
+  var ICONS2 = {
+    medkit: (g2) => {
+      rect(g2, C2.heal, 4, 9, 24, 18);
+      rect(g2, C2.dark, 12, 5, 8, 4);
+      rect(g2, C2.white, 14, 12, 4, 12);
+      rect(g2, C2.white, 10, 16, 12, 4);
+    },
+    bandage: (g2) => {
+      circ(g2, C2.white, 16, 16, 11);
+      circ(g2, C2.cure, 16, 16, 5);
+      rect(g2, C2.white, 16, 22, 12, 5);
+    },
+    antidote: bottle(C2.cure, C2.cure),
+    salt: (g2) => {
+      poly(g2, C2.white, [8, 28, 10, 8, 22, 8, 24, 28]);
+      rect(g2, C2.special, 9, 5, 14, 4);
+      circ(g2, C2.dark, 13, 6, 1);
+      circ(g2, C2.dark, 19, 6, 1);
+      rect(g2, C2.special, 11, 15, 10, 6);
+    },
+    flash: (g2) => {
+      rect(g2, C2.throw, 10, 10, 12, 18);
+      rect(g2, C2.dark, 12, 5, 8, 5);
+      line(g2, C2.metal, 2, [20, 7, 26, 4]);
+      poly(g2, C2.white, [16, 13, 18, 18, 14, 18, 17, 25, 13, 19, 16, 19]);
+    },
+    smoke: (g2) => {
+      rect(g2, C2.metal, 10, 11, 12, 17);
+      rect(g2, C2.dark, 12, 6, 8, 5);
+      circ(g2, "#c8cdd0", 22, 8, 4);
+      circ(g2, "#c8cdd0", 26, 5, 3);
+    },
+    charm: (g2) => {
+      rect(g2, "#e9d77a", 9, 3, 14, 26);
+      line(g2, C2.red, 2, [12, 8, 20, 8, 12, 14, 20, 14, 16, 22, 16, 26]);
+    },
     energy: (g2) => {
       rect(g2, C2.special, 10, 6, 12, 22);
       rect(g2, C2.metal, 10, 4, 12, 3);
@@ -4838,172 +5047,4 @@
         return true;
       }
     };
-    const recordInventory = () => {
-      w.notes.cash = ir.cash;
-      w.notes.shards = ir.shards;
-      w.notes.debt = ir.debt;
-      w.notes.bag = ir.bag.map((b) => b ? { ...b } : null);
-      w.notes.itemsLeft = ir.loadout.map((s2) => s2 ? { ...s2 } : null);
-    };
-    w.itemField = () => field;
-    const syncSlots = () => {
-      w.items = ir.loadout.map((s2) => s2 ? { id: s2.id, label: ITEMS[s2.id]?.name ?? s2.id, n: s2.n } : null);
-    };
-    syncSlots();
-    const targets = () => w.bodies.filter((b) => b.team === "enemy" && b.alive && b.hp > 0).map((b) => ({ id: b.id, x: b.x, y: b.y, z: b.z, w: 56, h: 170, human: true }));
-    const ctx = () => ({ hp: p.hp, max: p.hpMax, gauge: p.gauge / 100, energy: p.skillCd > 0 ? 0 : 1, energyMax: 1 });
-    const apply = (evs) => {
-      for (const e of evs) {
-        if (e.t === "hit") {
-          const b = w.bodies.find((x) => x.id === e.target);
-          if (!b) continue;
-          if (e.damage > 0) {
-            const cls = WEAPONS[e.source]?.cls;
-            const scale = cls === "melee" ? p.progression.stats.power : cls === "gun" ? p.progression.stats.aim : 1;
-            const result = b.applyHit(itemHit({ ...e, damage: e.damage * scale }, p.x), w);
-            if (result.kind === "hit" || result.kind === "armor") p.onConnect(w, !!result.killed);
-            if (result.killed) {
-              w.kills++;
-              if (!(b instanceof Fighter)) w.emit({ type: "enemyDie", kind: b.kind, x: b.x });
-            }
-          }
-          if (e.status === "stun" && b.alive && b.hp > 0) {
-            const ticks = Math.round((e.stun ?? 2) * TICK_HZ);
-            const shockKnockdown = e.damage > 0 && e.knockdown && b instanceof Enemy && b.state === "air";
-            if (b instanceof Enemy && b.inv <= 0 && (["idle", "walk", "attack", "hurt", "stunned", "grabbing"].includes(b.state) || shockKnockdown)) {
-              if (b.state === "grabbing") b.releaseGrab(w);
-              b.move = null;
-              b.vx = b.vy = 0;
-              b.set("stunned");
-              b.stunT = ticks;
-              w.fx("ring", b.x, b.y, 100, "2");
-            } else if (b instanceof Fighter && b.invuln <= 0 && ["free", "act", "hurt"].includes(b.phase)) {
-              b.vx = b.vy = 0;
-              b.enter("hurt", ticks);
-              w.fx("ring", b.x, b.y, 100, "2");
-            }
-          }
-        } else if (e.t === "use") {
-          const f = e.effect;
-          if (f.type === "heal") p.hp = Math.min(p.hpMax, p.hp + p.hpMax * f.ratio);
-          else if (f.type === "cure") p.hp = Math.min(p.hpMax, p.hp + p.hpMax * (f.heal ?? 0));
-          else if (f.type === "gauge") p.gauge = Math.min(100, p.gauge + f.amount * 100);
-          else if (f.type === "energy") p.skillCd = 0;
-          else if (f.type === "ward") p.ward += f.hits;
-        } else if (e.t === "pickup" && e.kind === "heal") {
-          p.hp = Math.min(p.hpMax, p.hp + pickupHealAmount(p.hpMax, e.amount));
-        }
-      }
-      for (const g2 of toGameEvents(evs, p.x, p.ammo)) w.emit(g2);
-      if (ir.reserve !== lastReserve) {
-        p.reserve += ir.reserve - lastReserve;
-        ir.reserve = lastReserve = p.reserve;
-      }
-      syncSlots();
-    };
-    const actor = () => ({ x: p.x, y: p.y, z: p.z, dir: p.dir });
-    const syncCarry = () => {
-      p.carry = ir.carry ? { kind: "prop", id: ir.carry.prop, hold: "over" } : ir.held ? { kind: "weapon", id: ir.held.id, hold: "hand", cls: WEAPONS[ir.held.id]?.cls } : null;
-    };
-    const melee = { damage: 12, reach: 110 };
-    p.itemAct = (k) => {
-      if (ir.carry) {
-        apply(stepField(field, ir, actor(), { attack: true }, targets(), 0, ctx(), melee));
-        syncCarry();
-        return "toss";
-      }
-      const cls = ir.held ? WEAPONS[ir.held.id]?.cls : void 0;
-      if (k === "attack" && cls === "melee") {
-        apply(stepField(field, ir, actor(), { attack: true }, targets(), 0, ctx(), melee));
-        syncCarry();
-        return "wswing";
-      }
-      if (k === "shoot" && cls === "gun") {
-        apply(stepField(field, ir, actor(), { shoot: true }, targets(), 0, ctx()));
-        syncCarry();
-        return "wfire";
-      }
-      return null;
-    };
-    w.pickHook = () => {
-      const before = `${ir.carry?.prop}|${ir.held?.id}|${field.ents.length}`;
-      const evs = stepField(field, ir, actor(), { interact: true }, targets(), 0, ctx());
-      apply(evs);
-      syncCarry();
-      const changed = evs.length > 0 || before !== `${ir.carry?.prop}|${ir.held?.id}|${field.ents.length}`;
-      if (changed && p.phase === "free" && !p.move && p.z <= 0) p.play("pickup", w);
-      return changed;
-    };
-    w.drawHeld = (c, carry, sx, sy, deg, dir) => {
-      c.save();
-      c.translate(sx, sy);
-      if (dir < 0) c.scale(-1, 1);
-      if (carry.kind === "prop") {
-        const d3 = PROPS[carry.id];
-        const s2 = Math.max(d3?.w ?? 60, d3?.h ?? 60);
-        if (!drawPropSized(c, carry.id, 0, -18)) drawItemIcon(c, carry.id, -s2 / 2, -s2 - 18, s2);
-      } else if (!drawItemHeld(c, carry.id, deg)) {
-        c.rotate((deg + 45) * Math.PI / 180);
-        drawItemIcon(c, carry.id, -12, -36, 48);
-      }
-      c.restore();
-    };
-    w.itemUse = (slot) => {
-      const evs = stepField(field, ir, { x: p.x, y: p.y, z: p.z, dir: p.dir }, { use: slot - 1 }, targets(), 0, ctx());
-      const used = evs.find((e) => e.t === "use");
-      apply(evs);
-      if (!used) {
-        if (w.items[slot - 1]) w.say("지금은 쓸 필요가 없다", 1);
-        return false;
-      }
-      const t = used.effect.type;
-      return { anim: t === "heal" || t === "energy" || t === "gauge" ? "drink" : t === "cure" ? "bandage" : t === "flash" || t === "smoke" ? "toss" : "drink", consumed: true };
-    };
-    w.on((e) => {
-      if (e.type === "run:end") recordInventory();
-      if (e.type === "enter:floor") {
-        const remembered = fields.get(e.floor.id);
-        if (remembered) {
-          field = remembered;
-          syncCarry();
-          return;
-        }
-        field = createField(run.seed + w.floors * 7919, e.floor.depth ?? 1, { x0: 20, x1: e.floor.length - 20, y0: w.lane[0], y1: w.lane[1] });
-        fields.set(e.floor.id, field);
-        const artProps = (e.floor.props ?? []).map((q) => ({ ...q, w: Math.max(q.w, (propArtSize(q.kind, q.label, e.floor.type)?.w ?? 0) + 40) }));
-        furnishFloor(field, { ...e.floor, props: furnishAvoid({ ...e.floor, props: artProps }, w.bodies.filter((b) => b.alive && b.team !== "player")) }, w.lane, () => w.rand());
-        const st = clearSpot(p.x, p.y, allSolids(), w.lane);
-        p.x = p.px = st.x;
-        p.y = p.py = st.y;
-        field.ents = field.ents.filter((q) => q.type !== "prop" || PROP_ART.has(q.prop));
-        syncCarry();
-      }
-      if (e.type === "enemyDie" && DROP_TABLE[e.kind]) apply(dropFromKill(field, ir, DROP_TABLE[e.kind], e.x, w.player.y));
-      if (e.type === "custom" && e.name === "enemyDrop") {
-        const d3 = e.data;
-        apply(spawnEnemyDrops(field, ir, d3.drops, d3.x, d3.y, d3.kind));
-      }
-    });
-    let shopSeed = run.seed ^ 20817;
-    const shops = /* @__PURE__ */ new Map();
-    w.interactHooks.push((prop) => {
-      if (prop?.kind !== "merchant" || !shopPanel || shopPanel.isOpen()) return;
-      const ids = Object.keys(VENDORS);
-      const vendor = ids.find((v) => prop.label?.includes(VENDORS[v].name)) ?? "madeokhee";
-      const shopKey = JSON.stringify([w.floor.id, prop.id, vendor]);
-      let shop = shops.get(shopKey);
-      if (!shop) {
-        shop = openShop(vendor, ir, w.floor?.depth ?? 1, shopSeed + (w.floors | 0) * 131);
-        shops.set(shopKey, shop);
-      }
-      lastReserve = ir.reserve = p.reserve;
-      shopPanel.open(shop, ir, (r) => {
-        if (r.heal) p.hp = Math.min(p.hpMax, p.hp + p.hpMax * r.heal);
-        if (r.hpCost) p.hp = Math.max(1, p.hp - p.hpMax * r.hpCost);
-        apply([]);
-        syncCarry();
-        w.emit({ type: "pickup", x: p.x, id: "shop" });
-      }, () => w.say(VENDORS[vendor].bye, 2), () => ({ hp: p.hp, max: p.hpMax }));
-    });
-    const hitSeen = /* @__PURE__ */ new Set();
-    const overlapT = /* @__PURE__ */ new WeakMa
+    const recordInventory = () 

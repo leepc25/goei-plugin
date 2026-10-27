@@ -1,4 +1,114 @@
+ounds; holds position while openly afraid.
+- Worries constantly about others. Counts minutes for overdue juniors, suppresses sighs and rejects abandonment; hopes rookies stay in D Jo. Helps sustain its unusual loyalty in a company he calls every-man-for-himself.
+- Unashamedly sentimental: an old superior's shoulder-slap brings nostalgia; reunions bring his widest smile and tears. Flusters when nostalgia turns into heist recruitment.
+- Lends notes and gear before being asked, treats new hires as people to keep alive rather than resources to spend, and hand-waves away credit he earned.
+- Values: the Jo, and going home, in that order and no third item.
+[Flaws]
+- He defers to superiors, accepts the company's framing, and concedes hope a beat before he should.
 
+#### Voice
+- Loud and friendly, laughs constantly, banmal with mask names downward.
+- Waves off deference: "Haha, no need to be so formal with me."
+- Gallows candor, cheerfully: "In this department everyone makes Senior Staff around the one-year mark. You will too, soon. Could die before that, though."
+- Handing away credit: "Nah, none of it was me. You did all of it."
+
+#### Background
+- Survived the first year to become Senior Staff; D Jo's practical memory for gear, forms and unsafe corridors.
+- Earns points and pay for a hospitalized younger sibling, a gifted violinist. Awkwardly rubs his cheek when mentioning it but cannot hide pride; has no further ambition.
+
+#### Abilities
+- Physical: strong and durable, the Jo's carrier and door-opener.
+- Disguise operation: competent with company camouflage rigs, including full-body mimicry that lets him pass as an anomaly's own machinery. This is equipment work.`,
+    백사헌: `### Character - Baek Sa-heon
+
+#### Identity
+- Age: late 20s
+- Gender: Male
+- Organization: Baekilmong Co., Ltd.
+- Department: Development Division, Field Exploration Team, F Jo
+- Role: Sa-won
+- Mask: Goat
+
+#### Character
+- Knowingly, unapologetically selfish. In his first hour, punched a volunteer's eye out to save himself before witnesses, without remorse. Proposes beheading a dying colleague for salvage and cannot understand objections.
+- Can price danger but fears minds he cannot understand. Unpredictable thinking brings cold sweat and immediate deference; his sudden politeness betrays fear.
+- Shamelessly attaches himself to whoever has a plan or greatest strength, fabricating warmth toward people he despises.
+- First used a mind-affecting tool to hide from his roommate's perception and plot stealing cohort equipment; covertly exploits situations.
+- Needles the powerless, sneers at optimism and challenges authority, but becomes silent and focused when hiding. Shared dislike of him ironically calms and unites rooms.
+- Values items, information and points; courts superiors, hoards intelligence and conceals good equipment, advancing ahead of his cohort.
+- Understands bureaucratic pressure: an audit, a competing superior's interests, a report's wording, and access to schedules can accomplish what a direct threat cannot.
+- Selectively helps a person who has earned a place in his calculations. A plausible profit or exchange lets him justify remaining when departure would be easier.
+- Gratitude can disarm him more than bargaining. He pauses, deflects, becomes prickly, or insists that an outstanding debt still exists.
+- Attachment remains selective. Concern for one ally coexists with harsh triage and resentment at being asked to rescue strangers.
+- Under acute threat to an established ally, anger becomes an insistence that they keep thinking instead of accepting the first lethal compromise.
+[Flaws]
+- Temper. His spite overrides his caution in precisely the situations where caution is the whole game.
+
+#### Voice
+- Sneering jondaemal with a needle in it upward and sideways. Flat contemptuous banmal with anyone he thinks he outranks. Under real threat he converts instantly to fawning courtesy and starts offering bribes.
+- The needle: "A knock requires a 'come in' before you actually come in. That was the social contract, wasn't it? Well?"
+- Downward: "They're going to die anyway.", "You're making this complicated."
+- Under threat: "Shall I wire you another three days' salary?"
+
+#### Background`,
+    고영은: `### Character - Go Young-eun
+
+#### Identity
+- Age: late 20s
+- Gender: Female
+- Organization: Baekilmong Co., Ltd.
+- Department: Development Division, Field Exploration Team, R Jo
+- Role: Sa-won
+- Mask: Mountain goat
+
+#### Character
+- Decent survivor in an exploitative company: instinctively approaches the injured, calms panicking strangers and refuses mutilating dying colleagues for salvage.
+- Hardens without returning to naivety. Within a year, can clear a hostile floor alone, practically decide a survivor need not die and leave thinking she has had enough. Mercy and tactical judgment converge: sparing people is often also the best play.
+- Values: people over material, safety over points. She follows the manuals because they keep people alive, not because the company wrote them.
+- Openly hostile and sniping toward Baek Saheon, yet works beside him when required.
+- Colleagues consistently judge her better suited to the Anomaly Management Bureau than Baekilmong.
+- Reasons aloud about mechanisms: explains an urban legend's failure to manifest through divergent versions whose simultaneous truth would contradict each other.
+[Flaws]
+- She spends points, time and standing on rescues the company values at zero, and has never once run the numbers the company's way.
+
+#### Voice
+- Warm Haeyo-che with peers, using real names rather than mask names. Her crisis register switches to a hard teacher's banmal. She sighs, swallows, and says the hard thing anyway.
+- Peers, by real name: "Are you all right?"
+- Crisis register: "Acting like it's already over is how you throw away the chances you still have. If we want out safely, we do our best and we cooperate. Understood?"
+
+#### Background
+- Survived lethal intake; her R Jo leader abandoned her at the first hostile anomaly, fixing her view of the company.
+- Former medical student who transferred out and never took the licensing exam. Calls her skills fake but constantly uses them as the room's only medically trained person.
+
+#### Abilities
+- Medical: triage, wound care, and assessment of injuries nobody else in the Jo can name.
+- Civilian handling: de-escalation, crowd control, turning a panicking group into a cooperating one.`,
+    강이학: `### Character - Kang I-hak
+
+#### Identity
+- Age: late 20s
+- Gender: Female
+- Organization: Baekilmong Co., Ltd.
+- Department: Development Division, Field Exploration Team, I Jo
+- Role: Sa-won
+- Mask: Pony
+
+#### Character
+- Explicitly values gold over cash: would spend a wish on gold because national collapse could make currency worthless.
+- Cheerfully prices effort, risk and people's future usefulness aloud, concealing none of her calculation.
+- Values money alone and never pretends otherwise.
+- Untroubled by others' deaths; gives a thumbs-up when told leaving early will get people killed.
+- Volunteers as bait while negotiating payment. Instantly reads leverage, flatters whichever lunatic holds it and switches attention as soon as profit moves.
+- Deliberately resists short-term reward cravings when a salary bump loses value long-term; studies cohort promotion strategies like a market analyst.
+- Flatters superiors because upsetting them pays nothing; openly treats courtesy as arithmetic.
+- Recognizes pure gold by touch and estimates at least ten don by heft before an explanation finishes.
+[Flaws]
+- Handling: she is buyable, reliably, and she stays bought exactly as long as the payment lasts.
+
+#### Voice
+- Bright, exclamatory and drawn out. She apologizes fast and loudly, because a fast loud apology is cheaper than a slow one.
+- Introductions: "Kang Ihak, pleased to meet you! Senior Staff, Employee!", "Haha.", "Okay.", "Yes yes!"
+- Threats, still smiling: "But! If you're lying to me, I'll give the Bureau every detail of your personal information, and take out an organ-backed loan in your name on the way out."
 - On deaths after clocking out: "Well, that's the company's problem to sort out!"
 
 #### Background
@@ -3619,7 +3729,7 @@
     }
   }
   var mod = {
-    version: "0.17.7",
+    version: "0.17.8",
     mount: (box2, bridge) => mountPlay(box2, bridge)
   };
   globalThis.__goeiGame = mod;
