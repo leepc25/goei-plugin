@@ -10,7 +10,8 @@ import { PAINTED, PAINTED_LANE, doorX } from './painted';
 
 export type SceneId =
   | 'street' | 'pasta' | 'lobby' | 'swat' | 'f2' | 'f3' | 'office' | 'interview' | 'lounge' | 'wc' | 'wc3'
-  | 'b1' | 'edu' | 'training' | 'clinic' | 'b2' | 'b3' | 'tooth';
+  | 'b1' | 'edu' | 'training' | 'clinic' | 'b2' | 'b3' | 'tooth'
+  | 'jr_entry' | 'jr_b1' | 'jr_alley' | 'jr_b2';
 
 export type DoorKind = 'main' | 'door' | 'glass' | 'steel' | 'security' | 'elevator' | 'stairs_up' | 'stairs_down' | 'stairs' | 'shop' | 'slide' | 'cell' | 'exit';
 export interface HqDoor {
@@ -130,7 +131,7 @@ const exitS = (to: SceneId, toDoor: string, key: string, west = false): HqDoor =
 function floorHall(id: SceneId, name: string, floor: HqScene['floor'], doors: Omit<HqDoor, 'x'>[], extra: Partial<HqScene> = {}): HqScene {
   const p = PAINTED[id];
   return {
-    id, name, floor, look: p.under ? 'labhall' : id === 'lobby' ? 'lobby' : 'hall', painted: id, length: p.w, lane: p.lane ?? PAINTED_LANE,
+    id, name, floor, look: id.startsWith('jr_') ? 'jr' : p.under ? 'labhall' : id === 'lobby' ? 'lobby' : 'hall', painted: id, length: p.w, lane: p.lane ?? PAINTED_LANE,
     doors: doors.map((d) => ({ ...d, x: doorX(id, d.id) })),
     spots: [], fixtures: [], things: [],
     // 막는 상자는 그림을 그리지 않는다 (오브젝트 그림은 첫 상자 자리에서 한 번만, 깊이 순서는 sortY)
@@ -147,7 +148,11 @@ export const HQ_SCENES: HqScene[] = [
   // ── 바깥 (그대로 둠) ──
   {
     id: 'street', name: '종로 뒷골목', floor: 'out', length: 1920, look: 'street', legacy: true, boxes: [], fixtures: [], spots: [],
-    doors: [{ id: 'main', x: 640, kind: 'main', to: 'lobby', toDoor: 'main' }, { id: 'pasta', x: 1500, kind: 'shop', to: 'pasta', toDoor: 'out', needs: 'pasta' }],
+    doors: [
+      { id: 'main', x: 640, kind: 'main', to: 'lobby', toDoor: 'main' }, { id: 'pasta', x: 1500, kind: 'shop', to: 'pasta', toDoor: 'out', needs: 'pasta' },
+      // 임시 연결: 이동수단(노선표)이 생기기 전까지 거리 동쪽 끝에서 중림으로 바로 간다
+      { id: 'jr', x: 1840, kind: 'exit', side: 'S', to: 'jr_entry', toDoor: 'west', label: '중림 지하상가 (임시)' },
+    ],
     things: [{ kind: 'streetlamp', x: 300, w: 30, h: 360 }, { kind: 'streetlamp', x: 1150, w: 30, h: 360 }, { kind: 'bike', x: 860, w: 120, h: 80 }],
   },
   {
@@ -208,6 +213,22 @@ export const HQ_SCENES: HqScene[] = [
     { id: 'supply', kind: 'steel', place: 'supply', label: '보급실' },
     { id: 'elev', kind: 'elevator' },
   ], { spots: [{ id: 'van', x: 370, y: LANE_TOP + 50, verb: '출동', depart: true }] }),
+  // ── 중림 지하상가 (중립지역, 그림 4장). 지상 입구 → 지하 1층 앞골목 → (가운데 통로) 뒷골목 / (동쪽 계단) 지하 2층 ──
+  floorHall('jr_entry', '중림 지하상가 입구', 'out', [
+    { id: 'west', kind: 'exit', side: 'S', to: 'street', toDoor: 'jr', label: '종로로 (임시)' },
+    { id: 'down', kind: 'door', to: 'jr_b1', toDoor: 'up', label: '지하상가로 내려가기' },
+  ]),
+  floorHall('jr_b1', '중림 지하상가 지하 1층', 'B1', [
+    { id: 'up', kind: 'door', to: 'jr_entry', toDoor: 'down', label: '지상으로' },
+    { id: 'alley', kind: 'door', to: 'jr_alley', toDoor: 'b1', label: '뒷골목' },
+    { id: 'down', kind: 'door', to: 'jr_b2', toDoor: 'up', label: '지하 2층으로' },
+  ]),
+  floorHall('jr_alley', '중림 뒷골목', 'B1', [
+    { id: 'b1', kind: 'door', to: 'jr_b1', toDoor: 'alley', label: '앞골목' },
+  ]),
+  floorHall('jr_b2', '중림 지하상가 지하 2층', 'B2', [
+    { id: 'up', kind: 'door', to: 'jr_b1', toDoor: 'down', label: '지하 1층으로' },
+  ]),
 ];
 export const SCENE_BY_ID = Object.fromEntries(HQ_SCENES.map((s) => [s.id, s])) as Record<SceneId, HqScene>;
 

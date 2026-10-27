@@ -1,23 +1,27 @@
 // 관리국 층 배경 그림(확정 6장) 그리기: 배경 · 문 열림 · 오린 오브젝트(로비 데스크) · 시간대 조명 · 깜빡이는 등.
-// 좌표 자료는 hq/painted.ts. 그림은 game-pack/hq-field (단독 시연판은 window.__GOEI_HQ_FIELD__).
+// 좌표 자료는 hq/painted.ts. 그림은 game-pack/hq-field·jr-field (단독 시연판은 window.__GOEI_HQ_FIELD__).
 // 문 열림은 배경에서 문짝 자리를 그대로 떠서 움직이고, 그 뒤는 코드로 칠한다(어두운 문 안·엘리베이터 칸·유리 너머).
 import { PAINTED, type PaintedDoor, type PaintedScene } from '../hq/painted';
 
 const FILES = ['lobby', 'f2', 'f3', 'b1', 'b2', 'b3', 'desk'];
+const JR_FILES = ['jr_entry', 'jr_b1', 'jr_alley', 'jr_b2'];
 let images: Record<string, HTMLImageElement> | null = null;
 let revision = 0;
 declare global { interface Window { __GOEI_HQ_FIELD__?: Record<string, string> } }
 
-export function prepareHqField(urlOf?: (file: string) => Promise<string>): () => void {
+export function prepareHqField(urlOf?: (pack: string, file: string) => Promise<string>): () => void {
   const own = ++revision;
   images = null;
-  void Promise.all(FILES.map(async (key) => {
-    const src = window.__GOEI_HQ_FIELD__?.[key] || (urlOf ? await urlOf(key + '.webp') : '');
-    if (!src) throw new Error('HQ field art unavailable');
+  // 팩마다 따로 받는다: 중림 팩이 없어도 본부 그림은 뜬다
+  const load = (pack: string, keys: string[]) => Promise.all(keys.map(async (key) => {
+    const src = window.__GOEI_HQ_FIELD__?.[key] || (urlOf ? await urlOf(pack, key + '.webp') : '');
+    if (!src) throw new Error('field art unavailable');
     const im = new Image(); im.src = src; await im.decode();
     return [key, im] as const;
-  })).then((rows) => { if (revision === own) images = Object.fromEntries(rows); })
+  })).then((rows) => { if (revision === own) images = { ...images, ...Object.fromEntries(rows) }; })
     .catch(() => { /* 그림이 없으면 기존 색 상자 장면 */ });
+  void load('hq-field', FILES);
+  void load('jr-field', JR_FILES);
   const keys = (e: KeyboardEvent) => {
     // 시험용: T = 시간대 돌리기 (자동 → 새벽 → 낮 → 저녁 → 밤)
     const t = e.target as HTMLElement | null;
@@ -28,7 +32,7 @@ export function prepareHqField(urlOf?: (file: string) => Promise<string>): () =>
   return () => { window.removeEventListener('keydown', keys); if (revision === own) { revision++; images = null; } };
 }
 
-export const hasHqField = (scene: string) => !!images && !!PAINTED[scene];
+export const hasHqField = (scene: string) => !!PAINTED[scene] && !!images?.[PAINTED[scene].file];
 
 /** 문 상태: open 0..1 (열린 정도), shake = 잠긴 문 덜컹 (px) */
 export type DoorFx = (id: string) => { open: number; shake: number };

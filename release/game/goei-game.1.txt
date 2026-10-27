@@ -1,4 +1,4 @@
-// goei-game 0.17.4
+// goei-game 0.17.5
 "use strict";
 (() => {
   // src/game/action/engine/view.ts
@@ -318,6 +318,98 @@
       ],
       windows: [],
       objects: []
+    },
+    // ── 중림 지하상가 (game-pack/jr-field, assets/gpt/중림지하상가를 tools/fit_bg700.py로 세로 700에 맞춤, 2026-10-27) ──
+    // 문은 그림 속 계단·통로 자리(문짝 없음). 막는 상자는 바닥에 튀어나온 매대·의자·상자 앞 모서리
+    jr_entry: {
+      file: "jr_entry",
+      w: 5521,
+      under: false,
+      lane: [428, 669],
+      blocks: [[80, 620, 505], [605, 665, 446], [2860, 3060, 442], [4500, 4660, 442], [5e3, 5521, 528]],
+      doors: {
+        down: { x0: 4880, x1: 5e3, y0: 300, y1: 505, anim: "none", behind: "dark" },
+        west: { x0: 0, x1: 60, y0: 420, y1: 669, anim: "none" }
+      },
+      lamps: [],
+      windows: [],
+      objects: []
+    },
+    jr_b1: {
+      file: "jr_b1",
+      w: 6425,
+      under: true,
+      lane: [428, 669],
+      blocks: [
+        [345, 485, 442],
+        [580, 870, 490],
+        [1690, 1950, 462],
+        [2240, 2460, 446],
+        [2650, 3020, 452],
+        [3740, 4110, 462],
+        [4320, 4810, 462],
+        [4830, 5e3, 442],
+        [5340, 5720, 452],
+        [6e3, 6160, 475]
+      ],
+      doors: {
+        up: { x0: 40, x1: 320, y0: 100, y1: 420, anim: "none", behind: "dark" },
+        alley: { x0: 3390, x1: 3530, y0: 140, y1: 420, anim: "none", behind: "dark" },
+        down: { x0: 6170, x1: 6425, y0: 240, y1: 470, anim: "none", behind: "dark" }
+      },
+      lamps: [],
+      windows: [],
+      objects: []
+    },
+    jr_alley: {
+      file: "jr_alley",
+      w: 6059,
+      under: true,
+      lane: [428, 669],
+      blocks: [
+        [80, 250, 440],
+        [535, 625, 448],
+        [1335, 1760, 470],
+        [1780, 1860, 442],
+        [1890, 2140, 446],
+        [3490, 3910, 455],
+        [4270, 4850, 452],
+        [5090, 5530, 442],
+        [5490, 6059, 472]
+      ],
+      doors: {
+        b1: { x0: 2800, x1: 3070, y0: 130, y1: 420, anim: "none", behind: "dark" }
+      },
+      lamps: [],
+      windows: [],
+      objects: []
+    },
+    jr_b2: {
+      // 왼쪽 끝 앞쪽에 큰 상자가 화면 앞까지 나와 있어 발을 x180부터
+      file: "jr_b2",
+      w: 5705,
+      under: true,
+      lane: [428, 669],
+      floor: [[180, 428], [5705, 428], [5705, 669], [180, 669]],
+      blocks: [
+        [180, 370, 448],
+        [615, 725, 445],
+        [920, 1190, 432],
+        [1315, 1700, 436],
+        [1780, 2030, 445],
+        [2130, 2710, 442],
+        [2960, 3270, 434],
+        [3330, 3510, 438],
+        [3700, 4140, 445],
+        [5120, 5335, 435],
+        [5590, 5705, 435]
+      ],
+      doors: {
+        up: { x0: 5400, x1: 5590, y0: 0, y1: 420, anim: "none", behind: "dark" }
+      },
+      lamps: [],
+      windows: [],
+      objects: []
     }
   };
   var doorX = (scene, id) => {
@@ -360,22 +452,25 @@
 
   // src/game/action/art/hqField.ts
   var FILES = ["lobby", "f2", "f3", "b1", "b2", "b3", "desk"];
+  var JR_FILES = ["jr_entry", "jr_b1", "jr_alley", "jr_b2"];
   var images = null;
   var revision2 = 0;
   function prepareHqField(urlOf) {
     const own = ++revision2;
     images = null;
-    void Promise.all(FILES.map(async (key2) => {
-      const src = window.__GOEI_HQ_FIELD__?.[key2] || (urlOf ? await urlOf(key2 + ".webp") : "");
-      if (!src) throw new Error("HQ field art unavailable");
+    const load = (pack2, keys3) => Promise.all(keys3.map(async (key2) => {
+      const src = window.__GOEI_HQ_FIELD__?.[key2] || (urlOf ? await urlOf(pack2, key2 + ".webp") : "");
+      if (!src) throw new Error("field art unavailable");
       const im = new Image();
       im.src = src;
       await im.decode();
       return [key2, im];
     })).then((rows) => {
-      if (revision2 === own) images = Object.fromEntries(rows);
+      if (revision2 === own) images = { ...images, ...Object.fromEntries(rows) };
     }).catch(() => {
     });
+    void load("hq-field", FILES);
+    void load("jr-field", JR_FILES);
     const keys2 = (e) => {
       const t = e.target;
       if (e.code !== "KeyT" || e.repeat || t?.closest?.('input, textarea, [contenteditable="true"]')) return;
@@ -390,7 +485,7 @@
       }
     };
   }
-  var hasHqField = (scene) => !!images && !!PAINTED[scene];
+  var hasHqField = (scene) => !!PAINTED[scene] && !!images?.[PAINTED[scene].file];
   function drawHqField(c, scene, camX, fx2, clockHour = null) {
     const p = PAINTED[scene];
     const im = images?.[p?.file ?? ""];
@@ -4870,69 +4965,4 @@
     }
     if (!cards.length) cards.push({ def: MISSIONS[0], done: true });
     const link = boardNames2.find((n) => /승강기|엘리베이터/.test(n));
-    if (link) cards[0] = { ...cards[0], linked: link };
-    return cards;
-  }
-  function noteDeadlines(s2, cards) {
-    for (const c of cards) if (c.def.deadline && s2.deadlines[c.def.id] === void 0) s2.deadlines[c.def.id] = s2.runs + c.def.deadline;
-  }
-  function supplyOpen(s2, d3) {
-    return !(d3.locked ?? LOCKED_SUPPLY.has(d3.id)) || s2.researchDone.includes("rs_supply");
-  }
-  function buy(s2, id) {
-    const d3 = supplyDef(id);
-    if (!d3 || !supplyOpen(s2, d3)) return "살 수 없는 물건이에요.";
-    if (s2.currencies.budget < d3.price) return `예산이 모자라요 (${d3.price} 필요).`;
-    s2.currencies.budget -= d3.price;
-    s2.stash[id] = (s2.stash[id] ?? 0) + 1;
-    return `${d3.name} 1개 구입 (예산 -${d3.price})`;
-  }
-  function equip(s2, slot, id) {
-    const d3 = supplyDef(id);
-    if (!d3 || !(s2.stash[id] > 0)) return "보관함에 없어요.";
-    const cur = s2.loadout[slot];
-    if (cur && cur.id !== id) unequip(s2, slot);
-    const now = s2.loadout[slot];
-    if (now && now.n >= d3.max) return `${d3.name}은 한 칸에 ${d3.max}개까지.`;
-    s2.stash[id]--;
-    s2.loadout[slot] = now ? { id, n: now.n + 1 } : { id, n: 1 };
-    return `${slot + 1}번 칸: ${d3.name} ×${s2.loadout[slot].n}`;
-  }
-  function unequip(s2, slot) {
-    const cur = s2.loadout[slot];
-    if (!cur) return;
-    s2.stash[cur.id] = (s2.stash[cur.id] ?? 0) + cur.n;
-    s2.loadout[slot] = null;
-  }
-  function equipRelic(s2, slot, id) {
-    if (id && !s2.relicsOwned.includes(id)) return "없는 유물이에요.";
-    if (id && s2.relics.includes(id)) s2.relics[s2.relics.indexOf(id)] = null;
-    s2.relics[slot] = id;
-    return id ? `유물 ${slot + 1}: ${RELICS[id]?.name}` : `유물 ${slot + 1} 비움`;
-  }
-  function pickCoffee(s2, id) {
-    s2.coffee = id;
-    const c = COFFEES.find((x) => x.id === id);
-    return c ? `${c.name}: 다음 출동 ${c.effect}` : "커피 안 마심";
-  }
-  var TREAT_COST = 150;
-  function treat(s2, agent) {
-    const rec = s2.agents[agent];
-    if (!rec.injured) return "다친 데 없어요.";
-    if (s2.currencies.budget < TREAT_COST) return `예산이 모자라요 (${TREAT_COST} 필요).`;
-    s2.currencies.budget -= TREAT_COST;
-    rec.injured = 0;
-    return `${AGENT_BY_ID[agent].name} 치료 완료 (예산 -${TREAT_COST})`;
-  }
-  function restDay(s2) {
-    if (s2.active) return "출동 중에는 본부에서 휴식할 수 없어요.";
-    if (!AGENTS.some((a) => s2.agents[a.id].injured > 0 || s2.agents[a.id].fatigue > 0)) return "모두 충분히 쉬었어요.";
-    for (const a of AGENTS) {
-      s2.agents[a.id].fatigue = 0;
-      s2.agents[a.id].injured = Math.max(0, s2.agents[a.id].injured - 1);
-    }
-    s2.day++;
-    return "하루 쉬었다. 피로가 풀리고 부상 회복에 하루가 지났다. (출동 보상 없음)";
-  }
-  function appraise(s2) {
-    if (!s2.appraisal.length) return ["감정할 회수물이 없어요."
+    if (link) ca

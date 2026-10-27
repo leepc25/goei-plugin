@@ -16,7 +16,7 @@
 
   // src/host/game/code.ts
   var CODE_KEY = "goei:game:code";
-  var VERSION = true ? "0.17.4" : "";
+  var VERSION = true ? "0.17.5" : "";
   var codeVersion = (code2) => /^\/\/ goei-game (\S+)/.exec(code2)?.[1] ?? null;
   var mod = null;
   var codeStats = { readMs: 0, runMs: 0, bytes: 0, fromNet: false };
@@ -3667,5 +3667,5 @@ ${texts.anomaly}`;
   }
 
   // src/body-entry.ts
-  globalThis.__goeiBody = { version: "0.17.4", start: start2 };
+  globalThis.__goeiBody = { version: "0.17.5", start: start2 };
 })();

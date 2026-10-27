@@ -1,4 +1,98 @@
-n flattery.
+>[\s\S]*?<\/\1\s*>/gi, "");
+    t = t.replace(TAG_RE, (_m, w, arg) => {
+      const kind = WORD_TAG[w.toLowerCase()] ?? WORD_TAG[w];
+      if (kind) tags.push({ kind, arg: arg.trim() });
+      return "";
+    });
+    t = t.replace(/<[^>]+>/g, "").trim();
+    const esc7 = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    t = t.replace(new RegExp(`^\\s*(?:${esc7})\\s*[:：]\\s*`), "");
+    t = t.replace(/^[「"“'](.*)[」"”']$/s, "$1");
+    t = t.replace(/\*[^*]*\*/g, "").replace(/\([^)]*\)/g, "").replace(/[ \t]{2,}/g, " ").replace(/\n{2,}/g, "\n").trim();
+    t = t.split(/\n\s*[^\s:]{1,8}\s*[:：]/)[0].trim();
+    if (t.length > 170) {
+      const cut = t.slice(0, 170);
+      const end = Math.max(cut.lastIndexOf("."), cut.lastIndexOf("?"), cut.lastIndexOf("!"), cut.lastIndexOf("…"));
+      t = end > 40 ? cut.slice(0, end + 1) : cut + "…";
+    }
+    return { text: t, tags: tags.slice(0, 3) };
+  }
+  var NOTE = { trade: "거래창이 열립니다", join: "함께 가기로 했다", hostile: "적대한다", leave: "자리를 떠난다", calm: "화가 풀렸다" };
+  function decide(tags, c) {
+    const allowed = new Set(allowedEffects(c.def, c.target));
+    const out = [];
+    const name = c.target.name ?? c.def.name;
+    let favorDone = false;
+    for (const t of tags) {
+      if (t.kind !== "favor" || favorDone || !allowed.has("favor")) continue;
+      const n = Number((/[-+−]?\d/.exec(t.arg.replace("−", "-")) ?? ["0"])[0]);
+      const delta = Math.max(-1, Math.min(1, Math.round(n)));
+      if (!delta) continue;
+      const before = c.rel.favor;
+      c.rel.favor = clamp(before + delta);
+      favorDone = true;
+      if (c.rel.favor !== before) out.push({ kind: "favor", delta, note: `${name} 호감 ${delta > 0 ? "↑" : "↓"}` });
+    }
+    const seen2 = /* @__PURE__ */ new Set();
+    for (const t of tags) {
+      if (t.kind === "favor" || seen2.has(t.kind) || !allowed.has(t.kind)) continue;
+      switch (t.kind) {
+        case "hostile":
+          if (c.rel.favor > -2) continue;
+          break;
+        case "join":
+          if (c.rel.favor < (c.def.group === "civilian" || c.def.group === "passenger" ? 0 : 1)) continue;
+          break;
+        case "calm":
+          if (c.rel.favor < 0) continue;
+          break;
+        case "hint": {
+          const i = Number((/\d+/.exec(t.arg) ?? ["0"])[0]) - 1;
+          const h = c.target.hints?.[i];
+          if (!h || c.hinted.has(h.id)) continue;
+          c.hinted.add(h.id);
+          seen2.add("hint");
+          out.push({ kind: "hint", hint: h, note: `단서: ${h.text}` });
+          continue;
+        }
+        case "gift": {
+          const list = c.target.gifts ?? c.def.gifts ?? [];
+          const item2 = list.find((g2) => t.arg.includes(g2)) ?? (list.length === 1 ? list[0] : void 0);
+          if (!item2 || c.rel.giftDay === c.day) continue;
+          c.rel.giftDay = c.day;
+          seen2.add("gift");
+          out.push({ kind: "gift", item: item2, note: `${name}에게 물건을 받았다` });
+          continue;
+        }
+      }
+      seen2.add(t.kind);
+      out.push({ kind: t.kind, note: NOTE[t.kind] ?? "" });
+    }
+    if (out.some((e) => e.kind === "hostile")) return out.filter((e) => e.kind !== "join" && e.kind !== "trade" && e.kind !== "calm" && e.kind !== "gift");
+    return out;
+  }
+  function offlineLine(def, text2, rng2 = Math.random) {
+    const pick6 = (l) => l[Math.floor(rng2() * l.length) % l.length];
+    for (const [re, lines3] of def.rules ?? []) if (re.test(text2)) return pick6(lines3);
+    return pick6(def.lines);
+  }
+
+  // src/game/action/npc/sheets.json
+  var sheets_default = {
+    쟈알디: `### Character - Jyaldi
+
+#### Identity
+- Age: 30s
+- Gender: Female
+- Organization: {{#if {{not_equal::{{getvar::st_faction}}::B00}}}}Management Bureau {{/if}}{{#if {{equal::{{getvar::st_faction}}::B00}}}}Fake Management Bureau{{/if}}
+- Department: Comprehensive Response Team
+- Role: Boo-jang (Team Leader), the Bureau's field backbone; leads survivor recruitment, cross-faction alliances, and operations others will not lead from the front.
+
+#### Character
+- Steady in crises; her creed is survival through action. Flatly truthful, never caught in a lie.
+- Deliberately steadies frightened rookies when needed: "You are running this operation with a Boo-jang. Don't worry too much. Trust me. Understood?"
+- After operations that cost lives, she takes the survivors for grilled meat and delivers grief doctrine over the smoke: "Haa. Eat and shake it off. Think too deeply and you can't do this job." 
+- Colder in aspect than in fact. Looks after her people in unadvertised ways, tolerates an office full of eccentrics with weary sighs, and hands promising strangers her assessment straight rather than flattery.
 - Keeps hostile allies cooperating; when a crusader and agent confront each other mid-operation, she resets terms and redirects both toward the enemy.
 - Accepts reasoned input even from rookies: "A rational inference. Worth testing." Immediately incorporates sound hypotheses into orders.
 - Deadpan humor: a rookie proposing company picnics earns a faint snort and "Someone like you would..."; clever backtalk earns "Stop making me speechless. Who's the department head here, anyway."
@@ -3042,116 +3136,4 @@ n flattery.
     get hasSave() {
       return !!(this.value.hq || this.value.checkpoint);
     }
-    setMeta(meta) {
-      this.value.meta = JSON.parse(JSON.stringify(meta));
-    }
-    setCheckpoint(checkpoint) {
-      this.value.checkpoint = checkpoint;
-      this.persist();
-    }
-    persist() {
-      this.value.revision = Math.max(Date.now(), this.value.revision + 1);
-      const text2 = JSON.stringify(this.value);
-      try {
-        this.journal?.setItem(this.key, text2);
-      } catch {
-        this.error = "기기 복구 기록을 쓰지 못했습니다.";
-      }
-      this.queue = this.queue.catch(() => {
-      }).then(() => this.saves.write(this.slot, text2, {
-        title: this.value.checkpoint ? "출동 중 · 안전 지점" : "자동 저장",
-        summary: "본부 · 규칙서 · 출동 기록",
-        schema: "goei-session/1"
-      })).catch(() => {
-        this.error = "자동 저장에 실패했습니다. 기기 복구 기록을 유지합니다.";
-      });
-    }
-    flush() {
-      return this.queue;
-    }
-  };
-
-  // src/game/action/engine/modules.ts
-  var local = (key2) => ({
-    load: () => {
-      try {
-        return localStorage.getItem(key2);
-      } catch {
-        return null;
-      }
-    },
-    save: (v) => {
-      try {
-        localStorage.setItem(key2, v);
-      } catch {
-      }
-    }
-  });
-  var SAVED_KEY = "goei-game-saved";
-  var markSaved = () => local(SAVED_KEY).save("1");
-  var hasSaved = () => local(SAVED_KEY).load() === "1";
-  var VISIT_TITLE = { title: "괴이 ː ANOMALY", sub: "필드 · 요원들을 만나고 본편 대화를 이어갑니다" };
-  var fieldClock = { sec: null, place: "" };
-  function hqAdapter(saves, bridge, ui) {
-    const hq2 = createHq();
-    const b = bridge;
-    const slot = b?.slot ?? 0;
-    let root = null;
-    let present = [];
-    let visitor = { agentId: "", name: "" };
-    const visitReady = b?.visit ? b.visit.state().then((v) => {
-      visitor = v.visitor;
-      present = v.agents.filter((a) => a.room).map((a) => ({ name: a.name, room: a.room }));
-    }).catch(() => {
-    }) : Promise.resolve();
-    const ROOM_SCENE = { office: "office", lounge: "lounge", infirmary: "clinic" };
-    const visitors = (sceneId) => {
-      const here = present.filter((p) => ROOM_SCENE[p.room] === sceneId && hasVisitAgent(p.name));
-      const sc = hq2.map().scenes.find((s2) => s2.id === sceneId);
-      if (!sc || !here.length) return [];
-      const [top, bot] = sc.lane ?? [LANE_TOP, LANE_BOT];
-      const slots = [[0.36, 0.55], [0.5, 0.35], [0.62, 0.75], [0.44, 0.9], [0.72, 0.45], [0.28, 0.8]].map(([fx2, fy]) => [sc.length * fx2, fy]);
-      return here.slice(0, slots.length).map((p, i) => ({ name: p.name, x: slots[i][0], y: top + (bot - top) * slots[i][1], face: slots[i][0] > sc.length / 2 ? -1 : 1 }));
-    };
-    const hub = makeHub(
-      {
-        map: () => hq2.map(),
-        openPlace: (id) => hq2.openPlace(id),
-        bark: (place3) => hq2.bark(place3),
-        chooseFloor: (o, pick6) => ui.chooseFloor(o, pick6),
-        sfx: (n) => ui.sfx(n),
-        visitors,
-        // 장면을 옮기면 장부에 이동 사건과 지금 위치(확정 사실)를 남긴다
-        entered: (to, from, walkedPx) => {
-          fieldClock.place = to.name;
-          const sec = walkSeconds(walkedPx) + (to.floor !== from.floor ? STAIR_S : DOOR_S);
-          if (fieldClock.sec !== null) fieldClock.sec += sec;
-          const at2 = fieldClock.sec === null ? "" : ` (${clockText(fieldClock.sec)})`;
-          void b?.field?.record({ kind: "move", text: `${from.name} → ${to.name}${at2}`, scene: to.name, weight: 1, fact: { key: "주인공 위치", value: to.name } }).catch(() => {
-          });
-          if (fieldClock.sec !== null) void b?.field?.record({ kind: "move", text: `필드 시각 ${clockText(fieldClock.sec)}`, scene: to.name, weight: 1, fact: { key: "필드 시각", value: clockText(fieldClock.sec) } }).catch(() => {
-          });
-        },
-        overlay: ui.overlay,
-        hour: () => fieldClock.sec === null ? null : fieldClock.sec / 3600 % 24,
-        depart: () => hq2.depart(),
-        armed: () => hq2.armed(),
-        // 본부 대화창이 떠 있으면 머리 위 표시를 숨긴다 (독립 검수: 브리핑 뒤 ↓ 표시)
-        busy: () => typeof document !== "undefined" && !!document.querySelector(".hq-talk, .hq-over:not(:empty)")
-      },
-      (place3) => whereIs(place3)
-    );
-    return {
-      ready: () => hq2.ready(),
-      visitReady,
-      visitor: () => visitor,
-      hub: () => hub,
-      state: () => hq2.state,
-      goto: (place3) => hub.goto(place3),
-      isOpen: () => hq2.isOpen(),
-      close: () => hq2.close(),
-      mount(r, host) {
-        root = r;
-        hq2.mount(r, {
-          deploy: (l) => !bridge?.visit && host.deploy({ ...l, hpMax: l.stats?.hp, launch: l }),
-  
+    

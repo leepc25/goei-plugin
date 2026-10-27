@@ -1,5 +1,5 @@
 {
- "version": "0.17.4",
+ "version": "0.17.5",
  "code": {
   "parts": [
    "goei-game.1.txt",
@@ -14,8 +14,8 @@
    "goei-game.10.txt",
    "goei-game.11.txt"
   ],
-  "length": 2056633,
-  "bytes": 2152322
+  "length": 2059701,
+  "bytes": 2155847
  },
  "packs": [
   {
@@ -46,6 +46,18 @@
     "hq-textures.1.bin"
    ],
    "required": false
+  },
+  {
+   "id": "jr-field",
+   "hash": "f18fd02951bd967c",
+   "bytes": 1949466,
+   "parts": [
+    "jr-field.1.bin",
+    "jr-field.2.bin",
+    "jr-field.3.bin",
+    "jr-field.4.bin"
+   ],
+   "required": true
   },
   {
    "id": "jyaldi",
