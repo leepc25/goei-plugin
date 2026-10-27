@@ -1,4 +1,66 @@
-r", "u", "d"];
+& p.x < g2.x - 100)) bad.push("열쇠 찾으러 갈 입구가 셔터 뒤");
+      const panel = f.placed.find((p) => p.kind === "panel");
+      if (panel && panel.x < g2.x) bad.push("패널이 셔터 앞");
+    }
+    if (!room2 && f.depth >= 4 && f.type !== "deep" && !f.placed.some((p) => p.kind === "sign" && p.data.rule)) bad.push("규칙 장치 없음");
+    if (room2 && f.type === "puzzle" && f.segments.some((sg) => sg.ref === "chunk:p_fork" || sg.ref === "chunk:p_switch") && !f.placed.some((p) => p.kind === "shutter")) bad.push("퍼즐 장치 없음");
+    return bad;
+  }
+
+  // src/game/action/stage/elevator.ts
+  var FAVOR_MIN = -3;
+  var FAVOR_MAX = 3;
+  var clampFavor = (n) => Math.max(FAVOR_MIN, Math.min(FAVOR_MAX, n));
+  function buttonCount(favor) {
+    return favor <= -2 ? 1 : favor >= 2 ? 3 : 2;
+  }
+  function elevatorButtons(o) {
+    const n = buttonCount(o.favor);
+    const out = [];
+    const next = o.depth + 1;
+    if (o.exitOpen && o.depth <= 3) out.push({ depth: 0, label: "EXIT", type: "lobby", sub: null, shown: true, exit: true });
+    for (let i = 0; i < n; i++) {
+      const type = pickType(next, o.last, o.seed, o.epoch, i * 101 + 3);
+      out.push({ depth: next, label: depthLabel(next), type, sub: type === "replica" ? pickSub(o.seed + i, next, o.epoch) : null, shown: o.favor >= 2 || o.reveal });
+    }
+    if (out.length >= 2 && next > 3) {
+      const r = rng(mix2(o.seed, next, 99));
+      for (let i = 1; i < out.length; i++)
+        if (!out[i].exit && out.slice(0, i).some((b) => b.type === out[i].type)) {
+          const alt = ["chase", "replica", "trial", "dark", "silent", "puzzle"].filter((t) => !out.some((b) => b.type === t) && t !== o.last[o.last.length - 1]);
+          if (alt.length && next !== 15) out[i].type = alt[Math.floor(r() * alt.length)];
+          out[i].sub = out[i].type === "replica" ? pickSub(o.seed + i, next, o.epoch) : null;
+        }
+    }
+    if (o.depth <= 3 && o.deepest >= 5) {
+      const d3 = Math.max(4, o.deepest - 1);
+      const type = pickType(d3, [], o.seed, o.epoch, 555);
+      out.push({ depth: d3, label: `${depthLabel(d3)} (기억)`, type, sub: type === "replica" ? pickSub(o.seed, d3, o.epoch) : null, shown: o.favor >= 2 || o.reveal, remembered: true });
+    }
+    return out;
+  }
+  function announce(depth, type) {
+    return `띵. ${depth <= 3 ? `${depth}층` : depthLabel(depth)}입니다. 문이 열립니다.${type === "deep" ? "" : ` …${FLOOR_TYPES[type].hint}`}`;
+  }
+  function greetLine(favor, gained, flip) {
+    if (flip) return "…말 걸지 마요. 오늘은.";
+    if (!gained) return favor >= 2 ? "네, 네. 알아요. 반가워요." : "…";
+    return ["…인사는 받을게요.", "어머. 예의 바르네요.", "고마워요. 다들 안 하더라고요.", "오늘은 좋은 층으로 모실게요."][Math.max(0, Math.min(3, favor + 1))];
+  }
+  var CLOSE_SPAM_LINE = "…서두르지 마요. 문은 제가 닫아요.";
+  var STUCK_LINE = "문이… 안 닫히네요. 어쩌죠. 누가 오는데.";
+  var LONELY_LINE = "…여기 오래 있으면, 다들 말이 없어져요. 당신은 말을 해 줘서 좋았어요.";
+  var MUTTER = ["열두 층 아래는 아직 아무도 안 세어 봤어요.", "이 버튼, 어제는 없었는데.", "거울 보지 마요. 피곤해 보여요.", "아래층 사람들이 또 문을 두드려요.", "위로는 안 가요. 그건 제 일이 아니라서."];
+  function defaultCallout(agent, favor) {
+    const name = agent === "eileen" ? "에일린" : agent === "jyaldi" ? "쟈알디" : "요원";
+    return favor >= 1 ? `안녕, ${name} 씨. 이번 층에서는 꼭 살아남아요.` : `${name} 씨. 또 왔네요.`;
+  }
+  function dealTruth(favor, roll) {
+    return roll < 0.5 + favor * 0.15;
+  }
+
+  // src/game/action/stage/gen/world.ts
+  var DIRS = ["l", "r", "u", "d"];
   var OPP = { l: "r", r: "l", u: "d", d: "u" };
   var STEP2 = { l: [-1, 0], r: [1, 0], u: [0, -1], d: [0, 1] };
   function worldSize(depth, type) {
@@ -606,11 +668,11 @@ r", "u", "d"];
   // src/game/action/stage/plan.ts
   function narrowBack(t, terr = []) {
     if (t.kind !== "narrow" || t.lane0 <= 0) return null;
-    const H7 = 126;
+    const H6 = 126;
     const xs = [];
     for (let x = t.x0 + 50; x < t.x1 - 20; x += 100) xs.push(x);
     if (!xs.length) xs.push((t.x0 + t.x1) / 2);
-    let a = xs[0] - H7, b = xs[xs.length - 1] + H7;
+    let a = xs[0] - H6, b = xs[xs.length - 1] + H6;
     let clipped = false;
     for (const o of terr) {
       if (o === t || o.kind !== "narrow") continue;
@@ -620,10 +682,10 @@ r", "u", "d"];
     const wall = lockerWall.get(t);
     const open = (xs2) => wall ? xs2.filter((x) => !wall.spans.some(([s0, s1]) => x + wall.half > s0 && x - wall.half < s1)) : xs2;
     if (!clipped) return { span: [a, b], xs: open(xs) };
-    if (b - a < 2 * H7) return { span: [Math.max(a, t.x0 - 20), Math.min(b, t.x1 + 20)], xs: [] };
+    if (b - a < 2 * H6) return { span: [Math.max(a, t.x0 - 20), Math.min(b, t.x1 + 20)], xs: [] };
     const fit3 = [];
-    for (let x = a + H7; x <= b - H7; x += 100) fit3.push(x);
-    if (fit3[fit3.length - 1] < b - H7 - 1) fit3.push(b - H7);
+    for (let x = a + H6; x <= b - H6; x += 100) fit3.push(x);
+    if (fit3[fit3.length - 1] < b - H6 - 1) fit3.push(b - H6);
     return { span: [a, b], xs: open(fit3) };
   }
   var lockerWall = /* @__PURE__ */ new WeakMap();
@@ -1443,18 +1505,18 @@ r", "u", "d"];
   function label2(_ctx, _s, _x, _y, _c) {
   }
   function drawFront(ctx, camX, world, plan) {
-    const fx2 = plan.stage.fx;
+    const fx = plan.stage.fx;
     const vw = ctx.canvas.width;
-    if (fx2.chaseX > -9e3) {
-      const g2 = ctx.createLinearGradient(fx2.chaseX - 300, 0, fx2.chaseX + 40, 0);
+    if (fx.chaseX > -9e3) {
+      const g2 = ctx.createLinearGradient(fx.chaseX - 300, 0, fx.chaseX + 40, 0);
       g2.addColorStop(0, "rgba(60,0,0,0.95)");
       g2.addColorStop(1, "rgba(160,20,20,0.85)");
       ctx.fillStyle = g2;
-      ctx.fillRect(fx2.chaseX - 1600, 100, 1640, 640);
+      ctx.fillRect(fx.chaseX - 1600, 100, 1640, 640);
     }
-    if (fx2.light < 0.99) {
+    if (fx.light < 0.99) {
       const p = world.player;
-      const r = 80 + fx2.light * 520;
+      const r = 80 + fx.light * 520;
       ctx.save();
       ctx.translate(camX, 0);
       const px = p.x - camX, py = p.y - p.z - 80;
@@ -1465,13 +1527,13 @@ r", "u", "d"];
       ctx.fillRect(0, 0, vw, 720);
       ctx.restore();
     }
-    if (fx2.squeeze > 0) {
-      const w = Math.min(560, fx2.squeeze * 560);
+    if (fx.squeeze > 0) {
+      const w = Math.min(560, fx.squeeze * 560);
       ctx.fillStyle = "rgba(30,10,50,0.9)";
       ctx.fillRect(camX, 0, w / 2, 720);
       ctx.fillRect(camX + vw - w / 2, 0, w / 2, 720);
     }
-    if (fx2.red) {
+    if (fx.red) {
       ctx.fillStyle = "rgba(160,0,0,0.12)";
       ctx.fillRect(camX, 0, vw, 720);
     }
@@ -2549,13 +2611,13 @@ ${RULE[id].variant.text}` : ""}`, 4);
             break;
           case "item":
           case "pack": {
-            const item2 = String(pl?.data.item ?? r.plan.stage.cell?.things.find((t) => `s${t.id}` === prop.id)?.data.item ?? "heal");
+            const item = String(pl?.data.item ?? r.plan.stage.cell?.things.find((t) => `s${t.id}` === prop.id)?.data.item ?? "heal");
             api.setProp(prop.id, null);
-            o.items.push(item2);
-            if (item2 === "heal") api.heal(25);
-            if (item2 === "light") r.light = 1;
-            api.world.emit({ type: "pickup", x: p.x, id: item2 });
-            api.world.say(`주웠다: ${itemName2(item2)}`, 1.5);
+            o.items.push(item);
+            if (item === "heal") api.heal(25);
+            if (item === "light") r.light = 1;
+            api.world.emit({ type: "pickup", x: p.x, id: item });
+            api.world.say(`주웠다: ${itemName2(item)}`, 1.5);
             break;
           }
           case "belonging":
@@ -3197,13 +3259,13 @@ ${RULE[id].variant.text}` : ""}`, 4);
           api.world.say("용도 모를 장비를 챙겼다. (회수물 · 거래에 쓸 수 있다)", 2.5);
           break;
         case "item": {
-          const item2 = String(prop.label?.split(":")[1] ?? "heal");
+          const item = String(prop.label?.split(":")[1] ?? "heal");
           api.setProp(prop.id, null);
-          o.items.push(item2);
-          if (item2 === "heal") api.heal(25);
-          if (item2 === "light") r.light = 1;
-          api.world.emit({ type: "pickup", x: p.x, id: item2 });
-          api.world.say(`주웠다: ${itemName2(item2)}`, 1.5);
+          o.items.push(item);
+          if (item === "heal") api.heal(25);
+          if (item === "light") r.light = 1;
+          api.world.emit({ type: "pickup", x: p.x, id: item });
+          api.world.say(`주웠다: ${itemName2(item)}`, 1.5);
           break;
         }
       }
@@ -3510,13 +3572,13 @@ ${SET_BONUS[u.set]}`;
       if (current) marker(c, rx + 8 * scale, ry + ch - 8 * scale, 9 * scale);
     }
   }
-  function drawRunMap(c, m, _px, _t, U2 = 1, W5 = c.canvas.width, H7 = c.canvas.height) {
+  function drawRunMap(c, m, _px, _t, U2 = 1, W5 = c.canvas.width, H6 = c.canvas.height) {
     setExplorationMap(c.canvas, true);
-    const v = mapViewport(c.canvas, U2, W5, H7), S2 = v.scale, left = v.margin, right = W5 - left;
+    const v = mapViewport(c.canvas, U2, W5, H6), S2 = v.scale, left = v.margin, right = W5 - left;
     c.save();
     c.setTransform(1, 0, 0, 1, 0, 0);
     c.fillStyle = C3.bg;
-    c.fillRect(0, 0, W5, H7);
+    c.fillRect(0, 0, W5, H6);
     const world = m.worlds.find((w) => w.depth === m.depth);
     const here = world?.rooms.find((r) => r.col === m.room?.[0] && r.row === m.room?.[1]);
     fit2(c, `출동 지도 · ${world?.label ?? `깊이 ${m.depth}`}`, left, 35 * S2, 21 * S2, right - left - 190 * S2);
@@ -3524,7 +3586,7 @@ ${SET_BONUS[u.set]}`;
     text(c, `보유 열쇠 ${m.keys.join(" ") || "없음"}   ·   강화 ${m.upgrades.length}`, left, 65 * S2, 14 * S2, C3.key);
     const goal = m.goal.replaceAll("(★)", " R").replaceAll("(▮)", " P");
     const goalHeight = lines2(c, goal, left, 94 * S2, 14 * S2, right - left);
-    const top = 94 * S2 + goalHeight + 20 * S2, bottom = H7 - 48 * S2;
+    const top = 94 * S2 + goalHeight + 20 * S2, bottom = H6 - 48 * S2;
     const sideW = 240 * S2, mapRight = right - sideW - 24 * S2;
     const mapW = mapRight - left, mapH = bottom - top - 28 * S2;
     fit2(c, m.where === "service" ? "정비 구역 · R 다락방 / 귀환 로프" : `◆ 현재 ${here?.name ?? (m.where === "car" ? "승강기 안" : "이동 중")}`, left, top - 3 * S2, 14 * S2, mapW, C3.here);
@@ -3576,7 +3638,7 @@ ${SET_BONUS[u.set]}`;
       else rooms(c, m, zone, gx, gy, cw, ch, gap, S2);
       c.restore();
     }
-    fit2(c, mapExits(m), left, H7 - 23 * S2, 13 * S2, right - left, C3.sub);
+    fit2(c, mapExits(m), left, H6 - 23 * S2, 13 * S2, right - left, C3.sub);
     c.restore();
   }
   function drawMiniMap(c, m, _px, _t, U2 = 1) {
@@ -3618,9 +3680,9 @@ ${SET_BONUS[u.set]}`;
   var MOODS = /* @__PURE__ */ new Set(["base", "smile", "serious", "hurt", "surprise"]);
   var ScriptError = class extends Error {
   };
-  function parseSay(body2, line2, where) {
-    const m = /^([a-z]+)(?:\((\w+)\))?\s*:\s*(.+)$/.exec(body2);
-    if (!m) throw new ScriptError(`${where}:${line2} 말 줄 형식이 아니에요: ${body2}`);
+  function parseSay(body, line2, where) {
+    const m = /^([a-z]+)(?:\((\w+)\))?\s*:\s*(.+)$/.exec(body);
+    if (!m) throw new ScriptError(`${where}:${line2} 말 줄 형식이 아니에요: ${body}`);
     const mood = m[2] ?? "base";
     if (!MOODS.has(mood)) throw new ScriptError(`${where}:${line2} 모르는 표정: ${m[2]}`);
     return { t: "say", who: m[1], mood, text: m[3].trim(), line: line2 };
@@ -3801,110 +3863,4 @@ ${SET_BONUS[u.set]}`;
     scripts = /* @__PURE__ */ new Map();
     add(src, where) {
       for (const s2 of parseScripts(src, where)) {
-        if (this.scripts.has(s2.id)) throw new ScriptError(`대본 id 중복: ${s2.id}`);
-        this.scripts.set(s2.id, s2);
-      }
-      return this;
-    }
-    get(id) {
-      const s2 = this.scripts.get(id);
-      if (!s2) throw new ScriptError(`없는 대본: ${id}`);
-      return s2;
-    }
-    /** 모든 goto·선택지·call이 실제로 있는 곳을 가리키는지 */
-    validate() {
-      const errs = [];
-      for (const s2 of this.scripts.values())
-        for (const n of s2.nodes) {
-          const target = (to) => to === "end" || s2.labels[to] !== void 0 || errs.push(`${s2.id}:${n.line} 없는 표지 ${to}`);
-          if (n.t === "goto") target(n.to);
-          if (n.t === "choice") n.options.forEach((o) => target(o.to));
-          if (n.t === "call" && !this.scripts.has(n.script)) errs.push(`${s2.id}:${n.line} 없는 대본 ${n.script}`);
-          try {
-            if (n.t === "goto" && n.if) evaluate(n.if, {});
-            if (n.t === "set") evaluate(n.expr, {});
-            if (n.t === "choice") n.options.forEach((o) => o.if && evaluate(o.if, {}));
-          } catch (e) {
-            errs.push(`${s2.id}:${n.line} ${e.message}`);
-          }
-        }
-      return errs;
-    }
-  };
-  var StoryRunner = class {
-    constructor(lib, ctx) {
-      this.lib = lib;
-      this.ctx = ctx;
-    }
-    stack = [];
-    pending = null;
-    /** 지금 보이는 걸음 */
-    current = { kind: "end" };
-    get done() {
-      return this.current.kind === "end";
-    }
-    start(id) {
-      this.stack = [{ script: this.lib.get(id), pc: 0 }];
-      this.pending = null;
-      this.ctx.flags.agent = this.ctx.agent;
-      this.ctx.flags[`seen.${id}`] = (Number(this.ctx.flags[`seen.${id}`]) || 0) + 1;
-      return this.current = this.run();
-    }
-    next() {
-      if (this.pending) return this.current;
-      return this.current = this.run();
-    }
-    choose(index) {
-      const opts = this.pending;
-      if (!opts) return this.current;
-      const opt = opts[index];
-      if (!opt) return this.current;
-      this.pending = null;
-      applySets(opt.set, this.ctx.flags);
-      this.jump(opt.to);
-      return this.current = this.run();
-    }
-    /** 바로 끝까지 넘김. 선택지가 나오면 거기서 멈춘다. */
-    skip() {
-      let s2 = this.current;
-      for (let i = 0; i < 500 && s2.kind === "say"; i++) s2 = this.next();
-      return s2;
-    }
-    fill(text2) {
-      const f = this.ctx.flags;
-      return text2.replace(/\{([\w.가-힣]+)\}/g, (_, k) => k === "name" ? this.ctx.speakerName("agent") : String(f[k] ?? ""));
-    }
-    jump(to) {
-      const top = this.stack[this.stack.length - 1];
-      if (!top) return;
-      if (to === "end") top.pc = top.script.nodes.length;
-      else top.pc = top.script.labels[to] ?? top.script.nodes.length;
-    }
-    say(n) {
-      const who = n.who === "agent" ? this.ctx.agent : n.who;
-      return { kind: "say", who, name: this.ctx.speakerName(who), text: this.fill(n.text), mood: n.mood ?? "base" };
-    }
-    run() {
-      const { flags, rng: rng2 } = this.ctx;
-      for (let guard3 = 0; guard3 < 2e3; guard3++) {
-        const top = this.stack[this.stack.length - 1];
-        if (!top) {
-          delete flags.d100;
-          return { kind: "end" };
-        }
-        flags.d100 = Math.floor(rng2() * 100);
-        const n = top.script.nodes[top.pc];
-        if (!n) {
-          this.stack.pop();
-          continue;
-        }
-        top.pc++;
-        switch (n.t) {
-          case "say":
-            return this.say(n);
-          case "pick":
-            return this.say(n.lines[Math.floor(rng2() * n.lines.length) % n.lines.length]);
-          case "agentline": {
-            const text2 = this.ctx.agentLine(this.ctx.agent, n.tag, rng2);
-            if (!text2) break;
-            const who = n.who === "agent" ? thi
+        if (this.scripts.has(s2.

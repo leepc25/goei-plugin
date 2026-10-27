@@ -1,4 +1,131 @@
-wood, 3, 13, 26, 5);
+    energy: (g2) => {
+      rect(g2, C2.special, 10, 6, 12, 22);
+      rect(g2, C2.metal, 10, 4, 12, 3);
+      poly(g2, C2.cash, [17, 9, 12, 18, 16, 18, 14, 25, 20, 15, 16, 15]);
+    },
+    adrenaline: (g2) => {
+      rect(g2, C2.white, 6, 14, 18, 5);
+      rect(g2, C2.red, 9, 15, 10, 3);
+      rect(g2, C2.metal, 24, 15, 6, 2);
+      rect(g2, C2.dark, 3, 12, 3, 9);
+    },
+    // 임시 무기: 한 손 근접 묶음
+    pipe: (g2) => line(g2, C2.metal, 5, [6, 26, 26, 6]),
+    chairleg: (g2) => {
+      line(g2, C2.wood, 6, [8, 26, 24, 8]);
+      rect(g2, C2.dark, 21, 4, 7, 7);
+    },
+    kitchenknife: (g2) => {
+      poly(g2, C2.white, [6, 26, 22, 8, 26, 6, 24, 12, 10, 28]);
+      line(g2, C2.dark, 4, [6, 26, 2, 30]);
+    },
+    katana: (g2) => {
+      line(g2, "#2a2f33", 3, [5, 27, 28, 4]);
+      line(g2, C2.white, 1, [9, 22, 27, 5]);
+      rect(g2, C2.gold, 7, 22, 6, 3);
+    },
+    // 총 묶음
+    smg: (g2) => {
+      rect(g2, C2.dark, 4, 11, 22, 7);
+      rect(g2, C2.dark, 10, 18, 5, 9);
+      rect(g2, C2.metal, 17, 18, 3, 7);
+      rect(g2, C2.metal, 26, 13, 4, 3);
+    },
+    servicepistol: (g2) => {
+      rect(g2, C2.dark, 7, 10, 18, 6);
+      poly(g2, C2.dark, [9, 16, 15, 16, 13, 26, 7, 26]);
+      rect(g2, C2.metal, 25, 11, 3, 3);
+    },
+    shotgun: (g2) => {
+      rect(g2, C2.metal, 8, 12, 22, 4);
+      rect(g2, C2.wood, 2, 13, 10, 6);
+      rect(g2, C2.dark, 14, 16, 8, 4);
+    },
+    // 바닥에 떨어지는 것
+    cash: (g2) => {
+      rect(g2, "#7aa35a", 4, 10, 20, 12);
+      circ(g2, C2.cash, 22, 20, 7);
+      circ(g2, "#b9a23c", 22, 20, 4);
+    },
+    shard: (g2) => poly(g2, C2.shard, [16, 3, 24, 14, 18, 29, 9, 17]),
+    heal: (g2) => {
+      circ(g2, C2.heal, 16, 16, 10);
+      rect(g2, C2.white, 14, 10, 4, 12);
+      rect(g2, C2.white, 10, 14, 12, 4);
+    },
+    "ammo-pistol": (g2) => {
+      for (const x of [8, 14, 20]) {
+        rect(g2, C2.gold, x, 12, 4, 14);
+        rect(g2, C2.metal, x, 8, 4, 4);
+      }
+    },
+    "ammo-rifle": (g2) => {
+      rect(g2, C2.dark, 10, 6, 12, 22);
+      rect(g2, C2.gold, 12, 3, 8, 4);
+    },
+    // 회수물
+    scrap: (g2) => {
+      poly(g2, C2.metal, [6, 22, 12, 8, 22, 10, 26, 24, 14, 27]);
+      circ(g2, C2.dark, 15, 17, 3);
+    },
+    oddcoin: (g2) => {
+      circ(g2, C2.gold, 16, 16, 11);
+      circ(g2, "#a38a2c", 16, 16, 7);
+      rect(g2, C2.gold, 14, 11, 4, 10);
+    },
+    rustkey: (g2) => {
+      circ(g2, "#a0603a", 10, 12, 6);
+      circ(g2, "#2b2f33", 10, 12, 2);
+      rect(g2, "#a0603a", 14, 11, 14, 3);
+      rect(g2, "#a0603a", 22, 14, 3, 5);
+    },
+    photo: (g2) => {
+      rect(g2, C2.white, 6, 5, 20, 22);
+      rect(g2, "#6b7378", 8, 7, 16, 14);
+      circ(g2, "#d0d4d6", 16, 13, 4);
+    },
+    tooth: (g2) => poly(g2, C2.white, [9, 6, 23, 6, 24, 14, 20, 28, 17, 18, 15, 18, 12, 28, 8, 14]),
+    dreamcatcher: (g2) => {
+      line(g2, C2.shard, 2, [16, 4, 16, 4]);
+      g2.strokeStyle = C2.shard;
+      g2.lineWidth = 2;
+      g2.beginPath();
+      g2.arc(16, 14, 9, 0, Math.PI * 2);
+      g2.stroke();
+      line(g2, C2.white, 1, [9, 9, 23, 19]);
+      line(g2, C2.white, 1, [9, 19, 23, 9]);
+      line(g2, C2.shard, 2, [12, 23, 11, 30]);
+      line(g2, C2.shard, 2, [20, 23, 21, 30]);
+    },
+    blackbox: (g2) => {
+      rect(g2, "#25292c", 5, 8, 22, 18);
+      rect(g2, C2.throw, 5, 8, 22, 4);
+      circ(g2, C2.red, 22, 20, 2);
+    },
+    // 환경 물건
+    chair: (g2) => {
+      rect(g2, C2.wood, 9, 4, 4, 22);
+      rect(g2, C2.wood, 9, 15, 15, 4);
+      rect(g2, C2.wood, 21, 15, 3, 13);
+      rect(g2, C2.wood, 9, 26, 3, 3);
+    },
+    pot: (g2) => {
+      poly(g2, "#b0653d", [9, 16, 23, 16, 21, 29, 11, 29]);
+      circ(g2, C2.heal, 16, 11, 6);
+    },
+    extinguisher: (g2) => {
+      rect(g2, C2.red, 11, 9, 10, 20);
+      rect(g2, C2.dark, 13, 5, 6, 4);
+      line(g2, C2.dark, 2, [19, 6, 25, 10, 25, 18]);
+    },
+    tv: (g2) => {
+      rect(g2, "#55595d", 4, 7, 24, 18);
+      rect(g2, "#7fa0a8", 7, 10, 18, 12);
+      line(g2, C2.dark, 2, [12, 7, 9, 2]);
+      line(g2, C2.dark, 2, [20, 7, 23, 2]);
+    },
+    table: (g2) => {
+      rect(g2, C2.wood, 3, 13, 26, 5);
       rect(g2, C2.wood, 6, 18, 3, 8);
       rect(g2, C2.wood, 23, 18, 3, 8);
     },
@@ -230,7 +357,7 @@ wood, 3, 13, 26, 5);
     return ev;
   }
   function furnishFloor(field, floor, lane, r = () => rand(field)) {
-    const pick6 = (a) => a[Math.floor(r() * a.length)];
+    const pick7 = (a) => a[Math.floor(r() * a.length)];
     const end = Number.isFinite(floor.exitX) ? floor.exitX : floor.length - 80;
     const x0 = (floor.startX ?? 200) + 260, x1 = Math.max(x0 + 200, Math.min(end, floor.length - 80) - 160);
     const taken = (floor.props ?? []).map((p) => [p.x - (p.w ?? 40) / 2 - 60, p.x + (p.w ?? 40) / 2 + 60]);
@@ -249,13 +376,13 @@ wood, 3, 13, 26, 5);
       const x = spot();
       if (x !== null) placeProp(field, id, x, y);
     };
-    put3(pick6(["chair", "bin", "pot"]), front - r() * 40);
-    put3(pick6(["tv", "extinguisher", "table", "chair"]), front - 20 - r() * 40);
-    put3(pick6(["crate", "crate", "drawer", "mailbox"]), back);
-    put3(pick6(["barrel", "locker", "crate"]), back + r() * 20);
+    put3(pick7(["chair", "bin", "pot"]), front - r() * 40);
+    put3(pick7(["tv", "extinguisher", "table", "chair"]), front - 20 - r() * 40);
+    put3(pick7(["crate", "crate", "drawer", "mailbox"]), back);
+    put3(pick7(["barrel", "locker", "crate"]), back + r() * 20);
     const wx = spot();
     if (wx !== null) {
-      const p = spawnPickup(field, "weapon", wx, (lane[0] + lane[1]) / 2, pick6(Object.keys(WEAPONS).filter((id) => id !== "katana" && id !== "smg")));
+      const p = spawnPickup(field, "weapon", wx, (lane[0] + lane[1]) / 2, pick7(Object.keys(WEAPONS).filter((id) => id !== "katana" && id !== "smg")));
       Object.assign(p, { vx: 0, vy: 0, vz: 0, z: 0 });
     }
   }
@@ -566,7 +693,7 @@ wood, 3, 13, 26, 5);
   var int = (r, a, b) => a + Math.floor(r() * (b - a + 1));
   function rollDrops2(table, r, elite = false) {
     const out = [];
-    const add = (item2, n) => n > 0 && out.push({ item: item2, n });
+    const add = (item, n) => n > 0 && out.push({ item, n });
     const k = elite ? 1.5 : 1;
     const heal2 = (p) => r() < p + (elite ? 0.1 : 0) && add("heal", 1);
     switch (table) {
@@ -772,7 +899,7 @@ wood, 3, 13, 26, 5);
     const headX = neckX + Math.sin(lean) * r * 1.1 + r * 0.2;
     const headY = neckY - Math.cos(lean) * r * 0.95;
     const armEnd = (a, len) => [sx + Math.sin(a) * len, sy + Math.cos(a) * len];
-    const [fx2, fy] = armEnd(p.armF, arm * p.reach);
+    const [fx, fy] = armEnd(p.armF, arm * p.reach);
     const [bx, by] = armEnd(p.armB, arm);
     const x = L.extras ?? [];
     const limbW = bulk * 0.5;
@@ -873,11 +1000,11 @@ wood, 3, 13, 26, 5);
       ctx.fillStyle = "#4a0808";
       ctx.fillRect(headX + r * 0.15, headY + r * 0.15, r * 0.8, r * 1.5 * p.open);
     }
-    segEdge(ctx, limbW, sx, sy, fx2, fy, arm * 0.06, paint("top"));
-    dot(ctx, fx2, fy, limbW * 0.62, paint("skin"));
-    if (x.includes("sword")) seg(ctx, Math.max(3, h * 0.016), fx2, fy, fx2 + Math.sin(p.armF + 0.4) * h * 0.42, fy + Math.cos(p.armF + 0.4) * h * 0.42, 0, paint("acc"));
+    segEdge(ctx, limbW, sx, sy, fx, fy, arm * 0.06, paint("top"));
+    dot(ctx, fx, fy, limbW * 0.62, paint("skin"));
+    if (x.includes("sword")) seg(ctx, Math.max(3, h * 0.016), fx, fy, fx + Math.sin(p.armF + 0.4) * h * 0.42, fy + Math.cos(p.armF + 0.4) * h * 0.42, 0, paint("acc"));
     if (x.includes("shield")) {
-      const shx = Math.max(fx2, sx + bulk * 0.6);
+      const shx = Math.max(fx, sx + bulk * 0.6);
       ctx.fillStyle = paint("acc");
       ctx.beginPath();
       ctx.roundRect(shx - h * 0.02, sy - h * 0.14, h * 0.07, h * 0.52, 4);
@@ -896,15 +1023,15 @@ wood, 3, 13, 26, 5);
     for (const side of [-1, 1]) {
       for (let i = 0; i < legN; i++) {
         const ph = Math.sin(walk + i * 1.3 + (side > 0 ? 0 : Math.PI)) * 8;
-        const fx2 = side * (w * 0.25 + i * w * 0.07) + ph + (p.armF > 1.4 && side > 0 && i === legN - 1 ? w * 0.3 : 0);
-        const kx = fx2 * 0.6;
+        const fx = side * (w * 0.25 + i * w * 0.07) + ph + (p.armF > 1.4 && side > 0 && i === legN - 1 ? w * 0.3 : 0);
+        const kx = fx * 0.6;
         const ky = cy - (big ? e.def.h * 0.3 : h * 0.35);
         ctx.strokeStyle = side < 0 ? paint("detail") : paint("skin");
         ctx.lineWidth = big ? e.def.h * 0.045 : Math.max(5, h * 0.12);
         ctx.beginPath();
         ctx.moveTo(0, cy);
         ctx.lineTo(kx, ky);
-        ctx.lineTo(fx2, 0);
+        ctx.lineTo(fx, 0);
         ctx.stroke();
       }
       if (side < 0) {
@@ -1360,14 +1487,14 @@ wood, 3, 13, 26, 5);
       return this.cds[id] ?? 0;
     }
     /** 공격 시작. 예고 장이 있으면 enemyTell/bossTell을 낸다 */
-    start(move3, w, cd = 0) {
-      this.move = move3;
+    start(move2, w, cd = 0) {
+      this.move = move2;
       this.mf = 0;
-      this.atk = newAttackId(move3.specs.length);
-      this.mem.last = move3.id;
+      this.atk = newAttackId(move2.specs.length);
+      this.mem.last = move2.id;
       this.set("attack");
-      if (cd) this.cds[move3.id] = Math.round(cd * (this.has("fast") ? 0.7 : 1));
-      if (move3.frames[0]?.tele) w.emit({ type: this.boss ? "bossTell" : "enemyTell", x: this.x, kind: this.kind });
+      if (cd) this.cds[move2.id] = Math.round(cd * (this.has("fast") ? 0.7 : 1));
+      if (move2.frames[0]?.tele) w.emit({ type: this.boss ? "bossTell" : "enemyTell", x: this.x, kind: this.kind });
     }
     frameNow() {
       return this.state === "attack" && this.move ? this.move.frames[this.mf] ?? null : null;
@@ -1799,20 +1926,20 @@ wood, 3, 13, 26, 5);
     ctx.restore();
   }
   function drawBoxes(e, ctx, f, alpha, outline, armorNow) {
-    const body2 = e.state === "down" || e.state === "getup" || e.state === "dead" ? flat(e) : e.localHurt().length ? e.localHurt() : e.brain.hurt ? [] : e.def.body;
+    const body = e.state === "down" || e.state === "getup" || e.state === "dead" ? flat(e) : e.localHurt().length ? e.localHurt() : e.brain.hurt ? [] : e.def.body;
     ctx.save();
     if (outline) {
       ctx.shadowColor = outline;
       ctx.shadowBlur = armorNow >= 2 ? 18 : 12;
     }
-    for (const b of body2) {
+    for (const b of body) {
       const wb = toWorld2(b, e.x, e.y, e.z, e.dir);
       ctx.fillStyle = tint(e.def.color, (PART_SHADE[b.part ?? "torso"] ?? 0) + (e.flash > 0 && e.state !== "dead" ? 0.5 : 0));
       ctx.fillRect(wb.x0, e.y - wb.z1, wb.x1 - wb.x0, wb.z1 - wb.z0);
     }
     ctx.restore();
-    if (body2.length && e.state !== "dead" && e.state !== "down") {
-      const top = Math.max(...body2.map((b) => b.z1));
+    if (body.length && e.state !== "dead" && e.state !== "down") {
+      const top = Math.max(...body.map((b) => b.z1));
       ctx.fillStyle = e.state === "attack" ? "#ff4b3a" : "#f2efe6";
       ctx.fillRect(e.x + e.dir * (e.def.w * 0.18) - 4, e.y - e.z - top + 12, 8, 6);
     }
@@ -2426,12 +2553,12 @@ wood, 3, 13, 26, 5);
     return { fx0: lerp(a.fx0, b.fx0, t), fx1: lerp(a.fx1, b.fx1, t), z0: lerp(a.z0, b.z0, t), z1: lerp(a.z1, b.z1, t), dy: lerp(a.dy, b.dy, t), part: a.part };
   }
   var at = (b, t) => b ? typeof b === "function" ? b(t) : b : [];
-  function bake(id, label3, body2, phases, specs, extra = {}) {
+  function bake(id, label3, body, phases, specs, extra = {}) {
     const frames = [];
     for (const p of phases) {
       for (let i = 0; i < p.n; i++) {
         const t = p.n <= 1 ? 1 : i / (p.n - 1);
-        const f = { hit: at(p.hit, t), hurt: p.hurt ? at(p.hurt, t) : body2, armor: p.armor ?? 0 };
+        const f = { hit: at(p.hit, t), hurt: p.hurt ? at(p.hurt, t) : body, armor: p.armor ?? 0 };
         if (f.hit.length) f.spec = p.spec ?? 0;
         const vx = typeof p.vx === "function" ? p.vx(t) : p.vx;
         if (vx) f.vx = vx;
@@ -2449,7 +2576,7 @@ wood, 3, 13, 26, 5);
   // src/game/action/enemy/moves.ts
   var S = (dmg, react2, push = 6, extra = {}) => ({ dmg, react: react2, push, stop: react2 === "none" ? 2 : react2 === "flinch" ? 3 : 5, strength: react2 === "none" || react2 === "flinch" ? 1 : react2 === "stagger" ? 2 : 3, ...extra });
   function strike(id, label3, w, h, o) {
-    const body2 = o.body ?? humanoid(w, h);
+    const body = o.body ?? humanoid(w, h);
     const lean = humanoid(w, h, 16, -w * 0.12);
     const reachBody = humanoid(w, h, 16, w * 0.18);
     const dy = o.dy ?? 20;
@@ -2463,15 +2590,15 @@ wood, 3, 13, 26, 5);
     ];
     if (o.fire) phases[1].hit = [];
     const danger = o.fire ? void 0 : [{ fx0: o.reach[0], fx1: o.reach[1] + (o.lunge ?? 0) * o.active, dy }];
-    return bake(id, label3, body2, phases, [{ ...o.spec, low: o.low ?? o.spec.low }], { danger });
+    return bake(id, label3, body, phases, [{ ...o.spec, low: o.low ?? o.spec.low }], { danger });
   }
   function grab(id, label3, w, h, o) {
-    const body2 = o.body ?? humanoid(w, h);
+    const body = o.body ?? humanoid(w, h);
     const spec = { dmg: 0, react: "none", push: 0, unblockable: true, grab: { ticks: o.ticks, dmgPerTick: o.dmgPerTick }, debuff: o.debuff, stop: 4 };
     return bake(
       id,
       label3,
-      body2,
+      body,
       [
         { n: o.tele, tele: true, hurt: humanoid(w, h, 16, -w * 0.1) },
         { n: o.active, hit: [B(w * 0.2, o.reach, h * 0.3, h * 0.8, 22, "arm")], vx: o.lunge ?? 0, armor: o.armor ?? 0 },
@@ -2482,11 +2609,11 @@ wood, 3, 13, 26, 5);
     );
   }
   function charge(id, label3, w, h, o) {
-    const body2 = o.body ?? humanoid(w, h);
+    const body = o.body ?? humanoid(w, h);
     return bake(
       id,
       label3,
-      body2,
+      body,
       [
         { n: o.tele, tele: true, hurt: humanoid(w, h, 16, -w * 0.15, 0.15), vx: -0.6 },
         { n: o.dash, hit: [B(0, w * 0.7, h * 0.1, h * 0.85, 22, "torso")], vx: o.speed, armor: o.armor ?? 1, hurt: humanoid(w, h, 16, w * 0.2) },
@@ -2497,11 +2624,11 @@ wood, 3, 13, 26, 5);
     );
   }
   function shoot2(id, label3, w, h, o) {
-    const body2 = o.body ?? humanoid(w, h);
+    const body = o.body ?? humanoid(w, h);
     const phases = [{ n: o.tele, tele: true }];
     for (let i = 0; i < o.shots; i++) phases.push({ n: o.gap, fire: o.fire, armor: o.armor ?? 0 });
     phases.push({ n: o.recover });
-    return bake(id, label3, body2, phases, [S(0, "none")]);
+    return bake(id, label3, body, phases, [S(0, "none")]);
   }
 
   // src/game/action/enemy/guardians.ts
@@ -4477,9 +4604,9 @@ wood, 3, 13, 26, 5);
         const ok = normal.filter((d4) => d4.price <= wl && wave.filter((s2) => s2.kind === d4.kind).length < (d4.cap ?? SCREEN_CAP));
         if (!ok.length) break;
         const weights = ok.map((d4) => 1 / (1 + wave.filter((s2) => s2.kind === d4.kind).length * 1.5));
-        let pick6 = r() * weights.reduce((a, b) => a + b, 0);
+        let pick7 = r() * weights.reduce((a, b) => a + b, 0);
         let d3 = ok[ok.length - 1];
-        for (let i = 0; i < ok.length; i++) if ((pick6 -= weights[i]) <= 0) d3 = ok[i], i = ok.length;
+        for (let i = 0; i < ok.length; i++) if ((pick7 -= weights[i]) <= 0) d3 = ok[i], i = ok.length;
         wave.push({ kind: d3.kind, ...place(d3, wave.length, area, r), wave: wv });
         wl -= d3.price;
       }
@@ -4879,73 +5006,4 @@ wood, 3, 13, 26, 5);
       }, () => w.say(VENDORS[vendor].bye, 2), () => ({ hp: p.hp, max: p.hpMax }));
     });
     const hitSeen = /* @__PURE__ */ new Set();
-    const overlapT = /* @__PURE__ */ new WeakMap();
-    const lastX = /* @__PURE__ */ new WeakMap();
-    const frontFor = (h) => Math.min(90, Math.max(PROP_DEPTH, h * 0.8));
-    const floorSolids = () => w.props.filter((q) => (q.kind === "prop" || q.kind === "table" || q.kind === "clutter") && q.y > w.lane[0] + 20).map((q) => {
-      const a = propArtSize(q.kind, q.label, w.floor?.type);
-      return { x: q.x, y: q.y, w: Math.max(a?.w ?? 0, q.w, 100), back: Math.min(200, Math.max(PROP_DEPTH, (a?.h ?? 0) * 0.75)), front: frontFor(a?.h ?? 0), h: a?.h ?? 0 };
-    });
-    const itemSolid = (e) => ({ x: e.x, y: e.y, w: PROPS[e.prop].w, back: Math.min(200, Math.max(PROP_DEPTH, PROPS[e.prop].h * 0.6)), front: frontFor(PROPS[e.prop].h), h: PROPS[e.prop].h });
-    const allSolids = () => [...field.ents.filter((e) => e.type === "prop" && PROPS[e.prop]).map((e) => itemSolid(e)), ...floorSolids()];
-    w.spawnAdjust = (s2) => {
-      const q = clearSpot(s2.x, s2.y, allSolids(), w.lane);
-      return q.x === s2.x && q.y === s2.y ? s2 : { ...s2, x: q.x, y: q.y };
-    };
-    Object.defineProperty(w, "itemField", { get: () => field, configurable: true });
-    Object.defineProperty(w, "solidsNow", { get: () => allSolids(), configurable: true });
-    Object.defineProperty(w, "propRects", {
-      get: () => [
-        ...w.props.filter((q) => !["hubdoor", "hubspot", "hatch"].includes(q.kind) && !isHighSign(q.kind, q.label)).map((q) => {
-          const a = propArtSize(q.kind, q.label, w.floor?.type);
-          return a ? { x: q.x, y: q.y, w: a.w, h: a.h, what: `${q.kind}:${q.label ?? ""}` } : null;
-        }).filter(Boolean),
-        ...field.ents.filter((e) => e.type === "prop" && PROPS[e.prop]).map((e) => ({ x: e.x, y: e.y, w: PROPS[e.prop].w, h: PROPS[e.prop].h, what: `물건:${e.prop}` }))
-      ],
-      configurable: true
-    });
-    w.itemState = {
-      snapshot: () => ({ inventory: ir, fields: [...fields], current: w.floor.id, lastReserve, shopSeed, shops: [...shops] }),
-      restore(value) {
-        const s2 = value;
-        if (!s2?.inventory || !Array.isArray(s2.fields)) throw new Error("손상된 아이템 저장");
-        Object.assign(ir, s2.inventory);
-        fields.clear();
-        for (const [k, v] of s2.fields) fields.set(k, v);
-        field = fields.get(s2.current);
-        if (!field) throw new Error("방 아이템 저장 누락");
-        lastReserve = s2.lastReserve;
-        shopSeed = s2.shopSeed;
-        shops.clear();
-        for (const [k, v] of s2.shops ?? []) shops.set(k, v);
-        syncSlots();
-        syncCarry();
-      }
-    };
-    return {
-      run: ir,
-      /** 대화로 받은 소모품 (빈 칸이 없으면 못 받는다) */
-      give(id) {
-        const n = addItem(ir, id, 1);
-        syncSlots();
-        return n > 0;
-      },
-      /** 시연(?start=items): 들 물건·임시 무기를 한 줄로 늘어놓는다 */
-      showcase() {
-        const ym = (w.lane[0] + w.lane[1]) / 2;
-        Object.keys(PROPS).forEach((id, i) => placeProp(field, id, 520 + i * 150, ym + (i % 2 * 2 - 1) * 50));
-        Object.keys(WEAPONS).forEach((id, i) => spawnPickup(field, "weapon", 600 + i * 140, ym));
-      },
-      tick() {
-        lastReserve = ir.reserve = p.reserve;
-        const hits = p.frame().hit;
-        if (hits.length) apply(strikeProps(field, ir, hits, hitSeen, targets()));
-        apply(stepField(field, ir, { x: p.x, y: p.y, z: p.z, dir: p.dir }, {}, targets(), 1 / TICK_HZ, ctx()));
-        for (const b of w.bodies)
-          if (b instanceof Enemy && b.alive && b.hp > 0 && slowAt(field, b.x, b.y) < 1) b.slow = Math.max(b.slow, 2);
-        const ents = field.ents.filter((e) => e.type === "prop" && PROPS[e.prop]);
-        const solids = ents.map((e) => itemSolid(e));
-        const fixed2 = floorSolids();
-        if (solids.length || fixed2.length) {
-          const bodies = [p, ...w.bodies].filter((b) => b.alive && b.kind !== "bullet" && b.kind !== "item" && b.team !== "neutral" && !b.kind.startsWith("proj"));
-          const views = bodies.map((b) => ({ x: b.x, y: b.y, z: b.z, px: b === p ? p.px : lastX
+    const overlapT = /* @__PURE__ */ new WeakMa

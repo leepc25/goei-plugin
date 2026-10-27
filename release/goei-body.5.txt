@@ -1,4 +1,7 @@
-physically connected to the outside. Shops, convenience stores, motels, restaurants, nightlife, work, and shopping continue normally; peaceful streets conceal deep cult control. Ordinary travel permits entry and does not immediately prevent departure.
+int's City",
+        fields: {
+          identity: `##### City and Religious Control
+- An apparently ordinary Korean city remains physically connected to the outside. Shops, convenience stores, motels, restaurants, nightlife, work, and shopping continue normally; peaceful streets conceal deep cult control. Ordinary travel permits entry and does not immediately prevent departure.
 - The cult centers on a naturally occurring Saint, with a hidden vampire household behind its public religion: an unnamed Cult Leader, his wife, son Do-jun, and servant Daesik. Most believers are ordinary humans. Public cult and vampire structure overlap but are not identical.
 - The distinction between worshipped "God" and Cult Leader is real. The Saint already possessed innate holiness when the Leader found him; the latter neither created nor understands it. Instead, he made himself protector and interpreter, controlling doctrine, organization, followers, and practical use of the sacred figure.
 - Human followers recognize one another and circulate outsider information quickly. Workers, customers, and recruiters may watch without acknowledgment; aggressive evangelists ask religion, purpose of visit, and local acquaintances, sometimes revealing prior knowledge of the visitor's movements. Longer stays increase active attention.
@@ -855,4 +858,4 @@ Three rules are engraved in the floor:
       "샛별 고시원": {
         keys: "샛별 고시원",
         fields: {
-          identity: "##### Lodging Lure and Rule Document\n- A decrepit exam-preparation boarding house in run-down urban cheap-lodging districts. Entry occurs while actively seeking inexpensive accommodation, especially in the evening or personal desperation.\n- The entrance looks mundane 
+          identity: "##### Lodging Lure and Rule Document\n- A decrepit exam-preparation boarding house in run-down urban cheap-lodging districts. Entry occurs w

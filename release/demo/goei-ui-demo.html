@@ -2836,6 +2836,7 @@ var Hud = class {
       const r = W3 - (s.compact ? 100 : 20);
       if (s.field.clock) label(c, s.field.clock, r, 34, 26, "#fff", "right", 900);
       if (s.field.place) label(c, s.field.place, r, 56, 15, C.amber, "right", 800);
+      if (s.field.wallet) label(c, s.field.wallet, r, 76, 15, "#cfe3c8", "right", 800);
     }
     if (!f.depth) return;
     const right = W3 - (s.compact ? 100 : 20);
@@ -2923,6 +2924,19 @@ var Hud = class {
   }
   /** 필드 주인공 칸 (전투 HUD가 없는 본부·거점): 왼쪽 아래 도트 얼굴 + 이름 + 체력 + 필살 게이지. 터치·좁은 화면은 왼쪽 위(아래는 스틱 자리).
    * 돌려주는 값 = 칸 오른쪽 끝 x (자막을 그 오른쪽에 둔다) */
+  /** 필드(방문) 오른쪽 위: 필드 시각·장소·잔고 (전투 HUD를 안 그리는 필드에서) */
+  drawFieldCorner(c, f, compact) {
+    if (!f) return;
+    c.save();
+    const k = compact ? 1.2 : 1;
+    W3 = c.canvas.width / k;
+    c.setTransform(k, 0, 0, k, 0, 0);
+    const r = W3 - (compact ? 100 : 20);
+    if (f.clock) label(c, f.clock, r, 34, 26, "#fff", "right", 900);
+    if (f.place) label(c, f.place, r, 56, 15, C.amber, "right", 800);
+    if (f.wallet) label(c, f.wallet, r, f.clock || f.place ? 76 : 34, 15, "#cfe3c8", "right", 800);
+    c.restore();
+  }
   drawFieldCard(c, s, dt = 1 / 60) {
     this.t += dt;
     c.save();
@@ -4674,7 +4688,13 @@ var DEFAULT_SETTINGS = {
   vibrate: true,
   numbers: true,
   talkModel: "main",
-  talkRecent: false
+  talkRecent: false,
+  tScene: 10,
+  tRegion: 30,
+  tTalk: 10,
+  tFight: 10,
+  tWaitShort: 30,
+  tWaitLong: 60
 };
 var KEY = "goei-game-ui:v1";
 var localStore = {
@@ -5306,6 +5326,17 @@ function mountGameShell(box2, o = {}) {
         { type: "choice", label: "NPC 대화 모델", options: [["main", "주 모델"], ["aux", "보조 모델"]], get: () => s.talkModel, set: (v) => s.talkModel = v },
         { type: "toggle", label: "본편 최근 채팅 같이 보내기", get: () => s.talkRecent, set: (v) => s.talkRecent = v }
       ],
+      { type: "head", label: "필드 시간" },
+      ...[["tScene", "장면 넘어가기", 60], ["tRegion", "지역 이동", 180], ["tTalk", "대화 한 번", 60], ["tFight", "싸움 (장면당 한 번)", 60], ["tWaitShort", "시간 보내기 · 짧게", 240], ["tWaitLong", "시간 보내기 · 길게", 480]].map(([k, label2, max]) => ({
+        type: "slider",
+        label: label2,
+        get: () => s[k],
+        set: (v) => s[k] = Math.round(v),
+        min: 0,
+        max,
+        step: 5,
+        fmt: (v) => v ? `${Math.round(v)}분` : "안 감"
+      })),
       { type: "html", html: `<p style="font-size:14px;color:#9aa6ab">게임패드: ${esc(pad.connected ? pad.connected.slice(0, 48) : "연결 안 됨 (버튼을 하나 누르면 잡힙니다)")}</p>` },
       { type: "button", label: "기본값으로", act: () => (settings = { ...DEFAULT_SETTINGS }, apply(), saveSettings(), menu.replace(settingsScreen())) }
     ];

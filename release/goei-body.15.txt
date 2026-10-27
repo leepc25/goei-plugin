@@ -1,4 +1,24 @@
-"업데이트 주소가 아직 연결되지 않은 빌드예요. 지금은 zip으로 갈아끼워 주세요."));
+y = (n2) => `${n2.card ?? ""}|${n2.plugin ?? ""}`;
+  function hasUpdate(ctx2) {
+    const n2 = newVersions(ctx2);
+    return !!(n2.card || n2.plugin);
+  }
+  function updateBanner(ctx2) {
+    const n2 = newVersions(ctx2);
+    if (!(n2.card || n2.plugin) || skipKey(n2) === skipped) return "";
+    const what = [n2.plugin ? `플러그인 v${esc20(n2.plugin)}` : "", n2.card ? `카드 v${esc20(n2.card)}` : ""].filter(Boolean).join(" · ");
+    return `<div class="upd-banner" role="status"><span class="upd-banner-t"><b>새 버전이 있어요</b> ${what}</span>
+    <span class="upd-banner-b"><button class="gx-mini primary" data-action="upd-go">업데이트</button><button class="gx-mini" data-action="upd-skip">건너뛰기</button></span></div>`;
+  }
+  function updateGroup(ctx2) {
+    const busy5 = updateUi.busy;
+    const rows2 = [];
+    const cur = cardVersion(ctx2.char.globalLore);
+    const lite = !!readManifest(ctx2.char.globalLore);
+    const L = updateUi.latest;
+    const row9 = (label2, value, help = "") => `<div class="ps-row"><div class="ps-label"><b>${label2}</b>${help ? `<small>${help}</small>` : ""}</div><div class="ps-ctl">${value}</div></div>`;
+    if (!UPDATE_BASE) {
+      return section2(row9("업데이트", '<span class="gx-muted">준비 중</span>', "업데이트 주소가 아직 연결되지 않은 빌드예요. 지금은 zip으로 갈아끼워 주세요."));
     }
     const pluginNew = L && compareVersions(L.plugin, PLUGIN_VERSION) > 0;
     rows2.push(row9(
@@ -354,8 +374,8 @@ ${recentStory.map((m) => m.text).join("\n")}`,
     const lines3 = s5.split("\n").map((l) => l.trim()).filter(Boolean);
     const quoted = !prose ? [] : lines3.flatMap((l) => [...l.matchAll(/[「"“『]([^」"”』]{1,})[」"”』]/g)].map((m) => m[1]));
     s5 = (quoted.length ? quoted : lines3).join(" ");
-    const esc31 = speaker.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    s5 = s5.replace(new RegExp(`^\\s*${esc31}\\s*[:：]\\s*`), "").replace(/^[「"“『]|[」"”』]$/g, "");
+    const esc32 = speaker.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    s5 = s5.replace(new RegExp(`^\\s*${esc32}\\s*[:：]\\s*`), "").replace(/^[「"“『]|[」"”』]$/g, "");
     return s5.replace(/\s+/g, " ").trim();
   }
   function clipLine(s5, limit) {
@@ -628,7 +648,13 @@ ${recentStory.map((m) => m.text).join("\n")}`,
     vibrate: true,
     numbers: true,
     talkModel: "main",
-    talkRecent: false
+    talkRecent: false,
+    tScene: 10,
+    tRegion: 30,
+    tTalk: 10,
+    tFight: 10,
+    tWaitShort: 30,
+    tWaitLong: 60
   };
   function parseSettings(text) {
     const s5 = { ...DEFAULT_SETTINGS2 };
@@ -698,6 +724,15 @@ ${recentStory.map((m) => m.text).join("\n")}`,
       { key: "stickRun", label: "스틱 끝까지 밀면 달리기", type: "on" },
       { key: "lefty", label: "왼손 배치", type: "on" },
       { key: "vibrate", label: "진동", type: "on" }
+    ]],
+    // 필드 시계 (docs/필드_세계_NPC_설계.md 16-2, 사용자 확정 2026-10-26): 0분 = 그 행동으로는 시간이 안 감
+    ["필드 시간", [
+      { key: "tScene", label: "장면 넘어가기", type: "min", min: 0, max: 60, step: 5 },
+      { key: "tRegion", label: "지역 이동", type: "min", min: 0, max: 180, step: 5 },
+      { key: "tTalk", label: "대화 한 번", type: "min", min: 0, max: 60, step: 5 },
+      { key: "tFight", label: "싸움 (장면당 한 번)", type: "min", min: 0, max: 60, step: 5 },
+      { key: "tWaitShort", label: "시간 보내기 · 짧게", type: "min", min: 0, max: 240, step: 5 },
+      { key: "tWaitLong", label: "시간 보내기 · 길게", type: "min", min: 0, max: 480, step: 5 }
     ]]
   ];
   var ITEMS = GROUPS.flatMap(([, g]) => g);
@@ -707,16 +742,17 @@ ${recentStory.map((m) => m.text).join("\n")}`,
   }
   function control2(it, s5) {
     const cur = s5[it.key];
-    const seg7 = (v, label2, on2) => `<button class="gx-seg${on2 ? " on" : ""}" data-action="visit-ui" data-value="${it.key}=${v}" aria-pressed="${on2}">${esc21(label2)}</button>`;
+    const seg7 = (v, label2, on3) => `<button class="gx-seg${on3 ? " on" : ""}" data-action="visit-ui" data-value="${it.key}=${v}" aria-pressed="${on3}">${esc21(label2)}</button>`;
     if (it.type === "pick") return `<div class="gx-segs gx-segs-sm">${it.opts.map(([v, l]) => seg7(v, l, cur === v)).join("")}</div>`;
     if (it.type === "on") return switchHtml({ action: "visit-ui", value: `${it.key}=${cur === true ? "0" : "1"}`, on: cur === true, label: it.label });
+    if (it.type === "min") return `<span class="adv-num"><input class="gx-search" type="number" inputmode="numeric" min="${it.min}" max="${it.max}" step="${it.step}" data-change="visit-ui" data-key="${it.key}" value="${Math.round(Number(cur))}" aria-label="${esc21(it.label)}"><span>분</span></span>`;
     return `<span class="adv-num"><input class="gx-search" type="number" inputmode="numeric" min="${Math.round(it.min * 100)}" max="${Math.round(it.max * 100)}" step="${Math.round(it.step * 100)}" data-change="visit-ui" data-key="${it.key}" value="${Math.round(Number(cur) * 100)}" aria-label="${esc21(it.label)}"><span>%</span></span>`;
   }
   function gameUiSections(state) {
     const s5 = gameUiOf(state);
     return GROUPS.map(([title2, items]) => `<section class="ps-group"><h3>게임 ${esc21(title2)}</h3><div class="ps-rows">${items.map((it) => {
       const changed = s5[it.key] !== DEFAULT_SETTINGS2[it.key];
-      return `<div class="ps-row adv-row${it.type === "pct" ? " adv-numrow" : ""}${changed ? " changed" : ""}"><div class="ps-label"><b>${esc21(it.label)}</b></div><div class="ps-ctl">${control2(it, s5)}</div></div>`;
+      return `<div class="ps-row adv-row${it.type === "pct" || it.type === "min" ? " adv-numrow" : ""}${changed ? " changed" : ""}"><div class="ps-label"><b>${esc21(it.label)}</b></div><div class="ps-ctl">${control2(it, s5)}</div></div>`;
     }).join("")}</div></section>`).join("") + `<section class="ps-group"><p class="ps-note">게임 안 설정(Esc → 설정)과 같은 값이에요. 게임을 열어 둔 채 바꿨다면 다시 들어가면 적용돼요.</p></section>`;
   }
   async function setGameUi(ctx2, value) {
@@ -729,7 +765,11 @@ ${recentStory.map((m) => m.text).join("\n")}`,
       if (!it.opts.some(([v]) => v === raw)) return false;
       s5[key2] = raw;
     } else if (it.type === "on") s5[key2] = raw === "1";
-    else {
+    else if (it.type === "min") {
+      const n2 = Number(raw);
+      if (!Number.isFinite(n2)) return false;
+      s5[key2] = Math.min(it.max, Math.max(it.min, Math.round(n2)));
+    } else {
       const n2 = Number(raw);
       if (!Number.isFinite(n2)) return false;
       s5[key2] = Math.min(it.max, Math.max(it.min, Math.round(n2 / (it.step * 100)) * it.step));
@@ -846,7 +886,7 @@ ${v.trim()}`).join("\n\n") : "";
     });
     return `<div class="st-cols ps-row-block">${rows2.join("")}</div>`;
   }
-  var wonInput = (n2, busy5) => `<input class="st-won" type="text" inputmode="numeric" value="${n2.toLocaleString("en-US")}" data-change="set-wallet-start" aria-label="시작 잔고"${busy5 ? " disabled" : ""}>`;
+  var wonInput = (n2, busy5, locked = false) => `<input class="st-won" type="text" inputmode="numeric" value="${n2.toLocaleString("en-US")}" data-change="set-wallet-start" aria-label="시작 잔고"${busy5 || locked ? " disabled" : ""}>`;
   function worldOffVars() {
     return { $st_anomaly_on: "0", [WORLD_KEY]: "", $an_report: "", $in_report: "", $ms_report: "", $ag_report: "" };
   }
@@ -941,21 +981,24 @@ ${v.trim()}`).join("\n\n") : "";
     if (settingsUi.page) return featurePage(ctx2, settingsUi.page, canChat);
     const { basic: s5, world, theme } = current3(ctx2, scope);
     const peopleOn = ppValue(scope === "chat" ? ctx2.chat.scriptstate : getPrefs().vars, "on") === "1";
-    const on2 = scope === "chat" ? worldOn(ctx2.chat) : s5.anomalyOn;
+    const on3 = scope === "chat" ? worldOn(ctx2.chat) : s5.anomalyOn;
     const busy5 = settingsUi.busy;
     const anomaly = settingsUi.confirmOff && scope === "chat" ? `<div class="st-confirm"><p>끄면 지금 상황판의 괴이·사건·특수·요원 상태를 비워요. 다시 켜도 이전 상태는 돌아오지 않아요.</p>
         <div class="gx-row-btns"><button class="gx-mini danger" data-action="set-anomaly" data-value="off-yes" ${busy5 ? "disabled" : ""}>끄기</button>
-        <button class="gx-mini" data-action="set-anomaly" data-value="off-no">취소</button></div></div>` : seg6("set-anomaly", on2 ? "on" : "off", [["on", "ON"], ["off", "OFF"]], busy5);
+        <button class="gx-mini" data-action="set-anomaly" data-value="off-no">취소</button></div></div>` : seg6("set-anomaly", on3 ? "on" : "off", [["on", "ON"], ["off", "OFF"]], busy5);
     const note = String(ctx2.chat.scriptstate?.[ASSET_NOTE] ?? "");
     const colCfg = colConfig(scope === "chat" ? ctx2.chat.scriptstate : getPrefs().vars);
     const wallet = readWallet(scope === "chat" ? ctx2.chat.scriptstate : void 0, getPrefs().walletStart ?? WALLET_START_DEFAULT);
     const walletStart = wallet.start;
     const walletNow = scope === "chat" ? walletBalance(wallet, aliveAnchors(ctx2.chat)) : walletStart;
+    const walletEdit = walletEditable(scope === "chat" ? ctx2.chat.scriptstate : getPrefs().vars);
+    const startLocked = scope === "chat" && !walletEdit && walletStarted(ctx2.chat);
     const S = {
       screen: `${group4("화면", [
         field2("테마", seg6("set-theme", theme, [["light", "라이트"], ["dark", "다크"], ["paper", "페이퍼"]], busy5), "채팅 화면의 캐릭터 이미지 배경과 상태창(「테마」를 골랐을 때) 배색이에요.", "device"),
         field2("상태창", seg6("set-status", getPrefs().status ?? "auto", [["auto", "테마"], ["dark", "다크"], ["light", "라이트"], ["paper", "페이퍼"], ["off", "미표시"]], busy5), "채팅 속 상태창의 배색이에요. 「테마」는 위 테마를 따라가요. 미표시를 고르면 상자만 숨기고, 모델은 상태 태그를 계속 써요.", "device"),
         field2("메뉴 위치", seg6("set-nav", getPrefs().nav ?? "left", [["left", "왼쪽"], ["right", "오른쪽"]], busy5), "PC 창에서 메뉴 목록을 놓을 쪽이에요.", "device"),
+        field2("위키 목록 위치", seg6("set-wiki-side", getPrefs().wikiSide ?? "left", [["left", "왼쪽"], ["right", "오른쪽"]], busy5), "PC 창에서 위키의 세로바와 숨은 목록 서랍을 놓을 쪽이에요. 모바일은 늘 오른쪽 아래 「목록」 책갈피예요.", "device"),
         field2("요원 칸", seg6("set-agents", getPrefs().agents ?? "wall", [["wall", "모니터"], ["list", "목록"]], busy5), "상황판 요원 칸 모양이에요.", "device"),
         field2("창 바깥 불투명도", dimSlider(getPrefs().dim ?? DIM_DEFAULT, busy5), "창 뒤 채팅 화면을 가리는 정도예요. 0%면 그대로 보이고 100%면 다 가려요.", "device"),
         field2("설정 창 폭", seg6("set-editor-width", String(getPrefs().editorWidth ?? 90), [["60", "60%"], ["70", "70%"], ["80", "80%"], ["90", "90%"], ["100", "100%"]], busy5), "이 설정 창이 화면 가로의 몇 %를 쓸지예요. 높이는 늘 화면의 92%. 폰에서는 늘 전체 화면이에요.", "device")
@@ -981,7 +1024,7 @@ ${v.trim()}`).join("\n\n") : "";
       ].join(""))}
     ${group4(
         `상태창 칸 <small>${usedCols(colCfg).length}칸 사용</small>`,
-        `${statusColsTable(colCfg, busy5)}${colCfg.wallet !== "off" ? field2("시작 잔고", wonInput(walletStart, busy5), scope === "chat" ? `이 채팅 장부의 시작 잔고예요. 지금 잔고 ${esc23(formatWon(walletNow))}. 거래 내역과 수정은 ID카드의 잔고 칩에서.` : "새 채팅 장부의 시작 잔고예요. 거래는 인물 기록 갱신기가 본문에서 금액이 적힌 것만 뽑아 더하고 빼요.") : ""}`,
+        `${statusColsTable(colCfg, busy5)}${colCfg.wallet !== "off" ? field2("시작 잔고", wonInput(walletStart, busy5, startLocked), scope === "chat" ? `이 채팅 장부의 시작 잔고예요. 지금 잔고 ${esc23(formatWon(walletNow))}. 거래 내역은 가계부 탭에서.${startLocked ? " 이야기가 시작돼서 잠겼어요(아래 「잔고 직접 수정」을 켜면 바꿀 수 있어요)." : ""}` : "새 채팅 장부의 시작 잔고예요. 거래는 인물 기록 갱신기가 본문에서 금액이 적힌 것만 뽑아 더하고 빼요.") : ""}${colCfg.wallet !== "off" ? field2("잔고 직접 수정", seg6("set-wallet-edit", walletEdit ? "1" : "0", [["1", "ON"], ["0", "OFF"]], busy5), "켜면 가계부에서 잔고를 고치고 거래를 지울 수 있고, 진행 중인 채팅의 시작 잔고도 바꿀 수 있어요. 이야기 밖에서 바뀐 잔고는 모델이 이유를 몰라 대화가 길어질수록 앞뒤가 꼬이기 쉬워서 기본은 꺼 둬요.") : ""}`,
         `응답 끝의 상태 태그 <code>[▣|…]</code>에 들어가는 칸이에요. 「안 씀」으로 하면 태그에서 그 칸이 빠지고(모델에 모양을 알려 줘요), 「숨김」은 태그에는 두고 채팅 속 상태창 상자에서만 가려요.${scope === "chat" ? " 바꾼 구성은 이 채팅에 바로 적용되고 바뀐 시점이 기록돼요." : " 새 채팅의 기본 구성이에요."}`
       )}
     <section class="ps-group"><h3>괴이 발생</h3><p class="ps-note">응답을 처리할 때마다 판정해요. 상한을 0으로 하면 그 종류는 자동으로 생기지 않아요.</p>
@@ -1130,6 +1173,10 @@ ${v.trim()}`).join("\n\n") : "";
       await saveDefaults(env3, (p) => ({ ...p, agents: v === "list" ? "list" : void 0 }));
       return true;
     }
+    if (action === "set-wiki-side") {
+      if (v === "left" || v === "right") await saveDefaults(env3, (p) => ({ ...p, wikiSide: v === "right" ? "right" : void 0 }));
+      return true;
+    }
     if (action === "set-nav" || action === "set-dim") {
       const n2 = Number(v);
       if (action === "set-nav" && (v === "left" || v === "right")) await saveDefaults(env3, (p) => ({ ...p, nav: v === "right" ? "right" : void 0 }));
@@ -1163,6 +1210,9 @@ ${v.trim()}`).join("\n\n") : "";
           else env3.render();
           return true;
         }
+        case "set-wallet-edit":
+          if (v === "1" || v === "0") await saveDefaults(env3, (p) => ({ ...p, vars: { ...p.vars ?? {}, [WALLET_EDIT_VAR]: v } }));
+          return true;
         case "set-agent": {
           const next = Math.min(AGENT_MAX, Math.max(0, d.basic.agentLimit + (v.endsWith("+") ? 1 : -1)));
           if (next !== d.basic.agentLimit) await basicPatch(env3, { agentLimit: next });
@@ -1223,11 +1273,16 @@ ${v.trim()}`).join("\n\n") : "";
           return true;
         }
         await save(ctx2, env3, (chat) => {
+          if (walletStarted(chat) && !walletEditable(chat.scriptstate)) return null;
           const w = readWallet(chat.scriptstate, getPrefs().walletStart ?? WALLET_START_DEFAULT);
           return w.start === n2 ? null : walletVars({ ...w, start: n2 });
         });
         return true;
       }
+      case "set-wallet-edit":
+        if (v !== "1" && v !== "0") return true;
+        await save(ctx2, env3, (chat) => walletEditable(chat.scriptstate) === (v === "1") ? null : { [WALLET_EDIT_VAR]: v });
+        return true;
       case "set-anomaly":
         if (v === "off") {
           if (!worldOn(ctx2.chat)) return true;
@@ -1575,10 +1630,10 @@ ${v.trim()}`).join("\n\n") : "";
     const right = page === "screen" ? '<span class="gw-tokens">이 기기 공통</span>' : showScope ? scopeSeg : `${canChat ? "" : '<span class="gw-tokens">새 채팅 기본값 (시작 전)</span>'}${act}`;
     const crumb = page === "update" ? "관리" : page === "screen" ? "설정 / 이 기기 공통" : `설정 / ${canChat ? scope === "chat" ? "이 채팅" : "새 채팅 기본값" : "새 채팅 기본값 · 시작 전"}`;
     const info = FEATURE_INFO[page];
-    const on2 = featureState(ctx2)[`set:${page}`];
-    const badge3 = on2 === void 0 ? "" : `<span class="gw-state${on2 ? "" : " off"}">${on2 ? "켬" : "끔"}</span>`;
+    const on3 = featureState(ctx2)[`set:${page}`];
+    const badge3 = on3 === void 0 ? "" : `<span class="gw-state${on3 ? "" : " off"}">${on3 ? "켬" : "끔"}</span>`;
     if (info) body5 = body5.replace(/<p class="ps-note">본편 응답이 끝날 때마다[\s\S]*?<\/p>/, "").replace(/<section class="ps-group"><p class="ps-note">필드에서 만난 사람과[\s\S]*?<\/section>/, "");
-    const lead = info ? `<p class="gx-muted">${esc24(info.desc)} <span class="gw-eg">예) ${esc24(info.example)}</span>${on2 === false && info.off ? ` <span class="gw-off-note">${esc24(info.off)}</span>` : ""}</p></header>` : "</header>";
+    const lead = info ? `<p class="gx-muted">${esc24(info.desc)} <span class="gw-eg">예) ${esc24(info.example)}</span>${on3 === false && info.off ? ` <span class="gw-off-note">${esc24(info.off)}</span>` : ""}</p></header>` : "</header>";
     return `<div class="gw-page gw-set"><header class="gw-head"><h2>${esc24(title2)}${badge3}</h2>${right ? `<div class="gw-head-act">${right}</div>` : ""}${lead}
     ${settingsNotices()}
     <div class="gx-settings gw-setbody">${body5}</div></div>`;
@@ -1608,9 +1663,9 @@ ${v.trim()}`).join("\n\n") : "";
   }
   function tree(ctx2) {
     const counts = treeCounts(ctx2);
-    const on2 = featureState(ctx2);
+    const on3 = featureState(ctx2);
     return treeOf(tabOf(edUi.node)).map(
-      (g) => `<div class="gw-tree-group"><h4>${g.title}</h4>${g.items.map(([id, label2, icon2, badge3]) => `<button class="gw-tree-item${edUi.node === id ? " on" : ""}" data-action="ed-node" data-value="${id}">${icon2}<span>${esc24(label2)}</span>${badge3 ?? (counts[id] !== void 0 ? `<em>${counts[id]}</em>` : on2[id] !== void 0 ? `<i class="gw-tree-badge${on2[id] ? "" : " off"}">${on2[id] ? "켬" : "끔"}</i>` : "")}</button>`).join("")}</div>`
+      (g) => `<div class="gw-tree-group"><h4>${g.title}</h4>${g.items.map(([id, label2, icon2, badge3]) => `<button class="gw-tree-item${edUi.node === id ? " on" : ""}" data-action="ed-node" data-value="${id}">${icon2}<span>${esc24(label2)}</span>${badge3 ?? (counts[id] !== void 0 ? `<em>${counts[id]}</em>` : on3[id] !== void 0 ? `<i class="gw-tree-badge${on3[id] ? "" : " off"}">${on3[id] ? "켬" : "끔"}</i>` : "")}</button>`).join("")}</div>`
     ).join("");
   }
   function guideNodePage(ctx2, n2) {
@@ -1927,8 +1982,8 @@ ${v.trim()}`).join("\n\n") : "";
     </div></li>`;
   }
   var TGT = '<svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="8" cy="8" r="5"/><path d="M8 1v3M8 12v3M1 8h3M12 8h3"/><circle class="dot" cx="8" cy="8" r="1.8" fill="currentColor" stroke="none"/></svg>';
-  function targetMark(on2, action, value, btn = false) {
-    return `<button class="${btn ? "gx-evbtn " : ""}gx-tgt${on2 ? " on" : ""}" data-action="${action}" data-value="${esc25(value)}" aria-pressed="${on2}" title="${on2 ? "목표 해제" : "목표로 지정"}" aria-label="${on2 ? "목표 해제" : "목표로 지정"}">${TGT}${btn ? "" : `<span>${on2 ? "해제" : "선택"}</span>`}</button>`;
+  function targetMark(on3, action, value, btn = false) {
+    return `<button class="${btn ? "gx-evbtn " : ""}gx-tgt${on3 ? " on" : ""}" data-action="${action}" data-value="${esc25(value)}" aria-pressed="${on3}" title="${on3 ? "목표 해제" : "목표로 지정"}" aria-label="${on3 ? "목표 해제" : "목표로 지정"}">${TGT}${btn ? "" : `<span>${on3 ? "해제" : "선택"}</span>`}</button>`;
   }
   function evPopup(clock2 = "") {
     const c = evUi.pop ? seen.get(evUi.pop) : void 0;
@@ -1967,9 +2022,9 @@ ${v.trim()}`).join("\n\n") : "";
     const rank2 = (c) => (ours(c) ? 0 : 10) + (GRADE_RANK[(c.grade ?? "").toUpperCase()] ?? 6);
     return [...live].sort((a, b) => rank2(a) - rank2(b))[0]?.id ?? cards[0]?.id ?? "";
   }
-  function opsRow(c, on2) {
+  function opsRow(c, on3) {
     const thumb = c.art?.pic ? `<img src="${esc25(c.art.pic)}" alt="" loading="lazy">` : `<span class="gx-oprow-ico">${MARK[c.kind]}</span>`;
-    return `<li class="gx-oprow k-${c.kind}${on2 ? " sel" : ""}${c.ended ? " ended" : ""}" data-action="ops-sel" data-value="${esc25(c.id)}" aria-current="${on2}">
+    return `<li class="gx-oprow k-${c.kind}${on3 ? " sel" : ""}${c.ended ? " ended" : ""}" data-action="ops-sel" data-value="${esc25(c.id)}" aria-current="${on3}">
     <span class="gx-oprow-pic">${thumb}</span>
     <span class="gx-oprow-t"><b>${gradeMark(c)}<span>${esc25(c.name)}</span>${c.selected ? '<span class="gx-badge gx-goaltag">목표</span>' : ""}</b><small><span>${c.loc}</span>${statusNote(c)}</small></span>${depMark(c)}</li>`;
   }
@@ -2144,8 +2199,8 @@ ${v.trim()}`).join("\n\n") : "";
           box.classList.remove("two");
         }
         const gap = 3 * parseFloat(getComputedStyle(inner).fontSize);
-        const on2 = box.classList.contains("on");
-        const w = on2 ? (inner.scrollWidth - gap) / 2 : inner.scrollWidth;
+        const on3 = box.classList.contains("on");
+        const w = on3 ? (inner.scrollWidth - gap) / 2 : inner.scrollWidth;
         const over = w - box.clientWidth > 2;
         box.classList.toggle("on", over);
         if (over) {
@@ -3008,47 +3063,4 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .ph-msg { display: flex; gap: 8px; max-width: min(78%, 560px); }
 .ph-msg.first { margin-top: 8px; }
 .ph-msg.me { align-self: flex-end; flex-direction: row-reverse; }
-.ph-msg.npc { align-self: flex-start; }
-.ph-msg-col { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
-.ph-msg.me .ph-msg-col { align-items: flex-end; }
-.ph-face, .ph-face-gap { flex: none; width: 38px; height: 38px; border-radius: 13px; font-size: 14px; }
-.ph-name { font-size: 13px; font-weight: 600; color: var(--sub); margin-left: 2px; }
-.ph-line { display: flex; align-items: flex-end; gap: 6px; min-width: 0; }
-.ph-msg.me .ph-line { flex-direction: row-reverse; }
-.ph-bubble { min-width: 0; padding: 8px 13px; border-radius: 18px; background: var(--panel2); color: var(--text); font-size: 15px; line-height: 1.55; overflow-wrap: anywhere; }
-.ph-msg.npc.first .ph-bubble { border-top-left-radius: 6px; }
-/* 상대 말풍선: 대화 배경(--sunk)과 확실히 구분되게 카드 면 + 테두리 (v0.16.22) */
-.ph-msg.npc .ph-bubble { background: var(--panel2); border: 1px solid var(--line2); box-shadow: 0 1px 2px rgba(0, 0, 0, .08); }
-.gx[data-theme="light"] .ph-msg.npc .ph-bubble, .gx[data-theme="paper"] .ph-msg.npc .ph-bubble { background: var(--panel); }
-.ph-msg.me .ph-bubble { background: color-mix(in srgb, var(--signal) 22%, var(--panel)); color: var(--text); border: 1px solid color-mix(in srgb, var(--signal) 40%, transparent); }
-.ph-msg.me.first .ph-bubble { border-top-right-radius: 6px; }
-.ph-bubble p { margin: 0; }
-.ph-bubble p + p { margin-top: 4px; }
-.ph-bubble .at-card { margin: 4px 0; background: color-mix(in srgb, var(--void) 55%, transparent); border-color: transparent; color: var(--text); }
-.ph-msg.me .ph-bubble .at-card { background: color-mix(in srgb, var(--text) 8%, transparent); color: var(--text); }
-.ph-msg.me .ph-bubble .at-card small, .ph-msg.me .ph-bubble .at-ico { color: var(--sub); }
-.ph-bubble:has(> .at-card-image:only-child) { padding: 0; background: none; }
-.ph-bubble > .at-card-image:only-child { margin: 0; border-radius: 16px; }
-.ph-meta-t { flex: none; display: flex; flex-direction: column; align-items: flex-end; font-size: 11px; color: var(--dim); white-space: nowrap; line-height: 1.3; }
-.ph-msg.npc .ph-meta-t { align-items: flex-start; }
-.ph-meta-t i { font-style: normal; font-weight: 800; color: var(--amber); }
-.ph-sys { align-self: center; max-width: 90%; margin: 6px 0; padding: 4px 12px; border-radius: 999px; background: var(--panel); border: 1px solid var(--line); color: var(--sub); font-size: 13px; text-align: center; }
-.ph-sys.pause { font-style: italic; background: none; border-color: transparent; }
-.ph-typing { display: inline-flex; gap: 4px; align-items: center; padding: 12px 14px; }
-.ph-typing i { width: 7px; height: 7px; border-radius: 50%; background: var(--dim); animation: ph-dot 1.2s infinite ease-in-out; }
-.ph-typing i:nth-child(2) { animation-delay: .15s; }
-.ph-typing i:nth-child(3) { animation-delay: .3s; }
-@keyframes ph-dot { 0%, 60%, 100% { transform: translateY(0); opacity: .45; } 30% { transform: translateY(-4px); opacity: 1; } }
-@media (prefers-reduced-motion: reduce) { .ph-typing i { animation: none; } }
-.ph-retry { align-self: center; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; justify-content: center; margin: 8px 0; font-size: 13px; color: var(--amber); }
-/* 입력창: 늘 대화 아래 */
-.ph-composer { flex: none; display: flex; flex-direction: column; gap: 8px; padding: 10px 12px calc(10px + env(safe-area-inset-bottom)); border-top: 1px solid var(--panel2); background: var(--void); }
-.ph-composer .at-editor { gap: 8px; }
-.ph-compose { display: flex; align-items: flex-end; gap: 6px; }
-.ph-input { flex: 1; min-width: 0; min-height: 44px; max-height: 140px; padding: 10px 14px; border: 1px solid var(--line); border-radius: 21px; background: var(--panel); color: var(--text); font: inherit; font-size: 15px; line-height: 1.45; resize: none; field-sizing: content; }
-.ph-input:focus { outline: none; border-color: var(--accent-line); }
-.ph-plus { width: 42px; height: 42px; border-radius: 50%; }
-.ph-plus.on svg { transform: rotate(45deg); }
-.ph-send { display: grid; place-items: center; width: 44px; height: 44px; flex: none; padding: 0; border: 0; border-radius: 15px; background: var(--signal); color: var(--on-signal); box-shadow: 0 4px 12px -6px color-mix(in srgb, var(--signal) 70%, transparent); transition: transform .12s ease, filter .12s ease; }
-.ph-send svg { width: 22px; height: 22px; }
-.ph-send:hover:not(:disabled) { filter: brightness(
+.p

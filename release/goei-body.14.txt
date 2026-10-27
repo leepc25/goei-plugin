@@ -1,4 +1,13 @@
- |",
+nsfer into another person's `knowledge` unless that person actually read the cue.",
+    "- 「접근:」 last actual approach, the target's actual response, confirmed boundaries, currently permitted range. Silence, no response and no resistance are not acceptance.",
+    "- 「겉과 속:」 for exploitative or abusive intent: the surface, the purpose, attempts, results, who noticed; never keep only the kindness until it becomes goodwill.",
+    "Never move target-specific material into `personality`; values and biases are separate from one target's interpretation. Never record a reaction or approach that existed only in a plan or memo.",
+    "",
+    "### 7.5 Relationship intents",
+    "Same interest, different behavior by intent. Playfulness (adult teasing, can withdraw) is not courtship; appreciation may be relaxed because approach was never intended; renunciation may leak; protection differs from possession by accepting the target's independence.",
+    "| Intent | Core reaction |",
+    "|---|---|",
+    "| 존중 Respect | Seeks recognition; may keep distance and caution. |",
     "| 애정 Affection | Wants the target to fare well; care without counting loss. |",
     "| 보호 Protection | Cares for or steps in; whether they can let go matters. |",
     "| 동지 Comradeship | Stands beside the target; feeling through shared work. |",
@@ -383,13 +392,13 @@
           break;
         }
         const curStore = peopleStore(fresh.chat);
-        const walletOn = colConfig(fresh.chat.scriptstate).wallet !== "off";
+        const walletOn2 = colConfig(fresh.chat.scriptstate).wallet !== "off";
         const walletStart = getPrefs().walletStart ?? WALLET_START_DEFAULT;
-        const balance = walletOn ? walletBalance(readWallet(fresh.chat.scriptstate, walletStart), aliveAnchors(fresh.chat)) : null;
+        const balance = walletOn2 ? walletBalance(readWallet(fresh.chat.scriptstate, walletStart), aliveAnchors(fresh.chat)) : null;
         const input2 = buildUpdate(fresh.chat, curStore, batches[b], { settings, system: "", values: Object.fromEntries(input0Names(curStore).map((n2) => [n2, valuesOf(n2)])), names: allNames(), exclude, factionNames: factionNamesOf(fresh.char.globalLore), only: o.scope?.only, wallet: balance });
         const sections3 = enabledSections(settings);
         if (input2.tidy.length) sections3.add("tidy");
-        if (walletOn) sections3.add("wallet");
+        if (walletOn2) sections3.add("wallet");
         const system = assemblePrompt(promptFor(settings), sections3, settings.rules, settings.lang);
         input2.system = system;
         if (!input2.people.length) {
@@ -434,7 +443,7 @@
             exclude,
             only: o.scope?.only,
             keepRead: !!o.scope?.only,
-            wallet: walletOn
+            wallet: walletOn2
           });
           diag.report = report;
           let next = cur;
@@ -1872,9 +1881,9 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
   var blank4 = (text) => `<div class="ph-blank"><p>${text}</p></div>`;
   var when2 = (sec) => new Date(sec * 1e3).toLocaleString("ko-KR", { dateStyle: "short", timeStyle: "short" });
   function row5(ctx2, e, title2, sub, dot = false) {
-    const on2 = (wiki.view === "doc" || wiki.view === "compose") && wiki.title === title2;
+    const on3 = (wiki.view === "doc" || wiki.view === "compose") && wiki.title === title2;
     const small = sub ?? (e ? [e.title !== e.name ? e.title : "", e.sub].filter(Boolean).join(" · ") : "");
-    return `<li class="ph-row"><button class="ph-main nw-row${on2 ? " on" : ""}" data-action="wiki-pick" data-value="${esc18(title2)}">${face2(ctx2, e)}
+    return `<li class="ph-row"><button class="ph-main nw-row${on3 ? " on" : ""}" data-action="wiki-pick" data-value="${esc18(title2)}">${face2(ctx2, e)}
     <span class="ph-who"><span class="ph-who-top"><b>${esc18(e?.name ?? title2)}</b>${dot ? '<span class="nw-dot" title="이번 이야기에서 작성" aria-label="이번 이야기에서 작성"></span>' : ""}</span>${small ? `<small>${esc18(small)}</small>` : ""}</span></button></li>`;
   }
   var CHO = "ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ";
@@ -2209,8 +2218,9 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
       x0 = null;
       if (Math.abs(dx) < 30) return;
       dragged = true;
-      if (dx > 0 && !wiki.listOpen) act("open");
-      else if (dx < 0 && wiki.listOpen) act("close");
+      const d = root3.closest("[data-wiki-side]")?.dataset.wikiSide === "right" ? -dx : dx;
+      if (d > 0 && !wiki.listOpen) act("open");
+      else if (d < 0 && wiki.listOpen) act("close");
     };
     bar.addEventListener("pointerdown", (e) => {
       x0 = e.clientX;
@@ -2248,7 +2258,8 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
       const dx = (e.changedTouches[0]?.clientX ?? t0.x) - t0.x;
       const dy = (e.changedTouches[0]?.clientY ?? t0.y) - t0.y;
       t0 = null;
-      const out = wide() ? dx < -36 : dx > 36;
+      const fromLeft = wide() && root3.closest("[data-wiki-side]")?.dataset.wikiSide !== "right";
+      const out = fromLeft ? dx < -36 : dx > 36;
       if (out && Math.abs(dx) > Math.abs(dy) * 1.5 && wiki.listOpen) act("close");
     }, { passive: true });
     const edge = root3.querySelector(".nw-edge");
@@ -2720,24 +2731,4 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
       plugin: compareVersions(L.plugin, PLUGIN_VERSION) > 0 ? L.plugin : void 0
     };
   }
-  var skipKey = (n2) => `${n2.card ?? ""}|${n2.plugin ?? ""}`;
-  function hasUpdate(ctx2) {
-    const n2 = newVersions(ctx2);
-    return !!(n2.card || n2.plugin);
-  }
-  function updateBanner(ctx2) {
-    const n2 = newVersions(ctx2);
-    if (!(n2.card || n2.plugin) || skipKey(n2) === skipped) return "";
-    const what = [n2.plugin ? `플러그인 v${esc20(n2.plugin)}` : "", n2.card ? `카드 v${esc20(n2.card)}` : ""].filter(Boolean).join(" · ");
-    return `<div class="upd-banner" role="status"><span class="upd-banner-t"><b>새 버전이 있어요</b> ${what}</span>
-    <span class="upd-banner-b"><button class="gx-mini primary" data-action="upd-go">업데이트</button><button class="gx-mini" data-action="upd-skip">건너뛰기</button></span></div>`;
-  }
-  function updateGroup(ctx2) {
-    const busy5 = updateUi.busy;
-    const rows2 = [];
-    const cur = cardVersion(ctx2.char.globalLore);
-    const lite = !!readManifest(ctx2.char.globalLore);
-    const L = updateUi.latest;
-    const row9 = (label2, value, help = "") => `<div class="ps-row"><div class="ps-label"><b>${label2}</b>${help ? `<small>${help}</small>` : ""}</div><div class="ps-ctl">${value}</div></div>`;
-    if (!UPDATE_BASE) {
-      return section2(row9("업데이트", '<span class="gx-muted">준비 중</span>', 
+  var skipKe

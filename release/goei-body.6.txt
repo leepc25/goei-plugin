@@ -1,4 +1,4 @@
-but wrong: dust where cleaning should occur, decor frozen in an uncertain past decade, and faded, water-damaged laundry, Wi-Fi, and communal-kitchen posters.\n- On or shortly after arrival, residents find the printed Saetbyeol Goshiwon Usage Guidelines on bulletin boards, under doors, or on beds. The small-print disclaimer disclaims management responsibility for permanent physical or mental harm from noncompliance. Obtain and memorize the full document immediately upon recognizing entrapment; apparently arbitrary or contradictory rules have internal logic requiring observation.",
+hile actively seeking inexpensive accommodation, especially in the evening or personal desperation.\n- The entrance looks mundane but wrong: dust where cleaning should occur, decor frozen in an uncertain past decade, and faded, water-damaged laundry, Wi-Fi, and communal-kitchen posters.\n- On or shortly after arrival, residents find the printed Saetbyeol Goshiwon Usage Guidelines on bulletin boards, under doors, or on beds. The small-print disclaimer disclaims management responsibility for permanent physical or mental harm from noncompliance. Obtain and memorize the full document immediately upon recognizing entrapment; apparently arbitrary or contradictory rules have internal logic requiring observation.",
           rules: "##### Recovered Usage Guidelines\n1. After 7 PM, please minimize noise to avoid disturbing other residents.\n2. There is no elevator in this goshiwon. If you discover one, immediately prostrate yourself and bow three times. This signals that the occupant in Rule 10 is in transit; he will proceed to Room 203.\n2-1. He enters Room 203 immediately after leaving the elevator. Resume normal activity afterward. Under no circumstances disturb his mood.\n4. Do not close hallway windows. Leave any open window open; closing what was open makes others uncomfortable, and disturbing residents is inadvisable.\n5. The goshiwon has five floors, no sixth floor and no basement level. Please note this for your reference.\n6. After 9 PM, do not knock on any surface, including walls or doors. An unexpected guest may answer.\n7. If singing comes from the communal bathroom after midnight, do not investigate. Return to your room and wait until morning.\n8. The third-floor vending machine sometimes dispenses unlisted items. Consume them at your own discretion.\n10. Do not approach Room 203. Its occupant is extremely sensitive and beyond management's control. If conflict occurs, run. Good luck.\n11. Do not damage shared goshiwon facilities; vandalism makes everyone angry.\n12. Spontaneous flames mean you have violated a rule. Leave the building as quickly as possible. The fire spreads slowly, but it will consume you.",
           survival: "##### Punishment and Confirmed Escape\n- Rule violations ignite spontaneous immolation after a variable delay of seconds to several minutes. The fire spreads slowly and relentlessly, allowing recognition of the mistake. It is punishment, not conventional fire, and cannot be extinguished.\n- Severity appears to scale with the violation: minor infractions cause localized burns that can heal after survival; moderate ones cause partial immolation, sometimes survivable with rapid treatment; major ones consume the victim within minutes, with no recorded survivors.\n- The only confirmed escape is one complete cycle of 7 internal days obeying every rule without exception. At completion, the entrance unlocks normally around dawn for an estimated 10–15 minutes. Missing it restarts the cycle; multi-cycle survivors report increasing hostility each iteration.\n- Keep absolute silence during restricted hours. When Room 203 becomes audible, remain motionless until its sounds stop. Do not establish eye contact with Residents. Previous victims' belongings may contain useful information; the goshiwon wants occupants to stay, and its lure must be resisted.",
           space: `##### Rooms and Shared Spaces
@@ -1588,10 +1588,10 @@ ${content}
           );
         }
       }
-      let start3 = 0;
+      let start4 = 0;
       while (true) {
         let nextSpecial = null;
-        let startFind = start3;
+        let startFind = start4;
         while (true) {
           specialRegex.lastIndex = startFind;
           nextSpecial = specialRegex.exec(text);
@@ -1600,7 +1600,7 @@ ${content}
           startFind = nextSpecial.index + 1;
         }
         const end = nextSpecial?.index ?? text.length;
-        for (const match of text.substring(start3, end).matchAll(regexes)) {
+        for (const match of text.substring(start4, end).matchAll(regexes)) {
           const piece = this.textEncoder.encode(match[0]);
           const token22 = this.rankMap.get(piece.join(","));
           if (token22 != null) {
@@ -1613,7 +1613,7 @@ ${content}
           break;
         let token2 = this.specialTokens[nextSpecial[0]];
         ret.push(token2);
-        start3 = nextSpecial.index + nextSpecial[0].length;
+        start4 = nextSpecial.index + nextSpecial[0].length;
       }
       return ret;
     }
@@ -1977,18 +1977,18 @@ ${content}
   function fields2(line2) {
     const out = [];
     let cur = "";
-    let esc31 = false;
+    let esc32 = false;
     for (const c of line2) {
-      if (esc31) {
+      if (esc32) {
         cur += c === "n" ? "\n" : c === "p" ? "|" : c === "\\" ? "\\" : `\\${c}`;
-        esc31 = false;
-      } else if (c === "\\") esc31 = true;
+        esc32 = false;
+      } else if (c === "\\") esc32 = true;
       else if (c === "|") {
         out.push(cur);
         cur = "";
       } else cur += c;
     }
-    if (esc31) cur += "\\";
+    if (esc32) cur += "\\";
     out.push(cur);
     return out;
   }
@@ -2007,7 +2007,4 @@ ${content}
           const post = {
             id,
             date: validDate(p[2]),
-            nick: cut(p[3], 80),
-            title: p[4],
-            views: Math.max(0, Math.floor(Number(p[5]) || 0)),
-            votes: Math.max(0, Math.
+            nick: cut(p[3],
