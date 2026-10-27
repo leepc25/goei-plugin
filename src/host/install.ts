@@ -138,8 +138,22 @@ export async function installIcon(charIndex: number, progress: Progress): Promis
   const prev = String(char.image ?? '');
   notes[id] = { ours: path, prev: notes[id]?.ours === prev ? notes[id].prev : prev };
   await risuai.pluginStorage.setItem(ICON_KEY, JSON.stringify(notes));
-  await risuai.setCharacterToIndex(charIndex, { ...char, image: path });
+  // Risu 는 캐릭터 아이콘을 여러 개 둘 수 있다 (캐릭터 디스플레이 → 캐릭터 아이콘 「+」, ccAssets 의 type icon). 메인은 image.
+  // 기존 아이콘은 목록에 남기고(없으면 더해) 우리 것을 더한 뒤 메인으로 (사용자 2026-10-27)
+  const cc = (Array.isArray(char.ccAssets) ? (char.ccAssets as CcAsset[]) : []).filter((a) => a && typeof a === 'object');
+  const hasIcon = (uri: string) => cc.some((a) => a.type === 'icon' && a.uri === uri);
+  if (prev && !hasIcon(prev)) cc.push({ type: 'icon', uri: prev, name: cc.some((a) => a.type === 'icon' && a.name === 'main') ? 'previous' : 'main', ext: extOf(prev) });
+  if (!hasIcon(path)) cc.push({ type: 'icon', uri: path, name: 'goei', ext: 'png' });
+  await risuai.setCharacterToIndex(charIndex, { ...char, image: path, ccAssets: cc });
 }
+
+interface CcAsset {
+  type: string;
+  uri: string;
+  name: string;
+  ext: string;
+}
+const extOf = (path: string) => /\.(png|jpe?g|webp|avif|gif)$/i.exec(path)?.[1]?.toLowerCase() ?? 'png';
 
 /** 설치 전 아이콘으로 되돌린다 */
 export async function restoreIcon(charIndex: number): Promise<boolean> {

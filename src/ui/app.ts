@@ -55,7 +55,7 @@ import { handleImgPrompt, imgInput } from './imgprompt';
 import { cropValue, setCrop, directoryExtList, directoryInput, directoryPhotoList, directoryList, dirUi, handleDirectory, resetDirectory } from './directory';
 import { basicDefaults, basicVars, DIM_DEFAULT, getPrefs, worldDefaults, worldSettings, worldVarsOf, type Mark } from '../core/settings';
 import { colConfig } from '../core/world/statuscols';
-import { adjustWallet, aliveAnchors, formatDelta, formatWon, liveWallet, parseWon, readWallet, removeWalletEntry, walletBalance, walletVars, type WalletEntry } from '../core/wallet';
+import { adjustWallet, aliveAnchors, formatDelta, formatWon, liveWallet, parseWon, readWallet, removeWalletEntry, walletBalance, walletVars, type WalletEntry, WALLET_START_DEFAULT } from '../core/wallet';
 
 /** ID카드 잔고 칩 → 장부 창 (열림·입력 알림) */
 const walletUi = { open: false, notice: '' };
@@ -803,7 +803,7 @@ async function handle(action: string, value?: string): Promise<void> {
       if (view.kind !== 'started' || !value) return;
       const ctx = view.ctx;
       await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
-        const w = readWallet(chat.scriptstate, getPrefs().walletStart ?? 0);
+        const w = readWallet(chat.scriptstate, getPrefs().walletStart ?? WALLET_START_DEFAULT);
         return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...walletVars(removeWalletEntry(w, value ?? '')) } };
       });
       return refresh();
@@ -817,7 +817,7 @@ async function handle(action: string, value?: string): Promise<void> {
       }
       const ctx = view.ctx;
       await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
-        const w = readWallet(chat.scriptstate, getPrefs().walletStart ?? 0);
+        const w = readWallet(chat.scriptstate, getPrefs().walletStart ?? WALLET_START_DEFAULT);
         return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...walletVars(adjustWallet(w, aliveAnchors(chat), n)) } };
       });
       walletUi.notice = '';
@@ -1413,14 +1413,14 @@ function idCard(ctx: ChatContext): string {
 /** 잔고 칩 (상태창 잔고 칸을 쓸 때): 장부 잔고. 누르면 장부 창 */
 function walletChip(ctx: ChatContext): string {
   if (colConfig(ctx.chat.scriptstate).wallet === 'off') return '';
-  const w = readWallet(ctx.chat.scriptstate, getPrefs().walletStart ?? 0);
+  const w = readWallet(ctx.chat.scriptstate, getPrefs().walletStart ?? WALLET_START_DEFAULT);
   return `<button class="gx-wallet" data-action="wallet-pop" aria-label="잔고·가계부" title="가계부">${esc(formatWon(walletBalance(w, aliveAnchors(ctx.chat))))}</button>`;
 }
 
 /** 장부 창: 최근 거래(살아 있는 것), 잔고 수정, 거래 지우기 */
 function walletPop(ctx: ChatContext): string {
   if (!walletUi.open) return '';
-  const w = readWallet(ctx.chat.scriptstate, getPrefs().walletStart ?? 0);
+  const w = readWallet(ctx.chat.scriptstate, getPrefs().walletStart ?? WALLET_START_DEFAULT);
   const alive = aliveAnchors(ctx.chat);
   const live = liveWallet(w, alive);
   const src = (e: WalletEntry) => (e.src === 'story' ? '본문' : e.src === 'field' ? '필드' : '수정');

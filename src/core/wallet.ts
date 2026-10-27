@@ -5,6 +5,8 @@ import type { Chat } from './types';
 import { messageKey } from './people/store';
 
 export const WALLET_VAR = '$st_wallet';
+/** 새 채팅 시작 잔고 기본값 (사용자 2026-10-27: 14만 원). 설정에서 바꾸고, 채팅마다 장부 시작값·지금 잔고도 고칠 수 있다 */
+export const WALLET_START_DEFAULT = 140_000;
 
 export interface WalletEntry {
   id: string;

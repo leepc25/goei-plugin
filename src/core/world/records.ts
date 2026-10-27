@@ -38,6 +38,8 @@ export interface WorldRecord {
   noSummary?: boolean;
   /** 조직: Roster 에서 부서 안 묶음 꼬리표 (「A Jo (Elite Jo)」). department 가 같은 요원들 앞에 한 줄 */
   roster_notes?: { department: string; label: string }[];
+  /** 요원: 🙂Roster 지침에서 뺌 (사용자 2026-10-27: 특정인 제외, 기본은 전원) */
+  rosterOff?: boolean;
   /** 덧쓰기에서: 기본 기록을 지움 */
   deleted?: boolean;
 }
@@ -127,6 +129,7 @@ export function mergeRecord(base: WorldRecord | undefined, over: Partial<WorldRe
   if (departments && Object.keys(departments).length) out.departments = { ...departments };
   if (over?.summaryOnly ?? base?.summaryOnly) out.summaryOnly = true;
   if (over?.noSummary ?? base?.noSummary) out.noSummary = true;
+  if (over?.rosterOff ?? base?.rosterOff) out.rosterOff = true;
   const notes = over?.roster_notes ?? base?.roster_notes;
   if (Array.isArray(notes) && notes.length) out.roster_notes = notes.map((n) => ({ department: String(n.department ?? ''), label: String(n.label ?? '') }));
   return out;

@@ -13,7 +13,7 @@ import { IMG_FOLD, IMG_RECENT, IMG_SIZE, imgFold, imgRecent, imgSize, setImgHidd
 import type { Chat, ScriptState } from '../core/types';
 import { parseCatalog, readWorld, startWorldVars, WORLD_KEY, worldOn, worldVars } from '../core/world';
 import { COL_LOG_VAR, colConfig, colVar, STATUS_COLS, usedCols, withColLog, type ColConfig, type ColId, type ColMode } from '../core/world/statuscols';
-import { aliveAnchors, formatWon, parseWon, readWallet, WALLET_MAX, walletBalance, walletVars } from '../core/wallet';
+import { aliveAnchors, formatWon, parseWon, readWallet, WALLET_MAX, walletBalance, walletVars, WALLET_START_DEFAULT } from '../core/wallet';
 import { updateChat, type ChatContext } from '../host/risu';
 import { barButtons, directoryBar, directoryDone, directoryDoneClear, directorySearch, directoryView } from './directory';
 import { drawerBox } from './drawer';
@@ -224,7 +224,7 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
   const note = String(ctx.chat.scriptstate?.[ASSET_NOTE] ?? '');
   // 상태창 칸 구성·시작 잔고 (채팅 변수 또는 새 채팅 기본값)
   const colCfg = colConfig(scope === 'chat' ? ctx.chat.scriptstate : getPrefs().vars);
-  const wallet = readWallet(scope === 'chat' ? ctx.chat.scriptstate : undefined, getPrefs().walletStart ?? 0);
+  const wallet = readWallet(scope === 'chat' ? ctx.chat.scriptstate : undefined, getPrefs().walletStart ?? WALLET_START_DEFAULT);
   const walletStart = wallet.start;
   const walletNow = scope === 'chat' ? walletBalance(wallet, aliveAnchors(ctx.chat)) : walletStart;
   return `<main class="gx-body gx-settings">
@@ -444,7 +444,7 @@ export async function handleSettings(action: string, value: string | undefined, 
       }
       case 'set-wallet-start': {
         const n = parseWon(v);
-        if (n !== null && n >= 0 && n <= WALLET_MAX) await saveDefaults(env, (p) => ({ ...p, walletStart: n || undefined }));
+        if (n !== null && n >= 0 && n <= WALLET_MAX) await saveDefaults(env, (p) => ({ ...p, walletStart: n }));
         else env.render();
         return true;
       }
@@ -510,7 +510,7 @@ export async function handleSettings(action: string, value: string | undefined, 
         return true;
       }
       await save(ctx, env, (chat) => {
-        const w = readWallet(chat.scriptstate, getPrefs().walletStart ?? 0);
+        const w = readWallet(chat.scriptstate, getPrefs().walletStart ?? WALLET_START_DEFAULT);
         return w.start === n ? null : walletVars({ ...w, start: n });
       });
       return true;

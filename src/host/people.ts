@@ -18,7 +18,7 @@ import { promptFor } from '../core/people/prompt';
 import { messageText } from '../core/refs';
 import { findStatusTags } from '../core/world/status';
 import { colConfig } from '../core/world/statuscols';
-import { addWalletEntry, aliveAnchors, readWallet, walletBalance, walletVars } from '../core/wallet';
+import { addWalletEntry, aliveAnchors, readWallet, walletBalance, walletVars, WALLET_START_DEFAULT } from '../core/wallet';
 import { getPrefs } from '../core/settings';
 import { parseIdentity } from '../core/people/identity';
 import type { Identity, PeopleStore } from '../core/people/types';
@@ -260,7 +260,7 @@ async function runOnce(reason: string, o: { manual?: boolean; scope?: RunScope }
       const curStore = peopleStore(fresh.chat);
       // 가계부: 상태창 잔고 칸을 쓰는 채팅이면 장부 잔고를 자료에 넣고 거래 절을 켠다 (core/wallet.ts)
       const walletOn = colConfig(fresh.chat.scriptstate).wallet !== 'off';
-      const walletStart = getPrefs().walletStart ?? 0;
+      const walletStart = getPrefs().walletStart ?? WALLET_START_DEFAULT;
       const balance = walletOn ? walletBalance(readWallet(fresh.chat.scriptstate, walletStart), aliveAnchors(fresh.chat)) : null;
       const input = buildUpdate(fresh.chat, curStore, batches[b], { settings, system: '', values: Object.fromEntries(input0Names(curStore).map((n) => [n, valuesOf(n)])), names: allNames(), exclude, factionNames: factionNamesOf(fresh.char.globalLore), only: o.scope?.only, wallet: balance });
       // 지침은 자료를 본 뒤 조립한다 (저장 상한을 넘긴 인물이 있으면 정리 절을 켠다)

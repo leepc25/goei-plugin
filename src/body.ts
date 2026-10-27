@@ -56,7 +56,7 @@ import { fieldRecord } from './core/field';
 import { buildImgPrompt, imgCharacters, imgPromptConfig, stripImgLore } from './core/imgprompt';
 import { withStatusBlock, type StatusShape } from './core/statusctx';
 import { colConfig, fillStatusSection, setStatusColumns, usedCols } from './core/world/statuscols';
-import { aliveAnchors, readWallet, walletBalance } from './core/wallet';
+import { aliveAnchors, readWallet, walletBalance, WALLET_START_DEFAULT } from './core/wallet';
 import { visitRecord } from './core/visit';
 import { visitContextRules } from './core/visitPrompt';
 import { withPeopleBlock, peopleBlockFor, insertBlock } from './core/people/request';
@@ -214,7 +214,7 @@ async function statusShape(): Promise<StatusShape> {
   const vars = chat?.scriptstate ?? {};
   setStatusColumns(vars);
   const cfg = colConfig(vars);
-  const wallet = chat && cfg.wallet !== 'off' ? walletBalance(readWallet(vars, getPrefs().walletStart ?? 0), aliveAnchors(chat)) : null;
+  const wallet = chat && cfg.wallet !== 'off' ? walletBalance(readWallet(vars, getPrefs().walletStart ?? WALLET_START_DEFAULT), aliveAnchors(chat)) : null;
   return { cols: usedCols(cfg), wallet };
 }
 

@@ -52,3 +52,9 @@ test('표기와 금액 읽기', () => {
   assert.ok(mentionsAmount('3만 원을 건넸다'));
   assert.ok(!mentionsAmount('돈을 조금 냈다'));
 });
+
+test('시작 잔고 기본값 14만 원 (사용자 2026-10-27)', async () => {
+  const { WALLET_START_DEFAULT } = await import('../dist-test/core.mjs');
+  assert.equal(WALLET_START_DEFAULT, 140000);
+  assert.equal(readWallet({}, WALLET_START_DEFAULT).start, 140000);
+});

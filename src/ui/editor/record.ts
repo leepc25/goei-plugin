@@ -145,6 +145,7 @@ export function recordPage(ctx: ChatContext, kind: WorldKind, over: WorldOverrid
           <button class="gx-mini${recUi.importOpen ? ' on' : ''}" data-action="ed-import-toggle">${ICONS.plus}글로 가져오기</button>
           ${isDefault && edited ? '<button class="gx-mini" data-action="ed-restore">기본으로</button>' : ''}
           <button class="gx-mini danger" data-action="ed-delete">${ICONS.trash}${isDefault ? '지우기' : '삭제'}</button></div></header>
+      ${kind === 'agent' ? `<p class="gw-roster"><button class="gx-chip${rec.rosterOff ? '' : ' on'}" data-action="ed-roster-toggle" aria-pressed="${!rec.rosterOff}">🙂Roster 지침에 포함</button><small>${rec.rosterOff ? '이 요원은 명부 지침(🙂Roster)에 들어가지 않아요. 로어 칸은 그대로 모델에게 가요.' : '명부 지침에 소개 한 줄로 들어가요. 기본은 전원 포함.'}</small></p>` : ''}
       ${recUi.preview ? `<pre class="gw-preview">${esc(text)}</pre>` : ''}
       ${recUi.importOpen ? importPane(kind) : ''}
       <details class="gw-sec" open><summary>기본 정보 <small>명부</small></summary>${basicPanel(ctx, kind, sel, d) || '<p class="gx-muted">명부 줄이 없어요. 저장하면 생겨요.</p>'}</details>
@@ -221,6 +222,12 @@ export async function recordAction(action: string, value: string | undefined, ct
       recUi.importResult = null;
       recUi.variant = '';
       return true;
+    case 'ed-roster-toggle': {
+      const cur = current(ctx, kind);
+      if (!cur || kind !== 'agent') return false;
+      setOverrides(putRecord(cur.over, kind, cur.name, { ...cur.rec, rosterOff: !cur.rec.rosterOff }));
+      return true;
+    }
     case 'ed-preview':
       recUi.preview = !recUi.preview;
       return true;

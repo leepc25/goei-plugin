@@ -77,7 +77,7 @@ export function assembleRoster(dir: Directory, agents: Map<string, WorldRecord>,
   const byOrg = new Map<string, AgentRow[]>();
   for (const a of dir.agents) {
     const rec = agents.get(a.lore);
-    if (!rec || !fieldValue(rec, 'intro')) continue;
+    if (!rec || !fieldValue(rec, 'intro') || rec.rosterOff) continue;
     const o = orgOf(dir.orgs, a.affiliation);
     const key = o?.name ?? a.affiliation ?? '';
     (byOrg.get(key) ?? byOrg.set(key, []).get(key)!).push(a);

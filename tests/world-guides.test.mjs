@@ -50,6 +50,10 @@ test('Faction·Roster 조립: 조직 소개 첫 문단 + 관계 목록 + 공통 
   assert.match(r, /### Management Bureau \[A00\]\n\n#### Comprehensive Response Team\n- Jyaldi \(early 30s\/F, Boo-jang\): /);
   assert.match(r, /#### Field Exploration Team\nA Jo \(Elite Jo\)\n- Baek Seok-ju \(late 30s\/F, Gwa-jang\): /, '조 꼬리표는 그 부서 요원 앞에');
   assert.match(r, /### Vatican\n- Blaret \(/, '부서 없는 요원은 조직 바로 아래');
+  // 🙂Roster 포함 토글 (사용자 2026-10-27): rosterOff 요원은 명부 지침에서만 빠진다 (기본은 전원)
+  const ros2 = evaluate(assembleRoster(dir, worldRecords('agent', { agent: { 쟈알디: { rosterOff: true } } }), worldRecords('org')), { vars: { st_faction: 'A00' }, user: 'U' });
+  assert.ok(!ros2.includes('- Jyaldi ('), 'rosterOff 요원은 Roster 에 없음');
+  assert.ok(ros2.includes('- Baek Seok-ju ('), '다른 요원은 그대로');
   assert.ok(!r.includes('Spangdal') === false, '소개가 있는 요원은 모두');
 });
 
