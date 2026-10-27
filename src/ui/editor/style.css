@@ -2,7 +2,11 @@
 .gw { position: fixed; inset: 0; z-index: 2147483000; display: flex; align-items: center; justify-content: center; background: var(--scrim); color: var(--text); font: 15px/1.5 var(--font); }
 .gw[hidden] { display: none; }
 .gw-win { width: min(var(--gw-width, 90%), 1600px); height: 90%; display: grid; grid-template-columns: 260px minmax(0, 1fr); grid-template-rows: 54px minmax(0, 1fr); grid-template-areas: "top top" "tree body"; background: var(--void); border: 1px solid var(--line); border-radius: 18px; box-shadow: var(--shadow); overflow: hidden; }
-.gw-top { grid-area: top; display: flex; align-items: center; gap: 12px; padding: 0 10px 0 16px; border-bottom: 1px solid var(--line); background: var(--panel); }
+.gw-top { grid-area: top; display: flex; align-items: center; gap: 10px; padding: 0 10px 0 16px; border-bottom: 1px solid var(--line); background: var(--panel); }
+.gw-top > .gw-save { margin-left: auto; }
+.gw-top > .gw-notice { order: 1; }
+.gw-top > .gx-x { order: 3; }
+.gw-top > .gw-save { order: 2; }
 .gw-top > b { font-size: 16px; }
 .gw-menu { display: none; }
 .gw-notice { margin-left: auto; font-size: 13px; color: var(--sub); }
@@ -157,3 +161,21 @@
 .gw .dir-line { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 10px 12px; margin-bottom: 8px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
 .gw .dir-line > span { font-size: 13px; font-weight: 700; }
 .gw .dir-panel > .gx-muted { margin: -2px 0 10px; font-size: 12px; }
+/* 패널 단추를 편집 창에서도 같은 모양으로: 아이콘과 글자가 한 줄 */
+.gw .gx-mini { display: inline-flex; align-items: center; justify-content: center; gap: 5px; white-space: nowrap; vertical-align: middle; }
+.gw .gx-mini svg { width: 15px; height: 15px; flex: none; }
+.gw .gx-chip { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+.gw .gx-row-btns { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 8px; }
+.gw-head-act { justify-content: flex-end; }
+/* 설정 페이지 (패널 설정 묶음을 그대로) */
+.gw-page-inner { padding: 0; }
+.gw-set-guide { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--line); }
+.gw-set-guide .gw-head h3 { margin: 0; font-size: 16px; display: flex; align-items: baseline; gap: 8px; }
+.gw-set-guide .gw-head h3 small { font-size: 12px; color: var(--dim); font-weight: 500; }
+.gw-setbody { max-width: 980px; }
+.gw-setbody .ps-group { margin-bottom: 14px; }
+.gw-setbody .ph-room-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.gw-setbody .ph-room-head .ph-act { margin-left: auto; }
+.gw .gx-segs { display: inline-flex; gap: 2px; padding: 3px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+.gw .gx-seg { min-height: 32px; padding: 0 12px; border: 0; border-radius: 9px; background: transparent; color: var(--dim); font: inherit; font-weight: 600; cursor: pointer; }
+.gw .gx-seg.on { background: var(--accent-bg); color: var(--text); }

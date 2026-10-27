@@ -17,14 +17,26 @@ import { recordCount, recordList, recordPage, recordAction, recordInput, recUi }
 import { relationsPage, relationsAction, relationsInput } from './relations';
 import { guidePage, guideAction, guideInput, guideUi } from './guides';
 import { installAction, installPage, instUi, refreshInstall } from './install';
+import { featurePane, settingsNotices, settingsSection, settingsUi, type SettingsSection } from '../settings';
+import { gnetLabel } from '../../core/gnet';
 
-export type EditorNode = WorldKind | 'base' | 'relations' | `guide:${GuideName}` | 'guide:Image' | 'install';
+/** 설정 페이지 (2026-10-27: 모든 설정은 이 창 하나로. 지침은 그 기능 페이지 아래에) */
+export type SetPage = 'screen' | 'image' | 'board' | 'gnet' | 'phone' | 'wiki' | 'visit' | 'people' | 'guides' | 'adv' | 'update';
+export type EditorNode = WorldKind | 'base' | 'relations' | `set:${SetPage}` | 'install';
+const SET_PAGES: SetPage[] = ['screen', 'image', 'board', 'gnet', 'phone', 'wiki', 'visit', 'people', 'guides', 'adv', 'update'];
+export const isSetNode = (n: string): n is `set:${SetPage}` => n.startsWith('set:') && SET_PAGES.includes(n.slice(4) as SetPage);
 
 export interface EditorHost {
   ctx: () => ChatContext | null;
   /** 앱 쪽 화면 다시 그리기 + 컨텍스트 다시 읽기 (저장 뒤) */
   refresh: () => Promise<void>;
   theme: () => string;
+  /** 패널의 동작·입력 처리기 (설정 페이지의 단추·입력은 패널과 같은 코드로) */
+  handle?: (action: string, value?: string) => Promise<void>;
+  input?: (el: HTMLInputElement) => void;
+  change?: (el: HTMLSelectElement) => void;
+  /** 채팅이 시작됐나 (설정의 「이 채팅」 범위를 쓸 수 있나) */
+  canChat?: () => boolean;
 }
 
 export const edUi = {
@@ -71,8 +83,16 @@ export function openEditor(h: EditorHost, node?: EditorNode): void {
   edUi.open = true;
   if (node) edUi.node = node;
   edUi.notice = '';
+  syncSettingsPage();
   ensureRoot();
   render();
+}
+
+/** 설정 페이지에 맞춰 패널의 기능 설정 상태를 맞춘다 (괴담넷·괴담톡·위키·필드·인물 기록 단추가 그 기능 처리기로 가게) */
+function syncSettingsPage(): void {
+  const n = edUi.node;
+  const page = isSetNode(n) ? n.slice(4) : '';
+  settingsUi.page = page === 'gnet' || page === 'phone' || page === 'wiki' || page === 'visit' || page === 'people' ? page : '';
 }
 
 export function closeEditor(): void {
@@ -82,6 +102,8 @@ export function closeEditor(): void {
 }
 
 export const editorOpen = () => edUi.open;
+/** 설정 페이지가 떠 있나 (패널이 다시 그려질 때 같이 그린다) */
+export const editorOnSettings = () => edUi.open && isSetNode(edUi.node);
 
 function ensureRoot(): HTMLElement {
   if (root) {
@@ -153,6 +175,19 @@ function ensureRoot(): HTMLElement {
     if (ctx && recordInput(name, el.dataset.key ?? '', el.value, ctx)) return void touched();
     if (ctx && relationsInput(name, el.dataset.key ?? '', el.value, ctx)) return void touched();
     if (guideInput(name, el.dataset.key ?? '', el.value)) return void touched();
+    // 설정 페이지의 입력(슬라이더·검색·규칙 글칸 등)은 패널과 같은 처리기로
+    host?.input?.(el as HTMLInputElement);
+  });
+  root.addEventListener('change', (ev) => {
+    const el = ev.target as HTMLSelectElement;
+    if (el?.dataset?.input === 'dir-crop-size') return render();
+    host?.change?.(el);
+  });
+  root.addEventListener('submit', (ev) => {
+    ev.preventDefault();
+    const form = ev.target as HTMLFormElement;
+    const input = form.querySelector('input');
+    if (form.dataset.submit) void handle(form.dataset.submit, input?.value ?? '');
   });
   root.addEventListener('keydown', (ev) => {
     const el = ev.target as HTMLInputElement;
@@ -202,12 +237,45 @@ function touched(): void {
 
 export const isKind = (n: string): n is WorldKind => ['agent', 'org', 'anomaly', 'site', 'appendix'].includes(n);
 
+const SET_LABEL: Record<SetPage, string> = { screen: '화면', image: '캐릭터 이미지', board: '상황판', gnet: '괴담넷', phone: '괴담톡', wiki: '위키', visit: '필드', people: '인물 기록', guides: '본편 지침', adv: '고급', update: '업데이트' };
+const SET_ICON: Record<SetPage, string> = { screen: ICONS.settings, image: ICONS.cctv, board: ICONS.grid, gnet: ICONS.gnet, phone: ICONS.phone, wiki: ICONS.wiki, visit: ICONS.game, people: ICONS.group, guides: ICONS.book, adv: ICONS.pen, update: ICONS.refresh };
 const TREE: { title: string; items: [EditorNode, string, string][] }[] = [
-  { title: '기록', items: [['agent', '요원', ICONS.person], ['org', '조직', ICONS.org], ['anomaly', '괴이', ICONS.spook], ['site', '파밍', ICONS.star], ['appendix', '부록', ICONS.book], ['base', '거점', ICONS.pin]] },
-  { title: '세력', items: [['relations', '세력 관계 · 공통 규칙', ICONS.grid]] },
-  { title: '지침', items: [...GUIDE_NAMES.map((g) => [`guide:${g}`, GUIDE_LABEL[g], ICONS.book] as [EditorNode, string, string]), ['guide:Image', '이미지', ICONS.cctv]] },
-  { title: '설치', items: [['install', '설치 · 점검', ICONS.refresh]] },
+  { title: '설정', items: SET_PAGES.map((p) => [`set:${p}`, SET_LABEL[p], SET_ICON[p]] as [EditorNode, string, string]) },
+  { title: '세계', items: [['agent', '요원', ICONS.person], ['org', '조직', ICONS.org], ['anomaly', '괴이', ICONS.spook], ['site', '파밍', ICONS.star], ['appendix', '부록', ICONS.book], ['base', '거점', ICONS.pin], ['relations', '세력 관계', ICONS.grid]] },
+  { title: '카드', items: [['install', '설치 · 점검', ICONS.refresh]] },
 ];
+void GUIDE_NAMES;
+void GUIDE_LABEL;
+
+/** 설정 페이지: 패널 설정의 묶음을 그대로 + 그 기능의 지침 */
+function settingsPage(ctx: ChatContext, page: SetPage): string {
+  const canChat = host?.canChat?.() ?? true;
+  const scope = canChat ? (settingsUi.scope === 'defaults' ? 'defaults' : 'chat') : 'defaults';
+  const scopeSeg = canChat
+    ? `<div class="gx-segs gx-segs-sm gw-scope"><button class="gx-seg${scope === 'chat' ? ' on' : ''}" data-action="set-scope" data-value="chat" aria-pressed="${scope === 'chat'}">이 채팅</button><button class="gx-seg${scope === 'defaults' ? ' on' : ''}" data-action="set-scope" data-value="defaults" aria-pressed="${scope === 'defaults'}">새 채팅 기본값</button></div>`
+    : '<span class="gw-tokens">새 채팅 기본값 (시작 전)</span>';
+  const title = page === 'gnet' ? gnetLabel(ctx.chat.scriptstate) : SET_LABEL[page];
+  const sec = (s: SettingsSection) => settingsSection(ctx, scope, canChat, s);
+  const guide = (g: GuideName) => `<div class="gw-set-guide">${guidePage(g).replace(/^<div class="gw-page">/, '<div class="gw-page gw-page-inner">')}</div>`;
+  let body = '';
+  switch (page) {
+    case 'screen': body = sec('screen'); break;
+    case 'image': body = sec('image') + `<section class="ps-group"><h3>이미지 지침</h3><div class="ps-rows">${imgPromptPane(ctx)}</div></section>`; break;
+    case 'board': body = sec('board') + guide('Tag'); break;
+    case 'gnet': body = featurePane(ctx, 'gnet', canChat) + guide('GNet'); break;
+    case 'phone': body = featurePane(ctx, 'phone', canChat) + guide('Phone'); break;
+    case 'wiki': body = featurePane(ctx, 'wiki', canChat) + guide('Wiki'); break;
+    case 'visit': body = featurePane(ctx, 'visit', canChat) + guide('Visit'); break;
+    case 'people': body = featurePane(ctx, 'people', canChat); break;
+    case 'guides': body = guide('RP') + guide('Directive'); break;
+    case 'adv': body = sec('adv'); break;
+    case 'update': body = sec('update'); break;
+  }
+  const showScope = ['screen', 'image', 'board', 'adv'].includes(page);
+  return `<div class="gw-page gw-set"><header class="gw-head"><h2>${esc(title)}</h2>${showScope ? `<div class="gw-head-act">${scopeSeg}</div>` : ''}</header>
+    ${settingsNotices()}
+    <div class="gx-settings gw-setbody">${body}</div></div>`;
+}
 
 function saveBar(): string {
   const n = (() => {
@@ -253,8 +321,7 @@ function body(ctx: ChatContext): string {
     return `<div class="gw-page gw-basepage"><header class="gw-head"><h2>거점</h2><p class="gx-muted">지도에 찍히는 장소예요. 조직마다 거점을 두고 지도를 눌러 위치를 정해요. 조직의 호칭·괴담톡 탭은 조직 기록의 「기본 정보」에서 고쳐요.</p></header>${directoryView(ctx)}</div>`;
   }
   if (n === 'relations') return relationsPage(ctx, overridesOf(ctx), false);
-  if (n === 'guide:Image') return `<div class="gw-page"><header class="gw-head"><h2>이미지 지침</h2><p class="gx-muted">이 기기 공통. 설정 → 캐릭터 이미지의 「지침 편집」과 같은 화면이에요.</p></header>${imgPromptPane(ctx)}</div>`;
-  if (n.startsWith('guide:')) return guidePage(n.slice(6) as GuideName);
+  if (isSetNode(n)) return settingsPage(ctx, n.slice(4) as SetPage);
   // 설치 · 점검: 이 캐릭터를 아직 점검하지 않았으면 점검하고 다시 그린다 (어느 길로 열어도)
   if (instUi.forChar !== ctx.charIndex && !instUi.pending) {
     instUi.pending = true;
@@ -352,6 +419,7 @@ export async function handle(action: string, value?: string): Promise<void> {
       edUi.drawer = false;
       edUi.notice = '';
       if (edUi.node === 'base') resetDirectory();
+      syncSettingsPage();
       if (edUi.node === 'install') {
         instUi.notice = '';
         instUi.info = '';
@@ -383,6 +451,11 @@ export async function handle(action: string, value?: string): Promise<void> {
   }
   if (await installAction(action, ctx, env)) return;
   if (isKind(edUi.node) && (await recordAction(action, value, ctx, edUi.node))) render();
+  // 그 밖의 동작(설정 단추·기능 설정)은 패널과 같은 처리기로. 패널이 다시 그려질 때 설정 페이지도 같이 그린다 (app.ts render)
+  else if (host?.handle && !action.startsWith('ed-')) {
+    await host.handle(action, value);
+    render();
+  }
 }
 
 export { guideUi };

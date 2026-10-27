@@ -21,7 +21,7 @@ const HELP: Record<GuideName, string> = {
 export function guidePage(name: GuideName): string {
   const text = guideUi.draft[name] ?? guideText(name);
   const dirty = guideUi.draft[name] !== undefined && guideUi.draft[name] !== guideText(name);
-  return `<div class="gw-page"><header class="gw-head"><h2>${esc(GUIDE_LABEL[name])} 지침<small>이 기기 공통${guideOverridden(name) ? ' · 고침' : ' · 기본'}</small></h2>
+  return `<div class="gw-page"><header class="gw-head"><h3>${esc(GUIDE_LABEL[name])} 지침<small>이 기기 공통${guideOverridden(name) ? ' · 고침' : ' · 기본'}</small></h3>
       <div class="gw-head-act"><span class="gw-tokens">약 ${tokens(text).toLocaleString()}토큰</span>
         <button class="gx-mini" data-action="ed-guide-save" data-value="${name}" ${dirty ? '' : 'disabled'}>${ICONS.pen}지침 저장</button>
         <button class="gx-mini" data-action="ed-guide-reset" data-value="${name}" ${guideOverridden(name) || dirty ? '' : 'disabled'}>기본으로</button></div>

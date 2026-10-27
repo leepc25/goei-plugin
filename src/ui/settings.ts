@@ -203,7 +203,29 @@ function featurePage(ctx: ChatContext, page: NonNullable<typeof settingsUi.page>
   return `<main class="gx-body gx-settings st-featpage">${pane}</main>`;
 }
 
-export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', canChat = true): string {
+/** 설정 묶음 하나 (편집 창의 「설정」 페이지가 묶음별로 가져다 쓴다, 2026-10-27) */
+export type SettingsSection = 'screen' | 'image' | 'board' | 'adv' | 'update';
+export function settingsSection(ctx: ChatContext, scope: SettingsScope, canChat: boolean, section: SettingsSection): string {
+  return settingsTab(ctx, scope, canChat, section);
+}
+
+/** 설정 머리: 알림·토스트 (편집 창용) */
+export function settingsNotices(): string {
+  return `${settingsUi.notice ? `<div class="gx-err" role="alert">${esc(settingsUi.notice)}</div>` : ''}${toast('st', settingsUi.info, (t) => {
+    if (settingsUi.info === t) settingsUi.info = '';
+  })}`;
+}
+
+/** 기능별 설정 화면의 본문 (편집 창용: 뒤로 단추·main 없이) */
+export function featurePane(ctx: ChatContext, page: NonNullable<typeof settingsUi.page>, canChat: boolean): string {
+  const html = featurePage(ctx, page, canChat);
+  return html
+    .replace(/^<main class="gx-body gx-settings st-featpage">/, '')
+    .replace(/<\/main>$/, '')
+    .replace(/<button class="ph-tool ph-back" data-action="set-feat-back"[^>]*>[\s\S]*?<\/button>/, '');
+}
+
+export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', canChat = true, only?: SettingsSection): string {
   // 명부: 모바일은 검색을 하단 서랍에 (괴이·특수·요원·조직 탭은 위에 고정)
   if (scope === 'card') {
     return `<main class="gx-body gx-settings">${scopeBar(scope, canChat)}${directoryView(ctx)}${toast('dir', directoryDone(), directoryDoneClear)}</main>${drawerBox(directorySearch(), 'gx-dirdrawer')}`;
@@ -227,22 +249,16 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
   const wallet = readWallet(scope === 'chat' ? ctx.chat.scriptstate : undefined, getPrefs().walletStart ?? WALLET_START_DEFAULT);
   const walletStart = wallet.start;
   const walletNow = scope === 'chat' ? walletBalance(wallet, aliveAnchors(ctx.chat)) : walletStart;
-  return `<main class="gx-body gx-settings">
-    ${scopeBar(scope, canChat)}
-    ${settingsUi.notice ? `<div class="gx-err" role="alert">${esc(settingsUi.notice)}</div>` : ''}
-    ${group('세계 편집', `<div class="st-feats"><button class="gx-mini st-feat" data-action="ed-open" data-value="agent">${ICONS.person}요원</button><button class="gx-mini st-feat" data-action="ed-open" data-value="anomaly">${ICONS.spook}괴이</button><button class="gx-mini st-feat" data-action="ed-open" data-value="org">${ICONS.org}조직</button><button class="gx-mini st-feat" data-action="ed-open" data-value="relations">${ICONS.grid}세력 관계</button><button class="gx-mini st-feat" data-action="ed-open" data-value="guide:GNet">${ICONS.book}지침</button><button class="gx-mini st-feat" data-action="ed-open" data-value="base">${ICONS.pin}거점</button><button class="gx-mini st-feat" data-action="ed-open" data-value="install">${ICONS.settings}설치 · 점검</button></div>`, '요원·조직·괴이·파밍·부록의 로어 칸, 세력 관계, 지침, 거점을 별도 창에서 고쳐요. 영문명·별칭·사진·소속·호칭·괴담톡 탭은 각 기록 안에 있어요. 저장은 카드 명부로 가요. 「설치 · 점검」은 카드에 있어야 할 폴더·명부·인사말·사진·아이콘·위키 기본 문서를 확인하고 채워요.')}
-    ${group('기능별 설정', `<div class="st-feats">${[['gnet', gnetLabel(ctx.chat.scriptstate), ICONS.gnet], ['phone', '괴담톡', ICONS.phone], ['wiki', '위키', ICONS.wiki], ['visit', '필드', ICONS.game], ['people', '인물 기록', ICONS.group]]
-      .map(([k, label, icon]) => `<button class="gx-mini st-feat" data-action="feature-set" data-value="${k}" aria-label="${label} 설정">${icon}${label}</button>`)
-      .join('')}</div>`, canChat ? '' : '시작 전에도 각 기능의 설정을 미리 바꿀 수 있어요. 바꾼 값은 이 채팅에 적용돼요.')}
-    ${group('화면', [
+  const S: Record<SettingsSection, string> = {
+    screen: `${group('화면', [
       field('테마', seg('set-theme', theme, [['light', '라이트'], ['dark', '다크'], ['paper', '페이퍼']], busy), '채팅 화면의 캐릭터 이미지 배경과 상태창(「테마」를 골랐을 때) 배색이에요.'),
       field('상태창', seg('set-status', getPrefs().status ?? 'auto', [['auto', '테마'], ['dark', '다크'], ['light', '라이트'], ['paper', '페이퍼'], ['off', '미표시']], busy), '채팅 속 상태창의 배색이에요. 「테마」는 위 테마를 따라가요. 미표시를 고르면 상자만 숨기고, 모델은 상태 태그를 계속 써요.'),
       field('메뉴 위치', seg('set-nav', getPrefs().nav ?? 'left', [['left', '왼쪽'], ['right', '오른쪽']], busy), 'PC 창에서 메뉴 목록을 놓을 쪽이에요. 이 기기의 모든 채팅에 같이 적용돼요.'),
       field('요원 칸', seg('set-agents', getPrefs().agents ?? 'wall', [['wall', '모니터'], ['list', '목록']], busy), '상황판 요원 칸 모양이에요. 이 기기의 모든 채팅에 같이 적용돼요.'),
       field('창 바깥 불투명도', dimSlider(getPrefs().dim ?? DIM_DEFAULT, busy), '창 뒤 채팅 화면을 가리는 정도예요. 0%면 그대로 보이고 100%면 다 가려요.'),
       field('세계 편집 창 폭', seg('set-editor-width', String(getPrefs().editorWidth ?? 90), [['70', '70%'], ['80', '80%'], ['90', '90%'], ['100', '100%']], busy), '세계 편집 창이 브라우저 폭의 몇 %를 쓸지 (최대 1600px). 폰에서는 늘 전체 화면이에요.'),
-    ].join(''))}
-    ${group('캐릭터 이미지', [
+    ].join(''))}`,
+    image: `${group('캐릭터 이미지', [
       field('에셋 출력', seg('set-asset', s.assetOn ? '1' : '0', [['1', 'ON'], ['0', 'OFF']], busy), '본문에 등장하는 캐릭터의 등록 이미지를 표시하도록 이미지 태그를 적어요. 이미지와 태그 목록은 봇 카드에 들어 있어요.'),
       s.assetOn ? field('이미지 크기', pctSlider('set-img-size', getPrefs().imgSize ?? IMG_SIZE.def, IMG_SIZE, '이미지 크기', busy), '채팅 속 캐릭터 이미지 칸의 크기예요. 100%가 원래 크기이고, 채팅 폭보다 커지지는 않아요. 이 기기의 모든 채팅에 같이 적용돼요.') : '',
       s.assetOn ? field('접힌 높이', pctSlider('set-img-fold', getPrefs().imgFold ?? IMG_FOLD.def, IMG_FOLD, '접힌 높이', busy), '이미지는 위쪽만 보이게 접혀 있다가 누르거나 마우스를 올리면 펼쳐져요. 접혔을 때 그림 높이의 몇 %를 보여 줄지예요. 원래는 68%(정사각형)이고 100%면 접지 않아요.') : '',
@@ -253,8 +269,8 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
       s.assetOn ? field('주인공 이미지', seg('set-asset-player', s.assetPlayer ? '1' : '0', [['1', 'ON'], ['0', 'OFF']], busy), '「캐릭터로 플레이」로 고른 요원(내가 연기하는 주인공)에게도 이미지 태그를 붙일지예요. 끄면 페르소나처럼 주인공 이미지는 띄우지 않아요.') : '',
       s.assetOn && s.assetModel === 'aux' ? field('캐릭터당 이미지 수', seg('set-asset-limit', String(s.assetLimit), [['1', '1'], ['2', '2'], ['3', '3'], ['4', '4']], busy), '보조모델이 한 응답에서 캐릭터 한 명에게 붙일 이미지 태그의 최대 개수') : '',
     ].join(''))}
-    ${scope === 'chat' && s.assetOn && s.assetModel === 'aux' && note ? `<p class="gx-hint">최근 보충: ${esc(note)}</p>` : ''}
-    ${group('상황판', [
+    ${scope === 'chat' && s.assetOn && s.assetModel === 'aux' && note ? `<p class="gx-hint">최근 보충: ${esc(note)}</p>` : ''}`,
+    board: `${group('상황판', [
       field('괴이 발생 · 요원 시스템', anomaly, scope === 'chat' ? 'ON이면 괴이·사건·특수가 자동으로 발생하고 응답마다 지도와 요원 상태를 갱신해요. OFF로 바꾸면 현재 상황판을 비워요. 커스텀 임무는 OFF에서도 쓸 수 있어요.' : '새 채팅을 상황판을 켠 채로 시작할지 정해요.'),
       field('요원 표시 인원', stepper('set-agent', 'n', `${s.agentLimit}명`, s.agentLimit > 0, s.agentLimit < AGENT_MAX, '요원 표시 인원', busy), `상황판과 편성에 보일 등록 요원 수 (0~${AGENT_MAX}명, 0이면 숨김)`),
       field('지원 투입', seg('set-support', s.supportOn ? '1' : '0', [['1', 'ON'], ['0', 'OFF']], busy), '편성에서 등록 요원 외의 일반 지원 인원을 더할 수 있어요.'),
@@ -273,9 +289,15 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
           ${worldRow(world, 'extra_cap', '괴이', '개', busy)}${worldRow(world, 'extra_in_cap', '사건', '개', busy)}${worldRow(world, 'extra_ms_cap', '특수', '개', busy)}</div>
           <p class="ps-note">직접 고르거나 RP 중에 새로 등장한 것을 상한과 따로 기록할 수 있는 개수예요.</p></div>
       </div>
-    </div></details>
-    ${advSections('gen', scope === 'chat' ? ctx.chat.scriptstate : getPrefs().vars, scope === 'chat' && canChat ? { 1: loreCheckBox(ctx) } : {})}
-    ${updateGroup(ctx)}
+    </div></details>`,
+    adv: `${advSections('gen', scope === 'chat' ? ctx.chat.scriptstate : getPrefs().vars, scope === 'chat' && canChat ? { 1: loreCheckBox(ctx) } : {})}`,
+    update: `${updateGroup(ctx)}`,
+  };
+  if (only) return S[only];
+  return `<main class="gx-body gx-settings">
+    ${scopeBar(scope, canChat)}
+    ${settingsUi.notice ? `<div class="gx-err" role="alert">${esc(settingsUi.notice)}</div>` : ''}
+    ${S.screen}${S.image}${S.board}${S.adv}${S.update}
     ${toast('st', settingsUi.info, (t) => {
       if (settingsUi.info === t) settingsUi.info = '';
     })}

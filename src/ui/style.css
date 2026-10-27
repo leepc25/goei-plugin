@@ -2795,8 +2795,9 @@ button.mk-go:hover { color: var(--signal); }
 .st-col-name small { font-size: 11px; color: var(--dim); }
 .st-won { width: 150px; padding: 6px 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel2); color: var(--text); font: inherit; font-size: 13px; text-align: right; font-variant-numeric: tabular-nums; }
 /* ID카드 잔고 칩 + 장부 창 */
-.gx-wallet { align-self: flex-start; margin-top: 4px; padding: 2px 9px; border: 1px solid var(--line); border-radius: 999px; background: var(--panel2); color: var(--text); font: inherit; font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; cursor: pointer; }
-.gx-wallet:hover { border-color: var(--signal); }
+.gx-wallet { width: 100%; padding: 0; border: 0; background: none; color: var(--text); font: inherit; cursor: pointer; font-variant-numeric: tabular-nums; }
+.gx-wallet em { font-weight: 700; }
+.gx-wallet:hover em { color: var(--signal); }
 .gx-walpop { position: absolute; z-index: 41; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(420px, calc(100% - 24px)); max-height: calc(100% - 24px); overflow-y: auto; box-sizing: border-box; padding: 14px 16px 16px; border: 1px solid var(--line); border-radius: 16px; background: var(--panel); color: var(--text); display: flex; flex-direction: column; gap: 10px; }
 .gx-walpop-head { display: flex; align-items: center; gap: 10px; }
 .gx-walpop-head b { font-size: 15px; }
