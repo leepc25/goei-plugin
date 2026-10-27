@@ -115,10 +115,10 @@ function watch(): void {
   void tick();
 }
 
-// 깡통봇 설치 (설계안 9절): 아무 봇에서나 채팅 메뉴(전송 단추 옆 ≡, 선택지 용사와 같은 자리)의 「괴이: ANOMALY 설치·점검」 으로
-// 본체를 꺼내 설치 화면을 연다. 괴이 카드에서는 같은 단추가 점검 화면을 연다 (2026-10-27: hamburger 위치는 사용자 화면에 안 보여 chat 으로)
+// 깡통봇 설치 (설계안 9절): 아무 봇에서나 햄버거 메뉴의 「괴이: ANOMALY 설치·점검」 으로 본체를 꺼내 설치 화면을 연다.
+// 괴이 카드에서는 같은 단추가 점검 화면을 연다
 void risuai
-  .registerButton({ name: '괴이: ANOMALY 설치·점검', icon: '👻', iconType: 'html', location: 'chat', id: 'goei-plugin-install' }, () => {
+  .registerButton({ name: '괴이: ANOMALY 설치·점검', icon: '👻', iconType: 'html', location: 'hamburger', id: 'goei-plugin-install' }, () => {
     void ensure(true).then((b) => b?.install());
   })
   .catch((error: unknown) => console.log(`[goei] 설치 단추를 두지 못했어요: ${error instanceof Error ? error.message : String(error)}`));
