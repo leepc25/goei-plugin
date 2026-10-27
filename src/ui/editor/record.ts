@@ -176,6 +176,7 @@ export function recordPage(ctx: ChatContext, kind: WorldKind, over: WorldOverrid
           ${isDefault && edited ? '<button class="gx-mini" data-action="ed-restore">기본으로</button>' : ''}
           <button class="gx-mini danger" data-action="ed-delete">${ICONS.trash}${isDefault ? '지우기' : '삭제'}</button></div></header>
       ${kind === 'agent' ? `<p class="gw-roster"><button class="gx-chip${rec.rosterOff ? '' : ' on'}" data-action="ed-roster-toggle" aria-pressed="${!rec.rosterOff}">🙂Roster 지침에 포함</button><small>${rec.rosterOff ? '이 요원은 명부 지침(🙂Roster)에 들어가지 않아요. 로어 칸은 그대로 모델에게 가요.' : '명부 지침에 소개 한 줄로 들어가요. 기본은 전원 포함.'}</small></p>` : ''}
+      ${kind === 'org' ? `<p class="gw-roster"><button class="gx-chip${rec.relOff ? '' : ' on'}" data-action="ed-rel-member-toggle" aria-pressed="${!rec.relOff}">세력 관계도에 포함</button><small>${rec.relOff ? '관계 격자·Faction 관계 목록·평판 시작값에서 빠져요 (민간인처럼 세력이 아닌 조직).' : '관계 격자에 행·열로 들어가요. 세력 관계 화면에서도 켜고 끌 수 있어요.'}</small></p>` : ''}
       ${recUi.preview ? `<pre class="gw-preview">${esc(text)}</pre>` : ''}
       ${recUi.importOpen ? importPane(kind) : ''}
       <section class="gw-sec gw-basic">${basicPanel(ctx, kind, sel, d) || '<p class="gx-muted">명부 줄이 없어요. 저장하면 생겨요.</p>'}</section>
@@ -274,6 +275,12 @@ export async function recordAction(action: string, value: string | undefined, ct
       const cur = current(ctx, kind);
       if (!cur || kind !== 'agent') return false;
       setOverrides(putRecord(cur.over, kind, cur.name, { ...cur.rec, rosterOff: !cur.rec.rosterOff }));
+      return true;
+    }
+    case 'ed-rel-member-toggle': {
+      const cur = current(ctx, kind);
+      if (!cur || kind !== 'org') return false;
+      setOverrides(putRecord(cur.over, kind, cur.name, { ...cur.rec, relOff: !cur.rec.relOff }));
       return true;
     }
     case 'ed-anote-toggle':

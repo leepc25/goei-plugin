@@ -40,6 +40,8 @@ export interface WorldRecord {
   roster_notes?: { department: string; label: string }[];
   /** 요원: 🙂Roster 지침에서 뺌 (사용자 2026-10-27: 특정인 제외, 기본은 전원) */
   rosterOff?: boolean;
+  /** 조직: 세력 관계도(격자·Faction 관계 목록·평판 시작값)에서 뺌 (사용자 2026-10-27: 민간인처럼 세력이 아닌 조직) */
+  relOff?: boolean;
   /** 덧쓰기에서: 기본 기록을 지움 */
   deleted?: boolean;
 }
@@ -135,6 +137,7 @@ export function mergeRecord(base: WorldRecord | undefined, over: Partial<WorldRe
   if (over?.summaryOnly ?? base?.summaryOnly) out.summaryOnly = true;
   if (over?.noSummary ?? base?.noSummary) out.noSummary = true;
   if (over?.rosterOff ?? base?.rosterOff) out.rosterOff = true;
+  if (over?.relOff ?? base?.relOff) out.relOff = true;
   const notes = over?.roster_notes ?? base?.roster_notes;
   if (Array.isArray(notes) && notes.length) out.roster_notes = notes.map((n) => ({ department: String(n.department ?? ''), label: String(n.label ?? '') }));
   return out;
@@ -166,6 +169,20 @@ export function worldRelations(overrides?: WorldOverrides): Relations {
     else if (v && RELATION_STAGES.includes(v.stage)) pairs[k] = { stage: v.stage, ...(v.memo ? { memo: v.memo } : {}) };
   }
   return { pairs, common: overrides?.relations?.common ?? DEFAULT_RELATIONS.common };
+}
+
+/** 세력 관계도에서 뺀 조직 이름들 */
+export const excludedOrgs = (orgs: Map<string, WorldRecord>): Set<string> => new Set([...orgs.entries()].filter(([, r]) => r.relOff).map(([n]) => n));
+
+/** 뺀 조직이 낀 쌍을 지운 관계 (격자·Faction 목록·평판 시작값이 쓴다) */
+export function filterRelations(rel: Relations, excluded: Set<string>): Relations {
+  if (!excluded.size) return rel;
+  const pairs: Record<string, RelationCell> = {};
+  for (const [k, v] of Object.entries(rel.pairs)) {
+    const [a, b] = k.split('>');
+    if (!excluded.has(a) && !excluded.has(b)) pairs[k] = v;
+  }
+  return { ...rel, pairs };
 }
 
 /** 기본 세계에 그 이름의 기록이 있는지 (카드 덧쓰기와 구분해 보여 줄 때) */

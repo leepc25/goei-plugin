@@ -5,7 +5,7 @@ import type { LoreEntry } from '../types';
 import { readDirectory, readDirectoryData, type Directory } from './directory';
 import { assembleAgent, assembleAnomaly, assembleAppendix, assembleOrg, assembleSite } from './assemble';
 import { assembleFaction, assembleRoster } from './faction';
-import { setActiveWorld, worldRecords, worldRelations, type WorldOverrides, type WorldRecord, worldAnomalyNote } from './records';
+import { setActiveWorld, worldRecords, worldRelations, type WorldOverrides, type WorldRecord, worldAnomalyNote, excludedOrgs, filterRelations } from './records';
 import type { WorldKind } from './schema';
 import { guideText } from '../guides';
 import { FACTION_BOOK, TAG_BOOK } from '../factions';
@@ -130,14 +130,14 @@ export function withWorldLore(lore: LoreEntry[] | undefined): LoreEntry[] {
     e.content = `@@dont_activate\n${content}\n\n---`;
   }
   // 인물 기록의 세력 시작값 등이 읽는 「지금 세계」: 관계 격자와 코드→조직 이름
-  setActiveWorld(worldRelations(overrides), Object.fromEntries(dir.orgs.flatMap((o) => (o.faction ? [[o.faction, o.name]] : []))), worldAnomalyNote(overrides));
+  setActiveWorld(filterRelations(worldRelations(overrides), excludedOrgs(recs.org)), Object.fromEntries(dir.orgs.flatMap((o) => (o.faction ? [[o.faction, o.name]] : []))), worldAnomalyNote(overrides));
   // 상시 지침(🏷️Tag·📜Faction·🙂Roster): 카드에 없으면 가상으로. 요청에는 플러그인이 직접 끼운다 (core/lore.ts insertLoreBlock)
   const missingAlways = ALWAYS_BOOKS.filter((b) => !existing.has(b.name));
   if (missingAlways.length) {
     const wf = base.find((e) => e.mode === 'folder' && typeof e.key === 'string' && folderWord(s(e.comment)) === '세계');
     const wkey = (wf?.key as string | undefined) ?? WORLD_FOLDER_KEY;
     if (!wf) out.push({ key: WORLD_FOLDER_KEY, comment: '🌐세계', content: '', mode: 'folder', insertorder: 100, alwaysActive: false, secondkey: '', selective: false, bookVersion: 2, [VIRTUAL]: true });
-    const rel = worldRelations(overrides);
+    const rel = filterRelations(worldRelations(overrides), excludedOrgs(recs.org));
     for (const b of missingAlways) {
       const content = b.kind === 'tag' ? guideText('Tag') : b.kind === 'faction' ? assembleFaction(dir, recs.org, rel) : assembleRoster(dir, recs.agent, recs.org);
       out.push({ key: '', secondkey: '', comment: b.name, content, mode: 'normal', insertorder: b.order, alwaysActive: true, selective: false, useRegex: false, bookVersion: 2, folder: wkey, [VIRTUAL]: true, goeiKind: b.kind });

@@ -268,7 +268,8 @@
     "intro": "Ordinary people outside the anomalous world, unaware of its hidden factions and dangers."
    },
    "extra": [],
-   "summaryOnly": true
+   "summaryOnly": true,
+   "relOff": true
   },
   "프리랜서": {
    "keys": "",

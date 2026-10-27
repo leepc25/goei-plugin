@@ -30,6 +30,7 @@ export function minimalOverride(kind: WorldKind, name: string, full: WorldRecord
   if (!same(base.roster_notes, full.roster_notes)) out.roster_notes = full.roster_notes ?? [];
   if (!!base.noSummary !== !!full.noSummary) out.noSummary = !!full.noSummary;
   if (!!base.rosterOff !== !!full.rosterOff) out.rosterOff = !!full.rosterOff;
+  if (!!base.relOff !== !!full.relOff) out.relOff = !!full.relOff;
   return Object.keys(out).length ? out : undefined;
 }
 

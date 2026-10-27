@@ -106,6 +106,8 @@ export interface Prefs {
   /** 채팅 속 캐릭터 이미지 칸 크기·접힌 높이 (%, 이 기기 공통, 없으면 원본 카드와 같은 100%·68%) */
   imgSize?: number;
   imgFold?: number;
+  /** 이미지를 접을지 (기본 켬). 끄면 늘 펼친 채 (사용자 2026-10-27) */
+  imgFoldOn?: boolean;
   /** 이미지를 띄울 최근 메시지 수·요청에 이미지 태그를 남길 최근 메시지 수 (0이면 전부, 없으면 6) */
   imgShow?: number;
   imgSend?: number;
@@ -177,6 +179,7 @@ export function setPrefs(raw: unknown): Prefs {
   const status = o.status === 'off' || o.status === 'light' || o.status === 'dark' || o.status === 'paper' ? o.status : undefined;
   const size = imgSize(o.imgSize);
   const fold = imgFold(o.imgFold);
+  const imgFoldOn = o.imgFoldOn === false ? false : undefined;
   const show = imgRecent(o.imgShow);
   const send = imgRecent(o.imgSend);
   const marks: Mark[] = (Array.isArray(o.marks) ? o.marks : [])
@@ -196,7 +199,7 @@ export function setPrefs(raw: unknown): Prefs {
   for (const k of GUIDE_NAMES) setGuideOverride(k, guides[k]);
   const relationsSym = o.relationsSym === false ? false : undefined;
   const walletStart = int(o.walletStart, 0, 1_000_000_000_000);
-  prefs = { basic, world, ...(walletStart !== null ? { walletStart } : {}), ...(editorWidth !== null ? { editorWidth } : {}), ...(Object.keys(guides).length ? { guides } : {}), ...(relationsSym === false ? { relationsSym } : {}), ...(theme ? { theme } : {}), ...(imgPrompt ? { imgPrompt } : {}), ...(imgNamesOff.length ? { imgNamesOff } : {}), ...(imgNamesExtra.length ? { imgNamesExtra } : {}), ...(imgKeywords.length ? { imgKeywords } : {}), ...(Object.keys(vars).length ? { vars } : {}), ...(nav ? { nav } : {}), ...(agents ? { agents } : {}), ...(dim !== null ? { dim } : {}), ...(status ? { status } : {}), ...(size !== null ? { imgSize: size } : {}), ...(fold !== null ? { imgFold: fold } : {}), ...(show !== null ? { imgShow: show } : {}), ...(send !== null ? { imgSend: send } : {}), ...(marks.length ? { marks } : {}) };
+  prefs = { basic, world, ...(walletStart !== null ? { walletStart } : {}), ...(editorWidth !== null ? { editorWidth } : {}), ...(Object.keys(guides).length ? { guides } : {}), ...(relationsSym === false ? { relationsSym } : {}), ...(theme ? { theme } : {}), ...(imgPrompt ? { imgPrompt } : {}), ...(imgNamesOff.length ? { imgNamesOff } : {}), ...(imgNamesExtra.length ? { imgNamesExtra } : {}), ...(imgKeywords.length ? { imgKeywords } : {}), ...(Object.keys(vars).length ? { vars } : {}), ...(nav ? { nav } : {}), ...(agents ? { agents } : {}), ...(dim !== null ? { dim } : {}), ...(status ? { status } : {}), ...(size !== null ? { imgSize: size } : {}), ...(fold !== null ? { imgFold: fold } : {}), ...(imgFoldOn === false ? { imgFoldOn } : {}), ...(show !== null ? { imgShow: show } : {}), ...(send !== null ? { imgSend: send } : {}), ...(marks.length ? { marks } : {}) };
   return prefs;
 }
 

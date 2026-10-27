@@ -1,8 +1,8 @@
 // 세력 관계 격자 (docs/설계안_세계편집.md 2장): 행 = 보는 쪽, 열 = 대상. 칸 34px, 색 칸 + 두 글자, 첫 행·열 고정.
 // 칸을 누르면 단계 순환(적대→경계→중립→호의→우호), 아래에 메모. 「대칭」이 켜져 있으면 반대 칸도 같이. 공통 규칙은 글칸 하나.
-import { RELATION_LABEL, RELATION_STAGES, worldRelations, type RelationCell, type RelationStage, type WorldOverrides } from '../../core/world/records';
+import { excludedOrgs, filterRelations, RELATION_LABEL, RELATION_STAGES, worldRecord, worldRecords, worldRelations, type RelationCell, type RelationStage, type WorldOverrides } from '../../core/world/records';
 import { assembleFaction } from '../../core/world/faction';
-import { worldRecords } from '../../core/world/records';
+import { emptyRecord, putRecord } from '../../core/world/draft';
 import { tokens } from '../../core/gnet';
 import { getPrefs } from '../../core/settings';
 import { savePrefs } from '../../host/prefs';
@@ -35,8 +35,12 @@ function setCell(over: WorldOverrides, key: string, cell: RelationCell | null): 
 
 export function relationsPage(ctx: ChatContext, over: WorldOverrides, rulesOnly: boolean): string {
   const d = directoryDraft(ctx);
-  const rel = worldRelations(over);
-  const orgs = d.orgs.map((o) => o.name);
+  const recs = worldRecords('org', over);
+  const excluded = excludedOrgs(recs);
+  const rel = filterRelations(worldRelations(over), excluded);
+  const orgs = d.orgs.map((o) => o.name).filter((n) => !excluded.has(n));
+  // 편입 칩: 명부의 모든 조직. 끈 조직은 격자·Faction 관계 목록·평판 시작값에서 빠진다 (사용자 2026-10-27)
+  const members = `<div class="gw-rel-members"><span>관계도에 넣을 조직</span>${d.orgs.map((o) => `<button class="gx-chip${excluded.has(o.name) ? '' : ' on'}" data-action="ed-rel-org" data-value="${esc(o.name)}" aria-pressed="${!excluded.has(o.name)}">${esc(o.name)}</button>`).join('')}</div>`;
   const player = String(ctx.chat.scriptstate?.['$st_faction'] ?? '');
   const playerOrg = player ? d.orgs.find((o) => o.faction === player)?.name ?? '' : '';
   void rulesOnly; // 2026-10-27: 세력 관계와 공통 규칙은 한 화면 (아래)
@@ -65,11 +69,12 @@ export function relationsPage(ctx: ChatContext, over: WorldOverrides, rulesOnly:
         <button class="gx-mini" data-action="ed-rel-clear">중립으로</button></div>
         <textarea data-input="ed-rel-memo" data-key="${esc(sel)}" rows="4" placeholder="메모 (선택). 단계만으로 안 되는 것만: 「협상 불가, 개인 유대도 배신」처럼">${esc(cell?.memo ?? '')}</textarea></div>`
     : '<p class="gx-muted">칸을 누르면 단계가 한 단계 바뀌고, 아래에 메모 칸이 열려요.</p>';
-  const fac = assembleFaction(d, worldRecords('org', over), rel);
+  const fac = assembleFaction(d, recs, rel);
   return `<div class="gw-page"><header class="gw-head"><h2>세력 관계</h2>
       <div class="gw-head-act"><label class="gw-toggle"><input type="checkbox" data-action="ed-rel-sym" ${sym() ? 'checked' : ''}> 대칭 (반대 칸도 같이)</label>
         <button class="gx-mini${relUi.preview ? ' on' : ''}" data-action="ed-rel-preview">Faction 지침 보기</button><span class="gw-tokens">Faction 약 ${tokens(fac).toLocaleString()}토큰</span></div>
       <p class="gx-muted">행이 보는 쪽, 열이 대상이에요. 단계는 세력 평판 5단계와 같고 평판 시작값이 돼요. 중립은 빈 칸. ${playerOrg ? `지금 플레이 세력(${esc(playerOrg)}) 행·열은 옅게 칠했어요.` : ''}</p></header>
+    ${members}
     <div class="gw-legend">${RELATION_STAGES.filter((s) => s !== 'neutral').map((s) => `<span class="st-${s}"><i></i>${RELATION_LABEL[s]}</span>`).join('')}<span><i class="none"></i>중립 (빈 칸)</span></div>
     <div class="gw-grid-wrap"><table class="gw-grid"><thead>${head}</thead><tbody>${rows}</tbody></table></div>
     ${memoBox}
@@ -129,6 +134,15 @@ export async function relationsAction(action: string, value: string | undefined,
     case 'ed-rel-preview':
       relUi.preview = !relUi.preview;
       return true;
+    case 'ed-rel-org': {
+      // 조직을 관계도에 넣거나 뺀다 (조직 기록의 relOff). 격자에서 빠진 조직의 칸은 그대로 두되 쓰지 않는다
+      const name = value ?? '';
+      if (!name) return false;
+      const rec = worldRecord('org', name, over) ?? emptyRecord();
+      setOverrides(putRecord(over, 'org', name, { ...rec, relOff: !rec.relOff }));
+      if (relUi.cell.split('>').includes(name)) relUi.cell = '';
+      return true;
+    }
     case 'ed-rules-reset': {
       const relations: NonNullable<WorldOverrides['relations']> = { ...(over.relations ?? {}) };
       delete relations.common;

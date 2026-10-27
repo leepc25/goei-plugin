@@ -58,7 +58,8 @@ export function assembleFaction(dir: Directory, orgs: Map<string, WorldRecord>, 
     const intro = variantText(rec, 'intro', firstParagraph);
     if (intro) parts.push(`### ${rec.title || name}\n${intro}`);
   }
-  const pairs = Object.entries(rel.pairs).filter(([, c]) => c.stage !== 'neutral' && RELATION_STAGES.includes(c.stage));
+  const excluded = new Set([...orgs.entries()].filter(([, r]) => r.relOff).map(([n]) => n));
+  const pairs = Object.entries(rel.pairs).filter(([k, c]) => c.stage !== 'neutral' && RELATION_STAGES.includes(c.stage) && !k.split('>').some((n) => excluded.has(n)));
   if (pairs.length) {
     const lines = pairs.map(([k, c]) => {
       const [a, b] = k.split('>');

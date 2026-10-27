@@ -179,3 +179,5 @@
 .gw .gx-segs { display: inline-flex; gap: 2px; padding: 3px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
 .gw .gx-seg { min-height: 32px; padding: 0 12px; border: 0; border-radius: 9px; background: transparent; color: var(--dim); font: inherit; font-weight: 600; cursor: pointer; }
 .gw .gx-seg.on { background: var(--accent-bg); color: var(--text); }
+.gw-rel-members { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 0 0 10px; }
+.gw-rel-members > span { font-size: 12px; font-weight: 700; color: var(--dim); margin-right: 4px; }
