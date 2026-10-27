@@ -132,7 +132,7 @@ export function agentInner(char: CharacterSnapshot, p: { english?: string; name:
 }
 
 /** 모바일 ID카드 창: 요원 정보 창과 같은 틀에 카드만 넣는다 */
-export function showIdCard(html: string): void {
+export function showIdCard(html: string, act?: (action: string, value?: string) => void): void {
   const box = document.createElement('div');
   box.className = 'gx gx-agpop gx-idpop';
   box.setAttribute('role', 'dialog');
@@ -140,6 +140,13 @@ export function showIdCard(html: string): void {
   const theme = document.querySelector('.gx')?.getAttribute('data-theme');
   if (theme) box.setAttribute('data-theme', theme);
   box.addEventListener('click', (e) => {
+    // 카드 안 단추(잔고 칩 → 가계부 등)는 패널 처리기로 보내고 창을 닫는다 (이 창은 패널 밖에 붙어 패널 클릭 처리기가 못 받는다)
+    const btn = (e.target as HTMLElement).closest<HTMLElement>('[data-action]');
+    if (btn && act && box.contains(btn)) {
+      box.remove();
+      act(btn.dataset.action!, btn.dataset.value);
+      return;
+    }
     if ((e.target as HTMLElement).closest('.gx-idpop-card') && !(e.target as HTMLElement).closest('.gx-agpop-x')) return;
     box.remove();
   });

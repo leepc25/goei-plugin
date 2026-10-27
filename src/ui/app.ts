@@ -55,10 +55,10 @@ import { handleImgPrompt, imgInput } from './imgprompt';
 import { cropValue, setCrop, directoryExtList, directoryInput, directoryPhotoList, directoryList, dirUi, handleDirectory, resetDirectory } from './directory';
 import { basicDefaults, basicVars, DIM_DEFAULT, getPrefs, worldDefaults, worldSettings, worldVarsOf, type Mark } from '../core/settings';
 import { colConfig } from '../core/world/statuscols';
-import { adjustWallet, aliveAnchors, formatDelta, formatWon, liveWallet, parseWon, readWallet, removeWalletEntry, walletBalance, walletVars, type WalletEntry, WALLET_START_DEFAULT } from '../core/wallet';
+import { addWalletEntry, adjustWallet, aliveAnchors, formatWon, parseWon, readWallet, removeWalletEntry, walletBalance, walletVars, WALLET_START_DEFAULT } from '../core/wallet';
+import { walletHeadButton, walletOn, walletTab, walletUi as walletTabUi } from './wallet';
 
 /** ID카드 잔고 칩 → 장부 창 (열림·입력 알림) */
-const walletUi = { open: false, notice: '' };
 
 interface Draft {
   faction?: FactionCode;
@@ -93,8 +93,8 @@ let busy = false;
 let notice = '';
 /** 괴담넷 탭 (완성 전까지 숨김) */
 const GNET_ON = true;
-type Tab = 'board' | 'map' | 'mission' | 'gnet' | 'phone' | 'wiki' | 'field' | 'settings';
-const TABS: Tab[] = ['board', 'map', 'mission', ...(GNET_ON ? (['gnet'] as Tab[]) : []), 'phone', 'wiki', 'field'];
+type Tab = 'board' | 'map' | 'mission' | 'gnet' | 'phone' | 'wiki' | 'field' | 'wallet' | 'settings';
+const TABS: Tab[] = ['board', 'map', 'mission', ...(GNET_ON ? (['gnet'] as Tab[]) : []), 'phone', 'wiki', 'field', 'wallet'];
 let tab: Tab = 'board';
 /** 커스텀 임무 시작 화면에서 "다시 고르기"를 눌렀을 때 */
 let repick = false;
@@ -200,7 +200,10 @@ function ensureRoot(): HTMLElement {
     const el = t.closest<HTMLElement>('[data-action]');
     if (!el || el.hasAttribute('disabled')) return;
     // data-take: 같은 창의 입력칸 값을 넘긴다 (form 제출은 플러그인 iframe에서 막혀 있음)
-    const take = el.dataset.take ? root?.querySelector<HTMLInputElement>(`[name="${el.dataset.take}"]`)?.value : undefined;
+    // 이름을 쉼표로 여럿 주면 값들을 JSON 배열로 (가계부 거래 추가: 금액·메모)
+    const names = el.dataset.take?.split(',') ?? [];
+    const val = (n: string) => root?.querySelector<HTMLInputElement>(`[name="${n}"]`)?.value ?? '';
+    const take = !names.length ? undefined : names.length > 1 ? JSON.stringify(names.map(val)) : root?.querySelector<HTMLInputElement>(`[name="${names[0]}"]`)?.value;
     void handle(el.dataset.action!, take ?? el.dataset.value);
   });
   // 명부 얼굴 틀: 대표 사진을 누르거나 끌면 그 자리가 틀 가운데 (틀이 사진 밖으로 나가지 않게)
@@ -811,14 +814,37 @@ async function handle(action: string, value?: string): Promise<void> {
     case 'id-card': {
       // 모바일: 머리의 ID카드 버튼 → 왼쪽 패널과 같은 카드를 작은 창으로
       if (view.kind !== 'started') return;
-      showIdCard(idCard(view.ctx));
+      showIdCard(idCard(view.ctx), (a, v) => void handle(a, v));
       return;
     }
     case 'wallet-pop':
-      // ID카드 잔고 칩 ↔ 장부 창
-      walletUi.open = !walletUi.open;
-      walletUi.notice = '';
+      // 옛 잔고 칩 → 가계부 탭
+      return handle('tab', 'wallet');
+    case 'wallet-filter':
+      walletTabUi.filter = value === 'in' || value === 'out' ? value : 'all';
       return render();
+    case 'wallet-open':
+      walletTabUi.open = walletTabUi.open === value ? null : value ?? null;
+      return render();
+    case 'wallet-add': {
+      // 금액·메모 두 칸 (data-take 두 이름: JSON 배열)
+      if (view.kind !== 'started') return;
+      let parts: string[] = [];
+      try { parts = JSON.parse(value ?? '[]'); } catch { /* 빈 값 */ }
+      const n = parseWon(String(parts[0] ?? ''));
+      if (n === null || n === 0) {
+        walletTabUi.notice = '금액을 읽을 수 없어요. 「-12000」「+3만」처럼 적어 주세요 (나간 돈은 −).';
+        return render();
+      }
+      const memo = String(parts[1] ?? '').trim() || (n < 0 ? '지출' : '수입');
+      const ctx = view.ctx;
+      await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
+        const w = readWallet(chat.scriptstate, getPrefs().walletStart ?? WALLET_START_DEFAULT);
+        return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...walletVars(addWalletEntry(w, { anchor: '', amount: n, memo, src: 'manual', id: `a_${Date.now().toString(36)}_${w.log.length}` })) } };
+      });
+      walletTabUi.notice = '';
+      return refresh();
+    }
     case 'wallet-del': {
       if (view.kind !== 'started' || !value) return;
       const ctx = view.ctx;
@@ -832,7 +858,7 @@ async function handle(action: string, value?: string): Promise<void> {
       if (view.kind !== 'started') return;
       const n = parseWon(value ?? '');
       if (n === null) {
-        walletUi.notice = '금액을 읽을 수 없어요. 숫자 또는 「120만」처럼 적어 주세요.';
+        walletTabUi.notice = '금액을 읽을 수 없어요. 숫자 또는 「120만」처럼 적어 주세요.';
         return render();
       }
       const ctx = view.ctx;
@@ -840,7 +866,7 @@ async function handle(action: string, value?: string): Promise<void> {
         const w = readWallet(chat.scriptstate, getPrefs().walletStart ?? WALLET_START_DEFAULT);
         return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...walletVars(adjustWallet(w, aliveAnchors(chat), n)) } };
       });
-      walletUi.notice = '';
+      walletTabUi.notice = '';
       return refresh();
     }
     case 'agents-view':
@@ -969,7 +995,7 @@ async function turnWorldOn(): Promise<void> {
 }
 
 const TAB_TITLE: Record<Tab, string> = {
-  board: '상황판', map: '임무', mission: '커스텀', gnet: '괴담넷', phone: '괴담톡', wiki: '위키', field: '필드', settings: '설정',
+  board: '상황판', map: '임무', mission: '커스텀', gnet: '괴담넷', phone: '괴담톡', wiki: '위키', field: '필드', wallet: '가계부', settings: '설정',
 };
 
 function header(sub: string, extra = ''): string {
@@ -987,6 +1013,7 @@ function startedHeader(ctx: ChatContext): string {
   return `<header class="gx-head">
     <div class="gx-brand gx-tabhead"><span class="gx-hmark"><span class="gx-logo">${GHOST_ICON}</span><span class="gx-mark-txt"><b aria-label="${BRAND.name}">${brandHtml('var(--text)', 'var(--signal)')}</b></span></span><span class="gx-hsep" aria-hidden="true">›</span><span class="gx-tabicon">${tab === 'field' ? ICONS.game : ICONS[tab]}</span><div><b>${tab === 'gnet' ? gnetLabel(ctx.chat.scriptstate) : TAB_TITLE[tab]}</b></div></div>
     <div class="gx-head-act">
+      ${walletHeadButton(ctx, tab === 'wallet')}
       ${gameShown() ? `<button class="gx-x gx-fieldbtn${tab === 'field' ? ' on' : ''}" data-action="tab" data-value="field" aria-label="필드" title="필드">${ICONS.game}</button>` : ''}
       <button class="gx-x gx-idbtn" data-action="id-card" aria-label="내 ID카드">${userInfo().photo ? `<img src="${esc(userInfo().photo!)}" alt="">` : ICONS.idcard}</button>
       <button class="gx-x" data-action="ed-open" data-value="set:screen" aria-label="설정">${ICONS.settings}${hasUpdate(ctx) ? '<span class="gx-xdot" aria-label="새 버전"></span>' : ''}</button>
@@ -1262,6 +1289,8 @@ function startedBody(ctx: ChatContext): string {
       return gnetTab(ctx, gnetEnv);
     case 'phone':
       return phoneTab(ctx, phoneEnv);
+    case 'wallet':
+      return walletTab(ctx);
     case 'field':
       // 게임은 그린 뒤 이 자리에 붙인다 (afterRender → syncField)
       return '<main class="gx-body gx-fieldhost"></main>';
@@ -1291,7 +1320,7 @@ function body(): string {
       </div>`;
     case 'started':
       evSeenReset();
-      return `${tabs()}${startedHeader(view.ctx)}<div class="gx-content">${tab === 'settings' ? '' : updateBanner(view.ctx)}${notice && tab !== 'map' && tab !== 'mission' ? `<div class="${noticeClass(notice)} gx-notice" role="alert">${esc(notice)}</div>` : ''}${startedBody(view.ctx)}</div>${evPopup(boardClock(view.ctx))}${tab === 'board' ? agentPopup((n) => view.kind === 'started' && hasPersonRecord(view.ctx, n)) : ''}${walletPop(view.ctx)}${markPop(markOf(navState()), recentMarks())}`;
+      return `${tabs()}${startedHeader(view.ctx)}<div class="gx-content">${tab === 'settings' ? '' : updateBanner(view.ctx)}${notice && tab !== 'map' && tab !== 'mission' ? `<div class="${noticeClass(notice)} gx-notice" role="alert">${esc(notice)}</div>` : ''}${startedBody(view.ctx)}</div>${evPopup(boardClock(view.ctx))}${tab === 'board' ? agentPopup((n) => view.kind === 'started' && hasPersonRecord(view.ctx, n)) : ''}${markPop(markOf(navState()), recentMarks())}`;
     case 'opening':
       return `${header('커스텀 임무 · 첫 장면 고르기', '<button class="gx-x" data-action="repick" aria-label="시작 설정 다시 고르기">' + ICONS.back + '</button>')}<div class="gx-content">${missionTab(view.ctx, true, notice, busy)}</div>`;
     case 'picker':
@@ -1378,6 +1407,7 @@ function tabs(): string {
     ${GNET_ON ? item('gnet', gnetLabel(ctx?.chat.scriptstate), ICONS.gnet) : ''}
     ${item('wiki', '위키', ICONS.wiki)}
     ${gameShown() ? item('field', '필드', ICONS.game, 'desk') : ''}
+    ${ctx && walletOn(ctx) ? item('wallet', '가계부', ICONS.wallet, 'desk') : ''}
     <button class="gx-nb desk" data-action="ed-open" data-value="set:screen">${ICONS.settings}<span>설정</span>${ctx && hasUpdate(ctx) ? '<span class="gx-nbadge dot" aria-label="새 버전"></span>' : ''}</button>
     <span class="gx-nav-gap"></span>
     ${ctx ? navHistBar(markOf(navState())) : ''}
@@ -1434,25 +1464,7 @@ function idCard(ctx: ChatContext): string {
 function walletChip(ctx: ChatContext): string {
   if (colConfig(ctx.chat.scriptstate).wallet === 'off') return '';
   const w = readWallet(ctx.chat.scriptstate, getPrefs().walletStart ?? WALLET_START_DEFAULT);
-  return `<button class="gx-op-ln gx-wallet" data-action="wallet-pop" aria-label="잔고·가계부" title="가계부"><i>잔고</i><em>${esc(formatWon(walletBalance(w, aliveAnchors(ctx.chat))))}</em></button>`;
-}
-
-/** 장부 창: 최근 거래(살아 있는 것), 잔고 수정, 거래 지우기 */
-function walletPop(ctx: ChatContext): string {
-  if (!walletUi.open) return '';
-  const w = readWallet(ctx.chat.scriptstate, getPrefs().walletStart ?? WALLET_START_DEFAULT);
-  const alive = aliveAnchors(ctx.chat);
-  const live = liveWallet(w, alive);
-  const src = (e: WalletEntry) => (e.src === 'story' ? '본문' : e.src === 'field' ? '필드' : '수정');
-  const rows = live.slice(-30).reverse().map((e) => `<li><span class="gx-wl-memo">${esc(e.memo)}<small>${src(e)}${e.quote ? ` · ${esc(e.quote.slice(0, 40))}` : ''}</small></span><b class="${e.amount < 0 ? 'out' : 'in'}">${esc(formatDelta(e.amount))}</b><button class="gx-wl-x" data-action="wallet-del" data-value="${esc(e.id)}" aria-label="지우기">✕</button></li>`).join('');
-  return `<button class="ev-scrim" data-action="wallet-pop" aria-label="닫기"></button>
-    <div class="gx-walpop" role="dialog" aria-label="가계부">
-      <div class="gx-walpop-head"><b>가계부</b><span>${esc(formatWon(walletBalance(w, alive)))}</span><button class="gx-x" data-action="wallet-pop" aria-label="닫기">${ICONS.close}</button></div>
-      <p class="gx-muted">시작 ${esc(formatWon(w.start))} · 거래 ${live.length}건. 본문에 금액이 적힌 거래만 인물 기록 갱신기가 적어요. 지운 메시지의 거래는 자동으로 빠져요.</p>
-      ${walletUi.notice ? `<div class="gx-err" role="alert">${esc(walletUi.notice)}</div>` : ''}
-      <ul class="gx-wl">${rows || '<li class="gx-wl-empty">거래가 없어요.</li>'}</ul>
-      <form class="gx-wl-adj" data-submit="wallet-adj"><input type="text" inputmode="numeric" placeholder="잔고를 이 값으로 (예: 1,200,000 또는 120만)" aria-label="잔고 수정"><button type="submit" class="gx-mini">잔고 수정</button></form>
-    </div>`;
+  return `<button class="gx-op-ln gx-wallet" data-action="tab" data-value="wallet" aria-label="잔고·가계부" title="가계부"><i>잔고</i><em>${esc(formatWon(walletBalance(w, aliveAnchors(ctx.chat))))}</em></button>`;
 }
 
 /** 내 소속은 내 시점의 이름으로 (가짜 관리국을 고르면 나에게는 그냥 관리국). 명부에서 이름을 바꿨으면 그 이름 */
