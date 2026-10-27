@@ -3,12 +3,12 @@
 import type { AgentRow, Directory, OrgRow } from './directory';
 import { orgOf } from './directory';
 import { orgNameCbs } from './assemble';
-import { fieldValue, RELATION_STAGES, type Relations, type RelationStage, type WorldRecord } from './records';
+import { excludedOrgs, fieldValue, RELATION_STAGES, type Relations, type RelationStage, type WorldRecord } from './records';
 
 const VAR = '{{getvar::st_faction}}';
 export const FACTION_INTRO = 'This reference describes the world to the GM. Public labels, hidden affiliations, doctrine, and internal information are known to an NPC only through that NPC\'s actual access.';
 export const ROSTER_INTRO = '- Purpose: GM reference for consistent character introductions before individual lore is active.\n- Detail: Use active character lore for fuller characterization.';
-const STAGE_MARK: Record<RelationStage, string> = { hostile: 'H', wary: 'W', neutral: '·', favorable: 'F', friendly: 'A' };
+const STAGE_MARK: Record<RelationStage, string> = { hostile: 'H', wary: 'W', neutral: 'N', favorable: 'F', friendly: 'A' };
 
 const firstParagraph = (t: string) => t.trim().split(/\n\s*\n/)[0]?.trim() ?? '';
 
@@ -58,7 +58,7 @@ export function assembleFaction(dir: Directory, orgs: Map<string, WorldRecord>, 
     const intro = variantText(rec, 'intro', firstParagraph);
     if (intro) parts.push(`### ${rec.title || name}\n${intro}`);
   }
-  const excluded = new Set([...orgs.entries()].filter(([, r]) => r.relOff).map(([n]) => n));
+  const excluded = excludedOrgs(orgs);
   // 관계는 표 하나로 (사용자 2026-10-27): 행 = 보는 쪽, 열 = 대상, 글자 한 개. 메모가 있는 칸만 표 아래 Notes 로
   const members = dir.orgs.filter((o) => !excluded.has(o.name)).map((o) => o.name);
   const stageOf = (a: string, b: string): RelationStage => {
@@ -70,10 +70,10 @@ export function assembleFaction(dir: Directory, orgs: Map<string, WorldRecord>, 
     const legend = members.map((n) => `${no.get(n)} ${named(n)}`).join(' · ');
     const head = `| viewer \\ target | ${members.map((n) => no.get(n)).join(' | ')} |`;
     const sep = `|---|${members.map(() => '---').join('|')}|`;
-    const rows = members.map((a) => `| ${no.get(a)} ${named(a)} | ${members.map((b) => (a === b ? '—' : STAGE_MARK[stageOf(a, b)])).join(' | ')} |`);
+    const rows = members.map((a) => `| ${no.get(a)} ${named(a)} | ${members.map((b) => (a === b ? '-' : STAGE_MARK[stageOf(a, b)])).join(' | ')} |`);
     // 메모는 기본값이 비어 있고(사용자 2026-10-27), 사용자가 쓴 칸만 표 아래에 한 줄씩
     const notes = members.flatMap((a) => members.filter((b) => a !== b && rel.pairs[`${a}>${b}`]?.memo?.trim()).map((b) => `- ${no.get(a)} → ${no.get(b)}: ${fillCodes(rel.pairs[`${a}>${b}`]!.memo!.trim().replace(/\n+/g, ' '), dir)}`));
-    parts.push(`## Faction Relations\nHow the row faction regards the column faction. H hostile · W wary · · neutral · F favorable · A allied. Factions not in the table regard each other neutrally.\nFactions: ${legend}\n${head}\n${sep}\n${rows.join('\n')}${notes.length ? `\nNotes:\n${notes.join('\n')}` : ''}`);
+    parts.push(`## Faction Relations\nHow the row faction regards the column faction: H hostile, W wary, N neutral, F favorable, A allied, - self. Factions not in the table regard each other neutrally.\nFactions: ${legend}\n${head}\n${sep}\n${rows.join('\n')}${notes.length ? `\nNotes:\n${notes.join('\n')}` : ''}`);
   }
   if (rel.common.trim()) parts.push(`## Faction Doctrine and Relations\n${fillCodes(rel.common.trim(), dir)}`);
   return parts.join('\n\n') + '\n\n---';

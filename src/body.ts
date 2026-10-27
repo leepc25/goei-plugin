@@ -8,7 +8,7 @@ import { hasSceneCard, renderSceneCards } from './core/dispatch';
 import { CONTEXT as GN_CONTEXT, GN_RAW, gnetSettings, mainContext, readGnet, userNick } from './core/gnet';
 import { mainContextRules } from './core/gnetPrompt';
 import { ALWAYS_BOOKS, isVirtual, stripVirtual, withWorldLore } from './core/world/virtual';
-import { guideText, RP_HEAD } from './core/guides';
+import { guidePrompt, RP_HEAD } from './core/guides';
 import { evaluate } from './core/cbs';
 import { shouldKeepSeed } from './core/request';
 import { messageText } from './core/refs';
@@ -199,7 +199,7 @@ async function fixLore<M extends PromptMessage>(messages: M[]): Promise<M[]> {
   // 시드(첫 장면 강제 로어): 카드에 📕Start Lore 가 없으면 플러그인이. 수명은 processRequest 가 표식으로 다룬다
   const seed = String(chat.scriptstate?.['$seed_lore'] ?? '');
   if (seed && shouldKeepSeed(chat) && !real.some((e) => e.comment === '📕Start Lore')) parts.push({ order: 399, text: seed });
-  if (!messages.some((m) => typeof m?.content === 'string' && m.content.includes(RP_HEAD))) parts.push({ order: 0, text: guideText('RP') });
+  if (!messages.some((m) => typeof m?.content === 'string' && m.content.includes(RP_HEAD))) parts.push({ order: 0, text: guidePrompt('RP') });
   const first = chat.message?.find((m) => typeof m.data === 'string' && m.data.trim())?.data;
   return insertLoreBlock(messages, joinLoreBlock(parts), first ? messageText(first) : undefined);
 }

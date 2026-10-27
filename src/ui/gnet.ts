@@ -1,5 +1,6 @@
 // 「괴담넷」 탭: 게시판·쪽지함. 생성은 새로고침·글 올리기·댓글·쪽지 보내기를 눌렀을 때만 한 번씩 부른다.
 // 원본은 채팅 입력창을 빌려 썼지만 여기서는 창 안의 입력칸에 쓴다. 생성은 창을 닫아도 계속되고 끝나면 원래 채팅에 저장한다.
+import { onOffSwitch } from './controls';
 import {
   acceptComments, acknowledge, addOutgoingDm, addUserComment, addUserPost, applyActivity, applyBoard, pushComments, hhmm, attachPostDraft, boardUnread, CFG, commitIncoming,
   dateNow, deleteComment, deletePost, deleteThread, dmThreads, dmUnread, findPost, GN_COOLDOWN, GN_DEFAULTS, GN_NICK, GnetError, gnetSettings,
@@ -379,6 +380,8 @@ const MODE_PREV = '$gn_mode_prev';
 // ── 화면 ──
 
 function seg(key: string, cur: string, items: [string, string][]): string {
+  const sw = onOffSwitch(items, cur, 'gn-cfg', (v) => `${key}=${v}`);
+  if (sw) return sw;
   return `<div class="gx-segs gx-segs-sm">${items
     .map(([v, label]) => `<button class="gx-seg${cur === v ? ' on' : ''}" data-action="gn-cfg" data-value="${key}=${v}" aria-pressed="${cur === v}">${label}</button>`)
     .join('')}</div>`;

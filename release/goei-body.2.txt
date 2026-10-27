@@ -1,4 +1,72 @@
-w;
+*)\\]`, "g");
+    for (const m of text.matchAll(re)) out.push(m[1].split("|").map((s5) => s5.trim()));
+    return out;
+  }
+  function scanAnomalies(text) {
+    return fields(text, "AN").flatMap((f) => {
+      const slot = /^\d+$/.test(f[0] ?? "") && f.length >= 6 ? 1 : 0;
+      const region = f[slot] ?? "";
+      const r = f.slice(slot + 1);
+      if (r.length < 4 || !region) return [];
+      return [{ region, name: stripLabel(r[0]), state: normAnState(r[1]), grade: normGrade(r[2]), deploy: stripLabel(r[3]), situation: stripLabel(r.slice(4).join(" ")) }];
+    });
+  }
+  function scanSites(text, kind, states) {
+    return fields(text, kind).flatMap((f) => {
+      const bare = (v) => stripLabel(v).replace(/\s*[(（][^)）]*[)）]\s*/g, "").trim();
+      const i = f.findIndex((v, k) => k >= 2 && states.includes(bare(v)));
+      if (i < 0) return [];
+      let region = f[0] ?? "";
+      if (/^\d+$/.test(region) && i >= 3) region = f[1] ?? "";
+      return [{ region, name: stripLabel(f[i - 1]), state: bare(f[i]), rest: f.slice(i + 1).map(stripLabel) }];
+    });
+  }
+  var DEPLOY_ONLY = /^(?:없음|none|-|[A-Z]\d{3}(?:\s*[,/·]\s*[A-Z]\d{3})*)$/i;
+  function scanIncidents(text) {
+    return scanSites(text, "IN", ["진행", "종료"]).map(({ rest, ...t }) => rest.length >= 2 ? { ...t, deploy: rest[0], situation: rest.slice(1).join(" ") } : DEPLOY_ONLY.test(rest[0] ?? "") ? { ...t, deploy: rest[0], situation: "" } : { ...t, deploy: "", situation: rest.join(" ") });
+  }
+  function scanMysticSites(text) {
+    return scanSites(text, "MS", ["출현", "소실"]).map(({ rest, ...t }) => ({ ...t, visitors: rest[0] ?? "", situation: rest.slice(1).join(" ") }));
+  }
+  function scanAgents(text) {
+    return fields(text, "AG").flatMap((f) => {
+      const state = normAgState(f[1]);
+      return f[0] && state ? [{ who: f[0], state, situation: f[2] ?? "" }] : [];
+    });
+  }
+  function scanAffiliation(text) {
+    const m = /\[AC\s*\|\s*(\w+)\s*\]/.exec(text);
+    return m ? m[1].toUpperCase() : null;
+  }
+  function scanStatus(text) {
+    const tags = findStatusTags(text);
+    const first = tags[0];
+    const minute = first ? statusMinute(first.date, first.time) : null;
+    const target = tags.length === 1 && (first.target || /\|\s*없음\s*[\]】］]?\s*$/.test(first.raw)) ? first.target : null;
+    return { minute, target };
+  }
+  function lastStatusFields(texts) {
+    for (let i = texts.length - 1; i >= 0; i--) {
+      const all = findStatusTags(texts[i] ?? "");
+      if (!all.length) continue;
+      const t = all[all.length - 1];
+      return { date: t.date, time: t.time, weather: t.weather, temp: t.temp, place: t.place, target: t.target, companions: t.companions, deployed: t.deployed };
+    }
+    return null;
+  }
+  function hasWorldTags(text) {
+    return /\[(?:AN|IN|MS|AG)\s*\||\[AC\s*\|/.test(text);
+  }
+  var AGE_META = /\{\s*\d+\s*시간\s+\d+\s*분\s*전\s*\}/;
+  var MARKERS = ["USER 관여 상태", "RP 시간 제한", "USER 관여 상태 규칙", "USER 탐험 상태 규칙", "탐험 추적", "자동 종료"];
+  function cleanOutput(text) {
+    const lines3 = text.split("\n");
+    const keep = [];
+    let prev = null;
+    let prevHadTag = false;
+    const ageOnly = (l) => l !== null && new RegExp(`^\\s*${AGE_META.source}\\s*$`).test(l);
+    for (const raw of lines3) {
+      let line2 = raw;
       if (MARKERS.some((m) => new RegExp(`^\\s*[-*]?\\s*\\[${m}\\]`).test(line2))) line2 = "";
       if (prevHadTag) line2 = line2.replace(new RegExp(`^\\s*${AGE_META.source}\\s*`), "");
       let count2 = 0;
@@ -266,11 +334,11 @@ w;
     return null;
   }
   function applyAnomalies(w, c, s5, faction, text) {
-    const pending = w.pending.an;
+    const pending2 = w.pending.an;
     let handled = false;
     for (const t of scanAnomalies(text)) {
       const canon2 = presetCanon(c, t.name);
-      const manualIncoming = !!pending && canon2 === pending;
+      const manualIncoming = !!pending2 && canon2 === pending2;
       let e;
       const existing = canon2 ? w.an.find((x) => x.origin !== "auto" && presetCanon(c, x.name || x.presetName) === canon2) : void 0;
       if (existing) {
@@ -309,7 +377,7 @@ w;
       } else {
         e = matchAn(w, t.region, canon2 ?? t.name);
         if (!e && t.state === "활성" && validName(t.name) && !w.an.some((x) => x.name === t.name)) {
-          const extra = w.an.filter((x) => x.origin !== "auto").length + (pending ? 1 : 0);
+          const extra = w.an.filter((x) => x.origin !== "auto").length + (pending2 ? 1 : 0);
           const presetActive = canon2 && w.an.some((x) => x.presetName === canon2 || presetCanon(c, x.name) === canon2);
           const loc = uniqueRegion(t.region);
           if (extra < s5.extra_cap && !presetActive && loc && !occupied(w).has(loc)) {
@@ -347,8 +415,8 @@ w;
       if (t.grade) e.grade = t.grade;
       if (t.situation) e.situation = codesToNames(t.situation, c, faction);
     }
-    if (pending && handled) w.pending.an = void 0;
-    else if (pending) w.notice = `${pending}: 발생 태그를 기다리는 중이에요. 다음 응답에서 다시 안내해요.`;
+    if (pending2 && handled) w.pending.an = void 0;
+    else if (pending2) w.notice = `${pending2}: 발생 태그를 기다리는 중이에요. 다음 응답에서 다시 안내해요.`;
   }
   function applyIncidents(w, c, s5, faction, text) {
     for (const t of scanIncidents(text)) {
@@ -364,12 +432,12 @@ w;
         if (!lm) e = w.inc.find((x) => x.loc === loc && x.state === "발생대기" && x.kind === "random" && !x.name);
         if (e) e.name = t.name;
         else {
-          const pending = w.pending.in;
-          const reserved = pending && pending !== t.name && !w.inc.some((x) => x.name === pending) ? 1 : 0;
+          const pending2 = w.pending.in;
+          const reserved = pending2 && pending2 !== t.name && !w.inc.some((x) => x.name === pending2) ? 1 : 0;
           const extra = w.inc.filter((x) => x.origin !== "auto").length + reserved;
           if (extra >= s5.extra_in_cap || blocked(w, "in", t.name)) continue;
           if (!lm && occupied(w).has(loc)) continue;
-          const origin = pending === t.name ? "manual" : "model";
+          const origin = pending2 === t.name ? "manual" : "model";
           e = { loc, name: t.name, state: "발생대기", situation: "", kind: lm ? "landmark" : "random", origin, since: null, born: w.minute };
           w.inc.push(e);
         }
@@ -392,12 +460,12 @@ w;
         if (!regionMatch(t.region, locName(e.loc))) continue;
       } else {
         if (t.state !== "출현" || !c.mysticSites.some((m) => m.name === t.name)) continue;
-        const pending = w.pending.ms;
-        const reserved = pending && pending !== t.name && !w.ms.some((x) => x.name === pending) ? 1 : 0;
+        const pending2 = w.pending.ms;
+        const reserved = pending2 && pending2 !== t.name && !w.ms.some((x) => x.name === pending2) ? 1 : 0;
         const extra = w.ms.filter((x) => x.origin !== "auto").length + reserved;
         const loc = uniqueRegion(t.region);
         if (extra >= s5.extra_ms_cap || !loc || occupied(w).has(loc)) continue;
-        e = { loc, name: t.name, state: "발생대기", visitors: "", origin: pending === t.name ? "manual" : "model", since: null, born: w.minute };
+        e = { loc, name: t.name, state: "발생대기", visitors: "", origin: pending2 === t.name ? "manual" : "model", since: null, born: w.minute };
         w.ms.push(e);
       }
       if (w.pending.ms === t.name) w.pending.ms = void 0;
@@ -2396,38 +2464,4 @@ w;
           voice: `- Bright, exclamatory and drawn out. She apologizes fast and loudly, because a fast loud apology is cheaper than a slow one.
 - Introductions: "Kang Ihak, pleased to meet you! Senior Staff, Employee!", "Haha.", "Okay.", "Yes yes!"
 - Threats, still smiling: "But! If you're lying to me, I'll give the Bureau every detail of your personal information, and take out an organ-backed loan in your name on the way out."
-- On deaths after clocking out: "Well, that's the company's problem to sort out!"`,
-          background: "- Standard intake, I Jo. She keeps a running ledger of who owes whom, what information is worth to which buyer, and which superior can be squeezed.\n- Sells Uh-doom intelligence to her employer, rival divisions and the opposing government agency without seeing a contradiction.",
-          abilities: '- Negotiation and framing. Her contribution to a fight is usually that it becomes a transaction instead.\n- Appraisal and brokerage: instant valuation of any object, corpse or secret in the room, and a buyer for it.\n- Manual-first pragmatism: "Even two rank-and-file employees are fine, as long as they follow the manual."\n- Combat: rookie-standard.\n- Equipment: An anomaly-grade currency wallet for coin-form denominations collected across entries.',
-          intro: "(late 20s/F, Sa-won): golden pixie cut, pleasant fixed smile, pony mask; chipper, shameless gold devotee; prices favors openly, reliable while paid."
-        },
-        extra: [
-          {
-            name: "Mask",
-            value: "Pony",
-            kind: "line",
-            sec: "identity",
-            at: "role"
-          },
-          {
-            name: "Mannerisms",
-            value: "thumbs-up, clasped hands, bright bows, and a coin shape made with thumb and forefinger when price enters the conversation.",
-            kind: "line",
-            sec: "appearance",
-            at: "outfit"
-          }
-        ]
-      },
-      장허운: {
-        keys: "Heo-un, 장허운, 허운",
-        fields: {
-          age: "late 20s",
-          gender: "Male",
-          organization: "Baekilmong Co., Ltd.",
-          department_en: "Development Division, Field Exploration Team, Y Jo (Finishing Team)",
-          role: "Sa-won, Y Jo Finishing Team; the late-letter squads serve as meat shields, spare lives for more valued employees.",
-          physique: "Tall, accustomed to physical labor rather than training; hunches to take less space.",
-          appearance: "Brown hair too long for ordinary office dress codes; this company scarcely notices. His exposed lower face pales with shock and tightens under hardship.",
-          outfit: "Standard field gear and the issued cow mask, worn even in the office between operations. He wears his equipment like a man who expects to need it.",
-          character: "- Stubbornly sincere, polite and deferential to everyone, including those designated expendable like himself.\n- Endures quietly because survival serves a purpose; visibly afraid but holds position.\n- Remembers kindness and vows repayment with interest. Being treated as a person rather than equipment first staggers, then steadies him.\n- Needs a wish certificate above all. Publicly asked about it at orientation because the answer outweighed embarrassment.\n- Accepts being expendable, but not dying before his wish is granted.\n\n[Flaws]\n- Prone to freezing when the situation exceeds him, and to obeying confident voices in the gap where his own judgment should be.\n- Endurance becomes self-neglect: absorbs danger rather than inconvenience anyone; treats expendability as fact, not insult.\n- A promised wish makes him exploitable; the company knowingly channels people like him into expendable squads.\n- Sudden warmth flusters him and earns disproportionate loyalty.",
-        
+- On deaths after clocking out: "Well, th

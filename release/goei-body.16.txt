@@ -1,4 +1,558 @@
-t: 1.4; color: var(--text); overflow-wrap: anywhere; }
+1.08); transform: translateY(-1px); }
+.ph-send:active:not(:disabled) { transform: scale(.94); }
+.ph-back2 { display: none; }
+@media (max-width: 760px) { .ph-compose .ph-back2 { display: inline-grid; width: 44px; height: 44px; border-radius: 15px; background: var(--panel2); color: var(--text); } .ph-compose .ph-back2 svg { width: 22px; height: 22px; } }
+.ph-send:disabled { background: var(--panel2); color: var(--dim); box-shadow: none; }
+/* 단톡·전화·연락처 추가·설정 */
+.ph-form-body { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding: 14px 16px; }
+.ph-form-foot { flex: none; display: flex; justify-content: flex-end; padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); border-top: 1px solid var(--panel2); background: var(--void); }
+.ph-form-foot .gx-start { width: 100%; min-height: 44px; border-radius: 12px; font-size: 16px; letter-spacing: .08em; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+.ph-form-foot .gx-start svg { width: 18px; height: 18px; }
+.ph-label { display: flex; flex-direction: column; gap: 2px; font-size: 14px; font-weight: 600; margin-bottom: -4px; }
+.ph-label small { font-weight: 400; color: var(--dim); font-size: 13px; }
+.ph-form textarea { resize: vertical; padding: 8px 10px; line-height: 1.5; }
+.ph-pick { flex: none; }
+.ph-inline { display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.ph-pct { width: 72px; min-height: 34px; }
+
+/* 설정 줄 (괴담톡 설정·설정 탭 공통): 묶음마다 카드, 줄마다 왼쪽 이름·설명 / 오른쪽 조작 */
+.ps { gap: 16px; }
+.gx-body .ps-group, .ps-group { padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.ps-group h3 { margin: 0 4px; font-size: 13px; font-weight: 700; letter-spacing: .04em; color: var(--dim); }
+.ps-rows { display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 16px; background: var(--panel); overflow: hidden; }
+.ps-row { display: flex; align-items: center; justify-content: space-between; gap: 12px 16px; padding: 12px 14px; flex-wrap: wrap; }
+.ps-row + .ps-row { border-top: 1px solid var(--panel2); }
+.ps-label { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1 1 200px; }
+.ps-label b { font-size: 15px; font-weight: 600; }
+.ps-label small { font-size: 13px; color: var(--dim); line-height: 1.45; }
+.ps-ctl { flex: 0 0 auto; display: flex; justify-content: flex-end; max-width: 100%; }
+.ps-ctl .gx-seg { flex: 0 0 auto; min-width: 56px; padding: 0 12px; }
+.ps-ctl .gx-segs { margin: 0; }
+
+/* 모바일: 목록 또는 대화 한 칸 */
+@media (max-width: 760px) {
+  .gx-body.ph-app { grid-template-columns: minmax(0, 1fr); padding: 0; }
+  .ph-app.is-list .ph-pane, .ph-app.is-detail .ph-side { display: none; }
+  .gx-body .ph-side { border-right: 0; padding: 12px 12px 0; }
+  .ph-content { margin: 0 -12px; padding: 0 4px 12px; }
+
+  .ph-room-head { min-height: 56px; padding: 6px 8px; gap: 8px; }
+  .ph-head-q { flex-basis: 150px; }
+  .ph-room-head .ph-act .ph-tool { width: 40px; height: 40px; }
+  .ph-msg { max-width: 84%; }
+  .ph-log { padding: 10px 12px 8px; }
+  .ph-composer { padding: 8px 8px calc(8px + env(safe-area-inset-bottom)); }
+  .ph-form-foot .gx-start { width: 100%; }
+}
+@media (min-width: 761px) and (max-width: 1080px) {
+  .gx-body.ph-app { grid-template-columns: minmax(260px, 300px) minmax(0, 1fr); }
+}
+
+/* 설정 탭 (v0.12.0): 묶음 카드 + 줄. 넓은 화면에서 너무 퍼지지 않게 가운데 */
+.gx-settings { display: flex; flex-direction: column; gap: 18px; }
+.gx-settings > * { width: 100%; max-width: 980px; margin-left: auto; margin-right: auto; }
+.ps-note { margin: 0 4px; font-size: 13px; color: var(--dim); line-height: 1.5; }
+.ps-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 10px; }
+.ps-card { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.ps-card h4 { margin: 0 4px; font-size: 15px; font-weight: 700; }
+.ps-card .ps-row { padding: 9px 12px; }
+.ps-card .ps-label { flex-basis: 90px; }
+.ps-card .ps-label b { font-size: 14px; font-weight: 500; }
+.ps-row .st-step { gap: 8px; }
+.ps-row .st-step b { min-width: 3.4em; }
+.ps-row .st-confirm { max-width: 360px; }
+/* 괴담넷: 넓은 PC 화면에서 글 목록이 끝까지 퍼지지 않게 */
+.gx-body.gn:not(.ph) > * { max-width: 1000px; margin-left: auto; margin-right: auto; }
+
+/* 좁은 칸에서 버튼 글자가 두 줄로 쪼개지지 않게 (v0.12.0) */
+.gx-seg, .gx-mini, .gx-chip, .gx-badge, .gx-st, .ph-sub, .ph-tab, .at-add, .gx-start { white-space: nowrap; }
+@media (max-width: 760px) {
+  .ps-row { padding: 12px; }
+  .ps-label { flex-basis: 180px; }
+}
+@media (max-width: 760px) {
+  /* 편성 요원: 모바일은 한 줄에 한 명. 두 칸이면 상태·상황이 안 보이고 부서·직급이 잘렸다 (v0.14.0) */
+  .gx-acards.pick { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+  .gx-acard.pick { gap: 10px; padding: 8px 36px 8px 8px; align-items: center; }
+  .gx-acard.pick .gx-ava { width: 44px; height: 44px; border-radius: 12px; }
+  .gx-acard.pick .gx-acard-top b { font-size: 15px; }
+  .gx-acard.pick small { white-space: normal; }
+  .gx-acard.pick .gx-acard-check { top: 50%; right: 10px; transform: translateY(-50%); width: 20px; height: 20px; font-size: 12px; }
+}
+/* 명부: 다른 폴더에서 온 발생 후보 (v0.12.0) */
+.dir-group-help { margin: -4px 2px 8px; font-size: 13px; }
+.dir-ext-open { width: 100%; min-height: 44px; margin-top: 10px; border: 1px dashed var(--line2); border-radius: 12px; background: none; color: var(--signal); font: inherit; font-size: 14px; font-weight: 600; }
+.dir-ext-open:hover { border-color: var(--accent-line); background: var(--accent-bg); }
+.dir-ext { margin-top: 10px; padding: 12px; border: 1px solid var(--accent-line); border-radius: 14px; background: var(--panel); display: flex; flex-direction: column; gap: 8px; }
+.dir-ext-head { display: flex; gap: 6px; }
+.dir-ext-head .gx-search { flex: 1; min-width: 0; }
+.dir-ext-list { display: flex; flex-direction: column; gap: 2px; max-height: 320px; overflow-y: auto; }
+.dir-ext-item { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "n a" "s a"; align-items: center; gap: 0 10px; padding: 8px 10px; border: 0; border-radius: 10px; background: none; color: var(--text); text-align: left; font: inherit; }
+.dir-ext-item:hover { background: var(--accent-bg); }
+.dir-ext-item b { grid-area: n; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dir-ext-item small { grid-area: s; font-size: 12px; color: var(--dim); }
+.dir-ext-item span { grid-area: a; font-size: 13px; font-weight: 600; color: var(--signal); white-space: nowrap; }
+
+/* 명부 → 조직: 플레이 세력 값 (v0.13.0) */
+.dir-fac { display: flex; flex-direction: column; gap: 10px; padding: 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--sunk); }
+.dir-fac > .gx-muted { margin: -4px 0 0; font-size: 13px; }
+.dir-fac .gx-hint { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.dir-code { margin-left: 6px; padding: 1px 8px; border-radius: 999px; background: var(--signal); color: var(--void); font-size: 12px; letter-spacing: .04em; }
+.dir-in textarea { min-height: 84px; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--void); color: var(--text); font: inherit; font-size: 15px; line-height: 1.5; resize: vertical; }
+.dir-in textarea:focus { outline: none; border-color: var(--signal); }
+
+/* ── v0.14.0: 모바일 정리 · 상황판 작전 현황 · 괴담톡 공지 카드 ── */
+/* 상황판 맨 위: 위협도 + 개수 칩(누르면 그 목록으로) + 누가 어디에 투입됐는지 */
+.gx-gmark.op { background: color-mix(in srgb, var(--blue) 18%, transparent); color: var(--blue); }
+.gx-sec { scroll-margin-top: 8px; }
+/* 배치·방문자 줄: 꼬리표 + 요원 칩(사진+이름) + 세력 이름표 */
+.gx-list p.gx-people { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+.gx-people-l { font-size: 13px; font-weight: 600; color: var(--dim); margin-right: 2px; }
+.gx-pchip { display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 10px 0 3px; border-radius: 999px; background: var(--panel2); color: var(--text); font-size: 13px; font-weight: 600; white-space: nowrap; }
+.gx-ava.xs { width: 24px; height: 24px; font-size: 11px; }
+
+/* 괴담톡: 빈 목록 안내는 목록 칸 한가운데 */
+.ph-content { display: flex; flex-direction: column; }
+.ph-blank { flex: 1; display: flex; align-items: center; justify-content: center; min-height: 200px; padding: 24px 20px; text-align: center; }
+.ph-blank p { margin: 0; max-width: 300px; font-size: 15px; line-height: 1.6; color: var(--dim); }
+/* 괴담톡 공지: 대화 목록과 같은 줄 (테두리 없음, 마우스 올리면 판 색, 고르면 민트) */
+.ph-notices { gap: 2px; padding: 0; }
+.ph-notice { position: relative; border-radius: 14px; background: none; overflow: hidden; }
+.ph-notice:hover { background: var(--panel); }
+.ph-notice.on, .ph-notice.on:hover { background: var(--accent-bg); }
+.ph-ncard { width: 100%; display: flex; flex-direction: column; align-items: stretch; gap: 6px; padding: 10px 12px; border: 0; background: none; color: var(--text); text-align: left; font: inherit; cursor: pointer; }
+.ph-ncard-top { display: flex; align-items: center; gap: 8px; min-width: 0; padding-right: 40px; min-height: 26px; }
+.ph-ncard-top small { flex: 1; min-width: 0; font-size: 12px; color: var(--dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ph-nfac { flex: none; max-width: 9em; padding: 1px 8px; border-radius: 999px; border: 1px solid var(--line2); background: var(--panel2); color: var(--sub); font-size: 11.5px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ph-notice-facs { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 8px; padding: 0 8px; }
+.ph-notice-facs .gx-chip small { margin-left: 4px; font-family: var(--mono); font-size: 11px; opacity: .75; }
+.ph-ncard-title { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.ph-ncard-title b { flex: 1; min-width: 0; font-size: 15px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ph-notice .ph-ndel { position: absolute; top: 8px; right: 8px; }
+.ph-notice .ph-tool.ph-ndel { width: 34px; height: 34px; }
+.ph-notice-bar { padding: 0 8px; }
+/* 모바일에서 펼친 공지는 판 색 바탕으로 읽기 쉽게 */
+@media (max-width: 760px) { .ph-notice.open, .ph-notice.open:hover { background: var(--panel); } }
+.ph-notice-body { margin: 0 14px 14px; padding: 12px 0 0; border-top: 1px solid var(--line); font-size: 15px; line-height: 1.7; word-break: keep-all; overflow-wrap: anywhere; }
+.ph-notice.open .ph-ncard-title b { white-space: normal; }
+/* PC는 목록에 첫 줄·제목만, 본문은 오른쪽 칸 */
+@media (min-width: 761px) { .ph-notice-body { display: none; } }
+.ph-row .ph-rdel { flex: none; }
+.ph-row .ph-tool.ph-rdel { width: 34px; height: 34px; color: var(--dim); }
+.ph-row .ph-tool.ph-rdel:hover { color: var(--danger); }
+.ph-notice .ph-tool.ph-ndel { color: var(--dim); }
+.ph-notice .ph-tool.ph-ndel:hover { color: var(--danger); }
+
+/* 위키 설정 등 작은 선택 버튼: 글자가 칸 밖으로 넘치지 않게 */
+.gx-segs-sm .gx-seg { flex: 0 0 auto; }
+
+@media (max-width: 760px) {
+  /* 커스텀 임무: 모바일은 한 칸 (예전엔 .gx-field.gx-mission 두 칸 규칙이 이겨서 안내문이 세로로 한 글자씩 깨졌다) */
+  .gx-field.gx-mission { grid-template-columns: minmax(0, 1fr); }
+  /* 위키 설정: 선택 버튼 줄을 칸 너비만큼 */
+  .nw-settings .gx-segs { justify-self: stretch; display: flex; }
+  .nw-settings .gx-seg { flex: 1 0 auto; }
+}
+@media (max-width: 520px) {
+  /* 머리글: 날짜·시간이 잘리지 않게 위협도 알약은 숫자만 */
+  .gx-head-act { gap: 6px; }
+  .gx-brand { gap: 10px; }
+  .gx-brand small { overflow: visible; text-overflow: clip; }
+}
+
+/* v0.15 지도 확대: 칸은 그대로, 안쪽 그림만 확대·이동 */
+.gx-mapzoom { position: relative; transform-origin: 0 0; }
+.gx-canvas.ph .gx-mapzoom { position: absolute; inset: 0; }
+.gx-mapzoom .gx-pin { transform: translate(-50%, -50%) scale(var(--pz, 1)); }
+.gx-canvas[data-map] { touch-action: pan-x pan-y; user-select: none; -webkit-user-select: none; }
+.gx-canvas:is(.zoomed, .pan) { touch-action: none; cursor: grab; }
+.gx-canvas:is(.zoomed, .pan):active { cursor: grabbing; }
+.gx-mapimg { -webkit-user-drag: none; pointer-events: none; }
+.gx-zbtn.txt { font-size: 12px; font-weight: 700; letter-spacing: -.02em; }
+.gx-zoom { position: absolute; right: 8px; bottom: 8px; display: flex; flex-direction: column; gap: 6px; z-index: 2; }
+.gx-zbtn {
+  width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--line);
+  background: color-mix(in srgb, var(--void) 88%, transparent); color: var(--text);
+  font-family: inherit; font-size: 18px; font-weight: 600; line-height: 1; padding: 0; display: grid; place-items: center; cursor: pointer;
+}
+.gx-zbtn:hover { border-color: var(--signal); }
+.gx-zbtn.reset { display: none; font-size: 16px; }
+.gx-canvas.zoomed .gx-zbtn.reset { display: grid; }
+@media (max-width: 760px) { .gx-zbtn { width: 40px; height: 40px; } }
+
+/* v0.15 왼쪽 위 간이 상태창 */
+.gx-stat { list-style: none; margin: 0; padding: 10px 12px; display: grid; gap: 6px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+.gx-stat li { display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 8px; align-items: baseline; font-size: 13px; }
+.gx-stat span { font-size: 11px; font-weight: 700; letter-spacing: .06em; color: var(--dim); }
+.gx-stat b { font-weight: 600; color: var(--text); overflow-wrap: anywhere; }
+.gx-stat b .y { opacity: .7; }
+
+/* 설정 → 업데이트 */
+.gx-mini.primary { background: var(--signal); border-color: var(--signal); color: var(--on-signal); font-weight: 600; }
+.upd-ver { font-family: var(--mono); font-size: 13px; color: var(--sub); white-space: nowrap; }
+.upd-ver b { color: var(--signal); }
+.upd-act { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 14px; border-top: 1px solid var(--panel2); }
+.upd-plan { margin: 0; padding: 0 14px 4px 32px; display: grid; gap: 4px; font-size: 13px; color: var(--sub); }
+.upd-plan small { color: var(--dim); }
+.ps-rows > .ps-note { margin: 0; padding: 0 14px 12px; }
+.ps-rows > .gx-err, .ps-rows > .gx-hint { margin: 0 14px 14px; padding: 10px 12px; font-size: 14px; }
+.upd-banner { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin: 8px var(--gx-pad, 20px) 4px; padding: 10px 12px 10px 14px; border-radius: 14px; background: var(--accent-bg); border: 1px solid var(--accent-line); }
+.upd-banner-t { font-size: 14px; color: var(--sub); min-width: 0; }
+.upd-banner-t b { color: var(--text); margin-right: 4px; }
+.upd-banner-b { display: flex; gap: 6px; flex: none; }
+.gx-x { position: relative; }
+.gx-xdot { position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; border-radius: 50%; background: var(--signal); box-shadow: 0 0 0 2px var(--panel); }
+
+/* 추가 요청·시작할 상황 입력칸 (v0.16.7) */
+.gx-note { display: flex; flex-direction: column; gap: 6px; margin-top: 12px; }
+.gx-note textarea { width: 100%; box-sizing: border-box; min-height: 76px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--void); color: var(--text); font: inherit; font-size: 15px; line-height: 1.55; resize: vertical; }
+.gx-note textarea:focus { outline: none; border-color: var(--signal); box-shadow: 0 0 0 3px color-mix(in srgb, var(--signal) 18%, transparent); }
+.gx-note textarea::placeholder { color: var(--dim); opacity: .8; }
+.gx-team .gx-note { margin-top: 0; }
+/* 편성 칸 (v0.16.21): 작전 메모는 PC 기본 두 줄, 출발·임무 요청 버튼은 낮게 (사용자 요청) */
+.gx-team .gx-note textarea { min-height: 0; }
+.gx-team .gx-start { min-height: 44px; border-radius: 12px; font-size: 16px; }
+.gx-notice { margin: 12px 20px 0; }
+/* 지원 인원 카드: 요원 카드와 같은 모양, 인원은 카드 안 −/+ */
+.gx-scard { grid-column: 1 / -1; align-items: center; cursor: default; }
+.gx-scard .gx-ava { color: var(--signal); background: var(--accent-bg); }
+.gx-scard .gx-ava svg { width: 26px; height: 26px; }
+.gx-scard-step { display: flex; align-items: center; gap: 6px; flex: none; }
+.gx-scard-step b { min-width: 18px; text-align: center; font-variant-numeric: tabular-nums; font-size: 16px; }
+.gx-scard-step .gx-step { width: 32px; height: 32px; border-radius: 9px; color: var(--text); }
+.gx-acard.pick.gx-scard.on { border-color: var(--signal); box-shadow: inset 0 0 0 1px var(--signal); }
+.gx-acard.pick.gx-scard.on .gx-acard-top b { color: var(--signal); }
+@media (max-width: 760px) { .gx-acard.pick.gx-scard { padding-right: 8px; } }
+
+/* 모바일 단계 바 (v0.16.9): 목표 고르기와 편성을 한 화면씩. PC는 두 칸이라 숨김 */
+.gx-stepbar { display: none; }
+@media (max-width: 760px) {
+  .gx-stepbar { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .gx-stepbar.has-swap { grid-template-columns: 1fr 1fr 84px; }
+  /* 임무↔커스텀 전환: 단계 바 오른쪽 끝 (v0.16.18) */
+  .gx-stepswap { display: flex; align-items: center; justify-content: center; gap: 4px; padding: 0 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); color: var(--sub); font: inherit; font-size: 13px; font-weight: 700; white-space: nowrap; }
+  .gx-stepswap svg { width: 16px; height: 16px; }
+  .gx-stepb { display: flex; align-items: center; gap: 10px; min-width: 0; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); color: var(--text); font: inherit; text-align: left; }
+  .gx-stepb i { flex: none; display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: var(--panel2); color: var(--dim); font-style: normal; font-size: 13px; font-family: var(--mono); }
+  .gx-stepb span { display: flex; flex-direction: column; min-width: 0; }
+  .gx-stepb b { font-size: 15px; }
+  .gx-stepb small { font-size: 12px; color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .gx-stepb.on { border-color: var(--signal); background: var(--accent-bg); }
+  .gx-stepb.on i { background: var(--signal); color: var(--void); }
+  .gx-stepb.on small { color: var(--sub); }
+  .gx-field[data-step="goal"] .gx-team { display: none; }
+  .gx-field[data-step="team"] > .gx-mapcol, .gx-field[data-step="team"] .gx-sidecol > .gx-sec { display: none; }
+}
+@media (max-width: 760px) {
+  /* 편성 요원: 한 줄에 한 명 (v0.16.18: 두 칸은 글이 너무 좁았다, 사용자 결정) */
+  .gx-acards.pick { grid-template-columns: minmax(0, 1fr); }
+  .gx-acard.pick { gap: 8px; padding: 8px; align-items: center; }
+  .gx-acard.pick .gx-ava { width: 40px; height: 40px; border-radius: 11px; }
+  /* 두 칸이면 이름 옆에 상태를 두면 이름이 잘려서, 이름 → 상태 → 부서 순으로 쌓는다 */
+  .gx-acard.pick .gx-acard-top { gap: 3px; flex-wrap: wrap; }
+  .gx-acard.pick .gx-acard-top b { flex: 0 1 auto; padding-right: 0; }
+  .gx-acard.pick .gx-st { flex: none; height: 18px; padding: 0 6px; gap: 4px; font-size: 11px; }
+  .gx-acard.pick .gx-st::before { width: 5px; height: 5px; }
+  .gx-acard.pick .gx-acard-top b { font-size: 14px; }
+  .gx-acard.pick small { white-space: normal; font-size: 12px; line-height: 1.35; }
+  .gx-acard.pick .gx-acard-sit { display: none; }
+  .gx-acard.pick .gx-acard-check { top: 6px; right: 6px; transform: none; width: 18px; height: 18px; font-size: 11px; }
+}
+@media (max-width: 760px) {
+  /* 모바일 편성 단계 (v0.16.11, 사용자 요청): 작전 메모·작전 개시는 아래에 두고 요원 목록만 스크롤 */
+  .gx-field[data-step="team"] { display: flex; flex-direction: column; align-items: stretch; overflow: hidden; padding-bottom: 12px; }
+  .gx-field[data-step="team"] > .gx-sidecol { flex: 1; min-height: 0; }
+  .gx-field[data-step="team"] .gx-team { flex: 1; min-height: 0; }
+  .gx-field[data-step="team"] .gx-team .gx-acards.pick { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; align-content: start; margin: 0 -4px; padding: 0 4px 2px; }
+}
+
+/* 아이콘만 있는 작은 버튼 (상황 행의 지도·위키·종료 등, v0.16.17: 글자 버튼 상자가 눈에 띄었다) */
+.gx-icon { display: grid; place-items: center; width: 30px; height: 30px; padding: 0; border: 0; border-radius: 8px; background: none; color: var(--dim); cursor: pointer; flex: none; }
+.gx-icon:hover { color: var(--signal); background: var(--panel2); }
+.gx-icon svg { width: 17px; height: 17px; }
+.gx-ev { position: relative; }
+.gx-ev > .gx-evact { position: absolute; top: 6px; right: 6px; flex-direction: row; align-items: center; gap: 0; padding: 0; }
+.gx-evs .gx-ev .gx-evmain > .gx-row:first-child { padding-right: 96px; }
+.gx-mlist .gx-ev .gx-evmain { padding-right: 44px; }
+/* 임무 탭 (v0.16.17): 지도 아래 상황 목록, 오른쪽 위 편성. 왼쪽 칸이 길어지니 붙여 두지 않는다 */
+.gx-field.gx-map > .gx-mapcol { position: static; }
+.gx-mapcol > .gx-sits { padding: 4px 0 0; }
+/* 상황 필터 줄 (v0.16.21): 종류 필터 + 오른쪽 끝 장소 선택 취소. 고른 장소는 목록 맨 앞 카드로 */
+.gx-sitbar { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+.gx-sitbar .gx-chip { flex: none; }
+.gx-unplace { margin-left: 4px; border-color: color-mix(in srgb, var(--danger) 45%, var(--line)); background: color-mix(in srgb, var(--danger) 16%, var(--panel)); color: var(--danger); font-weight: 700; }
+.gx-unplace:hover:not(:disabled) { background: color-mix(in srgb, var(--danger) 26%, var(--panel)); }
+/* 고른 것이 없을 때는 자리만 지키고 흐리게 (2026-10-21 사용자: 구석이라 안 보여서 특수 칩 바로 오른쪽, 색 바탕) */
+.gx-unplace:disabled { border-color: var(--line); background: none; color: var(--dim); font-weight: 600; opacity: .5; cursor: default; }
+.gx-mfilter .gx-unplace { margin-left: 0; }
+.gx-evc .gx-gmark.pl { background: var(--accent-bg); color: var(--signal); }
+.gx-goaltag { flex: none; font-size: 11.5px; padding: 3px 8px; border-color: var(--accent-line); background: var(--accent-bg); color: var(--signal); }
+/* 임무 탭 편성 카드 (v0.16.17): 상황판 요원 카드와 같은 모양, 한 줄에 한 명, 배경만 다르다 */
+.gx-acard.pick.wide { cursor: pointer; align-items: center; gap: 12px; padding: 10px 12px; }
+.gx-acard.pick.wide .gx-ava { width: 64px; height: 64px; border-radius: 14px; font-size: 22px; }
+.gx-acard.pick.wide:hover:not(.off) { border-color: var(--line2); }
+.gx-acard.pick.wide.off { opacity: .45; cursor: not-allowed; }
+.gx-acard.pick.wide .gx-acard-top { padding-right: 60px; }
+.gx-acard.pick.wide .gx-acard-sit { -webkit-line-clamp: 2; }
+.gx-acard.pick.wide .gx-acard-check { top: auto; bottom: 8px; right: 10px; transform: none; }
+@media (min-width: 761px) {
+  .gx-map .gx-acards.pick, .gx-mission .gx-acards.pick { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  /* PC 임무 탭: 오른쪽 편성은 창 높이에 붙여 두고 요원 목록만 스크롤, 작전 메모·출발은 아래 고정 (사용자 요청) */
+  /* 높이 = 창 높이 − 머리 60 − 본문 위아래 여백 9+16 − 창 테두리 2 − 소수점 여유 1. 테두리를 빼먹어 본문이 2px 넘쳐 휠마다 움찔거렸다 (v0.16.18) */
+  /* 기둥 높이는 창 높이 공식 대신 본문 높이에 맞춘다 (2026-10-27: 시작 전 커스텀 임무 화면에서 전체가 스크롤되던 문제) */
+  .gx-body.gx-field.gx-mission, .gx-body.gx-field.gx-map { grid-template-rows: minmax(0, 1fr); align-items: stretch; align-content: stretch; overflow: hidden; }
+  .gx-map > .gx-sidecol, .gx-mission > .gx-sidecol { position: static; height: auto; min-height: 0; overflow: hidden; }
+  /* 커스텀 왼쪽 목록도 오른쪽 편성과 같은 높이로 끝을 맞춘다 */
+  .gx-mission > .gx-mapcol { position: static; height: auto; min-height: 0; overflow: hidden; }
+  .gx-mission .gx-mbox { flex: 1; min-height: 0; max-height: none; }
+  .gx-map > .gx-sidecol > .gx-team, .gx-mission > .gx-sidecol > .gx-team { flex: 1; min-height: 0; }
+  .gx-map .gx-team .gx-acards.pick, .gx-mission .gx-team .gx-acards.pick { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; align-content: start; margin: 0 -4px; padding: 0 4px 2px; }
+  .gx-map .gx-team > .gx-note, .gx-map .gx-team > .gx-start, .gx-mission .gx-team > .gx-note, .gx-mission .gx-team > .gx-start { flex: none; }
+}
+@media (max-width: 760px) {
+  /* 모바일: 위 두 줄(임무·커스텀, 목표·편성)을 낮게 (v0.16.17) */
+  .gx-field { padding-top: 10px; row-gap: 12px; }
+  /* 목표·편성·전환 줄은 위에 고정, 아래만 스크롤 (사용자 요청) */
+  .gx-stepbar { gap: 6px; position: sticky; top: -10px; z-index: 3; margin: -10px -16px 0; padding: 10px 16px 8px; background: var(--void); }
+  .gx-stepb { gap: 8px; padding: 6px 10px; border-radius: 10px; }
+  .gx-stepb i { width: 20px; height: 20px; font-size: 12px; }
+  .gx-stepb span { flex-direction: row; align-items: baseline; gap: 6px; }
+  .gx-stepb b { font-size: 14px; flex: none; }
+  /* 편성 단계: 요원 목록이 넓게. 작전 메모는 한 줄로 접어 두고 누르면 펼친다 */
+  /* 목표·인원은 위 목표·편성 줄에 이미 나온다 */
+  .gx-team > .gx-goal { display: none; }
+  .gx-field[data-step="team"] .gx-note { gap: 4px; }
+  /* 작전 메모 칸: 누르면 늘어나니 스크롤 막대는 숨김 (v0.16.18) */
+  .gx-note textarea { scrollbar-width: none; }
+  .gx-note textarea::-webkit-scrollbar { display: none; }
+  .gx-field[data-step="team"] .gx-note textarea { min-height: 0; height: 42px; padding: 9px 12px; resize: none; }
+  .gx-field[data-step="team"] .gx-note textarea:focus, .gx-field[data-step="team"] .gx-note textarea.filled { height: 96px; }
+  .gx-field[data-step="team"] .gx-note textarea:not(:focus)::placeholder { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .gx-field[data-step="team"] .gx-team { gap: 8px; }
+  /* 임무 탭 편성 카드: 상황판 모바일 요원 카드처럼 두 칸 가로 배치 */
+  .gx-acard.pick.wide .gx-acard-top { padding-right: 0; }
+  .gx-acard.pick.wide .gx-acard-top b { flex: 0 1 auto; padding-right: 0; font-size: 13.5px; }
+  .gx-acard.pick.wide .gx-acard-sit { display: -webkit-box; font-size: 12px; }
+}
+
+/* 소속 사진 패널 안의 상태 (v0.16.12: 따로 있던 간이 상태창을 패널 안으로) */
+/* 세로 ID카드 (v0.16.22): 맨 위 유저 사진·이름, 아래 소속과 상태. 소속 사진이 아래에서 위로 옅어지며 비친다 */
+.gx-id { position: relative; display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 18px 14px 14px; border: 1px solid var(--line); border-radius: 18px; overflow: hidden; background: var(--panel); isolation: isolate; text-align: center; }
+.gx-id-bg { position: absolute; inset: 0; z-index: -1; background-size: cover; background-position: center 30%; opacity: .38; -webkit-mask-image: linear-gradient(0deg, #000 0%, rgba(0, 0, 0, .55) 45%, transparent 85%); mask-image: linear-gradient(0deg, #000 0%, rgba(0, 0, 0, .55) 45%, transparent 85%); }
+.gx-id-photo { position: relative; display: grid; place-items: center; width: 112px; height: 112px; border-radius: 20px; overflow: hidden; background: var(--panel2); color: var(--dim); border: 1px solid var(--line); flex: none; }
+.gx-id-photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.gx-id-photo.none svg { width: 44px; height: 44px; }
+.gx-id-who { display: flex; flex-direction: column; gap: 3px; min-width: 0; max-width: 100%; }
+.gx-id-who b { font-size: 17px; font-weight: 800; line-height: 1.25; color: var(--text); overflow-wrap: anywhere; }
+.gx-id-who small { font-size: 12.5px; font-weight: 600; color: var(--signal); overflow-wrap: anywhere; }
+.gx-id .gx-op-st { align-self: stretch; text-align: left; margin-top: 0; }
+.gx-idbtn { display: none; overflow: hidden; padding: 0; }
+.gx-idbtn img { width: 100%; height: 100%; object-fit: cover; }
+.gx-idpop-card { position: relative; width: 300px; max-width: 100%; max-height: calc(100% - 8px); overflow-y: auto; }
+.gx-idpop-card .gx-id { padding: 24px 18px 18px; }
+.gx-idpop-card .gx-id-photo { width: 160px; height: 160px; border-radius: 24px; }
+.gx-idpop-card .gx-agpop-x { z-index: 1; }
+@media (max-width: 760px) { .gx-idbtn { display: grid; } }
+.gx-op-st { display: flex; flex-direction: column; gap: 3px; margin-top: 8px; padding-top: 8px; border-top: 1px solid color-mix(in srgb, var(--line) 80%, transparent); }
+.gx-op-ln { display: flex; gap: 6px; align-items: baseline; min-width: 0; font-size: 12.5px; line-height: 1.4; }
+.gx-op-ln i { flex: none; font-style: normal; font-size: 10.5px; font-weight: 700; letter-spacing: .06em; color: var(--dim); }
+.gx-op-ln em { font-style: normal; font-weight: 600; color: var(--text); min-width: 0; overflow-wrap: anywhere; }
+.gx-op-meta { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 0 8px; margin-top: 2px; font-size: 11.5px; color: var(--sub); font-variant-numeric: tabular-nums; }
+.gx-op-wait { font-size: 12px; line-height: 1.45; color: var(--sub); text-align: center; word-break: keep-all; }
+/* 글이 사진 전체를 덮으니 위쪽도 어둡게 (v0.16.16: 소속 이름 위 빈 공간을 없앴다) */
+
+/* 상황판 다시 설계 (v0.16.13) */
+/* 상황판 (v0.16.15 촘촘하게): 괴이·사건·특수 세 칸, 행은 한 줄. 위협도는 머리에만 (v0.16.16) */
+.gx-board { gap: 14px; }
+.gx-bd-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 12px; align-items: start; }
+.gx-board .gx-bd-col { min-width: 0; padding: 0; }
+.gx-bd-col h2 { display: flex; align-items: baseline; gap: 6px; margin: 0 0 8px; font-size: 15px; color: var(--text); }
+.gx-bd-col h2 small { font-size: 13px; font-weight: 500; color: var(--dim); }
+.gx-bd-col .gx-none { margin: 0; padding: 10px 12px; font-size: 13px; border: 1px dashed var(--line); border-radius: 12px; }
+/* 괴이·사건·특수 카드 한 장 (상황판·임무 탭 공통, v0.16.17) */
+.gx-evcs { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+/* 임무 탭 상황 목록: 상황판 칸 너비(240px~)에 맞춰 한 줄에 두 장 이상 (v0.16.18) */
+.gx-sits .gx-evcs { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr)); align-items: stretch; }
+.gx-evc { display: flex; align-items: flex-start; gap: 10px; min-width: 0; padding: 10px 10px 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+.gx-evc.go { cursor: pointer; }
+.gx-evc.go:hover { border-color: var(--line2); }
+.gx-evc.sel { border-color: var(--signal); box-shadow: inset 0 0 0 1px var(--signal); }
+.gx-evc .gx-gmark { flex: none; width: 28px; height: 28px; border-radius: 8px; font-size: 13px; font-style: normal; }
+.gx-evc-main { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
+.gx-evc-top { display: flex; align-items: center; justify-content: space-between; gap: 6px; min-width: 0; min-height: 26px; }
+.gx-evc-name { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.gx-evc-tags { display: flex; align-items: center; gap: 4px; flex: none; }
+.gx-evc-tags .gx-badge { font-size: 11.5px; padding: 3px 8px; }
+.gx-evc-name b { min-width: 0; font-size: 14.5px; font-weight: 700; line-height: 1.35; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gx-evc-top > .gx-badge { flex: none; font-size: 11.5px; padding: 3px 8px; }
+.gx-evc-main > small { font-size: 12.5px; color: var(--dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gx-evc-who { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin-top: 4px; }
+.gx-evc-who .gx-pchip { height: 24px; font-size: 12px; padding-right: 8px; }
+.gx-evc-who .gx-badge { font-size: 11.5px; padding: 4px 8px; }
+.gx-evc-sit { margin-top: 2px; font-size: 12.5px; line-height: 1.45; color: var(--sub); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.gx-evc-act { display: flex; align-items: center; flex: none; margin: -4px -4px -4px auto; }
+.gx-evc-act .gx-icon { width: 26px; height: 26px; }
+.gx-evc-act .gx-icon svg { width: 15px; height: 15px; }
+.gx-evc-act .gx-mini { min-height: 26px; padding: 0 8px; font-size: 12px; }
+/* 상황 딱지 (v0.16.21, 사용자 요청: 알록달록해서 눈에 안 들어온다): 괴이는 붉은 계열, 사건은 노란 계열, 특수는 파란 계열로 통일.
+   괴이는 바탕은 모두 같고 등급 글자만 높을수록 밝게 빛난다 */
+.gx-evc .gx-gmark.an { background: var(--danger-bg); color: color-mix(in srgb, var(--danger) 70%, transparent); font-size: 14px; font-weight: 800; }
+.gx-gmark.an.g-s { color: #fff; text-shadow: 0 0 4px var(--danger), 0 0 10px var(--danger), 0 0 16px var(--danger); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--danger) 60%, transparent); }
+.gx-gmark.an.g-a { color: color-mix(in srgb, var(--danger) 55%, #fff); text-shadow: 0 0 4px var(--danger), 0 0 9px color-mix(in srgb, var(--danger) 70%, transparent); }
+.gx-gmark.an.g-b { color: var(--danger); text-shadow: 0 0 6px color-mix(in srgb, var(--danger) 45%, transparent); }
+.gx-gmark.an.g-c { color: color-mix(in srgb, var(--danger) 80%, transparent); }
+.gx-gmark.an.g-d, .gx-gmark.an.g-e { color: color-mix(in srgb, var(--danger) 55%, transparent); }
+/* 밝은·종이 테마: 흰 글자 빛남은 옅은 바탕에서 번진 얼룩처럼 보여 글자가 안 읽힌다 → 진한 글자에 작은 빛 */
+.gx[data-theme="light"] .gx-gmark.an.g-s, .gx[data-theme="paper"] .gx-gmark.an.g-s { color: var(--danger); text-shadow: 0 0 6px color-mix(in srgb, var(--danger) 50%, transparent); }
+.gx[data-theme="light"] .gx-gmark.an.g-a, .gx[data-theme="paper"] .gx-gmark.an.g-a { color: var(--danger); text-shadow: 0 0 4px color-mix(in srgb, var(--danger) 35%, transparent); }
+.gx[data-theme="light"] .gx-gmark.an.g-b, .gx[data-theme="paper"] .gx-gmark.an.g-b { text-shadow: none; }
+.gx-evc .gx-gmark.in { background: var(--amber-bg); color: var(--amber); }
+.gx-evc .gx-gmark.ms { background: color-mix(in srgb, var(--blue) 16%, transparent); color: var(--blue); }
+.gx-evc .gx-gmark svg { width: 16px; height: 16px; }
+/* 진행 중인 행은 눌러서 지도로, 오른쪽 위 아이콘 (v0.16.17) */
+#gx-sec-ag { scroll-margin-top: 12px; }
+/* 요원 카드: 사진 크게 */
+.gx-acard-act { position: absolute; top: 8px; right: 8px; display: flex; gap: 2px; }
+.gx-acard-tool { display: grid; place-items: center; width: 30px; height: 30px; padding: 0; border: 0; border-radius: 8px; background: none; color: var(--dim); cursor: pointer; }
+.gx-acard-tool:hover { color: var(--signal); }
+.gx-acard-tool svg { width: 18px; height: 18px; }
+.gx-board .gx-acard:has(.gx-acard-act) .gx-acard-top { padding-right: 60px; }
+.gx-board .gx-acards { grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); gap: 8px; }
+.gx-board .gx-acard { align-items: center; gap: 12px; padding: 10px 12px; cursor: pointer; }
+.gx-board .gx-acard .gx-ava { width: 72px; height: 72px; border-radius: 16px; font-size: 26px; }
+@media (max-width: 760px) {
+  /* 모바일 요원 카드: 한 줄에 한 명 (v0.16.18 사용자 결정) */
+  .gx-board .gx-acards { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  .gx-board .gx-acard-top b { font-size: 13.5px; }
+  .gx-board .gx-acard-txt small, .gx-board .gx-acard-sit { font-size: 12px; white-space: normal; }
+  .gx-board .gx-acard:has(.gx-acard-act) .gx-acard-top { padding-right: 0; }
+}
+/* 사진+톡·위키 칸: PC는 없는 셈 치고(사진은 그대로, 버튼은 카드 오른쪽 위) */
+.gx-acard-side { display: contents; }
+/* 모바일 요원 카드 (상황판·임무 편성 공통, v0.16.18): 한 줄에 한 명이라 PC와 같은 배치. 사진만 조금 작게, 톡·위키는 오른쪽 위에 손가락 크기로 */
+@media (max-width: 760px) {
+  .gx-board .gx-acard, .gx-acard.pick.wide { flex-wrap: nowrap; align-items: center; gap: 10px; padding: 10px; }
+  .gx-board .gx-acard .gx-ava, .gx-acard.pick.wide .gx-ava { width: 60px; height: 60px; border-radius: 14px; font-size: 22px; }
+  .gx-board .gx-acard-act, .gx-acard.pick.wide .gx-acard-act { position: absolute; top: 4px; right: 4px; display: flex; gap: 2px; margin: 0; }
+  .gx-board .gx-acard-tool, .gx-acard.pick.wide .gx-acard-tool { width: 36px; height: 34px; }
+  .gx-board .gx-acard-tool svg, .gx-acard.pick.wide .gx-acard-tool svg { width: 18px; height: 18px; }
+  /* 이름·상태 줄은 버튼 자리만큼 비우고, 딱지는 높이 고정 (줄이 바뀌어도 찌그러지지 않게) */
+  .gx-board .gx-acard-top, .gx-acard.pick.wide .gx-acard-top { flex-wrap: wrap; row-gap: 4px; column-gap: 6px; padding-right: 76px; }
+  .gx-board .gx-acard-top b, .gx-acard.pick.wide .gx-acard-top b { flex: 0 1 auto; max-width: 100%; }
+  .gx-board .gx-st, .gx-acard.pick.wide .gx-st { flex: none; height: 20px; line-height: 20px; padding: 0 7px; font-size: 11.5px; }
+  .gx-board .gx-acard-txt small, .gx-acard.pick.wide .gx-acard-txt small, .gx-board .gx-acard-sit, .gx-acard.pick.wide .gx-acard-sit { white-space: normal; word-break: keep-all; overflow-wrap: anywhere; }
+  .gx-board .gx-acard { cursor: pointer; }
+}
+.gx-agpop { position: fixed; inset: 0; z-index: 2147483647; display: grid; place-items: center; padding: 20px; background: var(--scrim); }
+.gx-agpop-card { position: relative; display: flex; flex-direction: column; align-items: center; gap: 14px; width: 340px; max-width: 100%; max-height: calc(100% - 8px); overflow-y: auto; box-sizing: border-box; padding: 20px; border: 1px solid var(--line); border-radius: 18px; background: var(--panel); color: var(--text); }
+.gx-agpop-card .gx-ava { width: 200px; height: 200px; border-radius: 22px; flex: none; font-size: 64px; }
+/* 사진 아래 한 줄: 이름·상태 왼쪽, 부서·직급 오른쪽. 상황은 그 아래 전체 폭 */
+.gx-agpop-txt { align-self: stretch; display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; column-gap: 10px; row-gap: 8px; min-width: 0; padding: 0 4px; }
+.gx-agpop-txt small { text-align: right; }
+.gx-agpop-txt .gx-acard-sit { grid-column: 1 / -1; }
+.gx-agpop-txt .gx-acard-top { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.gx-agpop-txt .gx-acard-top b { font-size: 16px; }
+.gx-agpop-txt small { font-size: 13px; color: var(--dim); }
+.gx-agpop-txt .gx-acard-sit { display: block; -webkit-line-clamp: unset; overflow: visible; font-size: 14px; line-height: 1.55; color: var(--sub); white-space: pre-wrap; }
+.gx-agpop-x { position: absolute; top: 10px; right: 10px; width: 30px; height: 30px; border: 0; border-radius: 8px; background: var(--panel2); color: var(--sub); }
+
+/* PC 상황판 (v0.16.21): 창 전체는 스크롤하지 않는다. 괴이·사건·특수는 진행 중 카드 세 장 높이까지, 넘치면 그 칸 안에서 스크롤.
+   요원은 남은 높이를 다 쓰고 넘치면 요원 칸 안에서 스크롤. 창 높이 950은 진행 중 괴이 3개 + 요원 4줄(설명 두 줄)이 딱 들어가는 높이 */
+@media (min-width: 761px) {
+  /* 괴이·사건·특수 칸은 비어 있어도 같은 높이 (사용자: 괴이가 없으면 요원이 딸려 올라가면 안 됨) */
+  .gx-board > .gx-bd-cols { flex: none; height: 350px; align-items: stretch; }
+  .gx-board .gx-bd-col { display: flex; flex-direction: column; min-height: 0; }
+  .gx-board .gx-bd-col > .gx-evcs { flex: 1 1 0; min-height: 0; max-height: none; overflow-y: auto; overscroll-behavior: contain; align-content: start; }
+  .gx-board .gx-bd-col > .gx-evcs > * { flex-shrink: 0; }
+  .gx-board .gx-bd-col > .gx-none { flex: 1 1 0; display: grid; place-items: center; text-align: center; }
+  .gx-board > #gx-sec-ag { flex: 1 1 0; min-height: 240px; display: flex; flex-direction: column; }
+  .gx-board > #gx-sec-ag > .gx-acards { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; align-content: start; }
+}
+
+/* 괴담넷 (v0.16.22): 괴담톡과 같은 두 칸. 왼쪽 목록, 오른쪽 글·쪽지·새 글·설정 */
+.gn-off { display: flex; flex-direction: column; padding: 0; overflow: hidden; }
+.gn-nickform { display: flex; gap: 6px; }
+.gn-nickform .gx-search { flex: 1; min-width: 0; }
+.gn-mynick { display: flex; flex-direction: column; align-items: flex-end; justify-content: center; min-width: 0; padding: 0 6px 2px; line-height: 1.25; }
+.gn-mynick small { font-size: 11px; color: var(--dim); }
+.gn-mynick b { max-width: 100%; font-size: 14px; color: var(--signal); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gn-list { gap: 4px; padding: 0 8px; }
+.gn-row { border-radius: 12px; }
+.gn-row-main { width: 100%; display: flex; flex-direction: column; gap: 4px; padding: 10px 12px; border: 1px solid transparent; border-radius: 12px; background: none; color: var(--text); text-align: left; font: inherit; cursor: pointer; }
+.gn-row-main:hover { background: var(--panel); }
+.gn-row.on .gn-row-main { background: var(--accent-bg); border-color: var(--accent-line); }
+.gn-title { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.gn-title b { min-width: 0; font-size: 15px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gn-title em { flex: none; font-style: normal; font-size: 13px; font-weight: 700; color: var(--amber); }
+.gn-title .gn-dot { margin-left: 0; flex: none; }
+.gn-row-meta { display: flex; gap: 10px; min-width: 0; font-size: 12px; color: var(--dim); white-space: nowrap; overflow: hidden; }
+.gn-row.mine .gn-row-nick { color: var(--signal); }
+.gn-ava { color: var(--signal); background: var(--accent-bg); }
+.gn-ava svg { width: 24px; height: 24px; }
+.gn-dm-t { font-size: 11px; color: var(--dim); padding: 0 6px; }
+/* 글 본문 + 댓글: 게시판 글 모양 (제목줄·구분선·댓글 줄). 가운데만 스크롤, 아래 입력줄 고정 */
+.gn-doc { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; display: flex; flex-direction: column; padding: 16px 22px 24px; }
+.gn-post { display: flex; flex-direction: column; }
+.gn-post-head { padding: 14px 4px 12px; border-top: 2px solid var(--line2); border-bottom: 1px solid var(--line); }
+.gn-post-title { margin: 0 0 8px; font-size: 20px; font-weight: 700; line-height: 1.4; color: var(--text); overflow-wrap: anywhere; }
+.gn-post-meta { display: flex; align-items: center; gap: 4px 12px; flex-wrap: wrap; font-size: 13px; color: var(--dim); }
+.gn-post-who { font-size: 14px; }
+.gn-post-stat { margin-left: auto; display: flex; gap: 12px; }
+.gn-post-body { min-height: 120px; padding: 22px 4px 28px; font-size: 16px; line-height: 1.8; overflow-wrap: anywhere; border-bottom: 1px solid var(--line); }
+.gn-csec { display: flex; flex-direction: column; margin-top: 20px; }
+.gn-chead { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 0 0 10px 4px; border-bottom: 2px solid var(--line2); }
+.gn-ccount { margin: 0; font-size: 15px; font-weight: 700; color: var(--text); }
+.gn-ccount b { color: var(--amber); }
+.gn-cnone { margin: 0; padding: 24px; text-align: center; color: var(--dim); font-size: 14px; border-bottom: 1px solid var(--line); }
+.gn-comments { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.gn-c { display: grid; grid-template-columns: 150px minmax(0, 1fr) auto; align-items: start; gap: 4px 14px; padding: 12px 4px 12px calc(4px + var(--gn-depth, 0) * 20px); border-bottom: 1px solid var(--panel2); }
+.gn-c.re { background: color-mix(in srgb, var(--panel) 45%, transparent); }
+.gn-c.unread .gn-c-body { color: var(--text); font-weight: 600; }
+.gn-c.target { background: var(--accent-bg); }
+.gn-c-who { display: flex; align-items: center; gap: 4px; min-width: 0; min-height: 28px; font-size: 14px; overflow: hidden; }
+.gn-c-who > b, .gn-c-who > button { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gn-re { flex: none; color: var(--dim); font-size: 14px; }
+.gn-c-body { padding-top: 3px; font-size: 15px; line-height: 1.65; color: var(--sub); overflow-wrap: anywhere; }
+.gn-c-act { display: flex; align-items: center; gap: 2px; }
+.gn-c-time { margin-right: 6px; font-family: var(--mono); font-size: 12px; color: var(--dim); white-space: nowrap; }
+.gn-reply { min-height: 28px; padding: 0 10px; border: 0; border-radius: 8px; background: none; color: var(--dim); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+.gn-reply:hover { background: var(--panel2); color: var(--text); }
+.gn-c .ph-tool.gn-cdel { width: 28px; height: 28px; }
+.gn-c .ph-tool.gn-cdel, .gn-pane .ph-act .ph-tool { color: var(--dim); }
+.gn-c .ph-tool.gn-cdel:hover, .gn-pane .ph-act .ph-tool:hover { color: var(--danger); }
+.gn-nick { border: 0; background: none; padding: 0; color: var(--mint); font: inherit; font-weight: 700; cursor: pointer; }
+.gn-nick:hover { text-decoration: underline; text-underline-offset: 3px; }
+.gn-me { color: var(--signal); font-weight: 700; }
+.gn-replyto { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 4px 4px 4px 14px; border-radius: 12px; background: var(--accent-bg); color: var(--signal); font-size: 13px; font-weight: 600; }
+.gn-replyto span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gn-to { margin: 0; font-size: 14px; color: var(--sub); }
+.gn-text { min-height: 140px; padding: 12px 14px; resize: vertical; line-height: 1.6; }
+.ps-text { width: 260px; max-width: 100%; }
+@media (max-width: 760px) {
+  .gn-doc { padding: 10px 12px 16px; }
+  .gn-post-title { font-size: 18px; }
+  .gn-post-stat { margin-left: 0; }
+  .gn-c { grid-template-columns: minmax(0, 1fr) auto; padding-left: calc(4px + var(--gn-depth, 0) * 14px); }
+  .gn-c-body { grid-column: 1 / -1; grid-row: 2; padding-top: 0; }
+  .ps-text { width: 100%; }
+}
+/* 모바일 괴담넷: 목록 안에서 펼침 */
+.gn-inline { display: flex; flex-direction: column; margin: 0 0 8px; border-top: 1px solid var(--line); }
+.gn-inline .gn-doc { flex: none; overflow: visible; padding: 4px 6px 8px; }
+.gn-inline .gn-post-head { border-top: 0; padding-top: 8px; }
+.gn-inline .gn-post-meta { align-items: center; }
+.gn-inline-del { margin-left: auto; }
+.ph-side > .gn-composer { margin: 0 -12px; }
+.ph-side > .gn-composer .ph-back2 { display: none !important; }
+.gn-dm-inline .ph-log { flex: none; overflow: visible; padding: 8px 6px; }
+.ph-row:has(> .gn-dm-inline) { flex-wrap: wrap; padding-right: 0; }
+.ph-row > .gn-dm-inline { flex: 1 0 100%; }
+.gn-row.on:has(> .gn-inline) .gn-row-main { border-color: transparent; }
+.gn-row:has(> .gn-inline) { background: var(--panel); border: 1px solid var(--line); }
+/* 괴담톡 공지 본문: 공지문 모양 (상자 없이 제목줄·구분선·서명) */
+.ph-ndoc-body { flex: 1; min-height: 0; overflow-y: auto; padding: 18px 24px 28px; }
+.ph-ndoc-head { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; padding: 16px 4px 14px; border-top: 2px solid var(--line2); border-bottom: 1px solid var(--line); }
+.ph-ndoc-head h3 { margin: 0; font-size: 20px; font-weight: 700; line-height: 1.4; color: var(--text); overflow-wrap: anywhere; }
 .ph-ndoc-meta { display: flex; gap: 12px; flex-wrap: wrap; font-size: 13px; color: var(--dim); }
 .ph-ndoc-text { padding: 22px 4px 26px; font-size: 15px; line-height: 1.85; color: var(--text); word-break: keep-all; overflow-wrap: anywhere; }
 .ph-ndoc-meta b { color: var(--sub); font-weight: 600; }
@@ -334,11 +888,14 @@ t: 1.4; color: var(--text); overflow-wrap: anywhere; }
 .adv-reset { flex: none; width: 32px; height: 32px; }
 .adv-numrow { flex-wrap: nowrap; }
 .adv-numrow .ps-label { flex: 1 1 auto; }
-.adv-num input::placeholder { color: var(--dim); opacity: 1; }
 .adv-row.changed .ps-label b::before { content: ''; display: inline-block; width: 6px; height: 6px; margin-right: 7px; border-radius: 50%; background: var(--signal); vertical-align: middle; transform: translateY(-1px); }
-.adv-num { display: inline-flex; align-items: center; gap: 6px; }
-.adv-num input { width: 96px; min-height: 34px; padding: 0 10px; text-align: right; }
-.adv-num span { min-width: 2.4em; font-size: 13px; color: var(--dim); white-space: nowrap; }
+.adv-step { gap: 6px; }
+.adv-step input.adv-val { width: 6.2em; min-height: 32px; height: 32px; padding: 0 6px; border: 1px solid transparent; border-radius: 8px; background: transparent; color: var(--signal); font: inherit; font-size: 14px; font-weight: 700; text-align: center; font-variant-numeric: tabular-nums; }
+.adv-step input.adv-val:focus { outline: none; border-color: var(--line); background: var(--void); }
+.adv-step input.adv-val::placeholder { color: var(--dim); font-weight: 600; opacity: 1; }
+.adv-step span { font-size: 13px; color: var(--dim); white-space: nowrap; }
+.adv-step input.adv-val { -moz-appearance: textfield; appearance: textfield; }
+.adv-step input.adv-val::-webkit-inner-spin-button, .adv-step input.adv-val::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 .adv-chips .gx-chips { margin: 0; }
 .adv-chips .gx-chip { cursor: pointer; font: inherit; font-size: 13px; }
 .ps-adv-sub { border: 1px solid var(--line); border-radius: 16px; background: var(--void); }
@@ -350,11 +907,8 @@ t: 1.4; color: var(--text); overflow-wrap: anywhere; }
 .adv-foot.st-confirm { justify-content: space-between; flex-wrap: wrap; gap: 8px; }
 @media (max-width: 760px) {
   .ps-adv-body { padding: 4px 10px 12px; }
-  .adv-num input { width: 80px; }
   .adv-numrow { padding: 10px 8px 10px 12px; gap: 8px; }
 }
-.adv-num input { -moz-appearance: textfield; appearance: textfield; }
-.adv-num input::-webkit-inner-spin-button, .adv-num input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 /* 설정·명부 줄은 위에 고정, 명부 탭에서는 그 아래 괴이·특수·요원·조직 줄도 함께 (--stbar는 app.ts가 위 줄 높이로 채움) */
 .gx-panel .gx-content > .gx-body.gx-settings { padding-top: 0; }
 .gx-panel.has-nav .gx-content > .gx-settings > .st-scopebar, .gx-panel .gx-content > .gx-settings > .st-scopebar { position: sticky; top: 0; z-index: 4; padding: 12px 0 8px; margin-bottom: -14px; background: var(--void); }
@@ -1405,6 +1959,16 @@ button.mk-go:hover { color: var(--signal); }
 .gx-x { width: 36px; height: 36px; border-radius: 8px; }
 .pp-upbar, .ph-act, .gx-row-btns { gap: 8px; }
 .gx-row-btns { display: flex; flex-wrap: wrap; align-items: center; }
+/* 스위치 (ON/OFF 둘뿐인 선택. 2026-10-27 리수폿식) */
+.gx-switch { position: relative; flex: none; width: 36px; height: 20px; padding: 0; border: 1px solid var(--line); border-radius: 12px; background: var(--sunk, var(--panel2)); cursor: pointer; vertical-align: middle; }
+.gx-switch i { position: absolute; left: 3px; top: 3px; width: 12px; height: 12px; border-radius: 50%; background: var(--dim); transition: transform .15s; }
+.gx-switch[aria-checked="true"] { background: var(--signal); border-color: var(--signal); }
+.gx-switch[aria-checked="true"] i { transform: translateX(16px); background: var(--on-signal, #fff); }
+.gx-switch:disabled { opacity: .4; cursor: default; }
+.gx-switch-wrap { display: inline-flex; align-items: center; gap: 8px; }
+.gx-switch-wrap small { font-size: 11.5px; color: var(--dim); white-space: nowrap; }
+/* 범위 배지: 이 줄의 값이 어디에 저장되나 (이 기기 공통) */
+.gx-scope { display: inline-block; margin-left: 6px; padding: 1px 6px; border-radius: 5px; font-style: normal; font-size: 10.5px; font-weight: 500; color: var(--dim); background: var(--panel2); vertical-align: middle; }
 `;
 
   // src/ui/mbar.ts
@@ -1472,7 +2036,7 @@ button.mk-go:hover { color: var(--signal); }
   }
 
   // src/ui/marks.ts
-  var esc24 = (s5) => String(s5 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  var esc27 = (s5) => String(s5 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   var key = (m) => JSON.stringify(m.s);
   var icon = (m) => ICONS[m.s.tab] ?? ICONS.board;
   var markUi = { pop: false };
@@ -1491,12 +2055,12 @@ button.mk-go:hover { color: var(--signal); }
     if (!markUi.pop) return "";
     const list4 = marks();
     const full = list4.length >= MARK_MAX;
-    const mine = list4.length ? `<ul class="mk-rows">${list4.map((m, i) => `<li class="mk-row"><button class="mk-go" data-action="mk-go" data-value="${i}">${icon(m)}<span>${esc24(m.name)}</span></button>
-        <button class="ph-tool sm" data-action="mk-del" data-value="${i}" aria-label="${esc24(m.name)} 빼기" title="빼기">${ICONS.close}</button></li>`).join("")}</ul>` : '<p class="mk-empty">아래 지금 화면이나 최근 본 화면의 ＋를 누르면 여기에 담겨요. 빼려면 오른쪽 ×를 누르세요.</p>';
-    const here = current4 && !isMarked(current4) ? `<button class="mk-here" data-action="mk-here" ${full ? "disabled" : ""}>${ICONS.plus}<span>지금 화면 · ${esc24(current4.name)}</span></button>` : "";
+    const mine = list4.length ? `<ul class="mk-rows">${list4.map((m, i) => `<li class="mk-row"><button class="mk-go" data-action="mk-go" data-value="${i}">${icon(m)}<span>${esc27(m.name)}</span></button>
+        <button class="ph-tool sm" data-action="mk-del" data-value="${i}" aria-label="${esc27(m.name)} 빼기" title="빼기">${ICONS.close}</button></li>`).join("")}</ul>` : '<p class="mk-empty">아래 지금 화면이나 최근 본 화면의 ＋를 누르면 여기에 담겨요. 빼려면 오른쪽 ×를 누르세요.</p>';
+    const here = current4 && !isMarked(current4) ? `<button class="mk-here" data-action="mk-here" ${full ? "disabled" : ""}>${ICONS.plus}<span>지금 화면 · ${esc27(current4.name)}</span></button>` : "";
     const cand = markCandidates(recent, current4);
-    const more = cand.length ? `<h4>최근 본 화면</h4><ul class="mk-rows">${cand.map((m, i) => `<li class="mk-row"><span class="mk-go">${icon(m)}<span>${esc24(m.name)}</span></span>
-        <button class="ph-tool sm" data-action="mk-add" data-value="${i}" aria-label="${esc24(m.name)} 추가" title="추가" ${full ? "disabled" : ""}>${ICONS.plus}</button></li>`).join("")}</ul>` : "";
+    const more = cand.length ? `<h4>최근 본 화면</h4><ul class="mk-rows">${cand.map((m, i) => `<li class="mk-row"><span class="mk-go">${icon(m)}<span>${esc27(m.name)}</span></span>
+        <button class="ph-tool sm" data-action="mk-add" data-value="${i}" aria-label="${esc27(m.name)} 추가" title="추가" ${full ? "disabled" : ""}>${ICONS.plus}</button></li>`).join("")}</ul>` : "";
     return `<button class="mk-scrim" data-action="mk-pop" aria-label="즐겨찾기 닫기"></button>
     <div class="mk-pop" role="dialog" aria-label="즐겨찾기">
       <div class="mk-head"><b>즐겨찾기</b><small>${list4.length}/${MARK_MAX}</small><button class="ph-tool sm" data-action="mk-pop" aria-label="닫기">${ICONS.close}</button></div>
@@ -1514,7 +2078,7 @@ button.mk-go:hover { color: var(--signal); }
     if (!list4.length) return `<button class="mk-hint" data-action="mk-pop">${ICONS.star}<span>좌우로 밀어 즐겨찾기를 추가하세요</span></button>`;
     return Array.from({ length: MARK_MAX }, (_, i) => {
       const m = list4[i];
-      return m ? `<button class="ph-tool mk-slot" data-action="mk-go" data-value="${i}" aria-label="${esc24(m.name)}" title="${esc24(m.name)}">${icon(m)}<span class="ph-tool-l">${esc24(m.name)}</span></button>` : `<button class="ph-tool mk-slot empty" data-action="mk-pop" aria-label="즐겨찾기 추가">${ICONS.plus}</button>`;
+      return m ? `<button class="ph-tool mk-slot" data-action="mk-go" data-value="${i}" aria-label="${esc27(m.name)}" title="${esc27(m.name)}">${icon(m)}<span class="ph-tool-l">${esc27(m.name)}</span></button>` : `<button class="ph-tool mk-slot empty" data-action="mk-pop" aria-label="즐겨찾기 추가">${ICONS.plus}</button>`;
     }).join("");
   }
 
@@ -1773,1165 +2337,4 @@ button.mk-go:hover { color: var(--signal); }
       try {
         v = JSON.parse(await getText3("index.json"));
       } catch {
-        throw new GameFileError("게임 파일 목록을 받지 못했어요.");
-      }
-      if (!v || typeof v.version !== "string" || !Array.isArray(v.code?.parts) || !Array.isArray(v.packs)) throw new GameFileError("게임 파일 목록이 올바르지 않아요.");
-      return v;
-    })();
-    index.catch(() => index = null);
-    return index;
-  }
-  var forgetIndex = () => void (index = null);
-  function base643(b) {
-    let out = "";
-    for (let i = 0; i < b.length; i += 32768) out += String.fromCharCode(...b.subarray(i, i + 32768));
-    return btoa(out);
-  }
-  var unbase64 = (s5) => Uint8Array.from(atob(s5), (c) => c.charCodeAt(0));
-
-  // src/host/game/code.ts
-  var CODE_KEY = "goei:game:code";
-  var VERSION = true ? "0.17.4" : "";
-  var codeVersion = (code2) => /^\/\/ goei-game (\S+)/.exec(code2)?.[1] ?? null;
-  var mod = null;
-  var codeStats = { readMs: 0, runMs: 0, bytes: 0, fromNet: false };
-  async function codeState() {
-    if (mod) return "ready";
-    try {
-      const saved = await risuai.pluginStorage.getItem(CODE_KEY);
-      if (typeof saved !== "string") return "none";
-      return codeVersion(saved) === VERSION ? "ready" : "old";
-    } catch {
-      return "none";
-    }
-  }
-  function runGameCode(code2) {
-    const g = globalThis;
-    delete g.__goeiGame;
-    const nonce = [...document.querySelectorAll("script")].map((s6) => s6.nonce).find(Boolean);
-    const s5 = document.createElement("script");
-    if (nonce) s5.nonce = nonce;
-    s5.textContent = code2;
-    document.head.append(s5);
-    s5.remove();
-    const api = g.__goeiGame;
-    delete g.__goeiGame;
-    if (!api || typeof api.mount !== "function") throw new GameFileError("게임 코드를 실행하지 못했어요.");
-    if (VERSION && api.version !== VERSION) throw new GameFileError(`게임 코드 판(${api.version})이 플러그인(${VERSION})과 달라요.`);
-    return api;
-  }
-  async function downloadGameCode(onPart) {
-    const idx = await gameIndex();
-    if (idx.version !== VERSION) throw new GameFileError("아직 이 판의 게임 파일이 올라오지 않았어요. 잠시 뒤 다시 받아 주세요.");
-    const code2 = new TextDecoder().decode(await getParts(idx.code.parts, onPart));
-    if (code2.length !== idx.code.length || codeVersion(code2) !== VERSION) throw new GameFileError("게임 코드를 끝까지 받지 못했어요.");
-    return code2;
-  }
-  async function installGameCode(code2) {
-    if (codeVersion(code2) !== VERSION) throw new GameFileError(`이 플러그인(${VERSION})용 게임 코드가 아니에요.`);
-    await risuai.pluginStorage.setItem(CODE_KEY, code2);
-    mod = null;
-  }
-  async function loadGameCode(onPart) {
-    if (mod) return mod;
-    const t0 = performance.now();
-    let code2 = null;
-    try {
-      const saved = await risuai.pluginStorage.getItem(CODE_KEY);
-      if (typeof saved === "string" && codeVersion(saved) === VERSION) code2 = saved;
-    } catch {
-    }
-    codeStats.fromNet = !code2;
-    if (!code2) {
-      code2 = await downloadGameCode(onPart);
-      await risuai.pluginStorage.setItem(CODE_KEY, code2);
-    }
-    const t1 = performance.now();
-    mod = runGameCode(code2);
-    codeStats.readMs = Math.round(t1 - t0);
-    codeStats.runMs = Math.round(performance.now() - t1);
-    codeStats.bytes = code2.length;
-    return mod;
-  }
-
-  // src/host/game/packs.ts
-  var KEY2 = (id) => `goei:game:pack:${id}`;
-  var MIME3 = {
-    png: "image/png",
-    webp: "image/webp",
-    avif: "image/avif",
-    gif: "image/gif",
-    jpg: "image/jpeg",
-    ogg: "audio/ogg",
-    mp3: "audio/mpeg",
-    m4a: "audio/mp4",
-    wav: "audio/wav",
-    opus: "audio/ogg",
-    json: "application/json",
-    txt: "text/plain"
-  };
-  function parseGamePack(b) {
-    if (b.length < 12 || new TextDecoder().decode(b.subarray(0, 8)) !== "GOEIPACK") return null;
-    const len = b[8] | b[9] << 8 | b[10] << 16 | b[11] << 24;
-    let head2;
-    try {
-      head2 = JSON.parse(new TextDecoder().decode(b.subarray(12, 12 + len)));
-    } catch {
-      return null;
-    }
-    if (typeof head2.id !== "string" || !Array.isArray(head2.files)) return null;
-    const at = 12 + len;
-    const files2 = /* @__PURE__ */ new Map();
-    for (const row8 of head2.files) {
-      if (!Array.isArray(row8)) return null;
-      const [name, start3, size] = row8;
-      if (typeof name !== "string" || typeof start3 !== "number" || typeof size !== "number" || at + start3 + size > b.length) return null;
-      files2.set(name, b.subarray(at + start3, at + start3 + size));
-    }
-    return { id: head2.id, hash: typeof head2.hash === "string" ? head2.hash : "", atlas: head2.atlas ?? null, files: files2 };
-  }
-  var memo = /* @__PURE__ */ new Map();
-  function stored2(id) {
-    let p = memo.get(id);
-    if (!p) {
-      p = (async () => {
-        try {
-          const raw = await risuai.pluginStorage.getItem(KEY2(id));
-          const v = typeof raw === "string" ? JSON.parse(raw) : null;
-          return v && typeof v.hash === "string" && v.files && typeof v.files === "object" ? v : null;
-        } catch {
-          return null;
-        }
-      })();
-      memo.set(id, p);
-    }
-    return p;
-  }
-  async function installGamePack(bytes, expect, hash3) {
-    const pack3 = parseGamePack(bytes);
-    if (!pack3) throw new GameFileError("괴이 ː ANOMALY 게임 팩 파일이 아니에요.");
-    if (expect && pack3.id !== expect) throw new GameFileError(`다른 팩이에요 (${pack3.id}).`);
-    const files2 = {};
-    for (const [name, b] of pack3.files) files2[name] = [MIME3[name.split(".").pop().toLowerCase()] ?? "application/octet-stream", base643(b)];
-    const value = { hash: hash3 || pack3.hash, atlas: pack3.atlas, bytes: bytes.length, files: files2 };
-    await risuai.pluginStorage.setItem(KEY2(pack3.id), JSON.stringify(value));
-    release(pack3.id);
-    memo.set(pack3.id, Promise.resolve(value));
-    return pack3.id;
-  }
-  async function downloadGamePack(entry3, onPart) {
-    const bytes = await getParts(entry3.parts, onPart);
-    if (bytes.length !== entry3.bytes) throw new GameFileError("팩을 끝까지 받지 못했어요.");
-    await installGamePack(bytes, entry3.id, entry3.hash);
-  }
-  async function packStateOf(entry3) {
-    const s5 = await stored2(entry3.id);
-    return !s5 ? "none" : s5.hash !== entry3.hash ? "old" : "ready";
-  }
-  var urls2 = /* @__PURE__ */ new Map();
-  function release(id) {
-    for (const u of urls2.get(id)?.values() ?? []) URL.revokeObjectURL(u);
-    urls2.delete(id);
-  }
-  function releaseAll() {
-    for (const id of [...urls2.keys()]) release(id);
-    memo.clear();
-  }
-  var liveUrls = () => [...urls2.values()].reduce((n2, m) => n2 + m.size, 0);
-  async function fileUrl(id, file) {
-    const have = urls2.get(id)?.get(file);
-    if (have) return have;
-    const s5 = await stored2(id);
-    const row8 = s5?.files[file] ?? s5?.files[`${file}.png`];
-    if (!row8) return "";
-    const u = URL.createObjectURL(new Blob([unbase64(row8[1])], { type: row8[0] }));
-    let m = urls2.get(id);
-    if (!m) urls2.set(id, m = /* @__PURE__ */ new Map());
-    m.set(file, u);
-    return u;
-  }
-  var gameAssets = {
-    ready: async (id) => !!await stored2(id),
-    url: fileUrl,
-    atlas: async (id) => (await stored2(id))?.atlas ?? null,
-    bytes: async (id, file) => {
-      const row8 = (await stored2(id))?.files[file];
-      return row8 ? unbase64(row8[1]) : null;
-    },
-    list: async () => {
-      let entries2 = [];
-      try {
-        entries2 = (await gameIndex()).packs;
-      } catch {
-      }
-      return Promise.all(
-        entries2.map(async (e) => {
-          const st = await packStateOf(e);
-          return { id: e.id, bytes: e.bytes, ready: st === "ready", old: st === "old" };
-        })
-      );
-    }
-  };
-
-  // src/game/bridge.ts
-  var SLOT_IDS = [0, 1, 2, 3];
-
-  // src/host/game/saves.ts
-  var SLOT_KEY = (n2) => `goei:game:slot:${n2}`;
-  var LIST_KEY = "goei:game:slots";
-  var queue = Promise.resolve();
-  var serial = (f) => {
-    const run3 = queue.then(f);
-    queue = run3.catch(() => {
-    });
-    return run3;
-  };
-  var isSlot = (n2) => SLOT_IDS.includes(n2);
-  async function readList() {
-    try {
-      const raw = await risuai.pluginStorage.getItem(LIST_KEY);
-      const v = typeof raw === "string" ? JSON.parse(raw) : null;
-      if (v && Array.isArray(v.slots)) return { slots: v.slots.filter((s5) => isSlot(s5?.slot)), last: isSlot(v.last) ? v.last : null };
-    } catch {
-    }
-    return { slots: [], last: null };
-  }
-  var writeList = (l) => risuai.pluginStorage.setItem(LIST_KEY, JSON.stringify(l));
-  var gameSaves = {
-    list: async () => {
-      await queue;
-      return (await readList()).slots.sort((a, b) => a.slot - b.slot);
-    },
-    read: async (slot) => {
-      if (!isSlot(slot)) return null;
-      await queue;
-      const v = await risuai.pluginStorage.getItem(SLOT_KEY(slot));
-      return typeof v === "string" ? v : null;
-    },
-    write: (slot, data, info) => serial(async () => {
-      if (!isSlot(slot)) throw new Error(`저장 칸 ${slot}은 없어요.`);
-      await risuai.pluginStorage.setItem(SLOT_KEY(slot), data);
-      const l = await readList();
-      const row8 = { slot, savedAt: Date.now(), title: String(info.title ?? ""), summary: String(info.summary ?? ""), schema: String(info.schema ?? ""), size: data.length };
-      l.slots = [...l.slots.filter((s5) => s5.slot !== slot), row8];
-      l.last = slot;
-      await writeList(l);
-    }),
-    remove: (slot) => serial(async () => {
-      if (!isSlot(slot)) return;
-      await risuai.pluginStorage.removeItem(SLOT_KEY(slot));
-      const l = await readList();
-      l.slots = l.slots.filter((s5) => s5.slot !== slot);
-      if (l.last === slot) l.last = l.slots.sort((a, b) => b.savedAt - a.savedAt)[0]?.slot ?? null;
-      await writeList(l);
-    }),
-    last: async () => {
-      await queue;
-      return (await readList()).last;
-    }
-  };
-
-  // src/host/game/card.ts
-  var lastChar = null;
-  async function readCard() {
-    const ctx2 = await loadContext().catch(() => null);
-    if (!ctx2) return null;
-    lastChar = ctx2.char;
-    return cardSnapshot(ctx2.char, ctx2.chat, { main: (r) => mainPic(ctx2.char, r), face: (r) => facePic(ctx2.char, r, true) });
-  }
-  async function cardPhoto(asset) {
-    if (!asset || !lastChar) return "";
-    return await assetUrl(lastChar, splitPic(asset).name) ?? "";
-  }
-  var REPORT_KEY = "goei:game:reports";
-  var KEEP = 5;
-  async function pendingReports() {
-    try {
-      const raw = await risuai.pluginStorage.getItem(REPORT_KEY);
-      const v = typeof raw === "string" ? JSON.parse(raw) : [];
-      return Array.isArray(v) ? v.filter((p) => p && normReport(p.report)) : [];
-    } catch {
-      return [];
-    }
-  }
-  var saveReports = (list4) => risuai.pluginStorage.setItem(REPORT_KEY, JSON.stringify(list4.slice(0, KEEP)));
-  var listeners2 = [];
-  var onReports = (cb) => (listeners2.push(cb), () => void (listeners2 = listeners2.filter((f) => f !== cb)));
-  async function takeReport(r) {
-    const report = normReport(r);
-    if (!report) return;
-    const list4 = await pendingReports();
-    if (report.id && list4.some((p) => p.report.id === report.id)) return;
-    await saveReports([{ at: Date.now(), report }, ...list4]);
-    listeners2.forEach((f) => f());
-  }
-  async function mark2(at, patch) {
-    const list4 = await pendingReports();
-    await saveReports(list4.map((p) => p.at === at ? { ...p, ...patch } : p));
-  }
-  var LinkError = class extends Error {
-  };
-  async function postReport(p) {
-    if (isWaiting()) throw new LinkError("응답을 받는 중이에요. 응답이 끝난 뒤 붙여 주세요.");
-    const ctx2 = await loadContext();
-    if (!ctx2) throw new LinkError("괴이 카드 채팅을 열어 주세요.");
-    const text = reportText(p.report);
-    await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
-      const list4 = chat.message ?? [];
-      const last2 = list4[list4.length - 1];
-      if (last2?.role === "user") throw new LinkError("마지막 메시지가 아직 보내지 않은 유저 메시지예요. 먼저 보내거나 지워 주세요.");
-      chat.message = [...list4, { role: "user", data: setUnsent(text, true) }];
-      return chat;
-    });
-    await mark2(p.at, { posted: true });
-  }
-  async function recordReport(p) {
-    const ctx2 = await loadContext();
-    if (!ctx2) throw new LinkError("괴이 카드 채팅을 열어 주세요.");
-    await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => withRecord(chat, p.report));
-    await mark2(p.at, { recorded: true });
-  }
-  async function clearRecord() {
-    const ctx2 = await loadContext();
-    if (!ctx2) return false;
-    return !!await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => withoutRecord(chat));
-  }
-  async function dropReport(at) {
-    await saveReports((await pendingReports()).filter((p) => p.at !== at));
-  }
-
-  // src/host/game/talk.ts
-  var gameTalk = {
-    model: (messages, which) => runModel(messages, which === "aux" ? "aux" : "main"),
-    async lore(name) {
-      const ctx2 = await loadContext().catch(() => null);
-      if (!ctx2) return null;
-      return bookText({ char: ctx2.char, chat: ctx2.chat }, name) || null;
-    },
-    async recent(n2) {
-      const ctx2 = await loadContext().catch(() => null);
-      if (!ctx2) return [];
-      const msgs3 = (ctx2.chat.message ?? []).slice(-Math.max(1, Math.min(n2, 4)));
-      return msgs3.map((m) => {
-        const t = messageText(String(m.data ?? "")).replace(/\s+/g, " ").trim();
-        if (!t) return "";
-        return `${m.role === "user" ? "주인공" : ctx2.char.name ?? "봇"}: ${t.length > 300 ? `${t.slice(0, 300)}…` : t}`;
-      }).filter(Boolean);
-    }
-  };
-
-  // src/core/fieldgate.ts
-  var IN_STATE = /작전\s*투입/;
-  function presence(i) {
-    if (i.override === "inside") return "inside";
-    const prep = (i.target ?? "").trim() ? "prep" : "none";
-    if (i.override === "outside") return prep;
-    const deployed = i.deployed ?? null;
-    if (i.player) {
-      if (IN_STATE.test(i.state ?? "")) return "inside";
-      if (deployed === true) return "unknown";
-      return prep;
-    }
-    if (deployed === true) return "inside";
-    if (deployed === null) return prep === "prep" ? "unknown" : "none";
-    return prep;
-  }
-  function entryDecision(p) {
-    if (p === "inside") return { allow: false, presence: p, reason: "본편에서 지금 괴이 안에 있어요. 밖으로 나온 뒤에 들어갈 수 있어요." };
-    if (p === "unknown") return { allow: true, presence: p, notice: "본편 상태를 확실히 판단하지 못해 그대로 들어가요." };
-    return { allow: true, presence: p };
-  }
-
-  // src/core/fieldsites.ts
-  var SITES = [
-    { id: "hq", name: "관리국 본부", factions: [] }
-  ];
-  var FALLBACK_SITE = SITES[0];
-  function siteFor(faction) {
-    const f = faction.trim();
-    const hit3 = f ? SITES.find((s5) => s5.factions.includes(f)) : void 0;
-    return hit3 ? { site: hit3, exact: true } : { site: FALLBACK_SITE, exact: false };
-  }
-
-  // src/core/people/field.ts
-  var CUE_OF = { gift: "작은친절", quest: "도움", provoke: "무시", hurt: "파탄", down: "파탄", kill: "중대위반" };
-  function targets(store, ev, player) {
-    return (ev.who ?? []).filter((w) => w !== player && w !== "@user" && store.people[w]);
-  }
-  function applyFieldEvent(store, chat, ev, player = "주인공", o = {}) {
-    let n2 = 0;
-    const cue = CUE_OF[ev.kind];
-    const group6 = `${ev.anchor}|${ev.visit ?? ""}|${ev.scene ?? ""}`;
-    if (cue && ev.witness?.faction && (ev.witness.named || (o.mobWeight ?? "half") !== "off")) {
-      const code2 = ev.witness.faction;
-      const scale = ev.witness.named || o.mobWeight === "full" ? 1 : 0.5;
-      const fw = factionWho(code2);
-      if (!store.factions[code2]) store.factions[code2] = { code: code2, name: o.factionNames?.[code2] || ORG_NAMES[code2] || code2, seeded: { at: new Date(ev.at || Date.now()).toISOString() } };
-      const seq = store.log.filter((c) => c.anchor === ev.anchor).length;
-      if (putChange(store, { id: changeId(fw, "cue", ev.anchor, 0, `${ev.kind}:${ev.id}`), anchor: ev.anchor, seq, src: "field", who: fw, kind: "cue", cue, group: group6, ...scale !== 1 ? { scale } : {}, reason: `필드(${ev.witness.named ? "명단 인물" : "몹"} 목격): ${ev.text}`.slice(0, 80) })) n2++;
-    }
-    const who = targets(store, ev, player);
-    if (!who.length) return n2;
-    const live = liveness(chat);
-    for (const name of who) {
-      const seq = store.log.filter((c) => c.anchor === ev.anchor).length + (store.people[name].slots.state?.length ?? 0);
-      if (cue) {
-        if (putChange(store, { id: changeId(name, "cue", ev.anchor, 0, `${ev.kind}:${ev.id}`), anchor: ev.anchor, seq, src: "field", who: name, kind: "cue", cue, group: group6, reason: `필드: ${ev.text}`.slice(0, 80) })) n2++;
-      }
-      const state = liveEntries(store.people[name].slots.state, live);
-      const put = (text, replaces) => {
-        if (putEntry(store, name, "state", { id: entryId(name, "state", ev.anchor, 0, `${ev.kind}:${ev.id}`), text, src: "field", anchor: ev.anchor, seq, ...replaces ? { replaces } : {} })) n2++;
-      };
-      if (ev.kind === "hurt" || ev.kind === "down") put(`${ev.kind === "down" ? "중상" : "부상"} (필드${ev.scene ? ` · ${ev.scene}` : ""})`);
-      if (ev.kind === "kill") put("사망 (필드)");
-      if (ev.kind === "follow") put("유저와 동행 중");
-      if (ev.kind === "unfollow") {
-        const f = state.find((e) => e.text.startsWith("유저와 동행 중"));
-        if (f) put("(해소) 유저와 동행 중", f.id);
-      }
-      if (ev.kind === "appoint" && putEntry(store, name, "threads", { id: entryId(name, "threads", ev.anchor, 0, `${ev.kind}:${ev.id}`), text: `약속: ${ev.text}`.slice(0, 200), src: "field", anchor: ev.anchor, seq, target: "@user" })) n2++;
-      if (["gift", "quest", "hurt", "down", "kill", "follow", "appoint", "call"].includes(ev.kind)) {
-        if (putEntry(store, name, "history", { id: entryId(name, "history", ev.anchor, 0, `${ev.kind}:${ev.id}`), text: `(필드) ${ev.text}`.slice(0, 200), src: "field", anchor: ev.anchor, seq })) n2++;
-      }
-    }
-    return n2;
-  }
-
-  // src/host/game/field.ts
-  var KINDS3 = ["move", "act", "hurt", "down", "kill", "flee", "provoke", "gift", "trade", "quest", "follow", "unfollow", "enter_anomaly", "exit_anomaly", "enter_site", "detected", "appoint", "call"];
-  function createField() {
-    const opening = loadContext();
-    let chain = Promise.resolve();
-    let forced = null;
-    return {
-      override(v) {
-        forced = v;
-      },
-      async entry() {
-        const c = await loadContext();
-        if (!c) return { allow: true, presence: "unknown", site: "hq", minute: null };
-        const snap = cardSnapshot(c.char, c.chat);
-        const st = lastStatusFields((c.chat.message ?? []).filter((m) => m.role === "char").slice(-6).map((m) => String(m.data ?? "")));
-        const me = snap.agents.find((a) => a.id === snap.player);
-        const p = presence({ player: !!me, state: me?.state, target: st?.target, deployed: st?.deployed ?? null, override: forced });
-        const t = /(\d{1,2}):(\d{2})/.exec(st?.time ?? "");
-        const minute = snap.minute ?? (t ? Number(t[1]) * 60 + Number(t[2]) : null);
-        return { ...entryDecision(p), site: siteFor(snap.faction).site.id, minute };
-      },
-      record(ev) {
-        const run3 = async () => {
-          const origin = await opening;
-          if (!origin) return;
-          const c = await loadContext();
-          if (!c || c.charIndex !== origin.charIndex || c.chatIndex !== origin.chatIndex || c.char.chaId !== origin.char.chaId || c.chat.id !== origin.chat.id) return;
-          if (!KINDS3.includes(ev.kind)) return;
-          const event = { id: crypto.randomUUID(), at: Date.now(), anchor: anchorOf(c.chat), kind: ev.kind, text: ev.text, scene: ev.scene, who: ev.who, weight: ev.weight, fact: ev.fact, ...ev.witness && typeof ev.witness.faction === "string" ? { witness: { faction: ev.witness.faction, named: !!ev.witness.named } } : {}, ...typeof ev.visit === "string" && ev.visit ? { visit: ev.visit } : {} };
-          await updateChat(c.charIndex, c.chatIndex, (chat) => {
-            if (chat.id !== c.chat.id) return null;
-            let next2 = withFieldEvent(chat, event);
-            if (peopleSettings(next2.scriptstate).on) {
-              const store = peopleStore(next2);
-              if (applyFieldEvent(store, next2, event, playerAgent(c.char.globalLore, next2.scriptstate)?.name ?? "주인공", { mobWeight: peopleSettings(next2.scriptstate).mobWeight, factionNames: factionNamesOf2(c.char.globalLore) }) > 0) next2 = withPeople(next2, store);
-            }
-            return next2;
-          });
-        };
-        const next = chain.then(run3, run3);
-        chain = next.catch(() => {
-        });
-        return next;
-      }
-    };
-  }
-
-  // src/host/game/people.ts
-  function createPeople() {
-    return {
-      async people(names4) {
-        const c = await loadContext().catch(() => null);
-        if (!c) return [];
-        const settings = peopleSettings(c.chat.scriptstate);
-        if (!settings.on) return [];
-        const store = peopleStore(c.chat);
-        const live = liveness(c.chat);
-        const changes = liveChanges(store, live);
-        const list4 = Object.values(store.people).filter((p) => !names4 || names4.includes(p.name));
-        return list4.map((p) => {
-          const aff = affinityView(p, changes, store.folded[p.name] ?? 0, { temper: temperOf(p.name), speed: settings.speed, turnCap: settings.turnCap });
-          const texts = (k) => liveEntries(p.slots[k], live).map((e) => e.text);
-          const note = settings.director === "facts" ? latestNote(store, p.name, live) : null;
-          return {
-            name: p.name,
-            faction: p.faction,
-            aliases: p.aliases,
-            affinity: { value: aff.value, stage: aff.stage.label, cell: aff.stage.cell },
-            address: addressOf(p, changes),
-            express: p.express,
-            state: texts("state"),
-            knowledge: texts("knowledge"),
-            threads: texts("threads"),
-            suspicion: liveEntries(p.slots.suspicion, live).map((e) => ({ target: e.target ?? "", kind: e.kind ?? "", text: e.text })),
-            ...note ? { note } : {}
-          };
-        });
-      },
-      async sheet(name) {
-        const c = await loadContext().catch(() => null);
-        if (!c) return null;
-        const settings = peopleSettings(c.chat.scriptstate);
-        const store = peopleStore(c.chat);
-        const p = store.people[name];
-        const sheet = bookText({ char: c.char, chat: c.chat }, name) || null;
-        if (!settings.on || !p) return sheet;
-        const live = liveness(c.chat);
-        const changes = liveChanges(store, live);
-        return personBlock(p, store, live, changes, { sheet, mode: settings.inject === "off" ? "split" : settings.inject, unknown: settings.features.has("perception") ? unknownTo(p, store, live) : [], user: "방문자", note: settings.director === "facts" ? latestNote(store, name, live) : null, temper: temperOf(name), speed: settings.speed, turnCap: settings.turnCap });
-      },
-      async factions() {
-        const c = await loadContext().catch(() => null);
-        if (!c) return [];
-        const settings = peopleSettings(c.chat.scriptstate);
-        if (!settings.on || !settings.features.has("faction_rep")) return [];
-        const store = peopleStore(c.chat);
-        const changes = liveChanges(store, liveness(c.chat));
-        const names4 = factionNamesOf2(c.char.globalLore);
-        const uf = userFactionOf(store, c.chat);
-        return knownFactionCodes(store, names4).map((code2) => {
-          const f = factionNow(store, code2, changes, uf, settings, names4);
-          return { code: code2, name: f.name, value: f.value, stage: f.stage.id, stageLabel: f.stage.label, bounds: settings.factionBounds };
-        });
-      },
-      onChange(cb) {
-        let wasBusy = false;
-        return onPeopleStatus((s5) => {
-          if (wasBusy && !s5.busy) cb();
-          wasBusy = s5.busy;
-        });
-      }
-    };
-  }
-
-  // src/host/game/index.ts
-  function makeBridge(viewport2, slot, close2, onHidden) {
-    return {
-      api: 1,
-      uiPrefs: createUiPrefs(),
-      visit: createVisit(),
-      field: createField(),
-      people: createPeople(),
-      slot,
-      saves: gameSaves,
-      assets: gameAssets,
-      card: readCard,
-      photo: cardPhoto,
-      talk: gameTalk,
-      report: (r) => void takeReport(r).catch((e) => console.log(`[goei] 게임 결과를 받지 못했어요: ${String(e)}`)),
-      viewport: viewport2,
-      waiting: isWaiting,
-      onWaiting,
-      narrow: () => matchMedia("(max-width: 760px)").matches,
-      close: close2,
-      onHidden
-    };
-  }
-
-  // src/host/game/viewport.ts
-  var portrait = () => innerHeight > innerWidth;
-  var phone2 = () => Math.min(innerWidth, innerHeight) <= 560 || matchMedia("(pointer: coarse)").matches;
-  function makeViewport(layer2, opt = {}) {
-    let full = false;
-    let mode2 = null;
-    let winFill = false;
-    let rotated = false;
-    let wantRotate = false;
-    const subs3 = /* @__PURE__ */ new Set();
-    const emit = () => subs3.forEach((f) => f());
-    const apply = () => {
-      const rot = !opt.inFrame && wantRotate && full && portrait() && phone2();
-      if (rot !== rotated) rotated = rot;
-      layer2.classList.toggle("gx-full", full);
-      layer2.classList.toggle("gx-panelfull", mode2 === "panel");
-      layer2.classList.toggle("gx-winfull", mode2 === "browser" && winFill);
-      layer2.classList.toggle("gx-rot", rotated);
-      emit();
-    };
-    const onResize = () => apply();
-    const onFs = () => {
-      if (!document.fullscreenElement && layer2.dataset.nativeFs === "1") {
-        if (mode2 === "browser") mode2 = null;
-        full = opt.inFrame ? full : false;
-        wantRotate = false;
-        delete layer2.dataset.nativeFs;
-        apply();
-      }
-    };
-    addEventListener("resize", onResize);
-    document.addEventListener("fullscreenchange", onFs);
-    const mq = matchMedia("(orientation: portrait)");
-    mq.addEventListener?.("change", onResize);
-    const vp = {
-      get full() {
-        return full;
-      },
-      get rotated() {
-        return rotated;
-      },
-      get mode() {
-        return mode2;
-      },
-      async enter(kind = "browser") {
-        full = true;
-        wantRotate = true;
-        if (kind === "panel") {
-          if (document.fullscreenElement) await document.exitFullscreen().catch(() => {
-          });
-          delete layer2.dataset.nativeFs;
-          mode2 = "panel";
-          return apply();
-        }
-        mode2 = "browser";
-        winFill = true;
-        try {
-          if (layer2.requestFullscreen && document.fullscreenEnabled) {
-            await layer2.requestFullscreen({ navigationUI: "hide" });
-            layer2.dataset.nativeFs = "1";
-            winFill = false;
-            try {
-              await screen.orientation.lock("landscape");
-            } catch {
-            }
-          }
-        } catch {
-        }
-        apply();
-      },
-      fill(on2) {
-        if (!on2 && document.fullscreenElement) return void vp.exit();
-        full = on2;
-        wantRotate = on2;
-        apply();
-      },
-      async exit() {
-        full = opt.inFrame && mode2 !== null ? full : false;
-        mode2 = null;
-        winFill = false;
-        wantRotate = false;
-        if (document.fullscreenElement) {
-          try {
-            screen.orientation?.unlock?.();
-          } catch {
-          }
-          await document.exitFullscreen().catch(() => {
-          });
-        }
-        delete layer2.dataset.nativeFs;
-        apply();
-      },
-      toLocal(x, y, el) {
-        const r = el.getBoundingClientRect();
-        return rotated ? { x: y - r.top, y: r.right - x } : { x: x - r.left, y: y - r.top };
-      },
-      onChange(cb) {
-        subs3.add(cb);
-        return () => void subs3.delete(cb);
-      },
-      dispose() {
-        removeEventListener("resize", onResize);
-        document.removeEventListener("fullscreenchange", onFs);
-        mq.removeEventListener?.("change", onResize);
-        subs3.clear();
-        if (document.fullscreenElement === layer2) void document.exitFullscreen().catch(() => {
-        });
-      }
-    };
-    return vp;
-  }
-
-  // src/ui/game.ts
-  var layer = null;
-  var viewport = null;
-  var unmount = null;
-  var view = "home";
-  var generation = 0;
-  var busy3 = "";
-  var notice = "";
-  var offReports = null;
-  var gameStats = { openMs: 0, codeMs: 0, mountMs: 0, heapOpen: 0, heapAfter: 0 };
-  globalThis.__goeiGameStats = { game: gameStats, code: codeStats, fetch: fetchStats, urls: liveUrls };
-  var heap = () => performance.memory?.usedJSHeapSize ?? 0;
-  var esc25 = (s5) => String(s5 ?? "").replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
-  var kb = (n2) => n2 >= 1024 * 1024 ? `${(n2 / 1024 / 1024).toFixed(1)}MB` : `${Math.max(1, Math.round(n2 / 1024))}KB`;
-  var when3 = (t) => {
-    const d = new Date(t);
-    return `${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
-  };
-  async function files() {
-    const code2 = await codeState();
-    let index2 = null;
-    try {
-      index2 = await gameIndex();
-    } catch {
-    }
-    const need = [];
-    for (const p of index2?.packs ?? []) if (p.required && await packStateOf(p) !== "ready") need.push({ id: p.id, bytes: p.bytes });
-    const bytes = (code2 === "ready" ? 0 : index2?.code.bytes ?? 0) + need.reduce((n2, p) => n2 + p.bytes, 0);
-    return { index: index2, code: code2, need, bytes };
-  }
-  var row7 = (label2, help, ctl = "") => `<div class="ps-row"><div class="ps-label"><b>${label2}</b>${help ? `<small>${help}</small>` : ""}</div>${ctl ? `<div class="ps-ctl gx-gl-ctl">${ctl}</div>` : ""}</div>`;
-  var group5 = (title2, rows2) => `<section class="ps-group"><h3>${title2}</h3><div class="ps-rows">${rows2}</div></section>`;
-  var dis = () => busy3 ? " disabled" : "";
-  var msgOf = () => busy3 || notice ? `<span role="status">${esc25(busy3 || notice)}</span>` : "";
-  var needFiles = (f) => f.code !== "ready" || f.need.length > 0;
-  function filesHtml(f) {
-    if (!needFiles(f)) return "";
-    const what = msgOf() || (f.code === "old" ? "플러그인이 바뀌어 게임 파일을 새로 받아야 해요." : "처음 한 번만 받아요. 받은 파일은 이 기기의 Risu에 저장돼요.");
-    const size = f.index ? ` (${kb(f.bytes)})` : "";
-    return group5("게임 파일", row7("게임 파일 받기", what, `<button class="gx-mini primary" data-g="get"${dis()}>받기${size}</button><button class="gx-mini" data-g="file"${dis()}>파일로 넣기</button>`));
-  }
-  function startHtml(slots, last2, ready) {
-    const s5 = slots.find((x) => x.slot === last2) ?? slots.sort((x, y) => y.savedAt - x.savedAt)[0];
-    const help = ready && msgOf() || (s5 ? `마지막 저장 · ${when3(s5.savedAt)}${s5.summary ? ` · ${esc25(s5.summary)}` : ""}` : "요원들을 만나 대화해요. 나눈 말은 다음 본편 요청에 막간으로 들어가요.");
-    return group5("필드", row7("본부", help, `<button class="gx-mini primary" data-g="play"${ready ? "" : " disabled"}>들어가기</button>`));
-  }
-  function linkHtml(card2, reports2, record) {
-    if (!card2) return group5("본편 연동", row7("채팅 연결 안 됨", "괴이 카드 채팅을 열면 명부 요원과 상황판을 게임이 읽어요."));
-    const n2 = (k) => card2.events.filter((e) => e.kind === k).length;
-    const free = card2.agents.filter((a) => !a.locked).length;
-    const reps = reports2.map((p) => row7(
-      esc25(p.report.mission),
-      `${{ return: "귀환", evac: "후송", withdraw: "자발 철수" }[p.report.outcome]}${p.report.depth ? ` · ${esc25(p.report.depth)}` : ""} · ${when3(p.at)}${p.report.summary ? ` · ${esc25(p.report.summary)}` : ""}`,
-      `<button class="gx-mini${p.posted ? "" : " primary"}" data-g="post" data-at="${p.at}"${p.posted || busy3 ? " disabled" : ""}>${p.posted ? "채팅에 놓음" : "보고서 붙이기"}</button>
-     <button class="gx-mini" data-g="record" data-at="${p.at}"${p.recorded || busy3 ? " disabled" : ""}>${p.recorded ? "기록함" : "기록 로어북에 남기기"}</button>
-     <button class="gx-mini" data-g="drop" data-at="${p.at}" aria-label="결과 지우기">${ICONS.trash}</button>`
-    )).join("");
-    return group5("본편 연동", [
-      row7("이 채팅에서 읽은 것", `요원 ${card2.agents.length}명(편성 가능 ${free}) · 괴이 ${n2("an")} · 사건 ${n2("in")} · 특수 ${n2("ms")}`),
-      reps || "",
-      record ? row7(`「${esc25(RECORD_COMMENT)}」 로어북`, `${record}줄`, '<button class="gx-mini" data-g="unrecord">지우기</button>') : ""
-    ].join(""));
-  }
-  function statsHtml() {
-    const s5 = gameStats;
-    return row7("측정", `게임 코드 ${kb(codeStats.bytes || 0)} · 꺼내기 ${codeStats.readMs}ms · 실행 ${codeStats.runMs}ms${codeStats.fromNet ? " (방금 받음)" : ""} · 붙이기 ${s5.mountMs}ms · 받은 양 ${kb(fetchStats.bytes)}/${fetchStats.requests}번 · 그림 주소 ${liveUrls()}개${s5.heapOpen ? ` · 힙 ${kb(s5.heapOpen)} → ${kb(heap())}` : ""}`);
-  }
-  var legacyHtml = () => row7("이전 시험판", "예전 순찰과 1인 전투 검증판이에요. 저장과 그림은 따로예요.", '<button class="gx-mini" data-g="legacy" data-mode="patrol">관리국 순찰</button><button class="gx-mini" data-g="legacy" data-mode="action">1인 전투 검증판</button>');
-  async function home() {
-    const box = layer?.querySelector(".gx-game-box");
-    if (!box || view !== "home") return;
-    const me = generation;
-    const [f, slots, last2, card2, reports2, ctx2] = await Promise.all([
-      files(),
-      gameSaves.list(),
-      gameSaves.last(),
-      readCard().catch(() => null),
-      pendingReports(),
-      loadContext().catch(() => null)
-    ]);
-    if (me !== generation || view !== "home" || !layer) return;
-    const record = ctx2 ? String((ctx2.chat.localLore ?? []).find((e) => e.comment === RECORD_COMMENT)?.content ?? "").split("\n").filter((l) => l.startsWith("- ")).length : 0;
-    const open3 = new Set([...box.querySelectorAll("details[data-keep]")].filter((d) => d.open).map((d) => d.dataset.keep));
-    box.innerHTML = `<div class="gx-gl gx-settings">
-    ${filesHtml(f)}${startHtml(slots, last2, !needFiles(f))}${linkHtml(card2, reports2, record)}
-    <details class="ps-adv gx-gl-dev" data-keep="game-dev"><summary class="ps-adv-sum"><b>시험용</b></summary><div class="ps-rows">${legacyHtml()}${statsHtml()}</div></details>
-    <input type="file" accept=".js,.pack" multiple hidden data-g-file></div>`;
-    box.querySelectorAll("details[data-keep]").forEach((d) => d.open = open3.has(d.dataset.keep));
-  }
-  var say = (t) => {
-    notice = t;
-    void home();
-  };
-  async function getFiles() {
-    busy3 = "게임 파일을 받는 중";
-    void home();
-    try {
-      forgetIndex();
-      const idx = await gameIndex();
-      if (await codeState() !== "ready") {
-        await loadGameCode((d, t) => (busy3 = `게임 코드 받는 중 ${d}/${t}`, void home()));
-      }
-      for (const p of idx.packs) {
-        if (!p.required || await packStateOf(p) === "ready") continue;
-        await downloadGamePack(p, (d, t) => (busy3 = `그림·소리 받는 중 (${p.id}) ${d}/${t}`, void home()));
-      }
-      busy3 = "";
-      say("다 받았어요.");
-    } catch (e) {
-      busy3 = "";
-      say(`받지 못했어요: ${e instanceof Error ? e.message : String(e)} 잠시 뒤 다시 받거나 파일로 넣어 주세요.`);
-    }
-  }
-  async function putFiles(list4) {
-    busy3 = "넣는 중";
-    void home();
-    const done2 = [];
-    try {
-      for (const f of [...list4]) {
-        const bytes = new Uint8Array(await f.arrayBuffer());
-        if (f.name.endsWith(".js")) await installGameCode(new TextDecoder().decode(bytes)), done2.push("게임 코드");
-        else done2.push(`팩 ${await installGamePack(bytes)}`);
-      }
-      busy3 = "";
-      say(`넣었어요: ${done2.join(", ")}`);
-    } catch (e) {
-      busy3 = "";
-      say(e instanceof Error ? e.message : String(e));
-    }
-  }
-  async function play(slot, mode2) {
-    const box = layer?.querySelector(".gx-game-box");
-    if (!box || !viewport) return;
-    const me = ++generation;
-    const t0 = performance.now();
-    gameStats.heapOpen = heap();
-    busy3 = "게임을 여는 중";
-    try {
-      const mod2 = await loadGameCode();
-      gameStats.codeMs = Math.round(performance.now() - t0);
-      if (me !== generation || !layer) return;
-      view = mode2;
-      viewport.fill(true);
-      setHead();
-      box.innerHTML = "";
-      const bridge = makeBridge(viewport, slot ?? 0, () => onExit ? onExit() : closeGame(), (cb) => {
-        hiddenSubs.add(cb);
-        return () => void hiddenSubs.delete(cb);
-      });
-      const t1 = performance.now();
-      const legacy = mode2 === "play" ? null : mod2.legacy?.[mode2];
-      unmount = legacy ? legacy(box, bridge) : mod2.mount(box, bridge);
-      gameStats.mountMs = Math.round(performance.now() - t1);
-      gameStats.openMs = Math.round(performance.now() - t0);
-      busy3 = "";
-    } catch (e) {
-      busy3 = "";
-      view = "home";
-      viewport.fill(false);
-      setHead();
-      say(`게임을 열지 못했어요: ${e instanceof Error ? e.message : String(e)}`);
-    }
-  }
-  function stop() {
-    generation++;
-    unmount?.();
-    unmount = null;
-    releaseAll();
-    gameStats.heapAfter = heap();
-  }
-  function toHome() {
-    stop();
-    view = "home";
-    viewport?.fill(false);
-    notice = "";
-    setHead();
-    void home();
-  }
-  function setHead() {
-    const head2 = layer?.querySelector(".gx-head");
-    if (!head2) return;
-    const inGame = view !== "home";
-    layer?.classList.toggle("gx-playing", inGame);
-    head2.innerHTML = `<div class="gx-brand gx-tabhead"><span class="gx-tabicon">${ICONS.game}</span><div><b>${view === "patrol" ? "관리국 순찰" : view === "action" ? "1인 전투 검증판" : "필드"}</b></div></div>
-    <div class="gx-head-act">${inGame ? `<button class="gx-x" data-g="home" aria-label="시작 화면">${ICONS.back}</button>` : ""}
-    <button class="gx-x" data-action="game-close" aria-label="게임 닫기">${ICONS.close}</button></div>`;
-  }
-  async function onClick(e) {
-    const t = e.target.closest("[data-g]");
-    if (!t || !layer || t.disabled) return;
-    const at = Number(t.dataset.at);
-    const find = async () => (await pendingReports()).find((p) => p.at === at);
-    try {
-      switch (t.dataset.g) {
-        case "get":
-          return void await getFiles();
-        case "file":
-          return layer.querySelector("[data-g-file]")?.click();
-        case "play":
-          notice = "";
-          return void await play(0, "play");
-        case "legacy":
-          return void await play(null, t.dataset.mode === "action" ? "action" : "patrol");
-        case "home":
-          return toHome();
-        case "full":
-          if (document.fullscreenElement) await viewport?.exit();
-          else if (view === "home" && viewport?.full) await viewport.exit();
-          else await viewport?.enter();
-          if (view !== "home") viewport?.fill(true);
-          return setHead();
-        case "post": {
-          const p = await find();
-          if (!p) return;
-          busy3 = "채팅에 놓는 중";
-          void home();
-          await postReport(p);
-          busy3 = "";
-          return say("보고서를 채팅에 놓았어요. 보내려면 채팅창의 전송 버튼을, 그만두려면 메시지의 취소를 눌러 주세요.");
-        }
-        case "record": {
-          const p = await find();
-          if (!p) return;
-          await recordReport(p);
-          return say(`이 채팅 로어북 「${RECORD_COMMENT}」에 남겼어요. 요청마다 들어가니 필요 없으면 지워 주세요.`);
-        }
-        case "unrecord":
-          if (!confirm(`「${RECORD_COMMENT}」 로어북을 지울까요?`)) return;
-          await clearRecord();
-          return say("기록 로어북을 지웠어요.");
-        case "drop":
-          await dropReport(at);
-          return void home();
-      }
-    } catch (err) {
-      busy3 = "";
-      say(err instanceof Error ? err.message : String(err));
-    }
-  }
-  var gameOpen = () => !!layer;
-  var hiddenSubs = /* @__PURE__ */ new Set();
-  function hideGame() {
-    if (!layer?.isConnected) return;
-    layer.remove();
-    hiddenSubs.forEach((f) => f(true));
-  }
-  var onExit = null;
-  function openGame(panel, exit) {
-    if (layer || !panel) return;
-    onExit = exit ?? null;
-    const t0 = performance.now();
-    layer = document.createElement("div");
-    layer.className = "gx-game";
-    layer.innerHTML = `<div class="gx-game-in"><header class="gx-head"></header><div class="gx-game-box"></div></div>`;
-    panel.append(layer);
-    viewport = makeViewport(layer, { inFrame: true });
-    view = "home";
-    notice = "";
-    setHead();
-    layer.addEventListener("click", (e) => void onClick(e));
-    layer.addEventListener("change", (e) => {
-      const input2 = e.target;
-      if (!input2.matches("[data-g-file]") || !input2.files?.length) return;
-      const list4 = input2.files;
-      void putFiles(list4).finally(() => input2.value = "");
-    });
-    offReports = onReports(() => void home());
-    void home().then(() => gameStats.openMs = Math.round(performance.now() - t0));
-  }
-  function closeGame() {
-    stop();
-    offReports?.();
-    offReports = null;
-    viewport?.dispose();
-    viewport = null;
-    layer?.remove();
-    layer = null;
-    onExit = null;
-    hiddenSubs.clear();
-    view = "home";
-    busy3 = "";
-  }
-  function reattachGame(panel) {
-    if (!layer || !panel || layer.parentElement === panel) return;
-    const was = layer.isConnected;
-    panel.append(layer);
-    if (!was) hiddenSubs.forEach((f) => f(false));
-  }
-
-  // src/ui/cctvfx.ts
-  var BASE = { tear: 0.12, lost: 0.03, shade: 0.04, text: 0.05, breath: 0.04 };
-  var LAST2 = { tear: 260, lost: 1500, shade: 1400, text: 750, breath: 4200 };
-  var BACK_MS = 1300;
-  var BACKS = ["stand", "flee", "near", "peek", "lens"];
-  var AN_ONLY = ["shade", "text", "breath"];
-  var GAP = { tear: 4e3, lost: 2e4, shade: 2e4, text: 1e4, breath: 15e3 };
-  var FIRST = ["shade", "shade", "text", "text", "tear", "lost"];
-  var visible = /* @__PURE__ */ new Set();
-  var lastAt = /* @__PURE__ */ new Map();
-  var GRADE = { s: 1.8, a: 1.35, b: 1, c: 0.6, d: 0.35 };
-  var BLOCKS = "█▓▒░#?¿§";
-  var JAMO = "ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎㅏㅑㅓㅕㅗㅛㅜㅠㅡㅣ";
-  var timer2 = null;
-  var any = (set2) => set2[Math.floor(Math.random() * set2.length)];
-  function garble(ch) {
-    if (/\s/.test(ch) || Math.random() > 0.45) return ch;
-    if (/[가-힣]/.test(ch)) return Math.random() < 0.5 ? any(JAMO) : String.fromCharCode(44032 + Math.floor(Math.random() * 11172));
-    return any(BLOCKS);
-  }
-  function textGlitch(view3) {
-    const nodes = [];
-    for (const box of view3.querySelectorAll(".gx-oposd, .gx-opcap")) {
-      const walk = document.createTreeWalker(box, NodeFilter.SHOW_TEXT);
-      for (let n2 = walk.nextNode(); n2; n2 = walk.nextNode()) if (n2.nodeValue?.trim()) nodes.push(n2);
-    }
-    const real = nodes.map((n2) => n2.nodeValue ?? "");
-    const shake = () => nodes.forEach((n2, i) => n2.nodeValue = Array.from(real[i]).map(garble).join(""));
-    shake();
-    const steps = [130, 280, 470].map((ms) => setTimeout(shake, ms));
-    setTimeout(() => {
-      steps.forEach(clearTimeout);
-      nodes.forEach((n2, i) => n2.nodeValue = real[i]);
-    }, LAST2.text - 10);
-  }
-  function fireFx(view3, fx) {
-    const cls = `fx-${fx}`;
-    if (view3.classList.contains(cls)) return;
-    if (fx === "text") textGlitch(view3);
-    view3.classList.add(cls);
-    setTimeout(() => {
-      view3.classList.remove(cls);
-      if (fx === "lost" && view3.isConnected) {
-        view3.dataset.back = BACKS[Math.floor(Math.random() * BACKS.length)];
-        view3.classList.add("fx-back");
-        setTimeout(() => view3.classList.remove("fx-back"), BACK_MS);
-      }
-    }, LAST2[fx]);
-  }
-  function tick2(root3) {
-    const now = /* @__PURE__ */ new Set();
-    for (const view3 of root3.querySelectorAll(".gx-opview.feed:not(.ended):not(.nosig)")) {
-      const an = view3.classList.contains("k-an");
-      const key2 = view3.dataset.fxkey ?? "";
-      now.add(key2);
-      if (key2 && !visible.has(key2)) {
-        const fx = an ? FIRST[Math.floor(Math.random() * FIRST.length)] : "tear";
-        lastAt.set(fx, Date.now());
-        setTimeout(() => view3.isConnected && fireFx(view3, fx), Math.random() * 1500);
-        continue;
-      }
-      const scale = an ? GRADE[view3.dataset.grade ?? ""] ?? 1 : 0.4;
-      for (const fx of Object.keys(BASE)) {
-        if (!an && AN_ONLY.includes(fx)) continue;
-        if (Date.now() - (lastAt.get(fx) ?? 0) < GAP[fx] || Math.random() >= BASE[fx] * scale) continue;
-        lastAt.set(fx, Date.now());
-        fireFx(view3, fx);
-      }
-    }
-    visible = now;
-  }
-  function startCctvFx(root3) {
-    if (timer2 || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    timer2 = setInterval(() => tick2(root3), 1e3);
-    tick2(root3);
-  }
-  function stopCctvFx() {
-    if (timer2) clearInterval(timer2);
-    timer2 = null;
-    visible = /* @__PURE__ */ new Set();
-  }
-
-  // src/host/send.ts
-  var QUICK_FAIL_MS = 700;
-  async function sendNow() {
-    let sent;
-    try {
-      sent = Promise.resolve(risuai.sendChat("")).then(
-        (r) => r !== false,
-        (e) => {
-          console.log(`[goei] 자동 전송 실패: ${e instanceof Error ? e.message : String(e)}`);
-          return false;
-        }
-      );
-    } catch {
-      return false;
-    }
-    return Promise.race([sent, new Promise((r) => setTimeout(() => r(true), QUICK_FAIL_MS))]);
-  }
-  var SEND_FALLBACK = "채팅에 요청을 놓았어요. 자동 전송이 막혀 있어서(플러그인 모델 사용 등) 채팅창의 전송 버튼을 한 번 눌러 주세요.";
-  var noticeClass = (text) => text === SEND_FALLBACK ? "gx-err info" : "gx-err";
-
-  // src/ui/field.ts
-  var field3 = {
-    region: "01",
-    filter: "all",
-    place: null,
-    target: null,
-    team: [],
-    support: 0,
-    mkind: "an",
-    mname: null,
-    mpick: "an",
-    mopen: "",
-    note: "",
-    step: "goal",
-    query: "",
-    mapq: "",
-    confirmEnd: null
-  };
-  var mapUrls = {};
-  var esc26 = (s5) => String(s5 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
-  var KIND_LABEL4 = { an: "괴이", in: "사건", ms: "특수" };
-  var MISSION_LABEL = { an: "괴이", ms: "특수", lm: "거점" };
-  function resetField(all = false) {
-    field3.target = null;
-    field3.team = [];
-    field3.support = 0;
-    field3.mname = null;
-    field3.note = "";
-    field3.step = "goal";
-    field3.confirmEnd = null;
-    field3.place = null;
-    if (all) {
-      field3.region = "01";
-      field3.filter = "all";
-      field3.query = "";
-      field3.mkind = "an";
-    }
-  }
-  function ctxOf(ctx2, chat) {
-    const lore = ctx2.char.globalLore;
-    const catalog = parseCatalog(lore);
-    const bases = draftBases();
-    return {
-      catalog: bases ? { ...catalog, landmarks: landmarksOf(bases) } : catalog,
-      world: readWorld(chat),
-      faction: String(chat.scriptstate?.["$st_faction"] ?? ""),
-      on: worldOn(chat),
-      settings: worldSettings(lore, chat.scriptstate),
-      supportOn: basicSettings(lore, chat.scriptstate).supportOn,
-      char: ctx2.char
-    };
-  }
-  function readCtx(ctx2) {
-    try {
-      return ctxOf(ctx2, ctx2.chat);
-    } catch (error) {
-      return error instanceof Error ? error.message : String(error);
-    }
-  }
-  function sidoOf(loc) {
-    return loc.split("-")[0];
-  }
-  function placeKey(ev, c) {
-    if (ev.kind === "in") {
-      const lm = c.landmarks.find((l) => l.name === ev.name && (l.gu ? landmarkLoc(l.sido, l.gu) === ev.loc : ev.loc.startsWith(`${l.sido}-`)));
-      if (lm) return `fac:${lm.name}`;
-    }
-    return ev.loc;
-  }
-  function placeTarget(key2) {
-    return key2.startsWith("fac:") ? { type: "facility", name: key2.slice(4) } : { type: "place", loc: key2 };
-  }
-  function targetName(t) {
-    if (t.type === "event") return t.name;
-    if (t.type === "facility") return t.name;
-    return locName(t.loc);
-  }
-  var isPC = () => !matchMedia("(max-width: 760px)").matches;
-  function sameTarget(a, key2) {
-    if (!a) return false;
-    if (a.type === "event") return a.key === key2;
-    return (a.type === "facility" ? `fac:${a.name}` : a.loc) === key2;
-  }
-  function mapImage(ctx2, code2, env3) {
-    const hit3 = mapUrls[code2];
-    if (hit3 === void 0) {
-      mapUrls[code2] = "loading";
-      void assetUrl(ctx2.char, `map${code2}`).then((url) => {
-        mapUrls[code2] = url;
-        env3.render();
-      });
-      return null;
-    }
-    return hit3 === "loading" ? null : hit3;
-  }
-  var boardMapUrl = (ctx2, env3) => mapImage(ctx2, "01", env3);
-  function pin(a
+        throw new GameFileError("게임 파일 목록을 받지 못

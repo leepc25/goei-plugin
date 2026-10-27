@@ -37,7 +37,7 @@ test('Faction·Roster 조립: 조직 소개 첫 문단 + 관계 목록 + 공통 
   assert.match(fac, /### \{\{#if \{\{not_equal::\{\{getvar::st_faction\}\}::B00\}\}\}\}Management Bureau\{\{\/if\}\}\{\{#if \{\{equal::\{\{getvar::st_faction\}\}::B00\}\}\}\}Fake Management Bureau\{\{\/if\}\} \[A00\]\n/);
   assert.ok(!/^### .*Namhae Branch/m.test(fac), 'noSummary 조직은 요약에 없음 (관계 목록에는 나옴)');
   assert.ok(fac.includes('### The Aestheticism') || fac.includes('### 탐미주의'), '요약 전용 조직은 뒤에');
-  assert.match(fac, /## Faction Relations\n[^\n]*\nFactions: 1 .*Management Bureau.*\n\| viewer \\ target \| 1 \| 2 \|.*\n\|---\|---\|.*\n\| 1 .*Management Bureau[^|]*\| — \| H \|/, '관계는 표 하나');
+  assert.match(fac, /## Faction Relations\n[^\n]*\nFactions: 1 .*Management Bureau.*\n\| viewer \\ target \| 1 \| 2 \|.*\n\|---\|---\|.*\n\| 1 .*Management Bureau[^|]*\| - \| H \|/, '관계는 표 하나');
   assert.ok(!/Faction Relations[\s\S]*Notes:/.test(fac), '기본 메모는 비어 있어 Notes 없음');
   const withMemo = assembleFaction(dir, worldRecords('org'), worldRelations({ relations: { pairs: { '관리국>가짜 관리국': { stage: 'hostile', memo: 'no talks, ever' } } } }));
   assert.match(withMemo, /\|\nNotes:\n- 1 → 2: no talks, ever/, '쓴 메모만 표 아래 한 줄');

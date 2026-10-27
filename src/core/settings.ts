@@ -1,6 +1,6 @@
 // 기본 설정과 괴이 생성 수치. 우선순위: 이 채팅의 변수($st_*, $wg_*) > 플러그인 저장소의 기본값(설정 창)
 // > 옛 카드의 Settings 로어북(있으면) > 내장 기본값. 채팅 변수 키는 원본 ensureDefaults·WG.get과 같다.
-import { GUIDE_NAMES, isGuideName, setGuideOverride } from './guides';
+import { GUIDE_NAMES, isGuideName, setGuideOverride, RULE_TARGETS, setUserRules, type RuleTarget, type UserRule } from './guides';
 import type { LoreEntry, ScriptState } from './types';
 import { DEFAULT_SETTINGS, type WorldSettings } from './world/engine';
 import { imgFold, imgRecent, imgSize } from './imgtag';
@@ -122,6 +122,8 @@ export interface Prefs {
   editorWidth?: number;
   /** 고친 지침 (core/guides.ts GuideName → 글). 없으면 기본 */
   guides?: Record<string, string>;
+  /** 내가 추가한 규칙 (core/guides.ts UserRule). 지침 끝에 붙는다 */
+  rules?: UserRule[];
   /** 세력 관계 격자: 한 칸을 바꾸면 반대 칸도 (기본 켬) */
   relationsSym?: boolean;
   /** 새 채팅의 시작 잔고 (원). 없으면 0 */
@@ -197,9 +199,19 @@ export function setPrefs(raw: unknown): Prefs {
     for (const [k, v] of Object.entries(o.guides as Record<string, unknown>)) if (isGuideName(k) && typeof v === 'string' && v.trim()) guides[k] = v.slice(0, 120000);
   }
   for (const k of GUIDE_NAMES) setGuideOverride(k, guides[k]);
+  const rules: UserRule[] = [];
+  if (Array.isArray(o.rules)) {
+    for (const r of o.rules as Record<string, unknown>[]) {
+      if (!r || typeof r !== 'object' || typeof r.id !== 'string') continue;
+      const to = (Array.isArray(r.to) ? r.to : []).filter((t): t is RuleTarget => (RULE_TARGETS as string[]).includes(String(t)));
+      rules.push({ id: r.id.slice(0, 40), title: String(r.title ?? '').slice(0, 80), text: String(r.text ?? '').slice(0, 20000), to, on: r.on !== false });
+      if (rules.length >= 100) break;
+    }
+  }
+  setUserRules(rules);
   const relationsSym = o.relationsSym === false ? false : undefined;
   const walletStart = int(o.walletStart, 0, 1_000_000_000_000);
-  prefs = { basic, world, ...(walletStart !== null ? { walletStart } : {}), ...(editorWidth !== null ? { editorWidth } : {}), ...(Object.keys(guides).length ? { guides } : {}), ...(relationsSym === false ? { relationsSym } : {}), ...(theme ? { theme } : {}), ...(imgPrompt ? { imgPrompt } : {}), ...(imgNamesOff.length ? { imgNamesOff } : {}), ...(imgNamesExtra.length ? { imgNamesExtra } : {}), ...(imgKeywords.length ? { imgKeywords } : {}), ...(Object.keys(vars).length ? { vars } : {}), ...(nav ? { nav } : {}), ...(agents ? { agents } : {}), ...(dim !== null ? { dim } : {}), ...(status ? { status } : {}), ...(size !== null ? { imgSize: size } : {}), ...(fold !== null ? { imgFold: fold } : {}), ...(imgFoldOn === false ? { imgFoldOn } : {}), ...(show !== null ? { imgShow: show } : {}), ...(send !== null ? { imgSend: send } : {}), ...(marks.length ? { marks } : {}) };
+  prefs = { basic, world, ...(walletStart !== null ? { walletStart } : {}), ...(editorWidth !== null ? { editorWidth } : {}), ...(Object.keys(guides).length ? { guides } : {}), ...(rules.length ? { rules } : {}), ...(relationsSym === false ? { relationsSym } : {}), ...(theme ? { theme } : {}), ...(imgPrompt ? { imgPrompt } : {}), ...(imgNamesOff.length ? { imgNamesOff } : {}), ...(imgNamesExtra.length ? { imgNamesExtra } : {}), ...(imgKeywords.length ? { imgKeywords } : {}), ...(Object.keys(vars).length ? { vars } : {}), ...(nav ? { nav } : {}), ...(agents ? { agents } : {}), ...(dim !== null ? { dim } : {}), ...(status ? { status } : {}), ...(size !== null ? { imgSize: size } : {}), ...(fold !== null ? { imgFold: fold } : {}), ...(imgFoldOn === false ? { imgFoldOn } : {}), ...(show !== null ? { imgShow: show } : {}), ...(send !== null ? { imgSend: send } : {}), ...(marks.length ? { marks } : {}) };
   return prefs;
 }
 

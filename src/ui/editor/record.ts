@@ -1,4 +1,5 @@
 // 공통 기록 편집기: 목록 → 상세. 기본 칸(종류별 schema) + 추가 칸 + 순서 + 글로 가져오기 + 칸별 토큰·합계 + 조립 글 보기 + 읽기 전용.
+import { switchHtml } from '../controls';
 import type { Directory } from '../../core/world/directory';
 import { tokenizerName } from '../../core/tokenizer';
 import { emptyRecord, moveField, moveFieldTo, parseImport, putRecord, recordText, removeRecord, resetRecord, type ImportResult } from '../../core/world/draft';
@@ -104,7 +105,7 @@ function fieldRow(kind: WorldKind, rec: WorldRecord, def: FieldDef, name: string
   const ph = recUi.variant ? '비우면 기본 글' : auto ? `자동: ${auto}` : '';
   const ctl = def.type === 'line'
     ? `<input data-input="ed-field" data-key="${esc(key)}" value="${esc(v)}" autocomplete="off" placeholder="${esc(ph)}">`
-    : `<textarea data-input="ed-field" data-key="${esc(key)}" rows="${Math.min(14, Math.max(3, v.split('\n').length + 1))}" placeholder="${esc(ph)}">${esc(v)}</textarea>`;
+    : `<textarea data-input="ed-field" data-key="${esc(key)}" rows="3" placeholder="${esc(ph)}">${esc(v)}</textarea>`;
   return `<div class="gw-field" data-field-row="${esc(def.id)}" draggable="true">
     <div class="gw-field-head"><span class="gw-grip" title="끌어서 순서 바꾸기">${ICONS.grip}</span><b>${esc(def.label)}</b><small class="gw-ftitle">${esc(def.title)}</small>${def.hint ? `<span class="gw-fhint" title="${esc(def.hint)}">?</span>` : ''}<span class="gw-ftok">${tok ? `${tok}토큰` : ''}</span>
       <span class="gw-fmove"><button class="gx-mini icon" data-action="ed-field-up" data-value="${esc(def.id)}" aria-label="위로">${ICONS.up}</button><button class="gx-mini icon" data-action="ed-field-down" data-value="${esc(def.id)}" aria-label="아래로">${ICONS.down}</button></span></div>
@@ -117,17 +118,32 @@ function extraRow(kind: WorldKind, rec: WorldRecord, e: ExtraField, i: number, n
   const place = e.kind === 'line' ? `<small class="gw-ftitle">${e.sec === 'appearance' ? 'Appearance' : 'Identity'} 절 · 한 줄${e.at ? ` · ${esc(e.at)} 뒤` : ' · 맨 앞'}</small>` : '<small class="gw-ftitle">절</small>';
   const ctl = e.kind === 'line'
     ? `<input data-input="ed-extra" data-key="${esc(key)}" value="${esc(e.value)}" autocomplete="off">`
-    : `<textarea data-input="ed-extra" data-key="${esc(key)}" rows="${Math.min(14, Math.max(3, e.value.split('\n').length + 1))}">${esc(e.value)}</textarea>`;
+    : `<textarea data-input="ed-extra" data-key="${esc(key)}" rows="3">${esc(e.value)}</textarea>`;
   return `<div class="gw-field extra" data-field-row="${esc(id)}" draggable="${e.kind === 'block'}">
     <div class="gw-field-head"><span class="gw-grip">${e.kind === 'block' ? ICONS.grip : ''}</span><input class="gw-xname" data-input="ed-extra-name" data-key="${esc(key)}" value="${esc(e.name)}" aria-label="칸 이름">${place}<span class="gw-ftok">${tokens(e.value) ? `${tokens(e.value)}토큰` : ''}</span>
       <span class="gw-fmove">${e.kind === 'block' ? `<button class="gx-mini icon" data-action="ed-field-up" data-value="${esc(id)}" aria-label="위로">${ICONS.up}</button><button class="gx-mini icon" data-action="ed-field-down" data-value="${esc(id)}" aria-label="아래로">${ICONS.down}</button>` : ''}<button class="gx-mini icon danger" data-action="ed-extra-del" data-value="${i}" aria-label="칸 지우기">${ICONS.trash}</button></span></div>
     ${ctl}</div>`;
 }
 
+/** 기본 정보 카드: 명부 판(directory.ts)을 설정 페이지와 같은 줄 모양으로. 요원 Roster 포함·조직 관계도 포함 토글은 첫 줄 (2026-10-27 사용자: 상자 속 상자 없애기) */
+function basicCard(ctx: ChatContext, kind: WorldKind, sel: string, d: Directory, rec: WorldRecord | null): string {
+  const panel = basicPanel(ctx, kind, sel, d);
+  const onoff = (action: string, on: boolean) => switchHtml({ action, value: '', on });
+  let first = '';
+  if (rec && kind === 'agent') first = `<div class="dir-line"><span>Roster 지침에 포함</span>${onoff('ed-roster-toggle', !rec.rosterOff)}<small>${rec.rosterOff ? '명부 지침(🙂Roster)에 들어가지 않아요. 로어 칸은 그대로 모델에게 가요.' : '명부 지침에 소개 한 줄로 들어가요. 기본은 전원 포함.'}</small></div>`;
+  if (rec && kind === 'org') first = `<div class="dir-line"><span>세력 관계도에 포함</span>${onoff('ed-rel-member-toggle', !rec.relOff)}<small>${rec.relOff ? '관계 표·Faction 표·평판 시작값에서 빠져요 (민간인처럼 세력이 아닌 조직).' : 'Faction 지침의 관계 표에 들어가요. 세력 관계 화면에서도 켜고 끌 수 있어요.'}</small></div>`;
+  const body = panel ? (first ? panel.replace('<div class="dir-panel">', `<div class="dir-panel">${first}`) : panel) : `<div class="dir-panel"><p class="gx-muted">명부 줄이 없어요. 저장하면 생겨요.</p></div>`;
+  return `<section class="gw-sec gw-basic"><h3>기본 정보</h3>${body}</section>`;
+}
+
 export function recordPage(ctx: ChatContext, kind: WorldKind, over: WorldOverrides, q: string, sel: string): string {
   const d = directoryDraft(ctx);
+  // 폰(760px 이하)에서는 목록 대신 드롭다운 하나 (목록이 화면을 다 먹지 않게). CSS 가 폭에 따라 하나만 보여 준다
+  const pick = `<select class="gw-list-pick" data-change="ed-sel" aria-label="${WORLD_KIND_LABEL[kind]} 고르기">${rowsOf(ctx, kind, over)
+    .map((r) => `<option value="${esc(r.name)}"${r.name === sel ? ' selected' : ''}>${esc(r.name)}${r.sub ? ` · ${esc(r.sub)}` : ''}${r.state === 'deleted' ? ' (지움)' : r.state === 'new' ? ' (추가)' : r.state === 'edited' ? ' (고침)' : ''}</option>`)
+    .join('')}</select>`;
   const list = `<aside class="gw-list-pane">
-    <div class="gw-list-tools"><input class="dir-search" type="search" data-input="ed-q" value="${esc(q)}" placeholder="${WORLD_KIND_LABEL[kind]} 검색" aria-label="검색">
+    <div class="gw-list-tools">${pick}<input class="dir-search" type="search" data-input="ed-q" value="${esc(q)}" placeholder="${WORLD_KIND_LABEL[kind]} 검색" aria-label="검색">
       <button class="gx-mini" data-action="ed-add-toggle" aria-expanded="${recUi.adding}">${ICONS.plus}추가</button></div>
     ${recUi.adding ? `<div class="gw-add"><input name="ed-new-name" placeholder="새 ${WORLD_KIND_LABEL[kind]} 이름 (한글)" data-enter="ed-add" autocomplete="off"><button class="gx-mini" data-action="ed-add" data-take="ed-new-name">만들기</button>
       <p class="gx-muted">${kind === 'agent' ? '요원은 만든 뒤 「기본 정보」에서 영문명·소속·부서를 채워요. 영문명은 그림 에셋 이름과 같아야 해요.' : kind === 'org' ? '조직은 만든 뒤 「기본 정보」에서 영문명·코드를 정해요.' : '만든 뒤 기본 정보에서 영문명·별칭을 채워요.'}</p></div>` : ''}
@@ -138,7 +154,7 @@ export function recordPage(ctx: ChatContext, kind: WorldKind, over: WorldOverrid
   let detail: string;
   if (!sel) detail = `<div class="gw-detail empty"><p class="gx-muted">왼쪽에서 ${WORLD_KIND_LABEL[kind]}을(를) 고르세요.</p></div>`;
   else if (bucket[sel]?.deleted) detail = `<div class="gw-detail"><header class="gw-head"><h2>${esc(sel)}</h2><p class="gx-muted">기본 세계의 이 기록을 지웠어요. 모델에게 가지 않아요.</p></header><button class="gx-mini" data-action="ed-restore">되살리기</button></div>`;
-  else if (!rec) detail = `<div class="gw-detail"><header class="gw-head"><h2>${esc(sel)}</h2><p class="gx-muted">이 기록에는 로어 칸이 없어요 (명부 줄만 있음).</p></header><button class="gx-mini" data-action="ed-make-rec">로어 칸 만들기</button>${basicPanel(ctx, kind, sel, d)}</div>`;
+  else if (!rec) detail = `<div class="gw-detail"><header class="gw-head"><h2>${esc(sel)}<small>명부에만 있음</small></h2><div class="gw-head-act"><button class="gx-mini" data-action="ed-make-rec">${ICONS.plus}로어 칸 만들기</button></div><p class="gx-muted">이 기록에는 로어 칸이 없어요. 명부 줄(이름·사진·소속 같은 것)만 있어요.</p></header>${basicCard(ctx, kind, sel, d, null)}</div>`;
   else {
     const order = fieldOrder(kind, rec);
     const defs = FIELDS[kind];
@@ -176,11 +192,9 @@ export function recordPage(ctx: ChatContext, kind: WorldKind, over: WorldOverrid
           <button class="gx-mini${recUi.importOpen ? ' on' : ''}" data-action="ed-import-toggle">${ICONS.plus}글로 가져오기</button>
           ${isDefault && edited ? '<button class="gx-mini" data-action="ed-restore">기본으로</button>' : ''}
           <button class="gx-mini danger" data-action="ed-delete">${ICONS.trash}${isDefault ? '지우기' : '삭제'}</button></div></header>
-      ${kind === 'agent' ? `<p class="gw-roster"><button class="gx-chip${rec.rosterOff ? '' : ' on'}" data-action="ed-roster-toggle" aria-pressed="${!rec.rosterOff}">🙂Roster 지침에 포함</button><small>${rec.rosterOff ? '이 요원은 명부 지침(🙂Roster)에 들어가지 않아요. 로어 칸은 그대로 모델에게 가요.' : '명부 지침에 소개 한 줄로 들어가요. 기본은 전원 포함.'}</small></p>` : ''}
-      ${kind === 'org' ? `<p class="gw-roster"><button class="gx-chip${rec.relOff ? '' : ' on'}" data-action="ed-rel-member-toggle" aria-pressed="${!rec.relOff}">세력 관계도에 포함</button><small>${rec.relOff ? '관계 격자·Faction 관계 목록·평판 시작값에서 빠져요 (민간인처럼 세력이 아닌 조직).' : '관계 격자에 행·열로 들어가요. 세력 관계 화면에서도 켜고 끌 수 있어요.'}</small></p>` : ''}
       ${recUi.preview ? `<pre class="gw-preview">${esc(text)}</pre>` : ''}
       ${recUi.importOpen ? importPane(kind) : ''}
-      <section class="gw-sec gw-basic">${basicPanel(ctx, kind, sel, d) || '<p class="gx-muted">명부 줄이 없어요. 저장하면 생겨요.</p>'}</section>
+      ${basicCard(ctx, kind, sel, d, rec)}
       <section class="gw-sec"><h3>로어 칸 ${variantBar}</h3>
         <div class="gw-fields">${rows.join('')}</div>
         ${lines ? `<h4 class="gw-sub">한 줄 추가 항목</h4><div class="gw-fields">${lines}</div>` : ''}

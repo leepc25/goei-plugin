@@ -1,5 +1,6 @@
 // 설정 → 기능별 설정 → 필드: 게임 안 설정(화면·소리·조작)을 여기서도 고친다 (2026-10-25 사용자).
 // 값은 이 채팅 변수 $hq_ui(JSON)에 있고, 게임은 bridge.uiPrefs로 같은 값을 읽고 쓴다. 덮어쓰기·불러오기(새 채팅 기본값)는 $hq_ 묶음 전체.
+import { switchHtml } from './controls';
 import { DEFAULT_SETTINGS, parseSettings, type UiSettings } from '../game/action/ui/settings';
 import { updateChat, type ChatContext } from '../host/risu';
 import { HQ_UI } from '../host/game/uiprefs';
@@ -46,7 +47,7 @@ function control(it: Item, s: UiSettings): string {
   const cur = s[it.key];
   const seg = (v: string, label: string, on: boolean) => `<button class="gx-seg${on ? ' on' : ''}" data-action="visit-ui" data-value="${it.key}=${v}" aria-pressed="${on}">${esc(label)}</button>`;
   if (it.type === 'pick') return `<div class="gx-segs gx-segs-sm">${it.opts.map(([v, l]) => seg(v, l, cur === v)).join('')}</div>`;
-  if (it.type === 'on') return `<div class="gx-segs gx-segs-sm">${seg('1', 'ON', cur === true)}${seg('0', 'OFF', cur === false)}</div>`;
+  if (it.type === 'on') return switchHtml({ action: 'visit-ui', value: `${it.key}=${cur === true ? '0' : '1'}`, on: cur === true, label: it.label });
   return `<span class="adv-num"><input class="gx-search" type="number" inputmode="numeric" min="${Math.round(it.min * 100)}" max="${Math.round(it.max * 100)}" step="${Math.round(it.step * 100)}" data-change="visit-ui" data-key="${it.key}" value="${Math.round(Number(cur) * 100)}" aria-label="${esc(it.label)}"><span>%</span></span>`;
 }
 
