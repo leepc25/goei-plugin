@@ -16,7 +16,7 @@ import { prepareBaseDocs } from '../core/wiki';
 import { facePic, loadModuleAssets, mainPic } from '../host/assets';
 import { playableAgents, playerAgent } from '../core/player';
 import { savePrefs } from '../host/prefs';
-import { openEditor, type EditorNode } from './editor/index';
+import { editorOpen, openEditor, render as editorRender, type EditorNode } from './editor/index';
 import { agentPanel, agentPopup, agUi, bindAgentTips, type AgentItem } from './agents';
 import css from './style.css';
 import { GHOST_ICON, ICONS } from './icons';
@@ -142,7 +142,12 @@ const esc = (s: unknown) =>
 function ensureRoot(): HTMLElement {
   if (root) return root;
   // 이미지가 도착하면: 시작 화면은 그 카드만, 나머지 화면은 다시 그린다
-  setImageRedraw(() => (view.kind === 'picker' ? renderPicker() : render()));
+  // 사진이 다 읽히면 패널과, 떠 있으면 세계 편집 창도 다시 그린다 (2026-10-27: 편집 창의 괴이·요원 사진이 안 뜨던 문제 — 창은 패널과 따로 그린다)
+  setImageRedraw(() => {
+    if (view.kind === 'picker') renderPicker();
+    else render();
+    if (editorOpen()) editorRender();
+  });
   const style = document.createElement('style');
   style.textContent = css;
   document.head.appendChild(style);
