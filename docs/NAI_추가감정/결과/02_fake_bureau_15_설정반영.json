@@ -5,7 +5,7 @@
     {
       "id": "1792315457882",
       "name": "Lee Do-hyeong_suspicious",
-      "scenePrompt": "skeptical, smirk, closed mouth, 1.15::head down, hands on own hips::, sunglasses,",
+      "scenePrompt": "1.15::smirk, raised eyebrow::, closed mouth, looking at viewer, head tilt, hand in pocket, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457882
@@ -13,7 +13,7 @@
     {
       "id": "1792315457883",
       "name": "Lee Do-hyeong_worried",
-      "scenePrompt": "worried, frown, parted lips, 1.15::hand up, hand on own forehead, arm at side, head down::, sunglasses,",
+      "scenePrompt": "1.15::serious, frown::, closed mouth, looking to the side, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457883
@@ -21,7 +21,7 @@
     {
       "id": "1792315457884",
       "name": "Lee Do-hyeong_relieved",
-      "scenePrompt": "light smile, sigh, parted lips, 1.15::head back, arms behind head::, sunglasses,",
+      "scenePrompt": "1.15::smile, sigh::, smoking, cigarette, smoke, head tilt, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457884
@@ -29,7 +29,7 @@
     {
       "id": "1792315457885",
       "name": "Lee Do-hyeong_disgusted",
-      "scenePrompt": "disgust, scowl, clenched teeth, 1.15::outstretched arm, thumbs down, hand on own hip::, sunglasses,",
+      "scenePrompt": "1.15::disdain, frown::, closed mouth, looking down, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457885
@@ -37,7 +37,7 @@
     {
       "id": "1792315457886",
       "name": "Lee Do-hyeong_determined",
-      "scenePrompt": "determined, grin, teeth, 1.15::hands up, fist in hand, head down::, sunglasses,",
+      "scenePrompt": "1.15::grin, teeth::, confident, looking at viewer, holding cigarette, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457886
@@ -45,7 +45,7 @@
     {
       "id": "1792315457887",
       "name": "Lee Do-hyeong_jealous",
-      "scenePrompt": "envy, grin, clenched teeth, 1.15::hand up, clenched hand, hand on own hip, head tilt::, sunglasses,",
+      "scenePrompt": "1.15::annoyed, frown::, closed mouth, looking to the side, hand on own hip, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457887
@@ -53,7 +53,7 @@
     {
       "id": "1792315457888",
       "name": "Lee Do-hyeong_pleading",
-      "scenePrompt": "forced smile, parted lips, 1.15::hands on own hips, head down, leaning forward::, sunglasses,",
+      "scenePrompt": "1.15::grin, raised eyebrows::, looking at viewer, beckoning, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457888
@@ -61,7 +61,7 @@
     {
       "id": "1792315457889",
       "name": "Lee Do-hyeong_forced smiling",
-      "scenePrompt": "forced smile, grin, sweat, 1.15::hand up, collar tug, hand on own hip, head tilt::, sunglasses,",
+      "scenePrompt": "1.15::forced smile, sweatdrop::, looking away, scratching head, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457889
@@ -69,7 +69,7 @@
     {
       "id": "1792744536868",
       "name": "Lee Do-hyeong_indifferent",
-      "scenePrompt": "bored, unamused, closed mouth, 1.15::hand up, hand to own mouth, hand on own hip, head back::, sunglasses,",
+      "scenePrompt": "1.15::bored, closed mouth::, looking away, cigarette, mouth hold, hand in pocket, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536868
@@ -77,7 +77,7 @@
     {
       "id": "1792744536869",
       "name": "Lee Do-hyeong_guilty",
-      "scenePrompt": "guilt, grimace, closed mouth, 1.15::hand on own chest, hand on own hip, head down::, sunglasses,",
+      "scenePrompt": "1.15::wavy mouth, sweatdrop::, looking away, hand on own neck, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536869
@@ -85,7 +85,7 @@
     {
       "id": "1792744536870",
       "name": "Lee Do-hyeong_pouting",
-      "scenePrompt": "pout, closed mouth, 1.15::hand up, hand on own neck, arm at side, head back, twisted torso::, sunglasses,",
+      "scenePrompt": "1.15::frown, annoyed::, closed mouth, crossed arms, looking away, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536870
@@ -93,7 +93,7 @@
     {
       "id": "1792744536871",
       "name": "Lee Do-hyeong_angry smile",
-      "scenePrompt": "angry, grin, teeth, 1.15::outstretched arm, pointing at viewer, arm behind back::, sunglasses,",
+      "scenePrompt": "1.15::grin, teeth, shaded face::, looking at viewer, clenched hand, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536871
@@ -101,7 +101,7 @@
     {
       "id": "1792744536872",
       "name": "Lee Do-hyeong_expressionless",
-      "scenePrompt": "expressionless, closed mouth, 1.15::hand up, hand on own chin, arm at side, head tilt::, sunglasses,",
+      "scenePrompt": "1.15::expressionless, closed mouth::, looking at viewer, hands in pockets, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536872
@@ -109,7 +109,7 @@
     {
       "id": "1792744536873",
       "name": "Lee Do-hyeong_tormented",
-      "scenePrompt": "distress, clenched teeth, sweat, 1.15::slouching, hand on own knee, hand up, clenched hand, head down::, sunglasses,",
+      "scenePrompt": "1.15::gritted teeth, furrowed brow, sweat::, shaded face, looking down, clenched hand, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536873
@@ -117,7 +117,7 @@
     {
       "id": "1792744536874",
       "name": "Lee Do-hyeong_crazy smile",
-      "scenePrompt": "crazy smile, open mouth, teeth, 1.15::head back, hand up, raised fist, hand on own hip::, sunglasses,",
+      "scenePrompt": "1.15::crazy smile, open mouth, teeth::, shaded face, looking at viewer, head tilt, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536874
@@ -125,7 +125,7 @@
     {
       "id": "1792315457890",
       "name": "Go Young-hoon_suspicious",
-      "scenePrompt": "skeptical, closed mouth, 1.15::hand up, index finger raised, arm behind back, head tilt::, sunglasses,",
+      "scenePrompt": "1.15::serious, closed mouth::, looking at viewer, head tilt, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457890
@@ -133,7 +133,7 @@
     {
       "id": "1792315457891",
       "name": "Go Young-hoon_worried",
-      "scenePrompt": "worried, frown, closed mouth, 1.15::hand up, hand on own ear, arm at side, head down::, sunglasses,",
+      "scenePrompt": "1.15::serious, frown::, closed mouth, looking down, hand on own chin, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457891
@@ -141,7 +141,7 @@
     {
       "id": "1792315457892",
       "name": "Go Young-hoon_relieved",
-      "scenePrompt": "sigh, parted lips, 1.15::head down, hand up, hand on own forehead, arm behind back::, sunglasses,",
+      "scenePrompt": "1.15::closed mouth, expressionless::, looking down, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457892
@@ -149,7 +149,7 @@
     {
       "id": "1792315457893",
       "name": "Go Young-hoon_disgusted",
-      "scenePrompt": "disgust, disdain, closed mouth, 1.15::hand up, adjusting eyewear, arm behind back, twisted torso::, sunglasses,",
+      "scenePrompt": "1.15::disdain, frown::, closed mouth, looking down, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457893
@@ -157,7 +157,7 @@
     {
       "id": "1792315457894",
       "name": "Go Young-hoon_determined",
-      "scenePrompt": "determined, serious, closed mouth, 1.15::outstretched arm, pointing forward, arm behind back::, sunglasses,",
+      "scenePrompt": "1.15::serious, closed mouth::, looking at viewer, pointing forward, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457894
@@ -165,7 +165,7 @@
     {
       "id": "1792315457895",
       "name": "Go Young-hoon_jealous",
-      "scenePrompt": "envy, frown, 1.15::hand up, hand on own chin, hand on own hip, head down::, sunglasses,",
+      "scenePrompt": "1.15::expressionless, closed mouth::, looking to the side, arms behind back, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457895
@@ -173,7 +173,7 @@
     {
       "id": "1792315457896",
       "name": "Go Young-hoon_pleading",
-      "scenePrompt": "parted lips, 1.15::hands up, palms together, head down::, sunglasses,",
+      "scenePrompt": "1.15::serious, parted lips::, looking at viewer, own hands clasped, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457896
@@ -181,7 +181,7 @@
     {
       "id": "1792315457897",
       "name": "Go Young-hoon_forced smiling",
-      "scenePrompt": "forced smile, closed mouth, 1.15::hand up, adjusting eyewear, arm at side, head down::, sunglasses,",
+      "scenePrompt": "1.15::expressionless, closed mouth::, looking at viewer, clapping, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457897
@@ -189,7 +189,7 @@
     {
       "id": "1792744536875",
       "name": "Go Young-hoon_indifferent",
-      "scenePrompt": "bored, closed mouth, 1.15::hands up, interlocked fingers, head down::, sunglasses,",
+      "scenePrompt": "1.15::expressionless, closed mouth::, looking to the side, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536875
@@ -197,7 +197,7 @@
     {
       "id": "1792744536876",
       "name": "Go Young-hoon_guilty",
-      "scenePrompt": "guilt, frown, closed mouth, 1.15::bowing, arms at sides::, sunglasses,",
+      "scenePrompt": "1.15::expressionless, closed mouth, shaded face::, looking back, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536876
@@ -205,7 +205,7 @@
     {
       "id": "1792744536877",
       "name": "Go Young-hoon_pouting",
-      "scenePrompt": "pout, closed mouth, 1.15::head down, hand up, adjusting necktie, arm behind back::, sunglasses,",
+      "scenePrompt": "1.15::frown, closed mouth::, looking at viewer, crossed arms, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536877
@@ -213,7 +213,7 @@
     {
       "id": "1792744536878",
       "name": "Go Young-hoon_angry smile",
-      "scenePrompt": "angry, light smile, closed mouth, 1.15::hand up, stop (gesture), arm at side, head down::, sunglasses,",
+      "scenePrompt": "1.15::expressionless, closed mouth, shaded face::, looking at viewer, own hands clasped, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536878
@@ -221,7 +221,7 @@
     {
       "id": "1792744536879",
       "name": "Go Young-hoon_expressionless",
-      "scenePrompt": "expressionless, closed mouth, 1.15::hands up, steepled fingers, head tilt::, sunglasses,",
+      "scenePrompt": "1.15::expressionless, closed mouth::, looking at viewer, own hands clasped, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536879
@@ -229,7 +229,7 @@
     {
       "id": "1792744536880",
       "name": "Go Young-hoon_tormented",
-      "scenePrompt": "distress, clenched teeth, sweat, 1.15::hands up, interlocked fingers, head down, slouching::, sunglasses,",
+      "scenePrompt": "1.15::clenched teeth, frown::, shaded face, sweat, looking down, clenched hand, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536880
@@ -237,7 +237,7 @@
     {
       "id": "1792744536881",
       "name": "Go Young-hoon_crazy smile",
-      "scenePrompt": "crazy smile, grin, teeth, 1.15::head down, hand up, hand on own cheek, arm at side::, sunglasses,",
+      "scenePrompt": "1.15::light smile, shaded face::, closed mouth, head tilt, looking at viewer, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536881
@@ -245,7 +245,7 @@
     {
       "id": "1792315457898",
       "name": "No Gi-gyun_suspicious",
-      "scenePrompt": "skeptical, grin, 1.15::hand up, open hand, arm behind back, head tilt::, sunglasses,",
+      "scenePrompt": "1.15::smirk, raised eyebrow::, closed mouth, head tilt, hand on own chin, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457898
@@ -253,7 +253,7 @@
     {
       "id": "1792315457899",
       "name": "No Gi-gyun_worried",
-      "scenePrompt": "worried, frown, open mouth, 1.15::hand up, hand on own forehead, hand on own hip, head down::, sunglasses,",
+      "scenePrompt": "1.15::sad smile, furrowed brow::, looking down, holding popsicle, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457899
@@ -261,7 +261,7 @@
     {
       "id": "1792315457900",
       "name": "No Gi-gyun_relieved",
-      "scenePrompt": "smile, open mouth, sigh, 1.15::hand up, thumbs up, hand on own hip, head back::, sunglasses,",
+      "scenePrompt": "1.15::grin, teeth, sigh::, looking up, holding popsicle, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457900
@@ -269,7 +269,7 @@
     {
       "id": "1792315457901",
       "name": "No Gi-gyun_disgusted",
-      "scenePrompt": "disgust, grimace, clenched teeth, 1.15::hand up, hand over own mouth, hand on own hip, leaning back::, sunglasses,",
+      "scenePrompt": "1.15::disgust, frown::, open mouth, pointing at viewer, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457901
@@ -277,7 +277,7 @@
     {
       "id": "1792315457902",
       "name": "No Gi-gyun_determined",
-      "scenePrompt": "determined, confident, grin, 1.15::hand up, clenched hand, hand on own chest, arm at side::, sunglasses,",
+      "scenePrompt": "1.15::serious, smirk::, closed mouth, looking at viewer, clenched hand, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457902
@@ -285,7 +285,7 @@
     {
       "id": "1792315457903",
       "name": "No Gi-gyun_jealous",
-      "scenePrompt": "envy, pout, closed mouth, 1.15::hands up, open hands, head tilt::, sunglasses,",
+      "scenePrompt": "1.15::pout, jealous::, looking to the side, crossed arms, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457903
@@ -293,7 +293,7 @@
     {
       "id": "1792315457904",
       "name": "No Gi-gyun_pleading",
-      "scenePrompt": "open mouth, 1.15::hands up, palms together, bowing::, sunglasses,",
+      "scenePrompt": "1.15::grin, open mouth, teeth::, looking at viewer, outstretched hand, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457904
@@ -301,7 +301,7 @@
     {
       "id": "1792315457905",
       "name": "No Gi-gyun_forced smiling",
-      "scenePrompt": "forced smile, sweat, closed mouth, 1.15::hand up, hand on own head, hand on own hip::, sunglasses,",
+      "scenePrompt": "1.15::forced smile, blush, sweat::, looking away, scratching head, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457905
@@ -309,7 +309,7 @@
     {
       "id": "1792744536882",
       "name": "No Gi-gyun_indifferent",
-      "scenePrompt": "bored, closed mouth, 1.15::arms behind head, head tilt::, sunglasses,",
+      "scenePrompt": "1.15::light smile, closed mouth::, looking away, hand in pocket, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536882
@@ -317,7 +317,7 @@
     {
       "id": "1792744536883",
       "name": "No Gi-gyun_guilty",
-      "scenePrompt": "guilt, frown, closed mouth, 1.15::head down, hand up, stroking own chin, arm at side::, sunglasses,",
+      "scenePrompt": "1.15::guilt, sad smile::, sweatdrop, looking down, hand on own neck, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536883
@@ -325,7 +325,7 @@
     {
       "id": "1792744536884",
       "name": "No Gi-gyun_pouting",
-      "scenePrompt": "pout, puffy cheeks, 1.15::hand up, scratching head, hand on own hip, head tilt::, sunglasses,",
+      "scenePrompt": "1.15::pout, frown::, looking to the side, hands on own hips, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536884
@@ -333,7 +333,7 @@
     {
       "id": "1792744536885",
       "name": "No Gi-gyun_angry smile",
-      "scenePrompt": "angry, grin, teeth, 1.15::hand up, salute, arm at side, head tilt::, sunglasses,",
+      "scenePrompt": "1.15::grin, teeth, shaded face::, looking at viewer, beckoning, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536885
@@ -341,7 +341,7 @@
     {
       "id": "1792744536886",
       "name": "No Gi-gyun_expressionless",
-      "scenePrompt": "expressionless, closed mouth, 1.15::hand up, hand on own cheek, arm at side::, sunglasses,",
+      "scenePrompt": "1.15::expressionless, closed mouth::, looking at viewer, hands on own hips, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536886
@@ -349,7 +349,7 @@
     {
       "id": "1792744536887",
       "name": "No Gi-gyun_tormented",
-      "scenePrompt": "distress, clenched teeth, sweat, 1.15::hand on own chest, hand on own thigh, slouching, head down::, sunglasses,",
+      "scenePrompt": "1.15::clenched teeth, furrowed brow::, shaded face, sweat, looking down, clenched hand, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536887
@@ -357,7 +357,7 @@
     {
       "id": "1792744536888",
       "name": "No Gi-gyun_crazy smile",
-      "scenePrompt": "crazy smile, grin, open mouth, teeth, 1.15::head back, spread arms, open hands::, sunglasses,",
+      "scenePrompt": "1.15::crazy smile, open mouth, teeth::, shaded face, head tilt, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536888
@@ -365,7 +365,7 @@
     {
       "id": "1792315457906",
       "name": "Song Ju-ik_suspicious",
-      "scenePrompt": "skeptical, frown, closed mouth, 1.15::hand up, adjusting eyewear, arm behind back, head tilt::, sunglasses,",
+      "scenePrompt": "1.15::frown, raised eyebrow::, closed mouth, looking at viewer, crossed arms, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457906
@@ -373,7 +373,7 @@
     {
       "id": "1792315457907",
       "name": "Song Ju-ik_worried",
-      "scenePrompt": "worried, parted lips, 1.15::hand up, hand on own chest, arm at side, head down::, sunglasses,",
+      "scenePrompt": "1.15::worried, raised inner eyebrows, sweat::, looking down, holding animal, hamster, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457907
@@ -381,7 +381,7 @@
     {
       "id": "1792315457908",
       "name": "Song Ju-ik_relieved",
-      "scenePrompt": "light smile, sigh, 1.15::hand up, hand on own neck, arm behind back, head back::, sunglasses,",
+      "scenePrompt": "1.15::smile, sigh::, looking up, holding popsicle, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457908
@@ -389,7 +389,7 @@
     {
       "id": "1792315457909",
       "name": "Song Ju-ik_disgusted",
-      "scenePrompt": "disgust, grimace, closed mouth, 1.15::twisted torso, hands up, open hands::, sunglasses,",
+      "scenePrompt": "1.15::disgust, frown, furrowed brow::, closed mouth, looking down, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457909
@@ -397,7 +397,7 @@
     {
       "id": "1792315457910",
       "name": "Song Ju-ik_determined",
-      "scenePrompt": "determined, confident, closed mouth, 1.15::hands up, fist in hand, head down::, sunglasses,",
+      "scenePrompt": "1.15::serious, v-shaped eyebrows::, closed mouth, looking at viewer, salute, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457910
@@ -405,7 +405,7 @@
     {
       "id": "1792315457911",
       "name": "Song Ju-ik_jealous",
-      "scenePrompt": "envy, pout, blush, 1.15::hand on own hip, arm behind back, head tilt::, sunglasses,",
+      "scenePrompt": "1.15::jealous, pout, furrowed brow::, looking to the side, clenched hand, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457911
@@ -413,7 +413,7 @@
     {
       "id": "1792315457912",
       "name": "Song Ju-ik_pleading",
-      "scenePrompt": "open mouth, 1.15::bowing, hands up, fist in hand::, sunglasses,",
+      "scenePrompt": "1.15::raised inner eyebrows, open mouth, blush::, looking at viewer, holding animal, hamster, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457912
@@ -421,7 +421,7 @@
     {
       "id": "1792315457913",
       "name": "Song Ju-ik_forced smiling",
-      "scenePrompt": "forced smile, blush, sweat, 1.15::hand up, salute, arm at side, head down::, sunglasses,",
+      "scenePrompt": "1.15::forced smile, sweat, blush::, looking away, scratching head, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457913
@@ -429,7 +429,7 @@
     {
       "id": "1792744536889",
       "name": "Song Ju-ik_indifferent",
-      "scenePrompt": "bored, closed mouth, 1.15::hand up, adjusting necktie, arm at side, looking away::, sunglasses,",
+      "scenePrompt": "1.15::expressionless, closed mouth::, looking to the side, hand on own chin, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536889
@@ -437,7 +437,7 @@
     {
       "id": "1792744536890",
       "name": "Song Ju-ik_guilty",
-      "scenePrompt": "guilt, frown, blush, 1.15::bowing, hand on own chest, arm at side::, sunglasses,",
+      "scenePrompt": "1.15::blush, clenched teeth, furrowed brow::, looking down, bowing, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536890
@@ -445,7 +445,7 @@
     {
       "id": "1792744536891",
       "name": "Song Ju-ik_pouting",
-      "scenePrompt": "pout, puffy cheeks, 1.15::hand up, hand on own neck, arm at side, twisted torso::, sunglasses,",
+      "scenePrompt": "1.15::pout, frown, furrowed brow::, closed mouth, crossed arms, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536891
@@ -453,7 +453,7 @@
     {
       "id": "1792744536892",
       "name": "Song Ju-ik_angry smile",
-      "scenePrompt": "angry, smile, clenched teeth, 1.15::outstretched arm, pointing forward, arm behind back::, sunglasses,",
+      "scenePrompt": "1.15::smile, anger vein, clenched teeth::, looking at viewer, clenched hand, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536892
@@ -461,7 +461,7 @@
     {
       "id": "1792744536893",
       "name": "Song Ju-ik_expressionless",
-      "scenePrompt": "expressionless, closed mouth, 1.15::hand up, adjusting necktie, arm at side::, sunglasses,",
+      "scenePrompt": "1.15::expressionless, serious::, closed mouth, looking at viewer, own hands clasped, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536893
@@ -469,7 +469,7 @@
     {
       "id": "1792744536894",
       "name": "Song Ju-ik_tormented",
-      "scenePrompt": "distress, clenched teeth, sweat, 1.15::hand up, hand on own chest, arm at side, head down, trembling::, sunglasses,",
+      "scenePrompt": "1.15::clenched teeth, raised inner eyebrows, sweat::, shaded face, looking down, hand on own head, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536894
@@ -477,7 +477,7 @@
     {
       "id": "1792744536895",
       "name": "Song Ju-ik_crazy smile",
-      "scenePrompt": "crazy smile, grin, teeth, 1.15::head back, hands up, clenched hands::, sunglasses,",
+      "scenePrompt": "1.15::crazy smile, open mouth, v-shaped eyebrows::, looking at viewer, pointing at viewer, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536895
@@ -485,7 +485,7 @@
     {
       "id": "1792315457914",
       "name": "Kwak Seong-ju_suspicious",
-      "scenePrompt": "skeptical, frown, closed mouth, 1.15::head tilt, hands on own hips::, sunglasses,",
+      "scenePrompt": "1.15::frown, raised eyebrow::, closed mouth, looking down, hand on own chin, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457914
@@ -493,7 +493,7 @@
     {
       "id": "1792315457915",
       "name": "Kwak Seong-ju_worried",
-      "scenePrompt": "worried, open mouth, sweat, 1.15::outstretched arm, stop (gesture), arm at side, head down::, sunglasses,",
+      "scenePrompt": "1.15::frown, furrowed brow::, closed mouth, looking up, hand on own chin, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457915
@@ -501,7 +501,7 @@
     {
       "id": "1792315457916",
       "name": "Kwak Seong-ju_relieved",
-      "scenePrompt": "grin, open mouth, sigh, 1.15::spread arms, open hands, head back::, sunglasses,",
+      "scenePrompt": "1.15::grin, open mouth, sigh::, sweat, hands on own hips, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457916
@@ -509,7 +509,7 @@
     {
       "id": "1792315457917",
       "name": "Kwak Seong-ju_disgusted",
-      "scenePrompt": "disgust, scowl, clenched teeth, 1.15::outstretched arm, pointing down, hand on own hip::, sunglasses,",
+      "scenePrompt": "1.15::disgust, frown, clenched teeth::, looking down, clenched hand, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457917
@@ -517,7 +517,7 @@
     {
       "id": "1792315457918",
       "name": "Kwak Seong-ju_determined",
-      "scenePrompt": "determined, confident, grin, 1.15::spread arms, clenched hands, head down::, sunglasses,",
+      "scenePrompt": "1.15::serious, clenched teeth, v-shaped eyebrows::, looking at viewer, clenched hands, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457918
@@ -525,7 +525,7 @@
     {
       "id": "1792315457919",
       "name": "Kwak Seong-ju_jealous",
-      "scenePrompt": "envy, pout, closed mouth, 1.15::hands on own hips, twisted torso, head down::, sunglasses,",
+      "scenePrompt": "1.15::jealous, pout, frown::, looking to the side, crossed arms, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457919
@@ -533,7 +533,7 @@
     {
       "id": "1792315457920",
       "name": "Kwak Seong-ju_pleading",
-      "scenePrompt": "open mouth, 1.15::hands up, fist in hand, head down::, sunglasses,",
+      "scenePrompt": "1.15::raised inner eyebrows, open mouth::, looking at viewer, index finger raised, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457920
@@ -541,7 +541,7 @@
     {
       "id": "1792315457921",
       "name": "Kwak Seong-ju_forced smiling",
-      "scenePrompt": "forced smile, grin, sweat, 1.15::hand up, scratching head, arm at side::, sunglasses,",
+      "scenePrompt": "1.15::forced smile, sweatdrop::, looking away, scratching head, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457921
@@ -549,7 +549,7 @@
     {
       "id": "1792744536896",
       "name": "Kwak Seong-ju_indifferent",
-      "scenePrompt": "bored, closed mouth, 1.15::hands on own hips, head tilt, looking away::, sunglasses,",
+      "scenePrompt": "1.15::bored, closed mouth::, looking away, hands on own hips, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536896
@@ -557,7 +557,7 @@
     {
       "id": "1792744536897",
       "name": "Kwak Seong-ju_guilty",
-      "scenePrompt": "guilt, frown, closed mouth, 1.15::head down, hands up, clenched hands, slouching::, sunglasses,",
+      "scenePrompt": "1.15::frown, clenched teeth::, shaded face, looking down, hand on own face, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536897
@@ -565,7 +565,7 @@
     {
       "id": "1792744536898",
       "name": "Kwak Seong-ju_pouting",
-      "scenePrompt": "pout, puffy cheeks, 1.15::shrugging, hands up, open hands, head back::, sunglasses,",
+      "scenePrompt": "1.15::pout, frown, annoyed::, looking to the side, crossed arms, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536898
@@ -573,7 +573,7 @@
     {
       "id": "1792744536899",
       "name": "Kwak Seong-ju_angry smile",
-      "scenePrompt": "angry, grin, teeth, 1.15::hand up, raised fist, hand on own hip::, sunglasses,",
+      "scenePrompt": "1.15::grin, teeth, anger vein::, looking at viewer, pointing at viewer, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536899
@@ -581,7 +581,7 @@
     {
       "id": "1792744536900",
       "name": "Kwak Seong-ju_expressionless",
-      "scenePrompt": "expressionless, closed mouth, 1.15::hand up, hand on own chin, arm behind back::, sunglasses,",
+      "scenePrompt": "1.15::expressionless, closed mouth::, looking at viewer, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536900
@@ -589,7 +589,7 @@
     {
       "id": "1792744536901",
       "name": "Kwak Seong-ju_tormented",
-      "scenePrompt": "distress, clenched teeth, tears, 1.15::head back, hands up, hands on own face::, sunglasses,",
+      "scenePrompt": "1.15::clenched teeth, sweat, furrowed brow::, shaded face, looking up, clenched hands, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536901
@@ -597,7 +597,7 @@
     {
       "id": "1792744536902",
       "name": "Kwak Seong-ju_crazy smile",
-      "scenePrompt": "crazy smile, open mouth, teeth, 1.15::spread arms, open hands, twisted torso::, sunglasses,",
+      "scenePrompt": "1.15::crazy smile, open mouth, teeth::, sweat, looking up, clenched hand, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536902
@@ -605,7 +605,7 @@
     {
       "id": "1792315457922",
       "name": "Cho Seong-choon_suspicious",
-      "scenePrompt": "skeptical, scowl, parted lips, 1.15::outstretched arm, pointing at viewer, hand on own hip, head tilt::, sunglasses,",
+      "scenePrompt": "1.15::frown, open mouth, furrowed brow::, looking at viewer, pointing at viewer, sunglasses, loose necktie,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457922
@@ -613,7 +613,7 @@
     {
       "id": "1792315457923",
       "name": "Cho Seong-choon_worried",
-      "scenePrompt": "worried, open mouth, sweat, trembling, 1.15::hands up, open hands, leaning back::, sunglasses,",
+      "scenePrompt": "1.15::frown, sweat, clenched teeth::, looking to the side, adjusting eyewear, sunglasses, loose necktie,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457923
@@ -621,7 +621,7 @@
     {
       "id": "1792315457924",
       "name": "Cho Seong-choon_relieved",
-      "scenePrompt": "grin, sweat, sigh, 1.15::hand up, wiping sweat, hand on own hip, head back::, sunglasses,",
+      "scenePrompt": "1.15::sigh, sweat, light smile::, looking up, hand on own neck, sunglasses, loose necktie,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457924
@@ -629,7 +629,7 @@
     {
       "id": "1792315457925",
       "name": "Cho Seong-choon_disgusted",
-      "scenePrompt": "disgust, grimace, tongue out, 1.15::hand up, holding nose, arm at side, head back::, sunglasses,",
+      "scenePrompt": "1.15::disgust, frown, clenched teeth::, looking to the side, hand in pocket, sunglasses, loose necktie,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457925
@@ -637,7 +637,7 @@
     {
       "id": "1792315457926",
       "name": "Cho Seong-choon_determined",
-      "scenePrompt": "determined, clenched teeth, sweat, 1.15::hands up, clenched hands, head down::, sunglasses,",
+      "scenePrompt": "1.15::clenched teeth, v-shaped eyebrows, sweat::, looking at viewer, adjusting necktie, sunglasses, loose necktie,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457926
@@ -645,7 +645,7 @@
     {
       "id": "1792315457927",
       "name": "Cho Seong-choon_jealous",
-      "scenePrompt": "envy, pout, blush, 1.15::hand up, collar tug, hand on own hip, head tilt::, sunglasses,",
+      "scenePrompt": "1.15::jealous, frown, pout::, looking to the side, crossed arms, sunglasses, loose necktie,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457927
@@ -653,7 +653,7 @@
     {
       "id": "1792315457928",
       "name": "Cho Seong-choon_pleading",
-      "scenePrompt": "open mouth, 1.15::hands up, own hands clasped, head down::, sunglasses,",
+      "scenePrompt": "1.15::frown, open mouth, raised inner eyebrows::, sweat, outstretched hand, sunglasses, loose necktie,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457928
@@ -661,7 +661,7 @@
     {
       "id": "1792315457929",
       "name": "Cho Seong-choon_forced smiling",
-      "scenePrompt": "forced smile, grin, sweat, 1.15::hand up, waving, hand on own hip, head tilt::, sunglasses,",
+      "scenePrompt": "1.15::forced smile, frown, sweatdrop::, looking away, scratching head, sunglasses, loose necktie,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457929
@@ -669,7 +669,7 @@
     {
       "id": "1792744536903",
       "name": "Cho Seong-choon_indifferent",
-      "scenePrompt": "bored, closed mouth, 1.15::slouching, hand up, hand on own cheek, hand on own hip::, sunglasses,",
+      "scenePrompt": "1.15::closed mouth, frown::, looking away, hand on own chin, sunglasses, loose necktie,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536903
@@ -677,7 +677,7 @@
     {
       "id": "1792744536904",
       "name": "Cho Seong-choon_guilty",
-      "scenePrompt": "guilt, grimace, blush, 1.15::hand up, scratching head, arm behind back, head down::, sunglasses,",
+      "scenePrompt": "1.15::wavy mouth, sweatdrop, frown::, looking away, hand on own neck, sunglasses, loose necktie,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536904
@@ -685,7 +685,7 @@
     {
       "id": "1792744536905",
       "name": "Cho Seong-choon_pouting",
-      "scenePrompt": "pout, puffy cheeks, 1.15::crossed arms, head back, twisted torso::, sunglasses,",
+      "scenePrompt": "1.15::pout, frown::, closed mouth, looking down, hands in pockets, sunglasses, loose necktie,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536905
@@ -693,7 +693,7 @@
     {
       "id": "1792744536906",
       "name": "Cho Seong-choon_angry smile",
-      "scenePrompt": "angry, grin, clenched teeth, 1.15::hands up, fist in hand, head tilt::, sunglasses,",
+      "scenePrompt": "1.15::grin, frown, teeth::, sweat, looking at viewer, clenched hand, sunglasses, loose necktie,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536906
@@ -701,7 +701,7 @@
     {
       "id": "1792744536907",
       "name": "Cho Seong-choon_expressionless",
-      "scenePrompt": "expressionless, closed mouth, 1.15::hand up, adjusting necktie, arm behind back::, sunglasses,",
+      "scenePrompt": "1.15::expressionless, closed mouth::, sweat, shaded face, looking down, sunglasses, loose necktie,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536907
@@ -709,7 +709,7 @@
     {
       "id": "1792744536908",
       "name": "Cho Seong-choon_tormented",
-      "scenePrompt": "distress, despair, open mouth, sweat, 1.15::head down, hands on own knees, slouching::, sunglasses,",
+      "scenePrompt": "1.15::scared, gritted teeth, sweat::, furrowed brow, looking at viewer, clenched hand, sunglasses, loose necktie,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536908
@@ -717,7 +717,7 @@
     {
       "id": "1792744536909",
       "name": "Cho Seong-choon_crazy smile",
-      "scenePrompt": "crazy smile, grin, sweat, tears, 1.15::head back, hand up, clenched hand, arm at side::, sunglasses,",
+      "scenePrompt": "1.15::crazy smile, open mouth, teeth::, sweat, looking up, hands in pockets, sunglasses, loose necktie,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536909
@@ -725,7 +725,7 @@
     {
       "id": "1792315457930",
       "name": "Yun Byeong-su_suspicious",
-      "scenePrompt": "skeptical, light smile, closed mouth, 1.15::hand up, adjusting eyewear, arm behind back, head tilt::, sunglasses,",
+      "scenePrompt": "1.15::frown, closed mouth::, looking at viewer, crossed arms, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457930
@@ -733,7 +733,7 @@
     {
       "id": "1792315457931",
       "name": "Yun Byeong-su_worried",
-      "scenePrompt": "worried, frown, parted lips, 1.15::hands up, interlocked fingers, head down::, sunglasses,",
+      "scenePrompt": "1.15::serious, closed mouth::, looking down, holding cigarette, smoke, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457931
@@ -741,7 +741,7 @@
     {
       "id": "1792315457932",
       "name": "Yun Byeong-su_relieved",
-      "scenePrompt": "light smile, sigh, 1.15::hand up, hand on own chin, arm at side, head back::, sunglasses,",
+      "scenePrompt": "1.15::sigh, closed mouth::, smoking, cigarette, looking up, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457932
@@ -749,7 +749,7 @@
     {
       "id": "1792315457933",
       "name": "Yun Byeong-su_disgusted",
-      "scenePrompt": "disgust, disdain, closed mouth, 1.15::hand up, hand on own chin, arm behind back, twisted torso::, sunglasses,",
+      "scenePrompt": "1.15::disdain, frown::, closed mouth, looking down, hands in pockets, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457933
@@ -757,7 +757,7 @@
     {
       "id": "1792315457934",
       "name": "Yun Byeong-su_determined",
-      "scenePrompt": "determined, serious, closed mouth, 1.15::hand up, index finger raised, arm at side, head down::, sunglasses,",
+      "scenePrompt": "1.15::serious, open mouth::, looking at viewer, pointing forward, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457934
@@ -765,7 +765,7 @@
     {
       "id": "1792315457935",
       "name": "Yun Byeong-su_jealous",
-      "scenePrompt": "envy, smirk, closed mouth, 1.15::hand up, hand on own cheek, arm behind back, head tilt::, sunglasses,",
+      "scenePrompt": "1.15::expressionless, closed mouth::, looking to the side, holding own arm, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457935
@@ -773,7 +773,7 @@
     {
       "id": "1792315457936",
       "name": "Yun Byeong-su_pleading",
-      "scenePrompt": "light smile, 1.15::hand up, hand on own chest, arm behind back, head down::, sunglasses,",
+      "scenePrompt": "1.15::serious, parted lips, furrowed brow::, looking at viewer, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457936
@@ -781,7 +781,7 @@
     {
       "id": "1792315457937",
       "name": "Yun Byeong-su_forced smiling",
-      "scenePrompt": "forced smile, closed mouth, 1.15::hand up, adjusting necktie, arm at side, looking away::, sunglasses,",
+      "scenePrompt": "1.15::light smile, closed mouth::, head tilt, crossed arms, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457937
@@ -789,7 +789,7 @@
     {
       "id": "1792744536910",
       "name": "Yun Byeong-su_indifferent",
-      "scenePrompt": "bored, closed mouth, 1.15::hand up, hand on own ear, arm at side, head tilt::, sunglasses,",
+      "scenePrompt": "1.15::expressionless, closed mouth::, cigarette, mouth hold, looking away, hands in pockets, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536910
@@ -797,7 +797,7 @@
     {
       "id": "1792744536911",
       "name": "Yun Byeong-su_guilty",
-      "scenePrompt": "guilt, frown, closed mouth, 1.15::hands up, fidgeting, head down::, sunglasses,",
+      "scenePrompt": "1.15::expressionless, shaded face::, closed mouth, looking down, hand in pocket, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536911
@@ -805,7 +805,7 @@
     {
       "id": "1792744536912",
       "name": "Yun Byeong-su_pouting",
-      "scenePrompt": "pout, closed mouth, 1.15::hand up, hand to own mouth, arm behind back, head tilt::, sunglasses,",
+      "scenePrompt": "1.15::annoyed, frown::, closed mouth, looking to the side, holding own arm, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536912
@@ -813,7 +813,7 @@
     {
       "id": "1792744536913",
       "name": "Yun Byeong-su_angry smile",
-      "scenePrompt": "angry, smile, teeth, 1.15::outstretched arm, pointing down, arm at side::, sunglasses,",
+      "scenePrompt": "1.15::smirk, anger vein::, shaded face, looking at viewer, crossed arms, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536913
@@ -821,7 +821,7 @@
     {
       "id": "1792744536914",
       "name": "Yun Byeong-su_expressionless",
-      "scenePrompt": "expressionless, closed mouth, 1.15::hand up, hand on own ear, hand on own hip::, sunglasses,",
+      "scenePrompt": "1.15::expressionless, closed mouth::, looking at viewer, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536914
@@ -829,7 +829,7 @@
     {
       "id": "1792744536915",
       "name": "Yun Byeong-su_tormented",
-      "scenePrompt": "distress, grimace, sweat, 1.15::head down, hand up, hand over own mouth, arm behind back, slouching::, sunglasses,",
+      "scenePrompt": "1.15::clenched teeth, furrowed brow::, shaded face, looking down, hand on own face, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536915
@@ -837,7 +837,7 @@
     {
       "id": "1792744536916",
       "name": "Yun Byeong-su_crazy smile",
-      "scenePrompt": "crazy smile, grin, shaded face, 1.15::hands up, steepled fingers, head tilt::, sunglasses,",
+      "scenePrompt": "1.15::smirk, shaded face::, closed mouth, head tilt, looking at viewer, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536916
@@ -845,7 +845,7 @@
     {
       "id": "1792315457938",
       "name": "Kim Seong-jin_suspicious",
-      "scenePrompt": "skeptical, smirk, 1.15::head tilt, hand up, pointing at viewer, hand on own hip::, sunglasses,",
+      "scenePrompt": "1.15::smirk, raised eyebrow::, looking to the side, adjusting eyewear, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457938
@@ -853,7 +853,7 @@
     {
       "id": "1792315457939",
       "name": "Kim Seong-jin_worried",
-      "scenePrompt": "worried, open mouth, sweat, 1.15::outstretched arm, reaching, arm at side, head down::, sunglasses,",
+      "scenePrompt": "1.15::worried, parted lips, sweat::, looking down, holding phone, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457939
@@ -861,7 +861,7 @@
     {
       "id": "1792315457940",
       "name": "Kim Seong-jin_relieved",
-      "scenePrompt": "grin, sigh, 1.15::hand up, thumbs up, arm behind back::, sunglasses,",
+      "scenePrompt": "1.15::grin, teeth, sweat::, sigh, looking up, hands in pockets, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457940
@@ -869,7 +869,7 @@
     {
       "id": "1792315457941",
       "name": "Kim Seong-jin_disgusted",
-      "scenePrompt": "disgust, grimace, tongue out, 1.15::shrugging, hand up, thumbs down, arm at side::, sunglasses,",
+      "scenePrompt": "1.15::disgust, smirk::, looking at viewer, pointing at viewer, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457941
@@ -877,7 +877,7 @@
     {
       "id": "1792315457942",
       "name": "Kim Seong-jin_determined",
-      "scenePrompt": "determined, confident, smile, 1.15::pointing at self, hand up, hand on own hip::, sunglasses,",
+      "scenePrompt": "1.15::serious, closed mouth::, looking to the side, adjusting eyewear, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457942
@@ -885,7 +885,7 @@
     {
       "id": "1792315457943",
       "name": "Kim Seong-jin_jealous",
-      "scenePrompt": "envy, pout, closed mouth, 1.15::hand up, thumbs down, hand on own hip, head tilt::, sunglasses,",
+      "scenePrompt": "1.15::pout, jealous, frown::, looking to the side, crossed arms, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457943
@@ -893,7 +893,7 @@
     {
       "id": "1792315457944",
       "name": "Kim Seong-jin_pleading",
-      "scenePrompt": "forced smile, 1.15::hands up, open hands, shrugging, head down::, sunglasses,",
+      "scenePrompt": "1.15::grin, raised eyebrows, open mouth::, looking at viewer, thumbs up, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457944
@@ -901,7 +901,7 @@
     {
       "id": "1792315457945",
       "name": "Kim Seong-jin_forced smiling",
-      "scenePrompt": "forced smile, sweat, 1.15::hand up, scratching head, arm at side::, sunglasses,",
+      "scenePrompt": "1.15::forced smile, sweatdrop, teeth::, looking away, scratching head, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457945
@@ -909,7 +909,7 @@
     {
       "id": "1792744536917",
       "name": "Kim Seong-jin_indifferent",
-      "scenePrompt": "bored, closed mouth, 1.15::arms behind head, head back::, sunglasses,",
+      "scenePrompt": "1.15::bored, closed mouth::, looking away, hands in pockets, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536917
@@ -917,7 +917,7 @@
     {
       "id": "1792744536918",
       "name": "Kim Seong-jin_guilty",
-      "scenePrompt": "guilt, frown, blush, 1.15::bowing, hand up, hand on own neck, arm at side::, sunglasses,",
+      "scenePrompt": "1.15::wavy mouth, sweatdrop::, looking away, holding phone, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536918
@@ -925,7 +925,7 @@
     {
       "id": "1792744536919",
       "name": "Kim Seong-jin_pouting",
-      "scenePrompt": "pout, puffy cheeks, 1.15::hands up, open hands, head tilt, leaning back::, sunglasses,",
+      "scenePrompt": "1.15::pout, annoyed::, looking to the side, hand on own hip, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536919
@@ -933,7 +933,7 @@
     {
       "id": "1792744536920",
       "name": "Kim Seong-jin_angry smile",
-      "scenePrompt": "angry, grin, teeth, 1.15::hand up, finger gun, arm at side, head tilt::, sunglasses,",
+      "scenePrompt": "1.15::grin, teeth, anger vein::, shaded face, looking at viewer, clenched hand, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536920
@@ -941,7 +941,7 @@
     {
       "id": "1792744536921",
       "name": "Kim Seong-jin_expressionless",
-      "scenePrompt": "expressionless, closed mouth, 1.15::hand up, adjusting eyewear, arm behind back::, sunglasses,",
+      "scenePrompt": "1.15::expressionless, closed mouth::, shaded face, looking down, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536921
@@ -949,7 +949,7 @@
     {
       "id": "1792744536922",
       "name": "Kim Seong-jin_tormented",
-      "scenePrompt": "distress, despair, tears, open mouth, 1.15::outstretched arms, reaching, spread fingers, head down::, sunglasses,",
+      "scenePrompt": "1.15::clenched teeth, sweat, furrowed brow::, shaded face, looking down, hands on own head, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536922
@@ -957,7 +957,7 @@
     {
       "id": "1792744536923",
       "name": "Kim Seong-jin_crazy smile",
-      "scenePrompt": "crazy smile, grin, open mouth, 1.15::head back, hands up, clenched hands::, sunglasses,",
+      "scenePrompt": "1.15::crazy smile, open mouth, teeth::, laughing, adjusting eyewear, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536923
@@ -965,7 +965,7 @@
     {
       "id": "1792315457946",
       "name": "Song Jin-seob_suspicious",
-      "scenePrompt": "skeptical, frown, 1.15::hand up, adjusting eyewear, arm at side, head tilt::, sunglasses,",
+      "scenePrompt": "1.15::pout, raised eyebrow::, closed mouth, pointing at viewer, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457946
@@ -973,7 +973,7 @@
     {
       "id": "1792315457947",
       "name": "Song Jin-seob_worried",
-      "scenePrompt": "worried, sweat, wavy mouth, 1.15::hands up, fidgeting, head down::, sunglasses,",
+      "scenePrompt": "1.15::worried, raised inner eyebrows, wavy mouth::, sweat, own hands together, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457947
@@ -981,7 +981,7 @@
     {
       "id": "1792315457948",
       "name": "Song Jin-seob_relieved",
-      "scenePrompt": "light smile, sigh, sweat, 1.15::hand up, hand on own chest, arm behind back::, sunglasses,",
+      "scenePrompt": "1.15::smile, open mouth, sigh::, looking at viewer, hand on own chest, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457948
@@ -989,7 +989,7 @@
     {
       "id": "1792315457949",
       "name": "Song Jin-seob_disgusted",
-      "scenePrompt": "disgust, grimace, open mouth, 1.15::leaning back, hands up, open hands::, sunglasses,",
+      "scenePrompt": "1.15::disgust, frown, wavy mouth::, sweat, looking down, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457949
@@ -997,7 +997,7 @@
     {
       "id": "1792315457950",
       "name": "Song Jin-seob_determined",
-      "scenePrompt": "determined, clenched teeth, sweat, 1.15::hand up, clenched hand, arm at side, head down::, sunglasses,",
+      "scenePrompt": "1.15::v-shaped eyebrows, open mouth, serious::, looking at viewer, clenched hands, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457950
@@ -1005,7 +1005,7 @@
     {
       "id": "1792315457951",
       "name": "Song Jin-seob_jealous",
-      "scenePrompt": "envy, blush, 1.15::hand up, biting own thumb, arm at side, head tilt::, sunglasses,",
+      "scenePrompt": "1.15::pout, jealous, puffy cheeks::, looking to the side, holding own arm, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457951
@@ -1013,7 +1013,7 @@
     {
       "id": "1792315457952",
       "name": "Song Jin-seob_pleading",
-      "scenePrompt": "tears, open mouth, 1.15::hands up, palms together, bowing::, sunglasses,",
+      "scenePrompt": "1.15::raised inner eyebrows, wavy mouth, sweat::, looking at viewer, own hands clasped, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457952
@@ -1021,7 +1021,7 @@
     {
       "id": "1792315457953",
       "name": "Song Jin-seob_forced smiling",
-      "scenePrompt": "forced smile, sweat, 1.15::collar tug, hand up, arm at side, head tilt::, sunglasses,",
+      "scenePrompt": "1.15::forced smile, sweatdrop::, looking down, adjusting necktie, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457953
@@ -1029,7 +1029,7 @@
     {
       "id": "1792744536924",
       "name": "Song Jin-seob_indifferent",
-      "scenePrompt": "bored, closed mouth, 1.15::slouching, hand up, hand on own chin, arm at side::, sunglasses,",
+      "scenePrompt": "1.15::expressionless, closed mouth, sigh::, looking away, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536924
@@ -1037,7 +1037,7 @@
     {
       "id": "1792744536925",
       "name": "Song Jin-seob_guilty",
-      "scenePrompt": "guilt, frown, blush, 1.15::arms behind back, head down::, sunglasses,",
+      "scenePrompt": "1.15::sweatdrop, blush, raised inner eyebrows::, looking to the side, covering own mouth, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536925
@@ -1045,7 +1045,7 @@
     {
       "id": "1792744536926",
       "name": "Song Jin-seob_pouting",
-      "scenePrompt": "pout, puffy cheeks, 1.15::hand up, hand on own cheek, hand on own hip::, sunglasses,",
+      "scenePrompt": "1.15::pout, puffy cheeks, frown::, looking to the side, crossed arms, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536926
@@ -1053,7 +1053,7 @@
     {
       "id": "1792744536927",
       "name": "Song Jin-seob_angry smile",
-      "scenePrompt": "angry, forced smile, sweat, 1.15::hand up, clenched hand, hand on own chest, arm at side::, sunglasses,",
+      "scenePrompt": "1.15::smile, anger vein, clenched teeth::, looking at viewer, clenched hand, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536927
@@ -1061,7 +1061,7 @@
     {
       "id": "1792744536928",
       "name": "Song Jin-seob_expressionless",
-      "scenePrompt": "expressionless, closed mouth, 1.15::hands up, palms together, head tilt::, sunglasses,",
+      "scenePrompt": "1.15::expressionless, closed mouth, sweat::, looking down, own hands together, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536928
@@ -1069,7 +1069,7 @@
     {
       "id": "1792744536929",
       "name": "Song Jin-seob_tormented",
-      "scenePrompt": "distress, open mouth, tears, trembling, 1.15::hands on own head, leaning back, head down::, sunglasses,",
+      "scenePrompt": "1.15::scared, clenched teeth, sweat::, trembling, hands on own head, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536929
@@ -1077,7 +1077,7 @@
     {
       "id": "1792744536930",
       "name": "Song Jin-seob_crazy smile",
-      "scenePrompt": "crazy smile, grin, tears, sweat, 1.15::hand up, hand to own mouth, hand on own chest, head tilt::, sunglasses,",
+      "scenePrompt": "1.15::crazy smile, open mouth, sweat::, trembling, looking at viewer, clenched hands, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536930
@@ -1085,7 +1085,7 @@
     {
       "id": "1792315457954",
       "name": "Lee Gil-hwan_suspicious",
-      "scenePrompt": "skeptical, light smile, closed mouth, 1.15::hand up, hand on own cheek, arm at side, head tilt::, sunglasses,",
+      "scenePrompt": "1.15::smile, closed mouth::, head tilt, looking to the side, hands in pockets, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457954
@@ -1093,7 +1093,7 @@
     {
       "id": "1792315457955",
       "name": "Lee Gil-hwan_worried",
-      "scenePrompt": "worried, sad smile, 1.15::hands up, palms together, head down::, sunglasses,",
+      "scenePrompt": "1.15::sad smile, raised inner eyebrows::, closed mouth, head tilt, own hands together, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457955
@@ -1101,7 +1101,7 @@
     {
       "id": "1792315457956",
       "name": "Lee Gil-hwan_relieved",
-      "scenePrompt": "smile, sigh, 1.15::hand on own stomach, hand up, open hand::, sunglasses,",
+      "scenePrompt": "1.15::smile, closed mouth, sigh::, looking at viewer, holding microphone, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457956
@@ -1109,7 +1109,7 @@
     {
       "id": "1792315457957",
       "name": "Lee Gil-hwan_disgusted",
-      "scenePrompt": "disgust, disdain, closed mouth, 1.15::hand up, hand to own mouth, hand on own stomach, head tilt::, sunglasses,",
+      "scenePrompt": "1.15::smile, closed mouth, shaded face::, looking down, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457957
@@ -1117,7 +1117,7 @@
     {
       "id": "1792315457958",
       "name": "Lee Gil-hwan_determined",
-      "scenePrompt": "determined, smile, closed mouth, 1.15::outstretched arm, beckoning, hand on own stomach::, sunglasses,",
+      "scenePrompt": "1.15::smile, open mouth::, looking at viewer, holding microphone, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457958
@@ -1125,7 +1125,7 @@
     {
       "id": "1792315457959",
       "name": "Lee Gil-hwan_jealous",
-      "scenePrompt": "envy, forced smile, closed mouth, 1.15::hand up, adjusting necktie, hand on own hip::, sunglasses,",
+      "scenePrompt": "1.15::smile, closed mouth, sweatdrop::, looking to the side, own hands together, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457959
@@ -1133,7 +1133,7 @@
     {
       "id": "1792315457960",
       "name": "Lee Gil-hwan_pleading",
-      "scenePrompt": "smile, 1.15::outstretched arms, open hands, head tilt::, sunglasses,",
+      "scenePrompt": "1.15::smile, closed mouth, raised inner eyebrows::, bowing, own hands clasped, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457960
@@ -1141,7 +1141,7 @@
     {
       "id": "1792315457961",
       "name": "Lee Gil-hwan_forced smiling",
-      "scenePrompt": "forced smile, sweat, 1.15::hands up, hands on own cheeks, head tilt::, sunglasses,",
+      "scenePrompt": "1.15::forced smile, closed mouth::, looking at viewer, palm up, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457961
@@ -1149,7 +1149,7 @@
     {
       "id": "1792744536931",
       "name": "Lee Gil-hwan_indifferent",
-      "scenePrompt": "bored, closed mouth, 1.15::shrugging, open hands, head back::, sunglasses,",
+      "scenePrompt": "1.15::light smile, closed mouth::, looking away, hands in pockets, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536931
@@ -1157,7 +1157,7 @@
     {
       "id": "1792744536932",
       "name": "Lee Gil-hwan_guilty",
-      "scenePrompt": "guilt, sad smile, closed mouth, 1.15::hands up, own hands clasped, head down::, sunglasses,",
+      "scenePrompt": "1.15::sad smile, closed mouth::, looking down, outstretched hand, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536932
@@ -1165,7 +1165,7 @@
     {
       "id": "1792744536933",
       "name": "Lee Gil-hwan_pouting",
-      "scenePrompt": "pout, puffy cheeks, 1.15::hand up, hand on own chin, hand on own hip::, sunglasses,",
+      "scenePrompt": "1.15::smile, closed mouth, sweatdrop::, head tilt, hand on own cheek, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536933
@@ -1173,7 +1173,7 @@
     {
       "id": "1792744536934",
       "name": "Lee Gil-hwan_angry smile",
-      "scenePrompt": "angry, smile, teeth, 1.15::hand up, pointing forward, arm behind back, head down::, sunglasses,",
+      "scenePrompt": "1.15::smile, closed mouth, shaded face::, looking down, hands in pockets, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536934
@@ -1181,7 +1181,7 @@
     {
       "id": "1792744536935",
       "name": "Lee Gil-hwan_expressionless",
-      "scenePrompt": "expressionless, closed mouth, 1.15::hands up, interlocked fingers, head tilt::, sunglasses,",
+      "scenePrompt": "1.15::light smile, closed mouth::, looking at viewer, own hands together, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536935
@@ -1189,7 +1189,7 @@
     {
       "id": "1792744536936",
       "name": "Lee Gil-hwan_tormented",
-      "scenePrompt": "distress, grimace, sweat, 1.15::hand on own stomach, hand up, hand on own forehead, slouching::, sunglasses,",
+      "scenePrompt": "1.15::smile, closed mouth, sweat::, looking down, hand on own neck, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536936
@@ -1197,7 +1197,7 @@
     {
       "id": "1792744536937",
       "name": "Lee Gil-hwan_crazy smile",
-      "scenePrompt": "crazy smile, grin, open mouth, 1.15::spread arms, open hands, head tilt::, sunglasses,",
+      "scenePrompt": "1.15::smile, parted lips, shaded face::, head tilt, palm up, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536937
@@ -1205,7 +1205,7 @@
     {
       "id": "1792315457962",
       "name": "Lee Gi-seok_suspicious",
-      "scenePrompt": "skeptical, light smile, 1.15::hand up, adjusting eyewear, arm at side, head tilt::, sunglasses, prosthetic arm,",
+      "scenePrompt": "1.15::smirk, closed mouth::, head tilt, hand on own chin, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457962
@@ -1213,7 +1213,7 @@
     {
       "id": "1792315457963",
       "name": "Lee Gi-seok_worried",
-      "scenePrompt": "worried, frown, parted lips, 1.15::hand up, hand on own chest, arm behind back::, sunglasses, prosthetic arm,",
+      "scenePrompt": "1.15::frown, closed mouth::, looking down, holding own arm, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457963
@@ -1221,7 +1221,7 @@
     {
       "id": "1792315457964",
       "name": "Lee Gi-seok_relieved",
-      "scenePrompt": "light smile, sigh, 1.15::hand up, wiping sweat, arm at side, head back::, sunglasses, prosthetic arm,",
+      "scenePrompt": "1.15::grin, sigh, sweat::, looking up, holding microphone, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457964
@@ -1229,7 +1229,7 @@
     {
       "id": "1792315457965",
       "name": "Lee Gi-seok_disgusted",
-      "scenePrompt": "disgust, grimace, closed mouth, 1.15::twisted torso, outstretched arm, stop (gesture), arm at side::, sunglasses, prosthetic arm,",
+      "scenePrompt": "1.15::disgust, frown::, closed mouth, looking down, crossed arms, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457965
@@ -1237,7 +1237,7 @@
     {
       "id": "1792315457966",
       "name": "Lee Gi-seok_determined",
-      "scenePrompt": "determined, serious, closed mouth, 1.15::hand up, clenched hand, hand on own chest, arm at side::, sunglasses, prosthetic arm,",
+      "scenePrompt": "1.15::grin, open mouth, v-shaped eyebrows::, looking at viewer, holding microphone, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457966
@@ -1245,7 +1245,7 @@
     {
       "id": "1792315457967",
       "name": "Lee Gi-seok_jealous",
-      "scenePrompt": "envy, pout, closed mouth, 1.15::hand up, adjusting necktie, arm behind back, head tilt::, sunglasses, prosthetic arm,",
+      "scenePrompt": "1.15::pout, jealous::, looking to the side, hand on own hip, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457967
@@ -1253,7 +1253,7 @@
     {
       "id": "1792315457968",
       "name": "Lee Gi-seok_pleading",
-      "scenePrompt": "open mouth, 1.15::hand up, hand on own chest, arm at side, bowing::, sunglasses, prosthetic arm,",
+      "scenePrompt": "1.15::open mouth, raised eyebrows::, looking at viewer, hand on own ear, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457968
@@ -1261,7 +1261,7 @@
     {
       "id": "1792315457969",
       "name": "Lee Gi-seok_forced smiling",
-      "scenePrompt": "forced smile, sweat, 1.15::hand up, scratching head, arm at side, head down::, sunglasses, prosthetic arm,",
+      "scenePrompt": "1.15::forced smile, sweatdrop::, looking down, holding own arm, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457969
@@ -1269,7 +1269,7 @@
     {
       "id": "1792744536938",
       "name": "Lee Gi-seok_indifferent",
-      "scenePrompt": "bored, closed mouth, 1.15::hand up, open hand, arm at side, twisted torso::, sunglasses, prosthetic arm,",
+      "scenePrompt": "1.15::expressionless, closed mouth::, looking away, hand in pocket, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536938
@@ -1277,7 +1277,7 @@
     {
       "id": "1792744536939",
       "name": "Lee Gi-seok_guilty",
-      "scenePrompt": "guilt, frown, closed mouth, 1.15::head down, hand up, hand on own face, arm at side::, sunglasses, prosthetic arm,",
+      "scenePrompt": "1.15::wavy mouth, sweatdrop::, looking up, scratching head, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536939
@@ -1285,7 +1285,7 @@
     {
       "id": "1792744536940",
       "name": "Lee Gi-seok_pouting",
-      "scenePrompt": "pout, puffy cheeks, 1.15::hand up, hand on own chin, arm at side, head down::, sunglasses, prosthetic arm,",
+      "scenePrompt": "1.15::pout, annoyed::, looking to the side, crossed arms, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536940
@@ -1293,7 +1293,7 @@
     {
       "id": "1792744536941",
       "name": "Lee Gi-seok_angry smile",
-      "scenePrompt": "angry, smile, teeth, 1.15::hand up, clenched hand, arm at side, head tilt::, sunglasses, prosthetic arm,",
+      "scenePrompt": "1.15::grin, teeth, furrowed brow::, looking at viewer, pointing at viewer, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536941
@@ -1301,7 +1301,7 @@
     {
       "id": "1792744536942",
       "name": "Lee Gi-seok_expressionless",
-      "scenePrompt": "expressionless, closed mouth, 1.15::hand up, hand on own ear, arm at side, head tilt::, sunglasses, prosthetic arm,",
+      "scenePrompt": "1.15::expressionless, closed mouth::, looking at viewer, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536942
@@ -1309,7 +1309,7 @@
     {
       "id": "1792744536943",
       "name": "Lee Gi-seok_tormented",
-      "scenePrompt": "distress, clenched teeth, sweat, 1.15::slouching, hand on own thigh, arm at side, head down::, sunglasses, prosthetic arm,",
+      "scenePrompt": "1.15::clenched teeth, furrowed brow::, shaded face, looking down, holding own arm, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536943
@@ -1317,7 +1317,7 @@
     {
       "id": "1792744536944",
       "name": "Lee Gi-seok_crazy smile",
-      "scenePrompt": "crazy smile, grin, open mouth, 1.15::head back, hand up, open hand, arm at side::, sunglasses, prosthetic arm,",
+      "scenePrompt": "1.15::crazy smile, open mouth::, looking at viewer, holding cup, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536944
@@ -1325,7 +1325,7 @@
     {
       "id": "1792315457970",
       "name": "Kim Jo-hak_suspicious",
-      "scenePrompt": "skeptical, frown, closed mouth, 1.15::hands up, steepled fingers, head down::, sunglasses,",
+      "scenePrompt": "1.15::frown, closed mouth::, looking at viewer, adjusting eyewear, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457970
@@ -1333,7 +1333,7 @@
     {
       "id": "1792315457971",
       "name": "Kim Jo-hak_worried",
-      "scenePrompt": "worried, grimace, sweat, 1.15::hand up, adjusting necktie, hand on own hip::, sunglasses,",
+      "scenePrompt": "1.15::serious, frown::, closed mouth, looking down, hand on own chin, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457971
@@ -1341,7 +1341,7 @@
     {
       "id": "1792315457972",
       "name": "Kim Jo-hak_relieved",
-      "scenePrompt": "light smile, sigh, 1.15::hand up, hand on own forehead, arm at side, head back::, sunglasses,",
+      "scenePrompt": "1.15::light smile, sigh::, looking at viewer, holding cup, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457972
@@ -1349,7 +1349,7 @@
     {
       "id": "1792315457973",
       "name": "Kim Jo-hak_disgusted",
-      "scenePrompt": "disgust, disdain, closed mouth, 1.15::hand up, facepalm, arm behind back, head down::, sunglasses,",
+      "scenePrompt": "1.15::disgust, disdain, frown::, looking down, pointing at viewer, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457973
@@ -1357,7 +1357,7 @@
     {
       "id": "1792315457974",
       "name": "Kim Jo-hak_determined",
-      "scenePrompt": "determined, serious, closed mouth, 1.15::outstretched arm, pointing at viewer, hand on own hip::, sunglasses,",
+      "scenePrompt": "1.15::serious, closed mouth::, looking at viewer, crossed arms, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457974
@@ -1365,7 +1365,7 @@
     {
       "id": "1792315457975",
       "name": "Kim Jo-hak_jealous",
-      "scenePrompt": "envy, grimace, closed mouth, 1.15::hand up, hand on own chin, arm behind back, head down::, sunglasses,",
+      "scenePrompt": "1.15::annoyed, frown::, closed mouth, looking to the side, crossed arms, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457975
@@ -1373,7 +1373,7 @@
     {
       "id": "1792315457976",
       "name": "Kim Jo-hak_pleading",
-      "scenePrompt": "forced smile, parted lips, 1.15::hands up, palms together, head tilt::, sunglasses,",
+      "scenePrompt": "1.15::smile, raised eyebrows, open mouth::, head tilt, palm up, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457976
@@ -1381,7 +1381,7 @@
     {
       "id": "1792315457977",
       "name": "Kim Jo-hak_forced smiling",
-      "scenePrompt": "forced smile, 1.15::hand up, adjusting eyewear, arm at side, head tilt::, sunglasses,",
+      "scenePrompt": "1.15::forced smile, teeth::, looking at viewer, palm up, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457977
@@ -1389,7 +1389,7 @@
     {
       "id": "1792744536945",
       "name": "Kim Jo-hak_indifferent",
-      "scenePrompt": "bored, closed mouth, 1.15::hands up, finger counting, looking away::, sunglasses,",
+      "scenePrompt": "1.15::bored, closed mouth::, looking away, head rest, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536945
@@ -1397,7 +1397,7 @@
     {
       "id": "1792744536946",
       "name": "Kim Jo-hak_guilty",
-      "scenePrompt": "guilt, frown, closed mouth, 1.15::head down, hands up, own hands clasped::, sunglasses,",
+      "scenePrompt": "1.15::expressionless, closed mouth, shaded face::, looking down, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536946
@@ -1405,7 +1405,7 @@
     {
       "id": "1792744536947",
       "name": "Kim Jo-hak_pouting",
-      "scenePrompt": "pout, closed mouth, 1.15::hand up, hand on own cheek, arm behind back, head down::, sunglasses,",
+      "scenePrompt": "1.15::annoyed, frown::, closed mouth, looking away, holding cup, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536947
@@ -1413,7 +1413,7 @@
     {
       "id": "1792744536948",
       "name": "Kim Jo-hak_angry smile",
-      "scenePrompt": "angry, grin, teeth, 1.15::hand up, clenched hand, arm at side, head down::, sunglasses,",
+      "scenePrompt": "1.15::grin, teeth, anger vein::, looking at viewer, hands on own hips, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536948
@@ -1421,7 +1421,7 @@
     {
       "id": "1792744536949",
       "name": "Kim Jo-hak_expressionless",
-      "scenePrompt": "expressionless, closed mouth, 1.15::hand up, index finger raised, arm behind back::, sunglasses,",
+      "scenePrompt": "1.15::expressionless, closed mouth::, looking at viewer, crossed arms, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536949
@@ -1429,7 +1429,7 @@
     {
       "id": "1792744536950",
       "name": "Kim Jo-hak_tormented",
-      "scenePrompt": "distress, grimace, sweat, 1.15::hand up, hand on own neck, hand on own stomach, head down::, sunglasses,",
+      "scenePrompt": "1.15::clenched teeth, furrowed brow, anger vein::, shaded face, clenched hand, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536950
@@ -1437,7 +1437,7 @@
     {
       "id": "1792744536951",
       "name": "Kim Jo-hak_crazy smile",
-      "scenePrompt": "crazy smile, grin, open mouth, 1.15::outstretched arm, pointing at viewer, arm behind back, head back::, sunglasses,",
+      "scenePrompt": "1.15::smirk, shaded face::, closed mouth, head tilt, looking at viewer, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536951
@@ -1445,7 +1445,7 @@
     {
       "id": "1792315457978",
       "name": "Do Pil-heon_suspicious",
-      "scenePrompt": "skeptical, light smile, closed mouth, 1.15::hands up, steepled fingers, head tilt::, sunglasses,",
+      "scenePrompt": "1.15::light smile, closed mouth::, head tilt, steepled fingers, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457978
@@ -1453,7 +1453,7 @@
     {
       "id": "1792315457979",
       "name": "Do Pil-heon_worried",
-      "scenePrompt": "worried, frown, closed mouth, 1.15::hand up, hand on own forehead, arm at side, head down::, sunglasses,",
+      "scenePrompt": "1.15::serious, closed mouth::, looking down, hand on own chin, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457979
@@ -1461,7 +1461,7 @@
     {
       "id": "1792315457980",
       "name": "Do Pil-heon_relieved",
-      "scenePrompt": "light smile, sigh, 1.15::hands on own stomach, head back::, sunglasses,",
+      "scenePrompt": "1.15::smile, closed mouth::, looking at viewer, own hands clasped, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457980
@@ -1469,7 +1469,7 @@
     {
       "id": "1792315457981",
       "name": "Do Pil-heon_disgusted",
-      "scenePrompt": "disgust, disdain, closed mouth, 1.15::hands up, own hands clasped, twisted torso, head back::, sunglasses,",
+      "scenePrompt": "1.15::disdain, closed mouth::, shaded face, looking down, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457981
@@ -1477,7 +1477,7 @@
     {
       "id": "1792315457982",
       "name": "Do Pil-heon_determined",
-      "scenePrompt": "determined, serious, closed mouth, 1.15::hand up, index finger raised, arm behind back, head down::, sunglasses,",
+      "scenePrompt": "1.15::serious, parted lips::, looking at viewer, index finger raised, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457982
@@ -1485,7 +1485,7 @@
     {
       "id": "1792315457983",
       "name": "Do Pil-heon_jealous",
-      "scenePrompt": "envy, forced smile, closed mouth, 1.15::hand up, adjusting eyewear, arm at side, head tilt::, sunglasses,",
+      "scenePrompt": "1.15::closed mouth, frown::, looking to the side, own hands clasped, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457983
@@ -1493,7 +1493,7 @@
     {
       "id": "1792315457984",
       "name": "Do Pil-heon_pleading",
-      "scenePrompt": "light smile, 1.15::outstretched arm, open hand, hand on own stomach::, sunglasses,",
+      "scenePrompt": "1.15::smile, parted lips::, head tilt, palm up, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457984
@@ -1501,7 +1501,7 @@
     {
       "id": "1792315457985",
       "name": "Do Pil-heon_forced smiling",
-      "scenePrompt": "forced smile, closed mouth, 1.15::hand up, adjusting necktie, arm behind back::, sunglasses,",
+      "scenePrompt": "1.15::forced smile, closed mouth::, looking away, palm up, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457985
@@ -1509,7 +1509,7 @@
     {
       "id": "1792744536952",
       "name": "Do Pil-heon_indifferent",
-      "scenePrompt": "bored, closed mouth, 1.15::hands up, palms together, twisted torso::, sunglasses,",
+      "scenePrompt": "1.15::expressionless, closed mouth::, looking away, own hands clasped, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536952
@@ -1517,7 +1517,7 @@
     {
       "id": "1792744536953",
       "name": "Do Pil-heon_guilty",
-      "scenePrompt": "guilt, sad smile, closed mouth, 1.15::bowing, hands on own stomach::, sunglasses,",
+      "scenePrompt": "1.15::serious, closed mouth::, looking down, holding cup, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536953
@@ -1525,7 +1525,7 @@
     {
       "id": "1792744536954",
       "name": "Do Pil-heon_pouting",
-      "scenePrompt": "pout, closed mouth, 1.15::hand up, hand on own cheek, arm at side, head down::, sunglasses,",
+      "scenePrompt": "1.15::frown, closed mouth::, looking to the side, hand on own chin, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536954
@@ -1533,7 +1533,7 @@
     {
       "id": "1792744536955",
       "name": "Do Pil-heon_angry smile",
-      "scenePrompt": "angry, light smile, teeth, 1.15::hand up, stop (gesture), arm behind back, head down::, sunglasses,",
+      "scenePrompt": "1.15::smile, closed mouth, shaded face::, looking at viewer, steepled fingers, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536955
@@ -1541,7 +1541,7 @@
     {
       "id": "1792744536956",
       "name": "Do Pil-heon_expressionless",
-      "scenePrompt": "expressionless, closed mouth, 1.15::hands up, own hands clasped, head tilt::, sunglasses,",
+      "scenePrompt": "1.15::expressionless, closed mouth::, looking at viewer, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536956
@@ -1549,7 +1549,7 @@
     {
       "id": "1792744536957",
       "name": "Do Pil-heon_tormented",
-      "scenePrompt": "distress, grimace, sweat, 1.15::hands up, hands on own face, head down::, sunglasses,",
+      "scenePrompt": "1.15::frown, clenched teeth::, shaded face, sweat, looking down, hand on own forehead, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536957
@@ -1557,7 +1557,7 @@
     {
       "id": "1792744536958",
       "name": "Do Pil-heon_crazy smile",
-      "scenePrompt": "crazy smile, grin, teeth, 1.15::head tilt, hands up, interlocked fingers::, sunglasses,",
+      "scenePrompt": "1.15::smile, parted lips, shaded face::, looking at viewer, outstretched hand, sunglasses,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536958
@@ -1565,7 +1565,7 @@
     {
       "id": "1792315457986",
       "name": "Sa-jang_suspicious",
-      "scenePrompt": "faceless, shaded face, 1.15::head tilt, hand up, hand on own chin, arm behind back::,",
+      "scenePrompt": "1.15::light smile, closed mouth::, head tilt, hand on own chin, no eyes, shaded face,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457986
@@ -1573,7 +1573,7 @@
     {
       "id": "1792315457987",
       "name": "Sa-jang_worried",
-      "scenePrompt": "faceless, shaded face, 1.15::head down, hands up, interlocked fingers::,",
+      "scenePrompt": "1.15::frown, closed mouth::, looking down, steepled fingers, no eyes, shaded face,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457987
@@ -1581,7 +1581,7 @@
     {
       "id": "1792315457988",
       "name": "Sa-jang_relieved",
-      "scenePrompt": "faceless, shaded face, 1.15::head back, hands on own stomach::,",
+      "scenePrompt": "1.15::smile, closed mouth::, looking at viewer, clapping, no eyes, shaded face,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457988
@@ -1589,7 +1589,7 @@
     {
       "id": "1792315457989",
       "name": "Sa-jang_disgusted",
-      "scenePrompt": "faceless, shaded face, 1.15::head tilt, twisted torso, arms at sides, open hands::,",
+      "scenePrompt": "1.15::disdain, closed mouth::, looking down, arms behind back, no eyes, shaded face,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457989
@@ -1597,7 +1597,7 @@
     {
       "id": "1792315457990",
       "name": "Sa-jang_determined",
-      "scenePrompt": "faceless, shaded face, 1.15::outstretched arm, pointing forward, hand on own hip::,",
+      "scenePrompt": "1.15::light smile, closed mouth::, looking at viewer, beckoning, no eyes, shaded face,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457990
@@ -1605,7 +1605,7 @@
     {
       "id": "1792315457991",
       "name": "Sa-jang_jealous",
-      "scenePrompt": "faceless, shaded face, 1.15::head down, hands up, clenched hands::,",
+      "scenePrompt": "1.15::closed mouth, light smile::, looking to the side, arms behind back, no eyes, shaded face,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457991
@@ -1613,7 +1613,7 @@
     {
       "id": "1792315457992",
       "name": "Sa-jang_pleading",
-      "scenePrompt": "faceless, shaded face, 1.15::head down, outstretched arm, reaching, arm behind back::,",
+      "scenePrompt": "1.15::smile, parted lips::, head tilt, palm up, no eyes, shaded face,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457992
@@ -1621,7 +1621,7 @@
     {
       "id": "1792315457993",
       "name": "Sa-jang_forced smiling",
-      "scenePrompt": "faceless, shaded face, 1.15::head tilt, spread arms, open hands::,",
+      "scenePrompt": "1.15::forced smile::, looking at viewer, outstretched hand, no eyes, shaded face,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792315457993
@@ -1629,7 +1629,7 @@
     {
       "id": "1792744536959",
       "name": "Sa-jang_indifferent",
-      "scenePrompt": "faceless, shaded face, 1.15::head tilt, arms behind back, twisted torso::,",
+      "scenePrompt": "1.15::expressionless, closed mouth::, looking away, arms behind back, no eyes, shaded face,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536959
@@ -1637,7 +1637,7 @@
     {
       "id": "1792744536960",
       "name": "Sa-jang_guilty",
-      "scenePrompt": "faceless, shaded face, 1.15::head down, hand up, hand on own face, arm behind back::,",
+      "scenePrompt": "1.15::frown, closed mouth::, looking away, hand on own chin, no eyes, shaded face,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536960
@@ -1645,7 +1645,7 @@
     {
       "id": "1792744536961",
       "name": "Sa-jang_pouting",
-      "scenePrompt": "faceless, shaded face, 1.15::hand up, hand on own cheek, arm at side, head back, twisted torso::,",
+      "scenePrompt": "1.15::frown, closed mouth::, head tilt, crossed arms, no eyes, shaded face,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536961
@@ -1653,7 +1653,7 @@
     {
       "id": "1792744536962",
       "name": "Sa-jang_angry smile",
-      "scenePrompt": "faceless, shaded face, 1.15::head tilt, outstretched arm, claw pose, arm at side::,",
+      "scenePrompt": "1.15::smile, teeth::, looking down, steepled fingers, no eyes, shaded face,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536962
@@ -1661,7 +1661,7 @@
     {
       "id": "1792744536963",
       "name": "Sa-jang_expressionless",
-      "scenePrompt": "faceless, shaded face, 1.15::arms behind back, head down::,",
+      "scenePrompt": "1.15::expressionless, closed mouth::, looking at viewer, no eyes, shaded face,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536963
@@ -1669,7 +1669,7 @@
     {
       "id": "1792744536964",
       "name": "Sa-jang_tormented",
-      "scenePrompt": "faceless, shaded face, 1.15::slouching, hands on own head, head down::,",
+      "scenePrompt": "1.15::gritted teeth, frown::, looking down, hand on own face, no eyes, shaded face,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536964
@@ -1677,7 +1677,7 @@
     {
       "id": "1792744536965",
       "name": "Sa-jang_crazy smile",
-      "scenePrompt": "faceless, shaded face, 1.15::head back, spread arms, spread fingers, twisted torso::,",
+      "scenePrompt": "1.15::crazy smile, teeth::, head tilt, looking at viewer, no eyes, shaded face,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792744536965
