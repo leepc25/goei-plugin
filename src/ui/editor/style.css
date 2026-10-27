@@ -1,7 +1,7 @@
 /* 설정·세계 편집 창 (.gw): 패널(.gx)과 별도. 폭은 --gw-width(설정 「창 폭」: 화면 가로의 %, 기본 90%), 높이 92%, 760px 이하 전체 화면 */
 .gw { position: fixed; inset: 0; z-index: 2147483000; display: flex; align-items: center; justify-content: center; background: var(--scrim); color: var(--text); font: 15px/1.5 var(--font); }
 .gw[hidden] { display: none; }
-.gw-win { width: var(--gw-width, 90%); height: min(92%, calc(100% - 24px)); display: grid; grid-template-columns: 260px minmax(0, 1fr); grid-template-rows: 54px minmax(0, 1fr) 34px; grid-template-areas: "top top" "tree body" "foot foot"; background: var(--void); border: 1px solid var(--line); border-radius: 18px; box-shadow: var(--shadow); overflow: hidden; }
+.gw-win { width: var(--gw-width, 90%); height: min(92%, calc(100% - 24px)); display: grid; grid-template-columns: 260px minmax(0, 1fr); grid-template-rows: 54px minmax(0, 1fr); grid-template-areas: "top top" "tree body"; background: var(--void); border: 1px solid var(--line); border-radius: 18px; box-shadow: var(--shadow); overflow: hidden; }
 .gw-top { grid-area: top; display: flex; align-items: center; gap: 10px; padding: 0 10px 0 16px; border-bottom: 1px solid var(--line); background: var(--panel); }
 .gw-top > b { font-size: 16px; }
 /* 머리 오른쪽: 저장 상태·저장·되돌리기·닫기가 한 줄, 상자 없이. 설정 페이지는 고친 것이 없으면 닫기만 (자리는 같음) */
@@ -91,7 +91,7 @@
 .gw-toggle { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--sub); }
 @media (max-width: 760px) {
   .gw { padding: 0; }
-  .gw-win { width: 100%; height: 100%; border-radius: 0; border: 0; grid-template-columns: minmax(0, 1fr); grid-template-rows: 54px minmax(0, 1fr) 34px; grid-template-areas: "top" "body" "foot"; }
+  .gw-win { width: 100%; height: 100%; border-radius: 0; border: 0; grid-template-columns: minmax(0, 1fr); grid-template-rows: 54px minmax(0, 1fr); grid-template-areas: "top" "body"; }
   .gw-menu { display: inline-flex; }
   .gw-tree { position: absolute; top: 54px; left: 0; bottom: 0; width: 260px; transform: translateX(-100%); transition: transform .18s; z-index: 3; box-shadow: var(--shadow); }
   .gw-win.drawer .gw-tree { transform: none; }
@@ -255,9 +255,8 @@
 /* ===== 리수폿식 평면 설정 (2026-10-27 사용자: 리수폿 설정 창 구성대로) =====
    카드 상자 없이: 묶음은 위 가는 선 + 「# 제목」, 줄은 가는 선으로만 나뉨. 이름·설명 왼쪽, 조작 오른쪽. 글자는 작고 차분하게(제목 17/500, 줄 이름 13/500, 설명 11.5, 단추 12) */
 .gw { --row-label: auto; }
-.gw .gw-crumb { flex-basis: 100%; font-size: 11px; color: var(--dim); letter-spacing: .02em; margin-bottom: -4px; }
 .gw .gw-head { margin-bottom: 18px; row-gap: 6px; }
-.gw .gw-head h2 { font-size: 17px; font-weight: 500; letter-spacing: -.3px; }
+.gw .gw-head h2 { font-size: 18px; font-weight: 700; letter-spacing: -.2px; }
 .gw .gw-head h2 small { font-size: 11px; }
 .gw .gw-head .gx-muted, .gw .gw-head > p { font-size: 12px; }
 .gw .gw-tokens { font-size: 11px; }
@@ -266,8 +265,7 @@
 /* 묶음 */
 .gw .ps-group, .gw .gw-sec { margin: 0; padding: 14px 0 6px; border-top: 1px solid var(--line); }
 .gw .ps-group:first-child, .gw .gw-sec:first-child, .gw .gw-setbody > .ps-group:first-child, .gw .gw-detail > .ps-group:first-child, .gw .gw-detail > .gw-sec:first-child { border-top: 0; padding-top: 0; }
-.gw .ps-group h3, .gw .gw-sec > h3, .gw .gw-sec > summary { margin: 0 0 4px; font-size: 14px; font-weight: 500; letter-spacing: 0; color: var(--text); }
-.gw .ps-group h3::before, .gw .gw-sec > h3::before { content: '#'; margin-right: 6px; color: var(--dim); font-weight: 400; }
+.gw .ps-group h3, .gw .gw-sec > h3, .gw .gw-sec > summary { margin: 0 0 6px; font-size: 12px; font-weight: 700; letter-spacing: .06em; color: var(--dim); }
 .gw .ps-group h3 small, .gw .gw-sec > h3 small { display: block; margin: 2px 0 0; font-size: 11.5px; font-weight: 400; color: var(--dim); }
 .gw .ps-note { margin: 0 0 6px; font-size: 11.5px; }
 /* 카드 → 평면 */
@@ -306,8 +304,7 @@
 /* 접는 고급 설정 */
 .gw .ps-adv { border: 0; border-top: 1px solid var(--line); border-radius: 0; background: transparent; margin: 0; }
 .gw .ps-adv-sum { padding: 12px 0; min-height: 0; }
-.gw .ps-adv-sum b { font-size: 14px; font-weight: 500; }
-.gw .ps-adv-sum b::before { content: '#'; margin-right: 6px; color: var(--dim); font-weight: 400; }
+.gw .ps-adv-sum b { font-size: 12px; font-weight: 700; letter-spacing: .06em; color: var(--dim); }
 .gw .ps-adv-body { border-top: 0; }
 .gw .ps-adv-body .ps-group h3 { padding: 0; }
 .gw .ps-adv-sub > summary { padding: 10px 0; }
@@ -323,37 +320,64 @@
 .gw .gw-basic .dir-grid > .dir-in > input { width: 100%; }
 .gw .gw-basic .dir-panel > p.gx-muted, .gw .gw-basic .dir-fac > p.gx-muted, .gw .gw-basic .dir-panel > p.gx-hint { margin-top: 0; padding: 0 0 12px; }
 .gw .gw-basic .dir-line:has(+ p.gx-muted), .gw .gw-basic .dir-in:has(+ p.gx-muted) { padding-bottom: 6px; }
-/* 머리: 이름 · 상단 탭 · 범위 칩 · 오른쪽 단추 (리수폿식) */
-.gw .gw-brand { font-size: 15px; font-weight: 600; letter-spacing: -.2px; white-space: nowrap; }
-.gw .gw-brand small { font-size: 11px; font-weight: 500; color: var(--dim); margin-left: 4px; }
-.gw .gw-tabs { display: flex; align-items: stretch; gap: 2px; align-self: stretch; margin-left: 12px; }
-.gw .gw-tab { display: flex; align-items: center; padding: 0 14px; border: 0; border-bottom: 2px solid transparent; background: transparent; color: var(--dim); font: inherit; font-size: 13px; font-weight: 500; cursor: pointer; white-space: nowrap; }
-.gw .gw-tab:hover { color: var(--text); }
-.gw .gw-tab[aria-selected="true"] { color: var(--signal); border-bottom-color: var(--signal); }
-.gw .gw-scope { display: inline-flex; align-items: center; gap: 6px; margin-left: auto; padding: 0 8px; height: 28px; border: 1px solid var(--line); border-radius: 8px; background: var(--sunk); font-size: 11.5px; color: var(--sub); white-space: nowrap; max-width: 320px; }
-.gw .gw-scope svg { width: 13px; height: 13px; flex: none; opacity: .8; }
-.gw .gw-scope > span { overflow: hidden; text-overflow: ellipsis; }
-.gw .gw-scope code { padding-left: 6px; border-left: 1px solid var(--line); color: var(--signal); font-family: var(--mono); font-size: 11px; }
-.gw .gw-scope + .gw-top-right, .gw .gw-scope + .gw-notice { margin-left: 0; }
-.gw .gw-top-right { margin-left: 10px; }
-.gw .gw-notice { margin-left: 10px; }
-.gw .gw-foot { grid-area: foot; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 16px; border-top: 1px solid var(--line); background: var(--panel); font-size: 11.5px; color: var(--dim); }
-.gw .gw-foot-status.dirty { color: var(--amber); }
-.gw .gw-foot-ver { font-family: var(--mono); font-size: 11px; }
+/* 머리: 제목 · 어디(봇 · 현재 채팅/시작 전) · 알림 · 저장·닫기. 왼쪽 목록 맨 위에 구역 타일 4개(기능·세계·지침·점검) */
+.gw .gw-where { margin-left: 2px; font-size: 11.5px; color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 300px; }
+.gw .gw-save-note { font-size: 11.5px; color: var(--dim); white-space: nowrap; }
+.gw .gw-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: 4px 4px 12px; }
+.gw .gw-tab { display: flex; align-items: center; justify-content: center; gap: 6px; height: 36px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); color: var(--sub); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+.gw .gw-tab svg { width: 15px; height: 15px; opacity: .8; }
+.gw .gw-tab:hover { color: var(--text); border-color: var(--signal); }
+.gw .gw-tab.on { background: var(--signal); border-color: var(--signal); color: var(--on-signal, #fff); }
+.gw .gw-tab.on svg { opacity: 1; }
 .gw .gw-tree-badge { margin-left: auto; padding: 1px 7px; border-radius: 5px; font-style: normal; font-size: 11px; color: var(--signal); background: var(--accent-bg); }
 .gw .gw-tree-badge.off { color: var(--dim); background: var(--panel); }
 .gw .gw-tree-item em { margin-left: auto; font-style: normal; font-size: 11px; color: var(--dim); }
-@media (max-width: 760px) {
-  .gw .gw-tabs { margin-left: 4px; }
-  .gw .gw-tab { padding: 0 9px; font-size: 12px; }
-  .gw .gw-scope { display: none; }
 }
 /* 기능 페이지 머리: 상태 배지 · 기본 예시 · 끄면 */
 .gw .gw-state { margin-left: 8px; padding: 2px 7px; border-radius: 5px; font-size: 11px; font-weight: 500; color: var(--signal); background: var(--accent-bg); vertical-align: middle; }
 .gw .gw-state.off { color: var(--dim); background: var(--panel); border: 1px solid var(--line); }
-.gw .gw-base-row { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 9px; max-width: 960px; margin: -6px 0 14px; padding: 10px 12px; border-radius: 8px; background: var(--sunk); font-size: 12px; color: var(--sub); line-height: 1.5; }
-.gw .gw-base-row p { margin: 0; }
-.gw .gw-base-label { font-size: 11px; font-weight: 600; color: var(--dim); letter-spacing: .04em; padding-top: 1px; }
-.gw .gw-off-note { max-width: 960px; margin: -6px 0 14px; font-size: 12px; color: var(--amber); }
+.gw .gw-eg { color: var(--sub); }
+.gw .gw-off-note { color: var(--amber); }
 .gw .gw-state.bad { color: var(--danger); background: var(--danger-bg, transparent); border: 1px solid var(--danger); }
 .gw .ps-row > textarea[readonly] { opacity: .85; }
+
+/* ===== 글자 크기 (2026-10-27 사용자: 너무 작아 가독성 떨어짐 → 한 단계씩 키움) ===== */
+.gw .gw-head h2 { font-size: 19px; font-weight: 700; }
+.gw .gw-head h2 small { font-size: 12.5px; }
+.gw .gw-head .gx-muted, .gw .gw-head > p { font-size: 13.5px; line-height: 1.55; }
+.gw .ps-group h3, .gw .gw-sec > h3, .gw .gw-sec > summary, .gw .ps-adv-sum b, .gw .gw-tree-group h4 { font-size: 12.5px; }
+.gw .ps-group h3 small, .gw .gw-sec > h3 small { font-size: 12.5px; }
+.gw .ps-note { font-size: 13px; }
+.gw .ps-row .ps-label b, .gw .gw-basic .dir-line > span, .gw .gw-basic .dir-in > span, .gw .gw-basic .dir-rename > .dir-in > span, .gw .st-col-name b, .gw .gw-field-head b { font-size: 14px; font-weight: 600; }
+.gw .ps-row .ps-label small, .gw .gw-basic .dir-line > small, .gw .gw-basic .dir-in > small, .gw .st-col-name small { font-size: 13px; line-height: 1.5; }
+.gw .gw-basic .dir-panel > p.gx-muted, .gw .gw-basic .dir-fac > p.gx-muted, .gw .gw-basic .dir-panel > p.gx-hint, .gw .ps-rows > .ps-note { font-size: 13px; }
+.gw .gw-basic .dir-grid > .dir-in > span { font-size: 12.5px; }
+.gw .gx-mini, .gw .gx-chip, .gw .gx-select, .gw input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([type="hidden"]), .gw select { font-size: 13px; }
+.gw .gx-seg { font-size: 13px; }
+.gw .gx-switch-wrap small { font-size: 12.5px; }
+.gw .gx-scope { font-size: 11px; }
+.gw .gw-tree-item { font-size: 14px; min-height: 36px; }
+.gw .gw-tab { font-size: 13.5px; }
+.gw .gw-tokens, .gw .gw-where, .gw .gw-save-note { font-size: 12px; }
+.gw .gw-state, .gw .gw-tree-badge { font-size: 11.5px; }
+.gw textarea { font-size: 13px; line-height: 1.65; }
+.gw .gw-field-head .gw-ftitle, .gw .gw-field-head .gw-ftok { font-size: 12.5px; }
+.gw .gw-row > b { font-size: 14.5px; }
+.gw .gw-row > small { font-size: 12.5px; }
+.gw .ps-row { padding: 14px 0; }
+/* 꼼꼼 점검 (2026-10-27): 깨진 줄·안 맞는 곳 */
+.gw .adv-num { display: inline-flex; align-items: center; gap: 6px; }
+.gw .adv-num input { width: 96px; text-align: right; }
+.gw .adv-num > span { font-size: 13px; color: var(--dim); white-space: nowrap; }
+.gw .upd-act { padding: 12px 0 0; border-top: 1px solid var(--panel2); }
+.gw .upd-plan { padding-left: 18px; }
+.gw .ps-row.gw-rel-foot { justify-content: flex-end; }
+.gw .gw-state.bad { color: var(--danger); background: color-mix(in srgb, var(--danger) 14%, transparent); border: 0; }
+.gw .gw-basepage .dir-row { border: 0; border-top: 1px solid var(--panel2); border-radius: 0; background: transparent; }
+.gw .gw-basepage .dir-row:first-child { border-top: 0; }
+.gw .gw-basepage .dir-row.open { background: var(--panel); border-radius: 10px; border-top-color: transparent; }
+/* 상태 배지 세 가지(켬·끔·문제)를 같은 모양으로 */
+.gw .gw-state { display: inline-block; margin-left: 8px; padding: 2px 8px; border-radius: 6px; font-size: 12px; font-weight: 600; line-height: 1.5; color: var(--signal); background: var(--accent-bg); border: 1px solid var(--accent-line); vertical-align: middle; white-space: nowrap; }
+.gw .gw-state.off { color: var(--dim); background: var(--panel); border-color: var(--line); }
+.gw .gw-state.bad { color: var(--danger); background: color-mix(in srgb, var(--danger) 12%, transparent); border-color: color-mix(in srgb, var(--danger) 45%, transparent); }
+.gw .ps-ctl .gw-state { margin-left: 0; }

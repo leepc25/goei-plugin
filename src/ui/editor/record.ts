@@ -149,8 +149,8 @@ export function recordPage(ctx: ChatContext, kind: WorldKind, over: WorldOverrid
   const bucket = (over[kind] ?? {}) as Record<string, Partial<WorldRecord> & { deleted?: boolean }>;
   let detail: string;
   if (!sel) detail = `<div class="gw-detail empty"><p class="gx-muted">왼쪽에서 ${WORLD_KIND_LABEL[kind]}을(를) 고르세요.</p></div>`;
-  else if (bucket[sel]?.deleted) detail = `<div class="gw-detail"><header class="gw-head"><div class="gw-crumb">세계 / ${esc(WORLD_KIND_LABEL[kind])}</div><h2>${esc(sel)}</h2><p class="gx-muted">기본 세계의 이 기록을 지웠어요. 모델에게 가지 않아요.</p></header><button class="gx-mini" data-action="ed-restore">되살리기</button></div>`;
-  else if (!rec) detail = `<div class="gw-detail"><header class="gw-head"><div class="gw-crumb">세계 / ${esc(WORLD_KIND_LABEL[kind])}</div><h2>${esc(sel)}<small>명부에만 있음</small></h2><div class="gw-head-act"><button class="gx-mini" data-action="ed-make-rec">${ICONS.plus}로어 칸 만들기</button></div><p class="gx-muted">이 기록에는 로어 칸이 없어요. 명부 줄(이름·사진·소속 같은 것)만 있어요.</p></header>${basicCard(ctx, kind, sel, d, null)}</div>`;
+  else if (bucket[sel]?.deleted) detail = `<div class="gw-detail"><header class="gw-head"><h2>${esc(sel)}</h2><p class="gx-muted">기본 세계의 이 기록을 지웠어요. 모델에게 가지 않아요.</p></header><button class="gx-mini" data-action="ed-restore">되살리기</button></div>`;
+  else if (!rec) detail = `<div class="gw-detail"><header class="gw-head"><h2>${esc(sel)}<small>명부에만 있음</small></h2><div class="gw-head-act"><button class="gx-mini" data-action="ed-make-rec">${ICONS.plus}로어 칸 만들기</button></div><p class="gx-muted">이 기록에는 로어 칸이 없어요. 명부 줄(이름·사진·소속 같은 것)만 있어요.</p></header>${basicCard(ctx, kind, sel, d, null)}</div>`;
   else {
     const order = fieldOrder(kind, rec);
     const defs = FIELDS[kind];
@@ -182,7 +182,7 @@ export function recordPage(ctx: ChatContext, kind: WorldKind, over: WorldOverrid
       return a ? `<p class="gw-ro">id ${esc(a.id)}${a.legacyEnglish.length ? ` · 옛 영문명 ${esc(a.legacyEnglish.join(', '))}` : ''} · 검색 키 ${esc(rec.keys || '(이름·영문명·별칭)')}</p>` : '';
     })() : `<p class="gw-ro">검색 키 ${esc(rec.keys || '(이름·영문명·별칭)')}${rec.title ? ` · 제목 ${esc(rec.title)}` : ''}</p>`;
     detail = `<div class="gw-detail">
-      <header class="gw-head"><div class="gw-crumb">세계 / ${esc(WORLD_KIND_LABEL[kind])}</div><h2>${esc(sel)}<small>${isDefault ? (edited ? '기본 세계 · 고침' : '기본 세계') : '카드에만 있음'}</small>${presetToggle(kind, sel, presetOf(d, kind, sel))}</h2>
+      <header class="gw-head"><h2>${esc(sel)}<small>${isDefault ? (edited ? '기본 세계 · 고침' : '기본 세계') : '카드에만 있음'}</small>${presetToggle(kind, sel, presetOf(d, kind, sel))}</h2>
         <div class="gw-head-act">${recUi.tokensHtml(ctx, kind, over)}
           <button class="gx-mini${recUi.preview ? ' on' : ''}" data-action="ed-preview">${ICONS.book}조립 글 보기</button>
           <button class="gx-mini${recUi.importOpen ? ' on' : ''}" data-action="ed-import-toggle">${ICONS.plus}글로 가져오기</button>

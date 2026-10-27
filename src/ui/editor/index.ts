@@ -24,7 +24,6 @@ import { CFG, GN_DEFAULTS, gnetLabel } from '../../core/gnet';
 import { basicSettings } from '../../core/settings';
 import { worldOn } from '../../core/world';
 import { ppValue } from '../../core/people/settings';
-import { PLUGIN_VERSION } from '../../core/update';
 
 /** 설정 페이지 (2026-10-27: 모든 설정은 이 창 하나로. 지침은 그 기능 페이지 아래에) */
 export type SetPage = 'screen' | 'image' | 'board' | 'gnet' | 'phone' | 'wiki' | 'visit' | 'people' | 'adv' | 'update';
@@ -35,7 +34,7 @@ export const isSetNode = (n: string): n is `set:${SetPage}` => n.startsWith('set
 export const isGuideNode = (n: string): n is GuideNode => n.startsWith('guide:');
 /* 상단 탭 (2026-10-27 리수폿식): 설정(기능) · 세계 · 지침 · 관리. 왼쪽 목록은 탭마다 다르다 */
 export type Tab = 'set' | 'world' | 'guide' | 'manage';
-const TABS: [Tab, string][] = [['set', '설정'], ['world', '세계'], ['guide', '지침'], ['manage', '관리']];
+const TABS: [Tab, string, string][] = [['set', '기능', ICONS.settings], ['world', '세계', ICONS.map], ['guide', '지침', ICONS.book], ['manage', '점검', ICONS.refresh]];
 export const tabOf = (n: EditorNode): Tab => (isKind(n) || n === 'base' || n === 'relations' ? 'world' : isGuideNode(n) || isRuleNode(n) ? 'guide' : n === 'install' || n === 'set:update' || n.startsWith('manage:') ? 'manage' : 'set');
 /** 옛 노드 이름 → 지금 (설정 페이지 아래 있던 지침은 지침 탭으로) */
 const legacyNode = (n: string): EditorNode => (n === 'set:guides' ? 'guide:RP' : (n as EditorNode));
@@ -249,12 +248,7 @@ function ensureRoot(): HTMLElement {
 function touched(): void {
   const bar = root?.querySelector('.gw-save');
   if (bar) bar.outerHTML = saveBar();
-  const foot = root?.querySelector('.gw-foot-status');
-  if (foot && tabOf(edUi.node) === 'world') {
-    const dirty = anyDirty();
-    foot.textContent = dirty ? '고친 것이 있어요. 「저장」을 눌러야 카드 명부에 남아요.' : '세계 기록은 카드 명부에 저장돼 있어요.';
-    foot.classList.toggle('dirty', dirty);
-  }
+
   const tok = root?.querySelector('.gw-tokens');
   const ctx = host?.ctx();
   if (tok && ctx && isKind(edUi.node)) tok.outerHTML = recUi.tokensHtml(ctx, edUi.node, overridesOf(ctx));
@@ -270,14 +264,14 @@ const guideItem = (g: GuideName | 'Image'): TreeItem => [`guide:${g}`, g === 'Im
 /** 탭마다 왼쪽 목록 (제목 + 항목). 설정 탭 항목에는 켬/끔 배지, 세계 탭에는 개수 */
 function treeOf(tab: Tab): { title: string; items: TreeItem[] }[] {
   switch (tab) {
-    case 'set': return [{ title: '기능 목록', items: (['screen', 'image', 'board', 'gnet', 'phone', 'wiki', 'visit', 'people', 'adv'] as SetPage[]).map(setItem) }];
+    case 'set': return [{ title: '기능', items: (['screen', 'image', 'board', 'gnet', 'phone', 'wiki', 'visit', 'people', 'adv'] as SetPage[]).map(setItem) }];
     case 'world': return [{ title: '세계', items: [['agent', '요원', ICONS.person], ['org', '조직', ICONS.org], ['anomaly', '괴이', ICONS.spook], ['site', '파밍', ICONS.star], ['appendix', '부록', ICONS.book], ['base', '거점', ICONS.pin], ['relations', '세력 관계', ICONS.grid]] }];
     case 'guide': return [
-      { title: '내가 추가한 규칙', items: ruleTreeItems().map(([id, label, badge]) => [id as EditorNode, label, id === 'rule:new' ? ICONS.plus : ICONS.pen, badge] as TreeItem) },
+      { title: '추가 규칙', items: ruleTreeItems().map(([id, label, badge]) => [id as EditorNode, label, id === 'rule:new' ? ICONS.plus : ICONS.pen, badge] as TreeItem) },
       { title: '기본 지침', items: (['RP', 'Directive', 'Tag'] as GuideName[]).map(guideItem) },
       { title: '기능별 지침', items: (['GNet', 'Phone', 'Wiki', 'Visit', 'Image'] as (GuideName | 'Image')[]).map(guideItem) },
     ];
-    case 'manage': return [{ title: '관리', items: [['install', '설치 · 점검', ICONS.refresh], setItem('update'), ['manage:backup', '백업 · 저장', ICONS.pen], ['manage:diag', '진단', ICONS.list], ['manage:log', '실행 기록', ICONS.book]] }];
+    case 'manage': return [{ title: '점검', items: [['install', '설치', ICONS.refresh], setItem('update'), ['manage:diag', '상태 점검', ICONS.list], ['manage:log', '요청 기록', ICONS.mail], ['manage:backup', '설정 내보내기', ICONS.swap]] }];
   }
 }
 const firstOf = (tab: Tab): EditorNode => (tab === 'guide' ? 'guide:RP' : treeOf(tab)[0].items[0][0]);
@@ -343,10 +337,9 @@ function settingsPage(ctx: ChatContext, page: SetPage): string {
   // 기능 판 안의 머리 설명은 여기 설명과 겹치니 뺀다 (인물 기록 소개, 필드 안내)
   if (info) body = body.replace(/<p class="ps-note">본편 응답이 끝날 때마다[\s\S]*?<\/p>/, '').replace(/<section class="ps-group"><p class="ps-note">필드에서 만난 사람과[\s\S]*?<\/section>/, '');
   const lead = info
-    ? `<p class="gx-muted">${esc(info.desc)}</p></header>
-      <div class="gw-base-row"><span class="gw-base-label">기본</span><p>${esc(info.example)}</p></div>${on === false && info.off ? `<p class="gw-off-note">${esc(info.off)}</p>` : ''}`
+    ? `<p class="gx-muted">${esc(info.desc)} <span class="gw-eg">예) ${esc(info.example)}</span>${on === false && info.off ? ` <span class="gw-off-note">${esc(info.off)}</span>` : ''}</p></header>`
     : '</header>';
-  return `<div class="gw-page gw-set"><header class="gw-head"><div class="gw-crumb">${esc(crumb)}</div><h2>${esc(title)}${badge}</h2>${right ? `<div class="gw-head-act">${right}</div>` : ''}${lead}
+  return `<div class="gw-page gw-set"><header class="gw-head"><h2>${esc(title)}${badge}</h2>${right ? `<div class="gw-head-act">${right}</div>` : ''}${lead}
     ${settingsNotices()}
     <div class="gx-settings gw-setbody">${body}</div></div>`;
 }
@@ -391,7 +384,7 @@ function tree(ctx: ChatContext | null): string {
 function guideNodePage(ctx: ChatContext, n: GuideNode): string {
   const g = n.slice(6) as GuideName | 'Image';
   const crumb = `지침 / ${g === 'RP' || g === 'Directive' || g === 'Tag' ? '기본 지침' : '기능별 지침'}`;
-  if (g === 'Image') return `<div class="gw-page gw-set"><header class="gw-head"><div class="gw-crumb">${crumb}</div><h2>이미지 지침</h2><p class="gx-muted">카드 로어북 대신 플러그인이 만드는 이미지 태그 지침이에요. 지침 틀, 출력 대상 캐릭터(명부에서 자동), 표정 세트를 여기서 관리해요.</p></header><div class="gx-settings gw-setbody"><section class="ps-group"><div class="ps-rows">${imgPromptPane(ctx)}</div></section></div></div>`;
+  if (g === 'Image') return `<div class="gw-page gw-set"><header class="gw-head"><h2>이미지 지침</h2><p class="gx-muted">카드 로어북 대신 플러그인이 만드는 이미지 태그 지침이에요. 지침 틀, 출력 대상 캐릭터(명부에서 자동), 표정 세트를 여기서 관리해요.</p></header><div class="gx-settings gw-setbody"><section class="ps-group"><div class="ps-rows">${imgPromptPane(ctx)}</div></section></div></div>`;
   return guidePage(g, crumb);
 }
 
@@ -401,7 +394,7 @@ function body(ctx: ChatContext): string {
   if (n === 'base') {
     // 거점: 지도에 찍히는 장소. 명부 패널의 거점 탭을 그대로 (종류 탭·사용법은 CSS 로 숨김). 호칭·괴담톡 탭은 조직 기록의 기본 정보에
     dirUi.kind = 'base';
-    return `<div class="gw-page gw-basepage"><header class="gw-head"><div class="gw-crumb">세계 / 부록</div><h2>거점</h2><p class="gx-muted">지도에 찍히는 장소예요. 조직마다 거점을 두고 지도를 눌러 위치를 정해요. 조직의 호칭·괴담톡 탭은 조직 기록의 「기본 정보」에서 고쳐요.</p></header>${directoryView(ctx)}</div>`;
+    return `<div class="gw-page gw-basepage"><header class="gw-head"><h2>거점</h2><p class="gx-muted">지도에 찍히는 장소예요. 조직마다 거점을 두고 지도를 눌러 위치를 정해요. 조직의 호칭·괴담톡 탭은 조직 기록의 「기본 정보」에서 고쳐요.</p></header>${directoryView(ctx)}</div>`;
   }
   if (n === 'relations') return relationsPage(ctx, overridesOf(ctx), false);
   if (isGuideNode(n)) return guideNodePage(ctx, n);
@@ -437,24 +430,18 @@ export function render(): void {
   const tab = tabOf(edUi.node);
   edUi.last[tab] = edUi.node;
   const canChat = host.canChat?.() ?? true;
-  const tabs = TABS.map(([id, label]) => `<button class="gw-tab" role="tab" aria-selected="${tab === id}" data-action="ed-tab" data-value="${id}">${label}</button>`).join('');
-  const scope = ctx ? `<span class="gw-scope" title="이 창이 보는 채팅">${ICONS.person}<span>${esc(String(ctx.char.name ?? ''))}</span><code>${canChat ? '현재 채팅' : '시작 전'}</code></span>` : '';
+  const tabs = TABS.map(([id, label, icon]) => `<button class="gw-tab${tab === id ? ' on' : ''}" role="tab" aria-selected="${tab === id}" data-action="ed-tab" data-value="${id}">${icon}<span>${label}</span></button>`).join('');
   const dirty = anyDirty();
-  const foot = tab === 'world'
-    ? (edUi.busy ? '저장하는 중…' : dirty ? '고친 것이 있어요. 「저장」을 눌러야 카드 명부에 남아요.' : '세계 기록은 카드 명부에 저장돼 있어요.')
-    : tab === 'set' ? '설정 값은 바꾸는 즉시 저장돼요.' : tab === 'guide' ? '지침은 「지침 저장」을 눌러야 이 기기에 남아요.' : '';
+  const where = ctx ? `${esc(String(ctx.char.name ?? ''))} · ${canChat ? '현재 채팅' : '시작 전'}` : '';
   root.innerHTML = `<div class="gw-win${edUi.drawer ? ' drawer' : ''}">
     <header class="gw-top">
       <button class="gx-x gw-menu" data-action="ed-drawer" aria-label="메뉴">${ICONS.list}</button>
-      <b class="gw-brand">괴이 <small>설정</small></b>
-      <nav class="gw-tabs" role="tablist">${tabs}</nav>
-      ${scope}
+      <b>설정</b><small class="gw-where">${where}</small>
       ${edUi.notice ? `<span class="gw-notice err">${esc(edUi.notice)}</span>` : edUi.info ? `<span class="gw-notice">${esc(edUi.info)}</span>` : ''}
-      <div class="gw-top-right">${tab === 'world' || dirty ? saveBar() : ''}<button class="gx-x" data-action="ed-close" aria-label="닫기">${ICONS.close}</button></div>
+      <div class="gw-top-right">${tab === 'world' || dirty ? saveBar() : `<span class="gw-save-note">${tab === 'set' ? '바꾸면 바로 저장' : tab === 'guide' ? '지침 저장을 눌러야 남아요' : ''}</span>`}<button class="gx-x" data-action="ed-close" aria-label="닫기">${ICONS.close}</button></div>
     </header>
-    <nav class="gw-tree">${tree(ctx)}</nav>
+    <nav class="gw-tree"><div class="gw-tabs" role="tablist">${tabs}</div>${tree(ctx)}</nav>
     <main class="gw-body">${ctx ? body(ctx) : '<p class="gx-err">채팅 정보를 읽지 못했어요. 창을 닫고 다시 열어 주세요.</p>'}</main>
-    <footer class="gw-foot"><span class="gw-foot-status${dirty && tab === 'world' ? ' dirty' : ''}">${foot}</span><span class="gw-foot-ver">괴이: ANOMALY v${esc(PLUGIN_VERSION)}</span></footer>
     ${confirm}
   </div>`;
 }

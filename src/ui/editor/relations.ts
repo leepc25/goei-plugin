@@ -83,7 +83,7 @@ export function relationsPage(ctx: ChatContext, over: WorldOverrides, rulesOnly:
   return `<div class="gw-page split">
     <div class="gw-list-pane"><div class="gw-list-tools"><span class="gw-list-title">조직 ${included.length}${all.length > included.length ? ` <small>· 제외 ${all.length - included.length}</small>` : ''}</span></div><div class="gw-list gw-rel-list">${list}</div></div>
     <div class="gw-detail">
-      <header class="gw-head"><div class="gw-crumb">세계 / 세력 관계</div><h2>${esc(sel)}</h2>
+      <header class="gw-head"><h2>${esc(sel)}</h2>
         <div class="gw-head-act"><span class="gw-tokens">Faction ${tokenizerName() ? '' : '약 '}${tokens(fac).toLocaleString()}토큰</span>
           <button class="gx-chip${sym() ? ' on' : ''}" data-action="ed-rel-sym" aria-pressed="${sym()}">대칭</button>
           <button class="gx-mini${relUi.preview ? ' on' : ''}" data-action="ed-rel-preview">${ICONS.book}Faction 지침 보기</button></div>

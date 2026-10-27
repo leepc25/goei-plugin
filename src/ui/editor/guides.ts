@@ -29,7 +29,7 @@ export function guidePage(name: GuideName, crumb = ''): string {
       <textarea data-input="ed-guide-sec" data-key="${name}|${i}" rows="3" spellcheck="false">${esc(p.body)}</textarea></div>`)
     .join('');
   const title = crumb
-    ? `<div class="gw-crumb">${esc(crumb)}</div><h2>${esc(GUIDE_LABEL[name])}<small>이 기기 공통${guideOverridden(name) ? ' · 고침' : ' · 기본'} · ${parts.length}절</small></h2>`
+    ? `<h2>${esc(GUIDE_LABEL[name])}<small>이 기기 공통${guideOverridden(name) ? ' · 고침' : ' · 기본'} · ${parts.length}절</small></h2>`
     : `<h3>${esc(GUIDE_LABEL[name])} 지침<small>이 기기 공통${guideOverridden(name) ? ' · 고침' : ' · 기본'} · ${parts.length}절</small></h3>`;
   return `<div class="gw-page${crumb ? ' gw-set' : ''}"><header class="gw-head">${title}
       <div class="gw-head-act"><span class="gw-tokens">${tokenizerName() ? '' : '약 '}${tokens(text).toLocaleString()}토큰</span>
