@@ -8,7 +8,7 @@ import { fieldValue, RELATION_STAGES, type Relations, type RelationStage, type W
 const VAR = '{{getvar::st_faction}}';
 export const FACTION_INTRO = 'This reference describes the world to the GM. Public labels, hidden affiliations, doctrine, and internal information are known to an NPC only through that NPC\'s actual access.';
 export const ROSTER_INTRO = '- Purpose: GM reference for consistent character introductions before individual lore is active.\n- Detail: Use active character lore for fuller characterization.';
-const STAGE_EN: Record<RelationStage, string> = { hostile: 'hostile', wary: 'wary', neutral: 'neutral', favorable: 'favorable', friendly: 'friendly' };
+const STAGE_MARK: Record<RelationStage, string> = { hostile: 'H', wary: 'W', neutral: '·', favorable: 'F', friendly: 'A' };
 
 const firstParagraph = (t: string) => t.trim().split(/\n\s*\n/)[0]?.trim() ?? '';
 
@@ -59,14 +59,19 @@ export function assembleFaction(dir: Directory, orgs: Map<string, WorldRecord>, 
     if (intro) parts.push(`### ${rec.title || name}\n${intro}`);
   }
   const excluded = new Set([...orgs.entries()].filter(([, r]) => r.relOff).map(([n]) => n));
-  const pairs = Object.entries(rel.pairs).filter(([k, c]) => c.stage !== 'neutral' && RELATION_STAGES.includes(c.stage) && !k.split('>').some((n) => excluded.has(n)));
-  if (pairs.length) {
-    const lines = pairs.map(([k, c]) => {
-      const [a, b] = k.split('>');
-      const memo = c.memo?.trim() ? ` — ${fillCodes(c.memo.trim().replace(/\n+/g, ' '), dir)}` : '';
-      return `- ${named(a)} → ${named(b)}: ${STAGE_EN[c.stage]}${memo}`;
-    });
-    parts.push(`## Faction Relations\nHow each faction regards another (viewer → target). Factions not listed regard each other neutrally.\n${lines.join('\n')}`);
+  // 관계는 표 하나로 (사용자 2026-10-27): 행 = 보는 쪽, 열 = 대상, 글자 한 개. 메모는 편집 참고용이라 안 들어간다
+  const members = dir.orgs.filter((o) => !excluded.has(o.name)).map((o) => o.name);
+  const stageOf = (a: string, b: string): RelationStage => {
+    const c = rel.pairs[`${a}>${b}`];
+    return c && RELATION_STAGES.includes(c.stage) ? c.stage : 'neutral';
+  };
+  if (members.length > 1 && members.some((a) => members.some((b) => a !== b && stageOf(a, b) !== 'neutral'))) {
+    const no = new Map(members.map((n, i) => [n, i + 1]));
+    const legend = members.map((n) => `${no.get(n)} ${named(n)}`).join(' · ');
+    const head = `| viewer \\ target | ${members.map((n) => no.get(n)).join(' | ')} |`;
+    const sep = `|---|${members.map(() => '---').join('|')}|`;
+    const rows = members.map((a) => `| ${no.get(a)} ${named(a)} | ${members.map((b) => (a === b ? '—' : STAGE_MARK[stageOf(a, b)])).join(' | ')} |`);
+    parts.push(`## Faction Relations\nHow the row faction regards the column faction. H hostile · W wary · · neutral · F favorable · A allied. Factions not in the table regard each other neutrally.\nFactions: ${legend}\n${head}\n${sep}\n${rows.join('\n')}`);
   }
   if (rel.common.trim()) parts.push(`## Faction Doctrine and Relations\n${fillCodes(rel.common.trim(), dir)}`);
   return parts.join('\n\n') + '\n\n---';

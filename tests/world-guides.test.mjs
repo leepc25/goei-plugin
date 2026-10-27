@@ -37,7 +37,8 @@ test('Faction·Roster 조립: 조직 소개 첫 문단 + 관계 목록 + 공통 
   assert.match(fac, /### \{\{#if \{\{not_equal::\{\{getvar::st_faction\}\}::B00\}\}\}\}Management Bureau\{\{\/if\}\}\{\{#if \{\{equal::\{\{getvar::st_faction\}\}::B00\}\}\}\}Fake Management Bureau\{\{\/if\}\} \[A00\]\n/);
   assert.ok(!/^### .*Namhae Branch/m.test(fac), 'noSummary 조직은 요약에 없음 (관계 목록에는 나옴)');
   assert.ok(fac.includes('### The Aestheticism') || fac.includes('### 탐미주의'), '요약 전용 조직은 뒤에');
-  assert.match(fac, /## Faction Relations\n[^\n]*\n- .*Management Bureau.* → .*Fake Management Bureau.*: hostile — /);
+  assert.match(fac, /## Faction Relations\n[^\n]*\nFactions: 1 .*Management Bureau.*\n\| viewer \\ target \| 1 \| 2 \|.*\n\|---\|---\|.*\n\| 1 .*Management Bureau[^|]*\| — \| H \|/, '관계는 표 하나');
+  assert.ok(!/Faction Relations[\s\S]*hostile — /.test(fac), '메모는 안 들어감');
   assert.match(fac, /## Faction Doctrine and Relations\n### Mutual Perception/);
   const a00 = evaluate(fac, { vars: { st_faction: 'A00' }, user: 'U' });
   const b00 = evaluate(fac, { vars: { st_faction: 'B00' }, user: 'U' });

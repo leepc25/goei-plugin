@@ -71,13 +71,13 @@ export function relationsPage(ctx: ChatContext, over: WorldOverrides, rulesOnly:
     ? `<div class="gw-rel-memo"><div class="gw-rel-memo-head"><b>${esc(sa)} → ${esc(sb)}</b>
         <div class="gx-segs gx-segs-sm">${RELATION_STAGES.map((s) => `<button class="gx-seg${(cell?.stage ?? 'neutral') === s ? ' on' : ''}" data-action="ed-rel-stage" data-value="${s}">${RELATION_LABEL[s]}</button>`).join('')}</div>
         <button class="gx-mini" data-action="ed-rel-clear">중립으로</button></div>
-        <textarea data-input="ed-rel-memo" data-key="${esc(sel)}" rows="4" placeholder="메모 (선택). 단계만으로 안 되는 것만: 「협상 불가, 개인 유대도 배신」처럼">${esc(cell?.memo ?? '')}</textarea></div>`
+        <textarea data-input="ed-rel-memo" data-key="${esc(sel)}" rows="4" placeholder="메모 (편집 참고용. 모델에는 표만 들어가요)">${esc(cell?.memo ?? '')}</textarea></div>`
     : '<p class="gx-muted">칸을 누르면 단계가 한 단계 바뀌고, 아래에 메모 칸이 열려요.</p>';
   const fac = assembleFaction(d, recs, rel);
   return `<div class="gw-page"><header class="gw-head"><h2>세력 관계</h2>
       <div class="gw-head-act"><label class="gw-toggle"><input type="checkbox" data-action="ed-rel-sym" ${sym() ? 'checked' : ''}> 대칭 (반대 칸도 같이)</label>
         <button class="gx-mini${relUi.preview ? ' on' : ''}" data-action="ed-rel-preview">Faction 지침 보기</button><span class="gw-tokens">Faction ${tokenizerName() ? '' : '약 '}${tokens(fac).toLocaleString()}토큰</span></div>
-      <p class="gx-muted">행이 보는 쪽, 열이 대상이에요. 단계는 세력 평판 5단계와 같고 평판 시작값이 돼요. 중립은 빈 칸. ${playerOrg ? `지금 플레이 세력(${esc(playerOrg)}) 행·열은 옅게 칠했어요.` : ''}</p></header>
+      <p class="gx-muted">행이 보는 쪽, 열이 대상이에요. 이 표 하나가 Faction 지침에 그대로 들어가고, 단계는 세력 평판 5단계와 같아 평판 시작값이 돼요. 중립은 빈 칸. ${playerOrg ? `지금 플레이 세력(${esc(playerOrg)}) 행·열은 옅게 칠했어요.` : ''}</p></header>
     ${members}
     <div class="gw-legend">${RELATION_STAGES.filter((s) => s !== 'neutral').map((s) => `<span class="st-${s}"><i></i>${RELATION_LABEL[s]}</span>`).join('')}<span><i class="none"></i>중립 (빈 칸)</span></div>
     <div class="gw-grid-wrap"><table class="gw-grid"><thead>${head}</thead><tbody>${rows}</tbody></table></div>
