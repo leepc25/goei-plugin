@@ -5,8 +5,8 @@ import { pfont } from './pxfont';
 import { view } from './view';
 import { charSize } from '../charSize';
 
-/** 필드 화면 확대 100%: 월드 1px = 화면 CSS 1.5px (리스 시험 창 세로 1082에서 세로 721 월드가 보인다) */
-export const BASE_ZOOM = 1.5;
+/** 필드 화면 확대 100%: 무확대(월드 1px = 화면 CSS 1px, 사용자 2026-10-27). 화면 확대 슬라이더로 최대 250% */
+export const BASE_ZOOM = 1;
 import { SCREEN_H, SCREEN_W, TICK_HZ, type GameEvent, type HqModuleLike, type RunConfigCore, type RunResultCore, type StageModule } from './contract';
 import type { Art } from './art';
 import { Input, type Pad } from './input';
@@ -151,6 +151,7 @@ export class Game {
         view.zoom = (fixed ? BASE_ZOOM * (this.canvas.height / cssH) : this.canvas.height / H) * Math.max(1, charSize.k);
         if (w) view.lane = w.lane;
         const vw = this.canvas.width / view.zoom;
+        view.w = this.inHub ? Math.max(SCREEN_W, vw) : SCREEN_W;
         // 화면 밀기는 그림과 같은 보간 위치로 (틱 위치로 하면 걸을 때 화면이 30Hz로 툭툭 따라가 캐릭터가 떨린다).
         // 렌더러는 camX를 정수로 반올림하므로, 둘을 합한 이동이 화면 px 정수가 되게 crop을 맞춘다
         view.crop = 0;
@@ -166,11 +167,14 @@ export class Game {
         // 확대해서 세로가 다 안 들어가면 주인공 발이 화면 아래쪽 1/3에 오게 위아래를 자른다
         view.cropY = 0;
         const vh = this.canvas.height / view.zoom;
+        if (this.inHub) {
+          // 장면 밖(짧거나 좁은 장면의 남는 곳)은 검게
+          this.ctx.fillStyle = '#000';
+          this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        }
         if (vh > H + 0.5) {
           // 장면이 화면보다 짧다: 가운데 두고 위아래는 검게
           view.cropY = -Math.round(((vh - H) / 2) * view.zoom) / view.zoom;
-          this.ctx.fillStyle = '#000';
-          this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         } else if (vh < H - 0.5 && w) {
           const a = frozen ? 1 : this.acc / T, p = w.player as { y: number; py?: number };
           const py = (p.py ?? p.y) + (p.y - (p.py ?? p.y)) * a;

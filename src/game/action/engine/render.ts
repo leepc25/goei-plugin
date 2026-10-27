@@ -3,7 +3,7 @@ import { pfont } from './pxfont';
 import { drawPropArt } from '../art/bg';
 import { drawGoSign } from '../ui/title';
 import { PIXEL, SCREEN_H, SCREEN_W, type Body, type WBox } from './contract';
-import { snapTo, spr } from './view';
+import { snapTo, spr, view } from './view';
 import type { Art } from './art';
 import { Bullet } from './bodies';
 import { Fighter } from './fighter';
@@ -40,7 +40,7 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
     ctx.fillRect(0, wallTop, SCREEN_W, top - wallTop - 20);
     // 벽 판넬·기둥 (시차 없이 바닥과 같이 흐름)
     const step = 320;
-    for (let x = Math.floor(camX / step) * step; x < camX + SCREEN_W + step; x += step) {
+    for (let x = Math.floor(camX / step) * step; x < camX + view.w + step; x += step) {
       const sx = x - camX;
       ctx.fillStyle = 'rgba(0,0,0,0.22)';
       ctx.fillRect(sx, wallTop, 26, top - wallTop - 20);
@@ -62,7 +62,7 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
     ctx.fillRect(0, top - 20, SCREEN_W, SCREEN_H - top + 20);
     ctx.strokeStyle = 'rgba(255,255,255,0.05)';
     ctx.lineWidth = 2;
-    for (let x = Math.floor(camX / 160) * 160; x < camX + SCREEN_W + 400; x += 160) {
+    for (let x = Math.floor(camX / 160) * 160; x < camX + view.w + 400; x += 160) {
       const sx = x - camX;
       ctx.beginPath();
       ctx.moveTo(sx, top - 20);
@@ -89,7 +89,7 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
   function drawProps(w: World, camX: number, list: readonly World['props'][number][] = w.props) {
     for (const p of list) {
       const sx = p.x - camX;
-      if (sx < -p.w - 200 || sx > SCREEN_W + p.w + 200) continue;
+      if (sx < -p.w - 200 || sx > view.w + p.w + 200) continue;
       if (p.kind === 'hubdoor' || p.kind === 'hubspot') continue; // 본부 문·자리는 본부 장면(hub.ts)이 그린다
       if (p.actor) {
         // 사람 대역: 플레이어 클립을 색만 바꿔서

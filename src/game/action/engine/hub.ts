@@ -15,7 +15,7 @@ import { drawVisitAgent, visitAgentTop } from '../art/visitAgents';
 import { drawTestMan, hasTestPeople, testManTop, testPlayerTop } from '../art/testPeople';
 import { persp, view as fieldView } from './view';
 import { blockByProps, clearSpot, type BlockProp } from './propBlock';
-import { clampPainted, doorReachY } from '../hq/painted';
+import { PAINTED, clampPainted, doorReachY } from '../hq/painted';
 import { LANE_BOT, LANE_TOP, type HqBox, type HqDoor, type HqMapView, type HqScene, type HqSpot } from '../hq/map';
 
 type Door = HqDoor & { open: boolean };
@@ -155,10 +155,10 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
           const cov = drawHqWall(c, place, sc.id, len, TOP, sc.doors);
           artDoors = cov ?? new Set();
           c.fillStyle = 'rgba(0,0,0,0.35)';
-          c.fillRect(camX - 40, TOP - 14, SCREEN_W + 80, 14);
-          if (!drawFloor(c, place, camX - 40, camX + SCREEN_W + 40, TOP, SCREEN_H)) {
+          c.fillRect(camX - 40, TOP - 14, fieldView.w + 80, 14);
+          if (!drawFloor(c, place, camX - 40, camX + fieldView.w + 40, TOP, SCREEN_H)) {
             c.fillStyle = '#2b3135';
-            c.fillRect(camX - 40, TOP, SCREEN_W + 80, SCREEN_H - TOP);
+            c.fillRect(camX - 40, TOP, fieldView.w + 80, SCREEN_H - TOP);
           }
           for (const t of sc.things) if (t.wall) legacyThing(c, t, camX);
           for (const d of sc.doors) if (!artDoors.has(d.id)) legacyDoor(c, d, camX);
@@ -167,7 +167,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
         }
         drawRoomShell(c, sc, camX);
         const textured = (sc.id === 'office' || sc.id === 'f2') && drawHqTextureWall(c, place, len, camX, sc.doors.filter(d => !isS(d)).map(d => ({ x: d.x, width: d.kind === 'glass' ? 192 : DOOR_W[d.kind] + 24 })));
-        if (sc.id === 'office' || sc.id === 'f2') drawFloor(c, place, camX - 40, camX + SCREEN_W + 40, TOP, SCREEN_H);
+        if (sc.id === 'office' || sc.id === 'f2') drawFloor(c, place, camX - 40, camX + fieldView.w + 40, TOP, SCREEN_H);
         for (const f of sc.fixtures) {
           // Windows/boards are already painted in the wall tiles; keep functional signage.
           if (!textured || f.kind === 'directory') drawFixture(c, f, sc.look, camX);
@@ -200,14 +200,14 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
         const dark = fadeOut > 0 ? 1 - fadeOut / FADE : age < FADE ? 1 - age / FADE : 0;
         if (dark > 0) {
           c.fillStyle = `rgba(0,0,0,${dark})`;
-          c.fillRect(camX - 40, 0, SCREEN_W + 80, SCREEN_H); // 이 그림판은 이미 -camX 만큼 옮겨져 있다
+          c.fillRect(camX - 40, 0, fieldView.w + 80, SCREEN_H); // 이 그림판은 이미 -camX 만큼 옮겨져 있다
         }
       },
     };
   };
 
   const go = (sceneId: string, x: number, y?: number) => {
-    fieldView.worldH = sceneOf(sceneId).painted ? 700 : SCREEN_H;
+    fieldView.worldH = sceneOf(sceneId).painted ? PAINTED[sceneOf(sceneId).painted!]?.h ?? 700 : SCREEN_H;
     pending = { scene: sceneId, x, y };
     fadeOut = FADE;
   };
@@ -443,7 +443,7 @@ const LOOKS: Record<string, Look> = {
 function drawRoomShell(c: CanvasRenderingContext2D, sc: Scene, camX: number) {
   const L = LOOKS[sc.look] ?? LOOKS.office;
   const x0 = camX - 40,
-    w = SCREEN_W + 80;
+    w = fieldView.w + 80;
   const g = c.createLinearGradient(0, 0, 0, TOP);
   g.addColorStop(0, L.wallTop);
   g.addColorStop(1, L.wallBot);
@@ -504,7 +504,7 @@ function drawRoomShell(c: CanvasRenderingContext2D, sc: Scene, camX: number) {
 
 function drawFixture(c: CanvasRenderingContext2D, f: Scene['fixtures'][number], look: string, camX: number) {
   const x = f.x - f.w / 2;
-  if (x > camX + SCREEN_W + 40 || x + f.w < camX - 40) return;
+  if (x > camX + fieldView.w + 40 || x + f.w < camX - 40) return;
   switch (f.kind) {
     case 'window': {
       // 통창: 장막 안의 텅 빈 종로 밤
@@ -627,7 +627,7 @@ function drawDoorN(c: CanvasRenderingContext2D, d: Door, look: string, open: num
   const w = DOOR_W[d.kind];
   const x = d.x - w / 2,
     y = TOP - DOOR_H;
-  if (x > camX + SCREEN_W + 40 || x + w < camX - 40) return;
+  if (x > camX + fieldView.w + 40 || x + w < camX - 40) return;
   c.fillStyle = '#12161b';
   c.fillRect(x - 10, y - 12, w + 20, DOOR_H + 12);
   c.fillStyle = '#05070a';
@@ -693,7 +693,7 @@ function drawDoorN(c: CanvasRenderingContext2D, d: Door, look: string, open: num
 /** 화면 아래 출입: 바닥 끝에 빛 띠 + 아래로 가는 화살표 (사용자: 문 자리에 나가는 표시) */
 function drawFloorExit(c: CanvasRenderingContext2D, d: Door, open: number, camX: number) {
   const w = DOOR_W.exit;
-  if (d.x + w < camX - 40 || d.x - w > camX + SCREEN_W + 40) return;
+  if (d.x + w < camX - 40 || d.x - w > camX + fieldView.w + 40) return;
   const col = d.kind === 'cell' ? '#7d4a3a' : d.open ? '#3cc596' : '#6b7480';
   c.fillStyle = 'rgba(0,0,0,0.3)';
   c.fillRect(d.x - w / 2 - 10, SCREEN_H - 36, w + 20, 36);
@@ -704,7 +704,7 @@ function drawFloorExit(c: CanvasRenderingContext2D, d: Door, open: number, camX:
 }
 function drawExitLintel(c: CanvasRenderingContext2D, d: Door, camX: number) {
   if (d.kind === 'cell') return;
-  if (d.x < camX - 200 || d.x > camX + SCREEN_W + 200) return;
+  if (d.x < camX - 200 || d.x > camX + fieldView.w + 200) return;
   const col = d.open ? '#3cc596' : '#6b7480';
   const y = SCREEN_H - 30;
   c.fillStyle = col;
@@ -802,7 +802,7 @@ function drawChair(c: CanvasRenderingContext2D, b: HqBox) {
 
 function legacyThing(c: CanvasRenderingContext2D, t: HqScene['things'][number], camX: number) {
   const sx = t.x - camX;
-  if (sx < -t.w - 100 || sx > SCREEN_W + t.w + 100) return;
+  if (sx < -t.w - 100 || sx > fieldView.w + t.w + 100) return;
   const base = t.wall ? TOP - 70 : TOP + 26;
   if (drawPropArt(c, t.kind, undefined, t.x, base)) return;
   c.fillStyle = '#4a4f55';
@@ -812,7 +812,7 @@ function legacyThing(c: CanvasRenderingContext2D, t: HqScene['things'][number], 
 function legacyDoor(c: CanvasRenderingContext2D, d: Door, camX: number) {
   const w = DOOR_W[d.kind];
   const sx = d.x - camX;
-  if (sx < -w - 40 || sx > SCREEN_W + w + 40) return;
+  if (sx < -w - 40 || sx > fieldView.w + w + 40) return;
   if (drawPropArt(c, `hq_${d.kind}`, undefined, d.x, TOP)) return;
   const x = d.x - w / 2,
     y = TOP - DOOR_H;

@@ -11,7 +11,7 @@ export interface UiSettings {
   bright: number;
   /** 확대할 때 도트를 각지게 */
   pixel: boolean;
-  /** 화면 확대 1~1.6: 배경과 사람을 같이 키운다 (기본 1 = 규격 크기: 필드 PC는 월드 1px = 화면 1.5px) */
+  /** 화면 확대 1~2.5: 배경과 사람을 같이 키운다 (기본 1 = 무확대: 필드 PC는 월드 1px = 화면 1px) */
   charSize: number;
   master: number;
   music: number;

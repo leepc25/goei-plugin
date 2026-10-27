@@ -34,6 +34,8 @@ export interface PaintedObject {
 export interface PaintedScene {
   file: string;
   w: number;
+  /** 그림 세로. 없으면 700 (방 그림은 축척만 맞추고 세로는 그대로) */
+  h?: number;
   under: boolean;
   /** 걷는 띠 [맨 뒤, 맨 앞]. 맨 뒤는 벽선(y420)보다 조금 앞이라 발이 벽·문 그림을 뚫지 않는다 */
   lane?: [number, number];

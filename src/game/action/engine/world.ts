@@ -20,6 +20,7 @@ import { newAttackId } from './ids';
 import { Player, playerFactory } from './player';
 import { initializeProgression, progressionHit } from './progression';
 import { encodeState, decodeState } from './checkpoint';
+import { view } from './view';
 
 export type EnemyFactory = (spec: SpawnSpec, world: WorldView) => Body;
 export type ItemUse = (slot: number, api: StageApi) => false | { anim: 'drink' | 'eat' | 'bandage' | 'toss'; consumed: boolean; label?: string };
@@ -271,7 +272,7 @@ export class World implements WorldView {
     p.enter('free'); p.stop = 0;
     p.resetLocomotion();
     p.dir = 1;
-    this.camX = Math.max(0, Math.min(f.length - SCREEN_W, p.x - SCREEN_W / 2));
+    this.camX = f.length <= view.w ? -(view.w - f.length) / 2 : Math.max(0, Math.min(f.length - view.w, p.x - view.w / 2));
     this.prevCamX = this.camX;
     this.banner = { text: f.banner ?? f.title, t: 70 };
     this.subtitle = null; // 지난 방·층 대사를 끌고 오지 않는다 (독립 검수: 탕비실 대사가 보급실까지)
@@ -566,13 +567,16 @@ export class World implements WorldView {
   private camera() {
     const p = this.player;
     const [b0, b1] = this.bounds;
-    const target = p.x - SCREEN_W / 2 + p.dir * 90;
+    const W = view.w;
+    // 장면이 화면보다 좁으면 가운데 (양옆은 검게)
+    if (this.floor.length <= W) { this.camX = -(W - this.floor.length) / 2; return; }
+    const target = p.x - W / 2 + p.dir * 90;
     let cx = this.camX + (target - this.camX) * 0.14;
-    cx = Math.max(b0, Math.min(b1 - SCREEN_W, cx));
-    cx = Math.max(0, Math.min(this.floor.length - SCREEN_W, cx));
+    cx = Math.max(b0, Math.min(b1 - W, cx));
+    cx = Math.max(0, Math.min(this.floor.length - W, cx));
     this.camX = cx;
     // 싸움 중에는 화면 밖으로 못 나감
-    if (this.encActive >= 0) p.x = Math.max(cx + 90, Math.min(cx + SCREEN_W - 90, p.x)); // 몸 전체가 보이게
+    if (this.encActive >= 0) p.x = Math.max(cx + 90, Math.min(cx + W - 90, p.x)); // 몸 전체가 보이게
   }
 
   /** 보스 체력 막대용 */
