@@ -17,7 +17,7 @@ DIR[20] = "east"
 DIR[21] = "south"
 DIR[30] = "east"
 DIR[31] = "east"
-for _n in (32, 33, 34, 35, 36): DIR[_n] = "east"   # 끝 장 지정: 18 = 14를 돌아서기 끝 장(수건 두른 옆모습)으로 끝나게 다시
+for _n in (32, 33, 34, 35, 36, 37): DIR[_n] = "east"   # 끝 장 지정: 18 = 14를 돌아서기 끝 장(수건 두른 옆모습)으로 끝나게 다시
 POSE_SIDE = "standing upright seen from the side, facing east"
 STEPS = {
  1: ("57", "Standing with the back to the viewer in front of a locker. First she wraps a large plain white bath towel around her body under the arms and holds it closed. Then, keeping the towel wrapped the whole time, she takes off the jacket, vest, shirt, trousers and shoes underneath it and lets them drop out of the frame. The towel always covers her from the armpits to the middle of the thighs. Last frame: standing with the back to the viewer, barefoot, wrapped in the white towel from the armpits to mid-thigh, bare shoulders, arms and lower legs, ponytail unchanged."),
@@ -48,6 +48,9 @@ STEPS[35] = ("REG_E", "Seen from the side facing east, she undresses for a showe
 FRAMES[35] = 16
 STEPS[36] = ("REG_E", STEPS[35][1].replace("Draw only the woman", "Each garment she takes off has empty sleeves and empty legs: no hands, arms or feet inside the dropped clothes. Both of her arms and hands stay attached to her body in every frame. Each dropped garment falls straight down to the floor at her feet right away and does not float in the air. Draw only the woman"))   # 35 찐빠(떨어지는 옷에 손) 고침
 FRAMES[36] = 16
+STEPS[37] = ("REG_E", "Seen from the side facing east, she undresses for a shower with clear body movements, in this order: she grips the jacket lapels with both hands, slides the jacket off her shoulders to the front, pulls her arms out of the sleeves while holding it in front of her body with her near hand, then bends and lays the jacket down on the floor in front of her toes. She unbuttons the vest and the shirt down the front, slides them off to the front the same way and lays them down on the floor in front of her toes. She bends forward, hooks both thumbs into the waistband and pushes the trousers down to the ankles, then steps out of them one foot at a time, leaving them and the shoes on the floor in front of her. She straightens up and stands bare, relaxed, arms at the sides. The taken-off clothes are always in front of her body, never behind her back, and they have empty sleeves with no hands inside; both of her arms stay attached to her body. No towel. Last frame: standing seen from the side facing east, barefoot, no clothes, ponytail unchanged. Draw only the woman and the clothes, no locker, furniture, shower or wall.")   # 옷을 몸 앞에 내려놓기
+FRAMES[37] = 16
+
 
 
 
