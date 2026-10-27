@@ -139,7 +139,17 @@ async function pickCustom(page, row = '.gx-mlist li.gx-mx') {
   console.log('show calls', await page.evaluate(() => JSON.stringify(window.__calls.show)));
   console.log('gx', await page.evaluate(() => { const g = document.querySelector('.gx'); return g ? `${g.style.display || 'shown'} ${g.querySelector('.gx-empty')?.textContent?.slice(0, 80)}` : 'none'; }));
   console.log('gw', await page.evaluate(() => { const g = document.querySelector('.gw'); return g ? `hidden=${g.hidden} install=${!!g.querySelector('.gw-install')} text=${g.textContent?.slice(0, 120)}` : 'none'; }));
+  assert.ok(await page.$('.gw-install'), '설치 창');
+  // 로어북·인사말 심기 → 괴이 카드가 됨 → 창을 닫으면 플로팅 버튼이 생겨야 (감시가 다시 판정)
+  await page.click('[data-action="ed-inst-lore"]');
+  await page.waitForFunction(() => document.querySelector('.gw-install')?.textContent?.includes('끝났어요'));
+  assert.equal(await page.evaluate(() => JSON.parse(window.__char.globalLore.find((e) => e.comment === 'Plugin manifest').content).plugin), 'goei-plugin');
+  assert.match(await page.evaluate(() => window.__char.name), /^괴이 . ANOMALY$/, '깡통봇 이름을 BRAND.name 으로 바꾼다 (기본 켬)');
+  await page.click('.gw [data-action="ed-close"]');
+  await page.click('.gx [data-action="close"]');
+  await page.waitForFunction(() => document.querySelector('[x-goei-fab]')?.style.display === 'block', null, { timeout: 8000 });
   console.log('errors', JSON.stringify(errors));
   console.log('logs', JSON.stringify(logs.filter((l) => l.includes('goei'))));
+  console.log('PASS 깡통봇: 사이드바 단추 → 설치 창 → 로어북 심기 → 닫으면 플로팅 버튼');
   await browser.close();
 }

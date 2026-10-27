@@ -43,6 +43,7 @@ import { getPrefs } from './core/settings';
 import { openApp, openInstall, openWiki } from './ui/app';
 import { isGoeiLore } from './core/install';
 import { loadStoredWikiPack } from './host/install';
+import { setInstalledHook } from './host/hooks';
 import { GHOST_ICON } from './ui/icons';
 import { landingHtml as renderLanding } from './ui/landing';
 import { loadPrefs } from './host/prefs';
@@ -599,6 +600,8 @@ async function readTheme(snap: WatchSnapshot): Promise<void> {
 // 괴이봇 Lite 채팅 화면에서만 보이는 플로팅 버튼 + 그 화면에 들어올 때마다 접속 효과
 function startWatcher(fab: Fab): () => void {
   const state = new WatchState();
+  // 설치·점검으로 카드가 바뀌면 다음 차례에 다시 판정 (플로팅 버튼이 바로 생기게)
+  setInstalledHook(() => state.forget());
   let stopped = false;
   let timer: ReturnType<typeof setTimeout> | undefined;
   const tick = async () => {
@@ -626,6 +629,7 @@ function startWatcher(fab: Fab): () => void {
   void tick();
   return () => {
     stopped = true;
+    setInstalledHook(null);
     clearTimeout(timer);
   };
 }

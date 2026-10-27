@@ -95,12 +95,13 @@ export type InstallStep = 'lore' | 'pictures' | 'icon' | 'wiki';
 export type Progress = (text: string) => void;
 
 /** 로어북·인사말 심기 (없는 것만). 캐릭터를 저장한다 */
-export async function installLoreAndGreetings(charIndex: number): Promise<void> {
+export async function installLoreAndGreetings(charIndex: number, o: { name?: string } = {}): Promise<void> {
   const char = (await risuai.getCharacterFromIndex(charIndex)) as Record<string, unknown> | null;
   if (!char) throw new Error('캐릭터를 찾을 수 없어요.');
   const planted = plantGreetings(char.alternateGreetings);
   const lore = installLore(char.globalLore as LoreEntry[] | undefined, planted.index);
-  await risuai.setCharacterToIndex(charIndex, { ...char, globalLore: lore, alternateGreetings: planted.greetings });
+  // 봇 이름: 설치 화면의 선택(기본: 괴이 카드가 아니던 봇이면 「괴이: ANOMALY」로)
+  await risuai.setCharacterToIndex(charIndex, { ...char, ...(o.name ? { name: o.name } : {}), globalLore: lore, alternateGreetings: planted.greetings });
 }
 
 /** 없는 카드 사진을 release/pic 에서 받아 에셋 저장소에 넣는다 */

@@ -2,6 +2,8 @@
 import { installSummary, type InstallState } from '../../core/install';
 import { checkInstall, dropWikiPack, installIcon, installLoreAndGreetings, installPictures, installWikiPack, restoreIcon } from '../../host/install';
 import type { ChatContext } from '../../host/risu';
+import { notifyInstalled } from '../../host/hooks';
+import { BRAND } from '../brand';
 import { ICONS } from '../icons';
 
 const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
@@ -17,6 +19,8 @@ export const instUi = {
   /** 점검 진행 중 (화면이 다시 그려질 때 두 번 점검하지 않게) */
   pending: false,
   busy: '' as Step,
+  /** 로어북·인사말을 심을 때 봇 이름도 BRAND.name 으로 (기본: 아직 괴이 카드가 아닌 봇이면 켬) */
+  setName: false,
   progress: '',
   notice: '',
   info: '',
@@ -25,6 +29,7 @@ export const instUi = {
 export async function refreshInstall(ctx: ChatContext): Promise<void> {
   try {
     const r = await checkInstall(ctx.charIndex);
+    if (instUi.forChar !== ctx.charIndex) instUi.setName = !r.state.goei;
     instUi.state = r.state;
     instUi.iconPrev = r.iconPrev;
     instUi.forChar = ctx.charIndex;
@@ -64,6 +69,7 @@ export function installPage(ctx: ChatContext): string {
       ${row('Plugin manifest', ok(s.manifest), '인사말 번호표·사진 목록·폴더 key. 없어도 명부만 있으면 괴이 카드로 인정하지만 시작 화면이 인사말을 못 찾아요.', '')}
       ${row('📖위키 폴더', ok(s.wikiFolder), '위키 탭에서 만든 문서가 들어가는 폴더.', '')}
       ${row('인사말', s.greetings.ok ? `<span class="gw-inst-ok">${s.greetings.total}개</span>` : `<span class="gw-inst-no">${s.greetings.total - s.greetings.missing.length}/${s.greetings.total}개</span>`, '세력·언어·시나리오별 첫 장면 (추가 인사말). 있는 인사말은 그대로 두고 없는 것만 뒤에 붙여요.', btn('ed-inst-lore', loreOk ? '다시 맞추기' : '심기', !loreOk))}
+      ${row('봇 이름', name === BRAND.name ? `<span class="gw-inst-ok">${esc(BRAND.name)}</span>` : `<span class="gw-inst-no">${esc(name)}</span>`, `로어북·인사말을 심을 때 봇 이름을 「${BRAND.name}」로 바꿀지. 이름을 그대로 두고 싶으면 끄세요.`, `<button class="gx-chip${instUi.setName ? ' on' : ''}" data-action="ed-inst-name" aria-pressed="${instUi.setName}" ${busy ? 'disabled' : ''}>${esc(BRAND.name)}로</button>`)}
     </div></section>
     <section class="ps-group"><h3>사진 · 아이콘</h3><div class="ps-rows">
       ${row('카드 사진', s.pictures.missing.length ? `<span class="gw-inst-no">${s.pictures.total - s.pictures.missing.length}/${s.pictures.total}장</span>` : `<span class="gw-inst-ok">${s.pictures.total}장</span>`, `요원·괴이·지도·표정 그림. 없는 것만 저장소(release/pic)에서 받아 에셋에 넣어요${s.pictures.missing.length ? ` (약 ${mb(s.pictures.bytes)})` : ''}.`, btn('ed-inst-pictures', '받기', !!s.pictures.missing.length, !s.pictures.missing.length))}
@@ -82,6 +88,11 @@ type Env = { render: () => void; refresh: () => Promise<void> };
 export async function installAction(action: string, ctx: ChatContext, env: Env): Promise<boolean> {
   if (!action.startsWith('ed-inst-')) return false;
   if (instUi.busy) return true;
+  if (action === 'ed-inst-name') {
+    instUi.setName = !instUi.setName;
+    env.render();
+    return true;
+  }
   const step = action.slice(8) as Step;
   instUi.busy = step;
   instUi.notice = '';
@@ -97,8 +108,8 @@ export async function installAction(action: string, ctx: ChatContext, env: Env):
     const s = instUi.state;
     if (step === 'all' || step === 'lore') {
       progress('로어북·인사말 심는 중…');
-      await installLoreAndGreetings(ctx.charIndex);
-      done.push('로어북·인사말');
+      await installLoreAndGreetings(ctx.charIndex, instUi.setName ? { name: BRAND.name } : {});
+      done.push(instUi.setName ? '로어북·인사말·봇 이름' : '로어북·인사말');
     }
     if (step === 'all' || step === 'pictures') {
       const n = await installPictures(ctx.charIndex, progress);
@@ -120,7 +131,10 @@ export async function installAction(action: string, ctx: ChatContext, env: Env):
       await dropWikiPack();
       done.push('위키 기본 문서 지움');
     }
-    if (done.length) instUi.info = `${done.join(' · ')} — 끝났어요. 채팅을 다시 열면 반영돼요.`;
+    if (done.length) {
+      instUi.info = `${done.join(' · ')} — 끝났어요. 채팅을 다시 열면 반영돼요.`;
+      notifyInstalled();
+    }
   } catch (error) {
     instUi.notice = error instanceof Error ? error.message : String(error);
   }

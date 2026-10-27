@@ -21,6 +21,11 @@ export class WatchState {
     return s.charIndex !== this.charIndex;
   }
 
+  /** 이 캐릭터를 다시 판정하게 한다 (설치로 로어북이 바뀌었을 때: 같은 캐릭터라 그냥 두면 「괴이 카드 아님」이 남는다) */
+  forget(): void {
+    this.charIndex = -2;
+  }
+
   /**
    * lite: 이번 캐릭터가 괴이봇 Lite인지 (needsCharacterCheck가 false면 생략, 이전 값 유지).
    * intro: 괴이봇 Lite 채팅 화면에 새로 들어온 순간마다 true (다른 봇·설정 화면에서 돌아올 때 포함).
