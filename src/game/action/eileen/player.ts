@@ -11,6 +11,7 @@ import type { Body, Hit, HitResult, React, WBox, WorldView } from '../engine/con
 import type { Pad, Btn } from '../engine/input';
 import type { FrameInfo } from '../engine/art';
 import { createEileenCore } from './core';
+import { StatusSet } from '../../combat/status';
 
 /** 테스트룸 동작 이름 ↔ 엔진 버튼 */
 /** 에일린 그림 배율 (사용자 2026-10-25: 문에 비해 작다 → 처음 맞춰 본 크기로). 걷는 띠 가운데쯤(y500)에서 약 270px, 맨 뒤 260px · 맨 앞 305px */
@@ -123,8 +124,10 @@ export class EileenPlayer extends Player {
   protected spMul(): number {
     return (this.progression?.stats.charge ?? 1) * (this.statusMod?.sp() ?? 1);
   }
-  /** 상태 효과가 거는 배율 (src/game/combat/status.ts 가 채운다) */
-  statusMod?: { speed(): number; sp(): number };
+  /** 상태 효과 (출혈·오염·두통·혼란·공포·둔화·침묵, src/game/combat/status.ts). 적 공격의 debuff 이벤트가 건다 */
+  status = new StatusSet();
+  /** 상태 효과가 거는 배율 */
+  statusMod?: { speed(): number; sp(): number } = { speed: () => this.status.speedMul(), sp: () => this.status.spMul() };
 
   private hurtTarget(t: Body, dmg: number, kind: string, face: 1 | -1, hitstop: number, o: { push?: number; src?: 'ranged' | 'blast' }) {
     const w = this.world as (WorldView & { kills: number; emit(e: unknown): void }) | null;
@@ -196,6 +199,7 @@ export class EileenPlayer extends Player {
       this.phase = 'down';
       return { kind: 'hit', killed: true };
     }
+    this.status.onHit();
     if (armored) { this.core.takeHit('hit'); return { kind: 'armor' }; }
     P.face = (Math.sign(hit.dir) === 1 ? -1 : 1) as 1 | -1;
     this.core.takeHit(hit.react === 'down' || hit.react === 'launch' ? 'knock' : 'hit');
@@ -209,13 +213,24 @@ export class EileenPlayer extends Player {
   private input(p: Pad) {
     const names = this.heldNames;
     names.clear();
-    for (const [b, n] of PRESS) if (p.held.has(b)) names.add(n);
+    // 혼란: 좌우가 뒤집힌다
+    const flip = this.status.flipped();
+    const nameOf = (n: string) => (flip && n === 'left' ? 'right' : flip && n === 'right' ? 'left' : n);
+    for (const [b, n] of PRESS) if (p.held.has(b)) names.add(nameOf(n));
     if (p.run) names.add('run');
+    // 공포: 막지 못한다. 침묵: 기술·필살을 못 쓴다
+    if (!this.status.canBlock()) names.delete('block');
+    const silenced = !this.status.canSkill();
+    if (silenced) { names.delete('skill'); names.delete('super'); }
     // 방어: 게이지가 다 회복되지 않았거나(깨진 뒤 40 미만) 거의 없으면 들어가지 않는다
     if (this.guardBroken || this.guard < 8) names.delete('block');
     // 방향키는 쓰러짐·웅크림·주저앉음일 때만 테스트룸에 넘긴다 (좌우 = 기기, 위 = 일어나기)
     const lying = ['down', 'belly', 'sit', 'scoot', 'crouch', 'crawl4'].includes(this.core.P.mode);
-    for (const [b, n] of PRESS) if (p.pressed.has(b) && (lying || !['left', 'right', 'up', 'down'].includes(n)) && (n !== 'block' || names.has('block'))) this.core.onPress(n);
+    for (const [b, n0] of PRESS) {
+      const n = nameOf(n0);
+      if (!p.pressed.has(b) || (silenced && (n === 'skill' || n === 'super'))) continue;
+      if ((lying || !['left', 'right', 'up', 'down'].includes(n)) && (n !== 'block' || names.has('block'))) this.core.onPress(n);
+    }
     if (p.evade) this.core.onPress('dodge');
     for (const b of ['block', 'charge'] as Btn[]) if (p.released.has(b)) this.core.onRelease(b);
   }
@@ -234,6 +249,7 @@ export class EileenPlayer extends Player {
     this.wantInteract = p.pressed.has('interact');
     this.wantItem = p.pressed.has('item1') ? 1 : p.pressed.has('item2') ? 2 : p.pressed.has('item3') ? 3 : p.pressed.has('item4') ? 4 : 0;
     if (this.comboClock > 0 && --this.comboClock === 0) this.combo = 0;
+    this.statusStep(world, 1 / 30);
     if (this.phase !== 'down') this.input(p); // 쓰러지면 후송을 기다린다
     this.core.frameView({ x0: w.camX, lane: w.lane });
     this.sync();
@@ -275,6 +291,17 @@ export class EileenPlayer extends Player {
     if (P.armed) { this.core.onPress('weapon'); this.calmT = 3.5; this.calmHold = true; return; }
     this.calmT = 0; this.calmHold = false;
     this.core.onPress('combat');
+  }
+
+  /** 상태 효과 시간·피해 (엔진 틱마다). 지속 피해로는 쓰러지지 않는다(1 남김). 오염은 최대 체력을 줄인다 */
+  private statusStep(world: WorldView, dt: number) {
+    if (!this.status.list.length) return;
+    const P = this.core.P;
+    const dmg = this.status.step(dt, { maxHp: this.hpMax, running: this.running, blocking: P.mode === 'block' });
+    if (dmg > 0 && this.hp > 1) this.hp = Math.max(1, this.hp - dmg);
+    const cap = this.hpMax * this.status.maxHpRatio();
+    if (this.hp > cap) this.hp = cap;
+    void world;
   }
 
   private spendGuard(n: number) {

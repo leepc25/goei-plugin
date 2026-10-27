@@ -44,7 +44,7 @@ export function openShop(vendor: VendorId, run: ItemRun, depth: number, seed: nu
   const offers: Offer[] = [];
   const greet = v.greet[Math.floor(rand(st) * v.greet.length)];
   if (vendor === 'madeokhee') {
-    const pool = ['medkit', 'bandage', 'antidote', 'salt', 'flash', 'smoke', 'charm', 'energy', 'adrenaline'];
+    const pool = ['medkit', 'bandage', 'antidote', 'painkiller', 'sedative', 'salt', 'flash', 'smoke', 'charm', 'energy', 'adrenaline'];
     // 늘 회복약 + 무작위 3종
     const picks = ['medkit'];
     while (picks.length < 4) {

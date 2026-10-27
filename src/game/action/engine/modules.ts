@@ -30,6 +30,7 @@ import { itemsBlocking, linkItems, mountItemsOverlay } from './itemsLink';
 import { makeHub, silhouette, type HubHost, type HubLife } from './hub';
 import { createHqWorld, hqDistrict } from '../../world/hq';
 import { isRegionMove } from '../../world/districts';
+import { STATUS, type DebuffKind, type StatusSet } from '../../combat/status';
 import { DEFAULT_CLOCK, clockRules, waitOptions, type ClockRules } from '../../world/clock';
 import { hashSeed } from '../../world/rng';
 import { observerLines } from '../../world/observer';
@@ -382,6 +383,8 @@ function hudState(w: World, shell: Shell): HudState {
     message: w.subtitle && w.tick - w.subtitleAt < 90 ? w.subtitle.text : undefined,
     // 가드 게이지는 가드 중이거나 닳았을 때만
     meters: p.guarding || p.guardMeter < 100 ? [{ label: '가드', v: p.guardMeter, max: 100, color: '#9ad08a' }] : [],
+    // 걸린 상태 효과 (출혈×2 5 · 오염×1 …)
+    status: ((p as { status?: StatusSet }).status?.view() ?? []).map((v) => ({ label: `${v.label}${v.stacks > 1 ? `×${v.stacks}` : ''}${v.t !== null ? ` ${Math.ceil(v.t)}` : ''}`, good: false })),
     compact: shell.touchShown,
     device: shell.touchShown ? 'touch' : shell.input.last,
     navigation: navigationFeedback(w),
@@ -927,7 +930,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
         const name = me.name || (testPlayerFace() ? '에일린' : '방문자');
         const face = (me.agentId && visitAgentFaceCanvas(name, 34)) || testPlayerFace(64, w.player.dir < 0) || visitAgentFaceCanvas('쟈알디', 34);
         // 좌상단 초상화 상자 (사용자 2026-10-25: 위 목표 띠 대신)
-        shell.hud.drawFieldCard(ctx, { name, face, hp: w.player.hp, maxHp: w.player.hpMax, gauge: w.player.gauge, compact: hs.compact, top: true, items: hs.items, device: hs.device }, dt);
+        shell.hud.drawFieldCard(ctx, { name, face, hp: w.player.hp, maxHp: w.player.hpMax, gauge: w.player.gauge, compact: hs.compact, top: true, items: hs.items, device: hs.device, status: hs.status }, dt);
         // 오른쪽 위 필드 시각·장소·잔고 (관찰 창이 켜져 있으면 그 자리라 숨김)
         if (!observerOn()) shell.hud.drawFieldCorner(ctx, hs.field, hs.compact);
       }
@@ -1046,10 +1049,13 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       bindEnemyInteractions(w);
       w.on((e) => {
         if (e.type !== 'custom') return;
-        const d = (e.data ?? {}) as { dmg?: number; text?: string };
+        const d = (e.data ?? {}) as { dmg?: number; text?: string; kind?: string; ticks?: number; debuff?: { kind?: string; ticks?: number } };
+        // 디버프는 글자만이 아니라 실제로 건다 (src/game/combat/status.ts, 에일린)
+        const st = (w.player as { status?: StatusSet }).status;
+        const put = (k?: string, ticks?: number) => { if (st && k && k in STATUS) st.apply(k as DebuffKind, ticks ? ticks / 30 : undefined); };
         if (e.name === 'evac' && !w.ended) w.ended = 'evac';
-        else if (e.name === 'hurtPlayer') w.api.hurtPlayer(d.dmg ?? 10);
-        else if (e.name === 'debuff' && d.text) w.say(d.text, 1.5);
+        else if (e.name === 'hurtPlayer') { w.api.hurtPlayer(d.dmg ?? 10); put(d.debuff?.kind, d.debuff?.ticks); }
+        else if (e.name === 'debuff') { put(d.kind, d.ticks); if (d.text) w.say(d.text, 1.5); }
       });
       const items = linkItems(w, run);
       npc.attach(w, { items, hq: false });

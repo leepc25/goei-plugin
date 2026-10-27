@@ -1,5 +1,6 @@
 // 아이템 모듈(items/) 연결: 1~4 소모품, 처치 드랍·자동 줍기(현금·파편·회복·탄·아이템·회수물), 섬광·연막 투척, 탄약 맞추기.
 // 환경 물건 들기(E)·던지기(A), 임시 무기 줍기(E)·휘두르기(A)·쏘기(S). 든 것은 캐릭터 그림과 따로 손 고정점에 그린다.
+import type { StatusSet } from '../../combat/status';
 import { drawItemHeld } from '../art/items';
 import {
   ITEMS,
@@ -168,7 +169,9 @@ export function linkItems(w: World, run: RunConfigCore & { launch?: { items?: ({
     w.bodies
       .filter((b) => b.team === 'enemy' && b.alive && b.hp > 0)
       .map((b) => ({ id: b.id, x: b.x, y: b.y, z: b.z, w: 56, h: 170, human: true }));
-  const ctx = () => ({ hp: p.hp, max: p.hpMax, gauge: p.gauge / 100, energy: p.skillCd > 0 ? 0 : 1, energyMax: 1 });
+  // 상태 효과(에일린 status)도 넘긴다: 효과 없을 때 해제 아이템을 소비하지 않게
+  const st = () => (p as unknown as { status?: StatusSet }).status;
+  const ctx = () => ({ hp: p.hp, max: p.hpMax, gauge: p.gauge / 100, energy: p.skillCd > 0 ? 0 : 1, energyMax: 1, bleed: !!st()?.has('bleed'), taint: st()?.stacks('taint') ?? 0, headache: !!st()?.has('headache'), mind: !!(st()?.has('fear') || st()?.has('confuse')) });
 
   const apply = (evs: ItemEvent[]) => {
     for (const e of evs) {
@@ -206,7 +209,15 @@ export function linkItems(w: World, run: RunConfigCore & { launch?: { items?: ({
       } else if (e.t === 'use') {
         const f = e.effect;
         if (f.type === 'heal') p.hp = Math.min(p.hpMax, p.hp + p.hpMax * f.ratio);
-        else if (f.type === 'cure') p.hp = Math.min(p.hpMax, p.hp + p.hpMax * (f.heal ?? 0));
+        else if (f.type === 'cure') {
+          p.hp = Math.min(p.hpMax, p.hp + p.hpMax * (f.heal ?? 0));
+          const s = st();
+          if (s) {
+            if (f.status === 'mind') { s.cure('fear'); s.cure('confuse'); }
+            else if (f.status === 'any') s.clear();
+            else s.cure(f.status);
+          }
+        }
         else if (f.type === 'gauge') p.gauge = Math.min(100, p.gauge + f.amount * 100);
         else if (f.type === 'energy') {
           p.skillCd = 0;
@@ -418,6 +429,18 @@ export function linkItems(w: World, run: RunConfigCore & { launch?: { items?: ({
       // 적 모듈의 기존 40% 둔화 상태를 연막 영역과 연결한다.
       for (const b of w.bodies)
         if (b instanceof Enemy && b.alive && b.hp > 0 && slowAt(field, b.x, b.y) < 1) b.slow = Math.max(b.slow, 2);
+      // 소금 원: 괴이(사람이 아닌 적)는 원 안에 들어오지 못한다. 안에 있으면 원 가장자리로 밀어낸다 (사람 적 bureau·daydream은 그대로)
+      for (const z of field.zones) {
+        if (z.kind !== 'salt') continue;
+        for (const b of w.bodies) {
+          if (!(b instanceof Enemy) || !b.alive || b.hp <= 0 || b.def.faction === 'bureau' || b.def.faction === 'daydream') continue;
+          const dx = b.x - z.x, dy2 = (b.y - z.y) * 2;
+          if (Math.hypot(dx, dy2) >= z.r) continue;
+          const edge = Math.sqrt(Math.max(0, z.r * z.r - dy2 * dy2)) + 2;
+          b.x = z.x + (dx >= 0 ? 1 : -1) * edge;
+          b.vx = 0;
+        }
+      }
       // 바닥 물건 뚫고 지나가기 금지: 요원·적 모두 (검수 15-2)
       const ents = field.ents.filter((e) => e.type === 'prop' && PROPS[e.prop]);
       const solids = ents.map((e) => itemSolid(e as { x: number; y: number; prop: string }));

@@ -142,11 +142,13 @@ export interface SupplyDef {
   locked?: boolean;
 }
 /** 연구 「진압 장비 보급 승인」 뒤에 살 수 있는 것 */
-export const LOCKED_SUPPLY = new Set(['antidote', 'smoke', 'charm']);
+export const LOCKED_SUPPLY = new Set(['antidote', 'sedative', 'smoke', 'charm']);
 export const SUPPLY_FALLBACK: SupplyDef[] = [
   { id: 'medkit', name: '회복약', price: 30, kind: 'heal', max: 3, desc: '체력 35% 회복' },
   { id: 'bandage', name: '압박 붕대', price: 18, kind: 'cure', max: 3, desc: '출혈을 멈추고 체력 10% 회복' },
   { id: 'antidote', name: '정화제', price: 40, kind: 'cure', max: 2, desc: '오염 한 단계 제거' },
+  { id: 'painkiller', name: '진통제', price: 20, kind: 'cure', max: 3, desc: '두통을 멎게 한다' },
+  { id: 'sedative', name: '진정제', price: 30, kind: 'cure', max: 2, desc: '공포·혼란을 가라앉힌다' },
   { id: 'salt', name: '소금', price: 25, kind: 'special', max: 3, desc: '발밑에 소금 원. 괴이가 6초 동안 들어오지 못한다' },
   { id: 'flash', name: '섬광탄', price: 35, kind: 'throw', max: 3, desc: '주변 적 2초 기절' },
   { id: 'smoke', name: '연막탄', price: 28, kind: 'throw', max: 2, desc: '연기 속 적 40% 둔화, 5초' },

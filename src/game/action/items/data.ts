@@ -7,7 +7,7 @@
 export type ItemKind = 'heal' | 'cure' | 'throw' | 'special';
 export type ItemEffect =
   | { type: 'heal'; ratio: number }
-  | { type: 'cure'; status: 'bleed' | 'taint' | 'any'; heal?: number }
+  | { type: 'cure'; status: 'bleed' | 'taint' | 'headache' | 'mind' | 'any'; heal?: number }
   | { type: 'flash'; radius: number; stun: number }
   | { type: 'smoke'; radius: number; slow: number; time: number }
   | { type: 'salt'; radius: number; time: number }
@@ -31,6 +31,9 @@ export const ITEMS: Record<string, ItemDef> = {
   medkit: { id: 'medkit', name: '회복약', kind: 'heal', max: 3, price: 30, desc: '체력 35% 회복', effect: { type: 'heal', ratio: 0.35 } },
   bandage: { id: 'bandage', name: '압박 붕대', kind: 'cure', max: 3, price: 18, desc: '출혈을 멈추고 체력 10% 회복', effect: { type: 'cure', status: 'bleed', heal: 0.1 } },
   antidote: { id: 'antidote', name: '정화제', kind: 'cure', max: 2, price: 40, desc: '오염 한 단계 제거', effect: { type: 'cure', status: 'taint' } },
+  // 상태 효과 해제 (docs/게임_성장_경제_설계.md 5-2, 2026-10-27)
+  painkiller: { id: 'painkiller', name: '진통제', kind: 'cure', max: 3, price: 20, desc: '두통을 멎게 한다', effect: { type: 'cure', status: 'headache' } },
+  sedative: { id: 'sedative', name: '진정제', kind: 'cure', max: 2, price: 30, desc: '공포·혼란을 가라앉힌다', effect: { type: 'cure', status: 'mind' } },
   salt: { id: 'salt', name: '소금', kind: 'special', max: 3, price: 25, desc: '발밑에 소금 원. 괴이가 6초 동안 들어오지 못한다', effect: { type: 'salt', radius: 120, time: 6 }, always: true },
   flash: { id: 'flash', name: '섬광탄', kind: 'throw', max: 3, price: 35, desc: '주변 적 2초 기절', effect: { type: 'flash', radius: 260, stun: 2 }, always: true },
   smoke: { id: 'smoke', name: '연막탄', kind: 'throw', max: 2, price: 28, desc: '연기 속 적 40% 둔화, 5초', effect: { type: 'smoke', radius: 200, slow: 0.4, time: 5 }, always: true },
@@ -39,7 +42,7 @@ export const ITEMS: Record<string, ItemDef> = {
   adrenaline: { id: 'adrenaline', name: '각성제', kind: 'special', max: 1, price: 70, desc: '필살 게이지 50% 충전', effect: { type: 'gauge', amount: 0.5 } },
 };
 /** 본부 정비실 보급 목록. 본부 화면이 그리기만 한다. */
-export const SUPPLY_CATALOG = ['medkit', 'bandage', 'antidote', 'salt', 'flash', 'smoke', 'charm', 'energy'].map(id => {
+export const SUPPLY_CATALOG = ['medkit', 'bandage', 'antidote', 'painkiller', 'sedative', 'salt', 'flash', 'smoke', 'charm', 'energy'].map(id => {
   const d = ITEMS[id];
   return { id: d.id, name: d.name, price: d.price, kind: d.kind, max: d.max, desc: d.desc };
 });
@@ -240,7 +243,7 @@ export const DROP_TABLES: Record<string, DropEntry[]> = {
   ],
   drawer: [
     { p: 0.8, kind: 'cash', min: 4, max: 12 },
-    { p: 0.3, kind: 'item', pool: ['bandage', 'antidote', 'energy'] },
+    { p: 0.3, kind: 'item', pool: ['bandage', 'antidote', 'painkiller', 'sedative', 'energy'] },
     { p: 0.1, kind: 'relic', pool: ['photo', 'tooth', 'oddcoin'] },
     { p: 0.12, kind: 'weapon', pool: ['kitchenknife'] },
   ],

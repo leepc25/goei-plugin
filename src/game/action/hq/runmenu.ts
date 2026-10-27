@@ -51,7 +51,7 @@ let iconDrawer: IconDrawer | null = null;
 export function setItemIconDrawer(f: IconDrawer | null) {
   iconDrawer = f;
 }
-const ICON_COLOR: Record<string, string> = { medkit: '#d05050', bandage: '#e0d0c0', antidote: '#60c080', salt: '#e8e8e8', flash: '#f0f070', smoke: '#8a8a9a', charm: '#d0a040', energy: '#d0b040' };
+const ICON_COLOR: Record<string, string> = { medkit: '#d05050', bandage: '#e0d0c0', antidote: '#60c080', painkiller: '#e8ecee', sedative: '#9a7fd1', salt: '#e8e8e8', flash: '#f0f070', smoke: '#8a8a9a', charm: '#d0a040', energy: '#d0b040' };
 export function drawIcon(ctx: CanvasRenderingContext2D, id: string, x: number, y: number, size: number) {
   if (iconDrawer) return iconDrawer(ctx, id, x, y, size);
   ctx.fillStyle = ICON_COLOR[id] ?? '#8a8a8a';

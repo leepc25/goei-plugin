@@ -139,6 +139,21 @@ export function setPixelText(on: boolean) {
   pixelOn = on;
 }
 
+/** 상태 효과 칩 (필드 주인공 칸: 전투 HUD는 meterRows가 같은 모양으로 그린다) */
+export function statusChips(c: CanvasRenderingContext2D, list: { label: string; good: boolean }[], x: number, y: number) {
+  let cx = x;
+  for (const st of list) {
+    c.font = font(13, 800);
+    const w = c.measureText(st.label).width + 14;
+    c.beginPath();
+    c.roundRect(cx, y, w, 22, 11);
+    c.fillStyle = st.good ? 'rgba(60,140,90,0.9)' : 'rgba(150,50,50,0.9)';
+    c.fill();
+    label(c, st.label, cx + 7, y + 16, 13, '#fff', 'left', 800);
+    cx += w + 6;
+  }
+}
+
 export function plate(c: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r = 8) {
   c.beginPath();
   c.roundRect(x, y, w, h, r);
@@ -490,7 +505,7 @@ export class Hud {
     c.restore();
   }
 
-  drawFieldCard(c: CanvasRenderingContext2D, s: { name: string; face?: CanvasImageSource | null; hp: number; maxHp: number; gauge?: number; sub?: string; compact?: boolean; top?: boolean; items?: HudItem[]; device?: string }, dt = 1 / 60): number {
+  drawFieldCard(c: CanvasRenderingContext2D, s: { name: string; face?: CanvasImageSource | null; hp: number; maxHp: number; gauge?: number; sub?: string; compact?: boolean; top?: boolean; items?: HudItem[]; device?: string; status?: { label: string; good: boolean }[] }, dt = 1 / 60): number {
     this.t += dt;
     c.save();
     const k = s.compact ? 1.2 : 1;
@@ -510,7 +525,8 @@ export class Hud {
     if (pixelHudReady()) {
       const cy = s.top ? 14 : H - 170;
       const end = drawPixelCard(c, { name: s.name, face: s.face, hp: s.hp, maxHp: s.maxHp, trail: this.trail, hurtT: this.hurtT, gauge: s.gauge, superKey: superKey(), t: this.t }, 16, cy);
-      if (s.items && !s.compact) this.pixelItems(c, s.items, s.device, 16 + 84, end + 6);
+      const iy = s.items && !s.compact ? this.pixelItems(c, s.items, s.device, 16 + 84, end + 6) : end;
+      if (s.status?.length) statusChips(c, s.status, 16 + 84, iy + 8);
       pixelOn = false;
       c.restore();
       return (16 + 340) * k;

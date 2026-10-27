@@ -45,6 +45,9 @@ export interface UseContext {
   max: number;
   bleed?: boolean;
   taint?: number;
+  headache?: boolean;
+  /** 공포·혼란 */
+  mind?: boolean;
   energy?: number;
   energyMax?: number;
   gauge?: number;
@@ -115,6 +118,8 @@ function useless(effect: ItemEffect, c?: UseContext): boolean {
     case 'cure':
       if (effect.status === 'bleed') return !c.bleed && c.hp >= c.max;
       if (effect.status === 'taint') return !c.taint;
+      if (effect.status === 'headache') return !c.headache;
+      if (effect.status === 'mind') return !c.mind;
       return false;
     case 'energy':
       return c.energy !== undefined && c.energyMax !== undefined && c.energy >= c.energyMax;
