@@ -98,3 +98,33 @@ alledProcessError: Command '['curl', '-sSf', '--retry', '3', 'https://backblaze.
 9.1_진압A [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
 6.1_가짜관리국검사A ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
 6.1_가짜관리국검사A [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+6.2_가짜관리국검사B ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+6.2_가짜관리국검사B [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+6.3_가짜관리국검사C ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+6.3_가짜관리국검사C [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+6.4_가짜관리국진압A ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+6.4_가짜관리국진압A [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+6.5_가짜관리국진압B ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+6.5_가짜관리국진압B [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+6.6_가짜관리국진압C ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+6.6_가짜관리국진압C [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+6.8_불량배남2 ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+6.8_불량배남2 [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+6.10_불량배여1 ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+6.10_불량배여1 [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+6.12_불량배여3 ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+6.12_불량배여3 [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+6.13_경찰남1 ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+6.13_경찰남1 [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+6.14_경찰남2 ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+6.14_경찰남2 [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+6.15_경찰여1 ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+6.15_경찰여1 [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+6.16_경찰여2 ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+6.16_경찰여2 [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+6.17_관리국남A ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+6.17_관리국남A [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+6.18_관리국남B ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+6.18_관리국남B [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+6.19_관리국여A ('A', '완료 16장 {"type": "generations", "generations": 2.0}')
+6.19_관리국여A [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
