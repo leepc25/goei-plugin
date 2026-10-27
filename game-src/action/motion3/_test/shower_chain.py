@@ -13,7 +13,8 @@ SUB = "a short woman in her early twenties with a faded platinum blonde high pon
 POSE = "standing upright with the back to the viewer, facing north"
 DIR = {5: "east", 6: "east", 12: "east", 13: "east", 17: "east", 14: "east", 18: "east"}
 END = {18: "5"}
-DIR[20] = "east"   # 끝 장 지정: 18 = 14를 돌아서기 끝 장(수건 두른 옆모습)으로 끝나게 다시
+DIR[20] = "east"
+DIR[21] = "south"   # 끝 장 지정: 18 = 14를 돌아서기 끝 장(수건 두른 옆모습)으로 끝나게 다시
 POSE_SIDE = "standing upright seen from the side, facing east"
 STEPS = {
  1: ("57", "Standing with the back to the viewer in front of a locker. First she wraps a large plain white bath towel around her body under the arms and holds it closed. Then, keeping the towel wrapped the whole time, she takes off the jacket, vest, shirt, trousers and shoes underneath it and lets them drop out of the frame. The towel always covers her from the armpits to the middle of the thighs. Last frame: standing with the back to the viewer, barefoot, wrapped in the white towel from the armpits to mid-thigh, bare shoulders, arms and lower legs, ponytail unchanged."),
@@ -34,11 +35,12 @@ def last(name):
 def b64(im):
     b = io.BytesIO(); im.save(b, "PNG"); return {"type": "base64", "base64": base64.b64encode(b.getvalue()).decode(), "format": "png"}
 STEPS[18] = STEPS[14]
+STEPS[21] = ("5", "Wrapped in the white towel and barefoot, she turns in place from facing right to facing straight toward the viewer. Then she unwraps the towel and pulls it off to the side; the towel vanishes as it comes off, nothing falls to the floor. She stands bare facing the viewer with no towel and no soap, relaxed, arms at the sides. Last frame: standing facing the viewer (south), barefoot, no towel, no soap foam, ponytail unchanged. Draw only the woman, no shower head, wall, water or towel.")   # 앞모습 거품 없이 시험
 STEPS[20] = ("5", "Standing under a shower seen from the side facing east, wrapped in the white towel, barefoot. She unwraps the towel and pulls it off; the towel vanishes from her hands as it comes off and is gone, nothing falls to the floor. She stands bare under the shower with no towel and no soap, relaxed, arms at the sides. Last frame: standing seen from the side facing east, barefoot, no towel, no soap foam, ponytail unchanged. Draw only the woman, no shower head, wall, water or towel.")   # 거품 없이 시험
 n = int(sys.argv[1]); src, prompt = STEPS[n]
 start = last(src)
 body = {"character_id": CID, "mode": "pixminimax", "action_description": prompt, "animation_name": f"test 샤워이음 {n}",
-        "directions": [DIR.get(n, "north")], "frame_count": 8, "subject_description": SUB, "initial_pose": POSE_SIDE if DIR.get(n) == "east" and n != 5 else POSE,
+        "directions": [DIR.get(n, "north")], "frame_count": 8, "subject_description": SUB, "initial_pose": POSE_SIDE if DIR.get(n) == "east" and n != 5 else ("standing upright seen from the side, facing east" if n == 21 else POSE),
         "keep_first_frame": False, "enhance_prompt": False, "custom_start_frame": b64(start)}
 if n in (3, 6, 7, 13, 17): body["end_frame"] = b64(start)
 if n in END: body["end_frame"] = b64(last(END[n]))
