@@ -31,7 +31,9 @@ python3 tools/stitch/stitch_bg.py 지하2층.png 30 1잘림.png p2.png 원본/�
 
 # 지상거리_낡음: 원본 PNG(약 2172×724, GitHub로 받음). 높이선이 세 장 모두 같아 자르기만 함(세로 724).
 # 건물 사이 어두운 틈에서 잇고, 화분이 두 번 나오지 않게 2·3은 103부터 자름
-python3 tools/stitch/stitch_bg.py 지상거리_낡음.png 16 1.png 2(103~).png 3(103~).png
+# 1은 건물이 2·3보다 위에 그려져 있어(간판 위 20→25, 건물 밑 462→485) 맞추고, 연석(600) 아래는 그대로
+python3 tools/stitch/remap_rows.py 원본/지상거리낡음1.png p1.png 1 20:25 462:485 600:600
+python3 tools/stitch/stitch_bg.py 지상거리_낡음.png 16 p1.png 2(103~).png 3(103~).png
 ```
 
 뒷골목·지하2층은 색 보정 한도(±8%)를 넣기 전에 만들었다.
