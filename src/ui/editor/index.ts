@@ -16,6 +16,7 @@ import editorCss from './style.css';
 import { recordCount, recordList, recordPage, recordAction, recordInput, recUi } from './record';
 import { relationsPage, relationsAction, relationsInput } from './relations';
 import { guidePage, guideAction, guideInput, guideUi } from './guides';
+import { isRuleNode, ruleAction, ruleInput, rulePage, ruleTreeItems } from './rules';
 import { installAction, installPage, instUi, refreshInstall } from './install';
 import { featurePane, settingsNotices, settingsSection, settingsUi, type SettingsSection } from '../settings';
 import { CFG, GN_DEFAULTS, gnetLabel } from '../../core/gnet';
@@ -28,14 +29,14 @@ import { PLUGIN_VERSION } from '../../core/update';
 export type SetPage = 'screen' | 'image' | 'board' | 'gnet' | 'phone' | 'wiki' | 'visit' | 'people' | 'adv' | 'update';
 export type GuideNode = `guide:${GuideName | 'Image'}`;
 export type ManageNode = 'manage:backup' | 'manage:diag' | 'manage:log';
-export type EditorNode = WorldKind | 'base' | 'relations' | `set:${SetPage}` | 'install' | GuideNode | ManageNode;
+export type EditorNode = WorldKind | 'base' | 'relations' | `set:${SetPage}` | 'install' | GuideNode | ManageNode | `rule:${string}`;
 const SET_PAGES: SetPage[] = ['screen', 'image', 'board', 'gnet', 'phone', 'wiki', 'visit', 'people', 'adv', 'update'];
 export const isSetNode = (n: string): n is `set:${SetPage}` => n.startsWith('set:') && SET_PAGES.includes(n.slice(4) as SetPage);
 export const isGuideNode = (n: string): n is GuideNode => n.startsWith('guide:');
 /* 상단 탭 (2026-10-27 리수폿식): 설정(기능) · 세계 · 지침 · 관리. 왼쪽 목록은 탭마다 다르다 */
 export type Tab = 'set' | 'world' | 'guide' | 'manage';
 const TABS: [Tab, string][] = [['set', '설정'], ['world', '세계'], ['guide', '지침'], ['manage', '관리']];
-export const tabOf = (n: EditorNode): Tab => (isKind(n) || n === 'base' || n === 'relations' ? 'world' : isGuideNode(n) ? 'guide' : n === 'install' || n === 'set:update' || n.startsWith('manage:') ? 'manage' : 'set');
+export const tabOf = (n: EditorNode): Tab => (isKind(n) || n === 'base' || n === 'relations' ? 'world' : isGuideNode(n) || isRuleNode(n) ? 'guide' : n === 'install' || n === 'set:update' || n.startsWith('manage:') ? 'manage' : 'set');
 /** 옛 노드 이름 → 지금 (설정 페이지 아래 있던 지침은 지침 탭으로) */
 const legacyNode = (n: string): EditorNode => (n === 'set:guides' ? 'guide:RP' : (n as EditorNode));
 
@@ -190,6 +191,7 @@ function ensureRoot(): HTMLElement {
     if (ctx && recordInput(name, el.dataset.key ?? '', el.value, ctx)) return void touched();
     if (ctx && relationsInput(name, el.dataset.key ?? '', el.value, ctx)) return void touched();
     if (guideInput(name, el.dataset.key ?? '', el.value)) return void touched();
+    if (ruleInput(name, el.dataset.key ?? '', el.value)) return;
     // 설정 페이지의 입력(슬라이더·검색·규칙 글칸 등)은 패널과 같은 처리기로
     host?.input?.(el as HTMLInputElement);
   });
@@ -261,7 +263,7 @@ export const isKind = (n: string): n is WorldKind => ['agent', 'org', 'anomaly',
 
 const SET_LABEL: Record<SetPage, string> = { screen: '화면', image: '캐릭터 이미지', board: '상황판', gnet: '괴담넷', phone: '괴담톡', wiki: '위키', visit: '필드', people: '인물 기록', adv: '고급', update: '업데이트' };
 const SET_ICON: Record<SetPage, string> = { screen: ICONS.settings, image: ICONS.cctv, board: ICONS.grid, gnet: ICONS.gnet, phone: ICONS.phone, wiki: ICONS.wiki, visit: ICONS.game, people: ICONS.group, adv: ICONS.pen, update: ICONS.refresh };
-type TreeItem = [EditorNode, string, string];
+type TreeItem = [EditorNode, string, string, string?];
 const setItem = (p: SetPage): TreeItem => [`set:${p}`, SET_LABEL[p], SET_ICON[p]];
 const guideItem = (g: GuideName | 'Image'): TreeItem => [`guide:${g}`, g === 'Image' ? '이미지' : GUIDE_LABEL[g], ICONS.book];
 /** 탭마다 왼쪽 목록 (제목 + 항목). 설정 탭 항목에는 켬/끔 배지, 세계 탭에는 개수 */
@@ -270,13 +272,14 @@ function treeOf(tab: Tab): { title: string; items: TreeItem[] }[] {
     case 'set': return [{ title: '기능 목록', items: (['screen', 'image', 'board', 'gnet', 'phone', 'wiki', 'visit', 'people', 'adv'] as SetPage[]).map(setItem) }];
     case 'world': return [{ title: '세계', items: [['agent', '요원', ICONS.person], ['org', '조직', ICONS.org], ['anomaly', '괴이', ICONS.spook], ['site', '파밍', ICONS.star], ['appendix', '부록', ICONS.book], ['base', '거점', ICONS.pin], ['relations', '세력 관계', ICONS.grid]] }];
     case 'guide': return [
+      { title: '내가 추가한 규칙', items: ruleTreeItems().map(([id, label, badge]) => [id as EditorNode, label, id === 'rule:new' ? ICONS.plus : ICONS.pen, badge] as TreeItem) },
       { title: '기본 지침', items: (['RP', 'Directive', 'Tag'] as GuideName[]).map(guideItem) },
       { title: '기능별 지침', items: (['GNet', 'Phone', 'Wiki', 'Visit', 'Image'] as (GuideName | 'Image')[]).map(guideItem) },
     ];
     case 'manage': return [{ title: '관리', items: [['install', '설치 · 점검', ICONS.refresh], setItem('update')] }];
   }
 }
-const firstOf = (tab: Tab): EditorNode => treeOf(tab)[0].items[0][0];
+const firstOf = (tab: Tab): EditorNode => (tab === 'guide' ? 'guide:RP' : treeOf(tab)[0].items[0][0]);
 /** 기능 켬/끔 배지 (설정 탭 목록) */
 function featureState(ctx: ChatContext | null): Partial<Record<EditorNode, boolean>> {
   if (!ctx) return {};
@@ -378,7 +381,7 @@ function tree(ctx: ChatContext | null): string {
   const on = featureState(ctx);
   return treeOf(tabOf(edUi.node)).map(
     (g) => `<div class="gw-tree-group"><h4>${g.title}</h4>${g.items
-      .map(([id, label, icon]) => `<button class="gw-tree-item${edUi.node === id ? ' on' : ''}" data-action="ed-node" data-value="${id}">${icon}<span>${esc(label)}</span>${counts[id] !== undefined ? `<em>${counts[id]}</em>` : on[id] !== undefined ? `<i class="gw-tree-badge${on[id] ? '' : ' off'}">${on[id] ? '켬' : '끔'}</i>` : ''}</button>`)
+      .map(([id, label, icon, badge]) => `<button class="gw-tree-item${edUi.node === id ? ' on' : ''}" data-action="ed-node" data-value="${id}">${icon}<span>${esc(label)}</span>${badge ?? (counts[id] !== undefined ? `<em>${counts[id]}</em>` : on[id] !== undefined ? `<i class="gw-tree-badge${on[id] ? '' : ' off'}">${on[id] ? '켬' : '끔'}</i>` : '')}</button>`)
       .join('')}</div>`,
   ).join('');
 }
@@ -401,6 +404,7 @@ function body(ctx: ChatContext): string {
   }
   if (n === 'relations') return relationsPage(ctx, overridesOf(ctx), false);
   if (isGuideNode(n)) return guideNodePage(ctx, n);
+  if (isRuleNode(n)) return rulePage(n);
   if (isSetNode(n)) return settingsPage(ctx, n.slice(4) as SetPage);
   // 설치 · 점검: 이 캐릭터를 아직 점검하지 않았으면 점검하고 다시 그린다 (어느 길로 열어도)
   if (instUi.forChar !== ctx.charIndex && !instUi.pending) {
@@ -542,6 +546,12 @@ export async function handle(action: string, value?: string): Promise<void> {
   }
   if (action.startsWith('ed-guide-')) {
     if (await guideAction(action, value)) render();
+    return;
+  }
+  if (action.startsWith('ed-rule-')) {
+    const r = await ruleAction(action, value);
+    if (typeof r === 'string') edUi.node = r;
+    if (r) render();
     return;
   }
   if (await installAction(action, ctx, env)) return;

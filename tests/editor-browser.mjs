@@ -92,7 +92,7 @@ await page.waitForSelector('.gw .gw-win');
 assert.ok(await page.$('.gw-set .gw-setbody .ps-group'), '설정 페이지(화면)');
 assert.ok(await page.$('[data-action="ed-node"][data-value="set:gnet"]'), '설정 트리');
 // 탭 → 노드 (2026-10-27: 왼쪽 목록은 탭마다 달라서, 노드를 누르기 전에 그 탭을 누른다)
-const tabOfNode = (n) => (n.startsWith('guide:') ? 'guide' : n === 'install' || n === 'set:update' || n.startsWith('manage:') ? 'manage' : n.startsWith('set:') ? 'set' : 'world');
+const tabOfNode = (n) => (n.startsWith('guide:') || n.startsWith('rule:') ? 'guide' : n === 'install' || n === 'set:update' || n.startsWith('manage:') ? 'manage' : n.startsWith('set:') ? 'set' : 'world');
 async function goNode(n) {
   await page.click(`[data-action="ed-tab"][data-value="${tabOfNode(n)}"]`);
   await page.click(`[data-action="ed-node"][data-value="${n}"]`);
@@ -149,6 +149,17 @@ assert.ok((await page.locator('.gw-guide-secs .gw-field-head b', { hasText: 'COM
 // 기능 설정 페이지: 괴담톡 설정 + Phone 지침이 한 페이지에, 설정 단추는 패널 처리기로 (범위 전환)
 await goNode('guide:Phone');
 await page.waitForSelector('textarea[data-key="Phone|1"]');
+// 내가 추가한 규칙: 추가 → 글 → 저장(기기 설정) → 지우기
+await goNode('rule:new');
+await page.click('[data-action="ed-rule-new"]');
+await page.waitForSelector('textarea[data-input="ed-rule-text"]');
+await page.fill('input[data-input="ed-rule-title"]', '대사 길이');
+await page.fill('textarea[data-input="ed-rule-text"]', 'Three sentences max.');
+await page.waitForFunction(() => JSON.parse(window.__store['p:goei:prefs'] ?? '{}').rules?.[0]?.text === 'Three sentences max.', null, { timeout: 5000 });
+assert.ok(await page.$('.gw-tree-item[data-value^="rule:r"]'), '규칙이 목록에');
+await page.click('[data-action="ed-rule-del"]');
+await page.click('[data-action="ed-rule-del-yes"]');
+await page.waitForSelector('textarea[data-key="RP|0"]');
 await goNode('set:screen');
 await page.waitForSelector('.gw-set [data-action="set-theme"]');
 await page.click('.gw-set [data-action="set-theme"][data-value="paper"]');

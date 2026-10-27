@@ -7,7 +7,7 @@ import { assembleAgent, assembleAnomaly, assembleAppendix, assembleOrg, assemble
 import { assembleFaction, assembleRoster } from './faction';
 import { setActiveWorld, worldRecords, worldRelations, type WorldOverrides, type WorldRecord, worldAnomalyNote, excludedOrgs, filterRelations } from './records';
 import type { WorldKind } from './schema';
-import { guideText } from '../guides';
+import { guidePrompt } from '../guides';
 import { FACTION_BOOK, TAG_BOOK } from '../factions';
 
 export const ROSTER_BOOK = '🙂Roster';
@@ -139,7 +139,7 @@ export function withWorldLore(lore: LoreEntry[] | undefined): LoreEntry[] {
     if (!wf) out.push({ key: WORLD_FOLDER_KEY, comment: '🌐세계', content: '', mode: 'folder', insertorder: 100, alwaysActive: false, secondkey: '', selective: false, bookVersion: 2, [VIRTUAL]: true });
     const rel = filterRelations(worldRelations(overrides), excludedOrgs(recs.org));
     for (const b of missingAlways) {
-      const content = b.kind === 'tag' ? guideText('Tag') : b.kind === 'faction' ? assembleFaction(dir, recs.org, rel) : assembleRoster(dir, recs.agent, recs.org);
+      const content = b.kind === 'tag' ? guidePrompt('Tag') : b.kind === 'faction' ? assembleFaction(dir, recs.org, rel) : assembleRoster(dir, recs.agent, recs.org);
       out.push({ key: '', secondkey: '', comment: b.name, content, mode: 'normal', insertorder: b.order, alwaysActive: true, selective: false, useRegex: false, bookVersion: 2, folder: wkey, [VIRTUAL]: true, goeiKind: b.kind });
     }
   }

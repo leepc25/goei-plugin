@@ -90,3 +90,45 @@ export function splitGuide(text: string): GuidePart[] {
 }
 
 export const joinGuide = (parts: GuidePart[]): string => parts.map((p) => p.head + p.body + p.tail).join('');
+
+/* ── 내가 추가한 규칙 (2026-10-27 리수폿식 「프롬프트」 탭): 기기 설정에 두고, 붙일 지침의 늘 쓰이는 절 끝에 넣는다 ──
+   본편(RP): 글 끝 / 이동·임무(Directive): COMMON 절 / 괴담넷: LB 절 / 괴담톡: COMMON / 위키: NW.GUIDE / 필드: COMMON */
+export type RuleTarget = 'RP' | 'Directive' | 'GNet' | 'Phone' | 'Wiki' | 'Visit';
+export const RULE_TARGETS: RuleTarget[] = ['RP', 'Directive', 'GNet', 'Phone', 'Wiki', 'Visit'];
+export const RULE_TARGET_LABEL: Record<RuleTarget, string> = { RP: '본편', Directive: '이동·임무', GNet: '괴담넷', Phone: '괴담톡', Wiki: '위키', Visit: '필드' };
+export interface UserRule {
+  id: string;
+  title: string;
+  text: string;
+  to: RuleTarget[];
+  on: boolean;
+}
+const RULE_SECTION: Record<RuleTarget, string | null> = { RP: null, Directive: 'COMMON', GNet: 'LB', Phone: 'COMMON', Wiki: 'NW.GUIDE', Visit: 'COMMON' };
+
+let userRules: UserRule[] = [];
+export function setUserRules(rules: UserRule[] | undefined | null): void {
+  userRules = Array.isArray(rules) ? rules.filter((r) => r && typeof r.id === 'string') : [];
+}
+export const getUserRules = (): UserRule[] => userRules;
+
+/** 이 지침에 붙을 규칙 글 (없으면 빈 글) */
+export function rulesFor(name: GuideName): string {
+  if (!(RULE_TARGETS as string[]).includes(name)) return '';
+  const hit = userRules.filter((r) => r.on && r.text.trim() && r.to.includes(name as RuleTarget));
+  if (!hit.length) return '';
+  return `## User Rules\n${hit.map((r) => `### ${r.title.trim() || '규칙'}\n${r.text.trim()}`).join('\n\n')}`;
+}
+
+/** 요청에 쓰는 지침 글: 고친 글(또는 기본) + 내가 추가한 규칙. 편집 창은 guideText(규칙 없는 글)를 쓴다 */
+export function guidePrompt(name: GuideName): string {
+  const base = guideText(name);
+  const rules = rulesFor(name);
+  if (!rules) return base;
+  const at = RULE_SECTION[name as RuleTarget];
+  if (!at) return `${base.replace(/\s+$/, '')}\n\n${rules}\n`;
+  const parts = splitGuide(base);
+  const i = parts.findIndex((p) => p.title === at);
+  if (i < 0) return base;
+  parts[i] = { ...parts[i], body: `${parts[i].body}\n\n${rules}` };
+  return joinGuide(parts);
+}
