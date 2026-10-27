@@ -138,6 +138,8 @@ function floorHall(id: SceneId, name: string, floor: HqScene['floor'], doors: Om
     // 막는 상자는 그림을 그리지 않는다 (오브젝트 그림은 첫 상자 자리에서 한 번만, 깊이 순서는 sortY)
     boxes: [
       ...p.objects.flatMap((o) => (o.solid ?? []).map((b, i) => ({ kind: i ? `${o.id}:${i}` : o.id, x: (b.x0 + b.x1) / 2, w: b.x1 - b.x0, y: i ? b.y1 : o.sortY, d: b.y1 - b.y0, h: b.h ?? o.sortY - o.y, solid: true }))),
+      // 막지 않는 오브젝트(가림만): 그림 자리용 빈 상자
+      ...p.objects.filter((o) => !o.solid?.length).map((o) => ({ kind: o.id, x: o.x + o.w / 2, w: o.w, y: o.sortY, d: 1, h: 0, solid: false })),
       // 그림 속 화분·벤치: 바닥 상자만 (그림은 배경에 이미 있다)
       ...(p.blocks ?? []).map(([x0, x1, y1, h]) => ({ kind: 'block', x: (x0 + x1) / 2, w: x1 - x0, y: y1, d: y1 - (p.lane ?? PAINTED_LANE)[0], h: h ?? 999, solid: true })),
     ],
