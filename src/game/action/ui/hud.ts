@@ -42,7 +42,7 @@ export interface HudState {
   items: HudItem[];
   floor: { depth: string; name: string; variant?: string };
   /** 필드: 시각과 장소 이름 (우상단 작게) */
-  field?: { clock?: string; place?: string };
+  field?: { clock?: string; place?: string; wallet?: string };
   rules?: { text: string; fresh?: boolean }[];
   ruleCount?: { found: number; sent: number };
   /** 승강기 총애 -3~+3 */
@@ -375,6 +375,7 @@ export class Hud {
       const r = W - (s.compact ? 100 : 20);
       if (s.field.clock) label(c, s.field.clock, r, 34, 26, '#fff', 'right', 900);
       if (s.field.place) label(c, s.field.place, r, 56, 15, C.amber, 'right', 800);
+      if (s.field.wallet) label(c, s.field.wallet, r, 76, 15, '#cfe3c8', 'right', 800);
     }
     if (!f.depth) return;
     const right = W - (s.compact ? 100 : 20);
@@ -475,6 +476,20 @@ export class Hud {
 
   /** 필드 주인공 칸 (전투 HUD가 없는 본부·거점): 왼쪽 아래 도트 얼굴 + 이름 + 체력 + 필살 게이지. 터치·좁은 화면은 왼쪽 위(아래는 스틱 자리).
    * 돌려주는 값 = 칸 오른쪽 끝 x (자막을 그 오른쪽에 둔다) */
+  /** 필드(방문) 오른쪽 위: 필드 시각·장소·잔고 (전투 HUD를 안 그리는 필드에서) */
+  drawFieldCorner(c: CanvasRenderingContext2D, f: HudState['field'], compact?: boolean) {
+    if (!f) return;
+    c.save();
+    const k = compact ? 1.2 : 1;
+    W = c.canvas.width / k;
+    c.setTransform(k, 0, 0, k, 0, 0);
+    const r = W - (compact ? 100 : 20);
+    if (f.clock) label(c, f.clock, r, 34, 26, '#fff', 'right', 900);
+    if (f.place) label(c, f.place, r, 56, 15, C.amber, 'right', 800);
+    if (f.wallet) label(c, f.wallet, r, f.clock || f.place ? 76 : 34, 15, '#cfe3c8', 'right', 800);
+    c.restore();
+  }
+
   drawFieldCard(c: CanvasRenderingContext2D, s: { name: string; face?: CanvasImageSource | null; hp: number; maxHp: number; gauge?: number; sub?: string; compact?: boolean; top?: boolean; items?: HudItem[]; device?: string }, dt = 1 / 60): number {
     this.t += dt;
     c.save();

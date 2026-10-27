@@ -222,6 +222,14 @@ export interface GamePeople {
   onChange(cb: () => void): () => void;
 }
 
+/** 가계부 (플러그인 core/wallet.ts, 채팅 변수 $st_wallet). 본편 상태창 잔고 칸과 같은 장부 */
+export interface GameWallet {
+  /** 지금 잔고(원). 이 채팅에서 잔고 칸을 끈 경우 null (게임은 돈 기능을 숨긴다) */
+  balance(): Promise<number | null>;
+  /** 필드 거래 한 줄: 들어오면 +, 나가면 −. 모자라도 적는다(마이너스 = 빚, 막는 건 게임이). 적은 뒤 잔고, 못 적으면 null */
+  add(amount: number, memo: string): Promise<number | null>;
+}
+
 export interface GameUiPrefs {
   load(): Promise<string | null>;
   save(text: string): void;
@@ -236,6 +244,8 @@ export interface GameBridge {
   visit?: GameVisit;
   /** 살아 있는 인물 기록 (없으면 옛 플러그인: 게임은 시트 사본·자기 저장소로 동작) */
   people?: GamePeople;
+  /** 가계부 (없으면 옛 플러그인: 게임은 돈을 쓰지 않는다) */
+  wallet?: GameWallet;
   readonly api: 1;
   /** NPC 자유 대화. 없으면 게임은 미리 쓴 대사로만 답한다 */
   talk?: GameTalk;

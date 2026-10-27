@@ -83,6 +83,12 @@ export function addWalletEntry(w: Wallet, e: Omit<WalletEntry, 'id' | 'at'> & { 
   return { ...w, log: [...w.log, { ...e, id, memo: e.memo.slice(0, 30), at: e.at ?? new Date().toISOString() }].slice(-400) };
 }
 
+/** 필드 거래 (게임 다리, 출처 field). 기준 메시지는 필드 사건·막간과 같은 자리(들어갈 때의 마지막 메시지)라 그 메시지를 다시 굴리면 같이 빠진다.
+ * 같은 물건을 두 번 사도 따로 적히게 id 는 부르는 쪽이 매번 새로 준다 */
+export function withFieldTrade(w: Wallet, anchor: string, amount: number, memo: string, id: string): Wallet {
+  return addWalletEntry(w, { anchor, amount: Math.trunc(amount), memo: memo.trim() || '필드 거래', src: 'field', id });
+}
+
 export function removeWalletEntry(w: Wallet, id: string): Wallet {
   return { ...w, log: w.log.filter((e) => e.id !== id) };
 }

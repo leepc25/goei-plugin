@@ -58,3 +58,17 @@ test('시작 잔고 기본값 14만 원 (사용자 2026-10-27)', async () => {
   assert.equal(WALLET_START_DEFAULT, 140000);
   assert.equal(readWallet({}, WALLET_START_DEFAULT).start, 140000);
 });
+
+test('필드 거래: 출처 field, 같은 물건 두 번도 따로, 기준 메시지가 사라지면 빠짐', async () => {
+  const { withFieldTrade } = await import('../dist-test/core.mjs');
+  let w = { start: 140000, log: [] };
+  w = withFieldTrade(w, 'c1', -1200, '삼각김밥', 'f_1');
+  w = withFieldTrade(w, 'c1', -1200, '삼각김밥', 'f_2');
+  w = withFieldTrade(w, 'c9', -5000, '사라진 방문', 'f_3');
+  w = withFieldTrade(w, 'c1', 0.4, '0원', 'f_4');
+  w = withFieldTrade(w, 'c1', 3000, '  ', 'f_5');
+  assert.equal(w.log.length, 4);
+  assert.ok(w.log.every((e) => e.src === 'field'));
+  assert.equal(w.log[3].memo, '필드 거래');
+  assert.equal(walletBalance(w, aliveAnchors(chat())), 140000 - 2400 + 3000);
+});
