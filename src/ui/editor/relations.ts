@@ -1,6 +1,7 @@
 // 세력 관계 격자 (docs/설계안_세계편집.md 2장): 행 = 보는 쪽, 열 = 대상. 칸 34px, 색 칸 + 두 글자, 첫 행·열 고정.
 // 칸을 누르면 단계 순환(적대→경계→중립→호의→우호), 아래에 메모. 「대칭」이 켜져 있으면 반대 칸도 같이. 공통 규칙은 글칸 하나.
 import { excludedOrgs, filterRelations, RELATION_LABEL, RELATION_STAGES, worldRecord, worldRecords, worldRelations, type RelationCell, type RelationStage, type WorldOverrides } from '../../core/world/records';
+import { tokenizerName } from '../../core/tokenizer';
 import { assembleFaction } from '../../core/world/faction';
 import { emptyRecord, putRecord } from '../../core/world/draft';
 import { tokens } from '../../core/gnet';
@@ -39,14 +40,17 @@ export function relationsPage(ctx: ChatContext, over: WorldOverrides, rulesOnly:
   const excluded = excludedOrgs(recs);
   const rel = filterRelations(worldRelations(over), excluded);
   const orgs = d.orgs.map((o) => o.name).filter((n) => !excluded.has(n));
-  // 편입 칩: 명부의 모든 조직. 끈 조직은 격자·Faction 관계 목록·평판 시작값에서 빠진다 (사용자 2026-10-27)
-  const members = `<div class="gw-rel-members"><span>관계도에 넣을 조직</span>${d.orgs.map((o) => `<button class="gx-chip${excluded.has(o.name) ? '' : ' on'}" data-action="ed-rel-org" data-value="${esc(o.name)}" aria-pressed="${!excluded.has(o.name)}">${esc(o.name)}</button>`).join('')}</div>`;
+  // 관계도에 넣을 조직 (사용자 2026-10-27): 뺀 조직만 칩으로(누르면 다시 넣기), 빼기는 고르기 하나. 뺀 조직은 격자·Faction 관계 목록·평판 시작값에서 빠진다
+  const out = d.orgs.filter((o) => excluded.has(o.name));
+  const members = `<div class="gw-rel-members"><span>관계도에서 뺀 조직</span>${
+    out.length ? out.map((o) => `<button class="gx-chip" data-action="ed-rel-org" data-value="${esc(o.name)}" title="다시 넣기">${esc(o.name)} ✕</button>`).join('') : '<small class="gx-muted">없음</small>'
+  }<select class="gx-select" data-change="ed-rel-org" aria-label="관계도에서 뺄 조직"><option value="">빼기…</option>${orgs.map((o) => `<option value="${esc(o)}">${esc(o)}</option>`).join('')}</select></div>`;
   const player = String(ctx.chat.scriptstate?.['$st_faction'] ?? '');
   const playerOrg = player ? d.orgs.find((o) => o.faction === player)?.name ?? '' : '';
   void rulesOnly; // 2026-10-27: 세력 관계와 공통 규칙은 한 화면 (아래)
   const rulesBox = `<section class="gw-sec gw-rules-sec"><h3>공통 규칙 <small>쌍 관계가 아닌 세력 전체 규칙. Faction 지침 끝에 그대로 들어가요. {A00} 같은 자리표는 그 코드 조직의 이름으로 바뀌어요.</small></h3>
       <textarea class="gw-rules" data-input="ed-rules" rows="14">${esc(rel.common)}</textarea>
-      <div class="gx-row-btns"><span class="gw-tokens">약 ${tokens(rel.common).toLocaleString()}토큰</span><button class="gx-mini" data-action="ed-rules-reset" ${over.relations?.common === undefined ? 'disabled' : ''}>기본으로</button></div></section>`;
+      <div class="gx-row-btns"><span class="gw-tokens">${tokenizerName() ? '' : '약 '}${tokens(rel.common).toLocaleString()}토큰</span><button class="gx-mini" data-action="ed-rules-reset" ${over.relations?.common === undefined ? 'disabled' : ''}>기본으로</button></div></section>`;
   const stageOf = (a: string, b: string) => rel.pairs[`${a}>${b}`]?.stage ?? 'neutral';
   const head = `<tr><th class="corner"><span>보는 쪽 ↓ 대상 →</span></th>${orgs.map((o) => `<th class="col${o === playerOrg ? ' me' : ''}"><span>${esc(o)}</span></th>`).join('')}</tr>`;
   const rows = orgs
@@ -72,7 +76,7 @@ export function relationsPage(ctx: ChatContext, over: WorldOverrides, rulesOnly:
   const fac = assembleFaction(d, recs, rel);
   return `<div class="gw-page"><header class="gw-head"><h2>세력 관계</h2>
       <div class="gw-head-act"><label class="gw-toggle"><input type="checkbox" data-action="ed-rel-sym" ${sym() ? 'checked' : ''}> 대칭 (반대 칸도 같이)</label>
-        <button class="gx-mini${relUi.preview ? ' on' : ''}" data-action="ed-rel-preview">Faction 지침 보기</button><span class="gw-tokens">Faction 약 ${tokens(fac).toLocaleString()}토큰</span></div>
+        <button class="gx-mini${relUi.preview ? ' on' : ''}" data-action="ed-rel-preview">Faction 지침 보기</button><span class="gw-tokens">Faction ${tokenizerName() ? '' : '약 '}${tokens(fac).toLocaleString()}토큰</span></div>
       <p class="gx-muted">행이 보는 쪽, 열이 대상이에요. 단계는 세력 평판 5단계와 같고 평판 시작값이 돼요. 중립은 빈 칸. ${playerOrg ? `지금 플레이 세력(${esc(playerOrg)}) 행·열은 옅게 칠했어요.` : ''}</p></header>
     ${members}
     <div class="gw-legend">${RELATION_STAGES.filter((s) => s !== 'neutral').map((s) => `<span class="st-${s}"><i></i>${RELATION_LABEL[s]}</span>`).join('')}<span><i class="none"></i>중립 (빈 칸)</span></div>

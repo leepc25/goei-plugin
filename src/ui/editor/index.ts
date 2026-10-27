@@ -181,6 +181,7 @@ function ensureRoot(): HTMLElement {
   root.addEventListener('change', (ev) => {
     const el = ev.target as HTMLSelectElement;
     if (el?.dataset?.input === 'dir-crop-size') return render();
+    if (el?.dataset?.change) return void handle(el.dataset.change, el.value);
     host?.change?.(el);
   });
   root.addEventListener('submit', (ev) => {
@@ -348,8 +349,8 @@ export function render(): void {
   root.innerHTML = `<div class="gw-win${edUi.drawer ? ' drawer' : ''}">
     <header class="gw-top">
       <button class="gx-x gw-menu" data-action="ed-drawer" aria-label="메뉴">${ICONS.list}</button>
-      <b>세계 편집</b>
-      ${saveBar()}
+      <b>설정</b>
+      ${(isSetNode(edUi.node) || edUi.node === 'install') && !anyDirty() ? '' : saveBar()}
       ${edUi.notice ? `<span class="gw-notice err">${esc(edUi.notice)}</span>` : edUi.info ? `<span class="gw-notice">${esc(edUi.info)}</span>` : ''}
       <button class="gx-x" data-action="ed-close" aria-label="닫기">${ICONS.close}</button>
     </header>

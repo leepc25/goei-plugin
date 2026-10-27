@@ -1,5 +1,6 @@
 // 공통 기록 편집기: 목록 → 상세. 기본 칸(종류별 schema) + 추가 칸 + 순서 + 글로 가져오기 + 칸별 토큰·합계 + 조립 글 보기 + 읽기 전용.
 import type { Directory } from '../../core/world/directory';
+import { tokenizerName } from '../../core/tokenizer';
 import { emptyRecord, moveField, moveFieldTo, parseImport, putRecord, recordText, removeRecord, resetRecord, type ImportResult } from '../../core/world/draft';
 import { defaultRecord, fieldOrder, fieldValue, isDefaultRecord, worldAnomalyNote, worldRecord, worldRecords, type ExtraField, type WorldOverrides, type WorldRecord } from '../../core/world/records';
 import { ANOMALY_NOTE } from '../../core/world/schema';
@@ -27,7 +28,7 @@ export const recUi = {
     const name = edUi.sel[kind] ?? '';
     const rec = name ? worldRecord(kind, name, over) : null;
     if (!rec) return '<span class="gw-tokens"></span>';
-    return `<span class="gw-tokens">조립 약 ${tokens(recordText(kind, name, rec, directoryDraft(ctx))).toLocaleString()}토큰</span>`;
+    return `<span class="gw-tokens">조립 ${tokenizerName() ? '' : '약 '}${tokens(recordText(kind, name, rec, directoryDraft(ctx))).toLocaleString()}토큰</span>`;
   },
 };
 
@@ -214,7 +215,7 @@ function current(ctx: ChatContext, kind: WorldKind): { name: string; rec: WorldR
 function anomalyNoteBox(over: WorldOverrides): string {
   const note = worldAnomalyNote(over);
   const edited = over.anomalyNote !== undefined;
-  return `<details class="gw-anote"${recUi.noteOpen ? ' open' : ''}><summary data-action="ed-anote-toggle"><b>괴이 공통 머리말</b><small>${edited ? '고침 · ' : ''}약 ${tokens(note).toLocaleString()}토큰</small></summary>
+  return `<details class="gw-anote"${recUi.noteOpen ? ' open' : ''}><summary data-action="ed-anote-toggle"><b>괴이 공통 머리말</b><small>${edited ? '고침 · ' : ''}${tokenizerName() ? '' : '약 '}${tokens(note).toLocaleString()}토큰</small></summary>
     <p class="gx-muted">모든 괴이 로어 앞에 한 번만 들어가는 공통 지침이에요 (괴이마다 붙지 않아요).</p>
     <textarea data-input="ed-anote" rows="5">${esc(note)}</textarea>
     <div class="gx-row-btns"><button class="gx-mini" data-action="ed-anote-reset" ${edited ? '' : 'disabled'}>기본으로</button></div></details>`;

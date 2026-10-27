@@ -2,6 +2,7 @@
 // 원칙(원본과 같음): 사용자 글·댓글·쪽지는 앱이 소유한다. 모델은 NPC 글·댓글·쪽지와 조회·추천 증가만 보탤 수 있고,
 // 저장된 글의 본문·작성자·날짜는 절대 바꾸지 못한다. 글 번호는 줄지 않는다(1846000부터).
 import type { Chat } from './types';
+import { exactTokens } from './tokenizer';
 import { readWorld } from './world/output';
 import { attachmentRecords, bodyParts as parts, describe, hasAttachment, stripForged } from './attach';
 import { pickRecords, related, type Focus, type Pick } from './focus';
@@ -162,8 +163,10 @@ export function userNick(state: Record<string, unknown> | undefined): string {
 
 // ── 글자 수·토큰 ──
 
-/** 대략적인 토큰 수 (한글·한자·가나 1자 ≈ 1토큰, 그 밖 ≈ 0.3) */
+/** 토큰 수: 받아 둔 토크나이저(o200k_base, core/tokenizer.ts)가 있으면 정확히, 없으면 어림 (한글·한자·가나 1자 ≈ 1토큰, 그 밖 ≈ 0.3) */
 export function tokens(s: string): number {
+  const exact = exactTokens(s);
+  if (exact !== null) return exact;
   let n = 0;
   for (const ch of String(s ?? '')) n += /[ᄀ-ᇿ぀-ヿ㄰-㆏一-鿿가-힣]/.test(ch) ? 1 : 0.3;
   return Math.ceil(n);

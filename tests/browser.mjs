@@ -135,9 +135,12 @@ async function pickCustom(page, row = '.gx-mlist li.gx-mx') {
   if (shots) await page.screenshot({ path: `${shots}/1-empty.png` });
   // 시작 전 설정: 새 채팅 기본값 (플러그인 저장소)
   await page.click('[data-action="prefs-open"]');
-  await page.waitForSelector('.gx-settings');
-  assert.equal(await page.$('[data-action="set-scope"][data-value="chat"]'), null, '시작 전에는 「이 채팅」 없음');
-  assert.ok(await page.$('[data-action="ed-open"][data-value="agent"]'), '시작 전에도 세계 편집 버튼 (3단계: 명부 탭은 편집 창으로)');
+  // 2026-10-27: 설정은 창 하나 (시작 전엔 새 채팅 기본값만)
+  await page.waitForSelector('.gw .gw-set');
+  assert.equal(await page.$('.gw-set [data-action="set-scope"][data-value="chat"]'), null, '시작 전에는 「이 채팅」 없음');
+  assert.ok(await page.$('[data-action="ed-node"][data-value="agent"]'), '시작 전에도 세계 편집 트리');
+  await page.click('[data-action="ed-node"][data-value="set:board"]');
+  await page.waitForSelector('.st-colsbox summary');
   // 4단계: 상태창 칸 표 (새 채팅 기본값) — 잠긴 칸은 끌 수 없고, 끈 칸은 표시 조작이 잠긴다
   if (await page.$('.st-colsbox summary')) {
   await page.click('.st-colsbox summary');
@@ -157,10 +160,12 @@ async function pickCustom(page, row = '.gx-mlist li.gx-mx') {
   await page.click('.st-world > summary');
   await page.click('[data-action="set-world"][data-value="incident_cap:+"]');
   await page.waitForFunction(() => JSON.parse(window.__store['p:goei:prefs'] || '{}').world?.incident_cap === 2);
+  await page.click('[data-action="ed-node"][data-value="set:screen"]');
+  await page.waitForSelector('.gw-set [data-action="set-theme"]');
   await page.click('[data-action="set-theme"][data-value="dark"]');
   await page.waitForFunction(() => JSON.parse(window.__store['p:goei:prefs'] || '{}').theme === 'dark');
   if (shots) await page.screenshot({ path: `${shots}/1-prefs.png` });
-  await page.click('[data-action="prefs-close"]');
+  await page.click('.gw [data-action="ed-close"]');
   await page.waitForSelector('.gx-fac');
   await page.click('.gx-fac[data-value="C00"]');
   await page.click('.gx-seg[data-value="en"]');

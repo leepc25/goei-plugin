@@ -42,7 +42,7 @@ import { loadModuleAssets, modulePicker } from './host/assets';
 import { getPrefs } from './core/settings';
 import { openApp, openInstall, openWiki } from './ui/app';
 import { isGoeiLore } from './core/install';
-import { loadStoredWikiPack } from './host/install';
+import { loadStoredTokenizer, loadStoredWikiPack } from './host/install';
 import { setInstalledHook } from './host/hooks';
 import { GHOST_ICON } from './ui/icons';
 import { landingHtml as renderLanding } from './ui/landing';
@@ -655,6 +655,7 @@ export interface BodyHandlers {
 export async function start(): Promise<BodyHandlers> {
   await loadPrefs();
   await loadStoredWikiPack();
+  await loadStoredTokenizer();
   // 채팅 속 이미지 태그가 쓸 모듈 에셋 이름 (창을 열 때도 다시 읽는다)
   assetsFirst = loadModuleAssets();
   void redrawAfterLoad();

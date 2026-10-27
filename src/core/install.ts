@@ -62,6 +62,8 @@ export interface InstallState {
   icon: boolean;
   /** 위키 기본 문서 묶음이 있나 (카드 로어북 또는 저장소) */
   wikiPack: boolean;
+  /** 토크나이저(o200k_base) 순위표가 저장소에 있나 */
+  tokenizer: boolean;
 }
 
 type Row = [string, string, string?];
@@ -74,6 +76,7 @@ export interface CheckInput {
   /** 지금 아이콘이 우리 것인지 (host 가 저장소 기록으로 안다) */
   iconOurs: boolean;
   wikiPack: boolean;
+  tokenizer: boolean;
 }
 
 /** 설치 상태 점검 */
@@ -107,6 +110,7 @@ export function installCheck(i: CheckInput): InstallState {
     pictures: { missing: missingPics, bytes: missingPics.reduce((n, p) => n + (Number(p[3]) || 0), 0), total: want.length },
     icon: i.iconOurs,
     wikiPack: i.wikiPack,
+    tokenizer: i.tokenizer,
   };
 }
 
@@ -202,5 +206,6 @@ export function installSummary(s: InstallState): string[] {
   if (!s.greetings.ok) out.push(`인사말 ${s.greetings.missing.length}/${s.greetings.total}개 없음`);
   if (s.pictures.missing.length) out.push(`카드 사진 ${s.pictures.missing.length}/${s.pictures.total}장 없음`);
   if (!s.wikiPack) out.push('위키 기본 문서 없음');
+  if (!s.tokenizer) out.push('토크나이저 없음');
   return out;
 }

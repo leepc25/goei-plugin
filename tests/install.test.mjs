@@ -71,7 +71,7 @@ test('점검: 다 갖춘 카드는 빠진 것 없음', () => {
   const planted = plantGreetings([]);
   const lore = installLore([], planted.index);
   const assets = INSTALL_PICTURES.map((p) => [p[0], `path/${p[1]}`, p[2]]);
-  const st = installCheck({ lore, alternateGreetings: planted.greetings, assets, iconOurs: true, wikiPack: true });
+  const st = installCheck({ lore, alternateGreetings: planted.greetings, assets, iconOurs: true, wikiPack: true, tokenizer: true });
   assert.deepEqual(installSummary(st), []);
   assert.equal(st.goei, true);
 });

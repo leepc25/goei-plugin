@@ -1,5 +1,6 @@
 // 지침 편집 (docs/설계안_세계편집.md 3장): 글칸 하나 + 자리표 안내 + 토큰. 고친 글은 이 기기 설정(prefs.guides)에 두고 core/guides.ts 가 요청에 쓴다.
 import { guideDefault, guideOverridden, guideText, GUIDE_LABEL, setGuideOverride, type GuideName } from '../../core/guides';
+import { tokenizerName } from '../../core/tokenizer';
 import { tokens } from '../../core/gnet';
 import { savePrefs } from '../../host/prefs';
 import { ICONS } from '../icons';
@@ -22,7 +23,7 @@ export function guidePage(name: GuideName): string {
   const text = guideUi.draft[name] ?? guideText(name);
   const dirty = guideUi.draft[name] !== undefined && guideUi.draft[name] !== guideText(name);
   return `<div class="gw-page"><header class="gw-head"><h3>${esc(GUIDE_LABEL[name])} 지침<small>이 기기 공통${guideOverridden(name) ? ' · 고침' : ' · 기본'}</small></h3>
-      <div class="gw-head-act"><span class="gw-tokens">약 ${tokens(text).toLocaleString()}토큰</span>
+      <div class="gw-head-act"><span class="gw-tokens">${tokenizerName() ? '' : '약 '}${tokens(text).toLocaleString()}토큰</span>
         <button class="gx-mini" data-action="ed-guide-save" data-value="${name}" ${dirty ? '' : 'disabled'}>${ICONS.pen}지침 저장</button>
         <button class="gx-mini" data-action="ed-guide-reset" data-value="${name}" ${guideOverridden(name) || dirty ? '' : 'disabled'}>기본으로</button></div>
       <p class="gx-muted">${esc(HELP[name])}</p>${guideUi.info ? `<p class="gx-hint">${esc(guideUi.info)}</p>` : ''}</header>

@@ -4,12 +4,14 @@
 import { installCheck, installLore, INSTALL_ICON, plantGreetings, type InstallState } from '../core/install';
 import { UPDATE_BASE } from '../core/update';
 import { setStoredWikiPack, storedWikiPack, WIKI_PACK_HEAD } from '../core/wiki';
+import { clearTokenizer, setTokenizerRanks, tokenizerName } from '../core/tokenizer';
 import type { LoreEntry } from '../core/types';
 import { fetchPictures } from './picpack';
 import { toBytes } from './assets';
 import { forgetImages } from '../ui/images';
 
 const WIKI_KEY = 'goei:wikibase';
+const TOK_KEY = 'goei:tok-o200k';
 const ICON_KEY = 'goei:icon';
 
 type RisuFetch = (url: string, arg: Record<string, unknown>) => Promise<{ ok: boolean; data: unknown; status: number }>;
@@ -87,6 +89,7 @@ export async function checkInstall(charIndex: number): Promise<{ state: InstallS
     assets: char.additionalAssets,
     iconOurs: !!note && note.ours === String(char.image ?? ''),
     wikiPack: packInLore || !!storedWikiPack(),
+    tokenizer: !!tokenizerName(),
   });
   return { state, iconPrev: note?.prev ?? '' };
 }
@@ -206,6 +209,44 @@ export async function installWikiPack(progress: Progress): Promise<number> {
   await risuai.pluginStorage.setItem(WIKI_KEY, text);
   setStoredWikiPack(text);
   return text.length;
+}
+
+/** 저장소의 토크나이저 순위표를 올린다 (본체 시작 때 한 번, 화면을 막지 않게 뒤로 미룸) */
+export async function loadStoredTokenizer(): Promise<void> {
+  try {
+    const raw: unknown = await risuai.pluginStorage.getItem(TOK_KEY);
+    if (typeof raw === 'string' && raw.length > 1000) setTimeout(() => setTokenizerRanks(raw, 'o200k_base'), 0);
+  } catch {
+    // 어림값 그대로
+  }
+}
+
+/** 토크나이저 순위표: release/tok-o200k.N.txt 를 받아 저장소에 */
+export async function installTokenizer(progress: Progress): Promise<void> {
+  if (!UPDATE_BASE) throw new Error('받을 곳이 정해지지 않은 빌드예요.');
+  progress('토크나이저 목록 받는 중…');
+  let index: { parts?: unknown; length?: unknown; name?: unknown } | null = null;
+  try {
+    index = JSON.parse((await getText('tok-o200k.json')).replace(/^\uFEFF/, ''));
+  } catch {
+    throw new Error('토크나이저 목록을 받지 못했어요.');
+  }
+  if (!index || !Array.isArray(index.parts)) throw new Error('토크나이저 목록 형식이 달라요.');
+  let text = '';
+  let n = 0;
+  for (const name of index.parts) {
+    if (typeof name !== 'string' || !/^tok-o200k\.\d+\.txt$/.test(name)) throw new Error('토크나이저 목록 형식이 달라요.');
+    text += await getText(name);
+    progress(`토크나이저 받는 중 ${++n}/${index.parts.length}`);
+  }
+  if (typeof index.length === 'number' && text.length !== index.length) throw new Error(`토크나이저를 끝까지 받지 못했어요. (${text.length}/${index.length}자)`);
+  if (!setTokenizerRanks(text, 'o200k_base')) throw new Error('토크나이저 순위표 형식이 달라요.');
+  await risuai.pluginStorage.setItem(TOK_KEY, text);
+}
+
+export async function dropTokenizer(): Promise<void> {
+  await risuai.pluginStorage.removeItem(TOK_KEY).catch(() => {});
+  clearTokenizer();
 }
 
 /** 저장소의 위키 묶음을 지운다 (카드에 묶음이 들어 있는 옛 카드면 그걸 쓴다) */

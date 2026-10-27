@@ -2818,3 +2818,28 @@ button.mk-go:hover { color: var(--signal); }
 .gx-wl-empty { color: var(--dim); }
 .gx-wl-adj { display: flex; gap: 6px; }
 .gx-wl-adj input { flex: 1; min-width: 0; padding: 6px 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel2); color: var(--text); font: inherit; font-size: 13px; }
+
+/* ── 조작 모양 통일 (2026-10-27 사용자: 단추·칩·선택 상자가 제각각이면 안 된다) ──
+   높이 32 · 모서리 8 · 글자 13 · 아이콘 15 · 테두리 1 — 어느 화면이든 같은 모양 */
+.gx-mini, .gx-chip, .gx-select, .gx-step, .gx-seg, .ph-act .gx-mini, .pp-upbar .gx-mini, .gx-row-btns .gx-mini, .upd-act .gx-mini {
+  box-sizing: border-box; min-height: 32px; height: 32px; padding: 0 12px; border: 1px solid var(--line); border-radius: 8px;
+  font: inherit; font-size: 13px; line-height: 1; display: inline-flex; align-items: center; justify-content: center; gap: 6px; white-space: nowrap; vertical-align: middle; cursor: pointer;
+}
+.gx-mini svg, .gx-chip svg, .pp-upbar .gx-mini svg, .ph-act .gx-mini svg { width: 15px; height: 15px; flex: none; }
+.gx-mini { background: var(--panel); color: var(--text); }
+.gx-mini:hover:not(:disabled) { border-color: var(--signal); }
+.gx-mini.primary { background: var(--signal); border-color: var(--signal); color: var(--on-signal); }
+.gx-mini.danger { background: var(--panel); border-color: var(--line); color: var(--danger); }
+.gx-mini.danger:hover:not(:disabled) { border-color: var(--danger); }
+.gx-mini.on { border-color: var(--signal); color: var(--signal); }
+.gx-mini:disabled { opacity: .45; cursor: default; }
+.gx-chip { background: var(--panel); color: var(--sub); border-radius: 8px; }
+.gx-chip.on { background: var(--accent-bg); border-color: var(--accent-line); color: var(--text); }
+.gx-select { padding-right: 28px; background-color: var(--panel); color: var(--text); }
+.gx-segs { padding: 2px; border-radius: 9px; gap: 2px; }
+.gx-seg { min-width: 0; height: 28px; min-height: 28px; padding: 0 12px; border: 0; border-radius: 7px; background: transparent; color: var(--dim); font-weight: 600; }
+.gx-seg.on { background: var(--accent-bg); color: var(--text); }
+.gx-step { width: 32px; padding: 0; font-size: 16px; }
+.gx-x { width: 36px; height: 36px; border-radius: 8px; }
+.pp-upbar, .ph-act, .gx-row-btns { gap: 8px; }
+.gx-row-btns { display: flex; flex-wrap: wrap; align-items: center; }

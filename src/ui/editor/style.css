@@ -1,7 +1,7 @@
-/* 세계 편집 창 (.gw): 패널(.gx)과 별도. 폭은 --gw-width(설정, 기본 90%) 최대 1600px, 높이 90%, 760px 이하 전체 화면 */
+/* 설정·세계 편집 창 (.gw): 패널(.gx)과 별도. 폭은 --gw-width(설정 「창 폭」: 화면 가로의 %, 기본 90%), 높이 92%, 760px 이하 전체 화면 */
 .gw { position: fixed; inset: 0; z-index: 2147483000; display: flex; align-items: center; justify-content: center; background: var(--scrim); color: var(--text); font: 15px/1.5 var(--font); }
 .gw[hidden] { display: none; }
-.gw-win { width: min(var(--gw-width, 90%), 1600px); height: 90%; display: grid; grid-template-columns: 260px minmax(0, 1fr); grid-template-rows: 54px minmax(0, 1fr); grid-template-areas: "top top" "tree body"; background: var(--void); border: 1px solid var(--line); border-radius: 18px; box-shadow: var(--shadow); overflow: hidden; }
+.gw-win { width: var(--gw-width, 90%); height: min(92%, calc(100% - 24px)); display: grid; grid-template-columns: 260px minmax(0, 1fr); grid-template-rows: 54px minmax(0, 1fr); grid-template-areas: "top top" "tree body"; background: var(--void); border: 1px solid var(--line); border-radius: 18px; box-shadow: var(--shadow); overflow: hidden; }
 .gw-top { grid-area: top; display: flex; align-items: center; gap: 10px; padding: 0 10px 0 16px; border-bottom: 1px solid var(--line); background: var(--panel); }
 .gw-top > .gw-save { margin-left: auto; }
 .gw-top > .gw-notice { order: 1; }
@@ -95,8 +95,8 @@
 .gw-grid-wrap { overflow: auto; max-height: 62vh; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
 .gw-grid { border-collapse: separate; border-spacing: 0; font-size: 11px; }
 .gw-grid th { position: sticky; background: var(--panel); color: var(--sub); font-weight: 600; z-index: 1; }
-.gw-grid thead th { top: 0; height: 118px; vertical-align: bottom; padding: 0 0 6px; border-bottom: 1px solid var(--line); }
-.gw-grid thead th.col span { display: block; writing-mode: vertical-rl; transform: rotate(180deg); white-space: nowrap; max-height: 108px; overflow: hidden; text-overflow: ellipsis; margin: 0 auto; font-size: 11.5px; line-height: 34px; }
+.gw-grid thead th { top: 0; height: 126px; vertical-align: top; padding: 8px 0 6px; border-bottom: 1px solid var(--line); }
+.gw-grid thead th.col span { display: block; writing-mode: vertical-rl; text-orientation: upright; white-space: nowrap; margin: 0 auto; font-size: 11.5px; letter-spacing: 1px; line-height: 34px; }
 .gw-grid th.corner { left: 0; z-index: 2; font-size: 10px; text-align: left; padding: 0 8px; }
 .gw-grid th.row { left: 0; text-align: left; padding: 0 10px; white-space: nowrap; border-right: 1px solid var(--line); font-size: 12px; }
 .gw-grid th.me { color: var(--signal); background: color-mix(in srgb, var(--signal) 10%, var(--panel)); }
@@ -180,4 +180,9 @@
 .gw .gx-seg { min-height: 32px; padding: 0 12px; border: 0; border-radius: 9px; background: transparent; color: var(--dim); font: inherit; font-weight: 600; cursor: pointer; }
 .gw .gx-seg.on { background: var(--accent-bg); color: var(--text); }
 .gw-rel-members { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 0 0 10px; }
+.gw-rel-members .gx-select { flex: 0 0 auto; width: auto; min-width: 0; }
 .gw-rel-members > span { font-size: 12px; font-weight: 700; color: var(--dim); margin-right: 4px; }
+/* 기능 설정 페이지: 안쪽 머리(제목 중복)는 숨기고 단추만 오른쪽에 */
+.gw-setbody .ph-room-head .ph-room-title { display: none; }
+.gw-setbody .ph-room-head { justify-content: flex-end; margin: -46px 0 10px; min-height: 0; }
+.gw-setbody .st-prehint { margin: 0 0 12px; font-size: 12.5px; }
