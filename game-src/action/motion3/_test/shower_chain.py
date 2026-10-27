@@ -14,7 +14,8 @@ POSE = "standing upright with the back to the viewer, facing north"
 DIR = {5: "east", 6: "east", 12: "east", 13: "east", 17: "east", 14: "east", 18: "east"}
 END = {18: "5"}
 DIR[20] = "east"
-DIR[21] = "south"   # 끝 장 지정: 18 = 14를 돌아서기 끝 장(수건 두른 옆모습)으로 끝나게 다시
+DIR[21] = "south"
+DIR[30] = "east"   # 끝 장 지정: 18 = 14를 돌아서기 끝 장(수건 두른 옆모습)으로 끝나게 다시
 POSE_SIDE = "standing upright seen from the side, facing east"
 STEPS = {
  1: ("57", "Standing with the back to the viewer in front of a locker. First she wraps a large plain white bath towel around her body under the arms and holds it closed. Then, keeping the towel wrapped the whole time, she takes off the jacket, vest, shirt, trousers and shoes underneath it and lets them drop out of the frame. The towel always covers her from the armpits to the middle of the thighs. Last frame: standing with the back to the viewer, barefoot, wrapped in the white towel from the armpits to mid-thigh, bare shoulders, arms and lower legs, ponytail unchanged."),
@@ -30,11 +31,14 @@ STEPS = {
  4: ("2", "Standing under a shower with the back to the viewer, covered by the thick white foam band from the armpits to mid-thigh. She picks up a large plain white bath towel and wraps it around her body under the arms while the foam rinses away beneath it. The body is always covered from the armpits to mid-thigh by foam or towel. Last frame: standing with the back to the viewer, barefoot, wrapped in the white towel from the armpits to mid-thigh, no foam, ponytail unchanged. Draw only the woman, no shower head, wall or water."),
 }
 def last(name):
+    if name == "REG_E":   # 등록 옆모습(동)
+        return m3.fetch_png(m3.req("GET", f"/characters/{CID}")["rotation_urls"]["east"]).convert("RGBA")
     d = (OUT.parent.parent / "1.4_에일린" / "57") if name == "57" else (OUT / f"샤워이음_{name}")
     return Image.open(sorted(d.glob("[0-9][0-9].png"))[-1]).convert("RGBA")
 def b64(im):
     b = io.BytesIO(); im.save(b, "PNG"); return {"type": "base64", "base64": base64.b64encode(b.getvalue()).decode(), "format": "png"}
 STEPS[18] = STEPS[14]
+STEPS[30] = ("REG_E", "Standing seen from the side facing east in front of a locker. First she wraps a large plain white bath towel around her body under the arms and holds it closed. Then, keeping the towel wrapped the whole time, she takes off the jacket, vest, shirt, trousers and shoes underneath it and lets them drop out of the frame. The towel always covers her from the armpits to the middle of the thighs. Last frame: standing seen from the side facing east, barefoot, wrapped in the white towel from the armpits to mid-thigh, bare shoulders, arms and lower legs, ponytail unchanged.")   # 옆모습 옷 벗기
 STEPS[21] = ("5", "Wrapped in the white towel and barefoot, she turns in place from facing right to facing straight toward the viewer. Then she unwraps the towel and pulls it off to the side; the towel vanishes as it comes off, nothing falls to the floor. She stands bare facing the viewer with no towel and no soap, relaxed, arms at the sides. Last frame: standing facing the viewer (south), barefoot, no towel, no soap foam, ponytail unchanged. Draw only the woman, no shower head, wall, water or towel.")   # 앞모습 거품 없이 시험
 STEPS[20] = ("5", "Standing under a shower seen from the side facing east, wrapped in the white towel, barefoot. She unwraps the towel and pulls it off; the towel vanishes from her hands as it comes off and is gone, nothing falls to the floor. She stands bare under the shower with no towel and no soap, relaxed, arms at the sides. Last frame: standing seen from the side facing east, barefoot, no towel, no soap foam, ponytail unchanged. Draw only the woman, no shower head, wall, water or towel.")   # 거품 없이 시험
 n = int(sys.argv[1]); src, prompt = STEPS[n]
