@@ -463,3 +463,6 @@
 10-27 19:01:08 169 앉은 채 맞고 굴러떨어지기 (옆) 완료 8장 (123초)
 10-27 19:01:43 66 정면 앉아 졸기 완료 9장 (163초)
 10-27 19:01:59 64 오류: Command '['curl', '-sSf', '--retry', '3', 'https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/6f58cde7-2e15-4e44-98a6-19f7988f1fb8/animations/44e91721-59cb-4849-9eb0-b72107be45fc/south/7.png?t=1793127697']' returned non-zero exit status 56.
+10-27 19:21:07 이전 판 지움: v3 64 정면 앉아 먹기
+10-27 19:21:10 64 정면 앉아 먹기 보냄 south 8장 시작=지정 끝=지정 약 1회
+10-27 19:22:49 64 정면 앉아 먹기 완료 9장 (99초)
