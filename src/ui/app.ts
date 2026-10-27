@@ -14,6 +14,7 @@ import { prepareBaseDocs } from '../core/wiki';
 import { facePic, loadModuleAssets, mainPic } from '../host/assets';
 import { playableAgents, playerAgent } from '../core/player';
 import { savePrefs } from '../host/prefs';
+import { openEditor, type EditorNode } from './editor/index';
 import { agentPanel, agentPopup, agUi, bindAgentTips, type AgentItem } from './agents';
 import css from './style.css';
 import { GHOST_ICON, ICONS } from './icons';
@@ -586,6 +587,16 @@ async function handle(action: string, value?: string): Promise<void> {
   if (action.startsWith('ip-') && (await handleImgPrompt(action, value, { render }))) return;
   if (featCtx && action.startsWith('gn-') && (await handleGnet(action, value, featCtx, gnetEnv))) return;
   if (featCtx && action.startsWith('ph-') && (await handlePhone(action, value, featCtx, phoneEnv))) return;
+  if (action === 'ed-open') {
+    // 세계 편집 창 (별도 창). 시작 전(설정 패널)에도 열 수 있다: ctx 가 있으면
+    if (!(view.kind === 'started' || view.kind === 'picker')) return;
+    openEditor({ ctx: () => (view.kind === 'started' || view.kind === 'picker' ? view.ctx : null), refresh: () => refresh(), theme: () => root?.dataset.theme ?? 'dark' }, (value as EditorNode) || undefined);
+    return;
+  }
+  if (action === 'set-editor-width') {
+    await savePrefs((p) => ({ ...p, editorWidth: Math.max(50, Math.min(100, Number(value) || 90)) }));
+    return render();
+  }
   if (action === 'prefs-open' || action === 'prefs-close') {
     pickerPrefs = action === 'prefs-open';
     resetSettings();

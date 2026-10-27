@@ -29,14 +29,14 @@
 }
 /* color-scheme은 문서 뿌리(:root)에 두면 안 된다: Risu 화면과 다르면 브라우저가 이 iframe 뒤를 불투명하게 칠해
    창 바깥이 늘 깜깜했다 (창 바깥 불투명도가 듣지 않던 원인). 창(.gx) 안에만 */
-.gx { color-scheme: dark; }
-.gx[data-theme="light"] {
+.gx, .gw { color-scheme: dark; }
+.gx[data-theme="light"], .gw[data-theme="light"] {
   --void: #F4F6F5; --sunk: #E9EEEC; --panel: #FFFFFF; --panel2: #EEF2F1; --line: #BCC9C5; --line2: #A3B3AE;
   --text: #13201D; --sub: #3B4B47; --dim: #5C6E6A; --mint: #4F625E; --signal: #0F8C7A; --on-signal: #FFFFFF;
   --accent-bg: #DDF3EE; --accent-line: #8FCFC3; --amber: #9A6400; --amber-bg: #FBEED3; --danger: #C2412F; --danger-bg: #FBE3DF;
   --blue: #2F6FB5; --violet: #7A4FC4; --shadow: 0 30px 60px -30px rgba(20, 40, 36, .45); --scrim: rgba(20, 30, 28, .58); color-scheme: light;
 }
-.gx[data-theme="paper"] {
+.gx[data-theme="paper"], .gw[data-theme="paper"] {
   --void: #EFE6D2; --sunk: #E5D9BF; --panel: #FAF5E9; --panel2: #F3EBDA; --line: #D3C29E; --line2: #C2AE85;
   --text: #2B2418; --sub: #4A3F2C; --dim: #6E6046; --mint: #5E5138; --signal: #8A4B12; --on-signal: #FFF8EC;
   --accent-bg: #F1DEC2; --accent-line: #C99A63; --amber: #8A5A00; --amber-bg: #F3E2BC; --danger: #A8361F; --danger-bg: #F2D6CB;

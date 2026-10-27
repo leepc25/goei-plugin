@@ -12,3 +12,4 @@ export * from './records';
 export * from './assemble';
 export * from './virtual';
 export * from './faction';
+export * from './draft';

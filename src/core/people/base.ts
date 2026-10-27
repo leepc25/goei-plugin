@@ -7,6 +7,7 @@ import type { NameEntry } from './select';
 import type { SeedBase } from './seed';
 import { relativeRank } from './identity';
 import { REGISTERS, type Identity, type Register, type Temper } from './types';
+import { relationStage, STAGE_VALUE } from '../world/records';
 
 interface BasePerson { faction: string; values: string; express: 0 | 1 | 2 | 3; temper: Temper; english: string[] }
 interface RelationsBase { version: number; people: Record<string, BasePerson>; pairs: Record<string, { aff: number; src: string }>; orgs: Record<string, number> }
@@ -47,10 +48,10 @@ export const basePerson = (name: string): BasePerson | undefined => RELATIONS.pe
 export const valuesOf = (name: string): string => RELATIONS.people[name]?.values ?? '';
 export const temperOf = (name: string): Temper | undefined => RELATIONS.people[name]?.temper;
 
-/** 인물 조직 → 유저 조직 시작값. 같은 조직·표에 없으면 0 */
+/** 인물 조직 → 유저 조직 시작값: 세력 관계 격자의 단계(사용자 2026-10-27: 격자 값이 평판 시작값). 같은 조직이면 0 */
 export function userAffinityBase(personFaction: string, userFaction: string): number {
   if (!personFaction || !userFaction || personFaction === userFaction) return 0;
-  return RELATIONS.orgs[`${personFaction}>${userFaction}`] ?? 0;
+  return STAGE_VALUE[relationStage(personFaction, userFaction)];
 }
 
 /** 세력 → 유저 소속 시작값 (같은 표). 세력 평판 시작값 */

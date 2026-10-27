@@ -1,5 +1,6 @@
 // 기본 설정과 괴이 생성 수치. 우선순위: 이 채팅의 변수($st_*, $wg_*) > 플러그인 저장소의 기본값(설정 창)
 // > 옛 카드의 Settings 로어북(있으면) > 내장 기본값. 채팅 변수 키는 원본 ensureDefaults·WG.get과 같다.
+import { GUIDE_NAMES, isGuideName, setGuideOverride } from './guides';
 import type { LoreEntry, ScriptState } from './types';
 import { DEFAULT_SETTINGS, type WorldSettings } from './world/engine';
 import { imgFold, imgRecent, imgSize } from './imgtag';
@@ -115,6 +116,12 @@ export interface Prefs {
   imgNamesOff?: string[];
   imgNamesExtra?: string[];
   imgKeywords?: string[];
+  /** 세계 편집 창 폭 (브라우저 폭의 %, 50~100. 없으면 90) */
+  editorWidth?: number;
+  /** 고친 지침 (core/guides.ts GuideName → 글). 없으면 기본 */
+  guides?: Record<string, string>;
+  /** 세력 관계 격자: 한 칸을 바꾸면 반대 칸도 (기본 켬) */
+  relationsSym?: boolean;
 }
 
 /** 즐겨찾기 하나: s는 app.ts가 앞뒤 이동 기록에 쓰는 화면 상태 그대로, name은 저장할 때 붙인 이름 */
@@ -179,7 +186,14 @@ export function setPrefs(raw: unknown): Prefs {
   const imgNamesOff = strList(o.imgNamesOff, 200, 40);
   const imgNamesExtra = strList(o.imgNamesExtra, 60, 40);
   const imgKeywords = strList(o.imgKeywords, 60, 24);
-  prefs = { basic, world, ...(theme ? { theme } : {}), ...(imgPrompt ? { imgPrompt } : {}), ...(imgNamesOff.length ? { imgNamesOff } : {}), ...(imgNamesExtra.length ? { imgNamesExtra } : {}), ...(imgKeywords.length ? { imgKeywords } : {}), ...(Object.keys(vars).length ? { vars } : {}), ...(nav ? { nav } : {}), ...(agents ? { agents } : {}), ...(dim !== null ? { dim } : {}), ...(status ? { status } : {}), ...(size !== null ? { imgSize: size } : {}), ...(fold !== null ? { imgFold: fold } : {}), ...(show !== null ? { imgShow: show } : {}), ...(send !== null ? { imgSend: send } : {}), ...(marks.length ? { marks } : {}) };
+  const editorWidth = int(o.editorWidth, 50, 100);
+  const guides: Record<string, string> = {};
+  if (o.guides && typeof o.guides === 'object') {
+    for (const [k, v] of Object.entries(o.guides as Record<string, unknown>)) if (isGuideName(k) && typeof v === 'string' && v.trim()) guides[k] = v.slice(0, 120000);
+  }
+  for (const k of GUIDE_NAMES) setGuideOverride(k, guides[k]);
+  const relationsSym = o.relationsSym === false ? false : undefined;
+  prefs = { basic, world, ...(editorWidth !== null ? { editorWidth } : {}), ...(Object.keys(guides).length ? { guides } : {}), ...(relationsSym === false ? { relationsSym } : {}), ...(theme ? { theme } : {}), ...(imgPrompt ? { imgPrompt } : {}), ...(imgNamesOff.length ? { imgNamesOff } : {}), ...(imgNamesExtra.length ? { imgNamesExtra } : {}), ...(imgKeywords.length ? { imgKeywords } : {}), ...(Object.keys(vars).length ? { vars } : {}), ...(nav ? { nav } : {}), ...(agents ? { agents } : {}), ...(dim !== null ? { dim } : {}), ...(status ? { status } : {}), ...(size !== null ? { imgSize: size } : {}), ...(fold !== null ? { imgFold: fold } : {}), ...(show !== null ? { imgShow: show } : {}), ...(send !== null ? { imgSend: send } : {}), ...(marks.length ? { marks } : {}) };
   return prefs;
 }
 

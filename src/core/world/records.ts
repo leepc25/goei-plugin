@@ -162,6 +162,26 @@ export function worldRelations(overrides?: WorldOverrides): Relations {
 
 /** 기본 세계에 그 이름의 기록이 있는지 (카드 덧쓰기와 구분해 보여 줄 때) */
 export const isDefaultRecord = (kind: WorldKind, name: string): boolean => name in DEFAULTS[kind];
+/** 기본 세계의 기록 (덧쓰기 전) */
+export const defaultRecord = (kind: WorldKind, name: string): WorldRecord | undefined => DEFAULTS[kind][name];
+
+// ── 지금 보고 있는 카드의 세계 (가상 로어북을 만들 때 기록해 둔다. 인물 기록의 세력 시작값 등이 읽는다) ──
+/** 기본 세력 코드 → 기본 세계의 조직 이름 (명부를 읽기 전·시험에서도 격자를 코드로 찾을 수 있게) */
+export const BUILTIN_ORG_CODES: Record<string, string> = { A00: '관리국', B00: '가짜 관리국', C00: '백일몽', D00: '민간인', E00: '프리랜서' };
+let active: { relations: Relations; orgCodes: Record<string, string> } = { relations: DEFAULT_RELATIONS, orgCodes: { ...BUILTIN_ORG_CODES } };
+export function setActiveWorld(relations: Relations, orgCodes: Record<string, string>): void {
+  active = { relations, orgCodes: { ...BUILTIN_ORG_CODES, ...orgCodes } };
+}
+export const activeRelations = (): Relations => active.relations;
+/** 조직 코드(A00)나 이름 → 격자의 조직 이름 */
+export const activeOrgName = (codeOrName: string): string => active.orgCodes[codeOrName] ?? codeOrName;
+
+/** 단계 → 평판 시작값 (단계 경계의 가운데: 적대 -80 · 경계 -40 · 중립 0 · 호의 40 · 우호 80) */
+export const STAGE_VALUE: Record<RelationStage, number> = { hostile: -80, wary: -40, neutral: 0, favorable: 40, friendly: 80 };
+/** 보는 쪽 → 대상의 시작 단계 (격자). 없으면 중립 */
+export function relationStage(viewer: string, target: string, rel: Relations = active.relations): RelationStage {
+  return rel.pairs[`${activeOrgName(viewer)}>${activeOrgName(target)}`]?.stage ?? 'neutral';
+}
 
 /** 기록의 칸 순서: order 가 있으면 그대로(모르는 id 는 뺌, 빠진 기본 칸은 뒤에), 없으면 기본 칸 순서 + 추가 칸 */
 export function fieldOrder(kind: WorldKind, rec: WorldRecord): string[] {

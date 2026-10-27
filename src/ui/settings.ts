@@ -153,7 +153,8 @@ const CONFIRM: Record<'chat' | 'card', Record<'save' | 'load', [string, string]>
 };
 
 function scopeBar(scope: SettingsScope, canChat: boolean): string {
-  const items: [SettingsScope, string][] = [[canChat ? 'chat' : 'defaults', '설정'], ['card', '명부']];
+  // 명부는 세계 편집 창으로 옮겼다 (2026-10-27). 설정 탭에는 옵션만
+  const items: [SettingsScope, string][] = [[canChat ? 'chat' : 'defaults', '설정']];
   const tabs = `<div class="gx-segs st-scope">${items
     .map(([k, label]) => `<button class="gx-seg${scope === k ? ' on' : ''}" data-action="set-scope" data-value="${k}" aria-pressed="${scope === k}">${label}</button>`)
     .join('')}</div>`;
@@ -206,6 +207,7 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
   return `<main class="gx-body gx-settings">
     ${scopeBar(scope, canChat)}
     ${settingsUi.notice ? `<div class="gx-err" role="alert">${esc(settingsUi.notice)}</div>` : ''}
+    ${group('세계 편집', `<div class="st-feats"><button class="gx-mini st-feat" data-action="ed-open" data-value="agent">${ICONS.person}요원</button><button class="gx-mini st-feat" data-action="ed-open" data-value="anomaly">${ICONS.spook}괴이</button><button class="gx-mini st-feat" data-action="ed-open" data-value="org">${ICONS.org}조직</button><button class="gx-mini st-feat" data-action="ed-open" data-value="relations">${ICONS.grid}세력 관계</button><button class="gx-mini st-feat" data-action="ed-open" data-value="guide:GNet">${ICONS.book}지침</button><button class="gx-mini st-feat" data-action="ed-open" data-value="directory">${ICONS.list}명부</button></div>`, '요원·조직·괴이·파밍·부록의 로어 칸, 세력 관계, 지침, 명부(거점·호칭·탭)를 별도 창에서 고쳐요. 저장은 카드 명부로 가요.')}
     ${group('기능별 설정', `<div class="st-feats">${[['gnet', gnetLabel(ctx.chat.scriptstate), ICONS.gnet], ['phone', '괴담톡', ICONS.phone], ['wiki', '위키', ICONS.wiki], ['visit', '필드', ICONS.game], ['people', '인물 기록', ICONS.group]]
       .map(([k, label, icon]) => `<button class="gx-mini st-feat" data-action="feature-set" data-value="${k}" aria-label="${label} 설정">${icon}${label}</button>`)
       .join('')}</div>`, canChat ? '' : '시작 전에도 각 기능의 설정을 미리 바꿀 수 있어요. 바꾼 값은 이 채팅에 적용돼요.')}
@@ -215,6 +217,7 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
       field('메뉴 위치', seg('set-nav', getPrefs().nav ?? 'left', [['left', '왼쪽'], ['right', '오른쪽']], busy), 'PC 창에서 메뉴 목록을 놓을 쪽이에요. 이 기기의 모든 채팅에 같이 적용돼요.'),
       field('요원 칸', seg('set-agents', getPrefs().agents ?? 'wall', [['wall', '모니터'], ['list', '목록']], busy), '상황판 요원 칸 모양이에요. 이 기기의 모든 채팅에 같이 적용돼요.'),
       field('창 바깥 불투명도', dimSlider(getPrefs().dim ?? DIM_DEFAULT, busy), '창 뒤 채팅 화면을 가리는 정도예요. 0%면 그대로 보이고 100%면 다 가려요.'),
+      field('세계 편집 창 폭', seg('set-editor-width', String(getPrefs().editorWidth ?? 90), [['70', '70%'], ['80', '80%'], ['90', '90%'], ['100', '100%']], busy), '세계 편집 창이 브라우저 폭의 몇 %를 쓸지 (최대 1600px). 폰에서는 늘 전체 화면이에요.'),
     ].join(''))}
     ${group('캐릭터 이미지', [
       field('에셋 출력', seg('set-asset', s.assetOn ? '1' : '0', [['1', 'ON'], ['0', 'OFF']], busy), '본문에 등장하는 캐릭터의 등록 이미지를 표시하도록 이미지 태그를 적어요. 이미지와 태그 목록은 봇 카드에 들어 있어요.'),
@@ -223,7 +226,7 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
       s.assetOn ? field('이미지 표시 범위', recentControl('img-show', getPrefs().imgShow, '이미지 표시 메시지 수', busy), '이미지를 띄울 메시지예요. 「최근만」이면 마지막 메시지부터 정한 개수까지만 띄워요(원래 6개). 바꾼 값은 메시지를 다시 그릴 때 반영돼요.') : '',
       s.assetOn ? field('요청 속 이미지 태그', recentControl('img-send', getPrefs().imgSend, '태그를 남길 메시지 수', busy), '모델에 보내는 대화 기록에서 이미지 태그를 남길 메시지예요. 오래된 태그를 빼면 토큰이 줄어요. 최근 태그는 모델이 태그 쓰는 법을 따라 하도록 남겨요(원래 6개).') : '',
       s.assetOn ? field('출력 모델', seg('set-asset-model', s.assetModel, [['main', '메인모델'], ['aux', '보조모델']], busy), '메인모델은 본문과 함께 적고, 보조모델은 응답이 끝난 뒤 한 번 더 불러 태그를 보충해요.') : '',
-      s.assetOn ? field('이미지 지침', `<button class="gx-mini" data-action="feature-set" data-value="image">${ICONS.pen}지침 편집</button>`, '카드 로어북 대신 플러그인이 만드는 이미지 태그 지침이에요. 지침 틀, 출력 대상 캐릭터(명부에서 자동), 표정 세트를 여기서 관리해요.') : '',
+      s.assetOn ? field('이미지 지침', `<button class="gx-mini" data-action="ed-open" data-value="guide:Image">${ICONS.pen}지침 편집</button>`, '카드 로어북 대신 플러그인이 만드는 이미지 태그 지침이에요. 지침 틀, 출력 대상 캐릭터(명부에서 자동), 표정 세트를 여기서 관리해요.') : '',
       s.assetOn ? field('주인공 이미지', seg('set-asset-player', s.assetPlayer ? '1' : '0', [['1', 'ON'], ['0', 'OFF']], busy), '「캐릭터로 플레이」로 고른 요원(내가 연기하는 주인공)에게도 이미지 태그를 붙일지예요. 끄면 페르소나처럼 주인공 이미지는 띄우지 않아요.') : '',
       s.assetOn && s.assetModel === 'aux' ? field('캐릭터당 이미지 수', seg('set-asset-limit', String(s.assetLimit), [['1', '1'], ['2', '2'], ['3', '3'], ['4', '4']], busy), '보조모델이 한 응답에서 캐릭터 한 명에게 붙일 이미지 태그의 최대 개수') : '',
     ].join(''))}
