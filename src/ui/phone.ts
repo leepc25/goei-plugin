@@ -915,7 +915,7 @@ const group = (title: string, rows: string) => `<section class="ps-group"><h3>${
 
 function settingsView(ctx: ChatContext): string {
   const v = (k: string) => phoneValue(ctx.chat.scriptstate, k);
-  const onoff = (k: string) => seg(k, v(k) === '1' ? '1' : '0', [['1', '켜기'], ['0', '끄기']]);
+  const onoff = (k: string) => seg(k, v(k) === '1' ? '1' : '0', [['1', 'ON'], ['0', 'OFF']]);
   const pct = (k: string) => `<span class="ph-inline"><input class="gx-search ph-pct" type="number" min="0" max="100" data-change="ph-num" data-key="${k}" value="${esc(v(k))}" aria-label="확률"><span>%</span></span>`;
   const num = (k: string, cur: number, lo: number, hi: number, unit: string) => `<span class="ph-inline"><input class="gx-search ph-pct" type="number" min="${lo}" max="${hi}" data-change="ph-num" data-key="${k}" value="${cur}" aria-label="${k}"><span>${unit}</span></span>`;
   const notices = noticeSettings(ctx.chat.scriptstate);
@@ -925,7 +925,7 @@ function settingsView(ctx: ChatContext): string {
   };
   const keep = (k: 'dm' | 'group' | 'notice', label: string) => {
     const st = phoneStorage(ctx.chat.scriptstate, k);
-    return row(label, `<span class="ph-inline">${seg(`storage_auto_${k}`, st.auto ? '1' : '0', [['1', '켜기'], ['0', '끄기']])}${st.auto ? num(`storage_limit_${k}`, st.limit, 1, STORAGE_MAX, '개') : ''}</span>`, '최근 기록만 남기고, 지운 대화는 흐름 요약으로 남겨요');
+    return row(label, `<span class="ph-inline">${seg(`storage_auto_${k}`, st.auto ? '1' : '0', [['1', 'ON'], ['0', 'OFF']])}${st.auto ? num(`storage_limit_${k}`, st.limit, 1, STORAGE_MAX, '개') : ''}</span>`, '최근 기록만 남기고, 지운 대화는 흐름 요약으로 남겨요');
   };
   return `<div class="ph-form">${paneHead('괴담톡 설정', '', `<span class="ph-act">${defaultsButtons('ph')}</span>`)}${defaultsConfirm('ph')}
     <div class="ph-form-body ps">

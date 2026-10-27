@@ -1,4 +1,4 @@
-w")];
+")];
       if (e.code === "Escape" || e.code === "KeyQ") close();
       else if (e.code === "ArrowDown" || e.code === "ArrowUp") {
         sel = (sel + (e.code === "ArrowDown" ? 1 : list.length - 1)) % Math.max(1, list.length);
@@ -4940,4 +4940,4 @@ w")];
       ctx.font = pfont(16).f;
       ctx.fillStyle = "#c9d3d8";
       ctx.fillText("탄", 34, 98);
-      
+      f

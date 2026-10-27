@@ -1,7 +1,7 @@
 //@name goei-plugin
-//@display-name 괴이: ANOMALY
+//@display-name 괴이: ANOMALY v0.17.3
 //@api 3.0
-//@version 0.16.61
+//@version 0.17.3
 //@update-url https://raw.githubusercontent.com/leepc25/goei-plugin/main/release/goei-plugin.js
 //@description 괴이: ANOMALY 전용 플러그인 (괴이봇 2탄 기반): 시작 화면, 상황판, 지도·요원 이동, 커스텀 임무, 괴담넷, 괴담톡, 위키, 설정·캐릭터 이미지
 // src/loader/body.ts
@@ -58,24 +58,29 @@ async function fetchBody(version) {
 }
 
 // src/core/lorebooks.ts
+var DIRECTORY_COMMENT = "Directory";
 var MANIFEST_COMMENT = "Plugin manifest";
+var OLD_DIRECTORY = "괴이봇 명부";
 var OLD_MANIFEST = "괴이봇 플러그인 매니페스트";
 function named(lore, name, old) {
   const list = lore ?? [];
   const hit = list.filter((e) => e.comment === name);
   return hit.length ? hit : list.filter((e) => e.comment === old);
 }
+var directoryEntries = (lore) => named(lore, DIRECTORY_COMMENT, OLD_DIRECTORY);
 var manifestEntry = (lore) => named(lore, MANIFEST_COMMENT, OLD_MANIFEST)[0];
 
 // src/loader/card.ts
 function isGoeiCard(char) {
-  const entry = manifestEntry(char?.globalLore);
-  if (!entry || typeof entry.content !== "string") return false;
-  try {
-    return JSON.parse(entry.content)?.plugin === "goei-plugin";
-  } catch {
-    return false;
+  const lore = char?.globalLore;
+  const entry = manifestEntry(lore);
+  if (entry && typeof entry.content === "string") {
+    try {
+      if (JSON.parse(entry.content)?.plugin === "goei-plugin") return true;
+    } catch {
+    }
   }
+  return directoryEntries(lore).some((e) => typeof e.content === "string" && /"schema"\s*:\s*1/.test(e.content));
 }
 
 // src/loader/panel.ts
@@ -143,7 +148,7 @@ function showPanel(version, install2) {
 }
 
 // src/main.ts
-var VERSION = true ? "0.16.61" : "";
+var VERSION = true ? "0.17.3" : "";
 var WATCH_MS = 1e3;
 var MARKS = ["%%SEED%%", "%%SCENE_CARD:", "%%PHONE_CALL:", "%%GOEI_UNSENT%%", "%%GOEI_START%%", 'data-goei="landing"', "ANOMALY SIMULATION", "[▣"];
 var ours = (t) => typeof t === "string" && MARKS.some((m) => t.includes(m));
@@ -231,6 +236,9 @@ function watch() {
   };
   void tick();
 }
+void risuai.registerButton({ name: "괴이: ANOMALY 설치·점검", icon: "👻", iconType: "html", location: "hamburger", id: "goei-plugin-install" }, () => {
+  void ensure(true).then((b) => b?.install());
+}).catch((error) => console.log(`[goei] 설치 단추를 두지 못했어요: ${error instanceof Error ? error.message : String(error)}`));
 for (const permission of ["replacer", "mainDom", "sendChat"]) {
   try {
     await risuai.requestPluginPermission(permission);

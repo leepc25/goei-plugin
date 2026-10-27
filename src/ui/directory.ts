@@ -58,6 +58,10 @@ const esc = (s: unknown) =>
 
 const snapshot = (d: Directory) => JSON.stringify(directoryData(d));
 
+export function directoryDraft(ctx: ChatContext): Directory {
+  return draftOf(ctx);
+}
+
 function draftOf(ctx: ChatContext): Directory {
   const lore = ctx.char.globalLore ?? [];
   if (!dirUi.draft || (dirUi.from !== lore && !dirty())) {
@@ -280,7 +284,7 @@ export function directoryPhotoList(ctx: ChatContext): string {
     .join('') + more;
 }
 
-function placePanel(p: PlaceRow, ctx: ChatContext): string {
+export function placePanel(p: PlaceRow, ctx: ChatContext): string {
   const k = (f: string) => `${f}|${p.lore}`;
   return `<div class="dir-panel">
     <div class="dir-line"><span>무작위 발생 후보</span><div class="gx-segs gx-segs-sm">
@@ -296,7 +300,7 @@ function placePanel(p: PlaceRow, ctx: ChatContext): string {
   </div>`;
 }
 
-function agentPanel(a: AgentRow, ctx: ChatContext, d: Directory): string {
+export function agentPanel(a: AgentRow, ctx: ChatContext, d: Directory): string {
   const lore = ctx.char.globalLore ?? [];
   const names = namesOf(d, lore);
   const tabs = tabsOf(d, lore);
@@ -365,7 +369,7 @@ function builtinBlock(code: string, d: Directory): string {
     <div class="dir-line"><span>첫 장면에 함께 넣을 로어북</span></div><div class="dir-grid">${scenes}</div>`;
 }
 
-function orgPanel(o: OrgRow, ctx: ChatContext, d: Directory): string {
+export function orgPanel(o: OrgRow, ctx: ChatContext, d: Directory): string {
   const lore = ctx.char.globalLore ?? [];
   const names = namesOf(d, lore);
   const tabs = tabsOf(d, lore);
@@ -533,7 +537,7 @@ function appendixRow(r: AppendixRow, ctx: ChatContext, d: Directory): string {
     </button>${open ? appendixPanel(r, ctx, d) : ''}</div>`;
 }
 
-function appendixPanel(r: AppendixRow, ctx: ChatContext, d: Directory): string {
+export function appendixPanel(r: AppendixRow, ctx: ChatContext, d: Directory): string {
   const k = (f: string) => `app:${f}|${r.lore}`;
   const e = (ctx.char.globalLore ?? []).find((x) => x.mode !== 'folder' && String(x.comment ?? '') === r.lore);
   const keys = String(e?.key ?? '').split(',').map((t) => t.trim()).filter(Boolean);

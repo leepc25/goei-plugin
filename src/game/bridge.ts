@@ -57,6 +57,8 @@ export interface CardSnapshot {
   events: CardEvent[];
   /** 상황판 시각 (분). 없으면 null */
   minute: number | null;
+  /** 유저 신분 (상태창 「신분」 칸, 인물 기록이 알아낸 것). 없으면 undefined. level = 직급 사다리 숫자 */
+  identity?: { faction: string; rank: string; level: number | null };
 }
 
 export interface CardAgent {
@@ -153,6 +155,23 @@ export interface GameFieldEvent {
   weight?: 1 | 2 | 3;
   /** 지금 확정된 사실 하나 (같은 key는 나중 것이 이긴다) */
   fact?: { key: string; value: string; permanent?: boolean };
+  /** 목격한 소속 (세력 평판): 조직 코드와 「명단 인물이 봤나(named) / 이름 없는 몹이 봤나」. 몹 목격은 계기 값의 절반(설정) */
+  witness?: { faction: string; named: boolean };
+  /** 방문 번호·id. 호감·평판의 메시지당 상한을 방문마다(그리고 장면마다) 따로 세게. 없으면 장면 이름만으로 나눈다 */
+  visit?: string;
+}
+
+/** 세력 평판 (docs/설계안_세력평판.md): 세력 → 유저 값과 구간. 몹의 첫 반응은 stage 로 정한다 */
+export interface FactionView {
+  code: string;
+  name: string;
+  /** −100~100 */
+  value: number;
+  /** friendly 우호 · favorable 호의 · neutral 중립 · wary 경계 · hostile 적대 */
+  stage: 'friendly' | 'favorable' | 'neutral' | 'wary' | 'hostile';
+  stageLabel: string;
+  /** 구간 경계 [우호 하한, 호의 하한, 중립 하한, 경계 하한] (설정) */
+  bounds: [number, number, number, number];
 }
 /** 필드에 들어갈 수 있는지 (본편 주인공이 괴이 안이면 막는다) */
 export interface GameEntry {
@@ -174,6 +193,35 @@ export interface GameField {
 }
 
 /** 게임 안 설정(화면·소리·조작) 저장소: 플러그인이 이 채팅 변수로 둔다 (메인 설정 → 필드에서도 고침) */
+/** 살아 있는 인물 기록 한 사람 (플러그인 core/people). 필드 대사·태도·대화 입력에 쓴다 */
+export interface PersonView {
+  name: string;
+  faction: string;
+  aliases: string[];
+  /** 호감: 값(-100~300)과 8단계 */
+  affinity: { value: number; stage: string; cell: 'hostile' | 'base' | 'warm' | 'close' };
+  /** 유저를 부르는 말 */
+  address: { toUser: string; register: '존댓말' | '반말' | '혼합' | '하게체' | '하오체' };
+  express: 0 | 1 | 2 | 3;
+  /** 칸별 살아 있는 항목 본문 */
+  state: string[];
+  knowledge: string[];
+  threads: string[];
+  suspicion: { target: string; kind: string; text: string }[];
+  /** 이 인물에 대한 다음 턴 메모 (사실형 Director) */
+  note?: { now?: string; mustNot?: string[] };
+}
+export interface GamePeople {
+  /** 기록이 있는 인물 (이름을 주면 그 사람들만). 기록 기능이 꺼져 있으면 빈 목록 */
+  people(names?: string[]): Promise<PersonView[]>;
+  /** NPC 대화 입력용 글: 시트 고정 절 + 살아 있는 기록 (없으면 null → 게임은 시트 사본) */
+  sheet(name: string): Promise<string | null>;
+  /** 세력 평판 전부 (아는 세력 모두, 장부가 없으면 시작값). 기능이 꺼져 있으면 빈 목록 */
+  factions(): Promise<FactionView[]>;
+  /** 기록이 갱신될 때 (갱신기가 끝났을 때) */
+  onChange(cb: () => void): () => void;
+}
+
 export interface GameUiPrefs {
   load(): Promise<string | null>;
   save(text: string): void;
@@ -186,6 +234,8 @@ export interface GameBridge {
   field?: GameField;
   /** 봇 보조 본부 방문. 응답은 시작한 채팅에 즉시 기록된다. */
   visit?: GameVisit;
+  /** 살아 있는 인물 기록 (없으면 옛 플러그인: 게임은 시트 사본·자기 저장소로 동작) */
+  people?: GamePeople;
   readonly api: 1;
   /** NPC 자유 대화. 없으면 게임은 미리 쓴 대사로만 답한다 */
   talk?: GameTalk;

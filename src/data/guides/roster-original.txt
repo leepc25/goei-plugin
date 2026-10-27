@@ -1,0 +1,113 @@
+## Roster
+- Purpose: GM reference for consistent character introductions before individual lore is active.
+- Detail: Use active character lore for fuller characterization.
+
+{{#if {{not_equal::{{getvar::st_faction}}::B00}}}}### Management Bureau [A00]{{/if}}{{#if {{equal::{{getvar::st_faction}}::B00}}}}### Fake Management Bureau [A00]{{/if}}
+
+#### Comprehensive Response Team
+- Jyaldi (early 30s/F, Boo-jang): long straight black hair, red eyes, huge bust, black suit and gloves; taciturn, decisive commander; outwardly cold but caring and trusted; destruction esper.
+- Spangdal (mid 20s/F, Senior Agent): wavy purple bob, lightless gold eyes, low half-smile, black skirt suit; teasing, deceptive thorn esper, frightening juniors while sincerely teaching and protecting them.
+- Jaemtri (late 20s/F, Senior Agent): long brown waves, soft green eyes, huge bust, office skirt suit and heels; warm, playful desk sister managing debriefings and information, secretly the Sa-jang's devoted watchdog.
+- Aileen (early 20s/F, Senior Agent): faded platinum-blonde high ponytail, murky eyes, black suit and ballistic vest; blunt, cynical field commander with no powers; relentless preparation, discipline and responsibility.
+- Deadpole (early 20s/F, Agent): long straight black hair, round eyes, black anti-tear suit; gentle, hesitant undying agent; casual about dying, sensitive to being treated as expendable.
+- Geshugan (mid 20s/F, Agent): short snow-white hair, cold blue eyes, loose white shirt, handheld cube; blunt, guarded telekinetic; prizes autonomy, watches strangers, quietly supports trusted teammates.
+- Rojemon (early 20s/F, Agent): long wavy purple hair, upturned purple eyes, cute face, office attire; prickly, defensive mental-interference specialist; insists on desk work, grumbles but fiercely protects teammates.
+- Konjyuce (17/F, Agent): shoulder-length black hair with a pink streak, blue-glinting eyes, school uniform; bright, willful, familiar; socially quick, superstrong evacuation carrier kept out of combat.
+
+#### Suppression Team
+- Gorgodio (early 30s/M, Senior Agent): bald, groomed beard, towering wrestler's build, black jacket; gruff, confident assault specialist; summons mechanical armor, charges head-on, protects civilians first.
+- Kyuras (early 30s/M, Senior Agent): swept light-green hair, gaunt cheeks, lean build, easy grin, black suit; warm, energetic pyrokinetic; friendly nonstop chatter doubles as precise tactical reporting.
+
+#### Containment Team
+- Gognija (mid 40s/M, Research Chief): wild white hair, round goggles, lab coat; manic, jovial containment chief with booming Hage-che; welcoming yet inscrutable.
+- Dejure (early 20s/F, Researcher): pink twin tails, conspicuously large bust, black skirt suit; timid, apologetic and stammering, yet steady and skilled with anomalous artifacts.
+
+{{#if {{not_equal::{{getvar::st_faction}}::B00}}}}### Fake Management Bureau [B00]{{/if}}{{#if {{equal::{{getvar::st_faction}}::B00}}}}### Management Bureau [B00]{{/if}}
+
+Attire: black suits; all listed officers except Sa-jang wear sunglasses.
+
+#### Executive office
+- Sa-jang (?/male-presenting, Sa-jang): permanently shadowed face; inscrutable, controlled executive; corporate pleasantries probe and manipulate; nature unknown to his officers.
+- Do Pil-heon (early 50s/M, Guk-jang): groomed statesman's bearing, conservative dark suit; unflappable, courteous Hage-che negotiator; adjusts doctrine pragmatically, trades information patiently.
+
+#### Interrogation and Information Security
+- Kim Jo-hak (late 40s/M, Gwa-jang): piercing narrow eyes; swaggering interrogator switching contemptuous abuse to hospitality; manipulative, sincerely prioritizing concealment over lives.
+
+#### Recruit Education
+- Lee Gil-hwan (mid 40s/M, Gwa-jang): practiced warm smile, softly worn suit; soothing orientation officer whose warm professionalism makes abduction and restraint resemble ordinary onboarding.
+- Lee Gi-seok (mid 40s/M, Gwa-jang): prosthetic arm; enthusiastic, theatrical instructor sincerely preaching humanity's-shield doctrine.
+
+#### Suppression Corps
+- Kwak Seong-ju (mid 40s/M, Gwa-jang): giant frame, full steel plate armor over his suit, paired miniguns; crude, booming commander; rough with subordinates, ready to die shielding them.
+- Cho Seong-choon (late 40s/M, Gwa-jang): loosened tie, perpetual scowl; foul-mouthed hothead; sharp-eyed yet gullible about good news, openly frightened but charges anyway.
+- Yun Byeong-su (mid 30s/M, Dae-ri): habitual cigarette, flat evaluating gaze; curt, exacting rookie instructor; diagnostic praise, constant talent and loyalty tests.
+- Song Jin-seob (19/M, Sa-won): ill-fitting suit, easily startled expression; kind, jumpy rookie, loyal despite fear; military formality collapses into teenage speech under stress.
+- Kim Seong-jin (mid 20s/M, Sa-won): swaggering posture, teasing grin; cocky, teasing loudmouth proud of his uniform; resourceful survivor, fiercely loyal to friends.
+
+#### Sword Corps
+Equipment: katanas.
+- Lee Do-hyeong (late 40s/M, Boo-jang): tied-back white hair, scar-crossed face, sleeves rolled to the elbow; the Bureau's strongest swordsman; arrogant, cutting-obsessed, barely remembers subordinates' names.
+- Go Young-hoon (mid 40s/M, Cha-jang): scarred, expressionless face; actual field commander; terse, flat orders, merciless calculation of missions and losses.
+- No Gi-gyun (mid 30s/M, Dae-ri): mouth-corner slash scars, constant grin; booming, warm swordsman and recruiter with keen talent judgment and teaching instincts.
+- Song Ju-ik (late 20s/M, Dae-ri): prominent jaw; overearnest junior swordsman and trainer, fiercely proud and solemn about Corps duties and customs.
+
+### Baekilmong Co., Ltd.
+
+#### Executive office
+- Cheong Dal-lae (mid 30s?/F, Jeon-mu): immaculate dark blue-green bun, black pupils, sharp three-piece suit; ruthless, possessive executive using authoritative Hage-che; binds talent through contracts honored literally.
+- Ho Yu-won (early 30s?/M, I-sa): fixed smile, casual grey executive suit; soft -nim courtesy; turns warmth and favors into leverage, honors promises literally.
+
+#### Field Exploration Team
+Field attire: suits and assigned animal masks.
+A Jo (Elite Jo)
+- Baek Seok-ju (late 30s/F, Gwa-jang): brown bun, hearty voice, kindly smile, mallard duck mask; motherly, ruthless talent screener; fiercely protects her Jo, holds grudges.
+- Jin Na-sol (late 20s/F, Dae-ri): tall, slender, black hair tied high, elaborate nail art, gold butterfly mask; irritable, elitist, curtly threatening; efficiency and points govern her violence.
+B Jo (Elite Jo)
+- Lee Seong-hae (mid 20s/F, Joo-im): long white curls in a low side ponytail, green-glinting black eyes, gold dolphin mask; cheerful, polite -yeo to everyone; helps the good and kills the wicked with the same smile.
+D Jo
+- Lee Ja-heon (mid 30s?/M, Gwa-jang): tall, handsome, white-haired, regulation suit, lizard mask; literal, expressionless Jo-jang; terse Hasipsio-che, independent judgment, cares through actions despite missing subtext.
+- Eun Ha-je (early 30s/F, Dae-ri): blue bob, hawk eyes, pale hollow-eyed face, sharp suit, peregrine falcon mask; weary, blunt, foul-mouthed skeptic; verifies claims, scorns the company, reliably protects juniors.
+- Park Min-seong (late 20s/M, Joo-im): large athletic build, warm face, badger mask; friendly, openly frightened; theatrical complaints, steadfast help for his Jo.
+F Jo
+- Baek Sa-heon (late 20s/M, Sa-won): bright curls, frail impression, eyepatch over a violet prosthetic eye, goat mask; wary, unapologetically selfish survivalist; sneers at the weak, becomes fawningly polite when frightened.
+I Jo
+- Kang I-hak (late 20s/F, Sa-won): golden pixie cut, pleasant fixed smile, pony mask; chipper, shameless gold devotee; prices favors openly, reliable while paid.
+R Jo
+- Go Young-eun (late 20s/F, Sa-won): brown bob, stitched ear rim, mountain goat mask; gentle, anxious medic-minded rookie; firm in crises, puts people before profit.
+Y Jo (Finishing Jo)
+- Jang Heo-un (late 20s/M, Sa-won): tall, long brown hair, slight hunch, cow mask; gloomy, sincere wish-certificate seeker; freezes when overwhelmed, endures quietly, repays kindness with deep loyalty.
+
+#### Research Team 1
+- Kwak Je-gang (mid 30s/M, Gwa-jang): wavy hair, young face, glasses, white coat; friendly, fast-talking briefing and assignment authority; treats people as experiments, curiosity before ethics or safety.
+- Lee Yeon-hwa (late 20s/F, Dae-ri): long low ponytail, glasses, deep dark circles, white coat; weary, composed researcher; careful speech, keen curiosity bounded by decency.
+
+#### Administrative Support
+- Lee Byeong-jin (early 40s/M, Gwa-jang): middle-aged office build, glasses, nervous sweat; cowardly manual-review gatekeeper; grovels upward, bullies downward, but risks himself to repay a lifesaver.
+
+#### Guard Team
+- Jay (early 30s?/M, Ban-jang): long pale shaggy hair, listless face, cap, worn guard uniform; lonely, apathetic ex-elite; quietly protective, repays kindness, loves donuts, cannot enter Uh-doom.
+
+### The Vatican
+- Blaret (mid 20s?/F, Special-class battle nun): long golden-blonde hair, green eyes, combat-modified habit; playful, proud, devout half-vampire; hunts vampires, sells crosses, promotes conversion, cooperates pragmatically.
+
+### Islam
+- Saladin (mid 30s/M, Jihad Crusader): white turban, black suit, full beard, scimitar and AK-47; booming, valorous Hao-che holy warrior; warmly embraces worthy strangers as brothers, delights in affection, destroys heresy.
+
+### Walpurgis Society
+- Avensha (late 20s?/F, Ten Witches): long blue waves, emerald eyes, black suit beneath a dark purple hooded cloak; Witch of Sand; rapturous flattery upward, casual sand-transmutation murder downward.
+
+### Vampires
+- Secriem (late 20s?/F, Vampire): long platinum-golden hair, crimson slit pupils, fitted crimson halterneck dress with open chest and high slit, heels; ancient, patient faction-builder; seductive, feigns helplessness, savors cruelty, rages at humiliation.
+
+### Jungrim Underground Shopping Center
+- Mun Hye-ran (late 30s/F, Dae-bak Al-seon/Fixer): brown low ponytail, wine-dark lips, dark-brown suit, gold watch; boisterous, cunning broker; genuine friendship coexists with exploitative fees and contracts.
+- Ma Deok-hee (mid 30s/F, Heol-gap Mae-ip/Fence Proprietor): black inverted bob, half-lidded eyes, mean dimple, burgundy suit; falsely sweet, malicious appraiser; prices desperation, enjoys cornering sellers.
+- Go Yeon-ji (early 30s/F, Son-gil Ui-won/Unlicensed Surgeon): black hair tucked behind ears, calm heatless eyes, white coat, navy scrubs; first-rate, clinical surgeon; ethics irrelevant, payment before treatment.
+- Yun Ji-a (early 20s/F, Son-gil Ui-won/Clinic Assistant): apricot double buns, soft downturned eyes, white nurse uniform; warm, steady patient care; genuinely kind, practical boundaries against inheriting patients' troubles.
+- Shin Yuri (early 30s/F, Yeong-chang Consulting/Loan Shark): long black hair slicked back and tied, sharp narrow dark eyes, leather jacket; curt, distrustful lender; anything is collateral, profitable seizure preferable to repayment.
+
+### Special Disaster Response Association / SDRA
+- Cha Yeo-jin (late 20s/F, Mission Coordinator): long dark-red hair, sharp upturned eyes, grey suit; glib, friendly coordinator; wins trust, steers desperate freelancers into lethal contracts for private commissions.
+- Seo Yun-ji (mid 20s/F, Mission Coordinator): sage-green twin braids, flat half-lidded stare, buttoned navy and white; rigid, formal coordinator; merciless clause enforcement, meticulous records of her work and Cha Yeo-jin's corruption.
+
+---

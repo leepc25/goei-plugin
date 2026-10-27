@@ -1,6 +1,7 @@
 // 보조 모델 이미지(에셋) 태그 보충. 원본 imgTagFireCore와 같은 흐름:
 // 단락 번호 매김 → Image tag 로어북의 캐릭터 → 등장 캐릭터만 → 보조 모델 JSON 패치 → 단락 뒤에 <img=...> 삽입.
 import type { LoreEntry } from './types';
+import { readDirectory } from './world/directory';
 import { termPresent } from './world/registry';
 
 export class AssetError extends Error {}
@@ -26,65 +27,45 @@ export function withUser(d: ImageData, self?: string): ImageData {
   return { ...d, allowUser: true, characters: [...d.characters, n], aliases: new Map(d.aliases).set(n.toLowerCase(), n) };
 }
 
-const fail = (field: string, why: string) => new AssetError(`${IMAGE_BOOK} 이미지 자료 오류 (${field}): ${why}`);
+const fail = (field: string, why: string) => new AssetError(`이미지 자료 오류 (${field}): ${why}`);
 
-/** Image tag 로어북 (원본 WG.auxImageData). 같은 이름이 여럿이면 이어 붙이지 않고 마지막 것 */
-export function readImageData(lore: LoreEntry[]): ImageData {
-  const books = lore.filter((e) => e.comment === IMAGE_BOOK && typeof e.content === 'string' && e.content.trim() && e.content.trim() !== '[]');
-  if (!books.length) throw fail('읽기', '로어북이 없거나 비어 있습니다. 봇 카드를 업데이트했는지 확인하세요.');
-  let src: Record<string, unknown>;
-  try {
-    src = JSON.parse(String(books[books.length - 1].content).replace(/^﻿/, '').trim());
-  } catch {
-    throw fail('JSON', 'JSON 구문 또는 같은 이름의 중복 로어북을 확인하세요.');
-  }
-  if (!src || typeof src !== 'object') throw fail('JSON', '객체가 필요합니다.');
+/** 보조 모델 이미지 자료: 명부(Directory)의 요원 한글 이름·영문명·별칭 + 출력 대상 목록(설정) + 표정 세트(설정).
+ *  v0.16.66: 카드 로어북 「Image tag」 없이 플러그인이 조립한다 (사용자 2026-10-27). characters 가 비면 명부 영문명 전부 */
+export function imageDataFrom(lore: LoreEntry[] | undefined, characters: string[], keywords: string[]): ImageData {
   const d: ImageData = { characters: [], keywords: [], keywordSet: new Set(), aliases: new Map() };
-  const allowed = new Set<string>();
   const alias = (term: string, target: string) => {
-    const k = term.toLowerCase();
+    const k = term.trim().toLowerCase();
+    if (!k) return;
     const cur = d.aliases.get(k);
     d.aliases.set(k, cur !== undefined && cur !== target ? false : target);
   };
-  const list = (v: unknown, field: string): unknown[] => {
-    if (!Array.isArray(v)) throw fail(field, '배열이 필요합니다.');
-    return v;
+  const agents = readDirectory(lore).agents.filter((x) => x.english);
+  const want = characters.length ? new Set(characters.map((c) => c.toLowerCase())) : null;
+  const seen = new Set<string>();
+  const add = (name: string) => {
+    const n = name.trim();
+    if (!n || /[<>"{}_]/.test(n) || seen.has(n.toLowerCase())) return;
+    seen.add(n.toLowerCase());
+    d.characters.push(n);
+    alias(n, n);
   };
-  const text = (v: unknown, field: string): string => {
-    if (typeof v !== 'string' || !v.trim()) throw fail(field, '빈 문자열이 아닌 값이 필요합니다.');
-    return v.trim();
-  };
-  for (const raw of list(src.characters, 'characters')) {
-    const name = text(raw, 'characters');
-    if (/[<>"{}_]/.test(name)) throw fail('characters', `이미지 영문명에 사용할 수 없는 문자입니다: ${name}`);
-    if (!allowed.has(name)) {
-      allowed.add(name);
-      d.characters.push(name);
+  for (const x of agents) {
+    if (want && !want.has(x.english.toLowerCase())) continue;
+    add(x.english);
+    alias(x.name, x.english);
+    for (const al of x.aliases) alias(al, x.english);
+  }
+  // 명부에 없는 임의 추가 이름: 영문명 자체만 별칭
+  for (const c of characters) if (!seen.has(c.toLowerCase())) add(c);
+  if (!d.characters.length) throw fail('characters', '출력 대상이 없습니다. 명부에 요원이 있는지, 설정에서 전부 끄지 않았는지 확인하세요.');
+  for (const k of keywords) {
+    const kw = k.trim();
+    if (kw && !d.keywordSet.has(kw)) {
+      d.keywordSet.add(kw);
+      d.keywords.push(kw);
     }
-    alias(name, name);
   }
-  if (!d.characters.length) throw fail('characters', '출력 대상이 필요합니다.');
-  for (const raw of list(src.sfw_keywords, 'sfw_keywords')) {
-    const k = text(raw, 'sfw_keywords');
-    if (!d.keywordSet.has(k)) {
-      d.keywordSet.add(k);
-      d.keywords.push(k);
-    }
-  }
-  if (!d.keywords.length) throw fail('sfw_keywords', '태그 목록이 필요합니다.');
-  const obj = (v: unknown, field: string) => {
-    if (v === undefined) return {};
-    if (!v || typeof v !== 'object' || Array.isArray(v)) throw fail(field, '객체가 필요합니다.');
-    return v as Record<string, unknown>;
-  };
-  for (const [term, target] of Object.entries(obj(src.kor_to_eng, 'kor_to_eng'))) {
-    if (typeof target !== 'string' || !allowed.has(target)) throw fail('kor_to_eng', `characters에 없는 대상: ${String(target)}`);
-    alias(text(term, 'kor_to_eng'), target);
-  }
-  for (const [target, terms] of Object.entries(obj(src.eng_aliases, 'eng_aliases'))) {
-    if (!allowed.has(target)) throw fail('eng_aliases', `characters에 없는 대상: ${target}`);
-    for (const t of list(terms, 'eng_aliases')) alias(text(t, 'eng_aliases'), target);
-  }
+  if (!d.keywords.length) throw fail('keywords', '표정 세트가 비어 있습니다.');
   return d;
 }
 

@@ -2,6 +2,7 @@
 // 원칙(원본과 같음): 사용자 글·댓글·쪽지는 앱이 소유한다. 모델은 NPC 글·댓글·쪽지와 조회·추천 증가만 보탤 수 있고,
 // 저장된 글의 본문·작성자·날짜는 절대 바꾸지 못한다. 글 번호는 줄지 않는다(1846000부터).
 import type { Chat } from './types';
+import { exactTokens } from './tokenizer';
 import { readWorld } from './world/output';
 import { attachmentRecords, bodyParts as parts, describe, hasAttachment, stripForged } from './attach';
 import { pickRecords, related, type Focus, type Pick } from './focus';
@@ -67,7 +68,18 @@ export const CFG = (key: string) => `$lb_cfg_lb-gn.${key}`;
 export const GN_DEFAULTS: Record<string, string> = {
   mode: '2', quantity: '1', subject: '', mood: '', privacy: '1', protagonist: '', sampling: '0',
   keepown: '1', keepreplied: '0', context: '0', incoming: '1', incoming_chance: '100', lazy: '1',
+  /** 게시판 성격: gal 괴담갤(일반 커뮤니티) / net 괴담넷(업계 관계자) / wpf 세정게(세계정치 게시판). 지침의 이용자 구성·기본 말투만 바뀐다 */
+  style: 'net',
 };
+
+export type GnetStyle = 'gal' | 'net' | 'wpf';
+export const GN_STYLE_NAME: Record<GnetStyle, string> = { gal: '괴담갤', net: '괴담넷', wpf: '세정게' };
+export function gnetStyle(state: Record<string, unknown> | undefined): GnetStyle {
+  const v = String(state?.[CFG('style')] ?? '');
+  return v === 'gal' || v === 'wpf' ? v : 'net';
+}
+/** 메뉴·창 머리에 쓰는 게시판 이름 (설정에 따라) */
+export const gnetLabel = (state: Record<string, unknown> | undefined): string => GN_STYLE_NAME[gnetStyle(state)];
 /** 쪽지 보관 (원본 gnet_retention: 자동 정리 켬/끔, 상대별 상한) */
 export const GN_STORAGE_AUTO = '$gn_storage_auto_dm';
 export const GN_STORAGE_LIMIT = '$gn_storage_limit_dm';
@@ -151,8 +163,10 @@ export function userNick(state: Record<string, unknown> | undefined): string {
 
 // ── 글자 수·토큰 ──
 
-/** 대략적인 토큰 수 (한글·한자·가나 1자 ≈ 1토큰, 그 밖 ≈ 0.3) */
+/** 토큰 수: 받아 둔 토크나이저(o200k_base, core/tokenizer.ts)가 있으면 정확히, 없으면 어림 (한글·한자·가나 1자 ≈ 1토큰, 그 밖 ≈ 0.3) */
 export function tokens(s: string): number {
+  const exact = exactTokens(s);
+  if (exact !== null) return exact;
   let n = 0;
   for (const ch of String(s ?? '')) n += /[ᄀ-ᇿ぀-ヿ㄰-㆏一-鿿가-힣]/.test(ch) ? 1 : 0.3;
   return Math.ceil(n);

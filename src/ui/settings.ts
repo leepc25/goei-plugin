@@ -12,11 +12,15 @@ import { ASSET_NOTE } from '../core/asset';
 import { IMG_FOLD, IMG_RECENT, IMG_SIZE, imgFold, imgRecent, imgSize, setImgHidden } from '../core/imgtag';
 import type { Chat, ScriptState } from '../core/types';
 import { parseCatalog, readWorld, startWorldVars, WORLD_KEY, worldOn, worldVars } from '../core/world';
+import { COL_LOG_VAR, colConfig, colVar, STATUS_COLS, usedCols, withColLog, type ColConfig, type ColId, type ColMode } from '../core/world/statuscols';
+import { aliveAnchors, formatWon, parseWon, readWallet, WALLET_MAX, walletBalance, walletVars, WALLET_START_DEFAULT } from '../core/wallet';
 import { updateChat, type ChatContext } from '../host/risu';
 import { barButtons, directoryBar, directoryDone, directoryDoneClear, directorySearch, directoryView } from './directory';
 import { drawerBox } from './drawer';
 import { toast } from './toast';
 import { ICONS } from './icons';
+import { gnetLabel } from '../core/gnet';
+import { imgPromptPane } from './imgprompt';
 import { keepOpen } from './panels';
 
 export interface SettingsEnv {
@@ -27,7 +31,7 @@ export interface SettingsEnv {
 /** 원본 테마 변수. 카드 배경 CSS가 이 값으로 갈림 (없으면 라이트) */
 export const THEME_KEY = '$st_fixed_theme';
 
-export const settingsUi = { page: '' as '' | 'visit' | 'phone' | 'gnet' | 'wiki', confirmOff: false, busy: false, notice: '', info: '', scope: 'chat' as SettingsScope, confirm: '' as '' | 'save' | 'load' };
+export const settingsUi = { page: '' as '' | 'visit' | 'phone' | 'gnet' | 'wiki' | 'people' | 'image', confirmOff: false, busy: false, notice: '', info: '', scope: 'chat' as SettingsScope, confirm: '' as '' | 'save' | 'load' };
 
 export function resetSettings(): void {
   settingsUi.confirmOff = false;
@@ -39,10 +43,12 @@ export function resetSettings(): void {
 
 import { updateGroup } from './update';
 import { handleVisitSettings, visitSettings, visitUi } from './visitset';
-import { defaultsButtons, defaultsConfirm } from './defaults';
+import { defaultsButtons, defaultsConfirm, MAIN_PREFIXES } from './defaults';
+import { PP, ppValue } from '../core/people/settings';
 import { phoneSettingsPane } from './phone';
 import { gnetSettingsPane } from './gnet';
 import { wikiSettingsPane } from './wiki';
+import { peopleSettingsPane } from './people';
 
 const esc = (s: unknown) =>
   String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
@@ -77,6 +83,22 @@ function recentControl(key: string, v: number | undefined, label: string, busy: 
 
 const group = (title: string, body: string, note = '') =>
   `<section class="ps-group"><h3>${title}</h3>${note ? `<p class="ps-note">${note}</p>` : ''}<div class="ps-rows">${body}</div></section>`;
+
+/** 상태창 칸 표 (설계안 7절): 칸마다 사용·표시. 날짜·시각·위치는 사용을 끌 수 없다. 플러그인이 쓰는 칸은 끄면 그 기능도 꺼진다고 알린다 */
+function statusColsTable(cfg: ColConfig, busy: boolean): string {
+  const rows = STATUS_COLS.map((c) => {
+    const m = cfg[c.id];
+    const use = seg('set-col', m === 'off' ? '0' : '1', [['1', '사용'], ['0', '안 씀']], busy || c.locked).replace(/data-value="(\d)"/g, `data-value="${c.id}:use:$1"`);
+    const show = seg('set-col', m === 'on' ? '1' : '0', [['1', '표시'], ['0', '숨김']], busy || m === 'off').replace(/data-value="(\d)"/g, `data-value="${c.id}:show:$1"`);
+    const hint = c.locked ? '늘 사용' : c.feature ? `끄면 ${c.feature}도 꺼져요` : '';
+    return `<div class="st-col-row${m === 'off' ? ' off' : ''}"><div class="st-col-name"><b>${c.label}</b>${hint ? `<small>${hint}</small>` : ''}</div>${use}${show}</div>`;
+  });
+  return `<div class="st-cols ps-row-block">${rows.join('')}</div>`;
+}
+
+/** 시작 잔고 입력 (원). 숫자 또는 「120만 원」 */
+const wonInput = (n: number, busy: boolean) =>
+  `<input class="st-won" type="text" inputmode="numeric" value="${n.toLocaleString('en-US')}" data-change="set-wallet-start" aria-label="시작 잔고"${busy ? ' disabled' : ''}>`;
 
 /** 상황판을 끈다: 상태와 보고를 비운다 (원본 clearIntegratedControlState. 다시 켜도 복원하지 않음) */
 function worldOffVars(): ScriptState {
@@ -149,7 +171,8 @@ const CONFIRM: Record<'chat' | 'card', Record<'save' | 'load', [string, string]>
 };
 
 function scopeBar(scope: SettingsScope, canChat: boolean): string {
-  const items: [SettingsScope, string][] = [[canChat ? 'chat' : 'defaults', '설정'], ['card', '명부']];
+  // 명부는 세계 편집 창으로 옮겼다 (2026-10-27). 설정 탭에는 옵션만
+  const items: [SettingsScope, string][] = [[canChat ? 'chat' : 'defaults', '설정']];
   const tabs = `<div class="gx-segs st-scope">${items
     .map(([k, label]) => `<button class="gx-seg${scope === k ? ' on' : ''}" data-action="set-scope" data-value="${k}" aria-pressed="${scope === k}">${label}</button>`)
     .join('')}</div>`;
@@ -166,25 +189,63 @@ function scopeBar(scope: SettingsScope, canChat: boolean): string {
 
 const BACK = `<button class="ph-tool ph-back" data-action="set-feat-back" aria-label="설정으로">${ICONS.back}</button>`;
 /** 기능별 설정을 설정창 안에서 (각 기능의 설정 화면을 그대로 쓰고, 뒤로가기만 설정으로) */
-function featurePage(ctx: ChatContext, page: NonNullable<typeof settingsUi.page>): string {
+function featurePage(ctx: ChatContext, page: NonNullable<typeof settingsUi.page>, canChat: boolean): string {
   let pane = '';
   if (page === 'visit') pane = `<header class="ph-room-head">${BACK}<div class="ph-room-title"><b>필드 설정</b></div><span class="ph-act">${defaultsButtons('visit')}</span></header>${defaultsConfirm('visit')}${visitUi.notice ? `<div class="gx-err" role="status">${esc(visitUi.notice)}</div>` : ''}${visitSettings(ctx, ctx.chat.scriptstate)}`;
+  else if (page === 'image') pane = `<header class="ph-room-head">${BACK}<div class="ph-room-title"><b>이미지 지침</b><small>이 기기 공통</small></div></header>${imgPromptPane(ctx)}`;
   else {
-    const raw = page === 'phone' ? phoneSettingsPane(ctx) : page === 'gnet' ? gnetSettingsPane(ctx) : wikiSettingsPane(ctx);
+    const raw = page === 'phone' ? phoneSettingsPane(ctx) : page === 'gnet' ? gnetSettingsPane(ctx) : page === 'people' ? peopleSettingsPane(ctx, canChat) : wikiSettingsPane(ctx);
     // 첫 머리의 뒤로 단추를 설정으로 돌아가는 단추로 (없으면 넣는다)
     pane = raw.replace(/<header class="ph-room-head[^"]*">(\s*<button class="ph-tool ph-back"[^>]*>[\s\S]*?<\/button>)?/, `<header class="ph-room-head">${BACK}`);
   }
+  // 시작 전(시작 패널): 설정 값은 이 채팅에 바로 적히고, 갱신·열기 같은 동작은 시작 뒤에 된다
+  if (!canChat) pane = pane.replace(/<\/header>/, '</header><p class="gx-hint st-prehint">채팅을 시작하기 전이에요. 여기서 바꾼 값은 이 채팅에 그대로 적용되고, 갱신·열기 같은 동작은 시작한 뒤에 할 수 있어요.</p>');
   return `<main class="gx-body gx-settings st-featpage">${pane}</main>`;
 }
 
-export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', canChat = true): string {
+/** 설정 묶음 하나 (편집 창의 「설정」 페이지가 묶음별로 가져다 쓴다, 2026-10-27) */
+export type SettingsSection = 'screen' | 'image' | 'board' | 'adv' | 'update';
+export function settingsSection(ctx: ChatContext, scope: SettingsScope, canChat: boolean, section: SettingsSection): string {
+  return settingsTab(ctx, scope, canChat, section);
+}
+
+/** 설정 머리: 알림·토스트 (편집 창용) */
+export function settingsNotices(): string {
+  return `${settingsUi.notice ? `<div class="gx-err" role="alert">${esc(settingsUi.notice)}</div>` : ''}${toast('st', settingsUi.info, (t) => {
+    if (settingsUi.info === t) settingsUi.info = '';
+  })}`;
+}
+
+/** 기능별 설정 화면의 본문 (편집 창용: 뒤로 단추·main 없이) */
+export function featurePane(ctx: ChatContext, page: NonNullable<typeof settingsUi.page>, canChat: boolean): { body: string; act: string } {
+  let html = featurePage(ctx, page, canChat)
+    .replace(/^<main class="gx-body gx-settings st-featpage">/, '')
+    .replace(/<\/main>$/, '')
+    .replace(/<p class="gx-hint st-prehint">[\s\S]*?<\/p>/, '');
+  // 안쪽 머리(뒤로·제목·단추)는 떼고, 단추(덮어쓰기·불러오기 등)만 창 머리 오른쪽으로 (2026-10-27: 모든 설정 페이지가 같은 머리)
+  let act = '';
+  html = html.replace(/<header class="ph-room-head[^"]*">([\s\S]*?)<\/header>/, (_m, inner: string) => {
+    act = inner
+      .replace(/<button class="ph-tool ph-back"[^>]*>[\s\S]*?<\/button>/, '')
+      .replace(/<div class="ph-room-title">[\s\S]*?<\/div>/, '')
+      .replace(/^<span class="ph-act">([\s\S]*)<\/span>$/, '$1')
+      .trim();
+    return '';
+  });
+  return { body: html, act };
+}
+
+export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', canChat = true, only?: SettingsSection): string {
   // 명부: 모바일은 검색을 하단 서랍에 (괴이·특수·요원·조직 탭은 위에 고정)
   if (scope === 'card') {
     return `<main class="gx-body gx-settings">${scopeBar(scope, canChat)}${directoryView(ctx)}${toast('dir', directoryDone(), directoryDoneClear)}</main>${drawerBox(directorySearch(), 'gx-dirdrawer')}`;
   }
   // 기능별 설정 → 본부 대화: 괴담톡·괴담넷·위키처럼 따로 된 화면 (2026-10-23 사용자)
-  if (settingsUi.page && scope === 'chat' && canChat) return featurePage(ctx, settingsUi.page);
+  // 시작 전(시작 패널의 「새 채팅 기본 설정」)에도 chat 객체·scriptstate 가 있어 같은 페이지를 연다 (2026-10-26 사용자)
+  if (settingsUi.page) return featurePage(ctx, settingsUi.page, canChat);
   const { basic: s, world, theme } = current(ctx, scope);
+  // 인물 기록 켬/끔: 채팅은 $pp_on, 새 채팅 기본값은 플러그인 저장소의 같은 변수
+  const peopleOn = ppValue(scope === 'chat' ? ctx.chat.scriptstate : getPrefs().vars, 'on') === '1';
   const on = scope === 'chat' ? worldOn(ctx.chat) : s.anomalyOn;
   const busy = settingsUi.busy;
   const anomaly = settingsUi.confirmOff && scope === 'chat'
@@ -193,36 +254,42 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
         <button class="gx-mini" data-action="set-anomaly" data-value="off-no">취소</button></div></div>`
     : seg('set-anomaly', on ? 'on' : 'off', [['on', 'ON'], ['off', 'OFF']], busy);
   const note = String(ctx.chat.scriptstate?.[ASSET_NOTE] ?? '');
-  return `<main class="gx-body gx-settings">
-    ${scopeBar(scope, canChat)}
-    ${settingsUi.notice ? `<div class="gx-err" role="alert">${esc(settingsUi.notice)}</div>` : ''}
-    ${scope === 'chat' && canChat ? group('기능별 설정', `<div class="st-feats">${[['gnet', '괴담넷', ICONS.gnet], ['phone', '괴담톡', ICONS.phone], ['wiki', '위키', ICONS.wiki], ['visit', '필드', ICONS.game]]
-      .map(([k, label, icon]) => `<button class="gx-mini st-feat" data-action="feature-set" data-value="${k}" aria-label="${label} 설정">${icon}${label}</button>`)
-      .join('')}</div>`) : ''}
-    ${group('화면', [
+  // 상태창 칸 구성·시작 잔고 (채팅 변수 또는 새 채팅 기본값)
+  const colCfg = colConfig(scope === 'chat' ? ctx.chat.scriptstate : getPrefs().vars);
+  const wallet = readWallet(scope === 'chat' ? ctx.chat.scriptstate : undefined, getPrefs().walletStart ?? WALLET_START_DEFAULT);
+  const walletStart = wallet.start;
+  const walletNow = scope === 'chat' ? walletBalance(wallet, aliveAnchors(ctx.chat)) : walletStart;
+  const S: Record<SettingsSection, string> = {
+    screen: `${group('화면', [
       field('테마', seg('set-theme', theme, [['light', '라이트'], ['dark', '다크'], ['paper', '페이퍼']], busy), '채팅 화면의 캐릭터 이미지 배경과 상태창(「테마」를 골랐을 때) 배색이에요.'),
       field('상태창', seg('set-status', getPrefs().status ?? 'auto', [['auto', '테마'], ['dark', '다크'], ['light', '라이트'], ['paper', '페이퍼'], ['off', '미표시']], busy), '채팅 속 상태창의 배색이에요. 「테마」는 위 테마를 따라가요. 미표시를 고르면 상자만 숨기고, 모델은 상태 태그를 계속 써요.'),
       field('메뉴 위치', seg('set-nav', getPrefs().nav ?? 'left', [['left', '왼쪽'], ['right', '오른쪽']], busy), 'PC 창에서 메뉴 목록을 놓을 쪽이에요. 이 기기의 모든 채팅에 같이 적용돼요.'),
       field('요원 칸', seg('set-agents', getPrefs().agents ?? 'wall', [['wall', '모니터'], ['list', '목록']], busy), '상황판 요원 칸 모양이에요. 이 기기의 모든 채팅에 같이 적용돼요.'),
       field('창 바깥 불투명도', dimSlider(getPrefs().dim ?? DIM_DEFAULT, busy), '창 뒤 채팅 화면을 가리는 정도예요. 0%면 그대로 보이고 100%면 다 가려요.'),
-    ].join(''))}
-    ${group('캐릭터 이미지', [
+      field('설정 창 폭', seg('set-editor-width', String(getPrefs().editorWidth ?? 90), [['60', '60%'], ['70', '70%'], ['80', '80%'], ['90', '90%'], ['100', '100%']], busy), '이 설정 창이 화면 가로의 몇 %를 쓸지예요. 높이는 늘 화면의 92%. 폰에서는 늘 전체 화면이에요.'),
+    ].join(''))}`,
+    image: `${group('캐릭터 이미지', [
       field('에셋 출력', seg('set-asset', s.assetOn ? '1' : '0', [['1', 'ON'], ['0', 'OFF']], busy), '본문에 등장하는 캐릭터의 등록 이미지를 표시하도록 이미지 태그를 적어요. 이미지와 태그 목록은 봇 카드에 들어 있어요.'),
       s.assetOn ? field('이미지 크기', pctSlider('set-img-size', getPrefs().imgSize ?? IMG_SIZE.def, IMG_SIZE, '이미지 크기', busy), '채팅 속 캐릭터 이미지 칸의 크기예요. 100%가 원래 크기이고, 채팅 폭보다 커지지는 않아요. 이 기기의 모든 채팅에 같이 적용돼요.') : '',
-      s.assetOn ? field('접힌 높이', pctSlider('set-img-fold', getPrefs().imgFold ?? IMG_FOLD.def, IMG_FOLD, '접힌 높이', busy), '이미지는 위쪽만 보이게 접혀 있다가 누르거나 마우스를 올리면 펼쳐져요. 접혔을 때 그림 높이의 몇 %를 보여 줄지예요. 원래는 68%(정사각형)이고 100%면 접지 않아요.') : '',
+      s.assetOn ? field('이미지 접기', seg('set-img-foldon', getPrefs().imgFoldOn === false ? '0' : '1', [['1', '접기'], ['0', '펼침']], busy), '이미지를 위쪽만 보이게 접어 두고 누르거나 마우스를 올리면 펼칠지, 늘 펼쳐 둘지예요.') : '',
+      s.assetOn && getPrefs().imgFoldOn !== false ? field('접힌 높이', pctSlider('set-img-fold', getPrefs().imgFold ?? IMG_FOLD.def, IMG_FOLD, '접힌 높이', busy), '접혔을 때 그림 높이의 몇 %를 보여 줄지예요. 원래는 68%(정사각형)예요.') : '',
       s.assetOn ? field('이미지 표시 범위', recentControl('img-show', getPrefs().imgShow, '이미지 표시 메시지 수', busy), '이미지를 띄울 메시지예요. 「최근만」이면 마지막 메시지부터 정한 개수까지만 띄워요(원래 6개). 바꾼 값은 메시지를 다시 그릴 때 반영돼요.') : '',
       s.assetOn ? field('요청 속 이미지 태그', recentControl('img-send', getPrefs().imgSend, '태그를 남길 메시지 수', busy), '모델에 보내는 대화 기록에서 이미지 태그를 남길 메시지예요. 오래된 태그를 빼면 토큰이 줄어요. 최근 태그는 모델이 태그 쓰는 법을 따라 하도록 남겨요(원래 6개).') : '',
       s.assetOn ? field('출력 모델', seg('set-asset-model', s.assetModel, [['main', '메인모델'], ['aux', '보조모델']], busy), '메인모델은 본문과 함께 적고, 보조모델은 응답이 끝난 뒤 한 번 더 불러 태그를 보충해요.') : '',
+      s.assetOn ? field('이미지 지침', `<button class="gx-mini" data-action="ed-open" data-value="guide:Image">${ICONS.pen}지침 편집</button>`, '카드 로어북 대신 플러그인이 만드는 이미지 태그 지침이에요. 지침 틀, 출력 대상 캐릭터(명부에서 자동), 표정 세트를 여기서 관리해요.') : '',
       s.assetOn ? field('주인공 이미지', seg('set-asset-player', s.assetPlayer ? '1' : '0', [['1', 'ON'], ['0', 'OFF']], busy), '「캐릭터로 플레이」로 고른 요원(내가 연기하는 주인공)에게도 이미지 태그를 붙일지예요. 끄면 페르소나처럼 주인공 이미지는 띄우지 않아요.') : '',
       s.assetOn && s.assetModel === 'aux' ? field('캐릭터당 이미지 수', seg('set-asset-limit', String(s.assetLimit), [['1', '1'], ['2', '2'], ['3', '3'], ['4', '4']], busy), '보조모델이 한 응답에서 캐릭터 한 명에게 붙일 이미지 태그의 최대 개수') : '',
     ].join(''))}
-    ${scope === 'chat' && s.assetOn && s.assetModel === 'aux' && note ? `<p class="gx-hint">최근 보충: ${esc(note)}</p>` : ''}
-    ${group('상황판', [
+    ${scope === 'chat' && s.assetOn && s.assetModel === 'aux' && note ? `<p class="gx-hint">최근 보충: ${esc(note)}</p>` : ''}`,
+    board: `${group('상황판', [
       field('괴이 발생 · 요원 시스템', anomaly, scope === 'chat' ? 'ON이면 괴이·사건·특수가 자동으로 발생하고 응답마다 지도와 요원 상태를 갱신해요. OFF로 바꾸면 현재 상황판을 비워요. 커스텀 임무는 OFF에서도 쓸 수 있어요.' : '새 채팅을 상황판을 켠 채로 시작할지 정해요.'),
       field('요원 표시 인원', stepper('set-agent', 'n', `${s.agentLimit}명`, s.agentLimit > 0, s.agentLimit < AGENT_MAX, '요원 표시 인원', busy), `상황판과 편성에 보일 등록 요원 수 (0~${AGENT_MAX}명, 0이면 숨김)`),
       field('지원 투입', seg('set-support', s.supportOn ? '1' : '0', [['1', 'ON'], ['0', 'OFF']], busy), '편성에서 등록 요원 외의 일반 지원 인원을 더할 수 있어요.'),
+      field('인물 기록', seg('set-people', peopleOn ? '1' : '0', [['1', 'ON'], ['0', 'OFF']], busy), scope === 'chat' ? '응답마다 보조 모델이 한 번 읽어 인물의 상태·관계·호감을 기록하고, 본편 요청이 그 기록을 읽어요. 세부는 「기능별 설정 → 인물 기록」에서.' : '새 채팅을 인물 기록을 켠 채로 시작할지 정해요.'),
     ].join(''))}
-    <details class="ps-adv st-world" data-keep="world-gen"${keepOpen('world-gen')}><summary class="ps-adv-sum"><b>괴이 발생</b></summary><div class="ps-adv-body"><p class="ps-note">응답을 처리할 때마다 판정해요. 상한을 0으로 하면 그 종류는 자동으로 생기지 않아요.</p>
+    ${group(`상태창 칸 <small>${usedCols(colCfg).length}칸 사용</small>`, `${statusColsTable(colCfg, busy)}${colCfg.wallet !== 'off' ? field('시작 잔고', wonInput(walletStart, busy), scope === 'chat' ? `이 채팅 장부의 시작 잔고예요. 지금 잔고 ${esc(formatWon(walletNow))}. 거래 내역과 수정은 ID카드의 잔고 칩에서.` : '새 채팅 장부의 시작 잔고예요. 거래는 인물 기록 갱신기가 본문에서 금액이 적힌 것만 뽑아 더하고 빼요.') : ''}`,
+      `응답 끝의 상태 태그 <code>[▣|…]</code>에 들어가는 칸이에요. 「안 씀」으로 하면 태그에서 그 칸이 빠지고(모델에 모양을 알려 줘요), 「숨김」은 태그에는 두고 채팅 속 상태창 상자에서만 가려요.${scope === 'chat' ? ' 바꾼 구성은 이 채팅에 바로 적용되고 바뀐 시점이 기록돼요.' : ' 새 채팅의 기본 구성이에요.'}`)}
+    <section class="ps-group"><h3>괴이 발생</h3><p class="ps-note">응답을 처리할 때마다 판정해요. 상한을 0으로 하면 그 종류는 자동으로 생기지 않아요.</p>
       <div class="ps-cards">
         ${worldKind(world, 'preset', '프리셋 괴이', busy)}${worldKind(world, 'random', '랜덤 괴이', busy)}
         ${worldKind(world, 'incident', '사건', busy)}${worldKind(world, 'mystic', '특수', busy)}
@@ -230,9 +297,15 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
           ${worldRow(world, 'extra_cap', '괴이', '개', busy)}${worldRow(world, 'extra_in_cap', '사건', '개', busy)}${worldRow(world, 'extra_ms_cap', '특수', '개', busy)}</div>
           <p class="ps-note">직접 고르거나 RP 중에 새로 등장한 것을 상한과 따로 기록할 수 있는 개수예요.</p></div>
       </div>
-    </div></details>
-    ${advSections('gen', scope === 'chat' ? ctx.chat.scriptstate : getPrefs().vars, scope === 'chat' && canChat ? { 1: loreCheckBox(ctx) } : {})}
-    ${updateGroup(ctx)}
+    </section>`,
+    adv: `${advSections('gen', scope === 'chat' ? ctx.chat.scriptstate : getPrefs().vars, scope === 'chat' && canChat ? { 1: loreCheckBox(ctx) } : {})}`,
+    update: `${updateGroup(ctx)}`,
+  };
+  if (only) return S[only];
+  return `<main class="gx-body gx-settings">
+    ${scopeBar(scope, canChat)}
+    ${settingsUi.notice ? `<div class="gx-err" role="alert">${esc(settingsUi.notice)}</div>` : ''}
+    ${S.screen}${S.image}${S.board}${S.adv}${S.update}
     ${toast('st', settingsUi.info, (t) => {
       if (settingsUi.info === t) settingsUi.info = '';
     })}
@@ -274,6 +347,18 @@ async function saveDefaults(env: SettingsEnv, change: (p: Prefs) => Prefs): Prom
 
 const basicPatch = (env: SettingsEnv, patch: Partial<BasicSettings>) => saveDefaults(env, (p) => ({ ...p, basic: { ...p.basic, ...patch } }));
 
+/** "칸:use:1|0" / "칸:show:1|0" → [칸, 새 모드]. 바뀌는 게 없거나 잠긴 칸을 끄려 하면 null */
+function nextColMode(cfg: ColConfig, v: string): [ColId, ColMode] | null {
+  const [id, what, val] = v.split(':');
+  const def = STATUS_COLS.find((c) => c.id === id);
+  if (!def || (what !== 'use' && what !== 'show') || (val !== '1' && val !== '0')) return null;
+  const cur = cfg[def.id];
+  let next: ColMode = cur;
+  if (what === 'use') next = val === '1' ? (cur === 'off' ? 'on' : cur) : def.locked ? cur : 'off';
+  else next = cur === 'off' ? cur : val === '1' ? 'on' : 'hide';
+  return next === cur ? null : [def.id, next];
+}
+
 /** "키:+" / "키:-" / "키:값" → 새 값 (범위 밖이면 null) */
 function nextWorld(w: WorldSettings, v: string): [WorldField['key'], number] | null {
   const [key, op] = v.split(':');
@@ -313,14 +398,14 @@ export async function handleSettings(action: string, value: string | undefined, 
       // 지금 채팅의 화면·상황판·괴이 발생·캐릭터 이미지 설정을 새 채팅 기본값으로
       const cur = current(ctx, 'chat');
       await saveDefaults(env, (p) => ({ ...p, basic: { ...cur.basic }, world: { ...cur.world }, theme: cur.theme }));
-      if (!settingsUi.notice) await saveVarDefaults(['$gen_', '$hq_adv_'], ctx.chat.scriptstate).catch((error) => (settingsUi.notice = `기본값을 저장하지 못했어요: ${error instanceof Error ? error.message : String(error)}`));
+      if (!settingsUi.notice) await saveVarDefaults(MAIN_PREFIXES, ctx.chat.scriptstate).catch((error) => (settingsUi.notice = `기본값을 저장하지 못했어요: ${error instanceof Error ? error.message : String(error)}`));
       if (!settingsUi.notice) settingsUi.info = '지금 설정을 새 채팅 기본값으로 저장했어요.';
       env.render();
     } else if (what === 'load') {
       // 새 채팅 기본값을 지금 채팅에. 상황판 켜기·끄기는 상태를 비우거나 새로 만들기 때문에 그대로 둔다
       const d = current(ctx, 'defaults');
       await save(ctx, env, (chat) => {
-        const vars: ScriptState = { ...basicVars(d.basic), [THEME_KEY]: d.theme, ...loadVarDefaults(['$gen_', '$hq_adv_'], chat.scriptstate) };
+        const vars: ScriptState = { ...basicVars(d.basic), [THEME_KEY]: d.theme, ...loadVarDefaults(MAIN_PREFIXES, chat.scriptstate) };
         for (const f of WORLD_SPEC) vars[wgKey(f.key)] = String(d.world[f.key]);
         if (worldOn(chat)) {
           const ss = { ...(chat.scriptstate ?? {}), ...vars };
@@ -337,6 +422,10 @@ export async function handleSettings(action: string, value: string | undefined, 
   if (action === 'set-status' && ['auto', 'dark', 'light', 'paper', 'off'].includes(v ?? '')) {
     await saveDefaults(env, (p) => ({ ...p, status: v === 'auto' ? undefined : (v as StatusStyle) }));
     repaintTheme();
+    return true;
+  }
+  if (action === 'set-img-foldon') {
+    await saveDefaults(env, (p) => ({ ...p, imgFoldOn: v === '0' ? false : undefined }));
     return true;
   }
   if (action === 'set-img-size' || action === 'set-img-fold') {
@@ -377,6 +466,22 @@ export async function handleSettings(action: string, value: string | undefined, 
       case 'set-anomaly':
         if (v === 'on' || v === 'off') await basicPatch(env, { anomalyOn: v === 'on' });
         return true;
+      case 'set-people':
+        // 새 채팅 기본값의 $pp_on (시작할 때 chat.scriptstate 로 들어간다)
+        if (v === '1' || v === '0') await saveDefaults(env, (p) => ({ ...p, vars: { ...(p.vars ?? {}), [PP('on')]: v } }));
+        return true;
+      case 'set-col': {
+        // 새 채팅 기본값의 상태창 칸 구성 ($st_col_<id>)
+        const hit = nextColMode(colConfig(getPrefs().vars), v);
+        if (hit) await saveDefaults(env, (p) => ({ ...p, vars: { ...(p.vars ?? {}), [colVar(hit[0])]: hit[1] } }));
+        return true;
+      }
+      case 'set-wallet-start': {
+        const n = parseWon(v);
+        if (n !== null && n >= 0 && n <= WALLET_MAX) await saveDefaults(env, (p) => ({ ...p, walletStart: n }));
+        else env.render();
+        return true;
+      }
       case 'set-agent': {
         const next = Math.min(AGENT_MAX, Math.max(0, d.basic.agentLimit + (v.endsWith('+') ? 1 : -1)));
         if (next !== d.basic.agentLimit) await basicPatch(env, { agentLimit: next });
@@ -417,6 +522,33 @@ export async function handleSettings(action: string, value: string | undefined, 
         return hit ? { [wgKey(hit[0])]: String(hit[1]) } : null;
       });
       return true;
+    case 'set-people':
+      // 인물 기록 켬/끔 (기능 페이지의 같은 줄과 같은 변수, 바로 저장)
+      if (v !== '1' && v !== '0') return true;
+      await save(ctx, env, (chat) => (ppValue(chat.scriptstate, 'on') === v ? null : { [PP('on')]: v }));
+      return true;
+    case 'set-col':
+      // 상태창 칸 사용·표시: 채팅 변수 + 바뀐 시점 기록 (파서가 옛 응답을 옛 구성으로 읽게)
+      await save(ctx, env, (chat) => {
+        const cfg = colConfig(chat.scriptstate);
+        const hit = nextColMode(cfg, v);
+        if (!hit) return null;
+        const next = { ...cfg, [hit[0]]: hit[1] };
+        return { [colVar(hit[0])]: hit[1], [COL_LOG_VAR]: withColLog(chat.scriptstate, (chat.message ?? []).length, usedCols(next)) };
+      });
+      return true;
+    case 'set-wallet-start': {
+      const n = parseWon(v);
+      if (n === null || n < 0 || n > WALLET_MAX) {
+        env.render();
+        return true;
+      }
+      await save(ctx, env, (chat) => {
+        const w = readWallet(chat.scriptstate, getPrefs().walletStart ?? WALLET_START_DEFAULT);
+        return w.start === n ? null : walletVars({ ...w, start: n });
+      });
+      return true;
+    }
     case 'set-anomaly':
       if (v === 'off') {
         if (!worldOn(ctx.chat)) return true;

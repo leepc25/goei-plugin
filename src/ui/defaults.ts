@@ -4,15 +4,19 @@ import { loadVarDefaults, saveVarDefaults } from '../host/prefs';
 import { updateChat, type ChatContext } from '../host/risu';
 import { ICONS } from './icons';
 
-export type DefaultsPane = 'ph' | 'gn' | 'wiki' | 'visit';
+export type DefaultsPane = 'ph' | 'gn' | 'wiki' | 'visit' | 'pp';
 
 const PREFIXES: Record<DefaultsPane, string[]> = {
   ph: ['$ph_'],
   gn: ['$lb_cfg_lb-gn.', '$gn_storage_'],
   wiki: ['$nw_'],
   visit: ['$hq_'],
+  /** 인물 기록 (core/people/settings.ts PP). 메인 설정의 「덮어쓰기/불러오기」도 같은 접두어를 함께 다룬다 */
+  pp: ['$pp_'],
 };
-const NAME: Record<DefaultsPane, string> = { ph: '괴담톡', gn: '괴담넷', wiki: '위키', visit: '필드' };
+/** 메인 설정의 「덮어쓰기/불러오기」가 기능 설정과 함께 다루는 접두어 */
+export const MAIN_PREFIXES = ['$gen_', '$hq_adv_', '$pp_'];
+const NAME: Record<DefaultsPane, string> = { ph: '괴담톡', gn: '괴담넷', wiki: '위키', visit: '필드', pp: '인물 기록' };
 
 export const defaultsAsk = { pane: '' as DefaultsPane | '', what: '' as '' | 'save' | 'load' };
 

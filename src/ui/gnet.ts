@@ -5,8 +5,7 @@ import {
   dateNow, deleteComment, deletePost, deleteThread, dmThreads, dmUnread, findPost, GN_COOLDOWN, GN_DEFAULTS, GN_NICK, GnetError, gnetSettings,
   GN_STORAGE_AUTO, GN_STORAGE_LIMIT, gnetRetention, incomingPlan, LIMITS, parseDmBody, parseJsonPayload, parsePostDraft, postKey, postUnread, QUANTITY,
   readGnet, sourceFor, STORAGE_MAX, storyTurns, tokens, trimBoard,
-  userNick, writeGnet, type GPost, type GSource, type GState, type IncomingOrigin, type IncomingPlan,
-} from '../core/gnet';
+  userNick, writeGnet, type GPost, type GSource, type GState, type IncomingOrigin, type IncomingPlan, gnetLabel } from '../core/gnet';
 import { commentPrompt, dmPrompt, POST_REFRESH_ACTION, postPrompt, refreshPrompt, retryMessages } from '../core/gnetPrompt';
 import { composeBody, describe, previewText, type UserKind } from '../core/attach';
 import { ICONS } from './icons';
@@ -603,15 +602,16 @@ function settingsView(ctx: ChatContext, back = true): string {
   const keep = gnetRetention(ctx.chat.scriptstate);
   const on = v('mode') !== '0';
   const rows = on
-    ? `${group('괴담넷', [
-        row('괴담넷 사용', seg('power', '1', [['1', '켜기'], ['0', '끄기']])),
+    ? `${group(gnetLabel(ctx.chat.scriptstate), [
+        row('게시판 사용', seg('power', '1', [['1', 'ON'], ['0', 'OFF']])),
         row('모델', seg('mode', v('mode') === '1' ? '1' : '2', [['1', '메인'], ['2', '보조']])),
         row('새로고침', seg('lazy', ['0', 'open'].includes(v('lazy')) ? v('lazy') : '1', [['1', '수동'], ['open', '창을 열 때'], ['0', '매 턴']]), LAZY_HINT[v('lazy')] ?? LAZY_HINT['1']),
         row('채팅에 반영', seg('context', v('context') === '1' ? '1' : '0', [['0', '포함'], ['1', '빼기']]), '지금 장면과 관련된 글과 쪽지가 채팅 요청에 참고로 붙어요'),
-        row('다양성 강화', seg('sampling', v('sampling') === '1' ? '1' : '0', [['0', '끄기'], ['1', '켜기']])),
+        row('다양성 강화', seg('sampling', v('sampling') === '1' ? '1' : '0', [['0', 'OFF'], ['1', 'ON']])),
       ].join(''))}
       ${group('게시판', [
         row('게시글 수', seg('quantity', v('quantity'), Object.entries(QUANTITY).map(([k, q]) => [k, q.label]))),
+        row('성격', seg('style', ['gal', 'wpf'].includes(v('style')) ? v('style') : 'net', [['gal', '괴담갤'], ['net', '괴담넷'], ['wpf', '세정게']]), '괴담갤 = 일반인 괴담 커뮤니티 · 괴담넷 = 업계 관계자들이 가명으로 쓰는 곳 · 세정게 = 세계정치 게시판(음모론 속에 진짜가 섞인 곳). 이용자 구성과 기본 말투만 바뀌고 다음 새로고침부터 적용돼요. 메뉴 이름도 같이 바뀌어요.'),
         row('사생활', seg('privacy', v('privacy'), [['0', '이목집중'], ['1', '자율'], ['2', '약보호'], ['3', '강보호'], ['4', '언급금지']])),
         row('주제', text('subject', '비우면 세계관에 맞는 다양한 주제')),
         row('분위기·말투', text('mood', '비우면 익명 커뮤니티 말투')),
@@ -621,11 +621,11 @@ function settingsView(ctx: ChatContext, back = true): string {
       ].join(''))}
       ${group('쪽지', [
         row('선쪽지 받기', seg('incoming', v('incoming') === '0' ? '0' : '1', [['1', '받기'], ['0', '안 받기']])),
-        row('쪽지 자동 정리', `<span class="ph-inline">${seg('storage', keep.auto ? '1' : '0', [['1', '켜기'], ['0', '끄기']])}${keep.auto ? `<input class="gx-search ph-pct" type="number" min="1" max="${STORAGE_MAX}" data-change="gn-keep" value="${keep.limit}" aria-label="상대별 쪽지 보관 상한"><span>통</span>` : ''}</span>`, `상대마다 최근 ${keep.limit}통만 남겨요`),
+        row('쪽지 자동 정리', `<span class="ph-inline">${seg('storage', keep.auto ? '1' : '0', [['1', 'ON'], ['0', 'OFF']])}${keep.auto ? `<input class="gx-search ph-pct" type="number" min="1" max="${STORAGE_MAX}" data-change="gn-keep" value="${keep.limit}" aria-label="상대별 쪽지 보관 상한"><span>통</span>` : ''}</span>`, `상대마다 최근 ${keep.limit}통만 남겨요`),
       ].join(''))}
       ${advancedBox('gn', ctx.chat.scriptstate)}`
-    : group('괴담넷', row('괴담넷 사용', seg('power', '0', [['1', '켜기'], ['0', '끄기']]), '꺼 두면 게시판 생성과 채팅 반영을 멈춰요. 저장된 글과 쪽지는 남아요'));
-  return `<div class="ph-form">${paneHead('괴담넷 설정', '', defaultsButtons('gn'), back)}${defaultsConfirm('gn')}<div class="ph-form-body ps">${rows}</div></div>`;
+    : group(gnetLabel(ctx.chat.scriptstate), row('게시판 사용', seg('power', '0', [['1', 'ON'], ['0', 'OFF']]), '꺼 두면 게시판 생성과 채팅 반영을 멈춰요. 저장된 글과 쪽지는 남아요'));
+  return `<div class="ph-form">${paneHead(`${gnetLabel(ctx.chat.scriptstate)} 설정`, '', defaultsButtons('gn'), back)}${defaultsConfirm('gn')}<div class="ph-form-body ps">${rows}</div></div>`;
 }
 
 function paneHtml(ctx: ChatContext, st: GState, kind: Pane, busy: boolean): string {
@@ -633,7 +633,7 @@ function paneHtml(ctx: ChatContext, st: GState, kind: Pane, busy: boolean): stri
   if (kind === 'compose' && gnet.compose) return composeView(gnet.compose, busy);
   if (kind === 'post') return postView(findPost(st, gnet.open as number) as GPost, busy);
   if (kind === 'dm') return dmPane(st, gnet.openDm as string, busy);
-  return `<div class="ph-empty"><span class="ph-empty-ico">${ICONS.gnet}</span><b>괴담넷</b><p>왼쪽에서 글이나 쪽지를 고르세요.</p></div>`;
+  return `<div class="ph-empty"><span class="ph-empty-ico">${ICONS.gnet}</span><b>${gnetLabel(ctx.chat.scriptstate)}</b><p>왼쪽에서 글이나 쪽지를 고르세요.</p></div>`;
 }
 
 export function gnetTab(ctx: ChatContext, env?: GnetEnv): string {
@@ -666,7 +666,7 @@ export function gnetTab(ctx: ChatContext, env?: GnetEnv): string {
     tool('gn-write', ICONS.pen, '글쓰기', gnet.compose?.kind === 'post' ? 'aria-pressed="true"' : '', '글쓰기'),
     tool('gn-newdm', ICONS.mail, '새 쪽지', gnet.compose?.kind === 'newdm' ? 'aria-pressed="true"' : '', '쪽지'),
     tool('gn-nick', ICONS.idcard, '닉네임 바꾸기', gnet.editNick ? 'aria-pressed="true"' : '', '닉네임'),
-    tool('gn-settings', ICONS.settings, '괴담넷 설정', gnet.settings ? 'aria-pressed="true"' : '', '설정'),
+    tool('gn-settings', ICONS.settings, `${gnetLabel(ctx.chat.scriptstate)} 설정`, gnet.settings ? 'aria-pressed="true"' : '', '설정'),
   ].join('');
   const subBtn = (id: 'board' | 'dm', label: string, extra = '') =>
     `<button class="ph-sub${gnet.sub === id ? ' on' : ''}" data-action="gn-sub" data-value="${id}" aria-pressed="${gnet.sub === id}">${label}${extra}</button>`;

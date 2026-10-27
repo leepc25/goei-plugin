@@ -15,3 +15,5 @@ metadata:
 - raw.githubusercontent.com은 push 후 약 5분 캐시됨. v0.16.31부터 build_lite_card가 release/pic/지문.ext(카드 사진 전부)를 쓰고, 창 카드 업데이트가 바뀐 사진만 받음 → release/pic/ 도 커밋할 것.
 - 공개 문구 원칙(사용자 2026-10-17): 저장소 README는 소개 한 줄·설치·업데이트만. 개발 경위(Lua→플러그인 등)와 변경 기록은 공개하지 않음(개발 중이라). 변경 기록은 프로젝트 공유 폴더 goei-plugin/README.md에만 → 개발 사본 README를 저장소로 복사하지 말 것. 릴리스는 pre-release로 표시(워크플로). 정식 릴리스 때 README·릴리스 페이지를 제대로 꾸미기로 함(사용자 약속).
 - 공유 폴더 동기화(rsync 없음, tar 사용) 때 반드시 --exclude=./README.md. 2026-10-19 tar 동기화가 공유 README 변경 기록을 저장소 README로 덮어써 v0.16.1–0.16.32 상세 기록이 사라짐(요약으로 다시 씀). 저장소 4a379a4:README.md에 v0.16.0 이하 원본 있음.
+- v0.17.0(2026-10-27)부터 build_lite_card 가 release/ 에 wiki-base.json+wiki-base.N.txt(위키 기본 문서 묶음, 카드에서 뺌)·icon.png 도 쓰고, src/data/install/(인사말·사진 목록·기본 명부·아이콘 지문)을 플러그인 소스에 생성한다(깡통봇 설치용, 같이 커밋). 본체는 조각 17개(약 3.4MB). 카드 minPlugin 0.17.0.
+- 다음 릴리스(0.17.2 뒤)부터 토크나이저 o200k_base: build.mjs 가 dist/tok-o200k.json+tok-o200k.N.txt(12조각, js-tiktoken 순위표) 를 쓴다 → 릴리스 때 **dist/tok-o200k.* 도 release/ 로 복사**. 플러그인이 설치·점검에서 받아 저장소(goei:tok-o200k)에 두고, 받기 전엔 어림값.

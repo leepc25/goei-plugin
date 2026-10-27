@@ -208,6 +208,8 @@ export interface DirectoryData {
   부록?: Record<string, AppendixData>;
   /** 새 세력에 준 적 있는 코드 */
   codes_used?: string[];
+  /** 세계 데이터 덧쓰기 (core/world/records.ts WorldOverrides): 기본 세계 기록을 칸 단위로 덮거나 지우거나 더한 것 */
+  세계?: Record<string, unknown>;
 }
 
 const s = (v: unknown) => (typeof v === 'string' ? v.trim() : '');
@@ -886,11 +888,17 @@ const HELP =
   '괴이는 🚧괴이, 미스틱 사이트는 🎁파밍, 요원은 🙂요원 폴더에 로어북을 넣으면 자동으로 들어옵니다. 요원의 소속은 창에서 조직을 골라 정합니다. 거점은 지도에 찍히는 장소이고 조직에 묶지 않아도 됩니다. 📎부록 폴더 항목은 「본 항목 이름 · 설명」으로 지으면 본 항목에 붙고, 켜지는 조건은 부록 탭에서 정합니다. 모델에게는 보내지 않습니다.';
 
 export function directoryContent(data: DirectoryData): string {
-  return JSON.stringify({ schema: data.schema, _help: HELP, refill: data.refill, 괴이: data.괴이, '미스틱 사이트': data['미스틱 사이트'], 요원: data.요원, 조직: data.조직, ...(data.거점 ? { 거점: data.거점 } : {}), ...(data.호칭 ? { 호칭: data.호칭 } : {}), ...(data['괴담톡 탭'] ? { '괴담톡 탭': data['괴담톡 탭'] } : {}), ...(data['시작 로어북'] ? { '시작 로어북': data['시작 로어북'] } : {}), ...(data.부록 && Object.keys(data.부록).length ? { 부록: data.부록 } : {}), ...(data.codes_used?.length ? { codes_used: data.codes_used } : {}) }, null, 1);
+  const world = data.세계 && typeof data.세계 === 'object' && Object.keys(data.세계).length ? { 세계: data.세계 } : {};
+  return JSON.stringify({ schema: data.schema, _help: HELP, refill: data.refill, 괴이: data.괴이, '미스틱 사이트': data['미스틱 사이트'], 요원: data.요원, 조직: data.조직, ...(data.거점 ? { 거점: data.거점 } : {}), ...(data.호칭 ? { 호칭: data.호칭 } : {}), ...(data['괴담톡 탭'] ? { '괴담톡 탭': data['괴담톡 탭'] } : {}), ...(data['시작 로어북'] ? { '시작 로어북': data['시작 로어북'] } : {}), ...(data.부록 && Object.keys(data.부록).length ? { 부록: data.부록 } : {}), ...(data.codes_used?.length ? { codes_used: data.codes_used } : {}), ...world }, null, 1);
 }
 
 /** 로어북 목록에 명부를 넣거나 바꾼 새 목록 (원래 목록은 그대로). 설정 폴더가 있으면 그 안에 둔다 */
 export function withDirectory(lore: LoreEntry[], data: DirectoryData): LoreEntry[] {
+  // 세계 덧쓰기를 모르는 저장(옛 명부 화면)은 카드에 있던 덧쓰기를 그대로 둔다
+  if (data.세계 === undefined) {
+    const cur = readDirectoryData(lore)?.세계;
+    if (cur && typeof cur === 'object' && Object.keys(cur).length) data = { ...data, 세계: cur };
+  }
   const content = directoryContent(data);
   // 새 이름 항목을 먼저 쓰고, 없으면 옛 이름 항목을 새 이름으로 바꿔 쓴다. 남는 명부 항목은 지운다
   const own = lore.findIndex((e) => e.comment === DIRECTORY_COMMENT);

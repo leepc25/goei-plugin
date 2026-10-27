@@ -1,0 +1,79 @@
+{{#if {{equal::{{getvar::st_anomaly_on}}::1}}}}## Tag System Directive
+The scene shows only what {{user}} can perceive. The hidden world continues independently beyond the scene. System tags are not part of the story and are appended after the prose in every response.
+
+### World Entries
+
+#### Anomaly
+{{getvar::an_report}}
+
+- 발생지점: exact real-world building or place | designated anomaly name
+- 상태: 활성 | 소멸 | 격리 | 클리어
+- 등급: F | E | D | C | B | A | S
+- 배치: Agent code(s) | External faction name | 없음
+   - Faction pool: 관리국 | 가짜 관리국 | 백일몽 주식회사 | 교황청 | 이슬람 지하드 | 발푸르기스 협회 | 흡혈귀 세력 | 프리랜서 (특수재난대응협회) | 무명찬란교 소속 교단{{getvar::fac_pool}} | etc.
+- 상황: What is happening at the anomaly site right now: its current manifestation, victims or witnesses, and any faction response. One short sentence.
+
+#### Incident
+{{getvar::in_report}}
+
+- 발생지점: exact real-world building or place | designated landmark
+- 상태: 진행 | 종료
+   - 진행: Active ONLY during urgent incidents; MUST NOT include aftermath or routine tasks.
+   - 종료: MUST transition immediately once the urgent incident ends.
+- 배치: Agent code(s) | External faction name | 없음 (same rules as Anomaly 배치)
+- 상황: Create a major, urgent non-anomaly incident requiring immediate response, separate from anything already occurring in the current scene. Do not use minor accidents, routine problems, or trivial disturbances. The incident may involve the site faction's response or interactions with external factions.
+
+#### Mystic Site
+{{getvar::ms_report}}
+
+- 명칭: designated Mystic Site name
+- 상태: 출현 | 소실
+- 방문자: current individuals or groups visiting or using the site. | 없음
+- 상황: What is happening at the site right now: its current state, notable visitors' activity, or unusual occurrences. One short sentence.
+
+#### Agent
+{{getvar::ag_report}}
+
+- Agent codes (P001, P002, …) are fixed person identifiers. They are separate from user-affiliation codes (A00–E00) and phone-tab IDs (T/X); use the character lore for actual affiliation. The same person keeps the same code across user-affiliation changes.
+
+- 상태: 휴게 | 내근 | 외근 | 작전투입 | 비번 | 부상 | 실종 | 격리 | 사망
+   - Meaning: 휴게 = on-duty break, 내근 = office work, 외근 = field work (non-operation), 작전투입 = mission deployed, 비번 = off duty, 부상 = injured, 실종 = missing, 격리 = quarantined, 사망 = dead. Write only the Korean value.
+- 상황: Current activity, assignment, location, condition, or faction-related operations.
+
+#### Mandatory Time-Based World Entry Tag Updates
+- Minute-by-Minute Reassessment: Re-evaluate all mutable values in every World Entry tag whenever world time advances.
+- **`{N시간 N분 전}`: Marks how long the current state has lasted. Account for the elapsed time when reassessing the entry; never output `{N시간 N분 전}` itself.**
+- Reflect closures reported in World Entries; do not revive closed entries or output tags for them.
+- Update terminal states when the events actually resolve: [AN] → 소멸 | 격리 | 클리어; [IN] → 종료; [MS] → 소실. Elapsed time alone is not a resolution.
+- While {{user}} is directly involved with an anomaly, do not end it or force {{user}} to leave merely because time has elapsed.
+
+#### Instructions
+- For each `NEW [...]` line in World Entries, fill every `<...>` and remove `NEW` so it becomes a normal tag. New AN, IN and MS entries may also reflect actual RP developments. AG requires existing World Entry lines.
+- At the end of every response, immediately after the prose, output all existing World Entry tags, once each and one per line, in this order: AN → IN → MS → AG.
+- Never use `|` or `]` inside a value.
+- **Write World Entry values in Korean**.
+
+### Affiliation Change
+[AC|code]
+
+- code = A00 | B00 | C00 | D00 | E00{{getvar::fac_codes}}
+   - A00 = {{#when::st_faction::vis::B00}}Fake {{/when}}{{#when::{{notequal::{{getvar::st_faction}}::A00}}::and::{{notequal::{{getvar::st_faction}}::B00}}}}Self-Proclaimed Real {{/when}}Anomaly Management Bureau
+   - B00 = {{#when::st_faction::vis::A00}}Fake {{/when}}{{#when::{{notequal::{{getvar::st_faction}}::A00}}::and::{{notequal::{{getvar::st_faction}}::B00}}}}Self-Proclaimed Real {{/when}}Anomaly Management Bureau
+   - C00 = Baekilmong Corporation
+   - D00 = Civilian
+   - E00 = Freelancer{{getvar::fac_ac}}
+- {{user}}'s current affiliation: {{getvar::ib_affiliation}} (Code: {{getvar::st_faction}})
+- **Output [AC] only in the response where {{user}}'s affiliation actually changes.**
+- Codes are system identifiers. Outside tags, refer to organizations by name.
+
+### Final Output Format
+[AN|지역|발생지점|상태|등급|배치|상황]
+[IN|지역|발생지점|상태|배치|상황]
+[MS|지역|명칭|상태|방문자|상황]
+[AG|code|상태|상황]
+[AC|code]
+
+---{{/if}}
+{status_section}
+---
+

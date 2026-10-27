@@ -25,6 +25,10 @@ export interface FieldEvent {
   /** 장면 이름 */
   scene?: string;
   who?: string[];
+  /** 목격한 소속 (세력 평판용): 코드와 「명단 인물인지(named) / 이름 없는 몹인지」 */
+  witness?: { faction: string; named: boolean };
+  /** 방문 번호·id (게임이 준다). 같은 채팅 메시지 뒤에 여러 번 들락날락해도 방문마다 상한을 따로 세게 */
+  visit?: string;
   /** 1 = 공간이 남으면, 3 = 반드시 */
   weight?: 1 | 2 | 3;
   fact?: FieldFact;
@@ -55,6 +59,8 @@ export function withFieldEvent(chat: Chat, ev: FieldEvent): Chat {
     scene: ev.scene ? plain(ev.scene, 60) : undefined,
     who: ev.who?.map((w) => plain(w, 40)).slice(0, 8),
     fact: ev.fact ? { key: plain(ev.fact.key, 40), value: plain(ev.fact.value, 120), ...(ev.fact.permanent ? { permanent: true } : {}) } : undefined,
+    ...(ev.witness ? { witness: { faction: plain(ev.witness.faction, 12), named: !!ev.witness.named } } : {}),
+    ...(ev.visit ? { visit: plain(ev.visit, 40) } : {}),
   };
   return { ...chat, [FIELD_KEY]: { events: [...old, clean].slice(-MAX_EVENTS) } };
 }

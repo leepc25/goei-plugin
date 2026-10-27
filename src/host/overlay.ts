@@ -14,7 +14,7 @@ const OPENING_CSS = '.default-chat-screen:has(.chat-message-container) [data-goe
 
 /** 채팅 속 카드·상태창 배색 (상태창은 설정 「상태창」을, 캐릭터 이미지 칸은 「이미지 크기」·「접는 정도」·에셋 출력을 따른다) */
 const chatCss = (t: ThemeName) => cardVarsCss(t) + LANDING_CSS + OPENING_CSS + statusCss(getPrefs().status ?? 'auto', t)
-  + imgCss(getPrefs().imgSize, getPrefs().imgFold, imgHidden());
+  + imgCss(getPrefs().imgSize, getPrefs().imgFoldOn === false ? 100 : getPrefs().imgFold, imgHidden());
 
 /** 창과 같은 배색을 x-goei-theme 속성별 CSS 변수로 (본 화면에서는 style 속성으로 변수를 못 넣을 수 있어 선택자로 나눈다) */
 function themeVars(sel: string): string {
