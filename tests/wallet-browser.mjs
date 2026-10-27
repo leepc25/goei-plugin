@@ -121,7 +121,7 @@ const chat = () => ({
     { role: 'user', data: '다음 날', chatId: 'u2' },
     { role: 'char', data: '본문\n[▣|2025.01.02|09:40 AM|☀️|4°C|종로 큰길|출근|-|-|관리국/요원|₩ 153,800]', chatId: 'c2' },
   ],
-  scriptstate: { $st_faction: 'A00', $st_lang: 'ko', $st_fm: '2', $st_wallet: JSON.stringify(wallet) },
+  scriptstate: { $st_faction: 'A00', $st_lang: 'ko', $st_fm: '2', $st_wallet: JSON.stringify(wallet), $st_wallet_edit: '1' },
 });
 const walletOf = (page) => page.evaluate(() => JSON.parse(window.__chat.scriptstate.$st_wallet));
 const rows = (page) => page.locator('.gx-wt-row').count();
@@ -197,6 +197,29 @@ const rows = (page) => page.locator('.gx-wt-row').count();
   await page.click('.gx-idpop .gx-wallet');
   await page.waitForSelector('.gx-wallettab');
   assert.equal(await page.locator('.gx-idpop').count(), 0, 'ID카드 창은 닫힘');
+  assert.deepEqual(errors, []);
+  await page.close();
+}
+
+// 잔고 직접 수정 꺼짐(기본): ✎·✕ 없음, 시작 잔고 잠김 → 설정에서 켜면 생김
+{
+  const c = chat();
+  delete c.scriptstate.$st_wallet_edit;
+  const { page, errors } = await boot(fixture, c, { width: 1280, height: 860 });
+  await open(page);
+  await page.waitForSelector('.gx-nav');
+  await page.click('.gx-nav > .gx-nb[data-value="wallet"]');
+  await page.waitForSelector('.gx-wallettab');
+  assert.equal(await page.locator('.gx-wt-pen').count(), 0, '꺼져 있으면 ✎ 없음');
+  assert.equal(await page.locator('.gx-wt-del').count(), 0, '꺼져 있으면 ✕ 없음');
+  await page.click('[data-action="ed-open"][data-value="set:screen"] >> nth=0');
+  await page.click('[data-action="ed-node"][data-value="set:board"]');
+  await page.waitForSelector('[data-action="set-wallet-edit"]');
+  assert.equal(await page.isDisabled('.st-won'), true, '이야기가 시작된 채팅은 시작 잔고 잠김');
+  await page.click('[data-action="set-wallet-edit"][data-value="1"]');
+  await page.waitForFunction(() => window.__chat.scriptstate.$st_wallet_edit === '1');
+  await page.waitForFunction(() => document.querySelector('.st-won') && !document.querySelector('.st-won').disabled);
+  if (shots) { await page.locator('[data-action="set-wallet-edit"]').first().scrollIntoViewIfNeeded(); await page.screenshot({ path: `${shots}/wallet-setting.png` }); }
   assert.deepEqual(errors, []);
   await page.close();
 }

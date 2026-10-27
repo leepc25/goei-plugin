@@ -3,7 +3,7 @@
 // 줄마다 출처 아이콘(본문·필드·직접) · 메모 · 근거(필드는 장면·시각) · 금액 · 그 뒤 잔고. 지우기는 PC는 마우스를 올리면, 모바일은 줄을 누르면.
 // PC는 왼쪽 메뉴, 모바일은 머리 잔고 단추·ID카드 잔고 칩으로 들어온다 (모바일 아래 바는 다섯 칸이 꽉 차 있음).
 import type { ChatContext } from '../host/risu';
-import { aliveAnchors, formatDelta, formatWon, liveWallet, readWallet, walletBalance, WALLET_START_DEFAULT, type WalletEntry } from '../core/wallet';
+import { aliveAnchors, formatDelta, formatWon, liveWallet, readWallet, walletBalance, walletEditable, WALLET_START_DEFAULT, type WalletEntry } from '../core/wallet';
 import { colConfig } from '../core/world/statuscols';
 import { findStatusTags } from '../core/world/status';
 import { getPrefs } from '../core/settings';
@@ -80,6 +80,8 @@ function subOf(e: WalletEntry): string {
 /** 목록만 (찾기 칸을 칠 때 이 부분만 다시 그린다) */
 export function walletList(ctx: ChatContext): string {
   const { rows } = rowsOf(ctx);
+  // 잔고 직접 수정이 꺼져 있으면 지우기도 없음 (설정 → 상황판 → 잔고 직접 수정)
+  const editable = walletEditable(ctx.chat.scriptstate);
   const q = walletUi.q.trim().toLowerCase();
   const shown = rows
     .filter(({ e }) => (walletUi.filter === 'in' ? e.amount > 0 : walletUi.filter === 'out' ? e.amount < 0 : true))
@@ -103,7 +105,7 @@ export function walletList(ctx: ChatContext): string {
           <span class="gx-wt-memo"><b>${esc(e.memo || '(메모 없음)')}</b>${sub ? `<small>${esc(sub)}</small>` : ''}</span>
           <span class="gx-wt-amt"><b class="${e.amount < 0 ? 'out' : 'in'}">${esc(formatDelta(e.amount))}</b><small>${esc(after.toLocaleString('en-US'))}</small></span>
         </button>
-        <button class="gx-wt-del" data-action="wallet-del" data-value="${esc(e.id)}" aria-label="이 거래 지우기">✕</button>
+        ${editable ? `<button class="gx-wt-del" data-action="wallet-del" data-value="${esc(e.id)}" aria-label="이 거래 지우기">✕</button>` : ''}
       </li>`;
     }).join('')}</ul>
   </section>`).join('');
@@ -125,14 +127,15 @@ export function walletTab(ctx: ChatContext): string {
   const todayNet = todayRows.reduce((n, r) => n + r.e.amount, 0);
   const balance = rows.length ? rows[rows.length - 1].after : start;
   const chip = (v: typeof walletUi.filter, label: string) => `<button class="gx-wt-chip${walletUi.filter === v ? ' on' : ''}" data-action="wallet-filter" data-value="${v}" aria-pressed="${walletUi.filter === v}">${label}</button>`;
-  const edit = walletUi.edit
+  const editable = walletEditable(ctx.chat.scriptstate);
+  const edit = editable && walletUi.edit
     ? `<div class="gx-wt-edit"><input type="text" name="wt-adj" inputmode="numeric" placeholder="예: 1,200,000 또는 120만" aria-label="잔고를 이 값으로" data-enter="wallet-adj"><button class="gx-mini" data-action="wallet-adj" data-take="wt-adj">저장</button><button class="gx-mini" data-action="wallet-edit">취소</button></div>`
     : '';
   return `<main class="gx-body gx-wallettab">
     <section class="gx-wt-tiles">
       <div class="gx-wt-tile bal">
         <small>잔고</small>
-        <div class="gx-wt-balrow"><b>${esc(formatWon(balance))}</b><button class="gx-wt-pen" data-action="wallet-edit" aria-label="잔고 고치기" title="잔고 고치기">${ICONS.pen}</button></div>
+        <div class="gx-wt-balrow"><b>${esc(formatWon(balance))}</b>${editable ? `<button class="gx-wt-pen" data-action="wallet-edit" aria-label="잔고 고치기" title="잔고 고치기">${ICONS.pen}</button>` : ''}</div>
         ${edit}
         <span class="gx-wt-sub">시작 ${esc(formatWon(start))} · 거래 ${rows.length}건</span>
       </div>

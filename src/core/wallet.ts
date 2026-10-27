@@ -31,6 +31,13 @@ export interface Wallet {
 
 export const WALLET_MAX = 1_000_000_000_000;
 
+/** 잔고 직접 수정 (2026-10-27 사용자: 기본 끔. 컨텍스트가 쌓이면 이유 없이 바뀐 잔고가 모델을 헷갈리게 한다).
+ * 켜면 가계부의 잔고 고치기·거래 지우기, 진행 중 채팅의 시작 잔고 바꾸기가 열린다. 채팅 변수 '1' = 켬 (새 채팅 기본값은 prefs.vars) */
+export const WALLET_EDIT_VAR = '$st_wallet_edit';
+export const walletEditable = (vars: Record<string, unknown> | undefined) => vars?.[WALLET_EDIT_VAR] === '1';
+/** 이야기가 시작됐나 (유저 메시지가 하나라도 있으면): 그 뒤로는 수정이 꺼져 있으면 시작 잔고도 못 바꾼다 */
+export const walletStarted = (chat: Chat) => (chat.message ?? []).some((m) => (m as { role?: string }).role === 'user');
+
 const isEntry = (e: unknown): e is WalletEntry => {
   const x = e as WalletEntry;
   return !!x && typeof x === 'object' && typeof x.id === 'string' && typeof x.anchor === 'string' && Number.isSafeInteger(x.amount) && typeof x.memo === 'string' && (x.src === 'story' || x.src === 'manual' || x.src === 'field');

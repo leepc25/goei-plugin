@@ -13,7 +13,7 @@ import { IMG_FOLD, IMG_RECENT, IMG_SIZE, imgFold, imgRecent, imgSize, setImgHidd
 import type { Chat, ScriptState } from '../core/types';
 import { parseCatalog, readWorld, startWorldVars, WORLD_KEY, worldOn, worldVars } from '../core/world';
 import { COL_LOG_VAR, colConfig, colVar, STATUS_COLS, usedCols, withColLog, type ColConfig, type ColId, type ColMode } from '../core/world/statuscols';
-import { aliveAnchors, formatWon, parseWon, readWallet, WALLET_MAX, walletBalance, walletVars, WALLET_START_DEFAULT } from '../core/wallet';
+import { aliveAnchors, formatWon, parseWon, readWallet, WALLET_EDIT_VAR, WALLET_MAX, walletBalance, walletEditable, walletStarted, walletVars, WALLET_START_DEFAULT } from '../core/wallet';
 import { updateChat, type ChatContext } from '../host/risu';
 import { barButtons, directoryBar, directoryDone, directoryDoneClear, directorySearch, directoryView } from './directory';
 import { drawerBox } from './drawer';
@@ -96,9 +96,9 @@ function statusColsTable(cfg: ColConfig, busy: boolean): string {
   return `<div class="st-cols ps-row-block">${rows.join('')}</div>`;
 }
 
-/** 시작 잔고 입력 (원). 숫자 또는 「120만 원」 */
-const wonInput = (n: number, busy: boolean) =>
-  `<input class="st-won" type="text" inputmode="numeric" value="${n.toLocaleString('en-US')}" data-change="set-wallet-start" aria-label="시작 잔고"${busy ? ' disabled' : ''}>`;
+/** 시작 잔고 입력 (원). 숫자 또는 「120만 원」. locked = 이야기가 시작됐고 잔고 직접 수정이 꺼짐 */
+const wonInput = (n: number, busy: boolean, locked = false) =>
+  `<input class="st-won" type="text" inputmode="numeric" value="${n.toLocaleString('en-US')}" data-change="set-wallet-start" aria-label="시작 잔고"${busy || locked ? ' disabled' : ''}>`;
 
 /** 상황판을 끈다: 상태와 보고를 비운다 (원본 clearIntegratedControlState. 다시 켜도 복원하지 않음) */
 function worldOffVars(): ScriptState {
@@ -259,6 +259,9 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
   const wallet = readWallet(scope === 'chat' ? ctx.chat.scriptstate : undefined, getPrefs().walletStart ?? WALLET_START_DEFAULT);
   const walletStart = wallet.start;
   const walletNow = scope === 'chat' ? walletBalance(wallet, aliveAnchors(ctx.chat)) : walletStart;
+  // 잔고 직접 수정 (기본 끔): 가계부 잔고 고치기·거래 지우기, 진행 중 시작 잔고 바꾸기를 한꺼번에
+  const walletEdit = walletEditable(scope === 'chat' ? ctx.chat.scriptstate : getPrefs().vars);
+  const startLocked = scope === 'chat' && !walletEdit && walletStarted(ctx.chat);
   const S: Record<SettingsSection, string> = {
     screen: `${group('화면', [
       field('테마', seg('set-theme', theme, [['light', '라이트'], ['dark', '다크'], ['paper', '페이퍼']], busy), '채팅 화면의 캐릭터 이미지 배경과 상태창(「테마」를 골랐을 때) 배색이에요.'),
@@ -287,7 +290,7 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
       field('지원 투입', seg('set-support', s.supportOn ? '1' : '0', [['1', 'ON'], ['0', 'OFF']], busy), '편성에서 등록 요원 외의 일반 지원 인원을 더할 수 있어요.'),
       field('인물 기록', seg('set-people', peopleOn ? '1' : '0', [['1', 'ON'], ['0', 'OFF']], busy), scope === 'chat' ? '응답마다 보조 모델이 한 번 읽어 인물의 상태·관계·호감을 기록하고, 본편 요청이 그 기록을 읽어요. 세부는 「기능별 설정 → 인물 기록」에서.' : '새 채팅을 인물 기록을 켠 채로 시작할지 정해요.'),
     ].join(''))}
-    ${group(`상태창 칸 <small>${usedCols(colCfg).length}칸 사용</small>`, `${statusColsTable(colCfg, busy)}${colCfg.wallet !== 'off' ? field('시작 잔고', wonInput(walletStart, busy), scope === 'chat' ? `이 채팅 장부의 시작 잔고예요. 지금 잔고 ${esc(formatWon(walletNow))}. 거래 내역과 수정은 ID카드의 잔고 칩에서.` : '새 채팅 장부의 시작 잔고예요. 거래는 인물 기록 갱신기가 본문에서 금액이 적힌 것만 뽑아 더하고 빼요.') : ''}`,
+    ${group(`상태창 칸 <small>${usedCols(colCfg).length}칸 사용</small>`, `${statusColsTable(colCfg, busy)}${colCfg.wallet !== 'off' ? field('시작 잔고', wonInput(walletStart, busy, startLocked), scope === 'chat' ? `이 채팅 장부의 시작 잔고예요. 지금 잔고 ${esc(formatWon(walletNow))}. 거래 내역은 가계부 탭에서.${startLocked ? ' 이야기가 시작돼서 잠겼어요(아래 「잔고 직접 수정」을 켜면 바꿀 수 있어요).' : ''}` : '새 채팅 장부의 시작 잔고예요. 거래는 인물 기록 갱신기가 본문에서 금액이 적힌 것만 뽑아 더하고 빼요.') : ''}${colCfg.wallet !== 'off' ? field('잔고 직접 수정', seg('set-wallet-edit', walletEdit ? '1' : '0', [['1', 'ON'], ['0', 'OFF']], busy), '켜면 가계부에서 잔고를 고치고 거래를 지울 수 있고, 진행 중인 채팅의 시작 잔고도 바꿀 수 있어요. 이야기 밖에서 바뀐 잔고는 모델이 이유를 몰라 대화가 길어질수록 앞뒤가 꼬이기 쉬워서 기본은 꺼 둬요.') : ''}`,
       `응답 끝의 상태 태그 <code>[▣|…]</code>에 들어가는 칸이에요. 「안 씀」으로 하면 태그에서 그 칸이 빠지고(모델에 모양을 알려 줘요), 「숨김」은 태그에는 두고 채팅 속 상태창 상자에서만 가려요.${scope === 'chat' ? ' 바꾼 구성은 이 채팅에 바로 적용되고 바뀐 시점이 기록돼요.' : ' 새 채팅의 기본 구성이에요.'}`)}
     <section class="ps-group"><h3>괴이 발생</h3><p class="ps-note">응답을 처리할 때마다 판정해요. 상한을 0으로 하면 그 종류는 자동으로 생기지 않아요.</p>
       <div class="ps-cards">
@@ -482,6 +485,10 @@ export async function handleSettings(action: string, value: string | undefined, 
         else env.render();
         return true;
       }
+      case 'set-wallet-edit':
+        // 새 채팅 기본값의 잔고 직접 수정 ($st_wallet_edit)
+        if (v === '1' || v === '0') await saveDefaults(env, (p) => ({ ...p, vars: { ...(p.vars ?? {}), [WALLET_EDIT_VAR]: v } }));
+        return true;
       case 'set-agent': {
         const next = Math.min(AGENT_MAX, Math.max(0, d.basic.agentLimit + (v.endsWith('+') ? 1 : -1)));
         if (next !== d.basic.agentLimit) await basicPatch(env, { agentLimit: next });
@@ -544,11 +551,17 @@ export async function handleSettings(action: string, value: string | undefined, 
         return true;
       }
       await save(ctx, env, (chat) => {
+        // 이야기가 시작된 뒤에는 잔고 직접 수정이 켜져 있을 때만
+        if (walletStarted(chat) && !walletEditable(chat.scriptstate)) return null;
         const w = readWallet(chat.scriptstate, getPrefs().walletStart ?? WALLET_START_DEFAULT);
         return w.start === n ? null : walletVars({ ...w, start: n });
       });
       return true;
     }
+    case 'set-wallet-edit':
+      if (v !== '1' && v !== '0') return true;
+      await save(ctx, env, (chat) => (walletEditable(chat.scriptstate) === (v === '1') ? null : { [WALLET_EDIT_VAR]: v }));
+      return true;
     case 'set-anomaly':
       if (v === 'off') {
         if (!worldOn(ctx.chat)) return true;

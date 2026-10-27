@@ -55,7 +55,7 @@ import { handleImgPrompt, imgInput } from './imgprompt';
 import { cropValue, setCrop, directoryExtList, directoryInput, directoryPhotoList, directoryList, dirUi, handleDirectory, resetDirectory } from './directory';
 import { basicDefaults, basicVars, DIM_DEFAULT, getPrefs, worldDefaults, worldSettings, worldVarsOf, type Mark } from '../core/settings';
 import { colConfig } from '../core/world/statuscols';
-import { adjustWallet, aliveAnchors, formatWon, parseWon, readWallet, removeWalletEntry, walletBalance, walletVars, WALLET_START_DEFAULT } from '../core/wallet';
+import { adjustWallet, walletEditable, aliveAnchors, formatWon, parseWon, readWallet, removeWalletEntry, walletBalance, walletVars, WALLET_START_DEFAULT } from '../core/wallet';
 import { walletHeadButton, walletList, walletOn, walletTab, walletUi as walletTabUi } from './wallet';
 
 /** ID카드 잔고 칩 → 장부 창 (열림·입력 알림) */
@@ -834,14 +834,15 @@ async function handle(action: string, value?: string): Promise<void> {
       walletTabUi.open = walletTabUi.open === value ? null : value ?? null;
       return render();
     case 'wallet-edit':
-      // 잔고 칸 ✎: 그 자리에 잔고 고치기 칸
+      // 잔고 칸 ✎: 그 자리에 잔고 고치기 칸 (잔고 직접 수정이 켜져 있을 때만)
+      if (view.kind !== 'started' || !walletEditable(view.ctx.chat.scriptstate)) return;
       walletTabUi.edit = !walletTabUi.edit;
       walletTabUi.notice = '';
       render();
       if (walletTabUi.edit) root?.querySelector<HTMLInputElement>('[name="wt-adj"]')?.focus();
       return;
     case 'wallet-del': {
-      if (view.kind !== 'started' || !value) return;
+      if (view.kind !== 'started' || !value || !walletEditable(view.ctx.chat.scriptstate)) return;
       const ctx = view.ctx;
       await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
         const w = readWallet(chat.scriptstate, getPrefs().walletStart ?? WALLET_START_DEFAULT);
@@ -850,7 +851,7 @@ async function handle(action: string, value?: string): Promise<void> {
       return refresh();
     }
     case 'wallet-adj': {
-      if (view.kind !== 'started') return;
+      if (view.kind !== 'started' || !walletEditable(view.ctx.chat.scriptstate)) return;
       const n = parseWon(value ?? '');
       if (n === null) {
         walletTabUi.notice = '금액을 읽을 수 없어요. 숫자 또는 「120만」처럼 적어 주세요.';
