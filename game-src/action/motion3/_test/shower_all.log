@@ -11,3 +11,9 @@
 1.8_데쥬레 ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
 1.8_데쥬레 [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
 alledProcessError: Command '['curl', '-sSf', '--retry', '3', 'https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/53f475f3-45ca-40af-b3ac-5ec5c814f103/animations/56b2cca3-4ae4-4d93-8784-7d7712f2e08f/east/6.png?t=1793121076']' returned non-zero exit status 56.
+1.11_로제몬 ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+1.11_로제몬 [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+2.1_사장 ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+2.1_사장 [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+2.2_도필헌 ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+2.2_도필헌 [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
