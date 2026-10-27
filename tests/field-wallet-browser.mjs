@@ -13,6 +13,18 @@ try {
   assert.equal(h.rec.length, 1);
   assert.match(h.rec[0].text, /삼각김밥 −1,200원/);
   assert.ok(h.rec[0].visit, '방문 id');
+  // 필드 가게: 종로 큰길 편의점에서 사면 가계부에서 빠지고 가방은 채팅 상태($fd_state)에 저장
+  await page.evaluate(() => window.__goeiEngine.world.stage.jump('jongno', 1300));
+  await page.waitForTimeout(1500);
+  await page.keyboard.press('KeyE');
+  await page.waitForSelector('.gf-shop:not([hidden])');
+  await page.click('.gf-shop [data-buy="onigiri"]');
+  await page.waitForFunction(() => window.__h.won === 138800 - 1200);
+  const fd = await page.evaluate(() => JSON.parse(window.__h.fd));
+  assert.equal(fd.bag.onigiri, 1);
+  assert.equal(fd.shops.cvs.stock.onigiri, 7);
+  assert.ok((await page.evaluate(() => window.__h.trades)).some(([n, m]) => n === -1200 && /편의점 삼각김밥/.test(m)));
+  await page.keyboard.press('Escape');
   assert.deepEqual(errors.filter((e) => !/favicon/.test(e)), []);
   console.log('field-wallet-browser 통과');
 } finally {

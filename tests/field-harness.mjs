@@ -50,6 +50,7 @@ export async function openField({ width = 1873, height = 1082, panel = true } = 
       uiPrefs: { load: async () => null, save: () => {} },
       visit: { state: async () => state(), send: async (id, text) => { h.sent.push([id, text]); turns.push({ id: String(turns.length), at: Date.now(), agentId: id, name: '잼트리', user: text, reply: '응.' }); return state(); } },
       wallet: { balance: async () => h.won, add: async (n, m) => { h.won += n; h.trades.push([n, m]); return h.won; } },
+      fieldState: { load: async () => h.fd ?? null, save: async (t) => void (h.fd = t) },
       field: { record: async (ev) => void h.records.push(ev), entry: async () => ({ allow: true, presence: 'none', site: 'hq', minute: 22 * 60 }) },
       talk: { model: async () => '응, 후배.', lore: async () => null, recent: async () => [] },
       saves: { list: async () => [], read: async (s) => saves.get(s) ?? null, write: async (s, d) => void saves.set(s, d), remove: async (s) => void saves.delete(s), last: async () => (saves.size ? 0 : null) },

@@ -55,6 +55,8 @@ export interface HqSpot {
   say?: string;
   /** 출동 차량: 출동 준비가 됐으면 출발 */
   depart?: boolean;
+  /** 필드 가게 (src/game/world/fieldShop.ts SHOPS id): E로 거래 창 */
+  shop?: string;
 }
 /** 바닥 위 상자 (집기). x = 가운데, y = 앞 모서리(바닥에 닿는 선), d = 뒤로 깊이, h = 높이. 모두 화면 px */
 export interface HqBox {
@@ -160,7 +162,9 @@ export const HQ_SCENES: HqScene[] = [
   },
   // 종로 큰길: 필드 세계 첫 시연 범위(docs/필드_세계_NPC_설계.md 20장). 그림 전까지 회색 거리
   {
-    id: 'jongno', name: '종로 큰길', floor: 'out', length: 4000, look: 'street', legacy: true, boxes: [], fixtures: [], spots: [],
+    id: 'jongno', name: '종로 큰길', floor: 'out', length: 4000, look: 'street', legacy: true, boxes: [], fixtures: [],
+    // 편의점 (점원은 근무형 몹, src/game/world/hq.ts). 그림 전까지 회색 거리의 임시 자리
+    spots: [{ id: 'cvs', x: 1300, verb: '편의점', shop: 'cvs' }],
     doors: [{ id: 'west', x: 60, kind: 'door', to: 'street', toDoor: 'east', label: '종로 뒷골목' }, { id: 'metro', x: 2200, kind: 'door', to: 'metro', toDoor: 'jonggak', label: '종각역' }],
     things: [{ kind: 'streetlamp', x: 700, w: 30, h: 360 }, { kind: 'streetlamp', x: 1700, w: 30, h: 360 }, { kind: 'streetlamp', x: 2700, w: 30, h: 360 }, { kind: 'streetlamp', x: 3600, w: 30, h: 360 }],
   },
@@ -182,7 +186,9 @@ export const HQ_SCENES: HqScene[] = [
     ['mangwon', '망원 주택가', 3000, '망원역'],
     ['yeouido', '여의도 한강공원', 4000, '여의나루역'],
   ] as const).map(([id, name, length, station]): HqScene => ({
-    id, name, floor: 'out', length, look: 'street', legacy: true, boxes: [], fixtures: [], spots: [],
+    id, name, floor: 'out', length, look: 'street', legacy: true, boxes: [], fixtures: [],
+    // 영등포 시장: 노점 (상인은 근무형 몹)
+    spots: id === 'yeongdeungpo' ? [{ id: 'market', x: 1500, verb: '노점', shop: 'market' }] : [],
     doors: [{ id: 'metro', x: 200, kind: 'door', to: 'metro', toDoor: id, label: station }],
     things: [1, 2, 3].map((i) => ({ kind: 'streetlamp', x: Math.round((length * i) / 4), w: 30, h: 360 })),
   })),

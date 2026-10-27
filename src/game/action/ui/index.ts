@@ -42,6 +42,8 @@ export interface ShellOptions {
   toLocal?: (clientX: number, clientY: number, el: HTMLElement) => { x: number; y: number };
   /** 일시정지 메뉴 위쪽 한 줄 요약 */
   pauseInfo?: () => string;
+  /** 필드 가방 (일시정지 메뉴 「가방」, 필드에 있을 때만) */
+  bag?: { available(): boolean; open(): void };
   /** 필드(봇 보조): 일시정지는 계속·설정·조작법·나가기만, 설정에서 전체 화면·NPC 대화 칸을 뺀다 (2026-10-23 사용자) */
   field?: { onExit: () => void; fullscreen?: { enter(kind: 'browser' | 'panel'): Promise<void>; exit(): Promise<void>; mode(): 'browser' | 'panel' | null } };
 }
@@ -271,6 +273,7 @@ export function mountGameShell(box: HTMLElement, o: ShellOptions = {}): Shell {
         sub: o.pauseInfo?.() ?? '',
         items: o.field ? [
           { type: 'button', label: '계속', sub: key('Esc'), act: () => menu.closeAll() },
+          ...(o.bag?.available() ? [{ type: 'button' as const, label: '가방', act: () => (menu.closeAll(), o.bag!.open()) }] : []),
           { type: 'button', label: '설정', act: () => shell.openSettings() },
           { type: 'button', label: '조작법', act: () => shell.openControls() },
           ...(o.onTitle ? [{ type: 'button' as const, label: '타이틀로', act: () => (menu.closeAll(), o.onTitle!()) }] : []),
@@ -278,6 +281,7 @@ export function mountGameShell(box: HTMLElement, o: ShellOptions = {}): Shell {
         ] : [
           ...(hud.last ? [{ type: 'html' as const, html: statusHtml(hud.last) }] : []),
           { type: 'button', label: '계속', sub: key('Esc'), act: () => menu.closeAll() },
+          ...(o.bag?.available() ? [{ type: 'button' as const, label: '가방', act: () => (menu.closeAll(), o.bag!.open()) }] : []),
           { type: 'button', label: '설정', act: () => shell.openSettings() },
           { type: 'button', label: '조작법', act: () => shell.openControls() },
           { type: 'button', label: '자동 전환', sub: key('X'), act: () => (menu.closeAll(), tap('KeyX')) },

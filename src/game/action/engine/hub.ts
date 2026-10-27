@@ -45,6 +45,8 @@ export interface HubHost {
   depart?(): string | null;
   /** 앉기·눕기 자리에 앉았다 (시간 보내기 고르기) */
   sat?(): void;
+  /** 필드 가게 자리: 거래 창을 연다. 못 열면(문 닫음 등) 자막 한 줄 */
+  shop?(id: string): string | null;
   /** 출동 준비가 됐나 (B3 승합차 화살표) */
   armed?(): boolean;
   /** 필드 세계 (src/game/world): 있으면 visitors 대신 움직이는 행위자를 그린다 */
@@ -382,6 +384,11 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
         const s = scene.spots.find((q) => `spot:${q.id}` === prop.id);
         if (!s) return;
         if (!s.open) return a.world.say('아직 쓸 수 없다. 본부 일이 더 진행되면 열린다.', 2.5);
+        if (s.shop) {
+          const m = host.shop?.(s.shop);
+          if (m) a.world.say(m, 2.5);
+          return;
+        }
         if (s.place) return host.openPlace(s.place);
         if (s.say) return a.world.say(s.say, 3);
         if (s.depart) {

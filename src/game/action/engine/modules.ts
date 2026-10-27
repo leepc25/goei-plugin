@@ -31,6 +31,7 @@ import { makeHub, silhouette, type HubHost, type HubLife } from './hub';
 import { createHqWorld, hqDistrict } from '../../world/hq';
 import { isRegionMove } from '../../world/districts';
 import { STATUS, type DebuffKind, type StatusSet } from '../../combat/status';
+import { createFieldShop, type FieldShop } from './fieldShopLink';
 import { DEFAULT_CLOCK, clockRules, waitOptions, type ClockRules } from '../../world/clock';
 import { hashSeed } from '../../world/rng';
 import { observerLines } from '../../world/observer';
@@ -90,9 +91,11 @@ const fieldWallet: { won: number | null } = { won: null };
 /** 관찰 창(F9) 켜짐: 오른쪽 위 자리를 같이 쓴다 */
 let observing = false;
 const observerOn = () => observing;
+/** 필드 가게 창이 쓰는 돈·장부 (hqAdapter 안에서 채운다: 가계부 다리·방문 id가 거기 있다) */
+const fieldLink: { pay?: (amount: number, memo: string) => Promise<number | null>; record?: (text: string) => void } = {};
 const wonText = (n: number) => `${n < 0 ? '−' : ''}₩ ${Math.abs(Math.trunc(n)).toLocaleString('en-US')}`;
 
-function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: HubHost['chooseFloor']; sfx: (n: string) => void; closed?: () => void; resuming?: () => boolean; overlay?: HubHost['overlay']; rules?: () => ClockRules; choose?: (o: { title: string; lines?: string[]; options: string[]; cancel?: boolean }) => Promise<number> }): HqModuleLike & { close(): void; goto(place: string): void; state(): { day: number; rescued: string[] }; visitReady: Promise<void>; visitor(): { agentId: string; name: string } } {
+function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: HubHost['chooseFloor']; sfx: (n: string) => void; closed?: () => void; resuming?: () => boolean; overlay?: HubHost['overlay']; rules?: () => ClockRules; shop?: (id: string) => string | null; choose?: (o: { title: string; lines?: string[]; options: string[]; cancel?: boolean }) => Promise<number> }): HqModuleLike & { close(): void; goto(place: string): void; state(): { day: number; rescued: string[] }; visitReady: Promise<void>; visitor(): { agentId: string; name: string } } {
   const hq = createHq();
   const b = bridge as (Partial<GameBridge> & { slot?: number; photo?: (name: string) => string | undefined }) | undefined;
   const slot = b?.slot ?? 0;
@@ -140,6 +143,10 @@ function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui
     }
     return after;
   };
+  // 시연판(본편 없음): 가계부 대신 이번 판 동안만 쓰는 지갑 (시작 잔고 기본값과 같은 14만 원)
+  if (!b?.wallet) fieldWallet.won = 140_000;
+  fieldLink.pay = (amount, memo) => (b?.wallet ? pay(amount, memo) : Promise.resolve((fieldWallet.won = (fieldWallet.won ?? 0) + amount)));
+  fieldLink.record = (text) => void b?.field?.record({ kind: 'act', text, scene: fieldClock.place || undefined, weight: 1, visit: visitId }).catch(() => {});
   // 개발 도구·브라우저 시험
   (globalThis as { __goeiWallet?: unknown }).__goeiWallet = { pay, balance: () => fieldWallet.won };
   /** 이번 필드 방문 id (방문마다 호감·평판 상한을 따로 세게) */
@@ -272,6 +279,7 @@ function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui
       overlay: ui.overlay,
       hour: () => (fieldClock.sec === null ? null : (fieldClock.sec / 3600) % 24),
       depart: () => hq.depart(),
+      shop: (id) => ui.shop?.(id) ?? null,
       // 앉기·눕기 자리: 시간 보내기 (16-2장). 고른 만큼 시계가 간다
       sat: () => {
         const opts = waitOptions(rules(), fieldClock.sec === null ? null : fieldClock.sec / 60);
@@ -432,8 +440,10 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     load: async () => (await uiPrefs.load().catch(() => null)) ?? localStore.load(),
     save: (t) => { uiPrefs.save(t); localStore.save(t); },
   } : undefined;
+  let fieldShop: FieldShop | null = null;
   const shell = mountGameShell(box, {
     synth: true,
+    bag: { available: () => !!game?.inHub && !!fieldShop, open: () => fieldShop?.openBag() },
     store,
     title: bridge?.visit ? VISIT_TITLE.title : '차원 승강기',
     sub: bridge?.visit ? VISIT_TITLE.sub : 'ANOMALY SIMULATION · 관리국 액션',
@@ -769,7 +779,19 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     },
     overlay: visit ? (c, people, player) => visit.draw(c, people, player) : undefined,
     choose: (o) => shell.choose(o),
+    shop: (id) => fieldShop?.open(id) ?? null,
     rules: () => { const t = shell.settings; return clockRules({ scene: t.tScene, region: t.tRegion, talk: t.tTalk, fight: t.tFight, waitShort: t.tWaitShort, waitLong: t.tWaitLong }); },
+  });
+  // 필드 가게·가방 창 (src/game/world/fieldShop.ts): 돈은 가계부, 가방·재고는 채팅 변수 $fd_state
+  fieldShop = createFieldShop({
+    root: shell.stage.ui,
+    store: bridge?.fieldState,
+    minute: () => (fieldClock.sec === null ? null : fieldClock.sec / 60),
+    balance: () => fieldWallet.won,
+    pay: (amount, memo) => fieldLink.pay?.(amount, memo) ?? Promise.resolve(null),
+    heal: (ratio) => { const p = game?.world?.player; if (p) p.hp = Math.min(p.hpMax, p.hp + p.hpMax * ratio); },
+    record: (text) => fieldLink.record?.(text),
+    rng: Math.random,
   });
   // 본부 메뉴 창이 열려 있으면 Esc는 창 닫기 (껍데기 일시정지보다 먼저)
   // 본부 메뉴 창(임무 창구·정비실 등) 키보드 (사용자 2026-10-25: 키보드가 안 먹는다): 방향키로 단추를 고르고 Enter·Space·E로 누른다, Esc 닫기
@@ -885,7 +907,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     hq,
     hqLayer: () => shell.stage.ui,
     hud: false,
-    blocking: () => !!visit?.isOpen() || story.isBlocking() || itemsBlocking() || !floorBox.hidden || npc.isOpen() || mapOpen,
+    blocking: () => !!visit?.isOpen() || story.isBlocking() || itemsBlocking() || !floorBox.hidden || npc.isOpen() || mapOpen || !!fieldShop?.isOpen(),
     covered: () => story.isVideoPlaying(),
     listeners,
     surface: { canvas: shell.canvas, ctx: shell.ctx },

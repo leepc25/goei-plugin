@@ -341,3 +341,32 @@ test('밤 원형: 유흥가 밤에는 nightMix에서만 나온다', () => {
   assert.equal(mobs.length, D.POPULATION.nightlife.target.night);
   for (const m of mobs) assert.ok(D.POPULATION.nightlife.nightMix.includes(m.def.archetype), m.def.archetype);
 });
+
+test('필드 가게: 값·떨이·평판 거부·재고 회복·가방 칸·흥정', async () => {
+  const { build: b2 } = await import('esbuild');
+  const d2 = await mkdtemp(join(tmpdir(), 'goei-fshop-'));
+  await b2({ entryPoints: ['src/game/world/fieldShop.ts'], outdir: d2, outbase: 'src', bundle: true, platform: 'node', format: 'esm', outExtension: { '.js': '.mjs' }, logLevel: 'silent' });
+  const F = await import(pathToFileURL(join(d2, 'game/world/fieldShop.mjs')));
+  const it = F.FIELD_ITEMS.onigiri, cvs = F.SHOPS.cvs, mk = F.SHOPS.market;
+  assert.equal(F.priceOf(it, cvs, { hour: 12 }), 1200);
+  assert.equal(F.priceOf(it, mk, { hour: 12 }), 1000, '시장 0.85 (백 원 단위)');
+  assert.equal(F.priceOf(it, mk, { hour: 18 }), 700, '저녁 떨이');
+  assert.equal(F.priceOf(it, cvs, { hour: 12, rep: 'hostile' }), null, '적대면 거래 거부');
+  assert.equal(F.sellPriceOf(it, cvs, { hour: 12 }), null, '편의점은 안 삼');
+  assert.equal(F.sellPriceOf(it, mk, { hour: 12 }), 500);
+  assert.ok(!F.isOpen(mk, 20) && F.isOpen(mk, 7) && F.isOpen(cvs, 3));
+  const s = F.emptyState();
+  const st = F.stockOf(s, cvs, 600);
+  st.onigiri = 0;
+  assert.equal(F.stockOf(s, cvs, 600 + 180).onigiri, 4, '반 시간이면 반만');
+  assert.equal(F.stockOf(s, cvs, 600 + 180 + 400).onigiri, 8);
+  for (const id of Object.keys(F.FIELD_ITEMS).slice(0, 8)) assert.ok(F.addBag(s, id));
+  assert.equal(F.addBag(s, 'umbrella'), false, '가방 8칸');
+  assert.ok(F.addBag(s, 'onigiri'), '같은 물건은 겹침');
+  assert.equal(F.parseState(JSON.stringify(s)).bag.onigiri, 2);
+  let fails = 0;
+  for (let i = 0; i < 5; i++) if (!F.haggle(s, mk, 1, () => 0.99)) fails++;
+  assert.equal(fails, 5);
+  assert.equal(F.haggle(s, mk, 1, () => 0), 0, '하루 두 번 실패하면 그날은 안 깎음');
+  assert.ok(F.haggle(s, mk, 2, () => 0) > 0, '다음 날은 다시');
+});

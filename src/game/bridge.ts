@@ -230,6 +230,12 @@ export interface GameWallet {
   add(amount: number, memo: string, where?: { place?: string; time?: string }): Promise<number | null>;
 }
 
+/** 필드 가방·가게 재고 (채팅 변수 $fd_state, JSON). 없으면 게임은 이번 방문 동안만 기억한다 */
+export interface GameFieldState {
+  load(): Promise<string | null>;
+  save(text: string): Promise<void>;
+}
+
 export interface GameUiPrefs {
   load(): Promise<string | null>;
   save(text: string): void;
@@ -246,6 +252,8 @@ export interface GameBridge {
   people?: GamePeople;
   /** 가계부 (없으면 옛 플러그인: 게임은 돈을 쓰지 않는다) */
   wallet?: GameWallet;
+  /** 필드 가방·가게 재고 */
+  fieldState?: GameFieldState;
   readonly api: 1;
   /** NPC 자유 대화. 없으면 게임은 미리 쓴 대사로만 답한다 */
   talk?: GameTalk;
