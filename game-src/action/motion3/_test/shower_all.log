@@ -128,3 +128,17 @@ alledProcessError: Command '['curl', '-sSf', '--retry', '3', 'https://backblaze.
 6.18_관리국남B [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
 6.19_관리국여A ('A', '완료 16장 {"type": "generations", "generations": 2.0}')
 6.19_관리국여A [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+6.20_관리국여B ('A', '완료 16장 {"type": "generations", "generations": 2.0}')
+6.20_관리국여B [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+6.21_백일몽남A ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+6.21_백일몽남A [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+6.22_백일몽남B ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+6.22_백일몽남B [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+6.23_백일몽여A ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+6.23_백일몽여A [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+6.24_백일몽여B ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+6.24_백일몽여B [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+6.25_협회남1 ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+6.25_협회남1 [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+6.26_협회남2 ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+6.26_협회남2 [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
