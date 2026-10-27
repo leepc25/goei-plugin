@@ -63,6 +63,7 @@ def last(n):
     im = Image.open(sorted((OUT / f"샤워2_{n}").glob("[0-9][0-9].png"))[-1]).convert("RGBA")
     clean = biggest(im); clean.save(OUT / f"샤워2_{n}_끝장_정리.png"); return clean
 def run(n):
+    if any((OUT / f"샤워2_{n}").glob("[0-9][0-9].png")): return n, "이미 있음(덮어쓰지 않음)"
     src, frames, opt, prompt = STEPS[n]; start = last(src)
     body = {"character_id": CID, "mode": "pixminimax", "action_description": prompt, "animation_name": f"test 샤워2 {n}",
             "directions": [D], "frame_count": frames, "subject_description": SUB, "initial_pose": f"standing upright {side}",
