@@ -159,7 +159,7 @@ assert.deepEqual(errors, []);
 // 5단계: 설치 · 점검 (괴이 카드: 로어북·인사말 있음, 사진은 없음). 설정 패널의 「설치 · 점검」 단추로 다시 연다
 await page.click('[data-action="ed-open"][data-value="install"]');
 await page.waitForFunction(() => document.querySelector('.gw')?.hidden === false);
-await page.waitForSelector('.gw-install .ps-row');
+await page.waitForSelector('.gw-install .gw-inst-list');
 const inst = await page.textContent('.gw-install');
 assert.ok(inst.includes('인사말') && inst.includes('카드 사진') && inst.includes('위키 기본 문서'), inst.slice(0, 300));
 assert.ok((await page.locator('.gw-inst-no').count()) >= 1, '사진·아이콘은 ✗');
