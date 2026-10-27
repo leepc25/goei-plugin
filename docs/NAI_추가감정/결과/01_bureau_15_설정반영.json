@@ -1,0 +1,1447 @@
+{
+  "id": "1792745053654",
+  "name": "관리국_추가감정_15종_설정반영",
+  "scenes": [
+    {
+      "id": "1792315457786",
+      "name": "Jyaldi_suspicious",
+      "scenePrompt": "1.15::narrowed eyes, expressionless::, closed mouth, looking at viewer, crossed arms, black gloves,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457786
+    },
+    {
+      "id": "1792315457787",
+      "name": "Jyaldi_worried",
+      "scenePrompt": "1.15::furrowed brow, serious::, closed mouth, looking down, holding cigarette, smoke, black gloves,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457787
+    },
+    {
+      "id": "1792315457788",
+      "name": "Jyaldi_relieved",
+      "scenePrompt": "1.15::half-closed eyes, sigh::, closed mouth, smoking, cigarette, black gloves,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457788
+    },
+    {
+      "id": "1792315457789",
+      "name": "Jyaldi_disgusted",
+      "scenePrompt": "1.15::disdain, half-closed eyes::, closed mouth, shaded face, looking at viewer, black gloves,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457789
+    },
+    {
+      "id": "1792315457790",
+      "name": "Jyaldi_determined",
+      "scenePrompt": "1.15::serious, narrowed eyes::, closed mouth, looking at viewer, adjusting gloves, black gloves,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457790
+    },
+    {
+      "id": "1792315457791",
+      "name": "Jyaldi_jealous",
+      "scenePrompt": "1.15::annoyed, narrowed eyes::, closed mouth, sideways glance, crossed arms, black gloves,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457791
+    },
+    {
+      "id": "1792315457792",
+      "name": "Jyaldi_pleading",
+      "scenePrompt": "1.15::serious, raised inner eyebrows::, parted lips, looking at viewer, reaching towards viewer, black gloves,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457792
+    },
+    {
+      "id": "1792315457793",
+      "name": "Jyaldi_forced smiling",
+      "scenePrompt": "1.15::forced smile, half-closed eyes, tired::, looking to the side, hand on own hip, black gloves,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457793
+    },
+    {
+      "id": "1792744536784",
+      "name": "Jyaldi_indifferent",
+      "scenePrompt": "1.15::expressionless, half-closed eyes::, looking away, cigarette, mouth hold, black gloves,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536784
+    },
+    {
+      "id": "1792744536785",
+      "name": "Jyaldi_guilty",
+      "scenePrompt": "1.15::looking down, shaded face::, closed mouth, furrowed brow, hand in pocket, black gloves,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536785
+    },
+    {
+      "id": "1792744536786",
+      "name": "Jyaldi_pouting",
+      "scenePrompt": "1.15::annoyed, frown, half-closed eyes::, closed mouth, hand on own forehead, black gloves,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536786
+    },
+    {
+      "id": "1792744536787",
+      "name": "Jyaldi_angry smile",
+      "scenePrompt": "1.15::light smile, glaring, shaded face::, closed mouth, looking at viewer, clenched hand, black gloves,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536787
+    },
+    {
+      "id": "1792744536788",
+      "name": "Jyaldi_expressionless",
+      "scenePrompt": "1.15::expressionless::, closed mouth, looking at viewer, crossed arms, black gloves,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536788
+    },
+    {
+      "id": "1792744536789",
+      "name": "Jyaldi_tormented",
+      "scenePrompt": "1.15::clenched teeth, glaring, furrowed brow::, shaded face, sweat, looking down, clenched hand, black gloves,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536789
+    },
+    {
+      "id": "1792744536790",
+      "name": "Jyaldi_crazy smile",
+      "scenePrompt": "1.15::smirk, glowing eyes, constricted pupils::, shaded face, looking at viewer, black gloves,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536790
+    },
+    {
+      "id": "1792315457794",
+      "name": "Spangdal_suspicious",
+      "scenePrompt": "skeptical, light smile, half-closed eyes, looking at viewer, 1.15::head tilt, hand up, hand to own mouth, arm behind back::, no eye highlights,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457794
+    },
+    {
+      "id": "1792315457795",
+      "name": "Spangdal_worried",
+      "scenePrompt": "worried, raised inner eyebrows, closed mouth, looking down, 1.15::hands up, fidgeting, head down::, no eye highlights,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457795
+    },
+    {
+      "id": "1792315457796",
+      "name": "Spangdal_relieved",
+      "scenePrompt": "closed eyes, light smile, sigh, 1.15::hand up, tucking hair, arm at side, head back::, no eye highlights,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457796
+    },
+    {
+      "id": "1792315457797",
+      "name": "Spangdal_disgusted",
+      "scenePrompt": "disgust, disdain, half-closed eyes, closed mouth, 1.15::leaning back, hand up, hand on own cheek, arm at side::, no eye highlights,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457797
+    },
+    {
+      "id": "1792315457798",
+      "name": "Spangdal_determined",
+      "scenePrompt": "determined, smile, glaring, closed mouth, 1.15::outstretched arm, claw pose, arm behind back, head down::, no eye highlights,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457798
+    },
+    {
+      "id": "1792315457799",
+      "name": "Spangdal_jealous",
+      "scenePrompt": "envy, smile, narrowed eyes, sideways glance, 1.15::arms behind back, twisted torso, head tilt::, no eye highlights,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457799
+    },
+    {
+      "id": "1792315457800",
+      "name": "Spangdal_pleading",
+      "scenePrompt": "raised eyebrows, sad smile, looking at viewer, 1.15::head tilt, hands up, own hands clasped, interlocked fingers::, no eye highlights,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457800
+    },
+    {
+      "id": "1792315457801",
+      "name": "Spangdal_forced smiling",
+      "scenePrompt": "forced smile, wide-eyed, closed mouth, 1.15::hand up, hand to own mouth, arm at side, looking away::, no eye highlights,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457801
+    },
+    {
+      "id": "1792744536791",
+      "name": "Spangdal_indifferent",
+      "scenePrompt": "bored, half-closed eyes, parted lips, 1.15::hand up, twirling hair, arm at side, head tilt::, no eye highlights,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536791
+    },
+    {
+      "id": "1792744536792",
+      "name": "Spangdal_guilty",
+      "scenePrompt": "guilt, frown, raised inner eyebrows, looking down, 1.15::hands on own stomach, head down, slouching::, no eye highlights,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536792
+    },
+    {
+      "id": "1792744536793",
+      "name": "Spangdal_pouting",
+      "scenePrompt": "pout, half-closed eyes, looking to the side, 1.15::hand up, index finger raised, hand on own cheek, arm behind back, head tilt::, no eye highlights,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536793
+    },
+    {
+      "id": "1792744536794",
+      "name": "Spangdal_angry smile",
+      "scenePrompt": "angry, smile, narrowed eyes, shaded face, 1.15::shushing, hand up, arm behind back, head tilt::, no eye highlights,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536794
+    },
+    {
+      "id": "1792744536795",
+      "name": "Spangdal_expressionless",
+      "scenePrompt": "expressionless, staring, closed mouth, 1.15::outstretched arm, open hand, arm at side, head tilt::, no eye highlights,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536795
+    },
+    {
+      "id": "1792744536796",
+      "name": "Spangdal_tormented",
+      "scenePrompt": "distress, wide-eyed, trembling, wavy mouth, 1.15::hands on own head, head down, slouching::, no eye highlights,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536796
+    },
+    {
+      "id": "1792744536797",
+      "name": "Spangdal_crazy smile",
+      "scenePrompt": "crazy smile, wide-eyed, grin, constricted pupils, 1.15::twisted torso, hand up, claw pose, hand on own hip, head back::, no eye highlights,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536797
+    },
+    {
+      "id": "1792315457802",
+      "name": "Jaemtri_suspicious",
+      "scenePrompt": "skeptical, raised eyebrow, smile, closed mouth, 1.15::hand up, hand on own cheek, hand on own hip, head tilt::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457802
+    },
+    {
+      "id": "1792315457803",
+      "name": "Jaemtri_worried",
+      "scenePrompt": "worried, raised inner eyebrows, parted lips, looking at viewer, 1.15::outstretched arms, open hands, head tilt::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457803
+    },
+    {
+      "id": "1792315457804",
+      "name": "Jaemtri_relieved",
+      "scenePrompt": "closed eyes, smile, sigh, 1.15::hand up, hand on own chest, arm at side, head back::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457804
+    },
+    {
+      "id": "1792315457805",
+      "name": "Jaemtri_disgusted",
+      "scenePrompt": "disgust, disdain, narrowed eyes, closed mouth, 1.15::hand up, facepalm, hand on own hip, head down::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457805
+    },
+    {
+      "id": "1792315457806",
+      "name": "Jaemtri_determined",
+      "scenePrompt": "determined, serious, furrowed brow, closed mouth, 1.15::hand up, stop (gesture), hand on own hip, head down::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457806
+    },
+    {
+      "id": "1792315457807",
+      "name": "Jaemtri_jealous",
+      "scenePrompt": "envy, forced smile, narrowed eyes, sideways glance, 1.15::hands on own hips, head tilt::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457807
+    },
+    {
+      "id": "1792315457808",
+      "name": "Jaemtri_pleading",
+      "scenePrompt": "raised inner eyebrows, sad smile, looking at viewer, 1.15::hands up, palms together, head down::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457808
+    },
+    {
+      "id": "1792315457809",
+      "name": "Jaemtri_forced smiling",
+      "scenePrompt": "forced smile, closed eyes, raised inner eyebrows, 1.15::hand up, tucking hair, hand on own hip, head tilt::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457809
+    },
+    {
+      "id": "1792744536798",
+      "name": "Jaemtri_indifferent",
+      "scenePrompt": "bored, half-closed eyes, looking away, 1.15::hand up, tucking hair, arm at side, head back::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536798
+    },
+    {
+      "id": "1792744536799",
+      "name": "Jaemtri_guilty",
+      "scenePrompt": "guilt, frown, looking down, raised inner eyebrows, 1.15::hand up, hand on own cheek, arm at side, head down::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536799
+    },
+    {
+      "id": "1792744536800",
+      "name": "Jaemtri_pouting",
+      "scenePrompt": "pout, puffy cheeks, looking to the side, 1.15::hands up, hands on own cheeks, head tilt::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536800
+    },
+    {
+      "id": "1792744536801",
+      "name": "Jaemtri_angry smile",
+      "scenePrompt": "angry, smile, glaring, closed mouth, 1.15::shushing, hand up, hand on own hip, head down::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536801
+    },
+    {
+      "id": "1792744536802",
+      "name": "Jaemtri_expressionless",
+      "scenePrompt": "expressionless, closed mouth, looking at viewer, 1.15::hand up, hand on own neck, arm at side, head down::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536802
+    },
+    {
+      "id": "1792744536803",
+      "name": "Jaemtri_tormented",
+      "scenePrompt": "distress, tears, clenched teeth, furrowed brow, 1.15::hands up, hands on own face, head down::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536803
+    },
+    {
+      "id": "1792744536804",
+      "name": "Jaemtri_crazy smile",
+      "scenePrompt": "crazy smile, grin, constricted pupils, shaded face, 1.15::head back, hand up, hand to own mouth, hand on own hip::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536804
+    },
+    {
+      "id": "1792315457810",
+      "name": "Aileen_suspicious",
+      "scenePrompt": "skeptical, squinting, frown, looking to the side, 1.15::twisted torso, arm behind back, hand on own hip::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457810
+    },
+    {
+      "id": "1792315457811",
+      "name": "Aileen_worried",
+      "scenePrompt": "worried, furrowed brow, closed mouth, looking down, 1.15::hand up, hand on own forehead, arm behind back, head down::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457811
+    },
+    {
+      "id": "1792315457812",
+      "name": "Aileen_relieved",
+      "scenePrompt": "closed eyes, sigh, parted lips, 1.15::head back, hands on own hips::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457812
+    },
+    {
+      "id": "1792315457813",
+      "name": "Aileen_disgusted",
+      "scenePrompt": "disgust, grimace, narrowed eyes, looking away, 1.15::hand up, hand over own mouth, arm at side, twisted torso::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457813
+    },
+    {
+      "id": "1792315457814",
+      "name": "Aileen_determined",
+      "scenePrompt": "determined, serious, looking at viewer, 1.15::outstretched arm, pointing forward, hand on own hip::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457814
+    },
+    {
+      "id": "1792315457815",
+      "name": "Aileen_jealous",
+      "scenePrompt": "envy, annoyed, sideways glance, closed mouth, 1.15::arms behind back, twisted torso, head down::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457815
+    },
+    {
+      "id": "1792315457816",
+      "name": "Aileen_pleading",
+      "scenePrompt": "raised inner eyebrows, frown, parted lips, 1.15::outstretched arm, reaching, arm at side, head tilt::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457816
+    },
+    {
+      "id": "1792315457817",
+      "name": "Aileen_forced smiling",
+      "scenePrompt": "forced smile, half-closed eyes, raised eyebrow, 1.15::shrugging, open hands, looking to the side::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457817
+    },
+    {
+      "id": "1792744536805",
+      "name": "Aileen_indifferent",
+      "scenePrompt": "bored, half-closed eyes, unamused, 1.15::head down, arms behind back::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536805
+    },
+    {
+      "id": "1792744536806",
+      "name": "Aileen_guilty",
+      "scenePrompt": "guilt, closed eyes, furrowed brow, frown, 1.15::bowing, hand up, hand on own neck, arm at side::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536806
+    },
+    {
+      "id": "1792744536807",
+      "name": "Aileen_pouting",
+      "scenePrompt": "pout, narrowed eyes, looking away, 1.15::shrugging, hand up, open hand, arm at side, head down::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536807
+    },
+    {
+      "id": "1792744536808",
+      "name": "Aileen_angry smile",
+      "scenePrompt": "angry, light smile, glaring, furrowed brow, 1.15::hands up, fist in hand, head down::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536808
+    },
+    {
+      "id": "1792744536809",
+      "name": "Aileen_expressionless",
+      "scenePrompt": "expressionless, closed mouth, looking to the side, 1.15::hand up, hand on own ear, arm behind back::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536809
+    },
+    {
+      "id": "1792744536810",
+      "name": "Aileen_tormented",
+      "scenePrompt": "distress, wince, clenched teeth, sweat, 1.15::slouching, hand on own stomach, hand on own thigh, head down::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536810
+    },
+    {
+      "id": "1792744536811",
+      "name": "Aileen_crazy smile",
+      "scenePrompt": "crazy smile, grin, constricted pupils, tears, 1.15::head back, hands up, interlocked fingers::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536811
+    },
+    {
+      "id": "1792315457818",
+      "name": "Gorgodio_suspicious",
+      "scenePrompt": "skeptical, raised eyebrow, frown, 1.15::hand up, stroking own chin, hand on own hip::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457818
+    },
+    {
+      "id": "1792315457819",
+      "name": "Gorgodio_worried",
+      "scenePrompt": "worried, furrowed brow, parted lips, looking at viewer, 1.15::spread arms, open hands, head down::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457819
+    },
+    {
+      "id": "1792315457820",
+      "name": "Gorgodio_relieved",
+      "scenePrompt": "closed eyes, grin, sigh, 1.15::head back, hand up, hand on own neck, arm at side::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457820
+    },
+    {
+      "id": "1792315457821",
+      "name": "Gorgodio_disgusted",
+      "scenePrompt": "disgust, scowl, clenched teeth, looking away, 1.15::hands up, clenched hands, head back, leaning back::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457821
+    },
+    {
+      "id": "1792315457822",
+      "name": "Gorgodio_determined",
+      "scenePrompt": "determined, confident, grin, looking at viewer, 1.15::hands up, fist in hand, head tilt::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457822
+    },
+    {
+      "id": "1792315457823",
+      "name": "Gorgodio_jealous",
+      "scenePrompt": "envy, frown, narrowed eyes, sideways glance, 1.15::hands on own hips, twisted torso::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457823
+    },
+    {
+      "id": "1792315457824",
+      "name": "Gorgodio_pleading",
+      "scenePrompt": "raised inner eyebrows, open mouth, 1.15::bowing, hands on own thighs::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457824
+    },
+    {
+      "id": "1792315457825",
+      "name": "Gorgodio_forced smiling",
+      "scenePrompt": "forced smile, grin, raised inner eyebrows, sweat, 1.15::hand up, hand on own head, arm at side::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457825
+    },
+    {
+      "id": "1792744536812",
+      "name": "Gorgodio_indifferent",
+      "scenePrompt": "bored, half-closed eyes, closed mouth, 1.15::hand up, stroking own chin, arm behind back, head back::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536812
+    },
+    {
+      "id": "1792744536813",
+      "name": "Gorgodio_guilty",
+      "scenePrompt": "guilt, frown, closed eyes, 1.15::head down, hand up, hand on own forehead, hand on own hip::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536813
+    },
+    {
+      "id": "1792744536814",
+      "name": "Gorgodio_pouting",
+      "scenePrompt": "pout, puffy cheeks, looking away, 1.15::hands up, clenched hands, head back::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536814
+    },
+    {
+      "id": "1792744536815",
+      "name": "Gorgodio_angry smile",
+      "scenePrompt": "angry, grin, glaring, teeth, 1.15::outstretched arm, pointing at viewer, arm at side::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536815
+    },
+    {
+      "id": "1792744536816",
+      "name": "Gorgodio_expressionless",
+      "scenePrompt": "expressionless, closed mouth, looking at viewer, 1.15::hand on own hip, arm behind back, head tilt::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536816
+    },
+    {
+      "id": "1792744536817",
+      "name": "Gorgodio_tormented",
+      "scenePrompt": "distress, clenched teeth, closed eyes, sweat, 1.15::slouching, hands on own knees, head down::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536817
+    },
+    {
+      "id": "1792744536818",
+      "name": "Gorgodio_crazy smile",
+      "scenePrompt": "crazy smile, open mouth, teeth, wide-eyed, 1.15::head back, spread arms, clenched hands::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536818
+    },
+    {
+      "id": "1792315457826",
+      "name": "Kyuras_suspicious",
+      "scenePrompt": "skeptical, raised eyebrow, parted lips, 1.15::head tilt, hand up, pointing at viewer, arm at side::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457826
+    },
+    {
+      "id": "1792315457827",
+      "name": "Kyuras_worried",
+      "scenePrompt": "worried, wide-eyed, raised inner eyebrows, sweat, 1.15::hands up, open hands, leaning back::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457827
+    },
+    {
+      "id": "1792315457828",
+      "name": "Kyuras_relieved",
+      "scenePrompt": "closed eyes, grin, sigh, 1.15::hand up, two-finger salute, hand on own hip::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457828
+    },
+    {
+      "id": "1792315457829",
+      "name": "Kyuras_disgusted",
+      "scenePrompt": "disgust, grimace, looking away, 1.15::hand up, hand over own mouth, arm at side, twisted torso::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457829
+    },
+    {
+      "id": "1792315457830",
+      "name": "Kyuras_determined",
+      "scenePrompt": "determined, confident, smile, looking at viewer, 1.15::hand up, thumbs up, arm at side, head down::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457830
+    },
+    {
+      "id": "1792315457831",
+      "name": "Kyuras_jealous",
+      "scenePrompt": "envy, pout, sideways glance, 1.15::pointing at self, hand up, hand on own hip::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457831
+    },
+    {
+      "id": "1792315457832",
+      "name": "Kyuras_pleading",
+      "scenePrompt": "raised eyebrows, open mouth, 1.15::hand up, hand on own head, hand on own hip, head tilt::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457832
+    },
+    {
+      "id": "1792315457833",
+      "name": "Kyuras_forced smiling",
+      "scenePrompt": "forced smile, sweat, half-closed eyes, 1.15::hand up, hand on own neck, hand on own hip::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457833
+    },
+    {
+      "id": "1792744536819",
+      "name": "Kyuras_indifferent",
+      "scenePrompt": "bored, half-closed eyes, looking to the side, 1.15::arms behind head, head tilt::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536819
+    },
+    {
+      "id": "1792744536820",
+      "name": "Kyuras_guilty",
+      "scenePrompt": "guilt, raised inner eyebrows, wavy mouth, looking down, 1.15::head down, hand up, hand on own ear, arm at side::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536820
+    },
+    {
+      "id": "1792744536821",
+      "name": "Kyuras_pouting",
+      "scenePrompt": "pout, puffy cheeks, narrowed eyes, 1.15::hand up, pointing at self, arm at side, head tilt::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536821
+    },
+    {
+      "id": "1792744536822",
+      "name": "Kyuras_angry smile",
+      "scenePrompt": "angry, grin, furrowed brow, looking at viewer, 1.15::hand up, hand on own forehead, hand on own hip, head tilt::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536822
+    },
+    {
+      "id": "1792744536823",
+      "name": "Kyuras_expressionless",
+      "scenePrompt": "expressionless, closed mouth, looking away, 1.15::hand up, hand on own cheek, arm behind back::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536823
+    },
+    {
+      "id": "1792744536824",
+      "name": "Kyuras_tormented",
+      "scenePrompt": "distress, clenched teeth, one eye closed, sweat, 1.15::hand up, hand on own chest, arm at side, slouching::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536824
+    },
+    {
+      "id": "1792744536825",
+      "name": "Kyuras_crazy smile",
+      "scenePrompt": "crazy smile, grin, wide-eyed, constricted pupils, 1.15::head back, hand up, hand on own neck, arm at side::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536825
+    },
+    {
+      "id": "1792315457834",
+      "name": "Deadpole_suspicious",
+      "scenePrompt": "skeptical, raised eyebrow, closed mouth, looking to the side, 1.15::head tilt, hand up, hand on own chest, arm at side::, black gloves,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457834
+    },
+    {
+      "id": "1792315457835",
+      "name": "Deadpole_worried",
+      "scenePrompt": "worried, raised inner eyebrows, parted lips, looking at viewer, 1.15::outstretched arm, reaching, hand on own chest::, black gloves,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457835
+    },
+    {
+      "id": "1792315457836",
+      "name": "Deadpole_relieved",
+      "scenePrompt": "closed eyes, light smile, tears, 1.15::hands up, own hands clasped, head down::, black gloves,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457836
+    },
+    {
+      "id": "1792315457837",
+      "name": "Deadpole_disgusted",
+      "scenePrompt": "disgust, frown, one eye closed, looking away, 1.15::leaning back, hand up, hand over own mouth, arm at side::, black gloves,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457837
+    },
+    {
+      "id": "1792315457838",
+      "name": "Deadpole_determined",
+      "scenePrompt": "determined, narrowed eyes, serious, closed mouth, 1.15::hands up, palms together, head down::, black gloves,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457838
+    },
+    {
+      "id": "1792315457839",
+      "name": "Deadpole_jealous",
+      "scenePrompt": "envy, sad, sideways glance, closed mouth, 1.15::hands on own stomach, twisted torso, head down::, black gloves,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457839
+    },
+    {
+      "id": "1792315457840",
+      "name": "Deadpole_pleading",
+      "scenePrompt": "raised inner eyebrows, tears, parted lips, 1.15::outstretched arms, cupping hands, head tilt::, black gloves,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457840
+    },
+    {
+      "id": "1792315457841",
+      "name": "Deadpole_forced smiling",
+      "scenePrompt": "forced smile, raised inner eyebrows, looking down, 1.15::hands up, fidgeting, head down::, black gloves,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457841
+    },
+    {
+      "id": "1792744536826",
+      "name": "Deadpole_indifferent",
+      "scenePrompt": "bored, half-closed eyes, closed mouth, 1.15::hand up, hand on own cheek, arm at side, head tilt::, black gloves,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536826
+    },
+    {
+      "id": "1792744536827",
+      "name": "Deadpole_guilty",
+      "scenePrompt": "guilt, frown, closed eyes, furrowed brow, 1.15::bowing, hands on own thighs::, black gloves,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536827
+    },
+    {
+      "id": "1792744536828",
+      "name": "Deadpole_pouting",
+      "scenePrompt": "pout, puffy cheeks, looking to the side, 1.15::hands up, index fingers together, head down::, black gloves,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536828
+    },
+    {
+      "id": "1792744536829",
+      "name": "Deadpole_angry smile",
+      "scenePrompt": "angry, smile, narrowed eyes, furrowed brow, 1.15::hand up, stop (gesture), arm at side, head down::, black gloves,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536829
+    },
+    {
+      "id": "1792744536830",
+      "name": "Deadpole_expressionless",
+      "scenePrompt": "expressionless, closed mouth, looking at viewer, 1.15::hand on own hip, arm behind back::, black gloves,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536830
+    },
+    {
+      "id": "1792744536831",
+      "name": "Deadpole_tormented",
+      "scenePrompt": "distress, tears, clenched teeth, trembling, 1.15::hand on own stomach, arm behind back, slouching, head down::, black gloves,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536831
+    },
+    {
+      "id": "1792744536832",
+      "name": "Deadpole_crazy smile",
+      "scenePrompt": "crazy smile, wide-eyed, tears, grin, 1.15::hand up, hand on own face, arm at side, head back::, black gloves,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536832
+    },
+    {
+      "id": "1792315457842",
+      "name": "Geshugan_suspicious",
+      "scenePrompt": "skeptical, narrowed eyes, unamused, looking to the side, 1.15::hand on own hip, arm behind back, twisted torso, head down::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457842
+    },
+    {
+      "id": "1792315457843",
+      "name": "Geshugan_worried",
+      "scenePrompt": "worried, furrowed brow, closed mouth, looking away, 1.15::hand up, hand on own neck, hand on own hip::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457843
+    },
+    {
+      "id": "1792315457844",
+      "name": "Geshugan_relieved",
+      "scenePrompt": "closed eyes, light smile, sigh, 1.15::arm behind head, hand on own hip, head tilt::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457844
+    },
+    {
+      "id": "1792315457845",
+      "name": "Geshugan_disgusted",
+      "scenePrompt": "disgust, scowl, looking at viewer, 1.15::outstretched arm, open hand, stop (gesture), arm at side::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457845
+    },
+    {
+      "id": "1792315457846",
+      "name": "Geshugan_determined",
+      "scenePrompt": "determined, serious, glaring, closed mouth, 1.15::outstretched arm, clenched hand, arm behind back::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457846
+    },
+    {
+      "id": "1792315457847",
+      "name": "Geshugan_jealous",
+      "scenePrompt": "envy, pout, narrowed eyes, sideways glance, 1.15::hand on own hip, hand up, hand on own cheek::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457847
+    },
+    {
+      "id": "1792315457848",
+      "name": "Geshugan_pleading",
+      "scenePrompt": "raised inner eyebrows, parted lips, 1.15::hand up, hand on own neck, arm at side, head down::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457848
+    },
+    {
+      "id": "1792315457849",
+      "name": "Geshugan_forced smiling",
+      "scenePrompt": "forced smile, half-closed eyes, sweat, 1.15::shrugging, hand up, open hand, hand on own hip::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457849
+    },
+    {
+      "id": "1792744536833",
+      "name": "Geshugan_indifferent",
+      "scenePrompt": "bored, half-closed eyes, looking away, closed mouth, 1.15::slouching, arms behind back, head tilt::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536833
+    },
+    {
+      "id": "1792744536834",
+      "name": "Geshugan_guilty",
+      "scenePrompt": "guilt, frown, looking down, 1.15::hand up, hand on own head, arm at side, head down::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536834
+    },
+    {
+      "id": "1792744536835",
+      "name": "Geshugan_pouting",
+      "scenePrompt": "pout, puffy cheeks, looking away, 1.15::arm behind head, hand on own hip, twisted torso::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536835
+    },
+    {
+      "id": "1792744536836",
+      "name": "Geshugan_angry smile",
+      "scenePrompt": "angry, smirk, glaring, furrowed brow, 1.15::hands up, fist in hand, head tilt::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536836
+    },
+    {
+      "id": "1792744536837",
+      "name": "Geshugan_expressionless",
+      "scenePrompt": "expressionless, closed mouth, looking at viewer, 1.15::hand up, beckoning, hand on own hip::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536837
+    },
+    {
+      "id": "1792744536838",
+      "name": "Geshugan_tormented",
+      "scenePrompt": "distress, wince, clenched teeth, sweat, 1.15::hand up, hand on own forehead, hand on own thigh, slouching::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536838
+    },
+    {
+      "id": "1792744536839",
+      "name": "Geshugan_crazy smile",
+      "scenePrompt": "crazy smile, grin, constricted pupils, 1.15::twisted torso, outstretched arm, clenched hand, head back, arm at side::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536839
+    },
+    {
+      "id": "1792315457850",
+      "name": "Rojemon_suspicious",
+      "scenePrompt": "skeptical, raised eyebrow, narrowed eyes, pout, 1.15::head tilt, hand on own hip, hand up, index finger raised::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457850
+    },
+    {
+      "id": "1792315457851",
+      "name": "Rojemon_worried",
+      "scenePrompt": "worried, raised inner eyebrows, parted lips, looking to the side, 1.15::hands up, own hands clasped, head down::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457851
+    },
+    {
+      "id": "1792315457852",
+      "name": "Rojemon_relieved",
+      "scenePrompt": "closed eyes, light smile, blush, 1.15::hand up, wiping tears, hand on own hip, head down::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457852
+    },
+    {
+      "id": "1792315457853",
+      "name": "Rojemon_disgusted",
+      "scenePrompt": "disgust, scowl, looking away, 1.15::leaning back, hands up, open hands::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457853
+    },
+    {
+      "id": "1792315457854",
+      "name": "Rojemon_determined",
+      "scenePrompt": "determined, glaring, serious, closed mouth, 1.15::outstretched arm, pointing at viewer, arm at side, head down::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457854
+    },
+    {
+      "id": "1792315457855",
+      "name": "Rojemon_jealous",
+      "scenePrompt": "envy, blush, pout, sideways glance, 1.15::twisted torso, hand up, hand over own mouth, hand on own hip::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457855
+    },
+    {
+      "id": "1792315457856",
+      "name": "Rojemon_pleading",
+      "scenePrompt": "raised inner eyebrows, tears, parted lips, 1.15::outstretched arm, reaching, arm behind back, head tilt::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457856
+    },
+    {
+      "id": "1792315457857",
+      "name": "Rojemon_forced smiling",
+      "scenePrompt": "forced smile, clenched teeth, raised eyebrows, 1.15::hands up, clenched hands, head tilt::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457857
+    },
+    {
+      "id": "1792744536840",
+      "name": "Rojemon_indifferent",
+      "scenePrompt": "bored, half-closed eyes, unamused, 1.15::arm behind head, hand on own hip, head tilt::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536840
+    },
+    {
+      "id": "1792744536841",
+      "name": "Rojemon_guilty",
+      "scenePrompt": "guilt, blush, frown, looking down, 1.15::arms behind back, head down, slouching::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536841
+    },
+    {
+      "id": "1792744536842",
+      "name": "Rojemon_pouting",
+      "scenePrompt": "pout, puffy cheeks, glaring, 1.15::hands on own hips, head back::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536842
+    },
+    {
+      "id": "1792744536843",
+      "name": "Rojemon_angry smile",
+      "scenePrompt": "angry, smile, furrowed brow, blush, 1.15::hand up, clenched hand, arm at side, head tilt::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536843
+    },
+    {
+      "id": "1792744536844",
+      "name": "Rojemon_expressionless",
+      "scenePrompt": "expressionless, closed mouth, looking to the side, 1.15::hand up, hand on own chin, arm behind back::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536844
+    },
+    {
+      "id": "1792744536845",
+      "name": "Rojemon_tormented",
+      "scenePrompt": "distress, tears, wavy mouth, trembling, 1.15::hands up, hands on own cheeks, head down::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536845
+    },
+    {
+      "id": "1792744536846",
+      "name": "Rojemon_crazy smile",
+      "scenePrompt": "crazy smile, constricted pupils, grin, shaded face, 1.15::head tilt, hand up, hand on own cheek, arm behind back::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536846
+    },
+    {
+      "id": "1792315457858",
+      "name": "Konjyuce_suspicious",
+      "scenePrompt": "skeptical, raised eyebrow, half-closed eyes, closed mouth, 1.15::pointing at viewer, hand up, hand on own hip, head tilt::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457858
+    },
+    {
+      "id": "1792315457859",
+      "name": "Konjyuce_worried",
+      "scenePrompt": "worried, wide-eyed, raised inner eyebrows, parted lips, 1.15::hand up, hand over own mouth, arm at side, head down::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457859
+    },
+    {
+      "id": "1792315457860",
+      "name": "Konjyuce_relieved",
+      "scenePrompt": "closed eyes, smile, tears, 1.15::hands up, open hands, head back::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457860
+    },
+    {
+      "id": "1792315457861",
+      "name": "Konjyuce_disgusted",
+      "scenePrompt": "disgust, grimace, tongue out, looking away, 1.15::hands up, x arms, leaning back::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457861
+    },
+    {
+      "id": "1792315457862",
+      "name": "Konjyuce_determined",
+      "scenePrompt": "determined, confident, grin, 1.15::pointing at self, hand up, hand on own hip::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457862
+    },
+    {
+      "id": "1792315457863",
+      "name": "Konjyuce_jealous",
+      "scenePrompt": "envy, pout, puffy cheeks, sideways glance, 1.15::hand up, hand on own cheek, arm behind back::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457863
+    },
+    {
+      "id": "1792315457864",
+      "name": "Konjyuce_pleading",
+      "scenePrompt": "raised eyebrows, open mouth, 1.15::hands up, palms together, head tilt::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457864
+    },
+    {
+      "id": "1792315457865",
+      "name": "Konjyuce_forced smiling",
+      "scenePrompt": "forced smile, sweat, raised inner eyebrows, 1.15::hand up, hand on own head, arm at side::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457865
+    },
+    {
+      "id": "1792744536847",
+      "name": "Konjyuce_indifferent",
+      "scenePrompt": "bored, half-closed eyes, unamused, 1.15::arms behind head, looking to the side::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536847
+    },
+    {
+      "id": "1792744536848",
+      "name": "Konjyuce_guilty",
+      "scenePrompt": "guilt, frown, blush, looking down, 1.15::hands up, index fingers together, head down::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536848
+    },
+    {
+      "id": "1792744536849",
+      "name": "Konjyuce_pouting",
+      "scenePrompt": "pout, puffy cheeks, furrowed brow, 1.15::hands up, clenched hands, leaning forward::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536849
+    },
+    {
+      "id": "1792744536850",
+      "name": "Konjyuce_angry smile",
+      "scenePrompt": "angry, grin, glaring, 1.15::outstretched arm, pointing forward, arm at side::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536850
+    },
+    {
+      "id": "1792744536851",
+      "name": "Konjyuce_expressionless",
+      "scenePrompt": "expressionless, closed mouth, looking at viewer, 1.15::hand up, index finger raised, arm behind back::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536851
+    },
+    {
+      "id": "1792744536852",
+      "name": "Konjyuce_tormented",
+      "scenePrompt": "distress, sobbing, tears, clenched teeth, 1.15::hands up, hands on own face, slouching::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536852
+    },
+    {
+      "id": "1792744536853",
+      "name": "Konjyuce_crazy smile",
+      "scenePrompt": "crazy smile, grin, wide-eyed, tears, 1.15::head back, hands up, clenched hands::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536853
+    },
+    {
+      "id": "1792315457866",
+      "name": "Gognija_suspicious",
+      "scenePrompt": "skeptical, grin, raised eyebrow, 1.15::hands up, steepled fingers, head tilt::, goggles,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457866
+    },
+    {
+      "id": "1792315457867",
+      "name": "Gognija_worried",
+      "scenePrompt": "worried, frown, sweat, parted lips, 1.15::hands on own head, head down::, goggles,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457867
+    },
+    {
+      "id": "1792315457868",
+      "name": "Gognija_relieved",
+      "scenePrompt": "closed eyes, open mouth, smile, 1.15::spread arms, open hands, head back::, goggles,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457868
+    },
+    {
+      "id": "1792315457869",
+      "name": "Gognija_disgusted",
+      "scenePrompt": "disgust, grimace, looking away, 1.15::hands on own head, head back::, goggles,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457869
+    },
+    {
+      "id": "1792315457870",
+      "name": "Gognija_determined",
+      "scenePrompt": "determined, grin, looking at viewer, 1.15::hands up, fist in hand, head down::, goggles,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457870
+    },
+    {
+      "id": "1792315457871",
+      "name": "Gognija_jealous",
+      "scenePrompt": "envy, pout, glaring, 1.15::outstretched arm, pointing at viewer, hand on own hip::, goggles,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457871
+    },
+    {
+      "id": "1792315457872",
+      "name": "Gognija_pleading",
+      "scenePrompt": "raised eyebrows, open mouth, 1.15::outstretched arms, cupping hands, head tilt::, goggles,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457872
+    },
+    {
+      "id": "1792315457873",
+      "name": "Gognija_forced smiling",
+      "scenePrompt": "forced smile, sweat, closed mouth, 1.15::hand up, adjusting eyewear, arm at side::, goggles,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457873
+    },
+    {
+      "id": "1792744536854",
+      "name": "Gognija_indifferent",
+      "scenePrompt": "bored, half-closed eyes, parted lips, 1.15::hand up, adjusting eyewear, arm at side, slouching::, goggles,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536854
+    },
+    {
+      "id": "1792744536855",
+      "name": "Gognija_guilty",
+      "scenePrompt": "guilt, frown, raised inner eyebrows, 1.15::hand up, scratching head, arm behind back, head down::, goggles,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536855
+    },
+    {
+      "id": "1792744536856",
+      "name": "Gognija_pouting",
+      "scenePrompt": "pout, puffy cheeks, looking away, 1.15::hands up, finger counting, head tilt::, goggles,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536856
+    },
+    {
+      "id": "1792744536857",
+      "name": "Gognija_angry smile",
+      "scenePrompt": "angry, grin, furrowed brow, 1.15::hand up, pointing at viewer, hand on own hip, head down::, goggles,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536857
+    },
+    {
+      "id": "1792744536858",
+      "name": "Gognija_expressionless",
+      "scenePrompt": "expressionless, closed mouth, looking at viewer, 1.15::hand up, index finger raised, hand on own hip::, goggles,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536858
+    },
+    {
+      "id": "1792744536859",
+      "name": "Gognija_tormented",
+      "scenePrompt": "distress, despair, open mouth, sweat, 1.15::slouching, hand up, hand on own forehead, hand on own knee::, goggles,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536859
+    },
+    {
+      "id": "1792744536860",
+      "name": "Gognija_crazy smile",
+      "scenePrompt": "crazy smile, open mouth, teeth, wide-eyed, 1.15::hands up, claw pose, head back::, goggles,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536860
+    },
+    {
+      "id": "1792315457874",
+      "name": "Dejure_suspicious",
+      "scenePrompt": "skeptical, raised inner eyebrows, narrowed eyes, closed mouth, 1.15::head tilt, hands up, index fingers together::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457874
+    },
+    {
+      "id": "1792315457875",
+      "name": "Dejure_worried",
+      "scenePrompt": "worried, wide-eyed, sweat, wavy mouth, 1.15::hands up, hands on own cheeks, head down::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457875
+    },
+    {
+      "id": "1792315457876",
+      "name": "Dejure_relieved",
+      "scenePrompt": "closed eyes, smile, tears, 1.15::hands up, hands on own chest, head back::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457876
+    },
+    {
+      "id": "1792315457877",
+      "name": "Dejure_disgusted",
+      "scenePrompt": "disgust, grimace, looking away, 1.15::twisted torso, hand up, hand over own mouth, arm behind back::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457877
+    },
+    {
+      "id": "1792315457878",
+      "name": "Dejure_determined",
+      "scenePrompt": "determined, serious, narrowed eyes, closed mouth, 1.15::hands up, open hands, head down::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457878
+    },
+    {
+      "id": "1792315457879",
+      "name": "Dejure_jealous",
+      "scenePrompt": "envy, pout, sideways glance, blush, 1.15::hand up, twirling hair, arm at side, head tilt::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457879
+    },
+    {
+      "id": "1792315457880",
+      "name": "Dejure_pleading",
+      "scenePrompt": "tears, raised inner eyebrows, open mouth, 1.15::hands up, own hands clasped, bowing::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457880
+    },
+    {
+      "id": "1792315457881",
+      "name": "Dejure_forced smiling",
+      "scenePrompt": "forced smile, raised eyebrows, sweat, 1.15::hand up, hand on own cheek, arm behind back::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792315457881
+    },
+    {
+      "id": "1792744536861",
+      "name": "Dejure_indifferent",
+      "scenePrompt": "bored, half-closed eyes, closed mouth, 1.15::slouching, hand on own stomach, arm at side::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536861
+    },
+    {
+      "id": "1792744536862",
+      "name": "Dejure_guilty",
+      "scenePrompt": "guilt, closed eyes, frown, sweat, 1.15::bowing, hands on own thighs::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536862
+    },
+    {
+      "id": "1792744536863",
+      "name": "Dejure_pouting",
+      "scenePrompt": "pout, puffy cheeks, looking to the side, 1.15::hands up, clenched hands, head tilt::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536863
+    },
+    {
+      "id": "1792744536864",
+      "name": "Dejure_angry smile",
+      "scenePrompt": "angry, forced smile, furrowed brow, 1.15::hands up, own hands clasped, head down::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536864
+    },
+    {
+      "id": "1792744536865",
+      "name": "Dejure_expressionless",
+      "scenePrompt": "expressionless, closed mouth, looking down, 1.15::hand up, hand on own ear, arm at side, head tilt::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536865
+    },
+    {
+      "id": "1792744536866",
+      "name": "Dejure_tormented",
+      "scenePrompt": "distress, sobbing, trembling, tears, 1.15::cowering, hands on own head, head down::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536866
+    },
+    {
+      "id": "1792744536867",
+      "name": "Dejure_crazy smile",
+      "scenePrompt": "crazy smile, grin, wide-eyed, tears, 1.15::hands up, fidgeting, head back::,",
+      "queueCount": 0,
+      "images": [],
+      "createdAt": 1792744536867
+    }
+  ],
+  "createdAt": 1792745052654
+}
