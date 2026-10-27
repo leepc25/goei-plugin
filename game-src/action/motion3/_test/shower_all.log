@@ -17,3 +17,41 @@ alledProcessError: Command '['curl', '-sSf', '--retry', '3', 'https://backblaze.
 2.1_사장 [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
 2.2_도필헌 ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
 2.2_도필헌 [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+2.3_이길환 ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+2.3_이길환 [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+2.4_이기석 ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+2.4_이기석 [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+2.5_김조학 ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+2.5_김조학 [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+2.6_이도형 ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+2.6_이도형 [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+2.7_고영훈 ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+2.7_고영훈 [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+2.8_노기균 ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+2.8_노기균 [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+2.9_송주익 ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+2.9_송주익 [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+2.10_곽성주 ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+2.10_곽성주 [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+2.11_조성춘 ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+2.11_조성춘 [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+2.12_윤병수 ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+2.12_윤병수 [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+2.13_김성진 ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+2.13_김성진 [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+2.14_송진섭 ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+2.14_송진섭 [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+3.1_청달래 ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+3.1_청달래 [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+3.3_백석주 ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+3.3_백석주 [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+3.4_진나솔 ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+3.4_진나솔 [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+3.5_이성해 ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+3.5_이성해 [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+3.6_이자헌 ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+3.6_이자헌 [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+3.7_은하제 ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+3.7_은하제 [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
+3.8_박민성 ('A', '완료 16장 {"type": "generations", "generations": 1.0}')
+3.8_박민성 [('B', '완료 8장 {"type": "generations", "generations": 1.0}'), ('D', '완료 8장 {"type": "generations", "generations": 1.0}'), ('E', '완료 8장 {"type": "generations", "generations": 1.0}')]
