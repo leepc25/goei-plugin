@@ -173,9 +173,9 @@
 .gw .ps-row, .gw .gw-basic .dir-line, .gw .gw-basic .dir-in, .gw .gw-basic .dir-rename, .gw .st-col-row { display: grid; grid-template-columns: var(--row-label) minmax(0, 1fr); grid-template-areas: 'label ctl' 'label hint'; column-gap: 16px; row-gap: 4px; align-items: center; margin: 0; padding: 9px var(--pad); border-top: 1px solid var(--panel2); border-radius: 0; background: transparent; }
 .gw .ps-rows > :first-child, .gw .gw-basic .dir-panel > :first-child, .gw .gw-fields > :first-child, .gw .st-cols > :first-child { border-top: 0; }
 .gw .ps-row .ps-label { display: contents; }
-.gw .ps-row .ps-label b, .gw .gw-basic .dir-line > span, .gw .gw-basic .dir-in > span, .gw .gw-basic .dir-rename > .dir-in > span, .gw .st-col-name { grid-area: label; display: block; min-width: 0; font-size: 14px; font-weight: 600; color: var(--text); line-height: 1.35; }
+.gw .ps-row .ps-label b, .gw .gw-basic .dir-line > span:first-child, .gw .gw-basic .dir-in > span:first-child, .gw .gw-basic .dir-rename > .dir-in > span:first-child, .gw .st-col-name { grid-area: label; display: block; min-width: 0; font-size: 14px; font-weight: 600; color: var(--text); line-height: 1.35; }
 .gw .ps-row .ps-label small, .gw .gw-basic .dir-line > small, .gw .gw-basic .dir-in > small, .gw .st-col-name small { grid-area: hint; display: block; font-size: 12.5px; font-weight: 400; color: var(--dim); line-height: 1.45; }
-.gw .ps-row .ps-ctl, .gw .gw-basic .dir-line > :not(span):not(small), .gw .gw-basic .dir-in > :not(span):not(small):not(textarea) { grid-area: ctl; display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-start; justify-self: start; gap: 8px; max-width: 100%; }
+.gw .ps-row .ps-ctl, .gw .gw-basic .dir-line > :not(span:first-child):not(small), .gw .gw-basic .dir-in > :not(span:first-child):not(small):not(textarea) { grid-area: ctl; display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-start; justify-self: start; gap: 8px; max-width: 100%; }
 .gw .ps-row .ps-ctl .gx-segs { margin: 0; }
 .gw .ps-row > textarea, .gw .ps-row > .nw-reqbox, .gw .gw-basic .dir-in > textarea { grid-column: 1 / -1; width: 100%; }
 .gw .ps-row:has(> textarea), .gw .ps-row:has(> .nw-reqbox), .gw .gw-basic .dir-in:has(> textarea) { grid-template-areas: 'label label' 'hint hint'; }
@@ -271,13 +271,13 @@
 /* 카드 → 평면 */
 .gw .ps-rows, .gw .gw-basic .dir-panel, .gw .gw-fields, .gw .gw-guide-secs { border: 0; border-radius: 0; background: transparent; overflow: visible; }
 /* 줄: 이름·설명 왼쪽, 조작 오른쪽, 가는 선 */
-.gw .ps-row, .gw .gw-basic .dir-line, .gw .gw-basic .dir-in, .gw .gw-basic .dir-rename, .gw .st-col-row { display: flex; flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 18px; padding: 13px 0; border-top: 1px solid var(--panel2); }
+.gw .ps-row, .gw .gw-basic .dir-line, .gw .gw-basic .dir-in, .gw .gw-basic .dir-rename, .gw .st-col-row { display: flex; flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 18px; margin: 0; padding: 13px 0; border: 0; border-top: 1px solid var(--panel2); border-radius: 0; background: transparent; box-shadow: none; }
 .gw .ps-rows > :first-child, .gw .gw-basic .dir-panel > :first-child, .gw .gw-fields > :first-child, .gw .st-cols > :first-child, .gw .gw-guide-secs > :first-child { border-top: 0; }
 .gw .ps-row .ps-label { display: flex; flex-direction: column; gap: 3px; flex: 1 1 260px; min-width: 0; max-width: 62%; }
-.gw .ps-row .ps-label b, .gw .gw-basic .dir-line > span, .gw .gw-basic .dir-in > span, .gw .gw-basic .dir-rename > .dir-in > span, .gw .st-col-name b { font-size: 13px; font-weight: 500; }
+.gw .ps-row .ps-label b, .gw .gw-basic .dir-line > span:first-child, .gw .gw-basic .dir-in > span:first-child, .gw .gw-basic .dir-rename > .dir-in > span:first-child, .gw .st-col-name b { font-size: 13px; font-weight: 500; }
 .gw .ps-row .ps-label small, .gw .gw-basic .dir-line > small, .gw .gw-basic .dir-in > small, .gw .st-col-name small { font-size: 11.5px; line-height: 1.45; }
-.gw .ps-row .ps-ctl, .gw .gw-basic .dir-line > :not(span):not(small), .gw .gw-basic .dir-in > :not(span):not(small):not(textarea) { flex: 0 1 auto; justify-content: flex-end; max-width: 100%; }
-.gw .gw-basic .dir-line > span, .gw .gw-basic .dir-in > span { flex: 1 1 200px; }
+.gw .ps-row .ps-ctl, .gw .gw-basic .dir-line > :not(span:first-child):not(small), .gw .gw-basic .dir-in > :not(span:first-child):not(small):not(textarea) { flex: 0 1 auto; display: flex; align-items: center; justify-content: flex-end; max-width: 100%; font-weight: 400; }
+.gw .gw-basic .dir-line > span:first-child, .gw .gw-basic .dir-in > span:first-child { flex: 1 1 200px; }
 .gw .gw-basic .dir-line > small, .gw .gw-basic .dir-in > small { flex-basis: 100%; order: 3; margin-top: -4px; }
 .gw .ps-row > textarea, .gw .ps-row > .nw-reqbox, .gw .gw-basic .dir-in > textarea { flex-basis: 100%; }
 .gw .gw-basic .dir-in > input, .gw .gw-basic .dir-in > select { width: min(100%, 340px); }
@@ -348,7 +348,7 @@
 .gw .ps-group h3, .gw .gw-sec > h3, .gw .gw-sec > summary, .gw .ps-adv-sum b, .gw .gw-tree-group h4 { font-size: 12.5px; }
 .gw .ps-group h3 small, .gw .gw-sec > h3 small { font-size: 12.5px; }
 .gw .ps-note { font-size: 13px; }
-.gw .ps-row .ps-label b, .gw .gw-basic .dir-line > span, .gw .gw-basic .dir-in > span, .gw .gw-basic .dir-rename > .dir-in > span, .gw .st-col-name b, .gw .gw-field-head b { font-size: 14px; font-weight: 600; }
+.gw .ps-row .ps-label b, .gw .gw-basic .dir-line > span:first-child, .gw .gw-basic .dir-in > span:first-child, .gw .gw-basic .dir-rename > .dir-in > span:first-child, .gw .st-col-name b, .gw .gw-field-head b { font-size: 14px; font-weight: 600; }
 .gw .ps-row .ps-label small, .gw .gw-basic .dir-line > small, .gw .gw-basic .dir-in > small, .gw .st-col-name small { font-size: 13px; line-height: 1.5; }
 .gw .gw-basic .dir-panel > p.gx-muted, .gw .gw-basic .dir-fac > p.gx-muted, .gw .gw-basic .dir-panel > p.gx-hint, .gw .ps-rows > .ps-note { font-size: 13px; }
 .gw .gw-basic .dir-grid > .dir-in > span { font-size: 12.5px; }
@@ -381,3 +381,6 @@
 .gw .gw-state.off { color: var(--dim); background: var(--panel); border-color: var(--line); }
 .gw .gw-state.bad { color: var(--danger); background: color-mix(in srgb, var(--danger) 12%, transparent); border-color: color-mix(in srgb, var(--danger) 45%, transparent); }
 .gw .ps-ctl .gw-state { margin-left: 0; }
+.gw .gw-basic .dir-in > .dir-photo { width: 100%; justify-content: space-between; }
+.gw .gw-basic .dir-photo .dir-photo-name { flex: 1 1 auto; }
+.gw .gw-basic .dir-photo .gx-mini { margin-left: auto; }
