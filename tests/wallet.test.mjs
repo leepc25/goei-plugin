@@ -72,3 +72,12 @@ test('필드 거래: 출처 field, 같은 물건 두 번도 따로, 기준 메�
   assert.equal(w.log[3].memo, '필드 거래');
   assert.equal(walletBalance(w, aliveAnchors(chat())), 140000 - 2400 + 3000);
 });
+
+test('필드 거래: 장면 이름·필드 시각을 같이 적는다 (길면 자름)', async () => {
+  const { withFieldTrade } = await import('../dist-test/core.mjs');
+  const w = withFieldTrade({ start: 0, log: [] }, 'c1', -1200, '삼각김밥', 'f_1', { place: '  종로 큰길  ', time: '09:40' });
+  assert.equal(w.log[0].place, '종로 큰길');
+  assert.equal(w.log[0].time, '09:40');
+  const bare = withFieldTrade({ start: 0, log: [] }, 'c1', -1200, '삼각김밥', 'f_2');
+  assert.equal('place' in bare.log[0], false);
+});

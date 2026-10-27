@@ -55,8 +55,8 @@ import { handleImgPrompt, imgInput } from './imgprompt';
 import { cropValue, setCrop, directoryExtList, directoryInput, directoryPhotoList, directoryList, dirUi, handleDirectory, resetDirectory } from './directory';
 import { basicDefaults, basicVars, DIM_DEFAULT, getPrefs, worldDefaults, worldSettings, worldVarsOf, type Mark } from '../core/settings';
 import { colConfig } from '../core/world/statuscols';
-import { addWalletEntry, adjustWallet, aliveAnchors, formatWon, parseWon, readWallet, removeWalletEntry, walletBalance, walletVars, WALLET_START_DEFAULT } from '../core/wallet';
-import { walletHeadButton, walletOn, walletTab, walletUi as walletTabUi } from './wallet';
+import { adjustWallet, aliveAnchors, formatWon, parseWon, readWallet, removeWalletEntry, walletBalance, walletVars, WALLET_START_DEFAULT } from '../core/wallet';
+import { walletHeadButton, walletList, walletOn, walletTab, walletUi as walletTabUi } from './wallet';
 
 /** ID카드 잔고 칩 → 장부 창 (열림·입력 알림) */
 
@@ -378,6 +378,13 @@ function panelInput(el: HTMLInputElement): void {
   if (el?.dataset?.input === 'pct' || el?.dataset?.input === 'count') {
     const out = el.parentElement?.querySelector('output');
     if (out) out.textContent = `${el.value}${el.dataset.input === 'pct' ? '%' : '개'}`;
+    return;
+  }
+  if (el?.dataset?.input === 'wallet-q' && view.kind === 'started') {
+    // 가계부 찾기: 목록만 다시 그린다 (입력칸 포커스 유지)
+    walletTabUi.q = el.value;
+    const box = root?.querySelector('.gx-wt-list');
+    if (box) box.innerHTML = walletList(view.ctx);
     return;
   }
   if (el?.dataset?.input === 'wiki-query' && view.kind === 'started') {
@@ -826,25 +833,13 @@ async function handle(action: string, value?: string): Promise<void> {
     case 'wallet-open':
       walletTabUi.open = walletTabUi.open === value ? null : value ?? null;
       return render();
-    case 'wallet-add': {
-      // 금액·메모 두 칸 (data-take 두 이름: JSON 배열)
-      if (view.kind !== 'started') return;
-      let parts: string[] = [];
-      try { parts = JSON.parse(value ?? '[]'); } catch { /* 빈 값 */ }
-      const n = parseWon(String(parts[0] ?? ''));
-      if (n === null || n === 0) {
-        walletTabUi.notice = '금액을 읽을 수 없어요. 「-12000」「+3만」처럼 적어 주세요 (나간 돈은 −).';
-        return render();
-      }
-      const memo = String(parts[1] ?? '').trim() || (n < 0 ? '지출' : '수입');
-      const ctx = view.ctx;
-      await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
-        const w = readWallet(chat.scriptstate, getPrefs().walletStart ?? WALLET_START_DEFAULT);
-        return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...walletVars(addWalletEntry(w, { anchor: '', amount: n, memo, src: 'manual', id: `a_${Date.now().toString(36)}_${w.log.length}` })) } };
-      });
+    case 'wallet-edit':
+      // 잔고 칸 ✎: 그 자리에 잔고 고치기 칸
+      walletTabUi.edit = !walletTabUi.edit;
       walletTabUi.notice = '';
-      return refresh();
-    }
+      render();
+      if (walletTabUi.edit) root?.querySelector<HTMLInputElement>('[name="wt-adj"]')?.focus();
+      return;
     case 'wallet-del': {
       if (view.kind !== 'started' || !value) return;
       const ctx = view.ctx;
@@ -867,6 +862,7 @@ async function handle(action: string, value?: string): Promise<void> {
         return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...walletVars(adjustWallet(w, aliveAnchors(chat), n)) } };
       });
       walletTabUi.notice = '';
+      walletTabUi.edit = false;
       return refresh();
     }
     case 'agents-view':

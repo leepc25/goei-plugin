@@ -111,14 +111,20 @@ async function open(page) {
 const wallet = { start: 140000, log: [
   { id: 'w1', anchor: 'c1', amount: -15000, memo: '택시비', src: 'story', quote: '택시비 15,000원을 카드로 냈다', at: '2026-10-27T01:00:00Z' },
   { id: 'w2', anchor: 'c1', amount: 30000, memo: '상품권', src: 'story', quote: '3만 원짜리 상품권을 받았다', at: '2026-10-27T01:00:00Z' },
-  { id: 'w3', anchor: 'c1', amount: -1200, memo: '삼각김밥', src: 'field', at: '2026-10-27T01:10:00Z' },
+  { id: 'w3', anchor: 'c2', amount: -1200, memo: '삼각김밥', src: 'field', place: '종로 큰길', time: '09:40', at: '2026-10-27T01:10:00Z' },
   { id: 'w4', anchor: 'gone', amount: -99999, memo: '지운 메시지', src: 'story', at: '2026-10-27T01:20:00Z' },
 ] };
 const chat = () => ({
-  message: [{ role: 'user', data: 'hi', chatId: 'u1' }, { role: 'char', data: '본문\n[▣|2025.01.01|02:47 AM|☀️|4°C|관리국 본부|출근|-|-|관리국/요원|₩ 153,800]', chatId: 'c1' }],
+  message: [
+    { role: 'user', data: 'hi', chatId: 'u1' },
+    { role: 'char', data: '본문\n[▣|2025.01.01|02:47 AM|☀️|4°C|관리국 본부|출근|-|-|관리국/요원|₩ 155,000]', chatId: 'c1' },
+    { role: 'user', data: '다음 날', chatId: 'u2' },
+    { role: 'char', data: '본문\n[▣|2025.01.02|09:40 AM|☀️|4°C|종로 큰길|출근|-|-|관리국/요원|₩ 153,800]', chatId: 'c2' },
+  ],
   scriptstate: { $st_faction: 'A00', $st_lang: 'ko', $st_fm: '2', $st_wallet: JSON.stringify(wallet) },
 });
 const walletOf = (page) => page.evaluate(() => JSON.parse(window.__chat.scriptstate.$st_wallet));
+const rows = (page) => page.locator('.gx-wt-row').count();
 
 // PC: 왼쪽 메뉴 「가계부」
 {
@@ -127,35 +133,42 @@ const walletOf = (page) => page.evaluate(() => JSON.parse(window.__chat.scriptst
   await page.waitForSelector('.gx-nav');
   await page.click('.gx-nav > .gx-nb[data-value="wallet"]');
   await page.waitForSelector('.gx-wallettab');
-  const bal = await page.textContent('.gx-wt-bal b');
-  assert.match(bal, /153,800/, '잔고 = 시작 + 살아 있는 거래 (지운 메시지 거래 빠짐)');
-  assert.match(await page.textContent('.gx-wt-nums .in'), /30,000/);
-  assert.match(await page.textContent('.gx-wt-nums .out'), /16,200/);
-  assert.equal(await page.locator('.gx-wt-list .gx-wt-main').count(), 3);
-  assert.match(await page.textContent('.gx-wt-list li:first-child'), /삼각김밥[\s\S]*필드 · #2/);
-  // 줄을 누르면 근거
-  await page.click('.gx-wt-main:has-text("택시비")');
-  assert.match(await page.textContent('.gx-wt-quote'), /15,000원을 카드로/);
-  // 거르기
+  assert.match(await page.textContent('.gx-wt-balrow b'), /153,800/, '잔고 = 시작 + 살아 있는 거래 (지운 메시지 거래 빠짐)');
+  assert.match(await page.textContent('.gx-wt-tile.bal'), /시작 ₩ 140,000 · 거래 3건/);
+  const tiles = await page.locator('.gx-wt-tile').allTextContents();
+  assert.match(tiles[1], /수입\s*\+30,000\s*1건/);
+  assert.match(tiles[2], /지출\s*−16,200\s*2건/);
+  assert.match(tiles[3], /오늘 · 01\.02\s*−1,200\s*1건/);
+  // 날짜 묶음 (최신 위) · 그 거래 뒤 잔고 · 필드 장면·시각 · 본문 근거
+  assert.deepEqual(await page.locator('.gx-wt-day h3 span').allTextContents(), ['2025.01.02 (목)', '2025.01.01 (수)']);
+  assert.equal(await rows(page), 3);
+  const first = await page.textContent('.gx-wt-row >> nth=0');
+  assert.match(first, /삼각김밥[\s\S]*종로 큰길 09:40[\s\S]*−1,200[\s\S]*153,800/);
+  assert.match(await page.textContent('.gx-wt-row:has-text("택시비")'), /「택시비 15,000원을 카드로 냈다」[\s\S]*125,000/);
+  assert.ok(await page.$('.gx-wt-row:has-text("삼각김밥") .gx-wt-ic.field'), '필드 아이콘');
+  // 거르기·찾기
   await page.click('[data-action="wallet-filter"][data-value="in"]');
-  assert.equal(await page.locator('.gx-wt-list .gx-wt-main').count(), 1);
+  assert.equal(await rows(page), 1);
   await page.click('[data-action="wallet-filter"][data-value="all"]');
-  // 직접 추가
-  await page.fill('[name="wt-amount"]', '-1.2만');
-  await page.fill('[name="wt-memo"]', '점심');
-  await page.click('[data-action="wallet-add"]');
-  await page.waitForFunction(() => document.querySelector('.gx-wt-bal b')?.textContent?.includes('141,800'));
-  const w = await walletOf(page);
-  assert.ok(w.log.some((e) => e.memo === '점심' && e.amount === -12000 && e.src === 'manual' && e.anchor === ''));
-  // 지우기
-  await page.click('.gx-wt-list li:has-text("점심") [data-action="wallet-del"]');
-  await page.waitForFunction(() => document.querySelector('.gx-wt-bal b')?.textContent?.includes('153,800'));
-  // 잔고 수정
+  await page.fill('.gx-wt-q', '카드');
+  await page.waitForFunction(() => document.querySelectorAll('.gx-wt-row').length === 1);
+  assert.ok(await page.isVisible('.gx-wt-q'), '찾는 동안 입력칸 유지');
+  await page.fill('.gx-wt-q', '');
+  await page.waitForFunction(() => document.querySelectorAll('.gx-wt-row').length === 3);
+  // 지우기 (마우스 올리면 ✕)
+  await page.hover('.gx-wt-row:has-text("상품권")');
+  await page.click('.gx-wt-row:has-text("상품권") .gx-wt-del');
+  await page.waitForFunction(() => document.querySelector('.gx-wt-balrow b')?.textContent?.includes('123,800'));
+  // 잔고 고치기 (✎)
+  await page.click('.gx-wt-pen');
   await page.fill('[name="wt-adj"]', '20만');
   await page.click('[data-action="wallet-adj"]');
-  await page.waitForFunction(() => document.querySelector('.gx-wt-bal b')?.textContent?.includes('200,000'));
-  assert.match(await page.textContent('.gx-wt-nums .in'), /\+30,000/, '잔고 수정은 수입에 안 섞임');
-  assert.match(await page.textContent('.gx-wt-nums'), /수정\s*\+46,200/);
+  await page.waitForFunction(() => document.querySelector('.gx-wt-balrow b')?.textContent?.includes('200,000'));
+  assert.equal(await page.locator('[name="wt-adj"]').count(), 0, '저장하면 고치기 칸 닫힘');
+  const w = await walletOf(page);
+  assert.ok(w.log.some((e) => e.src === 'manual' && e.amount === 76200));
+  assert.match((await page.locator('.gx-wt-tile').allTextContents())[1], /수입\s*\+0/, '직접 수정은 수입·지출에 안 섞임');
+  assert.ok(await page.$('.gx-wt-row .gx-wt-ic.manual'), '직접 수정 아이콘');
   if (shots) await page.screenshot({ path: `${shots}/wallet-pc.png` });
   // ID카드 잔고 칩도 탭으로
   await page.click('.gx-nav > .gx-nb[data-value="board"]');
@@ -165,18 +178,20 @@ const walletOf = (page) => page.evaluate(() => JSON.parse(window.__chat.scriptst
   await page.close();
 }
 
-// 모바일: 머리 잔고 단추, ID카드 창의 잔고 칩
+// 모바일: 머리 잔고 단추, 줄을 누르면 ✕, ID카드 창의 잔고 칩
 {
   const { page, errors } = await boot(fixture, chat(), { width: 390, height: 844 });
   await open(page);
   await page.waitForSelector('.gx-hwallet');
-  assert.ok(await page.isVisible('.gx-hwallet'), '모바일 머리에 잔고');
   assert.match(await page.textContent('.gx-hwallet'), /153,800/);
   await page.click('.gx-hwallet');
   await page.waitForSelector('.gx-wallettab');
   assert.equal(await page.locator('.gx-hwallet').count(), 0, '가계부 탭에서는 머리 잔고 단추 숨김');
-  if (shots) await page.screenshot({ path: `${shots}/wallet-mobile.png` });
-  await page.click('.gx-mbar [data-value="board"] >> nth=0').catch(() => page.locator('[data-value="board"]:visible').first().click());
+  assert.equal(await page.isVisible('.gx-wt-row:has-text("택시비") .gx-wt-del'), false);
+  await page.click('.gx-wt-row:has-text("택시비") .gx-wt-main');
+  assert.equal(await page.isVisible('.gx-wt-row:has-text("택시비") .gx-wt-del'), true, '누르면 ✕');
+  if (shots) await page.screenshot({ path: `${shots}/wallet-mobile.png`, fullPage: true });
+  await page.locator('[data-value="board"]:visible').first().click();
   await page.click('.gx-idbtn');
   await page.waitForSelector('.gx-idpop .gx-wallet');
   await page.click('.gx-idpop .gx-wallet');

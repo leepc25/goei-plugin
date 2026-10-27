@@ -25,7 +25,7 @@ export function createWallet(): GameWallet {
       const c = await same().catch(() => null);
       return c && on(c.chat) ? balanceOf(c.chat) : null;
     },
-    add(amount, memo) {
+    add(amount, memo, where) {
       // 거래 순서가 뒤바뀌지 않게 하나씩
       const run = async (): Promise<number | null> => {
         if (!Number.isFinite(amount) || !Math.trunc(amount)) return null;
@@ -34,7 +34,7 @@ export function createWallet(): GameWallet {
         let after: number | null = null;
         await updateChat(c.charIndex, c.chatIndex, (chat) => {
           if (chat.id !== c.chat.id) return null;
-          const w = withFieldTrade(readWallet(chat.scriptstate, start()), anchorOf(chat), amount, String(memo ?? ''), `f_${crypto.randomUUID()}`);
+          const w = withFieldTrade(readWallet(chat.scriptstate, start()), anchorOf(chat), amount, String(memo ?? ''), `f_${crypto.randomUUID()}`, where ?? {});
           const next = { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...walletVars(w) } };
           after = balanceOf(next);
           return next;

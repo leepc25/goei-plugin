@@ -132,7 +132,7 @@ function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui
   b?.people?.onChange(() => { readPeople(); readWallet(); });
   /** 필드 거래: 같은 장부에 출처 「필드」로 적는다 (+ 들어옴, − 나감). 가게·거래 화면이 이걸 부른다 */
   const pay = async (amount: number, memo: string): Promise<number | null> => {
-    const after = (await b?.wallet?.add(amount, memo).catch(() => null)) ?? null;
+    const after = (await b?.wallet?.add(amount, memo, { place: fieldClock.place || undefined, time: fieldClock.sec === null ? undefined : clockText(fieldClock.sec) }).catch(() => null)) ?? null;
     if (after !== null) {
       fieldWallet.won = after;
       void b?.field?.record({ kind: 'trade', text: `${memo} ${amount < 0 ? '−' : '+'}${Math.abs(amount).toLocaleString('en-US')}원`, scene: fieldClock.place || undefined, weight: 1, visit: visitId }).catch(() => {});

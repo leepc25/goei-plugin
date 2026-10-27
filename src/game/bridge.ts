@@ -226,8 +226,8 @@ export interface GamePeople {
 export interface GameWallet {
   /** 지금 잔고(원). 이 채팅에서 잔고 칸을 끈 경우 null (게임은 돈 기능을 숨긴다) */
   balance(): Promise<number | null>;
-  /** 필드 거래 한 줄: 들어오면 +, 나가면 −. 모자라도 적는다(마이너스 = 빚, 막는 건 게임이). 적은 뒤 잔고, 못 적으면 null */
-  add(amount: number, memo: string): Promise<number | null>;
+  /** 필드 거래 한 줄: 들어오면 +, 나가면 −. 모자라도 적는다(마이너스 = 빚, 막는 건 게임이). where = 필드 장면 이름·필드 시각(가계부 줄에 보임). 적은 뒤 잔고, 못 적으면 null */
+  add(amount: number, memo: string, where?: { place?: string; time?: string }): Promise<number | null>;
 }
 
 export interface GameUiPrefs {
